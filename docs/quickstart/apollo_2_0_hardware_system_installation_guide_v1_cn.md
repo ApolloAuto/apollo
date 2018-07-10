@@ -1,6 +1,4 @@
 # Apollo 2.0 Hardware and System Installation Guide
-<!-- TOC -->
-
 - [关于本篇指南](#关于本篇指南)
     - [文档编写规则](#文档编写规则)
 - [引言](#引言)
@@ -30,7 +28,7 @@
         - [主要部件安装图](#主要部件安装图)
         - [安装GPS的接收器和天线](#安装gps的接收器和天线)
             - [选项1：安装NovAtel SPAN-IGM-A1](#选项1安装novatel-span-igm-a1)
-            - [选项2：NovAtel SPAN® ProPak6™ 和 NovAtel IMU-IGM-A1](#选项2novatel-span®-propak6™-和-novatel-imu-igm-a1)
+            - [选项2: NovAtel SPAN ProPak6和NovAtel IMU-IGM-A1](#选项2-novatel-span-propak6和novatel-imu-igm-a1)
         - [安装激光雷达(LiDAR) (LiDAR)](#安装激光雷达lidar-lidar)
             - [选项 1: 安装 Velodyne HDL-64E S3](#选项-1-安装-velodyne-hdl-64e-s3)
             - [选项 2: 安装 Hesai Pandora](#选项-2-安装-hesai-pandora)
@@ -41,7 +39,6 @@
 - [额外任务](#额外任务)
 - [下一步](#下一步)
 
-<!-- /TOC -->
 # 关于本篇指南
 
 本篇指南提供了所有 **Apollo项目**需要的的安装硬件部分和软件系统教程。系统安装信息包括下载和安装Apollo Linux内核的过程。
@@ -1054,4 +1051,4 @@ SETIMUTOANTOFFSET -0.05 0.5 0.8 0.05 0.05 0.08
 
 # 下一步
 
-完成硬件部分的安装之后，可以参考快速入门的教程 [Apollo Quick Start](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_1_5_quick_start.md) 完成软件部分的安装。
+完成硬件部分的安装之后，可以参考快速入门的教程 [Apollo Quick Start](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_1_5_quick_start_cn.md) 完成软件部分的安装。
