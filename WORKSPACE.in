@@ -203,3 +203,10 @@ new_local_repository(
     build_file = "third_party/adv_plat.BUILD",
     path = "/usr/local/apollo/adv_plat"
 )
+#libprotobuf-mutator
+new_git_repository(
+    name = "libprotobuf_mutator",
+    build_file = "third_party/libprotobuf_mutator.BUILD",
+    commit = "b9e7e4f1ad7de94877de0570733badfba9b7aee3",
+    remote = "https://github.com/jiayunhan/libprotobuf-mutator",
+)
