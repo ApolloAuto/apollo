@@ -124,3 +124,7 @@ For additional information on the NovAtel SPAN-IGM-A1:
 *  [SPAN-IGM™ Quick Start Guide](http://www.novatel.com/assets/Documents/Manuals/GM-14915114.pdf)
 
 * [SPAN-IGM™ User Manual](http://www.novatel.com/assets/Documents/Manuals/OM-20000141.pdf)
+
+## Disclaimer
+
+This device is `Apollo Platform Supported`

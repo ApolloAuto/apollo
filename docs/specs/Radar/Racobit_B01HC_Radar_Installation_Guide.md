@@ -13,6 +13,10 @@ Racobit developed one Radar product with **60 degree FOV** and **150 m** detecti
 5. You should be able to receive the CAN messages through the CAN port once the Radar is powered.
 6. Please discuss with the vendor for additional support if needed while integrating it with your vehicle. 
 
+## Disclaimer
+
+This device is `Apollo Hardware Development Platform Supported`
+
   
 
   

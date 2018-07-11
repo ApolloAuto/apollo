@@ -88,12 +88,10 @@ class NaviPathDecider : public Task {
   /**
    * @brief take a section of the reference line as the initial path trajectory.
    * @param reference_line input reference line.
-   * @param init_point start plan point.
    * @param path_points output points intercepted from the reference line
    * @return if success return true or return false.
    */
-  bool GetLocalPath(const ReferenceLine &reference_line,
-                    const common::TrajectoryPoint &init_point,
+  bool GetBasicPathData(const ReferenceLine &reference_line,
                     std::vector<common::PathPoint> *const path_points);
 
   /**
@@ -132,7 +130,8 @@ class NaviPathDecider : public Task {
   common::VehicleState vehicle_state_;
   NaviPathDeciderConfig config_;
   std::string cur_reference_line_lane_id_;
-  std::map<std::string, double> last_lane_id_to_start_y_;
+  std::map<std::string, double> last_lane_id_to_adc_project_y_;
+  std::map<std::string, bool> last_lane_id_to_nudge_flag_;
 
   FRIEND_TEST(NaviPathDeciderTest, SmoothInitY);
 };

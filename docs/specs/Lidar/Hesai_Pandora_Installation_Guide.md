@@ -56,3 +56,7 @@ The detailed configuration steps can be found in the manual provided on Hesai Te
 * A Detailed Specification sheet on Pandora can be found at the following [website link](http://www.hesaitech.com/en/pandora.html)
 
 * Additional information about Pandora - Hesai can be found [here](https://drive.google.com/file/d/1THtxhlrzmyVpV_IZufRsYUBudmHTd8Ge/view)
+
+## Disclaimer
+
+This device is `Apollo Platform Supported`
