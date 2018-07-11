@@ -118,12 +118,12 @@ bool LatController::LoadControlConf(const ControlConf *control_conf) {
 
   lf_ = wheelbase_ * (1.0 - mass_front / mass_);
   lr_ = wheelbase_ * (1.0 - mass_rear / mass_);
+
+  // moment of inertia
   iz_ = lf_ * lf_ * mass_front + lr_ * lr_ * mass_rear;
 
   lqr_eps_ = control_conf->lat_controller_conf().eps();
   lqr_max_iteration_ = control_conf->lat_controller_conf().max_iteration();
-
-  query_relative_time_ = control_conf->query_relative_time();
 
   minimum_speed_protection_ = control_conf->minimum_speed_protection();
 
@@ -185,6 +185,7 @@ Status LatController::Init(const ControlConf *control_conf) {
   matrix_a_ = Matrix::Zero(basic_state_size_, basic_state_size_);
   matrix_ad_ = Matrix::Zero(basic_state_size_, basic_state_size_);
   matrix_adc_ = Matrix::Zero(matrix_size, matrix_size);
+
   matrix_a_(0, 1) = 1.0;
   matrix_a_(1, 2) = (cf_ + cr_) / mass_;
   matrix_a_(2, 3) = 1.0;
@@ -290,7 +291,7 @@ Status LatController::ComputeControlCommand(
                                     orientation.qy(), orientation.qz());
     }
 
-    // new plannng trajectory
+    // new planning trajectory
     if (time_stamp_diff > 1.0e-6) {
       init_vehicle_x_ = curr_vehicle_x;
       init_vehicle_y_ = curr_vehicle_y;
@@ -336,7 +337,7 @@ Status LatController::ComputeControlCommand(
 
   // Update state = [Lateral Error, Lateral Error Rate, Heading Error, Heading
   // Error Rate, preview lateral error1 , preview lateral error2, ...]
-  UpdateStateAnalyticalMatching(debug);
+  UpdateState(debug);
 
   UpdateMatrix();
 
@@ -438,12 +439,10 @@ Status LatController::ComputeControlCommand(
 }
 
 Status LatController::Reset() {
-  previous_heading_error_ = 0.0;
-  previous_lateral_error_ = 0.0;
   return Status::OK();
 }
 
-void LatController::UpdateStateAnalyticalMatching(SimpleLateralDebug *debug) {
+void LatController::UpdateState(SimpleLateralDebug *debug) {
   if (FLAGS_enable_navigation_mode_handlilng) {
     ComputeLateralErrors(0.0, 0.0, VehicleStateProvider::instance()->heading(),
                          VehicleStateProvider::instance()->linear_velocity(),
@@ -514,7 +513,7 @@ void LatController::UpdateMatrixCompound() {
   matrix_bdc_.block(0, 0, basic_state_size_, 1) = matrix_bd_;
   if (preview_window_ > 0) {
     matrix_bdc_(matrix_bdc_.rows() - 1, 0) = 1;
-    // Update augument A matrix;
+    // Update A matrix;
     for (int i = 0; i < preview_window_ - 1; ++i) {
       matrix_adc_(basic_state_size_ + i, basic_state_size_ + 1 + i) = 1;
     }
@@ -550,42 +549,32 @@ void LatController::ComputeLateralErrors(
   ADEBUG << "x point: " << x << " y point: " << y;
   ADEBUG << "match point information : " << target_point.ShortDebugString();
 
-  const double cos_matched_theta = std::cos(target_point.path_point().theta());
-  const double sin_matched_theta = std::sin(target_point.path_point().theta());
-  // d_error = cos_matched_theta * dy - sin_matched_theta * dx;
-  // lateral_error_ = lateral_rate_filter_.Filter(raw_lateral_error);
+  const double cos_target_heading = std::cos(target_point.path_point().theta());
+  const double sin_target_heading = std::sin(target_point.path_point().theta());
 
-  // TODO(QiL): Code reformat when done with test
-  const double raw_lateral_error =
-      cos_matched_theta * dy - sin_matched_theta * dx;
+  double lateral_error =
+      cos_target_heading * dy - sin_target_heading * dx;
   if (FLAGS_enable_navigation_mode_handlilng) {
-    double filtered_lateral_error =
-        lateral_error_filter_.Update(raw_lateral_error);
-    debug->set_lateral_error(filtered_lateral_error);
-  } else {
-    debug->set_lateral_error(raw_lateral_error);
+    lateral_error = lateral_error_filter_.Update(lateral_error);
   }
-  const double delta_theta =
+  debug->set_lateral_error(lateral_error);
+
+  double heading_error =
       common::math::NormalizeAngle(theta - target_point.path_point().theta());
-  const double sin_delta_theta = std::sin(delta_theta);
-  // d_error_dot = linear_v * sin_delta_theta;
-  // theta_error = delta_theta
-  // TODO(QiL): Code reformat after test
-  debug->set_lateral_error_rate(linear_v * sin_delta_theta);
   if (FLAGS_enable_navigation_mode_handlilng) {
-    debug->set_heading_error(heading_error_filter_.Update(delta_theta));
-  } else {
-    debug->set_heading_error(delta_theta);
+    heading_error = heading_error_filter_.Update(heading_error);
   }
+  debug->set_heading_error(heading_error);
 
-  // theta_error_dot = angular_v - target_point.path_point().kappa() *
-  // target_point.v();
-  debug->set_heading_error_rate(angular_v - target_point.path_point().kappa() *
-                                                target_point.v());
+  auto lateral_error_dot = linear_v * std::sin(heading_error);
+  debug->set_lateral_error_rate(lateral_error_dot);
 
-  // matched_theta = 3.path_point().theta();
+  auto heading_error_rate = angular_v - target_point.path_point().kappa() *
+      target_point.v();
+  debug->set_heading_error_rate(heading_error_rate);
+
   debug->set_ref_heading(target_point.path_point().theta());
-  // matched_kappa = target_point.path_point().kappa();
+
   debug->set_curvature(target_point.path_point().kappa());
 }
 
