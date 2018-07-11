@@ -91,6 +91,12 @@ TEST_F(SimpleControlTest, monitor_fatal) {
 }  // namespace control
 }  // namespace apollo
 
+/******************************************************
+* To fuzz certain functions that takes hard-coded file 
+* as input, and you don't want to make excessive 
+* modification. You can save the mutated message into file
+* before calling the target function.  
+******************************************************/
 DEFINE_PROTO_FUZZER(const apollo::planning::ADCTrajectory& message){
   apollo::control::simple_control_fuzzer.SetUp();
   apollo::control::simple_control_fuzzer.SetUpTestCase();

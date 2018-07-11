@@ -42,6 +42,11 @@ using LocalizationPb = apollo::localization::LocalizationEstimate;
 using ChassisPb = apollo::canbus::Chassis;
 using apollo::common::VehicleStateProvider;
 
+/******************************************************
+* Fuzzer class should inherit the target class in order
+* to invoke the target member function
+******************************************************/
+
 class LatControllerFuzzer : LatController{
   public:
   virtual void SetUp() {
@@ -92,8 +97,11 @@ class LatControllerFuzzer : LatController{
   double timestamp_ = 0.0;
   LatControllerConf lateral_conf_;
 };
-
-
+/******************************************************
+* Implements the target function that takes the protobuf
+* message structure. This function is modified from the 
+* original TEST_F gtest function. 
+******************************************************/
 void LatControllerFuzzer::target(planning::ADCTrajectory planning_trajectory_pb){
 
   timestamp_ = Clock::NowInSeconds();
@@ -122,6 +130,13 @@ void LatControllerFuzzer::target(planning::ADCTrajectory planning_trajectory_pb)
 
 }} //End of namespace
 
+/******************************************************
+* The test driver function. feed the mutated message to
+* the target function. In addition, some doman specific
+* constraints can be added, befor feeding the message.
+* The constraints can also help bypass discovered bugs, 
+* that are not patched yet. 
+******************************************************/
 DEFINE_PROTO_FUZZER(const apollo::planning::ADCTrajectory& message){
   apollo::control::LatControllerFuzzer fuzzer;
   if(message.header().module_name()!="") /*&&
