@@ -136,8 +136,9 @@ function build() {
 
   # Clear KV DB and update commit_id after compiling.
   rm -fr data/kv_db
+  REVISION=$(get_revision)
   python modules/tools/common/kv_db.py put \
-      "apollo:data:commit_id" "$(git rev-parse HEAD)"
+      "apollo:data:commit_id" "$REVISION"
 
   if [ -d /apollo-simulator ] && [ -e /apollo-simulator/build.sh ]; then
     cd /apollo-simulator && bash build.sh build
@@ -283,7 +284,7 @@ function release() {
 
   # release info
   META="${APOLLO_RELEASE_DIR}/meta.ini"
-  echo "git_commit: $(git rev-parse HEAD)" >> $META
+  echo "git_commit: $(get_revision)" >> $META
   echo "car_type: LINCOLN.MKZ" >> $META
   echo "arch: ${MACHINE_ARCH}" >> $META
 }
@@ -420,10 +421,26 @@ function gen_doc() {
 }
 
 function version() {
+  rev=$(get_revision)
+  if [ "$rev" = "unknown" ];then
+    echo "Version: $rev"
+    return
+  fi
   commit=$(git log -1 --pretty=%H)
   date=$(git log -1 --pretty=%cd)
   echo "Commit: ${commit}"
   echo "Date: ${date}"
+}
+
+function get_revision() {
+  git rev-parse --is-inside-work-tree &> /dev/null
+  if [ $? = 0 ];then
+    REVISION=$(git rev-parse HEAD)
+  else
+    warning "Could not get the version number, maybe this is not a git work tree." >&2
+    REVISION="unknown"
+  fi
+  echo "$REVISION"
 }
 
 function build_velodyne() {
