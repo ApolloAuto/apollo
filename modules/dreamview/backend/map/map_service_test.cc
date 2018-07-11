@@ -73,5 +73,28 @@ TEST_F(MapServiceTest, GetStartPoint) {
   EXPECT_DOUBLE_EQ(0.0, start_point.z());
 }
 
+TEST_F(MapServiceTest, GetPoseWithRegardToLane) {
+  double theta, s;
+  EXPECT_TRUE(map_service->GetPoseWithRegardToLane(-1826, -3027, &theta, &s));
+  EXPECT_DOUBLE_EQ(2.8771504789266014, theta);
+  EXPECT_DOUBLE_EQ(0.0, s);
+}
+
+TEST_F(MapServiceTest, ConstructLaneWayPoint) {
+  apollo::routing::LaneWaypoint way_point;
+  EXPECT_TRUE(map_service->ConstructLaneWayPoint(-1826, -3027, &way_point));
+  EXPECT_EQ("l1", way_point.id());
+  EXPECT_DOUBLE_EQ(0.0, way_point.s());
+  EXPECT_DOUBLE_EQ(-1826, way_point.pose().x());
+  EXPECT_DOUBLE_EQ(-3027, way_point.pose().y());
+}
+
+TEST_F(MapServiceTest, CalculateMapHash) {
+  MapElementIds ids;
+  ids.add_lane("l1");
+  size_t hash_code = map_service->CalculateMapHash(ids);
+  EXPECT_EQ(7655793271563537204, hash_code);
+}
+
 }  // namespace dreamview
 }  // namespace apollo

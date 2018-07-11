@@ -1,4 +1,4 @@
-## Guide for Navtech NV-GI120
+## Navtech_NV-GI120安装指南
 
 ```
 NV-GI120 is a position and orientation system for automatic drive of NAV Technology. With the
@@ -11,23 +11,24 @@ for post-processing high-precision resolution.
 
 ![navtech_pic](images/navtech_pic.png)
 
-NV-GI120 integrates the GNSS receiver and MEMS IMU device into a compact package to provide high precision localization  results. It supports dual antenna configuration and multi-frequency reception. 
+NV-GI120将GNSS接收器和MEMS IMU设备集成进一个小型的紧凑装置中，以提供高精度的定位结果。它支持双重天线配置和多频段频率的接收。
 
-### Installation
+### 安装
 
 ![navtech_pic](images/navtech_cables.png)
 
-1. The antennas(antennae) can be connected to the module via SMA connection.
+1. 可以通过SMA连接方式将天线和该设备进行连接
 
-2. A cable bundle is provided with the navigation module. One cable breaks out to multiple connectors to handle communication and configuration.
+2. 一个数据线捆和该设备一起提供。该数据线捆可以分出多个连接器以处理通讯和配置工作
 
-3. The configuration is similar to what can be done on Novatel devices. Please contact the vendor for detailed instructions.
+3. 配置工作和对Novatel设备的操作相同。请联系设备供应商获取详细的配置指令
 
-4. The table for the labels on the break out cable bundle and the corresponding explanations/translations is shown below:
+4. 数据线上的标签和相对应的解释/翻译在下表中展示：
+
 
    | Labels         | Explanations                                     |
    | -------------- | ------------------------------------------------ |
-   | PPS            | Pulse per second                                 |
+   | PPS            | Pulse per second（每秒脉冲数）                                 |
    | 导航           | navigation output （replaceable by the ethernet) |
    | 板卡           | -------                                          |
    | 里程           | Odometer connection                              |
@@ -36,6 +37,6 @@ NV-GI120 integrates the GNSS receiver and MEMS IMU device into a compact package
    | Two naked wire | Power （red and blue)                            |
    | 扩展           | Extension                                        |
 
-## Disclaimer
+## 免责声明
 
 This device is `Apollo Hardware Development Platform Supported`
