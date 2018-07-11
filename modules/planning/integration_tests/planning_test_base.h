@@ -38,24 +38,24 @@ namespace planning {
 
 using common::adapter::AdapterManager;
 
-#define RUN_GOLDEN_TEST(sub_case_num)                                        \
-  {                                                                          \
-    const ::testing::TestInfo* const test_info =                             \
-        ::testing::UnitTest::GetInstance()->current_test_info();             \
-    bool no_trajectory_point = false;                                        \
-    bool run_planning_success = RunPlanning(test_info->name(), sub_case_num, \
-                                            no_trajectory_point);            \
-    EXPECT_TRUE(run_planning_success);                                       \
+#define RUN_GOLDEN_TEST(sub_case_num)                                      \
+  {                                                                        \
+    const ::testing::TestInfo* const test_info =                           \
+        ::testing::UnitTest::GetInstance()->current_test_info();           \
+    bool no_trajectory_point = false;                                      \
+    bool run_planning_success =                                            \
+        RunPlanning(test_info->name(), sub_case_num, no_trajectory_point); \
+    EXPECT_TRUE(run_planning_success);                                     \
   }
 
-#define RUN_GOLDEN_TEST_DECISION(sub_case_num)                               \
-  {                                                                          \
-    const ::testing::TestInfo* const test_info =                             \
-        ::testing::UnitTest::GetInstance()->current_test_info();             \
-    bool no_trajectory_point = true;                                         \
-    bool run_planning_success = RunPlanning(test_info->name(), sub_case_num, \
-                                            no_trajectory_point);            \
-    EXPECT_TRUE(run_planning_success);                                       \
+#define RUN_GOLDEN_TEST_DECISION(sub_case_num)                             \
+  {                                                                        \
+    const ::testing::TestInfo* const test_info =                           \
+        ::testing::UnitTest::GetInstance()->current_test_info();           \
+    bool no_trajectory_point = true;                                       \
+    bool run_planning_success =                                            \
+        RunPlanning(test_info->name(), sub_case_num, no_trajectory_point); \
+    EXPECT_TRUE(run_planning_success);                                     \
   }
 
 #define TMAIN                                            \

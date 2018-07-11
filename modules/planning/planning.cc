@@ -198,8 +198,9 @@ void Planning::PublishPlanningPb(ADCTrajectory* trajectory_pb,
         AdapterManager::GetRoutingResponse()->GetLatestObserved().header());
   }
 
-  if (trajectory_pb->trajectory_point_size() == 0) {
-    SetFallbackCruiseTrajectory(trajectory_pb);
+  if (FLAGS_use_planning_fallback &&
+      trajectory_pb->trajectory_point_size() == 0) {
+    SetFallbackTrajectory(trajectory_pb);
   }
 
   // NOTICE:
@@ -427,20 +428,39 @@ void Planning::RunOnce() {
   FrameHistory::instance()->Add(seq_num, std::move(frame_));
 }
 
-void Planning::SetFallbackCruiseTrajectory(ADCTrajectory* cruise_trajectory) {
-  CHECK_NOTNULL(cruise_trajectory);
+void Planning::SetFallbackTrajectory(ADCTrajectory* trajectory_pb) {
+  CHECK_NOTNULL(trajectory_pb);
 
-  const double v = VehicleStateProvider::instance()->linear_velocity();
-  for (double t = 0.0; t < FLAGS_navigation_fallback_cruise_time; t += 0.1) {
-    const double s = t * v;
+  if (FLAGS_use_navigation_mode) {
+    const double v = VehicleStateProvider::instance()->linear_velocity();
+    for (double t = 0.0; t < FLAGS_navigation_fallback_cruise_time; t += 0.1) {
+      const double s = t * v;
 
-    auto* cruise_point = cruise_trajectory->add_trajectory_point();
-    cruise_point->mutable_path_point()->CopyFrom(
-        common::util::MakePathPoint(s, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
-    cruise_point->mutable_path_point()->set_s(s);
-    cruise_point->set_v(v);
-    cruise_point->set_a(0.0);
-    cruise_point->set_relative_time(t);
+      auto* cruise_point = trajectory_pb->add_trajectory_point();
+      cruise_point->mutable_path_point()->CopyFrom(
+          common::util::MakePathPoint(s, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
+      cruise_point->mutable_path_point()->set_s(s);
+      cruise_point->set_v(v);
+      cruise_point->set_a(0.0);
+      cruise_point->set_relative_time(t);
+    }
+  } else {
+    // use planning trajecotry from last cycle
+    auto* last_planning = AdapterManager::GetPlanning();
+    if (last_planning != nullptr) {
+      ADCTrajectory traj = last_planning->GetLatestObserved();
+
+      const double current_time_stamp = trajectory_pb->header().timestamp_sec();
+      const double pre_time_stamp = traj.header().timestamp_sec();
+
+      for (int i = 0; i < traj.trajectory_point_size(); ++i) {
+        const double t = traj.trajectory_point(i).relative_time() +
+                         pre_time_stamp - current_time_stamp;
+        auto* p = trajectory_pb->add_trajectory_point();
+        p->CopyFrom(traj.trajectory_point(i));
+        p->set_relative_time(t);
+      }
+    }
   }
 }
 
