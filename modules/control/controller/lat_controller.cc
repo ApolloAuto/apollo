@@ -29,6 +29,7 @@
 #include "modules/common/log.h"
 #include "modules/common/math/linear_quadratic_regulator.h"
 #include "modules/common/math/math_utils.h"
+#include "modules/common/math/quaternion.h"
 #include "modules/common/time/time.h"
 #include "modules/common/util/string_util.h"
 #include "modules/control/common/control_gflags.h"
@@ -269,8 +270,66 @@ Status LatController::ComputeControlCommand(
     ControlCommand *cmd) {
   VehicleStateProvider::instance()->set_linear_velocity(chassis->speed_mps());
 
+  auto target_tracking_trajectory = *planning_published_trajectory;
+
+  if (FLAGS_use_navigation_mode) {
+    auto time_stamp_diff =
+        planning_published_trajectory->header().timestamp_sec()
+        - current_trajectory_timestamp_;
+
+    auto curr_vehicle_x = localization->pose().position().x();
+    auto curr_vehicle_y = localization->pose().position().y();
+
+    double curr_vehicle_heading = 0.0;
+    const auto &orientation = localization->pose().orientation();
+    if (localization->pose().has_heading()) {
+      curr_vehicle_heading = localization->pose().heading();
+    } else {
+      curr_vehicle_heading =
+          common::math::QuaternionToHeading(orientation.qw(), orientation.qx(),
+                                    orientation.qy(), orientation.qz());
+    }
+
+    // new plannng trajectory
+    if (time_stamp_diff > 1.0e-6) {
+      init_vehicle_x_ = curr_vehicle_x;
+      init_vehicle_y_ = curr_vehicle_y;
+      init_vehicle_heading_ = curr_vehicle_heading;
+
+      current_trajectory_timestamp_ =
+          planning_published_trajectory->header().timestamp_sec();
+    } else {
+      auto x_diff = curr_vehicle_x - init_vehicle_x_;
+      auto y_diff = curr_vehicle_y - init_vehicle_y_;
+      auto theta_diff = curr_vehicle_heading - init_vehicle_heading_;
+
+      auto cos_theta = std::cos(-theta_diff);
+      auto sin_theta = std::sin(-theta_diff);
+
+      auto tx = -(cos_theta * x_diff - sin_theta * y_diff);
+      auto ty = -(sin_theta * x_diff + cos_theta * y_diff);
+
+      auto trajectory_points = target_tracking_trajectory.trajectory_point();
+      std::for_each(trajectory_points.begin(), trajectory_points.end(),
+          [&cos_theta, &sin_theta, &tx, &ty, &theta_diff]
+           (common::TrajectoryPoint& p) {
+            auto x = p.path_point().x();
+            auto y = p.path_point().y();
+            auto theta = p.path_point().theta();
+
+            auto x_new = cos_theta * x - sin_theta * y + tx;
+            auto y_new = sin_theta * x + cos_theta * y + ty;
+            auto theta_new = common::math::WrapAngle(theta - theta_diff);
+
+            p.mutable_path_point()->set_x(x_new);
+            p.mutable_path_point()->set_y(y_new);
+            p.mutable_path_point()->set_theta(theta_new);
+          });
+    }
+  }
+
   trajectory_analyzer_ =
-      std::move(TrajectoryAnalyzer(planning_published_trajectory));
+      std::move(TrajectoryAnalyzer(&target_tracking_trajectory));
 
   SimpleLateralDebug *debug = cmd->mutable_debug()->mutable_simple_lat_debug();
   debug->Clear();
@@ -482,15 +541,8 @@ void LatController::ComputeLateralErrors(
     const double x, const double y, const double theta, const double linear_v,
     const double angular_v, const TrajectoryAnalyzer &trajectory_analyzer,
     SimpleLateralDebug *debug) {
-  // TODO(QiL): change this to conf.
-  TrajectoryPoint target_point;
-  if (FLAGS_use_navigation_mode) {
-    const double current_timestamp = Clock::NowInSeconds();
-    target_point = trajectory_analyzer.QueryNearestPointByAbsoluteTime(
-        current_timestamp + query_relative_time_);
-  } else {
-    target_point = trajectory_analyzer.QueryNearestPointByPosition(x, y);
-  }
+  TrajectoryPoint target_point =
+      trajectory_analyzer.QueryNearestPointByPosition(x, y);
 
   const double dx = x - target_point.path_point().x();
   const double dy = y - target_point.path_point().y();

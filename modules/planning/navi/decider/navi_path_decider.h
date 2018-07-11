@@ -130,8 +130,8 @@ class NaviPathDecider : public Task {
   common::VehicleState vehicle_state_;
   NaviPathDeciderConfig config_;
   std::string cur_reference_line_lane_id_;
-  std::map<std::string, double> last_lane_id_to_start_y_;
-  bool last_plan_has_nudge = false;
+  std::map<std::string, double> last_lane_id_to_adc_project_y_;
+  std::map<std::string, bool> last_lane_id_to_nudge_flag_;
 
   FRIEND_TEST(NaviPathDeciderTest, SmoothInitY);
 };
