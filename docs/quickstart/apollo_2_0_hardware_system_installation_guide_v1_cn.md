@@ -228,16 +228,16 @@ GPS-IMU组件的GPS接收器、天线使用的是 **NovAtel GPS-703-GGG-HV**。
 
 **主要特点:**
 
-- 64 Channels
-- 120m range
-- 2.2 Million Points per Second
-- 360° Horizontal FOV
-- 26.9° Vertical FOV
-- 0.08° angular resolution (azimuth)
-- <2cm accuracy
-- ~0.4° Vertical Resolution
-- User selectable frame rate
-- Rugged Design
+- 线数：64
+- 探测距离：120m 
+- 220万点每秒
+- 水平视场角：360°
+- 垂直视场角：26.9°
+- 水平角分辨率：0.08°(方位角)
+- 精度：<2cm 
+- 垂直角分辨率: ~0.4°
+- 用户可选帧速率
+- 坚固耐用
 
 ![online](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/online_icon.png)Webpage for Velodyne HDL-64E S3:
 [http://velodynelidar.com/hdl-64e.html](http://velodynelidar.com/hdl-64e.html)
@@ -250,18 +250,18 @@ GPS-IMU组件的GPS接收器、天线使用的是 **NovAtel GPS-703-GGG-HV**。
 
 **主要特点:**
 
-- 40 Channels
-- 200m range (20% reflectivity)
-- 720 kHz measuring frequency
-- 360° Horizontal FOV
-- 23° Vertical FOV (-16° to 7°)
-- 0.2° angular resolution (azimuth)
-- <2cm accuracy
-- Vertical Resolution: 0.33° ( from -6° to +2°); 1° (from -16° to -6°, +2° to +7°)
-- User selectable frame rate
-- 360° surrounding view with 4 mono cameras and long disatance front view with 1 color camera
+- 线数：40
+- 探测距离：200米 (20% 反射率)
+- 测量频率：720 kHz
+- 水平视场角：360°
+- 垂直视场角：23° (-16° to 7°)
+- 水平角分辨率：0.2° (方位角)
+- 精度：<2cm
+- 垂直角分辨率: 0.33° (-6°到+2°范围)；1° (-16°到-6°，+2°到+7°范围)
+- 用户可选帧速率
+- 可由4个单摄像机提供360°环绕视野，由1个彩色摄像机提供长距离前视图
 
-![online](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/online_icon.png)Webpage for Hesai Pandora:
+![online](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/online_icon.png) Hesai Pandora的官网:
 [http://www.hesaitech.com/pandora.html](http://www.hesaitech.com/pandora.html)
 
 ## 摄像头
@@ -295,16 +295,23 @@ GPS-IMU组件的GPS接收器、天线使用的是 **NovAtel GPS-703-GGG-HV**。
  - 在将卡插入插槽之前，首先重新定位CAN卡端接跳线，准备并安装控制器局域网（CAN）卡。
 2. 如果未预装硬盘，请先在IPC安装硬盘
     您也可以选择更换预装的硬盘。
+    
      **推荐**：
      - 为了更好的可靠性，安装固态硬盘（SSD）；
+     
      - 如果需要收集驾驶数据，需要使用大容量硬盘；
 3. 准备IPC加电：
+
     a. 将电源线连接到电源连接器（接线端子）
+    
     b. 将显示器，以太网，键盘和鼠标连接到IPC
+    
     c. 将IPC连接到电源
 
 4. 在IPC安装软件（需要部分Linux经验）：
+    
     a. 安装Ubuntu Linux.
+    
     b. 安装Apollo Linux 内核.
 
 **上车安装:**
@@ -494,7 +501,6 @@ bash build.sh
 
 #### 安装 NVIDIA GPU 驱动
 
-The Apollo runtime in the vehicle requires the [NVIDIA GPU Driver](http://www.nvidia.com/download/driverResults.aspx/114708/en-us). You must install the NVIDIA GPU driver with specific options.
 车辆中的Apollo运行需要[NVIDIA GPU 驱动](http://www.nvidia.com/download/driverResults.aspx/114708/en-us)。您必须安装具有特定选项的NVIDIA GPU驱动程序。
 
 1. 下载安装文件
@@ -668,7 +674,7 @@ b. 使用从ESD Electronics获取到得的ESD CAN软件包的一部分的测试�
 [https://www.novatel.com/assets/Documents/Manuals/OM-20000148.pdf](https://www.novatel.com/assets/Documents/Manuals/OM-20000148.pdf)
 
 
-### 安装激光雷达(LiDAR) (LiDAR)
+### 安装激光雷达(LiDAR)
 
 您可从如下两种方案中选择**其一**进行安装:
 
@@ -827,7 +833,7 @@ LiDAR所需的实际高度取决于车辆的设计和LiDAR相对于车辆的安�
 
 本部分描述了安装摄像头的过程。
 
-Apollo参考设计建议使用6毫米和25毫米两个不同焦距的相机。摄像机的安装可以为系统的实际设计量身定做。
+Apollo参考设计建议使用两个不同焦距的相机，一个6毫米，另一个25毫米。摄像机的安装可以为系统的实际设计量身定做。
 
 - 这两个摄像机都应该朝着前进方向。视场（FOV）应尽量远离障碍物。
 
@@ -871,7 +877,7 @@ Apollo参考设计建议使用6毫米和25毫米两个不同焦距的相机。�
 
 2.   将板载计算机系统6108GC放在后备箱内（推荐）。
 
-      例如，阿波罗2.0使用4x4螺钉将6108GC螺栓固定在后备箱的箱板上。 ![IPC-bolt_down-936x720](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/Mount_ipc_on_carpet.JPG)
+      例如，Apollo 2.0使用4x4螺钉将6108GC螺栓固定在后备箱的箱板上。 ![IPC-bolt_down-936x720](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/Mount_ipc_on_carpet.JPG)
 
 3. 安装IPC，使其前后两侧（所有端口位于）面对右侧（乘客）或左侧（驱动器）的后备箱中。
 这种定位使得连接所有电缆更容易。
