@@ -35,7 +35,7 @@ config: {
   rule_id: DESTINATION
   enabled: true
   destination {
-    enable_pull_over: true
+    enable_pull_over: false
     stop_distance: 0.5
     pull_over_plan_distance: 55.00
   }
