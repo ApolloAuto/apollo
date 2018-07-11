@@ -131,7 +131,7 @@ DreamView是一个web应用程序，提供如下的功能：
 | ![](images/dreamview_usage_table/0clip_image048.png) | <ul><li> **自动驾驶模式未准备好** </li></ul>|
 | ![](images/dreamview_usage_table/0clip_image050.png) | <ul><li>**障碍物阻塞道路**</li></ul> |
 | ![](images/dreamview_usage_table/0clip_image052.png) | <ul><li> **前方行人穿越** </li></ul> |
-| ![](images/dreamview_usage_table/0clip_image054.png) | <ul><li>**黄/红信号等** </li></ul>|
+| ![](images/dreamview_usage_table/0clip_image054.png) | <ul><li>**黄/红信号灯** </li></ul>|
 | ![](images/dreamview_usage_table/0clip_image056.png) | <ul><li> **前方有车辆** </li></ul> |
 | ![](images/dreamview_usage_table/0clip_image058.png) | <ul><li> **前方停止标志** </li></ul>|
 | ![](images/dreamview_usage_table/0clip_image060.png) | <ul><li>**前方让行标志** </li></ul> |
