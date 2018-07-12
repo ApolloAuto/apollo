@@ -1,4 +1,5 @@
-# Apollo 2.0 硬件与系统安装指南
+# Apollo 2.5 硬件与系统安装指南
+
 - [关于本篇指南](#关于本篇指南)
     - [文档编写规则](#文档编写规则)
 - [引言](#引言)
@@ -7,15 +8,15 @@
     - [附加组件](#附加组件)
     - [车载计算机系统 - IPC](#车载计算机系统---ipc)
         - [IPC的配置](#ipc的配置)
-        - [IPC前后视图](#ipc前后视图)
+        - [IPC前侧视图](#ipc前侧视图)
     - [控制器局域网络(CAN)卡](#控制器局域网络can卡)
     - [全球定位系统(GPS)和惯性测量装置(IMU)](#全球定位系统gps和惯性测量装置imu)
         - [选项1: NovAtel SPAN-IGM-A1](#选项1-novatel-span-igm-a1)
         - [选项2: NovAtel SPAN ProPak6和NovAtel IMU-IGM-A1](#选项2-novatel-span-propak6和novatel-imu-igm-a1)
-    - [GPS接收器和天线](#gps接收器和天线)
-    - [激光雷达(LiDAR)](#激光雷达lidar)
-        - [选项 1: Velodyne HDL-64E S3](#选项-1-velodyne-hdl-64e-s3)
-        - [选项 2: Hesai Pandora](#选项-2-hesai-pandora)
+    - [The GPS Receiver/Antenna](#the-gps-receiverantenna)
+        - [选项 1: NovAtel GPS-703-GGG-HV](#选项-1-novatel-gps-703-ggg-hv)
+        - [选项 2: Dual NovAtel GNSS-502](#选项-2-dual-novatel-gnss-502)
+    - [激光雷达 (LiDAR)](#激光雷达-lidar)
     - [摄像头](#摄像头)
     - [雷达](#雷达)
 - [安装任务概览](#安装任务概览)
@@ -28,16 +29,15 @@
         - [主要部件安装图](#主要部件安装图)
         - [安装GPS的接收器和天线](#安装gps的接收器和天线)
             - [选项1：安装NovAtel SPAN-IGM-A1](#选项1安装novatel-span-igm-a1)
-            - [选项2: NovAtel SPAN ProPak6和NovAtel IMU-IGM-A1](#选项2-novatel-span-propak6和novatel-imu-igm-a1)
-        - [安装激光雷达(LiDAR) (LiDAR)](#安装激光雷达lidar-lidar)
-            - [选项 1: 安装 Velodyne HDL-64E S3](#选项-1-安装-velodyne-hdl-64e-s3)
-            - [选项 2: 安装 Hesai Pandora](#选项-2-安装-hesai-pandora)
+            - [选项2：NovAtel SPAN® ProPak6™ 和 NovAtel IMU-IGM-A1](#选项2novatel-span®-propak6™-和-novatel-imu-igm-a1)
+        - [安装激光雷达(LiDAR)](#安装激光雷达lidar)
         - [安装摄像头](#安装摄像头)
         - [安装雷达](#安装雷达)
 - [建立网络](#建立网络)
     - [推荐配置](#推荐配置)
 - [额外任务](#额外任务)
 - [下一步](#下一步)
+
 
 # 关于本篇指南
 
@@ -57,15 +57,13 @@
 | ![在线](https://github.com/ireeX/apollo/blob/master/docs/quickstart/images/online_icon.png)   | **在线** 提供指向特定网站的链接，您可以在其中获取更多信息。 |
 | ![警告](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/warning_icon.png) | **警告** 包含 **不能** 被忽略的内容，如果忽略，当前安装步骤可能会失败。 |
 
-
-
 # 引言
 
 **Apollo项目**旨在为汽车和自动驾驶行业的合作伙伴提供开放，完整和可靠的软件平台。该项目的目的是使这些企业能够开发基于Apollo软件栈的自动驾驶系统。
 
 ## 文档说明
 
-以下文档适用于Apollo 2.0:
+以下文档适用于Apollo 2.5:
 
 - ***<u>[Apollo Hardware and System Installation Guide]</u>***  ─ 提供用于安装车辆的硬件部件和系统软件的教程:
 
@@ -96,9 +94,7 @@
 - 全球定位系统(GPS)和惯性测量装置(IMU) ─ 您可从如下选项中任选其一:
   - NovAtel SPN-IGM-A1
   - NovAtel SPAN® ProPak6™ 和 NovAtel IMU-IGM-A1
-- 激光雷达 (LiDAR) ─ 您可从如下选项中任选其一:
-  - Velodyne HDL-64E S3
-  - Hesai Pandora
+- 激光雷达 (LiDAR) - Velodyne HDL-64E S3
 - 摄像头 — 采用 USB 3.0 的Leopard Imaging LI-USB30-AR023ZWDR 
 - 雷达 — Continental ARS408-21
 
@@ -197,34 +193,41 @@ IMU-IGM-A1是与支持SPAN的GNSS接收器（如SPAN ProPak6）配对的IMU。
 
   ![online](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/online_icon.png)NovAtel IMU-IGM-A1 产品页:
 
-[https://www.novatel.com/products/span-gnss-inertial-systems/span-imus/span-mems-imus/imu-igm-a1/#overview](https://www.novatel.com/products/span-gnss-inertial-systems/span-imus/span-mems-imus/imu-igm-a1/#overview)
+[https://www.novatel.com/products/span-gnss-inertial-systems/span-combined-systems/span-igm-a1/](https://www.novatel.com/products/span-gnss-inertial-systems/span-combined-systems/span-igm-a1/)
 
-## GPS接收器和天线
+## The GPS Receiver/Antenna
 
-GPS-IMU组件的GPS接收器、天线使用的是 **NovAtel GPS-703-GGG-HV**。
+GPS-IMU组件的GPS接收器、天线可使用选项有：
 
-**注意:** GPS NovAtelGPS-703-GGG-HV与上文中提到的两个GPS-IMU选项的任一型号配合使用。 
+### 选项 1: **NovAtel GPS-703-GGG-HV**.
 
-![gps_receiver](https://github.com/ireeX/apollo/blob/master/docs/quickstart/images/gps_receiver.png)
+**NOTE:**GPS NovAtelGPS-703-GGG-HV与上文中提到的两个GPS-IMU选项的任一型号配合使用。 
 
-更多关于 NovAtel GPS-703-GGG-HV的信息，请参考:
+![gps_receiver](images/gps_receiver.png)
 
-  ![online](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/online_icon.png) NovAtel GPS-703-GGG-HV 产品页:
+更多关于 NovAtel GPS-703-GGG-HV的信息, 请参考:
+
+  ![online](images/online_icon.png) NovAtel GPS-703-GGG-HV Product Page:
 
 [https://www.novatel.com/products/gnss-antennas/high-performance-gnss-antennas/gps-703-ggg-hv/](https://www.novatel.com/products/gnss-antennas/high-performance-gnss-antennas/gps-703-ggg-hv/)
 
-## 激光雷达(LiDAR)
-有 **两种** GPS-IMU的 **可选方案** ，您可根据需求选择最适合您的方案：
+### 选项 2: **Dual NovAtel GNSS-502** 
+
+**NOTE:**NovAtel GNSS-502与上文中提到的两个GPS-IMU选项的任一型号配合使用。通过使用2个天线，双天线接收器（如ProPak6）得以利用更高质量的航向信息。
+
+![gps_receiver](images/novatel_gnss-502.png)
+
+更多有关 NovAtel GNSS-502的信息, 请参考:
+
+  ![online](images/online_icon.png) NovAtel GNSS-502 产品页:
+
+[https://www.novatel.com/products/gnss-antennas/vexxis-series-antennas/vexxis-gnss-500-series-antennas/](https://www.novatel.com/products/gnss-antennas/vexxis-series-antennas/vexxis-gnss-500-series-antennas/)
 
 
-- **选项 1: Velodyne HDL-64E S3**
-- **选项 2: Hesai Pandora**
+## 激光雷达 (LiDAR)
+由Velodyne LiDAR公司提供的16线激光雷达系统 **HDL-64E S3** 。
 
-### 选项 1: Velodyne HDL-64E S3
-
-使用来自Velodyne激光雷达公司的64线激光雷达系统**HDL-64E S3**。
-
-![lidar_image](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/lidar_pic.png)
+![lidar_image](images/lidar_pic.png)
 
 **主要特点:**
 
@@ -239,40 +242,37 @@ GPS-IMU组件的GPS接收器、天线使用的是 **NovAtel GPS-703-GGG-HV**。
 - 用户可选帧速率
 - 坚固耐用
 
-![online](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/online_icon.png)Webpage for Velodyne HDL-64E S3:
+![online](images/online_icon.png)Velodyne HDL-64E S3的官网:
 [http://velodynelidar.com/hdl-64e.html](http://velodynelidar.com/hdl-64e.html)
 
-### 选项 2: Hesai Pandora
 
-使用来自Hesai Photonics科技有限公司的潘多拉40线激光雷达系统。 
 
-![pandora_image](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/hesai_pandora.png)
+由Velodyne LiDAR公司提供的16线激光雷达系统 **VLP-16**。
+
+![lidar_image](/Users/hanyang07/apollo/docs/quickstart/images/lidar_pic_16.png)
 
 **主要特点:**
 
-- 线数：40
-- 探测距离：200米 (20% 反射率)
-- 测量频率：720 kHz
+- 线数：16
+- 探测距离：100m
+- 600,000点每秒
 - 水平视场角：360°
-- 垂直视场角：23° (-16° to 7°)
-- 水平角分辨率：0.2° (方位角)
-- 精度：<2cm
-- 垂直角分辨率: 0.33° (-6°到+2°范围)；1° (-16°到-6°，+2°到+7°范围)
-- 用户可选帧速率
-- 可由4个单摄像机提供360°环绕视野，由1个彩色摄像机提供长距离前视图
+- 垂直视场角：±15°
+- 低功耗
+- 保护性设计
 
-![online](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/online_icon.png) Hesai Pandora的官网:
-[http://www.hesaitech.com/pandora.html](http://www.hesaitech.com/pandora.html)
+![online](/Users/hanyang07/apollo/docs/quickstart/images/online_icon.png)Velodyne VLP-16官网:
+[http://velodynelidar.com/vlp-16.html](http://velodynelidar.com/vlp-16.html)
 
 ## 摄像头
 
-所使用的相机是Leopard Imaging公司制造的标准USB 3.0接口的LI-USB30-AR023ZWDR，我们建议分别使用6毫米和25毫米镜头的两个相机来实现所需的性能。
+所使用的相机是Leopard Imaging公司制造的标准USB 3.0接口的LI-USB30-AR023ZWDR，我们建议分别使用两个6毫米和一个25毫米镜头的摄像头来实现所需的性能。
 
 ![camera_image](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/LI-camera.png)
 
 ![online](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/online_icon.png)您可以从 Leopard Imaging公司的官网上获得更多信息:
 
-[https://www.leopardimaging.com/LI-USB30-AR230WDR.html](https://www.leopardimaging.com/LI-USB30-AR230WDR.html)
+[https://leopardimaging.com/product/li-usb30-ar023zwdr/](https://leopardimaging.com/product/li-usb30-ar023zwdr/)
 
 
 ## 雷达
@@ -568,7 +568,7 @@ b. 使用从ESD Electronics获取到得的ESD CAN软件包的一部分的测试�
 
 ### 安装GPS的接收器和天线
 
-以下组件 **二选一**:
+以下组件 **二选一**: 
 
 - **选项 1:** GPS-IMU: **NovAtel SPAN-IGM-A1**
 - **选项 2:** GPS-IMU: **NovAtel SPAN® ProPak6™ and NovAtel IMU-IGM-A1**
@@ -619,6 +619,8 @@ b. 使用从ESD Electronics获取到得的ESD CAN软件包的一部分的测试�
 [http://www.novatel.com/assets/Documents/Manuals/OM-20000141.pdf](http://www.novatel.com/assets/Documents/Manuals/OM-20000141.pdf)
 
 
+
+
 #### 选项2：NovAtel SPAN® ProPak6™ 和 NovAtel IMU-IGM-A1
 
 安装说明描述了安装，连接和采取GPS NovAtelSPAN®ProPak6™**和** NovAtel IMU-IGM-A1的杠杆臂测量的步骤。
@@ -648,11 +650,13 @@ b. 使用从ESD Electronics获取到得的ESD CAN软件包的一部分的测试�
 你可以将 ProPak6 和 IMU 放置在车辆以下建议的位置：
 
 - 将ProPak6和IMU并排固定在行李箱内，Y轴指向前方。
+
 - 将NovAtel GPS-703-GGG-HV天线安装在车辆顶部或后备箱盖顶部，如图所示：
 
 ![gps_receiver_on_car](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/gps_receiver_on_car.png)
 
 - 使用磁性适配器将天线紧固到后备箱盖上。
+
 - 通过打开后备箱并将电缆放置在后备箱中，将天线也安装在后备箱中。
 
 ##### 接线
@@ -660,9 +664,13 @@ b. 使用从ESD Electronics获取到得的ESD CAN软件包的一部分的测试�
 按照以下步骤将ProPak6 GNSS接收器和IMU连接到Apollo系统：
 
 1. 使用IMU-IGM-A1附带的分接电缆连接IMU主端口和ProPak6 COM3/IMU端口。
+
 2. 使用USB-MicroUSB转换线，连接IPC的USB端口和ProPak6的MicroUSB端口。
+
 3. 将IMU-IGM-A1分离电缆的另一端连接到车辆电源。
+
 4. 将GNSS天线连接到Propak6。
+
 5. 连接Propak6电源线。
 
 ![wiring](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/wiring.png)
@@ -674,28 +682,18 @@ b. 使用从ESD Electronics获取到得的ESD CAN软件包的一部分的测试�
 [https://www.novatel.com/assets/Documents/Manuals/OM-20000148.pdf](https://www.novatel.com/assets/Documents/Manuals/OM-20000148.pdf)
 
 
+
 ### 安装激光雷达(LiDAR)
 
-您可从如下两种方案中选择**其一**进行安装:
+本部分描述了安装HDL-64E S3 LiDAR的步骤。
 
-- **Option 1:** LiDAR: **Velodyne HDL-64E S3**
-- **Option 2:** LiDAR: **Hesai Pandora**
+#### 安装
 
-#### 选项 1: 安装 Velodyne HDL-64E S3
+您需要一种定制的特定安装结构来成功地将HDL-64E S3激光雷达安装在车辆的顶部。这种结构必须向激光雷达系统提供刚性支撑，同时将激光雷达提高到地面以上的一定高度。这个高度避免了激光雷达的激光束被车辆的前部以及后部阻挡。激光雷达所需的实际高度取决于车辆的设计和激光雷达相对于车辆的安装点。激光器的垂直倾角通常与视距为2～24.8度。为了充分利用探测范围，在林肯MKZ上，建议将激光雷达安装在1.8米（从地面到激光雷达的底部）的最小高度。
 
-本部分描述了HDL-64E S3激光雷达的安装过程。	
+#### 接线
 
-##### 安装
-
-将HDL64E S3 LiDAR成功安装在车辆的顶部，需要一个定制的安装结构。 
-
-这种结构需要为LiDAR提供刚性支撑，同时将LiDAR提升到地面以上的某个高度，避免来自liDAR的激光束被车辆前部或后部阻挡。
-
-LiDAR所需的实际高度取决于车辆的设计和LiDAR相对于车辆的安装点。激光器的垂直倾斜角度通常在相对于地平线的±2〜-24.8度的范围内。为了充分利用检测角度范围，在林肯MKZ上，我们建议将LiDAR安装在1.8米的最小高度（从地面到LiDAR的底部）。
-
-##### 接线
-
-每个HDL-64E S3 LiDAR包括一个将LiDAR连接到电源的电缆组件，计算机（用于数据传输的以太网和用于LiDAR配置的串行端口）和GPS时间同步源。
+每个HDL-64E S3 激光雷达包括一个将LiDAR连接到电源的电缆组件，计算机（用于数据传输的以太网和用于LiDAR配置的串行端口）和GPS时间同步源。
 
 ![LiDAR_Cable](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/HDL64_Cable_whitened_labeled.png)
 
@@ -736,12 +734,14 @@ LiDAR所需的实际高度取决于车辆的设计和LiDAR相对于车辆的安�
    ![Wiring_Schematics_PP6](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/LiDAR_PP6_wiring.png)
 
 5. 通过串口连接进行LiDAR配置
-一些低级的参数可以通过串口进行配置。
-在Velodyne提供的电缆束内，有两对红色/黑色电缆，如下表所示。 较厚的一对（AWG 16）用于为LiDAR系统供电。 较薄的一对用于串行连接。 将黑线（串行输入）连接到RX，将红线连接到串行电缆的地线。 将串行电缆与USB串行适配器连接至所选择的计算机。
 
-![pinout_table](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/pinout_table.png)
+    一些低级的参数可以通过串口进行配置。
 
-##### 配置
+    在Velodyne提供的电缆束内，有两对红色/黑色电缆，如下表所示。 较厚的一对（AWG 16）用于为LiDAR系统供电。 较薄的一对用于串行连接。 将黑线（串行输入）连接到RX，将红线连接到串行电缆的地线。 将串行电缆与USB串行适配器连接至所选择的计算机。
+
+    ![pinout_table](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/pinout_table.png)
+
+   #### 配置
 
    默认情况下，HDL-64E S3的网络IP地址设置为192.168.0.1。 但是，当我们配置Apollo时，我们应该将网络IP地址改为192.168.20.13。 可以使用终端应用程序Terminalite 3.2，进入网络设置命令。可以按照以下步骤配置HDL-64E S3的IP地址：
 
@@ -770,70 +770,21 @@ LiDAR所需的实际高度取决于车辆的设计和LiDAR相对于车辆的安�
 
       [http://velodynelidar.com/hdl-64e.html](http://velodynelidar.com/hdl-64e.html)
 
+#### 安装 VLP-16 lidar (可选)
 
-#### 选项 2: 安装 Hesai Pandora
+Apollo 2.5的地图制作服务已经向公众开放。为了获得地图创建所需的数据，需要在车辆上安装附加的VLP-16激光雷达。LiDAR的目的是收集HDL-64 S3 激光雷达FOV上方的物体的点云信息，例如交通信号灯和标志。它需要一个定制的机架安装VLP-16激光雷达在车辆顶部。下图显示了可以选择的配置之一。![VLP_16_installation](images/VLP16_install_configuration.jpg)
 
-本部分描述了Hesai Pandora激光雷达的安装过程。
+In this specific configuration, the VLP-16 LiDAR is mounted with an upward tilt of 20±2°. The power cable of the VLP-16 is connected to the DataSpeed power panel. The ethernet connection is connected to the IPC (possibly through an ethernet switch). Similar to HDL-64 S3 LiDAR, the VLP-16 GPRMC and PPS input from the GPS receiver. Ideally, additional hardware should be installed to duplicate the GPRMC and PPS signal from the GPS receiver send to HDL-64 and VLP-16 respectively. However, a simple Y-split cable may also provide adequate signal for both LiDAR's. To distingush from the HDL-64 S3 LiDAR, please follow the VLP-16 manual and use the webpage interface to configure the IP of VLP-16 to 192.168.20.14, the data port to 2369, and the telemetry port to 8309. The pinout for the signal input from GPS receiver can also be found in the manual if you need customized cable.
 
-##### 安装
+![online_icon](images/online_icon.png)VLP-16 Manual can be found on this webpage:
 
-将Hesai Pandora 成功安装在车辆的顶部，需要一个定制的安装结构。 
-
-这种结构需要为LiDAR提供刚性支撑，同时将LiDAR提升到地面以上的某个高度，避免来自liDAR的激光束被车辆前部或后部阻挡。
-
-LiDAR所需的实际高度取决于车辆的设计和LiDAR相对于车辆的安装点。激光器的垂直倾斜角度通常在相对于地平线的+7~-16度的范围内。为了充分利用检测角度范围，在林肯MKZ上，我们建议将LiDAR安装在1.7米的最小高度（从地面到LiDAR的底部）。
-
-
-##### 接线
-
-每个Pandora包括一个将LiDAR连接到电源的电缆组件，计算机（用于数据传输的以太网）和GPS时间同步源。
-
-   ![Pandora_cable](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/pandora_cable.png)
-
-1. 连接到Pandora
-
-   将电源和信号电缆连接到LiDAR上的匹配端口
-
-   ![Power_Cabling](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/interface_box_connection.jpg) 
-
-
-2. 连接到电源
-
-   两根AWG 16线为HDL-64E S3提供所需电力。 所需电压/电流：12V/3A。 要连接电源，请与电线完全接触并拧紧螺丝。
-
-   ![Pandora_Power_Cable](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/Pandora_PowerCable.png)
-
-3. 连接到IPC
-
-   与IPC的连接是通过以太网线。将电缆束中的以太网线水晶头插入IPC上的以太网端口。
-
-4. 连接到 GPS:
-
-   Pandora推荐最小特定GPS/传输数据（GPRMC）和每秒脉冲（PPS）信号与GPS时间同步。需要定制连接来建立GPS接收机和LiDAR之间的通信：
-
-   a. SPAN-IGM-A1
-
-   如果您配置了[配置GPS和IMU]（＃configuration-the-gps-and-imu）中指定的SPAN-IGM-A1，GPRMC信号将通过用户端口电缆从主端口从GPS接收器发送。PPS信号通过Aux端口上标有“PPS”和“PPS dgnd”的电缆发送。下图中的虚线框是Pandora和SPAN-IGM-A1 GPS接收机附带的可用连接。剩余的连接需要由用户进行。
-
-   ![Wiring_Schematics_pandora1](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/Pandora_A1_wiring.png)
-   
-   b. Propak 6 和 IMU-IGM-A1
-
-   如果您配置了[配置GPS和IMU]（＃configuration-the-gps-and-imu）中指定的Propak 6，GPRMC信号将通过COM2端口从GPS接收器发送。PPS信号通过IO端口发送。下图中的虚线框是Pandora和Propak 6 GPS接收机附带的可用连接。剩余的连接需要由用户进行。
-
-   ![Wiring_Schematics_pandora2](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/Pandora_PP6_wiring.png)
-
-   Pandora的引脚表如下所示。 
-   ![Pandora_pin](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/Pandora_pinout_table.png)
-
- ![online_icon](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/online_icon.png)Pandora手册可以从如下网页中看到：
-[http://www.hesaitech.com/pandora.html](http://www.hesaitech.com/pandora.html)
+[http://velodynelidar.com/vlp-16.html](http://velodynelidar.com/vlp-16.htmll)
 
 ### 安装摄像头
 
 本部分描述了安装摄像头的过程。
 
-Apollo参考设计建议使用两个不同焦距的相机，一个6毫米，另一个25毫米。摄像机的安装可以为系统的实际设计量身定做。
+Apollo参考设计建议使用三个不同焦距的摄像头：两个6毫米镜头，一个25毫米镜头。这三个摄像头的摆放位置非常灵活，它们可以放置在LiDAR的旁边或前车窗的里。摄像机的安装可以为系统的实际设计量身定做。
 
 - 这两个摄像机都应该朝着前进方向。视场（FOV）应尽量远离障碍物。
 
@@ -848,11 +799,13 @@ Apollo参考设计建议使用两个不同焦距的相机，一个6毫米，另�
 - 使用USB 3.0连接相机（USB 3.0 Micro-B）和IPC（USB 3.0 type A），并用螺钉来加固连接。
 
 
+
+
 ### 安装雷达
 
 本部分介绍了Continental雷达的安装过程。
 
-雷达需要一个匹配的机械机架安装在前保险杠上。安装后，要求雷达朝向驱动方向，稍微向上倾斜不超过2度。 
+雷达需要一个匹配的机械机架安装在前保险杠上。安装后，要求雷达朝向驱动方向，稍微向上倾斜不超过2度。
 
 ![Radar Installations](./images/Radar_OnVehicle.png)
 
@@ -862,24 +815,25 @@ Apollo参考设计建议使用两个不同焦距的相机，一个6毫米，另�
 
 步骤如下:
 
-1. 使用电压转换器/调节器，将车辆的12 VDC输出转换为所需的电压。根据Neousys的建议，使用12 VDC至19 VDC转换器，最大输出电流为20 A.
+1.   使用电压转换器/调节器，将车辆的12 VDC输出转换为所需的电压。根据Neousys的建议，使用12 VDC至19 VDC转换器，最大输出电流为20 A. 
+ 
 
-     ![voltage_regulater_converter](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/voltage_converter2.jpg)
+     ![voltage_regulater_converter](images/voltage_converter2.jpg)
 
-     首先，将两条19 VDC输出线连接到IPC的电源连接器（绿色如下图所示）。
+     a.  首先，将两条19 VDC输出线连接到IPC的电源连接器（绿色如下图所示）。
 
-     ![ipc_power_RB](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/ipc_power_RB.png)
+     ![ipc_power_RB](images/ipc_power_RB.png)
 
-     其次，将12 VDC输入的两条电缆连接到车辆的电源面板。 如果导线的尺寸太厚，则电线应分开成几根线，并分别连接到相应的端口。
+     b. 将12 VDC输入的两条电缆连接到车辆的电源面板。 如果导线的尺寸太厚，则电线应分开成几根线，并分别连接到相应的端口。
 
-     ![warning](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/warning_icon.png)这一步非常有必要。 如果输入电压低于所需极限。 很可能导致系统故障。
+     ![warning](images/warning_icon.png)这一步非常有必要。 如果输入电压低于所需极限。 很可能导致系统故障。
 
 
 2.   将板载计算机系统6108GC放在后备箱内（推荐）。
 
-      例如，Apollo 2.0使用4x4螺钉将6108GC螺栓固定在后备箱的箱板上。 ![IPC-bolt_down-936x720](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/Mount_ipc_on_carpet.JPG)
+     例如，Apollo 2.5使用4x4螺钉将6108GC螺栓固定在后备箱的箱板上。 ![IPC-bolt_down-936x720](images/Mount_ipc_on_carpet.JPG)
 
-3. 安装IPC，使其前后两侧（所有端口位于）面对右侧（乘客）或左侧（驱动器）的后备箱中。
+3. 安装IPC，使其前后两侧（所有端口位于）面对右侧（乘客）或左侧（驱动器）的主干。
 这种定位使得连接所有电缆更容易。
 有关更多信息，请参见：
 
@@ -907,7 +861,7 @@ d. 连接:
 - IPC的GPS接收器
 - 监视器（可选）：
 
-![IPC-power-842x636](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/cable_connected_incar.JPG)
+![IPC-power-842x636](images/cable_connected_incar.JPG)
 
 
 #### 杠杆臂测量
@@ -918,7 +872,7 @@ d. 连接:
 2. 当IMU和GPS天线就位时，必须测量从IMU到GPS天线的距离。距离测量应为：X偏移，Y偏移，和Z偏移。偏移误差必须在一厘米以内，以达到定位和定位的高精度。
 更多信息，参见：
 
-![online_icon](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/online_icon.png)NovAtel ProPak6 安装与操作手册:
+![online_icon](images/online_icon.png)NovAtel ProPak6 安装与操作手册:
 
 [https://www.novatel.com/assets/Documents/Manuals/OM-20000148.pdf](https://www.novatel.com/assets/Documents/Manuals/OM-20000148.pdf)
 
@@ -926,7 +880,7 @@ d. 连接:
 
 [https://www.novatel.com/products/span-gnss-inertial-systems/span-combined-systems/span-igm-a1/](https://www.novatel.com/products/span-gnss-inertial-systems/span-combined-systems/span-igm-a1/)
 
-#### 配置GPS和IMU
+#### 配置GPS、IMU
 GPS 和IMU 配置如下：
 
 ```
@@ -948,32 +902,32 @@ psrdiffsource auto any
 
 SETIMUTOANTOFFSET 0.00 1.10866 1.14165 0.05 0.05 0.08
 SETINSOFFSET 0 0 0
-EVENTOUTCONTROLMARK2 ENABLE POSITIVE 999999990 10
-EVENTOUTCONTROLMARK1 ENABLE POSITIVE 500000000 500000000
+EVENTOUTCONTROL MARK2 ENABLE POSITIVE 999999990 10
+EVENTOUTCONTROL MARK1 ENABLE POSITIVE 500000000 500000000
 
 
 LOG COM2 GPRMC ONTIME 1.0 0.25
-LOG GPGGA ONTIME 1.0
+LOG USB1 GPGGA ONTIME 1.0
 
-log bestgnssposb ontime 1
-log bestgnssvelb ontime 1
-log bestposb ontime 1
-log INSPVAXB ontime 1
-log INSPVASB ontime 0.01
-log CORRIMUDATASB ontime 0.01
-log RAWIMUSXB onnew 0 0
-log mark1pvab onnew
+log USB1 bestgnssposb ontime 1
+log USB1 bestgnssvelb ontime 1
+log USB1 bestposb ontime 1
+log USB1 INSPVAXB ontime 1
+log USB1 INSPVASB ontime 0.01
+log USB1 CORRIMUDATASB ontime 0.01
+log USB1 RAWIMUSXB onnew 0 0
+log USB1 mark1pvab onnew
 
-log rangeb ontime 1
-log bdsephemerisb
-log gpsephemb
-log gloephemerisb
-log bdsephemerisb ontime 15
-log gpsephemb ontime 15
-log gloephemerisb ontime 15
+log USB1 rangeb ontime 1
+log USB1 bdsephemerisb
+log USB1 gpsephemb
+log USB1 gloephemerisb
+log USB1 bdsephemerisb ontime 15
+log USB1 gpsephemb ontime 15
+log USB1 gloephemerisb ontime 15
 
-log imutoantoffsetsb once
-log vehiclebodyrotationb onchanged
+log USB1 imutoantoffsetsb once
+log USB1 vehiclebodyrotationb onchanged
  
 SAVECONFIG
 
@@ -1001,37 +955,37 @@ rtksource auto any
 psrdiffsource auto any
 SETIMUTOANTOFFSET 0.00 1.10866 1.14165 0.05 0.05 0.08
 SETINSOFFSET 0 0 0
-EVENTOUTCONTROLMARK2 ENABLE POSITIVE 999999990 10
-EVENTOUTCONTROLMARK1 ENABLE POSITIVE 500000000 500000000
+EVENTOUTCONTROL MARK2 ENABLE POSITIVE 999999990 10
+EVENTOUTCONTROL MARK1 ENABLE POSITIVE 500000000 500000000
 
 
 LOG COM2 GPRMC ONTIME 1.0 0.25
-LOG GPGGA ONTIME 1.0
+LOG USB1 GPGGA ONTIME 1.0
 
-log bestgnssposb ontime 1
-log bestgnssvelb ontime 1
-log bestposb ontime 1
-log INSPVAXB ontime 1
-log INSPVASB ontime 0.01
-log CORRIMUDATASB ontime 0.01
-log RAWIMUSXB onnew 0 0
-log mark1pvab onnew
+log USB1 bestgnssposb ontime 1
+log USB1 bestgnssvelb ontime 1
+log USB1 bestposb ontime 1
+log USB1 INSPVAXB ontime 1
+log USB1 INSPVASB ontime 0.01
+log USB1 CORRIMUDATASB ontime 0.01
+log USB1 RAWIMUSXB onnew 0 0
+log USB1 mark1pvab onnew
 
-log rangeb ontime 1
-log bdsephemerisb
-log gpsephemb
-log gloephemerisb
-log bdsephemerisb ontime 15
-log gpsephemb ontime 15
-log gloephemerisb ontime 15
+log USB1 rangeb ontime 1
+log USB1 bdsephemerisb
+log USB1 gpsephemb
+log USB1 gloephemerisb
+log USB1 bdsephemerisb ontime 15
+log USB1 gpsephemb ontime 15
+log USB1 gloephemerisb ontime 15
 
-log imutoantoffsetsb once
-log vehiclebodyrotationb onchanged
+log USB1 imutoantoffsetsb once
+log USB1 vehiclebodyrotationb onchanged
  
 SAVECONFIG
 ```
 
-**![warning_icon](images/warning_icon.png) WARNING:** 基于真实的测量值（GPS天线、IMU的偏移量）修改 **<u>SETIMUTOANTOFFSE</u>T** 行。
+**![warning](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/warning_icon.png)WARNING：** 基于真实的测量值（GPS天线、IMU的偏移量）修改 **<u>SETIMUTOANTOFFSE</u>T** 行。
 
 示例:
 
@@ -1064,4 +1018,4 @@ SETIMUTOANTOFFSET -0.05 0.5 0.8 0.05 0.05 0.08
 
 # 下一步
 
-完成硬件部分的安装之后，可以参考快速入门的教程 [Apollo Quick Start](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_1_5_quick_start.md) 完成软件部分的安装。
+完成硬件部分的安装之后，可以参考快速入门的教程 [Apollo Quick Start](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_2_5_quick_start_cn.md)完成软件部分的安装。
