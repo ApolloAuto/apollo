@@ -262,6 +262,9 @@ function release() {
   # scripts
   cp -r scripts ${APOLLO_RELEASE_DIR}
 
+  # remove mounted models
+  rm -rf ${APOLLO_RELEASE_DIR}/modules/perception/model/yolo_camera_detector/
+
   # lib
   LIB_DIR="${APOLLO_RELEASE_DIR}/lib"
   mkdir "${LIB_DIR}"
