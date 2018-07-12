@@ -17,7 +17,7 @@
 请参考[Apollo 3.0 硬件与系统安装指南](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_3_0_hardware_system_installation_guide_cn.md)获取安装硬件组件的步骤，参考[Apollo软件安装指南](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_software_installation_guide_cn.md)获取软件安装步骤。
 
 ## DreamView的使用
-关于DreamView使用时的相关问题请参考[Dreamview Usage Table](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/dreamview_usage_table.md)。
+关于DreamView使用时的相关问题请参考[DreamView用法介绍](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/dreamview_usage_table_cn.md)。
 
 ## 上车测试
 1. 将一个外部磁盘驱动器接入主机任一可用USB接口。
