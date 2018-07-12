@@ -68,6 +68,7 @@ void Surround73::Parse(const std::uint8_t *bytes, int32_t length,
 
   // alternative representations.
   const int8_t kSonarNumbers = 12;
+  chassis_detail->mutable_surround()->clear_sonar_range();
   for (std::int8_t i = 0; i < kSonarNumbers; ++i) {
     chassis_detail->mutable_surround()->add_sonar_range(
         sonars(bytes, i, length / 2));

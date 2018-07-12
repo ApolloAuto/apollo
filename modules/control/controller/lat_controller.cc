@@ -29,6 +29,7 @@
 #include "modules/common/log.h"
 #include "modules/common/math/linear_quadratic_regulator.h"
 #include "modules/common/math/math_utils.h"
+#include "modules/common/math/quaternion.h"
 #include "modules/common/time/time.h"
 #include "modules/common/util/string_util.h"
 #include "modules/control/common/control_gflags.h"
@@ -117,12 +118,12 @@ bool LatController::LoadControlConf(const ControlConf *control_conf) {
 
   lf_ = wheelbase_ * (1.0 - mass_front / mass_);
   lr_ = wheelbase_ * (1.0 - mass_rear / mass_);
+
+  // moment of inertia
   iz_ = lf_ * lf_ * mass_front + lr_ * lr_ * mass_rear;
 
   lqr_eps_ = control_conf->lat_controller_conf().eps();
   lqr_max_iteration_ = control_conf->lat_controller_conf().max_iteration();
-
-  query_relative_time_ = control_conf->query_relative_time();
 
   minimum_speed_protection_ = control_conf->minimum_speed_protection();
 
@@ -184,6 +185,7 @@ Status LatController::Init(const ControlConf *control_conf) {
   matrix_a_ = Matrix::Zero(basic_state_size_, basic_state_size_);
   matrix_ad_ = Matrix::Zero(basic_state_size_, basic_state_size_);
   matrix_adc_ = Matrix::Zero(matrix_size, matrix_size);
+
   matrix_a_(0, 1) = 1.0;
   matrix_a_(1, 2) = (cf_ + cr_) / mass_;
   matrix_a_(2, 3) = 1.0;
@@ -269,15 +271,73 @@ Status LatController::ComputeControlCommand(
     ControlCommand *cmd) {
   VehicleStateProvider::instance()->set_linear_velocity(chassis->speed_mps());
 
+  auto target_tracking_trajectory = *planning_published_trajectory;
+
+  if (FLAGS_use_navigation_mode) {
+    auto time_stamp_diff =
+        planning_published_trajectory->header().timestamp_sec()
+        - current_trajectory_timestamp_;
+
+    auto curr_vehicle_x = localization->pose().position().x();
+    auto curr_vehicle_y = localization->pose().position().y();
+
+    double curr_vehicle_heading = 0.0;
+    const auto &orientation = localization->pose().orientation();
+    if (localization->pose().has_heading()) {
+      curr_vehicle_heading = localization->pose().heading();
+    } else {
+      curr_vehicle_heading =
+          common::math::QuaternionToHeading(orientation.qw(), orientation.qx(),
+                                    orientation.qy(), orientation.qz());
+    }
+
+    // new planning trajectory
+    if (time_stamp_diff > 1.0e-6) {
+      init_vehicle_x_ = curr_vehicle_x;
+      init_vehicle_y_ = curr_vehicle_y;
+      init_vehicle_heading_ = curr_vehicle_heading;
+
+      current_trajectory_timestamp_ =
+          planning_published_trajectory->header().timestamp_sec();
+    } else {
+      auto x_diff = curr_vehicle_x - init_vehicle_x_;
+      auto y_diff = curr_vehicle_y - init_vehicle_y_;
+      auto theta_diff = curr_vehicle_heading - init_vehicle_heading_;
+
+      auto cos_theta = std::cos(-theta_diff);
+      auto sin_theta = std::sin(-theta_diff);
+
+      auto tx = -(cos_theta * x_diff - sin_theta * y_diff);
+      auto ty = -(sin_theta * x_diff + cos_theta * y_diff);
+
+      auto trajectory_points = target_tracking_trajectory.trajectory_point();
+      std::for_each(trajectory_points.begin(), trajectory_points.end(),
+          [&cos_theta, &sin_theta, &tx, &ty, &theta_diff]
+           (common::TrajectoryPoint& p) {
+            auto x = p.path_point().x();
+            auto y = p.path_point().y();
+            auto theta = p.path_point().theta();
+
+            auto x_new = cos_theta * x - sin_theta * y + tx;
+            auto y_new = sin_theta * x + cos_theta * y + ty;
+            auto theta_new = common::math::WrapAngle(theta - theta_diff);
+
+            p.mutable_path_point()->set_x(x_new);
+            p.mutable_path_point()->set_y(y_new);
+            p.mutable_path_point()->set_theta(theta_new);
+          });
+    }
+  }
+
   trajectory_analyzer_ =
-      std::move(TrajectoryAnalyzer(planning_published_trajectory));
+      std::move(TrajectoryAnalyzer(&target_tracking_trajectory));
 
   SimpleLateralDebug *debug = cmd->mutable_debug()->mutable_simple_lat_debug();
   debug->Clear();
 
   // Update state = [Lateral Error, Lateral Error Rate, Heading Error, Heading
   // Error Rate, preview lateral error1 , preview lateral error2, ...]
-  UpdateStateAnalyticalMatching(debug);
+  UpdateState(debug);
 
   UpdateMatrix();
 
@@ -379,12 +439,10 @@ Status LatController::ComputeControlCommand(
 }
 
 Status LatController::Reset() {
-  previous_heading_error_ = 0.0;
-  previous_lateral_error_ = 0.0;
   return Status::OK();
 }
 
-void LatController::UpdateStateAnalyticalMatching(SimpleLateralDebug *debug) {
+void LatController::UpdateState(SimpleLateralDebug *debug) {
   if (FLAGS_enable_navigation_mode_handlilng) {
     ComputeLateralErrors(0.0, 0.0, VehicleStateProvider::instance()->heading(),
                          VehicleStateProvider::instance()->linear_velocity(),
@@ -455,7 +513,7 @@ void LatController::UpdateMatrixCompound() {
   matrix_bdc_.block(0, 0, basic_state_size_, 1) = matrix_bd_;
   if (preview_window_ > 0) {
     matrix_bdc_(matrix_bdc_.rows() - 1, 0) = 1;
-    // Update augument A matrix;
+    // Update A matrix;
     for (int i = 0; i < preview_window_ - 1; ++i) {
       matrix_adc_(basic_state_size_ + i, basic_state_size_ + 1 + i) = 1;
     }
@@ -482,15 +540,8 @@ void LatController::ComputeLateralErrors(
     const double x, const double y, const double theta, const double linear_v,
     const double angular_v, const TrajectoryAnalyzer &trajectory_analyzer,
     SimpleLateralDebug *debug) {
-  // TODO(QiL): change this to conf.
-  TrajectoryPoint target_point;
-  if (FLAGS_use_navigation_mode) {
-    const double current_timestamp = Clock::NowInSeconds();
-    target_point = trajectory_analyzer.QueryNearestPointByAbsoluteTime(
-        current_timestamp + query_relative_time_);
-  } else {
-    target_point = trajectory_analyzer.QueryNearestPointByPosition(x, y);
-  }
+  TrajectoryPoint target_point =
+      trajectory_analyzer.QueryNearestPointByPosition(x, y);
 
   const double dx = x - target_point.path_point().x();
   const double dy = y - target_point.path_point().y();
@@ -498,42 +549,32 @@ void LatController::ComputeLateralErrors(
   ADEBUG << "x point: " << x << " y point: " << y;
   ADEBUG << "match point information : " << target_point.ShortDebugString();
 
-  const double cos_matched_theta = std::cos(target_point.path_point().theta());
-  const double sin_matched_theta = std::sin(target_point.path_point().theta());
-  // d_error = cos_matched_theta * dy - sin_matched_theta * dx;
-  // lateral_error_ = lateral_rate_filter_.Filter(raw_lateral_error);
+  const double cos_target_heading = std::cos(target_point.path_point().theta());
+  const double sin_target_heading = std::sin(target_point.path_point().theta());
 
-  // TODO(QiL): Code reformat when done with test
-  const double raw_lateral_error =
-      cos_matched_theta * dy - sin_matched_theta * dx;
+  double lateral_error =
+      cos_target_heading * dy - sin_target_heading * dx;
   if (FLAGS_enable_navigation_mode_handlilng) {
-    double filtered_lateral_error =
-        lateral_error_filter_.Update(raw_lateral_error);
-    debug->set_lateral_error(filtered_lateral_error);
-  } else {
-    debug->set_lateral_error(raw_lateral_error);
+    lateral_error = lateral_error_filter_.Update(lateral_error);
   }
-  const double delta_theta =
+  debug->set_lateral_error(lateral_error);
+
+  double heading_error =
       common::math::NormalizeAngle(theta - target_point.path_point().theta());
-  const double sin_delta_theta = std::sin(delta_theta);
-  // d_error_dot = linear_v * sin_delta_theta;
-  // theta_error = delta_theta
-  // TODO(QiL): Code reformat after test
-  debug->set_lateral_error_rate(linear_v * sin_delta_theta);
   if (FLAGS_enable_navigation_mode_handlilng) {
-    debug->set_heading_error(heading_error_filter_.Update(delta_theta));
-  } else {
-    debug->set_heading_error(delta_theta);
+    heading_error = heading_error_filter_.Update(heading_error);
   }
+  debug->set_heading_error(heading_error);
 
-  // theta_error_dot = angular_v - target_point.path_point().kappa() *
-  // target_point.v();
-  debug->set_heading_error_rate(angular_v - target_point.path_point().kappa() *
-                                                target_point.v());
+  auto lateral_error_dot = linear_v * std::sin(heading_error);
+  debug->set_lateral_error_rate(lateral_error_dot);
 
-  // matched_theta = 3.path_point().theta();
+  auto heading_error_rate = angular_v - target_point.path_point().kappa() *
+      target_point.v();
+  debug->set_heading_error_rate(heading_error_rate);
+
   debug->set_ref_heading(target_point.path_point().theta());
-  // matched_kappa = target_point.path_point().kappa();
+
   debug->set_curvature(target_point.path_point().kappa());
 }
 

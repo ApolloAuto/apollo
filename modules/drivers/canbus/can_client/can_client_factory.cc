@@ -46,7 +46,7 @@ void CanClientFactory::RegisterCanClients() {
   Register(CANCardParameter::SOCKET_CAN_RAW,
            []() -> CanClient* { return new can::SocketCanClientRaw(); });
 
-  Register(CANCardParameter::SOCKET_CAN_RAW,
+  Register(CANCardParameter::HERMES_CAN,
            []() -> CanClient* { return new can::HermesCanClient(); });
 }
 
