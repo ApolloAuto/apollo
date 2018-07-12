@@ -102,7 +102,7 @@ class LatController : public Controller {
   std::string Name() const override;
 
  protected:
-  void UpdateStateAnalyticalMatching(SimpleLateralDebug *debug);
+  void UpdateState(SimpleLateralDebug *debug);
 
   void UpdateMatrix();
 
@@ -184,11 +184,6 @@ class LatController : public Controller {
   // 4 by 1 matrix; state matrix
   Eigen::MatrixXd matrix_state_;
 
-  // heading error of last control cycle
-  double previous_heading_error_ = 0.0;
-  // lateral distance to reference trajectory of last control cycle
-  double previous_lateral_error_ = 0.0;
-
   // parameters for lqr solver; number of iterations
   int lqr_max_iteration_ = 0;
   // parameters for lqr solver; threshold for computation
@@ -209,19 +204,17 @@ class LatController : public Controller {
 
   const std::string name_;
 
-  double query_relative_time_;
-
   double pre_steer_angle_ = 0.0;
 
   double minimum_speed_protection_ = 0.1;
 
   double current_trajectory_timestamp_ = -1.0;
 
-  double init_vehicle_x_;
+  double init_vehicle_x_ = 0.0;
 
-  double init_vehicle_y_;
+  double init_vehicle_y_ = 0.0;
 
-  double init_vehicle_heading_;
+  double init_vehicle_heading_ = 0.0;
 };
 
 }  // namespace control

@@ -1,61 +1,74 @@
-## How to Debug the Dreamview Start Problem
+# DreamView FAQs
 
-### Steps to Start Dreamview
+## I’m having difficulty connecting to localhost:8888 (Dreamview).
 
-If you encounter problems when starting Dreamview in the `docker/scripts/dev` sequence, first check if you are using the correct commands as shown below.
+The Dreamview web server is provided by the dreamview node(A node is an executable in ROS concept). Before accessing the Dreamview page, you need to build the system(including dreamview node) within the docker container following the [guide](https://github.com/ApolloAuto/apollo/blob/master/README.md). Once built, dreamview node will be started after the step `bash scripts/bootstrap.sh`.
 
+So if you can not access Dreamview, please check:
+
+* Make sure you have dreamview process running correctly. In the latest version, `bash scripts/bootstrap.sh` will report `dreamview: ERROR (spawn error)` if dreamview fails to start. For early version, please check with command: `supervisorctl status dreamview` or `ps aux | grep dreamview`. If dreamview is not running, please refer to [How to Debug a Dreamview Start Problem](https://github.com/ApolloAuto/apollo/blob/master/docs/howto/how_to_debug_dreamview_start_problem.md) or go to [Dreamview does not load successfully](#Dreamview-does-not-start-even-though-the-build-is-successful).
+* Make sure the address and port are not blocked by the firewall.
+* Make sure you're using <apollo_host_ip>:8888 instead of localhost:8888 if you are not accessing the Dreamview page through the host machine.
+
+---
+## Dreamview does not open up if I install more than 1 version of Apollo?
+
+This issue occured because of port conflict error.
+Even though you setup two different docker environments, both of them are still trying to use port 8888 on your machine, therefore causing a port conflict issue. If you'd like to run both versions at the same time, please make sure different ports are set.
+
+To do so,
+
+1. Open `dreamview.conf` file under modules/dreamview/conf
+add ```--server_ports=<PORT_NUMBER>``` to the end of the file.
+Ex:
+--flagfile=modules/common/data/global_flagfile.txt
+--server_ports=5555
+2. Restart apollo
+
+This way, dreamview can be accessed from http://localhost:<PORT_NUMBER> (http://localhost:5555 from the example)
+
+---
+## How to draw anything in DreamView (e.g. an arrow)
+
+Dreamview uses https://github.com/mrdoob/three.js as graphics library. You can modify the frontend code to draw an arrow using the corresponding API of the library. After that you need to run a `./apollo.sh build_fe` to compile.
+
+---
+## How can I test planning algorithms offline?
+
+Use dreamview and enable sim_control on dreamview to test your planning algorithm.
+
+---
+## What's the function of sim_control in the backend of dreamview
+
+It simulates a SDC's control module, and moves the car based on planning result. This is a really convenient way to visualize and test planning module
+
+---
+## How do I turn on Sim Control?
+
+Purpose of sim control: drive the car based on the planning trajectory. Good for debugging planning algorithms.
+
+**Apollo 2.5 or after**: simply turning on the SimControl switch as seen in the image below:
+      
+![](images/sim_control_2.5.png)
+
+**Apollo 2.0 or older**: you would need to enable the sim control manually, which can be performed as follows:
+1. Open `modules/dreamview/conf/dreamview.conf`
+2. Add **“--enable_sim_control=true”** to the second line of the file
+3. Restart apollo using our bootstrap script
 ```bash
-$ bash docker/scripts/dev_start.sh
-$ bash docker/scripts/dev_into.sh
-$ cd /apollo
-$ bash apollo.sh build
-$ bash scripts/dreamview.sh
+    bash scripts/bootstrap.sh stop
+    bash scripts/bootstrap.sh start
 ```
-### Dreamview Fails to Start
+ 
+**Please note**, planning and routing modules (see image below) should be ON while using SimControl. To navigate the ego-car, select either “route editing” or “default routing” from the side bar to define a route.
 
-If Dreamview fails to start, use the script below to check the Dreamview startup log and restart Dreamview.
+![](images/sim_control_2.0.png)
 
-```bash
-# Start Dreamview in foreground to see any error message it prints out during startup
-$ bash scripts/dreamview.sh start_fe
-
-# check dreamview startup log
-$ cat data/log/dreamview.out
-terminate called after throwing an instance of 'CivetException'
-  what():  null context when constructing CivetServer. Possible problem binding to port.
-
-$ sudo apt-get install psmisc
-
-# to check if dreamview is running from other terminal
-$ sudo lsof -i :8888
-
-# kill other running/pending dreamview
-$ sudo fuser -k 8888/tcp
-
-# restart dreamview again
-$ bash scripts/dreamview.sh
-```
-
-### Debug dreamview with gdb
-
-If you get nothing in dreamview startup logs, you can try to debug dreamview with gdb, use the following commands:
-
-```
-$ gdb --args /apollo/bazel-bin/modules/dreamview/dreamview --flagfile=/apollo/modules/dreamview/conf/dreamview.conf
-# or
-$ source scripts/apollo_base.sh;
-$ start_gdb dreamview
-```
-
-Once gdb is launched, press `r` and `enter` key to run,  if dreamview crashes, then get the backtrace with `bt`.
-
-If you see an error `Illegal instruction` and something related with **libpcl_sample_consensus.so.1.7** in gdb backtrace, then you probably need to rebuild pcl lib from source by yourself and replace the one in the docker.
-
-This usually happens when you're trying to run Apollo/dreamview on a machine that the CPU does not support FMA/FMA3 instructions, it will fail because the prebuilt pcl lib shipped with docker image is compiled with FMA/FMA3 support.
+---
+## Dreamview does not start even though the build is successful
 
 There are 2 steps to deducing this issue:
-1. Identify if the issue is due to pcl lib through gdb:
-    find the coredump file under /apollo/data/core/ with name core_dreamview.$PID.
+1. Identify if the issue is due to pcl lib through gdb: this can be done by finding the coredump file under `/apollo/data/core/` with name ***core_dreamview.$PID***.
 If you see logs like:
 ```
 @in_dev_docker:/apollo$ gdb bazel-bin/modules/dreamview/dreamview  data/core/core_dreamview.378
@@ -178,3 +191,4 @@ And finally restart Dreamview using
     bash scripts/bootstrap.sh start
 ```
 
+**More DreamView FAQs to follow.**

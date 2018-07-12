@@ -35,7 +35,7 @@ In addition, Lidar connectivity via Ethernet, WWAN gateway via 4G LTE module, an
 
 ### Purchase Channels
 
-The Apollo Sensor Unit is currently only provided to our Partners and certain developers. Questions regarding the availability and access to ASU should be directed to our Apollo official channel.
+The Apollo Sensor Unit is currently only provided to our Partners and certain developers. Questions regarding the availability and access to ASU should be directed to  apollo-hw@baidu.com
 
 ### Installation
 
