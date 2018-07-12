@@ -28,7 +28,7 @@ Apollo3.0有以下新特点：
 - 图像数据（R ROS topic /apollo/sensor/camera/obstacle/front_6mm）
 - 雷达传感器校准的外部参数（来自YAML文件）
 - 前摄像机标定的外部和内在参数（来自YAML文件）
-- 宿主车辆的速度和角速度（ROS主题/阿波罗/定位/姿态）
+- 主车辆的速度和角速度（ROS主题/阿波罗/定位/姿态）
 ## 输出
 
 感知模块输出为：
