@@ -32,7 +32,7 @@
   * [3D 障碍物感知](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/3d_obstacle_perception_cn.md)
   * [Apollo 3.0感知](https://github.com/ApolloAuto/apollo/blob/master/modules/perception/README.md)
   * [二次规划（QP）样条路径优化](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/qp_spline_path_optimizer_cn.md)
-  * [二次规划（QP）样条ST速度优化](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/qp_spline_st_speed_optimizer.md)
+  * [二次规划（QP）样条ST速度优化](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/qp_spline_st_speed_optimizer_cn.md)
   * [参考线平滑设定](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/reference_line_smoother_cn.md)
   * [交通信号灯感知](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/traffic_light_cn.md)
   
