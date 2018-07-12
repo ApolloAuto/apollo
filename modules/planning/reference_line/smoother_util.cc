@@ -28,9 +28,9 @@
 #include "modules/common/util/util.h"
 #include "modules/map/pnc_map/path.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/reference_line/spiral_reference_line_smoother.h"
 #include "modules/planning/reference_line/reference_line.h"
 #include "modules/planning/reference_line/reference_line_smoother.h"
+#include "modules/planning/reference_line/spiral_reference_line_smoother.h"
 
 DEFINE_string(input_file, "", "input file with format x,y per line");
 DEFINE_string(output_file, "", "output file with format x,y per line");
@@ -106,8 +106,8 @@ class SmootherUtil {
       common::SLPoint sl;
       prev_half_ref.XYToSL(raw_points_[i], &sl);
       while (sl.s() <= prev_half_ref.Length() && i + 1 < raw_points_.size()) {
+        prev_half_ref.XYToSL(raw_points_[i + 1], &sl);
         ++i;
-        prev_half_ref.XYToSL(raw_points_[i], &sl);
       }
       s = 0.0;
       j = i;

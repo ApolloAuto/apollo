@@ -33,9 +33,9 @@ namespace {
 std::string GetRosHome() {
   // Note that ROS_ROOT env points to <ROS_HOME>/share/ros.
   static const std::string kKnownTail = "/share/ros";
-  const char* ros_root = std::getenv("ROS_ROOT");
+  const char *ros_root = std::getenv("ROS_ROOT");
   if (ros_root == nullptr || !EndWith(ros_root, kKnownTail)) {
-    AERROR << "Failed to find ROS root: " << ros_root;
+    AERROR << "Failed to find ROS root";
     // Return dummy path which simply raises error if an operation is called.
     return "/CANNOT_FIND_ROS_HOME";
   }
@@ -223,8 +223,8 @@ std::vector<std::string> ListSubPaths(const std::string &directory_path,
   struct dirent *entry;
   while ((entry = readdir(directory)) != nullptr) {
     // Skip "." and "..".
-    if (entry->d_type == d_type &&
-        strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0) {
+    if (entry->d_type == d_type && strcmp(entry->d_name, ".") != 0 &&
+        strcmp(entry->d_name, "..") != 0) {
       result.emplace_back(entry->d_name);
     }
   }
