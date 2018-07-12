@@ -169,7 +169,7 @@ bool TLPreprocessor::SyncImage(ImageSharedPtr image,
     }
   }
 
-  if (sync_ok) {
+  if (sync_ok && cached_lights_ptr != cached_lights_.rend()) {
     *image_lights = *cached_lights_ptr;
     (*image_lights)->diff_image_pose_ts =
         image_ts - (*cached_lights_ptr)->timestamp;
