@@ -274,7 +274,6 @@ function release() {
   cp modules/perception/cuda_util/cmake_build/libcuda_util.so $LIB_DIR
 
   # doc
-  cp -r docs "${APOLLO_RELEASE_DIR}"
   cp LICENSE "${APOLLO_RELEASE_DIR}"
   cp third_party/ACKNOWLEDGEMENT.txt "${APOLLO_RELEASE_DIR}"
 
