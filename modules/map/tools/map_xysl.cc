@@ -122,9 +122,7 @@ class MapUtil {
                 PointENU *point, double *heading) const {
     QUIT_IF(point == nullptr, -1, ERROR, "arg point is null");
     QUIT_IF(heading == nullptr, -2, ERROR, "arg heading is null");
-    QUIT_IF(lane_ptr == nullptr, -3, ERROR,
-            "get_smooth_point_from_lane[%s] failed",
-            lane_ptr->id().id().c_str());
+    QUIT_IF(lane_ptr == nullptr, -3, ERROR, "the provided lane_ptr is null");
     *point = lane_ptr->GetSmoothPoint(s);
     *heading = lane_ptr->Heading(s);
     auto normal_vec =
