@@ -128,7 +128,7 @@ int Input::getPacket(PandarPacket *pkt) {
   }
 
   senderAddressLen = sizeof(senderAddress);
-  ssize_t nbytes;
+  ssize_t nbytes = 0;
   for (int i = 0; i != socketNumber; ++i) {
     if (fds[i].revents & POLLIN) {
       nbytes = recvfrom(fds[i].fd, &pkt->data[0], ETHERNET_MTU, 0,

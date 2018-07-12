@@ -313,7 +313,7 @@ bool RawStream::Connect() {
 
   if (command_stream_) {
     if (command_stream_->get_status() != Stream::Status::CONNECTED) {
-      if (!data_stream_->Connect()) {
+      if (!command_stream_->Connect()) {
         AERROR << "command stream connect failed.";
         return false;
       }
