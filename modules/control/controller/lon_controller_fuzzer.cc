@@ -1,6 +1,5 @@
 /******************************************************************************
  * Copyright 2017 The Apollo Authors. All Rights Reserved.
- * Copyright 2018 Baidu X-Lab. Yunhan Jia <jiayunhan@baidu.com>
 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +28,7 @@
 #include "modules/control/proto/control_conf.pb.h"
 #include "modules/localization/common/localization_gflags.h"
 #include "modules/planning/proto/planning.pb.h"
-#include "libfuzzer_macro.h"
+#include "libfuzzer/libfuzzer_macro.h"
 
 protobuf_mutator::protobuf::LogSilencer log_silincer;
 
@@ -45,8 +44,8 @@ using apollo::common::VehicleStateProvider;
 const char data_path[] =
     "modules/control/testdata/longitudinal_controller_test/";
 
-class LonControllerFuzzer : LonController{
-  public:
+class LonControllerFuzzer : LonController {
+ public:
   virtual void SetUp() {
     FLAGS_v = 3;
 
@@ -73,8 +72,9 @@ class LonControllerFuzzer : LonController{
     return LonController::Init(control_conf);
   }
 
-  void target(planning::ADCTrajectory planning_trajectory_pb); 
-  protected:
+  void target(planning::ADCTrajectory planning_trajectory_pb);
+
+ protected:
   LocalizationPb LoadLocalizationPb(const std::string &filename) {
     LocalizationPb localization_pb;
     CHECK(apollo::common::util::GetProtoFromFile(filename, &localization_pb))
@@ -105,14 +105,13 @@ class LonControllerFuzzer : LonController{
 }lon_controller_fuzzer;
 
 
-void LonControllerFuzzer::target(planning::ADCTrajectory trajectory_pb){
-
+void LonControllerFuzzer::target(planning::ADCTrajectory trajectory_pb) {
   FLAGS_enable_map_reference_unify = false;
 
   auto localization_pb =
       LoadLocalizationPb(std::string(data_path) + "1_localization.pb.txt");
   auto chassis_pb = LoadChassisPb(std::string(data_path) + "1_chassis.pb.txt");
-  //auto trajectory_pb =
+  // auto trajectory_pb =
   //   LoadPlanningTrajectoryPb(std::string(data_path) + "1_planning.pb.txt");
 
   double time_now = Clock::NowInSeconds();
@@ -127,12 +126,12 @@ void LonControllerFuzzer::target(planning::ADCTrajectory trajectory_pb){
 
   SimpleLongitudinalDebug debug;
   ComputeLongitudinalErrors(&trajectory_analyzer, preview_time, &debug);
-
 }
 
-}} //End of namespace
+}  // namespace control
+}  // namespace apollo
 
-DEFINE_PROTO_FUZZER(const apollo::planning::ADCTrajectory& message){
+DEFINE_PROTO_FUZZER(const apollo::planning::ADCTrajectory& message) {
   /*if(message.header().module_name() != "" &&
     !message.trajectory_point().empty())
   {

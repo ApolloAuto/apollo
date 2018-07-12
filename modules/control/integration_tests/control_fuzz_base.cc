@@ -1,6 +1,5 @@
 /******************************************************************************
  * Copyright 2017 The Apollo Authors. All Rights Reserved.
- * Copyright 2018 Baidu X-Lab. Yunhan Jia <jiayunhan@baidu.com>
  
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -73,7 +72,6 @@ bool ControlFuzzBase::test_control() {
     }
     control_.OnPad(pad_message);
   }
-  
   if (!FLAGS_test_localization_file.empty()) {
     if (!AdapterManager::FeedLocalizationFile(FLAGS_test_data_dir +
                                               FLAGS_test_localization_file)) {

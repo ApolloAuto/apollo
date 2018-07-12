@@ -1,6 +1,5 @@
 /******************************************************************************
  * Copyright 2017 The Apollo Authors. All Rights Reserved.
- * Copyright 2018 Baidu X-Lab. Yunhan Jia <jiayunhan@baidu.com>
 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +28,7 @@
 #include "modules/control/proto/control_conf.pb.h"
 #include "modules/localization/common/localization_gflags.h"
 #include "modules/planning/proto/planning.pb.h"
-#include "libfuzzer_macro.h"
+#include "libfuzzer/libfuzzer_macro.h"
 
 protobuf_mutator::protobuf::LogSilencer log_silincer;
 
@@ -47,8 +46,8 @@ using apollo::common::VehicleStateProvider;
 * to invoke the target member function
 ******************************************************/
 
-class LatControllerFuzzer : LatController{
-  public:
+class LatControllerFuzzer : LatController {
+ public:
   virtual void SetUp() {
     FLAGS_v = 3;
     std::string control_conf_file =
@@ -63,13 +62,13 @@ class LatControllerFuzzer : LatController{
   void ComputeLateralErrors(const double x, const double y, const double theta,
                             const double linear_v, const double angular_v,
                             const TrajectoryAnalyzer &trajectory_analyzer,
-                            SimpleLateralDebug *debug) 
-  {
+                            SimpleLateralDebug *debug) {
     LatController::ComputeLateralErrors(x, y, theta, linear_v, angular_v,
                                         trajectory_analyzer, debug);
   }
-  void target(planning::ADCTrajectory planning_trajectory_pb); 
-  protected:
+  void target(planning::ADCTrajectory planning_trajectory_pb);
+
+ protected:
   LocalizationPb LoadLocalizationPb(const std::string &filename) {
     LocalizationPb localization_pb;
     CHECK(apollo::common::util::GetProtoFromFile(filename, &localization_pb))
@@ -102,8 +101,8 @@ class LatControllerFuzzer : LatController{
 * message structure. This function is modified from the 
 * original TEST_F gtest function. 
 ******************************************************/
-void LatControllerFuzzer::target(planning::ADCTrajectory planning_trajectory_pb){
-
+void LatControllerFuzzer::target(planning::ADCTrajectory
+    planning_trajectory_pb) {
   timestamp_ = Clock::NowInSeconds();
 
   auto localization_pb = LoadLocalizationPb(
@@ -128,7 +127,8 @@ void LatControllerFuzzer::target(planning::ADCTrajectory planning_trajectory_pb)
       trajectory_analyzer, debug);
 }
 
-}} //End of namespace
+}  // namespace control
+}  // namespace apollo
 
 /******************************************************
 * The test driver function. feed the mutated message to
@@ -137,11 +137,9 @@ void LatControllerFuzzer::target(planning::ADCTrajectory planning_trajectory_pb)
 * The constraints can also help bypass discovered bugs, 
 * that are not patched yet. 
 ******************************************************/
-DEFINE_PROTO_FUZZER(const apollo::planning::ADCTrajectory& message){
+DEFINE_PROTO_FUZZER(const apollo::planning::ADCTrajectory& message) {
   apollo::control::LatControllerFuzzer fuzzer;
-  if(message.header().module_name()!="") /*&&
-    !message.trajectory_point().empty())*/
-  {
+  if (message.header().module_name() != "") {
     fuzzer.target(message);
   }
 }

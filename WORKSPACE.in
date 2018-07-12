@@ -207,6 +207,6 @@ new_local_repository(
 new_git_repository(
     name = "libprotobuf_mutator",
     build_file = "third_party/libprotobuf_mutator.BUILD",
-    commit = "91a872998bc204e9484dccdbeeafc608c1ee8062",
-    remote = "https://github.com/jiayunhan/libprotobuf-mutator",
+    commit = "f15940c782f9d130676de947d3a8a3662e4a8f34",
+    remote = "https://github.com/BaiduXLab/libprotobuf-mutator.git",
 )

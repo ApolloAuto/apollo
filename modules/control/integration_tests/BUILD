@@ -60,6 +60,7 @@ cc_test(
         "@gtest//:gtest",
     ],
 )
+
 cc_library(
     name = "control_fuzz_base",
     srcs = [
@@ -77,9 +78,14 @@ cc_library(
         "//modules/control/common:control_gflags",
         "//modules/control/proto:control_proto",
     ],
-    copts = ["-fsanitize=address"],
-    linkopts = ["-fsanitize=address"]
+    copts = [
+        "-fsanitize=address"
+    ],
+    linkopts = [
+        "-fsanitize=address"
+    ],
 )
+
 cc_binary(
     name = "simple_control_fuzz",
     srcs = [
@@ -90,8 +96,14 @@ cc_binary(
         ":control_fuzz_base",
         "@libprotobuf_mutator//:mutator", 
     ],
-    copts = ["-fsanitize=fuzzer,address",
-    "-Iexternal/libprotobuf_mutator/src/libfuzzer/",],
-    linkopts = ["-fsanitize=fuzzer,address"]
+    tags = [
+	"manual",
+    ],
+    copts = [
+        "-fsanitize=fuzzer,address",
+        "-Iexternal/libprotobuf_mutator/src/",
+    ],
+    linkopts = ["-fsanitize=fuzzer,address"],
 )
+
 cpplint()

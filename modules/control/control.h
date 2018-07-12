@@ -98,7 +98,7 @@ class Control : public apollo::common::ApolloApp {
 
   void SendCmd(ControlCommand *control_command);
 
-  private:
+ private:
   double init_time_ = 0.0;
 
   localization::LocalizationEstimate localization_;

@@ -1,6 +1,5 @@
 /******************************************************************************
  * Copyright 2017 The Apollo Authors. All Rights Reserved.
- * Copyright 2018 Baidu X-Lab. Yunhan Jia <jiayunhan@baidu.com>
 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +30,7 @@
 #include "modules/control/common/control_gflags.h"
 #include "modules/control/integration_tests/control_fuzz_base.h"
 
-#include "libfuzzer_macro.h"
+#include "libfuzzer/libfuzzer_macro.h"
 #include "modules/planning/proto/planning.pb.h"
 
 
@@ -97,9 +96,10 @@ TEST_F(SimpleControlTest, monitor_fatal) {
 * modification. You can save the mutated message into file
 * before calling the target function.  
 ******************************************************/
-DEFINE_PROTO_FUZZER(const apollo::planning::ADCTrajectory& message){
+DEFINE_PROTO_FUZZER(const apollo::planning::ADCTrajectory& message) {
   apollo::control::simple_control_fuzzer.SetUp();
   apollo::control::simple_control_fuzzer.SetUpTestCase();
-  apollo::common::util::SetProtoToASCIIFile(message,"modules/control/testdata/simple_control_fuzz/1_planning.pb.txt");
+  apollo::common::util::SetProtoToASCIIFile(message,
+    "modules/control/testdata/simple_control_fuzz/1_planning.pb.txt");
   apollo::control::simple_control_fuzzer.target();
 }

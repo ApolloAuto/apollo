@@ -189,6 +189,7 @@ cc_test(
         "@gtest//:main",
     ],
 )
+
 cc_binary(
     name = "lat_controller_fuzzer",
     srcs = ["lat_controller_fuzzer.cc"],
@@ -203,10 +204,18 @@ cc_binary(
         "//modules/planning/proto:planning_proto",
         "@libprotobuf_mutator//:mutator",
     ],
-    copts = ["-fsanitize=fuzzer,address",
-    "-Iexternal/libprotobuf_mutator/src/libfuzzer/",],
-    linkopts = ["-fsanitize=fuzzer,address"]
+    tags = [
+	"manual",
+    ],
+    copts = [
+        "-fsanitize=fuzzer,address",
+        "-Iexternal/libprotobuf_mutator/src/",
+    ],
+    linkopts = [
+        "-fsanitize=fuzzer,address",
+    ],
 )
+
 cc_binary(
     name = "lon_controller_fuzzer",
     srcs = ["lon_controller_fuzzer.cc"],
@@ -221,8 +230,16 @@ cc_binary(
         "//modules/planning/proto:planning_proto",
         "@libprotobuf_mutator//:mutator",   
     ],
-    copts = ["-fsanitize=fuzzer,address",
-    "-Iexternal/libprotobuf_mutator/src/libfuzzer/"],
-    linkopts = ["-fsanitize=fuzzer,address"]
+    tags = [
+	"manual",
+    ],
+    copts = [
+        "-fsanitize=fuzzer,address",
+        "-Iexternal/libprotobuf_mutator/src/",
+    ],
+    linkopts = [
+        "-fsanitize=fuzzer,address",
+    ]
 )
+
 cpplint()
