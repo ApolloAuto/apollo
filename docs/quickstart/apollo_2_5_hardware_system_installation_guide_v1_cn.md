@@ -14,8 +14,8 @@
         - [选项1: NovAtel SPAN-IGM-A1](#选项1-novatel-span-igm-a1)
         - [选项2: NovAtel SPAN ProPak6和NovAtel IMU-IGM-A1](#选项2-novatel-span-propak6和novatel-imu-igm-a1)
     - [The GPS Receiver/Antenna](#the-gps-receiverantenna)
-        - [选项 1: **NovAtel GPS-703-GGG-HV**.](#选项-1-novatel-gps-703-ggg-hv)
-        - [选项 2: **Dual NovAtel GNSS-502**](#选项-2-dual-novatel-gnss-502)
+        - [选项 1: NovAtel GPS-703-GGG-HV](#选项-1-novatel-gps-703-ggg-hv)
+        - [选项 2: Dual NovAtel GNSS-502](#选项-2-dual-novatel-gnss-502)
     - [激光雷达 (LiDAR)](#激光雷达-lidar)
     - [摄像头](#摄像头)
     - [雷达](#雷达)
@@ -985,7 +985,7 @@ log USB1 vehiclebodyrotationb onchanged
 SAVECONFIG
 ```
 
-**![warning_icon](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/warning_icon.png) WARNING:**基于真实的测量值（GPS天线、IMU的偏移量）修改 **<u>SETIMUTOANTOFFSE</u>T** 行。
+**![warning](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/warning_icon.png)WARNING** 基于真实的测量值（GPS天线、IMU的偏移量）修改 ** <u>SETIMUTOANTOFFSE</u>T** 行。
 
 示例:
 
