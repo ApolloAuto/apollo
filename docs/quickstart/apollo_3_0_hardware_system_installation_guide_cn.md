@@ -42,16 +42,16 @@
  
     - **车辆**：
      
-      - [工业级PC](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/IPC/Nuvo-6108GC_Installation_Guide.md)
-      - [全球定位系统（GPS）](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/Navigation/README.md)
-      - [惯性计算单元（IMU）](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/Navigation/README.md)
+      - [工业级PC](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/IPC/Nuvo-6108GC_Installation_Guide_cn.md)
+      - [全球定位系统（GPS）](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/Navigation/README_cn.md)
+      - [惯性计算单元（IMU）](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/Navigation/README_cn.md)
       - 区域网络控制卡（CAN）
       - GPS天线
       - GPS接收器
       - [激光雷达（LiDAR）](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/Lidar/README.md)
       - [摄像机](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/Camera/README.md)
       - [雷达](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/Radar/README.md)
-      - [Apollo传感器单元（ASU）](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/Apollo_Sensor_Unit/Apollo_Sensor_Unit_Installation_Guide.md)
+      - [Apollo传感器单元（ASU）](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/Apollo_Sensor_Unit/Apollo_Sensor_Unit_Installation_Guide_cn.md)
       
     - **Software**: 
       - Ubuntu Linux
