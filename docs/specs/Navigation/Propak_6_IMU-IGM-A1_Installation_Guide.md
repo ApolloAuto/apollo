@@ -8,7 +8,7 @@ The IMU-IGM-A1 is an IMU that pairs with a SPAN-enabled GNSS receiver such as th
 
 The GPS Receiver/Antenna used with the GPS-IMU component is the **NovAtel GPS-703-GGG-HV**.
 
-![gps_receiver](images/gps_receiver.png)
+![gps_receiver](/Users/hanyang07/apollo/docs/quickstart/images/gps_receiver.png)
 
 
 ### Installing the GPS Receiver and Antenna
@@ -62,7 +62,7 @@ Follow these steps:
 
 ### Configuring the GPS and IMU
 
-Configure the GPS and IMU as shown below. This process can be done either by keying in the commands, or by loading batch configuration file in NovAtel Connect.
+Configure the GPS and IMU as shown below. This process can be done either by keying in the commands, or by loading batch configuraion file in NovAtel Connect.
 
 ```
 WIFICONFIG STATE OFF
