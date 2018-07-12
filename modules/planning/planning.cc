@@ -54,9 +54,9 @@ Planning::~Planning() { Stop(); }
 
 std::string Planning::Name() const { return "planning"; }
 
-#define CHECK_ADAPTER(NAME)                                              \
-  if (AdapterManager::Get##NAME() == nullptr) {                          \
-    AERROR << #NAME << " is not registered";                             \
+#define CHECK_ADAPTER(NAME)                                               \
+  if (AdapterManager::Get##NAME() == nullptr) {                           \
+    AERROR << #NAME << " is not registered";                              \
     return Status(ErrorCode::PLANNING_ERROR, #NAME " is not registered"); \
   }
 
@@ -198,8 +198,7 @@ void Planning::PublishPlanningPb(ADCTrajectory* trajectory_pb,
         AdapterManager::GetRoutingResponse()->GetLatestObserved().header());
   }
 
-  if (FLAGS_use_navigation_mode &&
-      trajectory_pb->trajectory_point_size() == 0) {
+  if (trajectory_pb->trajectory_point_size() == 0) {
     SetFallbackCruiseTrajectory(trajectory_pb);
   }
 
@@ -272,8 +271,8 @@ void Planning::RunOnce() {
       auto y_diff = vehicle_config.y_ - last_vehicle_config_.y_;
       auto theta_diff = vehicle_config.theta_ - last_vehicle_config_.theta_;
 
-      TrajectoryStitcher::TransformLastPublishedTrajectory(x_diff, y_diff,
-          theta_diff, last_publishable_trajectory_.get());
+      TrajectoryStitcher::TransformLastPublishedTrajectory(
+          x_diff, y_diff, theta_diff, last_publishable_trajectory_.get());
     }
     last_vehicle_config_ = vehicle_config;
   }
@@ -577,13 +576,13 @@ Planning::VehicleConfig Planning::ComputeVehicleConfigFromLocalization(
   vehicle_config.x_ = localization.pose().position().x();
   vehicle_config.y_ = localization.pose().position().y();
 
-  const auto &orientation = localization.pose().orientation();
+  const auto& orientation = localization.pose().orientation();
 
   if (localization.pose().has_heading()) {
     vehicle_config.theta_ = localization.pose().heading();
   } else {
-    vehicle_config.theta_ = common::math::QuaternionToHeading(orientation.qw(),
-        orientation.qx(), orientation.qy(), orientation.qz());
+    vehicle_config.theta_ = common::math::QuaternionToHeading(
+        orientation.qw(), orientation.qx(), orientation.qy(), orientation.qz());
   }
 
   vehicle_config.is_valid_ = true;

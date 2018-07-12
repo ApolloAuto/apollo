@@ -225,7 +225,7 @@ void DpStGraph::GetRowRange(const StGraphPoint& point, int* next_highest_row,
   const float delta_s_lower_bound = std::fmax(
       0.0, v0 * unit_t_ + vehicle_param_.max_deceleration() * speed_coeff);
   *next_lowest_row =
-      point.index_s() - static_cast<int>(delta_s_lower_bound / unit_s_);
+      point.index_s() + static_cast<int>(delta_s_lower_bound / unit_s_);
   if (*next_lowest_row > max_s_size) {
     *next_lowest_row = max_s_size;
   } else if (*next_lowest_row < 0) {
@@ -288,9 +288,8 @@ void DpStGraph::CalculateCostAt(const uint32_t c, const uint32_t r) {
         continue;
       }
 
-      const float cost = cost_cr.obstacle_cost() +
-                          pre_col[r_pre].total_cost() +
-                          CalculateEdgeCostForThirdCol(r, r_pre, speed_limit);
+      const float cost = cost_cr.obstacle_cost() + pre_col[r_pre].total_cost() +
+                         CalculateEdgeCostForThirdCol(r, r_pre, speed_limit);
 
       if (cost < cost_cr.total_cost()) {
         cost_cr.SetTotalCost(cost);
@@ -306,9 +305,9 @@ void DpStGraph::CalculateCostAt(const uint32_t c, const uint32_t r) {
     }
 
     const float curr_a = (cost_cr.index_s() * unit_s_ +
-                           pre_col[r_pre].pre_point()->index_s() * unit_s_ -
-                           2 * pre_col[r_pre].index_s() * unit_s_) /
-                          (unit_t_ * unit_t_);
+                          pre_col[r_pre].pre_point()->index_s() * unit_s_ -
+                          2 * pre_col[r_pre].index_s() * unit_s_) /
+                         (unit_t_ * unit_t_);
     if (curr_a > vehicle_param_.max_acceleration() ||
         curr_a < vehicle_param_.max_deceleration()) {
       continue;
@@ -332,8 +331,8 @@ void DpStGraph::CalculateCostAt(const uint32_t c, const uint32_t r) {
     const STPoint& pre_point = pre_col[r_pre].point();
     const STPoint& curr_point = cost_cr.point();
     float cost = cost_cr.obstacle_cost() + pre_col[r_pre].total_cost() +
-                  CalculateEdgeCost(triple_pre_point, prepre_point, pre_point,
-                                    curr_point, speed_limit);
+                 CalculateEdgeCost(triple_pre_point, prepre_point, pre_point,
+                                   curr_point, speed_limit);
 
     if (cost < cost_cr.total_cost()) {
       cost_cr.SetTotalCost(cost);
@@ -391,15 +390,15 @@ Status DpStGraph::RetrieveSpeedProfile(SpeedData* const speed_data) {
 }
 
 float DpStGraph::CalculateEdgeCost(const STPoint& first, const STPoint& second,
-                                    const STPoint& third, const STPoint& forth,
-                                    const float speed_limit) {
+                                   const STPoint& third, const STPoint& forth,
+                                   const float speed_limit) {
   return dp_st_cost_.GetSpeedCost(third, forth, speed_limit) +
          dp_st_cost_.GetAccelCostByThreePoints(second, third, forth) +
          dp_st_cost_.GetJerkCostByFourPoints(first, second, third, forth);
 }
 
 float DpStGraph::CalculateEdgeCostForSecondCol(const uint32_t row,
-                                                const float speed_limit) {
+                                               const float speed_limit) {
   float init_speed = init_point_.v();
   float init_acc = init_point_.a();
   const STPoint& pre_point = cost_table_[0][0].point();
@@ -412,8 +411,8 @@ float DpStGraph::CalculateEdgeCostForSecondCol(const uint32_t row,
 }
 
 float DpStGraph::CalculateEdgeCostForThirdCol(const uint32_t curr_row,
-                                               const uint32_t pre_row,
-                                               const float speed_limit) {
+                                              const uint32_t pre_row,
+                                              const float speed_limit) {
   float init_speed = init_point_.v();
   const STPoint& first = cost_table_[0][0].point();
   const STPoint& second = cost_table_[1][pre_row].point();
