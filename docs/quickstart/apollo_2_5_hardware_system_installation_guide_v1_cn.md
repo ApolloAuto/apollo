@@ -1,204 +1,199 @@
-# Apollo 2.5 Hardware and System Installation Guide
+# Apollo 2.5 硬件与系统安装指南
 
-* [About This Guide](#about-this-guide)
-    * [Document Conventions](#document-conventions)
-* [Introduction](#introduction)
-    * [Documentation](#documentation)
-* [Key Hardware Components](#key-hardware-components)
-    * [Additional Components Required](#additional-components-required)
-    * [Onboard Computer System - IPC](#onboard-computer-system---ipc)
-        * [IPC Configuration](#ipc-configuration)
-        * [IPC Front and Side Views](#ipc-front-and-side-views)
-    * [Controller Area Network (CAN) Card](#controller-area-network-can-card)
-    * [Global Positioning System (GPS) and Inertial Measurement Unit (IMU)](#global-positioning-system-gps-and-inertial-measurement-unit-imu)
-        * [Option 1: The NovAtel SPAN-IGM-A1](#option-1-the-novatel-span-igm-a1)
-        * [Option 2: The NovAtel SPAN ProPak6 and NovAtel IMU-IGM-A1](#option-2-the-novatel-span-propak6-and-novatel-imu-igm-a1)
-    * [The GPS Receiver/Antenna](#the-gps-receiverantenna)
-* [Overview of the Installation Tasks](#overview-of-the-installation-tasks)
-* [Steps for the Installation Tasks](#steps-for-the-installation-tasks)
-    * [At the Office](#at-the-office)
-        * [Preparing the IPC](#preparing-the-ipc)
-        * [Installing the Software for the IPC](#installing-the-software-for-the-ipc)
-    * [In the Vehicle](#in-the-vehicle)
-        * [Prerequisites](#prerequisites)
-        * [Diagrams of the Major Component Installations](#diagrams-of-the-major-component-installations)
-        * [Installing the GPS Receiver and Antenna](#installing-the-gps-receiver-and-antenna)
-        * [Installing the Light Detection and Ranging System (LiDAR)](#installing-the-light-detection-and-ranging-system-lidar)
-        * [Installing the Cameras](#installing-the-cameras)
-        * [Installing the Radar](#installing-the-radar)
-        * [Installing the IPC](#installing-the-ipc)
-        * [Configuring the GPS and IMU](#configuring-the-gps-and-imu)
-* [Setting up the Network](#setting-up-the-network)
-    * [Recommendations](#recommendations)
-* [Additional Tasks Required](#additional-tasks-required)
-* [Next Steps](#next-steps)
+- [关于本篇指南](#关于本篇指南)
+    - [文档编写规则](#文档编写规则)
+- [引言](#引言)
+    - [文档说明](#文档说明)
+- [核心硬件](#核心硬件)
+    - [附加组件](#附加组件)
+    - [车载计算机系统 - IPC](#车载计算机系统---ipc)
+        - [IPC的配置](#ipc的配置)
+        - [IPC前侧视图](#ipc前侧视图)
+    - [控制器局域网络(CAN)卡](#控制器局域网络can卡)
+    - [全球定位系统(GPS)和惯性测量装置(IMU)](#全球定位系统gps和惯性测量装置imu)
+        - [选项1: NovAtel SPAN-IGM-A1](#选项1-novatel-span-igm-a1)
+        - [选项2: NovAtel SPAN ProPak6和NovAtel IMU-IGM-A1](#选项2-novatel-span-propak6和novatel-imu-igm-a1)
+    - [The GPS Receiver/Antenna](#the-gps-receiverantenna)
+        - [选项 1: **NovAtel GPS-703-GGG-HV**.](#选项-1-novatel-gps-703-ggg-hv)
+        - [选项 2: **Dual NovAtel GNSS-502**](#选项-2-dual-novatel-gnss-502)
+    - [激光雷达 (LiDAR)](#激光雷达-lidar)
+    - [摄像头](#摄像头)
+    - [雷达](#雷达)
+- [安装任务概览](#安装任务概览)
+- [安装任务步骤](#安装任务步骤)
+    - [上车前的准备工作](#上车前的准备工作)
+        - [IPC的准备工作](#ipc的准备工作)
+        - [为IPC安装软件](#为ipc安装软件)
+    - [上车安装](#上车安装)
+        - [前提条件](#前提条件)
+        - [主要部件安装图](#主要部件安装图)
+        - [安装GPS的接收器和天线](#安装gps的接收器和天线)
+            - [选项1：安装NovAtel SPAN-IGM-A1](#选项1安装novatel-span-igm-a1)
+            - [选项2：NovAtel SPAN® ProPak6™ 和 NovAtel IMU-IGM-A1](#选项2novatel-span®-propak6™-和-novatel-imu-igm-a1)
+        - [安装激光雷达(LiDAR)](#安装激光雷达lidar)
+        - [安装摄像头](#安装摄像头)
+        - [安装雷达](#安装雷达)
+- [建立网络](#建立网络)
+    - [推荐配置](#推荐配置)
+- [额外任务](#额外任务)
+- [下一步](#下一步)
 
 
-# About This Guide
+# 关于本篇指南
 
-The *Apollo 2.5 Hardware and System Installation Guide* provides the instructions to install all of the hardware components and system software for the **Apollo Project**. The system installation information included pertains to the procedures to download and install the Apollo Linux Kernel.
+本篇指南提供了所有 **Apollo项目**需要的的安装硬件部分和软件系统教程。系统安装信息包括下载和安装Apollo Linux内核的过程。
 
-## Document Conventions
+## 文档编写规则
 
-The following table lists the conventions that are used in this document:
+下表列出了本文使用的编写规则：
 
-| **Icon**                            | **Description**                          |
+| **图标**                            | **描述**                          |
 | ----------------------------------- | ---------------------------------------- |
-| **Bold**                            | Emphasis                                 |
-| `Mono-space font`                   | Code, typed data                         |
-| _Italic_                            | Titles of documents, sections, and headings Terms used |
-| ![info](images/info_icon.png)       | **Info**  Contains information that might be useful.  Ignoring the Info icon has no negative consequences. |
-| ![tip](images/tip_icon.png)         | **Tip**. Includes helpful hints or a shortcut that might assist you in completing a task. |
-| ![online](images/online_icon.png)   | **Online**. Provides a link to a particular web site where you can get more information. |
-| ![warning](images/warning_icon.png) | **Warning**. Contains information that must **not** be ignored or you risk failure when you perform a certain task or step. |
+| **加粗**                            | 强调。                                 |
+| `Mono-space 字体`                   | 代码, 类型数据。                         |
+| _斜体_                              | 文件、段落和标题中术语的用法。   |
+| ![信息](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/info_icon.png)       | **信息**  提供了可能有用的信息。忽略此信息可能会产生不可预知的后果。 |
+| ![提示](https://github.com/ireeX/apollo/blob/master/docs/quickstart/images/tip_icon.png)         | **提醒** 包含有用的提示或者可以帮助你完成安装的快捷步骤。 |
+| ![在线](https://github.com/ireeX/apollo/blob/master/docs/quickstart/images/online_icon.png)   | **在线** 提供指向特定网站的链接，您可以在其中获取更多信息。 |
+| ![警告](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/warning_icon.png) | **警告** 包含 **不能** 被忽略的内容，如果忽略，当前安装步骤可能会失败。 |
 
-# Introduction
+# 引言
 
-The **Apollo Project** is an initiative that provides an open, complete, and reliable software platform for Apollo partners in the automotive and autonomous driving industries. The aim of this project is to enable these entities to develop their own self-driving systems based on Apollo software stack.
+**Apollo项目**旨在为汽车和自动驾驶行业的合作伙伴提供开放，完整和可靠的软件平台。该项目的目的是使这些企业能够开发基于Apollo软件栈的自动驾驶系统。
 
-## Documentation
+## 文档说明
 
-The following set of documentation describes Apollo 2.5:
+以下文档适用于Apollo 2.5:
 
-- ***<u>[Apollo Hardware and System Installation Guide]</u>***  ─ Provides the instructions to install the hardware components and the system software for the vehicle:
+- ***<u>[Apollo Hardware and System Installation Guide]</u>***  ─ 提供用于安装车辆的硬件部件和系统软件的教程:
 
-    - **Vehicle**:
+    - **车辆**:
 
-      - Industrial PC (IPC)
-      - Global Positioning System (GPS)
-      - Inertial Measurement Unit (IMU)
-      - Controller Area Network (CAN) card
-      - GPS Antenna
-      - GPS Receiver
-      - Light Detection and Ranging System (LiDAR)
-      - Camera
-      - Radar
+      - 工业用计算机 (IPC)
+      - 全球定位系统 (GPS)
+      - 惯性测量单元 (IMU)
+      - 控制器局域网络 (CAN) 卡
+      - GPS 天线
+      - GPS 接收器
+      - 安装激光雷达 (LiDAR)
+      - 摄像头
+      - 雷达
 
-    - **Software**:
-      - Ubuntu Linux
-      - Apollo Linux Kernel
-      - NVIDIA GPU Driver
+    - **软件**:
+      - Ubuntu Linux 操作系统
+      - Apollo Linux 内核
+      - Nvidia GPU 驱动
 
-- ***<u>[Apollo Quick Start Guide]</u>*** ─ A combination of tutorial and roadmap that provides the complete set of end-to-end instructions. The Quick Start Guide also provides links to additional documents that describe the conversion of a regular car to an autonomous-driving vehicle.
+- ***<u>[Apollo Quick Start Guide]</u>*** ─ 文档和产品蓝图提供了完整的端到端教程。本文还提供了一些其它链接用于将一辆普通汽车改装成一辆自动驾驶车辆。
+
+# 核心硬件
+
+需要安装的关键的硬件组件包括：
+- 车载计算机系统 ─ Neousys Nuvo-6108GC
+- CAN卡 ─ ESD CAN-PCIe/402-B4
+- 全球定位系统(GPS)和惯性测量装置(IMU) ─ 您可从如下选项中任选其一:
+  - NovAtel SPN-IGM-A1
+  - NovAtel SPAN® ProPak6™ 和 NovAtel IMU-IGM-A1
+- 激光雷达 (LiDAR) - Velodyne HDL-64E S3
+- 摄像头 — 采用 USB 3.0 的Leopard Imaging LI-USB30-AR023ZWDR 
+- 雷达 — Continental ARS408-21
+
+## 附加组件
+- 提供网络接入的4G路由器
+- 提供额外USB接口的USB集线器
+- 供在车辆现场调试使用的显示器，键盘，鼠标
+- 连接线：数字可视接口（DVI）线（可选），用于GPS和LiDAR时间同步的定制线
+- 苹果iPad Pro:9.7寸, WiFi(可选)
 
 
-# Key Hardware Components
+关键硬件组件的特性将在后续部分中介绍。
 
-The key hardware components to install include:
+## 车载计算机系统 - IPC
+车载计算机系统是用于自动驾驶车辆的工业PC（IPC），并使用由第六代Intel Xeon E3 1275 V5 CPU强力驱动的 **NeousysNuvo-6108GC**。
 
-- Onboard computer system ─ Neousys Nuvo-6108GC
-- Controller Area Network (CAN) Card ─ ESD CAN-PCIe/402-B4
-- General Positioning System (GPS) and Inertial Measurement Unit (IMU) ─
-  You can select one of the following options:
-  - NovAtel SPAN-IGM-A1
-  - NovAtel SPAN® ProPak6™ and NovAtel IMU-IGM-A1
-- Light Detection and Ranging System (LiDAR) ─ Velodyne HDL-64E S3
-- Cameras — Leopard Imaging LI-USB30-AR023ZWDR with USB 3.0 case
-- Radar — Continental ARS408-21
+Neousys Nuvo-6108GC是自动驾驶系统（ADS）的中心单元。
 
-## Additional Components Required
-
-You need to provide these additional components for the Additional Tasks Required:
-
-- A 4G router for Internet access
-- A USB hub for extra USB ports
-- A monitor, keyboard, and mouse for debugging at the car onsite
-- Cables:a Digital Visual Interface (DVI) cable (optional), a customized cable for GPS-LiDAR time synchronization
-- Apple iPad Pro: 9.7-inch, Wi-Fi (optional)
-
-The features of the key hardware components are presented in the subsequent sections.
-
-## Onboard Computer System - IPC
-
-The onboard computer system is an industrial PC (IPC) for the autonomous vehicle and uses the **NeousysNuvo-6108GC** that is powered by a sixth-generation Intel Xeon E3 1275 V5 CPU.
-
-The Neousys Nuvo-6108GC is the central unit of the autonomous driving system (ADS).
-
-### IPC Configuration
-
-Configure the IPC as follows:
+### IPC的配置
+IPC配置如下：
 
 - ASUS GTX1080 GPU-A8G-Gaming GPU Card
 - 32GB DDR4 RAM
-- PO-280W-OW 280W AC/DC power adapter
-- 2.5" SATA Hard Disk 1TB 7200rpm
+- PO-280W-OW 280W 交流、直流电源适配器
+- 2.5" SATA 硬盘 1TB 7200rpm
 
-### IPC Front and Side Views
+### IPC前侧视图
 
-The front and side views of the IPC are shown with the Graphics Processing Unit (GPU) installed in the following pictures:
+安装了GPU的IPC前后视图如下:
 
-The front view of the Nuvo-6108GC:
+Nuvo-6108GC的前视图:
 
-![ipc_front](images/IPC-6108GC-front-side.jpg)
+![ipc_front](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/IPC-6108GC-front-side.jpg)
 
-The side view of the Nuvo-6108GC:
+Nuvo-6108GC的侧视图:
 
-![ipc_back](images/IPC-6108GC-left-side.jpg)
+![ipc_back](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/IPC-6108GC-left-side.jpg)
 
-For more information about the Nuvo-6108GC, see:
+想要了解更多有关 Nuvo-6108GC的资料, 请参考:
 
-![online](images/online_icon.png)
-Neousys Nuvo-6108GC Product Page:
+![online](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/online_icon.png)
+Neousys Nuvo-6108GC 产品页:
 
 [http://www.neousys-tech.com/en/product/application/rugged-embedded/nuvo-6108gc-gpu-computing](http://www.neousys-tech.com/en/product/application/rugged-embedded/nuvo-6108gc-gpu-computing)
 
-![online](images/online_icon.png)
-Neousys Nuvo-6108GC-Manual:
+![online](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/online_icon.png)
+Neousys Nuvo-6108GC 手册：还不可用。
 
-**[Link unavailable yet]**
+## 控制器局域网络(CAN)卡
+IPC中使用的CAN卡型号为 **ESD** **CAN-PCIe/402-B4**.
 
-## Controller Area Network (CAN) Card
+![can_card](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/CAN-B4.png)
 
-The CAN card to use with the IPC is **ESD** **CAN-PCIe/402-B4**.
+想要了解更多有关CAN-PCIe/402-B4的资料, 请参考:
 
-![can_card](images/CAN-B4.png)
-
-For more information about the CAN-PCIe/402-B4, see:
-
-![online](images/online_icon.png)    ESD CAN-PCIe/402 Product Page:
+![online](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/online_icon.png)    ESD CAN-PCIe/402 产品主页：
 
 [https://esd.eu/en/products/can-pcie402](https://esd.eu/en/products/can-pcie402)
 
 
 
-## Global Positioning System (GPS) and Inertial Measurement Unit (IMU)
+## 全球定位系统(GPS)和惯性测量装置(IMU)
 
-There are **two** GPS-IMU **options** available and the choice depends upon the one that most fits your needs:
+有 **两种** GPS-IMU的 **可选方案**，您只需根据您的需求进行选择:
 
-- **Option 1: NovAtel SPAN-IGM-A1**
-- **Option 2: NovAtel SPAN® ProPak6™ and NovAtel IMU-IGM-A1**
+- 选项1：NovAtel SPAN-IGM-A1
+- 选项2：NovAtel SPAN® ProPak6™ 和 NovAtel IMU-IGM-A1
 
-### Option 1: The NovAtel SPAN-IGM-A1
+### 选项1: NovAtel SPAN-IGM-A1
 
-The NovAtel SPAN-IGM-A1 is an integrated, single-box solution that offers tightly coupled Global Navigation Satellite System (GNSS) positioning and inertial navigation featuring the NovAtel OEM615 receiver.
+NovAtel SPAN-IGM-A1 是一个集成的，单盒的解决方案，提供紧密耦合的全球导航卫星系统（GNSS）定位和具有NovAtel OEM615接收机的惯性导航功能。 
 
-![novatel_imu](images/Novatel_imu.png)
+![novatel_imu](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/Novatel_imu.png)
 
-For more information about the NovAtel SPAN-IGM-A1, see:
+想要了解更多有关NovAtel SPAN-IGM-A1的资料, 请参考:
 
- ![online](images/online_icon.png) NovAtel SPAN-IGM-A1 Product Page:
+ ![online](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/online_icon.png) NovAtel SPAN-IGM-A1 产品页:
 
 [https://www.novatel.com/products/span-gnss-inertial-systems/span-combined-systems/span-igm-a1/](https://www.novatel.com/products/span-gnss-inertial-systems/span-combined-systems/span-igm-a1/)
 
-### Option 2: The NovAtel SPAN ProPak6 and NovAtel IMU-IGM-A1
+### 选项2: NovAtel SPAN ProPak6和NovAtel IMU-IGM-A1
 
-NovAtel ProPak6 is a standalone GNSS receiver. It works with a separate NovAtel- supported IMU (in this case, the NovAtel IMU-IGM-A1)to provide localization.
+NovAtel ProPak6是独立的GNSS接收机，它与NovAtel提供的独立IMU（本例中为NovAtel IMU-IGM-A1）相融合以提供定位。
 
-The ProPak6 provides the latest and most sophisticated enclosure product manufactured by NovAtel.
+ProPak6提供由NovAtel生产的最新最先进的外壳产品。
 
-The IMU-IGM-A1 is an IMU that pairs with a SPAN-enabled GNSS receiver such as the SPAN ProPak6.
+IMU-IGM-A1是与支持SPAN的GNSS接收器（如SPAN ProPak6）配对的IMU。 
 
-![novatel_pp6](images/Novatel_pp6.png)
+![novatel_pp6](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/Novatel_pp6.png)
 
-For more information about the NovAtel SPAN ProPak6 and the IMU-IGM-A1, see:
+想要了解更多有关NovAtel SPAN ProPak6 and the IMU-IGM-A1, 请参考:
 
-  ![online](images/online_icon.png) NovAtel ProPak6 Installation & Operation Manual:
+  ![online](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/online_icon.png) NovAtel ProPak6 安装操作手册
 
 [https://www.novatel.com/assets/Documents/Manuals/OM-20000148.pdf](https://www.novatel.com/assets/Documents/Manuals/OM-20000148.pdf)
 
-  ![online](images/online_icon.png)NovAtel IMU-IGM-A1 Product Page:
+  ![online](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/online_icon.png)NovAtel IMU-IGM-A1 产品页:
 
-[https://www.novatel.com/products/span-gnss-inertial-systems/span-imus/span-mems-imus/imu-igm-a1/#overview](https://www.novatel.com/products/span-gnss-inertial-systems/span-imus/span-mems-imus/imu-igm-a1/#overview)
+[https://www.novatel.com/products/span-gnss-inertial-systems/span-combined-systems/span-igm-a1/](https://www.novatel.com/products/span-gnss-inertial-systems/span-combined-systems/span-igm-a1/)
 
 ## The GPS Receiver/Antenna
 
