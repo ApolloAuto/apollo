@@ -1031,7 +1031,7 @@ log vehiclebodyrotationb onchanged
 SAVECONFIG
 ```
 
-**![warning_icon](images/warning_icon.png) WARNING:**基于真实的测量值（GPS天线、IMU的偏移量）修改 **<u>SETIMUTOANTOFFSE</u>T** 行。
+**![warning_icon](images/warning_icon.png) WARNING:** 基于真实的测量值（GPS天线、IMU的偏移量）修改 **<u>SETIMUTOANTOFFSE</u>T** 行。
 
 示例:
 
