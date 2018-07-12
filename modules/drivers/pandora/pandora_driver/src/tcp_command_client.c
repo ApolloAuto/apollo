@@ -14,9 +14,12 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "src/tcp_command_client.h"
 #include <arpa/inet.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <linux/sockios.h>
+#include <net/if.h>
 #include <netinet/in.h>
 #include <pthread.h>
 #include <setjmp.h>
@@ -25,17 +28,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/ioctl.h>
 #include <sys/ipc.h>
 #include <sys/msg.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <syslog.h>
 #include <unistd.h>
-#include <linux/sockios.h>
-#include <net/if.h>
-#include <sys/ioctl.h>
 #include "src/util.h"
-#include "src/tcp_command_client.h"
 
 typedef struct TcpCommandClient_s {
   pthread_mutex_t lock;
@@ -136,7 +136,7 @@ static int TcpCommand_buildHeader(char* buffer, TC_Command* cmd) {
 
 static PTC_ErrCode tcpCommandClient_SendCmd(TcpCommandClient* client,
                                             TC_Command* cmd) {
-  if (!client && !cmd) {
+  if (!client || !cmd) {
     printf("Bad Parameter\n");
     return PTC_ERROR_BAD_PARAMETER;
   }
