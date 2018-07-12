@@ -16,7 +16,7 @@
 ## Calibration
 > Learn the process of the calibration service
 
-  * [Calibration guide between LiDAR and INS](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_1_5_lidar_calibration_guide.md "Calibration guide between LiDAR and INS")
+  * [Calibration guide between LiDAR and INS](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/apollo_lidar_imu_calibration_guide.md)
   * [Guide for Camera-to-Camera calibration, Camera-to-LiDAR calibration, Radar-to-Camera calibration, IMU-to-Vehicle calibration](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_2_0_sensor_calibration_guide.md "Guide for Camera-to-Camera Calibration, Camera-to-LiDAR Calibration, Radar-to-Camera Calibration, IMU-to-Vehicle Calibration")
   * [Multiple-LiDAR GNSS calibration guide](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/multiple_lidar_gnss_calibration_guide.md "Multiple-LiDAR GNSS calibration guide")
   * [Apollo coordination](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/coordination.pdf "Apollo coordination")
