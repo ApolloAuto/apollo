@@ -447,7 +447,7 @@ void Planning::SetFallbackTrajectory(ADCTrajectory* trajectory_pb) {
   } else {
     // use planning trajecotry from last cycle
     auto* last_planning = AdapterManager::GetPlanning();
-    if (last_planning != nullptr) {
+    if (last_planning != nullptr && !last_planning->Empty()) {
       ADCTrajectory traj = last_planning->GetLatestObserved();
 
       const double current_time_stamp = trajectory_pb->header().timestamp_sec();
