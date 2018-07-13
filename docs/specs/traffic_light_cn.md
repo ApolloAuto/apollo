@@ -68,12 +68,12 @@ Apollo已经证明了仅仅使用一个固定视野的摄像头无法识别所�
 
 #### 输入数据
 
-- 可以通过订阅下述主题来获取不同摄像头的图像数据：
+- 可以通过订阅以下topic来获取不同摄像头的图像数据：
 
     - `/apollo/sensor/camera/traffic/image_long`
     - `/apollo/sensor/camera/traffic/image_short`
 
-- 定位信息，通过查询下述主题获得：
+- 定位信息，通过查询以下topic获得：
     - `/tf`
 
 - 高精地图
