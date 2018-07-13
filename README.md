@@ -249,5 +249,6 @@ Please refer the Disclaimer of Apollo in [Apollo's official website](http://apol
 * [YouTube](https://www.youtube.com/channel/UC8wR_NX_NShUTSSqIaEUY9Q)
 * [Blog](https://www.medium.com/apollo-auto)
 * [Newsletter](http://eepurl.com/c-mLSz)
+* Interested in our turnKey solutions or partnering with us Mail us at: apollopartner@baidu.com
 
 
