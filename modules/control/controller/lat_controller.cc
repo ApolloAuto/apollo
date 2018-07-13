@@ -269,6 +269,7 @@ Status LatController::ComputeControlCommand(
     const canbus::Chassis *chassis,
     const planning::ADCTrajectory *planning_published_trajectory,
     ControlCommand *cmd) {
+
   VehicleStateProvider::instance()->set_linear_velocity(chassis->speed_mps());
 
   auto target_tracking_trajectory = *planning_published_trajectory;
@@ -310,8 +311,10 @@ Status LatController::ComputeControlCommand(
       auto tx = -(cos_theta * x_diff - sin_theta * y_diff);
       auto ty = -(sin_theta * x_diff + cos_theta * y_diff);
 
-      auto trajectory_points = target_tracking_trajectory.trajectory_point();
-      std::for_each(trajectory_points.begin(), trajectory_points.end(),
+      auto ptr_trajectory_points =
+          target_tracking_trajectory.mutable_trajectory_point();
+      std::for_each(
+          ptr_trajectory_points->begin(), ptr_trajectory_points->end(),
           [&cos_theta, &sin_theta, &tx, &ty, &theta_diff]
            (common::TrajectoryPoint& p) {
             auto x = p.path_point().x();
@@ -443,7 +446,7 @@ Status LatController::Reset() {
 }
 
 void LatController::UpdateState(SimpleLateralDebug *debug) {
-  if (FLAGS_enable_navigation_mode_handlilng) {
+  if (FLAGS_use_navigation_mode) {
     ComputeLateralErrors(0.0, 0.0, VehicleStateProvider::instance()->heading(),
                          VehicleStateProvider::instance()->linear_velocity(),
                          VehicleStateProvider::instance()->angular_velocity(),
@@ -557,6 +560,7 @@ void LatController::ComputeLateralErrors(
   if (FLAGS_enable_navigation_mode_handlilng) {
     lateral_error = lateral_error_filter_.Update(lateral_error);
   }
+
   debug->set_lateral_error(lateral_error);
 
   double heading_error =
