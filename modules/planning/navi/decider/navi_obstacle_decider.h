@@ -26,9 +26,10 @@
 #include <string>
 #include <vector>
 
+#include "modules/common/proto/pnc_point.pb.h"
+
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/vec2d.h"
-#include "modules/common/proto/pnc_point.pb.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/obstacle.h"
 #include "modules/planning/tasks/task.h"
@@ -61,6 +62,12 @@ class NaviObstacleDecider : public Task {
   const ::apollo::common::VehicleParam &VehicleParam();
 
   /**
+   * @brief Get unsafe obstacles' ID
+   * @return unsafe_obstacle_ID_
+   */
+  const std::vector<std::string> &UnsafeObstacles();
+
+  /**
    * @brief get the actual nudgable distance according to the
    * position of the obstacle
    * @return actual nudgable distance
@@ -70,6 +77,14 @@ class NaviObstacleDecider : public Task {
       const PathDecision &path_decision,
       const std::vector<common::PathPoint> &path_data_points,
       const double min_lane_width, int *lane_obstacles_num);
+
+  /**
+   * @brief get the unsafe obstacles between trajectory and reference line.
+   * @return obstacles' ID.
+   */
+  void GetUnsafeObstaclesID(
+      const std::vector<common::PathPoint> &path_data_points,
+      const std::vector<const Obstacle *> &obstacles);
 
  private:
   /**
@@ -84,6 +99,7 @@ class NaviObstacleDecider : public Task {
 
  private:
   std::map<double, double> obstacle_lat_dist_;
+  std::vector<std::string> unsafe_obstacle_ID_;
 
   // TODO(all): Add your member functions and variables.
 };
@@ -94,6 +110,10 @@ NaviObstacleDecider::VehicleParam() {
                                   ->GetConfig()
                                   .vehicle_param();
   return vehicle_param;
+}
+
+inline const std::vector<std::string> &NaviObstacleDecider::UnsafeObstacles() {
+  return unsafe_obstacle_ID_;
 }
 
 }  // namespace planning

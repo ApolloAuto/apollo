@@ -108,6 +108,9 @@ class EMPlanner : public Planner {
 
   bool IsValidProfile(const QuinticPolynomialCurve1d& curve) const;
 
+  common::SLPoint GetStopSL(const ObjectStop& stop_decision,
+                            const ReferenceLine& reference_line) const;
+
   void RecordObstacleDebugInfo(ReferenceLineInfo* reference_line_info);
 
   void RecordDebugInfo(ReferenceLineInfo* reference_line_info,

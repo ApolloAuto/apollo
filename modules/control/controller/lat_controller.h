@@ -102,17 +102,13 @@ class LatController : public Controller {
   std::string Name() const override;
 
  protected:
-  void UpdateStateAnalyticalMatching(SimpleLateralDebug *debug);
+  void UpdateState(SimpleLateralDebug *debug);
 
   void UpdateMatrix();
 
   void UpdateMatrixCompound();
 
   double ComputeFeedForward(double ref_curvature) const;
-
-  double GetLateralError(
-      const common::math::Vec2d &point,
-      apollo::common::TrajectoryPoint *trajectory_point) const;
 
   void ComputeLateralErrors(const double x, const double y, const double theta,
                             const double linear_v, const double angular_v,
@@ -188,26 +184,6 @@ class LatController : public Controller {
   // 4 by 1 matrix; state matrix
   Eigen::MatrixXd matrix_state_;
 
-  // heading error
-  // double heading_error_ = 0.0;
-  // lateral distance to reference trajectory
-  // double lateral_error_ = 0.0;
-
-  // reference heading
-  // double ref_heading_ = 0.0;
-  // reference trajectory curvature
-  // double ref_curvature_ = 0.0;
-
-  // heading error of last control cycle
-  double previous_heading_error_ = 0.0;
-  // lateral distance to reference trajectory of last control cycle
-  double previous_lateral_error_ = 0.0;
-
-  // heading error change rate over time, i.e. d(heading_error) / dt
-  // double heading_error_rate_ = 0.0;
-  // lateral error change rate over time, i.e. d(lateral_error) / dt
-  // double lateral_error_rate_ = 0.0;
-
   // parameters for lqr solver; number of iterations
   int lqr_max_iteration_ = 0;
   // parameters for lqr solver; threshold for computation
@@ -228,11 +204,17 @@ class LatController : public Controller {
 
   const std::string name_;
 
-  double query_relative_time_;
-
   double pre_steer_angle_ = 0.0;
 
   double minimum_speed_protection_ = 0.1;
+
+  double current_trajectory_timestamp_ = -1.0;
+
+  double init_vehicle_x_ = 0.0;
+
+  double init_vehicle_y_ = 0.0;
+
+  double init_vehicle_heading_ = 0.0;
 };
 
 }  // namespace control

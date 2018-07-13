@@ -164,9 +164,23 @@ class SimulationWorldService {
   void UpdateMainStopDecision(
       const apollo::planning::MainDecision &main_decision,
       double update_timestamp_sec, Object *world_main_stop);
+
   template <typename MainDecision>
   void UpdateMainChangeLaneDecision(const MainDecision &decision,
-                                    Object *world_main_decision);
+                                    Object *world_main_decision) {
+    if (decision.has_change_lane_type() &&
+        (decision.change_lane_type() == apollo::routing::ChangeLaneType::LEFT ||
+         decision.change_lane_type() ==
+             apollo::routing::ChangeLaneType::RIGHT)) {
+      auto *change_lane_decision = world_main_decision->add_decision();
+      change_lane_decision->set_change_lane_type(decision.change_lane_type());
+      change_lane_decision->set_position_x(
+          world_.auto_driving_car().position_x() + map_service_->GetXOffset());
+      change_lane_decision->set_position_y(
+          world_.auto_driving_car().position_y() + map_service_->GetYOffset());
+      change_lane_decision->set_heading(world_.auto_driving_car().heading());
+    }
+  }
 
   void CreatePredictionTrajectory(
       const apollo::prediction::PredictionObstacle &obstacle,
@@ -206,7 +220,24 @@ class SimulationWorldService {
   template <typename Points>
   void DownsampleSpeedPointsByInterval(const Points &points,
                                        size_t downsampleInterval,
-                                       Points *downsampled_points);
+                                       Points *downsampled_points) {
+    if (points.size() == 0) {
+      return;
+    }
+
+    for (int i = 0; i < points.size() - 1; i += downsampleInterval) {
+      auto *point = downsampled_points->Add();
+      point->set_s(points[i].s());
+      point->set_t(points[i].t());
+      point->set_v(points[i].v());
+    }
+
+    // add the last point
+    auto *point = downsampled_points->Add();
+    point->set_s(points[points.size() - 1].s());
+    point->set_t(points[points.size() - 1].t());
+    point->set_v(points[points.size() - 1].v());
+  }
 
   // The underlying SimulationWorld object, owned by the
   // SimulationWorldService instance.
