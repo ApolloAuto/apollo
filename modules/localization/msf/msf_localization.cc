@@ -22,9 +22,9 @@
 #include "modules/drivers/gnss/proto/config.pb.h"
 
 #include "modules/common/adapters/adapter_manager.h"
+#include "modules/common/math/euler_angles_zxy.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/common/math/quaternion.h"
-#include "modules/common/math/euler_angles_zxy.h"
 #include "modules/common/time/time.h"
 #include "modules/common/util/file.h"
 #include "modules/common/util/string_tokenizer.h"
@@ -33,12 +33,12 @@
 namespace apollo {
 namespace localization {
 
-using ::Eigen::Vector3d;
+using apollo::common::Status;
 using apollo::common::adapter::AdapterManager;
 using apollo::common::adapter::ImuAdapter;
 using apollo::common::monitor::MonitorMessageItem;
-using apollo::common::Status;
 using apollo::common::time::Clock;
+using ::Eigen::Vector3d;
 
 MSFLocalization::MSFLocalization()
     : monitor_logger_(MonitorMessageItem::LOCALIZATION),
@@ -157,7 +157,7 @@ void MSFLocalization::InitParams() {
   // try load zone id from local_map folder
   if (FLAGS_if_utm_zone_id_from_folder) {
     bool success = LoadZoneIdFromFolder(localizaiton_param_.map_path,
-                                      &localizaiton_param_.utm_zone_id);
+                                        &localizaiton_param_.utm_zone_id);
     if (!success) {
       AWARN << "Can't load utm zone id from map folder, use default value.";
     }
@@ -189,10 +189,8 @@ void MSFLocalization::InitParams() {
       AWARN << "Can't load imu vehicle quat from file, use default value.";
     }
   }
-  AINFO << "imu_vehicle_quat: "
-        << imu_vehicle_quat_.x() << " "
-        << imu_vehicle_quat_.y() << " "
-        << imu_vehicle_quat_.z() << " "
+  AINFO << "imu_vehicle_quat: " << imu_vehicle_quat_.x() << " "
+        << imu_vehicle_quat_.y() << " " << imu_vehicle_quat_.z() << " "
         << imu_vehicle_quat_.w();
 
   // common
@@ -294,28 +292,23 @@ void MSFLocalization::OnRawImu(const drivers::gnss::Imu &imu_msg) {
       // caculate orientation_vehicle_world
       LocalizationEstimate local_result = itr->localization();
       apollo::localization::Pose *posepb_loc = local_result.mutable_pose();
-      const apollo::common::Quaternion& orientation =
-          posepb_loc->orientation();
+      const apollo::common::Quaternion &orientation = posepb_loc->orientation();
       const Eigen::Quaternion<double> quaternion(
-          orientation.qw(), orientation.qx(),
-          orientation.qy(), orientation.qz());
+          orientation.qw(), orientation.qx(), orientation.qy(),
+          orientation.qz());
       Eigen::Quaternion<double> quat_vehicle_world =
           quaternion * imu_vehicle_quat_;
 
       // set heading according to rotation of vehicle
-      posepb_loc->set_heading(
-          common::math::QuaternionToHeading(quat_vehicle_world.w(),
-                                            quat_vehicle_world.x(),
-                                            quat_vehicle_world.y(),
-                                            quat_vehicle_world.z()));
+      posepb_loc->set_heading(common::math::QuaternionToHeading(
+          quat_vehicle_world.w(), quat_vehicle_world.x(),
+          quat_vehicle_world.y(), quat_vehicle_world.z()));
 
       // set euler angles according to rotation of vehicle
-      apollo::common::Point3D *eulerangles =
-          posepb_loc->mutable_euler_angles();
-      common::math::EulerAnglesZXYd euler_angle(quat_vehicle_world.w(),
-                                                quat_vehicle_world.x(),
-                                                quat_vehicle_world.y(),
-                                                quat_vehicle_world.z());
+      apollo::common::Point3D *eulerangles = posepb_loc->mutable_euler_angles();
+      common::math::EulerAnglesZXYd euler_angle(
+          quat_vehicle_world.w(), quat_vehicle_world.x(),
+          quat_vehicle_world.y(), quat_vehicle_world.z());
       eulerangles->set_x(euler_angle.pitch());
       eulerangles->set_y(euler_angle.roll());
       eulerangles->set_z(euler_angle.yaw());
@@ -325,7 +318,7 @@ void MSFLocalization::OnRawImu(const drivers::gnss::Imu &imu_msg) {
     }
   }
 
-  if (integ_localization_list.size()) {
+  if (!integ_localization_list.empty()) {
     localization_state_ = integ_localization_list.back().state();
   }
 
@@ -425,9 +418,10 @@ bool MSFLocalization::LoadGnssAntennaExtrinsic(
   return false;
 }
 
-bool MSFLocalization::LoadImuVehicleExtrinsic(
-    const std::string &file_path, double *quat_qx, double *quat_qy,
-    double *quat_qz, double *quat_qw) {
+bool MSFLocalization::LoadImuVehicleExtrinsic(const std::string &file_path,
+                                              double *quat_qx, double *quat_qy,
+                                              double *quat_qz,
+                                              double *quat_qw) {
   if (!common::util::PathExists(file_path)) {
     return false;
   }
@@ -447,7 +441,7 @@ bool MSFLocalization::LoadImuVehicleExtrinsic(
 }
 
 bool MSFLocalization::LoadZoneIdFromFolder(const std::string &folder_path,
-                                         int *zone_id) {
+                                           int *zone_id) {
   std::string map_zone_id_folder;
   if (common::util::DirectoryExists(folder_path + "/map/000/north")) {
     map_zone_id_folder = folder_path + "/map/000/north";

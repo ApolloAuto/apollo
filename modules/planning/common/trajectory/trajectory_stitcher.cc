@@ -121,7 +121,8 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
   const double veh_rel_time =
       current_timestamp - prev_trajectory->header_time();
 
-  std::size_t matched_index = prev_trajectory->QueryNearestPoint(veh_rel_time);
+  std::size_t matched_index =
+      prev_trajectory->QueryLowerBoundPoint(veh_rel_time);
 
   if (matched_index == 0 &&
       veh_rel_time < prev_trajectory->StartPoint().relative_time()) {
@@ -133,7 +134,7 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
     return ComputeReinitStitchingTrajectory(vehicle_state);
   }
 
-  auto matched_point = prev_trajectory->Evaluate(veh_rel_time);
+  auto matched_point = prev_trajectory->TrajectoryPointAt(matched_index);
 
   if (!matched_point.has_path_point()) {
     return ComputeReinitStitchingTrajectory(vehicle_state);
@@ -161,7 +162,7 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
       planning_cycle_time;
 
   std::size_t forward_index =
-      prev_trajectory->QueryNearestPoint(forward_rel_time);
+      prev_trajectory->QueryLowerBoundPoint(forward_rel_time);
 
   ADEBUG << "matched_index: " << matched_index;
   std::vector<TrajectoryPoint> stitching_trajectory(
