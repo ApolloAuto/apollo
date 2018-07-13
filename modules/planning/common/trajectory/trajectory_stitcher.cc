@@ -72,8 +72,8 @@ void TrajectoryStitcher::TransformLastPublishedTrajectory(const double x_diff,
   auto tx = -(cos_theta * x_diff - sin_theta * y_diff);
   auto ty = -(sin_theta * x_diff + cos_theta * y_diff);
 
-  auto trajectory_points = prev_trajectory->trajectory_points();
-  std::for_each(trajectory_points.begin(), trajectory_points.end(),
+  std::for_each(prev_trajectory->trajectory_points().begin(),
+      prev_trajectory->trajectory_points().end(),
       [&cos_theta, &sin_theta, &tx, &ty, &theta_diff]
        (common::TrajectoryPoint& p) {
         auto x = p.path_point().x();
