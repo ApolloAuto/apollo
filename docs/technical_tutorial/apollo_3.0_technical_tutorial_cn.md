@@ -13,52 +13,52 @@
 ## 校准
 > 了解校准的过程
 
-  * [Calibration guide between LiDAR and INS](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_1_5_lidar_calibration_guide.md)
-  * [Guide for Camera-to-Camera calibration, Camera-to-LiDAR calibration, Radar-to-Camera calibration, IMU-to-Vehicle calibration](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_2_0_sensor_calibration_guide.md)
-  * [Multiple-LiDAR GNSS calibration guide](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/multiple_lidar_gnss_calibration_guide.md)
-  * [Apollo Coordinate System](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/coordination.pdf)
+  * [Apollo激光雷达校准指南](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_1_5_lidar_calibration_guide_cn.md)
+  * [Apollo 2.0传感器校准指南](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_2_0_sensor_calibration_guide_cn.md)
+  * [多激光雷达全球导航卫星系统(Multiple-LiDAR GNSS)校准指南](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/multiple_lidar_gnss_calibration_guide_cn.md)
+  * [Apollo坐标系统](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/coordination_cn.md)
 
 ## 软件安装
 > 了解Apollo3.0的软件安装过程
 
   * [Apollo软件安装指南](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_software_installation_guide_cn.md)
-  * [How to Debug a Dreamview Start Problem](https://github.com/ApolloAuto/apollo/blob/master/docs/howto/how_to_debug_dreamview_start_problem.md)
-  * [Run offline demo](https://github.com/ApolloAuto/apollo/blob/master/docs/demo_guide/README.md)
+  * [如何调试Dreamview启动问题](https://github.com/ApolloAuto/apollo/blob/master/docs/howto/how_to_debug_dreamview_start_problem_cn.md)
+  * [运行线下演示](https://github.com/ApolloAuto/apollo/blob/master/docs/demo_guide/README_cn.md)
   
 ## Apollo系统架构和原理
 > 了解核心模块的架构和原理
 
-  * [Apollo software architecture](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/Apollo_3.0_Software_Architecture.md "Apollo software architecture")
-  * [3D Obstacle Perception](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/3d_obstacle_perception.md)
-  * [Apollo 3.0 Perception](https://github.com/ApolloAuto/apollo/blob/master/modules/perception/README.md)
-  * [QP-Spline-Path Optimizer](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/qp_spline_path_optimizer.md)
-  * [QP-Spline-ST-Speed Optimizer](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/qp_spline_st_speed_optimizer.md)
-  * [Reference Line Smoother](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/reference_line_smoother.md)
-  * [Traffic Light Perception](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/traffic_light.md)
+  * [Apollo 3.0 软件架构](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/Apollo_3.0_Software_Architecture_cn.md "Apollo software architecture")
+  * [3D 障碍物感知](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/3d_obstacle_perception_cn.md)
+  * [Apollo 3.0感知](https://github.com/ApolloAuto/apollo/blob/master/modules/perception/README.md)
+  * [二次规划（QP）样条路径优化](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/qp_spline_path_optimizer_cn.md)
+  * [二次规划（QP）样条ST速度优化](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/qp_spline_st_speed_optimizer_cn.md)
+  * [参考线平滑设定](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/reference_line_smoother_cn.md)
+  * [交通信号灯感知](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/traffic_light_cn.md)
   
 ## 功能模块和相关扩展知识
 > 了解Apollo功能模块和相关扩展知识
 
-  * [Canbus module](https://github.com/ApolloAuto/apollo/blob/master/modules/canbus/README.md)
-  * [Common module](https://github.com/ApolloAuto/apollo/blob/master/modules/common/README.md)
-  * [Control module](https://github.com/ApolloAuto/apollo/blob/master/modules/control/README.md)
-  * [Data module](https://github.com/ApolloAuto/apollo/blob/master/modules/data/README.md)
-  * [Localization module](https://github.com/ApolloAuto/apollo/blob/master/modules/localization/README.md)
-  * [Perception module](https://github.com/ApolloAuto/apollo/blob/master/modules/perception/README.md)
-  * [Planning module](https://github.com/ApolloAuto/apollo/blob/master/modules/planning/README.md)
-  * [Prediction module](https://github.com/ApolloAuto/apollo/blob/master/modules/prediction/README.md)
-  * [Routing module](https://github.com/ApolloAuto/apollo/blob/master/modules/routing/README.md)
+  * [控制总线模块](https://github.com/ApolloAuto/apollo/blob/master/modules/canbus/README.md)
+  * [通用模块](https://github.com/ApolloAuto/apollo/blob/master/modules/common/README.md)
+  * [控制模块](https://github.com/ApolloAuto/apollo/blob/master/modules/control/README.md)
+  * [数据模块](https://github.com/ApolloAuto/apollo/blob/master/modules/data/README.md)
+  * [定位模块](https://github.com/ApolloAuto/apollo/blob/master/modules/localization/README.md)
+  * [感知模块](https://github.com/ApolloAuto/apollo/blob/master/modules/perception/README.md)
+  * [Planning模块](https://github.com/ApolloAuto/apollo/blob/master/modules/planning/README.md)
+  * [预测模块](https://github.com/ApolloAuto/apollo/blob/master/modules/prediction/README.md)
+  * [寻路模块](https://github.com/ApolloAuto/apollo/blob/master/modules/routing/README.md)
 
-  * [How to Add a New GPS Receiver](https://github.com/ApolloAuto/apollo/blob/master/docs/howto/how_to_add_a_gps_receiver.md)
-  * [How to Add a New CAN Card](https://github.com/ApolloAuto/apollo/blob/master/docs/howto/how_to_add_a_new_can_card.md )
-  * [How to Add a New Control Algorithm](https://github.com/ApolloAuto/apollo/blob/master/docs/howto/how_to_add_a_new_control_algorithm.md)
-  * [How to Add a New Evaluator in Prediction Module](https://github.com/ApolloAuto/apollo/blob/master/docs/howto/how_to_add_a_new_evaluator_in_prediction_module.md)
-  * [How to Add a New Predictor in Prediction Module](https://github.com/ApolloAuto/apollo/blob/master/docs/howto/how_to_add_a_new_predictor_in_prediction_module.md)
-  * [How to Add a New Vehicle](https://github.com/ApolloAuto/apollo/blob/master/docs/howto/how_to_add_a_new_vehicle.md)
-  * [How to Add a New External Dependency](https://github.com/ApolloAuto/apollo/blob/master/docs/howto/how_to_add_an_external_dependency.md)
+  * [如何添加新的GPS接收器](https://github.com/ApolloAuto/apollo/blob/master/docs/howto/how_to_add_a_gps_receiver_cn.md)
+  * [如何添加新的CAN卡](https://github.com/ApolloAuto/apollo/blob/master/docs/howto/how_to_add_a_new_can_card_cn.md )
+  * [如何添加新的控制算法](https://github.com/ApolloAuto/apollo/blob/master/docs/howto/how_to_add_a_new_control_algorithm_cn.md)
+  * [如何在预测模块中添加新评估器](https://github.com/ApolloAuto/apollo/blob/master/docs/howto/how_to_add_a_new_evaluator_in_prediction_module_cn.md)
+  * [如何在预测模块中添加一个预测器](https://github.com/ApolloAuto/apollo/blob/master/docs/howto/how_to_add_a_new_predictor_in_prediction_module_cn.md)
+  * [如何在Apollo中添加新的车辆](https://github.com/ApolloAuto/apollo/blob/master/docs/howto/how_to_add_a_new_vehicle_cn.md)
+  * [如何添加新的外部依赖项](https://github.com/ApolloAuto/apollo/blob/master/docs/howto/how_to_add_an_external_dependency_cn.md)
   
   ## 开发者工具
 > 了解开发者工具
 
-  * [How  to build and debug Apollo in VSCode](https://github.com/ApolloAuto/apollo/blob/master/docs/howto/how_to_build_and_debug_apollo_in_vscode_cn.md "How  to build and debug Apollo in VSCode")
-  * [Introduction of Dreamview](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/dreamview_usage_table.md)
+  * [使用VSCode构建、调试Apollo项目](https://github.com/ApolloAuto/apollo/blob/master/docs/howto/how_to_build_and_debug_apollo_in_vscode_cn.md "How  to build and debug Apollo in VSCode")
+  * [DreamView用法介绍](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/dreamview_usage_table_cn.md)

@@ -265,6 +265,9 @@ function release() {
   # scripts
   cp -r scripts ${APOLLO_RELEASE_DIR}
 
+  # remove mounted models
+  rm -rf ${APOLLO_RELEASE_DIR}/modules/perception/model/yolo_camera_detector/
+
   # lib
   LIB_DIR="${APOLLO_RELEASE_DIR}/lib"
   mkdir "${LIB_DIR}"
@@ -277,7 +280,6 @@ function release() {
   cp modules/perception/cuda_util/cmake_build/libcuda_util.so $LIB_DIR
 
   # doc
-  cp -r docs "${APOLLO_RELEASE_DIR}"
   cp LICENSE "${APOLLO_RELEASE_DIR}"
   cp third_party/ACKNOWLEDGEMENT.txt "${APOLLO_RELEASE_DIR}"
 
