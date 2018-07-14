@@ -268,12 +268,19 @@ void Planning::RunOnce() {
     auto vehicle_config = ComputeVehicleConfigFromLocalization(localization);
 
     if (last_vehicle_config_.is_valid_ && vehicle_config.is_valid_) {
-      auto x_diff = vehicle_config.x_ - last_vehicle_config_.x_;
-      auto y_diff = vehicle_config.y_ - last_vehicle_config_.y_;
+      auto x_diff_map = vehicle_config.x_ - last_vehicle_config_.x_;
+      auto y_diff_map = vehicle_config.y_ - last_vehicle_config_.y_;
+
+      auto cos_map_veh = std::cos(last_vehicle_config_.theta_);
+      auto sin_map_veh = std::sin(last_vehicle_config_.theta_);
+
+      auto x_diff_veh = cos_map_veh * x_diff_map + sin_map_veh * y_diff_map;
+      auto y_diff_veh = -sin_map_veh * x_diff_map + cos_map_veh * y_diff_map;
+
       auto theta_diff = vehicle_config.theta_ - last_vehicle_config_.theta_;
 
-      TrajectoryStitcher::TransformLastPublishedTrajectory(
-          x_diff, y_diff, theta_diff, last_publishable_trajectory_.get());
+      TrajectoryStitcher::TransformLastPublishedTrajectory(x_diff_veh,
+          y_diff_veh, theta_diff, last_publishable_trajectory_.get());
     }
     last_vehicle_config_ = vehicle_config;
   }
