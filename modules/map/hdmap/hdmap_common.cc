@@ -128,9 +128,7 @@ PointENU PointFromVec2d(const Vec2d &point) {
 
 }  // namespace
 
-LaneInfo::LaneInfo(const Lane &lane) : lane_(lane) {
-  Init();
-}
+LaneInfo::LaneInfo(const Lane &lane) : lane_(lane) { Init(); }
 
 void LaneInfo::Init() {
   PointsFromCurve(lane_.central_curve(), &points_);
@@ -428,46 +426,39 @@ bool LaneInfo::GetProjection(const Vec2d &point, double *accumulate_s,
   if (segments_.empty()) {
     return false;
   }
-  double min_distance = std::numeric_limits<double>::infinity();
-  std::size_t min_index = 0;
-  double min_proj = 0.0;
-  std::size_t num_segments = segments_.size();
-  for (std::size_t i = 0; i < num_segments; ++i) {
-    const auto &segment = segments_[i];
-    const double distance = segment.DistanceTo(point);
-    if (distance < min_distance) {
-      const double proj = segment.ProjectOntoUnit(point);
-      if (proj < 0.0 && i > 0) {
-        continue;
-      }
-      if (proj > segment.length() && i + 1 < num_segments) {
-        const auto &next_segment = segments_[i + 1];
-        if ((point - next_segment.start())
-                .InnerProd(next_segment.unit_direction()) >= 0.0) {
-          continue;
-        }
-      }
-      min_distance = distance;
+  double min_dist = std::numeric_limits<double>::infinity();
+  int seg_num = segments_.size();
+  int min_index = 0;
+  for (int i = 0; i < seg_num; ++i) {
+    const double distance = segments_[i].DistanceSquareTo(point);
+    if (distance < min_dist) {
       min_index = i;
-      min_proj = proj;
+      min_dist = distance;
     }
   }
-
-  const auto &segment = segments_[min_index];
-  if (min_index + 1 >= num_segments) {
-    *accumulate_s = accumulated_s_[min_index] + min_proj;
+  min_dist = std::sqrt(min_dist);
+  const auto &nearest_seg = segments_[min_index];
+  const auto prod = nearest_seg.ProductOntoUnit(point);
+  const auto proj = nearest_seg.ProjectOntoUnit(point);
+  if (min_index == 0) {
+    *accumulate_s = std::min(proj, nearest_seg.length());
+    if (proj < 0) {
+      *lateral = prod;
+    } else {
+      *lateral = (prod > 0.0 ? 1 : -1) * min_dist;
+    }
+  } else if (min_index == seg_num - 1) {
+    *accumulate_s = accumulated_s_[min_index] + std::max(0.0, proj);
+    if (proj > 0) {
+      *lateral = prod;
+    } else {
+      *lateral = (prod > 0.0 ? 1 : -1) * min_dist;
+    }
   } else {
-    *accumulate_s =
-        accumulated_s_[min_index] + std::min(min_proj, segment.length());
+    *accumulate_s = accumulated_s_[min_index] +
+                    std::max(0.0, std::min(proj, nearest_seg.length()));
+    *lateral = (prod > 0.0 ? 1 : -1) * min_dist;
   }
-  const double prod = segment.ProductOntoUnit(point);
-  if ((min_index == 0 && min_proj < 0.0) ||
-      (min_index + 1 == num_segments && min_proj > segment.length())) {
-    *lateral = prod;
-  } else {
-    *lateral = (prod > 0.0 ? min_distance : -min_distance);
-  }
-
   return true;
 }
 
@@ -575,9 +566,7 @@ void JunctionInfo::UpdateOverlaps(const HDMapImpl &map_instance) {
   }
 }
 
-SignalInfo::SignalInfo(const Signal &signal) : signal_(signal) {
-  Init();
-}
+SignalInfo::SignalInfo(const Signal &signal) : signal_(signal) { Init(); }
 
 void SignalInfo::Init() {
   for (const auto &stop_line : signal_.stop_line()) {
