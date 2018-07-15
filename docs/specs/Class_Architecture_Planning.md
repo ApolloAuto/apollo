@@ -47,7 +47,7 @@ Each predicted trajectory has a probability associated with it, and one obstacle
 
 In addition to the query concepts “where I want to go” and “what is surrounding me”, another important query concept is “where am I”. Such information is obtained from the HD-Map and Localization modules. Both localization and vehicle chassis information are incorporated in the messages of `VehicleState` that is defined in the `vehicle_state.proto`, as shown below.
 
-![img](file://localhost/private/var/folders/1n/hnpps_ps0gl_pw_g_69ds93m0000gp/T/TemporaryItems/msoclip/0/clip_image012.png)
+![img](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/images/class_architecture_planning/image009.png)
 
 ## Code Structure and Class Hierarchy
 
