@@ -46,7 +46,7 @@ When a localization update is received, the prediction module updates its intern
 
 ## Localization
 
-The routing module aggregates various data to locate the autonomous vehicle. There are two types of localization modes: OnTimer and Multiple SensorFusion.
+The localization module aggregates various data to locate the autonomous vehicle. There are two types of localization modes: OnTimer and Multiple SensorFusion.
 
 The first localization method is RTK-based, with a timer-based callback function `OnTimer`, as shown below.
 
@@ -112,11 +112,11 @@ The surveillance system of all the modules in the vehicle including hardware. Mo
 ## Guardian
 
 This new module is basically an action center that takes a decision based on the data that is sent by Monitor. There are 2 main functions of Guardian:
-    - All modules working fine - Guardian allows the flow of control to work normally. Control signals are sent to CANBus as if Guardian were not present.
-    - Module crash is detected by Monitor - if there is a failure detected by Monitor, Guardian will prevent Control signals from reaching CANBus and bring the car to a stop. There are 3 ways in which Guardian decides how to stop the car, and to do so, Guardian turns to the final Gatekeeper, Ultrasonic sensors,
-        - If the Ultrasonic sensor is running fine without detecting an obstacle, Guardian will bring the car to a slow stop 
-        - If the sensor is not responding, Guardian applies a hard brake to bring the car to an immediate stop.
-        - This is a special case, If the HMI informs the driver of an impending crash and the driver does not intervene for 10 seconds, Guardian applies a hard brake to bring the car to an immediate stop.
+- All modules working fine - Guardian allows the flow of control to work normally. Control signals are sent to CANBus as if Guardian were not present.
+- Module crash is detected by Monitor - if there is a failure detected by Monitor, Guardian will prevent Control signals from reaching CANBus and bring the car to a stop. There are 3 ways in which Guardian decides how to stop the car, and to do so, Guardian turns to the final Gatekeeper, Ultrasonic sensors,
+    - If the Ultrasonic sensor is running fine without detecting an obstacle, Guardian will bring the car to a slow stop 
+    - If the sensor is not responding, Guardian applies a hard brake to bring the car to an immediate stop.
+    - This is a special case, If the HMI informs the driver of an impending crash and the driver does not intervene for 10 seconds, Guardian applies a hard brake to bring the car to an immediate stop.
 
 ```
 Note: 

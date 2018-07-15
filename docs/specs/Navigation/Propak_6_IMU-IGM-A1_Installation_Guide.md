@@ -62,7 +62,7 @@ Follow these steps:
 
 ### Configuring the GPS and IMU
 
-Configure the GPS and IMU as shown below. This process can be done either by keying in the commands, or by loadinag  batch configuration file in NovAtel Connect.
+Configure the GPS and IMU as shown below. This process can be done either by keying in the commands, or by loading batch configuraion file in NovAtel Connect.
 
 ```
 WIFICONFIG STATE OFF
@@ -130,3 +130,7 @@ For more information about the NovAtel SPAN ProPak6 and the IMU-IGM-A1, see:
 * [NovAtel IMU-IGM-A1 Product Page](https://www.novatel.com/products/span-gnss-inertial-systems/span-imus/span-mems-imus/imu-igm-a1/#overview)
 
 * [NovAtel GPS-703-GGG-HV](https://www.novatel.com/products/gnss-antennas/high-performance-gnss-antennas/gps-703-ggg-hv/)
+
+## Disclaimer
+
+This device is `Apollo Platform Supported`

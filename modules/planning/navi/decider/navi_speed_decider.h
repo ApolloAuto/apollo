@@ -22,10 +22,16 @@
 #ifndef MODULES_PLANNING_NAVI_NAVI_SPEED_DECIDER_H_
 #define MODULES_PLANNING_NAVI_NAVI_SPEED_DECIDER_H_
 
+#include <functional>
+#include <string>
 #include <vector>
+
+#include "gtest/gtest.h"
 
 #include "modules/common/status/status.h"
 #include "modules/planning/common/speed/speed_data.h"
+#include "modules/planning/navi/decider/navi_obstacle_decider.h"
+#include "modules/planning/navi/decider/navi_speed_ts_graph.h"
 #include "modules/planning/proto/planning_config.pb.h"
 #include "modules/planning/tasks/task.h"
 
@@ -61,40 +67,78 @@ class NaviSpeedDecider : public Task {
   apollo::common::Status Execute(
       Frame* frame, ReferenceLineInfo* reference_line_info) override;
 
+ private:
   /**
-   * @brief Update acceleration settings.
-   * @param preferred_accel Preferred acceleration.
-   * @param preferred_decel Preferred deacceleration.
-   * @param max_accel Max acceleration.
-   * @param max_decel Max deacceleration.
-   */
-  void UpdateAccelSettings(
-      double preferred_accel,
-      double preferred_decel,
-      double max_accel,
-      double max_decel);
-
-  /**
-   * @brief Create speed-data, used for unit test.
-   * @param vehicle_state Current vehicle state.
+   * @brief Create speed-data.
+   * @param start_v V of planning start point.
+   * @param start_a A of planning start point.
+   * @param start_da Da of planning start point.
+   * @param planning_length Planning length.
+   * @param path_data_points The path data of current reference line.
    * @param obstacles Current obstacles.
-   * @param speed_data Data to output.
+   * @param find_obstacle Find obstacle from id.
+   * @param speed_data Output.
    * @return Status::OK() if a suitable speed-data is created; error otherwise.
    */
   apollo::common::Status MakeSpeedDecision(
-      const common::VehicleState& vehicle_state,
+      double start_v, double start_a, double start_da, double planning_length,
+      const std::vector<common::PathPoint>& path_data_points,
       const std::vector<const Obstacle*>& obstacles,
+      const std::function<const Obstacle*(const std::string& id)>&
+          find_obstacle,
       SpeedData* const speed_data);
 
- private:
+  /**
+   * @brief Add t-s constraints base on range of perception.
+   * @return Status::OK() if success; error otherwise.
+   */
+  apollo::common::Status AddPerceptionRangeConstraints();
+
+  /**
+   * @brief Add t-s constraints base on obstacles.
+   * @param path_data_points Current path data.
+   * @param obstacles Current obstacles.
+   * @param find_obstacle Find obstacle from id.
+   * @return Status::OK() if success; error otherwise.
+   */
+  apollo::common::Status AddObstaclesConstraints(
+      double vehicle_speed,
+      const std::vector<common::PathPoint>& path_data_points,
+      const std::vector<const Obstacle*>& obstacles,
+      const std::function<const Obstacle*(const std::string& id)>&
+          find_obstacle);
+
+  /**
+   * @brief Add t-s constraints base on bends.
+   * @return Status::OK() if success; error otherwise.
+   */
+  apollo::common::Status AddBendConstraints();
+
+  /**
+   * @brief Add t-s constraints base on configs, which has max-speed etc.
+   * @return Status::OK() if success; error otherwise.
+   */
+  apollo::common::Status AddConfiguredConstraints();
+
   void RecordDebugInfo(const SpeedData& speed_data);
 
  private:
-  PlanningConfig config_;
+  double preferred_speed_;
+  double max_speed_;
   double preferred_accel_;
   double preferred_decel_;
   double max_accel_;
   double max_decel_;
+  double obstacle_buffer_;
+  double safe_distance_base_;
+  double safe_distance_ratio_;
+
+  NaviObstacleDecider obstacle_decider_;
+  NaviSpeedTsGraph ts_graph_;
+
+  FRIEND_TEST(NaviSpeedDeciderTest, CreateSpeedData);
+  FRIEND_TEST(NaviSpeedDeciderTest, CreateSpeedDataForStaticObstacle);
+  FRIEND_TEST(NaviSpeedDeciderTest, CreateSpeedDataForObstacles);
 };
 
 }  // namespace planning
