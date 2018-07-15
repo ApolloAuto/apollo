@@ -271,9 +271,7 @@ UsbCam::UsbCam()
       video_sws_(NULL),
       image_(NULL),
       is_capturing_(false) {}
-UsbCam::~UsbCam() {
-  shutdown();
-}
+UsbCam::~UsbCam() { shutdown(); }
 
 int UsbCam::init_mjpeg_decoder(int image_width, int image_height) {
   avcodec_register_all();
@@ -369,8 +367,7 @@ void UsbCam::mjpeg2rgb(char *MJPEG, int len, char *RGB, int NumPixels) {
 bool UsbCam::process_image(const void *src, int len,
                            boost::shared_ptr<CameraImage> dest) {
   if (src == NULL || dest == NULL) {
-    ROS_ERROR("process image error. len: %d, width: %d, height: %d", len,
-              dest->width, dest->height);
+    ROS_ERROR("process image error. src or dest is null");
     return false;
   }
   if (pixelformat_ == V4L2_PIX_FMT_YUYV || pixelformat_ == V4L2_PIX_FMT_UYVY) {
@@ -425,9 +422,7 @@ int UsbCam::read_frame() {
   return 1;
 }
 
-bool UsbCam::is_capturing() {
-  return is_capturing_;
-}
+bool UsbCam::is_capturing() { return is_capturing_; }
 
 void UsbCam::stop_capturing(void) {
   if (!is_capturing_) {
@@ -525,7 +520,8 @@ void UsbCam::init_mmap(void) {
     tmp_buf.memory = V4L2_MEMORY_MMAP;
     tmp_buf.index = n_buffers_;
 
-    if (-1 == xioctl(fd_, VIDIOC_QUERYBUF, &tmp_buf)) errno_exit("VIDIOC_QUERYBUF");
+    if (-1 == xioctl(fd_, VIDIOC_QUERYBUF, &tmp_buf))
+      errno_exit("VIDIOC_QUERYBUF");
 
     buffers_[n_buffers_].length = tmp_buf.length;
     buffers_[n_buffers_].start =
@@ -821,20 +817,20 @@ void UsbCam::set_auto_focus(int value) {
 }
 
 /**
-* Set video device parameter via call to v4l-utils.
-*
-* @param param The name of the parameter to set
-* @param param The value to assign
-*/
+ * Set video device parameter via call to v4l-utils.
+ *
+ * @param param The name of the parameter to set
+ * @param param The value to assign
+ */
 void UsbCam::set_v4l_parameter(const std::string &param, int value) {
   set_v4l_parameter(param, boost::lexical_cast<std::string>(value));
 }
 /**
-* Set video device parameter via call to v4l-utils.
-*
-* @param param The name of the parameter to set
-* @param param The value to assign
-*/
+ * Set video device parameter via call to v4l-utils.
+ *
+ * @param param The name of the parameter to set
+ * @param param The value to assign
+ */
 void UsbCam::set_v4l_parameter(const std::string &param,
                                const std::string &value) {
   // build the command
@@ -881,12 +877,12 @@ UsbCam::pixel_format UsbCam::pixel_format_from_string(const std::string &str) {
 }
 
 int UsbCam::trigger_enable(unsigned char fps, unsigned char internal) {
-  ROS_INFO("Trigger enable, dev:%s, fps:%d, internal:%d", 
-      camera_dev_.c_str(), fps, internal);
+  ROS_INFO("Trigger enable, dev:%s, fps:%d, internal:%d", camera_dev_.c_str(),
+           fps, internal);
   return adv_trigger_enable(camera_dev_.c_str(), fps, internal);
 }
 
 int UsbCam::trigger_disable() {
   return adv_trigger_disable(camera_dev_.c_str());
 }
-}
+}  // namespace usb_cam
