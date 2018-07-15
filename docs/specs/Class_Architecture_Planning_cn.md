@@ -48,7 +48,7 @@ Routing定义了概念性问题“我想去哪儿”，消息定义在`routing.p
 
 除了概念性问题“我想去哪儿”和“我周围有什么”，另外一个重要的概念性问题是“我在哪”。关于该问题的数据通过高清地图和定位模块获得。定位信息和车辆车架信息被封装在`VehicleState`消息中，该消息定义在`vehicle_state.proto`，参考下述图片：
 
-![img](file://localhost/private/var/folders/1n/hnpps_ps0gl_pw_g_69ds93m0000gp/T/TemporaryItems/msoclip/0/clip_image012.png)
+![img](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/images/class_architecture_planning/image009.png)
 
 ## 代码结构和类层次
 
