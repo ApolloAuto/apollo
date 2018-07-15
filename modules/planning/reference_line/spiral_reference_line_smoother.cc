@@ -229,7 +229,7 @@ bool SpiralReferenceLineSmoother::Smooth(std::vector<Eigen::Vector2d> point2d,
   Ipopt::ApplicationReturnStatus status = app->Initialize();
   if (status != Ipopt::Solve_Succeeded) {
     ADEBUG << "*** Error during initialization!";
-    return static_cast<int>(status);
+    return false;
   }
 
   status = app->OptimizeTNLP(problem);

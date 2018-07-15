@@ -1,0 +1,14 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+message NaviSpeedDeciderConfig {
+  optional double preferred_accel = 1 [default = 2.0];
+  optional double preferred_decel = 2 [default = 2.0];
+  optional double max_accel = 3 [default = 4.0];
+  optional double max_decel = 4 [default = 5.0];
+  optional double obstacle_buffer = 5 [default = 0.5];
+  optional double safe_distance_base = 7 [default = 2.0];
+  optional double safe_distance_ratio = 8 [default = 1.0];
+}
+

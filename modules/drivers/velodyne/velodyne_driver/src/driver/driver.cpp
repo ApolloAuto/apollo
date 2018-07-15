@@ -20,7 +20,7 @@
 #include <ctime>
 #include <string>
 
-#include <ros/ros.h>
+#include "ros/ros.h"
 
 namespace apollo {
 namespace drivers {
@@ -65,8 +65,8 @@ bool VelodyneDriver::set_base_time() {
 }
 
 int VelodyneDriver::poll_standard(velodyne_msgs::VelodyneScanUnifiedPtr& scan) {
-  // Since the velodyne delivers data at a very high rate, keep
-  // reading and publishing scans as fast as possible.
+  // Since the velodyne delivers data at a very high rate, keep reading and
+  // publishing scans as fast as possible.
   scan->packets.resize(config_.npackets);
   for (int i = 0; i < config_.npackets; ++i) {
     while (true) {
@@ -75,14 +75,11 @@ int VelodyneDriver::poll_standard(velodyne_msgs::VelodyneScanUnifiedPtr& scan) {
 
       if (rc == 0) {
         break;  // got a full packet?
-      }
-
-      if (rc < 0) {
+      } else if (rc < 0) {
         return rc;
       }
     }
   }
-
   return 0;
 }
 
@@ -98,8 +95,8 @@ void VelodyneDriver::update_gps_top_hour(uint32_t current_time) {
                       << config_.model << std::fixed << ". current:"
                       << current_time << ", last time:" << last_gps_time_);
     } else {
-      ROS_WARN_STREAM("Currrnt stamp:" << std::fixed << current_time
-                                       << " less than previous statmp:"
+      ROS_WARN_STREAM("Current stamp:" << std::fixed << current_time
+                                       << " less than previous stamp:"
                                        << last_gps_time_
                                        << ". GPS time stamp maybe incorrect!");
     }
@@ -119,6 +116,19 @@ VelodyneDriver* VelodyneDriverFactory::create_driver(
   private_nh.param("positioning_data_port", config.positioning_data_port,
                    POSITIONING_DATA_PORT);
   private_nh.param("rpm", config.rpm, 600.0);
+  private_nh.param("prefix_angle", config.prefix_angle, 18000);
+
+  if (config.prefix_angle > 35900 || config.prefix_angle < 100) {
+    ROS_WARN_STREAM(
+        "invalid prefix angle, prefix_angle must be between 100 and 35900");
+    if (config.prefix_angle > 35900) {
+      config.prefix_angle = 35900;
+    } else if (config.prefix_angle < 100) {
+      config.prefix_angle = 100;
+    }
+  }
+
+  private_nh.param("use_sensor_sync", config.use_sensor_sync);
 
   if (config.model == "64E_S2" || config.model == "64E_S3S" ||
       config.model == "64E_S3D_STRONGEST" || config.model == "64E_S3D_LAST" ||

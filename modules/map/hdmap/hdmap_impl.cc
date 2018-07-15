@@ -93,6 +93,10 @@ int HDMapImpl::LoadMapFromProto(const Map& map_proto) {
     speed_bump_table_[speed_bump.id().id()].reset(
         new SpeedBumpInfo(speed_bump));
   }
+  for (const auto& parking_space : map_.parking_space()) {
+    parking_space_table_[parking_space.id().id()].reset(
+        new ParkingSpaceInfo(parking_space));
+  }
   for (const auto& overlap : map_.overlap()) {
     overlap_table_[overlap.id().id()].reset(new OverlapInfo(overlap));
   }
@@ -134,6 +138,7 @@ int HDMapImpl::LoadMapFromProto(const Map& map_proto) {
   BuildYieldSignSegmentKDTree();
   BuildClearAreaPolygonKDTree();
   BuildSpeedBumpSegmentKDTree();
+  BuildParkingSpacePolygonKDTree();
 
   return 0;
 }
@@ -196,6 +201,11 @@ OverlapInfoConstPtr HDMapImpl::GetOverlapById(const Id& id) const {
 RoadInfoConstPtr HDMapImpl::GetRoadById(const Id& id) const {
   RoadTable::const_iterator it = road_table_.find(id.id());
   return it != road_table_.end() ? it->second : nullptr;
+}
+
+ParkingSpaceInfoConstPtr HDMapImpl::GetParkingSpaceById(const Id& id) const {
+  ParkingSpaceTable::const_iterator it = parking_space_table_.find(id.id());
+  return it != parking_space_table_.end() ? it->second : nullptr;
 }
 
 int HDMapImpl::GetLanes(const PointENU& point, double distance,
@@ -421,6 +431,32 @@ int HDMapImpl::GetSpeedBumps(
   }
   for (const auto& id : ids) {
     speed_bumps->emplace_back(GetSpeedBumpById(CreateHDMapId(id)));
+  }
+
+  return 0;
+}
+
+int HDMapImpl::GetParkingSpaces(
+    const PointENU& point, double distance,
+    std::vector<ParkingSpaceInfoConstPtr>* parking_spaces) const {
+  return GetParkingSpaces({point.x(), point.y()}, distance, parking_spaces);
+}
+
+int HDMapImpl::GetParkingSpaces(
+    const Vec2d& point, double distance,
+    std::vector<ParkingSpaceInfoConstPtr>* parking_spaces) const {
+  if (parking_spaces == nullptr || parking_space_polygon_kdtree_ == nullptr) {
+    return -1;
+  }
+  parking_spaces->clear();
+  std::vector<std::string> ids;
+  const int status =
+      SearchObjects(point, distance, *parking_space_polygon_kdtree_, &ids);
+  if (status < 0) {
+    return status;
+  }
+  for (const auto& id : ids) {
+    parking_spaces->emplace_back(GetParkingSpaceById(CreateHDMapId(id)));
   }
 
   return 0;
@@ -889,6 +925,15 @@ void HDMapImpl::BuildSpeedBumpSegmentKDTree() {
                      &speed_bump_segment_kdtree_);
 }
 
+void HDMapImpl::BuildParkingSpacePolygonKDTree() {
+  AABoxKDTreeParams params;
+  params.max_leaf_dimension = 5.0;  // meters.
+  params.max_leaf_size = 4;
+  BuildPolygonKDTree(parking_space_table_, params,
+                     &parking_space_polygon_boxes_,
+                     &parking_space_polygon_kdtree_);
+}
+
 template <class KDTree>
 int HDMapImpl::SearchObjects(const Vec2d& center, const double radius,
                              const KDTree& kdtree,
@@ -934,6 +979,8 @@ void HDMapImpl::Clear() {
   clear_area_polygon_kdtree_.reset(nullptr);
   speed_bump_segment_boxes_.clear();
   speed_bump_segment_kdtree_.reset(nullptr);
+  parking_space_polygon_boxes_.clear();
+  parking_space_polygon_kdtree_.reset(nullptr);
 }
 
 }  // namespace hdmap

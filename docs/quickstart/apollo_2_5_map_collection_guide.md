@@ -33,7 +33,7 @@ confirm whether the sensors are ready.
 
 ![](images/map_collection_sensor_check.png)
 
-2.After sensors are all ready, switch on [Record Bag] to start recording the map data.
+2. After sensors are all ready, switch on [Record Bag] to start recording the map data.
 
 ![](images/map_collection_sensor_start_record.png)
 
@@ -41,30 +41,37 @@ Before the map collection, the vehicle needs to be stationary for five minutes, 
 During the map collection, we should ensure the same road can be covered more than five times in the speed below 60KM/h. and take different lanes as far as possible in every cycle.
 After the map collection is completed, the vehicle also needs to circle the ribbon in figure eight for five minutes, and to remain stationary for five minutes.
 
-3.After the collection is finished, switch off [Record Bag] firstly,and then switch off [GPS], [Camera], [Velodyne] and [Velodyne16].
+3. After the collection is finished, switch off [Record Bag] firstly, and then switch off [GPS], [Camera], [Velodyne] and [Velodyne16].
 
 ![](images/map_collection_sensor_stop_record.png)
 
-4.Data Upload
+4. Data Upload
 
 The collected map data is placed in the /apollo/data/bag/(start time of collection, e.g.,2018-04-14-21-20-24) directory by default, package them as tar.gz compressed file and upload them to the [Apollo Data Official Website](http://data.apollo.auto/hd_map_intro/?locale=en-us).
 
 ## Map Production Service
 
-1.Permission Application
+1、Permission Application
 
 First, you need to register a Baidu account, log into the account, and apply for permission to use map production service (only need to apply once， skip this step if you have already applied).
 
-![](images/map_collection_data_request_en.png)
+![](images/map_collection_request_en.png)
 
-2.Data Management
+2. Map technical service
 
-Users can create mapping task,upload collection data,manage mapping task, track progress of map production through Map Production Service.
+Users can create new areas, create mapping tasks, manage map data, track progress of cartography, and download map data on this page. 
 
-![](images/map_collection_data_manage_en.png)
+![](images/map_collection_Area_en.png)
 
-3.Map Download
 
-When the status is [Published], click the [Published] to download maps.
+3, Data management
 
-![](images/map_collection_data_finish_en.png)
+After clicking “Management”, users can open the data management page. On this page, you can view the description of data upload. After all the data is uploaded, the data can be submitted.And then the drawing process is entered, the data can no longer be edited.
+
+![](images/map_collection_Management_en.png)
+
+4, Data download
+
+When the demand status is "Published", click "Download" to download the map data. If you need to update the map, please click "Update Data" to initiate the mapping process, and you need to re-upload the data and the drawing process.
+
+![](images/map_collection_Download_en.png)

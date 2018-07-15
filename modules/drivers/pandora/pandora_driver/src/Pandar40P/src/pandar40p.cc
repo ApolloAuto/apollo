@@ -31,7 +31,7 @@ namespace hesai {
  *        start_angle       The start angle of every point cloud
  */
 Pandar40P::Pandar40P(
-    std::string device_ip, uint16_t lidar_port, uint16_t gps_port,
+    const std::string &device_ip, uint16_t lidar_port, uint16_t gps_port,
     boost::function<void(boost::shared_ptr<PPointCloud>, double)> pcl_callback,
     boost::function<void(double)> gps_callback, uint16_t start_angle, int tz,
     std::string frame_id) {
@@ -41,7 +41,7 @@ Pandar40P::Pandar40P(
 }
 
 /**
- * @brief deconstructor
+ * @brief destructor
  */
 Pandar40P::~Pandar40P() { delete internal_; }
 
@@ -49,7 +49,7 @@ Pandar40P::~Pandar40P() { delete internal_; }
  * @brief load the lidar correction file
  * @param contents The correction contents of lidar correction
  */
-int Pandar40P::LoadCorrectionFile(std::string file) {
+int Pandar40P::LoadCorrectionFile(const std::string &file) {
   return internal_->LoadCorrectionFile(file);
 }
 

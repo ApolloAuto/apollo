@@ -51,6 +51,7 @@ DECLARE_double(change_lane_speed_relax_percentage);
 DECLARE_bool(enable_side_vehicle_st_boundary);
 
 DECLARE_double(max_collision_distance);
+DECLARE_bool(ignore_overlapped_obstacle);
 DECLARE_bool(publish_estop);
 DECLARE_bool(enable_trajectory_stitcher);
 
@@ -182,6 +183,8 @@ DECLARE_double(time_min_density);
 DECLARE_double(comfort_acceleration_factor);
 DECLARE_double(polynomial_minimal_param);
 DECLARE_double(lattice_stop_buffer);
+
+DECLARE_bool(use_planning_fallback);
 
 // navigation mode
 DECLARE_double(navigation_fallback_cruise_time);

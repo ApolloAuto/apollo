@@ -254,8 +254,15 @@ Chassis LincolnController::chassis() {
   } else {
     chassis_.set_parking_brake(false);
   }
-  // TODO(Authors): lincoln beam
+
   // 14, 15
+  if (chassis_detail.has_light() &&
+      chassis_detail.light().has_lincoln_lamp_type()) {
+    chassis_.mutable_signal()->set_high_beam(
+        chassis_detail.light().lincoln_lamp_type() == Light::BEAM_HIGH);
+  } else {
+    chassis_.mutable_signal()->set_high_beam(false);
+  }
 
   // 16, 17
   if (chassis_detail.has_light() &&
@@ -335,19 +342,25 @@ Chassis LincolnController::chassis() {
   }
 
   // vin number will be written into KVDB once.
-  if (chassis_detail.license().has_vin() && !received_vin_) {
-    apollo::common::KVDB::Put("apollo:canbus:vin",
-                              chassis_detail.license().vin());
-    received_vin_ = true;
+  if (chassis_detail.license().has_vin()) {
+    chassis_.mutable_license()->set_vin(chassis_detail.license().vin());
+    if (!received_vin_) {
+      apollo::common::KVDB::Put("apollo:canbus:vin",
+                                chassis_detail.license().vin());
+      received_vin_ = true;
+    }
   }
 
+  if (chassis_detail.has_surround()) {
+    chassis_.mutable_surround()->CopyFrom(chassis_detail.surround());
+  }
   // give engage_advice based on error_code and canbus feedback
   if (chassis_error_mask_ || (chassis_.throttle_percentage() == 0.0) ||
       (chassis_.brake_percentage() == 0.0)) {
     chassis_.mutable_engage_advice()->set_advice(
         apollo::common::EngageAdvice::DISALLOW_ENGAGE);
     chassis_.mutable_engage_advice()->set_reason("Chassis error!");
-  } else if (chassis_.parking_brake() || !CheckSafetyError(chassis_detail)) {
+  } else if (chassis_.parking_brake() || CheckSafetyError(chassis_detail)) {
     chassis_.mutable_engage_advice()->set_advice(
         apollo::common::EngageAdvice::DISALLOW_ENGAGE);
     chassis_.mutable_engage_advice()->set_reason(
@@ -778,7 +791,8 @@ void LincolnController::SecurityDogThreadFunc() {
     std::chrono::duration<double, std::micro> elapsed{end - start};
     if (elapsed < default_period) {
       std::this_thread::sleep_for(default_period - elapsed);
-      start += (default_period - elapsed).count();
+      start = common::time::AsInt64<common::time::micros>(
+          common::time::Clock::Now());
     } else {
       AERROR_EVERY(100)
           << "Too much time consumption in LincolnController looping process:"
@@ -869,7 +883,7 @@ bool LincolnController::CheckSafetyError(
       (chassis_detail.safety().is_passenger_detected() &&
        (!chassis_detail.safety().is_passenger_airbag_enabled() ||
         !chassis_detail.safety().is_passenger_buckled()));
-
+  ADEBUG << "Vehicle safety error status is : " << safety_error;
   return safety_error;
 }
 

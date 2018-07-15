@@ -79,7 +79,7 @@ void ImageHandler::OnImage(const sensor_msgs::CompressedImage &image) {
 
 ImageHandler::ImageHandler() : requests_(0) {
   if (FLAGS_use_navigation_mode) {
-    AdapterManager::AddCompressedImageCallback(&ImageHandler::OnImage, this);
+    AdapterManager::AddImageFrontCallback(&ImageHandler::OnImage, this);
   } else {
     AdapterManager::AddImageShortCallback(&ImageHandler::OnImage, this);
   }

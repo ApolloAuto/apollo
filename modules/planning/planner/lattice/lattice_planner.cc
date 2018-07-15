@@ -372,16 +372,16 @@ Status LatticePlanner::PlanOnReferenceLine(
     return Status::OK();
   } else {
     AERROR << "Planning failed";
-    if (FLAGS_enable_backup_trajectory &&
-        !reference_line_info->IsChangeLanePath()) {
+    if (FLAGS_enable_backup_trajectory) {
       AERROR << "Use backup trajectory";
       BackupTrajectoryGenerator backup_trajectory_generator(
           init_s, init_d, planning_init_point.relative_time(),
+          std::make_shared<CollisionChecker>(collision_checker),
           &trajectory1d_generator);
       DiscretizedTrajectory trajectory =
           backup_trajectory_generator.GenerateTrajectory(*ptr_reference_line);
 
-      reference_line_info->SetCost(FLAGS_backup_trajectory_cost);
+      reference_line_info->AddCost(FLAGS_backup_trajectory_cost);
       reference_line_info->SetTrajectory(trajectory);
       reference_line_info->SetDrivable(true);
       return Status::OK();

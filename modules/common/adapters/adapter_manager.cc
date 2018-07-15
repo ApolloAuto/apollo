@@ -62,6 +62,9 @@ void AdapterManager::Init(const AdapterManagerConfig &configs) {
       case AdapterConfig::POINT_CLOUD:
         EnablePointCloud(FLAGS_pointcloud_topic, config);
         break;
+      case AdapterConfig::VLP16_POINT_CLOUD:
+        EnableVLP16PointCloud(FLAGS_vlp16_pointcloud_topic, config);
+        break;
       case AdapterConfig::GPS:
         EnableGps(FLAGS_gps_topic, config);
         break;
@@ -138,6 +141,9 @@ void AdapterManager::Init(const AdapterManagerConfig &configs) {
         break;
       case AdapterConfig::CONTI_RADAR:
         EnableContiRadar(FLAGS_conti_radar_topic, config);
+        break;
+      case AdapterConfig::RACOBIT_RADAR:
+        EnableRacobitRadar(FLAGS_racobit_radar_topic, config);
         break;
       case AdapterConfig::ULTRASONIC_RADAR:
         EnableUltrasonic(FLAGS_ultrasonic_radar_topic, config);

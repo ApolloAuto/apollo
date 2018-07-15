@@ -463,8 +463,12 @@ bool Projector<T>::Project(const T &u, const T &v,
     return false;
   }
 
-  Eigen::Matrix<T, 3, 1> uv_point(u, v, static_cast<T>(1));
-  Eigen::Matrix<T, 3, 1> xy_p = trans_mat_ * uv_point;
+  auto trans_mat = Singleton<CalibrationConfigManager>::get()
+  ->get_camera_calibration()
+  ->get_camera2car_homography_mat();
+
+  Eigen::Matrix<double, 3, 1> uv_point(u, v, 1.0);
+  Eigen::Matrix<double, 3, 1> xy_p = trans_mat * uv_point;
 
   T scale = xy_p(2);
   if (std::abs(scale) < 1e-6) {

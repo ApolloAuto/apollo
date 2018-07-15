@@ -34,6 +34,7 @@
 #include "modules/drivers/gnss/proto/imu.pb.h"
 #include "modules/drivers/gnss/proto/ins.pb.h"
 #include "modules/drivers/proto/conti_radar.pb.h"
+#include "modules/drivers/proto/racobit_radar.pb.h"
 #include "modules/drivers/proto/delphi_esr.pb.h"
 #include "modules/drivers/proto/mobileye.pb.h"
 #include "modules/drivers/proto/ultrasonic_radar.pb.h"
@@ -76,6 +77,7 @@ using PadAdapter = Adapter<control::PadMessage>;
 using PerceptionObstaclesAdapter = Adapter<perception::PerceptionObstacles>;
 using PlanningAdapter = Adapter<planning::ADCTrajectory>;
 using PointCloudAdapter = Adapter<::sensor_msgs::PointCloud2>;
+using VLP16PointCloudAdapter = Adapter<::sensor_msgs::PointCloud2>;
 using ImageFrontAdapter = Adapter<::sensor_msgs::Image>;
 using ImageShortAdapter = Adapter<::sensor_msgs::Image>;
 using ImageLongAdapter = Adapter<::sensor_msgs::Image>;
@@ -95,6 +97,7 @@ using StaticInfoAdapter = Adapter<apollo::data::StaticInfo>;
 using MobileyeAdapter = Adapter<drivers::Mobileye>;
 using DelphiESRAdapter = Adapter<drivers::DelphiESR>;
 using ContiRadarAdapter = Adapter<drivers::ContiRadar>;
+using RacobitRadarAdapter = Adapter<drivers::RacobitRadar>;
 using UltrasonicAdapter = Adapter<drivers::Ultrasonic>;
 using CompressedImageAdapter = Adapter<sensor_msgs::CompressedImage>;
 using GnssRtkObsAdapter = Adapter<apollo::drivers::gnss::EpochObservation>;

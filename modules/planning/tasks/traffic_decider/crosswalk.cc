@@ -25,10 +25,11 @@
 #include <vector>
 
 #include "modules/common/proto/pnc_point.pb.h"
+#include "modules/perception/proto/perception_obstacle.pb.h"
+
 #include "modules/common/util/util.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/hdmap/hdmap_util.h"
-#include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/tasks/traffic_decider/util.h"
 
@@ -108,10 +109,9 @@ void Crosswalk::MakeDecisions(Frame* const frame,
       // note: crosswalk expanded area will include sideway area
       Vec2d point(perception_obstacle.position().x(),
                   perception_obstacle.position().y());
-      const Polygon2d crosswalk_poly = crosswalk_ptr->polygon();
-      bool in_crosswalk = crosswalk_poly.IsPointIn(point);
-      const Polygon2d crosswalk_exp_poly = crosswalk_poly.ExpandByDistance(
-          config_.crosswalk().expand_s_distance());
+      const Polygon2d crosswalk_exp_poly =
+          crosswalk_ptr->polygon().ExpandByDistance(
+              config_.crosswalk().expand_s_distance());
       bool in_expanded_crosswalk = crosswalk_exp_poly.IsPointIn(point);
 
       if (!in_expanded_crosswalk) {
@@ -128,7 +128,7 @@ void Crosswalk::MakeDecisions(Frame* const frame,
           &obstacle_sl_point);
       double obstacle_l_distance = std::fabs(obstacle_sl_point.l());
 
-      const Box2d obstacle_box =
+      const Box2d& obstacle_box =
           path_obstacle->obstacle()->PerceptionBoundingBox();
       bool is_on_road =
           reference_line_info->reference_line().HasOverlap(obstacle_box);
@@ -137,8 +137,7 @@ void Crosswalk::MakeDecisions(Frame* const frame,
 
       ADEBUG << "obstacle_id[" << obstacle_id << "] type[" << obstacle_type_name
              << "] crosswalk_id[" << crosswalk_id << "] obstacle_l["
-             << obstacle_sl_point.l() << "] within_crosswalk_area["
-             << in_crosswalk << "] within_expanded_crosswalk_area["
+             << obstacle_sl_point.l() << "] within_expanded_crosswalk_area["
              << in_expanded_crosswalk << "] is_on_road[" << is_on_road
              << "] is_path_cross[" << is_path_cross << "]";
 
@@ -163,6 +162,20 @@ void Crosswalk::MakeDecisions(Frame* const frame,
           ADEBUG << "need_stop(<=11): obstacle_id[" << obstacle_id << "] type["
                  << obstacle_type_name << "] crosswalk_id[" << crosswalk_id
                  << "]";
+        }
+
+        // (4) when the pedestrian is moving toward the ego vehicle, stop
+        const auto& obs_v = Vec2d(perception_obstacle.velocity().x(),
+                                  perception_obstacle.velocity().y());
+        auto obs_to_adc =
+            Vec2d(reference_line_info->AdcPlanningPoint().path_point().x(),
+                  reference_line_info->AdcPlanningPoint().path_point().y()) -
+            Vec2d(perception_obstacle.position().x(),
+                  perception_obstacle.position().y());
+
+        const double kEpsilon = 1e-6;
+        if (obs_v.InnerProd(obs_to_adc) > kEpsilon) {
+          stop = true;
         }
       } else {
         // TODO(all)
