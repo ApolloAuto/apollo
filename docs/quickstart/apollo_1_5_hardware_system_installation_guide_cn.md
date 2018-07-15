@@ -17,7 +17,7 @@
 | ![info](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/info_icon.png)       | **Info**  包含可能有用的信息。忽略信息图标没有消极的后果。 |
 | ![tip](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/tip_icon.png)         | **Tip**. 包括有用的提示或可能有助于完成任务的快捷方式。 |
 | ![online](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/online_icon.png)   | **Online**. 提供指向特定网站的链接，您可以在其中获取更多信息。 |
-| ![warning](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/warning_icon.png) | **Warning**. 包含**不能忽略**的信息，或者执行某个任务或步骤时，您将面临风险。 |
+| ![warning](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/warning_icon.png) | **Warning**. 包含**不能忽略**的信息，否则执行某个任务或步骤时，您将面临风险。 |
 
 ## 引言
 阿波罗计划是为汽车和自主驾驶行业的合作伙伴提供开放，完整和可靠的软件平台。该项目的目的是使合作伙伴能够基于Apollo软件堆栈开发自己的自动驾驶系统。
