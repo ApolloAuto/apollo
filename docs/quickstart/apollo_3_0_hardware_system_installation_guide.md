@@ -69,7 +69,7 @@ The key hardware components to install include:
 
 - Onboard computer system ─ Neousys Nuvo-6108GC
 - Controller Area Network (CAN) Card ─ ESD CAN-PCIe/402-B4
-- General Positioning System (GPS) and Inertial Measurement Unit (IMU) ─
+- Global Positioning System (GPS) and Inertial Measurement Unit (IMU) ─
   You can select one of the following options:
   - NovAtel SPAN-IGM-A1
   - NovAtel SPAN® ProPak6™ and NovAtel IMU-IGM-A1
