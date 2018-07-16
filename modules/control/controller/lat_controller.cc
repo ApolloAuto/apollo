@@ -301,28 +301,34 @@ Status LatController::ComputeControlCommand(
       current_trajectory_timestamp_ =
           planning_published_trajectory->header().timestamp_sec();
     } else {
-      auto x_diff = curr_vehicle_x - init_vehicle_x_;
-      auto y_diff = curr_vehicle_y - init_vehicle_y_;
+      auto x_diff_map = curr_vehicle_x - init_vehicle_x_;
+      auto y_diff_map = curr_vehicle_y - init_vehicle_y_;
       auto theta_diff = curr_vehicle_heading - init_vehicle_heading_;
 
-      auto cos_theta = std::cos(-theta_diff);
-      auto sin_theta = std::sin(-theta_diff);
+      auto cos_map_veh = std::cos(init_vehicle_heading_);
+      auto sin_map_veh = std::sin(init_vehicle_heading_);
 
-      auto tx = -(cos_theta * x_diff - sin_theta * y_diff);
-      auto ty = -(sin_theta * x_diff + cos_theta * y_diff);
+      auto x_diff_veh = cos_map_veh * x_diff_map + sin_map_veh * y_diff_map;
+      auto y_diff_veh = -sin_map_veh * x_diff_map + cos_map_veh * y_diff_map;
+
+      auto cos_theta_diff = std::cos(-theta_diff);
+      auto sin_theta_diff = std::sin(-theta_diff);
+
+      auto tx = -(cos_theta_diff * x_diff_veh - sin_theta_diff * y_diff_veh);
+      auto ty = -(sin_theta_diff * x_diff_veh + cos_theta_diff * y_diff_veh);
 
       auto ptr_trajectory_points =
           target_tracking_trajectory.mutable_trajectory_point();
       std::for_each(
           ptr_trajectory_points->begin(), ptr_trajectory_points->end(),
-          [&cos_theta, &sin_theta, &tx, &ty, &theta_diff]
+          [&cos_theta_diff, &sin_theta_diff, &tx, &ty, &theta_diff]
            (common::TrajectoryPoint& p) {
             auto x = p.path_point().x();
             auto y = p.path_point().y();
             auto theta = p.path_point().theta();
 
-            auto x_new = cos_theta * x - sin_theta * y + tx;
-            auto y_new = sin_theta * x + cos_theta * y + ty;
+            auto x_new = cos_theta_diff * x - sin_theta_diff * y + tx;
+            auto y_new = sin_theta_diff * x + cos_theta_diff * y + ty;
             auto theta_new = common::math::WrapAngle(theta - theta_diff);
 
             p.mutable_path_point()->set_x(x_new);
