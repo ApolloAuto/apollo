@@ -16,6 +16,7 @@ export default class DriveEventEditor extends React.Component {
         this.handleMessageChange = this.handleMessageChange.bind(this);
         this.handleTimestampUpdate = this.handleTimestampUpdate.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
+        this.handleCancel = this.handleCancel.bind(this);
     }
 
     handleMessageChange(event) {
@@ -33,6 +34,10 @@ export default class DriveEventEditor extends React.Component {
         } else {
             alert("Please provide a drive event message.");
         }
+    }
+
+    handleCancel() {
+        STORE.handleOptionToggle('showDataRecorder');
     }
 
     render() {
@@ -61,6 +66,7 @@ export default class DriveEventEditor extends React.Component {
                                 <td>Message</td>
                                 <td>
                                     <textarea
+                                        autoFocus={true}
                                         placeholder="please enter a message..."
                                         value={this.state.eventMessage}
                                         onChange={this.handleMessageChange} />
@@ -71,6 +77,9 @@ export default class DriveEventEditor extends React.Component {
                                 <td>
                                     <button className="submit-button" onClick={this.handleSubmit}>
                                         Submit
+                                    </button>
+                                    <button onClick={this.handleCancel}>
+                                        Cancel
                                     </button>
                                 </td>
                             </tr>
