@@ -522,7 +522,8 @@ std::vector<double> TrajectoryEvaluator::ComputeLongitudinalGuideVelocity(
 
   if (!planning_target.has_stop_point()) {
     ConstantAccelerationTrajectory1d lon_traj(init_s_[0], cruise_v);
-    lon_traj.AppendSegment(0.0, FLAGS_trajectory_time_length);
+    lon_traj.AppendSegment(0.0,
+        FLAGS_trajectory_time_length + + FLAGS_lattice_epsilon);
 
     for (double t = 0.0; t < FLAGS_trajectory_time_length;
          t += FLAGS_trajectory_time_resolution) {
@@ -532,7 +533,8 @@ std::vector<double> TrajectoryEvaluator::ComputeLongitudinalGuideVelocity(
     double dist_s = planning_target.stop_point().s() - init_s_[0];
     if (dist_s < FLAGS_lattice_epsilon) {
       ConstantAccelerationTrajectory1d lon_traj(init_s_[0], 0.0);
-      lon_traj.AppendSegment(0.0, FLAGS_trajectory_time_length);
+      lon_traj.AppendSegment(0.0,
+          FLAGS_trajectory_time_length + FLAGS_lattice_epsilon);
 
       for (double t = 0.0; t < FLAGS_trajectory_time_length;
            t += FLAGS_trajectory_time_resolution) {
@@ -550,7 +552,8 @@ std::vector<double> TrajectoryEvaluator::ComputeLongitudinalGuideVelocity(
         PiecewiseBrakingTrajectoryGenerator::Generate(
             planning_target.stop_point().s(), init_s_[0],
             planning_target.cruise_speed(),
-            init_s_[1], a_comfort, d_comfort);
+            init_s_[1], a_comfort, d_comfort,
+            FLAGS_trajectory_time_length + FLAGS_lattice_epsilon);
 
     for (double t = 0.0; t < FLAGS_trajectory_time_length;
          t += FLAGS_trajectory_time_resolution) {
