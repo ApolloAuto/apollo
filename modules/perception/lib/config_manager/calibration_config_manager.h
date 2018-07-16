@@ -160,8 +160,7 @@ class CameraCalibration {
     camera_2car_stripped.col(1) = car2camera_3_4.col(1);
     camera_2car_stripped.col(2) = car2camera_3_4.col(3);
 
-    homography_camera2car_adj_ =
-     camera_2car_stripped.inverse() * c_int_inv;
+    homography_camera2car_adj_ = camera_2car_stripped.inverse() * c_int_inv;
   }
 
   bool GetCar2CameraExtrinsicsAdj(Eigen::Matrix<double, 4, 4>* matrix) {
@@ -201,6 +200,7 @@ class CameraCalibration {
   void init_camera_model();
 
   Eigen::Matrix<double, 3, 4> camera_intrinsic_;  // camera intrinsic
+  Eigen::Matrix<double, 5, 1> distort_params;
 
   std::shared_ptr<Eigen::Matrix<double, 4, 4>>
       _camera2car_pose;  // camera to ego car pose

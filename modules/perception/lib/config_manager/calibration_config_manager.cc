@@ -268,6 +268,7 @@ bool CameraCalibration::init(const std::string &intrinsic_path,
   image_width_ = camera_coefficient_.image_width;
   *_camera2car_pose = camera_coefficient_.camera_extrinsic;
   *_car2camera_pose = _camera2car_pose->inverse();
+  distort_params = camera_coefficient_.distort_params;
 
   // TODO(later): BUGGY. Crash
   // if (!init_undistortion(intrinsic_path)) {
@@ -295,6 +296,7 @@ void CameraCalibration::calculate_homographic() {
 void CameraCalibration::init_camera_model() {
   camera_model_->set(camera_intrinsic_.block(0, 0, 3, 3), image_width_,
                      image_height_);
+  camera_model_->set_distort_params(distort_params);
 }
 
 bool CameraCalibration::init_undistortion(const std::string &intrinsics_path) {
