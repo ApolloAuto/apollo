@@ -117,7 +117,7 @@
 
 所有标定程序需要用到车辆的定位结果。请确认车辆定位状态为56，否则标定程序不会开始采集数据。输入以下命令可查询车辆定位状态：
 
-```bash
+	```bash
 	rostopic echo /apollo/sensor/gnss/ins_stat
     ```
 
