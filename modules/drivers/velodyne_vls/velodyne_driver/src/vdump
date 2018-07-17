@@ -1,0 +1,18 @@
+#!/bin/bash
+
+# dump velodyne packets
+# $Id: vdump 8892 2009-10-24 15:13:57Z joq $
+
+if [ x$1 = x ]
+then	echo -e "usage:\t`basename $0` file-prefix [ interface ]"
+	echo -e "\n\tfile-prefix is completed with a three-digit number"
+	echo -e "\tinterface default is 'eth0'\n"
+	exit 9
+fi
+
+IF=${2:-eth0}
+ID=`id -un`
+
+echo "acquiring packets on $IF for user $ID; press ^C when done"
+
+sudo /usr/sbin/tcpdump -i $IF -Z $ID -s 0 -C 100 -W 999 -w $1

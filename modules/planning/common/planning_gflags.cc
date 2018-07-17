@@ -340,6 +340,9 @@ DEFINE_double(polynomial_minimal_param, 0.01,
 DEFINE_double(lattice_stop_buffer, 0.02,
               "The bufffer before the stop s to check trajectories.");
 
+DEFINE_bool(use_planning_fallback, true,
+            "Use fallback trajectory for planning.");
+
 // navigation mode
 DEFINE_double(navigation_fallback_cruise_time, 8.0,
               "The time range of fallback cruise under navigation mode.");

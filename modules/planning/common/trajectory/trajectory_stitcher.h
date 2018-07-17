@@ -48,7 +48,7 @@ class TrajectoryStitcher {
 
  private:
   static std::pair<double, double> ComputePositionProjection(const double x,
-      const double y, const PublishableTrajectory& prev_trajectory);
+      const double y, const common::TrajectoryPoint& matched_trajectory_point);
 
   static std::vector<common::TrajectoryPoint> ComputeReinitStitchingTrajectory(
       const common::VehicleState& vehicle_state);

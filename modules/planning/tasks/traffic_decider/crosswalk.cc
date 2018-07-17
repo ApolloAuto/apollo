@@ -25,10 +25,11 @@
 #include <vector>
 
 #include "modules/common/proto/pnc_point.pb.h"
+#include "modules/perception/proto/perception_obstacle.pb.h"
+
 #include "modules/common/util/util.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/hdmap/hdmap_util.h"
-#include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/tasks/traffic_decider/util.h"
 
@@ -161,6 +162,20 @@ void Crosswalk::MakeDecisions(Frame* const frame,
           ADEBUG << "need_stop(<=11): obstacle_id[" << obstacle_id << "] type["
                  << obstacle_type_name << "] crosswalk_id[" << crosswalk_id
                  << "]";
+        }
+
+        // (4) when the pedestrian is moving toward the ego vehicle, stop
+        const auto& obs_v = Vec2d(perception_obstacle.velocity().x(),
+                                  perception_obstacle.velocity().y());
+        auto obs_to_adc =
+            Vec2d(reference_line_info->AdcPlanningPoint().path_point().x(),
+                  reference_line_info->AdcPlanningPoint().path_point().y()) -
+            Vec2d(perception_obstacle.position().x(),
+                  perception_obstacle.position().y());
+
+        const double kEpsilon = 1e-6;
+        if (obs_v.InnerProd(obs_to_adc) > kEpsilon) {
+          stop = true;
         }
       } else {
         // TODO(all)
