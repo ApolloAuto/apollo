@@ -40,7 +40,10 @@ DpStCost::DpStCost(const DpStSpeedConfig& config,
   for (auto& obstacle : obstacles) {
     boundary_map_[obstacle->st_boundary().id()] = index++;
   }
+
   CHECK_GT(config.matrix_dimension_t(), 0);
+  CHECK_LT(config.matrix_dimension_t(), 10000);
+
   unit_t_ = config_.total_time() / config_.matrix_dimension_t();
 
   AddToKeepClearRange(obstacles);
