@@ -277,6 +277,10 @@ Status LatticePlanner::PlanOnReferenceLine(
       case ConstraintChecker::Result::LAT_JERK_OUT_OF_BOUND:
         lat_jerk_failure_count += 1;
         break;
+      case ConstraintChecker::Result::VALID:
+      default:
+        // Intentional empty
+        break;
       }
       continue;
     }
