@@ -339,13 +339,21 @@ Status MPCController::ComputeControlCommand(
   std::vector<Eigen::MatrixXd> control(horizon_, control_matrix);
 
   double mpc_start_timestamp = Clock::NowInSeconds();
+  double steer_angle_feedback = 0.0;
+  double acc_feedback = 0.0;
   if (common::math::SolveLinearMPC(
           matrix_ad_, matrix_bd_, matrix_cd_, matrix_q_updated_,
           matrix_r_updated_, lower_bound, upper_bound, matrix_state_, reference,
           mpc_eps_, mpc_max_iteration_, &control) != true) {
     AERROR << "MPC solver failed";
+    steer_angle_feedback = 0.0;
+    acc_feedback = 0.0;
   } else {
-    AINFO << "MPC problem solved! ";
+    ADEBUG << "MPC problem solved! ";
+    steer_angle_feedback = control[0](0, 0) * 180 / M_PI *
+                           steer_transmission_ratio_ /
+                           steer_single_direction_max_degree_ * 100;
+    acc_feedback = control[0](1, 0);
   }
 
   double mpc_end_timestamp = Clock::NowInSeconds();
@@ -355,9 +363,6 @@ Status MPCController::ComputeControlCommand(
 
   // TODO(QiL): evaluate whether need to add spline smoothing after the result
 
-  double steer_angle_feedback = control[0](0, 0) * 180 / M_PI *
-                                steer_transmission_ratio_ /
-                                steer_single_direction_max_degree_ * 100;
   double steer_angle =
       steer_angle_feedback + steer_angle_feedforwardterm_updated_;
 
@@ -383,9 +388,9 @@ Status MPCController::ComputeControlCommand(
     cmd->set_steering_target(steer_angle);
   }
 
-  debug->set_acceleration_cmd_closeloop(control[0](1, 0));
+  debug->set_acceleration_cmd_closeloop(acc_feedback);
 
-  double acceleration_cmd = control[0](1, 0) + debug->acceleration_reference();
+  double acceleration_cmd = acc_feedback + debug->acceleration_reference();
   // TODO(QiL): add pitch angle feedforward to accomendate for 3D control
 
   debug->set_is_full_stop(false);
