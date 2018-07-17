@@ -99,23 +99,8 @@ apollo::common::Status NaviPathDecider::Process(
                   "NaviPathDecider reference is too far from the car");
   }
 
-  // get the projection point coordinates of the reference line from the actual
-  // position of the adc
-  auto adc_project_point =
-      reference_line.GetReferencePoint(vehicle_state_.x(), vehicle_state_.y());
-  auto& adc_lane_way_points = adc_project_point.lane_waypoints();
-  if (adc_lane_way_points.empty()) {
-    AERROR << "Failed to get adc lane way points from reference line.";
-    return Status(apollo::common::ErrorCode::PLANNING_ERROR,
-                  "NaviPathDecider failed to get adc lane way points ");
-  }
-  double project_point_s = adc_lane_way_points[0].s;
-  auto adc_project_path_point =
-      reference_line.GetReferencePoint(project_point_s)
-          .ToPathPoint(project_point_s);
-  double adc_project_path_point_y = adc_project_path_point.y();
-
   // get y-coordinate of the target start path plan point
+  PlanningTarget planning_target = reference_line_info_->planning_target();
   double target_start_path_point_y = init_basic_path_y;
   if (reference_line_info_->IsChangeLanePath() &&
       reference_line_info_->IsNeighborLanePath()) {
@@ -126,73 +111,39 @@ apollo::common::Status NaviPathDecider::Process(
       return Status(apollo::common::ErrorCode::PLANNING_ERROR,
                     "NaviPathDecider It is not safe to change lane");
     }
+  } else if (planning_target.has_stop_point()) {
+    double start_point_s = path_points[0].s();
+    double lane_left_width = 0.0;
+    double lane_right_width = 0.0;
+    constexpr double KSideBuffer = 0.30;
+
+    bool bRet = reference_line.GetLaneWidth(start_point_s, &lane_left_width,
+                                            &lane_right_width);
+    if (bRet) {
+      target_start_path_point_y =
+          init_basic_path_y - lane_right_width + KSideBuffer;
+    } else {
+      AERROR << "Pull over failed, because cannot get the right lane width";
+      return Status(apollo::common::ErrorCode::PLANNING_ERROR,
+                    "NaviPathDecider can not pull over");
+    }
   } else {
     ADEBUG << "common lane path plan";
-    // to adjust target start point following the result of nudge processing
-    if (FLAGS_enable_nudge_decision) {
-      // get the min lane width from
-      double min_lane_width = std::numeric_limits<double>::max();
-      constexpr double KNudgeZero = 1e-6;
-      std::for_each(path_points.begin(), path_points.end(),
-                    [&min_lane_width, reference_line](
-                        const apollo::common::PathPoint& path_point) {
-                      double lane_left_width = 0.0;
-                      double lane_right_width = 0.0;
-                      bool bRet = reference_line.GetLaneWidth(
-                          path_point.s(), &lane_left_width, &lane_right_width);
-                      if (bRet) {
-                        double lane_width = lane_left_width + lane_right_width;
-                        if (lane_width < min_lane_width) {
-                          min_lane_width = lane_width;
-                        }
-                      }
-                    });
-
-      // get nudge latteral position
-      NaviObstacleDecider obstacle_decider;
-      int lane_obstacles_num = 0;
-      double nudge_distance = obstacle_decider.GetNudgeDistance(
-          obstacles, *path_decision, path_points, min_lane_width,
-          &lane_obstacles_num);
-      // adjust plan start point
-      if (std::fabs(nudge_distance) > KNudgeZero) {
-        ADEBUG << "need latteral nudge distance : " << nudge_distance;
-        target_start_path_point_y = nudge_distance;
-        last_lane_id_to_nudge_flag_[cur_reference_line_lane_id_] = true;
-      } else {
-        // no nudge distance but current lane has obstacles ,keepping path in
-        // the last nudge path direction
-        bool last_plan_has_nudge = false;
-        if (last_lane_id_to_nudge_flag_.find(cur_reference_line_lane_id_) !=
-            last_lane_id_to_nudge_flag_.end()) {
-          last_plan_has_nudge =
-              last_lane_id_to_nudge_flag_[cur_reference_line_lane_id_];
-        }
-
-        if (last_plan_has_nudge && lane_obstacles_num != 0) {
-          ADEBUG << "keepping last nudge path direction";
-          target_start_path_point_y = vehicle_state_.y();
-        } else {
-          last_lane_id_to_nudge_flag_[cur_reference_line_lane_id_] = false;
-        }
-      }
-    }
+    target_start_path_point_y =
+        NudgeProcess(reference_line, path_points, obstacles, *path_decision);
   }
 
   // caculate the y-coordinate of the actual start path plan point
-  ADEBUG << "in curret plan, adc to reference line distance : "
-         << adc_project_path_point_y
+  ADEBUG << "in current plan, adc to ref line distance : " << init_basic_path_y
          << " adc to target path line distance : " << target_start_path_point_y;
   double start_point_y =
-      SmoothInitY(adc_project_path_point_y, target_start_path_point_y);
-  double cur_start_plan_point = init_point.path_point().y() + start_point_y;
+      SmoothInitY(init_basic_path_y, target_start_path_point_y);
 
-  // shift trajectory intercepted from the reference line
-  double shift_distance_y = cur_start_plan_point - init_basic_path_y;
-  ADEBUG << "in curret plan, adc latteral to reference shift distance : "
-         << cur_start_plan_point
-         << " reference line latteral to adc shift distance : "
-         << shift_distance_y << " init basic path y :" << init_basic_path_y;
+  // shift trajectory intercepted from the reference line to adc
+  double shift_distance_y = start_point_y - init_basic_path_y;
+  ADEBUG << "in current plan, adc latteral to ref line shift distance : "
+         << start_point_y
+         << " ref line latteral to adc shift distance : " << shift_distance_y;
   ShiftY(shift_distance_y, &path_points);
 
   // calculate the value of the path trajectory later
@@ -206,7 +157,7 @@ apollo::common::Status NaviPathDecider::Process(
                   "NaviPathDecider SetDiscretizedPath");
   }
   last_lane_id_to_adc_project_y_[cur_reference_line_lane_id_] =
-      adc_project_path_point_y;
+      init_basic_path_y;
 
   return Status::OK();
 }
@@ -233,12 +184,10 @@ bool NaviPathDecider::GetBasicPathData(
     return false;
   }
 
-  // get the start plan point s on refernce line and get the length of reference
-  // line
-  auto start_plan_path_point =
-      reference_line_info_->AdcPlanningPoint().path_point();
-  auto start_plan_point_project = reference_line.GetReferencePoint(
-      start_plan_path_point.x(), start_plan_path_point.y());
+  // get the start plan point project s on refernce line and get the length of
+  // reference line
+  auto start_plan_point_project =
+      reference_line.GetReferencePoint(vehicle_state_.x(), vehicle_state_.y());
   auto& lane_way_points = start_plan_point_project.lane_waypoints();
   if (lane_way_points.empty()) {
     AERROR << "Failed to get start plan point lane way points from reference "
@@ -272,59 +221,26 @@ void NaviPathDecider::ShiftY(
 
 double NaviPathDecider::SmoothInitY(const double actual_ref_init_y,
                                     const double target_path_init_y) {
-  constexpr double KShiftZero = 1.0e-6;
-  const double max_init_y = config_.max_smooth_init_y();
+  constexpr double kPositiveSign = 1.0;
   const double min_init_y = config_.min_smooth_init_y();
-  double delta_shift = config_.lateral_shift_delta();
-  double cur_adc_shift = 0.0;
+  const double max_init_y = config_.max_smooth_init_y();
+  double start_position_y = vehicle_state_.y();
+  double shift_distance = 0.0;
+
+  // get shift diretion
+  double shift_direction =
+      target_path_init_y < 0.0 ? -kPositiveSign : kPositiveSign;
 
   // need to adjust in lateral
-  if (std::fabs(target_path_init_y) > min_init_y) {
-    // accurate to centimeters
-    double last_adc_y =
-        last_lane_id_to_adc_project_y_[cur_reference_line_lane_id_];
-    last_adc_y = std::floor(100 * last_adc_y);
-    double cur_adc_y = std::floor(100 * actual_ref_init_y);
-    double last_adc_lateral_shift = last_adc_y - cur_adc_y;
-
-    // last shift distacne was zero,initialize a suitable amount of shift
-    if (std::fabs(last_adc_lateral_shift) < KShiftZero) {
-      if (target_path_init_y > 0) {
-        cur_adc_shift = min_init_y;
-      } else {
-        cur_adc_shift = -min_init_y;
-      }
-    } else {  // the last shift distance was not zero
-      // The direction of the last lateral shift is the same as the direction
-      // that needs to be shifted this time
-      if (target_path_init_y * last_adc_lateral_shift > 0) {
-        if (last_adc_lateral_shift > 0) {
-          cur_adc_shift = last_adc_lateral_shift + delta_shift;
-          cur_adc_shift =
-              cur_adc_shift < max_init_y ? cur_adc_shift : max_init_y;
-        } else {
-          cur_adc_shift = last_adc_lateral_shift - delta_shift;
-          cur_adc_shift =
-              cur_adc_shift > -max_init_y ? cur_adc_shift : -max_init_y;
-        }
-      } else {
-        // The direction of the last lateral shift is opposite to the
-        // direction that needs to be shifted this time
-        if (target_path_init_y > 0) {
-          cur_adc_shift = min_init_y;
-        } else {
-          cur_adc_shift = -min_init_y;
-        }
-      }
-    }
-
-    // if shift exceeded target
-    if (std::fabs(target_path_init_y) < std::fabs(cur_adc_shift)) {
-      cur_adc_shift = target_path_init_y;
-    }
+  double plan_point_to_target_distance = std::fabs(target_path_init_y);
+  if (plan_point_to_target_distance > min_init_y) {
+    shift_distance = (plan_point_to_target_distance < max_init_y)
+                         ? plan_point_to_target_distance
+                         : max_init_y;
   }
+  start_position_y = shift_direction * shift_distance;
 
-  return cur_adc_shift;
+  return start_position_y;
 }
 
 bool NaviPathDecider::IsSafeChangeLane(const ReferenceLine& reference_line,
@@ -378,6 +294,69 @@ bool NaviPathDecider::IsSafeChangeLane(const ReferenceLine& reference_line,
   }
 
   return true;
+}
+
+double NaviPathDecider::NudgeProcess(
+    const ReferenceLine& reference_line,
+    const std::vector<common::PathPoint>& path_data_points,
+    const std::vector<const Obstacle*>& obstacles,
+    const PathDecision& path_decision) {
+  double nudge_position_y = 0.0;
+
+  if (!FLAGS_enable_nudge_decision) {
+    nudge_position_y = path_data_points[0].y();
+    return nudge_position_y;
+  }
+
+  // get the min lane width from
+  double min_lane_width = std::numeric_limits<double>::max();
+  constexpr double KNudgeEpsilon = 1e-6;
+  std::for_each(path_data_points.begin(), path_data_points.end(),
+                [&min_lane_width,
+                 reference_line](const apollo::common::PathPoint& path_point) {
+                  double lane_left_width = 0.0;
+                  double lane_right_width = 0.0;
+                  bool bRet = reference_line.GetLaneWidth(
+                      path_point.s(), &lane_left_width, &lane_right_width);
+                  if (bRet) {
+                    double lane_width = lane_left_width + lane_right_width;
+                    if (lane_width < min_lane_width) {
+                      min_lane_width = lane_width;
+                    }
+                  }
+                });
+
+  // get nudge latteral position
+  NaviObstacleDecider obstacle_decider;
+  int lane_obstacles_num = 0;
+  double nudge_distance = obstacle_decider.GetNudgeDistance(
+      obstacles, path_decision, path_data_points, min_lane_width,
+      &lane_obstacles_num);
+  // adjust plan start point
+  if (std::fabs(nudge_distance) > KNudgeEpsilon) {
+    ADEBUG << "need latteral nudge distance : " << nudge_distance;
+    nudge_position_y = nudge_distance;
+    last_lane_id_to_nudge_flag_[cur_reference_line_lane_id_] = true;
+  } else {
+    // no nudge distance but current lane has obstacles ,keepping path in
+    // the last nudge path direction
+    bool last_plan_has_nudge = false;
+    if (last_lane_id_to_nudge_flag_.find(cur_reference_line_lane_id_) !=
+        last_lane_id_to_nudge_flag_.end()) {
+      last_plan_has_nudge =
+          last_lane_id_to_nudge_flag_[cur_reference_line_lane_id_];
+    }
+
+    if (last_plan_has_nudge && lane_obstacles_num != 0) {
+      ADEBUG << "keepping last nudge path direction";
+      nudge_position_y = vehicle_state_.y();
+    } else {
+      // not need nudge or not need nudge keepping
+      last_lane_id_to_nudge_flag_[cur_reference_line_lane_id_] = false;
+      nudge_position_y = path_data_points[0].y();
+    }
+  }
+  return nudge_position_y;
 }
 
 }  // namespace planning
