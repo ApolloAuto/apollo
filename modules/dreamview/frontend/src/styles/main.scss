@@ -549,10 +549,6 @@ body {
         margin-bottom: auto;
     }
 
-    button:focus {
-        outline: 0;
-    }
-
     .button {
         display: block;
         width: 90px;
@@ -1091,7 +1087,7 @@ body {
             span {
                 font-family: PingFangSC-Light;
                 font-size: 14px;
-                color: #d8d8d8;
+                color: #D8D8D8;
                 text-align: center;
 
                 @include small-screen {
@@ -1115,7 +1111,7 @@ body {
             margin-left: auto;
             border: none;
 
-            color: #d8d8d8;
+            color: #D8D8D8;
             font-size: 35px;
 
             @include small-screen {
@@ -1198,7 +1194,6 @@ body {
                     padding: 5px 20px;
                     border: 5px solid #101315;
 
-                    outline: none;
                     background: #006AFF;
                     color: #FFFFFF;
                 }
@@ -1220,14 +1215,20 @@ body {
                 resize: none;
             }
         }
-        .submit-button {
+
+        button {
+            margin-right: 5px;
             padding: 10px 35px;
             border: none;
 
-            outline: none;
-            background: #000000;
+            background: #1D2226;
             color: #FFFFFF;
         }
+
+        .submit-button {
+            background: #000000;
+        }
+
         .submit-button:active {
             background: #383838;
         }

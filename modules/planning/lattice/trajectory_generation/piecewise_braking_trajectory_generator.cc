@@ -29,7 +29,8 @@ namespace planning {
 
 std::shared_ptr<Curve1d> PiecewiseBrakingTrajectoryGenerator::Generate(
     const double s_target, const double s_curr, const double v_target,
-    const double v_curr, const double a_comfort, const double d_comfort) {
+    const double v_curr, const double a_comfort, const double d_comfort,
+    const double max_time) {
 
   std::shared_ptr<ConstantAccelerationTrajectory1d> ptr_trajectory =
       std::make_shared<ConstantAccelerationTrajectory1d>(s_curr, v_curr);
@@ -43,6 +44,11 @@ std::shared_ptr<Curve1d> PiecewiseBrakingTrajectoryGenerator::Generate(
     double stop_d = ComputeStopDeceleration(s_dist, v_curr);
     double stop_t = v_curr / stop_d;
     ptr_trajectory->AppendSegment(-stop_d, stop_t);
+
+    if (ptr_trajectory->ParamLength() < max_time) {
+      ptr_trajectory->AppendSegment(0.0,
+          max_time - ptr_trajectory->ParamLength());
+    }
     return ptr_trajectory;
   }
 
@@ -55,6 +61,11 @@ std::shared_ptr<Curve1d> PiecewiseBrakingTrajectoryGenerator::Generate(
     ptr_trajectory->AppendSegment(-d_comfort, t_rampdown);
     ptr_trajectory->AppendSegment(0.0, t_cruise);
     ptr_trajectory->AppendSegment(-d_comfort, t_dec);
+
+    if (ptr_trajectory->ParamLength() < max_time) {
+      ptr_trajectory->AppendSegment(0.0,
+          max_time - ptr_trajectory->ParamLength());
+    }
     return ptr_trajectory;
 
   } else {
@@ -71,6 +82,11 @@ std::shared_ptr<Curve1d> PiecewiseBrakingTrajectoryGenerator::Generate(
       ptr_trajectory->AppendSegment(a_comfort, t_rampup);
       ptr_trajectory->AppendSegment(0.0, t_cruise);
       ptr_trajectory->AppendSegment(-d_comfort, t_dec);
+
+      if (ptr_trajectory->ParamLength() < max_time) {
+        ptr_trajectory->AppendSegment(0.0,
+            max_time - ptr_trajectory->ParamLength());
+      }
       return ptr_trajectory;
     } else {
       double s_rampup_rampdown = s_dist - comfort_stop_dist;
@@ -85,6 +101,11 @@ std::shared_ptr<Curve1d> PiecewiseBrakingTrajectoryGenerator::Generate(
       // construct the trajectory
       ptr_trajectory->AppendSegment(a_comfort, t_acc);
       ptr_trajectory->AppendSegment(-d_comfort, t_dec);
+
+      if (ptr_trajectory->ParamLength() < max_time) {
+        ptr_trajectory->AppendSegment(0.0,
+            max_time - ptr_trajectory->ParamLength());
+      }
       return ptr_trajectory;
     }
   }
