@@ -106,10 +106,26 @@ void Planning::ResetPullOver(const routing::RoutingResponse& response) {
   }
 }
 
+void Planning::CheckPlanningConfig() {
+  if (config_.has_em_planner_config() &&
+      config_.em_planner_config().has_dp_st_speed_config()) {
+    const auto& dp_st_speed_config =
+        config_.em_planner_config().dp_st_speed_config();
+    CHECK(dp_st_speed_config.has_matrix_dimension_s());
+    CHECK_GT(dp_st_speed_config.matrix_dimension_s(), 3);
+    CHECK_LT(dp_st_speed_config.matrix_dimension_s(), 10000);
+    CHECK(dp_st_speed_config.has_matrix_dimension_t());
+    CHECK_GT(dp_st_speed_config.matrix_dimension_t(), 3);
+    CHECK_LT(dp_st_speed_config.matrix_dimension_t(), 10000);
+  }
+  // TODO(All): check other config params
+}
+
 Status Planning::Init() {
   CHECK(apollo::common::util::GetProtoFromFile(FLAGS_planning_config_file,
                                                &config_))
       << "failed to load planning config file " << FLAGS_planning_config_file;
+  CheckPlanningConfig();
 
   CHECK(apollo::common::util::GetProtoFromFile(
       FLAGS_traffic_rule_config_filename, &traffic_rule_configs_))
@@ -279,8 +295,9 @@ void Planning::RunOnce() {
 
       auto theta_diff = vehicle_config.theta_ - last_vehicle_config_.theta_;
 
-      TrajectoryStitcher::TransformLastPublishedTrajectory(x_diff_veh,
-          y_diff_veh, theta_diff, last_publishable_trajectory_.get());
+      TrajectoryStitcher::TransformLastPublishedTrajectory(
+          x_diff_veh, y_diff_veh, theta_diff,
+          last_publishable_trajectory_.get());
     }
     last_vehicle_config_ = vehicle_config;
   }
