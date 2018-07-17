@@ -35,14 +35,13 @@ constexpr float kInf = std::numeric_limits<float>::infinity();
 DpStCost::DpStCost(const DpStSpeedConfig& config,
                    const std::vector<const PathObstacle*>& obstacles,
                    const common::TrajectoryPoint& init_point)
-    : config_(config),
-      obstacles_(obstacles),
-      init_point_(init_point),
-      unit_t_(config_.total_time() / config_.matrix_dimension_t()) {
+    : config_(config), obstacles_(obstacles), init_point_(init_point) {
   int index = 0;
   for (auto& obstacle : obstacles) {
     boundary_map_[obstacle->st_boundary().id()] = index++;
   }
+  CHECK_GT(config.matrix_dimension_t(), 0);
+  unit_t_ = config_.total_time() / config_.matrix_dimension_t();
 
   AddToKeepClearRange(obstacles);
 
