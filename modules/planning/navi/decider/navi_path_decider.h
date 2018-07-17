@@ -92,7 +92,7 @@ class NaviPathDecider : public Task {
    * @return if success return true or return false.
    */
   bool GetBasicPathData(const ReferenceLine &reference_line,
-                    std::vector<common::PathPoint> *const path_points);
+                        std::vector<common::PathPoint> *const path_points);
 
   /**
    * @brief shift the path points on the y-axis
@@ -105,10 +105,9 @@ class NaviPathDecider : public Task {
 
   /**
    * @brief calculate the y-coordinate of the starting point of the path plan
-   * @param real_ref_init_y the actual y-coordinate of start point that intercepted
-   * from reference line
+   * @param actual_ref_init_y the actual y-coordinate of start point that
+   * intercepted from reference line
    * @param target_path_init_y the y-coordinate of the start point that desired
-   * arrival path
    * @return the y-coordinate of the starting point in FLU coordinate.
    */
   double SmoothInitY(const double actual_ref_init_y,
@@ -125,7 +124,19 @@ class NaviPathDecider : public Task {
   bool IsSafeChangeLane(const ReferenceLine &reference_line,
                         const PathDecision &path_decision);
 
-  // TODO(all): Add your member functions and variables.
+  /**
+   * @brief calculate the lateral target position with slight avoidance
+   * @path_data_points the basic path data intercepted from the reference line
+   * @param reference_line input reference line
+   * @param obstacles unhandled obstacle information.
+   * @param path_decision path decision information provided by perception.
+   * @return the y coordinate value of nudging target position
+   */
+  double NudgeProcess(const ReferenceLine &reference_line,
+                      const std::vector<common::PathPoint> &path_data_points,
+                      const std::vector<const Obstacle *> &obstacles,
+                      const PathDecision &path_decision);
+
  private:
   common::VehicleState vehicle_state_;
   NaviPathDeciderConfig config_;
