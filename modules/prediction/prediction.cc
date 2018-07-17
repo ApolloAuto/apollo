@@ -58,19 +58,18 @@ Status Prediction::Init() {
                                       &prediction_conf_)) {
     return OnError("Unable to load prediction conf file: " +
                    FLAGS_prediction_conf_file);
-  } else {
-    ADEBUG << "Prediction config file is loaded into: "
-           << prediction_conf_.ShortDebugString();
   }
+  ADEBUG << "Prediction config file is loaded into: "
+         << prediction_conf_.ShortDebugString();
 
   adapter_conf_.Clear();
   if (!common::util::GetProtoFromFile(FLAGS_prediction_adapter_config_filename,
                                       &adapter_conf_)) {
     return OnError("Unable to load adapter conf file: " +
                    FLAGS_prediction_adapter_config_filename);
-  } else {
-    ADEBUG << "Adapter config file is loaded into: "
-           << adapter_conf_.ShortDebugString();
+  }
+  ADEBUG << "Adapter config file is loaded into: "
+         << adapter_conf_.ShortDebugString();
   }
 
   // Initialization of all managers
@@ -94,10 +93,8 @@ Status Prediction::Init() {
     return OnError("Map cannot be loaded.");
   }
 
-  if (FLAGS_prediction_offline_mode) {
-    if (!FeatureOutput::Ready()) {
+  if (FLAGS_prediction_offline_mode && !FeatureOutput::Ready()) {
       return OnError("Feature output is not ready.");
-    }
   }
 
   return Status::OK();
