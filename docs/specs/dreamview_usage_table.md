@@ -148,3 +148,13 @@ Main view that reflects the point of view chosen from **Layer Menu**:
 | ![](images/dreamview_usage_table/overhead_view.png) | <ul><li>**Overhead**    </li></ul> |        |
 | ![](images/dreamview_usage_table/map_view.png) | **Map** <ul><li> To zoom in/out: mouse scroll or pinch with two fingers </li><li> To move around:right-click and drag or swipe with three fingers</li></ul> |
 
+## Shortcut Keys
+
+| Shortcut Keys   | Description     |
+| --------------- | --------------- |
+| 1               | Toggle **Task** panel |
+| 2               | Toggle **Module Controller** panel |
+| 3               | Toggle **Layer Menu** panel |
+| 4               | Toggle **Route Editing** panel |
+| 5               | Toggle **Data Recorder** panel |
+| v               | Rotate **Point of View** options |

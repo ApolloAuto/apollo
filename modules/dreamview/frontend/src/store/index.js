@@ -140,7 +140,7 @@ class DreamviewStore {
         this.options[option] = (enabled || false);
     }
 
-    // This function is triggerred automatically whenever a observable changes
+    // This function is triggered automatically whenever a observable changes
     updateDimension() {
         let offsetX = 0;
         let offsetY = 0;

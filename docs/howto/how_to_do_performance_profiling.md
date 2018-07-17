@@ -52,7 +52,7 @@ google-pprof --pdf --lines /path/to/module/bin/${MODULE} /tmp/${MODULE}.prof > $
 ## Example
 Here is an example command of starting the planning module.
 ```
-PUPROFILE=/tmp/planning.prof /apollo/bazel-bin/modules/planning/planning \
+CPUPROFILE=/tmp/planning.prof /apollo/bazel-bin/modules/planning/planning \
  --flagfile=modules/planning/conf/planning.conf \
  --log_dir=/apollo/data/log \
  --planning_test_mode \
