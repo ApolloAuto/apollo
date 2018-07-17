@@ -1319,6 +1319,10 @@
                 "surround": {
                   "type": "Surround",
                   "id": 31
+                },
+                "license": {
+                  "type": "License",
+                  "id": 32
                 }
               },
               "nested": {
@@ -1662,6 +1666,14 @@
                   "rule": "repeated",
                   "type": "Sonar",
                   "id": 24
+                }
+              }
+            },
+            "License": {
+              "fields": {
+                "vin": {
+                  "type": "string",
+                  "id": 1
                 }
               }
             }
@@ -3292,6 +3304,11 @@
                   "rule": "repeated",
                   "type": "Road",
                   "id": 11
+                },
+                "parkingSpace": {
+                  "rule": "repeated",
+                  "type": "ParkingSpace",
+                  "id": 12
                 }
               }
             },
@@ -3725,6 +3742,10 @@
                   "rule": "repeated",
                   "type": "Id",
                   "id": 3
+                },
+                "heading": {
+                  "type": "double",
+                  "id": 4
                 }
               }
             },
