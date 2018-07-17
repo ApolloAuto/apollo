@@ -127,6 +127,8 @@ class Planning : public apollo::common::ApolloApp {
    */
   void ResetPullOver(const routing::RoutingResponse& response);
 
+  void CheckPlanningConfig();
+
   double start_time_ = 0.0;
 
   common::util::Factory<PlanningConfig::PlannerType, Planner> planner_factory_;
