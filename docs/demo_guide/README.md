@@ -26,8 +26,8 @@ Setup steps:
 3. Now you can play the rosbag:
 
     ```
-    sudo python docs/demo_guide/rosbag_helper.py demo_2.0.bag #download rosbag
-    rosbag play demo_2.0.bag --loop
+    sudo bash docs/demo_guide/rosbag_helper.sh download #download rosbag
+    rosbag play /apollo/docs/demo_guide/demo_2.0.bag --loop
     ```
 
     The `--loop` option enables rosbag to keep playing the bag in a loop
