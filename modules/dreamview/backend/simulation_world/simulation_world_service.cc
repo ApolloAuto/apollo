@@ -361,29 +361,22 @@ const Map &SimulationWorldService::GetRelativeMap() const {
 template <>
 void SimulationWorldService::UpdateSimulationWorld(
     const MonitorMessage &monitor_msg) {
-  std::vector<MonitorMessageItem> updated;
-  updated.reserve(SimulationWorldService::kMaxMonitorItems);
-  // Save the latest messages at the top of the history.
   const int updated_size = std::min(monitor_msg.item_size(),
                                     SimulationWorldService::kMaxMonitorItems);
-  std::copy(monitor_msg.item().begin(),
-            monitor_msg.item().begin() + updated_size,
-            std::back_inserter(updated));
-
-  // Copy over the previous messages until there is no more history or
-  // the max number of total messages has been hit.
-  auto history = world_.monitor().item();
-  const int history_size = std::min(
-      history.size(), SimulationWorldService::kMaxMonitorItems - updated_size);
-  if (history_size > 0) {
-    std::copy(history.begin(), history.begin() + history_size,
-              std::back_inserter(updated));
+  // Save the latest messages at the end of the history.
+  for (int idx = 0; idx < updated_size; ++idx) {
+    auto *notification = world_.add_notification();
+    notification->mutable_item()->CopyFrom(monitor_msg.item(idx));
+    notification->set_timestamp_sec(monitor_msg.header().timestamp_sec());
   }
 
-  // Refresh the monitor message list in simulation_world.
-  *world_.mutable_monitor()->mutable_item() = {updated.begin(), updated.end()};
-  world_.mutable_monitor()->mutable_header()->set_timestamp_sec(
-      Clock::NowInSeconds());
+  int remove_size =
+      world_.notification_size() - SimulationWorldService::kMaxMonitorItems;
+  if (remove_size > 0) {
+    auto *notifications = world_.mutable_notification();
+    notifications->erase(notifications->begin(),
+                         notifications->begin() + remove_size);
+  }
 }
 
 template <>
