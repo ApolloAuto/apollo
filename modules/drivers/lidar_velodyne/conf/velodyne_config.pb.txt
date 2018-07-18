@@ -1,0 +1,14 @@
+conf {
+  index: 0
+  position: "centre"
+  frame_id: "velodyne16"
+  firing_data_port: 2368
+  positioning_data_port: 8308
+  rpm: 600.0
+  model: VLP16
+  calibration_file: "modules/drivers/lidar_velodyne/data/params/VLP16_calibration.yaml"
+  min_range: 0.9
+  max_range: 70
+  organized: true
+  cache_size: 1
+}
