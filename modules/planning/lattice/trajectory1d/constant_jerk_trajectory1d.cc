@@ -30,14 +30,18 @@ namespace planning {
 
 ConstantJerkTrajectory1d::ConstantJerkTrajectory1d(
     const double p0, const double v0, const double a0,
-    const double p1, const double v1, const double a1,
-    const double param) : p0_(p0), v0_(v0), a0_(a0) {
+    const double jerk, const double param)
+  : p0_(p0), v0_(v0), a0_(a0), end_param_(param), jerk_(jerk) {
   CHECK_GT(param, FLAGS_lattice_epsilon);
-  jerk_ = (a1 - a0) / param;
+  p1_ = Evaluate(0, end_param_);
+  v1_ = Evaluate(1, end_param_);
+  a1_ = Evaluate(2, end_param_);
 }
 
 double ConstantJerkTrajectory1d::Evaluate(
     const std::uint32_t order, const double param) const {
+  CHECK_LT(param, end_param_ + FLAGS_lattice_epsilon);
+  CHECK_GT(param, -FLAGS_lattice_epsilon);
   switch (order) {
     case 0: {
       return p0_ + v0_ * param + 0.5 * a0_ * param * param +
@@ -55,6 +59,18 @@ double ConstantJerkTrajectory1d::Evaluate(
     default:
       return 0.0;
   }
+}
+
+double ConstantJerkTrajectory1d::GetEndState() const {
+  return p1_;
+}
+
+double ConstantJerkTrajectory1d::GetEndVelocity() const {
+  return v1_;
+}
+
+double ConstantJerkTrajectory1d::GetEndAcceleration() const {
+  return a1_;
 }
 
 }  // namespace planning
