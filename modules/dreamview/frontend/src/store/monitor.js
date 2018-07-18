@@ -28,18 +28,29 @@ export default class Monitor {
     }
 
     @action update(world) {
-        if (!world.monitor) {
+        if (!world.monitor && !world.notification) {
             return;
         }
 
-        const { item, header } = world.monitor;
-
-        const newTimestamp = Math.floor(header.timestampSec * 1000);
+        let newItems = [];
+        let newTimestamp = 0;
+        if (world.notification) {
+            newItems = world.notification.reverse().map(notification => {
+                return Object.assign(notification.item, {
+                    timestampMs: notification.timestampSec * 1000,
+                });
+            });
+            newTimestamp = Math.floor(newItems[0].timestampMs);
+        } else if (world.monitor) {
+            // deprecated: no timestamp for each item
+            newItems = world.monitor.item;
+            newTimestamp = Math.floor(world.monitor.header.timestampSec * 1000);
+        }
 
         if (newTimestamp > this.lastUpdateTimestamp) {
             this.hasActiveNotification = true;
             this.lastUpdateTimestamp = newTimestamp;
-            this.items.replace(item);
+            this.items.replace(newItems);
             this.startRefresh();
         }
     }
