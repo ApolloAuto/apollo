@@ -23,14 +23,5 @@
 namespace apollo {
 namespace planning {
 
-PiecewiseJerkTrajectory1d::PiecewiseJerkTrajectory1d() {
-  // TODO Auto-generated constructor stub
-
-}
-
-PiecewiseJerkTrajectory1d::~PiecewiseJerkTrajectory1d() {
-  // TODO Auto-generated destructor stub
-}
-
-} // namespace planning
-} // namespace apollo
+}  // namespace planning
+}  // namespace apollo
