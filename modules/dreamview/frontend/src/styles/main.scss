@@ -1,7 +1,7 @@
 @import "media-queries";
 
 
-@mixin monitor-item-common-properties() {
+@mixin monitor-item-common-properties($text-width: calc(100% - 17px)) {
     display: flex;
     list-style-type: none;
     flex-direction: row;
@@ -27,11 +27,19 @@
 
     .text {
         position: relative;
-        width: 100%;
+        width: $text-width;
+        padding-left: 5px;
+
         line-height: 150%;
         font-size: 12px;
-        character: 0px;
-        line: 20px;
+        word-wrap: break-word;
+    }
+
+    .time {
+        position: absolute;
+        right: 5px;
+
+        font-size: 12px;
     }
 
     .alert {
@@ -50,6 +58,13 @@ body {
     background-color: #14171A !important;
     font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
     color: #FFFFFF;
+
+    * {
+        font-size: 16px;
+        @include small-screen {
+            font-size: 14px;
+        }
+    }
 }
 
 
@@ -89,12 +104,10 @@ body {
 
     background: #000000;
     color: #ffffff;
-    font-size: 16px;
     text-align: left;
 
     @include small-screen {
         height: 55px;
-        font-size: 14px;
     }
 
     /* The Apollo logo on the header. */
@@ -324,16 +337,17 @@ body {
         .card-header {
             width: 100%;
             padding-bottom: 15px;
-            font-size: 18px;
 
             span {
                 width: 200px;
                 border-bottom: 1px solid #999999;
                 padding: 10px 10px 10px 0px;
-            }
 
-            @include small-screen {
-                font-size: 16px;
+                font-size: 18px;
+
+                @include small-screen {
+                    font-size: 16px;
+                }
             }
         }
 
@@ -353,7 +367,7 @@ body {
 
             overflow-x: hidden;
             overflow-y: auto;
-            height: 85%;
+            height: 89%;
         }
     }
 
@@ -368,7 +382,6 @@ body {
         color: #999999;
         list-style: none;
         cursor: pointer;
-        font-size: 12px;
 
         li {
             line-height: 40px;
@@ -455,7 +468,6 @@ body {
         overflow-y: hidden;
         overflow-x: auto;
         background: #1D2226;
-        font-size: 14px;
         color: #FFFFFF;
         text-align: left;
         white-space: nowrap;
@@ -520,16 +532,19 @@ body {
         border: none;
         padding: 0px;
 
-        overflow-y: auto;
-        overflow-x: hidden;
+        overflow: hidden;
 
         .monitor-item {
-            @include monitor-item-common-properties();
+            @include monitor-item-common-properties(calc(100% - 80px));
         }
     }
 
     .poi-button {
-        min-width: 250px;
+        min-width: 310px;
+
+        @include small-screen {
+            min-width: 280px;
+        }
     }
 }
 
@@ -555,7 +570,6 @@ body {
         border: none;
         padding: 20px 10px;
 
-        font-size: 14px;
         text-align: center;
         background: #1D2226;
         color: #FFFFFF;
@@ -563,7 +577,6 @@ body {
         cursor: pointer;
 
         @include small-screen {
-            font-size: 12px;
             width: 80px;
             padding-top: 10px;
         }
@@ -618,14 +631,12 @@ body {
         border: none;
         padding: 10px;
 
-        font-size: 14px;
         text-align: center;
         background: #3E4041;
         color: #999999;
         cursor: pointer;
 
         @include small-screen {
-            font-size: 12px;
             width: 80px;
             height: 60px;
         }
@@ -812,6 +823,7 @@ body {
                 top: 10px;
                 right: 8px;
 
+                font-size: 14px;
                 color: #FFFFFF;
             }
         }
@@ -831,6 +843,7 @@ body {
                 float: right;
                 transform: translate(-50%, -50%);
                 text-align: center;
+                font-size: 14px;
             }
         }
 
@@ -909,8 +922,13 @@ body {
     }
 
     .others {
-        min-width: 165px;
-        max-width: 260px;
+        min-width: 200px;
+        max-width: 280px;
+
+        @include small-screen {
+            min-width: 180px;
+            max-width: 260px;
+        }
     }
 
     .delay {
@@ -920,8 +938,6 @@ body {
         .delay-item {
             position: relative;
             margin: 0px 10px;
-
-            font-size: 16px;
 
             .name {
                 display: inline-block;
@@ -1086,13 +1102,8 @@ body {
 
             span {
                 font-family: PingFangSC-Light;
-                font-size: 14px;
                 color: #D8D8D8;
                 text-align: center;
-
-                @include small-screen {
-                    font-size: 12px;
-                }
             }
         }
 
@@ -1112,13 +1123,10 @@ body {
             border: none;
 
             color: #D8D8D8;
-            font-size: 35px;
 
             @include small-screen {
                 height: 60px;
                 width: 60px;
-
-                font-size: 20px;
             }
 
 
@@ -1132,7 +1140,6 @@ body {
 
                 background-color: #FFFFFF;
                 color: #999999;
-                font-size: 14px;
                 text-align: left;
                 white-space: pre-wrap;
 
@@ -1245,7 +1252,7 @@ body {
 
     .img-container {
         position: relative;
-        top: 50%;
+        top: 55%;
         left: 50%;
         width: 40%;
         transform: translate(-50%, -50%);
