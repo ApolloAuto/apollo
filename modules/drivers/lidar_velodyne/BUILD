@@ -17,7 +17,9 @@ cc_library(
     deps = [
         "//modules/common/status",
         "//modules/common:apollo_app",
-        "//modules/common",
+        "//modules/common/util",
+        "//modules/drivers/lidar_velodyne/common:velodyne_gflags",
+        "//modules/drivers/lidar_velodyne/proto:velodyne_proto",
         "@ros//:ros_common",
         "@pcl//:pcl",
     ],
