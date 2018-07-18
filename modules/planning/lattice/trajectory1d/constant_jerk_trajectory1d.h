@@ -30,8 +30,9 @@ namespace planning {
 
 class ConstantJerkTrajectory1d : public Curve1d {
  public:
-  ConstantJerkTrajectory1d(const double p0, const double v0, const double a0,
-      const double p1, const double v1, const double a1, const double param);
+  ConstantJerkTrajectory1d(
+      const double p0, const double v0, const double a0,
+      const double jerk, const double param);
 
   virtual ~ConstantJerkTrajectory1d() = default;
 
@@ -42,10 +43,20 @@ class ConstantJerkTrajectory1d : public Curve1d {
 
   std::string ToString() const;
 
+  double GetEndState() const;
+
+  double GetEndVelocity() const;
+
+  double GetEndAcceleration() const;
+
  private:
   double p0_;
   double v0_;
   double a0_;
+  double p1_;
+  double v1_;
+  double a1_;
+  double end_param_;
   double jerk_;
 };
 

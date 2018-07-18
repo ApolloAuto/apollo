@@ -21,16 +21,24 @@
 #ifndef MODULES_PLANNING_LATTICE_TRAJECTORY1D_PIECEWISE_JERK_TRAJECTORY1D_H_
 #define MODULES_PLANNING_LATTICE_TRAJECTORY1D_PIECEWISE_JERK_TRAJECTORY1D_H_
 
+#include <vector>
+#include <string>
+
 #include "modules/planning/math/curve1d/curve1d.h"
+#include "modules/planning/lattice/trajectory1d/constant_jerk_trajectory1d.h"
 
 namespace apollo {
 namespace planning {
 
 class PiecewiseJerkTrajectory1d : public Curve1d {
  public:
-  PiecewiseJerkTrajectory1d();
+  PiecewiseJerkTrajectory1d() = default;
 
-  virtual ~PiecewiseJerkTrajectory1d();
+  PiecewiseJerkTrajectory1d(
+      const double p0, const double v0, const double a0,
+      const double jerk, const double param);
+
+  virtual ~PiecewiseJerkTrajectory1d() = default;
 
   double Evaluate(const std::uint32_t order,
                   const double param) const;
@@ -38,9 +46,17 @@ class PiecewiseJerkTrajectory1d : public Curve1d {
   double ParamLength() const;
 
   std::string ToString() const;
+
+  void AppendSegment(const double jerk, const double param);
+
+  void AppendSegment(const double p1, const double v1, const double a1,
+                     const double param);
+
+ private:
+  std::vector<ConstantJerkTrajectory1d> segments_;
 };
 
-} // namespace planning
-} // namespace apollo
+}  // namespace planning
+}  // namespace apollo
 
-#endif /* MODULES_PLANNING_LATTICE_TRAJECTORY1D_PIECEWISE_JERK_TRAJECTORY1D_H_ */
+#endif  // MODULES_PLANNING_LATTICE_TRAJECTORY1D_PIECEWISE_JERK_TRAJECTORY1D_H_
