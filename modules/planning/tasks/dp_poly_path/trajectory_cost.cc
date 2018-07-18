@@ -241,9 +241,12 @@ ComparableCost TrajectoryCost::GetCostFromObsSL(
   const float delta_l = std::fabs(
       adc_l - (obs_sl_boundary.start_l() + obs_sl_boundary.end_l()) / 2.0);
 
-  obstacle_cost.safety_cost +=
-      config_.obstacle_collision_cost() *
-      Sigmoid(config_.obstacle_collision_distance() - delta_l);
+  const double kSafeDistance = 1.0;
+  if (delta_l < kSafeDistance) {
+    obstacle_cost.safety_cost +=
+        config_.obstacle_collision_cost() *
+        Sigmoid(config_.obstacle_collision_distance() - delta_l);
+  }
 
   const float delta_s = std::fabs(
       adc_s - (obs_sl_boundary.start_s() + obs_sl_boundary.end_s()) / 2.0);

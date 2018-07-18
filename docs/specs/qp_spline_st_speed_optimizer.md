@@ -21,11 +21,11 @@ $$
 
 ## 2  Objective function
 
-### 1.1  Get spline segments
+### 2.1  Get spline segments
 
 Split the S-T profile into **n** segments. Each segment trajectory is defined by a polynomial.
 
-### 1.2  Define function for each spline segment
+### 2.2  Define function for each spline segment
 
 Each segment ***i*** has an accumulated distance $d_i$ along a reference line. And the trajectory for the segment is defined as a polynomial of degree five by default. The degree of the polynomials are adjustable by configuration parameters.
 
@@ -36,7 +36,7 @@ s = f_i(t)
 $$
 </p>
 
-### 1.3  Define  objective function of optimization for each segment
+### 2.3  Define  objective function of optimization for each segment
 
 Apollo first defines $cost_1$ to make the trajectory smooth: 
 <p>
@@ -110,7 +110,7 @@ $$
 
 ### 3.3  Joint smoothness  constraints
 
-This constraint is designed to smooth the spline joint.  Given the assumption that two segments, $seg_k$ and $seg_{k+1}$, are connected, and the accumulated **s** of segment is $seg_k$ is $s_k$,  Apollo calculates the constraint equation as: 
+This constraint is designed to smooth the spline joint.  Given the assumption that two segments, $seg_k$ and $seg_{k+1}$, are connected, and the accumulated **s** of segment $seg_k$ is $s_k$,  Apollo calculates the constraint equation as: 
 <p>
 $$
 f_k(t_k) = f_{k+1} (t_0)

@@ -268,6 +268,7 @@ bool DPRoadGraph::SamplePathWaypoints(
   const float step_length =
       common::math::Clamp(init_point.v() * kSamplePointLookForwardTime,
                           config_.step_length_min(), config_.step_length_max());
+
   const float level_distance =
       (init_point.v() > FLAGS_max_stop_speed) ? step_length : step_length / 2.0;
   float accumulated_s = init_sl_point_.s();
@@ -324,7 +325,13 @@ bool DPRoadGraph::SamplePathWaypoints(
     const float eff_right_width = right_width - half_adc_width - kBoundaryBuff;
     const float eff_left_width = left_width - half_adc_width - kBoundaryBuff;
 
-    float kDefaultUnitL = 1.2 / (num_sample_per_level - 1);
+    // the heuristic shift of L for lane change scenarios
+    const double delta_dl = 1.2 / 20.0;
+    const double kChangeLaneDeltaL = common::math::Clamp(
+        level_distance * (std::fabs(init_frenet_frame_point_.dl()) + delta_dl),
+        1.2, 3.5);
+
+    float kDefaultUnitL = kChangeLaneDeltaL / (num_sample_per_level - 1);
     if (reference_line_info_.IsChangeLanePath() &&
         !reference_line_info_.IsSafeToChangeLane()) {
       kDefaultUnitL = 1.0;
