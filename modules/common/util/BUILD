@@ -34,6 +34,7 @@ cc_test(
     ],
     deps = [
         ":util",
+        "//modules/common/util/testdata:simple_proto",
         "@gtest//:main",
     ],
 )
