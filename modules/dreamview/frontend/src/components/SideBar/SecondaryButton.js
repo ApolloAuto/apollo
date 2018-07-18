@@ -2,15 +2,15 @@ import React from "react";
 import classNames from "classnames";
 
 
-export default class SubButton extends React.Component {
+export default class SecondaryButton extends React.PureComponent {
     render() {
-        const { enablePanel, onPanel, showPanel, panelLabel, extraClasses } = this.props;
+        const { disabled, onClick, active, panelLabel, extraClasses } = this.props;
         return (
-            <button onClick={onPanel}
-                    disabled={!enablePanel}
+            <button onClick={onClick}
+                    disabled={disabled}
                     className={classNames({
                             "sub-button": true,
-                            "sub-button-active": showPanel,
+                            "sub-button-active": active,
                         }, extraClasses)}>
                 <div className="label">{panelLabel}</div>
             </button>
