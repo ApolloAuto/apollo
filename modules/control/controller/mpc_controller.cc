@@ -159,7 +159,7 @@ Status MPCController::Init(const ControlConf *control_conf) {
   matrix_a_(3, 2) = (lf_ * cf_ - lr_ * cr_) / iz_;
   matrix_a_(4, 5) = 1.0;
   matrix_a_(5, 5) = 0.0;
-  // TODO(QiL): expand the model to accomendate more combined states.
+  // TODO(QiL): expand the model to accommodate more combined states.
 
   matrix_a_coeff_ = Matrix::Zero(basic_state_size_, basic_state_size_);
   matrix_a_coeff_(1, 1) = -(cf_ + cr_) / mass_;
@@ -261,7 +261,7 @@ void MPCController::LoadMPCGainScheduler(
 
   feedforwardterm_interpolation_.reset(new Interpolation1D);
   CHECK(feedforwardterm_interpolation_->Init(xy2))
-      << "Fail to load feedforwardterm gain scheduler for MPC controller";
+      << "Fail to load feed forward term gain scheduler for MPC controller";
 
   steer_weight_interpolation_.reset(new Interpolation1D);
   CHECK(steer_weight_interpolation_->Init(xy2))
@@ -284,13 +284,13 @@ Status MPCController::ComputeControlCommand(
   ComputeLongitudinalErrors(&trajectory_analyzer_, debug);
 
   // Update state
-  UpdateStateAnalyticalMatching(debug);
+  UpdateState(debug);
 
   UpdateMatrix(debug);
 
   FeedforwardUpdate(debug);
 
-  // Add gain sheduler for higher speed steering
+  // Add gain scheduler for higher speed steering
   if (FLAGS_enable_gain_scheduler) {
     matrix_q_updated_(0, 0) =
         matrix_q_(0, 0) *
@@ -391,7 +391,7 @@ Status MPCController::ComputeControlCommand(
   debug->set_acceleration_cmd_closeloop(acc_feedback);
 
   double acceleration_cmd = acc_feedback + debug->acceleration_reference();
-  // TODO(QiL): add pitch angle feedforward to accomendate for 3D control
+  // TODO(QiL): add pitch angle feed forward to accommodate for 3D control
 
   debug->set_is_full_stop(false);
   if (std::fabs(debug->acceleration_reference()) <=
@@ -475,7 +475,7 @@ void MPCController::LoadControlCalibrationTable(
       << "Fail to load control calibration table";
 }
 
-void MPCController::UpdateStateAnalyticalMatching(SimpleMPCDebug *debug) {
+void MPCController::UpdateState(SimpleMPCDebug *debug) {
   const auto &com = VehicleStateProvider::instance()->ComputeCOMPosition(lr_);
   ComputeLateralErrors(com.x(), com.y(),
                        VehicleStateProvider::instance()->heading(),
@@ -507,28 +507,6 @@ void MPCController::UpdateMatrix(SimpleMPCDebug *debug) {
   matrix_c_(1, 0) = (lr_ * cr_ - lf_ * cf_) / mass_ / v - v;
   matrix_c_(3, 0) = -(lf_ * lf_ * cf_ + lr_ * lr_ * cr_) / iz_ / v;
   matrix_cd_ = matrix_c_ * debug->heading_error_rate() * ts_;
-}
-
-/*
- * SL coordinate system:
- *  left to the ref_line, L is +
- * right to the ref_line, L is -
- */
-double MPCController::GetLateralError(const common::math::Vec2d &point,
-                                      TrajectoryPoint *traj_point) const {
-  const auto closest =
-      trajectory_analyzer_.QueryNearestPointByPosition(point.x(), point.y());
-
-  const double point_angle = std::atan2(point.y() - closest.path_point().y(),
-                                        point.x() - closest.path_point().x());
-  const double point2path_angle = point_angle - closest.path_point().theta();
-  if (traj_point != nullptr) {
-    *traj_point = closest;
-  }
-
-  const double dx = closest.path_point().x() - point.x();
-  const double dy = closest.path_point().y() - point.y();
-  return std::sin(point2path_angle) * std::sqrt(dx * dx + dy * dy);
 }
 
 void MPCController::FeedforwardUpdate(SimpleMPCDebug *debug) {
