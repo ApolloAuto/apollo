@@ -423,6 +423,18 @@
                 }
               }
             },
+            "Notification": {
+              "fields": {
+                "timestampSec": {
+                  "type": "double",
+                  "id": 1
+                },
+                "item": {
+                  "type": "apollo.common.monitor.MonitorMessageItem",
+                  "id": 2
+                }
+              }
+            },
             "SimulationWorld": {
               "fields": {
                 "timestamp": {
@@ -481,7 +493,15 @@
                 },
                 "monitor": {
                   "type": "apollo.common.monitor.MonitorMessage",
-                  "id": 12
+                  "id": 12,
+                  "options": {
+                    "deprecated": true
+                  }
+                },
+                "notification": {
+                  "rule": "repeated",
+                  "type": "Notification",
+                  "id": 25
                 },
                 "engageAdvice": {
                   "type": "string",
