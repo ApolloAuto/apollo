@@ -93,39 +93,54 @@ TEST_F(SimulationWorldServiceTest, UpdateMonitorSuccess) {
   monitor.add_item()->set_msg("I am the latest message.");
   monitor.mutable_header()->set_timestamp_sec(2000);
 
-  auto* world_monitor = sim_world_service_->world_.mutable_monitor();
-  world_monitor->mutable_header()->set_timestamp_sec(1990);
-  world_monitor->add_item()->set_msg("I am the previous message.");
+  auto* notification = sim_world_service_->world_.add_notification();
+  notification->set_timestamp_sec(1990);
+  notification->mutable_item()->set_msg("I am the previous message.");
 
   sim_world_service_->UpdateSimulationWorld(monitor);
 
-  EXPECT_EQ(2, world_monitor->item_size());
-  EXPECT_EQ("I am the latest message.", world_monitor->item(0).msg());
-  EXPECT_EQ("I am the previous message.", world_monitor->item(1).msg());
+  EXPECT_EQ(2, sim_world_service_->world_.notification_size());
+  EXPECT_EQ("I am the previous message.",
+            sim_world_service_->world_.notification(0).item().msg());
+  EXPECT_EQ("I am the latest message.",
+            sim_world_service_->world_.notification(1).item().msg());
+  EXPECT_DOUBLE_EQ(1990,
+                   sim_world_service_->world_.notification(0).timestamp_sec());
+  EXPECT_DOUBLE_EQ(2000,
+                   sim_world_service_->world_.notification(1).timestamp_sec());
 }
 
 TEST_F(SimulationWorldServiceTest, UpdateMonitorRemove) {
   MonitorMessage monitor;
-  monitor.add_item()->set_msg("I am message -2");
   monitor.add_item()->set_msg("I am message -1");
+  monitor.add_item()->set_msg("I am message -2");
   monitor.mutable_header()->set_timestamp_sec(2000);
 
-  auto* world_monitor = sim_world_service_->world_.mutable_monitor();
-  world_monitor->mutable_header()->set_timestamp_sec(1990);
   for (int i = 0; i < SimulationWorldService::kMaxMonitorItems; ++i) {
-    world_monitor->add_item()->set_msg(StrCat("I am message ", i));
+    auto* notification = sim_world_service_->world_.add_notification();
+    notification->mutable_item()->set_msg(StrCat("I am message ", i));
+    notification->set_timestamp_sec(1990);
   }
   int last = SimulationWorldService::kMaxMonitorItems - 1;
-  EXPECT_EQ(StrCat("I am message ", last), world_monitor->item(last).msg());
+  EXPECT_EQ(StrCat("I am message ", last),
+            sim_world_service_->world_.notification(last).item().msg());
 
   sim_world_service_->UpdateSimulationWorld(monitor);
 
   EXPECT_EQ(SimulationWorldService::kMaxMonitorItems,
-            world_monitor->item_size());
-  EXPECT_EQ("I am message -2", world_monitor->item(0).msg());
-  EXPECT_EQ("I am message -1", world_monitor->item(1).msg());
-  EXPECT_EQ(StrCat("I am message ", last - monitor.item_size()),
-            world_monitor->item(last).msg());
+            sim_world_service_->world_.notification_size());
+  EXPECT_EQ("I am message -2",
+            sim_world_service_->world_.notification(last).item().msg());
+  EXPECT_EQ("I am message -1",
+            sim_world_service_->world_.notification(last - 1).item().msg());
+  EXPECT_EQ(StrCat("I am message ", last),
+            sim_world_service_->world_.notification(last - 2).item().msg());
+  EXPECT_DOUBLE_EQ(
+      2000, sim_world_service_->world_.notification(last).timestamp_sec());
+  EXPECT_DOUBLE_EQ(
+      2000, sim_world_service_->world_.notification(last - 1).timestamp_sec());
+  EXPECT_DOUBLE_EQ(
+      1990, sim_world_service_->world_.notification(last - 2).timestamp_sec());
 }
 
 TEST_F(SimulationWorldServiceTest, UpdateMonitorTruncate) {
@@ -139,16 +154,19 @@ TEST_F(SimulationWorldServiceTest, UpdateMonitorTruncate) {
   EXPECT_EQ(StrCat("I am message ", large_size - 1),
             monitor.item(large_size - 1).msg());
 
-  auto* world_monitor = sim_world_service_->world_.mutable_monitor();
-  world_monitor->mutable_header()->set_timestamp_sec(1990);
-
   sim_world_service_->UpdateSimulationWorld(monitor);
 
   int last = SimulationWorldService::kMaxMonitorItems - 1;
   EXPECT_EQ(SimulationWorldService::kMaxMonitorItems,
-            world_monitor->item_size());
-  EXPECT_EQ("I am message 0", world_monitor->item(0).msg());
-  EXPECT_EQ(StrCat("I am message ", last), world_monitor->item(last).msg());
+            sim_world_service_->world_.notification_size());
+  EXPECT_EQ("I am message 0",
+            sim_world_service_->world_.notification(0).item().msg());
+  EXPECT_EQ(StrCat("I am message ", last),
+            sim_world_service_->world_.notification(last).item().msg());
+  EXPECT_DOUBLE_EQ(2000,
+                   sim_world_service_->world_.notification(0).timestamp_sec());
+  EXPECT_DOUBLE_EQ(
+      2000, sim_world_service_->world_.notification(last).timestamp_sec());
 }
 
 TEST_F(SimulationWorldServiceTest, UpdateChassisInfo) {
