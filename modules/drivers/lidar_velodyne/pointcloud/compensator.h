@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ * Copyright 2017 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,6 @@
 #ifndef MODULES_DRIVERS_LIDAR_VELODYNE_POINTCLOUD_COMPENSATOR_H_
 #define MODULES_DRIVERS_LIDAR_VELODYNE_POINTCLOUD_COMPENSATOR_H_
 
-#include <string>
-
 #include "Eigen/Eigen"
 #include "eigen_conversions/eigen_msg.h"
 #include "pcl/common/time.h"
@@ -27,7 +25,9 @@
 #include "std_msgs/String.h"
 #include "tf2_ros/transform_listener.h"
 
-#include "modules/drivers/lidar_velodyne/pointcloud/lib/const_variables.h"
+#include "modules/drivers/lidar_velodyne/proto/velodyne_conf.pb.h"
+
+#include "modules/drivers/lidar_velodyne/pointcloud/const_variables.h"
 
 namespace apollo {
 namespace drivers {
@@ -35,31 +35,33 @@ namespace lidar_velodyne {
 
 class Compensator {
  public:
-  Compensator(ros::NodeHandle& node, ros::NodeHandle& private_nh);  // NOLINT
-  virtual ~Compensator() = default;
+  explicit Compensator(const VelodyneConf& conf);
+  virtual ~Compensator() {}
 
- private:
   /**
   * @brief get pointcloud2 msg, compensate it,publish pointcloud2 after
   * compensator
   */
-  void pointcloud_callback(sensor_msgs::PointCloud2ConstPtr msg);
+  bool pointcloud_compensate(const sensor_msgs::PointCloud2ConstPtr msg,
+                             sensor_msgs::PointCloud2Ptr q_msg);
+
+ private:
   /**
   * @brief get pose affine from tf2 by gps timestamp
   *   novatel-preprocess broadcast the tf2 transfrom.
   */
-  bool query_pose_affine_from_tf2(const double timestamp,
+  bool query_pose_affine_from_tf2(const double& timestamp,
                                   Eigen::Affine3d* pose);
   /**
-  * @brief check if message is valid, check width, height, timestamp.
+  * @brief check if message is valid, check width, height, timesatmp.
   *   set timestamp_offset and point data type
   */
-  bool check_message(sensor_msgs::PointCloud2ConstPtr msg);
+  bool check_message(const sensor_msgs::PointCloud2ConstPtr msg);
   /**
   * @brief motion compensation for point cloud
   */
   template <typename Scalar>
-  void motion_compensation(sensor_msgs::PointCloud2::Ptr& msg,  // NOLINT
+  void motion_compensation(sensor_msgs::PointCloud2Ptr msg,
                            const double timestamp_min,
                            const double timestamp_max,
                            const Eigen::Affine3d& pose_min_time,
@@ -67,40 +69,22 @@ class Compensator {
   /**
   * @brief get min timestamp and max timestamp from points in pointcloud2
   */
-  inline void get_timestamp_interval(sensor_msgs::PointCloud2ConstPtr msg,
-                                     double& timestamp_min,   // NOLINT
-                                     double& timestamp_max);  // NOLINT
-
+  inline void get_timestamp_interval(const sensor_msgs::PointCloud2ConstPtr msg,
+                                     double* timestamp_min,
+                                     double* timestamp_max);
   /**
   * @brief get point field size by sensor_msgs::datatype
   */
   inline uint get_field_size(const int data_type);
 
-  // subscribe velodyne pointcloud2 msg.
-  ros::Subscriber pointcloud_sub_;
-  // publish point cloud2 after motion compensation
-  ros::Publisher compensation_pub_;
-  //   ros::Publisher metastatus_publisher_;
-  // tf2 buffer
-  tf2_ros::Buffer tf2_buffer_;
-  // tf2 transform listener to get transform by gps timestamp.
-  tf2_ros::TransformListener tf2_transform_listener_;
-  // transform child frame id(world -> child frame)
-  std::string child_frame_id_;
-  float tf_timeout_;
-
-  // variables for point fields value, we get point x,y,z by these offset
+  // varibes for point fields value, we get point x,y,z by these offset
   int x_offset_;
   int y_offset_;
   int z_offset_;
   int timestamp_offset_;
-  uint timestamp_data_size_;
+  int timestamp_data_size_;
 
-  // topic names
-  std::string topic_compensated_pointcloud_;
-  std::string topic_pointcloud_;
-  // ros queue size for publisher and subscriber
-  int queue_size_;
+  VelodyneConf conf_;
 };
 
 }  // namespace lidar_velodyne
