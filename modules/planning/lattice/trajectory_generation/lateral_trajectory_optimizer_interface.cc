@@ -286,6 +286,21 @@ bool LateralTrajectoryOptimizerInterface::eval_jac_g(int n, const double* x,
 
       ++constraint_index;
     }
+
+    // initial state constraint
+    // d_0
+    iRow[nz_index] = constraint_index;
+    jCol[nz_index] = 0;
+    ++nz_index;
+    // d_0'
+    iRow[nz_index] = constraint_index;
+    jCol[nz_index] = num_of_points_;
+    ++nz_index;
+    // d_0''
+    iRow[nz_index] = constraint_index;
+    jCol[nz_index] = 2 * num_of_points_;
+    ++nz_index;
+
     nnz_jac_g_ = nz_index;
   } else {
     if (new_x) {
@@ -343,6 +358,12 @@ bool LateralTrajectoryOptimizerInterface::eval_jac_g(int n, const double* x,
       ++nz_index;
       // d_i+1''
       values[nz_index] = delta_s_ * delta_s_ / 6.0;
+      ++nz_index;
+    }
+
+    // initial state constraint
+    for (std::size_t order = 0; order < 3; ++order) {
+      values[nz_index] = 1.0;
       ++nz_index;
     }
 
