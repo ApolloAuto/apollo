@@ -284,7 +284,7 @@ void ProbabilisticFusion::FuseForegroundObjects(
                          sensor_type, sensor_id, timestamp);
 
   if (FLAGS_use_navigation_mode) {
-    if (is_camera(sensor_type)) {
+    if (is_camera(sensor_type) || is_lidar(sensor_type)) {
       CreateNewTracks(*foreground_objects, unassigned_objects);
     }
   } else {
