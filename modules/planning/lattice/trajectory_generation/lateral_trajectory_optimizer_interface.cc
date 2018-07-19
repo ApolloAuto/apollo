@@ -28,7 +28,8 @@ namespace planning {
 
 LateralTrajectoryOptimizerInterface::LateralTrajectoryOptimizerInterface(
     const double d_init, const double d_prime_init, const double d_pprime_init,
-    const double delta_s, std::vector<std::pair<double, double>> d_bounds) {
+    const double delta_s, std::vector<std::pair<double, double>> d_bounds) :
+    opt_trajectory_(d_init, d_prime_init, d_pprime_init) {
 
   num_of_points_ = d_bounds.size();
 
@@ -37,10 +38,14 @@ LateralTrajectoryOptimizerInterface::LateralTrajectoryOptimizerInterface(
   delta_s_ = delta_s;
 
   d_bounds_ = std::move(d_bounds);
-}
 
-LateralTrajectoryOptimizerInterface::~LateralTrajectoryOptimizerInterface() {
-  // TODO Auto-generated destructor stub
+  w_d_ = 1.0;
+
+  w_d_prime_ = 1.0;
+
+  w_d_pprime_ = 1.0;
+
+  w_d_obs_ = 1.0;
 }
 
 bool LateralTrajectoryOptimizerInterface::get_nlp_info(int& n, int& m,
@@ -397,6 +402,17 @@ void LateralTrajectoryOptimizerInterface::finalize_solution(
     const double* z_U, int m, const double* g, const double* lambda,
     double obj_value, const Ipopt::IpoptData* ip_data,
     Ipopt::IpoptCalculatedQuantities* ip_cq) {
+
+  std::size_t offset = num_of_points_ * 2;
+  for (std::size_t i = 1; i < num_of_points_; ++i) {
+    auto j = (x[offset] - x[offset - 1]) / delta_s_;
+    opt_trajectory_.AppendSegment(j, delta_s_);
+  }
+}
+
+PiecewiseJerkTrajectory1d LateralTrajectoryOptimizerInterface::GetOptimalTrajectory() const {
+  return opt_trajectory_;
+
 }
 
 } // namespace planning
