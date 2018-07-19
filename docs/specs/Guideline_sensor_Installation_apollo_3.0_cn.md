@@ -12,7 +12,7 @@
 
 单位：毫米（mm）
 
-原点：后车轮毂中心
+原点：车辆后轮轴中心
 
 ![Image](images/perception_setup_figure1.png)
 

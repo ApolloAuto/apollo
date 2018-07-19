@@ -106,10 +106,26 @@ void Planning::ResetPullOver(const routing::RoutingResponse& response) {
   }
 }
 
+void Planning::CheckPlanningConfig() {
+  if (config_.has_em_planner_config() &&
+      config_.em_planner_config().has_dp_st_speed_config()) {
+    const auto& dp_st_speed_config =
+        config_.em_planner_config().dp_st_speed_config();
+    CHECK(dp_st_speed_config.has_matrix_dimension_s());
+    CHECK_GT(dp_st_speed_config.matrix_dimension_s(), 3);
+    CHECK_LT(dp_st_speed_config.matrix_dimension_s(), 10000);
+    CHECK(dp_st_speed_config.has_matrix_dimension_t());
+    CHECK_GT(dp_st_speed_config.matrix_dimension_t(), 3);
+    CHECK_LT(dp_st_speed_config.matrix_dimension_t(), 10000);
+  }
+  // TODO(All): check other config params
+}
+
 Status Planning::Init() {
   CHECK(apollo::common::util::GetProtoFromFile(FLAGS_planning_config_file,
                                                &config_))
       << "failed to load planning config file " << FLAGS_planning_config_file;
+  CheckPlanningConfig();
 
   CHECK(apollo::common::util::GetProtoFromFile(
       FLAGS_traffic_rule_config_filename, &traffic_rule_configs_))
@@ -268,12 +284,20 @@ void Planning::RunOnce() {
     auto vehicle_config = ComputeVehicleConfigFromLocalization(localization);
 
     if (last_vehicle_config_.is_valid_ && vehicle_config.is_valid_) {
-      auto x_diff = vehicle_config.x_ - last_vehicle_config_.x_;
-      auto y_diff = vehicle_config.y_ - last_vehicle_config_.y_;
+      auto x_diff_map = vehicle_config.x_ - last_vehicle_config_.x_;
+      auto y_diff_map = vehicle_config.y_ - last_vehicle_config_.y_;
+
+      auto cos_map_veh = std::cos(last_vehicle_config_.theta_);
+      auto sin_map_veh = std::sin(last_vehicle_config_.theta_);
+
+      auto x_diff_veh = cos_map_veh * x_diff_map + sin_map_veh * y_diff_map;
+      auto y_diff_veh = -sin_map_veh * x_diff_map + cos_map_veh * y_diff_map;
+
       auto theta_diff = vehicle_config.theta_ - last_vehicle_config_.theta_;
 
       TrajectoryStitcher::TransformLastPublishedTrajectory(
-          x_diff, y_diff, theta_diff, last_publishable_trajectory_.get());
+          x_diff_veh, y_diff_veh, theta_diff,
+          last_publishable_trajectory_.get());
     }
     last_vehicle_config_ = vehicle_config;
   }

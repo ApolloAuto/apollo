@@ -19,12 +19,11 @@
 
 #include <string>
 
-#include "modules/common/apollo_app.h"
+#include "modules/drivers/lidar_velodyne/proto/velodyne_conf.pb.h"
 
-/**
- * @namespace apollo::velodyne
- * @brief apollo::velodyne
- */
+#include "modules/common/apollo_app.h"
+#include "modules/common/status/status.h"
+
 namespace apollo {
 namespace drivers {
 namespace lidar_velodyne {
@@ -45,6 +44,7 @@ class LidarVelodyne : public apollo::common::ApolloApp {
   void Stop() override;
 
  private:
+  VelodyneConf conf_;
 };
 
 }  // namespace lidar_velodyne
