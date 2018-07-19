@@ -21,7 +21,7 @@
 
 #include "modules/planning/lattice/trajectory1d/constant_jerk_trajectory1d.h"
 
-#include "glog/logging.h"
+#include "modules/common/log.h"
 
 #include "modules/planning/common/planning_gflags.h"
 
