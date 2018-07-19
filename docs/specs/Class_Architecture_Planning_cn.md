@@ -75,4 +75,4 @@ Routing定义了概念性问题“我想去哪儿”，消息定义在`routing.p
 
 | **附注：**                                |
 | ---------------------------------------- |
-| DB表示动态规划（dynamic programming），QP表示二次规划（quadratic programming）。经过计算步骤后，最终的路径数据经过处理后传递到下一个节点模块进行路径的执行。 |
+| DP表示动态规划（dynamic programming），QP表示二次规划（quadratic programming）。经过计算步骤后，最终的路径数据经过处理后传递到下一个节点模块进行路径的执行。 |
