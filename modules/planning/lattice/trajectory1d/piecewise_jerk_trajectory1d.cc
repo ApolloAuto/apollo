@@ -20,8 +20,34 @@
 
 #include "modules/planning/lattice/trajectory1d/piecewise_jerk_trajectory1d.h"
 
+#include "modules/common/log.h"
+
+#include "modules/planning/common/planning_gflags.h"
+
 namespace apollo {
 namespace planning {
+
+void PiecewiseJerkTrajectory1d::AppendSegment(
+    const double jerk, const double param) {
+  CHECK(!segments_.empty());
+  const auto& last_segment = segments_.back();
+  double last_p = last_segment.GetEndState();
+  double last_v = last_segment.GetEndVelocity();
+  double last_a = last_segment.GetEndAcceleration();
+  segments_.emplace_back(last_p, last_v, last_a, jerk, param);
+}
+
+void PiecewiseJerkTrajectory1d::AppendSegment(
+    const double p1, const double v1, const double a1,
+    const double param) {
+  CHECK_GT(param, FLAGS_lattice_epsilon);
+  const auto& last_segment = segments_.back();
+  double last_p = last_segment.GetEndState();
+  double last_v = last_segment.GetEndVelocity();
+  double last_a = last_segment.GetEndAcceleration();
+  double jerk = (a1 - last_a) / param;
+  segments_.emplace_back(last_p, last_v, last_a, jerk, param);
+}
 
 }  // namespace planning
 }  // namespace apollo
