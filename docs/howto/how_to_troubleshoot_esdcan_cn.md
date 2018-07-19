@@ -6,7 +6,8 @@
 不能通过ESD卡进行通信。
 
 ### 故障排除步骤：
-1. 确保CAN驱动程序（内核模块）被加载，运行：```lsmod |grep can```; 如果驱动程序已经加载，您应该看到关于内核驱动程序的信息，例如版本号。2. 确保CAN设备存在并具有正确的权限集，运行：```ls -l /dev/can0```.
+1. 确保CAN驱动程序（内核模块）被加载，运行：```lsmod |grep can```; 如果驱动程序已经加载，您应该看到关于内核驱动程序的信息，例如版本号。
+2. 确保CAN设备存在并具有正确的权限集，运行：```ls -l /dev/can0```.
 3. 检查内核日志(运行 ```dmesg |grep -i can```) 和系统日志 (运行 ```grep -i can /var/log/syslog```), 查看是否存在与CAN相关的错误消息。
 4. 运行Apollo程序 ```esdcan_test_app``` (在```monitor/hwmonitor/hw/tools/```下), 它将列出详细统计数据和状态信息。
     * 了解这个工具，运行 ```esdcan_test_app --help```.
