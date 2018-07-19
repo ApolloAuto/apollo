@@ -2,9 +2,11 @@ package(default_visibility = ["//visibility:public"])
 
 licenses(["notice"])
 
+
+
 cc_library(
     name = "cuda",
-    includes = ["."],
+    includes = ["include"],
     linkopts = [
         "-L/usr/local/cuda/lib64",
         "-lOpenCL",

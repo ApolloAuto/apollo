@@ -157,7 +157,7 @@ new_local_repository(
 new_local_repository(
     name = "cuda",
     build_file = "third_party/cuda.BUILD",
-    path = "/usr/local/cuda/include",
+    path = "/usr/local/cuda",
 )
 
 # Local-integ
@@ -194,12 +194,12 @@ http_archive(
 new_local_repository(
     name = "jsoncpp",
     build_file = "third_party/jsoncpp.BUILD",
-    path = "/usr/local/apollo/jsoncpp/"
+    path = "/usr/local/apollo/jsoncpp/",
 )
 
 #adv_plat
 new_local_repository(
     name = "adv_plat",
     build_file = "third_party/adv_plat.BUILD",
-    path = "/usr/local/apollo/adv_plat"
+    path = "/usr/local/apollo/adv_plat",
 )
