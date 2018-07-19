@@ -27,9 +27,16 @@ namespace apollo {
 namespace planning {
 
 LateralTrajectoryOptimizerInterface::LateralTrajectoryOptimizerInterface(
-    const std::size_t num_of_points) {
-  // TODO Auto-generated constructor stub
+    const double d_init, const double d_prime_init, const double d_pprime_init,
+    const double delta_s, std::vector<std::pair<double, double>> d_bounds) {
 
+  num_of_points_ = d_bounds.size();
+
+  num_of_variables_ = 3 * num_of_points_;
+
+  delta_s_ = delta_s;
+
+  d_bounds_ = std::move(d_bounds);
 }
 
 LateralTrajectoryOptimizerInterface::~LateralTrajectoryOptimizerInterface() {
@@ -44,9 +51,8 @@ bool LateralTrajectoryOptimizerInterface::get_nlp_info(int& n, int& m,
   // constraints
   m = num_of_points_ * 3;
 
-  // TODO:
+  // none zero hessian and lagrangian
   nnz_h_lag = n;
-
 
   index_style = IndexStyleEnum::C_STYLE;
 
@@ -82,8 +88,6 @@ bool LateralTrajectoryOptimizerInterface::get_bounds_info(int n, double* x_l,
   // bounds for constraints
 
   // jerk bounds
-//  auto jerk_max_sqr = d_ppprime_max_ * delta_s_;
-//  jerk_max_sqr = jerk_max_sqr * jerk_max_sqr;
   for (std::size_t i = 0; i + 1 < num_of_points_; ++i) {
     g_l[i] = -d_ppprime_max_ * delta_s_;
     g_u[i] = d_ppprime_max_ * delta_s_;
