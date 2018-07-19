@@ -120,17 +120,18 @@ class Planning : public apollo::common::ApolloApp {
   bool IsVehicleStateValid(const common::VehicleState& vehicle_state);
   void ExportReferenceLineDebug(planning_internal::Debug* debug);
 
-  void SetFallbackCruiseTrajectory(ADCTrajectory* cruise_trajectory);
+  void SetFallbackTrajectory(ADCTrajectory* cruise_trajectory);
 
   /**
    * Reset pull over mode whenever received new routing
    */
   void ResetPullOver(const routing::RoutingResponse& response);
 
+  void CheckPlanningConfig();
+
   double start_time_ = 0.0;
 
-  common::util::Factory<PlanningConfig::PlannerType, Planner>
-      planner_factory_;
+  common::util::Factory<PlanningConfig::PlannerType, Planner> planner_factory_;
 
   PlanningConfig config_;
 

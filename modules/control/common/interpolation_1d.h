@@ -35,7 +35,7 @@ class Interpolation1D {
   // Return true if init is ok.
   bool Init(const DataType& xy);
 
-  // Only interplation x between [x_min, x_max]
+  // Only interpolate x between [x_min, x_max]
   // For x out of range, start or end y value is returned.
   double Interpolate(double x) const;
 

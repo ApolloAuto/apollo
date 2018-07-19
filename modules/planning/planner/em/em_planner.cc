@@ -230,6 +230,19 @@ Status EMPlanner::PlanOnReferenceLine(
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
+  // determine if there is a destination on reference line.
+  double dest_stop_s = -1.0;
+  for (const auto* path_obstacle :
+       reference_line_info->path_decision()->path_obstacles().Items()) {
+    if (path_obstacle->LongitudinalDecision().has_stop() &&
+        path_obstacle->LongitudinalDecision().stop().reason_code() ==
+            STOP_REASON_DESTINATION) {
+      SLPoint dest_sl = GetStopSL(path_obstacle->LongitudinalDecision().stop(),
+                                  reference_line_info->reference_line());
+      dest_stop_s = dest_sl.s();
+    }
+  }
+
   for (const auto* path_obstacle :
        reference_line_info->path_decision()->path_obstacles().Items()) {
     if (path_obstacle->obstacle()->IsVirtual()) {
@@ -239,14 +252,28 @@ Status EMPlanner::PlanOnReferenceLine(
       continue;
     }
     if (path_obstacle->LongitudinalDecision().has_stop()) {
-      constexpr double kRefrenceLineStaticObsCost = 1e3;
-      reference_line_info->AddCost(kRefrenceLineStaticObsCost);
+      bool add_stop_obstacle_cost = false;
+      if (dest_stop_s < 0.0) {
+        add_stop_obstacle_cost = true;
+      } else {
+        SLPoint stop_sl =
+            GetStopSL(path_obstacle->LongitudinalDecision().stop(),
+                      reference_line_info->reference_line());
+        if (stop_sl.s() < dest_stop_s) {
+          add_stop_obstacle_cost = true;
+        }
+      }
+      if (add_stop_obstacle_cost) {
+        constexpr double kRefrenceLineStaticObsCost = 1e3;
+        reference_line_info->AddCost(kRefrenceLineStaticObsCost);
+      }
     }
   }
 
   if (FLAGS_enable_trajectory_check) {
-    if (!ConstraintChecker::ValidTrajectory(trajectory)) {
-      std::string msg("Failed to validate current planning trajectory.");
+    if (ConstraintChecker::ValidTrajectory(trajectory) !=
+        ConstraintChecker::Result::VALID) {
+      std::string msg("Current planning trajectory is not valid.");
       AERROR << msg;
       return Status(ErrorCode::PLANNING_ERROR, msg);
     }
@@ -467,6 +494,15 @@ bool EMPlanner::IsValidProfile(const QuinticPolynomialCurve1d& curve) const {
     }
   }
   return true;
+}
+
+SLPoint EMPlanner::GetStopSL(const ObjectStop& stop_decision,
+                             const ReferenceLine& reference_line) const {
+  SLPoint sl_point;
+  reference_line.XYToSL(
+      {stop_decision.stop_point().x(), stop_decision.stop_point().y()},
+      &sl_point);
+  return sl_point;
 }
 
 }  // namespace planning
