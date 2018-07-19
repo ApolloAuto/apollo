@@ -22,6 +22,8 @@
 
 #include "ros/include/velodyne_msgs/VelodyneScanUnified.h"
 
+#include "modules/drivers/lidar_velodyne/proto/velodyne_conf.pb.h"
+
 #include "modules/drivers/lidar_velodyne/common/socket_input.h"
 
 namespace apollo {
@@ -31,50 +33,36 @@ namespace lidar_velodyne {
 constexpr int BLOCKS_PER_PACKET = 12;
 constexpr int BLOCK_SIZE = 100;
 
-// configuration parameters
-struct Config {
-  std::string frame_id;  ///< tf frame ID
-  std::string model;     ///< device model name
-  std::string topic;
-  int npackets = 0;  ///< number of packets to collect
-  double rpm = 0.0;  ///< device rotation rate (RPMs)
-  int firing_data_port = 0;
-  int positioning_data_port = 0;
-  int prefix_angle = 0;  // prefix angle to recv
-  bool use_sensor_sync = false;
-};
-
 class VelodyneDriver {
  public:
   VelodyneDriver();
   virtual ~VelodyneDriver() {}
 
   virtual bool poll(void) = 0;
-  virtual void init(ros::NodeHandle &node) = 0;  // NOLINT
+  virtual void init() = 0;
 
  protected:
-  Config config_;
-  boost::shared_ptr<Input> input_;
-  ros::Publisher output_;
-  std::string topic_;
-
-  uint64_t basetime_;
-  uint32_t last_gps_time_;
-
   virtual int poll_standard(
       velodyne_msgs::VelodyneScanUnifiedPtr &scan);  // NOLINT
   bool set_base_time();
   void set_base_time_from_nmea_time(NMEATimePtr nmea_time,
                                     uint64_t &basetime);  // NOLINT
   void update_gps_top_hour(unsigned int current_time);
+
+  VelodyneConf config_;
+  boost::shared_ptr<Input> input_;
+  ros::Publisher output_;
+  std::string topic_;
+  uint64_t basetime_;
+  uint32_t last_gps_time_;
 };
 
 class Velodyne64Driver : public VelodyneDriver {
  public:
-  explicit Velodyne64Driver(const Config &config);
+  explicit Velodyne64Driver(const VelodyneConf &config);
   virtual ~Velodyne64Driver() {}
 
-  void init(ros::NodeHandle &node);  // NOLINT
+  void init();
   bool poll(void);
 
  private:
@@ -85,9 +73,9 @@ class Velodyne64Driver : public VelodyneDriver {
 
 class Velodyne32Driver : public VelodyneDriver {
  public:
-  explicit Velodyne32Driver(const Config &config);
+  explicit Velodyne32Driver(const VelodyneConf &config);
   virtual ~Velodyne32Driver() {}
-  void init(ros::NodeHandle &node);  // NOLINT
+  void init();
   bool poll(void);
   void poll_positioning_packet();
 
@@ -97,10 +85,10 @@ class Velodyne32Driver : public VelodyneDriver {
 
 class Velodyne16Driver : public VelodyneDriver {
  public:
-  explicit Velodyne16Driver(const Config &config);
+  explicit Velodyne16Driver(const VelodyneConf &config);
   virtual ~Velodyne16Driver() {}
 
-  void init(ros::NodeHandle &node);  // NOLINT
+  void init();
   bool poll(void);
   void poll_positioning_packet();
 
@@ -110,7 +98,7 @@ class Velodyne16Driver : public VelodyneDriver {
 
 class VelodyneDriverFactory {
  public:
-  static VelodyneDriver *create_driver(ros::NodeHandle private_nh);
+  static VelodyneDriver *create_driver(const VelodyneConf &velodyne_config);
 };
 
 }  // namespace lidar_velodyne
