@@ -1,0 +1,18 @@
+syntax = "proto2";
+
+import "modules/drivers/lidar_velodyne/proto/velodyne_conf.proto";
+
+package apollo.drivers.lidar_velodyne;
+
+message VelodyneToolsConf {
+    optional string pcd_folder = 1;
+    optional string stamp_file = 2;
+    optional string pose_file = 3;
+    optional bool skip_static_frames = 4 [default = false];
+    optional string child_frame_id = 5 [default = "velodyne"];
+    optional bool use_seq = 6 [default = false];
+    optional string save_folder = 7; // point cloud dump forder
+    optional string file_prefix = 8; // point cloud dump file prefix
+
+    optional VelodyneConf module_conf = 101;
+}

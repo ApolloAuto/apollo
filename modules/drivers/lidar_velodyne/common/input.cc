@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ * Copyright 2017 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ namespace apollo {
 namespace drivers {
 namespace lidar_velodyne {
 
-bool Input::exract_nmea_time_from_packet(NMEATimePtr nmea_time,
+bool Input::exract_nmea_time_from_packet(const NMEATimePtr& nmea_time,
                                          const uint8_t* bytes) {
   int gprmc_index = 206;
 
@@ -31,7 +31,7 @@ bool Input::exract_nmea_time_from_packet(NMEATimePtr nmea_time,
   int validity_field_index = 0;
   int date_field_index = 0;
   while (bytes[++gprmc_index] != '*' &&
-         gprmc_index < static_cast<int>(POSITIONING_DATA_PACKET_SIZE)) {
+         gprmc_index < POSITIONING_DATA_PACKET_SIZE) {
     if (bytes[gprmc_index] == ',') {
       ++field_count;
       if (field_count == 1 && time_field_index == 0) {

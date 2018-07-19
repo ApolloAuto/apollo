@@ -17,10 +17,15 @@
 #ifndef MODULES_ADAPTERS_MESSAGE_ADAPTERS_H_
 #define MODULES_ADAPTERS_MESSAGE_ADAPTERS_H_
 
+#include "sensor_msgs/CompressedImage.h"
+#include "sensor_msgs/Image.h"
+#include "sensor_msgs/PointCloud2.h"
+#include "std_msgs/String.h"
+#include "velodyne_msgs/VelodyneScanUnified.h"
+
 #include "modules/calibration/republish_msg/proto/relative_odometry.pb.h"
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/canbus/proto/chassis_detail.pb.h"
-#include "modules/common/adapters/adapter.h"
 #include "modules/common/monitor_log/proto/monitor_log.pb.h"
 #include "modules/common/proto/drive_event.pb.h"
 #include "modules/control/proto/control_cmd.pb.h"
@@ -34,9 +39,9 @@
 #include "modules/drivers/gnss/proto/imu.pb.h"
 #include "modules/drivers/gnss/proto/ins.pb.h"
 #include "modules/drivers/proto/conti_radar.pb.h"
-#include "modules/drivers/proto/racobit_radar.pb.h"
 #include "modules/drivers/proto/delphi_esr.pb.h"
 #include "modules/drivers/proto/mobileye.pb.h"
+#include "modules/drivers/proto/racobit_radar.pb.h"
 #include "modules/drivers/proto/ultrasonic_radar.pb.h"
 #include "modules/guardian/proto/guardian.pb.h"
 #include "modules/localization/proto/gps.pb.h"
@@ -50,10 +55,8 @@
 #include "modules/planning/proto/planning.pb.h"
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
 #include "modules/routing/proto/routing.pb.h"
-#include "sensor_msgs/CompressedImage.h"
-#include "sensor_msgs/Image.h"
-#include "sensor_msgs/PointCloud2.h"
-#include "std_msgs/String.h"
+
+#include "modules/common/adapters/adapter.h"
 
 /**
  * @file message_adapters.h
@@ -129,6 +132,12 @@ using GnssRawDataAdapter = Adapter<std_msgs::String>;
 using StreamStatusAdapter = Adapter<drivers::gnss_status::StreamStatus>;
 using GnssHeadingAdapter = Adapter<drivers::gnss::Heading>;
 using RtcmDataAdapter = Adapter<std_msgs::String>;
+
+// for velodyne
+using VelodyneRaw0Adapter = Adapter<velodyne_msgs::VelodyneScanUnified>;
+using VelodyneRaw1Adapter = Adapter<velodyne_msgs::VelodyneScanUnified>;
+using PointCloudRaw0Adapter = Adapter<::sensor_msgs::PointCloud2>;
+using PointCloudRaw1Adapter = Adapter<::sensor_msgs::PointCloud2>;
 
 }  // namespace adapter
 }  // namespace common
