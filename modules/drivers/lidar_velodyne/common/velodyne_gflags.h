@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ * Copyright 2017 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,4 +23,10 @@ DECLARE_string(velodyne_module_name);
 DECLARE_string(velodyne_adapter_config_filename);
 DECLARE_string(velodyne_conf_file);
 
-#endif  // MODULES_DRIVERS_LIDAR_VELODYNE_COMMON_VELODYNE_GFLAGS_H_
+DECLARE_bool(publish_raw_data);
+DECLARE_bool(publish_raw_pointcloud);
+DECLARE_bool(publish_compensator_pointcloud);
+
+DECLARE_bool(pipeline_mode);
+
+#endif
