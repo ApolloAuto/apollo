@@ -221,11 +221,11 @@ bool LateralTrajectoryOptimizerInterface::eval_jac_g(int n, const double* x,
          ++variable_index) {
       // d_i''
       iRow[nz_index] = constraint_index;
-      jCol[nz_index] = 2 * n + variable_index;
+      jCol[nz_index] = 2 * num_of_points_ + variable_index;
       ++nz_index;
       // d_i+1''
       iRow[nz_index] = constraint_index;
-      jCol[nz_index] = 2 * n + variable_index + 1;
+      jCol[nz_index] = 2 * num_of_points_ + variable_index + 1;
       ++nz_index;
 
       ++constraint_index;
@@ -237,19 +237,19 @@ bool LateralTrajectoryOptimizerInterface::eval_jac_g(int n, const double* x,
          ++variable_index) {
       // d_i'
       iRow[nz_index] = constraint_index;
-      jCol[nz_index] = n + variable_index;
+      jCol[nz_index] = num_of_points_ + variable_index;
       ++nz_index;
       // d_i+1'
       iRow[nz_index] = constraint_index;
-      jCol[nz_index] = n + variable_index + 1;
+      jCol[nz_index] = num_of_points_ + variable_index + 1;
       ++nz_index;
       // d_i''
       iRow[nz_index] = constraint_index;
-      jCol[nz_index] = 2 * n + variable_index;
+      jCol[nz_index] = 2 * num_of_points_ + variable_index;
       ++nz_index;
       // d_i+1''
       iRow[nz_index] = constraint_index;
-      jCol[nz_index] = 2 * n + variable_index + 1;
+      jCol[nz_index] = 2 * num_of_points_ + variable_index + 1;
       ++nz_index;
 
       ++constraint_index;
@@ -269,15 +269,15 @@ bool LateralTrajectoryOptimizerInterface::eval_jac_g(int n, const double* x,
       ++nz_index;
       // d_i'
       iRow[nz_index] = constraint_index;
-      jCol[nz_index] = n + variable_index;
+      jCol[nz_index] = num_of_points_ + variable_index;
       ++nz_index;
       // d_i''
       iRow[nz_index] = constraint_index;
-      jCol[nz_index] = 2 * n + variable_index;
+      jCol[nz_index] = 2 * num_of_points_ + variable_index;
       ++nz_index;
       // d_i+1''
       iRow[nz_index] = constraint_index;
-      jCol[nz_index] = 2 * n + variable_index + 1;
+      jCol[nz_index] = 2 * num_of_points_ + variable_index + 1;
       ++nz_index;
 
       ++constraint_index;
