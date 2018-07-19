@@ -59,15 +59,15 @@ bool VelodyneDriver::set_base_time() {
   }
 
   set_base_time_from_nmea_time(nmea_time, basetime_);
-  input_->init(config_.firing_data_port);
+  input_->init(config_.firing_data_port());
   return true;
 }
 
 int VelodyneDriver::poll_standard(velodyne_msgs::VelodyneScanUnifiedPtr& scan) {
   // Since the velodyne delivers data at a very high rate, keep reading and
   // publishing scans as fast as possible.
-  scan->packets.resize(config_.npackets);
-  for (int i = 0; i < config_.npackets; ++i) {
+  scan->packets.resize(config_.npackets());
+  for (int i = 0; i < config_.npackets(); ++i) {
     while (true) {
       // keep reading until full packet received
       int rc = input_->get_firing_data_packet(&scan->packets[i]);
@@ -90,8 +90,9 @@ void VelodyneDriver::update_gps_top_hour(uint32_t current_time) {
   if (last_gps_time_ > current_time) {
     if (std::abs(last_gps_time_ - current_time) > 3599000000) {
       basetime_ += 3600 * 1e6;
-      AINFO << "Base time plus 3600s. Model: " << config_.model << std::fixed
-            << ". current:" << current_time << ", last time:" << last_gps_time_;
+      ADEBUG << "Base time plus 3600s. Model: " << config_.model() << std::fixed
+             << ". current:" << current_time
+             << ", last time:" << last_gps_time_;
     } else {
       AWARN << "Current stamp:" << std::fixed << current_time
             << " less than previous stamp:" << last_gps_time_
@@ -102,41 +103,29 @@ void VelodyneDriver::update_gps_top_hour(uint32_t current_time) {
 }
 
 VelodyneDriver* VelodyneDriverFactory::create_driver(
-    ros::NodeHandle private_nh) {
-  Config config;
+    const VelodyneConf& velodyne_config) {
   // use private node handle to get parameters
-  private_nh.param("frame_id", config.frame_id, std::string("velodyne"));
-  private_nh.param("model", config.model, std::string("64E"));
-  private_nh.param("topic", config.topic, std::string("velodyne_packets"));
-  private_nh.param("firing_data_port", config.firing_data_port,
-                   FIRING_DATA_PORT);
-  private_nh.param("positioning_data_port", config.positioning_data_port,
-                   POSITIONING_DATA_PORT);
-  private_nh.param("rpm", config.rpm, 600.0);
-  private_nh.param("prefix_angle", config.prefix_angle, 18000);
-
-  if (config.prefix_angle > 35900 || config.prefix_angle < 100) {
+  auto config = velodyne_config;
+  if (config.prefix_angle() > 35900 || config.prefix_angle() < 100) {
     AWARN << "invalid prefix angle, prefix_angle must be between 100 and 35900";
-    if (config.prefix_angle > 35900) {
-      config.prefix_angle = 35900;
-    } else if (config.prefix_angle < 100) {
-      config.prefix_angle = 100;
+    if (config.prefix_angle() > 35900) {
+      config.set_prefix_angle(35900);
+    } else if (config.prefix_angle() < 100) {
+      config.set_prefix_angle(100);
     }
   }
 
-  private_nh.param("use_sensor_sync", config.use_sensor_sync);
-
-  if (config.model == "64E_S2" || config.model == "64E_S3S" ||
-      config.model == "64E_S3D_STRONGEST" || config.model == "64E_S3D_LAST" ||
-      config.model == "64E_S3D_DUAL") {
+  if (config.model() == V64E_S2 || config.model() == V64E_S3S ||
+      config.model() == V64E_S3D_STRONGEST || config.model() == V64E_S3D_LAST ||
+      config.model() == V64E_S3D_DUAL) {
     return new Velodyne64Driver(config);
-  } else if (config.model == "HDL32E") {
+  } else if (config.model() == HDL32E) {
     return new Velodyne32Driver(config);
-  } else if (config.model == "VLP16") {
+  } else if (config.model() == VLP16) {
     return new Velodyne16Driver(config);
   } else {
-    AERROR << "invalid model, must be 64E_S2|64E_S3S"
-           << "|64E_S3D_STRONGEST|64E_S3D_LAST|64E_S3D_DUAL|VLP16|HDL32E";
+    AERROR << "invalid model, must be V64E_S2|V64E_S3S"
+           << "|V64E_S3D_STRONGEST|V64E_S3D_LAST|V64E_S3D_DUAL|VLP16|HDL32E";
     return nullptr;
   }
 }

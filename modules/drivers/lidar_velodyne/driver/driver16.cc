@@ -28,27 +28,26 @@ namespace apollo {
 namespace drivers {
 namespace lidar_velodyne {
 
-Velodyne16Driver::Velodyne16Driver(const Config &config) { config_ = config; }
+Velodyne16Driver::Velodyne16Driver(const VelodyneConf &config) {
+  config_ = config;
+}
 
-void Velodyne16Driver::init(ros::NodeHandle &node) {
-  double packet_rate = 754;                 // packet frequency (Hz)
-  double frequency = (config_.rpm / 60.0);  // expected Hz rate
+void Velodyne16Driver::init() {
+  double packet_rate = 754;                   // packet frequency (Hz)
+  double frequency = (config_.rpm() / 60.0);  // expected Hz rate
 
   // default number of packets for each scan is a single revolution
   // (fractions rounded up)
-  config_.npackets = static_cast<int>(ceil(packet_rate / frequency));
-  AINFO << "publishing " << config_.npackets << " packets per scan";
+  config_.set_npackets(static_cast<int>(ceil(packet_rate / frequency)));
+  AINFO << "publishing " << config_.npackets() << " packets per scan";
 
   // open Velodyne input device
 
   input_.reset(new SocketInput());
   positioning_input_.reset(new SocketInput());
-  input_->init(config_.firing_data_port);
-  positioning_input_->init(config_.positioning_data_port);
+  input_->init(config_.firing_data_port());
+  positioning_input_->init(config_.positioning_data_port());
 
-  // raw data output topic
-  output_ =
-      node.advertise<velodyne_msgs::VelodyneScanUnified>(config_.topic, 10);
   std::thread thread(&Velodyne16Driver::poll_positioning_packet, this);
   thread.detach();
 }
@@ -74,14 +73,14 @@ bool Velodyne16Driver::poll(void) {
   }
 
   if (scan->packets.empty()) {
-    AINFO << "Get a empty scan from port: " << config_.firing_data_port;
+    AINFO << "Get a empty scan from port: " << config_.firing_data_port();
     return true;
   }
 
   // publish message using time of last packet read
   ADEBUG << "Publishing a full Velodyne scan.";
   scan->header.stamp = ros::Time().now();
-  scan->header.frame_id = config_.frame_id;
+  scan->header.frame_id = config_.frame_id();
   // we use first packet gps time update gps base hour
   // in cloud nodelet, will update base time packet by packet
   uint32_t current_secs =
