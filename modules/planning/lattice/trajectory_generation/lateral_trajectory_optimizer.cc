@@ -20,6 +20,8 @@
 
 #include "modules/planning/lattice/trajectory_generation/lateral_trajectory_optimizer.h"
 
+#include <utility>
+
 #include "glog/logging.h"
 #include "modules/planning/lattice/trajectory1d/constant_jerk_trajectory1d.h"
 
@@ -29,8 +31,7 @@ namespace planning {
 LateralTrajectoryOptimizer::LateralTrajectoryOptimizer(
     const double d_init, const double d_prime_init, const double d_pprime_init,
     const double delta_s, std::vector<std::pair<double, double>> d_bounds) :
-    opt_trajectory_(d_init, d_prime_init, d_pprime_init) {
-
+    opt_piecewise_trajectory_(d_init, d_prime_init, d_pprime_init) {
   num_of_points_ = d_bounds.size();
 
   num_of_variables_ = 3 * num_of_points_;
@@ -406,13 +407,14 @@ void LateralTrajectoryOptimizer::finalize_solution(
   std::size_t offset = num_of_points_ * 2;
   for (std::size_t i = 1; i < num_of_points_; ++i) {
     auto j = (x[offset] - x[offset - 1]) / delta_s_;
-    opt_trajectory_.AppendSegment(j, delta_s_);
+    opt_piecewise_trajectory_.AppendSegment(j, delta_s_);
   }
 }
 
-PiecewiseJerkTrajectory1d LateralTrajectoryOptimizer::GetOptimalTrajectory() const {
-  return opt_trajectory_;
+PiecewiseJerkTrajectory1d
+LateralTrajectoryOptimizer::GetOptimalTrajectory() const {
+  return opt_piecewise_trajectory_;
 }
 
-} // namespace planning
-} // namespace apollo
+}  // namespace planning
+}  // namespace apollo
