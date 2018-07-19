@@ -16,18 +16,27 @@
 
 #include "modules/drivers/lidar_velodyne/lidar_velodyne.h"
 
-#include "modules/common/status/status.h"
+#include "modules/common/util/file.h"
+#include "modules/drivers/lidar_velodyne/common/velodyne_gflags.h"
 
 namespace apollo {
 namespace drivers {
 namespace lidar_velodyne {
 
 using apollo::common::Status;
+using apollo::common::ErrorCode;
 
 std::string LidarVelodyne::Name() const { return "LidarVelodyne"; }
 
 Status LidarVelodyne::Init() {
   AINFO << "Lidar velodyne init, starting ...";
+  ErrorCode err = ErrorCode::DRIVER_ERROR_VELODYNE;
+  if (!common::util::GetProtoFromFile(FLAGS_velodyne_conf_file, &conf_)) {
+    std::string msg = "Fail to load velodyne conf: " + FLAGS_velodyne_conf_file;
+    AERROR << msg;
+    return Status(err, msg);
+  }
+
   return Status::OK();
 }
 
