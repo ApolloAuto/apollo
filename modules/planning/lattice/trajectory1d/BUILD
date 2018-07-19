@@ -83,6 +83,7 @@ cc_library(
         "constant_jerk_trajectory1d.h",
     ],
     deps = [
+        "//modules/common",
         "//modules/planning/math/curve1d",
         "//modules/planning/common:planning_gflags",
     ],
@@ -97,6 +98,7 @@ cc_library(
         "piecewise_jerk_trajectory1d.h",
     ],
     deps = [
+        "//modules/common",
         "//modules/planning/math/curve1d",
         "//modules/planning/common:planning_gflags",
         ":constant_jerk_trajectory1d",
