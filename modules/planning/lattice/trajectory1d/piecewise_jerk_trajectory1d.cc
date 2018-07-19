@@ -20,6 +20,8 @@
 
 #include "modules/planning/lattice/trajectory1d/piecewise_jerk_trajectory1d.h"
 
+#include <algorithm>
+
 #include "modules/common/log.h"
 #include "modules/planning/common/planning_gflags.h"
 
