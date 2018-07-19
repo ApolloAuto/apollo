@@ -109,6 +109,7 @@ class LateralTrajectoryOptimizerInterface : public Ipopt::TNLP {
   double w_d_obs_;
 
   std::size_t nnz_jac_g_;
+
   PiecewiseJerkTrajectory1d opt_trajectory_;
 };
 

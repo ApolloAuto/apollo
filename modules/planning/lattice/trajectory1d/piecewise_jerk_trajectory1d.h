@@ -32,9 +32,7 @@ namespace planning {
 
 class PiecewiseJerkTrajectory1d : public Curve1d {
  public:
-  PiecewiseJerkTrajectory1d(
-      const double p0, const double v0, const double a0,
-      const double jerk, const double param);
+  PiecewiseJerkTrajectory1d(const double p, const double v, const double a);
 
   virtual ~PiecewiseJerkTrajectory1d() = default;
 
@@ -47,11 +45,21 @@ class PiecewiseJerkTrajectory1d : public Curve1d {
 
   void AppendSegment(const double jerk, const double param);
 
+  /**
   void AppendSegment(const double p1, const double v1, const double a1,
                      const double param);
+   **/
 
  private:
   std::vector<ConstantJerkTrajectory1d> segments_;
+
+  double last_p_;
+
+  double last_v_;
+
+  double last_a_;
+
+  std::vector<double> param_;
 };
 
 }  // namespace planning

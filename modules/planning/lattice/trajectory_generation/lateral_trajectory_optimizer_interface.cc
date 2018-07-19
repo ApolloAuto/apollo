@@ -198,8 +198,8 @@ bool LateralTrajectoryOptimizerInterface::eval_g(int n, const double* x,
     double j = (a1 - a0) / delta_s_;
     ConstantJerkTrajectory1d t(p0, v0, a0, j, delta_s_);
 
-    g[num_of_points_ - 1 + i] = t.GetEndVelocity() - v1;
-    g[2 * (num_of_points_ - 1) + i] = t.GetEndState() - p1;
+    g[num_of_points_ - 1 + i] = t.end_velocity() - v1;
+    g[2 * (num_of_points_ - 1) + i] = t.end_position() - p1;
   }
 
   std::size_t offset = 3 * (num_of_points_ - 1);
