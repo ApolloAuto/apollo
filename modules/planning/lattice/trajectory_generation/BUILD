@@ -121,4 +121,19 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "lateral_trajectory_optimizer",
+    srcs = [
+        "lateral_trajectory_optimizer.cc",
+    ],
+    hdrs = [
+        "lateral_trajectory_optimizer.h",
+    ],
+    deps = [
+        "//modules/planning/lattice/trajectory1d:piecewise_jerk_trajectory1d",
+        "//modules/common",
+        "@ipopt",
+    ],
+)
+
 cpplint()
