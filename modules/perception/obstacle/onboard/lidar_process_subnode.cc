@@ -125,6 +125,9 @@ void LidarProcessSubnode::OnPointCloud(
   // error_code_ = common::OK;
 
   /// call hdmap to get ROI
+  if (FLAGS_use_navigation_mode) {
+    AdapterManager::Observe();
+  }
   HdmapStructPtr hdmap = nullptr;
   if (hdmap_input_) {
     PointD velodyne_pose = {0.0, 0.0, 0.0, 0};  // (0,0,0)
