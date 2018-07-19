@@ -18,15 +18,18 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_LATTICE_TRAJECTORY_GENERATION_LATERAL_TRAJECTORY_OPTIMIZER_H_
-#define MODULES_PLANNING_LATTICE_TRAJECTORY_GENERATION_LATERAL_TRAJECTORY_OPTIMIZER_H_
+#ifndef MODULES_PLANNING_LATTICE_LATERAL_TRAJECTORY_OPTIMIZER_H_
+#define MODULES_PLANNING_LATTICE_LATERAL_TRAJECTORY_OPTIMIZER_H_
+
+#include <utility>
+#include <vector>
 
 #include "IpTNLP.hpp"
 #include "IpTypes.hpp"
 
 #include "modules/planning/lattice/trajectory1d/piecewise_jerk_trajectory1d.h"
 
-namespace apollo{
+namespace apollo {
 namespace planning {
 
 class LateralTrajectoryOptimizer : public Ipopt::TNLP {
@@ -112,10 +115,10 @@ class LateralTrajectoryOptimizer : public Ipopt::TNLP {
 
   std::size_t nnz_jac_g_ = 0;
 
-  PiecewiseJerkTrajectory1d opt_trajectory_;
+  PiecewiseJerkTrajectory1d opt_piecewise_trajectory_;
 };
 
-} // namespace planning
-} // namespace apollo
+}  // namespace planning
+}  // namespace apollo
 
-#endif /* MODULES_PLANNING_LATTICE_TRAJECTORY_GENERATION_LATERAL_TRAJECTORY_OPTIMIZER_H_ */
+#endif  // MODULES_PLANNING_LATTICE_LATERAL_TRAJECTORY_OPTIMIZER_H_
