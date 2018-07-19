@@ -101,6 +101,8 @@ class LateralTrajectoryOptimizerInterface : public Ipopt::TNLP {
   double w_d_pprime_;
 
   double w_d_obs_;
+
+  std::size_t nnz_jac_g_;
 };
 
 } // namespace planning
