@@ -10,6 +10,7 @@ cc_library(
         "util.cc",
     ],
     hdrs = [
+        "blocking_queue.h",
         "file.h",
         "string_tokenizer.h",
         "util.h",

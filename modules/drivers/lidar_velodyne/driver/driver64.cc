@@ -27,28 +27,26 @@ namespace apollo {
 namespace drivers {
 namespace lidar_velodyne {
 
-Velodyne64Driver::Velodyne64Driver(const Config& config) { config_ = config; }
+Velodyne64Driver::Velodyne64Driver(const VelodyneConf& config) {
+  config_ = config;
+}
 
-void Velodyne64Driver::init(ros::NodeHandle& node) {
+void Velodyne64Driver::init() {
   double packet_rate = 0;  // packet frequency (Hz)
-  if (config_.model == "64E_S2" || config_.model == "64E_S3S") {
+  if (config_.model() == V64E_S2 || config_.model() == V64E_S3S) {
     packet_rate = 3472.17;  // 1333312 / 384
   } else {                  // 64E_S3D etc.
     packet_rate = 5789;
   }
-  const double frequency = config_.rpm / 60.0;  // expected Hz rate
+  const double frequency = config_.rpm() / 60.0;  // expected Hz rate
 
   // default number of packets for each scan is a single revolution
   // (fractions rounded up)
-  config_.npackets = static_cast<int>(ceil(packet_rate / frequency));
-  AINFO << "publishing " << config_.npackets << " packets per scan";
+  config_.set_npackets(static_cast<int>(ceil(packet_rate / frequency)));
+  ADEBUG << "publishing " << config_.npackets() << " packets per scan";
 
   input_.reset(new SocketInput());
-  input_->init(config_.firing_data_port);
-
-  // raw data output topic
-  output_ =
-      node.advertise<velodyne_msgs::VelodyneScanUnified>(config_.topic, 10);
+  input_->init(config_.firing_data_port());
 }
 
 /** poll the device
@@ -60,22 +58,22 @@ bool Velodyne64Driver::poll(void) {
   velodyne_msgs::VelodyneScanUnifiedPtr scan(
       new velodyne_msgs::VelodyneScanUnified());
 
-  int poll_result =
-      config_.use_sensor_sync ? poll_standard_sync(scan) : poll_standard(scan);
+  int poll_result = config_.use_sensor_sync() ? poll_standard_sync(scan)
+                                              : poll_standard(scan);
 
   if (poll_result == SOCKET_TIMEOUT || poll_result == RECIEVE_FAIL) {
     return true;  // poll again
   }
 
   if (scan->packets.empty()) {
-    AINFO << "Get a empty scan from port: " << config_.firing_data_port;
+    AINFO << "Get a empty scan from port: " << config_.firing_data_port();
     return true;
   }
 
   // publish message using time of last packet read
   ADEBUG << "Publishing a full Velodyne scan.";
   scan->header.stamp = ros::Time().now();
-  scan->header.frame_id = config_.frame_id;
+  scan->header.frame_id = config_.frame_id();
   scan->basetime = basetime_;
   output_.publish(scan);
 
@@ -93,8 +91,8 @@ bool Velodyne64Driver::check_angle(velodyne_msgs::VelodynePacket& packet) {
     // for the velodyne64 angle resolution is 0.17~0.2 , so take the angle diff
     // at 0.3 degree should be a good choice
     // prefix_angle default = 18000
-    if (angle > config_.prefix_angle &&
-        std::abs(angle - config_.prefix_angle) < 30) {
+    if (angle > config_.prefix_angle() &&
+        std::abs(angle - config_.prefix_angle()) < 30) {
       return true;
     }
   }
@@ -115,7 +113,7 @@ int Velodyne64Driver::poll_standard_sync(
         scan->packets.emplace_back(packet);
         // check the angle for every packet if a packet has a angle
         if (check_angle(packet) == true &&
-            (scan->packets.size() > 0.5 * config_.npackets)) {
+            (scan->packets.size() > 0.5 * config_.npackets())) {
           return 0;
         } else {
           break;  // got a full packet?
@@ -125,9 +123,9 @@ int Velodyne64Driver::poll_standard_sync(
         return rc;
       }
     }
-    // if the only UDP packet lost then recv 1.5*config_.npackets  packets at
+    // if the only UDP packet lost then recv 1.5 * config_.npackets() packets at
     // most
-    if (scan->packets.size() > 1.5 * config_.npackets) {
+    if (scan->packets.size() > 1.5 * config_.npackets()) {
       return 0;
     }
   }
