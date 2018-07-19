@@ -45,7 +45,7 @@ bool LateralTrajectoryOptimizerInterface::get_nlp_info(int& n, int& m,
   m = num_of_points_ * 3;
 
   // TODO:
-  nnz_h_lag = 0;
+  nnz_h_lag = n;
 
 
   index_style = IndexStyleEnum::C_STYLE;
@@ -450,6 +450,21 @@ bool LateralTrajectoryOptimizerInterface::eval_jac_g(int n, const double* x,
 bool LateralTrajectoryOptimizerInterface::eval_h(int n, const double* x,
     bool new_x, double obj_factor, int m, const double* lambda, bool new_lambda,
     int nele_hess, int* iRow, int* jCol, double* values) {
+  if (values == nullptr) {
+    for (std::size_t i = 0; i < 3 * num_of_points_; ++i) {
+      iRow[i] = i;
+      jCol[i] = i;
+    }
+  } else {
+    for (std::size_t i = 0; i < num_of_points_; ++i) {
+      values[i] = 4.0;
+    }
+
+    for (std::size_t i = num_of_points_; i < 3 * num_of_points_; ++i) {
+      values[i] = 2.0;
+    }
+  }
+  return true;
 }
 
 void LateralTrajectoryOptimizerInterface::finalize_solution(
