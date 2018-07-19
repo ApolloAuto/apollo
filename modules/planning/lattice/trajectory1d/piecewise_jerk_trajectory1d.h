@@ -32,8 +32,6 @@ namespace planning {
 
 class PiecewiseJerkTrajectory1d : public Curve1d {
  public:
-  PiecewiseJerkTrajectory1d() = default;
-
   PiecewiseJerkTrajectory1d(
       const double p0, const double v0, const double a0,
       const double jerk, const double param);
