@@ -213,232 +213,132 @@ bool LateralTrajectoryOptimizerInterface::eval_jac_g(int n, const double* x,
 
   if (values == NULL) {
     std::size_t nz_index = 0;
+    std::size_t constraint_index = 0;
 
-    std::size_t variable_offset = num_of_points_ * 5;
-    for (std::size_t i = 0; i + 1 < num_of_points_; ++i) {
-      std::size_t variable_index = i * 5;
-
-      // theta0
-      iRow[nz_index] = i * 2;
-      jCol[nz_index] = variable_index + 0;
+    // acc constraint
+    // d_i'' - d_i+1''
+    for (std::size_t variable_index = 0; variable_index + 1 < num_of_points_;
+         ++variable_index) {
+      // d_i''
+      iRow[nz_index] = constraint_index;
+      jCol[nz_index] = 2 * n + variable_index;
+      ++nz_index;
+      // d_i+1''
+      iRow[nz_index] = constraint_index;
+      jCol[nz_index] = 2 * n + variable_index + 1;
       ++nz_index;
 
-      // kappa0
-      iRow[nz_index] = i * 2;
-      jCol[nz_index] = variable_index + 1;
-      ++nz_index;
-
-      // dkappa0
-      iRow[nz_index] = i * 2;
-      jCol[nz_index] = variable_index + 2;
-      ++nz_index;
-
-      // x0
-      iRow[nz_index] = i * 2;
-      jCol[nz_index] = variable_index + 3;
-      ++nz_index;
-
-      // theta1
-      iRow[nz_index] = i * 2;
-      jCol[nz_index] = variable_index + 5;
-      ++nz_index;
-
-      // kappa1
-      iRow[nz_index] = i * 2;
-      jCol[nz_index] = variable_index + 6;
-      ++nz_index;
-
-      // dkappa1
-      iRow[nz_index] = i * 2;
-      jCol[nz_index] = variable_index + 7;
-      ++nz_index;
-
-      // x1
-      iRow[nz_index] = i * 2;
-      jCol[nz_index] = variable_index + 8;
-      ++nz_index;
-
-      // s
-      iRow[nz_index] = i * 2;
-      jCol[nz_index] = variable_offset + i;
-      ++nz_index;
-
-      // theta0
-      iRow[nz_index] = i * 2 + 1;
-      jCol[nz_index] = variable_index + 0;
-      ++nz_index;
-
-      // kappa0
-      iRow[nz_index] = i * 2 + 1;
-      jCol[nz_index] = variable_index + 1;
-      ++nz_index;
-
-      // dkappa0
-      iRow[nz_index] = i * 2 + 1;
-      jCol[nz_index] = variable_index + 2;
-      ++nz_index;
-
-      // y0
-      iRow[nz_index] = i * 2 + 1;
-      jCol[nz_index] = variable_index + 4;
-      ++nz_index;
-
-      // theta1
-      iRow[nz_index] = i * 2 + 1;
-      jCol[nz_index] = variable_index + 5;
-      ++nz_index;
-
-      // kappa1
-      iRow[nz_index] = i * 2 + 1;
-      jCol[nz_index] = variable_index + 6;
-      ++nz_index;
-
-      // dkappa1
-      iRow[nz_index] = i * 2 + 1;
-      jCol[nz_index] = variable_index + 7;
-      ++nz_index;
-
-      // y1
-      iRow[nz_index] = i * 2 + 1;
-      jCol[nz_index] = variable_index + 9;
-      ++nz_index;
-
-      // s
-      iRow[nz_index] = i * 2 + 1;
-      jCol[nz_index] = variable_offset + i;
-      ++nz_index;
+      ++constraint_index;
     }
 
-    std::size_t constraint_offset = 2 * (num_of_points_ - 1);
-    for (std::size_t i = 0; i < num_of_points_; ++i) {
-      iRow[nz_index] = constraint_offset + i;
-      jCol[nz_index] = i * 5 + 3;
+    // velocity constraint
+    // d_i' - d_i+1 + 0.5 * ds * (d_i'' + d_i+1'')
+    for (std::size_t variable_index = 0; variable_index + 1 < num_of_points_;
+         ++variable_index) {
+      // d_i'
+      iRow[nz_index] = constraint_index;
+      jCol[nz_index] = n + variable_index;
+      ++nz_index;
+      // d_i+1'
+      iRow[nz_index] = constraint_index;
+      jCol[nz_index] = n + variable_index + 1;
+      ++nz_index;
+      // d_i''
+      iRow[nz_index] = constraint_index;
+      jCol[nz_index] = 2 * n + variable_index;
+      ++nz_index;
+      // d_i+1''
+      iRow[nz_index] = constraint_index;
+      jCol[nz_index] = 2 * n + variable_index + 1;
       ++nz_index;
 
-      iRow[nz_index] = constraint_offset + i;
-      jCol[nz_index] = i * 5 + 4;
-      ++nz_index;
+      ++constraint_index;
     }
 
-    CHECK_EQ(nz_index, nnz_jac_g_);
+    // state constraint
+    // d_i - d_i+1 + d_i' * ds + 1/3 * d_i'' * ds^2 + 1/6 * d_i+1'' * ds^2
+    for (std::size_t variable_index = 0; variable_index + 1 < num_of_points_;
+         ++variable_index) {
+      // d_i
+      iRow[nz_index] = constraint_index;
+      jCol[nz_index] = variable_index;
+      ++nz_index;
+      // d_i+1
+      iRow[nz_index] = constraint_index;
+      jCol[nz_index] = variable_index + 1;
+      ++nz_index;
+      // d_i'
+      iRow[nz_index] = constraint_index;
+      jCol[nz_index] = n + variable_index;
+      ++nz_index;
+      // d_i''
+      iRow[nz_index] = constraint_index;
+      jCol[nz_index] = 2 * n + variable_index;
+      ++nz_index;
+      // d_i+1''
+      iRow[nz_index] = constraint_index;
+      jCol[nz_index] = 2 * n + variable_index + 1;
+      ++nz_index;
+
+      ++constraint_index;
+    }
+    nnz_jac_g_ = nz_index;
   } else {
     if (new_x) {
-      update_piecewise_spiral_paths(x, n);
+      // TODO(kechxu) update
     }
 
     std::fill(values, values + nnz_jac_g_, 0.0);
     // first, positional equality constraints
     std::size_t nz_index = 0;
 
-    for (std::size_t i = 0; i + 1 < num_of_points_; ++i) {
-      std::size_t index0 = i * 5;
-      std::size_t index1 = (i + 1) * 5;
-
-      const QuinticSpiralPath& spiral_curve = piecewise_paths_[i];
-      double delta_s = spiral_curve.ParamLength();
-
-      double x_diff = x[index1 + 3] - x[index0 + 3] -
-                      spiral_curve.ComputeCartesianDeviationX<N>(delta_s);
-      double y_diff = x[index1 + 4] - x[index0 + 4] -
-                      spiral_curve.ComputeCartesianDeviationY<N>(delta_s);
-
-      auto pos_theta0 =
-          spiral_curve.DeriveCartesianDeviation<N>(QuinticSpiralPath::THETA0);
-      auto pos_kappa0 =
-          spiral_curve.DeriveCartesianDeviation<N>(QuinticSpiralPath::KAPPA0);
-      auto pos_dkappa0 =
-          spiral_curve.DeriveCartesianDeviation<N>(QuinticSpiralPath::DKAPPA0);
-
-      auto pos_theta1 =
-          spiral_curve.DeriveCartesianDeviation<N>(QuinticSpiralPath::THETA1);
-      auto pos_kappa1 =
-          spiral_curve.DeriveCartesianDeviation<N>(QuinticSpiralPath::KAPPA1);
-      auto pos_dkappa1 =
-          spiral_curve.DeriveCartesianDeviation<N>(QuinticSpiralPath::DKAPPA1);
-
-      auto pos_delta_s =
-          spiral_curve.DeriveCartesianDeviation<N>(QuinticSpiralPath::DELTA_S);
-
-      // for x coordinate
-      // theta0
-      values[nz_index] += 2.0 * x_diff * (-pos_theta0.first);
+    // fill acc constraint
+    // d_i'' - d_i+1''
+    for (std::size_t variable_index = 0; variable_index + 1 < num_of_points_;
+         ++variable_index) {
+      values[nz_index] = 1.0;
       ++nz_index;
 
-      // kappa0
-      values[nz_index] += 2.0 * x_diff * (-pos_kappa0.first);
-      ++nz_index;
-
-      // dkappa0
-      values[nz_index] += 2.0 * x_diff * (-pos_dkappa0.first);
-      ++nz_index;
-
-      // x0
-      values[nz_index] += 2.0 * x_diff * (-1.0);
-      ++nz_index;
-
-      // theta1
-      values[nz_index] += 2.0 * x_diff * (-pos_theta1.first);
-      ++nz_index;
-
-      // kappa1
-      values[nz_index] += 2.0 * x_diff * (-pos_kappa1.first);
-      ++nz_index;
-
-      // dkappa1
-      values[nz_index] += 2.0 * x_diff * (-pos_dkappa1.first);
-      ++nz_index;
-
-      // x1
-      values[nz_index] += 2.0 * x_diff;
-      ++nz_index;
-
-      // delta_s
-      values[nz_index] += 2.0 * x_diff * (-pos_delta_s.first);
-      ++nz_index;
-
-      // for y coordinate
-      // theta0
-      values[nz_index] += 2.0 * y_diff * (-pos_theta0.second);
-      ++nz_index;
-
-      // kappa0
-      values[nz_index] += 2.0 * y_diff * (-pos_kappa0.second);
-      ++nz_index;
-
-      // dkappa0
-      values[nz_index] += 2.0 * y_diff * (-pos_dkappa0.second);
-      ++nz_index;
-
-      // y0
-      values[nz_index] += 2.0 * y_diff * (-1.0);
-      ++nz_index;
-
-      // theta1
-      values[nz_index] += 2.0 * y_diff * (-pos_theta1.second);
-      ++nz_index;
-
-      // kappa1
-      values[nz_index] += 2.0 * y_diff * (-pos_kappa1.second);
-      ++nz_index;
-
-      // dkappa1
-      values[nz_index] += 2.0 * y_diff * (-pos_dkappa1.second);
-      ++nz_index;
-
-      // y1
-      values[nz_index] += 2.0 * y_diff;
-      ++nz_index;
-
-      // delta_s
-      values[nz_index] += 2.0 * y_diff * (-pos_delta_s.second);
+      values[nz_index] = -1.0;
       ++nz_index;
     }
 
-    for (std::size_t i = 0; i < num_of_points_; ++i) {
-      values[nz_index] = 2.0 * (x[i * 5 + 3] - init_points_[i].x());
+    // fill velocity constraint
+    // d_i' - d_i+1 + 0.5 * ds * (d_i'' + d_i+1'')
+    for (std::size_t variable_index = 0; variable_index + 1 < num_of_points_;
+         ++variable_index) {
+      // d_i'
+      values[nz_index] = 1.0;
       ++nz_index;
+      // d_i+1'
+      values[nz_index] = -1.0;
+      ++nz_index;
+      // d_i''
+      values[nz_index] = 0.5 * delta_s_;
+      ++nz_index;
+      // d_i+1''
+      values[nz_index] = 0.5 * delta_s_;
+      ++nz_index;
+    }
 
-      values[nz_index] = 2.0 * (x[i * 5 + 4] - init_points_[i].y());
+    // state constraint
+    // d_i - d_i+1 + d_i' * ds + 1/3 * d_i'' * ds^2 + 1/6 * d_i+1'' * ds^2
+    for (std::size_t variable_index = 0; variable_index + 1 < num_of_points_;
+         ++variable_index) {
+      // d_i
+      values[nz_index] = 1.0;
+      ++nz_index;
+      // d_i+1
+      values[nz_index] = -1.0;
+      ++nz_index;
+      // d_i'
+      values[nz_index] = delta_s_;
+      ++nz_index;
+      // d_i''
+      values[nz_index] = delta_s_ * delta_s_ / 3.0;
+      ++nz_index;
+      // d_i+1''
+      values[nz_index] = delta_s_ * delta_s_ / 6.0;
       ++nz_index;
     }
 
