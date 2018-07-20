@@ -180,6 +180,8 @@ DEFINE_bool(enable_nudge_decision, true, "enable nudge decision");
 DEFINE_bool(enable_nudge_slowdown, true,
             "True to slow down when nudge obstacles.");
 
+DEFINE_bool(enable_side_radar, false,
+            "If there is no radar on the side,ignore it");
 DEFINE_double(static_decision_nudge_l_buffer, 0.5, "l buffer for nudge");
 DEFINE_double(lateral_ignore_buffer, 3.0,
               "If an obstacle's lateral distance is further away than this "

@@ -45,6 +45,7 @@ TEST(NaviObstacleDeciderTest, ComputeNudgeDist1) {
   PerceptionObstacle perception_obstacle;
   PathDecision path_decision;
   SLBoundary obstacle_boundary;
+  ReferenceLine reference_line;
 
   perception_obstacle.set_width(1.0);
   perception_obstacle.set_length(1.0);
@@ -66,7 +67,8 @@ TEST(NaviObstacleDeciderTest, ComputeNudgeDist1) {
 
   int lane_obstacles_num = 0;
   double nudge_dist = obstacle_decider.GetNudgeDistance(
-      vec_obstacle, path_decision, vec_points, 3.3, &lane_obstacles_num);
+      vec_obstacle, reference_line, path_decision, vec_points,
+      &lane_obstacles_num);
   EXPECT_FLOAT_EQ(nudge_dist, 0.455);
   EXPECT_FLOAT_EQ(lane_obstacles_num, 1);
 }
@@ -78,6 +80,7 @@ TEST(NaviObstacleDeciderTest, ComputeNudgeDist2) {
   PerceptionObstacle perception_obstacle;
   PathDecision path_decision;
   SLBoundary obstacle_boundary;
+  ReferenceLine reference_line;
 
   perception_obstacle.set_width(1.0);
   perception_obstacle.set_length(1.0);
@@ -99,9 +102,10 @@ TEST(NaviObstacleDeciderTest, ComputeNudgeDist2) {
 
   int lane_obstacles_num = 0;
   double nudge_dist = obstacle_decider.GetNudgeDistance(
-      vec_obstacle, path_decision, vec_points, 3.3, &lane_obstacles_num);
-  EXPECT_FLOAT_EQ(nudge_dist, -0.595);
-  EXPECT_FLOAT_EQ(lane_obstacles_num, 0);
+      vec_obstacle, reference_line, path_decision, vec_points,
+      &lane_obstacles_num);
+  EXPECT_FLOAT_EQ(nudge_dist, -0.455);
+  EXPECT_FLOAT_EQ(lane_obstacles_num, 1);
 }
 
 TEST(NaviObstacleDeciderTest, ComputeNudgeDist3) {
@@ -111,6 +115,7 @@ TEST(NaviObstacleDeciderTest, ComputeNudgeDist3) {
   PerceptionObstacle perception_obstacle;
   PathDecision path_decision;
   SLBoundary obstacle_boundary;
+  ReferenceLine reference_line;
 
   // obstacle 1
   perception_obstacle.set_width(1.0);
@@ -154,7 +159,8 @@ TEST(NaviObstacleDeciderTest, ComputeNudgeDist3) {
 
   int lane_obstacles_num = 0;
   double nudge_dist = obstacle_decider.GetNudgeDistance(
-      vec_obstacle, path_decision, vec_points, 3.3, &lane_obstacles_num);
+      vec_obstacle, reference_line, path_decision, vec_points,
+      &lane_obstacles_num);
   EXPECT_FLOAT_EQ(nudge_dist, 0.42657289);
   EXPECT_FLOAT_EQ(lane_obstacles_num, 2);
 }
@@ -168,15 +174,19 @@ TEST(NaviObstacleDeciderTest, GetUnsafeObstaclesID) {
   // obstacle 1
   perception_obstacle.set_width(1.0);
   perception_obstacle.set_length(1.0);
-  perception_obstacle.mutable_position()->set_x(0.0);
+  perception_obstacle.mutable_position()->set_x(2.0);
   perception_obstacle.mutable_position()->set_y(3.0);
+  perception_obstacle.mutable_velocity()->set_x(10.0);
+  perception_obstacle.mutable_velocity()->set_y(0.0);
   Obstacle b1("5", perception_obstacle);
 
   // obstacle 2
   perception_obstacle.set_width(2.6);
   perception_obstacle.set_length(1.0);
-  perception_obstacle.mutable_position()->set_x(0.0);
+  perception_obstacle.mutable_position()->set_x(1.0);
   perception_obstacle.mutable_position()->set_y(-1.0);
+  perception_obstacle.mutable_velocity()->set_x(5.0);
+  perception_obstacle.mutable_velocity()->set_y(0.0);
   Obstacle b2("6", perception_obstacle);
 
   PathPoint p1 = MakePathPoint(0.0, 2.0, 0.0, 0.0, 0.0, 0.0, 0.0);
@@ -197,10 +207,15 @@ TEST(NaviObstacleDeciderTest, GetUnsafeObstaclesID) {
   vec_obstacle.emplace_back(&b1);
   vec_obstacle.emplace_back(&b2);
 
-  std::vector<std::string> unsafe_obstacle_ID;
-  obstacle_decider.GetUnsafeObstaclesID(vec_points, vec_obstacle);
-  unsafe_obstacle_ID = obstacle_decider.UnsafeObstacles();
-  EXPECT_EQ(unsafe_obstacle_ID.size(), 2);
+  std::vector<std::tuple<std::string, double, double>> unsafe_obstacle_info;
+  obstacle_decider.GetUnsafeObstaclesInfo(vec_points, vec_obstacle);
+  unsafe_obstacle_info = obstacle_decider.UnsafeObstacles();
+  EXPECT_EQ(std::get<0>(unsafe_obstacle_info[0]), "5");
+  EXPECT_EQ(std::get<0>(unsafe_obstacle_info[1]), "6");
+  EXPECT_EQ(std::get<1>(unsafe_obstacle_info[0]), 2);
+  EXPECT_EQ(std::get<1>(unsafe_obstacle_info[1]), 1);
+  EXPECT_EQ(std::get<2>(unsafe_obstacle_info[0]), 10);
+  EXPECT_EQ(std::get<2>(unsafe_obstacle_info[1]), 5);
 }
 }  // namespace planning
 }  // namespace apollo
