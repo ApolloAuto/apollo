@@ -25,6 +25,7 @@
 #include <limits>
 #include <utility>
 
+#include "lateral_trajectory_optimizer_interface.h"
 #include "modules/common/log.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/lattice/trajectory1d/constant_deceleration_trajectory1d.h"
@@ -46,6 +47,7 @@ Trajectory1dGenerator::Trajectory1dGenerator(
     std::shared_ptr<PredictionQuerier> ptr_prediction_querier)
     : init_lon_state_(lon_init_state),
       init_lat_state_(lat_init_state),
+      ptr_path_time_graph_(ptr_path_time_graph),
       end_condition_sampler_(lon_init_state, lat_init_state,
                              ptr_path_time_graph, ptr_prediction_querier) {}
 
@@ -122,11 +124,26 @@ void Trajectory1dGenerator::GenerateLongitudinalTrajectoryBundle(
 
 void Trajectory1dGenerator::GenerateLateralTrajectoryBundle(
     Trajectory1DBundle* ptr_lat_trajectory_bundle) const {
-  auto end_conditions = end_condition_sampler_.SampleLatEndConditions();
 
-  // Use the common function to generate trajectory bundles.
-  GenerateTrajectory1DBundle<5>(init_lat_state_, end_conditions,
-                                ptr_lat_trajectory_bundle);
+  if (FLAGS_lateral_optimization) {
+    auto end_conditions = end_condition_sampler_.SampleLatEndConditions();
+
+    // Use the common function to generate trajectory bundles.
+    GenerateTrajectory1DBundle<5>(init_lat_state_, end_conditions,
+        ptr_lat_trajectory_bundle);
+  } else {
+    double delta_s = 0.5;
+    auto lateral_bounds = ptr_path_time_graph_->GetLateralBounds(
+        0.0, 100.0, delta_s);
+    LateralTrajectoryOptimizerInterface lateral_trajectory_optimizer(
+        init_lat_state_[0], init_lat_state_[1], init_lat_state_[2],
+        delta_s, FLAGS_lateral_third_order_derivative_max, lateral_bounds);
+
+    lateral_trajectory_optimizer.set_objective_weights(FLAGS_weight_lateral_offset,
+        FLAGS_weight_lateral_derivative, FLAGS_weight_lateral_second_order_derivative,
+        FLAGS_weight_lateral_obstacle_distance);
+
+  }
 }
 
 }  // namespace planning

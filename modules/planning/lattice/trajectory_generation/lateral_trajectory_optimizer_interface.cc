@@ -18,7 +18,7 @@
  * @file
  **/
 
-#include "modules/planning/lattice/trajectory_generation/lateral_trajectory_optimizer.h"
+#include "lateral_trajectory_optimizer_interface.h"
 
 #include <utility>
 
@@ -28,7 +28,7 @@
 namespace apollo {
 namespace planning {
 
-LateralTrajectoryOptimizer::LateralTrajectoryOptimizer(
+LateralTrajectoryOptimizerInterface::LateralTrajectoryOptimizerInterface(
     const double d_init, const double d_prime_init, const double d_pprime_init,
     const double delta_s, const double d_ppprime_max,
     std::vector<std::pair<double, double>> d_bounds) :
@@ -50,7 +50,7 @@ LateralTrajectoryOptimizer::LateralTrajectoryOptimizer(
 }
 
 
-void LateralTrajectoryOptimizer::set_objective_weights(const double w_d,
+void LateralTrajectoryOptimizerInterface::set_objective_weights(const double w_d,
     const double w_d_prime, const double w_d_pprime, const double w_d_obs) {
   w_d_ = w_d;
 
@@ -61,7 +61,7 @@ void LateralTrajectoryOptimizer::set_objective_weights(const double w_d,
   w_d_obs_ = w_d_obs;
 }
 
-bool LateralTrajectoryOptimizer::get_nlp_info(int& n, int& m,
+bool LateralTrajectoryOptimizerInterface::get_nlp_info(int& n, int& m,
     int& nnz_jac_g, int& nnz_h_lag, IndexStyleEnum& index_style) {
   // variables
   n = num_of_variables_;
@@ -77,7 +77,7 @@ bool LateralTrajectoryOptimizer::get_nlp_info(int& n, int& m,
   return true;
 }
 
-bool LateralTrajectoryOptimizer::get_bounds_info(int n, double* x_l,
+bool LateralTrajectoryOptimizerInterface::get_bounds_info(int n, double* x_l,
     double* x_u, int m, double* g_l, double* g_u) {
 
   const double LARGE_VALUE = 5.0;
@@ -135,7 +135,7 @@ bool LateralTrajectoryOptimizer::get_bounds_info(int n, double* x_l,
   return true;
 }
 
-bool LateralTrajectoryOptimizer::get_starting_point(int n, bool init_x,
+bool LateralTrajectoryOptimizerInterface::get_starting_point(int n, bool init_x,
     double* x, bool init_z, double* z_L, double* z_U, int m, bool init_lambda,
     double* lambda) {
 
@@ -156,7 +156,7 @@ bool LateralTrajectoryOptimizer::get_starting_point(int n, bool init_x,
   return false;
 }
 
-bool LateralTrajectoryOptimizer::eval_f(int n, const double* x,
+bool LateralTrajectoryOptimizerInterface::eval_f(int n, const double* x,
     bool new_x, double& obj_value) {
   obj_value = 0.0;
 
@@ -174,7 +174,7 @@ bool LateralTrajectoryOptimizer::eval_f(int n, const double* x,
   return true;
 }
 
-bool LateralTrajectoryOptimizer::eval_grad_f(int n, const double* x,
+bool LateralTrajectoryOptimizerInterface::eval_grad_f(int n, const double* x,
     bool new_x, double* grad_f) {
 
   std::fill(grad_f, grad_f + n, 0.0);
@@ -193,7 +193,7 @@ bool LateralTrajectoryOptimizer::eval_grad_f(int n, const double* x,
   return true;
 }
 
-bool LateralTrajectoryOptimizer::eval_g(int n, const double* x,
+bool LateralTrajectoryOptimizerInterface::eval_g(int n, const double* x,
     bool new_x, int m, double* g) {
 
   std::size_t offset_prime = num_of_points_;
@@ -226,7 +226,7 @@ bool LateralTrajectoryOptimizer::eval_g(int n, const double* x,
   return true;
 }
 
-bool LateralTrajectoryOptimizer::eval_jac_g(int n, const double* x,
+bool LateralTrajectoryOptimizerInterface::eval_jac_g(int n, const double* x,
     bool new_x, int m, int nele_jac, int* iRow, int* jCol, double* values) {
 
   CHECK_EQ(std::size_t(n), num_of_points_ * 3);
@@ -389,7 +389,7 @@ bool LateralTrajectoryOptimizer::eval_jac_g(int n, const double* x,
   return true;
 }
 
-bool LateralTrajectoryOptimizer::eval_h(int n, const double* x,
+bool LateralTrajectoryOptimizerInterface::eval_h(int n, const double* x,
     bool new_x, double obj_factor, int m, const double* lambda, bool new_lambda,
     int nele_hess, int* iRow, int* jCol, double* values) {
   if (values == nullptr) {
@@ -409,7 +409,7 @@ bool LateralTrajectoryOptimizer::eval_h(int n, const double* x,
   return true;
 }
 
-void LateralTrajectoryOptimizer::finalize_solution(
+void LateralTrajectoryOptimizerInterface::finalize_solution(
     Ipopt::SolverReturn status, int n, const double* x, const double* z_L,
     const double* z_U, int m, const double* g, const double* lambda,
     double obj_value, const Ipopt::IpoptData* ip_data,
@@ -423,7 +423,7 @@ void LateralTrajectoryOptimizer::finalize_solution(
 }
 
 PiecewiseJerkTrajectory1d
-LateralTrajectoryOptimizer::GetOptimalTrajectory() const {
+LateralTrajectoryOptimizerInterface::GetOptimalTrajectory() const {
   return opt_piecewise_trajectory_;
 }
 
