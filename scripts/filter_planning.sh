@@ -37,6 +37,7 @@ perfect_control_topic="$perception_topic  \
    or $routing_topic \
    or topic == '/apollo/perception/obstacles' \
    or topic == '/apollo/prediction' \
+   or topic == '/apollo/control' \
    or topic == '/apollo/perception/traffic_light'"
 
 planning_deps="$perfect_control_topic \
