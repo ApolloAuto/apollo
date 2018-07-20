@@ -23,7 +23,6 @@
 #include <utility>
 
 #include "modules/common/log.h"
-#include "modules/planning/lattice/trajectory1d/constant_jerk_trajectory1d.h"
 
 namespace apollo {
 namespace planning {
@@ -31,8 +30,7 @@ namespace planning {
 LateralTrajectoryOptimizerInterface::LateralTrajectoryOptimizerInterface(
     const double d_init, const double d_prime_init, const double d_pprime_init,
     const double delta_s, const double d_ppprime_max,
-    std::vector<std::pair<double, double>> d_bounds) :
-    opt_piecewise_trajectory_(d_init, d_prime_init, d_pprime_init) {
+    std::vector<std::pair<double, double>> d_bounds) {
   CHECK(d_bounds.size() > 1);
   num_of_points_ = d_bounds.size();
 
@@ -48,7 +46,6 @@ LateralTrajectoryOptimizerInterface::LateralTrajectoryOptimizerInterface(
 
   d_bounds_ = std::move(d_bounds);
 }
-
 
 void LateralTrajectoryOptimizerInterface::set_objective_weights(const double w_d,
     const double w_d_prime, const double w_d_pprime, const double w_d_obs) {
@@ -415,16 +412,27 @@ void LateralTrajectoryOptimizerInterface::finalize_solution(
     double obj_value, const Ipopt::IpoptData* ip_data,
     Ipopt::IpoptCalculatedQuantities* ip_cq) {
 
-  std::size_t offset = num_of_points_ * 2;
-  for (std::size_t i = 1; i < num_of_points_; ++i) {
-    auto j = (x[offset] - x[offset - 1]) / delta_s_;
-    opt_piecewise_trajectory_.AppendSegment(j, delta_s_);
+  opt_d_.reserve(num_of_points_);
+  opt_d_prime_.reserve(num_of_points_);
+  opt_d_pprime_.reserve(num_of_points_);
+
+  std::size_t offset_prime = num_of_points_;
+  std::size_t offset_pprime = offset_prime + num_of_points_;
+
+  for (std::size_t i = 0; i < num_of_points_; ++i) {
+    opt_d_.push_back(x[i]);
+    opt_d_prime_.push_back(x[offset_prime + i]);
+    opt_d_pprime_.push_back(x[offset_pprime + i]);
   }
 }
 
-PiecewiseJerkTrajectory1d
-LateralTrajectoryOptimizerInterface::GetOptimalTrajectory() const {
-  return opt_piecewise_trajectory_;
+void LateralTrajectoryOptimizerInterface::GetOptimizationResult(
+    std::vector<double>* ptr_opt_d,
+    std::vector<double>* ptr_opt_d_prime,
+    std::vector<double>* ptr_opt_d_pprime) const {
+  *ptr_opt_d = opt_d_;
+  *ptr_opt_d_prime = opt_d_prime_;
+  *ptr_opt_d_pprime = opt_d_pprime_;
 }
 
 }  // namespace planning
