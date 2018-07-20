@@ -22,7 +22,7 @@
 
 #include <utility>
 
-#include "glog/logging.h"
+#include "modules/common/log.h"
 #include "modules/planning/lattice/trajectory1d/constant_jerk_trajectory1d.h"
 
 namespace apollo {
@@ -30,35 +30,47 @@ namespace planning {
 
 LateralTrajectoryOptimizer::LateralTrajectoryOptimizer(
     const double d_init, const double d_prime_init, const double d_pprime_init,
-    const double delta_s, std::vector<std::pair<double, double>> d_bounds) :
+    const double delta_s, const double d_ppprime_max,
+    std::vector<std::pair<double, double>> d_bounds) :
     opt_piecewise_trajectory_(d_init, d_prime_init, d_pprime_init) {
+  CHECK(d_bounds.size() > 1);
   num_of_points_ = d_bounds.size();
 
   num_of_variables_ = 3 * num_of_points_;
 
+  num_of_constraints_ = 3 * (num_of_points_ - 1) + 3;
+
+  CHECK_GT(delta_s, 0.0);
   delta_s_ = delta_s;
 
+  CHECK_GT(d_ppprime_max_, 0.0);
+  d_ppprime_max_ = d_ppprime_max;
+
   d_bounds_ = std::move(d_bounds);
+}
 
-  w_d_ = 1.0;
 
-  w_d_prime_ = 1.0;
+void LateralTrajectoryOptimizer::set_objective_weights(const double w_d,
+    const double w_d_prime, const double w_d_pprime, const double w_d_obs) {
+  w_d_ = w_d;
 
-  w_d_pprime_ = 1.0;
+  w_d_prime_ = w_d_prime;
 
-  w_d_obs_ = 1.0;
+  w_d_pprime_ = w_d_prime;
+
+  w_d_obs_ = w_d_obs;
 }
 
 bool LateralTrajectoryOptimizer::get_nlp_info(int& n, int& m,
     int& nnz_jac_g, int& nnz_h_lag, IndexStyleEnum& index_style) {
   // variables
-  n = num_of_points_ * 3;
+  n = num_of_variables_;
 
   // constraints
-  m = num_of_points_ * 3;
+  m = num_of_constraints_;
 
   // none zero hessian and lagrangian
-  nnz_h_lag = n;
+  nnz_h_lag = num_of_variables_;
 
   index_style = IndexStyleEnum::C_STYLE;
 
@@ -68,7 +80,7 @@ bool LateralTrajectoryOptimizer::get_nlp_info(int& n, int& m,
 bool LateralTrajectoryOptimizer::get_bounds_info(int n, double* x_l,
     double* x_u, int m, double* g_l, double* g_u) {
 
-  const double LARGE_VALUE = 10.0;
+  const double LARGE_VALUE = 5.0;
 
   // bounds for variables
   // d bounds;
@@ -92,7 +104,6 @@ bool LateralTrajectoryOptimizer::get_bounds_info(int n, double* x_l,
   }
 
   // bounds for constraints
-
   // jerk bounds
   for (std::size_t i = 0; i + 1 < num_of_points_; ++i) {
     g_l[i] = -d_ppprime_max_ * delta_s_;
@@ -307,13 +318,13 @@ bool LateralTrajectoryOptimizer::eval_jac_g(int n, const double* x,
     jCol[nz_index] = 2 * num_of_points_;
     ++nz_index;
 
-    nnz_jac_g_ = nz_index;
+    CHECK(nz_index == nele_jac);
   } else {
     if (new_x) {
       // TODO(kechxu) update
     }
 
-    std::fill(values, values + nnz_jac_g_, 0.0);
+    std::fill(values, values + nele_jac, 0.0);
     // first, positional equality constraints
     std::size_t nz_index = 0;
 
@@ -373,7 +384,7 @@ bool LateralTrajectoryOptimizer::eval_jac_g(int n, const double* x,
       ++nz_index;
     }
 
-    CHECK_EQ(nz_index, nnz_jac_g_);
+    CHECK_EQ(nz_index, nele_jac);
   }
   return true;
 }
