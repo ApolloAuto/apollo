@@ -18,8 +18,8 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_LATTICE_LATERAL_TRAJECTORY_OPTIMIZER_H_
-#define MODULES_PLANNING_LATTICE_LATERAL_TRAJECTORY_OPTIMIZER_H_
+#ifndef MODULES_PLANNING_LATTICE_LATERAL_TRAJECTORY_OPTIMIZER_INTERFACE_H_
+#define MODULES_PLANNING_LATTICE_LATERAL_TRAJECTORY_OPTIMIZER_INTERFACE_H_
 
 #include <utility>
 #include <vector>
@@ -32,14 +32,14 @@
 namespace apollo {
 namespace planning {
 
-class LateralTrajectoryOptimizer : public Ipopt::TNLP {
+class LateralTrajectoryOptimizerInterface : public Ipopt::TNLP {
  public:
-  LateralTrajectoryOptimizer(const double d_init,
+  LateralTrajectoryOptimizerInterface(const double d_init,
       const double d_prime_init, const double d_pprime_init,
       const double delta_s, const double d_ppprime_max,
       std::vector<std::pair<double, double>> d_bounds);
 
-  virtual ~LateralTrajectoryOptimizer() = default;
+  virtual ~LateralTrajectoryOptimizerInterface() = default;
 
   void set_objective_weights(const double w_d, const double w_d_prime,
       const double w_d_pprime, const double w_d_obs);
@@ -125,4 +125,4 @@ class LateralTrajectoryOptimizer : public Ipopt::TNLP {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_LATTICE_LATERAL_TRAJECTORY_OPTIMIZER_H_
+#endif  // MODULES_PLANNING_LATTICE_LATERAL_TRAJECTORY_OPTIMIZER_INTERFACE_H_
