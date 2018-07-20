@@ -340,6 +340,7 @@ std::vector<std::pair<double, double>> PathTimeGraph::GetLateralBounds(
   CHECK_LT(s_start, s_end);
   CHECK_GT(s_resolution, FLAGS_lattice_epsilon);
   std::vector<std::pair<double, double>> bounds;
+  std::vector<double> discretized_path;
   double s_range = s_end - s_start;
   double s_curr = s_start;
   std::size_t num_bound = static_cast<std::size_t>(s_range / s_resolution);
@@ -350,17 +351,53 @@ std::vector<std::pair<double, double>> PathTimeGraph::GetLateralBounds(
     ptr_reference_line_info_->reference_line().GetLaneWidth(
         s_curr, &left_width, &right_width);
     bounds.emplace_back(-right_width, left_width);
+    discretized_path.push_back(s_curr);
     s_curr += s_resolution;
   }
 
-  // TODO(kechxu) Update bounds by static obstacles
+  for (const SLBoundary& static_sl_boundary : static_obs_sl_boundaries_) {
+    UpdateLateralBoundsByObstacle(static_sl_boundary, discretized_path,
+        s_start, s_end, &bounds);
+  }
+  return bounds;
 }
 
 void PathTimeGraph::UpdateLateralBoundsByObstacle(
     const SLBoundary& sl_boundary,
-    const std::vector<common::PathPoint>& discretized_ref_points,
+    const std::vector<double>& discretized_path,
+    const double s_start, const double s_end,
     std::vector<std::pair<double, double>>* const bounds) {
-  // TODO(kechxu) implement
+  if (sl_boundary.start_s() > s_end || sl_boundary.end_s() < s_start) {
+    return;
+  }
+  auto start_iter = std::lower_bound(
+      discretized_path.begin(), discretized_path.end(), sl_boundary.start_s());
+  auto end_iter = std::upper_bound(
+      discretized_path.begin(), discretized_path.end(), sl_boundary.start_s());
+  std::size_t start_index = start_iter - discretized_path.begin();
+  std::size_t end_index = end_iter - discretized_path.begin();
+  if (sl_boundary.end_l() > -FLAGS_lattice_epsilon &&
+      sl_boundary.start_l() < FLAGS_lattice_epsilon) {
+    for (std::size_t i = start_index; i < end_index; ++i) {
+      bounds->operator[](i).first = -FLAGS_lattice_epsilon;
+      bounds->operator[](i).second = FLAGS_lattice_epsilon;
+    }
+    return;
+  }
+  if (sl_boundary.end_l() < FLAGS_lattice_epsilon) {
+    for (std::size_t i = start_index; i < end_index; ++i) {
+      bounds->operator[](i).first =
+          std::max(bounds->operator[](i).first, sl_boundary.end_l());
+    }
+    return;
+  }
+  if (sl_boundary.start_l() < -FLAGS_lattice_epsilon) {
+    for (std::size_t i = start_index; i < end_index; ++i) {
+      bounds->operator[](i).second =
+          std::min(bounds->operator[](i).second, sl_boundary.end_l());
+    }
+    return;
+  }
 }
 
 }  // namespace planning
