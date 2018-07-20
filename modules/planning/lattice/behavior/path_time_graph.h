@@ -93,7 +93,8 @@ class PathTimeGraph {
 
   void UpdateLateralBoundsByObstacle(
     const SLBoundary& sl_boundary,
-    const std::vector<common::PathPoint>& discretized_ref_points,
+    const std::vector<double>& discretized_path,
+    const double s_start, const double s_end,
     std::vector<std::pair<double, double>>* const bounds);
 
  private:
