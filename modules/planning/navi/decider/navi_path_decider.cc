@@ -43,7 +43,30 @@ NaviPathDecider::NaviPathDecider() : Task("NaviPathDecider") {
 }
 
 bool NaviPathDecider::Init(const PlanningConfig& config) {
+  speed_to_shift_param_table_.clear();
+  max_speed_levels_.clear();
   config_ = config.navi_planner_config().navi_path_decider_config();
+  auto later_shift_config_talbe = config_.later_shift_config_table();
+  for (const auto& item : later_shift_config_talbe.lateral_shift()) {
+    double max_speed_level = item.max_speed();
+    if (speed_to_shift_param_table_.find(max_speed_level) ==
+        speed_to_shift_param_table_.end()) {
+      speed_to_shift_param_table_.emplace(std::make_pair(
+          max_speed_level,
+          std::make_tuple(item.min_distance(), item.max_distance(),
+                          item.theta_change_ratio())));
+      max_speed_levels_.push_back(max_speed_level);
+    }
+  }
+  AINFO << "Maximum speeds and lateral shift parameters map : ";
+  for (const auto& data : speed_to_shift_param_table_) {
+    auto max_speed = data.first;
+    auto shift_param = data.second;
+    AINFO << "[max_sped : " << max_speed
+          << " ,min_distance : " << std::get<0>(shift_param)
+          << " ,max_distance : " << std::get<1>(shift_param)
+          << " ,theta_chage_ratio : " << std::get<2>(shift_param) << "]";
+  }
   is_init_ = true;
   return true;
 }
@@ -142,14 +165,17 @@ apollo::common::Status NaviPathDecider::Process(
 
   // shift trajectory intercepted from the reference line to adc
   double shift_distance_y = start_point_y - init_basic_path_y;
-  double delta_theta =
-      start_point_y * config_.theta_change_ratio() * M_PI / 180.0;
+  double delta_theta = start_point_y * theta_change_ratio_ * M_PI / 180.0;
   ADEBUG << "in current plan, adc latteral to ref line shift distance : "
          << start_point_y << " delta_theta : " << delta_theta
          << " ref line latteral to adc shift distance : " << shift_distance_y
-         << "path point size : " << path_points.size();
+         << " path point size : " << path_points.size();
   ShiftY(shift_distance_y, &path_points);
-  path_points[0].set_theta(path_points[0].theta() + delta_theta);
+
+  // adjust start path point theta
+  double diff_theta = path_points[0].theta() - vehicle_state_.heading();
+  double new_start_point_theta = diff_theta + delta_theta;
+  path_points[0].set_theta(new_start_point_theta);
 
   // calculate the value of the path trajectory later
   constexpr double KDefaultDoubleLaneWidth = 7.5;
@@ -231,10 +257,11 @@ void NaviPathDecider::ShiftY(
 double NaviPathDecider::SmoothInitY(const double actual_ref_init_y,
                                     const double target_path_init_y) {
   constexpr double kPositiveSign = 1.0;
-  const double min_init_y = config_.min_smooth_init_y();
-  const double max_init_y = config_.max_smooth_init_y();
-  double start_position_y = vehicle_state_.y();
   double shift_distance = 0.0;
+  double start_position_y = vehicle_state_.y();
+
+  // calculate lateral shift range and theta chage ratio
+  CalculateShiftParam();
 
   // get shift diretion
   double shift_direction =
@@ -242,10 +269,10 @@ double NaviPathDecider::SmoothInitY(const double actual_ref_init_y,
 
   double plan_point_to_target_distance = std::fabs(target_path_init_y);
   // need to adjust in lateral
-  if (plan_point_to_target_distance > min_init_y) {
-    shift_distance = (plan_point_to_target_distance < max_init_y)
+  if (plan_point_to_target_distance > min_init_y_) {
+    shift_distance = (plan_point_to_target_distance < max_init_y_)
                          ? plan_point_to_target_distance
-                         : max_init_y;
+                         : max_init_y_;
 
     // accurate to the centimeter scale
     start_position_y =
@@ -354,5 +381,26 @@ double NaviPathDecider::NudgeProcess(
   return nudge_position_y;
 }
 
+void NaviPathDecider::CalculateShiftParam() {
+  // default lateral shift param
+  min_init_y_ = config_.default_min_smooth_init_y();
+  max_init_y_ = config_.default_max_smooth_init_y();
+  theta_change_ratio_ = config_.default_theta_change_ratio();
+
+  // match an appropriate lateral shift param from the configuration file based
+  // on the current state of the vehicle state
+  double adc_velocity = vehicle_state_.linear_velocity();
+  double adc_acceleration = vehicle_state_.linear_acceleration();
+  double max_adc_speed = adc_velocity + adc_acceleration * 0.1;
+  auto max_speed_level_itr = std::upper_bound(
+      max_speed_levels_.begin(), max_speed_levels_.end(), max_adc_speed);
+  if (max_speed_level_itr != max_speed_levels_.end()) {
+    auto max_speed_level = *max_speed_level_itr;
+    auto shift_param = speed_to_shift_param_table_[max_speed_level];
+    min_init_y_ = std::get<0>(shift_param);
+    max_init_y_ = std::get<1>(shift_param);
+    theta_change_ratio_ = std::get<2>(shift_param);
+  }
+}
 }  // namespace planning
 }  // namespace apollo

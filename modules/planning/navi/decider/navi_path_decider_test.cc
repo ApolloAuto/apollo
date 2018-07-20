@@ -52,10 +52,10 @@ TEST_F(NaviPathDeciderTest, SmoothInitY) {
   PlanningConfig config;
   double min_shift_y = config.navi_planner_config()
                            .navi_path_decider_config()
-                           .min_smooth_init_y();
+                           .default_min_smooth_init_y();
   double max_shift_y = config.navi_planner_config()
                            .navi_path_decider_config()
-                           .max_smooth_init_y();
+                           .default_max_smooth_init_y();
   navi_path_decider.Init(config);
 
   // 1. target_path_init_y too small, can not need shift
