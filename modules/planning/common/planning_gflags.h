@@ -163,6 +163,13 @@ DECLARE_double(lon_collision_buffer);
 DECLARE_double(lat_collision_buffer);
 DECLARE_uint32(num_sample_follow_per_timestamp);
 
+DECLARE_bool(lateral_optimization);
+DECLARE_double(weight_lateral_offset);
+DECLARE_double(weight_lateral_derivative);
+DECLARE_double(weight_lateral_second_order_derivative);
+DECLARE_double(weight_lateral_obstacle_distance);
+DECLARE_double(lateral_third_order_derivative_max);
+
 // Lattice Evaluate Parameters
 DECLARE_double(weight_lon_objective);
 DECLARE_double(weight_lon_jerk);
