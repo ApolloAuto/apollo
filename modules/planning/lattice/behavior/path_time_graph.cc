@@ -335,5 +335,33 @@ bool PathTimeGraph::IsObstacleInGraph(const std::string& obstacle_id) {
          path_time_obstacle_map_.end();
 }
 
+std::vector<std::pair<double, double>> PathTimeGraph::GetLateralBounds(
+    const double s_start, const double s_end, const double s_resolution) {
+  CHECK_LT(s_start, s_end);
+  CHECK_GT(s_resolution, FLAGS_lattice_epsilon);
+  std::vector<std::pair<double, double>> bounds;
+  double s_range = s_end - s_start;
+  double s_curr = s_start;
+  std::size_t num_bound = static_cast<std::size_t>(s_range / s_resolution);
+  // Initialize bounds by reference line width
+  for (std::size_t i = 0; i < num_bound; ++i) {
+    double left_width = FLAGS_default_reference_line_width / 2.0;
+    double right_width = FLAGS_default_reference_line_width / 2.0;
+    ptr_reference_line_info_->reference_line().GetLaneWidth(
+        s_curr, &left_width, &right_width);
+    bounds.emplace_back(-right_width, left_width);
+    s_curr += s_resolution;
+  }
+
+  // TODO(kechxu) Update bounds by static obstacles
+}
+
+void PathTimeGraph::UpdateLateralBoundsByObstacle(
+    const SLBoundary& sl_boundary,
+    const std::vector<common::PathPoint>& discretized_ref_points,
+    std::vector<std::pair<double, double>>* const bounds) {
+  // TODO(kechxu) implement
+}
+
 }  // namespace planning
 }  // namespace apollo
