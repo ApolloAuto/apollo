@@ -286,10 +286,10 @@ void HMI::StartBroadcastHMIStatusThread() {
       // Broadcast messages.
       apollo::common::monitor::MonitorLogBuffer log_buffer(&logger_);
       if (status.current_map().empty()) {
-        log_buffer.WARN("You haven't select map yet!");
+        log_buffer.WARN("You haven't selected a map yet!");
       }
       if (status.current_vehicle().empty()) {
-        log_buffer.WARN("You haven't select vehicle yet!");
+        log_buffer.WARN("You haven't selected a vehicle yet!");
       }
     }
   }));
