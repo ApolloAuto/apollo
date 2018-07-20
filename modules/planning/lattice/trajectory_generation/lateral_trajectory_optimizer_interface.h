@@ -27,8 +27,6 @@
 #include "IpTNLP.hpp"
 #include "IpTypes.hpp"
 
-#include "modules/planning/lattice/trajectory1d/piecewise_jerk_trajectory1d.h"
-
 namespace apollo {
 namespace planning {
 
@@ -90,7 +88,10 @@ class LateralTrajectoryOptimizerInterface : public Ipopt::TNLP {
                          double obj_value, const Ipopt::IpoptData* ip_data,
                          Ipopt::IpoptCalculatedQuantities* ip_cq) override;
 
-  PiecewiseJerkTrajectory1d GetOptimalTrajectory() const;
+  void GetOptimizationResult(
+      std::vector<double>* ptr_opt_d,
+      std::vector<double>* ptr_opt_d_prime,
+      std::vector<double>* ptr_opt_d_pprime) const;
 
  private:
   std::size_t num_of_points_;
@@ -119,7 +120,11 @@ class LateralTrajectoryOptimizerInterface : public Ipopt::TNLP {
 
   double w_d_obs_ = 1.0;
 
-  PiecewiseJerkTrajectory1d opt_piecewise_trajectory_;
+  std::vector<double> opt_d_;
+
+  std::vector<double> opt_d_prime_;
+
+  std::vector<double> opt_d_pprime_;
 };
 
 }  // namespace planning
