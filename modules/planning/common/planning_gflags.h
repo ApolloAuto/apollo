@@ -112,6 +112,7 @@ DECLARE_double(follow_min_time_sec);
 DECLARE_double(stop_line_stop_distance);
 DECLARE_double(max_stop_speed);
 DECLARE_double(signal_light_min_pass_s_distance);
+DECLARE_bool(enable_side_radar);
 
 DECLARE_string(destination_obstacle_id);
 DECLARE_double(destination_check_distance);
