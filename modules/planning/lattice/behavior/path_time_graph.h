@@ -68,6 +68,9 @@ class PathTimeGraph {
 
   bool IsObstacleInGraph(const std::string& obstacle_id);
 
+  std::vector<std::pair<double, double>> GetLateralBounds(
+      const double s_start, const double s_end, const double s_resolution);
+
  private:
   void SetupObstacles(
       const std::vector<const Obstacle*>& obstacles,
@@ -87,6 +90,11 @@ class PathTimeGraph {
   void SetDynamicObstacle(
       const Obstacle* obstacle,
       const std::vector<common::PathPoint>& discretized_ref_points);
+
+  void UpdateLateralBoundsByObstacle(
+    const SLBoundary& sl_boundary,
+    const std::vector<common::PathPoint>& discretized_ref_points,
+    std::vector<std::pair<double, double>>* const bounds);
 
  private:
   std::pair<double, double> time_range_;
