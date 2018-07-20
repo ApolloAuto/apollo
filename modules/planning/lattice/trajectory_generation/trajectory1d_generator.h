@@ -84,6 +84,8 @@ class Trajectory1dGenerator {
   std::array<double, 3> init_lat_state_;
 
   EndConditionSampler end_condition_sampler_;
+
+  std::shared_ptr<PathTimeGraph> ptr_path_time_graph_;
 };
 
 template <>

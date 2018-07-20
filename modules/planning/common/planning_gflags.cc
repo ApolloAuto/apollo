@@ -340,7 +340,23 @@ DEFINE_double(comfort_acceleration_factor, 0.5,
 DEFINE_double(polynomial_minimal_param, 0.01,
               "Minimal time parameter in polynomials.");
 DEFINE_double(lattice_stop_buffer, 0.02,
-              "The bufffer before the stop s to check trajectories.");
+              "The buffer before the stop s to check trajectories.");
+
+DEFINE_bool(lateral_optimization, true,
+    "whether using optimization for lateral trajectory generation");
+DEFINE_double(weight_lateral_offset, 1.0,
+    "weight for lateral offset "
+    "in lateral trajectory optimization");
+DEFINE_double(weight_lateral_derivative, 1.0,
+    "weight for lateral derivative "
+    "in lateral trajectory optimization");
+DEFINE_double(weight_lateral_second_order_derivative, 1.0,
+    "weight for lateral second order derivative "
+    "in lateral trajectory optimization");
+DEFINE_double(weight_lateral_obstacle_distance, 1.0,
+    "weight for lateral obstacle distance in lateral trajectory optimization");
+DEFINE_double(lateral_third_order_derivative_max, 2.0,
+    "the maximal allowance for lateral third order derivative");
 
 DEFINE_bool(use_planning_fallback, true,
             "Use fallback trajectory for planning.");
