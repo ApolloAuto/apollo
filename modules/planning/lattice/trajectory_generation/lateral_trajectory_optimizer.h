@@ -36,9 +36,13 @@ class LateralTrajectoryOptimizer : public Ipopt::TNLP {
  public:
   LateralTrajectoryOptimizer(const double d_init,
       const double d_prime_init, const double d_pprime_init,
-      const double delta_s, std::vector<std::pair<double, double>> d_bounds);
+      const double delta_s, const double d_ppprime_max,
+      std::vector<std::pair<double, double>> d_bounds);
 
   virtual ~LateralTrajectoryOptimizer() = default;
+
+  void set_objective_weights(const double w_d, const double w_d_prime,
+      const double w_d_pprime, const double w_d_obs);
 
   /** Method to return some info about the nlp */
   bool get_nlp_info(int& n, int& m, int& nnz_jac_g, int& nnz_h_lag,
@@ -93,6 +97,8 @@ class LateralTrajectoryOptimizer : public Ipopt::TNLP {
 
   std::size_t num_of_variables_;
 
+  std::size_t num_of_constraints_;
+
   double d_init_ = 0.0;
 
   double d_prime_init_ = 0.0;
@@ -105,15 +111,13 @@ class LateralTrajectoryOptimizer : public Ipopt::TNLP {
 
   std::vector<std::pair<double, double>> d_bounds_;
 
-  double w_d_ = 0.0;
+  double w_d_ = 1.0;
 
-  double w_d_prime_ = 0.0;
+  double w_d_prime_ = 1.0;
 
-  double w_d_pprime_ = 0.0;
+  double w_d_pprime_ = 1.0;
 
-  double w_d_obs_ = 0.0;
-
-  std::size_t nnz_jac_g_ = 0;
+  double w_d_obs_ = 1.0;
 
   PiecewiseJerkTrajectory1d opt_piecewise_trajectory_;
 };
