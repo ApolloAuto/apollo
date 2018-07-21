@@ -25,11 +25,12 @@
 #include <limits>
 #include <utility>
 
-#include "lateral_trajectory_optimizer_interface.h"
+#include "modules/planning/lattice/trajectory_generation/lateral_trajectory_optimizer.h"
 #include "modules/common/log.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/lattice/trajectory1d/constant_deceleration_trajectory1d.h"
 #include "modules/planning/lattice/trajectory1d/standing_still_trajectory1d.h"
+#include "modules/planning/lattice/trajectory1d/piecewise_jerk_trajectory1d.h"
 
 namespace apollo {
 namespace planning {
@@ -125,24 +126,31 @@ void Trajectory1dGenerator::GenerateLongitudinalTrajectoryBundle(
 void Trajectory1dGenerator::GenerateLateralTrajectoryBundle(
     Trajectory1DBundle* ptr_lat_trajectory_bundle) const {
 
-  if (FLAGS_lateral_optimization) {
+  if (!FLAGS_lateral_optimization) {
     auto end_conditions = end_condition_sampler_.SampleLatEndConditions();
 
     // Use the common function to generate trajectory bundles.
     GenerateTrajectory1DBundle<5>(init_lat_state_, end_conditions,
         ptr_lat_trajectory_bundle);
   } else {
-//    double delta_s = 0.5;
-//    auto lateral_bounds = ptr_path_time_graph_->GetLateralBounds(
-//        0.0, 100.0, delta_s);
-//    LateralTrajectoryOptimizerInterface lateral_trajectory_optimizer(
-//        init_lat_state_[0], init_lat_state_[1], init_lat_state_[2],
-//        delta_s, FLAGS_lateral_third_order_derivative_max, lateral_bounds);
-//
-//    lateral_trajectory_optimizer.set_objective_weights(FLAGS_weight_lateral_offset,
-//        FLAGS_weight_lateral_derivative, FLAGS_weight_lateral_second_order_derivative,
-//        FLAGS_weight_lateral_obstacle_distance);
 
+    std::cout << "calling optimization lateral trajectory" << std::endl;
+    double s_min = 0.0;
+    double s_max = 100.0;
+
+    double delta_s = 0.5;
+
+    auto lateral_bounds = ptr_path_time_graph_->GetLateralBounds(
+            s_min, s_max, delta_s);
+
+    LateralTrajectoryOptimizer lateral_optimizer;
+    bool res = lateral_optimizer.optimize(init_lat_state_, delta_s, lateral_bounds);
+
+    auto lateral_trajectory = lateral_optimizer.GetOptimalTrajectory();
+
+    ptr_lat_trajectory_bundle->push_back(std::make_shared<PiecewiseJerkTrajectory1d>(lateral_trajectory));
+
+    std::cout << "done with trajectory generation" << std::endl;
   }
 }
 
