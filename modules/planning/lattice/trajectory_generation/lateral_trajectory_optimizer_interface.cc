@@ -92,7 +92,7 @@ bool LateralTrajectoryOptimizerInterface::get_nlp_info(int& n, int& m,
 bool LateralTrajectoryOptimizerInterface::get_bounds_info(int n, double* x_l,
     double* x_u, int m, double* g_l, double* g_u) {
 
-  const double LARGE_VALUE = 5.0;
+  const double LARGE_VALUE = 2.0;
 
   // bounds for variables
   // d bounds;
@@ -151,7 +151,7 @@ bool LateralTrajectoryOptimizerInterface::get_starting_point(int n, bool init_x,
     double* x, bool init_z, double* z_L, double* z_U, int m, bool init_lambda,
     double* lambda) {
 
-  CHECK_EQ(std::size_t(n), num_of_points_ * 3);
+  CHECK_EQ(std::size_t(n), num_of_variables_);
   CHECK(init_x == true);
   CHECK(init_z == false);
   CHECK(init_lambda == false);
@@ -188,7 +188,6 @@ bool LateralTrajectoryOptimizerInterface::eval_f(int n, const double* x,
 
 bool LateralTrajectoryOptimizerInterface::eval_grad_f(int n, const double* x,
     bool new_x, double* grad_f) {
-
   std::fill(grad_f, grad_f + n, 0.0);
 
   std::size_t offset_prime = num_of_points_;
@@ -207,7 +206,6 @@ bool LateralTrajectoryOptimizerInterface::eval_grad_f(int n, const double* x,
 
 bool LateralTrajectoryOptimizerInterface::eval_g(int n, const double* x,
     bool new_x, int m, double* g) {
-
   std::fill(g, g + m, 0.0);
   std::size_t offset_prime = num_of_points_;
   std::size_t offset_pprime = 2 * num_of_points_;
@@ -245,6 +243,9 @@ bool LateralTrajectoryOptimizerInterface::eval_jac_g(int n, const double* x,
   CHECK_EQ(std::size_t(n), num_of_variables_);
   CHECK_EQ(std::size_t(m), num_of_constraints_);
 
+  auto offset_prime = num_of_points_;
+  auto offset_pprime = 2 * num_of_points_;
+
   if (values == NULL) {
     std::size_t nz_index = 0;
     std::size_t constraint_index = 0;
@@ -255,12 +256,12 @@ bool LateralTrajectoryOptimizerInterface::eval_jac_g(int n, const double* x,
          ++variable_index) {
       // d_i''
       iRow[nz_index] = constraint_index;
-      jCol[nz_index] = 2 * num_of_points_ + variable_index;
+      jCol[nz_index] = offset_pprime + variable_index;
       ++nz_index;
 
       // d_i+1''
       iRow[nz_index] = constraint_index;
-      jCol[nz_index] = 2 * num_of_points_ + variable_index + 1;
+      jCol[nz_index] = offset_pprime + variable_index + 1;
       ++nz_index;
 
       ++constraint_index;
@@ -272,25 +273,25 @@ bool LateralTrajectoryOptimizerInterface::eval_jac_g(int n, const double* x,
          ++variable_index) {
       // d_i'
       iRow[nz_index] = constraint_index;
-      jCol[nz_index] = num_of_points_ + variable_index;
+      jCol[nz_index] = offset_prime + variable_index;
       ++nz_index;
       // d_i+1'
       iRow[nz_index] = constraint_index;
-      jCol[nz_index] = num_of_points_ + variable_index + 1;
+      jCol[nz_index] = offset_prime + variable_index + 1;
       ++nz_index;
       // d_i''
       iRow[nz_index] = constraint_index;
-      jCol[nz_index] = 2 * num_of_points_ + variable_index;
+      jCol[nz_index] = offset_pprime + variable_index;
       ++nz_index;
       // d_i+1''
       iRow[nz_index] = constraint_index;
-      jCol[nz_index] = 2 * num_of_points_ + variable_index + 1;
+      jCol[nz_index] = offset_pprime + variable_index + 1;
       ++nz_index;
 
       ++constraint_index;
     }
 
-    // state constraint
+    // position constraint
     // d_i+1 - d_i - d_i' * ds - 1/3 * d_i'' * ds^2 - 1/6 * d_i+1'' * ds^2
     for (std::size_t variable_index = 0; variable_index + 1 < num_of_points_;
          ++variable_index) {
@@ -304,15 +305,15 @@ bool LateralTrajectoryOptimizerInterface::eval_jac_g(int n, const double* x,
       ++nz_index;
       // d_i'
       iRow[nz_index] = constraint_index;
-      jCol[nz_index] = num_of_points_ + variable_index;
+      jCol[nz_index] = offset_prime + variable_index;
       ++nz_index;
       // d_i''
       iRow[nz_index] = constraint_index;
-      jCol[nz_index] = 2 * num_of_points_ + variable_index;
+      jCol[nz_index] = offset_pprime + variable_index;
       ++nz_index;
       // d_i+1''
       iRow[nz_index] = constraint_index;
-      jCol[nz_index] = 2 * num_of_points_ + variable_index + 1;
+      jCol[nz_index] = offset_pprime + variable_index + 1;
       ++nz_index;
 
       ++constraint_index;
@@ -322,17 +323,21 @@ bool LateralTrajectoryOptimizerInterface::eval_jac_g(int n, const double* x,
     // d_0
     iRow[nz_index] = constraint_index;
     jCol[nz_index] = 0;
+    ++constraint_index;
     ++nz_index;
     // d_0'
     iRow[nz_index] = constraint_index;
-    jCol[nz_index] = num_of_points_;
+    jCol[nz_index] = offset_prime;
+    ++constraint_index;
     ++nz_index;
     // d_0''
     iRow[nz_index] = constraint_index;
-    jCol[nz_index] = 2 * num_of_points_;
+    jCol[nz_index] = offset_pprime;
+    ++constraint_index;
     ++nz_index;
 
     CHECK_EQ(nz_index, static_cast<std::size_t>(nele_jac));
+    CHECK_EQ(constraint_index, static_cast<std::size_t>(m));
   } else {
     std::fill(values, values + nele_jac, 0.0);
     // first, positional equality constraints
