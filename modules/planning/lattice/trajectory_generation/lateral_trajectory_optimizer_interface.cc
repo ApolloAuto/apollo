@@ -23,6 +23,9 @@
 #include <utility>
 
 #include "modules/common/log.h"
+#include "modules/planning/lattice/trajectory1d/constant_jerk_trajectory1d.h"
+
+#include <iostream>
 
 namespace apollo {
 namespace planning {
@@ -32,6 +35,13 @@ LateralTrajectoryOptimizerInterface::LateralTrajectoryOptimizerInterface(
     const double delta_s, const double d_ppprime_max,
     std::vector<std::pair<double, double>> d_bounds) {
   CHECK(d_bounds.size() > 1);
+
+  d_init_ = d_init;
+
+  d_prime_init_ = d_prime_init;
+
+  d_pprime_init_ = d_pprime_init;
+
   num_of_points_ = d_bounds.size();
 
   num_of_variables_ = 3 * num_of_points_;
@@ -41,7 +51,7 @@ LateralTrajectoryOptimizerInterface::LateralTrajectoryOptimizerInterface(
   CHECK_GT(delta_s, 0.0);
   delta_s_ = delta_s;
 
-  CHECK_GT(d_ppprime_max_, 0.0);
+  CHECK_GT(d_ppprime_max, 0.0);
   d_ppprime_max_ = d_ppprime_max;
 
   d_bounds_ = std::move(d_bounds);
@@ -66,8 +76,13 @@ bool LateralTrajectoryOptimizerInterface::get_nlp_info(int& n, int& m,
   // constraints
   m = num_of_constraints_;
 
+  nnz_jac_g = 11 * (num_of_points_ - 1) + 3;
+  nnz_jac_g_  = nnz_jac_g;
+
   // none zero hessian and lagrangian
   nnz_h_lag = num_of_variables_;
+
+  nnz_h_lag_ = nnz_h_lag;
 
   index_style = IndexStyleEnum::C_STYLE;
 
@@ -150,7 +165,7 @@ bool LateralTrajectoryOptimizerInterface::get_starting_point(int n, bool init_x,
   x[0] = d_init_;
   x[num_of_points_] = d_prime_init_;
   x[num_of_points_ + num_of_points_] = d_pprime_init_;
-  return false;
+  return true;
 }
 
 bool LateralTrajectoryOptimizerInterface::eval_f(int n, const double* x,
@@ -315,7 +330,7 @@ bool LateralTrajectoryOptimizerInterface::eval_jac_g(int n, const double* x,
     jCol[nz_index] = 2 * num_of_points_;
     ++nz_index;
 
-    CHECK(nz_index == nele_jac);
+    CHECK_EQ(nz_index, static_cast<std::size_t>(nele_jac));
   } else {
     if (new_x) {
       // TODO(kechxu) update
@@ -381,7 +396,7 @@ bool LateralTrajectoryOptimizerInterface::eval_jac_g(int n, const double* x,
       ++nz_index;
     }
 
-    CHECK_EQ(nz_index, nele_jac);
+    CHECK_EQ(nz_index, static_cast<std::size_t>(nele_jac));
   }
   return true;
 }
