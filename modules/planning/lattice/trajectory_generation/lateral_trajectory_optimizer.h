@@ -40,7 +40,7 @@ class LateralTrajectoryOptimizer {
   bool optimize(
       const std::array<double, 3>& d_state,
       const double delta_s,
-      const std::shared_ptr<PathTimeGraph>& ptr_path_time_graph);
+      const std::vector<std::pair<double, double>>& d_bounds);
 
   PiecewiseJerkTrajectory1d GetOptimalTrajectory() const;
  private:
