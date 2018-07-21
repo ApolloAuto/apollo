@@ -25,9 +25,12 @@ config: {
     stop_distance: 1.0
     max_stop_deceleration: 6.0
     min_pass_s_distance: 1.0
+    max_stop_speed: 0.3
+    max_valid_stop_distance: 3.5
     expand_s_distance: 2.0
     stop_strick_l_distance: 6.0
     stop_loose_l_distance: 10.0
+    stop_timeout: 3.0
   }
 }
 
