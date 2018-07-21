@@ -30,21 +30,13 @@
 namespace apollo {
 namespace planning {
 
-LateralTrajectoryOptimizer::LateralTrajectoryOptimizer() {}
-
 bool LateralTrajectoryOptimizer::optimize(
     const std::array<double, 3>& d_state, const double delta_s,
-    const std::shared_ptr<PathTimeGraph>& ptr_path_time_graph) {
+    const std::vector<std::pair<double, double>>& lateral_bounds) {
 
   delta_s_ = delta_s;
 
-  double s_min = 0.0;
-  double s_max = 100.0;
-
-  auto lateral_bounds = ptr_path_time_graph->GetLateralBounds(
-      s_min, s_max, delta_s);
-
-  auto ptr_interface = std::make_unique<LateralTrajectoryOptimizerInterface>(
+  auto ptr_interface = new LateralTrajectoryOptimizerInterface(
       d_state[0], d_state[1], d_state[2], delta_s,
       FLAGS_lateral_third_order_derivative_max, lateral_bounds);
 
@@ -104,7 +96,6 @@ LateralTrajectoryOptimizer::GetOptimalTrajectory() const {
     double j = (opt_d_pprime_[i] - opt_d_pprime_[i - 1]) / delta_s_;
     optimal_trajectory.AppendSegment(j, delta_s_);
   }
-
   return optimal_trajectory;
 }
 

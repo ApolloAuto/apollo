@@ -44,6 +44,7 @@ cc_library(
         "//modules/planning/math/curve1d:quintic_polynomial_curve1d",
         "//modules/planning/proto:lattice_sampling_config_proto",
         "//modules/planning/proto:lattice_structure_proto",
+        "//modules/planning/lattice/trajectory_generation:lateral_trajectory_optimizer_interface",
         "//modules/planning/lattice/trajectory_generation:lateral_trajectory_optimizer",
     ],
 )
@@ -131,7 +132,7 @@ cc_library(
         "lateral_trajectory_optimizer_interface.h",
     ],
     deps = [
-        "//modules/common",
+        "//modules/planning/lattice/trajectory1d:constant_jerk_trajectory1d",
         "@ipopt",
     ],
 )
@@ -145,9 +146,10 @@ cc_library(
         "lateral_trajectory_optimizer.h",
     ],
     deps = [
+        "//modules/planning/lattice/behavior:path_time_graph",
+        "//modules/planning/lattice/trajectory_generation:lateral_trajectory_optimizer_interface",
         "//modules/planning/lattice/trajectory1d:piecewise_jerk_trajectory1d",
         "//modules/planning/common:planning_gflags",
-        "//modules/common",
         "@ipopt",
     ],
 )
