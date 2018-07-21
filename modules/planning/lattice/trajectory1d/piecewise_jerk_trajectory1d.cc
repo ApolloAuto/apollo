@@ -53,7 +53,7 @@ void PiecewiseJerkTrajectory1d::AppendSegment(
 
 double PiecewiseJerkTrajectory1d::Evaluate(const std::uint32_t order,
     const double param) const {
-  CHECK(param >= 0.0 && param <= param_.back());
+  CHECK(param >= 0.0);
 
   auto it_lower = std::lower_bound(param_.begin(), param_.end(), param);
 
@@ -70,20 +70,6 @@ double PiecewiseJerkTrajectory1d::ParamLength() const {
 std::string PiecewiseJerkTrajectory1d::ToString() const {
   return "";
 }
-
-/**
-void PiecewiseJerkTrajectory1d::AppendSegment(
-    const double p1, const double v1, const double a1,
-    const double param) {
-  CHECK_GT(param, FLAGS_lattice_epsilon);
-  const auto& last_segment = segments_.back();
-  double last_p = last_segment.end_position();
-  double last_v = last_segment.end_velocity();
-  double last_a = last_segment.end_acceleration();
-  double jerk = (a1 - last_a) / param;
-  segments_.emplace_back(last_p, last_v, last_a, jerk, param);
-}
-**/
 
 }  // namespace planning
 }  // namespace apollo

@@ -45,11 +45,6 @@ class PiecewiseJerkTrajectory1d : public Curve1d {
 
   void AppendSegment(const double jerk, const double param);
 
-  /**
-  void AppendSegment(const double p1, const double v1, const double a1,
-                     const double param);
-   **/
-
  private:
   std::vector<ConstantJerkTrajectory1d> segments_;
 

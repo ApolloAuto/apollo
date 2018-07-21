@@ -125,6 +125,10 @@ class LateralTrajectoryOptimizerInterface : public Ipopt::TNLP {
   std::vector<double> opt_d_prime_;
 
   std::vector<double> opt_d_pprime_;
+
+  std::size_t nnz_jac_g_ = 0;
+
+  std::size_t nnz_h_lag_ = 0;
 };
 
 }  // namespace planning
