@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ * Copyright 2017 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "modules/common/apollo_app.h"
-#include "modules/drivers/lidar_velodyne/lidar_velodyne.h"
+#include "modules/drivers/lidar_velodyne/velodyne.h"
 
-APOLLO_MAIN(::apollo::drivers::lidar_velodyne::LidarVelodyne);
+using ::apollo::drivers::lidar_velodyne::Velodyne;
+APOLLO_MAIN(Velodyne);
