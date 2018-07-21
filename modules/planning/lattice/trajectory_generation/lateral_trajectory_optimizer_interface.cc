@@ -208,6 +208,7 @@ bool LateralTrajectoryOptimizerInterface::eval_grad_f(int n, const double* x,
 bool LateralTrajectoryOptimizerInterface::eval_g(int n, const double* x,
     bool new_x, int m, double* g) {
 
+  std::fill(g, g + m, 0.0);
   std::size_t offset_prime = num_of_points_;
   std::size_t offset_pprime = 2 * num_of_points_;
 
@@ -227,8 +228,8 @@ bool LateralTrajectoryOptimizerInterface::eval_g(int n, const double* x,
     double j = (a1 - a0) / delta_s_;
     ConstantJerkTrajectory1d t(p0, v0, a0, j, delta_s_);
 
-    g[num_of_points_ - 1 + i] = t.end_velocity() - v1;
-    g[2 * (num_of_points_ - 1) + i] = t.end_position() - p1;
+    g[num_of_points_ - 1 + i] = v1 - t.end_velocity();
+    g[2 * (num_of_points_ - 1) + i] = p1 - t.end_position();
   }
 
   std::size_t offset = 3 * (num_of_points_ - 1);
@@ -241,21 +242,22 @@ bool LateralTrajectoryOptimizerInterface::eval_g(int n, const double* x,
 bool LateralTrajectoryOptimizerInterface::eval_jac_g(int n, const double* x,
     bool new_x, int m, int nele_jac, int* iRow, int* jCol, double* values) {
 
-  CHECK_EQ(std::size_t(n), num_of_points_ * 3);
-  CHECK_EQ(std::size_t(m), num_of_points_ * 3);
+  CHECK_EQ(std::size_t(n), num_of_variables_);
+  CHECK_EQ(std::size_t(m), num_of_constraints_);
 
   if (values == NULL) {
     std::size_t nz_index = 0;
     std::size_t constraint_index = 0;
 
     // acc constraint
-    // d_i'' - d_i+1''
+    // d_i+1'' - d_i''
     for (std::size_t variable_index = 0; variable_index + 1 < num_of_points_;
          ++variable_index) {
       // d_i''
       iRow[nz_index] = constraint_index;
       jCol[nz_index] = 2 * num_of_points_ + variable_index;
       ++nz_index;
+
       // d_i+1''
       iRow[nz_index] = constraint_index;
       jCol[nz_index] = 2 * num_of_points_ + variable_index + 1;
@@ -265,7 +267,7 @@ bool LateralTrajectoryOptimizerInterface::eval_jac_g(int n, const double* x,
     }
 
     // velocity constraint
-    // d_i' - d_i+1 + 0.5 * ds * (d_i'' + d_i+1'')
+    // d_i+1' - d_i' - 0.5 * ds * (d_i'' + d_i+1'')
     for (std::size_t variable_index = 0; variable_index + 1 < num_of_points_;
          ++variable_index) {
       // d_i'
@@ -289,7 +291,7 @@ bool LateralTrajectoryOptimizerInterface::eval_jac_g(int n, const double* x,
     }
 
     // state constraint
-    // d_i - d_i+1 + d_i' * ds + 1/3 * d_i'' * ds^2 + 1/6 * d_i+1'' * ds^2
+    // d_i+1 - d_i - d_i' * ds - 1/3 * d_i'' * ds^2 - 1/6 * d_i+1'' * ds^2
     for (std::size_t variable_index = 0; variable_index + 1 < num_of_points_;
          ++variable_index) {
       // d_i
@@ -332,61 +334,57 @@ bool LateralTrajectoryOptimizerInterface::eval_jac_g(int n, const double* x,
 
     CHECK_EQ(nz_index, static_cast<std::size_t>(nele_jac));
   } else {
-    if (new_x) {
-      // TODO(kechxu) update
-    }
-
     std::fill(values, values + nele_jac, 0.0);
     // first, positional equality constraints
     std::size_t nz_index = 0;
 
     // fill acc constraint
-    // d_i'' - d_i+1''
+    // d_i+1'' - d_i''
     for (std::size_t variable_index = 0; variable_index + 1 < num_of_points_;
          ++variable_index) {
-      values[nz_index] = 1.0;
+      values[nz_index] = -1.0;
       ++nz_index;
 
-      values[nz_index] = -1.0;
+      values[nz_index] = 1.0;
       ++nz_index;
     }
 
     // fill velocity constraint
-    // d_i' - d_i+1 + 0.5 * ds * (d_i'' + d_i+1'')
+    // d_i+1' - d_i - 0.5 * ds * (d_i'' + d_i+1'')
     for (std::size_t variable_index = 0; variable_index + 1 < num_of_points_;
          ++variable_index) {
       // d_i'
-      values[nz_index] = 1.0;
-      ++nz_index;
-      // d_i+1'
       values[nz_index] = -1.0;
       ++nz_index;
+      // d_i+1'
+      values[nz_index] = 1.0;
+      ++nz_index;
       // d_i''
-      values[nz_index] = 0.5 * delta_s_;
+      values[nz_index] = -0.5 * delta_s_;
       ++nz_index;
       // d_i+1''
-      values[nz_index] = 0.5 * delta_s_;
+      values[nz_index] = -0.5 * delta_s_;
       ++nz_index;
     }
 
     // state constraint
-    // d_i - d_i+1 + d_i' * ds + 1/3 * d_i'' * ds^2 + 1/6 * d_i+1'' * ds^2
+    // d_i+1 - d_i - d_i' * ds + 1/3 * d_i'' * ds^2 - 1/6 * d_i+1'' * ds^2
     for (std::size_t variable_index = 0; variable_index + 1 < num_of_points_;
          ++variable_index) {
       // d_i
-      values[nz_index] = 1.0;
-      ++nz_index;
-      // d_i+1
       values[nz_index] = -1.0;
       ++nz_index;
+      // d_i+1
+      values[nz_index] = 1.0;
+      ++nz_index;
       // d_i'
-      values[nz_index] = delta_s_;
+      values[nz_index] = -delta_s_;
       ++nz_index;
       // d_i''
-      values[nz_index] = delta_s_ * delta_s_ / 3.0;
+      values[nz_index] = -delta_s_ * delta_s_ / 3.0;
       ++nz_index;
       // d_i+1''
-      values[nz_index] = delta_s_ * delta_s_ / 6.0;
+      values[nz_index] = -delta_s_ * delta_s_ / 6.0;
       ++nz_index;
     }
 
