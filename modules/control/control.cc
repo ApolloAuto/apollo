@@ -167,7 +167,9 @@ Status Control::ProduceControlCommand(ControlCommand *control_command) {
   }
 
   // check estop
-  estop_ = estop_ || trajectory_.estop().is_estop();
+  estop_ = FLAGS_enable_persistent_estop ?
+    estop_ || trajectory_.estop().is_estop() : trajectory_.estop().is_estop();
+
   if (trajectory_.estop().is_estop()) {
     estop_reason_ = "estop from planning";
   }
