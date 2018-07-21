@@ -1,9 +1,10 @@
 import { observable, computed, action } from "mobx";
 
 export default class Monitor {
-    @observable lastUpdateTimestamp = 0;
     @observable hasActiveNotification = false;
     @observable items = [];
+
+    lastUpdateTimestamp = 0;
     refreshTimer = null;
 
     startRefresh() {
@@ -33,26 +34,33 @@ export default class Monitor {
         }
 
         let newItems = [];
-        let newTimestamp = 0;
         if (world.notification) {
             newItems = world.notification.reverse().map(notification => {
                 return Object.assign(notification.item, {
                     timestampMs: notification.timestampSec * 1000,
                 });
             });
-            newTimestamp = Math.floor(newItems[0].timestampMs);
         } else if (world.monitor) {
             // deprecated: no timestamp for each item
             newItems = world.monitor.item;
-            newTimestamp = Math.floor(world.monitor.header.timestampSec * 1000);
         }
 
-        if (newTimestamp > this.lastUpdateTimestamp) {
+        if (this.hasNewNotification(this.items, newItems)) {
             this.hasActiveNotification = true;
-            this.lastUpdateTimestamp = newTimestamp;
+            this.lastUpdateTimestamp = Date.now();
             this.items.replace(newItems);
             this.startRefresh();
         }
+    }
+
+    hasNewNotification(items, newItems) {
+        if (items.length === 0 && newItems.length === 0) {
+            return false;
+        }
+        if (items.length === 0 || newItems.length === 0) {
+            return true;
+        }
+        return JSON.stringify(this.items[0]) !== JSON.stringify(newItems[0]);
     }
 
     // Inserts the provided message into the items. This is for
