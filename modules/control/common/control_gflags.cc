@@ -58,3 +58,7 @@ DEFINE_double(lock_steer_speed, 0.081,
 
 DEFINE_bool(enable_navigation_mode_handlilng, false,
             "Enable special handling for navigation mode");
+
+DEFINE_bool(enable_persistent_estop, false,
+            "True to persistent keep estop status, "
+            "pad reset can reset the estop status.");

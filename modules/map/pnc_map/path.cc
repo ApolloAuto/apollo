@@ -681,9 +681,25 @@ bool Path::GetProjectionWithHueristicParams(const Vec2d& point,
   const auto& nearest_seg = segments_[min_index];
   const auto prod = nearest_seg.ProductOntoUnit(point);
   const auto proj = nearest_seg.ProjectOntoUnit(point);
-  *accumulate_s = accumulated_s_[min_index] +
-                  std::max(0.0, std::min(proj, nearest_seg.length()));
-  *lateral = (prod > 0.0 ? 1 : -1) * *min_distance;
+  if (min_index == 0) {
+    *accumulate_s = std::min(proj, nearest_seg.length());
+    if (proj < 0) {
+      *lateral = prod;
+    } else {
+      *lateral = (prod > 0.0 ? 1 : -1) * *min_distance;
+    }
+  } else if (min_index == num_segments_ - 1) {
+    *accumulate_s = accumulated_s_[min_index] + std::max(0.0, proj);
+    if (proj > 0) {
+      *lateral = prod;
+    } else {
+      *lateral = (prod > 0.0 ? 1 : -1) * *min_distance;
+    }
+  } else {
+    *accumulate_s = accumulated_s_[min_index] +
+                    std::max(0.0, std::min(proj, nearest_seg.length()));
+    *lateral = (prod > 0.0 ? 1 : -1) * *min_distance;
+  }
   return true;
 }
 

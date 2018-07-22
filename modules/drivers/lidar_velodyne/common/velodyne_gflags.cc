@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ * Copyright 2017 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,3 +23,9 @@ DEFINE_string(velodyne_adapter_config_filename,
 DEFINE_string(velodyne_conf_file,
               "modules/drivers/lidar_velodyne/conf/velodyne_conf.pb.txt",
               "Velodyne conf file");
+
+DEFINE_bool(publish_raw_data, true, "VELODYNE_RAW_DATA");
+DEFINE_bool(publish_raw_pointcloud, true, "RAW_POINT_CLOUD");
+DEFINE_bool(publish_compensator_pointcloud, true, "POINT_CLOUD");
+
+DEFINE_bool(pipeline_mode, false, "exec point one by one");

@@ -43,7 +43,30 @@ NaviPathDecider::NaviPathDecider() : Task("NaviPathDecider") {
 }
 
 bool NaviPathDecider::Init(const PlanningConfig& config) {
+  speed_to_shift_param_table_.clear();
+  max_speed_levels_.clear();
   config_ = config.navi_planner_config().navi_path_decider_config();
+  auto later_shift_config_talbe = config_.later_shift_config_table();
+  for (const auto& item : later_shift_config_talbe.lateral_shift()) {
+    double max_speed_level = item.max_speed();
+    if (speed_to_shift_param_table_.find(max_speed_level) ==
+        speed_to_shift_param_table_.end()) {
+      speed_to_shift_param_table_.emplace(std::make_pair(
+          max_speed_level,
+          std::make_tuple(item.min_distance(), item.max_distance(),
+                          item.theta_change_ratio())));
+      max_speed_levels_.push_back(max_speed_level);
+    }
+  }
+  AINFO << "Maximum speeds and lateral shift parameters map : ";
+  for (const auto& data : speed_to_shift_param_table_) {
+    auto max_speed = data.first;
+    auto shift_param = data.second;
+    AINFO << "[max_sped : " << max_speed
+          << " ,min_distance : " << std::get<0>(shift_param)
+          << " ,max_distance : " << std::get<1>(shift_param)
+          << " ,theta_chage_ratio : " << std::get<2>(shift_param) << "]";
+  }
   is_init_ = true;
   return true;
 }
@@ -100,6 +123,7 @@ apollo::common::Status NaviPathDecider::Process(
   }
 
   // get y-coordinate of the target start path plan point
+  common::math::Vec2d adc_vec2d_point(vehicle_state_.x(), vehicle_state_.y());
   PlanningTarget planning_target = reference_line_info_->planning_target();
   double target_start_path_point_y = init_basic_path_y;
   if (reference_line_info_->IsChangeLanePath() &&
@@ -112,12 +136,12 @@ apollo::common::Status NaviPathDecider::Process(
                     "NaviPathDecider It is not safe to change lane");
     }
   } else if (planning_target.has_stop_point()) {
-    double start_point_s = path_points[0].s();
+    double stop_point_s = planning_target.stop_point().s();
     double lane_left_width = 0.0;
     double lane_right_width = 0.0;
     constexpr double KSideBuffer = 0.30;
-
-    bool bRet = reference_line.GetLaneWidth(start_point_s, &lane_left_width,
+    ADEBUG << "Pull Over lane path plan";
+    bool bRet = reference_line.GetLaneWidth(stop_point_s, &lane_left_width,
                                             &lane_right_width);
     if (bRet) {
       target_start_path_point_y =
@@ -127,8 +151,8 @@ apollo::common::Status NaviPathDecider::Process(
       return Status(apollo::common::ErrorCode::PLANNING_ERROR,
                     "NaviPathDecider can not pull over");
     }
-  } else {
-    ADEBUG << "common lane path plan";
+  } else if (reference_line.IsOnRoad(adc_vec2d_point)) {
+    ADEBUG << "Common lane path plan";
     target_start_path_point_y =
         NudgeProcess(reference_line, path_points, obstacles, *path_decision);
   }
@@ -141,13 +165,23 @@ apollo::common::Status NaviPathDecider::Process(
 
   // shift trajectory intercepted from the reference line to adc
   double shift_distance_y = start_point_y - init_basic_path_y;
+  double delta_theta = start_point_y * theta_change_ratio_ * M_PI / 180.0;
   ADEBUG << "in current plan, adc latteral to ref line shift distance : "
-         << start_point_y
-         << " ref line latteral to adc shift distance : " << shift_distance_y;
+         << start_point_y << " delta_theta : " << delta_theta
+         << " ref line latteral to adc shift distance : " << shift_distance_y
+         << " path point size : " << path_points.size();
   ShiftY(shift_distance_y, &path_points);
 
+  // adjust start path point theta
+  double diff_theta = path_points[0].theta() - vehicle_state_.heading();
+  double new_start_point_theta = diff_theta + delta_theta;
+  path_points[0].set_theta(new_start_point_theta);
+
   // calculate the value of the path trajectory later
-  reference_line_info_->AddCost(0.0);
+  constexpr double KDefaultDoubleLaneWidth = 7.5;
+  double path_l_cost = std::fabs(init_basic_path_y) / KDefaultDoubleLaneWidth *
+                       config_.path_l_cost();
+  reference_line_info_->AddCost(path_l_cost);
 
   DiscretizedPath discretized_path(path_points);
   path_data->SetReferenceLine(&(reference_line_info_->reference_line()));
@@ -177,10 +211,10 @@ bool NaviPathDecider::GetBasicPathData(
     std::vector<common::PathPoint>* const path_points) {
   CHECK_NOTNULL(path_points);
   constexpr size_t kMinRefPointNum = 10;
-  constexpr double unit_s = 0.5;
+  constexpr double unit_s = 1.0;
   if (reference_line.reference_points().size() < kMinRefPointNum) {
     AERROR
-        << "Reference line points is not enough to generate path trajectory.";
+        << "Reference line points are not enough to generate path trajectory.";
     return false;
   }
 
@@ -198,6 +232,7 @@ bool NaviPathDecider::GetBasicPathData(
   const double reference_line_len = reference_line.Length();
 
   // get basic path points form reference_line
+  ADEBUG << "Basic path data len ; " << reference_line_len;
   for (double s = start_plan_point_project_s; s < reference_line_len;
        s += unit_s) {
     const auto& ref_point = reference_line.GetReferencePoint(s);
@@ -222,23 +257,27 @@ void NaviPathDecider::ShiftY(
 double NaviPathDecider::SmoothInitY(const double actual_ref_init_y,
                                     const double target_path_init_y) {
   constexpr double kPositiveSign = 1.0;
-  const double min_init_y = config_.min_smooth_init_y();
-  const double max_init_y = config_.max_smooth_init_y();
-  double start_position_y = vehicle_state_.y();
   double shift_distance = 0.0;
+  double start_position_y = vehicle_state_.y();
+
+  // calculate lateral shift range and theta chage ratio
+  CalculateShiftParam();
 
   // get shift diretion
   double shift_direction =
       target_path_init_y < 0.0 ? -kPositiveSign : kPositiveSign;
 
-  // need to adjust in lateral
   double plan_point_to_target_distance = std::fabs(target_path_init_y);
-  if (plan_point_to_target_distance > min_init_y) {
-    shift_distance = (plan_point_to_target_distance < max_init_y)
+  // need to adjust in lateral
+  if (plan_point_to_target_distance > min_init_y_) {
+    shift_distance = (plan_point_to_target_distance < max_init_y_)
                          ? plan_point_to_target_distance
-                         : max_init_y;
+                         : max_init_y_;
+
+    // accurate to the centimeter scale
+    start_position_y =
+        shift_direction * std::floor(shift_distance * 100.0) * 0.01;
   }
-  start_position_y = shift_direction * shift_distance;
 
   return start_position_y;
 }
@@ -308,29 +347,12 @@ double NaviPathDecider::NudgeProcess(
     return nudge_position_y;
   }
 
-  // get the min lane width from
-  double min_lane_width = std::numeric_limits<double>::max();
-  constexpr double KNudgeEpsilon = 1e-6;
-  std::for_each(path_data_points.begin(), path_data_points.end(),
-                [&min_lane_width,
-                 reference_line](const apollo::common::PathPoint& path_point) {
-                  double lane_left_width = 0.0;
-                  double lane_right_width = 0.0;
-                  bool bRet = reference_line.GetLaneWidth(
-                      path_point.s(), &lane_left_width, &lane_right_width);
-                  if (bRet) {
-                    double lane_width = lane_left_width + lane_right_width;
-                    if (lane_width < min_lane_width) {
-                      min_lane_width = lane_width;
-                    }
-                  }
-                });
-
   // get nudge latteral position
   NaviObstacleDecider obstacle_decider;
   int lane_obstacles_num = 0;
+  constexpr double KNudgeEpsilon = 1e-6;
   double nudge_distance = obstacle_decider.GetNudgeDistance(
-      obstacles, path_decision, path_data_points, min_lane_width,
+      obstacles, reference_line, path_decision, path_data_points,
       &lane_obstacles_num);
   // adjust plan start point
   if (std::fabs(nudge_distance) > KNudgeEpsilon) {
@@ -348,7 +370,7 @@ double NaviPathDecider::NudgeProcess(
     }
 
     if (last_plan_has_nudge && lane_obstacles_num != 0) {
-      ADEBUG << "keepping last nudge path direction";
+      ADEBUG << "Keepping last nudge path direction";
       nudge_position_y = vehicle_state_.y();
     } else {
       // not need nudge or not need nudge keepping
@@ -359,5 +381,26 @@ double NaviPathDecider::NudgeProcess(
   return nudge_position_y;
 }
 
+void NaviPathDecider::CalculateShiftParam() {
+  // default lateral shift param
+  min_init_y_ = config_.default_min_smooth_init_y();
+  max_init_y_ = config_.default_max_smooth_init_y();
+  theta_change_ratio_ = config_.default_theta_change_ratio();
+
+  // match an appropriate lateral shift param from the configuration file based
+  // on the current state of the vehicle state
+  double adc_velocity = vehicle_state_.linear_velocity();
+  double adc_acceleration = vehicle_state_.linear_acceleration();
+  double max_adc_speed = adc_velocity + adc_acceleration * 0.1;
+  auto max_speed_level_itr = std::upper_bound(
+      max_speed_levels_.begin(), max_speed_levels_.end(), max_adc_speed);
+  if (max_speed_level_itr != max_speed_levels_.end()) {
+    auto max_speed_level = *max_speed_level_itr;
+    auto shift_param = speed_to_shift_param_table_[max_speed_level];
+    min_init_y_ = std::get<0>(shift_param);
+    max_init_y_ = std::get<1>(shift_param);
+    theta_change_ratio_ = std::get<2>(shift_param);
+  }
+}
 }  // namespace planning
 }  // namespace apollo

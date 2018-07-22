@@ -146,7 +146,7 @@ class DreamviewStore {
         let offsetY = 0;
         let mainViewHeightRatio = 0.65;
         if (!OFFLINE_PLAYBACK) {
-            const smallScreen = window.innerHeight < 800.0;
+            const smallScreen = window.innerHeight < 800.0 || window.innerWidth < 1280.0;
             offsetX = smallScreen ? 80 : 90; // width of side-bar
             offsetY = smallScreen ? 55 : 60; // height of header
             mainViewHeightRatio = 0.60;

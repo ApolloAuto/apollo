@@ -77,8 +77,8 @@ std::ostream &operator<<(
 #define GET_ELEMENT_BY_ID(TYPE)                                     \
   const TYPE##InfoConstPtr Get##TYPE(const std::string &id) {       \
     auto ret = HDMapUtil::BaseMap().Get##TYPE##ById(MakeMapId(id)); \
-    AERROR_IF(ret == nullptr)                                       \
-        << "failed to find " << #TYPE << " with id: " << id;        \
+    AERROR_IF(ret == nullptr) << "failed to find " << #TYPE         \
+                              << " with id: " << id;                \
     return ret;                                                     \
   }
 
@@ -149,10 +149,13 @@ class MapUtil {
 
   void PrintOverlap(const std::string &overlap_id) {
     const auto *overlap_ptr = GetOverlap(FLAGS_overlap);
-    if (overlap_ptr != nullptr) {
-      std::cout << "overlap[" << overlap_ptr->id().id() << "] info["
-                << overlap_ptr->overlap().DebugString() << "]" << std::endl;
+    if (overlap_ptr == nullptr) {
+      AERROR << "overlap_ptr is nullptr.";
+      return;
     }
+    ADEBUG << "overlap[" << overlap_ptr->id().id() << "] info["
+           << overlap_ptr->overlap().DebugString() << "]" << std::endl;
+
     for (const auto &object_info : overlap_ptr->overlap().object()) {
       if (object_info.has_lane_overlap_info()) {
         std::cout << "Lane : " << object_info.id().id() << std::endl;

@@ -423,6 +423,18 @@
                 }
               }
             },
+            "Notification": {
+              "fields": {
+                "timestampSec": {
+                  "type": "double",
+                  "id": 1
+                },
+                "item": {
+                  "type": "apollo.common.monitor.MonitorMessageItem",
+                  "id": 2
+                }
+              }
+            },
             "SimulationWorld": {
               "fields": {
                 "timestamp": {
@@ -481,7 +493,15 @@
                 },
                 "monitor": {
                   "type": "apollo.common.monitor.MonitorMessage",
-                  "id": 12
+                  "id": 12,
+                  "options": {
+                    "deprecated": true
+                  }
+                },
+                "notification": {
+                  "rule": "repeated",
+                  "type": "Notification",
+                  "id": 25
                 },
                 "engageAdvice": {
                   "type": "string",
@@ -609,7 +629,8 @@
                 "HTTP_RUNTIME_ERROR": 10001,
                 "RELATIVE_MAP_ERROR": 11000,
                 "RELATIVE_MAP_NOT_READY": 11001,
-                "DRIVER_ERROR_GNSS": 12000
+                "DRIVER_ERROR_GNSS": 12000,
+                "DRIVER_ERROR_VELODYNE": 13000
               }
             },
             "StatusPb": {

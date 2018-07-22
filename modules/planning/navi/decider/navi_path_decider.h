@@ -24,6 +24,7 @@
 
 #include <map>
 #include <string>
+#include <tuple>
 #include <vector>
 
 #include "gflags/gflags.h"
@@ -136,6 +137,10 @@ class NaviPathDecider : public Task {
                       const std::vector<common::PathPoint> &path_data_points,
                       const std::vector<const Obstacle *> &obstacles,
                       const PathDecision &path_decision);
+  /**
+   * @brief calculate latreal shift param by vehicle state and config
+   */
+  void CalculateShiftParam();
 
  private:
   common::VehicleState vehicle_state_;
@@ -143,6 +148,12 @@ class NaviPathDecider : public Task {
   std::string cur_reference_line_lane_id_;
   std::map<std::string, double> last_lane_id_to_adc_project_y_;
   std::map<std::string, bool> last_lane_id_to_nudge_flag_;
+  std::map<double, std::tuple<double, double, double>>
+      speed_to_shift_param_table_;
+  std::vector<double> max_speed_levels_;
+  double theta_change_ratio_ = 0.0;
+  double min_init_y_ = 0.0;
+  double max_init_y_ = 0.0;
 
   FRIEND_TEST(NaviPathDeciderTest, SmoothInitY);
 };
