@@ -29,8 +29,8 @@ namespace planning {
 
 ConstantJerkTrajectory1d::ConstantJerkTrajectory1d(
     const double p0, const double v0, const double a0,
-    const double jerk, const double param)
-  : p0_(p0), v0_(v0), a0_(a0), param_(param), jerk_(jerk) {
+    const double j, const double param)
+  : p0_(p0), v0_(v0), a0_(a0), param_(param), jerk_(j) {
   CHECK_GT(param, FLAGS_lattice_epsilon);
   p1_ = Evaluate(0, param_);
   v1_ = Evaluate(1, param_);
@@ -39,7 +39,6 @@ ConstantJerkTrajectory1d::ConstantJerkTrajectory1d(
 
 double ConstantJerkTrajectory1d::Evaluate(
     const std::uint32_t order, const double param) const {
-  CHECK_LT(param, param_ + FLAGS_lattice_epsilon);
   CHECK_GT(param, -FLAGS_lattice_epsilon);
   switch (order) {
     case 0: {
