@@ -133,24 +133,22 @@ void Trajectory1dGenerator::GenerateLateralTrajectoryBundle(
     GenerateTrajectory1DBundle<5>(init_lat_state_, end_conditions,
         ptr_lat_trajectory_bundle);
   } else {
-
-    std::cout << "calling optimization lateral trajectory" << std::endl;
     double s_min = 0.0;
     double s_max = 100.0;
 
-    double delta_s = 0.5;
+    double delta_s = 1.0;
 
     auto lateral_bounds = ptr_path_time_graph_->GetLateralBounds(
             s_min, s_max, delta_s);
 
     LateralTrajectoryOptimizer lateral_optimizer;
-    bool res = lateral_optimizer.optimize(init_lat_state_, delta_s, lateral_bounds);
+    bool res = lateral_optimizer.optimize(
+        init_lat_state_, delta_s, lateral_bounds);
 
     auto lateral_trajectory = lateral_optimizer.GetOptimalTrajectory();
 
-    ptr_lat_trajectory_bundle->push_back(std::make_shared<PiecewiseJerkTrajectory1d>(lateral_trajectory));
-
-    std::cout << "done with trajectory generation" << std::endl;
+    ptr_lat_trajectory_bundle->push_back(
+        std::make_shared<PiecewiseJerkTrajectory1d>(lateral_trajectory));
   }
 }
 
