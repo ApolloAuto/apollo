@@ -21,8 +21,6 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 cd "${DIR}/.."
 
-set -x
-
 function setup() {
   bash scripts/canbus.sh start
   bash scripts/gps.sh start
