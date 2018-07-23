@@ -37,6 +37,8 @@ DpStCost::DpStCost(const DpStSpeedConfig& config,
                    const common::TrajectoryPoint& init_point)
     : config_(config), obstacles_(obstacles), init_point_(init_point) {
   int index = 0;
+  CHECK_GT(config_.matrix_dimension_t(), 0);
+  CHECK_LT(config_.matrix_dimension_t(), 100000);
   for (auto& obstacle : obstacles) {
     boundary_map_[obstacle->st_boundary().id()] = index++;
   }
