@@ -72,9 +72,8 @@ class BlockingQueue {
       }
     }
 
-    T front(queue_.front());
+    *x = queue_.front();
     queue_.pop_front();
-    *x = front;
     return true;
   }
 
@@ -83,7 +82,7 @@ class BlockingQueue {
     while (queue_.empty()) {
       not_empty_.wait(lock);
     }
-    T front(queue_.front());
+    const T front = queue_.front();
     queue_.pop_front();
     return front;
   }
@@ -94,12 +93,11 @@ class BlockingQueue {
       not_empty_.wait(lock);
     }
     while (!queue_.empty() && count--) {
-      T front(queue_.front());
-      v.push_back(front);
+      v->push_back(queue_.front());
       queue_.pop_front();
     }
 
-    return v.size();
+    return v->size();
   }
 
   size_t size() const {
