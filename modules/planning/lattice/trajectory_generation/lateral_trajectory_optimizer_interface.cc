@@ -77,12 +77,9 @@ bool LateralTrajectoryOptimizerInterface::get_nlp_info(int& n, int& m,
   m = num_of_constraints_;
 
   nnz_jac_g = 11 * (num_of_points_ - 1) + 3;
-  nnz_jac_g_  = nnz_jac_g;
 
   // none zero hessian and lagrangian
   nnz_h_lag = num_of_variables_;
-
-  nnz_h_lag_ = nnz_h_lag;
 
   index_style = IndexStyleEnum::C_STYLE;
 
@@ -91,9 +88,7 @@ bool LateralTrajectoryOptimizerInterface::get_nlp_info(int& n, int& m,
 
 bool LateralTrajectoryOptimizerInterface::get_bounds_info(int n, double* x_l,
     double* x_u, int m, double* g_l, double* g_u) {
-
-  const double LARGE_VALUE = 2.0;
-
+  const double LARGE_VALUE = 1.0;
   // bounds for variables
   // d bounds;
   for (std::size_t i = 0; i < num_of_points_; ++i) {
@@ -151,20 +146,22 @@ bool LateralTrajectoryOptimizerInterface::get_starting_point(int n, bool init_x,
     double* x, bool init_z, double* z_L, double* z_U, int m, bool init_lambda,
     double* lambda) {
 
-  CHECK_EQ(std::size_t(n), num_of_variables_);
+  CHECK_EQ(num_of_variables_, static_cast<std::size_t>(n));
   CHECK(init_x == true);
   CHECK(init_z == false);
   CHECK(init_lambda == false);
 
+  auto offset_prime = num_of_points_;
+  auto offset_pprime = num_of_points_ + num_of_points_;
   for (std::size_t i = 0; i < num_of_points_; ++i) {
     x[i] = 0.0;
-    x[num_of_points_ + i] = 0.0;
-    x[num_of_points_ + num_of_points_ + i] = 0.0;
+    x[offset_prime + i] = 0.0;
+    x[offset_pprime + i] = 0.0;
   }
 
   x[0] = d_init_;
-  x[num_of_points_] = d_prime_init_;
-  x[num_of_points_ + num_of_points_] = d_pprime_init_;
+  x[offset_prime] = d_prime_init_;
+  x[offset_pprime] = d_pprime_init_;
   return true;
 }
 
@@ -182,7 +179,6 @@ bool LateralTrajectoryOptimizerInterface::eval_f(int n, const double* x,
     auto dist = x[i] - (d_bounds_[i].first + d_bounds_[i].second) * 0.5;
     obj_value += dist * dist * w_d_obs_;
   }
-
   return true;
 }
 
@@ -200,7 +196,6 @@ bool LateralTrajectoryOptimizerInterface::eval_grad_f(int n, const double* x,
 
     grad_f[offset_pprime + i] = 2.0 * x[offset_pprime + i] * w_d_pprime_;
   }
-
   return true;
 }
 
@@ -250,7 +245,7 @@ bool LateralTrajectoryOptimizerInterface::eval_jac_g(int n, const double* x,
     std::size_t nz_index = 0;
     std::size_t constraint_index = 0;
 
-    // acc constraint
+    // jerk constraint
     // d_i+1'' - d_i''
     for (std::size_t variable_index = 0; variable_index + 1 < num_of_points_;
          ++variable_index) {
@@ -340,10 +335,9 @@ bool LateralTrajectoryOptimizerInterface::eval_jac_g(int n, const double* x,
     CHECK_EQ(constraint_index, static_cast<std::size_t>(m));
   } else {
     std::fill(values, values + nele_jac, 0.0);
-    // first, positional equality constraints
     std::size_t nz_index = 0;
 
-    // fill acc constraint
+    // fill jerk constraint
     // d_i+1'' - d_i''
     for (std::size_t variable_index = 0; variable_index + 1 < num_of_points_;
          ++variable_index) {
@@ -372,8 +366,8 @@ bool LateralTrajectoryOptimizerInterface::eval_jac_g(int n, const double* x,
       ++nz_index;
     }
 
-    // state constraint
-    // d_i+1 - d_i - d_i' * ds + 1/3 * d_i'' * ds^2 - 1/6 * d_i+1'' * ds^2
+    // position constraint
+    // d_i+1 - d_i - d_i' * ds - 1/3 * d_i'' * ds^2 - 1/6 * d_i+1'' * ds^2
     for (std::size_t variable_index = 0; variable_index + 1 < num_of_points_;
          ++variable_index) {
       // d_i
@@ -407,8 +401,9 @@ bool LateralTrajectoryOptimizerInterface::eval_jac_g(int n, const double* x,
 bool LateralTrajectoryOptimizerInterface::eval_h(int n, const double* x,
     bool new_x, double obj_factor, int m, const double* lambda, bool new_lambda,
     int nele_hess, int* iRow, int* jCol, double* values) {
+  CHECK_EQ(num_of_variables_, static_cast<std::size_t>(nele_hess));
   if (values == nullptr) {
-    for (std::size_t i = 0; i < 3 * num_of_points_; ++i) {
+    for (std::size_t i = 0; i < num_of_variables_; ++i) {
       iRow[i] = i;
       jCol[i] = i;
     }
@@ -417,7 +412,7 @@ bool LateralTrajectoryOptimizerInterface::eval_h(int n, const double* x,
       values[i] = 4.0;
     }
 
-    for (std::size_t i = num_of_points_; i < 3 * num_of_points_; ++i) {
+    for (std::size_t i = num_of_points_; i < num_of_variables_; ++i) {
       values[i] = 2.0;
     }
   }
@@ -429,7 +424,6 @@ void LateralTrajectoryOptimizerInterface::finalize_solution(
     const double* z_U, int m, const double* g, const double* lambda,
     double obj_value, const Ipopt::IpoptData* ip_data,
     Ipopt::IpoptCalculatedQuantities* ip_cq) {
-
   opt_d_.reserve(num_of_points_);
   opt_d_prime_.reserve(num_of_points_);
   opt_d_pprime_.reserve(num_of_points_);

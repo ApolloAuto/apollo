@@ -189,6 +189,7 @@ double TrajectoryEvaluator::Evaluate(
   // Lateral costs
   double lat_offset_cost = LatOffsetCost(lat_trajectory, s_values);
 
+//  std::cout << "lon horizon:\t" << lon_trajectory->Evaluate(0, FLAGS_trajectory_time_length) << std::endl;
   double lat_comfort_cost = LatComfortCost(lon_trajectory, lat_trajectory);
 
   if (cost_components != nullptr) {
@@ -243,6 +244,10 @@ double TrajectoryEvaluator::LatOffsetCost(
   double cost_sqr_sum = 0.0;
   double cost_abs_sum = 0.0;
   for (const auto& s : s_values) {
+//    if (s > lat_trajectory->ParamLength()) {
+//      std::cout << "skip" << std::endl;
+//      break;
+//    }
     double lat_offset = lat_trajectory->Evaluate(0, s);
     double cost = lat_offset / FLAGS_lat_offset_bound;
     if (lat_offset * lat_offset_start < 0.0) {
@@ -285,6 +290,10 @@ double TrajectoryEvaluator::LatComfortCost(
   for (double t = 0.0; t < FLAGS_trajectory_time_length;
        t += FLAGS_trajectory_time_resolution) {
     double s = lon_trajectory->Evaluate(0, t);
+
+    if (s > lat_trajectory->ParamLength()) {
+      break;
+    }
     double s_dot = lon_trajectory->Evaluate(1, t);
     double s_dotdot = lon_trajectory->Evaluate(2, t);
     double l_prime = lat_trajectory->Evaluate(1, s);

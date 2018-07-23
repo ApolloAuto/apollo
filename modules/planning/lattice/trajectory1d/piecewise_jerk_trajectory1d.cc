@@ -25,6 +25,8 @@
 #include "modules/common/log.h"
 #include "modules/planning/common/planning_gflags.h"
 
+#include <iostream>
+
 namespace apollo {
 namespace planning {
 
@@ -53,9 +55,21 @@ void PiecewiseJerkTrajectory1d::AppendSegment(
 
 double PiecewiseJerkTrajectory1d::Evaluate(const std::uint32_t order,
     const double param) const {
-  CHECK(param >= 0.0);
+  if (!(param >= 0.0)) {
+    std::cout << "param:\t" << param << std::endl;
+    CHECK(false);
+  }
 
   auto it_lower = std::lower_bound(param_.begin(), param_.end(), param);
+
+  /**
+  if (it_lower == param_.begin()) {
+    return segments_[0].Evaluate(order, param);
+  } else {
+    auto index = std::distance(param_.begin(), it_lower);
+    return segments_[index - 1].Evaluate(0, param - param_[index - 1]);
+  }
+  **/
 
   int index = std::max(0,
       static_cast<int>(std::distance(param_.begin(), it_lower)) - 1);
