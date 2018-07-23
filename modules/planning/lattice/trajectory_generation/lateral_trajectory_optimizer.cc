@@ -33,7 +33,6 @@ namespace planning {
 bool LateralTrajectoryOptimizer::optimize(
     const std::array<double, 3>& d_state, const double delta_s,
     const std::vector<std::pair<double, double>>& lateral_bounds) {
-
   delta_s_ = delta_s;
 
   auto ptr_interface = new LateralTrajectoryOptimizerInterface(
@@ -57,6 +56,7 @@ bool LateralTrajectoryOptimizer::optimize(
   app->Options()->SetIntegerValue("acceptable_iter", 5);
   app->Options()->SetNumericValue("tol", 1.0e-3);
   app->Options()->SetNumericValue("acceptable_tol", 1.0e-3);
+//  app->Options()->SetStringValue("mehrotra_algorithm", "yes");
 
   Ipopt::ApplicationReturnStatus status = app->Initialize();
   if (status != Ipopt::Solve_Succeeded) {
