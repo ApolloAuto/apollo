@@ -24,7 +24,7 @@ def cuda_library_impl(ctx):
     flags = ' '.join(ctx.attr.flags)
     output = ctx.outputs.out
     lib_flags = ["--shared", "--compiler-options '-fPIC'"]
-    args = ctx.attr.flags + [f.path for f in ctx.files.srcs] + [f.path for f in ctx.files.hdrs] + [f.path for f in ctx.files.deps]
+    args = ctx.attr.flags + [f.path for f in ctx.files.srcs] + [f.path for f in ctx.files.deps]
     ctx.actions.run_shell(
             inputs=ctx.files.srcs + ctx.files.hdrs,
             outputs=[ctx.outputs.out],
