@@ -620,9 +620,6 @@ function main() {
     buildify)
       buildify
       ;;
-    build_gnss)
-      build_gnss
-      ;;
     build_py)
       build_py_proto
       ;;
