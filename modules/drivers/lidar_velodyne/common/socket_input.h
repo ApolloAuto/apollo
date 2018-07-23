@@ -35,9 +35,9 @@ class SocketInput : public Input {
  public:
   SocketInput();
   virtual ~SocketInput();
-  bool init(int port);
-  int get_firing_data_packet(velodyne_msgs::VelodynePacket *pkt);
-  int get_positioning_data_packtet(const NMEATimePtr &nmea_time);
+  bool init(int port) override;
+  int get_firing_data_packet(velodyne_msgs::VelodynePacket *pkt) override;
+  int get_positioning_data_packtet(const NMEATimePtr &nmea_time) override;
 
  private:
   int sockfd_;

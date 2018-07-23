@@ -57,8 +57,8 @@ class Velodyne64Driver : public VelodyneDriver {
   explicit Velodyne64Driver(const VelodyneConf& conf);
   virtual ~Velodyne64Driver() {}
 
-  bool init();
-  bool poll(velodyne_msgs::VelodyneScanUnifiedPtr scan);
+  bool init() override;
+  bool poll(velodyne_msgs::VelodyneScanUnifiedPtr scan) override;
 
  private:
 };
@@ -68,8 +68,8 @@ class Velodyne16Driver : public VelodyneDriver {
   explicit Velodyne16Driver(const VelodyneConf& conf);
   virtual ~Velodyne16Driver() {}
 
-  bool init();
-  bool poll(velodyne_msgs::VelodyneScanUnifiedPtr scan);
+  bool init() override;
+  bool poll(velodyne_msgs::VelodyneScanUnifiedPtr scan) override;
   void poll_positioning_packet();
 
  private:
