@@ -68,11 +68,11 @@ double PiecewiseJerkTrajectory1d::Evaluate(const std::uint32_t order,
 
   if (it_lower == param_.end()) {
     auto index = std::max(0, static_cast<int>(param_.size() - 2));
-    return segments_.back().Evaluate(0, param - param_[index]);
+    return segments_.back().Evaluate(order, param - param_[index]);
   }
     
   auto index = std::distance(param_.begin(), it_lower);
-  return segments_[index - 1].Evaluate(0, param - param_[index - 1]);
+  return segments_[index - 1].Evaluate(order, param - param_[index - 1]);
 
   // int index = std::max(0,
   //      static_cast<int>(std::distance(param_.begin(), it_lower)) - 1);
