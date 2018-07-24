@@ -231,6 +231,7 @@ Status LatticePlanner::PlanOnReferenceLine(
   std::size_t lat_jerk_failure_count = 0;
 
   std::size_t num_lattice_traj = 0;
+
   while (trajectory_evaluator.has_more_trajectory_pairs()) {
     double trajectory_pair_cost =
         trajectory_evaluator.top_trajectory_pair_cost();
