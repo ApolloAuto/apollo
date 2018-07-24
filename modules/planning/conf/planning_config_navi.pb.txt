@@ -1,4 +1,4 @@
-planner_type : LATTICE
+planner_type : EM
 em_planner_config {
     task : DP_POLY_PATH_OPTIMIZER
 
