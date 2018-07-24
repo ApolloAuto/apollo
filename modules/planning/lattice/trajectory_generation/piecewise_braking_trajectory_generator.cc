@@ -32,8 +32,8 @@ std::shared_ptr<Curve1d> PiecewiseBrakingTrajectoryGenerator::Generate(
     const double v_curr, const double a_comfort, const double d_comfort,
     const double max_time) {
 
-  std::shared_ptr<ConstantAccelerationTrajectory1d> ptr_trajectory =
-      std::make_shared<ConstantAccelerationTrajectory1d>(s_curr, v_curr);
+  std::shared_ptr<PiecewiseAccelerationTrajectory1d> ptr_trajectory =
+      std::make_shared<PiecewiseAccelerationTrajectory1d>(s_curr, v_curr);
 
   double s_dist = s_target - s_curr;
 
