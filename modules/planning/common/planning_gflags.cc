@@ -347,13 +347,13 @@ DEFINE_bool(lateral_optimization, true,
 DEFINE_double(weight_lateral_offset, 1.0,
     "weight for lateral offset "
     "in lateral trajectory optimization");
-DEFINE_double(weight_lateral_derivative, 1.0,
+DEFINE_double(weight_lateral_derivative, 10.0,
     "weight for lateral derivative "
     "in lateral trajectory optimization");
-DEFINE_double(weight_lateral_second_order_derivative, 1.0,
+DEFINE_double(weight_lateral_second_order_derivative, 30.0,
     "weight for lateral second order derivative "
     "in lateral trajectory optimization");
-DEFINE_double(weight_lateral_obstacle_distance, 1.0,
+DEFINE_double(weight_lateral_obstacle_distance, 5.0,
     "weight for lateral obstacle distance in lateral trajectory optimization");
 DEFINE_double(lateral_third_order_derivative_max, 2.0,
     "the maximal allowance for lateral third order derivative");
