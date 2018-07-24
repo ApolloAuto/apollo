@@ -342,7 +342,7 @@ DEFINE_double(polynomial_minimal_param, 0.01,
 DEFINE_double(lattice_stop_buffer, 0.02,
               "The buffer before the stop s to check trajectories.");
 
-DEFINE_bool(lateral_optimization, true,
+DEFINE_bool(lateral_optimization, false,
     "whether using optimization for lateral trajectory generation");
 DEFINE_double(weight_lateral_offset, 1.0,
     "weight for lateral offset "
