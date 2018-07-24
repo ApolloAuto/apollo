@@ -531,6 +531,50 @@ TEST_F(SunnyvaleBigLoopTest, crosswalk_01) {
   RUN_GOLDEN_TEST_DECISION(0);
 }
 
+/*
+ * crosswalk: timeout on static pedestrian on crosswalk
+ * bag: 2018-01-29-17-22-46/2018-01-29-17-31-47_9.bag
+ * decision: STOP first, and then CRUISE
+ */
+TEST_F(SunnyvaleBigLoopTest, crosswalk_02) {
+  ENABLE_RULE(TrafficRuleConfig::CROSSWALK, true);
+  ENABLE_RULE(TrafficRuleConfig::KEEP_CLEAR, false);
+  ENABLE_RULE(TrafficRuleConfig::SIGNAL_LIGHT, false);
+  ENABLE_RULE(TrafficRuleConfig::STOP_SIGN, false);
+
+  std::string seq_num = "201";
+  FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
+  FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
+  FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
+  FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
+  PlanningTestBase::SetUp();
+
+  RUN_GOLDEN_TEST_DECISION(0);
+
+  // check PlanningStatus value
+  auto* crosswalk_status = GetPlanningStatus()->mutable_crosswalk();
+  EXPECT_EQ("2832", crosswalk_status->crosswalk_id());
+  EXPECT_EQ(1, crosswalk_status->stop_timers_size());
+  EXPECT_EQ("11652", crosswalk_status->stop_timers(0).obstacle_id());
+
+  // step 2:
+  // timeout on static pesestrian
+
+  // set PlanningStatus
+  auto* crosswalk_config = PlanningTestBase::GetTrafficRuleConfig(
+      TrafficRuleConfig::CROSSWALK);
+  double stop_timeout = crosswalk_config->crosswalk().stop_timeout();
+  double wait_time = stop_timeout + 0.5;
+  for (int i = 0; i < crosswalk_status->stop_timers_size(); ++i) {
+    auto stop_timer = crosswalk_status->mutable_stop_timers(i);
+    if (stop_timer->obstacle_id() == "11652") {
+      stop_timer->set_stop_time(Clock::NowInSeconds() - wait_time);
+    }
+  }
+
+  RUN_GOLDEN_TEST_DECISION(1);
+}
+
 TEST_F(SunnyvaleBigLoopTest, traffic_light_green) {
   ENABLE_RULE(TrafficRuleConfig::CROSSWALK, false);
   ENABLE_RULE(TrafficRuleConfig::KEEP_CLEAR, false);
