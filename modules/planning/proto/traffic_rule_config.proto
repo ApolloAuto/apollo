@@ -48,7 +48,7 @@ message CrosswalkConfig {
   // loose stop rule beyond this l_distance
   optional double stop_loose_l_distance = 8 [ default=5.0 ]; // meter
   // stop timeout for bicycles/pedestrians which are not moving
-  optional double stop_timeout = 9 [ default=3.0 ]; // second
+  optional double stop_timeout = 9 [ default=10.0 ]; // second
 }
 
 message DestinationConfig {
