@@ -62,19 +62,24 @@ double PiecewiseJerkTrajectory1d::Evaluate(const std::uint32_t order,
 
   auto it_lower = std::lower_bound(param_.begin(), param_.end(), param);
 
-  /**
   if (it_lower == param_.begin()) {
     return segments_[0].Evaluate(order, param);
-  } else {
-    auto index = std::distance(param_.begin(), it_lower);
-    return segments_[index - 1].Evaluate(0, param - param_[index - 1]);
+  } 
+
+  if (it_lower == param_.end()) {
+    auto index = std::max(0, static_cast<int>(param_.size() - 2));
+    return segments_.back().Evaluate(0, param - param_[index]);
   }
-  **/
+    
+  auto index = std::distance(param_.begin(), it_lower);
+  return segments_[index - 1].Evaluate(0, param - param_[index - 1]);
 
-  int index = std::max(0,
-      static_cast<int>(std::distance(param_.begin(), it_lower)) - 1);
+  // int index = std::max(0,
+  //      static_cast<int>(std::distance(param_.begin(), it_lower)) - 1);
 
-  return segments_[index].Evaluate(order, param - param_[index]);
+  // AINFO << "index = " << index << " out of size = " << segments_.size();
+
+  // return segments_[index].Evaluate(order, param - param_[index]);
 }
 
 double PiecewiseJerkTrajectory1d::ParamLength() const {

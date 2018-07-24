@@ -409,11 +409,14 @@ bool LateralTrajectoryOptimizerInterface::eval_h(int n, const double* x,
     }
   } else {
     for (std::size_t i = 0; i < num_of_points_; ++i) {
-      values[i] = 4.0;
+      values[i] = 2.0 * w_d_ + 2.0 * w_d_obs_;
     }
 
-    for (std::size_t i = num_of_points_; i < num_of_variables_; ++i) {
-      values[i] = 2.0;
+    for (std::size_t i = num_of_points_; i < 2 * num_of_points_; ++i) {
+      values[i] = 2.0 * w_d_prime_;
+    }
+    for (std::size_t i = 2 * num_of_points_; i < num_of_variables_; ++i) {
+      values[i] = 2.0 * w_d_pprime_;
     }
   }
   return true;
