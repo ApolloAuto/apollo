@@ -18,14 +18,11 @@
  * @file
  **/
 
-#include "modules/planning/lattice/trajectory1d/piecewise_jerk_trajectory1d.h"
-
 #include <algorithm>
 
+#include "modules/planning/lattice/trajectory1d/piecewise_jerk_trajectory1d.h"
 #include "modules/common/log.h"
 #include "modules/planning/common/planning_gflags.h"
-
-#include <iostream>
 
 namespace apollo {
 namespace planning {
@@ -55,31 +52,21 @@ void PiecewiseJerkTrajectory1d::AppendSegment(
 
 double PiecewiseJerkTrajectory1d::Evaluate(const std::uint32_t order,
     const double param) const {
-  if (!(param >= 0.0)) {
-    std::cout << "param:\t" << param << std::endl;
-    CHECK(false);
-  }
+  CHECK_GE(param, -FLAGS_lattice_epsilon);
 
   auto it_lower = std::lower_bound(param_.begin(), param_.end(), param);
 
   if (it_lower == param_.begin()) {
     return segments_[0].Evaluate(order, param);
-  } 
+  }
 
   if (it_lower == param_.end()) {
     auto index = std::max(0, static_cast<int>(param_.size() - 2));
     return segments_.back().Evaluate(order, param - param_[index]);
   }
-    
+
   auto index = std::distance(param_.begin(), it_lower);
   return segments_[index - 1].Evaluate(order, param - param_[index - 1]);
-
-  // int index = std::max(0,
-  //      static_cast<int>(std::distance(param_.begin(), it_lower)) - 1);
-
-  // AINFO << "index = " << index << " out of size = " << segments_.size();
-
-  // return segments_[index].Evaluate(order, param - param_[index]);
 }
 
 double PiecewiseJerkTrajectory1d::ParamLength() const {

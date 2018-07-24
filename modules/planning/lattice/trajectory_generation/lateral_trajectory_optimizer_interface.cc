@@ -18,14 +18,12 @@
  * @file
  **/
 
-#include "lateral_trajectory_optimizer_interface.h"
+#include "modules/planning/lattice/trajectory_generation/lateral_trajectory_optimizer_interface.h"
 
 #include <utility>
 
 #include "modules/common/log.h"
 #include "modules/planning/lattice/trajectory1d/constant_jerk_trajectory1d.h"
-
-#include <iostream>
 
 namespace apollo {
 namespace planning {
@@ -34,7 +32,7 @@ LateralTrajectoryOptimizerInterface::LateralTrajectoryOptimizerInterface(
     const double d_init, const double d_prime_init, const double d_pprime_init,
     const double delta_s, const double d_ppprime_max,
     std::vector<std::pair<double, double>> d_bounds) {
-  CHECK(d_bounds.size() > 1);
+  CHECK_GT(d_bounds.size(), 1);
 
   d_init_ = d_init;
 
@@ -57,8 +55,9 @@ LateralTrajectoryOptimizerInterface::LateralTrajectoryOptimizerInterface(
   d_bounds_ = std::move(d_bounds);
 }
 
-void LateralTrajectoryOptimizerInterface::set_objective_weights(const double w_d,
-    const double w_d_prime, const double w_d_pprime, const double w_d_obs) {
+void LateralTrajectoryOptimizerInterface::set_objective_weights(
+    const double w_d, const double w_d_prime, const double w_d_pprime,
+    const double w_d_obs) {
   w_d_ = w_d;
 
   w_d_prime_ = w_d_prime;
