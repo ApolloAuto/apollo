@@ -26,6 +26,7 @@
 #include <utility>
 #include <vector>
 
+#include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/linear_interpolation.h"
 #include "modules/common/math/path_matcher.h"
 #include "modules/planning/common/obstacle.h"
@@ -358,6 +359,19 @@ std::vector<std::pair<double, double>> PathTimeGraph::GetLateralBounds(
   for (const SLBoundary& static_sl_boundary : static_obs_sl_boundaries_) {
     UpdateLateralBoundsByObstacle(static_sl_boundary, discretized_path,
         s_start, s_end, &bounds);
+  }
+
+  const auto& vehicle_config =
+      common::VehicleConfigHelper::instance()->GetConfig();
+  double ego_width = vehicle_config.vehicle_param().width();
+
+  for (std::size_t i = 0; i < bounds.size(); ++i) {
+    bounds[i].first += ego_width / 2.0;
+    bounds[i].second -= ego_width / 2.0;
+    if (bounds[i].first >= bounds[i].second) {
+      bounds[i].first = 0.0;
+      bounds[i].second = 0.0;
+    }
   }
   return bounds;
 }
