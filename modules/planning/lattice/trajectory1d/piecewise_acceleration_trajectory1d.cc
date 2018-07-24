@@ -118,12 +118,15 @@ double ConstantAccelerationTrajectory1d::Evaluate_s(const double t) const {
 double ConstantAccelerationTrajectory1d::Evaluate_v(const double t) const {
   auto it_lower = std::lower_bound(t_.begin(), t_.end(), t);
   auto index = std::distance(t_.begin(), it_lower);
+  if (index == 0) {
+    return v_[0];
+  }
 
   double v0 = v_[index - 1];
   double t0 = t_[index - 1];
 
-  double v1 = v_.back();
-  double t1 = t_.back();
+  double v1 = v_[index];
+  double t1 = t_[index];
 
   double v = apollo::common::math::lerp(v0, t0, v1, t1, t);
   return v;
