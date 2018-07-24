@@ -15,7 +15,7 @@ message VelodyneConf {
     required uint32 index = 1 [default = 0];
     optional string position = 2 [default = "centre"];
     // packet params
-    optional string frame_id = 3 [default = "velodyne16"]; 
+    optional string frame_id = 3;
     optional uint32 firing_data_port = 4 [default = 2368];
     optional uint32 positioning_data_port = 5 [default = 8308];
     optional double rpm = 6 [default = 600.0];
