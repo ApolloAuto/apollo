@@ -43,20 +43,31 @@ class ConstantJerkTrajectory1d : public Curve1d {
 
   std::string ToString() const;
 
-  double GetEndState() const;
+  double start_position() const;
 
-  double GetEndVelocity() const;
+  double start_velocity() const;
 
-  double GetEndAcceleration() const;
+  double start_acceleration() const;
+
+  double end_position() const;
+
+  double end_velocity() const;
+
+  double end_acceleration() const;
+
+  double jerk() const;
 
  private:
   double p0_;
   double v0_;
   double a0_;
+
   double p1_;
   double v1_;
   double a1_;
-  double end_param_;
+
+  double param_;
+
   double jerk_;
 };
 

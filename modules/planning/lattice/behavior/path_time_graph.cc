@@ -26,6 +26,7 @@
 #include <utility>
 #include <vector>
 
+#include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/linear_interpolation.h"
 #include "modules/common/math/path_matcher.h"
 #include "modules/planning/common/obstacle.h"
@@ -333,6 +334,84 @@ std::vector<PathTimePoint> PathTimeGraph::GetObstacleSurroundingPoints(
 bool PathTimeGraph::IsObstacleInGraph(const std::string& obstacle_id) {
   return path_time_obstacle_map_.find(obstacle_id) !=
          path_time_obstacle_map_.end();
+}
+
+std::vector<std::pair<double, double>> PathTimeGraph::GetLateralBounds(
+    const double s_start, const double s_end, const double s_resolution) {
+  CHECK_LT(s_start, s_end);
+  CHECK_GT(s_resolution, FLAGS_lattice_epsilon);
+  std::vector<std::pair<double, double>> bounds;
+  std::vector<double> discretized_path;
+  double s_range = s_end - s_start;
+  double s_curr = s_start;
+  std::size_t num_bound = static_cast<std::size_t>(s_range / s_resolution);
+  // Initialize bounds by reference line width
+  for (std::size_t i = 0; i < num_bound; ++i) {
+    double left_width = FLAGS_default_reference_line_width / 2.0;
+    double right_width = FLAGS_default_reference_line_width / 2.0;
+    ptr_reference_line_info_->reference_line().GetLaneWidth(
+        s_curr, &left_width, &right_width);
+    bounds.emplace_back(-right_width, left_width);
+    discretized_path.push_back(s_curr);
+    s_curr += s_resolution;
+  }
+
+  for (const SLBoundary& static_sl_boundary : static_obs_sl_boundaries_) {
+    UpdateLateralBoundsByObstacle(static_sl_boundary, discretized_path,
+        s_start, s_end, &bounds);
+  }
+
+  const auto& vehicle_config =
+      common::VehicleConfigHelper::instance()->GetConfig();
+  double ego_width = vehicle_config.vehicle_param().width();
+
+  for (std::size_t i = 0; i < bounds.size(); ++i) {
+    bounds[i].first += ego_width / 2.0;
+    bounds[i].second -= ego_width / 2.0;
+    if (bounds[i].first >= bounds[i].second) {
+      bounds[i].first = 0.0;
+      bounds[i].second = 0.0;
+    }
+  }
+  return bounds;
+}
+
+void PathTimeGraph::UpdateLateralBoundsByObstacle(
+    const SLBoundary& sl_boundary,
+    const std::vector<double>& discretized_path,
+    const double s_start, const double s_end,
+    std::vector<std::pair<double, double>>* const bounds) {
+  if (sl_boundary.start_s() > s_end || sl_boundary.end_s() < s_start) {
+    return;
+  }
+  auto start_iter = std::lower_bound(
+      discretized_path.begin(), discretized_path.end(), sl_boundary.start_s());
+  auto end_iter = std::upper_bound(
+      discretized_path.begin(), discretized_path.end(), sl_boundary.start_s());
+  std::size_t start_index = start_iter - discretized_path.begin();
+  std::size_t end_index = end_iter - discretized_path.begin();
+  if (sl_boundary.end_l() > -FLAGS_lattice_epsilon &&
+      sl_boundary.start_l() < FLAGS_lattice_epsilon) {
+    for (std::size_t i = start_index; i < end_index; ++i) {
+      bounds->operator[](i).first = -FLAGS_lattice_epsilon;
+      bounds->operator[](i).second = FLAGS_lattice_epsilon;
+    }
+    return;
+  }
+  if (sl_boundary.end_l() < FLAGS_lattice_epsilon) {
+    for (std::size_t i = start_index; i < end_index; ++i) {
+      bounds->operator[](i).first =
+          std::max(bounds->operator[](i).first, sl_boundary.end_l());
+    }
+    return;
+  }
+  if (sl_boundary.start_l() < -FLAGS_lattice_epsilon) {
+    for (std::size_t i = start_index; i < end_index; ++i) {
+      bounds->operator[](i).second =
+          std::min(bounds->operator[](i).second, sl_boundary.end_l());
+    }
+    return;
+  }
 }
 
 }  // namespace planning
