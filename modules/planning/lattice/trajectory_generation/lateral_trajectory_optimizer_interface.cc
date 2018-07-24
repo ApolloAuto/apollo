@@ -349,7 +349,7 @@ bool LateralTrajectoryOptimizerInterface::eval_jac_g(int n, const double* x,
     }
 
     // fill velocity constraint
-    // d_i+1' - d_i - 0.5 * ds * (d_i'' + d_i+1'')
+    // d_i+1' - d_i' - 0.5 * ds * (d_i'' + d_i+1'')
     for (std::size_t variable_index = 0; variable_index + 1 < num_of_points_;
          ++variable_index) {
       // d_i'
