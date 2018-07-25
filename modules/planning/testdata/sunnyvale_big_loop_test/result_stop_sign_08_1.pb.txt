@@ -9,10 +9,10 @@ decision {
       reason_code: STOP_REASON_STOP_SIGN
       reason: "stop by SS_CREEP_2203"
       stop_point {
-        x: 586978.3235742352
-        y: 4141242.4926856607
+        x: 586978.32357418328
+        y: 4141242.4926718017
       }
-      stop_heading: 2.67318241685021
+      stop_heading: 2.673177386626687
       change_lane_type: FORWARD
     }
   }
@@ -25,11 +25,11 @@ decision {
           reason_code: STOP_REASON_STOP_SIGN
           distance_s: -0.3
           stop_point {
-            x: 586978.3235742352
-            y: 4141242.4926856607
+            x: 586978.32357418328
+            y: 4141242.4926718017
             z: 0
           }
-          stop_heading: 2.67318241685021
+          stop_heading: 2.673177386626687
         }
       }
     }
