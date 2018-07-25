@@ -66,9 +66,9 @@ void TrajectoryStitcher::TransformLastPublishedTrajectory(
 
   // R^-1
   float cos_theta =
-      common::math::sin(common::math::Angle16::from_rad(theta_diff));
+      common::math::cos(common::math::Angle16::from_rad(theta_diff));
   float sin_theta =
-      -common::math::cos(common::math::Angle16::from_rad(theta_diff));
+      -common::math::sin(common::math::Angle16::from_rad(theta_diff));
 
   // -R^-1 * t
   auto tx = -(cos_theta * x_diff - sin_theta * y_diff);
