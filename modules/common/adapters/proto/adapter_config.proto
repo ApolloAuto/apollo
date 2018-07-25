@@ -65,6 +65,8 @@ message AdapterConfig {
     RTCM_DATA = 57;
     RACOBIT_RADAR = 59;
     POINT_CLOUD_RAW = 60;
+    VELODYNE_RAW = 61;
+    POINT_CLOUD_FUSION = 62;
   }
   enum Mode {
     RECEIVE_ONLY = 0;

@@ -25,14 +25,15 @@
 #include <utility>
 #include <vector>
 
+#include "modules/planning/proto/lattice_structure.pb.h"
+
 #include "modules/planning/lattice/behavior/path_time_graph.h"
 #include "modules/planning/lattice/behavior/prediction_querier.h"
-#include "modules/planning/lattice/trajectory_generation/end_condition_sampler.h"
 #include "modules/planning/lattice/trajectory1d/lattice_trajectory1d.h"
+#include "modules/planning/lattice/trajectory_generation/end_condition_sampler.h"
 #include "modules/planning/math/curve1d/curve1d.h"
 #include "modules/planning/math/curve1d/quartic_polynomial_curve1d.h"
 #include "modules/planning/math/curve1d/quintic_polynomial_curve1d.h"
-#include "modules/planning/proto/lattice_structure.pb.h"
 
 namespace apollo {
 namespace planning {
@@ -75,7 +76,7 @@ class Trajectory1dGenerator {
   void GenerateTrajectory1DBundle(
       const std::array<double, 3>& init_state,
       const std::vector<std::pair<std::array<double, 3>, double>>&
-      end_conditions,
+          end_conditions,
       std::vector<std::shared_ptr<Curve1d>>* ptr_trajectory_bundle) const;
 
  private:
@@ -91,8 +92,7 @@ class Trajectory1dGenerator {
 template <>
 inline void Trajectory1dGenerator::GenerateTrajectory1DBundle<4>(
     const std::array<double, 3>& init_state,
-    const std::vector<std::pair<std::array<double, 3>, double>>&
-    end_conditions,
+    const std::vector<std::pair<std::array<double, 3>, double>>& end_conditions,
     std::vector<std::shared_ptr<Curve1d>>* ptr_trajectory_bundle) const {
   CHECK_NOTNULL(ptr_trajectory_bundle);
   CHECK(!end_conditions.empty());
@@ -101,8 +101,7 @@ inline void Trajectory1dGenerator::GenerateTrajectory1DBundle<4>(
   for (const auto& end_condition : end_conditions) {
     auto ptr_trajectory1d = std::make_shared<LatticeTrajectory1d>(
         std::shared_ptr<Curve1d>(new QuarticPolynomialCurve1d(
-            init_state,
-            {end_condition.first[1], end_condition.first[2]},
+            init_state, {end_condition.first[1], end_condition.first[2]},
             end_condition.second)));
 
     ptr_trajectory1d->set_target_velocity(end_condition.first[1]);
@@ -114,8 +113,7 @@ inline void Trajectory1dGenerator::GenerateTrajectory1DBundle<4>(
 template <>
 inline void Trajectory1dGenerator::GenerateTrajectory1DBundle<5>(
     const std::array<double, 3>& init_state,
-    const std::vector<std::pair<std::array<double, 3>, double>>&
-    end_conditions,
+    const std::vector<std::pair<std::array<double, 3>, double>>& end_conditions,
     std::vector<std::shared_ptr<Curve1d>>* ptr_trajectory_bundle) const {
   CHECK_NOTNULL(ptr_trajectory_bundle);
   CHECK(!end_conditions.empty());
