@@ -257,6 +257,7 @@ class AdapterManager {
 
   REGISTER_ADAPTER(VelodyneRaw0);
   REGISTER_ADAPTER(PointCloudRaw0);
+  REGISTER_ADAPTER(PointCloudFusion);
 
   REGISTER_ADAPTER(VLP16PointCloud);
   REGISTER_ADAPTER(ImageFront);

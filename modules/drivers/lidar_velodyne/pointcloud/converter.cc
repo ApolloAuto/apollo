@@ -67,8 +67,8 @@ bool Converter::append(const velodyne_msgs::VelodyneScanUnifiedPtr scan_msg) {
   return parser_->append(scan_msg);
 }
 
-bool Converter::init(VelodyneConf* conf) {
-  config_ = *conf;
+bool Converter::init(const VelodyneConf& conf) {
+  config_ = conf;
   parser_ = VelodyneParserFactory::create_parser(&config_);
   if (parser_ == nullptr) {
     AERROR << "velodyne create parser fail.";

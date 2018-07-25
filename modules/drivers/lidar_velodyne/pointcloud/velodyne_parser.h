@@ -261,7 +261,7 @@ class Velodyne64Parser : public VelodyneParser {
 
   void generate_pointcloud(
       const velodyne_msgs::VelodyneScanUnified::ConstPtr &scan_msg,
-      VPointCloud::Ptr out_msg);
+      VPointCloud::Ptr out_msg) override;
   void order(VPointCloud::Ptr cloud);
   bool setup() override;
 
@@ -290,10 +290,10 @@ class Velodyne16Parser : public VelodyneParser {
 
   void generate_pointcloud(
       const velodyne_msgs::VelodyneScanUnified::ConstPtr &scan_msg,
-      VPointCloud::Ptr out_msg);
+      VPointCloud::Ptr out_msg) override;
   void order(VPointCloud::Ptr cloud);
   bool append(const velodyne_msgs::VelodyneScanUnified::ConstPtr &scan_msg);
-  virtual VPointCloud::Ptr pack();
+  VPointCloud::Ptr pack() override;
 
  private:
   double get_timestamp(double base_time, float time_offset,

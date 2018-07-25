@@ -33,6 +33,8 @@ DECLARE_string(pad_topic);
 DECLARE_string(control_command_topic);
 DECLARE_string(pointcloud_topic);
 DECLARE_string(pointcloud_raw_topic);
+DECLARE_string(velodyne_raw_topic);
+DECLARE_string(pointcloud_fusion_topic);
 DECLARE_string(vlp16_pointcloud_topic);
 DECLARE_string(prediction_topic);
 DECLARE_string(perception_obstacle_topic);
