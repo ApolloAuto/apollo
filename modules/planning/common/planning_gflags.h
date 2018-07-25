@@ -191,6 +191,8 @@ DECLARE_double(time_min_density);
 DECLARE_double(comfort_acceleration_factor);
 DECLARE_double(polynomial_minimal_param);
 DECLARE_double(lattice_stop_buffer);
+DECLARE_double(max_s_lateral_optimization);
+DECLARE_double(default_delta_s_lateral_optimization);
 
 DECLARE_bool(use_planning_fallback);
 
