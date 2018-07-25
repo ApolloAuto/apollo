@@ -138,6 +138,7 @@ using VelodyneRaw0Adapter = Adapter<velodyne_msgs::VelodyneScanUnified>;
 using VelodyneRaw1Adapter = Adapter<velodyne_msgs::VelodyneScanUnified>;
 using PointCloudRaw0Adapter = Adapter<::sensor_msgs::PointCloud2>;
 using PointCloudRaw1Adapter = Adapter<::sensor_msgs::PointCloud2>;
+using PointCloudFusionAdapter = Adapter<::sensor_msgs::PointCloud2>;
 
 }  // namespace adapter
 }  // namespace common
