@@ -49,6 +49,33 @@ cc_test(
     ],
 )
 
+cc_binary(
+    name = "predictor_manager_fuzz",
+    srcs = ["predictor_manager_fuzz.cc"],
+    data = [
+        "//modules/prediction:prediction_data",
+        "//modules/prediction:prediction_testdata",
+    ],
+    deps = [
+        "//modules/common/util",
+        "//modules/common/adapters:adapter_manager",
+        "//modules/perception/proto:perception_proto",
+        "//modules/prediction/proto:prediction_conf_proto",
+        "//modules/prediction/common:kml_map_based_test",
+        "//modules/prediction/common:prediction_gflags",
+        "//modules/prediction/container:container_manager",
+        "//modules/prediction/container/obstacles:obstacles_container",
+        "//modules/prediction/evaluator:evaluator_manager",
+        "//modules/prediction/predictor:predictor_manager",
+        "@libprotobuf_mutator//:mutator",
+    ],
+    copts = [
+        "-fsanitize=fuzzer,address",
+        "-Iexternal/libprotobuf_mutator/src/",
+    ],
+    linkopts = ["-fsanitize=fuzzer,address"],
+)
+
 cc_library(
     name = "predictor",
     srcs = ["predictor.cc"],
