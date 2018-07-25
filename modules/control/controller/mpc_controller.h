@@ -101,15 +101,11 @@ class MPCController : public Controller {
   std::string Name() const override;
 
  protected:
-  void UpdateStateAnalyticalMatching(SimpleMPCDebug *debug);
+  void UpdateState(SimpleMPCDebug *debug);
 
   void UpdateMatrix(SimpleMPCDebug *debug);
 
   void FeedforwardUpdate(SimpleMPCDebug *debug);
-
-  double GetLateralError(
-      const common::math::Vec2d &point,
-      apollo::common::TrajectoryPoint *trajectory_point) const;
 
   void ComputeLateralErrors(const double x, const double y, const double theta,
                             const double linear_v, const double angular_v,
@@ -120,7 +116,9 @@ class MPCController : public Controller {
                                  SimpleMPCDebug *debug);
 
   bool LoadControlConf(const ControlConf *control_conf);
+
   void InitializeFilters(const ControlConf *control_conf);
+
   void LogInitParameters();
 
   void ProcessLogs(const SimpleMPCDebug *debug, const canbus::Chassis *chassis);

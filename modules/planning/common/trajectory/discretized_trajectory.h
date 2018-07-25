@@ -56,7 +56,7 @@ class DiscretizedTrajectory : public Trajectory {
 
   common::TrajectoryPoint Evaluate(const double relative_time) const override;
 
-  virtual uint32_t QueryNearestPoint(const double relative_time) const;
+  virtual uint32_t QueryLowerBoundPoint(const double relative_time) const;
 
   virtual uint32_t QueryNearestPoint(const common::math::Vec2d& position) const;
 

@@ -228,8 +228,9 @@ Status NaviPlanner::PlanOnReferenceLine(
   }
 
   if (FLAGS_enable_trajectory_check) {
-    if (!ConstraintChecker::ValidTrajectory(trajectory)) {
-      std::string msg("Failed to validate current planning trajectory.");
+    if (ConstraintChecker::ValidTrajectory(trajectory) !=
+        ConstraintChecker::Result::VALID) {
+      std::string msg("Current planning trajectory is not valid.");
       AERROR << msg;
       return Status(ErrorCode::PLANNING_ERROR, msg);
     }

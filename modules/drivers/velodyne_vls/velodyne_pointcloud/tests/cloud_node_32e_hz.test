@@ -1,0 +1,28 @@
+<!-- -*- mode: XML -*- -->
+<!-- rostest of reading Velodyne 32E PCAP files -->
+
+<launch>
+
+  <!-- start driver with example PCAP file -->
+  <node pkg="velodyne_driver" type="velodyne_node" name="velodyne_node">
+    <param name="model" value="32E"/>
+    <param name="pcap" value="$(find velodyne_pointcloud)/tests/32e.pcap"/>
+  </node>
+
+  <!-- start cloud node with test calibration file -->
+  <node pkg="velodyne_pointcloud" type="cloud_node" name="cloud_node">
+    <param name="calibration"
+           value="$(find velodyne_pointcloud)/params/32db.yaml"/>
+  </node>
+
+  <!-- verify PointCloud2 publication rate -->
+  <test test-name="cloud_node_32e_hz_test" pkg="rostest"
+        type="hztest" name="hztest_cloud_node_32e" >
+    <param name="hz" value="10.0" />
+    <param name="hzerror" value="3.0" />
+    <param name="test_duration" value="5.0" />    
+    <param name="topic" value="velodyne_points" />  
+    <param name="wait_time" value="2.0" />  
+  </test>
+
+</launch>

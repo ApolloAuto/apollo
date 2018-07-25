@@ -100,11 +100,11 @@ em_planner_config {
     }
     qp_st_speed_config {
         total_path_length: 250.0
-        total_time: 8.0
+        total_time: 7.0
         preferred_max_acceleration: 2.5
         preferred_min_deceleration: -3.3
         max_acceleration: 3.0
-        min_deceleration: -4.5
+        min_deceleration: -4.0
 
         qp_spline_config {
             number_of_discrete_graph_t: 4

@@ -47,7 +47,7 @@ TEST(basic_test, DiscretizedTrajectory) {
   EXPECT_DOUBLE_EQ(p1.relative_time(), 4.0);
   EXPECT_DOUBLE_EQ(p1.v(), 5.4412586837131443);
 
-  int k1 = discretized_trajectory.QueryNearestPoint(2.12);
+  int k1 = discretized_trajectory.QueryLowerBoundPoint(2.12);
   EXPECT_EQ(k1, 62);
 
   int k2 = discretized_trajectory.QueryNearestPoint({587264.0, 4140966.2});

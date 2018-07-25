@@ -668,8 +668,27 @@ bool NavigationLane::CreateMap(const MapGenerationParam &map_config,
     }
   }
 
-  // Set neighbor information for each lane
   int lane_num = hdmap->lane_size();
+
+  // Set road boundary
+  auto *road = hdmap->add_road();
+  road->mutable_id()->set_id("road_" + hdmap->lane(0).id().id());
+  auto *section = road->add_section();
+  for (int i = 0; i < lane_num; ++i) {
+    auto *lane_id = section->add_lane_id();
+    lane_id->CopyFrom(hdmap->lane(0).id());
+  }
+  auto *outer_polygon = section->mutable_boundary()->mutable_outer_polygon();
+  auto *left_edge = outer_polygon->add_edge();
+  left_edge->set_type(apollo::hdmap::BoundaryEdge::LEFT_BOUNDARY);
+  left_edge->mutable_curve()->CopyFrom(hdmap->lane(0).left_boundary().curve());
+
+  auto *right_edge = outer_polygon->add_edge();
+  right_edge->set_type(apollo::hdmap::BoundaryEdge::RIGHT_BOUNDARY);
+  right_edge->mutable_curve()->
+      CopyFrom(hdmap->lane(lane_num - 1).right_boundary().curve());
+
+  // Set neighbor information for each lane
   if (lane_num < 2) {
     return true;
   }
@@ -684,7 +703,6 @@ bool NavigationLane::CreateMap(const MapGenerationParam &map_config,
           hdmap->lane(i + 1).id());
     }
   }
-
   return true;
 }
 

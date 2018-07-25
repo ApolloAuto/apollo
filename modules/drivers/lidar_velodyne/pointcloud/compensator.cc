@@ -16,69 +16,67 @@
 
 #include "modules/drivers/lidar_velodyne/pointcloud/compensator.h"
 
+#include <stdlib.h>
 #include <limits>
 #include <string>
 
 #include "ros/this_node.h"
 
+#include "modules/common/adapters/adapter_manager.h"
+#include "modules/common/log.h"
+
 namespace apollo {
 namespace drivers {
 namespace lidar_velodyne {
 
-Compensator::Compensator(ros::NodeHandle& node, ros::NodeHandle& private_nh)
-    : tf2_transform_listener_(tf2_buffer_, node),
-      x_offset_(-1),
+using ::apollo::common::adapter::AdapterManager;
+
+Compensator::Compensator(const VelodyneConf& conf)
+    : x_offset_(-1),
       y_offset_(-1),
       z_offset_(-1),
       timestamp_offset_(-1),
-      timestamp_data_size_(0) {
-  private_nh.param("child_frame_id", child_frame_id_,
-                   std::string("velodyne64"));
-  private_nh.param("topic_compensated_pointcloud",
-                   topic_compensated_pointcloud_, TOPIC_COMPENSATED_POINTCLOUD);
-  private_nh.param("topic_pointcloud", topic_pointcloud_, TOPIC_POINTCLOUD);
-  private_nh.param("queue_size", queue_size_, 10);
-  private_nh.param("tf_query_timeout", tf_timeout_, static_cast<float>(0.1));
+      timestamp_data_size_(0),
+      conf_(conf) {}
 
-  // advertise output point cloud (before subscribing to input data)
-  compensation_pub_ = node.advertise<sensor_msgs::PointCloud2>(
-      topic_compensated_pointcloud_, queue_size_);
-  pointcloud_sub_ = node.subscribe(topic_pointcloud_, queue_size_,
-                                   &Compensator::pointcloud_callback,
-                                   reinterpret_cast<Compensator*>(this));
-}
-
-void Compensator::pointcloud_callback(sensor_msgs::PointCloud2ConstPtr msg) {
+bool Compensator::pointcloud_compensate(
+    const sensor_msgs::PointCloud2ConstPtr msg,
+    sensor_msgs::PointCloud2Ptr q_msg) {
   if (!check_message(msg)) {
-    ROS_FATAL("MotionCompensation : Input point cloud data field is invalid");
-    return;
+    AERROR << "MotionCompensation : Input point cloud data field is invalid";
+    return false;
   }
 
   Eigen::Affine3d pose_min_time;
   Eigen::Affine3d pose_max_time;
 
-  double timestamp_min = 0.0;
-  double timestamp_max = 0.0;
-  get_timestamp_interval(msg, timestamp_min, timestamp_max);
+  double timestamp_min = 0;
+  double timestamp_max = 0;
+  get_timestamp_interval(msg, &timestamp_min, &timestamp_max);
 
   // compensate point cloud, remove nan point
   if (query_pose_affine_from_tf2(timestamp_min, &pose_min_time) &&
       query_pose_affine_from_tf2(timestamp_max, &pose_max_time)) {
-    // we change message after motion compensation
-    sensor_msgs::PointCloud2::Ptr q_msg(new sensor_msgs::PointCloud2());
+    // we change message after motion compesation
     *q_msg = *msg;
     motion_compensation<float>(q_msg, timestamp_min, timestamp_max,
                                pose_min_time, pose_max_time);
     q_msg->header.stamp.fromSec(timestamp_max);
-    compensation_pub_.publish(q_msg);
+    uint64_t gps_time = uint64_t(q_msg->header.stamp.toSec() * 1e9);
+    uint64_t now = ros::Time::now().toSec() * 1e9;
+    AINFO << "[CALC] 3D_META_TIME : " << gps_time;
+    AINFO << "[CALC] 3D_PROC_TIME : " << abs(now - gps_time);
+    AINFO << "[CALC] 3D_CHAIN_TIME : " << abs(now - gps_time);
+    return true;
   }
+  return false;
 }
 
 inline void Compensator::get_timestamp_interval(
-    sensor_msgs::PointCloud2ConstPtr msg, double& timestamp_min,
-    double& timestamp_max) {
-  timestamp_max = 0.0;
-  timestamp_min = std::numeric_limits<double>::max();
+    const sensor_msgs::PointCloud2ConstPtr msg, double* timestamp_min,
+    double* timestamp_max) {
+  *timestamp_max = 0.0;
+  *timestamp_min = std::numeric_limits<double>::max();
   int total = msg->width * msg->height;
 
   // get min time and max time
@@ -87,17 +85,18 @@ inline void Compensator::get_timestamp_interval(
     memcpy(&timestamp, &msg->data[i * msg->point_step + timestamp_offset_],
            timestamp_data_size_);
 
-    if (timestamp < timestamp_min) {
-      timestamp_min = timestamp;
+    if (timestamp < *timestamp_min) {
+      *timestamp_min = timestamp;
     }
-    if (timestamp > timestamp_max) {
-      timestamp_max = timestamp;
+    if (timestamp > *timestamp_max) {
+      *timestamp_max = timestamp;
     }
   }
 }
 
-// TODO(All): if point type is always float, and timestamp is always double?
-inline bool Compensator::check_message(sensor_msgs::PointCloud2ConstPtr msg) {
+// TODO(all): if point type is always float, and timestamp is always double?
+inline bool Compensator::check_message(
+    const sensor_msgs::PointCloud2ConstPtr msg) {
   // check msg width and height
   if (msg->width == 0 || msg->height == 0) {
     return false;
@@ -107,7 +106,7 @@ inline bool Compensator::check_message(sensor_msgs::PointCloud2ConstPtr msg) {
   int y_data_type = 0;
   int z_data_type = 0;
 
-  // TODO(All): will use a new datastruct with interface to get offset,
+  // TODO(all): will use a new datastruct with interface to get offset,
   // datatype,datasize...
   for (size_t i = 0; i < msg->fields.size(); ++i) {
     const sensor_msgs::PointField& f = msg->fields[i];
@@ -134,18 +133,19 @@ inline bool Compensator::check_message(sensor_msgs::PointCloud2ConstPtr msg) {
     } else if (f.name == "timestamp") {
       timestamp_offset_ = f.offset;
       timestamp_data_size_ = f.count * get_field_size(f.datatype);
-      if (static_cast<int>(timestamp_offset_) == -1 ||
-          static_cast<int>(timestamp_data_size_) == -1) {
+      if (timestamp_offset_ == -1 || timestamp_data_size_ == -1) {
+        AERROR << "timestamp_offset_ invalid: " << timestamp_offset_;
         return false;
       }
     } else {
-      ROS_DEBUG_STREAM("get a unused field name:" << f.name);
+      ADEBUG << "get a unused field name:" << f.name;
     }
   }
 
   // check offset if valid
   if (x_offset_ == -1 || y_offset_ == -1 || z_offset_ == -1 ||
-      timestamp_offset_ == -1 || static_cast<int>(timestamp_data_size_) == -1) {
+      timestamp_offset_ == -1 || timestamp_data_size_ == -1) {
+    AERROR << "timestamp_offset_ invalid: " << timestamp_offset_;
     return false;
   }
   if (!(x_data_type == y_data_type && y_data_type == z_data_type)) {
@@ -154,32 +154,30 @@ inline bool Compensator::check_message(sensor_msgs::PointCloud2ConstPtr msg) {
   return true;
 }
 
-bool Compensator::query_pose_affine_from_tf2(const double timestamp,
+bool Compensator::query_pose_affine_from_tf2(const double& timestamp,
                                              Eigen::Affine3d* pose) {
-  if (pose == nullptr) {
-    return false;
-  }
   ros::Time query_time(timestamp);
   std::string err_string;
-  if (!tf2_buffer_.canTransform("world", child_frame_id_, query_time,
-                                ros::Duration(tf_timeout_), &err_string)) {
-    ROS_WARN_STREAM("Can not find transform. "
-                    << std::fixed << timestamp
-                    << " Error info: " << err_string);
+  const tf2_ros::Buffer& tf2_buffer = AdapterManager::Tf2Buffer();
+  if (!tf2_buffer.canTransform("world", conf_.child_frame_id(), query_time,
+                               ros::Duration(conf_.tf_query_timeout()),
+                               &err_string)) {
+    AWARN << "Can not find transform. " << std::fixed << timestamp
+          << " Error info: " << err_string << " Please check location and tf, "
+          << " Child_frame_id : " << conf_.child_frame_id();
     return false;
   }
 
   geometry_msgs::TransformStamped stamped_transform;
-
   try {
     stamped_transform =
-        tf2_buffer_.lookupTransform("world", child_frame_id_, query_time);
+        tf2_buffer.lookupTransform("world", conf_.child_frame_id(), query_time);
   } catch (tf2::TransformException& ex) {
-    ROS_ERROR_STREAM(ex.what());
+    AERROR << "transformMsgToEigen exception: " << ex.what();
     return false;
   }
-
   tf::transformMsgToEigen(stamped_transform.transform, *pose);
+
   return true;
 }
 
@@ -205,13 +203,13 @@ inline uint Compensator::get_field_size(const int datatype) {
       return 8;
 
     default:
-      ROS_ERROR_STREAM("can not get field size by datatype:" << datatype);
+      AERROR << "can not get field size by datatype:" << datatype;
       return 0;
   }
 }
 
 template <typename Scalar>
-void Compensator::motion_compensation(sensor_msgs::PointCloud2::Ptr& msg,
+void Compensator::motion_compensation(sensor_msgs::PointCloud2Ptr msg,
                                       const double timestamp_min,
                                       const double timestamp_max,
                                       const Eigen::Affine3d& pose_min_time,
@@ -237,48 +235,72 @@ void Compensator::motion_compensation(sensor_msgs::PointCloud2::Ptr& msg,
 
   // Threshold for a "significant" rotation from min_time to max_time:
   // The LiDAR range accuracy is ~2 cm. Over 70 meters range, it means an angle
-  // of 0.02 / 70 = 0.0003 rad. So, we consider a rotation "significant" only if
-  // the scalar part of quaternion is less than cos(0.0003 / 2) = 1 - 1e-8.
-  const double theta = acos(abs_d);
-  const double sin_theta = sin(theta);
-  const double c1_sign = (d > 0) ? 1 : -1;
+  // of 0.02 / 70 =
+  // 0.0003 rad. So, we consider a rotation "significant" only if the scalar
+  // part of quaternion is
+  // less than cos(0.0003 / 2) = 1 - 1e-8.
+  if (abs_d < 1.0 - 1.0e-8) {
+    double theta = acos(abs_d);
+    double sin_theta = sin(theta);
+    double c1_sign = (d > 0) ? 1 : -1;
+    for (int i = 0; i < total; ++i) {
+      size_t offset = i * msg->point_step;
+      Scalar* x_scalar =
+          reinterpret_cast<Scalar*>(&msg->data[offset + x_offset_]);
+      if (std::isnan(*x_scalar)) {
+        ROS_DEBUG_STREAM("nan point do not need motion compensation");
+        continue;
+      }
+      Scalar* y_scalar =
+          reinterpret_cast<Scalar*>(&msg->data[offset + y_offset_]);
+      Scalar* z_scalar =
+          reinterpret_cast<Scalar*>(&msg->data[offset + z_offset_]);
+      Eigen::Vector3d p(*x_scalar, *y_scalar, *z_scalar);
+
+      double tp = 0.0;
+      memcpy(&tp, &msg->data[i * msg->point_step + timestamp_offset_],
+             timestamp_data_size_);
+      double t = (timestamp_max - tp) * f;
+
+      Eigen::Translation3d ti(t * translation);
+
+      double c0 = sin((1 - t) * theta) / sin_theta;
+      double c1 = sin(t * theta) / sin_theta * c1_sign;
+      Eigen::Quaterniond qi(c0 * q0.coeffs() + c1 * q1.coeffs());
+
+      Eigen::Affine3d trans = ti * qi;
+      p = trans * p;
+      *x_scalar = p.x();
+      *y_scalar = p.y();
+      *z_scalar = p.z();
+    }
+    return;
+  }
+  // Not a "significant" rotation. Do translation only.
   for (int i = 0; i < total; ++i) {
-    size_t offset = i * msg->point_step;
     Scalar* x_scalar =
-        reinterpret_cast<Scalar*>(&msg->data[offset + x_offset_]);
+        reinterpret_cast<Scalar*>(&msg->data[i * msg->point_step + x_offset_]);
     if (std::isnan(*x_scalar)) {
-      ROS_DEBUG_STREAM("nan point do not need motion compensation");
+      ADEBUG << "nan point do not need motion compensation";
       continue;
     }
     Scalar* y_scalar =
-        reinterpret_cast<Scalar*>(&msg->data[offset + y_offset_]);
+        reinterpret_cast<Scalar*>(&msg->data[i * msg->point_step + y_offset_]);
     Scalar* z_scalar =
-        reinterpret_cast<Scalar*>(&msg->data[offset + z_offset_]);
+        reinterpret_cast<Scalar*>(&msg->data[i * msg->point_step + z_offset_]);
     Eigen::Vector3d p(*x_scalar, *y_scalar, *z_scalar);
 
     double tp = 0.0;
     memcpy(&tp, &msg->data[i * msg->point_step + timestamp_offset_],
            timestamp_data_size_);
     double t = (timestamp_max - tp) * f;
-
     Eigen::Translation3d ti(t * translation);
 
-    if (abs_d < 1.0 - 1.0e-8) {
-      // "significant". Do both rotation and translation.
-      double c0 = sin((1 - t) * theta) / sin_theta;
-      double c1 = sin(t * theta) / sin_theta * c1_sign;
-      Eigen::Quaterniond qi(c0 * q0.coeffs() + c1 * q1.coeffs());
-      Eigen::Affine3d trans = ti * qi;
-      p = trans * p;
-    } else {
-      // Not a "significant" rotation. Do translation only.
-      p = ti * p;
-    }
+    p = ti * p;
     *x_scalar = p.x();
     *y_scalar = p.y();
     *z_scalar = p.z();
   }
-  return;
 }
 
 }  // namespace lidar_velodyne

@@ -1,18 +1,18 @@
 /******************************************************************************
- * Modification Copyright 2018 The Apollo Authors. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *****************************************************************************/
+* Modification Copyright 2018 The Apollo Authors. All Rights Reserved.
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*****************************************************************************/
 
 /* -*- mode: C++ -*-
  *
@@ -59,7 +59,7 @@ bool SocketInput::init(int port) {
   }
 
   // connect to Velodyne UDP port
-  AINFO << "Opening UDP socket: port " << static_cast<uint16_t>(port);
+  AINFO << "Opening UDP socket: port " << uint16_t(port);
   port_ = port;
   sockfd_ = socket(AF_INET, SOCK_DGRAM, 0);
 
@@ -92,7 +92,6 @@ bool SocketInput::init(int port) {
 
 /** @brief Get one velodyne packet. */
 int SocketInput::get_firing_data_packet(velodyne_msgs::VelodynePacket *pkt) {
-  // TODO(All): use apollo time
   double time1 = ros::Time::now().toSec();
   while (true) {
     if (!input_available(POLL_TIMEOUT)) {
@@ -106,12 +105,12 @@ int SocketInput::get_firing_data_packet(velodyne_msgs::VelodynePacket *pkt) {
 
     if (nbytes < 0) {
       if (errno != EWOULDBLOCK) {
-        AERROR << "recvfail from port " << port_;
+        AERROR << "recv fail from port " << port_;
         return RECIEVE_FAIL;
       }
     }
 
-    if (static_cast<size_t>(nbytes) == FIRING_DATA_PACKET_SIZE) {
+    if ((size_t)nbytes == FIRING_DATA_PACKET_SIZE) {
       // read successful, done now
       break;
     }
@@ -125,7 +124,7 @@ int SocketInput::get_firing_data_packet(velodyne_msgs::VelodynePacket *pkt) {
   return 0;
 }
 
-int SocketInput::get_positioning_data_packet(NMEATimePtr nmea_time) {
+int SocketInput::get_positioning_data_packtet(const NMEATimePtr &nmea_time) {
   while (true) {
     if (!input_available(POLL_TIMEOUT)) {
       return 1;
@@ -194,7 +193,7 @@ bool SocketInput::input_available(int timeout) {
     }
 
     if (retval == 0) {  // poll() timeout?
-      AWARN << "Velodyne port " << port_ << " poll() timeout";
+      AWARN_EVERY(100) << "Velodyne port " << port_ << " poll() timeout";
       return false;
     }
 

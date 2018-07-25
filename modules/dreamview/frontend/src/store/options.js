@@ -1,6 +1,7 @@
 import { observable, action, computed } from "mobx";
 
 import PARAMETERS from "store/config/parameters.yml";
+import MENU_DATA from 'store/config/MenuData';
 
 export default class Options {
     // Side Bar options
@@ -14,8 +15,6 @@ export default class Options {
     @observable showTasks =
         OFFLINE_PLAYBACK ? false : PARAMETERS.options.defaults.showTasks;
 
-    mutuallyExclusiveOptions = ['showTasks', 'showModuleController',
-        'showMenu', 'showRouteEditingBar', 'showDataRecorder'];
 
     // Layer Menu options
     @observable cameraAngle = PARAMETERS.options.defaults.cameraAngle;
@@ -76,6 +75,10 @@ export default class Options {
         'perceptionLaneMarker': OFFLINE_PLAYBACK,
     };
 
+    cameraAngleNames = null;
+    mainSideBarOptions = ['showTasks', 'showModuleController',
+        'showMenu', 'showRouteEditingBar', 'showDataRecorder'];
+    secondarySideBarOptions = ['showPOI', 'enableVoiceCommand'];
 
     @computed get showTools() {
         return this.showTasks ||
@@ -96,8 +99,8 @@ export default class Options {
         this[option] = !this[option];
 
         // Disable other mutually exclusive options
-        if (this[option] && this.mutuallyExclusiveOptions.includes(option)) {
-            for (const other of this.mutuallyExclusiveOptions) {
+        if (this[option] && this.mainSideBarOptions.includes(option)) {
+            for (const other of this.mainSideBarOptions) {
                 if (other !== option) {
                     this[other] = false;
                 }
@@ -113,7 +116,41 @@ export default class Options {
         }
     }
 
-    @action selectCamera(option) {
-        this.cameraAngle = option;
+    isSideBarButtonDisabled(option, enableHMIButtonsOnly, inNavigationMode) {
+        if (!this.mainSideBarOptions.includes(option) &&
+            !this.secondarySideBarOptions.includes(option)) {
+            console.warn(`Disable logic for ${option} is not defined, return false.`);
+            return false;
+        }
+
+        if (option === "showTasks" ||
+            option === "showModuleController" ||
+            option === "enableVoiceCommand"
+        ) {
+            return false;
+        } else if (option === "showRouteEditingBar") {
+            return enableHMIButtonsOnly || inNavigationMode;
+        } else if (option === "showPOI") {
+            return enableHMIButtonsOnly || this.showRouteEditingBar;
+        } else {
+            return enableHMIButtonsOnly;
+        }
+    }
+
+    rotateCameraAngle() {
+        if (!this.cameraAngleNames) {
+            const cameraData = MENU_DATA.find(data => {
+                return data.id === "camera";
+            });
+            this.cameraAngleNames = Object.values(cameraData.data);
+        }
+
+        const currentIndex = this.cameraAngleNames.findIndex(name => name === this.cameraAngle);
+        const nextIndex = (currentIndex + 1) % this.cameraAngleNames.length;
+        this.selectCamera(this.cameraAngleNames[nextIndex]);
+    }
+
+    @action selectCamera(angleName) {
+        this.cameraAngle = angleName;
     }
 }

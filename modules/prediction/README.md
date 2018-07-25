@@ -39,7 +39,7 @@
       supported predictor includes:
 
       * Empty: obstacles have no predicted trajectories
-      * Single lane: Obstacles move along a single lane in highway navigatio mode. Obstacles not on lane will be ignored.
+      * Single lane: Obstacles move along a single lane in highway navigation mode. Obstacles not on lane will be ignored.
       * Lane sequence: obstacle moves along the lanes
       * Move sequence: obstacle moves along the lanes by following its kinetic pattern
       * Free movement: obstacle moves freely

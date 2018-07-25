@@ -66,7 +66,6 @@ SMALL_TOPICS = [
     '/apollo/relative_map',
     '/apollo/routing_request',
     '/apollo/routing_response',
-    '/apollo/sensor/camera/obstacle/front_6mm',
     '/apollo/sensor/conti_radar',
     '/apollo/sensor/delphi_esr',
     '/apollo/sensor/gnss/best_pose',
@@ -86,6 +85,7 @@ SMALL_TOPICS = [
 LARGE_TOPICS = [
     '/apollo/sensor/camera/traffic/image_short',
     '/apollo/sensor/camera/traffic/image_long',
+    '/apollo/sensor/camera/obstacle/front_6mm',
     '/apollo/sensor/velodyne64/compensator/PointCloud2',
     '/apollo/sensor/velodyne16/compensator/PointCloud2',
 ]

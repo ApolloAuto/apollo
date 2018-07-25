@@ -96,6 +96,10 @@ void PlanningTestBase::SetUp() {
   planning_.Stop();
   CHECK(SetUpAdapters()) << "Failed to setup adapters";
   CHECK(planning_.Init().ok()) << "Failed to init planning module";
+
+  // Do not use fallback trajectory during testing
+  FLAGS_use_planning_fallback = false;
+
   if (!FLAGS_test_previous_planning_file.empty()) {
     const auto prev_planning_file =
         FLAGS_test_data_dir + "/" + FLAGS_test_previous_planning_file;
@@ -146,8 +150,7 @@ void PlanningTestBase::TrimPlanning(ADCTrajectory* origin,
 }
 
 bool PlanningTestBase::RunPlanning(const std::string& test_case_name,
-                                   int case_num,
-                                   bool no_trajectory_point) {
+                                   int case_num, bool no_trajectory_point) {
   const std::string golden_result_file = apollo::common::util::StrCat(
       "result_", test_case_name, "_", case_num, ".pb.txt");
 
