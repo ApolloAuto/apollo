@@ -167,6 +167,11 @@ Use the components that you were required to provide to perform the following ta
 
 2.   Establish a Wi-Fi connection on the Apple iPad Pro to access the HMI and control the Apollo ADS that is running on the IPC.
 
+## Time Sync Script Setup [Optional]
+
+In order to, sync the computer time to the NTP server on the internet, you could use the [Time Sync script](https://github.com/ApolloAuto/apollo/blob/master/scripts/time_sync.sh)
+
+
 ## Next Steps
 
 After you complete the hardware installation in the vehicle, see the [Apollo Quick Start](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_3_0_quick_start.md) for the steps to complete the software installation.
