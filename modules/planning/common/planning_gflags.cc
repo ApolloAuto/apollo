@@ -357,6 +357,10 @@ DEFINE_double(weight_lateral_obstacle_distance, 5.0,
     "weight for lateral obstacle distance in lateral trajectory optimization");
 DEFINE_double(lateral_third_order_derivative_max, 2.0,
     "the maximal allowance for lateral third order derivative");
+DEFINE_double(max_s_lateral_optimization, 50.0,
+    "The maximal s for lateral optimization.");
+DEFINE_double(default_delta_s_lateral_optimization, 0.5,
+    "The default delta s for lateral optimization.");
 
 DEFINE_bool(use_planning_fallback, true,
             "Use fallback trajectory for planning.");
