@@ -217,7 +217,6 @@ function main(){
     docker ps -a --format "{{.Names}}" | grep 'apollo_dev' 1>/dev/null
     if [ $? == 0 ]; then
         docker stop apollo_dev 1>/dev/null
-        docker rm -f apollo_dev 1>/dev/null
     fi
     local display=""
     if [[ -z ${DISPLAY} ]];then
@@ -257,6 +256,7 @@ function main(){
     info "Starting docker container \"apollo_dev\" ..."
     docker run -it \
         -d \
+        --rm \
         --privileged \
         --name apollo_dev \
         ${MAP_VOLUME_CONF} \
