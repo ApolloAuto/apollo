@@ -10,7 +10,6 @@ enum VelodyneModel {
     V64E_S3D_LAST = 4;
     V64E_S3D_DUAL = 5;
 }
-
 message VelodyneConf {
     required uint32 index = 1 [default = 0];
     optional string position = 2 [default = "centre"];

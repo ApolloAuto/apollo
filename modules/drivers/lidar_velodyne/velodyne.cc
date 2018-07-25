@@ -162,8 +162,7 @@ void Velodyne::Convert(RawDataCache* input, PointCloudCache* output,
                        const VelodyneConf& conf) {
   AINFO << "start convert thread.";
   Converter converter;
-  VelodyneConf conf_var = conf;
-  if (!converter.init(&conf_var)) {
+  if (!converter.init(conf)) {
     AERROR << "init convert fail.";
     return;
   }
