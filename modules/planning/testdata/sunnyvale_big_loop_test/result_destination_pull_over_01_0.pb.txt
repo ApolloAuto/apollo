@@ -9,10 +9,10 @@ decision {
       reason_code: STOP_REASON_PULL_OVER
       reason: "stop by PO_DESTINATION"
       stop_point {
-        x: 587156.938997079
-        y: 4141199.4135187035
+        x: 587156.9389975972
+        y: 4141199.4135221057
       }
-      stop_heading: 2.893277712770439
+      stop_heading: 2.8932772511558027
       change_lane_type: FORWARD
     }
   }
@@ -25,11 +25,11 @@ decision {
           reason_code: STOP_REASON_PULL_OVER
           distance_s: -0.5
           stop_point {
-            x: 587156.938997079
-            y: 4141199.4135187035
+            x: 587156.9389975972
+            y: 4141199.4135221057
             z: 0
           }
-          stop_heading: 2.893277712770439
+          stop_heading: 2.8932772511558027
         }
       }
     }

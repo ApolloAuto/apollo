@@ -9,10 +9,10 @@ decision {
       reason_code: STOP_REASON_STOP_SIGN
       reason: "stop by SS_1022"
       stop_point {
-        x: 586704.05421353679
-        y: 4140225.0853936803
+        x: 586704.05418275413
+        y: 4140225.0853997837
       }
-      stop_heading: -1.9668832418443414
+      stop_heading: -1.9668817581617015
       change_lane_type: FORWARD
     }
   }
@@ -35,11 +35,11 @@ decision {
           reason_code: STOP_REASON_STOP_SIGN
           distance_s: -1
           stop_point {
-            x: 586704.05421353679
-            y: 4140225.0853936803
+            x: 586704.05418275413
+            y: 4140225.0853997837
             z: 0
           }
-          stop_heading: -1.9668832418443414
+          stop_heading: -1.9668817581617015
           wait_for_obstacle: "4059"
         }
       }
