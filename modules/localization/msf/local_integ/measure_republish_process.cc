@@ -18,13 +18,13 @@
 
 #include <iostream>
 #include <iomanip>
+#include <fstream>
 
 #include "yaml-cpp/yaml.h"
 
 #include "modules/common/math/euler_angles_zxy.h"
 #include "modules/common/log.h"
 #include "modules/common/time/time_util.h"
-
 namespace apollo {
 namespace localization {
 namespace msf {
@@ -49,10 +49,88 @@ Status MeasureRepublishProcess::Init(
   debug_log_flag_ = params.integ_debug_log_flag;
   is_trans_gpstime_to_utctime_ = params.is_trans_gpstime_to_utctime;
   gnss_mode_ = GnssMode(params.gnss_mode);
-
   pva_buffer_size_ = 150;
-
   map_height_time_ = 0.0;
+  novatel_heading_time_ = 0.0;
+  std::ifstream imu_ant_fin(params.ant_imu_leverarm_file.c_str());
+  std::cout << "the ant_imu_leverarm_file: "
+            << params.ant_imu_leverarm_file.c_str() << std::endl;
+  if (imu_ant_fin) {
+    bool success = LoadImuGnssAntennaExtrinsic(params.ant_imu_leverarm_file,
+                                            &imu_gnssant_extrinsic_);
+    if (!success) {
+      LOG(ERROR) << "IntegratedLocalization: Fail to access the lever arm "
+                    "between imu and gnss extrinsic file: "
+                 << params.ant_imu_leverarm_file;
+    }
+    LOG(INFO) << "gnss and imu lever arm in vehicle frame: " << " "
+              << imu_gnssant_extrinsic_.ant_num << " "
+              << imu_gnssant_extrinsic_.transform_1.translation()[0] << " "
+              << imu_gnssant_extrinsic_.transform_1.translation()[1] << " "
+              << imu_gnssant_extrinsic_.transform_1.translation()[2] << " "
+              << imu_gnssant_extrinsic_.transform_2.translation()[0] << " "
+              << imu_gnssant_extrinsic_.transform_2.translation()[1] << " "
+              << imu_gnssant_extrinsic_.transform_2.translation()[2];
+  } else {
+    LOG(INFO) << "the ant_imu_leverarm_file dose not existence!";
+  }
+
+//  double vehicle_to_imu_quatern[4] = {params.vehicle_to_imu_quatern.w,
+//                                      params.vehicle_to_imu_quatern.x,
+//                                      params.vehicle_to_imu_quatern.y,
+//                                      params.vehicle_to_imu_quatern.z};
+//  double dcm[3][3] = {0.0};
+  Eigen::Quaterniond vehicle_to_imu_quatern(params.vehicle_to_imu_quatern.w,
+                                            params.vehicle_to_imu_quatern.x,
+                                            params.vehicle_to_imu_quatern.y,
+                                            params.vehicle_to_imu_quatern.z);
+  vehicle_to_imu_quatern = vehicle_to_imu_quatern.normalized();
+  Eigen::Matrix3d dcm = vehicle_to_imu_quatern.toRotationMatrix();
+//  quaternion_to_dcm(&vehicle_to_imu_quatern[0], dcm);
+  double lever_arm_x = imu_gnssant_extrinsic_.transform_1.translation()[0];
+  double lever_arm_y = imu_gnssant_extrinsic_.transform_1.translation()[1];
+  double lever_arm_z = imu_gnssant_extrinsic_.transform_1.translation()[2];
+  imu_gnssant_extrinsic_.transform_1.translation()[0] =
+                         dcm(0, 0) * lever_arm_x +
+                         dcm(0, 1) * lever_arm_y +
+                         dcm(0, 2) * lever_arm_z;
+  imu_gnssant_extrinsic_.transform_1.translation()[1] =
+                         dcm(1, 0) * lever_arm_x +
+                         dcm(1, 1) * lever_arm_y +
+                         dcm(1, 2) * lever_arm_z;
+  imu_gnssant_extrinsic_.transform_1.translation()[2] =
+                         dcm(2, 0) * lever_arm_x +
+                         dcm(2, 1) * lever_arm_y +
+                         dcm(2, 2) * lever_arm_z;
+  lever_arm_x = imu_gnssant_extrinsic_.transform_2.translation()[0];
+  lever_arm_y = imu_gnssant_extrinsic_.transform_2.translation()[1];
+  lever_arm_z = imu_gnssant_extrinsic_.transform_2.translation()[2];
+  imu_gnssant_extrinsic_.transform_2.translation()[0] =
+                         dcm(0, 0) * lever_arm_x +
+                         dcm(0, 1) * lever_arm_y +
+                         dcm(0, 2) * lever_arm_z;
+  imu_gnssant_extrinsic_.transform_2.translation()[1] =
+                         dcm(1, 0) * lever_arm_x +
+                         dcm(1, 1) * lever_arm_y +
+                         dcm(1, 2) * lever_arm_z;
+  imu_gnssant_extrinsic_.transform_2.translation()[2] =
+                         dcm(2, 0) * lever_arm_x +
+                         dcm(2, 1) * lever_arm_y +
+                         dcm(2, 2) * lever_arm_z;
+
+  LOG(INFO) << "gnss and imu lever arm in imu frame: " << " "
+            << imu_gnssant_extrinsic_.ant_num << " "
+            << imu_gnssant_extrinsic_.transform_1.translation()[0] << " "
+            << imu_gnssant_extrinsic_.transform_1.translation()[1] << " "
+            << imu_gnssant_extrinsic_.transform_1.translation()[2] << " "
+            << imu_gnssant_extrinsic_.transform_2.translation()[0] << " "
+            << imu_gnssant_extrinsic_.transform_2.translation()[1] << " "
+            << imu_gnssant_extrinsic_.transform_2.translation()[2];
+
+  is_using_novatel_heading_ = params.is_using_novatel_heading;
+  if (imu_gnssant_extrinsic_.ant_num == 1) {
+    is_using_novatel_heading_ = false;
+  }
   return Status::OK();
 }
 
@@ -527,6 +605,150 @@ bool MeasureRepublishProcess::CheckBestgnssposeStatus(
   }
 
   return true;
+}
+
+bool MeasureRepublishProcess::GnssHeadingProcess(
+     const drivers::gnss::Heading& heading_msg, MeasureData *measure) {
+  if (imu_gnssant_extrinsic_.ant_num == 1) {
+    return false;
+  }
+  int solution_status = heading_msg.solution_status();
+  int position_type = heading_msg.position_type();
+  LOG(INFO) << "the heading solution_status and position_type: "
+            << solution_status << " " << position_type;
+  if (solution_status != 0) {
+    LOG(INFO) << "the heading solution_status is not computed: "
+              << solution_status;
+    return false;
+  }
+  if ((position_type == 0) || (position_type == 1)) {
+    LOG(INFO) << "the heading position_type is invalid or fixed: "
+              << position_type;
+    return false;
+  }
+  measure->time = heading_msg.measurement_time();
+  if (is_trans_gpstime_to_utctime_) {
+    measure->time = TimeUtil::Gps2unix(measure->time);
+  }
+  novatel_heading_mutex_.lock();
+  novatel_heading_time_ = measure->time;
+  novatel_heading_mutex_.unlock();
+
+  double delta_time_between_height = 0.0;
+  height_mutex_.lock();
+  delta_time_between_height = measure->time - map_height_time_;
+  height_mutex_.unlock();
+
+  if (delta_time_between_height < 1.0) {
+    LOG(INFO) << "the heading time and delta time: " << std::setprecision(15)
+              << measure->time << " " << delta_time_between_height;
+    return false;
+  }
+
+  integ_pva_mutex_.lock();
+  bool is_sins_align = integ_pva_list_.back().init_and_alignment &&
+                       (integ_pva_list_.size() > 1);
+  integ_pva_mutex_.unlock();
+  if (is_sins_align) {
+    static double pre_publish_time = 0.0;
+    if (measure->time - pre_publish_time < 0.5) {
+      return false;
+    }
+    pre_publish_time = measure->time;
+  }
+
+  double gnss_yaw = heading_msg.heading();
+  double gnss_pitch = heading_msg.pitch();
+  double heading_std = heading_msg.heading_std_dev();
+  double pitch_std = heading_msg.pitch_std_dev();
+
+  static double imu_ant_yaw_angle = 0.0;
+  if (imu_ant_yaw_angle == 0.0) {
+    imu_ant_yaw_angle = -atan2(
+          imu_gnssant_extrinsic_.transform_2.translation()[0] -
+          imu_gnssant_extrinsic_.transform_1.translation()[0],
+          imu_gnssant_extrinsic_.transform_2.translation()[1] -
+          imu_gnssant_extrinsic_.transform_1.translation()[1]) *
+          57.295779513082323;
+    LOG(INFO) << "the yaw between double ant yaw and vehicle: "
+              << imu_ant_yaw_angle;
+  }
+  LOG(INFO) << "novatel heading is: " << std::setprecision(15)
+                                      << measure->time << " "
+                                      << std::setprecision(6)
+                                      << gnss_yaw;
+  if (gnss_yaw > 180) {
+    gnss_yaw -= 360.0;
+  }
+  gnss_yaw += imu_ant_yaw_angle;
+  if (gnss_yaw > 180) {
+    gnss_yaw -= 360.0;
+  }
+  measure->measure_type = MeasureType::GNSS_DOUBLE_ANT_YAW;
+  measure->is_have_variance = true;
+  LOG(INFO) << "the novatel heading std: "
+            << std::setprecision(15) << measure->time
+            << " " << heading_std;
+  measure->variance[8][8] = heading_std * heading_std * 3.046174197867086e-04;
+  measure->gnss_att.yaw = -gnss_yaw * 0.017453292519943;
+  LOG(INFO) << "measure data heading is: "
+            << std::setprecision(15) << measure->time
+            << std::setprecision(6) << measure->gnss_att.yaw;
+  return true;
+}
+
+bool MeasureRepublishProcess::LoadImuGnssAntennaExtrinsic(
+     std::string file_path,
+     VehicleGnssAntExtrinsic *extrinsic) const {
+  YAML::Node config = YAML::LoadFile(file_path);
+  if (config["leverarm"]) {
+    if (config["leverarm"]["primary"]["offset"]) {
+      extrinsic->transform_1.translation()[0] =
+                config["leverarm"]["primary"]["offset"]["x"].as<double>();
+      extrinsic->transform_1.translation()[1] =
+                config["leverarm"]["primary"]["offset"]["y"].as<double>();
+      extrinsic->transform_1.translation()[2] =
+                config["leverarm"]["primary"]["offset"]["z"].as<double>();
+    } else {
+      return false;
+    }
+    if (config["leverarm"]["secondary"]["offset"]) {
+      extrinsic->transform_2.translation()[0] =
+                config["leverarm"]["secondary"]["offset"]["x"].as<double>();
+      extrinsic->transform_2.translation()[1] =
+                config["leverarm"]["secondary"]["offset"]["y"].as<double>();
+      extrinsic->transform_2.translation()[2] =
+                config["leverarm"]["secondary"]["offset"]["z"].as<double>();
+      extrinsic->ant_num = 2;
+
+      if (config["leverarm"]["secondary"]["rotation"]) {
+        double qx =
+          config["leverarm"]["secondary"]["rotation"]["x"].as<double>();
+        double qy =
+          config["leverarm"]["secondary"]["rotation"]["y"].as<double>();
+        double qz =
+          config["leverarm"]["secondary"]["rotation"]["z"].as<double>();
+        double qw =
+          config["leverarm"]["secondary"]["rotation"]["w"].as<double>();
+        extrinsic->transform_1.linear() =
+            Eigen::Quaterniond(qw, qx, qy, qz).toRotationMatrix();
+      } else {
+        double yaw = atan2(
+          extrinsic->transform_2.translation()[0] -
+          extrinsic->transform_1.translation()[0],
+          extrinsic->transform_2.translation()[1] -
+          extrinsic->transform_1.translation()[1]);
+        extrinsic->transform_1.linear() =
+            Eigen::Quaterniond(
+            cos(yaw / 2.0), 0.0, 0.0, sin(yaw / 2.0)).toRotationMatrix();
+      }
+      return true;
+    } else {
+      extrinsic->ant_num = 1;
+      return true;
+    }
+  }
+  return false;
 }
 
 }  // namespace msf
