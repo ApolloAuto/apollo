@@ -396,6 +396,16 @@ void LocalizationIntegImpl::GnssBestPoseProcess(
   return;
 }
 
+void LocalizationIntegImpl::GnssHeadingProcess(
+    const drivers::gnss::Heading& gnssheading_msg) {
+  gnss_heading_function_queue_mutex_.lock();
+  gnss_heading_function_queue_.push(std::function<void()>(std::bind(
+      &LocalizationIntegImpl::GnssHeadingProcessImpl, this, gnssheading_msg)));
+  gnss_heading_function_signal_.notify_one();
+  gnss_heading_function_queue_mutex_.unlock();
+  return;
+}
+
 void LocalizationIntegImpl::GnssThreadLoop() {
   AINFO << "Started gnss process thread";
   while (keep_gnss_running_.load()) {
@@ -428,6 +438,40 @@ void LocalizationIntegImpl::GnssThreadLoop() {
     gnss_func();
   }
   AINFO << "Exited gnss process thread";
+  return;
+}
+
+void LocalizationIntegImpl::GnssHeadingThreadLoop() {
+  AINFO << "Start gnss heading process thread";
+  while (keep_gnss_heading_running_.load()) {
+    {
+      std::unique_lock<std::mutex> lock(gnss_heading_function_queue_mutex_);
+      size_t size = gnss_heading_function_queue_.size();
+      while (size > gnss_heading_queue_max_size_) {
+        gnss_heading_function_queue_.pop();
+        --size;
+      }
+      if (gnss_heading_function_queue_.size() == 0) {
+        gnss_heading_function_signal_.wait(lock);
+        continue;
+      }
+    }
+
+    std::function<void()> gnss_heading_func;
+    int waiting_num = 0;
+    {
+      std::unique_lock<std::mutex> lock(gnss_heading_function_queue_mutex_);
+      gnss_heading_func = gnss_heading_function_queue_.front();
+      gnss_heading_function_queue_.pop();
+      waiting_num = gnss_heading_function_queue_.size();
+    }
+
+    if (waiting_num > 2) {
+      AWARN << waiting_num << " gnss_heading functions are waiting to process.";
+    }
+    gnss_heading_func();
+  }
+  AINFO << "Exited gnss_heading process thread.";
   return;
 }
 
@@ -483,6 +527,14 @@ void LocalizationIntegImpl::GnssBestPoseProcessImpl(
     gnss_localization_mutex_.unlock();
   }
   return;
+}
+
+void LocalizationIntegImpl::GnssHeadingProcessImpl(
+  const drivers::gnss::Heading &gnssheading_msg) {
+  MeasureData measure;
+  if (republish_process_->GnssHeadingProcess(gnssheading_msg, measure)) {
+    integ_process_->MeasureDataProcess(measure);
+  }
 }
 
 void LocalizationIntegImpl::TransferGnssMeasureToLocalization(
