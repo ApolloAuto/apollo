@@ -113,15 +113,27 @@ Status NaviPlanner::Plan(const TrajectoryPoint& planning_init_point,
   }
 
   std::size_t success_line_count = 0;
+  bool disable_low_priority_path = false;
   for (auto& reference_line_info : frame->reference_line_info()) {
-    if (!reference_line_info.IsChangeLanePath() ||
-        !reference_line_info.IsNeighborLanePath()) {
-      reference_line_info.AddCost(10.0);
+    if (disable_low_priority_path) {
+      reference_line_info.SetDrivable(false);
+    }
+    if (!reference_line_info.IsDrivable()) {
+      continue;
     }
     auto status =
         PlanOnReferenceLine(planning_init_point, frame, &reference_line_info);
 
-    if (status != Status::OK()) {
+    if (status.ok() && reference_line_info.IsDrivable()) {
+      success_line_count += 1;
+      if (FLAGS_prioritize_change_lane &&
+          reference_line_info.IsChangeLanePath() &&
+          reference_line_info.IsNeighborLanePath() &&
+          reference_line_info.Cost() < kStraightForwardLineCost) {
+        disable_low_priority_path = true;
+      }
+    } else {
+      reference_line_info.SetDrivable(false);
       if (reference_line_info.IsChangeLanePath() &&
           reference_line_info.IsNeighborLanePath()) {
         AERROR << "Planner failed to change lane to "
@@ -129,8 +141,6 @@ Status NaviPlanner::Plan(const TrajectoryPoint& planning_init_point,
       } else {
         AERROR << "Planner failed to " << reference_line_info.Lanes().Id();
       }
-    } else {
-      success_line_count += 1;
     }
   }
 
@@ -144,7 +154,8 @@ Status NaviPlanner::Plan(const TrajectoryPoint& planning_init_point,
 Status NaviPlanner::PlanOnReferenceLine(
     const TrajectoryPoint& planning_init_point, Frame* frame,
     ReferenceLineInfo* reference_line_info) {
-  if (!reference_line_info->IsChangeLanePath()) {
+  if (!reference_line_info->IsChangeLanePath() &&
+      reference_line_info->IsNeighborLanePath()) {
     reference_line_info->AddCost(kStraightForwardLineCost);
   }
   ADEBUG << "planning start point:" << planning_init_point.DebugString();
@@ -217,8 +228,9 @@ Status NaviPlanner::PlanOnReferenceLine(
   }
 
   if (FLAGS_enable_trajectory_check) {
-    if (!ConstraintChecker::ValidTrajectory(trajectory)) {
-      std::string msg("Failed to validate current planning trajectory.");
+    if (ConstraintChecker::ValidTrajectory(trajectory) !=
+        ConstraintChecker::Result::VALID) {
+      std::string msg("Current planning trajectory is not valid.");
       AERROR << msg;
       return Status(ErrorCode::PLANNING_ERROR, msg);
     }

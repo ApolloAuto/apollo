@@ -23,6 +23,7 @@
 #include "google/protobuf/repeated_field.h"
 
 #include "modules/common/adapters/adapter_manager.h"
+#include "modules/common/math/quaternion.h"
 #include "modules/common/time/time.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/hdmap/hdmap_util.h"
@@ -53,10 +54,10 @@ Planning::~Planning() { Stop(); }
 
 std::string Planning::Name() const { return "planning"; }
 
-#define CHECK_ADAPTER(NAME)                                              \
-  if (AdapterManager::Get##NAME() == nullptr) {                          \
-    AERROR << #NAME << " is not registered";                             \
-    return Status(ErrorCode::PLANNING_ERROR, #NAME " is not registerd"); \
+#define CHECK_ADAPTER(NAME)                                               \
+  if (AdapterManager::Get##NAME() == nullptr) {                           \
+    AERROR << #NAME << " is not registered";                              \
+    return Status(ErrorCode::PLANNING_ERROR, #NAME " is not registered"); \
   }
 
 #define CHECK_ADAPTER_IF(CONDITION, NAME) \
@@ -105,10 +106,26 @@ void Planning::ResetPullOver(const routing::RoutingResponse& response) {
   }
 }
 
+void Planning::CheckPlanningConfig() {
+  if (config_.has_em_planner_config() &&
+      config_.em_planner_config().has_dp_st_speed_config()) {
+    const auto& dp_st_speed_config =
+        config_.em_planner_config().dp_st_speed_config();
+    CHECK(dp_st_speed_config.has_matrix_dimension_s());
+    CHECK_GT(dp_st_speed_config.matrix_dimension_s(), 3);
+    CHECK_LT(dp_st_speed_config.matrix_dimension_s(), 10000);
+    CHECK(dp_st_speed_config.has_matrix_dimension_t());
+    CHECK_GT(dp_st_speed_config.matrix_dimension_t(), 3);
+    CHECK_LT(dp_st_speed_config.matrix_dimension_t(), 10000);
+  }
+  // TODO(All): check other config params
+}
+
 Status Planning::Init() {
   CHECK(apollo::common::util::GetProtoFromFile(FLAGS_planning_config_file,
                                                &config_))
       << "failed to load planning config file " << FLAGS_planning_config_file;
+  CheckPlanningConfig();
 
   CHECK(apollo::common::util::GetProtoFromFile(
       FLAGS_traffic_rule_config_filename, &traffic_rule_configs_))
@@ -197,9 +214,9 @@ void Planning::PublishPlanningPb(ADCTrajectory* trajectory_pb,
         AdapterManager::GetRoutingResponse()->GetLatestObserved().header());
   }
 
-  if (FLAGS_use_navigation_mode &&
+  if (FLAGS_use_planning_fallback &&
       trajectory_pb->trajectory_point_size() == 0) {
-    SetFallbackCruiseTrajectory(trajectory_pb);
+    SetFallbackTrajectory(trajectory_pb);
   }
 
   // NOTICE:
@@ -264,20 +281,25 @@ void Planning::RunOnce() {
       VehicleStateProvider::instance()->Update(localization, chassis);
 
   if (FLAGS_use_navigation_mode) {
-    const auto& vehicle_state_abs =
-        VehicleStateProvider::instance()->vehicle_state();
+    auto vehicle_config = ComputeVehicleConfigFromLocalization(localization);
 
-    if (IsVehicleStateValid(last_vehicle_state_abs_pos_)) {
-      auto x_diff = vehicle_state_abs.x() - last_vehicle_state_abs_pos_.x();
-      auto y_diff = vehicle_state_abs.y() - last_vehicle_state_abs_pos_.y();
-      auto theta_diff = vehicle_state_abs.heading()
-          - last_vehicle_state_abs_pos_.heading();
-      TrajectoryStitcher::TransformLastPublishedTrajectory(-x_diff, -y_diff,
-          -theta_diff, last_publishable_trajectory_.get());
+    if (last_vehicle_config_.is_valid_ && vehicle_config.is_valid_) {
+      auto x_diff_map = vehicle_config.x_ - last_vehicle_config_.x_;
+      auto y_diff_map = vehicle_config.y_ - last_vehicle_config_.y_;
+
+      auto cos_map_veh = std::cos(last_vehicle_config_.theta_);
+      auto sin_map_veh = std::sin(last_vehicle_config_.theta_);
+
+      auto x_diff_veh = cos_map_veh * x_diff_map + sin_map_veh * y_diff_map;
+      auto y_diff_veh = -sin_map_veh * x_diff_map + cos_map_veh * y_diff_map;
+
+      auto theta_diff = vehicle_config.theta_ - last_vehicle_config_.theta_;
+
+      TrajectoryStitcher::TransformLastPublishedTrajectory(
+          x_diff_veh, y_diff_veh, theta_diff,
+          last_publishable_trajectory_.get());
     }
-    last_vehicle_state_abs_pos_ = vehicle_state_abs;
-
-    VehicleStateProvider::instance()->set_vehicle_config(0.0, 0.0, 0.0);
+    last_vehicle_config_ = vehicle_config;
   }
 
   VehicleState vehicle_state =
@@ -430,20 +452,39 @@ void Planning::RunOnce() {
   FrameHistory::instance()->Add(seq_num, std::move(frame_));
 }
 
-void Planning::SetFallbackCruiseTrajectory(ADCTrajectory* cruise_trajectory) {
-  CHECK_NOTNULL(cruise_trajectory);
+void Planning::SetFallbackTrajectory(ADCTrajectory* trajectory_pb) {
+  CHECK_NOTNULL(trajectory_pb);
 
-  const double v = VehicleStateProvider::instance()->linear_velocity();
-  for (double t = 0.0; t < FLAGS_navigation_fallback_cruise_time; t += 0.1) {
-    const double s = t * v;
+  if (FLAGS_use_navigation_mode) {
+    const double v = VehicleStateProvider::instance()->linear_velocity();
+    for (double t = 0.0; t < FLAGS_navigation_fallback_cruise_time; t += 0.1) {
+      const double s = t * v;
 
-    auto* cruise_point = cruise_trajectory->add_trajectory_point();
-    cruise_point->mutable_path_point()->CopyFrom(
-        common::util::MakePathPoint(s, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
-    cruise_point->mutable_path_point()->set_s(s);
-    cruise_point->set_v(v);
-    cruise_point->set_a(0.0);
-    cruise_point->set_relative_time(t);
+      auto* cruise_point = trajectory_pb->add_trajectory_point();
+      cruise_point->mutable_path_point()->CopyFrom(
+          common::util::MakePathPoint(s, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
+      cruise_point->mutable_path_point()->set_s(s);
+      cruise_point->set_v(v);
+      cruise_point->set_a(0.0);
+      cruise_point->set_relative_time(t);
+    }
+  } else {
+    // use planning trajecotry from last cycle
+    auto* last_planning = AdapterManager::GetPlanning();
+    if (last_planning != nullptr && !last_planning->Empty()) {
+      const auto& traj = last_planning->GetLatestObserved();
+
+      const double current_time_stamp = trajectory_pb->header().timestamp_sec();
+      const double pre_time_stamp = traj.header().timestamp_sec();
+
+      for (int i = 0; i < traj.trajectory_point_size(); ++i) {
+        const double t = traj.trajectory_point(i).relative_time() +
+                         pre_time_stamp - current_time_stamp;
+        auto* p = trajectory_pb->add_trajectory_point();
+        p->CopyFrom(traj.trajectory_point(i));
+        p->set_relative_time(t);
+      }
+    }
   }
 }
 
@@ -566,6 +607,30 @@ Status Planning::Plan(const double current_time_stamp,
   best_ref_info->ExportEngageAdvice(trajectory_pb->mutable_engage_advice());
 
   return status;
+}
+
+Planning::VehicleConfig Planning::ComputeVehicleConfigFromLocalization(
+    const localization::LocalizationEstimate& localization) const {
+  Planning::VehicleConfig vehicle_config;
+
+  if (!localization.pose().has_position()) {
+    return vehicle_config;
+  }
+
+  vehicle_config.x_ = localization.pose().position().x();
+  vehicle_config.y_ = localization.pose().position().y();
+
+  const auto& orientation = localization.pose().orientation();
+
+  if (localization.pose().has_heading()) {
+    vehicle_config.theta_ = localization.pose().heading();
+  } else {
+    vehicle_config.theta_ = common::math::QuaternionToHeading(
+        orientation.qw(), orientation.qx(), orientation.qy(), orientation.qz());
+  }
+
+  vehicle_config.is_valid_ = true;
+  return vehicle_config;
 }
 
 }  // namespace planning

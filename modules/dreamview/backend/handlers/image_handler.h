@@ -56,6 +56,9 @@ class ImageHandler : public CivetHandler {
   template <typename SensorMsgsImage>
   void OnImage(const SensorMsgsImage &image);
 
+  void OnImageFront(const sensor_msgs::Image &image);
+  void OnImageShort(const sensor_msgs::Image &image);
+
   std::vector<uchar> send_buffer_;
   std::atomic<int> requests_;
 

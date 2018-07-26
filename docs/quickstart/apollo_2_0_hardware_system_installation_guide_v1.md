@@ -14,7 +14,7 @@
         * [Option 1: The NovAtel SPAN-IGM-A1](#option-1-the-novatel-span-igm-a1)
         * [Option 2: The NovAtel SPAN ProPak6 and NovAtel IMU-IGM-A1](#option-2-the-novatel-span-propak6-and-novatel-imu-igm-a1)
     * [The GPS Receiver/Antenna](#the-gps-receiver/antenna)
-    * [Light Detection and Ranging System (LiDAR)](#light-detection-and-ranging-system)
+    * [Light Detection and Ranging System (LiDAR)](#light-detection-and-ranging-system-(lidar)-)
         * [Option 1: Velodyne HDL-64E S3](#option-1-velodyne-hdl-64e-s3)
         * [Option 2: Hesai Pandora](#option-2-hesai-pandora) 
 * [Overview of the Installation Tasks](#overview-of-the-installation-tasks)
@@ -27,6 +27,8 @@
         * [Diagrams of the Major Component Installations](#diagrams-of-the-major-component-installations)
         * [Installing the GPS Receiver and Antenna](#installing-the-gps-receiver-and-antenna)
         * [Installing the Light Detection and Ranging System (LiDAR)](#installing-the-light-detection-and-ranging-system-(lidar))
+        * [Installing the Cameras](#installing-the-cameras)
+        * [Installing the Radar](#installing-the-radar)
         * [Installing the IPC](#installing-the-ipc)
         * [Configuring the GPS and IMU](#configuring-the-gps-and-imu)
 * [Setting up the Network](#setting-up-the-network)
@@ -1086,6 +1088,11 @@ Use the components that you were required to provide to perform the following ta
 1.   Connect a monitor using the DVI or the HDMI cables and connect the keyboard and mouse to perform debugging tasks at the car onsite.
 
 2.   Establish a Wi-Fi connection on the Apple iPad Pro to access the HMI and control the Apollo ADS that is running on the IPC.
+
+# Time Sync Script Setup [Optional]
+
+In order to, sync the computer time to the NTP server on the internet, you could use the [Time Sync script](https://github.com/ApolloAuto/apollo/blob/master/scripts/time_sync.sh)
+
 
 # Next Steps
 

@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ * Modification Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,8 +28,6 @@ namespace apollo {
 namespace drivers {
 namespace lidar_velodyne {
 
-static int FIRING_DATA_PORT = 2368;
-static int POSITIONING_DATA_PORT = 8308;
 static const int POLL_TIMEOUT = 1000;  // one second (in msec)
 
 /** @brief Live Velodyne input from socket. */
@@ -38,8 +36,8 @@ class SocketInput : public Input {
   SocketInput();
   virtual ~SocketInput();
   bool init(int port) override;
-  int get_firing_data_packet(velodyne_msgs::VelodynePacket *pkt);
-  int get_positioning_data_packet(NMEATimePtr nmea_time) override;
+  int get_firing_data_packet(velodyne_msgs::VelodynePacket *pkt) override;
+  int get_positioning_data_packtet(const NMEATimePtr &nmea_time) override;
 
  private:
   int sockfd_;

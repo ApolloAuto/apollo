@@ -31,8 +31,8 @@
 #include <string>
 #include <thread>
 #include <unordered_map>
-#include <vector>
 #include <unordered_set>
+#include <vector>
 
 #include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
 #include "modules/map/relative_map/proto/navigation.pb.h"
@@ -149,9 +149,9 @@ class ReferenceLineProvider {
    * by vehicle state.
    */
   bool GetNearestWayPointFromNavigationPath(
-       const common::VehicleState &state,
-       const std::unordered_set<std::string> &navigation_lane_ids,
-       hdmap::LaneWaypoint *waypoint);
+      const common::VehicleState& state,
+      const std::unordered_set<std::string>& navigation_lane_ids,
+      hdmap::LaneWaypoint* waypoint);
 
  private:
   bool is_initialized_ = false;
@@ -175,11 +175,6 @@ class ReferenceLineProvider {
   std::list<ReferenceLine> reference_lines_;
   std::list<hdmap::RouteSegments> route_segments_;
   double last_calculation_time_ = 0.0;
-
-  std::mutex notify_mutex_;
-  std::condition_variable cv_;
-  bool pending_ = false;
-  bool processed_ = false;
 
   std::queue<std::list<ReferenceLine>> reference_line_history_;
   std::queue<std::list<hdmap::RouteSegments>> route_segments_history_;

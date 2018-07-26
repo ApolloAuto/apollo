@@ -112,6 +112,7 @@ DECLARE_double(follow_min_time_sec);
 DECLARE_double(stop_line_stop_distance);
 DECLARE_double(max_stop_speed);
 DECLARE_double(signal_light_min_pass_s_distance);
+DECLARE_bool(enable_side_radar);
 
 DECLARE_string(destination_obstacle_id);
 DECLARE_double(destination_check_distance);
@@ -162,6 +163,13 @@ DECLARE_double(lon_collision_buffer);
 DECLARE_double(lat_collision_buffer);
 DECLARE_uint32(num_sample_follow_per_timestamp);
 
+DECLARE_bool(lateral_optimization);
+DECLARE_double(weight_lateral_offset);
+DECLARE_double(weight_lateral_derivative);
+DECLARE_double(weight_lateral_second_order_derivative);
+DECLARE_double(weight_lateral_obstacle_distance);
+DECLARE_double(lateral_third_order_derivative_max);
+
 // Lattice Evaluate Parameters
 DECLARE_double(weight_lon_objective);
 DECLARE_double(weight_lon_jerk);
@@ -183,6 +191,11 @@ DECLARE_double(time_min_density);
 DECLARE_double(comfort_acceleration_factor);
 DECLARE_double(polynomial_minimal_param);
 DECLARE_double(lattice_stop_buffer);
+DECLARE_double(max_s_lateral_optimization);
+DECLARE_double(default_delta_s_lateral_optimization);
+DECLARE_double(bound_buffer);
+
+DECLARE_bool(use_planning_fallback);
 
 // navigation mode
 DECLARE_double(navigation_fallback_cruise_time);

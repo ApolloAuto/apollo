@@ -16,6 +16,8 @@
 # limitations under the License.
 ###############################################################################
 
+sudo apt-get install -y ntpdate
+
 grep -q ntpdate /etc/crontab
 
 if [ $? -eq 1 ]; then

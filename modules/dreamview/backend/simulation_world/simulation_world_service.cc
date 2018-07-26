@@ -361,29 +361,22 @@ const Map &SimulationWorldService::GetRelativeMap() const {
 template <>
 void SimulationWorldService::UpdateSimulationWorld(
     const MonitorMessage &monitor_msg) {
-  std::vector<MonitorMessageItem> updated;
-  updated.reserve(SimulationWorldService::kMaxMonitorItems);
-  // Save the latest messages at the top of the history.
   const int updated_size = std::min(monitor_msg.item_size(),
                                     SimulationWorldService::kMaxMonitorItems);
-  std::copy(monitor_msg.item().begin(),
-            monitor_msg.item().begin() + updated_size,
-            std::back_inserter(updated));
-
-  // Copy over the previous messages until there is no more history or
-  // the max number of total messages has been hit.
-  auto history = world_.monitor().item();
-  const int history_size = std::min(
-      history.size(), SimulationWorldService::kMaxMonitorItems - updated_size);
-  if (history_size > 0) {
-    std::copy(history.begin(), history.begin() + history_size,
-              std::back_inserter(updated));
+  // Save the latest messages at the end of the history.
+  for (int idx = 0; idx < updated_size; ++idx) {
+    auto *notification = world_.add_notification();
+    notification->mutable_item()->CopyFrom(monitor_msg.item(idx));
+    notification->set_timestamp_sec(monitor_msg.header().timestamp_sec());
   }
 
-  // Refresh the monitor message list in simulation_world.
-  *world_.mutable_monitor()->mutable_item() = {updated.begin(), updated.end()};
-  world_.mutable_monitor()->mutable_header()->set_timestamp_sec(
-      Clock::NowInSeconds());
+  int remove_size =
+      world_.notification_size() - SimulationWorldService::kMaxMonitorItems;
+  if (remove_size > 0) {
+    auto *notifications = world_.mutable_notification();
+    notifications->erase(notifications->begin(),
+                         notifications->begin() + remove_size);
+  }
 }
 
 template <>
@@ -622,22 +615,6 @@ void SimulationWorldService::UpdateMainStopDecision(
   world_main_decision->set_timestamp_sec(update_timestamp_sec);
 }
 
-template <typename MainDecision>
-void SimulationWorldService::UpdateMainChangeLaneDecision(
-    const MainDecision &decision, Object *world_main_decision) {
-  if (decision.has_change_lane_type() &&
-      (decision.change_lane_type() == apollo::routing::ChangeLaneType::LEFT ||
-       decision.change_lane_type() == apollo::routing::ChangeLaneType::RIGHT)) {
-    auto *change_lane_decision = world_main_decision->add_decision();
-    change_lane_decision->set_change_lane_type(decision.change_lane_type());
-    change_lane_decision->set_position_x(
-        world_.auto_driving_car().position_x() + map_service_->GetXOffset());
-    change_lane_decision->set_position_y(
-        world_.auto_driving_car().position_y() + map_service_->GetYOffset());
-    change_lane_decision->set_heading(world_.auto_driving_car().heading());
-  }
-}
-
 bool SimulationWorldService::LocateMarker(
     const apollo::planning::ObjectDecisionType &decision,
     Decision *world_decision) {
@@ -851,28 +828,6 @@ void SimulationWorldService::UpdatePlanningData(const PlanningData &data) {
   }
 }
 
-template <typename Points>
-void SimulationWorldService::DownsampleSpeedPointsByInterval(
-    const Points &points, size_t downsampleInterval,
-    Points *downsampled_points) {
-  if (points.size() == 0) {
-    return;
-  }
-
-  for (int i = 0; i < points.size() - 1; i += downsampleInterval) {
-    auto *point = downsampled_points->Add();
-    point->set_s(points[i].s());
-    point->set_t(points[i].t());
-    point->set_v(points[i].v());
-  }
-
-  // add the last point
-  auto *point = downsampled_points->Add();
-  point->set_s(points[points.size() - 1].s());
-  point->set_t(points[points.size() - 1].t());
-  point->set_v(points[points.size() - 1].v());
-}
-
 template <>
 void SimulationWorldService::UpdateSimulationWorld(
     const ADCTrajectory &trajectory) {
@@ -916,7 +871,7 @@ void SimulationWorldService::UpdateSimulationWorld(
     // Note: There's a perfect one-to-one mapping between the perception
     // obstacles and prediction obstacles within the same frame. Creating a new
     // world object here is only possible when we happen to be processing a
-    // percpetion and prediction message from two frames.
+    // perception and prediction message from two frames.
     auto &world_obj = CreateWorldObjectIfAbsent(obstacle.perception_obstacle());
 
     // Add prediction trajectory to the object.

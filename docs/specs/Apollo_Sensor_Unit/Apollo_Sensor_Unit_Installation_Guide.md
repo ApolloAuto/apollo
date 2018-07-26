@@ -6,7 +6,7 @@ The ASU system provides sensor interfaces to collect data from various sensors, 
 
 The communication between the ASU and the IPC is through PCI Express Interface. ASU collects sensor data and passes to IPC via PCI Express Interface, and the IPC uses the ASU to send out Vehicle Control commands in the Controller Area Network (CAN) protocol. 
 
-In addition, the ASU system integrates Wi-Fi module and LTE module for LAN and WAN access. 
+In addition, Lidar connectivity via Ethernet, WWAN gateway via 4G LTE module, and WiFi access point via WiFi module will be enabled in the future releases.
 
 ![ASU_pic](images/ASU_pic.jpg)
 
@@ -35,7 +35,7 @@ In addition, the ASU system integrates Wi-Fi module and LTE module for LAN and W
 
 ### Purchase Channels
 
-The Apollo Sensor Unit is currently only provided to our Partners and certain developers. Questions regarding the availability and access to ASU should be directed to our Apollo official channel.
+The Apollo Sensor Unit is currently only provided to our Partners and certain developers. Questions regarding the availability and access to ASU should be directed to  apollo-hw@baidu.com
 
 ### Installation
 
@@ -87,7 +87,7 @@ The Apollo Sensor Unit is currently only provided to our Partners and certain de
 
    The forwards the duplicated GPS PPS/GPRMC from external GPS to the customized 8 Pin connector. This connector provides 3 sets of PPS/GPRMC output for sensors need synchronized, such as Lidars, Stereo Cameras, etc. 
 
-   ![1376350-2](/Users/hanyang07/baidu/personal-code/Apollo_30_hw_documents/Apollo Sensor Unit/images/1376350-2.jpeg)
+   ![1376350-2](images/1376350-2.jpeg)
 
    |MFR| MPN| Description|
    | --------------- | --------- | ------------------------------------------------- |
@@ -130,5 +130,6 @@ The Apollo Sensor Unit is currently only provided to our Partners and certain de
    | 12   | GND    | PWR   | Ground          |
 
    
+## Disclaimer
 
-   ​    
+This device is `Apollo Platform Supported`

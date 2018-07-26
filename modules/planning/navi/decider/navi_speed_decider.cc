@@ -32,17 +32,20 @@
 namespace apollo {
 namespace planning {
 
+using apollo::common::PathPoint;
 using apollo::common::Status;
-using apollo::common::VehicleState;
+using apollo::common::VehicleConfigHelper;
+using apollo::common::util::MakePathPoint;
 
 namespace {
-// max distance of obstacle
-constexpr double kObstacleMaxLon = 999.0;
+constexpr double kTsGraphSStep = 0.1;
+constexpr double kTsGraphSMax = 200.0;
 }  // namespace
 
 NaviSpeedDecider::NaviSpeedDecider() : Task("NaviSpeedDecider") {}
 
 bool NaviSpeedDecider::Init(const PlanningConfig& config) {
+  CHECK_GT(FLAGS_planning_upper_speed_limit, 0.0);
   CHECK(config.has_navi_planner_config());
   CHECK(config.navi_planner_config().has_navi_speed_decider_config());
   CHECK(config.navi_planner_config()
@@ -55,17 +58,38 @@ bool NaviSpeedDecider::Init(const PlanningConfig& config) {
       config.navi_planner_config().navi_speed_decider_config().has_max_accel());
   CHECK(
       config.navi_planner_config().navi_speed_decider_config().has_max_decel());
+  CHECK(config.navi_planner_config()
+            .navi_speed_decider_config()
+            .has_obstacle_buffer());
+  CHECK(config.navi_planner_config()
+            .navi_speed_decider_config()
+            .has_safe_distance_base());
+  CHECK(config.navi_planner_config()
+            .navi_speed_decider_config()
+            .has_safe_distance_ratio());
 
-  config_ = config;
-  UpdateAccelSettings(
-      config_.navi_planner_config()
-          .navi_speed_decider_config()
-          .preferred_accel(),
-      config_.navi_planner_config()
-          .navi_speed_decider_config()
-          .preferred_decel(),
-      config_.navi_planner_config().navi_speed_decider_config().max_accel(),
-      config_.navi_planner_config().navi_speed_decider_config().max_decel());
+  preferred_accel_ = std::abs(config.navi_planner_config()
+                                  .navi_speed_decider_config()
+                                  .preferred_accel());
+  preferred_decel_ = std::abs(config.navi_planner_config()
+                                  .navi_speed_decider_config()
+                                  .preferred_decel());
+  max_accel_ = std::abs(
+      config.navi_planner_config().navi_speed_decider_config().max_accel());
+  max_decel_ = std::abs(
+      config.navi_planner_config().navi_speed_decider_config().max_decel());
+  preferred_accel_ = std::min(max_accel_, preferred_accel_);
+  preferred_decel_ = std::min(max_decel_, preferred_accel_);
+
+  obstacle_buffer_ = std::abs(config.navi_planner_config()
+                                  .navi_speed_decider_config()
+                                  .obstacle_buffer());
+  safe_distance_base_ = std::abs(config.navi_planner_config()
+                                     .navi_speed_decider_config()
+                                     .safe_distance_base());
+  safe_distance_ratio_ = std::abs(config.navi_planner_config()
+                                      .navi_speed_decider_config()
+                                      .safe_distance_ratio());
 
   return true;
 }
@@ -73,8 +97,29 @@ bool NaviSpeedDecider::Init(const PlanningConfig& config) {
 Status NaviSpeedDecider::Execute(Frame* frame,
                                  ReferenceLineInfo* reference_line_info) {
   Task::Execute(frame, reference_line_info);
-  auto ret = MakeSpeedDecision(frame_->vehicle_state(), frame_->obstacles(),
-                               reference_line_info_->mutable_speed_data());
+
+  // get cruise speed
+  const auto& planning_target = reference_line_info_->planning_target();
+  preferred_speed_ = planning_target.has_cruise_speed()
+                         ? std::abs(planning_target.cruise_speed())
+                         : 0.0;
+  preferred_speed_ = std::min(max_speed_, preferred_speed_);
+
+  // TODO(all): should be real
+  std::vector<PathPoint> path_data_points;
+  path_data_points.emplace_back(
+      MakePathPoint(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
+
+  const auto& planning_start_point = frame_->PlanningStartPoint();
+  auto start_v = planning_start_point.has_v() ? planning_start_point.v() : 0.0;
+  auto start_a = planning_start_point.has_a() ? planning_start_point.a() : 0.0;
+  auto start_da = 0.0;
+
+  auto ret =
+      MakeSpeedDecision(start_v, start_a, start_da, kTsGraphSMax,
+                        path_data_points, frame_->obstacles(),
+                        [&](const std::string& id) { return frame_->Find(id); },
+                        reference_line_info_->mutable_speed_data());
   RecordDebugInfo(reference_line_info->speed_data());
   if (ret != Status::OK()) {
     reference_line_info->SetDrivable(false);
@@ -84,108 +129,113 @@ Status NaviSpeedDecider::Execute(Frame* frame,
   return ret;
 }
 
-void NaviSpeedDecider::UpdateAccelSettings(double preferred_accel,
-                                           double preferred_decel,
-                                           double max_accel, double max_decel) {
-  max_accel_ = std::abs(max_accel);
-  max_decel_ = std::abs(max_decel);
-  preferred_accel_ = std::min(std::abs(preferred_accel), max_accel_);
-  preferred_decel_ = std::min(std::abs(preferred_decel), max_decel_);
-}
-
 Status NaviSpeedDecider::MakeSpeedDecision(
-    const VehicleState& vehicle_state,
+    double start_v, double start_a, double start_da, double planning_length,
+    const std::vector<PathPoint>& path_data_points,
     const std::vector<const Obstacle*>& obstacles,
+    const std::function<const Obstacle*(const std::string&)>& find_obstacle,
     SpeedData* const speed_data) {
   CHECK_NOTNULL(speed_data);
 
-  auto obstacle_closest_lon = kObstacleMaxLon;
-  bool has_obstacle_speed = false;
-  double obstacle_speed = 0.0;
+  // init t-s graph
+  ts_graph_.Reset(kTsGraphSStep, planning_length, [&](double v) {
+    return safe_distance_ratio_ * v + safe_distance_base_;
+  });
 
-  auto vehicle_speed = vehicle_state.has_linear_velocity()
-                           ? vehicle_state.linear_velocity()
-                           : 0.0;
+  // add t-s constraints
+  auto ret = AddPerceptionRangeConstraints();
+  if (ret != Status::OK()) {
+    AERROR << "Add t-s constraints base on range of perception failed";
+    return ret;
+  }
 
-  const auto& vehicle_config =
-      common::VehicleConfigHelper::instance()->GetConfig();
+  ret = AddObstaclesConstraints(start_v, path_data_points, obstacles,
+                                find_obstacle);
+  if (ret != Status::OK()) {
+    AERROR << "Add t-s constraints base on obstacles failed";
+    return ret;
+  }
+
+  ret = AddBendConstraints();
+  if (ret != Status::OK()) {
+    AERROR << "Add t-s constraints base on bends failed";
+    return ret;
+  }
+
+  ret = AddConfiguredConstraints();
+  if (ret != Status::OK()) {
+    AERROR << "Add t-s constraints base on configs failed";
+    return ret;
+  }
+
+  // create speed-points
+  std::vector<NaviSpeedTsPoint> ts_points;
+  ret = ts_graph_.Solve(start_v, start_a, start_da, &ts_points);
+  if (ret != Status::OK()) {
+    AERROR << "Add t-s constraints base on configs failed";
+    return ret;
+  }
+
+  speed_data->Clear();
+  for (const auto& ts_point : ts_points)
+    speed_data->AppendSpeedPoint(ts_point.s, ts_point.t, ts_point.v, ts_point.a,
+                                 ts_point.da);
+
+  return Status::OK();
+}
+
+Status NaviSpeedDecider::AddPerceptionRangeConstraints() {
+  // TODO(all):
+  return Status::OK();
+}
+
+Status NaviSpeedDecider::AddObstaclesConstraints(
+    double vehicle_speed, const std::vector<PathPoint>& path_data_points,
+    const std::vector<const Obstacle*>& obstacles,
+    const std::function<const Obstacle*(const std::string&)>& find_obstacle) {
+  const auto& vehicle_config = VehicleConfigHelper::instance()->GetConfig();
   auto front_edge_to_center =
       vehicle_config.vehicle_param().front_edge_to_center();
 
-  for (const auto* obstacle : obstacles) {
-    // using FLU
-    const auto obstacle_aa_box = obstacle->PerceptionBoundingBox().GetAABox();
-    // TODO(all): if distance < 0 ?
-    auto distance = obstacle_aa_box.min_x() - front_edge_to_center;
-    // get the obstacle with minimum distance
-    if (distance < obstacle_closest_lon) {
-      obstacle_closest_lon = distance;
-      has_obstacle_speed = true;
+  obstacle_decider_.GetUnsafeObstaclesInfo(path_data_points, obstacles);
+  for (const auto& info : obstacle_decider_.UnsafeObstacles()) {
+    const auto& id = std::get<0>(info);
+    const auto* obstacle = find_obstacle(id);
+    if (obstacle != nullptr) {
+      // TODO(all): path data need to be considered
+      const auto obstacle_aa_box = obstacle->PerceptionBoundingBox().GetAABox();
+      auto obstacle_distance =
+          obstacle_aa_box.min_x() - front_edge_to_center - obstacle_buffer_;
+      obstacle_distance = std::max(0.0, obstacle_distance);
 
       double rel_speed = 0.0;
       if (obstacle->Perception().has_velocity() &&
           obstacle->Perception().velocity().has_x())
         rel_speed = obstacle->Perception().velocity().x();
       // TODO(all): if obstacle_speed < 0 ?
-      obstacle_speed = rel_speed + vehicle_speed;
+      auto obstacle_speed = std::max(rel_speed + vehicle_speed, 0.0);
+
+      ts_graph_.UpdateObstacleConstraints(obstacle_distance, obstacle_speed);
     }
   }
 
-  // decide speed
-  auto speed =
-      has_obstacle_speed && (obstacle_speed < FLAGS_default_cruise_speed)
-          ? obstacle_speed
-          : FLAGS_default_cruise_speed;
+  return Status::OK();
+}
 
-  // decide acceleration
-  double accel;
-  double accel_time;
-  if (vehicle_speed < speed) {
-    accel = preferred_accel_;
-    accel_time = (speed - vehicle_speed) / preferred_accel_;
-  } else if (vehicle_speed > speed) {
-    accel = -1 * preferred_decel_;
-    accel_time = (vehicle_speed - speed) / preferred_decel_;
-  } else {
-    accel = 0.0;
-    accel_time = 0.0;
-  }
-  auto accel_distance = 0.5 * (speed + vehicle_speed) * accel_time;
+Status NaviSpeedDecider::AddBendConstraints() {
+  // TODO(all):
+  return Status::OK();
+}
 
-  // create speed-points
-  speed_data->Clear();
-
-  // The actual speed of the vehicle is almost the same as the cruising speed.
-  if (!(accel_distance > 0.0)) {
-    // the first point
-    speed_data->AppendSpeedPoint(0.0, 0.0, vehicle_speed, accel, 0.0);
-    // the second point
-    auto total_time = obstacle_closest_lon / speed;
-    speed_data->AppendSpeedPoint(obstacle_closest_lon, total_time, speed, 0.0,
-                                 0.0);
-
-    return Status::OK();
-  }
-
-  if (obstacle_closest_lon > accel_distance) {
-    // the first point
-    speed_data->AppendSpeedPoint(0.0, 0.0, vehicle_speed, accel, 0.0);
-    // the second point
-    speed_data->AppendSpeedPoint(accel_distance, accel_time, speed, 0.0, 0.0);
-    // the third point
-    auto total_time =
-        (obstacle_closest_lon - accel_distance) / speed + accel_time;
-    speed_data->AppendSpeedPoint(obstacle_closest_lon, total_time, speed, 0.0,
-                                 0.0);
-  } else {
-    // TODO(all): need do more.
-    // the first point
-    speed_data->AppendSpeedPoint(0.0, 0.0, vehicle_speed, accel, 0.0);
-    // the second point
-    auto total_time = obstacle_closest_lon / speed;
-    speed_data->AppendSpeedPoint(obstacle_closest_lon, total_time, speed, 0.0,
-                                 0.0);
-  }
+Status NaviSpeedDecider::AddConfiguredConstraints() {
+  NaviSpeedTsConstraints constraints;
+  constraints.v_max = max_speed_;
+  constraints.v_preffered = preferred_speed_;
+  constraints.a_max = max_accel_;
+  constraints.a_preffered = preferred_accel_;
+  constraints.b_max = max_decel_;
+  constraints.b_preffered = preferred_decel_;
+  ts_graph_.UpdateConstraints(constraints);
 
   return Status::OK();
 }

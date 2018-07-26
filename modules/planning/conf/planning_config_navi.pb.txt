@@ -187,16 +187,44 @@ navi_planner_config {
     navi_path_decider_config {
         min_path_length: 5
         min_look_forward_time: 2
-        min_smooth_init_y: 0.02
-        max_smooth_init_y: 0.2
-        lateral_shift_delta: 0.05
+        default_min_smooth_init_y: 0.05
+        default_max_smooth_init_y: 0.5
+        default_theta_change_ratio: 15.0
         max_lateral_distance: 6.0
+        path_l_cost: 6.5
+        later_shift_config_table {
+            lateral_shift {
+                max_speed: 4.16
+                min_distance: 0.05
+                max_distance: 0.5
+                theta_change_ratio: 15.0
+            }
+            lateral_shift {
+                max_speed: 8.32
+                min_distance: 0.05
+                max_distance: 0.5
+                theta_change_ratio: 10.0
+            }
+            lateral_shift {
+                max_speed: 16.64
+                min_distance: 0.05
+                max_distance: 0.5
+                theta_change_ratio: 5.0
+            }
+        }
     }
 
     navi_speed_decider_config {
-        preferred_accel: 2.0
+        preferred_accel: 1.0
         preferred_decel: 2.0
         max_accel: 4.0
         max_decel: 5.0
+        obstacle_buffer: 0.5
+        safe_distance_base: 2.0
+        safe_distance_ratio: 1.0
+        following_accel_ratio: 0.5
+        curve_speed_limit_ratio: 0.01
+        hard_speed_limit: 10.0
+        hard_accel_limit: 6.0
     }
 }

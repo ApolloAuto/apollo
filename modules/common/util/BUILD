@@ -10,6 +10,7 @@ cc_library(
         "util.cc",
     ],
     hdrs = [
+        "blocking_queue.h",
         "file.h",
         "string_tokenizer.h",
         "util.h",
@@ -34,6 +35,7 @@ cc_test(
     ],
     deps = [
         ":util",
+        "//modules/common/util/testdata:simple_proto",
         "@gtest//:main",
     ],
 )

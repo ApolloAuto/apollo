@@ -62,6 +62,15 @@ void AdapterManager::Init(const AdapterManagerConfig &configs) {
       case AdapterConfig::POINT_CLOUD:
         EnablePointCloud(FLAGS_pointcloud_topic, config);
         break;
+      case AdapterConfig::POINT_CLOUD_RAW:
+        EnablePointCloudRaw0(FLAGS_pointcloud_raw_topic, config);
+        break;
+      case AdapterConfig::VELODYNE_RAW:
+        EnableVelodyneRaw0(FLAGS_velodyne_raw_topic, config);
+        break;
+      case AdapterConfig::POINT_CLOUD_FUSION:
+        EnablePointCloudFusion(FLAGS_pointcloud_fusion_topic, config);
+        break;
       case AdapterConfig::VLP16_POINT_CLOUD:
         EnableVLP16PointCloud(FLAGS_vlp16_pointcloud_topic, config);
         break;

@@ -24,6 +24,7 @@
 #include <cmath>
 
 #include "modules/common/log.h"
+#include "modules/common/math/angle.h"
 #include "modules/common/math/math_utils.h"
 
 namespace apollo {
@@ -477,8 +478,8 @@ std::vector<double> Spline2dConstraint::AffineCoef(const double angle,
                                                    const double t) const {
   const uint32_t num_params = spline_order_ + 1;
   std::vector<double> result(num_params * 2, 0.0);
-  double x_coef = -std::sin(angle);
-  double y_coef = std::cos(angle);
+  double x_coef = -common::math::sin(common::math::Angle16::from_rad(angle));
+  double y_coef = common::math::cos(common::math::Angle16::from_rad(angle));
   for (uint32_t i = 0; i < num_params; ++i) {
     result[i] = x_coef;
     result[i + num_params] = y_coef;
@@ -492,8 +493,8 @@ std::vector<double> Spline2dConstraint::AffineDerivativeCoef(
     const double angle, const double t) const {
   const uint32_t num_params = spline_order_ + 1;
   std::vector<double> result(num_params * 2, 0.0);
-  double x_coef = -std::sin(angle);
-  double y_coef = std::cos(angle);
+  double x_coef = -common::math::sin(common::math::Angle16::from_rad(angle));
+  double y_coef = common::math::cos(common::math::Angle16::from_rad(angle));
   std::vector<double> power_t = PolyCoef(t);
   for (uint32_t i = 1; i < num_params; ++i) {
     result[i] = x_coef * power_t[i - 1] * i;
@@ -506,8 +507,8 @@ std::vector<double> Spline2dConstraint::AffineSecondDerivativeCoef(
     const double angle, const double t) const {
   const uint32_t num_params = spline_order_ + 1;
   std::vector<double> result(num_params * 2, 0.0);
-  double x_coef = -std::sin(angle);
-  double y_coef = std::cos(angle);
+  double x_coef = -common::math::sin(common::math::Angle16::from_rad(angle));
+  double y_coef = common::math::cos(common::math::Angle16::from_rad(angle));
   std::vector<double> power_t = PolyCoef(t);
   for (uint32_t i = 2; i < num_params; ++i) {
     result[i] = x_coef * power_t[i - 2] * i * (i - 1);
@@ -520,8 +521,8 @@ std::vector<double> Spline2dConstraint::AffineThirdDerivativeCoef(
     const double angle, const double t) const {
   const uint32_t num_params = spline_order_ + 1;
   std::vector<double> result(num_params * 2, 0.0);
-  double x_coef = -std::sin(angle);
-  double y_coef = std::cos(angle);
+  double x_coef = -common::math::sin(common::math::Angle16::from_rad(angle));
+  double y_coef = common::math::cos(common::math::Angle16::from_rad(angle));
   std::vector<double> power_t = PolyCoef(t);
   for (uint32_t i = 3; i < num_params; ++i) {
     result[i] = x_coef * power_t[i - 3] * i * (i - 1) * (i - 2);
@@ -532,8 +533,10 @@ std::vector<double> Spline2dConstraint::AffineThirdDerivativeCoef(
 
 double Spline2dConstraint::SignDistance(const Vec2d& xy_point,
                                         const double angle) const {
-  return common::math::InnerProd(xy_point.x(), xy_point.y(), -std::sin(angle),
-                                 std::cos(angle));
+  return common::math::InnerProd(
+      xy_point.x(), xy_point.y(),
+      -common::math::sin(common::math::Angle16::from_rad(angle)),
+      common::math::cos(common::math::Angle16::from_rad(angle)));
 }
 
 std::vector<double> Spline2dConstraint::PolyCoef(const double t) const {

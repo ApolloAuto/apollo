@@ -642,6 +642,12 @@ bool NovatelParser::HandleCorrImuData(const novatel::CorrImuData* imu) {
              imu->z_angle_change * imu_measurement_hz_,
              ins_.mutable_angular_velocity());
 
+  double seconds = imu->gps_week * SECONDS_PER_WEEK + imu->gps_seconds;
+  if (ins_.measurement_time() != seconds) {
+    ins_.set_measurement_time(seconds);
+    return false;
+  }
+
   ins_.mutable_header()->set_timestamp_sec(ros::Time::now().toSec());
   return true;
 }
@@ -686,7 +692,11 @@ bool NovatelParser::HandleInsPva(const novatel::InsPva* pva) {
   }
 
   double seconds = pva->gps_week * SECONDS_PER_WEEK + pva->gps_seconds;
-  ins_.set_measurement_time(seconds);
+  if (ins_.measurement_time() != seconds) {
+    ins_.set_measurement_time(seconds);
+    return false;
+  }
+
   ins_.mutable_header()->set_timestamp_sec(ros::Time::now().toSec());
   return true;
 }
@@ -730,8 +740,8 @@ bool NovatelParser::HandleRawImuX(const novatel::RawImuX* imu) {
   if (imu_measurement_time_previous_ > 0.0 &&
       fabs(time - imu_measurement_time_previous_ - imu_measurement_span_) >
           1e-4) {
-    AWARN << "Unexpected delay between two IMU measurements at: "
-          << time - imu_measurement_time_previous_;
+    AWARN_EVERY(5) << "Unexpected delay between two IMU measurements at: "
+                   << time - imu_measurement_time_previous_;
   }
   imu_.set_measurement_time(time);
   switch (imu_frame_mapping_) {

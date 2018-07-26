@@ -262,10 +262,10 @@ class CameraDistort : public CameraModel<T> {
   /**@brief Set the distortion parameters. */
   void set_distort_params(T d0, T d1, T d2, T d3, T d4) {
     distort_params_[0] = d0;
-    distort_params_[0] = d1;
-    distort_params_[0] = d2;
-    distort_params_[0] = d3;
-    distort_params_[0] = d4;
+    distort_params_[1] = d1;
+    distort_params_[2] = d2;
+    distort_params_[3] = d3;
+    distort_params_[4] = d4;
   }
 
   /**@brief Set the distortion parameters. */

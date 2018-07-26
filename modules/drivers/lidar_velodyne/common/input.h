@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ * Copyright 2017 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,17 +20,15 @@
 #include <stdio.h>
 #include <unistd.h>
 
-#include "ros/ros.h"
-
 #include "velodyne_msgs/VelodyneScanUnified.h"
 
 namespace apollo {
 namespace drivers {
 namespace lidar_velodyne {
 
-static const size_t FIRING_DATA_PACKET_SIZE = 1206;
-static const size_t POSITIONING_DATA_PACKET_SIZE = 512;
-static const size_t ETHERNET_HEADER_SIZE = 42;
+static const int FIRING_DATA_PACKET_SIZE = 1206;
+static const int POSITIONING_DATA_PACKET_SIZE = 512;
+static const int ETHERNET_HEADER_SIZE = 42;
 static const int SOCKET_TIMEOUT = -2;
 static const int RECIEVE_FAIL = -3;
 
@@ -59,11 +57,11 @@ class Input {
    *          > 0 if incomplete packet (is this possible?)
    */
   virtual int get_firing_data_packet(velodyne_msgs::VelodynePacket* pkt) = 0;
-  virtual int get_positioning_data_packet(NMEATimePtr nmea_time) = 0;
-  virtual bool init(int port) { return true; }
+  virtual int get_positioning_data_packtet(const NMEATimePtr& nmea_time) = 0;
+  virtual bool init(int port) { return false; }
 
  protected:
-  bool exract_nmea_time_from_packet(NMEATimePtr nmea_time,
+  bool exract_nmea_time_from_packet(const NMEATimePtr& nmea_time,
                                     const uint8_t* bytes);
 };
 

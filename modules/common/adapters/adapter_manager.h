@@ -254,6 +254,11 @@ class AdapterManager {
   REGISTER_ADAPTER(PerceptionObstacles);
   REGISTER_ADAPTER(Planning);
   REGISTER_ADAPTER(PointCloud);
+
+  REGISTER_ADAPTER(VelodyneRaw0);
+  REGISTER_ADAPTER(PointCloudRaw0);
+  REGISTER_ADAPTER(PointCloudFusion);
+
   REGISTER_ADAPTER(VLP16PointCloud);
   REGISTER_ADAPTER(ImageFront);
   REGISTER_ADAPTER(ImageShort);

@@ -77,12 +77,21 @@ void ImageHandler::OnImage(const sensor_msgs::CompressedImage &image) {
   }
 }
 
-ImageHandler::ImageHandler() : requests_(0) {
+void ImageHandler::OnImageFront(const sensor_msgs::Image &image) {
   if (FLAGS_use_navigation_mode) {
-    AdapterManager::AddCompressedImageCallback(&ImageHandler::OnImage, this);
-  } else {
-    AdapterManager::AddImageShortCallback(&ImageHandler::OnImage, this);
+    OnImage(image);
   }
+}
+
+void ImageHandler::OnImageShort(const sensor_msgs::Image &image) {
+  if (!FLAGS_use_navigation_mode) {
+    OnImage(image);
+  }
+}
+
+ImageHandler::ImageHandler() : requests_(0) {
+  AdapterManager::AddImageFrontCallback(&ImageHandler::OnImageFront, this);
+  AdapterManager::AddImageShortCallback(&ImageHandler::OnImageShort, this);
 }
 
 bool ImageHandler::handleGet(CivetServer *server, struct mg_connection *conn) {
