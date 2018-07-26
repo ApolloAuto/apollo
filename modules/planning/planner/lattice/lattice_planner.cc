@@ -172,7 +172,7 @@ Status LatticePlanner::PlanOnReferenceLine(
       *ptr_reference_line,
       reference_line_info,
       init_s[0], init_s[0] + FLAGS_decision_horizon,
-      0.0, FLAGS_trajectory_time_length);
+      0.0, FLAGS_trajectory_time_length, init_d);
 
   PlanningTarget planning_target = reference_line_info->planning_target();
   if (planning_target.has_stop_point()) {

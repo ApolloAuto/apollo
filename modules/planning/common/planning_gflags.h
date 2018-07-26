@@ -193,6 +193,7 @@ DECLARE_double(polynomial_minimal_param);
 DECLARE_double(lattice_stop_buffer);
 DECLARE_double(max_s_lateral_optimization);
 DECLARE_double(default_delta_s_lateral_optimization);
+DECLARE_double(bound_buffer);
 
 DECLARE_bool(use_planning_fallback);
 

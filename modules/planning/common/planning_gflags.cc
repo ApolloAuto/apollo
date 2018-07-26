@@ -361,6 +361,7 @@ DEFINE_double(max_s_lateral_optimization, 50.0,
     "The maximal s for lateral optimization.");
 DEFINE_double(default_delta_s_lateral_optimization, 0.5,
     "The default delta s for lateral optimization.");
+DEFINE_double(bound_buffer, 0.3, "buffer to boundary for lateral optimization");
 
 DEFINE_bool(use_planning_fallback, true,
             "Use fallback trajectory for planning.");
