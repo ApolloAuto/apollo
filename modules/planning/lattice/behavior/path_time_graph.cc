@@ -49,7 +49,8 @@ PathTimeGraph::PathTimeGraph(
     const std::vector<PathPoint>& discretized_ref_points,
     const ReferenceLineInfo* ptr_reference_line_info,
     const double s_start, const double s_end,
-    const double t_start, const double t_end) {
+    const double t_start, const double t_end,
+    const std::array<double, 3>& init_d) {
   CHECK_LT(s_start, s_end);
   CHECK_LT(t_start, t_end);
   path_range_.first = s_start;
@@ -57,6 +58,7 @@ PathTimeGraph::PathTimeGraph(
   time_range_.first = t_start;
   time_range_.second = t_end;
   ptr_reference_line_info_ = ptr_reference_line_info;
+  init_d_ = init_d;
 
   SetupObstacles(obstacles, discretized_ref_points);
 }
@@ -345,13 +347,22 @@ std::vector<std::pair<double, double>> PathTimeGraph::GetLateralBounds(
   double s_range = s_end - s_start;
   double s_curr = s_start;
   std::size_t num_bound = static_cast<std::size_t>(s_range / s_resolution);
+
+  const auto& vehicle_config =
+      common::VehicleConfigHelper::instance()->GetConfig();
+  double ego_width = vehicle_config.vehicle_param().width();
+
   // Initialize bounds by reference line width
   for (std::size_t i = 0; i < num_bound; ++i) {
     double left_width = FLAGS_default_reference_line_width / 2.0;
     double right_width = FLAGS_default_reference_line_width / 2.0;
     ptr_reference_line_info_->reference_line().GetLaneWidth(
         s_curr, &left_width, &right_width);
-    bounds.emplace_back(-right_width, left_width);
+    double ego_d_lower = init_d_[0] - ego_width / 2.0;
+    double ego_d_upper = init_d_[0] + ego_width / 2.0;
+    bounds.emplace_back(
+        std::min(-right_width, ego_d_lower - FLAGS_bound_buffer),
+        std::max(left_width, ego_d_upper + FLAGS_bound_buffer));
     discretized_path.push_back(s_curr);
     s_curr += s_resolution;
   }
@@ -360,10 +371,6 @@ std::vector<std::pair<double, double>> PathTimeGraph::GetLateralBounds(
     UpdateLateralBoundsByObstacle(static_sl_boundary, discretized_path,
         s_start, s_end, &bounds);
   }
-
-  const auto& vehicle_config =
-      common::VehicleConfigHelper::instance()->GetConfig();
-  double ego_width = vehicle_config.vehicle_param().width();
 
   for (std::size_t i = 0; i < bounds.size(); ++i) {
     bounds[i].first += ego_width / 2.0;

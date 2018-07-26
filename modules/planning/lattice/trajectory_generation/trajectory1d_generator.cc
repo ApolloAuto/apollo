@@ -141,9 +141,9 @@ void Trajectory1dGenerator::GenerateLateralTrajectoryBundle(
 
     LateralTrajectoryOptimizer lateral_optimizer;
 
-    auto lateral_trajectory = lateral_optimizer.GetOptimalTrajectory();
-
     lateral_optimizer.optimize(init_lat_state_, delta_s, lateral_bounds);
+
+    auto lateral_trajectory = lateral_optimizer.GetOptimalTrajectory();
 
     ptr_lat_trajectory_bundle->push_back(
         std::make_shared<PiecewiseJerkTrajectory1d>(lateral_trajectory));
