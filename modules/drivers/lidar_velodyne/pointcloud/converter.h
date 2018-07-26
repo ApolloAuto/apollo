@@ -34,7 +34,7 @@ class Converter {
   Converter();
   ~Converter();
 
-  bool init(VelodyneConf* conf);
+  bool init(const VelodyneConf& conf);
   bool convert_packets_to_pointcloud(
       const velodyne_msgs::VelodyneScanUnifiedPtr scan_msg,
       sensor_msgs::PointCloud2Ptr pointcloud);

@@ -132,14 +132,16 @@ void Trajectory1dGenerator::GenerateLateralTrajectoryBundle(
                                   ptr_lat_trajectory_bundle);
   } else {
     double s_min = 0.0;
-    double s_max = 100.0;
+    double s_max = FLAGS_max_s_lateral_optimization;
 
-    double delta_s = 1.0;
+    double delta_s = FLAGS_default_delta_s_lateral_optimization;
 
     auto lateral_bounds =
         ptr_path_time_graph_->GetLateralBounds(s_min, s_max, delta_s);
 
     LateralTrajectoryOptimizer lateral_optimizer;
+
+    lateral_optimizer.optimize(init_lat_state_, delta_s, lateral_bounds);
 
     auto lateral_trajectory = lateral_optimizer.GetOptimalTrajectory();
 
