@@ -37,4 +37,10 @@ The code is at [Link](https://github.com/ApolloAuto/apollo/blob/master/modules/d
 This action is totally configurable, see the [example here](https://github.com/ApolloAuto/apollo/blob/master/modules/dreamview/conf/vehicle_data.pb.txt)
 
 ---
+
+## I am trying to run the extrinsic sensor calibration tools and they seem to complain about the INS_STAT not being 56. But when I echo the /apollo/sensor/gnss/ins_stat topic I can see that the position type is 56. What could be the problem?
+
+The error log occurs (stat=-1) whenever the tool has not received any GNSS message or the image stamp is not correct. Please check the topic of GNSS message or image stamp.
+
+---
 **More Perception FAQs to follow**
