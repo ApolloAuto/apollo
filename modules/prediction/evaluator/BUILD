@@ -29,10 +29,9 @@ cc_test(
         "//modules/prediction:prediction_testdata",
     ],
     deps = [
-        "//modules/common/util",
         "//modules/common/adapters:adapter_manager",
+        "//modules/common/util",
         "//modules/perception/proto:perception_proto",
-        "//modules/prediction/proto:prediction_conf_proto",
         "//modules/prediction/common:kml_map_based_test",
         "//modules/prediction/common:prediction_gflags",
         "//modules/prediction/container:container_manager",
@@ -41,6 +40,7 @@ cc_test(
         "//modules/prediction/evaluator/vehicle:cost_evaluator",
         "//modules/prediction/evaluator/vehicle:mlp_evaluator",
         "//modules/prediction/evaluator/vehicle:rnn_evaluator",
+        "//modules/prediction/proto:prediction_conf_proto",
         "@gtest//:main",
     ],
 )
@@ -50,6 +50,35 @@ cc_library(
     hdrs = ["evaluator.h"],
     deps = [
         "//modules/prediction/container/obstacles:obstacle",
+    ],
+)
+
+cc_binary(
+    name = "evaluator_manager_fuzz",
+    srcs = ["evaluator_manager_fuzz.cc"],
+    copts = [
+        "-fsanitize=fuzzer,address",
+        "-Iexternal/libprotobuf_mutator/src/",
+    ],
+    data = [
+        "//modules/prediction:prediction_data",
+        "//modules/prediction:prediction_testdata",
+    ],
+    linkopts = ["-fsanitize=fuzzer,address"],
+    deps = [
+        "//modules/common/adapters:adapter_manager",
+        "//modules/common/util",
+        "//modules/perception/proto:perception_proto",
+        "//modules/prediction/common:kml_map_based_test",
+        "//modules/prediction/common:prediction_gflags",
+        "//modules/prediction/container:container_manager",
+        "//modules/prediction/container/obstacles:obstacles_container",
+        "//modules/prediction/evaluator:evaluator_manager",
+        "//modules/prediction/evaluator/vehicle:cost_evaluator",
+        "//modules/prediction/evaluator/vehicle:mlp_evaluator",
+        "//modules/prediction/evaluator/vehicle:rnn_evaluator",
+        "//modules/prediction/proto:prediction_conf_proto",
+        "@libprotobuf_mutator//:mutator",
     ],
 )
 
