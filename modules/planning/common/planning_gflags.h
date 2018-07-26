@@ -27,6 +27,7 @@ DECLARE_string(planning_adapter_config_filename);
 DECLARE_string(traffic_rule_config_filename);
 DECLARE_string(smoother_config_filename);
 DECLARE_int32(planning_loop_rate);
+DECLARE_bool(enable_collision_detection);
 DECLARE_string(rtk_trajectory_filename);
 DECLARE_uint64(rtk_trajectory_forward);
 DECLARE_double(rtk_trajectory_resolution);
