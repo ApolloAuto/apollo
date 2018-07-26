@@ -57,8 +57,7 @@ Status PointCloudTool::Init() {
     RETURN_VAL_IF_NULL(AdapterManager::GetPointCloudRaw0(), error);
     converter_ = new Converter();
 
-    if (nullptr == converter_ ||
-        !converter_->init(conf_.mutable_module_conf())) {
+    if (nullptr == converter_ || !converter_->init(conf_.module_conf())) {
       AERROR << "new or init converter fail.";
       return error;
     }
