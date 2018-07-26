@@ -28,7 +28,6 @@
 #include "modules/drivers/lidar_velodyne/driver/driver.h"
 #include "modules/drivers/lidar_velodyne/pointcloud/compensator.h"
 #include "modules/drivers/lidar_velodyne/pointcloud/converter.h"
-#include "modules/drivers/lidar_velodyne/pointcloud/fusion.h"
 #include "modules/drivers/lidar_velodyne/pointcloud/multiple_velodyne_adapter.h"
 
 namespace apollo {
@@ -72,8 +71,6 @@ Status Velodyne::Init() {
 
   Notice();
 
-  is_fusion_ = conf_unit_.is_fusion();
-
   auto conf_size = conf_unit_.conf_size();
   std::map<uint32_t, uint8_t> velodyne_index_map;
 
@@ -90,10 +87,6 @@ Status Velodyne::Init() {
                            "pointcloud_cache_" + std::to_string(i));
     pointcloud_cache_vec_.push_back(pointcloud_cache);
     velodyne_index_map[conf_unit_.conf(i).index()] = 1;
-  }
-
-  if (is_fusion_ && !FusionCheckInit(velodyne_index_map)) {
-    return Status(ErrorCode::DRIVER_ERROR_VELODYNE, "fusion init error!");
   }
 
   return Status::OK();
@@ -228,9 +221,6 @@ void Velodyne::Compensate(PointCloudCache* input, const VelodyneConf& conf) {
       continue;
     }
     uint32_t index = conf.index();
-    if (is_fusion_ && (fusion_cache_.count(index) > 0)) {
-      fusion_cache_[index]->put(com_pointcloud);
-    }
     if (FLAGS_publish_compensator_pointcloud) {
       MultipleVelodyneAdapter::PublishPointCloudByIndex(index, com_pointcloud);
     }
@@ -242,58 +232,6 @@ void Velodyne::Compensate(PointCloudCache* input, const VelodyneConf& conf) {
   }
 
   AINFO << "end of compensator thread func.";
-  return;
-}
-void Velodyne::PointCloudFusion(
-    std::map<uint32_t, PointCloudCache*> fusion_cache) {
-  Fusion velodyne_fusion;
-  while (running_) {
-    int64_t t0 = GetTime();
-    int size = fusion_cache.size();
-    if (size == 0) {
-      AERROR << "no velodyne cache,fusion error!";
-      return;
-    }
-    int64_t t1 = GetTime();
-    sensor_msgs::PointCloud2Ptr point_cloud_fusion(
-        new sensor_msgs::PointCloud2());
-    uint32_t major_index = conf_unit_.fusion_conf().major_index();
-    auto it = fusion_cache.find(major_index);
-    if (it != fusion_cache.end()) {
-      if (size == 1) {
-        // only major
-        AERROR << "only one major velodyne,fusion error!";
-      } else {
-        // fusion
-        auto major_point_cloud_ptr = fusion_cache[major_index]->take();
-        auto it = fusion_cache.begin();  // upper_bound(major_index);
-        std::vector<sensor_msgs::PointCloud2Ptr> slave_point_cloud_vec;
-        for (; it != fusion_cache.end(); it++) {
-          if (it->first == major_index) {
-            continue;
-          }
-          slave_point_cloud_vec.push_back(it->second->take());
-        }
-        t1 = GetTime();
-        bool fusion_ret = velodyne_fusion.fusion(
-            major_point_cloud_ptr, slave_point_cloud_vec, point_cloud_fusion);
-        if (!fusion_ret) {
-          AERROR << "fusion error!";
-        }
-        // TODO(all): enable fusion
-        // AdapterManager::PublishPointCloudFusion(*point_cloud_fusion);
-      }
-    } else {
-      // no major
-      AERROR << "no major velodyne,fusion error!";
-    }
-    AINFO << "CALC fusion done.";
-    int64_t t2 = GetTime();
-    ADEBUG << "fusion total time: " << t2 - t0;
-    ADEBUG << "fusion take time: " << t1 - t0;
-    ADEBUG << "fusion real time: " << t2 - t1;
-  }
-  AINFO << "end of fusion thread func.";
   return;
 }
 
@@ -314,13 +252,7 @@ Status Velodyne::Start() {
     threads_.push_back(compensate_thread);
   }
 
-  if (is_fusion_) {
-    std::shared_ptr<std::thread> fusion_thread(new std::thread(
-        std::bind(&Velodyne::PointCloudFusion, this, fusion_cache_)));
-    threads_.push_back(fusion_thread);
-  }
-
-  AINFO << "Velodyne start done!";
+  ADEBUG << "Velodyne start done!";
   common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
   buffer.INFO("velodyne started");
 
@@ -357,35 +289,6 @@ bool Velodyne::CalcNpackets(VelodyneConfUnit* unit) {
     double frequency = (conf->rpm() / 60.0);
     conf->set_npackets(static_cast<int>(ceil(conf->packet_rate() / frequency)));
     AINFO << "lidar " << conf->index() << " npackets is " << conf->npackets();
-  }
-  return true;
-}
-bool Velodyne::FusionCheckInit(
-    const std::map<uint32_t, uint8_t>& velodyne_index_map) {
-  if (is_fusion_) {
-    uint32_t major_index = conf_unit_.fusion_conf().major_index();
-    fusion_index_map_[major_index] = 1;
-    auto fusion_size = conf_unit_.fusion_conf().slave_index_size();
-    for (int i = 0; i < fusion_size; i++) {
-      fusion_index_map_[conf_unit_.fusion_conf().slave_index(i)] = 1;
-    }
-    if (fusion_index_map_.size() == 1) {
-      AERROR << "only one fusion index, not need fusion.";
-      return false;
-    }
-    auto it = fusion_index_map_.begin();
-    for (; it != fusion_index_map_.end(); it++) {
-      PointCloudCache* fusion_pointcloud_cache = new PointCloudCache;
-      uint32_t index = it->first;
-      if (velodyne_index_map.count(index) == 0) {
-        return false;
-      }
-      fusion_pointcloud_cache->init(
-          conf_unit_.conf(index).cache_size(),
-          "fusion_pointcloud_cache_" + std::to_string(index));
-      // uint32_t index = conf_unit_.conf(i).index();
-      fusion_cache_[index] = fusion_pointcloud_cache;
-    }
   }
   return true;
 }
