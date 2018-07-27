@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_DRIVERS_LIDAR_VELODYNE_POINTCLOUD_MULTIPLE_VELODYNE_ADAPTER_H_
-#define MODULES_DRIVERS_LIDAR_VELODYNE_POINTCLOUD_MULTIPLE_VELODYNE_ADAPTER_H_
+#ifndef MODULES_DRIVERS_LIDAR_VELODYNE_POINTCLOUD_VELODYNE_ADAPTER_H_
+#define MODULES_DRIVERS_LIDAR_VELODYNE_POINTCLOUD_VELODYNE_ADAPTER_H_
 
 #include "ros/include/sensor_msgs/PointCloud2.h"
 #include "ros/include/std_msgs/String.h"
@@ -30,28 +30,27 @@ namespace lidar_velodyne {
 using apollo::common::adapter::AdapterManager;
 using velodyne_msgs::VelodyneScanUnifiedPtr;
 
-class MultipleVelodyneAdapter {
+class VelodyneAdapter {
  public:
-  MultipleVelodyneAdapter();
-  ~MultipleVelodyneAdapter();
-
-  static bool CheckMultipleVelodyne() {
-    if (nullptr == AdapterManager::GetPointCloudRaw0() ||
-        nullptr == AdapterManager::GetPointCloud() ||
-        nullptr == AdapterManager::GetVelodyneRaw0()) {
-      AERROR << "PointCloudRaw0,PointCloud0,Velodyne0 Adapter not initialized";
-      return false;
-    }
+  static bool CheckVelodyne() {
+    // TODO(All): implements here
     return true;
   }
 
-  static void PublishVelodyneRawByIndex(
+  static void PublishVelodyneScanByIndex(
       uint32_t index, velodyne_msgs::VelodyneScanUnifiedPtr scan) {
     switch (index) {
       case 0:
-        AdapterManager::PublishVelodyneRaw0(*(scan.get()));
+        AdapterManager::PublishVelodyneScanDense(*(scan.get()));
         break;
       case 1:
+        AdapterManager::PublishVelodyneScanSparse1(*(scan.get()));
+        break;
+      case 2:
+        AdapterManager::PublishVelodyneScanSparse2(*(scan.get()));
+        break;
+      case 3:
+        AdapterManager::PublishVelodyneScanSparse3(*(scan.get()));
         break;
       default:
         AERROR << "no index match!";
@@ -63,9 +62,16 @@ class MultipleVelodyneAdapter {
       uint32_t index, sensor_msgs::PointCloud2Ptr pointcloud) {
     switch (index) {
       case 0:
-        AdapterManager::PublishPointCloudRaw0(*(pointcloud.get()));
+        AdapterManager::PublishPointCloudDenseRaw(*(pointcloud.get()));
         break;
       case 1:
+        AdapterManager::PublishPointCloudSparseRaw1(*(pointcloud.get()));
+        break;
+      case 2:
+        AdapterManager::PublishPointCloudSparseRaw2(*(pointcloud.get()));
+        break;
+      case 3:
+        AdapterManager::PublishPointCloudSparseRaw3(*(pointcloud.get()));
         break;
       default:
         AERROR << "no index match!";
@@ -77,9 +83,16 @@ class MultipleVelodyneAdapter {
       uint32_t index, sensor_msgs::PointCloud2Ptr com_pointcloud) {
     switch (index) {
       case 0:
-        AdapterManager::PublishPointCloud(*com_pointcloud);
+        AdapterManager::PublishPointCloudDense(*com_pointcloud);
         break;
       case 1:
+        AdapterManager::PublishPointCloudSparse1(*com_pointcloud);
+        break;
+      case 2:
+        AdapterManager::PublishPointCloudSparse2(*com_pointcloud);
+        break;
+      case 3:
+        AdapterManager::PublishPointCloudSparse3(*com_pointcloud);
         break;
       default:
         AERROR << "no index match!";
@@ -93,4 +106,4 @@ class MultipleVelodyneAdapter {
 }  // namespace drivers
 }  // namespace apollo
 
-#endif  // MODULES_DRIVERS_VELODYNE_POINTCLOUD_MULTIPLE_VELODYNE_ADAPTER_H_
+#endif  // MODULES_DRIVERS_VELODYNE_POINTCLOUD_VELODYNE_ADAPTER_H_
