@@ -57,7 +57,7 @@ Status Velodyne::Init() {
     return Status(ErrorCode::DRIVER_ERROR_VELODYNE, msg);
   }
   AINFO << "Conf file: " << FLAGS_velodyne_conf_file << " is loaded.";
-  if (!CalcNpackets(&conf_unit_)) {
+  if (!SetNpackets(&conf_unit_)) {
     AERROR << "calc npackets fail.";
     return Status(ErrorCode::DRIVER_ERROR_VELODYNE, "init npackets fail.");
   }
@@ -74,7 +74,7 @@ Status Velodyne::Init() {
   auto conf_size = conf_unit_.conf_size();
   std::map<uint32_t, uint8_t> velodyne_index_map;
 
-  for (auto i = 0; i < conf_size; i++) {
+  for (auto i = 0; i < conf_size; ++i) {
     int size = conf_unit_.conf(i).cache_size();
     if (FLAGS_pipeline_mode) {
       size += conf_unit_.conf(i).npackets();
@@ -92,7 +92,7 @@ Status Velodyne::Init() {
   return Status::OK();
 }
 
-void Velodyne::Packet(RawDataCache* output, const VelodyneConf& conf) {
+void Velodyne::Packet(const VelodyneConf& conf, RawDataCache* output) {
   AINFO << "start packet thread.";
   VelodyneDriver* dvr = VelodyneDriverFactory::create_driver(conf);
   if (nullptr == dvr || !dvr->init()) {
@@ -123,7 +123,7 @@ void Velodyne::Packet(RawDataCache* output, const VelodyneConf& conf) {
       memcpy(&(full_scan->packets[scan_idx].data[0]),
              &(scan->packets[0].data[0]), FIRING_DATA_PACKET_SIZE);
       full_scan->packets[scan_idx].stamp = scan->packets[0].stamp;
-      scan_idx++;
+      ++scan_idx;
 
       if (scan_idx != conf.npackets()) {
         continue;
@@ -151,8 +151,8 @@ void Velodyne::Packet(RawDataCache* output, const VelodyneConf& conf) {
   return;
 }
 
-void Velodyne::Convert(RawDataCache* input, PointCloudCache* output,
-                       const VelodyneConf& conf) {
+void Velodyne::Convert(const VelodyneConf& conf, RawDataCache* input,
+                       PointCloudCache* output) {
   AINFO << "start convert thread.";
   Converter converter;
   if (!converter.init(conf)) {
@@ -206,7 +206,9 @@ void Velodyne::Convert(RawDataCache* input, PointCloudCache* output,
   return;
 }
 
-void Velodyne::Compensate(PointCloudCache* input, const VelodyneConf& conf) {
+void Velodyne::Compensate(
+
+    const VelodyneConf& conf, PointCloudCache* input) {
   AINFO << "start compensate thread.";
   Compensator compensator(conf);
   while (running_) {
@@ -235,16 +237,15 @@ void Velodyne::Compensate(PointCloudCache* input, const VelodyneConf& conf) {
 }
 
 Status Velodyne::Start() {
-  auto conf_size = conf_unit_.conf_size();
-  for (auto i = 0; i < conf_size; i++) {
+  for (int i = 0; i < conf_unit_.conf_size(); ++i) {
     std::shared_ptr<std::thread> packet_thread(new std::thread(std::bind(
-        &Velodyne::Packet, this, packet_cache_vec_[i], conf_unit_.conf(i))));
+        &Velodyne::Packet, this, conf_unit_.conf(i), packet_cache_vec_[i])));
     std::shared_ptr<std::thread> convert_therad(new std::thread(
-        std::bind(&Velodyne::Convert, this, packet_cache_vec_[i],
-                  pointcloud_cache_vec_[i], conf_unit_.conf(i))));
+        std::bind(&Velodyne::Convert, this, conf_unit_.conf(i),
+                  packet_cache_vec_[i], pointcloud_cache_vec_[i])));
     std::shared_ptr<std::thread> compensate_thread(new std::thread(
-        std::bind(&Velodyne::Compensate, this, pointcloud_cache_vec_[i],
-                  conf_unit_.conf(i))));
+        std::bind(&Velodyne::Compensate, this, conf_unit_.conf(i),
+                  pointcloud_cache_vec_[i])));
 
     threads_.push_back(packet_thread);
     threads_.push_back(convert_therad);
@@ -282,7 +283,7 @@ void Velodyne::Notice() {
       << "will not publish compensator pointcloud2";
 }
 
-bool Velodyne::CalcNpackets(VelodyneConfUnit* unit) {
+bool Velodyne::SetNpackets(VelodyneConfUnit* unit) {
   for (int i = 0; i < unit->conf_size(); ++i) {
     VelodyneConf* conf = unit->mutable_conf(i);
     double frequency = (conf->rpm() / 60.0);

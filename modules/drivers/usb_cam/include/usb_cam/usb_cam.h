@@ -36,16 +36,15 @@
 #ifndef USB_CAM_USB_CAM_H
 #define USB_CAM_USB_CAM_H
 
-#include <asm/types.h>          /* for videodev2.h */
+#include <asm/types.h> /* for videodev2.h */
 
-extern "C"
-{
-#include <linux/videodev2.h>
-#include <linux/uvcvideo.h>
-#include <linux/usb/video.h>
+extern "C" {
 #include <libavcodec/avcodec.h>
-#include <libswscale/swscale.h>
 #include <libavutil/mem.h>
+#include <libswscale/swscale.h>
+#include <linux/usb/video.h>
+#include <linux/uvcvideo.h>
+#include <linux/videodev2.h>
 }
 
 // legacy reasons
@@ -54,8 +53,8 @@ extern "C"
 #define AV_CODEC_ID_MJPEG CODEC_ID_MJPEG
 #endif
 
-#include <string>
 #include <sstream>
+#include <string>
 
 #include <sensor_msgs/Image.h>
 
@@ -63,99 +62,101 @@ namespace usb_cam {
 
 class UsbCam {
  public:
-  typedef enum
-  {
-    IO_METHOD_MMAP, IO_METHOD_UNKNOWN,
+  typedef enum {
+    IO_METHOD_MMAP,
+    IO_METHOD_UNKNOWN,
   } io_method;
 
-  typedef enum
-  {
-    PIXEL_FORMAT_YUYV, PIXEL_FORMAT_UYVY, PIXEL_FORMAT_MJPEG, PIXEL_FORMAT_YUVMONO10, PIXEL_FORMAT_RGB24, PIXEL_FORMAT_UNKNOWN
+  typedef enum {
+    PIXEL_FORMAT_YUYV,
+    PIXEL_FORMAT_UYVY,
+    PIXEL_FORMAT_MJPEG,
+    PIXEL_FORMAT_YUVMONO10,
+    PIXEL_FORMAT_RGB24,
+    PIXEL_FORMAT_UNKNOWN
   } pixel_format;
 
-    UsbCam();
-    ~UsbCam();
+  UsbCam();
+  ~UsbCam();
 
-    // start camera
-    void start(const std::string& dev, io_method io, pixel_format pf,
-            int image_width, int image_height, int framerate);
-    // shutdown camera
-    void shutdown(void);
+  // start camera
+  void start(const std::string &dev, io_method io, pixel_format pf,
+             int image_width, int image_height, int framerate);
+  // shutdown camera
+  void shutdown(void);
 
-    // grabs a new image from the camera
-    bool grab_image(sensor_msgs::Image* image, int timeout);
+  // grabs a new image from the camera
+  bool grab_image(sensor_msgs::Image *image, int timeout);
 
-    // enables/disable auto focus
-    void set_auto_focus(int value);
+  // enables/disable auto focus
+  void set_auto_focus(int value);
 
   // Set video device parameters
-  void set_v4l_parameter(const std::string& param, int value);
-  void set_v4l_parameter(const std::string& param, const std::string& value);
+  void set_v4l_parameter(const std::string &param, int value);
+  void set_v4l_parameter(const std::string &param, const std::string &value);
 
-  //enable video triggers //see libadv_trigger_ctl
+  // enable video triggers //see libadv_trigger_ctl
   int trigger_enable(unsigned char fps, unsigned char internal);
   int trigger_disable();
 
-  static io_method io_method_from_string(const std::string& str);
-  static pixel_format pixel_format_from_string(const std::string& str);
+  static io_method io_method_from_string(const std::string &str);
+  static pixel_format pixel_format_from_string(const std::string &str);
 
   void stop_capturing(void);
   void start_capturing(void);
   bool is_capturing();
 
-private:
-    struct CameraImage
-    {
-        int width;
-        int height;
-        int bytes_per_pixel;
-        int image_size;
-        char *image;
-        int is_new;
-        int tv_sec;
-        int tv_usec;
-    };
+ private:
+  struct CameraImage {
+    int width;
+    int height;
+    int bytes_per_pixel;
+    int image_size;
+    char *image;
+    int is_new;
+    int tv_sec;
+    int tv_usec;
+  };
 
-    struct Buffer {
-        void * start;
-        size_t length;
-    };
+  struct Buffer {
+    void *start;
+    size_t length;
+  };
 
-    int init_mjpeg_decoder(int image_width, int image_height);
-    void mjpeg2rgb(char *MJPEG, int len, char *RGB, int NumPixels);
-    bool process_image(const void * src, int len, boost::shared_ptr<CameraImage> dest);
-    int read_frame();
-    void uninit_device(void);
-    void init_read(unsigned int buffer_size);
-    void init_mmap(void);
-    void init_userp(unsigned int buffer_size);
-    void init_device(int image_width, int image_height, int framerate);
-    void close_device(void);
-    void open_device(void);
-    // TODO
-    //void reset_device(void);
-    bool grab_image(int timeout);
+  int init_mjpeg_decoder(int image_width, int image_height);
+  void mjpeg2rgb(char *MJPEG, int len, char *RGB, int NumPixels);
+  bool process_image(const void *src, int len,
+                     boost::shared_ptr<CameraImage> dest);
+  int read_frame();
+  void uninit_device(void);
+  void init_read(unsigned int buffer_size);
+  void init_mmap(void);
+  void init_userp(unsigned int buffer_size);
+  void init_device(int image_width, int image_height, int framerate);
+  void close_device(void);
+  void open_device(void);
+  // TODO
+  // void reset_device(void);
+  bool grab_image(int timeout);
 
-    bool is_capturing_;
-    std::string camera_dev_;
-    unsigned int pixelformat_;
-    bool monochrome_;
-    io_method io_;
-    int fd_;
-    std::vector<Buffer> buffers_;
-    unsigned int n_buffers_;
-    AVFrame *avframe_camera_;
-    AVFrame *avframe_rgb_;
-    AVCodec *avcodec_;
-    AVDictionary *avoptions_;
-    AVCodecContext *avcodec_context_;
-    int avframe_camera_size_;
-    int avframe_rgb_size_;
-    struct SwsContext *video_sws_;
-    boost::shared_ptr<CameraImage> image_;
+  bool is_capturing_;
+  std::string camera_dev_;
+  unsigned int pixelformat_;
+  bool monochrome_;
+  io_method io_;
+  int fd_;
+  std::vector<Buffer> buffers_;
+  unsigned int n_buffers_;
+  AVFrame *avframe_camera_;
+  AVFrame *avframe_rgb_;
+  AVCodec *avcodec_;
+  AVDictionary *avoptions_;
+  AVCodecContext *avcodec_context_;
+  int avframe_camera_size_;
+  int avframe_rgb_size_;
+  struct SwsContext *video_sws_;
+  boost::shared_ptr<CameraImage> image_;
 };
-
 }
 
 #endif
-
