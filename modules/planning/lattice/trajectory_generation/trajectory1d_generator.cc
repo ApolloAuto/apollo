@@ -28,7 +28,9 @@
 #include "modules/common/log.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/lattice/trajectory1d/constant_deceleration_trajectory1d.h"
+#include "modules/planning/lattice/trajectory1d/piecewise_jerk_trajectory1d.h"
 #include "modules/planning/lattice/trajectory1d/standing_still_trajectory1d.h"
+#include "modules/planning/lattice/trajectory_generation/lateral_trajectory_optimizer.h"
 
 namespace apollo {
 namespace planning {
@@ -40,14 +42,14 @@ typedef std::pair<State, double> Condition;
 typedef std::vector<std::shared_ptr<Curve1d>> Trajectory1DBundle;
 
 Trajectory1dGenerator::Trajectory1dGenerator(
-    const State& lon_init_state,
-    const State& lat_init_state,
+    const State& lon_init_state, const State& lat_init_state,
     std::shared_ptr<PathTimeGraph> ptr_path_time_graph,
     std::shared_ptr<PredictionQuerier> ptr_prediction_querier)
     : init_lon_state_(lon_init_state),
       init_lat_state_(lat_init_state),
       end_condition_sampler_(lon_init_state, lat_init_state,
-                             ptr_path_time_graph, ptr_prediction_querier) {}
+                             ptr_path_time_graph, ptr_prediction_querier),
+      ptr_path_time_graph_(ptr_path_time_graph) {}
 
 void Trajectory1dGenerator::GenerateTrajectoryBundles(
     const PlanningTarget& planning_target,
@@ -122,11 +124,30 @@ void Trajectory1dGenerator::GenerateLongitudinalTrajectoryBundle(
 
 void Trajectory1dGenerator::GenerateLateralTrajectoryBundle(
     Trajectory1DBundle* ptr_lat_trajectory_bundle) const {
-  auto end_conditions = end_condition_sampler_.SampleLatEndConditions();
+  if (!FLAGS_lateral_optimization) {
+    auto end_conditions = end_condition_sampler_.SampleLatEndConditions();
 
-  // Use the common function to generate trajectory bundles.
-  GenerateTrajectory1DBundle<5>(init_lat_state_, end_conditions,
-                                ptr_lat_trajectory_bundle);
+    // Use the common function to generate trajectory bundles.
+    GenerateTrajectory1DBundle<5>(init_lat_state_, end_conditions,
+                                  ptr_lat_trajectory_bundle);
+  } else {
+    double s_min = 0.0;
+    double s_max = FLAGS_max_s_lateral_optimization;
+
+    double delta_s = FLAGS_default_delta_s_lateral_optimization;
+
+    auto lateral_bounds =
+        ptr_path_time_graph_->GetLateralBounds(s_min, s_max, delta_s);
+
+    LateralTrajectoryOptimizer lateral_optimizer;
+
+    lateral_optimizer.optimize(init_lat_state_, delta_s, lateral_bounds);
+
+    auto lateral_trajectory = lateral_optimizer.GetOptimalTrajectory();
+
+    ptr_lat_trajectory_bundle->push_back(
+        std::make_shared<PiecewiseJerkTrajectory1d>(lateral_trajectory));
+  }
 }
 
 }  // namespace planning

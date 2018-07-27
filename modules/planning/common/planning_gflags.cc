@@ -24,6 +24,10 @@ DEFINE_double(test_duration, -1.0,
 
 DEFINE_int32(planning_loop_rate, 10, "Loop rate for planning node");
 
+// TODO(all) enable this when perception issue is fixed.
+DEFINE_bool(enable_collision_detection, false,
+            "enable collision detection in planning");
+
 DEFINE_string(planning_adapter_config_filename,
               "modules/planning/conf/adapter.conf",
               "The adapter configuration file");
@@ -180,6 +184,8 @@ DEFINE_bool(enable_nudge_decision, true, "enable nudge decision");
 DEFINE_bool(enable_nudge_slowdown, true,
             "True to slow down when nudge obstacles.");
 
+DEFINE_bool(enable_side_radar, false,
+            "If there is no radar on the side,ignore it");
 DEFINE_double(static_decision_nudge_l_buffer, 0.5, "l buffer for nudge");
 DEFINE_double(lateral_ignore_buffer, 3.0,
               "If an obstacle's lateral distance is further away than this "
@@ -338,7 +344,29 @@ DEFINE_double(comfort_acceleration_factor, 0.5,
 DEFINE_double(polynomial_minimal_param, 0.01,
               "Minimal time parameter in polynomials.");
 DEFINE_double(lattice_stop_buffer, 0.02,
-              "The bufffer before the stop s to check trajectories.");
+              "The buffer before the stop s to check trajectories.");
+
+DEFINE_bool(lateral_optimization, false,
+            "whether using optimization for lateral trajectory generation");
+DEFINE_double(weight_lateral_offset, 1.0,
+              "weight for lateral offset "
+              "in lateral trajectory optimization");
+DEFINE_double(weight_lateral_derivative, 10.0,
+              "weight for lateral derivative "
+              "in lateral trajectory optimization");
+DEFINE_double(weight_lateral_second_order_derivative, 30.0,
+              "weight for lateral second order derivative "
+              "in lateral trajectory optimization");
+DEFINE_double(
+    weight_lateral_obstacle_distance, 5.0,
+    "weight for lateral obstacle distance in lateral trajectory optimization");
+DEFINE_double(lateral_third_order_derivative_max, 2.0,
+              "the maximal allowance for lateral third order derivative");
+DEFINE_double(max_s_lateral_optimization, 50.0,
+              "The maximal s for lateral optimization.");
+DEFINE_double(default_delta_s_lateral_optimization, 0.5,
+              "The default delta s for lateral optimization.");
+DEFINE_double(bound_buffer, 0.3, "buffer to boundary for lateral optimization");
 
 DEFINE_bool(use_planning_fallback, true,
             "Use fallback trajectory for planning.");

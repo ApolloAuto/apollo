@@ -69,7 +69,7 @@ The key hardware components to install include:
 
 - Onboard computer system ─ Neousys Nuvo-6108GC
 - Controller Area Network (CAN) Card ─ ESD CAN-PCIe/402-B4
-- General Positioning System (GPS) and Inertial Measurement Unit (IMU) ─
+- Global Positioning System (GPS) and Inertial Measurement Unit (IMU) ─
   You can select one of the following options:
   - NovAtel SPAN-IGM-A1
   - NovAtel SPAN® ProPak6™ and NovAtel IMU-IGM-A1
@@ -166,6 +166,11 @@ Use the components that you were required to provide to perform the following ta
 1.   Connect a monitor using the DVI or the HDMI cables and connect the keyboard and mouse to perform debugging tasks at the car onsite.
 
 2.   Establish a Wi-Fi connection on the Apple iPad Pro to access the HMI and control the Apollo ADS that is running on the IPC.
+
+## Time Sync Script Setup [Optional]
+
+In order to, sync the computer time to the NTP server on the internet, you could use the [Time Sync script](https://github.com/ApolloAuto/apollo/blob/master/scripts/time_sync.sh)
+
 
 ## Next Steps
 

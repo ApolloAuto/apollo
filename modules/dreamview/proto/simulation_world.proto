@@ -182,7 +182,12 @@ message ControlData {
   optional double heading_error = 4;
 }
 
-// Next-id: 24
+message Notification {
+  optional double timestamp_sec = 1;
+  optional apollo.common.monitor.MonitorMessageItem item = 2;
+}
+
+// Next-id: 26
 message SimulationWorld {
   // Timestamp in milliseconds
   optional double timestamp = 1;
@@ -217,7 +222,9 @@ message SimulationWorld {
   // Module delays
   optional DelaysInMs delay = 11;
 
-  optional apollo.common.monitor.MonitorMessage monitor = 12;
+  // Notification
+  optional apollo.common.monitor.MonitorMessage monitor = 12 [deprecated=true];
+  repeated Notification notification = 25;
 
   // Engage advice from planning
   optional string engage_advice = 13;

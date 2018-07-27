@@ -28,67 +28,70 @@ namespace apollo {
 namespace drivers {
 namespace lidar_velodyne {
 
-Velodyne16Driver::Velodyne16Driver(const Config &config) { config_ = config; }
+static const int POLL_LOG_INTERVAL = 100000;
 
-void Velodyne16Driver::init(ros::NodeHandle &node) {
-  double packet_rate = 754;                 // packet frequency (Hz)
-  double frequency = (config_.rpm / 60.0);  // expected Hz rate
+Velodyne16Driver::Velodyne16Driver(const VelodyneConf& conf) { config_ = conf; }
+
+bool Velodyne16Driver::init() {
+  double packet_rate = 754;                   // packet frequency (Hz)
+  double frequency = (config_.rpm() / 60.0);  // expected Hz rate
 
   // default number of packets for each scan is a single revolution
   // (fractions rounded up)
-  config_.npackets = static_cast<int>(ceil(packet_rate / frequency));
-  AINFO << "publishing " << config_.npackets << " packets per scan";
+  config_.set_npackets(static_cast<int>(ceil(packet_rate / frequency)));
+  AINFO << "publishing " << config_.npackets() << " packets per scan";
 
   // open Velodyne input device
-
   input_.reset(new SocketInput());
   positioning_input_.reset(new SocketInput());
-  input_->init(config_.firing_data_port);
-  positioning_input_->init(config_.positioning_data_port);
 
-  // raw data output topic
-  output_ =
-      node.advertise<velodyne_msgs::VelodyneScanUnified>(config_.topic, 10);
+  if (!input_->init(config_.firing_data_port())) {
+    AERROR << "init data input socket fail.";
+    return false;
+  }
+  if (!positioning_input_->init(config_.positioning_data_port())) {
+    AERROR << "init position input socket fail.";
+    return false;
+  }
+
   std::thread thread(&Velodyne16Driver::poll_positioning_packet, this);
   thread.detach();
+
+  return true;
 }
 
 /** poll the device
  *
  *  @returns true unless end of file reached
  */
-bool Velodyne16Driver::poll(void) {
-  // Allocate a new shared pointer for zero-copy sharing with other nodelets.
-  velodyne_msgs::VelodyneScanUnifiedPtr scan(
-      new velodyne_msgs::VelodyneScanUnified);
-
+bool Velodyne16Driver::poll(velodyne_msgs::VelodyneScanUnifiedPtr scan) {
   if (basetime_ == 0) {
+    AINFO_EVERY(POLL_LOG_INTERVAL) << "no position data, wait init ...";
     usleep(100);  // waiting for positioning data
-    return true;
+    return false;
   }
 
   int poll_result = poll_standard(scan);
 
   if (poll_result == SOCKET_TIMEOUT || poll_result == RECIEVE_FAIL) {
-    return true;  // poll again
+    return false;  // poll again
   }
 
   if (scan->packets.empty()) {
-    AINFO << "Get a empty scan from port: " << config_.firing_data_port;
-    return true;
+    AINFO << "Get a empty scan from port: " << config_.firing_data_port();
+    return false;
   }
 
   // publish message using time of last packet read
   ADEBUG << "Publishing a full Velodyne scan.";
   scan->header.stamp = ros::Time().now();
-  scan->header.frame_id = config_.frame_id;
-  // we use first packet gps time update gps base hour
+  scan->header.frame_id = config_.frame_id();
+  // we use fisrt packet gps time update gps base hour
   // in cloud nodelet, will update base time packet by packet
   uint32_t current_secs =
-      *(reinterpret_cast<uint32_t *>(&scan->packets.front().data[0] + 1200));
+      *(reinterpret_cast<uint32_t*>(&scan->packets.front().data[0] + 1200));
   update_gps_top_hour(current_secs);
   scan->basetime = basetime_;
-  output_.publish(scan);
 
   return true;
 }
@@ -102,7 +105,7 @@ void Velodyne16Driver::poll_positioning_packet(void) {
     NMEATimePtr nmea_time(new NMEATime);
     bool ret = true;
     while (true) {
-      int rc = positioning_input_->get_positioning_data_packet(nmea_time);
+      int rc = positioning_input_->get_positioning_data_packtet(nmea_time);
       if (rc == 0) {
         break;  // got a full packet
       }
@@ -112,7 +115,7 @@ void Velodyne16Driver::poll_positioning_packet(void) {
     }
 
     if (basetime_ == 0 && ret) {
-      set_base_time_from_nmea_time(nmea_time, basetime_);
+      set_base_time_from_nmea_time(nmea_time, &basetime_);
     }
   }
 }
