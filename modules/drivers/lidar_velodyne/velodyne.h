@@ -65,17 +65,17 @@ class Velodyne : public apollo::common::ApolloApp {
       RawDataCache;
   typedef common::util::BlockingQueue<sensor_msgs::PointCloud2Ptr>
       PointCloudCache;
-  void Packet(RawDataCache* output, const VelodyneConf& conf);
-  void Convert(RawDataCache* input, PointCloudCache* output,
-               const VelodyneConf& conf);
-  void Compensate(PointCloudCache* input, const VelodyneConf& conf);
-  void Notice();
-  bool CalcNpackets(VelodyneConfUnit* unit);
+  void Packet(const VelodyneConf& conf, RawDataCache* output);
+  void Convert(const VelodyneConf& conf, RawDataCache* input,
+               PointCloudCache* output);
+  void Compensate(const VelodyneConf& conf, PointCloudCache* input);
+  bool SetNpackets(VelodyneConfUnit* unit);
   bool FusionCheckInit(const std::map<uint32_t, uint8_t>& velodyne_index_map);
   inline int64_t GetTime() {
     return apollo::common::time::AsInt64<common::time::micros>(
         apollo::common::time::Clock::Now());
   }
+  void Notice();
 
  private:
   VelodyneConfUnit conf_unit_;
