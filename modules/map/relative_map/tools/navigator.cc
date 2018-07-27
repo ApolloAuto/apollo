@@ -25,6 +25,7 @@
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/adapters/proto/adapter_config.pb.h"
 #include "modules/common/log.h"
+#include "modules/map/relative_map/common/relative_map_gflags.h"
 #include "modules/map/relative_map/proto/navigation.pb.h"
 
 using apollo::common::adapter::AdapterConfig;
@@ -41,6 +42,7 @@ bool GetNavigationPathFromFile(const std::string& filename,
 
 int main(int argc, char** argv) {
   google::InitGoogleLogging(argv[0]);
+  google::ParseCommandLineFlags(&argc, &argv, true);
   FLAGS_alsologtostderr = true;
 
   std::vector<std::string> navigation_line_filenames;
@@ -54,6 +56,9 @@ int main(int argc, char** argv) {
           << " left.txt.smoothed right.txt.smoothed middle.txt.smoothed";
     return -1;
   }
+
+  ADEBUG << "The flag \"navigator_down_sample\" is: "
+         << FLAGS_navigator_down_sample;
 
   ros::init(argc, argv, "navigator_offline", ros::init_options::AnonymousName);
 
@@ -74,7 +79,7 @@ int main(int argc, char** argv) {
       AWARN << "Failed to load file: " << filename;
       continue;
     }
-    AINFO << "Processing " + filename;
+    AINFO << "The file: " << filename + " is processed ";
     navigation_path->set_path_priority(i);
     navigation_path->mutable_path()->set_name("Navigation path " + i);
     ++i;
@@ -138,21 +143,51 @@ bool GetNavigationPathFromFile(const std::string& filename,
     return false;
   }
   std::string line_str;
+  double last_sampled_s = std::numeric_limits<double>::min();
+  double current_sampled_s = 0.0;
+  double diff_s = 0.0;
+  double current_kappa = 0.0;
+  int original_points_num = 0;
+  int down_sampled_points_num = 0;
+  constexpr double kStraightSampleInterval = 3.0;
+  constexpr double kSmallKappaSampleInterval = 1.0;
+  constexpr double kLargeKappaSampleInterval = 0.4;
+  constexpr double kSmallKappa = 0.005;
+  constexpr double kLargeKappa = 0.03;
   while (std::getline(ifs, line_str)) {
     try {
       auto json_obj = json::parse(line_str);
-      auto* point = navigation_path->mutable_path()->add_path_point();
-      point->set_x(json_obj["x"]);
-      point->set_y(json_obj["y"]);
-      point->set_s(json_obj["s"]);
-      point->set_theta(json_obj["theta"]);
-      point->set_kappa(json_obj["kappa"]);
-      point->set_dkappa(json_obj["dkappa"]);
-      ADEBUG << "x: " << json_obj["x"] << ", y: " << json_obj["y"];
+      current_sampled_s = json_obj["s"];
+      current_kappa = json_obj["kappa"];
+      diff_s = current_sampled_s - last_sampled_s;
+      bool not_down_sampling = FLAGS_navigator_down_sample
+                                   ? diff_s >= kStraightSampleInterval ||
+                                         (diff_s >= kSmallKappaSampleInterval &&
+                                          current_kappa > kSmallKappa) ||
+                                         (diff_s >= kLargeKappaSampleInterval &&
+                                          current_kappa > kLargeKappa)
+                                   : true;
+      if (not_down_sampling) {
+        last_sampled_s = current_sampled_s;
+        auto* point = navigation_path->mutable_path()->add_path_point();
+        point->set_x(json_obj["x"]);
+        point->set_y(json_obj["y"]);
+        point->set_s(current_sampled_s);
+        point->set_theta(json_obj["theta"]);
+        point->set_kappa(current_kappa);
+        point->set_dkappa(json_obj["dkappa"]);
+        ++down_sampled_points_num;
+        ADEBUG << "down_sample_x: " << json_obj["x"]
+               << ", down_sample_y: " << json_obj["y"];
+      }
+      ++original_points_num;
     } catch (const std::exception& e) {
       AERROR << "Failed to parse JSON data: " << e.what();
       return false;
     }
   }
+  AINFO << "The number of original points is: " << original_points_num
+        << " and the number of down sampled points is: "
+        << down_sampled_points_num << " in the file: " << filename;
   return true;
 }

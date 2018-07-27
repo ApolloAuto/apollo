@@ -51,3 +51,7 @@ DEFINE_bool(enable_cyclic_rerouting, false,
 
 DEFINE_bool(relative_map_generate_left_boundray, true,
             "Generate left boundary for detected lanes.");
+
+DEFINE_bool(navigator_down_sample, true,
+            "When a navigation line is sent, the original data is downsampled "
+            "to reduce unnecessary memory consumption.");
