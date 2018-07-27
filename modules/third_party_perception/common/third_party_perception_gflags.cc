@@ -87,6 +87,3 @@ DEFINE_double(max_mobileye_obstacle_width, 12.7,
 
 DEFINE_bool(overwrite_mobileye_theta, true,
             "overrite mobileye raw theta output");
-
-DEFINE_bool(use_navigation_mode, true,
-            "use navigation mode");
