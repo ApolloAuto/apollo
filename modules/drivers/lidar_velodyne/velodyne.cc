@@ -28,7 +28,7 @@
 #include "modules/drivers/lidar_velodyne/driver/driver.h"
 #include "modules/drivers/lidar_velodyne/pointcloud/compensator.h"
 #include "modules/drivers/lidar_velodyne/pointcloud/converter.h"
-#include "modules/drivers/lidar_velodyne/pointcloud/multiple_velodyne_adapter.h"
+#include "modules/drivers/lidar_velodyne/pointcloud/velodyne_adapter.h"
 
 namespace apollo {
 namespace drivers {
@@ -65,7 +65,7 @@ Status Velodyne::Init() {
   AdapterManager::Init(FLAGS_velodyne_adapter_config_filename);
   common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
 
-  if (!MultipleVelodyneAdapter::CheckMultipleVelodyne()) {
+  if (!VelodyneAdapter::CheckVelodyne()) {
     return Status(ErrorCode::DRIVER_ERROR_VELODYNE, "Adapter not initialized");
   }
 
@@ -133,7 +133,7 @@ void Velodyne::Packet(RawDataCache* output, const VelodyneConf& conf) {
     }
 
     if (FLAGS_publish_raw_data) {
-      MultipleVelodyneAdapter::PublishVelodyneRawByIndex(conf.index(), pub);
+      VelodyneAdapter::PublishVelodyneScanByIndex(conf.index(), pub);
     }
 
     if (FLAGS_pipeline_mode) {
@@ -192,8 +192,7 @@ void Velodyne::Convert(RawDataCache* input, PointCloudCache* output,
 
     output->put(pointcloud);
     if (FLAGS_publish_raw_pointcloud) {
-      MultipleVelodyneAdapter::PublishPointCloudRawByIndex(conf.index(),
-                                                           pointcloud);
+      VelodyneAdapter::PublishPointCloudRawByIndex(conf.index(), pointcloud);
     }
     AINFO << "CALC convert done.";
     int64_t t3 = GetTime();
@@ -222,7 +221,7 @@ void Velodyne::Compensate(PointCloudCache* input, const VelodyneConf& conf) {
     }
     uint32_t index = conf.index();
     if (FLAGS_publish_compensator_pointcloud) {
-      MultipleVelodyneAdapter::PublishPointCloudByIndex(index, com_pointcloud);
+      VelodyneAdapter::PublishPointCloudByIndex(index, com_pointcloud);
     }
     AINFO << "CALC compensate done.";
     int64_t t2 = GetTime();
