@@ -64,9 +64,22 @@ message AdapterConfig {
     GNSS_HEADING = 56;
     RTCM_DATA = 57;
     RACOBIT_RADAR = 59;
-    POINT_CLOUD_RAW = 60;
-    VELODYNE_RAW = 61;
-    POINT_CLOUD_FUSION = 62;
+    // veldoyne fusion configs
+    POINT_CLOUD_DENSE = 60;
+    POINT_CLOUD_DENSE_RAW = 61;
+    VELODYNE_SCAN_DENSE = 62;
+
+    POINT_CLOUD_SPARSE_1 = 63;
+    POINT_CLOUD_SPARSE_RAW_1 = 64;
+    VELODYNE_SCAN_SPARSE_1 = 65;
+
+    POINT_CLOUD_SPARSE_2 = 66;
+    POINT_CLOUD_SPARSE_RAW_2 = 67;
+    VELODYNE_SCAN_SPARSE_2 = 68;
+
+    POINT_CLOUD_SPARSE_3 = 69;
+    POINT_CLOUD_SPARSE_RAW_3 = 70;
+    VELODYNE_SCAN_SPARSE_3 = 71;
   }
   enum Mode {
     RECEIVE_ONLY = 0;
@@ -79,6 +92,7 @@ message AdapterConfig {
   // is not useful for PUBLISH_ONLY mode messages.
   optional int32 message_history_limit = 3 [default = 10];
   optional bool latch = 4 [default=false];
+  optional string topic = 5;
 }
 
 // A config to specify which messages a certain module would consume and

@@ -62,6 +62,4 @@ DECLARE_double(max_mobileye_obstacle_length);
 DECLARE_double(max_mobileye_obstacle_width);
 DECLARE_bool(overwrite_mobileye_theta);
 
-DECLARE_bool(use_navigation_mode);
-
 #endif
