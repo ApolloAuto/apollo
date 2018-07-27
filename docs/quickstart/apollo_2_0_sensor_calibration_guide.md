@@ -19,7 +19,7 @@ This guide provides the following information:
 
 ## Overview
 
-The new calibration tools in Apollo 2.0 (Camera-to-Camera Calibration, Camera-to-LiDAR Calibration, and Radar-to-Camera Calibration) are provided by an onboard executable program.For LiDAR-GNSS calibration, please refer to the LiDAR-GNSS calibration guide. Velodyne HDL-64 users can also use the calibration service in Apollo 1.5.
+The new calibration tools in Apollo 2.0 (Camera-to-Camera Calibration, Camera-to-LiDAR Calibration, and Radar-to-Camera Calibration) are provided by an onboard executable program.For LiDAR-GNSS calibration, please refer to the [LiDAR-IMU calibration guide](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/apollo_lidar_imu_calibration_guide.md). Velodyne HDL-64 users can also use the calibration service in Apollo 1.5.
 The benefit in using these tools is that they reduce the amount of work that the user must do. The user only has to start the corresponding calibration program, and the calibration work is performed and completes in real time. The user can then verify the calibration results, which are provided as `.yaml` files.
 
 ## Preparation

@@ -24,15 +24,16 @@
 
 #include <map>
 #include <string>
+#include <tuple>
 #include <vector>
+
+#include "modules/common/proto/pnc_point.pb.h"
 
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/vec2d.h"
-#include "modules/common/proto/pnc_point.pb.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/obstacle.h"
 #include "modules/planning/tasks/task.h"
-
 /**
  * @namespace apollo::planning
  * @brief apollo::planning
@@ -61,25 +62,54 @@ class NaviObstacleDecider : public Task {
   const ::apollo::common::VehicleParam &VehicleParam();
 
   /**
+   * @brief Get unsafe obstacles' ID
+   * @return unsafe_obstacle_ID_
+   */
+  const std::vector<std::tuple<std::string, double, double>> &UnsafeObstacles();
+
+  /**
    * @brief get the actual nudgable distance according to the
    * position of the obstacle
    * @return actual nudgable distance
    */
   double GetNudgeDistance(
       const std::vector<const Obstacle *> &obstacles,
+      const ReferenceLine &reference_line, const PathDecision &path_decision,
       const std::vector<common::PathPoint> &path_data_points,
-      const double min_lane_width);
+      int *lane_obstacles_num);
+
+  /**
+   * @brief get the unsafe obstacles between trajectory and reference line.
+   * @return obstacles' ID.
+   */
+  void GetUnsafeObstaclesInfo(
+      const std::vector<common::PathPoint> &path_data_points,
+      const std::vector<const Obstacle *> &obstacles);
 
  private:
   /**
    * @brief process path's obstacles info
+   * @return Number of obstacles in the current lane
    */
-  void ProcessPathObstacle(
+  int ProcessPathObstacle(
       const std::vector<const Obstacle *> &obstacles,
-      const std::vector<common::PathPoint> &path_data_points);
+      const std::vector<common::PathPoint> &path_data_points,
+      const PathDecision &path_decision, const double min_lane_width);
+
+  void JudgePointLeftOrRight(
+      const common::PathPoint &projection_point,
+      const std::vector<common::PathPoint> &path_data_points,
+      const Obstacle *current_obstacle, const double proj_len, double *dist);
+  /**
+   * @brief Get the minimum path width
+   * @return minimum path width
+   */
+  double GetMinLaneWidth(const std::vector<common::PathPoint> &path_data_points,
+                         const ReferenceLine &reference_line);
 
  private:
   std::map<double, double> obstacle_lat_dist_;
+  std::vector<std::tuple<std::string, double, double>> unsafe_obstacle_info_;
 
   // TODO(all): Add your member functions and variables.
 };
@@ -90,6 +120,11 @@ NaviObstacleDecider::VehicleParam() {
                                   ->GetConfig()
                                   .vehicle_param();
   return vehicle_param;
+}
+
+inline const std::vector<std::tuple<std::string, double, double>>
+    &NaviObstacleDecider::UnsafeObstacles() {
+  return unsafe_obstacle_info_;
 }
 
 }  // namespace planning

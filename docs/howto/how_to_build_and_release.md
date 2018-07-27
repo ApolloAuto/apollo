@@ -44,34 +44,8 @@ To create a release excluding proprietary software (such as ESD CAN library), us
 ```bash
 bash apollo.sh release_noproprietary
 ```
- **The next few commands need to be executed outside the container.** 
 
-### Generate release image
- First, you would have to exit the Docker container by typing ```exit```
-
- Then, to create a new Docker image:
-
-```bash
-bash apollo_docker.sh gen
-```
-This will create a new docker image with the release directory. The release image will be named as *release-yyyymmdd_hhmm*. Meanwhile, your most recent built image will be tagged as *release-latest*. 
-
-### Push docker images
-By default, the images will be pushed to Apolloauto/apollo Docker hub when you run the following command:
-```bash
-bash apollo_docker.sh push
-```
-You would need to upload it to your own docker hub, otherwise you would see an error
-```bash
-denied: requested access to resource is denied.
-```
-One way to solve this issue is by running the following command:
-```bash
-docker tag apolloauto/apollo:TAG_NAME YOUR_REPO:YOUR_TAGNAME
-```
-Now, login to gain access to your repository by following the process mentioned [here](https://docs.docker.com/engine/reference/commandline/login/#options)
-
-Then, push your images to your own repository on Docker hub. You can refer to [this page](https://ropenscilabs.github.io/r-docker-tutorial/04-Dockerhub.html) for additional support.
+In order to generate and push your images to your own docker repository, please refer to [How to Generate and Push Docker images](how_to_generate_and_push_docker_images.md)
 
 ## <span id="build_in_vscode">Build in Visual Studio Code</span>
 ### Install VSCode
@@ -91,6 +65,12 @@ Use the keyboard shortcut **(Ctrl+K Ctrl+O)** to open the Apollo project.
 Use the keyboard shortcut **(Ctrl+Shift+B)** to build the Apollo project. 
 ### Run all unit tests for the Apollo project in VSCode
 Select the "Tasks->Run Tasks..." menu command and click "run all unit tests for the apollo project" from a popup menu to check the code style for the Apollo project. 
+
+If you are currently developing on 16.04, you will get a build error.
+As seen in the image below, 2 perception tests. To avoid this build error, refer to the [how to build Apollo using Ubuntu 16](how_to_run_apollo_2.5_with_ubuntu16.md).
+
+![Build error](images/build_fail.png)
+
 ### Run a code style check task for the Apollo project in VSCode
 Select the "Tasks->Run Tasks..." menu command and click "code style check for the apollo project" from a popup menu to check the code style for the Apollo project. 
 ### Clean the Apollo project in VSCode

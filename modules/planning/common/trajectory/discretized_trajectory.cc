@@ -66,7 +66,7 @@ TrajectoryPoint DiscretizedTrajectory::Evaluate(
       *(it_lower - 1), *it_lower, relative_time);
 }
 
-std::uint32_t DiscretizedTrajectory::QueryNearestPoint(
+std::uint32_t DiscretizedTrajectory::QueryLowerBoundPoint(
     const double relative_time) const {
   CHECK(!trajectory_points_.empty());
 

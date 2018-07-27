@@ -16,8 +16,6 @@
 # limitations under the License.
 ###############################################################################
 
-#! /bin/bash
-
 python result2pb.py ../../control/conf/lincoln.pb.txt $1
 
 echo "Created control conf file: control_conf_pb.txt"

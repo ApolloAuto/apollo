@@ -78,8 +78,11 @@ bool FlatCameraTransformer::SetExtrinsics(
 bool FlatCameraTransformer::GetAdjustedExtrinsics(
   Eigen::Matrix<double, 4, 4>* extrinsics) {
   // Return static results if no object to use in the scene
-  if (!adjust_pitch_) *extrinsics = camera2car_.cast<double>();
-  if (adjust_pitch_) *extrinsics = camera2car_adj_.cast<double>();
+  if (adjust_pitch_) {
+    *extrinsics = camera2car_adj_.cast<double>();
+  } else {
+    *extrinsics = camera2car_.cast<double>();
+  }
   return adjust_pitch_;
 }
 

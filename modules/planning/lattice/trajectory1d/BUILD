@@ -74,4 +74,32 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "constant_jerk_trajectory1d",
+    srcs = [
+        "constant_jerk_trajectory1d.cc",
+    ],
+    hdrs = [
+        "constant_jerk_trajectory1d.h",
+    ],
+    deps = [
+        "//modules/common",
+        "//modules/planning/math/curve1d",
+        "//modules/planning/common:planning_gflags",
+    ],
+)
+
+cc_library(
+    name = "piecewise_jerk_trajectory1d",
+    srcs = [
+        "piecewise_jerk_trajectory1d.cc",
+    ],
+    hdrs = [
+        "piecewise_jerk_trajectory1d.h",
+    ],
+    deps = [
+        ":constant_jerk_trajectory1d",
+    ],
+)
+
 cpplint()

@@ -22,6 +22,7 @@ cc_library(
         "//modules/planning/proto:planning_proto",
         "//modules/planning/tasks:task",
         "//modules/planning/navi/common:common",
+        "//modules/planning/navi/decider:navi_obstacle_decider",
         "@glog",
     ],
 )
@@ -30,9 +31,11 @@ cc_library(
     name = "navi_speed_decider",
     srcs = [
         "navi_speed_decider.cc",
+        "navi_speed_ts_graph.cc",
     ],
     hdrs = [
         "navi_speed_decider.h",
+        "navi_speed_ts_graph.h",
     ],
     deps = [
         "//modules/common/configs:vehicle_config_helper",
@@ -42,6 +45,7 @@ cc_library(
         "//modules/planning/common:frame",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/common:reference_line_info",
+        "//modules/planning/navi/decider:navi_obstacle_decider",
         "//modules/planning/proto:planning_config_proto",
         "//modules/planning/proto:planning_proto",
         "//modules/planning/tasks:task",
@@ -79,6 +83,7 @@ cc_test(
     srcs = [
         "navi_path_decider_test.cc",
         "navi_speed_decider_test.cc",
+        "navi_speed_ts_graph_test.cc",
         "navi_obstacle_decider_test.cc",
     ],
     data = ["//modules/planning:planning_testdata"],

@@ -37,6 +37,14 @@ DEFINE_string(control_command_topic, "/apollo/control",
 DEFINE_string(pointcloud_topic,
               "/apollo/sensor/velodyne64/compensator/PointCloud2",
               "pointcloud topic name");
+DEFINE_string(pointcloud_raw_topic, "/apollo/sensor/velodyne64/PointCloud2",
+              "pointcloud raw topic name");
+DEFINE_string(velodyne_raw_topic,
+              "/apollo/sensor/velodyne64/VelodyneScanUnified",
+              "velodyne64 raw data topic name");
+DEFINE_string(pointcloud_fusion_topic,
+              "/apollo/sensor/velodyne64/fusion/PointCloud2",
+              "pointcloud fusion topic name");
 DEFINE_string(vlp16_pointcloud_topic,
               "/apollo/sensor/velodyne16/compensator/PointCloud2",
               "16 beam Lidar pointcloud topic name");
@@ -71,6 +79,8 @@ DEFINE_string(delphi_esr_topic, "/apollo/sensor/delphi_esr",
               "delphi esr radar topic name");
 DEFINE_string(conti_radar_topic, "/apollo/sensor/conti_radar",
               "continental radar topic name");
+DEFINE_string(racobit_radar_topic, "/apollo/sensor/racobit_radar",
+              "racobit radar topic name");
 DEFINE_string(ultrasonic_radar_topic, "/apollo/sensor/ultrasonic_radar",
               "ultrasonic esr radar topic name");
 // TODO(Authors): Change the topic name

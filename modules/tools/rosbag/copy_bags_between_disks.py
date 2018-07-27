@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 
 ###############################################################################
 # Copyright 2018 The Apollo Authors. All Rights Reserved.
@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ###############################################################################
+
 """
 Copy bags between disks.
 """
@@ -31,19 +32,21 @@ import psutil
 
 from modules.canbus.proto.chassis_pb2 import Chassis
 
-kChassisTopic = '/apollo/canbus/chassis'
-kDriveEventTopic = '/apollo/drive_event'
-kLargeSizeTopics = set([
+K_CHASSIS_TOPIC = '/apollo/canbus/chassis'
+K_DRIVE_EVENT_TOPIC = '/apollo/drive_event'
+
+K_LARGE_SIZE_TOPICS = set([
     '/apollo/sensor/camera/obstacle/front_6mm',
     '/apollo/sensor/camera/traffic/image_long',
     '/apollo/sensor/camera/traffic/image_short',
     '/apollo/sensor/velodyne64/compensator/PointCloud2',
 ])
-kCopyLargeSizeTopicsSecondsBeforeEvent = 20.0
+K_COPY_LARGE_SIZE_TOPICS_SECONDS_BEFORE_EVENT = 20.0
 
 
 def GetDisks():
     """Get disks, which should be mounted under /media."""
+
     disks = [disk.mountpoint for disk in psutil.disk_partitions()
              if disk.mountpoint.startswith('/media/')]
     disks.append('/apollo')
@@ -83,31 +86,31 @@ def GetDisks():
         sys.exit(1)
     return copy_from, copy_to
 
-
 def CollectEvents(bags):
     """Collect interested event timestamps."""
+
     print('Collecting events...', end='')
     events = []
     cur_driving_mode = None
     for bag_file in bags:
         with Bag(bag_file, 'r') as bag:
-            for topic, msg, t in bag.read_messages(topics=[kChassisTopic,
-                                                           kDriveEventTopic]):
+            for topic, msg, t in bag.read_messages(topics=[K_CHASSIS_TOPIC,
+                                                           K_DRIVE_EVENT_TOPIC]):
                 # For disengagement, take the message time as event time.
-                if topic == kChassisTopic:
+                if topic == K_CHASSIS_TOPIC:
                     if (cur_driving_mode == Chassis.COMPLETE_AUTO_DRIVE and
                         msg.driving_mode == Chassis.EMERGENCY_MODE):
                         events.append(t.to_sec())
                     cur_driving_mode = msg.driving_mode
                 # For DriveEvent, take the header time as event time.
-                elif topic == kDriveEventTopic:
+                elif topic == K_DRIVE_EVENT_TOPIC:
                     events.append(msg.header.timestamp_sec)
     print('Collected {} events.'.format(len(events)))
     return events
 
-
 def SmartCopyBags(from_dir, to_dir):
     """Copy a task but filter useless sensor data."""
+
     bags = sorted(glob.glob(os.path.join(from_dir, '*.bag')))
     if len(bags) == 0:
         return
@@ -124,7 +127,7 @@ def SmartCopyBags(from_dir, to_dir):
         with Bag(from_bag, 'r') as bag_in, Bag(to_bag, 'w') as bag_out:
             for topic, msg, t in bag_in.read_messages():
                 # For small size topics, always copy.
-                if topic not in kLargeSizeTopics:
+                if topic not in K_LARGE_SIZE_TOPICS:
                     bag_out.write(topic, msg, t)
                     continue
 
@@ -133,12 +136,13 @@ def SmartCopyBags(from_dir, to_dir):
                     next_event += 1
                 # For large size topics, only copy when it's near an event.
                 if (next_event < len(events) and events[next_event] - msg_sec <
-                        kCopyLargeSizeTopicsSecondsBeforeEvent):
+                    K_COPY_LARGE_SIZE_TOPICS_SECONDS_BEFORE_EVENT):
                     bag_out.write(topic, msg, t)
 
 
 def SmartCopyDir(from_dir, to_dir):
     """Copy directory."""
+
     print('Copy dir: {} -> {}'.format(from_dir, to_dir))
     is_task_dir = False
     for f in sorted(os.listdir(from_dir), reverse=True):
@@ -155,12 +159,15 @@ def SmartCopyDir(from_dir, to_dir):
 
         if f.endswith('.bag'):
             is_task_dir = True
+            break;
+
     if is_task_dir:
         SmartCopyBags(from_dir, to_dir)
 
 
-def Main():
+def main():
     """Do the job."""
+
     copy_from, copy_to = GetDisks()
     from_dir = os.path.join(copy_from, 'data/bag')
     if not os.path.exists(from_dir):
@@ -188,4 +195,4 @@ def Main():
             shutil.copytree(src, os.path.join(copy_to, dst)
 
 if __name__ == '__main__':
-    Main()
+    main()

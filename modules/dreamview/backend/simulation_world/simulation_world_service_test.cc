@@ -93,39 +93,54 @@ TEST_F(SimulationWorldServiceTest, UpdateMonitorSuccess) {
   monitor.add_item()->set_msg("I am the latest message.");
   monitor.mutable_header()->set_timestamp_sec(2000);
 
-  auto* world_monitor = sim_world_service_->world_.mutable_monitor();
-  world_monitor->mutable_header()->set_timestamp_sec(1990);
-  world_monitor->add_item()->set_msg("I am the previous message.");
+  auto* notification = sim_world_service_->world_.add_notification();
+  notification->set_timestamp_sec(1990);
+  notification->mutable_item()->set_msg("I am the previous message.");
 
   sim_world_service_->UpdateSimulationWorld(monitor);
 
-  EXPECT_EQ(2, world_monitor->item_size());
-  EXPECT_EQ("I am the latest message.", world_monitor->item(0).msg());
-  EXPECT_EQ("I am the previous message.", world_monitor->item(1).msg());
+  EXPECT_EQ(2, sim_world_service_->world_.notification_size());
+  EXPECT_EQ("I am the previous message.",
+            sim_world_service_->world_.notification(0).item().msg());
+  EXPECT_EQ("I am the latest message.",
+            sim_world_service_->world_.notification(1).item().msg());
+  EXPECT_DOUBLE_EQ(1990,
+                   sim_world_service_->world_.notification(0).timestamp_sec());
+  EXPECT_DOUBLE_EQ(2000,
+                   sim_world_service_->world_.notification(1).timestamp_sec());
 }
 
 TEST_F(SimulationWorldServiceTest, UpdateMonitorRemove) {
   MonitorMessage monitor;
-  monitor.add_item()->set_msg("I am message -2");
   monitor.add_item()->set_msg("I am message -1");
+  monitor.add_item()->set_msg("I am message -2");
   monitor.mutable_header()->set_timestamp_sec(2000);
 
-  auto* world_monitor = sim_world_service_->world_.mutable_monitor();
-  world_monitor->mutable_header()->set_timestamp_sec(1990);
   for (int i = 0; i < SimulationWorldService::kMaxMonitorItems; ++i) {
-    world_monitor->add_item()->set_msg(StrCat("I am message ", i));
+    auto* notification = sim_world_service_->world_.add_notification();
+    notification->mutable_item()->set_msg(StrCat("I am message ", i));
+    notification->set_timestamp_sec(1990);
   }
   int last = SimulationWorldService::kMaxMonitorItems - 1;
-  EXPECT_EQ(StrCat("I am message ", last), world_monitor->item(last).msg());
+  EXPECT_EQ(StrCat("I am message ", last),
+            sim_world_service_->world_.notification(last).item().msg());
 
   sim_world_service_->UpdateSimulationWorld(monitor);
 
   EXPECT_EQ(SimulationWorldService::kMaxMonitorItems,
-            world_monitor->item_size());
-  EXPECT_EQ("I am message -2", world_monitor->item(0).msg());
-  EXPECT_EQ("I am message -1", world_monitor->item(1).msg());
-  EXPECT_EQ(StrCat("I am message ", last - monitor.item_size()),
-            world_monitor->item(last).msg());
+            sim_world_service_->world_.notification_size());
+  EXPECT_EQ("I am message -2",
+            sim_world_service_->world_.notification(last).item().msg());
+  EXPECT_EQ("I am message -1",
+            sim_world_service_->world_.notification(last - 1).item().msg());
+  EXPECT_EQ(StrCat("I am message ", last),
+            sim_world_service_->world_.notification(last - 2).item().msg());
+  EXPECT_DOUBLE_EQ(
+      2000, sim_world_service_->world_.notification(last).timestamp_sec());
+  EXPECT_DOUBLE_EQ(
+      2000, sim_world_service_->world_.notification(last - 1).timestamp_sec());
+  EXPECT_DOUBLE_EQ(
+      1990, sim_world_service_->world_.notification(last - 2).timestamp_sec());
 }
 
 TEST_F(SimulationWorldServiceTest, UpdateMonitorTruncate) {
@@ -139,16 +154,19 @@ TEST_F(SimulationWorldServiceTest, UpdateMonitorTruncate) {
   EXPECT_EQ(StrCat("I am message ", large_size - 1),
             monitor.item(large_size - 1).msg());
 
-  auto* world_monitor = sim_world_service_->world_.mutable_monitor();
-  world_monitor->mutable_header()->set_timestamp_sec(1990);
-
   sim_world_service_->UpdateSimulationWorld(monitor);
 
   int last = SimulationWorldService::kMaxMonitorItems - 1;
   EXPECT_EQ(SimulationWorldService::kMaxMonitorItems,
-            world_monitor->item_size());
-  EXPECT_EQ("I am message 0", world_monitor->item(0).msg());
-  EXPECT_EQ(StrCat("I am message ", last), world_monitor->item(last).msg());
+            sim_world_service_->world_.notification_size());
+  EXPECT_EQ("I am message 0",
+            sim_world_service_->world_.notification(0).item().msg());
+  EXPECT_EQ(StrCat("I am message ", last),
+            sim_world_service_->world_.notification(last).item().msg());
+  EXPECT_DOUBLE_EQ(2000,
+                   sim_world_service_->world_.notification(0).timestamp_sec());
+  EXPECT_DOUBLE_EQ(
+      2000, sim_world_service_->world_.notification(last).timestamp_sec());
 }
 
 TEST_F(SimulationWorldServiceTest, UpdateChassisInfo) {
@@ -476,6 +494,104 @@ TEST_F(SimulationWorldServiceTest, UpdateRouting) {
   for (int i = 0; i < path.point_size(); ++i) {
     EXPECT_NEAR(path.point(i).x(), points[i][0], kEpsilon);
     EXPECT_NEAR(path.point(i).y(), points[i][1], kEpsilon);
+  }
+}
+
+TEST_F(SimulationWorldServiceTest, UpdateGps) {
+  // Prepare the gps message that will be used to update the
+  // SimulationWorld object.
+  apollo::localization::Gps gps;
+  auto* pose = gps.mutable_localization();
+  auto* position = pose->mutable_position();
+  position->set_x(586922.10396);
+  position->set_y(4141065.07993);
+  position->set_z(-30.60015);
+  auto* orientation = pose->mutable_orientation();
+  orientation->set_qx(-0.01742);
+  orientation->set_qy(0.00928);
+  orientation->set_qz(-0.12262);
+  orientation->set_qw(0.99226);
+
+  sim_world_service_->UpdateSimulationWorld(gps);
+
+  // Verify
+  const auto& gps_position = sim_world_service_->world().gps();
+  EXPECT_DOUBLE_EQ(586922.10396, gps_position.position_x());
+  EXPECT_DOUBLE_EQ(4141065.07993, gps_position.position_y());
+  EXPECT_NEAR(1.32515, gps_position.heading(), 0.00001);
+}
+
+TEST_F(SimulationWorldServiceTest, UpdateControlCommandWithSimpleLonLat) {
+  // Prepare the ControlCommand message that will be used to update the
+  // SimulationWorld object.
+  apollo::control::ControlCommand control_command;
+  const double station_error = 0.90225;
+  const double heading_error = -0.00097;
+  const double lateral_error = 0.004176;
+  control_command.mutable_header()->set_timestamp_sec(2000);
+  auto* debug = control_command.mutable_debug();
+  auto* simple_lon = debug->mutable_simple_lon_debug();
+  simple_lon->set_station_error(station_error);
+
+  auto* simple_lat = debug->mutable_simple_lat_debug();
+  simple_lat->set_heading_error(heading_error);
+  simple_lat->set_lateral_error(lateral_error);
+  sim_world_service_->UpdateSimulationWorld(control_command);
+
+  // Verify
+  const auto& control_data = sim_world_service_->world().control_data();
+  EXPECT_DOUBLE_EQ(station_error, control_data.station_error());
+  EXPECT_DOUBLE_EQ(heading_error, control_data.heading_error());
+  EXPECT_DOUBLE_EQ(lateral_error, control_data.lateral_error());
+}
+
+TEST_F(SimulationWorldServiceTest, UpdateControlCommandWithSimpleMpc) {
+  // Prepare the ControlCommand message that will be used to update the
+  // SimulationWorld object.
+  apollo::control::ControlCommand control_command;
+  const double station_error = 0.91225;
+  const double heading_error = -0.01097;
+  const double lateral_error = 0.014176;
+  control_command.mutable_header()->set_timestamp_sec(3000);
+  auto* debug = control_command.mutable_debug();
+  auto* simple_mpc = debug->mutable_simple_mpc_debug();
+  simple_mpc->set_station_error(station_error);
+  simple_mpc->set_heading_error(heading_error);
+  simple_mpc->set_lateral_error(lateral_error);
+  sim_world_service_->UpdateSimulationWorld(control_command);
+
+  // Verify
+  const auto& control_data = sim_world_service_->world().control_data();
+  EXPECT_DOUBLE_EQ(station_error, control_data.station_error());
+  EXPECT_DOUBLE_EQ(heading_error, control_data.heading_error());
+  EXPECT_DOUBLE_EQ(lateral_error, control_data.lateral_error());
+}
+
+TEST_F(SimulationWorldServiceTest, DownsampleSpeedPointsByInterval) {
+  apollo::planning_internal::STGraphDebug graph;
+  auto* speed_points = graph.mutable_speed_profile();
+  for (int i = 0; i < 10; ++i) {
+    auto* point = speed_points->Add();
+    point->set_s(i * 1.1);
+    point->set_t(i * 1.2);
+    point->set_v(i * 1.3);
+  }
+
+  size_t interval = 5;
+  auto* downsampled_points = sim_world_service_->world_.mutable_planning_data()
+                                 ->add_st_graph()
+                                 ->mutable_speed_profile();
+  sim_world_service_->DownsampleSpeedPointsByInterval(*speed_points, interval,
+                                                      downsampled_points);
+
+  // Verify
+  std::vector<int> kept_index = {0, 5, 9};
+  EXPECT_EQ(kept_index.size(), downsampled_points->size());
+  for (int i = 0; i < 3; ++i) {
+    auto& point = downsampled_points->Get(i);
+    EXPECT_DOUBLE_EQ(kept_index[i] * 1.1, point.s());
+    EXPECT_DOUBLE_EQ(kept_index[i] * 1.2, point.t());
+    EXPECT_DOUBLE_EQ(kept_index[i] * 1.3, point.v());
   }
 }
 

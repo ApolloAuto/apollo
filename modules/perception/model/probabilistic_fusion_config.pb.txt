@@ -6,7 +6,7 @@ max_lidar_invisible_period: 0.25
 max_radar_invisible_period: 0.25
 max_camera_invisible_period: 0.25
 max_radar_confident_angle: 30.0
-min_radar_confident_distance: 40.0
+min_radar_confident_distance: 60.0
 publish_if_has_lidar: true
 publish_if_has_radar: true
 publish_sensor: "velodyne_64"

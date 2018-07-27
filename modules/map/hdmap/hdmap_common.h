@@ -32,12 +32,12 @@ limitations under the License.
 #include "modules/map/proto/map_junction.pb.h"
 #include "modules/map/proto/map_lane.pb.h"
 #include "modules/map/proto/map_overlap.pb.h"
+#include "modules/map/proto/map_parking_space.pb.h"
 #include "modules/map/proto/map_road.pb.h"
 #include "modules/map/proto/map_signal.pb.h"
 #include "modules/map/proto/map_speed_bump.pb.h"
 #include "modules/map/proto/map_stop_sign.pb.h"
 #include "modules/map/proto/map_yield_sign.pb.h"
-#include "modules/map/proto/map_parking_space.pb.h"
 
 /**
  * @namespace apollo::hdmap
@@ -166,7 +166,7 @@ class LaneInfo {
     return sampled_right_road_width_;
   }
   void GetRoadWidth(const double s, double *left_width,
-                   double *right_width) const;
+                    double *right_width) const;
   double GetRoadWidth(const double s) const;
 
   bool IsOnLane(const apollo::common::math::Vec2d &point) const;
@@ -234,7 +234,7 @@ class JunctionInfo {
   const Junction &junction() const { return junction_; }
   const apollo::common::math::Polygon2d &polygon() const { return polygon_; }
 
-  const std::vector<Id>& OverlapStopSignIds() const {
+  const std::vector<Id> &OverlapStopSignIds() const {
     return overlap_stop_sign_ids_;
   }
 
@@ -307,9 +307,10 @@ class StopSignInfo {
   const std::vector<apollo::common::math::LineSegment2d> &segments() const {
     return segments_;
   }
-  const std::vector<Id>& OverlapLaneIds() const { return overlap_lane_ids_; }
-  const std::vector<Id>& OverlapJunctionIds() const {
-    return overlap_junction_ids_; }
+  const std::vector<Id> &OverlapLaneIds() const { return overlap_lane_ids_; }
+  const std::vector<Id> &OverlapJunctionIds() const {
+    return overlap_junction_ids_;
+  }
 
  private:
   friend class HDMapImpl;

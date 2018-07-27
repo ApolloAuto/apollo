@@ -8,11 +8,13 @@ RUN bash /tmp/installers/pre_install.sh
 RUN bash /tmp/installers/install_adv_plat.sh
 RUN bash /tmp/installers/install_bazel.sh
 RUN bash /tmp/installers/install_bazel_packages.sh
+RUN bash /tmp/installers/install_conda.sh
 RUN bash /tmp/installers/install_gflags_glog.sh
 RUN bash /tmp/installers/install_glew.sh
 RUN bash /tmp/installers/install_glusterfs.sh
 RUN bash /tmp/installers/install_gpu_caffe.sh
 RUN bash /tmp/installers/install_ipopt.sh
+RUN bash /tmp/installers/install_libjsonrpc-cpp.sh
 RUN bash /tmp/installers/install_nlopt.sh
 RUN bash /tmp/installers/install_node.sh
 RUN bash /tmp/installers/install_ota.sh

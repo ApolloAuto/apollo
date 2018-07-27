@@ -50,6 +50,8 @@ using apollo::common::math::Vec2d;
 using apollo::common::monitor::MonitorLogBuffer;
 using apollo::prediction::PredictionObstacles;
 
+constexpr double kMathEpsilon = 1e-8;
+
 FrameHistory::FrameHistory()
     : IndexedQueue<uint32_t, Frame>(FLAGS_max_history_frame_num) {}
 
@@ -347,11 +349,15 @@ Status Frame::Init() {
       AddObstacle(*ptr);
     }
   }
-  const auto *collision_obstacle = FindCollisionObstacle();
-  if (collision_obstacle) {
-    AERROR << "Found collision with obstacle: " << collision_obstacle->Id();
-    return Status(ErrorCode::PLANNING_ERROR,
-                  "Collision found with " + collision_obstacle->Id());
+  if (FLAGS_enable_collision_detection) {
+    const auto *collision_obstacle = FindCollisionObstacle();
+    if (collision_obstacle) {
+      std::string err_str =
+          "Found collision with obstacle: " + collision_obstacle->Id();
+      apollo::common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
+      buffer.ERROR(err_str);
+      return Status(ErrorCode::PLANNING_ERROR, err_str);
+    }
   }
   if (!CreateReferenceLineInfo()) {
     AERROR << "Failed to init reference line info";
@@ -388,8 +394,22 @@ const Obstacle *Frame::FindCollisionObstacle() const {
       ADEBUG << "Obstacle : " << obstacle->Id() << " is too far to collide";
       continue;
     }
-    if (obstacle->PerceptionPolygon().DistanceTo(adc_box) <
-        FLAGS_max_collision_distance) {
+    double distance = obstacle->PerceptionPolygon().DistanceTo(adc_box);
+    if (FLAGS_ignore_overlapped_obstacle && distance < kMathEpsilon) {
+      bool all_points_in = true;
+      for (const auto &point : obstacle->PerceptionPolygon().points()) {
+        if (!adc_box.IsPointIn(point)) {
+          all_points_in = false;
+          break;
+        }
+      }
+      if (all_points_in) {
+        ADEBUG << "Skip overlapped obstacle, which is often caused by lidar "
+                  "calibration error";
+        continue;
+      }
+    }
+    if (distance < FLAGS_max_collision_distance) {
       AERROR << "Found collision with obstacle " << obstacle->Id();
       return obstacle;
     }

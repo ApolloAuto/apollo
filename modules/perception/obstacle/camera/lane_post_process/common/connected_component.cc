@@ -440,7 +440,7 @@ void ConnectedComponent::SplitContourVertical(int len_split, bool is_clockwise,
   int height = start_pos - end_pos + 1;
   vector<int> lens = GetSplitRanges(height, len_split);
 
-  // create start and end vertice
+  // create start and end vertices
   int x = is_clockwise ? bbox_.right_contour->at(start_pos - this->y_min())
                        : bbox_.left_contour->at(start_pos - this->y_min());
   vertices_->push_back(Vertex(x, start_pos));

@@ -19,6 +19,8 @@
 
 #include <string>
 
+#include "modules/perception/proto/perception_obstacle.pb.h"
+
 #include "modules/perception/common/pcl_types.h"
 
 namespace apollo {
@@ -51,12 +53,6 @@ enum class SensorType {
   CAMERA = 3,
   ULTRASONIC = 4,
   UNKNOWN_SENSOR_TYPE = 10,
-};
-
-enum class ScoreType {
-  UNKNOWN_SCORE_TYPE = 0,
-  SCORE_CNN = 1,
-  SCORE_RADAR = 2,
 };
 
 typedef pcl_util::PointCloud PolygonType;

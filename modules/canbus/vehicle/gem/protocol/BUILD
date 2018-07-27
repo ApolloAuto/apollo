@@ -197,4 +197,76 @@ cc_test(
     ],
 )
 
+cc_test(
+    name = "lat_lon_heading_rpt_82_test",
+    size = "small",
+    srcs = [
+        "lat_lon_heading_rpt_82_test.cc",
+    ],
+    deps = [
+        "//modules/canbus/vehicle/gem/protocol:canbus_gem_protocol",
+        "@gtest//:main",
+    ],
+)
+
+cc_test(
+    name = "steering_motor_rpt_1_73_test",
+    size = "small",
+    srcs = [
+        "steering_motor_rpt_1_73_test.cc",
+    ],
+    deps = [
+        "//modules/canbus/vehicle/gem/protocol:canbus_gem_protocol",
+        "@gtest//:main",
+    ],
+)
+
+cc_test(
+    name = "steering_motor_rpt_2_74_test",
+    size = "small",
+    srcs = [
+        "steering_motor_rpt_2_74_test.cc",
+    ],
+    deps = [
+        "//modules/canbus/vehicle/gem/protocol:canbus_gem_protocol",
+        "@gtest//:main",
+    ],
+)
+
+cc_test(
+    name = "steering_motor_rpt_3_75_test",
+    size = "small",
+    srcs = [
+        "steering_motor_rpt_3_75_test.cc",
+    ],
+    deps = [
+        "//modules/canbus/vehicle/gem/protocol:canbus_gem_protocol",
+        "@gtest//:main",
+    ],
+)
+
+cc_test(
+    name = "steering_rpt_1_6e_test",
+    size = "small",
+    srcs = [
+        "steering_rpt_1_6e_test.cc",
+    ],
+    deps = [
+        "//modules/canbus/vehicle/gem/protocol:canbus_gem_protocol",
+        "@gtest//:main",
+    ],
+)
+
+cc_test(
+    name = "accel_cmd_67_test",
+    size = "small",
+    srcs = [
+        "accel_cmd_67_test.cc",
+    ],
+    deps = [
+        "//modules/canbus/vehicle/gem/protocol:canbus_gem_protocol",
+        "@gtest//:main",
+    ],
+)
+
 cpplint()

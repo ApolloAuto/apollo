@@ -48,16 +48,6 @@ void RslidarDriver::set_base_time_from_nmea_time(const NMEATimePtr& nmea_time,
 
 bool RslidarDriver::set_base_time() {
   NMEATimePtr nmea_time(new NMEATime);
-  while (true) {
-    int rc;
-    if (rc == 0) {
-      break;  // got a full packet
-    }
-    if (rc < 0) {
-      return false;  // end of file reached
-    }
-  }
-
   set_base_time_from_nmea_time(nmea_time, basetime_);
   input_->init(config_.msop_data_port);
   return true;

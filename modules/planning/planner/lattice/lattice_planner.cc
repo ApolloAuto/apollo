@@ -172,7 +172,7 @@ Status LatticePlanner::PlanOnReferenceLine(
       *ptr_reference_line,
       reference_line_info,
       init_s[0], init_s[0] + FLAGS_decision_horizon,
-      0.0, FLAGS_trajectory_time_length);
+      0.0, FLAGS_trajectory_time_length, init_d);
 
   PlanningTarget planning_target = reference_line_info->planning_target();
   if (planning_target.has_stop_point()) {
@@ -223,7 +223,15 @@ Status LatticePlanner::PlanOnReferenceLine(
   std::size_t collision_failure_count = 0;
   std::size_t combined_constraint_failure_count = 0;
 
+  std::size_t lon_vel_failure_count = 0;
+  std::size_t lon_acc_failure_count = 0;
+  std::size_t lon_jerk_failure_count = 0;
+  std::size_t curvature_failure_count = 0;
+  std::size_t lat_acc_failure_count = 0;
+  std::size_t lat_jerk_failure_count = 0;
+
   std::size_t num_lattice_traj = 0;
+
   while (trajectory_evaluator.has_more_trajectory_pairs()) {
     double trajectory_pair_cost =
         trajectory_evaluator.top_trajectory_pair_cost();
@@ -247,8 +255,34 @@ Status LatticePlanner::PlanOnReferenceLine(
 
     // check longitudinal and lateral acceleration
     // considering trajectory curvatures
-    if (!ConstraintChecker::ValidTrajectory(combined_trajectory)) {
+    auto result = ConstraintChecker::ValidTrajectory(combined_trajectory);
+    if (result != ConstraintChecker::Result::VALID) {
       ++combined_constraint_failure_count;
+
+      switch (result) {
+      case ConstraintChecker::Result::LON_VELOCITY_OUT_OF_BOUND:
+        lon_vel_failure_count += 1;
+        break;
+      case ConstraintChecker::Result::LON_ACCELERATION_OUT_OF_BOUND:
+        lon_acc_failure_count += 1;
+        break;
+      case ConstraintChecker::Result::LON_JERK_OUT_OF_BOUND:
+        lon_jerk_failure_count += 1;
+        break;
+      case ConstraintChecker::Result::CURVATURE_OUT_OF_BOUND:
+        curvature_failure_count += 1;
+        break;
+      case ConstraintChecker::Result::LAT_ACCELERATION_OUT_OF_BOUND:
+        lat_acc_failure_count += 1;
+        break;
+      case ConstraintChecker::Result::LAT_JERK_OUT_OF_BOUND:
+        lat_jerk_failure_count += 1;
+        break;
+      case ConstraintChecker::Result::VALID:
+      default:
+        // Intentional empty
+        break;
+      }
       continue;
     }
 

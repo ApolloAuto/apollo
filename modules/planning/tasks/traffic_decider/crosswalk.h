@@ -41,6 +41,8 @@ class Crosswalk : public TrafficRule {
   void MakeDecisions(Frame* const frame,
                      ReferenceLineInfo* const reference_line_info);
   bool FindCrosswalks(ReferenceLineInfo* const reference_line_info);
+  bool CheckADCkStop(ReferenceLineInfo* const reference_line_info,
+                     hdmap::PathOverlap* const crosswalk_overlap) const;
   int BuildStopDecision(Frame* frame,
                         ReferenceLineInfo* const reference_line_info,
                         hdmap::PathOverlap* const crosswalk_overlap,
