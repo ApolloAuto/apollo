@@ -27,8 +27,9 @@
 
 #include "ros/include/ros/ros.h"
 
-#include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/adapters/proto/adapter_config.pb.h"
+
+#include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/apollo_app.h"
 #include "modules/common/macro.h"
 #include "modules/common/monitor_log/monitor_log_buffer.h"
