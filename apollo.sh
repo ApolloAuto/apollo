@@ -632,11 +632,11 @@ function main() {
       apollo_build_opt $@
       ;;
     build_gpu)
-      DEFINES="${DEFINES} --cxxopt=-DUSE_CAFFE_GPU"
+      DEFINES="${DEFINES} --define USE_GPU=true --cxxopt=-DUSE_GPU"
       apollo_build_dbg $@
       ;;
     build_opt_gpu)
-      DEFINES="${DEFINES} --cxxopt=-DUSE_CAFFE_GPU"
+      DEFINES="${DEFINES} --define USE_GPU=true --cxxopt=-DUSE_GPU"
       apollo_build_opt $@
       ;;
     build_fe)
@@ -681,7 +681,7 @@ function main() {
       citest $@
       ;;
     test_gpu)
-      DEFINES="${DEFINES} --cxxopt=-DUSE_CAFFE_GPU"
+      DEFINES="${DEFINES} --cxxopt=-DUSE_GPU"
       USE_GPU="1"
       run_test $@
       ;;
