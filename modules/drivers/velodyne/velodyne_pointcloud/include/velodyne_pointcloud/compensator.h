@@ -82,7 +82,7 @@ class Compensator {
   tf2_ros::Buffer tf2_buffer_;
   // tf2 transform listener to get transform by gps timestamp.
   tf2_ros::TransformListener tf2_transform_listener_;
-  // transform child frame id(world -> child frame)
+  // transform child frame id(child frame -> world)
   std::string child_frame_id_;
   float tf_timeout_;
 
