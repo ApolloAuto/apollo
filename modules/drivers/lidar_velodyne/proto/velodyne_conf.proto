@@ -18,7 +18,7 @@ message VelodyneConf {
     optional uint32 firing_data_port = 4 [default = 2368];
     optional uint32 positioning_data_port = 5 [default = 8308];
     optional double rpm = 6 [default = 600.0];
-    optional VelodyneModel model = 7 [default = VLP16];
+    optional VelodyneModel model = 7;
     optional int32 npackets = 8;
     optional int32 cache_size = 9 [default = 1];
     optional int32 packet_rate = 10 [default = 754];
