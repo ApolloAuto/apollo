@@ -158,7 +158,8 @@ bool Compensator::query_pose_affine_from_tf2(const double timestamp,
   std::string err_string;
   if (!tf2_buffer_.canTransform("world", child_frame_id_, query_time,
                                 ros::Duration(tf_timeout_), &err_string)) {
-    ROS_WARN_STREAM("Can not find transform. "
+    ROS_WARN_STREAM("Can not find transform frame: "
+                    << child_frame_id_ <<". "
                     << std::fixed << timestamp
                     << " Error info: " << err_string);
     return false;
