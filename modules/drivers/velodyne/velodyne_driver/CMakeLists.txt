@@ -10,7 +10,7 @@ set(${PROJECT_NAME}_CATKIN_DEPS
 )
 
 #set define for unittest
-set(ENABLE_GPS_DISCARD false)
+#set(ENABLE_GPS_DISCARD false)
 
 find_package(catkin REQUIRED COMPONENTS ${${PROJECT_NAME}_CATKIN_DEPS})
 
