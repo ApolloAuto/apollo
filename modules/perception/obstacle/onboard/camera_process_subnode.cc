@@ -124,6 +124,7 @@ void CameraProcessSubnode::ImgCallback(const sensor_msgs::Image &message) {
 
   PERF_BLOCK_END("CameraProcessSubnode_Image_Preprocess");
   detector_->Multitask(img, CameraDetectorOptions(), &objects, &mask);
+<<<<<<< HEAD
   // mask = mask*2;
   cv::Mat mask_color(mask.rows, mask.cols, CV_32FC1);
   if (FLAGS_use_whole_lane_line) {
@@ -150,6 +151,13 @@ void CameraProcessSubnode::ImgCallback(const sensor_msgs::Image &message) {
         }
       }
     }
+=======
+  mask = mask*2;
+  if (FLAGS_use_whole_lane_line) {
+    cv::Mat mask1;
+    detector_->Lanetask(img, &mask1);
+    mask += mask1;
+>>>>>>> e8f73de8da1ca2e3e88012643083ec31458f5d3f
   }
 
   PERF_BLOCK_END("CameraProcessSubnode_detector_");

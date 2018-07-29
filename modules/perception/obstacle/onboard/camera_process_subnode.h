@@ -119,7 +119,11 @@ class CameraProcessSubnode : public Subnode {
   bool pb_obj_ = false;  // Objects
   apollo::canbus::Chassis chassis_;
   bool pb_ln_msk_ = false;  // Lane marking mask
+<<<<<<< HEAD
   float ln_msk_threshold_ = 0.95f;
+=======
+  const float ln_msk_threshold_ = 0.95f;
+>>>>>>> e8f73de8da1ca2e3e88012643083ec31458f5d3f
 
   // Modules
   std::unique_ptr<BaseCameraDetector> detector_;
