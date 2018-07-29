@@ -353,12 +353,8 @@ bool YoloCameraDetector::Multitask(
   return true;
 }
 
-bool YoloCameraDetector::Lanetask(const cv::Mat &frame, cv::Mat *mask) {
-  if (mask == nullptr) {
-    AERROR << "'mask' is a null pointer.";
-    return false;
-  }
-
+bool YoloCameraDetector::Lanetask(const cv::Mat &frame,
+                                  std::vector<cv::Mat> *predictions) {
   caffe::Caffe::SetDevice(FLAGS_obs_camera_detector_gpu);
   caffe::Timer pre_time;
   pre_time.Start();
@@ -393,17 +389,14 @@ bool YoloCameraDetector::Lanetask(const cv::Mat &frame, cv::Mat *mask) {
     return false;
   }
 
-  *mask = cv::Mat(lane_output_height_lane_, lane_output_width_lane_, CV_32FC1);
-  cv::Mat tmp(lane_output_height_lane_, lane_output_width_lane_, CV_32FC1);
-  memcpy(tmp.data, seg_blob->cpu_data() +
-        lane_output_width_lane_ * lane_output_height_lane_,
-         lane_output_width_lane_ * lane_output_height_lane_ * sizeof(float));
-
-  cv::resize(tmp, tmp, cv::Size(960, 384), 0, 0);
-  // select a region of interest
-  cv::Mat tRoi = tmp(cv::Rect(330, 0, 300, ignored_height_));
-  tRoi.setTo(0);
-  *mask = tmp;
+  for (int i = 0; i < 13; ++i) {
+    cv::Mat tmp(lane_output_height_lane_, lane_output_width_lane_, CV_32FC1);
+    memcpy(tmp.data, seg_blob->cpu_data() + lane_output_width_lane_ *
+          lane_output_height_lane_ * i,
+          lane_output_width_lane_ * lane_output_height_lane_ * sizeof(float));
+    cv::resize(tmp, tmp, cv::Size(960, 384), 0, 0);
+    predictions->push_back(tmp);
+  }
   return true;
 }
 

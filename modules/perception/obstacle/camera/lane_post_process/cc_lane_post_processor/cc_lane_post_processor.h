@@ -130,7 +130,16 @@ class CCLanePostProcessor : public BaseCameraLanePostProcessor {
   ScalarType max_distance_to_see_ = 500.0;
   int image_width_ = 1080;
   int image_height_ = 1920;
+
   cv::Rect roi_;
+  int roi_height = 768;
+  int roi_start = 312;
+  int roi_width = 1920;
+
+  Eigen::Matrix<double, 3, 3> trans_mat_;
+  Eigen::Matrix<double, 3, 3> trans_mat_inv;
+  std::vector<std::vector<Eigen::Matrix<double, 2, 1>>> xy_points;
+  std::vector<std::vector<Eigen::Matrix<double, 2, 1>>> uv_points;
 
   double scale_;
   int start_y_pos_;

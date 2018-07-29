@@ -1,7 +1,7 @@
 model_param {
-  model_name: "lane2d_0612"
-  proto_file: "deploy_lane_high.pt"
-  weight_file: "deploy_lane_high.md"
+  model_name: "lane13d_0716"
+  proto_file: "lane_deploy.pt"
+  weight_file: "lane_deploy.md"
   offset_ratio: 0.28843
   confidence_threshold: 0.95 # 0.5
   model_type: Caffe

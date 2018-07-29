@@ -172,6 +172,8 @@ bool Projector<T>::Init(const cv::Rect &roi, const T &max_distance,
 
   trans_mat_ = camera_calibration->get_camera2car_homography_mat().cast<T>();
 
+  AINFO << "trans_mat_:\n" << trans_mat_;
+
   // set ROI
   uv_xmin_ = static_cast<T>(roi.x);
   if (uv_xmin_ < 0) {
@@ -466,6 +468,9 @@ bool Projector<T>::Project(const T &u, const T &v,
   auto trans_mat = Singleton<CalibrationConfigManager>::get()
   ->get_camera_calibration()
   ->get_camera2car_homography_mat();
+
+  // AINFO << "**** old:\n" << trans_mat_;
+  // AINFO << "**** new:\n" << trans_mat;
 
   Eigen::Matrix<double, 3, 1> uv_point(u, v, 1.0);
   Eigen::Matrix<double, 3, 1> xy_p = trans_mat * uv_point;
