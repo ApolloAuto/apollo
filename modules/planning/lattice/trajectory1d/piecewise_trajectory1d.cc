@@ -56,7 +56,7 @@ std::string PiecewiseTrajectory1d::ToString() const { return ""; }
 
 void PiecewiseTrajectory1d::AppendSegment(
     const std::shared_ptr<Curve1d> trajectory) {
-  if (trajectory_segments_.size() > 0) {
+  if (trajectory_segments_.size() == 0) {
     trajectory_segments_.push_back(trajectory);
   } else {
     double s1 = trajectory->Evaluate(0, 0.0);
