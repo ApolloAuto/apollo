@@ -48,6 +48,14 @@ struct ImuToAntOffset {
   double uncertainty_z;
 };
 
+struct VehicleToImuQuatern {
+  VehicleToImuQuatern() : x(0.0), y(0.0), z(0.0), w(1.0) {}
+  double x;
+  double y;
+  double z;
+  double w;
+};
+
 struct LocalizationIntegParam {
   // localization mode
   bool enable_lidar_localization = true;
@@ -83,6 +91,10 @@ struct LocalizationIntegParam {
   int utm_zone_id = 50;
   bool is_lidar_unstable_reset = true;
   double unstable_reset_threshold = 0.08;
+
+  bool is_using_novatel_heading = true;
+  std::string ant_imu_leverarm_file = "";
+  VehicleToImuQuatern vehicle_to_imu_quatern;
 };
 
 enum class LocalizationMeasureState { NOT_VALID = 0, NOT_STABLE, OK, VALID };

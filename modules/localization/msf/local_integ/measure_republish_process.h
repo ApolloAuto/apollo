@@ -33,6 +33,7 @@
 
 #include "modules/common/status/status.h"
 #include "modules/drivers/gnss/proto/gnss_best_pose.pb.h"
+#include "modules/drivers/gnss/proto/heading.pb.h"
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/localization/msf/common/util/frame_transform.h"
 #include "modules/localization/msf/local_integ/localization_params.h"
@@ -46,7 +47,14 @@ namespace apollo {
 namespace localization {
 namespace msf {
 
+typedef Eigen::Affine3d TransformD;
+
 enum class GnssMode { NOVATEL = 0, SELF };
+struct VehicleGnssAntExtrinsic{
+    int ant_num;
+    TransformD transform_1;
+    TransformD transform_2;
+};
 
 /**
  * @class MeasureRepublishProcess
@@ -75,6 +83,10 @@ class MeasureRepublishProcess {
   bool LidarLocalProcess(const LocalizationEstimate& lidar_local_msg,
                          MeasureData *measure);
 
+  // gnss heading process
+  bool GnssHeadingProcess(const drivers::gnss::Heading& heading_msg,
+                          MeasureData *measure);
+
  protected:
   bool IsSinsAlign();
   bool CheckBestgnssposeStatus(const GnssBestPose& bestgnsspos_msg);
@@ -85,6 +97,8 @@ class MeasureRepublishProcess {
       const GnssBestPose& bestgnsspos_msg, MeasureData *measure);
   bool CalculateVelFromBestgnsspose(
       const GnssBestPose& bestgnsspos_msg, MeasureData *measure);
+  bool LoadImuGnssAntennaExtrinsic(std::string file_path,
+                                   VehicleGnssAntExtrinsic* extrinsic) const;
 
  private:
   MeasureData pre_bestgnsspose_;
@@ -101,6 +115,11 @@ class MeasureRepublishProcess {
 
   double map_height_time_;
   std::mutex height_mutex_;
+
+  bool is_using_novatel_heading_;
+  double novatel_heading_time_;
+  std::mutex novatel_heading_mutex_;
+  VehicleGnssAntExtrinsic imu_gnssant_extrinsic_;
 
   GnssMode gnss_mode_;
 
