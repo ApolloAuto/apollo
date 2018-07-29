@@ -21,7 +21,6 @@
 #include <string>
 
 #include "modules/common/log.h"
-#include "modules/drivers/lidar_velodyne/common/def.h"
 #include "modules/drivers/lidar_velodyne/common/velodyne_gflags.h"
 
 namespace apollo {
@@ -95,15 +94,10 @@ void VelodyneDriver::update_gps_top_hour(uint32_t current_time) {
 }
 
 VelodyneDriver* VelodyneDriverFactory::create_driver(const VelodyneConf& conf) {
-  if (v64_models.find(conf.model()) != v64_models.end()) {
-    AINFO << "create velodyne64 driver.";
-    return new Velodyne64Driver(conf);
-  } else if (v16_models.find(conf.model()) != v16_models.end()) {
-    AINFO << "create velodyne16 driver.";
+  if (conf.model() == VLP16) {
     return new Velodyne16Driver(conf);
   } else {
-    AERROR << "invalid model, must be in: " << valid_models;
-    return nullptr;
+    return new Velodyne64Driver(conf);
   }
 }
 

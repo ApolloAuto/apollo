@@ -25,7 +25,7 @@ namespace lidar_velodyne {
 
 Velodyne64Parser::Velodyne64Parser(const VelodyneConf& config)
     : VelodyneParser(config) {
-  for (int i = 0; i < 4; i++) {
+  for (int i = 0; i < 4; ++i) {
     gps_base_usec_[i] = 0;
     previous_packet_stamp_[i] = 0;
   }

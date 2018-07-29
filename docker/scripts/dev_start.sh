@@ -173,10 +173,6 @@ if [ "$LOCAL_IMAGE" == "yes" ] && [ -z "$VERSION_OPT" ]; then
     VERSION="local_dev"
 fi
 
-# Included default maps.
-for map_name in ${DEFAULT_MAPS[@]}; do
-    source ${APOLLO_ROOT_DIR}/docker/scripts/restart_map_volume.sh ${map_name} "${VOLUME_VERSION}"
-done
 
 IMG=${DOCKER_REPO}:$VERSION
 
@@ -217,8 +213,14 @@ function main(){
     docker ps -a --format "{{.Names}}" | grep 'apollo_dev' 1>/dev/null
     if [ $? == 0 ]; then
         docker stop apollo_dev 1>/dev/null
-        docker rm -f apollo_dev 1>/dev/null
+        docker rm -v -f apollo_dev 1>/dev/null
     fi
+
+    # Included default maps.
+    for map_name in ${DEFAULT_MAPS[@]}; do
+      source ${APOLLO_ROOT_DIR}/docker/scripts/restart_map_volume.sh ${map_name} "${VOLUME_VERSION}"
+    done
+
     local display=""
     if [[ -z ${DISPLAY} ]];then
         display=":0"
