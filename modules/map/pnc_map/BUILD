@@ -49,7 +49,6 @@ cc_library(
         "path.cc",
     ],
     hdrs = [
-        "cuda_util.h",
         "path.h",
     ],
     deps = [
@@ -58,7 +57,6 @@ cc_library(
         "//modules/map/hdmap:hdmap_util",
         "//modules/map/proto:map_proto",
         "//modules/routing/proto:routing_proto",
-        "@cuda",
     ],
 )
 
