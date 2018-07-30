@@ -103,7 +103,7 @@ bool LatController::LoadControlConf(const ControlConf *control_conf) {
   cr_ = control_conf->lat_controller_conf().cr();
   preview_window_ = control_conf->lat_controller_conf().preview_window();
   wheelbase_ = vehicle_param_.wheel_base();
-  steer_transmission_ratio_ = vehicle_param_.steer_ratio();
+  steer_ratio_ = vehicle_param_.steer_ratio();
   steer_single_direction_max_degree_ =
       vehicle_param_.max_steer_angle() / M_PI * 180;
   max_lat_acc_ = control_conf->lat_controller_conf().max_lateral_acceleration();
@@ -375,7 +375,7 @@ Status LatController::ComputeControlCommand(
   // Convert vehicle steer angle from rad to degree and then to steer degree
   // then to 100% ratio
   const double steer_angle_feedback = -(matrix_k_ * matrix_state_)(0, 0) * 180 /
-                                      M_PI * steer_transmission_ratio_ /
+                                      M_PI * steer_ratio_ /
                                       steer_single_direction_max_degree_ * 100;
 
   const double steer_angle_feedforward = ComputeFeedForward(debug->curvature());
