@@ -34,18 +34,8 @@ using apollo::common::util::GetProtoFromFile;
 using std::pair;
 using std::string;
 using std::vector;
-FILE *motion_history;
-FILE *lane_point_history;
-FILE *lane_point_history_i;
-bool store_history = true;
 
 bool CCLanePostProcessor::Init() {
-  if (store_history) {
-    motion_history = fopen("auto_label/motions.txt", "w");
-    lane_point_history = fopen("auto_label/lane_point.txt", "w");
-    lane_point_history_i = fopen("auto_label/lane_point_i.txt", "w");
-  }
-
   // 1. get model config
   CHECK(GetProtoFromFile(FLAGS_cc_lane_post_processor_config_file, &config_));
 

@@ -355,6 +355,11 @@ bool YoloCameraDetector::Multitask(
 
 bool YoloCameraDetector::Lanetask(const cv::Mat &frame,
                                   std::vector<cv::Mat> *predictions) {
+  if (predictions.empty()) {
+    AERROR << "'mask' is a null pointer.";
+    return false;
+  }
+
   caffe::Caffe::SetDevice(FLAGS_obs_camera_detector_gpu);
   caffe::Timer pre_time;
   pre_time.Start();
