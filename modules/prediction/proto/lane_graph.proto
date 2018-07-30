@@ -12,6 +12,16 @@ message LanePoint {
     optional double relative_s = 4 [default = 0.0];
     optional double relative_l = 5 [default = 0.0];
     optional double angle_diff = 6 [default = 0.0];
+    optional double kappa = 7 [default = 0.0];
+
+    enum ScenarioType {
+        URBAN_ROAD = 0;
+        JUNCTION = 1;
+        HIGHWAY = 2;
+    }
+
+    optional ScenarioType scenario_type = 8;
+    optional double speed_limit = 9;
 }
 
 message LaneSegment {
@@ -42,6 +52,20 @@ message LaneSequence {
     optional double probability = 6 [default = 0.0];
     optional double acceleration = 7 [default = 0.0];
     repeated apollo.common.PathPoint path_point = 8;
+
+    enum BehaviorType {
+        NOT_ON_LANE = 0;
+        CONSTANT_SPEED = 1;
+        SMALL_ACCELERATION = 2;
+        LARGE_ACCELERATION = 3;
+        SMALL_DECELERATION = 4;
+        LARGE_DECELERATION = 5;
+    }
+    optional BehaviorType behavior_type = 9;
+    optional bool vehicle_on_lane = 10;
+
+    repeated LaneSegment left_neighbor_segment = 11;
+    repeated LaneSegment right_neighbor_segment = 12;
 }
 
 message LaneGraph {
