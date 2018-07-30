@@ -32,6 +32,7 @@
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_util.h"
 #include "modules/planning/proto/sl_boundary.pb.h"
+#include "modules/planning/tasks/traffic_decider/util.h"
 
 namespace apollo {
 namespace planning {
@@ -65,7 +66,7 @@ Status PullOver::ApplyRule(Frame* const frame,
 
   common::PointENU stop_point;
   if (GetPullOverStopPoint(&stop_point) != 0) {
-    BuildInLaneStop(stop_point);
+    BuildInLaneStop(reference_line_info, stop_point);
     ADEBUG << "Could not find a safe pull over point. STOP in-lane";
   } else {
     BuildPullOverStop(stop_point);
@@ -462,7 +463,8 @@ int PullOver::FindPullOverStop(PointENU* stop_point) {
 }
 
 bool PullOver::CheckPullOverComplete() {
-  double adc_speed = reference_line_info_->AdcPlanningPoint().v();
+  double adc_speed =
+      common::VehicleStateProvider::instance()->linear_velocity();
   if (adc_speed > config_.pull_over().max_stop_speed()) {
     ADEBUG << "ADC not stopped: speed[" << adc_speed << "]";
     return false;
@@ -504,6 +506,16 @@ bool PullOver::CheckPullOverComplete() {
   return true;
 }
 
+bool PullOver::CheckStopDeceleration(
+    ReferenceLineInfo* const reference_line_info,
+    const double stop_line_s) const {
+  double stop_deceleration = util::GetADCStopDeceleration(
+      reference_line_info,
+      stop_line_s,
+      config_.pull_over().min_pass_s_distance());
+  return (stop_deceleration <= config_.pull_over().max_stop_deceleration());
+}
+
 int PullOver::BuildPullOverStop(const PointENU& stop_point) {
   const auto& reference_line = reference_line_info_->reference_line();
   common::SLPoint stop_point_sl;
@@ -536,7 +548,8 @@ int PullOver::BuildPullOverStop(const PointENU& stop_point) {
   return 0;
 }
 
-int PullOver::BuildInLaneStop(const PointENU& pull_over_stop_point) {
+int PullOver::BuildInLaneStop(ReferenceLineInfo* const reference_line_info,
+                              const PointENU& pull_over_stop_point) {
   const auto& reference_line = reference_line_info_->reference_line();
 
   const double adc_front_edge_s =
@@ -548,12 +561,14 @@ int PullOver::BuildInLaneStop(const PointENU& pull_over_stop_point) {
   // use inlane_stop_point if it's previously set
   if (inlane_stop_point_.has_x() && inlane_stop_point_.has_y()) {
     reference_line.XYToSL(inlane_stop_point_, &stop_point_sl);
-    inlane_stop_point_set = true;
-    ADEBUG << "BuildInLaneStop using previously set inlane_stop_point: s["
-        << stop_point_sl.s() << "] dist["
-        << stop_point_sl.s() - adc_front_edge_s
-        << "] POINT:(" << inlane_stop_point_.x() << ", "
-        << inlane_stop_point_.y() << ")";
+    if (CheckStopDeceleration(reference_line_info, stop_point_sl.s())) {
+      inlane_stop_point_set = true;
+      ADEBUG << "BuildInLaneStop using previously set inlane_stop_point: s["
+          << stop_point_sl.s() << "] dist["
+          << stop_point_sl.s() - adc_front_edge_s
+          << "] POINT:(" << inlane_stop_point_.x() << ", "
+          << inlane_stop_point_.y() << ")";
+    }
   }
 
   // use inlane_dest_point if there's one
@@ -563,11 +578,13 @@ int PullOver::BuildInLaneStop(const PointENU& pull_over_stop_point) {
     reference_line.XYToSL({pull_over_status.inlane_dest_point().x(),
                           pull_over_status.inlane_dest_point().y()},
                           &stop_point_sl);
-    inlane_stop_point_set = true;
-    ADEBUG << "BuildInLaneStop using inlane_dest_point: s["
-        << stop_point_sl.s() << "] dist["
-        << stop_point_sl.s() - adc_front_edge_s
-        << "] POINT:" << pull_over_status.inlane_dest_point().DebugString();
+    if (CheckStopDeceleration(reference_line_info, stop_point_sl.s())) {
+      inlane_stop_point_set = true;
+      ADEBUG << "BuildInLaneStop using inlane_dest_point: s["
+          << stop_point_sl.s() << "] dist["
+          << stop_point_sl.s() - adc_front_edge_s
+          << "] POINT:" << pull_over_status.inlane_dest_point().DebugString();
+    }
   }
 
   // use a point corresponding to pull_over_stop_point
@@ -576,22 +593,28 @@ int PullOver::BuildInLaneStop(const PointENU& pull_over_stop_point) {
       reference_line.XYToSL({pull_over_stop_point.x(),
                             pull_over_stop_point.y()},
                             &stop_point_sl);
-      inlane_stop_point_set = true;
-      ADEBUG << "BuildInLaneStop using pull_over_stop_point: s["
-          << stop_point_sl.s() << "] dist["
-          << stop_point_sl.s() - adc_front_edge_s
-          << "] POINT:" << pull_over_stop_point.DebugString();
+      if (CheckStopDeceleration(reference_line_info, stop_point_sl.s())) {
+        inlane_stop_point_set = true;
+        ADEBUG << "BuildInLaneStop using pull_over_stop_point: s["
+            << stop_point_sl.s() << "] dist["
+            << stop_point_sl.s() - adc_front_edge_s
+            << "] POINT:" << pull_over_stop_point.DebugString();
+      }
     }
   }
 
-  // use adc + plan_distance for new inlane_stop_point
+  // use adc + stop_distance(based on adc_speed + deceleration)
+  // for new inlane_stop_point
   if (!inlane_stop_point_set) {
-    stop_point_sl.set_s(
-        adc_front_edge_s + config_.pull_over().plan_distance());
+    double adc_speed =
+        common::VehicleStateProvider::instance()->linear_velocity();
+    double stop_distance = (adc_speed * adc_speed) /
+        (2 * config_.pull_over().max_stop_deceleration());
+    stop_point_sl.set_s(adc_front_edge_s + stop_distance);
+    CheckStopDeceleration(reference_line_info, stop_point_sl.s());
     ADEBUG << "BuildInLaneStop: adc: s[" << stop_point_sl.s()
-        << "] l[0.0] adc_front_edge_s[" << adc_front_edge_s;
+        << "] l[0.0] adc_front_edge_s[" << adc_front_edge_s << "]";
   }
-
 
   const auto& inlane_point =
       reference_line.GetReferencePoint(stop_point_sl.s());
