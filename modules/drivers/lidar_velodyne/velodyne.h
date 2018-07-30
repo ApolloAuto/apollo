@@ -65,12 +65,10 @@ class Velodyne : public apollo::common::ApolloApp {
       RawDataCache;
   typedef common::util::BlockingQueue<sensor_msgs::PointCloud2Ptr>
       PointCloudCache;
-  void Packet(const VelodyneConf& conf, RawDataCache* output);
-  void Convert(const VelodyneConf& conf, RawDataCache* input,
-               PointCloudCache* output);
-  void Compensate(const VelodyneConf& conf, PointCloudCache* input);
-  bool SetNpackets(VelodyneConfUnit* unit);
-  bool FusionCheckInit(const std::map<uint32_t, uint8_t>& velodyne_index_map);
+  void Packet(RawDataCache* output);
+  void Convert(RawDataCache* input, PointCloudCache* output);
+  void Compensate(PointCloudCache* input);
+  bool SetNpackets(VelodyneConf* conf);
   inline int64_t GetTime() {
     return apollo::common::time::AsInt64<common::time::micros>(
         apollo::common::time::Clock::Now());
@@ -78,10 +76,10 @@ class Velodyne : public apollo::common::ApolloApp {
   void Notice();
 
  private:
-  VelodyneConfUnit conf_unit_;
+  VelodyneConf conf_;
   common::monitor::MonitorLogger monitor_logger_;
-  std::vector<RawDataCache*> packet_cache_vec_;
-  std::vector<PointCloudCache*> pointcloud_cache_vec_;
+  std::shared_ptr<RawDataCache> packet_cache_;
+  std::shared_ptr<PointCloudCache> pointcloud_cache_;
 
   bool running_ = true;
   std::vector<std::shared_ptr<std::thread> > threads_;
