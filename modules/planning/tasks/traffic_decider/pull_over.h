@@ -94,10 +94,17 @@ class PullOver : public TrafficRule {
   bool CheckPullOverComplete();
 
   /**
+   * build stop deceleration
+   */
+  bool CheckStopDeceleration(ReferenceLineInfo* const reference_line_info,
+                             const double stop_line_s) const;
+
+  /**
    * build stop decision
    */
   int BuildPullOverStop(const common::PointENU& stop_point);
-  int BuildInLaneStop(const common::PointENU& pull_over_stop_point);
+  int BuildInLaneStop(ReferenceLineInfo* const reference_line_info,
+                      const common::PointENU& pull_over_stop_point);
   int BuildStopDecision(const std::string& vistual_obstacle_id_postfix,
                         const double stop_line_s,
                         const common::PointENU& stop_point,
