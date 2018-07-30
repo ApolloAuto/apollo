@@ -65,7 +65,7 @@ TrajectoryAnalyzer::TrajectoryAnalyzer(
 
 PathPoint TrajectoryAnalyzer::QueryMatchedPathPoint(const double x,
                                                     const double y) const {
-  CHECK(trajectory_points_.size() > 0);
+  CHECK_GT(trajectory_points_.size(), 0);
 
   double d_min = PointDistanceSquare(trajectory_points_.front(), x, y);
   size_t index_min = 0;
