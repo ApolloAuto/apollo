@@ -14,28 +14,36 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_DRIVERS_LIDAR_VELODYNE_COMMON_DEF_H_
-#define MODULES_DRIVERS_LIDAR_VELODYNE_COMMON_DEF_H_
+#include "modules/map/pnc_map/cuda_util.h"
 
-#include <set>
-#include "modules/drivers/lidar_velodyne/proto/velodyne_conf.pb.h"
+#include <vector>
+
+#include "gtest/gtest.h"
 
 namespace apollo {
-namespace drivers {
-namespace lidar_velodyne {
+namespace pnc_map {
 
-static const std::set<VelodyneModel> v64_models = {
-      V64E_S2,
-      V64E_S3S,
-      V64E_S3D_STRONGEST,
-      V64E_S3D_LAST,
-      V64E_S3D_DUAL
-};
-static const std::set<VelodyneModel> v16_models = {VLP16};
-static const char* valid_models =
-    "V64E_S2|V64E_S3S|V64E_S3D_STRONGEST|V64E_S3D_LAST|V64E_S3D_DUAL|VLP16";
-}  // namespace lidar_velodyne
-}  // namespace drivers
+using apollo::common::math::LineSegment2d;
+using apollo::common::math::Vec2d;
+
+TEST(CudaUtil, CudaNearestSegment) {
+  CudaNearestSegment segment_tool;
+  Vec2d p1(0, 0);
+  Vec2d p2(1, 0);
+  Vec2d p3(2, 0);
+  Vec2d p4(3, 0);
+
+  std::vector<LineSegment2d> segments;
+  segments.emplace_back(p1, p2);
+  segments.emplace_back(p2, p3);
+  segments.emplace_back(p3, p4);
+
+  segment_tool.UpdateLineSegment(segments);
+  int nearest_index = segment_tool.FindNearestSegment(0.5, 1.0);
+  EXPECT_EQ(0, nearest_index);
+  nearest_index = segment_tool.FindNearestSegment(1.5, 1.0);
+  EXPECT_EQ(1, nearest_index);
+}
+
+}  // namespace pnc_map
 }  // namespace apollo
-
-#endif  // MODULES_DRIVERS_LIDAR_VELODYNE_COMMON_DEF_H_
