@@ -31,7 +31,7 @@
 #include "modules/planning/lattice/trajectory1d/piecewise_jerk_trajectory1d.h"
 #include "modules/planning/lattice/trajectory1d/standing_still_trajectory1d.h"
 #include "modules/planning/lattice/trajectory_generation/lateral_trajectory_optimizer.h"
-
+#include "modules/planning/lattice/trajectory_generation/lateral_qp_optimizer.h"
 namespace apollo {
 namespace planning {
 
@@ -139,7 +139,8 @@ void Trajectory1dGenerator::GenerateLateralTrajectoryBundle(
     auto lateral_bounds =
         ptr_path_time_graph_->GetLateralBounds(s_min, s_max, delta_s);
 
-    LateralTrajectoryOptimizer lateral_optimizer;
+    // LateralTrajectoryOptimizer lateral_optimizer;
+    LateralQPOptimizer lateral_optimizer;
 
     lateral_optimizer.optimize(init_lat_state_, delta_s, lateral_bounds);
 
