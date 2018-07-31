@@ -132,6 +132,7 @@ class YoloCameraDetector : public BaseCameraDetector {
   int lane_output_height_lane_ = 0;
   int lane_output_width_lane_ = 0;
   int ignored_height_ = 0;
+  int num_lanes = 13;
 
   yolo_camera_detector_config::ModelConfigs config_;
 };
