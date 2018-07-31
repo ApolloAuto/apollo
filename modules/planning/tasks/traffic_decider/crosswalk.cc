@@ -79,6 +79,7 @@ void Crosswalk::MakeDecisions(Frame* const frame,
 
   auto* path_decision = reference_line_info->path_decision();
   double adc_front_edge_s = reference_line_info->AdcSlBoundary().end_s();
+  double adc_end_edge_s = reference_line_info->AdcSlBoundary().start_s();
 
   CrosswalkToStop crosswalks_to_stop;
 
@@ -188,11 +189,12 @@ void Crosswalk::MakeDecisions(Frame* const frame,
       } else if (obstacle_l_distance <=
                  config_.crosswalk().stop_strick_l_distance()) {
         // (2) when l_distance <= strick_l_distance + on_road, always STOP
-        if (is_on_road) {
+        if (is_on_road && obstacle_sl_point.s() > adc_end_edge_s) {
           stop = true;
           ADEBUG << "need_stop(<=11): obstacle_id[" << obstacle_id << "] type["
-                 << obstacle_type_name << "] crosswalk_id[" << crosswalk_id
-                 << "] ON_ROAD";
+                 << obstacle_type_name << "] s[" << obstacle_sl_point.s()
+                 << "] adc_end_edge_s[ " << adc_end_edge_s
+                 << "] crosswalk_id[" << crosswalk_id << "] ON_ROAD";
         } else if (is_path_cross) {
           // (3) when l_distance <= strick_l_distance + not on_road,
           //     STOP only if path crosses
@@ -223,7 +225,11 @@ void Crosswalk::MakeDecisions(Frame* const frame,
         // TODO(all)
         // (4) when l_distance is between loose_l and strick_l
         //     use history decision of this crosswalk to smooth unsteadiness
-        stop = true;
+        stop = false;
+        ADEBUG << "need_stop(between 11 & l2): obstacle_id[" << obstacle_id
+            << "] type[" << obstacle_type_name
+            << "] obstacle_l_distance[" << obstacle_l_distance
+            << "] crosswalk_id[" << crosswalk_id << "] USE_PREVIOUS_DECISION";
       }
 
       if (stop && !is_on_road) {
