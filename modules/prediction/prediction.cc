@@ -104,15 +104,22 @@ Status Prediction::Init() {
       return OnError("Feature output is not ready.");
     }
     std::vector<std::string> offline_bags;
-    apollo::common::util::split(FLAGS_prediction_offline_bags, ',',
-                                &offline_bags);
+    int file_count = apollo::common::util::split(FLAGS_prediction_offline_bags,
+                                                 ',', &offline_bags);
+    if (file_count == 0) {
+      ADEBUG << "Get messages from listening ros";
+      return Status::OK();
+    }
 
     std::vector<std::string> topics;
     topics.push_back(FLAGS_perception_obstacle_topic);
     topics.push_back(FLAGS_localization_topic);
     for (const auto& filename : offline_bags) {
-      rosbag::Bag bag;
+      if (filename.empty()) {
+        continue;
+      }
       AINFO << "Processing: " << filename;
+      rosbag::Bag bag;
       bag.open(filename, rosbag::bagmode::Read);
       rosbag::View view(bag, rosbag::TopicQuery(topics));
       for (auto it = view.begin(); it != view.end(); ++it) {
@@ -124,6 +131,7 @@ Status Prediction::Init() {
       }
       bag.close();
     }
+    Stop();
     ros::shutdown();
   }
 
