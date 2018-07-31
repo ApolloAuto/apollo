@@ -65,8 +65,9 @@ inline bool StartWith(const std::string& ori, const std::string& pat) {
  * @param [in]: the string you want to split
  * @param [in]: the character
  * @param [out]: result strings after exploded by character
+ * @return: the number of elements splitted in the given str
  **/
-void split(const std::string& str, char ch, std::vector<std::string>* result);
+int split(const std::string& str, char ch, std::vector<std::string>* result);
 
 /**
  * @brief: trim the left side empty space of string
