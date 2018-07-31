@@ -335,7 +335,7 @@ function run_test() {
     echo -e "${RED}Need GPU to run the tests.${NO_COLOR}"
     echo "$BUILD_TARGETS" | xargs bazel test $DEFINES --config=unit_test -c dbg --test_verbose_timeout_warnings $@
   else
-    echo "$BUILD_TARGETS" | grep -v "cnn_segmentation_test" | grep -v "yolo_camera_detector_test" | xargs bazel test $DEFINES --config=unit_test -c dbg --test_verbose_timeout_warnings $@
+    echo "$BUILD_TARGETS" | grep -v "cnn_segmentation_test\|yolo_camera_detector_test\|unity_recognize_test\|perception_traffic_light_rectify_test\|cuda_util_test" | xargs bazel test $DEFINES --config=unit_test -c dbg --test_verbose_timeout_warnings $@
   fi
   if [ $? -ne 0 ]; then
     fail 'Test failed!'
@@ -635,11 +635,11 @@ function main() {
       apollo_build_opt $@
       ;;
     build_gpu)
-      DEFINES="${DEFINES} --cxxopt=-DUSE_CAFFE_GPU"
+      DEFINES="${DEFINES} --define USE_GPU=true --cxxopt=-DUSE_GPU"
       apollo_build_dbg $@
       ;;
     build_opt_gpu)
-      DEFINES="${DEFINES} --cxxopt=-DUSE_CAFFE_GPU"
+      DEFINES="${DEFINES} --define USE_GPU=true --cxxopt=-DUSE_GPU"
       apollo_build_opt $@
       ;;
     build_fe)
@@ -684,7 +684,7 @@ function main() {
       citest $@
       ;;
     test_gpu)
-      DEFINES="${DEFINES} --cxxopt=-DUSE_CAFFE_GPU"
+      DEFINES="${DEFINES} --cxxopt=-DUSE_GPU"
       USE_GPU="1"
       run_test $@
       ;;

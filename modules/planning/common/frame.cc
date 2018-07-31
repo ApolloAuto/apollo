@@ -349,13 +349,15 @@ Status Frame::Init() {
       AddObstacle(*ptr);
     }
   }
-  const auto *collision_obstacle = FindCollisionObstacle();
-  if (collision_obstacle) {
-    std::string err_str =
-        "Found collision with obstacle: " + collision_obstacle->Id();
-    apollo::common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
-    buffer.ERROR(err_str);
-    return Status(ErrorCode::PLANNING_ERROR, err_str);
+  if (FLAGS_enable_collision_detection) {
+    const auto *collision_obstacle = FindCollisionObstacle();
+    if (collision_obstacle) {
+      std::string err_str =
+          "Found collision with obstacle: " + collision_obstacle->Id();
+      apollo::common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
+      buffer.ERROR(err_str);
+      return Status(ErrorCode::PLANNING_ERROR, err_str);
+    }
   }
   if (!CreateReferenceLineInfo()) {
     AERROR << "Failed to init reference line info";

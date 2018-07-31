@@ -236,9 +236,9 @@ class VelodyneParser {
    */
   void compute_coords(const union RawDistance &raw_distance,
                       const LaserCorrection &corrections,
-                      const uint16_t &rotation, VPoint *point);
+                      const uint16_t rotation, VPoint *point);
 
-  bool is_scan_valid(int rotation, float distance);
+  bool is_scan_valid(const int rotation, const float distance);
 
   /**
    * \brief Unpack velodyne packet

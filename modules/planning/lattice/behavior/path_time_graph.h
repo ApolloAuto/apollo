@@ -45,7 +45,8 @@ class PathTimeGraph {
                 const std::vector<common::PathPoint>& discretized_ref_points,
                 const ReferenceLineInfo* ptr_reference_line_info,
                 const double s_start, const double s_end,
-                const double t_start, const double t_end);
+                const double t_start, const double t_end,
+                const std::array<double, 3>& init_d);
 
   const std::vector<PathTimeObstacle>& GetPathTimeObstacles() const;
 
@@ -101,6 +102,7 @@ class PathTimeGraph {
   std::pair<double, double> time_range_;
   std::pair<double, double> path_range_;
   const ReferenceLineInfo* ptr_reference_line_info_;
+  std::array<double, 3> init_d_;
 
   std::unordered_map<std::string, PathTimeObstacle> path_time_obstacle_map_;
   std::vector<PathTimeObstacle> path_time_obstacles_;
