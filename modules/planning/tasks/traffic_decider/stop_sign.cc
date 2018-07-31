@@ -29,6 +29,7 @@
 
 #include "modules/common/time/time.h"
 #include "modules/common/util/util.h"
+#include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/hdmap/hdmap_common.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/planning/common/frame.h"
@@ -390,7 +391,8 @@ int StopSign::ProcessStopStatus(ReferenceLineInfo* const reference_line_info,
 bool StopSign::CheckADCkStop(ReferenceLineInfo* const reference_line_info) {
   CHECK_NOTNULL(reference_line_info);
 
-  double adc_speed = reference_line_info->AdcPlanningPoint().v();
+  double adc_speed =
+      common::VehicleStateProvider::instance()->linear_velocity();
   if (adc_speed > config_.stop_sign().max_stop_speed()) {
     ADEBUG << "ADC not stopped: speed[" << adc_speed << "]";
     return false;

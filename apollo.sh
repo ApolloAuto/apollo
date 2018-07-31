@@ -332,7 +332,7 @@ function run_test() {
     echo -e "${RED}Need GPU to run the tests.${NO_COLOR}"
     echo "$BUILD_TARGETS" | xargs bazel test $DEFINES --config=unit_test -c dbg --test_verbose_timeout_warnings $@
   else
-    echo "$BUILD_TARGETS" | grep -v "cnn_segmentation_test" | grep -v "yolo_camera_detector_test" | xargs bazel test $DEFINES --config=unit_test -c dbg --test_verbose_timeout_warnings $@
+    echo "$BUILD_TARGETS" | grep -v "cnn_segmentation_test\|yolo_camera_detector_test\|unity_recognize_test\|perception_traffic_light_rectify_test\|cuda_util_test" | xargs bazel test $DEFINES --config=unit_test -c dbg --test_verbose_timeout_warnings $@
   fi
   if [ $? -ne 0 ]; then
     fail 'Test failed!'
@@ -448,6 +448,30 @@ function build_velodyne() {
   rm -rf modules/devel_isolated/
 }
 
+function build_velodyne_vls128() {
+  CURRENT_PATH=$(pwd)
+  if [ -d "${ROS_ROOT}" ]; then
+    ROS_PATH="${ROS_ROOT}/../.."
+  else
+    warning "ROS not found. Run apolllo.sh build first."
+    exit 1
+  fi
+
+  source "${ROS_PATH}/setup.bash"
+
+  cd modules
+  catkin_make_isolated --install --source drivers/velodyne_vls \
+    --install-space "${ROS_PATH}" -DCMAKE_BUILD_TYPE=Release \
+    --cmake-args --no-warn-unused-cli
+  find "${ROS_PATH}" -name "*.pyc" -print0 | xargs -0 rm -rf
+  cd -
+
+  rm -rf modules/.catkin_workspace
+  rm -rf modules/build_isolated/
+  rm -rf modules/devel_isolated/
+}
+
+
 
 function build_lslidar() {
   CURRENT_PATH=$(pwd)
@@ -537,6 +561,7 @@ function print_usage() {
   ${BLUE}build_opt${NONE}: build optimized binary for the code
   ${BLUE}build_gpu${NONE}: run build only with Caffe GPU mode support
   ${BLUE}build_velodyne${NONE}: build velodyne driver
+  ${BLUE}build_velodyne_vls128${NONE}: build velodyne vls-128 driver
   ${BLUE}build_lslidar${NONE}: build lslidar driver
   ${BLUE}build_rslidar${NONE}: build rslidar driver
   ${BLUE}build_usbcam${NONE}: build usb camera driver
@@ -607,11 +632,11 @@ function main() {
       apollo_build_opt $@
       ;;
     build_gpu)
-      DEFINES="${DEFINES} --cxxopt=-DUSE_CAFFE_GPU"
+      DEFINES="${DEFINES} --define USE_GPU=true --cxxopt=-DUSE_GPU"
       apollo_build_dbg $@
       ;;
     build_opt_gpu)
-      DEFINES="${DEFINES} --cxxopt=-DUSE_CAFFE_GPU"
+      DEFINES="${DEFINES} --define USE_GPU=true --cxxopt=-DUSE_GPU"
       apollo_build_opt $@
       ;;
     build_fe)
@@ -620,14 +645,14 @@ function main() {
     buildify)
       buildify
       ;;
-    build_gnss)
-      build_gnss
-      ;;
     build_py)
       build_py_proto
       ;;
     build_velodyne)
       build_velodyne
+      ;;
+    build_velodyne_vls128)
+      build_velodyne_vls128
       ;;
     build_lslidar)
       build_lslidar
@@ -656,7 +681,7 @@ function main() {
       citest $@
       ;;
     test_gpu)
-      DEFINES="${DEFINES} --cxxopt=-DUSE_CAFFE_GPU"
+      DEFINES="${DEFINES} --cxxopt=-DUSE_GPU"
       USE_GPU="1"
       run_test $@
       ;;

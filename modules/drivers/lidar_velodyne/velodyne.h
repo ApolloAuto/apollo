@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_DRIVERS_VELODYN_VELODYNE_H_
-#define MODULES_DRIVERS_VELODYN_VELODYNE_H_
+#ifndef MODULES_DRIVERS_VELODYNE_VELODYNE_H_
+#define MODULES_DRIVERS_VELODYNE_VELODYNE_H_
 
 #include <map>
 #include <memory>
@@ -65,34 +65,28 @@ class Velodyne : public apollo::common::ApolloApp {
       RawDataCache;
   typedef common::util::BlockingQueue<sensor_msgs::PointCloud2Ptr>
       PointCloudCache;
-  void Packet(RawDataCache* output, const VelodyneConf& conf);
-  void Convert(RawDataCache* input, PointCloudCache* output,
-               const VelodyneConf& conf);
-  void Compensate(PointCloudCache* input, const VelodyneConf& conf);
-  void PointCloudFusion(std::map<uint32_t, PointCloudCache*> fusion_cache);
-  void Notice();
-  bool CalcNpackets(VelodyneConfUnit* unit);
-  bool FusionCheckInit(const std::map<uint32_t, uint8_t>& velodyne_index_map);
+  void Packet(RawDataCache* output);
+  void Convert(RawDataCache* input, PointCloudCache* output);
+  void Compensate(PointCloudCache* input);
+  bool SetNpackets(VelodyneConf* conf);
   inline int64_t GetTime() {
     return apollo::common::time::AsInt64<common::time::micros>(
         apollo::common::time::Clock::Now());
   }
+  void Notice();
 
  private:
-  VelodyneConfUnit conf_unit_;
+  VelodyneConf conf_;
   common::monitor::MonitorLogger monitor_logger_;
-  std::vector<RawDataCache*> packet_cache_vec_;
-  std::vector<PointCloudCache*> pointcloud_cache_vec_;
-  std::map<uint32_t, PointCloudCache*> fusion_cache_;
+  std::shared_ptr<RawDataCache> packet_cache_;
+  std::shared_ptr<PointCloudCache> pointcloud_cache_;
 
   bool running_ = true;
   std::vector<std::shared_ptr<std::thread> > threads_;
-  bool is_fusion_ = false;
-  std::map<uint32_t, uint8_t> fusion_index_map_;
 };
 
 }  // namespace lidar_velodyne
 }  // namespace drivers
 }  // namespace apollo
 
-#endif  // MODULES_DRIVERS_VELODYN_VELODYNE_H_
+#endif  // MODULES_DRIVERS_VELODYNE_VELODYNE_H_

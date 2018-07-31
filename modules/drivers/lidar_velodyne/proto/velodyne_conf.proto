@@ -10,16 +10,15 @@ enum VelodyneModel {
     V64E_S3D_LAST = 4;
     V64E_S3D_DUAL = 5;
 }
-
 message VelodyneConf {
     required uint32 index = 1 [default = 0];
     optional string position = 2 [default = "centre"];
     // packet params
-    optional string frame_id = 3 [default = "velodyne16"]; 
+    optional string frame_id = 3;
     optional uint32 firing_data_port = 4 [default = 2368];
     optional uint32 positioning_data_port = 5 [default = 8308];
     optional double rpm = 6 [default = 600.0];
-    optional VelodyneModel model = 7 [default = VLP16];
+    optional VelodyneModel model = 7;
     optional int32 npackets = 8;
     optional int32 cache_size = 9 [default = 1];
     optional int32 packet_rate = 10 [default = 754];
@@ -41,14 +40,4 @@ message VelodyneConf {
     // compensate params
     optional string child_frame_id = 200 [default = "velodyne16"];
     optional double tf_query_timeout = 201 [default = 0.1];
-}
-message FusionConf {
-  required uint32 major_index = 1 [default = 0];
-  repeated uint32 slave_index = 2;
-}
-
-message VelodyneConfUnit {
-    repeated VelodyneConf conf = 1;
-    optional bool is_fusion = 2 [default = false];
-    optional FusionConf fusion_conf = 3;
 }

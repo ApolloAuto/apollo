@@ -19,9 +19,11 @@
  */
 
 #include "modules/drivers/gnss/gnss.h"
+
+#include "modules/drivers/gnss/proto/config.pb.h"
+
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/drivers/gnss/gnss_gflags.h"
-#include "modules/drivers/gnss/proto/config.pb.h"
 
 /**
  * @namespace apollo::drivers::smartereye
