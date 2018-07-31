@@ -38,13 +38,15 @@ std::vector<int> Base64CodeTable() {
 
 }  // namespace
 
-void split(const std::string& str, char ch, std::vector<std::string>* result) {
-  result->clear();
+int split(const std::string& str, char ch, std::vector<std::string>* result) {
   std::stringstream ss(str);
   std::string segment;
+  int count = 0;
   while (std::getline(ss, segment, ch)) {
     result->push_back(segment);
+    ++count;
   }
+  return count;
 }
 
 void trim(std::string* str) {
@@ -71,7 +73,7 @@ void rtrim(std::string* str) {
              str->end());
 }
 
-std::string Base64Decode(const std::string &base64_str) {
+std::string Base64Decode(const std::string& base64_str) {
   static const std::vector<int> kBase64CodeTable = Base64CodeTable();
 
   std::string bytes;
