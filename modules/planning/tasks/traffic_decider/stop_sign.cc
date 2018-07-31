@@ -422,7 +422,7 @@ bool StopSign::CheckADCkStop(ReferenceLineInfo* const reference_line_info) {
 /**
  * @brief: read watch vehicles from PlanningStatus
  */
-int StopSign::GetWatchVehicles(const StopSignInfo& stop_sign_info,
+void StopSign::GetWatchVehicles(const StopSignInfo& stop_sign_info,
                                StopSignLaneVehicles* watch_vehicles) {
   CHECK_NOTNULL(watch_vehicles);
 
@@ -441,14 +441,12 @@ int StopSign::GetWatchVehicles(const StopSignInfo& stop_sign_info,
     ADEBUG << "GetWatchVehicles watch_vehicles: lane_id[" << associated_lane_id
            << "] vehicle[" << s << "]";
   }
-
-  return 0;
 }
 
 /**
  * @brief: update PlanningStatus with watch vehicles
  */
-int StopSign::UpdateWatchVehicles(StopSignLaneVehicles* watch_vehicles) {
+void StopSign::UpdateWatchVehicles(StopSignLaneVehicles* watch_vehicles) {
   CHECK_NOTNULL(watch_vehicles);
 
   auto* stop_sign_status = GetPlanningStatus()->mutable_stop_sign();
@@ -466,8 +464,6 @@ int StopSign::UpdateWatchVehicles(StopSignLaneVehicles* watch_vehicles) {
     ADEBUG << "UpdateWatchVehicles watch_vehicles: lane_id[" << it->first
            << "] vehicle[" << s << "]";
   }
-
-  return 0;
 }
 
 /**
