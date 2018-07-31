@@ -66,7 +66,7 @@ class PullOver : public TrafficRule {
   /**
    * get a pull over stop point
    */
-  int GetPullOverStop(common::PointENU* stop_point);
+  int GetPullOverStopPoint(common::PointENU* stop_point);
 
   /**
    * check if on a crosswalk/junction/clear_area/speedbumper/etc overlap
@@ -94,10 +94,17 @@ class PullOver : public TrafficRule {
   bool CheckPullOverComplete();
 
   /**
+   * build stop deceleration
+   */
+  bool CheckStopDeceleration(ReferenceLineInfo* const reference_line_info,
+                             const double stop_line_s) const;
+
+  /**
    * build stop decision
    */
   int BuildPullOverStop(const common::PointENU& stop_point);
-  int BuildInLaneStop(const common::PointENU& pull_over_stop_point);
+  int BuildInLaneStop(ReferenceLineInfo* const reference_line_info,
+                      const common::PointENU& pull_over_stop_point);
   int BuildStopDecision(const std::string& vistual_obstacle_id_postfix,
                         const double stop_line_s,
                         const common::PointENU& stop_point,
@@ -109,7 +116,7 @@ class PullOver : public TrafficRule {
   static constexpr double PARKING_SPOT_LONGITUDINAL_BUFFER = 1.0;
   static uint32_t failure_count_;
   static common::PointENU stop_point_;
-  static common::PointENU inlane_adc_potiion_stop_point_;
+  static common::PointENU inlane_stop_point_;
   Frame* frame_ = nullptr;
   ReferenceLineInfo* reference_line_info_ = nullptr;
 };

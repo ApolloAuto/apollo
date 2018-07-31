@@ -21,7 +21,6 @@
 #include "ros/ros.h"
 
 #include "modules/common/log.h"
-#include "modules/drivers/lidar_velodyne/common/def.h"
 #include "modules/drivers/lidar_velodyne/common/util.h"
 
 namespace apollo {
@@ -82,7 +81,7 @@ void VelodyneParser::init_angle_params(double view_direction,
   tmp_max_angle = fmod(fmod(tmp_max_angle, 2 * M_PI) + 2 * M_PI, 2 * M_PI);
 
   // converting into the hardware velodyne ref (negative yaml and degrees)
-  // adding 0.5 perfomrs a centered double to int conversion
+  // adding 0.5 performs a centered double to int conversion
   config_.set_min_angle(100 * (2 * M_PI - tmp_min_angle) * 180 / M_PI + 0.5);
   config_.set_max_angle(100 * (2 * M_PI - tmp_max_angle) * 180 / M_PI + 0.5);
   if (config_.min_angle() == config_.max_angle()) {
@@ -111,7 +110,7 @@ bool VelodyneParser::setup() {
   return true;
 }
 
-bool VelodyneParser::is_scan_valid(int rotation, float range) {
+bool VelodyneParser::is_scan_valid(const int rotation, const float range) {
   // check range first
   if (range < config_.min_range() || range > config_.max_range()) {
     return false;
@@ -121,7 +120,7 @@ bool VelodyneParser::is_scan_valid(int rotation, float range) {
 
 void VelodyneParser::compute_coords(const union RawDistance& raw_distance,
                                     const LaserCorrection& corrections,
-                                    const uint16_t& rotation, VPoint* point) {
+                                    const uint16_t rotation, VPoint* point) {
   if (rotation > 36000) {
     AERROR << "rotation must between 0 and 36000, now is :" << rotation;
     return;
@@ -201,16 +200,17 @@ void VelodyneParser::compute_coords(const union RawDistance& raw_distance,
 }
 
 VelodyneParser* VelodyneParserFactory::create_parser(VelodyneConf* config) {
-  if (v64_models.find(config->model()) != v64_models.end()) {
-    AINFO << "create velodyne64 parser.";
-    return new Velodyne64Parser(*config);
-  } else if (v16_models.find(config->model()) != v16_models.end()) {
+  if (config == nullptr) {
+    AERROR << "config is nullptr.";
+    return nullptr;
+  }
+  if (config->model() == VLP16) {
     AINFO << "create velodyne16 parser.";
     config->set_calibration_online(false);
     return new Velodyne16Parser(*config);
   } else {
-    AERROR << "invalid model, must be in" << valid_models;
-    return nullptr;
+    AINFO << "create velodyne64 parser.";
+    return new Velodyne64Parser(*config);
   }
 }
 

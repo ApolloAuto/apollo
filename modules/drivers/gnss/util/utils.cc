@@ -14,19 +14,19 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "modules/drivers/gnss/util/utils.h"
+
 #include <fcntl.h>
-#include <unistd.h>
 #include <google/protobuf/io/zero_copy_stream_impl.h>
 #include <google/protobuf/text_format.h>
+#include <unistd.h>
 #include <string>
-
-#include "modules/drivers/gnss/util/utils.h"
 
 namespace apollo {
 namespace drivers {
 namespace gnss {
-namespace {
 
+namespace {
 const char TABLE[] =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
