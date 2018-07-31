@@ -56,6 +56,7 @@ message ReferenceLineSmootherConfig {
   optional DrivingSide driving_side = 6 [default = RIGHT];
   // If a lane width larger than this value times adc width, this lane is
   // considered as a wide lane
+  // wide lane handing feature will be disabled if this number is negative
   optional double wide_lane_threshold_factor = 7 [default = 2.0];
   // In a wide lane case, leave the left side (or right side on a left-handed
   // driving map) this amount times adc width
