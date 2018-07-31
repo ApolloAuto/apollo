@@ -17,7 +17,12 @@
 #include "modules/prediction/prediction.h"
 
 #include <cmath>
+#include <vector>
 
+#include "rosbag/bag.h"
+#include "rosbag/view.h"
+
+#include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/math/vec2d.h"
 #include "modules/common/time/time.h"
@@ -98,6 +103,28 @@ Status Prediction::Init() {
     if (!FeatureOutput::Ready()) {
       return OnError("Feature output is not ready.");
     }
+    std::vector<std::string> offline_bags;
+    apollo::common::util::split(FLAGS_prediction_offline_bags, ',',
+                                &offline_bags);
+
+    std::vector<std::string> topics;
+    topics.push_back(FLAGS_perception_obstacle_topic);
+    topics.push_back(FLAGS_localization_topic);
+    for (const auto& filename : offline_bags) {
+      rosbag::Bag bag;
+      AINFO << "Processing: " << filename;
+      bag.open(filename, rosbag::bagmode::Read);
+      rosbag::View view(bag, rosbag::TopicQuery(topics));
+      for (auto it = view.begin(); it != view.end(); ++it) {
+        if (it->getTopic() == FLAGS_localization_topic) {
+          OnLocalization(*(it->instantiate<LocalizationEstimate>()));
+        } else if (it->getTopic() == FLAGS_perception_obstacle_topic) {
+          RunOnce(*(it->instantiate<PerceptionObstacles>()));
+        }
+      }
+      bag.close();
+    }
+    ros::shutdown();
   }
 
   return Status::OK();

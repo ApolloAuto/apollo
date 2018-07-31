@@ -200,7 +200,7 @@ std::string PrintDebugStringIter(const Container& container,
   return PrintDebugStringIter(container.begin(), container.end(), delimiter);
 }
 
-std::string Base64Decode(const std::string &base64_str);
+std::string Base64Decode(const std::string& base64_str);
 
 }  // namespace util
 }  // namespace common
