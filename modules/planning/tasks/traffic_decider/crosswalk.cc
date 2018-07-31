@@ -313,7 +313,8 @@ bool Crosswalk::CheckADCkStop(
     hdmap::PathOverlap* const crosswalk_overlap) const {
   CHECK_NOTNULL(reference_line_info);
 
-  double adc_speed = reference_line_info->AdcPlanningPoint().v();
+  double adc_speed =
+      common::VehicleStateProvider::instance()->linear_velocity();
   if (adc_speed > config_.crosswalk().max_stop_speed()) {
     ADEBUG << "ADC not stopped: speed[" << adc_speed << "]";
     return false;
