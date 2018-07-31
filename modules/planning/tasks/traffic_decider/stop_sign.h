@@ -58,7 +58,7 @@ class StopSign : public TrafficRule {
   int GetWatchVehicles(const hdmap::StopSignInfo& stop_sign_info,
                        StopSignLaneVehicles* watch_vehicles);
   int UpdateWatchVehicles(StopSignLaneVehicles* watch_vehicles);
-  int AddWatchVehicle(const PathObstacle& path_obstacle,
+  void AddWatchVehicle(const PathObstacle& path_obstacle,
                       StopSignLaneVehicles* watch_vehicles);
   int RemoveWatchVehicle(const PathObstacle& path_obstacle,
                          const std::vector<std::string>& watch_vehicle_ids,
