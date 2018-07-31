@@ -755,7 +755,8 @@ AnchorPoint ReferenceLineProvider::GetAnchorPoint(
   double shifted_left_width = total_width / 2.0;
 
   // shift to left (or right) on wide lanes
-  if (total_width > adc_width * smoother_config_.wide_lane_threshold_factor()) {
+  if (smoother_config_.wide_lane_threshold_factor() > 0 &&
+      total_width > adc_width * smoother_config_.wide_lane_threshold_factor()) {
     if (smoother_config_.driving_side() == ReferenceLineSmootherConfig::RIGHT) {
       shifted_left_width =
           adc_half_width +
@@ -832,8 +833,7 @@ bool ReferenceLineProvider::SmoothPrefixedReferenceLine(
     common::SLPoint sl_point;
     Vec2d xy{point.path_point.x(), point.path_point.y()};
     if (!prefix_ref.XYToSL(xy, &sl_point)) {
-      AERROR << "Failed to get projection for point: " << xy.DebugString();
-      return false;
+      continue;
     }
     if (sl_point.s() < 0 || sl_point.s() > prefix_ref.Length()) {
       continue;
