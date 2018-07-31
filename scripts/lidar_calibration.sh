@@ -92,6 +92,7 @@ function start_record() {
   NUM_PROCESSES="$(pgrep -c -f "rosbag record")"
     if [ "${NUM_PROCESSES}" -eq 0 ]; then
       nohup rosbag record -b 2048 -O lidar_calib.bag  \
+        /apollo/sensor/gnss/ins_status \ #this topic is not used for the calibration, due to it occurs a bug here
         /apollo/sensor/gnss/ins_stat \
         /apollo/sensor/velodyne64/VelodyneScanUnified \
         /apollo/calibration/relative_odometry \
