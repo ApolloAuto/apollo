@@ -41,13 +41,3 @@ message VelodyneConf {
     optional string child_frame_id = 200 [default = "velodyne16"];
     optional double tf_query_timeout = 201 [default = 0.1];
 }
-message FusionConf {
-  required uint32 major_index = 1 [default = 0];
-  repeated uint32 slave_index = 2;
-}
-
-message VelodyneConfUnit {
-    repeated VelodyneConf conf = 1;
-    optional bool is_fusion = 2 [default = false];
-    optional FusionConf fusion_conf = 3;
-}
