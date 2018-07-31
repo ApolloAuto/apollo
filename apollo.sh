@@ -109,6 +109,9 @@ function generate_build_targets() {
   if [ ${MACHINE_ARCH} != "x86_64" ]; then
      BUILD_TARGETS=$(echo $BUILD_TARGETS |tr ' ' '\n' | grep -v "msf")
   fi
+  #skip fuzz unit test since they rely on specific CROSSTOOL
+  #currently, fuzzing unit can only be build individually using bazel command
+  BUILD_TARGETS=$(echo $BUILD_TARGETS |tr ' ' '\n' | grep -v "_fuzz")
 }
 
 #=================================================

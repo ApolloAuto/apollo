@@ -190,4 +190,56 @@ cc_test(
     ],
 )
 
+cc_binary(
+    name = "lat_controller_fuzzer",
+    srcs = ["lat_controller_fuzzer.cc"],
+    data = ["//modules/control:control_testdata"],
+    deps = [
+        ":lat_controller",
+        "//modules/common:log",
+        "//modules/common/time",
+        "//modules/common/util",
+        "//modules/common/vehicle_state:vehicle_state_provider",
+        "//modules/control/proto:control_proto",
+        "//modules/planning/proto:planning_proto",
+        "@libprotobuf_mutator//:mutator",
+    ],
+    tags = [
+	"manual",
+    ],
+    copts = [
+        "-fsanitize=fuzzer,address",
+        "-Iexternal/libprotobuf_mutator/src/",
+    ],
+    linkopts = [
+        "-fsanitize=fuzzer,address",
+    ],
+)
+
+cc_binary(
+    name = "lon_controller_fuzzer",
+    srcs = ["lon_controller_fuzzer.cc"],
+    data = ["//modules/control:control_testdata"],
+    deps = [
+        ":lon_controller",
+        "//modules/common:log",
+        "//modules/common/time",
+        "//modules/common/util",
+        "//modules/common/vehicle_state:vehicle_state_provider",
+        "//modules/control/proto:control_proto",
+        "//modules/planning/proto:planning_proto",
+        "@libprotobuf_mutator//:mutator",   
+    ],
+    tags = [
+	"manual",
+    ],
+    copts = [
+        "-fsanitize=fuzzer,address",
+        "-Iexternal/libprotobuf_mutator/src/",
+    ],
+    linkopts = [
+        "-fsanitize=fuzzer,address",
+    ]
+)
+
 cpplint()

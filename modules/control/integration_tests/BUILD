@@ -61,4 +61,49 @@ cc_test(
     ],
 )
 
+cc_library(
+    name = "control_fuzz_base",
+    srcs = [
+        "control_fuzz_base.cc",
+    ],
+    hdrs = [
+        "control_fuzz_base.h",
+    ],
+    deps = [
+        "//modules/common:log",
+        "//modules/common/adapters:adapter_manager",
+        "//modules/common/proto:common_proto",
+        "//modules/common/time",
+        "//modules/control:control_lib",
+        "//modules/control/common:control_gflags",
+        "//modules/control/proto:control_proto",
+    ],
+    copts = [
+        "-fsanitize=address"
+    ],
+    linkopts = [
+        "-fsanitize=address"
+    ],
+)
+
+cc_binary(
+    name = "simple_control_fuzz",
+    srcs = [
+        "simple_control_fuzz.cc",
+    ],
+    data = ["//modules/control:control_testdata"],
+    deps = [
+        ":control_fuzz_base",
+        "@libprotobuf_mutator//:mutator", 
+    ],
+    tags = [
+	"manual",
+    ],
+    copts = [
+        "-fsanitize=fuzzer,address",
+        "-Iexternal/libprotobuf_mutator/src/",
+    ],
+    linkopts = ["-fsanitize=fuzzer,address"],
+)
+
 cpplint()
