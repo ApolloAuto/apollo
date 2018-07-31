@@ -473,7 +473,7 @@ int StopSign::UpdateWatchVehicles(StopSignLaneVehicles* watch_vehicles) {
 /**
  * @brief: add a watch vehicle which arrives at stop sign ahead of adc
  */
-int StopSign::AddWatchVehicle(const PathObstacle& path_obstacle,
+void StopSign::AddWatchVehicle(const PathObstacle& path_obstacle,
                               StopSignLaneVehicles* watch_vehicles) {
   CHECK_NOTNULL(watch_vehicles);
 
@@ -490,7 +490,6 @@ int StopSign::AddWatchVehicle(const PathObstacle& path_obstacle,
       obstacle_type != PerceptionObstacle::VEHICLE) {
     ADEBUG << "obstacle_id[" << obstacle_id << "] type[" << obstacle_type_name
            << "]. skip";
-    return 0;
   }
 
   auto point = common::util::MakePointENU(perception_obstacle.position().x(),
