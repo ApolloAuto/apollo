@@ -9,8 +9,11 @@ message LanePoint {
     optional apollo.common.Point3D position = 1;
     optional double heading = 2 [default = 0.0];
     optional double width = 3 [default = 0.0];
+    // relative s to focus obstacle
     optional double relative_s = 4 [default = 0.0];
+    // relative l to focus obstacle
     optional double relative_l = 5 [default = 0.0];
+    // lane point heading relative to focused obstacle heading
     optional double angle_diff = 6 [default = 0.0];
     optional double kappa = 7 [default = 0.0];
 
@@ -26,7 +29,9 @@ message LanePoint {
 
 message LaneSegment {
     optional string lane_id = 1;
+    // s offset of the first lane point
     optional double start_s = 2 [default = 0.0];
+    // s offset of the last lane point
     optional double end_s = 3 [default = 0.0];
     optional uint32 lane_turn_type = 4 [default = 0];
     repeated LanePoint lane_point = 5;
@@ -35,12 +40,14 @@ message LaneSegment {
 
 message NearbyObstacle {
     optional int32 id = 1;
-    optional double s = 2;
+    optional double s = 2;  // relative to focus obstacle
+    optional double l = 3;  // relative to focus obstacle
 }
 
 message LaneSequence {
     optional int32 lane_sequence_id = 1;
     repeated LaneSegment lane_segment = 2;
+    // nearby obstacles on this lane sequence
     repeated NearbyObstacle nearby_obstacle = 3;
 
     message Features {
@@ -54,18 +61,26 @@ message LaneSequence {
     repeated apollo.common.PathPoint path_point = 8;
 
     enum BehaviorType {
-        NOT_ON_LANE = 0;
-        CONSTANT_SPEED = 1;
-        SMALL_ACCELERATION = 2;
-        LARGE_ACCELERATION = 3;
-        SMALL_DECELERATION = 4;
-        LARGE_DECELERATION = 5;
+        NOT_GOTO_LANE = 1;
+        CONSTANT_SPEED = 2;
+        SMALL_ACCELERATION = 3;
+        LARGE_ACCELERATION = 4;
+        SMALL_DECELERATION = 5;
+        LARGE_DECELERATION = 6;
     }
     optional BehaviorType behavior_type = 9;
     optional bool vehicle_on_lane = 10;
 
-    repeated LaneSegment left_neighbor_segment = 11;
-    repeated LaneSegment right_neighbor_segment = 12;
+    // lane points on this lane sequence
+    repeated LanePoint curr_lane_point = 11;
+    // lane points on the left neighbor lane sequence
+    repeated LanePoint left_neighbor_point = 12;
+    // lane points on the right neighbor lane sequence
+    repeated LanePoint right_neighbor_point = 13;
+    // nearby obstacles on the left neighbor lane sequence
+    repeated NearbyObstacle left_nearby_obstacle = 14;
+    // nearby obstacles on the right neighbor lane sequence
+    repeated NearbyObstacle right_nearby_obstacle = 15;
 }
 
 message LaneGraph {
