@@ -469,9 +469,6 @@ bool Projector<T>::Project(const T &u, const T &v,
   ->get_camera_calibration()
   ->get_camera2car_homography_mat();
 
-  // AINFO << "**** old:\n" << trans_mat_;
-  // AINFO << "**** new:\n" << trans_mat;
-
   Eigen::Matrix<double, 3, 1> uv_point(u, v, 1.0);
   Eigen::Matrix<double, 3, 1> xy_p = trans_mat * uv_point;
 
