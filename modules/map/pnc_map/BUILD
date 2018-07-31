@@ -1,31 +1,19 @@
 load("//tools:cpplint.bzl", "cpplint")
+load("//tools:cuda_library.bzl", "cuda_library")
 
 package(default_visibility = ["//visibility:public"])
 
-genrule(
-    name = "cuda_util",
+cuda_library(
+    name = "cuda_pnc_util",
     srcs = [
         "cuda_util.cu",
+    ],
+    hdrs = [
         "cuda_util.h",
     ],
-    outs = ["libcuda_util.so"],
-    cmd = """
-    nvcc \
-    -arch=sm_52 \
-    -gencode=arch=compute_50,code=sm_50 \
-    -gencode=arch=compute_52,code=sm_52 \
-    -gencode=arch=compute_60,code=sm_60 \
-    -gencode=arch=compute_61,code=sm_61 \
-    -gencode=arch=compute_61,code=compute_61 \
-    -std=c++11 \
-    -lcudart -lcublas \
-    -I /apollo \
-    --shared \
-    --compiler-options '-fPIC' \
-    --expt-extended-lambda \
-    $(location cuda_util.cu) \
-    -o $@
-     """,
+    deps = [
+        "@cuda",
+    ],
 )
 
 cc_test(
@@ -34,11 +22,10 @@ cc_test(
     srcs = [
         "cuda_util.h",
         "cuda_util_test.cc",
-        "libcuda_util.so",
+        ":cuda_pnc_util",
     ],
     deps = [
         "//modules/common/math",
-        "@cuda",
         "@gtest//:main",
     ],
 )
