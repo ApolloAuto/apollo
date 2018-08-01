@@ -27,7 +27,7 @@ bool LateralQPOptimizer::optimize(
   delta_s_ = delta_s;
   const int num_var = static_cast<int>(d_bounds.size());
   const int kNumParam = 3 * num_var;
-  const int kNumConstraint = 3 * (num_var - 1) + 3;
+  const int kNumConstraint = 3 * (num_var - 1) + 5;
   ::qpOASES::HessianType hessian_type = ::qpOASES::HST_POSDEF;
   ::qpOASES::QProblem qp_problem(kNumParam, kNumConstraint, hessian_type);
   ::qpOASES::Options my_options;
@@ -38,6 +38,7 @@ bool LateralQPOptimizer::optimize(
   my_options.epsIterRef = 1e-3;
   my_options.terminationTolerance = 1e-3;
   qp_problem.setOptions(my_options);
+  qp_problem.setPrintLevel(qpOASES::PL_NONE);
   int max_iter = 1000;
 
   // Construct kernel matrix
@@ -146,6 +147,16 @@ bool LateralQPOptimizer::optimize(
   affine_constraint_matrix[pprime_index] = 1.0;
   constraint_lower_bounds[constraint_index] = d_state[2];
   constraint_upper_bounds[constraint_index] = d_state[2];
+  ++constraint_index;
+
+  affine_constraint_matrix[prime_index + num_var - 1] = 1.0;
+  constraint_lower_bounds[constraint_index] = 0.0;
+  constraint_upper_bounds[constraint_index] = 0.0;
+  ++constraint_index;
+
+  affine_constraint_matrix[pprime_index + num_var - 1] = 1.0;
+  constraint_lower_bounds[constraint_index] = 0.0;
+  constraint_upper_bounds[constraint_index] = 0.0;
   ++constraint_index;
 
   CHECK_EQ(constraint_index, kNumConstraint);
