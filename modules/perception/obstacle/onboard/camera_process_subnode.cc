@@ -131,7 +131,7 @@ void CameraProcessSubnode::ImgCallback(const sensor_msgs::Image &message) {
     detector_->Lanetask(img, &masks);
     mask_color.setTo(cv::Scalar(0));
     ln_msk_threshold_ = 0.9;
-    for (int c = 0; c < 13; ++c) {
+    for (int c = 0; c < num_lines; ++c) {
       for (int h = 0; h < masks[c].rows; ++h) {
         for (int w = 0; w < masks[c].cols; ++w) {
           if (masks[c].at<float>(h, w) >= ln_msk_threshold_) {
