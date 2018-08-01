@@ -591,7 +591,6 @@ void GLFWFusionViewer::render() {
   glClear(GL_COLOR_BUFFER_BIT);
 
   frame_count_++;
-  
   if (use_new_post_) {
     CalibrationConfigManager* calibration_config_manager =
       Singleton<CalibrationConfigManager>::get();
