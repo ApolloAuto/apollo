@@ -351,11 +351,10 @@ void Planning::RunOnce() {
 
   const double planning_cycle_time = 1.0 / FLAGS_planning_loop_rate;
 
-  bool is_replan = false;
   std::vector<TrajectoryPoint> stitching_trajectory;
   stitching_trajectory = TrajectoryStitcher::ComputeStitchingTrajectory(
       vehicle_state, start_timestamp, planning_cycle_time,
-      last_publishable_trajectory_.get(), &is_replan);
+      last_publishable_trajectory_.get());
 
   const uint32_t frame_num = AdapterManager::GetPlanning()->GetSeqNum() + 1;
   status = InitFrame(frame_num, stitching_trajectory.back(), start_timestamp,
@@ -444,7 +443,7 @@ void Planning::RunOnce() {
     }
   }
 
-  trajectory_pb->set_is_replan(is_replan);
+  trajectory_pb->set_is_replan(stitching_trajectory.size() == 1);
   PublishPlanningPb(trajectory_pb, start_timestamp);
   ADEBUG << "Planning pb:" << trajectory_pb->header().DebugString();
 
