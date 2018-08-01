@@ -64,19 +64,19 @@ std::vector<std::vector<int>> GLFWFusionViewer::s_color_table = {
     std::vector<int>{255, 128, 0}};
 
 std::vector<cv::Scalar> lane_map_colors = {
-    cv::Scalar(0, 0, 0), // Background, should never be used
-    cv::Scalar(100, 240, 0), // L3
-    cv::Scalar(150, 180, 0), // L2
-    cv::Scalar(250, 120, 0), // L1
-    cv::Scalar(250, 0, 0), // L0
-    cv::Scalar(0, 250, 0), // Center
-    cv::Scalar(0, 0, 250), // R0
-    cv::Scalar(120, 0, 200), // R1
-    cv::Scalar(180, 0, 150), // R2
-    cv::Scalar(240, 0, 100), // R3
-    cv::Scalar(0, 0, 0), // Other
-    cv::Scalar(255, 255, 255), // Left boundary
-    cv::Scalar(255, 255, 255)}; // Right boundary
+    cv::Scalar(0, 0, 0),  // Background, should never be used
+    cv::Scalar(100, 240, 0),  // L3
+    cv::Scalar(150, 180, 0),  // L2
+    cv::Scalar(250, 120, 0),  // L1
+    cv::Scalar(250, 0, 0),  // L0
+    cv::Scalar(0, 250, 0),  // Center
+    cv::Scalar(0, 0, 250),  // R0
+    cv::Scalar(120, 0, 200),  // R1
+    cv::Scalar(180, 0, 150),  // R2
+    cv::Scalar(240, 0, 100),  // R3
+    cv::Scalar(0, 0, 0),  // Other
+    cv::Scalar(255, 255, 255),  // Left boundary
+    cv::Scalar(255, 255, 255)};  // Right boundary
 
 GLFWFusionViewer::GLFWFusionViewer()
     : init_(false),
