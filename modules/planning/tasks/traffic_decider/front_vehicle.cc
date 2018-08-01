@@ -328,6 +328,16 @@ void FrontVehicle::MakeStopDecision(ReferenceLineInfo* reference_line_info) {
       continue;
     }
 
+    bool is_on_road =
+        reference_line_info->reference_line().HasOverlap(
+            path_obstacle->obstacle()->PerceptionBoundingBox());
+    if (!is_on_road) {
+      // skip obstacles not on reference line
+      ADEBUG << "obstacle_id[" << obstacle_id << "] type[" << obstacle_type_name
+             << "] NOT_ON_ROAD. SKIP";
+      continue;
+    }
+
     const auto& obstacle_sl = path_obstacle->PerceptionSLBoundary();
     if (obstacle_sl.end_s() <= adc_sl.start_s()) {
       // skip backside vehicles
