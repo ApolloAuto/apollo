@@ -1277,14 +1277,12 @@ bool GLFWFusionViewer::draw_lane_objects_image(cv::Mat* image_mat) {
   }
 
   // draw lane pixels
-  // cv::Scalar lane_map_color(0, 255, 255);  // yellow for lane line mark
   int x_offset = 0;
   int y_offset = lane_start_y_pos_;
   int x0 = x_offset;
   int y0 = y_offset;
   int x1 = image_mat->cols - 1;
   int y1 = image_mat->rows - 1;
-  lane_map_threshold_ = 0.5;
   for (int h = y0; h <= y1; ++h) {
     for (int w = x0; w <= x1; ++w) {
       int x = static_cast<int>(w * lane_map_scale_);
