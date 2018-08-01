@@ -82,7 +82,7 @@ const cv::Scalar kGreenYellow(47, 255, 173);
 
 // delay time for visualization
 constexpr int kDelayTime = 0;
-const size_t minNumPoints = 5;
+const size_t minNumPoints = 5; // minimum number to fit a curve
 
 enum MarkerShapeType {
   POINT = 0,
