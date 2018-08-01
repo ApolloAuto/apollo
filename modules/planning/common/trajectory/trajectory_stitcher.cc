@@ -65,10 +65,8 @@ void TrajectoryStitcher::TransformLastPublishedTrajectory(
   }
 
   // R^-1
-  float cos_theta =
-      common::math::cos(common::math::Angle16::from_rad(theta_diff));
-  float sin_theta =
-      -common::math::sin(common::math::Angle16::from_rad(theta_diff));
+  double cos_theta = std::cos(theta_diff);
+  double sin_theta = -std::sin(theta_diff);
 
   // -R^-1 * t
   auto tx = -(cos_theta * x_diff - sin_theta * y_diff);
@@ -181,8 +179,7 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
           std::max(0, static_cast<int>(matched_index - 1)),
       prev_trajectory->trajectory_points().begin() + forward_time_index + 1);
 
-  const double zero_s = time_matched_point.path_point().s();
-
+  const double zero_s = stitching_trajectory.back().path_point().s();
   for (auto& tp : stitching_trajectory) {
     if (!tp.has_path_point()) {
       return ComputeReinitStitchingTrajectory(vehicle_state);
