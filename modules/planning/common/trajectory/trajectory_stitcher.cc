@@ -97,8 +97,7 @@ void TrajectoryStitcher::TransformLastPublishedTrajectory(
 std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
     const VehicleState& vehicle_state, const double current_timestamp,
     const double planning_cycle_time,
-    const PublishableTrajectory* prev_trajectory, bool* is_replan) {
-  *is_replan = true;
+    const PublishableTrajectory* prev_trajectory) {
   if (!FLAGS_enable_trajectory_stitcher) {
     return ComputeReinitStitchingTrajectory(vehicle_state);
   }
@@ -188,7 +187,6 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
                          current_timestamp);
     tp.mutable_path_point()->set_s(tp.path_point().s() - zero_s);
   }
-  *is_replan = false;
   return stitching_trajectory;
 }
 
