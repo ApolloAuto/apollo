@@ -400,7 +400,9 @@ RadarObstacles DelphiToRadarObstacles(
   const auto adc_quaternion = localization.pose().orientation();
   const double adc_theta = GetAngleFromQuaternion(adc_quaternion);
 
-  for (int index = 0; index < delphi_esr.esr_track01_500_size(); ++index) {
+  for (int index = 0; index < delphi_esr.esr_track01_500_size() &&
+                      index < static_cast<int>(motionpowers.size());
+       ++index) {
     const auto& data_500 = delphi_esr.esr_track01_500(index);
 
     // ignore invalid target
