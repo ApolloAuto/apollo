@@ -394,7 +394,7 @@ bool YoloCameraDetector::Lanetask(const cv::Mat &frame,
     memcpy(tmp.data, seg_blob->cpu_data() + lane_output_width_lane_ *
           lane_output_height_lane_ * i,
           lane_output_width_lane_ * lane_output_height_lane_ * sizeof(float));
-    cv::resize(tmp, tmp, cv::Size(960, 384), 0, 0);
+    cv::resize(tmp, tmp, cv::Size(lane_output_width_, lane_output_height_), 0, 0);
     predictions->push_back(tmp);
   }
 
