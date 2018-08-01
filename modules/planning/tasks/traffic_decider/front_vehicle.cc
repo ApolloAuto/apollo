@@ -20,6 +20,7 @@
 
 #include "modules/planning/tasks/traffic_decider/front_vehicle.h"
 
+#include <algorithm>
 #include <string>
 #include <vector>
 
@@ -146,8 +147,8 @@ bool FrontVehicle::ProcessSidePass(
         sidepass_status->set_status(SidePassStatus::DRIVE);
         sidepass_status->clear_wait_start_time();
       } else {
-        double wait_start_time = sidepass_status->wait_start_time();
-        double wait_time = Clock::NowInSeconds() - wait_start_time;
+        const double wait_start_time = sidepass_status->wait_start_time();
+        const double wait_time = Clock::NowInSeconds() - wait_start_time;
         ADEBUG << "wait_start_time[" << wait_start_time << "] wait_time["
                << wait_time << "]";
 
@@ -287,7 +288,7 @@ std::string FrontVehicle::FindPassableObstacle(
         continue;
       }
 
-      double delta_s = other_obstacle->PerceptionSLBoundary().start_s() -
+      const double delta_s = other_obstacle->PerceptionSLBoundary().start_s() -
                        obstacle_sl.end_s();
       if (delta_s < 0.0 || delta_s > side_pass_s_threshold) {
         continue;
@@ -342,20 +343,28 @@ void FrontVehicle::MakeStopDecision(ReferenceLineInfo* reference_line_info) {
       continue;
     }
 
-    double left_width = 0.0;
-    double right_width = 0.0;
-    reference_line.GetLaneWidth(obstacle_sl.start_s(), &left_width,
-                                &right_width);
+    // use min width to take care splitting-lane scenario
+    double start_s_left_width = 0.0;
+    double start_s_right_width = 0.0;
+    reference_line.GetLaneWidth(obstacle_sl.start_s(), &start_s_left_width,
+                                &start_s_right_width);
+    double end_s_left_width = 0.0;
+    double end_s_right_width = 0.0;
+    reference_line.GetLaneWidth(obstacle_sl.end_s(), &end_s_left_width,
+                                &end_s_right_width);
 
-    double left_driving_width = left_width - obstacle_sl.end_l() -
-                                config_.front_vehicle().nudge_l_buffer();
-    double right_driving_width = right_width + obstacle_sl.start_l() -
-                                 config_.front_vehicle().nudge_l_buffer();
+    const double left_width = std::min(start_s_left_width, end_s_left_width);
+    const double left_driving_width = left_width - obstacle_sl.end_l() -
+        config_.front_vehicle().nudge_l_buffer();
+
+    const double right_width = std::min(start_s_right_width, end_s_right_width);
+    const double right_driving_width = right_width + obstacle_sl.start_l() -
+        config_.front_vehicle().nudge_l_buffer();
 
     ADEBUG << "obstacle_id[" << obstacle_id << "] type[" << obstacle_type_name
-           << "] left_driving_width[" << left_driving_width
-           << "] right_driving_width[" << right_driving_width << "] adc_width["
-           << adc_width << "]";
+        << "] left_driving_width[" << left_driving_width
+        << "] right_driving_width[" << right_driving_width << "] adc_width["
+        << adc_width << "]";
 
     // stop if not able to bypass or if obstacle crossed reference line
     if ((left_driving_width < adc_width && right_driving_width < adc_width) ||
@@ -363,11 +372,12 @@ void FrontVehicle::MakeStopDecision(ReferenceLineInfo* reference_line_info) {
       ADEBUG << "STOP: obstacle[" << obstacle_id << "]";
 
       // build stop decision
-      double stop_distance =
+      const double stop_distance =
           path_obstacle->MinRadiusStopDistance(vehicle_param);
       const double stop_s = obstacle_sl.start_s() - stop_distance;
       auto stop_point = reference_line.GetReferencePoint(stop_s);
-      double stop_heading = reference_line.GetReferencePoint(stop_s).heading();
+      const double stop_heading =
+          reference_line.GetReferencePoint(stop_s).heading();
 
       ObjectDecisionType stop;
       auto stop_decision = stop.mutable_stop();

@@ -222,10 +222,13 @@ void Crosswalk::MakeDecisions(Frame* const frame,
           }
         }
       } else {
-        // TODO(all)
         // (4) when l_distance is between loose_l and strick_l
         //     use history decision of this crosswalk to smooth unsteadiness
-        stop = false;
+
+        // TODO(all): replace this temp implementation
+        if (is_path_cross) {
+          stop = true;
+        }
         ADEBUG << "need_stop(between 11 & l2): obstacle_id[" << obstacle_id
             << "] type[" << obstacle_type_name
             << "] obstacle_l_distance[" << obstacle_l_distance
