@@ -17,6 +17,7 @@
 #include "modules/common/util/file.h"
 
 #include <errno.h>
+#include <glob.h>
 #include <limits.h>
 #include <algorithm>
 #include <fstream>
@@ -103,6 +104,18 @@ bool DirectoryExists(const std::string &directory_path) {
   }
 
   return false;
+}
+
+std::vector<std::string> Glob(const std::string& pattern) {
+  glob_t globs = {};
+  std::vector<std::string> results;
+  if (0 == glob(pattern.c_str(), GLOB_TILDE, nullptr, &globs)) {
+    for (size_t i = 0; i < globs.gl_pathc; ++i) {
+      results.emplace_back(globs.gl_pathv[i]);
+    }
+  }
+  globfree(&globs);
+  return results;
 }
 
 bool CopyFile(const std::string &from, const std::string &to) {

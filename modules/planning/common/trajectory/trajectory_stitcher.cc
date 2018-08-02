@@ -65,10 +65,8 @@ void TrajectoryStitcher::TransformLastPublishedTrajectory(
   }
 
   // R^-1
-  float cos_theta =
-      common::math::cos(common::math::Angle16::from_rad(theta_diff));
-  float sin_theta =
-      -common::math::sin(common::math::Angle16::from_rad(theta_diff));
+  double cos_theta = std::cos(theta_diff);
+  double sin_theta = -std::sin(theta_diff);
 
   // -R^-1 * t
   auto tx = -(cos_theta * x_diff - sin_theta * y_diff);
@@ -99,8 +97,7 @@ void TrajectoryStitcher::TransformLastPublishedTrajectory(
 std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
     const VehicleState& vehicle_state, const double current_timestamp,
     const double planning_cycle_time,
-    const PublishableTrajectory* prev_trajectory, bool* is_replan) {
-  *is_replan = true;
+    const PublishableTrajectory* prev_trajectory) {
   if (!FLAGS_enable_trajectory_stitcher) {
     return ComputeReinitStitchingTrajectory(vehicle_state);
   }
@@ -181,8 +178,7 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
           std::max(0, static_cast<int>(matched_index - 1)),
       prev_trajectory->trajectory_points().begin() + forward_time_index + 1);
 
-  const double zero_s = time_matched_point.path_point().s();
-
+  const double zero_s = stitching_trajectory.back().path_point().s();
   for (auto& tp : stitching_trajectory) {
     if (!tp.has_path_point()) {
       return ComputeReinitStitchingTrajectory(vehicle_state);
@@ -191,7 +187,6 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
                          current_timestamp);
     tp.mutable_path_point()->set_s(tp.path_point().s() - zero_s);
   }
-  *is_replan = false;
   return stitching_trajectory;
 }
 
