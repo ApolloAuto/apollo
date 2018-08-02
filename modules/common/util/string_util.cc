@@ -36,6 +36,16 @@ std::vector<int> Base64CodeTable() {
   return table;
 }
 
+const char* tripletBase64(const int triplet) {
+  auto table = Base64CodeTable();
+  static char result[4];
+  result[0] = table[(triplet >> 18) & 0x3f];
+  result[1] = table[(triplet >> 12) & 0x3f];
+  result[2] = table[(triplet >> 6) & 0x3f];
+  result[3] = table[triplet & 0x3f];
+  return result;
+}
+
 }  // namespace
 
 int split(const std::string& str, char ch, std::vector<std::string>* result) {
@@ -94,6 +104,30 @@ std::string Base64Decode(const std::string& base64_str) {
     }
   }
   return bytes;
+}
+
+std::string EncodeBase64(const std::string& in) {
+  std::string out;
+  if (in.empty()) {
+    return out;
+  }
+
+  int in_size = in.size();
+
+  out.reserve(((in_size - 1) / 3 + 1) * 4);
+
+  int i = 2;
+  for (; i < in_size; i += 3) {
+    out.append(tripletBase64((in[i - 2] << 16) | (in[i - 1] << 8) | in[i]), 4);
+  }
+  if (i == in_size) {
+    out.append(tripletBase64((in[i - 2] << 16) | (in[i - 1] << 8)), 3);
+    out.push_back('=');
+  } else if (i == in_size + 1) {
+    out.append(tripletBase64(in[i - 2] << 16), 2);
+    out.append("==");
+  }
+  return out;
 }
 
 }  // namespace util
