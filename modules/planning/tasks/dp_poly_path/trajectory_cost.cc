@@ -59,7 +59,8 @@ TrajectoryCost::TrajectoryCost(
       std::floor(total_time / config.eval_time_interval()));
 
   for (const auto *ptr_path_obstacle : obstacles) {
-    if (ptr_path_obstacle->IsIgnore() || ptr_path_obstacle->LongitudinalDecision().has_stop()) {
+    if (ptr_path_obstacle->IsIgnore() 
+        || ptr_path_obstacle->LongitudinalDecision().has_stop()) {
       continue;
     } 
       
