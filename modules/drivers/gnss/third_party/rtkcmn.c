@@ -1157,7 +1157,11 @@ extern int smoother(const double *xf, const double *Qf, const double *xb,
 {
     double *invQf=mat(n,n),*invQb=mat(n,n),*xx=mat(n,1);
     int i,info=-1;
-    
+   
+    if (!invQf||!invQb||!xx) {
+        return info;
+    }
+ 
     matcpy(invQf,Qf,n,n);
     matcpy(invQb,Qb,n,n);
     if (!matinv(invQf,n)&&!matinv(invQb,n)) {

@@ -499,6 +499,7 @@ void Planning::Stop() {
   FrameHistory::instance()->Clear();
 }
 
+// for testing only
 void Planning::SetLastPublishableTrajectory(
     const ADCTrajectory& adc_trajectory) {
   last_publishable_trajectory_.reset(new PublishableTrajectory(adc_trajectory));
