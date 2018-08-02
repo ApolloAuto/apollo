@@ -100,9 +100,18 @@ void Planning::ResetPullOver(const routing::RoutingResponse& response) {
     return;
   }
   if (hdmap::PncMap::IsNewRouting(last_routing_, response)) {
-    pull_over->Clear();
+    const auto& cur_routing_end =
+        *last_routing_.routing_request().waypoint().rbegin();
+    const auto& new_routing_end =
+        *response.routing_request().waypoint().rbegin();
+    const double kEpsilon = 1e-6;
+    if (cur_routing_end.id() != new_routing_end.id() ||
+        std::fabs(cur_routing_end.s() - new_routing_end.s()) > kEpsilon) {
+      // clear pull-over status for a new routing with DIFFERENT destination
+      pull_over->Clear();
+      AINFO << "Cleared Pull Over Status after received new routing";
+    }
     last_routing_ = response;
-    AINFO << "Cleared Pull Over Status after received new routing";
   }
 }
 
