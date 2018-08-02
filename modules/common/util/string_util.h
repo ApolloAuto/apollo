@@ -203,6 +203,8 @@ std::string PrintDebugStringIter(const Container& container,
 
 std::string Base64Decode(const std::string& base64_str);
 
+std::string EncodeBase64(const std::string& in);
+
 }  // namespace util
 }  // namespace common
 }  // namespace apollo

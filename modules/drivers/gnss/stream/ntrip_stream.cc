@@ -21,9 +21,9 @@
 #include "ros/include/ros/ros.h"
 #include "ros/include/std_msgs/String.h"
 
+#include "modules/common/util/string_util.h"
 #include "modules/drivers/gnss/stream/stream.h"
 #include "modules/drivers/gnss/stream/tcp_stream.h"
-#include "modules/drivers/gnss/util/utils.h"
 
 namespace {
 
@@ -75,7 +75,7 @@ NtripStream::NtripStream(const std::string& address, uint16_t port,
                   "User-Agent: NTRIP gnss_driver/0.0\r\n"
                   "accept: */* \r\n"
                   "Authorization: Basic " +
-                  encode_base64(user + ":" + passwd) + "\r\n\r\n"),
+                  common::util::EncodeBase64(user + ":" + passwd) + "\r\n\r\n"),
       timeout_s_(timeout_s),
       tcp_stream_(new TcpStream(address.c_str(), port, 0, false)) {}
 
