@@ -109,6 +109,12 @@ function generate_build_targets() {
   if [ ${MACHINE_ARCH} != "x86_64" ]; then
      BUILD_TARGETS=$(echo $BUILD_TARGETS |tr ' ' '\n' | grep -v "msf")
   fi
+  #switch for building fuzz test
+  if [ -z $BUILD_FUZZ_TEST ]; then
+     BUILD_TARGETS=$(echo $BUILD_TARGETS |tr ' ' '\n' | grep -v "fuzz")
+  else 
+     BUILD_TARGETS=`bazel query //modules/tools/fuzz/...`
+  fi
 }
 
 #=================================================
@@ -125,7 +131,16 @@ function build() {
   if [ "$MACHINE_ARCH" == 'aarch64' ]; then
     JOB_ARG="--jobs=3"
   fi
-  echo "$BUILD_TARGETS" | xargs bazel build $JOB_ARG $DEFINES -c $@
+
+  # Switch for building fuzz test
+  if [ -z $BUILD_FUZZ_TEST ]; then 
+    echo "$BUILD_TARGETS" | xargs bazel build $JOB_ARG $DEFINES -c $@
+  else
+    echo "$BUILD_TARGETS" | xargs bazel build \
+    --crosstool_top=tools/clang-6.0:toolchain \
+    $JOB_ARG $DEFINES -c $@ --compilation_mode=dbg
+  fi
+
   if [ $? -ne 0 ]; then
     fail 'Build failed!'
   fi
@@ -663,6 +678,10 @@ function main() {
     build_usbcam)
       build_usbcam
       ;;
+    build_fuzz_test)
+      BUILD_FUZZ_TEST=true
+      apollo_build_dbg $@
+    ;;
     config)
       config
       ;;
