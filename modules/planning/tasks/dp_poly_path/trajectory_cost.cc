@@ -59,11 +59,10 @@ TrajectoryCost::TrajectoryCost(
       std::floor(total_time / config.eval_time_interval()));
 
   for (const auto *ptr_path_obstacle : obstacles) {
-    if (ptr_path_obstacle->IsIgnore()) {
+    if (ptr_path_obstacle->IsIgnore() || ptr_path_obstacle->LongitudinalDecision().has_stop()) {
       continue;
-    } else if (ptr_path_obstacle->LongitudinalDecision().has_stop()) {
-      continue;
-    }
+    } 
+      
     const auto &sl_boundary = ptr_path_obstacle->PerceptionSLBoundary();
 
     const float adc_left_l =
