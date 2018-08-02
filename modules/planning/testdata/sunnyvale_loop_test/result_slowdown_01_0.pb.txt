@@ -1584,23 +1584,6 @@ decision {
           stop_point {
             x: 587254.40653671825
             y: 4140934.47571914
-            z: 0
-          }
-          stop_heading: -2.0650906754691016
-        }
-      }
-    }
-    decision {
-      id: "867_1"
-      perception_id: 867
-      object_decision {
-        stop {
-          reason_code: STOP_REASON_OBSTACLE
-          distance_s: -6
-          stop_point {
-            x: 587254.40653671825
-            y: 4140934.47571914
-            z: 0
           }
           stop_heading: -2.0650906754691016
         }
