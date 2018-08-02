@@ -25,10 +25,11 @@
 #include "ros/include/ros/ros.h"
 #include "ros/include/std_msgs/String.h"
 
-#include "modules/drivers/gnss/parser/data_parser.h"
-#include "modules/drivers/gnss/parser/rtcm_parser.h"
 #include "modules/drivers/gnss/proto/config.pb.h"
 #include "modules/drivers/gnss/proto/gnss_status.pb.h"
+
+#include "modules/drivers/gnss/parser/data_parser.h"
+#include "modules/drivers/gnss/parser/rtcm_parser.h"
 #include "modules/drivers/gnss/stream/stream.h"
 
 namespace apollo {
