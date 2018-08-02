@@ -412,10 +412,10 @@ void PathTimeGraph::UpdateLateralBoundsByObstacle(
     }
     return;
   }
-  if (sl_boundary.start_l() < -FLAGS_lattice_epsilon) {
+  if (sl_boundary.start_l() > -FLAGS_lattice_epsilon) {
     for (std::size_t i = start_index; i < end_index; ++i) {
       bounds->operator[](i).second =
-          std::min(bounds->operator[](i).second, sl_boundary.end_l());
+          std::min(bounds->operator[](i).second, sl_boundary.start_l());
     }
     return;
   }
