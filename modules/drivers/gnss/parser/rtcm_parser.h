@@ -17,9 +17,10 @@
 #ifndef MODULES_DRIVERS_GNSS_RTCM_PARSER_H_
 #define MODULES_DRIVERS_GNSS_RTCM_PARSER_H_
 
-#include <std_msgs/String.h>
 #include <memory>
+
 #include "ros/include/ros/ros.h"
+#include "std_msgs/String.h"
 
 #include "modules/drivers/gnss/parser/parser.h"
 
