@@ -44,6 +44,7 @@ message PullOverStatus {
     UNKNOWN = 1;
     IN_OPERATION = 2;
     DONE = 3;
+    DISABLED = 4;
   }
 
   optional bool in_pull_over = 1 [default=false];
