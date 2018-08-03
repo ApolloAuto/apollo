@@ -62,8 +62,7 @@ TrajectoryCost::TrajectoryCost(
     if (ptr_path_obstacle->IsIgnore() 
         || ptr_path_obstacle->LongitudinalDecision().has_stop()) {
       continue;
-    } 
-      
+    }
     const auto &sl_boundary = ptr_path_obstacle->PerceptionSLBoundary();
 
     const float adc_left_l =
