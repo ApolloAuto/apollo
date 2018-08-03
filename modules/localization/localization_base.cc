@@ -32,7 +32,11 @@ void LocalizationBase::PublishPoseBroadcastTF(
 
   // broadcast tf message
   geometry_msgs::TransformStamped tf2_msg;
-  tf2_msg.header.stamp = ros::Time(localization.measurement_time());
+  //There should be a if statement here like this, maybe the following is not correct.
+  if(use_sim_time)
+      tf2_msg.header.stamp = ros::Time(localization.measurement_time());
+  else
+      tf2_msg.header.stamp = localization.measurement_time();
   tf2_msg.header.frame_id = FLAGS_localization_tf2_frame_id;
   tf2_msg.child_frame_id = FLAGS_localization_tf2_child_frame_id;
 
