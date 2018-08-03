@@ -95,6 +95,8 @@ class SimControl : SimControlInterface {
 
   void PublishLocalization(const apollo::common::TrajectoryPoint &point);
 
+  bool InitStartPoint(double start_velocity, double start_acceleration);
+
   // Reset the start point, which can be a dummy point on the map or received
   // from the routing module.
   void SetStartPoint(const apollo::common::TrajectoryPoint &point);
@@ -143,6 +145,8 @@ class SimControl : SimControlInterface {
   // Initial velocity and acceleration of the main vehicle
   double start_velocity_ = 0.0;
   double start_acceleration_ = 0.0;
+  // Whether start point is initialized from actual localization data
+  bool start_point_set_ = false;
 
   static constexpr int kPlanningCountToStart = 5;
 
