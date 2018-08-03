@@ -67,8 +67,12 @@ SimControl::SimControl(const MapService* map_service)
 void SimControl::Init(bool set_start_point, double start_velocity,
                       double start_acceleration) {
   if (set_start_point && !FLAGS_use_navigation_mode) {
-    start_point_set_ = InitStartPoint(start_velocity, start_acceleration);
+    InitStartPoint(start_velocity, start_acceleration);
   }
+  InitAdapter();
+}
+
+void SimControl::InitAdapter() {
   if (inited_) {
     return;
   }
@@ -98,18 +102,18 @@ void SimControl::OnReceiveNavigationInfo(
   }
 }
 
-bool SimControl::InitStartPoint(double start_velocity,
+void SimControl::InitStartPoint(double start_velocity,
                                 double start_acceleration) {
   TrajectoryPoint point;
-  bool actual_position = false;
   // Use the latest localization position as start point,
   // fall back to a dummy point from map
   AdapterManager::GetLocalization()->Observe();
   if (AdapterManager::GetLocalization()->Empty()) {
+    start_point_set_ = false;
     apollo::common::PointENU start_point;
     if (!map_service_->GetStartPoint(&start_point)) {
       AWARN << "Failed to get a dummy start point from map!";
-      return actual_position;
+      return;
     }
     point.mutable_path_point()->set_x(start_point.x());
     point.mutable_path_point()->set_y(start_point.y());
@@ -119,7 +123,10 @@ bool SimControl::InitStartPoint(double start_velocity,
     map_service_->GetPoseWithRegardToLane(start_point.x(), start_point.y(),
                                           &theta, &s);
     point.mutable_path_point()->set_theta(theta);
+    point.set_v(start_velocity);
+    point.set_a(start_acceleration);
   } else {
+    start_point_set_ = true;
     const auto& localization = AdapterManager::GetLocalization()
         ->GetLatestObserved();
     const auto& pose = localization.pose();
@@ -127,8 +134,8 @@ bool SimControl::InitStartPoint(double start_velocity,
     point.mutable_path_point()->set_y(pose.position().y());
     point.mutable_path_point()->set_z(pose.position().z());
     point.mutable_path_point()->set_theta(pose.heading());
-    start_velocity = std::hypot(pose.linear_velocity().x(),
-                                pose.linear_velocity().y());
+    point.set_v(std::hypot(pose.linear_velocity().x(),
+                pose.linear_velocity().y()));
     // Calculates the dot product of acceleration and velocity. The sign
     // of this projection indicates whether this is acceleration or
     // deceleration.
@@ -140,13 +147,9 @@ bool SimControl::InitStartPoint(double start_velocity,
     // it is indeed a deceleration.
     double magnitude = std::hypot(pose.linear_acceleration().x(),
                                   pose.linear_acceleration().y());
-    start_acceleration = std::signbit(projection) ? -magnitude : magnitude;
-    actual_position = true;
+    point.set_a(std::signbit(projection) ? -magnitude : magnitude);
   }
-  point.set_v(start_velocity);
-  point.set_a(start_acceleration);
   SetStartPoint(point);
-  return actual_position;
 }
 
 void SimControl::SetStartPoint(const TrajectoryPoint& start_point) {
@@ -180,7 +183,8 @@ void SimControl::OnRoutingResponse(const RoutingResponse& routing) {
 
   current_routing_header_ = routing.header();
 
-  // If this is from a planning re-routing request, don't reset car's location.
+  // If this is from a planning re-routing request, or the start point has been
+  // initialized by an actual localization pose, don't reset the start point.
   re_routing_triggered_ =
       routing.routing_request().header().module_name() == "planning";
   if (!re_routing_triggered_ && !start_point_set_) {
@@ -201,11 +205,13 @@ void SimControl::OnRoutingResponse(const RoutingResponse& routing) {
 
 void SimControl::Start() {
   if (!enabled_) {
-    if (!inited_) {
-      // Only place the car when there is not a localization.
-      AdapterManager::GetLocalization()->Observe();
-      Init(AdapterManager::GetLocalization()->Empty());
-    }
+    // When there is no localization yet, Init(true) will use a
+    // dummy point from the current map as an arbitrary start.
+    // When localization is already available, we do not need to
+    // reset/override the start point.
+    AdapterManager::GetLocalization()->Observe();
+    Init(AdapterManager::GetLocalization()->Empty());
+
     Reset();
     sim_control_timer_.start();
     enabled_ = true;
