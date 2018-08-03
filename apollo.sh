@@ -132,10 +132,22 @@ function build() {
     JOB_ARG="--jobs=3"
   fi
 
-  # Switch for building fuzz test
+  # Switch for building fuzz test.
   if [ -z $BUILD_FUZZ_TEST ]; then 
     echo "$BUILD_TARGETS" | xargs bazel build $JOB_ARG $DEFINES -c $@
   else
+    if [ -z "$(command -v clang-6.0)" ]; then
+      # Install clang-6.0 if it doesn't exist.
+      info "Installing clang-6.0 which is required by the fuzz test ..."
+      sudo apt-add-repository \
+      "deb http://apt.llvm.org/trusty/ llvm-toolchain-trusty-6.0 main"
+      wget -O - http://apt.llvm.org/llvm-snapshot.gpg.key \
+      | sudo apt-key add -
+      sudo apt-get update
+      sudo apt-get install -y clang-6.0 lldb-6.0 lld-6.0
+      sudo ln -s /usr/lib/x86_64-linux-gnu/libgfortran.so.3 \
+      /usr/lib/libgfortran.so
+    fi  
     echo "$BUILD_TARGETS" | xargs bazel build \
     --crosstool_top=tools/clang-6.0:toolchain \
     $JOB_ARG $DEFINES -c $@ --compilation_mode=dbg
@@ -584,6 +596,7 @@ function print_usage() {
   ${BLUE}build_fe${NONE}: compile frontend javascript code, this requires all the node_modules to be installed already
   ${BLUE}build_no_perception [dbg|opt]${NONE}: run build build skip building perception module, useful when some perception dependencies are not satisified, e.g., CUDA, CUDNN, LIDAR, etc.
   ${BLUE}build_prof${NONE}: build for gprof support.
+  ${BLUE}build_fuzz_test${NONE}: build fuzz test cases.
   ${BLUE}buildify${NONE}: fix style of BUILD files
   ${BLUE}check${NONE}: run build/lint/test, please make sure it passes before checking in new code
   ${BLUE}clean${NONE}: run Bazel clean
