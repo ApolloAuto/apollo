@@ -51,8 +51,8 @@ class Destination : public TrafficRule {
            const std::string lane_id,
            const double lane_s);
   bool CheckPullOver(ReferenceLineInfo* const reference_line_info,
-                     const std::string lane_id,
-                     const double lane_s,
+                     const std::string& dest_lane_id,
+                     const double dest_lane_s,
                      common::PointENU* dest_point);
   int PullOver(common::PointENU* const dest_point);
 };
