@@ -15,7 +15,7 @@
 
 ## 准备
 
-下载校准工具，并将文件提取到$APOLLO_HOME/modules /calibration。$APOLLO_HOME是APOLLO repository的根目录。
+[下载校准工具](https://apollocache.blob.core.windows.net/apollo-cache/multi_lidar_gnss_calibrator_and_doc.zip)，并将文件提取到$APOLLO_HOME/modules /calibration。$APOLLO_HOME是APOLLO repository的根目录。
 根据Apollo 1.5提供的校准指南选择校准位置。
 确保GNSS处于良好状态。为了验证这一点，使用‘rostopic echo /apollo/sensor/gnss/best_pose’并检查关键词latitude_std_dev, longitude_std_dev 和height_std_dev后的数量，偏差越小，校准质量越好。 我们强烈建议在偏差小于0.02时校准传感器。
 ## 使用校准工具
