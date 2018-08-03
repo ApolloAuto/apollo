@@ -27,7 +27,7 @@ DEFINE_string(prediction_conf_file,
 DEFINE_string(prediction_adapter_config_filename,
               "modules/prediction/conf/adapter.conf",
               "Default conf file for prediction");
-DEFINE_string(prediction_data_file_prefix, "data/prediction/feature",
+DEFINE_string(prediction_data_dir, "data/prediction/",
               "Prefix of files to store feature data");
 DEFINE_bool(prediction_test_mode, false, "Set prediction to test mode");
 DEFINE_double(
