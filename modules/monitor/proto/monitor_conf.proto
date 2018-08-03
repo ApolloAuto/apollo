@@ -21,6 +21,15 @@ message TopicStatus {
   optional double message_delay = 1;
 }
 
+message ResourceConf {
+  message DirSpace {
+    // Path to monitor space. Support wildcards like ? and *.
+    optional string path = 1;
+    optional int32 min_available_gb = 2;
+  }
+  repeated DirSpace dir_spaces = 1;
+}
+
 message MonitorConf {
   message ModuleConf {
     optional string name = 1;
@@ -37,4 +46,6 @@ message MonitorConf {
 
   // End point for vehicle to report status.
   optional string online_report_endpoint = 3;
+
+  optional ResourceConf resource_conf = 4;
 }
