@@ -37,7 +37,9 @@ DEFINE_double(
 
 DEFINE_bool(prediction_offline_mode, false, "Prediction offline mode");
 DEFINE_string(prediction_offline_bags, "",
-              "bag files for offline mode, filenames are separated with ','");
+              "bag files for offline mode, filenames are separated with ' '. "
+              "If this value is not set, the prediction module will use the "
+              "listen to published ros topic mode.");
 
 DEFINE_double(prediction_duration, 8.0, "Prediction duration (in seconds)");
 DEFINE_double(prediction_period, 0.1, "Prediction period (in seconds");
