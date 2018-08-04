@@ -32,7 +32,7 @@ void PlanningThreadPool::Init() {
     return;
   }
   thread_pool_.reset(
-      new common::util::ThreadPool(FLAGS_num_thread_planning_thread_pool));
+      new common::util::ThreadPool(FLAGS_max_planning_thread_pool_size));
   is_initialized = true;
 }
 

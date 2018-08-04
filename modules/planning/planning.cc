@@ -132,9 +132,6 @@ Status Planning::Init() {
       << "Failed to load traffic rule config file "
       << FLAGS_traffic_rule_config_filename;
 
-  // initialize planning thread pool
-  PlanningThreadPool::instance()->Init();
-
   // clear planning status
   util::GetPlanningStatus()->Clear();
 
@@ -489,7 +486,6 @@ void Planning::SetFallbackTrajectory(ADCTrajectory* trajectory_pb) {
 
 void Planning::Stop() {
   AERROR << "Planning Stop is called";
-  // PlanningThreadPool::instance()->Stop();
   if (reference_line_provider_) {
     reference_line_provider_->Stop();
   }

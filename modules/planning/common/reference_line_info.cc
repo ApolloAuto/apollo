@@ -24,6 +24,8 @@
 #include <functional>
 #include <utility>
 
+#include "ctpl/ctpl_stl.h"
+
 #include "modules/planning/proto/sl_boundary.pb.h"
 
 #include "modules/common/adapters/adapter_manager.h"
@@ -267,14 +269,19 @@ PathObstacle* ReferenceLineInfo::AddObstacle(const Obstacle* obstacle) {
 
 bool ReferenceLineInfo::AddObstacles(
     const std::vector<const Obstacle*>& obstacles) {
+  if (obstacles.empty()) {
+    return true;
+  }
   if (FLAGS_use_multi_thread_to_add_obstacles) {
     std::vector<int> ret(obstacles.size(), 0);
+    ctpl::thread_pool pool(
+        std::min<int>(FLAGS_max_planning_thread_pool_size, obstacles.size()));
     for (size_t i = 0; i < obstacles.size(); ++i) {
       const auto* obstacle = obstacles.at(i);
-      PlanningThreadPool::instance()->Push(std::bind(
-          &ReferenceLineInfo::AddObstacleHelper, this, obstacle, &(ret[i])));
+      pool.push(std::bind(&ReferenceLineInfo::AddObstacleHelper, this, obstacle,
+                          &(ret[i])));
     }
-    PlanningThreadPool::instance()->Synchronize();
+    pool.stop(true);
     if (std::find(ret.begin(), ret.end(), 0) != ret.end()) {
       return false;
     }
@@ -397,7 +404,7 @@ bool ReferenceLineInfo::IsChangeLanePath() const {
 }
 
 bool ReferenceLineInfo::IsNeighborLanePath() const {
-     return Lanes().IsNeighborSegment();
+  return Lanes().IsNeighborSegment();
 }
 
 std::string ReferenceLineInfo::PathSpeedDebugString() const {
