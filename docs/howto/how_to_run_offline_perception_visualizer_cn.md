@@ -37,7 +37,7 @@ bazel build -c opt //modules/perception/tool/offline_visualizer_tool:offline_lid
 选项`-c opt`用于构建具有优化性能的程序，这对于实时感知模块的离线模拟和可视化非常重要。
 如果您想使用GPU运行感知模块，请使用以下命令：
 ```
-bazel build -c opt --cxxopt=-DUSE_CAFFE_GPU //modules/perception/tool/offline_visualizer_tool:offline_lidar_visualizer_tool
+bazel build -c opt --cxxopt=-DUSE_GPU //modules/perception/tool/offline_visualizer_tool:offline_lidar_visualizer_tool
 ```
 
 ### 3. 使用离线感知模拟运行可视化工具

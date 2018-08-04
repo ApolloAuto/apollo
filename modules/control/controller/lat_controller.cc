@@ -103,7 +103,7 @@ bool LatController::LoadControlConf(const ControlConf *control_conf) {
   cr_ = control_conf->lat_controller_conf().cr();
   preview_window_ = control_conf->lat_controller_conf().preview_window();
   wheelbase_ = vehicle_param_.wheel_base();
-  steer_transmission_ratio_ = vehicle_param_.steer_ratio();
+  steer_ratio_ = vehicle_param_.steer_ratio();
   steer_single_direction_max_degree_ =
       vehicle_param_.max_steer_angle() / M_PI * 180;
   max_lat_acc_ = control_conf->lat_controller_conf().max_lateral_acceleration();
@@ -376,7 +376,7 @@ Status LatController::ComputeControlCommand(
   // Convert vehicle steer angle from rad to degree and then to steer degree
   // then to 100% ratio
   const double steer_angle_feedback = -(matrix_k_ * matrix_state_)(0, 0) * 180 /
-                                      M_PI * steer_transmission_ratio_ /
+                                      M_PI * steer_ratio_ /
                                       steer_single_direction_max_degree_ * 100;
 
   const double steer_angle_feedforward = ComputeFeedForward(debug->curvature());
@@ -390,7 +390,7 @@ Status LatController::ComputeControlCommand(
         std::atan(max_lat_acc_ * wheelbase_ /
                   (VehicleStateProvider::instance()->linear_velocity() *
                    VehicleStateProvider::instance()->linear_velocity())) *
-        steer_transmission_ratio_ * 180 / M_PI /
+        steer_ratio_ * 180 / M_PI /
         steer_single_direction_max_degree_ * 100;
 
     // Clamp the steer angle
@@ -416,19 +416,19 @@ Status LatController::ComputeControlCommand(
   // compute extra information for logging and debugging
   const double steer_angle_lateral_contribution =
       -matrix_k_(0, 0) * matrix_state_(0, 0) * 180 / M_PI *
-      steer_transmission_ratio_ / steer_single_direction_max_degree_ * 100;
+      steer_ratio_ / steer_single_direction_max_degree_ * 100;
 
   const double steer_angle_lateral_rate_contribution =
       -matrix_k_(0, 1) * matrix_state_(1, 0) * 180 / M_PI *
-      steer_transmission_ratio_ / steer_single_direction_max_degree_ * 100;
+      steer_ratio_ / steer_single_direction_max_degree_ * 100;
 
   const double steer_angle_heading_contribution =
       -matrix_k_(0, 2) * matrix_state_(2, 0) * 180 / M_PI *
-      steer_transmission_ratio_ / steer_single_direction_max_degree_ * 100;
+      steer_ratio_ / steer_single_direction_max_degree_ * 100;
 
   const double steer_angle_heading_rate_contribution =
       -matrix_k_(0, 3) * matrix_state_(3, 0) * 180 / M_PI *
-      steer_transmission_ratio_ / steer_single_direction_max_degree_ * 100;
+      steer_ratio_ / steer_single_direction_max_degree_ * 100;
 
   debug->set_heading(VehicleStateProvider::instance()->heading());
   debug->set_steer_angle(steer_angle);
@@ -540,7 +540,7 @@ double LatController::ComputeFeedForward(double ref_curvature) const {
        matrix_k_(0, 2) *
            (lr_ * ref_curvature -
             lf_ * mass_ * v * v * ref_curvature / 2 / cr_ / wheelbase_)) *
-      180 / M_PI * steer_transmission_ratio_ /
+      180 / M_PI * steer_ratio_ /
       steer_single_direction_max_degree_ * 100;
   return steer_angle_feedforwardterm;
 }

@@ -94,7 +94,7 @@ bazel build -c opt //modules/perception/tool/offline_visualizer_tool:offline_seq
 2. (可选)如果你想在GPU模式下运行感知模块，请使用下面的命令：
 
 ```
-bazel build -c opt --cxxopt=-DUSE_CAFFE_GPU //modules/perception/tool/offline_visualizer_tool:offline_sequential_obstacle_perception_test
+bazel build -c opt --cxxopt=-DUSE_GPU //modules/perception/tool/offline_visualizer_tool:offline_sequential_obstacle_perception_test
 ```
 
 ## 运行工具
