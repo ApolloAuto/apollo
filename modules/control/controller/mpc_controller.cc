@@ -84,10 +84,12 @@ bool MPCController::LoadControlConf(const ControlConf *control_conf) {
   cf_ = control_conf->mpc_controller_conf().cf();
   cr_ = control_conf->mpc_controller_conf().cr();
   wheelbase_ = vehicle_param_.wheel_base();
-  steer_transmission_ratio_ = vehicle_param_.steer_ratio();
+  steer_ratio_ = vehicle_param_.steer_ratio();
   steer_single_direction_max_degree_ =
-      vehicle_param_.max_steer_angle() / steer_transmission_ratio_ / 180 * M_PI;
+      vehicle_param_.max_steer_angle() * 180 / M_PI;
   max_lat_acc_ = control_conf->mpc_controller_conf().max_lateral_acceleration();
+  wheel_single_direction_max_degree_ =
+      steer_single_direction_max_degree_ / steer_ratio_ / 180 * M_PI;
   max_acceleration_ = vehicle_param_.max_acceleration();
   max_deceleration_ = vehicle_param_.max_deceleration();
 
@@ -222,6 +224,10 @@ void MPCController::CloseLogFile() {
   }
 }
 
+double MPCController::Wheel2SteerPct(const double wheel_angle) {
+  return wheel_angle / wheel_single_direction_max_degree_ * 100;
+}
+
 void MPCController::Stop() { CloseLogFile(); }
 
 std::string MPCController::Name() const { return name_; }
@@ -331,10 +337,10 @@ Status MPCController::ComputeControlCommand(
   std::vector<Eigen::MatrixXd> reference(horizon_, reference_state);
 
   Eigen::MatrixXd lower_bound(controls_, 1);
-  lower_bound << -steer_single_direction_max_degree_, max_deceleration_;
+  lower_bound << -wheel_single_direction_max_degree_, max_deceleration_;
 
   Eigen::MatrixXd upper_bound(controls_, 1);
-  upper_bound << steer_single_direction_max_degree_, max_acceleration_;
+  upper_bound << wheel_single_direction_max_degree_, max_acceleration_;
 
   std::vector<Eigen::MatrixXd> control(horizon_, control_matrix);
 
@@ -350,9 +356,7 @@ Status MPCController::ComputeControlCommand(
     acc_feedback = 0.0;
   } else {
     ADEBUG << "MPC problem solved! ";
-    steer_angle_feedback = control[0](0, 0) * 180 / M_PI *
-                           steer_transmission_ratio_ /
-                           steer_single_direction_max_degree_ * 100;
+    steer_angle_feedback = Wheel2SteerPct(control[0](0, 0));
     acc_feedback = control[0](1, 0);
   }
 
@@ -374,8 +378,7 @@ Status MPCController::ComputeControlCommand(
         std::atan(max_lat_acc_ * wheelbase_ /
                   (VehicleStateProvider::instance()->linear_velocity() *
                    VehicleStateProvider::instance()->linear_velocity())) *
-        steer_transmission_ratio_ * 180 / M_PI /
-        steer_single_direction_max_degree_ * 100;
+        steer_ratio_ * 180 / M_PI / steer_single_direction_max_degree_ * 100;
 
     // Clamp the steer angle
     double steer_angle_limited =
@@ -510,9 +513,8 @@ void MPCController::UpdateMatrix(SimpleMPCDebug *debug) {
 }
 
 void MPCController::FeedforwardUpdate(SimpleMPCDebug *debug) {
-  steer_angle_feedforwardterm_ = (wheelbase_ * debug->curvature()) * 180 /
-                                 M_PI * steer_transmission_ratio_ /
-                                 steer_single_direction_max_degree_ * 100;
+  steer_angle_feedforwardterm_ =
+      Wheel2SteerPct(wheelbase_ * debug->curvature());
 }
 
 void MPCController::ComputeLateralErrors(

@@ -199,3 +199,15 @@ hardware {
     type: IMAGE_SHORT
   }
 }
+resource_conf {
+  dir_spaces {
+    # For logs.
+    path: "/apollo/data"
+    min_available_gb: 32
+  }
+  dir_spaces {
+    # For bags.
+    path: "/media/apollo/internal_nvme"
+    min_available_gb: 128
+  }
+}

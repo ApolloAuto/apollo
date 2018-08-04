@@ -17,12 +17,14 @@
 #ifndef MODULES_DRIVERS_GNSS_PARSER_H_
 #define MODULES_DRIVERS_GNSS_PARSER_H_
 
-#include <google/protobuf/message.h>
 #include <stdint.h>
 #include <string>
 
-#include "modules/common/log.h"
+#include "google/protobuf/message.h"
+
 #include "modules/drivers/gnss/proto/config.pb.h"
+
+#include "modules/common/log.h"
 #include "modules/drivers/gnss/util/macros.h"
 
 namespace apollo {

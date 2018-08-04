@@ -306,7 +306,7 @@ DEFINE_double(min_velocity_sample_gap, 1.0,
               "Minimal sampling gap for velocity");
 DEFINE_double(lon_collision_buffer, 2.0,
               "The longitudinal buffer to keep distance to other vehicles");
-DEFINE_double(lat_collision_buffer, 0.2,
+DEFINE_double(lat_collision_buffer, 0.1,
               "The lateral buffer to keep distance to other vehicles");
 DEFINE_uint32(num_sample_follow_per_timestamp, 3,
               "The number of sample points for each timestamp to follow");
@@ -351,22 +351,23 @@ DEFINE_bool(lateral_optimization, false,
 DEFINE_double(weight_lateral_offset, 1.0,
               "weight for lateral offset "
               "in lateral trajectory optimization");
-DEFINE_double(weight_lateral_derivative, 10.0,
+DEFINE_double(weight_lateral_derivative, 500.0,
               "weight for lateral derivative "
               "in lateral trajectory optimization");
-DEFINE_double(weight_lateral_second_order_derivative, 30.0,
+DEFINE_double(weight_lateral_second_order_derivative, 1000.0,
               "weight for lateral second order derivative "
               "in lateral trajectory optimization");
 DEFINE_double(
-    weight_lateral_obstacle_distance, 5.0,
+    weight_lateral_obstacle_distance, 0.0,
     "weight for lateral obstacle distance in lateral trajectory optimization");
-DEFINE_double(lateral_third_order_derivative_max, 2.0,
+DEFINE_double(lateral_third_order_derivative_max, 0.1,
               "the maximal allowance for lateral third order derivative");
 DEFINE_double(max_s_lateral_optimization, 50.0,
               "The maximal s for lateral optimization.");
-DEFINE_double(default_delta_s_lateral_optimization, 0.5,
+DEFINE_double(default_delta_s_lateral_optimization, 2.0,
               "The default delta s for lateral optimization.");
-DEFINE_double(bound_buffer, 0.3, "buffer to boundary for lateral optimization");
+DEFINE_double(bound_buffer, 0.1, "buffer to boundary for lateral optimization");
+DEFINE_double(nudge_buffer, 0.3, "buffer to nudge for lateral optimization");
 
 DEFINE_bool(use_planning_fallback, true,
             "Use fallback trajectory for planning.");
