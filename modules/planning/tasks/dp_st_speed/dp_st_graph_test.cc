@@ -36,10 +36,9 @@ namespace planning {
 class DpStGraphTest : public ::testing::Test {
  public:
   virtual void SetUp() {
-    PlanningThreadPool::instance()->Init();
-
     // dp_config_
     PlanningConfig config;
+    FLAGS_enable_multi_thread_in_dp_st_graph = true;
     FLAGS_planning_config_file = "modules/planning/conf/planning_config.pb.txt";
     CHECK(apollo::common::util::GetProtoFromFile(FLAGS_planning_config_file,
                                                  &config));
