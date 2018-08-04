@@ -54,8 +54,8 @@ void FeatureOutput::Write() {
     ADEBUG << "Skip writing empty feature.";
     return;
   }
-  std::string file_name = ::apollo::common::util::StrCat(
-      FLAGS_prediction_data_file_prefix, ".", std::to_string(index_), ".bin");
+  const std::string file_name =
+      FLAGS_prediction_data_dir + "/feature." + std::to_string(index_) + ".bin";
   ::apollo::common::util::SetProtoToBinaryFile(features_, file_name);
   features_.Clear();
   ++index_;
