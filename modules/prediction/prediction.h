@@ -22,6 +22,7 @@
 #define MODULES_PREDICTION_PREDICTION_H_
 
 #include <string>
+#include <vector>
 
 #include "modules/common/adapters/proto/adapter_config.pb.h"
 #include "modules/common/proto/pnc_point.pb.h"
@@ -77,6 +78,11 @@ class Prediction : public PredictionInterface {
 
  private:
   common::Status OnError(const std::string &error_msg);
+
+  // The function get the rosbags from the input flag_input.
+  // The input could be a file, a list of files seperated by space (' ') or a
+  // directory
+  std::vector<std::string> LoadOfflineBags(const std::string &flag_input);
 
   void OnLocalization(const localization::LocalizationEstimate &localization);
 

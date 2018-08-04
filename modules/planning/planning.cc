@@ -497,6 +497,7 @@ void Planning::Stop() {
   frame_.reset(nullptr);
   planner_.reset(nullptr);
   FrameHistory::instance()->Clear();
+  util::GetPlanningStatus()->Clear();
 }
 
 // for testing only
