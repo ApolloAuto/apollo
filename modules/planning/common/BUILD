@@ -193,6 +193,7 @@ cc_library(
         "//modules/planning/common/trajectory:publishable_trajectory",
         "//modules/planning/proto:lattice_structure_proto",
         "//modules/planning/reference_line",
+        "@ctpl",
         "@eigen",
     ],
 )

@@ -276,8 +276,8 @@ DEFINE_bool(enable_follow_accel_constraint, true,
 DEFINE_bool(enable_sqp_solver, true, "True to enable SQP solver.");
 
 /// thread pool
-DEFINE_int32(num_thread_planning_thread_pool, 5,
-             "num of thread used in planning thread pool.");
+DEFINE_uint32(max_planning_thread_pool_size, 5,
+              "num of thread used in planning thread pool.");
 DEFINE_bool(use_multi_thread_to_add_obstacles, false,
             "use multiple thread to add obstacles.");
 DEFINE_bool(

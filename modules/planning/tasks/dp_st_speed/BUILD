@@ -57,6 +57,7 @@ cc_library(
         "//modules/planning/proto:planning_config_proto",
         "//modules/planning/proto:planning_proto",
         "//modules/planning/tasks/st_graph:st_graph_data",
+        "@ctpl",
     ],
 )
 
