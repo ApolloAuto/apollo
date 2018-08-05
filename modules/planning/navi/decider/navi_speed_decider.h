@@ -73,16 +73,15 @@ class NaviSpeedDecider : public Task {
    * @param start_v V of planning start point.
    * @param start_a A of planning start point.
    * @param start_da Da of planning start point.
-   * @param planning_length Planning length.
-   * @param path_data_points The path data of current reference line.
+   * @param path_points Current path data.
    * @param obstacles Current obstacles.
    * @param find_obstacle Find obstacle from id.
    * @param speed_data Output.
    * @return Status::OK() if a suitable speed-data is created; error otherwise.
    */
   apollo::common::Status MakeSpeedDecision(
-      double start_v, double start_a, double start_da, double planning_length,
-      const std::vector<common::PathPoint>& path_data_points,
+      double start_v, double start_a, double start_da,
+      const std::vector<common::PathPoint>& path_points,
       const std::vector<const Obstacle*>& obstacles,
       const std::function<const Obstacle*(const std::string& id)>&
           find_obstacle,
@@ -96,23 +95,33 @@ class NaviSpeedDecider : public Task {
 
   /**
    * @brief Add t-s constraints base on obstacles.
-   * @param path_data_points Current path data.
+   * @param vehicle_speed Current speed of vehicle.
+   * @param path_length The length of path, just as an obstacle.
+   * @param path_points Current path data.
    * @param obstacles Current obstacles.
    * @param find_obstacle Find obstacle from id.
    * @return Status::OK() if success; error otherwise.
    */
   apollo::common::Status AddObstaclesConstraints(
-      double vehicle_speed,
-      const std::vector<common::PathPoint>& path_data_points,
+      double vehicle_speed, double path_length,
+      const std::vector<common::PathPoint>& path_points,
       const std::vector<const Obstacle*>& obstacles,
       const std::function<const Obstacle*(const std::string& id)>&
           find_obstacle);
 
   /**
-   * @brief Add t-s constraints base on bends.
+   * @brief Add t-s constraints base on traffic decision.
    * @return Status::OK() if success; error otherwise.
    */
-  apollo::common::Status AddBendConstraints();
+  apollo::common::Status AddTrafficDecisionConstraints();
+
+  /**
+   * @brief Add t-s constraints base on centric acceleration.
+   * @param path_points Current path data.
+   * @return Status::OK() if success; error otherwise.
+   */
+  apollo::common::Status AddCentricAccelerationConstraints(
+      const std::vector<common::PathPoint>& path_points);
 
   /**
    * @brief Add t-s constraints base on configs, which has max-speed etc.
@@ -127,11 +136,18 @@ class NaviSpeedDecider : public Task {
   double max_speed_;
   double preferred_accel_;
   double preferred_decel_;
+  double preferred_jerk_;
   double max_accel_;
   double max_decel_;
   double obstacle_buffer_;
   double safe_distance_base_;
   double safe_distance_ratio_;
+  double following_accel_ratio_;
+  double soft_centric_accel_limit_;
+  double hard_centric_accel_limit_;
+  double hard_speed_limit_;
+  double hard_accel_limit_;
+  bool enable_safe_path_;
 
   NaviObstacleDecider obstacle_decider_;
   NaviSpeedTsGraph ts_graph_;
@@ -139,6 +155,7 @@ class NaviSpeedDecider : public Task {
   FRIEND_TEST(NaviSpeedDeciderTest, CreateSpeedData);
   FRIEND_TEST(NaviSpeedDeciderTest, CreateSpeedDataForStaticObstacle);
   FRIEND_TEST(NaviSpeedDeciderTest, CreateSpeedDataForObstacles);
+  FRIEND_TEST(NaviSpeedDeciderTest, CreateSpeedDataForCurve);
 };
 
 }  // namespace planning
