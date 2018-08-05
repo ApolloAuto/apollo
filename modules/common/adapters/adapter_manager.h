@@ -254,12 +254,25 @@ class AdapterManager {
   REGISTER_ADAPTER(PerceptionObstacles);
   REGISTER_ADAPTER(Planning);
   REGISTER_ADAPTER(PointCloud);
-
-  REGISTER_ADAPTER(VelodyneRaw0);
-  REGISTER_ADAPTER(PointCloudRaw0);
-  REGISTER_ADAPTER(PointCloudFusion);
-
   REGISTER_ADAPTER(VLP16PointCloud);
+
+  // velodyne fusion sensors
+  // hdl-64e or vls-128
+  REGISTER_ADAPTER(PointCloudDense);
+  REGISTER_ADAPTER(PointCloudDenseRaw);
+  REGISTER_ADAPTER(VelodyneScanDense);
+
+  // vlp-16
+  REGISTER_ADAPTER(PointCloudSparse1);
+  REGISTER_ADAPTER(PointCloudSparseRaw1);
+  REGISTER_ADAPTER(VelodyneScanSparse1);
+  REGISTER_ADAPTER(PointCloudSparse2);
+  REGISTER_ADAPTER(PointCloudSparseRaw2);
+  REGISTER_ADAPTER(VelodyneScanSparse2);
+  REGISTER_ADAPTER(PointCloudSparse3);
+  REGISTER_ADAPTER(PointCloudSparseRaw3);
+  REGISTER_ADAPTER(VelodyneScanSparse3);
+
   REGISTER_ADAPTER(ImageFront);
   REGISTER_ADAPTER(ImageShort);
   REGISTER_ADAPTER(ImageLong);

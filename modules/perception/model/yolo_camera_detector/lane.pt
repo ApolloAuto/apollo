@@ -1,5 +1,5 @@
 model_param {
-  model_name: "lane2d_0612"
+  model_name: "lane2d_0627"
   proto_file: "deploy_lane_high.pt"
   weight_file: "deploy_lane_high.md"
   offset_ratio: 0.28843
