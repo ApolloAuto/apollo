@@ -83,7 +83,7 @@ class Planning : public apollo::common::ApolloApp {
   void RunOnce();
 
   /**
-   * @brief record last planning trajectory
+   * @brief record last planning trajectory; for testing purpose only
    */
   void SetLastPublishableTrajectory(const ADCTrajectory& adc_trajectory);
 

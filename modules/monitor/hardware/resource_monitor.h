@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,24 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-
-#ifndef MODULES_DRIVERS_GNSS_UTILS_H_
-#define MODULES_DRIVERS_GNSS_UTILS_H_
+#ifndef MODULES_MONITOR_HARDWARE_RESOURCE_MONITOR_H_
+#define MODULES_MONITOR_HARDWARE_RESOURCE_MONITOR_H_
 
 #include <string>
+#include <vector>
 
-#include "modules/drivers/gnss/proto/config.pb.h"
+#include "modules/monitor/common/recurrent_runner.h"
+#include "modules/monitor/proto/monitor_conf.pb.h"
 
 namespace apollo {
-namespace drivers {
-namespace gnss {
+namespace monitor {
 
-bool parse_config_text(const std::string &filename, config::Config *config);
+class ResourceMonitor : public RecurrentRunner {
+ public:
+  explicit ResourceMonitor(const ResourceConf& config);
+  void RunOnce(const double current_time) override;
 
-std::string encode_base64(const std::string &in);
+ private:
+  const ResourceConf& config_;
+};
 
-}  // namespace gnss
-}  // namespace drivers
+}  // namespace monitor
 }  // namespace apollo
 
-#endif  // MODULES_DRIVERS_GNSS_UTILS_H_
+#endif  // MODULES_MONITOR_HARDWARE_RESOURCE_MONITOR_H_

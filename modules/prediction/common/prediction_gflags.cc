@@ -27,7 +27,7 @@ DEFINE_string(prediction_conf_file,
 DEFINE_string(prediction_adapter_config_filename,
               "modules/prediction/conf/adapter.conf",
               "Default conf file for prediction");
-DEFINE_string(prediction_data_file_prefix, "data/prediction/feature",
+DEFINE_string(prediction_data_dir, "data/prediction/",
               "Prefix of files to store feature data");
 DEFINE_bool(prediction_test_mode, false, "Set prediction to test mode");
 DEFINE_double(
@@ -36,6 +36,10 @@ DEFINE_double(
     "restrict the runtime duration.");
 
 DEFINE_bool(prediction_offline_mode, false, "Prediction offline mode");
+DEFINE_string(prediction_offline_bags, "",
+              "bag files for offline mode, filenames are separated with ' '. "
+              "If this value is not set, the prediction module will use the "
+              "listen to published ros topic mode.");
 
 DEFINE_double(prediction_duration, 8.0, "Prediction duration (in seconds)");
 DEFINE_double(prediction_period, 0.1, "Prediction period (in seconds");

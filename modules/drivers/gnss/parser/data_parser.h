@@ -17,23 +17,22 @@
 #ifndef MODULES_DRIVERS_GNSS_DATA_PARSER_H_
 #define MODULES_DRIVERS_GNSS_DATA_PARSER_H_
 
-
 #include <proj_api.h>
-#include <std_msgs/String.h>
 #include <memory>
+
 #include "ros/include/geometry_msgs/TransformStamped.h"
 #include "ros/include/ros/ros.h"
 #include "ros/include/tf2_ros/transform_broadcaster.h"
+#include "std_msgs/String.h"
+
+#include "modules/drivers/gnss/proto/config.pb.h"
+#include "modules/drivers/gnss/proto/gnss.pb.h"
+#include "modules/drivers/gnss/proto/gnss_status.pb.h"
+#include "modules/drivers/gnss/proto/imu.pb.h"
+#include "modules/drivers/gnss/proto/ins.pb.h"
+#include "modules/localization/proto/gps.pb.h"
 
 #include "modules/drivers/gnss/parser/parser.h"
-#include "modules/drivers/gnss/proto/config.pb.h"
-
-#include "modules/drivers/gnss//proto/ins.pb.h"
-#include "modules/drivers/gnss/proto/gnss.pb.h"
-#include "modules/drivers/gnss/proto/imu.pb.h"
-
-#include "modules/drivers/gnss/proto/gnss_status.pb.h"
-#include "modules/localization/proto/gps.pb.h"
 
 namespace apollo {
 namespace drivers {

@@ -208,6 +208,13 @@ bool PathExists(const std::string &path);
 bool DirectoryExists(const std::string &directory_path);
 
 /**
+ * @brief Expand path pattern to matched pathes.
+ * @param pattern Path pattern, which may contain wildcards [?*].
+ * @return Matched path list.
+ */
+std::vector<std::string> Glob(const std::string& pattern);
+
+/**
  * @brief Copy a file.
  * @param from The file path to copy from.
  * @param to The file path to copy to.
