@@ -56,7 +56,7 @@ bool HmObjectTracker::Init() {
     AERROR << "Failed to set track cached history size maximum! " << name();
     return false;
   }
-  // load track consevutive invisible maximum
+  // load track consecutive invisible maximum
   if (!ObjectTrackSet::SetTrackConsecutiveInvisibleMaximum(
           config_.track_consecutive_invisible_maximum())) {
     AERROR << "Failed to set track consecutive invisible maximum! " << name();
@@ -284,7 +284,7 @@ void HmObjectTracker::ConstructTrackedObjects(
     std::shared_ptr<Object> obj(new Object());
     obj->clone(*objects[i]);
     (*tracked_objects)[i].reset(new TrackedObject(obj));
-    // Computing shape featrue
+    // Computing shape feature
     if (use_histogram_for_match_) {
       ComputeShapeFeatures(&((*tracked_objects)[i]));
     }
@@ -406,7 +406,7 @@ void HmObjectTracker::DeleteLostTracks() {
 void HmObjectTracker::CollectTrackedResults(
     std::vector<std::shared_ptr<Object>>* tracked_objects) {
   // Collect tracked results for reporting include objects may be occluded
-  // temporaryly
+  // temporarily
   const std::vector<ObjectTrackPtr>& tracks = object_tracks_.GetTracks();
   tracked_objects->resize(tracks.size());
 
