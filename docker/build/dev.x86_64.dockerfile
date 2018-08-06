@@ -11,7 +11,6 @@ RUN bash /tmp/installers/install_bazel_packages.sh
 RUN bash /tmp/installers/install_conda.sh
 RUN bash /tmp/installers/install_gflags_glog.sh
 RUN bash /tmp/installers/install_glew.sh
-RUN bash /tmp/installers/install_glusterfs.sh
 RUN bash /tmp/installers/install_gpu_caffe.sh
 RUN bash /tmp/installers/install_ipopt.sh
 RUN bash /tmp/installers/install_libjsonrpc-cpp.sh

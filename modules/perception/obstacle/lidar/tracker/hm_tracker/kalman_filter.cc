@@ -72,7 +72,7 @@ bool KalmanFilter::InitParams(const double measurement_noise,
     return false;
   }
   if (initial_velocity_noise < 0) {
-    AERROR << "invalid intial velocity noise of KalmanFilter!";
+    AERROR << "invalid initial velocity noise of KalmanFilter!";
     return false;
   }
   if (xy_propagation_noise < 0) {
@@ -88,7 +88,7 @@ bool KalmanFilter::InitParams(const double measurement_noise,
   s_propagation_noise_(0, 0) = xy_propagation_noise;
   s_propagation_noise_(1, 1) = xy_propagation_noise;
   s_propagation_noise_(2, 2) = z_propagation_noise;
-  AINFO << "measurment noise of KalmanFilter is " << s_measurement_noise_;
+  AINFO << "measurement noise of KalmanFilter is " << s_measurement_noise_;
   AINFO << "initial velocity noise of KalmanFilter is "
         << s_initial_velocity_noise_;
   AINFO << "propagation noise of KalmanFilter is\n" << s_propagation_noise_;
@@ -214,16 +214,16 @@ void KalmanFilter::Propagate(const double time_diff) {
 Eigen::VectorXf KalmanFilter::ComputeMeasuredVelocity(
     const std::shared_ptr<TrackedObject>& new_object,
     const std::shared_ptr<TrackedObject>& old_object, const double time_diff) {
-  // Compute 2D velocity measurment for filtering
-  // Obtain robust measurment via observation redundency
+  // Compute 2D velocity measurement for filtering
+  // Obtain robust measurement via observation redundancy
 
-  // Observation I: anchor point velocity measurment
+  // Observation I: anchor point velocity measurement
   Eigen::Vector3f measured_anchor_point_velocity =
       ComputeMeasuredAnchorPointVelocity(new_object, old_object, time_diff);
-  // Observation II: bbox center velocity measurment
+  // Observation II: bbox center velocity measurement
   Eigen::Vector3f measured_bbox_center_velocity =
       ComputeMeasuredBboxCenterVelocity(new_object, old_object, time_diff);
-  // Observation III: bbox corner velocity measurment
+  // Observation III: bbox corner velocity measurement
   Eigen::Vector3f measured_bbox_corner_velocity =
       ComputeMeasuredBboxCornerVelocity(new_object, old_object, time_diff);
 
@@ -239,7 +239,7 @@ Eigen::VectorXf KalmanFilter::ComputeMeasuredVelocity(
 Eigen::VectorXf KalmanFilter::ComputeMeasuredAnchorPointVelocity(
     const std::shared_ptr<TrackedObject>& new_object,
     const std::shared_ptr<TrackedObject>& old_object, const double time_diff) {
-  // Compute 2D anchor point velocity measurment
+  // Compute 2D anchor point velocity measurement
   Eigen::Vector3f measured_anchor_point_velocity =
       new_object->anchor_point - old_object->anchor_point;
   measured_anchor_point_velocity /= time_diff;
@@ -250,7 +250,7 @@ Eigen::VectorXf KalmanFilter::ComputeMeasuredAnchorPointVelocity(
 Eigen::VectorXf KalmanFilter::ComputeMeasuredBboxCenterVelocity(
     const std::shared_ptr<TrackedObject>& new_object,
     const std::shared_ptr<TrackedObject>& old_object, const double time_diff) {
-  // Compute 2D bbox center velocity measurment
+  // Compute 2D bbox center velocity measurement
   Eigen::Vector3d old_dir = old_object->direction.cast<double>();
   Eigen::Vector3d old_size = old_object->size.cast<double>();
   Eigen::Vector3d old_center = old_object->center.cast<double>();
@@ -275,7 +275,7 @@ Eigen::VectorXf KalmanFilter::ComputeMeasuredBboxCenterVelocity(
 Eigen::VectorXf KalmanFilter::ComputeMeasuredBboxCornerVelocity(
     const std::shared_ptr<TrackedObject>& new_object,
     const std::shared_ptr<TrackedObject>& old_object, const double time_diff) {
-  // Compute 2D bbox corner velocity measurment
+  // Compute 2D bbox corner velocity measurement
   Eigen::Vector3f project_dir =
       new_object->anchor_point - old_object->anchor_point;
   project_dir.normalize();
@@ -355,7 +355,7 @@ Eigen::VectorXf KalmanFilter::ComputeMeasuredBboxCornerVelocity(
 Eigen::Vector3f KalmanFilter::SelectMeasuredVelocity(
     const std::vector<Eigen::Vector3f>& candidates) {
   // Select measured velocity among candidates
-  // Strategy I: accoridng motion consistency
+  // Strategy I: according motion consistency
   return SelectMeasuredVelocityAccordingMotionConsistency(candidates);
 }
 
@@ -380,7 +380,7 @@ Eigen::Vector3f KalmanFilter::SelectMeasuredVelocityAccordingMotionConsistency(
 void KalmanFilter::UpdateVelocity(const Eigen::VectorXf& measured_anchor_point,
                                   const Eigen::VectorXf& measured_velocity,
                                   const double time_diff) {
-  // Compute kalman gain
+  // Compute Kalman gain
   Eigen::Matrix3d mat_c = Eigen::Matrix3d::Identity();
   Eigen::Matrix3d mat_q = s_measurement_noise_ * Eigen::Matrix3d::Identity();
   Eigen::Matrix3d mat_k =
@@ -455,7 +455,7 @@ float KalmanFilter::ComputeUpdateQualityAccordingAssociationScore(
 float KalmanFilter::ComputeUpdateQualityAccordingPointNumChange(
     const std::shared_ptr<TrackedObject>& new_object,
     const std::shared_ptr<TrackedObject>& old_object) {
-  // Compute updaet quality according point number change
+  // Compute update quality according point number change
   int new_pt_num = new_object->object_ptr->cloud->size();
   int old_pt_num = old_object->object_ptr->cloud->size();
   if (new_pt_num <= 0 || old_pt_num <= 0) {
@@ -523,7 +523,7 @@ void KalmanFilter::GetOnlineCovariance(Eigen::Matrix3f* online_covariance) {
 
 void KalmanFilter::UpdateAcceleration(
     const Eigen::VectorXf& measured_acceleration) {
-  // Compute kalman gain
+  // Compute Kalman gain
   Eigen::Matrix3d mat_c = Eigen::Matrix3d::Identity();
   Eigen::Matrix3d mat_q =
       s_measurement_noise_ * Eigen::Matrix3d::Identity() * 3;
@@ -537,7 +537,7 @@ void KalmanFilter::UpdateAcceleration(
       mat_k * (measured_acceleration_d - mat_c * belief_acceleration_);
   // Adaptive
   acceleration_gain *= update_quality_;
-  // Breakdonw
+  // Breakdown
   float breakdown_threshold = 2;
   if (acceleration_gain.norm() > breakdown_threshold) {
     acceleration_gain.normalize();
