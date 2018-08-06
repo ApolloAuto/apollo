@@ -36,12 +36,12 @@ class BaseMatcher {
   virtual ~BaseMatcher() {}
 
   // @brief match detected objects to maintained tracks
-  // @params[IN] objects: detected objects
-  // @params[IN] tracks: maintained tracks
-  // @params[IN] tracks_predict: predicted states of maintained tracks
-  // @params[OUT] assignments: matched pair of <track, object>
-  // @params[OUT] unassigned_tracks: unmatched tracks
-  // @params[OUT] unassigned_objects: unmatched objects
+  // @param[IN] objects: detected objects
+  // @param[IN] tracks: maintained tracks
+  // @param[IN] tracks_predict: predicted states of maintained tracks
+  // @param[OUT] assignments: matched pair of <track, object>
+  // @param[OUT] unassigned_tracks: unmatched tracks
+  // @param[OUT] unassigned_objects: unmatched objects
   // @return nothing
   virtual void Match(std::vector<std::shared_ptr<TrackedObject>>* objects,
                      const std::vector<ObjectTrackPtr>& tracks,

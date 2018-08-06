@@ -94,7 +94,7 @@ void HungarianMatcher::MatchInComponents(
   sub_assignments->clear();
   sub_unassigned_tracks->clear();
   sub_unassigned_objects->clear();
-  // A. failted to match if either components is empty
+  // A. failed to match if either components is empty
   if (track_component.empty()) {
     for (size_t i = 0; i < object_component.size(); ++i) {
       sub_unassigned_objects->push_back(object_component[i]);
