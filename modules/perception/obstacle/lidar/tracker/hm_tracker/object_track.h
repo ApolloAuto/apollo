@@ -42,55 +42,55 @@ class ObjectTrack {
   ~ObjectTrack();
 
   // @brief set track cached history size maximum
-  // @params[IN] track_cached_history_size_maximum: track cached history size
+  // @param[IN] track_cached_history_size_maximum: track cached history size
   // maximum
   // @return true if set successfully, otherwise return false
   static bool SetTrackCachedHistorySizeMaximum(
       const int track_cached_history_size_maximum);
 
   // @brief set acceleration noise maximum
-  // @params[IN] acceleration_noise_maximum: acceleration noise maximum
+  // @param[IN] acceleration_noise_maximum: acceleration noise maximum
   // @return true if set successfully, otherwise return false
   static bool SetAccelerationNoiseMaximum(
       const double acceleration_noise_maximum);
 
   // @brief set speed noise maximum
-  // @params[IN] speed noise maximum: speed noise maximum
+  // @param[IN] speed noise maximum: speed noise maximum
   // @return true if set successfully, otherwise return false
   static bool SetSpeedNoiseMaximum(const double speed_noise_maximum);
 
-  // @brief get next avaiable track id
-  // @return next avaiable track id
+  // @brief get next available track id
+  // @return next available track id
   static int GetNextTrackId();
 
   // @brief predict the state of track
-  // @params[IN] time_diff: time interval for predicting
+  // @param[IN] time_diff: time interval for predicting
   // @return predicted states of track
   Eigen::VectorXf Predict(const double time_diff);
 
   // @brief update track with object
-  // @params[IN] new_object: recent detected object for current updating
-  // @params[IN] time_diff: time interval from last updating
+  // @param[IN] new_object: recent detected object for current updating
+  // @param[IN] time_diff: time interval from last updating
   // @return nothing
   void UpdateWithObject(std::shared_ptr<TrackedObject>* new_object,
                         const double time_diff);
 
   // @brief update track without object
-  // @params[IN] time_diff: time interval from last updating
+  // @param[IN] time_diff: time interval from last updating
   // @return nothing
   void UpdateWithoutObject(const double time_diff);
 
   // @brief update track without object with given predicted state
-  // @params[IN] predict_state: given predicted state of track
-  // @params[IN] time_diff: time interval from last updating
+  // @param[IN] predict_state: given predicted state of track
+  // @param[IN] time_diff: time interval from last updating
   // @return nothing
   void UpdateWithoutObject(const Eigen::VectorXf& predict_state,
                            const double time_diff);
 
  protected:
   // @brief smooth velocity over track history
-  // @params[IN] new_object: new detected object for updating
-  // @params[IN] time_diff: time interval from last updating
+  // @param[IN] new_object: new detected object for updating
+  // @param[IN] time_diff: time interval from last updating
   // @return nothing
   void SmoothTrackVelocity(const std::shared_ptr<TrackedObject>& new_object,
                            const double time_diff);
@@ -100,16 +100,16 @@ class ObjectTrack {
   void SmoothTrackOrientation();
 
   // @brief check whether track is static or not
-  // @params[IN] new_object: new detected object just updated
-  // @params[IN] time_diff: time interval between last two updating
+  // @param[IN] new_object: new detected object just updated
+  // @param[IN] time_diff: time interval between last two updating
   // @return true if track is static, otherwise return false
   bool CheckTrackStaticHypothesis(const std::shared_ptr<Object>& new_object,
                                   const double time_diff);
 
   // @brief sub strategy of checking whether track is static or not via
   // considering the velocity angle change
-  // @params[IN] new_object: new detected object just updated
-  // @params[IN] time_diff: time interval between last two updating
+  // @param[IN] new_object: new detected object just updated
+  // @param[IN] time_diff: time interval between last two updating
   // @return true if track is static, otherwise return false
   bool CheckTrackStaticHypothesisByVelocityAngleChange(
       const std::shared_ptr<Object>& new_object, const double time_diff);
@@ -162,14 +162,14 @@ class ObjectTrackSet {
   ~ObjectTrackSet();
 
   // @brief set track consecutive invisible maximum
-  // @params[IN] track_consecutive_invisible_maximum: track consecutive
+  // @param[IN] track_consecutive_invisible_maximum: track consecutive
   // invisible maximum
   // @return true if set successfully, otherwise return false
   static bool SetTrackConsecutiveInvisibleMaximum(
       const int track_consecutive_invisible_maximum);
 
   // @brief set track visible ratio minimum
-  // @params[IN] track_visible_ratio_minimum: track visible ratio minimum
+  // @param[IN] track_visible_ratio_minimum: track visible ratio minimum
   // @return true if set successfully, otherwise return false
   static bool SetTrackVisibleRatioMinimum(
       const float track_visible_ratio_minimum);
@@ -187,7 +187,7 @@ class ObjectTrackSet {
   int Size() const { return tracks_.size(); }
 
   // @brief add track to current set of maintained tracks
-  // @params[IN] track: adding track
+  // @param[IN] track: adding track
   // @return nothing
   void AddTrack(ObjectTrackPtr track) { tracks_.push_back(track); }
 
