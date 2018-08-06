@@ -17,6 +17,9 @@ Apollo 3.0 enables L4 product level solution that allows vehicles to drive in a 
   * **Visual localization**: Cameras are currently being tested to aid and enhance localization
   * **16 beam LiDAR support**
 
+## Autonomous Driving Capabilities
+Vehicles with thia version can drive autonomously in a Closed Venue setting. It is a production ready version for low-speed autonomous driving capabilities.
+
 # Release 2.5
 This release allows the vehicle to autonomously run on geo-fenced highways. Vehicles are able to do lane keeping cruise and avoid collisions with the leading vehicles.
 
@@ -65,7 +68,7 @@ This release supports that vehicles autonomously cruise on fixed lanes.
 * Improve HMI and DreamView features to allow realtime traffic display and traffic scenario replay.
 
 ## Autonomous Driving Capabilities
-Vehicles with this version do **NOT** detect traffic lights. Vehicles will **NOT** stop at red traffic lights. Neither will them change lanes on the road.
+Vehicles with this version do **NOT** detect traffic lights. Vehicles will **NOT** stop at red traffic lights. Neither will they change lanes on the road.
 
 # Release 1.0
 Initial release of Apollo implements autonomous GPS waypoint following.
@@ -79,4 +82,4 @@ Initial release of Apollo implements autonomous GPS waypoint following.
 * Include debugging tools in `modules/tools/`
 
 ## Autonomous Driving Capabilities
-Vehicles with this version do **NOT** perceive obstacles in close promixity. Neither can then drive on public roads or areas without GPS signals.
+Vehicles with this version do **NOT** perceive obstacles in close promixity. Neither can they drive on public roads or areas without GPS signals.
