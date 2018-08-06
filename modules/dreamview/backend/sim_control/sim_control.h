@@ -137,10 +137,10 @@ class SimControl : SimControlInterface {
   bool enabled_ = false;
 
   // Whether the adapter setup has been initialized.
-  bool inited_ = false;
+  bool adapter_inited_ = false;
 
   // Whether start point is initialized from actual localization data
-  bool start_point_set_ = false;
+  bool start_point_from_localization_ = false;
 
   // The header of the routing planning is following.
   apollo::common::Header current_routing_header_;

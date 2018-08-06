@@ -73,7 +73,7 @@ void SimControl::Init(bool set_start_point, double start_velocity,
 }
 
 void SimControl::InitAdapter() {
-  if (inited_) {
+  if (adapter_inited_) {
     return;
   }
 
@@ -88,7 +88,7 @@ void SimControl::InitAdapter() {
   sim_control_timer_ = AdapterManager::CreateTimer(
       ros::Duration(kSimControlInterval), &SimControl::TimerCallback, this);
 
-  inited_ = true;
+  adapter_inited_ = true;
 }
 
 void SimControl::OnReceiveNavigationInfo(
@@ -109,7 +109,7 @@ void SimControl::InitStartPoint(double start_velocity,
   // fall back to a dummy point from map
   AdapterManager::GetLocalization()->Observe();
   if (AdapterManager::GetLocalization()->Empty()) {
-    start_point_set_ = false;
+    start_point_from_localization_ = false;
     apollo::common::PointENU start_point;
     if (!map_service_->GetStartPoint(&start_point)) {
       AWARN << "Failed to get a dummy start point from map!";
@@ -126,7 +126,7 @@ void SimControl::InitStartPoint(double start_velocity,
     point.set_v(start_velocity);
     point.set_a(start_acceleration);
   } else {
-    start_point_set_ = true;
+    start_point_from_localization_ = true;
     const auto& localization = AdapterManager::GetLocalization()
         ->GetLatestObserved();
     const auto& pose = localization.pose();
@@ -187,7 +187,7 @@ void SimControl::OnRoutingResponse(const RoutingResponse& routing) {
   // initialized by an actual localization pose, don't reset the start point.
   re_routing_triggered_ =
       routing.routing_request().header().module_name() == "planning";
-  if (!re_routing_triggered_ && !start_point_set_) {
+  if (!re_routing_triggered_ && !start_point_from_localization_) {
     ClearPlanning();
     TrajectoryPoint point;
     point.mutable_path_point()->set_x(start_pose.x());
