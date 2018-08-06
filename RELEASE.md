@@ -9,12 +9,12 @@ Apollo 3.0 enables L4 product level solution that allows vehicles to drive in a 
 * Apollo Sensor Unit (ASU)
 * New Gatekeeper - Ultrasonic Sensor
 * Perception module changes:
-  * **CIPV(Closest In-Path Vehicle) detection and Tailgaiting**: The vehicle in front of the ego-car is detected and its trajectory is estimated for more efficient tailgating and lane keeping when lane detection is unreliable.
+  * **CIPV(Closest In-Path Vehicle) detection and Tailgating**: The vehicle in front of the ego-car is detected and its trajectory is estimated for more efficient tailgating and lane keeping when lane detection is unreliable.
   * **Asynchronous sensor fusion**: unlike the previous version, Perception in Apollo 3.0 is capable of consolidating all the information and data points by asynchronously fusing LiDAR, Radar and Camera data. Such conditions allow for more comprehensive data capture and reflect more practical sensor environments.
   * **Online pose estimation**: This new feature estimates the pose of an ego-vehicle for every single frame. This feature helps to drive through bumps or slopes on the road with more accurate 3D scene understanding.
   * **Ultrasonic sensors**: Perception in Apollo 3.0 now works with ultrasonic sensors. The output can be used for Automated Emergency Brake (AEB) and vertical/perpendicular parking.
   * **Whole lane line**: Unlike previous lane line segments, this whole lane line feature will provide more accurate and long range detection of lane lines. 
-  * **Visual localization**: Camera's are currently being tested to aide and enhance localization
+  * **Visual localization**: Cameras are currently being tested to aid and enhance localization
   * **16 beam LiDAR support**
 
 # Release 2.5
@@ -26,7 +26,7 @@ This release allows the vehicle to autonomously run on geo-fenced highways. Vehi
 * Add HD map data collection tool
 * Add vision based perception with obstacle and lane mark detections
 * Add relative map to support ACC and lane keeping for planning and control
-* Make dockerfile available
+* Make docker file available
 
 ## Autonomous Drive Capabilities
 Vehicles with this version can drive autonomously on highways at higher speed with limited HD map support. The highway needs to have clear white painted lane marks with minimum curvatures. The performance of vision based perception will degrade significantly at night or with strong light flares. **BE CAUTIOUS WHEN DRIVING AUTONOMOUSLY, ESPECIALLY AT NIGHT OR IN POOR VISION ENVIRONMENT. PLEASE TEST APOLLO 2.5 WITH THE SUPPORT FROM APOLLO ENGINEERING TEAM**.
@@ -79,4 +79,4 @@ Initial release of Apollo implements autonomous GPS waypoint following.
 * Include debugging tools in `modules/tools/`
 
 ## Autonomous Driving Capabilities
-Vehicles with this version do **NOT** perceive obstacles in close promixity. Neither can them drive on public roads or areas without GPS signals.
+Vehicles with this version do **NOT** perceive obstacles in close promixity. Neither can then drive on public roads or areas without GPS signals.
