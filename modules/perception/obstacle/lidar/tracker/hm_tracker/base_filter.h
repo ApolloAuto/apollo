@@ -35,21 +35,21 @@ class BaseFilter {
   virtual ~BaseFilter() {}
 
   // @brief initialize the state of filter
-  // @params[IN] anchor_point: initial anchor point for filtering
-  // @params[IN] velocity: initial velocity for filtering
+  // @param[IN] anchor_point: initial anchor point for filtering
+  // @param[IN] velocity: initial velocity for filtering
   // @return nothing
   virtual void Initialize(const Eigen::Vector3f& anchor_point,
                           const Eigen::Vector3f& velocity) = 0;
 
   // @brief predict the state of filter
-  // @params[IN] time_diff: time interval for predicting
+  // @param[IN] time_diff: time interval for predicting
   // @return predicted states of filtering
   virtual Eigen::VectorXf Predict(const double time_diff) = 0;
 
   // @brief update filter with object
-  // @params[IN] new_object: recently detected object for current updating
-  // @params[IN] old_object: last detected object for last updating
-  // @params[IN] time_diff: time interval from last updating
+  // @param[IN] new_object: recently detected object for current updating
+  // @param[IN] old_object: last detected object for last updating
+  // @param[IN] time_diff: time interval from last updating
   // @return nothing
   virtual void UpdateWithObject(
       const std::shared_ptr<TrackedObject>& new_object,
@@ -57,30 +57,30 @@ class BaseFilter {
       const double time_diff) = 0;
 
   // @brief update filter without object
-  // @params[IN] time_diff: time interval from last updating
+  // @param[IN] time_diff: time interval from last updating
   // @return nothing
   virtual void UpdateWithoutObject(const double time_diff) = 0;
 
   // @brief get state of filter
-  // @params[OUT] anchor_point: anchor point of current state
-  // @params[OUT] velocity: velocity of current state
+  // @param[OUT] anchor_point: anchor point of current state
+  // @param[OUT] velocity: velocity of current state
   // @return nothing
   virtual void GetState(Eigen::Vector3f* anchor_point,
                         Eigen::Vector3f* velocity) = 0;
 
-  // @brief get state of filter with accelaration
-  // @params[OUT] anchor_point: anchor point of current state
-  // @params[OUT] velocity: velocity of current state
-  // @params[OUT] velocity_accelaration: accelaration of curret state
+  // @brief get state of filter with acceleration
+  // @param[OUT] anchor_point: anchor point of current state
+  // @param[OUT] velocity: velocity of current state
+  // @param[OUT] velocity_acceleration: acceleration of current state
   // @return nothing
   virtual void GetState(Eigen::Vector3f* anchor_point,
                         Eigen::Vector3f* velocity,
-                        Eigen::Vector3f* velocity_accelaration) = 0;
+                        Eigen::Vector3f* velocity_acceleration) = 0;
 
   virtual void GetAccelerationGain(Eigen::Vector3f* acceleration_gain) = 0;
 
   // @brief get online covariance of filter
-  // @params[OUT] online_covariance: online covariance
+  // @param[OUT] online_covariance: online covariance
   // @return noting
   virtual void GetOnlineCovariance(Eigen::Matrix3f* online_covariance) = 0;
 
