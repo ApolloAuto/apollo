@@ -203,7 +203,7 @@ resource_conf {
   dir_spaces {
     # For logs.
     path: "/apollo/data"
-    min_available_gb: 32
+    min_available_gb: 8
   }
   dir_spaces {
     # For bags.
