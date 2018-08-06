@@ -121,10 +121,11 @@ function build() {
   info "Building on $MACHINE_ARCH..."
 
   MACHINE_ARCH=$(uname -m)
-  JOB_ARG=""
+  JOB_ARG="--jobs=$(nproc)"
   if [ "$MACHINE_ARCH" == 'aarch64' ]; then
     JOB_ARG="--jobs=3"
   fi
+  info "Building with $JOB_ARG for $MACHINE_ARCH"
   echo "$BUILD_TARGETS" | xargs bazel build $JOB_ARG $DEFINES -c $@
   if [ $? -ne 0 ]; then
     fail 'Build failed!'
