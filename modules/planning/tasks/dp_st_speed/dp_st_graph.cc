@@ -32,7 +32,6 @@
 #include "modules/common/log.h"
 #include "modules/common/math/vec2d.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/common/planning_thread_pool.h"
 
 namespace apollo {
 namespace planning {
