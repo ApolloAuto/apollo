@@ -59,7 +59,7 @@ bool Thread::IsAlive() {
     return false;
   }
   if (ret == EINVAL) {
-    AWARN << "Invalid singal.";
+    AWARN << "Invalid signal.";
     return false;
   }
 
