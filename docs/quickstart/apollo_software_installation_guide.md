@@ -40,7 +40,14 @@ The Docker container is the simplest way to set up the build environment for Apo
 
 For more information, see the detailed Docker tutorial [here](https://docs.docker.com/).
 
-1. Please follow the
+1. If you are working on Ubuntu 16.04+, the easiest way is to leverage the
+modern snap package manager which is available out of the box:
+
+```bash
+sudo snap install docker
+```
+
+Otherwise, please follow the
 [official guide to install the docker-ce](https://docs.docker.com/install/linux/docker-ce/ubuntu).
 
 Don't forget the
