@@ -9,7 +9,7 @@ cuda_headers = FileType([
     ".hpp",
 ])
 
-cuda_arch = [
+cuda_arch = " ".join([
     "-arch=sm_30",
     "-gencode=arch=compute_30,code=sm_30",
     "-gencode=arch=compute_50,code=sm_50",
@@ -17,20 +17,19 @@ cuda_arch = [
     "-gencode=arch=compute_60,code=sm_60",
     "-gencode=arch=compute_61,code=sm_61",
     "-gencode=arch=compute_61,code=compute_61",
-]
+])
 
 def cuda_library_impl(ctx):
-    s = set()
     flags = ' '.join(ctx.attr.flags)
     output = ctx.outputs.out
-    lib_flags = ["--shared", "--compiler-options '-fPIC'"]
-    args = ctx.attr.flags + [f.path for f in ctx.files.srcs] + [f.path for f in ctx.files.deps]
+    lib_flags = ["-std=c++11", "--shared", "--compiler-options -fPIC", "-lcudart", "-lcublas"]
+    args = [f.path for f in ctx.files.srcs] + [f.path for f in ctx.files.deps]
     ctx.actions.run_shell(
             inputs=ctx.files.srcs + ctx.files.hdrs,
             outputs=[ctx.outputs.out],
             arguments=args,
-            env={ 'PATH':'/usr/local/cuda/bin:/usr/local/bin:/usr/bin:/bin', },
-            command="/usr/local/cuda/bin/nvcc %s %s -o %s %s" % (' '.join(cuda_arch), ' '.join(lib_flags), output.path, " ".join(args))
+            env={'PATH':'/usr/local/cuda/bin:/usr/local/bin:/usr/bin:/bin',},
+            command="nvcc %s %s %s -I. -o %s" % (cuda_arch, ' '.join(lib_flags),  " ".join(args), output.path)
      )
 
 def cuda_binary_impl(ctx):
@@ -42,16 +41,13 @@ def cuda_binary_impl(ctx):
             outputs=[ctx.outputs.out],
             arguments=args,
             env={ 'PATH':'/usr/local/cuda/bin:/usr/local/bin:/usr/bin:/bin', },
-            command="/usr/local/cuda/bin/nvcc %s -o %s %s" % (' '.join(cuda_arch), output.path, " ".join(args)),
+            command="/usr/local/cuda/bin/nvcc %s %s -o %s" % (' '.join(cuda_arch), " ".join(args), output.path),
      )
 
 cuda_library = rule(
     attrs = {
         "hdrs": attr.label_list(allow_files = cuda_headers),
-        "srcs": attr.label_list(
-            allow_files = cuda_srcs,
-            mandatory = True,
-        ),
+        "srcs": attr.label_list(allow_files = cuda_srcs),
         "deps": attr.label_list(allow_files = False),
         "flags": attr.label_list(allow_files = False),
     },
@@ -62,10 +58,7 @@ cuda_library = rule(
 cuda_binary = rule(
     attrs = {
         "hdrs": attr.label_list(allow_files = cuda_headers),
-        "srcs": attr.label_list(
-            allow_files = cuda_srcs,
-            mandatory = True,
-        ),
+        "srcs": attr.label_list(allow_files = cuda_srcs),
         "deps": attr.label_list(allow_files = False),
         "flags": attr.label_list(allow_files = False),
     },

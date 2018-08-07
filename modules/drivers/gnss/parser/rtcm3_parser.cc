@@ -14,17 +14,9 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <cmath>
-#include <iostream>
-#include <limits>
-#include <memory>
-#include <vector>
+#include "modules/drivers/gnss/parser/rtcm3_parser.h"
 
-#include "modules/drivers/gnss/parser/parser.h"
-#include "modules/drivers/gnss/proto/gnss_raw_observation.pb.h"
-#include "ros/include/ros/ros.h"
-
-#include "modules/drivers/gnss/parser/rtcm_decode.h"
+#include <utility>
 
 namespace apollo {
 namespace drivers {
@@ -39,39 +31,6 @@ constexpr bool is_zero(T value) {
 }
 
 }  // namespace
-
-class Rtcm3Parser : public Parser {
- public:
-  explicit Rtcm3Parser(bool is_base_satation);
-  virtual MessageType GetMessage(MessagePtr *message_ptr);
-
- private:
-  void SetObservationTime();
-  bool SetStationPosition();
-  void FillKepplerOrbit(const eph_t &eph,
-                          apollo::drivers::gnss::KepplerOrbit *keppler_orbit);
-  void FillGlonassOrbit(const geph_t &eph,
-                          apollo::drivers::gnss::GlonassOrbit *keppler_orbit);
-  bool ProcessObservation();
-  bool ProcessEphemerides();
-  bool ProcessStationParameters();
-  bool init_flag_;
-
-  std::vector<uint8_t> buffer_;
-
-  rtcm_t rtcm_;
-  bool is_base_station_ = false;
-
-  apollo::drivers::gnss::GnssEphemeris ephemeris_;
-  apollo::drivers::gnss::EpochObservation observation_;
-
-  struct Point3D {
-    double x;
-    double y;
-    double z;
-  };
-  std::map<int, Point3D> station_location_;
-};
 
 Parser *Parser::CreateRtcmV3(bool is_base_station) {
   return new Rtcm3Parser(is_base_station);
@@ -145,8 +104,8 @@ void Rtcm3Parser::FillKepplerOrbit(
   keppler_orbit->set_sat_prn(prn);
 }
 
-void Rtcm3Parser::FillGlonassOrbit(
-    const geph_t &eph, apollo::drivers::gnss::GlonassOrbit *orbit) {
+void Rtcm3Parser::FillGlonassOrbit(const geph_t &eph,
+                                   apollo::drivers::gnss::GlonassOrbit *orbit) {
   orbit->set_position_x(eph.pos[0]);
   orbit->set_position_y(eph.pos[1]);
   orbit->set_position_z(eph.pos[2]);

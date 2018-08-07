@@ -80,14 +80,6 @@ int Destination::BuildStopDecision(
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
 
-  auto* planning_state = GetPlanningStatus()->mutable_planning_state();
-  if (planning_state->has_pull_over() &&
-      planning_state->pull_over().in_pull_over()) {
-    PullOver(nullptr);
-    ADEBUG << "destination: continue PULL OVER";
-    return 0;
-  }
-
   const auto& routing =
       AdapterManager::GetRoutingResponse()->GetLatestObserved();
   if (routing.routing_request().waypoint_size() < 2) {
@@ -100,11 +92,26 @@ int Destination::BuildStopDecision(
       0.0, routing_end.s() - FLAGS_virtual_stop_wall_length -
       config_.destination().stop_distance());
 
+  const auto& planning_state = GetPlanningStatus()->planning_state();
+  if (planning_state.has_pull_over() &&
+      planning_state.pull_over().has_status() &&
+      planning_state.pull_over().status() == PullOverStatus::DISABLED) {
+    Stop(frame, reference_line_info, routing_end.id(), dest_lane_s);
+    ADEBUG << "destination: STOP at current lane. PULL-OVER disabled";
+    return 0;
+  }
+
   common::PointENU dest_point;
   if (CheckPullOver(reference_line_info, routing_end.id(),
                     dest_lane_s, &dest_point)) {
-    PullOver(&dest_point);
-    ADEBUG << "destination: PULL OVER";
+    if (planning_state.has_pull_over() &&
+        planning_state.pull_over().in_pull_over()) {
+      PullOver(nullptr);
+      ADEBUG << "destination: continue PULL OVER";
+    } else {
+      PullOver(&dest_point);
+      ADEBUG << "destination: PULL OVER";
+    }
   } else {
     Stop(frame, reference_line_info, routing_end.id(), dest_lane_s);
     ADEBUG << "destination: STOP at current lane";
@@ -170,8 +177,8 @@ int Destination::Stop(Frame* const frame,
  */
 bool Destination::CheckPullOver(
     ReferenceLineInfo* const reference_line_info,
-    const std::string lane_id,
-    const double lane_s,
+    const std::string& dest_lane_id,
+    const double dest_lane_s,
     common::PointENU* dest_point) {
   CHECK_NOTNULL(reference_line_info);
 
@@ -180,40 +187,55 @@ bool Destination::CheckPullOver(
   }
 
   const auto dest_lane = HDMapUtil::BaseMapPtr()->GetLaneById(
-      hdmap::MakeMapId(lane_id));
+      hdmap::MakeMapId(dest_lane_id));
   if (!dest_lane) {
-    ADEBUG << "Failed to find lane[" << lane_id << "]";
+    AERROR << "Failed to find lane[" << dest_lane_id << "]";
     return false;
   }
 
-  const auto& reference_line = reference_line_info->reference_line();
+  // check if ChangeLane
+  bool change_lane = false;
+  const auto& segments = reference_line_info->Lanes();
+  if (segments.NextAction() != routing::FORWARD) {
+    change_lane = true;
+  }
 
   // check dest OnRoad
-  double dest_lane_s = std::max(
-      0.0, lane_s - FLAGS_virtual_stop_wall_length -
-      config_.destination().stop_distance());
+  const auto& reference_line = reference_line_info->reference_line();
   *dest_point = dest_lane->GetSmoothPoint(dest_lane_s);
-  if (!reference_line.IsOnRoad(*dest_point)) {
+  if (!change_lane && !reference_line.IsOnRoad(*dest_point)) {
     return false;
   }
 
   // check dest within pull_over_plan_distance
   common::SLPoint dest_sl;
   if (!reference_line.XYToSL({dest_point->x(), dest_point->y()}, &dest_sl)) {
-    ADEBUG << "failed to project the dest point to the other reference line";
+    AERROR << "failed to project the dest point to the other reference line";
     return false;
   }
   double adc_front_edge_s = reference_line_info->AdcSlBoundary().end_s();
   double distance_to_dest = dest_sl.s() - adc_front_edge_s;
   ADEBUG << "adc_front_edge_s[" << adc_front_edge_s
       << "] distance_to_dest[" << distance_to_dest
-      << "] dest_lane[" << lane_id << "] dest_lane_s[" << dest_lane_s << "]";
+      << "] dest_lane[" << dest_lane_id
+      << "] dest_lane_s[" << dest_lane_s << "]";
 
   if (distance_to_dest > config_.destination().pull_over_plan_distance()) {
     // to far, not sending pull-over yet
     return false;
   }
 
+  // Disable pull-over for the rest route if ChangeLane and clost to dest
+  if (change_lane) {
+    auto* planning_state = GetPlanningStatus()->mutable_planning_state();
+    planning_state->clear_pull_over();
+    auto pull_over = planning_state->mutable_pull_over();
+    pull_over->set_reason(PullOverStatus::DESTINATION);
+    pull_over->set_status(PullOverStatus::DISABLED);
+    pull_over->set_status_set_time(Clock::NowInSeconds());
+
+    return false;
+  }
 
   return true;
 }

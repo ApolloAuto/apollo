@@ -25,6 +25,8 @@
 #include <string>
 #include <utility>
 
+#include "ctpl/ctpl_stl.h"
+
 #include "modules/common/proto/pnc_point.pb.h"
 
 #include "modules/common/log.h"
@@ -172,16 +174,20 @@ Status DpStGraph::CalculateTotalCost() {
     int highest_row = 0;
     int lowest_row = cost_table_.back().size() - 1;
 
-    for (uint32_t r = next_lowest_row; r <= next_highest_row; ++r) {
-      if (FLAGS_enable_multi_thread_in_dp_st_graph) {
-        PlanningThreadPool::instance()->Push(
-            std::bind(&DpStGraph::CalculateCostAt, this, c, r));
-      } else {
-        CalculateCostAt(c, r);
+    int count = next_highest_row - next_lowest_row + 1;
+    if (count > 0) {
+      ctpl::thread_pool pool(
+          std::min<std::size_t>(FLAGS_max_planning_thread_pool_size, count));
+      for (uint32_t r = next_lowest_row; r <= next_highest_row; ++r) {
+        if (FLAGS_enable_multi_thread_in_dp_st_graph) {
+          pool.push(std::bind(&DpStGraph::CalculateCostAt, this, c, r));
+        } else {
+          CalculateCostAt(c, r);
+        }
       }
-    }
-    if (FLAGS_enable_multi_thread_in_dp_st_graph) {
-      PlanningThreadPool::instance()->Synchronize();
+      if (FLAGS_enable_multi_thread_in_dp_st_graph) {
+        pool.stop(true);
+      }
     }
 
     for (uint32_t r = next_lowest_row; r <= next_highest_row; ++r) {

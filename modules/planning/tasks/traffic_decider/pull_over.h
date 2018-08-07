@@ -89,9 +89,14 @@ class PullOver : public TrafficRule {
   ValidateStopPointCode IsValidStop(const common::SLPoint& stop_point_sl) const;
 
   /**
-   * handle when pull-over is completed
+   * check if pull-over is completed
    */
   bool CheckPullOverComplete();
+
+  /**
+   * build stop deceleration
+   */
+  bool CheckStopDeceleration(const double stop_line_s) const;
 
   /**
    * build stop decision

@@ -34,7 +34,7 @@ message CrosswalkConfig {
   // stop distance from stop line of crosswalk
   optional double stop_distance = 1 [ default=1.0 ]; // meter
   // max deceleration
-  optional double max_stop_deceleration = 2 [ default=6.0 ];
+  optional double max_stop_deceleration = 2 [ default=4.0 ];
   // min s_distance for adc to be considered have passed crosswalk (stop_line_end_s)
   optional double min_pass_s_distance = 3 [ default=1.0 ]; // meter
   // max speed(m/s) to be considered as a valid stop
@@ -86,16 +86,20 @@ message PullOverConfig {
   optional double max_stop_speed = 2 [ default=0.3 ]; // m/s
   // max distance(m) to the stop line to be considered as a valid stop
   optional double max_valid_stop_distance = 3 [ default=3.0 ]; // meter
+  // max deceleration
+  optional double max_stop_deceleration = 4 [ default=2.5 ];
+  // min s_distance for adc to be considered have passed crosswalk (stop_line_end_s)
+  optional double min_pass_s_distance = 5 [ default=1.0 ]; // meter
   // l-distance buffer to road/lane boundary
-  optional double buffer_to_boundary = 4 [default=0.5];
+  optional double buffer_to_boundary = 6 [default=0.5];
   // distance to stop point to start planning pull over
-  optional double plan_distance = 5 [default=35.0];
+  optional double plan_distance = 7 [default=35.0];
   // s_distance to beteeen start and stop points
-  optional double operation_length = 6 [ default=30.0 ]; // meter
+  optional double operation_length = 8 [ default=30.0 ]; // meter
   // max s_distance to check ahead while planning pull over
-  optional double max_check_distance = 7 [ default=60.0]; // meter
+  optional double max_check_distance = 9 [ default=60.0]; // meter
   // max failure count before changing to stop in-lane
-  optional uint32 max_failure_count = 8 [ default=10];
+  optional uint32 max_failure_count = 10 [ default=10];
 }
 
 message ReferenceLineEndConfig {
@@ -114,7 +118,7 @@ message SignalLightConfig {
   // stop distance from stop line
   optional double stop_distance = 1 [ default=1.0 ]; // meter
   // max deceleration
-  optional double max_stop_deceleration = 2 [ default=6.0 ];
+  optional double max_stop_deceleration = 2 [ default=4.0 ];
   // min s_distance for adc to be considered have passed signal_light (stop_line_end_s)
   optional double min_pass_s_distance = 3 [ default=4.0 ]; // meter
   // treat yellow light as red when deceleration (abstract value in m/s^2)
