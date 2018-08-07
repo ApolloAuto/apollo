@@ -201,7 +201,7 @@ std::string PrintDebugStringIter(const Container& container,
   return PrintDebugStringIter(container.begin(), container.end(), delimiter);
 }
 
-std::string Base64Decode(const std::string& base64_str);
+std::string DecodeBase64(const std::string& base64_str);
 
 std::string EncodeBase64(const std::string& in);
 
