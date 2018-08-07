@@ -411,7 +411,9 @@ extern int test_glostr(const unsigned char* buff) {
     for (j = 0, cs = 0; j < 11; ++j) {
       cs ^= xor_8bit[buff[j] & mask_hamming[i][j]];
     }
-    if (cs) n++;
+    if (cs) {
+      n++;
+    }
   }
   return n == 0 || (n == 2 && cs);
 }
@@ -663,7 +665,9 @@ static int decode_subfrm3(const unsigned char* buff, eph_t* eph) {
   eph->idot = getbits(buff, i, 14) * P2_43 * SC2RAD;
 
   /* check iode and iodc consistency */
-  if (iode != eph->iode || iode != (eph->iodc & 0xFF)) return 0;
+  if (iode != eph->iode || iode != (eph->iodc & 0xFF)) {
+    return 0;
+  }
 
   /* adjustment for week handover */
   tow = time2gpst(eph->ttr, &eph->week);
@@ -692,7 +696,9 @@ static void decode_almanac(const unsigned char* buff, int sat, alm_t* alm) {
 
   trace(4, "decode_almanac: sat=%2d\n", sat);
 
-  if (!alm || alm[sat - 1].week == 0) return;
+  if (!alm || alm[sat - 1].week == 0) {
+    return;
+  }
 
   alm[sat - 1].sat = sat;
   alm[sat - 1].e = getbits(buff, i, 16) * P2_21;
@@ -723,10 +729,11 @@ static void decode_almanac(const unsigned char* buff, int sat, alm_t* alm) {
 
   toa = gpst2time(alm[sat - 1].week, alm[sat - 1].toas);
   tt = timediff(toa, alm[sat - 1].toa);
-  if (tt < 302400.0)
+  if (tt < 302400.0) {
     alm[sat - 1].week--;
-  else if (tt > 302400.0)
+  } else if (tt > 302400.0) {
     alm[sat - 1].week++;
+  }
   alm[sat - 1].toa = gpst2time(alm[sat - 1].week, alm[sat - 1].toas);
 }
 /* decode gps navigation data subframe 4 -------------------------------------*/
@@ -739,18 +746,24 @@ static void decode_gps_subfrm4(const unsigned char* buff, alm_t* alm,
   if (25 <= svid && svid <= 32) { /* page 2,3,4,5,7,8,9,10 */
     /* decode almanac */
     sat = getbitu(buff, 50, 6);
-    if (1 <= sat && sat <= 32) decode_almanac(buff, sat, alm);
+    if (1 <= sat && sat <= 32) {
+      decode_almanac(buff, sat, alm);
+    }
   } else if (svid == 63) { /* page 25 */
     /* decode as and sv config */
     i = 56;
     for (sat = 1; sat <= 32; sat++) {
-      if (alm) alm[sat - 1].svconf = getbitu(buff, i, 4);
+      if (alm) {
+        alm[sat - 1].svconf = getbitu(buff, i, 4);
+      }
       i += 4;
     }
     /* decode sv health */
     i = 186;
     for (sat = 25; sat <= 32; sat++) {
-      if (alm) alm[sat - 1].svh = getbitu(buff, i, 6);
+      if (alm) {
+        alm[sat - 1].svh = getbitu(buff, i, 6);
+      }
       i += 6;
     }
   } else if (svid == 56) { /* page 18 */
@@ -800,7 +813,9 @@ static void decode_gps_subfrm5(const unsigned char* buff, alm_t* alm) {
   if (1 <= svid && svid <= 24) { /* page 1-24 */
     /* decode almanac */
     sat = getbitu(buff, 50, 6);
-    if (1 <= sat && sat <= 32) decode_almanac(buff, sat, alm);
+    if (1 <= sat && sat <= 32) {
+      decode_almanac(buff, sat, alm);
+    }
   } else if (svid == 51) { /* page 25 */
     if (alm) {
       i = 56;
@@ -834,7 +849,9 @@ static void decode_qzs_subfrm45(const unsigned char* buff, alm_t* alm,
   int svid = getbitu(buff, 50, 6);
 
   if (1 <= svid && svid <= 5) { /* qzss almanac */
-    if (!(sat = satno(SYS_QZS, 192 + svid))) return;
+    if (!(sat = satno(SYS_QZS, 192 + svid))) {
+      return;
+    }
     decode_almanac(buff, sat, alm);
   } else if (svid == 51) { /* qzss health */
     if (alm) {
@@ -846,7 +863,9 @@ static void decode_qzs_subfrm45(const unsigned char* buff, alm_t* alm,
       week = adjgpsweek(week);
 
       for (j = 0; j < 5; ++j) {
-        if (!(sat = satno(SYS_QZS, 193 + j))) continue;
+        if (!(sat = satno(SYS_QZS, 193 + j))) {
+          continue;
+        }
         alm[sat - 1].toas = toas;
         alm[sat - 1].week = week;
         alm[sat - 1].toa = gpst2time(week, toas);
@@ -1049,7 +1068,9 @@ extern int init_raw(raw_t* raw) {
   }
   for (i = 0; i < MAXSAT; ++i) {
     for (j = 0; j < NFREQ; ++j) {
-      if (!(sys = satsys(i + 1, NULL))) continue;
+      if (!(sys = satsys(i + 1, NULL))) {
+        continue;
+      }
       raw->nav.lam[i][j] = sys == SYS_GLO ? lam_glo[j] : lam_carr[j];
     }
   }
