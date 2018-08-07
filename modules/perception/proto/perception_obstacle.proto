@@ -40,7 +40,7 @@ message PerceptionObstacle {
   optional Type type = 10;  // obstacle type
   optional double timestamp = 11;  // GPS time in seconds.
 
-  // Just for offline debuging, onboard will not fill this field.
+  // Just for offline debugging, onboard will not fill this field.
   // Format like : [x0, y0, z0, x1, y1, z1...]
   repeated double point_cloud = 12 [packed = true];
 

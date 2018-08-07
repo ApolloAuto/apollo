@@ -38,8 +38,8 @@
 #include "modules/perception/tool/data_generator/sensor.h"
 
 /**
- * @namespace apollo::calibration
- * @brief apollo::calibration
+ * @namespace apollo::perception::data_generator
+ * @brief apollo::perception::data_generator
  */
 namespace apollo {
 namespace perception {

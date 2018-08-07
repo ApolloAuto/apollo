@@ -49,7 +49,7 @@ const std::size_t DROPS_HISTORY_SIZE = 100;
 const std::size_t MAX_OBJECT_NUM = 100;
 const std::size_t MAX_ALLOWED_SKIP_OBJECT = 10;
 
-// TODO(All) averatge image frame rate should come from other header file.
+// TODO(All) average image frame rate should come from other header file.
 const float AVERAGE_FRATE_RATE = 0.1f;
 
 class Cipv {
@@ -89,12 +89,12 @@ class Cipv {
                        const float yaw_rate, const float velocity,
                        EgoLane *egolane_image, EgoLane *egolane_ground);
 
-  // Get closest edge of an object in image cooridnate
+  // Get closest edge of an object in image coordinate
   bool FindClosestEdgeOfObjectImage(const std::shared_ptr<Object> &object,
                                     const EgoLane &egolane_image,
                                     LineSegment2Df *closted_object_edge);
 
-  // Get closest edge of an object in ground cooridnate
+  // Get closest edge of an object in ground coordinate
   bool FindClosestEdgeOfObjectGround(const std::shared_ptr<Object> &object,
                                      const EgoLane &egolane_ground,
                                      LineSegment2Df *closted_object_edge);
