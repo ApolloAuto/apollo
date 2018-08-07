@@ -148,7 +148,9 @@ static void adjweek(rtcm_t* rtcm, double tow) {
   int week;
 
   /* if no time, get cpu time */
-  if (rtcm->time.time == 0) rtcm->time = utc2gpst(timeget());
+  if (rtcm->time.time == 0) {
+    rtcm->time = utc2gpst(timeget());
+  }
   tow_p = time2gpst(rtcm->time, &week);
   if (tow < tow_p - 302400.0) {
     tow += 604800.0;
@@ -161,7 +163,9 @@ static void adjweek(rtcm_t* rtcm, double tow) {
 static int adjbdtweek(int week) {
   int w;
   (void)time2bdt(gpst2bdt(utc2gpst(timeget())), &w);
-  if (w < 1) w = 1; /* use 2006/1/1 if time is earlier than 2006/1/1 */
+  if (w < 1) {
+    w = 1;  /* use 2006/1/1 if time is earlier than 2006/1/1 */
+  }
   return week + (w - week + 512) / 1024 * 1024;
 }
 /* adjust daily rollover of glonass time -------------------------------------*/
@@ -170,7 +174,9 @@ static void adjday_glot(rtcm_t* rtcm, double tod) {
   double tow, tod_p;
   int week;
 
-  if (rtcm->time.time == 0) rtcm->time = utc2gpst(timeget());
+  if (rtcm->time.time == 0) {
+    rtcm->time = utc2gpst(timeget());
+  }
   time = timeadd(gpst2utc(rtcm->time), 10800.0); /* glonass time */
   tow = time2gpst(time, &week);
   tod_p = fmod(tow, 86400.0);
@@ -210,9 +216,13 @@ static int obsindex(obs_t* obs, gtime_t time, int sat) {
   int i, j;
 
   for (i = 0; i < obs->n; ++i) {
-    if (obs->data[i].sat == sat) return i; /* field already exists */
+    if (obs->data[i].sat == sat) {
+      return i;  /* field already exists */
+    }
   }
-  if (i >= MAXOBS) return -1; /* overflow */
+  if (i >= MAXOBS) {
+    return -1;  /* overflow */
+  }
 
   /* add new field */
   obs->data[i].time = time;
@@ -232,7 +242,9 @@ static int test_staid(rtcm_t* rtcm, int staid) {
 
   /* test station id option */
   if ((p = strstr(rtcm->opt, "-STA=")) && sscanf(p, "-STA=%d", &id) == 1) {
-    if (staid != id) return 0;
+    if (staid != id) {
+      return 0;
+    }
   }
   /* save station id */
   if (rtcm->staid == 0 || rtcm->obsflag) {
@@ -269,7 +281,9 @@ static int decode_head1001(rtcm_t* rtcm, int* sync) {
     return -1;
   }
   /* test station id */
-  if (!test_staid(rtcm, staid)) return -1;
+  if (!test_staid(rtcm, staid)) {
+    return -1;
+  }
 
   adjweek(rtcm, tow);
 
@@ -285,7 +299,9 @@ static int decode_head1001(rtcm_t* rtcm, int* sync) {
 /* decode type 1001: L1-only gps rtk observation -----------------------------*/
 static int decode_type1001(rtcm_t* rtcm) {
   int sync;
-  if (decode_head1001(rtcm, &sync) < 0) return -1;
+  if (decode_head1001(rtcm, &sync) < 0) {
+    return -1;
+  }
   rtcm->obsflag = !sync;
   return sync ? 0 : 1;
 }
@@ -294,7 +310,9 @@ static int decode_type1002(rtcm_t* rtcm) {
   double pr1, cnr1, tt, cp1;
   int i = 24 + 64, j, index, nsat, sync, prn, code, sat, ppr1, lock1, amb, sys;
 
-  if ((nsat = decode_head1001(rtcm, &sync)) < 0) return -1;
+  if ((nsat = decode_head1001(rtcm, &sync)) < 0) {
+    return -1;
+  }
 
   for (j = 0; j < nsat && rtcm->obs.n < MAXOBS && i + 74 <= rtcm->len * 8; ++j) {
     prn  = getbitu(rtcm->buff, i, 6);
@@ -325,7 +343,9 @@ static int decode_type1002(rtcm_t* rtcm) {
     if (rtcm->obsflag || fabs(tt) > 1E-9) {
       rtcm->obs.n = rtcm->obsflag = 0;
     }
-    if ((index = obsindex(&rtcm->obs, rtcm->time, sat)) < 0) continue;
+    if ((index = obsindex(&rtcm->obs, rtcm->time, sat)) < 0) {
+      continue;
+    }
     pr1 = pr1 * 0.02 + amb * PRUNIT_GPS;
     if (ppr1 != (int)0xFFF80000) {
       rtcm->obs.data[index].P[0] = pr1;
@@ -341,7 +361,9 @@ static int decode_type1002(rtcm_t* rtcm) {
 /* decode type 1003: L1&L2 gps rtk observables -------------------------------*/
 static int decode_type1003(rtcm_t* rtcm) {
   int sync;
-  if (decode_head1001(rtcm, &sync) < 0) return -1;
+  if (decode_head1001(rtcm, &sync) < 0) {
+    return -1;
+  }
   rtcm->obsflag = !sync;
   return sync ? 0 : 1;
 }
@@ -352,7 +374,9 @@ static int decode_type1004(rtcm_t* rtcm) {
   int i = 24 + 64, j, index, nsat, sync, prn, sat, code1, code2, pr21, ppr1, ppr2;
   int lock1, lock2, amb, sys;
 
-  if ((nsat = decode_head1001(rtcm, &sync)) < 0) return -1;
+  if ((nsat = decode_head1001(rtcm, &sync)) < 0) {
+    return -1;
+  }
 
   for (j = 0; j < nsat && rtcm->obs.n < MAXOBS && i + 125 <= rtcm->len * 8; ++j) {
     prn  = getbitu(rtcm->buff, i, 6);
@@ -393,7 +417,9 @@ static int decode_type1004(rtcm_t* rtcm) {
     if (rtcm->obsflag || fabs(tt) > 1E-9) {
       rtcm->obs.n = rtcm->obsflag = 0;
     }
-    if ((index = obsindex(&rtcm->obs, rtcm->time, sat)) < 0) continue;
+    if ((index = obsindex(&rtcm->obs, rtcm->time, sat)) < 0) {
+      continue;
+    }
     pr1 = pr1 * 0.02 + amb * PRUNIT_GPS;
     if (ppr1 != (int)0xFFF80000) {
       rtcm->obs.data[index].P[0] = pr1;
@@ -447,7 +473,9 @@ static int decode_type1005(rtcm_t* rtcm) {
     sprintf(msg, " staid=%4d", staid);
   }
   /* test station id */
-  if (!test_staid(rtcm, staid)) return -1;
+  if (!test_staid(rtcm, staid)) {
+    return -1;
+  }
 
   rtcm->sta.deltype = 0; /* xyz */
   for (j = 0; j < 3; ++j) {
@@ -485,7 +513,9 @@ static int decode_type1006(rtcm_t* rtcm) {
     sprintf(msg, " staid=%4d", staid);
   }
   /* test station id */
-  if (!test_staid(rtcm, staid)) return -1;
+  if (!test_staid(rtcm, staid)) {
+    return -1;
+  }
 
   rtcm->sta.deltype = 1; /* xyz */
   for (j = 0; j < 3; ++j) {
@@ -521,7 +551,9 @@ static int decode_type1007(rtcm_t* rtcm) {
     sprintf(msg, " staid=%4d", staid);
   }
   /* test station id */
-  if (!test_staid(rtcm, staid)) return -1;
+  if (!test_staid(rtcm, staid)) {
+    return -1;
+  }
 
   strncpy(rtcm->sta.antdes, des, n);
   rtcm->sta.antdes[n] = '\0';
@@ -560,7 +592,9 @@ static int decode_type1008(rtcm_t* rtcm) {
     sprintf(msg, " staid=%4d", staid);
   }
   /* test station id */
-  if (!test_staid(rtcm, staid)) return -1;
+  if (!test_staid(rtcm, staid)) {
+    return -1;
+  }
 
   strncpy(rtcm->sta.antdes, des, n);
   rtcm->sta.antdes[n] = '\0';
@@ -591,7 +625,9 @@ static int decode_head1009(rtcm_t* rtcm, int* sync) {
     return -1;
   }
   /* test station id */
-  if (!test_staid(rtcm, staid)) return -1;
+  if (!test_staid(rtcm, staid)) {
+    return -1;
+  }
 
   adjday_glot(rtcm, tod);
 
@@ -607,7 +643,9 @@ static int decode_head1009(rtcm_t* rtcm, int* sync) {
 /* decode type 1009: L1-only glonass rtk observables -------------------------*/
 static int decode_type1009(rtcm_t* rtcm) {
   int sync;
-  if (decode_head1009(rtcm, &sync) < 0) return -1;
+  if (decode_head1009(rtcm, &sync) < 0) {
+    return -1;
+  }
   rtcm->obsflag = !sync;
   return sync ? 0 : 1;
 }
@@ -616,7 +654,9 @@ static int decode_type1010(rtcm_t* rtcm) {
   double pr1, cnr1, tt, cp1, lam1;
   int i = 24 + 61, j, index, nsat, sync, prn, sat, code, freq, ppr1, lock1, amb, sys = SYS_GLO;
 
-  if ((nsat = decode_head1009(rtcm, &sync)) < 0) return -1;
+  if ((nsat = decode_head1009(rtcm, &sync)) < 0) {
+    return -1;
+  }
 
   for (j = 0; j < nsat && rtcm->obs.n < MAXOBS && i + 79 <= rtcm->len * 8; ++j) {
     prn  = getbitu(rtcm->buff, i, 6);
@@ -643,7 +683,9 @@ static int decode_type1010(rtcm_t* rtcm) {
     if (rtcm->obsflag || fabs(tt) > 1E-9) {
       rtcm->obs.n = rtcm->obsflag = 0;
     }
-    if ((index = obsindex(&rtcm->obs, rtcm->time, sat)) < 0) continue;
+    if ((index = obsindex(&rtcm->obs, rtcm->time, sat)) < 0) {
+      continue;
+    }
     pr1 = pr1 * 0.02 + amb * PRUNIT_GLO;
     if (ppr1 != (int)0xFFF80000) {
       rtcm->obs.data[index].P[0] = pr1;
@@ -660,7 +702,9 @@ static int decode_type1010(rtcm_t* rtcm) {
 /* decode type 1011: L1&L2 glonass rtk observables ---------------------------*/
 static int decode_type1011(rtcm_t* rtcm) {
   int sync;
-  if (decode_head1009(rtcm, &sync) < 0) return -1;
+  if (decode_head1009(rtcm, &sync) < 0) {
+    return -1;
+  }
   rtcm->obsflag = !sync;
   return sync ? 0 : 1;
 }
@@ -670,7 +714,9 @@ static int decode_type1012(rtcm_t* rtcm) {
   int i = 24 + 61, j, index, nsat, sync, prn, sat, freq, code1, code2, pr21, ppr1, ppr2;
   int lock1, lock2, amb, sys = SYS_GLO;
 
-  if ((nsat = decode_head1009(rtcm, &sync)) < 0) return -1;
+  if ((nsat = decode_head1009(rtcm, &sync)) < 0) {
+    return -1;
+  }
 
   for (j = 0; j < nsat && rtcm->obs.n < MAXOBS && i + 130 <= rtcm->len * 8; ++j) {
     prn  = getbitu(rtcm->buff, i, 6);
@@ -707,7 +753,9 @@ static int decode_type1012(rtcm_t* rtcm) {
     if (rtcm->obsflag || fabs(tt) > 1E-9) {
       rtcm->obs.n = rtcm->obsflag = 0;
     }
-    if ((index = obsindex(&rtcm->obs, rtcm->time, sat)) < 0) continue;
+    if ((index = obsindex(&rtcm->obs, rtcm->time, sat)) < 0) {
+      continue;
+    }
     pr1 = pr1 * 0.02 + amb * PRUNIT_GLO;
     if (ppr1 != (int)0xFFF80000) {
       lam1 = CLIGHT / (FREQ1_GLO + DFRQ1_GLO * (freq - 7));
@@ -832,7 +880,9 @@ static int decode_type1019(rtcm_t* rtcm) {
   eph.ttr = rtcm->time;
   eph.A = sqrtA * sqrtA;
   if (!strstr(rtcm->opt, "-EPHALL")) {
-    if (eph.iode == rtcm->nav.eph[sat - 1].iode) return 0; /* unchanged */
+    if (eph.iode == rtcm->nav.eph[sat - 1].iode) {
+      return 0;  /* unchanged */
+    }
   }
   rtcm->nav.eph[sat - 1] = eph;
   rtcm->ephsat = sat;
@@ -899,17 +949,25 @@ static int decode_type1020(rtcm_t* rtcm) {
   geph.sat = sat;
   geph.svh = bn;
   geph.iode = tb & 0x7F;
-  if (rtcm->time.time == 0) rtcm->time = utc2gpst(timeget());
+  if (rtcm->time.time == 0) {
+    rtcm->time = utc2gpst(timeget());
+  }
   tow = time2gpst(gpst2utc(rtcm->time), &week);
   tod = fmod(tow, 86400.0);
   tow -= tod;
   tof = tk_h * 3600.0 + tk_m * 60.0 + tk_s - 10800.0; /* lt->utc */
-  if (tof < tod - 43200.0) tof += 86400.0;
-  else if (tof > tod + 43200.0) tof -= 86400.0;
+  if (tof < tod - 43200.0) {
+    tof += 86400.0;
+  } else if (tof > tod + 43200.0) {
+    tof -= 86400.0;
+  }
   geph.tof = utc2gpst(gpst2time(week, tow + tof));
   toe = tb * 900.0 - 10800.0; /* lt->utc */
-  if (toe < tod - 43200.0) toe += 86400.0;
-  else if (toe > tod + 43200.0) toe -= 86400.0;
+  if (toe < tod - 43200.0) {
+    toe += 86400.0;
+  } else if (toe > tod + 43200.0) {
+    toe -= 86400.0;
+  }
   geph.toe = utc2gpst(gpst2time(week, tow + toe)); /* utc->gpst */
 
   if (!strstr(rtcm->opt, "-EPHALL")) {
@@ -1021,7 +1079,9 @@ static int decode_type1033(rtcm_t* rtcm) {
     sprintf(msg, " staid=%4d", staid);
   }
   /* test station id */
-  if (!test_staid(rtcm, staid)) return -1;
+  if (!test_staid(rtcm, staid)) {
+    return -1;
+  }
 
   strncpy(rtcm->sta.antdes, des, n);
   rtcm->sta.antdes[n] = '\0';
@@ -1151,7 +1211,9 @@ static int decode_type1044(rtcm_t* rtcm) {
   eph.A = sqrtA * sqrtA;
   if (!strstr(rtcm->opt, "-EPHALL")) {
     if (eph.iode == rtcm->nav.eph[sat - 1].iode &&
-        eph.iodc == rtcm->nav.eph[sat - 1].iodc) return 0; /* unchanged */
+        eph.iodc == rtcm->nav.eph[sat - 1].iodc) {
+      return 0;  /* unchanged */
+    }
   }
   rtcm->nav.eph[sat - 1] = eph;
   rtcm->ephsat = sat;
@@ -1244,7 +1306,9 @@ static int decode_type1045(rtcm_t* rtcm) {
   eph.svh = (e5a_hs << 4) + (e5a_dvs << 3);
   eph.code = 2; /* data source = f/nav e5a */
   if (!strstr(rtcm->opt, "-EPHALL")) {
-    if (eph.iode == rtcm->nav.eph[sat - 1].iode) return 0; /* unchanged */
+    if (eph.iode == rtcm->nav.eph[sat - 1].iode) {
+      return 0;  /* unchanged */
+    }
   }
   rtcm->nav.eph[sat - 1] = eph;
   rtcm->ephsat = sat;
@@ -1339,7 +1403,9 @@ static int decode_type1047(rtcm_t* rtcm) {
   eph.ttr = rtcm->time;
   eph.A = sqrtA * sqrtA;
   if (!strstr(rtcm->opt, "-EPHALL")) {
-    if (eph.iode == rtcm->nav.eph[sat - 1].iode) return 0; /* unchanged */
+    if (eph.iode == rtcm->nav.eph[sat - 1].iode) {
+      return 0;  /* unchanged */
+    }
   }
   rtcm->nav.eph[sat - 1] = eph;
   rtcm->ephsat = sat;
@@ -1355,7 +1421,9 @@ static int decode_ssr1_head(rtcm_t* rtcm, int sys, int* sync, int* iod,
 #ifndef SSR_QZSS_DRAFT_V05
   ns = sys == SYS_QZS ? 4 : 6;
 #endif
-  if (i + (sys == SYS_GLO ? 53 : 50 + ns) > rtcm->len * 8) return -1;
+  if (i + (sys == SYS_GLO ? 53 : 50 + ns) > rtcm->len * 8) {
+    return -1;
+  }
 
   if (sys == SYS_GLO) {
     tod = getbitu(rtcm->buff, i, 17);
@@ -1403,7 +1471,9 @@ static int decode_ssr2_head(rtcm_t* rtcm, int sys, int* sync, int* iod,
 #ifndef SSR_QZSS_DRAFT_V05
   ns = sys == SYS_QZS ? 4 : 6;
 #endif
-  if (i + (sys == SYS_GLO ? 52 : 49 + ns) > rtcm->len * 8) return -1;
+  if (i + (sys == SYS_GLO ? 52 : 49 + ns) > rtcm->len * 8) {
+    return -1;
+  }
 
   if (sys == SYS_GLO) {
     tod = getbitu(rtcm->buff, i, 17);
@@ -1675,7 +1745,9 @@ static int decode_ssr3(rtcm_t* rtcm, int sys) {
     nbias = getbitu(rtcm->buff, i, 5);
     i += 5;
 
-    for (k = 0; k < MAXCODE; ++k) cbias[k] = 0.0;
+    for (k = 0; k < MAXCODE; ++k) {
+      cbias[k] = 0.0;
+    }
     for (k = 0; k < nbias && i + 19 < rtcm->len * 8; ++k) {
       mode = getbitu(rtcm->buff, i, 5);
       i += 5;
@@ -1921,7 +1993,9 @@ static void sigindex(int sys, const unsigned char* code, const int* freq, int n,
 
   /* test code priority */
   for (i = 0; i < n; ++i) {
-    if (!code[i]) continue;
+    if (!code[i]) {
+      continue;
+    }
 
     if (freq[i] > NFREQ) { /* save as extended signal if freq > NFREQ */
       ex[i] = 1;
@@ -1932,7 +2006,9 @@ static void sigindex(int sys, const unsigned char* code, const int* freq, int n,
 
     /* select highest priority signal */
     if (pri > pri_h[freq[i] - 1]) {
-      if (index[freq[i] - 1]) ex[index[freq[i] - 1] - 1] = 1;
+      if (index[freq[i] - 1]) {
+        ex[index[freq[i] - 1] - 1] = 1;
+      }
       pri_h[freq[i] - 1] = pri;
       index[freq[i] - 1] = i + 1;
     } else {
@@ -2017,13 +2093,20 @@ static void save_msm_obs(rtcm_t* rtcm, int sys, msm_h_t* h, const double* r,
 
     /* freqency index for beidou */
     if (sys == SYS_CMP) {
-      if (freq[i] == 5) freq[i] = 2;  /* B2 */
-      else if (freq[i] == 4) freq[i] = 3; /* B3 */
+      if (freq[i] == 5) {
+        freq[i] = 2;  /* B2 */
+      } else if (freq[i] == 4) {
+        freq[i] = 3;  /* B3 */
+      }
     }
     if (code[i] != CODE_NONE) {
-      if (q) q += sprintf(q, "L%s%s", sig[i], i < h->nsig - 1 ? "," : "");
+      if (q) {
+        q += sprintf(q, "L%s%s", sig[i], i < h->nsig - 1 ? "," : "");
+      }
     } else {
-      if (q) q += sprintf(q, "(%d)%s", h->sigs[i], i < h->nsig - 1 ? "," : "");
+      if (q) {
+        q += sprintf(q, "(%d)%s", h->sigs[i], i < h->nsig - 1 ? "," : "");
+      }
 
       trace(2, "rtcm3 %d: unknown signal id=%2d\n", type, h->sigs[i]);
     }
@@ -2051,7 +2134,9 @@ static void save_msm_obs(rtcm_t* rtcm, int sys, msm_h_t* h, const double* r,
       trace(2, "rtcm3 %d satellite error: prn=%d\n", type, prn);
     }
     for (k = 0; k < h->nsig; ++k) {
-      if (!h->cellmask[k + i * h->nsig]) continue;
+      if (!h->cellmask[k + i * h->nsig]) {
+        continue;
+      }
 
       if (sat && index >= 0 && ind[k] >= 0) {
         /* satellite carrier wave length */
@@ -2133,19 +2218,25 @@ static int decode_msm_head(rtcm_t* rtcm, int sys, int* sync, int* iod,
     for (j = 1; j <= 64; ++j) {
       mask = getbitu(rtcm->buff, i, 1);
       i += 1;
-      if (mask) h->sats[h->nsat++] = j;
+      if (mask) {
+        h->sats[h->nsat++] = j;
+      }
     }
     for (j = 1; j <= 32; ++j) {
       mask = getbitu(rtcm->buff, i, 1);
       i += 1;
-      if (mask) h->sigs[h->nsig++] = j;
+      if (mask) {
+        h->sigs[h->nsig++] = j;
+      }
     }
   } else {
     trace(2, "rtcm3 %d length error: len=%d\n", type, rtcm->len);
     return -1;
   }
   /* test station id */
-  if (!test_staid(rtcm, staid)) return -1;
+  if (!test_staid(rtcm, staid)) {
+    return -1;
+  }
 
   if (h->nsat * h->nsig > 64) {
     trace(2, "rtcm3 %d number of sats and sigs error: nsat=%d nsig=%d\n",
@@ -2160,7 +2251,9 @@ static int decode_msm_head(rtcm_t* rtcm, int sys, int* sync, int* iod,
   for (j = 0; j < h->nsat * h->nsig; ++j) {
     h->cellmask[j] = getbitu(rtcm->buff, i, 1);
     i += 1;
-    if (h->cellmask[j]) ncell++;
+    if (h->cellmask[j]) {
+      ncell++;
+    }
   }
   *hsize = i;
 
@@ -2178,7 +2271,9 @@ static int decode_msm_head(rtcm_t* rtcm, int sys, int* sync, int* iod,
 static int decode_msm0(rtcm_t* rtcm, int sys) {
   msm_h_t h = {0};
   int i, sync, iod;
-  if (decode_msm_head(rtcm, sys, &sync, &iod, &h, &i) < 0) return -1;
+  if (decode_msm_head(rtcm, sys, &sync, &iod, &h, &i) < 0) {
+    return -1;
+  }
   rtcm->obsflag = !sync;
   return sync ? 0 : 1;
 }
@@ -2191,37 +2286,51 @@ static int decode_msm4(rtcm_t* rtcm, int sys) {
   type = getbitu(rtcm->buff, 24, 12);
 
   /* decode msm header */
-  if ((ncell = decode_msm_head(rtcm, sys, &sync, &iod, &h, &i)) < 0) return -1;
+  if ((ncell = decode_msm_head(rtcm, sys, &sync, &iod, &h, &i)) < 0) {
+    return -1;
+  }
 
   if (i + h.nsat * 18 + ncell * 48 > rtcm->len * 8) {
     trace(2, "rtcm3 %d length error: nsat=%d ncell=%d len=%d\n", type, h.nsat,
           ncell, rtcm->len);
     return -1;
   }
-  for (j = 0; j < h.nsat; ++j) r[j] = 0.0;
-  for (j = 0; j < ncell; ++j) pr[j] = cp[j] = -1E16;
+  for (j = 0; j < h.nsat; ++j) {
+    r[j] = 0.0;
+  }
+  for (j = 0; j < ncell; ++j) {
+    pr[j] = cp[j] = -1E16;
+  }
 
   /* decode satellite data */
   for (j = 0; j < h.nsat; ++j) { /* range */
     rng  = getbitu(rtcm->buff, i, 8);
     i += 8;
-    if (rng != 255) r[j] = rng * RANGE_MS;
+    if (rng != 255) {
+      r[j] = rng * RANGE_MS;
+    }
   }
   for (j = 0; j < h.nsat; ++j) {
     rng_m = getbitu(rtcm->buff, i, 10);
     i += 10;
-    if (r[j] != 0.0) r[j] += rng_m * P2_10 * RANGE_MS;
+    if (r[j] != 0.0) {
+      r[j] += rng_m * P2_10 * RANGE_MS;
+    }
   }
   /* decode signal data */
   for (j = 0; j < ncell; ++j) { /* pseudorange */
     prv = getbits(rtcm->buff, i, 15);
     i += 15;
-    if (prv != -16384) pr[j] = prv * P2_24 * RANGE_MS;
+    if (prv != -16384) {
+      pr[j] = prv * P2_24 * RANGE_MS;
+    }
   }
   for (j = 0; j < ncell; ++j) { /* phaserange */
     cpv = getbits(rtcm->buff, i, 22);
     i += 22;
-    if (cpv != -2097152) cp[j] = cpv * P2_29 * RANGE_MS;
+    if (cpv != -2097152) {
+      cp[j] = cpv * P2_29 * RANGE_MS;
+    }
   }
   for (j = 0; j < ncell; ++j) { /* lock time */
     lock[j] = getbitu(rtcm->buff, i, 4);
@@ -2251,7 +2360,9 @@ static int decode_msm5(rtcm_t* rtcm, int sys) {
   type = getbitu(rtcm->buff, 24, 12);
 
   /* decode msm header */
-  if ((ncell = decode_msm_head(rtcm, sys, &sync, &iod, &h, &i)) < 0) return -1;
+  if ((ncell = decode_msm_head(rtcm, sys, &sync, &iod, &h, &i)) < 0) {
+    return -1;
+  }
 
   if (i + h.nsat * 36 + ncell * 63 > rtcm->len * 8) {
     trace(2, "rtcm3 %d length error: nsat=%d ncell=%d len=%d\n", type, h.nsat,
@@ -2262,13 +2373,17 @@ static int decode_msm5(rtcm_t* rtcm, int sys) {
     r[j] = rr[j] = 0.0;
     ex[j] = 15;
   }
-  for (j = 0; j < ncell; ++j) pr[j] = cp[j] = rrf[j] = -1E16;
+  for (j = 0; j < ncell; ++j) {
+    pr[j] = cp[j] = rrf[j] = -1E16;
+  }
 
   /* decode satellite data */
   for (j = 0; j < h.nsat; ++j) { /* range */
     rng  = getbitu(rtcm->buff, i, 8);
     i += 8;
-    if (rng != 255) r[j] = rng * RANGE_MS;
+    if (rng != 255) {
+      r[j] = rng * RANGE_MS;
+    }
   }
   for (j = 0; j < h.nsat; ++j) { /* extended info */
     ex[j] = getbitu(rtcm->buff, i, 4);
@@ -2277,23 +2392,31 @@ static int decode_msm5(rtcm_t* rtcm, int sys) {
   for (j = 0; j < h.nsat; ++j) {
     rng_m = getbitu(rtcm->buff, i, 10);
     i += 10;
-    if (r[j] != 0.0) r[j] += rng_m * P2_10 * RANGE_MS;
+    if (r[j] != 0.0) {
+      r[j] += rng_m * P2_10 * RANGE_MS;
+    }
   }
   for (j = 0; j < h.nsat; ++j) { /* phaserangerate */
     rate = getbits(rtcm->buff, i, 14);
     i += 14;
-    if (rate != -8192) rr[j] = rate * 1.0;
+    if (rate != -8192) {
+      rr[j] = rate * 1.0;
+    }
   }
   /* decode signal data */
   for (j = 0; j < ncell; ++j) { /* pseudorange */
     prv = getbits(rtcm->buff, i, 15);
     i += 15;
-    if (prv != -16384) pr[j] = prv * P2_24 * RANGE_MS;
+    if (prv != -16384) {
+      pr[j] = prv * P2_24 * RANGE_MS;
+    }
   }
   for (j = 0; j < ncell; ++j) { /* phaserange */
     cpv = getbits(rtcm->buff, i, 22);
     i += 22;
-    if (cpv != -2097152) cp[j] = cpv * P2_29 * RANGE_MS;
+    if (cpv != -2097152) {
+      cp[j] = cpv * P2_29 * RANGE_MS;
+    }
   }
   for (j = 0; j < ncell; ++j) { /* lock time */
     lock[j] = getbitu(rtcm->buff, i, 4);
@@ -2310,7 +2433,9 @@ static int decode_msm5(rtcm_t* rtcm, int sys) {
   for (j = 0; j < ncell; ++j) { /* phaserangerate */
     rrv = getbits(rtcm->buff, i, 15);
     i += 15;
-    if (rrv != -16384) rrf[j] = rrv * 0.0001;
+    if (rrv != -16384) {
+      rrf[j] = rrv * 0.0001;
+    }
   }
   /* save obs data in msm message */
   save_msm_obs(rtcm, sys, &h, r, pr, cp, rr, rrf, cnr, lock, ex, half);
@@ -2327,37 +2452,51 @@ static int decode_msm6(rtcm_t* rtcm, int sys) {
   type = getbitu(rtcm->buff, 24, 12);
 
   /* decode msm header */
-  if ((ncell = decode_msm_head(rtcm, sys, &sync, &iod, &h, &i)) < 0) return -1;
+  if ((ncell = decode_msm_head(rtcm, sys, &sync, &iod, &h, &i)) < 0) {
+    return -1;
+  }
 
   if (i + h.nsat * 18 + ncell * 65 > rtcm->len * 8) {
     trace(2, "rtcm3 %d length error: nsat=%d ncell=%d len=%d\n", type, h.nsat,
           ncell, rtcm->len);
     return -1;
   }
-  for (j = 0; j < h.nsat; ++j) r[j] = 0.0;
-  for (j = 0; j < ncell; ++j) pr[j] = cp[j] = -1E16;
+  for (j = 0; j < h.nsat; ++j) {
+    r[j] = 0.0;
+  }
+  for (j = 0; j < ncell; ++j) {
+    pr[j] = cp[j] = -1E16;
+  }
 
   /* decode satellite data */
   for (j = 0; j < h.nsat; ++j) { /* range */
     rng  = getbitu(rtcm->buff, i, 8);
     i += 8;
-    if (rng != 255) r[j] = rng * RANGE_MS;
+    if (rng != 255) {
+      r[j] = rng * RANGE_MS;
+    }
   }
   for (j = 0; j < h.nsat; ++j) {
     rng_m = getbitu(rtcm->buff, i, 10);
     i += 10;
-    if (r[j] != 0.0) r[j] += rng_m * P2_10 * RANGE_MS;
+    if (r[j] != 0.0) {
+      r[j] += rng_m * P2_10 * RANGE_MS;
+    }
   }
   /* decode signal data */
   for (j = 0; j < ncell; ++j) { /* pseudorange */
     prv = getbits(rtcm->buff, i, 20);
     i += 20;
-    if (prv != -524288) pr[j] = prv * P2_29 * RANGE_MS;
+    if (prv != -524288) {
+      pr[j] = prv * P2_29 * RANGE_MS;
+    }
   }
   for (j = 0; j < ncell; ++j) { /* phaserange */
     cpv = getbits(rtcm->buff, i, 24);
     i += 24;
-    if (cpv != -8388608) cp[j] = cpv * P2_31 * RANGE_MS;
+    if (cpv != -8388608) {
+      cp[j] = cpv * P2_31 * RANGE_MS;
+    }
   }
   for (j = 0; j < ncell; ++j) { /* lock time */
     lock[j] = getbitu(rtcm->buff, i, 10);
@@ -2387,7 +2526,9 @@ static int decode_msm7(rtcm_t* rtcm, int sys) {
   type = getbitu(rtcm->buff, 24, 12);
 
   /* decode msm header */
-  if ((ncell = decode_msm_head(rtcm, sys, &sync, &iod, &h, &i)) < 0) return -1;
+  if ((ncell = decode_msm_head(rtcm, sys, &sync, &iod, &h, &i)) < 0) {
+    return -1;
+  }
 
   if (i + h.nsat * 36 + ncell * 80 > rtcm->len * 8) {
     trace(2, "rtcm3 %d length error: nsat=%d ncell=%d len=%d\n", type, h.nsat,
@@ -2398,13 +2539,17 @@ static int decode_msm7(rtcm_t* rtcm, int sys) {
     r[j] = rr[j] = 0.0;
     ex[j] = 15;
   }
-  for (j = 0; j < ncell; ++j) pr[j] = cp[j] = rrf[j] = -1E16;
+  for (j = 0; j < ncell; ++j) {
+    pr[j] = cp[j] = rrf[j] = -1E16;
+  }
 
   /* decode satellite data */
   for (j = 0; j < h.nsat; ++j) { /* range */
     rng  = getbitu(rtcm->buff, i, 8);
     i += 8;
-    if (rng != 255) r[j] = rng * RANGE_MS;
+    if (rng != 255) {
+      r[j] = rng * RANGE_MS;
+    }
   }
   for (j = 0; j < h.nsat; ++j) { /* extended info */
     ex[j] = getbitu(rtcm->buff, i, 4);
@@ -2413,23 +2558,31 @@ static int decode_msm7(rtcm_t* rtcm, int sys) {
   for (j = 0; j < h.nsat; ++j) {
     rng_m = getbitu(rtcm->buff, i, 10);
     i += 10;
-    if (r[j] != 0.0) r[j] += rng_m * P2_10 * RANGE_MS;
+    if (r[j] != 0.0) {
+      r[j] += rng_m * P2_10 * RANGE_MS;
+    }
   }
   for (j = 0; j < h.nsat; ++j) { /* phaserangerate */
     rate = getbits(rtcm->buff, i, 14);
     i += 14;
-    if (rate != -8192) rr[j] = rate * 1.0;
+    if (rate != -8192) {
+      rr[j] = rate * 1.0;
+    }
   }
   /* decode signal data */
   for (j = 0; j < ncell; ++j) { /* pseudorange */
     prv = getbits(rtcm->buff, i, 20);
     i += 20;
-    if (prv != -524288) pr[j] = prv * P2_29 * RANGE_MS;
+    if (prv != -524288) {
+      pr[j] = prv * P2_29 * RANGE_MS;
+    }
   }
   for (j = 0; j < ncell; ++j) { /* phaserange */
     cpv = getbits(rtcm->buff, i, 24);
     i += 24;
-    if (cpv != -8388608) cp[j] = cpv * P2_31 * RANGE_MS;
+    if (cpv != -8388608) {
+      cp[j] = cpv * P2_31 * RANGE_MS;
+    }
   }
   for (j = 0; j < ncell; ++j) { /* lock time */
     lock[j] = getbitu(rtcm->buff, i, 10);
@@ -2446,7 +2599,9 @@ static int decode_msm7(rtcm_t* rtcm, int sys) {
   for (j = 0; j < ncell; ++j) { /* phaserangerate */
     rrv = getbits(rtcm->buff, i, 15);
     i += 15;
-    if (rrv != -16384) rrf[j] = rrv * 0.0001;
+    if (rrv != -16384) {
+      rrf[j] = rrv * 0.0001;
+    }
   }
   /* save obs data in msm message */
   save_msm_obs(rtcm, sys, &h, r, pr, cp, rr, rrf, cnr, lock, ex, half);
