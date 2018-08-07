@@ -16,6 +16,7 @@
 
 #include "modules/prediction/prediction.h"
 
+#include <algorithm>
 #include <cmath>
 #include <vector>
 
@@ -48,11 +49,41 @@ using ::apollo::common::adapter::AdapterConfig;
 using ::apollo::common::adapter::AdapterManager;
 using ::apollo::common::math::Vec2d;
 using ::apollo::common::time::Clock;
+using ::apollo::common::util::DirectoryExists;
+using ::apollo::common::util::Glob;
 using ::apollo::localization::LocalizationEstimate;
 using ::apollo::perception::PerceptionObstacle;
 using ::apollo::perception::PerceptionObstacles;
 
 std::string Prediction::Name() const { return FLAGS_prediction_module_name; }
+
+std::vector<std::string> Prediction::LoadOfflineBags(
+    const std::string& flag_input) {
+  std::vector<std::string> bag_files;
+  bool is_dir = DirectoryExists(flag_input);
+  if (is_dir) {
+    std::string post_fix = "*.bag";
+    std::vector<std::string> bags = Glob(flag_input + "/*.bag");
+    while (!bags.empty()) {
+      bag_files.insert(bag_files.end(), bags.begin(), bags.end());
+      post_fix = "/*/" + post_fix;
+      bags = Glob(flag_input + post_fix);
+    }
+    std::sort(bag_files.begin(), bag_files.end());
+  } else {
+    std::vector<std::string> bags;
+    apollo::common::util::split(flag_input, ' ', &bags);
+    for (const auto& file : bags) {
+      if (file.empty()) {
+        continue;
+      }
+      if (apollo::common::util::PathExists(file)) {
+        bag_files.push_back(file);
+      }
+    }
+  }
+  return bag_files;
+}
 
 Status Prediction::Init() {
   start_time_ = Clock::NowInSeconds();
@@ -103,21 +134,15 @@ Status Prediction::Init() {
     if (!FeatureOutput::Ready()) {
       return OnError("Feature output is not ready.");
     }
-    std::vector<std::string> offline_bags;
-    int file_count = apollo::common::util::split(FLAGS_prediction_offline_bags,
-                                                 ',', &offline_bags);
-    if (file_count == 0) {
-      ADEBUG << "Get messages from listening ros";
+
+    auto offline_bags = LoadOfflineBags(FLAGS_prediction_offline_bags);
+    if (offline_bags.empty()) {  // use listen to ROS topic mode
       return Status::OK();
     }
-
     std::vector<std::string> topics;
     topics.push_back(FLAGS_perception_obstacle_topic);
     topics.push_back(FLAGS_localization_topic);
     for (const auto& filename : offline_bags) {
-      if (filename.empty()) {
-        continue;
-      }
       AINFO << "Processing: " << filename;
       rosbag::Bag bag;
       bag.open(filename, rosbag::bagmode::Read);

@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,35 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+#ifndef MODULES_MONITOR_HARDWARE_RESOURCE_MONITOR_H_
+#define MODULES_MONITOR_HARDWARE_RESOURCE_MONITOR_H_
 
-/**
- * @file planning_thread_pool.cc
- **/
+#include <string>
+#include <vector>
 
-#include "modules/planning/common/planning_thread_pool.h"
-
-#include "modules/planning/common/planning_gflags.h"
+#include "modules/monitor/common/recurrent_runner.h"
+#include "modules/monitor/proto/monitor_conf.pb.h"
 
 namespace apollo {
-namespace planning {
+namespace monitor {
 
-PlanningThreadPool::PlanningThreadPool() {}
+class ResourceMonitor : public RecurrentRunner {
+ public:
+  explicit ResourceMonitor(const ResourceConf& config);
+  void RunOnce(const double current_time) override;
 
-void PlanningThreadPool::Init() {
-  if (is_initialized) {
-    return;
-  }
-  thread_pool_.reset(
-      new common::util::ThreadPool(FLAGS_max_planning_thread_pool_size));
-  is_initialized = true;
-}
+ private:
+  const ResourceConf& config_;
+};
 
-void PlanningThreadPool::Synchronize() {
-  for (auto& future : futures_) {
-    future.wait();
-  }
-  futures_.clear();
-}
-
-}  // namespace planning
+}  // namespace monitor
 }  // namespace apollo
+
+#endif  // MODULES_MONITOR_HARDWARE_RESOURCE_MONITOR_H_
