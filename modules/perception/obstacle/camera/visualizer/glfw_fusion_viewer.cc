@@ -63,6 +63,21 @@ std::vector<std::vector<int>> GLFWFusionViewer::s_color_table = {
     std::vector<int>{255, 0, 255}, std::vector<int>{255, 255, 0},
     std::vector<int>{255, 128, 0}};
 
+std::vector<cv::Scalar> lane_map_colors = {
+    cv::Scalar(0, 0, 0),  // Background, should never be used
+    cv::Scalar(100, 240, 0),  // L3
+    cv::Scalar(150, 180, 0),  // L2
+    cv::Scalar(250, 120, 0),  // L1
+    cv::Scalar(250, 0, 0),  // L0
+    cv::Scalar(0, 250, 0),  // Center
+    cv::Scalar(0, 0, 250),  // R0
+    cv::Scalar(120, 0, 200),  // R1
+    cv::Scalar(180, 0, 150),  // R2
+    cv::Scalar(240, 0, 100),  // R3
+    cv::Scalar(0, 0, 0),  // Other
+    cv::Scalar(255, 255, 255),  // Left boundary
+    cv::Scalar(255, 255, 255)};  // Right boundary
+
 GLFWFusionViewer::GLFWFusionViewer()
     : init_(false),
       window_(nullptr),
@@ -576,6 +591,13 @@ void GLFWFusionViewer::render() {
   glClear(GL_COLOR_BUFFER_BIT);
 
   frame_count_++;
+  if (use_new_post_) {
+    CalibrationConfigManager* calibration_config_manager =
+      Singleton<CalibrationConfigManager>::get();
+      CameraCalibrationPtr calibrator =
+          calibration_config_manager->get_camera_calibration();
+      car2camera = calibrator->get_car2camera_homography_mat();
+  }
 
   ADEBUG << "GLFWFusionViewer::render()";
   // 1. Top right, draw 3d detection and classification results (lidar tracked
@@ -1149,6 +1171,12 @@ void GLFWFusionViewer::draw_lane_objects_ground() {
                << static_cast<int>(lane_objects_->at(k).spatial);
       }
     }
+
+    cv::Scalar lane_object_color =
+      lane_map_colors[lane_objects_->at(k).newSpatial];
+    glColor3f(static_cast<float>(lane_object_color[2])/255.0,
+              static_cast<float>(lane_object_color[1])/255.0,
+              static_cast<float>(lane_object_color[0])/255.0);
     // if (show_trajectory_) {
     //   glColor3f(1.0f, 0.0f, 0.0f);  // red
     // }
@@ -1248,20 +1276,21 @@ bool GLFWFusionViewer::draw_lane_objects_image(cv::Mat* image_mat) {
   }
 
   // draw lane pixels
-  cv::Scalar lane_map_color(0, 255, 255);  // yellow for lane line mark
   int x_offset = 0;
   int y_offset = lane_start_y_pos_;
   int x0 = x_offset;
   int y0 = y_offset;
   int x1 = image_mat->cols - 1;
   int y1 = image_mat->rows - 1;
-
   for (int h = y0; h <= y1; ++h) {
     for (int w = x0; w <= x1; ++w) {
       int x = static_cast<int>(w * lane_map_scale_);
       int y = static_cast<int>((h - y_offset) * lane_map_scale_);
       if (x >= 0 && x < lane_map.cols && y >= 0 && y < lane_map.rows &&
           lane_map.at<float>(y, x) >= lane_map_threshold_) {
+        cv::Scalar lane_map_color =
+          lane_map_colors[static_cast<int>(round(lane_map.at<float>(y, x)))];
+        // AINFO << lane_map_color;
         for (uint16_t c = 0; c < 3; c++) {
           image_mat->at<cv::Vec3b>(h, w)[c] = static_cast<unsigned char>(
               image_mat->at<cv::Vec3b>(h, w)[c] * alpha_blending +
@@ -1310,30 +1339,74 @@ bool GLFWFusionViewer::draw_lane_objects_image(cv::Mat* image_mat) {
       }
     }
 
+    lane_object_color = lane_map_colors[lane_objects_->at(k).newSpatial];
+
     // Besides the fitted polynomial curves we draw lane markers as well
-    for (auto p = lane_objects_->at(k).image_pos.begin();
+    // Upper-left points in image coord
+    if (!use_new_post_) {
+      for (auto p = lane_objects_->at(k).image_pos.begin();
          p != lane_objects_->at(k).image_pos.end(); ++p) {
-      cv::circle(*image_mat,
-                 cv::Point(static_cast<int>(p->x()), static_cast<int>(p->y())),
-                 4, lane_object_color, -1);
-    }
-
-    // draw polynomial curve
-    float img_y_start =
+         cv::circle(*image_mat,
+          cv::Point(static_cast<int>(p->x()), static_cast<int>(p->y())),
+          3, cv::Scalar(0, 0, 0), -1);
+      }
+      // draw polynomial curve
+      // Upper-left points in image coord
+      float img_y_start =
         static_cast<float>(lane_objects_->at(k).img_curve.x_start);
-    float img_y_end = static_cast<float>(lane_objects_->at(k).img_curve.x_end);
-    float start = std::min(img_y_start, img_y_end);
-    float end = std::max(img_y_start, img_y_end);
-    float a = lane_objects_->at(k).img_curve.a;
-    float b = lane_objects_->at(k).img_curve.b;
-    float c = lane_objects_->at(k).img_curve.c;
-    float d = lane_objects_->at(k).img_curve.d;
+      float img_y_end =
+        static_cast<float>(lane_objects_->at(k).img_curve.x_end);
+      float start = std::min(img_y_start, img_y_end);
+      float end = std::max(img_y_start, img_y_end);
+      float a = lane_objects_->at(k).img_curve.a;
+      float b = lane_objects_->at(k).img_curve.b;
+      float c = lane_objects_->at(k).img_curve.c;
+      float d = lane_objects_->at(k).img_curve.d;
 
-    for (float l = start; l <= end; l++) {
-      cv::circle(*image_mat,
-                 cv::Point(static_cast<int>(GetPolyValue(a, b, c, d, l)),
-                           static_cast<int>(l)),
-                 2, lane_object_color, -1);
+      for (float l = start; l <= end; l++) {
+        cv::circle(*image_mat,
+                   cv::Point(static_cast<int>(GetPolyValue(a, b, c, d, l)),
+                             static_cast<int>(l)),
+                             2, lane_object_color, -1);
+      }
+    } else {
+      for (auto p = lane_objects_->at(k).pos.begin();
+           p != lane_objects_->at(k).pos.end(); ++p) {
+        Eigen::Matrix<double, 3, 1> pos_point(static_cast<double>(p->x()),
+                                            static_cast<double>(p->y()), 1.0);
+        Eigen::Matrix<double, 3, 1> img_point = car2camera * pos_point;
+        int x = static_cast<int>(img_point(0)/img_point(2));
+        int y = static_cast<int>(img_point(1)/img_point(2));
+        if (x > 0 && x < image_mat->cols && y > 0 && y < image_mat->rows) {
+          cv::circle(*image_mat,
+                   cv::Point(static_cast<int>(x), static_cast<int>(y)),
+                   3, lane_object_color, -1);
+        }
+      }
+
+      float pos_y_start =
+        static_cast<float>(lane_objects_->at(k).pos_curve.x_start);
+      float pos_y_end =
+        static_cast<float>(lane_objects_->at(k).pos_curve.x_end);
+      float start = std::min(pos_y_start, pos_y_end);
+      float end = std::max(pos_y_start, pos_y_end);
+      start = start > 15 ? start : 4;
+      float a = lane_objects_->at(k).pos_curve.a;
+      float b = lane_objects_->at(k).pos_curve.b;
+      float c = lane_objects_->at(k).pos_curve.c;
+      float d = lane_objects_->at(k).pos_curve.d;
+
+      for (float l = start; l <= end; l += 0.1) {
+        Eigen::Matrix<double, 3, 1> pos_point(static_cast<double>(l),
+                static_cast<double>(GetPolyValue(a, b, c, d, l)), 1.0);
+        Eigen::Matrix<double, 3, 1> img_point = car2camera * pos_point;
+        int x = static_cast<int>(img_point(0)/img_point(2));
+        int y = static_cast<int>(img_point(1)/img_point(2));
+        if (x > 0 && x < image_mat->cols && y > 0 && y < image_mat->rows) {
+          cv::circle(*image_mat, cv::Point(x, y),
+                   2, lane_object_color - cv::Scalar(25, 25, 25), -1);
+        }
+      }
     }
   }
 
