@@ -64,11 +64,19 @@ std::vector<std::vector<int>> GLFWFusionViewer::s_color_table = {
     std::vector<int>{255, 128, 0}};
 
 std::vector<cv::Scalar> lane_map_colors = {
-    cv::Scalar(0, 0, 0), cv::Scalar(100, 240, 0), cv::Scalar(150, 180, 0),
-    cv::Scalar(250, 120, 0), cv::Scalar(250, 0, 0), cv::Scalar(0, 250, 0),
-    cv::Scalar(0, 0, 250), cv::Scalar(120, 0, 200), cv::Scalar(180, 0, 150),
-    cv::Scalar(240, 0, 100), cv::Scalar(0, 0, 0), cv::Scalar(255, 255, 255),
-    cv::Scalar(255, 255, 255)};
+    cv::Scalar(0, 0, 0),  // Background, should never be used
+    cv::Scalar(100, 240, 0),  // L3
+    cv::Scalar(150, 180, 0),  // L2
+    cv::Scalar(250, 120, 0),  // L1
+    cv::Scalar(250, 0, 0),  // L0
+    cv::Scalar(0, 250, 0),  // Center
+    cv::Scalar(0, 0, 250),  // R0
+    cv::Scalar(120, 0, 200),  // R1
+    cv::Scalar(180, 0, 150),  // R2
+    cv::Scalar(240, 0, 100),  // R3
+    cv::Scalar(0, 0, 0),  // Other
+    cv::Scalar(255, 255, 255),  // Left boundary
+    cv::Scalar(255, 255, 255)};  // Right boundary
 
 GLFWFusionViewer::GLFWFusionViewer()
     : init_(false),
@@ -583,6 +591,13 @@ void GLFWFusionViewer::render() {
   glClear(GL_COLOR_BUFFER_BIT);
 
   frame_count_++;
+  if (use_new_post_) {
+    CalibrationConfigManager* calibration_config_manager =
+      Singleton<CalibrationConfigManager>::get();
+      CameraCalibrationPtr calibrator =
+          calibration_config_manager->get_camera_calibration();
+      car2camera = calibrator->get_car2camera_homography_mat();
+  }
 
   ADEBUG << "GLFWFusionViewer::render()";
   // 1. Top right, draw 3d detection and classification results (lidar tracked
@@ -1261,14 +1276,12 @@ bool GLFWFusionViewer::draw_lane_objects_image(cv::Mat* image_mat) {
   }
 
   // draw lane pixels
-  // cv::Scalar lane_map_color(0, 255, 255);  // yellow for lane line mark
   int x_offset = 0;
   int y_offset = lane_start_y_pos_;
   int x0 = x_offset;
   int y0 = y_offset;
   int x1 = image_mat->cols - 1;
   int y1 = image_mat->rows - 1;
-  lane_map_threshold_ = 0.5;
   for (int h = y0; h <= y1; ++h) {
     for (int w = x0; w <= x1; ++w) {
       int x = static_cast<int>(w * lane_map_scale_);
@@ -1328,7 +1341,6 @@ bool GLFWFusionViewer::draw_lane_objects_image(cv::Mat* image_mat) {
 
     lane_object_color = lane_map_colors[lane_objects_->at(k).newSpatial];
 
-    bool use_new_post_ = false;
     // Besides the fitted polynomial curves we draw lane markers as well
     // Upper-left points in image coord
     if (!use_new_post_) {
@@ -1358,12 +1370,6 @@ bool GLFWFusionViewer::draw_lane_objects_image(cv::Mat* image_mat) {
                              2, lane_object_color, -1);
       }
     } else {
-      CalibrationConfigManager* calibration_config_manager =
-      Singleton<CalibrationConfigManager>::get();
-      CameraCalibrationPtr calibrator =
-          calibration_config_manager->get_camera_calibration();
-      car2camera = calibrator->get_car2camera_homography_mat();
-
       for (auto p = lane_objects_->at(k).pos.begin();
            p != lane_objects_->at(k).pos.end(); ++p) {
         Eigen::Matrix<double, 3, 1> pos_point(static_cast<double>(p->x()),

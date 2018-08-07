@@ -23,6 +23,8 @@
 #include <algorithm>
 #include <utility>
 
+#include "ctpl/ctpl_stl.h"
+
 #include "modules/common/proto/error_code.pb.h"
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/planning/proto/planning_internal.pb.h"
@@ -43,8 +45,8 @@ namespace apollo {
 namespace planning {
 
 using apollo::common::ErrorCode;
-using apollo::common::Status;
 using apollo::common::SLPoint;
+using apollo::common::Status;
 using apollo::common::math::CartesianFrenetConverter;
 using apollo::common::util::MakeSLPoint;
 
@@ -150,23 +152,26 @@ bool DPRoadGraph::GenerateMinCostPath(
 
     graph_nodes.emplace_back();
 
+    ctpl::thread_pool pool(std::min<std::size_t>(
+        FLAGS_max_planning_thread_pool_size, level_points.size()));
     for (size_t i = 0; i < level_points.size(); ++i) {
       const auto &cur_point = level_points[i];
 
       graph_nodes.back().emplace_back(cur_point, nullptr);
       auto &cur_node = graph_nodes.back().back();
       if (FLAGS_enable_multi_thread_in_dp_poly_path) {
-        PlanningThreadPool::instance()->Push(std::bind(
-            &DPRoadGraph::UpdateNode, this, std::ref(prev_dp_nodes), level,
-            total_level, &trajectory_cost, &(front), &(cur_node)));
+        pool.push(std::bind(&DPRoadGraph::UpdateNode, this,
+                            std::ref(prev_dp_nodes), level, total_level,
+                            &trajectory_cost, &(front), &(cur_node)));
 
       } else {
         UpdateNode(prev_dp_nodes, level, total_level, &trajectory_cost, &front,
                    &cur_node);
       }
     }
+
     if (FLAGS_enable_multi_thread_in_dp_poly_path) {
-      PlanningThreadPool::instance()->Synchronize();
+      pool.stop(true);
     }
   }
 

@@ -14,15 +14,19 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <std_msgs/String.h>
+#include "modules/drivers/gnss/parser/rtcm_parser.h"
+
 #include <memory>
+
 #include "ros/include/ros/ros.h"
+#include "std_msgs/String.h"
+
+#include "modules/drivers/gnss/proto/gnss_raw_observation.pb.h"
 
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/drivers/gnss/gnss_gflags.h"
 #include "modules/drivers/gnss/parser/parser.h"
-#include "modules/drivers/gnss/parser/rtcm_parser.h"
-#include "modules/drivers/gnss/proto/gnss_raw_observation.pb.h"
+#include "modules/drivers/gnss/parser/rtcm3_parser.h"
 
 namespace apollo {
 namespace drivers {
@@ -33,7 +37,8 @@ using ::apollo::drivers::gnss::EpochObservation;
 using ::apollo::common::adapter::AdapterManager;
 
 bool RtcmParser::Init() {
-  rtcm_parser_.reset(Parser::CreateRtcmV3(true));
+  rtcm_parser_.reset(new Rtcm3Parser(true));
+
   if (!rtcm_parser_) {
     AERROR << "Failed to create rtcm parser.";
     return false;
