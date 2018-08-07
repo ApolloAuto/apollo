@@ -384,28 +384,44 @@ static void fatalerr(const char* format, ...) {
 * return : satellite number (0:error)
 *-----------------------------------------------------------------------------*/
 extern int satno(int sys, int prn) {
-  if (prn <= 0) return 0;
+  if (prn <= 0) {
+    return 0;
+  }
   switch (sys) {
   case SYS_GPS:
-    if (prn < MINPRNGPS || MAXPRNGPS < prn) return 0;
+    if (prn < MINPRNGPS || MAXPRNGPS < prn) {
+      return 0;
+    }
     return prn - MINPRNGPS + 1;
   case SYS_GLO:
-    if (prn < MINPRNGLO || MAXPRNGLO < prn) return 0;
+    if (prn < MINPRNGLO || MAXPRNGLO < prn) {
+      return 0;
+    }
     return NSATGPS + prn - MINPRNGLO + 1;
   case SYS_GAL:
-    if (prn < MINPRNGAL || MAXPRNGAL < prn) return 0;
+    if (prn < MINPRNGAL || MAXPRNGAL < prn) {
+      return 0;
+    }
     return NSATGPS + NSATGLO + prn - MINPRNGAL + 1;
   case SYS_QZS:
-    if (prn < MINPRNQZS || MAXPRNQZS < prn) return 0;
+    if (prn < MINPRNQZS || MAXPRNQZS < prn) {
+      return 0;
+    }
     return NSATGPS + NSATGLO + NSATGAL + prn - MINPRNQZS + 1;
   case SYS_CMP:
-    if (prn < MINPRNCMP || MAXPRNCMP < prn) return 0;
+    if (prn < MINPRNCMP || MAXPRNCMP < prn) {
+      return 0;
+    }
     return NSATGPS + NSATGLO + NSATGAL + NSATQZS + prn - MINPRNCMP + 1;
   case SYS_LEO:
-    if (prn < MINPRNLEO || MAXPRNLEO < prn) return 0;
+    if (prn < MINPRNLEO || MAXPRNLEO < prn) {
+      return 0;
+    }
     return NSATGPS + NSATGLO + NSATGAL + NSATQZS + NSATCMP + prn - MINPRNLEO + 1;
   case SYS_SBS:
-    if (prn < MINPRNSBS || MAXPRNSBS < prn) return 0;
+    if (prn < MINPRNSBS || MAXPRNSBS < prn) {
+      return 0;
+    }
     return NSATGPS + NSATGLO + NSATGAL + NSATQZS + NSATCMP + NSATLEO + prn - MINPRNSBS + 1;
   }
   return 0;
@@ -471,7 +487,9 @@ extern int satid2no(const char* id) {
     }
     return satno(sys, prn);
   }
-  if (sscanf(id, "%c%d", &code, &prn) < 2) return 0;
+  if (sscanf(id, "%c%d", &code, &prn) < 2) {
+    return 0;
+  }
 
   switch (code) {
   case 'G':
@@ -550,14 +568,24 @@ extern void satno2id(int sat, char* id) {
 extern int satexclude(int sat, int svh, const prcopt_t* opt) {
   int sys = satsys(sat, NULL);
 
-  if (svh < 0) return 1; /* ephemeris unavailable */
+  if (svh < 0) {
+    return 1;  /* ephemeris unavailable */
+  }
 
   if (opt) {
-    if (opt->exsats[sat - 1] == 1) return 1; /* excluded satellite */
-    if (opt->exsats[sat - 1] == 2) return 0; /* included satellite */
-    if (!(sys & opt->navsys)) return 1; /* unselected sat sys */
+    if (opt->exsats[sat - 1] == 1) {
+      return 1;  /* excluded satellite */
+    }
+    if (opt->exsats[sat - 1] == 2) {
+      return 0;  /* included satellite */
+    }
+    if (!(sys & opt->navsys)) {
+      return 1;  /* unselected sat sys */
+    }
   }
-  if (sys == SYS_QZS) svh &= 0xFE; /* mask QZSS LEX health */
+  if (sys == SYS_QZS) {
+    svh &= 0xFE;  /* mask QZSS LEX health */
+  }
   if (svh) {
     trace(3, "unhealthy satellite: sat=%3d svh=%02X\n", sat, svh);
     return 1;
@@ -578,7 +606,9 @@ extern int testsnr(int base, int freq, double el, double snr,
   double minsnr, a;
   int i;
 
-  if (!mask->ena[base] || freq < 0 || freq >= NFREQ) return 0;
+  if (!mask->ena[base] || freq < 0 || freq >= NFREQ) {
+    return 0;
+  }
 
   a = (el * R2D + 5.0) / 10.0;
   i = (int)floor(a);
@@ -603,10 +633,16 @@ extern int testsnr(int base, int freq, double el, double snr,
 *-----------------------------------------------------------------------------*/
 extern unsigned char obs2code(const char* obs, int* freq) {
   int i;
-  if (freq) *freq = 0;
+  if (freq) {
+    *freq = 0;
+  }
   for (i = 1; *obscodes[i]; ++i) {
-    if (strcmp(obscodes[i], obs)) continue;
-    if (freq) *freq = obsfreqs[i];
+    if (strcmp(obscodes[i], obs)) {
+      continue;
+    }
+    if (freq) {
+      *freq = obsfreqs[i];
+    }
     return (unsigned char)i;
   }
   return CODE_NONE;
@@ -620,9 +656,15 @@ extern unsigned char obs2code(const char* obs, int* freq) {
 * notes  : obs codes are based on reference [6] and qzss extension
 *-----------------------------------------------------------------------------*/
 extern char* code2obs(unsigned char code, int* freq) {
-  if (freq) *freq = 0;
-  if (code <= CODE_NONE || MAXCODE < code) return "";
-  if (freq) *freq = obsfreqs[code];
+  if (freq) {
+    *freq = 0;
+  }
+  if (code <= CODE_NONE || MAXCODE < code) {
+    return "";
+  }
+  if (freq) {
+    *freq = obsfreqs[code];
+  }
   return obscodes[code];
 }
 /* set code priority -----------------------------------------------------------
@@ -636,13 +678,27 @@ extern char* code2obs(unsigned char code, int* freq) {
 extern void setcodepri(int sys, int freq, const char* pri) {
   trace(3, "setcodepri:sys=%d freq=%d pri=%s\n", sys, freq, pri);
 
-  if (freq <= 0 || MAXFREQ < freq) return;
-  if (sys & SYS_GPS) strcpy(codepris[0][freq - 1], pri);
-  if (sys & SYS_GLO) strcpy(codepris[1][freq - 1], pri);
-  if (sys & SYS_GAL) strcpy(codepris[2][freq - 1], pri);
-  if (sys & SYS_QZS) strcpy(codepris[3][freq - 1], pri);
-  if (sys & SYS_SBS) strcpy(codepris[4][freq - 1], pri);
-  if (sys & SYS_CMP) strcpy(codepris[5][freq - 1], pri);
+  if (freq <= 0 || MAXFREQ < freq) {
+    return;
+  }
+  if (sys & SYS_GPS) {
+    strcpy(codepris[0][freq - 1], pri);
+  }
+  if (sys & SYS_GLO) {
+    strcpy(codepris[1][freq - 1], pri);
+  }
+  if (sys & SYS_GAL) {
+    strcpy(codepris[2][freq - 1], pri);
+  }
+  if (sys & SYS_QZS) {
+    strcpy(codepris[3][freq - 1], pri);
+  }
+  if (sys & SYS_SBS) {
+    strcpy(codepris[4][freq - 1], pri);
+  }
+  if (sys & SYS_CMP) {
+    strcpy(codepris[5][freq - 1], pri);
+  }
 }
 /* get code priority -----------------------------------------------------------
 * get code priority for multiple codes in a frequency
@@ -688,7 +744,9 @@ extern int getcodepri(int sys, unsigned char code, const char* opt) {
 
   /* parse code options */
   for (p = opt; p && (p = strchr(p, '-')); p++) {
-    if (sscanf(p, optstr, str) < 1 || str[0] != obs[0]) continue;
+    if (sscanf(p, optstr, str) < 1 || str[0] != obs[0]) {
+      continue;
+    }
     return str[1] == obs[1] ? 15 : 0;
   }
   /* search code priority */
@@ -704,12 +762,16 @@ extern int getcodepri(int sys, unsigned char code, const char* opt) {
 extern unsigned int getbitu(const unsigned char* buff, int pos, int len) {
   unsigned int bits = 0;
   int i;
-  for (i = pos; i < pos + len; ++i) bits = (bits << 1) + ((buff[i / 8] >> (7 - i % 8)) & 1u);
+  for (i = pos; i < pos + len; ++i) {
+    bits = (bits << 1) + ((buff[i / 8] >> (7 - i % 8)) & 1u);
+  }
   return bits;
 }
 extern int getbits(const unsigned char* buff, int pos, int len) {
   unsigned int bits = getbitu(buff, pos, len);
-  if (len <= 0 || 32 <= len || !(bits & (1u << (len - 1)))) return (int)bits;
+  if (len <= 0 || 32 <= len || !(bits & (1u << (len - 1)))) {
+    return (int)bits;
+  }
   return (int)(bits | (~0u << len)); /* extend sign */
 }
 /* set unsigned/signed bits ----------------------------------------------------
@@ -780,7 +842,9 @@ extern unsigned int crc24q(const unsigned char* buff, int len) {
 
   trace(4, "crc24q: len=%d\n", len);
 
-  for (i = 0; i < len; ++i) crc = ((crc << 8) & 0xFFFFFF)^tbl_CRC24Q[(crc >> 16)^buff[i]];
+  for (i = 0; i < len; ++i) {
+    crc = ((crc << 8) & 0xFFFFFF)^tbl_CRC24Q[(crc >> 16)^buff[i]];
+  }
   return crc;
 }
 /* crc-16 parity ---------------------------------------------------------------
@@ -819,15 +883,23 @@ extern int decode_word(unsigned int word, unsigned char* data) {
 
   trace(5, "decodeword: word=%08x\n", word);
 
-  if (word & 0x40000000) word ^= 0x3FFFFFC0;
+  if (word & 0x40000000) {
+    word ^= 0x3FFFFFC0;
+  }
 
   for (i = 0; i < 6; ++i) {
     parity <<= 1;
-    for (w = (word & hamming[i]) >> 6; w; w >>= 1) parity ^= w & 1;
+    for (w = (word & hamming[i]) >> 6; w; w >>= 1) {
+      parity ^= w & 1;
+    }
   }
-  if (parity != (word & 0x3F)) return 0;
+  if (parity != (word & 0x3F)) {
+    return 0;
+  }
 
-  for (i = 0; i < 3; ++i) data[i] = (unsigned char)(word >> (22 - i * 8));
+  for (i = 0; i < 3; ++i) {
+    data[i] = (unsigned char)(word >> (22 - i * 8));
+  }
   return 1;
 }
 /* new matrix ------------------------------------------------------------------
@@ -838,7 +910,9 @@ extern int decode_word(unsigned int word, unsigned char* data) {
 extern double* mat(int n, int m) {
   double* p;
 
-  if (n <= 0 || m <= 0) return NULL;
+  if (n <= 0 || m <= 0) {
+    return NULL;
+  }
   if (!(p = (double*)malloc(sizeof(double) * n * m))) {
     fatalerr("matrix memory allocation error: n=%d,m=%d\n", n, m);
   }
@@ -875,7 +949,9 @@ extern double* zeros(int n, int m) {
     }
   }
 #else
-  if (n <= 0 || m <= 0) return NULL;
+  if (n <= 0 || m <= 0) {
+    return NULL;
+  }
   if (!(p = (double*)calloc(sizeof(double), n * m))) {
     fatalerr("matrix memory allocation error: n=%d,m=%d\n", n, m);
   }
@@ -907,7 +983,9 @@ extern double* eye(int n) {
 extern double dot(const double* a, const double* b, int n) {
   double c = 0.0;
 
-  while (--n >= 0) c += a[n] * b[n];
+  while (--n >= 0) {
+    c += a[n] * b[n];
+  }
   return c;
 }
 /* euclid norm -----------------------------------------------------------------
@@ -938,7 +1016,9 @@ extern void cross3(const double* a, const double* b, double* c) {
 *-----------------------------------------------------------------------------*/
 extern int normv3(const double* a, double* b) {
   double r;
-  if ((r = norm(a, 3)) <= 0.0) return 0;
+  if ((r = norm(a, 3)) <= 0.0) {
+    return 0;
+  }
   b[0] = a[0] / r;
   b[1] = a[1] / r;
   b[2] = a[2] / r;
@@ -987,7 +1067,9 @@ extern int matinv(double* A, int n) {
 
   work = mat(lwork, 1);
   dgetrf_(&n, &n, A, &n, ipiv, &info);
-  if (!info) dgetri_(&n, A, &n, ipiv, work, &lwork, &info);
+  if (!info) {
+    dgetri_(&n, A, &n, ipiv, work, &lwork, &info);
+  }
   free(ipiv);
   free(work);
   return info;
@@ -1011,7 +1093,9 @@ extern int solve(const char* tr, const double* A, const double* Y, int n,
   matcpy(B, A, n, n);
   matcpy(X, Y, n, m);
   dgetrf_(&n, &n, B, &n, ipiv, &info);
-  if (!info) dgetrs_((char*)tr, &n, &m, B, &n, ipiv, X, &n, &info);
+  if (!info) {
+    dgetrs_((char*)tr, &n, &m, B, &n, ipiv, X, &n, &info);
+  }
   free(ipiv);
   free(B);
   return info;
@@ -1029,16 +1113,24 @@ extern void matmul(const char* tr, int n, int k, int m, double alpha,
       d = 0.0;
       switch (f) {
       case 1:
-        for (x = 0; x < m; x++) d += A[i + x * n] * B[x + j * m];
+        for (x = 0; x < m; x++) {
+          d += A[i + x * n] * B[x + j * m];
+        }
         break;
       case 2:
-        for (x = 0; x < m; x++) d += A[i + x * n] * B[j + x * k];
+        for (x = 0; x < m; x++) {
+          d += A[i + x * n] * B[j + x * k];
+        }
         break;
       case 3:
-        for (x = 0; x < m; x++) d += A[x + i * m] * B[x + j * m];
+        for (x = 0; x < m; x++) {
+          d += A[x + i * m] * B[x + j * m];
+        }
         break;
       case 4:
-        for (x = 0; x < m; x++) d += A[x + i * m] * B[j + x * k];
+        for (x = 0; x < m; x++) {
+          d += A[x + i * m] * B[j + x * k];
+        }
         break;
       }
       if (beta == 0.0) {
@@ -1071,13 +1163,17 @@ static int ludcmp(double* A, int n, int* indx, double* d) {
   for (j = 0; j < n; ++j) {
     for (i = 0; i < j; ++i) {
       s = A[i + j * n];
-      for (k = 0; k < i; ++k) s -= A[i + k * n] * A[k + j * n];
+      for (k = 0; k < i; ++k) {
+        s -= A[i + k * n] * A[k + j * n];
+      }
       A[i + j * n] = s;
     }
     big = 0.0;
     for (i = j; i < n; ++i) {
       s = A[i + j * n];
-      for (k = 0; k < j; ++k) s -= A[i + k * n] * A[k + j * n];
+      for (k = 0; k < j; ++k) {
+        s -= A[i + k * n] * A[k + j * n];
+      }
       A[i + j * n] = s;
       if ((tmp = vv[i] * fabs(s)) >= big) {
         big = tmp;
@@ -1100,7 +1196,9 @@ static int ludcmp(double* A, int n, int* indx, double* d) {
     }
     if (j != n - 1) {
       tmp = 1.0 / A[j + j * n];
-      for (i = j + 1; i < n; ++i) A[i + j * n] *= tmp;
+      for (i = j + 1; i < n; ++i) {
+        A[i + j * n] *= tmp;
+      }
     }
   }
   free(vv);
@@ -1146,7 +1244,9 @@ extern int matinv(double* A, int n) {
     return -1;
   }
   for (j = 0; j < n; ++j) {
-    for (i = 0; i < n; ++i) A[i + j * n] = 0.0;
+    for (i = 0; i < n; ++i) {
+      A[i + j * n] = 0.0;
+    }
     A[j + j * n] = 1.0;
     lubksb(B, n, indx, A + j * n);
   }
@@ -1161,7 +1261,9 @@ extern int solve(const char* tr, const double* A, const double* Y, int n,
   int info;
 
   matcpy(B, A, n, n);
-  if (!(info = matinv(B, n))) matmul(tr[0] == 'N' ? "NN" : "TN", n, m, n, 1.0, B, Y, 0.0, X);
+  if (!(info = matinv(B, n))) {
+    matmul(tr[0] == 'N' ? "NN" : "TN", n, m, n, 1.0, B, Y, 0.0, X);
+  }
   free(B);
   return info;
 }
@@ -1184,11 +1286,15 @@ extern int lsq(const double* A, const double* y, int n, int m, double* x,
   double* Ay;
   int info;
 
-  if (m < n) return -1;
+  if (m < n) {
+    return -1;
+  }
   Ay = mat(n, 1);
   matmul("NN", n, 1, m, 1.0, A, y, 0.0, Ay); /* Ay=A*y */
   matmul("NT", n, n, m, 1.0, A, A, 0.0, Q); /* Q=A*A' */
-  if (!(info = matinv(Q, n))) matmul("NN", n, 1, n, 1.0, Q, Ay, 0.0, x); /* x=Q^-1*Ay */
+  if (!(info = matinv(Q, n))) {
+    matmul("NN", n, 1, n, 1.0, Q, Ay, 0.0, x);  /* x=Q^-1*Ay */
+  }
   free(Ay);
   return info;
 }
@@ -1249,13 +1355,19 @@ extern int filter(double* x, double* P, const double* H, const double* v,
   H_ = mat(k, m);
   for (i = 0; i < k; ++i) {
     x_[i] = x[ix[i]];
-    for (j = 0; j < k; ++j) P_[i + j * k] = P[ix[i] + ix[j] * n];
-    for (j = 0; j < m; ++j) H_[i + j * k] = H[ix[i] + j * n];
+    for (j = 0; j < k; ++j) {
+      P_[i + j * k] = P[ix[i] + ix[j] * n];
+    }
+    for (j = 0; j < m; ++j) {
+      H_[i + j * k] = H[ix[i] + j * n];
+    }
   }
   info = filter_(x_, P_, H_, v, R, k, m, xp_, Pp_);
   for (i = 0; i < k; ++i) {
     x[ix[i]] = xp_[i];
-    for (j = 0; j < k; ++j) P[ix[i] + ix[j]*n] = Pp_[i + j * k];
+    for (j = 0; j < k; ++j) {
+      P[ix[i] + ix[j]*n] = Pp_[i + j * k];
+    }
   }
   free(ix);
   free(x_);
@@ -1293,7 +1405,9 @@ extern int smoother(const double* xf, const double* Qf, const double* xb,
   matcpy(invQf, Qf, n, n);
   matcpy(invQb, Qb, n, n);
   if (!matinv(invQf, n) && !matinv(invQb, n)) {
-    for (i = 0; i < n * n; ++i) Qs[i] = invQf[i] + invQb[i];
+    for (i = 0; i < n * n; ++i) {
+      Qs[i] = invQf[i] + invQb[i];
+    }
     if (!(info = matinv(Qs, n))) {
       matmul("NN", n, 1, n, 1.0, invQf, xf, 0.0, xx);
       matmul("NN", n, 1, n, 1.0, invQb, xb, 1.0, xx);
@@ -1318,7 +1432,9 @@ extern void matfprint(const double A[], int n, int m, int p, int q, FILE* fp) {
   int i, j;
 
   for (i = 0; i < n; ++i) {
-    for (j = 0; j < m; ++j) fprintf(fp, " %*.*f", p, q, A[i + j * n]);
+    for (j = 0; j < m; ++j) {
+      fprintf(fp, " %*.*f", p, q, A[i + j * n]);
+    }
     fprintf(fp, "\n");
   }
 }
@@ -1335,8 +1451,12 @@ extern double str2num(const char* s, int i, int n) {
   double value;
   char str[256], *p = str;
 
-  if (i < 0 || (int)strlen(s) < i || (int)sizeof(str) - 1 < n) return 0.0;
-  for (s += i; *s && --n >= 0; s++) *p++ = *s == 'd' || *s == 'D' ? 'E' : *s;
+  if (i < 0 || (int)strlen(s) < i || (int)sizeof(str) - 1 < n) {
+    return 0.0;
+  }
+  for (s += i; *s && --n >= 0; s++) {
+    *p++ = *s == 'd' || *s == 'D' ? 'E' : *s;
+  }
   *p = '\0';
   return sscanf(str, "%lf", &value) == 1 ? value : 0.0;
 }
@@ -1351,12 +1471,19 @@ extern int str2time(const char* s, int i, int n, gtime_t* t) {
   double ep[6];
   char str[256], *p = str;
 
-  if (i < 0 || (int)strlen(s) < i || (int)sizeof(str) - 1 < i) return -1;
-  for (s += i; *s && --n >= 0;) *p++ = *s++;
-  *p = '\0';
-  if (sscanf(str, "%lf %lf %lf %lf %lf %lf", ep, ep + 1, ep + 2, ep + 3, ep + 4, ep + 5) < 6)
+  if (i < 0 || (int)strlen(s) < i || (int)sizeof(str) - 1 < i) {
     return -1;
-  if (ep[0] < 100.0) ep[0] += ep[0] < 80.0 ? 2000.0 : 1900.0;
+  }
+  for (s += i; *s && --n >= 0;) {
+    *p++ = *s++;
+  }
+  *p = '\0';
+  if (sscanf(str, "%lf %lf %lf %lf %lf %lf", ep, ep + 1, ep + 2, ep + 3, ep + 4, ep + 5) < 6) {
+    return -1;
+  }
+  if (ep[0] < 100.0) {
+    ep[0] += ep[0] < 80.0 ? 2000.0 : 1900.0;
+  }
   *t = epoch2time(ep);
   return 0;
 }
@@ -1371,7 +1498,9 @@ extern gtime_t epoch2time(const double* ep) {
   gtime_t time = {0};
   int days, sec, year = (int)ep[0], mon = (int)ep[1], day = (int)ep[2];
 
-  if (year < 1970 || 2099 < year || mon < 1 || 12 < mon) return time;
+  if (year < 1970 || 2099 < year || mon < 1 || 12 < mon) {
+    return time;
+  }
 
   /* leap year if year%4==0 in 1901-2099 */
   days = (year - 1970) * 365 + (year - 1969) / 4 + doy[mon - 1] + day - 2 + (year % 4 == 0 && mon >= 3 ? 1 : 0);
@@ -1420,7 +1549,9 @@ extern void time2epoch(gtime_t t, double* ep) {
 extern gtime_t gpst2time(int week, double sec) {
   gtime_t t = epoch2time(gpst0);
 
-  if (sec < -1E9 || 1E9 < sec) sec = 0.0;
+  if (sec < -1E9 || 1E9 < sec) {
+    sec = 0.0;
+  }
   t.time += 86400 * 7 * week + (int)sec;
   t.sec = sec - (int)sec;
   return t;
@@ -1436,7 +1567,9 @@ extern double time2gpst(gtime_t t, int* week) {
   time_t sec = t.time - t0.time;
   int w = (int)(sec / (86400 * 7));
 
-  if (week) *week = w;
+  if (week) {
+    *week = w;
+  }
   return (double)(sec - w * 86400 * 7) + t.sec;
 }
 /* galileo system time to time -------------------------------------------------
@@ -1448,7 +1581,9 @@ extern double time2gpst(gtime_t t, int* week) {
 extern gtime_t gst2time(int week, double sec) {
   gtime_t t = epoch2time(gst0);
 
-  if (sec < -1E9 || 1E9 < sec) sec = 0.0;
+  if (sec < -1E9 || 1E9 < sec) {
+    sec = 0.0;
+  }
   t.time += 86400 * 7 * week + (int)sec;
   t.sec = sec - (int)sec;
   return t;
@@ -1464,7 +1599,9 @@ extern double time2gst(gtime_t t, int* week) {
   time_t sec = t.time - t0.time;
   int w = (int)(sec / (86400 * 7));
 
-  if (week) *week = w;
+  if (week) {
+    *week = w;
+  }
   return (double)(sec - w * 86400 * 7) + t.sec;
 }
 /* beidou time (bdt) to time ---------------------------------------------------
@@ -1476,7 +1613,9 @@ extern double time2gst(gtime_t t, int* week) {
 extern gtime_t bdt2time(int week, double sec) {
   gtime_t t = epoch2time(bdt0);
 
-  if (sec < -1E9 || 1E9 < sec) sec = 0.0;
+  if (sec < -1E9 || 1E9 < sec) {
+    sec = 0.0;
+  }
   t.time += 86400 * 7 * week + (int)sec;
   t.sec = sec - (int)sec;
   return t;
@@ -1492,7 +1631,9 @@ extern double time2bdt(gtime_t t, int* week) {
   time_t sec = t.time - t0.time;
   int w = (int)(sec / (86400 * 7));
 
-  if (week) *week = w;
+  if (week) {
+    *week = w;
+  }
   return (double)(sec - w * 86400 * 7) + t.sec;
 }
 /* add time --------------------------------------------------------------------
@@ -1577,16 +1718,26 @@ extern int read_leaps(const char* file) {
   char buff[256], *p;
   int i, n = 0, ep[6], ls;
 
-  if (!(fp = fopen(file, "r"))) return 0;
+  if (!(fp = fopen(file, "r"))) {
+    return 0;
+  }
 
   while (fgets(buff, sizeof(buff), fp) && n < MAXLEAPS) {
-    if ((p = strchr(buff, '#'))) * p = '\0';
+    if ((p = strchr(buff, '#'))) {
+      * p = '\0';
+    }
     if (sscanf(buff, "%d %d %d %d %d %d %d", ep, ep + 1, ep + 2, ep + 3, ep + 4, ep + 5,
-               &ls) < 7) continue;
-    for (i = 0; i < 6; ++i) leaps[n][i] = ep[i];
+               &ls) < 7) {
+      continue;
+    }
+    for (i = 0; i < 6; ++i) {
+      leaps[n][i] = ep[i];
+    }
     leaps[n++][6] = ls;
   }
-  for (i = 0; i < 7; ++i) leaps[n][i] = 0.0;
+  for (i = 0; i < 7; ++i) {
+    leaps[n][i] = 0.0;
+  }
   fclose(fp);
   return 1;
 }
@@ -1602,7 +1753,9 @@ extern gtime_t gpst2utc(gtime_t t) {
 
   for (i = 0; leaps[i][0] > 0; ++i) {
     tu = timeadd(t, leaps[i][6]);
-    if (timediff(tu, epoch2time(leaps[i])) >= 0.0) return tu;
+    if (timediff(tu, epoch2time(leaps[i])) >= 0.0) {
+      return tu;
+    }
   }
   return t;
 }
@@ -1616,7 +1769,9 @@ extern gtime_t utc2gpst(gtime_t t) {
   int i;
 
   for (i = 0; leaps[i][0] > 0; ++i) {
-    if (timediff(t, epoch2time(leaps[i])) >= 0.0) return timeadd(t, -leaps[i][6]);
+    if (timediff(t, epoch2time(leaps[i])) >= 0.0) {
+      return timeadd(t, -leaps[i][6]);
+    }
   }
   return t;
 }
@@ -1680,8 +1835,11 @@ extern double utc2gmst(gtime_t t, double ut1_utc) {
 extern void time2str(gtime_t t, char* s, int n) {
   double ep[6];
 
-  if (n < 0) n = 0;
-  else if (n > 12) n = 12;
+  if (n < 0) {
+    n = 0;
+  } else if (n > 12) {
+    n = 12;
+  }
   if (1.0 - t.sec < 0.5 / pow(10.0, n)) {
     t.time++;
     t.sec = 0.0;
@@ -1723,7 +1881,9 @@ extern double time2doy(gtime_t t) {
 extern int adjgpsweek(int week) {
   int w;
   (void)time2gpst(utc2gpst(timeget()), &w);
-  if (w < 1560) w = 1560; /* use 2009/12/1 if time is earlier than 2009/12/1 */
+  if (w < 1560) {
+    w = 1560;  /* use 2009/12/1 if time is earlier than 2009/12/1 */
+  }
   return week + (w - week + 512) / 1024 * 1024;
 }
 /* get tick time ---------------------------------------------------------------
@@ -1935,10 +2095,14 @@ static void ast_args(double t, double* f) {
   double tt[4];
   int i, j;
 
-  for (tt[0] = t, i = 1; i < 4; ++i) tt[i] = tt[i - 1] * t;
+  for (tt[0] = t, i = 1; i < 4; ++i) {
+    tt[i] = tt[i - 1] * t;
+  }
   for (i = 0; i < 5; ++i) {
     f[i] = fc[i][0] * 3600.0;
-    for (j = 0; j < 4; ++j) f[i] += fc[i][j + 1] * tt[j];
+    for (j = 0; j < 4; ++j) {
+      f[i] += fc[i][j + 1] * tt[j];
+    }
     f[i] = fmod(f[i] * AS2R, 2.0 * PI);
   }
 }
@@ -2059,7 +2223,9 @@ static void nut_iau1980(double t, const double* f, double* dpsi, double* deps) {
 
   for (i = 0; i < 106; ++i) {
     ang = 0.0;
-    for (j = 0; j < 5; ++j) ang += nut[i][j] * f[j];
+    for (j = 0; j < 5; ++j) {
+      ang += nut[i][j] * f[j];
+    }
     *dpsi += (nut[i][6] + nut[i][7] * t) * sin(ang);
     *deps += (nut[i][8] + nut[i][9] * t) * cos(ang);
   }
@@ -2089,8 +2255,12 @@ extern void eci2ecef(gtime_t tutc, const double* erpv, double* U, double* gmst) 
   trace(3, "eci2ecef: tutc=%s\n", time_str(tutc, 3));
 
   if (fabs(timediff(tutc, tutc_)) < 0.01) { /* read cache */
-    for (i = 0; i < 9; ++i) U[i] = U_[i];
-    if (gmst) *gmst = gmst_;
+    for (i = 0; i < 9; ++i) {
+      U[i] = U_[i];
+    }
+    if (gmst) {
+      *gmst = gmst_;
+    }
     return;
   }
   tutc_ = tutc;
@@ -2137,8 +2307,12 @@ extern void eci2ecef(gtime_t tutc, const double* erpv, double* U, double* gmst) 
   matmul("NN", 3, 3, 3, 1.0, N, P, 0.0, NP);
   matmul("NN", 3, 3, 3, 1.0, R, NP, 0.0, U_); /* U=W*Rz(gast)*N*P */
 
-  for (i = 0; i < 9; ++i) U[i] = U_[i];
-  if (gmst) *gmst = gmst_;
+  for (i = 0; i < 9; ++i) {
+    U[i] = U_[i];
+  }
+  if (gmst) {
+    *gmst = gmst_;
+  }
 
   trace(5, "gmst=%.12f gast=%.12f\n", gmst_, gast);
   trace(5, "P=\n");
@@ -2154,7 +2328,9 @@ extern void eci2ecef(gtime_t tutc, const double* erpv, double* U, double* gmst) 
 static int decodef(char* p, int n, double* v) {
   int i;
 
-  for (i = 0; i < n; ++i) v[i] = 0.0;
+  for (i = 0; i < n; ++i) {
+    v[i] = 0.0;
+  }
   for (i = 0, p = strtok(p, " "); p && i < n; p = strtok(NULL, " ")) {
     v[++i] = atof(p) * 1E-3;
   }
@@ -2247,7 +2423,9 @@ static int readantex(const char* file, pcvs_t* pcvs) {
     return 0;
   }
   while (fgets(buff, sizeof(buff), fp)) {
-    if (strlen(buff) < 60 || strstr(buff + 60, "COMMENT")) continue;
+    if (strlen(buff) < 60 || strstr(buff + 60, "COMMENT")) {
+      continue;
+    }
 
     if (strstr(buff + 60, "START OF ANTENNA")) {
       pcv = pcv0;
@@ -2257,7 +2435,9 @@ static int readantex(const char* file, pcvs_t* pcvs) {
       addpcv(&pcv, pcvs);
       state = 0;
     }
-    if (!state) continue;
+    if (!state) {
+      continue;
+    }
 
     if (strstr(buff + 60, "TYPE / SERIAL NO")) {
       strncpy(pcv.type, buff, 20);
@@ -2268,29 +2448,47 @@ static int readantex(const char* file, pcvs_t* pcvs) {
         pcv.sat = satid2no(pcv.code);
       }
     } else if (strstr(buff + 60, "VALID FROM")) {
-      if (!str2time(buff, 0, 43, &pcv.ts)) continue;
+      if (!str2time(buff, 0, 43, &pcv.ts)) {
+        continue;
+      }
     } else if (strstr(buff + 60, "VALID UNTIL")) {
-      if (!str2time(buff, 0, 43, &pcv.te)) continue;
+      if (!str2time(buff, 0, 43, &pcv.te)) {
+        continue;
+      }
     } else if (strstr(buff + 60, "START OF FREQUENCY")) {
-      if (sscanf(buff + 4, "%d", &f) < 1) continue;
+      if (sscanf(buff + 4, "%d", &f) < 1) {
+        continue;
+      }
       for (i = 0; i < NFREQ; ++i) {
         if (freqs[i] == f) {
           break;
         }
       }
-      if (i < NFREQ) freq = i + 1;
+      if (i < NFREQ) {
+        freq = i + 1;
+      }
     } else if (strstr(buff + 60, "END OF FREQUENCY")) {
       freq = 0;
     } else if (strstr(buff + 60, "NORTH / EAST / UP")) {
-      if (freq < 1 || NFREQ < freq) continue;
-      if (decodef(buff, 3, neu) < 3) continue;
+      if (freq < 1 || NFREQ < freq) {
+        continue;
+      }
+      if (decodef(buff, 3, neu) < 3) {
+        continue;
+      }
       pcv.off[freq - 1][0] = neu[pcv.sat ? 0 : 1]; /* x or e */
       pcv.off[freq - 1][1] = neu[pcv.sat ? 1 : 0]; /* y or n */
       pcv.off[freq - 1][2] = neu[2];       /* z or u */
     } else if (strstr(buff, "NOAZI")) {
-      if (freq < 1 || NFREQ < freq) continue;
-      if ((i = decodef(buff + 8, 19, pcv.var[freq - 1])) <= 0) continue;
-      for (; i < 19; ++i) pcv.var[freq - 1][i] = pcv.var[freq - 1][i - 1];
+      if (freq < 1 || NFREQ < freq) {
+        continue;
+      }
+      if ((i = decodef(buff + 8, 19, pcv.var[freq - 1])) <= 0) {
+        continue;
+      }
+      for (; i < 19; ++i) {
+        pcv.var[freq - 1][i] = pcv.var[freq - 1][i - 1];
+      }
     }
   }
   fclose(fp);
@@ -2314,7 +2512,9 @@ extern int readpcv(const char* file, pcvs_t* pcvs) {
 
   trace(3, "readpcv: file=%s\n", file);
 
-  if (!(ext = strrchr(file, '.'))) ext = "";
+  if (!(ext = strrchr(file, '.'))) {
+    ext = "";
+  }
 
   if (!strcmp(ext, ".atx") || !strcmp(ext, ".ATX")) {
     stat = readantex(file, pcvs);
@@ -2348,9 +2548,15 @@ extern pcv_t* searchpcv(int sat, const char* type, gtime_t time,
   if (sat) { /* search satellite antenna */
     for (i = 0; i < pcvs->n; ++i) {
       pcv = pcvs->pcv + i;
-      if (pcv->sat != sat) continue;
-      if (pcv->ts.time != 0 && timediff(pcv->ts, time) > 0.0) continue;
-      if (pcv->te.time != 0 && timediff(pcv->te, time) < 0.0) continue;
+      if (pcv->sat != sat) {
+        continue;
+      }
+      if (pcv->ts.time != 0 && timediff(pcv->ts, time) > 0.0) {
+        continue;
+      }
+      if (pcv->te.time != 0 && timediff(pcv->te, time) < 0.0) {
+        continue;
+      }
       return pcv;
     }
   } else {
@@ -2370,12 +2576,16 @@ extern pcv_t* searchpcv(int sat, const char* type, gtime_t time,
           break;
         }
       }
-      if (j >= n) return pcv;
+      if (j >= n) {
+        return pcv;
+      }
     }
     /* search receiver antenna without radome */
     for (i = 0; i < pcvs->n; ++i) {
       pcv = pcvs->pcv + i;
-      if (strstr(pcv->type, types[0]) != pcv->type) continue;
+      if (strstr(pcv->type, types[0]) != pcv->type) {
+        continue;
+      }
 
       trace(2, "pcv without radome is used type=%s\n", type);
       return pcv;
@@ -2406,7 +2616,9 @@ extern void readpos(const char* file, const char* rcv, double* pos) {
     return;
   }
   while (np < 2048 && fgets(buff, sizeof(buff), fp)) {
-    if (buff[0] == '%' || buff[0] == '#') continue;
+    if (buff[0] == '%' || buff[0] == '#') {
+      continue;
+    }
     if (sscanf(buff, "%lf %lf %lf %255s", &poss[np][0], &poss[np][1],
                &poss[np][2], str) < 4) {
       continue;
@@ -2417,8 +2629,12 @@ extern void readpos(const char* file, const char* rcv, double* pos) {
   fclose(fp);
   len = (int)strlen(rcv);
   for (i = 0; i < np; ++i) {
-    if (strncmp(stas[i], rcv, len)) continue;
-    for (j = 0; j < 3; ++j) pos[j] = poss[i][j];
+    if (strncmp(stas[i], rcv, len)) {
+      continue;
+    }
+    for (j = 0; j < 3; ++j) {
+      pos[j] = poss[i][j];
+    }
     pos[0] *= D2R;
     pos[1] *= D2R;
     return;
@@ -2432,11 +2648,19 @@ static int readblqrecord(FILE* fp, double* odisp) {
   int i, n = 0;
 
   while (fgets(buff, sizeof(buff), fp)) {
-    if (!strncmp(buff, "$$", 2)) continue;
+    if (!strncmp(buff, "$$", 2)) {
+      continue;
+    }
     if (sscanf(buff, "%lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf",
-               v, v + 1, v + 2, v + 3, v + 4, v + 5, v + 6, v + 7, v + 8, v + 9, v + 10) < 11) continue;
-    for (i = 0; i < 11; ++i) odisp[n + i * 6] = v[i];
-    if (++n == 6) return 1;
+               v, v + 1, v + 2, v + 3, v + 4, v + 5, v + 6, v + 7, v + 8, v + 9, v + 10) < 11) {
+      continue;
+    }
+    for (i = 0; i < 11; ++i) {
+      odisp[n + i * 6] = v[i];
+    }
+    if (++n == 6) {
+      return 1;
+    }
   }
   return 0;
 }
@@ -2460,11 +2684,17 @@ extern int readblq(const char* file, const char* sta, double* odisp) {
     return 0;
   }
   while (fgets(buff, sizeof(buff), fp)) {
-    if (!strncmp(buff, "$$", 2) || strlen(buff) < 2) continue;
+    if (!strncmp(buff, "$$", 2) || strlen(buff) < 2) {
+      continue;
+    }
 
-    if (sscanf(buff + 2, "%16s", name) < 1) continue;
+    if (sscanf(buff + 2, "%16s", name) < 1) {
+      continue;
+    }
     for (p = name; (*p = (char)toupper((int)(*p))); p++) ;
-    if (strcmp(name, staname)) continue;
+    if (strcmp(name, staname)) {
+      continue;
+    }
 
     /* read blq record */
     if (readblqrecord(fp, odisp)) {
@@ -2536,7 +2766,9 @@ extern int geterp(const erp_t* erp, gtime_t time, double* erpv) {
 
   trace(4, "geterp:\n");
 
-  if (erp->n <= 0) return 0;
+  if (erp->n <= 0) {
+    return 0;
+  }
 
   mjd = 51544.5 + (timediff(gpst2utc(time), epoch2time(ep))) / 86400.0;
 
@@ -2589,7 +2821,9 @@ static void uniqeph(nav_t* nav) {
 
   trace(3, "uniqeph: n=%d\n", nav->n);
 
-  if (nav->n <= 0) return;
+  if (nav->n <= 0) {
+    return;
+  }
 
   qsort(nav->eph, nav->n, sizeof(eph_t), cmpeph);
 
@@ -2627,7 +2861,9 @@ static void uniqgeph(nav_t* nav) {
 
   trace(3, "uniqgeph: ng=%d\n", nav->ng);
 
-  if (nav->ng <= 0) return;
+  if (nav->ng <= 0) {
+    return;
+  }
 
   qsort(nav->geph, nav->ng, sizeof(geph_t), cmpgeph);
 
@@ -2666,7 +2902,9 @@ static void uniqseph(nav_t* nav) {
 
   trace(3, "uniqseph: ns=%d\n", nav->ns);
 
-  if (nav->ns <= 0) return;
+  if (nav->ns <= 0) {
+    return;
+  }
 
   qsort(nav->seph, nav->ns, sizeof(seph_t), cmpseph);
 
@@ -2714,8 +2952,12 @@ extern void uniqnav(nav_t* nav) {
 static int cmpobs(const void* p1, const void* p2) {
   obsd_t* q1 = (obsd_t*)p1, *q2 = (obsd_t*)p2;
   double tt = timediff(q1->time, q2->time);
-  if (fabs(tt) > DTTOL) return tt < 0 ? -1 : 1;
-  if (q1->rcv != q2->rcv) return (int)q1->rcv - (int)q2->rcv;
+  if (fabs(tt) > DTTOL) {
+    return tt < 0 ? -1 : 1;
+  }
+  if (q1->rcv != q2->rcv) {
+    return (int)q1->rcv - (int)q2->rcv;
+  }
   return (int)q1->sat - (int)q2->sat;
 }
 /* sort and unique observation data --------------------------------------------
@@ -2728,7 +2970,9 @@ extern int sortobs(obs_t* obs) {
 
   trace(3, "sortobs: nobs=%d\n", obs->n);
 
-  if (obs->n <= 0) return 0;
+  if (obs->n <= 0) {
+    return 0;
+  }
 
   qsort(obs->data, obs->n, sizeof(obsd_t), cmpobs);
 
@@ -2744,7 +2988,9 @@ extern int sortobs(obs_t* obs) {
 
   for (i = n = 0; i < obs->n; i = j, n++) {
     for (j = i + 1; j < obs->n; ++j) {
-      if (timediff(obs->data[j].time, obs->data[i].time) > DTTOL) break;
+      if (timediff(obs->data[j].time, obs->data[i].time) > DTTOL) {
+        break;
+      }
     }
   }
   return n;
@@ -2776,12 +3022,18 @@ extern int readnav(const char* file, nav_t* nav) {
 
   trace(3, "loadnav: file=%s\n", file);
 
-  if (!(fp = fopen(file, "r"))) return 0;
+  if (!(fp = fopen(file, "r"))) {
+    return 0;
+  }
 
   while (fgets(buff, sizeof(buff), fp)) {
     if (!strncmp(buff, "IONUTC", 6)) {
-      for (i = 0; i < 8; ++i) nav->ion_gps[i] = 0.0;
-      for (i = 0; i < 4; ++i) nav->utc_gps[i] = 0.0;
+      for (i = 0; i < 8; ++i) {
+        nav->ion_gps[i] = 0.0;
+      }
+      for (i = 0; i < 4; ++i) {
+        nav->utc_gps[i] = 0.0;
+      }
       nav->leaps = 0;
       sscanf(buff, "IONUTC,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%d",
              &nav->ion_gps[0], &nav->ion_gps[1], &nav->ion_gps[2], &nav->ion_gps[3],
@@ -2795,7 +3047,9 @@ extern int readnav(const char* file, nav_t* nav) {
     } else {
       continue;
     }
-    if (!(sat = satid2no(buff))) continue;
+    if (!(sat = satid2no(buff))) {
+      continue;
+    }
     nav->eph[sat - 1] = eph0;
     nav->eph[sat - 1].sat = sat;
     sscanf(p + 1, "%d,%d,%d,%d,%ld,%ld,%ld,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,"
@@ -2822,10 +3076,14 @@ extern int savenav(const char* file, const nav_t* nav) {
 
   trace(3, "savenav: file=%s\n", file);
 
-  if (!(fp = fopen(file, "w"))) return 0;
+  if (!(fp = fopen(file, "w"))) {
+    return 0;
+  }
 
   for (i = 0; i < MAXSAT; ++i) {
-    if (nav->eph[i].ttr.time == 0) continue;
+    if (nav->eph[i].ttr.time == 0) {
+      continue;
+    }
     satno2id(nav->eph[i].sat, id);
     fprintf(fp, "%s,%d,%d,%d,%d,%d,%d,%d,%.14E,%.14E,%.14E,%.14E,%.14E,%.14E,"
             "%.14E,%.14E,%.14E,%.14E,%.14E,%.14E,%.14E,%.14E,%.14E,%.14E,"
@@ -2934,7 +3192,9 @@ static void traceswap(void) {
     unlock(&lock_trace);
     return;
   }
-  if (fp_trace) fclose(fp_trace);
+  if (fp_trace) {
+    fclose(fp_trace);
+  }
 
   if (!(fp_trace = fopen(path, "w"))) {
     fp_trace = stderr;
@@ -2946,14 +3206,18 @@ extern void traceopen(const char* file) {
   char path[1024];
 
   reppath(file, path, time, "", "");
-  if (!*path || !(fp_trace = fopen(path, "w"))) fp_trace = stderr;
+  if (!*path || !(fp_trace = fopen(path, "w"))) {
+    fp_trace = stderr;
+  }
   strcpy(file_trace, file);
   tick_trace = tickget();
   time_trace = time;
   initlock(&lock_trace);
 }
 extern void traceclose(void) {
-  if (fp_trace && fp_trace != stderr) fclose(fp_trace);
+  if (fp_trace && fp_trace != stderr) {
+    fclose(fp_trace);
+  }
   fp_trace = NULL;
   file_trace[0] = '\0';
 }
@@ -2969,7 +3233,9 @@ extern void trace(int level, const char* format, ...) {
     vfprintf(stderr, format, ap);
     va_end(ap);
   }
-  if (!fp_trace || level > level_trace) return;
+  if (!fp_trace || level > level_trace) {
+    return;
+  }
   traceswap();
   fprintf(fp_trace, "%d ", level);
   va_start(ap, format);
@@ -2980,7 +3246,9 @@ extern void trace(int level, const char* format, ...) {
 extern void tracet(int level, const char* format, ...) {
   va_list ap;
 
-  if (!fp_trace || level > level_trace) return;
+  if (!fp_trace || level > level_trace) {
+    return;
+  }
   traceswap();
   fprintf(fp_trace, "%d %9.3f: ", level, (tickget() - tick_trace) / 1000.0);
   va_start(ap, format);
@@ -2989,7 +3257,9 @@ extern void tracet(int level, const char* format, ...) {
   fflush(fp_trace);
 }
 extern void tracemat(int level, const double* A, int n, int m, int p, int q) {
-  if (!fp_trace || level > level_trace) return;
+  if (!fp_trace || level > level_trace) {
+    return;
+  }
   matfprint(A, n, m, p, q, fp_trace);
   fflush(fp_trace);
 }
@@ -2997,7 +3267,9 @@ extern void traceobs(int level, const obsd_t* obs, int n) {
   char str[64], id[16];
   int i;
 
-  if (!fp_trace || level > level_trace) return;
+  if (!fp_trace || level > level_trace) {
+    return;
+  }
   for (i = 0; i < n; ++i) {
     time2str(obs[i].time, str, 3);
     satno2id(obs[i].sat, id);
@@ -3012,7 +3284,9 @@ extern void tracenav(int level, const nav_t* nav) {
   char s1[64], s2[64], id[16];
   int i;
 
-  if (!fp_trace || level > level_trace) return;
+  if (!fp_trace || level > level_trace) {
+    return;
+  }
   for (i = 0; i < nav->n; ++i) {
     time2str(nav->eph[i].toe, s1, 0);
     time2str(nav->eph[i].ttr, s2, 0);
@@ -3031,7 +3305,9 @@ extern void tracegnav(int level, const nav_t* nav) {
   char s1[64], s2[64], id[16];
   int i;
 
-  if (!fp_trace || level > level_trace) return;
+  if (!fp_trace || level > level_trace) {
+    return;
+  }
   for (i = 0; i < nav->ng; ++i) {
     time2str(nav->geph[i].toe, s1, 0);
     time2str(nav->geph[i].tof, s2, 0);
@@ -3044,7 +3320,9 @@ extern void tracehnav(int level, const nav_t* nav) {
   char s1[64], s2[64], id[16];
   int i;
 
-  if (!fp_trace || level > level_trace) return;
+  if (!fp_trace || level > level_trace) {
+    return;
+  }
   for (i = 0; i < nav->ns; ++i) {
     time2str(nav->seph[i].t0, s1, 0);
     time2str(nav->seph[i].tof, s2, 0);
@@ -3057,7 +3335,9 @@ extern void tracepeph(int level, const nav_t* nav) {
   char s[64], id[16];
   int i, j;
 
-  if (!fp_trace || level > level_trace) return;
+  if (!fp_trace || level > level_trace) {
+    return;
+  }
 
   for (i = 0; i < nav->ne; ++i) {
     time2str(nav->peph[i].time, s, 0);
@@ -3076,7 +3356,9 @@ extern void tracepclk(int level, const nav_t* nav) {
   char s[64], id[16];
   int i, j;
 
-  if (!fp_trace || level > level_trace) return;
+  if (!fp_trace || level > level_trace) {
+    return;
+  }
 
   for (i = 0; i < nav->nc; ++i) {
     time2str(nav->pclk[i].time, s, 0);
@@ -3090,8 +3372,12 @@ extern void tracepclk(int level, const nav_t* nav) {
 }
 extern void traceb(int level, const unsigned char* p, int n) {
   int i;
-  if (!fp_trace || level > level_trace) return;
-  for (i = 0; i < n; ++i) fprintf(fp_trace, "%02X%s", *p++, i % 8 == 7 ? " " : "");
+  if (!fp_trace || level > level_trace) {
+    return;
+  }
+  for (i = 0; i < n; ++i) {
+    fprintf(fp_trace, "%02X%s", *p++, i % 8 == 7 ? " " : "");
+  }
   fprintf(fp_trace, "\n");
 }
 #else
@@ -3128,9 +3414,13 @@ extern int execcmd(const char* cmd) {
   si.cb = sizeof(si);
   sprintf(cmds, "cmd /c %s", cmd);
   if (!CreateProcess(NULL, (LPTSTR)cmds, NULL, NULL, FALSE, CREATE_NO_WINDOW, NULL,
-                     NULL, &si, &info)) return -1;
+                     NULL, &si, &info)) {
+    return -1;
+  }
   WaitForSingleObject(info.hProcess, INFINITE);
-  if (!GetExitCodeProcess(info.hProcess, &stat)) stat = -1;
+  if (!GetExitCodeProcess(info.hProcess, &stat)) {
+    stat = -1;
+  }
   CloseHandle(info.hProcess);
   CloseHandle(info.hThread);
   return (int)stat;
@@ -3168,7 +3458,9 @@ extern int expath(const char* path, char* paths[], int nmax) {
   }
   sprintf(paths[n++], "%s%s", dir, file.cFileName);
   while (FindNextFile(h, &file) && n < nmax) {
-    if (file.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) continue;
+    if (file.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+      continue;
+    }
     sprintf(paths[n++], "%s%s", dir, file.cFileName);
   }
   FindClose(h);
@@ -3185,7 +3477,9 @@ extern int expath(const char* path, char* paths[], int nmax) {
     strncpy(dir, path, p - path + 1);
     dir[p - path + 1] = '\0';
   }
-  if (!(dp = opendir(*dir ? dir : "."))) return 0;
+  if (!(dp = opendir(*dir ? dir : "."))) {
+    return 0;
+  }
   while ((d = readdir(dp))) {
     if (*(d->d_name) == '.') {
       continue;
@@ -3206,7 +3500,9 @@ extern int expath(const char* path, char* paths[], int nmax) {
         break;
       }
     }
-    if (p && n < nmax) sprintf(paths[n++], "%s%s", dir, d->d_name);
+    if (p && n < nmax) {
+      sprintf(paths[n++], "%s%s", dir, d->d_name);
+    }
   }
   closedir(dp);
 #endif
@@ -3220,7 +3516,9 @@ extern int expath(const char* path, char* paths[], int nmax) {
       }
     }
   }
-  for (i = 0; i < n; ++i) trace(3, "expath  : file=%s\n", paths[i]);
+  for (i = 0; i < n; ++i) {
+    trace(3, "expath  : file=%s\n", paths[i]);
+  }
 
   return n;
 }
@@ -3236,7 +3534,9 @@ extern void createdir(const char* path) {
   tracet(3, "createdir: path=%s\n", path);
 
   strcpy(buff, path);
-  if (!(p = strrchr(buff, FILEPATHSEP))) return;
+  if (!(p = strrchr(buff, FILEPATHSEP))) {
+    return;
+  }
   *p = '\0';
 
 #ifdef WIN32
@@ -3251,12 +3551,16 @@ static int repstr(char* str, const char* pat, const char* rep) {
   char buff[1024], *p, *q, *r;
 
   for (p = str, r = buff; *p; p = q + len) {
-    if (!(q = strstr(p, pat))) break;
+    if (!(q = strstr(p, pat))) {
+      break;
+    }
     strncpy(r, p, q - p);
     r += q - p;
     r += sprintf(r, "%s", rep);
   }
-  if (p <= str) return 0;
+  if (p <= str) {
+    return 0;
+  }
   strcpy(r, p);
   strcpy(str, buff);
   return 1;
@@ -3300,9 +3604,15 @@ extern int reppath(const char* path, char* rpath, gtime_t time, const char* rov,
 
   strcpy(rpath, path);
 
-  if (!strstr(rpath, "%")) return 0;
-  if (*rov) stat |= repstr(rpath, "%r", rov);
-  if (*base) stat |= repstr(rpath, "%b", base);
+  if (!strstr(rpath, "%")) {
+    return 0;
+  }
+  if (*rov) {
+    stat |= repstr(rpath, "%r", rov);
+  }
+  if (*base) {
+    stat |= repstr(rpath, "%b", base);
+  }
   if (time.time != 0) {
     time2epoch(time, ep);
     ep0[0] = ep[0];
@@ -3370,20 +3680,29 @@ extern int reppaths(const char* path, char* rpath[], int nmax, gtime_t ts,
 
   trace(3, "reppaths: path =%s nmax=%d rov=%s base=%s\n", path, nmax, rov, base);
 
-  if (ts.time == 0 || te.time == 0 || timediff(ts, te) > 0.0) return 0;
+  if (ts.time == 0 || te.time == 0 || timediff(ts, te) > 0.0) {
+    return 0;
+  }
 
-  if (strstr(path, "%S") || strstr(path, "%M") || strstr(path, "%t")) tint = 900.0;
-  else if (strstr(path, "%h") || strstr(path, "%H")) tint = 3600.0;
+  if (strstr(path, "%S") || strstr(path, "%M") || strstr(path, "%t")) {
+    tint = 900.0;
+  } else if (strstr(path, "%h") || strstr(path, "%H")) {
+    tint = 3600.0;
+  }
 
   tow = time2gpst(ts, &week);
   time = gpst2time(week, floor(tow / tint) * tint);
 
   while (timediff(time, te) <= 0.0 && n < nmax) {
     reppath(path, rpath[n], time, rov, base);
-    if (n == 0 || strcmp(rpath[n], rpath[n - 1])) n++;
+    if (n == 0 || strcmp(rpath[n], rpath[n - 1])) {
+      n++;
+    }
     time = timeadd(time, tint);
   }
-  for (i = 0; i < n; ++i) trace(3, "reppaths: rpath=%s\n", rpath[i]);
+  for (i = 0; i < n; ++i) {
+    trace(3, "reppaths: rpath=%s\n", rpath[i]);
+  }
   return n;
 }
 /* satellite carrier wave length -----------------------------------------------
@@ -3401,21 +3720,34 @@ extern double satwavelen(int sat, int frq, const nav_t* nav) {
   if (sys == SYS_GLO) {
     if (0 <= frq && frq <= 2) {
       for (i = 0; i < nav->ng; ++i) {
-        if (nav->geph[i].sat != sat) continue;
+        if (nav->geph[i].sat != sat) {
+          continue;
+        }
         return CLIGHT / (freq_glo[frq] + dfrq_glo[frq] * nav->geph[i].frq);
       }
     }
   } else if (sys == SYS_CMP) {
-    if (frq == 0) return CLIGHT / FREQ1_CMP;  /* B1 */
-    else if (frq == 1) return CLIGHT / FREQ2_CMP; /* B3 */
-    else if (frq == 2) return CLIGHT / FREQ3_CMP; /* B2 */
+    if (frq == 0) {
+      return CLIGHT / FREQ1_CMP;  /* B1 */
+    } else if (frq == 1) {
+      return CLIGHT / FREQ2_CMP;  /* B3 */
+    } else if (frq == 2) {
+      return CLIGHT / FREQ3_CMP;  /* B2 */
+    }
   } else {
-    if (frq == 0) return CLIGHT / FREQ1;  /* L1/E1 */
-    else if (frq == 1) return CLIGHT / FREQ2; /* L2 */
-    else if (frq == 2) return CLIGHT / FREQ5; /* L5/E5a */
-    else if (frq == 3) return CLIGHT / FREQ6; /* L6/LEX */
-    else if (frq == 4) return CLIGHT / FREQ7; /* E5b */
-    else if (frq == 5) return CLIGHT / FREQ8; /* E5a+b */
+    if (frq == 0) {
+      return CLIGHT / FREQ1;  /* L1/E1 */
+    } else if (frq == 1) {
+      return CLIGHT / FREQ2;  /* L2 */
+    } else if (frq == 2) {
+      return CLIGHT / FREQ5;  /* L5/E5a */
+    } else if (frq == 3) {
+      return CLIGHT / FREQ6;  /* L6/LEX */
+    } else if (frq == 4) {
+      return CLIGHT / FREQ7;  /* E5b */
+    } else if (frq == 5) {
+      return CLIGHT / FREQ8;  /* E5a+b */
+    }
   }
   return 0.0;
 }
@@ -3431,10 +3763,16 @@ extern double geodist(const double* rs, const double* rr, double* e) {
   double r;
   int i;
 
-  if (norm(rs, 3) < RE_WGS84) return -1.0;
-  for (i = 0; i < 3; ++i) e[i] = rs[i] - rr[i];
+  if (norm(rs, 3) < RE_WGS84) {
+    return -1.0;
+  }
+  for (i = 0; i < 3; ++i) {
+    e[i] = rs[i] - rr[i];
+  }
   r = norm(e, 3);
-  for (i = 0; i < 3; ++i) e[i] /= r;
+  for (i = 0; i < 3; ++i) {
+    e[i] /= r;
+  }
   return r + OMGE * (rs[0] * rr[1] - rs[1] * rr[0]) / CLIGHT;
 }
 /* satellite azimuth/elevation angle -------------------------------------------
@@ -3451,7 +3789,9 @@ extern double satazel(const double* pos, const double* e, double* azel) {
   if (pos[2] > -RE_WGS84) {
     ecef2enu(pos, e, enu);
     az = dot(enu, enu, 2) < 1E-12 ? 0.0 : atan2(enu[0], enu[1]);
-    if (az < 0.0) az += 2 * PI;
+    if (az < 0.0) {
+      az += 2 * PI;
+    }
     el = asin(enu[2]);
   }
   if (azel) {
@@ -3475,9 +3815,13 @@ extern void dops(int ns, const double* azel, double elmin, double* dop) {
   double H[4 * MAXSAT], Q[16], cosel, sinel;
   int i, n;
 
-  for (i = 0; i < 4; ++i) dop[i] = 0.0;
+  for (i = 0; i < 4; ++i) {
+    dop[i] = 0.0;
+  }
   for (i = n = 0; i < ns && i < MAXSAT; ++i) {
-    if (azel[1 + i * 2] < elmin || azel[1 + i * 2] <= 0.0) continue;
+    if (azel[1 + i * 2] < elmin || azel[1 + i * 2] <= 0.0) {
+      continue;
+    }
     cosel = cos(azel[1 + i * 2]);
     sinel = sin(azel[1 + i * 2]);
     H[  4 * n] = cosel * sin(azel[i * 2]);
@@ -3485,7 +3829,9 @@ extern void dops(int ns, const double* azel, double elmin, double* dop) {
     H[2 + 4 * n] = sinel;
     H[3 + 4 * n++] = 1.0;
   }
-  if (n < 4) return;
+  if (n < 4) {
+    return;
+  }
 
   matmul("NT", 4, 4, n, 1.0, H, H, 0.0, Q);
   if (!matinv(Q, 4)) {
@@ -3512,16 +3858,23 @@ extern double ionmodel(gtime_t t, const double* ion, const double* pos,
   double tt, f, psi, phi, lam, amp, per, x;
   int week;
 
-  if (pos[2] < -1E3 || azel[1] <= 0) return 0.0;
-  if (norm(ion, 8) <= 0.0) ion = ion_default;
+  if (pos[2] < -1E3 || azel[1] <= 0) {
+    return 0.0;
+  }
+  if (norm(ion, 8) <= 0.0) {
+    ion = ion_default;
+  }
 
   /* earth centered angle (semi-circle) */
   psi = 0.0137 / (azel[1] / PI + 0.11) - 0.022;
 
   /* subionospheric latitude/longitude (semi-circle) */
   phi = pos[0] / PI + psi * cos(azel[0]);
-  if (phi > 0.416) phi = 0.416;
-  else if (phi < -0.416) phi = -0.416;
+  if (phi > 0.416) {
+    phi = 0.416;
+  } else if (phi < -0.416) {
+    phi = -0.416;
+  }
   lam = pos[1] / PI + psi * sin(azel[0]) / cos(phi * PI);
 
   /* geomagnetic latitude (semi-circle) */
@@ -3550,7 +3903,9 @@ extern double ionmodel(gtime_t t, const double* ion, const double* pos,
 * return : ionospheric mapping function
 *-----------------------------------------------------------------------------*/
 extern double ionmapf(const double* pos, const double* azel) {
-  if (pos[2] >= HION) return 1.0;
+  if (pos[2] >= HION) {
+    return 1.0;
+  }
   return 1.0 / cos(asin((RE_WGS84 + pos[2]) / (RE_WGS84 + HION) * sin(PI / 2.0 - azel[1])));
 }
 /* ionospheric pierce point position -------------------------------------------
@@ -3596,7 +3951,9 @@ extern double tropmodel(gtime_t time, const double* pos, const double* azel,
   const double temp0 = 15.0; /* temparature at sea level */
   double hgt, pres, temp, e, z, trph, trpw;
 
-  if (pos[2] < -100.0 || 1E4 < pos[2] || azel[1] <= 0) return 0.0;
+  if (pos[2] < -100.0 || 1E4 < pos[2] || azel[1] <= 0) {
+    return 0.0;
+  }
 
   /* standard atmosphere */
   hgt = pos[2] < 0.0 ? 0.0 : pos[2];
@@ -3613,8 +3970,11 @@ extern double tropmodel(gtime_t time, const double* pos, const double* azel,
 }
 static double interpc(const double coef[], double lat) {
   int i = (int)(lat / 15.0);
-  if (i < 1) return coef[0];
-  else if (i > 4) return coef[4];
+  if (i < 1) {
+    return coef[0];
+  } else if (i > 4) {
+    return coef[4];
+  }
   return coef[i - 1] * (1.0 - lat / 15.0 + i) + coef[i] * (lat / 15.0 - i);
 }
 static double mapf(double el, double a, double b, double c) {
@@ -3644,7 +4004,9 @@ static double nmf(gtime_t time, const double pos[], const double azel[],
   int i;
 
   if (el <= 0.0) {
-    if (mapfw) *mapfw = 0.0;
+    if (mapfw) {
+      *mapfw = 0.0;
+    }
     return 0.0;
   }
   /* year from doy 28, added half a year for southern latitudes */
@@ -3660,7 +4022,9 @@ static double nmf(gtime_t time, const double pos[], const double azel[],
   /* ellipsoidal height is used instead of height above sea level */
   dm = (1.0 / sin(el) - mapf(el, aht[0], aht[1], aht[2])) * hgt / 1E3;
 
-  if (mapfw) *mapfw = mapf(el, aw[0], aw[1], aw[2]);
+  if (mapfw) {
+    *mapfw = mapf(el, aw[0], aw[1], aw[2]);
+  }
 
   return mapf(el, ah[0], ah[1], ah[2]) + dm;
 }
@@ -3687,7 +4051,9 @@ extern double tropmapf(gtime_t time, const double pos[], const double azel[],
         pos[0]*R2D, pos[1]*R2D, pos[2], azel[0]*R2D, azel[1]*R2D);
 
   if (pos[2] < -1000.0 || pos[2] > 20000.0) {
-    if (mapfw) *mapfw = 0.0;
+    if (mapfw) {
+      *mapfw = 0.0;
+    }
     return 0.0;
   }
 #ifdef IERS_MODEL
@@ -3700,7 +4066,9 @@ extern double tropmapf(gtime_t time, const double pos[], const double azel[],
   /* call GMF */
   gmf_(&mjd, &lat, &lon, &hgt, &zd, &gmfh, &gmfw);
 
-  if (mapfw) *mapfw = gmfw;
+  if (mapfw) {
+    *mapfw = gmfw;
+  }
   return gmfh;
 #else
   return nmf(time, pos, azel, mapfw); /* NMF */
@@ -3710,8 +4078,11 @@ extern double tropmapf(gtime_t time, const double pos[], const double azel[],
 static double interpvar(double ang, const double* var) {
   double a = ang / 5.0; /* ang=0-90 */
   int i = (int)a;
-  if (i < 0) return var[0];
-  else if (i >= 18) return var[18];
+  if (i < 0) {
+    return var[0];
+  } else if (i >= 18) {
+    return var[18];
+  }
   return var[i] * (1.0 - a + i) + var[i + 1] * (a - i);
 }
 /* receiver antenna model ------------------------------------------------------
@@ -3735,7 +4106,9 @@ extern void antmodel(const pcv_t* pcv, const double* del, const double* azel,
   e[2] = sin(azel[1]);
 
   for (i = 0; i < NFREQ; ++i) {
-    for (j = 0; j < 3; ++j) off[j] = pcv->off[i][j] + del[j];
+    for (j = 0; j < 3; ++j) {
+      off[j] = pcv->off[i][j] + del[j];
+    }
 
     dant[i] = -dot(off, e, 3) + (opt ? interpvar(90.0 - azel[1] * R2D, pcv->var[i]) : 0.0);
   }
@@ -3832,9 +4205,15 @@ extern void sunmoonpos(gtime_t tutc, const double* erpv, double* rsun,
   eci2ecef(tutc, erpv, U, &gmst_);
 
   /* sun and moon postion in ecef */
-  if (rsun) matmul("NN", 3, 1, 3, 1.0, U, rs, 0.0, rsun);
-  if (rmoon) matmul("NN", 3, 1, 3, 1.0, U, rm, 0.0, rmoon);
-  if (gmst) *gmst = gmst_;
+  if (rsun) {
+    matmul("NN", 3, 1, 3, 1.0, U, rs, 0.0, rsun);
+  }
+  if (rmoon) {
+    matmul("NN", 3, 1, 3, 1.0, U, rm, 0.0, rmoon);
+  }
+  if (gmst) {
+    *gmst = gmst_;
+  }
 }
 /* phase windup correction -----------------------------------------------------
 * phase windup correction (ref [7] 5.1.2)
@@ -3859,16 +4238,30 @@ extern void windupcorr(gtime_t time, const double* rs, const double* rr,
   sunmoonpos(gpst2utc(time), erpv, rsun, NULL, NULL);
 
   /* unit vector satellite to receiver */
-  for (i = 0; i < 3; ++i) r[i] = rr[i] - rs[i];
-  if (!normv3(r, ek)) return;
+  for (i = 0; i < 3; ++i) {
+    r[i] = rr[i] - rs[i];
+  }
+  if (!normv3(r, ek)) {
+    return;
+  }
 
   /* unit vectors of satellite antenna */
-  for (i = 0; i < 3; ++i) r[i] = -rs[i];
-  if (!normv3(r, ezs)) return;
-  for (i = 0; i < 3; ++i) r[i] = rsun[i] - rs[i];
-  if (!normv3(r, ess)) return;
+  for (i = 0; i < 3; ++i) {
+    r[i] = -rs[i];
+  }
+  if (!normv3(r, ezs)) {
+    return;
+  }
+  for (i = 0; i < 3; ++i) {
+    r[i] = rsun[i] - rs[i];
+  }
+  if (!normv3(r, ess)) {
+    return;
+  }
   cross3(ezs, ess, r);
-  if (!normv3(r, eys)) return;
+  if (!normv3(r, eys)) {
+    return;
+  }
   cross3(eys, ezs, exs);
 
   /* unit vectors of receiver antenna */
@@ -3889,11 +4282,16 @@ extern void windupcorr(gtime_t time, const double* rs, const double* rr,
     dr[i] = exr[i] - ek[i] * dot(ek, exr, 3) + ekr[i];
   }
   cosp = dot(ds, dr, 3) / norm(ds, 3) / norm(dr, 3);
-  if (cosp < -1.0) cosp = -1.0;
-  else if (cosp > 1.0) cosp = 1.0;
+  if (cosp < -1.0) {
+    cosp = -1.0;
+  } else if (cosp > 1.0) {
+    cosp = 1.0;
+  }
   ph = acos(cosp) / 2.0 / PI;
   cross3(ds, dr, drs);
-  if (dot(ek, drs, 3) < 0.0) ph = -ph;
+  if (dot(ek, drs, 3) < 0.0) {
+    ph = -ph;
+  }
 
   *phw = ph + floor(*phw - ph + 0.5); /* in cycle */
 }
@@ -3954,7 +4352,9 @@ extern int uncompress(const char* file, char* uncfile) {
   trace(3, "uncompress: file=%s\n", file);
 
   strcpy(tmpfile, file);
-  if (!(p = strrchr(tmpfile, '.'))) return 0;
+  if (!(p = strrchr(tmpfile, '.'))) {
+    return 0;
+  }
 
   /* uncompress by gzip */
   if (!strcmp(p, ".z") || !strcmp(p, ".Z") ||
@@ -4012,10 +4412,14 @@ extern int uncompress(const char* file, char* uncfile) {
 
     if (execcmd(cmd)) {
       remove(uncfile);
-      if (stat) remove(tmpfile);
+      if (stat) {
+        remove(tmpfile);
+      }
       return -1;
     }
-    if (stat) remove(tmpfile);
+    if (stat) {
+      remove(tmpfile);
+    }
     stat = 1;
   }
   trace(3, "uncompress: stat=%d\n", stat);
