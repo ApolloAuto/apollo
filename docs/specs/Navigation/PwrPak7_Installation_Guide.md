@@ -1,6 +1,6 @@
 ## Installation Guide of NovAtel PwrPak7
 
-NovAtel PwrPak is an integrated INS receiver, which has GNSS receiver and IMU included in the device.
+NovAtel PwrPak7 is an integrated INS receiver, which has GNSS receiver and IMU included in the device.
 
 ![novatel_pp7](images/pp7_pic.jpg)
 
