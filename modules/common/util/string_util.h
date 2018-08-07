@@ -22,13 +22,12 @@
 #ifndef MODULES_COMMON_UTIL_STRING_UTIL_H_
 #define MODULES_COMMON_UTIL_STRING_UTIL_H_
 
-#include <boost/algorithm/string.hpp>
-
 #include <functional>
 #include <sstream>
 #include <string>
 #include <vector>
 
+#include "boost/algorithm/string.hpp"
 #include "google/protobuf/stubs/stringprintf.h"
 #include "google/protobuf/stubs/strutil.h"
 
