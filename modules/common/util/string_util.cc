@@ -24,11 +24,11 @@ namespace common {
 namespace util {
 namespace {
 
+static const std::string kBase64Array =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+
 // A table which maps a char to its value in Base64 mode.
 std::vector<int> Base64CodeTable() {
-  static const std::string kBase64Array =
-      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-
   std::vector<int> table(256, -1);
   for (size_t i = 0; i < kBase64Array.length(); ++i) {
     table[kBase64Array[i]] = i;
@@ -37,7 +37,7 @@ std::vector<int> Base64CodeTable() {
 }
 
 const char* tripletBase64(const int triplet) {
-  auto table = Base64CodeTable();
+  auto table = kBase64Array;
   static char result[4];
   result[0] = table[(triplet >> 18) & 0x3f];
   result[1] = table[(triplet >> 12) & 0x3f];
