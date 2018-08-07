@@ -67,8 +67,7 @@ DECLARE_string(localization_sins_pva_topic);
 DECLARE_string(localization_msf_status);
 DECLARE_string(relative_map_topic);
 DECLARE_string(navigation_topic);
-DECLARE_string(voice_detection_request_topic);
-DECLARE_string(voice_detection_response_topic);
+DECLARE_string(audio_capture_topic);
 // For pandora.
 DECLARE_string(pandora_pointcloud_topic);
 DECLARE_string(pandora_camera_front_color_topic);
