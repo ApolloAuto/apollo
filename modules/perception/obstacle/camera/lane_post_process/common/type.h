@@ -82,6 +82,8 @@ const cv::Scalar kGreenYellow(47, 255, 173);
 
 // delay time for visualization
 constexpr int kDelayTime = 0;
+// minimum number to fit a curve
+const size_t minNumPoints = 5;
 
 enum MarkerShapeType {
   POINT = 0,
@@ -231,6 +233,7 @@ struct LaneObject {
   ScalarType longitude_start = std::numeric_limits<ScalarType>::max();
   ScalarType longitude_end = -std::numeric_limits<ScalarType>::max();
   int order = 0;
+  int newSpatial = 0;
   PolyModel model;
   ScalarType lateral_distance = 0.0;
 
