@@ -83,29 +83,31 @@ static const char rcsid[] = "$Id:$";
 #define P2_66 1.355252715606881E-20 /* 2^-66 for BeiDou ephemeris */
 
 /* get two component bits ----------------------------------------------------*/
-static unsigned int getbitu2(const unsigned char *buff, int p1, int l1, int p2,
+static unsigned int getbitu2(const unsigned char* buff, int p1, int l1, int p2,
                              int l2) {
   return (getbitu(buff, p1, l1) << l2) + getbitu(buff, p2, l2);
 }
-static int getbits2(const unsigned char *buff, int p1, int l1, int p2, int l2) {
-  if (getbitu(buff, p1, 1))
+static int getbits2(const unsigned char* buff, int p1, int l1, int p2, int l2) {
+  if (getbitu(buff, p1, 1)) {
     return (int)((getbits(buff, p1, l1) << l2) + getbitu(buff, p2, l2));
-  else
+  } else {
     return (int)getbitu2(buff, p1, l1, p2, l2);
+  }
 }
 /* get three component bits --------------------------------------------------*/
-static unsigned int getbitu3(const unsigned char *buff, int p1, int l1, int p2,
+static unsigned int getbitu3(const unsigned char* buff, int p1, int l1, int p2,
                              int l2, int p3, int l3) {
   return (getbitu(buff, p1, l1) << (l2 + l3)) + (getbitu(buff, p2, l2) << l3) +
          getbitu(buff, p3, l3);
 }
-static int getbits3(const unsigned char *buff, int p1, int l1, int p2, int l2,
+static int getbits3(const unsigned char* buff, int p1, int l1, int p2, int l2,
                     int p3, int l3) {
-  if (getbitu(buff, p1, 1))
+  if (getbitu(buff, p1, 1)) {
     return (int)((getbits(buff, p1, l1) << (l2 + l3)) +
                  (getbitu(buff, p2, l2) << l3) + getbitu(buff, p3, l3));
-  else
+  } else {
     return (int)getbitu3(buff, p1, l1, p2, l2, p3, l3);
+  }
 }
 /* merge two components ------------------------------------------------------*/
 static unsigned int merge_two_u(unsigned int a, unsigned int b, int n) {
@@ -115,7 +117,7 @@ static int merge_two_s(int a, unsigned int b, int n) {
   return (int)((a << n) + b);
 }
 /* get sign-magnitude bits ---------------------------------------------------*/
-static double getbitg(const unsigned char *buff, int pos, int len) {
+static double getbitg(const unsigned char* buff, int pos, int len) {
   double value = getbitu(buff, pos + 1, len - 1);
   return getbitu(buff, pos, 1) ? -value : value;
 }
@@ -128,7 +130,7 @@ static double getbitg(const unsigned char *buff, int pos, int len) {
 *          eph_t    *eph    IO  ephemeris structure
 * return : status (1:ok,0:error)
 *-----------------------------------------------------------------------------*/
-extern int decode_bds_d1(const unsigned char *buff, eph_t *eph) {
+extern int decode_bds_d1(const unsigned char* buff, eph_t* eph) {
   double toc_bds = 0.0;
   double sqrtA = 0.0;
   unsigned int toe1 = 0;
@@ -199,10 +201,11 @@ extern int decode_bds_d1(const unsigned char *buff, eph_t *eph) {
     return 0;
   }
   eph->ttr = bdt2gpst(bdt2time(eph->week, sow1)); /* bdt -> gpst */
-  if (eph->toes > sow1 + 302400.0)
+  if (eph->toes > sow1 + 302400.0) {
     eph->week++;
-  else if (eph->toes < sow1 - 302400.0)
+  } else if (eph->toes < sow1 - 302400.0) {
     eph->week--;
+  }
   eph->toe = bdt2gpst(bdt2time(eph->week, eph->toes)); /* bdt -> gpst */
   eph->toc = bdt2gpst(bdt2time(eph->week, toc_bds));   /* bdt -> gpst */
   return 1;
@@ -217,7 +220,7 @@ extern int decode_bds_d1(const unsigned char *buff, eph_t *eph) {
 *          eph_t    *eph    IO  ephemeris structure
 * return : status (1:ok,0:error)
 *-----------------------------------------------------------------------------*/
-extern int decode_bds_d2(const unsigned char *buff, eph_t *eph) {
+extern int decode_bds_d2(const unsigned char* buff, eph_t* eph) {
   double toc_bds = 0.0;
   double sqrtA = 0.0;
   unsigned int f1p4 = 0;
@@ -354,10 +357,11 @@ extern int decode_bds_d2(const unsigned char *buff, eph_t *eph) {
   eph->omg = merge_two_s(omgp9, omgp10, 5) * P2_31 * SC2RAD;
 
   eph->ttr = bdt2gpst(bdt2time(eph->week, sow1)); /* bdt -> gpst */
-  if (eph->toes > sow1 + 302400.0)
+  if (eph->toes > sow1 + 302400.0) {
     eph->week++;
-  else if (eph->toes < sow1 - 302400.0)
+  } else if (eph->toes < sow1 - 302400.0) {
     eph->week--;
+  }
   eph->toe = bdt2gpst(bdt2time(eph->week, eph->toes)); /* bdt -> gpst */
   eph->toc = bdt2gpst(bdt2time(eph->week, toc_bds));   /* bdt -> gpst */
   return 1;
@@ -372,37 +376,39 @@ extern int decode_bds_d2(const unsigned char *buff, eph_t *eph) {
 *                                  buff[10]: string bit  5- 1 (0 padded)
 * return : status (1:ok,0:error)
 *-----------------------------------------------------------------------------*/
-extern int test_glostr(const unsigned char *buff) {
+extern int test_glostr(const unsigned char* buff) {
   static const unsigned char xor_8bit[256] = {
-      /* xor of 8 bits */
-      0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0, 1, 0, 0, 1, 0, 1, 1, 0,
-      0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1,
-      0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0, 1, 0, 0, 1, 0, 1, 1, 0,
-      0, 1, 1, 0, 1, 0, 0, 1, 0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0,
-      0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0, 1, 0, 0, 1, 0, 1, 1, 0,
-      0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1,
-      0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1,
-      1, 0, 0, 1, 0, 1, 1, 0, 1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1,
-      0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0, 1, 0, 0, 1, 0, 1, 1, 0,
-      0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1,
-      0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0};
+    /* xor of 8 bits */
+    0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0, 1, 0, 0, 1, 0, 1, 1, 0,
+    0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1,
+    0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0, 1, 0, 0, 1, 0, 1, 1, 0,
+    0, 1, 1, 0, 1, 0, 0, 1, 0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0,
+    0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0, 1, 0, 0, 1, 0, 1, 1, 0,
+    0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1,
+    0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1,
+    1, 0, 0, 1, 0, 1, 1, 0, 1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1,
+    0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0, 1, 0, 0, 1, 0, 1, 1, 0,
+    0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1,
+    0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0
+  };
   static const unsigned char mask_hamming[][12] = {
-      /* mask of hamming codes */
-      {0x55, 0x55, 0x5A, 0xAA, 0xAA, 0xAA, 0xB5, 0x55, 0x6A, 0xD8, 0x08},
-      {0x66, 0x66, 0x6C, 0xCC, 0xCC, 0xCC, 0xD9, 0x99, 0xB3, 0x68, 0x10},
-      {0x87, 0x87, 0x8F, 0x0F, 0x0F, 0x0F, 0x1E, 0x1E, 0x3C, 0x70, 0x20},
-      {0x07, 0xF8, 0x0F, 0xF0, 0x0F, 0xF0, 0x1F, 0xE0, 0x3F, 0x80, 0x40},
-      {0xF8, 0x00, 0x0F, 0xFF, 0xF0, 0x00, 0x1F, 0xFF, 0xC0, 0x00, 0x80},
-      {0x00, 0x00, 0x0F, 0xFF, 0xFF, 0xFF, 0xE0, 0x00, 0x00, 0x01, 0x00},
-      {0xFF, 0xFF, 0xF0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0x00},
-      {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xF8}};
+    /* mask of hamming codes */
+    {0x55, 0x55, 0x5A, 0xAA, 0xAA, 0xAA, 0xB5, 0x55, 0x6A, 0xD8, 0x08},
+    {0x66, 0x66, 0x6C, 0xCC, 0xCC, 0xCC, 0xD9, 0x99, 0xB3, 0x68, 0x10},
+    {0x87, 0x87, 0x8F, 0x0F, 0x0F, 0x0F, 0x1E, 0x1E, 0x3C, 0x70, 0x20},
+    {0x07, 0xF8, 0x0F, 0xF0, 0x0F, 0xF0, 0x1F, 0xE0, 0x3F, 0x80, 0x40},
+    {0xF8, 0x00, 0x0F, 0xFF, 0xF0, 0x00, 0x1F, 0xFF, 0xC0, 0x00, 0x80},
+    {0x00, 0x00, 0x0F, 0xFF, 0xFF, 0xFF, 0xE0, 0x00, 0x00, 0x01, 0x00},
+    {0xFF, 0xFF, 0xF0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0x00},
+    {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xF8}
+  };
   unsigned char cs = 0;
   int i = 0;
   int j = 0;
   int n = 0;
 
-  for (i = 0; i < 8; i++) {
-    for (j = 0, cs = 0; j < 11; j++) {
+  for (i = 0; i < 8; ++i) {
+    for (j = 0, cs = 0; j < 11; ++j) {
       cs ^= xor_8bit[buff[j] & mask_hamming[i][j]];
     }
     if (cs) n++;
@@ -422,7 +428,7 @@ extern int test_glostr(const unsigned char *buff) {
 * notes  : geph->tof should be set to frame time witin 1/2 day before calling
 *          geph->frq is set to 0
 *-----------------------------------------------------------------------------*/
-extern int decode_glostr(const unsigned char *buff, geph_t *geph) {
+extern int decode_glostr(const unsigned char* buff, geph_t* geph) {
   double tow = 0.0;
   double tod = 0.0;
   double tof = 0.0;
@@ -532,21 +538,23 @@ extern int decode_glostr(const unsigned char *buff, geph_t *geph) {
   tod = fmod(tow, 86400.0);
   tow -= tod;
   tof = tk_h * 3600.0 + tk_m * 60.0 + tk_s - 10800.0; /* lt->utc */
-  if (tof < tod - 43200.0)
+  if (tof < tod - 43200.0) {
     tof += 86400.0;
-  else if (tof > tod + 43200.0)
+  } else if (tof > tod + 43200.0) {
     tof -= 86400.0;
+  }
   geph->tof = utc2gpst(gpst2time(week, tow + tof));
   toe = tb * 900.0 - 10800.0; /* lt->utc */
-  if (toe < tod - 43200.0)
+  if (toe < tod - 43200.0) {
     toe += 86400.0;
-  else if (toe > tod + 43200.0)
+  } else if (toe > tod + 43200.0) {
     toe -= 86400.0;
+  }
   geph->toe = utc2gpst(gpst2time(week, tow + toe)); /* utc->gpst */
   return 1;
 }
 /* decode gps/qzss navigation data subframe 1 --------------------------------*/
-static int decode_subfrm1(const unsigned char *buff, eph_t *eph) {
+static int decode_subfrm1(const unsigned char* buff, eph_t* eph) {
   double tow = 0.0;
   double toc = 0.0;
   int i = 48;
@@ -593,7 +601,7 @@ static int decode_subfrm1(const unsigned char *buff, eph_t *eph) {
   return 1;
 }
 /* decode gps/qzss navigation data subframe 2 --------------------------------*/
-static int decode_subfrm2(const unsigned char *buff, eph_t *eph) {
+static int decode_subfrm2(const unsigned char* buff, eph_t* eph) {
   double sqrtA = 0.0;
   int i = 48;
 
@@ -626,7 +634,7 @@ static int decode_subfrm2(const unsigned char *buff, eph_t *eph) {
   return 2;
 }
 /* decode gps/qzss navigation data subframe 3 --------------------------------*/
-static int decode_subfrm3(const unsigned char *buff, eph_t *eph) {
+static int decode_subfrm3(const unsigned char* buff, eph_t* eph) {
   double tow = 0.0;
   double toc = 0.0;
   int i = 48;
@@ -674,14 +682,13 @@ static int decode_subfrm3(const unsigned char *buff, eph_t *eph) {
   return 3;
 }
 /* decode gps/qzss almanac ---------------------------------------------------*/
-static void decode_almanac(const unsigned char *buff, int sat, alm_t *alm) {
+static void decode_almanac(const unsigned char* buff, int sat, alm_t* alm) {
   gtime_t toa;
   double deltai = 0.0;
   double sqrtA = 0.0;
   double tt = 0.0;
   int i = 50;
   int f0 = 0;
-  ;
 
   trace(4, "decode_almanac: sat=%2d\n", sat);
 
@@ -723,19 +730,17 @@ static void decode_almanac(const unsigned char *buff, int sat, alm_t *alm) {
   alm[sat - 1].toa = gpst2time(alm[sat - 1].week, alm[sat - 1].toas);
 }
 /* decode gps navigation data subframe 4 -------------------------------------*/
-static void decode_gps_subfrm4(const unsigned char *buff, alm_t *alm,
-                               double *ion, double *utc, int *leaps) {
+static void decode_gps_subfrm4(const unsigned char* buff, alm_t* alm,
+                               double* ion, double* utc, int* leaps) {
   int i = 0;
   int sat = 0;
   int svid = getbitu(buff, 50, 6);
 
   if (25 <= svid && svid <= 32) { /* page 2,3,4,5,7,8,9,10 */
-
     /* decode almanac */
     sat = getbitu(buff, 50, 6);
     if (1 <= sat && sat <= 32) decode_almanac(buff, sat, alm);
   } else if (svid == 63) { /* page 25 */
-
     /* decode as and sv config */
     i = 56;
     for (sat = 1; sat <= 32; sat++) {
@@ -749,7 +754,6 @@ static void decode_gps_subfrm4(const unsigned char *buff, alm_t *alm,
       i += 6;
     }
   } else if (svid == 56) { /* page 18 */
-
     /* decode ion/utc parameters */
     if (ion) {
       i = 56;
@@ -786,7 +790,7 @@ static void decode_gps_subfrm4(const unsigned char *buff, alm_t *alm,
   }
 }
 /* decode gps navigation data subframe 5 -------------------------------------*/
-static void decode_gps_subfrm5(const unsigned char *buff, alm_t *alm) {
+static void decode_gps_subfrm5(const unsigned char* buff, alm_t* alm) {
   double toas = 0.0;
   int i = 0;
   int sat = 0;
@@ -794,12 +798,10 @@ static void decode_gps_subfrm5(const unsigned char *buff, alm_t *alm) {
   int svid = getbitu(buff, 50, 6);
 
   if (1 <= svid && svid <= 24) { /* page 1-24 */
-
     /* decode almanac */
     sat = getbitu(buff, 50, 6);
     if (1 <= sat && sat <= 32) decode_almanac(buff, sat, alm);
   } else if (svid == 51) { /* page 25 */
-
     if (alm) {
       i = 56;
       toas = getbitu(buff, i, 8) * 4096;
@@ -822,8 +824,8 @@ static void decode_gps_subfrm5(const unsigned char *buff, alm_t *alm) {
   }
 }
 /* decode qzss navigation data subframe 4/5 ----------------------------------*/
-static void decode_qzs_subfrm45(const unsigned char *buff, alm_t *alm,
-                                double *ion, double *utc, int *leaps) {
+static void decode_qzs_subfrm45(const unsigned char* buff, alm_t* alm,
+                                double* ion, double* utc, int* leaps) {
   int i = 0;
   int j = 0;
   int sat = 0;
@@ -832,11 +834,9 @@ static void decode_qzs_subfrm45(const unsigned char *buff, alm_t *alm,
   int svid = getbitu(buff, 50, 6);
 
   if (1 <= svid && svid <= 5) { /* qzss almanac */
-
     if (!(sat = satno(SYS_QZS, 192 + svid))) return;
     decode_almanac(buff, sat, alm);
   } else if (svid == 51) { /* qzss health */
-
     if (alm) {
       i = 56;
       toas = getbitu(buff, i, 8) * 4096;
@@ -845,7 +845,7 @@ static void decode_qzs_subfrm45(const unsigned char *buff, alm_t *alm,
       i += 8;
       week = adjgpsweek(week);
 
-      for (j = 0; j < 5; j++) {
+      for (j = 0; j < 5; ++j) {
         if (!(sat = satno(SYS_QZS, 193 + j))) continue;
         alm[sat - 1].toas = toas;
         alm[sat - 1].week = week;
@@ -855,7 +855,6 @@ static void decode_qzs_subfrm45(const unsigned char *buff, alm_t *alm,
       }
     }
   } else if (svid == 56) { /* ion/utc parameters */
-
     if (ion) {
       i = 56;
       ion[0] = getbits(buff, i, 8) * P2_30;
@@ -887,8 +886,8 @@ static void decode_qzs_subfrm45(const unsigned char *buff, alm_t *alm,
   }
 }
 /* decode gps/qzss navigation data subframe 4 --------------------------------*/
-static int decode_subfrm4(const unsigned char *buff, alm_t *alm, double *ion,
-                          double *utc, int *leaps) {
+static int decode_subfrm4(const unsigned char* buff, alm_t* alm, double* ion,
+                          double* utc, int* leaps) {
   int dataid = getbitu(buff, 48, 2);
 
   trace(4, "decode_subfrm4: dataid=%d\n", dataid);
@@ -903,8 +902,8 @@ static int decode_subfrm4(const unsigned char *buff, alm_t *alm, double *ion,
   return 4;
 }
 /* decode gps/qzss navigation data subframe 5 --------------------------------*/
-static int decode_subfrm5(const unsigned char *buff, alm_t *alm, double *ion,
-                          double *utc, int *leaps) {
+static int decode_subfrm5(const unsigned char* buff, alm_t* alm, double* ion,
+                          double* utc, int* leaps) {
   int dataid = getbitu(buff, 48, 2);
 
   trace(4, "decode_subfrm5: dataid=%d\n", dataid);
@@ -934,23 +933,23 @@ static int decode_subfrm5(const unsigned char *buff, alm_t *alm, double *ion,
 *          ion and utc parameters by qzss indicate local iono and qzst-utc
 *          parameters.
 *-----------------------------------------------------------------------------*/
-extern int decode_frame(const unsigned char *buff, eph_t *eph, alm_t *alm,
-                        double *ion, double *utc, int *leaps) {
+extern int decode_frame(const unsigned char* buff, eph_t* eph, alm_t* alm,
+                        double* ion, double* utc, int* leaps) {
   int id = getbitu(buff, 43, 3); /* subframe id */
 
   trace(3, "decodefrm: id=%d\n", id);
 
   switch (id) {
-    case 1:
-      return decode_subfrm1(buff, eph);
-    case 2:
-      return decode_subfrm2(buff, eph);
-    case 3:
-      return decode_subfrm3(buff, eph);
-    case 4:
-      return decode_subfrm4(buff, alm, ion, utc, leaps);
-    case 5:
-      return decode_subfrm5(buff, alm, ion, utc, leaps);
+  case 1:
+    return decode_subfrm1(buff, eph);
+  case 2:
+    return decode_subfrm2(buff, eph);
+  case 3:
+    return decode_subfrm3(buff, eph);
+  case 4:
+    return decode_subfrm4(buff, alm, ion, utc, leaps);
+  case 5:
+    return decode_subfrm5(buff, alm, ion, utc, leaps);
   }
   return 0;
 }
@@ -960,7 +959,7 @@ extern int decode_frame(const unsigned char *buff, eph_t *eph, alm_t *alm,
 * args   : raw_t  *raw   IO     receiver raw data control struct
 * return : status (1:ok,0:memory allocation error)
 *-----------------------------------------------------------------------------*/
-extern int init_raw(raw_t *raw) {
+extern int init_raw(raw_t* raw) {
   const double lam_glo[NFREQ] = {CLIGHT / FREQ1_GLO, CLIGHT / FREQ2_GLO};
   gtime_t time0 = {0};
   obsd_t data0 = {{0}};
@@ -980,19 +979,19 @@ extern int init_raw(raw_t *raw) {
   raw->ephsat = 0;
   raw->sbsmsg = sbsmsg0;
   raw->msgtype[0] = '\0';
-  for (i = 0; i < MAXSAT; i++) {
-    for (j = 0; j < 380; j++) {
+  for (i = 0; i < MAXSAT; ++i) {
+    for (j = 0; j < 380; ++j) {
       raw->subfrm[i][j] = 0;
     }
-    for (j = 0; j < NFREQ; j++) {
+    for (j = 0; j < NFREQ; ++j) {
       raw->lockt[i][j] = 0.0;
     }
-    for (j = 0; j < NFREQ; j++) {
+    for (j = 0; j < NFREQ; ++j) {
       raw->halfc[i][j] = 0;
     }
     raw->icpp[i] = raw->off[i] = raw->prCA[i] = raw->dpCA[i] = 0.0;
   }
-  for (i = 0; i < MAXOBS; i++) {
+  for (i = 0; i < MAXOBS; ++i) {
     raw->freqn[i] = 0;
   }
   raw->lexmsg = lexmsg0;
@@ -1000,7 +999,7 @@ extern int init_raw(raw_t *raw) {
   raw->nbyte = raw->len = 0;
   raw->iod = raw->flag = raw->tbase = raw->outtype = 0;
   raw->tod = -1;
-  for (i = 0; i < MAXRAWLEN; i++) {
+  for (i = 0; i < MAXRAWLEN; ++i) {
     raw->buff[i] = 0;
   }
   raw->opt[0] = '\0';
@@ -1015,12 +1014,12 @@ extern int init_raw(raw_t *raw) {
   raw->nav.geph = NULL;
   raw->nav.seph = NULL;
 
-  if (!(raw->obs.data = (obsd_t *)malloc(sizeof(obsd_t) * MAXOBS)) ||
-      !(raw->obuf.data = (obsd_t *)malloc(sizeof(obsd_t) * MAXOBS)) ||
-      !(raw->nav.eph = (eph_t *)malloc(sizeof(eph_t) * MAXSAT)) ||
-      !(raw->nav.alm = (alm_t *)malloc(sizeof(alm_t) * MAXSAT)) ||
-      !(raw->nav.geph = (geph_t *)malloc(sizeof(geph_t) * NSATGLO)) ||
-      !(raw->nav.seph = (seph_t *)malloc(sizeof(seph_t) * NSATSBS * 2))) {
+  if (!(raw->obs.data = (obsd_t*)malloc(sizeof(obsd_t) * MAXOBS)) ||
+      !(raw->obuf.data = (obsd_t*)malloc(sizeof(obsd_t) * MAXOBS)) ||
+      !(raw->nav.eph = (eph_t*)malloc(sizeof(eph_t) * MAXSAT)) ||
+      !(raw->nav.alm = (alm_t*)malloc(sizeof(alm_t) * MAXSAT)) ||
+      !(raw->nav.geph = (geph_t*)malloc(sizeof(geph_t) * NSATGLO)) ||
+      !(raw->nav.seph = (seph_t*)malloc(sizeof(seph_t) * NSATSBS * 2))) {
     free_raw(raw);
     return 0;
   }
@@ -1030,26 +1029,26 @@ extern int init_raw(raw_t *raw) {
   raw->nav.na = MAXSAT;
   raw->nav.ng = NSATGLO;
   raw->nav.ns = NSATSBS * 2;
-  for (i = 0; i < MAXOBS; i++) {
+  for (i = 0; i < MAXOBS; ++i) {
     raw->obs.data[i] = data0;
   }
-  for (i = 0; i < MAXOBS; i++) {
+  for (i = 0; i < MAXOBS; ++i) {
     raw->obuf.data[i] = data0;
   }
-  for (i = 0; i < MAXSAT; i++) {
+  for (i = 0; i < MAXSAT; ++i) {
     raw->nav.eph[i] = eph0;
   }
-  for (i = 0; i < MAXSAT; i++) {
+  for (i = 0; i < MAXSAT; ++i) {
     raw->nav.alm[i] = alm0;
   }
-  for (i = 0; i < NSATGLO; i++) {
+  for (i = 0; i < NSATGLO; ++i) {
     raw->nav.geph[i] = geph0;
   }
-  for (i = 0; i < NSATSBS * 2; i++) {
+  for (i = 0; i < NSATSBS * 2; ++i) {
     raw->nav.seph[i] = seph0;
   }
-  for (i = 0; i < MAXSAT; i++) {
-    for (j = 0; j < NFREQ; j++) {
+  for (i = 0; i < MAXSAT; ++i) {
+    for (j = 0; j < NFREQ; ++j) {
       if (!(sys = satsys(i + 1, NULL))) continue;
       raw->nav.lam[i][j] = sys == SYS_GLO ? lam_glo[j] : lam_carr[j];
     }
@@ -1058,7 +1057,7 @@ extern int init_raw(raw_t *raw) {
   raw->sta.antdes[0] = raw->sta.antsno[0] = '\0';
   raw->sta.rectype[0] = raw->sta.recver[0] = raw->sta.recsno[0] = '\0';
   raw->sta.antsetup = raw->sta.itrf = raw->sta.deltype = 0;
-  for (i = 0; i < 3; i++) {
+  for (i = 0; i < 3; ++i) {
     raw->sta.pos[i] = raw->sta.del[i] = 0.0;
   }
   raw->sta.hgt = 0.0;
@@ -1069,7 +1068,7 @@ extern int init_raw(raw_t *raw) {
 * args   : raw_t  *raw   IO     receiver raw data control struct
 * return : none
 *-----------------------------------------------------------------------------*/
-extern void free_raw(raw_t *raw) {
+extern void free_raw(raw_t* raw) {
   trace(3, "free_raw:\n");
 
   free(raw->obs.data);
@@ -1100,24 +1099,24 @@ extern void free_raw(raw_t *raw) {
 *                  2: input ephemeris, 3: input sbas message,
 *                  9: input ion/utc parameter, 31: input lex message)
 *-----------------------------------------------------------------------------*/
-extern int input_raw(raw_t *raw, int format, unsigned char data) {
+extern int input_raw(raw_t* raw, int format, unsigned char data) {
   trace(5, "input_raw: format=%d data=0x%02x\n", format, data);
 
   switch (format) {
-    case STRFMT_OEM4:
-      return input_oem4(raw, data);
-    case STRFMT_OEM3:
-      return input_oem3(raw, data);
-      //        case STRFMT_UBX  : return input_ubx  (raw,data);
-      //        case STRFMT_SS2  : return input_ss2  (raw,data);
-      //        case STRFMT_CRES : return input_cres (raw,data);
-      //        case STRFMT_STQ  : return input_stq  (raw,data);
-      //        case STRFMT_GW10 : return input_gw10 (raw,data);
-      //        case STRFMT_JAVAD: return input_javad(raw,data);
-      //        case STRFMT_NVS  : return input_nvs  (raw,data);
-      //        case STRFMT_BINEX: return input_bnx  (raw,data);
-      //        case STRFMT_RT17 : return input_rt17 (raw,data);
-      //        case STRFMT_LEXR : return input_lexr (raw,data);
+  case STRFMT_OEM4:
+    return input_oem4(raw, data);
+  case STRFMT_OEM3:
+    return input_oem3(raw, data);
+    //        case STRFMT_UBX  : return input_ubx  (raw,data);
+    //        case STRFMT_SS2  : return input_ss2  (raw,data);
+    //        case STRFMT_CRES : return input_cres (raw,data);
+    //        case STRFMT_STQ  : return input_stq  (raw,data);
+    //        case STRFMT_GW10 : return input_gw10 (raw,data);
+    //        case STRFMT_JAVAD: return input_javad(raw,data);
+    //        case STRFMT_NVS  : return input_nvs  (raw,data);
+    //        case STRFMT_BINEX: return input_bnx  (raw,data);
+    //        case STRFMT_RT17 : return input_rt17 (raw,data);
+    //        case STRFMT_LEXR : return input_lexr (raw,data);
   }
   return 0;
 }
@@ -1128,24 +1127,24 @@ extern int input_raw(raw_t *raw, int format, unsigned char data) {
 *          FILE   *fp    I      file pointer
 * return : status(-2: end of file/format error, -1...31: same as above)
 *-----------------------------------------------------------------------------*/
-extern int input_rawf(raw_t *raw, int format, FILE *fp) {
+extern int input_rawf(raw_t* raw, int format, FILE* fp) {
   trace(4, "input_rawf: format=%d\n", format);
 
   switch (format) {
-    case STRFMT_OEM4:
-      return input_oem4f(raw, fp);
-    case STRFMT_OEM3:
-      return input_oem3f(raw, fp);
-      //        case STRFMT_UBX  : return input_ubxf  (raw,fp);
-      //        case STRFMT_SS2  : return input_ss2f  (raw,fp);
-      //        case STRFMT_CRES : return input_cresf (raw,fp);
-      //        case STRFMT_STQ  : return input_stqf  (raw,fp);
-      //        case STRFMT_GW10 : return input_gw10f (raw,fp);
-      //        case STRFMT_JAVAD: return input_javadf(raw,fp);
-      //        case STRFMT_NVS  : return input_nvsf  (raw,fp);
-      //        case STRFMT_BINEX: return input_bnxf  (raw,fp);
-      //        case STRFMT_RT17 : return input_rt17f (raw,fp);
-      //        case STRFMT_LEXR : return input_lexrf (raw,fp);
+  case STRFMT_OEM4:
+    return input_oem4f(raw, fp);
+  case STRFMT_OEM3:
+    return input_oem3f(raw, fp);
+    //        case STRFMT_UBX  : return input_ubxf  (raw,fp);
+    //        case STRFMT_SS2  : return input_ss2f  (raw,fp);
+    //        case STRFMT_CRES : return input_cresf (raw,fp);
+    //        case STRFMT_STQ  : return input_stqf  (raw,fp);
+    //        case STRFMT_GW10 : return input_gw10f (raw,fp);
+    //        case STRFMT_JAVAD: return input_javadf(raw,fp);
+    //        case STRFMT_NVS  : return input_nvsf  (raw,fp);
+    //        case STRFMT_BINEX: return input_bnxf  (raw,fp);
+    //        case STRFMT_RT17 : return input_rt17f (raw,fp);
+    //        case STRFMT_LEXR : return input_lexrf (raw,fp);
   }
   return -2;
 }
