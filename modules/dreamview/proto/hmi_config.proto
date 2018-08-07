@@ -13,7 +13,17 @@ message Component {
   optional string display_name = 1;
   // If the path is given, HMI will check if it's available.
   optional string path = 2;
-  map<string, string> supported_commands = 3;
+
+  message Command {
+    // Command to be executed for debugging purpose.
+    optional string debug_cmd = 1;
+
+    // Command to be executed for production, which could be more robust with
+    // recovery mechanism such as supervisor tool.
+    // HMI will fallback to the debug command if it's not provided.
+    optional string prod_cmd = 2;
+  }
+  map<string, Command> commands = 3;
 }
 
 message Mode {
