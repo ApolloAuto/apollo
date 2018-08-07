@@ -40,4 +40,11 @@ Without an IMU, the localization would depend on GPS system which only updates o
 
 HDL64 provides a much denser point cloud than VLP-16 can. It gives a further detection range for obstacles. That is why we recommend it in the reference design. Whether VLP-16 works for your project, you will need to find out. 
 
+---
+## Is HDL32 (Velodyne 32 line LiDAR) compatible with Apollo?
+
+Apollo can work successfully for HDL32 Lidars. You could follow the [Puck Series Guide](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/Lidar/VLP_Series_Installation_Guide.md) alongwith the following [modification](https://github.com/ApolloAuto/apollo/commit/df37d2c79129434fb90353950a65671278a4229e#diff-cb9767ab272f7dc5b3e0d870a324be51). However, please note that you would need to change the intrinsics for HDL32 in order to avoid [the following error](https://github.com/ApolloAuto/apollo/issues/5244). 
+
+---
+
 **More Hardware FAQs to follow.**
