@@ -156,30 +156,32 @@ void Crosswalk::MakeDecisions(Frame* const frame,
         continue;
       }
 
+      const auto& reference_line = reference_line_info->reference_line();
+
       common::SLPoint obstacle_sl_point;
-      reference_line_info->reference_line().XYToSL(
-          {perception_obstacle.position().x(),
-           perception_obstacle.position().y()},
-          &obstacle_sl_point);
+      reference_line.XYToSL({perception_obstacle.position().x(),
+                             perception_obstacle.position().y()},
+                            &obstacle_sl_point);
       double obstacle_l_distance = std::fabs(obstacle_sl_point.l());
 
-      const Box2d& obstacle_box =
-          path_obstacle->obstacle()->PerceptionBoundingBox();
-      bool is_on_road =
-          reference_line_info->reference_line().HasOverlap(obstacle_box);
-      bool is_path_cross =
+      const bool is_on_lane = reference_line.IsOnLane(
+          path_obstacle->PerceptionSLBoundary());
+      const bool is_on_road = reference_line.IsOnRoad(
+          path_obstacle->PerceptionSLBoundary());
+      const bool is_path_cross =
           !path_obstacle->reference_line_st_boundary().IsEmpty();
 
       ADEBUG << "obstacle_id[" << obstacle_id << "] type[" << obstacle_type_name
              << "] crosswalk_id[" << crosswalk_id << "] obstacle_l["
              << obstacle_sl_point.l() << "] within_expanded_crosswalk_area["
-             << in_expanded_crosswalk << "] is_on_road[" << is_on_road
+             << in_expanded_crosswalk << "] is_on_lane[" << is_on_lane
+             << "] is_on_road[" << is_on_road
              << "] is_path_cross[" << is_path_cross << "]";
 
       bool stop = false;
       if (obstacle_l_distance >= config_.crosswalk().stop_loose_l_distance()) {
         // (1) when obstacle_l_distance is big enough(>= loose_l_distance),
-        //     STOP only if path crosses
+        //     STOP only if paths crosses
         if (is_path_cross) {
           stop = true;
           ADEBUG << "need_stop(>=l2): obstacle_id[" << obstacle_id << "] type["
@@ -188,37 +190,48 @@ void Crosswalk::MakeDecisions(Frame* const frame,
         }
       } else if (obstacle_l_distance <=
                  config_.crosswalk().stop_strick_l_distance()) {
-        // (2) when l_distance <= strick_l_distance + on_road, always STOP
-        if (is_on_road && obstacle_sl_point.s() > adc_end_edge_s) {
-          stop = true;
-          ADEBUG << "need_stop(<=11): obstacle_id[" << obstacle_id << "] type["
-                 << obstacle_type_name << "] s[" << obstacle_sl_point.s()
-                 << "] adc_end_edge_s[ " << adc_end_edge_s
-                 << "] crosswalk_id[" << crosswalk_id << "] ON_ROAD";
-        } else if (is_path_cross) {
-          // (3) when l_distance <= strick_l_distance + not on_road,
-          //     STOP only if path crosses
-          stop = true;
-          ADEBUG << "need_stop(<=11): obstacle_id[" << obstacle_id << "] type["
-              << obstacle_type_name << "] crosswalk_id[" << crosswalk_id
-              << "] PATH_CRSOSS";
-        } else {
-          // (4) when the pedestrian is moving toward the ego vehicle, stop
-          const auto obstacle_v = Vec2d(
-              perception_obstacle.velocity().x(),
-              perception_obstacle.velocity().y());
-          auto obs_to_adc =
-              Vec2d(reference_line_info->AdcPlanningPoint().path_point().x(),
-                    reference_line_info->AdcPlanningPoint().path_point().y()) -
-              Vec2d(perception_obstacle.position().x(),
-                    perception_obstacle.position().y());
-
-          const double kEpsilon = 1e-6;
-          if (obstacle_v.InnerProd(obs_to_adc) > kEpsilon) {
+        if (is_on_road) {
+          // (2) when l_distance <= strick_l_distance + on_road
+          //     always STOP
+          if (obstacle_sl_point.s() > adc_end_edge_s) {
             stop = true;
             ADEBUG << "need_stop(<=11): obstacle_id[" << obstacle_id
                 << "] type[" << obstacle_type_name
-                << "] crosswalk_id[" << crosswalk_id << "] MOVING_TOWARD_ADC";
+                << "] s[" << obstacle_sl_point.s()
+                << "] adc_end_edge_s[ " << adc_end_edge_s
+                << "] crosswalk_id[" << crosswalk_id << "] ON_ROAD";
+          }
+        } else {
+          // (3) when l_distance <= strick_l_distance
+          //     + NOT on_road(i.e. on crosswalk/median etc)
+          //     STOP if paths cross
+          if (is_path_cross) {
+            stop = true;
+            ADEBUG << "need_stop(<=11): obstacle_id["
+                << obstacle_id << "] type[" << obstacle_type_name
+                << "] crosswalk_id[" << crosswalk_id << "] PATH_CRSOSS";
+          } else {
+            // (4) when l_distance <= strick_l_distance
+            //     + NOT on_road(i.e. on crosswalk/median etc)
+            //     STOP if he pedestrian is moving toward the ego vehicle
+            const auto obstacle_v = Vec2d(
+                perception_obstacle.velocity().x(),
+                perception_obstacle.velocity().y());
+            const auto adc_path_point =
+                Vec2d(reference_line_info->AdcPlanningPoint().path_point().x(),
+                      reference_line_info->AdcPlanningPoint().path_point().y());
+            const auto ovstacle_position =
+                Vec2d(perception_obstacle.position().x(),
+                      perception_obstacle.position().y());
+            auto obs_to_adc = adc_path_point - ovstacle_position;
+            const double kEpsilon = 1e-6;
+            if (obstacle_v.InnerProd(obs_to_adc) > kEpsilon) {
+              stop = true;
+              ADEBUG << "need_stop(<=11): obstacle_id[" << obstacle_id
+                  << "] type[" << obstacle_type_name
+                  << "] crosswalk_id[" << crosswalk_id
+                  << "] MOVING_TOWARD_ADC";
+            }
           }
         }
       } else {
@@ -235,8 +248,9 @@ void Crosswalk::MakeDecisions(Frame* const frame,
             << "] crosswalk_id[" << crosswalk_id << "] USE_PREVIOUS_DECISION";
       }
 
-      if (stop && !is_on_road) {
-        // check on stop timer for static pedestrians/bicycles if NOT on road
+      if (stop && !is_on_lane) {
+        // check on stop timer for static pedestrians/bicycles
+        // if NOT on_lane ahead of adc
         const double kMaxStopSpeed = 0.3;
         auto obstacle_speed = std::hypot(perception_obstacle.velocity().x(),
                                          perception_obstacle.velocity().y());
