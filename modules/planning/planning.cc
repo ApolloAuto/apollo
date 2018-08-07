@@ -195,6 +195,7 @@ void Planning::OnTimer(const ros::TimerEvent&) {
 
   if (FLAGS_planning_test_mode && FLAGS_test_duration > 0.0 &&
       Clock::NowInSeconds() - start_time_ > FLAGS_test_duration) {
+    Stop();
     ros::shutdown();
   }
 }
