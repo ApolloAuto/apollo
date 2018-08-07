@@ -64,40 +64,6 @@ cc_library(
 )
 
 cc_library(
-    name = "threadpool",
-    hdrs = ["threadpool.h"],
-)
-
-cc_test(
-    name = "threadpool_test",
-    size = "small",
-    srcs = [
-        "threadpool_test.cc",
-    ],
-    deps = [
-        ":threadpool",
-        "@gtest//:main",
-    ],
-)
-
-cc_library(
-    name = "ctpl_stl",
-    hdrs = ["ctpl_stl.h"],
-)
-
-cc_test(
-    name = "ctpl_stl_test",
-    size = "small",
-    srcs = [
-        "ctpl_stl_test.cc",
-    ],
-    deps = [
-        "//modules/common/util:ctpl_stl",
-        "@gtest//:main",
-    ],
-)
-
-cc_library(
     name = "color",
     hdrs = ["color.h"],
 )
