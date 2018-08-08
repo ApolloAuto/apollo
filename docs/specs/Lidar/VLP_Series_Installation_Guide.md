@@ -6,9 +6,9 @@
 This guide covers the installation procedure of Puck(VLP16), Puck LITE, Puck High-Res, Ultra Puck(VLP-32c) and HDL32.
 You can connect to the LiDAR via an interface box which is included in the package.
 
-```
-Since the interface box was first introduced with the HDL32 product line, this installation guide also works for HDL32 Lidars.
-```
+
+Since the interface box was first introduced with the **HDL32** product line, this installation guide also works for HDL32 Lidars alongwith the following [modification](https://github.com/ApolloAuto/apollo/commit/df37d2c79129434fb90353950a65671278a4229e#diff-cb9767ab272f7dc5b3e0d870a324be51). However, please note that you would need to change the intrinsics for HDL32. 
+
 #### Mounting
 
 A customized mounting structure(s) is required to successfully mount a Puck Series LiDAR on top of a vehicle. This structure must provide rigid support to the LiDAR system. If only one LiDAR is used in the system, the mount needs to raise the LiDAR to a certain height to avoid the laser beams being blocked by the vehicle's body. If multiple LiDAR's are to be installed, the mounting structure(s) needs to provide suitable LiDAR configurations including positioning and tilting of the LiDARs as required by your system. Please find the detailed tilt angle of each laser beam on the individual LiDAR's manual when deciding the mounting of the LiDARs. Or you could also consult with Apollo engineers for the configurations that we have used and tested successfully.

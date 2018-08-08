@@ -3617,7 +3617,8 @@
                     "CITY_DRIVING": 2,
                     "BIKING": 3,
                     "SIDEWALK": 4,
-                    "PARKING": 5
+                    "PARKING": 5,
+                    "SHOULDER": 6
                   }
                 },
                 "LaneTurn": {

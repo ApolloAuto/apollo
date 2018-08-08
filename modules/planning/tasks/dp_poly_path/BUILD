@@ -22,7 +22,6 @@ cc_library(
         "//modules/planning/common:obstacle",
         "//modules/planning/common:path_decision",
         "//modules/planning/common:planning_gflags",
-        "//modules/planning/common:planning_thread_pool",
         "//modules/planning/common/path:path_data",
         "//modules/planning/common/speed:speed_data",
         "//modules/planning/math/curve1d:polynomial_curve1d",
