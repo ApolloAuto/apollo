@@ -55,7 +55,7 @@ class YoloCameraDetector : public BaseCameraDetector {
                  std::vector<std::shared_ptr<VisualObject>> *objects,
                  cv::Mat *mask);
 
-  bool Lanetask(const cv::Mat &frame, cv::Mat *mask);
+  bool Lanetask(const cv::Mat &frame, std::vector<cv::Mat> *predictions);
 
   bool Extract(std::vector<std::shared_ptr<VisualObject>> *objects) {
     for (auto &extractor : extractors_) {
@@ -132,6 +132,7 @@ class YoloCameraDetector : public BaseCameraDetector {
   int lane_output_height_lane_ = 0;
   int lane_output_width_lane_ = 0;
   int ignored_height_ = 0;
+  int num_lanes = 13;
 
   yolo_camera_detector_config::ModelConfigs config_;
 };

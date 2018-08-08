@@ -52,7 +52,6 @@ cc_library(
         "//modules/common/status",
         "//modules/planning/common:path_decision",
         "//modules/planning/common:path_obstacle",
-        "//modules/planning/common:planning_thread_pool",
         "//modules/planning/common/speed:speed_data",
         "//modules/planning/proto:planning_config_proto",
         "//modules/planning/proto:planning_proto",

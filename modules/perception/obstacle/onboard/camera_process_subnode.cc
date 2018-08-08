@@ -124,11 +124,32 @@ void CameraProcessSubnode::ImgCallback(const sensor_msgs::Image &message) {
 
   PERF_BLOCK_END("CameraProcessSubnode_Image_Preprocess");
   detector_->Multitask(img, CameraDetectorOptions(), &objects, &mask);
-  mask = mask*2;
+
+  cv::Mat mask_color(mask.rows, mask.cols, CV_32FC1);
   if (FLAGS_use_whole_lane_line) {
-    cv::Mat mask1;
-    detector_->Lanetask(img, &mask1);
-    mask += mask1;
+    std::vector<cv::Mat> masks;
+    detector_->Lanetask(img, &masks);
+    mask_color.setTo(cv::Scalar(0));
+    ln_msk_threshold_ = 0.9;
+    for (int c = 0; c < num_lines; ++c) {
+      for (int h = 0; h < masks[c].rows; ++h) {
+        for (int w = 0; w < masks[c].cols; ++w) {
+          if (masks[c].at<float>(h, w) >= ln_msk_threshold_) {
+            mask_color.at<float>(h, w) = static_cast<float>(c);
+          }
+        }
+      }
+    }
+  } else {
+    mask.copyTo(mask_color);
+    ln_msk_threshold_ = 0.5;
+    for (int h = 0; h < mask_color.rows; ++h) {
+      for (int w = 0; w < mask_color.cols; ++w) {
+        if (mask_color.at<float>(h, w) >= ln_msk_threshold_) {
+          mask_color.at<float>(h, w) = static_cast<float>(5);
+        }
+      }
+    }
   }
 
   PERF_BLOCK_END("CameraProcessSubnode_detector_");
@@ -158,12 +179,12 @@ void CameraProcessSubnode::ImgCallback(const sensor_msgs::Image &message) {
 
   SharedDataPtr<CameraItem> camera_item_ptr(new CameraItem);
   camera_item_ptr->image_src_mat = img.clone();
-  mask.copyTo(out_objs->camera_frame_supplement->lane_map);
+  mask_color.copyTo(out_objs->camera_frame_supplement->lane_map);
   PublishDataAndEvent(timestamp, out_objs, camera_item_ptr);
   PERF_BLOCK_END("CameraProcessSubnode publish in DAG");
 
   if (pb_obj_) PublishPerceptionPbObj(out_objs);
-  if (pb_ln_msk_) PublishPerceptionPbLnMsk(mask, message);
+  if (pb_ln_msk_) PublishPerceptionPbLnMsk(mask_color, message);
 }
 
 void CameraProcessSubnode::ChassisCallback(

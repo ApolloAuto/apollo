@@ -302,8 +302,7 @@ class AdapterManager {
   REGISTER_ADAPTER(DriveEvent);
   REGISTER_ADAPTER(RelativeMap);
   REGISTER_ADAPTER(Navigation);
-  REGISTER_ADAPTER(VoiceDetectionRequest);
-  REGISTER_ADAPTER(VoiceDetectionResponse);
+  REGISTER_ADAPTER(AudioCapture);
   // for pandora
   REGISTER_ADAPTER(PandoraPointCloud);
   REGISTER_ADAPTER(PandoraCameraFrontColor);

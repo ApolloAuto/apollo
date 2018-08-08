@@ -65,7 +65,7 @@ bool ChangeLane::FilterObstacles(ReferenceLineInfo* reference_line_info) {
     if (last_point.v() < config_.change_lane().min_guard_speed()) {
       continue;
     }
-    if (!reference_line.IsOnRoad(last_point.path_point())) {
+    if (!reference_line.IsOnLane(last_point.path_point())) {
       continue;
     }
     SLPoint last_sl;
