@@ -9,7 +9,7 @@ export default class Options {
     @observable showMenu = PARAMETERS.options.defaults.showMenu;
     @observable showRouteEditingBar = PARAMETERS.options.defaults.showRouteEditingBar;
     @observable showPOI = PARAMETERS.options.defaults.showPOI;
-    @observable enableVoiceCommand = PARAMETERS.options.defaults.enableVoiceCommand;
+    @observable enableAudioCapture = PARAMETERS.options.defaults.enableAudioCapture;
     @observable showDataRecorder = PARAMETERS.options.defaults.showDataRecorder;
     @observable showVideo = PARAMETERS.options.defaults.showVideo;
     @observable showTasks =
@@ -78,7 +78,7 @@ export default class Options {
     cameraAngleNames = null;
     mainSideBarOptions = ['showTasks', 'showModuleController',
         'showMenu', 'showRouteEditingBar', 'showDataRecorder'];
-    secondarySideBarOptions = ['showPOI', 'enableVoiceCommand'];
+    secondarySideBarOptions = ['showPOI', 'enableAudioCapture'];
 
     @computed get showTools() {
         return this.showTasks ||
@@ -125,7 +125,7 @@ export default class Options {
 
         if (option === "showTasks" ||
             option === "showModuleController" ||
-            option === "enableVoiceCommand"
+            option === "enableAudioCapture"
         ) {
             return false;
         } else if (option === "showRouteEditingBar") {

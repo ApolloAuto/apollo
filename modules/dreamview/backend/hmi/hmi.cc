@@ -27,6 +27,7 @@
 #include "modules/common/util/map_util.h"
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
 #include "modules/dreamview/backend/hmi/hmi_worker.h"
+#include "modules/dreamview/proto/audio_capture.pb.h"
 #include "modules/monitor/proto/system_status.pb.h"
 
 namespace apollo {
@@ -68,19 +69,19 @@ void HMI::RegisterMessageHandlers() {
         SendVehicleParam(conn);
       });
 
-  // HMI client sends voice data.
+  // HMI client sends audio data, publish to AudioCapture topic.
   websocket_->RegisterMessageHandler(
-      "VoicePiece",
+      "AudioPiece",
       [this](const Json &json, WebSocketHandler::Connection *conn) {
         // json should contain {data: "<base64 encoded audio/wav piece>"}.
         std::string data;
         if (JsonUtil::GetStringFromJson(json, "data", &data)) {
-          VoiceDetectionRequest request;
-          request.set_id(reinterpret_cast<uint64_t>(conn));
-          request.set_wav_stream(apollo::common::util::Base64Decode(data));
-          AdapterManager::PublishVoiceDetectionRequest(request);
+          AudioCapture audio;
+          audio.set_connection_id(reinterpret_cast<uint64_t>(conn));
+          audio.set_wav_stream(apollo::common::util::DecodeBase64(data));
+          AdapterManager::PublishAudioCapture(audio);
         } else {
-          AERROR << "Truncated voice piece.";
+          AERROR << "Truncated audio piece.";
         }
       });
 
@@ -250,15 +251,6 @@ void HMI::RegisterMessageHandlers() {
             AERROR_IF(!ret) << "Failed to execute high_beam action.";
           }
         }
-      });
-
-  // Received VoiceDetection response.
-  AdapterManager::AddVoiceDetectionResponseCallback(
-      [this](const VoiceDetectionResponse &response) {
-        apollo::common::monitor::MonitorLogBuffer log_buffer(&logger_);
-        log_buffer.INFO() << "Triggered action by voice: "
-                          << HMIAction_Name(response.action());
-        HMIWorker::instance()->Trigger(response.action());
       });
 }
 

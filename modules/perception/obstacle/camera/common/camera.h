@@ -58,6 +58,7 @@ class CameraModel {
     width_ = 1;
     height_ = 1;
   }
+  virtual ~CameraModel() = default;
 
   void set(const Eigen::Matrix<T, 3, 3>& params, T w, T h) {
     intrinsic_ = params;
@@ -94,7 +95,7 @@ class CameraModel {
     return pixel_denormalize(pt2d);
   }
 
-  /**@brief Unproject a pixel to 3D point on a given XY plane, where z = 1 */
+  /**@brief Unproject a pixel to 3D point on a given XY plane, where Z = 1 */
   virtual Eigen::Matrix<T, 3, 1> unproject(
       const Eigen::Matrix<T, 2, 1>& pt2d) const {
     Eigen::Matrix<T, 3, 1> pt3d;
