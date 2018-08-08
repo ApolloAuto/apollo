@@ -301,6 +301,7 @@ class GLFWFusionViewer {
   int image_height_;
 
   Eigen::Matrix<double, 3, 4> camera_intrinsic_;  // camera intrinsic
+  Eigen::Matrix<double, 3, 3> car2camera;
 
   bool show_fusion_;
   bool show_radar_pc_;
@@ -315,6 +316,7 @@ class GLFWFusionViewer {
   bool show_vp_grid_ = true;  // show vanishing point and ground plane grid
   bool draw_lane_objects_;
   bool show_trajectory_;
+  bool use_new_post_ = false;
 
   static std::vector<std::vector<int>> s_color_table;
   std::shared_ptr<GLRasterText> raster_text_;
@@ -336,7 +338,7 @@ class GLFWFusionViewer {
   // frame count
   int frame_count_;
   // alpha_blending factor for visualization
-  float alpha_blending = 0.5;  // [0..1]
+  float alpha_blending = 0.75;  // [0..1]
   float one_minus_alpha = 1.0 - alpha_blending;
   // object_trajectories
 

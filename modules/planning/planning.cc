@@ -28,7 +28,6 @@
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/common/planning_thread_pool.h"
 #include "modules/planning/common/planning_util.h"
 #include "modules/planning/common/trajectory/trajectory_stitcher.h"
 #include "modules/planning/planner/em/em_planner.h"
@@ -196,6 +195,7 @@ void Planning::OnTimer(const ros::TimerEvent&) {
 
   if (FLAGS_planning_test_mode && FLAGS_test_duration > 0.0 &&
       Clock::NowInSeconds() - start_time_ > FLAGS_test_duration) {
+    Stop();
     ros::shutdown();
   }
 }

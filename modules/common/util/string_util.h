@@ -22,13 +22,12 @@
 #ifndef MODULES_COMMON_UTIL_STRING_UTIL_H_
 #define MODULES_COMMON_UTIL_STRING_UTIL_H_
 
-#include <boost/algorithm/string.hpp>
-
 #include <functional>
 #include <sstream>
 #include <string>
 #include <vector>
 
+#include "boost/algorithm/string.hpp"
 #include "google/protobuf/stubs/stringprintf.h"
 #include "google/protobuf/stubs/strutil.h"
 
@@ -201,7 +200,7 @@ std::string PrintDebugStringIter(const Container& container,
   return PrintDebugStringIter(container.begin(), container.end(), delimiter);
 }
 
-std::string Base64Decode(const std::string& base64_str);
+std::string DecodeBase64(const std::string& base64_str);
 
 std::string EncodeBase64(const std::string& in);
 

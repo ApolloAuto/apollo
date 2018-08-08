@@ -172,6 +172,8 @@ bool Projector<T>::Init(const cv::Rect &roi, const T &max_distance,
 
   trans_mat_ = camera_calibration->get_camera2car_homography_mat().cast<T>();
 
+  AINFO << "trans_mat_:\n" << trans_mat_;
+
   // set ROI
   uv_xmin_ = static_cast<T>(roi.x);
   if (uv_xmin_ < 0) {

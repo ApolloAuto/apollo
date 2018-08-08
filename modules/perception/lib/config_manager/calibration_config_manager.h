@@ -162,6 +162,7 @@ class CameraCalibration {
 
     homography_camera2car_adj_ =
      camera_2car_stripped.inverse() * c_int_inv;
+    homography_camera2car_adj_inverse_ = homography_camera2car_adj_.inverse();
   }
 
   bool GetCar2CameraExtrinsicsAdj(Eigen::Matrix<double, 4, 4>* matrix) {
@@ -183,6 +184,8 @@ class CameraCalibration {
   }
 
   Eigen::Matrix<double, 3, 3> get_car2camera_homography_mat() {
+    std::lock_guard<std::mutex> lock(adj_mtx_);
+    if (adjusted_extrinsic_) return homography_camera2car_adj_inverse_;
     return homography_mat_inverse_;
   }
 
@@ -219,6 +222,8 @@ class CameraCalibration {
       homography_mat_;  // homography mat from camera 2 car
   Eigen::Matrix<double, 3, 3>
       homography_mat_inverse_;  // homography mat from car 2 camera
+  Eigen::Matrix<double, 3, 3>
+      homography_camera2car_adj_inverse_;
   volatile std::shared_ptr<Eigen::Matrix<double, 3, 3>>
       camera_homography_;  // final homography based on online calibration
 
