@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-// The base class of measurement estimation filtering, ex Kalman Filtering
+// The base class of measurement estimation filtering, e.g., Kalman Filtering
 
 #ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_INTERFACE_BASE_CAMERA_FILTER_H_
 #define MODULES_PERCEPTION_OBSTACLE_CAMERA_INTERFACE_BASE_CAMERA_FILTER_H_

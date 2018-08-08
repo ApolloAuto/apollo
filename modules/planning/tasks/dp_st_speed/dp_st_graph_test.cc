@@ -28,7 +28,6 @@
 #include "modules/common/log.h"
 #include "modules/common/util/file.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/common/planning_thread_pool.h"
 
 namespace apollo {
 namespace planning {

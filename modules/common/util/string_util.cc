@@ -24,25 +24,25 @@ namespace common {
 namespace util {
 namespace {
 
-static const std::string kBase64Array =
+static const char kBase64Array[] =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
 // A table which maps a char to its value in Base64 mode.
 std::vector<int> Base64CodeTable() {
   std::vector<int> table(256, -1);
-  for (size_t i = 0; i < kBase64Array.length(); ++i) {
+  const size_t base64_array_length = strlen(kBase64Array);
+  for (size_t i = 0; i < base64_array_length; ++i) {
     table[kBase64Array[i]] = i;
   }
   return table;
 }
 
 const char* tripletBase64(const int triplet) {
-  auto table = kBase64Array;
   static char result[4];
-  result[0] = table[(triplet >> 18) & 0x3f];
-  result[1] = table[(triplet >> 12) & 0x3f];
-  result[2] = table[(triplet >> 6) & 0x3f];
-  result[3] = table[triplet & 0x3f];
+  result[0] = kBase64Array[(triplet >> 18) & 0x3f];
+  result[1] = kBase64Array[(triplet >> 12) & 0x3f];
+  result[2] = kBase64Array[(triplet >> 6) & 0x3f];
+  result[3] = kBase64Array[triplet & 0x3f];
   return result;
 }
 
@@ -83,7 +83,7 @@ void rtrim(std::string* str) {
              str->end());
 }
 
-std::string Base64Decode(const std::string& base64_str) {
+std::string DecodeBase64(const std::string& base64_str) {
   static const std::vector<int> kBase64CodeTable = Base64CodeTable();
 
   std::string bytes;
