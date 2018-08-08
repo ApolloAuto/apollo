@@ -50,7 +50,7 @@ bool MatrixProjector::project(vector<float>* feature) {
   return true;
 }
 
-MatrixProjector::MatrixProjector(string weight_file) {
+MatrixProjector::MatrixProjector(const string &weight_file) {
   ifstream f_in(weight_file.c_str());
   int height = 0;
   int width = 0;
