@@ -51,5 +51,6 @@ First use time_sync.sh script to sync the system clock to NTP servers. Then rese
 ```
 rmmod UVCVideo; modprobe UVCVideo clock=realtime
 ```
+
 ---
 **More Hardware FAQs to follow.**
