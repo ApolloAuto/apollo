@@ -25,26 +25,32 @@ If you are looking for a different version of Apollo, refer to that version's Ha
 ---
 ### What is the difference between Apollo Platform Supported devices and Apollo Hardware Development Platform Supported device?
 
-1. Apollo Platform Supported means 
+1. Apollo Platform Supported means
     *	The device is part of the Apollo hardware reference design
     *	One or more device(s) has/have been tested and passed to become a fully functional module of the corresponding hardware category, which provides adequate support for upper software layers
-2. Apollo Hardware Development Platform certified means 
+2. Apollo Hardware Development Platform supported means
 one or more device(s) has/have been tested and passed for data collection purpose only. Please note, that in order to collect useful data, it is required for the device to work with the rest of necessary hardware devices listed in the Apollo Reference Design. In order to achieve the same performance in Perception and other upper software modules, it would require extra effort from the developers’ side, including the creation of new model(s), annotation of the data, training the new models, etc.
 
 ---
-### I do not have an IMU, now what? 
+### I do not have an IMU, now what?
 Without an IMU, the localization would depend on GPS system which only updates once per second. On top of that, you wouldn't have velocity and heading information of your vehicle. That is probably not a good idea unless you have other solutions.
 
 ---
 ### I have only VLP16, can I work with it? The documentation advises me to use HDL64
 
-HDL64 provides a much denser point cloud than VLP-16 can. It gives a further detection range for obstacles. That is why we recommend it in the reference design. Whether VLP-16 works for your project, you will need to find out. 
+HDL64 provides a much denser point cloud than VLP-16 can. It gives a further detection range for obstacles. That is why we recommend it in the reference design. Whether VLP-16 works for your project, you will need to find out.
 
 ---
-## Is HDL32 (Velodyne 32 line LiDAR) compatible with Apollo?
+### Is HDL32 (Velodyne 32 line LiDAR) compatible with Apollo?
 
-Apollo can work successfully for HDL32 Lidars. You could follow the [Puck Series Guide](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/Lidar/VLP_Series_Installation_Guide.md) alongwith the following [modification](https://github.com/ApolloAuto/apollo/commit/df37d2c79129434fb90353950a65671278a4229e#diff-cb9767ab272f7dc5b3e0d870a324be51). However, please note that you would need to change the intrinsics for HDL32 in order to avoid [the following error](https://github.com/ApolloAuto/apollo/issues/5244). 
+Apollo can work successfully for HDL32 Lidars. You could follow the [Puck Series Guide](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/Lidar/VLP_Series_Installation_Guide.md) alongwith the following [modification](https://github.com/ApolloAuto/apollo/commit/df37d2c79129434fb90353950a65671278a4229e#diff-cb9767ab272f7dc5b3e0d870a324be51). However, please note that you would need to change the intrinsics for HDL32 in order to avoid [the following error](https://github.com/ApolloAuto/apollo/issues/5244).
 
 ---
+### How to set the USB cameras to provide valid time stamp?
+First use time_sync.sh script to sync the system clock to NTP servers. Then reset UVCVideo module with clock set to realtime with root access.
+```
+rmmod UVCVideo; modprobe UVCVideo clock=realtime
+```
 
+---
 **More Hardware FAQs to follow.**
