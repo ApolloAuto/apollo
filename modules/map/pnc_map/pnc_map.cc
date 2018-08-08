@@ -313,9 +313,8 @@ int PncMap::SearchForwardWaypointIndex(int start,
 int PncMap::SearchBackwardWaypointIndex(int start,
                                         const LaneWaypoint &waypoint) const {
   int i = std::min(static_cast<int>(route_indices_.size() - 1), start);
-  while (
-      i >= 0 &&
-      !RouteSegments::WithinLaneSegment(route_indices_[i].segment, waypoint)) {
+  while (i >= 0 && !RouteSegments::WithinLaneSegment(route_indices_[i].segment,
+                                                     waypoint)) {
     --i;
   }
   return i;
@@ -627,7 +626,8 @@ bool PncMap::ExtendSegments(const RouteSegments &segments, double start_s,
     AERROR << "start_s(" << start_s << " >= end_s(" << end_s << ")";
     return false;
   }
-  const double kRouteEpsilon = 1e-3;
+  std::unordered_set<std::string> unique_lanes;
+  constexpr double kRouteEpsilon = 1e-3;
   // Extend the trajectory towards the start of the trajectory.
   if (start_s < 0) {
     const auto &first_segment = *segments.begin();
@@ -638,7 +638,8 @@ bool PncMap::ExtendSegments(const RouteSegments &segments, double start_s,
     while (extend_s > kRouteEpsilon) {
       if (s <= kRouteEpsilon) {
         lane = GetRoutePredecessor(lane);
-        if (lane == nullptr) {
+        if (lane == nullptr ||
+            unique_lanes.find(lane->id().id()) != unique_lanes.end()) {
           break;
         }
         s = lane->total_length();
@@ -647,12 +648,14 @@ bool PncMap::ExtendSegments(const RouteSegments &segments, double start_s,
         extended_lane_segments.emplace_back(lane, s - length, s);
         extend_s -= length;
         s -= length;
+        unique_lanes.insert(lane->id().id());
       }
     }
     truncated_segments->insert(truncated_segments->begin(),
                                extended_lane_segments.rbegin(),
                                extended_lane_segments.rend());
   }
+  bool found_loop = false;
   double router_s = 0;
   for (const auto &lane_segment : segments) {
     const double adjusted_start_s = std::max(
@@ -664,15 +667,23 @@ bool PncMap::ExtendSegments(const RouteSegments &segments, double start_s,
           truncated_segments->back().lane->id().id() ==
               lane_segment.lane->id().id()) {
         truncated_segments->back().end_s = adjusted_end_s;
-      } else {
+      } else if (unique_lanes.find(lane_segment.lane->id().id()) ==
+                 unique_lanes.end()) {
         truncated_segments->emplace_back(lane_segment.lane, adjusted_start_s,
                                          adjusted_end_s);
+        unique_lanes.insert(lane_segment.lane->id().id());
+      } else {
+        found_loop = true;
+        break;
       }
     }
     router_s += (lane_segment.end_s - lane_segment.start_s);
     if (router_s > end_s) {
       break;
     }
+  }
+  if (found_loop) {
+    return true;
   }
   // Extend the trajectory towards the end of the trajectory.
   if (router_s < end_s && !truncated_segments->empty()) {
@@ -684,24 +695,17 @@ bool PncMap::ExtendSegments(const RouteSegments &segments, double start_s,
       router_s += back.end_s - origin_end_s;
     }
   }
-  if (router_s < end_s) {
-    auto last_lane = GetRouteSuccessor(segments.back().lane);
-    double last_s = 0.0;
-    while (router_s < end_s - kRouteEpsilon) {
-      if (last_lane == nullptr) {
-        break;
-      }
-      if (last_s >= last_lane->total_length() - kRouteEpsilon) {
-        last_lane = GetRouteSuccessor(last_lane);
-        last_s = 0.0;
-      } else {
-        const double length =
-            std::min(end_s - router_s, last_lane->total_length() - last_s);
-        truncated_segments->emplace_back(last_lane, last_s, last_s + length);
-        router_s += length;
-        last_s += length;
-      }
+  auto last_lane = segments.back().lane;
+  while (router_s < end_s - kRouteEpsilon) {
+    last_lane = GetRouteSuccessor(last_lane);
+    if (last_lane == nullptr ||
+        unique_lanes.find(last_lane->id().id()) != unique_lanes.end()) {
+      break;
     }
+    const double length = std::min(end_s - router_s, last_lane->total_length());
+    truncated_segments->emplace_back(last_lane, 0, length);
+    unique_lanes.insert(last_lane->id().id());
+    router_s += length;
   }
   return true;
 }
@@ -722,10 +726,9 @@ void PncMap::AppendLaneToPoints(LaneInfoConstPtr lane, const double start_s,
       const auto &segment = lane->segments()[i];
       const double next_accumulate_s = accumulate_s + segment.length();
       if (start_s > accumulate_s && start_s < next_accumulate_s) {
-        points->emplace_back(
-            segment.start() +
-                segment.unit_direction() * (start_s - accumulate_s),
-            lane->headings()[i], LaneWaypoint(lane, start_s));
+        points->emplace_back(segment.start() + segment.unit_direction() *
+                                                   (start_s - accumulate_s),
+                             lane->headings()[i], LaneWaypoint(lane, start_s));
       }
       if (end_s > accumulate_s && end_s < next_accumulate_s) {
         points->emplace_back(
