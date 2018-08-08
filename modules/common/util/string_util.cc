@@ -30,7 +30,8 @@ static const char kBase64Array[] =
 // A table which maps a char to its value in Base64 mode.
 std::vector<int> Base64CodeTable() {
   std::vector<int> table(256, -1);
-  for (size_t i = 0; i < strlen(kBase64Array); ++i) {
+  const size_t base64_array_length = strlen(kBase64Array);
+  for (size_t i = 0; i < base64_array_length; ++i) {
     table[kBase64Array[i]] = i;
   }
   return table;
