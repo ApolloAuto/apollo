@@ -47,9 +47,9 @@ Apollo can work successfully for HDL32 Lidars. You could follow the [Puck Series
 
 ---
 ### How to set the USB cameras to provide valid time stamp?
-First use time_sync.sh script to sync the system clock to NTP servers. Then reset UVCVideo module with clock set to realtime.
+First use time_sync.sh script to sync the system clock to NTP servers. Then reset UVCVideo module with clock set to realtime with root access.
 ```
-rmmod UVCVideo; modprobe UVCvideo clock=realtime
+rmmod UVCVideo; modprobe UVCVideo clock=realtime
 ```
 ---
 **More Hardware FAQs to follow.**
