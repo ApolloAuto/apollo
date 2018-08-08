@@ -591,7 +591,7 @@ void GLFWFusionViewer::render() {
   glClear(GL_COLOR_BUFFER_BIT);
 
   frame_count_++;
-  if (use_new_post_) {
+  if (FLAGS_use_whole_lane_line) {
     CalibrationConfigManager* calibration_config_manager =
       Singleton<CalibrationConfigManager>::get();
       CameraCalibrationPtr calibrator =
@@ -1343,7 +1343,7 @@ bool GLFWFusionViewer::draw_lane_objects_image(cv::Mat* image_mat) {
 
     // Besides the fitted polynomial curves we draw lane markers as well
     // Upper-left points in image coord
-    if (!use_new_post_) {
+    if (!FLAGS_use_whole_lane_line) {
       for (auto p = lane_objects_->at(k).image_pos.begin();
          p != lane_objects_->at(k).image_pos.end(); ++p) {
          cv::circle(*image_mat,
