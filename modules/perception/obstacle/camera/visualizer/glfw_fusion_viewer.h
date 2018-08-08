@@ -316,7 +316,6 @@ class GLFWFusionViewer {
   bool show_vp_grid_ = true;  // show vanishing point and ground plane grid
   bool draw_lane_objects_;
   bool show_trajectory_;
-  bool use_new_post_ = false;
 
   static std::vector<std::vector<int>> s_color_table;
   std::shared_ptr<GLRasterText> raster_text_;
