@@ -31,10 +31,10 @@ export default class SideBar extends React.Component {
                 <ButtonPanel settings={settings} />
                 <div className="sub-button-panel">
                     <SecondaryButton
-                        panelLabel="Voice Command"
-                        disabled={settings.enableVoiceCommand.disabled}
-                        onClick={settings.enableVoiceCommand.onClick}
-                        active={settings.enableVoiceCommand.active} />
+                        panelLabel="Audio Capture"
+                        disabled={settings.enableAudioCapture.disabled}
+                        onClick={settings.enableAudioCapture.onClick}
+                        active={settings.enableAudioCapture.active} />
                     <SecondaryButton
                         panelLabel="Default Routing"
                         disabled={settings.showPOI.disabled}

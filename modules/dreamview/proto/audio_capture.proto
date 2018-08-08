@@ -1,0 +1,8 @@
+syntax = "proto2";
+
+package apollo.dreamview;
+
+message AudioCapture {
+  optional uint64 connection_id = 1;
+  optional bytes wav_stream = 2;
+}
