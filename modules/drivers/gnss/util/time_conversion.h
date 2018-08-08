@@ -116,7 +116,7 @@ static const int32_t LEAP_SECONDS[][2] = {
 const int32_t GPS_AND_SYSTEM_DIFF_SECONDS = 315964800;
 
 template <typename T>
-T unix2gps(T unix_seconds) {
+T unix2gps(const T unix_seconds) {
   for (size_t i = 0; i < array_size(LEAP_SECONDS); ++i) {
     if (unix_seconds >= LEAP_SECONDS[i][0]) {
       return unix_seconds - (GPS_AND_SYSTEM_DIFF_SECONDS - LEAP_SECONDS[i][1]);
@@ -126,7 +126,7 @@ T unix2gps(T unix_seconds) {
 }
 
 template <typename T>
-T gps2unix(T gps_seconds) {
+T gps2unix(const T gps_seconds) {
   for (size_t i = 0; i < array_size(LEAP_SECONDS); ++i) {
     T result = gps_seconds + (GPS_AND_SYSTEM_DIFF_SECONDS - LEAP_SECONDS[i][1]);
     if (result >= LEAP_SECONDS[i][0]) {

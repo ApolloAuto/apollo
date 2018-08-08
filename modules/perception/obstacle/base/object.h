@@ -68,7 +68,8 @@ struct alignas(16) Object {
   // foreground score/probability
   float score = 0.0;
   // foreground score/probability type
-  ScoreType score_type = ScoreType::SCORE_CNN;
+  PerceptionObstacle::ConfidenceType score_type =
+      PerceptionObstacle::CONFIDENCE_CNN;
 
   // Object classification type.
   ObjectType type = ObjectType::UNKNOWN;
@@ -113,7 +114,7 @@ struct alignas(16) Object {
   // local camera track ts
   double local_camera_track_ts = -1;
 
-  // sensor particular suplplements, default nullptr
+  // sensor particular supplements, default nullptr
   RadarSupplementPtr radar_supplement = nullptr;
   CameraSupplementPtr camera_supplement = nullptr;
 };
@@ -142,7 +143,7 @@ struct SensorObjects {
   uint32_t cipv_index = -1;
   uint32_t cipv_track_id = -1;
 
-  // sensor particular suplplements, default nullptr
+  // sensor particular supplements, default nullptr
   RadarFrameSupplementPtr radar_frame_supplement = nullptr;
   CameraFrameSupplementPtr camera_frame_supplement = nullptr;
 };

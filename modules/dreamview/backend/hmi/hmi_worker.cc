@@ -35,6 +35,8 @@ DEFINE_string(map_data_path, "/apollo/modules/map/data", "Path to map data.");
 DEFINE_string(vehicle_data_path, "/apollo/modules/calibration/data",
               "Path to vehicle data.");
 
+DEFINE_bool(prod_mode, false, "Run commands in production mode.");
+
 namespace apollo {
 namespace dreamview {
 namespace {
@@ -86,15 +88,17 @@ int RunComponentCommand(const Map<std::string, Component> &components,
     AERROR << "Cannot find component " << component_name;
     return -1;
   }
-  const auto *cmd = FindOrNull(component->supported_commands(), command_name);
+  const auto *cmd = FindOrNull(component->commands(), command_name);
   if (cmd == nullptr) {
     AERROR << "Cannot find command " << component_name << "." << command_name;
     return -1;
   }
-  AINFO << "Execute system command: " << *cmd;
-  const int ret = std::system(cmd->c_str());
+  const auto &cmd_str = (FLAGS_prod_mode && cmd->has_prod_cmd()) ?
+      cmd->prod_cmd() : cmd->debug_cmd();
+  AINFO << "Execute system command: " << cmd_str;
+  const int ret = std::system(cmd_str.c_str());
 
-  AERROR_IF(ret != 0) << "Command returns " << ret << ": " << *cmd;
+  AERROR_IF(ret != 0) << "Command returns " << ret << ": " << cmd_str;
   return ret;
 }
 

@@ -44,11 +44,11 @@ class TrajectoryStitcher {
   static std::vector<common::TrajectoryPoint> ComputeStitchingTrajectory(
       const common::VehicleState& vehicle_state, const double current_timestamp,
       const double planning_cycle_time,
-      const PublishableTrajectory* prev_trajectory, bool* is_replan);
+      const PublishableTrajectory* prev_trajectory);
 
  private:
   static std::pair<double, double> ComputePositionProjection(const double x,
-      const double y, const PublishableTrajectory& prev_trajectory);
+      const double y, const common::TrajectoryPoint& matched_trajectory_point);
 
   static std::vector<common::TrajectoryPoint> ComputeReinitStitchingTrajectory(
       const common::VehicleState& vehicle_state);

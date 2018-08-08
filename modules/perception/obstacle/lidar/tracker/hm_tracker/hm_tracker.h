@@ -45,10 +45,10 @@ class HmObjectTracker : public BaseTracker {
   bool Init();
 
   // @brief track detected objects over consecutive frames
-  // @params[IN] objects: recently detected objects
-  // @params[IN] timestamp: timestamp of recently detected objects
-  // @params[IN] options: tracker options with necessary information
-  // @params[OUT] tracked_objects: tracked objects with tracking information
+  // @param[IN] objects: recently detected objects
+  // @param[IN] timestamp: timestamp of recently detected objects
+  // @param[IN] options: tracker options with necessary information
+  // @param[OUT] tracked_objects: tracked objects with tracking information
   // @return true if track successfully, otherwise return false
   bool Track(const std::vector<std::shared_ptr<Object>>& objects,
              double timestamp, const TrackerOptions& options,
@@ -62,10 +62,10 @@ class HmObjectTracker : public BaseTracker {
 
  protected:
   // @brief initialize tracker after obtaining detection of first frame
-  // @params[IN] objects: recently detected objects
-  // @params[IN] timestamp: timestamp of recently detected objects
-  // @params[IN] options: tracker options with necessary information
-  // @params[OUT] tracked_objects: tracked objects with tracking information
+  // @param[IN] objects: recently detected objects
+  // @param[IN] timestamp: timestamp of recently detected objects
+  // @param[IN] options: tracker options with necessary information
+  // @param[OUT] tracked_objects: tracked objects with tracking information
   // @return true if initialize successfully, otherwise return false
   bool InitializeTrack(const std::vector<std::shared_ptr<Object>>& objects,
                        const double timestamp, const TrackerOptions& options,
@@ -73,16 +73,16 @@ class HmObjectTracker : public BaseTracker {
 
   // @brief transform v2world pose to v2local pose intend to avoid huge value
   // float computing
-  // @params[OUT] pose: v2world pose
+  // @param[OUT] pose: v2world pose
   // @return nothing
   void TransformPoseGlobal2Local(Eigen::Matrix4d* pose);
 
-  // @brief construct tracked objects via necessray transformation & feature
+  // @brief construct tracked objects via necessary transformation & feature
   // computing
-  // @params[IN] objects: objects for construction
-  // @params[OUT] tracked_objects: constructed objects
-  // @params[IN] pose: pose using for coordinate transformation
-  // @params[IN] options: tracker options with necessary information
+  // @param[IN] objects: objects for construction
+  // @param[OUT] tracked_objects: constructed objects
+  // @param[IN] pose: pose using for coordinate transformation
+  // @param[IN] options: tracker options with necessary information
   // @return nothing
   void ConstructTrackedObjects(
       const std::vector<std::shared_ptr<Object>>& objects,
@@ -90,36 +90,36 @@ class HmObjectTracker : public BaseTracker {
       const Eigen::Matrix4d& pose, const TrackerOptions& options);
 
   // @brief compute objects' shape feature
-  // @params[OUT] object: object for computing shape feature
+  // @param[OUT] object: object for computing shape feature
   // @return nothing
   void ComputeShapeFeatures(std::shared_ptr<TrackedObject>* obj);
 
   // @brief transform tracked object with given pose
-  // @params[OUT] obj: tracked object for transfromation
-  // @params[IN] pose: pose using for coordinate transformation
+  // @param[OUT] obj: tracked object for transformation
+  // @param[IN] pose: pose using for coordinate transformation
   // @return nothing
   void TransformTrackedObject(std::shared_ptr<TrackedObject>* obj,
                               const Eigen::Matrix4d& pose);
 
   // @brief transform object with given pose
-  // @params[OUT] obj: object for transfromation
-  // @params[IN] pose: pose using for coordinate transformation
+  // @param[OUT] obj: object for transformation
+  // @param[IN] pose: pose using for coordinate transformation
   // @return nothing
   void TransformObject(std::shared_ptr<Object>* obj,
                        const Eigen::Matrix4d& pose);
 
   // @brief compute predicted states of maintained tracks
-  // @params[OUT] tracks_predict: predicted states of maintained tracks
-  // @params[IN] time_diff: time interval for predicting
+  // @param[OUT] tracks_predict: predicted states of maintained tracks
+  // @param[IN] time_diff: time interval for predicting
   // @return nothing
   void ComputeTracksPredict(std::vector<Eigen::VectorXf>* tracks_predict,
                             const double time_diff);
 
   // @brief update assigned tracks
-  // @params[IN] tracks_predict: predicted states of maintained tracks
-  // @params[IN] new_objects: recently detected objects
-  // @params[IN] assignments: assignment pair of <track, object>
-  // @params[IN] time_diff: time interval for updating
+  // @param[IN] tracks_predict: predicted states of maintained tracks
+  // @param[IN] new_objects: recently detected objects
+  // @param[IN] assignments: assignment pair of <track, object>
+  // @param[IN] time_diff: time interval for updating
   // @return nothing
   void UpdateAssignedTracks(
       std::vector<Eigen::VectorXf>* tracks_predict,
@@ -128,17 +128,17 @@ class HmObjectTracker : public BaseTracker {
       const double time_diff);
 
   // @brief update tracks without matched objects
-  // @params[IN] tracks_predict: predicted states of maintained tracks
-  // @params[IN] unassigned_tracks: index of unassigned tracks
-  // @params[IN] time_diff: time interval for updating
+  // @param[IN] tracks_predict: predicted states of maintained tracks
+  // @param[IN] unassigned_tracks: index of unassigned tracks
+  // @param[IN] time_diff: time interval for updating
   // @return nothing
   void UpdateUnassignedTracks(
       const std::vector<Eigen::VectorXf>& tracks_predict,
       const std::vector<int>& unassigned_tracks, const double time_diff);
 
   // @brief create new tracks for objects without matched track
-  // @params[IN] new_objects: recently detected objects
-  // @params[IN] unassigned_objects: index of unassigned objects
+  // @param[IN] new_objects: recently detected objects
+  // @param[IN] unassigned_objects: index of unassigned objects
   // @return nothing
   void CreateNewTracks(
       const std::vector<std::shared_ptr<TrackedObject>>& new_objects,
@@ -149,7 +149,7 @@ class HmObjectTracker : public BaseTracker {
   void DeleteLostTracks();
 
   // @brief collect tracked results
-  // @params[OUT] tracked_objects: tracked objects with tracking information
+  // @param[OUT] tracked_objects: tracked objects with tracking information
   // @return nothing
   void CollectTrackedResults(
       std::vector<std::shared_ptr<Object>>* tracked_objects);

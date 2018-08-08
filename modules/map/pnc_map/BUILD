@@ -1,6 +1,34 @@
 load("//tools:cpplint.bzl", "cpplint")
+load("//tools:cuda_library.bzl", "cuda_library")
 
 package(default_visibility = ["//visibility:public"])
+
+cuda_library(
+    name = "cuda_pnc_util",
+    srcs = [
+        "cuda_util.cu",
+    ],
+    hdrs = [
+        "cuda_util.h",
+    ],
+    deps = [
+        "@cuda",
+    ],
+)
+
+cc_test(
+    name = "cuda_util_test",
+    size = "small",
+    srcs = [
+        "cuda_util.h",
+        "cuda_util_test.cc",
+        ":cuda_pnc_util",
+    ],
+    deps = [
+        "//modules/common/math",
+        "@gtest//:main",
+    ],
+)
 
 cc_library(
     name = "path",

@@ -66,7 +66,6 @@ SMALL_TOPICS = [
     '/apollo/relative_map',
     '/apollo/routing_request',
     '/apollo/routing_response',
-    '/apollo/sensor/camera/obstacle/front_6mm',
     '/apollo/sensor/conti_radar',
     '/apollo/sensor/delphi_esr',
     '/apollo/sensor/gnss/best_pose',
@@ -86,12 +85,10 @@ SMALL_TOPICS = [
 LARGE_TOPICS = [
     '/apollo/sensor/camera/traffic/image_short',
     '/apollo/sensor/camera/traffic/image_long',
+    '/apollo/sensor/camera/obstacle/front_6mm',
     '/apollo/sensor/velodyne64/compensator/PointCloud2',
     '/apollo/sensor/velodyne16/compensator/PointCloud2',
 ]
-
-
-MIN_DISK_SIZE = 2**35  # 32GB
 
 
 def shell_cmd(cmd, alert_on_failure=True):
@@ -181,17 +178,7 @@ class Recorder(object):
         # 2. Or we have a NVME disk.
         record_all = self.args.all or (len(disks) > 0 and disks[0]['is_nvme'])
         # Use the best disk, or fallback '/apollo' if none available.
-        disk_to_use = '/apollo'
-        available_size = 0
-        if len(disks) > 0:
-            disk_to_use = disks[0]['mountpoint']
-            available_size = disks[0]['available_size']
-        else:
-            available_size = DiskManager.disk_avail_size(disk_to_use)
-        if available_size < MIN_DISK_SIZE:
-            print('Insufficient disk space, stop recording: {} with {}'.format(
-                disk_to_use, available_size))
-            return
+        disk_to_use = disks[0]['mountpoint'] if len(disks) > 0 else '/apollo'
         if record_all:
             self.record_task(disk_to_use, SMALL_TOPICS + LARGE_TOPICS)
         else:

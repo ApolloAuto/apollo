@@ -45,6 +45,7 @@
 #include "sensor_msgs/Image.h"
 #include "sensor_msgs/PointCloud2.h"
 #include "std_msgs/String.h"
+#include "velodyne_msgs/VelodyneScanUnified.h"
 
 /**
  * @namespace apollo::common::adapter
@@ -394,6 +395,10 @@ class Adapter : public AdapterBase {
   }
   bool FeedFile(const std::string& message_file,
                 IdentifierType<::std_msgs::String>) {
+    return false;
+  }
+  bool FeedFile(const std::string& message_file,
+                IdentifierType<velodyne_msgs::VelodyneScanUnified>) {
     return false;
   }
   // HasSequenceNumber returns false for non-proto-message data types.

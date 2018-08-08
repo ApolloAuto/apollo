@@ -190,13 +190,8 @@ void AdapterManager::Init(const AdapterManagerConfig &configs) {
       case AdapterConfig::NAVIGATION:
         EnableNavigation(FLAGS_navigation_topic, config);
         break;
-      case AdapterConfig::VOICE_DETECTION_REQUEST:
-        EnableVoiceDetectionRequest(FLAGS_voice_detection_request_topic,
-                                    config);
-        break;
-      case AdapterConfig::VOICE_DETECTION_RESPONSE:
-        EnableVoiceDetectionResponse(FLAGS_voice_detection_response_topic,
-                                     config);
+      case AdapterConfig::AUDIO_CAPTURE:
+        EnableAudioCapture(FLAGS_audio_capture_topic, config);
         break;
       // For pandora.
       case AdapterConfig::PANDORA_POINT_CLOUD:
@@ -236,6 +231,47 @@ void AdapterManager::Init(const AdapterManagerConfig &configs) {
       case AdapterConfig::RTCM_DATA:
         EnableRtcmData(FLAGS_rtcm_data_topic, config);
         break;
+      // velodyne fusion adapters
+      case AdapterConfig::POINT_CLOUD_DENSE:
+        EnablePointCloudDense(config.topic(), config);
+        break;
+      case AdapterConfig::POINT_CLOUD_DENSE_RAW:
+        EnablePointCloudDenseRaw(config.topic(), config);
+        break;
+      case AdapterConfig::VELODYNE_SCAN_DENSE:
+        EnableVelodyneScanDense(config.topic(), config);
+        break;
+
+      case AdapterConfig::POINT_CLOUD_SPARSE_1:
+        EnablePointCloudSparse1(config.topic(), config);
+        break;
+      case AdapterConfig::POINT_CLOUD_SPARSE_RAW_1:
+        EnablePointCloudSparseRaw1(config.topic(), config);
+        break;
+      case AdapterConfig::VELODYNE_SCAN_SPARSE_1:
+        EnableVelodyneScanSparse1(config.topic(), config);
+        break;
+
+      case AdapterConfig::POINT_CLOUD_SPARSE_2:
+        EnablePointCloudSparse2(config.topic(), config);
+        break;
+      case AdapterConfig::POINT_CLOUD_SPARSE_RAW_2:
+        EnablePointCloudSparseRaw2(config.topic(), config);
+        break;
+      case AdapterConfig::VELODYNE_SCAN_SPARSE_2:
+        EnableVelodyneScanSparse2(config.topic(), config);
+        break;
+
+      case AdapterConfig::POINT_CLOUD_SPARSE_3:
+        EnablePointCloudSparse3(config.topic(), config);
+        break;
+      case AdapterConfig::POINT_CLOUD_SPARSE_RAW_3:
+        EnablePointCloudSparseRaw3(config.topic(), config);
+        break;
+      case AdapterConfig::VELODYNE_SCAN_SPARSE_3:
+        EnableVelodyneScanSparse3(config.topic(), config);
+        break;
+
       default:
         AERROR << "Unknown adapter config type!";
         break;

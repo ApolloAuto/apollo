@@ -24,6 +24,7 @@
 
 #include <map>
 #include <string>
+#include <tuple>
 #include <vector>
 
 #include "gflags/gflags.h"
@@ -88,13 +89,11 @@ class NaviPathDecider : public Task {
   /**
    * @brief take a section of the reference line as the initial path trajectory.
    * @param reference_line input reference line.
-   * @param init_point start plan point.
    * @param path_points output points intercepted from the reference line
    * @return if success return true or return false.
    */
-  bool GetLocalPath(const ReferenceLine &reference_line,
-                    const common::TrajectoryPoint &init_point,
-                    std::vector<common::PathPoint> *const path_points);
+  bool GetBasicPathData(const ReferenceLine &reference_line,
+                        std::vector<common::PathPoint> *const path_points);
 
   /**
    * @brief shift the path points on the y-axis
@@ -107,10 +106,9 @@ class NaviPathDecider : public Task {
 
   /**
    * @brief calculate the y-coordinate of the starting point of the path plan
-   * @param real_ref_init_y the actual y-coordinate of start point that intercepted
-   * from reference line
+   * @param actual_ref_init_y the actual y-coordinate of start point that
+   * intercepted from reference line
    * @param target_path_init_y the y-coordinate of the start point that desired
-   * arrival path
    * @return the y-coordinate of the starting point in FLU coordinate.
    */
   double SmoothInitY(const double actual_ref_init_y,
@@ -127,12 +125,35 @@ class NaviPathDecider : public Task {
   bool IsSafeChangeLane(const ReferenceLine &reference_line,
                         const PathDecision &path_decision);
 
-  // TODO(all): Add your member functions and variables.
+  /**
+   * @brief calculate the lateral target position with slight avoidance
+   * @path_data_points the basic path data intercepted from the reference line
+   * @param reference_line input reference line
+   * @param obstacles unhandled obstacle information.
+   * @param path_decision path decision information provided by perception.
+   * @return the y coordinate value of nudging target position
+   */
+  double NudgeProcess(const ReferenceLine &reference_line,
+                      const std::vector<common::PathPoint> &path_data_points,
+                      const std::vector<const Obstacle *> &obstacles,
+                      const PathDecision &path_decision);
+  /**
+   * @brief calculate latreal shift param by vehicle state and config
+   */
+  void CalculateShiftParam();
+
  private:
   common::VehicleState vehicle_state_;
   NaviPathDeciderConfig config_;
   std::string cur_reference_line_lane_id_;
-  std::map<std::string, double> last_lane_id_to_start_y_;
+  std::map<std::string, double> last_lane_id_to_adc_project_y_;
+  std::map<std::string, bool> last_lane_id_to_nudge_flag_;
+  std::map<double, std::tuple<double, double, double>>
+      speed_to_shift_param_table_;
+  std::vector<double> max_speed_levels_;
+  double theta_change_ratio_ = 0.0;
+  double min_init_y_ = 0.0;
+  double max_init_y_ = 0.0;
 
   FRIEND_TEST(NaviPathDeciderTest, SmoothInitY);
 };

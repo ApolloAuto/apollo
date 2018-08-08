@@ -375,12 +375,23 @@ RadarObstacles DelphiToRadarObstacles(
       motionpowers(64);
   for (const auto& esr_trackmotionpower_540 :
        delphi_esr.esr_trackmotionpower_540()) {
+    if (!esr_trackmotionpower_540.has_can_tx_track_can_id_group()) {
+      AERROR << "ESR track motion power 540 does not have "
+                "can_tx_track_can_id_group()";
+      continue;
+    }
     const int can_tx_track_can_id_group =
         esr_trackmotionpower_540.can_tx_track_can_id_group();
-    for (int index = 0; index < (can_tx_track_can_id_group < 9 ? 7 : 1);
+    const int can_tx_track_motion_power_size =
+        esr_trackmotionpower_540.can_tx_track_motion_power_size();
+    for (int index = 0; index < (can_tx_track_can_id_group < 9 ? 7 : 1) &&
+                        index < can_tx_track_motion_power_size;
          ++index) {
-      motionpowers[can_tx_track_can_id_group * 7 + index].CopyFrom(
-          esr_trackmotionpower_540.can_tx_track_motion_power(index));
+      std::size_t motion_powers_index = can_tx_track_can_id_group * 7 + index;
+      if (motion_powers_index < motionpowers.size()) {
+        motionpowers[motion_powers_index].CopyFrom(
+            esr_trackmotionpower_540.can_tx_track_motion_power(index));
+      }
     }
   }
 
@@ -389,7 +400,9 @@ RadarObstacles DelphiToRadarObstacles(
   const auto adc_quaternion = localization.pose().orientation();
   const double adc_theta = GetAngleFromQuaternion(adc_quaternion);
 
-  for (int index = 0; index < delphi_esr.esr_track01_500_size(); ++index) {
+  for (int index = 0; index < delphi_esr.esr_track01_500_size() &&
+                      index < static_cast<int>(motionpowers.size());
+       ++index) {
     const auto& data_500 = delphi_esr.esr_track01_500(index);
 
     // ignore invalid target

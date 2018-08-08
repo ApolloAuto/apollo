@@ -669,35 +669,36 @@ bool Path::GetProjectionWithHueristicParams(const Vec2d& point,
   int start_interpolation_index = GetIndexFromS(hueristic_start_s).id;
   int end_interpolation_index =
       std::fmin(num_segments_, GetIndexFromS(hueristic_end_s).id + 1);
+  int min_index = start_interpolation_index;
   for (int i = start_interpolation_index; i < end_interpolation_index; ++i) {
-    const auto& segment = segments_[i];
-    const double distance = segment.DistanceTo(point);
+    const double distance = segments_[i].DistanceSquareTo(point);
     if (distance < *min_distance) {
-      const double proj = segment.ProjectOntoUnit(point);
-      if (proj < 0.0 && i > 0) {
-        continue;
-      }
-      if (proj > segment.length() && i + 1 < end_interpolation_index) {
-        const auto& next_segment = segments_[i + 1];
-        if ((point - next_segment.start())
-                .InnerProd(next_segment.unit_direction()) >= 0.0) {
-          continue;
-        }
-      }
+      min_index = i;
       *min_distance = distance;
-      if (i + 1 >= end_interpolation_index) {
-        *accumulate_s = accumulated_s_[i] + proj;
-      } else {
-        *accumulate_s = accumulated_s_[i] + std::min(proj, segment.length());
-      }
-      const double prod = segment.ProductOntoUnit(point);
-      if ((i == 0 && proj < 0.0) ||
-          (i + 1 == end_interpolation_index && proj > segment.length())) {
-        *lateral = prod;
-      } else {
-        *lateral = (prod > 0.0 ? distance : -distance);
-      }
     }
+  }
+  *min_distance = std::sqrt(*min_distance);
+  const auto& nearest_seg = segments_[min_index];
+  const auto prod = nearest_seg.ProductOntoUnit(point);
+  const auto proj = nearest_seg.ProjectOntoUnit(point);
+  if (min_index == 0) {
+    *accumulate_s = std::min(proj, nearest_seg.length());
+    if (proj < 0) {
+      *lateral = prod;
+    } else {
+      *lateral = (prod > 0.0 ? 1 : -1) * *min_distance;
+    }
+  } else if (min_index == num_segments_ - 1) {
+    *accumulate_s = accumulated_s_[min_index] + std::max(0.0, proj);
+    if (proj > 0) {
+      *lateral = prod;
+    } else {
+      *lateral = (prod > 0.0 ? 1 : -1) * *min_distance;
+    }
+  } else {
+    *accumulate_s = accumulated_s_[min_index] +
+                    std::max(0.0, std::min(proj, nearest_seg.length()));
+    *lateral = (prod > 0.0 ? 1 : -1) * *min_distance;
   }
   return true;
 }
@@ -717,36 +718,36 @@ bool Path::GetProjection(const Vec2d& point, double* accumulate_s,
   }
   CHECK_GE(num_points_, 2);
   *min_distance = std::numeric_limits<double>::infinity();
-
+  int min_index = 0;
   for (int i = 0; i < num_segments_; ++i) {
-    const auto& segment = segments_[i];
-    const double distance = segment.DistanceTo(point);
+    const double distance = segments_[i].DistanceSquareTo(point);
     if (distance < *min_distance) {
-      const double proj = segment.ProjectOntoUnit(point);
-      if (proj < 0.0 && i > 0) {
-        continue;
-      }
-      if (proj > segment.length() && i + 1 < num_segments_) {
-        const auto& next_segment = segments_[i + 1];
-        if ((point - next_segment.start())
-                .InnerProd(next_segment.unit_direction()) >= 0.0) {
-          continue;
-        }
-      }
+      min_index = i;
       *min_distance = distance;
-      if (i + 1 >= num_segments_) {
-        *accumulate_s = accumulated_s_[i] + proj;
-      } else {
-        *accumulate_s = accumulated_s_[i] + std::min(proj, segment.length());
-      }
-      const double prod = segment.ProductOntoUnit(point);
-      if ((i == 0 && proj < 0.0) ||
-          (i + 1 == num_segments_ && proj > segment.length())) {
-        *lateral = prod;
-      } else {
-        *lateral = (prod > 0.0 ? distance : -distance);
-      }
     }
+  }
+  *min_distance = std::sqrt(*min_distance);
+  const auto& nearest_seg = segments_[min_index];
+  const auto prod = nearest_seg.ProductOntoUnit(point);
+  const auto proj = nearest_seg.ProjectOntoUnit(point);
+  if (min_index == 0) {
+    *accumulate_s = std::min(proj, nearest_seg.length());
+    if (proj < 0) {
+      *lateral = prod;
+    } else {
+      *lateral = (prod > 0.0 ? 1 : -1) * *min_distance;
+    }
+  } else if (min_index == num_segments_ - 1) {
+    *accumulate_s = accumulated_s_[min_index] + std::max(0.0, proj);
+    if (proj > 0) {
+      *lateral = prod;
+    } else {
+      *lateral = (prod > 0.0 ? 1 : -1) * *min_distance;
+    }
+  } else {
+    *accumulate_s = accumulated_s_[min_index] +
+                    std::max(0.0, std::min(proj, nearest_seg.length()));
+    *lateral = (prod > 0.0 ? 1 : -1) * *min_distance;
   }
   return true;
 }

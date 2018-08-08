@@ -2,11 +2,12 @@
 
 ## Software
 - [Apollo 2.0 Software Architecture](Apollo_2.0_Software_Architecture.md)
+- [Apollo 3.0 Software Architecture](Apollo_3.0_Software_Architecture.md)
 - [Class Architecture Planning](Class_Architecture_Planning.md)
 
 ## Apollo Hardware Development Platform
 
-We highly recommend that you read through our [Disclaimer](Disclaimer_Hardware.pdf) before reading through our Hardware platform documents.
+Apollo 3.0 Hardware Development Platform provides 2 types of evaluation for our supported hardware devices - Apollo Platform Supported devices and Apollo Hardware Development Platform Supported devices. In order to view each device's support type, please look under the  `Disclaimer` section in each device's insallation guide. We highly recommend that you read through our [Disclaimer](Disclaimer_Hardware.pdf) to understand each device type, before reading through our Hardware platform installation documents.
 
 - [Apollo Sensor Unit](Apollo_Sensor_Unit/Apollo_Sensor_Unit_Installation_Guide.md)
 - [Camera](Camera/README.md)
@@ -17,10 +18,13 @@ We highly recommend that you read through our [Disclaimer](Disclaimer_Hardware.p
 - [Software system and Kernel Installation](Software_and_Kernel_Installation_guide.md)
 
 ## Perception
+- [Perception Apollo 3.0](perception_apollo_3.0.md)
+- [Guideline Sensor Installation Apollo 3.0](Guideline_sensor_Installation_apollo_3.0.md)
 - [Perception Apollo 2.5](perception_apollo_2.5.md)
 - [Guideline Sensor Installation Apollo 2.5](Guideline_sensor_Installation_apollo_2.5.md)
-- [Lidar calibration.pdf](lidar_calibration.pdf)
-- [Lidar calibration cn.pdf](lidar_calibration_cn.pdf)
+- [LiDAR Calibration.pdf](lidar_calibration.pdf)
+- [LiDAR Calibration cn.pdf](lidar_calibration_cn.pdf)
+- [LiDAR - IMU Calibration Guide](apollo_lidar_imu_calibration_guide.md)
 
 
 ## HMI

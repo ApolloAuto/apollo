@@ -23,13 +23,13 @@
 #include "ros/include/ros/ros.h"
 #include "ros/include/std_msgs/String.h"
 
+#include "modules/drivers/gnss/proto/config.pb.h"
+
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
 #include "modules/drivers/gnss/gnss_gflags.h"
-#include "modules/drivers/gnss/proto/config.pb.h"
 #include "modules/drivers/gnss/stream/raw_stream.h"
 #include "modules/drivers/gnss/stream/stream.h"
-#include "modules/drivers/gnss/util/utils.h"
 
 namespace apollo {
 namespace drivers {
@@ -313,7 +313,7 @@ bool RawStream::Connect() {
 
   if (command_stream_) {
     if (command_stream_->get_status() != Stream::Status::CONNECTED) {
-      if (!data_stream_->Connect()) {
+      if (!command_stream_->Connect()) {
         AERROR << "command stream connect failed.";
         return false;
       }

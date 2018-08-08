@@ -1,0 +1,32 @@
+<!-- -*- mode: XML -*- -->
+<!-- rostest of publishing a PointCloud from PCAP data.
+
+     Uses rostest, because a running roscore is required.
+
+     $Id$
+  -->
+
+<launch>
+
+  <!-- start nodelet manager and driver nodelets -->
+  <include file="$(find velodyne_driver)/launch/nodelet_manager.launch">
+    <arg name="pcap" value="$(find velodyne_pointcloud)/tests/class.pcap"/>
+  </include>
+
+  <!-- start cloud nodelet using test calibration file -->
+  <include file="$(find velodyne_pointcloud)/launch/cloud_nodelet.launch">
+    <arg name="calibration"
+         value="$(find velodyne_pointcloud)/params/64e_utexas.yaml"/>
+  </include>
+
+  <!-- verify PointCloud2 publication rate -->
+  <test test-name="cloud_nodelet_hz_test" pkg="rostest"
+        type="hztest" name="hztest_cloud_nodelet_64e" >
+    <param name="hz" value="10.0" />
+    <param name="hzerror" value="3.0" />
+    <param name="test_duration" value="5.0" />    
+    <param name="topic" value="velodyne_points" />  
+    <param name="wait_time" value="2.0" />  
+  </test>
+
+</launch>

@@ -1,0 +1,43 @@
+syntax = "proto2";
+
+package apollo.drivers.lidar_velodyne;
+
+enum VelodyneModel {
+    VLP16 = 0;
+    V64E_S2 = 1;
+    V64E_S3S = 2;
+    V64E_S3D_STRONGEST = 3;
+    V64E_S3D_LAST = 4;
+    V64E_S3D_DUAL = 5;
+}
+message VelodyneConf {
+    required uint32 index = 1 [default = 0];
+    optional string position = 2 [default = "centre"];
+    // packet params
+    optional string frame_id = 3;
+    optional uint32 firing_data_port = 4 [default = 2368];
+    optional uint32 positioning_data_port = 5 [default = 8308];
+    optional double rpm = 6 [default = 600.0];
+    optional VelodyneModel model = 7;
+    optional int32 npackets = 8;
+    optional int32 cache_size = 9 [default = 1];
+    optional int32 packet_rate = 10 [default = 754];
+    // convert params
+    // maximum range to publish
+    optional double max_range = 100 [default = 130.0];
+    // minmum range to publish
+    optional double min_range = 101 [default = 0.9];
+    optional double min_angle = 102;
+    optional double max_angle = 103;
+    optional double view_direction = 104 [default = 0.0];
+    // default view_width = M_PI * 2
+    optional double view_width = 105 [default = 6.28318530717958647692];
+    optional bool calibration_online = 106 [default = false];
+    // is point cloud order
+    optional bool organized = 107 [default = false];
+    optional string calibration_file = 108;
+
+    // compensate params
+    optional string child_frame_id = 200 [default = "velodyne16"];
+    optional double tf_query_timeout = 201 [default = 0.1];
+}

@@ -41,6 +41,9 @@ DEFINE_string(test_previous_planning_file, "",
               "The previous planning test file");
 
 void PlanningTestBase::SetUpTestCase() {
+  FLAGS_use_multi_thread_to_add_obstacles = false;
+  FLAGS_enable_multi_thread_in_dp_poly_path = false;
+  FLAGS_enable_multi_thread_in_dp_st_graph = false;
   FLAGS_planning_config_file = "modules/planning/conf/planning_config.pb.txt";
   FLAGS_planning_adapter_config_filename =
       "modules/planning/testdata/conf/adapter.conf";
@@ -96,6 +99,10 @@ void PlanningTestBase::SetUp() {
   planning_.Stop();
   CHECK(SetUpAdapters()) << "Failed to setup adapters";
   CHECK(planning_.Init().ok()) << "Failed to init planning module";
+
+  // Do not use fallback trajectory during testing
+  FLAGS_use_planning_fallback = false;
+
   if (!FLAGS_test_previous_planning_file.empty()) {
     const auto prev_planning_file =
         FLAGS_test_data_dir + "/" + FLAGS_test_previous_planning_file;
@@ -146,8 +153,7 @@ void PlanningTestBase::TrimPlanning(ADCTrajectory* origin,
 }
 
 bool PlanningTestBase::RunPlanning(const std::string& test_case_name,
-                                   int case_num,
-                                   bool no_trajectory_point) {
+                                   int case_num, bool no_trajectory_point) {
   const std::string golden_result_file = apollo::common::util::StrCat(
       "result_", test_case_name, "_", case_num, ".pb.txt");
 
@@ -185,7 +191,7 @@ bool PlanningTestBase::RunPlanning(const std::string& test_case_name,
         AERROR << "Failed to write to file " << tmp_fname;
       }
       AERROR << "found\ndiff " << tmp_fname << " " << full_golden_path;
-      AERROR << "visualize diff\npython "
+      AERROR << "visualize diff\n/usr/bin/python "
                 "modules/tools/plot_trace/plot_planning_result.py "
              << tmp_fname << " " << full_golden_path;
       return false;

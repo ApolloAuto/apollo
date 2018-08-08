@@ -30,11 +30,11 @@
 namespace apollo {
 namespace planning {
 
-class ConstantAccelerationTrajectory1d : public Curve1d {
+class PiecewiseAccelerationTrajectory1d : public Curve1d {
  public:
-  ConstantAccelerationTrajectory1d(const double start_s, const double start_v);
+  PiecewiseAccelerationTrajectory1d(const double start_s, const double start_v);
 
-  virtual ~ConstantAccelerationTrajectory1d() = default;
+  virtual ~PiecewiseAccelerationTrajectory1d() = default;
 
   void AppendSegment(const double a, const double t_duration);
 

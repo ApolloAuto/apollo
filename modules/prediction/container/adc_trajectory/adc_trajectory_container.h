@@ -26,6 +26,7 @@
 #include <string>
 #include <unordered_set>
 #include <vector>
+#include <mutex>
 
 #include "Eigen/Dense"
 
@@ -95,6 +96,7 @@ class ADCTrajectoryContainer : public Container {
   ::apollo::common::math::Polygon2d adc_junction_polygon_;
   std::unordered_set<std::string> adc_lane_ids_;
   std::vector<std::string> adc_lane_seq_;
+  std::mutex adc_trajectory_mutex_;
 };
 
 }  // namespace prediction

@@ -95,16 +95,8 @@ ReferenceLineProvider::FutureRouteWaypoints() {
 
 void ReferenceLineProvider::UpdateVehicleState(
     const VehicleState &vehicle_state) {
-  {
-    std::lock_guard<std::mutex> lock(vehicle_state_mutex_);
-    vehicle_state_ = vehicle_state;
-  }
-  // Set the flag "pending_" to true so that worker threads start processing.
-  {
-    std::lock_guard<std::mutex> lock(notify_mutex_);
-    pending_ = true;
-  }
-  cv_.notify_one();
+  std::lock_guard<std::mutex> lock(vehicle_state_mutex_);
+  vehicle_state_ = vehicle_state;
 }
 
 bool ReferenceLineProvider::Start() {
@@ -179,14 +171,11 @@ void ReferenceLineProvider::UpdateReferenceLine(
 }
 
 void ReferenceLineProvider::GenerateThread() {
+  constexpr int32_t kSleepTime = 50;  // milliseconds
   while (!is_stop_) {
-    // Wait until UpdateVehicleState() changes the flag of "pending_" to "true".
-    // See "http://en.cppreference.com/w/cpp/thread/condition_variable" for
-    // datails.
-    std::unique_lock<std::mutex> lock(notify_mutex_);
-    cv_.wait(lock, [this]() { return pending_; });
-    lock.unlock();
-
+    std::this_thread::yield();
+    std::this_thread::sleep_for(
+        std::chrono::duration<double, std::milli>(kSleepTime));
     double start_time = Clock::NowInSeconds();
     if (!has_routing_) {
       AERROR << "Routing is not ready.";
@@ -200,16 +189,8 @@ void ReferenceLineProvider::GenerateThread() {
     }
     UpdateReferenceLine(reference_lines, segments);
     double end_time = Clock::NowInSeconds();
-    {
-      std::lock_guard<std::mutex> rf_lock(reference_lines_mutex_);
-      last_calculation_time_ = end_time - start_time;
-    }
-
-    // Tell the main thread that the current reference line is processed.
-    lock.lock();
-    processed_ = true;
-    lock.unlock();
-    cv_.notify_one();
+    std::lock_guard<std::mutex> lock(reference_lines_mutex_);
+    last_calculation_time_ = end_time - start_time;
   }
 }
 
@@ -243,15 +224,7 @@ bool ReferenceLineProvider::GetReferenceLines(
   }
 
   if (FLAGS_enable_reference_line_provider_thread) {
-    // Wait the worker thread function GenerateThread() changes the flag of
-    // "processed_" to "true".
-    {
-      std::unique_lock<std::mutex> lock(notify_mutex_);
-      if (!cv_.wait_for(lock, std::chrono::milliseconds(10),
-                        [this]() { return processed_; })) {
-        AWARN << "Failed to update the current reference line whin 10ms. ";
-      }
-    }
+    std::lock_guard<std::mutex> lock(reference_lines_mutex_);
     if (!reference_lines_.empty()) {
       reference_lines->assign(reference_lines_.begin(), reference_lines_.end());
       segments->assign(route_segments_.begin(), route_segments_.end());
@@ -782,7 +755,8 @@ AnchorPoint ReferenceLineProvider::GetAnchorPoint(
   double shifted_left_width = total_width / 2.0;
 
   // shift to left (or right) on wide lanes
-  if (total_width > adc_width * smoother_config_.wide_lane_threshold_factor()) {
+  if (smoother_config_.wide_lane_threshold_factor() > 0 &&
+      total_width > adc_width * smoother_config_.wide_lane_threshold_factor()) {
     if (smoother_config_.driving_side() == ReferenceLineSmootherConfig::RIGHT) {
       shifted_left_width =
           adc_half_width +
@@ -859,8 +833,7 @@ bool ReferenceLineProvider::SmoothPrefixedReferenceLine(
     common::SLPoint sl_point;
     Vec2d xy{point.path_point.x(), point.path_point.y()};
     if (!prefix_ref.XYToSL(xy, &sl_point)) {
-      AERROR << "Failed to get projection for point: " << xy.DebugString();
-      return false;
+      continue;
     }
     if (sl_point.s() < 0 || sl_point.s() > prefix_ref.Length()) {
       continue;

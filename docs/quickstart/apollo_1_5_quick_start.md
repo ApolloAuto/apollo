@@ -4,7 +4,7 @@ This quick start focuses on Apollo 1.5 new features. For general Apollo concepts
 
 # Onboard Test
 
-1. For vehicle onboard test, make sure you have calibrated the extrinsic parameters between the LiDAR and the GNSS/INS. For sensor calibration, please refer to [Apollo 1.5 LiDAR calibration guide](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_1_5_lidar_calibration_guide.md) before you proceed.
+1. For vehicle onboard test, make sure you have calibrated the extrinsic parameters between the LiDAR and the GNSS/INS. For sensor calibration, please refer to [Apollo 1.5 LiDAR calibration guide](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/apollo_lidar_imu_calibration_guide.md) before you proceed.
 
 2. Launch Docker Release Container
 

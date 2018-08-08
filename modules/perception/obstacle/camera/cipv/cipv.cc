@@ -199,7 +199,7 @@ bool Cipv::ElongateEgoLane(const LaneObjectsPtr lane_objects,
   if (b_left_valid && b_right_valid) {
     // elongate both lanes or do nothing
     ADEBUG << "Both lanes are fine";
-    // When only left lane line is avaiable
+    // When only left lane line is available
   } else if (!b_left_valid && b_right_valid) {
     // Generate virtual left lane based on right lane
     offset_distance = -(fabs(egolane_ground->right_line.line_point[0][1]) +
@@ -208,7 +208,7 @@ bool Cipv::ElongateEgoLane(const LaneObjectsPtr lane_objects,
                     &egolane_ground->left_line);
     ADEBUG << "Made left lane";
 
-    // When only right lane line is avaiable
+    // When only right lane line is available
   } else if (b_left_valid && !b_right_valid) {
     // Generate virtual right lane based on left lane
     offset_distance = (fabs(egolane_ground->left_line.line_point[0][1]) +
@@ -229,7 +229,7 @@ bool Cipv::ElongateEgoLane(const LaneObjectsPtr lane_objects,
   return true;
 }
 
-// Get closest edge of an object in image cooridnate
+// Get closest edge of an object in image coordinate
 bool Cipv::FindClosestEdgeOfObjectImage(const std::shared_ptr<Object> &object,
                                         const EgoLane &egolane_image,
                                         LineSegment2Df *closted_object_edge) {
@@ -310,8 +310,8 @@ bool Cipv::FindClosestEdgeOfObjectImage(const std::shared_ptr<Object> &object,
 
   return true;
 }
-// Get closest edge of an object in ground cooridnate
-// *** TO DO *** This funcion should be changed to find min-y and max-y edges
+// Get closest edge of an object in ground coordinate
+// *** TO DO *** This function should be changed to find min-y and max-y edges
 // to decide CIPV.
 bool Cipv::FindClosestEdgeOfObjectGround(const std::shared_ptr<Object> &object,
                                          const EgoLane &egolane_ground,
@@ -552,7 +552,7 @@ bool Cipv::IsObjectInTheLaneGround(const std::shared_ptr<Object> &object,
   closest_index = -1;
   shortest_distance = MAX_FLOAT;
   for (size_t i = 0; i + 1 < egolane_ground.left_line.line_point.size(); ++i) {
-    // If a end point is in the clostest left lane line segments
+    // If a end point is in the closest left lane line segments
     distance = MAX_FLOAT;
     if (DistanceFromPointToLineSegment(
             closted_object_edge.end_point,
@@ -564,7 +564,7 @@ bool Cipv::IsObjectInTheLaneGround(const std::shared_ptr<Object> &object,
       }
     }
   }
-  // When the clostest line segment was found
+  // When the closest line segment was found
   if (closest_index >= 0) {
     // Check if the end point is on the right of the line segment
     if (debug_level_ >= 3) {
@@ -593,7 +593,7 @@ bool Cipv::IsObjectInTheLaneGround(const std::shared_ptr<Object> &object,
   closest_index = -1;
   shortest_distance = MAX_FLOAT;
   for (size_t i = 0; i + 1 < egolane_ground.right_line.line_point.size(); ++i) {
-    // If a end point is in the clostest right lane line segments
+    // If a end point is in the closest right lane line segments
     distance = MAX_FLOAT;
     if (DistanceFromPointToLineSegment(
             closted_object_edge.start_point,
@@ -605,7 +605,7 @@ bool Cipv::IsObjectInTheLaneGround(const std::shared_ptr<Object> &object,
       }
     }
   }
-  // When the clostest line segment was found
+  // When the closest line segment was found
   if (closest_index >= 0) {
     if (debug_level_ >= 3) {
       AINFO << "[right] closest_index: " << closest_index
@@ -838,7 +838,7 @@ bool Cipv::CollectDrops(const MotionBuffer &motion_buffer,
       }
       if (object_id_skip_count_[obj_id] >= MAX_ALLOWED_SKIP_OBJECT) {
         if (debug_level_ >= 2) {
-          AINFO << "Removed obsolte object " << obj_id;
+          AINFO << "Removed obsolete object " << obj_id;
         }
         object_trackjectories_.erase(obj_id);
         object_id_skip_count_.erase(obj_id);

@@ -121,10 +121,11 @@ function build() {
   info "Building on $MACHINE_ARCH..."
 
   MACHINE_ARCH=$(uname -m)
-  JOB_ARG=""
+  JOB_ARG="--jobs=$(nproc)"
   if [ "$MACHINE_ARCH" == 'aarch64' ]; then
     JOB_ARG="--jobs=3"
   fi
+  info "Building with $JOB_ARG for $MACHINE_ARCH"
   echo "$BUILD_TARGETS" | xargs bazel build $JOB_ARG $DEFINES -c $@
   if [ $? -ne 0 ]; then
     fail 'Build failed!'
@@ -135,8 +136,9 @@ function build() {
 
   # Clear KV DB and update commit_id after compiling.
   rm -fr data/kv_db
+  REVISION=$(get_revision)
   python modules/tools/common/kv_db.py put \
-      "apollo:data:commit_id" "$(git rev-parse HEAD)"
+      "apollo:data:commit_id" "$REVISION"
 
   if [ -d /apollo-simulator ] && [ -e /apollo-simulator/build.sh ]; then
     cd /apollo-simulator && bash build.sh build
@@ -262,6 +264,9 @@ function release() {
   # scripts
   cp -r scripts ${APOLLO_RELEASE_DIR}
 
+  # remove mounted models
+  rm -rf ${APOLLO_RELEASE_DIR}/modules/perception/model/yolo_camera_detector/
+
   # lib
   LIB_DIR="${APOLLO_RELEASE_DIR}/lib"
   mkdir "${LIB_DIR}"
@@ -274,13 +279,12 @@ function release() {
   cp modules/perception/cuda_util/cmake_build/libcuda_util.so $LIB_DIR
 
   # doc
-  cp -r docs "${APOLLO_RELEASE_DIR}"
   cp LICENSE "${APOLLO_RELEASE_DIR}"
   cp third_party/ACKNOWLEDGEMENT.txt "${APOLLO_RELEASE_DIR}"
 
   # release info
   META="${APOLLO_RELEASE_DIR}/meta.ini"
-  echo "git_commit: $(git rev-parse HEAD)" >> $META
+  echo "git_commit: $(get_revision)" >> $META
   echo "car_type: LINCOLN.MKZ" >> $META
   echo "arch: ${MACHINE_ARCH}" >> $META
 }
@@ -330,7 +334,7 @@ function run_test() {
     echo -e "${RED}Need GPU to run the tests.${NO_COLOR}"
     echo "$BUILD_TARGETS" | xargs bazel test $DEFINES --config=unit_test -c dbg --test_verbose_timeout_warnings $@
   else
-    echo "$BUILD_TARGETS" | grep -v "cnn_segmentation_test" | grep -v "yolo_camera_detector_test" | xargs bazel test $DEFINES --config=unit_test -c dbg --test_verbose_timeout_warnings $@
+    echo "$BUILD_TARGETS" | grep -v "cnn_segmentation_test\|yolo_camera_detector_test\|unity_recognize_test\|perception_traffic_light_rectify_test\|cuda_util_test" | xargs bazel test $DEFINES --config=unit_test -c dbg --test_verbose_timeout_warnings $@
   fi
   if [ $? -ne 0 ]; then
     fail 'Test failed!'
@@ -417,10 +421,26 @@ function gen_doc() {
 }
 
 function version() {
+  rev=$(get_revision)
+  if [ "$rev" = "unknown" ];then
+    echo "Version: $rev"
+    return
+  fi
   commit=$(git log -1 --pretty=%H)
   date=$(git log -1 --pretty=%cd)
   echo "Commit: ${commit}"
   echo "Date: ${date}"
+}
+
+function get_revision() {
+  git rev-parse --is-inside-work-tree &> /dev/null
+  if [ $? = 0 ];then
+    REVISION=$(git rev-parse HEAD)
+  else
+    warning "Could not get the version number, maybe this is not a git work tree." >&2
+    REVISION="unknown"
+  fi
+  echo "$REVISION"
 }
 
 function build_velodyne() {
@@ -445,6 +465,30 @@ function build_velodyne() {
   rm -rf modules/build_isolated/
   rm -rf modules/devel_isolated/
 }
+
+function build_velodyne_vls128() {
+  CURRENT_PATH=$(pwd)
+  if [ -d "${ROS_ROOT}" ]; then
+    ROS_PATH="${ROS_ROOT}/../.."
+  else
+    warning "ROS not found. Run apolllo.sh build first."
+    exit 1
+  fi
+
+  source "${ROS_PATH}/setup.bash"
+
+  cd modules
+  catkin_make_isolated --install --source drivers/velodyne_vls \
+    --install-space "${ROS_PATH}" -DCMAKE_BUILD_TYPE=Release \
+    --cmake-args --no-warn-unused-cli
+  find "${ROS_PATH}" -name "*.pyc" -print0 | xargs -0 rm -rf
+  cd -
+
+  rm -rf modules/.catkin_workspace
+  rm -rf modules/build_isolated/
+  rm -rf modules/devel_isolated/
+}
+
 
 
 function build_lslidar() {
@@ -535,6 +579,7 @@ function print_usage() {
   ${BLUE}build_opt${NONE}: build optimized binary for the code
   ${BLUE}build_gpu${NONE}: run build only with Caffe GPU mode support
   ${BLUE}build_velodyne${NONE}: build velodyne driver
+  ${BLUE}build_velodyne_vls128${NONE}: build velodyne vls-128 driver
   ${BLUE}build_lslidar${NONE}: build lslidar driver
   ${BLUE}build_rslidar${NONE}: build rslidar driver
   ${BLUE}build_usbcam${NONE}: build usb camera driver
@@ -605,11 +650,11 @@ function main() {
       apollo_build_opt $@
       ;;
     build_gpu)
-      DEFINES="${DEFINES} --cxxopt=-DUSE_CAFFE_GPU"
+      DEFINES="${DEFINES} --define USE_GPU=true --cxxopt=-DUSE_GPU"
       apollo_build_dbg $@
       ;;
     build_opt_gpu)
-      DEFINES="${DEFINES} --cxxopt=-DUSE_CAFFE_GPU"
+      DEFINES="${DEFINES} --define USE_GPU=true --cxxopt=-DUSE_GPU"
       apollo_build_opt $@
       ;;
     build_fe)
@@ -618,14 +663,14 @@ function main() {
     buildify)
       buildify
       ;;
-    build_gnss)
-      build_gnss
-      ;;
     build_py)
       build_py_proto
       ;;
     build_velodyne)
       build_velodyne
+      ;;
+    build_velodyne_vls128)
+      build_velodyne_vls128
       ;;
     build_lslidar)
       build_lslidar
@@ -654,7 +699,7 @@ function main() {
       citest $@
       ;;
     test_gpu)
-      DEFINES="${DEFINES} --cxxopt=-DUSE_CAFFE_GPU"
+      DEFINES="${DEFINES} --cxxopt=-DUSE_GPU"
       USE_GPU="1"
       run_test $@
       ;;

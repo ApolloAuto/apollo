@@ -24,6 +24,10 @@ DEFINE_double(test_duration, -1.0,
 
 DEFINE_int32(planning_loop_rate, 10, "Loop rate for planning node");
 
+// TODO(all) enable this when perception issue is fixed.
+DEFINE_bool(enable_collision_detection, false,
+            "enable collision detection in planning");
+
 DEFINE_string(planning_adapter_config_filename,
               "modules/planning/conf/adapter.conf",
               "The adapter configuration file");
@@ -180,6 +184,8 @@ DEFINE_bool(enable_nudge_decision, true, "enable nudge decision");
 DEFINE_bool(enable_nudge_slowdown, true,
             "True to slow down when nudge obstacles.");
 
+DEFINE_bool(enable_side_radar, false,
+            "If there is no radar on the side,ignore it");
 DEFINE_double(static_decision_nudge_l_buffer, 0.5, "l buffer for nudge");
 DEFINE_double(lateral_ignore_buffer, 3.0,
               "If an obstacle's lateral distance is further away than this "
@@ -270,8 +276,8 @@ DEFINE_bool(enable_follow_accel_constraint, true,
 DEFINE_bool(enable_sqp_solver, true, "True to enable SQP solver.");
 
 /// thread pool
-DEFINE_int32(num_thread_planning_thread_pool, 5,
-             "num of thread used in planning thread pool.");
+DEFINE_uint32(max_planning_thread_pool_size, 5,
+              "num of thread used in planning thread pool.");
 DEFINE_bool(use_multi_thread_to_add_obstacles, false,
             "use multiple thread to add obstacles.");
 DEFINE_bool(
@@ -300,7 +306,7 @@ DEFINE_double(min_velocity_sample_gap, 1.0,
               "Minimal sampling gap for velocity");
 DEFINE_double(lon_collision_buffer, 2.0,
               "The longitudinal buffer to keep distance to other vehicles");
-DEFINE_double(lat_collision_buffer, 0.2,
+DEFINE_double(lat_collision_buffer, 0.1,
               "The lateral buffer to keep distance to other vehicles");
 DEFINE_uint32(num_sample_follow_per_timestamp, 3,
               "The number of sample points for each timestamp to follow");
@@ -338,7 +344,33 @@ DEFINE_double(comfort_acceleration_factor, 0.5,
 DEFINE_double(polynomial_minimal_param, 0.01,
               "Minimal time parameter in polynomials.");
 DEFINE_double(lattice_stop_buffer, 0.02,
-              "The bufffer before the stop s to check trajectories.");
+              "The buffer before the stop s to check trajectories.");
+
+DEFINE_bool(lateral_optimization, false,
+            "whether using optimization for lateral trajectory generation");
+DEFINE_double(weight_lateral_offset, 1.0,
+              "weight for lateral offset "
+              "in lateral trajectory optimization");
+DEFINE_double(weight_lateral_derivative, 500.0,
+              "weight for lateral derivative "
+              "in lateral trajectory optimization");
+DEFINE_double(weight_lateral_second_order_derivative, 1000.0,
+              "weight for lateral second order derivative "
+              "in lateral trajectory optimization");
+DEFINE_double(
+    weight_lateral_obstacle_distance, 0.0,
+    "weight for lateral obstacle distance in lateral trajectory optimization");
+DEFINE_double(lateral_third_order_derivative_max, 0.1,
+              "the maximal allowance for lateral third order derivative");
+DEFINE_double(max_s_lateral_optimization, 50.0,
+              "The maximal s for lateral optimization.");
+DEFINE_double(default_delta_s_lateral_optimization, 2.0,
+              "The default delta s for lateral optimization.");
+DEFINE_double(bound_buffer, 0.1, "buffer to boundary for lateral optimization");
+DEFINE_double(nudge_buffer, 0.3, "buffer to nudge for lateral optimization");
+
+DEFINE_bool(use_planning_fallback, true,
+            "Use fallback trajectory for planning.");
 
 // navigation mode
 DEFINE_double(navigation_fallback_cruise_time, 8.0,

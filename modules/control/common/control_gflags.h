@@ -50,4 +50,7 @@ DECLARE_bool(enable_slope_offset);
 
 DECLARE_double(lock_steer_speed);
 
+DECLARE_bool(enable_navigation_mode_handlilng);
+DECLARE_bool(enable_persistent_estop);
+
 #endif  // MODULES_CONTROL_COMMON_CONTROL_GFLAGS_H_
