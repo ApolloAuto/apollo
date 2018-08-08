@@ -151,7 +151,7 @@ apollo::common::Status NaviPathDecider::Process(
       return Status(apollo::common::ErrorCode::PLANNING_ERROR,
                     "NaviPathDecider can not pull over");
     }
-  } else if (reference_line.IsOnRoad(adc_vec2d_point)) {
+  } else if (reference_line.IsOnLane(adc_vec2d_point)) {
     ADEBUG << "Common lane path plan";
     target_start_path_point_y =
         NudgeProcess(reference_line, path_points, obstacles, *path_decision);

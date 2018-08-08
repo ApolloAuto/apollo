@@ -148,8 +148,8 @@ int Destination::Stop(Frame* const frame,
 
   // build stop decision
   const auto stop_wall_box = stop_wall->obstacle()->PerceptionBoundingBox();
-  if (!reference_line.IsOnRoad(stop_wall_box.center())) {
-    ADEBUG << "destination point is not on road";
+  if (!reference_line.IsOnLane(stop_wall_box.center())) {
+    ADEBUG << "destination point is not on lane";
     return 0;
   }
   auto stop_point = reference_line.GetReferencePoint(
@@ -203,7 +203,7 @@ bool Destination::CheckPullOver(
   // check dest OnRoad
   const auto& reference_line = reference_line_info->reference_line();
   *dest_point = dest_lane->GetSmoothPoint(dest_lane_s);
-  if (!change_lane && !reference_line.IsOnRoad(*dest_point)) {
+  if (!change_lane && !reference_line.IsOnLane(*dest_point)) {
     return false;
   }
 
