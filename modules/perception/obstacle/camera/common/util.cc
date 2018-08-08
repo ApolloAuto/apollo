@@ -49,7 +49,7 @@ std::vector<cv::Scalar> color_table = {
 bool LoadVisualObjectFromFile(
     const std::string &file_name,
     std::vector<std::shared_ptr<VisualObject>> *visual_objects) {
-  std::fstream fs(file_name, std::fstream::out);
+  std::fstream fs(file_name, std::fstream::in);
 
   while (!fs.eof()) {
     std::shared_ptr<VisualObject> obj(new VisualObject());
