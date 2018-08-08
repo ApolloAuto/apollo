@@ -44,9 +44,9 @@ struct alignas(16) VisualObject {
   // front box  lower-right corner: x2, y2
   Eigen::Vector2d front_lower_right;
 
-  // front box upper-left corner: x1, y1
+  // back box upper-left corner: x1, y1
   Eigen::Vector2d back_upper_left;
-  // front box  lower-right corner: x2, y2
+  // back box lower-right corner: x2, y2
   Eigen::Vector2d back_lower_right;
 
   // 2Dto3D, pts8.resize(16), x, y...

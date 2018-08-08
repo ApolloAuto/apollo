@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,29 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+#ifndef MODULES_MONITOR_HARDWARE_RESOURCE_MONITOR_H_
+#define MODULES_MONITOR_HARDWARE_RESOURCE_MONITOR_H_
 
-#ifndef MODULES_DRIVERS_LIDAR_VELODYNE_COMMON_DEF_H_
-#define MODULES_DRIVERS_LIDAR_VELODYNE_COMMON_DEF_H_
+#include <string>
+#include <vector>
 
-#include <set>
-#include "modules/drivers/lidar_velodyne/proto/velodyne_conf.pb.h"
+#include "modules/monitor/common/recurrent_runner.h"
+#include "modules/monitor/proto/monitor_conf.pb.h"
 
 namespace apollo {
-namespace drivers {
-namespace lidar_velodyne {
+namespace monitor {
 
-static const std::set<VelodyneModel> v64_models = {
-      V64E_S2,
-      V64E_S3S,
-      V64E_S3D_STRONGEST,
-      V64E_S3D_LAST,
-      V64E_S3D_DUAL
+class ResourceMonitor : public RecurrentRunner {
+ public:
+  explicit ResourceMonitor(const ResourceConf& config);
+  void RunOnce(const double current_time) override;
+
+ private:
+  const ResourceConf& config_;
 };
-static const std::set<VelodyneModel> v16_models = {VLP16};
-static const char* valid_models =
-    "V64E_S2|V64E_S3S|V64E_S3D_STRONGEST|V64E_S3D_LAST|V64E_S3D_DUAL|VLP16";
-}  // namespace lidar_velodyne
-}  // namespace drivers
+
+}  // namespace monitor
 }  // namespace apollo
 
-#endif  // MODULES_DRIVERS_LIDAR_VELODYNE_COMMON_DEF_H_
+#endif  // MODULES_MONITOR_HARDWARE_RESOURCE_MONITOR_H_

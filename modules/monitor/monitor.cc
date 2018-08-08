@@ -19,6 +19,7 @@
 #include "modules/monitor/common/monitor_manager.h"
 #include "modules/monitor/hardware/can/can_monitor.h"
 #include "modules/monitor/hardware/gps/gps_monitor.h"
+#include "modules/monitor/hardware/resource_monitor.h"
 #include "modules/monitor/reporters/static_info_reporter.h"
 #include "modules/monitor/reporters/vehicle_state_reporter.h"
 #include "modules/monitor/software/process_monitor.h"
@@ -63,6 +64,9 @@ Status Monitor::Init() {
           hardware.topic_conf(), hw_status->mutable_topic_status()));
     }
   }
+  // Register resource monitor.
+  monitor_thread_.RegisterRunner(make_unique<ResourceMonitor>(
+      config.resource_conf()));
 
   // Register online reporters.
   if (MonitorManager::GetConfig().has_online_report_endpoint()) {

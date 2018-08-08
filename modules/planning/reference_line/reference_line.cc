@@ -436,6 +436,45 @@ void ReferenceLine::GetLaneFromS(
   }
 }
 
+bool ReferenceLine::IsOnLane(const common::math::Vec2d& vec2d_point) const {
+  common::SLPoint sl_point;
+  if (!XYToSL(vec2d_point, &sl_point)) {
+    return false;
+  }
+  return IsOnLane(sl_point);
+}
+
+bool ReferenceLine::IsOnLane(const SLBoundary& sl_boundary) const {
+  if (sl_boundary.end_s() < 0 || sl_boundary.start_s() > Length()) {
+    return false;
+  }
+  double middle_s = (sl_boundary.start_s() + sl_boundary.end_s()) / 2.0;
+  double lane_left_width = 0.0;
+  double lane_right_width = 0.0;
+  map_path_.GetLaneWidth(middle_s, &lane_left_width, &lane_right_width);
+  return !(sl_boundary.start_l() > lane_left_width ||
+           sl_boundary.end_l() < -lane_right_width);
+}
+
+bool ReferenceLine::IsOnLane(const SLPoint& sl_point) const {
+  if (sl_point.s() <= 0 || sl_point.s() > map_path_.length()) {
+    return false;
+  }
+  double left_width = 0.0;
+  double right_width = 0.0;
+
+  if (!GetLaneWidth(sl_point.s(), &left_width, &right_width)) {
+    return false;
+  }
+
+  return !(sl_point.l() < -right_width || sl_point.l() > left_width);
+}
+
+bool ReferenceLine::IsBlockRoad(const common::math::Box2d& box2d,
+                                double gap) const {
+  return map_path_.OverlapWith(box2d, gap);
+}
+
 bool ReferenceLine::IsOnRoad(const common::math::Vec2d& vec2d_point) const {
   common::SLPoint sl_point;
   if (!XYToSL(vec2d_point, &sl_point)) {
@@ -449,30 +488,25 @@ bool ReferenceLine::IsOnRoad(const SLBoundary& sl_boundary) const {
     return false;
   }
   double middle_s = (sl_boundary.start_s() + sl_boundary.end_s()) / 2.0;
-  double lane_left_width = 0.0;
-  double lane_right_width = 0.0;
-  map_path_.GetLaneWidth(middle_s, &lane_left_width, &lane_right_width);
-  return !(sl_boundary.start_l() > lane_left_width ||
-           sl_boundary.end_l() < -lane_right_width);
-}
-
-bool ReferenceLine::IsBlockRoad(const common::math::Box2d& box2d,
-                                double gap) const {
-  return map_path_.OverlapWith(box2d, gap);
+  double road_left_width = 0.0;
+  double road_right_width = 0.0;
+  map_path_.GetRoadWidth(middle_s, &road_left_width, &road_right_width);
+  return !(sl_boundary.start_l() > road_left_width ||
+           sl_boundary.end_l() < -road_right_width);
 }
 
 bool ReferenceLine::IsOnRoad(const SLPoint& sl_point) const {
   if (sl_point.s() <= 0 || sl_point.s() > map_path_.length()) {
     return false;
   }
-  double left_width = 0.0;
-  double right_width = 0.0;
+  double road_left_width = 0.0;
+  double road_right_width = 0.0;
 
-  if (!GetLaneWidth(sl_point.s(), &left_width, &right_width)) {
+  if (!GetRoadWidth(sl_point.s(), &road_left_width, &road_right_width)) {
     return false;
   }
 
-  return !(sl_point.l() < -right_width || sl_point.l() > left_width);
+  return !(sl_point.l() < -road_right_width || sl_point.l() > road_left_width);
 }
 
 // return a rough approximated SLBoundary using box length. It is guaranteed to
@@ -636,7 +670,7 @@ double ReferenceLine::GetSpeedLimitFromS(const double s) const {
 void ReferenceLine::AddSpeedLimit(const hdmap::SpeedControl& speed_control) {
   SLBoundary sl_boundary;
   if (GetSLBoundary(speed_control.polygon(), &sl_boundary) &&
-      IsOnRoad(sl_boundary)) {
+      IsOnLane(sl_boundary)) {
     AddSpeedLimit(sl_boundary.start_s(), sl_boundary.end_s(),
                   speed_control.speed_limit());
   }
