@@ -201,6 +201,7 @@ Status LanePostProcessingSubnode::ProcEvents() {
   timer.Start();
 
   cv::Mat lane_map = objs->camera_frame_supplement->lane_map;
+
   if (lane_map.empty()) {
     AERROR << "Get NULL lane_map from camera frame supplement";
     return Status(ErrorCode::PERCEPTION_ERROR, "Failed to proc events.");
@@ -271,7 +272,7 @@ Status LanePostProcessingSubnode::ProcEvents() {
   min_processing_time_ = std::min(min_processing_time_, t);
   max_processing_time_ = std::max(max_processing_time_, t);
   tot_processing_time_ += t;
-  ADEBUG << "Lane Post Processing Runtime: "
+  AINFO << "Lane Post Processing Runtime: "
          << "MIN (" << min_processing_time_ << " ms), "
          << "MAX (" << max_processing_time_ << " ms), "
          << "AVE (" << tot_processing_time_ / seq_num_ << " ms).";

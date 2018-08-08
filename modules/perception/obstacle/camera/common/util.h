@@ -51,7 +51,7 @@ bool LoadVisualObjectFromFile(
 
 bool WriteVisualObjectToFile(
     const std::string &file_name,
-    std::vector<std::shared_ptr<VisualObject>> *visual_objects);
+    const std::vector<std::shared_ptr<VisualObject>> *visual_objects);
 
 bool LoadGTfromFile(const std::string &gt_path,
                     std::vector<std::shared_ptr<VisualObject>> *visual_objects);

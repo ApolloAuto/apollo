@@ -69,7 +69,7 @@ bool Rerouting::ChangeLaneFailRerouting() {
     AERROR << "Failed to project point: " << point.ShortDebugString();
     return false;
   }
-  if (!reference_line.IsOnRoad(sl_point)) {
+  if (!reference_line.IsOnLane(sl_point)) {
     return true;
   }
   // 5. If the end of current passage region is further than kPrepareRoutingTime

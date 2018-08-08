@@ -40,6 +40,14 @@ new_http_archive(
     url = "file:///home/tmp/benchmark-1.1.0.tar.gz",
 )
 
+new_http_archive(
+    name = "ctpl",
+    build_file = "third_party/ctpl.BUILD",
+    sha256 = "8c1cec7c570d6d84be1d29283af5039ea27c3e69703bd446d396424bf619816e",
+    strip_prefix = "CTPL-ctpl_v.0.0.2",
+    url = "https://github.com/vit-vit/CTPL/archive/ctpl_v.0.0.2.tar.gz",
+)
+
 # cpplint from google style guide
 new_git_repository(
     name = "google_styleguide",
