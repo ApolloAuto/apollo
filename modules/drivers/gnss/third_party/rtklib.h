@@ -92,7 +92,7 @@ extern "C" {
 #endif
 
 /* constants -----------------------------------------------------------------*/
-//#define TRACE
+// #define TRACE
 #define ENAGLO
 #define ENACMP
 
@@ -234,7 +234,7 @@ extern "C" {
 #endif
 #define NSYS                                         \
   (NSYSGPS + NSYSGLO + NSYSGAL + NSYSQZS + NSYSCMP + \
-   NSYSLEO) /* number of systems */
+  NSYSLEO) /* number of systems */
 
 #define MINPRNSBS 120 /* min satellite PRN number of SBAS */
 #define MAXPRNSBS 142 /* max satellite PRN number of SBAS */
@@ -536,7 +536,7 @@ typedef struct {                      /* observation data record */
 
 typedef struct { /* observation data */
   int n, nmax;   /* number of obervation data/allocated */
-  obsd_t *data;  /* observation data records */
+  obsd_t* data;  /* observation data records */
 } obs_t;
 
 typedef struct {   /* earth rotation parameter data type */
@@ -549,7 +549,7 @@ typedef struct {   /* earth rotation parameter data type */
 
 typedef struct { /* earth rotation parameter type */
   int n, nmax;   /* number and max number of data */
-  erpd_t *data;  /* earth rotation parameter data */
+  erpd_t* data;  /* earth rotation parameter data */
 } erp_t;
 
 typedef struct {         /* antenna parameter type */
@@ -559,12 +559,12 @@ typedef struct {         /* antenna parameter type */
   gtime_t ts, te;        /* valid time start and end */
   double off[NFREQ][3];  /* phase center offset e/n/u or x/y/z (m) */
   double var[NFREQ][19]; /* phase center variation (m) */
-                         /* el=90,85,...,0 or nadir=0,1,2,3,... (deg) */
+  /* el=90,85,...,0 or nadir=0,1,2,3,... (deg) */
 } pcv_t;
 
 typedef struct { /* antenna parameters type */
   int n, nmax;   /* number of data/allocated */
-  pcv_t *pcv;    /* antenna parameters data */
+  pcv_t* pcv;    /* antenna parameters data */
 } pcvs_t;
 
 typedef struct { /* almanac type */
@@ -573,7 +573,7 @@ typedef struct { /* almanac type */
   int svconf;    /* as and sv config */
   int week;      /* GPS/QZS: gps week, GAL: galileo week */
   gtime_t toa;   /* Toa */
-                 /* SV orbit parameters */
+  /* SV orbit parameters */
   double A, e, i0, OMG0, omg, M0, OMGd;
   double toas;   /* Toa (s) in week */
   double f0, f1; /* SV clock parameters (af0,af1) */
@@ -588,16 +588,16 @@ typedef struct {         /* GPS/QZS/GAL broadcast ephemeris type */
   int code;              /* GPS/QZS: code on L2, GAL/CMP: data sources */
   int flag;              /* GPS/QZS: L2 P data flag, CMP: nav type */
   gtime_t toe, toc, ttr; /* Toe,Toc,T_trans */
-                         /* SV orbit parameters */
+  /* SV orbit parameters */
   double A, e, i0, OMG0, omg, M0, deln, OMGd, idot;
   double crc, crs, cuc, cus, cic, cis;
   double toes;       /* Toe (s) in week */
   double fit;        /* fit interval (h) */
   double f0, f1, f2; /* SV clock parameters (af0,af1,af2) */
   double tgd[4];     /* group delay parameters */
-                     /* GPS/QZS:tgd[0]=TGD */
-                     /* GAL    :tgd[0]=BGD E5a/E1,tgd[1]=BGD E5b/E1 */
-                     /* CMP    :tgd[0]=BGD1,tgd[1]=BGD2 */
+  /* GPS/QZS:tgd[0]=TGD */
+  /* GAL    :tgd[0]=BGD E5a/E1,tgd[1]=BGD E5b/E1 */
+  /* CMP    :tgd[0]=BGD1,tgd[1]=BGD2 */
   double Adot, ndot; /* Adot,ndot for CNAV */
   double tocs;       /* Toc (s) in week */
 } eph_t;
@@ -669,7 +669,7 @@ typedef struct {  /* norad two line element data type */
 
 typedef struct { /* norad two line element type */
   int n, nmax;   /* number/max number of two line element data */
-  tled_t *data;  /* norad two line element data */
+  tled_t* data;  /* norad two line element data */
 } tle_t;
 
 typedef struct {  /* TEC grid type */
@@ -679,8 +679,8 @@ typedef struct {  /* TEC grid type */
   double lats[3]; /* latitude start/interval (deg) */
   double lons[3]; /* longitude start/interval (deg) */
   double hgts[3]; /* heights start/interval (km) */
-  double *data;   /* TEC grid data (tecu) */
-  float *rms;     /* RMS values (tecu) */
+  double* data;   /* TEC grid data (tecu) */
+  float* rms;     /* RMS values (tecu) */
 } tec_t;
 
 typedef struct {      /* stec data type */
@@ -696,7 +696,7 @@ typedef struct {     /* stec grid type */
   double pos[2];     /* latitude/longitude (deg) */
   int index[MAXSAT]; /* search index */
   int n, nmax;       /* number of data */
-  stecd_t *data;     /* stec data */
+  stecd_t* data;     /* stec data */
 } stec_t;
 
 typedef struct { /* zwd data type */
@@ -708,7 +708,7 @@ typedef struct { /* zwd data type */
 typedef struct { /* zwd grid type */
   float pos[2];  /* latitude,longitude (rad) */
   int n, nmax;   /* number of data */
-  zwdd_t *data;  /* zwd data */
+  zwdd_t* data;  /* zwd data */
 } zwd_t;
 
 typedef struct {         /* SBAS message type */
@@ -719,7 +719,7 @@ typedef struct {         /* SBAS message type */
 
 typedef struct {  /* SBAS messages type */
   int n, nmax;    /* number of SBAS messages/allocated */
-  sbsmsg_t *msgs; /* SBAS messages */
+  sbsmsg_t* msgs; /* SBAS messages */
 } sbs_t;
 
 typedef struct { /* SBAS fast correction type */
@@ -762,7 +762,7 @@ typedef struct {  /* SBAS ionospheric correction type */
 
 typedef struct {      /* IGP band type */
   short x;            /* longitude/latitude (deg) */
-  const short *y;     /* latitudes/longitudes (deg) */
+  const short* y;     /* latitudes/longitudes (deg) */
   unsigned char bits; /* IGP mask start bit */
   unsigned char bite; /* IGP mask end bit */
 } sbsigpband_t;
@@ -809,7 +809,7 @@ typedef struct {          /* QZSS LEX message type */
 
 typedef struct {  /* QZSS LEX messages type */
   int n, nmax;    /* number of LEX messages and allocated */
-  lexmsg_t *msgs; /* LEX messages */
+  lexmsg_t* msgs; /* LEX messages */
 } lex_t;
 
 typedef struct {        /* QZSS LEX ephemeris type */
@@ -843,14 +843,14 @@ typedef struct {     /* navigation data type */
   int na, namax;     /* number of almanac data */
   int nt, ntmax;     /* number of tec grid data */
   int nn, nnmax;     /* number of stec grid data */
-  eph_t *eph;        /* GPS/QZS/GAL ephemeris */
-  geph_t *geph;      /* GLONASS ephemeris */
-  seph_t *seph;      /* SBAS ephemeris */
-  peph_t *peph;      /* precise ephemeris */
-  pclk_t *pclk;      /* precise clock */
-  alm_t *alm;        /* almanac data */
-  tec_t *tec;        /* tec grid data */
-  stec_t *stec;      /* stec grid data */
+  eph_t* eph;        /* GPS/QZS/GAL ephemeris */
+  geph_t* geph;      /* GLONASS ephemeris */
+  seph_t* seph;      /* SBAS ephemeris */
+  peph_t* peph;      /* precise ephemeris */
+  pclk_t* pclk;      /* precise clock */
+  alm_t* alm;        /* almanac data */
+  tec_t* tec;        /* tec grid data */
+  stec_t* stec;      /* stec grid data */
   erp_t erp;         /* earth rotation parameters */
   double utc_gps[4]; /* GPS delta-UTC parameters {A0,A1,T,W} */
   double utc_glo[4]; /* GLONASS UTC GPS time parameters */
@@ -862,7 +862,7 @@ typedef struct {     /* navigation data type */
   double ion_gal[4]; /* Galileo iono model parameters {ai0,ai1,ai2,0} */
   double ion_qzs[8]; /* QZSS iono model parameters {a0,a1,a2,a3,b0,b1,b2,b3} */
   double
-      ion_cmp[8]; /* BeiDou iono model parameters {a0,a1,a2,a3,b0,b1,b2,b3} */
+  ion_cmp[8]; /* BeiDou iono model parameters {a0,a1,a2,a3,b0,b1,b2,b3} */
   int leaps;      /* leap seconds (s) */
   double lam[MAXSAT][NFREQ];    /* carrier wave lengths (m) */
   double cbias[MAXSAT][3];      /* code bias (0:p1-p2,1:p1-c1,2:p2-c2) (m) */
@@ -897,10 +897,10 @@ typedef struct {        /* station parameter type */
 typedef struct {      /* solution type */
   gtime_t time;       /* time (GPST) */
   double rr[6];       /* position/velocity (m|m/s) */
-                      /* {x,y,z,vx,vy,vz} or {e,n,u,ve,vn,vu} */
+  /* {x,y,z,vx,vy,vz} or {e,n,u,ve,vn,vu} */
   float qr[6];        /* position variance/covariance (m^2) */
-                      /* {c_xx,c_yy,c_zz,c_xy,c_yz,c_zx} or */
-                      /* {c_ee,c_nn,c_uu,c_en,c_nu,c_ue} */
+  /* {c_xx,c_yy,c_zz,c_xy,c_yz,c_zx} or */
+  /* {c_ee,c_nn,c_uu,c_en,c_nu,c_ue} */
   double dtr[6];      /* receiver clock bias to time systems (s) */
   unsigned char type; /* type (0:xyz-ecef,1:enu-baseline) */
   unsigned char stat; /* solution status (SOLQ_???) */
@@ -914,7 +914,7 @@ typedef struct {  /* solution buffer type */
   int cyclic;     /* cyclic buffer flag */
   int start, end; /* start/end index */
   gtime_t time;   /* current solution time */
-  sol_t *data;    /* solution data */
+  sol_t* data;    /* solution data */
   double rb[3];   /* reference position {x,y,z} (ecef) (m) */
   unsigned char buff[MAXSOLMSG + 1]; /* message buffer */
   int nb;                            /* number of byte in message buffer */
@@ -937,7 +937,7 @@ typedef struct {        /* solution status type */
 
 typedef struct {   /* solution status buffer type */
   int n, nmax;     /* number of solution/max number of buffer */
-  solstat_t *data; /* solution status data */
+  solstat_t* data; /* solution status data */
 } solstatbuf_t;
 
 typedef struct {        /* RTCM control struct type */
@@ -950,7 +950,7 @@ typedef struct {        /* RTCM control struct type */
   obs_t obs;            /* observation data (uncorrected) */
   nav_t nav;            /* satellite ephemerides */
   sta_t sta;            /* station parameters */
-  dgps_t *dgps;         /* output of dgps corrections */
+  dgps_t* dgps;         /* output of dgps corrections */
   ssr_t ssr[MAXSAT];    /* output of ssr corrections */
   char msg[128];        /* special message */
   char msgtype[256];    /* last message type */
@@ -968,7 +968,7 @@ typedef struct {        /* RTCM control struct type */
   unsigned int word;        /* word buffer for rtcm 2 */
   unsigned int nmsg2[100];  /* message count of RTCM 2 (1-99:1-99,0:other) */
   unsigned int
-      nmsg3[300]; /* message count of RTCM 3 (1-299:1001-1299,0:ohter) */
+  nmsg3[300]; /* message count of RTCM 3 (1-299:1001-1299,0:ohter) */
   char opt[256];  /* RTCM dependent options */
   int message_type;
 } rtcm_t;
@@ -995,10 +995,10 @@ typedef struct {   /* download url type */
 } url_t;
 
 typedef struct { /* option type */
-  char *name;    /* option name */
+  char* name;    /* option name */
   int format;    /* option format (0:int,1:double,2:string,3:enum) */
-  void *var;     /* pointer to option variable */
-  char *comment; /* option comment/enum labels/unit */
+  void* var;     /* pointer to option variable */
+  char* comment; /* option comment/enum labels/unit */
 } opt_t;
 
 typedef struct {             /* extended receiver error model */
@@ -1022,8 +1022,7 @@ typedef struct {     /* processing options type */
   double elmin;      /* elevation mask angle (rad) */
   snrmask_t snrmask; /* SNR mask */
   int sateph;        /* satellite ephemeris/clock (EPHOPT_???) */
-  int modear;        /* AR mode (0:off,1:continuous,2:instantaneous,3:fix and
-                        hold,4:ppp-ar) */
+  int modear;        /* AR mode (0:off,1:continuous,2:instantaneous,3:fix and hold,4:ppp-ar) */
   int glomodear;     /* GLONASS AR mode (0:off,1:on,2:auto cal,3:ext cal) */
   int bdsmodear;     /* BeiDou AR mode (0:off,1:on) */
   int maxout;        /* obs outage count to reset bias */
@@ -1040,13 +1039,13 @@ typedef struct {     /* processing options type */
   int sbassatsel; /* SBAS satellite selection (0:all) */
   int rovpos;     /* rover position for fixed mode */
   int refpos;     /* base position for relative mode */
-                  /* (0:pos in prcopt,  1:average of single pos, */
-                  /*  2:read from file, 3:rinex header, 4:rtcm pos) */
+  /* (0:pos in prcopt,  1:average of single pos, */
+  /*  2:read from file, 3:rinex header, 4:rtcm pos) */
   double eratio[NFREQ]; /* code/phase error ratio */
   double err[5];        /* measurement error factor */
-                        /* [0]:reserved */
-                        /* [1-3]:error factor a/b/c of phase (m) */
-                        /* [4]:doppler frequency (hz) */
+  /* [0]:reserved */
+  /* [1-3]:error factor a/b/c of phase (m) */
+  /* [4]:doppler frequency (hz) */
   double std[3];        /* initial-state std [0]bias,[1]iono [2]trop */
   double prn[5]; /* process-noise std [0]bias,[1]iono [2]trop [3]acch [4]accv */
   double sclkstab;    /* satellite clock stability (sec/sec) */
@@ -1062,11 +1061,11 @@ typedef struct {     /* processing options type */
   double rb[3];       /* base position for relative mode {x,y,z} (ecef) (m) */
   char anttype[2][MAXANT]; /* antenna types {rover,base} */
   double
-      antdel[2]
-            [3]; /* antenna delta {{rov_e,rov_n,rov_u},{ref_e,ref_n,ref_u}} */
+  antdel[2]
+  [3]; /* antenna delta {{rov_e,rov_n,rov_u},{ref_e,ref_n,ref_u}} */
   pcv_t pcvr[2]; /* receiver antenna parameters {rov,base} */
   unsigned char
-      exsats[MAXSAT];      /* excluded satellites (1:excluded,2:included) */
+  exsats[MAXSAT];      /* excluded satellites (1:excluded,2:included) */
   char rnxopt[2][256];     /* rinex options {rover,base} */
   int posopt[6];           /* positioning options */
   int syncsol;             /* solution sync mode (0:off,1:on) */
@@ -1089,7 +1088,7 @@ typedef struct { /* solution options type */
   int sstat;     /* solution statistics level (0:off,1:states,2:residuals) */
   int trace;     /* debug trace level (0:off,1-5:debug) */
   double nmeaintv[2]; /* nmea output interval (s) (<0:no,0:all) */
-                      /* nmeaintv[0]:gprmc,gpgga,nmeaintv[1]:gpgsv */
+  /* nmeaintv[0]:gprmc,gpgga,nmeaintv[1]:gpgsv */
   char sep[64];       /* field separator */
   char prog[64];      /* program name */
 } solopt_t;
@@ -1179,8 +1178,8 @@ typedef struct {          /* RTK control/result type */
   double rb[6];           /* base position/velocity (ecef) (m|m/s) */
   int nx, na;             /* number of float states/fixed states */
   double tt;              /* time difference between current and previous (s) */
-  double *x, *P;          /* float states and their covariance */
-  double *xa, *Pa;        /* fixed states and their covariance */
+  double* x, *P;          /* float states and their covariance */
+  double* xa, *Pa;        /* fixed states and their covariance */
   int nfix;               /* number of continuous fixes of ambiguity */
   ambc_t ambc[MAXSAT];    /* ambibuity control */
   ssat_t ssat[MAXSAT];    /* satellite status */
@@ -1216,7 +1215,7 @@ typedef struct {     /* receiver raw data control type */
   unsigned char buff[MAXRAWLEN]; /* message buffer */
   char opt[256];                 /* receiver dependent options */
   double
-      receive_time; /* RT17: Reiceve time of week for week rollover detection */
+  receive_time; /* RT17: Reiceve time of week for week rollover detection */
   unsigned int plen;  /* RT17: Total size of packet to be read */
   unsigned int pbyte; /* RT17: How many packet bytes have been read so far */
   unsigned int page;  /* RT17: Last page number */
@@ -1234,7 +1233,7 @@ typedef struct {            /* stream type */
   unsigned int tick, tact;  /* tick/active tick */
   unsigned int inbt, outbt; /* input/output bytes at tick */
   lock_t lock;              /* lock flag */
-  void *port;               /* type dependent port control struct */
+  void* port;               /* type dependent port control struct */
   char path[MAXSTRPATH];    /* stream path */
   char msg[MAXSTRMSG];      /* stream message */
 } stream_t;
@@ -1260,11 +1259,11 @@ typedef struct {       /* stream server type */
   int nstr;            /* number of streams (1 input + (nstr-1) outputs */
   int npb;             /* data length in peek buffer (bytes) */
   double nmeapos[3];   /* NMEA request position (ecef) (m) */
-  unsigned char *buff; /* input buffers */
-  unsigned char *pbuf; /* peek buffer */
+  unsigned char* buff; /* input buffers */
+  unsigned char* pbuf; /* peek buffer */
   unsigned int tick;   /* start tick */
   stream_t stream[16]; /* input/output streams */
-  strconv_t *conv[16]; /* stream converter */
+  strconv_t* conv[16]; /* stream converter */
   thread_t thread;     /* server thread */
   lock_t lock;         /* lock flag */
 } strsvr_t;
@@ -1285,9 +1284,9 @@ typedef struct {            /* RTK server type */
   int nb[3];                /* bytes in input buffers {rov,base} */
   int nsb[2];               /* bytes in soulution buffers */
   int npb[3];               /* bytes in input peek buffers */
-  unsigned char *buff[3];   /* input buffers {rov,base,corr} */
-  unsigned char *sbuf[2];   /* output buffers {sol1,sol2} */
-  unsigned char *pbuf[3];   /* peek buffers {rov,base,corr} */
+  unsigned char* buff[3];   /* input buffers {rov,base,corr} */
+  unsigned char* sbuf[2];   /* output buffers {sol1,sol2} */
+  unsigned char* pbuf[3];   /* peek buffers {rov,base,corr} */
   sol_t solbuf[MAXSOLBUF];  /* solution buffer */
   unsigned int nmsg[3][10]; /* input message counts */
   raw_t raw[3];             /* receiver raw control {rov,base,corr} */
@@ -1298,7 +1297,7 @@ typedef struct {            /* RTK server type */
   nav_t nav;                  /* navigation data */
   sbsmsg_t sbsmsg[MAXSBSMSG]; /* SBAS message buffer */
   stream_t stream[8]; /* streams {rov,base,corr,sol1,sol2,logr,logb,logc} */
-  stream_t *moni;     /* monitor stream */
+  stream_t* moni;     /* monitor stream */
   unsigned int tick;  /* start tick */
   thread_t thread;    /* server thread */
   int cputime;        /* CPU time (ms) for a processing cycle */
@@ -1313,59 +1312,59 @@ extern const prcopt_t prcopt_default; /* default positioning options */
 extern const solopt_t solopt_default; /* default solution output options */
 extern const sbsigpband_t igpband1[][8]; /* SBAS IGP band 0-8 */
 extern const sbsigpband_t igpband2[][5]; /* SBAS IGP band 9-10 */
-extern const char *formatstrs[];         /* stream format strings */
+extern const char* formatstrs[];         /* stream format strings */
 extern opt_t sysopts[];                  /* system options table */
 
 /* satellites, systems, codes functions --------------------------------------*/
 extern int satno(int sys, int prn);
-extern int satsys(int sat, int *prn);
-extern int satid2no(const char *id);
-extern void satno2id(int sat, char *id);
-extern unsigned char obs2code(const char *obs, int *freq);
-extern char *code2obs(unsigned char code, int *freq);
-extern int satexclude(int sat, int svh, const prcopt_t *opt);
+extern int satsys(int sat, int* prn);
+extern int satid2no(const char* id);
+extern void satno2id(int sat, char* id);
+extern unsigned char obs2code(const char* obs, int* freq);
+extern char* code2obs(unsigned char code, int* freq);
+extern int satexclude(int sat, int svh, const prcopt_t* opt);
 extern int testsnr(int base, int freq, double el, double snr,
-                   const snrmask_t *mask);
-extern void setcodepri(int sys, int freq, const char *pri);
-extern int getcodepri(int sys, unsigned char code, const char *opt);
+                   const snrmask_t* mask);
+extern void setcodepri(int sys, int freq, const char* pri);
+extern int getcodepri(int sys, unsigned char code, const char* opt);
 
 /* matrix and vector functions -----------------------------------------------*/
-extern double *mat(int n, int m);
-extern int *imat(int n, int m);
-extern double *zeros(int n, int m);
-extern double *eye(int n);
-extern double dot(const double *a, const double *b, int n);
-extern double norm(const double *a, int n);
-extern void cross3(const double *a, const double *b, double *c);
-extern int normv3(const double *a, double *b);
-extern void matcpy(double *A, const double *B, int n, int m);
-extern void matmul(const char *tr, int n, int k, int m, double alpha,
-                   const double *A, const double *B, double beta, double *C);
-extern int matinv(double *A, int n);
-extern int solve(const char *tr, const double *A, const double *Y, int n, int m,
-                 double *X);
-extern int lsq(const double *A, const double *y, int n, int m, double *x,
-               double *Q);
-extern int filter(double *x, double *P, const double *H, const double *v,
-                  const double *R, int n, int m);
-extern int smoother(const double *xf, const double *Qf, const double *xb,
-                    const double *Qb, int n, double *xs, double *Qs);
-extern void matprint(const double *A, int n, int m, int p, int q);
-extern void matfprint(const double *A, int n, int m, int p, int q, FILE *fp);
+extern double* mat(int n, int m);
+extern int* imat(int n, int m);
+extern double* zeros(int n, int m);
+extern double* eye(int n);
+extern double dot(const double* a, const double* b, int n);
+extern double norm(const double* a, int n);
+extern void cross3(const double* a, const double* b, double* c);
+extern int normv3(const double* a, double* b);
+extern void matcpy(double* A, const double* B, int n, int m);
+extern void matmul(const char* tr, int n, int k, int m, double alpha,
+                   const double* A, const double* B, double beta, double* C);
+extern int matinv(double* A, int n);
+extern int solve(const char* tr, const double* A, const double* Y, int n, int m,
+                 double* X);
+extern int lsq(const double* A, const double* y, int n, int m, double* x,
+               double* Q);
+extern int filter(double* x, double* P, const double* H, const double* v,
+                  const double* R, int n, int m);
+extern int smoother(const double* xf, const double* Qf, const double* xb,
+                    const double* Qb, int n, double* xs, double* Qs);
+extern void matprint(const double* A, int n, int m, int p, int q);
+extern void matfprint(const double* A, int n, int m, int p, int q, FILE* fp);
 
 /* time and string functions -------------------------------------------------*/
-extern double str2num(const char *s, int i, int n);
-extern int str2time(const char *s, int i, int n, gtime_t *t);
-extern void time2str(gtime_t t, char *str, int n);
-extern gtime_t epoch2time(const double *ep);
-extern void time2epoch(gtime_t t, double *ep);
+extern double str2num(const char* s, int i, int n);
+extern int str2time(const char* s, int i, int n, gtime_t* t);
+extern void time2str(gtime_t t, char* str, int n);
+extern gtime_t epoch2time(const double* ep);
+extern void time2epoch(gtime_t t, double* ep);
 extern gtime_t gpst2time(int week, double sec);
-extern double time2gpst(gtime_t t, int *week);
+extern double time2gpst(gtime_t t, int* week);
 extern gtime_t gst2time(int week, double sec);
-extern double time2gst(gtime_t t, int *week);
+extern double time2gst(gtime_t t, int* week);
 extern gtime_t bdt2time(int week, double sec);
-extern double time2bdt(gtime_t t, int *week);
-extern char *time_str(gtime_t t, int n);
+extern double time2bdt(gtime_t t, int* week);
+extern char* time_str(gtime_t t, int n);
 
 extern gtime_t timeadd(gtime_t t, double sec);
 extern double timediff(gtime_t t1, gtime_t t2);
@@ -1377,412 +1376,412 @@ extern gtime_t timeget(void);
 extern void timeset(gtime_t t);
 extern double time2doy(gtime_t t);
 extern double utc2gmst(gtime_t t, double ut1_utc);
-extern int read_leaps(const char *file);
+extern int read_leaps(const char* file);
 
 extern int adjgpsweek(int week);
 extern unsigned int tickget(void);
 extern void sleepms(int ms);
 
-extern int reppath(const char *path, char *rpath, gtime_t time, const char *rov,
-                   const char *base);
-extern int reppaths(const char *path, char *rpaths[], int nmax, gtime_t ts,
-                    gtime_t te, const char *rov, const char *base);
+extern int reppath(const char* path, char* rpath, gtime_t time, const char* rov,
+                   const char* base);
+extern int reppaths(const char* path, char* rpaths[], int nmax, gtime_t ts,
+                    gtime_t te, const char* rov, const char* base);
 
 /* coordinates transformation ------------------------------------------------*/
-extern void ecef2pos(const double *r, double *pos);
-extern void pos2ecef(const double *pos, double *r);
-extern void ecef2enu(const double *pos, const double *r, double *e);
-extern void enu2ecef(const double *pos, const double *e, double *r);
-extern void covenu(const double *pos, const double *P, double *Q);
-extern void covecef(const double *pos, const double *Q, double *P);
-extern void xyz2enu(const double *pos, double *E);
-extern void eci2ecef(gtime_t tutc, const double *erpv, double *U, double *gmst);
-extern void deg2dms(double deg, double *dms);
-extern double dms2deg(const double *dms);
+extern void ecef2pos(const double* r, double* pos);
+extern void pos2ecef(const double* pos, double* r);
+extern void ecef2enu(const double* pos, const double* r, double* e);
+extern void enu2ecef(const double* pos, const double* e, double* r);
+extern void covenu(const double* pos, const double* P, double* Q);
+extern void covecef(const double* pos, const double* Q, double* P);
+extern void xyz2enu(const double* pos, double* E);
+extern void eci2ecef(gtime_t tutc, const double* erpv, double* U, double* gmst);
+extern void deg2dms(double deg, double* dms);
+extern double dms2deg(const double* dms);
 
 /* input and output functions ------------------------------------------------*/
-extern void readpos(const char *file, const char *rcv, double *pos);
-extern int sortobs(obs_t *obs);
-extern void uniqnav(nav_t *nav);
+extern void readpos(const char* file, const char* rcv, double* pos);
+extern int sortobs(obs_t* obs);
+extern void uniqnav(nav_t* nav);
 extern int screent(gtime_t time, gtime_t ts, gtime_t te, double tint);
-extern int readnav(const char *file, nav_t *nav);
-extern int savenav(const char *file, const nav_t *nav);
-extern void freeobs(obs_t *obs);
-extern void freenav(nav_t *nav, int opt);
-extern int readblq(const char *file, const char *sta, double *odisp);
-extern int readerp(const char *file, erp_t *erp);
-extern int geterp(const erp_t *erp, gtime_t time, double *val);
+extern int readnav(const char* file, nav_t* nav);
+extern int savenav(const char* file, const nav_t* nav);
+extern void freeobs(obs_t* obs);
+extern void freenav(nav_t* nav, int opt);
+extern int readblq(const char* file, const char* sta, double* odisp);
+extern int readerp(const char* file, erp_t* erp);
+extern int geterp(const erp_t* erp, gtime_t time, double* val);
 
 /* debug trace functions -----------------------------------------------------*/
-extern void traceopen(const char *file);
+extern void traceopen(const char* file);
 extern void traceclose(void);
 extern void tracelevel(int level);
-extern void trace(int level, const char *format, ...);
-extern void tracet(int level, const char *format, ...);
-extern void tracemat(int level, const double *A, int n, int m, int p, int q);
-extern void traceobs(int level, const obsd_t *obs, int n);
-extern void tracenav(int level, const nav_t *nav);
-extern void tracegnav(int level, const nav_t *nav);
-extern void tracehnav(int level, const nav_t *nav);
-extern void tracepeph(int level, const nav_t *nav);
-extern void tracepclk(int level, const nav_t *nav);
-extern void traceb(int level, const unsigned char *p, int n);
+extern void trace(int level, const char* format, ...);
+extern void tracet(int level, const char* format, ...);
+extern void tracemat(int level, const double* A, int n, int m, int p, int q);
+extern void traceobs(int level, const obsd_t* obs, int n);
+extern void tracenav(int level, const nav_t* nav);
+extern void tracegnav(int level, const nav_t* nav);
+extern void tracehnav(int level, const nav_t* nav);
+extern void tracepeph(int level, const nav_t* nav);
+extern void tracepclk(int level, const nav_t* nav);
+extern void traceb(int level, const unsigned char* p, int n);
 
 /* platform dependent functions ----------------------------------------------*/
-extern int execcmd(const char *cmd);
-extern int expath(const char *path, char *paths[], int nmax);
-extern void createdir(const char *path);
+extern int execcmd(const char* cmd);
+extern int expath(const char* path, char* paths[], int nmax);
+extern void createdir(const char* path);
 
 /* positioning models --------------------------------------------------------*/
-extern double satwavelen(int sat, int frq, const nav_t *nav);
-extern double satazel(const double *pos, const double *e, double *azel);
-extern double geodist(const double *rs, const double *rr, double *e);
-extern void dops(int ns, const double *azel, double elmin, double *dop);
-extern void csmooth(obs_t *obs, int ns);
+extern double satwavelen(int sat, int frq, const nav_t* nav);
+extern double satazel(const double* pos, const double* e, double* azel);
+extern double geodist(const double* rs, const double* rr, double* e);
+extern void dops(int ns, const double* azel, double elmin, double* dop);
+extern void csmooth(obs_t* obs, int ns);
 
 /* atmosphere models ---------------------------------------------------------*/
-extern double ionmodel(gtime_t t, const double *ion, const double *pos,
-                       const double *azel);
-extern double ionmapf(const double *pos, const double *azel);
-extern double ionppp(const double *pos, const double *azel, double re,
-                     double hion, double *pppos);
-extern double tropmodel(gtime_t time, const double *pos, const double *azel,
+extern double ionmodel(gtime_t t, const double* ion, const double* pos,
+                       const double* azel);
+extern double ionmapf(const double* pos, const double* azel);
+extern double ionppp(const double* pos, const double* azel, double re,
+                     double hion, double* pppos);
+extern double tropmodel(gtime_t time, const double* pos, const double* azel,
                         double humi);
-extern double tropmapf(gtime_t time, const double *pos, const double *azel,
-                       double *mapfw);
-extern int iontec(gtime_t time, const nav_t *nav, const double *pos,
-                  const double *azel, int opt, double *delay, double *var);
-extern void readtec(const char *file, nav_t *nav, int opt);
-extern int ionocorr(gtime_t time, const nav_t *nav, int sat, const double *pos,
-                    const double *azel, int ionoopt, double *ion, double *var);
-extern int tropcorr(gtime_t time, const nav_t *nav, const double *pos,
-                    const double *azel, int tropopt, double *trp, double *var);
-extern void stec_read(const char *file, nav_t *nav);
-extern int stec_grid(const nav_t *nav, const double *pos, int nmax, int *index,
-                     double *dist);
-extern int stec_data(stec_t *stec, gtime_t time, int sat, double *iono,
-                     double *rate, double *rms, int *slip);
-extern int stec_ion(gtime_t time, const nav_t *nav, int sat, const double *pos,
-                    const double *azel, double *iono, double *rate, double *var,
-                    int *brk);
-extern void stec_free(nav_t *nav);
+extern double tropmapf(gtime_t time, const double* pos, const double* azel,
+                       double* mapfw);
+extern int iontec(gtime_t time, const nav_t* nav, const double* pos,
+                  const double* azel, int opt, double* delay, double* var);
+extern void readtec(const char* file, nav_t* nav, int opt);
+extern int ionocorr(gtime_t time, const nav_t* nav, int sat, const double* pos,
+                    const double* azel, int ionoopt, double* ion, double* var);
+extern int tropcorr(gtime_t time, const nav_t* nav, const double* pos,
+                    const double* azel, int tropopt, double* trp, double* var);
+extern void stec_read(const char* file, nav_t* nav);
+extern int stec_grid(const nav_t* nav, const double* pos, int nmax, int* index,
+                     double* dist);
+extern int stec_data(stec_t* stec, gtime_t time, int sat, double* iono,
+                     double* rate, double* rms, int* slip);
+extern int stec_ion(gtime_t time, const nav_t* nav, int sat, const double* pos,
+                    const double* azel, double* iono, double* rate, double* var,
+                    int* brk);
+extern void stec_free(nav_t* nav);
 
 /* antenna models ------------------------------------------------------------*/
-extern int readpcv(const char *file, pcvs_t *pcvs);
-extern pcv_t *searchpcv(int sat, const char *type, gtime_t time,
-                        const pcvs_t *pcvs);
-extern void antmodel(const pcv_t *pcv, const double *del, const double *azel,
-                     int opt, double *dant);
-extern void antmodel_s(const pcv_t *pcv, double nadir, double *dant);
+extern int readpcv(const char* file, pcvs_t* pcvs);
+extern pcv_t* searchpcv(int sat, const char* type, gtime_t time,
+                        const pcvs_t* pcvs);
+extern void antmodel(const pcv_t* pcv, const double* del, const double* azel,
+                     int opt, double* dant);
+extern void antmodel_s(const pcv_t* pcv, double nadir, double* dant);
 
 /* earth tide models ---------------------------------------------------------*/
-extern void sunmoonpos(gtime_t tutc, const double *erpv, double *rsun,
-                       double *rmoon, double *gmst);
-extern void tidedisp(gtime_t tutc, const double *rr, int opt, const erp_t *erp,
-                     const double *odisp, double *dr);
+extern void sunmoonpos(gtime_t tutc, const double* erpv, double* rsun,
+                       double* rmoon, double* gmst);
+extern void tidedisp(gtime_t tutc, const double* rr, int opt, const erp_t* erp,
+                     const double* odisp, double* dr);
 
 /* geiod models --------------------------------------------------------------*/
-extern int opengeoid(int model, const char *file);
+extern int opengeoid(int model, const char* file);
 extern void closegeoid(void);
-extern double geoidh(const double *pos);
+extern double geoidh(const double* pos);
 
 /* datum transformation ------------------------------------------------------*/
-extern int loaddatump(const char *file);
-extern int tokyo2jgd(double *pos);
-extern int jgd2tokyo(double *pos);
+extern int loaddatump(const char* file);
+extern int tokyo2jgd(double* pos);
+extern int jgd2tokyo(double* pos);
 
 /* rinex functions -----------------------------------------------------------*/
-extern int readrnx(const char *file, int rcv, const char *opt, obs_t *obs,
-                   nav_t *nav, sta_t *sta);
-extern int readrnxt(const char *file, int rcv, gtime_t ts, gtime_t te,
-                    double tint, const char *opt, obs_t *obs, nav_t *nav,
-                    sta_t *sta);
-extern int readrnxc(const char *file, nav_t *nav);
-extern int outrnxobsh(FILE *fp, const rnxopt_t *opt, const nav_t *nav);
-extern int outrnxobsb(FILE *fp, const rnxopt_t *opt, const obsd_t *obs, int n,
+extern int readrnx(const char* file, int rcv, const char* opt, obs_t* obs,
+                   nav_t* nav, sta_t* sta);
+extern int readrnxt(const char* file, int rcv, gtime_t ts, gtime_t te,
+                    double tint, const char* opt, obs_t* obs, nav_t* nav,
+                    sta_t* sta);
+extern int readrnxc(const char* file, nav_t* nav);
+extern int outrnxobsh(FILE* fp, const rnxopt_t* opt, const nav_t* nav);
+extern int outrnxobsb(FILE* fp, const rnxopt_t* opt, const obsd_t* obs, int n,
                       int epflag);
-extern int outrnxnavh(FILE *fp, const rnxopt_t *opt, const nav_t *nav);
-extern int outrnxgnavh(FILE *fp, const rnxopt_t *opt, const nav_t *nav);
-extern int outrnxhnavh(FILE *fp, const rnxopt_t *opt, const nav_t *nav);
-extern int outrnxlnavh(FILE *fp, const rnxopt_t *opt, const nav_t *nav);
-extern int outrnxqnavh(FILE *fp, const rnxopt_t *opt, const nav_t *nav);
-extern int outrnxcnavh(FILE *fp, const rnxopt_t *opt, const nav_t *nav);
-extern int outrnxnavb(FILE *fp, const rnxopt_t *opt, const eph_t *eph);
-extern int outrnxgnavb(FILE *fp, const rnxopt_t *opt, const geph_t *geph);
-extern int outrnxhnavb(FILE *fp, const rnxopt_t *opt, const seph_t *seph);
-extern int uncompress(const char *file, char *uncfile);
-extern int convrnx(int format, rnxopt_t *opt, const char *file, char **ofile);
-extern int init_rnxctr(rnxctr_t *rnx);
-extern void free_rnxctr(rnxctr_t *rnx);
-extern int open_rnxctr(rnxctr_t *rnx, FILE *fp);
-extern int input_rnxctr(rnxctr_t *rnx, FILE *fp);
+extern int outrnxnavh(FILE* fp, const rnxopt_t* opt, const nav_t* nav);
+extern int outrnxgnavh(FILE* fp, const rnxopt_t* opt, const nav_t* nav);
+extern int outrnxhnavh(FILE* fp, const rnxopt_t* opt, const nav_t* nav);
+extern int outrnxlnavh(FILE* fp, const rnxopt_t* opt, const nav_t* nav);
+extern int outrnxqnavh(FILE* fp, const rnxopt_t* opt, const nav_t* nav);
+extern int outrnxcnavh(FILE* fp, const rnxopt_t* opt, const nav_t* nav);
+extern int outrnxnavb(FILE* fp, const rnxopt_t* opt, const eph_t* eph);
+extern int outrnxgnavb(FILE* fp, const rnxopt_t* opt, const geph_t* geph);
+extern int outrnxhnavb(FILE* fp, const rnxopt_t* opt, const seph_t* seph);
+extern int uncompress(const char* file, char* uncfile);
+extern int convrnx(int format, rnxopt_t* opt, const char* file, char** ofile);
+extern int init_rnxctr(rnxctr_t* rnx);
+extern void free_rnxctr(rnxctr_t* rnx);
+extern int open_rnxctr(rnxctr_t* rnx, FILE* fp);
+extern int input_rnxctr(rnxctr_t* rnx, FILE* fp);
 
 /* ephemeris and clock functions ---------------------------------------------*/
-extern double eph2clk(gtime_t time, const eph_t *eph);
-extern double geph2clk(gtime_t time, const geph_t *geph);
-extern double seph2clk(gtime_t time, const seph_t *seph);
-extern void eph2pos(gtime_t time, const eph_t *eph, double *rs, double *dts,
-                    double *var);
-extern void geph2pos(gtime_t time, const geph_t *geph, double *rs, double *dts,
-                     double *var);
-extern void seph2pos(gtime_t time, const seph_t *seph, double *rs, double *dts,
-                     double *var);
-extern int peph2pos(gtime_t time, int sat, const nav_t *nav, int opt,
-                    double *rs, double *dts, double *var);
-extern void satantoff(gtime_t time, const double *rs, int sat, const nav_t *nav,
-                      double *dant);
+extern double eph2clk(gtime_t time, const eph_t* eph);
+extern double geph2clk(gtime_t time, const geph_t* geph);
+extern double seph2clk(gtime_t time, const seph_t* seph);
+extern void eph2pos(gtime_t time, const eph_t* eph, double* rs, double* dts,
+                    double* var);
+extern void geph2pos(gtime_t time, const geph_t* geph, double* rs, double* dts,
+                     double* var);
+extern void seph2pos(gtime_t time, const seph_t* seph, double* rs, double* dts,
+                     double* var);
+extern int peph2pos(gtime_t time, int sat, const nav_t* nav, int opt,
+                    double* rs, double* dts, double* var);
+extern void satantoff(gtime_t time, const double* rs, int sat, const nav_t* nav,
+                      double* dant);
 extern int satpos(gtime_t time, gtime_t teph, int sat, int ephopt,
-                  const nav_t *nav, double *rs, double *dts, double *var,
-                  int *svh);
-extern void satposs(gtime_t time, const obsd_t *obs, int n, const nav_t *nav,
-                    int sateph, double *rs, double *dts, double *var, int *svh);
-extern void readsp3(const char *file, nav_t *nav, int opt);
-extern int readsap(const char *file, gtime_t time, nav_t *nav);
-extern int readdcb(const char *file, nav_t *nav);
-extern void alm2pos(gtime_t time, const alm_t *alm, double *rs, double *dts);
+                  const nav_t* nav, double* rs, double* dts, double* var,
+                  int* svh);
+extern void satposs(gtime_t time, const obsd_t* obs, int n, const nav_t* nav,
+                    int sateph, double* rs, double* dts, double* var, int* svh);
+extern void readsp3(const char* file, nav_t* nav, int opt);
+extern int readsap(const char* file, gtime_t time, nav_t* nav);
+extern int readdcb(const char* file, nav_t* nav);
+extern void alm2pos(gtime_t time, const alm_t* alm, double* rs, double* dts);
 
-extern int tle_read(const char *file, tle_t *tle);
-extern int tle_name_read(const char *file, tle_t *tle);
-extern int tle_pos(gtime_t time, const char *name, const char *satno,
-                   const char *desig, const tle_t *tle, const erp_t *erp,
-                   double *rs);
+extern int tle_read(const char* file, tle_t* tle);
+extern int tle_name_read(const char* file, tle_t* tle);
+extern int tle_pos(gtime_t time, const char* name, const char* satno,
+                   const char* desig, const tle_t* tle, const erp_t* erp,
+                   double* rs);
 
 /* receiver raw data functions -----------------------------------------------*/
-extern unsigned int getbitu(const unsigned char *buff, int pos, int len);
-extern int getbits(const unsigned char *buff, int pos, int len);
-extern void setbitu(unsigned char *buff, int pos, int len, unsigned int data);
-extern void setbits(unsigned char *buff, int pos, int len, int data);
-extern unsigned int crc32(const unsigned char *buff, int len);
-extern unsigned int crc24q(const unsigned char *buff, int len);
-extern unsigned short crc16(const unsigned char *buff, int len);
-extern int decode_word(unsigned int word, unsigned char *data);
-extern int decode_frame(const unsigned char *buff, eph_t *eph, alm_t *alm,
-                        double *ion, double *utc, int *leaps);
-extern int test_glostr(const unsigned char *buff);
-extern int decode_glostr(const unsigned char *buff, geph_t *geph);
-extern int decode_bds_d1(const unsigned char *buff, eph_t *eph);
-extern int decode_bds_d2(const unsigned char *buff, eph_t *eph);
+extern unsigned int getbitu(const unsigned char* buff, int pos, int len);
+extern int getbits(const unsigned char* buff, int pos, int len);
+extern void setbitu(unsigned char* buff, int pos, int len, unsigned int data);
+extern void setbits(unsigned char* buff, int pos, int len, int data);
+extern unsigned int crc32(const unsigned char* buff, int len);
+extern unsigned int crc24q(const unsigned char* buff, int len);
+extern unsigned short crc16(const unsigned char* buff, int len);
+extern int decode_word(unsigned int word, unsigned char* data);
+extern int decode_frame(const unsigned char* buff, eph_t* eph, alm_t* alm,
+                        double* ion, double* utc, int* leaps);
+extern int test_glostr(const unsigned char* buff);
+extern int decode_glostr(const unsigned char* buff, geph_t* geph);
+extern int decode_bds_d1(const unsigned char* buff, eph_t* eph);
+extern int decode_bds_d2(const unsigned char* buff, eph_t* eph);
 
-extern int init_raw(raw_t *raw);
-extern void free_raw(raw_t *raw);
-extern int input_raw(raw_t *raw, int format, unsigned char data);
-extern int input_rawf(raw_t *raw, int format, FILE *fp);
+extern int init_raw(raw_t* raw);
+extern void free_raw(raw_t* raw);
+extern int input_raw(raw_t* raw, int format, unsigned char data);
+extern int input_rawf(raw_t* raw, int format, FILE* fp);
 
-extern int input_oem4(raw_t *raw, unsigned char data);
-extern int input_oem3(raw_t *raw, unsigned char data);
-extern int input_ubx(raw_t *raw, unsigned char data);
-extern int input_ss2(raw_t *raw, unsigned char data);
-extern int input_cres(raw_t *raw, unsigned char data);
-extern int input_stq(raw_t *raw, unsigned char data);
-extern int input_gw10(raw_t *raw, unsigned char data);
-extern int input_javad(raw_t *raw, unsigned char data);
-extern int input_nvs(raw_t *raw, unsigned char data);
-extern int input_bnx(raw_t *raw, unsigned char data);
-extern int input_rt17(raw_t *raw, unsigned char data);
-extern int input_lexr(raw_t *raw, unsigned char data);
-extern int input_oem4f(raw_t *raw, FILE *fp);
-extern int input_oem3f(raw_t *raw, FILE *fp);
-extern int input_ubxf(raw_t *raw, FILE *fp);
-extern int input_ss2f(raw_t *raw, FILE *fp);
-extern int input_cresf(raw_t *raw, FILE *fp);
-extern int input_stqf(raw_t *raw, FILE *fp);
-extern int input_gw10f(raw_t *raw, FILE *fp);
-extern int input_javadf(raw_t *raw, FILE *fp);
-extern int input_nvsf(raw_t *raw, FILE *fp);
-extern int input_bnxf(raw_t *raw, FILE *fp);
-extern int input_rt17f(raw_t *raw, FILE *fp);
-extern int input_lexrf(raw_t *raw, FILE *fp);
+extern int input_oem4(raw_t* raw, unsigned char data);
+extern int input_oem3(raw_t* raw, unsigned char data);
+extern int input_ubx(raw_t* raw, unsigned char data);
+extern int input_ss2(raw_t* raw, unsigned char data);
+extern int input_cres(raw_t* raw, unsigned char data);
+extern int input_stq(raw_t* raw, unsigned char data);
+extern int input_gw10(raw_t* raw, unsigned char data);
+extern int input_javad(raw_t* raw, unsigned char data);
+extern int input_nvs(raw_t* raw, unsigned char data);
+extern int input_bnx(raw_t* raw, unsigned char data);
+extern int input_rt17(raw_t* raw, unsigned char data);
+extern int input_lexr(raw_t* raw, unsigned char data);
+extern int input_oem4f(raw_t* raw, FILE* fp);
+extern int input_oem3f(raw_t* raw, FILE* fp);
+extern int input_ubxf(raw_t* raw, FILE* fp);
+extern int input_ss2f(raw_t* raw, FILE* fp);
+extern int input_cresf(raw_t* raw, FILE* fp);
+extern int input_stqf(raw_t* raw, FILE* fp);
+extern int input_gw10f(raw_t* raw, FILE* fp);
+extern int input_javadf(raw_t* raw, FILE* fp);
+extern int input_nvsf(raw_t* raw, FILE* fp);
+extern int input_bnxf(raw_t* raw, FILE* fp);
+extern int input_rt17f(raw_t* raw, FILE* fp);
+extern int input_lexrf(raw_t* raw, FILE* fp);
 
-extern int gen_ubx(const char *msg, unsigned char *buff);
-extern int gen_stq(const char *msg, unsigned char *buff);
-extern int gen_nvs(const char *msg, unsigned char *buff);
-extern int gen_lexr(const char *msg, unsigned char *buff);
+extern int gen_ubx(const char* msg, unsigned char* buff);
+extern int gen_stq(const char* msg, unsigned char* buff);
+extern int gen_nvs(const char* msg, unsigned char* buff);
+extern int gen_lexr(const char* msg, unsigned char* buff);
 
 /* rtcm functions ------------------------------------------------------------*/
-extern int init_rtcm(rtcm_t *rtcm);
-extern void free_rtcm(rtcm_t *rtcm);
-extern int input_rtcm2(rtcm_t *rtcm, unsigned char data);
-extern int input_rtcm3(rtcm_t *rtcm, unsigned char data);
-extern int input_rtcm2f(rtcm_t *rtcm, FILE *fp);
-extern int input_rtcm3f(rtcm_t *rtcm, FILE *fp);
-extern int gen_rtcm2(rtcm_t *rtcm, int type, int sync);
-extern int gen_rtcm3(rtcm_t *rtcm, int type, int sync);
+extern int init_rtcm(rtcm_t* rtcm);
+extern void free_rtcm(rtcm_t* rtcm);
+extern int input_rtcm2(rtcm_t* rtcm, unsigned char data);
+extern int input_rtcm3(rtcm_t* rtcm, unsigned char data);
+extern int input_rtcm2f(rtcm_t* rtcm, FILE* fp);
+extern int input_rtcm3f(rtcm_t* rtcm, FILE* fp);
+extern int gen_rtcm2(rtcm_t* rtcm, int type, int sync);
+extern int gen_rtcm3(rtcm_t* rtcm, int type, int sync);
 
 /* solution functions --------------------------------------------------------*/
-extern void initsolbuf(solbuf_t *solbuf, int cyclic, int nmax);
-extern void freesolbuf(solbuf_t *solbuf);
-extern void freesolstatbuf(solstatbuf_t *solstatbuf);
-extern sol_t *getsol(solbuf_t *solbuf, int index);
-extern int addsol(solbuf_t *solbuf, const sol_t *sol);
-extern int readsol(char *files[], int nfile, solbuf_t *sol);
-extern int readsolt(char *files[], int nfile, gtime_t ts, gtime_t te,
-                    double tint, int qflag, solbuf_t *sol);
-extern int readsolstat(char *files[], int nfile, solstatbuf_t *statbuf);
-extern int readsolstatt(char *files[], int nfile, gtime_t ts, gtime_t te,
-                        double tint, solstatbuf_t *statbuf);
+extern void initsolbuf(solbuf_t* solbuf, int cyclic, int nmax);
+extern void freesolbuf(solbuf_t* solbuf);
+extern void freesolstatbuf(solstatbuf_t* solstatbuf);
+extern sol_t* getsol(solbuf_t* solbuf, int index);
+extern int addsol(solbuf_t* solbuf, const sol_t* sol);
+extern int readsol(char* files[], int nfile, solbuf_t* sol);
+extern int readsolt(char* files[], int nfile, gtime_t ts, gtime_t te,
+                    double tint, int qflag, solbuf_t* sol);
+extern int readsolstat(char* files[], int nfile, solstatbuf_t* statbuf);
+extern int readsolstatt(char* files[], int nfile, gtime_t ts, gtime_t te,
+                        double tint, solstatbuf_t* statbuf);
 extern int inputsol(unsigned char data, gtime_t ts, gtime_t te, double tint,
-                    int qflag, const solopt_t *opt, solbuf_t *solbuf);
+                    int qflag, const solopt_t* opt, solbuf_t* solbuf);
 
-extern int outprcopts(unsigned char *buff, const prcopt_t *opt);
-extern int outsolheads(unsigned char *buff, const solopt_t *opt);
-extern int outsols(unsigned char *buff, const sol_t *sol, const double *rb,
-                   const solopt_t *opt);
-extern int outsolexs(unsigned char *buff, const sol_t *sol, const ssat_t *ssat,
-                     const solopt_t *opt);
-extern void outprcopt(FILE *fp, const prcopt_t *opt);
-extern void outsolhead(FILE *fp, const solopt_t *opt);
-extern void outsol(FILE *fp, const sol_t *sol, const double *rb,
-                   const solopt_t *opt);
-extern void outsolex(FILE *fp, const sol_t *sol, const ssat_t *ssat,
-                     const solopt_t *opt);
-extern int outnmea_rmc(unsigned char *buff, const sol_t *sol);
-extern int outnmea_gga(unsigned char *buff, const sol_t *sol);
-extern int outnmea_gsa(unsigned char *buff, const sol_t *sol,
-                       const ssat_t *ssat);
-extern int outnmea_gsv(unsigned char *buff, const sol_t *sol,
-                       const ssat_t *ssat);
+extern int outprcopts(unsigned char* buff, const prcopt_t* opt);
+extern int outsolheads(unsigned char* buff, const solopt_t* opt);
+extern int outsols(unsigned char* buff, const sol_t* sol, const double* rb,
+                   const solopt_t* opt);
+extern int outsolexs(unsigned char* buff, const sol_t* sol, const ssat_t* ssat,
+                     const solopt_t* opt);
+extern void outprcopt(FILE* fp, const prcopt_t* opt);
+extern void outsolhead(FILE* fp, const solopt_t* opt);
+extern void outsol(FILE* fp, const sol_t* sol, const double* rb,
+                   const solopt_t* opt);
+extern void outsolex(FILE* fp, const sol_t* sol, const ssat_t* ssat,
+                     const solopt_t* opt);
+extern int outnmea_rmc(unsigned char* buff, const sol_t* sol);
+extern int outnmea_gga(unsigned char* buff, const sol_t* sol);
+extern int outnmea_gsa(unsigned char* buff, const sol_t* sol,
+                       const ssat_t* ssat);
+extern int outnmea_gsv(unsigned char* buff, const sol_t* sol,
+                       const ssat_t* ssat);
 
 /* google earth kml converter ------------------------------------------------*/
-extern int convkml(const char *infile, const char *outfile, gtime_t ts,
-                   gtime_t te, double tint, int qflg, double *offset,
+extern int convkml(const char* infile, const char* outfile, gtime_t ts,
+                   gtime_t te, double tint, int qflg, double* offset,
                    int tcolor, int pcolor, int outalt, int outtime);
 
 /* sbas functions ------------------------------------------------------------*/
-extern int sbsreadmsg(const char *file, int sel, sbs_t *sbs);
-extern int sbsreadmsgt(const char *file, int sel, gtime_t ts, gtime_t te,
-                       sbs_t *sbs);
-extern void sbsoutmsg(FILE *fp, sbsmsg_t *sbsmsg);
-extern int sbsdecodemsg(gtime_t time, int prn, const unsigned int *words,
-                        sbsmsg_t *sbsmsg);
-extern int sbsupdatecorr(const sbsmsg_t *msg, nav_t *nav);
-extern int sbssatcorr(gtime_t time, int sat, const nav_t *nav, double *rs,
-                      double *dts, double *var);
-extern int sbsioncorr(gtime_t time, const nav_t *nav, const double *pos,
-                      const double *azel, double *delay, double *var);
-extern double sbstropcorr(gtime_t time, const double *pos, const double *azel,
-                          double *var);
+extern int sbsreadmsg(const char* file, int sel, sbs_t* sbs);
+extern int sbsreadmsgt(const char* file, int sel, gtime_t ts, gtime_t te,
+                       sbs_t* sbs);
+extern void sbsoutmsg(FILE* fp, sbsmsg_t* sbsmsg);
+extern int sbsdecodemsg(gtime_t time, int prn, const unsigned int* words,
+                        sbsmsg_t* sbsmsg);
+extern int sbsupdatecorr(const sbsmsg_t* msg, nav_t* nav);
+extern int sbssatcorr(gtime_t time, int sat, const nav_t* nav, double* rs,
+                      double* dts, double* var);
+extern int sbsioncorr(gtime_t time, const nav_t* nav, const double* pos,
+                      const double* azel, double* delay, double* var);
+extern double sbstropcorr(gtime_t time, const double* pos, const double* azel,
+                          double* var);
 
 /* options functions ---------------------------------------------------------*/
-extern opt_t *searchopt(const char *name, const opt_t *opts);
-extern int str2opt(opt_t *opt, const char *str);
-extern int opt2str(const opt_t *opt, char *str);
-extern int opt2buf(const opt_t *opt, char *buff);
-extern int loadopts(const char *file, opt_t *opts);
-extern int saveopts(const char *file, const char *mode, const char *comment,
-                    const opt_t *opts);
+extern opt_t* searchopt(const char* name, const opt_t* opts);
+extern int str2opt(opt_t* opt, const char* str);
+extern int opt2str(const opt_t* opt, char* str);
+extern int opt2buf(const opt_t* opt, char* buff);
+extern int loadopts(const char* file, opt_t* opts);
+extern int saveopts(const char* file, const char* mode, const char* comment,
+                    const opt_t* opts);
 extern void resetsysopts(void);
-extern void getsysopts(prcopt_t *popt, solopt_t *sopt, filopt_t *fopt);
-extern void setsysopts(const prcopt_t *popt, const solopt_t *sopt,
-                       const filopt_t *fopt);
+extern void getsysopts(prcopt_t* popt, solopt_t* sopt, filopt_t* fopt);
+extern void setsysopts(const prcopt_t* popt, const solopt_t* sopt,
+                       const filopt_t* fopt);
 
 /* stream data input and output functions ------------------------------------*/
 extern void strinitcom(void);
-extern void strinit(stream_t *stream);
-extern void strlock(stream_t *stream);
-extern void strunlock(stream_t *stream);
-extern int stropen(stream_t *stream, int type, int mode, const char *path);
-extern void strclose(stream_t *stream);
-extern int strread(stream_t *stream, unsigned char *buff, int n);
-extern int strwrite(stream_t *stream, unsigned char *buff, int n);
-extern void strsync(stream_t *stream1, stream_t *stream2);
-extern int strstat(stream_t *stream, char *msg);
-extern void strsum(stream_t *stream, int *inb, int *inr, int *outb, int *outr);
-extern void strsetopt(const int *opt);
-extern gtime_t strgettime(stream_t *stream);
-extern void strsendnmea(stream_t *stream, const double *pos);
-extern void strsendcmd(stream_t *stream, const char *cmd);
-extern void strsettimeout(stream_t *stream, int toinact, int tirecon);
-extern void strsetdir(const char *dir);
-extern void strsetproxy(const char *addr);
+extern void strinit(stream_t* stream);
+extern void strlock(stream_t* stream);
+extern void strunlock(stream_t* stream);
+extern int stropen(stream_t* stream, int type, int mode, const char* path);
+extern void strclose(stream_t* stream);
+extern int strread(stream_t* stream, unsigned char* buff, int n);
+extern int strwrite(stream_t* stream, unsigned char* buff, int n);
+extern void strsync(stream_t* stream1, stream_t* stream2);
+extern int strstat(stream_t* stream, char* msg);
+extern void strsum(stream_t* stream, int* inb, int* inr, int* outb, int* outr);
+extern void strsetopt(const int* opt);
+extern gtime_t strgettime(stream_t* stream);
+extern void strsendnmea(stream_t* stream, const double* pos);
+extern void strsendcmd(stream_t* stream, const char* cmd);
+extern void strsettimeout(stream_t* stream, int toinact, int tirecon);
+extern void strsetdir(const char* dir);
+extern void strsetproxy(const char* addr);
 
 /* integer ambiguity resolution ----------------------------------------------*/
-extern int lambda(int n, int m, const double *a, const double *Q, double *F,
-                  double *s);
+extern int lambda(int n, int m, const double* a, const double* Q, double* F,
+                  double* s);
 
 /* standard positioning ------------------------------------------------------*/
-extern int pntpos(const obsd_t *obs, int n, const nav_t *nav,
-                  const prcopt_t *opt, sol_t *sol, double *azel, ssat_t *ssat,
-                  char *msg);
+extern int pntpos(const obsd_t* obs, int n, const nav_t* nav,
+                  const prcopt_t* opt, sol_t* sol, double* azel, ssat_t* ssat,
+                  char* msg);
 
 /* precise positioning -------------------------------------------------------*/
-extern void rtkinit(rtk_t *rtk, const prcopt_t *opt);
-extern void rtkfree(rtk_t *rtk);
-extern int rtkpos(rtk_t *rtk, const obsd_t *obs, int nobs, const nav_t *nav);
-extern int rtkopenstat(const char *file, int level);
+extern void rtkinit(rtk_t* rtk, const prcopt_t* opt);
+extern void rtkfree(rtk_t* rtk);
+extern int rtkpos(rtk_t* rtk, const obsd_t* obs, int nobs, const nav_t* nav);
+extern int rtkopenstat(const char* file, int level);
 extern void rtkclosestat(void);
 
 /* precise point positioning -------------------------------------------------*/
-extern void pppos(rtk_t *rtk, const obsd_t *obs, int n, const nav_t *nav);
-extern int pppamb(rtk_t *rtk, const obsd_t *obs, int n, const nav_t *nav,
-                  const double *azel);
-extern int pppnx(const prcopt_t *opt);
-extern void pppoutsolstat(rtk_t *rtk, int level, FILE *fp);
-extern void windupcorr(gtime_t time, const double *rs, const double *rr,
-                       double *phw);
+extern void pppos(rtk_t* rtk, const obsd_t* obs, int n, const nav_t* nav);
+extern int pppamb(rtk_t* rtk, const obsd_t* obs, int n, const nav_t* nav,
+                  const double* azel);
+extern int pppnx(const prcopt_t* opt);
+extern void pppoutsolstat(rtk_t* rtk, int level, FILE* fp);
+extern void windupcorr(gtime_t time, const double* rs, const double* rr,
+                       double* phw);
 
 /* post-processing positioning -----------------------------------------------*/
 extern int postpos(gtime_t ts, gtime_t te, double ti, double tu,
-                   const prcopt_t *popt, const solopt_t *sopt,
-                   const filopt_t *fopt, char **infile, int n, char *outfile,
-                   const char *rov, const char *base);
+                   const prcopt_t* popt, const solopt_t* sopt,
+                   const filopt_t* fopt, char** infile, int n, char* outfile,
+                   const char* rov, const char* base);
 
 /* stream server functions ---------------------------------------------------*/
-extern void strsvrinit(strsvr_t *svr, int nout);
-extern int strsvrstart(strsvr_t *svr, int *opts, int *strs, char **paths,
-                       strconv_t **conv, const char *cmd,
-                       const double *nmeapos);
-extern void strsvrstop(strsvr_t *svr, const char *cmd);
-extern void strsvrstat(strsvr_t *svr, int *stat, int *byte, int *bps,
-                       char *msg);
-extern strconv_t *strconvnew(int itype, int otype, const char *msgs, int staid,
-                             int stasel, const char *opt);
-extern void strconvfree(strconv_t *conv);
+extern void strsvrinit(strsvr_t* svr, int nout);
+extern int strsvrstart(strsvr_t* svr, int* opts, int* strs, char** paths,
+                       strconv_t** conv, const char* cmd,
+                       const double* nmeapos);
+extern void strsvrstop(strsvr_t* svr, const char* cmd);
+extern void strsvrstat(strsvr_t* svr, int* stat, int* byte, int* bps,
+                       char* msg);
+extern strconv_t* strconvnew(int itype, int otype, const char* msgs, int staid,
+                             int stasel, const char* opt);
+extern void strconvfree(strconv_t* conv);
 
 /* rtk server functions ------------------------------------------------------*/
-extern int rtksvrinit(rtksvr_t *svr);
-extern void rtksvrfree(rtksvr_t *svr);
-extern int rtksvrstart(rtksvr_t *svr, int cycle, int buffsize, int *strs,
-                       char **paths, int *formats, int navsel, char **cmds,
-                       char **rcvopts, int nmeacycle, int nmeareq,
-                       const double *nmeapos, prcopt_t *prcopt,
-                       solopt_t *solopt, stream_t *moni);
-extern void rtksvrstop(rtksvr_t *svr, char **cmds);
-extern int rtksvropenstr(rtksvr_t *svr, int index, int str, const char *path,
-                         const solopt_t *solopt);
-extern void rtksvrclosestr(rtksvr_t *svr, int index);
-extern void rtksvrlock(rtksvr_t *svr);
-extern void rtksvrunlock(rtksvr_t *svr);
-extern int rtksvrostat(rtksvr_t *svr, int type, gtime_t *time, int *sat,
-                       double *az, double *el, int **snr, int *vsat);
-extern void rtksvrsstat(rtksvr_t *svr, int *sstat, char *msg);
+extern int rtksvrinit(rtksvr_t* svr);
+extern void rtksvrfree(rtksvr_t* svr);
+extern int rtksvrstart(rtksvr_t* svr, int cycle, int buffsize, int* strs,
+                       char** paths, int* formats, int navsel, char** cmds,
+                       char** rcvopts, int nmeacycle, int nmeareq,
+                       const double* nmeapos, prcopt_t* prcopt,
+                       solopt_t* solopt, stream_t* moni);
+extern void rtksvrstop(rtksvr_t* svr, char** cmds);
+extern int rtksvropenstr(rtksvr_t* svr, int index, int str, const char* path,
+                         const solopt_t* solopt);
+extern void rtksvrclosestr(rtksvr_t* svr, int index);
+extern void rtksvrlock(rtksvr_t* svr);
+extern void rtksvrunlock(rtksvr_t* svr);
+extern int rtksvrostat(rtksvr_t* svr, int type, gtime_t* time, int* sat,
+                       double* az, double* el, int** snr, int* vsat);
+extern void rtksvrsstat(rtksvr_t* svr, int* sstat, char* msg);
 
 /* downloader functions ------------------------------------------------------*/
-extern int dl_readurls(const char *file, char **types, int ntype, url_t *urls,
+extern int dl_readurls(const char* file, char** types, int ntype, url_t* urls,
                        int nmax);
-extern int dl_readstas(const char *file, char **stas, int nmax);
+extern int dl_readstas(const char* file, char** stas, int nmax);
 extern int dl_exec(gtime_t ts, gtime_t te, double ti, int seqnos, int seqnoe,
-                   const url_t *urls, int nurl, char **stas, int nsta,
-                   const char *dir, const char *usr, const char *pwd,
-                   const char *proxy, int opts, char *msg, FILE *fp);
-extern void dl_test(gtime_t ts, gtime_t te, double ti, const url_t *urls,
-                    int nurl, char **stas, int nsta, const char *dir, int ncol,
-                    int datefmt, FILE *fp);
+                   const url_t* urls, int nurl, char** stas, int nsta,
+                   const char* dir, const char* usr, const char* pwd,
+                   const char* proxy, int opts, char* msg, FILE* fp);
+extern void dl_test(gtime_t ts, gtime_t te, double ti, const url_t* urls,
+                    int nurl, char** stas, int nsta, const char* dir, int ncol,
+                    int datefmt, FILE* fp);
 
 /* application defined functions ---------------------------------------------*/
-extern int showmsg(char *format, ...);
+extern int showmsg(char* format, ...);
 extern void settspan(gtime_t ts, gtime_t te);
 extern void settime(gtime_t time);
 
 /* qzss lex functions --------------------------------------------------------*/
-extern int lexupdatecorr(const lexmsg_t *msg, nav_t *nav, gtime_t *tof);
-extern int lexreadmsg(const char *file, int sel, lex_t *lex);
-extern void lexoutmsg(FILE *fp, const lexmsg_t *msg);
-extern int lexconvbin(int type, int format, const char *infile,
-                      const char *outfile);
-extern int lexeph2pos(gtime_t time, int sat, const nav_t *nav, double *rs,
-                      double *dts, double *var);
-extern int lexioncorr(gtime_t time, const nav_t *nav, const double *pos,
-                      const double *azel, double *delay, double *var);
+extern int lexupdatecorr(const lexmsg_t* msg, nav_t* nav, gtime_t* tof);
+extern int lexreadmsg(const char* file, int sel, lex_t* lex);
+extern void lexoutmsg(FILE* fp, const lexmsg_t* msg);
+extern int lexconvbin(int type, int format, const char* infile,
+                      const char* outfile);
+extern int lexeph2pos(gtime_t time, int sat, const nav_t* nav, double* rs,
+                      double* dts, double* var);
+extern int lexioncorr(gtime_t time, const nav_t* nav, const double* pos,
+                      const double* azel, double* delay, double* var);
 
 #ifdef __cplusplus
 }
