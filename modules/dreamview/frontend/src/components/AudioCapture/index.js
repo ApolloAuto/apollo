@@ -2,8 +2,14 @@ import React from 'react';
 import { inject, observer } from "mobx-react";
 import Recorder from "recorder-js";
 
-import STORE from "store";
 import WS from "store/websocket";
+
+// This component will record and send audio to backend in pieces of every
+// 100ms, which could be used as voice command or oral log.
+//
+// Please note that Chrome has strict restriction on microphone control. To use
+// the audio capture facility, you should use browsers like Firefox and grant
+// requried permissions.
 
 // Utils.
 function PCM16Encode(channel) {
@@ -45,7 +51,7 @@ function Downsample(buffer, in_sample_rate) {
 
 // Public component.
 @inject("store") @observer
-export default class VoiceCommand extends React.Component {
+export default class AudioCapture extends React.Component {
     constructor(props) {
         super(props);
         this.handleStream = this.handleStream.bind(this);
@@ -82,7 +88,7 @@ export default class VoiceCommand extends React.Component {
                 ({blob, buffer}) => {
                     const downsampled = Downsample(
                         buffer[0], this.audio_context.sampleRate);
-                    WS.sendVoicePiece(PCM16Encode(downsampled));
+                    WS.sendAudioPiece(PCM16Encode(downsampled));
                     // Start next cycle.
                     this.recorder.start();
                 }
@@ -110,4 +116,3 @@ export default class VoiceCommand extends React.Component {
         return (null);
     }
 }
-

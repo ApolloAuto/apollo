@@ -35,7 +35,6 @@
 #include "modules/map/hdmap/hdmap_common.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/common/planning_thread_pool.h"
 #include "modules/planning/common/planning_util.h"
 
 namespace apollo {

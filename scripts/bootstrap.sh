@@ -46,9 +46,6 @@ function start() {
         supervisorctl status dreamview | grep RUNNING > /dev/null
     fi
 
-    # TODO(xiaoxq): Replace voice_detector with voice_recorder.
-    bash scripts/voice_detector.sh start
-
     if [ $? -eq 0 ]; then
         echo "Dreamview is running at http://localhost:8888"
     fi
@@ -61,7 +58,6 @@ function stop() {
     fi
 
     # Stop modules in reverse order of the starting procedure.
-    bash scripts/voice_detector.sh stop
     if [ "$DEBUG_MODE" == "yes" ]; then
         ./scripts/dreamview.sh stop
         ./scripts/monitor.sh stop
