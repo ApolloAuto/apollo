@@ -28,7 +28,7 @@ If you are looking for a different version of Apollo, refer to that version's Ha
 1. Apollo Platform Supported means
     *	The device is part of the Apollo hardware reference design
     *	One or more device(s) has/have been tested and passed to become a fully functional module of the corresponding hardware category, which provides adequate support for upper software layers
-2. Apollo Hardware Development Platform certified means
+2. Apollo Hardware Development Platform supported means
 one or more device(s) has/have been tested and passed for data collection purpose only. Please note, that in order to collect useful data, it is required for the device to work with the rest of necessary hardware devices listed in the Apollo Reference Design. In order to achieve the same performance in Perception and other upper software modules, it would require extra effort from the developers’ side, including the creation of new model(s), annotation of the data, training the new models, etc.
 
 ---
