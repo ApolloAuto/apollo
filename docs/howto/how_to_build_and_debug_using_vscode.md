@@ -1,5 +1,7 @@
 # How to Build and Debug using VSCode
 
+Thank you @davidhopper2003 for the chinese version of this document.
+
 Visual Studio Code (hereafter referred to as VSCode) is Microsoft's first lightweight code editor for Linux. Find below a few configuration files that allow the use of VSCode to compile and debug the Apollo project. I will elaborate on it below, hoping to bring some help to the developers.
 
 ## Compile the Apollo project using VSCode
