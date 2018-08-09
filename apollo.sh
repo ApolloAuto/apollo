@@ -285,6 +285,7 @@ function release() {
   # release info
   META="${APOLLO_RELEASE_DIR}/meta.ini"
   echo "git_commit: $(get_revision)" >> $META
+  echo "git_branch: $(get_branch)" >> $META
   echo "car_type: LINCOLN.MKZ" >> $META
   echo "arch: ${MACHINE_ARCH}" >> $META
 }
@@ -441,6 +442,17 @@ function get_revision() {
     REVISION="unknown"
   fi
   echo "$REVISION"
+}
+
+function get_branch() {
+  git branch &> /dev/null
+  if [ $? = 0 ];then
+    BRANCH=$(git rev-parse --abbrev-ref HEAD)
+  else
+    warning "Could not get the branch name, maybe this is not a git work tree." >&2
+    BRANCH="unknown"
+  fi
+  echo "$BRANCH"
 }
 
 function build_velodyne() {
