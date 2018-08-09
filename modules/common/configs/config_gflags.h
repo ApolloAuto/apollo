@@ -31,6 +31,8 @@ DECLARE_string(routing_map_filename);
 DECLARE_string(end_way_point_filename);
 DECLARE_string(speed_control_filename);
 
+DECLARE_double(look_forward_time_sec);
+
 DECLARE_string(vehicle_config_path);
 
 DECLARE_bool(use_ros_time);
