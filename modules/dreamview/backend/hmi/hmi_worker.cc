@@ -93,8 +93,9 @@ int RunComponentCommand(const Map<std::string, Component> &components,
     AERROR << "Cannot find command " << component_name << "." << command_name;
     return -1;
   }
-  const auto &cmd_str = (FLAGS_prod_mode && cmd->has_prod_cmd()) ?
-      cmd->prod_cmd() : cmd->debug_cmd();
+  const auto &cmd_str = (FLAGS_prod_mode && cmd->has_prod_cmd())
+                            ? cmd->prod_cmd()
+                            : cmd->debug_cmd();
   AINFO << "Execute system command: " << cmd_str;
   const int ret = std::system(cmd_str.c_str());
 
@@ -357,6 +358,11 @@ void HMIWorker::ChangeToMode(const std::string &mode_name) {
 void HMIWorker::UpdateSystemStatus(const monitor::SystemStatus &system_status) {
   WLock wlock(status_mutex_);
   *status_.mutable_system_status() = system_status;
+}
+
+const HMIStatus HMIWorker::GetStatus() const {
+  RLock rlock(status_mutex_);
+  return status_;
 }
 
 }  // namespace dreamview
