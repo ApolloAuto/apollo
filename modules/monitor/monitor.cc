@@ -22,6 +22,7 @@
 #include "modules/monitor/hardware/resource_monitor.h"
 #include "modules/monitor/reporters/static_info_reporter.h"
 #include "modules/monitor/reporters/vehicle_state_reporter.h"
+#include "modules/monitor/software/localization_monitor.h"
 #include "modules/monitor/software/process_monitor.h"
 #include "modules/monitor/software/summary_monitor.h"
 #include "modules/monitor/software/topic_monitor.h"

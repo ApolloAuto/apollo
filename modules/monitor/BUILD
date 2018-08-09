@@ -16,6 +16,7 @@ cc_library(
         "//modules/monitor/proto:system_status_proto",
         "//modules/monitor/reporters:static_info_reporter",
         "//modules/monitor/reporters:vehicle_state_reporter",
+        "//modules/monitor/software:localization_monitor",
         "//modules/monitor/software:process_monitor",
         "//modules/monitor/software:summary_monitor",
         "//modules/monitor/software:topic_monitor",
