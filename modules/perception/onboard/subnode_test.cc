@@ -47,7 +47,6 @@ class MySubnode : public Subnode {
 
 TEST(SubnodeTest, test_init) {
   FLAGS_work_root = "modules/perception";
-  FLAGS_config_manager_path = "./conf/config_manager.config";
   std::string dag_config_path =
       FLAGS_work_root + "/data/onboard_test/dag_streaming.config";
   std::string content;
