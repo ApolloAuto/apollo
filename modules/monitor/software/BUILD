@@ -27,6 +27,16 @@ cc_library(
 )
 
 cc_library(
+    name = "localization_monitor",
+    srcs = ["localization_monitor.cc"],
+    hdrs = ["localization_monitor.h"],
+    deps = [
+        "//modules/common/adapters:adapter_manager",
+        "//modules/monitor/common:recurrent_runner",
+    ],
+)
+
+cc_library(
     name = "safety_manager",
     srcs = ["safety_manager.cc"],
     hdrs = ["safety_manager.h"],
