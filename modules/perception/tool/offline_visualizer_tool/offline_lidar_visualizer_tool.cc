@@ -33,7 +33,6 @@
 
 DECLARE_string(flagfile);
 DECLARE_bool(enable_visualization);
-DECLARE_string(config_manager_path);
 DEFINE_string(pcd_path, "./pcd/", "pcd path");
 DEFINE_string(pose_path, "./pose/", "pose path");
 DEFINE_string(output_path, "./output/", "output path");

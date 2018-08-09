@@ -48,7 +48,6 @@ using apollo::perception::obstacle::yolo::YoloParam;
 class YoloCameraDetectorTest : public ::testing::Test {
  protected:
   void SetUp() override {
-    FLAGS_config_manager_path = FLAGS_test_dir + "config_manager.config",
     FLAGS_yolo_config_filename = "config.pt";
     RegisterFactoryYoloCameraDetector();
   }

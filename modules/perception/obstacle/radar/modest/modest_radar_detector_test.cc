@@ -24,7 +24,6 @@ namespace perception {
 
 TEST(ModestRadarDetectorTest, modest_radar_detector_test) {
   FLAGS_work_root = "modules/perception";
-  FLAGS_config_manager_path = "./conf/config_manager.config";
   const double time_diff = 0.074;
   ModestRadarDetector *radar_detector = new ModestRadarDetector();
   EXPECT_TRUE(radar_detector != nullptr);
