@@ -53,19 +53,6 @@ DEFINE_double(rtk_trajectory_resolution, 0.01,
 DEFINE_bool(publish_estop, false, "publish estop decision in planning");
 DEFINE_bool(enable_trajectory_stitcher, true, "enable stitching trajectory");
 
-DEFINE_double(
-    look_backward_distance, 30,
-    "look backward this distance when creating reference line from routing");
-
-DEFINE_double(look_forward_short_distance, 150,
-              "short look forward this distance when creating reference line "
-              "from routing when ADC is slow");
-DEFINE_double(
-    look_forward_long_distance, 250,
-    "look forward this distance when creating reference line from routing");
-DEFINE_double(look_forward_time_sec, 8.0,
-              "look forward time times adc speed to calculate this distance "
-              "when creating reference line from routing");
 DEFINE_bool(enable_reference_line_stitching, true,
             "Enable stitching reference line, which can reducing computing "
             "time and improve stability");
