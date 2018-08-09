@@ -41,4 +41,5 @@ ln -s /usr/lib64/libGLEW.so /usr/lib/libGLEW.so
 ln -s /usr/lib64/libGLEW.so.2.0 /usr/lib/libGLEW.so.2.0
 
 # Clean up.
+apt-get clean && rm -rf /var/lib/apt/lists/*
 rm -fr glew-2.0.0.zip glew-2.0.0 /etc/apt/sources.list.d/fillwave_ext.list
