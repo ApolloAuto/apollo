@@ -42,4 +42,5 @@ mv caffe_x86/output-GPU/include/caffe /usr/include/
 mv caffe_x86/output-GPU/lib/* /usr/lib/x86_64-linux-gnu/
 
 # Clean up.
+apt-get clean && rm -rf /var/lib/apt/lists/*
 rm -fr caffe_x86.tar.gz caffe_x86
