@@ -1,4 +1,5 @@
-# -*- coding: utf-8 -*-
+#!/usr/bin/env python
+
 ###############################################################################
 # Copyright 2018 The Apollo Authors. All Rights Reserved.
 #
@@ -19,6 +20,7 @@ Usage:
     python body_sensation_evalution.py bag1 bag2 ...
 """
 
+import argparse
 import collections
 import math
 import sys
@@ -28,15 +30,21 @@ from rosbag.bag import Bag
 
 from modules.canbus.proto.chassis_pb2 import Chassis
 
+BUMP_TIME_THRESHOLD = 3
+ACCELERATE_TIME_THRESHOLD = 1
+SPEED_UP_THRESHOLD_2 = 2
+SPEED_UP_THRESHOLD_4 = 4
+SPEED_DOWN_THRESHOLD_2 = -2
+SPEED_DOWN_THRESHOLD_4 = -4
+
 kChassisTopic = '/apollo/canbus/chassis'
 kLocalizationTopic = '/apollo/localization/pose'
 
 class BodySensationCalculator(object):
-
+    """The class to dispose body sensation from rosbag"""
     def __init__(self):
         self.driving_mode = []
         self._timestamp = 0.0
-        self._bump_lock_time = 0.0
         self._last_bump_time = 0.0
         self._last_speed_down_2_time = 0.0
         self._last_speed_down_4_time = 0.0
@@ -69,9 +77,9 @@ class BodySensationCalculator(object):
             mode={}
             mode["status"] = 'UNKNOW'
             mode["start_time"] = 0.0
-            mode["end_time"] = 0.0;  
+            mode["end_time"] = 0.0
             for topic, msg, _t in bag.read_messages([kChassisTopic]):
-                t = long(str(_t))*pow(10,-9)
+                t = long(str(_t)) * pow(10, -9)
                 cur_status = msg.driving_mode
                 if mode["status"] != cur_status:
                     if mode["status"] != 'UNKNOW':
@@ -93,55 +101,52 @@ class BodySensationCalculator(object):
 
     def _bumps_rollback(self, bump_time):
         """rollback 1 second when passing bumps"""
-
-        if bump_time - self._last_speed_down_2_time <= 1:
+        if bump_time - self._last_speed_down_2_time <= ACCELERATE_TIME_THRESHOLD:
             if self._check_status(self._last_speed_down_2_time):
                 self.auto_counts["speed_down_2"] -= 1
             else:
                 self.manual_counts["speed_down_2"] -= 1
 
-        if bump_time - self._last_speed_up_2_time <= 1:
+        if bump_time - self._last_speed_up_2_time <= ACCELERATE_TIME_THRESHOLD:
             if self._check_status(self._last_speed_up_2_time):
                 self.auto_counts["speed_up_2"] -= 1
             else:
                 self.manual_counts["speed_up_2"] -= 1
 
-        if bump_time - self._last_speed_down_4_time <= 1:
+        if bump_time - self._last_speed_down_4_time <= ACCELERATE_TIME_THRESHOLD:
             if self._check_status(self._last_speed_down_4_time):
                 self.auto_counts["speed_down_4"] -= 1
             else:
                 self.manual_counts["speed_down_4"] -= 1
 
-        if bump_time - self._last_speed_up_4_time <= 1:
+        if bump_time - self._last_speed_up_4_time <= ACCELERATE_TIME_THRESHOLD:
             if self._check_status(self._last_speed_up_4_time):
                 self.auto_counts["speed_up_4"] -= 1
             else:
                 self.manual_counts["speed_up_4"] -= 1
 
-        if bump_time - self._last_turning_time <= 1:
+        if bump_time - self._last_turning_time <= ACCELERATE_TIME_THRESHOLD:
             if self._check_status(self._last_turning_time):
                 self.auto_counts["turning"] -= 1
             else:
                 self.manual_counts["turning"] -= 1
 
-
     def calculate(self, bag_file):
+        """calculate body sensation, it should be after get driving mode"""
         with Bag(bag_file, 'r') as bag:
             for topic, msg, _t in bag.read_messages([kLocalizationTopic]):
-                t = long(str(_t))*pow(10,-9)
-                #时间戳
-                #dt = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(_t))
+                t = long(str(_t)) * pow(10, -9)
                 self.timestamp = t
-                if t - self._bump_lock_time <= 3:
+                diff_bump_time = t - self._last_bump_time
+                if diff_bump_time <= BUMP_TIME_THRESHOLD:
                     continue
                 acc_x = msg.pose.linear_acceleration.x
                 acc_y = msg.pose.linear_acceleration.y
                 acc_z = msg.pose.linear_acceleration.z
-                diff_bump_time = t - self._last_bump_time
-                if abs(acc_z) >= 2 and diff_bump_time >= 3:
+                
+                if abs(acc_z) >= SPEED_UP_THRESHOLD_2 and diff_bump_time >= BUMP_TIME_THRESHOLD:
                     self._bumps_rollback(t)
                     self._last_bump_time = t
-                    self._bump_lock_time = t
 
                     if self._check_status(t):
                         self.auto_counts["bumps"] += 1
@@ -149,18 +154,19 @@ class BodySensationCalculator(object):
                         self.manual_counts["bumps"] += 1
                 else:
                     if self._speed_down_2_flag:
-                        if acc_y <= -4:
+                        if acc_y <= SPEED_DOWN_THRESHOLD_4:
                             self._speed_down_4_flag = 1
                             continue
-                        if acc_y <= -2:
+                        if acc_y <= SPEED_DOWN_THRESHOLD_2:
                             continue
-                        if self._speed_down_4_flag == 1 and t - self._last_speed_down_4_time >=1:
+                        if self._speed_down_4_flag == 1 \
+                        and t - self._last_speed_down_4_time >= ACCELERATE_TIME_THRESHOLD:
                             self._last_speed_down_4_time = t
                             if self._check_status(t):
                                 self.auto_counts["speed_down_4"] += 1
                             else:
                                 self.manual_counts["speed_down_4"] += 1
-                        elif t - self._last_speed_down_2_time >= 1:
+                        elif t - self._last_speed_down_2_time >= ACCELERATE_TIME_THRESHOLD:
                             self._last_speed_down_2_time = t
                             if self._check_status(t):
                                 self.auto_counts["speed_down_2"] += 1
@@ -168,22 +174,23 @@ class BodySensationCalculator(object):
                                 self.manual_counts["speed_down_2"] += 1
                         self._speed_down_2_flag = 0
                         self._speed_down_4_flag = 0
-                    elif acc_y <= -2:
+                    elif acc_y <= SPEED_DOWN_THRESHOLD_2:
                         self._speed_down_2_flag = 1
 
                     if self._speed_up_2_flag:
-                        if acc_y >= 4:
+                        if acc_y >= SPEED_UP_THRESHOLD_4:
                             self._speed_up_4_flag = 1
                             continue
-                        if acc_y >= 2:
+                        if acc_y >= SPEED_UP_THRESHOLD_2:
                             continue
-                        if self._speed_up_4_flag == 1 and t - self._last_speed_up_4_time >=1:
+                        if self._speed_up_4_flag == 1 \
+                        and t - self._last_speed_up_4_time >= ACCELERATE_TIME_THRESHOLD:
                             self._last_speed_up_4_time = t
                             if self._check_status(t):
                                 self.auto_counts["speed_up_4"] += 1
                             else:
                                 self.manual_counts["speed_up_4"] += 1
-                        elif t - self._last_speed_up_2_time >= 1:
+                        elif t - self._last_speed_up_2_time >= ACCELERATE_TIME_THRESHOLD:
                             self._last_speed_up_2_time = t
                             if self._check_status(t):
                                 self.auto_counts["speed_up_2"] += 1
@@ -191,34 +198,38 @@ class BodySensationCalculator(object):
                                 self.manual_counts["speed_up_2"] += 1
                         self._speed_up_2_flag = 0
                         self._speed_up_4_flag = 0
-                    elif acc_y >= -2:
+                    elif acc_y >= SPEED_UP_THRESHOLD_2:
                         self._speed_up_2_flag = 1
 
                     if self._turning_flag:
-                        if abs(acc_x) >= 2:
+                        if abs(acc_x) >= SPEED_UP_THRESHOLD_2:
                             continue
-                        if t - self._last_turning_time >= 1:
+                        if t - self._last_turning_time >= ACCELERATE_TIME_THRESHOLD:
                             self._last_turning_time = t
                             if self._check_status(t):
                                 self.auto_counts["turning"] += 1
                             else:
-                                self.manual_counts["speed_up_2"] += 1
+                                self.manual_counts["turning"] += 1
                         self._turning_flag = 0
-                    elif abs(acc_x) >= -2:
+                    elif abs(acc_x) >= SPEED_UP_THRESHOLD_2:
                         self._turning_flag = 1
 
 
-def main():
-    """Main function."""
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(
+        description=
+        "A tool to evaluate the body sensation. \
+        It should be used like 'python body_sensation_evalution.py bag1 bag2 ...' ")
+    parser.add_argument(
+        "in_rosbag", action="store", nargs='+', type=str, help="the input rosbag")
+    args = parser.parse_args()
     bsc = BodySensationCalculator()
-    for bag_file in sys.argv[1:]:
+    for bag_file in args.in_rosbag:
         bsc.get_driving_mode(bag_file)
-    for bag_file in sys.argv[1:]:
+    for bag_file in args.in_rosbag:
         bsc.calculate(bag_file)
     counts = {}
     counts["auto"] = sorted(bsc.auto_counts.items())
     counts["manual"] = sorted(bsc.manual_counts.items())
     print(counts)
 
-if __name__ == '__main__':
-    main()
