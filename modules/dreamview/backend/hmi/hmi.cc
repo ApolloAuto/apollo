@@ -59,13 +59,11 @@ void HMI::RegisterMessageHandlers() {
         const auto &config = HMIWorker::instance()->GetConfig();
         websocket_->SendData(
             conn, JsonUtil::ProtoToTypedJson("HMIConfig", config).dump());
+        websocket_->SendData(
+            conn, JsonUtil::ProtoToTypedJson("HMIStatus",
+                                             HMIWorker::instance()->GetStatus())
+                      .dump());
 
-        {
-          RLock rlock(HMIWorker::instance()->GetStatusMutex());
-          const auto &status = HMIWorker::instance()->GetStatus();
-          websocket_->SendData(
-              conn, JsonUtil::ProtoToTypedJson("HMIStatus", status).dump());
-        }
         SendVehicleParam(conn);
       });
 
@@ -152,13 +150,13 @@ void HMI::RegisterMessageHandlers() {
 
   // HMI client asks for changing map.
   HMIWorker::instance()->RegisterChangeMapHandler(
-    [this](const std::string& new_map) {
-      // Reload simulation map after changing map.
-      CHECK(map_service_->ReloadMap(true))
-          << "Failed to load new simulation map: " << new_map;
-      // And then broadcast new HMIStatus to all clients.
-      DeferredBroadcastHMIStatus();
-    });
+      [this](const std::string &new_map) {
+        // Reload simulation map after changing map.
+        CHECK(map_service_->ReloadMap(true))
+            << "Failed to load new simulation map: " << new_map;
+        // And then broadcast new HMIStatus to all clients.
+        DeferredBroadcastHMIStatus();
+      });
   websocket_->RegisterMessageHandler(
       "ChangeMap",
       [this](const Json &json, WebSocketHandler::Connection *conn) {
@@ -174,11 +172,11 @@ void HMI::RegisterMessageHandlers() {
 
   // HMI client asks for changing vehicle.
   HMIWorker::instance()->RegisterChangeVehicleHandler(
-    [this](const std::string& new_vehicle) {
-      // Broadcast new HMIStatus and VehicleParam.
-      DeferredBroadcastHMIStatus();
-      SendVehicleParam();
-    });
+      [this](const std::string &new_vehicle) {
+        // Broadcast new HMIStatus and VehicleParam.
+        DeferredBroadcastHMIStatus();
+        SendVehicleParam();
+      });
   websocket_->RegisterMessageHandler(
       "ChangeVehicle",
       [this](const Json &json, WebSocketHandler::Connection *conn) {
@@ -194,10 +192,10 @@ void HMI::RegisterMessageHandlers() {
 
   // HMI client asks for changing mode.
   HMIWorker::instance()->RegisterChangeModeHandler(
-    [this](const std::string& new_mode) {
-      // Broadcast new HMIStatus.
-      DeferredBroadcastHMIStatus();
-    });
+      [this](const std::string &new_mode) {
+        // Broadcast new HMIStatus.
+        DeferredBroadcastHMIStatus();
+      });
   websocket_->RegisterMessageHandler(
       "ChangeMode",
       [this](const Json &json, WebSocketHandler::Connection *conn) {
@@ -241,17 +239,16 @@ void HMI::RegisterMessageHandlers() {
       });
 
   // Received Chassis, trigger action if there is high beam signal.
-  AdapterManager::AddChassisCallback(
-      [this](const Chassis &chassis) {
-        if (Clock::NowInSeconds() - chassis.header().timestamp_sec() <
-            FLAGS_system_status_lifetime_seconds) {
-          if (chassis.signal().high_beam()) {
-            const bool ret = HMIWorker::instance()->Trigger(
-                HMIWorker::instance()->GetConfig().chassis_high_beam_action());
-            AERROR_IF(!ret) << "Failed to execute high_beam action.";
-          }
-        }
-      });
+  AdapterManager::AddChassisCallback([this](const Chassis &chassis) {
+    if (Clock::NowInSeconds() - chassis.header().timestamp_sec() <
+        FLAGS_system_status_lifetime_seconds) {
+      if (chassis.signal().high_beam()) {
+        const bool ret = HMIWorker::instance()->Trigger(
+            HMIWorker::instance()->GetConfig().chassis_high_beam_action());
+        AERROR_IF(!ret) << "Failed to execute high_beam action.";
+      }
+    }
+  });
 }
 
 void HMI::StartBroadcastHMIStatusThread() {
@@ -270,8 +267,8 @@ void HMI::StartBroadcastHMIStatusThread() {
         need_broadcast_ = false;
       }
 
-      RLock rlock(HMIWorker::instance()->GetStatusMutex());
-      const auto &status = HMIWorker::instance()->GetStatus();
+      // Get a copy of status.
+      const auto status = HMIWorker::instance()->GetStatus();
       websocket_->BroadcastData(
           JsonUtil::ProtoToTypedJson("HMIStatus", status).dump());
 
