@@ -21,8 +21,6 @@
 #include "modules/common/configs/config_gflags.h"
 DECLARE_string(perception_adapter_config_filename);
 
-/// lib/config_manager/config_manager.cc
-DECLARE_string(config_manager_path);
 DECLARE_string(work_root);
 
 /// obstacle/base/object.cc
