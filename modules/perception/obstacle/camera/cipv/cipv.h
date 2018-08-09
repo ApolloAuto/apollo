@@ -55,7 +55,6 @@ const float AVERAGE_FRATE_RATE = 0.1f;
 class Cipv {
   // Member functions
  public:
-  //    friend class ::adu::perception::OnlineCalibrationService;
   Cipv(void);
   virtual ~Cipv(void);
 
