@@ -35,6 +35,7 @@
 #include "modules/common/math/vec2d.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/hdmap/hdmap_util.h"
+#include "modules/map/pnc_map/pnc_map.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/reference_line/reference_line_provider.h"
 
@@ -140,7 +141,7 @@ bool Frame::CreateReferenceLineInfo() {
   DCHECK_EQ(reference_lines.size(), segments.size());
 
   auto forword_limit =
-      ReferenceLineProvider::LookForwardDistance(vehicle_state_);
+      hdmap::PncMap::LookForwardDistance(vehicle_state_.linear_velocity());
 
   for (auto &ref_line : reference_lines) {
     if (!ref_line.Shrink(Vec2d(vehicle_state_.x(), vehicle_state_.y()),

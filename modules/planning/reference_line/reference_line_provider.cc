@@ -52,6 +52,7 @@ using apollo::common::time::Clock;
 using apollo::hdmap::HDMapUtil;
 using apollo::hdmap::LaneWaypoint;
 using apollo::hdmap::MapPathPoint;
+using apollo::hdmap::PncMap;
 using apollo::hdmap::RouteSegments;
 
 ReferenceLineProvider::~ReferenceLineProvider() {
@@ -514,12 +515,10 @@ bool ReferenceLineProvider::GetNearestWayPointFromNavigationPath(
 
 bool ReferenceLineProvider::CreateRouteSegments(
     const common::VehicleState &vehicle_state,
-    const double look_backward_distance, const double look_forward_distance,
     std::list<hdmap::RouteSegments> *segments) {
   {
     std::lock_guard<std::mutex> lock(pnc_map_mutex_);
-    if (!pnc_map_->GetRouteSegments(vehicle_state, look_backward_distance,
-                                    look_forward_distance, segments)) {
+    if (!pnc_map_->GetRouteSegments(vehicle_state, segments)) {
       AERROR << "Failed to extract segments from routing";
       return false;
     }
@@ -529,16 +528,6 @@ bool ReferenceLineProvider::CreateRouteSegments(
     PrioritzeChangeLane(segments);
   }
   return !segments->empty();
-}
-
-double ReferenceLineProvider::LookForwardDistance(const VehicleState &state) {
-  auto forward_distance = state.linear_velocity() * FLAGS_look_forward_time_sec;
-
-  if (forward_distance > FLAGS_look_forward_short_distance) {
-    return FLAGS_look_forward_long_distance;
-  }
-
-  return FLAGS_look_forward_short_distance;
 }
 
 bool ReferenceLineProvider::CreateReferenceLine(
@@ -570,10 +559,7 @@ bool ReferenceLineProvider::CreateReferenceLine(
     }
   }
 
-  double look_forward_distance = LookForwardDistance(vehicle_state);
-  double look_backward_distance = FLAGS_look_backward_distance;
-  if (!CreateRouteSegments(vehicle_state, look_backward_distance,
-                           look_forward_distance, segments)) {
+  if (!CreateRouteSegments(vehicle_state, segments)) {
     AERROR << "Failed to create reference line from routing";
     return false;
   }
@@ -636,7 +622,8 @@ bool ReferenceLineProvider::ExtendReferenceLine(const VehicleState &state,
   }
   const double prev_segment_length = RouteSegments::Length(*prev_segment);
   const double remain_s = prev_segment_length - sl_point.s();
-  const double look_forward_required_distance = LookForwardDistance(state);
+  const double look_forward_required_distance =
+      PncMap::LookForwardDistance(state.linear_velocity());
   if (remain_s > look_forward_required_distance) {
     *segments = *prev_segment;
     segments->SetProperties(segment_properties);
