@@ -62,4 +62,6 @@ chmod a+w "${ROS}/share/gnss_driver/launch/gnss_driver.launch"
 chmod a+w "${ROS}/share/gnss_driver/conf/gnss_conf_mkz.txt"
 
 # Clean up.
+# Clean up.
+apt-get clean && rm -rf /var/lib/apt/lists/*
 rm -fr ${FILENAME} /etc/apt/sources.list.d/ros-latest.list

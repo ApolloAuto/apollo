@@ -87,7 +87,6 @@ class HdmapROIFilterTest : public testing::Test, HdmapROIFilter {
 
 void HdmapROIFilterTest::init() {
   FLAGS_work_root = "/apollo/modules/perception/data";
-  FLAGS_config_manager_path = "config_manager_test/config_manager.config";
   ASSERT_TRUE(Init());
 }
 
