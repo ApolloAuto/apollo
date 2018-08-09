@@ -1,0 +1,27 @@
+feat_stride: 32
+extractor {
+  feat_blob: "conv3_3"
+  feat_type: ROIPooling
+  roi_pooling_param {
+      pooled_h: 3
+      pooled_w: 3
+      use_floor: true
+  }
+  reorg_param {
+      ref_height: 20
+      ref_width: 50
+  }
+}
+# extractor {
+#   feat_blob: "conv3_1"
+#   feat_type: Reorg    # ROIPooling
+#   roi_pooling_param {
+#     pooled_h: 3
+#     pooled_w: 3
+#     use_floor: true
+#   }
+#   reorg_param {
+#     ref_blob: "conv9_1"
+#   }
+# }
+# remap_model: "yolo_2d.model"
