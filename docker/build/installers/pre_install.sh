@@ -31,4 +31,5 @@ apt-get install -y \
     wget \
     unzip
 
+apt-get clean && rm -rf /var/lib/apt/lists/*
 echo '\n\n\n' | ssh-keygen -t rsa

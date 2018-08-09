@@ -536,8 +536,7 @@ bool CCLanePostProcessor::Process(const cv::Mat &lane_map,
 
   time_stamp_ = options.timestamp;
 
-  bool use_new_post_ = false;
-  if (use_new_post_) {
+  if (FLAGS_use_whole_lane_line) {
     lane_objects->reset(new LaneObjects());
     (*lane_objects)->reserve(13);
 

@@ -164,7 +164,7 @@ class WebSocketHandler : public CivetWebSocketHandler {
   mutable std::mutex mutex_;
 
   // The pool of all maintained connections. Each connection has a lock to
-  // against simultaneous write.
+  // guard against simultaneous write.
   std::unordered_map<Connection *, std::shared_ptr<std::mutex>> connections_;
 };
 
