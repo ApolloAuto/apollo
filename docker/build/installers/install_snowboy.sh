@@ -33,4 +33,5 @@ mkdir -p /usr/local/apollo
 mv snowboy /usr/local/apollo/
 
 # Clean up.
+apt-get clean && rm -rf /var/lib/apt/lists/*
 rm -fr snowboy.tar.gz
