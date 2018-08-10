@@ -615,8 +615,8 @@ void ConnectedComponent::SplitContour(int split_len) {
     }
 
   } else {
-    std::cerr << "unknown bounding box split type: "
-              << bbox_.split << std::endl;
+    std::cerr << "unknown bounding box split type: " << bbox_.split
+              << std::endl;
   }
 }
 
@@ -633,12 +633,11 @@ void ConnectedComponent::Process(ScalarType split_siz, int split_len) {
 
 vector<int> ConnectedComponent::GetSplitRanges(int siz, int len_split) {
   if (siz <= 0) {
-    std::cerr << "siz should be a positive number: "
-              << siz << std::endl;
+    std::cerr << "siz should be a positive number: " << siz << std::endl;
   }
   if (len_split <= 0) {
-    std::cerr << "len_split should be a positive number: "
-              << len_split << std::endl;
+    std::cerr << "len_split should be a positive number: " << len_split
+              << std::endl;
   }
 
   int num_split = siz / len_split;
