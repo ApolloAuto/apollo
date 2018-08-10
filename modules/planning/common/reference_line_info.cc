@@ -35,7 +35,6 @@
 #include "modules/map/hdmap/hdmap_common.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/common/planning_thread_pool.h"
 #include "modules/planning/common/planning_util.h"
 
 namespace apollo {
@@ -86,7 +85,7 @@ bool ReferenceLineInfo::Init(const std::vector<const Obstacle*>& obstacles) {
     AERROR << "Ego vehicle is too far away from reference line.";
     return false;
   }
-  is_on_reference_line_ = reference_line_.IsOnRoad(adc_sl_boundary_);
+  is_on_reference_line_ = reference_line_.IsOnLane(adc_sl_boundary_);
   if (!AddObstacles(obstacles)) {
     AERROR << "Failed to add obstacles to reference line";
     return false;
@@ -305,7 +304,7 @@ bool ReferenceLineInfo::IsUnrelaventObstacle(PathObstacle* path_obstacle) {
   if (is_on_reference_line_ &&
       path_obstacle->PerceptionSLBoundary().end_s() <
           adc_sl_boundary_.end_s() &&
-      reference_line_.IsOnRoad(path_obstacle->PerceptionSLBoundary())) {
+      reference_line_.IsOnLane(path_obstacle->PerceptionSLBoundary())) {
     return true;
   }
   return false;
@@ -341,7 +340,7 @@ bool ReferenceLineInfo::IsStartFrom(
       previous_reference_line_info.reference_line();
   common::SLPoint sl_point;
   prev_reference_line.XYToSL(start_point, &sl_point);
-  return previous_reference_line_info.reference_line_.IsOnRoad(sl_point);
+  return previous_reference_line_info.reference_line_.IsOnLane(sl_point);
 }
 
 const PathData& ReferenceLineInfo::path_data() const { return path_data_; }
@@ -493,8 +492,8 @@ bool ReferenceLineInfo::ReachedDestination() const {
   if (!dest_ptr->LongitudinalDecision().has_stop()) {
     return false;
   }
-  if (!reference_line_.IsOnRoad(
-          dest_ptr->obstacle()->PerceptionBoundingBox().center())) {
+  if (!reference_line_.IsOnLane(
+      dest_ptr->obstacle()->PerceptionBoundingBox().center())) {
     return false;
   }
   const double stop_s = dest_ptr->PerceptionSLBoundary().start_s() +

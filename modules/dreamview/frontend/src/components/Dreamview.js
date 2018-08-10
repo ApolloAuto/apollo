@@ -7,7 +7,7 @@ import MainView from "components/Layouts/MainView";
 import ToolView from "components/Layouts/ToolView";
 import PNCMonitor from "components/PNCMonitor";
 import SideBar from "components/SideBar";
-import VoiceCommand from "components/VoiceCommand";
+import AudioCapture from "components/AudioCapture";
 
 import HOTKEYS_CONFIG from "store/config/hotkeys.yml";
 import WS, {MAP_WS, POINT_CLOUD_WS} from "store/websocket";
@@ -89,7 +89,7 @@ export default class Dreamview extends React.Component {
                     </SplitPane>
                 </div>
                 <div className="hidden">
-                    {options.enableVoiceCommand && <VoiceCommand />}
+                    {options.enableAudioCapture && <AudioCapture />}
                 </div>
             </div>
         );

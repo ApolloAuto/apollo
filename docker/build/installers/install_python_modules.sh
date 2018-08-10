@@ -32,3 +32,6 @@ apt-get install -y \
    python3-psutil
 
 pip install -r py27_requirements.txt
+
+# Clean up.
+apt-get clean && rm -rf /var/lib/apt/lists/*

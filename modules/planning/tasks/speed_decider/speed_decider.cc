@@ -91,6 +91,30 @@ SpeedDecider::StPosition SpeedDecider::GetStPosition(
     if (st_boundary.HasOverlap(speed_line)) {
       ADEBUG << "speed profile cross st_boundaries.";
       st_position = CROSS;
+
+      // check if KEEP_CLEAR obstacle is "crossable"
+      if (st_boundary.boundary_type() ==
+          StBoundary::BoundaryType::KEEP_CLEAR) {
+        const auto& last_speed_point = speed_profile.speed_vector().back();
+        double last_speed_point_v = 0.0;
+        if (last_speed_point.has_v()) {
+          last_speed_point_v = last_speed_point.v();
+        } else {
+          const size_t len = speed_profile.speed_vector().size();
+          if (len > 1) {
+            const auto& last_2nd_speed_point =
+                speed_profile.speed_vector()[len - 2];
+            last_speed_point_v =
+                (last_speed_point.s() - last_2nd_speed_point.s()) /
+                (last_speed_point.t() - last_2nd_speed_point.t());
+          }
+        }
+        constexpr double kKeepClearSlowSpeed = 4.0;    // m/s
+        if (last_speed_point.s() <= st_boundary.max_s() &&
+            last_speed_point_v < kKeepClearSlowSpeed) {
+          st_position = BELOW;
+        }
+      }
       break;
     }
 
@@ -261,6 +285,11 @@ bool SpeedDecider::CreateStopDecision(const PathObstacle& path_obstacle,
   stop_point->set_y(fence_point.y());
   stop_point->set_z(0.0);
   stop->set_stop_heading(fence_point.heading());
+
+  if (boundary.boundary_type() ==
+      StBoundary::BoundaryType::KEEP_CLEAR) {
+    stop->set_reason_code(StopReasonCode::STOP_REASON_CLEAR_ZONE);
+  }
 
   PerceptionObstacle::Type obstacle_type =
       path_obstacle.obstacle()->Perception().type();

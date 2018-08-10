@@ -27,12 +27,13 @@ namespace perception {
 
 class BaseProjector {
  public:
+  virtual ~BaseProjector() = default;
   virtual bool project(std::vector<float>* feature) = 0;
 };
 
 class MatrixProjector : public BaseProjector {
  public:
-  explicit MatrixProjector(std::string weight_file);
+  explicit MatrixProjector(const std::string &weight_file);
 
   bool project(std::vector<float>* feature) override;
 

@@ -17,6 +17,7 @@
 #include <cmath>
 #include <utility>
 #include <vector>
+#include <algorithm>
 
 #include "Eigen/Core"
 #include "Eigen/QR"
@@ -113,6 +114,54 @@ T GetPolyValue(T a, T b, T c, T d, T x) {
   v *= x;
   y += (a * v);
   return y;
+}
+
+template <typename T = ScalarType>
+bool IterativeFitting(std::vector<Eigen::Matrix<T, 2, 1>> *pos_vec,
+             const int order, Eigen::Matrix<T, MAX_POLY_ORDER + 1, 1> *coeff,
+             const bool &is_x_axis = true,
+             const int N = 5, double inlier_thres = 0.1) {
+  if (coeff == NULL) {
+    AERROR << "The coefficient pointer is NULL.";
+    return false;
+  }
+
+  if (order > MAX_POLY_ORDER) {
+    AERROR << "The order of polynomial must be smaller than " << MAX_POLY_ORDER;
+    return false;
+  }
+
+  int n = static_cast<int>(pos_vec->size());
+  if (n <= order) {
+    AERROR << "The number of points should be larger than the order. #points = "
+           << pos_vec->size();
+    return false;
+  }
+
+  for (int l = 0; l < N; ++l) {
+    if (pos_vec->size() < minNumPoints) break;
+    PolyFit(*pos_vec, std::min(l + 2, order), coeff);
+    int m = pos_vec->size();
+
+    for (int i = 0; i < m; ++i) {
+      double x = (*pos_vec)[i](0);
+      double y = PolyEval(x, order, *coeff);
+      if (std::abs(y - (*pos_vec)[i](1)) > inlier_thres) {
+        pos_vec->erase(pos_vec->begin() + i);
+        --i;
+        --m;
+      }
+    }
+    inlier_thres /= 2;
+  }
+  if (pos_vec->size() >= minNumPoints) {
+    if (std::abs((*coeff)(3)) <= 5e-5)
+      PolyFit(*pos_vec, order, coeff);
+    else
+      PolyFit(*pos_vec, order-1, coeff);
+  }
+
+  return true;
 }
 
 // @brief: non mask class which is used for filtering out the markers inside the
