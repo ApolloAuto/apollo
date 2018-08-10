@@ -3283,6 +3283,9 @@ extern void traceopen(const char* file) {
 
   reppath(file, path, time, "", "");
 
+  if (fp_trace) {
+    fclose(fp_trace);
+  }
   if (!*path || !(fp_trace = fopen(path, "w"))) {
     fp_trace = stderr;
   }
