@@ -24,12 +24,18 @@ def cuda_library_impl(ctx):
     output = ctx.outputs.out
     lib_flags = ["-std=c++11", "--shared", "--compiler-options -fPIC", "-lcudart", "-lcublas"]
     args = [f.path for f in ctx.files.srcs] + [f.path for f in ctx.files.deps]
+
+    deps_flags=[]
+    for f in ctx.attr.deps:
+      deps_flags += f.cc.link_flags
+      deps_flags += ["-I" + d for d in f.cc.quote_include_directories]
+
     ctx.actions.run_shell(
             inputs=ctx.files.srcs + ctx.files.hdrs,
             outputs=[ctx.outputs.out],
             arguments=args,
             env={'PATH':'/usr/local/cuda/bin:/usr/local/bin:/usr/bin:/bin',},
-            command="nvcc %s %s %s -I. -o %s" % (cuda_arch, ' '.join(lib_flags),  " ".join(args), output.path)
+            command="nvcc %s %s %s -I. %s -o %s" % (cuda_arch, ' '.join(lib_flags),  " ".join(args), " ".join(deps_flags), output.path)
      )
 
 def cuda_binary_impl(ctx):
