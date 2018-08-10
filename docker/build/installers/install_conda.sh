@@ -29,7 +29,5 @@ bash Miniconda2-latest-Linux-x86_64.sh -b -p ${CONDA_PATH}
 # Init python 2.7 environment.
 ${CONDA_PATH}/bin/conda env update -f py27_conda.yml
 
-
 # Clean up.
 rm -f Miniconda2-latest-Linux-x86_64.sh
-

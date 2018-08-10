@@ -10,4 +10,3 @@ dependencies:
     - grpcio-tools==1.4.0
     - protobuf==3.4.0 # version 3.2.0 actually gives some parsing errors on the original protos
     - python-gflags
-
