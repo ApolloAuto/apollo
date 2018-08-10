@@ -470,7 +470,7 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_08) {
 
 /*
  * kee_clear: keep clear zone clear
- * bag: 2018-05-15-10-33-12/2018-05-15-10-33-12_39.bag
+ * bag: 2018-05-22-13-59-27/2018-05-22-14-09-29_10.bag
  * decision: not stopped by KEEP_CLEAR
  */
 TEST_F(SunnyvaleBigLoopTest, keep_clear_01) {
@@ -490,9 +490,9 @@ TEST_F(SunnyvaleBigLoopTest, keep_clear_01) {
 }
 
 /*
- * kee_clear: vehicle inside KEEP Clear zone, with speed and not blocking
- * bag: 2018-05-15-10-24-12/2018-05-15-10-24-12_30.bag
- * decision: CRUISE
+ * kee_clear: vehicle inside KEEP Clear zone, with speed and BLOCKING
+ * bag: 2018-05-22-13-59-27/2018-05-22-14-13-29_14.bag
+ * decision: STOP
  */
 TEST_F(SunnyvaleBigLoopTest, keep_clear_02) {
   ENABLE_RULE(TrafficRuleConfig::CROSSWALK, false);
@@ -501,6 +501,27 @@ TEST_F(SunnyvaleBigLoopTest, keep_clear_02) {
   ENABLE_RULE(TrafficRuleConfig::STOP_SIGN, false);
 
   std::string seq_num = "102";
+  FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
+  FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
+  FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
+  FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
+  PlanningTestBase::SetUp();
+
+  RUN_GOLDEN_TEST_DECISION(0);
+}
+
+/*
+ * kee_clear: vehicle inside KEEP Clear zone, with speed and NOT BLOCKING
+ * bag: 2018-05-22-13-59-27/2018-05-22-14-13-29_14.bag
+ * decision: CRUISE
+ */
+TEST_F(SunnyvaleBigLoopTest, keep_clear_03) {
+  ENABLE_RULE(TrafficRuleConfig::CROSSWALK, false);
+  ENABLE_RULE(TrafficRuleConfig::KEEP_CLEAR, true);
+  ENABLE_RULE(TrafficRuleConfig::SIGNAL_LIGHT, false);
+  ENABLE_RULE(TrafficRuleConfig::STOP_SIGN, false);
+
+  std::string seq_num = "103";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
   FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
   FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
