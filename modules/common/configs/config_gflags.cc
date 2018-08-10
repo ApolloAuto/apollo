@@ -51,3 +51,7 @@ DEFINE_string(
     navigation_mode_end_way_point_file,
     "modules/dreamview/conf/navigation_mode_default_end_way_point.txt",
     "end_way_point file used if navigation mode is set.");
+
+DEFINE_double(look_forward_time_sec, 8.0,
+              "look forward time times adc speed to calculate this distance "
+              "when creating reference line from routing");

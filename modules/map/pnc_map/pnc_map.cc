@@ -39,6 +39,17 @@
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/routing/common/routing_gflags.h"
 
+DEFINE_double(
+    look_backward_distance, 30,
+    "look backward this distance when creating reference line from routing");
+
+DEFINE_double(look_forward_short_distance, 150,
+              "short look forward this distance when creating reference line "
+              "from routing when ADC is slow");
+DEFINE_double(
+    look_forward_long_distance, 250,
+    "look forward this distance when creating reference line from routing");
+
 namespace apollo {
 namespace hdmap {
 
@@ -82,6 +93,16 @@ LaneWaypoint PncMap::ToLaneWaypoint(
   auto lane = hdmap_->GetLaneById(hdmap::MakeMapId(waypoint.id()));
   CHECK(lane) << "invalid lane id: " << waypoint.id();
   return LaneWaypoint(lane, waypoint.s());
+}
+
+double PncMap::LookForwardDistance(double velocity) {
+  auto forward_distance = velocity * FLAGS_look_forward_time_sec;
+
+  if (forward_distance > FLAGS_look_forward_short_distance) {
+    return FLAGS_look_forward_long_distance;
+  }
+
+  return FLAGS_look_forward_short_distance;
 }
 
 LaneSegment PncMap::ToLaneSegment(const routing::LaneSegment &segment) const {
@@ -423,6 +444,14 @@ std::vector<int> PncMap::GetNeighborPassages(const routing::RoadSegment &road,
     }
   }
   return result;
+}
+bool PncMap::GetRouteSegments(const VehicleState &vehicle_state,
+                              std::list<RouteSegments> *const route_segments) {
+  double look_forward_distance =
+      LookForwardDistance(vehicle_state.linear_velocity());
+  double look_backward_distance = FLAGS_look_backward_distance;
+  return GetRouteSegments(vehicle_state, look_backward_distance,
+                          look_forward_distance, route_segments);
 }
 
 bool PncMap::GetRouteSegments(const VehicleState &vehicle_state,
