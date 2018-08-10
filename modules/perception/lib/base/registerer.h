@@ -138,7 +138,7 @@ bool GetRegisteredClasses(
       FactoryMap &map = perception::GlobalFactoryMap()[#base_class];  \
       FactoryMap::iterator iter = map.find(name);                     \
       if (iter == map.end()) {                                        \
-        for (auto c : map) {                                          \
+        for (const auto &c : map) {                                   \
           AERROR << "Instance:" << c.first;                           \
         }                                                             \
         AERROR << "Get instance " << name << " failed.";              \
@@ -151,7 +151,7 @@ bool GetRegisteredClasses(
       std::vector<base_class *> instances;                            \
       FactoryMap &map = perception::GlobalFactoryMap()[#base_class];  \
       instances.reserve(map.size());                                  \
-      for (auto item : map) {                                         \
+      for (const auto &item : map) {                                  \
         Any object = item.second->NewInstance();                      \
         instances.push_back(*(object.AnyCast<base_class *>()));       \
       }                                                               \
