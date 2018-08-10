@@ -55,8 +55,9 @@ class BaseCameraDetector {
                         CameraDetectorInitOptions()) = 0;
 
   // @brief: Object detection on image from camera
-  // @param [in]: image frame from camera
-  // @param [in/out]: detected objects
+  // @param frame [in]: image frame from camera
+  // @param options [in] detector options
+  // @param objects [in/out]: detected objects
   virtual bool Detect(const cv::Mat& frame,
                       const CameraDetectorOptions& options,
                       std::vector<std::shared_ptr<VisualObject>>* objects) = 0;
