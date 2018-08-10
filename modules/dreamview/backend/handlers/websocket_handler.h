@@ -161,6 +161,8 @@ class WebSocketHandler : public CivetWebSocketHandler {
   // The mutex guarding the connection set. We are not using read
   // write lock, as the server is not expected to get many clients
   // (connections).
+  // CAVEAT: Execution section while holding this global lock should be as
+  // brief as possible.
   mutable std::mutex mutex_;
 
   // The pool of all maintained connections. Each connection has a lock to
