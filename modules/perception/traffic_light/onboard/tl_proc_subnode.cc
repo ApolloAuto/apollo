@@ -68,60 +68,73 @@ void OutputDebugImg(const std::shared_ptr<ImageLights> &image_lights,
     auto &crop_roi = lights->at(0)->region.debug_roi[0];
     cv::rectangle(*img, crop_roi, cv::Scalar(0, 255, 255), 2);
   }
+
+  int rows = img->rows;
+  int cols = img->cols;
+  double pos_x = cols / 1920.0 * 30.0;
+  double step_y = rows / 1080.0 * 40.0;
+  double font_scale = rows / 1080.0 * 3.0;
+  double thickness = rows / 1080.0 * 2.0;
+
   // draw camera timestamp
-  int pos_y = 40;
+  int pos_y = step_y;
   std::string ts_text = cv::format("img ts=%lf", image_lights->timestamp);
-  cv::putText(*img, ts_text, cv::Point(30, pos_y), cv::FONT_HERSHEY_PLAIN, 3.0,
-              CV_RGB(128, 255, 0), 2);
+  cv::putText(*img, ts_text, cv::Point(pos_x, pos_y), cv::FONT_HERSHEY_PLAIN,
+              font_scale, CV_RGB(128, 255, 0), thickness);
+
   // draw distance to stopline
-  pos_y += 50;
+  pos_y += step_y;
   double distance = light_debug->distance_to_stop_line();
   if (lights->size() > 0) {
     std::string dis2sl_text = cv::format("dis2sl=%lf", distance);
-    cv::putText(*img, dis2sl_text, cv::Point(30, pos_y), cv::FONT_HERSHEY_PLAIN,
-                3.0, CV_RGB(128, 255, 0), 2);
+    cv::putText(*img, dis2sl_text, cv::Point(pos_x, pos_y),
+                cv::FONT_HERSHEY_PLAIN, font_scale, CV_RGB(128, 255, 0),
+                thickness);
   }
 
   // draw "Signals Num"
-  pos_y += 50;
+  pos_y += step_y;
   if (light_debug->valid_pos()) {
     std::string signal_txt = "Signals Num: " + std::to_string(lights->size());
-    cv::putText(*img, signal_txt, cv::Point(30, pos_y), cv::FONT_HERSHEY_PLAIN,
-                3.0, CV_RGB(255, 0, 0), 2);
+    cv::putText(*img, signal_txt, cv::Point(pos_x, pos_y),
+                cv::FONT_HERSHEY_PLAIN, font_scale, CV_RGB(255, 0, 0),
+                thickness);
   }
 
   // draw "No Pose info."
-  pos_y += 50;
+  pos_y += step_y;
   if (!light_debug->valid_pos()) {
-    cv::putText(*img, "No Valid Pose.", cv::Point(30, pos_y),
-                cv::FONT_HERSHEY_PLAIN, 3.0, CV_RGB(255, 0, 0), 2);
+    cv::putText(*img, "No Valid Pose.", cv::Point(pos_x, pos_y),
+                cv::FONT_HERSHEY_PLAIN, font_scale, CV_RGB(255, 0, 0),
+                thickness);
   }
+
   // if image's timestamp is too early or too old
   // draw timestamp difference between image and pose
-  pos_y += 50;
+  pos_y += step_y;
   std::string diff_img_pose_ts_str =
       "ts diff: " + std::to_string(light_debug->ts_diff_pos());
-  cv::putText(*img, diff_img_pose_ts_str, cv::Point(30, pos_y),
-              cv::FONT_HERSHEY_PLAIN, 3.0, CV_RGB(255, 0, 0), 2);
+  cv::putText(*img, diff_img_pose_ts_str, cv::Point(pos_x, pos_y),
+              cv::FONT_HERSHEY_PLAIN, font_scale, CV_RGB(255, 0, 0), thickness);
 
-  pos_y += 50;
+  pos_y += step_y;
   std::string diff_img_sys_ts_str =
       "ts diff sys: " + std::to_string(light_debug->ts_diff_sys());
-  cv::putText(*img, diff_img_sys_ts_str, cv::Point(30, pos_y),
-              cv::FONT_HERSHEY_PLAIN, 3.0, CV_RGB(255, 0, 0), 2);
+  cv::putText(*img, diff_img_sys_ts_str, cv::Point(pos_x, pos_y),
+              cv::FONT_HERSHEY_PLAIN, font_scale, CV_RGB(255, 0, 0), thickness);
 
-  pos_y += 50;
+  pos_y += step_y;
   std::string signal_txt = "camera id: " + image_lights->image->camera_id_str();
-  cv::putText(*img, signal_txt, cv::Point(30, pos_y), cv::FONT_HERSHEY_PLAIN,
-              3.0, CV_RGB(255, 0, 0), 2);
+  cv::putText(*img, signal_txt, cv::Point(pos_x, pos_y), cv::FONT_HERSHEY_PLAIN,
+              font_scale, CV_RGB(255, 0, 0), thickness);
 
   // draw image border size (offset between hdmap-box and detection-box)
   //    if (light_debug->project_error() > 100) {
   std::string img_border_txt =
       "Offset size: " + std::to_string(light_debug->project_error());
-  constexpr int kPosYOffset = 1000;
-  cv::putText(*img, img_border_txt, cv::Point(30, kPosYOffset),
-              cv::FONT_HERSHEY_PLAIN, 3.0, CV_RGB(255, 0, 0), 2);
+  int kPosYOffset = rows - (step_y * 2);
+  cv::putText(*img, img_border_txt, cv::Point(pos_x, kPosYOffset),
+              cv::FONT_HERSHEY_PLAIN, font_scale, CV_RGB(255, 0, 0), thickness);
   //    }
 
   cv::resize(*img, *img, cv::Size(960, 540));
