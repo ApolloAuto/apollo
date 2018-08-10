@@ -7,4 +7,3 @@ dependencies:
 
   - pip:
     - glog
-
