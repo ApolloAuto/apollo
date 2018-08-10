@@ -96,9 +96,17 @@ bool PlanningTestBase::SetUpAdapters() {
 }
 
 void PlanningTestBase::SetUp() {
-  planning_.Stop();
+  if (planning_) {
+    planning_->Stop();
+  } else {
+    if (FLAGS_use_navigation_mode) {
+      planning_ = std::unique_ptr<PlanningBase>(new NaviPlanning());
+    } else {
+      planning_ = std::unique_ptr<PlanningBase>(new StdPlanning());
+    }
+  }
   CHECK(SetUpAdapters()) << "Failed to setup adapters";
-  CHECK(planning_.Init().ok()) << "Failed to init planning module";
+  CHECK(planning_->Init().ok()) << "Failed to init planning module";
 
   // Do not use fallback trajectory during testing
   FLAGS_use_planning_fallback = false;
@@ -108,9 +116,10 @@ void PlanningTestBase::SetUp() {
         FLAGS_test_data_dir + "/" + FLAGS_test_previous_planning_file;
     ADCTrajectory prev_planning;
     CHECK(common::util::GetProtoFromFile(prev_planning_file, &prev_planning));
-    planning_.SetLastPublishableTrajectory(prev_planning);
+    planning_->last_publishable_trajectory_.reset(
+        new PublishableTrajectory(prev_planning));
   }
-  for (auto& config : *planning_.traffic_rule_configs_.mutable_config()) {
+  for (auto& config : *(planning_->traffic_rule_configs_.mutable_config())) {
     auto iter = rule_enabled_.find(config.rule_id());
     if (iter != rule_enabled_.end()) {
       config.set_enabled(iter->second);
@@ -125,9 +134,10 @@ void PlanningTestBase::UpdateData() {
         FLAGS_test_data_dir + "/" + FLAGS_test_previous_planning_file;
     ADCTrajectory prev_planning;
     CHECK(common::util::GetProtoFromFile(prev_planning_file, &prev_planning));
-    planning_.SetLastPublishableTrajectory(prev_planning);
+    planning_->last_publishable_trajectory_.reset(
+        new PublishableTrajectory(prev_planning));
   }
-  for (auto& config : *planning_.traffic_rule_configs_.mutable_config()) {
+  for (auto& config : *planning_->traffic_rule_configs_.mutable_config()) {
     auto iter = rule_enabled_.find(config.rule_id());
     if (iter != rule_enabled_.end()) {
       config.set_enabled(iter->second);
@@ -158,7 +168,7 @@ bool PlanningTestBase::RunPlanning(const std::string& test_case_name,
       "result_", test_case_name, "_", case_num, ".pb.txt");
 
   std::string full_golden_path = FLAGS_test_data_dir + "/" + golden_result_file;
-  planning_.RunOnce();
+  planning_->RunOnce();
 
   const ADCTrajectory* trajectory_pointer =
       AdapterManager::GetPlanning()->GetLatestPublished();
@@ -238,7 +248,7 @@ bool PlanningTestBase::IsValidTrajectory(const ADCTrajectory& trajectory) {
 
 TrafficRuleConfig* PlanningTestBase::GetTrafficRuleConfig(
     const TrafficRuleConfig::RuleId& rule_id) {
-  for (auto& config : *planning_.traffic_rule_configs_.mutable_config()) {
+  for (auto& config : *planning_->traffic_rule_configs_.mutable_config()) {
     if (config.rule_id() == rule_id) {
       return &config;
     }
