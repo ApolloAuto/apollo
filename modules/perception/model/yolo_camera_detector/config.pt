@@ -1,0 +1,31 @@
+model_param {
+  model_name: "yolo3d_1128"
+  proto_file: "deploy.pt"
+  weight_file: "deploy.md"
+  offset_ratio: 0.28843
+  confidence_threshold: 0.8 # 0.5
+  min_2d_height: 17
+  min_3d_height: 0.5
+  model_type: Caffe
+  cropped_ratio: 0.71157
+  resized_width: 960
+  aligned_pixel: 32
+}
+net_param {
+  loc_blob: "loc_pred"
+  obj_blob: "obj_pred"
+  cls_blob: "cls_pred"
+  ori_blob: "ori_pred"
+  dim_blob: "dim_pred"
+  lof_blob: "lof_pred"
+  lor_blob: "lor_pred"
+  seg_blob: "seg_prob"
+  input_blob: "data"
+}
+nms_param {
+  type: "NormalNMS"
+  threshold: 0.4
+  sigma: 0.4
+  inter_cls_nms_thresh: 1
+  cross_class_merge_thresh: 1
+}
