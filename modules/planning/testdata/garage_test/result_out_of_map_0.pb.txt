@@ -1,5 +1,5 @@
 header {
-  module_name: "planning"
+  module_name: "std_planning"
   status {
     error_code: PLANNING_ERROR
     msg: "failed to init reference line info"

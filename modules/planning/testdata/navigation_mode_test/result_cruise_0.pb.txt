@@ -1,5 +1,5 @@
 header {
-  module_name: "planning"
+  module_name: "navi_planning"
 }
 total_path_length: 58.719980711700266
 total_path_time: 5.299999999999998
