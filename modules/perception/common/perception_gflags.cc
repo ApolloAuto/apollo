@@ -63,7 +63,7 @@ DEFINE_string(radar_tf2_frame_id, "novatel", "the tf2 transform frame id");
 DEFINE_string(radar_tf2_child_frame_id, "radar",
               "the tf2 transform child frame id");
 DEFINE_double(front_radar_forward_distance, 120.0,
-              "get front radar forward distancer");
+              "get front radar forward distance");
 DEFINE_string(radar_extrinsic_file,
               "modules/perception/data/params/radar_extrinsics.yaml",
               "radar extrinsic file");
@@ -94,14 +94,14 @@ DEFINE_bool(output_debug_img, false, "write debug image to disk");
 
 /// Temporarily change Kalman motion fusion to config here.
 DEFINE_double(q_matrix_coefficient_amplifier, 0.5,
-              "Kalman fitler matrix Q coeffcients");
-DEFINE_double(r_matrix_amplifier, 1, "Kalman fitler matrix r coeffcients");
-DEFINE_double(p_matrix_amplifier, 1, "Kalman fitler matrix p coeffcients");
+              "Kalman filter matrix Q coefficients");
+DEFINE_double(r_matrix_amplifier, 1, "Kalman filter matrix r coefficients");
+DEFINE_double(p_matrix_amplifier, 1, "Kalman filter matrix p coefficients");
 
 DEFINE_double(a_matrix_covariance_coeffcient_1, 0.05,
-              "Kalman fitler matrix a coeffcients, a_matrix_(0, 2)");
+              "Kalman filter matrix a coefficients, a_matrix_(0, 2)");
 DEFINE_double(a_matrix_covariance_coeffcient_2, 0.05,
-              "Kalman fitler matrix a coeffcients, a_matrix_(1, 3)");
+              "Kalman filter matrix a coefficients, a_matrix_(1, 3)");
 
 /// calibration_config_manager.cc
 DEFINE_int32(obs_camera_detector_gpu, 0, "device id for camera detector");
