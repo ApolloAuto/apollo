@@ -82,7 +82,8 @@ class HMIWorker {
 
   // Get current config and status.
   inline const HMIConfig& GetConfig() const { return config_; }
-  inline const HMIStatus& GetStatus() const { return status_; }
+  const HMIStatus GetStatus() const;
+
   // HMIStatus is updated frequently by multiple threads, including web workers
   // and ROS message callback. Please apply proper read/write lock when
   // accessing it.

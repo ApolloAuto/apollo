@@ -53,7 +53,8 @@ RUN apt-get install -y \
    vim \
    v4l-utils \
    nfs-common \
-   zip
+   zip && \
+   apt-get clean && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /apollo
 USER apollo

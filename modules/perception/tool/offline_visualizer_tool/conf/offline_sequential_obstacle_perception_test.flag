@@ -1,6 +1,5 @@
 
 --work_root=modules/perception
---config_manager_path=conf/config_manager.config
 
 ####################################################################
 # Flags from modules/perception/tool/offline_visualizer_tool/

@@ -83,8 +83,6 @@ class ReferenceLineProvider {
 
   std::vector<routing::LaneWaypoint> FutureRouteWaypoints();
 
-  static double LookForwardDistance(const common::VehicleState& state);
-
  private:
   /**
    * @brief Use PncMap to create reference line and the corresponding segments
@@ -108,8 +106,6 @@ class ReferenceLineProvider {
   void PrioritzeChangeLane(std::list<hdmap::RouteSegments>* route_segments);
 
   bool CreateRouteSegments(const common::VehicleState& vehicle_state,
-                           const double look_forward_distance,
-                           const double look_backward_distance,
                            std::list<hdmap::RouteSegments>* segments);
 
   bool IsReferenceLineSmoothValid(const ReferenceLine& raw,

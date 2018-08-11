@@ -25,4 +25,5 @@ apt-get update -y
 apt-get install -y yarn
 
 # Clean up.
+apt-get clean && rm -rf /var/lib/apt/lists/*
 rm -fr /etc/apt/sources.list.d/yarn.list

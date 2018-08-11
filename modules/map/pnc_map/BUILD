@@ -78,7 +78,7 @@ cc_library(
         "//modules/map/hdmap",
         "//modules/planning/common:planning_gflags",
         "//modules/routing/common:routing_gflags",
-        "@gtest//:gtest",
+        "@gtest",
     ],
 )
 
