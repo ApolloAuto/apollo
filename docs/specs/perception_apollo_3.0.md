@@ -59,7 +59,7 @@ Tailgating is a maneuver to follow the vehicle or object in front of the autonom
 The snapshot of visualization of the output is shown in the figure below: 
 ![Image](images/perception_visualization_apollo_3.0.png)
 
-The figure above depicts visualization of the Perception output in Apollo 3.0. The top left image shows image-based output. The bottom-left image shows the 3D bounding box of objects. Therefore, the left image shows 3-D top-down view of lane lines and objects. The CIPV is marked with a red bounding box. The yellow lines depicts the trajectory of each vehicle
+The figure above depicts visualization of the Perception output in Apollo 3.0. The top left image shows image-based output. The bottom-left image shows the 3D bounding box of objects. Therefore, the right image shows 3-D top-down view of lane lines and objects. The CIPV is marked with a red bounding box. The yellow lines depicts the trajectory of each vehicle
 
 ### Radar + Camera Output Fusion
 Given multiple sensors, their output should be combined in a synergic fashion. Apollo 3.0. introduces a sensor set with a radar and a camera. For this process, both sensors need to be calibrated. Each sensor will be calibrated using the same method introduced in Apollo 2.0. After calibration, the output will be represented in a 3-D world coordinate system and each output will be fused by their similarity in location, size, time and the utility of each sensor. After learning the utility function of each sensor, the camera contributes more on lateral distance and the radar contributes more on longitudinal distance measurement. Asynchronous sensor fusion algorithm can also be used as an option.

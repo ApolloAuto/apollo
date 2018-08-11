@@ -137,7 +137,7 @@ ObjectCameraExtendedKalmanFilter::InitObjectFilter(const float x,
   ExtendedKalmanFilter<float, 4, 3, 1> filter;
   Eigen::Vector4f state = { x, y, theta, v };
 
-  // initial guess of the believe space
+  // initial guess of the belief space
   Eigen::Matrix4f P;
   P.setIdentity();
   P(0, 0) = P(1, 1) = 20.0f;

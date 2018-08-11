@@ -53,11 +53,11 @@ class YoloCameraDetector : public BaseCameraDetector {
 
   bool Multitask(const cv::Mat &frame, const CameraDetectorOptions &options,
                  std::vector<std::shared_ptr<VisualObject>> *objects,
-                 cv::Mat *mask);
+                 cv::Mat *mask) override;
 
-  bool Lanetask(const cv::Mat &frame, std::vector<cv::Mat> *predictions);
+  bool Lanetask(const cv::Mat &frame, std::vector<cv::Mat> *predictions) override;
 
-  bool Extract(std::vector<std::shared_ptr<VisualObject>> *objects) {
+  bool Extract(std::vector<std::shared_ptr<VisualObject>> *objects) override {
     for (auto &extractor : extractors_) {
       extractor->extract(objects);
     }
@@ -132,7 +132,7 @@ class YoloCameraDetector : public BaseCameraDetector {
   int lane_output_height_lane_ = 0;
   int lane_output_width_lane_ = 0;
   int ignored_height_ = 0;
-  int num_lanes = 13;
+  int num_lanes_ = 13;
 
   yolo_camera_detector_config::ModelConfigs config_;
 };

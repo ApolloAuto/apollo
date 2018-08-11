@@ -389,7 +389,7 @@ bool YoloCameraDetector::Lanetask(const cv::Mat &frame,
     return false;
   }
 
-  for (int i = 0; i < num_lanes; ++i) {
+  for (int i = 0; i < num_lanes_; ++i) {
     cv::Mat tmp(lane_output_height_lane_, lane_output_width_lane_, CV_32FC1);
     memcpy(tmp.data, seg_blob->cpu_data() + lane_output_width_lane_ *
           lane_output_height_lane_ * i,
