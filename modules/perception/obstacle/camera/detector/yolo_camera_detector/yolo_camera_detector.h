@@ -55,7 +55,8 @@ class YoloCameraDetector : public BaseCameraDetector {
                  std::vector<std::shared_ptr<VisualObject>> *objects,
                  cv::Mat *mask) override;
 
-  bool Lanetask(const cv::Mat &frame, std::vector<cv::Mat> *predictions) override;
+  bool Lanetask(const cv::Mat &frame,
+                std::vector<cv::Mat> *predictions) override;
 
   bool Extract(std::vector<std::shared_ptr<VisualObject>> *objects) override {
     for (auto &extractor : extractors_) {
