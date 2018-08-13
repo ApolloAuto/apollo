@@ -5,8 +5,8 @@ services:
 dist: trusty
 os: linux
 env:
-    - JOB=build
-    - JOB=test
+    - JOB=cibuild
+    - JOB=citest
     - JOB=lint
 cache:
   directories:
