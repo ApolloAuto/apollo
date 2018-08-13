@@ -20,6 +20,8 @@
 #include <cmath>
 #include <vector>
 
+#include "boost/filesystem.hpp"
+#include "boost/range/iterator_range.hpp"
 #include "rosbag/bag.h"
 #include "rosbag/view.h"
 
@@ -57,30 +59,35 @@ using ::apollo::perception::PerceptionObstacles;
 
 std::string Prediction::Name() const { return FLAGS_prediction_module_name; }
 
+void GetBagFiles(const boost::filesystem::path& p,
+                 std::vector<std::string>* bag_files) {
+  CHECK(bag_files);
+  if (!boost::filesystem::exists(p)) {
+    return;
+  }
+  if (boost::filesystem::is_regular_file(p)) {
+    const auto ext = p.extension();
+    if (ext == ".bag" || ext == ".BAG") {
+      AINFO << "Found bag file: " << p.c_str();
+      bag_files->push_back(p.c_str());
+    }
+    return;
+  }
+  if (boost::filesystem::is_directory(p)) {
+    for (auto& entry : boost::make_iterator_range(
+             boost::filesystem::directory_iterator(p), {})) {
+      GetBagFiles(entry.path(), bag_files);
+    }
+  }
+}
+
 std::vector<std::string> Prediction::LoadOfflineBags(
     const std::string& flag_input) {
   std::vector<std::string> bag_files;
-  bool is_dir = DirectoryExists(flag_input);
-  if (is_dir) {
-    std::string post_fix = "*.bag";
-    std::vector<std::string> bags = Glob(flag_input + "/*.bag");
-    while (!bags.empty()) {
-      bag_files.insert(bag_files.end(), bags.begin(), bags.end());
-      post_fix = "/*/" + post_fix;
-      bags = Glob(flag_input + post_fix);
-    }
-    std::sort(bag_files.begin(), bag_files.end());
-  } else {
-    std::vector<std::string> bags;
-    apollo::common::util::split(flag_input, ' ', &bags);
-    for (const auto& file : bags) {
-      if (file.empty()) {
-        continue;
-      }
-      if (apollo::common::util::PathExists(file)) {
-        bag_files.push_back(file);
-      }
-    }
+  std::vector<std::string> inputs;
+  apollo::common::util::split(flag_input, ';', &inputs);
+  for (const auto& input : inputs) {
+    GetBagFiles(boost::filesystem::path(input), &bag_files);
   }
   return bag_files;
 }
@@ -134,14 +141,19 @@ Status Prediction::Init() {
     if (!FeatureOutput::Ready()) {
       return OnError("Feature output is not ready.");
     }
+    if (FLAGS_prediction_offline_bags.empty()) {
+      return Status::OK();  // use listen to ROS topic mode
+    }
 
     auto offline_bags = LoadOfflineBags(FLAGS_prediction_offline_bags);
-    if (offline_bags.empty()) {  // use listen to ROS topic mode
-      return Status::OK();
+    if (offline_bags.empty()) {
+      return OnError("Failed to find valid rosbag in provided list: " +
+                     FLAGS_prediction_offline_bags);
     }
     std::vector<std::string> topics;
     topics.push_back(FLAGS_perception_obstacle_topic);
     topics.push_back(FLAGS_localization_topic);
+    AINFO << "Have found " << offline_bags.size() << " rosbags to process";
     for (const auto& filename : offline_bags) {
       AINFO << "Processing: " << filename;
       rosbag::Bag bag;
