@@ -89,6 +89,7 @@ std::vector<std::string> Prediction::LoadOfflineBags(
   for (const auto& input : inputs) {
     GetBagFiles(boost::filesystem::path(input), &bag_files);
   }
+  std::sort(bag_files.begin(), bag_files.end());
   return bag_files;
 }
 
