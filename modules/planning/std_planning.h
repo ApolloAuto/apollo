@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,12 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PLANNING_PLANNING_H_
-#define MODULES_PLANNING_PLANNING_H_
+#ifndef MODULES_PLANNING_STD_PLANNING_H_
+#define MODULES_PLANNING_STD_PLANNING_H_
 
-#include <memory>
 #include <string>
 
-#include "modules/common/apollo_app.h"
-#include "modules/common/configs/config_gflags.h"
-#include "modules/planning/navi_planning.h"
 #include "modules/planning/planning_base.h"
-#include "modules/planning/std_planning.h"
 
 /**
  * @namespace apollo::planning
@@ -39,46 +34,49 @@ namespace planning {
  * @brief Planning module main class. It processes GPS and IMU as input,
  * to generate planning info.
  */
-class Planning : public apollo::common::ApolloApp {
+class StdPlanning : public PlanningBase {
  public:
-  Planning() {
-    if (FLAGS_use_navigation_mode) {
-      planning_ptr_ = std::unique_ptr<PlanningBase>(new NaviPlanning());
-    } else {
-      planning_ptr_ = std::unique_ptr<PlanningBase>(new StdPlanning());
-    }
-  }
-  virtual ~Planning() {}
+  StdPlanning() = default;
+  virtual ~StdPlanning();
   /**
    * @brief module name
    * @return module name
    */
-  std::string Name() const override { return planning_ptr_->Name(); }
-
-  virtual void RunOnce() { planning_ptr_->RunOnce(); }
+  std::string Name() const override;
 
   /**
    * @brief module initialization function
    * @return initialization status
    */
-  apollo::common::Status Init() override { return planning_ptr_->Init(); }
+  apollo::common::Status Init() override;
 
   /**
    * @brief module start function
    * @return start status
    */
-  apollo::common::Status Start() override { return planning_ptr_->Start(); }
+  apollo::common::Status Start() override;
 
   /**
    * @brief module stop function
    */
-  void Stop() override { return planning_ptr_->Stop(); }
+  void Stop() override;
+
+  /**
+   * @brief main logic of the planning module, runs periodically triggered by
+   * timer.
+   */
+  void RunOnce() override;
+
+  void OnTimer(const ros::TimerEvent&) override;
 
  private:
-  std::unique_ptr<PlanningBase> planning_ptr_;
+  /**
+   * Reset pull over mode whenever received new routing
+   */
+  void ResetPullOver(const routing::RoutingResponse& response);
 };
 
 }  // namespace planning
 }  // namespace apollo
 
-#endif /* MODULES_PLANNING_PLANNING_H_ */
+#endif /* MODULES_PLANNING_STD_PLANNING_H_ */
