@@ -70,7 +70,6 @@ class ApolloApp {
    */
   void SetCallbackThreadNumber(uint32_t callback_thread_num);
 
- protected:
   /**
    * @brief The module initialization function. This is the first function being
    * called when the App starts. Usually this function loads the configurations,
@@ -97,6 +96,7 @@ class ApolloApp {
    */
   virtual void Stop() = 0;
 
+ protected:
   /** The callback thread number
    */
   uint32_t callback_thread_num_ = 1;
