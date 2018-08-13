@@ -1,5 +1,5 @@
 header {
-  module_name: "planning"
+  module_name: "std_planning"
 }
 total_path_length: 84.6674430567009
 total_path_time: 6.999999999999992
