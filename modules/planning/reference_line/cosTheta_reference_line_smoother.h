@@ -1,8 +1,5 @@
 /******************************************************************************
- * Adapted from Apollo.(spiral_reference_line_smoother.h)
- * Author: Jinyun Zhou
- *
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-
-/*
- * cosTheta_reference_line_smoother.h
- */
 
 #ifndef MODULES_PLANNING_REFERENCE_LINE_COSTHETA_REFERENCE_LINE_SMOOTHER_H_
 #define MODULES_PLANNING_REFERENCE_LINE_COSTHETA_REFERENCE_LINE_SMOOTHER_H_
@@ -112,4 +105,4 @@ class CosThetaReferenceLineSmoother : public ReferenceLineSmoother {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_REFERENCE_LINE_cosTheta_REFERENCE_LINE_SMOOTHER_H_
+#endif  // MODULES_PLANNING_REFERENCE_LINE_COSTHETA_REFERENCE_LINE_SMOOTHER_H_

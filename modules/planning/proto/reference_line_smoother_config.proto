@@ -63,7 +63,6 @@ message CosThetaSmootherConfig {
 
   // dkappa filter
   optional double dkappa_filter = 7 [default = 1.0e9];
-
   }
 
 message ReferenceLineSmootherConfig {

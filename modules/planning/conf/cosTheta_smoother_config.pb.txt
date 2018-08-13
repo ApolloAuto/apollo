@@ -1,4 +1,4 @@
-max_constraint_interval : 2.5
+max_constraint_interval : 2.0
 longitudinal_boundary_bound : 2.0
 lateral_boundary_bound : 0.25
 num_of_total_points : 500
@@ -6,7 +6,7 @@ curb_shift : 0.2
 driving_side : RIGHT
 wide_lane_threshold_factor : 10.0
 wide_lane_shift_remain_factor : 0.5
-resolution: 0.05
+resolution: 0.02
 
 cos_theta {
   max_point_deviation: 0.5

@@ -1,8 +1,5 @@
 /******************************************************************************
- * Adapted from Apollo.(spiral_problem_interface.h)
- * Author: Jinyun Zhou
- *
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,16 +14,12 @@
  * limitations under the License.
  *****************************************************************************/
 
-/*
- * cosTheta_problem_interface.h
- */
-
 #ifndef MODULES_PLANNING_REFERENCE_LINE_COSTHETA_PROBLEM_INTERFACE_H_
 #define MODULES_PLANNING_REFERENCE_LINE_COSTHETA_PROBLEM_INTERFACE_H_
 
-#include <vector>
 #include <map>
 #include <utility>
+#include <vector>
 
 #include "Eigen/Dense"
 
@@ -40,12 +33,12 @@
 namespace apollo {
 namespace planning {
 
-class cosThetaProbleminterface : public Ipopt::TNLP {
+class CosThetaProbleminterface : public Ipopt::TNLP {
  public:
-  explicit cosThetaProbleminterface(std::vector<Eigen::Vector2d> points,
+  explicit CosThetaProbleminterface(std::vector<Eigen::Vector2d> points,
                                     std::vector<double> lateral_bounds);
 
-  virtual ~cosThetaProbleminterface() = default;
+  virtual ~CosThetaProbleminterface() = default;
 
   void set_default_max_point_deviation(const double point_max_deviation);
 
@@ -151,4 +144,4 @@ class cosThetaProbleminterface : public Ipopt::TNLP {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_REFERENCE_LINE_SPIRAL_PROBLEM_INTERFACE_H_
+#endif  // MODULES_PLANNING_REFERENCE_LINE_COSTHETA_PROBLEM_INTERFACE_H_

@@ -1,8 +1,5 @@
 /******************************************************************************
- * Adapted from Apollo.(spiral_reference_line_smoother.cc)
- * Author: Jinyun Zhou
- *
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-
-/*
- * cosTheta_reference_line_smoother.cc
- */
 
 #include "modules/planning/reference_line/cosTheta_reference_line_smoother.h"
 
@@ -159,8 +152,8 @@ bool CosThetaReferenceLineSmoother::Smooth(
   std::vector<double> y;
   std::vector<common::PathPoint> ptr_smoothed_point2d;
 
-  cosThetaProbleminterface* ptop =
-      new cosThetaProbleminterface(scaled_point2d, lateral_bounds);
+  CosThetaProbleminterface* ptop =
+      new CosThetaProbleminterface(scaled_point2d, lateral_bounds);
 
   ptop->set_default_max_point_deviation(max_point_deviation_);
   ptop->set_weight_cos_included_angle(weight_cos_included_angle_);
@@ -180,7 +173,7 @@ bool CosThetaReferenceLineSmoother::Smooth(
   // Create an instance of the IpoptApplication
   Ipopt::SmartPtr<Ipopt::IpoptApplication> app = IpoptApplicationFactory();
   // app->Options()->SetStringValue("derivative_test", "second-order");
-  app->Options()->SetIntegerValue("print_level", 5);
+  app->Options()->SetIntegerValue("print_level", 0);
   // app->Options()->SetStringValue("print_info_string", "yes");
   // app->Options()->SetStringValue("check_derivatives_for_naninf", "yes");
   app->Options()->SetIntegerValue("max_iter", num_of_iterations_);
@@ -215,7 +208,7 @@ bool CosThetaReferenceLineSmoother::Smooth(
 
   ptop->get_optimization_results(&x, &y);
   const double opt_end_timestamp = Clock::NowInSeconds();
-    AINFO << "cosTheta reference line optimizing time: "
+  AINFO << "cosTheta reference line optimizing time: "
         << (opt_end_timestamp - start_timestamp) * 1000 << " ms.";
   // load the point position and estimated derivatives at each point
   for (std::size_t i = 0; i < x.size(); ++i) {
@@ -321,7 +314,7 @@ bool CosThetaReferenceLineSmoother::Smooth(
             ptr_interpolated_point2d->at(i).y_3rd_derivative()));
   }
   const double interpl_end_timestamp = Clock::NowInSeconds();
-    AINFO << "cosTheta reference line interpolating time: "
+  AINFO << "cosTheta reference line interpolating time: "
         << (interpl_end_timestamp - opt_end_timestamp) * 1000 << " ms.";
 
   return status == Ipopt::Solve_Succeeded ||
