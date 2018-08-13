@@ -44,8 +44,6 @@
 #ifndef MODULES_PERCEPTION_LIB_CALIBRATION_CONFIG_MANAGER_H_
 #define MODULES_PERCEPTION_LIB_CALIBRATION_CONFIG_MANAGER_H_
 
-#include <Eigen/Core>
-#include <Eigen/Geometry>
 #include <map>
 #include <memory>
 #include <mutex>
@@ -53,6 +51,10 @@
 #include <string>
 #include <typeinfo>
 #include <vector>
+
+#include "Eigen/Core"
+#include "Eigen/Geometry"
+
 #include "modules/common/macro.h"
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/cuda_util/undistortion.h"
@@ -160,8 +162,7 @@ class CameraCalibration {
     camera_2car_stripped.col(1) = car2camera_3_4.col(1);
     camera_2car_stripped.col(2) = car2camera_3_4.col(3);
 
-    homography_camera2car_adj_ =
-     camera_2car_stripped.inverse() * c_int_inv;
+    homography_camera2car_adj_ = camera_2car_stripped.inverse() * c_int_inv;
     homography_camera2car_adj_inverse_ = homography_camera2car_adj_.inverse();
   }
 
@@ -222,8 +223,7 @@ class CameraCalibration {
       homography_mat_;  // homography mat from camera 2 car
   Eigen::Matrix<double, 3, 3>
       homography_mat_inverse_;  // homography mat from car 2 camera
-  Eigen::Matrix<double, 3, 3>
-      homography_camera2car_adj_inverse_;
+  Eigen::Matrix<double, 3, 3> homography_camera2car_adj_inverse_;
   volatile std::shared_ptr<Eigen::Matrix<double, 3, 3>>
       camera_homography_;  // final homography based on online calibration
 
