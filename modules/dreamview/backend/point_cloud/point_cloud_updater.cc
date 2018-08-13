@@ -128,12 +128,14 @@ void PointCloudUpdater::FilterPointCloud(
   voxel_grid.setInputCloud(pcl_ptr);
   voxel_grid.setLeafSize(FLAGS_voxel_filter_size, FLAGS_voxel_filter_size,
                          FLAGS_voxel_filter_height);
-  voxel_grid.filter(*pcl_ptr);
-  AINFO << "filtered point cloud data size: " << pcl_ptr->size();
+  pcl::PointCloud<pcl::PointXYZ>::Ptr pcl_filtered_ptr(
+    new pcl::PointCloud<pcl::PointXYZ>);
+  voxel_grid.filter(*pcl_filtered_ptr);
+  AINFO << "filtered point cloud data size: " << pcl_filtered_ptr->size();
 
   PointCloud point_cloud_pb;
-  for (size_t idx = 0; idx < pcl_ptr->size(); ++idx) {
-    pcl::PointXYZ &pt = pcl_ptr->points[idx];
+  for (size_t idx = 0; idx < pcl_filtered_ptr->size(); ++idx) {
+    pcl::PointXYZ &pt = pcl_filtered_ptr->points[idx];
     if (!std::isnan(pt.x) && !std::isnan(pt.y) && !std::isnan(pt.z)) {
       point_cloud_pb.add_num(pt.x);
       point_cloud_pb.add_num(pt.y);
