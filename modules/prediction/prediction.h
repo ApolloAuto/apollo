@@ -80,8 +80,7 @@ class Prediction : public PredictionInterface {
   common::Status OnError(const std::string &error_msg);
 
   // The function get the rosbags from the input flag_input.
-  // The input could be a file, a list of files seperated by space (' ') or a
-  // directory
+  // The input is a list of files or directories seperated by space (' ')
   std::vector<std::string> LoadOfflineBags(const std::string &flag_input);
 
   void OnLocalization(const localization::LocalizationEstimate &localization);
