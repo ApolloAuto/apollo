@@ -132,4 +132,15 @@ cc_test(
     ],
 )
 
+cc_test(
+    name = "piecewise_quintic_spiral_path_test",
+    size = "small",
+    srcs = [
+        "piecewise_quintic_spiral_path_test.cc",
+    ],
+    deps = [
+        ":piecewise_quintic_spiral_path",
+        "@gtest//:main",
+    ],
+)
 cpplint()
