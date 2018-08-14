@@ -134,9 +134,67 @@ set args ./crash-0x12345678
 run # usually will stop on crash
 bt  # output backtrace of crash
 ```
-## Reporting Bugs
+
+## Case Study
+
+Here is one of the crash (SEGV) produced by fuzzing the `control` module, and it has already been patched. The fuzzer stops on the following error message:
+```
+Running: crash-da39a3ee5e6b4b0d3255bfef95601890afd80709
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+==11875==ERROR: AddressSanitizer: SEGV on unknown address 0x000000000018 (pc 0x00000057b770 bp 0x7fff21e8cf80 sp 0x7fff21e8cf50 T0)
+==11875==The signal is caused by a READ memory access.
+==11875==Hint: address points to the zero page.
+```
+
+Using `gdb`, we can get a more detaield backtrace when crash occurs, which is:
+
+```
+#0  0x000000000057e3b0 in apollo::common::TrajectoryPoint::path_point (this=0x0)
+    at bazel-out/local-dbg/genfiles/modules/common/proto/pnc_point.pb.h:1502
+#1  0x000000000059f9ff in apollo::control::(anonymous namespace)::PointDistanceSquare (point=..., x=-123.13666043742973, 
+    y=364.35546687249285) at modules/control/common/trajectory_analyzer.cc:39
+#2  0x000000000059f7d6 in apollo::control::TrajectoryAnalyzer::QueryMatchedPathPoint (this=0x7fffffffc250, x=-123.13666043742973, 
+    y=364.35546687249285) at modules/control/common/trajectory_analyzer.cc:68
+#3  0x000000000057779b in apollo::control::LonController::ComputeLongitudinalErrors (
+    this=0x2b3c2e0 <apollo::control::lon_controller_fuzzer>, trajectory_analyzer=0x7fffffffc250, preview_time=0, debug=0x7fffffffc2a0)
+    at modules/control/controller/lon_controller.cc:323
+#4  0x0000000000569504 in apollo::control::LonControllerFuzzer::ComputeLongitudinalErrors (
+    this=0x2b3c2e0 <apollo::control::lon_controller_fuzzer>, trajectory=0x7fffffffc250, preview_time=0, debug=0x7fffffffc2a0)
+    at modules/control/controller/lon_controller_fuzzer.cc:69
+#5  0x000000000056648a in apollo::control::LonControllerFuzzer::target (this=0x2b3c2e0 <apollo::control::lon_controller_fuzzer>, 
+    trajectory_pb=...) at modules/control/controller/lon_controller_fuzzer.cc:129
+#6  0x0000000000567793 in TestOneProtoInput (message=...) at modules/control/controller/lon_controller_fuzzer.cc:139
+#7  0x000000000056744b in LLVMFuzzerTestOneInput (
+    data=0x611000016c00 "header {\n  timestamp_sec: 1494373003.683531\n  module_name: \"planning\"\n  sequence_num: 1\n}\ntotal_path_length: 32.38002780204\ntotal_path_time: 9.9800000190734863\nestop {\n  is_estop: false\n}\ngear: GEAR_D"..., size=253)
+    at modules/control/controller/lon_controller_fuzzer.cc:135
+#8  0x000000000043b84d in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) ()
+#9  0x000000000042ebb4 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) ()
+#10 0x00000000004378a5 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) ()
+#11 0x00000000004251c3 in main ()
+```
+By examing the `QueryMatchedPathPoint` function in the `trajectory_analyzer.cc`:
+```
+PathPoint TrajectoryAnalyzer::QueryMatchedPathPoint(const double x,
+                                                    const double y) const {
+
+  double d_min = PointDistanceSquare(trajectory_points_.front(), x, y);
+  size_t index_min = 0;
+```
+You will notice that it uses the return value of `vector::front()` function without checking whether it's `NULL` or not, and thus causes the invalid memory read access. The patches are then applied as:
+```
+PathPoint TrajectoryAnalyzer::QueryMatchedPathPoint(const double x,
+                                                    const double y) const {
+  CHECK_GT(trajectory_points_.size(), 0);
+
+  double d_min = PointDistanceSquare(trajectory_points_.front(), x, y);
+```
+
+## Contributing
 
 You are encouraged to report the problems discovered to the Apollo team. Just open an issue and probably with a pull request following these [steps](https://github.com/ApolloAuto/apollo/blob/master/CONTRIBUTING.md).
+
+Also, you may notice that the fuzz test cases only cover small set of Apollo functionalities, you are very welcomed to contribute fuzz test cases by writing a good `FuzzTarget()` and the entry point function. These fuzz test cases can be reused everytime new code is added in the future to ensure that no bugs are intruduced. 
 
 ## Further Reading
 
