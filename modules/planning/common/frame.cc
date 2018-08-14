@@ -91,6 +91,10 @@ bool Frame::Rerouting() {
     AERROR << "No previous routing available";
     return false;
   }
+  if (!hdmap_) {
+    AERROR << "Invalid HD Map.";
+    return false;
+  }
   auto request = adapter_manager->GetRoutingResponse()
                      ->GetLatestObserved()
                      .routing_request();
@@ -238,6 +242,10 @@ const Obstacle *Frame::CreateStopObstacle(
 const Obstacle *Frame::CreateStopObstacle(const std::string &obstacle_id,
                                           const std::string &lane_id,
                                           const double lane_s) {
+  if (!hdmap_) {
+    AERROR << "Invalid HD Map.";
+    return nullptr;
+  }
   const auto lane = hdmap_->GetLaneById(hdmap::MakeMapId(lane_id));
   if (!lane) {
     AERROR << "Failed to find lane[" << lane_id << "]";
@@ -324,6 +332,7 @@ const Obstacle *Frame::CreateStaticVirtualObstacle(const std::string &id,
 
 Status Frame::Init() {
   hdmap_ = hdmap::HDMapUtil::BaseMapPtr();
+  CHECK_NOTNULL(hdmap_);
   vehicle_state_ = common::VehicleStateProvider::instance()->vehicle_state();
   const auto &point = common::util::MakePointENU(
       vehicle_state_.x(), vehicle_state_.y(), vehicle_state_.z());

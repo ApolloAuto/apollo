@@ -25,14 +25,14 @@
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/time/time.h"
 #include "modules/map/proto/map_lane.pb.h"
-#include "modules/planning/common/planning_util.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/common/planning_util.h"
 
 namespace apollo {
 namespace planning {
 
-using apollo::common::adapter::AdapterManager;
 using apollo::common::Status;
+using apollo::common::adapter::AdapterManager;
 using apollo::common::time::Clock;
 using apollo::hdmap::HDMapUtil;
 using apollo::hdmap::LaneSegment;
@@ -88,9 +88,9 @@ int Destination::BuildStopDecision(
   }
 
   const auto& routing_end = *routing.routing_request().waypoint().rbegin();
-  double dest_lane_s = std::max(
-      0.0, routing_end.s() - FLAGS_virtual_stop_wall_length -
-      config_.destination().stop_distance());
+  double dest_lane_s =
+      std::max(0.0, routing_end.s() - FLAGS_virtual_stop_wall_length -
+                        config_.destination().stop_distance());
 
   const auto& planning_state = GetPlanningStatus()->planning_state();
   if (planning_state.has_pull_over() &&
@@ -102,8 +102,8 @@ int Destination::BuildStopDecision(
   }
 
   common::PointENU dest_point;
-  if (CheckPullOver(reference_line_info, routing_end.id(),
-                    dest_lane_s, &dest_point)) {
+  if (CheckPullOver(reference_line_info, routing_end.id(), dest_lane_s,
+                    &dest_point)) {
     if (planning_state.has_pull_over() &&
         planning_state.pull_over().in_pull_over()) {
       PullOver(nullptr);
@@ -125,8 +125,7 @@ int Destination::BuildStopDecision(
  */
 int Destination::Stop(Frame* const frame,
                       ReferenceLineInfo* const reference_line_info,
-                      const std::string lane_id,
-                      const double lane_s) {
+                      const std::string lane_id, const double lane_s) {
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
 
@@ -175,19 +174,22 @@ int Destination::Stop(Frame* const frame,
 /**
  * @brief: check if adc will pull-over upon arriving destination
  */
-bool Destination::CheckPullOver(
-    ReferenceLineInfo* const reference_line_info,
-    const std::string& dest_lane_id,
-    const double dest_lane_s,
-    common::PointENU* dest_point) {
+bool Destination::CheckPullOver(ReferenceLineInfo* const reference_line_info,
+                                const std::string& dest_lane_id,
+                                const double dest_lane_s,
+                                common::PointENU* dest_point) {
   CHECK_NOTNULL(reference_line_info);
 
   if (!config_.destination().enable_pull_over()) {
     return false;
   }
 
-  const auto dest_lane = HDMapUtil::BaseMapPtr()->GetLaneById(
-      hdmap::MakeMapId(dest_lane_id));
+  const auto hdmap_ptr = HDMapUtil::BaseMapPtr();
+  if (!hdmap_ptr) {
+    AERROR << "Invalid HD Map.";
+    return false;
+  }
+  const auto dest_lane = hdmap_ptr->GetLaneById(hdmap::MakeMapId(dest_lane_id));
   if (!dest_lane) {
     AERROR << "Failed to find lane[" << dest_lane_id << "]";
     return false;
@@ -215,10 +217,9 @@ bool Destination::CheckPullOver(
   }
   double adc_front_edge_s = reference_line_info->AdcSlBoundary().end_s();
   double distance_to_dest = dest_sl.s() - adc_front_edge_s;
-  ADEBUG << "adc_front_edge_s[" << adc_front_edge_s
-      << "] distance_to_dest[" << distance_to_dest
-      << "] dest_lane[" << dest_lane_id
-      << "] dest_lane_s[" << dest_lane_s << "]";
+  ADEBUG << "adc_front_edge_s[" << adc_front_edge_s << "] distance_to_dest["
+         << distance_to_dest << "] dest_lane[" << dest_lane_id
+         << "] dest_lane_s[" << dest_lane_s << "]";
 
   if (distance_to_dest > config_.destination().pull_over_plan_distance()) {
     // to far, not sending pull-over yet
