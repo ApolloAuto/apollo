@@ -5,9 +5,7 @@ services:
 dist: trusty
 os: linux
 env:
-    - JOB=cibuild
-    - JOB=citest
-    - JOB=lint
+    - JOB=check
 cache:
   directories:
   - $HOME/.cache/bazel
