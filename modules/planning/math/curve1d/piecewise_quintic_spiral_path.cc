@@ -25,15 +25,23 @@
 namespace apollo {
 namespace planning {
 
-PiecewiseQuinticSpiralPath::PiecewiseQuinticSpiralPath() {
+PiecewiseQuinticSpiralPath::PiecewiseQuinticSpiralPath(
+    const double theta, const double kappa, const double dkappa) :
+    last_theta_(theta), last_kappa_(kappa), last_dkappa_(dkappa) {
   accumulated_s_.push_back(0.0);
 }
 
-void PiecewiseQuinticSpiralPath::Append(QuinticSpiralPath spiral_path) {
-  double s = spiral_path.ParamLength() + accumulated_s_.back();
+void PiecewiseQuinticSpiralPath::Append(const double theta,
+    const double kappa, const double dkappa, const double delta_s) {
+  double s = delta_s + accumulated_s_.back();
   accumulated_s_.push_back(s);
 
-  pieces_.push_back(std::move(spiral_path));
+  pieces_.emplace_back(last_theta_, last_kappa_, last_dkappa_,
+      theta, kappa, dkappa, delta_s);
+
+  last_theta_ = theta;
+  last_kappa_ = kappa;
+  last_dkappa_ = dkappa;
 }
 
 double PiecewiseQuinticSpiralPath::Evaluate(const std::uint32_t order,
@@ -47,6 +55,10 @@ double PiecewiseQuinticSpiralPath::DeriveKappaS(const double s) const {
   const auto& piece = pieces_[index];
   double ratio = (s - accumulated_s_[index]) / piece.ParamLength();
   return piece.DeriveKappaDerivative(QuinticSpiralPath::DELTA_S, ratio);
+}
+
+double PiecewiseQuinticSpiralPath::ParamLength() const {
+  return accumulated_s_.back();
 }
 
 std::size_t PiecewiseQuinticSpiralPath::LocatePiece(const double s) const {
