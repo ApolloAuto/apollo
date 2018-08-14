@@ -428,7 +428,6 @@ void LidarProcessSubnode::PublishDataAndEvent(
     event_manager_->Publish(event);
   }
 }
-
 SensorType Lidar64ProcessSubnode::GetSensorType() const {
   return SensorType::VELODYNE_64;
 }
