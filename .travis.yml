@@ -6,7 +6,7 @@ dist: trusty
 os: linux
 env:
     - JOB=cibuild
-    - JOB=test
+    - JOB=citest
     - JOB=lint
 cache:
   directories:
