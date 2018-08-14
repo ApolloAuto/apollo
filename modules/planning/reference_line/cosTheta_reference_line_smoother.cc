@@ -87,8 +87,6 @@ bool CosThetaReferenceLineSmoother::Smooth(
 
   Smooth(raw_point2d, &smoothed_point2d, anchorpoints_lateralbound);
 
-  const double load_reference_timestamp = Clock::NowInSeconds();
-
   std::vector<ReferencePoint> ref_points;
 
   for (const auto& p : smoothed_point2d) {
@@ -135,8 +133,6 @@ bool CosThetaReferenceLineSmoother::Smooth(
   }
   *smoothed_reference_line = ReferenceLine(ref_points);
   const double end_timestamp = Clock::NowInSeconds();
-  AINFO << "cosTheta reference line loading time: "
-        << (end_timestamp - load_reference_timestamp) * 1000 << " ms.";
   ADEBUG << "cosTheta reference line smoother time: "
          << (end_timestamp - start_timestamp) * 1000 << " ms.";
   AINFO << "cosTheta reference line smoother time: "
@@ -147,7 +143,6 @@ bool CosThetaReferenceLineSmoother::Smooth(
     std::vector<Eigen::Vector2d> scaled_point2d,
     std::vector<common::PathPoint>* ptr_interpolated_point2d,
     std::vector<double> lateral_bounds) {
-  const double start_timestamp = Clock::NowInSeconds();
   std::vector<double> x;
   std::vector<double> y;
   std::vector<common::PathPoint> ptr_smoothed_point2d;
@@ -186,7 +181,7 @@ bool CosThetaReferenceLineSmoother::Smooth(
 
   Ipopt::ApplicationReturnStatus status = app->Initialize();
   if (status != Ipopt::Solve_Succeeded) {
-    std::cout << "*** Error during initialization!" << std::endl;
+    AINFO << "*** Error during initialization!";
     return static_cast<int>(status);
   }
 
@@ -196,20 +191,12 @@ bool CosThetaReferenceLineSmoother::Smooth(
       status == Ipopt::Solved_To_Acceptable_Level) {
     // Retrieve some statistics about the solve
     Ipopt::Index iter_count = app->Statistics()->IterationCount();
-    std::cout << "*** The problem solved in " << iter_count << " iterations!"
-              << std::endl;
-
-    Ipopt::Number final_obj = app->Statistics()->FinalObjective();
-    std::cout << "*** The final value of the objective function is "
-              << final_obj << "." << std::endl;
+    ADEBUG << "*** The problem solved in " << iter_count << " iterations!";
   } else {
-    std::cout << "Return status: " << int(status) << std::endl;
+    AINFO << "Return status: " << int(status);
   }
 
   ptop->get_optimization_results(&x, &y);
-  const double opt_end_timestamp = Clock::NowInSeconds();
-  AINFO << "cosTheta reference line optimizing time: "
-        << (opt_end_timestamp - start_timestamp) * 1000 << " ms.";
   // load the point position and estimated derivatives at each point
   for (std::size_t i = 0; i < x.size(); ++i) {
     // reverse back to the unscaled points
@@ -313,10 +300,6 @@ bool CosThetaReferenceLineSmoother::Smooth(
             ptr_interpolated_point2d->at(i).y_2nd_derivative(),
             ptr_interpolated_point2d->at(i).y_3rd_derivative()));
   }
-  const double interpl_end_timestamp = Clock::NowInSeconds();
-  AINFO << "cosTheta reference line interpolating time: "
-        << (interpl_end_timestamp - opt_end_timestamp) * 1000 << " ms.";
-
   return status == Ipopt::Solve_Succeeded ||
          status == Ipopt::Solved_To_Acceptable_Level;
 }
@@ -473,7 +456,6 @@ double CosThetaReferenceLineSmoother::quintic_hermite_s(
   double t2 = t * t;
   double t3 = t2 * t;
   double t4 = t3 * t;
-  double t5 = t4 * t;
   double q1 = -30 * t4 + 60 * t3 - 30 * t2;
   double q2 = -15 * t4 + 32 * t3 - 18 * t2 + 1;
   double q3 = -2.5 * t4 + 6 * t3 - 4.5 * t2 + t;
@@ -488,7 +470,7 @@ double CosThetaReferenceLineSmoother::quintic_hermite_s(
                q3 * front_point.y_2nd_derivative() + q4 * back_point.y() +
                q5 * back_point.y_derivative() +
                q6 * back_point.y_2nd_derivative();
-  return std::pow(x_d * x_d + y_d * y_d, 0.5);
+  return std::sqrt(x_d * x_d + y_d * y_d);
 }
 
 void CosThetaReferenceLineSmoother::SetAnchorPoints(

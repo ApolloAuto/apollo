@@ -117,6 +117,24 @@ cc_test(
     ],
 )
 
+
+cc_test(
+    name = "cosTheta_reference_line_smoother_test",
+    size = "small",
+    srcs = [
+        "cosTheta_reference_line_smoother_test.cc",
+    ],
+    data = [
+        "//modules/planning:planning_conf",
+        "//modules/planning:planning_testdata",
+    ],
+    deps = [
+        ":cosTheta_reference_line_smoother",
+        "//modules/map/hdmap",
+        "@gtest//:main",
+    ],
+)
+
 cc_library(
     name = "reference_line_provider",
     srcs = [

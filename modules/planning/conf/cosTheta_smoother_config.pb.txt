@@ -10,10 +10,10 @@ resolution: 0.02
 
 cos_theta {
   max_point_deviation: 0.5
-  relax:0
-  num_of_iteration: 1000
-  weight_cos_included_angle: 1e8
-  acceptable_tol:1e-8
+  relax:0.25
+  num_of_iteration: 500
+  weight_cos_included_angle: 1e6
+  acceptable_tol:1e-1
   kappa_filter:1.0e9
   dkappa_filter:1.0e9
 }
