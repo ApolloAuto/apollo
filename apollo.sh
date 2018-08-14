@@ -109,6 +109,12 @@ function generate_build_targets() {
   if [ ${MACHINE_ARCH} != "x86_64" ]; then
      BUILD_TARGETS=$(echo $BUILD_TARGETS |tr ' ' '\n' | grep -v "msf")
   fi
+  #switch for building fuzz test
+  if [ -z $BUILD_FUZZ_TEST ]; then
+     BUILD_TARGETS=$(echo $BUILD_TARGETS |tr ' ' '\n' | grep -v "fuzz")
+  else 
+     BUILD_TARGETS=`bazel query //modules/tools/fuzz/...`
+  fi
 }
 
 #=================================================
@@ -126,7 +132,28 @@ function build() {
     JOB_ARG="--jobs=3"
   fi
   info "Building with $JOB_ARG for $MACHINE_ARCH"
-  echo "$BUILD_TARGETS" | xargs bazel build $JOB_ARG $DEFINES -c $@
+  
+  # Switch for building fuzz test.
+  if [ -z $BUILD_FUZZ_TEST ]; then 
+    echo "$BUILD_TARGETS" | xargs bazel build $JOB_ARG $DEFINES -c $@
+  else
+    if [ -z "$(command -v clang-6.0)" ]; then
+      # Install clang-6.0 if it doesn't exist.
+      info "Installing clang-6.0 which is required by the fuzz test ..."
+      sudo apt-add-repository \
+      "deb http://apt.llvm.org/trusty/ llvm-toolchain-trusty-6.0 main"
+      wget -O - http://apt.llvm.org/llvm-snapshot.gpg.key \
+      | sudo apt-key add -
+      sudo apt-get update
+      sudo apt-get install -y clang-6.0 lldb-6.0 lld-6.0
+      sudo ln -s /usr/lib/x86_64-linux-gnu/libgfortran.so.3 \
+      /usr/lib/libgfortran.so
+    fi  
+    echo "$BUILD_TARGETS" | xargs bazel build \
+    --crosstool_top=tools/clang-6.0:toolchain \
+    $JOB_ARG $DEFINES -c $@ --compilation_mode=dbg
+  fi
+
   if [ $? -ne 0 ]; then
     fail 'Build failed!'
   fi
@@ -599,6 +626,7 @@ function print_usage() {
   ${BLUE}build_fe${NONE}: compile frontend javascript code, this requires all the node_modules to be installed already
   ${BLUE}build_no_perception [dbg|opt]${NONE}: run build build skip building perception module, useful when some perception dependencies are not satisified, e.g., CUDA, CUDNN, LIDAR, etc.
   ${BLUE}build_prof${NONE}: build for gprof support.
+  ${BLUE}build_fuzz_test${NONE}: build fuzz test cases.
   ${BLUE}buildify${NONE}: fix style of BUILD files
   ${BLUE}check${NONE}: run build/lint/test, please make sure it passes before checking in new code
   ${BLUE}clean${NONE}: run Bazel clean
@@ -693,6 +721,10 @@ function main() {
     build_usbcam)
       build_usbcam
       ;;
+    build_fuzz_test)
+      BUILD_FUZZ_TEST=true
+      apollo_build_dbg $@
+    ;;
     config)
       config
       ;;
