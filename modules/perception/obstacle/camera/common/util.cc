@@ -49,7 +49,7 @@ std::vector<cv::Scalar> color_table = {
 bool LoadVisualObjectFromFile(
     const std::string &file_name,
     std::vector<std::shared_ptr<VisualObject>> *visual_objects) {
-  std::fstream fs(file_name, std::fstream::out);
+  std::fstream fs(file_name, std::fstream::in);
 
   while (!fs.eof()) {
     std::shared_ptr<VisualObject> obj(new VisualObject());
@@ -87,7 +87,7 @@ bool LoadVisualObjectFromFile(
 
 bool WriteVisualObjectToFile(
     const std::string &file_name,
-    std::vector<std::shared_ptr<VisualObject>> *visual_objects) {
+    const std::vector<std::shared_ptr<VisualObject>> *visual_objects) {
   FILE *fp = fopen(file_name.c_str(), "w");
   if (!fp) {
     AERROR << "write file: " << file_name << " error!";

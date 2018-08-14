@@ -53,19 +53,6 @@ DEFINE_double(rtk_trajectory_resolution, 0.01,
 DEFINE_bool(publish_estop, false, "publish estop decision in planning");
 DEFINE_bool(enable_trajectory_stitcher, true, "enable stitching trajectory");
 
-DEFINE_double(
-    look_backward_distance, 30,
-    "look backward this distance when creating reference line from routing");
-
-DEFINE_double(look_forward_short_distance, 150,
-              "short look forward this distance when creating reference line "
-              "from routing when ADC is slow");
-DEFINE_double(
-    look_forward_long_distance, 250,
-    "look forward this distance when creating reference line from routing");
-DEFINE_double(look_forward_time_sec, 8.0,
-              "look forward time times adc speed to calculate this distance "
-              "when creating reference line from routing");
 DEFINE_bool(enable_reference_line_stitching, true,
             "Enable stitching reference line, which can reducing computing "
             "time and improve stability");
@@ -276,8 +263,8 @@ DEFINE_bool(enable_follow_accel_constraint, true,
 DEFINE_bool(enable_sqp_solver, true, "True to enable SQP solver.");
 
 /// thread pool
-DEFINE_int32(num_thread_planning_thread_pool, 5,
-             "num of thread used in planning thread pool.");
+DEFINE_uint32(max_planning_thread_pool_size, 5,
+              "num of thread used in planning thread pool.");
 DEFINE_bool(use_multi_thread_to_add_obstacles, false,
             "use multiple thread to add obstacles.");
 DEFINE_bool(

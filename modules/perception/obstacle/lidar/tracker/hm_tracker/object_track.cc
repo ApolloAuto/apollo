@@ -72,7 +72,7 @@ bool ObjectTrack::SetAccelerationNoiseMaximum(
 }
 
 int ObjectTrack::GetNextTrackId() {
-  // Get next avaiable track id
+  // Get next available track id
   int ret_track_id = s_track_idx_;
   if (s_track_idx_ == INT_MAX) {
     s_track_idx_ = 0;
@@ -277,7 +277,7 @@ void ObjectTrack::UpdateWithoutObject(const Eigen::VectorXf& predict_state,
 
 void ObjectTrack::SmoothTrackVelocity(
     const std::shared_ptr<TrackedObject>& new_object, const double time_diff) {
-  // A. keep motion if accelaration of filter is greater than a threshold
+  // A. keep motion if acceleration of filter is greater than a threshold
   Eigen::Vector3f filter_acceleration_gain = Eigen::Vector3f::Zero();
   filter_->GetAccelerationGain(&filter_acceleration_gain);
   double filter_accelaration = filter_acceleration_gain.norm();
@@ -296,7 +296,7 @@ void ObjectTrack::SmoothTrackVelocity(
     // keep static hypothesis
     return;
   }
-  // B. static hypothesis check & claping noise
+  // B. static hypothesis check & clipping noise
   is_static_hypothesis_ =
       CheckTrackStaticHypothesis(new_object->object_ptr, time_diff);
   if (is_static_hypothesis_) {
@@ -343,7 +343,7 @@ bool ObjectTrack::CheckTrackStaticHypothesis(
   if (velocity_is_noise) {
     return true;
   }
-  // NEED TO NOTICE: claping small velocity may not reasonable when the true
+  // NEED TO NOTICE: clipping small velocity may not reasonable when the true
   // velocity of target object is really small. e.g. a moving out vehicle in
   // a parking lot. Thus, instead of clapping all the small velocity, we clap
   // those whose history trajectory or performance is close to a static one.

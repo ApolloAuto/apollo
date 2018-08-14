@@ -42,6 +42,8 @@ void SubLongFocusCallback(sensor_msgs::ImagePtr);
 void SubShortFocusCallback(sensor_msgs::ImagePtr);
 
 int main(int argc, char **argv) {
+  google::InitGoogleLogging(argv[0]);
+  google::ParseCommandLineFlags(&argc, &argv, true);
   ros::init(argc, argv, "traffic_light_viz_listener");
   ros::NodeHandle n;
 

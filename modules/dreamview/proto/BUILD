@@ -59,16 +59,13 @@ proto_library(
 )
 
 cc_proto_library(
-    name = "voice_detection_proto",
+    name = "audio_capture_proto",
     deps = [
-        ":voice_detection_proto_lib",
+        ":audio_capture_proto_lib",
     ],
 )
 
 proto_library(
-    name = "voice_detection_proto_lib",
-    srcs = ["voice_detection.proto"],
-    deps = [
-        ":hmi_config_proto_lib",
-    ],
+    name = "audio_capture_proto_lib",
+    srcs = ["audio_capture.proto"],
 )

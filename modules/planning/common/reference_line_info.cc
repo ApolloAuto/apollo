@@ -24,6 +24,8 @@
 #include <functional>
 #include <utility>
 
+#include "ctpl/ctpl_stl.h"
+
 #include "modules/planning/proto/sl_boundary.pb.h"
 
 #include "modules/common/adapters/adapter_manager.h"
@@ -33,7 +35,6 @@
 #include "modules/map/hdmap/hdmap_common.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/common/planning_thread_pool.h"
 #include "modules/planning/common/planning_util.h"
 
 namespace apollo {
@@ -84,7 +85,7 @@ bool ReferenceLineInfo::Init(const std::vector<const Obstacle*>& obstacles) {
     AERROR << "Ego vehicle is too far away from reference line.";
     return false;
   }
-  is_on_reference_line_ = reference_line_.IsOnRoad(adc_sl_boundary_);
+  is_on_reference_line_ = reference_line_.IsOnLane(adc_sl_boundary_);
   if (!AddObstacles(obstacles)) {
     AERROR << "Failed to add obstacles to reference line";
     return false;
@@ -267,14 +268,19 @@ PathObstacle* ReferenceLineInfo::AddObstacle(const Obstacle* obstacle) {
 
 bool ReferenceLineInfo::AddObstacles(
     const std::vector<const Obstacle*>& obstacles) {
+  if (obstacles.empty()) {
+    return true;
+  }
   if (FLAGS_use_multi_thread_to_add_obstacles) {
     std::vector<int> ret(obstacles.size(), 0);
+    ctpl::thread_pool pool(
+        std::min<int>(FLAGS_max_planning_thread_pool_size, obstacles.size()));
     for (size_t i = 0; i < obstacles.size(); ++i) {
       const auto* obstacle = obstacles.at(i);
-      PlanningThreadPool::instance()->Push(std::bind(
-          &ReferenceLineInfo::AddObstacleHelper, this, obstacle, &(ret[i])));
+      pool.push(std::bind(&ReferenceLineInfo::AddObstacleHelper, this, obstacle,
+                          &(ret[i])));
     }
-    PlanningThreadPool::instance()->Synchronize();
+    pool.stop(true);
     if (std::find(ret.begin(), ret.end(), 0) != ret.end()) {
       return false;
     }
@@ -298,7 +304,7 @@ bool ReferenceLineInfo::IsUnrelaventObstacle(PathObstacle* path_obstacle) {
   if (is_on_reference_line_ &&
       path_obstacle->PerceptionSLBoundary().end_s() <
           adc_sl_boundary_.end_s() &&
-      reference_line_.IsOnRoad(path_obstacle->PerceptionSLBoundary())) {
+      reference_line_.IsOnLane(path_obstacle->PerceptionSLBoundary())) {
     return true;
   }
   return false;
@@ -334,7 +340,7 @@ bool ReferenceLineInfo::IsStartFrom(
       previous_reference_line_info.reference_line();
   common::SLPoint sl_point;
   prev_reference_line.XYToSL(start_point, &sl_point);
-  return previous_reference_line_info.reference_line_.IsOnRoad(sl_point);
+  return previous_reference_line_info.reference_line_.IsOnLane(sl_point);
 }
 
 const PathData& ReferenceLineInfo::path_data() const { return path_data_; }
@@ -397,7 +403,7 @@ bool ReferenceLineInfo::IsChangeLanePath() const {
 }
 
 bool ReferenceLineInfo::IsNeighborLanePath() const {
-     return Lanes().IsNeighborSegment();
+  return Lanes().IsNeighborSegment();
 }
 
 std::string ReferenceLineInfo::PathSpeedDebugString() const {
@@ -486,8 +492,8 @@ bool ReferenceLineInfo::ReachedDestination() const {
   if (!dest_ptr->LongitudinalDecision().has_stop()) {
     return false;
   }
-  if (!reference_line_.IsOnRoad(
-          dest_ptr->obstacle()->PerceptionBoundingBox().center())) {
+  if (!reference_line_.IsOnLane(
+      dest_ptr->obstacle()->PerceptionBoundingBox().center())) {
     return false;
   }
   const double stop_s = dest_ptr->PerceptionSLBoundary().start_s() +
