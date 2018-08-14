@@ -324,34 +324,39 @@ bool CosThetaReferenceLineSmoother::Smooth(
 void CosThetaReferenceLineSmoother::quintic_hermite_point(
     const double t, const common::PathPoint front_point,
     const common::PathPoint back_point, double* quintic_hermite_point_info) {
-  double q1 = -6 * t * t * t * t * t + 15 * t * t * t * t - 10 * t * t * t + 1;
-  double q2 = -3 * t * t * t * t * t + 8 * t * t * t * t - 6 * t * t * t + t;
-  double q3 = -0.5 * t * t * t * t * t + 1.5 * t * t * t * t - 1.5 * t * t * t +
-              0.5 * t * t;
-  double q4 = 6 * t * t * t * t * t - 15 * t * t * t * t + 10 * t * t * t;
-  double q5 = -3 * t * t * t * t * t + 7 * t * t * t * t - 4 * t * t * t;
-  double q6 = 0.5 * t * t * t * t * t - t * t * t * t + 0.5 * t * t * t;
+  double t2 = t * t;
+  double t3 = t2 * t;
+  double t4 = t3 * t;
+  double t5 = t4 * t;
 
-  double q1_d = -30 * t * t * t * t + 60 * t * t * t - 30 * t * t;
-  double q2_d = -15 * t * t * t * t + 32 * t * t * t - 18 * t * t + 1;
-  double q3_d = -2.5 * t * t * t * t + 6 * t * t * t - 4.5 * t * t + t;
-  double q4_d = 30 * t * t * t * t - 60 * t * t * t + 30 * t * t;
-  double q5_d = -15 * t * t * t * t + 28 * t * t * t - 12 * t * t;
-  double q6_d = 2.5 * t * t * t * t - 4 * t * t * t + 1.5 * t * t;
+  double q1 = -6 * t5 + 15 * t4 - 10 * t3 + 1;
+  double q2 = -3 * t5 + 8 * t4 - 6 * t3 + t;
+  double q3 = -0.5 * t5 + 1.5 * t4 - 1.5 * t3 +
+              0.5 * t2;
+  double q4 = 6 * t5 - 15 * t4 + 10 * t3;
+  double q5 = -3 * t5 + 7 * t4 - 4 * t3;
+  double q6 = 0.5 * t5 - t4 + 0.5 * t3;
 
-  double q1_dd = -120 * t * t * t + 180 * t * t - 60 * t;
-  double q2_dd = -60 * t * t * t + 96 * t * t - 36 * t;
-  double q3_dd = -10 * t * t * t + 18 * t * t - 9 * t + 1;
-  double q4_dd = 120 * t * t * t - 180 * t * t + 60 * t;
-  double q5_dd = -60 * t * t * t + 84 * t * t - 24 * t;
-  double q6_dd = 10 * t * t * t - 12 * t * t + 3 * t;
+  double q1_d = -30 * t4 + 60 * t3 - 30 * t2;
+  double q2_d = -15 * t4 + 32 * t3 - 18 * t2 + 1;
+  double q3_d = -2.5 * t4 + 6 * t3 - 4.5 * t2 + t;
+  double q4_d = 30 * t4 - 60 * t3 + 30 * t2;
+  double q5_d = -15 * t4 + 28 * t3 - 12 * t2;
+  double q6_d = 2.5 * t4 - 4 * t3 + 1.5 * t2;
 
-  double q1_ddd = -360 * t * t + 360 * t - 60;
-  double q2_ddd = -180 * t * t + 192 * t - 36;
-  double q3_ddd = -30 * t * t + 36 * t - 9;
-  double q4_ddd = 360 * t * t - 360 * t + 60;
-  double q5_ddd = -180 * t * t + 168 * t - 24;
-  double q6_ddd = 30 * t * t - 24 * t + 3;
+  double q1_dd = -120 * t3 + 180 * t2 - 60 * t;
+  double q2_dd = -60 * t3 + 96 * t2 - 36 * t;
+  double q3_dd = -10 * t3 + 18 * t2 - 9 * t + 1;
+  double q4_dd = 120 * t3 - 180 * t2 + 60 * t;
+  double q5_dd = -60 * t3 + 84 * t2 - 24 * t;
+  double q6_dd = 10 * t3 - 12 * t2 + 3 * t;
+
+  double q1_ddd = -360 * t2 + 360 * t - 60;
+  double q2_ddd = -180 * t2 + 192 * t - 36;
+  double q3_ddd = -30 * t2 + 36 * t - 9;
+  double q4_ddd = 360 * t2 - 360 * t + 60;
+  double q5_ddd = -180 * t2 + 168 * t - 24;
+  double q6_ddd = 30 * t2 - 24 * t + 3;
 
   double x_p = q1 * front_point.x() + q2 * front_point.x_derivative() +
                q3 * front_point.x_2nd_derivative() + q4 * back_point.x() +
@@ -465,12 +470,16 @@ double CosThetaReferenceLineSmoother::arclength_integration(
 double CosThetaReferenceLineSmoother::quintic_hermite_s(
     const double t, common::PathPoint front_point,
     common::PathPoint back_point) {
-  double q1 = -30 * t * t * t * t + 60 * t * t * t - 30 * t * t;
-  double q2 = -15 * t * t * t * t + 32 * t * t * t - 18 * t * t + 1;
-  double q3 = -2.5 * t * t * t * t + 6 * t * t * t - 4.5 * t * t + t;
-  double q4 = 30 * t * t * t * t - 60 * t * t * t + 30 * t * t;
-  double q5 = -15 * t * t * t * t + 28 * t * t * t - 12 * t * t;
-  double q6 = 2.5 * t * t * t * t - 4 * t * t * t + 1.5 * t * t;
+  double t2 = t * t;
+  double t3 = t2 * t;
+  double t4 = t3 * t;
+  double t5 = t4 * t;
+  double q1 = -30 * t4 + 60 * t3 - 30 * t2;
+  double q2 = -15 * t4 + 32 * t3 - 18 * t2 + 1;
+  double q3 = -2.5 * t4 + 6 * t3 - 4.5 * t2 + t;
+  double q4 = 30 * t4 - 60 * t3 + 30 * t2;
+  double q5 = -15 * t4 + 28 * t3 - 12 * t2;
+  double q6 = 2.5 * t4 - 4 * t3 + 1.5 * t2;
   double x_d = q1 * front_point.x() + q2 * front_point.x_derivative() +
                q3 * front_point.x_2nd_derivative() + q4 * back_point.x() +
                q5 * back_point.x_derivative() +
