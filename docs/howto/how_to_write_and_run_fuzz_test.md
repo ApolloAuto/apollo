@@ -198,6 +198,6 @@ Also, you may notice that the fuzz test cases only cover small set of Apollo fun
 
 ## Further Reading
 
-libprotobuf-mutator [tutorial](https://github.com/BaiduXLab/libprotobuf-mutator)
-libfuzzer command line [options](https://llvm.org/docs/LibFuzzer.html)
+* libprotobuf-mutator [tutorial](https://github.com/BaiduXLab/libprotobuf-mutator)
+* libfuzzer command line [options](https://llvm.org/docs/LibFuzzer.html)
 
