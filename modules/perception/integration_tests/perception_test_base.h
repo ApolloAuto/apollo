@@ -25,6 +25,7 @@
 #include "modules/common/configs/config_gflags.h"
 #include "modules/common/log.h"
 #include "modules/common/util/file.h"
+#include "modules/perception/common/pcl_types.h"
 
 #define private public
 #include "modules/perception/perception.h"
@@ -76,6 +77,7 @@ class PerceptionTestBase : public ::testing::Test {
   bool SetUpAdapters();
 
   Perception perception_;
+  pcl_util::PointCloudPtr point_cloud_{new pcl_util::PointCloud};
 };
 
 }  // namespace perception

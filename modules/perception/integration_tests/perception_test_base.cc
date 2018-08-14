@@ -18,6 +18,8 @@
 
 #include <cstdlib>
 
+#include "pcl/io/pcd_io.h"
+
 #include "google/protobuf/io/zero_copy_stream_impl.h"
 #include "modules/common/log.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
@@ -41,7 +43,8 @@ void PerceptionTestBase::SetUpTestCase() {
   FLAGS_perception_adapter_config_filename =
       "modules/perception/integration_test/testdata/conf/adapter.conf";
 
-  FLAGS_test_pointcloud_file = "";
+  FLAGS_test_pointcloud_file =
+      "modules/perception/integration_test/testdata/point_cloud_test_file.pcd";
   FLAGS_test_localization_file = "";
   FLAGS_test_chassis_file = "";
 }
@@ -68,7 +71,8 @@ bool PerceptionTestBase::SetUpAdapters() {
   if (!AdapterManager::Initialized()) {
     AdapterManager::Init(FLAGS_perception_adapter_config_filename);
   }
-  FEED_ADAPTER(PointCloud, FLAGS_test_localization_file);
+
+  FEED_ADAPTER(PointCloud, FLAGS_test_pointcloud_file);
   FEED_ADAPTER(Localization, FLAGS_test_localization_file);
   FEED_ADAPTER(Chassis, FLAGS_test_chassis_file);
   return true;
@@ -76,6 +80,25 @@ bool PerceptionTestBase::SetUpAdapters() {
 
 void PerceptionTestBase::SetUp() {
   perception_.Stop();
+
+  // load PCD file and transfer to point cloud
+  pcl::PointCloud<pcl_util::PointXYZIT>::Ptr org_cloud(
+      new pcl::PointCloud<pcl_util::PointXYZIT>);
+  pcl::io::loadPCDFile(FLAGS_test_pointcloud_file, *org_cloud);
+  point_cloud_->points.reserve(org_cloud->points.size());
+
+  for (size_t i = 0; i < org_cloud->points.size(); ++i) {
+    pcl_util::Point pt;
+    pt.x = org_cloud->points[i].x;
+    pt.y = org_cloud->points[i].y;
+    pt.z = org_cloud->points[i].z;
+    pt.intensity = org_cloud->points[i].intensity;
+    if (std::isnan(org_cloud->points[i].x)) {
+      continue;
+    }
+    point_cloud_->push_back(pt);
+  }
+
   CHECK(SetUpAdapters()) << "Failed to setup adapters";
   CHECK(perception_.Init().ok()) << "Failed to init perception module";
 }
