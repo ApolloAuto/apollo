@@ -770,9 +770,9 @@ TEST_F(SunnyvaleBigLoopTest, destination_pull_over_02) {
   // be able to use this dest point stop fence so that the test result is fixed
   // instead of using adc's position which may differ for some reason
   planning_state->mutable_pull_over()->mutable_inlane_dest_point()->set_x(
-      587163.74162973207);
+      587163.741);
   planning_state->mutable_pull_over()->mutable_inlane_dest_point()->set_y(
-      4141196.1366618969);
+      4141196.136);
 
   // set config
   pull_over_config->mutable_pull_over()->set_operation_length(21.0);
