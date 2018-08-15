@@ -153,8 +153,7 @@ DEFINE_string(
     yolo_camera_detector_config,
     "modules/perception/model/camera/yolo_camera_detector_config.pb.txt",
     "Yolo camera detector config filename.");
-DEFINE_bool(use_whole_lane_line, false,
-            "Use whole lane line model or not");
+DEFINE_bool(use_whole_lane_line, false, "Use whole lane line model or not");
 DEFINE_string(modest_radar_detector_config,
               "modules/perception/model/modest_radar_detector_config.pb.txt",
               "modest radar detector config filename.");
@@ -203,3 +202,11 @@ DEFINE_string(traffic_light_subnode_config,
               "modules/perception/model/traffic_light/"
               "subnode_config.pb.txt",
               "traffic light subnode config filename.");
+DEFINE_double(light_height_adjust, 0, " adjust height without chaning code");
+
+DEFINE_string(traffic_light_rectifier, "",
+              "the rectifier enabled for traffic_light");
+DEFINE_string(traffic_light_recognizer, "",
+              "the recognizer enabled for traffic_light");
+DEFINE_string(traffic_light_reviser, "",
+              "the reviser enabled for traffic_light");

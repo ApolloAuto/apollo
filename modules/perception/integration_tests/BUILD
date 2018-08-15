@@ -41,6 +41,7 @@ cc_test(
         ":integration_tests_data",
         "//modules/common/configs:config_gflags",
         "//modules/map:map_data",
+        "//modules/perception:perception_model",
     ],
     deps = [
         ":perception_test_base",

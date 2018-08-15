@@ -22,8 +22,6 @@
 #include "modules/common/log.h"
 #include "modules/perception/traffic_light/base/utils.h"
 
-DEFINE_double(light_height_adjust, 0, " adjust height without chaning code");
-
 namespace apollo {
 namespace perception {
 namespace traffic_light {
