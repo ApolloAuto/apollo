@@ -81,18 +81,6 @@ void GetBagFiles(const boost::filesystem::path& p,
   }
 }
 
-std::vector<std::string> Prediction::LoadOfflineBags(
-    const std::string& flag_input) {
-  std::vector<std::string> bag_files;
-  std::vector<std::string> inputs;
-  apollo::common::util::split(flag_input, ';', &inputs);
-  for (const auto& input : inputs) {
-    GetBagFiles(boost::filesystem::path(input), &bag_files);
-  }
-  std::sort(bag_files.begin(), bag_files.end());
-  return bag_files;
-}
-
 Status Prediction::Init() {
   start_time_ = Clock::NowInSeconds();
 
@@ -145,29 +133,31 @@ Status Prediction::Init() {
     if (FLAGS_prediction_offline_bags.empty()) {
       return Status::OK();  // use listen to ROS topic mode
     }
-
-    auto offline_bags = LoadOfflineBags(FLAGS_prediction_offline_bags);
-    if (offline_bags.empty()) {
-      return OnError("Failed to find valid rosbag in provided list: " +
-                     FLAGS_prediction_offline_bags);
-    }
     std::vector<std::string> topics;
     topics.push_back(FLAGS_perception_obstacle_topic);
     topics.push_back(FLAGS_localization_topic);
-    AINFO << "Have found " << offline_bags.size() << " rosbags to process";
-    for (const auto& filename : offline_bags) {
-      AINFO << "Processing: " << filename;
-      rosbag::Bag bag;
-      bag.open(filename, rosbag::bagmode::Read);
-      rosbag::View view(bag, rosbag::TopicQuery(topics));
-      for (auto it = view.begin(); it != view.end(); ++it) {
-        if (it->getTopic() == FLAGS_localization_topic) {
-          OnLocalization(*(it->instantiate<LocalizationEstimate>()));
-        } else if (it->getTopic() == FLAGS_perception_obstacle_topic) {
-          RunOnce(*(it->instantiate<PerceptionObstacles>()));
+    std::vector<std::string> inputs;
+    apollo::common::util::split(FLAGS_prediction_offline_bags, ':', &inputs);
+    for (const auto& input : inputs) {
+      std::vector<std::string> offline_bags;
+      GetBagFiles(boost::filesystem::path(input), &offline_bags);
+      std::sort(offline_bags.begin(), offline_bags.end());
+      AINFO << "For input " << input << ", found " << offline_bags.size()
+            << "  rosbags to process";
+      for (const auto& filename : offline_bags) {
+        AINFO << "\tProcessing: " << filename;
+        rosbag::Bag bag;
+        bag.open(filename, rosbag::bagmode::Read);
+        rosbag::View view(bag, rosbag::TopicQuery(topics));
+        for (auto it = view.begin(); it != view.end(); ++it) {
+          if (it->getTopic() == FLAGS_localization_topic) {
+            OnLocalization(*(it->instantiate<LocalizationEstimate>()));
+          } else if (it->getTopic() == FLAGS_perception_obstacle_topic) {
+            RunOnce(*(it->instantiate<PerceptionObstacles>()));
+          }
         }
+        bag.close();
       }
-      bag.close();
     }
     Stop();
     ros::shutdown();
