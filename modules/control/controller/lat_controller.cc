@@ -94,7 +94,7 @@ bool LatController::LoadControlConf(const ControlConf *control_conf) {
     AERROR << "[LatController] control_conf == nullptr";
     return false;
   }
-  const auto &vehicle_param_ =
+  vehicle_param_ =
       common::VehicleConfigHelper::instance()->GetConfig().vehicle_param();
 
   ts_ = control_conf->lat_controller_conf().ts();
