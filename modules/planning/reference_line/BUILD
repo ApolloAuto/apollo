@@ -78,6 +78,28 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "cosTheta_reference_line_smoother",
+    srcs = [
+        "cosTheta_problem_interface.cc",
+        "cosTheta_reference_line_smoother.cc",
+    ],
+    hdrs = [
+        "cosTheta_problem_interface.h",
+        "cosTheta_reference_line_smoother.h",
+    ],
+    deps = [
+        ":reference_line",
+        ":reference_line_smoother",
+        "//modules/common/math",
+        "//modules/planning/common:planning_gflags",
+        "//modules/planning/proto:planning_proto",
+        "//modules/planning/math:curve_math",
+        "@eigen",
+        "@ipopt",
+    ],
+)
+
 cc_test(
     name = "qp_spline_reference_line_smoother_test",
     size = "small",
@@ -95,6 +117,24 @@ cc_test(
     ],
 )
 
+
+cc_test(
+    name = "cosTheta_reference_line_smoother_test",
+    size = "small",
+    srcs = [
+        "cosTheta_reference_line_smoother_test.cc",
+    ],
+    data = [
+        "//modules/planning:planning_conf",
+        "//modules/planning:planning_testdata",
+    ],
+    deps = [
+        ":cosTheta_reference_line_smoother",
+        "//modules/map/hdmap",
+        "@gtest//:main",
+    ],
+)
+
 cc_library(
     name = "reference_line_provider",
     srcs = [
@@ -107,6 +147,7 @@ cc_library(
         ":qp_spline_reference_line_smoother",
         ":reference_line",
         ":spiral_reference_line_smoother",
+        ":cosTheta_reference_line_smoother",
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/util:factory",
         "//modules/map/pnc_map",
@@ -127,6 +168,7 @@ cc_binary(
         ":qp_spline_reference_line_smoother",
         ":reference_line",
         ":spiral_reference_line_smoother",
+        ":cosTheta_reference_line_smoother",
         "//modules/planning/proto:planning_config_proto",
     ],
 )

@@ -42,6 +42,28 @@ message SpiralSmootherConfig {
   optional double opt_weight_d2kappa = 10 [default = 0.0];
 }
 
+message CosThetaSmootherConfig {
+  // The max deviation of cosTheta reference line smoother.
+  optional double max_point_deviation = 1 [default = 5.0];
+
+  // The number of iteration in optimization
+  optional int32 num_of_iteration = 2 [default = 10000];
+
+  // The weight of cosine of included angle between points
+  optional double weight_cos_included_angle = 3 [default = 10000.0];
+
+  // The tolerance of optimization 
+  optional double acceptable_tol = 4 [default = 1e-1];
+
+  // Relax constraint on end condition
+  optional double relax = 5 [default = 0.2];
+
+  // kappa filter
+  optional double kappa_filter = 6 [default = 1.0e9];
+
+  // dkappa filter
+  optional double dkappa_filter = 7 [default = 1.0e9];
+  }
 
 message ReferenceLineSmootherConfig {
   enum DrivingSide {
@@ -68,5 +90,6 @@ message ReferenceLineSmootherConfig {
   oneof SmootherConfig {
     QpSplineSmootherConfig qp_spline = 20;
     SpiralSmootherConfig spiral = 21;
+    CosThetaSmootherConfig cos_theta = 22;
   }
 }
