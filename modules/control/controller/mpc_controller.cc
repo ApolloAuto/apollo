@@ -76,7 +76,7 @@ bool MPCController::LoadControlConf(const ControlConf *control_conf) {
     AERROR << "[MPCController] control_conf == nullptr";
     return false;
   }
-  const auto &vehicle_param_ =
+  vehicle_param_ =
       VehicleConfigHelper::instance()->GetConfig().vehicle_param();
 
   ts_ = control_conf->mpc_controller_conf().ts();
