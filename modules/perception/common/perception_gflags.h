@@ -130,5 +130,9 @@ DECLARE_string(traffic_light_preprocessor_config);
 DECLARE_string(traffic_light_rectifier_config);
 DECLARE_string(traffic_light_reviser_config);
 DECLARE_string(traffic_light_subnode_config);
+DECLARE_double(light_height_adjust);
+DECLARE_string(traffic_light_rectifier);
+DECLARE_string(traffic_light_recognizer);
+DECLARE_string(traffic_light_reviser);
 
 #endif  // MODULES_PERCEPTION_COMMON_PERCEPTION_GFLAGS_H_
