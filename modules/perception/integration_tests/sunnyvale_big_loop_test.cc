@@ -47,6 +47,7 @@ TEST_F(SunnyvaleBigLoopTest, test_01) {
   std::string seq_num = "1";
   FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
   FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
+  PerceptionTestBase::SetUp();
 
   // TODO(All): implement sunnyvale big loop test here.
   AERROR << "test done.";

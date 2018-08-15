@@ -58,8 +58,10 @@ bool CNNSegmentation::Init() {
 
 /// Instantiate Caffe net
 #ifndef USE_GPU
+  AINFO << "using Caffe CPU mode";
   caffe::Caffe::set_mode(caffe::Caffe::CPU);
 #else
+  AINFO << "using Caffe GPU mode";
   int gpu_id =
       cnnseg_param_.has_gpu_id() ? static_cast<int>(cnnseg_param_.gpu_id()) : 0;
   CHECK_GE(gpu_id, 0);
@@ -71,54 +73,48 @@ bool CNNSegmentation::Init() {
   caffe_net_.reset(new caffe::Net<float>(config_.proto_file(), caffe::TEST));
   caffe_net_->CopyTrainedLayersFrom(config_.weight_file());
 
-#ifndef USE_GPU
-  AINFO << "using Caffe CPU mode";
-#else
-  AINFO << "using Caffe GPU mode";
-#endif
-
   /// set related Caffe blobs
   // center offset prediction
   std::string instance_pt_blob_name = network_param.has_instance_pt_blob()
                                           ? network_param.instance_pt_blob()
                                           : "instance_pt";
   instance_pt_blob_ = caffe_net_->blob_by_name(instance_pt_blob_name);
-  CHECK(instance_pt_blob_ != nullptr)
-      << "`" << instance_pt_blob_name << "` not exists!";
+  CHECK(instance_pt_blob_ != nullptr) << "`" << instance_pt_blob_name
+                                      << "` not exists!";
   // objectness prediction
   std::string category_pt_blob_name = network_param.has_category_pt_blob()
                                           ? network_param.category_pt_blob()
                                           : "category_score";
   category_pt_blob_ = caffe_net_->blob_by_name(category_pt_blob_name);
-  CHECK(category_pt_blob_ != nullptr)
-      << "`" << category_pt_blob_name << "` not exists!";
+  CHECK(category_pt_blob_ != nullptr) << "`" << category_pt_blob_name
+                                      << "` not exists!";
   // positiveness (foreground object probability) prediction
   std::string confidence_pt_blob_name = network_param.has_confidence_pt_blob()
                                             ? network_param.confidence_pt_blob()
                                             : "confidence_score";
   confidence_pt_blob_ = caffe_net_->blob_by_name(confidence_pt_blob_name);
-  CHECK(confidence_pt_blob_ != nullptr)
-      << "`" << confidence_pt_blob_name << "` not exists!";
+  CHECK(confidence_pt_blob_ != nullptr) << "`" << confidence_pt_blob_name
+                                        << "` not exists!";
   // object height prediction
   std::string height_pt_blob_name = network_param.has_height_pt_blob()
                                         ? network_param.height_pt_blob()
                                         : "height_pt";
   height_pt_blob_ = caffe_net_->blob_by_name(height_pt_blob_name);
-  CHECK(height_pt_blob_ != nullptr)
-      << "`" << height_pt_blob_name << "` not exists!";
+  CHECK(height_pt_blob_ != nullptr) << "`" << height_pt_blob_name
+                                    << "` not exists!";
   // raw feature data
   std::string feature_blob_name =
       network_param.has_feature_blob() ? network_param.feature_blob() : "data";
   feature_blob_ = caffe_net_->blob_by_name(feature_blob_name);
-  CHECK(feature_blob_ != nullptr)
-      << "`" << feature_blob_name << "` not exists!";
+  CHECK(feature_blob_ != nullptr) << "`" << feature_blob_name
+                                  << "` not exists!";
   // class prediction
   std::string class_pt_blob_name = network_param.has_class_pt_blob()
                                        ? network_param.class_pt_blob()
                                        : "class_score";
   class_pt_blob_ = caffe_net_->blob_by_name(class_pt_blob_name);
-  CHECK(class_pt_blob_ != nullptr)
-      << "`" << class_pt_blob_name << "` not exists!";
+  CHECK(class_pt_blob_ != nullptr) << "`" << class_pt_blob_name
+                                   << "` not exists!";
 
   cluster2d_.reset(new cnnseg::Cluster2D());
   if (!cluster2d_->Init(height_, width_, range_)) {
