@@ -107,6 +107,7 @@ bool LatController::LoadControlConf(const ControlConf *control_conf) {
   steer_single_direction_max_degree_ =
       vehicle_param_.max_steer_angle() / M_PI * 180;
   max_lat_acc_ = control_conf->lat_controller_conf().max_lateral_acceleration();
+  min_turn_radius_ = vehicle_param_.min_turn_radius();
 
   const double mass_fl = control_conf->lat_controller_conf().mass_fl();
   const double mass_fr = control_conf->lat_controller_conf().mass_fr();
@@ -386,7 +387,7 @@ Status LatController::ComputeControlCommand(
 
   if (FLAGS_set_steer_limit) {
     const double steer_limit =
-        std::atan(max_lat_acc_ * vehicle_param_.min_turn_radius() /
+        std::atan(max_lat_acc_ * min_turn_radius_ /
                   (VehicleStateProvider::instance()->linear_velocity() *
                    VehicleStateProvider::instance()->linear_velocity())) *
         steer_ratio_ * 180 / M_PI / steer_single_direction_max_degree_ * 100;
