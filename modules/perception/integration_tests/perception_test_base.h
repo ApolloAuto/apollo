@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include <map>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -25,9 +26,10 @@
 #include "modules/common/configs/config_gflags.h"
 #include "modules/common/log.h"
 #include "modules/common/util/file.h"
-#include "modules/perception/common/pcl_types.h"
+#include "modules/perception/common/perception_gflags.h"
 
 #define private public
+#define protect public
 #include "modules/perception/perception.h"
 
 namespace apollo {
@@ -56,7 +58,6 @@ DECLARE_string(test_pointcloud_file);
 DECLARE_string(test_localization_file);
 DECLARE_string(test_chassis_file);
 DECLARE_string(perception_config_file);
-DECLARE_string(perception_adapter_config_filename);
 
 class PerceptionTestBase : public ::testing::Test {
  public:
@@ -76,8 +77,8 @@ class PerceptionTestBase : public ::testing::Test {
  protected:
   bool SetUpAdapters();
 
-  Perception perception_;
-  pcl_util::PointCloudPtr point_cloud_{new pcl_util::PointCloud};
+  std::unique_ptr<Perception> perception_;
+  sensor_msgs::PointCloud2 cloud_blob_;
 };
 
 }  // namespace perception

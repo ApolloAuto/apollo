@@ -28,13 +28,6 @@
 #include "modules/perception/traffic_light/rectify/unity_rectify.h"
 #include "modules/perception/traffic_light/reviser/color_decision.h"
 
-DEFINE_string(traffic_light_rectifier, "",
-              "the rectifier enabled for traffic_light");
-DEFINE_string(traffic_light_recognizer, "",
-              "the recognizer enabled for traffic_light");
-DEFINE_string(traffic_light_reviser, "",
-              "the reviser enabled for traffic_light");
-
 namespace apollo {
 namespace perception {
 namespace traffic_light {
