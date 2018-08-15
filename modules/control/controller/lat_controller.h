@@ -215,6 +215,8 @@ class LatController : public Controller {
   double init_vehicle_y_ = 0.0;
 
   double init_vehicle_heading_ = 0.0;
+
+  double min_turn_radius_ = 0.0;
 };
 
 }  // namespace control
