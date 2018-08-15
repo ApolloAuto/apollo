@@ -37,6 +37,8 @@ DEFINE_string(test_chassis_file, "", "The chassis test file");
 DEFINE_string(perception_config_file, "", "The perception config file");
 
 void PerceptionTestBase::SetUpTestCase() {
+  FLAGS_work_root = "modules/perception";
+
   FLAGS_perception_config_file =
       "modules/perception/integration_tests/testdata/conf/"
       "perception_config.pb.txt";
@@ -49,9 +51,40 @@ void PerceptionTestBase::SetUpTestCase() {
   FLAGS_test_pointcloud_file =
       "modules/perception/integration_tests/testdata/point_cloud_test_file.pcd";
 
+  FLAGS_is_serialize_point_cloud = false;
+  FLAGS_map_radius = 60.0;
+  FLAGS_map_sample_step = 1;
+
+  FLAGS_enable_hdmap_input = true;
   FLAGS_onboard_roi_filter = "HdmapROIFilter";
   FLAGS_onboard_segmentor = "CNNSegmentation";
-
+  FLAGS_onboard_object_filter = "LowObjectFilter";
+  FLAGS_onboard_object_builder = "MinBoxObjectBuilder";
+  FLAGS_onboard_tracker = "HmObjectTracker";
+  FLAGS_onboard_type_fuser = "DummyTypeFuser";
+  FLAGS_obstacle_module_name = "perception_obstacle";
+  FLAGS_tf2_buff_in_ms = 20;
+  FLAGS_lidar_tf2_frame_id = "novatel";
+  FLAGS_lidar_tf2_child_frame_id = "velodyne64";
+  FLAGS_enable_visualization = false;
+  FLAGS_onboard_radar_detector = "ModestRadarDetector";
+  FLAGS_front_radar_forward_distance = 100;
+  FLAGS_localization_buffer_size = 40;
+  FLAGS_radar_tf2_frame_id = "novatel";
+  FLAGS_radar_tf2_child_frame_id = "radar";
+  FLAGS_onboard_fusion = "ProbabilisticFusion";
+  FLAGS_light_height_adjust = 0;
+  FLAGS_traffic_light_rectifier = "UnityRectify";
+  FLAGS_traffic_light_recognizer = "UnityRecognize";
+  FLAGS_traffic_light_reviser = "ColorReviser";
+  FLAGS_query_signal_range = 200.0;
+  FLAGS_output_debug_img = false;
+  FLAGS_output_raw_img = false;
+  FLAGS_q_matrix_coefficient_amplifier = 0.5;
+  // FLAGS_r_matrix_amplifer = 1;
+  // FLAGS_p_matrix_amplifer = 1;
+  FLAGS_a_matrix_covariance_coeffcient_1 = 0.05;
+  FLAGS_a_matrix_covariance_coeffcient_2 = 0.05;
   FLAGS_test_localization_file = "";
   FLAGS_test_chassis_file = "";
 }
