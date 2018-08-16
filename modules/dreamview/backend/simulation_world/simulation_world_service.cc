@@ -542,8 +542,6 @@ void SimulationWorldService::UpdatePlanningTrajectory(
   const double cutoff_time = world_.auto_driving_car().timestamp_sec();
   const double header_time = trajectory.header().timestamp_sec();
 
-  world_.set_planning_time(header_time);
-
   // Collect trajectory
   util::TrajectoryPointCollector collector(&world_);
 
@@ -844,8 +842,10 @@ void SimulationWorldService::UpdateSimulationWorld(
 
   UpdatePlanningData(trajectory.debug().planning_data());
 
-  world_.mutable_latency()->set_planning(
-      trajectory.latency_stats().total_time_ms());
+  Latency latency;
+  latency.set_timestamp_sec(header_time);
+  latency.set_total_time_ms(trajectory.latency_stats().total_time_ms());
+  (*world_.mutable_latency())["planning"] = latency;
 }
 
 void SimulationWorldService::CreatePredictionTrajectory(
@@ -973,7 +973,13 @@ template <>
 void SimulationWorldService::UpdateSimulationWorld(
     const ControlCommand &control_command) {
   auto *control_data = world_.mutable_control_data();
-  control_data->set_timestamp_sec(control_command.header().timestamp_sec());
+  const double header_time = control_command.header().timestamp_sec();
+  control_data->set_timestamp_sec(header_time);
+
+  Latency latency;
+  latency.set_timestamp_sec(header_time);
+  latency.set_total_time_ms(control_command.latency_stats().total_time_ms());
+  (*world_.mutable_latency())["control"] = latency;
 
   if (control_command.has_debug()) {
     auto &debug = control_command.debug();
