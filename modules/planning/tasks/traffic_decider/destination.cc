@@ -59,10 +59,6 @@ void Destination::MakeDecisions(Frame* const frame,
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
 
-  if (FLAGS_use_navigation_mode) {
-    return;
-  }
-
   if (!frame->is_near_destination()) {
     return;
   }
