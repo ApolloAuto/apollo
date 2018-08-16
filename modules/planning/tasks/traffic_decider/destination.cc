@@ -46,26 +46,27 @@ Status Destination::ApplyRule(Frame* frame,
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
 
-  MakeDecisions(frame, reference_line_info);
-
-  return Status::OK();
-}
-
-/**
- * @brief: make decision
- */
-void Destination::MakeDecisions(Frame* const frame,
-                                ReferenceLineInfo* const reference_line_info) {
-  CHECK_NOTNULL(frame);
-  CHECK_NOTNULL(reference_line_info);
-
   if (!frame->is_near_destination()) {
-    return;
+    return Status::OK();
+  }
+
+  const auto& routing =
+      AdapterManager::GetRoutingResponse()->GetLatestObserved();
+
+  common::SLPoint dest_sl;
+  const auto& ref_line = reference_line_info->reference_line();
+  const auto& routing_end = *routing.routing_request().waypoint().rbegin();
+  ref_line.XYToSL({routing_end.pose().x(), routing_end.pose().y()}, &dest_sl);
+  const auto& adc_sl = reference_line_info->AdcSlBoundary();
+  const auto& dest = GetPlanningStatus()->destination();
+  if (adc_sl.end_s() > dest_sl.s() && !dest.has_passed_destination()) {
+    ADEBUG << "Destination at back, but we have not reached destination yet";
+    return Status::OK();
   }
 
   BuildStopDecision(frame, reference_line_info);
 
-  return;
+  return Status::OK();
 }
 
 /**
@@ -83,12 +84,12 @@ int Destination::BuildStopDecision(
     return -1;
   }
 
+  const auto& planning_state = GetPlanningStatus()->planning_state();
   const auto& routing_end = *routing.routing_request().waypoint().rbegin();
   double dest_lane_s =
       std::max(0.0, routing_end.s() - FLAGS_virtual_stop_wall_length -
                         config_.destination().stop_distance());
 
-  const auto& planning_state = GetPlanningStatus()->planning_state();
   if (planning_state.has_pull_over() &&
       planning_state.pull_over().has_status() &&
       planning_state.pull_over().status() == PullOverStatus::DISABLED) {
