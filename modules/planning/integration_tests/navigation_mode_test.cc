@@ -36,6 +36,8 @@ class NavigationModeTest : public PlanningTestBase {
   virtual void SetUp() {
     FLAGS_use_navigation_mode = true;
     FLAGS_test_data_dir = "modules/planning/testdata/navigation_mode_test";
+    FLAGS_traffic_rule_config_filename =
+        "modules/planning/conf/navi_traffic_rule_config.pb.txt";
   }
 };
 
