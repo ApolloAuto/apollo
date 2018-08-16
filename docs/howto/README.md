@@ -50,3 +50,4 @@
 - [How to use IRC client on ubuntu](how_to_use_IRC_client_on_ubuntu.md)
 - [How to generate and push images into Docker](how_to_generate_and_push_docker_images.md)
 - [How to solve slow pull from cn](how_to_solve_slow_pull_from_cn.md)
+- [How to run fuzz test and write your own](how_to_write_and_run_fuzz_test.md)

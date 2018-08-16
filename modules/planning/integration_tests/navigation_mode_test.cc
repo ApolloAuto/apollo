@@ -22,7 +22,6 @@
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/integration_tests/planning_test_base.h"
-#include "modules/planning/planning.h"
 
 namespace apollo {
 namespace planning {
@@ -37,6 +36,8 @@ class NavigationModeTest : public PlanningTestBase {
   virtual void SetUp() {
     FLAGS_use_navigation_mode = true;
     FLAGS_test_data_dir = "modules/planning/testdata/navigation_mode_test";
+    FLAGS_traffic_rule_config_filename =
+        "modules/planning/conf/navi_traffic_rule_config.pb.txt";
   }
 };
 

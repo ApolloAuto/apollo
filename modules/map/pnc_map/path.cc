@@ -34,11 +34,11 @@ namespace apollo {
 namespace hdmap {
 
 using common::math::Box2d;
-using common::math::kMathEpsilon;
 using common::math::LineSegment2d;
 using common::math::Polygon2d;
 using common::math::Sqr;
 using common::math::Vec2d;
+using common::math::kMathEpsilon;
 using std::placeholders::_1;
 
 namespace {
@@ -108,6 +108,7 @@ LaneWaypoint LeftNeighborWaypoint(const LaneWaypoint& waypoint) {
   }
   auto point = waypoint.lane->GetSmoothPoint(waypoint.s);
   auto map_ptr = HDMapUtil::BaseMapPtr();
+  CHECK_NOTNULL(map_ptr);
   for (const auto& lane_id :
        waypoint.lane->lane().left_neighbor_forward_lane_id()) {
     auto lane = map_ptr->GetLaneById(lane_id);
@@ -163,6 +164,7 @@ LaneWaypoint RightNeighborWaypoint(const LaneWaypoint& waypoint) {
   }
   auto point = waypoint.lane->GetSmoothPoint(waypoint.s);
   auto map_ptr = HDMapUtil::BaseMapPtr();
+  CHECK_NOTNULL(map_ptr);
   for (const auto& lane_id :
        waypoint.lane->lane().right_neighbor_forward_lane_id()) {
     auto lane = map_ptr->GetLaneById(lane_id);
