@@ -38,7 +38,7 @@ DEFINE_string(traffic_rule_config_filename,
 
 DEFINE_string(smoother_config_filename,
               "modules/planning/conf/qp_spline_smoother_config.pb.txt",
-              "The configuration file for spiral smoother");
+              "The configuration file for qp_spline smoother");
 
 DEFINE_string(rtk_trajectory_filename, "modules/planning/data/garage.csv",
               "Loop rate for planning node");
@@ -53,19 +53,6 @@ DEFINE_double(rtk_trajectory_resolution, 0.01,
 DEFINE_bool(publish_estop, false, "publish estop decision in planning");
 DEFINE_bool(enable_trajectory_stitcher, true, "enable stitching trajectory");
 
-DEFINE_double(
-    look_backward_distance, 30,
-    "look backward this distance when creating reference line from routing");
-
-DEFINE_double(look_forward_short_distance, 150,
-              "short look forward this distance when creating reference line "
-              "from routing when ADC is slow");
-DEFINE_double(
-    look_forward_long_distance, 250,
-    "look forward this distance when creating reference line from routing");
-DEFINE_double(look_forward_time_sec, 8.0,
-              "look forward time times adc speed to calculate this distance "
-              "when creating reference line from routing");
 DEFINE_bool(enable_reference_line_stitching, true,
             "Enable stitching reference line, which can reducing computing "
             "time and improve stability");
@@ -276,8 +263,8 @@ DEFINE_bool(enable_follow_accel_constraint, true,
 DEFINE_bool(enable_sqp_solver, true, "True to enable SQP solver.");
 
 /// thread pool
-DEFINE_int32(num_thread_planning_thread_pool, 5,
-             "num of thread used in planning thread pool.");
+DEFINE_uint32(max_planning_thread_pool_size, 5,
+              "num of thread used in planning thread pool.");
 DEFINE_bool(use_multi_thread_to_add_obstacles, false,
             "use multiple thread to add obstacles.");
 DEFINE_bool(
@@ -306,7 +293,7 @@ DEFINE_double(min_velocity_sample_gap, 1.0,
               "Minimal sampling gap for velocity");
 DEFINE_double(lon_collision_buffer, 2.0,
               "The longitudinal buffer to keep distance to other vehicles");
-DEFINE_double(lat_collision_buffer, 0.2,
+DEFINE_double(lat_collision_buffer, 0.1,
               "The lateral buffer to keep distance to other vehicles");
 DEFINE_uint32(num_sample_follow_per_timestamp, 3,
               "The number of sample points for each timestamp to follow");
@@ -351,22 +338,23 @@ DEFINE_bool(lateral_optimization, false,
 DEFINE_double(weight_lateral_offset, 1.0,
               "weight for lateral offset "
               "in lateral trajectory optimization");
-DEFINE_double(weight_lateral_derivative, 10.0,
+DEFINE_double(weight_lateral_derivative, 500.0,
               "weight for lateral derivative "
               "in lateral trajectory optimization");
-DEFINE_double(weight_lateral_second_order_derivative, 30.0,
+DEFINE_double(weight_lateral_second_order_derivative, 1000.0,
               "weight for lateral second order derivative "
               "in lateral trajectory optimization");
 DEFINE_double(
-    weight_lateral_obstacle_distance, 5.0,
+    weight_lateral_obstacle_distance, 0.0,
     "weight for lateral obstacle distance in lateral trajectory optimization");
-DEFINE_double(lateral_third_order_derivative_max, 2.0,
+DEFINE_double(lateral_third_order_derivative_max, 0.1,
               "the maximal allowance for lateral third order derivative");
 DEFINE_double(max_s_lateral_optimization, 50.0,
               "The maximal s for lateral optimization.");
-DEFINE_double(default_delta_s_lateral_optimization, 0.5,
+DEFINE_double(default_delta_s_lateral_optimization, 2.0,
               "The default delta s for lateral optimization.");
-DEFINE_double(bound_buffer, 0.3, "buffer to boundary for lateral optimization");
+DEFINE_double(bound_buffer, 0.1, "buffer to boundary for lateral optimization");
+DEFINE_double(nudge_buffer, 0.3, "buffer to nudge for lateral optimization");
 
 DEFINE_bool(use_planning_fallback, true,
             "Use fallback trajectory for planning.");

@@ -12,8 +12,8 @@ cc_library(
     ]),
     deps = [
         "//external:gflags",
-        "@ros//:ros_common",
         "//modules/common",
+        "@ros//:ros_common",
     ],
 )
 

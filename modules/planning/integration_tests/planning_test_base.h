@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include <map>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -31,7 +32,10 @@
 #include "modules/common/util/file.h"
 
 #define private public
-#include "modules/planning/planning.h"
+#define protected public
+#include "modules/planning/navi_planning.h"
+#include "modules/planning/planning_base.h"
+#include "modules/planning/std_planning.h"
 
 namespace apollo {
 namespace planning {
@@ -100,7 +104,7 @@ class PlanningTestBase : public ::testing::Test {
   bool SetUpAdapters();
   bool IsValidTrajectory(const ADCTrajectory& trajectory);
 
-  Planning planning_;
+  std::unique_ptr<PlanningBase> planning_ = nullptr;
   std::map<TrafficRuleConfig::RuleId, bool> rule_enabled_;
   ADCTrajectory adc_trajectory_;
 };

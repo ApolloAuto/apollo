@@ -31,7 +31,7 @@
 #include "modules/control/proto/control_cmd.pb.h"
 #include "modules/control/proto/pad_msg.pb.h"
 #include "modules/data/proto/static_info.pb.h"
-#include "modules/dreamview/proto/voice_detection.pb.h"
+#include "modules/dreamview/proto/audio_capture.pb.h"
 #include "modules/drivers/gnss/proto/gnss_best_pose.pb.h"
 #include "modules/drivers/gnss/proto/gnss_raw_observation.pb.h"
 #include "modules/drivers/gnss/proto/gnss_status.pb.h"
@@ -116,10 +116,7 @@ using LocalizationMsfStatusAdapter =
     Adapter<apollo::localization::LocalizationStatus>;
 using RelativeMapAdapter = Adapter<apollo::relative_map::MapMsg>;
 using NavigationAdapter = Adapter<apollo::relative_map::NavigationInfo>;
-using VoiceDetectionRequestAdapter =
-    Adapter<apollo::dreamview::VoiceDetectionRequest>;
-using VoiceDetectionResponseAdapter =
-    Adapter<apollo::dreamview::VoiceDetectionResponse>;
+using AudioCaptureAdapter = Adapter<apollo::dreamview::AudioCapture>;
 // for pandora
 using PandoraPointCloudAdapter = Adapter<::sensor_msgs::PointCloud2>;
 using PandoraCameraFrontColorAdapter = Adapter<::sensor_msgs::Image>;
@@ -133,12 +130,22 @@ using StreamStatusAdapter = Adapter<drivers::gnss_status::StreamStatus>;
 using GnssHeadingAdapter = Adapter<drivers::gnss::Heading>;
 using RtcmDataAdapter = Adapter<std_msgs::String>;
 
-// for velodyne
-using VelodyneRaw0Adapter = Adapter<velodyne_msgs::VelodyneScanUnified>;
-using VelodyneRaw1Adapter = Adapter<velodyne_msgs::VelodyneScanUnified>;
-using PointCloudRaw0Adapter = Adapter<::sensor_msgs::PointCloud2>;
-using PointCloudRaw1Adapter = Adapter<::sensor_msgs::PointCloud2>;
-using PointCloudFusionAdapter = Adapter<::sensor_msgs::PointCloud2>;
+// for velodyne fusion sensors
+using PointCloudDenseAdapter = Adapter<::sensor_msgs::PointCloud2>;
+using PointCloudDenseRawAdapter = Adapter<::sensor_msgs::PointCloud2>;
+using VelodyneScanDenseAdapter = Adapter<velodyne_msgs::VelodyneScanUnified>;
+
+using PointCloudSparse1Adapter = Adapter<::sensor_msgs::PointCloud2>;
+using PointCloudSparseRaw1Adapter = Adapter<::sensor_msgs::PointCloud2>;
+using VelodyneScanSparse1Adapter = Adapter<velodyne_msgs::VelodyneScanUnified>;
+
+using PointCloudSparse2Adapter = Adapter<::sensor_msgs::PointCloud2>;
+using PointCloudSparseRaw2Adapter = Adapter<::sensor_msgs::PointCloud2>;
+using VelodyneScanSparse2Adapter = Adapter<velodyne_msgs::VelodyneScanUnified>;
+
+using PointCloudSparse3Adapter = Adapter<::sensor_msgs::PointCloud2>;
+using PointCloudSparseRaw3Adapter = Adapter<::sensor_msgs::PointCloud2>;
+using VelodyneScanSparse3Adapter = Adapter<velodyne_msgs::VelodyneScanUnified>;
 
 }  // namespace adapter
 }  // namespace common

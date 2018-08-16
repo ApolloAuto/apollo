@@ -29,7 +29,7 @@ bool ObjectCameraFilter::Filter(
   if (!objects) return false;
 
   // update lost_frame_count
-  for (auto p : tracked_filters_) {
+  for (auto &p : tracked_filters_) {
     p.second.lost_frame_cnt_ += 1;
   }
 

@@ -35,6 +35,7 @@
 #include "modules/common/math/vec2d.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/hdmap/hdmap_util.h"
+#include "modules/map/pnc_map/pnc_map.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/reference_line/reference_line_provider.h"
 
@@ -90,6 +91,10 @@ bool Frame::Rerouting() {
     AERROR << "No previous routing available";
     return false;
   }
+  if (!hdmap_) {
+    AERROR << "Invalid HD Map.";
+    return false;
+  }
   auto request = adapter_manager->GetRoutingResponse()
                      ->GetLatestObserved()
                      .routing_request();
@@ -140,7 +145,7 @@ bool Frame::CreateReferenceLineInfo() {
   DCHECK_EQ(reference_lines.size(), segments.size());
 
   auto forword_limit =
-      ReferenceLineProvider::LookForwardDistance(vehicle_state_);
+      hdmap::PncMap::LookForwardDistance(vehicle_state_.linear_velocity());
 
   for (auto &ref_line : reference_lines) {
     if (!ref_line.Shrink(Vec2d(vehicle_state_.x(), vehicle_state_.y()),
@@ -237,6 +242,10 @@ const Obstacle *Frame::CreateStopObstacle(
 const Obstacle *Frame::CreateStopObstacle(const std::string &obstacle_id,
                                           const std::string &lane_id,
                                           const double lane_s) {
+  if (!hdmap_) {
+    AERROR << "Invalid HD Map.";
+    return nullptr;
+  }
   const auto lane = hdmap_->GetLaneById(hdmap::MakeMapId(lane_id));
   if (!lane) {
     AERROR << "Failed to find lane[" << lane_id << "]";
@@ -323,6 +332,7 @@ const Obstacle *Frame::CreateStaticVirtualObstacle(const std::string &id,
 
 Status Frame::Init() {
   hdmap_ = hdmap::HDMapUtil::BaseMapPtr();
+  CHECK_NOTNULL(hdmap_);
   vehicle_state_ = common::VehicleStateProvider::instance()->vehicle_state();
   const auto &point = common::util::MakePointENU(
       vehicle_state_.x(), vehicle_state_.y(), vehicle_state_.z());

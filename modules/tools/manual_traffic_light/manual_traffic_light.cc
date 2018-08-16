@@ -78,6 +78,10 @@ bool GetAllTrafficLights(std::vector<SignalInfoConstPtr> *traffic_lights) {
     }
     for (const auto &signal : map_proto.signal()) {
       const auto *hdmap = HDMapUtil::BaseMapPtr();
+      if (!hdmap) {
+        AERROR << "Invalid HD Map.";
+        return false;
+      }
       map_traffic_lights.push_back(hdmap->GetSignalById(signal.id()));
     }
   }
@@ -94,6 +98,10 @@ bool GetTrafficLightsWithinDistance(
     return false;
   }
   const auto *hdmap = HDMapUtil::BaseMapPtr();
+  if (!hdmap) {
+    AERROR << "Invalid HD Map.";
+    return false;
+  }
   auto position =
       AdapterManager::GetLocalization()->GetLatestObserved().pose().position();
   int ret = hdmap->GetForwardNearestSignalsOnLane(

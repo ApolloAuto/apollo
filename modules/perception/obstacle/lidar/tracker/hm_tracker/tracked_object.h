@@ -34,7 +34,7 @@ struct TrackedObject {
   TrackedObject() = default;
   explicit TrackedObject(std::shared_ptr<Object> obj_ptr);
 
-  // deep copy (copy point clonds)
+  // deep copy (copy point clouds)
   void clone(const TrackedObject& rhs);
 
   // cloud

@@ -104,6 +104,22 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "piecewise_quintic_spiral_path",
+    srcs = [
+        "piecewise_quintic_spiral_path.cc",
+    ],
+    hdrs = [
+        "piecewise_quintic_spiral_path.h",
+    ],
+    deps = [
+        ":quintic_spiral_path",
+        "//modules/common:log",
+        "//modules/common/math",
+        "//modules/common/util:string_util",
+    ],
+)
+
 cc_test(
     name = "quintic_polynomial_curve1d_test",
     size = "small",
@@ -116,4 +132,15 @@ cc_test(
     ],
 )
 
+cc_test(
+    name = "piecewise_quintic_spiral_path_test",
+    size = "small",
+    srcs = [
+        "piecewise_quintic_spiral_path_test.cc",
+    ],
+    deps = [
+        ":piecewise_quintic_spiral_path",
+        "@gtest//:main",
+    ],
+)
 cpplint()

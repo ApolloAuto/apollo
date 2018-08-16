@@ -22,6 +22,7 @@
 #define MODULES_PREDICTION_PREDICTION_H_
 
 #include <string>
+#include <vector>
 
 #include "modules/common/adapters/proto/adapter_config.pb.h"
 #include "modules/common/proto/pnc_point.pb.h"

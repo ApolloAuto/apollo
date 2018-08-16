@@ -31,10 +31,6 @@ DECLARE_bool(enable_collision_detection);
 DECLARE_string(rtk_trajectory_filename);
 DECLARE_uint64(rtk_trajectory_forward);
 DECLARE_double(rtk_trajectory_resolution);
-DECLARE_double(look_backward_distance);
-DECLARE_double(look_forward_short_distance);
-DECLARE_double(look_forward_long_distance);
-DECLARE_double(look_forward_time_sec);
 DECLARE_bool(enable_reference_line_stitching);
 DECLARE_double(look_forward_extend_distance);
 DECLARE_double(reference_line_stitch_overlap_distance);
@@ -142,7 +138,7 @@ DECLARE_bool(enable_follow_accel_constraint);
 DECLARE_bool(enable_sqp_solver);
 
 /// thread pool
-DECLARE_int32(num_thread_planning_thread_pool);
+DECLARE_uint32(max_planning_thread_pool_size);
 DECLARE_bool(use_multi_thread_to_add_obstacles);
 DECLARE_bool(enable_multi_thread_in_dp_poly_path);
 DECLARE_bool(enable_multi_thread_in_dp_st_graph);
@@ -195,6 +191,7 @@ DECLARE_double(lattice_stop_buffer);
 DECLARE_double(max_s_lateral_optimization);
 DECLARE_double(default_delta_s_lateral_optimization);
 DECLARE_double(bound_buffer);
+DECLARE_double(nudge_buffer);
 
 DECLARE_bool(use_planning_fallback);
 

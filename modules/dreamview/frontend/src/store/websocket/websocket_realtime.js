@@ -250,9 +250,9 @@ export default class RosWebSocketEndpoint {
         }));
     }
 
-    sendVoicePiece(data) {
+    sendAudioPiece(data) {
         this.websocket.send(JSON.stringify({
-            type: "VoicePiece",
+            type: "AudioPiece",
             data: btoa(String.fromCharCode(...data)),
         }));
     }
