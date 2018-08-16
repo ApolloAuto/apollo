@@ -348,9 +348,13 @@
             },
             "Latency": {
               "fields": {
-                "planning": {
+                "timestampSec": {
                   "type": "double",
                   "id": 1
+                },
+                "totalTimeMs": {
+                  "type": "double",
+                  "id": 2
                 }
               }
             },
@@ -481,19 +485,19 @@
                 },
                 "mainDecision": {
                   "type": "Object",
-                  "id": 24
+                  "id": 10
                 },
                 "speedLimit": {
                   "type": "double",
-                  "id": 10
+                  "id": 11
                 },
                 "delay": {
                   "type": "DelaysInMs",
-                  "id": 11
+                  "id": 12
                 },
                 "monitor": {
                   "type": "apollo.common.monitor.MonitorMessage",
-                  "id": 12,
+                  "id": 13,
                   "options": {
                     "deprecated": true
                   }
@@ -501,52 +505,49 @@
                 "notification": {
                   "rule": "repeated",
                   "type": "Notification",
-                  "id": 25
+                  "id": 14
                 },
                 "engageAdvice": {
                   "type": "string",
-                  "id": 13
+                  "id": 15
                 },
                 "latency": {
+                  "keyType": "string",
                   "type": "Latency",
-                  "id": 14
+                  "id": 16
                 },
                 "mapElementIds": {
                   "type": "MapElementIds",
-                  "id": 15
+                  "id": 17
                 },
                 "mapHash": {
                   "type": "uint64",
-                  "id": 16
+                  "id": 18
                 },
                 "mapRadius": {
                   "type": "double",
-                  "id": 17
-                },
-                "planningTime": {
-                  "type": "double",
-                  "id": 18
+                  "id": 19
                 },
                 "planningData": {
                   "type": "apollo.planning_internal.PlanningData",
-                  "id": 19
+                  "id": 20
                 },
                 "gps": {
                   "type": "Object",
-                  "id": 20
+                  "id": 21
                 },
                 "laneMarker": {
                   "type": "apollo.perception.LaneMarkers",
-                  "id": 21
+                  "id": 22
                 },
                 "controlData": {
                   "type": "ControlData",
-                  "id": 22
+                  "id": 23
                 },
                 "navigationPath": {
                   "rule": "repeated",
                   "type": "apollo.common.Path",
-                  "id": 23
+                  "id": 24
                 }
               }
             }
@@ -914,6 +915,30 @@
                 "laneId": {
                   "type": "string",
                   "id": 9
+                },
+                "xDerivative": {
+                  "type": "double",
+                  "id": 10
+                },
+                "yDerivative": {
+                  "type": "double",
+                  "id": 11
+                },
+                "x_2ndDerivative": {
+                  "type": "double",
+                  "id": 12
+                },
+                "y_2ndDerivative": {
+                  "type": "double",
+                  "id": 13
+                },
+                "x_3rdDerivative": {
+                  "type": "double",
+                  "id": 14
+                },
+                "y_3rdDerivative": {
+                  "type": "double",
+                  "id": 15
                 }
               }
             },
