@@ -314,7 +314,7 @@ function release() {
   cp -r third_party/can_card_library/*/lib/* $LIB_DIR
   cp -r bazel-genfiles/external $LIB_DIR
   cp -r py_proto/modules $LIB_DIR
-  cp modules/perception/cuda_util/cmake_build/libcuda_util.so $LIB_DIR
+  cp /apollo/bazel-apollo/bazel-out/local-opt/bin/modules/perception/cuda_util/libintegrated_cuda_util.so $LIB_DIR
 
   # doc
   cp LICENSE "${APOLLO_RELEASE_DIR}"
