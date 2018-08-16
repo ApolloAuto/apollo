@@ -38,6 +38,13 @@ Dreamview uses https://github.com/mrdoob/three.js as graphics library. You can m
 Use dreamview and enable sim_control on dreamview to test your planning algorithm.
 
 ---
+
+## Adding a new point of interest permanently in the Dreamview interface
+
+There's a default_end_way_point file for each map to specify point of interest, you can refer to [the following file](https://github.com/ApolloAuto/apollo/blob/master/modules/map/data/demo/default_end_way_point.txt).
+
+---
+
 ## What's the function of sim_control in the backend of dreamview
 
 It simulates a SDC's control module, and moves the car based on planning result. This is a really convenient way to visualize and test planning module
