@@ -2,6 +2,7 @@ import { observable, computed, action, autorun } from "mobx";
 
 import HMI from "store/hmi";
 import ControlData from "store/control_data";
+import Latency from "store/latency";
 import Meters from "store/meters";
 import Monitor from "store/monitor";
 import Options from "store/options";
@@ -35,6 +36,8 @@ class DreamviewStore {
     @observable planningData = new PlanningData();
 
     @observable controlData = new ControlData();
+
+    @observable latency = new Latency();
 
     @observable playback = OFFLINE_PLAYBACK ? new Playback() : null;
 

@@ -159,8 +159,9 @@ message RoutePath {
   repeated PolygonPoint point = 1;
 }
 
-message Latency { // ms
-  optional double planning = 1;
+message Latency {
+  optional double timestamp_sec = 1;
+  optional double total_time_ms = 2;
 }
 
 message MapElementIds {
@@ -187,7 +188,7 @@ message Notification {
   optional apollo.common.monitor.MonitorMessageItem item = 2;
 }
 
-// Next-id: 26
+// Next-id: 25
 message SimulationWorld {
   // Timestamp in milliseconds
   optional double timestamp = 1;
@@ -214,41 +215,40 @@ message SimulationWorld {
 
   // Main decision
   optional Object main_stop = 9 [deprecated=true];
-  optional Object main_decision = 24;
+  optional Object main_decision = 10;
 
   // Speed limit
-  optional double speed_limit = 10;
+  optional double speed_limit = 11;
 
   // Module delays
-  optional DelaysInMs delay = 11;
+  optional DelaysInMs delay = 12;
 
   // Notification
-  optional apollo.common.monitor.MonitorMessage monitor = 12 [deprecated=true];
-  repeated Notification notification = 25;
+  optional apollo.common.monitor.MonitorMessage monitor = 13 [deprecated=true];
+  repeated Notification notification = 14;
 
   // Engage advice from planning
-  optional string engage_advice = 13;
+  optional string engage_advice = 15;
 
   // Module latency
-  optional Latency latency = 14;
+  map<string, Latency> latency = 16;
 
-  optional MapElementIds map_element_ids = 15;
-  optional uint64 map_hash = 16;
-  optional double map_radius = 17;
+  optional MapElementIds map_element_ids = 17;
+  optional uint64 map_hash = 18;
+  optional double map_radius = 19;
 
   // Planning data
-  optional double planning_time = 18;
-  optional apollo.planning_internal.PlanningData planning_data = 19;
+  optional apollo.planning_internal.PlanningData planning_data = 20;
 
   // GPS
-  optional Object gps = 20;
+  optional Object gps = 21;
 
   // Lane Markers from perception
-  optional apollo.perception.LaneMarkers lane_marker = 21;
+  optional apollo.perception.LaneMarkers lane_marker = 22;
 
   // Control data
-  optional ControlData control_data = 22;
+  optional ControlData control_data = 23;
 
   // Relative Map
-  repeated apollo.common.Path navigation_path = 23;
+  repeated apollo.common.Path navigation_path = 24;
 }
