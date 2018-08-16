@@ -164,21 +164,25 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_04) {
   FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
   PlanningTestBase::SetUp();
 
-  // set config
+  RUN_GOLDEN_TEST_DECISION(0);
+
+  // get config
   auto* stop_sign_config =
       PlanningTestBase::GetTrafficRuleConfig(TrafficRuleConfig::STOP_SIGN);
   stop_sign_config->mutable_stop_sign()->mutable_creep()->set_enabled(false);
 
-  // set PlanningStatus: wait time > STOP_DURATION
+  // update clock
+  double stop_duration = stop_sign_config->stop_sign().stop_duration();
+  // add 0.5 seconds as buffer time.
+  std::chrono::duration<double> time_sec(Clock::NowInSeconds() + stop_duration +
+                                         0.5);
+  Clock::SetNow(std::chrono::duration_cast<std::chrono::nanoseconds>(time_sec));
+
   auto* stop_sign_status = GetPlanningStatus()->mutable_stop_sign();
   stop_sign_status->set_stop_sign_id("1017");
   stop_sign_status->set_status(StopSignStatus::STOP);
-  double stop_duration = stop_sign_config->stop_sign().stop_duration();
-  double wait_time = stop_duration + 0.5;
-  double stop_start_time = Clock::NowInSeconds() - wait_time;
-  stop_sign_status->set_stop_start_time(stop_start_time);
 
-  RUN_GOLDEN_TEST_DECISION(0);
+  RUN_GOLDEN_TEST_DECISION(1);
 
   // check PlanningStatus value: STOP_DONE
   EXPECT_TRUE(stop_sign_status->has_status() &&

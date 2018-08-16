@@ -24,6 +24,8 @@
 
 #include "google/protobuf/repeated_field.h"
 
+#include "modules/routing/proto/routing.pb.h"
+
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/math/quaternion.h"
 #include "modules/common/time/time.h"
@@ -48,26 +50,24 @@ using apollo::common::VehicleStateProvider;
 using apollo::common::adapter::AdapterManager;
 using apollo::common::time::Clock;
 using apollo::hdmap::HDMapUtil;
+using apollo::routing::RoutingResponse;
 
 StdPlanning::~StdPlanning() { Stop(); }
 
 std::string StdPlanning::Name() const { return "std_planning"; }
 
-void StdPlanning::ResetPullOver(const routing::RoutingResponse& response) {
-  auto* pull_over =
-      util::GetPlanningStatus()->mutable_planning_state()->mutable_pull_over();
-  if (!last_routing_.has_header()) {
-    last_routing_ = response;
-    pull_over->Clear();
-    return;
-  }
-  if (!pull_over->in_pull_over()) {
-    return;
-  }
-  if (hdmap::PncMap::IsNewRouting(last_routing_, response)) {
-    pull_over->Clear();
-    last_routing_ = response;
-    AINFO << "Cleared Pull Over Status after received new routing";
+bool IsDifferentRouting(const RoutingResponse& first,
+                        const RoutingResponse& second) {
+  if (first.has_header() && second.has_header()) {
+    if (first.header().sequence_num() != second.header().sequence_num()) {
+      return true;
+    }
+    if (first.header().timestamp_sec() != second.header().timestamp_sec()) {
+      return true;
+    }
+    return false;
+  } else {
+    return true;
   }
 }
 
@@ -197,14 +197,12 @@ void StdPlanning::RunOnce() {
     return;
   }
 
-  if (!reference_line_provider_->UpdateRoutingResponse(
-          AdapterManager::GetRoutingResponse()->GetLatestObserved())) {
-    std::string msg("Failed to update routing in reference line provider");
-    AERROR << msg;
-    not_ready->set_reason(msg);
-    status.Save(not_ready_pb.mutable_header()->mutable_status());
-    PublishPlanningPb(&not_ready_pb, start_timestamp);
-    return;
+  const auto& latest_routing =
+      AdapterManager::GetRoutingResponse()->GetLatestObserved();
+  if (IsDifferentRouting(last_routing_, latest_routing)) {
+    last_routing_ = latest_routing;
+    util::GetPlanningStatus()->Clear();
+    reference_line_provider_->UpdateRoutingResponse(latest_routing);
   }
 
   if (FLAGS_enable_prediction && AdapterManager::GetPrediction()->Empty()) {
@@ -213,7 +211,6 @@ void StdPlanning::RunOnce() {
 
   // Update reference line provider and reset pull over if necessary
   reference_line_provider_->UpdateVehicleState(vehicle_state);
-  ResetPullOver(AdapterManager::GetRoutingResponse()->GetLatestObserved());
 
   const double planning_cycle_time = 1.0 / FLAGS_planning_loop_rate;
 
@@ -325,6 +322,7 @@ void StdPlanning::Stop() {
   planner_.reset(nullptr);
   FrameHistory::instance()->Clear();
   util::GetPlanningStatus()->Clear();
+  last_routing_.Clear();
 }
 
 }  // namespace planning
