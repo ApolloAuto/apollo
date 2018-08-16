@@ -107,6 +107,10 @@ message PlanningState {
   }
 }
 
+message DestinationStatus {
+    optional bool has_passed_destination = 1 [default = false];
+}
+
 message PlanningStatus {
   optional PlanningState planning_state = 1;
   optional ChangeLaneStatus change_lane = 2;
@@ -116,5 +120,6 @@ message PlanningStatus {
   optional RightOfWayStatus right_of_way = 6;
   optional SidePassStatus side_pass = 7;
   optional StopSignStatus stop_sign = 8;
+  optional DestinationStatus destination  = 9;
 }
 
