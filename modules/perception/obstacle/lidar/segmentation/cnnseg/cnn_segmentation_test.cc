@@ -242,7 +242,7 @@ TEST_F(CNNSegmentationTest, test_cnnseg_det) {
   for (int i = 0; i < 10; ++i) {
     EXPECT_TRUE(
         cnn_segmentor_->Segment(in_pc, valid_idx, options, &out_objects));
-    EXPECT_EQ(out_objects.size(), 15);
+    EXPECT_EQ(out_objects.size(), 13);
   }
 
 #ifdef VISUALIZE
