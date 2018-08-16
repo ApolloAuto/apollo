@@ -608,11 +608,6 @@ void SimulationWorldService::UpdateMainStopDecision(
   decision->set_position_x(stop_pt.x() + map_service_->GetXOffset());
   decision->set_position_y(stop_pt.y() + map_service_->GetYOffset());
   decision->set_heading(stop_heading);
-
-  world_main_decision->set_position_x(decision->position_x());
-  world_main_decision->set_position_y(decision->position_y());
-  world_main_decision->set_heading(decision->heading());
-  world_main_decision->set_timestamp_sec(update_timestamp_sec);
 }
 
 bool SimulationWorldService::LocateMarker(
@@ -691,6 +686,16 @@ void SimulationWorldService::UpdateDecision(const DecisionResult &decision_res,
     UpdateMainChangeLaneDecision(main_decision.stop(), world_main_decision);
   } else if (main_decision.has_cruise()) {
     UpdateMainChangeLaneDecision(main_decision.cruise(), world_main_decision);
+  }
+  if (world_main_decision->decision_size() > 0) {
+    // set default position
+    const auto &adc = world_.auto_driving_car();
+    world_main_decision->set_position_x(adc.position_x() +
+                                        map_service_->GetXOffset());
+    world_main_decision->set_position_y(adc.position_y() +
+                                        map_service_->GetYOffset());
+    world_main_decision->set_heading(adc.heading());
+    world_main_decision->set_timestamp_sec(header_time);
   }
 
   // Update obstacle decision.
