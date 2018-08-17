@@ -190,17 +190,17 @@ function cibuild() {
 
   echo "Building on $MACHINE_ARCH..."
   BUILD_TARGETS="
-  //modules/common
-  //modules/map/hdmap
-  //modules/map/pnc_map
+  //modules/common/...
   //modules/canbus:canbus_lib
-  //modules/control
-  //modules/dreamview
-  //modules/localization
-  //modules/perception
-  //modules/planning
+  //modules/control/...
+  //modules/dreamview/...
+  //modules/drivers/gnss/...
+  //modules/localization/...
+  //modules/map/...
+  //modules/perception/...
+  //modules/planning/...
   //modules/prediction/...
-  //modules/routing
+  //modules/routing/...
   "
   bazel build $JOB_ARG $DEFINES $@ $BUILD_TARGETS
   if [ $? -eq 0 ]; then
@@ -387,54 +387,19 @@ function run_test() {
 }
 
 function citest() {
-  BUILD_TARGETS="
-  modules/common/adapters:adapter_test
-  modules/common/configs:vehicle_config_helper_test
-  modules/common/filters:digital_filter_coefficients_test
-  modules/common/filters:digital_filter_test
-  modules/common/filters:mean_filter_test
-  modules/common/kv_db:kv_db_test
-  modules/common/math:aabox2d_test
-  modules/common/math:aaboxkdtree2d_test
-  modules/common/math:angle_test
-  modules/common/math:box2d_test
-  modules/common/math:cartesian_frenet_conversion_test
-  modules/common/math:euler_angles_zxy_test
-  modules/common/math:integral_test
-  modules/common/math:kalman_filter_test
-  modules/common/math:line_segment2d_test
-  modules/common/math:linear_interpolation_test
-  modules/common/math:math_utils_test
-  modules/common/math:matrix_operations_test
-  modules/common/math:mpc_test
-  modules/common/math:polygon2d_test
-  modules/common/math/qp_solver:active_set_qp_solver_test
-  modules/common/math:quaternion_test
-  modules/common/math:search_test
-  modules/common/math:vec2d_test
-  modules/common/monitor_log:monitor_log_buffer_test
-  modules/common/monitor_log:monitor_logger_test
-  modules/common/status:status_test
-  modules/common/time:time_test
-  modules/common/time:timer_test
-  modules/common/util:disjoint_set_test
-  modules/common/util:factory_test
-  modules/common/util:file_test
-  modules/common/util:json_util_test
-  modules/common/util:lru_cache_test
-  modules/common/util:points_downsampler_test
-  modules/common/util:string_tokenizer_test
-  modules/common/util:string_util_test
-  modules/common/util:util_test
-  modules/common/vehicle_state:vehicle_state_provider_test
-  modules/planning/integration_tests:garage_test
-  modules/planning/integration_tests:sunnyvale_loop_test
-  modules/planning/integration_tests:sunnyvale_big_loop_test
-  modules/control/integration_tests:simple_control_test
-  modules/prediction/container/obstacles:obstacle_test
-  modules/dreamview/backend/simulation_world:simulation_world_service_test
-  "
-  bazel test $DEFINES --config=unit_test --test_verbose_timeout_warnings $@ $BUILD_TARGETS
+  generate_build_targets
+  # common related test
+  echo "$BUILD_TARGETS" | grep "common\/" | xargs bazel test $DEFINES --config=unit_test -c dbg --test_verbose_timeout_warnings $@
+
+  # control related test
+  echo "$BUILD_TARGETS" | grep "control\/" | xargs bazel test $DEFINES --config=unit_test -c dbg --test_verbose_timeout_warnings $@
+
+  # prediction related test
+  echo "$BUILD_TARGETS" | grep "prediction\/" | xargs bazel test $DEFINES --config=unit_test -c dbg --test_verbose_timeout_warnings $@
+
+  # planning related test
+  echo "$BUILD_TARGETS" | grep "planning\/" | xargs bazel test $DEFINES --config=unit_test -c dbg --test_verbose_timeout_warnings $@
+
   if [ $? -eq 0 ]; then
     success 'Test passed!'
     return 0
