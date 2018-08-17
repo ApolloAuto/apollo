@@ -26,7 +26,8 @@
 namespace apollo {
 namespace planning {
 
-using common::adapter::AdapterManager;
+using apollo::common::adapter::AdapterManager;
+using apollo::common::time::Clock;
 
 DEFINE_string(test_data_dir, "", "the test data folder");
 DEFINE_bool(test_update_golden_log, false,
@@ -86,6 +87,16 @@ bool PlanningTestBase::SetUpAdapters() {
   if (!AdapterManager::Initialized()) {
     AdapterManager::Init(FLAGS_planning_adapter_config_filename);
   }
+  {  // setup timestamp
+    localization::LocalizationEstimate localization;
+    common::util::GetProtoFromFile(
+        FLAGS_test_data_dir + "/" + FLAGS_test_localization_file,
+        &localization);
+    std::chrono::duration<double> time_sec(
+        localization.header().timestamp_sec());
+    Clock::SetNow(
+        std::chrono::duration_cast<std::chrono::nanoseconds>(time_sec));
+  }
   FEED_ADAPTER(RoutingResponse, FLAGS_test_routing_response_file);
   FEED_ADAPTER(Localization, FLAGS_test_localization_file);
   FEED_ADAPTER(Chassis, FLAGS_test_chassis_file);
@@ -96,6 +107,8 @@ bool PlanningTestBase::SetUpAdapters() {
 }
 
 void PlanningTestBase::SetUp() {
+  Clock::SetMode(Clock::MOCK);
+  // time in nanoseconds
   if (planning_) {
     planning_->Stop();
   } else {
