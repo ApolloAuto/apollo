@@ -120,8 +120,6 @@ class PlanningBase : public apollo::common::ApolloApp {
   std::unique_ptr<ReferenceLineProvider> reference_line_provider_;
 
   ros::Timer timer_;
-
-  routing::RoutingResponse last_routing_;
 };
 
 }  // namespace planning
