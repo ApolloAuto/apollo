@@ -83,6 +83,12 @@ class Prediction : public PredictionInterface {
 
   void OnPlanning(const planning::ADCTrajectory &adc_trajectory);
 
+  /**
+   * @brief process rosbag in offline mode, mainly for extracting prediction
+   * features.
+   */
+  void ProcessRosbag(const std::string &filename);
+
  private:
   double start_time_ = 0.0;
   PredictionConf prediction_conf_;
