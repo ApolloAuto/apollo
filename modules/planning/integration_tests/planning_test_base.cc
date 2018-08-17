@@ -92,10 +92,7 @@ bool PlanningTestBase::SetUpAdapters() {
     common::util::GetProtoFromFile(
         FLAGS_test_data_dir + "/" + FLAGS_test_localization_file,
         &localization);
-    std::chrono::duration<double> time_sec(
-        localization.header().timestamp_sec());
-    Clock::SetNow(
-        std::chrono::duration_cast<std::chrono::nanoseconds>(time_sec));
+    Clock::SetNowInSeconds(localization.header().timestamp_sec());
   }
   FEED_ADAPTER(RoutingResponse, FLAGS_test_routing_response_file);
   FEED_ADAPTER(Localization, FLAGS_test_localization_file);
