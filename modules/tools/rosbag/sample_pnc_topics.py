@@ -15,7 +15,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ###############################################################################
-
 """
 Sample PNC topics. For each /path/to/a.bag, will generate
 /path/to/pnc_sample/a.bag.
@@ -70,27 +69,33 @@ class SamplePNC(object):
     ]
 
     @classmethod
-    def process_bags(cls, bags):
-        for bag_file in bags:
-            output_dir = os.path.join(os.path.dirname(bag_file), 'pnc_sample')
-            output_bag = os.path.join(output_dir, os.path.basename(bag_file))
-            if os.path.exists(output_bag):
-                glog.info('Skip {} which has been processed'.format(bag_file))
-                continue
+    def process_bag(cls, input_bag, output_bag):
+        output_dir = os.path.dirname(output_bag)
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir)
+        try:
+            with rosbag.Bag(input_bag, 'r') as bag_in:
+                try:
+                    with rosbag.Bag(output_bag, 'w') as bag_out:
+                        for topic, msg, t in bag_in.read_messages(
+                                topics=SamplePNC.TOPICS):
+                            bag_out.write(topic, msg, t)
+                except BagIOException as bag_io_exception:
+                    print("Read file: {} with error: {}".format(
+                        input_bag, bag_io_exception))
+                finally:
+                    print("Failed to write file: {}".format(output_bag))
+        except BagIOException as bag_io_exception:
+            print("Open file: {} with error: {} ".format(
+                input_bag, bag_io_exception))
+        finally:
+            print("Failed to open file: {}".format(input_bag))
 
-            glog.info('Processing bag {}'.format(bag_file))
-            if not os.path.exists(output_dir):
-                os.makedirs(output_dir)
-            with rosbag.Bag(bag_file, 'r') as bag_in:
-                with rosbag.Bag(output_bag, 'w') as bag_out:
-                    for topic, msg, t in bag_in.read_messages(
-                            topics=SamplePNC.TOPICS):
-                        bag_out.write(topic, msg, t)
 
 if __name__ == '__main__':
-    if len(sys.argv) < 2:
-        print("Usage: %s <bag_path> ..." % sys.argv[0])
-        sys.exit(1)
-
-    bags = sorted(sum([glob.glob(arg) for arg in sys.argv[1:]], []))
-    SamplePNC.process_bags(bags)
+    import argparse
+    parser = argparse.ArgumentParser(description="Filter pnc rosbag")
+    parser.add_argument('input', type=str, help="the input rosbag")
+    parser.add_argument('output', type=str, help="the output rosbag")
+    args = parser.parse_args()
+    SamplePNC.process_bag(args.input, args.output)
