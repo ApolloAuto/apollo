@@ -777,6 +777,7 @@ TEST_F(SunnyvaleBigLoopTest, destination_pull_over_02) {
   // set config
   pull_over_config->mutable_pull_over()->set_operation_length(21.0);
   pull_over_config->mutable_pull_over()->set_max_failure_count(1);
+  pull_over_config->mutable_pull_over()->set_max_stop_deceleration(3.0);
 
   // check PULL OVER decision
   RUN_GOLDEN_TEST_DECISION(1);
