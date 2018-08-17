@@ -123,7 +123,7 @@ inline Timestamp FromInt64(int64_t timestamp_value) {
  * @brief converts the double to \class Timestamp. The input double has
  * a unit of seconds.
  * @return a Timestamp object.
-*/
+ */
 inline Timestamp From(double timestamp_value) {
   int64_t nanos_value = static_cast<int64_t>(timestamp_value * 1e9);
   return FromInt64<nanos>(nanos_value);
