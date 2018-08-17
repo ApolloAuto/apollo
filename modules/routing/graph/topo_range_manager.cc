@@ -1,18 +1,18 @@
 /******************************************************************************
-  * Copyright 2017 The Apollo Authors. All Rights Reserved.
-  *
-  * Licensed under the Apache License, Version 2.0 (the "License");
-  * you may not use this file except in compliance with the License.
-  * You may obtain a copy of the License at
-  *
-  * http://www.apache.org/licenses/LICENSE-2.0
-  *
-  * Unless required by applicable law or agreed to in writing, software
-  * distributed under the License is distributed on an "AS IS" BASIS,
-  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  * See the License for the specific language governing permissions and
-  * limitations under the License.
-  *****************************************************************************/
+ * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
 
 #include "modules/routing/graph/topo_range_manager.h"
 
@@ -32,10 +32,8 @@ using apollo::common::util::FindOrDieNoPrint;
 void merge_block_range(const TopoNode* topo_node,
                        const std::vector<NodeSRange>& origin_range,
                        std::vector<NodeSRange>* block_range) {
-  std::vector<NodeSRange> sorted_origin_range;
-  sorted_origin_range.insert(sorted_origin_range.end(), origin_range.begin(),
-                             origin_range.end());
-  sort(sorted_origin_range.begin(), sorted_origin_range.end());
+  std::vector<NodeSRange> sorted_origin_range(origin_range);
+  std::sort(sorted_origin_range.begin(), sorted_origin_range.end());
   int cur_index = 0;
   int total_size = sorted_origin_range.size();
   while (cur_index < total_size) {
@@ -61,19 +59,14 @@ const std::unordered_map<const TopoNode*, std::vector<NodeSRange>>&
 TopoRangeManager::RangeMap() const {
   return range_map_;
 }
-
-bool TopoRangeManager::Find(const TopoNode* node) const {
-  return ContainsKey(range_map_, node);
-}
-
-double TopoRangeManager::RangeStart(const TopoNode* node) const {
-  const auto& range = FindOrDieNoPrint(range_map_, node);
-  return range.front().StartS();
-}
-
-double TopoRangeManager::RangeEnd(const TopoNode* node) const {
-  const auto& range = FindOrDieNoPrint(range_map_, node);
-  return range.back().EndS();
+const std::vector<NodeSRange>* TopoRangeManager::Find(
+    const TopoNode* node) const {
+  auto iter = range_map_.find(node);
+  if (iter == range_map_.end()) {
+    return nullptr;
+  } else {
+    return &(iter->second);
+  }
 }
 
 void TopoRangeManager::PrintDebugInfo() const {
@@ -96,9 +89,7 @@ void TopoRangeManager::SortAndMerge() {
   for (auto& iter : range_map_) {
     std::vector<NodeSRange> merged_range_vec;
     merge_block_range(iter.first, iter.second, &merged_range_vec);
-    iter.second.clear();
-    iter.second.insert(iter.second.begin(), merged_range_vec.begin(),
-                       merged_range_vec.end());
+    iter.second.assign(merged_range_vec.begin(), merged_range_vec.end());
   }
 }
 
