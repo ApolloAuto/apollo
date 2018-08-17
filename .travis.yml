@@ -7,7 +7,9 @@ os: linux
 env:
     - JOB=cibuild
     - JOB=citest
-    - JOB=lint
+    - JOB=build
+    - JOB=test
+    - JOB=check
 cache:
   directories:
   - $HOME/.cache/bazel
@@ -15,6 +17,7 @@ install: skip
 before_script:
     - cp scripts/AGREEMENT.txt ${HOME}/.apollo_agreement.txt
 script:
+    - rm -rf "${HOME}/.cache/bazel/_bazel_${USER}/*"
     - ./docker/scripts/dev_start.sh
     - ./apollo_docker.sh ${JOB}
     - rm -rf "${HOME}/.cache/bazel/_bazel_${USER}/install"

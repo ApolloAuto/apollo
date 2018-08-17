@@ -132,6 +132,7 @@ function build() {
     JOB_ARG="--jobs=3"
   fi
   info "Building with $JOB_ARG for $MACHINE_ARCH"
+  df -h
 
   # Switch for building fuzz test.
   if [ -z $BUILD_FUZZ_TEST ]; then
@@ -399,6 +400,18 @@ function citest() {
 
   # planning related test
   echo "$BUILD_TARGETS" | grep "planning\/" | xargs bazel test $DEFINES --config=unit_test -c dbg --test_verbose_timeout_warnings $@
+
+  # map related test
+  echo "$BUILD_TARGETS" | grep "map\/" | xargs bazel test $DEFINES --config=unit_test -c dbg --test_verbose_timeout_warnings $@
+
+  # dreamview related test
+  echo "$BUILD_TARGETS" | grep "dreamview\/" | xargs bazel test $DEFINES --config=unit_test -c dbg --test_verbose_timeout_warnings $@
+
+  # routing related test
+  echo "$BUILD_TARGETS" | grep "routing\/" | xargs bazel test $DEFINES --config=unit_test -c dbg --test_verbose_timeout_warnings $@
+
+  # perception related test
+  echo "$BUILD_TARGETS" | grep "perception\/" | grep -v "sunnyvale_big_loop\|cnn_segmentation_test\|yolo_camera_detector_test\|unity_recognize_test\|perception_traffic_light_rectify_test\|cuda_util_test" | xargs bazel test $DEFINES --config=unit_test -c dbg --test_verbose_timeout_warnings $@
 
   if [ $? -eq 0 ]; then
     success 'Test passed!'
@@ -756,7 +769,7 @@ function main() {
       ;;
     citest)
       DEFINES="${DEFINES} --cxxopt=-DCPU_ONLY"
-      citest $@
+      run_test $@
       ;;
     test_gpu)
       DEFINES="${DEFINES} --cxxopt=-DUSE_GPU"
