@@ -70,10 +70,7 @@ class StdPlanning : public PlanningBase {
   void OnTimer(const ros::TimerEvent&) override;
 
  private:
-  /**
-   * Reset pull over mode whenever received new routing
-   */
-  void ResetPullOver(const routing::RoutingResponse& response);
+  routing::RoutingResponse last_routing_;
 };
 
 }  // namespace planning
