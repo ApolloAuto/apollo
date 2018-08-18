@@ -58,7 +58,9 @@ extern "C" {
 
 #include <sensor_msgs/Image.h>
 
-namespace usb_cam_new {
+namespace apollo {
+namespace drivers {
+namespace camera {
 
 class UsbCam {
  public:
@@ -157,6 +159,9 @@ class UsbCam {
   struct SwsContext *video_sws_;
   boost::shared_ptr<CameraImage> image_;
 };
-}
+
+}  // namespace camera
+}  // namespace drivers
+}  // namespace apollo
 
 #endif

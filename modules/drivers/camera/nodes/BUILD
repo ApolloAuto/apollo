@@ -14,7 +14,7 @@ cc_library(
     ],
     deps = [
         "//modules/drivers/proto:sensor_proto",
-        "//modules/drivers/usb_cam_new/src:usb_cam_lib",
+        "//modules/drivers/camera/src:usb_cam_lib",
         "@ros//:ros_common",
         "@yaml_cpp//:yaml",
     ],

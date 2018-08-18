@@ -1,17 +1,23 @@
-/*********************************************************************
-*
-* Software License Agreement (TBD)
-*
-*  Copyright (c) 2017, XXX
-*  All rights reserved.
-*
-*
-*********************************************************************/
+/******************************************************************************
+ * Modification Copyright 2018 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
 
 #ifndef MODULES_DRIVERS_USB_CAM_NODES_USB_CAM_WRAPPER_H_
 #define MODULES_DRIVERS_USB_CAM_NODES_USB_CAM_WRAPPER_H_
 
-#include "modules/drivers/usb_cam_new/src/usb_cam.h"
+#include "modules/drivers/camera/src/usb_cam.h"
 
 #include <ros/ros.h>
 #include <image_transport/image_transport.h>
@@ -20,7 +26,9 @@
 #include <std_srvs/Empty.h>
 #include <string>
 
-namespace usb_cam_new {
+namespace apollo {
+namespace drivers {
+namespace camera {
 
 enum TriggerFrequence {
     FPS_10HZ = 10,
@@ -61,19 +69,19 @@ class UsbCamWrapper {
 
   // std::string start_service_name_, start_service_name_;
   // bool streaming_status_;
-  int image_width_;
-  int image_height_;
-  int framerate_;
-  int exposure_;
-  int brightness_;
-  int contrast_;
-  int saturation_;
-  int sharpness_;
-  int focus_;
-  int white_balance_;
-  int gain_;
-  int trigger_internal_;
-  int trigger_fps_;
+  int image_width_ = 0;
+  int image_height_ = 0;
+  int framerate_ = 0;
+  int exposure_ = 0;
+  int brightness_ = 0;
+  int contrast_ = 0;
+  int saturation_ = 0;
+  int sharpness_ = 0;
+  int focus_ = 0;
+  int white_balance_ = 0;
+  int gain_ = 0;
+  int trigger_internal_ = 0;
+  int trigger_fps_ = 0;
 
   bool autofocus_;
   bool autoexposure_;
@@ -98,6 +106,8 @@ class UsbCamWrapper {
   int error_code_;
 };
 
-}  // namespace usb_cam_new
+}  // namespace camera
+}  // namespace drivers
+}  // namespace apollo
 
 #endif /* MODULES_DRIVERS_USB_CAM_NODES_USB_CAM_WRAPPER_H_ */

@@ -36,13 +36,13 @@
 
 #include <ros/ros.h>
 
-#include "modules/drivers/usb_cam_new/nodes/usb_cam_wrapper.h"
+#include "modules/drivers/camera/nodes/usb_cam_wrapper.h"
 
 int main(int argc, char **argv) {
   ros::init(argc, argv, "usb_cam");
   ros::NodeHandle node;
   ros::NodeHandle priv_nh("~");
-  usb_cam_new::UsbCamWrapper usbCam(node, priv_nh);
+  ::apollo::drivers::camera::UsbCamWrapper usbCam(node, priv_nh);
   usbCam.spin();
   return EXIT_SUCCESS;
 }

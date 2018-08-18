@@ -35,7 +35,7 @@
  *********************************************************************/
 #define __STDC_CONSTANT_MACROS
 
-#include "modules/drivers/usb_cam_new/src/usb_cam.h"
+#include "modules/drivers/camera/src/usb_cam.h"
 
 #include <assert.h>
 #include <errno.h>
@@ -61,7 +61,9 @@
 
 #define CLEAR(x) memset(&(x), 0, sizeof(x))
 
-namespace usb_cam_new {
+namespace apollo {
+namespace drivers {
+namespace camera {
 
 static void errno_exit(const char *s) {
   ROS_ERROR("%s error %d, %s", s, errno, strerror(errno));
@@ -899,4 +901,7 @@ int UsbCam::trigger_enable(unsigned char fps, unsigned char internal) {
 int UsbCam::trigger_disable() {
   return adv_trigger_disable(camera_dev_.c_str());
 }
-}  // namespace usb_cam
+
+}  // namespace camera
+}  // namespace drivers
+}  // namespace apollo
