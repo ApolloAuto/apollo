@@ -15,9 +15,9 @@
  *****************************************************************************/
 
 /**
- * @file cosTheta_reference_line_smoother_test.cc
+ * @file
  **/
-#include "modules/planning/reference_line/cosTheta_reference_line_smoother.h"
+#include "modules/planning/reference_line/cos_theta_reference_line_smoother.h"
 
 #include "gtest/gtest.h"
 

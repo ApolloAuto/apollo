@@ -727,6 +727,12 @@ bool CCLanePostProcessor::Process(const cv::Mat &lane_map,
                                 static_cast<float>(coeffs[i](0))};
         cur_object.confidence.push_back(1);
       }
+      PolyModel p_model;
+      p_model << static_cast<ScalarType>(coeffs[i](0)),
+                 static_cast<ScalarType>(coeffs[i](1)),
+                 static_cast<ScalarType>(coeffs[i](2)),
+                 static_cast<ScalarType>(coeffs[i](3));
+      cur_object.model = p_model;
       (*lane_objects)->push_back(cur_object);
     }
   } else {

@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/planning/reference_line/cosTheta_problem_interface.h"
+#include "modules/planning/reference_line/cos_theta_problem_interface.h"
 #include <math.h>
 #include <algorithm>
 #include <iostream>
@@ -221,32 +221,27 @@ bool CosThetaProbleminterface::eval_grad_f(int n, const double* x, bool new_x,
           (x[index + 1] - x[index + 3]) * (x[index + 3] - x[index + 5])));
     double sqrt_q1 = std::sqrt(q1);
     double sqrt_q2 = std::sqrt(q2);
-    grad_f[index] +=
+    grad_f[index] += -weight_cos_included_angle_ *
+                     ((x[index + 2] - x[index + 4]) / (sqrt_q1 * sqrt_q2) -
+                      q3 / (2 * q1 * sqrt_q1 * sqrt_q2));
+    grad_f[index + 1] += -weight_cos_included_angle_ *
+                         ((x[index + 3] - x[index + 5]) / (sqrt_q1 * sqrt_q2) -
+                          q4 / (2 * q1 * sqrt_q1 * sqrt_q2));
+    grad_f[index + 2] +=
         -weight_cos_included_angle_ *
-        ((x[index + 2] - x[index + 4]) / (sqrt_q1 * sqrt_q2) -
-         q3 / (2 * q1 * sqrt_q1 * sqrt_q2));
-    grad_f[index + 1] +=
+        ((x[index] - 2 * x[index + 2] + x[index + 4]) / (sqrt_q1 * sqrt_q2) +
+         q3 / (2 * q1 * sqrt_q1 * sqrt_q2) - q5 / (2 * sqrt_q1 * q2 * sqrt_q2));
+    grad_f[index + 3] +=
         -weight_cos_included_angle_ *
-        ((x[index + 3] - x[index + 5]) / (sqrt_q1 * sqrt_q2) -
-         q4 / (2 * q1 * sqrt_q1 * sqrt_q2));
-    grad_f[index + 2] += -weight_cos_included_angle_ *
-                         ((x[index] - 2 * x[index + 2] + x[index + 4]) /
-                              (sqrt_q1 * sqrt_q2) +
-                          q3 / (2 * q1 * sqrt_q1 * sqrt_q2) -
-                          q5 / (2 * sqrt_q1 * q2 * sqrt_q2));
-    grad_f[index + 3] += -weight_cos_included_angle_ *
-                         ((x[index + 1] - 2 * x[index + 3] + x[index + 5]) /
-                              (sqrt_q1 * sqrt_q2) +
-                          q4 / (2 * q1 * sqrt_q1 * sqrt_q2) -
-                          q6 / (2 * sqrt_q1 * q2 * sqrt_q2));
-    grad_f[index + 4] +=
-        -weight_cos_included_angle_ *
-        (q5 / (2 * sqrt_q1 * q2 * sqrt_q2) -
-         (x[index] - x[index + 2]) / (sqrt_q1 * sqrt_q2));
-    grad_f[index + 5] +=
-        -weight_cos_included_angle_ *
-        (q6 / (2 * sqrt_q1 * q2 * sqrt_q2) -
-         (x[index + 1] - x[index + 3]) / (sqrt_q1 * sqrt_q2));
+        ((x[index + 1] - 2 * x[index + 3] + x[index + 5]) /
+             (sqrt_q1 * sqrt_q2) +
+         q4 / (2 * q1 * sqrt_q1 * sqrt_q2) - q6 / (2 * sqrt_q1 * q2 * sqrt_q2));
+    grad_f[index + 4] += -weight_cos_included_angle_ *
+                         (q5 / (2 * sqrt_q1 * q2 * sqrt_q2) -
+                          (x[index] - x[index + 2]) / (sqrt_q1 * sqrt_q2));
+    grad_f[index + 5] += -weight_cos_included_angle_ *
+                         (q6 / (2 * sqrt_q1 * q2 * sqrt_q2) -
+                          (x[index + 1] - x[index + 3]) / (sqrt_q1 * sqrt_q2));
   }
   return true;
 }
@@ -330,173 +325,160 @@ bool CosThetaProbleminterface::eval_h(int n, const double* x, bool new_x,
     // fill the included angle part of obj
     for (std::size_t i = 0; i < num_of_points_ - 2; ++i) {
       std::size_t topleft = i * 2;
-      double q5 = (2 * x[topleft] - 2 * x[topleft + 2]);
-      double q6 = (2 * x[topleft + 1] - 2 * x[topleft + 3]);
-      double q7 = (x[topleft] - 2 * x[topleft + 2] + x[topleft + 4]);
-      double q8 = (2 * x[topleft + 2] - 2 * x[topleft + 4]);
-      double q9 = (2 * x[topleft + 3] - 2 * x[topleft + 5]);
-      double q10 = (x[topleft + 1] - 2 * x[topleft + 3] + x[topleft + 5]);
-      double q11 = (x[topleft + 3] - x[topleft + 5]);
-      double q12 = (x[topleft] - x[topleft + 2]);
-      double q13 = (x[topleft + 2] - x[topleft + 4]);
-      double q14 = (x[topleft + 1] - x[topleft + 3]);
-      double q1 = q12 * q12 + q14 * q14;
-      double q2 = q13 * q13 + q11 * q11;
-      double q3 = (3 * q5 * q5 * (q12 * q13 + q14 * q11));
-      double q4 = (q12 * q13 + q14 * q11);
-      double sqrt_q1 = std::sqrt(q1);
-      double sqrt_q2 = std::sqrt(q2);
+      const double q5 = (2 * x[topleft] - 2 * x[topleft + 2]);
+      const double q6 = (2 * x[topleft + 1] - 2 * x[topleft + 3]);
+      const double q7 = (x[topleft] - 2 * x[topleft + 2] + x[topleft + 4]);
+      const double q8 = (2 * x[topleft + 2] - 2 * x[topleft + 4]);
+      const double q9 = (2 * x[topleft + 3] - 2 * x[topleft + 5]);
+      const double q10 = (x[topleft + 1] - 2 * x[topleft + 3] + x[topleft + 5]);
+      const double q11 = (x[topleft + 3] - x[topleft + 5]);
+      const double q12 = (x[topleft] - x[topleft + 2]);
+      const double q13 = (x[topleft + 2] - x[topleft + 4]);
+      const double q14 = (x[topleft + 1] - x[topleft + 3]);
+      const double q1 = q12 * q12 + q14 * q14;
+      const double q2 = q13 * q13 + q11 * q11;
+      const double q3 = (3 * q5 * q5 * (q12 * q13 + q14 * q11));
+      const double q4 = (q12 * q13 + q14 * q11);
+      const double sqrt_q1 = std::sqrt(q1);
+      const double q1_sqrt_q1 = q1 * sqrt_q1;
+      const double sqrt_q2 = std::sqrt(q2);
+      const double q2_sqrt_q2 = q2 * sqrt_q2;
+      const double square_q1 = q1 * q1;
+      const double square_q2 = q2 * q2;
+      const double sqrt_q1q2 = sqrt_q1 * sqrt_q2;
+      const double q1_sqrt_q1q2 = q1 * sqrt_q1q2;
+      const double sqrt_q1_q2_sqrt_q2 = sqrt_q1 * q2_sqrt_q2;
+      const double q1_sqrt_q1_q2_sqrt_q2 = q1_sqrt_q1 * q2_sqrt_q2;
       values[idx_map_[std::make_pair(topleft, topleft)]] +=
           obj_factor * (-weight_cos_included_angle_) *
-          (q3 / (4 * q1 * q1 * sqrt_q1 * sqrt_q2) -
-           q4 / (q1 * sqrt_q1 * sqrt_q2) -
-           (q5 * q13) / (q1 * sqrt_q1 * sqrt_q2));
+          (q3 / (4 * square_q1 * sqrt_q1q2) - q4 / q1_sqrt_q1q2 -
+           (q5 * q13) / q1_sqrt_q1q2);
       values[idx_map_[std::make_pair(topleft + 1, topleft)]] +=
           obj_factor * (-weight_cos_included_angle_) *
-          ((3 * q5 * q6 * q4) / (4 * q1 * q1 * sqrt_q1 * sqrt_q2) -
-           (q6 * q13) / (2 * q1 * sqrt_q1 * sqrt_q2) -
-           (q5 * q11) / (2 * q1 * sqrt_q1 * sqrt_q2));
+          ((3 * q5 * q6 * q4) / (4 * square_q1 * sqrt_q1q2) -
+           (q6 * q13) / (2 * q1_sqrt_q1q2) - (q5 * q11) / (2 * q1_sqrt_q1q2));
       values[idx_map_[std::make_pair(topleft + 2, topleft)]] +=
           obj_factor * (-weight_cos_included_angle_) *
-          (1 / (sqrt_q1 * sqrt_q2) +
-           q4 / (q1 * sqrt_q1 * sqrt_q2) -
-           (q5 * q7) / (2 * q1 * sqrt_q1 * sqrt_q2) -
-           q3 / (4 * q1 * q1 * sqrt_q1 * sqrt_q2) +
-           (q5 * q13) / (2 * q1 * sqrt_q1 * sqrt_q2) -
-           (q8 * q13) / (2 * sqrt_q1 * q2 * sqrt_q2) +
-           (q5 * q8 * q4) / (4 * q1 * sqrt_q1 * q2 * sqrt_q2));
+          (1 / sqrt_q1q2 + q4 / q1_sqrt_q1q2 - (q5 * q7) / (2 * q1_sqrt_q1q2) -
+           q3 / (4 * square_q1 * sqrt_q1q2) + (q5 * q13) / (2 * q1_sqrt_q1q2) -
+           (q8 * q13) / (2 * sqrt_q1_q2_sqrt_q2) +
+           (q5 * q8 * q4) / (4 * q1_sqrt_q1_q2_sqrt_q2));
       values[idx_map_[std::make_pair(topleft + 3, topleft)]] +=
           obj_factor * (-weight_cos_included_angle_) *
-          ((q6 * q13) / (2 * q1 * sqrt_q1 * sqrt_q2) -
-           (q5 * q10) / (2 * q1 * sqrt_q1 * sqrt_q2) -
-           (q9 * q13) / (2 * sqrt_q1 * q2 * sqrt_q2) -
-           (3 * q5 * q6 * q4) / (4 * q1 * q1 * sqrt_q1 * sqrt_q2) +
-           (q5 * q9 * q4) / (4 * q1 * sqrt_q1 * q2 * sqrt_q2));
+          ((q6 * q13) / (2 * q1_sqrt_q1q2) - (q5 * q10) / (2 * q1_sqrt_q1q2) -
+           (q9 * q13) / (2 * sqrt_q1_q2_sqrt_q2) -
+           (3 * q5 * q6 * q4) / (4 * square_q1 * sqrt_q1q2) +
+           (q5 * q9 * q4) / (4 * q1_sqrt_q1_q2_sqrt_q2));
       values[idx_map_[std::make_pair(topleft + 4, topleft)]] +=
           obj_factor * (-weight_cos_included_angle_) *
-          ((q5 * q12) / (2 * q1 * sqrt_q1 * sqrt_q2) -
-           1 / (sqrt_q1 * sqrt_q2) +
-           (q8 * q13) / (2 * sqrt_q1 * q2 * sqrt_q2) -
-           (q5 * q8 * q4) / (4 * q1 * sqrt_q1 * q2 * sqrt_q2));
+          ((q5 * q12) / (2 * q1_sqrt_q1q2) - 1 / sqrt_q1q2 +
+           (q8 * q13) / (2 * sqrt_q1_q2_sqrt_q2) -
+           (q5 * q8 * q4) / (4 * q1_sqrt_q1_q2_sqrt_q2));
       values[idx_map_[std::make_pair(topleft + 5, topleft)]] +=
           obj_factor * (-weight_cos_included_angle_) *
-          ((q5 * q14) / (2 * q1 * sqrt_q1 * sqrt_q2) +
-           (q9 * q13) / (2 * sqrt_q1 * q2 * sqrt_q2) -
-           (q5 * q9 * q4) / (4 * q1 * sqrt_q1 * q2 * sqrt_q2));
+          ((q5 * q14) / (2 * q1_sqrt_q1q2) +
+           (q9 * q13) / (2 * sqrt_q1_q2_sqrt_q2) -
+           (q5 * q9 * q4) / (4 * q1_sqrt_q1_q2_sqrt_q2));
 
       values[idx_map_[std::make_pair(topleft + 1, topleft + 1)]] +=
           obj_factor * (-weight_cos_included_angle_) *
-          ((3 * q6 * q6 * q4) / (4 * q1 * q1 * sqrt_q1 * sqrt_q2) -
-           q4 / (q1 * sqrt_q1 * sqrt_q2) -
-           (q6 * q11) / (q1 * sqrt_q1 * sqrt_q2));
+          ((3 * q6 * q6 * q4) / (4 * square_q1 * sqrt_q1q2) -
+           q4 / q1_sqrt_q1q2 - (q6 * q11) / q1_sqrt_q1q2);
       values[idx_map_[std::make_pair(topleft + 2, topleft + 1)]] +=
           obj_factor * (-weight_cos_included_angle_) *
-          ((q5 * q11) / (2 * q1 * sqrt_q1 * sqrt_q2) -
-           (q6 * q7) / (2 * q1 * sqrt_q1 * sqrt_q2) -
-           (q8 * q11) / (2 * sqrt_q1 * q2 * sqrt_q2) -
-           (3 * q5 * q6 * q4) / (4 * q1 * q1 * sqrt_q1 * sqrt_q2) +
-           (q8 * q6 * q4) / (4 * q1 * sqrt_q1 * q2 * sqrt_q2));
+          ((q5 * q11) / (2 * q1_sqrt_q1q2) - (q6 * q7) / (2 * q1_sqrt_q1q2) -
+           (q8 * q11) / (2 * sqrt_q1_q2_sqrt_q2) -
+           (3 * q5 * q6 * q4) / (4 * square_q1 * sqrt_q1q2) +
+           (q8 * q6 * q4) / (4 * q1_sqrt_q1_q2_sqrt_q2));
       values[idx_map_[std::make_pair(topleft + 3, topleft + 1)]] +=
           obj_factor * (-weight_cos_included_angle_) *
-          (1 / (sqrt_q1 * sqrt_q2) +
-           q4 / (q1 * sqrt_q1 * sqrt_q2) -
-           (q6 * q10) / (2 * q1 * sqrt_q1 * sqrt_q2) -
-           (3 * q6 * q6 * q4) / (4 * q1 * q1 * sqrt_q1 * sqrt_q2) +
-           (q6 * q11) / (2 * q1 * sqrt_q1 * sqrt_q2) -
-           (q9 * q11) / (2 * sqrt_q1 * q2 * sqrt_q2) +
-           (q6 * q9 * q4) / (4 * q1 * sqrt_q1 * q2 * sqrt_q2));
+          (1 / sqrt_q1q2 + q4 / q1_sqrt_q1q2 - (q6 * q10) / (2 * q1_sqrt_q1q2) -
+           (3 * q6 * q6 * q4) / (4 * square_q1 * sqrt_q1q2) +
+           (q6 * q11) / (2 * q1_sqrt_q1q2) -
+           (q9 * q11) / (2 * sqrt_q1_q2_sqrt_q2) +
+           (q6 * q9 * q4) / (4 * q1_sqrt_q1_q2_sqrt_q2));
       values[idx_map_[std::make_pair(topleft + 4, topleft + 1)]] +=
           obj_factor * (-weight_cos_included_angle_) *
-          ((q6 * q12) / (2 * q1 * sqrt_q1 * sqrt_q2) +
-           (q8 * q11) / (2 * sqrt_q1 * q2 * sqrt_q2) -
-           (q8 * q6 * q4) / (4 * q1 * sqrt_q1 * q2 * sqrt_q2));
+          ((q6 * q12) / (2 * q1_sqrt_q1q2) +
+           (q8 * q11) / (2 * sqrt_q1_q2_sqrt_q2) -
+           (q8 * q6 * q4) / (4 * q1_sqrt_q1_q2_sqrt_q2));
       values[idx_map_[std::make_pair(topleft + 5, topleft + 1)]] +=
           obj_factor * (-weight_cos_included_angle_) *
-          ((q6 * q14) / (2 * q1 * sqrt_q1 * sqrt_q2) -
-           1 / (sqrt_q1 * sqrt_q2) +
-           (q9 * q11) / (2 * sqrt_q1 * q2 * sqrt_q2) -
-           (q6 * q9 * q4) / (4 * q1 * sqrt_q1 * q2 * sqrt_q2));
+          ((q6 * q14) / (2 * q1_sqrt_q1q2) - 1 / sqrt_q1q2 +
+           (q9 * q11) / (2 * sqrt_q1_q2_sqrt_q2) -
+           (q6 * q9 * q4) / (4 * q1_sqrt_q1_q2_sqrt_q2));
 
       values[idx_map_[std::make_pair(topleft + 2, topleft + 2)]] +=
           obj_factor * (-weight_cos_included_angle_) *
-          ((q5 * q7) / (q1 * sqrt_q1 * sqrt_q2) -
-           q4 / (sqrt_q1 * q2 * sqrt_q2) -
-           q4 / (q1 * sqrt_q1 * sqrt_q2) -
-           2 / (sqrt_q1 * sqrt_q2) -
-           (q8 * q7) / (sqrt_q1 * q2 * sqrt_q2) +
-           q3 / (4 * q1 * q1 * sqrt_q1 * sqrt_q2) +
-           (3 * q8 * q8 * q4) / (4 * sqrt_q1 * q2 * q2 * sqrt_q2) -
-           (q5 * q8 * q4) / (2 * q1 * sqrt_q1 * q2 * sqrt_q2));
+          ((q5 * q7) / q1_sqrt_q1q2 -
+           q4 / (sqrt_q1_q2_sqrt_q2)-q4 / q1_sqrt_q1q2 - 2 / sqrt_q1q2 -
+           (q8 * q7) / (sqrt_q1_q2_sqrt_q2) + q3 / (4 * square_q1 * sqrt_q1q2) +
+           (3 * q8 * q8 * q4) / (4 * sqrt_q1 * square_q2 * sqrt_q2) -
+           (q5 * q8 * q4) / (2 * q1_sqrt_q1_q2_sqrt_q2));
       values[idx_map_[std::make_pair(topleft + 3, topleft + 2)]] +=
           obj_factor * (-weight_cos_included_angle_) *
-          ((q6 * q7) / (2 * q1 * sqrt_q1 * sqrt_q2) -
-           (q9 * q7) / (2 * sqrt_q1 * q2 * sqrt_q2) +
-           (q5 * q10) / (2 * q1 * sqrt_q1 * sqrt_q2) -
-           (q8 * q10) / (2 * sqrt_q1 * q2 * sqrt_q2) +
-           (3 * q5 * q6 * q4) / (4 * q1 * q1 * sqrt_q1 * sqrt_q2) -
-           (q5 * q9 * q4) / (4 * q1 * sqrt_q1 * q2 * sqrt_q2) -
-           (q8 * q6 * q4) / (4 * q1 * sqrt_q1 * q2 * sqrt_q2) +
-           (3 * q8 * q9 * q4) / (4 * sqrt_q1 * q2 * q2 * sqrt_q2));
+          ((q6 * q7) / (2 * q1_sqrt_q1q2) -
+           (q9 * q7) / (2 * sqrt_q1_q2_sqrt_q2) +
+           (q5 * q10) / (2 * q1_sqrt_q1q2) -
+           (q8 * q10) / (2 * sqrt_q1_q2_sqrt_q2) +
+           (3 * q5 * q6 * q4) / (4 * square_q1 * sqrt_q1q2) -
+           (q5 * q9 * q4) / (4 * q1_sqrt_q1_q2_sqrt_q2) -
+           (q8 * q6 * q4) / (4 * q1_sqrt_q1_q2_sqrt_q2) +
+           (3 * q8 * q9 * q4) / (4 * sqrt_q1 * square_q2 * sqrt_q2));
       values[idx_map_[std::make_pair(topleft + 4, topleft + 2)]] +=
           obj_factor * (-weight_cos_included_angle_) *
-          (1 / (sqrt_q1 * sqrt_q2) +
-           q4 / (sqrt_q1 * q2 * sqrt_q2) +
-           (q8 * q7) / (2 * sqrt_q1 * q2 * sqrt_q2) -
-           (3 * q8 * q8 * q4) / (4 * sqrt_q1 * q2 * q2 * sqrt_q2) -
-           (q5 * q12) / (2 * q1 * sqrt_q1 * sqrt_q2) +
-           (q8 * q12) / (2 * sqrt_q1 * q2 * sqrt_q2) +
-           (q5 * q8 * q4) / (4 * q1 * sqrt_q1 * q2 * sqrt_q2));
+          (1 / sqrt_q1q2 + q4 / (sqrt_q1_q2_sqrt_q2) +
+           (q8 * q7) / (2 * sqrt_q1_q2_sqrt_q2) -
+           (3 * q8 * q8 * q4) / (4 * sqrt_q1 * square_q2 * sqrt_q2) -
+           (q5 * q12) / (2 * q1_sqrt_q1q2) +
+           (q8 * q12) / (2 * sqrt_q1_q2_sqrt_q2) +
+           (q5 * q8 * q4) / (4 * q1_sqrt_q1_q2_sqrt_q2));
       values[idx_map_[std::make_pair(topleft + 5, topleft + 2)]] +=
           obj_factor * (-weight_cos_included_angle_) *
-          ((q9 * q7) / (2 * sqrt_q1 * q2 * sqrt_q2) -
-           (q5 * q14) / (2 * q1 * sqrt_q1 * sqrt_q2) +
-           (q8 * q14) / (2 * sqrt_q1 * q2 * sqrt_q2) +
-           (q5 * q9 * q4) / (4 * q1 * sqrt_q1 * q2 * sqrt_q2) -
-           (3 * q8 * q9 * q4) / (4 * sqrt_q1 * q2 * q2 * sqrt_q2));
+          ((q9 * q7) / (2 * sqrt_q1_q2_sqrt_q2) -
+           (q5 * q14) / (2 * q1_sqrt_q1q2) +
+           (q8 * q14) / (2 * sqrt_q1_q2_sqrt_q2) +
+           (q5 * q9 * q4) / (4 * q1_sqrt_q1_q2_sqrt_q2) -
+           (3 * q8 * q9 * q4) / (4 * sqrt_q1 * square_q2 * sqrt_q2));
 
       values[idx_map_[std::make_pair(topleft + 3, topleft + 3)]] +=
           obj_factor * (-weight_cos_included_angle_) *
-          ((q6 * q10) / (q1 * sqrt_q1 * sqrt_q2) -
-           q4 / (sqrt_q1 * q2 * sqrt_q2) -
-           q4 / (q1 * sqrt_q1 * sqrt_q2) -
-           2 / (sqrt_q1 * sqrt_q2) -
-           (q9 * q10) / (sqrt_q1 * q2 * sqrt_q2) +
-           (3 * q6 * q6 * q4) / (4 * q1 * q1 * sqrt_q1 * sqrt_q2) +
-           (3 * q9 * q9 * q4) / (4 * sqrt_q1 * q2 * q2 * sqrt_q2) -
-           (q6 * q9 * q4) / (2 * q1 * sqrt_q1 * q2 * sqrt_q2));
+          ((q6 * q10) / q1_sqrt_q1q2 -
+           q4 / (sqrt_q1_q2_sqrt_q2)-q4 / q1_sqrt_q1q2 - 2 / sqrt_q1q2 -
+           (q9 * q10) / (sqrt_q1_q2_sqrt_q2) +
+           (3 * q6 * q6 * q4) / (4 * square_q1 * sqrt_q1q2) +
+           (3 * q9 * q9 * q4) / (4 * sqrt_q1 * square_q2 * sqrt_q2) -
+           (q6 * q9 * q4) / (2 * q1_sqrt_q1_q2_sqrt_q2));
       values[idx_map_[std::make_pair(topleft + 4, topleft + 3)]] +=
           obj_factor * (-weight_cos_included_angle_) *
-          ((q8 * q10) / (2 * sqrt_q1 * q2 * sqrt_q2) -
-           (q6 * q12) / (2 * q1 * sqrt_q1 * sqrt_q2) +
-           (q9 * q12) / (2 * sqrt_q1 * q2 * sqrt_q2) +
-           (q8 * q6 * q4) / (4 * q1 * sqrt_q1 * q2 * sqrt_q2) -
-           (3 * q8 * q9 * q4) / (4 * sqrt_q1 * q2 * q2 * sqrt_q2));
+          ((q8 * q10) / (2 * sqrt_q1_q2_sqrt_q2) -
+           (q6 * q12) / (2 * q1_sqrt_q1q2) +
+           (q9 * q12) / (2 * sqrt_q1_q2_sqrt_q2) +
+           (q8 * q6 * q4) / (4 * q1_sqrt_q1_q2_sqrt_q2) -
+           (3 * q8 * q9 * q4) / (4 * sqrt_q1 * square_q2 * sqrt_q2));
       values[idx_map_[std::make_pair(topleft + 5, topleft + 3)]] +=
           obj_factor * (-weight_cos_included_angle_) *
-          (1 / (sqrt_q1 * sqrt_q2) +
-           q4 / (sqrt_q1 * q2 * sqrt_q2) +
-           (q9 * q10) / (2 * sqrt_q1 * q2 * sqrt_q2) -
-           (3 * q9 * q9 * q4) / (4 * sqrt_q1 * q2 * q2 * sqrt_q2) -
-           (q6 * q14) / (2 * q1 * sqrt_q1 * sqrt_q2) +
-           (q9 * q14) / (2 * sqrt_q1 * q2 * sqrt_q2) +
-           (q6 * q9 * q4) / (4 * q1 * sqrt_q1 * q2 * sqrt_q2));
+          (1 / sqrt_q1q2 + q4 / (sqrt_q1_q2_sqrt_q2) +
+           (q9 * q10) / (2 * sqrt_q1_q2_sqrt_q2) -
+           (3 * q9 * q9 * q4) / (4 * sqrt_q1 * square_q2 * sqrt_q2) -
+           (q6 * q14) / (2 * q1_sqrt_q1q2) +
+           (q9 * q14) / (2 * sqrt_q1_q2_sqrt_q2) +
+           (q6 * q9 * q4) / (4 * q1_sqrt_q1_q2_sqrt_q2));
 
       values[idx_map_[std::make_pair(topleft + 4, topleft + 4)]] +=
           obj_factor * (-weight_cos_included_angle_) *
-          ((3 * q8 * q8 * q4) / (4 * sqrt_q1 * q2 * q2 * sqrt_q2) -
-           q4 / (sqrt_q1 * q2 * sqrt_q2) -
-           (q8 * q12) / (sqrt_q1 * q2 * sqrt_q2));
+          ((3 * q8 * q8 * q4) / (4 * sqrt_q1 * square_q2 * sqrt_q2) -
+           q4 / (sqrt_q1_q2_sqrt_q2) - (q8 * q12) / (sqrt_q1_q2_sqrt_q2));
       values[idx_map_[std::make_pair(topleft + 5, topleft + 4)]] +=
           obj_factor * (-weight_cos_included_angle_) *
-          ((3 * q8 * q9 * q4) / (4 * sqrt_q1 * q2 * q2 * sqrt_q2) -
-           (q9 * q12) / (2 * sqrt_q1 * q2 * sqrt_q2) -
-           (q8 * q14) / (2 * sqrt_q1 * q2 * sqrt_q2));
+          ((3 * q8 * q9 * q4) / (4 * sqrt_q1 * square_q2 * sqrt_q2) -
+           (q9 * q12) / (2 * sqrt_q1_q2_sqrt_q2) -
+           (q8 * q14) / (2 * sqrt_q1_q2_sqrt_q2));
 
       values[idx_map_[std::make_pair(topleft + 5, topleft + 5)]] +=
           obj_factor * (-weight_cos_included_angle_) *
-          ((3 * q9 * q9 * q4) / (4 * sqrt_q1 * q2 * q2 * sqrt_q2) -
-           q4 / (sqrt_q1 * q2 * sqrt_q2) -
-           (q9 * q14) / (sqrt_q1 * q2 * sqrt_q2));
+          ((3 * q9 * q9 * q4) / (4 * sqrt_q1 * square_q2 * sqrt_q2) -
+           q4 / (sqrt_q1_q2_sqrt_q2) - (q9 * q14) / (sqrt_q1_q2_sqrt_q2));
     }
 
     // fill the deviation part of obj
