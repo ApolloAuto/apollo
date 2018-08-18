@@ -46,7 +46,7 @@
 #include "modules/planning/reference_line/qp_spline_reference_line_smoother.h"
 #include "modules/planning/reference_line/reference_line.h"
 #include "modules/planning/reference_line/spiral_reference_line_smoother.h"
-#include "modules/planning/reference_line/cosTheta_reference_line_smoother.h"
+#include "modules/planning/reference_line/cos_theta_reference_line_smoother.h"
 
 /**
  * @namespace apollo::planning

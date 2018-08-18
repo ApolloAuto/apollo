@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/planning/reference_line/cosTheta_reference_line_smoother.h"
+#include "modules/planning/reference_line/cos_theta_reference_line_smoother.h"
 
 #include <algorithm>
 #include <iomanip>
@@ -27,7 +27,7 @@
 #include "modules/common/log.h"
 #include "modules/common/time/time.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/reference_line/cosTheta_problem_interface.h"
+#include "modules/planning/reference_line/cos_theta_problem_interface.h"
 
 namespace apollo {
 namespace planning {
@@ -133,9 +133,9 @@ bool CosThetaReferenceLineSmoother::Smooth(
   }
   *smoothed_reference_line = ReferenceLine(ref_points);
   const double end_timestamp = Clock::NowInSeconds();
-  ADEBUG << "cosTheta reference line smoother time: "
+  ADEBUG << "cos_theta reference line smoother time: "
          << (end_timestamp - start_timestamp) * 1000 << " ms.";
-  AINFO << "cosTheta reference line smoother time: "
+  AINFO << "cos_theta reference line smoother time: "
         << (end_timestamp - start_timestamp) * 1000 << " ms.";
   return true;
 }
@@ -314,8 +314,7 @@ void CosThetaReferenceLineSmoother::quintic_hermite_point(
 
   double q1 = -6 * t5 + 15 * t4 - 10 * t3 + 1;
   double q2 = -3 * t5 + 8 * t4 - 6 * t3 + t;
-  double q3 = -0.5 * t5 + 1.5 * t4 - 1.5 * t3 +
-              0.5 * t2;
+  double q3 = -0.5 * t5 + 1.5 * t4 - 1.5 * t3 + 0.5 * t2;
   double q4 = 6 * t5 - 15 * t4 + 10 * t3;
   double q5 = -3 * t5 + 7 * t4 - 4 * t3;
   double q6 = 0.5 * t5 - t4 + 0.5 * t3;
