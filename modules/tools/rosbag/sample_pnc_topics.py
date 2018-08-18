@@ -70,8 +70,9 @@ class SamplePNC(object):
 
     @classmethod
     def process_bag(cls, input_bag, output_bag):
+        print("filtering: {} -> {}".format(input_bag, output_bag))
         output_dir = os.path.dirname(output_bag)
-        if not os.path.exists(output_dir):
+        if output_dir != "" and not os.path.exists(output_dir):
             os.makedirs(output_dir)
         try:
             with rosbag.Bag(input_bag, 'r') as bag_in:
@@ -80,16 +81,25 @@ class SamplePNC(object):
                         for topic, msg, t in bag_in.read_messages(
                                 topics=SamplePNC.TOPICS):
                             bag_out.write(topic, msg, t)
-                except BagIOException as bag_io_exception:
-                    print("Read file: {} with error: {}".format(
-                        input_bag, bag_io_exception))
-                finally:
-                    print("Failed to write file: {}".format(output_bag))
-        except BagIOException as bag_io_exception:
-            print("Open file: {} with error: {} ".format(
-                input_bag, bag_io_exception))
-        finally:
-            print("Failed to open file: {}".format(input_bag))
+                except rosbag.ROSBagException as e:
+                    print("Write file {} raised ROSBagException: {}".format(
+                        input_bag, e))
+                except ValueError as e:
+                    print("Write file {} raised ValueError: {}".format(
+                        input_bag, e))
+                except:
+                    print("Write file {} raised unknown exception".format(
+                        output_bag))
+        except rosbag.ROSBagException as e:
+            print("open {} raised ROSBagException: {} ".format(input_bag, e))
+        except rosbag.ROSBagFormatException as e:
+            print("open {} raised ROSBagFormatException: {}".format(
+                input_bag, e))
+        except rosbag.ROSBagUnindexedException as e:
+            print("open {} raised ROSBagUnindexedException: {} ".format(
+                input_bag, e))
+        except:
+            print("Open {} failed with unknown exception".format(input_bag))
 
 
 if __name__ == '__main__':
