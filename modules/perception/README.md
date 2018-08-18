@@ -11,7 +11,7 @@ Apollo 3.0 has following new features:
   * **Visual localization**: Camera's are currently being tested to aide and enhance localization
   * **16 beam LiDAR support**
 
-The perception module incorporates the capability of using a front camera and a front radar to recognize obstacles and fuse their individual tracks to obtain a final track list.  The obstacle sub-module detects, classifies and tracks obstacles. This sub-module also predicts obstacle motion and position information (e.g., heading and velocity). For lane line, we construct lane instances by postprocessing lane parsing pixels and calculate the lane relative location to the ego-vehicle (L0, L1, R0, R1, etc)
+The perception module incorporates the capability of using a front camera and a front radar to recognize obstacles and fuse their individual tracks to obtain a final track list. The obstacle sub-module detects, classifies and tracks obstacles. This sub-module also predicts obstacle motion and position information (e.g., heading and velocity). For lane line, we construct lane instances by postprocessing lane parsing pixels and calculate the lane relative location to the ego-vehicle (L0, L1, R0, R1, etc.).
 
 See Also:
 
@@ -34,7 +34,9 @@ The perception module inputs are:
 The perception module outputs are:
 
 * The 3D obstacle tracks with the heading, velocity and classification information (ROS topic _/apollo/perception/obstacles_)
-* The lane marker information with fitted curve parameter, spatial information(l0,r0, etc) as well as semantic information (lane type) (ROS topic _/apollo/perception/obstacles_)
+* The lane marker information with fitted curve parameter, spatial information(L0, R0, etc.) as well as semantic information (lane type) (ROS topic _/apollo/perception/obstacles_)
+
+## Setup Instructions
 
     1. Set up the general settings in the configuration file `modules/perception/conf/perception_lowcost.conf`.
     2. Run the command  `./scripts/bootstrap.sh` to launch the web GUI.
@@ -43,19 +45,18 @@ The perception module outputs are:
     5. Download the demo data from the Apollo [Open Data Platform](http://data.apollo.auto).
 
 ## Function enable/disable
-The perception framework is a directed acyclic graph (DAG). There are three components in DAG configuration, including sub-nodes, edges and shared data. Each function is implemented as a sub-node in DAG. The sub-nodes that share data have an edge from producer to customer.
+The perception framework is a directed acyclic graph (DAG). There are three components in the DAG configuration, including sub-nodes, edges and shared data. Each function is implemented as a sub-node in the DAG. The sub-nodes that share data have an edge from producer to customer.
 
-A typical DAG configuration for a perception module is shown in the example below.  The example DAG configuration features the following:  
+A typical DAG configuration for a perception module is shown in the example below. The example DAG configuration features the following:
 
 - Default obstacle perception that consists of "CameraProcessSubnode", "RadarProcessSubnode" and "FusionSubnode", as shown in *subnode_config*.
 - The "CameraProcessSubnode" and "RadarProcessSubnode" that receive sensor data and output obstacle data independently, i.e., the "CameraObjectData" and "RadarObjectData" in *data_config*.
 - The "FusionSubnode" that both subscribes the obstacle data and publishes the final results.
-- The "LanePostProcessSubnode" processes the lane parsing output from camera detection module and generates lane instances and attributes
+- The "LanePostProcessSubnode" processes the lane parsing output from camera detection module and generates lane instances and attributes.
 - The edge and data configuration that define the links.
 - Each function can be disabled by removing the corresponding sub-node, edge, and shared data configuration. However you must ensure that all the input and output configurations are correct.
 
-``` protobuf
-
+```protobuf
 # Nvidia Driver and CUDA are required for these 2 subnodes
 subnode_config {
     # Camera node
@@ -163,19 +164,18 @@ data_config {
         name: "RadarObjectData"
     }
 }
-
-
 ```
 
 ### Note
 1. Nvidia GPU and CUDA are required to run the perception module with Caffe. Apollo provides the CUDA and Caffe libraries in the release docker image. However, the Nvidia GPU driver is not installed in the dev docker image.
 
-2. To run the perception module with CUDA acceleration, install the exact same version of the Nvidia driver in the docker that is installed in your host machine, and then build Apollo with the GPU option (i.e., using `./apollo.sh build_gpu` or `./apollo.sh build_opt_gpu`).
+2. To run the perception module with CUDA acceleration, install the exact same version of the Nvidia driver in the docker image that is installed on your host machine, and then build Apollo with the GPU option (i.e., using `./apollo.sh build_gpu` or `./apollo.sh build_opt_gpu`).
 
     See [How to Run Perception Module on Your Local Computer](https://github.com/ApolloAuto/apollo/blob/master/docs/howto/how_to_run_perception_module_on_your_local_computer.md).
 
-3. This module contains a redistribution in binary form of a modified version of caffe(https://github.com/BVLC/caffe). 
+3. This module contains a redistribution in binary form of a modified version of [caffe](https://github.com/BVLC/caffe). 
 A copy of the caffe's original copyright statement is included below:
+
 ```
     COPYRIGHT
 
