@@ -59,7 +59,7 @@ Status Destination::ApplyRule(Frame* frame,
   ref_line.XYToSL({routing_end.pose().x(), routing_end.pose().y()}, &dest_sl);
   const auto& adc_sl = reference_line_info->AdcSlBoundary();
   const auto& dest = GetPlanningStatus()->destination();
-  if (adc_sl.end_s() > dest_sl.s() && !dest.has_passed_destination()) {
+  if (adc_sl.start_s() > dest_sl.s() && !dest.has_passed_destination()) {
     ADEBUG << "Destination at back, but we have not reached destination yet";
     return Status::OK();
   }
