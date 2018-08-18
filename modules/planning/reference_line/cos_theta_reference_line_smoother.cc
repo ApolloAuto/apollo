@@ -26,8 +26,11 @@
 
 #include "modules/common/log.h"
 #include "modules/common/time/time.h"
+#include "modules/common/util/util.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/reference_line/cos_theta_problem_interface.h"
+#include "modules/planning/math/smoothing_spline/spline_2d_solver.h"
+#include "modules/planning/reference_line/qp_spline_reference_line_smoother.h"
 
 namespace apollo {
 namespace planning {
@@ -45,13 +48,11 @@ CosThetaReferenceLineSmoother::CosThetaReferenceLineSmoother(
 
   acceptable_tol_ = config.cos_theta().acceptable_tol();
 
-  resolution_ = config.resolution();
-
   relax_ = config.cos_theta().relax();
 
-  kappa_filter_ = config.cos_theta().kappa_filter();
+  resolution_ = 10.0;
 
-  dkappa_filter_ = config.cos_theta().dkappa_filter();
+  reopt_qp_bound_ = config.cos_theta().reopt_qp_bound();
 }
 
 bool CosThetaReferenceLineSmoother::Smooth(
@@ -87,58 +88,50 @@ bool CosThetaReferenceLineSmoother::Smooth(
 
   Smooth(raw_point2d, &smoothed_point2d, anchorpoints_lateralbound);
 
-  std::vector<ReferencePoint> ref_points;
-
   for (const auto& p : smoothed_point2d) {
     double heading = p.theta();
-    double kappa = p.kappa();
-    double dkappa = p.dkappa();
-    // if (dkappa > dkappa_filter_ || dkappa < -dkappa_filter_) {
-    //   continue;
-    // }
-    // if (kappa > kappa_filter_ || kappa < -kappa_filter_) {
-    //   continue;
-    // }
-    if (dkappa > dkappa_filter_) {
-      dkappa = dkappa_filter_;
-    }
-    if (dkappa < -dkappa_filter_) {
-      dkappa = -dkappa_filter_;
-    }
-    if (kappa > kappa_filter_) {
-      kappa = kappa_filter_;
-    }
-    if (kappa < -kappa_filter_) {
-      kappa = -kappa_filter_;
-    }
+    // double kappa = p.kappa();
+    // double dkappa = p.dkappa();
+    double s = p.s();
     common::SLPoint ref_sl_point;
     if (!raw_reference_line.XYToSL({p.x(), p.y()}, &ref_sl_point)) {
       return false;
     }
     if (ref_sl_point.s() < 0 ||
         ref_sl_point.s() > raw_reference_line.Length()) {
-      continue;
+      // continue;
     }
-
-    ReferencePoint rlp = raw_reference_line.GetReferencePoint(ref_sl_point.s());
-    ref_points.emplace_back(
-        ReferencePoint(hdmap::MapPathPoint(common::math::Vec2d(p.x(), p.y()),
-                                           heading, rlp.lane_waypoints()),
-                       kappa, dkappa));
+    AnchorPoint anchor;
+    anchor.longitudinal_bound = reopt_qp_bound_;
+    anchor.lateral_bound = reopt_qp_bound_;
+    anchor.path_point = apollo::common::util::MakePathPoint(p.x(), p.y(), 0.0, heading, 0.0, 0.0, 0.0);
+    anchor.path_point.set_s(s);
+    AINFO<<anchor.path_point.s();
+    AINFO<<anchor.path_point.x();
+    AINFO<<anchor.path_point.y();
+    AINFO<<anchor.path_point.theta();
+    reOpt_anchor_points_.emplace_back(anchor);
   }
 
-  if (ref_points.size() < 2) {
-    AERROR << "Fail to generate smoothed reference line.";
-    return false;
+    AINFO<<"reOpt_anchor_points_.size "<<reOpt_anchor_points_.size();
+    CHECK(common::util::GetProtoFromFile(FLAGS_reOpt_smoother_config_filename,
+                                       &reOpt_smoother_config_))
+      << "Failed to load smoother config file "
+      << FLAGS_reOpt_smoother_config_filename;
+      reOpt_qp_smoother_.reset(new QpSplineReferenceLineSmoother(reOpt_smoother_config_));
+      reOpt_qp_smoother_->SetAnchorPoints(reOpt_anchor_points_);
+      if (!reOpt_qp_smoother_->Smooth(raw_reference_line, smoothed_reference_line)) {
+        AERROR << "Failed to reOpt smooth reference line with anchor points by cosTheta";
+        return false;
   }
-  *smoothed_reference_line = ReferenceLine(ref_points);
   const double end_timestamp = Clock::NowInSeconds();
   ADEBUG << "cos_theta reference line smoother time: "
          << (end_timestamp - start_timestamp) * 1000 << " ms.";
   AINFO << "cos_theta reference line smoother time: "
         << (end_timestamp - start_timestamp) * 1000 << " ms.";
   return true;
-}
+  }
+
 bool CosThetaReferenceLineSmoother::Smooth(
     std::vector<Eigen::Vector2d> scaled_point2d,
     std::vector<common::PathPoint>* ptr_interpolated_point2d,
@@ -197,6 +190,7 @@ bool CosThetaReferenceLineSmoother::Smooth(
   }
 
   ptop->get_optimization_results(&x, &y);
+  AINFO<<"x.size()"<<x.size();
   // load the point position and estimated derivatives at each point
   for (std::size_t i = 0; i < x.size(); ++i) {
     // reverse back to the unscaled points
@@ -258,6 +252,8 @@ bool CosThetaReferenceLineSmoother::Smooth(
                         first_interpolated_point_info);
   ptr_interpolated_point2d->emplace_back(
       to_path_point(first_interpolated_point_info));
+  double accumulated_s = 0.0;
+  ptr_interpolated_point2d->front().set_s(0.0);
 
   // as the anchor points are equally spaced, density_ is calculated only once
   density_ = std::ceil(arclength_integration(1.0, ptr_smoothed_point2d.at(0),
@@ -274,11 +270,22 @@ bool CosThetaReferenceLineSmoother::Smooth(
       quintic_hermite_point(t + j * t_increament, ptr_smoothed_point2d.at(i),
                             ptr_smoothed_point2d.at(i + 1), seg_mid_point_info);
       ptr_interpolated_point2d->emplace_back(to_path_point(seg_mid_point_info));
+      ptr_interpolated_point2d->back().set_s(arclength_integration(
+    t + j * t_increament, ptr_smoothed_point2d.at(i),
+                            ptr_smoothed_point2d.at(i + 1)) + accumulated_s);
+      AINFO<<"should have no interpolation";
     }
     double seg_end_point_info[8] = {};
     quintic_hermite_point(1.0, ptr_smoothed_point2d.at(i),
                           ptr_smoothed_point2d.at(i + 1), seg_end_point_info);
     ptr_interpolated_point2d->emplace_back(to_path_point(seg_end_point_info));
+    double end_segment_s = arclength_integration(
+    1.0, ptr_smoothed_point2d.at(i),
+                            ptr_smoothed_point2d.at(i + 1))+ accumulated_s;
+    ptr_interpolated_point2d->back().set_s(end_segment_s);
+    accumulated_s += arclength_integration(
+    1.0, ptr_smoothed_point2d.at(i),
+                            ptr_smoothed_point2d.at(i + 1));
   }
 
   // use precise definition of kappa on a parametric curve

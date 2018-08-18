@@ -65,7 +65,13 @@ class CosThetaReferenceLineSmoother : public ReferenceLineSmoother {
   double arclength_integration(const double t, common::PathPoint front_point,
                                common::PathPoint back_point);
 
+  std::unique_ptr<ReferenceLineSmoother> reOpt_qp_smoother_;
+
   std::vector<AnchorPoint> anchor_points_;
+
+  std::vector<AnchorPoint> reOpt_anchor_points_;
+
+  ReferenceLineSmootherConfig reOpt_smoother_config_;
 
   double max_point_deviation_ = 0.1;
 
@@ -87,19 +93,17 @@ class CosThetaReferenceLineSmoother : public ReferenceLineSmoother {
 
   double acceptable_tol_ = 1e-5;
 
-  double resolution_ = 0.0;
-
   double relax_ = 0.2;
 
-  double kappa_filter_ = 1.0e9;
-
-  double dkappa_filter_ = 1.0e9;
+  double resolution_ = 10.0;
 
   std::size_t density_ = 0;
 
   double zero_x_ = 0.0;
 
   double zero_y_ = 0.0;
+
+  double reopt_qp_bound_ = 0.0;
 };
 
 }  // namespace planning
