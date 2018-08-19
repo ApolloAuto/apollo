@@ -17,8 +17,8 @@
 #include "modules/perception/obstacle/onboard/ultrasonic_obstacle_subnode.h"
 
 #include <cmath>
-#include <utility>
 #include <unordered_map>
+#include <utility>
 
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/configs/vehicle_config_helper.h"
@@ -36,9 +36,9 @@ using apollo::common::VehicleStateProvider;
 
 bool UltrasonicObstacleSubnode::InitInternal() {
   if (!InitAlgorithmPlugin()) {
-        AERROR << "Failed to init algorithm plugin.";
-        return false;
-    }
+    AERROR << "Failed to init algorithm plugin.";
+    return false;
+  }
   // parse reserve fileds
   std::unordered_map<std::string, std::string> reserve_field_map;
   if (!SubnodeHelper::ParseReserveField(reserve_, &reserve_field_map)) {
@@ -53,8 +53,8 @@ bool UltrasonicObstacleSubnode::InitInternal() {
   device_id_ = reserve_field_map["device_id"];
 
   CHECK(AdapterManager::GetChassis()) << "Failed to get Ultrasonic adapter";
-  AdapterManager::AddChassisCallback(
-      &UltrasonicObstacleSubnode::OnUltrasonic, this);
+  AdapterManager::AddChassisCallback(&UltrasonicObstacleSubnode::OnUltrasonic,
+                                     this);
 
   ADEBUG << "Succeed to finish ultrasonic detector initialization!";
 
@@ -84,20 +84,18 @@ void UltrasonicObstacleSubnode::OnUltrasonic(
 }
 
 bool UltrasonicObstacleSubnode::InitAlgorithmPlugin() {
-    /// init share data
-    CHECK(shared_data_manager_ != nullptr);
-    // init preprocess_data
-    const std::string processing_data_name("UltrasonicObjectData");
-    processing_data_ = dynamic_cast<UltrasonicObjectData*>(
-        shared_data_manager_->GetSharedData(processing_data_name));
-    if (processing_data_ == nullptr) {
-      AERROR << "Failed to get shared data instance "
-             << processing_data_name;
-      return false;
-    }
-    ADEBUG << "Init shared data successfully, data: "
-           << processing_data_->name();
-    return true;
+  /// init share data
+  CHECK(shared_data_manager_ != nullptr);
+  // init preprocess_data
+  const std::string processing_data_name("UltrasonicObjectData");
+  processing_data_ = dynamic_cast<UltrasonicObjectData*>(
+      shared_data_manager_->GetSharedData(processing_data_name));
+  if (processing_data_ == nullptr) {
+    AERROR << "Failed to get shared data instance " << processing_data_name;
+    return false;
+  }
+  ADEBUG << "Init shared data successfully, data: " << processing_data_->name();
+  return true;
 }
 
 bool UltrasonicObstacleSubnode::PublishDataAndEvent(
@@ -124,8 +122,7 @@ bool UltrasonicObstacleSubnode::PublishDataAndEvent(
 }
 
 void UltrasonicObstacleSubnode::BuildSingleObject(
-    const apollo::canbus::Sonar& sonar,
-    std::shared_ptr<Object> object_ptr) {
+    const apollo::canbus::Sonar& sonar, std::shared_ptr<Object> object_ptr) {
   object_ptr->track_id = 0;
   object_ptr->type = ObjectType::UNKNOWN;
   object_ptr->velocity = {0.0, 0.0, 0.0};
@@ -137,13 +134,13 @@ void UltrasonicObstacleSubnode::BuildSingleObject(
   double sonar_y = vehicle_y + sonar.translation().y();
   double sonar_z = vehicle_z + sonar.translation().z();
   double sonar_relative_heading = apollo::common::math::QuaternionToHeading(
-      sonar.rotation().qw(), sonar.rotation().qx(),
-      sonar.rotation().qy(), sonar.rotation().qz());
+      sonar.rotation().qw(), sonar.rotation().qx(), sonar.rotation().qy(),
+      sonar.rotation().qz());
   double sonar_heading = vehicle_heading + sonar_relative_heading;
   double sonar_obs_x = sonar_x + sonar.range() * std::cos(sonar_heading);
   double sonar_obs_y = sonar_y + sonar.range() * std::cos(sonar_heading);
   double half_width = 0.2;  // TODO(kechxu) refactor
-  double length = 0.2;  // TODO(kechxu) refactor
+  double length = 0.2;      // TODO(kechxu) refactor
   double alpha = sonar_heading - M_PI / 2.0;
   std::vector<std::pair<double, double>> vertices;
   double near_left_x = sonar_obs_x - half_width * half_width * std::cos(alpha);
@@ -152,12 +149,10 @@ void UltrasonicObstacleSubnode::BuildSingleObject(
   double near_right_y = sonar_obs_y + half_width * half_width * std::sin(alpha);
   vertices.emplace_back(near_left_x, near_left_y);
   vertices.emplace_back(near_right_x, near_right_y);
-  vertices.emplace_back(
-      near_right_x + length * std::cos(sonar_heading),
-      near_right_y + length * std::sin(sonar_heading));
-  vertices.emplace_back(
-      near_left_x + length * std::cos(sonar_heading),
-      near_left_y + length * std::sin(sonar_heading));
+  vertices.emplace_back(near_right_x + length * std::cos(sonar_heading),
+                        near_right_y + length * std::sin(sonar_heading));
+  vertices.emplace_back(near_left_x + length * std::cos(sonar_heading),
+                        near_left_y + length * std::sin(sonar_heading));
 
   auto& polygon = object_ptr->polygon;
   polygon.resize(vertices.size());
@@ -168,8 +163,8 @@ void UltrasonicObstacleSubnode::BuildSingleObject(
   }
   CHECK_GT(polygon.points.size(), 0);
   object_ptr->theta = sonar_heading;
-  Eigen::Vector3d direction(std::cos(sonar_heading),
-                            std::sin(sonar_heading), 0.0);
+  Eigen::Vector3d direction(std::cos(sonar_heading), std::sin(sonar_heading),
+                            0.0);
   object_ptr->direction = direction;
   object_ptr->length = length;
   object_ptr->width = 2.0 * half_width;

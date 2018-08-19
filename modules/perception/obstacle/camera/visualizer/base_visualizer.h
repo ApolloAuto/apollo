@@ -62,22 +62,22 @@ namespace lowcostvisualizer {
 
 class BaseVisualizer {
  public:
-    BaseVisualizer() = default;
+  BaseVisualizer() = default;
 
-    virtual ~BaseVisualizer() = default;
+  virtual ~BaseVisualizer() = default;
 
-    virtual bool init() = 0;
+  virtual bool init() = 0;
 
-    virtual std::string name() const = 0;
+  virtual std::string name() const = 0;
 
-    virtual void update_camera_system(FrameContent *content) {}
+  virtual void update_camera_system(FrameContent *content) {}
 
-    virtual void render(FrameContent *content) = 0;
+  virtual void render(FrameContent *content) = 0;
 
-    // virtual void set_motion_buffer(MotionBuffer &motion_buffer) {}
+  // virtual void set_motion_buffer(MotionBuffer &motion_buffer) {}
 
  private:
-      DISALLOW_COPY_AND_ASSIGN(BaseVisualizer);
+  DISALLOW_COPY_AND_ASSIGN(BaseVisualizer);
 };
 
 REGISTER_REGISTERER(BaseVisualizer);

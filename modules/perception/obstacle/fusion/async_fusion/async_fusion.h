@@ -46,7 +46,8 @@ class AsyncFusion : public BaseFusion {
   // @param [out]: fused objects.
   // @return true if fuse successfully, otherwise return false
   virtual bool Fuse(const std::vector<SensorObjects> &multi_sensor_objects,
-                    std::vector<std::shared_ptr<Object>> *fused_objects);
+                    std::vector<std::shared_ptr<Object>> *fused_objects,
+                    FusionOptions *options);
 
   virtual std::string name() const;
 

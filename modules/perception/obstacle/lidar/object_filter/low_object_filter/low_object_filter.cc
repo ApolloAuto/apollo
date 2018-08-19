@@ -39,7 +39,7 @@ bool LowObjectFilter::Init() {
   }
   object_height_threshold_ = config_.object_height_threshold();
   object_position_height_threshold_ =
-                    config_.object_position_height_threshold();
+      config_.object_position_height_threshold();
   return true;
 }
 
@@ -69,8 +69,8 @@ void LowObjectFilter::FilterLowObject(
     }
 
     // object is low and flat
-    if (max_height - min_height < object_height_threshold_
-        && max_height < object_position_height_threshold_) {
+    if (max_height - min_height < object_height_threshold_ &&
+        max_height < object_position_height_threshold_) {
       continue;
     }
 

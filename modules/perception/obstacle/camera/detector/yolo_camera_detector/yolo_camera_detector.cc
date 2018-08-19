@@ -17,9 +17,9 @@
 #include "modules/perception/obstacle/camera/detector/yolo_camera_detector/yolo_camera_detector.h"
 
 #include <cmath>
+#include <ctime>
 #include <unordered_map>
 #include <utility>
-#include <ctime>
 
 #include "modules/perception/obstacle/camera/detector/common/proto/tracking_feature.pb.h"
 
@@ -307,7 +307,8 @@ bool YoloCameraDetector::init_cnn_lane(const string &yolo_root) {
 
   // init feature
   if (!cnnadapter_lane_->init(input_names, output_names, proto_file,
-            weight_file, FLAGS_obs_camera_detector_gpu, model_root)) {
+                              weight_file, FLAGS_obs_camera_detector_gpu,
+                              model_root)) {
     return false;
   }
 
@@ -388,11 +389,11 @@ bool YoloCameraDetector::Lanetask(const cv::Mat &frame,
 
   for (int i = 0; i < num_lanes_; ++i) {
     cv::Mat tmp(lane_output_height_lane_, lane_output_width_lane_, CV_32FC1);
-    memcpy(tmp.data, seg_blob->cpu_data() + lane_output_width_lane_ *
-          lane_output_height_lane_ * i,
-          lane_output_width_lane_ * lane_output_height_lane_ * sizeof(float));
-    cv::resize(tmp, tmp,
-               cv::Size(lane_output_width_, lane_output_height_), 0, 0);
+    memcpy(tmp.data, seg_blob->cpu_data() +
+                         lane_output_width_lane_ * lane_output_height_lane_ * i,
+           lane_output_width_lane_ * lane_output_height_lane_ * sizeof(float));
+    cv::resize(tmp, tmp, cv::Size(lane_output_width_, lane_output_height_), 0,
+               0);
     predictions->push_back(tmp);
   }
 

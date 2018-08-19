@@ -88,7 +88,7 @@ bool FusionSubnode::InitInternal() {
 
   // init motion service
   if (motion_event_id_ != -1) {
-    motion_service_ = dynamic_cast<MotionService*>(
+    motion_service_ = dynamic_cast<MotionService *>(
         DAGStreaming::GetSubnodeByName("MotionService"));
     if (motion_service_ == nullptr) {
       AWARN << "motion service not inited";
@@ -161,7 +161,6 @@ bool FusionSubnode::InitOutputStream() {
     lane_event_id_ = static_cast<EventID>(atoi((lane_iter->second).c_str()));
   }
 
-
   auto motion_iter = reserve_field_map.find("motion_event_id");
   if (motion_iter == reserve_field_map.end()) {
     AWARN << "Failed to find motion_event_id:" << reserve_;
@@ -169,7 +168,7 @@ bool FusionSubnode::InitOutputStream() {
     motion_event_id_ = -1;
   } else {
     motion_event_id_ =
-      static_cast<EventID>(atoi((motion_iter->second).c_str()));
+        static_cast<EventID>(atoi((motion_iter->second).c_str()));
   }
 
   return true;
@@ -221,7 +220,10 @@ Status FusionSubnode::Process(const EventMeta &event_meta,
   PERF_BLOCK_START();
   objects_.clear();
   double latest_fused_ts = sensor_objs.back().timestamp;
-  if (!fusion_->Fuse(sensor_objs, &objects_)) {
+
+  FusionOptions options;
+
+  if (!fusion_->Fuse(sensor_objs, &objects_, &options)) {
     AWARN << "Failed to call fusion plugin."
           << " event_meta: [" << event_meta.to_string()
           << "] event_cnt:" << events.size() << " event_0: ["
@@ -236,6 +238,7 @@ Status FusionSubnode::Process(const EventMeta &event_meta,
   } else if (event_meta.event_id == camera_event_id_) {
     for (auto &obj : sensor_objs) {
       if (obj.sensor_type == SensorType::CAMERA) {
+        AINFO << "camera object size is " << obj.objects.size();
         AINFO << "fusion received image : " << GLOG_TIMESTAMP(obj.timestamp)
               << " at time: " << GLOG_TIMESTAMP(TimeUtil::GetCurrentTime());
         break;
@@ -247,6 +250,8 @@ Status FusionSubnode::Process(const EventMeta &event_meta,
       motion_buffer_ = motion_service_->GetMotionBuffer();
     }
   }
+
+  AINFO << "number of objects after fuse is " << objects_.size();
 
   // Process CIPV
   if (motion_service_ != nullptr) {
@@ -278,7 +283,7 @@ Status FusionSubnode::Process(const EventMeta &event_meta,
     apollo::common::time::Timer timer;
     timer.Start();
     // Get Drop points
-  //  motion_buffer_ = motion_service_->GetMotionBuffer();
+    //  motion_buffer_ = motion_service_->GetMotionBuffer();
     if (motion_buffer_.size() > 0) {
       cipv_.CollectDrops(motion_buffer_, &objects_);
     } else {
@@ -296,12 +301,25 @@ Status FusionSubnode::Process(const EventMeta &event_meta,
            << "AVE (" << tot_processing_time_ / seq_num_ << " ms).";
   }
 
-  if (objects_.size() > 0 && FLAGS_publish_fusion_event) {
+  if (FLAGS_publish_fusion_event && options.fused) {
     SharedDataPtr<FusionItem> fusion_item_ptr(new FusionItem);
-    fusion_item_ptr->timestamp = objects_[0]->latest_tracked_time;
+
+    if (objects_.size() > 0) {
+      fusion_item_ptr->timestamp = objects_[0]->latest_tracked_time;
+    } else {
+      fusion_item_ptr->timestamp = latest_fused_ts;
+    }
+
     fusion_item_ptr->fused_sensor_ts = latest_fused_ts;
     const std::string &device_id = events[0].reserve;
     fusion_item_ptr->fused_sensor_device_id = device_id;
+
+    for (int i = 0; i < options.fused_frame_ts.size(); ++i) {
+      fusion_item_ptr->frame_ts.push_back(options.fused_frame_ts[i]);
+      fusion_item_ptr->frame_device_id.push_back(
+          options.fused_frame_device_id[i]);
+    }
+
     for (auto obj : objects_) {
       std::shared_ptr<Object> objclone(new Object());
       if (obj->b_cipv) {
@@ -313,7 +331,7 @@ Status FusionSubnode::Process(const EventMeta &event_meta,
     AINFO << "publishing event for timestamp deviceid and size of fusion object"
           << fusion_item_ptr->timestamp << " " << device_id << " "
           << fusion_item_ptr->obstacles.size();
-    PublishDataAndEvent(fusion_item_ptr->timestamp, device_id, fusion_item_ptr);
+    PublishDataAndEvent(latest_fused_ts, device_id, fusion_item_ptr);
   }
 
   error_code_ = common::OK;

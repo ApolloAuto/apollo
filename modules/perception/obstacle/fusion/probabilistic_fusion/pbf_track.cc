@@ -17,18 +17,20 @@
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_track.h"
 
 #include <algorithm>
-
+#include <vector>
 #include "boost/format.hpp"
 #include "modules/common/configs/config_gflags.h"
 #include "modules/common/macro.h"
 #include "modules/common/time/time.h"
 #include "modules/perception/common/geometry_util.h"
 #include "modules/perception/common/perception_gflags.h"
+#include "modules/perception/lib/config_manager/calibration_config_manager.h"
 #include "modules/perception/obstacle/base/types.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_base_track_object_matcher.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_imf_fusion.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_kalman_motion_fusion.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_sensor_manager.h"
+#include "modules/perception/onboard/transform_input.h"
 #include "ros/include/ros/ros.h"
 
 namespace apollo {
@@ -51,7 +53,18 @@ using apollo::common::time::TimeUtil;
 PbfTrack::MotionFusionMethod PbfTrack::s_motion_fusion_method_ =
     PbfTrack::MotionFusionMethod::PBF_KALMAN;
 
-PbfTrack::PbfTrack(std::shared_ptr<PbfSensorObject> obj) {
+// bba manager ptr
+const BBAManager *PbfTrack::_s_classify_manager_ptr =
+    &BBAManager::instance("classify");
+
+std::map<SensorType, double> PbfTrack::_s_sensor_factors = {{VELODYNE_64, 0.5},
+                                                            {CAMERA, 0.95}};
+
+std::map<SensorType, double> PbfTrack::_s_sensor_factors_for_unknown = {
+    {VELODYNE_64, 0.5}, {CAMERA, 0.95}};
+
+PbfTrack::PbfTrack(std::shared_ptr<PbfSensorObject> obj)
+    : _fused_bba(_s_classify_manager_ptr) {
   idx_ = GetNextTrackId();
   if (s_motion_fusion_method_ == MotionFusionMethod::PBF_KALMAN) {
     motion_fusion_.reset(new PbfKalmanMotionFusion());
@@ -85,6 +98,9 @@ PbfTrack::PbfTrack(std::shared_ptr<PbfSensorObject> obj) {
   fused_timestamp_ = obj->timestamp;
   fused_object_.reset(new PbfSensorObject());
   fused_object_->clone(*obj);
+
+  PerformClassFusion(obj);
+
   age_ = 0;
   invisible_period_ = 0;
   tracking_period_ = 0.0;
@@ -107,6 +123,8 @@ void PbfTrack::UpdateWithSensorObject(std::shared_ptr<PbfSensorObject> obj,
                                       double match_dist) {
   const SensorType &sensor_type = obj->sensor_type;
   const std::string sensor_id = obj->sensor_id;
+  ADEBUG << "update with sensor object with track id " << GetTrackId()
+        << " type " << GetObjectName(obj->object->type);
   if (FLAGS_async_fusion) {
     PerformMotionFusionAsync(obj);
     std::cerr << "PBFIMF:track id is: " << GetTrackId() << std::endl;
@@ -125,6 +143,10 @@ void PbfTrack::UpdateWithSensorObject(std::shared_ptr<PbfSensorObject> obj,
     invisible_in_camera_ = false;
   }
 
+  if (!FLAGS_use_navigation_mode) {
+    PerformClassFusion(obj);
+  }
+
   double timestamp = obj->timestamp;
   UpdateMeasurementsLifeWithMeasurement(&lidar_objects_, sensor_id, timestamp,
                                         s_max_lidar_invisible_period_);
@@ -139,14 +161,60 @@ void PbfTrack::UpdateWithSensorObject(std::shared_ptr<PbfSensorObject> obj,
   fused_object_->timestamp = obj->timestamp;
 }
 
+bool PbfTrack::IsInCameraView(const Eigen::Vector3d &center, double timestamp) {
+  // read transformation matrix from calibration config manager
+  CalibrationConfigManager *calibration_config_manager =
+      Singleton<CalibrationConfigManager>::get();
+
+  const CameraCalibrationPtr camera_calibration =
+      calibration_config_manager->get_camera_calibration();
+
+  const CameraDistortPtr camera_distort =
+      camera_calibration->get_camera_model();
+  Eigen::Matrix4d camera_trans;
+
+  if (!GetCameraTrans(timestamp, &camera_trans)) {
+    AERROR << "failed to get trans at timestamp: " << timestamp;
+    return false;
+  }
+
+  Eigen::Matrix4d world_to_camera = camera_trans.inverse();
+
+  return camera_distort->is_in_view(world_to_camera, center);
+}
+
 void PbfTrack::UpdateWithoutSensorObject(const SensorType &sensor_type,
                                          const std::string &sensor_id,
                                          double min_match_dist,
                                          double timestamp) {
+  AINFO << "update with sensor object with track id " << GetTrackId()
+        << " with sensor id " << sensor_id;
+
+  const Eigen::Vector3d &center = fused_object_->object->center;
+
+  // only recalculate type if in same field of view of camera
+  if (!FLAGS_use_navigation_mode && is_camera(sensor_type) &&
+      IsInCameraView(center, timestamp) &&
+      fused_object_->object->type != VEHICLE) {
+    std::map<uint64_t, double> fp_bba_map = {
+        {DSTInitiator::OTHERS_UNMOVABLE, 0.8},
+        {DSTInitiator::OTHERS_MOVABLE, 0.2}};
+
+    BBA fp_bba(_s_classify_manager_ptr);
+    fp_bba.set_bba(fp_bba_map);
+    _fused_bba = _fused_bba + fp_bba * GetUnknownReliablityFactor(sensor_type);
+    AINFO << "camera without sensor for object id " << fused_object_->object->id
+          << "with type " << GetObjectName(fused_object_->object->type);
+    DecideObjectType();
+    AINFO << "camera without after type fusion " << fused_object_->object->id
+          << "with type " << GetObjectName(fused_object_->object->type);
+  }
+
   if (motion_fusion_ == nullptr) {
     AERROR << "Skip update becuase motion_fusion_ is nullptr.";
     return;
   }
+
   UpdateMeasurementsLifeWithoutMeasurement(
       &lidar_objects_, sensor_id, timestamp, s_max_lidar_invisible_period_,
       &invisible_in_lidar_);
@@ -225,13 +293,18 @@ void PbfTrack::PerformMotionFusionAsync(std::shared_ptr<PbfSensorObject> obj) {
         << current_time;
 
   // for low cost, we only consider radar and camera fusion for now
-  if (is_camera(sensor_type) || is_radar(sensor_type)) {
+  if (is_camera(sensor_type) || is_radar(sensor_type) ||
+      is_lidar(sensor_type)) {
     if (is_camera(sensor_type)) {
       AINFO << "camera sensor in async fusion";
     }
     if (is_radar(sensor_type)) {
       AINFO << "radar sensor in async fusion";
     }
+    if (is_lidar(sensor_type)) {
+      AINFO << "lidar sensor in async fusion";
+    }
+
     Eigen::Vector3d velocity = Eigen::Vector3d::Zero();
     motion_fusion_->setCurrentFuseTS(current_time);
     if (motion_fusion_->Initialized()) {
@@ -247,7 +320,7 @@ void PbfTrack::PerformMotionFusionAsync(std::shared_ptr<PbfSensorObject> obj) {
     fused_object_->object->velocity = velocity;
     fused_object_->object->anchor_point = anchor_point;
     fused_object_->object->center = anchor_point;
-    if (is_camera(sensor_type)) {
+    if (is_camera(sensor_type) || is_lidar(sensor_type)) {
       fused_object_->object->theta = obj->object->theta;
       fused_object_->object->direction = obj->object->direction;
     }
@@ -296,7 +369,7 @@ void PbfTrack::PerformMotionFusion(std::shared_ptr<PbfSensorObject> obj) {
       }
     }
   } else {
-    if (is_lidar(sensor_type)) {
+    if (is_lidar(sensor_type) || is_camera(sensor_type)) {
       fused_object_->clone(*obj);
       if (motion_fusion_->Initialized() &&
           (lidar_object != nullptr || radar_object != nullptr)) {
@@ -387,6 +460,8 @@ int PbfTrack::GetNextTrackId() {
 }
 
 bool PbfTrack::AbleToPublish() {
+  return true;
+
   if (FLAGS_use_navigation_mode && !camera_objects_.empty()) {
     return true;
   }
@@ -513,6 +588,98 @@ std::shared_ptr<PbfSensorObject> PbfTrack::GetSensorObject(
     AERROR << "Unsupported sensor type.";
     return nullptr;
   }
+}
+
+// @brief use dst evidence theory to do the class type fusion
+void PbfTrack::PerformClassFusion(std::shared_ptr<PbfSensorObject> obj) {
+  if (obj->object->type == VEHICLE) {
+    AINFO << "disable type fusion for vehicle type";
+    return;
+  }
+
+  AINFO << "perform class fusion type is " << GetObjectName(obj->object->type);
+  BBA sensor_obj_bba = TypeProbsToBba(obj->object->type_probs);
+  // AINFO<<"sensor obj bba information " << sensor_obj_bba.print_bba();
+  // AINFO<<"sensor reliability factor " <<
+  // GetReliabilityFactor(obj->sensor_type);
+  _fused_bba =
+      _fused_bba + sensor_obj_bba * GetReliabilityFactor(obj->sensor_type);
+  DecideObjectType();
+}
+
+void PbfTrack::DecideObjectType() {
+  const DSTInitiator &dst_initiator = DSTInitiator::instance();
+  const BBAManager &classify_manager = *_s_classify_manager_ptr;
+  const std::vector<double> &fused_bba_vec = _fused_bba.get_bba_vec();
+  auto max_iter = std::max_element(fused_bba_vec.begin(), fused_bba_vec.end());
+  size_t max_hyp_ind = max_iter - fused_bba_vec.begin();
+  uint64_t max_hyp = classify_manager.ind_to_fod_subset(max_hyp_ind);
+  if (max_hyp == DSTInitiator::OTHERS_MOVABLE) {
+    AERROR << "max hyp is UNKNOWN_MOVABLE" << _fused_bba.print_bba();
+  }
+  fused_object_->object->type =
+      static_cast<ObjectType>(dst_initiator.hyp_to_typ(max_hyp));
+  AINFO << "used object type is " << GetObjectName(fused_object_->object->type);
+}
+
+BBA PbfTrack::TypeProbsToBba(const std::vector<float> &type_probs) {
+  const auto &classify_manager = *_s_classify_manager_ptr;
+  const auto &dst_initiator = DSTInitiator::instance();
+  CHECK(classify_manager.initialized());
+  BBA res_bba(&classify_manager);
+  double type_probs_sum =
+      std::accumulate(type_probs.begin(), type_probs.end(), 0.0);
+  if (type_probs_sum < DBL_MIN) {
+    AWARN << "the sum of types probability equal 0.0";
+    return res_bba;
+  }
+  if (type_probs.size() > UNKNOWN_UNMOVABLE &&
+      type_probs[static_cast<int>(UNKNOWN_UNMOVABLE)] > 0.0f) {
+    ADEBUG << "unknonw_unmovable prob = "
+           << type_probs[static_cast<int>(UNKNOWN_UNMOVABLE)]
+          << " > 0.0f";
+  }
+  std::map<uint64_t, double> res_bba_map;
+  for (size_t i = 0; i < type_probs.size(); ++i) {
+    size_t typ = i;
+    uint64_t hyp = 0;
+    if (!dst_initiator.typ_to_hyp(typ, &hyp)) {
+      continue;
+    }
+    res_bba_map[hyp] = type_probs[typ];
+  }
+  // for support camera probs detection prob
+  // if (type_probs_sum < 1.0) {
+  //     auto find_res = res_bba_map.find(DSTInitiator::OTHERS);
+  //     if (find_res == res_bba_map.end()) {
+  //         res_bba_map[DSTInitiator::OTHERS] = 1 - type_probs_sum;
+  //     } else {
+  //         find_res->second += (1 - type_probs_sum);
+  //     }
+  // }
+  CHECK(res_bba.set_bba(res_bba_map));
+  return res_bba;
+}
+
+double PbfTrack::GetReliabilityFactor(SensorType sensor_type) {
+  auto find_res = _s_sensor_factors.find(sensor_type);
+  if (find_res == _s_sensor_factors.end()) {
+    AWARN << "the sensor type: " << sensor_type
+          << " is not supported by class fusion";
+    return 0.0;
+  }
+
+  return find_res->second;
+}
+
+double PbfTrack::GetUnknownReliablityFactor(SensorType sensor_type) {
+  auto find_res = _s_sensor_factors_for_unknown.find(sensor_type);
+  if (find_res == _s_sensor_factors_for_unknown.end()) {
+    AWARN << "the sensor type: " << sensor_type
+          << " is not supported by class fusion";
+    return 0.0;
+  }
+  return find_res->second;
 }
 
 }  // namespace perception

@@ -44,9 +44,7 @@ class PolygonScanConverter {
   typedef std::pair<double, double> Interval;
   typedef std::pair<Point, Point> Segment;
   struct Edge {
-    bool operator<(const Edge& other) const {
-      return y < other.y;
-    }
+    bool operator<(const Edge& other) const { return y < other.y; }
     bool MoveUp(const double delta_x);
 
     double max_x;

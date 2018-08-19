@@ -141,8 +141,8 @@ struct alignas(16) VehicleStatus {
   float velocity_x = 0;
   float velocity_y = 0;
   float velocity_z = 0;
-  double time_ts = 0;     // time stamp
-  double time_d = 0;      // time stamp difference in image
+  double time_ts = 0;                          // time stamp
+  double time_d = 0;                           // time stamp difference in image
   MotionType motion = MotionType::Identity();  // Motion Matrix
 };
 

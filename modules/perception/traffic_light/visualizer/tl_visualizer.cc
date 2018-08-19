@@ -178,8 +178,9 @@ void SubDebugCallback(const TrafficLightDetection &tl_result) {
   pos_y += 50;
   {
     std::string signal_txt =
-        "camera id: " + apollo::perception::traffic_light::kCameraIdToStr.at(
-                            tl_debug_msg.camera_id());
+        "camera id: " +
+        apollo::perception::traffic_light::kCameraIdToStr.at(
+            tl_debug_msg.camera_id());
     cv::putText(img, signal_txt, cv::Point(30, pos_y), cv::FONT_HERSHEY_PLAIN,
                 3.0, CV_RGB(255, 0, 0), 2);
   }

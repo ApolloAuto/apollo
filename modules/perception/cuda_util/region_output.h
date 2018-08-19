@@ -95,7 +95,7 @@ bool sort_score_pair_descend(const std::pair<float, T> &pair1,
 
 void get_max_score_index(const std::vector<float> &scores,
                          const float threshold, const int top_k,
-                         std::vector<std::pair<float, int> > *score_index_vec);
+                         std::vector<std::pair<float, int>> *score_index_vec);
 
 float get_bbox_size(const NormalizedBBox &bbox);
 

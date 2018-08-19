@@ -29,7 +29,7 @@ using std::ifstream;
 using Eigen::MatrixXf;
 using Eigen::Map;
 
-bool MatrixProjector::project(vector<float>* feature) {
+bool MatrixProjector::project(vector<float> *feature) {
   if (feature == nullptr) {
     AERROR << "feature is a null pointer.";
     return false;

@@ -115,8 +115,8 @@ apollo::common::Status CIPVSubnode::ProcEvents() {
   // cipv_options.yaw_angle =
   //     vehicle_information.yaw_rate * vehicle_information.time_diff;
   cipv_options.yaw_angle = 0.0f;  // ***** fill in the value *****
-  cipv_options.velocity = 5.0f;  // ***** fill in the value *****
-  cipv_options.yaw_rate = 0.0f;  // ***** fill in the value *****
+  cipv_options.velocity = 5.0f;   // ***** fill in the value *****
+  cipv_options.yaw_rate = 0.0f;   // ***** fill in the value *****
   AINFO << "[CIPVSubnode] velocity " << cipv_options.velocity
         << ", yaw rate: " << cipv_options.yaw_rate
         << ", yaw angle: " << cipv_options.yaw_angle;
