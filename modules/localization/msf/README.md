@@ -7,9 +7,9 @@
 
 ## Input
   * Point cloud data from LiDAR sensor (ROS topic `/apollo/sensor/velodyne64/compensator/PointCloud2`)
-  * Gnss observation and ephemeris data from Gnss sensor (ROS topic `/apollo/sensor/gnss/rtk_obs` and `/apollo/sensor/gnss/rtk_eph`)
-  * Gnss best pose from Gnss sensor (ROS topic is `/apollo/sensor/gnss/best_pose`)
-  * Imu data from IMU sensor (ROS topic `/apollo/sensor/gnss/imu`)
+  * GNSS observation and ephemeris data from GNSS sensor (ROS topic `/apollo/sensor/GNSS/rtk_obs` and `/apollo/sensor/GNSS/rtk_eph`)
+  * GNSS best pose from GNSS sensor (ROS topic is `/apollo/sensor/GNSS/best_pose`)
+  * Imu data from IMU sensor (ROS topic `/apollo/sensor/GNSS/imu`)
   * Localization map (FLAGS_map_dir + "/" + FLAGS_local_map_name)
   * Parameter config files (velodyne64_novatel_extrinsics_example.yaml, velodyne64_height.yaml, and ant_imu_leverarm.yaml, located in `modules/localization/msf/params/`)
 
@@ -21,7 +21,7 @@
 ## Modes
 
 ### MSF Localization Modes
-  We provide 4 modes for msf localization module. 3-Systems uses gnss localization result all the time, while 2-Systems only apply gnss localization result to initilize SINS alignment.
+  We provide 4 modes for msf localization module. 3-Systems uses GNSS localization result all the time, while 2-Systems only apply GNSS localization result to initilize SINS alignment.
   1. 3-Systems(BestGnss + LiDAR + SINS): gnss_mode(0), gnss_only_init(false).
   2. 3-Systems(Local-Gnss + LiDAR + SINS): gnss_mode(1), gnss_only_init(false).
   3. 2-Systems(BestGnss + LiDAR + SINS):gnss_mode(0), gnss_only_init(true).
@@ -41,9 +41,9 @@
   We provide a script (`apollo/scripts/msf_local_map_creator.sh`) to generate localization map. You need to provide a group of point cloud frames (as .pcd file), corresponding poses file, and UTM zone id. The format of the poses file is `pcd_number timestamp x y z qx qy qz qw`.
 
 ## Visualization Tool
-  We provide a simple online visulazation tool for debug multi-sensor fusion localization module. The parameter `use_visualize` in localizaiton.conf is used to enable the online visulazation tool.
+  We provide a simple online visulazation tool for debug multi-sensor fusion localization module. The parameter `use_visualize` in localizaiton.conf is used to enable the online visulization tool.
 
-  We also provide an advanced online visualization tool which can show localization map, point cloud, horizontal position and variance circle of LiDAR-localization, Gnss-localization, and fused localization results. This tool is simplely launched by `./scripts/localization_online_visualizer.sh`.
+  We also provide an advanced online visualization tool which can show localization map, point cloud, horizontal position and variance circle of LiDAR-localization, GNSS-localization, and fused localization results. This tool is simply launched by `./scripts/localization_online_visualizer.sh`.
 
 ## Check MSF Localization Status
-  We provide a simple way to check lidar localization, gnss localization and fusion localization status. There are four states {NOT_VALID, NOT_STABLE, OK, VALID} for localization status. You can simply use `rostopic echo /apollo/localization/msf_status` to check localization status. If fusion_status is VALID or OK, the output of msf localization is reliable.
+  We provide a simple way to check lidar localization, GNSS localization and fusion localization status. There are four states {NOT_VALID, NOT_STABLE, OK, VALID} for localization status. You can simply use `rostopic echo /apollo/localization/msf_status` to check localization status. If fusion_status is VALID or OK, the output of msf localization is reliable.
