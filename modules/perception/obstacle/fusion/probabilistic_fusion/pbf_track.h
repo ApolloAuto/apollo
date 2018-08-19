@@ -20,8 +20,10 @@
 #include <map>
 #include <memory>
 #include <string>
-
+#include <vector>
 #include "gtest/gtest.h"
+#include "modules/perception/obstacle/fusion/probabilistic_fusion/dst_evidence.h"
+#include "modules/perception/obstacle/fusion/probabilistic_fusion/dst_evidence_initiator.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_base_motion_fusion.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_sensor_object.h"
 
@@ -117,6 +119,14 @@ class PbfTrack {
 
   static void SetMotionFusionMethod(const std::string &motion_fusion_method);
 
+  // @brief convert type probabilities to bba
+  static BBA TypeProbsToBba(const std::vector<float> &type_probs);
+
+  // @brief get reliability factor of sensor
+  static double GetReliabilityFactor(SensorType sensor_type);
+
+  static double GetUnknownReliablityFactor(SensorType sensor_type);
+
  protected:
   /**@brief use obj's velocity to update obj's location to input timestamp*/
   void PerformMotionCompensation(std::shared_ptr<PbfSensorObject> obj,
@@ -125,6 +135,10 @@ class PbfTrack {
   void PerformMotionFusion(std::shared_ptr<PbfSensorObject> obj);
 
   void PerformMotionFusionAsync(std::shared_ptr<PbfSensorObject> obj);
+
+  void PerformClassFusion(std::shared_ptr<PbfSensorObject> obj);
+
+  void DecideObjectType();
 
   void UpdateMeasurementsLifeWithMeasurement(
       std::map<std::string, std::shared_ptr<PbfSensorObject>> *objects,
@@ -136,8 +150,15 @@ class PbfTrack {
       const std::string &sensor_id, double timestamp, double max_invisible_time,
       bool *invisible_state);
 
+  BBA *GetFusedBBA() { return &_fused_bba; }
+
+  bool IsInCameraView(const Eigen::Vector3d &pt, double ts);
+
  protected:
   std::shared_ptr<PbfSensorObject> fused_object_;
+
+  /**@brief the fused bba for type decision*/
+  BBA _fused_bba;
 
   /**@brief time stamp of the track*/
   double fused_timestamp_;
@@ -186,6 +207,14 @@ class PbfTrack {
   // publish conditions
   static bool s_publish_if_has_lidar_;
   static bool s_publish_if_has_radar_;
+
+  // bba manager ptr
+  static const BBAManager *_s_classify_manager_ptr;
+
+  /**@brief the reliability factors of different sensor types*/
+  static std::map<SensorType, double> _s_sensor_factors;
+  static std::map<SensorType, double> _s_sensor_factors_for_unknown;
+
   FRIEND_TEST(PbfTrackTest, test_pbf_track_constructor);
   FRIEND_TEST(PbfTrackTest, test_pbf_get_object);
   FRIEND_TEST(PbfTrackTest, test_pbf_update_measurements_life);

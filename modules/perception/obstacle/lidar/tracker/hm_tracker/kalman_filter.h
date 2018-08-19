@@ -115,8 +115,7 @@ class KalmanFilter : public BaseFilter {
   // @return measured velocity
   Eigen::VectorXf ComputeMeasuredVelocity(
       const std::shared_ptr<TrackedObject>& new_object,
-      const std::shared_ptr<TrackedObject>& old_object,
-      const double time_diff);
+      const std::shared_ptr<TrackedObject>& old_object, const double time_diff);
 
   // @brief compute measured anchor point velocity
   // @param[IN] new_object: new object for current updating
@@ -125,8 +124,7 @@ class KalmanFilter : public BaseFilter {
   // @return measured anchor point velocity
   Eigen::VectorXf ComputeMeasuredAnchorPointVelocity(
       const std::shared_ptr<TrackedObject>& new_object,
-      const std::shared_ptr<TrackedObject>& old_object,
-      const double time_diff);
+      const std::shared_ptr<TrackedObject>& old_object, const double time_diff);
 
   // @brief compute measured bbox center velocity
   // @param[IN] new_object: new object for current updating
@@ -135,8 +133,7 @@ class KalmanFilter : public BaseFilter {
   // @return measured bbox center velocity
   Eigen::VectorXf ComputeMeasuredBboxCenterVelocity(
       const std::shared_ptr<TrackedObject>& new_object,
-      const std::shared_ptr<TrackedObject>& old_object,
-      const double time_diff);
+      const std::shared_ptr<TrackedObject>& old_object, const double time_diff);
 
   // @brief compute measured bbox corner velocity
   // @param[IN] new_object: new object for current updating
@@ -145,8 +142,7 @@ class KalmanFilter : public BaseFilter {
   // @return measured bbox corner velocity
   Eigen::VectorXf ComputeMeasuredBboxCornerVelocity(
       const std::shared_ptr<TrackedObject>& new_object,
-      const std::shared_ptr<TrackedObject>& old_object,
-      const double time_diff);
+      const std::shared_ptr<TrackedObject>& old_object, const double time_diff);
 
   // @brief select measured velocity among candidates
   // @param[IN] candidates: candidates of measured velocity

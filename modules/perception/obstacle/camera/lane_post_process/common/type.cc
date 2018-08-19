@@ -21,7 +21,7 @@ namespace perception {
 
 void LaneObjectsToLaneMarkerProto(const LaneObjects& lane_objects,
                                   LaneMarkers* lane_markers) {
-  for (auto &lane_obj : lane_objects) {
+  for (auto& lane_obj : lane_objects) {
     if (lane_obj.spatial == SpatialLabelType::L_0) {
       lane_obj.ToLaneMarkerProto(lane_markers->mutable_left_lane_marker());
     } else if (lane_obj.spatial == SpatialLabelType::R_0) {

@@ -41,8 +41,7 @@ class TrackObjectDistance {
   // objects
   // @param[IN] direction_distance_weight: weight of direction dist
   // @return true if set successfully, otherwise return false
-  static bool SetDirectionDistanceWeight(
-      const float direction_distance_weight);
+  static bool SetDirectionDistanceWeight(const float direction_distance_weight);
 
   // @brief set weight of bbox size dist for all the track object distance
   // objects
@@ -60,8 +59,7 @@ class TrackObjectDistance {
   // objects
   // @param[IN] weight_histogram_dist: weight of histogram dist
   // @return true if set successfully, otherwise return false
-  static bool SetHistogramDistanceWeight(
-      const float histogram_distance_weight);
+  static bool SetHistogramDistanceWeight(const float histogram_distance_weight);
 
   // @brief compute distance for given track & object
   // @param[IN] track: track for <track, object> distance computing
@@ -98,24 +96,21 @@ class TrackObjectDistance {
   // @param[IN] new_object: recently detected object
   // @return bbox size distance of given <track, object>
   static float ComputeBboxSizeDistance(
-      ObjectTrackPtr track,
-      const std::shared_ptr<TrackedObject>& new_object);
+      ObjectTrackPtr track, const std::shared_ptr<TrackedObject>& new_object);
 
   // @brief compute point num distance for given track & object
   // @param[IN] track: track for <track, object> distance computing
   // @param[IN] new_object: recently detected object
   // @return point num distance of given <track, object>
   static float ComputePointNumDistance(
-      ObjectTrackPtr track,
-      const std::shared_ptr<TrackedObject>& new_object);
+      ObjectTrackPtr track, const std::shared_ptr<TrackedObject>& new_object);
 
   // @brief compute histogram distance for given track & object
   // @param[IN] track: track for <track, object> distance computing
   // @param[IN] new_object: recently detected object
   // @return histogram distance of given <track, object>
   static float ComputeHistogramDistance(
-      ObjectTrackPtr track,
-      const std::shared_ptr<TrackedObject>& new_object);
+      ObjectTrackPtr track, const std::shared_ptr<TrackedObject>& new_object);
 
  protected:
   // distance weights

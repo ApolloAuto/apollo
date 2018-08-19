@@ -652,8 +652,7 @@ bool Cipv::DetermineCipv(const LaneObjectsPtr lane_objects,
                          std::vector<std::shared_ptr<Object>> *objects) {
   if (debug_level_ >= 3) {
     AINFO << "Cipv Got SensorObjects size " << objects->size();
-    AINFO << "Cipv Got lane object size "
-          << lane_objects->size();
+    AINFO << "Cipv Got lane object size " << lane_objects->size();
   }
 
   float yaw_rate = options.yaw_rate;
@@ -670,30 +669,28 @@ bool Cipv::DetermineCipv(const LaneObjectsPtr lane_objects,
   EgoLane egolane_ground;
 
   // Get ego lanes (in both image and ground coordinate)
-  GetEgoLane(lane_objects, &egolane_image, &egolane_ground,
-             &b_left_valid, &b_right_valid);
-  ElongateEgoLane(lane_objects, b_left_valid, b_right_valid,
-                  yaw_rate, velocity, &egolane_image, &egolane_ground);
+  GetEgoLane(lane_objects, &egolane_image, &egolane_ground, &b_left_valid,
+             &b_right_valid);
+  ElongateEgoLane(lane_objects, b_left_valid, b_right_valid, yaw_rate, velocity,
+                  &egolane_image, &egolane_ground);
 
-  for (int32_t i = 0; i < static_cast<int32_t>(objects->size());
-        ++i) {
-     if (debug_level_ >= 2) {
+  for (int32_t i = 0; i < static_cast<int32_t>(objects->size()); ++i) {
+    if (debug_level_ >= 2) {
       AINFO << "objects[i]->track_id: " << (*objects)[i]->track_id;
-     }
-    if (IsObjectInTheLane((*objects)[i], egolane_image,
-                           egolane_ground) == true) {
-       if (cipv_index < 0 ||
-          (*objects)[i]->center[0] <
-              (*objects)[cipv_index]->center[0]) {
-         // cipv_index is not set or if objects[i] is closer than
-         // objects[cipv_index] in ego-x coordinate
+    }
+    if (IsObjectInTheLane((*objects)[i], egolane_image, egolane_ground) ==
+        true) {
+      if (cipv_index < 0 ||
+          (*objects)[i]->center[0] < (*objects)[cipv_index]->center[0]) {
+        // cipv_index is not set or if objects[i] is closer than
+        // objects[cipv_index] in ego-x coordinate
         // AINFO << "objects[i]->center[0]: "
         //            << objects[i]->center[0];
         // AINFO << "objects[cipv_index]->center[0]: "
         //            << objects[cipv_index]->center[0];
         cipv_index = i;
         cipv_track_id = (*objects)[i]->track_id;
-       }
+      }
 
       if (debug_level_ >= 2) {
         AINFO << "current cipv_index: " << cipv_index;
@@ -702,7 +699,7 @@ bool Cipv::DetermineCipv(const LaneObjectsPtr lane_objects,
   }
   AINFO << "old_cipv_index: " << old_cipv_index;
   if (cipv_index >= 0) {
-//  if (old_cipv_index != cipv_index && cipv_index >= 0) {
+    //  if (old_cipv_index != cipv_index && cipv_index >= 0) {
     // AINFO << "(*objects)[cipv_index]->b_cipv: "
     //             << (*objects)[cipv_index]->b_cipv;
     // AINFO << "sensor_objects.cipv_index: "
@@ -737,10 +734,9 @@ bool Cipv::DetermineCipv(const LaneObjectsPtr lane_objects,
   return true;
 }
 
-
-bool Cipv::TranformPoint(const Eigen::VectorXf& in,
-                         const MotionType& motion_matrix,
-                         Eigen::Vector3d* out) {
+bool Cipv::TranformPoint(const Eigen::VectorXf &in,
+                         const MotionType &motion_matrix,
+                         Eigen::Vector3d *out) {
   CHECK(in.rows() == motion_matrix.cols());
   Eigen::VectorXf trans_pt = motion_matrix * in;
   if (fabs(trans_pt[3]) < EPSILON) {
@@ -753,7 +749,7 @@ bool Cipv::TranformPoint(const Eigen::VectorXf& in,
 }
 
 bool Cipv::CollectDrops(const MotionBuffer &motion_buffer,
-                        std::vector<std::shared_ptr<Object>>* objects) {
+                        std::vector<std::shared_ptr<Object>> *objects) {
   int motion_size = motion_buffer.size();
   if (debug_level_ >= 2) {
     AINFO << " motion_size: " << motion_size;
@@ -785,20 +781,19 @@ bool Cipv::CollectDrops(const MotionBuffer &motion_buffer,
 
     object_id_skip_count_[cur_id] = 0;
 
-
     object_trackjectories_[cur_id].push_back(
         std::make_pair(obj->center[0], obj->center[1]));
 
     if (debug_level_ >= 2) {
-      AINFO << "object_trackjectories_[" << cur_id << " ].size(): "
-            << object_trackjectories_[cur_id].size();
+      AINFO << "object_trackjectories_[" << cur_id
+            << " ].size(): " << object_trackjectories_[cur_id].size();
     }
 
     obj->drops.clear();
     // Add drops
     for (std::size_t it = object_trackjectories_[cur_id].size() - 1, count = 0;
          it > 0; it--, count++) {
-      if (count >= DROPS_HISTORY_SIZE || count > motion_buffer.size()) {
+      if (count >= DROPS_HISTORY_SIZE || count >= motion_buffer.size()) {
         break;
       }
       Eigen::VectorXf pt =
@@ -809,8 +804,7 @@ bool Cipv::CollectDrops(const MotionBuffer &motion_buffer,
       pt[3] = 1.0f;
 
       Eigen::Vector3d transformed_pt;
-      TranformPoint(pt,
-                    motion_buffer[motion_size - count - 1].motion,
+      TranformPoint(pt, motion_buffer[motion_size - count - 1].motion,
                     &transformed_pt);
       obj->drops.push_back(transformed_pt);
     }
@@ -818,7 +812,7 @@ bool Cipv::CollectDrops(const MotionBuffer &motion_buffer,
 
   // Currently remove trajectory if they do not exist in the current frame
   // TO DO: need to wait several frames
-  for (const auto& each_object : object_trackjectories_) {
+  for (const auto &each_object : object_trackjectories_) {
     int obj_id = each_object.first;
     bool b_found_id = false;
     for (auto obj : *objects) {
@@ -830,11 +824,11 @@ bool Cipv::CollectDrops(const MotionBuffer &motion_buffer,
     }
     // If object ID was not found erase it from map
     if (b_found_id == false && object_trackjectories_[obj_id].size() > 0) {
-//      object_id_skip_count_[obj_id].second++;
+      //      object_id_skip_count_[obj_id].second++;
       object_id_skip_count_[obj_id]++;
       if (debug_level_ >= 2) {
-        AINFO << "object_id_skip_count_[" << obj_id <<" ]: "
-              << object_id_skip_count_[obj_id];
+        AINFO << "object_id_skip_count_[" << obj_id
+              << " ]: " << object_id_skip_count_[obj_id];
       }
       if (object_id_skip_count_[obj_id] >= MAX_ALLOWED_SKIP_OBJECT) {
         if (debug_level_ >= 2) {

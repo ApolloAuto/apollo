@@ -14,10 +14,10 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include <algorithm>
 #include <cmath>
 #include <utility>
 #include <vector>
-#include <algorithm>
 
 #include "Eigen/Core"
 #include "Eigen/QR"
@@ -158,7 +158,7 @@ bool IterativeFitting(std::vector<Eigen::Matrix<T, 2, 1>> *pos_vec,
     if (std::abs((*coeff)(3)) <= 5e-5)
       PolyFit(*pos_vec, order, coeff);
     else
-      PolyFit(*pos_vec, order-1, coeff);
+      PolyFit(*pos_vec, order - 1, coeff);
   }
 
   return true;

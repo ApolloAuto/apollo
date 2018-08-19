@@ -151,10 +151,9 @@ ScalarType LaneFrame::ComputeMarkerPairDistance(const Marker& ref,
 
 bool LaneFrame::Init(const vector<ConnectedComponentPtr>& input_cc,
                      const shared_ptr<NonMask>& non_mask,
-                     const LaneFrameOptions& options,
-                     const double scale,
+                     const LaneFrameOptions& options, const double scale,
                      const int start_y_pos) {
-  if (options.space_type != SpaceType::IMAGE) {
+  if (options.space_type != SpaceType::IMAGECOR) {
     AERROR << "the space type is not IMAGE.";
     return false;
   }
@@ -176,21 +175,20 @@ bool LaneFrame::Init(const vector<ConnectedComponentPtr>& input_cc,
         marker.shape_type = MarkerShapeType::LINE_SEGMENT;
         marker.space_type = opts_.space_type;
 
-        marker.pos = cc_ptr->GetVertex(edge_ptr->end_vertex_id,
-          scale, start_y_pos);
+        marker.pos =
+            cc_ptr->GetVertex(edge_ptr->end_vertex_id, scale, start_y_pos);
         marker.image_pos = marker.pos;
-        if (opts_.use_non_mask &&
-            non_mask->IsInsideMask(marker.image_pos)) {
-          ADEBUG << "the marker with end point ("
-                 << marker.image_pos.x() << ", "
-                 << marker.image_pos.y() << ") is filtered by non_mask.";
+        if (opts_.use_non_mask && non_mask->IsInsideMask(marker.image_pos)) {
+          ADEBUG << "the marker with end point (" << marker.image_pos.x()
+                 << ", " << marker.image_pos.y()
+                 << ") is filtered by non_mask.";
           continue;
         }
         marker.vis_pos = cv::Point(static_cast<int>(marker.pos.x()),
                                    static_cast<int>(marker.pos.y()));
 
-        marker.start_pos = cc_ptr->GetVertex(edge_ptr->start_vertex_id,
-          scale, start_y_pos);
+        marker.start_pos =
+            cc_ptr->GetVertex(edge_ptr->start_vertex_id, scale, start_y_pos);
         marker.image_start_pos = marker.start_pos;
         if (opts_.use_non_mask &&
             non_mask->IsInsideMask(marker.image_start_pos)) {
@@ -300,10 +298,9 @@ bool LaneFrame::Init(const vector<ConnectedComponentPtr>& input_cc,
 bool LaneFrame::Init(const vector<ConnectedComponentPtr>& input_cc,
                      const shared_ptr<NonMask>& non_mask,
                      const shared_ptr<Projector<ScalarType>>& projector,
-                     const LaneFrameOptions& options,
-                     const double scale,
+                     const LaneFrameOptions& options, const double scale,
                      const int start_y_pos) {
-  if (options.space_type != SpaceType::VEHICLE) {
+  if (options.space_type != SpaceType::VEHICLECOR) {
     AERROR << "the space type is not VEHICLE.";
     return false;
   }
@@ -324,28 +321,26 @@ bool LaneFrame::Init(const vector<ConnectedComponentPtr>& input_cc,
       int n = 0;
       for (int j = 0; j < static_cast<int>(inner_edges->size()); ++j) {
         const ConnectedComponent::Edge* edge_ptr = &(inner_edges->at(j));
-        Vector2D pos = cc_ptr->GetVertex(edge_ptr->end_vertex_id,
-          scale, start_y_pos);
-        Vector2D start_pos = cc_ptr->GetVertex(edge_ptr->start_vertex_id,
-          scale, start_y_pos);
+        Vector2D pos =
+            cc_ptr->GetVertex(edge_ptr->end_vertex_id, scale, start_y_pos);
+        Vector2D start_pos =
+            cc_ptr->GetVertex(edge_ptr->start_vertex_id, scale, start_y_pos);
 
         Marker marker;
         marker.shape_type = MarkerShapeType::LINE_SEGMENT;
         marker.space_type = opts_.space_type;
 
         if (opts_.use_non_mask && non_mask->IsInsideMask(pos)) {
-          ADEBUG << "the marker with end point ("
-                 << pos(0) << ", "
-                 << pos(1) << ") is filtered by non_mask.";
+          ADEBUG << "the marker with end point (" << pos(0) << ", " << pos(1)
+                 << ") is filtered by non_mask.";
           continue;
         }
         marker.image_pos = pos;
         if (!projector_->UvToXy(static_cast<ScalarType>(pos(0)),
                                 static_cast<ScalarType>(pos(1)),
                                 &(marker.pos))) {
-          ADEBUG << "the marker with end point ("
-                 << pos(0) << ", "
-                 << pos(1) << ") is filtered by projector.";
+          ADEBUG << "the marker with end point (" << pos(0) << ", " << pos(1)
+                 << ") is filtered by projector.";
           continue;
         }
         if (projector_->is_vis()) {
@@ -357,8 +352,7 @@ bool LaneFrame::Init(const vector<ConnectedComponentPtr>& input_cc,
         }
 
         if (opts_.use_non_mask && non_mask->IsInsideMask(start_pos)) {
-          ADEBUG << "the marker with start point ("
-                 << start_pos(0) << ", "
+          ADEBUG << "the marker with start point (" << start_pos(0) << ", "
                  << start_pos(1) << ") is filtered by non_mask.";
           continue;
         }
@@ -366,8 +360,7 @@ bool LaneFrame::Init(const vector<ConnectedComponentPtr>& input_cc,
         if (!projector_->UvToXy(static_cast<ScalarType>(start_pos(0)),
                                 static_cast<ScalarType>(start_pos(1)),
                                 &(marker.start_pos))) {
-          ADEBUG << "the marker with start point ("
-                 << start_pos(0) << ", "
+          ADEBUG << "the marker with start point (" << start_pos(0) << ", "
                  << start_pos(1) << ") is filtered by projector.";
           continue;
         }
@@ -441,11 +434,11 @@ bool LaneFrame::Init(const vector<ConnectedComponentPtr>& input_cc,
         }
         if (x_max - x_min < 0.5 && y_max - y_min < 0.5) {
           ADEBUG << "x_min = " << x_min << ", "
-                << "x_max = " << x_max << ", "
-                << "width = " << x_max - x_min << ", "
-                << "y_min = " << y_min << ", "
-                << "y_max = " << y_max << ", "
-                << "height = " << y_max - y_min;
+                 << "x_max = " << x_max << ", "
+                 << "width = " << x_max - x_min << ", "
+                 << "y_min = " << y_min << ", "
+                 << "y_max = " << y_max << ", "
+                 << "height = " << y_max - y_min;
           ADEBUG << "this cc is too small, ignore it.";
           is_small_cc = true;
         }
@@ -518,11 +511,11 @@ vector<int> LaneFrame::ComputeMarkerEdges(
 
     ScalarType y_thresh = 0;
     switch (opts_.space_type) {
-      case SpaceType::IMAGE: {
+      case SpaceType::IMAGECOR: {
         y_thresh = markers_[i].pos(1) + opts_.min_y_search_offset;
         break;
       }
-      case SpaceType::VEHICLE: {
+      case SpaceType::VEHICLECOR: {
         y_thresh = markers_[i].pos(0) - opts_.min_y_search_offset;
         break;
       }
@@ -535,9 +528,9 @@ vector<int> LaneFrame::ComputeMarkerEdges(
         continue;
       }
 
-      if ((opts_.space_type == SpaceType::IMAGE &&
+      if ((opts_.space_type == SpaceType::IMAGECOR &&
            markers_[j].start_pos(1) > y_thresh) ||
-          (opts_.space_type == SpaceType::VEHICLE &&
+          (opts_.space_type == SpaceType::VEHICLECOR &&
            markers_[j].start_pos(0) < y_thresh)) {
         continue;
       }
@@ -598,9 +591,9 @@ bool LaneFrame::GreedyGroupConnectAssociation() {
       opts_.orientation_estimation_skip_marker_num;
 
   ADEBUG << "max_group_prediction_marker_num = "
-        << opts_.group_param.max_group_prediction_marker_num;
+         << opts_.group_param.max_group_prediction_marker_num;
   ADEBUG << "orientation_estimation_skip_marker_num = "
-        << opts_.group_param.orientation_estimation_skip_marker_num;
+         << opts_.group_param.orientation_estimation_skip_marker_num;
 
   // generate marker groups based on CC heuristic
   vector<Group> groups;
@@ -677,11 +670,11 @@ bool LaneFrame::GreedyGroupConnectAssociation() {
 
     ScalarType y_thresh = 0;
     switch (cur_group->space_type) {
-      case SpaceType::IMAGE: {
+      case SpaceType::IMAGECOR: {
         y_thresh = cur_group->end_pos(1) + opts_.min_y_search_offset;
         break;
       }
-      case SpaceType::VEHICLE: {
+      case SpaceType::VEHICLECOR: {
         y_thresh = cur_group->end_pos(0) - opts_.min_y_search_offset;
         break;
       }
@@ -697,9 +690,9 @@ bool LaneFrame::GreedyGroupConnectAssociation() {
         continue;
       }
 
-      if ((tar_group->space_type == SpaceType::IMAGE &&
+      if ((tar_group->space_type == SpaceType::IMAGECOR &&
            tar_group->start_pos(1) > y_thresh) ||
-          (tar_group->space_type == SpaceType::VEHICLE &&
+          (tar_group->space_type == SpaceType::VEHICLECOR &&
            tar_group->start_pos(0) < y_thresh)) {
         continue;
       }
@@ -952,7 +945,7 @@ bool LaneFrame::Process(LaneInstancesPtr instances) {
   switch (opts_.assoc_param.method) {
     case AssociationMethod::GREEDY_GROUP_CONNECT: {
       ADEBUG << "using greedy group connection algorithm "
-            << "for marker association ...";
+             << "for marker association ...";
       if (!GreedyGroupConnectAssociation()) {
         AERROR << "failed to do marker association.";
         return false;

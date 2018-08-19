@@ -44,6 +44,9 @@ DEFINE_int32(localization_buffer_size, 40, "localization buffer size");
 DEFINE_string(lidar_tf2_frame_id, "novatel", "the tf2 transform frame id");
 DEFINE_string(lidar_tf2_child_frame_id, "velodyne64",
               "the tf2 transform child frame id");
+DEFINE_string(camera_tf2_frame_id, "velodyne64", "the tf2 transform frame id");
+DEFINE_string(camera_tf2_child_frame_id, "camera",
+              "the tf2 transform child frame id");
 DEFINE_string(obstacle_module_name, "perception_obstacle",
               "perception obstacle module name");
 DEFINE_bool(enable_visualization, false, "enable visualization for debug");
