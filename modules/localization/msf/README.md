@@ -7,9 +7,9 @@
 
 ## Input
   * Point cloud data from LiDAR sensor (ROS topic `/apollo/sensor/velodyne64/compensator/PointCloud2`)
-  * GNSS observation and ephemeris data from GNSS sensor (ROS topic `/apollo/sensor/GNSS/rtk_obs` and `/apollo/sensor/GNSS/rtk_eph`)
-  * GNSS best pose from GNSS sensor (ROS topic is `/apollo/sensor/GNSS/best_pose`)
-  * Imu data from IMU sensor (ROS topic `/apollo/sensor/GNSS/imu`)
+  * GNSS observation and ephemeris data from GNSS sensor (ROS topic `/apollo/sensor/gnss/rtk_obs` and `/apollo/sensor/gnss/rtk_eph`)
+  * GNSS best pose from GNSS sensor (ROS topic is `/apollo/sensor/gnss/best_pose`)
+  * Imu data from IMU sensor (ROS topic `/apollo/sensor/gnss/imu`)
   * Localization map (FLAGS_map_dir + "/" + FLAGS_local_map_name)
   * Parameter config files (velodyne64_novatel_extrinsics_example.yaml, velodyne64_height.yaml, and ant_imu_leverarm.yaml, located in `modules/localization/msf/params/`)
 
@@ -28,7 +28,7 @@
   4. 2-Systems(Local-Gnss + LiDAR + SINS): gnss_mode(1), gnss_only_init(true).
 
 ### GNSS Localization Setting
-  This module works in two modes. One is directly to use gnss best pose (`/apollo/sensor/gnss/best_pose`) from INS system, such as NovAtel system. In the second mode, the initial gnss observations and ephemeris information (`/apollo/sensor/gnss/rtk_obs` and `/apollo/sensor/gnss/rtk_eph`) are used to calculate gnss localization result.
+  This module works in two modes. One is directly to use GNSS best pose (`/apollo/sensor/gnss/best_pose`) from INS system, such as NovAtel system. In the second mode, the initial gnss observations and ephemeris information (`/apollo/sensor/gnss/rtk_obs` and `/apollo/sensor/gnss/rtk_eph`) are used to calculate GNSS localization result.
 
   You can set `gnss_mode` in `apollo/localization/conf/localization.conf` to decide which mode you want to use. The default mode is gnss best pose.
 
@@ -41,7 +41,7 @@
   We provide a script (`apollo/scripts/msf_local_map_creator.sh`) to generate localization map. You need to provide a group of point cloud frames (as .pcd file), corresponding poses file, and UTM zone id. The format of the poses file is `pcd_number timestamp x y z qx qy qz qw`.
 
 ## Visualization Tool
-  We provide a simple online visulazation tool for debug multi-sensor fusion localization module. The parameter `use_visualize` in localizaiton.conf is used to enable the online visulization tool.
+  We provide a simple online visualization tool for debug multi-sensor fusion localization module. The parameter `use_visualize` in localizaiton.conf is used to enable the online visualization tool.
 
   We also provide an advanced online visualization tool which can show localization map, point cloud, horizontal position and variance circle of LiDAR-localization, GNSS-localization, and fused localization results. This tool is simply launched by `./scripts/localization_online_visualizer.sh`.
 
