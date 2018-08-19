@@ -5,11 +5,11 @@
 
 ## Input
   In the provided RTK localization method, there are two inputs:
-  * GPS - The Global Position System.
+  * GPS - The Global Positioning System.
   * IMU - Inertial Measurement Unit.
   
   In the provided multi-sensor fusion localization method, there are three inputs:
-  * GPS - The Global Position System.
+  * GPS - The Global Positioning System.
   * IMU - Inertial Measurement Unit.
   * LiDAR - Light Detection And Ranging Sensor.
   For more information, refer to [multi-sensor fusion localizaiton](https://github.com/ApolloAuto/apollo/tree/master/modules/localization/msf/README.md).
