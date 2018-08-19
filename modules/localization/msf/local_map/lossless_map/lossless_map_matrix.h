@@ -120,7 +120,7 @@ struct LosslessMapCell {
   inline float GetAltVar() const { return map_cells[0].altitude_var; }
   /**@brief Get the count of the samples in the map cell. */
   inline unsigned int GetCount() const { return map_cells[0].count; }
-  /**@brief Get a perticular layer in the map cell. The layer 0 is the layer
+  /**@brief Get a particular layer in the map cell. The layer 0 is the layer
    * includes all the samples. */
   LosslessMapSingleCell& GetLayer(unsigned int layer_id) {
     DCHECK_LT(layer_id, layer_num);
