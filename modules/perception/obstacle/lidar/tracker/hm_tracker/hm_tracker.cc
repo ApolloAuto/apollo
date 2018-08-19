@@ -232,8 +232,8 @@ bool HmObjectTracker::Track(
 }
 
 bool HmObjectTracker::InitializeTrack(
-    const std::vector<std::shared_ptr<Object>>& objects,
-    const double timestamp, const TrackerOptions& options,
+    const std::vector<std::shared_ptr<Object>>& objects, const double timestamp,
+    const TrackerOptions& options,
     std::vector<std::shared_ptr<Object>>* tracked_objects) {
   // A. track setup
   Eigen::Matrix4d velo2world_pose = Eigen::Matrix4d::Identity();

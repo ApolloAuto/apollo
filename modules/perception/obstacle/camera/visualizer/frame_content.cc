@@ -28,7 +28,8 @@ namespace lowcostvisualizer {
 using apollo::perception::LaneObjects;
 using apollo::perception::LaneObjectsPtr;
 
-FrameContent::FrameContent() : global_offset_initialized_(false) {
+FrameContent::FrameContent()
+    : global_offset_initialized_(false), cloud_(new pcl_util::PointCloud) {
   continuous_type_ = PC_CONTINUOUS;
 }
 
@@ -48,18 +49,48 @@ void FrameContent::set_camera_content(
   auto key = DoubleToMapKey(timestamp);
   if (camera_caches_.count(key)) return;
 
+  // set_global_offset(pose_c2w);
+  pose_c2w_ = pose_c2w;
+
+  if (FLAGS_use_navigation_mode) {
+    pose_v2w_ = pose_c2w;
+  }
+
   CameraContent content;
   content.timestamp_ = timestamp;
   content._pose_c2w = pose_c2w;
   content._pose_c2w_static = pose_c2w_static;
+  content._pose_c2w(0, 3) += global_offset_[0];
+  content._pose_c2w(1, 3) += global_offset_[1];
+  content._pose_c2w(2, 3) += global_offset_[2];
   content.camera_objects_.resize(objects.size());
   for (size_t i = 0; i < objects.size(); ++i) {
     content.camera_objects_[i].reset(new Object);
     content.camera_objects_[i]->clone(*objects[i]);
-    // offset_object(content.camera_objects_[i], global_offset_);
+    offset_object(content.camera_objects_[i], global_offset_);
   }
   content.camera_frame_supplement_->clone(supplement);
   camera_caches_[key] = content;
+}
+
+void FrameContent::set_global_offset(const Eigen::Matrix4d& pose_v2w) {
+  pose_v2w_ = pose_v2w;
+  global_offset_[0] = -pose_v2w(0, 3);
+  global_offset_[1] = -pose_v2w(1, 3);
+  global_offset_[2] = -pose_v2w(2, 3);
+  pose_v2w_(0, 3) += global_offset_[0];
+  pose_v2w_(1, 3) += global_offset_[1];
+  pose_v2w_(2, 3) += global_offset_[2];
+
+  //  global_offset_initialized_ = true;
+  AINFO << "initial pose " << pose_v2w;
+  AINFO << "offset = " << global_offset_[0] << "  " << global_offset_[1] << "  "
+        << global_offset_[2] << "\n";
+  global_offset_initialized_ = true;
+}
+
+bool FrameContent::is_global_offset_init() {
+  return global_offset_initialized_;
 }
 
 void FrameContent::set_camera_content(
@@ -68,22 +99,14 @@ void FrameContent::set_camera_content(
   auto key = DoubleToMapKey(timestamp);
   if (camera_caches_.count(key)) return;
 
+  // set_global_offset(pose_c2w);
+
   CameraContent content;
   content.timestamp_ = timestamp;
-
-  if (!global_offset_initialized_) {
-    global_offset_[0] = -pose_c2w(0, 3);
-    global_offset_[1] = -pose_c2w(1, 3);
-    global_offset_[2] = -pose_c2w(2, 3);
-    global_offset_initialized_ = true;
-    AINFO << "initial pose " << pose_c2w;
-    AINFO << "offset = " << global_offset_[0] << "  " << global_offset_[1]
-          << "  " << global_offset_[2] << "\n";
-  }
   content._pose_c2w = pose_c2w;
-  // content._pose_c2w(0, 3) += global_offset_[0];
-  // content._pose_c2w(1, 3) += global_offset_[1];
-  // content._pose_c2w(2, 3) += global_offset_[2];
+  content._pose_c2w(0, 3) += global_offset_[0];
+  content._pose_c2w(1, 3) += global_offset_[1];
+  content._pose_c2w(2, 3) += global_offset_[2];
   content.camera_objects_.resize(objects.size());
   for (size_t i = 0; i < objects.size(); ++i) {
     content.camera_objects_[i].reset(new Object);
@@ -105,6 +128,27 @@ void FrameContent::set_radar_content(
     offset_object(content.radar_objects_[i], global_offset_);
   }
   radar_caches_[DoubleToMapKey(timestamp)] = content;
+}
+
+void FrameContent::set_lidar_content(
+    double timestamp, Eigen::Matrix4d pose_v2w,
+    const std::vector<std::shared_ptr<Object>>& objects) {
+  auto key = DoubleToMapKey(timestamp);
+  if (lidar_caches_.count(key)) return;
+  AINFO << "lidar object size is " << objects.size();
+  LidarContent content;
+  content.timestamp_ = timestamp;
+  content._pose_v2w = pose_v2w;
+  content._pose_v2w(0, 3) += global_offset_[0];
+  content._pose_v2w(1, 3) += global_offset_[1];
+  content._pose_v2w(2, 3) += global_offset_[2];
+  content.lidar_objects_.resize(objects.size());
+  for (size_t i = 0; i < objects.size(); ++i) {
+    content.lidar_objects_[i].reset(new Object);
+    content.lidar_objects_[i]->clone(*objects[i]);
+    offset_lidar_object(content.lidar_objects_[i], global_offset_);
+  }
+  lidar_caches_[DoubleToMapKey(timestamp)] = content;
 }
 
 void FrameContent::set_fusion_content(
@@ -224,6 +268,27 @@ void FrameContent::update_timestamp(double ref) {
 
   best_delta = FLT_MAX;
   best_ts = -1;
+
+  for (std::map<int64_t, LidarContent>::iterator it = lidar_caches_.begin();
+       it != lidar_caches_.end(); ++it) {
+    double it_ts = MapKeyToDouble(it->first);
+    double delta = fabs(it_ts - ref);
+
+    if (delta < best_delta) {
+      best_delta = delta;
+      best_ts = it_ts;
+    }
+  }
+  current_lidar_timestamp_ = best_ts;
+  common::util::erase_map_where(
+      lidar_caches_,
+      [this, best_ts](std::map<int64_t, LidarContent>::value_type& p) {
+        return this->MapKeyToDouble(p.first) < best_ts;
+      });
+
+  best_delta = FLT_MAX;
+  best_ts = -1;
+
   for (auto it = fusion_caches_.begin(); it != fusion_caches_.end(); ++it) {
     double it_ts = MapKeyToDouble(it->first);
     double delta = fabs(it_ts - ref);
@@ -281,6 +346,7 @@ void FrameContent::update_timestamp(double ref) {
         << " | lane caches num: " << lane_caches_.size()
         << " | fusion caches num: " << fusion_caches_.size()
         << " | image caches num: " << image_caches_.size()
+        << " | lidar caches num: " << lidar_caches_.size()
         << " | motion caches num: " << motion_caches_.size();
 }
 
@@ -322,8 +388,8 @@ std::vector<std::shared_ptr<Object>> FrameContent::get_camera_objects(
     }
     return it->second.camera_objects_;
   } else {
-    AWARN << "FrameContent::get_camera_objects() : No Objects found";
-    AWARN << "current_camera_timestamp_ : " << current_camera_timestamp_;
+    ADEBUG << "FrameContent::get_camera_objects() : No Objects found";
+    ADEBUG << "current_camera_timestamp_ : " << current_camera_timestamp_;
     return std::vector<std::shared_ptr<Object>>();
   }
 }
@@ -366,6 +432,19 @@ std::vector<std::shared_ptr<Object>> FrameContent::get_radar_objects(
     *ts = content.timestamp_;
   }
   return content.radar_objects_;
+}
+
+std::vector<std::shared_ptr<Object>> FrameContent::get_lidar_objects(
+    double* ts) {
+  auto it = lidar_caches_.find(DoubleToMapKey(current_lidar_timestamp_));
+  if (it == lidar_caches_.end()) {
+    return std::vector<std::shared_ptr<Object>>();
+  }
+  LidarContent content = it->second;
+  if (ts != nullptr) {
+    *ts = content.timestamp_;
+  }
+  return content.lidar_objects_;
 }
 
 CameraFrameSupplementPtr FrameContent::get_camera_frame_supplement() {
@@ -424,6 +503,41 @@ void FrameContent::offset_object(std::shared_ptr<Object> object,
   object->center[1] += offset[1];
   object->center[2] += offset[2];
 }
+
+void FrameContent::set_lidar_cloud(pcl_util::PointCloudPtr cloud) {
+  pcl::transformPointCloud(*cloud, *(cloud_), pose_v2w_);
+}
+
+pcl_util::PointCloudPtr FrameContent::get_cloud() { return cloud_; }
+
+void FrameContent::offset_pointcloud(pcl_util::PointCloud* cloud,
+                                     const Eigen::Vector3d& offset) {
+  for (size_t i = 0; i < cloud->size(); ++i) {
+    cloud->points[i].x += offset[0];
+    cloud->points[i].y += offset[1];
+    cloud->points[i].z += offset[2];
+  }
+}
+
+void FrameContent::offset_pointcloud(pcl_util::PointDCloud* cloud,
+                                     const Eigen::Vector3d& offset) {
+  for (size_t i = 0; i < cloud->size(); ++i) {
+    cloud->points[i].x += offset[0];
+    cloud->points[i].y += offset[1];
+    cloud->points[i].z += offset[2];
+  }
+}
+
+void FrameContent::offset_lidar_object(std::shared_ptr<Object> object,
+                                       const Eigen::Vector3d& offset) {
+  offset_pointcloud(object->cloud.get(), offset);
+  offset_pointcloud(&(object->polygon), offset);
+  offset_object(object, offset);
+}
+
+Eigen::Matrix4d FrameContent::get_pose_v2w() { return pose_v2w_; }
+
+Eigen::Matrix4d FrameContent::get_pose_c2w() { return pose_c2w_; }
 
 }  // namespace lowcostvisualizer
 }  // namespace perception

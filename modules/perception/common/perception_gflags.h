@@ -39,6 +39,8 @@ DECLARE_string(onboard_type_fuser);
 DECLARE_int32(tf2_buff_in_ms);
 DECLARE_string(lidar_tf2_frame_id);
 DECLARE_string(lidar_tf2_child_frame_id);
+DECLARE_string(camera_tf2_frame_id);
+DECLARE_string(camera_tf2_child_frame_id);
 DECLARE_string(obstacle_module_name);
 DECLARE_bool(enable_visualization);
 

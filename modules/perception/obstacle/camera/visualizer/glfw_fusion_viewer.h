@@ -201,17 +201,21 @@ class GLFWFusionViewer {
                     const std::vector<std::shared_ptr<Object>> &objects,
                     const Eigen::Matrix4d &w2c, bool draw_cube,
                     bool draw_velocity, const Eigen::Vector3f &color,
-                    bool use_class_color, bool use_track_color = true);
+                    bool use_class_color, bool use_track_color = true,
+                    std::string type = "");
 
-  void draw_3d_classifications(FrameContent *content, bool show_fusion);
+  void draw_3d_classifications(FrameContent *content);
   void draw_camera_box(const std::vector<std::shared_ptr<Object>> &objects,
                        Eigen::Matrix4d w2c, Eigen::Matrix4d w2c_static,
-                       int offset_x, int offset_y,
-                       int image_width, int image_height);
+                       int offset_x, int offset_y, int image_width,
+                       int image_height);
 
   void draw_objects2d(const std::vector<std::shared_ptr<Object>> &objects,
                       Eigen::Matrix4d w2c, std::string name, int offset_x,
                       int offset_y, int image_width, int image_height);
+  // fusion association
+  void draw_camera_fusion_association(FrameContent *content);
+  void draw_lidar_fusion_association(FrameContent *content);
 
  private:
   bool init_;
@@ -261,16 +265,13 @@ class GLFWFusionViewer {
   GLuint buffers_cloud[VAO_cloud_num][NumVBOs];
   GLfloat cloudVerts[VBO_cloud_num][3];
 
-  bool draw_cloud(FrameContent *content);
+  void draw_cloud();
 
   // circle
   static const int VAO_circle_num = 4;
   static const int VBO_circle_num = 360;
   GLuint VAO_circle[VAO_circle_num];
   vec3 get_velocity_src_position(FrameContent *content, int id);
-
-  // fusion association
-  void draw_fusion_association(FrameContent *content);
 
   GLuint image_to_gl_texture(const cv::Mat &mat, GLenum min_filter,
                              GLenum mag_filter, GLenum wrap_filter);
@@ -287,7 +288,7 @@ class GLFWFusionViewer {
 
   // @brief draw vanishing point and ground plane on image
   // stat: static or not. decide colors
-  void draw_vp_ground(const Eigen::Matrix4d& v2c, bool stat, int offset_x,
+  void draw_vp_ground(const Eigen::Matrix4d &v2c, bool stat, int offset_x,
                       int offset_y, int image_width, int image_height);
 
   bool use_class_color_ = true;
@@ -316,6 +317,9 @@ class GLFWFusionViewer {
   bool show_vp_grid_ = true;  // show vanishing point and ground plane grid
   bool draw_lane_objects_;
   bool show_trajectory_;
+  bool show_point_cloud_ = true;
+  bool show_lidar_bdv_ = true;
+  bool show_fusion_association_ = false;
 
   static std::vector<std::vector<int>> s_color_table;
   std::shared_ptr<GLRasterText> raster_text_;
@@ -343,7 +347,7 @@ class GLFWFusionViewer {
 
   std::map<int, size_t> object_id_skip_count_;
   std::map<int, boost::circular_buffer<std::pair<float, float>>>
-    object_trackjectories_;
+      object_trackjectories_;
   std::map<int, std::vector<double>> object_timestamps_;
 };
 

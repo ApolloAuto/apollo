@@ -17,20 +17,20 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_ONBOARD_ULTRASONIC_OBSTACLE_SUBNODE_H_
 #define MODULES_PERCEPTION_OBSTACLE_ONBOARD_ULTRASONIC_OBSTACLE_SUBNODE_H_
 
-#include <string>
 #include <memory>
 #include <mutex>
-#include <vector>
 #include <set>
-#include "Eigen/Dense"
+#include <string>
+#include <vector>
 #include "Eigen/Core"
+#include "Eigen/Dense"
 
 #include "modules/canbus/proto/chassis.pb.h"
-#include "modules/perception/proto/perception_ultrasonic.pb.h"
 #include "modules/perception/obstacle/base/object.h"
-#include "modules/perception/onboard/common_shared_data.h"
 #include "modules/perception/obstacle/onboard/object_shared_data.h"
+#include "modules/perception/onboard/common_shared_data.h"
 #include "modules/perception/onboard/subnode.h"
+#include "modules/perception/proto/perception_ultrasonic.pb.h"
 
 namespace apollo {
 namespace perception {
@@ -48,8 +48,8 @@ class UltrasonicObstacleSubnode : public Subnode {
  private:
   void OnUltrasonic(const apollo::canbus::Chassis& message);
 
-  bool PublishDataAndEvent(
-    const double timestamp, const SharedDataPtr<SensorObjects>& data);
+  bool PublishDataAndEvent(const double timestamp,
+                           const SharedDataPtr<SensorObjects>& data);
 
   bool InitInternal() override;
 
@@ -59,13 +59,11 @@ class UltrasonicObstacleSubnode : public Subnode {
 
   bool set_ultrasonic_type(const std::string& type);
 
-  void BuildSingleObject(
-      const apollo::canbus::Sonar& sonar_message,
-      std::shared_ptr<Object> object_ptr);
+  void BuildSingleObject(const apollo::canbus::Sonar& sonar_message,
+                         std::shared_ptr<Object> object_ptr);
 
-  void BuildAllObjects(
-      const apollo::canbus::Surround& surround,
-      std::shared_ptr<SensorObjects> sensor_objects);
+  void BuildAllObjects(const apollo::canbus::Surround& surround,
+                       std::shared_ptr<SensorObjects> sensor_objects);
 
  private:
   uint32_t seq_num_;

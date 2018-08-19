@@ -40,6 +40,7 @@
 #include "modules/perception/obstacle/lidar/visualizer/opengl_visualizer/opengl_visualizer.h"
 #include "modules/perception/obstacle/onboard/hdmap_input.h"
 #include "modules/perception/obstacle/onboard/object_shared_data.h"
+#include "modules/perception/obstacle/onboard/scene_shared_data.h"
 #include "modules/perception/onboard/subnode.h"
 
 namespace apollo {
@@ -73,13 +74,15 @@ class LidarProcessSubnode : public Subnode {
                             pcl_util::PointCloudPtr* out_cloud);
 
   void PublishDataAndEvent(double timestamp,
-                           const SharedDataPtr<SensorObjects>& data);
+                           const SharedDataPtr<SensorObjects>& data,
+                           pcl_util::PointCloudPtr* cloud = nullptr);
 
   bool inited_ = false;
   double timestamp_ = 0.0;
   SeqId seq_num_ = 0;
   common::ErrorCode error_code_ = common::OK;
   LidarObjectData* processing_data_ = nullptr;
+  SceneSharedData* scene_data_ = nullptr;
   std::string device_id_;
 
   HDMapInput* hdmap_input_ = nullptr;
