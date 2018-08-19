@@ -42,7 +42,7 @@ class LosslessMapNode : public BaseMapNode {
    * */
   bool SetValueIfInBound(const Eigen::Vector3d& coordinate,
                          unsigned char intensity);
-  /**@brief Set the vlaue of a pixel in a layer in the map node.
+  /**@brief Set the value of a pixel in a layer in the map node.
    * @param <coordinate> The 3D global coordinate. The z is used as the altitude
    * for the layer match.
    * @param <intensity> The reflectance intensity.
