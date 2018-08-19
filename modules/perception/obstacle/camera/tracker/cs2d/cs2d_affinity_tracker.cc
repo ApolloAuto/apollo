@@ -19,9 +19,7 @@
 namespace apollo {
 namespace perception {
 
-bool CS2DAffinityTracker::Init() {
-  return true;
-}
+bool CS2DAffinityTracker::Init() { return true; }
 
 bool CS2DAffinityTracker::GetAffinityMatrix(
     const cv::Mat &img, const std::vector<Tracked> &tracked,
@@ -74,9 +72,9 @@ bool CS2DAffinityTracker::GetAffinityMatrix(
 
       // 3D camera space range limit
       auto d_c = detected[j].center_;
-      float dist = sqrt(pow(fabs(t_c.x() - d_c.x()), 2.0f)
-                        + pow(fabs(t_c.y() - d_c.y()), 2.0f)
-                        + pow(fabs(t_c.z() - d_c.z()), 2.0f));
+      float dist = sqrt(pow(fabs(t_c.x() - d_c.x()), 2.0f) +
+                        pow(fabs(t_c.y() - d_c.y()), 2.0f) +
+                        pow(fabs(t_c.z() - d_c.z()), 2.0f));
       if (dist > center_range_) related = false;
 
       if (related) (*affinity_matrix)[i][j] = 1.0f;

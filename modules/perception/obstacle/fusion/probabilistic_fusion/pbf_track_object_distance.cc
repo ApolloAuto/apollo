@@ -61,13 +61,13 @@ float PbfTrackObjectDistance::Compute(
   const std::shared_ptr<PbfSensorObject> &radar_object =
       fused_track->GetLatestRadarObject();
 
-  if (FLAGS_use_navigation_mode) {
-    if (FLAGS_use_distance_angle_fusion) {
-      distance = ComputeDistanceAngleMatchProb(fused_object, sensor_object);
-    } else {
-      AERROR << "other distance method not supported for async fusion";
-    }
+  if (FLAGS_use_distance_angle_fusion) {
+    AINFO << "use distance angle fusion";
+    distance =
+        ComputeDistanceAngleMatchProb(fused_object, sensor_object, options);
   } else {
+    AINFO << "use traditional lidar camera radar fusion";
+
     if (is_lidar(sensor_type)) {
       if (lidar_object != nullptr) {
         distance = ComputeVelodyne64Velodyne64(fused_object, sensor_object,
@@ -126,25 +126,62 @@ float PbfTrackObjectDistance::ComputeRadarRadar(
   return distance;
 }
 
-float PbfTrackObjectDistance::GetAngle(const std::shared_ptr<Object> &obj) {
-  if (obj->center[0] == 0) {
-    if (obj->center[1] > 0) {
+float PbfTrackObjectDistance::GetAngle(const Eigen::Vector3d &sensor_center,
+                                       SensorType type) {
+  Eigen::Vector3d center = sensor_center;
+
+  if (!FLAGS_use_navigation_mode) {
+    if (is_camera(type)) {
+      center[0] = sensor_center[2];
+      center[1] = sensor_center[0];
+    } else if (is_lidar(type)) {
+      center[0] = sensor_center[0];
+      center[1] = -sensor_center[1];
+    }
+  }
+
+  if (center[0] == 0) {
+    if (center[1] > 0) {
       return M_PI / 2;
     } else {
       return -M_PI / 2;
     }
   }
-  return std::atan2(obj->center[1], obj->center[0]);
+
+  return std::atan2(center[1], center[0]);
+}
+
+Eigen::Vector3d PbfTrackObjectDistance::GetCenter(
+    const std::shared_ptr<PbfSensorObject> &obj,
+    const Eigen::Matrix4d &world_sensor_pose, SensorType sensor_type) {
+  if (!FLAGS_use_navigation_mode) {
+    Eigen::Vector3d sensor_center =
+        (world_sensor_pose *
+         Eigen::Vector4d(obj->object->center[0], obj->object->center[1], 0, 1))
+            .head(3);
+    // normalize to rfu
+    Eigen::Vector3d center = sensor_center;
+    if (is_camera(sensor_type)) {
+      center[0] = sensor_center[0];
+      center[1] = sensor_center[2];
+    } else if (is_lidar(sensor_type)) {
+      center[0] = -sensor_center[1];
+      center[1] = sensor_center[0];
+    }
+    return center;
+  }
+  return obj->object->center;
 }
 
 float PbfTrackObjectDistance::ComputeDistanceAngleMatchProb(
     const std::shared_ptr<PbfSensorObject> &fused_object,
-    const std::shared_ptr<PbfSensorObject> &sensor_object) {
+    const std::shared_ptr<PbfSensorObject> &sensor_object,
+    const TrackObjectDistanceOptions &options) {
   static float weight_x = 0.8f;
   static float weight_y = 0.2f;
   static float speed_diff = 5.0f;
   static float epislon = 0.1f;
-  static float angle_tolerance = 1.0f;
+  static float angle_tolerance = 5.0f;
   static float distance_tolerance_max = 5.0f;
   static float distance_tolerance_min = 2.0f;
 
@@ -156,21 +193,36 @@ float PbfTrackObjectDistance::ComputeDistanceAngleMatchProb(
     return std::numeric_limits<float>::max();
   }
 
-  Eigen::Vector3d &fcenter = fobj->center;
-  Eigen::Vector3d &scenter = sobj->center;
+  const Eigen::Matrix4d &world_sensor_pose =
+      options.sensor_world_pose->inverse();
 
-  float euclid_dist = static_cast<float>(((fcenter - scenter).norm()));
+  Eigen::Vector3d fcenter =
+      GetCenter(fused_object, world_sensor_pose, sensor_object->sensor_type);
+  Eigen::Vector3d scenter =
+      GetCenter(sensor_object, world_sensor_pose, sensor_object->sensor_type);
 
-  if (euclid_dist > distance_tolerance_max) {
-    return std::numeric_limits<float>::max();
+  AINFO << "fcenter is " << fcenter;
+  AINFO << "scenter is " << scenter;
+
+  float euclid_dist =
+      static_cast<float>(((fcenter.head(2) - scenter.head(2)).norm()));
+
+  if (is_camera(sensor_object->sensor_type)) {
+    AINFO << " camera object sensor before check for distance with id"
+          << sensor_object->object->track_id << " with dist " << euclid_dist
+          << " with fused track id " << fused_object->object->track_id;
   }
+
+  /*if (euclid_dist > distance_tolerance_max) {
+    return std::numeric_limits<float>::max();
+  }*/
 
   float range_distance_ratio = std::numeric_limits<float>::max();
   float angle_distance_diff = 0.0f;
 
   if (fcenter(0) > epislon && std::abs(fcenter(1)) > epislon) {
     float x_ratio = std::abs(fcenter(0) - scenter(0)) / fcenter(0);
-    assert(x_ratio >=0);
+    assert(x_ratio >= 0);
     float y_ratio = std::abs(fcenter(1) - scenter(1)) / std::abs(fcenter(1));
 
     if (x_ratio < FLAGS_pbf_fusion_assoc_distance_percent &&
@@ -191,36 +243,39 @@ float PbfTrackObjectDistance::ComputeDistanceAngleMatchProb(
   }
   float distance = range_distance_ratio;
 
-  if (is_radar(sensor_object->sensor_type)) {
-    float sangle = GetAngle(sobj);
-    float fangle = GetAngle(fobj);
-    angle_distance_diff = (std::abs(sangle - fangle) * 180) / M_PI;
-    float fobject_dist = static_cast<float>(fcenter.norm());
-    double svelocity = sobj->velocity.norm();
-    double fvelocity = fobj->velocity.norm();
-    if (svelocity > 0.0 && fvelocity > 0.0) {
-      float cos_distance =
-          sobj->velocity.dot(fobj->velocity) / (svelocity * fvelocity);
-      if (cos_distance < FLAGS_pbf_distance_speed_cos_diff) {
-        ADEBUG << "ignore radar data for fusing" << cos_distance;
-        distance = std::numeric_limits<float>::max();
-      }
-    }
-
-    if (std::abs(svelocity - fvelocity) > speed_diff ||
-        angle_distance_diff > angle_tolerance) {
-      ADEBUG << "ignore radar data for fusing" << speed_diff;
-      distance = std::numeric_limits<float>::max();
-    }
-
-    float distance_allowed =
-        std::max(static_cast<float>(fobject_dist * sin(angle_distance_diff)),
-                 distance_tolerance_min);
-    if (euclid_dist > distance_allowed) {
-      ADEBUG << "ignore radar data for fusing " << distance_allowed;
+  // if (is_radar(sensor_object->sensor_type)) {
+  float sangle = GetAngle(scenter, sensor_object->sensor_type);
+  float fangle = GetAngle(fcenter, sensor_object->sensor_type);
+  angle_distance_diff = (std::abs(sangle - fangle) * 180) / M_PI;
+  float fobject_dist = static_cast<float>(fcenter.norm());
+  double svelocity = sobj->velocity.norm();
+  double fvelocity = fobj->velocity.norm();
+  if (svelocity > 0.0 && fvelocity > 0.0) {
+    float cos_distance =
+        sobj->velocity.dot(fobj->velocity) / (svelocity * fvelocity);
+    if (cos_distance < FLAGS_pbf_distance_speed_cos_diff) {
+      AWARN << "velocity cosine distance too large" << cos_distance;
       distance = std::numeric_limits<float>::max();
     }
   }
+
+  if (std::abs(svelocity - fvelocity) > speed_diff ||
+      angle_distance_diff > angle_tolerance) {
+    AWARN << "angle " << angle_distance_diff << " tolerance " << angle_tolerance
+          << " speed " << std::abs(svelocity - fvelocity) << " tolerance "
+          << speed_diff;
+    distance = std::numeric_limits<float>::max();
+  }
+
+  float distance_allowed =
+      std::max(static_cast<float>(fobject_dist * sin(angle_distance_diff)),
+               distance_tolerance_min);
+  if (euclid_dist > distance_allowed) {
+    AWARN << "angle distance too large  " << distance_allowed;
+    distance = std::numeric_limits<float>::max();
+  }
+  AINFO << "distance calculated " << distance;
+  //}
   return distance;
 }
 

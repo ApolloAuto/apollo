@@ -61,7 +61,7 @@ struct Group {
 
   Group()
       : shape_type(MarkerShapeType::LINE_SEGMENT),
-        space_type(SpaceType::IMAGE),
+        space_type(SpaceType::IMAGECOR),
         start_pos(0.0, 0.0),
         start_orie(0.0, -1.0),
         start_angle(static_cast<ScalarType>(-M_PI / 2.0)),
@@ -79,8 +79,8 @@ struct Group {
   }
 
   static bool Comp(const Group& a, const Group& b) {
-    return (a.space_type == SpaceType::IMAGE) ? a.end_pos(1) > b.end_pos(1)
-                                              : a.end_pos(1) < b.end_pos(1);
+    return (a.space_type == SpaceType::IMAGECOR) ? a.end_pos(1) > b.end_pos(1)
+                                                 : a.end_pos(1) < b.end_pos(1);
   }
 
   inline int ComputeOrientation(const std::vector<Marker>& markers,

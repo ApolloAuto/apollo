@@ -17,7 +17,5 @@
 #include "modules/perception/obstacle/onboard/camera_shared_data.h"
 
 namespace apollo {
-namespace perception {
-
-}  // namespace perception
+namespace perception {}  // namespace perception
 }  // namespace apollo

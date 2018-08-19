@@ -91,8 +91,8 @@ enum MarkerShapeType {
 };
 
 enum SpaceType {
-  IMAGE = 0,
-  VEHICLE,
+  IMAGECOR = 0,
+  VEHICLECOR,
 };
 
 typedef Eigen::Matrix<ScalarType, 2, 1> Vector2D;
@@ -118,7 +118,7 @@ struct AssociationParam {
 struct Marker {
   MarkerShapeType shape_type = MarkerShapeType::LINE_SEGMENT;
   int marker_type = 0;
-  SpaceType space_type = SpaceType::IMAGE;
+  SpaceType space_type = SpaceType::IMAGECOR;
   Vector2D pos{0.0, 0.0};
   Vector2D image_pos{0.0, 0.0};
   Vector2D start_pos{0.0, 0.0};
@@ -139,8 +139,8 @@ struct Marker {
 
   static bool comp(const Marker &a, const Marker &b) {
     CHECK_EQ(a.space_type, b.space_type);
-    return (a.space_type == SpaceType::IMAGE) ? a.pos(1) > b.pos(1)
-                                              : a.pos(1) < b.pos(1);
+    return (a.space_type == SpaceType::IMAGECOR) ? a.pos(1) > b.pos(1)
+                                                 : a.pos(1) < b.pos(1);
   }
 };
 
@@ -163,7 +163,7 @@ enum SemanticLabelType {
   SOLID = 0,
   DASHED,
   PARRELLE,
-  UNKNOWN,
+  UNKNOWNLABEL,
 };
 
 typedef Eigen::Matrix<ScalarType, MAX_POLY_ORDER + 1, 1> PolyModel;
@@ -227,7 +227,7 @@ struct LaneObject {
   std::vector<Vector2D> image_pos;
   std::vector<ScalarType> confidence;
   SpatialLabelType spatial = SpatialLabelType::L_0;
-  SemanticLabelType semantic = SemanticLabelType::UNKNOWN;
+  SemanticLabelType semantic = SemanticLabelType::UNKNOWNLABEL;
   bool is_compensated = false;
 
   ScalarType longitude_start = std::numeric_limits<ScalarType>::max();

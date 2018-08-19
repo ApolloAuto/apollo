@@ -93,7 +93,8 @@ void GLFusionVisualizer::set_main_car_points() {
 }
 
 void GLFusionVisualizer::update_camera_system(FrameContent *content) {
-  Eigen::Matrix4d pose_v2w = Eigen::Matrix4d::Identity();
+  Eigen::Matrix4d pose_v2w = content->get_pose_v2w();
+
   Eigen::Vector4d camera_center_w(camera_center_velodyne_[0],
                                   camera_center_velodyne_[1],
                                   camera_center_velodyne_[2], 0);

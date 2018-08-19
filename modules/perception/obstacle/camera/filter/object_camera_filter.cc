@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "modules/perception/obstacle/camera/filter/object_camera_filter.h"
+#include "modules/perception/common/perception_gflags.h"
 
 namespace apollo {
 namespace perception {
@@ -24,12 +25,12 @@ using KalmanFilter1D = common::math::KalmanFilter<float, 2, 1, 1>;
 bool ObjectCameraFilter::Init() { return true; }
 
 bool ObjectCameraFilter::Filter(
-    const double timestamp,
-    std::vector<std::shared_ptr<VisualObject>> *objects) {
+    const double timestamp, std::vector<std::shared_ptr<VisualObject>>* objects,
+    const FilterOptions& options) {
   if (!objects) return false;
 
   // update lost_frame_count
-  for (auto &p : tracked_filters_) {
+  for (auto p : tracked_filters_) {
     p.second.lost_frame_cnt_ += 1;
   }
 
@@ -38,10 +39,10 @@ bool ObjectCameraFilter::Filter(
 
     if (track_id != -1 && tracked_filters_.count(track_id)) {
       Predict(track_id, timestamp);
-      Update(track_id, obj_ptr);
+      Update(track_id, obj_ptr, options);
       GetState(track_id, obj_ptr);
     } else {
-      Create(track_id, timestamp, obj_ptr);
+      Create(track_id, timestamp, obj_ptr, options);
     }
   }
 
@@ -51,7 +52,7 @@ bool ObjectCameraFilter::Filter(
 
 std::string ObjectCameraFilter::Name() const { return "ObjectCameraFilter"; }
 
-void ObjectCameraFilter::InitFilter(const float x, KalmanFilter1D *filter) {
+void ObjectCameraFilter::InitFilter(const float x, KalmanFilter1D* filter) {
   CHECK_NOTNULL(filter);
 
   Eigen::Matrix<float, 2, 1> state_x;
@@ -87,10 +88,28 @@ void ObjectCameraFilter::InitFilter(const float x, KalmanFilter1D *filter) {
 }
 
 void ObjectCameraFilter::Create(const int track_id, const double timestamp,
-                                const std::shared_ptr<VisualObject> &obj_ptr) {
+                                const std::shared_ptr<VisualObject>& obj_ptr,
+                                const FilterOptions& options) {
   tracked_filters_[track_id] = ObjectFilter();
   tracked_filters_[track_id].track_id_ = track_id;
   tracked_filters_[track_id].last_timestamp_ = timestamp;
+
+  if (!FLAGS_use_navigation_mode) {
+    Eigen::Matrix4d cam2world_pose = Eigen::Matrix4d::Identity();
+    if (options.camera_trans != nullptr) {
+      cam2world_pose = *(options.camera_trans);
+    } else {
+      AERROR << "Input camera_trans is null";
+      return;
+    }
+    tracked_filters_[track_id].global_to_local_offset_ = Eigen::Vector3d(
+        -cam2world_pose(0, 3), -cam2world_pose(1, 3), -cam2world_pose(2, 3));
+
+    TransformPoseGlobal2Local(track_id, &cam2world_pose);
+    ADEBUG << "cam2world_pose\n" << cam2world_pose;
+    Eigen::Matrix4f cam2world_posef = cam2world_pose.cast<float>();
+    TransformObject(obj_ptr, cam2world_posef);
+  }
 
   InitFilter(obj_ptr->center.x(), &(tracked_filters_[track_id].x_));
   InitFilter(obj_ptr->center.y(), &(tracked_filters_[track_id].y_));
@@ -106,6 +125,29 @@ void ObjectCameraFilter::Create(const int track_id, const double timestamp,
       y_state_cov(0, 1);
   obj_ptr->state_uncertainty.block(2, 0, 2, 2) << x_state_cov(1, 0), 0, 0,
       y_state_cov(1, 0);
+}
+
+void ObjectCameraFilter::TransformPoseGlobal2Local(const int track_id,
+                                                   Eigen::Matrix4d* pose) {
+  (*pose)(0, 3) += tracked_filters_[track_id].global_to_local_offset_(0);
+  (*pose)(1, 3) += tracked_filters_[track_id].global_to_local_offset_(1);
+  (*pose)(2, 3) += tracked_filters_[track_id].global_to_local_offset_(2);
+}
+
+void ObjectCameraFilter::TransformObject(std::shared_ptr<VisualObject> obj,
+                                         const Eigen::Matrix4f& pose) {
+  // Transform object with given pose
+  Eigen::Vector3f& dir = obj->direction;
+  dir = (pose * Eigen::Vector4f(dir[0], dir[1], dir[2], 0)).head(3);
+  // transform center
+  Eigen::Vector3f& center = obj->center;
+  center = (pose * Eigen::Vector4f(center[0], center[1], center[2], 1)).head(3);
+
+  if (fabs(obj->direction[0]) < DBL_MIN) {
+    obj->theta = obj->direction(1) > 0 ? M_PI / 2 : -M_PI / 2;
+  } else {
+    obj->theta = atan2(obj->direction[1], obj->direction[0]);
+  }
 }
 
 void ObjectCameraFilter::Predict(const int track_id, const double timestamp) {
@@ -136,7 +178,24 @@ void ObjectCameraFilter::Predict(const int track_id, const double timestamp) {
 }
 
 void ObjectCameraFilter::Update(const int track_id,
-                                const std::shared_ptr<VisualObject> &obj_ptr) {
+                                const std::shared_ptr<VisualObject>& obj_ptr,
+                                const FilterOptions& options) {
+  if (!FLAGS_use_navigation_mode) {
+    Eigen::Matrix4d cam2world_pose = Eigen::Matrix4d::Identity();
+
+    if (options.camera_trans != nullptr) {
+      cam2world_pose = *(options.camera_trans);
+    } else {
+      AERROR << "Input camera_trans is null";
+      return;
+    }
+
+    TransformPoseGlobal2Local(track_id, &cam2world_pose);
+    ADEBUG << "cam2world_pose\n" << cam2world_pose;
+    Eigen::Matrix4f cam2world_posef = cam2world_pose.cast<float>();
+    TransformObject(obj_ptr, cam2world_posef);
+  }
+
   Eigen::Matrix<float, 1, 1> z_x;
   z_x << obj_ptr->center.x();
   tracked_filters_[track_id].x_.Correct(z_x);
@@ -157,10 +216,13 @@ void ObjectCameraFilter::GetState(const int track_id,
   auto x_state_cov = tracked_filters_[track_id].x_.GetStateCovariance();
   auto y_state_cov = tracked_filters_[track_id].y_.GetStateCovariance();
 
-  obj_ptr->center.x() = x_state.x();
+  obj_ptr->center.x() =
+      x_state.x() - tracked_filters_[track_id].global_to_local_offset_(0);
   obj_ptr->velocity.x() = x_state.y();
 
-  obj_ptr->center.y() = y_state.x();
+  obj_ptr->center.y() =
+      y_state.x() - tracked_filters_[track_id].global_to_local_offset_(1);
+
   obj_ptr->velocity.y() = y_state.y();
 
   obj_ptr->center.z() = 0.0f;
@@ -176,19 +238,26 @@ void ObjectCameraFilter::GetState(const int track_id,
       y_state_cov(1, 0);
 
   obj_ptr->theta = tracked_filters_[track_id].theta_.GetStateEstimate().x();
-  obj_ptr->direction =
-      Eigen::Vector3f(cos(obj_ptr->theta), 0.0f, -sin(obj_ptr->theta));
+
+  if (FLAGS_use_navigation_mode) {
+    obj_ptr->direction =
+        Eigen::Vector3f(cos(obj_ptr->theta), 0.0f, -sin(obj_ptr->theta));
+  } else {
+    // obtain direction in world coordinates
+    obj_ptr->direction =
+        Eigen::Vector3f(cos(obj_ptr->theta), sin(obj_ptr->theta), 0);
+  }
 }
 
 void ObjectCameraFilter::Destroy() {
   std::vector<int> id_to_destroy;
-  for (const auto &p : tracked_filters_) {
+  for (const auto& p : tracked_filters_) {
     if (p.second.lost_frame_cnt_ > kMaxKeptFrameCnt) {
       id_to_destroy.emplace_back(p.first);
     }
   }
 
-  for (const auto &id : id_to_destroy) {
+  for (const auto& id : id_to_destroy) {
     tracked_filters_.erase(id);
   }
 }

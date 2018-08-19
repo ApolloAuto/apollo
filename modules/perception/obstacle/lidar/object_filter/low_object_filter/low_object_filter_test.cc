@@ -24,7 +24,7 @@
 namespace apollo {
 namespace perception {
 
-void ConstructObject(std::vector<std::shared_ptr<Object> >* objects) {
+void ConstructObject(std::vector<std::shared_ptr<Object>>* objects) {
   objects->resize(10);
 
   for (size_t i = 0; i < objects->size(); ++i) {
@@ -51,8 +51,8 @@ TEST(LowObjectFilterTest, test_object_filter) {
   LowObjectFilter filter;
 
   ObjectFilterOptions object_filter_options;
-  std::vector<std::shared_ptr<Object> >* objects =
-      new std::vector<std::shared_ptr<Object> >();
+  std::vector<std::shared_ptr<Object>>* objects =
+      new std::vector<std::shared_ptr<Object>>();
   ConstructObject(objects);
 
   EXPECT_EQ(10, objects->size());

@@ -31,6 +31,7 @@ namespace perception {
 
 struct TrackObjectMatcherOptions {
   const Eigen::Vector3d *ref_point = nullptr;
+  const Eigen::Matrix4d *sensor_world_pose = nullptr;
 };
 
 class PbfBaseTrackObjectMatcher {

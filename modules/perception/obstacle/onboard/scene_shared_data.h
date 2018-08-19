@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ * Copyright 2017 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,34 +14,39 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_COMMON_PROJECTOR_H_
-#define MODULES_PERCEPTION_OBSTACLE_CAMERA_COMMON_PROJECTOR_H_
+#ifndef MODULES_PERCEPTION_OBSTACLE_ONBOARD_SCENE_SHARED_DATA_H_
+#define MODULES_PERCEPTION_OBSTACLE_ONBOARD_SCENE_SHARED_DATA_H_
 
-#include <Eigen/Core>
-
+#include <memory>
 #include <string>
 #include <vector>
+
+#include "modules/perception/obstacle/base/object.h"
+#include "modules/perception/onboard/common_shared_data.h"
 
 namespace apollo {
 namespace perception {
 
-class BaseProjector {
- public:
-  virtual ~BaseProjector() = default;
-  virtual bool project(std::vector<float>* feature) = 0;
+struct SceneItem {
+  double timestamp = 0.0;
+  pcl_util::PointCloudPtr cloud;
+  Eigen::Matrix4d pose;
 };
 
-class MatrixProjector : public BaseProjector {
+class SceneSharedData : public CommonSharedData<SceneItem> {
  public:
-  explicit MatrixProjector(const std::string& weight_file);
+  SceneSharedData() = default;
+  virtual ~SceneSharedData() = default;
 
-  bool project(std::vector<float>* feature) override;
+  std::string name() const override { return "SceneSharedData"; }
 
  private:
-  Eigen::MatrixXf matrix_;
+  DISALLOW_COPY_AND_ASSIGN(SceneSharedData);
 };
+
+REGISTER_SHAREDDATA(SceneSharedData);
 
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_OBSTACLE_CAMERA_COMMON_PROJECTOR_H_
+#endif  // MODULES_PERCEPTION_OBSTACLE_ONBOARD_FUSION_SHARED_DATA_H_

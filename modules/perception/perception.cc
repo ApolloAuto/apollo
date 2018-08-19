@@ -34,6 +34,7 @@
 #include "modules/perception/obstacle/onboard/motion_service.h"
 #include "modules/perception/obstacle/onboard/object_shared_data.h"
 #include "modules/perception/obstacle/onboard/radar_process_subnode.h"
+#include "modules/perception/obstacle/onboard/scene_shared_data.h"
 #include "modules/perception/obstacle/onboard/ultrasonic_obstacle_subnode.h"
 #include "modules/perception/obstacle/onboard/visualization_subnode.h"
 #include "modules/perception/traffic_light/onboard/tl_preprocessor_subnode.h"
@@ -71,6 +72,7 @@ void Perception::RegistAllOnboardClass() {
   RegisterFactoryCIPVObjectData();
   RegisterFactoryLaneSharedData();
   RegisterFactoryFusionSharedData();
+  RegisterFactorySceneSharedData();
   traffic_light::RegisterFactoryTLPreprocessingData();
 
   /// register subnode

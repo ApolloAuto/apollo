@@ -46,8 +46,7 @@ bool HdmapROIFilter::Filter(pcl_util::PointCloudPtr cloud,
 }
 
 bool HdmapROIFilter::FilterWithPolygonMask(
-    pcl_util::PointCloudPtr cloud,
-    const std::vector<PolygonType>& map_polygons,
+    pcl_util::PointCloudPtr cloud, const std::vector<PolygonType>& map_polygons,
     pcl_util::PointIndices* roi_indices) {
   // 2. Get Major Direction as X direction and convert map_polygons to raw
   // polygons
@@ -136,8 +135,7 @@ void HdmapROIFilter::MergeRoadBoundariesToPolygons(
 }
 
 void HdmapROIFilter::MergeHdmapStructToPolygons(
-    HdmapStructConstPtr hdmap_struct_ptr,
-    std::vector<PolygonDType>* polygons) {
+    HdmapStructConstPtr hdmap_struct_ptr, std::vector<PolygonDType>* polygons) {
   std::vector<PolygonDType> road_polygons;
   MergeRoadBoundariesToPolygons(hdmap_struct_ptr->road_boundary,
                                 &road_polygons);

@@ -25,6 +25,8 @@ bool GetVelodyneTrans(const double query_time, Eigen::Matrix4d* trans);
 
 bool GetRadarTrans(const double query_time, Eigen::Matrix4d* trans);
 
+bool GetCameraTrans(const double query_time, Eigen::Matrix4d* trans);
+
 }  // namespace perception
 }  // namespace apollo
 

@@ -21,8 +21,8 @@
 #include "modules/common/macro.h"
 #include "modules/common/util/file.h"
 #include "modules/perception/common/perception_gflags.h"
+#include "modules/perception/obstacle/fusion/probabilistic_fusion/dst_evidence_initiator.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_hm_track_object_matcher.h"
-
 namespace apollo {
 namespace perception {
 
@@ -75,13 +75,21 @@ bool ProbabilisticFusion::Init() {
   }
   ADEBUG << "publish_sensor: " << publish_sensor_id_;
 
+  // add camera front narrow intrinsic if have
+  // initialize BBAManager
+  if (!DSTInitiator::instance().initialize_bba_manager()) {
+    AERROR << "failed to initialize BBAManager!";
+    return false;
+  }
+
   ADEBUG << "ProbabilisticFusion initialize successfully";
   return true;
 }
 
 bool ProbabilisticFusion::Fuse(
     const std::vector<SensorObjects> &multi_sensor_objects,
-    std::vector<std::shared_ptr<Object>> *fused_objects) {
+    std::vector<std::shared_ptr<Object>> *fused_objects,
+    FusionOptions *options) {
   ACHECK(fused_objects != nullptr) << "parameter fused_objects is nullptr";
 
   std::vector<PbfSensorFramePtr> frames;
@@ -106,6 +114,11 @@ bool ProbabilisticFusion::Fuse(
         continue;
       }
 
+      AINFO << "GetSensorType(multi_sensor_objects[i].sensor_type)"
+            << GetSensorType(multi_sensor_objects[i].sensor_type);
+
+      AINFO << "publish_sensor_id_" << publish_sensor_id_;
+
       if (GetSensorType(multi_sensor_objects[i].sensor_type) ==
           publish_sensor_id_) {
         need_to_fusion = true;
@@ -117,6 +130,7 @@ bool ProbabilisticFusion::Fuse(
       }
     }
 
+    options->fused = need_to_fusion;
     if (!need_to_fusion) {
       sensor_data_rw_mutex_.unlock();
       return true;
@@ -132,6 +146,18 @@ bool ProbabilisticFusion::Fuse(
     fusion_mutex_.lock();
     // 3.peform fusion on related frames
     for (size_t i = 0; i < frames.size(); ++i) {
+      if (frames[i]->sensor_id == "velodyne_64") {
+        options->fused_frame_ts.insert(options->fused_frame_ts.begin(),
+                                       frames[i]->timestamp);
+        options->fused_frame_device_id.insert(
+            options->fused_frame_device_id.begin(), frames[i]->sensor_id);
+      } else {
+        options->fused_frame_ts.push_back(frames[i]->timestamp);
+        options->fused_frame_device_id.push_back(frames[i]->sensor_id);
+      }
+      AINFO << "adding frame ts " << std::fixed << std::setprecision(12)
+            << frames[i]->timestamp;
+      AINFO << "adding frame sensor id " << frames[i]->sensor_id;
       FuseFrame(frames[i]);
     }
 
@@ -157,7 +183,8 @@ void ProbabilisticFusion::FuseFrame(PbfSensorFramePtr frame) {
 
   Eigen::Vector3d ref_point = frame->sensor2world_pose.topRightCorner(3, 1);
   FuseForegroundObjects(&foreground_objects, ref_point, frame->sensor_type,
-                        frame->sensor_id, frame->timestamp);
+                        frame->sensor_id, frame->timestamp,
+                        frame->sensor2world_pose);
   track_manager_->RemoveLostTracks();
 }
 
@@ -255,7 +282,8 @@ void ProbabilisticFusion::DecomposeFrameObjects(
 void ProbabilisticFusion::FuseForegroundObjects(
     std::vector<std::shared_ptr<PbfSensorObject>> *foreground_objects,
     Eigen::Vector3d ref_point, const SensorType &sensor_type,
-    const std::string &sensor_id, double timestamp) {
+    const std::string &sensor_id, double timestamp,
+    const Eigen::Matrix4d &sensor_world_pose) {
   std::vector<int> unassigned_tracks;
   std::vector<int> unassigned_objects;
   std::vector<std::pair<int, int>> assignments;
@@ -264,6 +292,7 @@ void ProbabilisticFusion::FuseForegroundObjects(
 
   TrackObjectMatcherOptions options;
   options.ref_point = &ref_point;
+  options.sensor_world_pose = &sensor_world_pose;
 
   std::vector<double> track2measurements_dist;
   std::vector<double> measurement2tracks_dist;
@@ -288,7 +317,9 @@ void ProbabilisticFusion::FuseForegroundObjects(
       CreateNewTracks(*foreground_objects, unassigned_objects);
     }
   } else {
-    CreateNewTracks(*foreground_objects, unassigned_objects);
+    if (is_lidar(sensor_type)) {
+      CreateNewTracks(*foreground_objects, unassigned_objects);
+    }
   }
 }
 
