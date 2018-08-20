@@ -12,6 +12,31 @@ message Trajectory {
   repeated apollo.common.TrajectoryPoint trajectory_point = 2;
 }
 
+// estimated obstacle intent
+message ObstacleIntent {
+   enum Type {
+    UNKNOWN = 0;
+    STOP = 1;
+    STATIONARY = 2;
+    MOVING = 3;
+    CHANGE_LANE = 4;
+    ACCELERATION = 5;
+    DECELERATION = 6;
+  }
+  optional Type type = 1 [default = UNKNOWN];
+}
+
+// self driving car intent
+message Intent {
+   enum Type {
+    UNKNOWN = 0;
+    STOP = 1;
+    CRUISE = 2;
+    CHANGE_LANE = 3;
+  }
+  optional Type type = 1 [default = UNKNOWN];
+}
+
 message PredictionObstacle {
   optional apollo.perception.PerceptionObstacle perception_obstacle = 1;
   optional double timestamp = 2;  // GPS time in seconds
@@ -19,6 +44,9 @@ message PredictionObstacle {
   optional double predicted_period = 3;
   // can have multiple trajectories per obstacle
   repeated Trajectory trajectory = 4;
+
+  // estimated obstacle intent
+  optional ObstacleIntent intent = 5;
 }
 
 message PredictionObstacles {
@@ -36,4 +64,7 @@ message PredictionObstacles {
 
   // end timestamp
   optional double end_timestamp = 5;
+
+  // self driving car intent
+  optional Intent intent = 6;
 }
