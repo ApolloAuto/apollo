@@ -132,6 +132,7 @@ function build() {
     JOB_ARG="--jobs=3"
   fi
   info "Building with $JOB_ARG for $MACHINE_ARCH"
+  df -h
 
   # Switch for building fuzz test.
   if [ -z $BUILD_FUZZ_TEST ]; then
@@ -195,6 +196,7 @@ function cibuild() {
   //modules/control/...
   //modules/dreamview/...
   //modules/drivers/gnss/...
+  //modules/drivers/lidar_velodyne/...
   //modules/localization/...
   //modules/map/...
   //modules/perception/...
@@ -387,7 +389,9 @@ function run_test() {
 }
 
 function citest() {
+  df -t
   generate_build_targets
+
   # common related test
   echo "$BUILD_TARGETS" | grep "common\/" | xargs bazel test $DEFINES --config=unit_test -c dbg --test_verbose_timeout_warnings $@
 
