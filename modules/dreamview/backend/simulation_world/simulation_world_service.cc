@@ -542,8 +542,6 @@ void SimulationWorldService::UpdatePlanningTrajectory(
   const double cutoff_time = world_.auto_driving_car().timestamp_sec();
   const double header_time = trajectory.header().timestamp_sec();
 
-  world_.set_planning_time(header_time);
-
   // Collect trajectory
   util::TrajectoryPointCollector collector(&world_);
 
@@ -608,11 +606,6 @@ void SimulationWorldService::UpdateMainStopDecision(
   decision->set_position_x(stop_pt.x() + map_service_->GetXOffset());
   decision->set_position_y(stop_pt.y() + map_service_->GetYOffset());
   decision->set_heading(stop_heading);
-
-  world_main_decision->set_position_x(decision->position_x());
-  world_main_decision->set_position_y(decision->position_y());
-  world_main_decision->set_heading(decision->heading());
-  world_main_decision->set_timestamp_sec(update_timestamp_sec);
 }
 
 bool SimulationWorldService::LocateMarker(
@@ -691,6 +684,16 @@ void SimulationWorldService::UpdateDecision(const DecisionResult &decision_res,
     UpdateMainChangeLaneDecision(main_decision.stop(), world_main_decision);
   } else if (main_decision.has_cruise()) {
     UpdateMainChangeLaneDecision(main_decision.cruise(), world_main_decision);
+  }
+  if (world_main_decision->decision_size() > 0) {
+    // set default position
+    const auto &adc = world_.auto_driving_car();
+    world_main_decision->set_position_x(adc.position_x() +
+                                        map_service_->GetXOffset());
+    world_main_decision->set_position_y(adc.position_y() +
+                                        map_service_->GetYOffset());
+    world_main_decision->set_heading(adc.heading());
+    world_main_decision->set_timestamp_sec(header_time);
   }
 
   // Update obstacle decision.
@@ -839,8 +842,10 @@ void SimulationWorldService::UpdateSimulationWorld(
 
   UpdatePlanningData(trajectory.debug().planning_data());
 
-  world_.mutable_latency()->set_planning(
-      trajectory.latency_stats().total_time_ms());
+  Latency latency;
+  latency.set_timestamp_sec(header_time);
+  latency.set_total_time_ms(trajectory.latency_stats().total_time_ms());
+  (*world_.mutable_latency())["planning"] = latency;
 }
 
 void SimulationWorldService::CreatePredictionTrajectory(
@@ -968,7 +973,13 @@ template <>
 void SimulationWorldService::UpdateSimulationWorld(
     const ControlCommand &control_command) {
   auto *control_data = world_.mutable_control_data();
-  control_data->set_timestamp_sec(control_command.header().timestamp_sec());
+  const double header_time = control_command.header().timestamp_sec();
+  control_data->set_timestamp_sec(header_time);
+
+  Latency latency;
+  latency.set_timestamp_sec(header_time);
+  latency.set_total_time_ms(control_command.latency_stats().total_time_ms());
+  (*world_.mutable_latency())["control"] = latency;
 
   if (control_command.has_debug()) {
     auto &debug = control_command.debug();

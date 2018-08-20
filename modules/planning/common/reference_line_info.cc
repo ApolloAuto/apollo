@@ -493,7 +493,7 @@ bool ReferenceLineInfo::ReachedDestination() const {
     return false;
   }
   if (!reference_line_.IsOnLane(
-      dest_ptr->obstacle()->PerceptionBoundingBox().center())) {
+          dest_ptr->obstacle()->PerceptionBoundingBox().center())) {
     return false;
   }
   const double stop_s = dest_ptr->PerceptionSLBoundary().start_s() +
@@ -547,7 +547,10 @@ void ReferenceLineInfo::MakeMainMissionCompleteDecision(
 
   auto mission_complete =
       decision_result->mutable_main_decision()->mutable_mission_complete();
-  if (!ReachedDestination()) {
+  if (ReachedDestination()) {
+    GetPlanningStatus()->mutable_destination()->set_has_passed_destination(
+        true);
+  } else {
     mission_complete->mutable_stop_point()->CopyFrom(main_stop.stop_point());
     mission_complete->set_stop_heading(main_stop.stop_heading());
   }

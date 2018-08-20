@@ -123,7 +123,7 @@ inline Timestamp FromInt64(int64_t timestamp_value) {
  * @brief converts the double to \class Timestamp. The input double has
  * a unit of seconds.
  * @return a Timestamp object.
-*/
+ */
 inline Timestamp From(double timestamp_value) {
   int64_t nanos_value = static_cast<int64_t>(timestamp_value * 1e9);
   return FromInt64<nanos>(nanos_value);
@@ -201,6 +201,20 @@ class Clock {
       AFATAL << "Cannot set now when clock mode is not MOCK!";
     }
     clock->mock_now_ = Timestamp(duration);
+  }
+
+  /**
+   * @brief This is for mock clock mode only. It will set the timestamp
+   * for the mock clock with UNIX timestamp in seconds.
+   */
+  static void SetNowInSeconds(double seconds) {
+    Clock *clock = instance();
+    if (clock->mode_ != ClockMode::MOCK) {
+      AFATAL << "Cannot set now when clock mode is not MOCK!";
+    }
+    std::chrono::duration<double> duration_sec(seconds);
+    clock->mock_now_ =
+        Timestamp(std::chrono::duration_cast<Duration>(duration_sec));
   }
 
  private:

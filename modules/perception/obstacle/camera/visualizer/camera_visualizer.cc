@@ -41,6 +41,8 @@ void OnPerception(const PerceptionObstacles &);
 void OnImageShort(sensor_msgs::ImagePtr);
 
 int main(int argc, char **argv) {
+  google::InitGoogleLogging(argv[0]);
+  google::ParseCommandLineFlags(&argc, &argv, true);
   ros::init(argc, argv, "camera_visualizer");
   ros::NodeHandle n;
 

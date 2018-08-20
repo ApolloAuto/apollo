@@ -1,134 +1,14 @@
 header {
-  timestamp_sec: 1526515219.0394421
+  timestamp_sec: 1533844120.2057884
   module_name: "routing"
   sequence_num: 1
-}
-road {
-  id: "11173"
-  passage {
-    segment {
-      id: "11173_1_-1"
-      start_s: 11.489033326336457
-      end_s: 34.5646
-    }
-    can_exit: true
-    change_lane_type: FORWARD
-  }
-}
-road {
-  id: "11182"
-  passage {
-    segment {
-      id: "11182_1_-1"
-      start_s: 0
-      end_s: 5.3302
-    }
-    can_exit: true
-    change_lane_type: FORWARD
-  }
-}
-road {
-  id: "10685"
-  passage {
-    segment {
-      id: "10685_1_-1"
-      start_s: 0
-      end_s: 11.8264
-    }
-    can_exit: true
-    change_lane_type: FORWARD
-  }
-}
-road {
-  id: "10686"
-  passage {
-    segment {
-      id: "10686_1_-1"
-      start_s: 0
-      end_s: 85.0173
-    }
-    can_exit: true
-    change_lane_type: FORWARD
-  }
-}
-road {
-  id: "2882"
-  passage {
-    segment {
-      id: "2882_1_-1"
-      start_s: 0
-      end_s: 12.5631
-    }
-    can_exit: true
-    change_lane_type: FORWARD
-  }
-}
-road {
-  id: "2881"
-  passage {
-    segment {
-      id: "2881_1_-1"
-      start_s: 0
-      end_s: 150.477
-    }
-    can_exit: true
-    change_lane_type: FORWARD
-  }
-}
-road {
-  id: "2887"
-  passage {
-    segment {
-      id: "2887_1_-1"
-      start_s: 0
-      end_s: 11.5982
-    }
-    can_exit: true
-    change_lane_type: FORWARD
-  }
-}
-road {
-  id: "2886"
-  passage {
-    segment {
-      id: "2886_1_-1"
-      start_s: 0
-      end_s: 59.8892
-    }
-    can_exit: true
-    change_lane_type: FORWARD
-  }
-}
-road {
-  id: "342"
-  passage {
-    segment {
-      id: "342_1_-1"
-      start_s: 0
-      end_s: 24.1879
-    }
-    can_exit: true
-    change_lane_type: FORWARD
-  }
-}
-road {
-  id: "337"
-  passage {
-    segment {
-      id: "337_1_-1"
-      start_s: 0
-      end_s: 8.57602
-    }
-    can_exit: true
-    change_lane_type: FORWARD
-  }
 }
 road {
   id: "2896"
   passage {
     segment {
       id: "2896_1_-1"
-      start_s: 0
+      start_s: 3.9204489256831567
       end_s: 7.14577
     }
     can_exit: true
@@ -345,35 +225,71 @@ road {
     segment {
       id: "11044_1_-1"
       start_s: 0
-      end_s: 10.880802241746931
+      end_s: 16.9657
+    }
+    can_exit: true
+    change_lane_type: FORWARD
+  }
+}
+road {
+  id: "373"
+  passage {
+    segment {
+      id: "373_1_-1"
+      start_s: 0
+      end_s: 24.8904
+    }
+    can_exit: true
+    change_lane_type: FORWARD
+  }
+}
+road {
+  id: "2923"
+  passage {
+    segment {
+      id: "2923_1_-1"
+      start_s: 0
+      end_s: 8.22673
+    }
+    can_exit: true
+    change_lane_type: FORWARD
+  }
+}
+road {
+  id: "2922"
+  passage {
+    segment {
+      id: "2922_1_-1"
+      start_s: 0
+      end_s: 30.496601298037231
     }
     can_exit: true
     change_lane_type: FORWARD
   }
 }
 measurement {
-  distance: 611.10974891541048
+  distance: 284.34704237235405
 }
 routing_request {
   header {
-    timestamp_sec: 1526515219.0374687
+    timestamp_sec: 1533844120.2038052
     module_name: "dreamview"
     sequence_num: 1
   }
   waypoint {
-    id: "11173_1_-1"
-    s: 11.489033326336457
+    id: "2896_1_-1"
+    s: 3.9204489256831567
     pose {
-      x: 586401.26174655254
-      y: 4140179.5699795387
+      x: 586420.32695324044
+      y: 4140565.8413469042
     }
   }
   waypoint {
-    id: "11044_1_-1"
-    s: 10.880802241746931
+    id: "2922_1_-1"
+    s: 30.496601298037231
     pose {
-      x: 586449.71510344348
-      y: 4140775.1864158288
+      x: 586466.290268646
+      y: 4140842.8926803083
     }
   }
 }
