@@ -56,9 +56,9 @@ export default class RosWebSocketEndpoint {
                     const updateCoordination = (this.currentMode !== STORE.hmi.currentMode);
                     this.currentMode = STORE.hmi.currentMode;
                     if (STORE.hmi.inNavigationMode) {
-                        // In navigation mode, relative map is set and the relative position
-                        // of auto driving car is (0, 0). Absolute position of the car
-                        // only needed in MAP_NAVIGATOR.
+                        // In navigation mode, the coordinate system is FLU and
+                        // relative position of the ego-car is (0, 0). But,
+                        // absolute position of the ego-car is needed in MAP_NAVIGATOR.
                         if (MAP_NAVIGATOR.isInitialized()) {
                             MAP_NAVIGATOR.update(message);
                         }
@@ -73,23 +73,13 @@ export default class RosWebSocketEndpoint {
                         this.mapUpdatePeriodMs = 1000;
                     }
 
-                    STORE.updateTimestamp(message.timestamp);
-                    STORE.updateModuleDelay(message);
+                    STORE.update(message);
                     RENDERER.maybeInitializeOffest(
                         message.autoDrivingCar.positionX,
                         message.autoDrivingCar.positionY,
                         updateCoordination);
-                    STORE.meters.update(message);
-                    STORE.monitor.update(message);
-                    STORE.trafficSignal.update(message);
-                    STORE.hmi.update(message);
-                    STORE.latency.update(message);
                     RENDERER.updateWorld(message);
                     this.updateMapIndex(message);
-                    if (STORE.options.showPNCMonitor) {
-                        STORE.planningData.update(message);
-                        STORE.controlData.update(message, STORE.hmi.vehicleParam);
-                    }
                     if (this.routingTime !== message.routingTime) {
                         // A new routing needs to be fetched from backend.
                         this.requestRoutePath();
