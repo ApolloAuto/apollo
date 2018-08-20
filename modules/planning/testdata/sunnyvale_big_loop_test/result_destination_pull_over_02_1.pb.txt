@@ -1,5 +1,5 @@
 header {
-  module_name: "planning"
+  module_name: "std_planning"
 }
 is_replan: false
 gear: GEAR_DRIVE
@@ -9,10 +9,10 @@ decision {
       reason_code: STOP_REASON_PULL_OVER
       reason: "stop by PO_DESTINATION_INLANE"
       stop_point {
-        x: 587161.39123766182
-        y: 4141195.6674832343
+        x: 587163.48776570184
+        y: 4141195.1363233807
       }
-      stop_heading: 2.89343296090915
+      stop_heading: 2.8935009865796331
       change_lane_type: FORWARD
     }
   }
@@ -25,11 +25,11 @@ decision {
           reason_code: STOP_REASON_PULL_OVER
           distance_s: -0.5
           stop_point {
-            x: 587161.39123766182
-            y: 4141195.6674832343
+            x: 587163.48776570184
+            y: 4141195.1363233807
             z: 0
           }
-          stop_heading: 2.89343296090915
+          stop_heading: 2.8935009865796331
         }
       }
     }

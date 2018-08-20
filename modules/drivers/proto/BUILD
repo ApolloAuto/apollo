@@ -18,6 +18,7 @@ proto_library(
         "pointcloud.proto",
         "racobit_radar.proto",
         "radar.proto",
+        "sensor_image.proto",
         "ultrasonic_radar.proto",
     ],
     deps = [

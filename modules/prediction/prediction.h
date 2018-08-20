@@ -79,14 +79,15 @@ class Prediction : public PredictionInterface {
  private:
   common::Status OnError(const std::string &error_msg);
 
-  // The function get the rosbags from the input flag_input.
-  // The input could be a file, a list of files seperated by space (' ') or a
-  // directory
-  std::vector<std::string> LoadOfflineBags(const std::string &flag_input);
-
   void OnLocalization(const localization::LocalizationEstimate &localization);
 
   void OnPlanning(const planning::ADCTrajectory &adc_trajectory);
+
+  /**
+   * @brief process rosbag in offline mode, mainly for extracting prediction
+   * features.
+   */
+  void ProcessRosbag(const std::string &filename);
 
  private:
   double start_time_ = 0.0;

@@ -73,6 +73,8 @@ ReferenceLineProvider::ReferenceLineProvider(const hdmap::HDMap *base_map) {
     smoother_.reset(new QpSplineReferenceLineSmoother(smoother_config_));
   } else if (smoother_config_.has_spiral()) {
     smoother_.reset(new SpiralReferenceLineSmoother(smoother_config_));
+  } else if (smoother_config_.has_cos_theta()) {
+    smoother_.reset(new CosThetaReferenceLineSmoother(smoother_config_));
   } else {
     CHECK(false) << "unknown smoother config "
                  << smoother_config_.DebugString();
@@ -172,9 +174,9 @@ void ReferenceLineProvider::UpdateReferenceLine(
 }
 
 void ReferenceLineProvider::GenerateThread() {
-  constexpr int32_t kSleepTime = 50;  // milliseconds
   while (!is_stop_) {
     std::this_thread::yield();
+    constexpr int32_t kSleepTime = 50;  // milliseconds
     std::this_thread::sleep_for(
         std::chrono::duration<double, std::milli>(kSleepTime));
     double start_time = Clock::NowInSeconds();

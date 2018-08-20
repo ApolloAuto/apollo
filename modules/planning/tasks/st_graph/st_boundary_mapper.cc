@@ -132,7 +132,7 @@ Status StBoundaryMapper::CreateStBoundary(PathDecision* path_decision) const {
         return Status(ErrorCode::PLANNING_ERROR,
                       "Fail to map overtake/yield decision");
       }
-    } else {
+    } else if (!decision.has_ignore()) {
       AWARN << "No mapping for decision: " << decision.DebugString();
     }
   }

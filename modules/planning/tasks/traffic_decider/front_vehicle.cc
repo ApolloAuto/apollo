@@ -79,11 +79,6 @@ bool FrontVehicle::MakeSidePassDecision(
     return true;
   }
 
-  if (FLAGS_use_navigation_mode) {
-    // no SIDE_PASS in navigation mode
-    return true;
-  }
-
   if (!reference_line_info->Lanes().IsOnSegment()) {
     // The lane keeping reference line
     return true;
@@ -289,7 +284,7 @@ std::string FrontVehicle::FindPassableObstacle(
       }
 
       const double delta_s = other_obstacle->PerceptionSLBoundary().start_s() -
-                       obstacle_sl.end_s();
+                             obstacle_sl.end_s();
       if (delta_s < 0.0 || delta_s > side_pass_s_threshold) {
         continue;
       } else {
@@ -328,9 +323,8 @@ void FrontVehicle::MakeStopDecision(ReferenceLineInfo* reference_line_info) {
       continue;
     }
 
-    bool is_on_road =
-        reference_line_info->reference_line().HasOverlap(
-            path_obstacle->obstacle()->PerceptionBoundingBox());
+    bool is_on_road = reference_line_info->reference_line().HasOverlap(
+        path_obstacle->obstacle()->PerceptionBoundingBox());
     if (!is_on_road) {
       // skip obstacles not on reference line
       ADEBUG << "obstacle_id[" << obstacle_id << "] type[" << obstacle_type_name
@@ -365,16 +359,16 @@ void FrontVehicle::MakeStopDecision(ReferenceLineInfo* reference_line_info) {
 
     const double left_width = std::min(start_s_left_width, end_s_left_width);
     const double left_driving_width = left_width - obstacle_sl.end_l() -
-        config_.front_vehicle().nudge_l_buffer();
+                                      config_.front_vehicle().nudge_l_buffer();
 
     const double right_width = std::min(start_s_right_width, end_s_right_width);
     const double right_driving_width = right_width + obstacle_sl.start_l() -
-        config_.front_vehicle().nudge_l_buffer();
+                                       config_.front_vehicle().nudge_l_buffer();
 
     ADEBUG << "obstacle_id[" << obstacle_id << "] type[" << obstacle_type_name
-        << "] left_driving_width[" << left_driving_width
-        << "] right_driving_width[" << right_driving_width << "] adc_width["
-        << adc_width << "]";
+           << "] left_driving_width[" << left_driving_width
+           << "] right_driving_width[" << right_driving_width << "] adc_width["
+           << adc_width << "]";
 
     // stop if not able to bypass or if obstacle crossed reference line
     if ((left_driving_width < adc_width && right_driving_width < adc_width) ||

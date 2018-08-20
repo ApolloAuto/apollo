@@ -83,6 +83,7 @@ export default class RosWebSocketEndpoint {
                     STORE.monitor.update(message);
                     STORE.trafficSignal.update(message);
                     STORE.hmi.update(message);
+                    STORE.latency.update(message);
                     RENDERER.updateWorld(message);
                     this.updateMapIndex(message);
                     if (STORE.options.showPNCMonitor) {
