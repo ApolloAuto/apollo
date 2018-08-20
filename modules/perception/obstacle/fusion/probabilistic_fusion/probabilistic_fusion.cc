@@ -60,6 +60,7 @@ bool ProbabilisticFusion::Init() {
   // track related parameters
   PbfTrack::SetMaxLidarInvisiblePeriod(config_.max_lidar_invisible_period());
   PbfTrack::SetMaxRadarInvisiblePeriod(config_.max_radar_invisible_period());
+  PbfTrack::SetMaxCameraInvisiblePeriod(config_.max_camera_invisible_period());
   PbfTrack::SetMaxRadarConfidentAngle(config_.max_radar_confident_angle());
   PbfTrack::SetMinRadarConfidentDistance(
       config_.min_radar_confident_distance());
@@ -283,7 +284,7 @@ void ProbabilisticFusion::FuseForegroundObjects(
                          sensor_type, sensor_id, timestamp);
 
   if (FLAGS_use_navigation_mode) {
-    if (is_camera(sensor_type)) {
+    if (is_camera(sensor_type) || is_lidar(sensor_type)) {
       CreateNewTracks(*foreground_objects, unassigned_objects);
     }
   } else {

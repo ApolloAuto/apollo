@@ -183,7 +183,7 @@ bool CameraCoeffient::init_camera_intrinsic_matrix_and_distort_params(
       distort_params[i] = config["D"][i].as<double>();
     }
   } else {
-    AERROR << "load camera distortion coeffients failed. file_name:"
+    AERROR << "load camera distortion coefficients failed. file_name:"
            << file_name;
     return false;
   }
@@ -282,6 +282,7 @@ bool CameraCalibration::init(const std::string &intrinsic_path,
 }
 
 void CameraCalibration::calculate_homographic() {
+  std::lock_guard<std::mutex> lock(adj_mtx_);
   auto camera_intrinsic_inverse = camera_intrinsic_.block(0, 0, 3, 3).inverse();
   auto car2camera_3_4 = (*_car2camera_pose).block(0, 0, 3, 4);
   Eigen::Matrix3d camera_2car_stripped;
@@ -303,7 +304,7 @@ bool CameraCalibration::init_undistortion(const std::string &intrinsics_path) {
       undistort_handler_->init(intrinsics_path, FLAGS_obs_camera_detector_gpu);
 
   if (err != 0) {
-    AERROR << "Undistortion initialization failed wiht error code: " << err;
+    AERROR << "Undistortion initialization failed with error code: " << err;
     return false;
   }
   undistort_handler_->set_device(FLAGS_obs_camera_detector_gpu);

@@ -167,7 +167,7 @@ namespace adapter {
 class AdapterManager {
  public:
   /**
-   * @brief Initialize the /class AdapterManager singleton with the
+   * @brief Initialize the \class AdapterManager singleton with the
    * provided configuration. The configuration is specified by the
    * file path.
    * @param adapter_config_filename the path to the proto file that
@@ -176,14 +176,14 @@ class AdapterManager {
   static void Init(const std::string &adapter_config_filename);
 
   /**
-   * @brief Initialize the /class AdapterManager singleton with the
+   * @brief Initialize the \class AdapterManager singleton with the
    * provided configuration.
    * @param configs the adapter manager configuration proto.
    */
   static void Init(const AdapterManagerConfig &configs);
 
   /**
-   * @brief Resets the /class AdapterManager so that it could be
+   * @brief Resets the \class AdapterManager so that it could be
    * re-initiailized.
    */
   static void Reset();
@@ -231,7 +231,7 @@ class AdapterManager {
   }
 
  private:
-  /// The node handler of ROS, owned by the /class AdapterManager
+  /// The node handler of ROS, owned by the \class AdapterManager
   /// singleton.
   std::unique_ptr<ros::NodeHandle> node_handle_;
 
@@ -254,6 +254,25 @@ class AdapterManager {
   REGISTER_ADAPTER(PerceptionObstacles);
   REGISTER_ADAPTER(Planning);
   REGISTER_ADAPTER(PointCloud);
+  REGISTER_ADAPTER(VLP16PointCloud);
+
+  // velodyne fusion sensors
+  // hdl-64e or vls-128
+  REGISTER_ADAPTER(PointCloudDense);
+  REGISTER_ADAPTER(PointCloudDenseRaw);
+  REGISTER_ADAPTER(VelodyneScanDense);
+
+  // vlp-16
+  REGISTER_ADAPTER(PointCloudSparse1);
+  REGISTER_ADAPTER(PointCloudSparseRaw1);
+  REGISTER_ADAPTER(VelodyneScanSparse1);
+  REGISTER_ADAPTER(PointCloudSparse2);
+  REGISTER_ADAPTER(PointCloudSparseRaw2);
+  REGISTER_ADAPTER(VelodyneScanSparse2);
+  REGISTER_ADAPTER(PointCloudSparse3);
+  REGISTER_ADAPTER(PointCloudSparseRaw3);
+  REGISTER_ADAPTER(VelodyneScanSparse3);
+
   REGISTER_ADAPTER(ImageFront);
   REGISTER_ADAPTER(ImageShort);
   REGISTER_ADAPTER(ImageLong);
@@ -270,6 +289,7 @@ class AdapterManager {
   REGISTER_ADAPTER(Mobileye);
   REGISTER_ADAPTER(DelphiESR);
   REGISTER_ADAPTER(ContiRadar);
+  REGISTER_ADAPTER(RacobitRadar);
   REGISTER_ADAPTER(Ultrasonic);
   REGISTER_ADAPTER(CompressedImage);
   REGISTER_ADAPTER(GnssRtkObs);
@@ -282,8 +302,7 @@ class AdapterManager {
   REGISTER_ADAPTER(DriveEvent);
   REGISTER_ADAPTER(RelativeMap);
   REGISTER_ADAPTER(Navigation);
-  REGISTER_ADAPTER(VoiceDetectionRequest);
-  REGISTER_ADAPTER(VoiceDetectionResponse);
+  REGISTER_ADAPTER(AudioCapture);
   // for pandora
   REGISTER_ADAPTER(PandoraPointCloud);
   REGISTER_ADAPTER(PandoraCameraFrontColor);

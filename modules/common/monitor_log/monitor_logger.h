@@ -41,7 +41,7 @@ using MessageItem = std::pair<MonitorMessageItem::LogLevel, std::string>;
 /**
  * class MonitorLogger
  *
- * @brief This class help collect and publish MonitorMessage pb to monitor
+ * @brief This class helps collect and publish MonitorMessage pb to monitor
  * topic. A module who wants to publish message can use macro
  * `MONITOR(log_level, log_msg)` to record messages, and call
  * Publish to broadcast the message to other modules.
@@ -50,7 +50,7 @@ class MonitorLogger {
  public:
   /**
    * @brief Construct the monitor with the source of the monitor messages. The
-   * source is usually the module name who publish the monitor messages.
+   * source is usually the module name who publishes the monitor messages.
    * @param source the source of the monitor messages.
    */
   explicit MonitorLogger(const MonitorMessageItem::MessageSource &source)

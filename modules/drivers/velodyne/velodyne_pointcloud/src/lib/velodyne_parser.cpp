@@ -39,7 +39,7 @@ double VelodyneParser::get_gps_stamp(double current_packet_stamp,
                       << ". current:" << current_packet_stamp
                       << ", last time:" << previous_packet_stamp);
     } else {
-      ROS_WARN_STREAM("Currrnt stamp:" << std::fixed << current_packet_stamp
+      ROS_WARN_STREAM("Current stamp:" << std::fixed << current_packet_stamp
                                        << " less than previous stamp:"
                                        << previous_packet_stamp
                                        << ". GPS time stamp maybe incorrect!");
@@ -83,7 +83,7 @@ void VelodyneParser::init_angle_params(double view_direction,
   tmp_max_angle = fmod(fmod(tmp_max_angle, 2 * M_PI) + 2 * M_PI, 2 * M_PI);
 
   // converting into the hardware velodyne ref (negative yaml and degrees)
-  // adding 0.5 perfomrs a centered double to int conversion
+  // adding 0.5 performs a centered double to int conversion
   config_.min_angle = 100 * (2 * M_PI - tmp_min_angle) * 180 / M_PI + 0.5;
   config_.max_angle = 100 * (2 * M_PI - tmp_max_angle) * 180 / M_PI + 0.5;
   if (config_.min_angle == config_.max_angle) {

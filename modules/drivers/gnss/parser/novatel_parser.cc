@@ -642,6 +642,12 @@ bool NovatelParser::HandleCorrImuData(const novatel::CorrImuData* imu) {
              imu->z_angle_change * imu_measurement_hz_,
              ins_.mutable_angular_velocity());
 
+  double seconds = imu->gps_week * SECONDS_PER_WEEK + imu->gps_seconds;
+  if (ins_.measurement_time() != seconds) {
+    ins_.set_measurement_time(seconds);
+    return false;
+  }
+
   ins_.mutable_header()->set_timestamp_sec(ros::Time::now().toSec());
   return true;
 }
@@ -686,7 +692,11 @@ bool NovatelParser::HandleInsPva(const novatel::InsPva* pva) {
   }
 
   double seconds = pva->gps_week * SECONDS_PER_WEEK + pva->gps_seconds;
-  ins_.set_measurement_time(seconds);
+  if (ins_.measurement_time() != seconds) {
+    ins_.set_measurement_time(seconds);
+    return false;
+  }
+
   ins_.mutable_header()->set_timestamp_sec(ros::Time::now().toSec());
   return true;
 }
@@ -707,7 +717,7 @@ bool NovatelParser::HandleRawImuX(const novatel::RawImuX* imu) {
           << imu->imuStatus;
   }
   if (is_zero(gyro_scale_)) {
-    config::ImuType imu_type = static_cast<config::ImuType>(imu->imu_type);
+    config::ImuType imu_type = imu_type_;
     novatel::ImuParameter param = novatel::GetImuParameter(imu_type);
     AINFO << "IMU type: " << config::ImuType_Name(imu_type) << "; "
           << "Gyro scale: " << param.gyro_scale << "; "
@@ -730,8 +740,8 @@ bool NovatelParser::HandleRawImuX(const novatel::RawImuX* imu) {
   if (imu_measurement_time_previous_ > 0.0 &&
       fabs(time - imu_measurement_time_previous_ - imu_measurement_span_) >
           1e-4) {
-    AWARN << "Unexpected delay between two IMU measurements at: "
-          << time - imu_measurement_time_previous_;
+    AWARN_EVERY(5) << "Unexpected delay between two IMU measurements at: "
+                   << time - imu_measurement_time_previous_;
   }
   imu_.set_measurement_time(time);
   switch (imu_frame_mapping_) {
@@ -1013,8 +1023,6 @@ bool NovatelParser::DecodeGnssObservation(const uint8_t* obs_data,
               break;
             }
 
-            double freq = 0;
-            gnss_frequence(baud_id, &freq);
             auto band_obs = sat_obs->add_band_obs();
             if (raw_.obs.data[i].code[i] == CODE_L1C) {
               band_obs->set_pseudo_type(
@@ -1028,7 +1036,6 @@ bool NovatelParser::DecodeGnssObservation(const uint8_t* obs_data,
             }
 
             band_obs->set_band_id(baud_id);
-            band_obs->set_frequency_value(freq);
             band_obs->set_pseudo_range(raw_.obs.data[i].P[j]);
             band_obs->set_carrier_phase(raw_.obs.data[i].L[j]);
             band_obs->set_loss_lock_index(raw_.obs.data[i].SNR[j]);

@@ -93,6 +93,9 @@ modules {
   process_conf {
     process_cmd_keywords: "modules/planning/planning"
   }
+  topic_conf {
+    type: PLANNING_TRAJECTORY
+  }
 }
 modules {
   name: "navigation_planning"
@@ -194,5 +197,17 @@ hardware {
   name: "camera_short"
   topic_conf {
     type: IMAGE_SHORT
+  }
+}
+resource_conf {
+  dir_spaces {
+    # For logs.
+    path: "/apollo/data"
+    min_available_gb: 8
+  }
+  dir_spaces {
+    # For bags.
+    path: "/media/apollo/internal_nvme"
+    min_available_gb: 128
   }
 }

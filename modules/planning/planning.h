@@ -19,22 +19,12 @@
 
 #include <memory>
 #include <string>
-#include <utility>
-#include <vector>
 
-#include "modules/common/proto/pnc_point.pb.h"
-#include "modules/planning/proto/planning.pb.h"
-#include "modules/planning/proto/planning_config.pb.h"
-#include "modules/planning/proto/traffic_rule_config.pb.h"
-
-#include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/apollo_app.h"
-#include "modules/common/status/status.h"
-#include "modules/common/util/factory.h"
-#include "modules/common/vehicle_state/vehicle_state_provider.h"
-#include "modules/planning/common/frame.h"
-#include "modules/planning/common/trajectory/publishable_trajectory.h"
-#include "modules/planning/planner/planner.h"
+#include "modules/common/configs/config_gflags.h"
+#include "modules/planning/navi_planning.h"
+#include "modules/planning/planning_base.h"
+#include "modules/planning/std_planning.h"
 
 /**
  * @namespace apollo::planning
@@ -51,104 +41,41 @@ namespace planning {
  */
 class Planning : public apollo::common::ApolloApp {
  public:
-  Planning() = default;
-  virtual ~Planning();
+  Planning() {
+    if (FLAGS_use_navigation_mode) {
+      planning_ptr_ = std::unique_ptr<PlanningBase>(new NaviPlanning());
+    } else {
+      planning_ptr_ = std::unique_ptr<PlanningBase>(new StdPlanning());
+    }
+  }
+  virtual ~Planning() {}
   /**
    * @brief module name
    * @return module name
    */
-  std::string Name() const override;
+  std::string Name() const override { return planning_ptr_->Name(); }
+
+  virtual void RunOnce() { planning_ptr_->RunOnce(); }
 
   /**
    * @brief module initialization function
    * @return initialization status
    */
-  apollo::common::Status Init() override;
+  apollo::common::Status Init() override { return planning_ptr_->Init(); }
 
   /**
    * @brief module start function
    * @return start status
    */
-  apollo::common::Status Start() override;
+  apollo::common::Status Start() override { return planning_ptr_->Start(); }
 
   /**
    * @brief module stop function
    */
-  void Stop() override;
-
-  /**
-   * @brief main logic of the planning module, runs periodically triggered by
-   * timer.
-   */
-  void RunOnce();
-
-  /**
-   * @brief record last planning trajectory
-   */
-  void SetLastPublishableTrajectory(const ADCTrajectory& adc_trajectory);
+  void Stop() override { return planning_ptr_->Stop(); }
 
  private:
-  // Watch dog timer
-  void OnTimer(const ros::TimerEvent&);
-
-  void PublishPlanningPb(ADCTrajectory* trajectory_pb, double timestamp);
-
-  /**
-   * @brief Fill the header and publish the planning message.
-   */
-  void Publish(planning::ADCTrajectory* trajectory) {
-    using apollo::common::adapter::AdapterManager;
-    AdapterManager::FillPlanningHeader(Name(), trajectory);
-    AdapterManager::PublishPlanning(*trajectory);
-  }
-
-  void RegisterPlanners();
-
-  /**
-   * @brief Plan the trajectory given current vehicle state
-   */
-  common::Status Plan(
-      const double current_time_stamp,
-      const std::vector<common::TrajectoryPoint>& stitching_trajectory,
-      ADCTrajectory* trajectory);
-
-  common::Status InitFrame(const uint32_t sequence_num,
-                           const common::TrajectoryPoint& planning_start_point,
-                           const double start_time,
-                           const common::VehicleState& vehicle_state);
-
-  bool IsVehicleStateValid(const common::VehicleState& vehicle_state);
-  void ExportReferenceLineDebug(planning_internal::Debug* debug);
-
-  void SetFallbackCruiseTrajectory(ADCTrajectory* cruise_trajectory);
-
-  /**
-   * Reset pull over mode whenever received new routing
-   */
-  void ResetPullOver(const routing::RoutingResponse& response);
-
-  double start_time_ = 0.0;
-
-  apollo::common::util::Factory<PlanningConfig::PlannerType, Planner>
-      planner_factory_;
-
-  PlanningConfig config_;
-
-  TrafficRuleConfigs traffic_rule_configs_;
-
-  const hdmap::HDMap* hdmap_ = nullptr;
-
-  std::unique_ptr<Frame> frame_;
-
-  std::unique_ptr<Planner> planner_;
-
-  std::unique_ptr<PublishableTrajectory> last_publishable_trajectory_;
-
-  std::unique_ptr<ReferenceLineProvider> reference_line_provider_;
-
-  ros::Timer timer_;
-
-  routing::RoutingResponse last_routing_;
+  std::unique_ptr<PlanningBase> planning_ptr_;
 };
 
 }  // namespace planning

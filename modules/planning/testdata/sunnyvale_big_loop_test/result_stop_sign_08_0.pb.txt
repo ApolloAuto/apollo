@@ -1,5 +1,5 @@
 header {
-  module_name: "planning"
+  module_name: "std_planning"
 }
 is_replan: true
 gear: GEAR_DRIVE
@@ -9,10 +9,10 @@ decision {
       reason_code: STOP_REASON_STOP_SIGN
       reason: "stop by SS_2203"
       stop_point {
-        x: 586980.497798301
-        y: 4141243.0496373256
+        x: 586979.95439842215
+        y: 4141241.73174152
       }
-      stop_heading: 2.6448072106250251
+      stop_heading: 2.7491778522192512
       change_lane_type: FORWARD
     }
   }
@@ -25,11 +25,11 @@ decision {
           reason_code: STOP_REASON_STOP_SIGN
           distance_s: -1
           stop_point {
-            x: 586980.497798301
-            y: 4141243.0496373256
+            x: 586979.95439842215
+            y: 4141241.73174152
             z: 0
           }
-          stop_heading: 2.6448072106250251
+          stop_heading: 2.7491778522192512
         }
       }
     }
@@ -43,7 +43,7 @@ routing_header {
   module_name: "routing"
   sequence_num: 2
 }
-right_of_way_status: UNPROTECTED
+right_of_way_status: PROTECTED
 lane_id {
   id: "2687_1_-1"
 }

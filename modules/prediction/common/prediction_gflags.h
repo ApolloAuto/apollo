@@ -23,12 +23,13 @@
 DECLARE_string(prediction_module_name);
 DECLARE_string(prediction_conf_file);
 DECLARE_string(prediction_adapter_config_filename);
-DECLARE_string(prediction_data_file_prefix);
+DECLARE_string(prediction_data_dir);
 
 DECLARE_bool(prediction_test_mode);
 DECLARE_double(prediction_test_duration);
 
 DECLARE_bool(prediction_offline_mode);
+DECLARE_string(prediction_offline_bags);
 
 DECLARE_double(prediction_duration);
 DECLARE_double(prediction_period);

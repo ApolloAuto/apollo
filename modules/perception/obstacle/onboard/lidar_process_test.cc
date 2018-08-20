@@ -75,12 +75,13 @@ TEST_F(LidarProcessTest, test_Init) {
 
 TEST_F(LidarProcessTest, test_Process) {
   std::string pcd_file =
-      "modules/perception/data/hm_tracker_test/"
-      "QN68P2_12_1476265365_1476265665_2.pcd";
+      "modules/perception/data/cnnseg_test/"
+      "uscar_12_1470770225_1470770492_1349.pcd";
   PointCloudPtr point_cloud(new PointCloud);
   pcl::PointCloud<pcl_util::PointXYZIT>::Ptr org_cloud(
       new pcl::PointCloud<pcl_util::PointXYZIT>);
-  pcl::io::loadPCDFile(pcd_file, *org_cloud);
+  CHECK_NE(-1, pcl::io::loadPCDFile(pcd_file, *org_cloud));
+
   point_cloud->points.reserve(org_cloud->points.size());
   for (size_t i = 0; i < org_cloud->points.size(); ++i) {
     pcl_util::Point pt;

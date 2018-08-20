@@ -33,8 +33,8 @@ namespace apollo {
 namespace perception {
 namespace cnnseg {
 
-using apollo::common::util::DisjointSetMakeSet;
 using apollo::common::util::DisjointSetFind;
+using apollo::common::util::DisjointSetMakeSet;
 using apollo::common::util::DisjointSetUnion;
 
 enum class MetaType {
@@ -268,7 +268,7 @@ class Cluster2D {
       std::shared_ptr<Object> out_obj(new apollo::perception::Object);
       out_obj->cloud = obs->cloud;
       out_obj->score = obs->score;
-      out_obj->score_type = ScoreType::SCORE_CNN;
+      out_obj->score_type = PerceptionObstacle::CONFIDENCE_CNN;
       out_obj->type = GetObjectType(obs->meta_type);
       out_obj->type_probs = GetObjectTypeProbs(obs->meta_type_probs);
       objects->push_back(out_obj);

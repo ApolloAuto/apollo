@@ -40,6 +40,14 @@ new_http_archive(
     url = "file:///home/tmp/benchmark-1.1.0.tar.gz",
 )
 
+new_http_archive(
+    name = "ctpl",
+    build_file = "third_party/ctpl.BUILD",
+    sha256 = "8c1cec7c570d6d84be1d29283af5039ea27c3e69703bd446d396424bf619816e",
+    strip_prefix = "CTPL-ctpl_v.0.0.2",
+    url = "https://github.com/vit-vit/CTPL/archive/ctpl_v.0.0.2.tar.gz",
+)
+
 # cpplint from google style guide
 new_git_repository(
     name = "google_styleguide",
@@ -157,7 +165,7 @@ new_local_repository(
 new_local_repository(
     name = "cuda",
     build_file = "third_party/cuda.BUILD",
-    path = "/usr/local/cuda/include",
+    path = "/usr/local/cuda",
 )
 
 # Local-integ
@@ -188,4 +196,26 @@ http_archive(
     name = "com_google_protobuf",
     strip_prefix = "protobuf-3.3.0",
     url = "file:///home/tmp/protobuf-3.3.0.tar.gz",
+)
+
+#jsoncpp .so for adv_plat
+new_local_repository(
+    name = "jsoncpp",
+    build_file = "third_party/jsoncpp.BUILD",
+    path = "/usr/local/apollo/jsoncpp/",
+)
+
+#adv_plat
+new_local_repository(
+    name = "adv_plat",
+    build_file = "third_party/adv_plat.BUILD",
+    path = "/usr/local/apollo/adv_plat",
+)
+
+#libprotobuf-mutator
+new_git_repository(
+    name = "libprotobuf_mutator",
+    build_file = "third_party/libprotobuf_mutator.BUILD",
+    commit = "f15940c782f9d130676de947d3a8a3662e4a8f34",
+    remote = "https://github.com/BaiduXLab/libprotobuf-mutator.git",
 )

@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <ctime>
 #include <cmath>
+#include <ctime>
 #include <memory>
 #include <thread>
 #include <vector>
@@ -23,13 +23,13 @@
 #include "ros/include/ros/ros.h"
 #include "ros/include/std_msgs/String.h"
 
+#include "modules/drivers/gnss/proto/config.pb.h"
+
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
 #include "modules/drivers/gnss/gnss_gflags.h"
-#include "modules/drivers/gnss/proto/config.pb.h"
 #include "modules/drivers/gnss/stream/raw_stream.h"
 #include "modules/drivers/gnss/stream/stream.h"
-#include "modules/drivers/gnss/util/utils.h"
 
 namespace apollo {
 namespace drivers {
@@ -278,11 +278,11 @@ void RawStream::Start() {
   rtk_thread_ptr_.reset(new std::thread(&RawStream::RtkSpin, this));
   if (config_.has_wheel_parameters()) {
     wheel_velocity_timer_ = AdapterManager::CreateTimer(
-      ros::Duration(1), &RawStream::OnWheelVelocityTimer, this);
+        ros::Duration(1), &RawStream::OnWheelVelocityTimer, this);
   }
 }
 
-void RawStream::OnWheelVelocityTimer(const ros::TimerEvent&) {
+void RawStream::OnWheelVelocityTimer(const ros::TimerEvent &) {
   AdapterManager::Observe();
   if (AdapterManager::GetChassis()->Empty()) {
     AINFO << "No chassis message received";
@@ -293,8 +293,8 @@ void RawStream::OnWheelVelocityTimer(const ros::TimerEvent&) {
       ros::Time::now().toSec() - chassis->header().timestamp_sec();
   auto latency_ms = std::to_string(std::lround(latency_sec * 1000));
   auto speed_cmps = std::to_string(std::lround(chassis->speed_mps() * 100));
-  auto cmd_wheelvelocity = "WHEELVELOCITY " + latency_ms
-                           + " 100 0 0 0 0 0 " + speed_cmps + "\r\n";
+  auto cmd_wheelvelocity =
+      "WHEELVELOCITY " + latency_ms + " 100 0 0 0 0 0 " + speed_cmps + "\r\n";
   AINFO << "Write command: " << cmd_wheelvelocity;
   command_stream_->write(cmd_wheelvelocity);
 }
@@ -313,7 +313,7 @@ bool RawStream::Connect() {
 
   if (command_stream_) {
     if (command_stream_->get_status() != Stream::Status::CONNECTED) {
-      if (!data_stream_->Connect()) {
+      if (!command_stream_->Connect()) {
         AERROR << "command stream connect failed.";
         return false;
       }
@@ -361,7 +361,7 @@ bool RawStream::Disconnect() {
 
   if (command_stream_) {
     if (command_stream_->get_status() == Stream::Status::CONNECTED) {
-      if (!data_stream_->Disconnect()) {
+      if (!command_stream_->Disconnect()) {
         AERROR << "command stream disconnect failed.";
         return false;
       }
@@ -393,7 +393,7 @@ bool RawStream::Login() {
     data_stream_->write(login_command);
     login_data.emplace_back(login_command);
     AINFO << "Login command: " << login_command;
-    // sleep a little to avoid overun of the slow serial interface.
+    // sleep a little to avoid overrun of the slow serial interface.
     ros::Duration(0.5).sleep();
   }
   data_stream_->RegisterLoginData(login_data);

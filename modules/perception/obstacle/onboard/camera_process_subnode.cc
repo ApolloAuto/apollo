@@ -118,11 +118,40 @@ void CameraProcessSubnode::ImgCallback(const sensor_msgs::Image &message) {
   } else {
     img = cv::imread(FLAGS_image_file_path, CV_LOAD_IMAGE_COLOR);
   }
+  cv::resize(img, img, cv::Size(1920, 1080), 0, 0);
   std::vector<std::shared_ptr<VisualObject>> objects;
   cv::Mat mask;
-  PERF_BLOCK_END("CameraProcessSubnode_Image_Preprocess");
 
+  PERF_BLOCK_END("CameraProcessSubnode_Image_Preprocess");
   detector_->Multitask(img, CameraDetectorOptions(), &objects, &mask);
+
+  cv::Mat mask_color(mask.rows, mask.cols, CV_32FC1);
+  if (FLAGS_use_whole_lane_line) {
+    std::vector<cv::Mat> masks;
+    detector_->Lanetask(img, &masks);
+    mask_color.setTo(cv::Scalar(0));
+    ln_msk_threshold_ = 0.9;
+    for (int c = 0; c < num_lines; ++c) {
+      for (int h = 0; h < masks[c].rows; ++h) {
+        for (int w = 0; w < masks[c].cols; ++w) {
+          if (masks[c].at<float>(h, w) >= ln_msk_threshold_) {
+            mask_color.at<float>(h, w) = static_cast<float>(c);
+          }
+        }
+      }
+    }
+  } else {
+    mask.copyTo(mask_color);
+    ln_msk_threshold_ = 0.5;
+    for (int h = 0; h < mask_color.rows; ++h) {
+      for (int w = 0; w < mask_color.cols; ++w) {
+        if (mask_color.at<float>(h, w) >= ln_msk_threshold_) {
+          mask_color.at<float>(h, w) = static_cast<float>(5);
+        }
+      }
+    }
+  }
+
   PERF_BLOCK_END("CameraProcessSubnode_detector_");
 
   converter_->Convert(&objects);
@@ -150,12 +179,12 @@ void CameraProcessSubnode::ImgCallback(const sensor_msgs::Image &message) {
 
   SharedDataPtr<CameraItem> camera_item_ptr(new CameraItem);
   camera_item_ptr->image_src_mat = img.clone();
-  mask.copyTo(out_objs->camera_frame_supplement->lane_map);
+  mask_color.copyTo(out_objs->camera_frame_supplement->lane_map);
   PublishDataAndEvent(timestamp, out_objs, camera_item_ptr);
   PERF_BLOCK_END("CameraProcessSubnode publish in DAG");
 
   if (pb_obj_) PublishPerceptionPbObj(out_objs);
-  if (pb_ln_msk_) PublishPerceptionPbLnMsk(mask, message);
+  if (pb_ln_msk_) PublishPerceptionPbLnMsk(mask_color, message);
 }
 
 void CameraProcessSubnode::ChassisCallback(
@@ -220,11 +249,7 @@ void CameraProcessSubnode::VisualObjToSensorObj(
   ((*sensor_objects)->camera_frame_supplement).reset(new CameraFrameSupplement);
 
   if (!CameraFrameSupplement::state_vars.initialized_) {
-    CameraFrameSupplement::state_vars.process_noise(1, 1) *= 10;
-    CameraFrameSupplement::state_vars.process_noise(2, 2) *= 10;
-    CameraFrameSupplement::state_vars.process_noise(3, 3) *= 10;
-    CameraFrameSupplement::state_vars.process_noise(3, 3) *= 10;
-
+    CameraFrameSupplement::state_vars.process_noise *= 10;
     CameraFrameSupplement::state_vars.trans_matrix.block(0, 0, 1, 4) << 1.0f,
         0.0f, 0.33f, 0.0f;
     CameraFrameSupplement::state_vars.trans_matrix.block(1, 0, 1, 4) << 0.0f,

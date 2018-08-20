@@ -77,10 +77,8 @@ bool LidarProcessSubnode::InitInternal() {
     return false;
   }
   device_id_ = reserve_field_map["device_id"];
+  AddMessageCallback();
 
-  CHECK(AdapterManager::GetPointCloud()) << "PointCloud is not initialized.";
-  AdapterManager::AddPointCloudCallback(&LidarProcessSubnode::OnPointCloud,
-                                        this);
   inited_ = true;
 
   return true;
@@ -127,6 +125,9 @@ void LidarProcessSubnode::OnPointCloud(
   // error_code_ = common::OK;
 
   /// call hdmap to get ROI
+  if (FLAGS_use_navigation_mode) {
+    AdapterManager::Observe();
+  }
   HdmapStructPtr hdmap = nullptr;
   if (hdmap_input_) {
     PointD velodyne_pose = {0.0, 0.0, 0.0, 0};  // (0,0,0)
@@ -334,10 +335,10 @@ bool LidarProcessSubnode::InitAlgorithmPlugin() {
         << object_builder_->name();
 
   /// init pre object filter
-  object_filter_.reset(
-      BaseObjectFilterRegisterer::GetInstanceByName("LowObjectFilter"));
+  object_filter_.reset(BaseObjectFilterRegisterer::GetInstanceByName(
+      FLAGS_onboard_object_filter));
   if (!object_filter_) {
-    AERROR << "Failed to get instance: ExtHdmapObjectFilter";
+    AERROR << "Failed to get instance: " << FLAGS_onboard_object_filter;
     return false;
   }
   if (!object_filter_->Init()) {
@@ -427,13 +428,25 @@ void LidarProcessSubnode::PublishDataAndEvent(
     event_manager_->Publish(event);
   }
 }
-
 SensorType Lidar64ProcessSubnode::GetSensorType() const {
   return SensorType::VELODYNE_64;
 }
 
+void Lidar64ProcessSubnode::AddMessageCallback() {
+  CHECK(AdapterManager::GetPointCloud()) << "PointCloud is not initialized.";
+  AdapterManager::AddPointCloudCallback<LidarProcessSubnode>(
+      &LidarProcessSubnode::OnPointCloud, this);
+}
+
 SensorType Lidar16ProcessSubnode::GetSensorType() const {
   return SensorType::VELODYNE_16;
+}
+
+void Lidar16ProcessSubnode::AddMessageCallback() {
+  CHECK(AdapterManager::GetVLP16PointCloud())
+      << "VLP16 PointCloud is not initialized.";
+  AdapterManager::AddVLP16PointCloudCallback<LidarProcessSubnode>(
+      &LidarProcessSubnode::OnPointCloud, this);
 }
 
 }  // namespace perception

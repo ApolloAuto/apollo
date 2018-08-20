@@ -19,6 +19,7 @@
 #include <cmath>
 #include <unordered_map>
 #include <utility>
+#include <ctime>
 
 #include "modules/perception/obstacle/camera/detector/common/proto/tracking_feature.pb.h"
 
@@ -43,14 +44,17 @@ bool YoloCameraDetector::Init(const CameraDetectorInitOptions &options) {
   const string yolo_config = apollo::common::util::GetAbsolutePath(
       yolo_root, FLAGS_yolo_config_filename);
 
+  const string lane_config = apollo::common::util::GetAbsolutePath(
+      yolo_root, "lane.pt");
+
   CHECK(apollo::common::util::GetProtoFromASCIIFile(yolo_config, &yolo_param_));
+  CHECK(apollo::common::util::GetProtoFromASCIIFile(lane_config, &lane_param_));
   load_intrinsic(options);
-  if (!init_cnn(yolo_root)) {
+  if (!init_cnn(yolo_root) || !init_cnn_lane(yolo_root)) {
     return false;
   }
   load_nms_params();
   init_anchor(yolo_root);
-
   return true;
 }
 
@@ -148,6 +152,27 @@ void YoloCameraDetector::load_intrinsic(
 
   int channel = 3;
   image_data_.reset(
+      new caffe::SyncedMemory(roi_w * roi_h * channel * sizeof(unsigned char)));
+}
+
+void YoloCameraDetector::load_intrinsic_lane(
+    const CameraDetectorInitOptions &options) {
+  const auto &model_param = lane_param_.model_param();
+
+  float offset_ratio = model_param.offset_ratio();
+  int resized_width = model_param.resized_width();
+  confidence_threshold_ = model_param.confidence_threshold();
+  ignored_height_ = model_param.ignored_height();
+  offset_y_ = static_cast<int>(offset_ratio * image_height_ + .5);
+
+  int roi_w = resized_width;
+  int roi_h = resized_width;
+
+  ADEBUG << "roi_w=" << roi_w << ", "
+         << "roi_h=" << roi_h;
+
+  int channel = 3;
+  image_data_lane_.reset(
       new caffe::SyncedMemory(roi_w * roi_h * channel * sizeof(unsigned char)));
 }
 
@@ -249,6 +274,56 @@ bool YoloCameraDetector::init_cnn(const string &yolo_root) {
   return true;
 }
 
+bool YoloCameraDetector::init_cnn_lane(const string &yolo_root) {
+  ADEBUG << "yolo_root: " << yolo_root;
+
+  auto const &net_param = lane_param_.net_param();
+  const auto &model_param = lane_param_.model_param();
+  string model_root = apollo::common::util::GetAbsolutePath(
+      yolo_root, model_param.model_name());
+  string proto_file = apollo::common::util::GetAbsolutePath(
+      model_root, model_param.proto_file());
+  string weight_file = apollo::common::util::GetAbsolutePath(
+      model_root, model_param.weight_file());
+
+  ADEBUG << " proto_file: " << proto_file;
+  ADEBUG << " weight_file: " << weight_file;
+  ADEBUG << " model_root: " << model_root;
+
+  const auto &model_type = model_param.model_type();
+  ignored_height_ = model_param.ignored_height();
+
+  vector<string> input_names;
+  vector<string> output_names;
+  input_names.push_back(net_param.input_blob());
+  output_names.push_back(net_param.seg_blob());
+
+  // init Net
+  ADEBUG << "model_type=" << model_type;
+  switch (model_type) {
+    case obstacle::yolo::ModelType::Caffe:
+      cnnadapter_lane_.reset(new CNNCaffe);
+      break;
+    default:
+      AERROR << "unknown model type.";
+      return false;
+  }
+
+  // init feature
+  if (!cnnadapter_lane_->init(input_names, output_names, proto_file,
+            weight_file, FLAGS_obs_camera_detector_gpu, model_root)) {
+    return false;
+  }
+
+  auto seg_blob = cnnadapter_lane_->get_blob_by_name(net_param.seg_blob());
+  if (seg_blob != nullptr) {
+    lane_output_height_lane_ = seg_blob->height();
+    lane_output_width_lane_ = seg_blob->width();
+  }
+
+  return true;
+}
+
 bool YoloCameraDetector::Multitask(
     const cv::Mat &frame, const CameraDetectorOptions &options,
     vector<std::shared_ptr<VisualObject>> *objects, cv::Mat *mask) {
@@ -274,6 +349,55 @@ bool YoloCameraDetector::Multitask(
   memcpy(mask->data,
          seg_blob->cpu_data() + lane_output_width_ * lane_output_height_,
          lane_output_width_ * lane_output_height_ * sizeof(float));
+
+  return true;
+}
+
+bool YoloCameraDetector::Lanetask(const cv::Mat &frame,
+                                  std::vector<cv::Mat> *predictions) {
+  caffe::Caffe::SetDevice(FLAGS_obs_camera_detector_gpu);
+  caffe::Timer pre_time;
+  pre_time.Start();
+
+  int roi_w = frame.cols;
+  int roi_h = frame.rows - offset_y_;
+  cv::Rect roi(0, offset_y_, roi_w, roi_h);
+  cv::Mat img(frame, roi);
+  cv::resize(img, img, cv::Size(lane_output_height_lane_,
+                        lane_output_width_lane_), 0, 0);
+  auto input_blob = cnnadapter_lane_->
+          get_blob_by_name(lane_param_.net_param().input_blob());
+
+  resize(img, input_blob.get(), image_data_lane_, 0);
+  pre_time.Stop();
+
+  AINFO << "Pre-processing: " << pre_time.MilliSeconds() << " ms";
+
+  caffe::Timer det_time;
+  det_time.Start();
+  cnnadapter_lane_->forward();
+  AINFO << "Running detection lane: " << det_time.MilliSeconds() << " ms";
+
+  caffe::Timer post_time;
+  post_time.Start();
+
+  auto seg_blob =
+      cnnadapter_lane_->get_blob_by_name(lane_param_.net_param().seg_blob());
+
+  if (seg_blob == nullptr) {
+    AERROR << "'seg_blob' is a null pointer.";
+    return false;
+  }
+
+  for (int i = 0; i < num_lanes_; ++i) {
+    cv::Mat tmp(lane_output_height_lane_, lane_output_width_lane_, CV_32FC1);
+    memcpy(tmp.data, seg_blob->cpu_data() + lane_output_width_lane_ *
+          lane_output_height_lane_ * i,
+          lane_output_width_lane_ * lane_output_height_lane_ * sizeof(float));
+    cv::resize(tmp, tmp,
+               cv::Size(lane_output_width_, lane_output_height_), 0, 0);
+    predictions->push_back(tmp);
+  }
 
   return true;
 }
@@ -306,7 +430,7 @@ bool YoloCameraDetector::Detect(
   caffe::Timer det_time;
   det_time.Start();
   cnnadapter_->forward();
-  AINFO << "Running detection: " << det_time.MilliSeconds() << " ms";
+  AINFO << "Running detection object: " << det_time.MilliSeconds() << " ms";
   caffe::Timer post_time;
   post_time.Start();
 

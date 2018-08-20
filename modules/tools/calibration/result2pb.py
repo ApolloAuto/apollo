@@ -24,10 +24,9 @@ import common.proto_utils as proto_utils
 from modules.control.proto import calibration_table_pb2
 from modules.control.proto.control_conf_pb2 import ControlConf
 
-
 def load_calibration_raw_data(fn):
     speed_table = {}
-    f = open(fn, 'r')
+    with open(fn, 'r') as f:
     for line in f:
         items = line.split(',')
         cmd = round(float(items[0]))
@@ -43,7 +42,6 @@ def load_calibration_raw_data(fn):
             cmd_table = {}
             cmd_table[cmd] = [acc]
             speed_table[speed] = cmd_table
-    f.close()
     for speed, cmd_table in speed_table.items():
         new_cmd_table = {}
         for cmd, acc_list in cmd_table.items():
@@ -61,10 +59,9 @@ def load_calibration_raw_data(fn):
         speed_table2[speed] = acc_table
     return speed_table2
 
-
 def load_calibration_raw_data_old(fn):
     speed_table = {}
-    f = open(fn, 'r')
+    with open(fn, 'r') as f:
     for line in f:
         items = line.split(',')
         cmd = round(float(items[0]))
@@ -80,9 +77,7 @@ def load_calibration_raw_data_old(fn):
             acc_table = {}
             acc_table[acc] = [cmd]
             speed_table[speed] = acc_table
-    f.close()
     return speed_table
-
 
 def get_calibration_table_pb(speed_table):
     calibration_table_pb = calibration_table_pb2.ControlCalibrationTable()
@@ -103,8 +98,8 @@ def get_calibration_table_pb(speed_table):
 
 if __name__ == "__main__":
     if len(sys.argv) != 3:
-        print("Usage: python plot_results.py old_control_conf.pb.txt result.csv")
-        sys.exit(0)
+        print("Usage: %s old_control_conf.pb.txt result.csv" % sys.argv[0])
+        sys.exit(1)
 
     ctl_conf_pb = proto_utils.get_pb_from_text_file(sys.argv[1], ControlConf())
     speed_table_dict = load_calibration_raw_data(sys.argv[2])

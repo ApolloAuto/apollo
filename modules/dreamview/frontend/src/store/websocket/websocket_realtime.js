@@ -83,6 +83,7 @@ export default class RosWebSocketEndpoint {
                     STORE.monitor.update(message);
                     STORE.trafficSignal.update(message);
                     STORE.hmi.update(message);
+                    STORE.latency.update(message);
                     RENDERER.updateWorld(message);
                     this.updateMapIndex(message);
                     if (STORE.options.showPNCMonitor) {
@@ -250,9 +251,9 @@ export default class RosWebSocketEndpoint {
         }));
     }
 
-    sendVoicePiece(data) {
+    sendAudioPiece(data) {
         this.websocket.send(JSON.stringify({
-            type: "VoicePiece",
+            type: "AudioPiece",
             data: btoa(String.fromCharCode(...data)),
         }));
     }

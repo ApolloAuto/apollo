@@ -28,9 +28,9 @@
 #include "modules/common/util/util.h"
 #include "modules/map/pnc_map/path.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/reference_line/qp_spline_reference_line_smoother.h"
 #include "modules/planning/reference_line/reference_line.h"
 #include "modules/planning/reference_line/reference_line_smoother.h"
+#include "modules/planning/reference_line/spiral_reference_line_smoother.h"
 
 DEFINE_string(input_file, "", "input file with format x,y per line");
 DEFINE_string(output_file, "", "output file with format x,y per line");
@@ -47,7 +47,6 @@ using hdmap::MapPathPoint;
 class SmootherUtil {
  public:
   explicit SmootherUtil(const std::string& filename) : filename_(filename) {
-    filename_ = filename;
     std::ifstream ifs(filename.c_str(), std::ifstream::in);
     std::string point_str;
     while (std::getline(ifs, point_str)) {
@@ -84,7 +83,7 @@ class SmootherUtil {
       // Prefer "std::make_unique" to direct use of "new".
       // Reference "https://herbsutter.com/gotw/_102/" for details.
       auto smoother_ptr =
-          std::make_unique<QpSplineReferenceLineSmoother>(config_);
+          std::make_unique<SpiralReferenceLineSmoother>(config_);
       auto anchors =
           CreateAnchorPoints(init_ref.reference_points().front(), init_ref);
       smoother_ptr->SetAnchorPoints(anchors);
@@ -107,8 +106,8 @@ class SmootherUtil {
       common::SLPoint sl;
       prev_half_ref.XYToSL(raw_points_[i], &sl);
       while (sl.s() <= prev_half_ref.Length() && i + 1 < raw_points_.size()) {
+        prev_half_ref.XYToSL(raw_points_[i + 1], &sl);
         ++i;
-        prev_half_ref.XYToSL(raw_points_[i], &sl);
       }
       s = 0.0;
       j = i;
@@ -126,7 +125,7 @@ class SmootherUtil {
       // Prefer "std::make_unique" to direct use of "new".
       // Reference "https://herbsutter.com/gotw/_102/" for details.
       auto smoother_ptr =
-          std::make_unique<QpSplineReferenceLineSmoother>(config_);
+          std::make_unique<SpiralReferenceLineSmoother>(config_);
       smoother_ptr->SetAnchorPoints(anchors);
       ReferenceLine smoothed_local_ref;
       if (!smoother_ptr->Smooth(local_ref, &smoothed_local_ref)) {

@@ -53,9 +53,12 @@ class YoloCameraDetector : public BaseCameraDetector {
 
   bool Multitask(const cv::Mat &frame, const CameraDetectorOptions &options,
                  std::vector<std::shared_ptr<VisualObject>> *objects,
-                 cv::Mat *mask);
+                 cv::Mat *mask) override;
 
-  bool Extract(std::vector<std::shared_ptr<VisualObject>> *objects) {
+  bool Lanetask(const cv::Mat &frame,
+                std::vector<cv::Mat> *predictions) override;
+
+  bool Extract(std::vector<std::shared_ptr<VisualObject>> *objects) override {
     for (auto &extractor : extractors_) {
       extractor->extract(objects);
     }
@@ -67,7 +70,11 @@ class YoloCameraDetector : public BaseCameraDetector {
  protected:
   bool init_cnn(const std::string &yolo_root);
 
+  bool init_cnn_lane(const std::string &yolo_root);
+
   void load_intrinsic(const CameraDetectorInitOptions &options);
+
+  void load_intrinsic_lane(const CameraDetectorInitOptions &options);
 
   void load_nms_params();
 
@@ -85,11 +92,13 @@ class YoloCameraDetector : public BaseCameraDetector {
 
  private:
   std::shared_ptr<CNNAdapter> cnnadapter_;
+  std::shared_ptr<CNNAdapter> cnnadapter_lane_;
 
   std::shared_ptr<caffe::SyncedMemory> res_cls_tensor_ = nullptr;
   std::shared_ptr<caffe::SyncedMemory> res_box_tensor_ = nullptr;
 
   std::shared_ptr<caffe::SyncedMemory> image_data_ = nullptr;
+  std::shared_ptr<caffe::SyncedMemory> image_data_lane_ = nullptr;
   std::shared_ptr<caffe::SyncedMemory> overlapped_ = nullptr;
   std::shared_ptr<caffe::SyncedMemory> idx_sm_ = nullptr;
   std::shared_ptr<caffe::SyncedMemory> anchor_ = nullptr;
@@ -114,8 +123,17 @@ class YoloCameraDetector : public BaseCameraDetector {
   float confidence_threshold_ = 0.1f;
   std::shared_ptr<BaseProjector> projector_;
   obstacle::yolo::YoloParam yolo_param_;
+  obstacle::yolo::YoloParam lane_param_;
   int image_height_ = 0;
   int image_width_ = 0;
+
+  // parameters for lane detection
+  float confidence_threshold_lane_ = 0.95;
+  int offset_y_lane_ = 0;
+  int lane_output_height_lane_ = 0;
+  int lane_output_width_lane_ = 0;
+  int ignored_height_ = 0;
+  int num_lanes_ = 13;
 
   yolo_camera_detector_config::ModelConfigs config_;
 };

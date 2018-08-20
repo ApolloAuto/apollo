@@ -21,13 +21,12 @@
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/planning_util.h"
 #include "modules/planning/integration_tests/planning_test_base.h"
-#include "modules/planning/planning.h"
 
 namespace apollo {
 namespace planning {
 
-using common::adapter::AdapterManager;
 using apollo::planning::util::GetPlanningStatus;
+using common::adapter::AdapterManager;
 
 DECLARE_string(test_routing_response_file);
 DECLARE_string(test_localization_file);
@@ -61,8 +60,8 @@ TEST_F(GarageTest, stop_obstacle) {
   PlanningTestBase::SetUp();
 
   // set config
-  auto* destination_config = PlanningTestBase::GetTrafficRuleConfig(
-      TrafficRuleConfig::DESTINATION);
+  auto* destination_config =
+      PlanningTestBase::GetTrafficRuleConfig(TrafficRuleConfig::DESTINATION);
   destination_config->mutable_destination()->set_enable_pull_over(false);
 
   RUN_GOLDEN_TEST(0);
@@ -79,8 +78,8 @@ TEST_F(GarageTest, follow) {
   PlanningTestBase::SetUp();
 
   // set config
-  auto* destination_config = PlanningTestBase::GetTrafficRuleConfig(
-      TrafficRuleConfig::DESTINATION);
+  auto* destination_config =
+      PlanningTestBase::GetTrafficRuleConfig(TrafficRuleConfig::DESTINATION);
   destination_config->mutable_destination()->set_enable_pull_over(false);
 
   RUN_GOLDEN_TEST(0);
@@ -99,8 +98,8 @@ TEST_F(GarageTest, dest_stop_01) {
   PlanningTestBase::SetUp();
 
   // set config
-  auto* destination_config = PlanningTestBase::GetTrafficRuleConfig(
-      TrafficRuleConfig::DESTINATION);
+  auto* destination_config =
+      PlanningTestBase::GetTrafficRuleConfig(TrafficRuleConfig::DESTINATION);
   destination_config->mutable_destination()->set_enable_pull_over(false);
 
   RUN_GOLDEN_TEST(0);
@@ -129,8 +128,8 @@ TEST_F(GarageTest, stop_over_line) {
   PlanningTestBase::SetUp();
 
   // set config
-  auto* destination_config = PlanningTestBase::GetTrafficRuleConfig(
-      TrafficRuleConfig::DESTINATION);
+  auto* destination_config =
+      PlanningTestBase::GetTrafficRuleConfig(TrafficRuleConfig::DESTINATION);
   destination_config->mutable_destination()->set_enable_pull_over(false);
 
   RUN_GOLDEN_TEST(0);

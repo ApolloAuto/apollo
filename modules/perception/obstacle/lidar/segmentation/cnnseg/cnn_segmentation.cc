@@ -57,9 +57,11 @@ bool CNNSegmentation::Init() {
   }
 
 /// Instantiate Caffe net
-#ifndef USE_CAFFE_GPU
+#ifndef USE_GPU
+  AINFO << "using Caffe CPU mode";
   caffe::Caffe::set_mode(caffe::Caffe::CPU);
 #else
+  AINFO << "using Caffe GPU mode";
   int gpu_id =
       cnnseg_param_.has_gpu_id() ? static_cast<int>(cnnseg_param_.gpu_id()) : 0;
   CHECK_GE(gpu_id, 0);
@@ -70,12 +72,6 @@ bool CNNSegmentation::Init() {
 
   caffe_net_.reset(new caffe::Net<float>(config_.proto_file(), caffe::TEST));
   caffe_net_->CopyTrainedLayersFrom(config_.weight_file());
-
-#ifndef USE_CAFFE_GPU
-  AINFO << "using Caffe CPU mode";
-#else
-  AINFO << "using Caffe GPU mode";
-#endif
 
   /// set related Caffe blobs
   // center offset prediction
@@ -160,7 +156,7 @@ bool CNNSegmentation::Segment(pcl_util::PointCloudPtr pc_ptr,
   PERF_BLOCK_END("[CNNSeg] feature generation");
 
 // network forward process
-#ifdef USE_CAFFE_GPU
+#ifdef USE_GPU
   caffe::Caffe::set_mode(caffe::Caffe::GPU);
 #endif
   caffe_net_->Forward();

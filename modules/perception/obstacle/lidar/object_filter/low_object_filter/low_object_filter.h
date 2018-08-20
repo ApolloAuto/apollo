@@ -46,6 +46,8 @@ class LowObjectFilter : public BaseObjectFilter {
 
  private:
   low_object_filter_config::ModelConfigs config_;
+  float object_height_threshold_  = 0.f;
+  float object_position_height_threshold_ = 0.f;
 
  private:
   DISALLOW_COPY_AND_ASSIGN(LowObjectFilter);

@@ -63,10 +63,25 @@ std::vector<std::vector<int>> GLFWFusionViewer::s_color_table = {
     std::vector<int>{255, 0, 255}, std::vector<int>{255, 255, 0},
     std::vector<int>{255, 128, 0}};
 
+std::vector<cv::Scalar> lane_map_colors = {
+    cv::Scalar(0, 0, 0),  // Background, should never be used
+    cv::Scalar(100, 240, 0),  // L3
+    cv::Scalar(150, 180, 0),  // L2
+    cv::Scalar(250, 120, 0),  // L1
+    cv::Scalar(250, 0, 0),  // L0
+    cv::Scalar(0, 250, 0),  // Center
+    cv::Scalar(0, 0, 250),  // R0
+    cv::Scalar(120, 0, 200),  // R1
+    cv::Scalar(180, 0, 150),  // R2
+    cv::Scalar(240, 0, 100),  // R3
+    cv::Scalar(0, 0, 0),  // Other
+    cv::Scalar(255, 255, 255),  // Left boundary
+    cv::Scalar(255, 255, 255)};  // Right boundary
+
 GLFWFusionViewer::GLFWFusionViewer()
     : init_(false),
       window_(nullptr),
-      pers_camera_(nullptr),
+      //  pers_camera_(nullptr),
       bg_color_(0.0, 0.0, 0.0),
       win_width_(2560),
       win_height_(1440),
@@ -100,9 +115,9 @@ GLFWFusionViewer::GLFWFusionViewer()
 
 GLFWFusionViewer::~GLFWFusionViewer() {
   close();
-  if (pers_camera_) {
-    delete pers_camera_;
-  }
+  //  if (pers_camera_) {
+  //    delete pers_camera_;
+  //  }
   if (rgba_buffer_) {
     delete[] rgba_buffer_;
     rgba_buffer_ = nullptr;
@@ -248,16 +263,22 @@ void GLFWFusionViewer::close() { glfwTerminate(); }
 void GLFWFusionViewer::set_camera_para(Eigen::Vector3d i_position,
                                        Eigen::Vector3d i_scn_center,
                                        Eigen::Vector3d i_up_vector) {
-  pers_camera_->set_position(i_position);
-  pers_camera_->setscene_center(i_scn_center);
-  pers_camera_->setup_vector(i_up_vector);
-  pers_camera_->look_at(i_scn_center);
+  //  pers_camera_->set_position(i_position);
+  //  pers_camera_->setscene_center(i_scn_center);
+  //  pers_camera_->setup_vector(i_up_vector);
+  //  pers_camera_->look_at(i_scn_center);
 
-  GLdouble v_mat[16];
-  pers_camera_->get_model_view_matrix(v_mat);
-  view_mat_ << v_mat[0], v_mat[4], v_mat[8], v_mat[12], v_mat[1], v_mat[5],
-      v_mat[9], v_mat[13], v_mat[2], v_mat[6], v_mat[10], v_mat[14], v_mat[3],
-      v_mat[7], v_mat[11], v_mat[15];
+  //  GLdouble v_mat[16];
+  //  pers_camera_->get_model_view_matrix(v_mat);
+  //   view_mat_ << v_mat[0], v_mat[4], v_mat[8], v_mat[12], v_mat[1], v_mat[5],
+  //   v_mat[9], v_mat[13], v_mat[2], v_mat[6], v_mat[10], v_mat[14], v_mat[3],
+  //       v_mat[7], v_mat[11], v_mat[15];
+  //   AINFO << "camera parameter: " << view_mat_;
+  scene_center_ = i_scn_center;
+  view_mat_ <<  1, 0, 0, 0,
+                0, 1, 0, 0,
+                0, 0, 1, -100,
+                0, 0, 0, 1;
 }
 
 bool GLFWFusionViewer::window_init() {
@@ -298,14 +319,14 @@ bool GLFWFusionViewer::window_init() {
 
 bool GLFWFusionViewer::camera_init() {
   // perspective cameras
-  pers_camera_ = new Camera;
-  pers_camera_->set_type(Camera::Type::PERSPECTIVE);
-  pers_camera_->setscene_radius(1000);
-  pers_camera_->set_position(Eigen::Vector3d(0, 0, -30));
-  pers_camera_->setscreen_widthandheight(scene_width_, scene_height_);
-  pers_camera_->look_at(Eigen::Vector3d(0, 0, 0));
-  double fov = 45 * (My_PI / 180.0);
-  pers_camera_->setfield_of_view(fov);
+  //  pers_camera_ = new Camera;
+  //  pers_camera_->set_type(Camera::Type::PERSPECTIVE);
+  //  pers_camera_->setscene_radius(1000);
+  //  pers_camera_->set_position(Eigen::Vector3d(0, 0, -30));
+  //  pers_camera_->setscreen_widthandheight(scene_width_, scene_height_);
+  //  pers_camera_->look_at(Eigen::Vector3d(0, 0, 0));
+  //  double fov = 45 * (My_PI / 180.0);
+  //  pers_camera_->setfield_of_view(fov);
   return true;
 }
 
@@ -436,8 +457,17 @@ bool GLFWFusionViewer::opengl_init() {
 
 void GLFWFusionViewer::pre_draw() {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  pers_camera_->load_projection_matrix();
-
+  //  pers_camera_->load_projection_matrix();
+  {
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    GLdouble tmp_projection_matrix[16] = { 1.37509, 0, 0, 0,
+                                      0, 2.41421, 0, 0,
+                                      0, 0, -1.0095, -1,
+                                      0, 0, -17.4028, 0
+                                     };
+    glMultMatrixd(tmp_projection_matrix);
+  }
   // column major
   GLdouble mode_mat[16] = {
       mode_mat_(0, 0), mode_mat_(1, 0), mode_mat_(2, 0), mode_mat_(3, 0),
@@ -561,6 +591,13 @@ void GLFWFusionViewer::render() {
   glClear(GL_COLOR_BUFFER_BIT);
 
   frame_count_++;
+  if (FLAGS_use_whole_lane_line) {
+    CalibrationConfigManager* calibration_config_manager =
+      Singleton<CalibrationConfigManager>::get();
+      CameraCalibrationPtr calibrator =
+          calibration_config_manager->get_camera_calibration();
+      car2camera = calibrator->get_car2camera_homography_mat();
+  }
 
   ADEBUG << "GLFWFusionViewer::render()";
   // 1. Top right, draw 3d detection and classification results (lidar tracked
@@ -717,7 +754,7 @@ void GLFWFusionViewer::resize_window(int width, int height) {
   scene_height_ = win_height_ * 0.5;
   image_width_ = scene_width_;
   image_height_ = scene_height_;
-  pers_camera_->setscreen_widthandheight(scene_width_, scene_height_);
+  //  pers_camera_->setscreen_widthandheight(scene_width_, scene_height_);
 }
 
 void GLFWFusionViewer::resize_framebuffer(int width, int height) {
@@ -735,20 +772,24 @@ void GLFWFusionViewer::resize_framebuffer(int width, int height) {
   scene_height_ = win_height_ * 0.5;
   image_width_ = scene_width_;
   image_height_ = scene_height_;
-  pers_camera_->setscreen_widthandheight(scene_width_, scene_height_);
+  //  pers_camera_->setscreen_widthandheight(scene_width_, scene_height_);
 }
 
+
 void GLFWFusionViewer::mouse_move(double xpos, double ypos) {
+/*
   int state_left = glfwGetMouseButton(window_, GLFW_MOUSE_BUTTON_LEFT);
   int state_right = glfwGetMouseButton(window_, GLFW_MOUSE_BUTTON_RIGHT);
   int x_delta = xpos - mouse_prev_x_;
   int y_delta = ypos - mouse_prev_y_;
   if (state_left == GLFW_PRESS) {
-    Eigen::Quaterniond rot =
-        pers_camera_->get_rotatation_by_mouse_from_qgwidget(
-            mouse_prev_x_, mouse_prev_y_, xpos, ypos);
-    Eigen::Matrix3d rot_mat = rot.inverse().toRotationMatrix();
-    Eigen::Vector3d scn_center = pers_camera_->scene_center();
+    //  Eigen::Quaterniond rot =
+    //      pers_camera_->get_rotatation_by_mouse_from_qgwidget(
+    //          mouse_prev_x_, mouse_prev_y_, xpos, ypos);
+    //  Eigen::Matrix3d rot_mat = rot.inverse().toRotationMatrix();
+    //  AINFO << "camera Quaterniond rot_mat: "  << rot_mat;
+    //  Eigen::Vector3d scn_center = pers_camera_->scene_center();
+    Eigen::Vector3d scn_center = scene_center_;
     Eigen::Vector4d scn_center_(scn_center(0), scn_center(1), scn_center(2), 1);
     scn_center_ = mode_mat_ * view_mat_ * scn_center_;
     scn_center = scn_center_.head(3);
@@ -765,8 +806,9 @@ void GLFWFusionViewer::mouse_move(double xpos, double ypos) {
 
   mouse_prev_x_ = xpos;
   mouse_prev_y_ = ypos;
-}
 
+*/
+}
 void GLFWFusionViewer::mouse_wheel(double delta) { mode_mat_(2, 3) -= delta; }
 
 void GLFWFusionViewer::reset() { mode_mat_ = Eigen::Matrix4d::Identity(); }
@@ -800,6 +842,7 @@ void GLFWFusionViewer::keyboard(int key) {
       break;
     case GLFW_KEY_E:  // E
       draw_lane_objects_ = !draw_lane_objects_;
+      break;
     case GLFW_KEY_F:  // F
       show_fusion_ = !show_fusion_;
       break;
@@ -1128,6 +1171,12 @@ void GLFWFusionViewer::draw_lane_objects_ground() {
                << static_cast<int>(lane_objects_->at(k).spatial);
       }
     }
+
+    cv::Scalar lane_object_color =
+      lane_map_colors[lane_objects_->at(k).newSpatial];
+    glColor3f(static_cast<float>(lane_object_color[2])/255.0,
+              static_cast<float>(lane_object_color[1])/255.0,
+              static_cast<float>(lane_object_color[0])/255.0);
     // if (show_trajectory_) {
     //   glColor3f(1.0f, 0.0f, 0.0f);  // red
     // }
@@ -1227,20 +1276,21 @@ bool GLFWFusionViewer::draw_lane_objects_image(cv::Mat* image_mat) {
   }
 
   // draw lane pixels
-  cv::Scalar lane_map_color(0, 255, 255);  // yellow for lane line mark
   int x_offset = 0;
   int y_offset = lane_start_y_pos_;
   int x0 = x_offset;
   int y0 = y_offset;
   int x1 = image_mat->cols - 1;
   int y1 = image_mat->rows - 1;
-
   for (int h = y0; h <= y1; ++h) {
     for (int w = x0; w <= x1; ++w) {
       int x = static_cast<int>(w * lane_map_scale_);
       int y = static_cast<int>((h - y_offset) * lane_map_scale_);
       if (x >= 0 && x < lane_map.cols && y >= 0 && y < lane_map.rows &&
           lane_map.at<float>(y, x) >= lane_map_threshold_) {
+        cv::Scalar lane_map_color =
+          lane_map_colors[static_cast<int>(round(lane_map.at<float>(y, x)))];
+        // AINFO << lane_map_color;
         for (uint16_t c = 0; c < 3; c++) {
           image_mat->at<cv::Vec3b>(h, w)[c] = static_cast<unsigned char>(
               image_mat->at<cv::Vec3b>(h, w)[c] * alpha_blending +
@@ -1289,30 +1339,74 @@ bool GLFWFusionViewer::draw_lane_objects_image(cv::Mat* image_mat) {
       }
     }
 
+    lane_object_color = lane_map_colors[lane_objects_->at(k).newSpatial];
+
     // Besides the fitted polynomial curves we draw lane markers as well
-    for (auto p = lane_objects_->at(k).image_pos.begin();
+    // Upper-left points in image coord
+    if (!FLAGS_use_whole_lane_line) {
+      for (auto p = lane_objects_->at(k).image_pos.begin();
          p != lane_objects_->at(k).image_pos.end(); ++p) {
-      cv::circle(*image_mat,
-                 cv::Point(static_cast<int>(p->x()), static_cast<int>(p->y())),
-                 4, lane_object_color, -1);
-    }
-
-    // draw polynomial curve
-    float img_y_start =
+         cv::circle(*image_mat,
+          cv::Point(static_cast<int>(p->x()), static_cast<int>(p->y())),
+          3, cv::Scalar(0, 0, 0), -1);
+      }
+      // draw polynomial curve
+      // Upper-left points in image coord
+      float img_y_start =
         static_cast<float>(lane_objects_->at(k).img_curve.x_start);
-    float img_y_end = static_cast<float>(lane_objects_->at(k).img_curve.x_end);
-    float start = std::min(img_y_start, img_y_end);
-    float end = std::max(img_y_start, img_y_end);
-    float a = lane_objects_->at(k).img_curve.a;
-    float b = lane_objects_->at(k).img_curve.b;
-    float c = lane_objects_->at(k).img_curve.c;
-    float d = lane_objects_->at(k).img_curve.d;
+      float img_y_end =
+        static_cast<float>(lane_objects_->at(k).img_curve.x_end);
+      float start = std::min(img_y_start, img_y_end);
+      float end = std::max(img_y_start, img_y_end);
+      float a = lane_objects_->at(k).img_curve.a;
+      float b = lane_objects_->at(k).img_curve.b;
+      float c = lane_objects_->at(k).img_curve.c;
+      float d = lane_objects_->at(k).img_curve.d;
 
-    for (float l = start; l <= end; l++) {
-      cv::circle(*image_mat,
-                 cv::Point(static_cast<int>(GetPolyValue(a, b, c, d, l)),
-                           static_cast<int>(l)),
-                 2, lane_object_color, -1);
+      for (float l = start; l <= end; l++) {
+        cv::circle(*image_mat,
+                   cv::Point(static_cast<int>(GetPolyValue(a, b, c, d, l)),
+                             static_cast<int>(l)),
+                             2, lane_object_color, -1);
+      }
+    } else {
+      for (auto p = lane_objects_->at(k).pos.begin();
+           p != lane_objects_->at(k).pos.end(); ++p) {
+        Eigen::Matrix<double, 3, 1> pos_point(static_cast<double>(p->x()),
+                                            static_cast<double>(p->y()), 1.0);
+        Eigen::Matrix<double, 3, 1> img_point = car2camera * pos_point;
+        int x = static_cast<int>(img_point(0)/img_point(2));
+        int y = static_cast<int>(img_point(1)/img_point(2));
+        if (x > 0 && x < image_mat->cols && y > 0 && y < image_mat->rows) {
+          cv::circle(*image_mat,
+                   cv::Point(static_cast<int>(x), static_cast<int>(y)),
+                   3, lane_object_color, -1);
+        }
+      }
+
+      float pos_y_start =
+        static_cast<float>(lane_objects_->at(k).pos_curve.x_start);
+      float pos_y_end =
+        static_cast<float>(lane_objects_->at(k).pos_curve.x_end);
+      float start = std::min(pos_y_start, pos_y_end);
+      float end = std::max(pos_y_start, pos_y_end);
+      start = start > 15 ? start : 4;
+      float a = lane_objects_->at(k).pos_curve.a;
+      float b = lane_objects_->at(k).pos_curve.b;
+      float c = lane_objects_->at(k).pos_curve.c;
+      float d = lane_objects_->at(k).pos_curve.d;
+
+      for (float l = start; l <= end; l += 0.1) {
+        Eigen::Matrix<double, 3, 1> pos_point(static_cast<double>(l),
+                static_cast<double>(GetPolyValue(a, b, c, d, l)), 1.0);
+        Eigen::Matrix<double, 3, 1> img_point = car2camera * pos_point;
+        int x = static_cast<int>(img_point(0)/img_point(2));
+        int y = static_cast<int>(img_point(1)/img_point(2));
+        if (x > 0 && x < image_mat->cols && y > 0 && y < image_mat->rows) {
+          cv::circle(*image_mat, cv::Point(x, y),
+                   2, lane_object_color - cv::Scalar(25, 25, 25), -1);
+        }
+      }
     }
   }
 
@@ -1749,7 +1843,9 @@ bool GLFWFusionViewer::draw_car_forward_dir() {
   glColor3f(1.0, 0.5, 0.17);
   glLineWidth(3);
   glBegin(GL_LINES);
-  Eigen::Vector3d center = pers_camera_->scene_center();
+  //  Eigen::Vector3d center = pers_camera_->scene_center();
+  Eigen::Vector3d center = scene_center_;
+
   Eigen::Vector3d forward_vp = center + forward_dir_ * 5;
   glVertex3f(center(0), center(1), center(2));
   glVertex3f(forward_vp(0), forward_vp(1), forward_vp(2));

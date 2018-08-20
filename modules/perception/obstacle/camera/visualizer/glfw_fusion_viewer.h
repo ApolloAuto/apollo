@@ -34,7 +34,7 @@
 #include "modules/perception/obstacle/camera/cipv/cipv.h"
 #include "modules/perception/obstacle/camera/common/camera.h"
 #include "modules/perception/obstacle/camera/visualizer/base_visualizer.h"
-#include "modules/perception/obstacle/camera/visualizer/common/camera.h"
+//  #include "modules/perception/obstacle/camera/visualizer/common/camera.h"
 #include "modules/perception/obstacle/camera/visualizer/common/gl_raster_text.h"
 #include "modules/perception/obstacle/camera/visualizer/frame_content.h"
 
@@ -217,7 +217,8 @@ class GLFWFusionViewer {
   bool init_;
 
   GLFWwindow *window_;
-  Camera *pers_camera_;
+  //  Camera *pers_camera_;
+  Eigen::Vector3d scene_center_;
   Eigen::Vector3d forward_dir_;
   std::vector<Eigen::Vector3d> main_car_;
 
@@ -300,6 +301,7 @@ class GLFWFusionViewer {
   int image_height_;
 
   Eigen::Matrix<double, 3, 4> camera_intrinsic_;  // camera intrinsic
+  Eigen::Matrix<double, 3, 3> car2camera;
 
   bool show_fusion_;
   bool show_radar_pc_;
@@ -335,7 +337,7 @@ class GLFWFusionViewer {
   // frame count
   int frame_count_;
   // alpha_blending factor for visualization
-  float alpha_blending = 0.5;  // [0..1]
+  float alpha_blending = 0.75;  // [0..1]
   float one_minus_alpha = 1.0 - alpha_blending;
   // object_trajectories
 

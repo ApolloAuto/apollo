@@ -44,6 +44,9 @@ cc_library(
         "//modules/planning/math/curve1d:quintic_polynomial_curve1d",
         "//modules/planning/proto:lattice_sampling_config_proto",
         "//modules/planning/proto:lattice_structure_proto",
+        "//modules/planning/lattice/trajectory_generation:lateral_trajectory_optimizer_interface",
+        "//modules/planning/lattice/trajectory_generation:lateral_trajectory_optimizer",
+        "//modules/planning/lattice/trajectory_generation:lateral_qp_optimizer",
     ],
 )
 
@@ -62,6 +65,7 @@ cc_library(
         "//modules/planning/constraint_checker:constraint_checker1d",
         "//modules/planning/lattice/behavior:path_time_graph",
         "//modules/planning/lattice/trajectory1d:piecewise_acceleration_trajectory1d",
+        "//modules/planning/lattice/trajectory_generation:piecewise_braking_trajectory_generator",
         "//modules/planning/math/curve1d",
         "//modules/planning/proto:lattice_sampling_config_proto",
     ],
@@ -102,6 +106,68 @@ cc_library(
         "//modules/planning/common:planning_gflags",
         "//modules/planning/common/trajectory:discretized_trajectory",
         "//modules/planning/math/curve1d",
+    ],
+)
+
+cc_library(
+    name = "piecewise_braking_trajectory_generator",
+    srcs = [
+        "piecewise_braking_trajectory_generator.cc",
+    ],
+    hdrs = [
+        "piecewise_braking_trajectory_generator.h",
+    ],
+    deps = [
+        "//modules/planning/lattice/trajectory1d:piecewise_acceleration_trajectory1d",
+        "//modules/common",
+        "//modules/planning/math/curve1d",
+    ],
+)
+
+cc_library(
+    name = "lateral_trajectory_optimizer_interface",
+    srcs = [
+        "lateral_trajectory_optimizer_interface.cc",
+    ],
+    hdrs = [
+        "lateral_trajectory_optimizer_interface.h",
+    ],
+    deps = [
+        "//modules/planning/lattice/trajectory1d:constant_jerk_trajectory1d",
+        "@ipopt",
+    ],
+)
+
+cc_library(
+    name = "lateral_trajectory_optimizer",
+    srcs = [
+        "lateral_trajectory_optimizer.cc",
+    ],
+    hdrs = [
+        "lateral_trajectory_optimizer.h",
+    ],
+    deps = [
+        "//modules/planning/lattice/behavior:path_time_graph",
+        "//modules/planning/lattice/trajectory_generation:lateral_trajectory_optimizer_interface",
+        "//modules/planning/lattice/trajectory1d:piecewise_jerk_trajectory1d",
+        "//modules/planning/common:planning_gflags",
+        "@ipopt",
+    ],
+)
+
+cc_library(
+    name = "lateral_qp_optimizer",
+    srcs = [
+        "lateral_qp_optimizer.cc",
+    ],
+    hdrs = [
+        "lateral_qp_optimizer.h",
+    ],
+    deps = [
+        "//modules/planning/lattice/behavior:path_time_graph",
+        "//modules/planning/lattice/trajectory1d:piecewise_jerk_trajectory1d",
+        "//modules/planning/common:planning_gflags",
+        "@qpOASES",
     ],
 )
 

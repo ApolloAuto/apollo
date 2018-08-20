@@ -27,5 +27,9 @@ apt-get install -y \
     cmake \
     curl \
     software-properties-common \
+    sshfs \
     wget \
     unzip
+
+apt-get clean && rm -rf /var/lib/apt/lists/*
+echo '\n\n\n' | ssh-keygen -t rsa

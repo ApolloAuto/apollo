@@ -1,0 +1,25 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+message NaviPathDeciderConfig {
+  optional uint32 min_path_length = 1 [default = 5];
+  optional uint32 min_look_forward_time = 2 [default = 2];
+  optional double default_min_smooth_init_y = 3 [default = 0.1];
+  optional double default_max_smooth_init_y = 4 [default = 0.4];
+  optional double default_theta_change_ratio = 5 [default = 15.0];
+  optional double max_lateral_distance = 6 [default = 6.0];
+  optional double path_l_cost = 7 [default = 6.5];
+  optional LateralShiftConfigTable later_shift_config_table = 8;
+}
+
+message LateralShiftConfigTable {
+  repeated ShiftConfig lateral_shift = 1;
+}
+
+message ShiftConfig {
+  optional double max_speed = 1 [default = 4.16];
+  optional double min_distance = 2 [default = 0.1];
+  optional double max_distance = 3 [default = 0.4];
+  optional double theta_change_ratio = 4 [default = 15.0]; // unit:degree/m
+}

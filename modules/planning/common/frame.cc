@@ -35,6 +35,7 @@
 #include "modules/common/math/vec2d.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/hdmap/hdmap_util.h"
+#include "modules/map/pnc_map/pnc_map.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/reference_line/reference_line_provider.h"
 
@@ -47,7 +48,10 @@ using apollo::common::VehicleStateProvider;
 using apollo::common::adapter::AdapterManager;
 using apollo::common::math::Box2d;
 using apollo::common::math::Vec2d;
+using apollo::common::monitor::MonitorLogBuffer;
 using apollo::prediction::PredictionObstacles;
+
+constexpr double kMathEpsilon = 1e-8;
 
 FrameHistory::FrameHistory()
     : IndexedQueue<uint32_t, Frame>(FLAGS_max_history_frame_num) {}
@@ -60,7 +64,8 @@ Frame::Frame(uint32_t sequence_num,
       planning_start_point_(planning_start_point),
       start_time_(start_time),
       vehicle_state_(vehicle_state),
-      reference_line_provider_(reference_line_provider) {
+      reference_line_provider_(reference_line_provider),
+      monitor_logger_(common::monitor::MonitorMessageItem::PLANNING) {
   if (FLAGS_enable_lag_prediction) {
     lag_predictor_.reset(
         new LagPrediction(FLAGS_lag_prediction_min_appear_num,
@@ -84,6 +89,10 @@ bool Frame::Rerouting() {
   auto *adapter_manager = AdapterManager::instance();
   if (adapter_manager->GetRoutingResponse()->Empty()) {
     AERROR << "No previous routing available";
+    return false;
+  }
+  if (!hdmap_) {
+    AERROR << "Invalid HD Map.";
     return false;
   }
   auto request = adapter_manager->GetRoutingResponse()
@@ -116,6 +125,8 @@ bool Frame::Rerouting() {
     return false;
   }
   AdapterManager::PublishRoutingRequest(request);
+  apollo::common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
+  buffer.INFO("Planning send Rerouting request");
   return true;
 }
 
@@ -134,7 +145,7 @@ bool Frame::CreateReferenceLineInfo() {
   DCHECK_EQ(reference_lines.size(), segments.size());
 
   auto forword_limit =
-      ReferenceLineProvider::LookForwardDistance(vehicle_state_);
+      hdmap::PncMap::LookForwardDistance(vehicle_state_.linear_velocity());
 
   for (auto &ref_line : reference_lines) {
     if (!ref_line.Shrink(Vec2d(vehicle_state_.x(), vehicle_state_.y()),
@@ -205,8 +216,7 @@ bool Frame::CreateReferenceLineInfo() {
  */
 const Obstacle *Frame::CreateStopObstacle(
     ReferenceLineInfo *const reference_line_info,
-    const std::string &obstacle_id,
-    const double obstacle_s) {
+    const std::string &obstacle_id, const double obstacle_s) {
   if (reference_line_info == nullptr) {
     AERROR << "reference_line_info nullptr";
     return nullptr;
@@ -232,6 +242,10 @@ const Obstacle *Frame::CreateStopObstacle(
 const Obstacle *Frame::CreateStopObstacle(const std::string &obstacle_id,
                                           const std::string &lane_id,
                                           const double lane_s) {
+  if (!hdmap_) {
+    AERROR << "Invalid HD Map.";
+    return nullptr;
+  }
   const auto lane = hdmap_->GetLaneById(hdmap::MakeMapId(lane_id));
   if (!lane) {
     AERROR << "Failed to find lane[" << lane_id << "]";
@@ -258,8 +272,7 @@ const Obstacle *Frame::CreateStopObstacle(const std::string &obstacle_id,
  */
 const Obstacle *Frame::CreateStaticObstacle(
     ReferenceLineInfo *const reference_line_info,
-    const std::string &obstacle_id,
-    const double obstacle_start_s,
+    const std::string &obstacle_id, const double obstacle_start_s,
     const double obstacle_end_s) {
   if (reference_line_info == nullptr) {
     AERROR << "reference_line_info nullptr";
@@ -319,6 +332,7 @@ const Obstacle *Frame::CreateStaticVirtualObstacle(const std::string &id,
 
 Status Frame::Init() {
   hdmap_ = hdmap::HDMapUtil::BaseMapPtr();
+  CHECK_NOTNULL(hdmap_);
   vehicle_state_ = common::VehicleStateProvider::instance()->vehicle_state();
   const auto &point = common::util::MakePointENU(
       vehicle_state_.x(), vehicle_state_.y(), vehicle_state_.z());
@@ -345,11 +359,15 @@ Status Frame::Init() {
       AddObstacle(*ptr);
     }
   }
-  const auto *collision_obstacle = FindCollisionObstacle();
-  if (collision_obstacle) {
-    AERROR << "Found collision with obstacle: " << collision_obstacle->Id();
-    return Status(ErrorCode::PLANNING_ERROR,
-                  "Collision found with " + collision_obstacle->Id());
+  if (FLAGS_enable_collision_detection) {
+    const auto *collision_obstacle = FindCollisionObstacle();
+    if (collision_obstacle) {
+      std::string err_str =
+          "Found collision with obstacle: " + collision_obstacle->Id();
+      apollo::common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
+      buffer.ERROR(err_str);
+      return Status(ErrorCode::PLANNING_ERROR, err_str);
+    }
   }
   if (!CreateReferenceLineInfo()) {
     AERROR << "Failed to init reference line info";
@@ -386,8 +404,22 @@ const Obstacle *Frame::FindCollisionObstacle() const {
       ADEBUG << "Obstacle : " << obstacle->Id() << " is too far to collide";
       continue;
     }
-    if (obstacle->PerceptionPolygon().DistanceTo(adc_box) <
-        FLAGS_max_collision_distance) {
+    double distance = obstacle->PerceptionPolygon().DistanceTo(adc_box);
+    if (FLAGS_ignore_overlapped_obstacle && distance < kMathEpsilon) {
+      bool all_points_in = true;
+      for (const auto &point : obstacle->PerceptionPolygon().points()) {
+        if (!adc_box.IsPointIn(point)) {
+          all_points_in = false;
+          break;
+        }
+      }
+      if (all_points_in) {
+        ADEBUG << "Skip overlapped obstacle, which is often caused by lidar "
+                  "calibration error";
+        continue;
+      }
+    }
+    if (distance < FLAGS_max_collision_distance) {
       AERROR << "Found collision with obstacle " << obstacle->Id();
       return obstacle;
     }
@@ -470,7 +502,7 @@ const ReferenceLineInfo *Frame::FindDriveReferenceLineInfo() {
   drive_reference_line_info_ = nullptr;
   for (const auto &reference_line_info : reference_line_info_) {
     if (reference_line_info.IsDrivable() &&
-               reference_line_info.Cost() < min_cost) {
+        reference_line_info.Cost() < min_cost) {
       drive_reference_line_info_ = &reference_line_info;
       min_cost = reference_line_info.Cost();
     }

@@ -24,6 +24,8 @@
 #include <functional>
 #include <utility>
 
+#include "ctpl/ctpl_stl.h"
+
 #include "modules/planning/proto/sl_boundary.pb.h"
 
 #include "modules/common/adapters/adapter_manager.h"
@@ -33,7 +35,6 @@
 #include "modules/map/hdmap/hdmap_common.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/common/planning_thread_pool.h"
 #include "modules/planning/common/planning_util.h"
 
 namespace apollo {
@@ -84,7 +85,7 @@ bool ReferenceLineInfo::Init(const std::vector<const Obstacle*>& obstacles) {
     AERROR << "Ego vehicle is too far away from reference line.";
     return false;
   }
-  is_on_reference_line_ = reference_line_.IsOnRoad(adc_sl_boundary_);
+  is_on_reference_line_ = reference_line_.IsOnLane(adc_sl_boundary_);
   if (!AddObstacles(obstacles)) {
     AERROR << "Failed to add obstacles to reference line";
     return false;
@@ -133,16 +134,14 @@ ADCTrajectory::RightOfWayStatus ReferenceLineInfo::GetRightOfWayStatus() const {
       if (is_protected) {
         return ADCTrajectory::PROTECTED;
       } else {
-        double junction_s = (overlap.end_s + overlap.start_s) / 2.0;
-        auto ref_point = reference_line_.GetReferencePoint(junction_s);
-        if (ref_point.lane_waypoints().empty()) {
-          return ADCTrajectory::PROTECTED;
-        }
-        for (const auto& waypoint : ref_point.lane_waypoints()) {
-          if (waypoint.lane->lane().turn() == hdmap::Lane::NO_TURN) {
-            return ADCTrajectory::PROTECTED;
+        const auto lane_segments =
+            reference_line_.GetLaneSegments(overlap.start_s, overlap.end_s);
+        for (const auto& segment : lane_segments) {
+          if (segment.lane->lane().turn() != hdmap::Lane::NO_TURN) {
+            return ADCTrajectory::UNPROTECTED;
           }
         }
+        return ADCTrajectory::PROTECTED;
       }
     }
   }
@@ -269,14 +268,19 @@ PathObstacle* ReferenceLineInfo::AddObstacle(const Obstacle* obstacle) {
 
 bool ReferenceLineInfo::AddObstacles(
     const std::vector<const Obstacle*>& obstacles) {
+  if (obstacles.empty()) {
+    return true;
+  }
   if (FLAGS_use_multi_thread_to_add_obstacles) {
     std::vector<int> ret(obstacles.size(), 0);
+    ctpl::thread_pool pool(
+        std::min<int>(FLAGS_max_planning_thread_pool_size, obstacles.size()));
     for (size_t i = 0; i < obstacles.size(); ++i) {
       const auto* obstacle = obstacles.at(i);
-      PlanningThreadPool::instance()->Push(std::bind(
-          &ReferenceLineInfo::AddObstacleHelper, this, obstacle, &(ret[i])));
+      pool.push(std::bind(&ReferenceLineInfo::AddObstacleHelper, this, obstacle,
+                          &(ret[i])));
     }
-    PlanningThreadPool::instance()->Synchronize();
+    pool.stop(true);
     if (std::find(ret.begin(), ret.end(), 0) != ret.end()) {
       return false;
     }
@@ -300,7 +304,7 @@ bool ReferenceLineInfo::IsUnrelaventObstacle(PathObstacle* path_obstacle) {
   if (is_on_reference_line_ &&
       path_obstacle->PerceptionSLBoundary().end_s() <
           adc_sl_boundary_.end_s() &&
-      reference_line_.IsOnRoad(path_obstacle->PerceptionSLBoundary())) {
+      reference_line_.IsOnLane(path_obstacle->PerceptionSLBoundary())) {
     return true;
   }
   return false;
@@ -336,7 +340,7 @@ bool ReferenceLineInfo::IsStartFrom(
       previous_reference_line_info.reference_line();
   common::SLPoint sl_point;
   prev_reference_line.XYToSL(start_point, &sl_point);
-  return previous_reference_line_info.reference_line_.IsOnRoad(sl_point);
+  return previous_reference_line_info.reference_line_.IsOnLane(sl_point);
 }
 
 const PathData& ReferenceLineInfo::path_data() const { return path_data_; }
@@ -396,6 +400,10 @@ bool ReferenceLineInfo::IsDrivable() const { return is_drivable_; }
 
 bool ReferenceLineInfo::IsChangeLanePath() const {
   return !Lanes().IsOnSegment();
+}
+
+bool ReferenceLineInfo::IsNeighborLanePath() const {
+  return Lanes().IsNeighborSegment();
 }
 
 std::string ReferenceLineInfo::PathSpeedDebugString() const {
@@ -484,7 +492,7 @@ bool ReferenceLineInfo::ReachedDestination() const {
   if (!dest_ptr->LongitudinalDecision().has_stop()) {
     return false;
   }
-  if (!reference_line_.IsOnRoad(
+  if (!reference_line_.IsOnLane(
           dest_ptr->obstacle()->PerceptionBoundingBox().center())) {
     return false;
   }
@@ -536,13 +544,16 @@ void ReferenceLineInfo::MakeMainMissionCompleteDecision(
       FLAGS_destination_check_distance) {
     return;
   }
-  if (ReachedDestination()) {
-    return;
-  }
+
   auto mission_complete =
       decision_result->mutable_main_decision()->mutable_mission_complete();
-  mission_complete->mutable_stop_point()->CopyFrom(main_stop.stop_point());
-  mission_complete->set_stop_heading(main_stop.stop_heading());
+  if (ReachedDestination()) {
+    GetPlanningStatus()->mutable_destination()->set_has_passed_destination(
+        true);
+  } else {
+    mission_complete->mutable_stop_point()->CopyFrom(main_stop.stop_point());
+    mission_complete->set_stop_heading(main_stop.stop_heading());
+  }
 }
 
 int ReferenceLineInfo::MakeMainStopDecision(

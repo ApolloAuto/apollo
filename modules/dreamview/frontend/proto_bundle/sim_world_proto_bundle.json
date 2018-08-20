@@ -348,9 +348,13 @@
             },
             "Latency": {
               "fields": {
-                "planning": {
+                "timestampSec": {
                   "type": "double",
                   "id": 1
+                },
+                "totalTimeMs": {
+                  "type": "double",
+                  "id": 2
                 }
               }
             },
@@ -423,6 +427,18 @@
                 }
               }
             },
+            "Notification": {
+              "fields": {
+                "timestampSec": {
+                  "type": "double",
+                  "id": 1
+                },
+                "item": {
+                  "type": "apollo.common.monitor.MonitorMessageItem",
+                  "id": 2
+                }
+              }
+            },
             "SimulationWorld": {
               "fields": {
                 "timestamp": {
@@ -469,64 +485,69 @@
                 },
                 "mainDecision": {
                   "type": "Object",
-                  "id": 24
+                  "id": 10
                 },
                 "speedLimit": {
                   "type": "double",
-                  "id": 10
+                  "id": 11
                 },
                 "delay": {
                   "type": "DelaysInMs",
-                  "id": 11
+                  "id": 12
                 },
                 "monitor": {
                   "type": "apollo.common.monitor.MonitorMessage",
-                  "id": 12
+                  "id": 13,
+                  "options": {
+                    "deprecated": true
+                  }
+                },
+                "notification": {
+                  "rule": "repeated",
+                  "type": "Notification",
+                  "id": 14
                 },
                 "engageAdvice": {
                   "type": "string",
-                  "id": 13
+                  "id": 15
                 },
                 "latency": {
+                  "keyType": "string",
                   "type": "Latency",
-                  "id": 14
+                  "id": 16
                 },
                 "mapElementIds": {
                   "type": "MapElementIds",
-                  "id": 15
+                  "id": 17
                 },
                 "mapHash": {
                   "type": "uint64",
-                  "id": 16
+                  "id": 18
                 },
                 "mapRadius": {
                   "type": "double",
-                  "id": 17
-                },
-                "planningTime": {
-                  "type": "double",
-                  "id": 18
+                  "id": 19
                 },
                 "planningData": {
                   "type": "apollo.planning_internal.PlanningData",
-                  "id": 19
+                  "id": 20
                 },
                 "gps": {
                   "type": "Object",
-                  "id": 20
+                  "id": 21
                 },
                 "laneMarker": {
                   "type": "apollo.perception.LaneMarkers",
-                  "id": 21
+                  "id": 22
                 },
                 "controlData": {
                   "type": "ControlData",
-                  "id": 22
+                  "id": 23
                 },
                 "navigationPath": {
                   "rule": "repeated",
                   "type": "apollo.common.Path",
-                  "id": 23
+                  "id": 24
                 }
               }
             }
@@ -608,7 +629,9 @@
                 "HTTP_LOGIC_ERROR": 10000,
                 "HTTP_RUNTIME_ERROR": 10001,
                 "RELATIVE_MAP_ERROR": 11000,
-                "RELATIVE_MAP_NOT_READY": 11001
+                "RELATIVE_MAP_NOT_READY": 11001,
+                "DRIVER_ERROR_GNSS": 12000,
+                "DRIVER_ERROR_VELODYNE": 13000
               }
             },
             "StatusPb": {
@@ -892,6 +915,30 @@
                 "laneId": {
                   "type": "string",
                   "id": 9
+                },
+                "xDerivative": {
+                  "type": "double",
+                  "id": 10
+                },
+                "yDerivative": {
+                  "type": "double",
+                  "id": 11
+                },
+                "x_2ndDerivative": {
+                  "type": "double",
+                  "id": 12
+                },
+                "y_2ndDerivative": {
+                  "type": "double",
+                  "id": 13
+                },
+                "x_3rdDerivative": {
+                  "type": "double",
+                  "id": 14
+                },
+                "y_3rdDerivative": {
+                  "type": "double",
+                  "id": 15
                 }
               }
             },
@@ -999,7 +1046,8 @@
                         "ROUTING": 10,
                         "MONITOR": 11,
                         "HMI": 12,
-                        "RELATIVE_MAP": 13
+                        "RELATIVE_MAP": 13,
+                        "GNSS": 14
                       }
                     },
                     "LogLevel": {
@@ -1313,6 +1361,14 @@
                 "wheelSpeed": {
                   "type": "WheelSpeed",
                   "id": 30
+                },
+                "surround": {
+                  "type": "Surround",
+                  "id": 31
+                },
+                "license": {
+                  "type": "License",
+                  "id": 32
                 }
               },
               "nested": {
@@ -1535,6 +1591,135 @@
                     "STANDSTILL": 2,
                     "INVALID": 3
                   }
+                }
+              }
+            },
+            "Sonar": {
+              "fields": {
+                "range": {
+                  "type": "double",
+                  "id": 1
+                },
+                "translation": {
+                  "type": "apollo.common.Point3D",
+                  "id": 2
+                },
+                "rotation": {
+                  "type": "apollo.common.Quaternion",
+                  "id": 3
+                }
+              }
+            },
+            "Surround": {
+              "fields": {
+                "crossTrafficAlertLeft": {
+                  "type": "bool",
+                  "id": 1
+                },
+                "crossTrafficAlertLeftEnabled": {
+                  "type": "bool",
+                  "id": 2
+                },
+                "blindSpotLeftAlert": {
+                  "type": "bool",
+                  "id": 3
+                },
+                "blindSpotLeftAlertEnabled": {
+                  "type": "bool",
+                  "id": 4
+                },
+                "crossTrafficAlertRight": {
+                  "type": "bool",
+                  "id": 5
+                },
+                "crossTrafficAlertRightEnabled": {
+                  "type": "bool",
+                  "id": 6
+                },
+                "blindSpotRightAlert": {
+                  "type": "bool",
+                  "id": 7
+                },
+                "blindSpotRightAlertEnabled": {
+                  "type": "bool",
+                  "id": 8
+                },
+                "sonar00": {
+                  "type": "double",
+                  "id": 9
+                },
+                "sonar01": {
+                  "type": "double",
+                  "id": 10
+                },
+                "sonar02": {
+                  "type": "double",
+                  "id": 11
+                },
+                "sonar03": {
+                  "type": "double",
+                  "id": 12
+                },
+                "sonar04": {
+                  "type": "double",
+                  "id": 13
+                },
+                "sonar05": {
+                  "type": "double",
+                  "id": 14
+                },
+                "sonar06": {
+                  "type": "double",
+                  "id": 15
+                },
+                "sonar07": {
+                  "type": "double",
+                  "id": 16
+                },
+                "sonar08": {
+                  "type": "double",
+                  "id": 17
+                },
+                "sonar09": {
+                  "type": "double",
+                  "id": 18
+                },
+                "sonar10": {
+                  "type": "double",
+                  "id": 19
+                },
+                "sonar11": {
+                  "type": "double",
+                  "id": 20
+                },
+                "sonarEnabled": {
+                  "type": "bool",
+                  "id": 21
+                },
+                "sonarFault": {
+                  "type": "bool",
+                  "id": 22
+                },
+                "sonarRange": {
+                  "rule": "repeated",
+                  "type": "double",
+                  "id": 23,
+                  "options": {
+                    "packed": false
+                  }
+                },
+                "sonar": {
+                  "rule": "repeated",
+                  "type": "Sonar",
+                  "id": 24
+                }
+              }
+            },
+            "License": {
+              "fields": {
+                "vin": {
+                  "type": "string",
+                  "id": 1
                 }
               }
             }
@@ -2766,6 +2951,11 @@
                   "options": {
                     "default": "CONFIDENCE_CNN"
                   }
+                },
+                "drops": {
+                  "rule": "repeated",
+                  "type": "Point",
+                  "id": 15
                 }
               },
               "nested": {
@@ -3160,6 +3350,11 @@
                   "rule": "repeated",
                   "type": "Road",
                   "id": 11
+                },
+                "parkingSpace": {
+                  "rule": "repeated",
+                  "type": "ParkingSpace",
+                  "id": 12
                 }
               }
             },
@@ -3447,7 +3642,8 @@
                     "CITY_DRIVING": 2,
                     "BIKING": 3,
                     "SIDEWALK": 4,
-                    "PARKING": 5
+                    "PARKING": 5,
+                    "SHOULDER": 6
                   }
                 },
                 "LaneTurn": {
@@ -3593,6 +3789,10 @@
                   "rule": "repeated",
                   "type": "Id",
                   "id": 3
+                },
+                "heading": {
+                  "type": "double",
+                  "id": 4
                 }
               }
             },

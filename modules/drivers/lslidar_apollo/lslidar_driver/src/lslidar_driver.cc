@@ -89,7 +89,7 @@ bool LslidarDriver::openUDPPort() {
 }
 
 bool LslidarDriver::initialize() {
-    
+
     this->initTimeStamp();
 
     if (!loadParameters()) {
@@ -221,7 +221,7 @@ void LslidarDriver::getFPGA_GPSTimeStamp(lslidar_msgs::LslidarPacketPtr &packet)
     if(head2[0] == 0xA5 && head2[1] == 0xFF)
     {
         if(head2[2] == 0x00 && head2[3] == 0x5A)
-        {   
+        {
             this->packetTimeStamp[4] = packet->data[41];
             this->packetTimeStamp[5] = packet->data[40];
             this->packetTimeStamp[6] = packet->data[39];
@@ -233,11 +233,11 @@ void LslidarDriver::getFPGA_GPSTimeStamp(lslidar_msgs::LslidarPacketPtr &packet)
     else if(head2[0] == 0xFF && head2[1] == 0xEE)
     {
         uint64_t packet_timestamp;
-        packet_timestamp = (packet->data[1200]  + 
+        packet_timestamp = (packet->data[1200]  +
                         packet->data[1201] * pow(2, 8) +
-                        packet->data[1202] * pow(2, 16) + 
+                        packet->data[1202] * pow(2, 16) +
                         packet->data[1203] * pow(2, 24)) * 1e3;
-        
+
         cur_time.tm_sec = this->packetTimeStamp[4];
         cur_time.tm_min = this->packetTimeStamp[5];
         cur_time.tm_hour = this->packetTimeStamp[6];
@@ -250,13 +250,13 @@ void LslidarDriver::getFPGA_GPSTimeStamp(lslidar_msgs::LslidarPacketPtr &packet)
 
         timeStamp = ros::Time(this->pointcloudTimeStamp, packet_timestamp);
         ROS_DEBUG("ROS TS: %f, GPS: y:%d m:%d d:%d h:%d m:%d s:%d; FPGA: us:%lu",
-        timeStamp.toSec(), 
-        cur_time.tm_year,cur_time.tm_mon,cur_time.tm_mday,cur_time.tm_hour,cur_time.tm_min,cur_time.tm_sec, 
+        timeStamp.toSec(),
+        cur_time.tm_year,cur_time.tm_mon,cur_time.tm_mday,cur_time.tm_hour,cur_time.tm_min,cur_time.tm_sec,
         packet_timestamp);
 
     }
 }
 
-} // namespace lslidar_driver
-}
-}
+}  // namespace lslidar_driver
+}  // namespace drivers
+}  // namespace apollo

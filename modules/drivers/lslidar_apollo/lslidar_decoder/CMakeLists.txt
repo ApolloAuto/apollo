@@ -76,7 +76,7 @@ add_dependencies(lslidar_decoder_nodelet
 
 
 install(
-    TARGETS 
+    TARGETS
     lslidar_decoder
     lslidar_decoder_node
     lslidar_decoder_nodelet

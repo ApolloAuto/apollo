@@ -21,6 +21,18 @@ cc_binary(
     ],
 )
 
+cc_test(
+    name = "vehicle_manager_test",
+    size = "small",
+    srcs = ["vehicle_manager_test.cc"],
+    data = glob(["testdata/**"]),
+    deps = [
+        ":vehicle_manager",
+        "//modules/common/util",
+        "@gtest//:main",
+    ],
+)
+
 cc_library(
     name = "hmi",
     srcs = ["hmi.cc"],
@@ -34,6 +46,7 @@ cc_library(
         "//modules/common/util:map_util",
         "//modules/dreamview/backend/handlers:websocket_handler",
         "//modules/dreamview/backend/map:map_service",
+        "//modules/dreamview/proto:audio_capture_proto",
     ],
 )
 

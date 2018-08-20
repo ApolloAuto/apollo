@@ -52,6 +52,7 @@ using apollo::common::time::Clock;
 using apollo::hdmap::HDMapUtil;
 using apollo::hdmap::LaneWaypoint;
 using apollo::hdmap::MapPathPoint;
+using apollo::hdmap::PncMap;
 using apollo::hdmap::RouteSegments;
 
 ReferenceLineProvider::~ReferenceLineProvider() {
@@ -72,6 +73,8 @@ ReferenceLineProvider::ReferenceLineProvider(const hdmap::HDMap *base_map) {
     smoother_.reset(new QpSplineReferenceLineSmoother(smoother_config_));
   } else if (smoother_config_.has_spiral()) {
     smoother_.reset(new SpiralReferenceLineSmoother(smoother_config_));
+  } else if (smoother_config_.has_cos_theta()) {
+    smoother_.reset(new CosThetaReferenceLineSmoother(smoother_config_));
   } else {
     CHECK(false) << "unknown smoother config "
                  << smoother_config_.DebugString();
@@ -95,16 +98,8 @@ ReferenceLineProvider::FutureRouteWaypoints() {
 
 void ReferenceLineProvider::UpdateVehicleState(
     const VehicleState &vehicle_state) {
-  {
-    std::lock_guard<std::mutex> lock(vehicle_state_mutex_);
-    vehicle_state_ = vehicle_state;
-  }
-  // Set the flag "pending_" to true so that worker threads start processing.
-  {
-    std::lock_guard<std::mutex> lock(notify_mutex_);
-    pending_ = true;
-  }
-  cv_.notify_one();
+  std::lock_guard<std::mutex> lock(vehicle_state_mutex_);
+  vehicle_state_ = vehicle_state;
 }
 
 bool ReferenceLineProvider::Start() {
@@ -180,13 +175,10 @@ void ReferenceLineProvider::UpdateReferenceLine(
 
 void ReferenceLineProvider::GenerateThread() {
   while (!is_stop_) {
-    // Wait until UpdateVehicleState() changes the flag of "pending_" to "true".
-    // See "http://en.cppreference.com/w/cpp/thread/condition_variable" for
-    // datails.
-    std::unique_lock<std::mutex> lock(notify_mutex_);
-    cv_.wait(lock, [this]() { return pending_; });
-    lock.unlock();
-
+    std::this_thread::yield();
+    constexpr int32_t kSleepTime = 50;  // milliseconds
+    std::this_thread::sleep_for(
+        std::chrono::duration<double, std::milli>(kSleepTime));
     double start_time = Clock::NowInSeconds();
     if (!has_routing_) {
       AERROR << "Routing is not ready.";
@@ -200,16 +192,8 @@ void ReferenceLineProvider::GenerateThread() {
     }
     UpdateReferenceLine(reference_lines, segments);
     double end_time = Clock::NowInSeconds();
-    {
-      std::lock_guard<std::mutex> rf_lock(reference_lines_mutex_);
-      last_calculation_time_ = end_time - start_time;
-    }
-
-    // Tell the main thread that the current reference line is processed.
-    lock.lock();
-    processed_ = true;
-    lock.unlock();
-    cv_.notify_one();
+    std::lock_guard<std::mutex> lock(reference_lines_mutex_);
+    last_calculation_time_ = end_time - start_time;
   }
 }
 
@@ -243,15 +227,7 @@ bool ReferenceLineProvider::GetReferenceLines(
   }
 
   if (FLAGS_enable_reference_line_provider_thread) {
-    // Wait the worker thread function GenerateThread() changes the flag of
-    // "processed_" to "true".
-    {
-      std::unique_lock<std::mutex> lock(notify_mutex_);
-      if (!cv_.wait_for(lock, std::chrono::milliseconds(10),
-                        [this]() { return processed_; })) {
-        AWARN << "Failed to update the current reference line whin 10ms. ";
-      }
-    }
+    std::lock_guard<std::mutex> lock(reference_lines_mutex_);
     if (!reference_lines_.empty()) {
       reference_lines->assign(reference_lines_.begin(), reference_lines_.end());
       segments->assign(route_segments_.begin(), route_segments_.end());
@@ -296,7 +272,12 @@ bool ReferenceLineProvider::GetReferenceLinesFromRelativeMap(
     const relative_map::MapMsg &relative_map,
     std::list<ReferenceLine> *reference_line,
     std::list<hdmap::RouteSegments> *segments) {
-  if (relative_map.navigation_path_size() <= 0) {
+  DCHECK_GE(relative_map.navigation_path_size(), 0);
+  DCHECK_NOTNULL(reference_line);
+  DCHECK_NOTNULL(segments);
+
+  if (relative_map.navigation_path().empty()) {
+    AERROR << "There isn't any navigation path in current relative map.";
     return false;
   }
 
@@ -334,29 +315,31 @@ bool ReferenceLineProvider::GetReferenceLinesFromRelativeMap(
       adc_navigation_path->second.path_priority();
   // get adc left neighbor lanes
   std::vector<std::string> left_neighbor_lane_ids;
-  for (auto lane_ptr = adc_lane_way_point.lane;
-       lane_ptr != nullptr &&
-       lane_ptr->lane().left_neighbor_forward_lane_id_size() > 0;) {
-    auto neighbor_lane_id = lane_ptr->lane().left_neighbor_forward_lane_id(0);
+  auto left_lane_ptr = adc_lane_way_point.lane;
+  while (left_lane_ptr != nullptr &&
+         left_lane_ptr->lane().left_neighbor_forward_lane_id_size() > 0) {
+    auto neighbor_lane_id =
+        left_lane_ptr->lane().left_neighbor_forward_lane_id(0);
     left_neighbor_lane_ids.emplace_back(neighbor_lane_id.id());
-    lane_ptr = hdmap->GetLaneById(neighbor_lane_id);
+    left_lane_ptr = hdmap->GetLaneById(neighbor_lane_id);
   }
   ADEBUG << adc_lane_id
-         << "left neighbor size : " << left_neighbor_lane_ids.size();
+         << " left neighbor size : " << left_neighbor_lane_ids.size();
   for (const auto &neighbor : left_neighbor_lane_ids) {
     ADEBUG << adc_lane_id << " left neighbor : " << neighbor;
   }
   // get adc right neighbor lanes
   std::vector<std::string> right_neighbor_lane_ids;
-  for (auto lane_ptr = adc_lane_way_point.lane;
-       lane_ptr != nullptr &&
-       lane_ptr->lane().right_neighbor_forward_lane_id_size() > 0;) {
-    auto neighbor_lane_id = lane_ptr->lane().right_neighbor_forward_lane_id(0);
+  auto right_lane_ptr = adc_lane_way_point.lane;
+  while (right_lane_ptr != nullptr &&
+         right_lane_ptr->lane().right_neighbor_forward_lane_id_size() > 0) {
+    auto neighbor_lane_id =
+        right_lane_ptr->lane().right_neighbor_forward_lane_id(0);
     right_neighbor_lane_ids.emplace_back(neighbor_lane_id.id());
-    lane_ptr = hdmap->GetLaneById(neighbor_lane_id);
+    right_lane_ptr = hdmap->GetLaneById(neighbor_lane_id);
   }
   ADEBUG << adc_lane_id
-         << "right neighbor size : " << right_neighbor_lane_ids.size();
+         << " right neighbor size : " << right_neighbor_lane_ids.size();
   for (const auto &neighbor : right_neighbor_lane_ids) {
     ADEBUG << adc_lane_id << " right neighbor : " << neighbor;
   }
@@ -399,57 +382,20 @@ bool ReferenceLineProvider::GetReferenceLinesFromRelativeMap(
     if (left_neighbor_lane_ids.end() !=
         std::find(left_neighbor_lane_ids.begin(), left_neighbor_lane_ids.end(),
                   target_lane_pair.first)) {
-      auto lane_ptr =
-          hdmap->GetLaneById(hdmap::MakeMapId(target_lane_pair.first));
-      for (; lane_ptr != nullptr &&
-             lane_ptr->lane().right_neighbor_forward_lane_id_size() > 0;) {
-        ADEBUG << "target : " << lane_ptr->lane().id().id()
-               << " right neihbor size : "
-               << lane_ptr->lane().right_neighbor_forward_lane_id_size()
-               << "right neihbor id : "
-               << lane_ptr->lane().right_neighbor_forward_lane_id(0).id();
-        auto neighbor_lane_id =
-            lane_ptr->lane().left_neighbor_forward_lane_id(0);
-        if (adc_lane_id == neighbor_lane_id.id()) {
-          break;
-        }
-        lane_ptr = hdmap->GetLaneById(neighbor_lane_id);
-      }
-      if (lane_ptr != nullptr &&
-          lane_ptr->lane().right_neighbor_forward_lane_id_size() > 0 &&
-          lane_ptr->lane().right_neighbor_forward_lane_id(0).id() ==
-              adc_lane_id) {
-        neareast_neighbor_lane_id = lane_ptr->lane().id().id();
-        lane_change_type = routing::LEFT;
-      }
-      // target lane on the right of adc
+      // take the id of the first adjacent lane on the left of adc as
+      // the neareast_neighbor_lane_id
+      neareast_neighbor_lane_id =
+          adc_lane_way_point.lane->lane().left_neighbor_forward_lane_id(0).id();
     } else if (right_neighbor_lane_ids.end() !=
                std::find(right_neighbor_lane_ids.begin(),
                          right_neighbor_lane_ids.end(),
                          target_lane_pair.first)) {
-      auto lane_ptr =
-          hdmap->GetLaneById(hdmap::MakeMapId(target_lane_pair.first));
-      for (; lane_ptr != nullptr &&
-             lane_ptr->lane().left_neighbor_forward_lane_id_size() > 0;) {
-        ADEBUG << "target : " << lane_ptr->lane().id().id()
-               << " left neihbor size : "
-               << lane_ptr->lane().left_neighbor_forward_lane_id_size()
-               << "left neihbor id : "
-               << lane_ptr->lane().left_neighbor_forward_lane_id(0).id();
-        auto neighbor_lane_id =
-            lane_ptr->lane().left_neighbor_forward_lane_id(0);
-        if (adc_lane_id == neighbor_lane_id.id()) {
-          break;
-        }
-        lane_ptr = hdmap->GetLaneById(neighbor_lane_id);
-      }
-      if (lane_ptr != nullptr &&
-          lane_ptr->lane().left_neighbor_forward_lane_id_size() > 0 &&
-          lane_ptr->lane().left_neighbor_forward_lane_id(0).id() ==
-              adc_lane_id) {
-        neareast_neighbor_lane_id = lane_ptr->lane().id().id();
-        lane_change_type = routing::RIGHT;
-      }
+      // target lane on the right of adc
+      // take the id  of the first adjacent lane on the right of adc as
+      // the neareast_neighbor_lane_id
+      neareast_neighbor_lane_id = adc_lane_way_point.lane->lane()
+                                      .right_neighbor_forward_lane_id(0)
+                                      .id();
     }
   }
 
@@ -462,20 +408,21 @@ bool ReferenceLineProvider::GetReferenceLinesFromRelativeMap(
     segment.SetCanExit(true);
     segment.SetId(lane_id);
     segment.SetNextAction(routing::FORWARD);
-    segment.SetIsOnSegment(true);
     segment.SetStopForDestination(false);
     segment.SetPreviousAction(routing::FORWARD);
-    // need change line
+
     if (is_lane_change_needed) {
       if (lane_id == neareast_neighbor_lane_id) {
         ADEBUG << "adc lane_id = " << adc_lane_id
                << " neareast_neighbor_lane_id = " << lane_id;
-        segment.SetIsOnSegment(false);
+        segment.SetIsNeighborSegment(true);
         segment.SetPreviousAction(lane_change_type);
       } else if (lane_id == adc_lane_id) {
+        segment.SetIsOnSegment(true);
         segment.SetNextAction(lane_change_type);
       }
     }
+
     segments->emplace_back(segment);
     std::vector<ReferencePoint> ref_points;
     for (const auto &path_point : path_points) {
@@ -516,11 +463,6 @@ bool ReferenceLineProvider::GetNearestWayPointFromNavigationPath(
     AERROR << "failed to get lane from point " << point.ShortDebugString();
     return false;
   }
-  if (lanes.empty()) {
-    AERROR << "no valid lane found within " << kMaxDistance
-           << " meters with heading " << state.heading();
-    return false;
-  }
 
   // get lanes that exist in both map and navigation paths as vallid lanes
   std::vector<hdmap::LaneInfoConstPtr> valid_lanes;
@@ -528,6 +470,11 @@ bool ReferenceLineProvider::GetNearestWayPointFromNavigationPath(
                [&](hdmap::LaneInfoConstPtr ptr) {
                  return navigation_lane_ids.count(ptr->lane().id().id()) > 0;
                });
+  if (valid_lanes.empty()) {
+    AERROR << "no valid lane found within " << kMaxDistance
+           << " meters with heading " << state.heading();
+    return false;
+  }
 
   // get nearest lane wayponints for current adc position
   double min_distance = std::numeric_limits<double>::infinity();
@@ -543,7 +490,7 @@ bool ReferenceLineProvider::GetNearestWayPointFromNavigationPath(
       continue;
     }
 
-    // get the neareast distance between adc point adn lane
+    // get the neareast distance between adc point and lane
     double distance = 0.0;
     common::PointENU map_point =
         lane->GetNearestPoint({point.x(), point.y()}, &distance);
@@ -570,12 +517,10 @@ bool ReferenceLineProvider::GetNearestWayPointFromNavigationPath(
 
 bool ReferenceLineProvider::CreateRouteSegments(
     const common::VehicleState &vehicle_state,
-    const double look_backward_distance, const double look_forward_distance,
     std::list<hdmap::RouteSegments> *segments) {
   {
     std::lock_guard<std::mutex> lock(pnc_map_mutex_);
-    if (!pnc_map_->GetRouteSegments(vehicle_state, look_backward_distance,
-                                    look_forward_distance, segments)) {
+    if (!pnc_map_->GetRouteSegments(vehicle_state, segments)) {
       AERROR << "Failed to extract segments from routing";
       return false;
     }
@@ -585,16 +530,6 @@ bool ReferenceLineProvider::CreateRouteSegments(
     PrioritzeChangeLane(segments);
   }
   return !segments->empty();
-}
-
-double ReferenceLineProvider::LookForwardDistance(const VehicleState &state) {
-  auto forward_distance = state.linear_velocity() * FLAGS_look_forward_time_sec;
-
-  if (forward_distance > FLAGS_look_forward_short_distance) {
-    return FLAGS_look_forward_long_distance;
-  }
-
-  return FLAGS_look_forward_short_distance;
 }
 
 bool ReferenceLineProvider::CreateReferenceLine(
@@ -626,10 +561,7 @@ bool ReferenceLineProvider::CreateReferenceLine(
     }
   }
 
-  double look_forward_distance = LookForwardDistance(vehicle_state);
-  double look_backward_distance = FLAGS_look_backward_distance;
-  if (!CreateRouteSegments(vehicle_state, look_backward_distance,
-                           look_forward_distance, segments)) {
+  if (!CreateRouteSegments(vehicle_state, segments)) {
     AERROR << "Failed to create reference line from routing";
     return false;
   }
@@ -692,7 +624,8 @@ bool ReferenceLineProvider::ExtendReferenceLine(const VehicleState &state,
   }
   const double prev_segment_length = RouteSegments::Length(*prev_segment);
   const double remain_s = prev_segment_length - sl_point.s();
-  const double look_forward_required_distance = LookForwardDistance(state);
+  const double look_forward_required_distance =
+      PncMap::LookForwardDistance(state.linear_velocity());
   if (remain_s > look_forward_required_distance) {
     *segments = *prev_segment;
     segments->SetProperties(segment_properties);
@@ -811,8 +744,7 @@ AnchorPoint ReferenceLineProvider::GetAnchorPoint(
   double shifted_left_width = total_width / 2.0;
 
   // shift to left (or right) on wide lanes
-  if (!(waypoint.lane->lane().left_boundary().virtual_() ||
-        waypoint.lane->lane().right_boundary().virtual_()) &&
+  if (smoother_config_.wide_lane_threshold_factor() > 0 &&
       total_width > adc_width * smoother_config_.wide_lane_threshold_factor()) {
     if (smoother_config_.driving_side() == ReferenceLineSmootherConfig::RIGHT) {
       shifted_left_width =
@@ -890,8 +822,7 @@ bool ReferenceLineProvider::SmoothPrefixedReferenceLine(
     common::SLPoint sl_point;
     Vec2d xy{point.path_point.x(), point.path_point.y()};
     if (!prefix_ref.XYToSL(xy, &sl_point)) {
-      AERROR << "Failed to get projection for point: " << xy.DebugString();
-      return false;
+      continue;
     }
     if (sl_point.s() < 0 || sl_point.s() > prefix_ref.Length()) {
       continue;

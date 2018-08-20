@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include <map>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -31,31 +32,34 @@
 #include "modules/common/util/file.h"
 
 #define private public
-#include "modules/planning/planning.h"
+#define protected public
+#include "modules/planning/navi_planning.h"
+#include "modules/planning/planning_base.h"
+#include "modules/planning/std_planning.h"
 
 namespace apollo {
 namespace planning {
 
 using common::adapter::AdapterManager;
 
-#define RUN_GOLDEN_TEST(sub_case_num)                                        \
-  {                                                                          \
-    const ::testing::TestInfo* const test_info =                             \
-        ::testing::UnitTest::GetInstance()->current_test_info();             \
-    bool no_trajectory_point = false;                                        \
-    bool run_planning_success = RunPlanning(test_info->name(), sub_case_num, \
-                                            no_trajectory_point);            \
-    EXPECT_TRUE(run_planning_success);                                       \
+#define RUN_GOLDEN_TEST(sub_case_num)                                      \
+  {                                                                        \
+    const ::testing::TestInfo* const test_info =                           \
+        ::testing::UnitTest::GetInstance()->current_test_info();           \
+    bool no_trajectory_point = false;                                      \
+    bool run_planning_success =                                            \
+        RunPlanning(test_info->name(), sub_case_num, no_trajectory_point); \
+    EXPECT_TRUE(run_planning_success);                                     \
   }
 
-#define RUN_GOLDEN_TEST_DECISION(sub_case_num)                               \
-  {                                                                          \
-    const ::testing::TestInfo* const test_info =                             \
-        ::testing::UnitTest::GetInstance()->current_test_info();             \
-    bool no_trajectory_point = true;                                         \
-    bool run_planning_success = RunPlanning(test_info->name(), sub_case_num, \
-                                            no_trajectory_point);            \
-    EXPECT_TRUE(run_planning_success);                                       \
+#define RUN_GOLDEN_TEST_DECISION(sub_case_num)                             \
+  {                                                                        \
+    const ::testing::TestInfo* const test_info =                           \
+        ::testing::UnitTest::GetInstance()->current_test_info();           \
+    bool no_trajectory_point = true;                                       \
+    bool run_planning_success =                                            \
+        RunPlanning(test_info->name(), sub_case_num, no_trajectory_point); \
+    EXPECT_TRUE(run_planning_success);                                     \
   }
 
 #define TMAIN                                            \
@@ -100,7 +104,7 @@ class PlanningTestBase : public ::testing::Test {
   bool SetUpAdapters();
   bool IsValidTrajectory(const ADCTrajectory& trajectory);
 
-  Planning planning_;
+  std::unique_ptr<PlanningBase> planning_ = nullptr;
   std::map<TrafficRuleConfig::RuleId, bool> rule_enabled_;
   ADCTrajectory adc_trajectory_;
 };

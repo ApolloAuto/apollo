@@ -1,6 +1,5 @@
 
 --work_root=modules/perception
---config_manager_path=conf/config_manager.config
 
 ####################################################################
 # Flags from modules/perception/tool/offline_visualizer_tool/
@@ -35,6 +34,11 @@
 # default: fused
 --obstacle_show_type=fused
 
+# start frame id
+# type: int32
+# default: 0
+--start_frame=0
+
 ####################################################################
 # Flags from obstacle/onboard/hdmap_input.cc
 
@@ -66,6 +70,11 @@
 # type: string
 # candidate: DummySegmentation, CNNSegmentation
 --onboard_segmentor=CNNSegmentation
+
+# the object filter for onboard
+# type: string
+# candidate: DummyObjectFilter, LowObjectFilter
+--onboard_object_filter=LowObjectFilter
 
 # the object build algorithm for onboard
 # type: string

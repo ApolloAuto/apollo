@@ -27,7 +27,6 @@
 #include "modules/common/macro.h"
 #include "modules/dreamview/proto/hmi_config.pb.h"
 #include "modules/dreamview/proto/hmi_status.pb.h"
-#include "modules/dreamview/proto/voice_detection.pb.h"
 #include "modules/monitor/proto/system_status.pb.h"
 
 /**
@@ -83,7 +82,8 @@ class HMIWorker {
 
   // Get current config and status.
   inline const HMIConfig& GetConfig() const { return config_; }
-  inline const HMIStatus& GetStatus() const { return status_; }
+  const HMIStatus GetStatus() const;
+
   // HMIStatus is updated frequently by multiple threads, including web workers
   // and ROS message callback. Please apply proper read/write lock when
   // accessing it.

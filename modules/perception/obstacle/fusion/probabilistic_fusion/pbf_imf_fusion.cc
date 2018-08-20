@@ -111,8 +111,8 @@ void PbfIMFFusion::UpdateWithObject(
   q_matrix_.setIdentity();
   q_matrix_(0, 0) *= 0.1;
   q_matrix_(1, 1) *= 0.1;
-  q_matrix_(2, 2) *= 1;
-  q_matrix_(3, 3) *= 1;
+  q_matrix_(2, 2) *= 0.1;
+  q_matrix_(3, 3) *= 0.1;
 
   priori_state_ = a_matrix_ * posteriori_state_;
   std::cerr << "PBFIMF: Fusion Start : Posterior state \n"
@@ -289,10 +289,10 @@ bool PbfIMFFusion::AdjustCovMatrix() {
   Eigen::Vector4d eigenvalues = es_.eigenvalues().transpose();
   std::cerr << "adjust eigen values for covariance matrix\n";
   std::cerr << "eigen values before \n" << eigenvalues << std::endl;
-  // if (eigenvalues.minCoeff() > 0)
-  //  return false;
+  if (eigenvalues.minCoeff() > 0)
+    return false;
 
-  // eigenvalues = eigenvalues.cwiseMax(cov_eigen_thresh_);
+  eigenvalues = eigenvalues.cwiseMax(cov_eigen_thresh_);
   std::cerr << "eigen values after \n" << eigenvalues << std::endl;
   Eigen::Matrix4d diagonal = Eigen::Matrix4d::Identity();
   diagonal(0, 0) = eigenvalues(0);

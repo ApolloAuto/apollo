@@ -27,6 +27,7 @@
 #include "modules/common/util/map_util.h"
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
 #include "modules/dreamview/backend/hmi/hmi_worker.h"
+#include "modules/dreamview/proto/audio_capture.pb.h"
 #include "modules/monitor/proto/system_status.pb.h"
 
 namespace apollo {
@@ -58,29 +59,27 @@ void HMI::RegisterMessageHandlers() {
         const auto &config = HMIWorker::instance()->GetConfig();
         websocket_->SendData(
             conn, JsonUtil::ProtoToTypedJson("HMIConfig", config).dump());
+        websocket_->SendData(
+            conn, JsonUtil::ProtoToTypedJson("HMIStatus",
+                                             HMIWorker::instance()->GetStatus())
+                      .dump());
 
-        {
-          RLock rlock(HMIWorker::instance()->GetStatusMutex());
-          const auto &status = HMIWorker::instance()->GetStatus();
-          websocket_->SendData(
-              conn, JsonUtil::ProtoToTypedJson("HMIStatus", status).dump());
-        }
         SendVehicleParam(conn);
       });
 
-  // HMI client sends voice data.
+  // HMI client sends audio data, publish to AudioCapture topic.
   websocket_->RegisterMessageHandler(
-      "VoicePiece",
+      "AudioPiece",
       [this](const Json &json, WebSocketHandler::Connection *conn) {
         // json should contain {data: "<base64 encoded audio/wav piece>"}.
         std::string data;
         if (JsonUtil::GetStringFromJson(json, "data", &data)) {
-          VoiceDetectionRequest request;
-          request.set_id(reinterpret_cast<uint64_t>(conn));
-          request.set_wav_stream(apollo::common::util::Base64Decode(data));
-          AdapterManager::PublishVoiceDetectionRequest(request);
+          AudioCapture audio;
+          audio.set_connection_id(reinterpret_cast<uint64_t>(conn));
+          audio.set_wav_stream(apollo::common::util::DecodeBase64(data));
+          AdapterManager::PublishAudioCapture(audio);
         } else {
-          AERROR << "Truncated voice piece.";
+          AERROR << "Truncated audio piece.";
         }
       });
 
@@ -151,13 +150,13 @@ void HMI::RegisterMessageHandlers() {
 
   // HMI client asks for changing map.
   HMIWorker::instance()->RegisterChangeMapHandler(
-    [this](const std::string& new_map) {
-      // Reload simulation map after changing map.
-      CHECK(map_service_->ReloadMap(true))
-          << "Failed to load new simulation map: " << new_map;
-      // And then broadcast new HMIStatus to all clients.
-      DeferredBroadcastHMIStatus();
-    });
+      [this](const std::string &new_map) {
+        // Reload simulation map after changing map.
+        CHECK(map_service_->ReloadMap(true))
+            << "Failed to load new simulation map: " << new_map;
+        // And then broadcast new HMIStatus to all clients.
+        DeferredBroadcastHMIStatus();
+      });
   websocket_->RegisterMessageHandler(
       "ChangeMap",
       [this](const Json &json, WebSocketHandler::Connection *conn) {
@@ -173,11 +172,11 @@ void HMI::RegisterMessageHandlers() {
 
   // HMI client asks for changing vehicle.
   HMIWorker::instance()->RegisterChangeVehicleHandler(
-    [this](const std::string& new_vehicle) {
-      // Broadcast new HMIStatus and VehicleParam.
-      DeferredBroadcastHMIStatus();
-      SendVehicleParam();
-    });
+      [this](const std::string &new_vehicle) {
+        // Broadcast new HMIStatus and VehicleParam.
+        DeferredBroadcastHMIStatus();
+        SendVehicleParam();
+      });
   websocket_->RegisterMessageHandler(
       "ChangeVehicle",
       [this](const Json &json, WebSocketHandler::Connection *conn) {
@@ -193,10 +192,10 @@ void HMI::RegisterMessageHandlers() {
 
   // HMI client asks for changing mode.
   HMIWorker::instance()->RegisterChangeModeHandler(
-    [this](const std::string& new_mode) {
-      // Broadcast new HMIStatus.
-      DeferredBroadcastHMIStatus();
-    });
+      [this](const std::string &new_mode) {
+        // Broadcast new HMIStatus.
+        DeferredBroadcastHMIStatus();
+      });
   websocket_->RegisterMessageHandler(
       "ChangeMode",
       [this](const Json &json, WebSocketHandler::Connection *conn) {
@@ -239,14 +238,17 @@ void HMI::RegisterMessageHandlers() {
         }
       });
 
-  // Received VoiceDetection response.
-  AdapterManager::AddVoiceDetectionResponseCallback(
-      [this](const VoiceDetectionResponse &response) {
-        apollo::common::monitor::MonitorLogBuffer log_buffer(&logger_);
-        log_buffer.INFO() << "Triggered action by voice: "
-                          << HMIAction_Name(response.action());
-        HMIWorker::instance()->Trigger(response.action());
-      });
+  // Received Chassis, trigger action if there is high beam signal.
+  AdapterManager::AddChassisCallback([this](const Chassis &chassis) {
+    if (Clock::NowInSeconds() - chassis.header().timestamp_sec() <
+        FLAGS_system_status_lifetime_seconds) {
+      if (chassis.signal().high_beam()) {
+        const bool ret = HMIWorker::instance()->Trigger(
+            HMIWorker::instance()->GetConfig().chassis_high_beam_action());
+        AERROR_IF(!ret) << "Failed to execute high_beam action.";
+      }
+    }
+  });
 }
 
 void HMI::StartBroadcastHMIStatusThread() {
@@ -265,18 +267,18 @@ void HMI::StartBroadcastHMIStatusThread() {
         need_broadcast_ = false;
       }
 
-      RLock rlock(HMIWorker::instance()->GetStatusMutex());
-      const auto &status = HMIWorker::instance()->GetStatus();
+      // Get a copy of status.
+      const auto status = HMIWorker::instance()->GetStatus();
       websocket_->BroadcastData(
           JsonUtil::ProtoToTypedJson("HMIStatus", status).dump());
 
       // Broadcast messages.
       apollo::common::monitor::MonitorLogBuffer log_buffer(&logger_);
       if (status.current_map().empty()) {
-        log_buffer.WARN("You haven't select map yet!");
+        log_buffer.WARN("You haven't selected a map yet!");
       }
       if (status.current_vehicle().empty()) {
-        log_buffer.WARN("You haven't select vehicle yet!");
+        log_buffer.WARN("You haven't selected a vehicle yet!");
       }
     }
   }));

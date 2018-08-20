@@ -21,8 +21,6 @@
 #include "modules/common/configs/config_gflags.h"
 DECLARE_string(perception_adapter_config_filename);
 
-/// lib/config_manager/config_manager.cc
-DECLARE_string(config_manager_path);
 DECLARE_string(work_root);
 
 /// obstacle/base/object.cc
@@ -37,6 +35,7 @@ DECLARE_bool(enable_hdmap_input);
 DECLARE_string(onboard_roi_filter);
 DECLARE_string(onboard_segmentor);
 DECLARE_string(onboard_object_builder);
+DECLARE_string(onboard_object_filter);
 DECLARE_string(onboard_tracker);
 DECLARE_string(onboard_type_fuser);
 DECLARE_int32(tf2_buff_in_ms);
@@ -116,6 +115,7 @@ DECLARE_string(cc_lane_post_processor_config_file);
 DECLARE_string(probabilistic_fusion_config_file);
 DECLARE_string(yolo_config_filename);
 DECLARE_string(yolo_camera_detector_config);
+DECLARE_bool(use_whole_lane_line);
 DECLARE_string(modest_radar_detector_config);
 DECLARE_string(tracker_config);
 DECLARE_string(sequence_type_fuser_config);
@@ -130,5 +130,9 @@ DECLARE_string(traffic_light_preprocessor_config);
 DECLARE_string(traffic_light_rectifier_config);
 DECLARE_string(traffic_light_reviser_config);
 DECLARE_string(traffic_light_subnode_config);
+DECLARE_double(light_height_adjust);
+DECLARE_string(traffic_light_rectifier);
+DECLARE_string(traffic_light_recognizer);
+DECLARE_string(traffic_light_reviser);
 
 #endif  // MODULES_PERCEPTION_COMMON_PERCEPTION_GFLAGS_H_

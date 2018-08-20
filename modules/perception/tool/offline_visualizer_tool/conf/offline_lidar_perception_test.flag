@@ -1,6 +1,5 @@
 
 --work_root=modules/perception
---config_manager_path=conf/config_manager.config
 
 ####################################################################
 # Flags from obstacle/lidar/test/offline_lidar_perception_test.cpp

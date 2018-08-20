@@ -2,6 +2,7 @@ import { observable, computed, action, autorun } from "mobx";
 
 import HMI from "store/hmi";
 import ControlData from "store/control_data";
+import Latency from "store/latency";
 import Meters from "store/meters";
 import Monitor from "store/monitor";
 import Options from "store/options";
@@ -35,6 +36,8 @@ class DreamviewStore {
     @observable planningData = new PlanningData();
 
     @observable controlData = new ControlData();
+
+    @observable latency = new Latency();
 
     @observable playback = OFFLINE_PLAYBACK ? new Playback() : null;
 
@@ -140,13 +143,13 @@ class DreamviewStore {
         this.options[option] = (enabled || false);
     }
 
-    // This function is triggerred automatically whenever a observable changes
+    // This function is triggered automatically whenever a observable changes
     updateDimension() {
         let offsetX = 0;
         let offsetY = 0;
         let mainViewHeightRatio = 0.65;
         if (!OFFLINE_PLAYBACK) {
-            const smallScreen = window.innerHeight < 800.0;
+            const smallScreen = window.innerHeight < 800.0 || window.innerWidth < 1280.0;
             offsetX = smallScreen ? 80 : 90; // width of side-bar
             offsetY = smallScreen ? 55 : 60; // height of header
             mainViewHeightRatio = 0.60;

@@ -115,11 +115,12 @@ class CameraProcessSubnode : public Subnode {
   bool adjusted_extrinsics_ = false;
   Eigen::Matrix4d camera_to_car_adj_;
 
-  // Publish to Peception Protobuf and ROS topic
+  // Publish to Perception Protobuf and ROS topic
   bool pb_obj_ = false;  // Objects
   apollo::canbus::Chassis chassis_;
   bool pb_ln_msk_ = false;  // Lane marking mask
-  const float ln_msk_threshold_ = 0.5f;
+  float ln_msk_threshold_ = 0.95f;
+  const int num_lines = 13;
 
   // Modules
   std::unique_ptr<BaseCameraDetector> detector_;

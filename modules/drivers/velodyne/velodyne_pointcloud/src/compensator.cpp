@@ -62,7 +62,7 @@ void Compensator::pointcloud_callback(
   // compensate point cloud, remove nan point
   if (query_pose_affine_from_tf2(timestamp_min, pose_min_time) &&
       query_pose_affine_from_tf2(timestamp_max, pose_max_time)) {
-    // we change message after motion compesation
+    // we change message after motion compensation
     sensor_msgs::PointCloud2::Ptr q_msg(new sensor_msgs::PointCloud2());
     *q_msg = *msg;
     motion_compensation<float>(q_msg, timestamp_min, timestamp_max,
@@ -158,7 +158,8 @@ bool Compensator::query_pose_affine_from_tf2(const double timestamp,
   std::string err_string;
   if (!tf2_buffer_.canTransform("world", child_frame_id_, query_time,
                                 ros::Duration(tf_timeout_), &err_string)) {
-    ROS_WARN_STREAM("Can not find transform. "
+    ROS_WARN_STREAM("Can not find transform frame: "
+                    << child_frame_id_ <<". "
                     << std::fixed << timestamp
                     << " Error info: " << err_string);
     return false;
