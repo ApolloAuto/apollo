@@ -41,8 +41,23 @@ Here is a solution to solve this problem:
 
 Yes, you should be able to make Apollo work on Ubuntu 18. Just follow the document to install docker, then `apollo.sh build` and `apollo.sh lint` should work. But `apollo.sh test` might not, because the nvidia-drivers are generally miss-matched between HOST and Docker container, which will raise test failures.
 
-
+---
 ## How do I add a new module
 Apollo currently functions as a single system, therefore before adding a module to it, understand that there would be a lot of additional work to be done to ensure that the module functions perfectly with the other modules of Apollo. Simply add your module to the `modules/` folder. You can use `modules/routing` as an example, which is a relatively simple module. Write the BUILD files properly and apollo.sh will build your module automatically
 
+---
+## Rosbag: not found - What now?
+
+Should you see this error while building Apollo, please confirm the following:
+
+1. Make sure you are running rosbag when you are inside docker (dev or release). We recommend using the dev docker container.
+2. You are probably running it as `root`. If yes, you would need to add:
+    ```
+    source /apollo/scripts/apollo_base.sh (this script includes the ros environment setup procedure source /home/tmp/ros/setup.bash(for dev docker), or you can only source the ros env setup script as well).
+    ```
+    Usually, this could be avoid by running Apollo as a normal user, since it will be configured into .bashrc automatically.
+
+3. Do not use `sudo` parameter, when executing `dev_start.sh` and `dev_into.sh`
+
+---
 **More Software FAQs to follow.**
