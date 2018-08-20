@@ -121,7 +121,7 @@ bool IterativeFitting(std::vector<Eigen::Matrix<T, 2, 1>> *pos_vec,
              const int order, Eigen::Matrix<T, MAX_POLY_ORDER + 1, 1> *coeff,
              const bool &is_x_axis = true,
              const int N = 5, double inlier_thres = 0.1) {
-  if (coeff == NULL) {
+  if (coeff == nullptr) {
     AERROR << "The coefficient pointer is NULL.";
     return false;
   }
