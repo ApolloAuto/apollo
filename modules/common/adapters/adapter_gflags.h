@@ -58,6 +58,7 @@ DECLARE_string(compressed_image_topic);
 DECLARE_string(image_front_topic);
 DECLARE_string(image_short_topic);
 DECLARE_string(image_long_topic);
+DECLARE_string(image_usb_cam_topic);
 DECLARE_string(gnss_rtk_obs_topic);
 DECLARE_string(gnss_rtk_eph_topic);
 DECLARE_string(gnss_best_pose_topic);
