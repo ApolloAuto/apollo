@@ -261,7 +261,10 @@ Status LanePostProcessingSubnode::ProcEvents() {
   Timer timer;
   timer.Start();
 
-  lane_post_processor_->ProcessWithoutCC(lane_map, options_, &lane_objects);
+  if (FLAGS_use_whole_lane_line)
+    lane_post_processor_->ProcessWithoutCC(lane_map, options_, &lane_objects);
+  else
+    lane_post_processor_->Process(lane_map, options_, &lane_objects);
   for (size_t i = 0; i < lane_objects->size(); ++i) {
     (*lane_objects)[i].timestamp = event.timestamp;
     (*lane_objects)[i].seq_num = seq_num_;
