@@ -182,10 +182,20 @@ body {
     }
 
     .header-button {
-        padding: 0.5em 3em 0.5em 3em;
+        min-width: 125px;
+        padding: 0.5em 0em;
+
         background: #181818;
         color: #ffffff;
         text-align: center;
+
+        @include small-screen {
+            min-width: 110px;
+        }
+    }
+
+    .header-button-active {
+        color: #30A5FF;
     }
 }
 
@@ -1203,6 +1213,10 @@ body {
 
                     background: #006AFF;
                     color: #FFFFFF;
+                }
+
+                .timestamp-button:hover {
+                    background: #49a9ee;
                 }
             }
         }
