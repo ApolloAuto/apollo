@@ -792,11 +792,11 @@ void ReferenceLineProvider::GetAnchorPoints(
                               &anchor_s);
   for (const double s : anchor_s) {
     AnchorPoint anchor = GetAnchorPoint(reference_line,s);
-      AINFO<<anchor.path_point.s();
-    AINFO<<anchor.path_point.x();
-    AINFO<<anchor.path_point.y();
-    AINFO<<anchor.path_point.theta();
-    AINFO<<"---------------------------------";
+    //   AINFO<<anchor.path_point.s();
+    // AINFO<<anchor.path_point.x();
+    // AINFO<<anchor.path_point.y();
+    // AINFO<<anchor.path_point.theta();
+    // AINFO<<"---------------------------------";
     anchor_points->emplace_back(anchor);
   }
   anchor_points->front().longitudinal_bound = 1e-6;

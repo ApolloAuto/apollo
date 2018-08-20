@@ -170,11 +170,11 @@ bool QpSplineReferenceLineSmoother::AddConstraint() {
   }
 
   // the heading of the first point should be identical to the anchor point.
-  if (!spline_constraint->AddPointAngleConstraint(evaluated_t.front(),
-                                                  headings.front())) {
-    AERROR << "Add 2d point angle constraint failed.";
-    return false;
-  }
+  // if (!spline_constraint->AddPointAngleConstraint(evaluated_t.front(),
+  //                                                 headings.front())) {
+  //   AERROR << "Add 2d point angle constraint failed.";
+  //   return false;
+  // }
 
   // all spline should be connected smoothly to the second order derivative.
   if (!spline_constraint->AddSecondDerivativeSmoothConstraint()) {

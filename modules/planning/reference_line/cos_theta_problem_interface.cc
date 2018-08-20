@@ -46,7 +46,7 @@ bool CosThetaProbleminterface::get_nlp_info(int& n, int& m, int& nnz_jac_g,
   num_of_variables_ = n;
 
   // number of constraints
-  m = num_of_points_;
+  m = num_of_points_ * 2;
   // m = 0;
   num_of_constraints_ = m;
 
@@ -110,17 +110,38 @@ bool CosThetaProbleminterface::get_bounds_info(int n, double* x_l, double* x_u,
   // constraints
   // positional deviation constraints
   for (std::size_t i = 0; i < num_of_points_; ++i) {
+    std::size_t index = i * 2;
+    double x_lower = 0.0;
+    double x_upper = 0.0;
+    double y_lower = 0.0;
+    double y_upper = 0.0;
     double bound = std::min(lateral_bounds_[i], default_max_point_deviation_);
-    g_l[i] = 0.0;
-    g_u[i] = bound * bound;
+    // / std::pow(2,0.5)
+
+    if (i == 0 && has_fixed_start_point_) {
+      x_lower = start_x_ - relax_;
+      x_upper = start_x_ + relax_;
+      y_lower = start_y_ - relax_;
+      y_upper = start_y_ + relax_;
+    } else if (i + 1 == num_of_points_ && has_fixed_end_point_) {
+      x_lower = end_x_ - relax_;
+      x_upper = end_x_ + relax_;
+      y_lower = end_y_ - relax_;
+      y_upper = end_y_ + relax_;
+    } else {
+      x_lower = init_points_[i].x() - bound;
+      x_upper = init_points_[i].x() + bound;
+      y_lower = init_points_[i].y() - bound;
+      y_upper = init_points_[i].y() + bound;
+    }
+    // x
+    g_l[index] = x_lower;
+    g_u[index] = x_upper;
+
+    // y
+    g_l[index + 1] = y_lower;
+    g_u[index + 1] = y_upper;
   }
-
-  // seems like the given constraint on end point is too tight, not good for
-  // problem scaling
-
-  g_u[0] = relax_ * relax_;
-  g_u[num_of_points_ - 1] = relax_ * relax_;
-
   return true;
 }
 
@@ -251,11 +272,16 @@ bool CosThetaProbleminterface::eval_g(int n, const double* x, bool new_x, int m,
   CHECK_EQ(static_cast<std::size_t>(n), num_of_variables_);
   CHECK_EQ(static_cast<std::size_t>(m), num_of_constraints_);
   // fill in the positional deviation constraints
+  // for (std::size_t i = 0; i < num_of_points_; ++i) {
+  //   std::size_t index = i * 2;
+  //   g[i] = (x[index] - init_points_[i].x()) * (x[index] - init_points_[i].x()) +
+  //          (x[index + 1] - init_points_[i].y()) *
+  //              (x[index + 1] - init_points_[i].y());
+  // }
   for (std::size_t i = 0; i < num_of_points_; ++i) {
     std::size_t index = i * 2;
-    g[i] = (x[index] - init_points_[i].x()) * (x[index] - init_points_[i].x()) +
-           (x[index + 1] - init_points_[i].y()) *
-               (x[index + 1] - init_points_[i].y());
+    g[index] = x[index];
+    g[index + 1] = x[index + 1];
   }
 
   return true;
@@ -266,23 +292,35 @@ bool CosThetaProbleminterface::eval_jac_g(int n, const double* x, bool new_x,
                                           int* jCol, double* values) {
   CHECK_EQ(static_cast<std::size_t>(n), num_of_variables_);
   CHECK_EQ(static_cast<std::size_t>(m), num_of_constraints_);
+  // if (values == NULL) {
+  //   for (std::size_t i = 0; i < num_of_points_; ++i) {
+  //     std::size_t index = i * 2;
+  //     iRow[index] = i;
+  //     jCol[index] = index;
+  //     iRow[index + 1] = i;
+  //     jCol[index + 1] = index + 1;
+  //   }
+  // } else {
+  //   std::fill(values, values + nnz_jac_g_, 0.0);
+  //   for (std::size_t i = 0; i < num_of_points_; ++i) {
+  //     std::size_t index = i * 2;
+  //     values[index] = x[index] * 2 - init_points_[i].x() * 2;
+  //     values[index + 1] = x[index + 1] * 2 - init_points_[i].y() * 2;
+  //   }
+  // }
   if (values == NULL) {
-    for (std::size_t i = 0; i < num_of_points_; ++i) {
-      std::size_t index = i * 2;
-      iRow[index] = i;
-      jCol[index] = index;
-      iRow[index + 1] = i;
-      jCol[index + 1] = index + 1;
-    }
+      // positional deviation constraints
+      for (std::size_t i = 0; i < num_of_points_ * 2; ++i) {
+          iRow[i] = i;
+          jCol[i] = i;
+      }
   } else {
-    std::fill(values, values + nnz_jac_g_, 0.0);
-    for (std::size_t i = 0; i < num_of_points_; ++i) {
-      std::size_t index = i * 2;
-      values[index] = x[index] * 2 - init_points_[i].x() * 2;
-      values[index + 1] = x[index + 1] * 2 - init_points_[i].y() * 2;
-    }
+      std::fill(values, values + nnz_jac_g_, 0.0);
+      // positional deviation constraints
+      for (std::size_t i = 0; i < num_of_points_ * 2; ++i) {
+          values[i] = 1;
+      }
   }
-
   return true;
 }
 
@@ -486,16 +524,16 @@ bool CosThetaProbleminterface::eval_h(int n, const double* x, bool new_x,
       values[idx_map_[std::make_pair(i, i)]] += obj_factor * 2;
     }
     // fill the constraints
-    std::size_t lambda_idx = 0;
-    for (std::size_t i = 0; i < num_of_points_; ++i) {
-      std::size_t idx_constr = i * 2;
-      std::pair<size_t, size_t> coors = std::make_pair(idx_constr, idx_constr);
-      std::pair<size_t, size_t> coors1 =
-          std::make_pair(idx_constr + 1, idx_constr + 1);
-      values[idx_map_[coors]] += lambda[lambda_idx] * 2;
-      values[idx_map_[coors1]] += lambda[lambda_idx] * 2;
-      lambda_idx++;
-    }
+    // std::size_t lambda_idx = 0;
+    // for (std::size_t i = 0; i < num_of_points_; ++i) {
+    //   std::size_t idx_constr = i * 2;
+    //   std::pair<size_t, size_t> coors = std::make_pair(idx_constr, idx_constr);
+    //   std::pair<size_t, size_t> coors1 =
+    //       std::make_pair(idx_constr + 1, idx_constr + 1);
+    //   values[idx_map_[coors]] += lambda[lambda_idx] * 2;
+    //   values[idx_map_[coors1]] += lambda[lambda_idx] * 2;
+    //   lambda_idx++;
+    // }
   }
   return true;
 }

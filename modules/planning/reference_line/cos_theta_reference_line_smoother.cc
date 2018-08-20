@@ -40,6 +40,14 @@ using apollo::common::time::Clock;
 CosThetaReferenceLineSmoother::CosThetaReferenceLineSmoother(
     const ReferenceLineSmootherConfig& config)
     : ReferenceLineSmoother(config) {
+
+  CHECK(common::util::GetProtoFromFile(FLAGS_reOpt_smoother_config_filename,
+                                      &reOpt_smoother_config_))
+    << "Failed to load smoother config file "
+    << FLAGS_reOpt_smoother_config_filename;
+
+  reOpt_qp_smoother_.reset(new QpSplineReferenceLineSmoother(reOpt_smoother_config_));
+  
   max_point_deviation_ = config.cos_theta().max_point_deviation();
 
   num_of_iterations_ = config.cos_theta().num_of_iteration();
@@ -50,7 +58,7 @@ CosThetaReferenceLineSmoother::CosThetaReferenceLineSmoother(
 
   relax_ = config.cos_theta().relax();
 
-  resolution_ = 10.0;
+  resolution_ = 100.0;
 
   reopt_qp_bound_ = config.cos_theta().reopt_qp_bound();
 }
@@ -87,7 +95,8 @@ bool CosThetaReferenceLineSmoother::Smooth(
   }
 
   Smooth(raw_point2d, &smoothed_point2d, anchorpoints_lateralbound);
-
+  double last_s = 0.0;
+  reOpt_anchor_points_.clear();
   for (const auto& p : smoothed_point2d) {
     double heading = p.theta();
     // double kappa = p.kappa();
@@ -106,19 +115,19 @@ bool CosThetaReferenceLineSmoother::Smooth(
     anchor.lateral_bound = reopt_qp_bound_;
     anchor.path_point = apollo::common::util::MakePathPoint(p.x(), p.y(), 0.0, heading, 0.0, 0.0, 0.0);
     anchor.path_point.set_s(s);
-    AINFO<<anchor.path_point.s();
-    AINFO<<anchor.path_point.x();
-    AINFO<<anchor.path_point.y();
-    AINFO<<anchor.path_point.theta();
+    // AINFO<<"delta s "<<s - last_s;
+    // AINFO<<anchor.path_point.s();
+    // AINFO<<anchor.path_point.x();
+    // AINFO<<anchor.path_point.y();
+    // AINFO<<anchor.path_point.theta();
     reOpt_anchor_points_.emplace_back(anchor);
+    last_s = s;
   }
 
+  // for (const auto& p : reOpt_anchor_points_){
+  //   AINFO<<p.path_point.s();
+  // }
     AINFO<<"reOpt_anchor_points_.size "<<reOpt_anchor_points_.size();
-    CHECK(common::util::GetProtoFromFile(FLAGS_reOpt_smoother_config_filename,
-                                       &reOpt_smoother_config_))
-      << "Failed to load smoother config file "
-      << FLAGS_reOpt_smoother_config_filename;
-      reOpt_qp_smoother_.reset(new QpSplineReferenceLineSmoother(reOpt_smoother_config_));
       reOpt_qp_smoother_->SetAnchorPoints(reOpt_anchor_points_);
       if (!reOpt_qp_smoother_->Smooth(raw_reference_line, smoothed_reference_line)) {
         AERROR << "Failed to reOpt smooth reference line with anchor points by cosTheta";
@@ -256,57 +265,67 @@ bool CosThetaReferenceLineSmoother::Smooth(
   ptr_interpolated_point2d->front().set_s(0.0);
 
   // as the anchor points are equally spaced, density_ is calculated only once
-  density_ = std::ceil(arclength_integration(1.0, ptr_smoothed_point2d.at(0),
-                                             ptr_smoothed_point2d.at(1)) /
-                       resolution_) -
-             1;
-  double t_increament = 1.0 / (density_ + 1);
-
+  // density_ = std::ceil(arclength_integration(1.0, ptr_smoothed_point2d.at(0),
+  //                                            ptr_smoothed_point2d.at(1)) /
+  //                      resolution_) -
+  //            1;
+  // double t_increament = 1.0 / (density_ + 1);
+  double Fx = ptr_interpolated_point2d->front().x();
+  double Fy = ptr_interpolated_point2d->front().y();
+  double Nx = 0.0;
+  double Ny = 0.0; 
   for (std::size_t i = 0; i < ptr_smoothed_point2d.size() - 1; i++) {
-    double t = 0.0;
+    // double t = 0.0;
     // interpolation by quintic hermite.
-    for (std::size_t j = 1; j <= density_; j++) {
-      double seg_mid_point_info[8] = {};
-      quintic_hermite_point(t + j * t_increament, ptr_smoothed_point2d.at(i),
-                            ptr_smoothed_point2d.at(i + 1), seg_mid_point_info);
-      ptr_interpolated_point2d->emplace_back(to_path_point(seg_mid_point_info));
-      ptr_interpolated_point2d->back().set_s(arclength_integration(
-    t + j * t_increament, ptr_smoothed_point2d.at(i),
-                            ptr_smoothed_point2d.at(i + 1)) + accumulated_s);
-      AINFO<<"should have no interpolation";
-    }
+    // for (std::size_t j = 1; j <= density_; j++) {
+    //   double seg_mid_point_info[8] = {};
+    //   quintic_hermite_point(t + j * t_increament, ptr_smoothed_point2d.at(i),
+    //                         ptr_smoothed_point2d.at(i + 1), seg_mid_point_info);
+    //   ptr_interpolated_point2d->emplace_back(to_path_point(seg_mid_point_info));
+    //   ptr_interpolated_point2d->back().set_s(arclength_integration(
+    // t + j * t_increament, ptr_smoothed_point2d.at(i),
+    //                         ptr_smoothed_point2d.at(i + 1)) + accumulated_s);
+    //   AINFO<<"should have no interpolation";
+    // }
     double seg_end_point_info[8] = {};
     quintic_hermite_point(1.0, ptr_smoothed_point2d.at(i),
                           ptr_smoothed_point2d.at(i + 1), seg_end_point_info);
+    Nx = seg_end_point_info[0];
+    Ny = seg_end_point_info[1];
     ptr_interpolated_point2d->emplace_back(to_path_point(seg_end_point_info));
-    double end_segment_s = arclength_integration(
-    1.0, ptr_smoothed_point2d.at(i),
-                            ptr_smoothed_point2d.at(i + 1))+ accumulated_s;
-    ptr_interpolated_point2d->back().set_s(end_segment_s);
-    accumulated_s += arclength_integration(
-    1.0, ptr_smoothed_point2d.at(i),
-                            ptr_smoothed_point2d.at(i + 1));
+    double end_segment_s = std::sqrt((Fx - Nx) * (Fx - Nx) + (Fy - Ny) * (Fy - Ny));
+    ptr_interpolated_point2d->back().set_s(end_segment_s + accumulated_s);
+    accumulated_s += end_segment_s;
+    // double end_segment_s = arclength_integration(
+    // 1.0, ptr_smoothed_point2d.at(i),
+    //                         ptr_smoothed_point2d.at(i + 1))+ accumulated_s;
+    // ptr_interpolated_point2d->back().set_s(end_segment_s);
+    // accumulated_s += arclength_integration(
+    // 1.0, ptr_smoothed_point2d.at(i),
+    //                         ptr_smoothed_point2d.at(i + 1));
+    Fx = Nx;
+    Fy = Ny;
   }
 
   // use precise definition of kappa on a parametric curve
-  for (std::size_t i = 0; i < ptr_interpolated_point2d->size(); i++) {
-    ptr_interpolated_point2d->at(i).set_kappa(CurveMath::ComputeCurvature(
-        ptr_interpolated_point2d->at(i).x_derivative(),
-        ptr_interpolated_point2d->at(i).x_2nd_derivative(),
-        ptr_interpolated_point2d->at(i).y_derivative(),
-        ptr_interpolated_point2d->at(i).y_2nd_derivative()));
-  }
-  // use precise definition of dkappa on a parametric curve
-  for (std::size_t i = 0; i < ptr_interpolated_point2d->size(); i++) {
-    ptr_interpolated_point2d->at(i).set_dkappa(
-        CurveMath::ComputeCurvatureDerivative(
-            ptr_interpolated_point2d->at(i).x_derivative(),
-            ptr_interpolated_point2d->at(i).x_2nd_derivative(),
-            ptr_interpolated_point2d->at(i).x_3rd_derivative(),
-            ptr_interpolated_point2d->at(i).y_derivative(),
-            ptr_interpolated_point2d->at(i).y_2nd_derivative(),
-            ptr_interpolated_point2d->at(i).y_3rd_derivative()));
-  }
+  // for (std::size_t i = 0; i < ptr_interpolated_point2d->size(); i++) {
+  //   ptr_interpolated_point2d->at(i).set_kappa(CurveMath::ComputeCurvature(
+  //       ptr_interpolated_point2d->at(i).x_derivative(),
+  //       ptr_interpolated_point2d->at(i).x_2nd_derivative(),
+  //       ptr_interpolated_point2d->at(i).y_derivative(),
+  //       ptr_interpolated_point2d->at(i).y_2nd_derivative()));
+  // }
+  // // use precise definition of dkappa on a parametric curve
+  // for (std::size_t i = 0; i < ptr_interpolated_point2d->size(); i++) {
+  //   ptr_interpolated_point2d->at(i).set_dkappa(
+  //       CurveMath::ComputeCurvatureDerivative(
+  //           ptr_interpolated_point2d->at(i).x_derivative(),
+  //           ptr_interpolated_point2d->at(i).x_2nd_derivative(),
+  //           ptr_interpolated_point2d->at(i).x_3rd_derivative(),
+  //           ptr_interpolated_point2d->at(i).y_derivative(),
+  //           ptr_interpolated_point2d->at(i).y_2nd_derivative(),
+  //           ptr_interpolated_point2d->at(i).y_3rd_derivative()));
+  // }
   return status == Ipopt::Solve_Succeeded ||
          status == Ipopt::Solved_To_Acceptable_Level;
 }
