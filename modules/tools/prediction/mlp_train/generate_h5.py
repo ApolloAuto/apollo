@@ -33,6 +33,7 @@ from common.trajectory import TrajectoryToSample
 
 mlp_feature_size = parameters['mlp']['dim_input']
 
+
 def extract_mlp_features(filename):
     features = load_label_feature(filename)
 
@@ -54,39 +55,29 @@ def extract_mlp_features(filename):
             if mlp_features is None:
                 mlp_features = mlp_feature_np
             else:
-                mlp_features = np.concatenate((mlp_features, mlp_feature_np),
-                                              axis=0)
-    mlp_features = mlp_features.reshape((np.shape(mlp_features)[0] / (mlp_feature_size + 1),
-                                        (mlp_feature_size + 1)))
+                mlp_features = np.concatenate(
+                    (mlp_features, mlp_feature_np), axis=0)
+    mlp_features = mlp_features.reshape(
+        (np.shape(mlp_features)[0] / (mlp_feature_size + 1),
+         (mlp_feature_size + 1)))
     print np.shape(mlp_features)
     return mlp_features
 
 
-def generate_h5_file(filename):
+def generate_h5_file(filename, output_file):
     features = extract_mlp_features(filename)
-    file_pre, file_ext = os.path.splitext(filename)
-    output_file = file_pre + '.h5'
     h5_file = h5py.File(output_file, 'w')
-    h5_file.create_dataset('data', data = features)
+    h5_file.create_dataset('data', data=features)
     h5_file.close()
 
 
 if __name__ == "__main__":
-
-    parser = argparse.ArgumentParser(description = 'Generate H5 files')
-    parser.add_argument('-d', '--dir', help = 'directory containing features')
-    parser.add_argument('-f', '--file', help = 'feature file')
-
+    parser = argparse.ArgumentParser(description='Generate H5 files')
+    parser.add_argument('input', type=str, help='input file')
+    parser.add_argument('output', type=str, help='output file')
     args = parser.parse_args()
-    directory = args.dir
-    file = args.file
-
-    if directory and os.path.isdir(directory):
-        for feature_file in glob.glob(directory + '/*.label.bin'):
-            print "Processing labeled feature file: ", feature_file
-            generate_h5_file(feature_file)
-
-    if file and os.path.isfile(file):
-        print "Processing labeled feature file: ", file
-        generate_h5_file(file)
-
+    print("Creating H5: {} -> {}".format(args.input, args.output))
+    if os.path.isfile(args.input):
+        generate_h5_file(args.input, args.output)
+    else:
+        print("{} is not a valid file.".format(args.input))
