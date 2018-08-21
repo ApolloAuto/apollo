@@ -15,6 +15,8 @@ message CNNSegParam {
     optional bool use_full_cloud = 31 [default = false];
 
     optional uint32 gpu_id = 41 [default = 0];
+    optional float filter_thresh = 42 [default = 5];
+    optional float enable_filter_thresh = 43 [default = 700];
 }
 
 message NetworkParam {
