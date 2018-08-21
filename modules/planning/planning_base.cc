@@ -114,6 +114,18 @@ bool PlanningBase::IsVehicleStateValid(const VehicleState& vehicle_state) {
 void PlanningBase::PublishPlanningPb(ADCTrajectory* trajectory_pb,
                                      double timestamp) {
   trajectory_pb->mutable_header()->set_timestamp_sec(timestamp);
+  if (AdapterManager::GetPrediction() &&
+      !AdapterManager::GetPrediction()->Empty()) {
+    const auto& prediction =
+        AdapterManager::GetPrediction()->GetLatestObserved();
+    trajectory_pb->mutable_header()->set_lidar_timestamp(
+        prediction.header().lidar_timestamp());
+    trajectory_pb->mutable_header()->set_camera_timestamp(
+        prediction.header().camera_timestamp());
+    trajectory_pb->mutable_header()->set_radar_timestamp(
+        prediction.header().radar_timestamp());
+  }
+
   // TODO(all): integrate reverse gear
   trajectory_pb->set_gear(canbus::Chassis::GEAR_DRIVE);
   if (AdapterManager::GetRoutingResponse() &&
