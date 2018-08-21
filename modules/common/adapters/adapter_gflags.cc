@@ -94,6 +94,10 @@ DEFINE_string(image_long_topic, "/apollo/sensor/camera/traffic/image_long",
               "long camera image topic name");
 DEFINE_string(image_usb_cam_topic, "/apollo/sensor/camera/image_usb_cam",
               "usb camera image topic name");
+DEFINE_string(camera_image_long_topic, "/apollo/sensor/camera/image_long",
+              "long camera image topic name");
+DEFINE_string(camera_image_short_topic, "/apollo/sensor/camera/image_short",
+              "short camera image topic name");
 DEFINE_string(gnss_rtk_obs_topic, "/apollo/sensor/gnss/rtk_obs",
               "Gnss rtk observation topic name");
 DEFINE_string(gnss_rtk_eph_topic, "/apollo/sensor/gnss/rtk_eph",
