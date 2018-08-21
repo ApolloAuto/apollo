@@ -210,10 +210,13 @@ void HMIWorker::SubmitDriveEvent(const uint64_t event_time_ms,
   AdapterManager::FillDriveEventHeader("HMI", &drive_event);
   drive_event.mutable_header()->set_timestamp_sec(event_time_ms / 1000.0);
   drive_event.set_event(event_msg);
-  for (const auto type_name : event_types) {
+  for (const auto &type_name : event_types) {
     DriveEvent::Type type;
-    DriveEvent::Type_Parse(type_name, &type);
-    drive_event.add_type(type);
+    if (DriveEvent::Type_Parse(type_name, &type)) {
+      drive_event.add_type(type);
+    } else {
+      AERROR << "Failed to parse drive event type:" <<type_name;
+    }
   }
   AdapterManager::PublishDriveEvent(drive_event);
 }
