@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "modules/drivers/camera/nodes/usb_cam_wrapper.h"
+#include "modules/drivers/proto/sensor_image.pb.h"
 
 #include <time.h>   /* for clock_gettime */
 
@@ -27,6 +28,16 @@ namespace camera {
 
 UsbCamWrapper::UsbCamWrapper(ros::NodeHandle node, ros::NodeHandle private_nh) :
     node_(node), priv_node_(private_nh), last_stamp_(0) {
+  // pb
+  sensor_image_.mutable_header()->set_camera_timestamp(img_.header.stamp.toSec());
+  sensor_image_.set_frame_id(img_.header.frame_id);
+  // TODO(all) sensor_image_.set_measurement_time();
+  sensor_image_.set_height(image_height_);
+  sensor_image_.set_width(image_width_);
+  sensor_image_.set_encoding(img_.encoding);
+  sensor_image_.set_step(img_.step);
+  // TODO (all) sensor_image_.set_allocated_data(img_.data);
+
   // grab the parameters
   priv_node_.param("topic_name", topic_name_, std::string("image_raw0"));
   priv_node_.param("video_device", video_device_name_,

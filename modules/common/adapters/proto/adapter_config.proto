@@ -80,7 +80,8 @@ message AdapterConfig {
     POINT_CLOUD_SPARSE_RAW_3 = 70;
     VELODYNE_SCAN_SPARSE_3 = 71;
 
-    IMAGE_USB_CAM = 72;
+    CAMERA_IMAGE_LONG = 72;
+    CAMERA_IMAGE_SHORT = 73;
   }
   enum Mode {
     RECEIVE_ONLY = 0;
