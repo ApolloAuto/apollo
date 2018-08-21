@@ -3,15 +3,12 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "velodyne_driver",
+    name = "laser_scan",
     srcs = [
-        "driver.cc",
-        "input.cc",
+        "laser_scan.cc",
     ],
     hdrs = [
-        "driver.h",
-        "input.h",
-        "ring_sequence.h",
+        "laser_scan.h",
     ],
     deps = [
         "//modules/common:log",
