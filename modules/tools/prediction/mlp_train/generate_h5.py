@@ -57,8 +57,10 @@ def extract_mlp_features(filename):
             else:
                 mlp_features = np.concatenate(
                     (mlp_features, mlp_feature_np), axis=0)
-    if not mlp_features:
+
+    if mlp_features is None:
         return
+
     mlp_features = mlp_features.reshape(
         (np.shape(mlp_features)[0] / (mlp_feature_size + 1),
          (mlp_feature_size + 1)))
