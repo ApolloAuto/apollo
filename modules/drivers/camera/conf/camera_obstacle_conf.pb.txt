@@ -1,0 +1,17 @@
+is_fusion : false
+conf {
+  index: 0
+  position: "centre"
+  video_device: "/dev/camera/obstacle"
+  image_width: 1920
+  image_height: 1080
+  pixel_format: "yuyv"
+  frame_rate:
+  camera_frame_id: "usb_cam"
+  io_method: "mmap"
+  camera_timeout: 2000
+  error_code: 14
+  camera_info_url:
+  trigger_internal:
+  trigger_fps:
+}
