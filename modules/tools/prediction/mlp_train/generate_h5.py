@@ -57,15 +57,19 @@ def extract_mlp_features(filename):
             else:
                 mlp_features = np.concatenate(
                     (mlp_features, mlp_feature_np), axis=0)
+    if not mlp_features:
+        return
     mlp_features = mlp_features.reshape(
         (np.shape(mlp_features)[0] / (mlp_feature_size + 1),
          (mlp_feature_size + 1)))
-    print np.shape(mlp_features)
     return mlp_features
 
 
 def generate_h5_file(filename, output_file):
     features = extract_mlp_features(filename)
+    if not features:
+        print("Failed to extract mlp features from {}".format(filename))
+        return
     h5_file = h5py.File(output_file, 'w')
     h5_file.create_dataset('data', data=features)
     h5_file.close()
