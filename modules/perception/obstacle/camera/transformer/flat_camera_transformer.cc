@@ -62,7 +62,7 @@ bool FlatCameraTransformer::Transform(
     }
   }
 
-  GetDynamicExtrinsics(centers);
+  // GetDynamicExtrinsics(centers);
   return true;
 }
 
