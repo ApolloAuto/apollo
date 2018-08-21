@@ -92,7 +92,7 @@ Status StdPlanning::Init() {
   CHECK_ADAPTER(Chassis);
   CHECK_ADAPTER(RoutingResponse);
   CHECK_ADAPTER(RoutingRequest);
-  CHECK_ADAPTER_IF(FLAGS_enable_prediction, Prediction);
+  CHECK_ADAPTER(Prediction);
   CHECK_ADAPTER(TrafficLightDetection);
 
   hdmap_ = HDMapUtil::BaseMapPtr();
@@ -205,7 +205,7 @@ void StdPlanning::RunOnce() {
     reference_line_provider_->UpdateRoutingResponse(latest_routing);
   }
 
-  if (FLAGS_enable_prediction && AdapterManager::GetPrediction()->Empty()) {
+  if (AdapterManager::GetPrediction()->Empty()) {
     AWARN_EVERY(100) << "prediction is enabled but no prediction provided";
   }
 
