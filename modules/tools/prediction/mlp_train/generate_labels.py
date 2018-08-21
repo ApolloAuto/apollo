@@ -29,13 +29,10 @@ from common.feature_io import build_trajectory
 from common.trajectory import TrajectoryToSample
 
 
-def label_file(input_file):
+def label_file(input_file, output_file):
     """
     label each feature file
     """
-    file_name, file_ext = os.path.splitext(input_file)
-    output_file = file_name + ".label" + file_ext
-
     # read input file and save them in dict
     features = load_protobuf(input_file)
 
@@ -60,19 +57,13 @@ def label_file(input_file):
 
 if __name__ == "__main__":
 
-    parser = argparse.ArgumentParser(description = 'Generate labels')
-    parser.add_argument('-d', '--dir', help = 'directory containing features')
-    parser.add_argument('-f', '--file', help = 'feature file')
-
+    parser = argparse.ArgumentParser(description='Generate labels')
+    parser.add_argument('input', type=str, help='input file')
+    parser.add_argument('output', type=str, help='output file')
     args = parser.parse_args()
-    directory = args.dir
-    file = args.file
 
-    if directory and os.path.isdir(directory):
-        for feature_file in glob.glob(directory + '/*.bin'):
-            print "Processing feature file: ", feature_file
-            label_file(feature_file)
-
-    if file and os.path.isfile(file):
-        print "Processing feature file: ", file
-        label_file(file)
+    print("Create Label {} -> {}".format(args.input, args.output))
+    if os.path.isfile(args.input):
+        label_file(args.input, args.output)
+    else:
+        print("{} is not a valid file".format(args.input))

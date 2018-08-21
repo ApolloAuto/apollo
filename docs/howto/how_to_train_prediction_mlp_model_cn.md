@@ -41,8 +41,14 @@
 
 12. 在docker中进入`/apollo/modules/tools/prediction/mlp_train/`， 使用`python generate_labels.py -f /apollo/data/prediction/feature.0.bin`标记数据。然后在`/apollo/data/prediction/`文件夹中检查是否有`feature.0.label.bin`文件存在
 
+> 更新: 在docker中进入`/apollo/modules/tools/prediction/mlp_train/`， 使用`python generate_labels.py /apollo/data/prediction/feature.0.bin /apollo/data/prediction/feature.0.label.bin` 标记数据。然后在`/apollo/data/prediction/`文件夹中检查是否有`feature.0.label.bin`文件存在
+
 13. 在docker中，`/apollo/modules/tools/prediction/mlp_train/`下， 通过
 `python generate_h5.py -f /apollo/data/prediction/feature.0.label.bin`生成 H5文件。然后检查`feature.0.label.h5`是否被创建
+
+> 更新：在docker中，`/apollo/modules/tools/prediction/mlp_train/`下， 通过
+ `python generate_h5.py /apollo/data/prediction/feature.0.label.bin  /apollo/data/prediction/feature.0.label.h5` 生成 H5文件。然后检查`feature.0.label.h5`是否被创建
+
 14. 退出dev docker
 
 15. 进入`APOLLO/modules/tools/prediction/mlp_train/proto/`文件夹并运行`protoc --python_out=./ fnn_model.proto`来生成fnn_model_pb2.py
