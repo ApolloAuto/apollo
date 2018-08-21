@@ -787,16 +787,10 @@ void ReferenceLineProvider::GetAnchorPoints(
   int num_of_anchors =
       std::max(2, static_cast<int>(reference_line.Length() / interval + 0.5));
   std::vector<double> anchor_s;
-  AINFO<<"num_of_anchors "<<num_of_anchors;
   common::util::uniform_slice(0.0, reference_line.Length(), num_of_anchors - 1,
                               &anchor_s);
   for (const double s : anchor_s) {
     AnchorPoint anchor = GetAnchorPoint(reference_line,s);
-    //   AINFO<<anchor.path_point.s();
-    // AINFO<<anchor.path_point.x();
-    // AINFO<<anchor.path_point.y();
-    // AINFO<<anchor.path_point.theta();
-    // AINFO<<"---------------------------------";
     anchor_points->emplace_back(anchor);
   }
   anchor_points->front().longitudinal_bound = 1e-6;

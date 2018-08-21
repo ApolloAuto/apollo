@@ -45,25 +45,12 @@ class CosThetaReferenceLineSmoother : public ReferenceLineSmoother {
 
  private:
   bool Smooth(std::vector<Eigen::Vector2d> point2d,
-              std::vector<common::PathPoint>* ptr_interpolated_point2d,
+              std::vector<common::PathPoint>& ptr_smoothed_point2d,
               std::vector<double> lateral_bounds);
 
   common::PathPoint to_path_point(const double x, const double y,
                                   const double x_derivative,
                                   const double y_derivative) const;
-
-  common::PathPoint to_path_point(const double* point_info) const;
-
-  void quintic_hermite_point(const double t,
-                             const common::PathPoint front_point,
-                             const common::PathPoint back_point,
-                             double* quintic_hermite_point_info);
-
-  double quintic_hermite_s(const double t, common::PathPoint front_point,
-                           common::PathPoint back_point);
-
-  double arclength_integration(const double t, common::PathPoint front_point,
-                               common::PathPoint back_point);
 
   std::unique_ptr<ReferenceLineSmoother> reOpt_qp_smoother_;
 
@@ -83,21 +70,13 @@ class CosThetaReferenceLineSmoother : public ReferenceLineSmoother {
 
   double start_x_derivative_ = 0.0;
 
-  double start_x_2nd_derivative_ = 0.0;
-
   double start_y_derivative_ = 0.0;
-
-  double start_y_2nd_derivative_ = 0.0;
 
   double weight_cos_included_angle_ = 0.0;
 
   double acceptable_tol_ = 1e-5;
 
   double relax_ = 0.2;
-
-  double resolution_ = 10.0;
-
-  std::size_t density_ = 0;
 
   double zero_x_ = 0.0;
 

@@ -47,12 +47,10 @@ bool CosThetaProbleminterface::get_nlp_info(int& n, int& m, int& nnz_jac_g,
 
   // number of constraints
   m = num_of_points_ * 2;
-  // m = 0;
   num_of_constraints_ = m;
 
   // number of nonzero constraint jacobian.
   nnz_jac_g = num_of_points_ * 2;
-  // nnz_jac_g = 0;
   nnz_jac_g_ = nnz_jac_g;
 
   // number of nonzero hessian and lagrangian.
@@ -116,23 +114,23 @@ bool CosThetaProbleminterface::get_bounds_info(int n, double* x_l, double* x_u,
     double y_lower = 0.0;
     double y_upper = 0.0;
     double bound = std::min(lateral_bounds_[i], default_max_point_deviation_);
-    // / std::pow(2,0.5)
+    double radius_ratio = std::sqrt(2);
 
     if (i == 0 && has_fixed_start_point_) {
-      x_lower = start_x_ - relax_;
-      x_upper = start_x_ + relax_;
-      y_lower = start_y_ - relax_;
-      y_upper = start_y_ + relax_;
+      x_lower = start_x_ - relax_ / radius_ratio;
+      x_upper = start_x_ + relax_ / radius_ratio;
+      y_lower = start_y_ - relax_ / radius_ratio;
+      y_upper = start_y_ + relax_ / radius_ratio;
     } else if (i + 1 == num_of_points_ && has_fixed_end_point_) {
-      x_lower = end_x_ - relax_;
-      x_upper = end_x_ + relax_;
-      y_lower = end_y_ - relax_;
-      y_upper = end_y_ + relax_;
+      x_lower = end_x_ - relax_ / radius_ratio;
+      x_upper = end_x_ + relax_ / radius_ratio;
+      y_lower = end_y_ - relax_ / radius_ratio;
+      y_upper = end_y_ + relax_ / radius_ratio;
     } else {
-      x_lower = init_points_[i].x() - bound;
-      x_upper = init_points_[i].x() + bound;
-      y_lower = init_points_[i].y() - bound;
-      y_upper = init_points_[i].y() + bound;
+      x_lower = init_points_[i].x() - bound / radius_ratio;
+      x_upper = init_points_[i].x() + bound / radius_ratio;
+      y_lower = init_points_[i].y() - bound / radius_ratio;
+      y_upper = init_points_[i].y() + bound / radius_ratio;
     }
     // x
     g_l[index] = x_lower;
@@ -154,27 +152,11 @@ bool CosThetaProbleminterface::get_starting_point(int n, bool init_x, double* x,
   std::random_device rd;
   std::default_random_engine gen = std::default_random_engine(rd());
   std::normal_distribution<> dis{0, 0.05};
-
   for (std::size_t i = 0; i < num_of_points_; ++i) {
     std::size_t index = i * 2;
     x[index] = init_points_[i].x() + dis(gen);
     x[index + 1] = init_points_[i].y() + dis(gen);
-    // + dis(gen)
   }
-  // for (std::size_t i = 0; i < num_of_points_; i++) {
-  //   std::size_t index = i * 2;
-  //   z_L[index] = 4.0e-8;
-  //   z_L[index + 1] = 4.0e-8;
-  // }
-  // for (std::size_t i = 0; i < num_of_points_; i++) {
-  //   std::size_t index = i * 2;
-  //   z_U[index] = 4.0e-8;
-  //   z_U[index + 1] = 4.0e-8;
-  // }
-  // for (std::size_t i = 0; i < num_of_points_; i++) {
-  //   lambda[i] = 0.0;
-  // }
-
   return true;
 }
 
@@ -272,18 +254,11 @@ bool CosThetaProbleminterface::eval_g(int n, const double* x, bool new_x, int m,
   CHECK_EQ(static_cast<std::size_t>(n), num_of_variables_);
   CHECK_EQ(static_cast<std::size_t>(m), num_of_constraints_);
   // fill in the positional deviation constraints
-  // for (std::size_t i = 0; i < num_of_points_; ++i) {
-  //   std::size_t index = i * 2;
-  //   g[i] = (x[index] - init_points_[i].x()) * (x[index] - init_points_[i].x()) +
-  //          (x[index + 1] - init_points_[i].y()) *
-  //              (x[index + 1] - init_points_[i].y());
-  // }
   for (std::size_t i = 0; i < num_of_points_; ++i) {
     std::size_t index = i * 2;
     g[index] = x[index];
     g[index + 1] = x[index + 1];
   }
-
   return true;
 }
 
@@ -292,34 +267,18 @@ bool CosThetaProbleminterface::eval_jac_g(int n, const double* x, bool new_x,
                                           int* jCol, double* values) {
   CHECK_EQ(static_cast<std::size_t>(n), num_of_variables_);
   CHECK_EQ(static_cast<std::size_t>(m), num_of_constraints_);
-  // if (values == NULL) {
-  //   for (std::size_t i = 0; i < num_of_points_; ++i) {
-  //     std::size_t index = i * 2;
-  //     iRow[index] = i;
-  //     jCol[index] = index;
-  //     iRow[index + 1] = i;
-  //     jCol[index + 1] = index + 1;
-  //   }
-  // } else {
-  //   std::fill(values, values + nnz_jac_g_, 0.0);
-  //   for (std::size_t i = 0; i < num_of_points_; ++i) {
-  //     std::size_t index = i * 2;
-  //     values[index] = x[index] * 2 - init_points_[i].x() * 2;
-  //     values[index + 1] = x[index + 1] * 2 - init_points_[i].y() * 2;
-  //   }
-  // }
   if (values == NULL) {
-      // positional deviation constraints
-      for (std::size_t i = 0; i < num_of_points_ * 2; ++i) {
-          iRow[i] = i;
-          jCol[i] = i;
-      }
+    // positional deviation constraints
+    for (std::size_t i = 0; i < num_of_points_ * 2; ++i) {
+      iRow[i] = i;
+      jCol[i] = i;
+    }
   } else {
-      std::fill(values, values + nnz_jac_g_, 0.0);
-      // positional deviation constraints
-      for (std::size_t i = 0; i < num_of_points_ * 2; ++i) {
-          values[i] = 1;
-      }
+    std::fill(values, values + nnz_jac_g_, 0.0);
+    // positional deviation constraints
+    for (std::size_t i = 0; i < num_of_points_ * 2; ++i) {
+      values[i] = 1;
+    }
   }
   return true;
 }
@@ -397,10 +356,19 @@ bool CosThetaProbleminterface::eval_h(int n, const double* x, bool new_x,
            (q6 * q13) / (2 * q1_sqrt_q1q2) - (q5 * q11) / (2 * q1_sqrt_q1q2));
       values[idx_map_[std::make_pair(topleft + 2, topleft)]] +=
           obj_factor * (-weight_cos_included_angle_) *
+<<<<<<< ba3168c5206584b4d22eb9f8e603077b8fd21439:modules/planning/reference_line/cos_theta_problem_interface.cc
           (1 / sqrt_q1q2 + q4 / q1_sqrt_q1q2 - (q5 * q7) / (2 * q1_sqrt_q1q2) -
            q3 / (4 * square_q1 * sqrt_q1q2) + (q5 * q13) / (2 * q1_sqrt_q1q2) -
            (q8 * q13) / (2 * sqrt_q1_q2_sqrt_q2) +
            (q5 * q8 * q4) / (4 * q1_sqrt_q1_q2_sqrt_q2));
+=======
+          (1 / (sqrt_q1 * sqrt_q2) + q4 / (q1 * sqrt_q1 * sqrt_q2) -
+           (q5 * q7) / (2 * q1 * sqrt_q1 * sqrt_q2) -
+           q3 / (4 * q1 * q1 * sqrt_q1 * sqrt_q2) +
+           (q5 * q13) / (2 * q1 * sqrt_q1 * sqrt_q2) -
+           (q8 * q13) / (2 * sqrt_q1 * q2 * sqrt_q2) +
+           (q5 * q8 * q4) / (4 * q1 * sqrt_q1 * q2 * sqrt_q2));
+>>>>>>> box constraints and qp interpolation(styled):modules/planning/reference_line/cosTheta_problem_interface.cc
       values[idx_map_[std::make_pair(topleft + 3, topleft)]] +=
           obj_factor * (-weight_cos_included_angle_) *
           ((q6 * q13) / (2 * q1_sqrt_q1q2) - (q5 * q10) / (2 * q1_sqrt_q1q2) -
@@ -409,9 +377,15 @@ bool CosThetaProbleminterface::eval_h(int n, const double* x, bool new_x,
            (q5 * q9 * q4) / (4 * q1_sqrt_q1_q2_sqrt_q2));
       values[idx_map_[std::make_pair(topleft + 4, topleft)]] +=
           obj_factor * (-weight_cos_included_angle_) *
+<<<<<<< ba3168c5206584b4d22eb9f8e603077b8fd21439:modules/planning/reference_line/cos_theta_problem_interface.cc
           ((q5 * q12) / (2 * q1_sqrt_q1q2) - 1 / sqrt_q1q2 +
            (q8 * q13) / (2 * sqrt_q1_q2_sqrt_q2) -
            (q5 * q8 * q4) / (4 * q1_sqrt_q1_q2_sqrt_q2));
+=======
+          ((q5 * q12) / (2 * q1 * sqrt_q1 * sqrt_q2) - 1 / (sqrt_q1 * sqrt_q2) +
+           (q8 * q13) / (2 * sqrt_q1 * q2 * sqrt_q2) -
+           (q5 * q8 * q4) / (4 * q1 * sqrt_q1 * q2 * sqrt_q2));
+>>>>>>> box constraints and qp interpolation(styled):modules/planning/reference_line/cosTheta_problem_interface.cc
       values[idx_map_[std::make_pair(topleft + 5, topleft)]] +=
           obj_factor * (-weight_cos_included_angle_) *
           ((q5 * q14) / (2 * q1_sqrt_q1q2) +
@@ -430,11 +404,20 @@ bool CosThetaProbleminterface::eval_h(int n, const double* x, bool new_x,
            (q8 * q6 * q4) / (4 * q1_sqrt_q1_q2_sqrt_q2));
       values[idx_map_[std::make_pair(topleft + 3, topleft + 1)]] +=
           obj_factor * (-weight_cos_included_angle_) *
+<<<<<<< ba3168c5206584b4d22eb9f8e603077b8fd21439:modules/planning/reference_line/cos_theta_problem_interface.cc
           (1 / sqrt_q1q2 + q4 / q1_sqrt_q1q2 - (q6 * q10) / (2 * q1_sqrt_q1q2) -
            (3 * q6 * q6 * q4) / (4 * square_q1 * sqrt_q1q2) +
            (q6 * q11) / (2 * q1_sqrt_q1q2) -
            (q9 * q11) / (2 * sqrt_q1_q2_sqrt_q2) +
            (q6 * q9 * q4) / (4 * q1_sqrt_q1_q2_sqrt_q2));
+=======
+          (1 / (sqrt_q1 * sqrt_q2) + q4 / (q1 * sqrt_q1 * sqrt_q2) -
+           (q6 * q10) / (2 * q1 * sqrt_q1 * sqrt_q2) -
+           (3 * q6 * q6 * q4) / (4 * q1 * q1 * sqrt_q1 * sqrt_q2) +
+           (q6 * q11) / (2 * q1 * sqrt_q1 * sqrt_q2) -
+           (q9 * q11) / (2 * sqrt_q1 * q2 * sqrt_q2) +
+           (q6 * q9 * q4) / (4 * q1 * sqrt_q1 * q2 * sqrt_q2));
+>>>>>>> box constraints and qp interpolation(styled):modules/planning/reference_line/cosTheta_problem_interface.cc
       values[idx_map_[std::make_pair(topleft + 4, topleft + 1)]] +=
           obj_factor * (-weight_cos_included_angle_) *
           ((q6 * q12) / (2 * q1_sqrt_q1q2) +
@@ -442,6 +425,7 @@ bool CosThetaProbleminterface::eval_h(int n, const double* x, bool new_x,
            (q8 * q6 * q4) / (4 * q1_sqrt_q1_q2_sqrt_q2));
       values[idx_map_[std::make_pair(topleft + 5, topleft + 1)]] +=
           obj_factor * (-weight_cos_included_angle_) *
+<<<<<<< ba3168c5206584b4d22eb9f8e603077b8fd21439:modules/planning/reference_line/cos_theta_problem_interface.cc
           ((q6 * q14) / (2 * q1_sqrt_q1q2) - 1 / sqrt_q1q2 +
            (q9 * q11) / (2 * sqrt_q1_q2_sqrt_q2) -
            (q6 * q9 * q4) / (4 * q1_sqrt_q1_q2_sqrt_q2));
@@ -453,6 +437,20 @@ bool CosThetaProbleminterface::eval_h(int n, const double* x, bool new_x,
            (q8 * q7) / (sqrt_q1_q2_sqrt_q2) + q3 / (4 * square_q1 * sqrt_q1q2) +
            (3 * q8 * q8 * q4) / (4 * sqrt_q1 * square_q2 * sqrt_q2) -
            (q5 * q8 * q4) / (2 * q1_sqrt_q1_q2_sqrt_q2));
+=======
+          ((q6 * q14) / (2 * q1 * sqrt_q1 * sqrt_q2) - 1 / (sqrt_q1 * sqrt_q2) +
+           (q9 * q11) / (2 * sqrt_q1 * q2 * sqrt_q2) -
+           (q6 * q9 * q4) / (4 * q1 * sqrt_q1 * q2 * sqrt_q2));
+
+      values[idx_map_[std::make_pair(topleft + 2, topleft + 2)]] +=
+          obj_factor * (-weight_cos_included_angle_) *
+          ((q5 * q7) / (q1 * sqrt_q1 * sqrt_q2) -
+           q4 / (sqrt_q1 * q2 * sqrt_q2) - q4 / (q1 * sqrt_q1 * sqrt_q2) -
+           2 / (sqrt_q1 * sqrt_q2) - (q8 * q7) / (sqrt_q1 * q2 * sqrt_q2) +
+           q3 / (4 * q1 * q1 * sqrt_q1 * sqrt_q2) +
+           (3 * q8 * q8 * q4) / (4 * sqrt_q1 * q2 * q2 * sqrt_q2) -
+           (q5 * q8 * q4) / (2 * q1 * sqrt_q1 * q2 * sqrt_q2));
+>>>>>>> box constraints and qp interpolation(styled):modules/planning/reference_line/cosTheta_problem_interface.cc
       values[idx_map_[std::make_pair(topleft + 3, topleft + 2)]] +=
           obj_factor * (-weight_cos_included_angle_) *
           ((q6 * q7) / (2 * q1_sqrt_q1q2) -
@@ -465,12 +463,21 @@ bool CosThetaProbleminterface::eval_h(int n, const double* x, bool new_x,
            (3 * q8 * q9 * q4) / (4 * sqrt_q1 * square_q2 * sqrt_q2));
       values[idx_map_[std::make_pair(topleft + 4, topleft + 2)]] +=
           obj_factor * (-weight_cos_included_angle_) *
+<<<<<<< ba3168c5206584b4d22eb9f8e603077b8fd21439:modules/planning/reference_line/cos_theta_problem_interface.cc
           (1 / sqrt_q1q2 + q4 / (sqrt_q1_q2_sqrt_q2) +
            (q8 * q7) / (2 * sqrt_q1_q2_sqrt_q2) -
            (3 * q8 * q8 * q4) / (4 * sqrt_q1 * square_q2 * sqrt_q2) -
            (q5 * q12) / (2 * q1_sqrt_q1q2) +
            (q8 * q12) / (2 * sqrt_q1_q2_sqrt_q2) +
            (q5 * q8 * q4) / (4 * q1_sqrt_q1_q2_sqrt_q2));
+=======
+          (1 / (sqrt_q1 * sqrt_q2) + q4 / (sqrt_q1 * q2 * sqrt_q2) +
+           (q8 * q7) / (2 * sqrt_q1 * q2 * sqrt_q2) -
+           (3 * q8 * q8 * q4) / (4 * sqrt_q1 * q2 * q2 * sqrt_q2) -
+           (q5 * q12) / (2 * q1 * sqrt_q1 * sqrt_q2) +
+           (q8 * q12) / (2 * sqrt_q1 * q2 * sqrt_q2) +
+           (q5 * q8 * q4) / (4 * q1 * sqrt_q1 * q2 * sqrt_q2));
+>>>>>>> box constraints and qp interpolation(styled):modules/planning/reference_line/cosTheta_problem_interface.cc
       values[idx_map_[std::make_pair(topleft + 5, topleft + 2)]] +=
           obj_factor * (-weight_cos_included_angle_) *
           ((q9 * q7) / (2 * sqrt_q1_q2_sqrt_q2) -
@@ -481,12 +488,21 @@ bool CosThetaProbleminterface::eval_h(int n, const double* x, bool new_x,
 
       values[idx_map_[std::make_pair(topleft + 3, topleft + 3)]] +=
           obj_factor * (-weight_cos_included_angle_) *
+<<<<<<< ba3168c5206584b4d22eb9f8e603077b8fd21439:modules/planning/reference_line/cos_theta_problem_interface.cc
           ((q6 * q10) / q1_sqrt_q1q2 -
            q4 / (sqrt_q1_q2_sqrt_q2)-q4 / q1_sqrt_q1q2 - 2 / sqrt_q1q2 -
            (q9 * q10) / (sqrt_q1_q2_sqrt_q2) +
            (3 * q6 * q6 * q4) / (4 * square_q1 * sqrt_q1q2) +
            (3 * q9 * q9 * q4) / (4 * sqrt_q1 * square_q2 * sqrt_q2) -
            (q6 * q9 * q4) / (2 * q1_sqrt_q1_q2_sqrt_q2));
+=======
+          ((q6 * q10) / (q1 * sqrt_q1 * sqrt_q2) -
+           q4 / (sqrt_q1 * q2 * sqrt_q2) - q4 / (q1 * sqrt_q1 * sqrt_q2) -
+           2 / (sqrt_q1 * sqrt_q2) - (q9 * q10) / (sqrt_q1 * q2 * sqrt_q2) +
+           (3 * q6 * q6 * q4) / (4 * q1 * q1 * sqrt_q1 * sqrt_q2) +
+           (3 * q9 * q9 * q4) / (4 * sqrt_q1 * q2 * q2 * sqrt_q2) -
+           (q6 * q9 * q4) / (2 * q1 * sqrt_q1 * q2 * sqrt_q2));
+>>>>>>> box constraints and qp interpolation(styled):modules/planning/reference_line/cosTheta_problem_interface.cc
       values[idx_map_[std::make_pair(topleft + 4, topleft + 3)]] +=
           obj_factor * (-weight_cos_included_angle_) *
           ((q8 * q10) / (2 * sqrt_q1_q2_sqrt_q2) -
@@ -496,12 +512,21 @@ bool CosThetaProbleminterface::eval_h(int n, const double* x, bool new_x,
            (3 * q8 * q9 * q4) / (4 * sqrt_q1 * square_q2 * sqrt_q2));
       values[idx_map_[std::make_pair(topleft + 5, topleft + 3)]] +=
           obj_factor * (-weight_cos_included_angle_) *
+<<<<<<< ba3168c5206584b4d22eb9f8e603077b8fd21439:modules/planning/reference_line/cos_theta_problem_interface.cc
           (1 / sqrt_q1q2 + q4 / (sqrt_q1_q2_sqrt_q2) +
            (q9 * q10) / (2 * sqrt_q1_q2_sqrt_q2) -
            (3 * q9 * q9 * q4) / (4 * sqrt_q1 * square_q2 * sqrt_q2) -
            (q6 * q14) / (2 * q1_sqrt_q1q2) +
            (q9 * q14) / (2 * sqrt_q1_q2_sqrt_q2) +
            (q6 * q9 * q4) / (4 * q1_sqrt_q1_q2_sqrt_q2));
+=======
+          (1 / (sqrt_q1 * sqrt_q2) + q4 / (sqrt_q1 * q2 * sqrt_q2) +
+           (q9 * q10) / (2 * sqrt_q1 * q2 * sqrt_q2) -
+           (3 * q9 * q9 * q4) / (4 * sqrt_q1 * q2 * q2 * sqrt_q2) -
+           (q6 * q14) / (2 * q1 * sqrt_q1 * sqrt_q2) +
+           (q9 * q14) / (2 * sqrt_q1 * q2 * sqrt_q2) +
+           (q6 * q9 * q4) / (4 * q1 * sqrt_q1 * q2 * sqrt_q2));
+>>>>>>> box constraints and qp interpolation(styled):modules/planning/reference_line/cosTheta_problem_interface.cc
 
       values[idx_map_[std::make_pair(topleft + 4, topleft + 4)]] +=
           obj_factor * (-weight_cos_included_angle_) *
@@ -523,17 +548,6 @@ bool CosThetaProbleminterface::eval_h(int n, const double* x, bool new_x,
     for (std::size_t i = 0; i < num_of_points_ * 2; ++i) {
       values[idx_map_[std::make_pair(i, i)]] += obj_factor * 2;
     }
-    // fill the constraints
-    // std::size_t lambda_idx = 0;
-    // for (std::size_t i = 0; i < num_of_points_; ++i) {
-    //   std::size_t idx_constr = i * 2;
-    //   std::pair<size_t, size_t> coors = std::make_pair(idx_constr, idx_constr);
-    //   std::pair<size_t, size_t> coors1 =
-    //       std::make_pair(idx_constr + 1, idx_constr + 1);
-    //   values[idx_map_[coors]] += lambda[lambda_idx] * 2;
-    //   values[idx_map_[coors1]] += lambda[lambda_idx] * 2;
-    //   lambda_idx++;
-    // }
   }
   return true;
 }
