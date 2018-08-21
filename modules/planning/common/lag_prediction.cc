@@ -117,8 +117,10 @@ void LagPrediction::GetLaggedPrediction(PredictionObstacles* obstacles) const {
     if (apply_lag && iter.second.last_observed_seq > max_disappear_num_) {
       continue;
     }
-    AddObstacleToPrediction(timestamp - iter.second.last_observed_time,
-                            *(iter.second.obstacle_ptr), obstacles);
+    if (iter.second.obstacle_ptr != nullptr) {
+      AddObstacleToPrediction(timestamp - iter.second.last_observed_time,
+                              *(iter.second.obstacle_ptr), obstacles);
+    }
   }
 }
 
