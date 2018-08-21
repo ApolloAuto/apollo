@@ -197,9 +197,6 @@ Status LanePostProcessingSubnode::ProcEvents() {
     return Status(ErrorCode::PERCEPTION_ERROR, "Failed to proc events.");
   }
 
-  Timer timer;
-  timer.Start();
-
   cv::Mat lane_map = objs->camera_frame_supplement->lane_map;
 
   if (lane_map.empty()) {
@@ -260,7 +257,14 @@ Status LanePostProcessingSubnode::ProcEvents() {
     ADEBUG << "options_.vehicle_status.motion:  "
            << options_.vehicle_status.motion;
   }
-  lane_post_processor_->Process(lane_map, options_, &lane_objects);
+
+  Timer timer;
+  timer.Start();
+
+  if (FLAGS_use_whole_lane_line)
+    lane_post_processor_->ProcessWithoutCC(lane_map, options_, &lane_objects);
+  else
+    lane_post_processor_->Process(lane_map, options_, &lane_objects);
   for (size_t i = 0; i < lane_objects->size(); ++i) {
     (*lane_objects)[i].timestamp = event.timestamp;
     (*lane_objects)[i].seq_num = seq_num_;
@@ -271,7 +275,9 @@ Status LanePostProcessingSubnode::ProcEvents() {
   uint64_t t = timer.End("lane post-processing");
   min_processing_time_ = std::min(min_processing_time_, t);
   max_processing_time_ = std::max(max_processing_time_, t);
+
   tot_processing_time_ += t;
+  AINFO << "Lane Post Processing Runtime: " << t << " ms.";
   AINFO << "Lane Post Processing Runtime: "
          << "MIN (" << min_processing_time_ << " ms), "
          << "MAX (" << max_processing_time_ << " ms), "

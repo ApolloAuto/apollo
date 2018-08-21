@@ -276,7 +276,8 @@ class AdapterManager {
   REGISTER_ADAPTER(ImageFront);
   REGISTER_ADAPTER(ImageShort);
   REGISTER_ADAPTER(ImageLong);
-  REGISTER_ADAPTER(ImageUSBCam);
+  REGISTER_ADAPTER(CameraImageLong);
+  REGISTER_ADAPTER(CameraImageShort);
   REGISTER_ADAPTER(Prediction);
   REGISTER_ADAPTER(TrafficLightDetection);
   REGISTER_ADAPTER(RoutingRequest);
