@@ -121,7 +121,7 @@ bool IterativeFitting(std::vector<Eigen::Matrix<T, 2, 1>> *pos_vec,
              const int order, Eigen::Matrix<T, MAX_POLY_ORDER + 1, 1> *coeff,
              const bool &is_x_axis = true,
              const int N = 5, double inlier_thres = 0.1) {
-  if (coeff == NULL) {
+  if (coeff == nullptr) {
     AERROR << "The coefficient pointer is NULL.";
     return false;
   }
@@ -161,6 +161,85 @@ bool IterativeFitting(std::vector<Eigen::Matrix<T, 2, 1>> *pos_vec,
       PolyFit(*pos_vec, order-1, coeff);
   }
 
+  return true;
+}
+
+template <typename T = ScalarType>
+bool RansacFitting(std::vector<Eigen::Matrix<T, 2, 1>> *pos_vec,
+             Eigen::Matrix<T, MAX_POLY_ORDER + 1, 1> *coeff,
+             const int max_iters = 100,
+             const int N = 5, float inlier_thres = 0.1) {
+  if (coeff == NULL) {
+    AERROR << "The coefficient pointer is NULL.";
+    return false;
+  }
+
+  int n = static_cast<int>(pos_vec->size());
+  int q1 = static_cast<int>(n/4);
+  int q2 = static_cast<int>(n/2);
+  int q3 = static_cast<int>(n*3/4);
+  if (n < N) {
+    AERROR << "The number of points should be larger than the order. #points = "
+           << pos_vec->size();
+    return false;
+  }
+
+  std::vector<int> index(3, 0);
+  int max_inliers = 0;
+  float min_residual = FLT_MAX;
+  float early_stop_ratio = 0.95;
+  float good_lane_ratio = 0.666;
+  for (int j = 0; j < max_iters; ++j) {
+    index[0] = std::rand() % q2;
+    index[1] = q2 + std::rand() % q1;
+    index[2] = q3 + std::rand() % q1;
+
+    Eigen::Matrix<T, 3, 3> matA;
+    matA << (*pos_vec)[index[0]](0)*(*pos_vec)[index[0]](0),
+            (*pos_vec)[index[0]](0), 1,
+            (*pos_vec)[index[1]](0)*(*pos_vec)[index[1]](0),
+            (*pos_vec)[index[1]](0), 1,
+            (*pos_vec)[index[2]](0)*(*pos_vec)[index[2]](0),
+            (*pos_vec)[index[2]](0), 1;
+
+    Eigen::Matrix<T, 3, 1> matB;
+    matB << (*pos_vec)[index[0]](1),
+            (*pos_vec)[index[1]](1),
+            (*pos_vec)[index[2]](1);
+    Eigen::Matrix<T, 3, 1> c = matA.colPivHouseholderQr().solve(matB);
+
+    int num_inliers = 0;
+    float residual = 0;
+    float y = 0;
+    for (int i = 0; i < n; ++i) {
+      y = (*pos_vec)[i](0)*(*pos_vec)[i](0)*c(0) + (*pos_vec)[i](0)*c(1) + c(2);
+      if (std::abs(y - (*pos_vec)[i](1)) <= inlier_thres) ++num_inliers;
+      residual += std::abs(y - (*pos_vec)[i](1));
+    }
+
+    if (num_inliers > max_inliers ||
+      (num_inliers == max_inliers && residual < min_residual)) {
+      (*coeff)(3) = 0;
+      (*coeff)(2) = c(0);
+      (*coeff)(1) = c(1);
+      (*coeff)(0) = c(2);
+      max_inliers = num_inliers;
+      min_residual = residual;
+    }
+
+    if (max_inliers > early_stop_ratio*n) break;
+  }
+  if (static_cast<float>(max_inliers)/n < good_lane_ratio) {
+    return false;
+  } else {
+    std::vector<Eigen::Matrix<T, 2, 1>> tmp = *pos_vec;
+    pos_vec->clear();
+    for (int i = 0; i < n; ++i) {
+      float y = tmp[i](0)*tmp[i](0)*(*coeff)(2) +
+                  tmp[i](0)*(*coeff)(1) + (*coeff)(0);
+      if (std::abs(y - tmp[i](1)) <= inlier_thres) pos_vec->push_back(tmp[i]);
+    }
+  }
   return true;
 }
 
