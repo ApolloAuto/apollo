@@ -14,10 +14,11 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_DRIVERS_USB_CAM_NODES_USB_CAM_WRAPPER_H_
-#define MODULES_DRIVERS_USB_CAM_NODES_USB_CAM_WRAPPER_H_
+#ifndef MODULES_DRIVERS_CAMERA_NODES_USB_CAM_WRAPPER_H_
+#define MODULES_DRIVERS_CAMERA_NODES_USB_CAM_WRAPPER_H_
 
 #include "modules/drivers/camera/src/usb_cam.h"
+#include "modules/drivers/proto/sensor_image.pb.h"
 
 #include <ros/ros.h>
 #include <image_transport/image_transport.h>
@@ -51,6 +52,7 @@ class UsbCamWrapper {
  private:
   // shared image message
   sensor_msgs::Image img_;
+  ::apollo::drivers::Image sensor_image_;
   sensor_msgs::CameraInfoPtr cam_info_ = nullptr;
   // image_transport::CameraPublisher image_pub_;
 
@@ -110,4 +112,4 @@ class UsbCamWrapper {
 }  // namespace drivers
 }  // namespace apollo
 
-#endif /* MODULES_DRIVERS_USB_CAM_NODES_USB_CAM_WRAPPER_H_ */
+#endif /* MODULES_DRIVERS_CAMERA_NODES_USB_CAM_WRAPPER_H_ */
