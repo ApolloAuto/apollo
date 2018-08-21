@@ -389,7 +389,7 @@ function run_test() {
 }
 
 function citest() {
-  df -t
+  df -h
   generate_build_targets
 
   # common related test

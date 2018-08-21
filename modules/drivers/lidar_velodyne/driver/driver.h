@@ -14,17 +14,29 @@
  * limitations under the License.
  *****************************************************************************/
 
+/* -*- mode: C++ -*- */
+/*
+ *  Copyright (C) 2012 Austin Robot Technology, Jack O'Quin
+ *
+ *  License: Modified BSD Software License Agreement
+ *
+ *  Id
+ */
+
+/** \file
+ *
+ *  ROS driver interface for the Velodyne 3D LIDARs
+ */
+
 #ifndef MODULES_DRIVERS_VELODYN_DRIVER_DRIVER_H_
 #define MODULES_DRIVERS_VELODYN_DRIVER_DRIVER_H_
 
 #include <string>
 
-#include "ros/include/velodyne_msgs/VelodyneScanUnified.h"
+#include "dynamic_reconfigure/server.h"
 #include "ros/ros.h"
 
-#include "modules/drivers/lidar_velodyne/proto/velodyne_conf.pb.h"
-
-#include "modules/drivers/lidar_velodyne/common/socket_input.h"
+#include "modules/drivers/lidar_velodyne/driver/input.h"
 
 namespace apollo {
 namespace drivers {
@@ -32,53 +44,37 @@ namespace lidar_velodyne {
 
 class VelodyneDriver {
  public:
-  VelodyneDriver();
-  virtual ~VelodyneDriver() {}
+  VelodyneDriver(ros::NodeHandle node, ros::NodeHandle private_nh);
+  ~VelodyneDriver() {}
 
-  virtual bool poll(velodyne_msgs::VelodyneScanUnifiedPtr scan) = 0;
-  virtual bool init() = 0;
+  bool poll(void);
 
- protected:
-  VelodyneConf config_;
+ private:
+  /// Callback for dynamic reconfigure
+  // void callback(velodyne_driver::VelodyneNodeConfig &config, uint32_t level);
+
+  /// Pointer to dynamic reconfigure service srv_
+  // boost::shared_ptr<
+  //     dynamic_reconfigure::Server<velodyne_driver::VelodyneNodeConfig> >
+  //     srv_;
+
+  // configuration parameters
+  struct {
+    std::string frame_id;  ///< tf frame ID
+    std::string model;     ///< device model name
+    int npackets;          ///< number of packets to collect
+    double rpm;            ///< device rotation rate (RPMs)
+    double time_offset;  ///< time in seconds added to each velodyne time stamp
+  } config_;
+
   boost::shared_ptr<Input> input_;
   ros::Publisher output_;
-  std::string topic_;
 
-  uint64_t basetime_;
-  uint32_t last_gps_time_;
-  int poll_standard(velodyne_msgs::VelodyneScanUnifiedPtr scan);
-  void set_base_time_from_nmea_time(const NMEATimePtr& nmea_time,
-                                    uint64_t* basetime);
-  void update_gps_top_hour(unsigned int current_time);
-};
-
-class Velodyne64Driver : public VelodyneDriver {
- public:
-  explicit Velodyne64Driver(const VelodyneConf& conf);
-  virtual ~Velodyne64Driver() {}
-
-  bool init() override;
-  bool poll(velodyne_msgs::VelodyneScanUnifiedPtr scan) override;
-
- private:
-};
-
-class Velodyne16Driver : public VelodyneDriver {
- public:
-  explicit Velodyne16Driver(const VelodyneConf& conf);
-  virtual ~Velodyne16Driver() {}
-
-  bool init() override;
-  bool poll(velodyne_msgs::VelodyneScanUnifiedPtr scan) override;
-  void poll_positioning_packet();
-
- private:
-  boost::shared_ptr<Input> positioning_input_;
-};
-
-class VelodyneDriverFactory {
- public:
-  static VelodyneDriver* create_driver(const VelodyneConf& conf);
+  /** diagnostics updater */
+  // diagnostic_updater::Updater diagnostics_;
+  double diag_min_freq_;
+  double diag_max_freq_;
+  // boost::shared_ptr<diagnostic_updater::TopicDiagnostic> diag_topic_;
 };
 
 }  // namespace lidar_velodyne
