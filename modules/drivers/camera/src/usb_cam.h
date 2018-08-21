@@ -33,8 +33,8 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *
  *********************************************************************/
-#ifndef USB_CAM_USB_CAM_H
-#define USB_CAM_USB_CAM_H
+#ifndef MODULES_DRIVERS_CAMERA_SRC_USB_CAM_H_
+#define MODULES_DRIVERS_CAMERA_SRC_USB_CAM_H_
 
 #include <asm/types.h> /* for videodev2.h */
 
@@ -164,4 +164,4 @@ class UsbCam {
 }  // namespace drivers
 }  // namespace apollo
 
-#endif
+#endif  /* MODULES_DRIVERS_CAMERA_SRC_USB_CAM_H_ */

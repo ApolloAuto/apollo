@@ -1,0 +1,21 @@
+syntax = "proto2";
+
+package apollo.drivers.lidar_velodyne;
+
+message CameraConf {
+  required uint32 index = 1 [default = 0];
+  optional string position = 2 [default = "centre"];
+  // packet params
+  optional string video_device = 3;
+  optional double image_width = 4;
+  optional double image_height = 5;
+  optional string pixel_format = 6;  
+  optional uint64 frame_rate = 7;
+  optional string camera_frame_id = 8;
+  optional string io_method = 9;    
+  optional uint32 camera_timeout = 10;
+  optional uint32 error_code = 11;
+  optional string camera_info_url = 12;
+  optional string trigger_internal = 13;
+  optional string trigger_fps = 14;
+}

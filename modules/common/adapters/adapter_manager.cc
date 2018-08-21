@@ -160,8 +160,11 @@ void AdapterManager::Init(const AdapterManagerConfig &configs) {
       case AdapterConfig::IMAGE_LONG:
         EnableImageLong(FLAGS_image_long_topic, config);
         break;
-      case AdapterConfig::IMAGE_USB_CAM:
-        EnableImageUSBCam(FLAGS_image_usb_cam_topic, config);
+      case AdapterConfig::CAMERA_IMAGE_LONG:
+        EnableCameraImageLong(FLAGS_camera_image_long_topic, config);
+        break;
+      case AdapterConfig::CAMERA_IMAGE_SHORT:
+        EnableCameraImageShort(FLAGS_camera_image_short_topic, config);
         break;
       case AdapterConfig::DRIVE_EVENT:
         EnableDriveEvent(FLAGS_drive_event_topic, config);
