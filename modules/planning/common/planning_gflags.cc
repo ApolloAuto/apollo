@@ -236,7 +236,6 @@ DEFINE_int32(trajectory_point_num_for_debug, 10,
 
 DEFINE_bool(enable_record_debug, true,
             "True to enable record debug into debug protobuf.");
-DEFINE_bool(enable_prediction, true, "True to enable prediction input.");
 
 DEFINE_bool(enable_lag_prediction, true,
             "Enable lagged prediction, which is more tolerant to obstacles "
