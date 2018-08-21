@@ -40,13 +40,13 @@ using apollo::common::time::Clock;
 CosThetaReferenceLineSmoother::CosThetaReferenceLineSmoother(
     const ReferenceLineSmootherConfig& config)
     : ReferenceLineSmoother(config) {
-  CHECK(common::util::GetProtoFromFile(FLAGS_reOpt_smoother_config_filename,
-                                       &reOpt_smoother_config_))
+  CHECK(common::util::GetProtoFromFile(FLAGS_reopt_smoother_config_filename,
+                                       &reopt_smoother_config_))
       << "Failed to load smoother config file "
-      << FLAGS_reOpt_smoother_config_filename;
+      << FLAGS_reopt_smoother_config_filename;
 
-  reOpt_qp_smoother_.reset(
-      new QpSplineReferenceLineSmoother(reOpt_smoother_config_));
+  reopt_qp_smoother_.reset(
+      new QpSplineReferenceLineSmoother(reopt_smoother_config_));
 
   max_point_deviation_ = config.cos_theta().max_point_deviation();
 
@@ -90,7 +90,7 @@ bool CosThetaReferenceLineSmoother::Smooth(
 
   // load the results by cosTheta as anchor points and put it into qp_spline to
   // do the interpolation
-  reOpt_anchor_points_.clear();
+  reopt_anchor_points_.clear();
 
   for (const auto& p : smoothed_point2d) {
     double heading = p.theta();
@@ -109,12 +109,12 @@ bool CosThetaReferenceLineSmoother::Smooth(
     anchor.path_point = apollo::common::util::MakePathPoint(
         p.x(), p.y(), 0.0, heading, 0.0, 0.0, 0.0);
     anchor.path_point.set_s(s);
-    reOpt_anchor_points_.emplace_back(anchor);
+    reopt_anchor_points_.emplace_back(anchor);
   }
-  reOpt_qp_smoother_->SetAnchorPoints(reOpt_anchor_points_);
-  if (!reOpt_qp_smoother_->Smooth(raw_reference_line,
+  reopt_qp_smoother_->SetAnchorPoints(reopt_anchor_points_);
+  if (!reopt_qp_smoother_->Smooth(raw_reference_line,
                                   smoothed_reference_line)) {
-    AERROR << "Failed to reOpt smooth reference line with anchor points by "
+    AERROR << "Failed to reopt smooth reference line with anchor points by "
               "cosTheta";
     return false;
   }

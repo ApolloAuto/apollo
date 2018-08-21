@@ -52,13 +52,13 @@ class CosThetaReferenceLineSmoother : public ReferenceLineSmoother {
                                   const double x_derivative,
                                   const double y_derivative) const;
 
-  std::unique_ptr<ReferenceLineSmoother> reOpt_qp_smoother_;
+  std::unique_ptr<ReferenceLineSmoother> reopt_qp_smoother_;
 
   std::vector<AnchorPoint> anchor_points_;
 
-  std::vector<AnchorPoint> reOpt_anchor_points_;
+  std::vector<AnchorPoint> reopt_anchor_points_;
 
-  ReferenceLineSmootherConfig reOpt_smoother_config_;
+  ReferenceLineSmootherConfig reopt_smoother_config_;
 
   double max_point_deviation_ = 0.1;
 

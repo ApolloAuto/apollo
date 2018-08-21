@@ -58,7 +58,7 @@ message CosThetaSmootherConfig {
   // Relax constraint on end condition
   optional double relax = 5 [default = 0.2];
 
-  // ReOpt bound for anchor points
+  // Reopt bound for anchor points
   optional double reopt_qp_bound = 6 [default = 0.05];
   }
 

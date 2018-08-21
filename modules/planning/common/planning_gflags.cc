@@ -40,7 +40,7 @@ DEFINE_string(smoother_config_filename,
               "modules/planning/conf/qp_spline_smoother_config.pb.txt",
               "The configuration file for qp_spline smoother");
 
-DEFINE_string(reOpt_smoother_config_filename,
+DEFINE_string(reopt_smoother_config_filename,
               "modules/planning/conf/qp_spline_smoother_config.pb.txt",
               "The configuration file for qp_spline smoother");
 
