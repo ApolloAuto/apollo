@@ -2,6 +2,7 @@ import { observable, computed, action, autorun } from "mobx";
 
 import HMI from "store/hmi";
 import ControlData from "store/control_data";
+import Latency from "store/latency";
 import Meters from "store/meters";
 import Monitor from "store/monitor";
 import Options from "store/options";
@@ -36,6 +37,8 @@ class DreamviewStore {
 
     @observable controlData = new ControlData();
 
+    @observable latency = new Latency();
+
     @observable playback = OFFLINE_PLAYBACK ? new Playback() : null;
 
     @observable trafficSignal = new TrafficSignal();
@@ -51,6 +54,8 @@ class DreamviewStore {
     @observable geolocation = {};
 
     @observable moduleDelay = observable.map();
+
+    @observable newDisengagementReminder = false;
 
     @computed get enableHMIButtonsOnly() {
         return !this.isInitialized;
@@ -158,6 +163,29 @@ class DreamviewStore {
         this.sceneDimension.width = this.dimension.width - offsetX;
         this.sceneDimension.height = this.options.showTools
                 ? this.dimension.height * mainViewHeightRatio : this.dimension.height;
+    }
+
+    update(world) {
+        this.updateTimestamp(world.timestamp);
+        this.updateModuleDelay(world);
+
+        const wasAutoMode = this.meters.isAutoMode;
+        this.meters.update(world);
+        this.newDisengagementReminder =
+            this.hmi.isCoDriver && wasAutoMode && !this.meters.isAutoMode;
+        if (this.newDisengagementReminder && !this.options.showDataRecorder) {
+            this.handleOptionToggle("showDataRecorder");
+        }
+
+        this.monitor.update(world);
+        this.trafficSignal.update(world);
+        this.hmi.update(world);
+
+        if (this.options.showPNCMonitor) {
+            this.planningData.update(world);
+            this.controlData.update(world, this.hmi.vehicleParam);
+            this.latency.update(world);
+        }
     }
 }
 

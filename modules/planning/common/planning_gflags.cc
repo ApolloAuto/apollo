@@ -38,7 +38,7 @@ DEFINE_string(traffic_rule_config_filename,
 
 DEFINE_string(smoother_config_filename,
               "modules/planning/conf/qp_spline_smoother_config.pb.txt",
-              "The configuration file for spiral smoother");
+              "The configuration file for qp_spline smoother");
 
 DEFINE_string(rtk_trajectory_filename, "modules/planning/data/garage.csv",
               "Loop rate for planning node");
@@ -236,7 +236,6 @@ DEFINE_int32(trajectory_point_num_for_debug, 10,
 
 DEFINE_bool(enable_record_debug, true,
             "True to enable record debug into debug protobuf.");
-DEFINE_bool(enable_prediction, true, "True to enable prediction input.");
 
 DEFINE_bool(enable_lag_prediction, true,
             "Enable lagged prediction, which is more tolerant to obstacles "

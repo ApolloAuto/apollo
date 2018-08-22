@@ -41,7 +41,12 @@ The following steps are to be followed in order to train the MLP model using the
 12. In docker, go to `/apollo/modules/tools/prediction/mlp_train/`, label the data using
 `python generate_labels.py -f /apollo/data/prediction/feature.0.bin`. Then check if there is a file called `feature.0.label.bin` under the folder `/apollo/data/prediction/`
 
+> Update: In docker, go to `/apollo/modules/tools/prediction/mlp_train/`, label the data using
+`python generate_labels.py /apollo/data/prediction/feature.0.bin  /apollo/data/prediction/feature.0.label.bin`. Then check if there is a file called `feature.0.label.bin` under the folder `/apollo/data/prediction/`
+
 13. In docker, under `/apollo/modules/tools/prediction/mlp_train/`, generate H5 files using `python generate_h5.py -f /apollo/data/prediction/feature.0.label.bin`. Then check if there is a file called `feature.0.label.h5` created
+
+> Update: In docker, under `/apollo/modules/tools/prediction/mlp_train/`, generate H5 files using `python generate_h5.py /apollo/data/prediction/feature.0.label.bin /apollo/data/prediction/feature.0.label.h5`. Then check if there is a file called `feature.0.label.h5` created
 
 14. Exit dev docker
 

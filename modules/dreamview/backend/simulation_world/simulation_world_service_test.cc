@@ -381,11 +381,11 @@ TEST_F(SimulationWorldServiceTest, UpdateDecision) {
 
   const Object& world_main_stop = world.main_decision();
   EXPECT_EQ(1, world_main_stop.decision_size());
-  EXPECT_EQ(Decision::STOP_REASON_CROSSWALK,
-            world_main_stop.decision(0).stopreason());
-  EXPECT_DOUBLE_EQ(45678.9, world_main_stop.position_x());
-  EXPECT_DOUBLE_EQ(1234567.8, world_main_stop.position_y());
-  EXPECT_DOUBLE_EQ(1.234, world_main_stop.heading());
+  const Decision& decision = world_main_stop.decision(0);
+  EXPECT_EQ(Decision::STOP_REASON_CROSSWALK, decision.stopreason());
+  EXPECT_DOUBLE_EQ(45678.9, decision.position_x());
+  EXPECT_DOUBLE_EQ(1234567.8, decision.position_y());
+  EXPECT_DOUBLE_EQ(1.234, decision.heading());
 
   sim_world_service_->world_.clear_object();
   for (auto& kv : sim_world_service_->obj_map_) {

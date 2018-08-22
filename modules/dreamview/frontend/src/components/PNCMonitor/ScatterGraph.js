@@ -182,3 +182,23 @@ export default class ScatterGraph extends React.Component {
         );
     }
 }
+
+function generateScatterGraph(setting, data) {
+    if (!setting || !data) {
+        console.error("Graph setting or data not found.");
+        return null;
+    }
+
+    return (
+        <ScatterGraph
+            key={setting.title}
+            title={setting.title}
+            options={setting.options}
+            properties={setting.properties}
+            data={data} />
+    );
+}
+
+export {
+    generateScatterGraph
+};
