@@ -38,12 +38,17 @@ The perception module outputs are:
 
 ## Setup Instructions
 
-    1. Set up the general settings in the configuration file `modules/perception/conf/perception_lowcost.conf`.
-    2. Run the command  `./scripts/bootstrap.sh` to launch the web GUI.
-    3. Select the vehicle model in the web GUI.
-    4. Launch the perception module using the command `./scripts/perception_lowcost_vis.sh start` or by enabling the perception button on the *Module Controller* page of the web GUI. The command for stopping perception is `./scripts/perception_lowcost_vis.sh stop`. Note: please do not try to use GUI to enable perception but use script to stop it, vice versa. 
-    5. Download the demo data from the Apollo [Open Data Platform](http://data.apollo.auto).
+1. Set up the general settings in the configuration file `modules/perception/conf/perception_lowcost.conf`.
+2. Run the command  `./scripts/bootstrap.sh` to launch the web GUI.
+3. Select the vehicle model in the web GUI.
+4. Launch the perception module using the command `./scripts/perception_lowcost_vis.sh start` or by enabling the perception button on the *Module Controller* page of the web GUI. The command for stopping perception is `./scripts/perception_lowcost_vis.sh stop`. Note: please do not try to use GUI to enable perception but use script to stop it, vice versa. 
+5. Download the demo data from the Apollo [Open Data Platform](http://data.apollo.auto).
 
+```
+Note:
+    If you are redirected to the Baidu Cloud login page, complete the login and Repeat step 5 (click on the Open Data Platform link)
+```
+    
 ## Function enable/disable
 The perception framework is a directed acyclic graph (DAG). There are three components in the DAG configuration, including sub-nodes, edges and shared data. Each function is implemented as a sub-node in the DAG. The sub-nodes that share data have an edge from producer to customer.
 
