@@ -77,8 +77,8 @@ class Calibration {
   bool ros_info;
 
  public:
-  Calibration(bool info = true) : initialized(false), ros_info(info) {}
-  Calibration(const std::string& calibration_file, bool info = true)
+  explicit Calibration(bool info = true) : initialized(false), ros_info(info) {}
+  explicit Calibration(const std::string& calibration_file, bool info = true)
       : ros_info(info) {
     read(calibration_file);
   }

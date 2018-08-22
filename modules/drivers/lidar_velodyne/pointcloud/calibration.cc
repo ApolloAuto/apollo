@@ -34,6 +34,7 @@
 #include <iostream>
 #include <limits>
 #include <string>
+#include <utility>
 
 #include "ros/ros.h"
 #include "yaml-cpp/yaml.h"
@@ -54,21 +55,23 @@ namespace apollo {
 namespace drivers {
 namespace lidar_velodyne {
 
-const std::string NUM_LASERS = "num_lasers";
-const std::string LASERS = "lasers";
-const std::string LASER_ID = "laser_id";
-const std::string ROT_CORRECTION = "rot_correction";
-const std::string VERT_CORRECTION = "vert_correction";
-const std::string DIST_CORRECTION = "dist_correction";
-const std::string TWO_PT_CORRECTION_AVAILABLE = "two_pt_correction_available";
-const std::string DIST_CORRECTION_X = "dist_correction_x";
-const std::string DIST_CORRECTION_Y = "dist_correction_y";
-const std::string VERT_OFFSET_CORRECTION = "vert_offset_correction";
-const std::string HORIZ_OFFSET_CORRECTION = "horiz_offset_correction";
-const std::string MAX_INTENSITY = "max_intensity";
-const std::string MIN_INTENSITY = "min_intensity";
-const std::string FOCAL_DISTANCE = "focal_distance";
-const std::string FOCAL_SLOPE = "focal_slope";
+const std::string NUM_LASERS = "num_lasers";                          // NOLINT
+const std::string LASERS = "lasers";                                  // NOLINT
+const std::string LASER_ID = "laser_id";                              // NOLINT
+const std::string ROT_CORRECTION = "rot_correction";                  // NOLINT
+const std::string VERT_CORRECTION = "vert_correction";                // NOLINT
+const std::string DIST_CORRECTION = "dist_correction";                // NOLINT
+const std::string TWO_PT_CORRECTION_AVAILABLE =                       // NOLINT
+    "two_pt_correction_available";                                    // NOLINT
+const std::string DIST_CORRECTION_X = "dist_correction_x";            // NOLINT
+const std::string DIST_CORRECTION_Y = "dist_correction_y";            // NOLINT
+const std::string VERT_OFFSET_CORRECTION = "vert_offset_correction";  // NOLINT
+const std::string HORIZ_OFFSET_CORRECTION =                           // NOLINT
+    "horiz_offset_correction";                                        // NOLINT
+const std::string MAX_INTENSITY = "max_intensity";                    // NOLINT
+const std::string MIN_INTENSITY = "min_intensity";                    // NOLINT
+const std::string FOCAL_DISTANCE = "focal_distance";                  // NOLINT
+const std::string FOCAL_SLOPE = "focal_slope";                        // NOLINT
 
 /** Read calibration for a single laser. */
 void operator>>(const YAML::Node& node,
@@ -77,42 +80,29 @@ void operator>>(const YAML::Node& node,
   node[ROT_CORRECTION] >> correction.second.rot_correction;
   node[VERT_CORRECTION] >> correction.second.vert_correction;
   node[DIST_CORRECTION] >> correction.second.dist_correction;
-  //#ifdef HAVE_NEW_YAMLCPP
-  if (node[TWO_PT_CORRECTION_AVAILABLE])
+  if (node[TWO_PT_CORRECTION_AVAILABLE]) {
     node[TWO_PT_CORRECTION_AVAILABLE] >>
         correction.second.two_pt_correction_available;
-  //#else
-  //  if (const YAML::Node* pName = node.FindValue(TWO_PT_CORRECTION_AVAILABLE))
-  //    *pName >> correction.second.two_pt_correction_available;
-  //#endif
-  else
+  } else {
     correction.second.two_pt_correction_available = false;
+  }
   node[DIST_CORRECTION_X] >> correction.second.dist_correction_x;
   node[DIST_CORRECTION_Y] >> correction.second.dist_correction_y;
   node[VERT_OFFSET_CORRECTION] >> correction.second.vert_offset_correction;
-  //#ifdef HAVE_NEW_YAMLCPP
-  if (node[HORIZ_OFFSET_CORRECTION])
+
+  if (node[HORIZ_OFFSET_CORRECTION]) {
     node[HORIZ_OFFSET_CORRECTION] >> correction.second.horiz_offset_correction;
-  //#else
-  //  if (const YAML::Node* pName = node.FindValue(HORIZ_OFFSET_CORRECTION))
-  //    *pName >> correction.second.horiz_offset_correction;
-  //#endif
-  else
+  } else {
     correction.second.horiz_offset_correction = 0;
+  }
 
   const YAML::Node* max_intensity_node = NULL;
   YAML::Node max_intensity_node_ref;
 
-  //#ifdef HAVE_NEW_YAMLCPP
   if (node[MAX_INTENSITY]) {
     max_intensity_node_ref = node[MAX_INTENSITY];
     max_intensity_node = &max_intensity_node_ref;
   }
-  //#else
-  //  if (const YAML::Node* pName = node.FindValue(MAX_INTENSITY)) {
-  //    max_intensity_node = pName;
-  //  }
-  //#endif
 
   if (max_intensity_node) {
     float max_intensity_float;
@@ -125,15 +115,10 @@ void operator>>(const YAML::Node& node,
   const YAML::Node* min_intensity_node = NULL;
   YAML::Node min_intensity_node_ref;
 
-  //#ifdef HAVE_NEW_YAMLCPP
   if (node[MIN_INTENSITY]) {
     min_intensity_node_ref = node[MIN_INTENSITY];
     min_intensity_node = &min_intensity_node_ref;
   }
-  //#else
-  //  if (const YAML::Node* pName = node.FindValue(MIN_INTENSITY))
-  //    min_intensity_node = pName;
-  //#endif
   if (min_intensity_node) {
     float min_intensity_float;
     *min_intensity_node >> min_intensity_float;
@@ -169,7 +154,6 @@ void operator>>(const YAML::Node& node, Calibration& calibration) {
   }
 
   // For each laser ring, find the next-smallest vertical angle.
-  //
   // This implementation is simple, but not efficient.  That is OK,
   // since it only runs while starting up.
   double next_angle = -std::numeric_limits<double>::infinity();
@@ -184,9 +168,8 @@ void operator>>(const YAML::Node& node, Calibration& calibration) {
         next_index = j;
       }
     }
-
-    if (next_index < num_lasers) {  // anything found in this ring?
-
+    // anything found in this ring?
+    if (next_index < num_lasers) {
       // store this ring number with its corresponding laser number
       calibration.laser_corrections[next_index].laser_ring = ring;
       next_angle = min_seen;
@@ -254,13 +237,8 @@ void Calibration::read(const std::string& calibration_file) {
   initialized = true;
   try {
     YAML::Node doc;
-    //#ifdef HAVE_NEW_YAMLCPP
     fin.close();
     doc = YAML::LoadFile(calibration_file);
-    //#else
-    //    YAML::Parser parser(fin);
-    //    parser.GetNextDocument(doc);
-    //#endif
     doc >> *this;
   } catch (YAML::Exception& e) {
     std::cerr << "YAML Exception: " << e.what() << std::endl;
