@@ -340,6 +340,17 @@ Status Control::CheckTimestamp() {
 
 void Control::SendCmd(ControlCommand *control_command) {
   // set header
+  if (AdapterManager::GetPlanning() &&
+      !AdapterManager::GetPlanning()->Empty()) {
+    const auto& planning =
+        AdapterManager::GetPlanning()->GetLatestObserved();
+    control_command->mutable_header()->set_lidar_timestamp(
+        planning.header().lidar_timestamp());
+    control_command->mutable_header()->set_camera_timestamp(
+        planning.header().camera_timestamp());
+    control_command->mutable_header()->set_radar_timestamp(
+        planning.header().radar_timestamp());
+  }
   AdapterManager::FillControlCommandHeader(Name(), control_command);
 
   ADEBUG << control_command->ShortDebugString();
