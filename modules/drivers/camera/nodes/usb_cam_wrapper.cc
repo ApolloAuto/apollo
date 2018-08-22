@@ -29,14 +29,19 @@ namespace camera {
 UsbCamWrapper::UsbCamWrapper(ros::NodeHandle node, ros::NodeHandle private_nh) :
     node_(node), priv_node_(private_nh), last_stamp_(0) {
   // pb
+  // http://docs.ros.org/melodic/api/sensor_msgs/html/msg/Image.html
   sensor_image_.mutable_header()->set_camera_timestamp(img_.header.stamp.toSec());
   sensor_image_.set_frame_id(img_.header.frame_id);
   // TODO(all) sensor_image_.set_measurement_time();
-  sensor_image_.set_height(image_height_);
-  sensor_image_.set_width(image_width_);
+  sensor_image_.set_height(img_.height);  // image height, that is, number of rows
+  sensor_image_.set_width(img_.width);  // image width, that is, number of columns
   sensor_image_.set_encoding(img_.encoding);
-  sensor_image_.set_step(img_.step);
-  // TODO (all) sensor_image_.set_allocated_data(img_.data);
+  sensor_image_.set_step(img_.step);  // Full row length in bytes
+  // actual matrix data, size is (step * rows)
+  size_t data_length = img_.step * image_height_;
+  std::string image_data;
+  image_data.assign(reinterpret_cast<const char *>(img_.data.data()), data_length);
+  sensor_image_.set_data(image_data);
 
   // grab the parameters
   priv_node_.param("topic_name", topic_name_, std::string("image_raw0"));
