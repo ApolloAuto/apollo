@@ -174,11 +174,11 @@ class SimulationWorldService {
              apollo::routing::ChangeLaneType::RIGHT)) {
       auto *change_lane_decision = world_main_decision->add_decision();
       change_lane_decision->set_change_lane_type(decision.change_lane_type());
-      change_lane_decision->set_position_x(
-          world_.auto_driving_car().position_x() + map_service_->GetXOffset());
-      change_lane_decision->set_position_y(
-          world_.auto_driving_car().position_y() + map_service_->GetYOffset());
-      change_lane_decision->set_heading(world_.auto_driving_car().heading());
+
+      const auto &adc = world_.auto_driving_car();
+      change_lane_decision->set_position_x(adc.position_x());
+      change_lane_decision->set_position_y(adc.position_y());
+      change_lane_decision->set_heading(adc.heading());
     }
   }
 
