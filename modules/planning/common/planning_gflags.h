@@ -197,6 +197,8 @@ DECLARE_double(default_delta_s_lateral_optimization);
 DECLARE_double(bound_buffer);
 
 DECLARE_bool(use_planning_fallback);
+DECLARE_double(fallback_total_time);
+DECLARE_double(fallback_time_unit);
 
 // navigation mode
 DECLARE_double(navigation_fallback_cruise_time);
