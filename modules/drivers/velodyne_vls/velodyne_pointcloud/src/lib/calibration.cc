@@ -82,7 +82,7 @@ void operator>>(const YAML::Node& node,
     correction.second.horiz_offset_correction = 0;
 
   const YAML::Node* max_intensity_node = NULL;
-  const YAML::Node max_intensity_node_ref;
+  YAML::Node max_intensity_node_ref;
 
 #ifdef HAVE_NEW_YAMLCPP
   if (node[MAX_INTENSITY]) {
@@ -104,7 +104,7 @@ void operator>>(const YAML::Node& node,
   }
 
   const YAML::Node* min_intensity_node = NULL;
-  const YAML::Node min_intensity_node_ref;
+  YAML::Node min_intensity_node_ref;
 
 #ifdef HAVE_NEW_YAMLCPP
   if (node[MIN_INTENSITY]) {
