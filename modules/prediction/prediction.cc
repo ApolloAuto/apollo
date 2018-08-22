@@ -270,6 +270,12 @@ void Prediction::RunOnce(const PerceptionObstacles& perception_obstacles) {
       PredictorManager::instance()->prediction_obstacles();
   prediction_obstacles.set_start_timestamp(start_timestamp);
   prediction_obstacles.set_end_timestamp(Clock::NowInSeconds());
+  prediction_obstacles.mutable_header()->set_lidar_timestamp(
+      perception_obstacles.header().lidar_timestamp());
+  prediction_obstacles.mutable_header()->set_camera_timestamp(
+      perception_obstacles.header().camera_timestamp());
+  prediction_obstacles.mutable_header()->set_radar_timestamp(
+      perception_obstacles.header().radar_timestamp());
 
   if (FLAGS_prediction_test_mode) {
     for (auto const& prediction_obstacle :
