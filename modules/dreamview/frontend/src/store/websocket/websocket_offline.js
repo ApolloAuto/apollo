@@ -105,12 +105,13 @@ export default class OfflinePlaybackWebSocketEndpoint {
         clearInterval(this.requestTimer);
         this.requestTimer = setInterval(() => {
             if (this.websocket.readyState === this.websocket.OPEN && STORE.playback.initialized()) {
-                this.requestSimulationWorld(STORE.playback.recordId, STORE.playback.next());
-
                 if (!STORE.playback.hasNext()) {
                     clearInterval(this.requestTimer);
                     this.requestTimer = null;
+                    return;
                 }
+
+                this.requestSimulationWorld(STORE.playback.recordId, STORE.playback.next());
             }
         }, msPerFrame/2);
 

@@ -77,7 +77,7 @@ export default [
             positionLocalization: 'Localization',
             positionGps: 'GPS',
         },
-        supportInOfflineView: false,
+        supportInOfflineView: true,
     }, {
         id: 'map',
         title: 'Map',
