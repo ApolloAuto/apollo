@@ -568,6 +568,24 @@
                 "location": {
                   "type": "apollo.localization.Pose",
                   "id": 3
+                },
+                "type": {
+                  "rule": "repeated",
+                  "type": "Type",
+                  "id": 4,
+                  "options": {
+                    "packed": false
+                  }
+                }
+              },
+              "nested": {
+                "Type": {
+                  "values": {
+                    "CRITICAL": 0,
+                    "PROBLEM": 1,
+                    "DESIRED": 2,
+                    "OUT_OF_SCOPE": 3
+                  }
                 }
               }
             },

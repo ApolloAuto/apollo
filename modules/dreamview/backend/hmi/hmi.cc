@@ -216,11 +216,14 @@ void HMI::RegisterMessageHandlers() {
         // json should contain event_time_ms and event_msg.
         uint64_t event_time_ms;
         std::string event_msg;
+        std::vector<std::string> event_types;
         apollo::common::monitor::MonitorLogBuffer log_buffer(&logger_);
         if (JsonUtil::GetNumberFromJson(json, "event_time_ms",
                                         &event_time_ms) &&
-            JsonUtil::GetStringFromJson(json, "event_msg", &event_msg)) {
-          HMIWorker::SubmitDriveEvent(event_time_ms, event_msg);
+            JsonUtil::GetStringFromJson(json, "event_msg", &event_msg) &&
+            JsonUtil::GetStringVectorFromJson(json, "event_type",
+                                              &event_types)) {
+          HMIWorker::SubmitDriveEvent(event_time_ms, event_msg, event_types);
           log_buffer.INFO("Drive event added.");
         } else {
           AERROR << "Truncated SubmitDriveEvent request.";

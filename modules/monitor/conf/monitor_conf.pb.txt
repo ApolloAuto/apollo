@@ -146,6 +146,12 @@ modules {
   }
 }
 modules {
+  name: "record_map_data"
+  process_conf {
+    process_cmd_keywords: "rosbag/record"
+  }
+}
+modules {
   name: "relative_map"
   process_conf {
     process_cmd_keywords: "modules/map/relative_map/relative_map"
