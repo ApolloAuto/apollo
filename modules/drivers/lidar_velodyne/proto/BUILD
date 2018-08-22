@@ -13,3 +13,17 @@ proto_library(
         "cloud_node_conf.proto",
     ],
 )
+
+cc_proto_library(
+    name = "transform_node_conf_proto",
+    deps = [
+        ":transform_node_conf_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "transform_node_conf_proto_lib",
+    srcs = [
+        "transform_node_conf.proto",
+    ],
+)
