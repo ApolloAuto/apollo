@@ -396,6 +396,22 @@ function run_test() {
   fi
 }
 
+function citest_perception() {
+  df -h
+  generate_build_targets
+
+  # common related test
+  echo "$BUILD_TARGETS" | grep "perception\/" | grep -v "sunnyvale_big_loop\|cnn_segmentation_test\|yolo_camera_detector_test\|unity_recognize_test\|perception_traffic_light_rectify_test\|cuda_util_test" | xargs bazel test $DEFINES --config=unit_test -c dbg --test_verbose_timeout_warnings $@
+
+  if [ $? -eq 0 ]; then
+    success 'Test passed!'
+    return 0
+  else
+    fail 'Test failed!'
+    return 1
+  fi
+}
+
 function citest() {
   df -h
   generate_build_targets
@@ -765,6 +781,10 @@ function main() {
     test)
       DEFINES="${DEFINES} --cxxopt=-DCPU_ONLY"
       run_test $@
+      ;;
+    citest_perception)
+      DEFINES="${DEFINES} --cxxopt=-DCPU_ONLY"
+      citest_perception $@
       ;;
     citest)
       DEFINES="${DEFINES} --cxxopt=-DCPU_ONLY"
