@@ -91,6 +91,7 @@ cc_library(
     deps = [
         ":reference_line",
         ":reference_line_smoother",
+        ":qp_spline_reference_line_smoother",
         "//modules/common/math",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/math:curve_math",
