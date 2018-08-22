@@ -42,6 +42,7 @@ namespace dreamview {
 namespace {
 
 using apollo::canbus::Chassis;
+using apollo::common::DriveEvent;
 using apollo::common::adapter::AdapterManager;
 using apollo::common::util::ContainsKey;
 using apollo::common::util::FindOrNull;
@@ -203,11 +204,20 @@ int HMIWorker::RunToolCommand(const std::string &tool,
 }
 
 void HMIWorker::SubmitDriveEvent(const uint64_t event_time_ms,
-                                 const std::string &event_msg) {
-  apollo::common::DriveEvent drive_event;
+                                 const std::string &event_msg,
+                                 const std::vector<std::string> &event_types) {
+  DriveEvent drive_event;
   AdapterManager::FillDriveEventHeader("HMI", &drive_event);
   drive_event.mutable_header()->set_timestamp_sec(event_time_ms / 1000.0);
   drive_event.set_event(event_msg);
+  for (const auto &type_name : event_types) {
+    DriveEvent::Type type;
+    if (DriveEvent::Type_Parse(type_name, &type)) {
+      drive_event.add_type(type);
+    } else {
+      AERROR << "Failed to parse drive event type:" <<type_name;
+    }
+  }
   AdapterManager::PublishDriveEvent(drive_event);
 }
 

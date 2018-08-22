@@ -47,7 +47,6 @@ class NavigationModeTest : public PlanningTestBase {
  */
 TEST_F(NavigationModeTest, cruise) {
   std::string seq_num = "1";
-  FLAGS_enable_prediction = false;
   FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
   FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
   FLAGS_test_relative_map_file = seq_num + "_relative_map.pb.txt";
