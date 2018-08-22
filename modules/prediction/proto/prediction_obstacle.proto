@@ -20,8 +20,10 @@ message ObstacleIntent {
     STATIONARY = 2;
     MOVING = 3;
     CHANGE_LANE = 4;
-    ACCELERATION = 5;
-    DECELERATION = 6;
+    LOW_ACCELERATION = 5;
+    HIGH_ACCELERATION = 6;
+    LOW_DECELERATION = 7;
+    HIGH_DECELERATION = 8;
   }
   optional Type type = 1 [default = UNKNOWN];
 }
