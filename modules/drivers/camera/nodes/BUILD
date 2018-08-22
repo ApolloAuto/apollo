@@ -12,6 +12,7 @@ cc_library(
         "usb_cam_wrapper.h",
     ],
     deps = [
+        "//modules/common:log",
         "//modules/drivers/proto:sensor_proto",
         "//modules/drivers/camera/src:usb_cam_lib",
         "@ros//:ros_common",
