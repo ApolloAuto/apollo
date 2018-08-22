@@ -204,7 +204,7 @@ Status FusionSubnode::ProcEvents() {
       common::adapter::AdapterManager::PublishPerceptionObstacles(obstacles);
     }
     AINFO << "Publish 3d perception fused msg. timestamp:"
-          << GLOG_TIMESTAMP(timestamp_) << " obj_cnt:" << objects_.size();
+          << GLOG_TIMESTAMP(lidar_timestamp_) << " obj_cnt:" << objects_.size();
   }
   return Status::OK();
 }
@@ -261,10 +261,18 @@ Status FusionSubnode::Process(const EventMeta &event_meta,
     }
     ADEBUG << "[CIPVSubnode] velocity " << cipv_options.velocity
           << ", yaw rate: " << cipv_options.yaw_rate;
+    camera_timestamp_ = 0;
+    lidar_timestamp_ = 0;
+    radar_timestamp_ = 0;
     for (auto &obj : sensor_objs) {
-        if (obj.sensor_type == SensorType::CAMERA) {
-          cipv_.DetermineCipv(lane_objects_, cipv_options, &objects_);
-        }
+      if (obj.sensor_type == SensorType::CAMERA) {
+        cipv_.DetermineCipv(lane_objects_, cipv_options, &objects_);
+        camera_timestamp_ = obj.timestamp;
+      } else if (obj.sensor_type == SensorType::VELODYNE_64) {
+        lidar_timestamp_ = obj.timestamp;
+      } else if (obj.sensor_type == SensorType::RADAR) {
+        radar_timestamp_ = obj.timestamp;
+      }
     }
 
     apollo::common::time::Timer timer;
@@ -296,7 +304,7 @@ Status FusionSubnode::Process(const EventMeta &event_meta,
     fusion_item_ptr->fused_sensor_device_id = device_id;
     for (auto obj : objects_) {
       std::shared_ptr<Object> objclone(new Object());
-      if (obj->b_cipv == true) {
+      if (obj->b_cipv) {
         AINFO << "CIPV ID: " << obj->track_id;
       }
       objclone->clone(*obj);
@@ -308,7 +316,6 @@ Status FusionSubnode::Process(const EventMeta &event_meta,
     PublishDataAndEvent(fusion_item_ptr->timestamp, device_id, fusion_item_ptr);
   }
 
-  timestamp_ = sensor_objs[0].timestamp;
   error_code_ = common::OK;
   return Status::OK();
 }
@@ -412,22 +419,16 @@ bool FusionSubnode::GeneratePbMsg(PerceptionObstacles *obstacles) {
   common::adapter::AdapterManager::FillPerceptionObstaclesHeader(
       FLAGS_obstacle_module_name, obstacles);
   common::Header *header = obstacles->mutable_header();
-  if (pub_driven_event_id_ == lidar_event_id_) {
-    header->set_lidar_timestamp(timestamp_ * 1e9);  // in ns
-    header->set_camera_timestamp(0);
-    header->set_radar_timestamp(0);
-  } else if (pub_driven_event_id_ == camera_event_id_) {
-    header->set_lidar_timestamp(0);  // in ns
-    header->set_camera_timestamp(timestamp_ * 1e9);
-    header->set_radar_timestamp(0);
-  }
+  header->set_lidar_timestamp(lidar_timestamp_ * 1e9);  // in ns
+  header->set_camera_timestamp(camera_timestamp_ * 1e9);
+  header->set_radar_timestamp(radar_timestamp_ * 1e9);
 
   obstacles->set_error_code(error_code_);
 
   for (const auto &obj : objects_) {
     PerceptionObstacle *obstacle = obstacles->add_perception_obstacle();
     // add CIPV
-    if (obj->b_cipv == true) {
+    if (obj->b_cipv) {
       CIPVInfo *cipv = obstacles->mutable_cipv_info();
       cipv->set_cipv_id(obj->track_id);
     }
