@@ -200,7 +200,6 @@ bool CosThetaReferenceLineSmoother::Smooth(
     ptr_smoothed_point2d->emplace_back(
         to_path_point(start_x, start_y, x_derivative, y_derivative));
   }
-  
   // load the accumulated s at each point
   ptr_smoothed_point2d->front().set_s(0.0);
   double accumulated_s = 0.0;

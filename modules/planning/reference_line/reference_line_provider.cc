@@ -790,7 +790,7 @@ void ReferenceLineProvider::GetAnchorPoints(
   common::util::uniform_slice(0.0, reference_line.Length(), num_of_anchors - 1,
                               &anchor_s);
   for (const double s : anchor_s) {
-    AnchorPoint anchor = GetAnchorPoint(reference_line,s);
+    AnchorPoint anchor = GetAnchorPoint(reference_line, s);
     anchor_points->emplace_back(anchor);
   }
   anchor_points->front().longitudinal_bound = 1e-6;

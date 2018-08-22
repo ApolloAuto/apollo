@@ -9,7 +9,7 @@ wide_lane_shift_remain_factor : 0.5
 
 cos_theta {
   max_point_deviation: 0.5
-  relax: 0.4
+  relax: 0.25
   num_of_iteration: 500
   weight_cos_included_angle: 1e6
   acceptable_tol: 1e-1
