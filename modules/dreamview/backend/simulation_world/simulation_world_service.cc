@@ -342,8 +342,8 @@ void SimulationWorldService::GetMapElementIds(double radius,
   // Gather required map element ids based on current location.
   apollo::common::PointENU point;
   const auto &adc = world_.auto_driving_car();
-  point.set_x(adc.position_x() + map_service_->GetXOffset());
-  point.set_y(adc.position_y() + map_service_->GetYOffset());
+  point.set_x(adc.position_x());
+  point.set_y(adc.position_y());
   map_service_->CollectMapElementIds(point, radius, ids);
 }
 
@@ -688,10 +688,8 @@ void SimulationWorldService::UpdateDecision(const DecisionResult &decision_res,
   if (world_main_decision->decision_size() > 0) {
     // set default position
     const auto &adc = world_.auto_driving_car();
-    world_main_decision->set_position_x(adc.position_x() +
-                                        map_service_->GetXOffset());
-    world_main_decision->set_position_y(adc.position_y() +
-                                        map_service_->GetYOffset());
+    world_main_decision->set_position_x(adc.position_x());
+    world_main_decision->set_position_y(adc.position_y());
     world_main_decision->set_heading(adc.heading());
     world_main_decision->set_timestamp_sec(header_time);
   }
