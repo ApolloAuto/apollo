@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@
  *
  * License: Modified BSD License
  *
- * $ Id: 02/14/2012 11:25:34 AM piyushk $
+ * Id:02/14/201211:25:34AMpiyushk
  */
 
 #ifndef MODULES_DRIVERS_LIDAR_VELODYNE_POINTCLOUD_CALIBRATION_H_
@@ -37,15 +37,19 @@ namespace lidar_velodyne {
 
 /** \brief correction values for a single laser
  *
- * Correction values for a single laser (as provided by db.xml from veleodyne)
- * Includes parameters for Velodyne HDL-64E S2.1 calibration.
+ * Correction values for a single laser (as provided by db.xml from
+ * Velodyne).  Includes parameters for Velodyne HDL-64E S2.1.
+ *
  * http://velodynelidar.com/lidar/products/manual/63-HDL64E%20S2%20Manual_Rev%20D_2011_web.pdf
- **/
+ */
+
+/** \brief Correction information for a single laser. */
 struct LaserCorrection {
   /** parameters in db.xml */
   float rot_correction;
   float vert_correction;
   float dist_correction;
+  bool two_pt_correction_available;
   float dist_correction_x;
   float dist_correction_y;
   float vert_offset_correction;
@@ -54,27 +58,28 @@ struct LaserCorrection {
   int min_intensity;
   float focal_distance;
   float focal_slope;
-  float focal_offset;
 
   /** cached values calculated when the calibration file is read */
-  float cos_rot_correction;   ///< cached cosine of rot_correction
-  float sin_rot_correction;   ///< cached sine of rot_correction
-  float cos_vert_correction;  ///< cached cosine of vert_correction
-  float sin_vert_correction;  ///< cached sine of vert_correction
+  float cos_rot_correction;   ///< cosine of rot_correction
+  float sin_rot_correction;   ///< sine of rot_correction
+  float cos_vert_correction;  ///< cosine of vert_correction
+  float sin_vert_correction;  ///< sine of vert_correction
 
   int laser_ring;  ///< ring number for this laser
 };
 
-/** \brief Calibration class storing entire configuration for the Velodyne */
+/** \brief Calibration information for the entire device. */
 class Calibration {
  public:
-  std::map<int, LaserCorrection> laser_corrections_;
-  int num_lasers_;
-  bool initialized_;
+  std::map<int, LaserCorrection> laser_corrections;
+  int num_lasers;
+  bool initialized;
+  bool ros_info;
 
  public:
-  Calibration() : initialized_(false) {}
-  explicit Calibration(const std::string& calibration_file) {
+  Calibration(bool info = true) : initialized(false), ros_info(info) {}
+  Calibration(const std::string& calibration_file, bool info = true)
+      : ros_info(info) {
     read(calibration_file);
   }
 
