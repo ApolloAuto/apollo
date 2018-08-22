@@ -344,7 +344,7 @@ Status Frame::Init() {
          << FLAGS_align_prediction_time;
 
   // prediction
-  if (FLAGS_enable_prediction && AdapterManager::GetPrediction() &&
+  if (AdapterManager::GetPrediction() &&
       !AdapterManager::GetPrediction()->Empty()) {
     if (FLAGS_enable_lag_prediction && lag_predictor_) {
       lag_predictor_->GetLaggedPrediction(&prediction_);
