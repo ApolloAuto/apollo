@@ -86,15 +86,13 @@ bool CosThetaReferenceLineSmoother::Smooth(
     has_end_point_constraint_ = true;
   }
 
-  Smooth(raw_point2d, smoothed_point2d, anchorpoints_lateralbound);
+  Smooth(raw_point2d, anchorpoints_lateralbound, &smoothed_point2d);
 
   // load the results by cosTheta as anchor points and put it into qp_spline to
   // do the interpolation
   reopt_anchor_points_.clear();
 
   for (const auto& p : smoothed_point2d) {
-    double heading = p.theta();
-    double s = p.s();
     common::SLPoint ref_sl_point;
     if (!raw_reference_line.XYToSL({p.x(), p.y()}, &ref_sl_point)) {
       return false;
@@ -103,6 +101,8 @@ bool CosThetaReferenceLineSmoother::Smooth(
         ref_sl_point.s() > raw_reference_line.Length()) {
       continue;
     }
+    double heading = p.theta();
+    double s = p.s();
     AnchorPoint anchor;
     anchor.longitudinal_bound = reopt_qp_bound_;
     anchor.lateral_bound = reopt_qp_bound_;
@@ -120,17 +120,15 @@ bool CosThetaReferenceLineSmoother::Smooth(
   }
 
   const double end_timestamp = Clock::NowInSeconds();
-  ADEBUG << "cos_theta reference line smoother time: "
-         << (end_timestamp - start_timestamp) * 1000 << " ms.";
   AINFO << "cos_theta reference line smoother time: "
         << (end_timestamp - start_timestamp) * 1000 << " ms.";
   return true;
 }
 
 bool CosThetaReferenceLineSmoother::Smooth(
-    std::vector<Eigen::Vector2d> scaled_point2d,
-    std::vector<common::PathPoint>& ptr_smoothed_point2d,
-    std::vector<double> lateral_bounds) {
+    const std::vector<Eigen::Vector2d>& scaled_point2d,
+    const std::vector<double>& lateral_bounds,
+    std::vector<common::PathPoint>* ptr_smoothed_point2d) {
   std::vector<double> x;
   std::vector<double> y;
 
@@ -177,6 +175,8 @@ bool CosThetaReferenceLineSmoother::Smooth(
 
   ptop->get_optimization_results(&x, &y);
   // load the point position and estimated derivatives at each point
+  CHECK_GT(x.size(), 1);
+  CHECK_GT(y.size(), 1);
   for (std::size_t i = 0; i < x.size(); ++i) {
     // reverse back to the unscaled points
     double start_x = x[i] + zero_x_;
@@ -197,22 +197,23 @@ bool CosThetaReferenceLineSmoother::Smooth(
       x_derivative = 0.5 * (x[i + 1] - x[i - 1]);
       y_derivative = 0.5 * (y[i + 1] - y[i - 1]);
     }
-    ptr_smoothed_point2d.emplace_back(
+    ptr_smoothed_point2d->emplace_back(
         to_path_point(start_x, start_y, x_derivative, y_derivative));
   }
+  
   // load the accumulated s at each point
-  ptr_smoothed_point2d.front().set_s(0.0);
+  ptr_smoothed_point2d->front().set_s(0.0);
   double accumulated_s = 0.0;
-  double Fx = ptr_smoothed_point2d.front().x();
-  double Fy = ptr_smoothed_point2d.front().y();
+  double Fx = ptr_smoothed_point2d->front().x();
+  double Fy = ptr_smoothed_point2d->front().y();
   double Nx = 0.0;
   double Ny = 0.0;
-  for (std::size_t i = 1; i < ptr_smoothed_point2d.size(); i++) {
-    Nx = ptr_smoothed_point2d.at(i).x();
-    Ny = ptr_smoothed_point2d.at(i).y();
+  for (std::size_t i = 1; i <ptr_smoothed_point2d->size(); i++) {
+    Nx = ptr_smoothed_point2d->at(i).x();
+    Ny = ptr_smoothed_point2d->at(i).y();
     double end_segment_s =
         std::sqrt((Fx - Nx) * (Fx - Nx) + (Fy - Ny) * (Fy - Ny));
-    ptr_smoothed_point2d.at(i).set_s(end_segment_s + accumulated_s);
+    ptr_smoothed_point2d->at(i).set_s(end_segment_s + accumulated_s);
     accumulated_s += end_segment_s;
     Fx = Nx;
     Fy = Ny;

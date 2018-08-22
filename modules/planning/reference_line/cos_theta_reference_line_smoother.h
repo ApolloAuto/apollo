@@ -44,9 +44,9 @@ class CosThetaReferenceLineSmoother : public ReferenceLineSmoother {
   void SetAnchorPoints(const std::vector<AnchorPoint>&) override;
 
  private:
-  bool Smooth(std::vector<Eigen::Vector2d> point2d,
-              std::vector<common::PathPoint>& ptr_smoothed_point2d,
-              std::vector<double> lateral_bounds);
+  bool Smooth(const std::vector<Eigen::Vector2d>& point2d,
+              const std::vector<double>& lateral_bounds,
+              std::vector<common::PathPoint>* ptr_smoothed_point2d);
 
   common::PathPoint to_path_point(const double x, const double y,
                                   const double x_derivative,
