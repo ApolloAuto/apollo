@@ -9,6 +9,7 @@ cc_library(
         "colors.cc",
         "convert.cc",
         "rawdata.cc",
+        "transform.cc",
     ],
     hdrs = [
         "calibration.h",
@@ -16,10 +17,12 @@ cc_library(
         "convert.h",
         "point_types.h",
         "rawdata.h",
+        "transform.h",
     ],
     deps = [
         "//modules/common:log",
         "//modules/drivers/lidar_velodyne/proto:cloud_node_conf_proto",
+        "//modules/drivers/lidar_velodyne/proto:transform_node_conf_proto",
         "@eigen",
         "@pcl",
         "@ros//:ros_common",
