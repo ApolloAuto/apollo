@@ -191,7 +191,8 @@ class RawData {
   int setupOffline(std::string calibration_file, double max_range_,
                    double min_range_);
 
-  void unpack(const velodyne_msgs::VelodynePacket &pkt, VPointCloud &pc);
+  void unpack(const velodyne_msgs::VelodynePacket &pkt,
+              VPointCloud &pc);  // NOLINT
   //    void unpack(const velodyne_msgs::VelodynePacket &pkt, XYZIRBPointCloud
   //    &pc);
 
@@ -223,14 +224,19 @@ class RawData {
   float sin_rot_table_[ROTATION_MAX_UNITS];
   float cos_rot_table_[ROTATION_MAX_UNITS];
   /** add private function to handle each sensor **/
-  void unpack_vlp16(const velodyne_msgs::VelodynePacket &pkt, VPointCloud &pc);
-  void unpack_vlp32(const velodyne_msgs::VelodynePacket &pkt, VPointCloud &pc);
-  void unpack_hdl32(const velodyne_msgs::VelodynePacket &pkt, VPointCloud &pc);
-  void unpack_hdl64(const velodyne_msgs::VelodynePacket &pkt, VPointCloud &pc);
-  void unpack_vls128(const velodyne_msgs::VelodynePacket &pkt, VPointCloud &pc);
+  void unpack_vlp16(const velodyne_msgs::VelodynePacket &pkt,
+                    VPointCloud &pc);  // NOLINT
+  void unpack_vlp32(const velodyne_msgs::VelodynePacket &pkt,
+                    VPointCloud &pc);  // NOLINT
+  void unpack_hdl32(const velodyne_msgs::VelodynePacket &pkt,
+                    VPointCloud &pc);  // NOLINT
+  void unpack_hdl64(const velodyne_msgs::VelodynePacket &pkt,
+                    VPointCloud &pc);  // NOLINT
+  void unpack_vls128(const velodyne_msgs::VelodynePacket &pkt,
+                     VPointCloud &pc);  // NOLINT
   void compute_xyzi(const uint8_t chan_id, const uint16_t azimuth_uint,
-                    const float distance, float &intensity, float &x_coord,
-                    float &y_coord, float &z_coord);
+                    const float distance, float *intensity, float *x_coord,
+                    float *y_coord, float *z_coord);
 
   /** in-line test whether a point is in range */
   bool pointInRange(float range) {
