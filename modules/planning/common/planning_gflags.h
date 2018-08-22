@@ -127,7 +127,6 @@ DECLARE_double(lag_prediction_protection_distance);
 DECLARE_double(perception_confidence_threshold);
 
 DECLARE_bool(enable_record_debug);
-DECLARE_bool(enable_prediction);
 
 DECLARE_double(turn_signal_distance);
 
