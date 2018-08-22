@@ -28,8 +28,8 @@
 #include "modules/common/time/time.h"
 #include "modules/common/util/util.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/reference_line/cos_theta_problem_interface.h"
 #include "modules/planning/math/smoothing_spline/spline_2d_solver.h"
+#include "modules/planning/reference_line/cos_theta_problem_interface.h"
 #include "modules/planning/reference_line/qp_spline_reference_line_smoother.h"
 
 namespace apollo {
@@ -175,8 +175,10 @@ bool CosThetaReferenceLineSmoother::Smooth(
 
   ptop->get_optimization_results(&x, &y);
   // load the point position and estimated derivatives at each point
-  CHECK_GT(x.size(), 1);
-  CHECK_GT(y.size(), 1);
+  if (x.size() < 2 || y.size() < 2) {
+    AINFO << "Return by IPOPT is wrong. Size smaller than 2 ";
+    return false;
+  }
   for (std::size_t i = 0; i < x.size(); ++i) {
     // reverse back to the unscaled points
     double start_x = x[i] + zero_x_;
@@ -207,7 +209,7 @@ bool CosThetaReferenceLineSmoother::Smooth(
   double Fy = ptr_smoothed_point2d->front().y();
   double Nx = 0.0;
   double Ny = 0.0;
-  for (std::size_t i = 1; i <ptr_smoothed_point2d->size(); i++) {
+  for (std::size_t i = 1; i < ptr_smoothed_point2d->size(); i++) {
     Nx = ptr_smoothed_point2d->at(i).x();
     Ny = ptr_smoothed_point2d->at(i).y();
     double end_segment_s =
