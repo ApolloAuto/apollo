@@ -58,11 +58,8 @@ message CosThetaSmootherConfig {
   // Relax constraint on end condition
   optional double relax = 5 [default = 0.2];
 
-  // kappa filter
-  optional double kappa_filter = 6 [default = 1.0e9];
-
-  // dkappa filter
-  optional double dkappa_filter = 7 [default = 1.0e9];
+  // Reopt bound for anchor points
+  optional double reopt_qp_bound = 6 [default = 0.05];
   }
 
 message ReferenceLineSmootherConfig {

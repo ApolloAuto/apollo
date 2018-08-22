@@ -99,9 +99,9 @@ bool Spline2dSolver::Solve() {
                                                ::qpOASES::HST_UNKNOWN));
     ::qpOASES::Options my_options;
     my_options.enableCholeskyRefactorisation = 10;
-    my_options.epsNum = FLAGS_default_active_set_eps_num;
-    my_options.epsDen = FLAGS_default_active_set_eps_den;
-    my_options.epsIterRef = FLAGS_default_active_set_eps_iter_ref;
+    my_options.epsNum = FLAGS_default_qp_smoothing_eps_num;
+    my_options.epsDen = FLAGS_default_qp_smoothing_eps_den;
+    my_options.epsIterRef = FLAGS_default_qp_smoothing_eps_iter_ref;
     sqp_solver_->setOptions(my_options);
     if (!FLAGS_default_enable_active_set_debug_info) {
       sqp_solver_->setPrintLevel(qpOASES::PL_NONE);
@@ -193,7 +193,7 @@ bool Spline2dSolver::Solve() {
                               constraint_upper_bound, max_iter);
     }
   } else {
-    ADEBUG << "Spline2dSolver is NOT using SQP hotstart.";
+    AINFO << "Spline2dSolver is NOT using SQP hotstart.";
     ret = sqp_solver_->init(h_matrix, g_matrix, affine_constraint_matrix,
                             lower_bound, upper_bound, constraint_lower_bound,
                             constraint_upper_bound, max_iter);
@@ -201,7 +201,7 @@ bool Spline2dSolver::Solve() {
   const double end_timestamp = Clock::NowInSeconds();
   ADEBUG << "Spline2dSolver QP time: "
          << (end_timestamp - start_timestamp) * 1000 << " ms.";
-
+  ADEBUG << "return status is" << getSimpleStatus(ret);
   if (ret != qpOASES::SUCCESSFUL_RETURN) {
     if (ret == qpOASES::RET_MAX_NWSR_REACHED) {
       AERROR << "qpOASES solver failed due to reached max iteration";
