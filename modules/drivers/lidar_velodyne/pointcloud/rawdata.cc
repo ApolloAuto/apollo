@@ -48,9 +48,11 @@
 #include <math.h>
 #include <fstream>
 
-#include <angles/angles.h>
-#include <ros/package.h>
-#include <ros/ros.h>
+#include "angles/angles.h"
+#include "ros/package.h"
+#include "ros/ros.h"
+
+#include "modules/common/log.h"
 
 namespace apollo {
 namespace drivers {
@@ -152,30 +154,6 @@ int RawData::setupOffline(std::string calibration_file, double max_range_,
   return 0;
 }
 
-#if 0
-  void RawData::unpack(const velodyne_msgs::VelodynePacket &pkt,
-                       XYZIRBPointCloud &pc)
-  {
-    ROS_DEBUG_STREAM("Received packet, time: " << pkt.stamp);
-    if (pkt.data[1205] == 34) {
-      unpack_vlp16(pkt, pc);
- //     std::cerr<<" current motion compensation code only supports VLP32C!" <<std::endl;
-    }
-    else if (pkt.data[1205] == 40) { // VLP32 C
-      unpack_vlp32(pkt, pc);
-    }
-    else if (pkt.data[1205] == 33) { // HDL-32E (NOT TESTED YET)
-      unpack_hdl32(pkt, pc);
-  ///   std::cerr<<" current motion compensation code only supports VLP32C!" <<std::endl;
-    }
-    else { // HDL-64E without azimuth compensation from the firing order
-      unpack_hdl64(pkt, pc);
-   //   std::cerr<<" current motion compensation code only supports VLP32C!" <<std::endl;
-    }
-  }
-
-#endif
-
 /** @brief convert raw packet to point cloud
  *
  *  @param pkt raw packet to unpack
@@ -204,8 +182,13 @@ void RawData::unpack(const velodyne_msgs::VelodynePacket &pkt,
            output : x_coord, y_coord, z_coord, intensity
  */
 void RawData::compute_xyzi(const uint8_t chan_id, const uint16_t azimuth_uint,
-                           const float distance, float &intensity,
-                           float &x_coord, float &y_coord, float &z_coord) {
+                           const float distance, float *intensity,
+                           float *x_coord, float *y_coord, float *z_coord) {
+  CHECK_NOTNULL(intensity);
+  CHECK_NOTNULL(x_coord);
+  CHECK_NOTNULL(y_coord);
+  CHECK_NOTNULL(z_coord);
+
   float x, y, z;
   LaserCorrection &corrections = calibration_.laser_corrections[chan_id];
 
@@ -282,9 +265,9 @@ void RawData::compute_xyzi(const uint8_t chan_id, const uint16_t azimuth_uint,
   z = distance_y * sin_vert_angle + vert_offset * cos_vert_angle;
 
   /** Use standard ROS coordinate system (right-hand rule) */
-  x_coord = y;
-  y_coord = -x;
-  z_coord = z;
+  *x_coord = y;
+  *y_coord = -x;
+  *z_coord = z;
 
   /** Intensity Calculation */
   float min_intensity = corrections.min_intensity;
@@ -293,12 +276,12 @@ void RawData::compute_xyzi(const uint8_t chan_id, const uint16_t azimuth_uint,
   float focal_offset = 256 * (1 - corrections.focal_distance / 13100) *
                        (1 - corrections.focal_distance / 13100);
   float focal_slope = corrections.focal_slope;
-  intensity +=
+  *intensity +=
       focal_slope * (abs(focal_offset -
                          256 * (1 - static_cast<float>(azimuth_uint) / 65535) *
                              (1 - static_cast<float>(azimuth_uint) / 65535)));
-  intensity = (intensity < min_intensity) ? min_intensity : intensity;
-  intensity = (intensity > max_intensity) ? max_intensity : intensity;
+  *intensity = (*intensity < min_intensity) ? min_intensity : *intensity;
+  *intensity = (*intensity > max_intensity) ? max_intensity : *intensity;
 }
 
 /** @brief convert raw HDL-64E channel packet to point cloud
@@ -344,8 +327,8 @@ void RawData::unpack_hdl64(const velodyne_msgs::VelodynePacket &pkt,
 
           // apply calibration file and convert polar coordinates to Euclidean
           // XYZ
-          compute_xyzi(laser_number, azimuth, distance, intensity, x_coord,
-                       y_coord, z_coord);
+          compute_xyzi(laser_number, azimuth, distance, &intensity, &x_coord,
+                       &y_coord, &z_coord);
 
           // append this point to the cloud
           VPoint point;
@@ -396,7 +379,8 @@ void RawData::unpack_vlp16(const velodyne_msgs::VelodynePacket &pkt,
     // Calculate difference between current and next block's azimuth angle.
     if (block < (NUM_BLOCKS_PER_PACKET - 1)) {
       azimuth_next = raw->blocks[block + 1].rotation;
-      azimuth_diff = (float)((36000 + azimuth_next - azimuth) % 36000);
+      azimuth_diff =
+          static_cast<float>((36000 + azimuth_next - azimuth) % 36000);
       last_azimuth_diff = azimuth_diff;
     } else {
       azimuth_diff = last_azimuth_diff;
@@ -417,23 +401,24 @@ void RawData::unpack_vlp16(const velodyne_msgs::VelodynePacket &pkt,
           union two_bytes tmp;
           tmp.bytes[0] = raw->blocks[block].data[k];
           tmp.bytes[1] = raw->blocks[block].data[k + 1];
-          distance = (float)tmp.uint * DISTANCE_RESOLUTION;
+          distance = tmp.uint * DISTANCE_RESOLUTION;
           distance += corrections.dist_correction;
 
           if (pointInRange(distance)) {
-            intensity = (float)raw->blocks[block].data[k + 2];
+            intensity = static_cast<float>(raw->blocks[block].data[k + 2]);
 
             // azimuth correction from the firing order in time-domain
             azimuth_corrected_f =
                 azimuth + (azimuth_diff * ((chan_id * CHANNEL_TDURATION) +
                                            (seq_id * SEQ_TDURATION)) /
                            VLP16_BLOCK_TDURATION);
-            azimuth_corrected = ((uint16_t)round(azimuth_corrected_f)) % 36000;
+            azimuth_corrected =
+                (static_cast<uint16_t>(round(azimuth_corrected_f))) % 36000;
 
             // apply calibration file and convert polar coordinates to Euclidean
             // XYZ
-            compute_xyzi(chan_id, azimuth_corrected, distance, intensity,
-                         x_coord, y_coord, z_coord);
+            compute_xyzi(chan_id, azimuth_corrected, distance, &intensity,
+                         &x_coord, &y_coord, &z_coord);
 
             // append this point to the cloud
             VPoint point;
@@ -452,90 +437,6 @@ void RawData::unpack_vlp16(const velodyne_msgs::VelodynePacket &pkt,
   }
 }
 
-#if 0
-  void RawData::unpack_vlp32(const velodyne_msgs::VelodynePacket &pkt,
-                             velodyne_rawdata::XYZIRBPointCloud &pc)
-  {
-    float azimuth_diff, azimuth_corrected_f;
-    float last_azimuth_diff = 0;
-    uint16_t azimuth, azimuth_next, azimuth_corrected;
-    float x_coord, y_coord, z_coord;
-    float distance, intensity;
-
-    const raw_packet_t *raw = (const raw_packet_t *) &pkt.data[0];
-
-    for (int block = 0; block < NUM_BLOCKS_PER_PACKET; block++) {
-
-      // ignore packets with mangled or otherwise different contents
-      if (UPPER_BANK != raw->blocks[block].header) {
-        // Do not flood the log with messages, only issue at most one
-        // of these warnings per minute.
-        ROS_WARN_STREAM_THROTTLE(60, "skipping invalid VLP-32 packet: block "
-                                 << block << " header value is "
-                                 << raw->blocks[block].header);
-        return;                         // bad packet: skip the rest
-      }
-
-      // Calculate difference between current and next block's azimuth angle.
-      if (block == 0) {
-        azimuth = raw->blocks[block].rotation;
-      } else {
-        azimuth = azimuth_next;
-      }
-      if (block < (NUM_BLOCKS_PER_PACKET-1)){
-        azimuth_next = raw->blocks[block+1].rotation;
-        azimuth_diff = (float)((36000 + azimuth_next - azimuth)%36000);
-        last_azimuth_diff = azimuth_diff;
-      } else {
-        azimuth_diff = last_azimuth_diff;
-      }
-
-      /*condition added to avoid calculating points which are not
-        in the interesting defined area (min_angle < area < max_angle)*/
-      if ((config_.min_angle < config_.max_angle &&
-        azimuth >= config_.min_angle && azimuth <= config_.max_angle)
-        || (config_.min_angle > config_.max_angle)) {
-
-	for (int j = 0, k = 0; j < NUM_CHANS_PER_BLOCK; j++, k+=CHANNEL_SIZE){
-	  uint8_t chan_id = j;
-	  uint8_t firing_order = chan_id/2;
-	  LaserCorrection &corrections = calibration_.laser_corrections[chan_id];
-
-	  // distance extraction
-	  union two_bytes tmp;
-	  tmp.bytes[0] = raw->blocks[block].data[k];
-	  tmp.bytes[1] = raw->blocks[block].data[k+1];
-	  distance = (float)tmp.uint * VLP32_DISTANCE_RESOLUTION;
-	  distance += corrections.dist_correction;
-
-	  if (pointInRange(distance)) {
-	    intensity = (float)raw->blocks[block].data[k+2];
-
-	    /** correct for the laser rotation as a function of timing during the firings **/
-	    azimuth_corrected_f = azimuth + (azimuth_diff * (firing_order*CHANNEL_TDURATION) / SEQ_TDURATION);
-	    azimuth_corrected = ((uint16_t)round(azimuth_corrected_f)) % 36000;
-
-	    // apply calibration file and convert polar coordinates to Euclidean XYZ
-	    compute_xyzi(chan_id, azimuth_corrected, distance, intensity, x_coord, y_coord, z_coord);
-
-	    // append this point to the cloud
-	    PointXYZIRB point;
-	    point.ring = corrections.laser_ring;
-	    point.x = x_coord;
-	    point.y = y_coord;
-	    point.z = z_coord;
-	    point.intensity = intensity;
-	    point.block = block;
-	    pc.points.push_back(point);
-	    ++pc.width;
-	  }
-        }
-      }
-    }
-  }
-
-#endif
-
 /** @brief convert raw VLP32 packet to point cloud
  *
  *  @param pkt raw packet to unpack
@@ -543,7 +444,8 @@ void RawData::unpack_vlp16(const velodyne_msgs::VelodynePacket &pkt,
  */
 void RawData::unpack_vlp32(const velodyne_msgs::VelodynePacket &pkt,
                            VPointCloud &pc) {
-  float azimuth_diff, azimuth_corrected_f;
+  float azimuth_diff = 0.0f;
+  float azimuth_corrected_f = 0.0f;
   float last_azimuth_diff = 0;
   uint16_t azimuth, azimuth_next, azimuth_corrected;
   float x_coord, y_coord, z_coord;
@@ -570,7 +472,7 @@ void RawData::unpack_vlp32(const velodyne_msgs::VelodynePacket &pkt,
     }
     if (block < (NUM_BLOCKS_PER_PACKET - 1)) {
       azimuth_next = raw->blocks[block + 1].rotation;
-      azimuth_diff = (float)((36000 + azimuth_next - azimuth) % 36000);
+      azimuth_diff = (36000 + azimuth_next - azimuth) % 36000;
       last_azimuth_diff = azimuth_diff;
     } else {
       azimuth_diff = last_azimuth_diff;
@@ -590,23 +492,24 @@ void RawData::unpack_vlp32(const velodyne_msgs::VelodynePacket &pkt,
         union two_bytes tmp;
         tmp.bytes[0] = raw->blocks[block].data[k];
         tmp.bytes[1] = raw->blocks[block].data[k + 1];
-        distance = (float)tmp.uint * VLP32_DISTANCE_RESOLUTION;
+        distance = tmp.uint * VLP32_DISTANCE_RESOLUTION;
         distance += corrections.dist_correction;
 
         if (pointInRange(distance)) {
-          intensity = (float)raw->blocks[block].data[k + 2];
+          intensity = static_cast<float>(raw->blocks[block].data[k + 2]);
 
           /** correct for the laser rotation as a function of timing during the
            * firings **/
           azimuth_corrected_f =
               azimuth + (azimuth_diff * (firing_order * CHANNEL_TDURATION) /
                          SEQ_TDURATION);
-          azimuth_corrected = ((uint16_t)round(azimuth_corrected_f)) % 36000;
+          azimuth_corrected =
+              (static_cast<uint16_t>(round(azimuth_corrected_f))) % 36000;
 
           // apply calibration file and convert polar coordinates to Euclidean
           // XYZ
-          compute_xyzi(chan_id, azimuth_corrected, distance, intensity, x_coord,
-                       y_coord, z_coord);
+          compute_xyzi(chan_id, azimuth_corrected, distance, &intensity,
+                       &x_coord, &y_coord, &z_coord);
 
           // append this point to the cloud
           VPoint point;
@@ -650,19 +553,6 @@ void RawData::unpack_vls128(const velodyne_msgs::VelodynePacket &pkt,
   const raw_packet_t *raw = (const raw_packet_t *)&pkt.data[0];
   // std::cerr << " Inside unpack_vls128 " << std::endl;
   for (int block = 0; block < 12; block++) {
-#if 0
-      // ignore packets with mangled or otherwise different contents
-      if (UPPER_BANK != raw->blocks[block].header) {
-        // Do not flood the log with messages, only issue at most one
-        // of these warnings per minute.
-        std::cerr << "skipping invalid VLS128 packet ... block " << block << " header value is " << raw->blocks[block].header << std::endl;
-        ROS_WARN_STREAM_THROTTLE(60, "skipping invalid VLS128 packet: block "
-                                 << block << " header value is "
-                                 << raw->blocks[block].header);
-        return;                         // bad packet: skip the rest
-      }
-#endif
-
     // Calculate difference between current and next block's azimuth angle.
     if (block == 0) {
       azimuth = raw->blocks[block].rotation;
@@ -671,7 +561,8 @@ void RawData::unpack_vls128(const velodyne_msgs::VelodynePacket &pkt,
     }
     if (block < (NUM_BLOCKS_PER_PACKET - 1)) {
       azimuth_next = raw->blocks[block + 1].rotation;
-      azimuth_diff = (float)((36000 + azimuth_next - azimuth) % 36000);
+      azimuth_diff =
+          static_cast<float>((36000 + azimuth_next - azimuth) % 36000);
       last_azimuth_diff = azimuth_diff;
     } else {
       azimuth_diff = last_azimuth_diff;
@@ -693,23 +584,24 @@ void RawData::unpack_vls128(const velodyne_msgs::VelodynePacket &pkt,
         union two_bytes tmp;
         tmp.bytes[0] = raw->blocks[block].data[k];
         tmp.bytes[1] = raw->blocks[block].data[k + 1];
-        distance = (float)tmp.uint * VLP32_DISTANCE_RESOLUTION;
+        distance = tmp.uint * VLP32_DISTANCE_RESOLUTION;
         distance += corrections.dist_correction;
 
         if (pointInRange(distance)) {
-          intensity = (float)raw->blocks[block].data[k + 2];
+          intensity = static_cast<float>(raw->blocks[block].data[k + 2]);
 
           /** correct for the laser rotation as a function of timing during the
            * firings **/
           azimuth_corrected_f =
               azimuth + (azimuth_diff * (firing_order * CHANNEL_TDURATION) /
                          SEQ_TDURATION);
-          azimuth_corrected = ((uint16_t)round(azimuth_corrected_f)) % 36000;
+          azimuth_corrected =
+              (static_cast<uint16_t>(round(azimuth_corrected_f))) % 36000;
 
           // apply calibration file and convert polar coordinates to Euclidean
           // XYZ
-          compute_xyzi(chan_id, azimuth_corrected, distance, intensity, x_coord,
-                       y_coord, z_coord);
+          compute_xyzi(chan_id, azimuth_corrected, distance, &intensity,
+                       &x_coord, &y_coord, &z_coord);
 
           // append this point to the cloud
           VPoint point;
@@ -774,7 +666,8 @@ void RawData::unpack_hdl32(const velodyne_msgs::VelodynePacket &pkt,
     }
     if (block < (NUM_BLOCKS_PER_PACKET - 1)) {
       azimuth_next = raw->blocks[block + 1].rotation;
-      azimuth_diff = (float)((36000 + azimuth_next - azimuth) % 36000);
+      azimuth_diff =
+          static_cast<float>((36000 + azimuth_next - azimuth) % 36000);
       last_azimuth_diff = azimuth_diff;
     } else {
       azimuth_diff = last_azimuth_diff;
@@ -793,23 +686,24 @@ void RawData::unpack_hdl32(const velodyne_msgs::VelodynePacket &pkt,
         union two_bytes tmp;
         tmp.bytes[0] = raw->blocks[block].data[k];
         tmp.bytes[1] = raw->blocks[block].data[k + 1];
-        distance = (float)tmp.uint * DISTANCE_RESOLUTION;
+        distance = tmp.uint * DISTANCE_RESOLUTION;
         distance += corrections.dist_correction;
 
         if (pointInRange(distance)) {
-          intensity = (float)raw->blocks[block].data[k + 2];
+          intensity = static_cast<float>(raw->blocks[block].data[k + 2]);
 
           /** correct for the laser rotation as a function of timing during the
            * firings **/
           azimuth_corrected_f =
               azimuth + (azimuth_diff * (chan_id * HDL32_CHANNEL_TDURATION) /
                          HDL32_SEQ_TDURATION);
-          azimuth_corrected = ((uint16_t)round(azimuth_corrected_f)) % 36000;
+          azimuth_corrected =
+              (static_cast<uint16_t>(round(azimuth_corrected_f))) % 36000;
 
           // apply calibration file and convert polar coordinates to Euclidean
           // XYZ
-          compute_xyzi(chan_id, azimuth_corrected, distance, intensity, x_coord,
-                       y_coord, z_coord);
+          compute_xyzi(chan_id, azimuth_corrected, distance, &intensity,
+                       &x_coord, &y_coord, &z_coord);
 
           // append this point to the cloud
           VPoint point;
