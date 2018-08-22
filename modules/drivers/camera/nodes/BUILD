@@ -6,7 +6,6 @@ cc_library(
     name = "usb_cam_nodes",
     srcs = [
         "usb_cam_wrapper.cc",
-        "usb_cam_node.cc",
         "usb_cam_nodelet.cc",
     ],
     hdrs = [
