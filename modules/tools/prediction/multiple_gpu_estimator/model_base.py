@@ -37,9 +37,9 @@ import tensorflow as tf
 
 
 class ModelBase(object):
-    def __init__(self, is_training, data_format, batch_norm_decay,
-                 batch_norm_epsilon):
-        """ResNet constructor.
+    def __init__(self, is_training=True, data_format='channels_last',
+                 batch_norm_decay=0.999, batch_norm_epsilon=0.001):
+        """ModelBase constructor.
 
     Args:
       is_training: if build training or inference model.
@@ -103,14 +103,14 @@ class ModelBase(object):
     def _fully_connected(self,
                          x,
                          out_dim,
-                         kernel_initializer=tf.zeros_initializer(),
+                         kernel_initializer=None,
                          kernel_regularizer=None):
         with tf.name_scope('fully_connected') as name_scope:
             x = tf.layers.dense(
                 x,
                 out_dim,
                 kernel_initializer=kernel_initializer,
-                kernel_regularizer=None)
+                kernel_regularizer=kernel_regularizer)
 
         tf.logging.info('image after unit %s: %s', name_scope, x.get_shape())
         return x
