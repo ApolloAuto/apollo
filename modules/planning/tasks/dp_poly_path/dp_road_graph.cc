@@ -34,8 +34,8 @@
 #include "modules/map/hdmap/hdmap_util.h"
 
 #include "modules/planning/common/path/frenet_frame_path.h"
+#include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/common/planning_util.h"
 #include "modules/planning/math/curve1d/quintic_polynomial_curve1d.h"
 #include "modules/planning/proto/planning_internal.pb.h"
 #include "modules/planning/proto/planning_status.pb.h"
@@ -279,17 +279,10 @@ bool DPRoadGraph::SamplePathWaypoints(
   float accumulated_s = init_sl_point_.s();
   float prev_s = accumulated_s;
 
-  auto *status = util::GetPlanningStatus();
-  if (status == nullptr) {
-    AERROR << "Fail to  get planning status.";
-    return false;
-  }
-  if (status->planning_state().has_pull_over() &&
-      status->planning_state().pull_over().in_pull_over()) {
-    status->mutable_planning_state()->mutable_pull_over()->set_status(
-        PullOverStatus::IN_OPERATION);
-    const auto &start_point =
-        status->planning_state().pull_over().start_point();
+  auto *status = GetPlanningStatus();
+  if (!status->has_pull_over() && status->pull_over().in_pull_over()) {
+    status->mutable_pull_over()->set_status(PullOverStatus::IN_OPERATION);
+    const auto &start_point = status->pull_over().start_point();
     SLPoint start_point_sl;
     if (!reference_line_.XYToSL(start_point, &start_point_sl)) {
       AERROR << "Fail to change xy to sl.";
@@ -297,8 +290,7 @@ bool DPRoadGraph::SamplePathWaypoints(
     }
 
     if (init_sl_point_.s() > start_point_sl.s()) {
-      const auto &stop_point =
-          status->planning_state().pull_over().stop_point();
+      const auto &stop_point = status->pull_over().stop_point();
       SLPoint stop_point_sl;
       if (!reference_line_.XYToSL(stop_point, &stop_point_sl)) {
         AERROR << "Fail to change xy to sl.";

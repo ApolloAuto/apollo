@@ -18,33 +18,44 @@
  * @file
  */
 
-#ifndef MODULES_PLANNING_UTIL_PLANNING_UTIL_H_
-#define MODULES_PLANNING_UTIL_PLANNING_UTIL_H_
+#ifndef MODULES_PLANNING_COMMON_PLANNING_CONTEXT_H_
+#define MODULES_PLANNING_COMMON_PLANNING_CONTEXT_H_
 
 #include <string>
 
+#include "modules/common/macro.h"
+#include "modules/common/proto/drive_state.pb.h"
 #include "modules/common/proto/pnc_point.pb.h"
 
 #include "modules/planning/proto/planning_status.pb.h"
 
 /**
- * @namespace apollo::common::util
- * @brief apollo::common::util
+ * @brief PlanningContext is the runtime context in planning. It is
+ * persistant across multiple frames.
  */
 namespace apollo {
 namespace planning {
-namespace util {
 
-/**
- * This function returns the run-time state of the planning module.
- * @Warnning: this function is not thread safe.
- */
-PlanningStatus *GetPlanningStatus();
+class PlanningContext {
+ public:
+  void Clear();
+
+  PlanningStatus* GetPlanningStatus() { return &planning_status_; }
+
+ private:
+  PlanningStatus planning_status_;
+
+  // this is a sigleton class
+  DECLARE_SINGLETON(PlanningContext);
+};
 
 void DumpPlanningContext();
 
-}  // namespace util
+inline PlanningStatus* GetPlanningStatus() {
+  return PlanningContext::instance()->GetPlanningStatus();
+}
+
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_UTIL_PLANNING_UTIL_H_
+#endif  // MODULES_PLANNING_COMMON_PLANNING_CONTEXT_H_

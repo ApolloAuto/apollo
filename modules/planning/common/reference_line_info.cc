@@ -32,9 +32,8 @@
 
 #include "modules/map/hdmap/hdmap_common.h"
 #include "modules/map/hdmap/hdmap_util.h"
-
+#include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/common/planning_util.h"
 #include "modules/planning/proto/sl_boundary.pb.h"
 
 namespace apollo {
@@ -50,7 +49,6 @@ using apollo::common::adapter::AdapterManager;
 using apollo::common::math::Box2d;
 using apollo::common::math::Vec2d;
 using apollo::common::util::ThreadPool;
-using apollo::planning::util::GetPlanningStatus;
 
 ReferenceLineInfo::ReferenceLineInfo(const common::VehicleState& vehicle_state,
                                      const TrajectoryPoint& adc_planning_point,

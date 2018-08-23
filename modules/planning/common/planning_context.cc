@@ -14,21 +14,17 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/planning/common/planning_util.h"
+#include "modules/planning/common/planning_context.h"
 
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
 namespace planning {
-namespace util {
 
 using common::adapter::AdapterManager;
 
-PlanningStatus *GetPlanningStatus() {
-  static PlanningStatus status;
-  return &status;
-}
+PlanningContext::PlanningContext() {}
 
 void DumpPlanningContext() {
   AdapterManager::GetLocalization()->DumpLatestMessage();
@@ -37,6 +33,7 @@ void DumpPlanningContext() {
   AdapterManager::GetPrediction()->DumpLatestMessage();
 }
 
-}  // namespace util
+void PlanningContext::Clear() { planning_status_.Clear(); }
+
 }  // namespace planning
 }  // namespace apollo

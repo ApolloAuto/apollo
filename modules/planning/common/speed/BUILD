@@ -61,8 +61,8 @@ cc_library(
         "//modules/common/math",
         "//modules/common/proto:pnc_point_proto",
         "//modules/common/util",
+        "//modules/planning/common:planning_context",
         "//modules/planning/common:planning_gflags",
-        "//modules/planning/common:planning_util",
         "//modules/planning/proto:planning_proto",
     ],
 )

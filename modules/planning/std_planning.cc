@@ -31,11 +31,9 @@
 #include "modules/common/time/time.h"
 #include "modules/common/util/thread_pool.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
-
 #include "modules/map/hdmap/hdmap_util.h"
-
+#include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/common/planning_util.h"
 #include "modules/planning/common/trajectory/trajectory_stitcher.h"
 #include "modules/planning/planner/navi/navi_planner.h"
 #include "modules/planning/planner/rtk/rtk_replay_planner.h"
@@ -87,7 +85,7 @@ Status StdPlanning::Init() {
       << FLAGS_traffic_rule_config_filename;
 
   // clear planning status
-  util::GetPlanningStatus()->Clear();
+  GetPlanningStatus()->Clear();
 
   if (!AdapterManager::Initialized()) {
     AdapterManager::Init(FLAGS_planning_adapter_config_filename);
@@ -207,7 +205,7 @@ void StdPlanning::RunOnce() {
       AdapterManager::GetRoutingResponse()->GetLatestObserved();
   if (IsDifferentRouting(last_routing_, latest_routing)) {
     last_routing_ = latest_routing;
-    util::GetPlanningStatus()->Clear();
+    GetPlanningStatus()->Clear();
     reference_line_provider_->UpdateRoutingResponse(latest_routing);
   }
 
@@ -327,7 +325,7 @@ void StdPlanning::Stop() {
   frame_.reset(nullptr);
   planner_.reset(nullptr);
   FrameHistory::instance()->Clear();
-  util::GetPlanningStatus()->Clear();
+  GetPlanningStatus()->Clear();
   last_routing_.Clear();
 }
 

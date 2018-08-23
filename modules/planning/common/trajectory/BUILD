@@ -26,7 +26,7 @@ cc_library(
         ":trajectory",
         "//modules/common/math:linear_interpolation",
         "//modules/common/proto:pnc_point_proto",
-        "//modules/planning/common:planning_util",
+        "//modules/planning/common:planning_context",
         "@eigen//:eigen",
     ],
 )
@@ -46,7 +46,6 @@ cc_test(
         "@gtest//:main",
     ],
 )
-
 
 cc_library(
     name = "publishable_trajectory",
