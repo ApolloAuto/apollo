@@ -128,7 +128,6 @@ void MSFLocalization::InitParams() {
   localizaiton_param_.sins_state_span_time = FLAGS_integ_sins_state_span_time;
   localizaiton_param_.sins_state_pos_std = FLAGS_integ_sins_state_pos_std;
   localizaiton_param_.vel_threshold_get_yaw = FLAGS_vel_threshold_get_yaw;
-  localizaiton_param_.integ_debug_log_flag = FLAGS_integ_debug_log_flag;
   localizaiton_param_.is_trans_gpstime_to_utctime =
       FLAGS_trans_gpstime_to_utctime;
   localizaiton_param_.gnss_mode = FLAGS_gnss_mode;
@@ -142,7 +141,6 @@ void MSFLocalization::InitParams() {
   localizaiton_param_.lidar_extrinsic_file = FLAGS_lidar_extrinsics_file;
   localizaiton_param_.lidar_height_file = FLAGS_lidar_height_file;
   localizaiton_param_.lidar_height_default = FLAGS_lidar_height_default;
-  localizaiton_param_.lidar_debug_log_flag = FLAGS_lidar_debug_log_flag;
   localizaiton_param_.localization_mode = FLAGS_lidar_localization_mode;
   localizaiton_param_.lidar_yaw_align_mode = FLAGS_lidar_yaw_align_mode;
   localizaiton_param_.lidar_filter_size = FLAGS_lidar_filter_size;

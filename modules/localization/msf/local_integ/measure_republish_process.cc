@@ -16,13 +16,13 @@
 
 #include "modules/localization/msf/local_integ/measure_republish_process.h"
 
-#include <iostream>
 #include <iomanip>
+#include <iostream>
 
 #include "yaml-cpp/yaml.h"
 
-#include "modules/common/math/euler_angles_zxy.h"
 #include "modules/common/log.h"
+#include "modules/common/math/euler_angles_zxy.h"
 #include "modules/common/time/time_util.h"
 
 namespace apollo {
@@ -33,20 +33,19 @@ using common::Status;
 using common::time::TimeUtil;
 
 MeasureRepublishProcess::MeasureRepublishProcess()
-    : pre_bestgnsspose_(), pre_bestgnsspose_valid_(false),
+    : pre_bestgnsspose_(),
+      pre_bestgnsspose_valid_(false),
       send_init_bestgnsspose_(false),
-      pva_buffer_size_(150), local_utm_zone_id_(50),
+      pva_buffer_size_(150),
+      local_utm_zone_id_(50),
       is_trans_gpstime_to_utctime_(true),
-      debug_log_flag_(true), map_height_time_(0.0),
+      map_height_time_(0.0),
       gnss_mode_(GnssMode::NOVATEL) {}
 
-MeasureRepublishProcess::~MeasureRepublishProcess() {
-}
+MeasureRepublishProcess::~MeasureRepublishProcess() {}
 
-Status MeasureRepublishProcess::Init(
-    const LocalizationIntegParam& params) {
+Status MeasureRepublishProcess::Init(const LocalizationIntegParam& params) {
   local_utm_zone_id_ = params.utm_zone_id;
-  debug_log_flag_ = params.integ_debug_log_flag;
   is_trans_gpstime_to_utctime_ = params.is_trans_gpstime_to_utctime;
   gnss_mode_ = GnssMode(params.gnss_mode);
 
@@ -57,7 +56,7 @@ Status MeasureRepublishProcess::Init(
 }
 
 bool MeasureRepublishProcess::NovatelBestgnssposProcess(
-    const GnssBestPose& bestgnsspos_msg, MeasureData *measure) {
+    const GnssBestPose& bestgnsspos_msg, MeasureData* measure) {
   if (gnss_mode_ != GnssMode::NOVATEL) {
     return false;
   }
@@ -94,24 +93,22 @@ bool MeasureRepublishProcess::NovatelBestgnssposProcess(
     }
   }
 
-  if (debug_log_flag_) {
-    AINFO << std::setprecision(16)
-          << "MeasureDataRepublish Debug Log: bestgnsspos msg: "
-          << "[time:" << measure->time << "]"
-          << "[x:" << measure->gnss_pos.longitude * RAD_TO_DEG << "]"
-          << "[y:" << measure->gnss_pos.latitude * RAD_TO_DEG << "]"
-          << "[z:" << measure->gnss_pos.height << "]"
-          << "[std_x:" << bestgnsspos_msg.longitude_std_dev() << "]"
-          << "[std_y:" << bestgnsspos_msg.latitude_std_dev() << "]"
-          << "[std_z:" << bestgnsspos_msg.height_std_dev() << "]"
-          << "[position_type:" << bestgnsspos_msg.sol_type() << "]";
-  }
+  ADEBUG << std::setprecision(16)
+         << "MeasureDataRepublish Debug Log: bestgnsspos msg: "
+         << "[time:" << measure->time << "]"
+         << "[x:" << measure->gnss_pos.longitude * RAD_TO_DEG << "]"
+         << "[y:" << measure->gnss_pos.latitude * RAD_TO_DEG << "]"
+         << "[z:" << measure->gnss_pos.height << "]"
+         << "[std_x:" << bestgnsspos_msg.longitude_std_dev() << "]"
+         << "[std_y:" << bestgnsspos_msg.latitude_std_dev() << "]"
+         << "[std_z:" << bestgnsspos_msg.height_std_dev() << "]"
+         << "[position_type:" << bestgnsspos_msg.sol_type() << "]";
 
   return true;
 }
 
 void MeasureRepublishProcess::GnssLocalProcess(
-    const MeasureData& gnss_local_msg, MeasureData *measure) {
+    const MeasureData& gnss_local_msg, MeasureData* measure) {
   if (gnss_mode_ != GnssMode::SELF) {
     return;
   }
@@ -124,7 +121,7 @@ void MeasureRepublishProcess::GnssLocalProcess(
   }
 
   AINFO << "the gnss velocity: " << measure_data.gnss_vel.ve << " "
-            << measure_data.gnss_vel.vn << " " << measure_data.gnss_vel.vu;
+        << measure_data.gnss_vel.vn << " " << measure_data.gnss_vel.vu;
 
   measure_data.gnss_att.pitch = 0.0;
   measure_data.gnss_att.roll = 0.0;
@@ -144,7 +141,7 @@ void MeasureRepublishProcess::GnssLocalProcess(
   double vn_std = std::sqrt(measure_data.variance[4][4]);
   double vu_std = std::sqrt(measure_data.variance[5][5]);
   AINFO << "the gnss velocity std: " << ve_std << " " << vn_std << " "
-            << vu_std;
+        << vu_std;
 
   bool is_sins_align = IsSinsAlign();
 
@@ -177,11 +174,11 @@ void MeasureRepublishProcess::GnssLocalProcess(
       return;
     }
 
-    if (gnss_local_msg.measure_type != MeasureType::GNSS_POS_VEL
-        && gnss_local_msg.measure_type != MeasureType::ENU_VEL_ONLY) {
+    if (gnss_local_msg.measure_type != MeasureType::GNSS_POS_VEL &&
+        gnss_local_msg.measure_type != MeasureType::ENU_VEL_ONLY) {
       AERROR << "gnss does not have velocity,"
-                 << "the gnss velocity std: "
-                 << ve_std << " " << vn_std << " " << vu_std;
+             << "the gnss velocity std: " << ve_std << " " << vn_std << " "
+             << vu_std;
       return;
     }
     if (!gnss_local_msg.is_have_variance) {
@@ -189,8 +186,7 @@ void MeasureRepublishProcess::GnssLocalProcess(
       return;
     } else {
       if ((ve_std > 0.1) || (vn_std > 0.1)) {
-        AWARN << "gnss velocity variance is large: " << ve_std << " "
-                  << vn_std;
+        AWARN << "gnss velocity variance is large: " << ve_std << " " << vn_std;
         return;
       }
     }
@@ -227,8 +223,7 @@ void MeasureRepublishProcess::GnssLocalProcess(
         AWARN << "yaw velocity is large! pre, "
               << "cur yaw from vel and velocity: "
               << pre_yaw_from_vel * RAD_TO_DEG << " "
-              << yaw_from_vel * RAD_TO_DEG << " "
-              << yaw_incr * RAD_TO_DEG;
+              << yaw_from_vel * RAD_TO_DEG << " " << yaw_incr * RAD_TO_DEG;
         pre_measure_time = measure_data.time;
         pre_yaw_from_vel = yaw_from_vel;
         return;
@@ -239,19 +234,15 @@ void MeasureRepublishProcess::GnssLocalProcess(
   }
   *measure = measure_data;
 
-  if (debug_log_flag_) {
-    AINFO << std::setprecision(16)
-              << "MeasureDataRepublish Debug Log: rtkgnss msg: "
-              << "[time:" << measure_data.time << "]"
-              << "[x:" << measure_data.gnss_pos.longitude * RAD_TO_DEG
-              << "]"
-              << "[y:" << measure_data.gnss_pos.latitude * RAD_TO_DEG
-              << "]"
-              << "[z:" << measure_data.gnss_pos.height << "]"
-              << "[std_x:" << measure_data.variance[0][0] << "]"
-              << "[std_y:" << measure_data.variance[1][1] << "]"
-              << "[std_z:" << measure_data.variance[2][2] << "]";
-  }
+  ADEBUG << std::setprecision(16)
+         << "MeasureDataRepublish Debug Log: rtkgnss msg: "
+         << "[time:" << measure_data.time << "]"
+         << "[x:" << measure_data.gnss_pos.longitude * RAD_TO_DEG << "]"
+         << "[y:" << measure_data.gnss_pos.latitude * RAD_TO_DEG << "]"
+         << "[z:" << measure_data.gnss_pos.height << "]"
+         << "[std_x:" << measure_data.variance[0][0] << "]"
+         << "[std_y:" << measure_data.variance[1][1] << "]"
+         << "[std_z:" << measure_data.variance[2][2] << "]";
   return;
 }
 
@@ -271,7 +262,7 @@ void MeasureRepublishProcess::IntegPvaProcess(const InsPva& inspva_msg) {
 }
 
 bool MeasureRepublishProcess::LidarLocalProcess(
-    const LocalizationEstimate& lidar_local_msg, MeasureData *measure) {
+    const LocalizationEstimate& lidar_local_msg, MeasureData* measure) {
   CHECK_NOTNULL(measure);
 
   MeasureData measure_data;
@@ -280,8 +271,8 @@ bool MeasureRepublishProcess::LidarLocalProcess(
   apollo::localization::msf::WGS84Corr temp_wgs;
   apollo::localization::msf::UtmXYToLatlon(
       lidar_local_msg.pose().position().x(),
-      lidar_local_msg.pose().position().y(),
-      local_utm_zone_id_, false, &temp_wgs);
+      lidar_local_msg.pose().position().y(), local_utm_zone_id_, false,
+      &temp_wgs);
   measure_data.gnss_pos.longitude = temp_wgs.log;
   measure_data.gnss_pos.latitude = temp_wgs.lat;
   measure_data.gnss_pos.height = lidar_local_msg.pose().position().z();
@@ -291,10 +282,8 @@ bool MeasureRepublishProcess::LidarLocalProcess(
                                lidar_local_msg.pose().orientation().qy(),
                                lidar_local_msg.pose().orientation().qz());
 
-  common::math::EulerAnglesZXYd euler(temp_quat.w(),
-                                      temp_quat.x(),
-                                      temp_quat.y(),
-                                      temp_quat.z());
+  common::math::EulerAnglesZXYd euler(temp_quat.w(), temp_quat.x(),
+                                      temp_quat.y(), temp_quat.z());
 
   height_mutex_.lock();
   Eigen::Vector3d trans(lidar_local_msg.pose().position().x(),
@@ -322,21 +311,16 @@ bool MeasureRepublishProcess::LidarLocalProcess(
 
   *measure = measure_data;
 
-  if (debug_log_flag_) {
-    AINFO << std::setprecision(16)
-              << "MeasureDataRepublish Debug Log: lidarLocal msg: "
-              << "[time:" << measure_data.time << "]"
-              << "[x:" << measure_data.gnss_pos.longitude * RAD_TO_DEG
-              << "]"
-              << "[y:" << measure_data.gnss_pos.latitude * RAD_TO_DEG
-              << "]"
-              << "[z:" << measure_data.gnss_pos.height << "]"
-              << "[yaw:" << measure_data.gnss_att.yaw * RAD_TO_DEG
-              << "]"
-              << "[std_x:" << std::sqrt(longitude_var) << "]"
-              << "[std_y:" << std::sqrt(latitude_var) << "]"
-              << "[std_z:" << std::sqrt(height_var) << "]";
-  }
+  ADEBUG << std::setprecision(16)
+         << "MeasureDataRepublish Debug Log: lidarLocal msg: "
+         << "[time:" << measure_data.time << "]"
+         << "[x:" << measure_data.gnss_pos.longitude * RAD_TO_DEG << "]"
+         << "[y:" << measure_data.gnss_pos.latitude * RAD_TO_DEG << "]"
+         << "[z:" << measure_data.gnss_pos.height << "]"
+         << "[yaw:" << measure_data.gnss_att.yaw * RAD_TO_DEG << "]"
+         << "[std_x:" << std::sqrt(longitude_var) << "]"
+         << "[std_y:" << std::sqrt(latitude_var) << "]"
+         << "[std_z:" << std::sqrt(height_var) << "]";
 
   return true;
 }
@@ -352,7 +336,7 @@ bool MeasureRepublishProcess::IsSinsAlign() {
 }
 
 void MeasureRepublishProcess::TransferXYZFromBestgnsspose(
-    const GnssBestPose& bestgnsspos_msg, MeasureData *measure) {
+    const GnssBestPose& bestgnsspos_msg, MeasureData* measure) {
   CHECK_NOTNULL(measure);
 
   measure->time = bestgnsspos_msg.measurement_time();
@@ -360,10 +344,8 @@ void MeasureRepublishProcess::TransferXYZFromBestgnsspose(
     measure->time = TimeUtil::Gps2unix(measure->time);
   }
 
-  measure->gnss_pos.longitude =
-      bestgnsspos_msg.longitude() * DEG_TO_RAD;
-  measure->gnss_pos.latitude =
-      bestgnsspos_msg.latitude() * DEG_TO_RAD;
+  measure->gnss_pos.longitude = bestgnsspos_msg.longitude() * DEG_TO_RAD;
+  measure->gnss_pos.latitude = bestgnsspos_msg.latitude() * DEG_TO_RAD;
   measure->gnss_pos.height =
       bestgnsspos_msg.height_msl() + bestgnsspos_msg.undulation();
 
@@ -386,7 +368,7 @@ void MeasureRepublishProcess::TransferXYZFromBestgnsspose(
 }
 
 void MeasureRepublishProcess::TransferFirstMeasureFromBestgnsspose(
-    const GnssBestPose& bestgnsspos_msg, MeasureData *measure) {
+    const GnssBestPose& bestgnsspos_msg, MeasureData* measure) {
   CHECK_NOTNULL(measure);
 
   TransferXYZFromBestgnsspose(bestgnsspos_msg, measure);
@@ -404,7 +386,7 @@ void MeasureRepublishProcess::TransferFirstMeasureFromBestgnsspose(
 }
 
 bool MeasureRepublishProcess::CalculateVelFromBestgnsspose(
-    const GnssBestPose& bestgnsspos_msg, MeasureData *measure) {
+    const GnssBestPose& bestgnsspos_msg, MeasureData* measure) {
   CHECK_NOTNULL(measure);
 
   TransferXYZFromBestgnsspose(bestgnsspos_msg, measure);
@@ -428,8 +410,8 @@ bool MeasureRepublishProcess::CalculateVelFromBestgnsspose(
 
   const double re = 6378137.0;
   const double e = 0.0033528;
-  double temp_sin_lati_2 = sin(measure->gnss_pos.latitude) *
-                           sin(measure->gnss_pos.latitude);
+  double temp_sin_lati_2 =
+      sin(measure->gnss_pos.latitude) * sin(measure->gnss_pos.latitude);
   double rn = re / (1 - e * temp_sin_lati_2);
   double rm = re / (1 + 2.0 * e - 3.0 * e * temp_sin_lati_2);
 
@@ -439,26 +421,21 @@ bool MeasureRepublishProcess::CalculateVelFromBestgnsspose(
     position_good_counter = 0;
     return false;
   }
-  measure->gnss_vel.ve = (measure->gnss_pos.longitude -
-                              pre_bestgnsspose_.gnss_pos.longitude) *
-                              rn * inv_time *
-                              cos(measure->gnss_pos.latitude);
-  measure->gnss_vel.vn = (measure->gnss_pos.latitude -
-                              pre_bestgnsspose_.gnss_pos.latitude) *
-                              rm * inv_time;
-  measure->gnss_vel.vu =
-      (measure->gnss_pos.height - pre_bestgnsspose_.gnss_pos.height) *
+  measure->gnss_vel.ve =
+      (measure->gnss_pos.longitude - pre_bestgnsspose_.gnss_pos.longitude) *
+      rn * inv_time * cos(measure->gnss_pos.latitude);
+  measure->gnss_vel.vn =
+      (measure->gnss_pos.latitude - pre_bestgnsspose_.gnss_pos.latitude) * rm *
       inv_time;
+  measure->gnss_vel.vu =
+      (measure->gnss_pos.height - pre_bestgnsspose_.gnss_pos.height) * inv_time;
 
   pre_bestgnsspose_ = *measure;
-  AINFO << "novatel bestgnsspos velocity: "
-        << measure->gnss_vel.ve << " "
-        << measure->gnss_vel.vn << " "
-        << measure->gnss_vel.vu;
+  AINFO << "novatel bestgnsspos velocity: " << measure->gnss_vel.ve << " "
+        << measure->gnss_vel.vn << " " << measure->gnss_vel.vu;
 
   static double pre_yaw_from_vel = 0.0;
-  double yaw_from_vel =
-      atan2(measure->gnss_vel.ve, measure->gnss_vel.vn);
+  double yaw_from_vel = atan2(measure->gnss_vel.ve, measure->gnss_vel.vn);
   if (!pre_yaw_from_vel) {
     pre_yaw_from_vel = yaw_from_vel;
     return false;
@@ -480,9 +457,8 @@ bool MeasureRepublishProcess::CalculateVelFromBestgnsspose(
     if (delta_yaw > rad_5deg || delta_yaw < -rad_5deg) {
       AWARN << "novatel bestgnsspos delta yaw is large! "
             << "pre, cur yaw from vel and delta: "
-            << pre_yaw_from_vel * RAD_TO_DEG << " "
-            << yaw_from_vel * RAD_TO_DEG << " "
-            << delta_yaw * RAD_TO_DEG;
+            << pre_yaw_from_vel * RAD_TO_DEG << " " << yaw_from_vel * RAD_TO_DEG
+            << " " << delta_yaw * RAD_TO_DEG;
       pre_yaw_from_vel = yaw_from_vel;
       return false;
     }
@@ -510,19 +486,17 @@ bool MeasureRepublishProcess::CheckBestgnssposeStatus(
   int gnss_solution_status = static_cast<int>(bestgnsspos_msg.sol_status());
   int gnss_position_type = static_cast<int>(bestgnsspos_msg.sol_type());
   AINFO << "the gnss solution_status and position_type: "
-            << gnss_solution_status << " " << gnss_position_type;
+        << gnss_solution_status << " " << gnss_position_type;
 
   if (gnss_solution_status != 0) {
     AINFO << "novatel gnsspos's solution_status is not computed: "
-              << gnss_solution_status;
+          << gnss_solution_status;
     return false;
   }
-  if (gnss_position_type == 0
-      || gnss_position_type == 1
-      || gnss_position_type == 2) {
+  if (gnss_position_type == 0 || gnss_position_type == 1 ||
+      gnss_position_type == 2) {
     AINFO << "novatel gnsspos's solution_type is invalid "
-              << "or xy fixed or height fixed: "
-              << gnss_position_type;
+          << "or xy fixed or height fixed: " << gnss_position_type;
     return false;
   }
 
