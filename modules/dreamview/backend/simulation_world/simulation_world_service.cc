@@ -595,16 +595,16 @@ void SimulationWorldService::UpdateMainStopDecision(
   } else {
     // Normal stop.
     const apollo::planning::MainStop &stop = main_decision.stop();
-    stop_pt.set_x(stop.stop_point().x());
-    stop_pt.set_y(stop.stop_point().y());
+    stop_pt.set_x(stop.stop_point().x() + map_service_->GetXOffset());
+    stop_pt.set_y(stop.stop_point().y() + map_service_->GetYOffset());
     stop_heading = stop.stop_heading();
     if (stop.has_reason_code()) {
       SetStopReason(stop.reason_code(), decision);
     }
   }
 
-  decision->set_position_x(stop_pt.x() + map_service_->GetXOffset());
-  decision->set_position_y(stop_pt.y() + map_service_->GetYOffset());
+  decision->set_position_x(stop_pt.x());
+  decision->set_position_y(stop_pt.y());
   decision->set_heading(stop_heading);
 }
 
