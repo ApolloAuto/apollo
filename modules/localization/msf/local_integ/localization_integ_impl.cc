@@ -19,8 +19,8 @@
 #include <list>
 #include <queue>
 
-#include "modules/common/time/timer.h"
 #include "modules/common/log.h"
+#include "modules/common/time/timer.h"
 #include "modules/localization/msf/common/util/frame_transform.h"
 
 namespace apollo {
@@ -37,12 +37,16 @@ LocalizationIntegImpl::LocalizationIntegImpl()
       lidar_localization_list_max_size_(10),
       integ_localization_list_max_size_(50),
       gnss_localization_list_max_size_(10),
-      is_use_gnss_bestpose_(true), keep_lidar_running_(false),
-      lidar_queue_max_size_(5), imu_altitude_from_lidar_localization_(0.0),
+      is_use_gnss_bestpose_(true),
+      keep_lidar_running_(false),
+      lidar_queue_max_size_(5),
+      imu_altitude_from_lidar_localization_(0.0),
       imu_altitude_from_lidar_localization_available_(false),
-      keep_imu_running_(false), imu_queue_max_size_(200),
-      keep_gnss_running_(false), gnss_queue_max_size_(100),
-      debug_log_flag_(true), enable_lidar_localization_(true),
+      keep_imu_running_(false),
+      imu_queue_max_size_(200),
+      keep_gnss_running_(false),
+      gnss_queue_max_size_(100),
+      enable_lidar_localization_(true),
       gnss_antenna_extrinsic_(Eigen::Affine3d::Identity()) {}
 
 LocalizationIntegImpl::~LocalizationIntegImpl() {
@@ -54,8 +58,7 @@ LocalizationIntegImpl::~LocalizationIntegImpl() {
   delete integ_process_;
 }
 
-Status LocalizationIntegImpl::Init(
-    const LocalizationIntegParam& params) {
+Status LocalizationIntegImpl::Init(const LocalizationIntegParam& params) {
   enable_lidar_localization_ = params.enable_lidar_localization;
   if (params.enable_lidar_localization == true) {
     auto state = lidar_process_->Init(params);
@@ -108,12 +111,12 @@ void LocalizationIntegImpl::StartThreadLoop() {
   // run process thread
   keep_lidar_running_ = true;
   lidar_queue_max_size_ = 5;
-  const auto &pcd_loop_func = [this] { PcdThreadLoop(); };
+  const auto& pcd_loop_func = [this] { PcdThreadLoop(); };
   lidar_data_thread_ = std::thread(pcd_loop_func);
 
   keep_imu_running_ = true;
   imu_queue_max_size_ = 200;
-  const auto &imu_loop_func = [this] { ImuThreadLoop(); };
+  const auto& imu_loop_func = [this] { ImuThreadLoop(); };
   imu_data_thread_ = std::thread(imu_loop_func);
 
   keep_gnss_running_ = true;
@@ -142,8 +145,7 @@ void LocalizationIntegImpl::StopThreadLoop() {
   }
 }
 
-void LocalizationIntegImpl::PcdProcess(
-    const LidarFrame& lidar_frame) {
+void LocalizationIntegImpl::PcdProcess(const LidarFrame& lidar_frame) {
   lidar_data_queue_mutex_.lock();
   lidar_data_queue_.push(lidar_frame);
   lidar_data_signal_.notify_one();
@@ -177,8 +179,7 @@ void LocalizationIntegImpl::PcdThreadLoop() {
     }
 
     if (waiting_num > 2) {
-      AWARN << waiting_num
-            << " point cloud msg are waiting to process.";
+      AWARN << waiting_num << " point cloud msg are waiting to process.";
     }
 
     PcdProcessImpl(lidar_frame);
@@ -214,8 +215,7 @@ void LocalizationIntegImpl::PcdProcessImpl(const LidarFrame& pcd_data) {
   lidar_localization_mutex_.unlock();
 }
 
-void LocalizationIntegImpl::RawImuProcessRfu(
-    const ImuData& imu_data) {
+void LocalizationIntegImpl::RawImuProcessRfu(const ImuData& imu_data) {
   // push to imu_data_queue
   imu_data_queue_mutex_.lock();
   imu_data_queue_.push(imu_data);
@@ -335,8 +335,7 @@ void LocalizationIntegImpl::ImuProcessImpl(const ImuData& imu_data) {
 
   if (state != IntegState::NOT_INIT) {
     // pass result of integration localization to lidar process module
-    if (enable_lidar_localization_
-        && state != IntegState::NOT_STABLE) {
+    if (enable_lidar_localization_ && state != IntegState::NOT_STABLE) {
       lidar_process_->IntegPvaProcess(integ_sins_pva);
     }
 
@@ -439,8 +438,8 @@ void LocalizationIntegImpl::RawObservationProcessImpl(
   LocalizationMeasureState state = gnss_process_->GetResult(&gnss_measure);
 
   MeasureData measure;
-  if (state == LocalizationMeasureState::OK
-      || state == LocalizationMeasureState::VALID) {
+  if (state == LocalizationMeasureState::OK ||
+      state == LocalizationMeasureState::VALID) {
     republish_process_->GnssLocalProcess(gnss_measure, &measure);
     integ_process_->MeasureDataProcess(measure);
   }
@@ -467,8 +466,8 @@ void LocalizationIntegImpl::RawEphemerisProcessImpl(
 void LocalizationIntegImpl::GnssBestPoseProcessImpl(
     const drivers::gnss::GnssBestPose& bestgnsspos_msg) {
   MeasureData measure;
-  if (republish_process_->NovatelBestgnssposProcess(
-      bestgnsspos_msg, &measure)) {
+  if (republish_process_->NovatelBestgnssposProcess(bestgnsspos_msg,
+                                                    &measure)) {
     integ_process_->MeasureDataProcess(measure);
 
     LocalizationEstimate gnss_localization;
@@ -486,7 +485,7 @@ void LocalizationIntegImpl::GnssBestPoseProcessImpl(
 }
 
 void LocalizationIntegImpl::TransferGnssMeasureToLocalization(
-    const MeasureData& measure, LocalizationEstimate *localization) {
+    const MeasureData& measure, LocalizationEstimate* localization) {
   CHECK_NOTNULL(localization);
 
   apollo::common::Header* headerpb = localization->mutable_header();
@@ -497,9 +496,7 @@ void LocalizationIntegImpl::TransferGnssMeasureToLocalization(
   headerpb->set_timestamp_sec(timestamp);
 
   UTMCoor utm_xy;
-  LatlonToUtmXY(measure.gnss_pos.longitude,
-                  measure.gnss_pos.latitude,
-                  &utm_xy);
+  LatlonToUtmXY(measure.gnss_pos.longitude, measure.gnss_pos.latitude, &utm_xy);
 
   apollo::common::PointENU* position = posepb->mutable_position();
   position->set_x(utm_xy.x);
@@ -537,8 +534,7 @@ void LocalizationIntegImpl::TransferGnssMeasureToLocalization(
 }
 
 void LocalizationIntegImpl::GetLastestLidarLocalization(
-    LocalizationMeasureState *state,
-    LocalizationEstimate *lidar_localization) {
+    LocalizationMeasureState* state, LocalizationEstimate* lidar_localization) {
   CHECK_NOTNULL(state);
   CHECK_NOTNULL(lidar_localization);
 
@@ -555,8 +551,7 @@ void LocalizationIntegImpl::GetLastestLidarLocalization(
 }
 
 void LocalizationIntegImpl::GetLastestIntegLocalization(
-    LocalizationMeasureState *state,
-    LocalizationEstimate *integ_localization) {
+    LocalizationMeasureState* state, LocalizationEstimate* integ_localization) {
   CHECK_NOTNULL(state);
   CHECK_NOTNULL(integ_localization);
 
@@ -573,8 +568,7 @@ void LocalizationIntegImpl::GetLastestIntegLocalization(
 }
 
 void LocalizationIntegImpl::GetLastestGnssLocalization(
-    LocalizationMeasureState *state,
-    LocalizationEstimate *gnss_localization) {
+    LocalizationMeasureState* state, LocalizationEstimate* gnss_localization) {
   CHECK_NOTNULL(state);
   CHECK_NOTNULL(gnss_localization);
 
@@ -591,7 +585,7 @@ void LocalizationIntegImpl::GetLastestGnssLocalization(
 }
 
 void LocalizationIntegImpl::GetLidarLocalizationList(
-    std::list<LocalizationResult> *results) {
+    std::list<LocalizationResult>* results) {
   CHECK_NOTNULL(results);
 
   lidar_localization_mutex_.lock();
@@ -601,7 +595,7 @@ void LocalizationIntegImpl::GetLidarLocalizationList(
 }
 
 void LocalizationIntegImpl::GetIntegLocalizationList(
-    std::list<LocalizationResult> *results) {
+    std::list<LocalizationResult>* results) {
   CHECK_NOTNULL(results);
 
   integ_localization_mutex_.lock();
@@ -611,7 +605,7 @@ void LocalizationIntegImpl::GetIntegLocalizationList(
 }
 
 void LocalizationIntegImpl::GetGnssLocalizationList(
-    std::list<LocalizationResult> *results) {
+    std::list<LocalizationResult>* results) {
   CHECK_NOTNULL(results);
 
   gnss_localization_mutex_.lock();
