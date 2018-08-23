@@ -25,7 +25,7 @@
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/time/time.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
-#include "modules/planning/common/planning_util.h"
+#include "modules/planning/common/planning_context.h"
 
 namespace apollo {
 namespace planning {
@@ -35,7 +35,6 @@ using apollo::common::adapter::AdapterManager;
 using apollo::common::time::Clock;
 using apollo::perception::TrafficLight;
 using apollo::perception::TrafficLightDetection;
-using apollo::planning::util::GetPlanningStatus;
 
 Rerouting::Rerouting(const TrafficRuleConfig& config) : TrafficRule(config) {}
 
