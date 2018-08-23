@@ -100,9 +100,17 @@ class ModelBase(object):
     def _relu(self, x):
         return tf.nn.relu(x)
 
-    def _fully_connected(self, x, out_dim):
+    def _fully_connected(self,
+                         x,
+                         out_dim,
+                         kernel_initializer=tf.zeros_initializer(),
+                         kernel_regularizer=None):
         with tf.name_scope('fully_connected') as name_scope:
-            x = tf.layers.dense(x, out_dim)
+            x = tf.layers.dense(
+                x,
+                out_dim,
+                kernel_initializer=kernel_initializer,
+                kernel_regularizer=None)
 
         tf.logging.info('image after unit %s: %s', name_scope, x.get_shape())
         return x
