@@ -112,7 +112,7 @@ function generate_build_targets() {
   #switch for building fuzz test
   if [ -z $BUILD_FUZZ_TEST ]; then
      BUILD_TARGETS=$(echo $BUILD_TARGETS |tr ' ' '\n' | grep -v "fuzz")
-  else 
+  else
      BUILD_TARGETS=`bazel query //modules/tools/fuzz/...`
   fi
 }
@@ -132,7 +132,6 @@ function build() {
     JOB_ARG="--jobs=3"
   fi
   info "Building with $JOB_ARG for $MACHINE_ARCH"
-  df -h
 
   # Switch for building fuzz test.
   if [ -z $BUILD_FUZZ_TEST ]; then
@@ -397,7 +396,6 @@ function run_test() {
 }
 
 function citest_perception() {
-  df -h
   generate_build_targets
 
   # common related test
@@ -413,7 +411,6 @@ function citest_perception() {
 }
 
 function citest() {
-  df -h
   generate_build_targets
 
   # common related test
