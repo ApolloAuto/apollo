@@ -24,15 +24,15 @@
 
 #include <atomic>
 #include <functional>
-#include <queue>
 #include <list>
+#include <queue>
 
 #include "modules/common/status/status.h"
 #include "modules/localization/msf/local_integ/localization_gnss_process.h"
+#include "modules/localization/msf/local_integ/localization_integ.h"
 #include "modules/localization/msf/local_integ/localization_integ_process.h"
 #include "modules/localization/msf/local_integ/localization_lidar_process.h"
 #include "modules/localization/msf/local_integ/measure_republish_process.h"
-#include "modules/localization/msf/local_integ/localization_integ.h"
 
 /**
  * @namespace apollo::localization
@@ -73,20 +73,20 @@ class LocalizationIntegImpl {
   // gnss best pose process
   void GnssBestPoseProcess(const drivers::gnss::GnssBestPose& bestgnsspos_msg);
 
-  void GetLastestLidarLocalization(LocalizationMeasureState *state,
-                                   LocalizationEstimate *lidar_localization);
+  void GetLastestLidarLocalization(LocalizationMeasureState* state,
+                                   LocalizationEstimate* lidar_localization);
 
-  void GetLastestIntegLocalization(LocalizationMeasureState *state,
-                                   LocalizationEstimate *integ_localization);
+  void GetLastestIntegLocalization(LocalizationMeasureState* state,
+                                   LocalizationEstimate* integ_localization);
 
-  void GetLastestGnssLocalization(LocalizationMeasureState *state,
-                                  LocalizationEstimate *gnss_localization);
+  void GetLastestGnssLocalization(LocalizationMeasureState* state,
+                                  LocalizationEstimate* gnss_localization);
 
-  void GetLidarLocalizationList(std::list<LocalizationResult> *results);
+  void GetLidarLocalizationList(std::list<LocalizationResult>* results);
 
-  void GetIntegLocalizationList(std::list<LocalizationResult> *results);
+  void GetIntegLocalizationList(std::list<LocalizationResult>* results);
 
-  void GetGnssLocalizationList(std::list<LocalizationResult> *results);
+  void GetGnssLocalizationList(std::list<LocalizationResult>* results);
 
  protected:
   void StartThreadLoop();
@@ -107,7 +107,7 @@ class LocalizationIntegImpl {
       const drivers::gnss::GnssBestPose& bestgnsspos_msg);
 
   void TransferGnssMeasureToLocalization(const MeasureData& measure,
-                                         LocalizationEstimate *localization);
+                                         LocalizationEstimate* localization);
 
  private:
   MeasureRepublishProcess* republish_process_;
@@ -157,7 +157,6 @@ class LocalizationIntegImpl {
   size_t gnss_queue_max_size_;
   std::mutex gnss_function_queue_mutex_;
 
-  bool debug_log_flag_;
   bool enable_lidar_localization_;
 
   Eigen::Affine3d gnss_antenna_extrinsic_;
