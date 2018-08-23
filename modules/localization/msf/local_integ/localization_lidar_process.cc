@@ -36,7 +36,6 @@ LocalizationLidarProcess::LocalizationLidarProcess()
       map_path_(""),
       lidar_extrinsic_file_(""),
       lidar_height_file_(""),
-      debug_log_flag_(true),
       localization_mode_(2),
       yaw_align_mode_(2),
       lidar_filter_size_(17),
@@ -78,7 +77,6 @@ Status LocalizationLidarProcess::Init(const LocalizationIntegParam& params) {
   map_path_ = params.map_path;
   lidar_extrinsic_file_ = params.lidar_extrinsic_file;
   lidar_height_file_ = params.lidar_height_file;
-  debug_log_flag_ = params.lidar_debug_log_flag;
   localization_mode_ = params.localization_mode;
   yaw_align_mode_ = params.lidar_yaw_align_mode;
   utm_zone_id_ = params.utm_zone_id;
