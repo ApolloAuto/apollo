@@ -30,8 +30,8 @@
 #include "modules/common/macro.h"
 #include "modules/common/math/linear_interpolation.h"
 #include "modules/common/util/util.h"
+#include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/common/planning_util.h"
 
 namespace apollo {
 namespace planning {

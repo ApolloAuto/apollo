@@ -65,7 +65,7 @@ cc_library(
         "//modules/common/math:geometry",
         "//modules/common/util",
         "//modules/perception/proto:perception_proto",
-        "//modules/planning/common:planning_util",
+        "//modules/planning/common:planning_context",
         "//modules/planning/proto:planning_proto",
         "//modules/prediction/proto:prediction_proto",
     ],
@@ -127,12 +127,12 @@ cc_test(
 )
 
 cc_library(
-    name = "planning_util",
+    name = "planning_context",
     srcs = [
-        "planning_util.cc",
+        "planning_context.cc",
     ],
     hdrs = [
-        "planning_util.h",
+        "planning_context.h",
     ],
     deps = [
         ":planning_gflags",
