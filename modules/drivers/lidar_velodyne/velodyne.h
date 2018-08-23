@@ -26,13 +26,9 @@
 #include "ros/include/sensor_msgs/PointCloud2.h"
 #include "ros/include/velodyne_msgs/VelodyneScanUnified.h"
 
-#include "modules/drivers/lidar_velodyne/proto/velodyne_conf.pb.h"
-
 #include "modules/common/apollo_app.h"
-#include "modules/common/monitor_log/monitor_log_buffer.h"
-#include "modules/common/time/time.h"
-#include "modules/common/util/blocking_queue.h"
 #include "modules/common/util/util.h"
+#include "modules/drivers/lidar_velodyne/driver/driver_nodelet.h"
 
 /**
  * @namespace apollo::velodyne
@@ -48,41 +44,20 @@ namespace lidar_velodyne {
  * @brief velodyne module main class
  */
 class Velodyne : public apollo::common::ApolloApp {
-  friend class VelodyneTestBase;
-
  public:
-  Velodyne() : monitor_logger_(common::monitor::MonitorMessageItem::CONTROL) {}
+  Velodyne() = default;
+  virtual ~Velodyne() = default;
 
   std::string Name() const override;
   apollo::common::Status Init() override;
   apollo::common::Status Start() override;
   void Stop() override;
 
-  virtual ~Velodyne() = default;
-
  private:
-  typedef common::util::BlockingQueue<velodyne_msgs::VelodyneScanUnifiedPtr>
-      RawDataCache;
-  typedef common::util::BlockingQueue<sensor_msgs::PointCloud2Ptr>
-      PointCloudCache;
-  void Packet(RawDataCache* output);
-  void Convert(RawDataCache* input, PointCloudCache* output);
-  void Compensate(PointCloudCache* input);
-  bool SetNpackets(VelodyneConf* conf);
-  inline int64_t GetTime() {
-    return apollo::common::time::AsInt64<common::time::micros>(
-        apollo::common::time::Clock::Now());
-  }
-  void Notice();
-
- private:
-  VelodyneConf conf_;
-  common::monitor::MonitorLogger monitor_logger_;
-  std::shared_ptr<RawDataCache> packet_cache_;
-  std::shared_ptr<PointCloudCache> pointcloud_cache_;
-
   bool running_ = true;
   std::vector<std::shared_ptr<std::thread> > threads_;
+
+  DriverNodelet driver_nodelet_;
 };
 
 }  // namespace lidar_velodyne
