@@ -7,6 +7,7 @@ os: linux
 env:
     - JOB=cibuild
     - JOB=citest
+    - JOB=citest_perception
     - JOB=lint
 cache:
   directories:
