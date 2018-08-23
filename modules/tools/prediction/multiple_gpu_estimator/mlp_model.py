@@ -46,10 +46,10 @@ class MlpModel(model_base.ModelBase):
     """prediction model with fully connected layers."""
 
     def __init__(self,
-                 is_training,
-                 batch_norm_decay,
-                 batch_norm_epsilon,
-                 data_format='channels_first'):
+                 is_training = True,
+                 batch_norm_decay = 0.999,
+                 batch_norm_epsilon = 0.001,
+                 data_format='channels_last'):
         super(MlpModel, self).__init__(is_training, data_format,
                                        batch_norm_decay, batch_norm_epsilon)
 
@@ -58,29 +58,29 @@ class MlpModel(model_base.ModelBase):
         x = self._fully_connected_with_bn(
             x,
             dim_input,
-            kernel_initializer=tf.contrib.keras.initializers.he_normal,
-            kernel_regularizer=tf.contrib.layers.l2_regularizer)
+            kernel_initializer=tf.contrib.keras.initializers.he_normal(),
+            kernel_regularizer=tf.contrib.layers.l2_regularizer(0.01))
         x = self._fully_connected_with_bn(
             x,
             dim_hidden_1,
-            kernel_initializer=tf.contrib.keras.initializers.he_normal,
-            kernel_regularizer=tf.contrib.layers.l2_regularizer)
+            kernel_initializer=tf.contrib.keras.initializers.he_normal(),
+            kernel_regularizer=tf.contrib.layers.l2_regularizer(0.01))
         x = self._fully_connected_with_bn(
             x,
             dim_hidden_2,
-            kernel_initializer=tf.contrib.keras.initializers.he_normal,
-            kernel_regularizer=tf.contrib.layers.l2_regularizer)
+            kernel_initializer=tf.contrib.keras.initializers.he_normal(),
+            kernel_regularizer=tf.contrib.layers.l2_regularizer(0.01))
         x = self._fully_connected(x, dim_output)
         return x
 
     def _fully_connected_with_bn(self,
                                  x,
-                                 dim,
-                                 kernel_initializer=tf.zeros_initializer(),
+                                 out_dim,
+                                 kernel_initializer=None,
                                  kernel_regularizer=None):
         x = self._fully_connected(
             x,
-            dim,
+            out_dim,
             kernel_initializer=kernel_initializer,
             kernel_regularizer=kernel_regularizer)
         x = self._relu(x)
