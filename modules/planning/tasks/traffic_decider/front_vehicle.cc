@@ -28,8 +28,8 @@
 #include "modules/common/time/time.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
+#include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/common/planning_util.h"
 #include "modules/planning/proto/planning_status.pb.h"
 
 namespace apollo {
@@ -40,7 +40,6 @@ using apollo::common::VehicleConfigHelper;
 using apollo::common::time::Clock;
 using apollo::hdmap::HDMapUtil;
 using apollo::perception::PerceptionObstacle;
-using apollo::planning::util::GetPlanningStatus;
 
 FrontVehicle::FrontVehicle(const TrafficRuleConfig& config)
     : TrafficRule(config) {}
