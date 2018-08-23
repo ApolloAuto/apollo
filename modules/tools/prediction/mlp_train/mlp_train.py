@@ -15,7 +15,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ###############################################################################
-
 """
 @requirement:
     tensorflow- 1.3.0
@@ -50,7 +49,6 @@ from common.data_preprocess import train_test_split
 from common.configure import parameters
 from common.configure import labels
 
-
 # Constants
 dim_input = parameters['mlp']['dim_input']
 dim_hidden_1 = parameters['mlp']['dim_hidden_1']
@@ -66,7 +64,7 @@ def load_data(filename):
     """
     Load the data from h5 file to the format of numpy
     """
-    if not(os.path.exists(filename)):
+    if not (os.path.exists(filename)):
         logging.error("file: {}, does not exist".format(filename))
         os._exit(1)
     if os.path.splitext(filename)[1] != '.h5':
@@ -97,8 +95,10 @@ def down_sample(data):
 
     rand = np.random.random((size))
 
-    cutin_false_select = np.logical_and(cutin_false_index, rand > cutin_false_drate)
-    cutin_true_select = np.logical_and(cutin_true_index, rand > cutin_true_drate)
+    cutin_false_select = np.logical_and(cutin_false_index,
+                                        rand > cutin_false_drate)
+    cutin_true_select = np.logical_and(cutin_true_index,
+                                       rand > cutin_true_drate)
     go_false_select = np.logical_and(go_false_index, rand > go_false_drate)
     go_true_select = np.logical_and(go_true_index, rand > go_true_drate)
 
@@ -126,25 +126,30 @@ def setup_model():
     Set up neural network based on keras.Sequential
     """
     model = Sequential()
-    model.add(Dense(dim_hidden_1,
-        input_dim = dim_input,
-        init = 'he_normal',
-        activation = 'relu',
-        W_regularizer = l2(0.01)))
+    model.add(
+        Dense(
+            dim_hidden_1,
+            input_dim=dim_input,
+            init='he_normal',
+            activation='relu',
+            W_regularizer=l2(0.01)))
 
-    model.add(Dense(dim_hidden_2,
-        init = 'he_normal',
-        activation = 'relu',
-        W_regularizer = l2(0.01)))
+    model.add(
+        Dense(
+            dim_hidden_2,
+            init='he_normal',
+            activation='relu',
+            W_regularizer=l2(0.01)))
 
-    model.add(Dense(dim_output,
-        init='he_normal',
-        activation = 'sigmoid',
-        W_regularizer = l2(0.01)))
+    model.add(
+        Dense(
+            dim_output,
+            init='he_normal',
+            activation='sigmoid',
+            W_regularizer=l2(0.01)))
 
-    model.compile(loss = 'binary_crossentropy',
-                  optimizer = 'rmsprop',
-                  metrics = ['accuracy'])
+    model.compile(
+        loss='binary_crossentropy', optimizer='rmsprop', metrics=['accuracy'])
 
     return model
 
@@ -173,46 +178,52 @@ def evaluate_model(y, pred):
 
     cutin_true = (y == labels['cutin_true']).sum()
     cutin_false = (y == labels['cutin_false']).sum()
-    index_cutin = np.logical_or(y == labels['cutin_false'], y == labels['cutin_true'])
+    index_cutin = np.logical_or(y == labels['cutin_false'],
+                                y == labels['cutin_true'])
     cutin_positive = (pred[index_cutin] == 1).sum()
     cutin_negative = (pred[index_cutin] == 0).sum()
 
     logging.info("data size: {}, included:".format(y.shape[0]))
     logging.info("\t  True    False   Positive   Negative")
-    logging.info(" Go:  {:7} {:7} {:7} {:7}".format(
-            go_true, go_false, go_positive, go_negative))
+    logging.info(" Go:  {:7} {:7} {:7} {:7}".format(go_true, go_false,
+                                                    go_positive, go_negative))
     logging.info("Cutin:{:7} {:7} {:7} {:7}".format(
-            cutin_true, cutin_false, cutin_positive, cutin_negative))
+        cutin_true, cutin_false, cutin_positive, cutin_negative))
 
     logging.info("--------------------SCORE-----------------------------")
     logging.info("          recall   precision    F1-score")
-    ctrue =  float(go_true + cutin_true)
+    ctrue = float(go_true + cutin_true)
     positive = float(go_positive + cutin_positive)
     tp = float((pred[y > 0.1] == 1).sum())
     recall = tp / ctrue if ctrue != 0 else 0.0
     precision = tp / positive if positive != 0 else 0.0
-    fscore = 2 * precision * recall / (precision +
-                recall) if precision + recall != 0 else 0.0
-    logging.info("Positive:{:6.3}     {:6.3}     {:6.3}".format(recall, precision, fscore))
+    fscore = 2 * precision * recall / (
+        precision + recall) if precision + recall != 0 else 0.0
+    logging.info("Positive:{:6.3}     {:6.3}     {:6.3}".format(
+        recall, precision, fscore))
 
     go_tp = float((pred[y == 1] == 1).sum())
     go_recall = go_tp / go_true if go_true != 0 else 0.0
     go_precision = go_tp / go_positive if go_positive != 0 else 0.0
-    go_fscore = 2 * go_precision * go_recall / (go_precision +
-                go_recall) if go_precision + go_recall != 0 else 0.0
-    logging.info("      Go:{:6.3}     {:6.3}     {:6.3}".format(go_recall, go_precision, go_fscore))
+    go_fscore = 2 * go_precision * go_recall / (
+        go_precision + go_recall) if go_precision + go_recall != 0 else 0.0
+    logging.info("      Go:{:6.3}     {:6.3}     {:6.3}".format(
+        go_recall, go_precision, go_fscore))
 
     cutin_tp = float((pred[y == 2] == 1).sum())
     cutin_recall = cutin_tp / cutin_true if cutin_true != 0 else 0.0
     cutin_precision = cutin_tp / cutin_positive if cutin_positive != 0 else 0.0
-    cutin_fscore = 2 * cutin_precision * cutin_recall / (cutin_precision +
-                cutin_recall) if cutin_precision + cutin_recall != 0 else 0.0
+    cutin_fscore = 2 * cutin_precision * cutin_recall / (
+        cutin_precision +
+        cutin_recall) if cutin_precision + cutin_recall != 0 else 0.0
     logging.info("   Cutin:{:6.3}     {:6.3}     {:6.3}".format(
         cutin_recall, cutin_precision, cutin_fscore))
     logging.info("-----------------------------------------------------\n\n")
 
-    performance = {'recall': [recall, go_recall, cutin_recall],
-            'precision': [precision, go_precision, cutin_precision]}
+    performance = {
+        'recall': [recall, go_recall, cutin_recall],
+        'precision': [precision, go_precision, cutin_precision]
+    }
     return performance
 
 
@@ -250,10 +261,11 @@ def save_model(model, param_norm, filename):
 
 if __name__ == "__main__":
 
-    parser = argparse.ArgumentParser(description =
-            'train neural network based on feature files and save parameters')
-    parser.add_argument('filename', type = str, help = 'h5 file of data.')
-    
+    parser = argparse.ArgumentParser(
+        description=
+        'train neural network based on feature files and save parameters')
+    parser.add_argument('filename', type=str, help='h5 file of data.')
+
     args = parser.parse_args()
     file = args.filename
 
@@ -266,11 +278,11 @@ if __name__ == "__main__":
 
     print "training size =", train_data.shape
 
-    X_train = train_data[:, 0 : dim_input]
+    X_train = train_data[:, 0:dim_input]
     Y_train = train_data[:, -1]
     Y_trainc = Y_train > 0.1
 
-    X_test = test_data[:, 0 : dim_input]
+    X_test = test_data[:, 0:dim_input]
     Y_test = test_data[:, -1]
     Y_testc = Y_test > 0.1
 
@@ -282,10 +294,7 @@ if __name__ == "__main__":
 
     model = setup_model()
 
-    model.fit(X_train, Y_trainc,
-        shuffle = True,
-        nb_epoch = 20,
-        batch_size = 32)
+    model.fit(X_train, Y_trainc, shuffle=True, nb_epoch=20, batch_size=32)
     print "Model trained success."
 
     X_test = (X_test - param_norm[0]) / param_norm[1]
@@ -293,9 +302,10 @@ if __name__ == "__main__":
     score = model.evaluate(X_test, Y_testc)
     print "\nThe accuracy on testing dat is", score[1]
 
-    logging.info("Test data loss: {}, accuracy: {} ".format(score[0], score[1]))
-    Y_train_hat = model.predict_classes(X_train, batch_size = 32)
-    Y_test_hat = model.predict_proba(X_test, batch_size = 32)
+    logging.info("Test data loss: {}, accuracy: {} ".format(
+        score[0], score[1]))
+    Y_train_hat = model.predict_classes(X_train, batch_size=32)
+    Y_test_hat = model.predict_proba(X_test, batch_size=32)
     logging.info("## Training Data:")
     evaluate_model(Y_train, Y_train_hat)
     for thres in [x / 100.0 for x in range(20, 80, 5)]:
@@ -305,7 +315,7 @@ if __name__ == "__main__":
 
     print "\nFor more detailed evaluation results, please refer to", \
           evaluation_log_path + ".log"
-    
+
     model_path = os.path.join(os.getcwd(), "mlp_model.bin")
     save_model(model, param_norm, model_path)
     print "Model has been saved to", model_path

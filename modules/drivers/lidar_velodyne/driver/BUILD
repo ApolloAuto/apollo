@@ -3,13 +3,14 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "velodyne_driver",
+    name = "driver",
     srcs = [
         "driver.cc",
         "input.cc",
     ],
     hdrs = [
         "driver.h",
+        "driver_nodelet.h",
         "input.h",
         "ring_sequence.h",
     ],
