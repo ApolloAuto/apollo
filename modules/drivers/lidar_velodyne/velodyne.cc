@@ -47,6 +47,18 @@ Status Velodyne::Start() {
       new std::thread(std::bind(&DriverNodelet::OnInit, &driver_nodelet_)));
   threads_.push_back(driver_thread);
 
+  std::shared_ptr<std::thread> cloud_thread(
+      new std::thread(std::bind(&CloudNodelet::OnInit, &cloud_nodelet_)));
+  threads_.push_back(cloud_thread);
+
+  std::shared_ptr<std::thread> transform_thread(new std::thread(
+      std::bind(&TransformNodelet::OnInit, &transform_nodelet_)));
+  threads_.push_back(transform_thread);
+
+  std::shared_ptr<std::thread> ringcolors_thread(new std::thread(
+      std::bind(&RingColorsNodelet::OnInit, &ringcolors_nodelet_)));
+  threads_.push_back(ringcolors_thread);
+
   ADEBUG << "Velodyne start done!";
   return Status::OK();
 }
