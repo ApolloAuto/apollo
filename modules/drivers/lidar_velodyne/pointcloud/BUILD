@@ -3,7 +3,7 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "velodyne_pointcloud",
+    name = "pointcloud",
     srcs = [
         "calibration.cc",
         "colors.cc",
@@ -13,11 +13,14 @@ cc_library(
     ],
     hdrs = [
         "calibration.h",
+        "cloud_nodelet.h",
         "colors.h",
         "convert.h",
         "point_types.h",
         "rawdata.h",
+        "ringcolors_nodelet.h",
         "transform.h",
+        "transform_nodelet.h",
     ],
     deps = [
         "//modules/common:log",
