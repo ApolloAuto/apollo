@@ -24,8 +24,8 @@
 #include <numeric>
 
 #include "modules/common/util/file.h"
-#include "modules/perception/obstacle/camera/lane_post_process/common/util.h"
 #include "modules/perception/lib/config_manager/calibration_config_manager.h"
+#include "modules/perception/obstacle/camera/lane_post_process/common/util.h"
 
 namespace apollo {
 namespace perception {
@@ -35,19 +35,13 @@ using std::pair;
 using std::string;
 using std::vector;
 
-vector<SpatialLabelType> spatialLUT({SpatialLabelType::L_UNKNOWN,
-                                    SpatialLabelType::L_UNKNOWN,
-                                    SpatialLabelType::L_2,
-                                    SpatialLabelType::L_1,
-                                    SpatialLabelType::L_0,
-                                    SpatialLabelType::L_UNKNOWN,
-                                    SpatialLabelType::R_0,
-                                    SpatialLabelType::R_1,
-                                    SpatialLabelType::R_2,
-                                    SpatialLabelType::R_UNKNOWN,
-                                    SpatialLabelType::R_UNKNOWN,
-                                    SpatialLabelType::L_UNKNOWN,
-                                    SpatialLabelType::R_UNKNOWN});
+vector<SpatialLabelType> spatialLUT(
+    {SpatialLabelType::L_UNKNOWN, SpatialLabelType::L_UNKNOWN,
+     SpatialLabelType::L_2, SpatialLabelType::L_1, SpatialLabelType::L_0,
+     SpatialLabelType::L_UNKNOWN, SpatialLabelType::R_0, SpatialLabelType::R_1,
+     SpatialLabelType::R_2, SpatialLabelType::R_UNKNOWN,
+     SpatialLabelType::R_UNKNOWN, SpatialLabelType::L_UNKNOWN,
+     SpatialLabelType::R_UNKNOWN});
 
 bool CCLanePostProcessor::Init() {
   // 1. get model config
@@ -83,9 +77,8 @@ bool CCLanePostProcessor::Init() {
     roi_.width = config_.roi(2);
     roi_.height = config_.roi(3);
     options_.frame.image_roi = roi_;
-    AINFO << "project ROI = [" << roi_.x << ", " << roi_.y << ", "
-           << roi_.width  << ", " << roi_.height
-           << "]";
+    AINFO << "project ROI = [" << roi_.x << ", " << roi_.y << ", " << roi_.width
+          << ", " << roi_.height << "]";
   }
 
   options_.frame.use_non_mask = config_.use_non_mask();
@@ -104,10 +97,10 @@ bool CCLanePostProcessor::Init() {
 
   CalibrationConfigManager *calibration_config_manager =
       Singleton<CalibrationConfigManager>::get();
-    const CameraCalibrationPtr camera_calibration =
-        calibration_config_manager->get_camera_calibration();
+  const CameraCalibrationPtr camera_calibration =
+      calibration_config_manager->get_camera_calibration();
 
-    trans_mat_ = camera_calibration->get_camera2car_homography_mat();
+  trans_mat_ = camera_calibration->get_camera2car_homography_mat();
 
   AINFO << "trans_mat_: " << trans_mat_;
 
@@ -335,8 +328,8 @@ bool CCLanePostProcessor::AddInstanceIntoLaneObject(
   // lane_object->lateral_distance = lane_object->pos[0].y();
 
   // Option 3: Use value at x=3
-  lane_object->lateral_distance = PolyEval(static_cast<float>(3.0),
-              lane_object->order, lane_object->model);
+  lane_object->lateral_distance =
+      PolyEval(static_cast<float>(3.0), lane_object->order, lane_object->model);
 
   return true;
 }
@@ -450,8 +443,8 @@ bool CCLanePostProcessor::AddInstanceIntoLaneObjectImage(
   // lane_object->lateral_distance = lane_object->pos[0].y();
 
   // Option 3: Use value at x=3
-  lane_object->lateral_distance = PolyEval(static_cast<float>(3.0),
-                            lane_object->order, lane_object->model);
+  lane_object->lateral_distance =
+      PolyEval(static_cast<float>(3.0), lane_object->order, lane_object->model);
 
   return true;
 }
@@ -530,9 +523,9 @@ bool CCLanePostProcessor::GenerateLaneInstances(const cv::Mat &lane_map) {
   return true;
 }
 
-bool CCLanePostProcessor::ProcessWithoutCC(const cv::Mat &lane_map,
-                                  const CameraLanePostProcessOptions &options,
-                                  LaneObjectsPtr *lane_objects) {
+bool CCLanePostProcessor::ProcessWithoutCC(
+    const cv::Mat &lane_map, const CameraLanePostProcessOptions &options,
+    LaneObjectsPtr *lane_objects) {
   if (!is_init_) {
     AERROR << "lane post-processor is not initialized";
     return false;
@@ -564,8 +557,8 @@ bool CCLanePostProcessor::ProcessWithoutCC(const cv::Mat &lane_map,
   int roi_width = roi_.width;
 
   // 1. Sample points on lane_map and project them onto world coordinate
-  int y = lane_map.rows*0.9 - 1;
-  int step_y = (y - 40)*(y - 40)/6400 + 1;
+  int y = lane_map.rows * 0.9 - 1;
+  int step_y = (y - 40) * (y - 40) / 6400 + 1;
 
   xy_points.clear();
   xy_points.resize(13);
@@ -579,9 +572,10 @@ bool CCLanePostProcessor::ProcessWithoutCC(const cv::Mat &lane_map,
       // lane on left
       if ((value > 0 && value < 5) || value == 11) {
         // right edge (inner) of the lane
-        if (value != round(lane_map.at<float>(y, x+1))) {
-          Eigen::Matrix<double, 3, 1> img_point(x*roi_width/lane_map.cols,
-                                  y*roi_height/lane_map.rows+roi_start, 1.0);
+        if (value != round(lane_map.at<float>(y, x + 1))) {
+          Eigen::Matrix<double, 3, 1> img_point(
+              x * roi_width / lane_map.cols,
+              y * roi_height / lane_map.rows + roi_start, 1.0);
           Eigen::Matrix<double, 3, 1> xy_p = trans_mat_ * img_point;
           Eigen::Matrix<double, 2, 1> xy_point;
           Eigen::Matrix<double, 2, 1> uv_point;
@@ -591,19 +585,20 @@ bool CCLanePostProcessor::ProcessWithoutCC(const cv::Mat &lane_map,
             ++x;
             continue;
           }
-          uv_point << static_cast<double>(x*roi_width/lane_map.cols),
-                    static_cast<double>(y*roi_height/lane_map.rows+roi_start);
+          uv_point << static_cast<double>(x * roi_width / lane_map.cols),
+              static_cast<double>(y * roi_height / lane_map.rows + roi_start);
           if (xy_points[value].size() < 5 || xy_point(0) < 50 ||
-            std::abs(xy_point(1) - xy_points[value].back()(1)) < 1) {
+              std::abs(xy_point(1) - xy_points[value].back()(1)) < 1) {
             xy_points[value].push_back(xy_point);
             uv_points[value].push_back(uv_point);
           }
         }
       } else if (value >= 5) {
         // left edge (inner) of the lane
-        if (value != round(lane_map.at<float>(y, x-1))) {
-          Eigen::Matrix<double, 3, 1> img_point(x*roi_width/lane_map.cols,
-                                  y*roi_height/lane_map.rows+roi_start, 1.0);
+        if (value != round(lane_map.at<float>(y, x - 1))) {
+          Eigen::Matrix<double, 3, 1> img_point(
+              x * roi_width / lane_map.cols,
+              y * roi_height / lane_map.rows + roi_start, 1.0);
           Eigen::Matrix<double, 3, 1> xy_p = trans_mat_ * img_point;
           Eigen::Matrix<double, 2, 1> xy_point;
           Eigen::Matrix<double, 2, 1> uv_point;
@@ -612,10 +607,10 @@ bool CCLanePostProcessor::ProcessWithoutCC(const cv::Mat &lane_map,
             ++x;
             continue;
           }
-          uv_point << static_cast<double>(x*roi_width/lane_map.cols),
-                    static_cast<double>(y*roi_height/lane_map.rows+roi_start);
+          uv_point << static_cast<double>(x * roi_width / lane_map.cols),
+              static_cast<double>(y * roi_height / lane_map.rows + roi_start);
           if (xy_points[value].size() < 5 || xy_point(0) < 50 ||
-            std::abs(xy_point(1) - xy_points[value].back()(1)) < 1) {
+              std::abs(xy_point(1) - xy_points[value].back()(1)) < 1) {
             xy_points[value].push_back(xy_point);
             uv_points[value].push_back(uv_point);
           }
@@ -623,13 +618,13 @@ bool CCLanePostProcessor::ProcessWithoutCC(const cv::Mat &lane_map,
       }
       ++x;
     }
-    step_y = (y - 45)*(y - 45)/6400 + 1;
+    step_y = (y - 45) * (y - 45) / 6400 + 1;
     y -= step_y;
   }
 
   auto elapsed_1 = std::chrono::high_resolution_clock::now() - start;
   int64_t microseconds_1 =
-    std::chrono::duration_cast<std::chrono::microseconds>(elapsed_1).count();
+      std::chrono::duration_cast<std::chrono::microseconds>(elapsed_1).count();
   AINFO << "**** Time for sampling: " << microseconds_1 << " us";
   time_1 += microseconds_1;
 
@@ -651,19 +646,17 @@ bool CCLanePostProcessor::ProcessWithoutCC(const cv::Mat &lane_map,
   }
   auto elapsed_2 = std::chrono::high_resolution_clock::now() - start;
   int64_t microseconds_2 =
-    std::chrono::duration_cast<std::chrono::microseconds>(elapsed_2).count();
+      std::chrono::duration_cast<std::chrono::microseconds>(elapsed_2).count();
   time_2 += microseconds_2 - microseconds_1;
-  AINFO << "**** Time for Ransac: "
-        << microseconds_2 - microseconds_1 << " us";
+  AINFO << "**** Time for Ransac: " << microseconds_2 - microseconds_1 << " us";
   // 3. Write values into lane_objects
   vector<float> c0s(13, 0);
   for (int i = 1; i < 13; ++i) {
     if (xy_points[i].size() < minNumPoints) continue;
-    c0s[i] = GetPolyValue(static_cast<float>(coeffs[i](3)),
-                          static_cast<float>(coeffs[i](2)),
-                          static_cast<float>(coeffs[i](1)),
-                          static_cast<float>(coeffs[i](0)),
-                          static_cast<float>(3.0));
+    c0s[i] = GetPolyValue(
+        static_cast<float>(coeffs[i](3)), static_cast<float>(coeffs[i](2)),
+        static_cast<float>(coeffs[i](1)), static_cast<float>(coeffs[i](0)),
+        static_cast<float>(3.0));
   }
   // [1] determine lane spatial tag in special cases
   if (xy_points[4].size() < minNumPoints &&
@@ -672,7 +665,7 @@ bool CCLanePostProcessor::ProcessWithoutCC(const cv::Mat &lane_map,
     std::swap(coeffs[4], coeffs[5]);
     std::swap(c0s[4], c0s[5]);
   } else if (xy_points[6].size() < minNumPoints &&
-              xy_points[5].size() >= minNumPoints) {
+             xy_points[5].size() >= minNumPoints) {
     std::swap(xy_points[6], xy_points[5]);
     std::swap(coeffs[6], coeffs[5]);
     std::swap(c0s[6], c0s[5]);
@@ -696,7 +689,7 @@ bool CCLanePostProcessor::ProcessWithoutCC(const cv::Mat &lane_map,
   }
 
   if (xy_points[6].size() < minNumPoints &&
-              xy_points[12].size() >= minNumPoints) {
+      xy_points[12].size() >= minNumPoints) {
     // use right lane boundary as the left most missing right lane,
     bool use_boundary = true;
     for (int k = 7; k <= 9; ++k) {
@@ -721,12 +714,16 @@ bool CCLanePostProcessor::ProcessWithoutCC(const cv::Mat &lane_map,
     cur_object.spatial = spatialLUT[i];
 
     // [3] determine which lines are valid according to the y value at x = 3
-    if (i < 5 && c0s[i] < c0s[i+1]) continue;
-    else if (i > 5 && i < 10 && c0s[i] > c0s[i-1]) continue;
+    if (i < 5 && c0s[i] < c0s[i + 1])
+      continue;
+    else if (i > 5 && i < 10 && c0s[i] > c0s[i - 1])
+      continue;
     if (i == 11 || i == 12) {
       std::sort(c0s.begin(), c0s.begin() + 10);
-      if (c0s[i] > c0s[0] && i == 12) continue;
-      else if (c0s[i] < c0s[9] && i == 11) continue;
+      if (c0s[i] > c0s[0] && i == 12)
+        continue;
+      else if (c0s[i] < c0s[9] && i == 11)
+        continue;
     }
 
     // [4] write values
@@ -746,9 +743,9 @@ bool CCLanePostProcessor::ProcessWithoutCC(const cv::Mat &lane_map,
                             static_cast<float>(coeffs[i](1)),
                             static_cast<float>(coeffs[i](0))};
     cur_object.model << static_cast<ScalarType>(coeffs[i](0)),  // c0
-            static_cast<ScalarType>(coeffs[i](1)),  // c1
-            static_cast<ScalarType>(coeffs[i](2)),  // c2
-            static_cast<ScalarType>(coeffs[i](3));  // c3
+        static_cast<ScalarType>(coeffs[i](1)),                  // c1
+        static_cast<ScalarType>(coeffs[i](2)),                  // c2
+        static_cast<ScalarType>(coeffs[i](3));                  // c3
 
     cur_object.confidence.push_back(1);
     (*lane_objects)->push_back(cur_object);
@@ -757,8 +754,10 @@ bool CCLanePostProcessor::ProcessWithoutCC(const cv::Mat &lane_map,
   int has_center_ = 0;
   for (auto lane_ : *(*lane_objects)) {
     if (lane_.newSpatial == 5) {
-      if (lane_.model(0) >= 0) has_center_ = 1;
-      else if (lane_.model(0) < 0) has_center_ = 2;
+      if (lane_.model(0) >= 0)
+        has_center_ = 1;
+      else if (lane_.model(0) < 0)
+        has_center_ = 2;
       break;
     }
   }
@@ -781,14 +780,16 @@ bool CCLanePostProcessor::ProcessWithoutCC(const cv::Mat &lane_map,
 
   auto elapsed = std::chrono::high_resolution_clock::now() - start;
   int64_t microseconds =
-    std::chrono::duration_cast<std::chrono::microseconds>(elapsed).count();
+      std::chrono::duration_cast<std::chrono::microseconds>(elapsed).count();
   AINFO << "Time for writing: " << microseconds - microseconds_2 << " us";
   time_3 += microseconds - microseconds_2;
   time_num += 1;
 
-  AINFO << "Avg sampling time: " << time_1/time_num
-        << " Avg ransac time: " << time_2/time_num
-        << " Avg writing time: " << time_3/time_num;
+  AINFO << "Avg sampling time: " << time_1 / time_num
+        << " Avg ransac time: " << time_2 / time_num
+        << " Avg writing time: " << time_3 / time_num;
+
+  return true;
 }
 
 bool CCLanePostProcessor::Process(const cv::Mat &lane_map,
@@ -895,7 +896,7 @@ bool CCLanePostProcessor::Process(const cv::Mat &lane_map,
                << " points, lateral distance="
                << (*lane_objects)->at(count_lane_objects).lateral_distance;
         origin_lateral_dist_object_id.push_back(
-          std::make_pair(cur_object.lateral_distance, count_lane_objects++));
+            std::make_pair(cur_object.lateral_distance, count_lane_objects++));
         ADEBUG << "generate a new lane object from instance";
         continue;
       }
@@ -1007,9 +1008,7 @@ bool CCLanePostProcessor::Process(const cv::Mat &lane_map,
     std::sort(origin_lateral_dist_object_id.begin(),
               origin_lateral_dist_object_id.end(),
               [](const pair<ScalarType, int> &a,
-                 const pair<ScalarType, int> &b) {
-                return a.first > b.first;
-              });
+                 const pair<ScalarType, int> &b) { return a.first > b.first; });
 
     int index_closest_left = -1;
     for (int k = 0; k < count_lane_objects; ++k) {
@@ -1192,7 +1191,7 @@ bool CCLanePostProcessor::CorrectWithLaneHistory(int l,
       Eigen::VectorXf p = Eigen::VectorXf::Zero(len);
       p[0] = pos.x();
       p[1] = pos.y();
-      p[len-1] = 1.0;
+      p[len - 1] = 1.0;
       p = motion_buffer_->at(i).motion * p;
       project_p << p[0], p[1];
       if (project_p.x() <= 0) continue;
@@ -1205,9 +1204,8 @@ bool CCLanePostProcessor::CorrectWithLaneHistory(int l,
   // fit polynomial model and compute lateral distance for lane object
   lane.point_num = lane.pos.size();
 
-  if (lane.point_num < 3 ||
-      lane.longitude_end - lane.longitude_start <
-          options_.frame.max_size_to_fit_straight_line) {
+  if (lane.point_num < 3 || lane.longitude_end - lane.longitude_start <
+                                options_.frame.max_size_to_fit_straight_line) {
     // fit a 1st-order polynomial curve (straight line)
     lane.order = 1;
   } else {
@@ -1326,11 +1324,10 @@ void CCLanePostProcessor::FilterWithLaneHistory(LaneObjectsPtr lane_objects) {
   for (size_t i = 0; i < lane_objects->size(); i++) {
     Eigen::VectorXf start_pos;
     if (motion_buffer_->size() > 0) {
-      start_pos =
-        Eigen::VectorXf::Zero(motion_buffer_->at(0).motion.cols());
+      start_pos = Eigen::VectorXf::Zero(motion_buffer_->at(0).motion.cols());
       start_pos[0] = lane_objects->at(i).pos[0].x();
       start_pos[1] = lane_objects->at(i).pos[0].y();
-      start_pos[motion_buffer_->at(0).motion.cols()-1] = 1.0;
+      start_pos[motion_buffer_->at(0).motion.cols() - 1] = 1.0;
     }
     for (size_t j = 0; j < lane_history_.size(); j++) {
       // iter to find corresponding lane
