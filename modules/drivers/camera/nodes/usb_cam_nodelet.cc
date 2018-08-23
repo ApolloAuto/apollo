@@ -39,16 +39,16 @@ class UsbCamNodelet: public nodelet::Nodelet {
 
  private:
   virtual void onInit();
-  boost::shared_ptr<UsbCamWrapper> usb_cam_ = nullptr;
+  boost::shared_ptr<UsbCamWrapper> usb_cam_wrapper_ = nullptr;
   boost::shared_ptr<boost::thread> device_thread_ = nullptr;
 };
 
 void UsbCamNodelet::onInit() {
   ROS_INFO("Usb cam nodelet init");
-  usb_cam_.reset(new UsbCamWrapper(getNodeHandle(), getPrivateNodeHandle()));
+  usb_cam_wrapper_.reset(new UsbCamWrapper(getNodeHandle(), getPrivateNodeHandle()));
   // spawn device poll thread
   device_thread_ = boost::shared_ptr<boost::thread>
-        (new boost::thread(boost::bind(&UsbCamWrapper::spin, usb_cam_)));
+        (new boost::thread(boost::bind(&UsbCamWrapper::spin, usb_cam_wrapper_)));
 }
 
 }  // namespace camera
@@ -58,6 +58,6 @@ void UsbCamNodelet::onInit() {
 // Register this plugin with pluginlib.  Names must match nodelets.xml.
 //
 // parameters: package, class name, class type, base class type
-PLUGINLIB_DECLARE_CLASS(usb_cam, UsbCamNodelet,
+PLUGINLIB_DECLARE_CLASS(camera, UsbCamNodelet,
                         ::apollo::drivers::camera::UsbCamNodelet,
                          nodelet::Nodelet);

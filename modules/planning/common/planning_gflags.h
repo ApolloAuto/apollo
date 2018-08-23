@@ -26,6 +26,7 @@ DECLARE_string(planning_config_file);
 DECLARE_string(planning_adapter_config_filename);
 DECLARE_string(traffic_rule_config_filename);
 DECLARE_string(smoother_config_filename);
+DECLARE_string(reopt_smoother_config_filename);
 DECLARE_int32(planning_loop_rate);
 DECLARE_bool(enable_collision_detection);
 DECLARE_string(rtk_trajectory_filename);
@@ -193,6 +194,8 @@ DECLARE_double(bound_buffer);
 DECLARE_double(nudge_buffer);
 
 DECLARE_bool(use_planning_fallback);
+DECLARE_double(fallback_total_time);
+DECLARE_double(fallback_time_unit);
 
 // navigation mode
 DECLARE_double(navigation_fallback_cruise_time);

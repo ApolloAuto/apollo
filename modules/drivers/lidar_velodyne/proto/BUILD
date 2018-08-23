@@ -1,15 +1,29 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_proto_library(
-    name = "velodyne_proto",
+    name = "cloud_node_conf_proto",
     deps = [
-        ":velodyne_proto_lib",
+        ":cloud_node_conf_proto_lib",
     ],
 )
 
 proto_library(
-    name = "velodyne_proto_lib",
+    name = "cloud_node_conf_proto_lib",
     srcs = [
-        "velodyne_conf.proto",
+        "cloud_node_conf.proto",
+    ],
+)
+
+cc_proto_library(
+    name = "transform_node_conf_proto",
+    deps = [
+        ":transform_node_conf_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "transform_node_conf_proto_lib",
+    srcs = [
+        "transform_node_conf.proto",
     ],
 )

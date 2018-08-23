@@ -85,7 +85,6 @@ SMALL_TOPICS = [
 LARGE_TOPICS = [
     '/apollo/sensor/camera/traffic/image_short',
     '/apollo/sensor/camera/traffic/image_long',
-    '/apollo/sensor/camera/obstacle/front_6mm',
     '/apollo/sensor/velodyne64/compensator/PointCloud2',
     '/apollo/sensor/velodyne16/compensator/PointCloud2',
 ]
@@ -116,6 +115,8 @@ class ArgManager(object):
                                  'that case, the False value is ignored.')
         self.parser.add_argument('--stop', default=False, action="store_true",
                                  help='Stop recorder.')
+        self.parser.add_argument('--additional_topics', action='append',
+                                 help='Record additional topics.')
         self.parser.add_argument('--all', default=False, action="store_true",
                                  help='Record all topics even without high '
                                  'performance disks.')
@@ -179,10 +180,13 @@ class Recorder(object):
         record_all = self.args.all or (len(disks) > 0 and disks[0]['is_nvme'])
         # Use the best disk, or fallback '/apollo' if none available.
         disk_to_use = disks[0]['mountpoint'] if len(disks) > 0 else '/apollo'
+
+        topics = SMALL_TOPICS.copy()
         if record_all:
-            self.record_task(disk_to_use, SMALL_TOPICS + LARGE_TOPICS)
-        else:
-            self.record_task(disk_to_use, SMALL_TOPICS)
+            topics.extend(LARGE_TOPICS)
+        if self.args.additional_topics:
+            topics.extend(self.args.additional_topics)
+        self.record_task(disk_to_use, topics)
 
     def stop(self):
         """Stop recording."""

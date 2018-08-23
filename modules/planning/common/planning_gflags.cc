@@ -40,6 +40,10 @@ DEFINE_string(smoother_config_filename,
               "modules/planning/conf/qp_spline_smoother_config.pb.txt",
               "The configuration file for qp_spline smoother");
 
+DEFINE_string(reopt_smoother_config_filename,
+              "modules/planning/conf/qp_spline_smoother_config.pb.txt",
+              "The configuration file for qp_spline smoother");
+
 DEFINE_string(rtk_trajectory_filename, "modules/planning/data/garage.csv",
               "Loop rate for planning node");
 
@@ -357,6 +361,9 @@ DEFINE_double(nudge_buffer, 0.3, "buffer to nudge for lateral optimization");
 
 DEFINE_bool(use_planning_fallback, true,
             "Use fallback trajectory for planning.");
+DEFINE_double(fallback_total_time, 3.0, "total fallback trajectory time");
+DEFINE_double(fallback_time_unit, 0.02,
+              "fallback trajectory unit time in seconds");
 
 // navigation mode
 DEFINE_double(navigation_fallback_cruise_time, 8.0,

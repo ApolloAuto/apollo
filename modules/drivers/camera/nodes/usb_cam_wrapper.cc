@@ -38,7 +38,7 @@ UsbCamWrapper::UsbCamWrapper(ros::NodeHandle node, ros::NodeHandle private_nh) :
   sensor_image_.set_encoding(img_.encoding);
   sensor_image_.set_step(img_.step);  // Full row length in bytes
   // actual matrix data, size is (step * rows)
-  size_t data_length = img_.step * image_height_;
+  size_t data_length = img_.step * img_.height;
   std::string image_data;
   image_data.assign(reinterpret_cast<const char *>(img_.data.data()), data_length);
   sensor_image_.set_data(image_data);
