@@ -57,7 +57,7 @@
 #include <sensor_msgs/fill_image.h>
 #include <boost/lexical_cast.hpp>
 
-#include "include/adv_trigger_ctl.h"
+#include "adv_plat/include/adv_trigger.h"
 
 #define CLEAR(x) memset(&(x), 0, sizeof(x))
 
