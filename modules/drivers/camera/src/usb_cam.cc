@@ -261,8 +261,10 @@ static void yuyv2rgb(char *YUV, char *RGB, int NumPixels) {
 void rgb242rgb(char *YUV, char *RGB, int NumPixels) {
   memcpy(RGB, YUV, NumPixels * 3);
 }
+
 UsbCam::UsbCam()
-    : io_(IO_METHOD_MMAP),
+    : is_capturing_(false),
+      io_(IO_METHOD_MMAP),
       fd_(-1),
       n_buffers_(0),
       avframe_camera_(NULL),
@@ -273,8 +275,8 @@ UsbCam::UsbCam()
       avframe_camera_size_(0),
       avframe_rgb_size_(0),
       video_sws_(NULL),
-      image_(NULL),
-      is_capturing_(false) {}
+      image_(NULL) {}
+
 UsbCam::~UsbCam() { shutdown(); }
 
 int UsbCam::init_mjpeg_decoder(int image_width, int image_height) {
@@ -385,7 +387,6 @@ bool UsbCam::process_image(const void *src, int len,
 
 int UsbCam::read_frame() {
   struct v4l2_buffer v4l_buf;
-  unsigned int i;
   int len;
   bool result = false;
 
