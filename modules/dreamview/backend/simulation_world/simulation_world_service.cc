@@ -644,8 +644,7 @@ void SimulationWorldService::FindNudgeRegion(
     const Object &world_obj, Decision *world_decision) {
   std::vector<apollo::common::math::Vec2d> points;
   for (auto &polygon_pt : world_obj.polygon_point()) {
-    points.emplace_back(polygon_pt.x() + map_service_->GetXOffset(),
-                        polygon_pt.y() + map_service_->GetYOffset());
+    points.emplace_back(polygon_pt.x(), polygon_pt.y());
   }
   const apollo::common::math::Polygon2d obj_polygon(points);
   const apollo::common::math::Polygon2d &nudge_polygon =
