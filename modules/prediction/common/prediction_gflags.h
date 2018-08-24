@@ -38,6 +38,7 @@ DECLARE_double(min_prediction_length);
 
 // Bag replay timestamp gap
 DECLARE_double(replay_timestamp_gap);
+DECLARE_int32(max_num_dump_feature);
 
 // Map
 DECLARE_double(lane_search_radius);
