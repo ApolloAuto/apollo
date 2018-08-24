@@ -24,6 +24,7 @@ cc_library(
     ],
     deps = [
         "//modules/common:log",
+        "//modules/drivers/lidar_velodyne/common:velodyne_gflags",
         "//modules/drivers/lidar_velodyne/proto:cloud_node_conf_proto",
         "//modules/drivers/lidar_velodyne/proto:transform_node_conf_proto",
         "@eigen",

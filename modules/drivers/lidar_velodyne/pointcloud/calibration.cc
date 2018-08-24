@@ -147,7 +147,7 @@ void operator>>(const YAML::Node& node, Calibration& calibration) {
   const YAML::Node& lasers = node[LASERS];
   calibration.laser_corrections.clear();
   calibration.num_lasers = num_lasers;
-  for (int i = 0; i < num_lasers; i++) {
+  for (int i = 0; i < num_lasers; ++i) {
     std::pair<int, LaserCorrection> correction;
     lasers[i] >> correction;
     calibration.laser_corrections.insert(correction);
