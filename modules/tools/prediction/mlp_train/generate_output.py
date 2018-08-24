@@ -65,23 +65,22 @@ def extract_mlp_features(filename):
     return mlp_features
 
 
-def generate_h5_file(filename, output_file):
+def generate_output(filename, output_file):
     features = extract_mlp_features(filename)
     if (features is None) or (np.size(features) == 0):
         print("Failed to extract mlp features from {}".format(filename))
         return
-    h5_file = h5py.File(output_file, 'w')
-    h5_file.create_dataset('data', data=features)
-    h5_file.close()
+    features = features.astype(np.float32)
+    features.tofile(output_file)
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Generate H5 files')
+    parser = argparse.ArgumentParser(description='Generate .bin files for tensorflow')
     parser.add_argument('input', type=str, help='input file')
     parser.add_argument('output', type=str, help='output file')
     args = parser.parse_args()
-    print("Creating H5: {} -> {}".format(args.input, args.output))
+    print("Creating .bin: {} -> {}".format(args.input, args.output))
     if os.path.isfile(args.input):
-        generate_h5_file(args.input, args.output)
+        generate_output(args.input, args.output)
     else:
         print("{} is not a valid file.".format(args.input))
