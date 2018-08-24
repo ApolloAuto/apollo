@@ -1,6 +1,3 @@
-
---work_root=modules/perception
-
 ####################################################################
 # Flags from tool/export_sensor_data/export_sensor_data.cc
 # pcd path

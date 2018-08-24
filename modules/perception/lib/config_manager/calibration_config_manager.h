@@ -121,7 +121,6 @@ class CalibrationConfigManager {
   std::string camera_extrinsic_path_;
   std::string camera_intrinsic_path_;
   std::string radar_extrinsic_path_;
-  std::string work_root_;
   CameraCalibrationPtr camera_calibration_;
   RadarCalibrationPtr radar_calibration_;
 
