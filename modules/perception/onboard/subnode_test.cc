@@ -46,13 +46,11 @@ class MySubnode : public Subnode {
 };
 
 TEST(SubnodeTest, test_init) {
-  FLAGS_work_root = "modules/perception";
-  std::string dag_config_path =
-      FLAGS_work_root + "/data/onboard_test/dag_streaming.config";
-  std::string content;
+  const std::string dag_config_path =
+      "modules/perception/data/onboard_test/dag_streaming.config";
   DAGConfig dag_config;
-  ASSERT_TRUE(apollo::common::util::GetContent(dag_config_path, &content));
-  ASSERT_TRUE(TextFormat::ParseFromString(content, &dag_config));
+  ASSERT_TRUE(
+      apollo::common::util::GetProtoFromFile(dag_config_path, &dag_config));
   EventManager event_manager;
   ASSERT_TRUE(event_manager.Init(dag_config.edge_config()));
 

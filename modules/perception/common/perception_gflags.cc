@@ -20,9 +20,6 @@ DEFINE_string(perception_adapter_config_filename,
               "modules/perception/conf/adapter.conf",
               "The adapter config filename");
 
-DEFINE_string(work_root, "/apollo/modules/perception/",
-              "perception work root direcotry.");
-
 /// obstacle/base/object.cc
 DEFINE_bool(is_serialize_point_cloud, false,
             "serialize and output object cloud");
@@ -53,7 +50,7 @@ DEFINE_bool(enable_visualization, false, "enable visualization for debug");
 
 /// obstacle/perception.cc
 /* dag streaming config for Apollo 2.0 */
-DEFINE_string(dag_config_path, "./conf/dag_streaming.config",
+DEFINE_string(dag_config_path, "modules/perception/conf/dag_streaming.config",
               "Onboard DAG Streaming config.");
 
 /// obstacle/onboard/radar_process_subnode.cc
