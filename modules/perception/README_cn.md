@@ -98,7 +98,7 @@ subnode_config {
 # Define all edges which link nodes.
 edge_config {
 
-    # CameraDetectorSubnode -> LanePostProcessingSubnode
+    # CameraProcessSubnode -> LanePostProcessingSubnode
     edges {
         id: 106
         from_node: 3

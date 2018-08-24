@@ -58,7 +58,7 @@ bool DAGStreaming::Init(const string& dag_config_path) {
 
   DAGConfig dag_config;
   CHECK(apollo::common::util::GetProtoFromFile(dag_config_path, &dag_config))
-      << "failed to laod DAGConfig file: " << dag_config_path;
+      << "failed to load DAGConfig file: " << dag_config_path;
 
   if (!event_manager_.Init(dag_config.edge_config())) {
     AERROR << "failed to Init EventManager. file: " << dag_config_path;

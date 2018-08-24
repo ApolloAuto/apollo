@@ -39,7 +39,7 @@ class SunnyvaleBigLoopTest : public PerceptionTestBase {
   virtual void SetUp() {
     FLAGS_map_dir = "modules/map/data/sunnyvale_big_loop";
     FLAGS_test_base_map_filename = "base_map.bin";
-    AERROR << "SetUp done.";
+    AINFO << "SetUp done.";
   }
 };
 
@@ -50,7 +50,7 @@ TEST_F(SunnyvaleBigLoopTest, test_01) {
   PerceptionTestBase::SetUp();
 
   // TODO(All): implement sunnyvale big loop test here.
-  AERROR << "test done.";
+  AINFO << "test done.";
 }
 
 }  // namespace perception
