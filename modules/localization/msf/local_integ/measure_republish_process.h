@@ -22,21 +22,21 @@
 #ifndef MODULES_LOCALIZATION_MSF_MEASURE_REPUBLISH_PROCESS_H_
 #define MODULES_LOCALIZATION_MSF_MEASURE_REPUBLISH_PROCESS_H_
 
-#include <list>
-#include <string>
-#include <mutex>
 #include <cmath>
 #include <cstdint>
+#include <list>
+#include <mutex>
+#include <string>
 
 #include "Eigen/Core"
 #include "Eigen/Geometry"
 
+#include "include/sins_struct.h"
 #include "modules/common/status/status.h"
 #include "modules/drivers/gnss/proto/gnss_best_pose.pb.h"
-#include "modules/localization/proto/localization.pb.h"
 #include "modules/localization/msf/common/util/frame_transform.h"
 #include "modules/localization/msf/local_integ/localization_params.h"
-#include "include/sins_struct.h"
+#include "modules/localization/proto/localization.pb.h"
 
 /**
  * @namespace apollo::localization::msf
@@ -64,27 +64,27 @@ class MeasureRepublishProcess {
 
   // GNSS message process
   bool NovatelBestgnssposProcess(const GnssBestPose& bestgnsspos_msg,
-                                 MeasureData *measure);
+                                 MeasureData* measure);
   void GnssLocalProcess(const MeasureData& gnss_local_msg,
-                        MeasureData *measure);
+                        MeasureData* measure);
 
   // integrated message process
   void IntegPvaProcess(const InsPva& inspva_msg);
 
   // lidar message process
   bool LidarLocalProcess(const LocalizationEstimate& lidar_local_msg,
-                         MeasureData *measure);
+                         MeasureData* measure);
 
  protected:
   bool IsSinsAlign();
   bool CheckBestgnssposeStatus(const GnssBestPose& bestgnsspos_msg);
   bool CheckBestgnssPoseXYStd(const GnssBestPose& bestgnsspos_msg);
-  void TransferXYZFromBestgnsspose(
-      const GnssBestPose& bestgnsspos_msg, MeasureData *measure);
-  void TransferFirstMeasureFromBestgnsspose(
-      const GnssBestPose& bestgnsspos_msg, MeasureData *measure);
-  bool CalculateVelFromBestgnsspose(
-      const GnssBestPose& bestgnsspos_msg, MeasureData *measure);
+  void TransferXYZFromBestgnsspose(const GnssBestPose& bestgnsspos_msg,
+                                   MeasureData* measure);
+  void TransferFirstMeasureFromBestgnsspose(const GnssBestPose& bestgnsspos_msg,
+                                            MeasureData* measure);
+  bool CalculateVelFromBestgnsspose(const GnssBestPose& bestgnsspos_msg,
+                                    MeasureData* measure);
 
  private:
   MeasureData pre_bestgnsspose_;
@@ -97,7 +97,6 @@ class MeasureRepublishProcess {
 
   int local_utm_zone_id_;
   bool is_trans_gpstime_to_utctime_;
-  bool debug_log_flag_;
 
   double map_height_time_;
   std::mutex height_mutex_;

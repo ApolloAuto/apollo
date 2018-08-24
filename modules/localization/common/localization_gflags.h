@@ -71,7 +71,6 @@ DECLARE_double(integ_sins_state_span_time);
 DECLARE_double(integ_sins_state_pos_std);
 
 DECLARE_double(vel_threshold_get_yaw);
-DECLARE_bool(integ_debug_log_flag);
 
 // gnss module
 DECLARE_bool(enable_ins_aid_rtk);
