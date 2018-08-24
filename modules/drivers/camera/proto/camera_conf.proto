@@ -1,21 +1,38 @@
 syntax = "proto2";
 
-package apollo.drivers.lidar_velodyne;
+package apollo.drivers.camera;
 
 message CameraConf {
   required uint32 index = 1 [default = 0];
   optional string position = 2 [default = "centre"];
   // packet params
-  optional string video_device = 3;
-  optional double image_width = 4;
-  optional double image_height = 5;
-  optional string pixel_format = 6;  
-  optional uint64 frame_rate = 7;
-  optional string camera_frame_id = 8;
-  optional string io_method = 9;    
-  optional uint32 camera_timeout = 10;
-  optional uint32 error_code = 11;
-  optional string camera_info_url = 12;
-  optional string trigger_internal = 13;
-  optional string trigger_fps = 14;
+  optional string topic_name = 3 [ default="" ];
+  optional string video_device = 4 [ default="/dev/video0"];
+  optional string camera_name = 5 [ default="head_camera" ];
+  optional string camera_info_url = 6 [ default="" ];
+  optional string camera_frame_id = 7 [ default="" ];
+  optional uint32 camera_timeout = 8 [ default=1000 ];
+  optional double spin_interval = 9 [ default=0.005 ];
+  // possible values: mmap, read, userptr
+  optional string io_method = 10 [ default="mmap" ];
+  // possible values: yuyv, uyvy, mjpeg, yuvmono10, rgb24
+  optional string pixel_format = 11 [ default="mjpeg" ];
+  optional uint32 image_width = 12 [ default=640 ];
+  optional uint32 image_height = 13 [ default=480 ];
+  optional uint64 frame_rate = 14 [ default=30 ];
+  optional int32 brightness = 15 [ default=-1 ];  // 0-255, -1 "leave alone"
+  optional int32 contrast = 16 [ default=-1 ];  //  0-255, -1 "leave alone"
+  optional int32 saturation = 17 [ default=-1 ];  //  0-255, -1 "leave alone"
+  optional int32 sharpness = 18 [ default=-1 ];  //  0-255, -1 "leave alone"
+  optional int32 gain = 19 [ default=-1 ];  //  0-255, -1 "leave alone"
+  optional bool autoexposure = 20 [ default=true ];
+  optional uint32 exposure = 21 [ default=100 ];
+  optional bool autofocus = 22 [ default=false ];
+  optional int32 focus = 23 [ default=-1 ];  //  0-255, -1 "leave alone"
+  optional bool auto_white_balance = 24 [ default=true ];
+  optional int32 white_balance = 25 [ default=4000 ];
+  optional uint32 trigger_internal = 26 [ default=0 ];
+  optional uint32 trigger_fps = 27 [ default=30 ];
+  optional uint32 error_code = 28 [ default=0 ];
+
 }

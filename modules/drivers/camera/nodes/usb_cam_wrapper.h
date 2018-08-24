@@ -17,6 +17,7 @@
 #ifndef MODULES_DRIVERS_CAMERA_NODES_USB_CAM_WRAPPER_H_
 #define MODULES_DRIVERS_CAMERA_NODES_USB_CAM_WRAPPER_H_
 
+#include "modules/drivers/camera/proto/camera_conf.pb.h"
 #include "modules/drivers/camera/src/usb_cam.h"
 #include "modules/drivers/proto/sensor_image.pb.h"
 
@@ -50,6 +51,7 @@ class UsbCamWrapper {
   bool spin();
 
  private:
+  CameraConf config_;
   // shared image message
   sensor_msgs::Image img_;
   ::apollo::drivers::Image sensor_image_;
@@ -61,36 +63,6 @@ class UsbCamWrapper {
 
   ros::Publisher cam_info_pub_;
 
-  // parameters
-  std::string topic_name_;
-  std::string video_device_name_;
-  std::string io_method_name_;
-  std::string pixel_format_name_;
-  std::string camera_name_;
-  std::string camera_info_url_;
-
-  // std::string start_service_name_, start_service_name_;
-  // bool streaming_status_;
-  int image_width_ = 0;
-  int image_height_ = 0;
-  int framerate_ = 0;
-  int exposure_ = 0;
-  int brightness_ = 0;
-  int contrast_ = 0;
-  int saturation_ = 0;
-  int sharpness_ = 0;
-  int focus_ = 0;
-  int white_balance_ = 0;
-  int gain_ = 0;
-  int trigger_internal_ = 0;
-  int trigger_fps_ = 0;
-
-  bool autofocus_;
-  bool autoexposure_;
-  bool auto_white_balance_;
-
-  // usb will be reset when camera timeout
-  int cam_timeout_;
   UsbCam cam_;
   boost::shared_ptr<camera_info_manager::CameraInfoManager> cinfo_;
 
@@ -104,8 +76,6 @@ class UsbCamWrapper {
   ros::Time last_stamp_;
   float frame_warning_interval_;
   float frame_drop_interval_;
-  float spin_interval_;
-  int error_code_;
 };
 
 }  // namespace camera

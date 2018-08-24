@@ -14,13 +14,17 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/drivers/camera/nodes/usb_cam_wrapper.h"
-#include "modules/drivers/proto/sensor_image.pb.h"
-
 #include <time.h>   /* for clock_gettime */
 
 #include "image_transport/camera_common.h"
 #include "image_transport/publisher_plugin.h"
+
+#include "modules/common/log.h"
+#include "modules/common/util/file.h"
+#include "modules/drivers/camera/common/camera_gflags.h"
+#include "modules/drivers/proto/sensor_image.pb.h"
+
+#include "modules/drivers/camera/nodes/usb_cam_wrapper.h"
 
 namespace apollo {
 namespace drivers {
@@ -28,6 +32,12 @@ namespace camera {
 
 UsbCamWrapper::UsbCamWrapper(ros::NodeHandle node, ros::NodeHandle private_nh) :
     node_(node), priv_node_(private_nh), last_stamp_(0) {
+  if (!::apollo::common::util::GetProtoFromFile(FLAGS_camera_config_file,
+                                                &config_)) {
+    AERROR << "Unable to load camera conf file: " << FLAGS_camera_config_file;
+    return;
+  }
+
   // pb
   // http://docs.ros.org/melodic/api/sensor_msgs/html/msg/Image.html
   sensor_image_.mutable_header()->set_camera_timestamp(img_.header.stamp.toSec());
@@ -43,57 +53,22 @@ UsbCamWrapper::UsbCamWrapper(ros::NodeHandle node, ros::NodeHandle private_nh) :
   image_data.assign(reinterpret_cast<const char *>(img_.data.data()), data_length);
   sensor_image_.set_data(image_data);
 
-  // grab the parameters
-  priv_node_.param("topic_name", topic_name_, std::string("image_raw0"));
-  priv_node_.param("video_device", video_device_name_,
-                   std::string("/dev/video0"));
-  priv_node_.param("brightness", brightness_, -1);  // 0-255, -1 "leave alone"
-  priv_node_.param("contrast", contrast_, -1);  // 0-255, -1 "leave alone"
-  priv_node_.param("saturation", saturation_, -1);  // 0-255, -1 "leave alone"
-  priv_node_.param("sharpness", sharpness_, -1);  // 0-255, -1 "leave alone"
-  // possible values: mmap, read, userptr
-  priv_node_.param("io_method", io_method_name_, std::string("mmap"));
-  priv_node_.param("image_width", image_width_, 640);
-  priv_node_.param("image_height", image_height_, 480);
-  priv_node_.param("frame_rate", framerate_, 30);
-  // default gps pps
-  priv_node_.param("trigger_internal", trigger_internal_, 0);
-  priv_node_.param("trigger_fps", trigger_fps_, 30);
-  // possible values: yuyv, uyvy, mjpeg, yuvmono10, rgb24
-  priv_node_.param("pixel_format", pixel_format_name_, std::string("mjpeg"));
-  // enable/disable autofocus
-  priv_node_.param("autofocus", autofocus_, false);
-  priv_node_.param("focus", focus_, -1);  // 0-255, -1 "leave alone"
-  // enable/disable autoexposure
-  priv_node_.param("autoexposure", autoexposure_, true);
-  priv_node_.param("exposure", exposure_, 100);
-  priv_node_.param("gain", gain_, -1);  // 0-100?, -1 "leave alone"
-  // enable/disable auto white balance temperature
-  priv_node_.param("auto_white_balance", auto_white_balance_, true);
-  priv_node_.param("white_balance", white_balance_, 4000);
-
-  // load the camera info
-  priv_node_.param("camera_frame_id", img_.header.frame_id,
-                   std::string("head_camera"));
-  priv_node_.param("camera_name", camera_name_, std::string("head_camera"));
-  priv_node_.param("camera_info_url", camera_info_url_, std::string(""));
-  cinfo_.reset(new camera_info_manager::CameraInfoManager(node_, camera_name_,
-                                                          camera_info_url_));
+  cinfo_.reset(new camera_info_manager::CameraInfoManager(
+      node_, config_.camera_name(), config_.camera_info_url()));
 
   // default 3000 ms
-  priv_node_.param("camera_timeout", cam_timeout_, 1000);
-  priv_node_.param("spin_interval", spin_interval_, 0.005f);
+
 
   // Warning when diff with last > 1.5* interval
-  frame_warning_interval_ = 1.5 / framerate_;
+  frame_warning_interval_ = 1.5 / config_.frame_rate();
   // now max fps 30, we use a appox time 0.9 to drop image.
-  frame_drop_interval_ = 0.9 / framerate_;
+  frame_drop_interval_ = 0.9 / config_.frame_rate();
 
   // advertise the main image topic
   // image_transport::ImageTransport it(node_);
   // image_pub_ = it.advertiseCamera(topic_name_, 1);
   // Load transport publish plugin
-  std::string image_topic = node_.resolveName(topic_name_);
+  std::string image_topic = node_.resolveName(config_.topic_name());
   pub_loader_ = boost::make_shared<image_transport::PubLoader>(
       "image_transport", "image_transport::PublisherPlugin");
   std::string lookup_name = image_transport::PublisherPlugin::getLookupName(
@@ -104,8 +79,7 @@ UsbCamWrapper::UsbCamWrapper(ros::NodeHandle node, ros::NodeHandle private_nh) :
                                  image_transport::SubscriberStatusCallback(),
            image_transport::SubscriberStatusCallback(), ros::VoidPtr(), false);
   } else {
-    ROS_ERROR("create image publish plugin error. lookup_name: '%s'",
-              lookup_name.c_str());
+    AERROR << "create image publish plugin error. lookup_name: " << lookup_name;
     node_.shutdown();
     return;
   }
@@ -125,102 +99,101 @@ UsbCamWrapper::UsbCamWrapper(ros::NodeHandle node, ros::NodeHandle private_nh) :
 
   // check for default camera info
   if (!cinfo_->isCalibrated()) {
-    cinfo_->setCameraName(video_device_name_);
+    cinfo_->setCameraName(config_.video_device());
     sensor_msgs::CameraInfo camera_info;
     camera_info.header.frame_id = img_.header.frame_id;
-    camera_info.width = image_width_;
-    camera_info.height = image_height_;
+    camera_info.width = config_.image_width();
+    camera_info.height = config_.image_height();
     cinfo_->setCameraInfo(camera_info);
   }
   // get the camera basical infomation
   cam_info_.reset(new sensor_msgs::CameraInfo(cinfo_->getCameraInfo()));
 
-  ROS_INFO("Starting '%s' (%s) at %dx%d via %s (%s) at %i FPS",
-           camera_name_.c_str(),
-           video_device_name_.c_str(),
-           image_width_,
-           image_height_,
-           io_method_name_.c_str(),
-           pixel_format_name_.c_str(),
-           framerate_);
+  AINFO << "Starting '" << config_.camera_name() << "' (" << config_.video_device()
+      << ") at " << config_.image_width() << "x" << config_.image_height()
+      << " via " << config_.io_method()  << " (" << config_.pixel_format()
+      << ") at %" << config_.frame_rate() << " FPS";
 
   // set the IO method
-  UsbCam::io_method io_method = UsbCam::io_method_from_string(io_method_name_);
+  UsbCam::io_method io_method =
+      UsbCam::io_method_from_string(config_.io_method());
 
   if (io_method == UsbCam::IO_METHOD_UNKNOWN) {
-    ROS_FATAL("Unknown IO method '%s'", io_method_name_.c_str());
+    AFATAL << "Unknown IO method '" << config_.io_method() << "'";
     node_.shutdown();
     return;
   }
 
   // set the pixel format
   UsbCam::pixel_format pixel_format = UsbCam::pixel_format_from_string(
-      pixel_format_name_);
+      config_.pixel_format());
 
   if (pixel_format == UsbCam::PIXEL_FORMAT_UNKNOWN) {
-    ROS_FATAL("Unknown pixel format '%s'", pixel_format_name_.c_str());
+    AFATAL << "Unknown pixel format '" << config_.pixel_format() << "'";
     node_.shutdown();
     return;
   }
 
   // start the camera
-  cam_.start(video_device_name_.c_str(),
+  cam_.start(config_.video_device(),
              io_method, pixel_format,
-             image_width_, image_height_, framerate_);
+             config_.image_width(), config_.image_height(),
+             config_.frame_rate());
 
   // set camera parameters
-  if (brightness_ >= 0) {
-    cam_.set_v4l_parameter("brightness", brightness_);
+  if (config_.brightness() >= 0) {
+    cam_.set_v4l_parameter("brightness", config_.brightness());
   }
 
-  if (contrast_ >= 0) {
-    cam_.set_v4l_parameter("contrast", contrast_);
+  if (config_.contrast() >= 0) {
+    cam_.set_v4l_parameter("contrast", config_.contrast());
   }
 
-  if (saturation_ >= 0) {
-    cam_.set_v4l_parameter("saturation", saturation_);
+  if (config_.saturation() >= 0) {
+    cam_.set_v4l_parameter("saturation", config_.saturation());
   }
 
-  if (sharpness_ >= 0) {
-    cam_.set_v4l_parameter("sharpness", sharpness_);
+  if (config_.sharpness() >= 0) {
+    cam_.set_v4l_parameter("sharpness", config_.sharpness());
   }
 
-  if (gain_ >= 0) {
-    cam_.set_v4l_parameter("gain", gain_);
+  if (config_.gain() >= 0) {
+    cam_.set_v4l_parameter("gain", config_.gain());
   }
 
   // check auto white balance
-  if (auto_white_balance_) {
+  if (config_.auto_white_balance()) {
     cam_.set_v4l_parameter("white_balance_temperature_auto", 1);
   } else {
     cam_.set_v4l_parameter("white_balance_temperature_auto", 0);
-    cam_.set_v4l_parameter("white_balance_temperature", white_balance_);
+    cam_.set_v4l_parameter("white_balance_temperature", config_.white_balance());
   }
 
   // check auto exposure
-  if (!autoexposure_) {
+  if (!config_.autoexposure()) {
     // turn down exposure control (from max of 3)
     cam_.set_v4l_parameter("exposure_auto", 1);
     // change the exposure level
-    cam_.set_v4l_parameter("exposure_absolute", exposure_);
+    cam_.set_v4l_parameter("exposure_absolute", config_.exposure());
   }
 
   // check auto focus
-  if (autofocus_) {
+  if (config_.autofocus()) {
     cam_.set_auto_focus(1);
     cam_.set_v4l_parameter("focus_auto", 1);
   } else {
     cam_.set_v4l_parameter("focus_auto", 0);
 
-    if (focus_ >= 0) {
-      cam_.set_v4l_parameter("focus_absolute", focus_);
+    if (config_.focus() >= 0) {
+      cam_.set_v4l_parameter("focus_absolute", config_.focus());
     }
   }
 
   // trigger enable
-  int trigger_ret = cam_.trigger_enable(trigger_fps_, trigger_internal_);
+  int trigger_ret = cam_.trigger_enable(config_.trigger_fps(),
+                                        config_.trigger_internal());
   if (0 != trigger_ret) {
-    ROS_WARN("Camera trigger Fail ret '%d'", trigger_ret);
+    AWARN << "Camera trigger Fail ret: " << trigger_ret;
     // node_.shutdown();
     // return;
   }
@@ -244,7 +217,7 @@ bool UsbCamWrapper::service_stop_cap(std_srvs::Empty::Request& req,
 
 bool UsbCamWrapper::take_and_send_image() {
   // grab the image
-  bool get_new_image = cam_.grab_image(&img_, cam_timeout_);
+  bool get_new_image = cam_.grab_image(&img_, config_.camera_timeout());
 
   if (!get_new_image) {
     return false;
@@ -280,12 +253,12 @@ bool UsbCamWrapper::take_and_send_image() {
 
 bool UsbCamWrapper::spin() {
   // spin loop rate should be in accord with the trigger frequence
-  ros::Duration loop_interval(this->spin_interval_);
+  ros::Duration loop_interval(config_.spin_interval());
 
   while (node_.ok()) {
     if (cam_.is_capturing()) {
       if (!take_and_send_image()) {
-        ROS_ERROR("USB camera did not respond in time.");
+        AERROR << "USB camera did not respond in time.";
       }
     }
     // ros::spinOnce();
