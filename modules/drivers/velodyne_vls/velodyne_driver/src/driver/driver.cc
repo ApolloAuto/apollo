@@ -73,7 +73,7 @@ VelodyneDriver::VelodyneDriver(ros::NodeHandle node,
   config_.frame_id = tf::resolve(tf_prefix, config_.frame_id);
 
   // get model name, validate string, determine packet rate
-  private_nh.param("model", config_.model, std::string("64E"));
+  private_nh.param("model", config_.model, std::string("VLS128"));
   double packet_rate;  // packet frequency (Hz)
   std::string model_full_name;
   if ((config_.model == "64E_S2") ||

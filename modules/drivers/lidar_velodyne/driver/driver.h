@@ -36,6 +36,8 @@
 #include "dynamic_reconfigure/server.h"
 #include "ros/ros.h"
 
+#include "modules/drivers/lidar_velodyne/proto/driver_node_conf.pb.h"
+
 #include "modules/drivers/lidar_velodyne/driver/input.h"
 
 namespace apollo {
@@ -75,6 +77,7 @@ class VelodyneDriver {
   double diag_min_freq_;
   double diag_max_freq_;
   // boost::shared_ptr<diagnostic_updater::TopicDiagnostic> diag_topic_;
+  DriverNodeConf driver_node_conf_;
 };
 
 }  // namespace lidar_velodyne
