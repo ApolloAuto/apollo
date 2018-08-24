@@ -14,38 +14,43 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/drivers/camera/nodes/usb_cam_wrapper.h"
-
 #include <boost/thread.hpp>
 
 #include <ros/ros.h>
 #include <pluginlib/class_list_macros.h>
 #include <nodelet/nodelet.h>
 
+#include "modules/common/log.h"
+#include "modules/drivers/camera/nodes/usb_cam_wrapper.h"
+
 namespace apollo {
 namespace drivers {
 namespace camera {
 
-class UsbCamNodelet: public nodelet::Nodelet {
+class CameraNodelet {
  public:
-  UsbCamNodelet() {}
-  ~UsbCamNodelet() {
-    ROS_INFO("shutting down driver thread");
+  CameraNodelet() {}
+  ~CameraNodelet() {
+    AINFO << "shutting down driver thread";
     if (device_thread_ != nullptr && device_thread_->joinable()) {
       device_thread_->join();
     }
-    ROS_INFO("driver thread stopped");
+    AINFO << "driver thread stopped";
   }
+  virtual void OnInit(void);
 
  private:
-  virtual void onInit();
   boost::shared_ptr<UsbCamWrapper> usb_cam_wrapper_ = nullptr;
   boost::shared_ptr<boost::thread> device_thread_ = nullptr;
+
+ private:
+  ros::NodeHandle nh_;
+  ros::NodeHandle private_nh_;
 };
 
-void UsbCamNodelet::onInit() {
-  ROS_INFO("Usb cam nodelet init");
-  usb_cam_wrapper_.reset(new UsbCamWrapper(getNodeHandle(), getPrivateNodeHandle()));
+void CameraNodelet::OnInit() {
+  AINFO << "Usb cam nodelet init";
+  usb_cam_wrapper_.reset(new UsbCamWrapper(nh_, private_nh_));
   // spawn device poll thread
   device_thread_ = boost::shared_ptr<boost::thread>
         (new boost::thread(boost::bind(&UsbCamWrapper::spin, usb_cam_wrapper_)));
@@ -58,6 +63,6 @@ void UsbCamNodelet::onInit() {
 // Register this plugin with pluginlib.  Names must match nodelets.xml.
 //
 // parameters: package, class name, class type, base class type
-PLUGINLIB_DECLARE_CLASS(camera, UsbCamNodelet,
-                        ::apollo::drivers::camera::UsbCamNodelet,
-                         nodelet::Nodelet);
+// PLUGINLIB_DECLARE_CLASS(camera, UsbCamNodelet,
+//                        ::apollo::drivers::camera::CameraNodelet,
+//                         nodelet::Nodelet);
