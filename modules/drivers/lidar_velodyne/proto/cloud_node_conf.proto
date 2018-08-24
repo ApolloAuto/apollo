@@ -1,0 +1,14 @@
+syntax = "proto2";
+
+package apollo.drivers.lidar_velodyne;
+
+message CloudNodeConf {
+  // min range to publish
+  optional double min_range = 1 [default = 0.9]; // range: 0.1 ~ 10.0
+  // max range to publish
+  optional double max_range = 2 [default = 130]; // range: 0.1 ~ 200.0
+  // angle defining the center of view
+  optional double view_direction = 3 [default = 0.0]; // range: -pi ~ pi
+  // angle defining the view width
+  optional double view_width = 4 [default = 0.0]; // range: -2*pi ~ 2*pi
+}

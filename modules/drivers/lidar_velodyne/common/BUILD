@@ -3,17 +3,15 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "velodyne_common",
-    srcs = glob([
-        "*.cc",
-    ]),
-    hdrs = glob([
-        "*.h",
-    ]),
+    name = "velodyne_gflags",
+    srcs = [
+        "velodyne_gflags.cc",
+    ],
+    hdrs = [
+        "velodyne_gflags.h",
+    ],
     deps = [
         "//external:gflags",
-        "//modules/common",
-        "@ros//:ros_common",
     ],
 )
 

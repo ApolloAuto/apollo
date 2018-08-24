@@ -342,8 +342,8 @@ void SimulationWorldService::GetMapElementIds(double radius,
   // Gather required map element ids based on current location.
   apollo::common::PointENU point;
   const auto &adc = world_.auto_driving_car();
-  point.set_x(adc.position_x() + map_service_->GetXOffset());
-  point.set_y(adc.position_y() + map_service_->GetYOffset());
+  point.set_x(adc.position_x());
+  point.set_y(adc.position_y());
   map_service_->CollectMapElementIds(point, radius, ids);
 }
 
@@ -595,16 +595,16 @@ void SimulationWorldService::UpdateMainStopDecision(
   } else {
     // Normal stop.
     const apollo::planning::MainStop &stop = main_decision.stop();
-    stop_pt.set_x(stop.stop_point().x());
-    stop_pt.set_y(stop.stop_point().y());
+    stop_pt.set_x(stop.stop_point().x() + map_service_->GetXOffset());
+    stop_pt.set_y(stop.stop_point().y() + map_service_->GetYOffset());
     stop_heading = stop.stop_heading();
     if (stop.has_reason_code()) {
       SetStopReason(stop.reason_code(), decision);
     }
   }
 
-  decision->set_position_x(stop_pt.x() + map_service_->GetXOffset());
-  decision->set_position_y(stop_pt.y() + map_service_->GetYOffset());
+  decision->set_position_x(stop_pt.x());
+  decision->set_position_y(stop_pt.y());
   decision->set_heading(stop_heading);
 }
 
@@ -644,8 +644,7 @@ void SimulationWorldService::FindNudgeRegion(
     const Object &world_obj, Decision *world_decision) {
   std::vector<apollo::common::math::Vec2d> points;
   for (auto &polygon_pt : world_obj.polygon_point()) {
-    points.emplace_back(polygon_pt.x() + map_service_->GetXOffset(),
-                        polygon_pt.y() + map_service_->GetYOffset());
+    points.emplace_back(polygon_pt.x(), polygon_pt.y());
   }
   const apollo::common::math::Polygon2d obj_polygon(points);
   const apollo::common::math::Polygon2d &nudge_polygon =
@@ -688,10 +687,8 @@ void SimulationWorldService::UpdateDecision(const DecisionResult &decision_res,
   if (world_main_decision->decision_size() > 0) {
     // set default position
     const auto &adc = world_.auto_driving_car();
-    world_main_decision->set_position_x(adc.position_x() +
-                                        map_service_->GetXOffset());
-    world_main_decision->set_position_y(adc.position_y() +
-                                        map_service_->GetYOffset());
+    world_main_decision->set_position_x(adc.position_x());
+    world_main_decision->set_position_y(adc.position_y());
     world_main_decision->set_heading(adc.heading());
     world_main_decision->set_timestamp_sec(header_time);
   }

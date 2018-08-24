@@ -23,9 +23,20 @@ adduser --disabled-password --force-badname --gecos '' "$DOCKER_USER" \
 usermod -aG sudo "$DOCKER_USER"
 echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 cp -r /etc/skel/. /home/${DOCKER_USER}
-echo "export PATH=\${PATH}:/apollo/scripts:/usr/local/miniconda2/bin" >> /home/${DOCKER_USER}/.bashrc
-echo 'if [ -e "/apollo/scripts/apollo_base.sh" ]; then source /apollo/scripts/apollo_base.sh; fi' >> "/home/${DOCKER_USER}/.bashrc"
-echo "ulimit -c unlimited" >> /home/${DOCKER_USER}/.bashrc
+echo '
+export PATH=${PATH}:/apollo/scripts:/usr/local/miniconda2/bin
+
+if [ -e "/apollo/scripts/apollo_base.sh" ]; then
+  source /apollo/scripts/apollo_base.sh
+fi
+
+ulimit -c unlimited
+' >> "/home/${DOCKER_USER}/.bashrc"
+
+echo '
+genhtml_branch_coverage = 1
+lcov_branch_coverage = 1
+' > "/home/${DOCKER_USER}/.lcovrc"
 
 chown -R ${DOCKER_USER}:${DOCKER_GRP} "/home/${DOCKER_USER}"
 

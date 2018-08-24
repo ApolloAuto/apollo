@@ -33,6 +33,8 @@ export default class HMI {
 
     @observable dockerImage = 'unknown';
 
+    @observable isCoDriver = false;
+
     @action initialize(config) {
         if (config.dockerImage) {
             this.dockerImage = config.dockerImage;
@@ -60,6 +62,10 @@ export default class HMI {
             this.hardwareStatus.set(key, 'NOT_READY');
             this.displayName[key] = config.hardware[key].displayName;
         });
+    }
+
+    @action toggleCoDriverFlag() {
+        this.isCoDriver = !this.isCoDriver;
     }
 
     @action updateStatus(newStatus) {

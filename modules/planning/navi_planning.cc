@@ -75,8 +75,8 @@ Status NaviPlanning::Init() {
   CHECK_ADAPTER(RoutingResponse);
   CHECK_ADAPTER(RoutingRequest);
   CHECK_ADAPTER(RelativeMap);
-  CHECK_ADAPTER_IF(FLAGS_enable_prediction, PerceptionObstacles);
-  CHECK_ADAPTER_IF(FLAGS_enable_prediction, Prediction);
+  CHECK_ADAPTER(PerceptionObstacles);
+  CHECK_ADAPTER(Prediction);
   CHECK_ADAPTER(TrafficLightDetection);
 
   RegisterPlanners();
@@ -196,7 +196,7 @@ void NaviPlanning::RunOnce() {
     return;
   }
 
-  if (FLAGS_enable_prediction && AdapterManager::GetPrediction()->Empty()) {
+  if (AdapterManager::GetPrediction()->Empty()) {
     AWARN_EVERY(100) << "prediction is enabled but no prediction provided";
   }
 

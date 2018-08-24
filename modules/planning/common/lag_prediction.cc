@@ -117,15 +117,24 @@ void LagPrediction::GetLaggedPrediction(PredictionObstacles* obstacles) const {
     if (apply_lag && iter.second.last_observed_seq > max_disappear_num_) {
       continue;
     }
-    AddObstacleToPrediction(timestamp - iter.second.last_observed_time,
-                            *(iter.second.obstacle_ptr), obstacles);
+    if (iter.second.obstacle_ptr != nullptr) {
+      AddObstacleToPrediction(timestamp - iter.second.last_observed_time,
+                              *(iter.second.obstacle_ptr), obstacles);
+    }
   }
 }
 
 void LagPrediction::AddObstacleToPrediction(
     double delay_sec, const prediction::PredictionObstacle& history_obstacle,
     prediction::PredictionObstacles* obstacles) const {
+  CHECK_NOTNULL(obstacles);
+
   auto* obstacle = obstacles->add_prediction_obstacle();
+  if (obstacle == nullptr) {
+    AERROR << "obstalce is nullptr.";
+    return;
+  }
+
   if (delay_sec <= 1e-6) {
     obstacle->CopyFrom(history_obstacle);
     return;

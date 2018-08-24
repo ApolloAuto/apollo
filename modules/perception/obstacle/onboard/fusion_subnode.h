@@ -74,7 +74,10 @@ class FusionSubnode : public Subnode {
   void PublishDataAndEvent(const double timestamp,
                            const std::string &device_id,
                            const SharedDataPtr<FusionItem> &data);
-  double timestamp_;
+  double lidar_timestamp_;
+  double radar_timestamp_;
+  double camera_timestamp_;
+
   std::vector<std::shared_ptr<Object>> objects_;
   common::ErrorCode error_code_ = common::OK;
   std::unique_ptr<BaseFusion> fusion_;

@@ -34,9 +34,7 @@ void DumpPlanningContext() {
   AdapterManager::GetLocalization()->DumpLatestMessage();
   AdapterManager::GetChassis()->DumpLatestMessage();
   AdapterManager::GetRoutingResponse()->DumpLatestMessage();
-  if (FLAGS_enable_prediction) {
-    AdapterManager::GetPrediction()->DumpLatestMessage();
-  }
+  AdapterManager::GetPrediction()->DumpLatestMessage();
 }
 
 }  // namespace util

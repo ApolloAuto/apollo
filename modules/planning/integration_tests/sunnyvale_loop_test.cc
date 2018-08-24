@@ -188,7 +188,6 @@ TEST_F(SunnyvaleLoopTest, rightturn_with_red_light) {
 TEST_F(SunnyvaleLoopTest, change_lane) {
   std::string seq_num = "9";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
-  FLAGS_enable_prediction = false;
   FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
   FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
   PlanningTestBase::SetUp();
@@ -203,7 +202,6 @@ TEST_F(SunnyvaleLoopTest, mission_complete) {
 
   std::string seq_num = "10";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
-  FLAGS_enable_prediction = false;
   FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
   FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
   PlanningTestBase::SetUp();
@@ -236,7 +234,6 @@ TEST_F(SunnyvaleLoopTest, avoid_change_left) {
 TEST_F(SunnyvaleLoopTest, qp_path_failure) {
   std::string seq_num = "12";
   FLAGS_reckless_change_lane = true;
-  FLAGS_enable_prediction = false;
   FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
   FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
@@ -261,7 +258,6 @@ TEST_F(SunnyvaleLoopTest, change_lane_failback) {
   }
   std::string seq_num = "13";
   FLAGS_reckless_change_lane = true;
-  FLAGS_enable_prediction = true;
   FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
   FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";

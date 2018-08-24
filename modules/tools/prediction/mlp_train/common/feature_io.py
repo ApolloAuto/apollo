@@ -31,7 +31,7 @@ def readVarint32(stream):
     """
     read block size from file stream
     """
-    mask = 0x80 #(1 << 7)
+    mask = 0x80  #(1 << 7)
     raw_varint32 = []
     while 1:
         b = stream.read(1)
@@ -103,7 +103,7 @@ def build_trajectory(features):
         if len(fea_dict[k]) < 2:
             del fea_dict[k]
             continue
-        fea_dict[k].sort(key = lambda x: x.timestamp)
+        fea_dict[k].sort(key=lambda x: x.timestamp)
     feature_trajectories = fea_dict
 
     return feature_trajectories

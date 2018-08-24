@@ -19,7 +19,6 @@
 
   <buildtool_depend>catkin</buildtool_depend>
 
-  <build_depend>diagnostic_updater</build_depend>
   <build_depend>dynamic_reconfigure</build_depend>
   <build_depend>libpcap</build_depend>
   <build_depend>nodelet</build_depend>
@@ -32,7 +31,6 @@
   <build_depend>roslaunch</build_depend>
   <build_depend>rostest</build_depend>
 
-  <run_depend>diagnostic_updater</run_depend>
   <run_depend>dynamic_reconfigure</run_depend>
   <run_depend>libpcap</run_depend>
   <run_depend>nodelet</run_depend>

@@ -97,7 +97,6 @@ DEFINE_bool(integ_sins_state_check, false, "");
 DEFINE_double(integ_sins_state_span_time, 60.0, "");
 DEFINE_double(integ_sins_state_pos_std, 1.0, "");
 DEFINE_double(vel_threshold_get_yaw, 5.0, "");
-DEFINE_bool(integ_debug_log_flag, false, "");
 
 // gnss module
 DEFINE_bool(enable_ins_aid_rtk, false, "");

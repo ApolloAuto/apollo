@@ -3,18 +3,19 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "velodyne_driver",
-    srcs = glob([
-        "*.cc",
-    ]),
-    hdrs = glob([
-        "*.h",
-    ]),
+    name = "driver",
+    srcs = [
+        "driver.cc",
+        "input.cc",
+    ],
+    hdrs = [
+        "driver.h",
+        "driver_nodelet.h",
+        "input.h",
+        "ring_sequence.h",
+    ],
     deps = [
-        "//modules/drivers/lidar_velodyne/common:velodyne_common",
-        "//modules/drivers/lidar_velodyne/proto:velodyne_proto",
-        "//modules/common",
-        "//modules/common/util",
+        "//modules/common:log",
         "@ros//:ros_common",
     ],
 )

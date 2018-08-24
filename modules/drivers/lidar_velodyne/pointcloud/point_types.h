@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,24 @@
  * limitations under the License.
  *****************************************************************************/
 
+/* -*- mode: C++ -*-
+ *
+ *  Copyright (C) 2011, 2012 Austin Robot Technology
+ *
+ *  License: Modified BSD Software License Agreement
+ *
+ *  Id:database.h15542011−06−1422:11:17Zjack.oquin
+ */
+
+/** \file
+ *
+ *  Point Cloud Library point structures for Velodyne data.
+ *
+ *  @author Jesse Vera
+ *  @author Jack O'Quin
+ *  @author Piyush Khandelwal
+ */
+
 #ifndef MODULES_DRIVERS_LIDAR_VELODYNE_POINTCLOUD_POINT_TYPES_H_
 #define MODULES_DRIVERS_LIDAR_VELODYNE_POINTCLOUD_POINT_TYPES_H_
 
@@ -23,20 +41,21 @@ namespace apollo {
 namespace drivers {
 namespace lidar_velodyne {
 
-struct PointXYZIT {
-  PCL_ADD_POINT4D
-  uint8_t intensity;
-  double timestamp;
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW  // make sure our new allocators are aligned
+/** Euclidean Velodyne coordinate, including intensity and ring number. */
+struct PointXYZIR {
+  PCL_ADD_POINT4D;                 // quad-word XYZ
+  float intensity;                 ///< laser intensity reading
+  uint16_t ring;                   ///< laser ring number
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW  // ensure proper alignment
 } EIGEN_ALIGN16;
-// enforce SSE padding for correct memory alignment
 
 }  // namespace lidar_velodyne
 }  // namespace drivers
 }  // namespace apollo
 
-POINT_CLOUD_REGISTER_POINT_STRUCT(apollo::drivers::lidar_velodyne::PointXYZIT,
-                                  (float, x, x)(float, y, y)(float, z, z)(
-                                      uint8_t, intensity,
-                                      intensity)(double, timestamp, timestamp))
+POINT_CLOUD_REGISTER_POINT_STRUCT(
+    apollo::drivers::lidar_velodyne::PointXYZIR,
+    (float, x, x)(float, y, y)(float, z, z)(float, intensity,
+                                            intensity)(uint16_t, ring, ring))
+
 #endif  // MODULES_DRIVERS_LIDAR_VELODYNE_POINTCLOUD_POINT_TYPES_H_

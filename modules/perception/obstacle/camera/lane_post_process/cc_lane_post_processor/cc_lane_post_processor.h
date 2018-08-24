@@ -69,6 +69,10 @@ class CCLanePostProcessor : public BaseCameraLanePostProcessor {
                const CameraLanePostProcessOptions &options,
                LaneObjectsPtr *lane_instances) override;
 
+  bool ProcessWithoutCC(const cv::Mat &lane_map,
+               const CameraLanePostProcessOptions &options,
+               LaneObjectsPtr *lane_instances) override;
+
   void set_max_distance_to_see(ScalarType max_distance_to_see) {
     max_distance_to_see_ = max_distance_to_see;
   }
@@ -130,6 +134,10 @@ class CCLanePostProcessor : public BaseCameraLanePostProcessor {
   ScalarType max_distance_to_see_ = 500.0;
   int image_width_ = 1080;
   int image_height_ = 1920;
+  int64_t time_1 = 0;
+  int64_t time_2 = 0;
+  int64_t time_3 = 0;
+  int time_num = 0;
 
   cv::Rect roi_;
   int roi_height = 768;
