@@ -429,7 +429,7 @@ function citest_map() {
   generate_build_targets
 
   # common related test
-  echo "$BUILD_TARGETS" | grep "map\/" | xargs bazel test $DEFINES --config=unit_test -c dbg --test_verbose_timeout_warnings $@
+  echo "$BUILD_TARGETS" | grep "map\/" | grep -v "cuda_util_test" | xargs bazel test $DEFINES --config=unit_test -c dbg --test_verbose_timeout_warnings $@
 
   if [ $? -eq 0 ]; then
     success 'Test passed!'
