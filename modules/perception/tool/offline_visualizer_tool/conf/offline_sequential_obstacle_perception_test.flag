@@ -1,5 +1,4 @@
-
---work_root=modules/perception
+--flagfile=modules/common/data/global_flagfile.txt
 
 ####################################################################
 # Flags from modules/perception/tool/offline_visualizer_tool/
@@ -51,8 +50,6 @@
 # type: int32
 # default: 1
 --map_sample_step=1
-
---flagfile=modules/common/data/global_flagfile.txt
 
 ####################################################################
 # Flags from obstacle/onboard/lidar_process.cc

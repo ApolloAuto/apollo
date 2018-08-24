@@ -211,7 +211,6 @@ bool CameraCoeffient::init_camera_intrinsic_matrix_and_distort_params(
 
 CalibrationConfigManager::CalibrationConfigManager()
     : camera_calibration_(new CameraCalibration()) {
-  work_root_ = FLAGS_work_root;
   camera_extrinsic_path_ = FLAGS_front_camera_extrinsics_file;
   camera_intrinsic_path_ = FLAGS_front_camera_intrinsics_file;
   init();
