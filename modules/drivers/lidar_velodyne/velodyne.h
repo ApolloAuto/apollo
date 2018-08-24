@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_DRIVERS_VELODYNE_VELODYNE_H_
-#define MODULES_DRIVERS_VELODYNE_VELODYNE_H_
+#ifndef MODULES_DRIVERS_LIDAR_VELODYNE_VELODYNE_H_
+#define MODULES_DRIVERS_LIDAR_VELODYNE_VELODYNE_H_
 
 #include <map>
 #include <memory>
@@ -70,4 +70,4 @@ class Velodyne : public apollo::common::ApolloApp {
 }  // namespace drivers
 }  // namespace apollo
 
-#endif  // MODULES_DRIVERS_VELODYNE_VELODYNE_H_
+#endif  // MODULES_DRIVERS_LIDAR_VELODYNE_VELODYNE_H_

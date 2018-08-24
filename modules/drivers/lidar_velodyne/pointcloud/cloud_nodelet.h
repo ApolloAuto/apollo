@@ -26,8 +26,8 @@
     PointCloud2.
 */
 
-#ifndef MODULES_DRIVERS_VELODYN_DRIVER_CLOUD_NODELET_H_
-#define MODULES_DRIVERS_VELODYN_DRIVER_CLOUD_NODELET_H_
+#ifndef MODULES_DRIVERS_LIDAR_VELODYN_DRIVER_CLOUD_NODELET_H_
+#define MODULES_DRIVERS_LIDAR_VELODYN_DRIVER_CLOUD_NODELET_H_
 
 #include "ros/ros.h"
 
@@ -41,7 +41,9 @@ class CloudNodelet {
  public:
   CloudNodelet() = default;
   ~CloudNodelet() = default;
-  virtual void OnInit();
+
+  /** @brief Nodelet initialization. */
+  virtual void OnInit() { conv_.reset(new Convert(nh_, private_nh_)); }
 
  private:
   ros::NodeHandle nh_;
@@ -49,11 +51,8 @@ class CloudNodelet {
   boost::shared_ptr<Convert> conv_;
 };
 
-/** @brief Nodelet initialization. */
-void CloudNodelet::OnInit() { conv_.reset(new Convert(nh_, private_nh_)); }
-
 }  // namespace lidar_velodyne
 }  // namespace drivers
 }  // namespace apollo
 
-#endif  // MODULES_DRIVERS_VELODYN_DRIVER_CLOUD_NODELET_H_
+#endif  // MODULES_DRIVERS_LIDAR_VELODYN_DRIVER_CLOUD_NODELET_H_

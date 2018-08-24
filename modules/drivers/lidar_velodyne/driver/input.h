@@ -49,12 +49,12 @@
 #define MODULES_DRIVERS_LIDAR_VELODYNE_COMMON_INPUT_H_
 
 #include <netinet/in.h>
-#include <pcap.h>
 #include <unistd.h>
 #include <cstdio>
 
 #include <string>
 
+#include "pcap/pcap.h"
 #include "ros/ros.h"
 #include "velodyne_msgs/VelodynePacket.h"
 
