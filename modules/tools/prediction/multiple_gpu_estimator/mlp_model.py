@@ -53,7 +53,7 @@ class MlpModel(model_base.ModelBase):
         super(MlpModel, self).__init__(is_training, data_format,
                                        batch_norm_decay, batch_norm_epsilon)
 
-    def forward_pass(self, x):
+    def forward_pass(self, x, input_data_format='channels_last'):
         """Build the core model within the graph."""
         x = self._fully_connected_with_bn(
             x,
