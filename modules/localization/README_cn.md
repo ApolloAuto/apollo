@@ -29,9 +29,9 @@
 
 1. 转到`modules/localization`目录，并创建一个Foo目录。在Foo目录中，根据rtk目录中的`RTKLocalization`类增加`FooLocalization`类。`FooLocalization`必须是`LocalizationBase`的子类。根据`rtk/BUILD`还需创建文件`foo/BUILD`。
  
-1. 您需要在函数`Localization::RegisterLocalizationMethods()`中注册`FooLocalizatoin`，它位于CPP文件`localization.cc`中。您可以通过在函数的末尾插入以下代码来注册：
+1. 您需要在函数`Localization::RegisterLocalizationMethods()`中注册`FooLocalization`，它位于CPP文件`localization.cc`中。您可以通过在函数的末尾插入以下代码来注册：
 ```
-localization_factory_.Register(LocalizationConfing::FOO, []()->LocalizationBase* { return new FooLocalization(); });
+localization_factory_.Register(LocalizationConfig::FOO, []()->LocalizationBase* { return new FooLocalization(); });
 ```
 请确保您的代码可以编译包含`FooLocalization`的头文件。
 
