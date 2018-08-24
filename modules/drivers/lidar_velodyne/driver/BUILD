@@ -16,6 +16,8 @@ cc_library(
     ],
     deps = [
         "//modules/common:log",
+        "//modules/common/util",
+        "//modules/drivers/lidar_velodyne/proto:driver_node_conf_proto",
         "@ros//:ros_common",
     ],
 )
