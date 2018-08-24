@@ -56,8 +56,6 @@ class CCLanePostProcessorTest : public ::testing::Test {
 };
 
 TEST_F(CCLanePostProcessorTest, test_lane_post_process_vis) {
-  FLAGS_work_root = "modules/perception";
-
   CHECK(GetProtoFromFile(FLAGS_cc_lane_post_processor_config_file, &config_));
 
   cc_lane_post_processor_->set_vis(true);
