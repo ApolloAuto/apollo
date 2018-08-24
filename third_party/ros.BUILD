@@ -23,6 +23,7 @@ cc_library(
         "lib/libroscpp_serialization.so",
         "lib/libroslz4.so",
         "lib/librostime.so",
+        "lib/libtf.so",
         "lib/libtf2.so",
         "lib/libtf2_ros.so",
         "lib/libtopic_tools.so",
