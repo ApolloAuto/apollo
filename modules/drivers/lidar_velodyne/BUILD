@@ -23,6 +23,7 @@ cc_library(
         "//modules/common/util",
         "//modules/drivers/lidar_velodyne/common:velodyne_gflags",
         "//modules/drivers/lidar_velodyne/driver",
+        "//modules/drivers/lidar_velodyne/pointcloud",
         "@pcl",
         "@ros//:ros_common",
     ],
