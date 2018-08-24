@@ -28,8 +28,8 @@
  *  ROS driver interface for the Velodyne 3D LIDARs
  */
 
-#ifndef MODULES_DRIVERS_VELODYN_DRIVER_DRIVER_H_
-#define MODULES_DRIVERS_VELODYN_DRIVER_DRIVER_H_
+#ifndef MODULES_DRIVERS_LIDAR_VELODYN_DRIVER_DRIVER_H_
+#define MODULES_DRIVERS_LIDAR_VELODYN_DRIVER_DRIVER_H_
 
 #include <string>
 
@@ -84,4 +84,4 @@ class VelodyneDriver {
 }  // namespace drivers
 }  // namespace apollo
 
-#endif  // MODULES_DRIVERS_VELODYN_DRIVER_DRIVER_H__
+#endif  // MODULES_DRIVERS_LIDAR_VELODYN_DRIVER_DRIVER_H__

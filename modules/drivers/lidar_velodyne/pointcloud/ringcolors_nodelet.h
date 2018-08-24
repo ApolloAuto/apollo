@@ -27,8 +27,8 @@
     rings.
 */
 
-#ifndef MODULES_DRIVERS_VELODYN_DRIVER_RINGCOLORS_NODELET_H_
-#define MODULES_DRIVERS_VELODYN_DRIVER_RINGCOLORS_NODELET_H_
+#ifndef MODULES_DRIVERS_LIDAR_VELODYN_DRIVER_RINGCOLORS_NODELET_H_
+#define MODULES_DRIVERS_LIDAR_VELODYN_DRIVER_RINGCOLORS_NODELET_H_
 
 #include "ros/ros.h"
 
@@ -42,7 +42,9 @@ class RingColorsNodelet {
  public:
   RingColorsNodelet() = default;
   ~RingColorsNodelet() = default;
-  virtual void OnInit();
+
+  /** @brief Nodelet initialization. */
+  virtual void OnInit() { colors_.reset(new RingColors(nh_, private_nh_)); }
 
  private:
   ros::NodeHandle nh_;
@@ -50,13 +52,8 @@ class RingColorsNodelet {
   boost::shared_ptr<RingColors> colors_;
 };
 
-/** @brief Nodelet initialization. */
-void RingColorsNodelet::OnInit() {
-  colors_.reset(new RingColors(nh_, private_nh_));
-}
-
 }  // namespace lidar_velodyne
 }  // namespace drivers
 }  // namespace apollo
 
-#endif  // MODULES_DRIVERS_VELODYN_DRIVER_RINGCOLORS_NODELET_H_
+#endif  // MODULES_DRIVERS_LIDAR_VELODYN_DRIVER_RINGCOLORS_NODELET_H_

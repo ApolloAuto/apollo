@@ -43,6 +43,7 @@ Status Velodyne::Init() {
 }
 
 Status Velodyne::Start() {
+  /*
   std::shared_ptr<std::thread> driver_thread(
       new std::thread(std::bind(&DriverNodelet::OnInit, &driver_nodelet_)));
   threads_.push_back(driver_thread);
@@ -58,6 +59,7 @@ Status Velodyne::Start() {
   std::shared_ptr<std::thread> ringcolors_thread(new std::thread(
       std::bind(&RingColorsNodelet::OnInit, &ringcolors_nodelet_)));
   threads_.push_back(ringcolors_thread);
+  */
 
   ADEBUG << "Velodyne start done!";
   return Status::OK();

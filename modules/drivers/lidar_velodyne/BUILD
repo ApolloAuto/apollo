@@ -10,6 +10,10 @@ cc_library(
     hdrs = [
         "velodyne.h",
     ],
+    linkopts = [
+        "-lboost_system",
+        "-lboost_thread",
+    ],
     deps = [
         "//modules/common",
         "//modules/common:apollo_app",
@@ -26,6 +30,17 @@ cc_library(
         "//modules/drivers/lidar_velodyne/pointcloud",
         "@pcl",
         "@ros//:ros_common",
+    ],
+)
+
+cc_binary(
+    name = "lidar_velodyne",
+    srcs = [
+        "main.cc",
+    ],
+    deps = [
+        ":velodyne_lib",
+        "//external:gflags",
     ],
 )
 

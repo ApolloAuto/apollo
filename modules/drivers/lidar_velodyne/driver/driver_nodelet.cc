@@ -15,44 +15,44 @@
  *****************************************************************************/
 
 /*
- *  Copyright (C) 2012 Austin Robot Technology, Jack O'Quin
- *  License: Modified BSD Software License Agreement
+ * Copyright (C) 2012 Austin Robot Technology, Jack O'Quin
  *
- *  Id
+ * License: Modified BSD Software License Agreement
+ *
+ * Id
+ **/
+
+/** \file
+ *
+ *  ROS driver nodelet for the Velodyne 3D LIDARs
  */
 
-/** @file
-    This ROS nodelet transforms raw Velodyne 3D LIDAR packets to a
-    PointCloud2 in the /odom frame.
-*/
-
-#ifndef MODULES_DRIVERS_LIDAR_VELODYN_DRIVER_TRANSFORM_NODELET_H_
-#define MODULES_DRIVERS_LIDAR_VELODYN_DRIVER_TRANSFORM_NODELET_H_
-
-#include "ros/ros.h"
-
-#include "modules/drivers/lidar_velodyne/pointcloud/transform.h"
+#include "modules/drivers/lidar_velodyne/driver/driver_nodelet.h"
 
 namespace apollo {
 namespace drivers {
 namespace lidar_velodyne {
 
-class TransformNodelet {
- public:
-  TransformNodelet() = default;
-  ~TransformNodelet() = default;
+void DriverNodelet::OnInit() {
+  // start the driver
+  dvr_.reset(new VelodyneDriver(nh_, private_nh_));
 
-  /** @brief Nodelet initialization. */
-  void OnInit() { tf_.reset(new Transform(nh_, private_nh_)); }
+  // spawn device poll thread
+  running_ = true;
+  deviceThread_ = boost::shared_ptr<boost::thread>(
+      new boost::thread(boost::bind(&DriverNodelet::DevicePoll, this)));
+}
 
- private:
-  ros::NodeHandle nh_;
-  ros::NodeHandle private_nh_;
-  boost::shared_ptr<Transform> tf_;
-};
+/** @brief Device poll thread main loop. */
+void DriverNodelet::DevicePoll() {
+  while (ros::ok()) {
+    // poll device until end of file
+    running_ = dvr_->poll();
+    if (!running_) break;
+  }
+  running_ = false;
+}
 
 }  // namespace lidar_velodyne
 }  // namespace drivers
 }  // namespace apollo
-
-#endif  // MODULES_DRIVERS_LIDAR_VELODYN_DRIVER_TRANSFORM_NODELET_H_
