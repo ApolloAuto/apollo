@@ -52,11 +52,11 @@ void ObstaclesContainer::Insert(const ::google::protobuf::Message& message) {
   }
 
   if (FLAGS_prediction_offline_mode) {
-     if (std::fabs(timestamp - timestamp_) > FLAGS_replay_timestamp_gap ||
-         FeatureOutput::Size() > FLAGS_max_num_dump_feature) {
-       FeatureOutput::Write();
-     }
-   }
+    if (std::fabs(timestamp - timestamp_) > FLAGS_replay_timestamp_gap ||
+        FeatureOutput::Size() > FLAGS_max_num_dump_feature) {
+      FeatureOutput::Write();
+    }
+  }
 
   timestamp_ = timestamp;
   ADEBUG << "Current timestamp is [" << timestamp_ << "]";
