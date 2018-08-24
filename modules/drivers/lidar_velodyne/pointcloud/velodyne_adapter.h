@@ -106,4 +106,4 @@ class VelodyneAdapter {
 }  // namespace drivers
 }  // namespace apollo
 
-#endif  // MODULES_DRIVERS_VELODYNE_POINTCLOUD_VELODYNE_ADAPTER_H_
+#endif  // MODULES_DRIVERS_LIDAR_VELODYNE_POINTCLOUD_VELODYNE_ADAPTER_H_
