@@ -29,10 +29,13 @@
 #include "modules/common/apollo_app.h"
 #include "modules/common/util/util.h"
 #include "modules/drivers/lidar_velodyne/driver/driver_nodelet.h"
+#include "modules/drivers/lidar_velodyne/pointcloud/cloud_nodelet.h"
+#include "modules/drivers/lidar_velodyne/pointcloud/ringcolors_nodelet.h"
+#include "modules/drivers/lidar_velodyne/pointcloud/transform_nodelet.h"
 
 /**
- * @namespace apollo::velodyne
- * @brief apollo::velodyne
+ * @namespace apollo::drivers::lidar_velodyne
+ * @brief apollo::drivers::lidar_velodyne
  */
 namespace apollo {
 namespace drivers {
@@ -58,6 +61,9 @@ class Velodyne : public apollo::common::ApolloApp {
   std::vector<std::shared_ptr<std::thread> > threads_;
 
   DriverNodelet driver_nodelet_;
+  CloudNodelet cloud_nodelet_;
+  TransformNodelet transform_nodelet_;
+  RingColorsNodelet ringcolors_nodelet_;
 };
 
 }  // namespace lidar_velodyne
