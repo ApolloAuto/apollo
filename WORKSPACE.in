@@ -213,9 +213,10 @@ new_local_repository(
 )
 
 #libprotobuf-mutator
-new_git_repository(
+new_http_archive(
     name = "libprotobuf_mutator",
     build_file = "third_party/libprotobuf_mutator.BUILD",
-    commit = "f15940c782f9d130676de947d3a8a3662e4a8f34",
-    remote = "https://github.com/BaiduXLab/libprotobuf-mutator.git",
+    sha256 = "9e8c92b4e70c2639d355eb5e99c89f9f5f760ca9cb87a400e3c38e10711e58b6",
+    strip_prefix = "libprotobuf-mutator-1.0",
+    url = "https://github.com/BaiduXLab/libprotobuf-mutator/archive/v1.0.tar.gz",
 )
