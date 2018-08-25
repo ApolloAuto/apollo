@@ -24,10 +24,10 @@
 
   1. Go to the `modules/localization` directory, and create a `foo` directory. In the `foo` directory, implement the class `FooLocalization` by following the code in the `RTKLocalization` class in the `rtk` directory. `FooLocalization` has to be a subclass of `LocalizationBase`. Also create a file `foo/BUILD` by following the file `rtk/BUILD`.
 
-  1. You need to register the `FooLocalizatoin` class in the function `Localization::RegisterLocalizationMethods()`, which is located in the C++ file `localization.cc`. You can register it by inserting the following code at the end of the function:
-  
+  1. You need to register the `FooLocalization` class in the function `Localization::RegisterLocalizationMethods()`, which is located in the C++ file `localization.cc`. You can register it by inserting the following code at the end of the function:
+
   ```
-  localization_factory_.Register(LocalizationConfing::FOO, []()->LocalizationBase* { return new FooLocalization(); });
+  localization_factory_.Register(LocalizationConfig::FOO, []()->LocalizationBase* { return new FooLocalization(); });
   ```
   
   Make sure your code compiles by including the header files that defines class `FooLocalization`.
