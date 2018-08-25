@@ -46,9 +46,9 @@ class MlpModel(model_base.ModelBase):
     """prediction model with fully connected layers."""
 
     def __init__(self,
-                 is_training = True,
-                 batch_norm_decay = 0.999,
-                 batch_norm_epsilon = 0.001,
+                 is_training=True,
+                 batch_norm_decay=0.999,
+                 batch_norm_epsilon=0.001,
                  data_format='channels_last'):
         super(MlpModel, self).__init__(is_training, data_format,
                                        batch_norm_decay, batch_norm_epsilon)
