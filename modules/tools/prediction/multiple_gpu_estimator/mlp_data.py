@@ -60,12 +60,11 @@ class MlpDataSet(object):
         features = tf.parse_single_example(
                 serialized_example,
                 features={
-                        'image': tf.FixedLenFeature([], tf.string),
-                        'label': tf.FixedLenFeature([], tf.int64),
+                        'image': tf.FixedLenFeature([62], tf.float32),
+                        'label': tf.FixedLenFeature([1], tf.float32),
                 })
-        image = tf.decode_raw(features['image'], tf.float32)
-        image.set_shape([dim_input])
 
+        image = features['image']
         label = tf.cast(features['label'], tf.int32)
         return image, label
 
