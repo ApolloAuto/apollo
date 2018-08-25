@@ -27,8 +27,8 @@
  *  ROS driver nodelet for the Velodyne 3D LIDARs
  */
 
-#ifndef MODULES_DRIVERS_VELODYN_DRIVER_DRIVER_NODELET_H_
-#define MODULES_DRIVERS_VELODYN_DRIVER_DRIVER_NODELET_H_
+#ifndef MODULES_DRIVERS_LIDAR_VELODYN_DRIVER_DRIVER_NODELET_H_
+#define MODULES_DRIVERS_LIDAR_VELODYN_DRIVER_DRIVER_NODELET_H_
 
 #include <string>
 
@@ -54,10 +54,10 @@ class DriverNodelet {
     }
   }
 
-  virtual void OnInit(void);
+  virtual void OnInit();
 
  private:
-  virtual void DevicePoll(void);
+  virtual void DevicePoll();
 
   volatile bool running_;  ///< device thread is running
   boost::shared_ptr<boost::thread> deviceThread_;
@@ -68,28 +68,8 @@ class DriverNodelet {
   ros::NodeHandle private_nh_;
 };
 
-void DriverNodelet::OnInit() {
-  // start the driver
-  dvr_.reset(new VelodyneDriver(nh_, private_nh_));
-
-  // spawn device poll thread
-  running_ = true;
-  deviceThread_ = boost::shared_ptr<boost::thread>(
-      new boost::thread(boost::bind(&DriverNodelet::DevicePoll, this)));
-}
-
-/** @brief Device poll thread main loop. */
-void DriverNodelet::DevicePoll() {
-  while (ros::ok()) {
-    // poll device until end of file
-    running_ = dvr_->poll();
-    if (!running_) break;
-  }
-  running_ = false;
-}
-
 }  // namespace lidar_velodyne
 }  // namespace drivers
 }  // namespace apollo
 
-#endif  // MODULES_DRIVERS_VELODYN_DRIVER_DRIVER_NODELET_H_
+#endif  // MODULES_DRIVERS_LIDAR_VELODYN_DRIVER_DRIVER_NODELET_H_
