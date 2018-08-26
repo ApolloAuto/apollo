@@ -14,16 +14,26 @@ Setup steps:
 1. Start the docker release environment using the command:
 
     ```
-    bash docker/scripts/release_start.sh
+    bash docker/scripts/dev_start.sh
     ```
 
 2. Enter the docker release environment:
 
     ```
-    bash docker/scripts/release_into.sh
+    bash docker/scripts/dev_into.sh
     ```
 
-3. Now you can play the rosbag:
+3. Build Apollo in the Container:
+    ```
+    bash apollo.sh build
+    ```
+
+4. Bootstrap to start ros call and Monitor module and Dreamview
+    ```
+    bash bootstrap.sh
+    ```
+
+5. Now you can play the rosbag:
 
     ```
     sudo python docs/demo_guide/rosbag_helper.py demo_2.0.bag #download rosbag
@@ -33,7 +43,7 @@ Setup steps:
     The `--loop` option enables rosbag to keep playing the bag in a loop
     playback mode.
 
-4. Open Chrome and go to **localhost:8888** to access Apollo Dreamview, which
+6. Open Chrome and go to **localhost:8888** to access Apollo Dreamview, which
    opens the screen below.
     ![](images/dv_trajectory.png)
    The car in Dreamview is happy to move around!

@@ -401,11 +401,11 @@ void EMPlanner::GenerateFallbackPathProfile(
 
 void EMPlanner::GenerateFallbackSpeedProfile(
     const ReferenceLineInfo* reference_line_info, SpeedData* speed_data) {
-  *speed_data = GenerateStopProfileFromPolynomial(
+  if (FLAGS_enable_polynomial_speed_fallback) {
+    *speed_data = GenerateStopProfileFromPolynomial(
       reference_line_info->AdcPlanningPoint().v(),
       reference_line_info->AdcPlanningPoint().a());
-
-  if (speed_data->Empty()) {
+  } else {
     *speed_data =
         GenerateStopProfile(reference_line_info->AdcPlanningPoint().v(),
                             reference_line_info->AdcPlanningPoint().a());

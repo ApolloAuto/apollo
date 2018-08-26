@@ -196,6 +196,7 @@ DECLARE_double(nudge_buffer);
 DECLARE_bool(use_planning_fallback);
 DECLARE_double(fallback_total_time);
 DECLARE_double(fallback_time_unit);
+DECLARE_bool(enable_polynomial_speed_fallback);
 
 // navigation mode
 DECLARE_double(navigation_fallback_cruise_time);

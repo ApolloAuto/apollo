@@ -52,12 +52,9 @@ Status Perception::Init() {
   AdapterManager::Init(FLAGS_perception_adapter_config_filename);
 
   RegistAllOnboardClass();
-  const std::string dag_config_path = apollo::common::util::GetAbsolutePath(
-      FLAGS_work_root, FLAGS_dag_config_path);
-
-  if (!dag_streaming_.Init(dag_config_path)) {
-    AERROR << "failed to Init DAGStreaming. dag_config_path:"
-           << dag_config_path;
+  if (!dag_streaming_.Init(FLAGS_dag_config_path)) {
+    AERROR << "Failed to init DAGStreaming. dag_config_path:"
+           << FLAGS_dag_config_path;
     return Status(ErrorCode::PERCEPTION_ERROR, "failed to Init DAGStreaming.");
   }
   callback_thread_num_ = 5;
