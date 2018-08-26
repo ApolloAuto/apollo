@@ -37,8 +37,11 @@ import tensorflow as tf
 
 
 class ModelBase(object):
-    def __init__(self, is_training=True, data_format='channels_last',
-                 batch_norm_decay=0.999, batch_norm_epsilon=0.001):
+    def __init__(self,
+                 is_training=True,
+                 data_format='channels_last',
+                 batch_norm_decay=0.999,
+                 batch_norm_epsilon=0.001):
         """ModelBase constructor.
 
     Args:
