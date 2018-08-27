@@ -29,3 +29,8 @@ DEFINE_bool(publish_raw_pointcloud, true, "RAW_POINT_CLOUD");
 DEFINE_bool(publish_compensator_pointcloud, true, "POINT_CLOUD");
 
 DEFINE_bool(pipeline_mode, false, "exec point one by one");
+
+DEFINE_string(calibration_file_vls128,
+              "modules/drivers/lidar_velodyne/pointcloud/params/"
+              "VeloView_VLS-128_FS1.yaml",
+              "The calibration file of vls128");

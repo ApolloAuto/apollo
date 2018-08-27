@@ -42,6 +42,9 @@
 #include "tf/transform_listener.h"
 #include "velodyne_msgs/VelodyneScan.h"
 
+#include "modules/common/log.h"
+#include "modules/common/util/file.h"
+
 namespace apollo {
 namespace drivers {
 namespace lidar_velodyne {
@@ -89,15 +92,13 @@ double computeTimeStamp(velodyne_msgs::VelodyneScanPtr scan, int index) {
 
 VelodyneDriver::VelodyneDriver(ros::NodeHandle node,
                                ros::NodeHandle private_nh) {
+  // TODO(All): get proto from file here.
   // use private node handle to get parameters
-  private_nh.param("frame_id", config_.frame_id, std::string("velodyne"));
-  std::string tf_prefix = tf::getPrefixParam(private_nh);
-  ROS_DEBUG_STREAM("tf_prefix: " << tf_prefix);
-  config_.frame_id = tf::resolve(tf_prefix, config_.frame_id);
+  config_.frame_id = driver_node_conf_.frame_id();
 
   // get model name, validate string, determine packet rate
-  private_nh.param("model", config_.model, std::string("64E"));
-  double packet_rate;  // packet frequency (Hz)
+  config_.model = driver_node_conf_.model();
+  double packet_rate = 0.0;  // packet frequency (Hz)
   std::string model_full_name;
   if ((config_.model == "64E_S2") || (config_.model == "64E_S2.1")) {
     // generates 1333312 points per second
@@ -128,21 +129,20 @@ VelodyneDriver::VelodyneDriver(ros::NodeHandle node,
   }
   std::string deviceName(std::string("Velodyne ") + model_full_name);
 
-  private_nh.param("rpm", config_.rpm, 600.0);
-  ROS_INFO_STREAM(deviceName << " rotating at " << config_.rpm << " RPM");
+  config_.rpm = driver_node_conf_.rpm();
+
+  AINFO << deviceName << " rotating at " << config_.rpm << " RPM";
   double frequency = (config_.rpm / 60.0);  // expected Hz rate
+  AINFO << "publishing frequency: " << frequency;
 
   // default number of packets for each scan is a single revolution
   // (fractions rounded up)
-  config_.npackets = static_cast<int>(ceil(packet_rate / frequency));
-  private_nh.getParam("npackets", config_.npackets);
-  ROS_INFO_STREAM("publishing " << config_.npackets << " packets per scan");
+  config_.npackets = driver_node_conf_.npackets();
+  AINFO << "publishing " << config_.npackets << " packets per scan";
 
-  std::string dump_file;
-  private_nh.param("pcap", dump_file, std::string(""));
+  std::string dump_file = driver_node_conf_.pcap();
 
-  int udp_port = 0;
-  private_nh.param("port", udp_port, static_cast<int>(DATA_PORT_NUMBER));
+  int udp_port = driver_node_conf_.port();
 
   // Initialize dynamic reconfigure
   // srv_ = boost::make_shared<

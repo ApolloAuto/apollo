@@ -5,10 +5,12 @@ services:
 dist: trusty
 os: linux
 env:
-    - JOB=cibuild
-    - JOB=citest
-    - JOB=citest_perception
     - JOB=lint
+    - JOB=cibuild
+    - JOB=citest_basic
+    - JOB=citest_map
+    - JOB=citest_dreamview
+    - JOB=citest_perception
 cache:
   directories:
   - $HOME/.cache/bazel

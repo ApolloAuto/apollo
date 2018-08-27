@@ -28,5 +28,6 @@ DECLARE_bool(publish_raw_pointcloud);
 DECLARE_bool(publish_compensator_pointcloud);
 
 DECLARE_bool(pipeline_mode);
+DECLARE_string(calibration_file_vls128);
 
-#endif
+#endif  // MODULES_DRIVERS_LIDAR_VELODYNE_COMMON_VELODYNE_GFLAGS_H_

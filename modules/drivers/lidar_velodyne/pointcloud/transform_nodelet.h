@@ -26,8 +26,8 @@
     PointCloud2 in the /odom frame.
 */
 
-#ifndef MODULES_DRIVERS_VELODYN_DRIVER_TRANSFORM_NODELET_H_
-#define MODULES_DRIVERS_VELODYN_DRIVER_TRANSFORM_NODELET_H_
+#ifndef MODULES_DRIVERS_LIDAR_VELODYN_DRIVER_TRANSFORM_NODELET_H_
+#define MODULES_DRIVERS_LIDAR_VELODYN_DRIVER_TRANSFORM_NODELET_H_
 
 #include "ros/ros.h"
 
@@ -41,7 +41,9 @@ class TransformNodelet {
  public:
   TransformNodelet() = default;
   ~TransformNodelet() = default;
-  virtual void OnInit();
+
+  /** @brief Nodelet initialization. */
+  void OnInit() { tf_.reset(new Transform(nh_, private_nh_)); }
 
  private:
   ros::NodeHandle nh_;
@@ -49,11 +51,8 @@ class TransformNodelet {
   boost::shared_ptr<Transform> tf_;
 };
 
-/** @brief Nodelet initialization. */
-void TransformNodelet::OnInit() { tf_.reset(new Transform(nh_, private_nh_)); }
-
 }  // namespace lidar_velodyne
 }  // namespace drivers
 }  // namespace apollo
 
-#endif  // MODULES_DRIVERS_VELODYN_DRIVER_TRANSFORM_NODELET_H_
+#endif  // MODULES_DRIVERS_LIDAR_VELODYN_DRIVER_TRANSFORM_NODELET_H_

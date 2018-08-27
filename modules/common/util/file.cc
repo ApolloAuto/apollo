@@ -106,7 +106,7 @@ bool DirectoryExists(const std::string &directory_path) {
   return false;
 }
 
-std::vector<std::string> Glob(const std::string& pattern) {
+std::vector<std::string> Glob(const std::string &pattern) {
   glob_t globs = {};
   std::vector<std::string> results;
   if (0 == glob(pattern.c_str(), GLOB_TILDE, nullptr, &globs)) {

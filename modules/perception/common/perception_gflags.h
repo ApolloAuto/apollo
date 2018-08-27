@@ -21,8 +21,6 @@
 #include "modules/common/configs/config_gflags.h"
 DECLARE_string(perception_adapter_config_filename);
 
-DECLARE_string(work_root);
-
 /// obstacle/base/object.cc
 DECLARE_bool(is_serialize_point_cloud);
 

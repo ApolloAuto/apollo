@@ -37,8 +37,6 @@ DEFINE_string(test_chassis_file, "", "The chassis test file");
 DEFINE_string(perception_config_file, "", "The perception config file");
 
 void PerceptionTestBase::SetUpTestCase() {
-  FLAGS_work_root = "modules/perception";
-
   FLAGS_perception_config_file =
       "modules/perception/integration_tests/testdata/conf/"
       "perception_config.pb.txt";
@@ -46,7 +44,7 @@ void PerceptionTestBase::SetUpTestCase() {
       "modules/perception/integration_tests/testdata/conf/adapter.conf";
 
   FLAGS_dag_config_path =
-      "./integration_tests/testdata/conf/dag_streaming.config";
+      "modules/perception/integration_tests/testdata/conf/dag_streaming.config";
 
   FLAGS_test_pointcloud_file =
       "modules/perception/integration_tests/testdata/point_cloud_test_file.pcd";
