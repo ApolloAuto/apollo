@@ -9,6 +9,7 @@ cc_library(
     deps = [
         "//modules/common:log",
         "//modules/common:macro",
+        "//modules/prediction/proto:prediction_conf_proto",
     ],
 )
 
