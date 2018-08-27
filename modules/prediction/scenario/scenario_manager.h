@@ -21,13 +21,33 @@
 #ifndef MODULES_PREDICTION_SCENARIO_SCENARIO_MANAGER_H_
 #define MODULES_PREDICTION_SCENARIO_SCENARIO_MANAGER_H_
 
+#include "modules/prediction/proto/prediction_conf.pb.h"
+
 namespace apollo {
 namespace prediction {
 
 class ScenarioManager {
  public:
+  /**
+   * @brief Constructor
+   */
   ScenarioManager();
+
+  /**
+   * @brief Destructor
+   */
   virtual ~ScenarioManager();
+
+  /**
+   * @brief Initializer
+   * @param Prediction config
+   */
+  void Init(const PredictionConf& config);
+
+  /**
+   * @brief Run scenario analysis 
+   */
+  void Run();
 };
 
 }  // namespace prediction
