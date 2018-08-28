@@ -3,7 +3,7 @@ Apollo 3.0
 June 27, 2018
 
 ## Introduction
-Apollo 3.0 aims for L4 autonomous driving with low cost sensors. The autonomous vehicle will stay in the lane and keep a distance with the closest in-path vehicle (CIPV) using a single front-facing camera and a frontal radar. Apollo 3.0 is best suited for a closed venue setting and driving should be restricted to low speed. 
+Apollo 3.0 aims for L2 autonomous driving with low cost sensors. The autonomous vehicle will stay in the lane and keep a distance with the closest in-path vehicle (CIPV) using a single front-facing camera and a frontal radar. Apollo 3.0 is best suited for a closed venue setting and driving should be restricted to low speed. 
 
 
 ***Safety alert***
