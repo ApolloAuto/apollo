@@ -72,7 +72,7 @@ void PoseContainer::Update(
     double qx = localization.pose().orientation().qx();
     double qy = localization.pose().orientation().qy();
     double qz = localization.pose().orientation().qz();
-    theta = ::apollo::common::math::QuaternionToHeading(qw, qx, qy, qz);
+    theta = common::math::QuaternionToHeading(qw, qx, qy, qz);
   }
   obstacle_ptr_->set_theta(theta);
 
