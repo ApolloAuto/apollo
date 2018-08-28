@@ -18,6 +18,8 @@
 * @file
 **/
 
+#include "glog/logging.h"
+
 #include "modules/common/util/thread_pool.h"
 
 namespace apollo {
@@ -30,7 +32,9 @@ void ThreadPool::Init(int pool_size) {
   instance()->pool_.reset(new ctpl::thread_pool(pool_size));
 }
 
-ctpl::thread_pool* ThreadPool::pool() { return instance()->pool_.get(); }
+ctpl::thread_pool* ThreadPool::pool() {
+  return CHECK_NOTNULL(instance()->pool_.get());
+}
 
 void ThreadPool::Stop() {
   if (instance()->pool_) {
