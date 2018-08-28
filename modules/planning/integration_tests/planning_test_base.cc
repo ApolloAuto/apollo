@@ -100,6 +100,8 @@ bool PlanningTestBase::SetUpAdapters() {
   FEED_ADAPTER(RelativeMap, FLAGS_test_relative_map_file);
   FEED_ADAPTER(Prediction, FLAGS_test_prediction_file);
   FEED_ADAPTER(TrafficLightDetection, FLAGS_test_traffic_light_file);
+  AdapterManager::Observe();
+
   return true;
 }
 

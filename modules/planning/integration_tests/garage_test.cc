@@ -18,14 +18,13 @@
 
 #include "gtest/gtest.h"
 
+#include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/common/planning_util.h"
 #include "modules/planning/integration_tests/planning_test_base.h"
 
 namespace apollo {
 namespace planning {
 
-using apollo::planning::util::GetPlanningStatus;
 using common::adapter::AdapterManager;
 
 DECLARE_string(test_routing_response_file);

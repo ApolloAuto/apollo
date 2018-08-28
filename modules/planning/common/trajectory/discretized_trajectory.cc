@@ -26,7 +26,7 @@
 
 #include "modules/common/log.h"
 #include "modules/common/math/linear_interpolation.h"
-#include "modules/planning/common/planning_util.h"
+#include "modules/planning/common/planning_context.h"
 
 namespace apollo {
 namespace planning {
