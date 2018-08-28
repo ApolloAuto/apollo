@@ -5,22 +5,17 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update -y && \
     apt-get install -y \
     apt-transport-https \
+    bc \
     build-essential \
     cmake \
-    curl \
-    software-properties-common \
-    sshfs \
-    wget \
-    unzip \
-    bc \
     cppcheck \
+    curl \
     debconf-utils \
     doxygen \
-    graphviz \
     gdb \
     git \
-    subversion \
     google-perftools \
+    graphviz \
     lcov \
     libblas-dev \
     libboost-all-dev \
@@ -30,11 +25,16 @@ RUN apt-get update -y && \
     libpcap-dev \
     locate \
     lsof \
+    nfs-common \
     realpath \
     shellcheck \
-    vim \
+    software-properties-common \
+    sshfs \
+    subversion \
+    unzip \
     v4l-utils \
-    nfs-common \
+    vim \
+    wget \
     zip && \
     apt-get clean && rm -rf /var/lib/apt/lists/* && \
     echo '\n\n\n' | ssh-keygen -t rsa
