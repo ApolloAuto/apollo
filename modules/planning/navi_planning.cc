@@ -27,8 +27,11 @@
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/math/quaternion.h"
 #include "modules/common/time/time.h"
+#include "modules/common/util/thread_pool.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
+
 #include "modules/map/hdmap/hdmap_util.h"
+
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/planning_util.h"
 #include "modules/planning/common/trajectory/trajectory_stitcher.h"
@@ -47,6 +50,7 @@ using apollo::common::VehicleState;
 using apollo::common::VehicleStateProvider;
 using apollo::common::adapter::AdapterManager;
 using apollo::common::time::Clock;
+using apollo::common::util::ThreadPool;
 using apollo::hdmap::HDMapUtil;
 
 NaviPlanning::~NaviPlanning() { Stop(); }
@@ -78,6 +82,8 @@ Status NaviPlanning::Init() {
   CHECK_ADAPTER(PerceptionObstacles);
   CHECK_ADAPTER(Prediction);
   CHECK_ADAPTER(TrafficLightDetection);
+
+  ThreadPool::Init(FLAGS_max_planning_thread_pool_size);
 
   RegisterPlanners();
   planner_ = planner_factory_.CreateObject(config_.planner_type());
@@ -320,7 +326,7 @@ void NaviPlanning::SetFallbackTrajectory(ADCTrajectory* trajectory_pb) {
 }
 
 void NaviPlanning::Stop() {
-  AERROR << "Planning Stop is called";
+  AWARN << "Planning Stop is called";
   last_publishable_trajectory_.reset(nullptr);
   frame_.reset(nullptr);
   planner_.reset(nullptr);

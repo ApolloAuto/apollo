@@ -24,18 +24,18 @@
 #include <functional>
 #include <utility>
 
-#include "ctpl/ctpl_stl.h"
-
-#include "modules/planning/proto/sl_boundary.pb.h"
-
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/util/string_util.h"
+#include "modules/common/util/thread_pool.h"
 #include "modules/common/util/util.h"
+
 #include "modules/map/hdmap/hdmap_common.h"
 #include "modules/map/hdmap/hdmap_util.h"
+
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/planning_util.h"
+#include "modules/planning/proto/sl_boundary.pb.h"
 
 namespace apollo {
 namespace planning {
@@ -49,6 +49,7 @@ using apollo::common::VehicleSignal;
 using apollo::common::adapter::AdapterManager;
 using apollo::common::math::Box2d;
 using apollo::common::math::Vec2d;
+using apollo::common::util::ThreadPool;
 using apollo::planning::util::GetPlanningStatus;
 
 ReferenceLineInfo::ReferenceLineInfo(const common::VehicleState& vehicle_state,
@@ -218,9 +219,8 @@ void ReferenceLineInfo::SetTrajectory(const DiscretizedTrajectory& trajectory) {
   discretized_trajectory_ = trajectory;
 }
 
-void ReferenceLineInfo::AddObstacleHelper(const Obstacle* obstacle, int* ret) {
-  auto* path_obstacle = AddObstacle(obstacle);
-  *ret = path_obstacle == nullptr ? 0 : 1;
+bool ReferenceLineInfo::AddObstacleHelper(const Obstacle* obstacle) {
+  return AddObstacle(obstacle) != nullptr;
 }
 
 // AddObstacle is thread safe
@@ -268,21 +268,21 @@ PathObstacle* ReferenceLineInfo::AddObstacle(const Obstacle* obstacle) {
 
 bool ReferenceLineInfo::AddObstacles(
     const std::vector<const Obstacle*>& obstacles) {
-  if (obstacles.empty()) {
-    return true;
-  }
   if (FLAGS_use_multi_thread_to_add_obstacles) {
-    std::vector<int> ret(obstacles.size(), 0);
-    ctpl::thread_pool pool(
-        std::min<int>(FLAGS_max_planning_thread_pool_size, obstacles.size()));
-    for (size_t i = 0; i < obstacles.size(); ++i) {
-      const auto* obstacle = obstacles.at(i);
-      pool.push(std::bind(&ReferenceLineInfo::AddObstacleHelper, this, obstacle,
-                          &(ret[i])));
+    std::vector<std::future<bool>> futures;
+    for (const auto* obstacle : obstacles) {
+      futures.push_back(ThreadPool::pool()->push(
+          std::bind(&ReferenceLineInfo::AddObstacleHelper, this, obstacle)));
     }
-    pool.stop(true);
-    if (std::find(ret.begin(), ret.end(), 0) != ret.end()) {
-      return false;
+
+    for (const auto& f : futures) {
+      f.wait();
+    }
+
+    for (auto& f : futures) {
+      if (!f.get()) {
+        return false;
+      }
     }
   } else {
     for (const auto* obstacle : obstacles) {
@@ -292,6 +292,7 @@ bool ReferenceLineInfo::AddObstacles(
       }
     }
   }
+
   return true;
 }
 

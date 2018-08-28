@@ -38,9 +38,9 @@ class StdPlanning : public PlanningBase {
  public:
   StdPlanning() = default;
   virtual ~StdPlanning();
+
   /**
-   * @brief module name
-   * @return module name
+   * @brief Planning algorithm name.
    */
   std::string Name() const override;
 
