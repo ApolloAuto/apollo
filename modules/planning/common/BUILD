@@ -183,6 +183,7 @@ cc_library(
         ":planning_gflags",
         "//modules/common:log",
         "//modules/common/proto:pnc_point_proto",
+        "//modules/common/util:thread_pool",
         "//modules/common/vehicle_state:vehicle_state_provider",
         "//modules/map/pnc_map",
         "//modules/map/proto:map_proto",
@@ -192,7 +193,6 @@ cc_library(
         "//modules/planning/common/trajectory:publishable_trajectory",
         "//modules/planning/proto:lattice_structure_proto",
         "//modules/planning/reference_line",
-        "@ctpl",
         "@eigen",
     ],
 )
