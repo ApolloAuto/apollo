@@ -103,11 +103,9 @@ def draw_boundary(ax, line_segment):
     :param line_segment:
     :return:
     """
-    px = []
-    py = []
-    for p in line_segment.point:
-        px.append(float(p.x))
-        py.append(float(p.y))
+    px = [float(p.x) for p in line_segment.point]
+    py = [float(p.y) for p in line_segment.point]
+
     px = downsample_array(px)
     py = downsample_array(py)
     ax.plot(px, py, 'k', lw=0.4)
