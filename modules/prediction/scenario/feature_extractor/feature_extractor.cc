@@ -24,12 +24,9 @@ namespace apollo {
 namespace prediction {
 
 FeatureExtractor::FeatureExtractor() {
-  // TODO Auto-generated constructor stub
-
 }
 
 FeatureExtractor::~FeatureExtractor() {
-  // TODO Auto-generated destructor stub
 }
 
 }  // namespace prediction

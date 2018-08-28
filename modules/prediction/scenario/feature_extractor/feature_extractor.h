@@ -25,8 +25,9 @@ namespace apollo {
 namespace prediction {
 
 class FeatureExtractor {
-public:
+ public:
   FeatureExtractor();
+
   virtual ~FeatureExtractor();
 };
 
