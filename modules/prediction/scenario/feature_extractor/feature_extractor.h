@@ -21,6 +21,8 @@
 #ifndef MODULES_PREDICTION_SCENARIO_FEATURE_EXTRACTOR_FEATURE_EXTRACTOR_H_
 #define MODULES_PREDICTION_SCENARIO_FEATURE_EXTRACTOR_FEATURE_EXTRACTOR_H_
 
+#include "modules/prediction/proto/scenario_feature.pb.h"
+
 namespace apollo {
 namespace prediction {
 
@@ -29,6 +31,12 @@ class FeatureExtractor {
   FeatureExtractor();
 
   virtual ~FeatureExtractor();
+
+  void UpdateVehicleState();
+
+  void UpdateMap();
+
+  void UpdateObstacleInfo();
 };
 
 }  // namespace prediction
