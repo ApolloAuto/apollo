@@ -206,10 +206,11 @@ new_local_repository(
 )
 
 #adv_plat
-new_local_repository(
+new_http_archive(
     name = "adv_plat",
     build_file = "third_party/adv_plat.BUILD",
-    path = "/usr/local/apollo/adv_plat",
+    sha256 = "0a58dadab924b520d5b5a58ef82fc0f76c2aa4feaaabd49ec9873228c125d513",
+    url = "https://github.com/ApolloAuto/apollo-contrib/releases/download/v3.0.0/plat-sw-3.0.0.1.zip",
 )
 
 #libprotobuf-mutator

@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,36 +15,33 @@
  *****************************************************************************/
 
 /**
- * @file
- */
+* @file
+**/
 
-#ifndef MODULES_PLANNING_UTIL_PLANNING_UTIL_H_
-#define MODULES_PLANNING_UTIL_PLANNING_UTIL_H_
+#include "glog/logging.h"
 
-#include <string>
+#include "modules/common/util/thread_pool.h"
 
-#include "modules/common/proto/pnc_point.pb.h"
-
-#include "modules/planning/proto/planning_status.pb.h"
-
-/**
- * @namespace apollo::common::util
- * @brief apollo::common::util
- */
 namespace apollo {
-namespace planning {
+namespace common {
 namespace util {
 
-/**
- * This function returns the run-time state of the planning module.
- * @Warnning: this function is not thread safe.
- */
-PlanningStatus *GetPlanningStatus();
+ThreadPool::ThreadPool() {}
 
-void DumpPlanningContext();
+void ThreadPool::Init(int pool_size) {
+  instance()->pool_.reset(new ctpl::thread_pool(pool_size));
+}
+
+ctpl::thread_pool* ThreadPool::pool() {
+  return CHECK_NOTNULL(instance()->pool_.get());
+}
+
+void ThreadPool::Stop() {
+  if (instance()->pool_) {
+    instance()->pool_->stop(true);
+  }
+}
 
 }  // namespace util
-}  // namespace planning
+}  // namespace common
 }  // namespace apollo
-
-#endif  // MODULES_PLANNING_UTIL_PLANNING_UTIL_H_

@@ -25,12 +25,11 @@
 #include <string>
 #include <utility>
 
-#include "ctpl/ctpl_stl.h"
-
-#include "modules/common/proto/pnc_point.pb.h"
-
 #include "modules/common/log.h"
 #include "modules/common/math/vec2d.h"
+#include "modules/common/proto/pnc_point.pb.h"
+#include "modules/common/util/thread_pool.h"
+
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
@@ -41,8 +40,10 @@ using apollo::common::SpeedPoint;
 using apollo::common::Status;
 using apollo::common::VehicleParam;
 using apollo::common::math::Vec2d;
+using apollo::common::util::ThreadPool;
 
 namespace {
+
 constexpr float kInf = std::numeric_limits<float>::infinity();
 
 bool CheckOverlapOnDpStGraph(const std::vector<const StBoundary*>& boundaries,
@@ -175,17 +176,19 @@ Status DpStGraph::CalculateTotalCost() {
 
     int count = next_highest_row - next_lowest_row + 1;
     if (count > 0) {
-      ctpl::thread_pool pool(
-          std::min<std::size_t>(FLAGS_max_planning_thread_pool_size, count));
+      std::vector<std::future<void>> futures;
+
       for (uint32_t r = next_lowest_row; r <= next_highest_row; ++r) {
         if (FLAGS_enable_multi_thread_in_dp_st_graph) {
-          pool.push(std::bind(&DpStGraph::CalculateCostAt, this, c, r));
+          futures.push_back(ThreadPool::pool()->push(
+              std::bind(&DpStGraph::CalculateCostAt, this, c, r)));
         } else {
           CalculateCostAt(c, r);
         }
       }
-      if (FLAGS_enable_multi_thread_in_dp_st_graph) {
-        pool.stop(true);
+
+      for (const auto& f : futures) {
+        f.wait();
       }
     }
 
