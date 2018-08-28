@@ -80,6 +80,7 @@ void GetBagFiles(const boost::filesystem::path& p,
     }
   }
 }
+
 void Prediction::ProcessRosbag(const std::string& filename) {
   const std::vector<std::string> topics{FLAGS_perception_obstacle_topic,
                                         FLAGS_localization_topic};
@@ -210,7 +211,7 @@ void Prediction::OnPlanning(const planning::ADCTrajectory& adc_trajectory) {
 }
 
 void Prediction::RunOnce(const PerceptionObstacles& perception_obstacles) {
-  if (FLAGS_prediction_test_mode && FLAGS_prediction_test_duration > 0 &&
+  if (FLAGS_prediction_test_mode && FLAGS_prediction_test_duration > 0.0 &&
       (Clock::NowInSeconds() - start_time_ > FLAGS_prediction_test_duration)) {
     AINFO << "Prediction finished running in test mode";
     ros::shutdown();
