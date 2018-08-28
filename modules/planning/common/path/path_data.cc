@@ -28,15 +28,15 @@
 #include "modules/common/math/cartesian_frenet_conversion.h"
 #include "modules/common/util/string_util.h"
 #include "modules/common/util/util.h"
+#include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/common/planning_util.h"
 
 namespace apollo {
 namespace planning {
 
+using apollo::common::SLPoint;
 using apollo::common::math::CartesianFrenetConverter;
 using apollo::common::math::Vec2d;
-using apollo::common::SLPoint;
 
 bool PathData::SetDiscretizedPath(const DiscretizedPath &path) {
   if (reference_line_ == nullptr) {
@@ -154,8 +154,9 @@ std::string PathData::DebugString() const {
                static_cast<size_t>(FLAGS_trajectory_point_num_for_debug));
 
   return apollo::common::util::StrCat(
-      "[\n", apollo::common::util::PrintDebugStringIter(
-                 path_points.begin(), path_points.begin() + limit, ",\n"),
+      "[\n",
+      apollo::common::util::PrintDebugStringIter(
+          path_points.begin(), path_points.begin() + limit, ",\n"),
       "]\n");
 }
 
