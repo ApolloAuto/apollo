@@ -25,8 +25,8 @@
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/time/time.h"
 #include "modules/map/proto/map_lane.pb.h"
+#include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/common/planning_util.h"
 
 namespace apollo {
 namespace planning {
@@ -36,7 +36,6 @@ using apollo::common::adapter::AdapterManager;
 using apollo::common::time::Clock;
 using apollo::hdmap::HDMapUtil;
 using apollo::hdmap::LaneSegment;
-using apollo::planning::util::GetPlanningStatus;
 
 Destination::Destination(const TrafficRuleConfig& config)
     : TrafficRule(config) {}
@@ -84,15 +83,15 @@ int Destination::BuildStopDecision(
     return -1;
   }
 
-  const auto& planning_state = GetPlanningStatus()->planning_state();
+  const auto* planning_status = GetPlanningStatus();
   const auto& routing_end = *routing.routing_request().waypoint().rbegin();
   double dest_lane_s =
       std::max(0.0, routing_end.s() - FLAGS_virtual_stop_wall_length -
                         config_.destination().stop_distance());
 
-  if (planning_state.has_pull_over() &&
-      planning_state.pull_over().has_status() &&
-      planning_state.pull_over().status() == PullOverStatus::DISABLED) {
+  if (planning_status->has_pull_over() &&
+      planning_status->pull_over().has_status() &&
+      planning_status->pull_over().status() == PullOverStatus::DISABLED) {
     Stop(frame, reference_line_info, routing_end.id(), dest_lane_s);
     ADEBUG << "destination: STOP at current lane. PULL-OVER disabled";
     return 0;
@@ -101,8 +100,8 @@ int Destination::BuildStopDecision(
   common::PointENU dest_point;
   if (CheckPullOver(reference_line_info, routing_end.id(), dest_lane_s,
                     &dest_point)) {
-    if (planning_state.has_pull_over() &&
-        planning_state.pull_over().in_pull_over()) {
+    if (planning_status->has_pull_over() &&
+        planning_status->pull_over().in_pull_over()) {
       PullOver(nullptr);
       ADEBUG << "destination: continue PULL OVER";
     } else {
@@ -225,9 +224,9 @@ bool Destination::CheckPullOver(ReferenceLineInfo* const reference_line_info,
 
   // Disable pull-over for the rest route if ChangeLane and clost to dest
   if (change_lane) {
-    auto* planning_state = GetPlanningStatus()->mutable_planning_state();
-    planning_state->clear_pull_over();
-    auto pull_over = planning_state->mutable_pull_over();
+    auto* planning_status = GetPlanningStatus();
+    planning_status->clear_pull_over();
+    auto* pull_over = planning_status->mutable_pull_over();
     pull_over->set_reason(PullOverStatus::DESTINATION);
     pull_over->set_status(PullOverStatus::DISABLED);
     pull_over->set_status_set_time(Clock::NowInSeconds());
@@ -242,11 +241,11 @@ bool Destination::CheckPullOver(ReferenceLineInfo* const reference_line_info,
  * @brief: build pull-over decision upon arriving at destination
  */
 int Destination::PullOver(common::PointENU* const dest_point) {
-  auto* planning_state = GetPlanningStatus()->mutable_planning_state();
-  if (!planning_state->has_pull_over() ||
-      !planning_state->pull_over().in_pull_over()) {
-    planning_state->clear_pull_over();
-    auto pull_over = planning_state->mutable_pull_over();
+  auto* planning_status = GetPlanningStatus();
+  if (!planning_status->has_pull_over() ||
+      !planning_status->pull_over().in_pull_over()) {
+    planning_status->clear_pull_over();
+    auto* pull_over = planning_status->mutable_pull_over();
     pull_over->set_in_pull_over(true);
     pull_over->set_reason(PullOverStatus::DESTINATION);
     pull_over->set_status_set_time(Clock::NowInSeconds());

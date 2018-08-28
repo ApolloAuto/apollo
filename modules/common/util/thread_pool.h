@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,29 +14,45 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/planning/common/planning_util.h"
+/**
+* @file
+**/
 
-#include "modules/common/adapters/adapter_manager.h"
-#include "modules/planning/common/planning_gflags.h"
+#ifndef MODULES_COMMON_UTIL_THREAD_POOL_H_
+#define MODULES_COMMON_UTIL_THREAD_POOL_H_
+
+#include <memory>
+
+#include "ctpl/ctpl_stl.h"
+#include "modules/common/macro.h"
 
 namespace apollo {
-namespace planning {
+namespace common {
 namespace util {
 
-using common::adapter::AdapterManager;
+/**
+* @class ThreadPool
+*
+* @brief A wrapper around ctpl thread pool.
+* TODO(authors): Eventually migrate other threadpool usages to this.
+*/
 
-PlanningStatus *GetPlanningStatus() {
-  static PlanningStatus status;
-  return &status;
-}
+class ThreadPool {
+ public:
+  static void Init(int pool_size);
 
-void DumpPlanningContext() {
-  AdapterManager::GetLocalization()->DumpLatestMessage();
-  AdapterManager::GetChassis()->DumpLatestMessage();
-  AdapterManager::GetRoutingResponse()->DumpLatestMessage();
-  AdapterManager::GetPrediction()->DumpLatestMessage();
-}
+  static ctpl::thread_pool* pool();
+
+  static void Stop();
+
+ private:
+  std::unique_ptr<ctpl::thread_pool> pool_;
+
+  DECLARE_SINGLETON(ThreadPool);
+};
 
 }  // namespace util
-}  // namespace planning
+}  // namespace common
 }  // namespace apollo
+
+#endif  // MODULES_COMMON_UTIL_THREAD_POOL_H_
