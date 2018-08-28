@@ -2,37 +2,45 @@ FROM nvidia/cuda:8.0-cudnn7-devel-ubuntu14.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-RUN apt-get update && \
-   apt-get install -y \
-   bc \
-   cppcheck \
-   debconf-utils \
-   doxygen \
-   graphviz \
-   gdb \
-   git \
-   subversion \
-   google-perftools \
-   lcov \
-   libblas-dev \
-   libboost-all-dev \
-   libcurl4-openssl-dev \
-   libfreetype6-dev \
-   liblapack-dev \
-   libpcap-dev \
-   locate \
-   lsof \
-   realpath \
-   shellcheck \
-   vim \
-   v4l-utils \
-   nfs-common \
-   zip && \
-   apt-get clean && rm -rf /var/lib/apt/lists/*
+RUN apt-get update -y && \
+    apt-get install -y \
+    apt-transport-https \
+    build-essential \
+    cmake \
+    curl \
+    software-properties-common \
+    sshfs \
+    wget \
+    unzip \
+    bc \
+    cppcheck \
+    debconf-utils \
+    doxygen \
+    graphviz \
+    gdb \
+    git \
+    subversion \
+    google-perftools \
+    lcov \
+    libblas-dev \
+    libboost-all-dev \
+    libcurl4-openssl-dev \
+    libfreetype6-dev \
+    liblapack-dev \
+    libpcap-dev \
+    locate \
+    lsof \
+    realpath \
+    shellcheck \
+    vim \
+    v4l-utils \
+    nfs-common \
+    zip && \
+    apt-get clean && rm -rf /var/lib/apt/lists/* && \
+    echo '\n\n\n' | ssh-keygen -t rsa
 
 # Run installers.
 COPY installers /tmp/installers
-RUN bash /tmp/installers/pre_install.sh
 RUN bash /tmp/installers/install_adv_plat.sh
 RUN bash /tmp/installers/install_bazel.sh
 RUN bash /tmp/installers/install_bazel_packages.sh
