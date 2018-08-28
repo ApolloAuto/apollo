@@ -38,7 +38,7 @@ void ADCTrajectoryContainer::Insert(
     const ::google::protobuf::Message& message) {
   adc_lane_ids_.clear();
   adc_lane_seq_.clear();
-  adc_junction_polygon_ = Polygon2d{};
+  adc_junction_polygon_ = std::move(Polygon2d());
 
   std::lock_guard<std::mutex> lock(adc_trajectory_mutex_);
   adc_trajectory_.CopyFrom(dynamic_cast<const ADCTrajectory&>(message));
