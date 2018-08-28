@@ -1,6 +1,22 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_proto_library(
+    name = "scenario_feature_proto",
+    deps = [
+        ":scenario_feature_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "scenario_feature_proto_lib",
+    srcs = [
+        "scenario_feature.proto",
+    ],
+    deps = [
+    ],
+)
+
+cc_proto_library(
     name = "prediction_conf_proto",
     deps = [
         ":prediction_conf_proto_lib",
