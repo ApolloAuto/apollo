@@ -216,8 +216,9 @@ Status EMPlanner::PlanOnReferenceLine(
 
   if (!ret.ok() || reference_line_info->speed_data().Empty()) {
     ADEBUG << "Speed fallback.";
-    GenerateFallbackSpeedProfile(reference_line_info,
-                                 reference_line_info->mutable_speed_data());
+
+    *reference_line_info->mutable_speed_data() =
+        GenerateFallbackSpeedProfile(*reference_line_info);
     reference_line_info->AddCost(kSpeedOptimizationFallbackClost);
   }
 
@@ -399,16 +400,14 @@ void EMPlanner::GenerateFallbackPathProfile(
   path_data->SetDiscretizedPath(DiscretizedPath(std::move(path_points)));
 }
 
-void EMPlanner::GenerateFallbackSpeedProfile(
-    const ReferenceLineInfo* reference_line_info, SpeedData* speed_data) {
-  if (FLAGS_enable_polynomial_speed_fallback) {
-    *speed_data = GenerateStopProfileFromPolynomial(
-      reference_line_info->AdcPlanningPoint().v(),
-      reference_line_info->AdcPlanningPoint().a());
+SpeedData EMPlanner::GenerateFallbackSpeedProfile(
+    const ReferenceLineInfo& reference_line_info) {
+  const double init_v = reference_line_info.AdcPlanningPoint().v();
+  const double init_a = reference_line_info.AdcPlanningPoint().a();
+  if (init_v > FLAGS_polynomial_speed_fallback_velocity) {
+    return GenerateStopProfileFromPolynomial(init_v, init_a);
   } else {
-    *speed_data =
-        GenerateStopProfile(reference_line_info->AdcPlanningPoint().v(),
-                            reference_line_info->AdcPlanningPoint().a());
+    return GenerateStopProfile(init_v, init_a);
   }
 }
 
@@ -429,8 +428,7 @@ SpeedData EMPlanner::GenerateStopProfile(const double init_speed,
     double v = 0.0;
     s = std::fmax(pre_s,
                   pre_s + 0.5 * (pre_v + (pre_v + unit_t * acc)) * unit_t);
-    v = std::fmax(0.0,
-                  pre_v + unit_t * acc);
+    v = std::fmax(0.0, pre_v + unit_t * acc);
     speed_data.AppendSpeedPoint(s, t, v, acc, 0.0);
     pre_s = s;
     pre_v = v;

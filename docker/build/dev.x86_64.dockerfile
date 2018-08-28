@@ -2,9 +2,45 @@ FROM nvidia/cuda:8.0-cudnn7-devel-ubuntu14.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 
+RUN apt-get update -y && \
+    apt-get install -y \
+    apt-transport-https \
+    bc \
+    build-essential \
+    cmake \
+    cppcheck \
+    curl \
+    debconf-utils \
+    doxygen \
+    gdb \
+    git \
+    google-perftools \
+    graphviz \
+    lcov \
+    libblas-dev \
+    libboost-all-dev \
+    libcurl4-openssl-dev \
+    libfreetype6-dev \
+    liblapack-dev \
+    libpcap-dev \
+    locate \
+    lsof \
+    nfs-common \
+    realpath \
+    shellcheck \
+    software-properties-common \
+    sshfs \
+    subversion \
+    unzip \
+    v4l-utils \
+    vim \
+    wget \
+    zip && \
+    apt-get clean && rm -rf /var/lib/apt/lists/* && \
+    echo '\n\n\n' | ssh-keygen -t rsa
+
 # Run installers.
 COPY installers /tmp/installers
-RUN bash /tmp/installers/pre_install.sh
 RUN bash /tmp/installers/install_adv_plat.sh
 RUN bash /tmp/installers/install_bazel.sh
 RUN bash /tmp/installers/install_bazel_packages.sh
@@ -28,33 +64,6 @@ RUN bash /tmp/installers/install_undistort.sh
 RUN bash /tmp/installers/install_user.sh
 RUN bash /tmp/installers/install_yarn.sh
 RUN bash /tmp/installers/post_install.sh
-
-RUN apt-get install -y \
-   bc \
-   cppcheck \
-   debconf-utils \
-   doxygen \
-   graphviz \
-   gdb \
-   git \
-   subversion \
-   google-perftools \
-   lcov \
-   libblas-dev \
-   libboost-all-dev \
-   libcurl4-openssl-dev \
-   libfreetype6-dev \
-   liblapack-dev \
-   libpcap-dev \
-   locate \
-   lsof \
-   realpath \
-   shellcheck \
-   vim \
-   v4l-utils \
-   nfs-common \
-   zip && \
-   apt-get clean && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /apollo
 USER apollo
