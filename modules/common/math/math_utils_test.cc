@@ -75,8 +75,8 @@ TEST(MathUtilsTest, Square) {
 
 TEST(MathUtilsTest, Sqr) {
   EXPECT_DOUBLE_EQ(121.0, Sqr(11.0));
-  EXPECT_DOUBLE_EQ(0.25, Sqr(0.5)); 
-  EXPECT_DOUBLE_EQ(169.0, Sqr(-13.0)); 
+  EXPECT_DOUBLE_EQ(0.25, Sqr(0.5));
+  EXPECT_DOUBLE_EQ(169.0, Sqr(-13.0));
 }
 
 TEST(MathUtilsTest, Sigmoid) {
@@ -87,30 +87,30 @@ TEST(MathUtilsTest, Clamp) {
   EXPECT_EQ(1, Clamp(1, 0, 6));
   EXPECT_EQ(6, Clamp(7, 0, 6));
   EXPECT_EQ(0, Clamp(-1, 0, 6));
-  EXPECT_EQ(0, Clamp(0, 0, 6)); // test lower bound as input
-  EXPECT_EQ(6, Clamp(6, 0, 6)); // test upper bound as input   
+  EXPECT_EQ(0, Clamp(0, 0, 6));  // test lower bound as input
+  EXPECT_EQ(6, Clamp(6, 0, 6));  // test upper bound as input
 }
 
 TEST(MathUtilsTest, RotateAxis) {
-  double x,y;
-  double expected_x,expected_y;
+  double x, y;
+  double expected_x, expected_y;
   expected_x = sqrt(2);
   expected_y = 0;
-  RotateAxis(M_PI/4, 1.0, 1.0, &x, &y);
+  RotateAxis(M_PI / 4, 1.0, 1.0, &x, &y);
   EXPECT_DOUBLE_EQ(expected_x, x);
   EXPECT_NEAR(expected_y, y, 1e-5);
 
   expected_x = 1;
   expected_y = 0;
-  RotateAxis(M_PI/2, 0.0, 1.0, &x, &y);
+  RotateAxis(M_PI / 2, 0.0, 1.0, &x, &y);
   EXPECT_DOUBLE_EQ(expected_x, x);
-  EXPECT_NEAR(expected_y, y,  1e-5);
+  EXPECT_NEAR(expected_y, y, 1e-5);
 
   expected_x = -1;
   expected_y = 0;
   RotateAxis(M_PI, 1.0, 0.0, &x, &y);
   EXPECT_DOUBLE_EQ(expected_x, x);
-  EXPECT_NEAR(expected_y, y,  1e-5);
+  EXPECT_NEAR(expected_y, y, 1e-5);
 }
 
 }  // namespace math
