@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -71,6 +71,46 @@ TEST(MathUtilsTest, Square) {
   EXPECT_EQ(169, Square(-13));
   EXPECT_EQ(2147395600, Square(46340));
   EXPECT_EQ(-2147479015, Square(46341));  // Overflow!
+}
+
+TEST(MathUtilsTest, Sqr) {
+  EXPECT_DOUBLE_EQ(121.0, Sqr(11.0));
+  EXPECT_DOUBLE_EQ(0.25, Sqr(0.5)); 
+  EXPECT_DOUBLE_EQ(169.0, Sqr(-13.0)); 
+}
+
+TEST(MathUtilsTest, Sigmoid) {
+  EXPECT_DOUBLE_EQ(0.5, Sigmoid(0.0));
+}
+
+TEST(MathUtilsTest, Clamp) {
+  EXPECT_EQ(1, Clamp(1, 0, 6));
+  EXPECT_EQ(6, Clamp(7, 0, 6));
+  EXPECT_EQ(0, Clamp(-1, 0, 6));
+  EXPECT_EQ(0, Clamp(0, 0, 6)); // test lower bound as input
+  EXPECT_EQ(6, Clamp(6, 0, 6)); // test upper bound as input   
+}
+
+TEST(MathUtilsTest, RotateAxis) {
+  double x,y;
+  double expected_x,expected_y;
+  expected_x = sqrt(2);
+  expected_y = 0;
+  RotateAxis(M_PI/4, 1.0, 1.0, &x, &y);
+  EXPECT_DOUBLE_EQ(expected_x, x);
+  EXPECT_NEAR(expected_y, y, 1e-5);
+
+  expected_x = 1;
+  expected_y = 0;
+  RotateAxis(M_PI/2, 0.0, 1.0, &x, &y);
+  EXPECT_DOUBLE_EQ(expected_x, x);
+  EXPECT_NEAR(expected_y, y,  1e-5);
+
+  expected_x = -1;
+  expected_y = 0;
+  RotateAxis(M_PI, 1.0, 0.0, &x, &y);
+  EXPECT_DOUBLE_EQ(expected_x, x);
+  EXPECT_NEAR(expected_y, y,  1e-5);
 }
 
 }  // namespace math
