@@ -4,8 +4,15 @@ June 27, 2018
 
 ## Introduction
 
-Apollo 3.0 supports L2 autonomous driving capabilities with low cost sensors. The autonomous vehicle will stay in the lane and keep a distance with the closest in-path vehicle (CIPV) using a single front-facing camera and a frontal radar. Apollo 3.0 is best suited for a closed venue setting and driving should be restricted to low speed. 
+Apollo 3.0 introduced a production level solution for the low-cost, closed venue driving scenario that is used as the foundation for comercialized products. The Perception module introduced a few major features to provide more diverse functionalities and a more reliable, robust perception in AV performance, which are:
 
+ * **CIPV(Closest In-Path Vehicle) detection and Tailgaiting**: The vehicle in front of the ego-car is detected and its trajectory is estimated for more efficient tailgating and lane keeping when lane detection is unreliable.
+  * **Asynchronous sensor fusion**: unlike the previous version, Perception in Apollo 3.0 is capable of consolidating all the information and data points by asynchronously fusing LiDAR, Radar and Camera data. Such conditions allow for more comprehensive data capture and reflect more practical sensor environments.
+  * **Online pose estimation**: This new feature estimates the pose of an ego-vehicle for every single frame. This feature helps to drive through bumps or slopes on the road with more accurate 3D scene understanding.
+  * **Ultrasonic sensors**: Perception in Apollo 3.0 now works with ultrasonic sensors. The output can be used for Automated Emergency Brake (AEB) and vertical/perpendicular parking.
+  * **Whole lane line**: Unlike previous lane line segments, this whole lane line feature will provide more accurate and long range detection of lane lines. 
+  * **Visual localization**: Camera's are currently being tested to aide and enhance localization
+  * **16 beam LiDAR support**
 
 ***Safety alert***
 
