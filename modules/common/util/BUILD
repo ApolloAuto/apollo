@@ -232,4 +232,18 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "thread_pool",
+    hdrs = [
+        "thread_pool.h",
+    ],
+    srcs = [
+        "thread_pool.cc",
+    ],
+    deps = [
+        "//modules/common:macro",
+        "@ctpl",
+    ],
+)
+
 cpplint()
