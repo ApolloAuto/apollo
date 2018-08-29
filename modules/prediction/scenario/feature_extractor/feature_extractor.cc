@@ -29,9 +29,12 @@ FeatureExtractor::FeatureExtractor() {
 FeatureExtractor::~FeatureExtractor() {
 }
 
-ScenarioFeature FeatureExtractor::ExtractFeatures() {
-  ScenarioFeature features;
-  return features;
+void FeatureExtractor::ExtractFeatures() {
+  // TODO(all) process all steps here
+}
+
+const ScenarioFeature& FeatureExtractor::scenario_feature() const {
+  return scenario_feature_;
 }
 
 }  // namespace prediction

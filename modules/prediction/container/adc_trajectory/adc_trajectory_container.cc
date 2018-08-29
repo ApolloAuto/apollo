@@ -18,6 +18,7 @@
 
 #include <memory>
 #include <vector>
+#include <utility>
 
 #include "modules/common/log.h"
 #include "modules/prediction/common/prediction_gflags.h"
