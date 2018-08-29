@@ -29,5 +29,10 @@ FeatureExtractor::FeatureExtractor() {
 FeatureExtractor::~FeatureExtractor() {
 }
 
+ScenarioFeature FeatureExtractor::ExtractFeatures() {
+  ScenarioFeature features;
+  return features;
+}
+
 }  // namespace prediction
 }  // namespace apollo
