@@ -34,7 +34,6 @@
 #include "modules/common/status/status.h"
 #include "modules/common/util/factory.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
-#include "modules/planning/common/frame.h"
 #include "modules/planning/common/trajectory/publishable_trajectory.h"
 #include "modules/planning/planner/planner.h"
 
@@ -69,6 +68,14 @@ class PlanningBase : public apollo::common::ApolloApp {
   // Watch dog timer
   virtual void OnTimer(const ros::TimerEvent&) = 0;
 
+  /**
+   * @brief Plan the trajectory given current vehicle state
+   */
+  virtual apollo::common::Status Plan(
+      const double current_time_stamp,
+      const std::vector<common::TrajectoryPoint>& stitching_trajectory,
+      ADCTrajectory* trajectory) = 0;
+
  protected:
   void PublishPlanningPb(ADCTrajectory* trajectory_pb, double timestamp);
 
@@ -83,21 +90,7 @@ class PlanningBase : public apollo::common::ApolloApp {
 
   void RegisterPlanners();
 
-  /**
-   * @brief Plan the trajectory given current vehicle state
-   */
-  common::Status Plan(
-      const double current_time_stamp,
-      const std::vector<common::TrajectoryPoint>& stitching_trajectory,
-      ADCTrajectory* trajectory);
-
-  common::Status InitFrame(const uint32_t sequence_num,
-                           const common::TrajectoryPoint& planning_start_point,
-                           const double start_time,
-                           const common::VehicleState& vehicle_state);
-
   bool IsVehicleStateValid(const common::VehicleState& vehicle_state);
-  void ExportReferenceLineDebug(planning_internal::Debug* debug);
 
   virtual void SetFallbackTrajectory(ADCTrajectory* cruise_trajectory);
 
@@ -113,13 +106,9 @@ class PlanningBase : public apollo::common::ApolloApp {
 
   const hdmap::HDMap* hdmap_ = nullptr;
 
-  std::unique_ptr<Frame> frame_;
-
   std::unique_ptr<Planner> planner_;
 
   std::unique_ptr<PublishableTrajectory> last_publishable_trajectory_;
-
-  std::unique_ptr<ReferenceLineProvider> reference_line_provider_;
 
   ros::Timer timer_;
 };
