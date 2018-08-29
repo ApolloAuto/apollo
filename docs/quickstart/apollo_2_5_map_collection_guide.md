@@ -39,6 +39,7 @@ confirm whether the sensors are ready.
 
 Before the map collection, the vehicle needs to be stationary for five minutes, and then circles the ribbon in figure eight for five minutes.
 During the map collection, we should ensure the same road can be covered more than five times in the speed below 60KM/h. and take different lanes as far as possible in every cycle.
+You don't need to stop at the intersection area, you can pass slowly. It is necessary to collect at least 50m of roads in all directions to ensure the traffic lights and lane lines are complete and clear.
 After the map collection is completed, the vehicle also needs to circle the ribbon in figure eight for five minutes, and to remain stationary for five minutes.
 
 3. After the collection is finished, switch off [Record Bag] firstly, and then switch off [GPS], [Camera], [Velodyne] and [Velodyne16].
