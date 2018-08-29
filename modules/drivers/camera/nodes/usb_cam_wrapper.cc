@@ -30,8 +30,9 @@ namespace apollo {
 namespace drivers {
 namespace camera {
 
-UsbCamWrapper::UsbCamWrapper(ros::NodeHandle node, ros::NodeHandle private_nh) :
-    node_(node), priv_node_(private_nh), last_stamp_(0) {
+UsbCamWrapper::UsbCamWrapper(
+    ros::NodeHandle node, ros::NodeHandle private_nh, CameraConf config) :
+    node_(node), priv_node_(private_nh), config_(config), last_stamp_(0) {
   if (!::apollo::common::util::GetProtoFromFile(FLAGS_camera_config_file,
                                                 &config_)) {
     AERROR << "Unable to load camera conf file: " << FLAGS_camera_config_file;
@@ -40,17 +41,22 @@ UsbCamWrapper::UsbCamWrapper(ros::NodeHandle node, ros::NodeHandle private_nh) :
 
   // pb
   // http://docs.ros.org/melodic/api/sensor_msgs/html/msg/Image.html
-  sensor_image_.mutable_header()->set_camera_timestamp(img_.header.stamp.toSec());
+  sensor_image_.mutable_header()->set_camera_timestamp(
+      img_.header.stamp.toSec());
   sensor_image_.set_frame_id(img_.header.frame_id);
   // TODO(all) sensor_image_.set_measurement_time();
-  sensor_image_.set_height(img_.height);  // image height, that is, number of rows
-  sensor_image_.set_width(img_.width);  // image width, that is, number of columns
+  // image height, that is, number of rows
+  sensor_image_.set_height(img_.height);
+  // image width, that is, number of columns
+  sensor_image_.set_width(img_.width);
   sensor_image_.set_encoding(img_.encoding);
-  sensor_image_.set_step(img_.step);  // Full row length in bytes
+  // Full row length in bytes
+  sensor_image_.set_step(img_.step);
   // actual matrix data, size is (step * rows)
   size_t data_length = img_.step * img_.height;
   std::string image_data;
-  image_data.assign(reinterpret_cast<const char *>(img_.data.data()), data_length);
+  image_data.assign(reinterpret_cast<const char *>(img_.data.data()),
+                    data_length);
   sensor_image_.set_data(image_data);
 
   cinfo_.reset(new camera_info_manager::CameraInfoManager(
@@ -109,7 +115,8 @@ UsbCamWrapper::UsbCamWrapper(ros::NodeHandle node, ros::NodeHandle private_nh) :
   // get the camera basical infomation
   cam_info_.reset(new sensor_msgs::CameraInfo(cinfo_->getCameraInfo()));
 
-  AINFO << "Starting '" << config_.camera_name() << "' (" << config_.video_device()
+  AINFO << "Starting '" << config_.camera_name()
+      << "' (" << config_.video_device()
       << ") at " << config_.image_width() << "x" << config_.image_height()
       << " via " << config_.io_method()  << " (" << config_.pixel_format()
       << ") at %" << config_.frame_rate() << " FPS";
@@ -166,7 +173,8 @@ UsbCamWrapper::UsbCamWrapper(ros::NodeHandle node, ros::NodeHandle private_nh) :
     cam_.set_v4l_parameter("white_balance_temperature_auto", 1);
   } else {
     cam_.set_v4l_parameter("white_balance_temperature_auto", 0);
-    cam_.set_v4l_parameter("white_balance_temperature", config_.white_balance());
+    cam_.set_v4l_parameter("white_balance_temperature",
+                           config_.white_balance());
   }
 
   // check auto exposure

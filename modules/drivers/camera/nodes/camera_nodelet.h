@@ -1,5 +1,5 @@
 /******************************************************************************
- * Modification Copyright 2018 The Apollo Authors. All Rights Reserved.
+ * Copyright 2017 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,18 @@
  * limitations under the License.
  *****************************************************************************/
 
+#ifndef MODULES_DRIVERS_CAMERA_NODES_CAMERA_NODELET_H_
+#define MODULES_DRIVERS_CAMERA_NODES_CAMERA_NODELET_H_
+
 #include <boost/thread.hpp>
 
 #include <ros/ros.h>
 #include <pluginlib/class_list_macros.h>
 #include <nodelet/nodelet.h>
 
-#include "modules/common/log.h"
+// #include "modules/common/log.h"
+// #include "modules/common/util/file.h"
+// #include "modules/drivers/camera/common/camera_gflags.h"
 #include "modules/drivers/camera/nodes/usb_cam_wrapper.h"
 
 namespace apollo {
@@ -29,32 +34,17 @@ namespace camera {
 
 class CameraNodelet {
  public:
-  CameraNodelet() {}
-  ~CameraNodelet() {
-    AINFO << "shutting down driver thread";
-    if (device_thread_ != nullptr && device_thread_->joinable()) {
-      device_thread_->join();
-    }
-    AINFO << "driver thread stopped";
-  }
-  virtual void OnInit(void);
+  CameraNodelet();
+  ~CameraNodelet();
+
+  void OnInit();
 
  private:
   boost::shared_ptr<UsbCamWrapper> usb_cam_wrapper_ = nullptr;
   boost::shared_ptr<boost::thread> device_thread_ = nullptr;
-
- private:
   ros::NodeHandle nh_;
   ros::NodeHandle private_nh_;
 };
-
-void CameraNodelet::OnInit() {
-  AINFO << "Usb cam nodelet init";
-  usb_cam_wrapper_.reset(new UsbCamWrapper(nh_, private_nh_));
-  // spawn device poll thread
-  device_thread_ = boost::shared_ptr<boost::thread>
-        (new boost::thread(boost::bind(&UsbCamWrapper::spin, usb_cam_wrapper_)));
-}
 
 }  // namespace camera
 }  // namespace drivers
@@ -66,3 +56,5 @@ void CameraNodelet::OnInit() {
 // PLUGINLIB_DECLARE_CLASS(camera, UsbCamNodelet,
 //                        ::apollo::drivers::camera::CameraNodelet,
 //                         nodelet::Nodelet);
+
+#endif // MODULES_DRIVERS_CAMERA_NODES_CAMERA_NODELET_H_

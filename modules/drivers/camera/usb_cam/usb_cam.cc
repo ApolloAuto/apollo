@@ -35,7 +35,7 @@
  *********************************************************************/
 #define __STDC_CONSTANT_MACROS
 
-#include "modules/drivers/camera/src/usb_cam.h"
+#include "modules/drivers/camera/usb_cam/usb_cam.h"
 
 #include <assert.h>
 #include <errno.h>
@@ -50,14 +50,15 @@
 #include <sys/time.h>
 #include <sys/types.h>
 #include <unistd.h>
-#include <iostream>
-#include <sstream>
-
 #include <ros/ros.h>
 #include <sensor_msgs/fill_image.h>
 #include <boost/lexical_cast.hpp>
-
 #include "adv_plat/include/adv_trigger.h"
+
+#include <iostream>
+#include <sstream>
+
+#include "modules/common/log.h"
 
 #define CLEAR(x) memset(&(x), 0, sizeof(x))
 
@@ -66,16 +67,16 @@ namespace drivers {
 namespace camera {
 
 static void errno_exit(const char *s) {
-  ROS_ERROR("%s error %d, %s", s, errno, strerror(errno));
+  AERROR << s << " error: " << errno << ", " << strerror(errno);
   exit(EXIT_FAILURE);
 }
 
 static int xioctl(int fd, int request, void *arg) {
   int r;
 
-  do
+  do {
     r = ioctl(fd, request, arg);
-  while (-1 == r && EINTR == errno);
+  } while (-1 == r && EINTR == errno);
 
   return r;
 }
@@ -284,7 +285,7 @@ int UsbCam::init_mjpeg_decoder(int image_width, int image_height) {
 
   avcodec_ = avcodec_find_decoder(AV_CODEC_ID_MJPEG);
   if (!avcodec_) {
-    ROS_ERROR("Could not find MJPEG decoder");
+    AERROR << "Could not find MJPEG decoder";
     return 0;
   }
 
@@ -311,7 +312,7 @@ int UsbCam::init_mjpeg_decoder(int image_width, int image_height) {
 
   /* open it */
   if (avcodec_open2(avcodec_context_, avcodec_, &avoptions_) < 0) {
-    ROS_ERROR("Could not open MJPEG Decoder");
+    AERROR << "Could not open MJPEG Decoder";
     return 0;
   }
   return 1;
@@ -333,7 +334,7 @@ void UsbCam::mjpeg2rgb(char *MJPEG, int len, char *RGB, int NumPixels) {
                                       &got_picture, &avpkt);
 
   if (decoded_len < 0) {
-    ROS_ERROR("Error while decoding frame.");
+    AERROR << "Error while decoding frame.";
     return;
   }
 #else
@@ -342,7 +343,7 @@ void UsbCam::mjpeg2rgb(char *MJPEG, int len, char *RGB, int NumPixels) {
 #endif
 
   if (!got_picture) {
-    ROS_ERROR("Webcam: expected picture but didn't get it...");
+    AERROR << "Webcam: expected picture but didn't get it...";
     return;
   }
 
@@ -350,8 +351,8 @@ void UsbCam::mjpeg2rgb(char *MJPEG, int len, char *RGB, int NumPixels) {
   int ysize = avcodec_context_->height;
   int pic_size = avpicture_get_size(avcodec_context_->pix_fmt, xsize, ysize);
   if (pic_size != avframe_camera_size_) {
-    ROS_ERROR("outbuf size mismatch.  pic_size: %d bufsize: %d", pic_size,
-              avframe_camera_size_);
+    AERROR << "outbuf size mismatch.  pic_size[" << pic_size
+        << "] bufsize[" << avframe_camera_size_ << "]";
     return;
   }
 
@@ -365,7 +366,7 @@ void UsbCam::mjpeg2rgb(char *MJPEG, int len, char *RGB, int NumPixels) {
   int size = avpicture_layout((AVPicture *)avframe_rgb_, PIX_FMT_RGB24, xsize,
                               ysize, (uint8_t *)RGB, avframe_rgb_size_);
   if (size != avframe_rgb_size_) {
-    ROS_ERROR("webcam: avpicture_layout error: %d", size);
+    AERROR << "webcam: avpicture_layout error: " << size;
     return;
   }
 }
@@ -373,13 +374,13 @@ void UsbCam::mjpeg2rgb(char *MJPEG, int len, char *RGB, int NumPixels) {
 bool UsbCam::process_image(const void *src, int len,
                            boost::shared_ptr<CameraImage> dest) {
   if (src == NULL || dest == NULL) {
-    ROS_ERROR("process image error. src or dest is null");
+    AERROR << "process image error. src or dest is null";
     return false;
   }
   if (pixelformat_ == V4L2_PIX_FMT_YUYV || pixelformat_ == V4L2_PIX_FMT_UYVY) {
     memcpy(dest->image, src, dest->width * dest->height * 2);
   } else {
-    ROS_ERROR("unsupported pixel format: %d", pixelformat_);
+    AERROR << "unsupported pixel format: " << pixelformat_;
     return false;
   }
   return true;
@@ -413,14 +414,17 @@ int UsbCam::read_frame() {
       len = v4l_buf.bytesused;
       image_->tv_sec = v4l_buf.timestamp.tv_sec;
       image_->tv_usec = v4l_buf.timestamp.tv_usec;
-      ROS_DEBUG("new image timestamp: %d.%d", image_->tv_sec, image_->tv_usec);
+      ADEBUG << "new image timestamp: "
+          << image_->tv_sec << "." << image_->tv_usec;
 
       result = process_image(buffers_[v4l_buf.index].start, len, image_);
       if (!result) {
         return 0;
       }
 
-      if (-1 == xioctl(fd_, VIDIOC_QBUF, &v4l_buf)) errno_exit("VIDIOC_QBUF");
+      if (-1 == xioctl(fd_, VIDIOC_QBUF, &v4l_buf)) {
+        errno_exit("VIDIOC_QBUF");
+      }
       break;
     case IO_METHOD_UNKNOWN:
       break;
@@ -443,8 +447,9 @@ void UsbCam::stop_capturing(void) {
     case IO_METHOD_MMAP:
       v4l_type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 
-      if (-1 == xioctl(fd_, VIDIOC_STREAMOFF, &v4l_type))
+      if (-1 == xioctl(fd_, VIDIOC_STREAMOFF, &v4l_type)) {
         errno_exit("VIDIOC_STREAMOFF");
+      }
 
       break;
     case IO_METHOD_UNKNOWN:
@@ -471,14 +476,16 @@ void UsbCam::start_capturing(void) {
         tmp_buf.memory = V4L2_MEMORY_MMAP;
         tmp_buf.index = i;
 
-        if (-1 == xioctl(fd_, VIDIOC_QBUF, &tmp_buf)) errno_exit("VIDIOC_QBUF");
+        if (-1 == xioctl(fd_, VIDIOC_QBUF, &tmp_buf)) {
+          errno_exit("VIDIOC_QBUF");
+        }
       }
 
       v4l_type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 
-      if (-1 == xioctl(fd_, VIDIOC_STREAMON, &v4l_type))
+      if (-1 == xioctl(fd_, VIDIOC_STREAMON, &v4l_type)) {
         errno_exit("VIDIOC_STREAMON");
-
+      }
       break;
     case IO_METHOD_UNKNOWN:
       break;
@@ -491,9 +498,11 @@ void UsbCam::uninit_device(void) {
 
   switch (io_) {
     case IO_METHOD_MMAP:
-      for (i = 0; i < n_buffers_; ++i)
-        if (-1 == munmap(buffers_[i].start, buffers_[i].length))
+      for (i = 0; i < n_buffers_; ++i) {
+        if (-1 == munmap(buffers_[i].start, buffers_[i].length)) {
           errno_exit("munmap");
+        }
+      }
       break;
     case IO_METHOD_UNKNOWN:
       break;
@@ -533,15 +542,17 @@ void UsbCam::init_mmap(void) {
     tmp_buf.memory = V4L2_MEMORY_MMAP;
     tmp_buf.index = n_buffers_;
 
-    if (-1 == xioctl(fd_, VIDIOC_QUERYBUF, &tmp_buf))
+    if (-1 == xioctl(fd_, VIDIOC_QUERYBUF, &tmp_buf)) {
       errno_exit("VIDIOC_QUERYBUF");
-
+    }
     buffers_[n_buffers_].length = tmp_buf.length;
     buffers_[n_buffers_].start =
         mmap(NULL, tmp_buf.length, PROT_READ | PROT_WRITE, MAP_SHARED, fd_,
              tmp_buf.m.offset);
 
-    if (MAP_FAILED == buffers_[n_buffers_].start) errno_exit("mmap");
+    if (MAP_FAILED == buffers_[n_buffers_].start) {
+      errno_exit("mmap");
+    }
   }
 }
 
@@ -611,12 +622,18 @@ void UsbCam::init_device(int image_width, int image_height, int framerate) {
   v4l_fmt.fmt.pix.pixelformat = pixelformat_;
   v4l_fmt.fmt.pix.field = V4L2_FIELD_INTERLACED;
 
-  if (-1 == xioctl(fd_, VIDIOC_S_FMT, &v4l_fmt)) errno_exit("VIDIOC_S_FMT");
+  if (-1 == xioctl(fd_, VIDIOC_S_FMT, &v4l_fmt)) {
+    errno_exit("VIDIOC_S_FMT");
+  }
 
   min = v4l_fmt.fmt.pix.width * 2;
-  if (v4l_fmt.fmt.pix.bytesperline < min) v4l_fmt.fmt.pix.bytesperline = min;
+  if (v4l_fmt.fmt.pix.bytesperline < min) {
+    v4l_fmt.fmt.pix.bytesperline = min;
+  }
   min = v4l_fmt.fmt.pix.bytesperline * v4l_fmt.fmt.pix.height;
-  if (v4l_fmt.fmt.pix.sizeimage < min) v4l_fmt.fmt.pix.sizeimage = min;
+  if (v4l_fmt.fmt.pix.sizeimage < min) {
+    v4l_fmt.fmt.pix.sizeimage = min;
+  }
 
   image_width = v4l_fmt.fmt.pix.width;
   image_height = v4l_fmt.fmt.pix.height;
@@ -627,15 +644,15 @@ void UsbCam::init_device(int image_width, int image_height, int framerate) {
   // if (xioctl(fd_, VIDIOC_G_PARM, &stream_params) < 0)
   //   errno_exit("Couldn't query v4l fps!");
 
-  ROS_DEBUG("Capability flag: 0x%x", stream_params.parm.capture.capability);
+  ADEBUG << "Capability flag: " << stream_params.parm.capture.capability;
 
   stream_params.parm.capture.timeperframe.numerator = 1;
   stream_params.parm.capture.timeperframe.denominator = framerate;
-  if (xioctl(fd_, VIDIOC_S_PARM, &stream_params) < 0)
-    ROS_WARN("Couldn't set camera framerate");
-  else
-    ROS_DEBUG("Set framerate to be %i", framerate);
-
+  if (xioctl(fd_, VIDIOC_S_PARM, &stream_params) < 0) {
+    AWARN << "Couldn't set camera framerate";
+  } else {
+    ADEBUG << "Set framerate to be " << framerate;
+  }
   switch (io_) {
     case IO_METHOD_MMAP:
       init_mmap();
@@ -646,7 +663,9 @@ void UsbCam::init_device(int image_width, int image_height, int framerate) {
 }
 
 void UsbCam::close_device(void) {
-  if (-1 == close(fd_)) errno_exit("close");
+  if (-1 == close(fd_)) {
+    errno_exit("close");
+  }
   fd_ = -1;
 }
 
@@ -680,11 +699,11 @@ void UsbCam::start(const std::string &dev, io_method io_method,
 
   io_ = io_method;
   monochrome_ = false;
-  if (pixel_format == PIXEL_FORMAT_YUYV)
+  if (pixel_format == PIXEL_FORMAT_YUYV) {
     pixelformat_ = V4L2_PIX_FMT_YUYV;
-  else if (pixel_format == PIXEL_FORMAT_UYVY)
+  } else if (pixel_format == PIXEL_FORMAT_UYVY) {
     pixelformat_ = V4L2_PIX_FMT_UYVY;
-  else if (pixel_format == PIXEL_FORMAT_MJPEG) {
+  } else if (pixel_format == PIXEL_FORMAT_MJPEG) {
     pixelformat_ = V4L2_PIX_FMT_MJPEG;
     init_mjpeg_decoder(image_width, image_height);
   } else if (pixel_format == PIXEL_FORMAT_YUVMONO10) {
@@ -695,7 +714,7 @@ void UsbCam::start(const std::string &dev, io_method io_method,
   } else if (pixel_format == PIXEL_FORMAT_RGB24) {
     pixelformat_ = V4L2_PIX_FMT_RGB24;
   } else {
-    ROS_ERROR("Unknown pixel format.");
+    AERROR << "Unknown pixel format.";
     exit(EXIT_FAILURE);
   }
 
@@ -713,7 +732,7 @@ void UsbCam::start(const std::string &dev, io_method io_method,
   image_->is_new = 0;
   image_->image = new char[image_->image_size]();
   if (!image_->image) {
-    ROS_ERROR("Outof memory!");
+    AERROR << "Outof memory!";
     exit(EXIT_FAILURE);
   }
 }
@@ -728,9 +747,13 @@ void UsbCam::shutdown(void) {
     av_free(avcodec_context_);
     avcodec_context_ = NULL;
   }
-  if (avframe_camera_) av_free(avframe_camera_);
+  if (avframe_camera_) {
+    av_free(avframe_camera_);
+  }
   avframe_camera_ = NULL;
-  if (avframe_rgb_) av_free(avframe_rgb_);
+  if (avframe_rgb_) {
+    av_free(avframe_rgb_);
+  }
   avframe_rgb_ = NULL;
 }
 
@@ -778,10 +801,9 @@ bool UsbCam::grab_image(int timeout) {
 
   if (-1 == r) {
     if (EINTR == errno) {
-      ROS_ERROR("select error EINTR.");
+      AERROR << "select error EINTR.";
       return false;
     }
-
     errno_exit("select error.");
   }
 
@@ -794,7 +816,7 @@ bool UsbCam::grab_image(int timeout) {
 
   int get_new_image = read_frame();
   if (!get_new_image) {
-    ROS_ERROR("read frame error.");
+    AERROR << "read frame error.";
     return false;
   }
 
@@ -815,11 +837,11 @@ void UsbCam::set_auto_focus(int value) {
       perror("VIDIOC_QUERYCTRL");
       return;
     } else {
-      ROS_INFO("V4L2_CID_FOCUS_AUTO is not supported");
+      AINFO << "V4L2_CID_FOCUS_AUTO is not supported";
       return;
     }
   } else if (queryctrl.flags & V4L2_CTRL_FLAG_DISABLED) {
-    ROS_INFO("V4L2_CID_FOCUS_AUTO is not supported");
+    AINFO << "V4L2_CID_FOCUS_AUTO is not supported";
     return;
   } else {
     memset(&control, 0, sizeof(control));
@@ -862,40 +884,48 @@ void UsbCam::set_v4l_parameter(const std::string &param,
   char buffer[buffer_size];
   FILE *stream = popen(cmd.c_str(), "r");
   if (stream) {
-    while (!feof(stream))
-      if (fgets(buffer, buffer_size, stream) != NULL) output.append(buffer);
+    while (!feof(stream)) {
+      if (fgets(buffer, buffer_size, stream) != NULL) {
+        output.append(buffer);
+      }
+    }
     pclose(stream);
     // any output should be an error
-    if (output.length() > 0) ROS_WARN("%s", output.c_str());
-  } else
-    ROS_WARN("usb_cam_node could not run '%s'", cmd.c_str());
+    if (output.length() > 0) {
+      AWARN << output;
+    }
+  } else {
+    AWARN << "usb_cam_node could not run '" << cmd << "'";
+  }
 }
 
 UsbCam::io_method UsbCam::io_method_from_string(const std::string &str) {
-  if (str == "mmap")
+  if (str == "mmap") {
     return IO_METHOD_MMAP;
-  else
+  } else {
     return IO_METHOD_UNKNOWN;
+  }
 }
 
 UsbCam::pixel_format UsbCam::pixel_format_from_string(const std::string &str) {
-  if (str == "yuyv")
+  if (str == "yuyv") {
     return PIXEL_FORMAT_YUYV;
-  else if (str == "uyvy")
+  } else if (str == "uyvy") {
     return PIXEL_FORMAT_UYVY;
-  else if (str == "mjpeg")
+  } else if (str == "mjpeg") {
     return PIXEL_FORMAT_MJPEG;
-  else if (str == "yuvmono10")
+  } else if (str == "yuvmono10") {
     return PIXEL_FORMAT_YUVMONO10;
-  else if (str == "rgb24")
+  } else if (str == "rgb24") {
     return PIXEL_FORMAT_RGB24;
-  else
+  } else {
     return PIXEL_FORMAT_UNKNOWN;
+  }
 }
 
 int UsbCam::trigger_enable(unsigned char fps, unsigned char internal) {
-  ROS_INFO("Trigger enable, dev:%s, fps:%d, internal:%d", camera_dev_.c_str(),
-           fps, internal);
+  AINFO << "Trigger enable, dev[" << camera_dev_ << "] fps["
+      << fps << "] internal[" << internal << "]";
   return adv_trigger_enable(camera_dev_.c_str(), fps, internal);
 }
 
