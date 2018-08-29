@@ -343,4 +343,35 @@ proto_library(
     ],
 )
 
+cc_proto_library(
+    name = "auto_tuning_raw_feature",
+    deps = [
+        ":auto_tuning_model_raw_feature_lib",
+    ],
+)
+
+proto_library(
+    name = "auto_tuning_model_raw_feature_lib",
+    srcs = [
+            "auto_tuning_raw_feature.proto",
+    ],
+    deps = [
+        "//modules/common/proto:pnc_point_proto_lib",
+    ],
+)
+
+cc_proto_library(
+    name = "auto_tuning_model_input",
+    deps = [
+        ":auto_tuning_model_input_lib",
+    ],
+)
+
+proto_library(
+    name = "auto_tuning_model_input_lib",
+    srcs = [
+            "auto_tuning_model_input.proto",
+    ],
+)
+
 cpplint()
