@@ -22,7 +22,6 @@
 #define MODULES_PREDICTION_SCENARIO_FEATURE_EXTRACTOR_FEATURE_EXTRACTOR_H_
 
 #include "modules/prediction/proto/scenario_feature.pb.h"
-
 #include "modules/prediction/container/container_manager.h"
 
 namespace apollo {
@@ -34,7 +33,12 @@ class FeatureExtractor {
 
   virtual ~FeatureExtractor();
 
-  ScenarioFeature ExtractFeatures();
+  void ExtractFeatures();
+
+  const ScenarioFeature& scenario_feature() const;
+
+ private:
+  ScenarioFeature scenario_feature_;
 };
 
 }  // namespace prediction
