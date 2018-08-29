@@ -148,7 +148,7 @@ class FeatureXYPlane {
     std::vector<int> outliers;
     unsigned int inlier_idx = 0;
     for (unsigned int i = 0; i < cloud_new->points.size(); ++i) {
-      if (inlier_idx >= inliners.size() ||
+      if (inlier_idx >= inliers.size() ||
           static_cast<int>(i) < inliers[inlier_idx]) {
         outliers.push_back(i);
       } else {
