@@ -253,6 +253,7 @@ class AdapterManager {
   REGISTER_ADAPTER(Pad);
   REGISTER_ADAPTER(PerceptionObstacles);
   REGISTER_ADAPTER(Planning);
+  REGISTER_ADAPTER(PlanningPad);
   REGISTER_ADAPTER(PointCloud);
   REGISTER_ADAPTER(VLP16PointCloud);
 

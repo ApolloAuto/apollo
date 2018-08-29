@@ -82,6 +82,8 @@ message AdapterConfig {
 
     CAMERA_IMAGE_LONG = 72;
     CAMERA_IMAGE_SHORT = 73;
+
+    PLANNING_PAD = 74;
   }
   enum Mode {
     RECEIVE_ONLY = 0;
