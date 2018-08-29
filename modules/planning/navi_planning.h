@@ -17,10 +17,12 @@
 #ifndef MODULES_PLANNING_NAVI_PLANNING_H_
 #define MODULES_PLANNING_NAVI_PLANNING_H_
 
+#include <memory>
 #include <string>
 #include <utility>
 #include <vector>
 
+#include "modules/planning/common/frame.h"
 #include "modules/planning/planning_base.h"
 #include "modules/planning/proto/pad_msg.pb.h"
 
@@ -72,7 +74,16 @@ class NaviPlanning : public PlanningBase {
 
   void OnTimer(const ros::TimerEvent&) override;
 
+  apollo::common::Status Plan(
+      const double current_time_stamp,
+      const std::vector<common::TrajectoryPoint>& stitching_trajectory,
+      ADCTrajectory* trajectory) override;
+
  private:
+  common::Status InitFrame(const uint32_t sequence_num,
+                           const common::TrajectoryPoint& planning_start_point,
+                           const double start_time,
+                           const common::VehicleState& vehicle_state);
   /**
    * @brief receiving planning pad message
    */
@@ -108,6 +119,8 @@ class NaviPlanning : public PlanningBase {
 
   void SetFallbackTrajectory(ADCTrajectory* cruise_trajectory) override;
 
+  void ExportReferenceLineDebug(planning_internal::Debug* debug);
+
   class VehicleConfig {
    public:
     double x_ = 0.0;
@@ -123,6 +136,10 @@ class NaviPlanning : public PlanningBase {
   std::string target_lane_id_;
   DrivingAction driving_action_;
   bool is_received_pad_msg_ = false;
+
+  std::unique_ptr<Frame> frame_;
+
+  std::unique_ptr<ReferenceLineProvider> reference_line_provider_;
 };
 
 }  // namespace planning

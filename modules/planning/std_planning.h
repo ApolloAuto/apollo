@@ -17,9 +17,13 @@
 #ifndef MODULES_PLANNING_STD_PLANNING_H_
 #define MODULES_PLANNING_STD_PLANNING_H_
 
+#include <memory>
 #include <string>
+#include <vector>
 
 #include "modules/planning/planning_base.h"
+
+#include "modules/planning/common/frame.h"
 
 /**
  * @namespace apollo::planning
@@ -69,8 +73,24 @@ class StdPlanning : public PlanningBase {
 
   void OnTimer(const ros::TimerEvent&) override;
 
+  apollo::common::Status Plan(
+      const double current_time_stamp,
+      const std::vector<common::TrajectoryPoint>& stitching_trajectory,
+      ADCTrajectory* trajectory) override;
+
  private:
+  common::Status InitFrame(const uint32_t sequence_num,
+                           const common::TrajectoryPoint& planning_start_point,
+                           const double start_time,
+                           const common::VehicleState& vehicle_state);
+
   routing::RoutingResponse last_routing_;
+
+  void ExportReferenceLineDebug(planning_internal::Debug* debug);
+
+  std::unique_ptr<Frame> frame_;
+
+  std::unique_ptr<ReferenceLineProvider> reference_line_provider_;
 };
 
 }  // namespace planning
