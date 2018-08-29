@@ -52,6 +52,7 @@
 #include "modules/monitor/proto/system_status.pb.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/perception/proto/traffic_light_detection.pb.h"
+#include "modules/planning/proto/pad_msg.pb.h"
 #include "modules/planning/proto/planning.pb.h"
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
 #include "modules/routing/proto/routing.pb.h"
@@ -79,6 +80,7 @@ using MonitorAdapter = Adapter<apollo::common::monitor::MonitorMessage>;
 using PadAdapter = Adapter<control::PadMessage>;
 using PerceptionObstaclesAdapter = Adapter<perception::PerceptionObstacles>;
 using PlanningAdapter = Adapter<planning::ADCTrajectory>;
+using PlanningPadAdapter = Adapter<planning::PadMessage>;
 using PointCloudAdapter = Adapter<::sensor_msgs::PointCloud2>;
 using VLP16PointCloudAdapter = Adapter<::sensor_msgs::PointCloud2>;
 using ImageFrontAdapter = Adapter<::sensor_msgs::Image>;

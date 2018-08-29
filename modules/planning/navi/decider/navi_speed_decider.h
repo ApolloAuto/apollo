@@ -148,9 +148,17 @@ class NaviSpeedDecider : public Task {
   double hard_speed_limit_;
   double hard_accel_limit_;
   bool enable_safe_path_;
+  bool enable_planning_start_point_;
+  bool enable_accel_auto_compensation_;
+  double kappa_preview_;
+  double kappa_threshold_;
 
   NaviObstacleDecider obstacle_decider_;
   NaviSpeedTsGraph ts_graph_;
+
+  double prev_v_ = 0.0;
+  double accel_compensation_ratio_ = 1.0;
+  double decel_compensation_ratio_ = 1.0;
 
   FRIEND_TEST(NaviSpeedDeciderTest, CreateSpeedData);
   FRIEND_TEST(NaviSpeedDeciderTest, CreateSpeedDataForStaticObstacle);

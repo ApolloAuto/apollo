@@ -18,9 +18,27 @@
 
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+cd "${DIR}/.."
 
-source "${DIR}/apollo_base.sh"
+source "$DIR/apollo_base.sh"
 
-# run function from apollo_base.sh
-# run command_name module_name
-run planning "$@" --flagfile=modules/planning/conf/planning_navi.conf --use_navigation_mode
+function start() {
+    eval "${APOLLO_BIN_PREFIX}/modules/planning/tools/planning_pad_terminal  \
+        --log_dir=${APOLLO_ROOT_DIR}/data/log"
+}
+
+function stop() {
+    pkill -SIGKILL -f planning_pad_terminal
+}
+
+case $1 in
+  start)
+    start
+    ;;
+  stop)
+    stop
+    ;;
+  *)
+    start
+    ;;
+esac

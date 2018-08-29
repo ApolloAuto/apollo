@@ -106,6 +106,9 @@ void AdapterManager::Init(const AdapterManagerConfig &configs) {
       case AdapterConfig::PLANNING_TRAJECTORY:
         EnablePlanning(FLAGS_planning_trajectory_topic, config);
         break;
+      case AdapterConfig::PLANNING_PAD:
+        EnablePlanningPad(FLAGS_planning_pad_topic, config);
+        break;
       case AdapterConfig::PREDICTION:
         EnablePrediction(FLAGS_prediction_topic, config);
         break;
