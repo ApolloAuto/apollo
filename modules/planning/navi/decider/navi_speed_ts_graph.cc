@@ -42,10 +42,9 @@ constexpr double kDefaultSStep = 1.0;
 constexpr double kDefaultSMax = 2.0;
 constexpr double kDefaultSafeDistanceRatio = 1.0;
 constexpr double kDefaultSafeDistanceBase = 2.0;
-constexpr double kSafeDistanceSmooth = 2.0;
+constexpr double kSafeDistanceSmooth = 3.0;
 constexpr double kFollowSpeedSmooth = 0.25;
 constexpr double kInfinityValue = 1.0e8;
-constexpr double kTimeDeviation = 1.0e-3;
 }  // namespace
 
 static void CheckConstraints(const NaviSpeedTsConstraints& constraints) {
@@ -126,8 +125,9 @@ void NaviSpeedTsGraph::UpdateObstacleConstraints(double distance,
   CHECK_GT(following_accel_ratio, 0.0);
 
   // smooth obstacle following
-  if (std::abs(distance - safe_distance) <= kSafeDistanceSmooth &&
-      std::abs(v - start_v_) <= kFollowSpeedSmooth) {
+  if (distance > safe_distance &&
+      distance - safe_distance < kSafeDistanceSmooth &&
+      std::abs(v - start_v_) < kFollowSpeedSmooth) {
     distance = safe_distance;
     v = start_v_;
   }
@@ -242,7 +242,7 @@ Status NaviSpeedTsGraph::Solve(std::vector<NaviSpeedTsPoint>* output) {
                                cur.v_preffered);
   }
 
-  std::vector<NaviSpeedTsPoint> points;
+  auto& points = *output;
   points.resize(constraints_.size());
 
   // compute the first point
@@ -272,14 +272,9 @@ Status NaviSpeedTsGraph::Solve(std::vector<NaviSpeedTsPoint>* output) {
 
     // if t_max < t_min
     if (t_max < t_min) {
-      if (t_min - t_max < kTimeDeviation) {
-        t_max = t_min;
-      } else {
-        AERROR << "failure to satisfy the constraints.";
-        points.resize(i);
-        return Status(ErrorCode::PLANNING_ERROR,
-                      "failure to satisfy the constraints.");
-      }
+      AERROR << "failure to satisfy the constraints.";
+      return Status(ErrorCode::PLANNING_ERROR,
+                    "failure to satisfy the constraints.");
     }
 
     // compute t_preffered base on v_preffered
@@ -290,8 +285,6 @@ Status NaviSpeedTsGraph::Solve(std::vector<NaviSpeedTsPoint>* output) {
     cur.t = Clamp(t_preffered, t_min, t_max);
     auto dt = cur.t - prev.t;
     cur.v = std::max(2.0 * s_step_ / dt - prev.v, 0.0);
-    cur.a = (cur.v - prev.v) / dt;
-    cur.da = (cur.a - prev.a) / dt;
 
     // if t is infinity
     if (std::isinf(cur.t)) {
@@ -300,44 +293,39 @@ Status NaviSpeedTsGraph::Solve(std::vector<NaviSpeedTsPoint>* output) {
     }
   }
 
-  output->resize(points.size() - 1);
-  (*output)[0] = points[0];
-
-  // smooth v
   for (size_t i = 1; i < points.size() - 1; i++) {
     const auto& prev = points[i - 1];
     const auto& next = points[i + 1];
-    auto& cur = (*output)[i];
-
+    auto& cur = points[i];
     auto ds = next.s - prev.s;
     auto dt = next.t - prev.t;
-    cur.s = (prev.s + next.s) / 2.0;
-    cur.t = (prev.t + next.t) / 2.0;
     cur.v = ds / dt;
   }
 
-  // smooth a
+  auto& first = points[0];
+  const auto& second = points[1];
+  first.a = (second.v - first.v) / (2.0 * (second.t - first.t));
+
   for (size_t i = 1; i < points.size() - 1; i++) {
     const auto& prev = points[i - 1];
     const auto& next = points[i + 1];
-    auto& cur = (*output)[i];
-
+    auto& cur = points[i];
+    auto dv = next.v - prev.v;
     auto dt = next.t - prev.t;
-    cur.a = (next.v - prev.v) / dt;
+    cur.a = dv / dt;
   }
 
-  // smooth da
   for (size_t i = 1; i < points.size() - 1; i++) {
     const auto& prev = points[i - 1];
     const auto& next = points[i + 1];
-    auto& cur = (*output)[i];
-
+    auto& cur = points[i];
+    auto da = next.a - prev.a;
     auto dt = next.t - prev.t;
-    cur.da = (next.a - prev.a) / dt;
+    cur.da = da / dt;
   }
 
-  for (size_t i = 0; i < output->size(); i++) {
-    auto& point = (*output)[i];
+  for (size_t i = 0; i < points.size(); i++) {
+    auto& point = points[i];
     point.s = std::min(kInfinityValue, point.s);
     point.t = std::min(kInfinityValue, point.t);
     point.v = std::min(kInfinityValue, point.v);
@@ -345,7 +333,7 @@ Status NaviSpeedTsGraph::Solve(std::vector<NaviSpeedTsPoint>* output) {
     point.da = std::min(kInfinityValue, point.da);
 
     if (std::abs(point.t - kInfinityValue) < kDoubleEpsilon)
-      output->resize(i + 1);
+      points.resize(i + 1);
   }
 
   return Status::OK();

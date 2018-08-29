@@ -29,6 +29,8 @@ DEFINE_string(localization_topic, "/apollo/localization/pose",
               "localization topic name");
 DEFINE_string(planning_trajectory_topic, "/apollo/planning",
               "planning trajectory topic name");
+DEFINE_string(planning_pad_topic, "/apollo/planning/pad",
+              "planning pad topic name");
 DEFINE_string(monitor_topic, "/apollo/monitor", "ROS topic for monitor");
 DEFINE_string(pad_topic, "/apollo/control/pad",
               "control pad message topic name");

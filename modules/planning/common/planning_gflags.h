@@ -201,4 +201,8 @@ DECLARE_double(polynomial_speed_fallback_velocity);
 // navigation mode
 DECLARE_double(navigation_fallback_cruise_time);
 
+// control whether to stitch last trajectory to current plan trajectory
+DECLARE_bool(enable_stitch_last_trajectory);
+DECLARE_bool(enable_planning_pad_msg);
+
 #endif  // MODULES_PLANNING_COMMON_PLANNING_GFLAGS_H_
