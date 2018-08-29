@@ -62,6 +62,9 @@ TEST(NaviSpeedDeciderTest, CreateSpeedData) {
   speed_decider.hard_speed_limit_ = 100.0;
   speed_decider.hard_accel_limit_ = 10.0;
   speed_decider.enable_safe_path_ = true;
+  speed_decider.enable_planning_start_point_ = true;
+  speed_decider.kappa_preview_ = 0.0;
+  speed_decider.kappa_threshold_ = 0.0;
 
   PerceptionObstacle perception_obstacle;
   std::map<std::string, Obstacle> obstacle_buf;
@@ -80,7 +83,7 @@ TEST(NaviSpeedDeciderTest, CreateSpeedData) {
                               &speed_data));
 
   for (auto& p : speed_data.speed_vector()) {
-    if (p.s() > 0.0 && p.s() < 24.0) EXPECT_NEAR(2.0, p.a(), 0.1);
+    if (p.s() > 2.0 && p.s() < 24.0) EXPECT_NEAR(2.0, p.a(), 0.1);
     if (p.s() > 26.0 && p.s() < 60.0) EXPECT_NEAR(10.0, p.v(), 0.1);
   }
 }
@@ -102,7 +105,10 @@ TEST(NaviSpeedDeciderTest, CreateSpeedDataForStaticObstacle) {
   speed_decider.hard_centric_accel_limit_ = 1.5;
   speed_decider.hard_speed_limit_ = 100.0;
   speed_decider.hard_accel_limit_ = 10.0;
-  speed_decider.enable_safe_path_ = true;
+  speed_decider.enable_safe_path_ = false;
+  speed_decider.enable_planning_start_point_ = true;
+  speed_decider.kappa_preview_ = 0.0;
+  speed_decider.kappa_threshold_ = 0.0;
 
   PerceptionObstacle perception_obstacle;
   std::map<std::string, Obstacle> obstacle_buf;
@@ -110,10 +116,10 @@ TEST(NaviSpeedDeciderTest, CreateSpeedDataForStaticObstacle) {
 
   std::vector<PathPoint> path_points;
   path_points.emplace_back(GenPathPoint(0.0));
-  path_points.emplace_back(GenPathPoint(100.0));
+  path_points.emplace_back(GenPathPoint(200.0));
 
   // obstacle1
-  perception_obstacle.mutable_position()->set_x(5.0);
+  perception_obstacle.mutable_position()->set_x(30.0);
   perception_obstacle.mutable_position()->set_y(1.0);
   perception_obstacle.mutable_velocity()->set_x(0.0);
   perception_obstacle.mutable_velocity()->set_y(0.0);
@@ -131,7 +137,7 @@ TEST(NaviSpeedDeciderTest, CreateSpeedDataForStaticObstacle) {
                               },
                               &speed_data));
   for (auto& p : speed_data.speed_vector()) {
-    if (p.s() > 38.0) EXPECT_NEAR(0.0, p.v(), 1.0);
+    if (p.s() > 16.7) EXPECT_NEAR(0.0, p.v(), 1.0);
   }
 }
 
@@ -153,6 +159,9 @@ TEST(NaviSpeedDeciderTest, CreateSpeedDataForObstacles) {
   speed_decider.hard_speed_limit_ = 100.0;
   speed_decider.hard_accel_limit_ = 10.0;
   speed_decider.enable_safe_path_ = true;
+  speed_decider.enable_planning_start_point_ = true;
+  speed_decider.kappa_preview_ = 0.0;
+  speed_decider.kappa_threshold_ = 0.0;
 
   PerceptionObstacle perception_obstacle;
   std::map<std::string, Obstacle> obstacle_buf;
@@ -165,7 +174,7 @@ TEST(NaviSpeedDeciderTest, CreateSpeedDataForObstacles) {
   // obstacle1
   perception_obstacle.mutable_position()->set_x(50.0);
   perception_obstacle.mutable_position()->set_y(1.0);
-  perception_obstacle.mutable_velocity()->set_x(-10.0);
+  perception_obstacle.mutable_velocity()->set_x(0.0);
   perception_obstacle.mutable_velocity()->set_y(0.0);
   perception_obstacle.set_length(3.0);
   perception_obstacle.set_width(3.0);
@@ -176,7 +185,7 @@ TEST(NaviSpeedDeciderTest, CreateSpeedDataForObstacles) {
   // obstacle2
   perception_obstacle.mutable_position()->set_x(20.0);
   perception_obstacle.mutable_position()->set_y(1.0);
-  perception_obstacle.mutable_velocity()->set_x(-5.0);
+  perception_obstacle.mutable_velocity()->set_x(5.0);
   perception_obstacle.mutable_velocity()->set_y(0.0);
   perception_obstacle.set_length(3.0);
   perception_obstacle.set_width(3.0);
@@ -193,7 +202,7 @@ TEST(NaviSpeedDeciderTest, CreateSpeedDataForObstacles) {
                               &speed_data));
   for (auto& p : speed_data.speed_vector()) {
     if (p.s() > 15.0 && p.s() < 26.0) EXPECT_NEAR(5.0, p.v(), 0.5);
-    if (p.s() > 38.0) EXPECT_NEAR(0.0, p.v(), 1.0);
+    if (p.s() > 37.0) EXPECT_NEAR(0.0, p.v(), 1.0);
   }
 }
 
@@ -215,6 +224,9 @@ TEST(NaviSpeedDeciderTest, CreateSpeedDataForCurve) {
   speed_decider.hard_speed_limit_ = 100.0;
   speed_decider.hard_accel_limit_ = 10.0;
   speed_decider.enable_safe_path_ = false;
+  speed_decider.enable_planning_start_point_ = true;
+  speed_decider.kappa_preview_ = 0.0;
+  speed_decider.kappa_threshold_ = 0.0;
 
   PerceptionObstacle perception_obstacle;
   std::map<std::string, Obstacle> obstacle_buf;

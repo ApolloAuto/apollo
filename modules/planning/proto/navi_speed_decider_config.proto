@@ -17,5 +17,8 @@ message NaviSpeedDeciderConfig {
   optional double hard_speed_limit = 12 [default = 100.0];
   optional double hard_accel_limit = 13 [default = 10.0];
   optional bool enable_safe_path = 14 [default = true];
+  optional bool enable_planning_start_point = 15 [default = true];
+  optional bool enable_accel_auto_compensation = 16 [default = true];
+  optional double kappa_preview = 17 [default = 0.0];
+  optional double kappa_threshold = 18 [default = 0.0];
 }
-

@@ -23,6 +23,7 @@
 
 #include <cstdint>
 #include <list>
+#include <map>
 #include <memory>
 #include <string>
 #include <vector>
@@ -110,6 +111,13 @@ class Frame {
   const ADCTrajectory &trajectory() const { return trajectory_; }
 
   const bool is_near_destination() const { return is_near_destination_; }
+
+  /**
+   * @brief Adjust reference line priority according to actual road conditions
+   * @id_to_priority lane id and reference line priority mapping relationship
+   */
+  void UpdateReferenceLinePriority(
+      const std::map<std::string, uint32_t> &id_to_priority);
 
  private:
   bool CreateReferenceLineInfo();

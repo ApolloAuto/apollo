@@ -370,3 +370,9 @@ DEFINE_double(polynomial_speed_fallback_velocity, 3.5,
 // navigation mode
 DEFINE_double(navigation_fallback_cruise_time, 8.0,
               "The time range of fallback cruise under navigation mode.");
+
+DEFINE_bool(enable_stitch_last_trajectory, true,
+            "To control whether to stitch last trajectory or not.");
+
+DEFINE_bool(enable_planning_pad_msg, false,
+            "To control whether to enable planning pad message.");
