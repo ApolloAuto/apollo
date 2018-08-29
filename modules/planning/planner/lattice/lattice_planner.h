@@ -32,7 +32,7 @@
 namespace apollo {
 namespace planning {
 
-class LatticePlanner : public Planner {
+class LatticePlanner : public PlannerWithReferenceLine {
  public:
   LatticePlanner() = default;
 
