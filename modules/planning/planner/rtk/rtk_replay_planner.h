@@ -39,7 +39,7 @@ namespace planning {
  *        outputs proper segment of the trajectory according to vehicle
  * position.
  */
-class RTKReplayPlanner : public Planner {
+class RTKReplayPlanner : public PlannerWithReferenceLine {
  public:
   /**
    * @brief Constructor
