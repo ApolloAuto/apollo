@@ -11,6 +11,7 @@ cc_library(
         "//modules/common:log",
         "//modules/common:macro",
         "//modules/prediction/proto:scenario_feature_proto",
+        "//modules/prediction/container:container_manager",
     ],
 )
 
