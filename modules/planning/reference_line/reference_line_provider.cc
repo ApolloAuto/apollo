@@ -270,10 +270,10 @@ void ReferenceLineProvider::PrioritzeChangeLane(
 
 bool ReferenceLineProvider::GetReferenceLinesFromRelativeMap(
     const relative_map::MapMsg &relative_map,
-    std::list<ReferenceLine> *reference_line,
+    std::list<ReferenceLine> *reference_lines,
     std::list<hdmap::RouteSegments> *segments) {
   DCHECK_GE(relative_map.navigation_path_size(), 0);
-  DCHECK_NOTNULL(reference_line);
+  DCHECK_NOTNULL(reference_lines);
   DCHECK_NOTNULL(segments);
 
   if (relative_map.navigation_path().empty()) {
@@ -432,7 +432,8 @@ bool ReferenceLineProvider::GetReferenceLinesFromRelativeMap(
                        LaneWaypoint(lane_ptr, path_point.s())},
           path_point.kappa(), path_point.dkappa());
     }
-    reference_line->emplace_back(ref_points.begin(), ref_points.end());
+    reference_lines->emplace_back(ref_points.begin(), ref_points.end());
+    reference_lines->back().SetPriority(path_pair.second.path_priority());
   }
   return !segments->empty();
 }

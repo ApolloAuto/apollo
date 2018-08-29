@@ -154,6 +154,10 @@ class ReferenceLineInfo {
 
   void set_is_on_reference_line() { is_on_reference_line_ = true; }
 
+  uint32_t GetPriority() const { return reference_line_.GetPriority(); }
+
+  void SetPriority(uint32_t priority) { reference_line_.SetPriority(priority); }
+
  private:
   bool CheckChangeLane() const;
 

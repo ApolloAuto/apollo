@@ -18,6 +18,7 @@
 
 #include <algorithm>
 #include <list>
+#include <map>
 #include <memory>
 #include <utility>
 #include <vector>
@@ -80,6 +81,9 @@ Status NaviPlanning::Init() {
   CHECK_ADAPTER(PerceptionObstacles);
   CHECK_ADAPTER(Prediction);
   CHECK_ADAPTER(TrafficLightDetection);
+  CHECK_ADAPTER(PlanningPad);
+
+  AdapterManager::AddPlanningPadCallback(&NaviPlanning::OnPad, this);
 
   ThreadPool::Init(FLAGS_max_planning_thread_pool_size);
 
@@ -102,6 +106,156 @@ void NaviPlanning::OnTimer(const ros::TimerEvent&) {
     Stop();
     ros::shutdown();
   }
+}
+
+void NaviPlanning::OnPad(const PadMessage& pad) {
+  ADEBUG << "Received Planning Pad Msg:" << pad.DebugString();
+  AERROR_IF(!pad.has_action()) << "pad message check failed!";
+  driving_action_ = pad.action();
+  is_received_pad_msg_ = true;
+}
+
+void NaviPlanning::ProcessPadMsg(DrivingAction drvie_action) {
+  if (config_.planner_type() == PlanningConfig::NAVI) {
+    std::map<std::string, uint32_t> lane_id_to_priority;
+    auto& ref_line_info_group = frame_->reference_line_info();
+    if (is_received_pad_msg_) {
+      is_received_pad_msg_ = false;
+      using LaneInfoPair = std::pair<std::string, double>;
+      std::string current_lane_id;
+      switch (drvie_action) {
+        case DrivingAction::FOLLOW: {
+          AINFO << "Received follow drive action";
+          std::string current_lane_id = GetCurrentLaneId();
+          if (!current_lane_id.empty()) {
+            target_lane_id_ = current_lane_id;
+          }
+          break;
+        }
+        case DrivingAction::CHANGE_LEFT: {
+          AINFO << "Received change left lane drive action";
+          std::vector<LaneInfoPair> lane_info_group;
+          GetLeftNeighborLanesInfo(&lane_info_group);
+          if (!lane_info_group.empty()) {
+            target_lane_id_ = lane_info_group.front().first;
+          }
+          break;
+        }
+        case DrivingAction::CHANGE_RIGHT: {
+          AINFO << "Received change right lane drive action";
+          std::vector<LaneInfoPair> lane_info_group;
+          GetRightNeighborLanesInfo(&lane_info_group);
+          if (!lane_info_group.empty()) {
+            target_lane_id_ = lane_info_group.front().first;
+          }
+          break;
+        }
+        case DrivingAction::PULL_OVER: {
+          AINFO << "Received pull over drive action";
+          // to do
+          break;
+        }
+        case DrivingAction::STOP: {
+          AINFO << "Received stop drive action";
+          // to do
+          break;
+        }
+        default: {
+          AWARN << "Received undefined drive action.";
+          break;
+        }
+      }
+    }
+
+    if (!target_lane_id_.empty()) {
+      constexpr uint32_t KTargetRefLinePriority = 0;
+      constexpr uint32_t kOtherRefLinePriority = 10;
+      for (auto& ref_line_info : ref_line_info_group) {
+        auto lane_id = ref_line_info.Lanes().Id();
+        ADEBUG << "lane_id : " << lane_id;
+        lane_id_to_priority[lane_id] = kOtherRefLinePriority;
+        if (lane_id == target_lane_id_) {
+          lane_id_to_priority[lane_id] = KTargetRefLinePriority;
+          ADEBUG << "target lane_id : " << lane_id;
+        }
+      }
+      frame_->UpdateReferenceLinePriority(lane_id_to_priority);
+    }
+  }
+
+  // other planner to do
+}
+
+std::string NaviPlanning::GetCurrentLaneId() {
+  auto& ref_line_info_group = frame_->reference_line_info();
+  const auto& vehicle_state = frame_->vehicle_state();
+  common::math::Vec2d adc_position(vehicle_state.x(), vehicle_state.y());
+  std::string current_lane_id;
+  for (auto& ref_line_info : ref_line_info_group) {
+    auto lane_id = ref_line_info.Lanes().Id();
+    auto& ref_line = ref_line_info.reference_line();
+    if (ref_line.IsOnLane(adc_position)) {
+      current_lane_id = lane_id;
+    }
+  }
+  return current_lane_id;
+}
+
+void NaviPlanning::GetLeftNeighborLanesInfo(
+    std::vector<std::pair<std::string, double>>* const lane_info_group) {
+  DCHECK_NOTNULL(lane_info_group);
+  auto& ref_line_info_group = frame_->reference_line_info();
+  const auto& vehicle_state = frame_->vehicle_state();
+  for (auto& ref_line_info : ref_line_info_group) {
+    common::math::Vec2d adc_position(vehicle_state.x(), vehicle_state.y());
+    auto& ref_line = ref_line_info.reference_line();
+    if (ref_line.IsOnLane(adc_position)) {
+      continue;
+    }
+    auto lane_id = ref_line_info.Lanes().Id();
+    auto ref_point =
+        ref_line.GetReferencePoint(vehicle_state.x(), vehicle_state.y());
+    double y = ref_point.y();
+    // in FLU positive on the left
+    if (y > 0.0) {
+      lane_info_group->emplace_back(std::make_pair(lane_id, y));
+    }
+  }
+  // sort neighbor lanes from near to far
+  using LaneInfoPair = std::pair<std::string, double>;
+  std::sort(lane_info_group->begin(), lane_info_group->end(),
+            [](const LaneInfoPair& left, const LaneInfoPair& right) {
+              return left.second < right.second;
+            });
+}
+
+void NaviPlanning::GetRightNeighborLanesInfo(
+    std::vector<std::pair<std::string, double>>* const lane_info_group) {
+  DCHECK_NOTNULL(lane_info_group);
+  auto& ref_line_info_group = frame_->reference_line_info();
+  const auto& vehicle_state = frame_->vehicle_state();
+  for (auto& ref_line_info : ref_line_info_group) {
+    common::math::Vec2d adc_position(vehicle_state.x(), vehicle_state.y());
+    auto& ref_line = ref_line_info.reference_line();
+    if (ref_line.IsOnLane(adc_position)) {
+      continue;
+    }
+    auto lane_id = ref_line_info.Lanes().Id();
+    auto ref_point =
+        ref_line.GetReferencePoint(vehicle_state.x(), vehicle_state.y());
+    double y = ref_point.y();
+    // in FLU negative on the right
+    if (y < 0.0) {
+      lane_info_group->emplace_back(std::make_pair(lane_id, y));
+    }
+  }
+
+  // sort neighbor lanes from near to far
+  using LaneInfoPair = std::pair<std::string, double>;
+  std::sort(lane_info_group->begin(), lane_info_group->end(),
+            [](const LaneInfoPair& left, const LaneInfoPair& right) {
+              return left.second > right.second;
+            });
 }
 
 Status NaviPlanning::Start() {
@@ -254,6 +408,11 @@ void NaviPlanning::RunOnce() {
     FrameHistory::instance()->Add(seq_num, std::move(frame_));
 
     return;
+  }
+
+  // Use planning pad message to make driving decisions
+  if (FLAGS_enable_planning_pad_msg) {
+    ProcessPadMsg(driving_action_);
   }
 
   for (auto& ref_line_info : frame_->reference_line_info()) {
