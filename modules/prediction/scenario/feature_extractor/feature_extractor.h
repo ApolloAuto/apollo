@@ -23,6 +23,8 @@
 
 #include "modules/prediction/proto/scenario_feature.pb.h"
 
+#include "modules/prediction/container/container_manager.h"
+
 namespace apollo {
 namespace prediction {
 
@@ -32,11 +34,7 @@ class FeatureExtractor {
 
   virtual ~FeatureExtractor();
 
-  void UpdateVehicleState();
-
-  void UpdateMap();
-
-  void UpdateObstacleInfo();
+  ScenarioFeature ExtractFeatures();
 };
 
 }  // namespace prediction
