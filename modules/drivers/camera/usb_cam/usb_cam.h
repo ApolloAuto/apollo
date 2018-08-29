@@ -33,8 +33,8 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *
  *********************************************************************/
-#ifndef MODULES_DRIVERS_CAMERA_SRC_USB_CAM_H_
-#define MODULES_DRIVERS_CAMERA_SRC_USB_CAM_H_
+#ifndef MODULES_DRIVERS_CAMERA_USB_CAM_USB_CAM_H_
+#define MODULES_DRIVERS_CAMERA_USB_CAM_USB_CAM_H_
 
 #include <asm/types.h> /* for videodev2.h */
 
@@ -53,10 +53,11 @@ extern "C" {
 #define AV_CODEC_ID_MJPEG CODEC_ID_MJPEG
 #endif
 
+#include <sensor_msgs/Image.h>
+
 #include <sstream>
 #include <string>
-
-#include <sensor_msgs/Image.h>
+#include <vector>
 
 namespace apollo {
 namespace drivers {
@@ -137,7 +138,7 @@ class UsbCam {
   void init_device(int image_width, int image_height, int framerate);
   void close_device(void);
   void open_device(void);
-  // TODO
+  // TODO(all)
   // void reset_device(void);
   bool grab_image(int timeout);
 
@@ -164,4 +165,4 @@ class UsbCam {
 }  // namespace drivers
 }  // namespace apollo
 
-#endif  /* MODULES_DRIVERS_CAMERA_SRC_USB_CAM_H_ */
+#endif  /* MODULES_DRIVERS_CAMERA_USB_CAM_USB_CAM_H_ */
