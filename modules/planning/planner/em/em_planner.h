@@ -46,7 +46,7 @@ namespace planning {
  * @brief EMPlanner is an expectation maximization planner.
  */
 
-class EMPlanner : public Planner {
+class EMPlanner : public PlannerWithReferenceLine {
  public:
   /**
    * @brief Constructor
