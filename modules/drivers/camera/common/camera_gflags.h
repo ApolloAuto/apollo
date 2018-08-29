@@ -19,6 +19,7 @@
 
 #include "gflags/gflags.h"
 
+DECLARE_string(camera_module_name);
 DECLARE_string(camera_adapter_config_filename);
 DECLARE_string(camera_config_file);
 
