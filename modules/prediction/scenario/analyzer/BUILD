@@ -9,6 +9,7 @@ cc_library(
     deps = [
         "//modules/common:log",
         "//modules/common:macro",
+        "//modules/common/proto:scenario_proto",
     ],
 )
 

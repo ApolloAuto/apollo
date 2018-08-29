@@ -22,6 +22,8 @@
 #define MODULES_PREDICTION_SCENARIO_SCENARIO_MANAGER_H_
 
 #include "modules/prediction/proto/prediction_conf.pb.h"
+#include "modules/prediction/scenario/feature_extractor/feature_extractor.h"
+#include "modules/prediction/scenario/analyzer/scenario_analyzer.h"
 
 namespace apollo {
 namespace prediction {
@@ -48,6 +50,10 @@ class ScenarioManager {
    * @brief Run scenario analysis 
    */
   void Run();
+
+ private:
+  FeatureExtractor feature_extractor_;
+  ScenarioAnalyzer scenario_analyzer_;
 };
 
 }  // namespace prediction

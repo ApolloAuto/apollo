@@ -17,13 +17,23 @@
 #ifndef MODULES_PREDICTION_SCENARIO_ANALYZER_SCENARIO_ANALYZER_H_
 #define MODULES_PREDICTION_SCENARIO_ANALYZER_SCENARIO_ANALYZER_H_
 
+#include "modules/common/proto/scenario.pb.h"
+
 namespace apollo {
 namespace prediction {
 
 class ScenarioAnalyzer {
  public:
   ScenarioAnalyzer();
+
   virtual ~ScenarioAnalyzer();
+
+  void Analyze();
+
+  const apollo::common::Scenario& scenario() const;
+
+ private:
+  apollo::common::Scenario scenario_;
 };
 
 }  // namespace prediction
