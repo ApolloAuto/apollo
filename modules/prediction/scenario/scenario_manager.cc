@@ -19,5 +19,11 @@
 namespace apollo {
 namespace prediction {
 
+void ScenarioManager::Run() {
+  feature_extractor_.ExtractFeatures();
+  scenario_analyzer_.Analyze();
+  // TODO(kechxu) deal with scenario output
+}
+
 }  // namespace prediction
 }  // namespace apollo
