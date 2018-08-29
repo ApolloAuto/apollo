@@ -17,16 +17,17 @@
 #ifndef MODULES_DRIVERS_CAMERA_NODES_USB_CAM_WRAPPER_H_
 #define MODULES_DRIVERS_CAMERA_NODES_USB_CAM_WRAPPER_H_
 
-#include "modules/drivers/camera/proto/camera_conf.pb.h"
-#include "modules/drivers/camera/src/usb_cam.h"
-#include "modules/drivers/proto/sensor_image.pb.h"
-
 #include <ros/ros.h>
 #include <image_transport/image_transport.h>
 #include <camera_info_manager/camera_info_manager.h>
 #include <pluginlib/class_loader.h>
 #include <std_srvs/Empty.h>
+
 #include <string>
+
+#include "modules/drivers/camera/proto/camera_conf.pb.h"
+#include "modules/drivers/camera/usb_cam/usb_cam.h"
+#include "modules/drivers/proto/sensor_image.pb.h"
 
 namespace apollo {
 namespace drivers {
@@ -41,7 +42,9 @@ enum TriggerFrequence {
 
 class UsbCamWrapper {
  public:
-  UsbCamWrapper(ros::NodeHandle node, ros::NodeHandle private_nh);
+  UsbCamWrapper(ros::NodeHandle node,
+                ros::NodeHandle private_nh,
+                CameraConf config);
   virtual ~UsbCamWrapper();
   bool service_start_cap(std_srvs::Empty::Request &req,
                          std_srvs::Empty::Response &res);
@@ -51,6 +54,10 @@ class UsbCamWrapper {
   bool spin();
 
  private:
+  // private ROS node handle
+  ros::NodeHandle node_;
+  ros::NodeHandle priv_node_;
+
   CameraConf config_;
   // shared image message
   sensor_msgs::Image img_;
@@ -69,10 +76,6 @@ class UsbCamWrapper {
   ros::ServiceServer service_start_;
   ros::ServiceServer service_stop_;
 
-  // private ROS node handle
-  ros::NodeHandle node_;
-  ros::NodeHandle priv_node_;
-
   ros::Time last_stamp_;
   float frame_warning_interval_;
   float frame_drop_interval_;
@@ -82,4 +85,4 @@ class UsbCamWrapper {
 }  // namespace drivers
 }  // namespace apollo
 
-#endif /* MODULES_DRIVERS_CAMERA_NODES_USB_CAM_WRAPPER_H_ */
+#endif // MODULES_DRIVERS_CAMERA_NODES_USB_CAM_WRAPPER_H_
