@@ -13,4 +13,16 @@ cc_binary(
     ],
 )
 
+cc_binary(
+    name = "planning_pad_terminal",
+    srcs = ["terminal.cc"],
+    deps = [
+        "//external:gflags",
+        "//modules/common:log",
+        "//modules/common/adapters:adapter_manager",
+        "//modules/planning/proto:planning_proto",
+        "@ros//:ros_common",
+    ],
+)
+
 cpplint()
