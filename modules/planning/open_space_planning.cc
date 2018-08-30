@@ -27,7 +27,6 @@
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/math/quaternion.h"
 #include "modules/common/time/time.h"
-#include "modules/common/util/thread_pool.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/planning/common/planning_context.h"
@@ -45,7 +44,6 @@ using apollo::common::VehicleState;
 using apollo::common::VehicleStateProvider;
 using apollo::common::adapter::AdapterManager;
 using apollo::common::time::Clock;
-using apollo::common::util::ThreadPool;
 using apollo::hdmap::HDMapUtil;
 
 OpenSpacePlanning::~OpenSpacePlanning() { Stop(); }
@@ -68,8 +66,6 @@ Status OpenSpacePlanning::Init() {
   CHECK_ADAPTER(Chassis);
   CHECK_ADAPTER(Prediction);
   CHECK_ADAPTER(TrafficLightDetection);
-
-  ThreadPool::Init(FLAGS_max_planning_thread_pool_size);
 
   hdmap_ = HDMapUtil::BaseMapPtr();
   CHECK(hdmap_) << "Failed to load map";
