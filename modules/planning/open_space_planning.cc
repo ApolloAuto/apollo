@@ -46,8 +46,6 @@ using apollo::common::adapter::AdapterManager;
 using apollo::common::time::Clock;
 using apollo::hdmap::HDMapUtil;
 
-OpenSpacePlanning::~OpenSpacePlanning() { Stop(); }
-
 std::string OpenSpacePlanning::Name() const { return "open_space_planning"; }
 
 Status OpenSpacePlanning::Init() {
@@ -166,9 +164,14 @@ void OpenSpacePlanning::RunOnce() {
     AWARN_EVERY(100) << "prediction is enabled but no prediction provided";
   }
 
-  const double planning_cycle_time = 1.0 / FLAGS_planning_loop_rate;
-
   return;
+}
+
+Status OpenSpacePlanning::Plan(
+    const double current_time_stamp,
+    const std::vector<TrajectoryPoint>& stitching_trajectory,
+    ADCTrajectory* trajectory_pb) {
+  return Status::OK();
 }
 
 void OpenSpacePlanning::Stop() {

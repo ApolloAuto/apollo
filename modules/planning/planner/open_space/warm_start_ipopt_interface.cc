@@ -338,6 +338,11 @@ bool WarmStartIPOPTInterface::eval_f(int n, const double* x, bool new_x,
   return true;
 }
 
+bool WarmStartIPOPTInterface::eval_grad_f(int n, const double* x, bool new_x,
+                                          double* grad_f) {
+  return true;
+}
+
 void WarmStartIPOPTInterface::finalize_solution(
     Ipopt::SolverReturn status, int n, const double* x, const double* z_L,
     const double* z_U, int m, const double* g, const double* lambda,
