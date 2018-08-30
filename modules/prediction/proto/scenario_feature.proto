@@ -9,14 +9,14 @@ message ScenarioFeature {
     optional double speed = 1;
     optional double acceleration = 2;
     optional double heading = 3;
-    optional apollo.hdmap.Lane curr_lane = 1001;
+    optional string curr_lane_id = 1001;
     optional double curr_lane_s = 1002;
-    optional apollo.hdmap.Lane left_neighbor_lane = 1003;
+    optional string left_neighbor_lane_id = 1003;
     optional double left_neighbor_lane_s = 1004;
-    optional apollo.hdmap.Lane right_neighbor_lane = 1005;
+    optional string right_neighbor_lane_id = 1005;
     optional double right_neighbor_lane_s = 1006;
 
-    optional apollo.hdmap.Junction junction = 2001;  // junction ahead
+    optional string junction_id = 2001;  // junction ahead
     optional double dist_to_junction = 2002;
 
     repeated int32 obstacle_id = 3001;
