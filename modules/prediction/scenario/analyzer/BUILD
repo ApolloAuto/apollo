@@ -10,6 +10,7 @@ cc_library(
         "//modules/common:log",
         "//modules/common:macro",
         "//modules/common/proto:scenario_proto",
+        "//modules/prediction/proto:scenario_feature_proto",
     ],
 )
 
