@@ -196,6 +196,8 @@ class Obstacle {
   void SetVelocity(const perception::PerceptionObstacle& perception_obstacle,
                    Feature* feature);
 
+  void AdjustHeadingByLane(Feature* feature);
+
   void UpdateVelocity(const double theta, double* velocity_x,
                       double* velocity_y, double* velocity_heading,
                       double* speed);

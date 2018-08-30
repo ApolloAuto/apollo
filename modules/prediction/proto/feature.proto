@@ -31,6 +31,7 @@ message LaneFeature {
     optional double angle_diff = 5;
     optional double dist_to_left_boundary = 6;
     optional double dist_to_right_boundary = 7;
+    optional double lane_heading = 8;
 }
 
 message Feature {
