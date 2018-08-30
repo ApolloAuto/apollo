@@ -1,0 +1,17 @@
+syntax = "proto2";
+
+package apollo.tools.fuzz.control;
+
+import "modules/common/monitor_log/proto/monitor_log.proto";
+import "modules/control/proto/pad_msg.proto";
+import "modules/canbus/proto/chassis.proto";
+import "modules/localization/proto/localization.proto";
+import "modules/planning/proto/planning.proto";
+
+message ControlFuzzMessage {
+    required apollo.common.monitor.MonitorMessage monitor_message = 1;
+    required apollo.control.PadMessage pad_message = 2;
+    required apollo.canbus.Chassis chassis = 3;
+    required apollo.localization.LocalizationEstimate localization_estimate = 4;
+    required apollo.planning.ADCTrajectory adc_trajectory = 5;
+}
