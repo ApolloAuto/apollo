@@ -12,6 +12,8 @@ cc_library(
         "//modules/common:macro",
         "//modules/prediction/proto:scenario_feature_proto",
         "//modules/prediction/container:container_manager",
+        "//modules/prediction/container/adc_trajectory:adc_trajectory_container",
+        "//modules/prediction/container/pose:pose_container",
     ],
 )
 

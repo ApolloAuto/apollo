@@ -20,6 +20,4 @@ message ScenarioFeature {
     optional double dist_to_junction = 2002;
 
     repeated int32 obstacle_id = 3001;
-
-
 }
