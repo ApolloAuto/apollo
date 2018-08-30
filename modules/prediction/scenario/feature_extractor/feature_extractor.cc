@@ -50,7 +50,9 @@ const ScenarioFeature& FeatureExtractor::scenario_feature() const {
 }
 
 void FeatureExtractor::SetADCFeature() {
-  // TODO(all) implement ADC's dynamic features
+  scenario_feature_.set_speed(pose_container_->GetSpeed());
+  scenario_feature_.set_heading(pose_container_->GetTheta());
+  // TODO(all) adc acceleration if needed
 }
 
 void FeatureExtractor::SetLaneFeature() {
