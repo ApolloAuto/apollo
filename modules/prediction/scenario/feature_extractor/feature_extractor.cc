@@ -19,11 +19,20 @@
  */
 
 #include "modules/prediction/scenario/feature_extractor/feature_extractor.h"
+#include "modules/common/adapters/proto/adapter_config.pb.h"
+
+using apollo::common::adapter::AdapterConfig;
 
 namespace apollo {
 namespace prediction {
 
 FeatureExtractor::FeatureExtractor() {
+  adc_trajectory_container_ = dynamic_cast<ADCTrajectoryContainer*>(
+      ContainerManager::instance()->GetContainer(
+          AdapterConfig::PLANNING_TRAJECTORY));
+  pose_container_ = dynamic_cast<PoseContainer*>(
+      ContainerManager::instance()->GetContainer(
+          AdapterConfig::LOCALIZATION));
 }
 
 FeatureExtractor::~FeatureExtractor() {
