@@ -468,7 +468,7 @@ Status NaviSpeedDecider::AddCentricAccelerationConstraints(
 
   // kappa preview
   for (size_t i = 0; i < c_limits.size(); i++) {
-    for (size_t j = j; j - i < (size_t)(kappa_preview_ / kTsGraphSStep) &&
+    for (size_t j = i; j - i < (size_t)(kappa_preview_ / kTsGraphSStep) &&
                        j < c_limits.size();
          j++)
       c_limits[i].v_preffered =
