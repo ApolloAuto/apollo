@@ -61,6 +61,18 @@ class PoseContainer : public Container {
    */
   double GetTimestamp();
 
+  /**
+   * @brief Get speed of adc
+   * @return speed of adc
+   */
+  double GetSpeed() const;
+
+   /**
+   * @brief Get heading of adc
+   * @return heading of adc
+   */
+  double GetTheta() const;
+
  private:
   /**
    * @brief Update pose
