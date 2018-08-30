@@ -5,11 +5,16 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "planning_dispatcher",
     srcs = [
+        "navi_planning.cc",
         "planning_base.cc",
+        "planning_dispatcher.cc",
+        "std_planning.cc",
     ],
     hdrs = [
+        "navi_planning.h",
         "planning_base.h",
         "planning_dispatcher.h",
+        "std_planning.h",
     ],
     deps = [
         "//modules/common",
@@ -38,32 +43,6 @@ cc_library(
 )
 
 cc_library(
-    name = "std_planning_lib",
-    srcs = [
-        "std_planning.cc",
-    ],
-    hdrs = [
-        "std_planning.h",
-    ],
-    deps = [
-        ":planning_dispatcher",
-    ],
-)
-
-cc_library(
-    name = "navi_planning_lib",
-    srcs = [
-        "navi_planning.cc",
-    ],
-    hdrs = [
-        "navi_planning.h",
-    ],
-    deps = [
-        ":planning_dispatcher",
-    ],
-)
-
-cc_library(
     name = "open_space_planning_lib",
     srcs = [
         "open_space_planning.cc",
@@ -82,8 +61,7 @@ cc_library(
         "planning.h",
     ],
     deps = [
-        ":navi_planning_lib",
-        ":std_planning_lib",
+        ":planning_dispatcher",
     ],
 )
 
