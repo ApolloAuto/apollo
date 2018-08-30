@@ -13,6 +13,7 @@ proto_library(
         "scenario_feature.proto",
     ],
     deps = [
+        "//modules/map/proto:map_proto_lib",
     ],
 )
 

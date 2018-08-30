@@ -18,6 +18,7 @@
 #define MODULES_PREDICTION_SCENARIO_ANALYZER_SCENARIO_ANALYZER_H_
 
 #include "modules/common/proto/scenario.pb.h"
+#include "modules/prediction/proto/scenario_feature.pb.h"
 
 namespace apollo {
 namespace prediction {
@@ -28,7 +29,7 @@ class ScenarioAnalyzer {
 
   virtual ~ScenarioAnalyzer();
 
-  void Analyze();
+  void Analyze(const ScenarioFeature& scenario_feature);
 
   const apollo::common::Scenario& scenario() const;
 
