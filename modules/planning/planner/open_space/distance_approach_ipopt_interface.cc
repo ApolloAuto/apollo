@@ -446,9 +446,9 @@ void DistanceApproachIPOPTInterface::finalize_solution(
     const double* z_U, int m, const double* g, const double* lambda,
     double obj_value, const Ipopt::IpoptData* ip_data,
     Ipopt::IpoptCalculatedQuantities* ip_cq) {
-  std::size_t state_start_index = 0;
-  std::size_t input_start_index = (horizon_ + 1) * 4;
-  std::size_t time_start_index = input_start_index + horizon_ * 2;
+  // std::size_t state_start_index = 0;
+  // std::size_t input_start_index = (horizon_ + 1) * 4;
+  // std::size_t time_start_index = input_start_index + horizon_ * 2;
   for (std::size_t i = 0; i < horizon_; ++i) {
     std::size_t state_index = i * 4;
 
