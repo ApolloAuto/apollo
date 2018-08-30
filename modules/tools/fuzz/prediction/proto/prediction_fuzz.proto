@@ -1,0 +1,13 @@
+syntax = "proto2";
+
+package apollo.tools.fuzz.prediction;
+
+import "modules/localization/proto/localization.proto";
+import "modules/planning/proto/planning.proto";
+import "modules/perception/proto/perception_obstacle.proto";
+
+message PredictionFuzzMessage {
+    required apollo.localization.LocalizationEstimate localization_estimate = 1;
+    required apollo.planning.ADCTrajectory adc_trajectory = 2;
+    required apollo.perception.PerceptionObstacles perception_obstacles = 3;
+}
