@@ -52,7 +52,7 @@ class OpenSpacePlanner : public Planner {
   /**
    * @brief Constructor
    */
-  OpenSpacePlanner();
+  OpenSpacePlanner() = default;
 
   /**
    * @brief Destructor

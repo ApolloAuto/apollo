@@ -30,8 +30,6 @@ using apollo::common::ErrorCode;
 using apollo::common::Status;
 using apollo::common::TrajectoryPoint;
 
-OpenSpacePlanner::OpenSpacePlanner() {}
-
 Status OpenSpacePlanner::Init(const PlanningConfig&) { return Status::OK(); }
 
 apollo::common::Status OpenSpacePlanner::Plan(
@@ -156,9 +154,10 @@ apollo::common::Status OpenSpacePlanner::Plan(
   return Status::OK();
 }
 
-Status ObsHRep(const std::size_t& nOb, const Eigen::MatrixXd& vOb,
-               const std::vector<std::vector<std::vector<double>>>& lOb,
-               Eigen::MatrixXd* A_all, Eigen::MatrixXd* b_all) {
+Status OpenSpacePlanner::ObsHRep(
+    const std::size_t& nOb, const Eigen::MatrixXd& vOb,
+    const std::vector<std::vector<std::vector<double>>>& lOb,
+    Eigen::MatrixXd* A_all, Eigen::MatrixXd* b_all) {
   // TODO(JiaXuan) : Code replacement : find alternative ways for H presentation
   // caculation
   /*
