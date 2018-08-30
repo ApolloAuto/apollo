@@ -63,6 +63,19 @@ cc_library(
 )
 
 cc_library(
+    name = "open_space_planning_lib",
+    srcs = [
+        "open_space_planning.cc",
+    ],
+    hdrs = [
+        "open_space_planning.h",
+    ],
+    deps = [
+        ":planning_base",
+    ],
+)
+
+cc_library(
     name = "planning_lib",
     hdrs = [
         "planning.h",
