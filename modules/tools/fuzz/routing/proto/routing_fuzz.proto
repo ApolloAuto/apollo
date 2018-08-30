@@ -1,9 +1,0 @@
-syntax = "proto2";
-
-package apollo.tools.fuzz.routing;
-
-import "modules/routing/proto/routing.proto";
-
-message RoutingFuzzMessage {
-    required apollo.routing.RoutingRequest routing_request = 1;
-}
