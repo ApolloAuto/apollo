@@ -29,13 +29,33 @@ namespace prediction {
 
 class FeatureExtractor {
  public:
+  /**
+   * @brief Constructor
+   */
   FeatureExtractor();
 
+  /**
+   * @brief Destructor
+   */
   virtual ~FeatureExtractor();
 
+  /**
+   * @brief Extract features for scenario analysis
+   */
   void ExtractFeatures();
 
+  /**
+   * @brief Get scenario features
+   * @return Scenario features
+   */
   const ScenarioFeature& scenario_feature() const;
+
+ private:
+  void SetADCFeature();
+
+  void SetLaneFeature();
+
+  void SetJunctionFeature();
 
  private:
   ScenarioFeature scenario_feature_;
