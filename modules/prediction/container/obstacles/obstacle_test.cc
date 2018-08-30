@@ -43,6 +43,7 @@ class ObstacleTest : public KMLMapBasedTest {
     FLAGS_enable_kf_tracking = true;
     FLAGS_min_prediction_length = 50.0;
     FLAGS_adjust_velocity_by_position_shift = false;
+    FLAGS_adjust_vehicle_heading_by_lane = false;
 
     int num_frame = 3;
     for (int i = 1; i <= num_frame; ++i) {

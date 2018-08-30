@@ -18,6 +18,7 @@
 
 #include <algorithm>
 #include <list>
+#include <map>
 #include <memory>
 #include <utility>
 #include <vector>
@@ -80,6 +81,9 @@ Status NaviPlanning::Init() {
   CHECK_ADAPTER(PerceptionObstacles);
   CHECK_ADAPTER(Prediction);
   CHECK_ADAPTER(TrafficLightDetection);
+  CHECK_ADAPTER(PlanningPad);
+
+  AdapterManager::AddPlanningPadCallback(&NaviPlanning::OnPad, this);
 
   ThreadPool::Init(FLAGS_max_planning_thread_pool_size);
 
@@ -94,6 +98,20 @@ Status NaviPlanning::Init() {
   return planner_->Init(config_);
 }
 
+Status NaviPlanning::InitFrame(const uint32_t sequence_num,
+                               const TrajectoryPoint& planning_start_point,
+                               const double start_time,
+                               const VehicleState& vehicle_state) {
+  frame_.reset(new Frame(sequence_num, planning_start_point, start_time,
+                         vehicle_state, reference_line_provider_.get()));
+  auto status = frame_->Init();
+  if (!status.ok()) {
+    AERROR << "failed to init frame:" << status.ToString();
+    return status;
+  }
+  return Status::OK();
+}
+
 void NaviPlanning::OnTimer(const ros::TimerEvent&) {
   RunOnce();
 
@@ -102,6 +120,156 @@ void NaviPlanning::OnTimer(const ros::TimerEvent&) {
     Stop();
     ros::shutdown();
   }
+}
+
+void NaviPlanning::OnPad(const PadMessage& pad) {
+  ADEBUG << "Received Planning Pad Msg:" << pad.DebugString();
+  AERROR_IF(!pad.has_action()) << "pad message check failed!";
+  driving_action_ = pad.action();
+  is_received_pad_msg_ = true;
+}
+
+void NaviPlanning::ProcessPadMsg(DrivingAction drvie_action) {
+  if (config_.planner_type() == PlanningConfig::NAVI) {
+    std::map<std::string, uint32_t> lane_id_to_priority;
+    auto& ref_line_info_group = frame_->reference_line_info();
+    if (is_received_pad_msg_) {
+      is_received_pad_msg_ = false;
+      using LaneInfoPair = std::pair<std::string, double>;
+      std::string current_lane_id;
+      switch (drvie_action) {
+        case DrivingAction::FOLLOW: {
+          AINFO << "Received follow drive action";
+          std::string current_lane_id = GetCurrentLaneId();
+          if (!current_lane_id.empty()) {
+            target_lane_id_ = current_lane_id;
+          }
+          break;
+        }
+        case DrivingAction::CHANGE_LEFT: {
+          AINFO << "Received change left lane drive action";
+          std::vector<LaneInfoPair> lane_info_group;
+          GetLeftNeighborLanesInfo(&lane_info_group);
+          if (!lane_info_group.empty()) {
+            target_lane_id_ = lane_info_group.front().first;
+          }
+          break;
+        }
+        case DrivingAction::CHANGE_RIGHT: {
+          AINFO << "Received change right lane drive action";
+          std::vector<LaneInfoPair> lane_info_group;
+          GetRightNeighborLanesInfo(&lane_info_group);
+          if (!lane_info_group.empty()) {
+            target_lane_id_ = lane_info_group.front().first;
+          }
+          break;
+        }
+        case DrivingAction::PULL_OVER: {
+          AINFO << "Received pull over drive action";
+          // to do
+          break;
+        }
+        case DrivingAction::STOP: {
+          AINFO << "Received stop drive action";
+          // to do
+          break;
+        }
+        default: {
+          AWARN << "Received undefined drive action.";
+          break;
+        }
+      }
+    }
+
+    if (!target_lane_id_.empty()) {
+      constexpr uint32_t KTargetRefLinePriority = 0;
+      constexpr uint32_t kOtherRefLinePriority = 10;
+      for (auto& ref_line_info : ref_line_info_group) {
+        auto lane_id = ref_line_info.Lanes().Id();
+        ADEBUG << "lane_id : " << lane_id;
+        lane_id_to_priority[lane_id] = kOtherRefLinePriority;
+        if (lane_id == target_lane_id_) {
+          lane_id_to_priority[lane_id] = KTargetRefLinePriority;
+          ADEBUG << "target lane_id : " << lane_id;
+        }
+      }
+      frame_->UpdateReferenceLinePriority(lane_id_to_priority);
+    }
+  }
+
+  // other planner to do
+}
+
+std::string NaviPlanning::GetCurrentLaneId() {
+  auto& ref_line_info_group = frame_->reference_line_info();
+  const auto& vehicle_state = frame_->vehicle_state();
+  common::math::Vec2d adc_position(vehicle_state.x(), vehicle_state.y());
+  std::string current_lane_id;
+  for (auto& ref_line_info : ref_line_info_group) {
+    auto lane_id = ref_line_info.Lanes().Id();
+    auto& ref_line = ref_line_info.reference_line();
+    if (ref_line.IsOnLane(adc_position)) {
+      current_lane_id = lane_id;
+    }
+  }
+  return current_lane_id;
+}
+
+void NaviPlanning::GetLeftNeighborLanesInfo(
+    std::vector<std::pair<std::string, double>>* const lane_info_group) {
+  DCHECK_NOTNULL(lane_info_group);
+  auto& ref_line_info_group = frame_->reference_line_info();
+  const auto& vehicle_state = frame_->vehicle_state();
+  for (auto& ref_line_info : ref_line_info_group) {
+    common::math::Vec2d adc_position(vehicle_state.x(), vehicle_state.y());
+    auto& ref_line = ref_line_info.reference_line();
+    if (ref_line.IsOnLane(adc_position)) {
+      continue;
+    }
+    auto lane_id = ref_line_info.Lanes().Id();
+    auto ref_point =
+        ref_line.GetReferencePoint(vehicle_state.x(), vehicle_state.y());
+    double y = ref_point.y();
+    // in FLU positive on the left
+    if (y > 0.0) {
+      lane_info_group->emplace_back(std::make_pair(lane_id, y));
+    }
+  }
+  // sort neighbor lanes from near to far
+  using LaneInfoPair = std::pair<std::string, double>;
+  std::sort(lane_info_group->begin(), lane_info_group->end(),
+            [](const LaneInfoPair& left, const LaneInfoPair& right) {
+              return left.second < right.second;
+            });
+}
+
+void NaviPlanning::GetRightNeighborLanesInfo(
+    std::vector<std::pair<std::string, double>>* const lane_info_group) {
+  DCHECK_NOTNULL(lane_info_group);
+  auto& ref_line_info_group = frame_->reference_line_info();
+  const auto& vehicle_state = frame_->vehicle_state();
+  for (auto& ref_line_info : ref_line_info_group) {
+    common::math::Vec2d adc_position(vehicle_state.x(), vehicle_state.y());
+    auto& ref_line = ref_line_info.reference_line();
+    if (ref_line.IsOnLane(adc_position)) {
+      continue;
+    }
+    auto lane_id = ref_line_info.Lanes().Id();
+    auto ref_point =
+        ref_line.GetReferencePoint(vehicle_state.x(), vehicle_state.y());
+    double y = ref_point.y();
+    // in FLU negative on the right
+    if (y < 0.0) {
+      lane_info_group->emplace_back(std::make_pair(lane_id, y));
+    }
+  }
+
+  // sort neighbor lanes from near to far
+  using LaneInfoPair = std::pair<std::string, double>;
+  std::sort(lane_info_group->begin(), lane_info_group->end(),
+            [](const LaneInfoPair& left, const LaneInfoPair& right) {
+              return left.second > right.second;
+            });
 }
 
 Status NaviPlanning::Start() {
@@ -256,6 +424,11 @@ void NaviPlanning::RunOnce() {
     return;
   }
 
+  // Use planning pad message to make driving decisions
+  if (FLAGS_enable_planning_pad_msg) {
+    ProcessPadMsg(driving_action_);
+  }
+
   for (auto& ref_line_info : frame_->reference_line_info()) {
     TrafficDecider traffic_decider;
     traffic_decider.Init(traffic_rule_configs_);
@@ -321,6 +494,116 @@ void NaviPlanning::SetFallbackTrajectory(ADCTrajectory* trajectory_pb) {
     cruise_point->set_a(0.0);
     cruise_point->set_relative_time(t);
   }
+}
+
+void NaviPlanning::ExportReferenceLineDebug(planning_internal::Debug* debug) {
+  if (!FLAGS_enable_record_debug) {
+    return;
+  }
+  for (auto& reference_line_info : frame_->reference_line_info()) {
+    auto rl_debug = debug->mutable_planning_data()->add_reference_line();
+    rl_debug->set_id(reference_line_info.Lanes().Id());
+    rl_debug->set_length(reference_line_info.reference_line().Length());
+    rl_debug->set_cost(reference_line_info.Cost());
+    rl_debug->set_is_change_lane_path(reference_line_info.IsChangeLanePath());
+    rl_debug->set_is_drivable(reference_line_info.IsDrivable());
+    rl_debug->set_is_protected(reference_line_info.GetRightOfWayStatus() ==
+                               ADCTrajectory::PROTECTED);
+  }
+}
+
+Status NaviPlanning::Plan(
+    const double current_time_stamp,
+    const std::vector<TrajectoryPoint>& stitching_trajectory,
+    ADCTrajectory* trajectory_pb) {
+  auto* ptr_debug = trajectory_pb->mutable_debug();
+  if (FLAGS_enable_record_debug) {
+    ptr_debug->mutable_planning_data()->mutable_init_point()->CopyFrom(
+        stitching_trajectory.back());
+  }
+
+  auto status = planner_->Plan(stitching_trajectory.back(), frame_.get());
+
+  ExportReferenceLineDebug(ptr_debug);
+
+  const auto* best_ref_info = frame_->FindDriveReferenceLineInfo();
+  if (!best_ref_info) {
+    std::string msg("planner failed to make a driving plan");
+    AERROR << msg;
+    if (last_publishable_trajectory_) {
+      last_publishable_trajectory_->Clear();
+    }
+    return Status(ErrorCode::PLANNING_ERROR, msg);
+  }
+  ptr_debug->MergeFrom(best_ref_info->debug());
+  trajectory_pb->mutable_latency_stats()->MergeFrom(
+      best_ref_info->latency_stats());
+  // set right of way status
+  trajectory_pb->set_right_of_way_status(best_ref_info->GetRightOfWayStatus());
+  for (const auto& id : best_ref_info->TargetLaneId()) {
+    trajectory_pb->add_lane_id()->CopyFrom(id);
+  }
+
+  best_ref_info->ExportDecision(trajectory_pb->mutable_decision());
+
+  // Add debug information.
+  if (FLAGS_enable_record_debug) {
+    auto* reference_line = ptr_debug->mutable_planning_data()->add_path();
+    reference_line->set_name("planning_reference_line");
+    const auto& reference_points =
+        best_ref_info->reference_line().reference_points();
+    double s = 0.0;
+    double prev_x = 0.0;
+    double prev_y = 0.0;
+    bool empty_path = true;
+    for (const auto& reference_point : reference_points) {
+      auto* path_point = reference_line->add_path_point();
+      path_point->set_x(reference_point.x());
+      path_point->set_y(reference_point.y());
+      path_point->set_theta(reference_point.heading());
+      path_point->set_kappa(reference_point.kappa());
+      path_point->set_dkappa(reference_point.dkappa());
+      if (empty_path) {
+        path_point->set_s(0.0);
+        empty_path = false;
+      } else {
+        double dx = reference_point.x() - prev_x;
+        double dy = reference_point.y() - prev_y;
+        s += std::hypot(dx, dy);
+        path_point->set_s(s);
+      }
+      prev_x = reference_point.x();
+      prev_y = reference_point.y();
+    }
+  }
+
+  last_publishable_trajectory_.reset(new PublishableTrajectory(
+      current_time_stamp, best_ref_info->trajectory()));
+
+  ADEBUG << "current_time_stamp: " << std::to_string(current_time_stamp);
+
+  // Navi Panner doesn't need to stitch the last path planning
+  // trajectory.Otherwise, it will cause the Dremview planning track to display
+  // flashing or bouncing
+  if (FLAGS_enable_stitch_last_trajectory) {
+    last_publishable_trajectory_->PrependTrajectoryPoints(
+        stitching_trajectory.begin(), stitching_trajectory.end() - 1);
+  }
+
+  for (size_t i = 0; i < last_publishable_trajectory_->NumOfPoints(); ++i) {
+    if (last_publishable_trajectory_->TrajectoryPointAt(i).relative_time() >
+        FLAGS_trajectory_time_high_density_period) {
+      break;
+    }
+    ADEBUG << last_publishable_trajectory_->TrajectoryPointAt(i)
+                  .ShortDebugString();
+  }
+
+  last_publishable_trajectory_->PopulateTrajectoryProtobuf(trajectory_pb);
+
+  best_ref_info->ExportEngageAdvice(trajectory_pb->mutable_engage_advice());
+
+  return status;
 }
 
 void NaviPlanning::Stop() {

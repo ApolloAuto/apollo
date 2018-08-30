@@ -16,11 +16,10 @@
 
 #include "modules/drivers/camera/common/camera_gflags.h"
 
+DEFINE_string(camera_module_name, "camera", "camera module name");
 DEFINE_string(camera_adapter_config_filename,
               "modules/drivers/camera/conf/adapter.conf",
               "The adapter configuration file");
-
-// planning config file
-DEFINE_string(planning_config_file,
+DEFINE_string(camera_config_file,
               "modules/drivers/conf/camera_config.pb.txt",
               "camera config file");
