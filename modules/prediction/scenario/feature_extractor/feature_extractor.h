@@ -23,6 +23,8 @@
 
 #include "modules/prediction/proto/scenario_feature.pb.h"
 #include "modules/prediction/container/container_manager.h"
+#include "modules/prediction/container/adc_trajectory/adc_trajectory_container.h"
+#include "modules/prediction/container/pose/pose_container.h"
 
 namespace apollo {
 namespace prediction {
@@ -58,6 +60,8 @@ class FeatureExtractor {
   void SetJunctionFeature();
 
  private:
+  ADCTrajectoryContainer* adc_trajectory_container_;
+  PoseContainer* pose_container_;
   ScenarioFeature scenario_feature_;
 };
 
