@@ -3,6 +3,7 @@ syntax = "proto2";
 package apollo.prediction;
 
 import "modules/map/proto/map_lane.proto";
+import "modules/map/proto/map_junction.proto";
 
 message ScenarioFeature {
     optional double speed = 1;
@@ -15,7 +16,7 @@ message ScenarioFeature {
     optional apollo.hdmap.Lane right_neighbor_lane = 1005;
     optional double right_neighbor_lane_s = 1006;
 
-    optional string junction_id = 2001;  // junction ahead
+    optional apollo.hdmap.Junction junction = 2001;  // junction ahead
     optional double dist_to_junction = 2002;
 
     repeated int32 obstacle_id = 3001;
