@@ -44,10 +44,10 @@ WarmStartIPOPTInterface::WarmStartIPOPTInterface(
       x0_(x0),
       xf_(xf),
       XYbounds_(XYbounds) {
-  const auto& wheelbase_ = common::VehicleConfigHelper::instance()
-                               ->GetConfig()
-                               .vehicle_param()
-                               .wheel_base();
+  /*
+const auto& wheelbase_ = common::VehicleConfigHelper::instance()
+->GetConfig().vehicle_param().wheel_base();
+*/
   state_result_(horizon_ + 1, 4);
   control_result_(horizon_ + 1, 2);
   time_result_(horizon_ + 1, 1);
@@ -354,9 +354,9 @@ void WarmStartIPOPTInterface::finalize_solution(
 
     t_result_.clear();
   */
-  std::size_t state_start_index = 0;
-  std::size_t input_start_index = (horizon_ + 1) * 4;
-  std::size_t time_start_index = input_start_index + horizon_ * 2;
+  // std::size_t state_start_index = 0;
+  // std::size_t input_start_index = (horizon_ + 1) * 4;
+  // std::size_t time_start_index = input_start_index + horizon_ * 2;
   for (std::size_t i = 0; i < horizon_; ++i) {
     std::size_t state_index = i * 4;
     /*
