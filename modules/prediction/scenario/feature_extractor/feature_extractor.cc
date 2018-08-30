@@ -30,11 +30,26 @@ FeatureExtractor::~FeatureExtractor() {
 }
 
 void FeatureExtractor::ExtractFeatures() {
-  // TODO(all) process all steps here
+  SetADCFeature();
+  SetLaneFeature();
+  SetJunctionFeature();
+  // TODO(all) other processes
 }
 
 const ScenarioFeature& FeatureExtractor::scenario_feature() const {
   return scenario_feature_;
+}
+
+void FeatureExtractor::SetADCFeature() {
+  // TODO(all) implement ADC's dynamic features
+}
+
+void FeatureExtractor::SetLaneFeature() {
+  // TODO(all) implement lane features of ADC
+}
+
+void FeatureExtractor::SetJunctionFeature() {
+  // TODO(all) implement junction featues of ADC
 }
 
 }  // namespace prediction
