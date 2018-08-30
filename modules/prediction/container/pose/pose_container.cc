@@ -100,5 +100,15 @@ PerceptionObstacle* PoseContainer::ToPerceptionObstacle() {
   return obstacle_ptr_.get();
 }
 
+double PoseContainer::GetSpeed() const {
+  double velocity_x = obstacle_ptr_->velocity().x();
+  double velocity_y = obstacle_ptr_->velocity().y();
+  return std::hypot(velocity_x, velocity_y);
+}
+
+double PoseContainer::GetTheta() const {
+  return obstacle_ptr_->theta();
+}
+
 }  // namespace prediction
 }  // namespace apollo
