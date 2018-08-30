@@ -53,4 +53,9 @@ message PlanningConfig {
   optional EMPlannerConfig em_planner_config = 2;
 
   optional NaviPlannerConfig navi_planner_config = 3;
+
+  enum ScenarioType {
+    LANE_FOLLOW = 0;
+  };
+  optional ScenarioType scenario_type = 4 [default = LANE_FOLLOW];
 }
