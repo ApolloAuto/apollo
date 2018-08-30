@@ -1,0 +1,9 @@
+syntax = "proto2";
+
+package apollo.tools.fuzz.hdmap;
+
+import "modules/map/proto/map.proto";
+
+message HDmapFuzzMessage {
+    required apollo.hdmap.Map map = 1;
+}
