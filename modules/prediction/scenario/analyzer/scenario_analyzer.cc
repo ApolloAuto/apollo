@@ -19,5 +19,9 @@
 namespace apollo {
 namespace prediction {
 
+void ScenarioAnalyzer::Analyze(const ScenarioFeature& scenario_feature) {
+  // TODO(kechxu) implement
+}
+
 }  // namespace prediction
 }  // namespace apollo
