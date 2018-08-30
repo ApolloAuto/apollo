@@ -3,12 +3,13 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "planning_base",
+    name = "planning_dispatcher",
     srcs = [
         "planning_base.cc",
     ],
     hdrs = [
         "planning_base.h",
+        "planning_dispatcher.h",
     ],
     deps = [
         "//modules/common",
@@ -45,7 +46,7 @@ cc_library(
         "std_planning.h",
     ],
     deps = [
-        ":planning_base",
+        ":planning_dispatcher",
     ],
 )
 
@@ -58,7 +59,7 @@ cc_library(
         "navi_planning.h",
     ],
     deps = [
-        ":planning_base",
+        ":planning_dispatcher",
     ],
 )
 
@@ -71,7 +72,7 @@ cc_library(
         "open_space_planning.h",
     ],
     deps = [
-        ":planning_base",
+        ":planning_dispatcher",
     ],
 )
 
