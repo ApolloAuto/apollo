@@ -436,6 +436,11 @@ bool DistanceApproachIPOPTInterface::eval_f(int n, const double* x, bool new_x,
   return true;
 }
 
+bool DistanceApproachIPOPTInterface::eval_grad_f(int n, const double* x,
+                                                 bool new_x, double* grad_f) {
+  return true;
+}
+
 void DistanceApproachIPOPTInterface::finalize_solution(
     Ipopt::SolverReturn status, int n, const double* x, const double* z_L,
     const double* z_U, int m, const double* g, const double* lambda,
