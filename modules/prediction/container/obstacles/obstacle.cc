@@ -179,6 +179,11 @@ void Obstacle::Insert(const PerceptionObstacle& perception_obstacle,
   SetNearbyLanes(&feature);
   SetLaneGraphFeature(&feature);
 
+  if (FLAGS_adjust_vehicle_heading_by_lane &&
+     type_ == PerceptionObstacle::VEHICLE) {
+    AdjustHeadingByLane(&feature);
+  }
+
   // Insert obstacle feature to history
   InsertFeatureToHistory(feature);
 
@@ -426,6 +431,23 @@ void Obstacle::SetVelocity(const PerceptionObstacle& perception_obstacle,
          << std::setprecision(6) << velocity_heading << "] ";
   ADEBUG << "Obstacle [" << id_ << "] has speed [" << std::fixed
          << std::setprecision(6) << speed << "].";
+}
+
+void Obstacle::AdjustHeadingByLane(Feature* feature) {
+  if (!feature->has_lane() ||
+      !feature->lane().has_lane_feature()) {
+    return;
+  }
+  double velocity_heading = feature->velocity_heading();
+  double lane_heading = feature->lane().lane_feature().lane_heading();
+  double angle_diff = feature->lane().lane_feature().angle_diff();
+  if (std::abs(angle_diff) < FLAGS_max_angle_diff_to_adjust_velocity) {
+    velocity_heading = lane_heading;
+    double speed = feature->speed();
+    feature->mutable_velocity()->set_x(speed * std::cos(velocity_heading));
+    feature->mutable_velocity()->set_y(speed * std::sin(velocity_heading));
+    feature->set_velocity_heading(velocity_heading);
+  }
 }
 
 void Obstacle::UpdateVelocity(const double theta, double* velocity_x,
@@ -733,6 +755,7 @@ void Obstacle::SetCurrentLanes(Feature* feature) {
     lane_feature->set_lane_s(s);
     lane_feature->set_lane_l(l);
     lane_feature->set_angle_diff(angle_diff);
+    lane_feature->set_lane_heading(nearest_point_heading);
     lane_feature->set_dist_to_left_boundary(left - l);
     lane_feature->set_dist_to_right_boundary(right + l);
     if (std::fabs(angle_diff) < min_heading_diff) {
