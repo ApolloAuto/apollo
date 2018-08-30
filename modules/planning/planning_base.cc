@@ -50,7 +50,7 @@ using apollo::common::time::Clock;
 using apollo::common::util::ThreadPool;
 using apollo::hdmap::HDMapUtil;
 
-PlanningBase::~PlanningBase() { ThreadPool::Stop(); }
+PlanningBase::~PlanningBase() {}
 
 #define CHECK_ADAPTER(NAME)                                               \
   if (AdapterManager::Get##NAME() == nullptr) {                           \
