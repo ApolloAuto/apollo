@@ -18,6 +18,7 @@
 #define MODULES_PLANNING_OPEN_SPACE_PLANNING_H_
 
 #include <string>
+#include <vector>
 
 #include "modules/planning/planning_base.h"
 
@@ -37,7 +38,7 @@ namespace planning {
 class OpenSpacePlanning : public PlanningBase {
  public:
   OpenSpacePlanning() = default;
-  virtual ~OpenSpacePlanning();
+  virtual ~OpenSpacePlanning() = default;
 
   /**
    * @brief Planning algorithm name.
@@ -68,6 +69,11 @@ class OpenSpacePlanning : public PlanningBase {
   void RunOnce() override;
 
   void OnTimer(const ros::TimerEvent&) override;
+
+  apollo::common::Status Plan(
+      const double current_time_stamp,
+      const std::vector<common::TrajectoryPoint>& stitching_trajectory,
+      ADCTrajectory* trajectory) override;
 
  private:
 };

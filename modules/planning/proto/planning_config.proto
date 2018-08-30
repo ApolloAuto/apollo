@@ -46,6 +46,7 @@ message PlanningConfig {
     EM = 1;  // expectation maximization
     LATTICE = 2;
     NAVI = 3; // navigation planner
+    OPENSPACE = 4; // open space planner
   };
   optional PlannerType planner_type = 1 [default = EM];
 

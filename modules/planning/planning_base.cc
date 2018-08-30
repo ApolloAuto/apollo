@@ -34,6 +34,7 @@
 #include "modules/planning/planner/em/em_planner.h"
 #include "modules/planning/planner/lattice/lattice_planner.h"
 #include "modules/planning/planner/navi/navi_planner.h"
+#include "modules/planning/planner/open_space/open_space_planner.h"
 #include "modules/planning/planner/rtk/rtk_replay_planner.h"
 #include "modules/planning/tasks/traffic_decider/traffic_decider.h"
 
@@ -70,6 +71,9 @@ void PlanningBase::RegisterPlanners() {
                             []() -> Planner* { return new LatticePlanner(); });
   planner_factory_.Register(PlanningConfig::NAVI,
                             []() -> Planner* { return new NaviPlanner(); });
+  planner_factory_.Register(PlanningConfig::OPENSPACE, []() -> Planner* {
+    return new OpenSpacePlanner();
+  });
 }
 
 void PlanningBase::CheckPlanningConfig() {
