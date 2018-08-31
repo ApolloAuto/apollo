@@ -45,25 +45,24 @@
 #include "modules/planning/common/obstacle.h"
 #include "modules/planning/common/trajectory/publishable_trajectory.h"
 
-
 namespace apollo {
 namespace planning {
 
 /**
- * @class Frame_open_space
+ * @class FrameOpenSpace
  *
- * @brief Frame_open_space holds all data for one planning cycle.
+ * @brief FrameOpenSpace holds all data for one planning cycle.
  */
 
-class Frame_open_space {
+class FrameOpenSpace {
  public:
-  explicit Frame_open_space(uint32_t sequence_num,
-                 const common::TrajectoryPoint &planning_start_point,
-                 const double start_time,
-                 const common::VehicleState &vehicle_state);
-  
+  explicit FrameOpenSpace(uint32_t sequence_num,
+                          const common::TrajectoryPoint &planning_start_point,
+                          const double start_time,
+                          const common::VehicleState &vehicle_state);
+
   common::Status Init();
-  
+
   const common::TrajectoryPoint &PlanningStartPoint() const;
 
   uint32_t SequenceNum() const;
@@ -91,11 +90,10 @@ class Frame_open_space {
   const bool is_near_destination() const { return is_near_destination_; }
 
  private:
-
   /**
    * Find an obstacle that collides with ADC (Autonomous Driving Car) if
    * such
-   * obstacle exists.                                   
+   * obstacle exists.
    * @return pointer to the obstacle if such obstacle exists, otherwise
    * @return false if no colliding obstacle.
    */
@@ -118,9 +116,9 @@ class Frame_open_space {
   apollo::common::monitor::MonitorLogger monitor_logger_;
 };
 
-class Frame_open_space_History : public IndexedQueue<uint32_t, Frame_open_space> {
+class FrameOpenSpaceHistory : public IndexedQueue<uint32_t, FrameOpenSpace> {
  private:
-  DECLARE_SINGLETON(Frame_open_space_History);
+  DECLARE_SINGLETON(FrameOpenSpaceHistory);
 };
 
 }  // namespace planning

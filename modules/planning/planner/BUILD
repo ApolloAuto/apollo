@@ -11,6 +11,7 @@ cc_library(
         "//modules/common/proto:pnc_point_proto",
         "//modules/common/status",
         "//modules/planning/common:frame",
+        "//modules/planning/common:frame_open_space",
         "//modules/planning/common:reference_line_info",
         "//modules/planning/proto:planning_proto",
     ],
