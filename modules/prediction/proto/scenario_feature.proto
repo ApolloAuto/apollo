@@ -2,9 +2,6 @@ syntax = "proto2";
 
 package apollo.prediction;
 
-import "modules/map/proto/map_lane.proto";
-import "modules/map/proto/map_junction.proto";
-
 message ScenarioFeature {
     optional double speed = 1;
     optional double acceleration = 2;
