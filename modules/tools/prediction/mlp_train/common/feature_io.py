@@ -47,14 +47,10 @@ def load_protobuf(filename):
     """
     read a file in protobuf binary
     """
-    features = []
     offline_features = offline_features_pb2.Features()
     with open(filename, 'rb') as file_in:
         offline_features.ParseFromString(file_in.read())
-    for i in range(len(offline_features.feature)):
-        features.append(offline_features.feature[i])
-
-    return features
+    return offline_features.feature
 
 
 def load_label_feature(filename):
@@ -104,6 +100,5 @@ def build_trajectory(features):
             del fea_dict[k]
             continue
         fea_dict[k].sort(key=lambda x: x.timestamp)
-    feature_trajectories = fea_dict
 
-    return feature_trajectories
+    return fea_dict
