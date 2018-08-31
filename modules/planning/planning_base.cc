@@ -53,15 +53,6 @@ using apollo::hdmap::HDMapUtil;
 
 PlanningBase::~PlanningBase() {}
 
-#define CHECK_ADAPTER(NAME)                                               \
-  if (AdapterManager::Get##NAME() == nullptr) {                           \
-    AERROR << #NAME << " is not registered";                              \
-    return Status(ErrorCode::PLANNING_ERROR, #NAME " is not registered"); \
-  }
-
-#define CHECK_ADAPTER_IF(CONDITION, NAME) \
-  if (CONDITION) CHECK_ADAPTER(NAME)
-
 void PlanningBase::RegisterPlanners() {
   planner_factory_.Register(
       PlanningConfig::RTK, []() -> Planner* { return new RTKReplayPlanner(); });
