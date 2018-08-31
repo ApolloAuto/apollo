@@ -44,18 +44,18 @@
 namespace apollo {
 namespace prediction {
 
-using ::apollo::common::ErrorCode;
-using ::apollo::common::Status;
-using ::apollo::common::TrajectoryPoint;
-using ::apollo::common::adapter::AdapterConfig;
-using ::apollo::common::adapter::AdapterManager;
-using ::apollo::common::math::Vec2d;
-using ::apollo::common::time::Clock;
-using ::apollo::common::util::DirectoryExists;
-using ::apollo::common::util::Glob;
-using ::apollo::localization::LocalizationEstimate;
-using ::apollo::perception::PerceptionObstacle;
-using ::apollo::perception::PerceptionObstacles;
+using apollo::common::ErrorCode;
+using apollo::common::Status;
+using apollo::common::TrajectoryPoint;
+using apollo::common::adapter::AdapterConfig;
+using apollo::common::adapter::AdapterManager;
+using apollo::common::math::Vec2d;
+using apollo::common::time::Clock;
+using apollo::common::util::DirectoryExists;
+using apollo::common::util::Glob;
+using apollo::localization::LocalizationEstimate;
+using apollo::perception::PerceptionObstacle;
+using apollo::perception::PerceptionObstacles;
 
 std::string Prediction::Name() const { return FLAGS_prediction_module_name; }
 
