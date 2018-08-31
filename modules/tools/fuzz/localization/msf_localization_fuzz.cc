@@ -99,12 +99,12 @@ void MSFLocalizationFuzz::Init() {
 
 void MSFLocalizationFuzz::Fuzz(
     MSFLocalizationFuzzMessage msf_localization_fuzz_message) {
-  AdapterManager::PublishRawImu(msf_localization_fuzz_message.imu());
-  AdapterManager::PublishGnssBestPose(
+  msf_localization_->OnRawImu(msf_localization_fuzz_message.imu());
+  msf_localization_->OnGnssBestPose(
       msf_localization_fuzz_message.gnss_best_pose());
-  AdapterManager::PublishGnssRtkObs(
+  msf_localization_->OnGnssRtkObs(
       msf_localization_fuzz_message.gnss_rtk_obs());
-  AdapterManager::PublishGnssRtkEph(
+  msf_localization_->OnGnssRtkEph(
       msf_localization_fuzz_message.gnss_rtk_eph());
 }
 

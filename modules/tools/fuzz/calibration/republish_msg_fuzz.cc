@@ -64,8 +64,8 @@ void RepublishMsgFuzz::Init() {
 
 void RepublishMsgFuzz::Fuzz(
     RepublishMsgFuzzMessage republish_msg_fuzz_message) {
-  AdapterManager::PublishGps(republish_msg_fuzz_message.gps());
-  AdapterManager::PublishInsStat(republish_msg_fuzz_message.ins_stat());
+  republish_msg_->OnGps(republish_msg_fuzz_message.gps());
+  republish_msg_->OnInsStat(republish_msg_fuzz_message.ins_stat());
 }
 
 DEFINE_PROTO_FUZZER(
