@@ -50,7 +50,10 @@ FeatureExtractor::~FeatureExtractor() {
 void FeatureExtractor::ExtractFeatures() {
   ExtractEgoVehicleFeatures();
 
-  ExtractEgoLaneFeatures();
+  auto ego_trajectory_point = pose_container_->GetPosition();
+  Vec2d ego_position(ego_trajectory_point.x(), ego_trajectory_point.y());
+
+  ExtractEgoLaneFeatures(ego_position);
 
   ExtractFrontJunctionFeatures();
   // TODO(all) other processes
@@ -64,29 +67,24 @@ void FeatureExtractor::ExtractEgoVehicleFeatures() {
   // TODO(all): change this to ego_speed and ego_heading
   scenario_feature_.set_speed(pose_container_->GetSpeed());
   scenario_feature_.set_heading(pose_container_->GetTheta());
-  // TODO(all) adc acceleration if needed
+  // TODO(all): add acceleration if needed
 }
 
-void FeatureExtractor::ExtractEgoLaneFeatures() {
-  LaneInfoPtr ego_lane_info = GetEgoLane();
+void FeatureExtractor::ExtractEgoLaneFeatures(const Vec2d& ego_position) {
+  LaneInfoPtr ego_lane_info = GetEgoLane(ego_position);
   if (ego_lane_info == nullptr) {
     AERROR << "Ego vehicle is not on any lane.";
     return;
   }
-  auto position = pose_container_->GetPosition();
   scenario_feature_.set_curr_lane_id(ego_lane_info->id().id());
   double curr_lane_s = 0.0;
   double curr_lane_l = 0.0;
-  ego_lane_info->GetProjection({position.x(), position.y()},
-                                &curr_lane_s, &curr_lane_l);
+  ego_lane_info->GetProjection(ego_position, &curr_lane_s, &curr_lane_l);
   scenario_feature_.set_curr_lane_s(curr_lane_s);
-
-  // TODO(all) implement neighbor lane features
 }
 
-void FeatureExtractor::ExtractNeighborLaneFeatures() {
+void FeatureExtractor::ExtractNeighborLaneFeatures(const Vec2d& ego_position) {
 }
-
 
 void FeatureExtractor::ExtractFrontJunctionFeatures() {
   JunctionInfoPtr junction = ego_trajectory_containter_->ADCJunction();
@@ -100,21 +98,23 @@ void FeatureExtractor::ExtractFrontJunctionFeatures() {
 void FeatureExtractor::ExtractObstacleFeatures() {
 }
 
-LaneInfoPtr FeatureExtractor::GetEgoLane() const {
-  auto position = pose_container_->GetPosition();
+
+LaneInfoPtr FeatureExtractor::GetEgoLane(const Vec2d& ego_position) const {
   const auto& trajectory =
       ego_trajectory_containter_->adc_trajectory();
   for (const auto& lane_id : trajectory.lane_id()) {
     LaneInfoPtr lane_info =
         HDMapUtil::BaseMap().GetLaneById(hdmap::MakeMapId(lane_id.id()));
-    if (lane_info->IsOnLane({position.x(), position.y()})) {
+    if (lane_info->IsOnLane(ego_position)) {
       return lane_info;
     }
   }
   return nullptr;
 }
 
-std::vector<LaneInfoPtr> FeatureExtractor::GetNeighborLanes() const {
+std::vector<LaneInfoPtr> FeatureExtractor::GetNeighborLanes(
+    const LaneInfoPtr& ego_lane_info) const {
+
 }
 
 }  // namespace prediction
