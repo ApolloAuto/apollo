@@ -30,7 +30,10 @@ using apollo::common::ErrorCode;
 using apollo::common::Status;
 using apollo::common::TrajectoryPoint;
 
-Status OpenSpacePlanner::Init(const PlanningConfig&) { return Status::OK(); }
+Status OpenSpacePlanner::Init(const PlanningConfig&) {
+  AINFO << "In OpenSpacePlanner::Init()";
+  return Status::OK();
+}
 
 apollo::common::Status OpenSpacePlanner::Plan(
     const common::TrajectoryPoint& planning_init_point, Frame* frame) {
