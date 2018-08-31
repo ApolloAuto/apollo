@@ -269,6 +269,33 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "frame_open_space",
+    srcs = [
+        "frame_open_space.cc",
+    ],
+    hdrs = [
+        "frame_open_space.h",
+    ],
+    deps = [
+        ":change_lane_decider",
+        ":indexed_queue",
+        ":lag_prediction",
+        ":obstacle",
+        "//modules/common:log",
+        "//modules/common/adapters:adapter_manager",
+        "//modules/common/configs:vehicle_config_helper",
+        "//modules/common/monitor_log",
+        "//modules/common/vehicle_state:vehicle_state_provider",
+        "//modules/map/hdmap:hdmap_util",
+        "//modules/map/pnc_map",
+        "//modules/planning/common/trajectory:discretized_trajectory",
+        "//modules/planning/common/trajectory:publishable_trajectory",
+        "//modules/planning/proto:planning_config_proto",
+        "//modules/planning/proto:planning_proto",
+    ],
+)
+
 cc_test(
     name = "frame_test",
     size = "small",
@@ -316,6 +343,7 @@ cc_library(
     name = "planning_common",
     deps = [
         ":frame",
+        ":frame_open_space",
         ":planning_gflags",
         ":speed_limit",
         "//modules/common:log",
