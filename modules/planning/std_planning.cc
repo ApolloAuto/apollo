@@ -376,6 +376,8 @@ Status StdPlanning::Plan(
     trajectory_pb->add_lane_id()->CopyFrom(id);
   }
 
+  trajectory_pb->set_trajectory_type(best_ref_info->trajectory_type());
+
   best_ref_info->ExportDecision(trajectory_pb->mutable_decision());
 
   // Add debug information.

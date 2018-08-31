@@ -127,4 +127,12 @@ message ADCTrajectory {
   // critial region will be empty when planning is NOT sure which region is critical
   // critial regions may or may not overlap
   optional CriticalRegion critical_region = 20;
+
+  enum TrajectoryType {
+    UNKNOWN = 0;
+    NORMAL = 1;
+    PATH_FALLBACK = 2;
+    SPEED_FALLBACK = 3;
+  }
+  optional TrajectoryType trajectory_type = 21 [ default = UNKNOWN];
 }
