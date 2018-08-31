@@ -14,35 +14,32 @@
  * limitations under the License.
  *****************************************************************************/
 
-/**
- * @file
- **/
+#include "modules/planning/scenarios/scenario_manager.h"
 
-#ifndef MODULES_PLANNING_SCENARIOS_LANE_FOLLLOW_SCENARIO_H_
-#define MODULES_PLANNING_SCENARIOS_LANE_FOLLLOW_SCENARIO_H_
-
-#include <string>
-
-#include "modules/planning/proto/planning_config.pb.h"
-
-#include "modules/common/status/status.h"
-#include "modules/common/util/factory.h"
-
-#include "modules/planning/scenarios/scenario.h"
+#include "modules/planning/scenarios/lane_follow/lane_follow_scenario.h"
 
 namespace apollo {
 namespace planning {
 
-class LaneFollowScenario : public Scenario {
- public:
-  LaneFollowScenario() : Scenario("LaneFollowScenario") {}
-  virtual ~LaneFollowScenario() = default;
+bool ScenarioManager::Init() {
+  RegisterScenarios();
+  return true;
+}
 
-  virtual bool Init() { return true; }
-  virtual common::Status Process() { return common::Status::OK(); }
-};
+void ScenarioManager::RegisterScenarios() {
+  scenario_factory_.Register(PlanningConfig::LANE_FOLLOW, []() -> Scenario* {
+    return new LaneFollowScenario();
+  });
+}
+
+void ScenarioManager::Update() {
+  // TODO(Liangliang): update scenario here.
+  scenario_ = scenario_factory_.CreateObject(PlanningConfig::LANE_FOLLOW);
+}
+
+PlanningConfig::ScenarioType ScenarioManager::DecideCurrentScenario() {
+  return PlanningConfig::LANE_FOLLOW;
+}
 
 }  // namespace planning
 }  // namespace apollo
-
-#endif  // MODULES_PLANNING_SCENARIOS_LANE_FOLLLOW_SCENARIO_H_

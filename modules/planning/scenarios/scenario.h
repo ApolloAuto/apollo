@@ -34,20 +34,20 @@ namespace planning {
 class Scenario {
  public:
   Scenario() = default;
+
+  explicit Scenario(const std::string& name) : name_(name) {}
+
   virtual ~Scenario() = default;
+
   virtual const std::string& Name() const;
 
   virtual bool Init();
-  virtual apollo::common::Status Process();
+
+  virtual common::Status Process() { return common::Status::OK(); }
 
  protected:
   bool is_init_ = false;
   const std::string name_;
-
- private:
-  void RegisterScenarios();
-  common::util::Factory<PlanningConfig::ScenarioType, Scenario>
-      scenario_factory_;
 };
 
 }  // namespace planning

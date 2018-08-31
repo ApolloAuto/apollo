@@ -78,9 +78,6 @@ cv::Vec3b GetTypeColor(ObjectType type) {
 }
 
 class CNNSegmentationTest : public testing::Test {
- protected:
-  CNNSegmentationTest() {}
-  ~CNNSegmentationTest() {}
   void SetUp() {
     google::InitGoogleLogging("CNNSegmentationTest");
     cnn_segmentor_.reset(new CNNSegmentation());

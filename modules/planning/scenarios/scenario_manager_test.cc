@@ -18,31 +18,27 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_SCENARIOS_LANE_FOLLLOW_SCENARIO_H_
-#define MODULES_PLANNING_SCENARIOS_LANE_FOLLLOW_SCENARIO_H_
+#include "modules/planning/scenarios/scenario_manager.h"
 
-#include <string>
+#include <memory>
 
-#include "modules/planning/proto/planning_config.pb.h"
-
-#include "modules/common/status/status.h"
-#include "modules/common/util/factory.h"
-
-#include "modules/planning/scenarios/scenario.h"
+#include "gtest/gtest.h"
 
 namespace apollo {
 namespace planning {
 
-class LaneFollowScenario : public Scenario {
+class ScenarioManagerTest : public ::testing::Test {
  public:
-  LaneFollowScenario() : Scenario("LaneFollowScenario") {}
-  virtual ~LaneFollowScenario() = default;
+  virtual void SetUp() {}
 
-  virtual bool Init() { return true; }
-  virtual common::Status Process() { return common::Status::OK(); }
+ protected:
+  ScenarioManager scenario_manager_;
 };
+
+TEST_F(ScenarioManagerTest, Simple) {
+  EXPECT_TRUE(scenario_manager_.Init());
+  scenario_manager_.Update();
+}
 
 }  // namespace planning
 }  // namespace apollo
-
-#endif  // MODULES_PLANNING_SCENARIOS_LANE_FOLLLOW_SCENARIO_H_

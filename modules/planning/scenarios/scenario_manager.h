@@ -14,35 +14,41 @@
  * limitations under the License.
  *****************************************************************************/
 
-/**
- * @file
- **/
+#ifndef MODULES_PLANNING_SCENARIOS_SCENARIO_MANAGER_H_
+#define MODULES_PLANNING_SCENARIOS_SCENARIO_MANAGER_H_
 
-#ifndef MODULES_PLANNING_SCENARIOS_LANE_FOLLLOW_SCENARIO_H_
-#define MODULES_PLANNING_SCENARIOS_LANE_FOLLLOW_SCENARIO_H_
-
-#include <string>
+#include <memory>
 
 #include "modules/planning/proto/planning_config.pb.h"
 
 #include "modules/common/status/status.h"
-#include "modules/common/util/factory.h"
-
 #include "modules/planning/scenarios/scenario.h"
 
 namespace apollo {
 namespace planning {
 
-class LaneFollowScenario : public Scenario {
+class ScenarioManager final {
  public:
-  LaneFollowScenario() : Scenario("LaneFollowScenario") {}
-  virtual ~LaneFollowScenario() = default;
+  ScenarioManager() = default;
 
-  virtual bool Init() { return true; }
-  virtual common::Status Process() { return common::Status::OK(); }
+  bool Init();
+
+  Scenario* mutable_scenario() { return scenario_.get(); }
+
+  void Update();
+
+ private:
+  void RegisterScenarios();
+
+  PlanningConfig::ScenarioType DecideCurrentScenario();
+
+  common::util::Factory<PlanningConfig::ScenarioType, Scenario>
+      scenario_factory_;
+
+  std::unique_ptr<Scenario> scenario_;
 };
 
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_SCENARIOS_LANE_FOLLLOW_SCENARIO_H_
+#endif  // MODULES_PLANNING_SCENARIOS_SCENARIO_MANAGER_H_
