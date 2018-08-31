@@ -56,13 +56,13 @@ class FeatureExtractor {
   const ScenarioFeature& scenario_feature() const;
 
  private:
-  void SetADCFeature();
+  void ExtractEgoVehicleFeature();
 
-  void SetLaneFeature();
+  void ExtractLaneFeature();
 
-  void SetJunctionFeature();
+  void ExtractFrontJunctionFeature();
 
-  std::shared_ptr<const apollo::hdmap::LaneInfo> GetCurrentLane() const;
+  std::shared_ptr<const hdmap::LaneInfo> GetCurrentLane() const;
 
  private:
   ADCTrajectoryContainer* ego_trajectory_containter_;

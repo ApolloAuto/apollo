@@ -48,9 +48,11 @@ FeatureExtractor::~FeatureExtractor() {
 }
 
 void FeatureExtractor::ExtractFeatures() {
-  SetADCFeature();
-  SetLaneFeature();
-  SetJunctionFeature();
+  ExtractEgoVehicleFeature();
+
+  ExtractLaneFeature();
+
+  ExtractFrontJunctionFeature();
   // TODO(all) other processes
 }
 
@@ -58,14 +60,14 @@ const ScenarioFeature& FeatureExtractor::scenario_feature() const {
   return scenario_feature_;
 }
 
-void FeatureExtractor::SetADCFeature() {
+void FeatureExtractor::ExtractEgoVehicleFeature() {
   // TODO(all): change this to ego_speed and ego_heading
   scenario_feature_.set_speed(pose_container_->GetSpeed());
   scenario_feature_.set_heading(pose_container_->GetTheta());
   // TODO(all) adc acceleration if needed
 }
 
-void FeatureExtractor::SetLaneFeature() {
+void FeatureExtractor::ExtractLaneFeature() {
   LaneInfoPtr curr_lane_info = GetCurrentLane();
   if (curr_lane_info == nullptr) {
     AERROR << "ADC is not on any lane.";
@@ -82,7 +84,7 @@ void FeatureExtractor::SetLaneFeature() {
   // TODO(all) implement neighbor lane features
 }
 
-void FeatureExtractor::SetJunctionFeature() {
+void FeatureExtractor::ExtractFrontJunctionFeature() {
   JunctionInfoPtr junction = ego_trajectory_containter_->ADCJunction();
   if (junction != nullptr) {
     scenario_feature_.set_junction_id(junction->id().id());
@@ -91,15 +93,15 @@ void FeatureExtractor::SetJunctionFeature() {
   }
 }
 
-std::shared_ptr<const apollo::hdmap::LaneInfo>
+std::shared_ptr<const hdmap::LaneInfo>
 FeatureExtractor::GetCurrentLane() const {
   auto position = pose_container_->GetPosition();
-  const ADCTrajectory& adc_trajectory =
+  const auto& adc_trajectory =
       ego_trajectory_containter_->adc_trajectory();
   for (const auto& lane_id : adc_trajectory.lane_id()) {
     LaneInfoPtr lane_info =
         HDMapUtil::BaseMap().GetLaneById(hdmap::MakeMapId(lane_id.id()));
-    if (lane_info->IsOnLane(Vec2d{position.x(), position.y()})) {
+    if (lane_info->IsOnLane({position.x(), position.y()})) {
       return lane_info;
     }
   }
