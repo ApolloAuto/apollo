@@ -54,7 +54,7 @@ class AutotuningRawFeatureGenerator {
    * @param frame related status
    * @return OK if the evaluation succeeds; error otherwise.
    */
-  common::Status evaluate_trajectory(
+  common::Status evaluate_trajectory_point(
       const common::TrajectoryPoint& trajectory_point,
       const ReferenceLineInfo& reference_line_info, const Frame& frame,
       autotuning::TrajectoryPointRawFeature* const trajectory_point_feature)
