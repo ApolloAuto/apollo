@@ -23,10 +23,9 @@
 namespace apollo {
 namespace planning {
 
-void Scenario::RegisterScenarios() {
-  scenario_factory_.Register(PlanningConfig::LANE_FOLLOW,
-                             []() -> Scenario* { return nullptr; });
-}
+const std::string& Scenario::Name() const { return name_; }
+
+bool Scenario::Init() { return true; }
 
 }  // namespace planning
 }  // namespace apollo
