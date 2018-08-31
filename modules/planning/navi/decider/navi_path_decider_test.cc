@@ -29,6 +29,7 @@
 #include "modules/planning/common/planning_gflags.h"
 
 using apollo::common::TrajectoryPoint;
+using apollo::common::util::MakePathPoint;
 
 namespace apollo {
 namespace planning {
@@ -37,51 +38,160 @@ class NaviPathDeciderTest : public ::testing::Test {
   static void SetUpTestCase() {
     AINFO << "NaviPathDeciderTest : SetUpTestCase";
   }
+
+  static void GeneratePathData(
+      double s, double init_y, double kappa,
+      std::vector<common::PathPoint>* const path_points) {
+    DCHECK_NOTNULL(path_points);
+    for (double x = 0.0, y = init_y; x < s; ++x) {
+      path_points->clear();
+      auto path_point = MakePathPoint(x, y, 0.0, 0.0, kappa, 0.0, 0.0);
+      path_points->emplace_back(path_point);
+    }
+  }
+
+  static void InitPlannigConfig(PlanningConfig* const plannig_config) {
+    DCHECK_NOTNULL(plannig_config);
+    auto* navi_planner_config = plannig_config->mutable_navi_planner_config();
+    DCHECK_NOTNULL(navi_planner_config);
+    auto* navi_path_decider_config =
+        navi_planner_config->mutable_navi_path_decider_config();
+    DCHECK_NOTNULL(navi_path_decider_config);
+    navi_path_decider_config->set_min_path_length(5.0);
+    navi_path_decider_config->set_min_look_forward_time(2.0);
+    navi_path_decider_config->set_max_keep_lane_distance(0.4);
+    navi_path_decider_config->set_max_keep_lane_shift_y(0.15);
+    navi_path_decider_config->set_min_keep_lane_offset(0.20);
+    navi_path_decider_config->set_keep_lane_shift_compensation(0.01);
+    navi_path_decider_config->set_move_dest_lane_compensation(0.35);
+    navi_path_decider_config->clear_move_dest_lane_config_talbe();
+    auto* move_dest_lane_cfg_table =
+        navi_path_decider_config->mutable_move_dest_lane_config_talbe();
+    DCHECK_NOTNULL(move_dest_lane_cfg_table);
+    auto* move_shift_config = move_dest_lane_cfg_table->add_lateral_shift();
+    DCHECK_NOTNULL(move_shift_config);
+    move_shift_config->set_max_speed(34);
+    move_shift_config->set_max_move_dest_lane_shift_y(0.45);
+  }
 };
 
 TEST_F(NaviPathDeciderTest, Init) {
   NaviPathDecider navi_path_decider;
   PlanningConfig config;
+  InitPlannigConfig(&config);
   EXPECT_TRUE(navi_path_decider.Init(config));
 }
 
 TEST_F(NaviPathDeciderTest, Execute) {}
 
-TEST_F(NaviPathDeciderTest, SmoothInitY) {
+TEST_F(NaviPathDeciderTest, MoveToDestLane) {
   NaviPathDecider navi_path_decider;
   PlanningConfig config;
-  double min_shift_y = config.navi_planner_config()
-                           .navi_path_decider_config()
-                           .default_min_smooth_init_y();
-  double max_shift_y = config.navi_planner_config()
-                           .navi_path_decider_config()
-                           .default_max_smooth_init_y();
+  InitPlannigConfig(&config);
   navi_path_decider.Init(config);
 
-  // 1. target_path_init_y too small, can not need shift
-  double smooth_y = navi_path_decider.SmoothInitY(0.002, min_shift_y - 0.05);
-  EXPECT_DOUBLE_EQ(smooth_y, 0.0);
+  // generate path point
+  constexpr double kMaxS = 152.0;
+  std::vector<common::PathPoint> path_points;
 
-  // 2.need shift
-  // 2.1 adc on the right of reference line and shift bettween [min_shift_y,
-  // max_shift_y]
-  smooth_y = navi_path_decider.SmoothInitY(0.0, 0.30);
-  EXPECT_DOUBLE_EQ(smooth_y, 0.30);
+  // 1.std::fabs(target_path_init_y) < max_keep_lane_distance not need move to
+  // dest lane
+  GeneratePathData(kMaxS, 0.03, 0.03, &path_points);
+  double dest_y = path_points[0].y();
+  double expect_y = path_points[0].y();
+  navi_path_decider.MoveToDestLane(dest_y, &path_points);
+  EXPECT_DOUBLE_EQ(path_points[0].y(), expect_y);
 
-  // 2.need shift
-  // 2.2 adc on the right of reference line and shift max_shift_y]
-  smooth_y = navi_path_decider.SmoothInitY(0.0, max_shift_y + 0.30);
-  EXPECT_DOUBLE_EQ(smooth_y, max_shift_y);
+  // 2.std::fabs(target_path_init_y) > max_keep_lane_distance need move to dest
+  // lane 2.1 move to left, not need compensation
+  navi_path_decider.start_plan_v_ = 10.0;
+  navi_path_decider.start_plan_a_ = 1.0;
+  GeneratePathData(kMaxS, 0.9, 0.03, &path_points);
+  dest_y = path_points[0].y();
+  auto navi_path_decider_cfg =
+      config.navi_planner_config().navi_path_decider_config();
+  expect_y = navi_path_decider_cfg.move_dest_lane_config_talbe()
+                 .lateral_shift(0)
+                 .max_move_dest_lane_shift_y();
+  navi_path_decider.MoveToDestLane(dest_y, &path_points);
+  EXPECT_DOUBLE_EQ(path_points[0].y(), expect_y);
 
-  // 2.3 adc on the left of reference line and shift bettween [min_shift_y,
-  // max_shift_y]
-  smooth_y = navi_path_decider.SmoothInitY(0.0, -0.30);
-  EXPECT_DOUBLE_EQ(smooth_y, -0.30);
+  // 2.std::fabs(target_path_init_y) > max_keep_lane_distance need move to dest
+  // lane 2.2 move to right, need compensation
+  navi_path_decider.start_plan_v_ = 10.0;
+  navi_path_decider.start_plan_a_ = 1.0;
+  GeneratePathData(kMaxS, -0.9, 0.03, &path_points);
+  dest_y = path_points[0].y();
+  expect_y = -navi_path_decider_cfg.move_dest_lane_config_talbe()
+                  .lateral_shift(0)
+                  .max_move_dest_lane_shift_y() -
+             navi_path_decider_cfg.move_dest_lane_compensation();
+  navi_path_decider.MoveToDestLane(dest_y, &path_points);
+  EXPECT_DOUBLE_EQ(path_points[0].y(), expect_y);
+}
 
-  // 2.need shift
-  // 2.4 adc on the left of reference line and shift max_shift_y]
-  smooth_y = navi_path_decider.SmoothInitY(0.0, -max_shift_y - 0.30);
-  EXPECT_DOUBLE_EQ(smooth_y, -max_shift_y);
+TEST_F(NaviPathDeciderTest, KeepLane) {
+  NaviPathDecider navi_path_decider;
+  PlanningConfig config;
+  InitPlannigConfig(&config);
+  navi_path_decider.Init(config);
+
+  // generate path point
+  constexpr double kMaxS = 152.0;
+  std::vector<common::PathPoint> path_points;
+
+  // 1.std::fabs(target_path_init_y) > max_keep_lane_distance not need keep lane
+  GeneratePathData(kMaxS, 0.90, 0.03, &path_points);
+  double dest_y = path_points[0].y();
+  double expect_y = path_points[0].y();
+  navi_path_decider.KeepLane(dest_y, &path_points);
+  EXPECT_DOUBLE_EQ(path_points[0].y(), expect_y);
+
+  // 2. std::fabs(target_path_init_y)<= max_keep_lane_distance need keep lane
+  // 2.1 std::fabs(target_path_init_y) < keep_lane_offset, not need adjust
+  // reference points
+  const common::TrajectoryPoint plan_start_point;
+  const common::VehicleState vehicle_state;
+  apollo::planning::ReferenceLine ref_line;
+  apollo::hdmap::RouteSegments route_segments;
+  navi_path_decider.reference_line_info_ = new ReferenceLineInfo(
+      vehicle_state, plan_start_point, ref_line, route_segments);
+  navi_path_decider.frame_ =
+      new Frame(1, plan_start_point, 0, vehicle_state, nullptr);
+  DCHECK_NOTNULL(navi_path_decider.reference_line_info_);
+  DCHECK_NOTNULL(navi_path_decider.frame_);
+  GeneratePathData(kMaxS, 0.19, 0.03, &path_points);
+  dest_y = path_points[0].y();
+  expect_y = path_points[0].y();
+  navi_path_decider.KeepLane(dest_y, &path_points);
+  EXPECT_DOUBLE_EQ(path_points[0].y(), expect_y);
+
+  // 2.2 min_keep_lane_offset + max_keep_lane_shift_y -
+  // keep_lane_shift_compensation > std::fabs(target_path_init_y) >
+  // min_keep_lane_offset, need adjust reference points
+  GeneratePathData(kMaxS, 0.29, 0.03, &path_points);
+  dest_y = path_points[0].y();
+  auto navi_path_decider_cfg =
+      config.navi_planner_config().navi_path_decider_config();
+  expect_y = dest_y - navi_path_decider_cfg.min_keep_lane_offset() +
+             navi_path_decider_cfg.keep_lane_shift_compensation() + dest_y;
+  navi_path_decider.KeepLane(dest_y, &path_points);
+  EXPECT_DOUBLE_EQ(path_points[0].y(), expect_y);
+
+  // 2.2 min_keep_lane_offset + max_keep_lane_shift_y -
+  // keep_lane_shift_compensation <= std::fabs(target_path_init_y)
+  // min_keep_lane_offset, need adjust reference points
+  GeneratePathData(kMaxS, 0.34, 0.03, &path_points);
+  dest_y = path_points[0].y();
+  expect_y = path_points[0].y();
+  expect_y = navi_path_decider_cfg.max_keep_lane_shift_y() + dest_y;
+  navi_path_decider.KeepLane(dest_y, &path_points);
+  EXPECT_DOUBLE_EQ(path_points[0].y(), expect_y);
+
+  delete navi_path_decider.reference_line_info_;
+  navi_path_decider.reference_line_info_ = nullptr;
+  delete navi_path_decider.frame_;
+  navi_path_decider.frame_ = nullptr;
 }
 
 }  // namespace planning

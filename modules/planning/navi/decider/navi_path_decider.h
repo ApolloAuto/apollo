@@ -24,7 +24,6 @@
 
 #include <map>
 #include <string>
-#include <tuple>
 #include <vector>
 
 #include "gflags/gflags.h"
@@ -32,11 +31,11 @@
 
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/common/status/status.h"
+#include "modules/planning/navi/decider/navi_obstacle_decider.h"
 #include "modules/planning/proto/navi_path_decider_config.pb.h"
 #include "modules/planning/proto/planning_config.pb.h"
 #include "modules/planning/reference_line/reference_line.h"
 #include "modules/planning/tasks/task.h"
-
 /**
  * @namespace apollo::planning
  * @brief apollo::planning
@@ -96,23 +95,20 @@ class NaviPathDecider : public Task {
                         std::vector<common::PathPoint> *const path_points);
 
   /**
-   * @brief shift the path points on the y-axis
-   * @param shift_distance shift distance in y-axis.
-   * @param init_point both input and output path points.
-   * @return if success return true or return false.
+   * @brief if adc is not on the dest lane, move to dest lane slowly.
+   * @param the y of adc project point to dest lane reference line.
+   * @param path point intercepted from the reference line
    */
-  void ShiftY(const double shift_distance,
-              std::vector<common::PathPoint> *const path_points);
+  void MoveToDestLane(const double dest_ref_line_y,
+                      std::vector<common::PathPoint> *const path_points);
 
   /**
-   * @brief calculate the y-coordinate of the starting point of the path plan
-   * @param actual_ref_init_y the actual y-coordinate of start point that
-   * intercepted from reference line
-   * @param target_path_init_y the y-coordinate of the start point that desired
-   * @return the y-coordinate of the starting point in FLU coordinate.
+   * @brief if adc is on the dest lane, keep lane.
+   * @param the y of adc project point to dest lane reference line.
+   * @param path point intercepted from the reference line
    */
-  double SmoothInitY(const double actual_ref_init_y,
-                     const double target_path_init_y);
+  void KeepLane(const double dest_ref_line_y,
+                std::vector<common::PathPoint> *const path_points);
 
   void RecordDebugInfo(const PathData &path_data);
 
@@ -131,31 +127,41 @@ class NaviPathDecider : public Task {
    * @param reference_line input reference line
    * @param obstacles unhandled obstacle information.
    * @param path_decision path decision information provided by perception.
+   * @vehicle_state adc status
    * @return the y coordinate value of nudging target position
    */
   double NudgeProcess(const ReferenceLine &reference_line,
                       const std::vector<common::PathPoint> &path_data_points,
                       const std::vector<const Obstacle *> &obstacles,
-                      const PathDecision &path_decision);
+                      const PathDecision &path_decision,
+                      const common::VehicleState &vehicle_state);
   /**
-   * @brief calculate latreal shift param by vehicle state and config
+   * @brief calculate latreal shift distance by vehicle state and config
    */
-  void CalculateShiftParam();
+  double CalculateDistanceToDestLane();
 
  private:
+  double max_keep_lane_distance_ = 0.0;
+  double min_keep_lane_offset_ = 0.0;
+  double max_keep_lane_shift_y_ = 0.0;
+  double keep_lane_shift_compensation_ = 0.0;
+  double move_dest_lane_compensation_ = 0.0;
+  uint32_t start_plan_point_from_ = 0;
+  std::map<double, double> move_dest_lane_config_talbe_;
+  std::vector<double> max_speed_levels_;
+
+  double start_plan_v_ = 0.0;
+  double start_plan_a_ = 0.0;
+  apollo::common::PathPoint start_plan_point_;
+
+  std::string cur_reference_line_lane_id_;
+  std::map<std::string, bool> last_lane_id_to_nudge_flag_;
+  NaviObstacleDecider obstacle_decider_;
   common::VehicleState vehicle_state_;
   NaviPathDeciderConfig config_;
-  std::string cur_reference_line_lane_id_;
-  std::map<std::string, double> last_lane_id_to_adc_project_y_;
-  std::map<std::string, bool> last_lane_id_to_nudge_flag_;
-  std::map<double, std::tuple<double, double, double>>
-      speed_to_shift_param_table_;
-  std::vector<double> max_speed_levels_;
-  double theta_change_ratio_ = 0.0;
-  double min_init_y_ = 0.0;
-  double max_init_y_ = 0.0;
 
-  FRIEND_TEST(NaviPathDeciderTest, SmoothInitY);
+  FRIEND_TEST(NaviPathDeciderTest, MoveToDestLane);
+  FRIEND_TEST(NaviPathDeciderTest, KeepLane);
 };
 
 }  // namespace planning

@@ -61,7 +61,7 @@ class ReferenceLineInfo {
 
   bool AddObstacles(const std::vector<const Obstacle*>& obstacles);
   PathObstacle* AddObstacle(const Obstacle* obstacle);
-  void AddObstacleHelper(const Obstacle* obstacle, int* ret);
+  bool AddObstacleHelper(const Obstacle* obstacle);
 
   PathDecision* path_decision();
   const PathDecision& path_decision() const;
@@ -118,7 +118,7 @@ class ReferenceLineInfo {
   bool IsChangeLanePath() const;
 
   /**
-   * Check if the current reference line is the neighbor of the vehicle 
+   * Check if the current reference line is the neighbor of the vehicle
    * current position
    */
   bool IsNeighborLanePath() const;
@@ -153,6 +153,10 @@ class ReferenceLineInfo {
   }
 
   void set_is_on_reference_line() { is_on_reference_line_ = true; }
+
+  uint32_t GetPriority() const { return reference_line_.GetPriority(); }
+
+  void SetPriority(uint32_t priority) { reference_line_.SetPriority(priority); }
 
  private:
   bool CheckChangeLane() const;

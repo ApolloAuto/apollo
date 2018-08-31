@@ -266,7 +266,7 @@ DEFINE_bool(enable_follow_accel_constraint, true,
 DEFINE_bool(enable_sqp_solver, true, "True to enable SQP solver.");
 
 /// thread pool
-DEFINE_uint32(max_planning_thread_pool_size, 5,
+DEFINE_uint32(max_planning_thread_pool_size, 15,
               "num of thread used in planning thread pool.");
 DEFINE_bool(use_multi_thread_to_add_obstacles, false,
             "use multiple thread to add obstacles.");
@@ -364,9 +364,15 @@ DEFINE_bool(use_planning_fallback, true,
 DEFINE_double(fallback_total_time, 3.0, "total fallback trajectory time");
 DEFINE_double(fallback_time_unit, 0.02,
               "fallback trajectory unit time in seconds");
-DEFINE_bool(enable_polynomial_speed_fallback, false,
-              "True to enable polynomial speed fallback.");
+DEFINE_double(polynomial_speed_fallback_velocity, 3.5,
+              "velocity to use polynomial speed fallback.");
 
 // navigation mode
 DEFINE_double(navigation_fallback_cruise_time, 8.0,
               "The time range of fallback cruise under navigation mode.");
+
+DEFINE_bool(enable_stitch_last_trajectory, true,
+            "To control whether to stitch last trajectory or not.");
+
+DEFINE_bool(enable_planning_pad_msg, false,
+            "To control whether to enable planning pad message.");

@@ -55,7 +55,7 @@ namespace planning {
  * mode by setting "FLAGS_use_navigation_mode" to "true") and do not use it in
  * standard mode.
  */
-class NaviPlanner : public Planner {
+class NaviPlanner : public PlannerWithReferenceLine {
  public:
   NaviPlanner() = default;
 

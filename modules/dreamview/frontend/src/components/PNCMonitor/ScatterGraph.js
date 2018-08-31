@@ -84,6 +84,8 @@ export default class ScatterGraph extends React.Component {
                     ticks: {
                         min: setting.min,
                         max: setting.max,
+			minRotation: 0,
+			maxRotation: 0,
                     },
                     gridLines: {
                         color: 'rgba(153, 153, 153, 0.5)',

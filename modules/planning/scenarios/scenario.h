@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,35 +16,41 @@
 
 /**
  * @file
- */
+ **/
 
-#ifndef MODULES_PLANNING_UTIL_PLANNING_UTIL_H_
-#define MODULES_PLANNING_UTIL_PLANNING_UTIL_H_
+#ifndef MODULES_PLANNING_SCENARIOS_SCENARIO_H_
+#define MODULES_PLANNING_SCENARIOS_SCENARIO_H_
 
 #include <string>
 
-#include "modules/common/proto/pnc_point.pb.h"
+#include "modules/planning/proto/planning_config.pb.h"
 
-#include "modules/planning/proto/planning_status.pb.h"
+#include "modules/common/status/status.h"
+#include "modules/common/util/factory.h"
 
-/**
- * @namespace apollo::common::util
- * @brief apollo::common::util
- */
 namespace apollo {
 namespace planning {
-namespace util {
 
-/**
- * This function returns the run-time state of the planning module.
- * @Warnning: this function is not thread safe.
- */
-PlanningStatus *GetPlanningStatus();
+class Scenario {
+ public:
+  Scenario() = default;
+  virtual ~Scenario() = default;
+  virtual const std::string& Name() const;
 
-void DumpPlanningContext();
+  virtual bool Init();
+  virtual apollo::common::Status Process();
 
-}  // namespace util
+ protected:
+  bool is_init_ = false;
+  const std::string name_;
+
+ private:
+  void RegisterScenarios();
+  common::util::Factory<PlanningConfig::ScenarioType, Scenario>
+      scenario_factory_;
+};
+
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_UTIL_PLANNING_UTIL_H_
+#endif  // MODULES_PLANNING_SCENARIOS_SCENARIO_H_

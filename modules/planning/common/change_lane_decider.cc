@@ -21,8 +21,8 @@
 #include "modules/planning/common/change_lane_decider.h"
 
 #include "modules/common/time/time.h"
+#include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/common/planning_util.h"
 
 namespace apollo {
 namespace planning {
@@ -37,7 +37,7 @@ void ChangeLaneDecider::UpdateStatus(ChangeLaneStatus::Status status_code,
 void ChangeLaneDecider::UpdateStatus(double timestamp,
                                      ChangeLaneStatus::Status status_code,
                                      const std::string& path_id) {
-  auto* change_lane_status = util::GetPlanningStatus()->mutable_change_lane();
+  auto* change_lane_status = GetPlanningStatus()->mutable_change_lane();
   change_lane_status->set_timestamp(timestamp);
   change_lane_status->set_path_id(path_id);
   change_lane_status->set_status(status_code);
@@ -94,7 +94,7 @@ bool ChangeLaneDecider::Apply(
     return true;
   }
 
-  auto* prev_status = util::GetPlanningStatus()->mutable_change_lane();
+  auto* prev_status = GetPlanningStatus()->mutable_change_lane();
   double now = Clock::NowInSeconds();
 
   if (!prev_status->has_status()) {

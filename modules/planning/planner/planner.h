@@ -57,6 +57,19 @@ class Planner {
    */
   virtual apollo::common::Status Plan(
       const common::TrajectoryPoint& planning_init_point, Frame* frame) = 0;
+};
+
+class PlannerWithReferenceLine : public Planner {
+ public:
+  /**
+   * @brief Constructor
+   */
+  PlannerWithReferenceLine() = default;
+
+  /**
+   * @brief Destructor
+   */
+  virtual ~PlannerWithReferenceLine() = default;
 
   /**
    * @brief Compute a trajectory for execution.
