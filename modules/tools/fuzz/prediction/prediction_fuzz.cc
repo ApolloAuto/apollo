@@ -72,10 +72,10 @@ void PredictionFuzz::Init() {
 }
 
 void PredictionFuzz::Fuzz(PredictionFuzzMessage prediction_fuzz_message) {
-  AdapterManager::PublishLocalization(
+  prediction_->OnLocalization(
       prediction_fuzz_message.localization_estimate());
-  AdapterManager::PublishPlanning(prediction_fuzz_message.adc_trajectory());
-  AdapterManager::PublishPerceptionObstacles(
+  prediction_->OnPlanning(prediction_fuzz_message.adc_trajectory());
+  prediction_->RunOnce(
       prediction_fuzz_message.perception_obstacles());
 }
 
