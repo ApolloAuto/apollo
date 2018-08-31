@@ -22,5 +22,5 @@ filename=$(basename $1)
 pathname="${dir}/${filename}" 
 #echo ${pathname}
 cd /apollo
-./bazel-bin/modules/planning/reference_line/smoother_util --input_file ${pathname} --smooth_length $2
+./bazel-bin/modules/planning/reference_line/spiral_smoother_util --input_file ${pathname} --smooth_length $2
 

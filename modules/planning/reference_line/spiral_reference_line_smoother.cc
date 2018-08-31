@@ -188,6 +188,63 @@ bool SpiralReferenceLineSmoother::Smooth(
   return true;
 }
 
+bool SpiralReferenceLineSmoother::SmoothStandAlone(
+    std::vector<Eigen::Vector2d> point2d, std::vector<double>* ptr_theta,
+    std::vector<double>* ptr_kappa, std::vector<double>* ptr_dkappa,
+    std::vector<double>* ptr_s, std::vector<double>* ptr_x,
+    std::vector<double>* ptr_y) const {
+  CHECK_GT(point2d.size(), 1);
+
+  SpiralProblemInterface* ptop = new SpiralProblemInterface(point2d);
+
+  ptop->set_default_max_point_deviation(default_max_point_deviation_);
+  ptop->set_element_weight_curve_length(
+      config_.spiral().opt_weight_curve_length());
+  ptop->set_element_weight_kappa(config_.spiral().opt_weight_kappa());
+  ptop->set_element_weight_dkappa(config_.spiral().opt_weight_dkappa());
+  ptop->set_element_weight_d2kappa(config_.spiral().opt_weight_d2kappa());
+
+  Ipopt::SmartPtr<Ipopt::TNLP> problem = ptop;
+
+  // Create an instance of the IpoptApplication
+  Ipopt::SmartPtr<Ipopt::IpoptApplication> app = IpoptApplicationFactory();
+
+  app->Options()->SetStringValue("hessian_approximation", "limited-memory");
+  app->Options()->SetIntegerValue("max_iter", config_.spiral().max_iteration());
+  app->Options()->SetIntegerValue("acceptable_iter",
+                                  config_.spiral().opt_acceptable_iteration());
+  app->Options()->SetNumericValue("tol", config_.spiral().opt_tol());
+  app->Options()->SetNumericValue("acceptable_tol",
+                                  config_.spiral().opt_acceptable_tol());
+
+  Ipopt::ApplicationReturnStatus status = app->Initialize();
+  if (status != Ipopt::Solve_Succeeded) {
+    ADEBUG << "*** Error during initialization!";
+    return false;
+  }
+
+  status = app->OptimizeTNLP(problem);
+
+  if (status == Ipopt::Solve_Succeeded ||
+      status == Ipopt::Solved_To_Acceptable_Level) {
+    // Retrieve some statistics about the solve
+    Ipopt::Index iter_count = app->Statistics()->IterationCount();
+    ADEBUG << "*** The problem solved in " << iter_count << " iterations!";
+
+    Ipopt::Number final_obj = app->Statistics()->FinalObjective();
+    ADEBUG << "*** The final value of the objective function is " << final_obj
+           << '.';
+  } else {
+    ADEBUG << "Return status: " << int(status);
+  }
+
+  ptop->get_optimization_results(ptr_theta, ptr_kappa, ptr_dkappa, ptr_s, ptr_x,
+                                 ptr_y);
+
+  return status == Ipopt::Solve_Succeeded ||
+         status == Ipopt::Solved_To_Acceptable_Level;
+}
+
 bool SpiralReferenceLineSmoother::Smooth(std::vector<Eigen::Vector2d> point2d,
                                          std::vector<double>* ptr_theta,
                                          std::vector<double>* ptr_kappa,
