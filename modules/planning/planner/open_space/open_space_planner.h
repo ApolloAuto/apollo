@@ -22,7 +22,7 @@
 #include <vector>
 
 #include "Eigen/Eigen"
-#include "modules/planning/common/frame.h"
+#include "modules/planning/common/frame_open_space.h"
 #include "modules/planning/planner/open_space/distance_approach_problem.h"
 #include "modules/planning/planner/open_space/warm_start_problem.h"
 #include "modules/planning/planner/planner.h"
@@ -81,6 +81,7 @@ class OpenSpacePlanner : public Planner {
   std::unique_ptr<::apollo::planning::WarmStartProblem> warm_start_;
   std::unique_ptr<::apollo::planning::DistanceApproachProblem>
       distance_approach_;
+  common::VehicleState vehicle_state_;
 };
 
 }  // namespace planning

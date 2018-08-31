@@ -21,7 +21,7 @@
 #include <vector>
 
 #include "modules/planning/planning_base.h"
-
+#include "modules/planning/common/frame_open_space.h"
 /**
  * @namespace apollo::planning
  * @brief apollo::planning
@@ -71,11 +71,15 @@ class OpenSpacePlanning : public PlanningBase {
   void OnTimer(const ros::TimerEvent&) override;
 
   apollo::common::Status Plan(
-      const double current_time_stamp,
-      const std::vector<common::TrajectoryPoint>& stitching_trajectory,
+      const double current_time_stamp, const std::vector<common::TrajectoryPoint>& stitching_trajectory,
       ADCTrajectory* trajectory) override;
 
  private:
+   common::Status InitFrame(const uint32_t sequence_num,
+                           const common::TrajectoryPoint& planning_start_point,
+                           const double start_time,
+                           const common::VehicleState& vehicle_state);
+   std::unique_ptr<Frame_open_space> frame_;
 };
 
 }  // namespace planning
