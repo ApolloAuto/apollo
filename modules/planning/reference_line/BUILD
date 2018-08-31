@@ -173,4 +173,15 @@ cc_binary(
     ],
 )
 
+cc_binary(
+    name = "spiral_smoother_util",
+    srcs = [
+        "spiral_smoother_util.cc",
+    ],
+    deps = [
+        ":spiral_reference_line_smoother",
+        "//modules/planning/proto:planning_config_proto",
+    ],
+)
+
 cpplint()
