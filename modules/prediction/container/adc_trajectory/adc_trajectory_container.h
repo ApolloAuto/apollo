@@ -95,6 +95,12 @@ class ADCTrajectoryContainer : public Container {
    */
   double ADCDistanceToJunction() const;
 
+  /**
+   * @brief Get ADC planning trajectory
+   * @return ADC planning trajectory
+   */
+  const apollo::planning::ADCTrajectory& adc_trajectory() const;
+
  private:
   void SetJunctionPolygon();
 
