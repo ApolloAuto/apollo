@@ -313,6 +313,23 @@ cc_test(
     ],
 )
 
+cc_test(
+    name = "frame_open_space_test",
+    size = "small",
+    srcs = [
+        "frame_open_space_test.cc",
+    ],
+    data = [
+        "//modules/planning/common:common_testdata",
+    ],
+    deps = [
+        ":frame_open_space",
+        "//modules/common/util",
+        "//modules/planning/proto:planning_config_proto",
+        "@gtest//:main",
+    ],
+)
+
 cc_library(
     name = "speed_limit",
     srcs = [
