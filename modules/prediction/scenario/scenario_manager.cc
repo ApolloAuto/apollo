@@ -21,7 +21,7 @@ namespace prediction {
 
 void ScenarioManager::Run() {
   feature_extractor_.ExtractFeatures();
-  scenario_analyzer_.Analyze(feature_extractor_.scenario_feature());
+  scenario_analyzer_.Analyze(feature_extractor_.GetScenarioFeatures());
   // TODO(kechxu) deal with scenario output
 }
 
