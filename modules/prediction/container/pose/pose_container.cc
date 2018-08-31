@@ -110,5 +110,9 @@ double PoseContainer::GetTheta() const {
   return obstacle_ptr_->theta();
 }
 
+Point PoseContainer::GetPosition() const {
+  return obstacle_ptr_->position();
+}
+
 }  // namespace prediction
 }  // namespace apollo

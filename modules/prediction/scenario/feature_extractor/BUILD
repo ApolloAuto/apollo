@@ -10,6 +10,8 @@ cc_library(
     deps = [
         "//modules/common:log",
         "//modules/common:macro",
+        "//modules/common/math:geometry",
+        "//modules/map/hdmap:hdmap_util",
         "//modules/prediction/proto:scenario_feature_proto",
         "//modules/prediction/container:container_manager",
         "//modules/prediction/container/adc_trajectory:adc_trajectory_container",

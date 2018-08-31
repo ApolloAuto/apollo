@@ -136,6 +136,10 @@ double ADCTrajectoryContainer::ADCDistanceToJunction() const {
   return s_dist_to_junction_;
 }
 
+const ADCTrajectory& ADCTrajectoryContainer::adc_trajectory() const {
+  return adc_trajectory_;
+}
+
 void ADCTrajectoryContainer::SetLaneSequence() {
   for (const auto& lane : adc_trajectory_.lane_id()) {
     if (!lane.id().empty()) {
