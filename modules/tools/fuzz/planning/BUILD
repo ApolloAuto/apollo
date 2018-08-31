@@ -16,7 +16,7 @@ cc_binary(
         "-lubsan",
     ],
     deps = [
-        "//modules/planning:navi_planning_lib",
+        "//modules/planning:planning_lib",
         "//modules/tools/fuzz/planning/proto:navi_planning_fuzz_proto",
         "@libprotobuf_mutator//:mutator",
     ],
@@ -36,7 +36,7 @@ cc_binary(
         "-lubsan",
     ],
     deps = [
-        "//modules/planning:std_planning_lib",
+        "//modules/planning:planning_lib",
         "//modules/tools/fuzz/planning/proto:std_planning_fuzz_proto",
         "@libprotobuf_mutator//:mutator",
     ],
