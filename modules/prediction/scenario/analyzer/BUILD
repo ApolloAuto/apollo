@@ -14,4 +14,20 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "scenario_analyzer_test",
+    size = "small",
+    srcs = ["scenario_analyzer_test.cc"],
+    data = [
+        "//modules/prediction:prediction_data",
+        "//modules/prediction:prediction_testdata",
+    ],
+    deps = [
+        ":scenario_analyzer",
+        "//modules/prediction/common:kml_map_based_test",
+        "//modules/prediction/common:prediction_gflags",
+        "@gtest//:main",
+    ],
+)
+
 cpplint()
