@@ -73,6 +73,12 @@ class PoseContainer : public Container {
    */
   double GetTheta() const;
 
+  /**
+   * @brief Get adc position
+   * @return adc position
+   */
+  apollo::perception::Point GetPosition() const;
+
  private:
   /**
    * @brief Update pose

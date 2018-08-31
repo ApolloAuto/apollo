@@ -21,6 +21,9 @@
 #ifndef MODULES_PREDICTION_SCENARIO_FEATURE_EXTRACTOR_FEATURE_EXTRACTOR_H_
 #define MODULES_PREDICTION_SCENARIO_FEATURE_EXTRACTOR_FEATURE_EXTRACTOR_H_
 
+#include <memory>
+
+#include "modules/map/hdmap/hdmap_common.h"
 #include "modules/prediction/proto/scenario_feature.pb.h"
 #include "modules/prediction/container/container_manager.h"
 #include "modules/prediction/container/adc_trajectory/adc_trajectory_container.h"
@@ -58,6 +61,8 @@ class FeatureExtractor {
   void SetLaneFeature();
 
   void SetJunctionFeature();
+
+  std::shared_ptr<const apollo::hdmap::LaneInfo> GetCurrentLane() const;
 
  private:
   ADCTrajectoryContainer* adc_trajectory_container_;
