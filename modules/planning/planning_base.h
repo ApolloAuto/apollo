@@ -36,6 +36,8 @@
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/trajectory/publishable_trajectory.h"
 #include "modules/planning/planner/planner.h"
+#include "modules/planning/scenarios/scenario.h"
+#include "modules/planning/scenarios/scenario_manager.h"
 
 /**
  * @namespace apollo::planning
@@ -80,28 +82,28 @@ class PlanningBase : public apollo::common::ApolloApp {
   }
 
   void RegisterPlanners();
-
   bool IsVehicleStateValid(const common::VehicleState& vehicle_state);
-
   virtual void SetFallbackTrajectory(ADCTrajectory* cruise_trajectory);
-
   void CheckPlanningConfig();
 
   double start_time_ = 0.0;
-
   common::util::Factory<PlanningConfig::PlannerType, Planner> planner_factory_;
-
   PlanningConfig config_;
-
   TrafficRuleConfigs traffic_rule_configs_;
-
   const hdmap::HDMap* hdmap_ = nullptr;
-
   std::unique_ptr<Planner> planner_;
-
   std::unique_ptr<PublishableTrajectory> last_publishable_trajectory_;
-
   ros::Timer timer_;
+
+ private:
+  void RegisterScenarios();
+  void Process() {
+    scenario_manager_.Update();
+    scenario_ = scenario_manager_.mutable_scenario();
+  }
+
+  ScenarioManager scenario_manager_;
+  Scenario* scenario_;
 };
 
 }  // namespace planning
