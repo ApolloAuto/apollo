@@ -26,16 +26,19 @@ using apollo::common::adapter::AdapterConfig;
 using apollo::common::math::Vec2d;
 using apollo::planning::ADCTrajectory;
 using apollo::hdmap::HDMapUtil;
-using JunctionInfoPtr = std::shared_ptr<const apollo::hdmap::JunctionInfo>;
-using LaneInfoPtr = std::shared_ptr<const apollo::hdmap::LaneInfo>;
+using apollo::hdmap::LaneInfo;
+using apollo::hdmap::JunctionInfo;
+using JunctionInfoPtr = std::shared_ptr<const JunctionInfo>;
+using LaneInfoPtr = std::shared_ptr<const LaneInfo>;
 
 namespace apollo {
 namespace prediction {
 
 FeatureExtractor::FeatureExtractor() {
-  adc_trajectory_container_ = dynamic_cast<ADCTrajectoryContainer*>(
+  ego_trajectory_containter_ = dynamic_cast<ADCTrajectoryContainer*>(
       ContainerManager::instance()->GetContainer(
           AdapterConfig::PLANNING_TRAJECTORY));
+
   pose_container_ = dynamic_cast<PoseContainer*>(
       ContainerManager::instance()->GetContainer(
           AdapterConfig::LOCALIZATION));
@@ -56,6 +59,7 @@ const ScenarioFeature& FeatureExtractor::scenario_feature() const {
 }
 
 void FeatureExtractor::SetADCFeature() {
+  // TODO(all): change this to ego_speed and ego_heading
   scenario_feature_.set_speed(pose_container_->GetSpeed());
   scenario_feature_.set_heading(pose_container_->GetTheta());
   // TODO(all) adc acceleration if needed
@@ -77,11 +81,11 @@ void FeatureExtractor::SetLaneFeature() {
 }
 
 void FeatureExtractor::SetJunctionFeature() {
-  JunctionInfoPtr junction = adc_trajectory_container_->ADCJunction();
+  JunctionInfoPtr junction = ego_trajectory_containter_->ADCJunction();
   if (junction != nullptr) {
     scenario_feature_.set_junction_id(junction->id().id());
     scenario_feature_.set_dist_to_junction(
-        adc_trajectory_container_->ADCDistanceToJunction());
+        ego_trajectory_containter_->ADCDistanceToJunction());
   }
 }
 
@@ -89,7 +93,7 @@ std::shared_ptr<const apollo::hdmap::LaneInfo>
 FeatureExtractor::GetCurrentLane() const {
   auto position = pose_container_->GetPosition();
   const ADCTrajectory& adc_trajectory =
-      adc_trajectory_container_->adc_trajectory();
+      ego_trajectory_containter_->adc_trajectory();
   for (const auto& lane_id : adc_trajectory.lane_id()) {
     LaneInfoPtr lane_info =
         HDMapUtil::BaseMap().GetLaneById(hdmap::MakeMapId(lane_id.id()));
