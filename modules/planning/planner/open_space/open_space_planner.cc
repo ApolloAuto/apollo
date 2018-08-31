@@ -36,7 +36,7 @@ Status OpenSpacePlanner::Init(const PlanningConfig&) {
 }
 
 apollo::common::Status OpenSpacePlanner::Plan(
-    const common::TrajectoryPoint& planning_init_point, Frame* frame) {
+    const common::TrajectoryPoint& planning_init_point, FrameOpenSpace* frame) {
   // Problem setup
 
   // TODO(JinYun) : cleaning up : load control configs from VehicleParam at
@@ -52,7 +52,6 @@ apollo::common::Status OpenSpacePlanner::Plan(
   // initial state
 
   // TODO(JinYun): Step 1 : Get initial state from VehicleState when enabled.
-  
   Eigen::MatrixXd x0(4, 1);
   x0 << -12, 11, 0, 0;
 

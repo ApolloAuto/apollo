@@ -27,8 +27,6 @@
 #include <string>
 #include <utility>
 
-#include "modules/routing/proto/routing.pb.h"
-
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/log.h"
@@ -52,12 +50,12 @@ using apollo::prediction::PredictionObstacles;
 
 constexpr double kMathEpsilon = 1e-8;
 
-Frame_open_space_History::Frame_open_space_History()
-    : IndexedQueue<uint32_t, Frame_open_space>(FLAGS_max_history_frame_num) {}
+FrameOpenSpaceHistory::FrameOpenSpaceHistory()
+    : IndexedQueue<uint32_t, FrameOpenSpace>(FLAGS_max_history_frame_num) {}
 
-Frame_open_space::Frame_open_space(uint32_t sequence_num,
-             const common::TrajectoryPoint &planning_start_point,
-             const double start_time, const common::VehicleState &vehicle_state)
+FrameOpenSpace::FrameOpenSpace(
+    uint32_t sequence_num, const common::TrajectoryPoint &planning_start_point,
+    const double start_time, const common::VehicleState &vehicle_state)
     : sequence_num_(sequence_num),
       planning_start_point_(planning_start_point),
       start_time_(start_time),
@@ -70,15 +68,15 @@ Frame_open_space::Frame_open_space(uint32_t sequence_num,
   }
 }
 
-const common::TrajectoryPoint &Frame_open_space::PlanningStartPoint() const {
+const common::TrajectoryPoint &FrameOpenSpace::PlanningStartPoint() const {
   return planning_start_point_;
 }
 
-const common::VehicleState &Frame_open_space::vehicle_state() const {
+const common::VehicleState &FrameOpenSpace::vehicle_state() const {
   return vehicle_state_;
 }
 
-Status Frame_open_space::Init() {
+Status FrameOpenSpace::Init() {
   hdmap_ = hdmap::HDMapUtil::BaseMapPtr();
   CHECK_NOTNULL(hdmap_);
   vehicle_state_ = common::VehicleStateProvider::instance()->vehicle_state();
@@ -121,7 +119,7 @@ Status Frame_open_space::Init() {
   return Status::OK();
 }
 
-const Obstacle *Frame_open_space::FindCollisionObstacle() const {
+const Obstacle *FrameOpenSpace::FindCollisionObstacle() const {
   if (obstacles_.Items().empty()) {
     return nullptr;
   }
@@ -170,13 +168,13 @@ const Obstacle *Frame_open_space::FindCollisionObstacle() const {
   return nullptr;
 }
 
-uint32_t Frame_open_space::SequenceNum() const { return sequence_num_; }
+uint32_t FrameOpenSpace::SequenceNum() const { return sequence_num_; }
 
-std::string Frame_open_space::DebugString() const {
-  return "Frame_open_space: " + std::to_string(sequence_num_);
+std::string FrameOpenSpace::DebugString() const {
+  return "FrameOpenSpace: " + std::to_string(sequence_num_);
 }
 
-void Frame_open_space::RecordInputDebug(planning_internal::Debug *debug) {
+void FrameOpenSpace::RecordInputDebug(planning_internal::Debug *debug) {
   if (!debug) {
     ADEBUG << "Skip record input into debug";
     return;
@@ -191,23 +189,12 @@ void Frame_open_space::RecordInputDebug(planning_internal::Debug *debug) {
   auto debug_chassis = planning_data->mutable_chassis();
   debug_chassis->CopyFrom(chassis);
 
-  if (!FLAGS_use_navigation_mode) {
-    auto debug_routing = planning_data->mutable_routing();
-    debug_routing->CopyFrom(
-        AdapterManager::GetRoutingResponse()->GetLatestObserved());
-  }
-
   planning_data->mutable_prediction_header()->CopyFrom(prediction_.header());
-
-  auto relative_map = AdapterManager::GetRelativeMap();
-  if (!relative_map->Empty()) {
-    planning_data->mutable_relative_map()->mutable_header()->CopyFrom(
-        relative_map->GetLatestObserved().header());
-  }
 }
 
-void Frame_open_space::AlignPredictionTime(const double planning_start_time,
-                                PredictionObstacles *prediction_obstacles) {
+void FrameOpenSpace::AlignPredictionTime(
+    const double planning_start_time,
+    PredictionObstacles *prediction_obstacles) {
   if (!prediction_obstacles || !prediction_obstacles->has_header() ||
       !prediction_obstacles->header().has_timestamp_sec()) {
     return;
@@ -234,13 +221,15 @@ void Frame_open_space::AlignPredictionTime(const double planning_start_time,
   }
 }
 
-Obstacle *Frame_open_space::Find(const std::string &id) { return obstacles_.Find(id); }
+Obstacle *FrameOpenSpace::Find(const std::string &id) {
+  return obstacles_.Find(id);
+}
 
-void Frame_open_space::AddObstacle(const Obstacle &obstacle) {
+void FrameOpenSpace::AddObstacle(const Obstacle &obstacle) {
   obstacles_.Add(obstacle.Id(), obstacle);
 }
 
-const std::vector<const Obstacle *> Frame_open_space::obstacles() const {
+const std::vector<const Obstacle *> FrameOpenSpace::obstacles() const {
   return obstacles_.Items();
 }
 
