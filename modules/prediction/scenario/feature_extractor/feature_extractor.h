@@ -59,17 +59,21 @@ class FeatureExtractor {
  private:
   void ExtractEgoVehicleFeatures();
 
-  void ExtractEgoLaneFeatures();
+  void ExtractLaneFeatures();
 
-  void ExtractNeighborLaneFeatures();
+  void ExtractEgoLaneFeatures(const common::math::Vec2d& ego_position);
+
+  void ExtractNeighborLaneFeatures(const common::math::Vec2d& ego_position);
 
   void ExtractFrontJunctionFeatures();
 
   void ExtractObstacleFeatures();
 
-  std::shared_ptr<const hdmap::LaneInfo> GetEgoLane() const;
+  std::shared_ptr<const hdmap::LaneInfo> GetEgoLane(
+      const common::math::Vec2d& ego_position) const;
 
-  std::vector<std::shared_ptr<const hdmap::LaneInfo>> GetNeighborLanes() const;
+  std::vector<std::shared_ptr<const hdmap::LaneInfo>>
+  GetNeighborLanes(const std::shared_ptr<const hdmap::LaneInfo>& ego_lane_info) const;
 
   ADCTrajectoryContainer* ego_trajectory_containter_;
 
