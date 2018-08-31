@@ -70,7 +70,7 @@ class ADCTrajectoryContainer : public Container {
    * @param Point
    * @return True if the point is in the first junction of the adc trajectory
    */
-  bool IsPointInJunction(const apollo::common::PathPoint& point) const;
+  bool IsPointInJunction(const common::PathPoint& point) const;
 
   /**
    * @brief Has overlap with ADC trajectory
@@ -81,13 +81,13 @@ class ADCTrajectoryContainer : public Container {
   /**
    * @brief Set ADC position
    */
-  void SetPosition(const ::apollo::common::math::Vec2d& position);
+  void SetPosition(const common::math::Vec2d& position);
 
   /**
    * @brief Get ADC junction
    * @return A pointer to ADC junction information
    */
-  std::shared_ptr<const apollo::hdmap::JunctionInfo> ADCJunction() const;
+  std::shared_ptr<const hdmap::JunctionInfo> ADCJunction() const;
 
   /**
    * @brief Compute ADC's distance to junction
@@ -99,7 +99,7 @@ class ADCTrajectoryContainer : public Container {
    * @brief Get ADC planning trajectory
    * @return ADC planning trajectory
    */
-  const apollo::planning::ADCTrajectory& adc_trajectory() const;
+  const planning::ADCTrajectory& adc_trajectory() const;
 
  private:
   void SetJunctionPolygon();
@@ -111,9 +111,9 @@ class ADCTrajectoryContainer : public Container {
   std::string ToString(const std::vector<std::string>& lane_ids);
 
  private:
-  ::apollo::planning::ADCTrajectory adc_trajectory_;
-  ::apollo::common::math::Polygon2d adc_junction_polygon_;
-  std::shared_ptr<const apollo::hdmap::JunctionInfo> adc_junction_info_ptr_;
+  planning::ADCTrajectory adc_trajectory_;
+  common::math::Polygon2d adc_junction_polygon_;
+  std::shared_ptr<const hdmap::JunctionInfo> adc_junction_info_ptr_;
   double s_dist_to_junction_;
   std::unordered_set<std::string> adc_lane_ids_;
   std::vector<std::string> adc_lane_seq_;
