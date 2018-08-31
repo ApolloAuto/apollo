@@ -18,8 +18,8 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_SCENARIOS_SCENARIO_H_
-#define MODULES_PLANNING_SCENARIOS_SCENARIO_H_
+#ifndef MODULES_PLANNING_SCENARIOS_LANE_FOLLLOW_SCENARIO_H_
+#define MODULES_PLANNING_SCENARIOS_LANE_FOLLLOW_SCENARIO_H_
 
 #include <string>
 
@@ -31,10 +31,10 @@
 namespace apollo {
 namespace planning {
 
-class Scenario {
+class LaneFollowScenario : public Scenario {
  public:
-  Scenario() = default;
-  virtual ~Scenario() = default;
+  LaneFollowScenario() : name_("LaneFollowScenario") {}
+  virtual ~LaneFollowScenario() = default;
   virtual const std::string& Name() const;
 
   virtual bool Init();
@@ -53,4 +53,4 @@ class Scenario {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_SCENARIOS_SCENARIO_H_
+#endif  // MODULES_PLANNING_SCENARIOS_LANE_FOLLLOW_SCENARIO_H_
