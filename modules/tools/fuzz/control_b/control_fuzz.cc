@@ -79,8 +79,8 @@ void ControlFuzz::Init() {
 }
 
 void ControlFuzz::Fuzz(ControlFuzzMessage control_fuzz_message) {
-  AdapterManager::PublishMonitor(control_fuzz_message.monitor_message());
-  AdapterManager::PublishPad(control_fuzz_message.pad_message());
+  control_->OnMonitor(control_fuzz_message.monitor_message());
+  control_->OnPad(control_fuzz_message.pad_message());
   AdapterManager::FeedLocalizationData(
       control_fuzz_message.localization_estimate());
   AdapterManager::FeedPlanningData(control_fuzz_message.adc_trajectory());

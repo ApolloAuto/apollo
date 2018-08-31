@@ -72,9 +72,9 @@ void GuardianFuzz::Init() {
 }
 
 void GuardianFuzz::Fuzz(GuardianFuzzMessage guardian_fuzz_message) {
-  AdapterManager::PublishChassis(guardian_fuzz_message.chassis());
-  AdapterManager::PublishSystemStatus(guardian_fuzz_message.system_status());
-  AdapterManager::PublishControlCommand(
+  guardian_->OnChassis(guardian_fuzz_message.chassis());
+  guardian_->OnSystemStatus(guardian_fuzz_message.system_status());
+  guardian_->OnControl(
       guardian_fuzz_message.control_command());
   ros::TimerEvent event;
   guardian_->OnTimer(event);
