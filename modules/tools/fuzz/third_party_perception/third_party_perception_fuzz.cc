@@ -77,15 +77,15 @@ void ThirdPartyPerceptionFuzz::Init() {
 
 void ThirdPartyPerceptionFuzz::Fuzz(
     ThirdPartyPerceptionFuzzMessage third_party_perception_fuzz_message) {
-  AdapterManager::PublishMobileye(
+  third_party_perception_->OnMobileye(
       third_party_perception_fuzz_message.mobileye());
-  AdapterManager::PublishChassis(
+  third_party_perception_->OnChassis(
       third_party_perception_fuzz_message.chassis());
-  AdapterManager::PublishDelphiESR(
+  third_party_perception_->OnDelphiESR(
       third_party_perception_fuzz_message.delphi_esr());
-  AdapterManager::PublishContiRadar(
+  third_party_perception_->OnContiRadar(
       third_party_perception_fuzz_message.conti_radar());
-  AdapterManager::PublishLocalization(
+  third_party_perception_->OnLocalization(
       third_party_perception_fuzz_message.localization_estimate());
   ros::TimerEvent event;
   third_party_perception_->OnTimer(event);

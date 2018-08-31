@@ -65,8 +65,8 @@ void LidarExCheckerFuzz::Init() {
 
 void LidarExCheckerFuzz::Fuzz(
     LidarExCheckerFuzzMessage lidar_ex_checker_fuzz_message) {
-  AdapterManager::PublishGps(lidar_ex_checker_fuzz_message.gps());
-  AdapterManager::PublishInsStat(lidar_ex_checker_fuzz_message.ins_stat());
+  lidar_ex_checker_->OnGps(lidar_ex_checker_fuzz_message.gps());
+  lidar_ex_checker_->OnInsStat(lidar_ex_checker_fuzz_message.ins_stat());
 }
 
 DEFINE_PROTO_FUZZER(

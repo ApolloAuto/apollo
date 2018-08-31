@@ -65,7 +65,7 @@ void RoutingFuzz::Init() {
 }
 
 void RoutingFuzz::Fuzz(RoutingFuzzMessage routing_fuzz_message) {
-  AdapterManager::PublishRoutingRequest(routing_fuzz_message.routing_request());
+  routing_->OnRoutingRequest(routing_fuzz_message.routing_request());
 }
 
 DEFINE_PROTO_FUZZER(const RoutingFuzzMessage& routing_fuzz_message) {
