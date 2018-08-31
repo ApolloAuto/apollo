@@ -197,6 +197,18 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "reference_line_info_test",
+    size = "small",
+    srcs = [
+        "reference_line_info_test.cc",
+    ],
+    deps = [
+        ":reference_line_info",
+        "@gtest//:main",
+    ],
+)
+
 cc_library(
     name = "lag_prediction",
     srcs = [

@@ -50,6 +50,7 @@ namespace planning {
  */
 class ReferenceLineInfo {
  public:
+  ReferenceLineInfo() = default;
   explicit ReferenceLineInfo(const common::VehicleState& vehicle_state,
                              const common::TrajectoryPoint& adc_planning_point,
                              const ReferenceLine& reference_line,
@@ -118,7 +119,7 @@ class ReferenceLineInfo {
   bool IsChangeLanePath() const;
 
   /**
-   * Check if the current reference line is the neighbor of the vehicle 
+   * Check if the current reference line is the neighbor of the vehicle
    * current position
    */
   bool IsNeighborLanePath() const;
@@ -153,6 +154,15 @@ class ReferenceLineInfo {
   }
 
   void set_is_on_reference_line() { is_on_reference_line_ = true; }
+
+  void set_trajectory_type(
+      const ADCTrajectory::TrajectoryType trajectory_type) {
+    trajectory_type_ = trajectory_type;
+  }
+
+  ADCTrajectory::TrajectoryType trajectory_type() const {
+    return trajectory_type_;
+  }
 
  private:
   bool CheckChangeLane() const;
@@ -205,6 +215,8 @@ class ReferenceLineInfo {
   double priority_cost_ = 0.0;
 
   PlanningTarget planning_target_;
+
+  ADCTrajectory::TrajectoryType trajectory_type_ = ADCTrajectory::UNKNOWN;
 
   DISALLOW_COPY_AND_ASSIGN(ReferenceLineInfo);
 };

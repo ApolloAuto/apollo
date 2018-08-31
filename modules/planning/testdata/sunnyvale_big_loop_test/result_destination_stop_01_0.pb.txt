@@ -62,3 +62,4 @@ lane_id {
 engage_advice {
   advice: KEEP_ENGAGED
 }
+trajectory_type: NORMAL

@@ -1,5 +1,5 @@
 header {
-  module_name: "planning"
+  module_name: "std_planning"
 }
 is_replan: true
 gear: GEAR_DRIVE
@@ -10,35 +10,22 @@ decision {
     }
   }
   object_decision {
-    decision {
-      id: "31046"
-      perception_id: 31046
-      object_decision {
-        nudge {
-          type: LEFT_NUDGE
-          distance_l: 0.5
-        }
-      }
-    }
   }
   vehicle_signal {
     turn_signal: TURN_NONE
   }
 }
 routing_header {
-  timestamp_sec: 1526515219.0394421
+  timestamp_sec: 1533844120.2057884
   module_name: "routing"
   sequence_num: 1
 }
-right_of_way_status: PROTECTED
+right_of_way_status: UNPROTECTED
 lane_id {
-  id: "2900_1_-1"
+  id: "2849_1_-1"
 }
 lane_id {
-  id: "11043_1_-1"
-}
-lane_id {
-  id: "2907_1_-1"
+  id: "10591a_1_-1"
 }
 lane_id {
   id: "2906_1_-1"
@@ -76,7 +63,13 @@ lane_id {
 lane_id {
   id: "373_1_-1"
 }
+lane_id {
+  id: "2923_1_-1"
+}
+lane_id {
+  id: "2922_1_-1"
+}
 engage_advice {
-  advice: KEEP_ENGAGED
+  advice: READY_TO_ENGAGE
 }
 trajectory_type: NORMAL

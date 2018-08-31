@@ -212,6 +212,7 @@ Status EMPlanner::PlanOnReferenceLine(
     GenerateFallbackPathProfile(reference_line_info,
                                 reference_line_info->mutable_path_data());
     reference_line_info->AddCost(kPathOptimizationFallbackClost);
+    reference_line_info->set_trajectory_type(ADCTrajectory::PATH_FALLBACK);
   }
 
   if (!ret.ok() || reference_line_info->speed_data().Empty()) {
@@ -220,8 +221,10 @@ Status EMPlanner::PlanOnReferenceLine(
     *reference_line_info->mutable_speed_data() =
         GenerateFallbackSpeedProfile(*reference_line_info);
     reference_line_info->AddCost(kSpeedOptimizationFallbackClost);
+    reference_line_info->set_trajectory_type(ADCTrajectory::SPEED_FALLBACK);
   }
 
+  reference_line_info->set_trajectory_type(ADCTrajectory::NORMAL);
   DiscretizedTrajectory trajectory;
   if (!reference_line_info->CombinePathAndSpeedProfile(
           planning_start_point.relative_time(),
