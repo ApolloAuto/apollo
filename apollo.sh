@@ -379,7 +379,7 @@ function gen_coverage() {
 function run_test() {
   generate_build_targets
   if [ "$USE_GPU" == "1" ]; then
-    echo -e "${RED}Need GPU to run the tests.${NO_COLOR}"
+    echo -e "${YELLOW}Runnint tests under GPU mode. Require GPU  to run the tests.${NO_COLOR}"
     echo "$BUILD_TARGETS" | xargs bazel test $DEFINES --config=unit_test -c dbg --test_verbose_timeout_warnings $@
   else
     echo "$BUILD_TARGETS" | grep -v "cnn_segmentation_test\|yolo_camera_detector_test\|unity_recognize_test\|perception_traffic_light_rectify_test\|cuda_util_test" | xargs bazel test $DEFINES --config=unit_test -c dbg --test_verbose_timeout_warnings $@
@@ -748,6 +748,10 @@ function main() {
       check $@
       ;;
     build)
+      DEFINES="${DEFINES} --define USE_GPU=true --cxxopt=-DUSE_GPU"
+      apollo_build_dbg $@
+      ;;
+    build_cpu)
       DEFINES="${DEFINES} --cxxopt=-DCPU_ONLY"
       apollo_build_dbg $@
       ;;
@@ -820,6 +824,11 @@ function main() {
       run_lint
       ;;
     test)
+      DEFINES="${DEFINES} --cxxopt=-DUSE_GPU"
+      USE_GPU="1"
+      run_test $@
+      ;;
+    test_cpu)
       DEFINES="${DEFINES} --cxxopt=-DCPU_ONLY"
       run_test $@
       ;;
