@@ -16,12 +16,18 @@
 
 #include "modules/prediction/scenario/feature_extractor/feature_extractor.h"
 
-#include <memory>
+#include <string>
 
 #include "modules/common/adapters/proto/adapter_config.pb.h"
+#include "modules/common/math/vec2d.h"
+#include "modules/map/hdmap/hdmap_util.h"
 
 using apollo::common::adapter::AdapterConfig;
+using apollo::common::math::Vec2d;
+using apollo::planning::ADCTrajectory;
+using apollo::hdmap::HDMapUtil;
 using JunctionInfoPtr = std::shared_ptr<const apollo::hdmap::JunctionInfo>;
+using LaneInfoPtr = std::shared_ptr<const apollo::hdmap::LaneInfo>;
 
 namespace apollo {
 namespace prediction {
@@ -56,7 +62,18 @@ void FeatureExtractor::SetADCFeature() {
 }
 
 void FeatureExtractor::SetLaneFeature() {
-  // TODO(all) implement lane features of ADC
+  LaneInfoPtr curr_lane_info = GetCurrentLane();
+  if (curr_lane_info != nullptr) {
+    auto position = pose_container_->GetPosition();
+    scenario_feature_.set_curr_lane_id(curr_lane_info->id().id());
+    double curr_lane_s = 0.0;
+    double curr_lane_l = 0.0;
+    curr_lane_info->GetProjection(Vec2d{position.x(), position.y()},
+                                  &curr_lane_s, &curr_lane_l);
+    scenario_feature_.set_curr_lane_s(curr_lane_s);
+  }
+
+  // TODO(all) implement neighbor lane features
 }
 
 void FeatureExtractor::SetJunctionFeature() {
@@ -66,6 +83,21 @@ void FeatureExtractor::SetJunctionFeature() {
     scenario_feature_.set_dist_to_junction(
         adc_trajectory_container_->ADCDistanceToJunction());
   }
+}
+
+std::shared_ptr<const apollo::hdmap::LaneInfo>
+FeatureExtractor::GetCurrentLane() const {
+  auto position = pose_container_->GetPosition();
+  const ADCTrajectory& adc_trajectory =
+      adc_trajectory_container_->adc_trajectory();
+  for (const auto& lane_id : adc_trajectory.lane_id()) {
+    LaneInfoPtr lane_info =
+        HDMapUtil::BaseMap().GetLaneById(hdmap::MakeMapId(lane_id.id()));
+    if (lane_info->IsOnLane(Vec2d{position.x(), position.y()})) {
+      return lane_info;
+    }
+  }
+  return nullptr;
 }
 
 }  // namespace prediction
