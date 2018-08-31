@@ -15,4 +15,16 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "autotuning_raw_feature_generator_test",
+    size = "small",
+    srcs = [
+        "autotuning_raw_feature_generator_test.cc",
+    ],
+    deps = [
+        ":autotuning_raw_feature_generator",
+        "@gtest//:main",
+    ],
+)
+
 cpplint()
