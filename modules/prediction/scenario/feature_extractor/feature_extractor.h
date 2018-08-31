@@ -65,7 +65,7 @@ class FeatureExtractor {
   std::shared_ptr<const apollo::hdmap::LaneInfo> GetCurrentLane() const;
 
  private:
-  ADCTrajectoryContainer* adc_trajectory_container_;
+  ADCTrajectoryContainer* ego_trajectory_containter_;
   PoseContainer* pose_container_;
   ScenarioFeature scenario_feature_;
 };
