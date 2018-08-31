@@ -53,20 +53,27 @@ class FeatureExtractor {
    * @brief Get scenario features
    * @return Scenario features
    */
-  const ScenarioFeature& scenario_feature() const;
+  const ScenarioFeature& GetScenarioFeatures() const;
 
  private:
-  void ExtractEgoVehicleFeature();
+  void ExtractEgoVehicleFeatures();
 
-  void ExtractLaneFeature();
+  void ExtractEgoLaneFeatures();
 
-  void ExtractFrontJunctionFeature();
+  void ExtractNeighborLaneFeatures();
 
-  std::shared_ptr<const hdmap::LaneInfo> GetCurrentLane() const;
+  void ExtractFrontJunctionFeatures();
 
- private:
+  void ExtractObstacleFeatures();
+
+  std::shared_ptr<const hdmap::LaneInfo> GetEgoLane() const;
+
+  std::vector<std::shared_ptr<const hdmap::LaneInfo>> GetNeighborLanes() const;
+
   ADCTrajectoryContainer* ego_trajectory_containter_;
+
   PoseContainer* pose_container_;
+
   ScenarioFeature scenario_feature_;
 };
 

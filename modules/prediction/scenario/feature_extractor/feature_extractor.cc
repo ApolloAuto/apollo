@@ -48,43 +48,47 @@ FeatureExtractor::~FeatureExtractor() {
 }
 
 void FeatureExtractor::ExtractFeatures() {
-  ExtractEgoVehicleFeature();
+  ExtractEgoVehicleFeatures();
 
-  ExtractLaneFeature();
+  ExtractEgoLaneFeatures();
 
-  ExtractFrontJunctionFeature();
+  ExtractFrontJunctionFeatures();
   // TODO(all) other processes
 }
 
-const ScenarioFeature& FeatureExtractor::scenario_feature() const {
+const ScenarioFeature& FeatureExtractor::GetScenarioFeatures() const {
   return scenario_feature_;
 }
 
-void FeatureExtractor::ExtractEgoVehicleFeature() {
+void FeatureExtractor::ExtractEgoVehicleFeatures() {
   // TODO(all): change this to ego_speed and ego_heading
   scenario_feature_.set_speed(pose_container_->GetSpeed());
   scenario_feature_.set_heading(pose_container_->GetTheta());
   // TODO(all) adc acceleration if needed
 }
 
-void FeatureExtractor::ExtractLaneFeature() {
-  LaneInfoPtr curr_lane_info = GetCurrentLane();
-  if (curr_lane_info == nullptr) {
-    AERROR << "ADC is not on any lane.";
+void FeatureExtractor::ExtractEgoLaneFeatures() {
+  LaneInfoPtr ego_lane_info = GetEgoLane();
+  if (ego_lane_info == nullptr) {
+    AERROR << "Ego vehicle is not on any lane.";
     return;
   }
   auto position = pose_container_->GetPosition();
-  scenario_feature_.set_curr_lane_id(curr_lane_info->id().id());
+  scenario_feature_.set_curr_lane_id(ego_lane_info->id().id());
   double curr_lane_s = 0.0;
   double curr_lane_l = 0.0;
-  curr_lane_info->GetProjection(Vec2d{position.x(), position.y()},
+  ego_lane_info->GetProjection({position.x(), position.y()},
                                 &curr_lane_s, &curr_lane_l);
   scenario_feature_.set_curr_lane_s(curr_lane_s);
 
   // TODO(all) implement neighbor lane features
 }
 
-void FeatureExtractor::ExtractFrontJunctionFeature() {
+void FeatureExtractor::ExtractNeighborLaneFeatures() {
+}
+
+
+void FeatureExtractor::ExtractFrontJunctionFeatures() {
   JunctionInfoPtr junction = ego_trajectory_containter_->ADCJunction();
   if (junction != nullptr) {
     scenario_feature_.set_junction_id(junction->id().id());
@@ -93,12 +97,14 @@ void FeatureExtractor::ExtractFrontJunctionFeature() {
   }
 }
 
-std::shared_ptr<const hdmap::LaneInfo>
-FeatureExtractor::GetCurrentLane() const {
+void FeatureExtractor::ExtractObstacleFeatures() {
+}
+
+LaneInfoPtr FeatureExtractor::GetEgoLane() const {
   auto position = pose_container_->GetPosition();
-  const auto& adc_trajectory =
+  const auto& trajectory =
       ego_trajectory_containter_->adc_trajectory();
-  for (const auto& lane_id : adc_trajectory.lane_id()) {
+  for (const auto& lane_id : trajectory.lane_id()) {
     LaneInfoPtr lane_info =
         HDMapUtil::BaseMap().GetLaneById(hdmap::MakeMapId(lane_id.id()));
     if (lane_info->IsOnLane({position.x(), position.y()})) {
@@ -106,6 +112,9 @@ FeatureExtractor::GetCurrentLane() const {
     }
   }
   return nullptr;
+}
+
+std::vector<LaneInfoPtr> FeatureExtractor::GetNeighborLanes() const {
 }
 
 }  // namespace prediction
