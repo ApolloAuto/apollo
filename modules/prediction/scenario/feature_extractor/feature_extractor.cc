@@ -14,10 +14,6 @@
  * limitations under the License.
  *****************************************************************************/
 
-/**
- * @file
- */
-
 #include "modules/prediction/scenario/feature_extractor/feature_extractor.h"
 
 #include <memory>
@@ -67,7 +63,8 @@ void FeatureExtractor::SetJunctionFeature() {
   JunctionInfoPtr junction = adc_trajectory_container_->ADCJunction();
   if (junction != nullptr) {
     scenario_feature_.set_junction_id(junction->id().id());
-    // TODO(kechxu) distance to junction
+    scenario_feature_.set_dist_to_junction(
+        adc_trajectory_container_->ADCDistanceToJunction());
   }
 }
 
