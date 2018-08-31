@@ -549,6 +549,17 @@ class Adapter : public AdapterBase {
   friend class AdapterManager;
 };
 
+#define CHECK_ADAPTER(NAME)                                               \
+  if (AdapterManager::Get##NAME() == nullptr) {                           \
+    AERROR << #NAME << " is not registered";                              \
+    return Status(ErrorCode::PLANNING_ERROR, #NAME " is not registered"); \
+  }
+
+#define CHECK_ADAPTER_IF(CONDITION, NAME) \
+  if (CONDITION) {                        \
+    CHECK_ADAPTER(NAME);                  \
+  }
+
 }  // namespace adapter
 }  // namespace common
 }  // namespace apollo

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 ###############################################################################
-# Copyright 2017 The Apollo Authors. All Rights Reserved.
+# Copyright 2018 The Apollo Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,11 +16,8 @@
 # limitations under the License.
 ###############################################################################
 
-# Get the absolute path.
-dir=$(cd "$(dirname "$1" )" && pwd)
-filename=$(basename $1)
-pathname="${dir}/${filename}" 
-#echo ${pathname}
-cd /apollo
-./bazel-bin/modules/planning/reference_line/spiral_smoother_util --input_file ${pathname} --smooth_length $2
+wget https://github.com/NVIDIA/nvidia-docker/releases/download/v1.0.1/nvidia-docker_1.0.1-1_amd64.deb
+sudo dpkg -i nvidia-docker_1.0.1-1_amd64.deb
+sudo apt-get install -f
+rm nvidia-docker_1.0.1-1_amd64.deb
 

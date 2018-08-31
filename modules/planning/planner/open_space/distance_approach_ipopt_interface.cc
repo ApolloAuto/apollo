@@ -436,14 +436,19 @@ bool DistanceApproachIPOPTInterface::eval_f(int n, const double* x, bool new_x,
   return true;
 }
 
+bool DistanceApproachIPOPTInterface::eval_grad_f(int n, const double* x,
+                                                 bool new_x, double* grad_f) {
+  return true;
+}
+
 void DistanceApproachIPOPTInterface::finalize_solution(
     Ipopt::SolverReturn status, int n, const double* x, const double* z_L,
     const double* z_U, int m, const double* g, const double* lambda,
     double obj_value, const Ipopt::IpoptData* ip_data,
     Ipopt::IpoptCalculatedQuantities* ip_cq) {
-  std::size_t state_start_index = 0;
-  std::size_t input_start_index = (horizon_ + 1) * 4;
-  std::size_t time_start_index = input_start_index + horizon_ * 2;
+  // std::size_t state_start_index = 0;
+  // std::size_t input_start_index = (horizon_ + 1) * 4;
+  // std::size_t time_start_index = input_start_index + horizon_ * 2;
   for (std::size_t i = 0; i < horizon_; ++i) {
     std::size_t state_index = i * 4;
 

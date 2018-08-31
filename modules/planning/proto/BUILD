@@ -148,6 +148,7 @@ proto_library(
         ":navi_path_decider_config_proto_lib",
         ":navi_speed_decider_config_proto_lib",
         ":navi_obstacle_decider_config_proto_lib",
+        ":open_space_planner_config_proto_lib",
     ],
 )
 
@@ -340,6 +341,20 @@ proto_library(
     deps = [
         ":lattice_sampling_config_proto_lib",
         "//modules/common/proto:pnc_point_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "open_space_planner_config_proto_lib",
+    srcs = [
+        "open_space_planner_config.proto",
+    ],
+)
+
+cc_proto_library(
+    name = "open_space_planner_config_proto",
+    deps = [
+        ":open_space_planner_config_proto_lib",
     ],
 )
 

@@ -37,15 +37,6 @@
 #include "modules/planning/common/trajectory/publishable_trajectory.h"
 #include "modules/planning/planner/planner.h"
 
-#define CHECK_ADAPTER(NAME)                                               \
-  if (AdapterManager::Get##NAME() == nullptr) {                           \
-    AERROR << #NAME << " is not registered";                              \
-    return Status(ErrorCode::PLANNING_ERROR, #NAME " is not registered"); \
-  }
-
-#define CHECK_ADAPTER_IF(CONDITION, NAME) \
-  if (CONDITION) CHECK_ADAPTER(NAME)
-
 /**
  * @namespace apollo::planning
  * @brief apollo::planning

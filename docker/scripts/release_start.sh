@@ -83,7 +83,12 @@ function main() {
     if [ ! -d "$HOME/.cache" ];then
         mkdir "$HOME/.cache"
     fi
-    docker run -it \
+
+    DOCKER_CMD="nvidia-docker"
+    if ! [ -x "$(command -v ${DOCKER_CMD})" ]; then
+        DOCKER_CMD="docker"
+    fi
+    ${DOCKER_CMD} run -it \
         -d --privileged \
         --name apollo_release \
         --net host \

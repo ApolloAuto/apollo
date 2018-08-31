@@ -20,7 +20,7 @@ INCHINA="no"
 LOCAL_IMAGE="no"
 VERSION=""
 ARCH=$(uname -m)
-VERSION_X86_64="dev-x86_64-20180830_2013"
+VERSION_X86_64="dev-x86_64-20180806_1111"
 VERSION_AARCH64="dev-aarch64-20170927_1111"
 VERSION_OPT=""
 
@@ -257,13 +257,7 @@ function main(){
     docker run -it -d --rm --name ${YOLO3D_VOLUME} ${YOLO3D_VOLUME_IMAGE}
 
     info "Starting docker container \"apollo_dev\" ..."
-
-    DOCKER_CMD="nvidia-docker"
-    if ! [ -x "$(command -v ${DOCKER_CMD})" ]; then
-        DOCKER_CMD="docker"
-    fi
-
-    ${DOCKER_CMD} run -it \
+    docker run -it \
         -d \
         --privileged \
         --name apollo_dev \
@@ -285,7 +279,6 @@ function main(){
         --hostname in_dev_docker \
         --shm-size 2G \
         --pid=host \
-        -v /dev/null:/dev/raw1394 \
         $IMG \
         /bin/bash
 

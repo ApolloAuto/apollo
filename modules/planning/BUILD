@@ -5,11 +5,16 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "planning_dispatcher",
     srcs = [
+        "navi_planning.cc",
         "planning_base.cc",
+        "planning_dispatcher.cc",
+        "std_planning.cc",
     ],
     hdrs = [
+        "navi_planning.h",
         "planning_base.h",
         "planning_dispatcher.h",
+        "std_planning.h",
     ],
     deps = [
         "//modules/common",
@@ -28,38 +33,13 @@ cc_library(
         "//modules/planning/planner/lattice:lattice_planner",
         "//modules/planning/planner/navi:navi_planner",
         "//modules/planning/planner/rtk:rtk_planner",
+        "//modules/planning/planner/open_space:open_space_planner",
         "//modules/planning/proto:planning_proto",
         "//modules/planning/proto:traffic_rule_config_proto",
         "//modules/planning/reference_line:reference_line_provider",
         "//modules/planning/tasks/traffic_decider",
         "//modules/prediction/proto:prediction_proto",
         "@ros//:ros_common",
-    ],
-)
-
-cc_library(
-    name = "std_planning_lib",
-    srcs = [
-        "std_planning.cc",
-    ],
-    hdrs = [
-        "std_planning.h",
-    ],
-    deps = [
-        ":planning_dispatcher",
-    ],
-)
-
-cc_library(
-    name = "navi_planning_lib",
-    srcs = [
-        "navi_planning.cc",
-    ],
-    hdrs = [
-        "navi_planning.h",
-    ],
-    deps = [
-        ":planning_dispatcher",
     ],
 )
 
@@ -82,8 +62,7 @@ cc_library(
         "planning.h",
     ],
     deps = [
-        ":navi_planning_lib",
-        ":std_planning_lib",
+        ":planning_dispatcher",
     ],
 )
 

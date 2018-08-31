@@ -22,6 +22,8 @@
 
 #include "modules/common/apollo_app.h"
 #include "modules/common/status/status.h"
+#include "modules/common/util/thread_pool.h"
+#include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/navi_planning.h"
 #include "modules/planning/planning_base.h"
 #include "modules/planning/std_planning.h"
@@ -40,16 +42,14 @@ namespace planning {
  */
 class PlanningDispatcher final : public common::ApolloApp {
  public:
-  PlanningDispatcher() {
-    if (FLAGS_use_navigation_mode) {
-      planning_base_ = std::unique_ptr<PlanningBase>(new NaviPlanning());
-    } else {
-      planning_base_ = std::unique_ptr<PlanningBase>(new StdPlanning());
-    }
-  }
-  virtual ~PlanningDispatcher() = default;
+  PlanningDispatcher() = default;
+  virtual ~PlanningDispatcher();
 
-  common::Status Init() override { return planning_base_->Init(); }
+  common::Status Init() override {
+    common::util::ThreadPool::Init(FLAGS_max_planning_thread_pool_size);
+    Dispatch();
+    return planning_base_->Init();
+  }
 
   common::Status Start() override { return planning_base_->Start(); }
 
@@ -60,6 +60,14 @@ class PlanningDispatcher final : public common::ApolloApp {
   std::string Name() const override { return planning_base_->Name(); }
 
  private:
+  void Dispatch() {
+    if (FLAGS_use_navigation_mode) {
+      planning_base_ = std::unique_ptr<PlanningBase>(new NaviPlanning());
+    } else {
+      planning_base_ = std::unique_ptr<PlanningBase>(new StdPlanning());
+    }
+  }
+
   std::unique_ptr<PlanningBase> planning_base_;
 };
 
