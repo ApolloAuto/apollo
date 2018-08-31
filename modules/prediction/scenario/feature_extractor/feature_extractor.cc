@@ -67,15 +67,17 @@ void FeatureExtractor::SetADCFeature() {
 
 void FeatureExtractor::SetLaneFeature() {
   LaneInfoPtr curr_lane_info = GetCurrentLane();
-  if (curr_lane_info != nullptr) {
-    auto position = pose_container_->GetPosition();
-    scenario_feature_.set_curr_lane_id(curr_lane_info->id().id());
-    double curr_lane_s = 0.0;
-    double curr_lane_l = 0.0;
-    curr_lane_info->GetProjection(Vec2d{position.x(), position.y()},
-                                  &curr_lane_s, &curr_lane_l);
-    scenario_feature_.set_curr_lane_s(curr_lane_s);
+  if (curr_lane_info == nullptr) {
+    AERROR << "ADC is not on any lane.";
+    return;
   }
+  auto position = pose_container_->GetPosition();
+  scenario_feature_.set_curr_lane_id(curr_lane_info->id().id());
+  double curr_lane_s = 0.0;
+  double curr_lane_l = 0.0;
+  curr_lane_info->GetProjection(Vec2d{position.x(), position.y()},
+                                &curr_lane_s, &curr_lane_l);
+  scenario_feature_.set_curr_lane_s(curr_lane_s);
 
   // TODO(all) implement neighbor lane features
 }
