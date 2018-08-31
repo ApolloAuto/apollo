@@ -1,0 +1,7 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+message OpenSpacePlannerConfig {
+  optional uint32 planning_horizon = 1 [default = 10];
+}

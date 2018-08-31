@@ -10,6 +10,7 @@ import "modules/planning/proto/poly_st_speed_config.proto";
 import "modules/planning/proto/navi_path_decider_config.proto";
 import "modules/planning/proto/navi_speed_decider_config.proto";
 import "modules/planning/proto/navi_obstacle_decider_config.proto";
+import "modules/planning/proto/open_space_planner_config.proto";
 
 enum TaskType {
   DP_POLY_PATH_OPTIMIZER = 0;
@@ -58,4 +59,6 @@ message PlanningConfig {
     LANE_FOLLOW = 0;
   };
   optional ScenarioType scenario_type = 4 [default = LANE_FOLLOW];
+
+  optional OpenSpacePlannerConfig open_space_planner_config = 5;
 }
