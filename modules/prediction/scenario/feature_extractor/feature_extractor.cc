@@ -19,9 +19,13 @@
  */
 
 #include "modules/prediction/scenario/feature_extractor/feature_extractor.h"
+
+#include <memory>
+
 #include "modules/common/adapters/proto/adapter_config.pb.h"
 
 using apollo::common::adapter::AdapterConfig;
+using JunctionInfoPtr = std::shared_ptr<const apollo::hdmap::JunctionInfo>;
 
 namespace apollo {
 namespace prediction {
@@ -60,7 +64,11 @@ void FeatureExtractor::SetLaneFeature() {
 }
 
 void FeatureExtractor::SetJunctionFeature() {
-  // TODO(all) implement junction featues of ADC
+  JunctionInfoPtr junction = adc_trajectory_container_->ADCJunction();
+  if (junction != nullptr) {
+    scenario_feature_.set_junction_id(junction->id().id());
+    // TODO(kechxu) distance to junction
+  }
 }
 
 }  // namespace prediction

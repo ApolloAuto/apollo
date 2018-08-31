@@ -36,6 +36,7 @@
 #include "modules/planning/proto/planning.pb.h"
 #include "modules/prediction/container/container.h"
 #include "modules/prediction/proto/lane_graph.pb.h"
+#include "modules/prediction/common/prediction_map.h"
 
 namespace apollo {
 namespace prediction {
@@ -45,7 +46,7 @@ class ADCTrajectoryContainer : public Container {
   /**
    * @brief Constructor
    */
-  ADCTrajectoryContainer() = default;
+  ADCTrajectoryContainer();
 
   /**
    * @brief Destructor
@@ -82,6 +83,12 @@ class ADCTrajectoryContainer : public Container {
    */
   void SetPosition(const ::apollo::common::math::Vec2d& position);
 
+  /**
+   * @brief Get ADC junction
+   * @return A pointer to ADC junction information
+   */
+  std::shared_ptr<const apollo::hdmap::JunctionInfo> ADCJunction() const;
+
  private:
   void SetJunctionPolygon();
 
@@ -94,6 +101,7 @@ class ADCTrajectoryContainer : public Container {
  private:
   ::apollo::planning::ADCTrajectory adc_trajectory_;
   ::apollo::common::math::Polygon2d adc_junction_polygon_;
+  std::shared_ptr<const apollo::hdmap::JunctionInfo> adc_junction_info_ptr_;
   std::unordered_set<std::string> adc_lane_ids_;
   std::vector<std::string> adc_lane_seq_;
   std::mutex adc_trajectory_mutex_;
