@@ -89,6 +89,12 @@ class ADCTrajectoryContainer : public Container {
    */
   std::shared_ptr<const apollo::hdmap::JunctionInfo> ADCJunction() const;
 
+  /**
+   * @brief Compute ADC's distance to junction
+   * @return ADC's distance to junction
+   */
+  double ADCDistanceToJunction() const;
+
  private:
   void SetJunctionPolygon();
 
@@ -102,6 +108,7 @@ class ADCTrajectoryContainer : public Container {
   ::apollo::planning::ADCTrajectory adc_trajectory_;
   ::apollo::common::math::Polygon2d adc_junction_polygon_;
   std::shared_ptr<const apollo::hdmap::JunctionInfo> adc_junction_info_ptr_;
+  double s_dist_to_junction_;
   std::unordered_set<std::string> adc_lane_ids_;
   std::vector<std::string> adc_lane_seq_;
   std::mutex adc_trajectory_mutex_;
