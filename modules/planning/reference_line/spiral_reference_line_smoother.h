@@ -44,13 +44,13 @@ class SpiralReferenceLineSmoother : public ReferenceLineSmoother {
   bool Smooth(const ReferenceLine& raw_reference_line,
               ReferenceLine* const smoothed_reference_line) override;
 
-  void SetAnchorPoints(const std::vector<AnchorPoint>&) override;
+  // For offline navigation line smoothing
+  bool SmoothStandAlone(std::vector<Eigen::Vector2d> point2d,
+      std::vector<double>* ptr_theta, std::vector<double>* ptr_kappa,
+      std::vector<double>* ptr_dkappa, std::vector<double>* ptr_s,
+      std::vector<double>* ptr_x, std::vector<double>* ptr_y) const;
 
- private:
-  bool Smooth(std::vector<Eigen::Vector2d> point2d,
-              std::vector<double>* ptr_theta, std::vector<double>* ptr_kappa,
-              std::vector<double>* ptr_dkappa, std::vector<double>* ptr_s,
-              std::vector<double>* ptr_x, std::vector<double>* ptr_y) const;
+  void SetAnchorPoints(const std::vector<AnchorPoint>&) override;
 
   std::vector<common::PathPoint> Interpolate(const std::vector<double>& theta,
                                              const std::vector<double>& kappa,
@@ -58,8 +58,15 @@ class SpiralReferenceLineSmoother : public ReferenceLineSmoother {
                                              const std::vector<double>& s,
                                              const std::vector<double>& x,
                                              const std::vector<double>& y,
-                                             const double resulotion) const;
+                                             const double resolution) const;
 
+ private:
+  bool Smooth(std::vector<Eigen::Vector2d> point2d,
+              std::vector<double>* ptr_theta, std::vector<double>* ptr_kappa,
+              std::vector<double>* ptr_dkappa, std::vector<double>* ptr_s,
+              std::vector<double>* ptr_x, std::vector<double>* ptr_y) const;
+
+ private:
   std::vector<common::PathPoint> Interpolate(
       const double start_x, const double start_y, const double start_s,
       const double theta0, const double kappa0, const double dkappa0,

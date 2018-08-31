@@ -8,14 +8,14 @@ wide_lane_threshold_factor : 2.0
 wide_lane_shift_remain_factor : 0.5
 
 spiral {
-  max_deviation: 0.1
+  max_deviation: 0.05
   piecewise_length : 10.0
-  max_iteration : 1000
+  max_iteration : 2000
   opt_tol : 1.0e-8
   opt_acceptable_tol : 1e-6
   opt_acceptable_iteration : 15
   opt_weight_curve_length : 1.0
-  opt_weight_kappa : 1.5
-  opt_weight_dkappa : 1.0
+  opt_weight_kappa : 1.0
+  opt_weight_dkappa : 100.0
   opt_weight_d2kappa : 0.0
 }
