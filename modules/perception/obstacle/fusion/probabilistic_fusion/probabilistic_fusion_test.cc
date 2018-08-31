@@ -27,7 +27,6 @@ namespace apollo {
 namespace perception {
 
 TEST(ProbabilisticFusionTest, probabilistic_fusion_test) {
-  FLAGS_work_root = "modules/perception";
   AINFO << "start probabilistic_fusion_test\n";
   ProbabilisticFusion *probabilistic_fusion = new ProbabilisticFusion();
   EXPECT_TRUE(probabilistic_fusion->Init());

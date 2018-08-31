@@ -32,7 +32,7 @@
 #include "modules/common/status/status.h"
 #include "modules/common/util/string_util.h"
 #include "modules/planning/common/path/path_data.h"
-#include "modules/planning/common/planning_util.h"
+#include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/speed/speed_data.h"
 #include "modules/planning/common/speed/st_boundary.h"
 #include "modules/planning/math/smoothing_spline/piecewise_linear_generator.h"

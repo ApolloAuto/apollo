@@ -46,7 +46,7 @@ namespace planning {
  * @brief EMPlanner is an expectation maximization planner.
  */
 
-class EMPlanner : public Planner {
+class EMPlanner : public PlannerWithReferenceLine {
  public:
   /**
    * @brief Constructor
@@ -97,8 +97,8 @@ class EMPlanner : public Planner {
   void GenerateFallbackPathProfile(const ReferenceLineInfo* reference_line_info,
                                    PathData* path_data);
 
-  void GenerateFallbackSpeedProfile(
-      const ReferenceLineInfo* reference_line_info, SpeedData* speed_data);
+  SpeedData GenerateFallbackSpeedProfile(
+      const ReferenceLineInfo& reference_line_info);
 
   SpeedData GenerateStopProfile(const double init_speed,
                                 const double init_acc) const;

@@ -17,6 +17,7 @@ cc_library(
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/math",
         "//modules/common/status",
+        "//modules/common/util:thread_pool",
         "//modules/map/proto:map_proto",
         "//modules/planning/common:frame",
         "//modules/planning/common:obstacle",

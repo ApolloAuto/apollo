@@ -379,7 +379,7 @@ function gen_coverage() {
 function run_test() {
   generate_build_targets
   if [ "$USE_GPU" == "1" ]; then
-    echo -e "${RED}Need GPU to run the tests.${NO_COLOR}"
+    echo -e "${YELLOW}Runnint tests under GPU mode. Require GPU  to run the tests.${NO_COLOR}"
     echo "$BUILD_TARGETS" | xargs bazel test $DEFINES --config=unit_test -c dbg --test_verbose_timeout_warnings $@
   else
     echo "$BUILD_TARGETS" | grep -v "cnn_segmentation_test\|yolo_camera_detector_test\|unity_recognize_test\|perception_traffic_light_rectify_test\|cuda_util_test" | xargs bazel test $DEFINES --config=unit_test -c dbg --test_verbose_timeout_warnings $@
@@ -410,7 +410,37 @@ function citest_perception() {
   fi
 }
 
-function citest() {
+function citest_dreamview() {
+  generate_build_targets
+
+  # common related test
+  echo "$BUILD_TARGETS" | grep "dreamview\/" | xargs bazel test $DEFINES --config=unit_test -c dbg --test_verbose_timeout_warnings $@
+
+  if [ $? -eq 0 ]; then
+    success 'Test passed!'
+    return 0
+  else
+    fail 'Test failed!'
+    return 1
+  fi
+}
+
+function citest_map() {
+  generate_build_targets
+
+  # common related test
+  echo "$BUILD_TARGETS" | grep "map\/" | grep -v "cuda_util_test" | xargs bazel test $DEFINES --config=unit_test -c dbg --test_verbose_timeout_warnings $@
+
+  if [ $? -eq 0 ]; then
+    success 'Test passed!'
+    return 0
+  else
+    fail 'Test failed!'
+    return 1
+  fi
+}
+
+function citest_basic() {
   generate_build_targets
 
   # common related test
@@ -425,6 +455,20 @@ function citest() {
   # planning related test
   echo "$BUILD_TARGETS" | grep "planning\/" | xargs bazel test $DEFINES --config=unit_test -c dbg --test_verbose_timeout_warnings $@
 
+  if [ $? -eq 0 ]; then
+    success 'Test passed!'
+    return 0
+  else
+    fail 'Test failed!'
+    return 1
+  fi
+}
+
+function citest() {
+  citest_basic
+  citest_perception
+  citest_map
+  citest_dreamview
   if [ $? -eq 0 ]; then
     success 'Test passed!'
     return 0
@@ -704,6 +748,10 @@ function main() {
       check $@
       ;;
     build)
+      DEFINES="${DEFINES} --define USE_GPU=true --cxxopt=-DUSE_GPU"
+      apollo_build_dbg $@
+      ;;
+    build_cpu)
       DEFINES="${DEFINES} --cxxopt=-DCPU_ONLY"
       apollo_build_dbg $@
       ;;
@@ -776,16 +824,33 @@ function main() {
       run_lint
       ;;
     test)
+      DEFINES="${DEFINES} --cxxopt=-DUSE_GPU"
+      USE_GPU="1"
+      run_test $@
+      ;;
+    test_cpu)
       DEFINES="${DEFINES} --cxxopt=-DCPU_ONLY"
       run_test $@
+      ;;
+    citest)
+      DEFINES="${DEFINES} --cxxopt=-DCPU_ONLY"
+      citest $@
+      ;;
+    citest_map)
+      DEFINES="${DEFINES} --cxxopt=-DCPU_ONLY"
+      citest_map $@
+      ;;
+    citest_dreamview)
+      DEFINES="${DEFINES} --cxxopt=-DCPU_ONLY"
+      citest_dreamview $@
       ;;
     citest_perception)
       DEFINES="${DEFINES} --cxxopt=-DCPU_ONLY"
       citest_perception $@
       ;;
-    citest)
+    citest_basic)
       DEFINES="${DEFINES} --cxxopt=-DCPU_ONLY"
-      citest $@
+      citest_basic $@
       ;;
     test_gpu)
       DEFINES="${DEFINES} --cxxopt=-DUSE_GPU"

@@ -14,37 +14,13 @@
  * limitations under the License.
  *****************************************************************************/
 
-/**
- * @file
- */
+#ifndef MODULES_DRIVERS_CAMERA_COMMON_CAMERA_GFLAGS_H_
+#define MODULES_DRIVERS_CAMERA_COMMON_CAMERA_GFLAGS_H_
 
-#ifndef MODULES_PLANNING_UTIL_PLANNING_UTIL_H_
-#define MODULES_PLANNING_UTIL_PLANNING_UTIL_H_
+#include "gflags/gflags.h"
 
-#include <string>
+DECLARE_string(camera_module_name);
+DECLARE_string(camera_adapter_config_filename);
+DECLARE_string(camera_config_file);
 
-#include "modules/common/proto/pnc_point.pb.h"
-
-#include "modules/planning/proto/planning_status.pb.h"
-
-/**
- * @namespace apollo::common::util
- * @brief apollo::common::util
- */
-namespace apollo {
-namespace planning {
-namespace util {
-
-/**
- * This function returns the run-time state of the planning module.
- * @Warnning: this function is not thread safe.
- */
-PlanningStatus *GetPlanningStatus();
-
-void DumpPlanningContext();
-
-}  // namespace util
-}  // namespace planning
-}  // namespace apollo
-
-#endif  // MODULES_PLANNING_UTIL_PLANNING_UTIL_H_
+#endif  // MODULES_DRIVERS_CAMERA_COMMON_CAMERA_GFLAGS_H_

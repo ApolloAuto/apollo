@@ -162,6 +162,9 @@ class ReferenceLine {
   void AddSpeedLimit(const hdmap::SpeedControl& speed_control);
   void AddSpeedLimit(double start_s, double end_s, double speed_limit);
 
+  uint32_t GetPriority() const { return priority_; }
+  void SetPriority(uint32_t priority) { priority_ = priority; }
+
  private:
   /**
    * @brief Linearly interpolate p0 and p1 by s0 and s1.
@@ -207,6 +210,7 @@ class ReferenceLine {
   std::vector<SpeedLimit> speed_limit_;
   std::vector<ReferencePoint> reference_points_;
   hdmap::Path map_path_;
+  uint32_t priority_ = 0;
 };
 
 }  // namespace planning

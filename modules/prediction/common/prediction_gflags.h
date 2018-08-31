@@ -38,6 +38,7 @@ DECLARE_double(min_prediction_length);
 
 // Bag replay timestamp gap
 DECLARE_double(replay_timestamp_gap);
+DECLARE_int32(max_num_dump_feature);
 
 // Map
 DECLARE_double(lane_search_radius);
@@ -49,6 +50,7 @@ DECLARE_bool(enable_kf_tracking);
 DECLARE_double(max_acc);
 DECLARE_double(min_acc);
 DECLARE_double(max_speed);
+DECLARE_double(max_angle_diff_to_adjust_velocity);
 DECLARE_double(q_var);
 DECLARE_double(r_var);
 DECLARE_double(p_var);
@@ -83,6 +85,7 @@ DECLARE_double(split_rate);
 DECLARE_double(rnn_min_lane_relatice_s);
 DECLARE_bool(adjust_velocity_by_obstacle_heading);
 DECLARE_bool(adjust_velocity_by_position_shift);
+DECLARE_bool(adjust_vehicle_heading_by_lane);
 DECLARE_double(heading_filter_param);
 DECLARE_uint32(max_num_lane_point);
 

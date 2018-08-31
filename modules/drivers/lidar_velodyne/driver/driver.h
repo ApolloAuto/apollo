@@ -28,13 +28,15 @@
  *  ROS driver interface for the Velodyne 3D LIDARs
  */
 
-#ifndef MODULES_DRIVERS_VELODYN_DRIVER_DRIVER_H_
-#define MODULES_DRIVERS_VELODYN_DRIVER_DRIVER_H_
+#ifndef MODULES_DRIVERS_LIDAR_VELODYN_DRIVER_DRIVER_H_
+#define MODULES_DRIVERS_LIDAR_VELODYN_DRIVER_DRIVER_H_
 
 #include <string>
 
 #include "dynamic_reconfigure/server.h"
 #include "ros/ros.h"
+
+#include "modules/drivers/lidar_velodyne/proto/driver_node_conf.pb.h"
 
 #include "modules/drivers/lidar_velodyne/driver/input.h"
 
@@ -75,10 +77,11 @@ class VelodyneDriver {
   double diag_min_freq_;
   double diag_max_freq_;
   // boost::shared_ptr<diagnostic_updater::TopicDiagnostic> diag_topic_;
+  DriverNodeConf driver_node_conf_;
 };
 
 }  // namespace lidar_velodyne
 }  // namespace drivers
 }  // namespace apollo
 
-#endif  // MODULES_DRIVERS_VELODYN_DRIVER_DRIVER_H__
+#endif  // MODULES_DRIVERS_LIDAR_VELODYN_DRIVER_DRIVER_H__

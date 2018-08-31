@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,29 +14,19 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/planning/common/planning_util.h"
+/**
+ * @file
+ **/
 
-#include "modules/common/adapters/adapter_manager.h"
-#include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/scenarios/scenario.h"
 
 namespace apollo {
 namespace planning {
-namespace util {
 
-using common::adapter::AdapterManager;
-
-PlanningStatus *GetPlanningStatus() {
-  static PlanningStatus status;
-  return &status;
+void Scenario::RegisterScenarios() {
+  scenario_factory_.Register(PlanningConfig::LANE_FOLLOW,
+                             []() -> Scenario* { return nullptr; });
 }
 
-void DumpPlanningContext() {
-  AdapterManager::GetLocalization()->DumpLatestMessage();
-  AdapterManager::GetChassis()->DumpLatestMessage();
-  AdapterManager::GetRoutingResponse()->DumpLatestMessage();
-  AdapterManager::GetPrediction()->DumpLatestMessage();
-}
-
-}  // namespace util
 }  // namespace planning
 }  // namespace apollo

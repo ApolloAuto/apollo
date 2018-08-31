@@ -53,6 +53,7 @@
 #include "ros/ros.h"
 
 #include "modules/common/log.h"
+#include "modules/drivers/lidar_velodyne/common/velodyne_gflags.h"
 
 namespace apollo {
 namespace drivers {
@@ -98,13 +99,8 @@ void RawData::setParameters(double min_range, double max_range,
 /** Set up for on-line operation. */
 int RawData::setup(ros::NodeHandle private_nh) {
   // get path to angles.config file for this device
-  if (!private_nh.getParam("calibration", config_.calibrationFile)) {
-    ROS_ERROR_STREAM("No calibration angles specified! Using test values!");
-
-    // have to use something: grab unit test version as a default
-    std::string pkgPath = ros::package::getPath("velodyne_pointcloud");
-    config_.calibrationFile = pkgPath + "/params/64e_utexas.yaml";
-  }
+  // TODO(All): used a general config to support multiple lidar types
+  config_.calibrationFile = FLAGS_calibration_file_vls128;
 
   ROS_INFO_STREAM("correction angles: " << config_.calibrationFile);
 

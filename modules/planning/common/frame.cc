@@ -134,6 +134,22 @@ std::list<ReferenceLineInfo> &Frame::reference_line_info() {
   return reference_line_info_;
 }
 
+void Frame::UpdateReferenceLinePriority(
+    const std::map<std::string, uint32_t> &id_to_priority) {
+  for (const auto &pair : id_to_priority) {
+    const auto id = pair.first;
+    const auto priority = pair.second;
+    auto ref_line_info_itr =
+        std::find_if(reference_line_info_.begin(), reference_line_info_.end(),
+                     [&id](const ReferenceLineInfo &ref_line_info) {
+                       return ref_line_info.Lanes().Id() == id;
+                     });
+    if (ref_line_info_itr != reference_line_info_.end()) {
+      ref_line_info_itr->SetPriority(priority);
+    }
+  }
+}
+
 bool Frame::CreateReferenceLineInfo() {
   std::list<ReferenceLine> reference_lines;
   std::list<hdmap::RouteSegments> segments;

@@ -21,7 +21,6 @@ cc_library(
         "//modules/planning/proto:planning_config_proto",
         "//modules/planning/proto:planning_proto",
         "//modules/planning/tasks:task",
-        "//modules/planning/navi/common:common",
         "//modules/planning/navi/decider:navi_obstacle_decider",
         "@glog",
     ],

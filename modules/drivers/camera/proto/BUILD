@@ -1,14 +1,14 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_proto_library(
-    name = "camero_proto",
+    name = "camera_proto",
     deps = [
-        ":camero_proto_lib",
+        ":camera_proto_lib",
     ],
 )
 
 proto_library(
-    name = "camero_proto_lib",
+    name = "camera_proto_lib",
     srcs = [
         "camera_conf.proto",
     ],

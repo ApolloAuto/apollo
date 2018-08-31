@@ -941,22 +941,6 @@
                 "yDerivative": {
                   "type": "double",
                   "id": 11
-                },
-                "x_2ndDerivative": {
-                  "type": "double",
-                  "id": 12
-                },
-                "y_2ndDerivative": {
-                  "type": "double",
-                  "id": 13
-                },
-                "x_3rdDerivative": {
-                  "type": "double",
-                  "id": 14
-                },
-                "y_3rdDerivative": {
-                  "type": "double",
-                  "id": 15
                 }
               }
             },
@@ -990,6 +974,30 @@
                 "relativeTime": {
                   "type": "double",
                   "id": 4
+                }
+              }
+            },
+            "Scenario": {
+              "fields": {
+                "type": {
+                  "type": "Type",
+                  "id": 1,
+                  "options": {
+                    "default": "UNKNOWN"
+                  }
+                }
+              },
+              "nested": {
+                "Type": {
+                  "values": {
+                    "UNKNOWN": 0,
+                    "CRUISE_UNKNOWN": 1000,
+                    "CRUISE_URBAN": 1001,
+                    "CRUISE_HIGHWAY": 1002,
+                    "JUNCTION_UNKNOWN": 2000,
+                    "JUNCTION_TRAFFIC_LIGHT": 2001,
+                    "JUNCTION_STOP_SIGN": 2002
+                  }
                 }
               }
             },
