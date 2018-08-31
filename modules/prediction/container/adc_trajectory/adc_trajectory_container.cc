@@ -22,7 +22,6 @@
 
 #include "modules/common/log.h"
 #include "modules/prediction/common/prediction_gflags.h"
-#include "modules/prediction/common/prediction_map.h"
 
 namespace apollo {
 namespace prediction {
@@ -34,6 +33,10 @@ using ::apollo::common::math::Polygon2d;
 using ::apollo::common::math::Vec2d;
 using ::apollo::hdmap::JunctionInfo;
 using ::apollo::planning::ADCTrajectory;
+
+ADCTrajectoryContainer::ADCTrajectoryContainer()
+    :adc_junction_info_ptr_(nullptr) {
+}
 
 void ADCTrajectoryContainer::Insert(
     const ::google::protobuf::Message& message) {
@@ -111,8 +114,14 @@ void ADCTrajectoryContainer::SetJunctionPolygon() {
     }
     if (vertices.size() >= 3) {
       adc_junction_polygon_ = Polygon2d{vertices};
+      adc_junction_info_ptr_ = junction_info;
     }
   }
+}
+
+std::shared_ptr<const apollo::hdmap::JunctionInfo>
+ADCTrajectoryContainer::ADCJunction() const {
+  return adc_junction_info_ptr_;
 }
 
 void ADCTrajectoryContainer::SetLaneSequence() {
