@@ -279,6 +279,7 @@ function main(){
         --hostname in_dev_docker \
         --shm-size 2G \
         --pid=host \
+        -v /dev/null:/dev/raw1394 \
         $IMG \
         /bin/bash
 
