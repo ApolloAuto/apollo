@@ -16,11 +16,22 @@
 
 #include "modules/prediction/scenario/analyzer/scenario_analyzer.h"
 
+using apollo::common::Scenario;
+
 namespace apollo {
 namespace prediction {
 
 void ScenarioAnalyzer::Analyze(const ScenarioFeature& scenario_feature) {
-  // TODO(kechxu) implement
+  if (scenario_feature.has_junction_id() &&
+      scenario_feature.dist_to_junction() < 10.0) {  // TODO(kechxu) gflags
+    scenario_.set_type(Scenario::JUNCTION_UNKNOWN);
+  } else if (scenario_feature.has_curr_lane_id()) {
+    scenario_.set_type(Scenario::CRUISE_UNKNOWN);
+  }
+}
+
+const Scenario& ScenarioAnalyzer::scenario() const {
+  return scenario_;
 }
 
 }  // namespace prediction
