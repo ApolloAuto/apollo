@@ -168,8 +168,7 @@ void OpenSpacePlanning::RunOnce() {
 }
 
 Status OpenSpacePlanning::Plan(
-    const double current_time_stamp,
-    const std::vector<TrajectoryPoint>& stitching_trajectory,
+    const double current_time_stamp,const std::vector<common::TrajectoryPoint>& stitching_trajectory,
     ADCTrajectory* trajectory_pb) {
   return Status::OK();
 }
@@ -178,6 +177,21 @@ void OpenSpacePlanning::Stop() {
   AWARN << "Planning Stop is called";
   planner_.reset(nullptr);
   GetPlanningStatus()->Clear();
+}
+
+common::Status OpenSpacePlanning::InitFrame(const uint32_t sequence_num,
+                        const common::TrajectoryPoint& planning_start_point,
+                        const double start_time,
+                        const common::VehicleState& vehicle_state) {
+
+  frame_.reset(new Frame_open_space(sequence_num, planning_start_point, start_time,
+                         vehicle_state));
+  auto status = frame_->Init();
+  if (!status.ok()) {
+    AERROR << "failed to init frame:" << status.ToString();
+    return status;
+  }
+  return Status::OK();
 }
 
 }  // namespace planning

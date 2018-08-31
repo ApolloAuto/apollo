@@ -52,7 +52,7 @@ apollo::common::Status OpenSpacePlanner::Plan(
   // initial state
 
   // TODO(JinYun): Step 1 : Get initial state from VehicleState when enabled.
-
+  
   Eigen::MatrixXd x0(4, 1);
   x0 << -12, 11, 0, 0;
 
