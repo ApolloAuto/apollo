@@ -18,31 +18,29 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_SCENARIOS_LANE_FOLLLOW_SCENARIO_H_
-#define MODULES_PLANNING_SCENARIOS_LANE_FOLLLOW_SCENARIO_H_
+#include "modules/planning/scenarios/lane_follow/lane_follow_scenario.h"
 
-#include <string>
+#include <memory>
 
-#include "modules/planning/proto/planning_config.pb.h"
-
-#include "modules/common/status/status.h"
-#include "modules/common/util/factory.h"
-
-#include "modules/planning/scenarios/scenario.h"
+#include "gtest/gtest.h"
 
 namespace apollo {
 namespace planning {
 
-class LaneFollowScenario : public Scenario {
+class LaneFollowScenarioTest : public ::testing::Test {
  public:
-  LaneFollowScenario() : Scenario("LaneFollowScenario") {}
-  virtual ~LaneFollowScenario() = default;
+  virtual void SetUp() {}
 
-  virtual bool Init() { return true; }
-  virtual common::Status Process() { return common::Status::OK(); }
+ protected:
+  std::unique_ptr<LaneFollowScenario> scenario_;
 };
+
+TEST_F(LaneFollowScenarioTest, Simple) {
+  scenario_.reset(new LaneFollowScenario());
+  EXPECT_EQ(scenario_->Name(), "LaneFollowScenario");
+  EXPECT_TRUE(scenario_->Init());
+  EXPECT_EQ(scenario_->Process(), common::Status::OK());
+}
 
 }  // namespace planning
 }  // namespace apollo
-
-#endif  // MODULES_PLANNING_SCENARIOS_LANE_FOLLLOW_SCENARIO_H_
