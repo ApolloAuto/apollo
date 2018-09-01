@@ -141,14 +141,14 @@ proto_library(
     deps = [
         ":dp_poly_path_config_proto_lib",
         ":dp_st_speed_config_proto_lib",
+        ":navi_obstacle_decider_config_proto_lib",
+        ":navi_path_decider_config_proto_lib",
+        ":navi_speed_decider_config_proto_lib",
+        ":open_space_planner_config_proto_lib",
         ":poly_st_speed_config_proto_lib",
         ":qp_spline_path_config_proto_lib",
         ":qp_st_speed_config_proto_lib",
         ":reference_line_smoother_config_proto_lib",
-        ":navi_path_decider_config_proto_lib",
-        ":navi_speed_decider_config_proto_lib",
-        ":navi_obstacle_decider_config_proto_lib",
-        ":open_space_planner_config_proto_lib",
     ],
 )
 
@@ -359,16 +359,16 @@ cc_proto_library(
 )
 
 cc_proto_library(
-    name = "auto_tuning_raw_feature",
+    name = "auto_tuning_raw_feature_proto",
     deps = [
-        ":auto_tuning_model_raw_feature_lib",
+        ":auto_tuning_raw_feature_lib",
     ],
 )
 
 proto_library(
-    name = "auto_tuning_model_raw_feature_lib",
+    name = "auto_tuning_raw_feature_lib",
     srcs = [
-            "auto_tuning_raw_feature.proto",
+        "auto_tuning_raw_feature.proto",
     ],
     deps = [
         "//modules/common/proto:pnc_point_proto_lib",
@@ -376,7 +376,7 @@ proto_library(
 )
 
 cc_proto_library(
-    name = "auto_tuning_model_input",
+    name = "auto_tuning_model_input_proto",
     deps = [
         ":auto_tuning_model_input_lib",
     ],
@@ -385,7 +385,7 @@ cc_proto_library(
 proto_library(
     name = "auto_tuning_model_input_lib",
     srcs = [
-            "auto_tuning_model_input.proto",
+        "auto_tuning_model_input.proto",
     ],
 )
 
