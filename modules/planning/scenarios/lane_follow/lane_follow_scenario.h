@@ -28,26 +28,18 @@
 #include "modules/common/status/status.h"
 #include "modules/common/util/factory.h"
 
+#include "modules/planning/scenarios/scenario.h"
+
 namespace apollo {
 namespace planning {
 
 class LaneFollowScenario : public Scenario {
  public:
-  LaneFollowScenario() : name_("LaneFollowScenario") {}
+  LaneFollowScenario() : Scenario("LaneFollowScenario") {}
   virtual ~LaneFollowScenario() = default;
-  virtual const std::string& Name() const;
 
-  virtual bool Init();
-  virtual apollo::common::Status Process();
-
- protected:
-  bool is_init_ = false;
-  const std::string name_;
-
- private:
-  void RegisterScenarios();
-  common::util::Factory<PlanningConfig::ScenarioType, Scenario>
-      scenario_factory_;
+  virtual bool Init() { return true; }
+  virtual common::Status Process() { return common::Status::OK(); }
 };
 
 }  // namespace planning
