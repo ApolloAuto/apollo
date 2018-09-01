@@ -27,8 +27,10 @@
 #include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
 
+#include "modules/common/proto/pnc_point.pb.h"
 #include "modules/common/util/file.h"
 #include "modules/common/util/util.h"
+#include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
 #include "modules/planning/common/frame_open_space.h"
 #include "modules/planning/common/planning_gflags.h"
 
@@ -43,10 +45,21 @@ class FrameTest : public ::testing::Test {
     ASSERT_TRUE(common::util::GetProtoFromFile(
         "modules/planning/common/testdata/sample_prediction.pb.txt",
         &prediction_obstacles_));
+    sequence_num_ = 1;
+    start_time_ = 1535757683;
+    vehicle_state_.set_x(587419.24);
+    vehicle_state_.set_y(4141269.79);
+    test_frame_ = new FrameOpenSpace(sequence_num_, planning_start_point_,
+                                     start_time_, vehicle_state_);
   }
 
  protected:
   prediction::PredictionObstacles prediction_obstacles_;
+  FrameOpenSpace* test_frame_;
+  uint32_t sequence_num_;
+  apollo::common::TrajectoryPoint planning_start_point_;
+  double start_time_;
+  apollo::common::VehicleState vehicle_state_;
 };
 
 TEST_F(FrameTest, AlignPredictionTime) {
@@ -71,6 +84,27 @@ TEST_F(FrameTest, AlignPredictionTime) {
   ASSERT_EQ(0, prediction_obstacles_.prediction_obstacle(0)
                    .trajectory(0)
                    .trajectory_point_size());
+}
+
+TEST_F(FrameTest, is_near_destination) {
+  ASSERT_FALSE(test_frame_->is_near_destination());
+}
+
+TEST_F(FrameTest, vehicle_state) {
+  apollo::common::VehicleState vehicle_state_test_;
+  vehicle_state_test_.set_x(587419.24);
+  vehicle_state_test_.set_y(4141269.79);
+  apollo::common::VehicleState vehicle_state_result =
+      test_frame_->vehicle_state();
+  double x = vehicle_state_result.x();
+  double y = vehicle_state_result.y();
+  ASSERT_EQ(vehicle_state_test_.x(), x);
+  ASSERT_EQ(vehicle_state_test_.y(), y);
+}
+
+TEST_F(FrameTest, sequence_num) {
+  double sequence_num_test = 1;
+  ASSERT_EQ(test_frame_->SequenceNum(), sequence_num_test);
 }
 
 }  // namespace planning
