@@ -1585,3 +1585,4 @@ engage_advice {
   advice: DISALLOW_ENGAGE
   reason: "Not on reference line"
 }
+trajectory_type: NORMAL
