@@ -25,9 +25,9 @@ namespace prediction {
 
 class ScenarioAnalyzer {
  public:
-  ScenarioAnalyzer();
+  ScenarioAnalyzer() = default;
 
-  virtual ~ScenarioAnalyzer();
+  virtual ~ScenarioAnalyzer() = default;
 
   void Analyze(const ScenarioFeature& scenario_feature);
 
