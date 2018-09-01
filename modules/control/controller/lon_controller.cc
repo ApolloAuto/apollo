@@ -232,7 +232,8 @@ Status LonController::ComputeControlCommand(
   debug->set_is_full_stop(false);
   GetPathRemain(debug);
 
-  if ((trajectory_message_->TrajectoryType() == NORMAL) && 
+  if ((trajectory_message_->trajectory_type() ==
+   apollo::planning::ADCTrajectory::NORMAL) &&
       ((std::fabs(debug->preview_acceleration_reference()) <=
            FLAGS_max_acceleration_when_stopped &&
        std::fabs(debug->preview_speed_reference()) <=
