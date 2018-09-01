@@ -232,11 +232,12 @@ Status LonController::ComputeControlCommand(
   debug->set_is_full_stop(false);
   GetPathRemain(debug);
 
-  if ((std::fabs(debug->preview_acceleration_reference()) <=
+  if ((trajectory_message_->TrajectoryType() == NORMAL) && 
+      ((std::fabs(debug->preview_acceleration_reference()) <=
            FLAGS_max_acceleration_when_stopped &&
        std::fabs(debug->preview_speed_reference()) <=
            vehicle_param_.max_abs_speed_when_stopped()) ||
-      (debug->path_remain() < 0.3)) {
+      (debug->path_remain() < 0.3))) {
     acceleration_cmd = lon_controller_conf.standstill_acceleration();
     AINFO << "Stop location reached";
     debug->set_is_full_stop(true);
