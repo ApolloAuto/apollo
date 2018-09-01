@@ -18,20 +18,33 @@
 
 #include "gtest/gtest.h"
 
+#include "modules/prediction/proto/scenario_feature.pb.h"
 #include "modules/prediction/common/kml_map_based_test.h"
 #include "modules/prediction/common/prediction_gflags.h"
 
 namespace apollo {
 namespace prediction {
 
+using apollo::common::Scenario;
+
 class ScenarioAnalyzerTest : public KMLMapBasedTest {};
 
-TEST_F(ScenarioAnalyzerTest, getter) {
-  // TODO(kechxu) add tests
+TEST_F(ScenarioAnalyzerTest, unknown) {
+  ScenarioFeature scenario_feature;
+  ScenarioAnalyzer scenario_analyzer;
+  scenario_analyzer.Analyze(scenario_feature);
+  Scenario scenario = scenario_analyzer.scenario();
+  EXPECT_EQ(scenario.type(), Scenario::UNKNOWN);
 }
 
 TEST_F(ScenarioAnalyzerTest, junction) {
-  // TODO(kechxu) add tests
+  ScenarioFeature scenario_feature;
+  scenario_feature.set_junction_id("1");
+  scenario_feature.set_dist_to_junction(3.0);
+  ScenarioAnalyzer scenario_analyzer;
+  scenario_analyzer.Analyze(scenario_feature);
+  Scenario scenario = scenario_analyzer.scenario();
+  EXPECT_EQ(scenario.type(), Scenario::JUNCTION_UNKNOWN);
 }
 
 }  // namespace prediction
