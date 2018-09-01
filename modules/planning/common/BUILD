@@ -326,6 +326,8 @@ cc_test(
         ":frame_open_space",
         "//modules/common/util",
         "//modules/planning/proto:planning_config_proto",
+        "//modules/common/vehicle_state/proto:vehicle_state_proto",
+        "//modules/common/proto:pnc_point_proto",
         "@gtest//:main",
     ],
 )
