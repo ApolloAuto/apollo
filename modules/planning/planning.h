@@ -22,9 +22,10 @@
 
 #include "modules/common/apollo_app.h"
 #include "modules/common/configs/config_gflags.h"
+#include "modules/common/util/thread_pool.h"
+#include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/navi_planning.h"
 #include "modules/planning/planning_base.h"
-#include "modules/planning/planning_dispatcher.h"
 #include "modules/planning/std_planning.h"
 
 /**
@@ -42,39 +43,41 @@ namespace planning {
  */
 class Planning : public apollo::common::ApolloApp {
  public:
-  Planning() { planning_dispatcher_.reset(new PlanningDispatcher()); }
-  virtual ~Planning() {}
+  Planning() {
+    if (FLAGS_use_navigation_mode) {
+      planning_base_ = std::unique_ptr<PlanningBase>(new NaviPlanning());
+    } else {
+      planning_base_ = std::unique_ptr<PlanningBase>(new StdPlanning());
+    }
+  }
+  virtual ~Planning() = default;
   /**
    * @brief module name
    * @return module name
    */
-  std::string Name() const override { return planning_dispatcher_->Name(); }
+  std::string Name() const override { return planning_base_->Name(); }
 
-  virtual void RunOnce() { planning_dispatcher_->RunOnce(); }
+  virtual void RunOnce() { planning_base_->RunOnce(); }
 
   /**
    * @brief module initialization function
    * @return initialization status
    */
-  apollo::common::Status Init() override {
-    return planning_dispatcher_->Init();
-  }
+  apollo::common::Status Init() override { return planning_base_->Init(); }
 
   /**
    * @brief module start function
    * @return start status
    */
-  apollo::common::Status Start() override {
-    return planning_dispatcher_->Start();
-  }
+  apollo::common::Status Start() override { return planning_base_->Start(); }
 
   /**
    * @brief module stop function
    */
-  void Stop() override { return planning_dispatcher_->Stop(); }
+  void Stop() override { return planning_base_->Stop(); }
 
  private:
-  std::unique_ptr<PlanningDispatcher> planning_dispatcher_;
+  std::unique_ptr<PlanningBase> planning_base_;
 };
 
 }  // namespace planning

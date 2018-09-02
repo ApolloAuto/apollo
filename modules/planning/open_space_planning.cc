@@ -32,6 +32,7 @@
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/trajectory/trajectory_stitcher.h"
+#include "modules/planning/planner/planner_dispatcher.h"
 #include "modules/planning/tasks/traffic_decider/traffic_decider.h"
 
 namespace apollo {
@@ -68,8 +69,7 @@ Status OpenSpacePlanning::Init() {
   hdmap_ = HDMapUtil::BaseMapPtr();
   CHECK(hdmap_) << "Failed to load map";
 
-  RegisterPlanners();
-  planner_ = planner_factory_.CreateObject(config_.planner_type());
+  planner_ = planner_dispatcher_->DispatchPlanner();
   if (!planner_) {
     return Status(
         ErrorCode::PLANNING_ERROR,
