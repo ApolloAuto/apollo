@@ -22,7 +22,7 @@
 #include <vector>
 
 #include "Eigen/Eigen"
-#include "modules/planning/common/frame.h"
+#include "modules/planning/common/frame_open_space.h"
 #include "modules/planning/planner/open_space/distance_approach_problem.h"
 #include "modules/planning/planner/open_space/warm_start_problem.h"
 #include "modules/planning/planner/planner.h"
@@ -40,6 +40,7 @@ Zhanga , Alexander Linigerb and Francesco Borrellia
 namespace apollo {
 namespace planning {
 
+using apollo::common::Status;
 /**
  * @class OpenSpacePlanner
  * @brief OpenSpacePlanner is a derived class of Planner.
@@ -62,15 +63,19 @@ class OpenSpacePlanner : public Planner {
   apollo::common::Status Init(const PlanningConfig& config) override;
 
   /**
-   * @brief override function Plan in parent class Planner.
-   * @param planning_init_point The trajectory point where planning starts.
-   * @param frame Current planning frame.
-   * @param reference_line_info The computed reference line.
-   * @return OK if planning succeeds; error otherwise.
+   * @brief override function Plan in parent class Planner.Dummy implementation
+   */
+  apollo::common::Status Plan(
+      const common::TrajectoryPoint& planning_init_point, Frame* frame) {
+    return Status::OK();
+  }
+
+  /**
+   * @brief Real "Plan" taking init point and FrameOpenSpace
    */
   apollo::common::Status Plan(
       const common::TrajectoryPoint& planning_init_point,
-      Frame* frame) override;
+      FrameOpenSpace* frame);
 
   apollo::common::Status ObsHRep(
       const std::size_t& nOb, const Eigen::MatrixXd& vOb,
@@ -81,6 +86,7 @@ class OpenSpacePlanner : public Planner {
   std::unique_ptr<::apollo::planning::WarmStartProblem> warm_start_;
   std::unique_ptr<::apollo::planning::DistanceApproachProblem>
       distance_approach_;
+  common::VehicleState vehicle_state_;
 };
 
 }  // namespace planning
