@@ -25,7 +25,6 @@
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/math/quaternion.h"
 #include "modules/common/time/time.h"
-#include "modules/common/util/thread_pool.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/planning/common/planning_context.h"
@@ -48,24 +47,9 @@ using apollo::common::VehicleState;
 using apollo::common::VehicleStateProvider;
 using apollo::common::adapter::AdapterManager;
 using apollo::common::time::Clock;
-using apollo::common::util::ThreadPool;
 using apollo::hdmap::HDMapUtil;
 
 PlanningBase::~PlanningBase() {}
-
-void PlanningBase::RegisterPlanners() {
-  planner_factory_.Register(
-      PlanningConfig::RTK, []() -> Planner* { return new RTKReplayPlanner(); });
-  planner_factory_.Register(PlanningConfig::EM,
-                            []() -> Planner* { return new EMPlanner(); });
-  planner_factory_.Register(PlanningConfig::LATTICE,
-                            []() -> Planner* { return new LatticePlanner(); });
-  planner_factory_.Register(PlanningConfig::NAVI,
-                            []() -> Planner* { return new NaviPlanner(); });
-  planner_factory_.Register(PlanningConfig::OPENSPACE, []() -> Planner* {
-    return new OpenSpacePlanner();
-  });
-}
 
 void PlanningBase::CheckPlanningConfig() {
   if (config_.has_em_planner_config() &&

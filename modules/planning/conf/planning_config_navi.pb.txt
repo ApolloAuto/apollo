@@ -236,5 +236,5 @@ navi_planner_config {
         lateral_velocity_value : 0.5
         speed_decider_detect_range : 0.35
         max_keep_nudge_cycles : 110
-    }   
+    }
 }
