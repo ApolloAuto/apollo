@@ -22,9 +22,12 @@
 #include <utility>
 #include <vector>
 
-#include "modules/planning/common/frame.h"
-#include "modules/planning/planning_base.h"
 #include "modules/planning/proto/pad_msg.pb.h"
+
+#include "modules/planning/common/frame.h"
+#include "modules/planning/planner/navi_planner_dispatcher.h"
+#include "modules/planning/planner/planner_dispatcher.h"
+#include "modules/planning/planning_base.h"
 
 /**
  * @namespace apollo::planning
@@ -41,7 +44,9 @@ namespace planning {
  */
 class NaviPlanning : public PlanningBase {
  public:
-  NaviPlanning() = default;
+  NaviPlanning() {
+    planner_dispatcher_ = std::make_unique<NaviPlannerDispatcher>();
+  }
   virtual ~NaviPlanning();
 
   /**
@@ -140,6 +145,8 @@ class NaviPlanning : public PlanningBase {
   std::unique_ptr<Frame> frame_;
 
   std::unique_ptr<ReferenceLineProvider> reference_line_provider_;
+
+  std::unique_ptr<PlannerDispatcher> planner_dispatcher_;
 };
 
 }  // namespace planning
