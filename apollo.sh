@@ -122,7 +122,7 @@ function generate_build_targets() {
 #=================================================
 
 function build() {
-  if ${USE_GPU} ; then
+  if [ "${USE_GPU}" = "1" ] ; then
     echo -e "${YELLOW}Running build under GPU mode. GPU is required to run the build.${NO_COLOR}"
   else
     echo -e "${YELLOW}Running build under CPU mode. No GPU is required to run the build.${NO_COLOR}"
@@ -755,6 +755,7 @@ function main() {
       ;;
     build)
       DEFINES="${DEFINES} --define USE_GPU=true --cxxopt=-DUSE_GPU"
+      USE_GPU="1"
       apollo_build_dbg $@
       ;;
     build_cpu)
@@ -786,10 +787,12 @@ function main() {
       ;;
     build_gpu)
       DEFINES="${DEFINES} --define USE_GPU=true --cxxopt=-DUSE_GPU"
+      USE_GPU="1"
       apollo_build_dbg $@
       ;;
     build_opt_gpu)
       DEFINES="${DEFINES} --define USE_GPU=true --cxxopt=-DUSE_GPU"
+      USE_GPU="1"
       apollo_build_opt $@
       ;;
     build_fe)
