@@ -34,7 +34,7 @@ Setup steps:
     ```
 4. Bootstrap to start ros call and Monitor module and Dreamview
     ```
-    bash bootstrap.sh
+    bash scripts/bootstrap.sh
     ```
 
 5. Now you can play the rosbag:
