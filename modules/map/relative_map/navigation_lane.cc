@@ -47,6 +47,17 @@ void NavigationLane::SetConfig(const NavigationLaneConfig &config) {
   config_ = config;
 }
 
+void NavigationLane::UpdateNavigationInfo(
+    const NavigationInfo &navigation_path) {
+  navigation_info_ = navigation_path;
+  last_project_index_map_.clear();
+  navigation_path_list_.clear();
+  current_navi_path_tuple_ = std::make_tuple(-1, -1.0, -1.0, nullptr);
+  if (FLAGS_enable_cyclic_rerouting) {
+    UpdateStitchIndexInfo();
+  }
+}
+
 bool NavigationLane::GeneratePath() {
   navigation_path_list_.clear();
   current_navi_path_tuple_ = std::make_tuple(-1, -1.0, -1.0, nullptr);
@@ -112,7 +123,11 @@ bool NavigationLane::GeneratePath() {
     for (const auto &navi_path_tuple : navigation_path_list_) {
       int current_line_index = std::get<0>(navi_path_tuple);
       ADEBUG << "Current navigation path index is: " << current_line_index;
-      double current_d = last_project_index_map_[current_line_index].second;
+      double current_d = std::numeric_limits<double>::max();
+      auto item_iter = last_project_index_map_.find(current_line_index);
+      if (item_iter != last_project_index_map_.end()) {
+        current_d = item_iter->second.second;
+      }
       if (current_d < min_d) {
         min_d = current_d;
         current_navi_path_tuple_ = navi_path_tuple;
@@ -334,43 +349,95 @@ bool NavigationLane::ConvertNavigationLineToPath(const int line_index,
     last_project_index_map_[line_index] = proj_index_pair;
   }
 
-  double dist = navigation_path.path_point().rbegin()->s() -
-                navigation_path.path_point(current_project_index).s();
-  if (dist < 20) {
-    return false;
-  }
-
   // offset between the current vehicle state and navigation line
   const double dx = -original_pose_.position().x();
   const double dy = -original_pose_.position().y();
-  const double ref_s = navigation_path.path_point(current_project_index).s();
-  for (int i = std::max(0, current_project_index - 3);
-       i < navigation_path.path_point_size(); ++i) {
-    auto *point = path->add_path_point();
-    point->CopyFrom(navigation_path.path_point(i));
+  auto enu_to_flu_func = [this, dx, dy](const double enu_x, const double enu_y,
+                                        const double enu_theta, double *flu_x,
+                                        double *flu_y, double *flu_theta) {
+    if (flu_x != nullptr && flu_y != nullptr) {
+      common::math::RotateAxis(original_pose_.heading(), enu_x + dx, enu_y + dy,
+                               flu_x, flu_y);
+    }
 
-    // shift to (0, 0)
-    double enu_x = point->x() + dx;
-    double enu_y = point->y() + dy;
+    if (flu_theta != nullptr) {
+      *flu_theta = common::math::NormalizeAngle(
+          common::math::NormalizeAngle(enu_theta) - original_pose_.heading());
+    }
+  };
 
-    double flu_x = 0.0;
-    double flu_y = 0.0;
-    common::math::RotateAxis(original_pose_.heading(), enu_x, enu_y, &flu_x,
-                             &flu_y);
+  auto gen_navi_path_loop_func =
+      [this, &navigation_path, &enu_to_flu_func](
+          const int start, const int end, const double ref_s_base,
+          const double max_length, common::Path *path) {
+        CHECK_NOTNULL(path);
+        const double ref_s = navigation_path.path_point(start).s();
+        for (int i = start; i < end; ++i) {
+          auto *point = path->add_path_point();
+          point->CopyFrom(navigation_path.path_point(i));
 
-    point->set_x(flu_x);
-    point->set_y(flu_y);
-    point->set_theta(common::math::NormalizeAngle(
-        common::math::NormalizeAngle(point->theta()) -
-        original_pose_.heading()));
-    const double accumulated_s = navigation_path.path_point(i).s() - ref_s;
-    point->set_s(accumulated_s);
+          double flu_x = 0.0;
+          double flu_y = 0.0;
+          double flu_theta = 0.0;
+          enu_to_flu_func(point->x(), point->y(), point->theta(), &flu_x,
+                          &flu_y, &flu_theta);
 
-    if (accumulated_s > FLAGS_max_len_from_navigation_line) {
-      break;
+          point->set_x(flu_x);
+          point->set_y(flu_y);
+          point->set_theta(flu_theta);
+          const double accumulated_s =
+              navigation_path.path_point(i).s() - ref_s + ref_s_base;
+          point->set_s(accumulated_s);
+
+          if (accumulated_s > max_length) {
+            break;
+          }
+        }
+      };
+
+  double dist = navigation_path.path_point().rbegin()->s() -
+                navigation_path.path_point(current_project_index).s();
+  // Stitch current position to the beginning for a cyclic/circular route.
+  if (FLAGS_enable_cyclic_rerouting &&
+      dist < FLAGS_max_len_from_navigation_line) {
+    auto item_iter = stitch_index_map_.find(line_index);
+    if (item_iter != stitch_index_map_.end()) {
+      int stitch_start_index =
+          std::max(item_iter->second.first, item_iter->second.second);
+      stitch_start_index = std::max(current_project_index, stitch_start_index);
+      stitch_start_index =
+          std::min(navigation_path.path_point_size() - 1, stitch_start_index);
+
+      int stitch_end_index =
+          std::min(item_iter->second.first, item_iter->second.second);
+      stitch_end_index = std::max(0, stitch_end_index);
+      stitch_end_index = std::min(current_project_index, stitch_end_index);
+
+      ADEBUG << "The stitch_start_index is: " << stitch_start_index << "; "
+             << "the stitch_end_index is: " << stitch_end_index << "; "
+             << "the current_project_index is: " << current_project_index
+             << " for the navigation line: " << line_index;
+
+      double length = navigation_path.path_point(stitch_start_index).s() -
+                      navigation_path.path_point(current_project_index).s();
+      gen_navi_path_loop_func(std::max(0, current_project_index - 3),
+                              stitch_start_index + 1, 0.0, length, path);
+      if (length > FLAGS_max_len_from_navigation_line) {
+        return true;
+      }
+      gen_navi_path_loop_func(stitch_end_index,
+                              navigation_path.path_point_size(), length,
+                              FLAGS_max_len_from_navigation_line, path);
+      return true;
     }
   }
 
+  if (dist < 20) {
+    return false;
+  }
+  gen_navi_path_loop_func(std::max(0, current_project_index - 3),
+                          navigation_path.path_point_size(), 0.0,
+                          FLAGS_max_len_from_navigation_line, path);
   return true;
 }
 
@@ -415,39 +482,12 @@ ProjIndexPair NavigationLane::UpdateProjectionIndex(const common::Path &path,
         (enu_x - x_shift) * cos_angle + (enu_y - y_shift) * sin_angle;
     double flu_y =
         (enu_y - y_shift) * cos_angle - (enu_x - x_shift) * sin_angle;
-    if (std::fabs(flu_x) < FLAGS_max_distance_to_navigation_line / 3.0 &&
-        std::fabs(flu_y) < FLAGS_max_distance_to_navigation_line) {
+    if (std::fabs(flu_x) < FLAGS_max_distance_to_navigation_line / 2.0 &&
+        std::fabs(flu_y) < FLAGS_max_distance_to_navigation_line * 2.0) {
       return true;
     }
     return false;
   };
-
-  if (FLAGS_enable_cyclic_rerouting) {
-    // We create a condition here that sets the "current_project_index" to
-    // 0, should the vehicle reach the end point of a cyclic/circular
-    // route. For cyclic/circular navigation lines where the distance
-    // between their starting and end points is very small, it is tedious
-    // and unnecessary to re-send navigation lines every time. Because the
-    // starting point and the end point cannot be completely consistent in
-    // a cyclic/circular navigaton line. The vehicle's end point is
-    // usually beyond the starting point a little when making a
-    // cyclic/circular navigation line. Therefore, the
-    // "current_project_index" is reset to 0 if it is larger than 95% size
-    // of the navigaton line and the vehicle's current position is near
-    // the starting point of the navigatoin line.
-    const int near_end_size = static_cast<int>(path_size * 0.95);
-    if (current_project_index > near_end_size &&
-        current_project_index < path_size) {
-      if (DistanceXY(path.path_point(0),
-                     path.path_point(current_project_index)) <
-          FLAGS_max_distance_to_navigation_line) {
-        if (check_distance_func(0)) {
-          min_d = DistanceXY(original_pose_.position(), path.path_point(0));
-          return std::make_pair(0, min_d);
-        }
-      }
-    }
-  }
 
   int index = 0;
   for (int i = current_project_index; i + 1 < path_size; ++i) {
@@ -463,8 +503,28 @@ ProjIndexPair NavigationLane::UpdateProjectionIndex(const common::Path &path,
   }
 
   if (check_distance_func(index)) {
+    if (FLAGS_enable_cyclic_rerouting) {
+      // We create a condition here that sets the "current_project_index" to
+      // 0, should the vehicle reach the end point of a cyclic/circular
+      // route. For cyclic/circular navigation lines where the distance
+      // between their start and end points is very small, it is tedious
+      // and unnecessary to re-send navigation lines every time.
+      auto item_iter = stitch_index_map_.find(line_index);
+      if (item_iter != stitch_index_map_.end()) {
+        int start_index =
+            std::max(item_iter->second.first, item_iter->second.second);
+        int end_index =
+            std::min(item_iter->second.first, item_iter->second.second);
+        int index_diff = index - start_index;
+        if (index_diff >= 0) {
+          index = std::min(end_index + index_diff, start_index);
+          min_d = DistanceXY(original_pose_.position(), path.path_point(index));
+        }
+      }
+    }
     return std::make_pair(index, min_d);
   }
+
   return std::make_pair(-1, std::numeric_limits<double>::max());
 }
 
@@ -550,7 +610,7 @@ void NavigationLane::ConvertLaneMarkerToPath(
 
 bool NavigationLane::CreateMap(const MapGenerationParam &map_config,
                                MapMsg *map_msg) const {
-  auto *navigation_info = map_msg->mutable_navigation_path();
+  auto *navigation_path = map_msg->mutable_navigation_path();
   auto *hdmap = map_msg->mutable_hdmap();
   auto *lane_marker = map_msg->mutable_lane_marker();
 
@@ -565,7 +625,7 @@ bool NavigationLane::CreateMap(const MapGenerationParam &map_config,
     auto *lane = hdmap->add_lane();
     lane->mutable_id()->set_id(std::to_string(navi_path->path_priority()) +
                                "_" + path.name());
-    (*navigation_info)[lane->id().id()] = *navi_path;
+    (*navigation_path)[lane->id().id()] = *navi_path;
     // lane types
     lane->set_type(Lane::CITY_DRIVING);
     lane->set_turn(Lane::NO_TURN);
@@ -669,6 +729,7 @@ bool NavigationLane::CreateMap(const MapGenerationParam &map_config,
   }
 
   int lane_num = hdmap->lane_size();
+  ADEBUG << "The Lane number is: " << lane_num;
 
   // Set road boundary
   auto *road = hdmap->add_road();
@@ -685,8 +746,8 @@ bool NavigationLane::CreateMap(const MapGenerationParam &map_config,
 
   auto *right_edge = outer_polygon->add_edge();
   right_edge->set_type(apollo::hdmap::BoundaryEdge::RIGHT_BOUNDARY);
-  right_edge->mutable_curve()->
-      CopyFrom(hdmap->lane(lane_num - 1).right_boundary().curve());
+  right_edge->mutable_curve()->CopyFrom(
+      hdmap->lane(lane_num - 1).right_boundary().curve());
 
   // Set neighbor information for each lane
   if (lane_num < 2) {
@@ -704,6 +765,60 @@ bool NavigationLane::CreateMap(const MapGenerationParam &map_config,
     }
   }
   return true;
+}
+
+void NavigationLane::UpdateStitchIndexInfo() {
+  stitch_index_map_.clear();
+
+  int navigation_line_num = navigation_info_.navigation_path_size();
+  if (navigation_line_num <= 0) {
+    return;
+  }
+
+  constexpr int kMinPathPointSize = 100;
+  for (int i = 0; i < navigation_line_num; ++i) {
+    const auto &navigation_path = navigation_info_.navigation_path(i).path();
+    if (!navigation_info_.navigation_path(i).has_path() ||
+        navigation_path.path_point_size() < kMinPathPointSize) {
+      continue;
+    }
+
+    double min_distance = std::numeric_limits<double>::max();
+    StitchIndexPair min_index_pair = std::make_pair(-1, -1);
+
+    int path_size = navigation_path.path_point_size();
+    const double start_s = navigation_path.path_point(0).s();
+    const double end_s = navigation_path.path_point(path_size - 1).s();
+    for (int m = 0; m < path_size; ++m) {
+      double forward_s = navigation_path.path_point(m).s() - start_s;
+      if (forward_s > FLAGS_max_len_from_navigation_line) {
+        break;
+      }
+
+      for (int n = path_size - 1; n >= 0; --n) {
+        double reverse_s = end_s - navigation_path.path_point(n).s();
+        if (reverse_s > FLAGS_max_len_from_navigation_line) {
+          break;
+        }
+        if (m == n) {
+          break;
+        }
+
+        double current_distance = DistanceXY(navigation_path.path_point(m),
+                                             navigation_path.path_point(n));
+        if (current_distance < min_distance) {
+          min_distance = current_distance;
+          min_index_pair = std::make_pair(m, n);
+        }
+      }
+    }
+
+    if (min_distance < FLAGS_min_lane_half_width) {
+      AINFO << "The stitching pair is: (" << min_index_pair.first << ", "
+            << min_index_pair.second << ") for the navigation line: " << i;
+      stitch_index_map_[i] = min_index_pair;
+    }
+  }
 }
 
 }  // namespace relative_map

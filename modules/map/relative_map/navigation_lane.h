@@ -53,6 +53,11 @@ namespace relative_map {
 typedef std::tuple<int, double, double, std::shared_ptr<NavigationPath>>
     NaviPathTuple;
 
+// A stitching index pair.
+// pair.first: the start stitching index of the current navigation line.
+// pair.second: the end stitching index of the current navigation line.
+typedef std::pair<int, int> StitchIndexPair;
+
 // A projection index pair.
 // pair.first: projection index of the vehicle in the current navigation line.
 // pair.second: the distance between the vehicle's initial position and the
@@ -67,6 +72,8 @@ class NavigationLane {
 
   void SetConfig(const NavigationLaneConfig& config);
 
+  void UpdateNavigationInfo(const NavigationInfo& navigation_info);
+
   void SetDefaultWidth(const double left_width, const double right_width) {
     default_left_width_ = left_width;
     default_right_width_ = right_width;
@@ -79,14 +86,7 @@ class NavigationLane {
     perception_obstacles_ = perception_obstacles;
   }
 
-  void UpdateNavigationInfo(const NavigationInfo& navigation_info) {
-    navigation_info_ = navigation_info;
-    last_project_index_map_.clear();
-    navigation_path_list_.clear();
-    current_navi_path_tuple_ = std::make_tuple(-1, -1.0, -1.0, nullptr);
-  }
-
-  const NavigationPath Path() {
+  NavigationPath Path() const {
     const auto& current_navi_path = std::get<3>(current_navi_path_tuple_);
     if (current_navi_path) {
       return *current_navi_path;
@@ -118,6 +118,9 @@ class NavigationLane {
 
   ProjIndexPair UpdateProjectionIndex(const common::Path& path, int line_index);
 
+  void UpdateStitchIndexInfo();
+
+ private:
   NavigationLaneConfig config_;
 
   // received from topic: /apollo/perception_obstacles
@@ -146,6 +149,10 @@ class NavigationLane {
   // key: line index,
   // value: last projection index pair in the "key" line.
   std::unordered_map<int, ProjIndexPair> last_project_index_map_;
+
+  // key: line index,
+  // value: stitching index pair in the "key" line.
+  std::unordered_map<int, StitchIndexPair> stitch_index_map_;
 
   // in world coordination: ENU
   localization::Pose original_pose_;
