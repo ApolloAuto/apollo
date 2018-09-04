@@ -111,6 +111,10 @@ void FeatureExtractor::ExtractNeighborLaneFeatures(
 }
 
 void FeatureExtractor::ExtractFrontJunctionFeatures() {
+  if (ego_trajectory_containter_ == nullptr) {
+    AERROR << "Null ego trajectory container";
+    return;
+  }
   JunctionInfoPtr junction = ego_trajectory_containter_->ADCJunction();
   if (junction != nullptr) {
     scenario_feature_.set_junction_id(junction->id().id());
