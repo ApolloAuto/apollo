@@ -41,6 +41,19 @@ message NaviPlannerConfig {
   optional apollo.planning.NaviObstacleDeciderConfig  navi_obstacle_decider_config = 4;
 }
 
+enum ScenarioType {
+  LANE_FOLLOW = 0;
+};
+
+message LaneFollowScenarioConfig {
+  repeated TaskType task = 1;
+  optional apollo.planning.DpPolyPathConfig dp_poly_path_config = 2;
+  optional apollo.planning.DpStSpeedConfig dp_st_speed_config = 3;
+  optional apollo.planning.QpSplinePathConfig qp_spline_path_config = 4;
+  optional apollo.planning.QpStSpeedConfig qp_st_speed_config = 5;
+  optional apollo.planning.PolyStSpeedConfig poly_st_speed_config = 6;
+}
+
 message PlanningConfig {
   enum PlannerType {
     RTK = 0;
@@ -55,10 +68,7 @@ message PlanningConfig {
 
   optional NaviPlannerConfig navi_planner_config = 3;
 
-  enum ScenarioType {
-    LANE_FOLLOW = 0;
-  };
-  optional ScenarioType scenario_type = 4 [default = LANE_FOLLOW];
+  optional OpenSpacePlannerConfig open_space_planner_config = 4;
 
-  optional OpenSpacePlannerConfig open_space_planner_config = 5;
+  optional LaneFollowScenarioConfig lane_follow_scenario_config = 5;
 }
