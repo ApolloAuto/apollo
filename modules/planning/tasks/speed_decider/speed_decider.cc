@@ -44,7 +44,8 @@ using apollo::perception::PerceptionObstacle;
 SpeedDecider::SpeedDecider() : Task("SpeedDecider") {}
 
 bool SpeedDecider::Init(const PlanningConfig& config) {
-  dp_st_speed_config_ = config.em_planner_config().dp_st_speed_config();
+  dp_st_speed_config_ =
+      config.lane_follow_scenario_config().dp_st_speed_config();
   st_boundary_config_ = dp_st_speed_config_.st_boundary_config();
   return true;
 }
@@ -93,8 +94,7 @@ SpeedDecider::StPosition SpeedDecider::GetStPosition(
       st_position = CROSS;
 
       // check if KEEP_CLEAR obstacle is "crossable"
-      if (st_boundary.boundary_type() ==
-          StBoundary::BoundaryType::KEEP_CLEAR) {
+      if (st_boundary.boundary_type() == StBoundary::BoundaryType::KEEP_CLEAR) {
         const auto& last_speed_point = speed_profile.speed_vector().back();
         double last_speed_point_v = 0.0;
         if (last_speed_point.has_v()) {
@@ -109,7 +109,7 @@ SpeedDecider::StPosition SpeedDecider::GetStPosition(
                 (last_speed_point.t() - last_2nd_speed_point.t());
           }
         }
-        constexpr double kKeepClearSlowSpeed = 4.0;    // m/s
+        constexpr double kKeepClearSlowSpeed = 4.0;  // m/s
         if (last_speed_point.s() <= st_boundary.max_s() &&
             last_speed_point_v < kKeepClearSlowSpeed) {
           st_position = BELOW;
@@ -286,8 +286,7 @@ bool SpeedDecider::CreateStopDecision(const PathObstacle& path_obstacle,
   stop_point->set_z(0.0);
   stop->set_stop_heading(fence_point.heading());
 
-  if (boundary.boundary_type() ==
-      StBoundary::BoundaryType::KEEP_CLEAR) {
+  if (boundary.boundary_type() == StBoundary::BoundaryType::KEEP_CLEAR) {
     stop->set_reason_code(StopReasonCode::STOP_REASON_CLEAR_ZONE);
   }
 
