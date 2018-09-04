@@ -42,7 +42,7 @@ class DpStGraphTest : public ::testing::Test {
     FLAGS_planning_config_file = "modules/planning/conf/planning_config.pb.txt";
     CHECK(apollo::common::util::GetProtoFromFile(FLAGS_planning_config_file,
                                                  &config));
-    dp_config_ = config.em_planner_config().dp_st_speed_config();
+    dp_config_ = config.lane_follow_scenario_config().dp_st_speed_config();
 
     // speed_limit:
     for (float s = 0; s < 200.0; s += 1.0) {

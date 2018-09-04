@@ -47,7 +47,8 @@ DpStSpeedOptimizer::DpStSpeedOptimizer()
     : SpeedOptimizer("DpStSpeedOptimizer") {}
 
 bool DpStSpeedOptimizer::Init(const PlanningConfig& config) {
-  dp_st_speed_config_ = config.em_planner_config().dp_st_speed_config();
+  dp_st_speed_config_ =
+      config.lane_follow_scenario_config().dp_st_speed_config();
   st_boundary_config_ = dp_st_speed_config_.st_boundary_config();
   is_init_ = true;
   return true;
