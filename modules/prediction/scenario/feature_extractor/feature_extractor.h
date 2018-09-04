@@ -22,6 +22,7 @@
 #define MODULES_PREDICTION_SCENARIO_FEATURE_EXTRACTOR_FEATURE_EXTRACTOR_H_
 
 #include <memory>
+#include <vector>
 
 #include "modules/map/hdmap/hdmap_common.h"
 #include "modules/prediction/proto/scenario_feature.pb.h"
