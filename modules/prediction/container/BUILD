@@ -14,6 +14,7 @@ cc_library(
         "//modules/prediction/container/obstacles:obstacles_container",
         "//modules/prediction/container/pose:pose_container",
         "@glog//:glog",
+        "@gtest//:main",
     ],
 )
 
