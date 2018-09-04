@@ -32,7 +32,7 @@
  * 定义实现LidarProcess类，用于处理激光雷达数据。
  * init()函数：RegistAllAlgorithm()函数注册激光雷达处理函数，分别是HdmapROIFilter，CNNSegmentation，MinBoxObjectBuilder，HmObjectTracker其对应的时激光雷达数据处理流程。InitFrameDependence()函数配置HD map。InitAlgorithmPlugin()函数将roi_filter_,segmentor_,object_builder_,tracker_实例化，可能是只作为插件，并调用其init()方法。
  * Process(const sensor_msgs::PointCloud2& message)函数：调用GetVelodyneTrans()函数获取velodyne2world坐标系转化关系，调用TransPointCloudToPCL()函数由Lidar数据生成PCL，存入point_cloud变量。然后调用Process(timestamp_, point_cloud, velodyne_trans)函数。
- * Process(timestamp_, point_cloud, velodyne_trans)函数：hdmap_input_->GetROI()函数从HD map获取ROI；roi_filter_->Filter()函数获取ROI的索引indices；segmentor_->Segment()函数对根据indices对障碍物进行分割，object_builder_->Build()函数重建障碍物，构成6变形；tracker_->Track()函数	预测障碍物运动轨迹。这是perception算法的核心部分，其四个步骤分别使用四中不同的算法，详细算法需要进一步研究。此步结束之后，对激光雷达数据处理结束，剩余部分就是合成障碍物，然后发布出去。
+ * Process(timestamp_, point_cloud, velodyne_trans)函数：hdmap_input_->GetROI()函数从HD map获取ROI；roi_filter_->Filter()函数获取ROI的索引indices；segmentor_->Segment()函数对根据indices对障碍物进行分割，object_builder_->Build()函数重建障碍物，构成6边形；tracker_->Track()函数	预测障碍物运动轨迹。这是perception算法的核心部分，其四个步骤分别使用四种不同的算法，详细算法需要进一步研究。此步结束之后，对激光雷达数据处理结束，剩余部分就是合成障碍物，然后发布出去。
 
 ### HD map的引入：
  * HD map的引入是通过hdmap_input.cc和hdmap_input.h文件实现，通过定义HDMapInput类表述和操作HD map。
