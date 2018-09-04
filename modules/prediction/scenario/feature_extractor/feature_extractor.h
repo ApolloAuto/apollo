@@ -24,6 +24,8 @@
 #include <memory>
 #include <vector>
 
+#include "gtest/gtest.h"
+
 #include "modules/map/hdmap/hdmap_common.h"
 #include "modules/prediction/proto/scenario_feature.pb.h"
 #include "modules/prediction/container/container_manager.h"
@@ -55,6 +57,8 @@ class FeatureExtractor {
    * @return Scenario features
    */
   const ScenarioFeature& GetScenarioFeatures() const;
+
+  FRIEND_TEST(FeatureExtractorTest, junction);
 
  private:
   void ExtractEgoVehicleFeatures();

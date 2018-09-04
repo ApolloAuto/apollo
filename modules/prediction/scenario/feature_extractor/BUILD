@@ -16,6 +16,7 @@ cc_library(
         "//modules/prediction/container:container_manager",
         "//modules/prediction/container/adc_trajectory:adc_trajectory_container",
         "//modules/prediction/container/pose:pose_container",
+        "@gtest//:main",
     ],
 )
 
@@ -30,6 +31,7 @@ cc_test(
     deps = [
         "//modules/prediction/common:kml_map_based_test",
         "//modules/prediction/common:prediction_gflags",
+        "//modules/prediction/container:container_manager",
         ":feature_extractor",
         "@gtest//:main",
     ],
