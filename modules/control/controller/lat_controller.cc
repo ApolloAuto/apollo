@@ -126,6 +126,8 @@ bool LatController::LoadControlConf(const ControlConf *control_conf) {
   lqr_eps_ = control_conf->lat_controller_conf().eps();
   lqr_max_iteration_ = control_conf->lat_controller_conf().max_iteration();
 
+  query_relative_time_ = control_conf->query_relative_time();
+
   minimum_speed_protection_ = control_conf->minimum_speed_protection();
 
   return true;
@@ -274,7 +276,8 @@ Status LatController::ComputeControlCommand(
 
   auto target_tracking_trajectory = *planning_published_trajectory;
 
-  if (FLAGS_use_navigation_mode) {
+  if (FLAGS_use_navigation_mode &&
+      FLAGS_enable_navigation_mode_position_update) {
     auto time_stamp_diff =
         planning_published_trajectory->header().timestamp_sec() -
         current_trajectory_timestamp_;
@@ -545,9 +548,14 @@ void LatController::ComputeLateralErrors(
     const double x, const double y, const double theta, const double linear_v,
     const double angular_v, const TrajectoryAnalyzer &trajectory_analyzer,
     SimpleLateralDebug *debug) {
-  TrajectoryPoint target_point =
-      trajectory_analyzer.QueryNearestPointByPosition(x, y);
-
+  TrajectoryPoint target_point;
+  if (FLAGS_use_navigation_mode  &&
+      !FLAGS_enable_navigation_mode_position_update) {
+    target_point = trajectory_analyzer.QueryNearestPointByAbsoluteTime(
+        Clock::NowInSeconds() + query_relative_time_);
+  } else {
+    target_point = trajectory_analyzer.QueryNearestPointByPosition(x, y);
+  }
   const double dx = x - target_point.path_point().x();
   const double dy = y - target_point.path_point().y();
 
@@ -558,7 +566,7 @@ void LatController::ComputeLateralErrors(
   const double sin_target_heading = std::sin(target_point.path_point().theta());
 
   double lateral_error = cos_target_heading * dy - sin_target_heading * dx;
-  if (FLAGS_enable_navigation_mode_handlilng) {
+  if (FLAGS_enable_navigation_mode_error_filter) {
     lateral_error = lateral_error_filter_.Update(lateral_error);
   }
 
@@ -566,7 +574,7 @@ void LatController::ComputeLateralErrors(
 
   double heading_error =
       common::math::NormalizeAngle(theta - target_point.path_point().theta());
-  if (FLAGS_enable_navigation_mode_handlilng) {
+  if (FLAGS_enable_navigation_mode_error_filter) {
     heading_error = heading_error_filter_.Update(heading_error);
   }
   debug->set_heading_error(heading_error);
