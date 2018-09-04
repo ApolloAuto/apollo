@@ -57,3 +57,7 @@ message TrajectoryPointwiseFeature{
     optional PathPointwiseFeature path_input_feature= 1;
     optional SpeedPointwiseFeature speed_input_feature= 2;
 }
+
+message TrajectoryFeature {
+    repeated TrajectoryPointwiseFeature point_feature = 1;
+}
