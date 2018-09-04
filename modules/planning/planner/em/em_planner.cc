@@ -408,10 +408,12 @@ SpeedData EMPlanner::GenerateFallbackSpeedProfile(
   const double init_v = reference_line_info.AdcPlanningPoint().v();
   const double init_a = reference_line_info.AdcPlanningPoint().a();
   if (init_v > FLAGS_polynomial_speed_fallback_velocity) {
-    return GenerateStopProfileFromPolynomial(init_v, init_a);
-  } else {
-    return GenerateStopProfile(init_v, init_a);
+    auto speed_data = GenerateStopProfileFromPolynomial(init_v, init_a);
+    if (!speed_data.Empty()) {
+      return speed_data;
+    }
   }
+  return GenerateStopProfile(init_v, init_a);
 }
 
 SpeedData EMPlanner::GenerateStopProfile(const double init_speed,
