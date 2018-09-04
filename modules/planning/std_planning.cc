@@ -22,8 +22,6 @@
 #include <utility>
 #include <vector>
 
-#include "google/protobuf/repeated_field.h"
-
 #include "modules/routing/proto/routing.pb.h"
 
 #include "modules/common/adapters/adapter_manager.h"

@@ -36,8 +36,6 @@
 #include "modules/planning/common/trajectory/publishable_trajectory.h"
 #include "modules/planning/planner/planner.h"
 #include "modules/planning/planner/planner_dispatcher.h"
-#include "modules/planning/scenarios/scenario.h"
-#include "modules/planning/scenarios/scenario_manager.h"
 
 /**
  * @namespace apollo::planning
@@ -93,16 +91,6 @@ class PlanningBase : public apollo::common::ApolloApp {
   std::unique_ptr<PublishableTrajectory> last_publishable_trajectory_;
   ros::Timer timer_;
   std::unique_ptr<PlannerDispatcher> planner_dispatcher_;
-
- private:
-  void RegisterScenarios();
-  void Process() {
-    scenario_manager_.Update();
-    scenario_ = scenario_manager_.mutable_scenario();
-  }
-
-  ScenarioManager scenario_manager_;
-  Scenario* scenario_;
 };
 
 }  // namespace planning
