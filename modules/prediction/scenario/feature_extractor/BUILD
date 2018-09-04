@@ -19,4 +19,20 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "feature_extractor_test",
+    size = "small",
+    srcs = ["feature_extractor_test.cc"],
+    data = [
+        "//modules/prediction:prediction_data",
+        "//modules/prediction:prediction_testdata",
+    ],
+    deps = [
+        "//modules/prediction/common:kml_map_based_test",
+        "//modules/prediction/common:prediction_gflags",
+        ":feature_extractor",
+        "@gtest//:main",
+    ],
+)
+
 cpplint()
