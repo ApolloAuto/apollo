@@ -14,6 +14,8 @@ cc_library(
         "//modules/planning/common:frame_open_space",
         "//modules/planning/common:reference_line_info",
         "//modules/planning/proto:planning_proto",
+        "//modules/planning/scenarios:scenario_lib",
+        "//modules/planning/scenarios:scenario_manager",
     ],
 )
 
