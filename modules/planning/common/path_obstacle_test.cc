@@ -454,5 +454,6 @@ TEST(PathObstacleTest, add_decision_test) {
     EXPECT_TRUE(path_obstacle.HasLongitudinalDecision());
     EXPECT_TRUE(path_obstacle.LongitudinalDecision().has_stop());
   }
+}
 }  // namespace planning
 }  // namespace apollo
