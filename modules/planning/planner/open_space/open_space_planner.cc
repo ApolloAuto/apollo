@@ -41,19 +41,31 @@ apollo::common::Status OpenSpacePlanner::Plan(
 
   // TODO(JinYun) : cleaning up : load control configs from VehicleParam at
   // initialization
+
   // horizon
   std::size_t horizon = 80;
+
   // nominal sampling time
   float ts = 0.1;
 
+  // load vehicle configuration
+  vehicle_param_ =
+    common::VehicleConfigHelper::instance()->GetConfig().vehicle_param();
+  double front_to_center_ = vehicle_param_.front_edge_to_center();
+  double back_to_center_ = vehicle_param_.back_edge_to_center();
+  double left_to_center_ = vehicle_param_.left_edge_to_center();
+  double right_to_center_ = vehicle_param_.right_edge_to_center();
   Eigen::MatrixXd ego(4, 1);
-  ego << 3.7, 1, 1, 1;
+  ego << front_to_center_, back_to_center_, left_to_center_, right_to_center_;
 
   // initial state
-
-  // TODO(JinYun): Step 1 : Get initial state from VehicleState when enabled.
+  init_state_ = frame->vehicle_state();
+  init_x_ = init_state_.x();
+  init_y_ = init_state_.y();
+  init_phi_ = init_state_.heading();
+  init_v_ = init_state_.linear_velocity();
   Eigen::MatrixXd x0(4, 1);
-  x0 << -12, 11, 0, 0;
+  x0 << init_x_, init_y_, init_phi_, init_v_;
 
   // std::vector<double> x0({-12, 11, 0, 0});
 
@@ -165,7 +177,7 @@ Status OpenSpacePlanner::ObsHRep(
   /*
   CHECK(nOb == lOb.rows()) << "No. of obstacles size mismatch, nOb : " << nOb
                            << ", lOb.rows() : " << lOb.rows();
-*/
+  */
   A_all->resize(vOb.sum(), 2);
   b_all->resize(vOb.sum(), 1);
 
