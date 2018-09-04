@@ -25,7 +25,5 @@ namespace planning {
 
 const std::string& Scenario::Name() const { return name_; }
 
-bool Scenario::Init() { return true; }
-
 }  // namespace planning
 }  // namespace apollo

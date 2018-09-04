@@ -27,21 +27,11 @@
 namespace apollo {
 namespace planning {
 
-TEST(EMPlannerTest, GenerateFallbackSpeedProfile) {
+TEST(EMPlannerTest, Simple) {
   EMPlanner em;
-  ReferenceLineInfo reference_line_info;
-  auto speed_data = em.GenerateFallbackSpeedProfile(reference_line_info);
-  EXPECT_FALSE(speed_data.Empty());
-
-  common::VehicleState vehicle_state;
-  common::TrajectoryPoint adc_planning_point;
-  ReferenceLine reference_line;
-  hdmap::RouteSegments segments;
-  adc_planning_point.set_v(FLAGS_polynomial_speed_fallback_velocity + 0.1);
-  ReferenceLineInfo reference_line_info2(vehicle_state, adc_planning_point,
-                                         reference_line, segments);
-  auto speed_data2 = em.GenerateFallbackSpeedProfile(reference_line_info);
-  EXPECT_FALSE(speed_data2.Empty());
+  PlanningConfig config;
+  EXPECT_EQ(em.Name(), "EM");
+  EXPECT_EQ(em.Init(config), common::Status::OK());
 }
 
 }  // namespace planning
