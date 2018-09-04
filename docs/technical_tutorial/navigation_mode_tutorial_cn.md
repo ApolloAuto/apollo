@@ -1,4 +1,6 @@
-### 1. 教程简介
+###Apollo导航模式教程
+
+#### 1. 教程简介
 
 无人驾驶系统利用实时感知信息和静态地图信息构建出完整驾驶环境，并在构建的环境中，依据routing数据，规划出行车轨迹，并由控制模块执行完成。Apollo导航模式在上述的框架下，针对高速、乡村道路等简单道路场景，进行了以下的提升：
 
@@ -28,7 +30,7 @@
 - 下载 [Apollo2.5 demo bag](https://github.com/ApolloAuto/apollo/releases/download/v2.5.0/demo_2.5.bag)
 
 
-### 3. 配置导航模式
+#### 2. 配置导航模式
 
 在导航模式下，有以下几个参数需要进行配置：
 
@@ -74,9 +76,7 @@ in_dev_docker:/apollo$ cd /apollo/modules/tools/navigation/config/
 in_dev_docker:/apollo/modules/tools/navigation/config$ python navi_config.py default.ini
 ```
 
-
-
-### 4. 云端指引者的使用
+#### 3. 云端指引者的使用
 
 ##### 回放demo bag
 
@@ -117,7 +117,7 @@ in_dev_docker:/apollo/data$rosbag play demo_2.5.bag
 
 以上就是云端指引者的调用过程。
 
-### 5.  离线指引者工具的使用 
+#### 4.  离线指引者工具的使用 
 
 目前云端指引者只覆盖了有限的区域。除了云端的服务之外，我们还提供了离线指引者工具来制作和发送线下指引线。在本教程中，我们以[Apollo2.5 demo bag](https://github.com/ApolloAuto/apollo/releases/download/v2.5.0/demo_2.5.bag)为例来生成指引线。
 
@@ -168,7 +168,7 @@ in_dev_docker:/apollo/modules/tools/navigator$python navigator.py path_demo_2.5.
 
 ![img](images/navigation_mode_tutorial/navigation_mode_4_offline.png)
 
-### 6. 规划模块的调试
+#### 5. 规划模块的调试
 
 ##### 调试数据准备
 
@@ -207,7 +207,7 @@ in_dev_docker:/apollo/data$rosbag play demo_2.5_no_planning.bag
 
 ![img](images/navigation_mode_tutorial/navigation_mode_6_live_planning.png)
 
-我们看到实时计算的车辆的规划轨迹显示在Dreamview中。这是你可以试着更改一些规划模块的配置
+我们看到实时计算的车辆的规划轨迹显示在Dreamview中。这时你可以试着更改一些规划模块的配置
 
 ```
 in_dev_docker:/apollo/modules/planning/conf$planning_config_navi.pb.txt
@@ -215,7 +215,7 @@ in_dev_docker:/apollo/modules/planning/conf$planning_config_navi.pb.txt
 
 去了解，这些参数会对规划结果有什么影响。或者修改规划算法的代码，进行调试。
 
-### 7.结束
+#### 6.结束
 
 恭喜你完成了本教程。现在你应该了解
 
