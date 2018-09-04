@@ -60,6 +60,8 @@ Status NaviPlanning::Init() {
       << "failed to load planning config file " << FLAGS_planning_config_file;
   CheckPlanningConfig();
 
+  planner_dispatcher_->Init();
+
   CHECK(apollo::common::util::GetProtoFromFile(
       FLAGS_traffic_rule_config_filename, &traffic_rule_configs_))
       << "Failed to load traffic rule config file "
@@ -83,8 +85,7 @@ Status NaviPlanning::Init() {
 
   AdapterManager::AddPlanningPadCallback(&NaviPlanning::OnPad, this);
 
-  RegisterPlanners();
-  planner_ = planner_factory_.CreateObject(config_.planner_type());
+  planner_ = planner_dispatcher_->DispatchPlanner();
   if (!planner_) {
     return Status(
         ErrorCode::PLANNING_ERROR,

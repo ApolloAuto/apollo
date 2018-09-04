@@ -56,8 +56,11 @@ DEFINE_bool(enable_slope_offset, false, "Enable slope offset compensation");
 DEFINE_double(lock_steer_speed, 0.081,
               "Minimum speed to lock the steer, in m/s");
 
-DEFINE_bool(enable_navigation_mode_handlilng, false,
-            "Enable special handling for navigation mode");
+DEFINE_bool(enable_navigation_mode_error_filter, false,
+            "Enable error_filter for navigation mode");
+
+DEFINE_bool(enable_navigation_mode_position_update, true,
+            "Enable position update for navigation mode");
 
 DEFINE_bool(enable_persistent_estop, false,
             "True to persistent keep estop status, "

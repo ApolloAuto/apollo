@@ -60,6 +60,8 @@ class OpenSpacePlanner : public Planner {
    */
   virtual ~OpenSpacePlanner() = default;
 
+  std::string Name() override { return "OPEN_SPACE"; }
+
   apollo::common::Status Init(const PlanningConfig& config) override;
 
   /**

@@ -51,6 +51,8 @@ class RTKReplayPlanner : public PlannerWithReferenceLine {
    */
   virtual ~RTKReplayPlanner() = default;
 
+  std::string Name() override { return "RTK"; }
+
   apollo::common::Status Init(const PlanningConfig& config) override;
 
   /**

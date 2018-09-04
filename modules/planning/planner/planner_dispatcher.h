@@ -14,45 +14,47 @@
  * limitations under the License.
  *****************************************************************************/
 
-/**
- * @file
- **/
+#ifndef MODULES_PLANNING_PLANNER_PLANNER_DISPATCHER_H_
+#define MODULES_PLANNING_PLANNER_PLANNER_DISPATCHER_H_
 
-#ifndef MODULES_PLANNING_SCENARIOS_SCENARIO_H_
-#define MODULES_PLANNING_SCENARIOS_SCENARIO_H_
-
+#include <memory>
 #include <string>
-
-#include "modules/planning/proto/planning_config.pb.h"
 
 #include "modules/common/status/status.h"
 #include "modules/common/util/factory.h"
-#include "modules/planning/common/frame.h"
+#include "modules/planning/planner/planner.h"
 
+/**
+ * @namespace apollo::planning
+ * @brief apollo::planning
+ */
 namespace apollo {
 namespace planning {
 
-class Scenario {
+/**
+ * @class planning
+ *
+ * @brief PlannerDispatcher module main class.
+ */
+class PlannerDispatcher {
  public:
-  Scenario() = default;
+  PlannerDispatcher() = default;
+  virtual ~PlannerDispatcher() = default;
 
-  explicit Scenario(const std::string& name) : name_(name) {}
+  virtual common::Status Init() {
+    RegisterPlanners();
+    return common::Status::OK();
+  }
 
-  virtual ~Scenario() = default;
-
-  virtual const std::string& Name() const;
-
-  virtual bool Init(const PlanningConfig& config) = 0;
-
-  virtual common::Status Process(
-      const common::TrajectoryPoint& planning_init_point, Frame* frame) = 0;
+  virtual std::unique_ptr<Planner> DispatchPlanner() = 0;
 
  protected:
-  bool is_init_ = false;
-  const std::string name_;
+  void RegisterPlanners();
+
+  common::util::Factory<PlanningConfig::PlannerType, Planner> planner_factory_;
 };
 
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_SCENARIOS_SCENARIO_H_
+#endif  // MODULES_PLANNING_PLANNER_PLANNER_DISPATCHER_H_

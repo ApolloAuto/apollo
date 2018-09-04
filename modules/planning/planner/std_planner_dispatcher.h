@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,27 +14,37 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/planning/planner/em/em_planner.h"
+#ifndef MODULES_PLANNING_PLANNER_STD_PLANNER_DISPATCHER_H_
+#define MODULES_PLANNING_PLANNER_STD_PLANNER_DISPATCHER_H_
 
+#include <memory>
+#include <string>
+
+#include "modules/common/status/status.h"
+#include "modules/common/util/factory.h"
+#include "modules/planning/planner/planner_dispatcher.h"
+
+/**
+ * @namespace apollo::planning
+ * @brief apollo::planning
+ */
 namespace apollo {
 namespace planning {
 
-using common::Status;
-using common::TrajectoryPoint;
+/**
+ * @class planning
+ *
+ * @brief PlannerDispatcher module main class.
+ */
+class StdPlannerDispatcher final : public PlannerDispatcher {
+ public:
+  StdPlannerDispatcher() = default;
+  virtual ~StdPlannerDispatcher() = default;
 
-Status EMPlanner::Init(const PlanningConfig& config) {
-  config_ = config;
-  scenario_manager_.Init();
-  return Status::OK();
-}
-
-Status EMPlanner::Plan(const TrajectoryPoint& planning_start_point,
-                       Frame* frame) {
-  scenario_manager_.Update();
-  scenario_ = scenario_manager_.mutable_scenario();
-  scenario_->Init(config_);  // init will be skipped if it was called before
-  return scenario_->Process(planning_start_point, frame);
-}
+  std::unique_ptr<Planner> DispatchPlanner() override;
+};
 
 }  // namespace planning
 }  // namespace apollo
+
+#endif  // MODULES_PLANNING_PLANNER_STD_PLANNER_DISPATCHER_H_
