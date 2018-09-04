@@ -349,8 +349,7 @@ std::shared_ptr<const LaneInfo> PredictionMap::GetNeighborLane(
     const double threshold) {
   double ego_s = 0.0;
   double ego_l = 0.0;
-  GetProjection({ego_position.x(), ego_position.y()},
-      ptr_ego_lane, &ego_s, &ego_l);
+  GetProjection(ego_position, ptr_ego_lane, &ego_s, &ego_l);
 
   double s_diff_min = std::numeric_limits<double>::max();
   std::shared_ptr<const LaneInfo> ptr_lane_min = nullptr;
@@ -359,7 +358,7 @@ std::shared_ptr<const LaneInfo> PredictionMap::GetNeighborLane(
     std::shared_ptr<const LaneInfo> ptr_lane = LaneById(lane_id);
     double s = -1.0;
     double l = 0.0;
-    GetProjection({ego_position.x(), ego_position.y()}, ptr_lane, &s, &l);
+    GetProjection(ego_position, ptr_lane, &s, &l);
 
     double s_diff = std::fabs(s - ego_s);
     if (s_diff < s_diff_min) {
