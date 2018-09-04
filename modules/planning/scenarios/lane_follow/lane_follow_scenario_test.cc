@@ -24,6 +24,8 @@
 
 #include "gtest/gtest.h"
 
+#include "modules/planning/common/planning_gflags.h"
+
 namespace apollo {
 namespace planning {
 
@@ -34,12 +36,31 @@ class LaneFollowScenarioTest : public ::testing::Test {
  protected:
   std::unique_ptr<LaneFollowScenario> scenario_;
 };
-
 TEST_F(LaneFollowScenarioTest, Simple) {
   scenario_.reset(new LaneFollowScenario());
+  PlanningConfig config;
+  EXPECT_TRUE(scenario_->Init(config));
+}
+
+TEST_F(LaneFollowScenarioTest, GenerateFallbackSpeedProfile) {
+  scenario_.reset(new LaneFollowScenario());
   EXPECT_EQ(scenario_->Name(), "LaneFollowScenario");
-  EXPECT_TRUE(scenario_->Init());
-  EXPECT_EQ(scenario_->Process(), common::Status::OK());
+
+  ReferenceLineInfo reference_line_info;
+  auto speed_data =
+      scenario_->GenerateFallbackSpeedProfile(reference_line_info);
+  EXPECT_FALSE(speed_data.Empty());
+
+  common::VehicleState vehicle_state;
+  common::TrajectoryPoint adc_planning_point;
+  ReferenceLine reference_line;
+  hdmap::RouteSegments segments;
+  adc_planning_point.set_v(FLAGS_polynomial_speed_fallback_velocity + 0.1);
+  ReferenceLineInfo reference_line_info2(vehicle_state, adc_planning_point,
+                                         reference_line, segments);
+  auto speed_data2 =
+      scenario_->GenerateFallbackSpeedProfile(reference_line_info);
+  EXPECT_FALSE(speed_data2.Empty());
 }
 
 }  // namespace planning
