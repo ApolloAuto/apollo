@@ -53,7 +53,10 @@ void FeatureExtractor::ExtractFeatures() {
   auto ego_trajectory_point = pose_container_->GetPosition();
   Vec2d ego_position(ego_trajectory_point.x(), ego_trajectory_point.y());
 
-  ExtractEgoLaneFeatures(ego_position);
+  auto ptr_ego_lane = GetEgoLane(ego_position);
+  ExtractEgoLaneFeatures(ptr_ego_lane, ego_position);
+
+  ExtractNeighborLaneFeatures(ptr_ego_lane, ego_position);
 
   ExtractFrontJunctionFeatures();
   // TODO(all) other processes
@@ -70,20 +73,41 @@ void FeatureExtractor::ExtractEgoVehicleFeatures() {
   // TODO(all): add acceleration if needed
 }
 
-void FeatureExtractor::ExtractEgoLaneFeatures(const Vec2d& ego_position) {
-  LaneInfoPtr ego_lane_info = GetEgoLane(ego_position);
-  if (ego_lane_info == nullptr) {
+void FeatureExtractor::ExtractEgoLaneFeatures(const LaneInfoPtr& ptr_ego_lane,
+    const common::math::Vec2d& ego_position) {
+
+  if (ptr_ego_lane == nullptr) {
     AERROR << "Ego vehicle is not on any lane.";
     return;
   }
-  scenario_feature_.set_curr_lane_id(ego_lane_info->id().id());
+  scenario_feature_.set_curr_lane_id(ptr_ego_lane->id().id());
   double curr_lane_s = 0.0;
   double curr_lane_l = 0.0;
-  ego_lane_info->GetProjection(ego_position, &curr_lane_s, &curr_lane_l);
+  ptr_ego_lane->GetProjection(ego_position, &curr_lane_s, &curr_lane_l);
   scenario_feature_.set_curr_lane_s(curr_lane_s);
 }
 
-void FeatureExtractor::ExtractNeighborLaneFeatures(const Vec2d& ego_position) {
+void FeatureExtractor::ExtractNeighborLaneFeatures(
+    const LaneInfoPtr& ptr_ego_lane, const Vec2d& ego_position) {
+
+  // TODO(all): make this a gflag
+  double threshold = 3.0;
+
+  auto ptr_left_neighbor_lane = PredictionMap::GetLeftNeighborLane(
+      ptr_ego_lane, {ego_position.x(), ego_position.y()}, threshold);
+
+  if (ptr_left_neighbor_lane != nullptr) {
+    scenario_feature_.set_left_neighbor_lane_id(
+        ptr_left_neighbor_lane->id().id());
+  }
+
+  auto ptr_right_neighbor_lane = PredictionMap::GetRightNeighborLane(
+      ptr_ego_lane, {ego_position.x(), ego_position.y()}, threshold);
+
+  if (ptr_right_neighbor_lane != nullptr) {
+    scenario_feature_.set_right_neighbor_lane_id(
+        ptr_right_neighbor_lane->id().id());
+  }
 }
 
 void FeatureExtractor::ExtractFrontJunctionFeatures() {
@@ -113,7 +137,8 @@ LaneInfoPtr FeatureExtractor::GetEgoLane(const Vec2d& ego_position) const {
 }
 
 std::vector<LaneInfoPtr> FeatureExtractor::GetNeighborLanes(
-    const LaneInfoPtr& ego_lane_info) const {
+    const LaneInfoPtr& ego_lane_info,
+    const common::math::Vec2d& ego_position) const {
 
 }
 
