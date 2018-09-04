@@ -41,4 +41,16 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "em_planner_test",
+    size = "small",
+    srcs = [
+        "em_planner_test.cc",
+    ],
+    deps = [
+        ":em_planner",
+        "@gtest//:main",
+    ],
+)
+
 cpplint()
