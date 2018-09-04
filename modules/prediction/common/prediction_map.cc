@@ -139,21 +139,20 @@ void PredictionMap::OnLane(
   std::vector<std::shared_ptr<const LaneInfo>> candidate_lanes;
 
   common::PointENU hdmap_point;
-  hdmap_point.set_x(point[0]);
-  hdmap_point.set_y(point[1]);
+  hdmap_point.set_x(point.x());
+  hdmap_point.set_y(point.y());
   if (HDMapUtil::BaseMap().GetLanesWithHeading(hdmap_point, radius, heading,
                                                max_lane_angle_diff,
                                                &candidate_lanes) != 0) {
     return;
   }
 
-  const common::math::Vec2d vec_point(point[0], point[1]);
   std::vector<std::pair<std::shared_ptr<const LaneInfo>, double>> lane_pairs;
   for (const auto& candidate_lane : candidate_lanes) {
     if (candidate_lane == nullptr) {
       continue;
     }
-    if (on_lane && !candidate_lane->IsOnLane(vec_point)) {
+    if (on_lane && !candidate_lane->IsOnLane({point.x(), point.y()})) {
       continue;
     }
     if (!FLAGS_use_navigation_mode &&
@@ -165,7 +164,7 @@ void PredictionMap::OnLane(
     }
     double distance = 0.0;
     common::PointENU nearest_point =
-        candidate_lane->GetNearestPoint(vec_point, &distance);
+        candidate_lane->GetNearestPoint({point.x(), point.y()}, &distance);
     double nearest_point_heading = PathHeading(candidate_lane, nearest_point);
     double diff =
         std::fabs(common::math::AngleDiff(heading, nearest_point_heading));
@@ -270,7 +269,7 @@ void PredictionMap::NearbyLanesByCurrentLanes(
     const int max_num_lane,
     std::vector<std::shared_ptr<const LaneInfo>>* nearby_lanes) {
   if (lanes.size() == 0) {
-    std::vector<std::shared_ptr<const LaneInfo>> prev_lanes(0);
+    std::vector<std::shared_ptr<const LaneInfo>> prev_lanes;
     OnLane(prev_lanes, point, heading, radius, false, max_num_lane,
            FLAGS_max_lane_angle_diff, nearby_lanes);
   } else {
