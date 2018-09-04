@@ -44,9 +44,6 @@ FeatureExtractor::FeatureExtractor() {
           AdapterConfig::LOCALIZATION));
 }
 
-FeatureExtractor::~FeatureExtractor() {
-}
-
 void FeatureExtractor::ExtractFeatures() {
   ExtractEgoVehicleFeatures();
 
@@ -59,7 +56,10 @@ void FeatureExtractor::ExtractFeatures() {
   ExtractNeighborLaneFeatures(ptr_ego_lane, ego_position);
 
   ExtractFrontJunctionFeatures();
-  // TODO(all) other processes
+
+  ExtractObstacleFeatures();
+
+  // TODO(all): add other features
 }
 
 const ScenarioFeature& FeatureExtractor::GetScenarioFeatures() const {
@@ -89,6 +89,11 @@ void FeatureExtractor::ExtractEgoLaneFeatures(const LaneInfoPtr& ptr_ego_lane,
 
 void FeatureExtractor::ExtractNeighborLaneFeatures(
     const LaneInfoPtr& ptr_ego_lane, const Vec2d& ego_position) {
+
+  if (ptr_ego_lane == nullptr) {
+    AERROR << "Ego vehicle is not on any lane.";
+    return;
+  }
 
   // TODO(all): make this a gflag
   double threshold = 3.0;
@@ -126,7 +131,6 @@ void FeatureExtractor::ExtractFrontJunctionFeatures() {
 void FeatureExtractor::ExtractObstacleFeatures() {
 }
 
-
 LaneInfoPtr FeatureExtractor::GetEgoLane(const Vec2d& ego_position) const {
   const auto& trajectory =
       ego_trajectory_containter_->adc_trajectory();
@@ -138,12 +142,6 @@ LaneInfoPtr FeatureExtractor::GetEgoLane(const Vec2d& ego_position) const {
     }
   }
   return nullptr;
-}
-
-std::vector<LaneInfoPtr> FeatureExtractor::GetNeighborLanes(
-    const LaneInfoPtr& ego_lane_info,
-    const common::math::Vec2d& ego_position) const {
-
 }
 
 }  // namespace prediction
