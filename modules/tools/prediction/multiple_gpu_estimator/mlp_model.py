@@ -39,7 +39,7 @@ import model_base
 dim_input = 62
 dim_hidden_1 = 30
 dim_hidden_2 = 15
-dim_output = 1
+dim_output = 2
 
 
 class MlpModel(model_base.ModelBase):
