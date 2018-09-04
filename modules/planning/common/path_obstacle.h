@@ -54,7 +54,7 @@ namespace planning {
  * Lateral decision includes: nudge, ignore.
  * Lateral decision saftey priority: nudge > ignore.
  * Longitudinal decision includes: stop, yield, follow, overtake, ignore.
- * Decision saftey priorities order: stop > yield >= follow > overtake > ignore
+ * Decision safety priorities order: stop > yield >= follow > overtake > ignore
  *
  * Ignore decision belongs to both lateral decision and longitudinal decision,
  * and it has the lowest priority.
