@@ -101,6 +101,7 @@ class EMPlanner : public PlannerWithReferenceLine {
 
   SpeedData GenerateFallbackSpeedProfile(
       const ReferenceLineInfo& reference_line_info);
+  FRIEND_TEST(EMPlannerTest, GenerateFallbackSpeedProfile);
 
   SpeedData GenerateStopProfile(const double init_speed,
                                 const double init_acc) const;
