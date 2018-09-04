@@ -61,6 +61,8 @@ class NaviPlanner : public PlannerWithReferenceLine {
 
   virtual ~NaviPlanner() = default;
 
+  std::string Name() override { return "NAVI"; }
+
   common::Status Init(const PlanningConfig& config) override;
 
   /**

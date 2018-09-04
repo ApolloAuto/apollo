@@ -21,9 +21,10 @@
 #include <string>
 #include <vector>
 
-#include "modules/planning/planning_base.h"
-
+#include "modules/common/util/thread_pool.h"
 #include "modules/planning/common/frame.h"
+#include "modules/planning/planner/std_planner_dispatcher.h"
+#include "modules/planning/planning_base.h"
 
 /**
  * @namespace apollo::planning
@@ -40,7 +41,9 @@ namespace planning {
  */
 class StdPlanning : public PlanningBase {
  public:
-  StdPlanning() = default;
+  StdPlanning() {
+    planner_dispatcher_ = std::make_unique<StdPlannerDispatcher>();
+  }
   virtual ~StdPlanning();
 
   /**

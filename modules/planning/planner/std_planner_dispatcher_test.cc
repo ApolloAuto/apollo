@@ -14,16 +14,35 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/planning/planning_dispatcher.h"
+/**
+ * @file
+ **/
 
-#include "modules/common/util/thread_pool.h"
+#include "modules/planning/planner/std_planner_dispatcher.h"
+
+#include <memory>
+
+#include "gtest/gtest.h"
+
+#include "modules/planning/planner/planner_dispatcher.h"
 
 namespace apollo {
 namespace planning {
 
-using apollo::common::util::ThreadPool;
+class StdPlannerDispatcherTest : public ::testing::Test {
+ public:
+  virtual void SetUp() {}
 
-PlanningDispatcher::~PlanningDispatcher() { ThreadPool::Stop(); }
+ protected:
+  std::unique_ptr<PlannerDispatcher> pd_;
+};
+
+TEST_F(StdPlannerDispatcherTest, Simple) {
+  pd_.reset(new StdPlannerDispatcher());
+  pd_->Init();
+  auto planner = pd_->DispatchPlanner();
+  EXPECT_EQ(planner->Name(), "EM");
+}
 
 }  // namespace planning
 }  // namespace apollo

@@ -32,10 +32,10 @@
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/apollo_app.h"
 #include "modules/common/status/status.h"
-#include "modules/common/util/factory.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/trajectory/publishable_trajectory.h"
 #include "modules/planning/planner/planner.h"
+#include "modules/planning/planner/planner_dispatcher.h"
 #include "modules/planning/scenarios/scenario.h"
 #include "modules/planning/scenarios/scenario_manager.h"
 
@@ -81,19 +81,18 @@ class PlanningBase : public apollo::common::ApolloApp {
     AdapterManager::PublishPlanning(*trajectory);
   }
 
-  void RegisterPlanners();
   bool IsVehicleStateValid(const common::VehicleState& vehicle_state);
   virtual void SetFallbackTrajectory(ADCTrajectory* cruise_trajectory);
   void CheckPlanningConfig();
 
   double start_time_ = 0.0;
-  common::util::Factory<PlanningConfig::PlannerType, Planner> planner_factory_;
   PlanningConfig config_;
   TrafficRuleConfigs traffic_rule_configs_;
   const hdmap::HDMap* hdmap_ = nullptr;
   std::unique_ptr<Planner> planner_;
   std::unique_ptr<PublishableTrajectory> last_publishable_trajectory_;
   ros::Timer timer_;
+  std::unique_ptr<PlannerDispatcher> planner_dispatcher_;
 
  private:
   void RegisterScenarios();

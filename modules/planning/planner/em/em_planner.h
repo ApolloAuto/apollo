@@ -58,6 +58,8 @@ class EMPlanner : public PlannerWithReferenceLine {
    */
   virtual ~EMPlanner() = default;
 
+  std::string Name() override { return "EM"; }
+
   common::Status Init(const PlanningConfig& config) override;
 
   /**

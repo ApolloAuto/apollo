@@ -21,6 +21,7 @@
 #ifndef MODULES_PLANNING_PLANNER_LATTICE_LATTICE_PLANNER_H_
 #define MODULES_PLANNING_PLANNER_LATTICE_LATTICE_PLANNER_H_
 
+#include <string>
 #include <vector>
 
 #include "modules/common/status/status.h"
@@ -37,6 +38,8 @@ class LatticePlanner : public PlannerWithReferenceLine {
   LatticePlanner() = default;
 
   virtual ~LatticePlanner() = default;
+
+  std::string Name() override { return "LATTICE"; }
 
   common::Status Init(const PlanningConfig& config) override {
     return common::Status::OK();
