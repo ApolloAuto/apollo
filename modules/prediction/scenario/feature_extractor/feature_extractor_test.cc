@@ -35,14 +35,7 @@ using apollo::common::adapter::AdapterConfig;
 using apollo::localization::LocalizationEstimate;
 using apollo::planning::ADCTrajectory;
 
-class FeatureExtractorTest : public KMLMapBasedTest {
- public:
-  virtual void SetUp() {}
-
- protected:
-  LocalizationEstimate localization_message_;
-  ADCTrajectory adc_trajectory_;
-};
+class FeatureExtractorTest : public KMLMapBasedTest {};
 
 TEST_F(FeatureExtractorTest, junction) {
   ContainerManager::instance()->RegisterContainers();
