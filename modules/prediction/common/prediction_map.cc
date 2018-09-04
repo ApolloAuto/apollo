@@ -312,6 +312,68 @@ void PredictionMap::NearbyLanesByCurrentLanes(
   }
 }
 
+std::shared_ptr<const LaneInfo> PredictionMap::GetLeftNeighborLane(
+    const std::shared_ptr<const LaneInfo>& ptr_ego_lane,
+    const Eigen::Vector2d& ego_position,
+    const double threshold) {
+
+  std::vector<std::string> neighbor_ids;
+  for (const auto& lane_id :
+      ptr_ego_lane->lane().left_neighbor_forward_lane_id()) {
+    neighbor_ids.push_back(lane_id.id());
+  }
+
+  return GetNeighborLane(ptr_ego_lane, ego_position, neighbor_ids,
+      threshold);
+}
+
+std::shared_ptr<const LaneInfo> PredictionMap::GetRightNeighborLane(
+    const std::shared_ptr<const LaneInfo>& ptr_ego_lane,
+    const Eigen::Vector2d& ego_position,
+    const double threshold) {
+
+  std::vector<std::string> neighbor_ids;
+  for (const auto& lane_id :
+      ptr_ego_lane->lane().right_neighbor_forward_lane_id()) {
+    neighbor_ids.push_back(lane_id.id());
+  }
+
+  return GetNeighborLane(ptr_ego_lane, ego_position, neighbor_ids,
+      threshold);
+}
+
+std::shared_ptr<const LaneInfo> PredictionMap::GetNeighborLane(
+    const std::shared_ptr<const LaneInfo>& ptr_ego_lane,
+    const Eigen::Vector2d& ego_position,
+    const std::vector<std::string>& neighbor_lane_ids,
+    const double threshold) {
+  double ego_s = 0.0;
+  double ego_l = 0.0;
+  GetProjection({ego_position.x(), ego_position.y()},
+      ptr_ego_lane, &ego_s, &ego_l);
+
+  double s_diff_min = std::numeric_limits<double>::max();
+  std::shared_ptr<const LaneInfo> ptr_lane_min = nullptr;
+
+  for (auto& lane_id : neighbor_lane_ids) {
+    std::shared_ptr<const LaneInfo> ptr_lane = LaneById(lane_id);
+    double s = -1.0;
+    double l = 0.0;
+    GetProjection({ego_position.x(), ego_position.y()}, ptr_lane, &s, &l);
+
+    double s_diff = std::fabs(s - ego_s);
+    if (s_diff < s_diff_min) {
+      s_diff_min = s_diff;
+      ptr_lane_min = ptr_lane;
+    }
+  }
+
+  if (s_diff_min > threshold) {
+    return nullptr;
+  }
+  return ptr_lane_min;
+}
+
 std::vector<std::string> PredictionMap::NearbyLaneIds(
     const Eigen::Vector2d& point, const double radius) {
   std::vector<std::string> lane_ids;
