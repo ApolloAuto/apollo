@@ -45,7 +45,7 @@ class FeatureExtractor {
   /**
    * @brief Destructor
    */
-  virtual ~FeatureExtractor();
+  virtual ~FeatureExtractor() = default;
 
   /**
    * @brief Extract features for scenario analysis
@@ -76,10 +76,6 @@ class FeatureExtractor {
   void ExtractObstacleFeatures();
 
   std::shared_ptr<const hdmap::LaneInfo> GetEgoLane(
-      const common::math::Vec2d& ego_position) const;
-
-  std::vector<std::shared_ptr<const hdmap::LaneInfo>>
-  GetNeighborLanes(const std::shared_ptr<const hdmap::LaneInfo>& ego_lane_info,
       const common::math::Vec2d& ego_position) const;
 
   ADCTrajectoryContainer* ego_trajectory_containter_;
