@@ -26,6 +26,8 @@
 #include <memory>
 #include <string>
 
+#include "gtest/gtest.h"
+
 #include "modules/common/adapters/proto/adapter_config.pb.h"
 
 #include "modules/common/macro.h"
@@ -53,6 +55,8 @@ class ContainerManager {
    */
   Container *GetContainer(
       const common::adapter::AdapterConfig::MessageType &type);
+
+  FRIEND_TEST(FeatureExtractorTest, junction);
 
  private:
   /**
