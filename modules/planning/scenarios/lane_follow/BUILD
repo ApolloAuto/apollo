@@ -22,6 +22,7 @@ cc_library(
         "//modules/common/vehicle_state:vehicle_state_provider",
         "//modules/map/hdmap",
         "//modules/planning/common:planning_common",
+        "//modules/planning/common:speed_profile_generator",
         "//modules/planning/constraint_checker",
         "//modules/planning/math/curve1d:quartic_polynomial_curve1d",
         "//modules/planning/proto:planning_proto",
