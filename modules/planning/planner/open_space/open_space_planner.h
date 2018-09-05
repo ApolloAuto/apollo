@@ -91,15 +91,16 @@ class OpenSpacePlanner : public Planner {
   std::unique_ptr<::apollo::planning::DistanceApproachProblem>
       distance_approach_;
   common::VehicleState init_state_;
-  common::VehicleParam vehicle_param_;
-  double init_x_;
-  double init_y_;
-  double init_phi_;
-  double init_v_;
-  double front_to_center_;
-  double back_to_center_;
-  double left_to_center_;
-  double right_to_center_;
+  const common::VehicleParam& vehicle_param_ =
+      common::VehicleConfigHelper::GetConfig().vehicle_param();
+  double init_x_ = 0.0;
+  double init_y_ = 0.0;
+  double init_phi_ = 0.0;
+  double init_v_ = 0.0;
+  double front_to_center_ = 0.0;
+  double back_to_center_ = 0.0;
+  double left_to_center_ = 0.0;
+  double right_to_center_ = 0.0;
 };
 
 }  // namespace planning
