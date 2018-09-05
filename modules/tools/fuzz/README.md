@@ -17,4 +17,4 @@ apollo.sh build_fuzz_test
 ```
 
 ## Seeds
-Seed file is a valid input file for the target program, it helps fuzzer to reach the code blocks that are of interest faster, and explore more paths. Fuzzing performs best when high quality seeds are provided. You can download the seeds consumed by these fuzzing test cases [here](https://github.com/BaiduXLab/libprotobuf-mutator/releases/download/v1.0/apollo_fuzz_seeds.tgz)
+Seed file is a valid input file for the target program, it helps fuzzer reach the code blocks that are of interest faster, and explore more paths. Fuzzing performs best when high quality seeds are provided. You can download the seeds consumed by these fuzzing test cases [here](https://github.com/BaiduXLab/libprotobuf-mutator/releases/download/v1.0/apollo_fuzz_seeds.tgz)
