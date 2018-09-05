@@ -43,12 +43,18 @@ namespace planning {
 
 class LaneFollowScenario : public Scenario {
  public:
-  LaneFollowScenario() : Scenario("LaneFollowScenario") {}
+  LaneFollowScenario() : Scenario(ScenarioConfig::LANE_FOLLOW) {}
   virtual ~LaneFollowScenario() = default;
 
-  virtual bool Init(const PlanningConfig& config);
-  virtual common::Status Process(
-      const common::TrajectoryPoint& planning_init_point, Frame* frame);
+  bool Init(const PlanningConfig& config) override;
+
+  common::Status Process(const common::TrajectoryPoint& planning_init_point,
+                         Frame* frame) override;
+
+  ScenarioConfig::ScenarioType Transfer(
+      const ScenarioConfig::ScenarioType& current_scenario,
+      const common::TrajectoryPoint& ego_point,
+      const Frame& frame) const override;
 
  private:
   void RegisterTasks();

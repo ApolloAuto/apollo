@@ -41,8 +41,35 @@ message NaviPlannerConfig {
   optional apollo.planning.NaviObstacleDeciderConfig  navi_obstacle_decider_config = 4;
 }
 
-enum ScenarioType {
-  LANE_FOLLOW = 0;
+message ScenarioConfig {
+  enum ScenarioType {
+    // LANE_FOLLOW is the default scenario
+    LANE_FOLLOW = 0;
+
+    // change from one lane to an adjacent lane
+    CHANGE_LANE = 1;
+
+    // go around an object when it blocks the road.
+    SIDE_PASS = 2;
+
+    // approach to an intersection
+    APPROACH = 3;
+
+    // drive at an intersection with 4-way stop sign
+    INTERSECTION_STOP_SIGN_FOUR_WAY = 4;
+
+    // drive at an intersection with 1 or 2 way stop sign
+    INTERSECTION_STOP_SIGN_ONE_OR_TWO_WAY = 5;
+
+    // turn left at an intersection with traffic light
+    INTERSECTION_TRAFFIC_LIGHT_LEFT_TURN = 6;
+
+    // turn right at an intersection with traffic light
+    INTERSECTION_TRAFFIC_LIGHT_RIGHT_TURN = 7;
+
+    // go through an intersection with traffic light
+    INTERSECTION_TRAFFIC_GO_THROUGH = 8;
+  }
 };
 
 message LaneFollowScenarioConfig {
