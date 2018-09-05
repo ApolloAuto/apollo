@@ -24,6 +24,7 @@
 #include <unordered_set>
 #include <utility>
 #include <vector>
+#include <limits>
 
 #include "modules/common/math/linear_interpolation.h"
 #include "modules/common/math/polygon2d.h"
