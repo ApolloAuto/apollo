@@ -500,5 +500,12 @@ SLPoint LaneFollowScenario::GetStopSL(
   return sl_point;
 }
 
+ScenarioConfig::ScenarioType LaneFollowScenario::Transfer(
+    const ScenarioConfig::ScenarioType& current_scenario,
+    const common::TrajectoryPoint& ego_point, const Frame& frame) const {
+  // implement here
+  return ScenarioConfig::LANE_FOLLOW;
+}
+
 }  // namespace planning
 }  // namespace apollo
