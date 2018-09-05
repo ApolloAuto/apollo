@@ -15,4 +15,18 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "scenario_manager_test",
+    size = "small",
+    srcs = ["scenario_manager_test.cc"],
+    data = [
+        "//modules/prediction:prediction_data",
+        "//modules/prediction:prediction_testdata",
+    ],
+    deps = [
+        ":scenario_manager",
+        "@gtest//:main",
+    ],
+)
+
 cpplint()

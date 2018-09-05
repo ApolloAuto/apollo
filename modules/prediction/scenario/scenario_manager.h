@@ -21,6 +21,8 @@
 #ifndef MODULES_PREDICTION_SCENARIO_SCENARIO_MANAGER_H_
 #define MODULES_PREDICTION_SCENARIO_SCENARIO_MANAGER_H_
 
+#include "modules/common/macro.h"
+#include "modules/common/proto/scenario.pb.h"
 #include "modules/prediction/proto/prediction_conf.pb.h"
 #include "modules/prediction/scenario/feature_extractor/feature_extractor.h"
 #include "modules/prediction/scenario/analyzer/scenario_analyzer.h"
@@ -31,29 +33,20 @@ namespace prediction {
 class ScenarioManager {
  public:
   /**
-   * @brief Constructor
-   */
-  ScenarioManager();
-
-  /**
-   * @brief Destructor
-   */
-  virtual ~ScenarioManager();
-
-  /**
-   * @brief Initializer
-   * @param Prediction config
-   */
-  void Init(const PredictionConf& config);
-
-  /**
-   * @brief Run scenario analysis 
+   * @brief Run scenario analysis
    */
   void Run();
+
+  /**
+   * @brief Get scenario analysis result
+   */
+  const apollo::common::Scenario& scenario() const;
 
  private:
   FeatureExtractor feature_extractor_;
   ScenarioAnalyzer scenario_analyzer_;
+
+  DECLARE_SINGLETON(ScenarioManager)
 };
 
 }  // namespace prediction
