@@ -19,7 +19,7 @@
 #include "modules/control/control.h"
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/control/common/control_gflags.h"
-#include "modules/tools/fuzz/control_b/proto/control_fuzz.pb.h"
+#include "modules/tools/fuzz/control/proto/control_fuzz.pb.h"
 #include "libfuzzer/libfuzzer_macro.h"
 
 static google::protobuf::LogSilencer logSilencer;
@@ -33,18 +33,18 @@ using apollo::common::adapter::AdapterManagerConfig;
 using apollo::canbus::Chassis;
 using apollo::localization::LocalizationEstimate;
 using apollo::planning::ADCTrajectory;
-using apollo::tools::fuzz::control::ControlFuzzMessage;
+using apollo::tools::fuzz::control::ControlModuleFuzzMessage;
 
-class ControlFuzz {
+class ControlModuleFuzz {
  public:
   void Init();
-  void Fuzz(ControlFuzzMessage control_fuzz_message);
+  void Fuzz(ControlModuleFuzzMessage message);
 
  private:
   std::unique_ptr<Control> control_;
-} control_fuzzer;
+} control_module_fuzzer;
 
-void ControlFuzz::Init() {
+void ControlModuleFuzz::Init() {
   AdapterManagerConfig config;
   config.set_is_ros(false);
   {
@@ -78,26 +78,26 @@ void ControlFuzz::Init() {
   control_->Start();
 }
 
-void ControlFuzz::Fuzz(ControlFuzzMessage control_fuzz_message) {
-  control_->OnMonitor(control_fuzz_message.monitor_message());
-  control_->OnPad(control_fuzz_message.pad_message());
+void ControlModuleFuzz::Fuzz(ControlModuleFuzzMessage message) {
+  control_->OnMonitor(message.monitor_message());
+  control_->OnPad(message.pad_message());
   AdapterManager::FeedLocalizationData(
-      control_fuzz_message.localization_estimate());
-  AdapterManager::FeedPlanningData(control_fuzz_message.adc_trajectory());
-  AdapterManager::FeedChassisData(control_fuzz_message.chassis());
+      message.localization_estimate());
+  AdapterManager::FeedPlanningData(message.adc_trajectory());
+  AdapterManager::FeedChassisData(message.chassis());
   ControlCommand control_command;
-  if (control_fuzz_message.adc_trajectory().trajectory_point().size() > 0) {
+  if (message.adc_trajectory().trajectory_point().size() > 0) {
     control_->ProduceControlCommand(&control_command);
   }
   // AdapterManager::GetMonitor()->receive_callbacks_.clear();
 }
 
-DEFINE_PROTO_FUZZER(const ControlFuzzMessage& control_fuzz_message) {
-  control_fuzzer.Fuzz(control_fuzz_message);
+DEFINE_PROTO_FUZZER(const ControlModuleFuzzMessage& message) {
+  control_module_fuzzer.Fuzz(message);
 }
 
 extern "C" int LLVMFuzzerInitialize(int *argc, char ***argv) {
-  control_fuzzer.Init();
+  control_module_fuzzer.Init();
   return 0;
 }
 

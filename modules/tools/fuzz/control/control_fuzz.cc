@@ -39,6 +39,7 @@
 
 
 using apollo::common::time::Clock;
+using apollo::tools::fuzz::control::ControlFuzzMessage;
 
 protobuf_mutator::protobuf::LogSilencer log_silincer;
 
@@ -118,7 +119,8 @@ bool ControlFuzz::FuzzTarget(
  * LocalizationEstimate, ADCTrajectory, and Chassis messages together to
  * fuzz the control module. 
  *****************************************************************************/
-DEFINE_PROTO_FUZZER(const apollo::tools::fuzz::control_message& message) {
+
+DEFINE_PROTO_FUZZER(const ControlFuzzMessage& message) {
   apollo::control::control_fuzzer.SetUp();
   if (message.has_planning() &&
     message.planning().header().module_name() == "planning"

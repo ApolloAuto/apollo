@@ -15,7 +15,8 @@
  *****************************************************************************/
 
 syntax = "proto2";
-package apollo.tools.fuzz;
+
+package apollo.tools.fuzz.control;
 
 import "modules/localization/proto/localization.proto";
 import "modules/control/proto/pad_msg.proto";
@@ -23,7 +24,7 @@ import "modules/planning/proto/planning.proto";
 import "modules/canbus/proto/chassis.proto";
 
 
-message control_message{
+message ControlFuzzMessage{
 	required apollo.localization.LocalizationEstimate localization = 1;
 	required apollo.control.PadMessage pad = 2;
 	required apollo.planning.ADCTrajectory planning = 3;
