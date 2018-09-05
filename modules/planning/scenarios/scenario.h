@@ -27,6 +27,7 @@
 
 #include "modules/common/status/status.h"
 #include "modules/common/util/factory.h"
+#include "modules/planning/common/frame.h"
 
 namespace apollo {
 namespace planning {
@@ -34,20 +35,21 @@ namespace planning {
 class Scenario {
  public:
   Scenario() = default;
+
+  explicit Scenario(const std::string& name) : name_(name) {}
+
   virtual ~Scenario() = default;
+
   virtual const std::string& Name() const;
 
-  virtual bool Init();
-  virtual apollo::common::Status Process();
+  virtual bool Init(const PlanningConfig& config) = 0;
+
+  virtual common::Status Process(
+      const common::TrajectoryPoint& planning_init_point, Frame* frame) = 0;
 
  protected:
   bool is_init_ = false;
   const std::string name_;
-
- private:
-  void RegisterScenarios();
-  common::util::Factory<PlanningConfig::ScenarioType, Scenario>
-      scenario_factory_;
 };
 
 }  // namespace planning

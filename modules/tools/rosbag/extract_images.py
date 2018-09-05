@@ -24,9 +24,6 @@ Usage:
 See the gflags for more optional args.
 """
 
-# TODO(xiaoxq): Need 'apt-get install python-opencv'. Add it to docker image
-# when it's stable.
-
 import os
 import sys
 
@@ -45,7 +42,7 @@ gflags.DEFINE_string('output_path', './', 'Output path.')
 gflags.DEFINE_string('weather', 'CLEAR', 'Options: CLEAR, SUNNY, RAINY.')
 gflags.DEFINE_string('scene', 'CITY', 'Options: CITY, HIGHWAY.')
 gflags.DEFINE_string('time_interval', 'DAYTIME', 'Options: DAYTIME, NIGHT.')
-gflags.DEFINE_float('extract_rate', 0.005, 'Rate to extract image, in seconds.')
+gflags.DEFINE_float('extract_rate', 3, 'Rate to extract image, in seconds.')
 
 # Stable flags which rarely change.
 gflags.DEFINE_string('topic', '/apollo/sensor/camera/obstacle/front_6mm',

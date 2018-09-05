@@ -19,9 +19,10 @@
 
 #include <string>
 #include <vector>
+#include <memory>
 
+#include "modules/planning/common/frame_open_space.h"
 #include "modules/planning/planning_base.h"
-
 /**
  * @namespace apollo::planning
  * @brief apollo::planning
@@ -76,6 +77,11 @@ class OpenSpacePlanning : public PlanningBase {
       ADCTrajectory* trajectory) override;
 
  private:
+  common::Status InitFrame(const uint32_t sequence_num,
+                           const common::TrajectoryPoint& planning_start_point,
+                           const double start_time,
+                           const common::VehicleState& vehicle_state);
+  std::unique_ptr<FrameOpenSpace> frame_;
 };
 
 }  // namespace planning

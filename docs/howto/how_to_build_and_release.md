@@ -27,6 +27,12 @@ bash docker/scripts/dev_into.sh
 ```bash
 bash apollo.sh build
 ```
+`Note:` If you do not have a GPU, you can use the following script instead
+
+```
+bash apollo.sh build_cpu
+```
+
 `Note:` If your computer is very slow, you can enter the following command to limit the CPU.
 
 ```

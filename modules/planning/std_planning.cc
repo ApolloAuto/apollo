@@ -22,8 +22,6 @@
 #include <utility>
 #include <vector>
 
-#include "google/protobuf/repeated_field.h"
-
 #include "modules/routing/proto/routing.pb.h"
 
 #include "modules/common/adapters/adapter_manager.h"
@@ -72,10 +70,13 @@ bool IsDifferentRouting(const RoutingResponse& first,
 }
 
 Status StdPlanning::Init() {
+  common::util::ThreadPool::Init(FLAGS_max_planning_thread_pool_size);
   CHECK(apollo::common::util::GetProtoFromFile(FLAGS_planning_config_file,
                                                &config_))
       << "failed to load planning config file " << FLAGS_planning_config_file;
   CheckPlanningConfig();
+
+  planner_dispatcher_->Init();
 
   CHECK(apollo::common::util::GetProtoFromFile(
       FLAGS_traffic_rule_config_filename, &traffic_rule_configs_))
@@ -97,12 +98,8 @@ Status StdPlanning::Init() {
 
   hdmap_ = HDMapUtil::BaseMapPtr();
   CHECK(hdmap_) << "Failed to load map";
-  // Prefer "std::make_unique" to direct use of "new".
-  // Reference "https://herbsutter.com/gotw/_102/" for details.
   reference_line_provider_ = std::make_unique<ReferenceLineProvider>(hdmap_);
-
-  RegisterPlanners();
-  planner_ = planner_factory_.CreateObject(config_.planner_type());
+  planner_ = planner_dispatcher_->DispatchPlanner();
   if (!planner_) {
     return Status(
         ErrorCode::PLANNING_ERROR,
@@ -158,6 +155,7 @@ void StdPlanning::RunOnce() {
   auto* not_ready = not_ready_pb.mutable_decision()
                         ->mutable_main_decision()
                         ->mutable_not_ready();
+
   if (AdapterManager::GetLocalization()->Empty()) {
     not_ready->set_reason("localization not ready");
   } else if (AdapterManager::GetChassis()->Empty()) {
@@ -376,6 +374,8 @@ Status StdPlanning::Plan(
     trajectory_pb->add_lane_id()->CopyFrom(id);
   }
 
+  trajectory_pb->set_trajectory_type(best_ref_info->trajectory_type());
+
   best_ref_info->ExportDecision(trajectory_pb->mutable_decision());
 
   // Add debug information.
@@ -440,6 +440,7 @@ Status StdPlanning::Plan(
 
 void StdPlanning::Stop() {
   AWARN << "Planning Stop is called";
+  common::util::ThreadPool::Stop();
   reference_line_provider_->Stop();
   last_publishable_trajectory_.reset(nullptr);
   frame_.reset(nullptr);

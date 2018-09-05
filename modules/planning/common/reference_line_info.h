@@ -50,6 +50,7 @@ namespace planning {
  */
 class ReferenceLineInfo {
  public:
+  ReferenceLineInfo() = default;
   explicit ReferenceLineInfo(const common::VehicleState& vehicle_state,
                              const common::TrajectoryPoint& adc_planning_point,
                              const ReferenceLine& reference_line,
@@ -158,6 +159,15 @@ class ReferenceLineInfo {
 
   void SetPriority(uint32_t priority) { reference_line_.SetPriority(priority); }
 
+  void set_trajectory_type(
+      const ADCTrajectory::TrajectoryType trajectory_type) {
+    trajectory_type_ = trajectory_type;
+  }
+
+  ADCTrajectory::TrajectoryType trajectory_type() const {
+    return trajectory_type_;
+  }
+
  private:
   bool CheckChangeLane() const;
 
@@ -209,6 +219,8 @@ class ReferenceLineInfo {
   double priority_cost_ = 0.0;
 
   PlanningTarget planning_target_;
+
+  ADCTrajectory::TrajectoryType trajectory_type_ = ADCTrajectory::UNKNOWN;
 
   DISALLOW_COPY_AND_ASSIGN(ReferenceLineInfo);
 };

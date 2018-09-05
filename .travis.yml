@@ -18,7 +18,7 @@ install: skip
 before_script:
     - cp scripts/AGREEMENT.txt ${HOME}/.apollo_agreement.txt
 script:
-    - ./docker/scripts/travis_dev_start.sh
+    - ./docker/scripts/dev_start.sh -t dev-x86_64-20180806_1111
     - ./apollo_docker.sh ${JOB}
     - rm -rf "${HOME}/.cache/bazel/_bazel_${USER}/install"
 notifications:

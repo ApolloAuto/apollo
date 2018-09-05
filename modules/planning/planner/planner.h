@@ -17,10 +17,15 @@
 #ifndef MODULES_PLANNING_PLANNER_PLANNER_H_
 #define MODULES_PLANNING_PLANNER_PLANNER_H_
 
+#include <string>
+
 #include "modules/common/proto/pnc_point.pb.h"
+#include "modules/planning/proto/planning_config.pb.h"
+
 #include "modules/common/status/status.h"
 #include "modules/planning/common/frame.h"
-#include "modules/planning/proto/planning_config.pb.h"
+#include "modules/planning/scenarios/scenario.h"
+#include "modules/planning/scenarios/scenario_manager.h"
 
 /**
  * @namespace apollo::planning
@@ -47,6 +52,7 @@ class Planner {
    */
   virtual ~Planner() = default;
 
+  virtual std::string Name() = 0;
   virtual apollo::common::Status Init(const PlanningConfig& config) = 0;
 
   /**
@@ -57,6 +63,11 @@ class Planner {
    */
   virtual apollo::common::Status Plan(
       const common::TrajectoryPoint& planning_init_point, Frame* frame) = 0;
+
+ protected:
+  PlanningConfig config_;
+  ScenarioManager scenario_manager_;
+  Scenario* scenario_;
 };
 
 class PlannerWithReferenceLine : public Planner {
@@ -80,10 +91,13 @@ class PlannerWithReferenceLine : public Planner {
    */
   virtual apollo::common::Status PlanOnReferenceLine(
       const common::TrajectoryPoint& planning_init_point, Frame* frame,
-      ReferenceLineInfo* reference_line_info) = 0;
+      ReferenceLineInfo* reference_line_info) {
+    CHECK_NOTNULL(frame);
+    return apollo::common::Status::OK();
+  }
 };
 
 }  // namespace planning
 }  // namespace apollo
 
-#endif /* MODULES_PLANNING_PLANNER_PLANNER_H_ */
+#endif  // MODULES_PLANNING_PLANNER_PLANNER_H_

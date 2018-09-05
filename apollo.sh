@@ -122,6 +122,11 @@ function generate_build_targets() {
 #=================================================
 
 function build() {
+  if [ "${USE_GPU}" = "1" ] ; then
+    echo -e "${YELLOW}Running build under GPU mode. GPU is required to run the build.${NO_COLOR}"
+  else
+    echo -e "${YELLOW}Running build under CPU mode. No GPU is required to run the build.${NO_COLOR}"
+  fi
   info "Start building, please wait ..."
   generate_build_targets
   info "Building on $MACHINE_ARCH..."
@@ -379,9 +384,10 @@ function gen_coverage() {
 function run_test() {
   generate_build_targets
   if [ "$USE_GPU" == "1" ]; then
-    echo -e "${YELLOW}Runnint tests under GPU mode. Require GPU  to run the tests.${NO_COLOR}"
+    echo -e "${YELLOW}Running tests under GPU mode. GPU is required to run the tests.${NO_COLOR}"
     echo "$BUILD_TARGETS" | xargs bazel test $DEFINES --config=unit_test -c dbg --test_verbose_timeout_warnings $@
   else
+    echo -e "${YELLOW}Running tests under CPU mode. No GPU is required to run the tests.${NO_COLOR}"
     echo "$BUILD_TARGETS" | grep -v "cnn_segmentation_test\|yolo_camera_detector_test\|unity_recognize_test\|perception_traffic_light_rectify_test\|cuda_util_test" | xargs bazel test $DEFINES --config=unit_test -c dbg --test_verbose_timeout_warnings $@
   fi
   if [ $? -ne 0 ]; then
@@ -749,6 +755,7 @@ function main() {
       ;;
     build)
       DEFINES="${DEFINES} --define USE_GPU=true --cxxopt=-DUSE_GPU"
+      USE_GPU="1"
       apollo_build_dbg $@
       ;;
     build_cpu)
@@ -780,10 +787,12 @@ function main() {
       ;;
     build_gpu)
       DEFINES="${DEFINES} --define USE_GPU=true --cxxopt=-DUSE_GPU"
+      USE_GPU="1"
       apollo_build_dbg $@
       ;;
     build_opt_gpu)
       DEFINES="${DEFINES} --define USE_GPU=true --cxxopt=-DUSE_GPU"
+      USE_GPU="1"
       apollo_build_opt $@
       ;;
     build_fe)

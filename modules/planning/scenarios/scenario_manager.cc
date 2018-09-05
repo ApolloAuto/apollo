@@ -14,16 +14,32 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/planning/planning_dispatcher.h"
+#include "modules/planning/scenarios/scenario_manager.h"
 
-#include "modules/common/util/thread_pool.h"
+#include "modules/planning/scenarios/lane_follow/lane_follow_scenario.h"
 
 namespace apollo {
 namespace planning {
 
-using apollo::common::util::ThreadPool;
+bool ScenarioManager::Init() {
+  RegisterScenarios();
+  return true;
+}
 
-PlanningDispatcher::~PlanningDispatcher() { ThreadPool::Stop(); }
+void ScenarioManager::RegisterScenarios() {
+  scenario_factory_.Register(PlanningConfig::LANE_FOLLOW, []() -> Scenario* {
+    return new LaneFollowScenario();
+  });
+}
+
+void ScenarioManager::Update() {
+  // TODO(Liangliang): update scenario here.
+  scenario_ = scenario_factory_.CreateObject(PlanningConfig::LANE_FOLLOW);
+}
+
+PlanningConfig::ScenarioType ScenarioManager::DecideCurrentScenario() {
+  return PlanningConfig::LANE_FOLLOW;
+}
 
 }  // namespace planning
 }  // namespace apollo

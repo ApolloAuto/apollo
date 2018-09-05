@@ -3,17 +3,16 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "planning_dispatcher",
+    name = "planning_lib",
     srcs = [
         "navi_planning.cc",
         "planning_base.cc",
-        "planning_dispatcher.cc",
         "std_planning.cc",
     ],
     hdrs = [
         "navi_planning.h",
+        "planning.h",
         "planning_base.h",
-        "planning_dispatcher.h",
         "std_planning.h",
     ],
     deps = [
@@ -29,11 +28,12 @@ cc_library(
         "//modules/perception/proto:perception_proto",
         "//modules/planning/common:planning_common",
         "//modules/planning/common/trajectory:trajectory_stitcher",
+        "//modules/planning/planner:planner_dispatcher",
         "//modules/planning/planner/em:em_planner",
         "//modules/planning/planner/lattice:lattice_planner",
         "//modules/planning/planner/navi:navi_planner",
-        "//modules/planning/planner/rtk:rtk_planner",
         "//modules/planning/planner/open_space:open_space_planner",
+        "//modules/planning/planner/rtk:rtk_planner",
         "//modules/planning/proto:planning_proto",
         "//modules/planning/proto:traffic_rule_config_proto",
         "//modules/planning/reference_line:reference_line_provider",
@@ -52,17 +52,7 @@ cc_library(
         "open_space_planning.h",
     ],
     deps = [
-        ":planning_dispatcher",
-    ],
-)
-
-cc_library(
-    name = "planning_lib",
-    hdrs = [
-        "planning.h",
-    ],
-    deps = [
-        ":planning_dispatcher",
+        ":planning_lib",
     ],
 )
 
