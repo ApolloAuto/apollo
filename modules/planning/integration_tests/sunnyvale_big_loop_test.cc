@@ -24,7 +24,7 @@
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/integration_tests/planning_test_base.h"
-#include "modules/planning/tasks/traffic_decider/stop_sign.h"
+#include "modules/planning/toolkits/deciders/stop_sign.h"
 
 namespace apollo {
 namespace planning {
