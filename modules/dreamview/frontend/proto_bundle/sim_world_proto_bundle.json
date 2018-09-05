@@ -124,7 +124,8 @@
                     "STOP_REASON_CLEAR_ZONE": 103,
                     "STOP_REASON_CROSSWALK": 104,
                     "STOP_REASON_EMERGENCY": 105,
-                    "STOP_REASON_NOT_READY": 106
+                    "STOP_REASON_NOT_READY": 106,
+                    "STOP_REASON_PULL_OVER": 107
                   }
                 }
               }
