@@ -83,7 +83,7 @@ bool LaneFollowScenario::Init(const PlanningConfig& config) {
     return true;
   }
   RegisterTasks();
-  for (const auto task : config.em_planner_config().task()) {
+  for (const auto task : config.lane_follow_scenario_config().task()) {
     tasks_.emplace_back(
         task_factory_.CreateObject(static_cast<TaskType>(task)));
     AINFO << "Created task:" << tasks_.back()->Name();
