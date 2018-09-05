@@ -17,4 +17,4 @@ apollo.sh build_fuzz_test
 ```
 
 ## 种子
-种子输入通常是一个对于被测程序正常的输入，它能够帮助模糊测试更快地到达被测程序的核心逻辑，并且能帮助发现更多的程序路径。通常模糊测试需要在高质量的种子输入的帮助下达到最好的测试效果。我们提供当前测试用例所使用的种子输入的][下载](https://github.com/BaiduXLab/libprotobuf-mutator/releases/download/v1.0/apollo_fuzz_seeds.tgz)。
+种子输入通常是一个对于被测程序正常的输入，它能够帮助模糊测试更快地到达被测程序的核心逻辑，并且能帮助发现更多的程序路径。通常模糊测试需要在高质量的种子输入的帮助下才能达到最好的效果。我们提供当前测试用例所使用的种子输入的[下载](https://github.com/BaiduXLab/libprotobuf-mutator/releases/download/v1.0/apollo_fuzz_seeds.tgz)。
