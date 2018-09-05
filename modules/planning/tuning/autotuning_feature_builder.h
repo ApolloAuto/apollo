@@ -17,6 +17,10 @@
 #ifndef MODULES_PLANNING_TUNING_AUTOTUNING_FEATURE_BUILDER_H_
 #define MODULES_PLANNING_TUNING_AUTOTUNING_FEATURE_BUILDER_H_
 
+#include "modules/common/status/status.h"
+#include "modules/planning/proto/auto_tuning_model_input.pb.h"
+#include "modules/planning/proto/auto_tuning_raw_feature.pb.h"
+
 namespace apollo {
 namespace planning {
 
@@ -35,16 +39,17 @@ class AutotuningFeatureBuilder {
    * @param: raw feature function input
    * @param: generated model input feature from raw feature, function output
    */
-  void BuildFeature(const autotuning::TrajectoryRawFeature& raw_feature,
+  virtual common::Status BuildFeature(
+    const autotuning::TrajectoryRawFeature& raw_feature,
     autotuning::TrajectoryFeature* const input_feature) const = 0;
 
   /**
    * @param: pointwise raw feature, function input
    * @param: generated model input feature, function output
    */
-  void BuildFeature(
+  virtual common::Status BuildPointFeature(
     const autotuning::TrajectoryPointRawFeature& raw_point_feature,
-    autotuning::TrajectroyPointFeature* const point_feature) const = 0;
+    autotuning::TrajectoryPointwiseFeature* const point_feature) const = 0;
 };
 
 }  // namespace planning
