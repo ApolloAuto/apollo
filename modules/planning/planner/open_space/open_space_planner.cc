@@ -49,12 +49,10 @@ apollo::common::Status OpenSpacePlanner::Plan(
   float ts = 0.1;
 
   // load vehicle configuration
-  vehicle_param_ =
-    common::VehicleConfigHelper::instance()->GetConfig().vehicle_param();
-  double front_to_center_ = vehicle_param_.front_edge_to_center();
-  double back_to_center_ = vehicle_param_.back_edge_to_center();
-  double left_to_center_ = vehicle_param_.left_edge_to_center();
-  double right_to_center_ = vehicle_param_.right_edge_to_center();
+  front_to_center_ = vehicle_param_.front_edge_to_center();
+  back_to_center_ = vehicle_param_.back_edge_to_center();
+  left_to_center_ = vehicle_param_.left_edge_to_center();
+  right_to_center_ = vehicle_param_.right_edge_to_center();
   Eigen::MatrixXd ego(4, 1);
   ego << front_to_center_, back_to_center_, left_to_center_, right_to_center_;
 
