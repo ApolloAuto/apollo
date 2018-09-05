@@ -1,6 +1,6 @@
 /******************************************************************************
  * Copyright 2017 The Apollo Authors. All Rights Reserved.
-
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -111,9 +111,6 @@ void LonControllerFuzzer::target(planning::ADCTrajectory trajectory_pb) {
   auto localization_pb =
       LoadLocalizationPb(std::string(data_path) + "1_localization.pb.txt");
   auto chassis_pb = LoadChassisPb(std::string(data_path) + "1_chassis.pb.txt");
-  // auto trajectory_pb =
-  //   LoadPlanningTrajectoryPb(std::string(data_path) + "1_planning.pb.txt");
-
   double time_now = Clock::NowInSeconds();
   trajectory_pb.mutable_header()->set_timestamp_sec(time_now);
 
@@ -132,10 +129,8 @@ void LonControllerFuzzer::target(planning::ADCTrajectory trajectory_pb) {
 }  // namespace apollo
 
 DEFINE_PROTO_FUZZER(const apollo::planning::ADCTrajectory& message) {
-  /*if(message.header().module_name() != "" &&
-    !message.trajectory_point().empty())
-  {
+  if (message.header().module_name() != "" &&
+    !message.trajectory_point().empty()) {
     apollo::control::lon_controller_fuzzer.target(message);
-  }*/
-  apollo::control::lon_controller_fuzzer.target(message);
+  }
 }
