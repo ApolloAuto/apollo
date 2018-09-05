@@ -110,6 +110,7 @@ class ReferenceLineInfo {
       DiscretizedTrajectory* discretized_trajectory);
 
   const SLBoundary& AdcSlBoundary() const;
+  const SLBoundary& VehicleSlBoundary() const;
   std::string PathSpeedDebugString() const;
 
   /**
@@ -202,6 +203,8 @@ class ReferenceLineInfo {
   DiscretizedTrajectory discretized_trajectory_;
 
   SLBoundary adc_sl_boundary_;
+
+  SLBoundary vehicle_sl_boundary_;
 
   planning_internal::Debug debug_;
   LatencyStats latency_stats_;

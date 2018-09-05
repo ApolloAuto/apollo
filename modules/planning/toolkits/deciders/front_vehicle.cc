@@ -302,6 +302,7 @@ std::string FrontVehicle::FindPassableObstacle(
 
 void FrontVehicle::MakeStopDecision(ReferenceLineInfo* reference_line_info) {
   const auto& adc_sl = reference_line_info->AdcSlBoundary();
+  const auto& vehicle_sl = reference_line_info->VehicleSlBoundary();
   auto* path_decision = reference_line_info->path_decision();
   const auto& reference_line = reference_line_info->reference_line();
   const auto& vehicle_param = VehicleConfigHelper::GetConfig().vehicle_param();
@@ -332,7 +333,7 @@ void FrontVehicle::MakeStopDecision(ReferenceLineInfo* reference_line_info) {
     }
 
     const auto& obstacle_sl = path_obstacle->PerceptionSLBoundary();
-    if (obstacle_sl.end_s() <= adc_sl.start_s()) {
+    if (obstacle_sl.end_s() <= adc_sl.start_s() || obstacle_sl.end_s() <= vehicle_sl.start_s()) {
       // skip backside vehicles
       ADEBUG << "obstacle_id[" << obstacle_id << "] type[" << obstacle_type_name
              << "] behind ADC. SKIP";
