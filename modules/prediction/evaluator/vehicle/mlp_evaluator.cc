@@ -134,7 +134,8 @@ void MLPEvaluator::ExtractFeatureValues(Obstacle* obstacle_ptr,
   feature_values->insert(feature_values->end(), lane_feature_values.begin(),
                          lane_feature_values.end());
 
-  if (FLAGS_prediction_offline_mode) {
+  if (FLAGS_prediction_offline_mode &&
+      !obstacle_ptr->IsNearJunction()) {
     SaveOfflineFeatures(lane_sequence_ptr, *feature_values);
   }
 }
