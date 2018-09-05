@@ -14,32 +14,24 @@
  * limitations under the License.
  *****************************************************************************/
 
-/**
- * @file
- **/
-
-#include "modules/planning/scenarios/scenario.h"
-
-#include <memory>
+#include "modules/planning/planner/em/em_planner.h"
 
 #include "gtest/gtest.h"
+
+#include "modules/common/proto/drive_state.pb.h"
+#include "modules/common/proto/pnc_point.pb.h"
+#include "modules/map/hdmap/hdmap_common.h"
+#include "modules/map/hdmap/hdmap_util.h"
+#include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
 namespace planning {
 
-class ScenarioTest : public ::testing::Test {
- public:
-  virtual void SetUp() {}
-
- protected:
-  std::unique_ptr<Scenario> scenario_;
-};
-
-TEST_F(ScenarioTest, Simple) {
-  scenario_.reset(new Scenario("simple"));
-  EXPECT_EQ(scenario_->Name(), "simple");
-  EXPECT_TRUE(scenario_->Init());
-  EXPECT_EQ(scenario_->Process(), common::Status::OK());
+TEST(EMPlannerTest, Simple) {
+  EMPlanner em;
+  PlanningConfig config;
+  EXPECT_EQ(em.Name(), "EM");
+  EXPECT_EQ(em.Init(config), common::Status::OK());
 }
 
 }  // namespace planning
