@@ -14,23 +14,40 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include <string>
+
+#include "gtest/gtest.h"
+
 #include "modules/prediction/scenario/scenario_manager.h"
+#include "modules/prediction/container/container_manager.h"
 
 namespace apollo {
 namespace prediction {
 
+using apollo::common::adapter::AdapterConfig;
 using apollo::common::Scenario;
 
-ScenarioManager::ScenarioManager() {}
+class ScenarioManagerTest : public ::testing::Test {
+ public:
+  virtual void SetUp() {
+    manager_ = ScenarioManager::instance();
+  }
 
-void ScenarioManager::Run() {
-  feature_extractor_.ExtractFeatures();
-  scenario_analyzer_.Analyze(feature_extractor_.GetScenarioFeatures());
-  // TODO(kechxu) deal with scenario output
-}
+ protected:
+  ScenarioManager* manager_ = nullptr;
+};
 
-const Scenario& ScenarioManager::scenario() const {
-  return scenario_analyzer_.scenario();
+TEST_F(ScenarioManagerTest, run) {
+  ContainerManager::instance()->RegisterContainers();
+  std::unique_ptr<Container> adc_traj_container =
+      ContainerManager::instance()->CreateContainer(
+          AdapterConfig::PLANNING_TRAJECTORY);
+  std::unique_ptr<Container> pose_container =
+      ContainerManager::instance()->CreateContainer(
+          AdapterConfig::LOCALIZATION);
+  manager_->Run();
+  const auto& scenario = manager_->scenario();
+  EXPECT_EQ(scenario.type(), Scenario::UNKNOWN);
 }
 
 }  // namespace prediction
