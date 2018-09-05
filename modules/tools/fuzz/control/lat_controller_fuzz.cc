@@ -1,6 +1,6 @@
 /******************************************************************************
  * Copyright 2017 The Apollo Authors. All Rights Reserved.
-
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -96,11 +96,13 @@ class LatControllerFuzzer : LatController {
   double timestamp_ = 0.0;
   LatControllerConf lateral_conf_;
 };
+
 /******************************************************
 * Implements the target function that takes the protobuf
 * message structure. This function is modified from the 
 * original TEST_F gtest function. 
 ******************************************************/
+
 void LatControllerFuzzer::target(planning::ADCTrajectory
     planning_trajectory_pb) {
   timestamp_ = Clock::NowInSeconds();
