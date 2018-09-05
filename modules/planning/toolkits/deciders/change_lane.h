@@ -18,8 +18,8 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_TASKS_TRAFFIC_DECIDER_CHANGE_LANE_H_
-#define MODULES_PLANNING_TASKS_TRAFFIC_DECIDER_CHANGE_LANE_H_
+#ifndef MODULES_PLANNING_TOOLKITS_DECIDERS_CHANGE_LANE_H_
+#define MODULES_PLANNING_TOOLKITS_DECIDERS_CHANGE_LANE_H_
 
 #include <string>
 #include <vector>
@@ -69,4 +69,4 @@ class ChangeLane : public TrafficRule {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_TASKS_TRAFFIC_DECIDER_CHANGE_LANE_H_
+#endif  // MODULES_PLANNING_TOOLKITS_DECIDERS_CHANGE_LANE_H_

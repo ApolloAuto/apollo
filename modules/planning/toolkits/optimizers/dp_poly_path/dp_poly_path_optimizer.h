@@ -18,8 +18,8 @@
  * @file dp_poly_path_optimizer.h
  **/
 
-#ifndef MODULES_PLANNING_TASKS_DP_POLY_PATH_OPTIMIZER_H_
-#define MODULES_PLANNING_TASKS_DP_POLY_PATH_OPTIMIZER_H_
+#ifndef MODULES_PLANNING_TOOLKITS_OPTIMIZERS_DP_POLY_PATH_OPTIMIZER_H_
+#define MODULES_PLANNING_TOOLKITS_OPTIMIZERS_DP_POLY_PATH_OPTIMIZER_H_
 
 #include <string>
 
@@ -55,4 +55,4 @@ class DpPolyPathOptimizer : public PathOptimizer {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_TASKS_DP_POLY_PATH_OPTIMIZER_H_
+#endif  // MODULES_PLANNING_TOOLKITS_OPTIMIZERS_DP_POLY_PATH_OPTIMIZER_H_

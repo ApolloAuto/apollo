@@ -18,8 +18,8 @@
  * @file util.h
  **/
 
-#ifndef MODULES_PLANNING_TASKS_TRAFFIC_DECIDER_UTIL_H_
-#define MODULES_PLANNING_TASKS_TRAFFIC_DECIDER_UTIL_H_
+#ifndef MODULES_PLANNING_TOOLKITS_DECIDERS_UTIL_H_
+#define MODULES_PLANNING_TOOLKITS_DECIDERS_UTIL_H_
 
 #include "modules/planning/common/reference_line_info.h"
 
@@ -35,4 +35,4 @@ double GetADCStopDeceleration(ReferenceLineInfo* const reference_line_info,
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_TASKS_TRAFFIC_DECIDER_UTIL_H_
+#endif  // MODULES_PLANNING_TOOLKITS_DECIDERS_UTIL_H_
