@@ -14,6 +14,9 @@
  * limitations under the License.
  *****************************************************************************/
 
+#ifndef MODULES_PREDICTION_NETWORK_NET_MODEL_H_
+#define MODULES_PREDICTION_NETWORK_NET_MODEL_H_
+
 #include <memory>
 #include <string>
 #include <vector>
@@ -24,9 +27,6 @@
 
 #include "modules/prediction/network/net_layer.h"
 #include "modules/prediction/network/net_util.h"
-
-#ifndef MODULES_PREDICTION_NETWORK_NET_MODEL_H_
-#define MODULES_PREDICTION_NETWORK_NET_MODEL_H_
 
 /**
  * @namespace apollo::prediction::network
