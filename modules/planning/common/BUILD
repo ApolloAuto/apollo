@@ -388,6 +388,34 @@ cc_test(
 )
 
 cc_library(
+    name = "ego_info",
+    srcs = [
+        "ego_info.cc",
+    ],
+    hdrs = [
+        "ego_info.h",
+    ],
+    deps = [
+        "//modules/common:log",
+        "//modules/common/vehicle_state/proto:vehicle_state_proto",
+        "//modules/planning/reference_line",
+        "@eigen",
+    ],
+)
+
+cc_test(
+    name = "ego_info_test",
+    size = "small",
+    srcs = [
+        "ego_info_test.cc",
+    ],
+    deps = [
+        ":ego_info",
+        "@gtest//:main",
+    ],
+)
+
+cc_library(
     name = "planning_common",
     deps = [
         ":frame",
