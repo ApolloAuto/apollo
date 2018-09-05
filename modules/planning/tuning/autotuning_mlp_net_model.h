@@ -14,30 +14,34 @@
  * limitations under the License.
  *****************************************************************************/
 
-/**
- * @file
- **/
+#ifndef MODULES_PLANNING_TUNING_AUTOTUNING_MLP_NET_MODEL_H_
+#define MODULES_PLANNING_TUNING_AUTOTUNING_MLP_NET_MODEL_H_
 
-#include "modules/planning/tasks/task.h"
+#include <vector>
 
-#include "modules/planning/proto/planning_config.pb.h"
+#include "Eigen/Dense"
+
+#include "modules/common/macro.h"
+#include "modules/prediction/network/net_model.h"
 
 namespace apollo {
 namespace planning {
 
-using apollo::common::Status;
-
-Task::Task(const std::string& name) : name_(name) {}
-
-const std::string& Task::Name() const { return name_; }
-
-bool Task::Init(const PlanningConfig&) { return true; }
-
-Status Task::Execute(Frame* frame, ReferenceLineInfo* reference_line_info) {
-  frame_ = frame;
-  reference_line_info_ = reference_line_info;
-  return Status::OK();
-}
+class AutotuningMLPModel : public prediction::network::NetModel {
+ public:
+  AutotuningMLPModel() = default;
+  virtual ~AutotuningMLPModel() = default;
+  /**
+   * @brief Compute the model output from inputs according to a defined layers'
+   * flow
+   * @param Inputs to the network
+   * @param Output of the network will be returned
+   */
+  void Run(const std::vector<Eigen::MatrixXf>& inputs,
+           Eigen::MatrixXf* output) const override;
+};
 
 }  // namespace planning
 }  // namespace apollo
+
+#endif  // MODULES_PLANNING_TUNING_AUTOTUNING_MLP_NET_MODEL_H_

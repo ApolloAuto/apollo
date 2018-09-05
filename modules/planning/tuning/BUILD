@@ -27,4 +27,41 @@ cc_test(
     ],
 )
 
+cc_library(
+    name = "autotuning_base_model",
+    hdrs = ["autotuning_base_model.h"],
+    deps = [
+        "//modules/planning/proto:auto_tuning_model_input_proto",
+    ],
+)
+
+cc_library(
+    name = "autotuning_feature_builder",
+    hdrs = ["autotuning_feature_builder.h"],
+    deps = [
+        "//modules/planning/proto:auto_tuning_model_input_proto",
+        "//modules/planning/proto:auto_tuning_raw_feature_proto",
+    ],
+)
+
+cc_library(
+    name = "autotuning_mlp_net_model",
+    srcs = ["autotuning_mlp_net_model.cc"],
+    hdrs = ["autotuning_mlp_net_model.h"],
+    deps = [
+        "//modules/prediction/network:net_model",
+    ],
+)
+
+cc_test(
+    name = "autotuning_mlp_net_model_test",
+    size = "small",
+    srcs = [
+        "autotuning_mlp_net_model_test.cc",
+    ],
+    deps = [
+        ":autotuning_mlp_net_model",
+        "@gtest//:main",
+    ],
+)
 cpplint()

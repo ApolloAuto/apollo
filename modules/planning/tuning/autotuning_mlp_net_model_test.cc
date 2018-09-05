@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ * Copyright 2017 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,24 +15,21 @@
  *****************************************************************************/
 
 /**
- * @file util.h
+ * @file: testing casese for mlp net model
  **/
 
-#ifndef MODULES_PLANNING_TASKS_TRAFFIC_DECIDER_UTIL_H_
-#define MODULES_PLANNING_TASKS_TRAFFIC_DECIDER_UTIL_H_
+#include "modules/planning/tuning/autotuning_mlp_net_model.h"
 
-#include "modules/planning/common/reference_line_info.h"
+#include "gtest/gtest.h"
 
 namespace apollo {
 namespace planning {
-namespace util {
 
-double GetADCStopDeceleration(ReferenceLineInfo* const reference_line_info,
-                              const double stop_line_s,
-                              const double min_pass_s_distance);
+TEST(AutotuningMLPNetModeltest, test_case_one) {
+  AutotuningMLPModel model;
+  prediction::NetParameter net_parameter;
+  EXPECT_TRUE(model.LoadModel(net_parameter));
+}
 
-}  // util
 }  // namespace planning
 }  // namespace apollo
-
-#endif  // MODULES_PLANNING_TASKS_TRAFFIC_DECIDER_UTIL_H_

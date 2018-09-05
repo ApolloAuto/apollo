@@ -37,7 +37,7 @@ cc_library(
         "//modules/planning/proto:planning_proto",
         "//modules/planning/proto:traffic_rule_config_proto",
         "//modules/planning/reference_line:reference_line_provider",
-        "//modules/planning/tasks/traffic_decider",
+        "//modules/planning/toolkits/deciders",
         "//modules/prediction/proto:prediction_proto",
         "@ros//:ros_common",
     ],

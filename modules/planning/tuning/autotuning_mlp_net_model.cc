@@ -14,40 +14,22 @@
  * limitations under the License.
  *****************************************************************************/
 
-/**
- * @file
- **/
-
-#ifndef MODULES_PLANNING_TASKS_TRAFFIC_DECIDER_REROUTING_H_
-#define MODULES_PLANNING_TASKS_TRAFFIC_DECIDER_REROUTING_H_
-
-#include <string>
-
-#include "modules/planning/tasks/traffic_decider/traffic_rule.h"
+#include "modules/planning/tuning/autotuning_mlp_net_model.h"
 
 namespace apollo {
 namespace planning {
 
-/**
- * This class decides whether we should send rerouting request based on traffic
- * situation.
- */
-class Rerouting : public TrafficRule {
- public:
-  explicit Rerouting(const TrafficRuleConfig& config);
-  virtual ~Rerouting() = default;
-
-  common::Status ApplyRule(Frame* const frame,
-                 ReferenceLineInfo* const reference_line_info);
-
- private:
-  bool ChangeLaneFailRerouting();
-
-  ReferenceLineInfo* reference_line_info_ = nullptr;
-  Frame* frame_ = nullptr;
-};
+void AutotuningMLPModel::Run(
+    const std::vector<Eigen::MatrixXf>& inputs,
+    Eigen::MatrixXf* const output) const {
+  Eigen::MatrixXf inp = inputs[0];
+  Eigen::MatrixXf temp;
+  for (size_t i = 0; i < layers_.size(); ++i) {
+    layers_[i]->Run({inp}, &temp);
+    inp = temp;
+  }
+  *output = temp;
+}
 
 }  // namespace planning
 }  // namespace apollo
-
-#endif  // MODULES_PLANNING_TASKS_TRAFFIC_DECIDER_REROUTING_H_

@@ -33,7 +33,7 @@
 #include "modules/common/math/vec2d.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/obstacle.h"
-#include "modules/planning/tasks/task.h"
+#include "modules/planning/toolkits/optimizers/task.h"
 /**
  * @namespace apollo::planning
  * @brief apollo::planning
