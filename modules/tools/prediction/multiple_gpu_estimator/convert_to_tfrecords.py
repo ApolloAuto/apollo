@@ -54,19 +54,19 @@ def convert_to(bin_data, name):
         raise ValueError(
             'data size (%d) must be multiple of feature_dim + 1 (%d).' %
             (bin_data.shape[0], feature_dim + 1))
-    num_examples = bin_data.shape[0] // feature_dim
+    num_examples = bin_data.shape[0] // (feature_dim + 1)
 
-    filename = os.path.join(FLAGS.directory, name + '.tfrecords')
+    filename = os.path.join(name + '.tfrecords')
     print('Writing', filename)
     with tf.python_io.TFRecordWriter(filename) as writer:
         for index in range(0, num_examples):
             data_raw = bin_data[index * (feature_dim + 1):index *
-                                (feature_dim + 1) + feature_dim].tostring()
-            label_raw = bin_data[index].tostring()
+                                (feature_dim + 1) + feature_dim]
+            label_raw = np.array([bin_data[index*(feature_dim +1)+feature_dim]])
             example = tf.train.Example(
                 features=tf.train.Features(
                     feature={
-                        'train': _float_feature(data_raw),
+                        'data': _float_feature(data_raw),
                         'label': _float_feature(label_raw)
                     }))
             writer.write(example.SerializeToString())

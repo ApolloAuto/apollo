@@ -24,6 +24,8 @@
 
 #include "gtest/gtest.h"
 
+#include "modules/planning/common/planning_gflags.h"
+
 namespace apollo {
 namespace planning {
 
@@ -34,12 +36,11 @@ class LaneFollowScenarioTest : public ::testing::Test {
  protected:
   std::unique_ptr<LaneFollowScenario> scenario_;
 };
-
 TEST_F(LaneFollowScenarioTest, Simple) {
   scenario_.reset(new LaneFollowScenario());
-  EXPECT_EQ(scenario_->Name(), "LaneFollowScenario");
-  EXPECT_TRUE(scenario_->Init());
-  EXPECT_EQ(scenario_->Process(), common::Status::OK());
+  EXPECT_EQ(scenario_->scenario_type(), ScenarioConfig::LANE_FOLLOW);
+  PlanningConfig config;
+  EXPECT_TRUE(scenario_->Init(config));
 }
 
 }  // namespace planning

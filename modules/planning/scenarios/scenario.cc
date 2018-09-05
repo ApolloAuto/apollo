@@ -23,9 +23,9 @@
 namespace apollo {
 namespace planning {
 
-const std::string& Scenario::Name() const { return name_; }
-
-bool Scenario::Init() { return true; }
+ScenarioConfig::ScenarioType Scenario::scenario_type() const {
+  return scenario_type_;
+}
 
 }  // namespace planning
 }  // namespace apollo

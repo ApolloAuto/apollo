@@ -32,18 +32,6 @@ cc_library(
 )
 
 cc_test(
-    name = "scenario_test",
-    size = "small",
-    srcs = [
-        "scenario_test.cc",
-    ],
-    deps = [
-        ":scenario_lib",
-        "@gtest//:main",
-    ],
-)
-
-cc_test(
     name = "scenario_manager_test",
     size = "small",
     srcs = [

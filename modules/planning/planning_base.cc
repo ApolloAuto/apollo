@@ -35,7 +35,7 @@
 #include "modules/planning/planner/navi/navi_planner.h"
 #include "modules/planning/planner/open_space/open_space_planner.h"
 #include "modules/planning/planner/rtk/rtk_replay_planner.h"
-#include "modules/planning/tasks/traffic_decider/traffic_decider.h"
+#include "modules/planning/toolkits/deciders/traffic_decider.h"
 
 namespace apollo {
 namespace planning {
@@ -52,10 +52,10 @@ using apollo::hdmap::HDMapUtil;
 PlanningBase::~PlanningBase() {}
 
 void PlanningBase::CheckPlanningConfig() {
-  if (config_.has_em_planner_config() &&
-      config_.em_planner_config().has_dp_st_speed_config()) {
+  if (config_.has_lane_follow_scenario_config() &&
+      config_.lane_follow_scenario_config().has_dp_st_speed_config()) {
     const auto& dp_st_speed_config =
-        config_.em_planner_config().dp_st_speed_config();
+        config_.lane_follow_scenario_config().dp_st_speed_config();
     CHECK(dp_st_speed_config.has_matrix_dimension_s());
     CHECK_GT(dp_st_speed_config.matrix_dimension_s(), 3);
     CHECK_LT(dp_st_speed_config.matrix_dimension_s(), 10000);

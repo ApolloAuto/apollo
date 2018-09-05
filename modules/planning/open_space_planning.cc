@@ -33,7 +33,7 @@
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/trajectory/trajectory_stitcher.h"
 #include "modules/planning/planner/planner_dispatcher.h"
-#include "modules/planning/tasks/traffic_decider/traffic_decider.h"
+#include "modules/planning/toolkits/deciders/traffic_decider.h"
 
 namespace apollo {
 namespace planning {

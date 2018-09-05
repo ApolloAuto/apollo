@@ -22,8 +22,6 @@
 #include <utility>
 #include <vector>
 
-#include "google/protobuf/repeated_field.h"
-
 #include "modules/routing/proto/routing.pb.h"
 
 #include "modules/common/adapters/adapter_manager.h"
@@ -37,7 +35,7 @@
 #include "modules/planning/planner/navi/navi_planner.h"
 #include "modules/planning/planner/rtk/rtk_replay_planner.h"
 #include "modules/planning/reference_line/reference_line_provider.h"
-#include "modules/planning/tasks/traffic_decider/traffic_decider.h"
+#include "modules/planning/toolkits/deciders/traffic_decider.h"
 
 namespace apollo {
 namespace planning {

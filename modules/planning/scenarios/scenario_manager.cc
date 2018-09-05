@@ -27,18 +27,18 @@ bool ScenarioManager::Init() {
 }
 
 void ScenarioManager::RegisterScenarios() {
-  scenario_factory_.Register(PlanningConfig::LANE_FOLLOW, []() -> Scenario* {
+  scenario_factory_.Register(ScenarioConfig::LANE_FOLLOW, []() -> Scenario* {
     return new LaneFollowScenario();
   });
 }
 
 void ScenarioManager::Update() {
   // TODO(Liangliang): update scenario here.
-  scenario_ = scenario_factory_.CreateObject(PlanningConfig::LANE_FOLLOW);
+  scenario_ = scenario_factory_.CreateObject(ScenarioConfig::LANE_FOLLOW);
 }
 
-PlanningConfig::ScenarioType ScenarioManager::DecideCurrentScenario() {
-  return PlanningConfig::LANE_FOLLOW;
+ScenarioConfig::ScenarioType ScenarioManager::DecideCurrentScenario() {
+  return ScenarioConfig::LANE_FOLLOW;
 }
 
 }  // namespace planning

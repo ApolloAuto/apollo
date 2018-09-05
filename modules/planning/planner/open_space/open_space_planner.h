@@ -27,6 +27,8 @@
 #include "modules/planning/planner/open_space/warm_start_problem.h"
 #include "modules/planning/planner/planner.h"
 #include "modules/planning/proto/planning_config.pb.h"
+#include "modules/common/configs/proto/vehicle_config.pb.h"
+#include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
 
 /*
 Initially inspired by "Optimization-Based Collision Avoidance" from Xiaojing
@@ -88,7 +90,17 @@ class OpenSpacePlanner : public Planner {
   std::unique_ptr<::apollo::planning::WarmStartProblem> warm_start_;
   std::unique_ptr<::apollo::planning::DistanceApproachProblem>
       distance_approach_;
-  common::VehicleState vehicle_state_;
+  common::VehicleState init_state_;
+  const common::VehicleParam& vehicle_param_ =
+      common::VehicleConfigHelper::GetConfig().vehicle_param();
+  double init_x_ = 0.0;
+  double init_y_ = 0.0;
+  double init_phi_ = 0.0;
+  double init_v_ = 0.0;
+  double front_to_center_ = 0.0;
+  double back_to_center_ = 0.0;
+  double left_to_center_ = 0.0;
+  double right_to_center_ = 0.0;
 };
 
 }  // namespace planning

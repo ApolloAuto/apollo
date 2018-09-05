@@ -35,7 +35,7 @@
 #include "modules/planning/proto/navi_path_decider_config.pb.h"
 #include "modules/planning/proto/planning_config.pb.h"
 #include "modules/planning/reference_line/reference_line.h"
-#include "modules/planning/tasks/task.h"
+#include "modules/planning/toolkits/optimizers/task.h"
 /**
  * @namespace apollo::planning
  * @brief apollo::planning
