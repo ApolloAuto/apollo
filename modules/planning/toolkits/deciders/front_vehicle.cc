@@ -333,7 +333,8 @@ void FrontVehicle::MakeStopDecision(ReferenceLineInfo* reference_line_info) {
 
     const auto& vehicle_sl = reference_line_info->VehicleSlBoundary();
     const auto& obstacle_sl = path_obstacle->PerceptionSLBoundary();
-    if (obstacle_sl.end_s() <= adc_sl.start_s() || obstacle_sl.end_s() <= vehicle_sl.start_s()) {
+    if (obstacle_sl.end_s() <= adc_sl.start_s() ||
+        obstacle_sl.end_s() <= vehicle_sl.start_s()) {
       // skip backside vehicles
       ADEBUG << "obstacle_id[" << obstacle_id << "] type[" << obstacle_type_name
              << "] behind ADC. SKIP";
