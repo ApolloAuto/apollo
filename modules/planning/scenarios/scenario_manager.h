@@ -40,9 +40,10 @@ class ScenarioManager final {
  private:
   void RegisterScenarios();
 
-  ScenarioType DecideCurrentScenario();
+  ScenarioConfig::ScenarioType DecideCurrentScenario();
 
-  common::util::Factory<ScenarioType, Scenario> scenario_factory_;
+  common::util::Factory<ScenarioConfig::ScenarioType, Scenario>
+      scenario_factory_;
 
   std::unique_ptr<Scenario> scenario_;
 };
