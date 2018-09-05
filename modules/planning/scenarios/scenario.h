@@ -36,20 +36,25 @@ class Scenario {
  public:
   Scenario() = default;
 
-  explicit Scenario(const std::string& name) : name_(name) {}
+  explicit Scenario(const ScenarioConfig::ScenarioType& scenario_type)
+      : scenario_type_(scenario_type) {}
 
   virtual ~Scenario() = default;
 
-  virtual const std::string& Name() const;
+  virtual ScenarioConfig::ScenarioType scenario_type() const;
 
   virtual bool Init(const PlanningConfig& config) = 0;
 
   virtual common::Status Process(
       const common::TrajectoryPoint& planning_init_point, Frame* frame) = 0;
 
+  virtual ScenarioConfig::ScenarioType Transfer(
+      const ScenarioConfig::ScenarioType& current_scenario,
+      const common::TrajectoryPoint& ego_point, const Frame& frame) const = 0;
+
  protected:
   bool is_init_ = false;
-  const std::string name_;
+  const ScenarioConfig::ScenarioType scenario_type_;
 };
 
 }  // namespace planning
