@@ -53,7 +53,7 @@ cc_library(
 )
 
 cc_library(
-    name = "traffic_decider",
+    name = "deciders",
     srcs = [
         "traffic_decider.cc",
     ],
@@ -67,7 +67,7 @@ cc_library(
         "//modules/planning/common:frame",
         "//modules/planning/common:reference_line_info",
         "//modules/planning/proto:traffic_rule_config_proto",
-        "//modules/planning/tasks:task",
+        "//modules/planning/toolkits/optimizers:task",
     ],
 )
 
