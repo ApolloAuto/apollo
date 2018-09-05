@@ -38,13 +38,14 @@ class LaneFollowScenarioTest : public ::testing::Test {
 };
 TEST_F(LaneFollowScenarioTest, Simple) {
   scenario_.reset(new LaneFollowScenario());
+  EXPECT_EQ(scenario_->scenario_type(), ScenarioConfig::LANE_FOLLOW);
   PlanningConfig config;
   EXPECT_TRUE(scenario_->Init(config));
 }
 
 TEST_F(LaneFollowScenarioTest, GenerateFallbackSpeedProfile) {
   scenario_.reset(new LaneFollowScenario());
-  EXPECT_EQ(scenario_->Name(), "LaneFollowScenario");
+  EXPECT_EQ(scenario_->scenario_type(), ScenarioConfig::LANE_FOLLOW);
 
   ReferenceLineInfo reference_line_info;
   auto speed_data =
