@@ -210,6 +210,35 @@ cc_test(
 )
 
 cc_library(
+    name = "speed_profile_generator",
+    srcs = [
+        "speed_profile_generator.cc",
+    ],
+    hdrs = [
+        "speed_profile_generator.h",
+    ],
+    deps = [
+        ":frame",
+        ":reference_line_info",
+        "//modules/common/proto:pnc_point_proto",
+        "//modules/planning/common/speed:speed_data",
+        "//modules/planning/proto:planning_config_proto",
+    ],
+)
+
+cc_test(
+    name = "speed_profile_generator_test",
+    size = "small",
+    srcs = [
+        "speed_profile_generator_test.cc",
+    ],
+    deps = [
+        ":speed_profile_generator",
+        "@gtest//:main",
+    ],
+)
+
+cc_library(
     name = "lag_prediction",
     srcs = [
         "lag_prediction.cc",
@@ -324,10 +353,10 @@ cc_test(
     ],
     deps = [
         ":frame_open_space",
-        "//modules/common/util",
-        "//modules/planning/proto:planning_config_proto",
-        "//modules/common/vehicle_state/proto:vehicle_state_proto",
         "//modules/common/proto:pnc_point_proto",
+        "//modules/common/util",
+        "//modules/common/vehicle_state/proto:vehicle_state_proto",
+        "//modules/planning/proto:planning_config_proto",
         "@gtest//:main",
     ],
 )
