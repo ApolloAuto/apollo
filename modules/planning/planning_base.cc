@@ -35,7 +35,7 @@
 #include "modules/planning/planner/navi/navi_planner.h"
 #include "modules/planning/planner/open_space/open_space_planner.h"
 #include "modules/planning/planner/rtk/rtk_replay_planner.h"
-#include "modules/planning/tasks/traffic_decider/traffic_decider.h"
+#include "modules/planning/toolkits/deciders/traffic_decider.h"
 
 namespace apollo {
 namespace planning {
