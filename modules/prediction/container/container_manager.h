@@ -57,6 +57,7 @@ class ContainerManager {
       const common::adapter::AdapterConfig::MessageType &type);
 
   FRIEND_TEST(FeatureExtractorTest, junction);
+  FRIEND_TEST(ScenarioManagerTest, run);
 
  private:
   /**

@@ -45,9 +45,18 @@ FeatureExtractor::FeatureExtractor() {
 }
 
 void FeatureExtractor::ExtractFeatures() {
+  if (pose_container_ == nullptr) {
+    AERROR << "Null pose container found.";
+    return;
+  }
   ExtractEgoVehicleFeatures();
 
   auto ego_trajectory_point = pose_container_->GetPosition();
+  if (!ego_trajectory_point.has_x() ||
+      !ego_trajectory_point.has_y()) {
+    AERROR << "Fail to get ego vehicle position";
+    return;
+  }
   Vec2d ego_position(ego_trajectory_point.x(), ego_trajectory_point.y());
 
   auto ptr_ego_lane = GetEgoLane(ego_position);
