@@ -39,6 +39,7 @@ cc_library(
     name = "autotuning_feature_builder",
     hdrs = ["autotuning_feature_builder.h"],
     deps = [
+        "//modules/common/status",
         "//modules/planning/proto:auto_tuning_model_input_proto",
         "//modules/planning/proto:auto_tuning_raw_feature_proto",
     ],

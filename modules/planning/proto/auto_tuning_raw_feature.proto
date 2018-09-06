@@ -10,7 +10,7 @@ message PathPointRawFeature {
 }
 
 message SpeedPointRawFeature {
-    message DecisionObjectFeature {
+    message ObjectDecisionFeature {
     	// obstacle id
         optional int32 id = 1;
 		// relative to eog, s_obs - s_host [m]
@@ -18,7 +18,9 @@ message SpeedPointRawFeature {
 		// relative to ego, l_obs - l_host [m]
         optional double relative_l = 3;
 		// relative to ego, v_obs - v_host [m/s]
-        optional double relative_v = 4;  
+        optional double relative_v = 4;
+        // speed [m / s]
+        optional double speed = 5;
     }
 
     optional double s = 1; // [m]
@@ -28,14 +30,14 @@ message SpeedPointRawFeature {
     optional double j = 5; // [m/s^3]
     optional double speed_limit = 6;    //speed limit with curvature adj [m/s]
 
-    repeated DecisionObjectFeature follow = 10;
-    repeated DecisionObjectFeature overtake = 11;
-    repeated DecisionObjectFeature virtual_decision = 13;
-    repeated DecisionObjectFeature stop = 14;
-    repeated DecisionObjectFeature collision = 15;
-    repeated DecisionObjectFeature nudge = 12;
-    repeated DecisionObjectFeature sidepass_front = 16;
-    repeated DecisionObjectFeature sidepass_rear = 17;
+    repeated ObjectDecisionFeature follow = 10;
+    repeated ObjectDecisionFeature overtake = 11;
+    repeated ObjectDecisionFeature virtual_decision = 13;
+    repeated ObjectDecisionFeature stop = 14;
+    repeated ObjectDecisionFeature collision = 15;
+    repeated ObjectDecisionFeature nudge = 12;
+    repeated ObjectDecisionFeature sidepass_front = 16;
+    repeated ObjectDecisionFeature sidepass_rear = 17;
 }
 
 // caputuring the obstacle raw distance information from surrounding environment

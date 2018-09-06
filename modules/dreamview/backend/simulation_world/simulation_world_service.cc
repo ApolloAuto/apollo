@@ -179,6 +179,9 @@ void SetStopReason(const StopReasonCode &reason_code, Decision *decision) {
     case StopReasonCode::STOP_REASON_CROSSWALK:
       decision->set_stopreason(Decision::STOP_REASON_CROSSWALK);
       break;
+    case StopReasonCode::STOP_REASON_PULL_OVER:
+      decision->set_stopreason(Decision::STOP_REASON_PULL_OVER);
+      break;
     default:
       AWARN << "Unrecognizable stop reason code:" << reason_code;
   }
