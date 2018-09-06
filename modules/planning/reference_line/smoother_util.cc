@@ -30,7 +30,7 @@
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/reference_line/reference_line.h"
 #include "modules/planning/reference_line/reference_line_smoother.h"
-#include "modules/planning/reference_line/spiral_reference_line_smoother.h"
+#include "modules/planning/reference_line/qp_spline_reference_line_smoother.h"
 
 DEFINE_string(input_file, "", "input file with format x,y per line");
 DEFINE_string(output_file, "", "output file with format x,y per line");
@@ -83,7 +83,7 @@ class SmootherUtil {
       // Prefer "std::make_unique" to direct use of "new".
       // Reference "https://herbsutter.com/gotw/_102/" for details.
       auto smoother_ptr =
-          std::make_unique<SpiralReferenceLineSmoother>(config_);
+          std::make_unique<QpSplineReferenceLineSmoother>(config_);
       auto anchors =
           CreateAnchorPoints(init_ref.reference_points().front(), init_ref);
       smoother_ptr->SetAnchorPoints(anchors);
@@ -125,7 +125,7 @@ class SmootherUtil {
       // Prefer "std::make_unique" to direct use of "new".
       // Reference "https://herbsutter.com/gotw/_102/" for details.
       auto smoother_ptr =
-          std::make_unique<SpiralReferenceLineSmoother>(config_);
+          std::make_unique<QpSplineReferenceLineSmoother>(config_);
       smoother_ptr->SetAnchorPoints(anchors);
       ReferenceLine smoothed_local_ref;
       if (!smoother_ptr->Smooth(local_ref, &smoothed_local_ref)) {
