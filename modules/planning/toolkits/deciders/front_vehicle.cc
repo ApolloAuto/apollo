@@ -24,13 +24,15 @@
 #include <string>
 #include <vector>
 
+#include "modules/perception/proto/perception_obstacle.pb.h"
+#include "modules/planning/proto/planning_status.pb.h"
+
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/time/time.h"
 #include "modules/map/hdmap/hdmap_util.h"
-#include "modules/perception/proto/perception_obstacle.pb.h"
+#include "modules/planning/common/ego_info.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/proto/planning_status.pb.h"
 
 namespace apollo {
 namespace planning {
@@ -125,7 +127,7 @@ bool FrontVehicle::ProcessSidePass(
     }
     case SidePassStatus::DRIVE: {
       constexpr double kAdcStopSpeedThreshold = 0.1;  // unit: m/s
-      const auto& adc_planning_point = reference_line_info->AdcPlanningPoint();
+      const auto& adc_planning_point = EgoInfo::instance()->start_point();
       if (!passable_obstacle_id.empty() &&
           adc_planning_point.v() < kAdcStopSpeedThreshold) {
         sidepass_status->set_status(SidePassStatus::WAIT);

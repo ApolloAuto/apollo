@@ -29,28 +29,22 @@ namespace planning {
 using common::math::Vec2d;
 using common::math::Box2d;
 
-EgoInfo::EgoInfo() {}
-
-void EgoInfo::Init() {
+EgoInfo::EgoInfo() {
   common::VehicleConfig ego_vehicle_config_ =
       common::VehicleConfigHelper::GetConfig();
 }
 
-SLBoundary EgoInfo::GetSLBoundaryOnReferenceLine(
-    const ReferenceLine* reference_line) const {
-  if (sl_boundary_map_.find(reference_line) != sl_boundary_map_.end()) {
-    return sl_boundary_map_.at(reference_line);
-  } else {
-    return SLBoundary();
-  }
+bool EgoInfo::Update(const common::TrajectoryPoint& start_point,
+                     const common::VehicleState& vehicle_state,
+                     const std::vector<const Obstacle*>& obstacles) {
+  set_start_point(start_point);
+  set_vehicle_state(vehicle_state);
+  CalculateFrontObstacleClearDistance(obstacles);
+  return true;
 }
 
-void EgoInfo::SetSLBoundary(const ReferenceLine* reference_line,
-                            const SLBoundary& sl_boundary) {
-  sl_boundary_map_[reference_line] = sl_boundary;
-}
-
-void EgoInfo::CalculateFrontObstacleClearDistance(const Frame& frame) {
+void EgoInfo::CalculateFrontObstacleClearDistance(
+    const std::vector<const Obstacle*>& obstacles) {
   Vec2d position(vehicle_state_.x(), vehicle_state_.y());
 
   const auto& param = ego_vehicle_config_.vehicle_param();
@@ -75,7 +69,7 @@ void EgoInfo::CalculateFrontObstacleClearDistance(const Frame& frame) {
                          vehicle_state_.heading(), impact_region_length,
                          param.width() + buffer);
 
-  for (const auto& obstacle : frame.obstacles()) {
+  for (const auto& obstacle : obstacles) {
     if (obstacle->IsVirtual() ||
         !ego_front_region.HasOverlap(obstacle->PerceptionBoundingBox())) {
       continue;
