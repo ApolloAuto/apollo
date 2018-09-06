@@ -46,8 +46,7 @@ class VehicleConfigHelper {
    * @brief Initialize vehicle configurations with default configuration file
    * pointed by gflags FLAGS_vehicle_config_path. The code will crash if
    * FLAGS_vehicle_config_path does not exist or it points to a file with
-   * invalid
-   * format.
+   * invalid format.
    */
   static void Init();
 
