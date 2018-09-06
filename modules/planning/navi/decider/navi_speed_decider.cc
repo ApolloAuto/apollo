@@ -25,9 +25,8 @@
 #include <cmath>
 #include <limits>
 
-#include "glog/logging.h"
-
 #include "modules/common/configs/vehicle_config_helper.h"
+#include "modules/common/log.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/planning/common/planning_gflags.h"
 
