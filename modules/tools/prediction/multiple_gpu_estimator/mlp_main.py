@@ -153,7 +153,7 @@ def get_model_fn(num_gpus, variable_strategy, num_workers):
                 'train') // (params.train_batch_size * num_workers)
             boundaries = [
                 num_batches_per_epoch * x
-                for x in np.array([82, 123, 300], dtype=np.int64)
+                for x in np.array([20, 50, 80], dtype=np.int64)
             ]
             staged_lr = [
                 params.learning_rate * x for x in [1, 0.1, 0.01, 0.002]
@@ -409,17 +409,17 @@ if __name__ == '__main__':
     parser.add_argument(
         '--train-steps',
         type=int,
-        default=80000,
+        default=20000,
         help='The number of steps to use for training.')
     parser.add_argument(
         '--train-batch-size',
         type=int,
-        default=128,
+        default=10000,
         help='Batch size for training.')
     parser.add_argument(
         '--eval-batch-size',
         type=int,
-        default=100,
+        default=10000,
         help='Batch size for validation.')
     parser.add_argument(
         '--momentum',
