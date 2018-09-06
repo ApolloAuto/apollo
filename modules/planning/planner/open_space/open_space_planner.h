@@ -22,13 +22,15 @@
 #include <vector>
 
 #include "Eigen/Eigen"
+#include "modules/common/configs/proto/vehicle_config.pb.h"
+#include "modules/common/math/box2d.h"
+#include "modules/common/math/vec2d.h"
+#include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
 #include "modules/planning/common/frame_open_space.h"
 #include "modules/planning/planner/open_space/distance_approach_problem.h"
 #include "modules/planning/planner/open_space/warm_start_problem.h"
 #include "modules/planning/planner/planner.h"
 #include "modules/planning/proto/planning_config.pb.h"
-#include "modules/common/configs/proto/vehicle_config.pb.h"
-#include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
 
 /*
 Initially inspired by "Optimization-Based Collision Avoidance" from Xiaojing
@@ -80,11 +82,6 @@ class OpenSpacePlanner : public Planner {
   apollo::common::Status Plan(
       const common::TrajectoryPoint& planning_init_point,
       FrameOpenSpace* frame);
-
-  apollo::common::Status ObsHRep(
-      const std::size_t& nOb, const Eigen::MatrixXd& vOb,
-      const std::vector<std::vector<std::vector<double>>>& lOb,
-      Eigen::MatrixXd* A_all, Eigen::MatrixXd* b_all);
 
  private:
   std::unique_ptr<::apollo::planning::WarmStartProblem> warm_start_;

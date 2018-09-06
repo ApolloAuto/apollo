@@ -322,6 +322,8 @@ cc_library(
         "//modules/planning/common/trajectory:publishable_trajectory",
         "//modules/planning/proto:planning_config_proto",
         "//modules/planning/proto:planning_proto",
+        "//modules/common/math:geometry",
+        "@eigen",
     ],
 )
 
@@ -338,6 +340,7 @@ cc_test(
         ":frame",
         "//modules/common/util",
         "//modules/planning/proto:planning_config_proto",
+        "//modules/map/hdmap:hdmap_util",
         "@gtest//:main",
     ],
 )

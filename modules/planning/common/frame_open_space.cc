@@ -105,7 +105,7 @@ Status FrameOpenSpace::Init() {
       AddObstacle(*ptr);
     }
   }
-
+  // check collision
   if (FLAGS_enable_collision_detection) {
     const auto *collision_obstacle = FindCollisionObstacle();
     if (collision_obstacle) {
@@ -116,6 +116,13 @@ Status FrameOpenSpace::Init() {
       return Status(ErrorCode::PLANNING_ERROR, err_str);
     }
   }
+  // fill up the v and h presentation of the obstacle
+  if (VPresentationObstacle() && HPresentationObstacle()) {
+    AINFO << "fill up the v and h presentation of obstacle succeed";
+  } else {
+    AINFO << "fail to get v and h presentation of obstacle";
+  }
+
   return Status::OK();
 }
 
@@ -231,6 +238,118 @@ void FrameOpenSpace::AddObstacle(const Obstacle &obstacle) {
 
 const std::vector<const Obstacle *> FrameOpenSpace::obstacles() const {
   return obstacles_.Items();
+}
+
+bool FrameOpenSpace::VPresentationObstacle() {
+  obstacles_num_ = obstacles_.Items().size();
+  if (obstacles_num_ == 0) {
+    AINFO << "no obstacle by perception";
+    return false;
+  }
+  obstacles_vertices_num_ = 4 * Eigen::MatrixXd::Ones(obstacles_num_, 1);
+  for (const auto &obstacle : obstacles_.Items()) {
+    Box2d obstacle_box = obstacle->PerceptionBoundingBox();
+    std::vector<Vec2d> vertices_ccw = obstacle_box.GetAllCorners();
+    std::vector<Vec2d> vertice_cw;
+    while (!vertices_ccw.empty()) {
+      vertice_cw.emplace_back(vertices_ccw.back());
+      vertices_ccw.pop_back();
+    }
+    obstacles_vertices_vec_.emplace_back(vertice_cw);
+  }
+  return true;
+}
+
+bool FrameOpenSpace::HPresentationObstacle() {
+  obstacles_A_ = Eigen::MatrixXd::Zero(obstacles_vertices_num_.sum(), 2);
+  obstacles_b_ = Eigen::MatrixXd::Zero(obstacles_vertices_num_.sum(), 1);
+  // vertices using H-represetntation
+  if (ObsHRep(obstacles_num_, obstacles_vertices_num_, obstacles_vertices_vec_,
+              &obstacles_A_, &obstacles_b_) != Status::OK()) {
+    AINFO << "Fail to present obstacle in H";
+    return false;
+  }
+  return true;
+}
+
+Status FrameOpenSpace::ObsHRep(
+    const std::size_t &obstacles_num,
+    const Eigen::MatrixXd &obstacles_vertices_num,
+    const std::vector<std::vector<Vec2d>> &obstacles_vertices_vec,
+    Eigen::MatrixXd *A_all, Eigen::MatrixXd *b_all) {
+  // // TODO(JiaXuan) : Code replacement : find alternative ways for H
+  // presentation
+  // // caculation
+  // /*
+  // CHECK(obstacles_num == obstacles_vertices_vec.rows()) << "No. of obstacles
+  // size mismatch, obstacles_num : " << obstacles_num
+  //                          << ", obstacles_vertices_vec.rows() : " <<
+  //                          obstacles_vertices_vec.rows();
+  // */
+  // A_all->resize(obstacles_vertices_num.sum(), 2);
+  // b_all->resize(obstacles_vertices_num.sum(), 1);
+
+  // int counter = 1;
+
+  // // start building H representation
+  // // TODO(QiL) : Add basic sanity check for H representation.
+  // for (std::size_t i = 1; i != obstacles_num; ++i) {
+  //   Eigen::MatrixXd A_i(static_cast<int>(obstacles_vertices_num(i - 1, 0)),
+  //   2); Eigen::MatrixXd b_i(static_cast<int>(obstacles_vertices_num(i - 1,
+  //   0)), 1);
+
+  //   // take two subsequent vertices, and computer hyperplane
+  //   for (int j = 1; j != obstacles_vertices_num(i, 1); ++j) {
+  //     std::vector<double> v1 = obstacles_vertices_vec[i - 1][j - 1];
+  //     std::vector<double> v2 = obstacles_vertices_vec[i - 1][j];
+
+  //     Eigen::MatrixXd A_tmp(2, 1), b_tmp(2, 1), ab(2, 2);
+  //     // find hyperplane passing through v1 and v2
+  //     if (v1[0] == v2[0]) {
+  //       if (v2[1] < v1[1]) {
+  //         A_tmp << 1, 0;
+  //         b_tmp << v1[0];
+  //       } else {
+  //         A_tmp << -1, 0;
+  //         b_tmp << v1[1];
+  //       }
+  //     } else if (v1[1] == v2[1]) {
+  //       if (v1[1] < v2[1]) {
+  //         A_tmp << 0, 1;
+  //         b_tmp << v1[1];
+  //       } else {
+  //         A_tmp << 0, -1;
+  //         b_tmp << -v1[1];
+  //       }
+  //     } else {
+  //       Eigen::MatrixXd tmp1(2, 2);
+  //       tmp1 << v1[0], 1, v2[0], 1;
+  //       Eigen::MatrixXd tmp2(2, 1);
+  //       tmp2 << v1[1], v2[1];
+  //       ab = tmp2 * tmp1.inverse();
+  //       double a = ab(0, 0);
+  //       double b = ab(1, 0);
+
+  //       if (v1[0] < v2[0]) {
+  //         A_tmp << -a, 1;
+  //         b_tmp << b;
+  //       } else {
+  //         A_tmp << a, -1;
+  //         b_tmp << -b;
+  //       }
+  //     }
+
+  //     // store vertices
+  //     A_i.block(j, 0, 2, 1) = A_tmp;
+  //     b_i.block(j, 0, 1, 1) = b_tmp;
+  //   }
+
+  //   AINFO << "size of A_j is : " << A_i.size();
+
+  //   A_all->block(counter, 0, obstacles_vertices_num(i, 0) - 1, 1) = A_i;
+  //   b_all->block(counter, 0, obstacles_vertices_num(i, 0) - 1, 1) = b_i;
+  // }
+  return Status::OK();
 }
 
 }  // namespace planning
