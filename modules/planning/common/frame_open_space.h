@@ -106,6 +106,20 @@ class FrameOpenSpace {
 
   const Eigen::MatrixXd &obstacles_b() { return obstacles_b_; }
 
+  // @brief Transform the vertice presentation of the obstacles into linear
+  // inequality as Ax>b
+  bool HPresentationObstacle();
+
+  // @brief Helper function for HPresentationObstacle()
+  bool ObsHRep(const std::size_t &obstacles_num,
+               const Eigen::MatrixXd &obstacles_vertices_num,
+               const std::vector<std::vector<Vec2d>> &obstacles_vertices_vec,
+               Eigen::MatrixXd *A_all, Eigen::MatrixXd *b_all);
+
+  // @brief Represent the obstacles in vertices and load it into
+  // obstacles_vertices_vec_ in clock wise order
+  bool VPresentationObstacle();
+
  private:
   /**
    * Find an obstacle that collides with ADC (Autonomous Driving Car) if
@@ -118,22 +132,7 @@ class FrameOpenSpace {
 
   void AddObstacle(const Obstacle &obstacle);
 
-  // @brief Represent the obstacles in vertices and load it into
-  // obstacles_vertices_vec_ in clock wise order
-  bool VPresentationObstacle();
-
-  // @brief Transform the vertice presentation of the obstacles into linear
-  // inequality as Ax>b
-  bool HPresentationObstacle();
-
  private:
-  // @brief Helper function for HPresentationObstacle()
-  common::Status ObsHRep(
-      const std::size_t &obstacles_num,
-      const Eigen::MatrixXd &obstacles_vertices_num,
-      const std::vector<std::vector<Vec2d>> &obstacles_vertices_vec,
-      Eigen::MatrixXd *A_all, Eigen::MatrixXd *b_all);
-
   uint32_t sequence_num_ = 0;
   const hdmap::HDMap *hdmap_ = nullptr;
   common::TrajectoryPoint planning_start_point_;

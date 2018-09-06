@@ -360,6 +360,7 @@ cc_test(
         "//modules/common/util",
         "//modules/common/vehicle_state/proto:vehicle_state_proto",
         "//modules/planning/proto:planning_config_proto",
+        "@eigen",
         "@gtest//:main",
     ],
 )
