@@ -26,11 +26,13 @@
 #include <utility>
 #include <vector>
 
+#include "gtest/gtest_prod.h"
+
 #include "modules/common/configs/proto/vehicle_config.pb.h"
 #include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
 
 #include "modules/common/macro.h"
-#include "modules/planning/common/frame.h"
+#include "modules/planning/common/obstacle.h"
 #include "modules/planning/reference_line/reference_line.h"
 
 namespace apollo {
@@ -40,31 +42,30 @@ class EgoInfo {
  public:
   ~EgoInfo() = default;
 
-  void Init();
+  bool Update(const common::TrajectoryPoint& start_point,
+              const common::VehicleState& vehicle_state,
+              const std::vector<const Obstacle*>& obstacles);
 
   common::TrajectoryPoint start_point() const { return start_point_; }
 
-  void set_start_point(const common::TrajectoryPoint& start_point) {
-    start_point_ = start_point;
-  }
-
-  SLBoundary GetSLBoundaryOnReferenceLine(
-      const ReferenceLine* reference_line) const;
-
-  void SetSLBoundary(const ReferenceLine* reference_line,
-                     const SLBoundary& sl_boundary);
-
   common::VehicleState vehicle_state() const { return vehicle_state_; }
+
+  double front_clear_distance() const { return front_clear_distance_; }
+
+ private:
+  FRIEND_TEST(EgoInfoTest, EgoInfoSimpleTest);
 
   void set_vehicle_state(const common::VehicleState& vehicle_state) {
     vehicle_state_ = vehicle_state;
   }
 
-  void CalculateFrontObstacleClearDistance(const Frame& frame);
+  void set_start_point(const common::TrajectoryPoint& start_point) {
+    start_point_ = start_point;
+  }
 
-  double front_clear_distance() const { return front_clear_distance_; }
+  void CalculateFrontObstacleClearDistance(
+      const std::vector<const Obstacle*>& obstacles);
 
- private:
   // stitched point (at stitching mode)
   // or real vehicle point (at non-stitching mode)
   common::TrajectoryPoint start_point_;
@@ -81,7 +82,7 @@ class EgoInfo {
   /**
    * @brief SL boundary of vehicle realtime state relative to the reference line
    */
-  SLBoundary vehicle_sl_boundary_;
+  std::unordered_map<const ReferenceLine*, SLBoundary> vehicle_sl_boundary_map_;
 
   double front_clear_distance_ = std::numeric_limits<double>::max();
 

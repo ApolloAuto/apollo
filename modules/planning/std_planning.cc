@@ -22,6 +22,8 @@
 #include <utility>
 #include <vector>
 
+#include "gtest/gtest_prod.h"
+
 #include "modules/routing/proto/routing.pb.h"
 
 #include "modules/common/adapters/adapter_manager.h"
@@ -29,6 +31,7 @@
 #include "modules/common/time/time.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/hdmap/hdmap_util.h"
+#include "modules/planning/common/ego_info.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/trajectory/trajectory_stitcher.h"
@@ -242,6 +245,10 @@ void StdPlanning::RunOnce() {
     PublishPlanningPb(&not_ready_pb, start_timestamp);
     return;
   }
+
+  EgoInfo::instance()->Update(stitching_trajectory.back(), vehicle_state,
+                              frame_->obstacles());
+
   auto* trajectory_pb = frame_->mutable_trajectory();
   if (FLAGS_enable_record_debug) {
     frame_->RecordInputDebug(trajectory_pb->mutable_debug());
