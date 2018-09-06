@@ -24,8 +24,6 @@
 #include <algorithm>
 #include <cmath>
 
-#include "glog/logging.h"
-
 #include "modules/common/log.h"
 #include "modules/common/math/math_utils.h"
 

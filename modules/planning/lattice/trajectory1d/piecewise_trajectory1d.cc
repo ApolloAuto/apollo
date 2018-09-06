@@ -24,8 +24,6 @@
 
 #include "modules/common/log.h"
 
-#include "glog/logging.h"
-
 namespace apollo {
 namespace planning {
 

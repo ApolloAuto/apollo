@@ -20,8 +20,6 @@
 
 #include "modules/planning/lattice/trajectory1d/standing_still_trajectory1d.h"
 
-#include "glog/logging.h"
-
 namespace apollo {
 namespace planning {
 

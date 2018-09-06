@@ -24,7 +24,7 @@
 #include <cmath>
 #include <utility>
 
-#include "glog/logging.h"
+#include "modules/common/log.h"
 #include "modules/common/math/angle.h"
 #include "modules/common/math/integral.h"
 #include "modules/planning/math/curve1d/quintic_polynomial_curve1d.h"
