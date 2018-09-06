@@ -44,8 +44,8 @@ using apollo::perception::PerceptionObstacle;
 SpeedDecider::SpeedDecider() : Task("SpeedDecider") {}
 
 bool SpeedDecider::Init(const PlanningConfig& config) {
-  dp_st_speed_config_ =
-      config.lane_follow_scenario_config().dp_st_speed_config();
+  dp_st_speed_config_ = config.em_planner_config().scenario_config()
+      .scenario_lane_follow_config().dp_st_speed_config();
   st_boundary_config_ = dp_st_speed_config_.st_boundary_config();
   return true;
 }
