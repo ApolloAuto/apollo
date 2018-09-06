@@ -23,12 +23,14 @@
 #include <limits>
 #include <vector>
 
-#include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/proto/pnc_point.pb.h"
+#include "modules/planning/proto/planning_internal.pb.h"
+
+#include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/util/map_util.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
+#include "modules/planning/common/ego_info.h"
 #include "modules/planning/common/frame.h"
-#include "modules/planning/proto/planning_internal.pb.h"
 #include "modules/planning/toolkits/deciders/util.h"
 
 namespace apollo {
@@ -146,7 +148,7 @@ void SignalLight::SetCreepForwardSignalDecision(
     hdmap::PathOverlap* const signal_light) const {
   CHECK_NOTNULL(signal_light);
 
-  if (reference_line_info->AdcPlanningPoint().v() >
+  if (EgoInfo::instance()->start_point().v() >
       config_.signal_light().righ_turn_creep().speed_limit()) {
     ADEBUG << "Do not creep forward due to large speed.";
     return;

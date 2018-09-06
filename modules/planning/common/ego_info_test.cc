@@ -23,18 +23,14 @@
 #include "gtest/gtest.h"
 
 #include "modules/common/util/util.h"
+#include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/reference_line/reference_line_provider.h"
 
 namespace apollo {
 namespace planning {
 
-class EgoInfoTest : public ::testing::Test {
- public:
-  virtual void SetUp() {}
-};
-
-TEST_F(EgoInfoTest, simple) {
+TEST(EgoInfoTest, EgoInfoSimpleTest) {
   const auto p =
       common::util::MakePathPoint(1.23, 3.23, 52.18, 0.1, 0.3, 0.32, 0.4);
   common::TrajectoryPoint tp;
@@ -64,7 +60,7 @@ TEST_F(EgoInfoTest, simple) {
 
   Frame frame(sequence_num, planning_start_point, start_time, vehicle_state,
               &reference_line_provider);
-  ego_info->CalculateFrontObstacleClearDistance(frame);
+  ego_info->CalculateFrontObstacleClearDistance(frame.obstacles());
 }
 
 }  // namespace planning

@@ -32,6 +32,7 @@
 #include "modules/common/util/util.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/hdmap/hdmap_util.h"
+#include "modules/planning/common/ego_info.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/proto/planning_status.pb.h"
@@ -215,8 +216,8 @@ void Crosswalk::MakeDecisions(Frame* const frame,
             const auto obstacle_v = Vec2d(perception_obstacle.velocity().x(),
                                           perception_obstacle.velocity().y());
             const auto adc_path_point =
-                Vec2d(reference_line_info->AdcPlanningPoint().path_point().x(),
-                      reference_line_info->AdcPlanningPoint().path_point().y());
+                Vec2d(EgoInfo::instance()->start_point().path_point().x(),
+                      EgoInfo::instance()->start_point().path_point().y());
             const auto ovstacle_position =
                 Vec2d(perception_obstacle.position().x(),
                       perception_obstacle.position().y());
