@@ -26,9 +26,15 @@ bool CameraProcessSubnode::InitInternal() {
   std::unordered_map<std::string, std::string> fields;
   SubnodeHelper::ParseReserveField(reserve_, &fields);
 
-  if (fields.count("device_id")) device_id_ = fields["device_id"];
-  if (fields.count("pb_obj") && stoi(fields["pb_obj"])) pb_obj_ = true;
-  if (fields.count("pb_ln_msk") && stoi(fields["pb_ln_msk"])) pb_ln_msk_ = true;
+  if (fields.count("device_id")) {
+    device_id_ = fields["device_id"];
+  }
+  if (fields.count("pb_obj") && stoi(fields["pb_obj"])) {
+    pb_obj_ = true;
+  }
+  if (fields.count("pb_ln_msk") && stoi(fields["pb_ln_msk"])) {
+    pb_ln_msk_ = true;
+  }
 
   // Shared Data
   cam_obj_data_ = static_cast<CameraObjectData *>(
@@ -107,8 +113,7 @@ void CameraProcessSubnode::ImgCallback(const sensor_msgs::Image &message) {
   }
 
   timestamp_ns_ = curr_timestamp;
-  ADEBUG << "CameraProcessSubnode Process: "
-         << " frame: " << ++seq_num_;
+  ADEBUG << "CameraProcessSubnode Process:  frame: " << ++seq_num_;
   PERF_FUNCTION("CameraProcessSubnode");
   PERF_BLOCK_START();
 
@@ -259,9 +264,8 @@ void CameraProcessSubnode::VisualObjToSensorObj(
     CameraFrameSupplement::state_vars.initialized_ = true;
   }
 
-  for (size_t i = 0; i < objects.size(); ++i) {
-    std::shared_ptr<VisualObject> vobj = objects[i];
-    std::shared_ptr<Object> obj(new Object());
+  for (auto vobj : objects) {
+    std::unique_ptr<Object> obj(new Object());
 
     obj->id = vobj->id;
     obj->score = vobj->score;
@@ -285,19 +289,18 @@ void CameraProcessSubnode::VisualObjToSensorObj(
     obj->camera_supplement->alpha = vobj->alpha;
     obj->camera_supplement->pts8 = vobj->pts8;
 
-    ((*sensor_objects)->objects).emplace_back(obj);
+    ((*sensor_objects)->objects).emplace_back(obj.release());
   }
 }
 
 void CameraProcessSubnode::PublishDataAndEvent(
     const double timestamp, const SharedDataPtr<SensorObjects> &sensor_objects,
     const SharedDataPtr<CameraItem> &camera_item) {
-  CommonSharedDataKey key(timestamp, device_id_);
+  const CommonSharedDataKey key(timestamp, device_id_);
   cam_obj_data_->Add(key, sensor_objects);
   cam_shared_data_->Add(key, camera_item);
 
-  for (size_t idx = 0; idx < pub_meta_events_.size(); ++idx) {
-    const EventMeta &event_meta = pub_meta_events_[idx];
+  for (const EventMeta& event_meta : pub_meta_events_) {
     Event event;
     event.event_id = event_meta.event_id;
     event.timestamp = timestamp;
@@ -327,8 +330,8 @@ void CameraProcessSubnode::PublishPerceptionPbObj(
 
   // Relative speed of objects + latest ego car speed in X
   for (auto obstacle : obstacles.perception_obstacle()) {
-    obstacle.mutable_velocity()->set_x(obstacle.velocity().x() +
-                                       chassis_.speed_mps());
+    obstacle.mutable_velocity()->set_x(
+        obstacle.velocity().x() + chassis_.speed_mps());
   }
 
   AdapterManager::PublishPerceptionObstacles(obstacles);
