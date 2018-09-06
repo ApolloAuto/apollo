@@ -1186,8 +1186,8 @@ body {
         height: 100%;
         min-width: 550px;
 
-        tr {
-            border: 5px solid #1D2226;
+        tr, td {
+            border: 2px solid #1D2226;
         }
         td:first-child {
             width: 100px;
@@ -1200,29 +1200,21 @@ body {
                 width: 60px;
             }
         }
-        td:not(:first-child) {
-            border: 5px solid #1D2226;
-        }
 
         .drive-event-time-row {
-            div {
+            span {
                 position: relative;
-                width: 320px;
-                padding: 10px 145px 10px 10px;
-
+                padding: 10px 5px 10px 10px;
                 background: #101315;
                 white-space: nowrap;
 
-                @include small-screen {
-                    width: 290px;
-                }
-
                 .timestamp-button {
-                    position: absolute;
+                    position: relative;
                     top: 0px;
                     right: 0px;
                     padding: 5px 20px;
                     border: 5px solid #101315;
+                    margin-left: 10px;
 
                     background: #006AFF;
                     color: #FFFFFF;
@@ -1232,6 +1224,7 @@ body {
                     background: #49a9ee;
                 }
             }
+
         }
         .drive-event-msg-row {
             width: 70%;
@@ -1257,6 +1250,8 @@ body {
 
             background: #1D2226;
             color: #FFFFFF;
+
+            cursor: pointer;
         }
 
         .drive-event-type-button {

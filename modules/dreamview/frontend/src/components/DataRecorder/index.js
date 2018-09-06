@@ -103,14 +103,14 @@ export default class DriveEventEditor extends React.Component {
                             <tr className="drive-event-time-row">
                                 <td>Event Time</td>
                                 <td>
-                                    <div>
+                                    <span>
                                         {this.state.eventTime.toString()}
                                         <button
                                             className="timestamp-button"
                                             onClick={this.handleTimestampUpdate} >
                                             Update Time
                                         </button>
-                                    </div>
+                                    </span>
                                 </td>
                             </tr>
                             <tr className="drive-event-time-row">
