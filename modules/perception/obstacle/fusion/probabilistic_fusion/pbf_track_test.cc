@@ -14,18 +14,22 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <glog/logging.h>
 #include <algorithm>
 #include <functional>
 #include <map>
 #include <string>
 #include <vector>
+
 #include "boost/format.hpp"
 #include "gtest/gtest.h"
+
+#include "modules/common/log.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_sensor_manager.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_sensor_object.h"
+
 #define protected public
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_track.h"
+
 namespace apollo {
 namespace perception {
 
