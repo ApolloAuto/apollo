@@ -396,7 +396,10 @@ cc_library(
         "ego_info.h",
     ],
     deps = [
+        ":frame",
         "//modules/common:log",
+        "//modules/common/configs/proto:vehicle_config_proto",
+        "//modules/common/math:geometry",
         "//modules/common/vehicle_state/proto:vehicle_state_proto",
         "//modules/planning/reference_line",
         "@eigen",

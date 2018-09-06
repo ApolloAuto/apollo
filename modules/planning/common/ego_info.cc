@@ -20,15 +20,75 @@
 
 #include "modules/planning/common/ego_info.h"
 
+#include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/log.h"
 
 namespace apollo {
 namespace planning {
 
+using common::math::Vec2d;
+using common::math::Box2d;
+
 EgoInfo::EgoInfo() {}
 
-void EgoInfo::CalculateFrontClearDistance() {
-  // TODO(Liangliang): implement this function
+void EgoInfo::Init() {
+  common::VehicleConfig ego_vehicle_config_ =
+      common::VehicleConfigHelper::GetConfig();
+}
+
+SLBoundary EgoInfo::GetSLBoundaryOnReferenceLine(
+    const ReferenceLine* reference_line) const {
+  if (sl_boundary_map_.find(reference_line) != sl_boundary_map_.end()) {
+    return sl_boundary_map_.at(reference_line);
+  } else {
+    return SLBoundary();
+  }
+}
+
+void EgoInfo::SetSLBoundary(const ReferenceLine* reference_line,
+                            const SLBoundary& sl_boundary) {
+  sl_boundary_map_[reference_line] = sl_boundary;
+}
+
+void EgoInfo::CalculateFrontObstacleClearDistance(const Frame& frame) {
+  Vec2d position(vehicle_state_.x(), vehicle_state_.y());
+
+  const auto& param = ego_vehicle_config_.vehicle_param();
+  Vec2d vec_to_center(
+      (param.front_edge_to_center() - param.back_edge_to_center()) / 2.0,
+      (param.left_edge_to_center() - param.right_edge_to_center()) / 2.0);
+
+  Vec2d center(position + vec_to_center.rotate(vehicle_state_.heading()));
+
+  const double buffer = 0.1;  // in meters
+  Box2d ego_box(center, vehicle_state_.heading(), param.length() + buffer,
+                param.width() + buffer);
+  const double adc_half_diagnal = ego_box.diagonal() / 2.0;
+
+  Vec2d unit_vec_heading = Vec2d::CreateUnitVec2d(vehicle_state_.heading());
+
+  // Due to the error of ego heading, only short range distance is meaningful
+  const double kDistanceThreshold = 50.0;
+  const double impact_region_length =
+      param.length() + buffer + kDistanceThreshold;
+  Box2d ego_front_region(center + unit_vec_heading * kDistanceThreshold / 2.0,
+                         vehicle_state_.heading(), impact_region_length,
+                         param.width() + buffer);
+
+  for (const auto& obstacle : frame.obstacles()) {
+    if (obstacle->IsVirtual() ||
+        !ego_front_region.HasOverlap(obstacle->PerceptionBoundingBox())) {
+      continue;
+    }
+
+    double dist = ego_box.center().DistanceTo(
+                      obstacle->PerceptionBoundingBox().center()) -
+                  adc_half_diagnal;
+
+    if (front_clear_distance_ < 0.0 || dist < front_clear_distance_) {
+      front_clear_distance_ = dist;
+    }
+  }
 }
 
 }  // namespace planning

@@ -124,8 +124,7 @@ class Frame {
 
   /**
    * Find an obstacle that collides with ADC (Autonomous Driving Car) if
-   * such
-   * obstacle exists.
+   * such obstacle exists.
    * @return pointer to the obstacle if such obstacle exists, otherwise
    * @return false if no colliding obstacle.
    */
