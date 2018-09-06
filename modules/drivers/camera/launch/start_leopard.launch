@@ -55,7 +55,7 @@
 
     <node pkg="nodelet" type="nodelet" name="sensor_camera_obstacle" output="screen"
           args="load usb_cam/UsbCamNodelet camera_nodelet_manager" respawn="true" >
-      <param name="video_device" value="/dev/camera/obstacle" />
+      <param name="video_device" value="/dev/camera/lanemark" />
     	<param name="image_width" value="1920" />
     	<param name="image_height" value="1080" />
     	<param name="pixel_format" value="yuyv" />
@@ -71,5 +71,5 @@
       <remap from="/apollo/sensor/camera/traffic/camera_info" to="$(arg perception_obstacle)/camera_info" />
     </node>
   </group>
-  
+
 </launch>
