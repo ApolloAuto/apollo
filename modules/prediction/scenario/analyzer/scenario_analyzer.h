@@ -14,40 +14,30 @@
  * limitations under the License.
  *****************************************************************************/
 
-/**
- * @file
- **/
+#ifndef MODULES_PREDICTION_SCENARIO_ANALYZER_SCENARIO_ANALYZER_H_
+#define MODULES_PREDICTION_SCENARIO_ANALYZER_SCENARIO_ANALYZER_H_
 
-#include "modules/planning/scenarios/scenario_manager.h"
-
-#include <memory>
-
-#include "gtest/gtest.h"
+#include "modules/common/proto/scenario.pb.h"
+#include "modules/prediction/proto/scenario_feature.pb.h"
 
 namespace apollo {
-namespace planning {
+namespace prediction {
 
-class ScenarioManagerTest : public ::testing::Test {
+class ScenarioAnalyzer {
  public:
-  virtual void SetUp() {}
+  ScenarioAnalyzer() = default;
 
- protected:
-  ScenarioManager scenario_manager_;
+  virtual ~ScenarioAnalyzer() = default;
+
+  void Analyze(const ScenarioFeature& scenario_feature);
+
+  const apollo::common::Scenario& scenario() const;
+
+ private:
+  apollo::common::Scenario scenario_;
 };
 
-TEST_F(ScenarioManagerTest, Simple) {
-  EXPECT_TRUE(scenario_manager_.Init());
-  common::TrajectoryPoint tp;
-
-  uint32_t sequence_num = 10;
-  const double start_time = 123.45;
-  common::VehicleState vehicle_state;
-  ReferenceLineProvider reference_line_provider;
-  Frame frame(sequence_num, tp, start_time, vehicle_state,
-              &reference_line_provider);
-
-  scenario_manager_.Update(tp, frame);
-}
-
-}  // namespace planning
+}  // namespace prediction
 }  // namespace apollo
+
+#endif  // MODULES_PREDICTION_SCENARIO_ANALYZER_SCENARIO_ANALYZER_H_

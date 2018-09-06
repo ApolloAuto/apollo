@@ -54,12 +54,30 @@ class PoseContainer : public Container {
    * @brief Transform pose to a perception obstacle.
    * @return A pointer to a perception obstacle.
    */
-  apollo::perception::PerceptionObstacle* ToPerceptionObstacle();
+  perception::PerceptionObstacle* ToPerceptionObstacle();
 
   /**
    * @brief Get timestamp
    */
   double GetTimestamp();
+
+  /**
+   * @brief Get speed of adc
+   * @return speed of adc
+   */
+  double GetSpeed() const;
+
+   /**
+   * @brief Get heading of adc
+   * @return heading of adc
+   */
+  double GetTheta() const;
+
+  /**
+   * @brief Get adc position
+   * @return adc position
+   */
+  apollo::perception::Point GetPosition() const;
 
  private:
   /**
@@ -70,11 +88,11 @@ class PoseContainer : public Container {
 
  public:
   static const int ID = -1;
-  static const apollo::perception::PerceptionObstacle::Type type_ =
+  static const perception::PerceptionObstacle::Type type_ =
       perception::PerceptionObstacle::VEHICLE;
 
  private:
-  std::unique_ptr<apollo::perception::PerceptionObstacle> obstacle_ptr_;
+  std::unique_ptr<perception::PerceptionObstacle> obstacle_ptr_;
 };
 
 }  // namespace prediction

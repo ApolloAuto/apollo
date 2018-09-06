@@ -195,6 +195,16 @@ class PredictionMap {
       const int max_num_lane,
       std::vector<std::shared_ptr<const hdmap::LaneInfo>>* nearby_lanes);
 
+  static std::shared_ptr<const hdmap::LaneInfo> GetLeftNeighborLane(
+      const std::shared_ptr<const hdmap::LaneInfo>& ptr_ego_lane,
+      const Eigen::Vector2d& ego_position,
+      const double threshold);
+
+  static std::shared_ptr<const hdmap::LaneInfo> GetRightNeighborLane(
+      const std::shared_ptr<const hdmap::LaneInfo>& ptr_ego_lane,
+      const Eigen::Vector2d& ego_position,
+      const double threshold);
+
   /**
    * @brief Get nearby lanes by a position.
    * @param point The position to search its nearby lanes.
@@ -310,6 +320,12 @@ class PredictionMap {
   static int LaneTurnType(const std::string& lane_id);
 
  private:
+  static std::shared_ptr<const hdmap::LaneInfo> GetNeighborLane(
+      const std::shared_ptr<const hdmap::LaneInfo>& ptr_ego_lane,
+      const Eigen::Vector2d& ego_position,
+      const std::vector<std::string>& neighbor_lane_ids,
+      const double threshold);
+
   PredictionMap() = delete;
 };
 

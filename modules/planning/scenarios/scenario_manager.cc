@@ -23,6 +23,7 @@ namespace planning {
 
 bool ScenarioManager::Init() {
   RegisterScenarios();
+  scenario_ = scenario_factory_.CreateObject(ScenarioConfig::LANE_FOLLOW);
   return true;
 }
 
@@ -32,13 +33,17 @@ void ScenarioManager::RegisterScenarios() {
   });
 }
 
-void ScenarioManager::Update() {
-  // TODO(Liangliang): update scenario here.
-  scenario_ = scenario_factory_.CreateObject(ScenarioConfig::LANE_FOLLOW);
+void ScenarioManager::Update(const common::TrajectoryPoint& ego_point,
+                             const Frame& frame) {
+  const auto new_scenario_type = DecideCurrentScenario(ego_point, frame);
+  if (new_scenario_type != scenario_->scenario_type()) {
+    scenario_ = scenario_factory_.CreateObject(new_scenario_type);
+  }
 }
 
-ScenarioConfig::ScenarioType ScenarioManager::DecideCurrentScenario() {
-  return ScenarioConfig::LANE_FOLLOW;
+ScenarioConfig::ScenarioType ScenarioManager::DecideCurrentScenario(
+    const common::TrajectoryPoint& ego_point, const Frame& frame) {
+  return scenario_->Transfer(scenario_->scenario_type(), ego_point, frame);
 }
 
 }  // namespace planning

@@ -14,40 +14,41 @@
  * limitations under the License.
  *****************************************************************************/
 
-/**
- * @file
- **/
-
-#include "modules/planning/scenarios/scenario_manager.h"
-
-#include <memory>
+#include <string>
 
 #include "gtest/gtest.h"
 
+#include "modules/prediction/scenario/scenario_manager.h"
+#include "modules/prediction/container/container_manager.h"
+
 namespace apollo {
-namespace planning {
+namespace prediction {
+
+using apollo::common::adapter::AdapterConfig;
+using apollo::common::Scenario;
 
 class ScenarioManagerTest : public ::testing::Test {
  public:
-  virtual void SetUp() {}
+  virtual void SetUp() {
+    manager_ = ScenarioManager::instance();
+  }
 
  protected:
-  ScenarioManager scenario_manager_;
+  ScenarioManager* manager_ = nullptr;
 };
 
-TEST_F(ScenarioManagerTest, Simple) {
-  EXPECT_TRUE(scenario_manager_.Init());
-  common::TrajectoryPoint tp;
-
-  uint32_t sequence_num = 10;
-  const double start_time = 123.45;
-  common::VehicleState vehicle_state;
-  ReferenceLineProvider reference_line_provider;
-  Frame frame(sequence_num, tp, start_time, vehicle_state,
-              &reference_line_provider);
-
-  scenario_manager_.Update(tp, frame);
+TEST_F(ScenarioManagerTest, run) {
+  ContainerManager::instance()->RegisterContainers();
+  std::unique_ptr<Container> adc_traj_container =
+      ContainerManager::instance()->CreateContainer(
+          AdapterConfig::PLANNING_TRAJECTORY);
+  std::unique_ptr<Container> pose_container =
+      ContainerManager::instance()->CreateContainer(
+          AdapterConfig::LOCALIZATION);
+  manager_->Run();
+  const auto& scenario = manager_->scenario();
+  EXPECT_EQ(scenario.type(), Scenario::UNKNOWN);
 }
 
-}  // namespace planning
+}  // namespace prediction
 }  // namespace apollo

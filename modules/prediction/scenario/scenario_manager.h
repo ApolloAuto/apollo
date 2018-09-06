@@ -16,38 +16,40 @@
 
 /**
  * @file
- **/
+ */
 
-#include "modules/planning/scenarios/scenario_manager.h"
+#ifndef MODULES_PREDICTION_SCENARIO_SCENARIO_MANAGER_H_
+#define MODULES_PREDICTION_SCENARIO_SCENARIO_MANAGER_H_
 
-#include <memory>
-
-#include "gtest/gtest.h"
+#include "modules/common/macro.h"
+#include "modules/common/proto/scenario.pb.h"
+#include "modules/prediction/proto/prediction_conf.pb.h"
+#include "modules/prediction/scenario/feature_extractor/feature_extractor.h"
+#include "modules/prediction/scenario/analyzer/scenario_analyzer.h"
 
 namespace apollo {
-namespace planning {
+namespace prediction {
 
-class ScenarioManagerTest : public ::testing::Test {
+class ScenarioManager {
  public:
-  virtual void SetUp() {}
+  /**
+   * @brief Run scenario analysis
+   */
+  void Run();
 
- protected:
-  ScenarioManager scenario_manager_;
+  /**
+   * @brief Get scenario analysis result
+   */
+  const apollo::common::Scenario& scenario() const;
+
+ private:
+  FeatureExtractor feature_extractor_;
+  ScenarioAnalyzer scenario_analyzer_;
+
+  DECLARE_SINGLETON(ScenarioManager)
 };
 
-TEST_F(ScenarioManagerTest, Simple) {
-  EXPECT_TRUE(scenario_manager_.Init());
-  common::TrajectoryPoint tp;
-
-  uint32_t sequence_num = 10;
-  const double start_time = 123.45;
-  common::VehicleState vehicle_state;
-  ReferenceLineProvider reference_line_provider;
-  Frame frame(sequence_num, tp, start_time, vehicle_state,
-              &reference_line_provider);
-
-  scenario_manager_.Update(tp, frame);
-}
-
-}  // namespace planning
+}  // namespace prediction
 }  // namespace apollo
+
+#endif  // MODULES_PREDICTION_SCENARIO_SCENARIO_MANAGER_H_

@@ -14,40 +14,24 @@
  * limitations under the License.
  *****************************************************************************/
 
-/**
- * @file
- **/
-
-#include "modules/planning/scenarios/scenario_manager.h"
-
-#include <memory>
-
-#include "gtest/gtest.h"
+#include "modules/prediction/scenario/scenario_manager.h"
 
 namespace apollo {
-namespace planning {
+namespace prediction {
 
-class ScenarioManagerTest : public ::testing::Test {
- public:
-  virtual void SetUp() {}
+using apollo::common::Scenario;
 
- protected:
-  ScenarioManager scenario_manager_;
-};
+ScenarioManager::ScenarioManager() {}
 
-TEST_F(ScenarioManagerTest, Simple) {
-  EXPECT_TRUE(scenario_manager_.Init());
-  common::TrajectoryPoint tp;
-
-  uint32_t sequence_num = 10;
-  const double start_time = 123.45;
-  common::VehicleState vehicle_state;
-  ReferenceLineProvider reference_line_provider;
-  Frame frame(sequence_num, tp, start_time, vehicle_state,
-              &reference_line_provider);
-
-  scenario_manager_.Update(tp, frame);
+void ScenarioManager::Run() {
+  feature_extractor_.ExtractFeatures();
+  scenario_analyzer_.Analyze(feature_extractor_.GetScenarioFeatures());
+  // TODO(kechxu) deal with scenario output
 }
 
-}  // namespace planning
+const Scenario& ScenarioManager::scenario() const {
+  return scenario_analyzer_.scenario();
+}
+
+}  // namespace prediction
 }  // namespace apollo
