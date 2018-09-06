@@ -35,12 +35,13 @@ class ScenarioManager final {
 
   Scenario* mutable_scenario() { return scenario_.get(); }
 
-  void Update();
+  void Update(const common::TrajectoryPoint& ego_point, const Frame& frame);
 
  private:
   void RegisterScenarios();
 
-  ScenarioConfig::ScenarioType DecideCurrentScenario();
+  ScenarioConfig::ScenarioType DecideCurrentScenario(
+      const common::TrajectoryPoint& ego_point, const Frame& frame);
 
   common::util::Factory<ScenarioConfig::ScenarioType, Scenario>
       scenario_factory_;
