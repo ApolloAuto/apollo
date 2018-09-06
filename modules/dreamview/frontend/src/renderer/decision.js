@@ -25,6 +25,7 @@ import reasonClearZone from "assets/images/decision/clear-zone.png";
 import reasonCrosswalk from "assets/images/decision/crosswalk.png";
 import reasonEmergency from "assets/images/decision/emergency.png";
 import reasonNotReady from "assets/images/decision/not-ready.png";
+import reasonPullover from "assets/images/decision/pullover.png";
 
 import iconChangeLaneRight from "assets/images/decision/change-lane-right.png";
 import iconChangeLaneLeft from "assets/images/decision/change-lane-left.png";
@@ -50,7 +51,8 @@ const StopReasonMarkerMapping = {
     STOP_REASON_CLEAR_ZONE: reasonClearZone,
     STOP_REASON_CROSSWALK: reasonCrosswalk,
     STOP_REASON_EMERGENCY: reasonEmergency,
-    STOP_REASON_NOT_READY: reasonNotReady
+    STOP_REASON_NOT_READY: reasonNotReady,
+    STOP_REASON_PULL_OVER: reasonPullover,
 };
 
 const ChangeLaneMarkerMapping = {
@@ -229,7 +231,7 @@ export default class Decision {
         const marker = this.getFence("MAIN_STOP");
 
         for (const reason in StopReasonMarkerMapping) {
-            const reasonMarker = drawImage(StopReasonMarkerMapping[reason], 1, 1, 4.2, 3.7, 0);
+            const reasonMarker = drawImage(StopReasonMarkerMapping[reason], 1, 1, 4.2, 3.6, 0);
             marker.add(reasonMarker);
             marker[reason] = reasonMarker;
         }

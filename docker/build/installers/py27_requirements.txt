@@ -25,3 +25,6 @@ rospkg
 plyvel == 0.9
 pyproj
 shapely
+
+# Data format
+h5py
