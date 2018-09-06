@@ -22,6 +22,7 @@
 
 #include "gtest/gtest.h"
 
+#include "modules/planning/common/ego_info.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
@@ -36,18 +37,17 @@ class SpeedProfileGeneratorTest : public ::testing::Test {
 };
 
 TEST_F(SpeedProfileGeneratorTest, GenerateFallbackSpeedProfile) {
-  ReferenceLineInfo reference_line_info;
-  auto speed_data = spg_.GenerateFallbackSpeedProfile(reference_line_info);
+  auto speed_data = spg_.GenerateFallbackSpeedProfile();
   EXPECT_FALSE(speed_data.Empty());
 
-  common::VehicleState vehicle_state;
   common::TrajectoryPoint adc_planning_point;
-  ReferenceLine reference_line;
-  hdmap::RouteSegments segments;
   adc_planning_point.set_v(FLAGS_polynomial_speed_fallback_velocity + 0.1);
-  ReferenceLineInfo reference_line_info2(vehicle_state, adc_planning_point,
-                                         reference_line, segments);
-  auto speed_data2 = spg_.GenerateFallbackSpeedProfile(reference_line_info);
+
+  common::VehicleState vs;
+  const std::vector<const Obstacle*> obstacles;
+
+  EgoInfo::instance()->Update(adc_planning_point, vs, obstacles);
+  auto speed_data2 = spg_.GenerateFallbackSpeedProfile();
   EXPECT_FALSE(speed_data2.Empty());
 }
 

@@ -25,10 +25,12 @@
 #include <vector>
 
 #include "gtest/gtest.h"
-#include "modules/common/util/file.h"
-#include "modules/common/util/util.h"
+
 #include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
+
+#include "modules/common/util/file.h"
+#include "modules/common/util/util.h"
 
 namespace apollo {
 namespace planning {

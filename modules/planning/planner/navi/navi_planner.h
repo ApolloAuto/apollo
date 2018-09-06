@@ -100,8 +100,7 @@ class NaviPlanner : public PlannerWithReferenceLine {
   void GenerateFallbackPathProfile(const ReferenceLineInfo* reference_line_info,
                                    PathData* path_data);
 
-  void GenerateFallbackSpeedProfile(
-      const ReferenceLineInfo* reference_line_info, SpeedData* speed_data);
+  void GenerateFallbackSpeedProfile(SpeedData* speed_data);
 
   SpeedData GenerateStopProfile(const double init_speed,
                                 const double init_acc) const;
