@@ -55,7 +55,7 @@ def convert_to(bin_data, name):
             'data size (%d) must be multiple of feature_dim + 1 (%d).' %
             (bin_data.shape[0], feature_dim + 1))
     num_examples = bin_data.shape[0] // (feature_dim + 1)
-
+    print("num_examples:", num_examples)
     filename = os.path.join(name + '.tfrecords')
     print('Writing', filename)
     with tf.python_io.TFRecordWriter(filename) as writer:
@@ -83,7 +83,7 @@ def main(unused_argv):
             bin_data = np.fromfile(filename, dtype=np.float32)
 
             # Convert to Examples and write the result to TFRecords.
-            convert_to(bin_data, filename + '.train')
+            convert_to(bin_data, filename)
 
 
 if __name__ == '__main__':
