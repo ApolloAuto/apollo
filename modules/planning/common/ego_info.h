@@ -21,13 +21,16 @@
 #ifndef MODULES_PLANNING_COMMON_EGO_INFO_H_
 #define MODULES_PLANNING_COMMON_EGO_INFO_H_
 
+#include <limits>
 #include <unordered_map>
 #include <utility>
 #include <vector>
 
+#include "modules/common/configs/proto/vehicle_config.pb.h"
 #include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
 
 #include "modules/common/macro.h"
+#include "modules/planning/common/frame.h"
 #include "modules/planning/reference_line/reference_line.h"
 
 namespace apollo {
@@ -37,6 +40,8 @@ class EgoInfo {
  public:
   ~EgoInfo() = default;
 
+  void Init();
+
   common::TrajectoryPoint start_point() const { return start_point_; }
 
   void set_start_point(const common::TrajectoryPoint& start_point) {
@@ -44,18 +49,10 @@ class EgoInfo {
   }
 
   SLBoundary GetSLBoundaryOnReferenceLine(
-      const ReferenceLine* reference_line) const {
-    if (sl_boundary_map_.find(reference_line) != sl_boundary_map_.end()) {
-      return sl_boundary_map_.at(reference_line);
-    } else {
-      return SLBoundary();
-    }
-  }
+      const ReferenceLine* reference_line) const;
 
   void SetSLBoundary(const ReferenceLine* reference_line,
-                     const SLBoundary& sl_boundary) {
-    sl_boundary_map_[reference_line] = sl_boundary;
-  }
+                     const SLBoundary& sl_boundary);
 
   common::VehicleState vehicle_state() const { return vehicle_state_; }
 
@@ -63,7 +60,9 @@ class EgoInfo {
     vehicle_state_ = vehicle_state;
   }
 
-  void CalculateFrontClearDistance();
+  void CalculateFrontObstacleClearDistance(const Frame& frame);
+
+  double front_clear_distance() const { return front_clear_distance_; }
 
  private:
   // stitched point (at stitching mode)
@@ -84,7 +83,9 @@ class EgoInfo {
    */
   SLBoundary vehicle_sl_boundary_;
 
-  double front_clear_distance_ = -1.0;
+  double front_clear_distance_ = std::numeric_limits<double>::max();
+
+  common::VehicleConfig ego_vehicle_config_;
 
   DECLARE_SINGLETON(EgoInfo);
 };
