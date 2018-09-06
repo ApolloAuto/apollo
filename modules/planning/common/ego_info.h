@@ -45,6 +45,7 @@ class EgoInfo {
   bool Update(const common::TrajectoryPoint& start_point,
               const common::VehicleState& vehicle_state,
               const std::vector<const Obstacle*>& obstacles);
+  void Clear();
 
   common::TrajectoryPoint start_point() const { return start_point_; }
 
@@ -72,17 +73,6 @@ class EgoInfo {
 
   // ego vehicle state
   common::VehicleState vehicle_state_;
-
-  /**
-   * @brief SL boundary of stitching point (starting point of plan trajectory)
-   * relative to the reference line
-   */
-  std::unordered_map<const ReferenceLine*, SLBoundary> sl_boundary_map_;
-
-  /**
-   * @brief SL boundary of vehicle realtime state relative to the reference line
-   */
-  std::unordered_map<const ReferenceLine*, SLBoundary> vehicle_sl_boundary_map_;
 
   double front_clear_distance_ = std::numeric_limits<double>::max();
 
