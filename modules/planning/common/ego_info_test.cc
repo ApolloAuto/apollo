@@ -41,17 +41,6 @@ TEST(EgoInfoTest, EgoInfoSimpleTest) {
   EXPECT_DOUBLE_EQ(ego_info->start_point().path_point().y(), p.y());
   EXPECT_DOUBLE_EQ(ego_info->start_point().path_point().z(), p.z());
 
-  ReferenceLine ref_line;
-  SLBoundary sl_boundary;
-  sl_boundary.set_start_s(10.22);
-  sl_boundary.set_end_s(28.79);
-  ego_info->SetSLBoundary(&ref_line, sl_boundary);
-
-  SLBoundary sl_boundary2 = ego_info->GetSLBoundaryOnReferenceLine(&ref_line);
-
-  EXPECT_DOUBLE_EQ(sl_boundary2.start_s(), sl_boundary.start_s());
-  EXPECT_DOUBLE_EQ(sl_boundary2.end_s(), sl_boundary.end_s());
-
   uint32_t sequence_num = 0;
   common::TrajectoryPoint planning_start_point;
   const double start_time = 102342.0;

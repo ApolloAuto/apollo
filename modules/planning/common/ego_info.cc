@@ -43,6 +43,12 @@ bool EgoInfo::Update(const common::TrajectoryPoint& start_point,
   return true;
 }
 
+void EgoInfo::Clear() {
+  start_point_.Clear();
+  vehicle_state_.Clear();
+  front_clear_distance_ = std::numeric_limits<double>::max();
+}
+
 void EgoInfo::CalculateFrontObstacleClearDistance(
     const std::vector<const Obstacle*>& obstacles) {
   Vec2d position(vehicle_state_.x(), vehicle_state_.y());

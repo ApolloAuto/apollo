@@ -166,7 +166,9 @@ SpeedData SpeedProfileGenerator::GenerateStopProfileFromPolynomial(
   AERROR << "Slowing down the car with polynomial.";
   constexpr double kMaxT = 4.0;
   for (double t = 2.0; t <= kMaxT; t += 0.5) {
-    for (double s = 0.0; s < 50.0; s += 1.0) {
+    for (double s = 0.0;
+         s < std::min(50.0, EgoInfo::instance()->front_clear_distance() - 0.3);
+         s += 1.0) {
       QuinticPolynomialCurve1d curve(0.0, init_speed, init_acc, s, 0.0, 0.0, t);
       if (!IsValidProfile(curve)) {
         continue;

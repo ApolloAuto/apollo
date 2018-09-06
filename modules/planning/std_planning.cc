@@ -361,6 +361,8 @@ Status StdPlanning::Plan(
 
   auto status = planner_->Plan(stitching_trajectory.back(), frame_.get());
 
+  ptr_debug->mutable_planning_data()->set_front_clear_distance(
+      EgoInfo::instance()->front_clear_distance());
   ExportReferenceLineDebug(ptr_debug);
 
   const auto* best_ref_info = frame_->FindDriveReferenceLineInfo();
@@ -455,6 +457,7 @@ void StdPlanning::Stop() {
   FrameHistory::instance()->Clear();
   GetPlanningStatus()->Clear();
   last_routing_.Clear();
+  EgoInfo::instance()->Clear();
 }
 
 }  // namespace planning
