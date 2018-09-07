@@ -32,11 +32,11 @@ class AutotuningRawFeatureGeneratorTest : public ::testing::Test {
     common::TrajectoryPoint ego_pos;
     ReferenceLine reference_line;
     hdmap::RouteSegments segments;
-    ref_line_info_.reset(new ReferenceLineInfo(ego_state, ego_pos,
-                         reference_line, segments));
+    ref_line_info_.reset(
+        new ReferenceLineInfo(ego_state, ego_pos, reference_line, segments));
     // pseudo empty frame info
     frame_.reset(new Frame(0, ego_pos, 0, ego_state, nullptr));
-    std::vector<double> evaluate_time{1., 2. , 3., 4., 5., 6., 7., 8.};
+    std::vector<double> evaluate_time{1., 2., 3., 4., 5., 6., 7., 8.};
     generator_.reset(new AutotuningRawFeatureGenerator(evaluate_time));
   }
 
@@ -55,16 +55,16 @@ TEST_F(AutotuningRawFeatureGeneratorTest, generate_input_trajectory) {
   // init trajectory
   std::vector<common::TrajectoryPoint> trajectory;
   ASSERT_TRUE(generator_ != nullptr);
-  auto result = generator_->evaluate_trajectory(trajectory,
-                *ref_line_info_, *frame_, nullptr);
+  auto result = generator_->evaluate_trajectory(trajectory, *ref_line_info_,
+                                                *frame_, nullptr);
   EXPECT_TRUE(result == common::Status::OK());
 }
 
 TEST_F(AutotuningRawFeatureGeneratorTest, generate_input_trajectory_pointwise) {
   common::TrajectoryPoint trajectory_point;
   ASSERT_TRUE(generator_ != nullptr);
-  auto result = generator_->evaluate_trajectory_point(trajectory_point,
-                *ref_line_info_, *frame_, nullptr);
+  auto result = generator_->evaluate_trajectory_point(
+      trajectory_point, *ref_line_info_, *frame_, nullptr);
   EXPECT_TRUE(result == common::Status::OK());
 }
 
