@@ -38,7 +38,7 @@ DpPolyPathOptimizer::DpPolyPathOptimizer()
     : PathOptimizer("DpPolyPathOptimizer") {}
 
 bool DpPolyPathOptimizer::Init(const PlanningConfig &config) {
-  config_ = config.em_planner_config().scenario_config()
+  config_ = config.planner_em_config().scenario_config()
       .scenario_lane_follow_config().dp_poly_path_config();
   is_init_ = true;
   return true;

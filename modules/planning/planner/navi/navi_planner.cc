@@ -88,7 +88,7 @@ Status NaviPlanner::Init(const PlanningConfig& config) {
 
   AINFO << "In NaviPlanner::Init()";
   RegisterTasks();
-  for (const auto task : config.navi_planner_config().task()) {
+  for (const auto task : config.planner_navi_config().task()) {
     tasks_.emplace_back(
         task_factory_.CreateObject(static_cast<TaskType>(task)));
     AINFO << "Created task:" << tasks_.back()->Name();

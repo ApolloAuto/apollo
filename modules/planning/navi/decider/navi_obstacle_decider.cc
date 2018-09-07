@@ -53,7 +53,7 @@ constexpr double kEpislon = 1e-6;
 NaviObstacleDecider::NaviObstacleDecider() : Task("NaviObstacleDecider") {}
 
 bool NaviObstacleDecider::Init(const PlanningConfig& config) {
-  config_ = config.navi_planner_config().navi_obstacle_decider_config();
+  config_ = config.planner_navi_config().navi_obstacle_decider_config();
   return true;
 }
 
