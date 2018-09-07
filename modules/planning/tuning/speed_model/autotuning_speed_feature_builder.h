@@ -56,7 +56,8 @@ class AutotuningSpeedFeatureBuilder : public AutotuningFeatureBuilder {
   void map_obstacle_feature(
       const autotuning::SpeedPointRawFeature_ObjectDecisionFeature&
           obj_raw_feature,
-      autotuning::SpeedPointwiseFeature_ObstacleFeature* input_feature);
+      autotuning::SpeedPointwiseFeature_ObstacleFeature* const input_feature)
+      const;
 
   /**
    * @brief: map nudge obstacle to model input feature
@@ -64,7 +65,8 @@ class AutotuningSpeedFeatureBuilder : public AutotuningFeatureBuilder {
   void map_nudge_obs_feature(
       const autotuning::SpeedPointRawFeature_ObjectDecisionFeature&
           obj_raw_feature,
-      autotuning::SpeedPointwiseFeature_ObstacleFeature* input_feature);
+      autotuning::SpeedPointwiseFeature_ObstacleFeature* const input_feature)
+      const;
 
   /**
    * @brief: map sidepass obstacle to model input feature
@@ -72,7 +74,8 @@ class AutotuningSpeedFeatureBuilder : public AutotuningFeatureBuilder {
   void map_sidepass_obs_feature(
       const autotuning::SpeedPointRawFeature_ObjectDecisionFeature&
           obj_raw_feature,
-      autotuning::SpeedPointwiseFeature_ObstacleFeature* input_feature);
+      autotuning::SpeedPointwiseFeature_ObstacleFeature* const input_feature)
+      const;
 };
 
 }  // namespace planning
@@ -80,4 +83,3 @@ class AutotuningSpeedFeatureBuilder : public AutotuningFeatureBuilder {
 
 #endif
 // MODULES_PLANNING_TUNING_SPEED_MODEL_AUTOTUNING_SPEED_FEATURE_BUILDER_H_
-

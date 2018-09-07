@@ -14,20 +14,20 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/planning/tuning/autotuning_mlp_net_model.h"
+/**
+ * @file: testing casese for mlp net model
+ **/
+
+#include "modules/planning/tuning/speed_model/autotuning_speed_mlp_model.h"
+
+#include "gtest/gtest.h"
 
 namespace apollo {
 namespace planning {
 
-void AutotuningMLPModel::Run(const std::vector<Eigen::MatrixXf>& inputs,
-                             Eigen::MatrixXf* const output) const {
-  Eigen::MatrixXf inp = inputs[0];
-  Eigen::MatrixXf temp;
-  for (size_t i = 0; i < layers_.size(); ++i) {
-    layers_[i]->Run({inp}, &temp);
-    inp = temp;
-  }
-  *output = temp;
+TEST(AutotuningSpeedMLPModel, test_case_one) {
+  AutotuningSpeedMLPModel speed_model;
+  EXPECT_TRUE(speed_model.SetParams() == common::Status::OK());
 }
 
 }  // namespace planning

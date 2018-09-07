@@ -13,21 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-
-#include "modules/planning/tuning/autotuning_mlp_net_model.h"
+#include "modules/planning/tuning/speed_model/autotuning_speed_mlp_model.h"
+#include "modules/planning/tuning/speed_model/autotuning_speed_feature_builder.h"
 
 namespace apollo {
 namespace planning {
 
-void AutotuningMLPModel::Run(const std::vector<Eigen::MatrixXf>& inputs,
-                             Eigen::MatrixXf* const output) const {
-  Eigen::MatrixXf inp = inputs[0];
-  Eigen::MatrixXf temp;
-  for (size_t i = 0; i < layers_.size(); ++i) {
-    layers_[i]->Run({inp}, &temp);
-    inp = temp;
-  }
-  *output = temp;
+common::Status AutotuningSpeedMLPModel::SetParams() {
+  mlp_model_.reset(new AutotuningMLPModel());
+  feature_builder_.reset(new AutotuningSpeedFeatureBuilder());
+  return common::Status::OK();
+}
+
+double AutotuningSpeedMLPModel::Evaluate(
+    const autotuning::TrajectoryFeature& trajectory_feature) const {
+  return 0.0;
+}
+
+double AutotuningSpeedMLPModel::Evaluate(
+    const autotuning::TrajectoryPointwiseFeature& point_feature) const {
+  return 0.0;
 }
 
 }  // namespace planning
