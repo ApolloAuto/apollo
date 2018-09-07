@@ -86,13 +86,12 @@ class StdPlanning : public PlanningBase {
                            const common::TrajectoryPoint& planning_start_point,
                            const double start_time,
                            const common::VehicleState& vehicle_state);
-
-  routing::RoutingResponse last_routing_;
-
   void ExportReferenceLineDebug(planning_internal::Debug* debug);
+  bool CheckPlanningConfig();
 
+ private:
+  routing::RoutingResponse last_routing_;
   std::unique_ptr<Frame> frame_;
-
   std::unique_ptr<ReferenceLineProvider> reference_line_provider_;
 };
 

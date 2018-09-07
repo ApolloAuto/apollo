@@ -36,24 +36,15 @@ message ScenarioLaneFollowConfig {
 
 message ScenarioConfig {
   enum ScenarioType {
-    // LANE_FOLLOW is the default scenario
-    LANE_FOLLOW = 0;
-    // change from one lane to an adjacent lane
+    LANE_FOLLOW = 0;  // default scenario
     CHANGE_LANE = 1;
-    // go around an object when it blocks the road.
-    SIDE_PASS = 2;
-    // approach to an intersection
-    APPROACH = 3;
-    // drive at an intersection with 4-way stop sign
+    SIDE_PASS = 2;  // go around an object when it blocks the road
+    APPROACH = 3;  // approach to an intersection
     INTERSECTION_STOP_SIGN_FOUR_WAY = 4;
-    // drive at an intersection with 1 or 2 way stop sign
     INTERSECTION_STOP_SIGN_ONE_OR_TWO_WAY = 5;
-    // turn left at an intersection with traffic light
     INTERSECTION_TRAFFIC_LIGHT_LEFT_TURN = 6;
-    // turn right at an intersection with traffic light
     INTERSECTION_TRAFFIC_LIGHT_RIGHT_TURN = 7;
-    // go through an intersection with traffic light
-    INTERSECTION_TRAFFIC_GO_THROUGH = 8;
+    INTERSECTION_TRAFFIC_LIGHT_GO_THROUGH = 8;
   }
 
   optional ScenarioType scenario_type = 1;
@@ -62,8 +53,14 @@ message ScenarioConfig {
   }
 };
 
+message PlannerRTKonfig {
+}
+
 message PlannerEMConfig {
   optional ScenarioConfig scenario_config = 1;
+}
+
+message PlannerLatticeonfig {
 }
 
 message PlannerNaviConfig {
@@ -83,8 +80,10 @@ message PlanningConfig {
   };
   optional PlannerType planner_type = 1 [default = EM];
   oneof planner_config {
-    PlannerEMConfig planner_em_config = 2;
-    PlannerNaviConfig planner_navi_config = 3;
-    PlannerOpenSpaceConfig planner_open_space_config = 4;
+    PlannerRTKonfig planner_rtk_config = 2;
+    PlannerEMConfig planner_em_config = 3;
+    PlannerLatticeonfig planner_lattice_config = 4;
+    PlannerNaviConfig planner_navi_config = 5;
+    PlannerOpenSpaceConfig planner_open_space_config = 6;
   }
 }
