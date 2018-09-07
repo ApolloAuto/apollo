@@ -13,39 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-
-/**
- * @file
- **/
-
-#ifndef MODULES_PLANNING_TOOLKITS_DECIDERS_BACKSIDE_VEHICE_H_
-#define MODULES_PLANNING_TOOLKITS_DECIDERS_BACKSIDE_VEHICE_H_
-
-#include <string>
-
-#include "modules/planning/toolkits/deciders/traffic_rule.h"
+#include "modules/planning/tuning/speed_model/autotuning_speed_mlp_model.h"
+#include "modules/planning/tuning/speed_model/autotuning_speed_feature_builder.h"
 
 namespace apollo {
 namespace planning {
 
-class BacksideVehicle : public TrafficRule {
- public:
-  explicit BacksideVehicle(const TrafficRuleConfig& config);
-  virtual ~BacksideVehicle() = default;
+common::Status AutotuningSpeedMLPModel::SetParams() {
+  mlp_model_.reset(new AutotuningMLPModel());
+  feature_builder_.reset(new AutotuningSpeedFeatureBuilder());
+  return common::Status::OK();
+}
 
-  common::Status ApplyRule(Frame* const frame,
-                 ReferenceLineInfo* const reference_line_info);
+double AutotuningSpeedMLPModel::Evaluate(
+    const autotuning::TrajectoryFeature& trajectory_feature) const {
+  return 0.0;
+}
 
- private:
-  /**
-   * @brief When the reference line info indicates that there is no lane change,
-   * use lane keeping strategy for back side vehicles.
-   */
-  void MakeLaneKeepingObstacleDecision(const SLBoundary& adc_sl_boundary,
-                                       PathDecision* path_decision);
-};
+double AutotuningSpeedMLPModel::Evaluate(
+    const autotuning::TrajectoryPointwiseFeature& point_feature) const {
+  return 0.0;
+}
 
 }  // namespace planning
 }  // namespace apollo
-
-#endif  // MODULES_PLANNING_TOOLKITS_DECIDERS_BACK_SIDEVEHICE_H_

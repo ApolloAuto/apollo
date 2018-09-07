@@ -15,37 +15,20 @@
  *****************************************************************************/
 
 /**
- * @file
+ * @file: testing casese for mlp net model
  **/
 
-#ifndef MODULES_PLANNING_TOOLKITS_DECIDERS_BACKSIDE_VEHICE_H_
-#define MODULES_PLANNING_TOOLKITS_DECIDERS_BACKSIDE_VEHICE_H_
+#include "modules/planning/tuning/speed_model/autotuning_speed_mlp_model.h"
 
-#include <string>
-
-#include "modules/planning/toolkits/deciders/traffic_rule.h"
+#include "gtest/gtest.h"
 
 namespace apollo {
 namespace planning {
 
-class BacksideVehicle : public TrafficRule {
- public:
-  explicit BacksideVehicle(const TrafficRuleConfig& config);
-  virtual ~BacksideVehicle() = default;
-
-  common::Status ApplyRule(Frame* const frame,
-                 ReferenceLineInfo* const reference_line_info);
-
- private:
-  /**
-   * @brief When the reference line info indicates that there is no lane change,
-   * use lane keeping strategy for back side vehicles.
-   */
-  void MakeLaneKeepingObstacleDecision(const SLBoundary& adc_sl_boundary,
-                                       PathDecision* path_decision);
-};
+TEST(AutotuningSpeedMLPModel, test_case_one) {
+  AutotuningSpeedMLPModel speed_model;
+  EXPECT_TRUE(speed_model.SetParams() == common::Status::OK());
+}
 
 }  // namespace planning
 }  // namespace apollo
-
-#endif  // MODULES_PLANNING_TOOLKITS_DECIDERS_BACK_SIDEVEHICE_H_

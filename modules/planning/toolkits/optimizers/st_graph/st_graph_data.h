@@ -19,8 +19,8 @@
  * @brief: data with map info and obstacle info
  **/
 
-#ifndef MODULES_PLANNING_TASKS_ST_GRAPH_ST_GRAPH_DATA_H_
-#define MODULES_PLANNING_TASKS_ST_GRAPH_ST_GRAPH_DATA_H_
+#ifndef MODULES_PLANNING_TOOLKITS_OPTIMIZERS_ST_GRAPH_ST_GRAPH_DATA_H_
+#define MODULES_PLANNING_TOOLKITS_OPTIMIZERS_ST_GRAPH_ST_GRAPH_DATA_H_
 
 #include <vector>
 
@@ -58,4 +58,4 @@ class StGraphData {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_TASKS_ST_GRAPH_ST_GRAPH_DATA_H_
+#endif  // MODULES_PLANNING_TOOLKITS_OPTIMIZERS_ST_GRAPH_ST_GRAPH_DATA_H_

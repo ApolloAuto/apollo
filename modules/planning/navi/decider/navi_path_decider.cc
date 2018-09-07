@@ -45,7 +45,7 @@ NaviPathDecider::NaviPathDecider() : Task("NaviPathDecider") {
 bool NaviPathDecider::Init(const PlanningConfig& config) {
   move_dest_lane_config_talbe_.clear();
   max_speed_levels_.clear();
-  config_ = config.navi_planner_config().navi_path_decider_config();
+  config_ = config.planner_navi_config().navi_path_decider_config();
   auto move_dest_lane_config_talbe = config_.move_dest_lane_config_talbe();
   for (const auto& item : move_dest_lane_config_talbe.lateral_shift()) {
     double max_speed_level = item.max_speed();

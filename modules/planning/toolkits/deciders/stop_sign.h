@@ -18,8 +18,8 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_TASKS_TRAFFIC_DECIDER_STOP_SIGN_H_
-#define MODULES_PLANNING_TASKS_TRAFFIC_DECIDER_STOP_SIGN_H_
+#ifndef MODULES_PLANNING_TOOLKITS_DECIDERS_STOP_SIGN_H_
+#define MODULES_PLANNING_TOOLKITS_DECIDERS_STOP_SIGN_H_
 
 #include <string>
 #include <unordered_map>
@@ -85,4 +85,4 @@ class StopSign : public TrafficRule {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_TASKS_TRAFFIC_DECIDER_STOP_SIGN_H_
+#endif  // MODULES_PLANNING_TOOLKITS_DECIDERS_STOP_SIGN_H_
