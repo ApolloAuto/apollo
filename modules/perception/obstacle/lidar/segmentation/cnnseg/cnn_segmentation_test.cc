@@ -77,17 +77,6 @@ cv::Vec3b GetTypeColor(ObjectType type) {
   }
 }
 
-class CNNSegmentationTest : public testing::Test {
-  void SetUp() {
-    google::InitGoogleLogging("CNNSegmentationTest");
-    cnn_segmentor_.reset(new CNNSegmentation());
-  }
-  void TearDown() {}
-
- protected:
-  shared_ptr<CNNSegmentation> cnn_segmentor_;
-};
-
 bool IsValidRowCol(int row, int rows, int col, int cols) {
   return row >= 0 && row < rows && col >= 0 && col < cols;
 }
@@ -214,7 +203,7 @@ void DrawDetection(PointCloudPtr pc_ptr, const PointIndices &valid_idx,
   fclose(f_res);
 }
 
-TEST_F(CNNSegmentationTest, test_cnnseg_det) {
+TEST(CNNSegmentationTest, CnnSegDet) {
   // generate input point cloud data
   const string in_pcd_file = FLAGS_test_dir + FLAGS_pcd_name + ".pcd";
   AINFO << "pcd file: " << in_pcd_file;
@@ -233,12 +222,12 @@ TEST_F(CNNSegmentationTest, test_cnnseg_det) {
   std::vector<std::shared_ptr<Object>> out_objects;
 
   // testing initialization function
-  EXPECT_TRUE(cnn_segmentor_->Init());
+  CNNSegmentation cnn_segmentor;
+  EXPECT_TRUE(cnn_segmentor.Init());
 
   // testing segment function
   for (int i = 0; i < 10; ++i) {
-    EXPECT_TRUE(
-        cnn_segmentor_->Segment(in_pc, valid_idx, options, &out_objects));
+    EXPECT_TRUE(cnn_segmentor.Segment(in_pc, valid_idx, options, &out_objects));
     EXPECT_EQ(out_objects.size(), 13);
   }
 
@@ -246,8 +235,8 @@ TEST_F(CNNSegmentationTest, test_cnnseg_det) {
   // do visualization of segmentation results (output object detections)
   string result_file(FLAGS_test_dir);
   result_file = result_file + FLAGS_pcd_name + "-detection.txt";
-  DrawDetection(in_pc, valid_idx, cnn_segmentor_->height(),
-                cnn_segmentor_->width(), cnn_segmentor_->range(), out_objects,
+  DrawDetection(in_pc, valid_idx, cnn_segmentor.height(),
+                cnn_segmentor.width(), cnn_segmentor.range(), out_objects,
                 result_file);
 #endif
 }
