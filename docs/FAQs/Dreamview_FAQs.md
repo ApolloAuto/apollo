@@ -28,6 +28,11 @@ Ex:
 This way, dreamview can be accessed from http://localhost:<PORT_NUMBER> (http://localhost:5555 from the example)
 
 ---
+## Dreamview is too slow. How do I resolve it?
+
+If you feel Dreamview is taking too long to load/work, please run both the [WebGL reports](http://webglreport.com/?v=1). If there are any missing drivers, please install them
+
+---
 ## How to draw anything in DreamView (e.g. an arrow)
 
 Dreamview uses https://github.com/mrdoob/three.js as graphics library. You can modify the frontend code to draw an arrow using the corresponding API of the library. After that you need to run a `./apollo.sh build_fe` to compile.
