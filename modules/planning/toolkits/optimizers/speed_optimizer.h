@@ -18,8 +18,8 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_TASKS_SPEED_OPTIMIZER_H_
-#define MODULES_PLANNING_TASKS_SPEED_OPTIMIZER_H_
+#ifndef MODULES_PLANNING_TOOLKITS_OPTIMIZERS_SPEED_OPTIMIZER_H_
+#define MODULES_PLANNING_TOOLKITS_OPTIMIZERS_SPEED_OPTIMIZER_H_
 
 #include <string>
 #include <vector>
@@ -56,4 +56,4 @@ class SpeedOptimizer : public Task {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_TASKS_SPEED_OPTIMIZER_H_
+#endif  // MODULES_PLANNING_TOOLKITS_OPTIMIZERS_SPEED_OPTIMIZER_H_
