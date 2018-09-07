@@ -35,16 +35,13 @@
 2. 根据车辆反应情况，调整命令脚本
 3. 运行 `python plot_data.py ` 使采集到的数据可视化
 
-
 比如输出指令 `15 5.2 -10`,将会生成名为`t15b-10r0.csv`的文件。
 
-
-
 ### 处理数据
-对每个记录的日志分别运行`process_data.sh {dir}`，其中dir为{command}.txt_recorded.csv所在的目录。每个数据日志被处理并追加到`result.csv`
+对每个记录的日志分别运行`process_data.sh {dir}`，其中dir为`t15b-10r0.csv`所在的目录。每个数据日志被处理成`t15b-10r0.csv.result`。
 
 ### 绘制结果
-通过运行`python plot_results.py result.csv`得到可视化最终结果，检查是否有异常
+通过运行`python plot_results.py t15b-10r0.csv`得到可视化最终结果，检查是否有异常
 
 ### 转换结果为`protobuf`格式
 如果一切正常，运行`result2pb.sh`，把校准结果result.csv转换成控制模块定义的`protobuf`格式
