@@ -18,8 +18,8 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_TASKS_POLY_ST_POLY_ST_SPEED_OPTIMIZER_H_
-#define MODULES_PLANNING_TASKS_POLY_ST_POLY_ST_SPEED_OPTIMIZER_H_
+#ifndef MODULES_PLANNING_TOOLKITS_OPTIMIZERS_POLY_ST_SPEED_OPTIMIZER_H_
+#define MODULES_PLANNING_TOOLKITS_OPTIMIZERS_POLY_ST_SPEED_OPTIMIZER_H_
 
 #include "modules/common/configs/proto/vehicle_config.pb.h"
 #include "modules/planning/proto/planning_config.pb.h"
@@ -54,4 +54,4 @@ class PolyStSpeedOptimizer : public SpeedOptimizer {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_TASKS_POLY_ST_POLY_ST_SPEED_OPTIMIZER_H_
+#endif  // MODULES_PLANNING_TOOLKITS_OPTIMIZERS_POLY_ST_SPEED_OPTIMIZER_H_

@@ -18,8 +18,8 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_TASKS_TRAFFIC_DECIDER_CREEPER_H_
-#define MODULES_PLANNING_TASKS_TRAFFIC_DECIDER_CREEPER_H_
+#ifndef MODULES_PLANNING_TOOLKITS_DECIDERS_CREEPER_H_
+#define MODULES_PLANNING_TOOLKITS_DECIDERS_CREEPER_H_
 
 #include "modules/common/macro.h"
 #include "modules/map/pnc_map/path.h"
@@ -49,4 +49,4 @@ class Creeper {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_TASKS_TRAFFIC_DECIDER_CREEPER_H_
+#endif  // MODULES_PLANNING_TOOLKITS_DECIDERS_CREEPER_H_
