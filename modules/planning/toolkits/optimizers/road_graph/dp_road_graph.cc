@@ -15,30 +15,28 @@
  *****************************************************************************/
 
 /**
- * @file dp_road_graph.h
+ * @file dp_road_graph.cc
  **/
 
-#include "modules/planning/toolkits/optimizers/dp_poly_path/dp_road_graph.h"
+#include "modules/planning/toolkits/optimizers/road_graph/dp_road_graph.h"
 
 #include <algorithm>
 #include <utility>
 
+#include "modules/common/proto/error_code.pb.h"
+#include "modules/planning/proto/planning_internal.pb.h"
+#include "modules/planning/proto/planning_status.pb.h"
+
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/log.h"
 #include "modules/common/math/cartesian_frenet_conversion.h"
-#include "modules/common/proto/error_code.pb.h"
-#include "modules/common/proto/pnc_point.pb.h"
 #include "modules/common/util/thread_pool.h"
 #include "modules/common/util/util.h"
-
 #include "modules/map/hdmap/hdmap_util.h"
-
 #include "modules/planning/common/path/frenet_frame_path.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/math/curve1d/quintic_polynomial_curve1d.h"
-#include "modules/planning/proto/planning_internal.pb.h"
-#include "modules/planning/proto/planning_status.pb.h"
 
 namespace apollo {
 namespace planning {
@@ -50,7 +48,7 @@ using apollo::common::math::CartesianFrenetConverter;
 using apollo::common::util::MakeSLPoint;
 using apollo::common::util::ThreadPool;
 
-DPRoadGraph::DPRoadGraph(const DpPolyPathConfig &config,
+DpRoadGraph::DpRoadGraph(const DpPolyPathConfig &config,
                          const ReferenceLineInfo &reference_line_info,
                          const SpeedData &speed_data)
     : config_(config),
@@ -58,7 +56,7 @@ DPRoadGraph::DPRoadGraph(const DpPolyPathConfig &config,
       reference_line_(reference_line_info.reference_line()),
       speed_data_(speed_data) {}
 
-bool DPRoadGraph::FindPathTunnel(
+bool DpRoadGraph::FindPathTunnel(
     const common::TrajectoryPoint &init_point,
     const std::vector<const PathObstacle *> &obstacles,
     PathData *const path_data) {
@@ -79,7 +77,7 @@ bool DPRoadGraph::FindPathTunnel(
     return false;
   }
 
-  std::vector<DPRoadGraphNode> min_cost_path;
+  std::vector<DpRoadGraphNode> min_cost_path;
   if (!GenerateMinCostPath(obstacles, &min_cost_path)) {
     AERROR << "Fail to generate graph!";
     return false;
@@ -119,9 +117,9 @@ bool DPRoadGraph::FindPathTunnel(
   return true;
 }
 
-bool DPRoadGraph::GenerateMinCostPath(
+bool DpRoadGraph::GenerateMinCostPath(
     const std::vector<const PathObstacle *> &obstacles,
-    std::vector<DPRoadGraphNode> *min_cost_path) {
+    std::vector<DpRoadGraphNode> *min_cost_path) {
   CHECK(min_cost_path != nullptr);
 
   std::vector<std::vector<common::SLPoint>> path_waypoints;
@@ -140,7 +138,7 @@ bool DPRoadGraph::GenerateMinCostPath(
       config_, reference_line_, reference_line_info_.IsChangeLanePath(),
       obstacles, vehicle_config.vehicle_param(), speed_data_, init_sl_point_);
 
-  std::list<std::list<DPRoadGraphNode>> graph_nodes;
+  std::list<std::list<DpRoadGraphNode>> graph_nodes;
   graph_nodes.emplace_back();
   graph_nodes.back().emplace_back(init_sl_point_, nullptr, ComparableCost());
   auto &front = graph_nodes.front().front();
@@ -161,7 +159,7 @@ bool DPRoadGraph::GenerateMinCostPath(
       auto &cur_node = graph_nodes.back().back();
       if (FLAGS_enable_multi_thread_in_dp_poly_path) {
         futures.push_back(ThreadPool::pool()->push(std::bind(
-            &DPRoadGraph::UpdateNode, this, std::ref(prev_dp_nodes), level,
+            &DpRoadGraph::UpdateNode, this, std::ref(prev_dp_nodes), level,
             total_level, &trajectory_cost, &(front), &(cur_node))));
 
       } else {
@@ -176,7 +174,7 @@ bool DPRoadGraph::GenerateMinCostPath(
   }
 
   // find best path
-  DPRoadGraphNode fake_head;
+  DpRoadGraphNode fake_head;
   for (const auto &cur_dp_node : graph_nodes.back()) {
     fake_head.UpdateCost(&cur_dp_node, cur_dp_node.min_cost_curve,
                          cur_dp_node.min_cost);
@@ -203,11 +201,11 @@ bool DPRoadGraph::GenerateMinCostPath(
   return true;
 }
 
-void DPRoadGraph::UpdateNode(const std::list<DPRoadGraphNode> &prev_nodes,
+void DpRoadGraph::UpdateNode(const std::list<DpRoadGraphNode> &prev_nodes,
                              const uint32_t level, const uint32_t total_level,
                              TrajectoryCost *trajectory_cost,
-                             DPRoadGraphNode *front,
-                             DPRoadGraphNode *cur_node) {
+                             DpRoadGraphNode *front,
+                             DpRoadGraphNode *cur_node) {
   DCHECK_NOTNULL(trajectory_cost);
   DCHECK_NOTNULL(front);
   DCHECK_NOTNULL(cur_node);
@@ -251,7 +249,7 @@ void DPRoadGraph::UpdateNode(const std::list<DPRoadGraphNode> &prev_nodes,
   }
 }
 
-bool DPRoadGraph::SamplePathWaypoints(
+bool DpRoadGraph::SamplePathWaypoints(
     const common::TrajectoryPoint &init_point,
     std::vector<std::vector<common::SLPoint>> *const points) {
   CHECK_NOTNULL(points);
@@ -400,7 +398,7 @@ bool DPRoadGraph::SamplePathWaypoints(
   return true;
 }
 
-bool DPRoadGraph::CalculateFrenetPoint(
+bool DpRoadGraph::CalculateFrenetPoint(
     const common::TrajectoryPoint &traj_point,
     common::FrenetFramePoint *const frenet_frame_point) {
   common::SLPoint sl_point;
@@ -433,7 +431,7 @@ bool DPRoadGraph::CalculateFrenetPoint(
   return true;
 }
 
-bool DPRoadGraph::IsValidCurve(const QuinticPolynomialCurve1d &curve) const {
+bool DpRoadGraph::IsValidCurve(const QuinticPolynomialCurve1d &curve) const {
   constexpr float kMaxLateralDistance = 20.0;
   for (float s = 0.0; s < curve.ParamLength(); s += 2.0) {
     const float l = curve.Evaluate(0, s);
@@ -444,7 +442,7 @@ bool DPRoadGraph::IsValidCurve(const QuinticPolynomialCurve1d &curve) const {
   return true;
 }
 
-void DPRoadGraph::GetCurveCost(TrajectoryCost trajectory_cost,
+void DpRoadGraph::GetCurveCost(TrajectoryCost trajectory_cost,
                                const QuinticPolynomialCurve1d &curve,
                                const float start_s, const float end_s,
                                const uint32_t curr_level,
@@ -454,7 +452,7 @@ void DPRoadGraph::GetCurveCost(TrajectoryCost trajectory_cost,
       trajectory_cost.Calculate(curve, start_s, end_s, curr_level, total_level);
 }
 
-bool DPRoadGraph::HasSidepass() {
+bool DpRoadGraph::HasSidepass() {
   const auto &path_decision = reference_line_info_.path_decision();
   for (const auto &obstacle : path_decision.path_obstacles().Items()) {
     if (obstacle->LateralDecision().has_sidepass()) {
