@@ -22,7 +22,7 @@
 
 #include <cmath>
 
-#include "glog/logging.h"
+#include "modules/common/log.h"
 
 namespace apollo {
 namespace planning {
@@ -31,7 +31,6 @@ std::shared_ptr<Curve1d> PiecewiseBrakingTrajectoryGenerator::Generate(
     const double s_target, const double s_curr, const double v_target,
     const double v_curr, const double a_comfort, const double d_comfort,
     const double max_time) {
-
   std::shared_ptr<PiecewiseAccelerationTrajectory1d> ptr_trajectory =
       std::make_shared<PiecewiseAccelerationTrajectory1d>(s_curr, v_curr);
 
@@ -47,7 +46,7 @@ std::shared_ptr<Curve1d> PiecewiseBrakingTrajectoryGenerator::Generate(
 
     if (ptr_trajectory->ParamLength() < max_time) {
       ptr_trajectory->AppendSegment(0.0,
-          max_time - ptr_trajectory->ParamLength());
+                                    max_time - ptr_trajectory->ParamLength());
     }
     return ptr_trajectory;
   }
@@ -64,7 +63,7 @@ std::shared_ptr<Curve1d> PiecewiseBrakingTrajectoryGenerator::Generate(
 
     if (ptr_trajectory->ParamLength() < max_time) {
       ptr_trajectory->AppendSegment(0.0,
-          max_time - ptr_trajectory->ParamLength());
+                                    max_time - ptr_trajectory->ParamLength());
     }
     return ptr_trajectory;
 
@@ -85,15 +84,14 @@ std::shared_ptr<Curve1d> PiecewiseBrakingTrajectoryGenerator::Generate(
 
       if (ptr_trajectory->ParamLength() < max_time) {
         ptr_trajectory->AppendSegment(0.0,
-            max_time - ptr_trajectory->ParamLength());
+                                      max_time - ptr_trajectory->ParamLength());
       }
       return ptr_trajectory;
     } else {
       double s_rampup_rampdown = s_dist - comfort_stop_dist;
-      double v_max = std::sqrt(
-          v_curr * v_curr
-              + 2.0 * a_comfort * d_comfort * s_rampup_rampdown
-                  / (a_comfort + d_comfort));
+      double v_max = std::sqrt(v_curr * v_curr +
+                               2.0 * a_comfort * d_comfort * s_rampup_rampdown /
+                                   (a_comfort + d_comfort));
 
       double t_acc = (v_max - v_curr) / a_comfort;
       double t_dec = v_max / d_comfort;
@@ -104,15 +102,15 @@ std::shared_ptr<Curve1d> PiecewiseBrakingTrajectoryGenerator::Generate(
 
       if (ptr_trajectory->ParamLength() < max_time) {
         ptr_trajectory->AppendSegment(0.0,
-            max_time - ptr_trajectory->ParamLength());
+                                      max_time - ptr_trajectory->ParamLength());
       }
       return ptr_trajectory;
     }
   }
 }
 
-double PiecewiseBrakingTrajectoryGenerator::ComputeStopDistance(const double v,
-    const double dec) {
+double PiecewiseBrakingTrajectoryGenerator::ComputeStopDistance(
+    const double v, const double dec) {
   CHECK(dec > 0.0);
   return v * v / dec * 0.5;
 }

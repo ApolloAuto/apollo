@@ -322,6 +322,8 @@ cc_library(
         "//modules/planning/common/trajectory:publishable_trajectory",
         "//modules/planning/proto:planning_config_proto",
         "//modules/planning/proto:planning_proto",
+        "//modules/common/math:geometry",
+        "@eigen",
     ],
 )
 
@@ -338,6 +340,7 @@ cc_test(
         ":frame",
         "//modules/common/util",
         "//modules/planning/proto:planning_config_proto",
+        "//modules/map/hdmap:hdmap_util",
         "@gtest//:main",
     ],
 )
@@ -357,6 +360,7 @@ cc_test(
         "//modules/common/util",
         "//modules/common/vehicle_state/proto:vehicle_state_proto",
         "//modules/planning/proto:planning_config_proto",
+        "@eigen",
         "@gtest//:main",
     ],
 )
@@ -396,7 +400,10 @@ cc_library(
         "ego_info.h",
     ],
     deps = [
+        ":frame",
         "//modules/common:log",
+        "//modules/common/configs/proto:vehicle_config_proto",
+        "//modules/common/math:geometry",
         "//modules/common/vehicle_state/proto:vehicle_state_proto",
         "//modules/planning/reference_line",
         "@eigen",

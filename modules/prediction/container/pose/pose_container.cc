@@ -72,7 +72,7 @@ void PoseContainer::Update(
     double qx = localization.pose().orientation().qx();
     double qy = localization.pose().orientation().qy();
     double qz = localization.pose().orientation().qz();
-    theta = ::apollo::common::math::QuaternionToHeading(qw, qx, qy, qz);
+    theta = common::math::QuaternionToHeading(qw, qx, qy, qz);
   }
   obstacle_ptr_->set_theta(theta);
 
@@ -98,6 +98,20 @@ double PoseContainer::GetTimestamp() {
 
 PerceptionObstacle* PoseContainer::ToPerceptionObstacle() {
   return obstacle_ptr_.get();
+}
+
+double PoseContainer::GetSpeed() const {
+  double velocity_x = obstacle_ptr_->velocity().x();
+  double velocity_y = obstacle_ptr_->velocity().y();
+  return std::hypot(velocity_x, velocity_y);
+}
+
+double PoseContainer::GetTheta() const {
+  return obstacle_ptr_->theta();
+}
+
+Point PoseContainer::GetPosition() const {
+  return obstacle_ptr_->position();
 }
 
 }  // namespace prediction

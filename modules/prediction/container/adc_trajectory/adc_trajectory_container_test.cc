@@ -67,6 +67,7 @@ TEST_F(ADCTrajectoryTest, InsertionWithProtection) {
   path_point.set_x(-438.537);
   path_point.set_y(-160.991);
   EXPECT_TRUE(!container_.IsPointInJunction(path_point));
+  EXPECT_EQ(container_.ADCJunction(), nullptr);
 
   LaneSequence non_overlap_lane_sequence;
   LaneSegment lane_segment;

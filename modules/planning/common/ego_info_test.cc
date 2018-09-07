@@ -24,6 +24,7 @@
 
 #include "modules/common/util/util.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/reference_line/reference_line_provider.h"
 
 namespace apollo {
 namespace planning {
@@ -54,6 +55,16 @@ TEST_F(EgoInfoTest, simple) {
 
   EXPECT_DOUBLE_EQ(sl_boundary2.start_s(), sl_boundary.start_s());
   EXPECT_DOUBLE_EQ(sl_boundary2.end_s(), sl_boundary.end_s());
+
+  uint32_t sequence_num = 0;
+  common::TrajectoryPoint planning_start_point;
+  const double start_time = 102342.0;
+  common::VehicleState vehicle_state;
+  ReferenceLineProvider reference_line_provider;
+
+  Frame frame(sequence_num, planning_start_point, start_time, vehicle_state,
+              &reference_line_provider);
+  ego_info->CalculateFrontObstacleClearDistance(frame);
 }
 
 }  // namespace planning
