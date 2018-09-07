@@ -18,8 +18,8 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_TASKS_TRAFFIC_DECIDER_CROSSWALK_H_
-#define MODULES_PLANNING_TASKS_TRAFFIC_DECIDER_CROSSWALK_H_
+#ifndef MODULES_PLANNING_TOOLKITS_DECIDERS_CROSSWALK_H_
+#define MODULES_PLANNING_TOOLKITS_DECIDERS_CROSSWALK_H_
 
 #include <string>
 #include <vector>
@@ -54,4 +54,4 @@ class Crosswalk : public TrafficRule {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_TASKS_TRAFFIC_DECIDER_CROSSWALK_H_
+#endif  // MODULES_PLANNING_TOOLKITS_DECIDERS_CROSSWALK_H_

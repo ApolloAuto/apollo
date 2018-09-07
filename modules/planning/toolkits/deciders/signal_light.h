@@ -18,8 +18,8 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_TASKS_TRAFFIC_DECIDER_SIGNAL_LIGHT_H_
-#define MODULES_PLANNING_TASKS_TRAFFIC_DECIDER_SIGNAL_LIGHT_H_
+#ifndef MODULES_PLANNING_TOOLKITS_DECIDERS_SIGNAL_LIGHT_H_
+#define MODULES_PLANNING_TOOLKITS_DECIDERS_SIGNAL_LIGHT_H_
 
 #include <string>
 #include <unordered_map>
@@ -63,4 +63,4 @@ class SignalLight : public TrafficRule {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_TASKS_TRAFFIC_DECIDER_SIGNAL_LIGHT_H_
+#endif  // MODULES_PLANNING_TOOLKITS_DECIDERS_SIGNAL_LIGHT_H_
