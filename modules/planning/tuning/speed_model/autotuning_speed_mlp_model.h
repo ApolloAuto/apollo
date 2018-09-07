@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ * Copyright 2017 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,60 +14,43 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PLANNING_TUNING_AUTOTUNING_BASE_MODEL_H_
-#define MODULES_PLANNING_TUNING_AUTOTUNING_BASE_MODEL_H_
+#ifndef MODULES_PLANNING_TUNING_SPEED_MODEL_SPEED_MLP_MODEL_H_
+#define MODULES_PLANNING_TUNING_SPEED_MODEL_SPEED_MLP_MODEL_H_
 
-#include <memory>
 #include "modules/common/status/status.h"
-#include "modules/planning/proto/auto_tuning_model_input.pb.h"
-#include "modules/planning/tuning/autotuning_feature_builder.h"
-#include "modules/planning/tuning/autotuning_mlp_net_model.h"
+#include "modules/planning/tuning/autotuning_base_model.h"
 
 namespace apollo {
 namespace planning {
 
-class AutotuningBaseModel {
+class AutotuningSpeedMLPModel : public AutotuningBaseModel {
  public:
-  /**
-   * @brief constructor
-   */
-  AutotuningBaseModel() = default;
-
-  /**
-   * @brief destructor
-   */
-  ~AutotuningBaseModel() = default;
+  AutotuningSpeedMLPModel() = default;
+  ~AutotuningSpeedMLPModel() = default;
 
   /**
    * @brief set mlp model as well as feature builder
    */
-  virtual common::Status SetParams() = 0;
+  common::Status SetParams() override;
 
   /**
    * @brief : evaluate by trajectory
    * @param : input trajectory feature proto
    * @return : the total value of reward / cost
    */
-  virtual double Evaluate(
-      const autotuning::TrajectoryFeature& trajectory_feature) const = 0;
+  double Evaluate(
+      const autotuning::TrajectoryFeature& trajectory_feature) const override;
 
   /**
    * @brief: evaluate by trajectory point
    * @param : trajectory pointwise input feature
    * @return : total value of reward / cost
    */
-  virtual double Evaluate(
-      const autotuning::TrajectoryPointwiseFeature& point_feature) const = 0;
-
- protected:
-  /**
-   * @brief : stored autotuning mlp model
-   */
-  std::unique_ptr<AutotuningMLPModel> mlp_model_ = nullptr;
-  std::unique_ptr<AutotuningFeatureBuilder> feature_builder_ = nullptr;
+  double Evaluate(const autotuning::TrajectoryPointwiseFeature& point_feature)
+      const override;
 };
 
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_TUNING_AUTOTUNING_BASE_MODEL_H_
+#endif  // MODULES_PLANNING_TUNING_SPEED_MODEL_SPEED_MLP_MODEL_H_
