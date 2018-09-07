@@ -23,6 +23,7 @@
 #include <algorithm>
 
 #include "modules/common/log.h"
+#include "modules/planning/common/ego_info.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_gflags.h"
 
@@ -121,10 +122,9 @@ std::vector<SpeedPoint> SpeedProfileGenerator::GenerateSpeedHotStart(
   return hot_start_speed_profile;
 }
 
-SpeedData SpeedProfileGenerator::GenerateFallbackSpeedProfile(
-    const ReferenceLineInfo& reference_line_info) {
-  const double init_v = reference_line_info.AdcPlanningPoint().v();
-  const double init_a = reference_line_info.AdcPlanningPoint().a();
+SpeedData SpeedProfileGenerator::GenerateFallbackSpeedProfile() {
+  const double init_v = EgoInfo::instance()->start_point().v();
+  const double init_a = EgoInfo::instance()->start_point().a();
   if (init_v > FLAGS_polynomial_speed_fallback_velocity) {
     return GenerateStopProfileFromPolynomial(init_v, init_a);
   } else {
@@ -166,7 +166,9 @@ SpeedData SpeedProfileGenerator::GenerateStopProfileFromPolynomial(
   AERROR << "Slowing down the car with polynomial.";
   constexpr double kMaxT = 4.0;
   for (double t = 2.0; t <= kMaxT; t += 0.5) {
-    for (double s = 0.0; s < 50.0; s += 1.0) {
+    for (double s = 0.0;
+         s < std::min(50.0, EgoInfo::instance()->front_clear_distance() - 0.3);
+         s += 1.0) {
       QuinticPolynomialCurve1d curve(0.0, init_speed, init_acc, s, 0.0, 0.0, t);
       if (!IsValidProfile(curve)) {
         continue;

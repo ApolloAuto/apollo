@@ -36,6 +36,7 @@
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/hdmap/hdmap.h"
 #include "modules/map/hdmap/hdmap_common.h"
+#include "modules/planning/common/ego_info.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/constraint_checker/constraint_checker.h"
@@ -193,8 +194,7 @@ Status NaviPlanner::PlanOnReferenceLine(
 
   if (!ret.ok() || reference_line_info->speed_data().Empty()) {
     ADEBUG << "Speed fallback.";
-    GenerateFallbackSpeedProfile(reference_line_info,
-                                 reference_line_info->mutable_speed_data());
+    GenerateFallbackSpeedProfile(reference_line_info->mutable_speed_data());
     reference_line_info->AddCost(kSpeedOptimizationFallbackClost);
   }
 
@@ -370,7 +370,7 @@ std::vector<SpeedPoint> NaviPlanner::GenerateSpeedHotStart(
 
 void NaviPlanner::GenerateFallbackPathProfile(
     const ReferenceLineInfo* reference_line_info, PathData* path_data) {
-  auto adc_point = reference_line_info->AdcPlanningPoint();
+  auto adc_point = EgoInfo::instance()->start_point();
   double adc_s = reference_line_info->AdcSlBoundary().end_s();
   const double max_s = 150.0;
   const double unit_s = 1.0;
@@ -398,16 +398,12 @@ void NaviPlanner::GenerateFallbackPathProfile(
   path_data->SetDiscretizedPath(DiscretizedPath(std::move(path_points)));
 }
 
-void NaviPlanner::GenerateFallbackSpeedProfile(
-    const ReferenceLineInfo* reference_line_info, SpeedData* speed_data) {
-  *speed_data = GenerateStopProfileFromPolynomial(
-      reference_line_info->AdcPlanningPoint().v(),
-      reference_line_info->AdcPlanningPoint().a());
-
+void NaviPlanner::GenerateFallbackSpeedProfile(SpeedData* speed_data) {
+  const auto& start_point = EgoInfo::instance()->start_point();
+  *speed_data =
+      GenerateStopProfileFromPolynomial(start_point.v(), start_point.a());
   if (speed_data->Empty()) {
-    *speed_data =
-        GenerateStopProfile(reference_line_info->AdcPlanningPoint().v(),
-                            reference_line_info->AdcPlanningPoint().a());
+    *speed_data = GenerateStopProfile(start_point.v(), start_point.a());
   }
 }
 

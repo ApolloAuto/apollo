@@ -179,6 +179,7 @@ cc_library(
         "reference_line_info.h",
     ],
     deps = [
+        ":ego_info",
         ":path_decision",
         ":planning_gflags",
         "//modules/common:log",
@@ -400,8 +401,9 @@ cc_library(
         "ego_info.h",
     ],
     deps = [
-        ":frame",
+        ":obstacle",
         "//modules/common:log",
+        "//modules/common/configs:vehicle_config_helper",
         "//modules/common/configs/proto:vehicle_config_proto",
         "//modules/common/math:geometry",
         "//modules/common/vehicle_state/proto:vehicle_state_proto",
@@ -418,6 +420,7 @@ cc_test(
     ],
     deps = [
         ":ego_info",
+        ":frame",
         "@gtest//:main",
     ],
 )
@@ -425,6 +428,7 @@ cc_test(
 cc_library(
     name = "planning_common",
     deps = [
+        ":ego_info",
         ":frame",
         ":frame_open_space",
         ":planning_gflags",
