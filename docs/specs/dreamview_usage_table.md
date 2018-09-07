@@ -10,8 +10,10 @@ Dreamview is a web application that,
 The application layout is divided into several regions: header, sidebar, main view, and tool view.
 
 ### Header
-The Header has 4 drop-downs that can be set as shown:
+The Header has 3 drop-downs that can be set as shown:
 ![](images/dreamview_usage_table/header.png) 
+
+The Co-Driver switch is used to detect disengagement event automatically. Once detected, Dreamview will display a pop-up of the data recorder window for the co-driver to enter a new drive event.
 
 Depending on the mode chosen from the mode selector, the corresponding modules and commands, defined in [hmi.conf](https://github.com/ApolloAuto/apollo/blob/master/modules/dreamview/conf/hmi.conf), will be presented in the **Module Controller**, and **Quick Start**, respectively.
 
@@ -126,17 +128,18 @@ When a STOP decision fence is shown, the reason to stop is displayed on the righ
  
 | Visual Element                           | Depiction Explanation                    |
 | ---------------------------------------- | ---------------------------------------- |
-| ![](images/dreamview_usage_table/0clip_image040.png) | <ul><li>**Clear-zone in front** </li></ul>|
-| ![](images/dreamview_usage_table/0clip_image042.png) | <ul><li>**Crosswalk in front** </li></ul>|
-| ![](images/dreamview_usage_table/0clip_image044.png) | <ul><li>**Destination arrival** </li></ul>|
-| ![](images/dreamview_usage_table/0clip_image046.png) | <ul><li>**Emergency**  </li></ul>       |
+| ![](images/dreamview_usage_table/0clip_image040.png) | <ul><li> **Clear-zone in front** </li></ul>|
+| ![](images/dreamview_usage_table/0clip_image042.png) | <ul><li> **Crosswalk in front** </li></ul>|
+| ![](images/dreamview_usage_table/0clip_image044.png) | <ul><li> **Destination arrival** </li></ul>|
+| ![](images/dreamview_usage_table/0clip_image046.png) | <ul><li> **Emergency**  </li></ul>       |
 | ![](images/dreamview_usage_table/0clip_image048.png) | <ul><li> **Auto mode is not ready** </li></ul>|
-| ![](images/dreamview_usage_table/0clip_image050.png) | <ul><li>**Obstacle is blocking the route**</li></ul> |
+| ![](images/dreamview_usage_table/0clip_image050.png) | <ul><li> **Obstacle is blocking the route**</li></ul> |
 | ![](images/dreamview_usage_table/0clip_image052.png) | <ul><li> **Pedestrian crossing in front** </li></ul> |
-| ![](images/dreamview_usage_table/0clip_image054.png) | <ul><li>**Traffic light is yellow/red** </li></ul>|
+| ![](images/dreamview_usage_table/0clip_image054.png) | <ul><li> **Traffic light is yellow/red** </li></ul>|
 | ![](images/dreamview_usage_table/0clip_image056.png) | <ul><li> **Vehicle in front** </li></ul> |
 | ![](images/dreamview_usage_table/0clip_image058.png) | <ul><li> **Stop sign in front** </li></ul>|
-| ![](images/dreamview_usage_table/0clip_image060.png) | <ul><li>**Yield sign in front** </li></ul> |
+| ![](images/dreamview_usage_table/0clip_image059.png) | <ul><li> **Pull over** </li></ul>|
+| ![](images/dreamview_usage_table/0clip_image060.png) | <ul><li> **Yield sign in front** </li></ul> |
 
 #### Point of View
 Main view that reflects the point of view chosen from **Layer Menu**:
@@ -157,4 +160,6 @@ Main view that reflects the point of view chosen from **Layer Menu**:
 | 3               | Toggle **Layer Menu** panel |
 | 4               | Toggle **Route Editing** panel |
 | 5               | Toggle **Data Recorder** panel |
+| 6               | Toggle **Audio Capture** panel |
+| 7               | Toggle **Default Routing** panel |
 | v               | Rotate **Point of View** options |
