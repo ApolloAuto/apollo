@@ -59,7 +59,11 @@ Status NaviPlanning::Init() {
   CHECK(apollo::common::util::GetProtoFromFile(FLAGS_planning_config_file,
                                                &config_))
       << "failed to load planning config file " << FLAGS_planning_config_file;
-  CheckPlanningConfig();
+
+  if (!CheckPlanningConfig()) {
+    return Status(ErrorCode::PLANNING_ERROR,
+                  "planning config error: " + config_.DebugString());
+  }
 
   planner_dispatcher_->Init();
 
@@ -639,6 +643,15 @@ NaviPlanning::VehicleConfig NaviPlanning::ComputeVehicleConfigFromLocalization(
 
   vehicle_config.is_valid_ = true;
   return vehicle_config;
+}
+
+bool NaviPlanning::CheckPlanningConfig() {
+  if (!config_.has_planner_navi_config()) {
+    return false;
+  }
+  // TODO(All): check other config params
+
+  return true;
 }
 
 }  // namespace planning
