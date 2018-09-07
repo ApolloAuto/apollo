@@ -31,9 +31,13 @@
 - 转换结果为`protobuf`格式
 
 ### 采集数据
-1. 为不同的命令运行`python data_collector.py {dir}/{command}.txt`，且每条命令运行多次，其中data_collector.py在modules/tools/calibration/，{command}.txt可以参考modules/tools/calibration/calibration_data_sample/中样例
+1. 运行 `python data_collector.py`,参数如 x y z, x 代表了加速的控制指令, y 代表了限制速度(mps), z 是减速指令,正值标识油门量，负值标识刹车量.且每条命令运行多次，其中 `data_collector.py`在modules/tools/calibration/
 2. 根据车辆反应情况，调整命令脚本
-3. 运行 `python plot_data.py {dir}/{command}.txt_recorded.csv>` 使采集到的数据可视化
+3. 运行 `python plot_data.py ` 使采集到的数据可视化
+
+
+比如输出指令 `15 5.2 -10`,将会生成名为`t15b-10r0.csv`的文件。
+
 
 
 ### 处理数据
