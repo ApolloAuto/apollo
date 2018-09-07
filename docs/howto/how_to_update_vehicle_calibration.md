@@ -41,7 +41,7 @@ After preparation, complete the following task sequence from `modules/tools/cali
 like `15 5.2 -10`, will create and record a file named `t15b-10r0.csv`.
 
 ### Process Data
-Run `process_data.sh` on each recorded log individually. Each data log is processed and appended to `t15b-10r0.csv.result`.
+Run `process_data.sh` on each recorded log individually. data log is processed to `t15b-10r0.csv.result`.
 
 ### Plot Results
 Run `python plot_results.py t15b-10r0.csv.result` to visualize final results. Check for any abnormality.
