@@ -23,18 +23,14 @@
 #include "gtest/gtest.h"
 
 #include "modules/common/util/util.h"
+#include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/reference_line/reference_line_provider.h"
 
 namespace apollo {
 namespace planning {
 
-class EgoInfoTest : public ::testing::Test {
- public:
-  virtual void SetUp() {}
-};
-
-TEST_F(EgoInfoTest, simple) {
+TEST(EgoInfoTest, EgoInfoSimpleTest) {
   const auto p =
       common::util::MakePathPoint(1.23, 3.23, 52.18, 0.1, 0.3, 0.32, 0.4);
   common::TrajectoryPoint tp;
@@ -45,17 +41,6 @@ TEST_F(EgoInfoTest, simple) {
   EXPECT_DOUBLE_EQ(ego_info->start_point().path_point().y(), p.y());
   EXPECT_DOUBLE_EQ(ego_info->start_point().path_point().z(), p.z());
 
-  ReferenceLine ref_line;
-  SLBoundary sl_boundary;
-  sl_boundary.set_start_s(10.22);
-  sl_boundary.set_end_s(28.79);
-  ego_info->SetSLBoundary(&ref_line, sl_boundary);
-
-  SLBoundary sl_boundary2 = ego_info->GetSLBoundaryOnReferenceLine(&ref_line);
-
-  EXPECT_DOUBLE_EQ(sl_boundary2.start_s(), sl_boundary.start_s());
-  EXPECT_DOUBLE_EQ(sl_boundary2.end_s(), sl_boundary.end_s());
-
   uint32_t sequence_num = 0;
   common::TrajectoryPoint planning_start_point;
   const double start_time = 102342.0;
@@ -64,7 +49,7 @@ TEST_F(EgoInfoTest, simple) {
 
   Frame frame(sequence_num, planning_start_point, start_time, vehicle_state,
               &reference_line_provider);
-  ego_info->CalculateFrontObstacleClearDistance(frame);
+  ego_info->CalculateFrontObstacleClearDistance(frame.obstacles());
 }
 
 }  // namespace planning

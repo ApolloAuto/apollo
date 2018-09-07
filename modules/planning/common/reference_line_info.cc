@@ -24,17 +24,17 @@
 #include <functional>
 #include <utility>
 
+#include "modules/planning/proto/sl_boundary.pb.h"
+
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/util/string_util.h"
 #include "modules/common/util/thread_pool.h"
 #include "modules/common/util/util.h"
-
 #include "modules/map/hdmap/hdmap_common.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/proto/sl_boundary.pb.h"
 
 namespace apollo {
 namespace planning {
@@ -76,30 +76,35 @@ bool ReferenceLineInfo::Init(const std::vector<const Obstacle*>& obstacles) {
   Box2d vehicle_box(vehicle_center, vehicle_state_.heading(), param.length(),
                     param.width());
 
-  if (!reference_line_.GetSLBoundary(vehicle_box, &vehicle_sl_boundary_)) {
+  if (!reference_line_.GetSLBoundary(vehicle_box,
+                                     &sl_boundary_info_.vehicle_sl_boundary_)) {
     AERROR << "Failed to get ADC boundary from vehicle_box(realtime position "
               "of the car): "
            << box.DebugString();
     return false;
   }
 
-  if (!reference_line_.GetSLBoundary(box, &adc_sl_boundary_)) {
+  if (!reference_line_.GetSLBoundary(box,
+                                     &sl_boundary_info_.adc_sl_boundary_)) {
     AERROR << "Failed to get ADC boundary from box: " << box.DebugString();
     return false;
   }
-  if (adc_sl_boundary_.end_s() < 0 ||
-      adc_sl_boundary_.start_s() > reference_line_.Length()) {
-    AWARN << "Vehicle SL " << adc_sl_boundary_.ShortDebugString()
+
+  if (sl_boundary_info_.adc_sl_boundary_.end_s() < 0 ||
+      sl_boundary_info_.adc_sl_boundary_.start_s() > reference_line_.Length()) {
+    AWARN << "Vehicle SL "
+          << sl_boundary_info_.adc_sl_boundary_.ShortDebugString()
           << " is not on reference line:[0, " << reference_line_.Length()
           << "]";
   }
   constexpr double kOutOfReferenceLineL = 10.0;  // in meters
-  if (adc_sl_boundary_.start_l() > kOutOfReferenceLineL ||
-      adc_sl_boundary_.end_l() < -kOutOfReferenceLineL) {
+  if (sl_boundary_info_.adc_sl_boundary_.start_l() > kOutOfReferenceLineL ||
+      sl_boundary_info_.adc_sl_boundary_.end_l() < -kOutOfReferenceLineL) {
     AERROR << "Ego vehicle is too far away from reference line.";
     return false;
   }
-  is_on_reference_line_ = reference_line_.IsOnLane(adc_sl_boundary_);
+  is_on_reference_line_ =
+      reference_line_.IsOnLane(sl_boundary_info_.adc_sl_boundary_);
   if (!AddObstacles(obstacles)) {
     AERROR << "Failed to add obstacles to reference line";
     return false;
@@ -141,9 +146,10 @@ ADCTrajectory::RightOfWayStatus ReferenceLineInfo::GetRightOfWayStatus() const {
   auto* right_of_way = GetPlanningStatus()->mutable_right_of_way();
   auto* junction_right_of_way = right_of_way->mutable_junction();
   for (const auto& overlap : reference_line_.map_path().junction_overlaps()) {
-    if (overlap.end_s < adc_sl_boundary_.start_s()) {
+    if (overlap.end_s < sl_boundary_info_.adc_sl_boundary_.start_s()) {
       junction_right_of_way->erase(overlap.object_id);
-    } else if (WithinOverlap(overlap, adc_sl_boundary_.end_s())) {
+    } else if (WithinOverlap(overlap,
+                             sl_boundary_info_.adc_sl_boundary_.end_s())) {
       auto is_protected = (*junction_right_of_way)[overlap.object_id];
       if (is_protected) {
         return ADCTrajectory::PROTECTED;
@@ -191,10 +197,10 @@ bool ReferenceLineInfo::CheckChangeLane() const {
                  static_cast<float>((path_obstacle->obstacle()->Speed() -
                                      adc_planning_point_.v()) *
                                     kSafeTime));
-    if (sl_boundary.end_s() >
-            adc_sl_boundary_.start_s() - kBackwardSafeDistance &&
+    if (sl_boundary.end_s() > sl_boundary_info_.adc_sl_boundary_.start_s() -
+                                  kBackwardSafeDistance &&
         sl_boundary.start_s() <
-            adc_sl_boundary_.end_s() + kForwardSafeDistance) {
+            sl_boundary_info_.adc_sl_boundary_.end_s() + kForwardSafeDistance) {
       return false;
     }
   }
@@ -212,20 +218,17 @@ const std::list<hdmap::Id> ReferenceLineInfo::TargetLaneId() const {
 }
 
 const SLBoundary& ReferenceLineInfo::AdcSlBoundary() const {
-  return adc_sl_boundary_;
+  return sl_boundary_info_.adc_sl_boundary_;
 }
 
 const SLBoundary& ReferenceLineInfo::VehicleSlBoundary() const {
-  return vehicle_sl_boundary_;
+  return sl_boundary_info_.vehicle_sl_boundary_;
 }
 
 PathDecision* ReferenceLineInfo::path_decision() { return &path_decision_; }
 
 const PathDecision& ReferenceLineInfo::path_decision() const {
   return path_decision_;
-}
-const TrajectoryPoint& ReferenceLineInfo::AdcPlanningPoint() const {
-  return adc_planning_point_;
 }
 
 const ReferenceLine& ReferenceLineInfo::reference_line() const {
@@ -270,8 +273,8 @@ PathObstacle* ReferenceLineInfo::AddObstacle(const Obstacle* obstacle) {
     ADEBUG << "NO build reference line st boundary. id:" << obstacle->Id();
   } else {
     ADEBUG << "build reference line st boundary. id:" << obstacle->Id();
-    path_obstacle->BuildReferenceLineStBoundary(reference_line_,
-                                                adc_sl_boundary_.start_s());
+    path_obstacle->BuildReferenceLineStBoundary(
+        reference_line_, sl_boundary_info_.adc_sl_boundary_.start_s());
 
     ADEBUG << "reference line st boundary: "
            << path_obstacle->reference_line_st_boundary().min_t() << ", "
@@ -321,7 +324,7 @@ bool ReferenceLineInfo::IsUnrelaventObstacle(PathObstacle* path_obstacle) {
   }
   if (is_on_reference_line_ &&
       path_obstacle->PerceptionSLBoundary().end_s() <
-          adc_sl_boundary_.end_s() &&
+          sl_boundary_info_.adc_sl_boundary_.end_s() &&
       reference_line_.IsOnLane(path_obstacle->PerceptionSLBoundary())) {
     return true;
   }
@@ -445,7 +448,7 @@ void ReferenceLineInfo::ExportTurnSignal(VehicleSignal* signal) const {
   }
   // check lane's turn type
   double route_s = 0.0;
-  const double adc_s = adc_sl_boundary_.end_s();
+  const double adc_s = sl_boundary_info_.adc_sl_boundary_.end_s();
   for (const auto& seg : Lanes()) {
     if (route_s > adc_s + FLAGS_turn_signal_distance) {
       break;
@@ -483,7 +486,7 @@ void ReferenceLineInfo::ExportTurnSignal(VehicleSignal* signal) const {
 
 bool ReferenceLineInfo::IsRightTurnPath() const {
   double route_s = 0.0;
-  const double adc_s = adc_sl_boundary_.end_s();
+  const double adc_s = sl_boundary_info_.adc_sl_boundary_.end_s();
   constexpr double kRightTurnStartBuff = 1.0;
   for (const auto& seg : Lanes()) {
     if (route_s > adc_s + kRightTurnStartBuff) {
@@ -516,7 +519,8 @@ bool ReferenceLineInfo::ReachedDestination() const {
   }
   const double stop_s = dest_ptr->PerceptionSLBoundary().start_s() +
                         dest_ptr->LongitudinalDecision().stop().distance_s();
-  return adc_sl_boundary_.end_s() + kDestinationDeltaS > stop_s;
+  return sl_boundary_info_.adc_sl_boundary_.end_s() + kDestinationDeltaS >
+         stop_s;
 }
 
 void ReferenceLineInfo::ExportDecision(DecisionResult* decision_result) const {
@@ -557,7 +561,7 @@ void ReferenceLineInfo::MakeMainMissionCompleteDecision(
   if (main_stop.reason_code() != STOP_REASON_DESTINATION) {
     return;
   }
-  const auto& adc_pos = AdcPlanningPoint().path_point();
+  const auto& adc_pos = adc_planning_point_.path_point();
   if (common::util::DistanceXY(adc_pos, main_stop.stop_point()) >
       FLAGS_destination_check_distance) {
     return;
@@ -673,8 +677,8 @@ void ReferenceLineInfo::ExportEngageAdvice(EngageAdvice* engage_advice) const {
     prev_advice->set_reason("Not on reference line");
   } else {
     // check heading
-    auto ref_point =
-        reference_line_.GetReferencePoint(adc_sl_boundary_.end_s());
+    auto ref_point = reference_line_.GetReferencePoint(
+        sl_boundary_info_.adc_sl_boundary_.end_s());
     if (common::math::AngleDiff(vehicle_state_.heading(), ref_point.heading()) >
         kMaxAngleDiff) {
       if (prev_advice->advice() == EngageAdvice::DISALLOW_ENGAGE) {

@@ -290,7 +290,7 @@ bool FrameOpenSpace::ObsHRep(
   b_all->resize(obstacles_vertices_num.sum(), 1);
 
   int counter = 0;
-
+  double kEpsilon = 1.0e-5;
   // start building H representation
   for (std::size_t i = 0; i < obstacles_num; ++i) {
     std::size_t current_vertice_num = obstacles_vertices_num(i, 0);
@@ -304,7 +304,7 @@ bool FrameOpenSpace::ObsHRep(
 
       Eigen::MatrixXd A_tmp(2, 1), b_tmp(1, 1), ab(2, 1);
       // find hyperplane passing through v1 and v2
-      if (v1.x() == v2.x()) {
+      if (std::abs(v1.x() - v2.x()) < kEpsilon) {
         if (v2.y() < v1.y()) {
           A_tmp << 1, 0;
           b_tmp << v1.x();
@@ -312,7 +312,7 @@ bool FrameOpenSpace::ObsHRep(
           A_tmp << -1, 0;
           b_tmp << -v1.x();
         }
-      } else if (v1.y() == v2.y()) {
+      } else if (std::abs(v1.y() - v2.y()) < kEpsilon) {
         if (v1.x() < v2.x()) {
           A_tmp << 0, 1;
           b_tmp << v1.y();
