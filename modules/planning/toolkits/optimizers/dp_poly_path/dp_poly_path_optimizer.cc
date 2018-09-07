@@ -26,7 +26,7 @@
 
 #include "modules/common/util/file.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/toolkits/optimizers/dp_poly_path/dp_road_graph.h"
+#include "modules/planning/toolkits/optimizers/road_graph/dp_road_graph.h"
 
 namespace apollo {
 namespace planning {
@@ -38,8 +38,10 @@ DpPolyPathOptimizer::DpPolyPathOptimizer()
     : PathOptimizer("DpPolyPathOptimizer") {}
 
 bool DpPolyPathOptimizer::Init(const PlanningConfig &config) {
-  config_ = config.planner_em_config().scenario_config()
-      .scenario_lane_follow_config().dp_poly_path_config();
+  config_ = config.planner_em_config()
+                .scenario_config()
+                .scenario_lane_follow_config()
+                .dp_poly_path_config();
   is_init_ = true;
   return true;
 }
@@ -53,7 +55,7 @@ Status DpPolyPathOptimizer::Process(const SpeedData &speed_data,
     return Status(ErrorCode::PLANNING_ERROR, "Not inited.");
   }
   CHECK_NOTNULL(path_data);
-  DPRoadGraph dp_road_graph(config_, *reference_line_info_, speed_data);
+  DpRoadGraph dp_road_graph(config_, *reference_line_info_, speed_data);
   dp_road_graph.SetDebugLogger(reference_line_info_->mutable_debug());
 
   if (!dp_road_graph.FindPathTunnel(
