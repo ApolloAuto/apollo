@@ -31,6 +31,7 @@
 namespace apollo {
 namespace perception {
 
+using apollo::common::util::GetAbsolutePath;
 using apollo::common::util::GetProtoFromFile;
 using std::string;
 using std::unordered_map;
@@ -41,11 +42,9 @@ bool YoloCameraDetector::Init(const CameraDetectorInitOptions &options) {
   CHECK(GetProtoFromFile(FLAGS_yolo_camera_detector_config, &config_));
 
   const string &yolo_root = config_.yolo_root();
-  const string yolo_config = apollo::common::util::GetAbsolutePath(
-      yolo_root, FLAGS_yolo_config_filename);
-
-  const string lane_config = apollo::common::util::GetAbsolutePath(
-      yolo_root, "lane.pt");
+  const string yolo_config = GetAbsolutePath(yolo_root,
+                                             FLAGS_yolo_config_filename);
+  const string lane_config = GetAbsolutePath(yolo_root, "lane.pt");
 
   CHECK(apollo::common::util::GetProtoFromASCIIFile(yolo_config, &yolo_param_));
   CHECK(apollo::common::util::GetProtoFromASCIIFile(lane_config, &lane_param_));
@@ -60,12 +59,12 @@ bool YoloCameraDetector::Init(const CameraDetectorInitOptions &options) {
 
 void YoloCameraDetector::init_anchor(const string &yolo_root) {
   const auto &model_param = yolo_param_.model_param();
-  string model_root = apollo::common::util::GetAbsolutePath(
-      yolo_root, model_param.model_name());
+  const string model_root = GetAbsolutePath(yolo_root,
+                                            model_param.model_name());
 
   // loading anchors
-  string anchors_file = apollo::common::util::GetAbsolutePath(
-      model_root, model_param.anchors_file());
+  const string anchors_file = GetAbsolutePath(model_root,
+                                              model_param.anchors_file());
   vector<float> anchors;
   yolo::load_anchors(anchors_file, &anchors);
   num_anchors_ = anchors.size() / 2;
@@ -76,8 +75,8 @@ void YoloCameraDetector::init_anchor(const string &yolo_root) {
   memcpy(anchor_cpu_data, anchors.data(), anchors.size() * sizeof(float));
 
   // loading types
-  string types_file = apollo::common::util::GetAbsolutePath(
-      model_root, model_param.types_file());
+  const string types_file = GetAbsolutePath(model_root,
+                                            model_param.types_file());
   yolo::load_types(types_file, &types_);
 
   res_box_tensor_.reset(
@@ -100,7 +99,7 @@ void YoloCameraDetector::init_anchor(const string &yolo_root) {
 }
 
 void YoloCameraDetector::load_nms_params() {
-  auto const &nms_param = yolo_param_.nms_param();
+  const auto &nms_param = yolo_param_.nms_param();
   nms_.sigma = nms_param.sigma();
   nms_.type = nms_param.type();
   nms_.threshold = nms_param.threshold();
@@ -179,16 +178,16 @@ void YoloCameraDetector::load_intrinsic_lane(
 bool YoloCameraDetector::init_cnn(const string &yolo_root) {
   ADEBUG << "yolo_root: " << yolo_root;
 
-  auto const &net_param = yolo_param_.net_param();
+  const auto &net_param = yolo_param_.net_param();
   const auto &model_param = yolo_param_.model_param();
-  string model_root = apollo::common::util::GetAbsolutePath(
-      yolo_root, model_param.model_name());
-  string proto_file = apollo::common::util::GetAbsolutePath(
-      model_root, model_param.proto_file());
-  string weight_file = apollo::common::util::GetAbsolutePath(
-      model_root, model_param.weight_file());
-  string feature_file = apollo::common::util::GetAbsolutePath(
-      model_root, model_param.feature_file());
+  const string model_root = GetAbsolutePath(yolo_root,
+                                            model_param.model_name());
+  const string proto_file = GetAbsolutePath(model_root,
+                                            model_param.proto_file());
+  const string weight_file = GetAbsolutePath(model_root,
+                                             model_param.weight_file());
+  const string feature_file = GetAbsolutePath(model_root,
+                                              model_param.feature_file());
 
   ADEBUG << " proto_file: " << proto_file;
   ADEBUG << " weight_file: " << weight_file;
@@ -197,17 +196,17 @@ bool YoloCameraDetector::init_cnn(const string &yolo_root) {
 
   const auto &model_type = model_param.model_type();
 
-  vector<string> input_names;
-  vector<string> output_names;
-  input_names.push_back(net_param.input_blob());
-  output_names.push_back(net_param.loc_blob());
-  output_names.push_back(net_param.obj_blob());
-  output_names.push_back(net_param.cls_blob());
-  output_names.push_back(net_param.ori_blob());
-  output_names.push_back(net_param.dim_blob());
-  output_names.push_back(net_param.lof_blob());
-  output_names.push_back(net_param.lor_blob());
-  output_names.push_back(net_param.seg_blob());
+  vector<string> input_names = {net_param.input_blob()};
+  vector<string> output_names = {
+      net_param.loc_blob(),
+      net_param.obj_blob(),
+      net_param.cls_blob(),
+      net_param.ori_blob(),
+      net_param.dim_blob(),
+      net_param.lof_blob(),
+      net_param.lor_blob(),
+      net_param.seg_blob()
+  };
 
   FeatureParam feat_param;
   CHECK(apollo::common::util::GetProtoFromASCIIFile(feature_file, &feat_param));
@@ -248,9 +247,8 @@ bool YoloCameraDetector::init_cnn(const string &yolo_root) {
   }
 
   if (feat_param.has_remap_model()) {
-    string track_model = feat_param.remap_model();
-    track_model =
-        apollo::common::util::GetAbsolutePath(model_root, track_model);
+    const string track_model = GetAbsolutePath(model_root,
+                                               feat_param.remap_model());
     ADEBUG << "Using tracking model: " << track_model;
     projector_.reset(new MatrixProjector(track_model));
   } else {
@@ -259,8 +257,9 @@ bool YoloCameraDetector::init_cnn(const string &yolo_root) {
   }
   extractors_.resize(feat_param.extractor_size());
   for (int i = 0; i < feat_param.extractor_size(); ++i) {
-    const auto extractor_param = feat_param.extractor(i);
-    auto feat_blob = cnnadapter_->get_blob_by_name(extractor_param.feat_blob());
+    const auto &extractor_param = feat_param.extractor(i);
+    const auto feat_blob =
+        cnnadapter_->get_blob_by_name(extractor_param.feat_blob());
     switch (extractor_param.feat_type()) {
       case ExtractorParam::Reorg:
         extractors_[i].reset(new ReorgFeatureExtractor());
@@ -279,12 +278,12 @@ bool YoloCameraDetector::init_cnn_lane(const string &yolo_root) {
 
   auto const &net_param = lane_param_.net_param();
   const auto &model_param = lane_param_.model_param();
-  string model_root = apollo::common::util::GetAbsolutePath(
-      yolo_root, model_param.model_name());
-  string proto_file = apollo::common::util::GetAbsolutePath(
-      model_root, model_param.proto_file());
-  string weight_file = apollo::common::util::GetAbsolutePath(
-      model_root, model_param.weight_file());
+  const string model_root = GetAbsolutePath(yolo_root,
+                                            model_param.model_name());
+  const string proto_file = GetAbsolutePath(model_root,
+                                            model_param.proto_file());
+  const string weight_file = GetAbsolutePath(model_root,
+                                             model_param.weight_file());
 
   ADEBUG << " proto_file: " << proto_file;
   ADEBUG << " weight_file: " << weight_file;
@@ -293,11 +292,8 @@ bool YoloCameraDetector::init_cnn_lane(const string &yolo_root) {
   const auto &model_type = model_param.model_type();
   ignored_height_ = model_param.ignored_height();
 
-  vector<string> input_names;
-  vector<string> output_names;
-  input_names.push_back(net_param.input_blob());
-  output_names.push_back(net_param.seg_blob());
-
+  vector<string> input_names = {net_param.input_blob()};
+  vector<string> output_names = {net_param.seg_blob()};
   // init Net
   ADEBUG << "model_type=" << model_type;
   switch (model_type) {
@@ -315,7 +311,8 @@ bool YoloCameraDetector::init_cnn_lane(const string &yolo_root) {
     return false;
   }
 
-  auto seg_blob = cnnadapter_lane_->get_blob_by_name(net_param.seg_blob());
+  const auto seg_blob =
+      cnnadapter_lane_->get_blob_by_name(net_param.seg_blob());
   if (seg_blob != nullptr) {
     lane_output_height_lane_ = seg_blob->height();
     lane_output_width_lane_ = seg_blob->width();
@@ -338,7 +335,7 @@ bool YoloCameraDetector::Multitask(
 
   Detect(frame, options, objects);
 
-  auto seg_blob =
+  const auto seg_blob =
       cnnadapter_->get_blob_by_name(yolo_param_.net_param().seg_blob());
   if (seg_blob == nullptr) {
     AERROR << "'seg_blob' is a null pointer.";
@@ -365,8 +362,8 @@ bool YoloCameraDetector::Lanetask(const cv::Mat &frame,
   cv::Mat img(frame, roi);
   cv::resize(img, img, cv::Size(lane_output_height_lane_,
                         lane_output_width_lane_), 0, 0);
-  auto input_blob = cnnadapter_lane_->
-          get_blob_by_name(lane_param_.net_param().input_blob());
+  const auto input_blob = cnnadapter_lane_->get_blob_by_name(
+      lane_param_.net_param().input_blob());
 
   resize(img, input_blob.get(), image_data_lane_, 0);
   pre_time.Stop();
@@ -381,7 +378,7 @@ bool YoloCameraDetector::Lanetask(const cv::Mat &frame,
   caffe::Timer post_time;
   post_time.Start();
 
-  auto seg_blob =
+  const auto seg_blob =
       cnnadapter_lane_->get_blob_by_name(lane_param_.net_param().seg_blob());
 
   if (seg_blob == nullptr) {
@@ -416,7 +413,7 @@ bool YoloCameraDetector::Detect(
   int roi_w = frame.cols;
   int roi_h = frame.rows - offset_y_;
   cv::Rect roi(0, offset_y_, roi_w, roi_h);
-  auto input_blob =
+  const auto input_blob =
       cnnadapter_->get_blob_by_name(yolo_param_.net_param().input_blob());
   if (roi_w == frame.cols && roi_h == frame.rows) {
     resize(frame, input_blob.get(), image_data_, 0);
@@ -455,10 +452,10 @@ bool YoloCameraDetector::Detect(
            << sizeof(obj->internal_type_probs);
   }
 
-  auto ori_blob =
-      cnnadapter_->get_blob_by_name(yolo_param_.net_param().ori_blob());
-  auto dim_blob =
-      cnnadapter_->get_blob_by_name(yolo_param_.net_param().dim_blob());
+  const auto ori_blob = cnnadapter_->get_blob_by_name(
+      yolo_param_.net_param().ori_blob());
+  const auto dim_blob = cnnadapter_->get_blob_by_name(
+      yolo_param_.net_param().dim_blob());
   if (ori_blob != nullptr && dim_blob != nullptr) {
     int valid_obj_idx = 0;
     int total_obj_idx = 0;
@@ -505,19 +502,19 @@ string YoloCameraDetector::Name() const { return "YoloCameraDetector"; }
 bool YoloCameraDetector::get_objects_cpu(
     std::vector<std::shared_ptr<VisualObject>> *objects) {
   int num_classes = types_.size();
-  auto loc_blob =
+  const auto loc_blob =
       cnnadapter_->get_blob_by_name(yolo_param_.net_param().loc_blob());
-  auto obj_blob =
+  const auto obj_blob =
       cnnadapter_->get_blob_by_name(yolo_param_.net_param().obj_blob());
-  auto cls_blob =
+  const auto cls_blob =
       cnnadapter_->get_blob_by_name(yolo_param_.net_param().cls_blob());
-  auto dim_blob =
+  const auto dim_blob =
       cnnadapter_->get_blob_by_name(yolo_param_.net_param().dim_blob());
-  auto ori_blob =
+  const auto ori_blob =
       cnnadapter_->get_blob_by_name(yolo_param_.net_param().ori_blob());
-  auto lof_blob =
+  const auto lof_blob =
       cnnadapter_->get_blob_by_name(yolo_param_.net_param().lof_blob());
-  auto lor_blob =
+  const auto lor_blob =
       cnnadapter_->get_blob_by_name(yolo_param_.net_param().lor_blob());
 
   int batch = obj_blob->num();
@@ -638,19 +635,19 @@ bool YoloCameraDetector::get_objects_cpu(
 }
 bool YoloCameraDetector::get_objects_gpu(
     std::vector<std::shared_ptr<VisualObject>> *objects) {
-  auto loc_blob =
+  const auto loc_blob =
       cnnadapter_->get_blob_by_name(yolo_param_.net_param().loc_blob());
-  auto obj_blob =
+  const auto obj_blob =
       cnnadapter_->get_blob_by_name(yolo_param_.net_param().obj_blob());
-  auto cls_blob =
+  const auto cls_blob =
       cnnadapter_->get_blob_by_name(yolo_param_.net_param().cls_blob());
-  auto dim_blob =
+  const auto dim_blob =
       cnnadapter_->get_blob_by_name(yolo_param_.net_param().dim_blob());
-  auto ori_blob =
+  const auto ori_blob =
       cnnadapter_->get_blob_by_name(yolo_param_.net_param().ori_blob());
-  auto lof_blob =
+  const auto lof_blob =
       cnnadapter_->get_blob_by_name(yolo_param_.net_param().lof_blob());
-  auto lor_blob =
+  const auto lor_blob =
       cnnadapter_->get_blob_by_name(yolo_param_.net_param().lor_blob());
   const float *anchor_data = static_cast<const float *>(anchor_->gpu_data());
   int num_classes = types_.size();
