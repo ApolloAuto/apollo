@@ -25,13 +25,45 @@ enum TaskType {
   NAVI_OBSTACLE_DECIDER = 9;
 };
 
-message EMPlannerConfig {
+message ScenarioLaneFollowConfig {
   repeated TaskType task = 1;
   optional apollo.planning.DpPolyPathConfig dp_poly_path_config = 2;
   optional apollo.planning.DpStSpeedConfig dp_st_speed_config = 3;
   optional apollo.planning.QpSplinePathConfig qp_spline_path_config = 4;
   optional apollo.planning.QpStSpeedConfig qp_st_speed_config = 5;
   optional apollo.planning.PolyStSpeedConfig poly_st_speed_config = 6;
+}
+
+message ScenarioConfig {
+  enum ScenarioType {
+    // LANE_FOLLOW is the default scenario
+    LANE_FOLLOW = 0;
+    // change from one lane to an adjacent lane
+    CHANGE_LANE = 1;
+    // go around an object when it blocks the road.
+    SIDE_PASS = 2;
+    // approach to an intersection
+    APPROACH = 3;
+    // drive at an intersection with 4-way stop sign
+    INTERSECTION_STOP_SIGN_FOUR_WAY = 4;
+    // drive at an intersection with 1 or 2 way stop sign
+    INTERSECTION_STOP_SIGN_ONE_OR_TWO_WAY = 5;
+    // turn left at an intersection with traffic light
+    INTERSECTION_TRAFFIC_LIGHT_LEFT_TURN = 6;
+    // turn right at an intersection with traffic light
+    INTERSECTION_TRAFFIC_LIGHT_RIGHT_TURN = 7;
+    // go through an intersection with traffic light
+    INTERSECTION_TRAFFIC_GO_THROUGH = 8;
+  }
+
+  optional ScenarioType scenario_type = 1;
+  oneof scenario {
+    ScenarioLaneFollowConfig scenario_lane_follow_config = 2;
+  }
+};
+
+message EMPlannerConfig {
+  optional ScenarioConfig scenario_config = 1;
 }
 
 message NaviPlannerConfig {
@@ -39,46 +71,6 @@ message NaviPlannerConfig {
   optional apollo.planning.NaviPathDeciderConfig  navi_path_decider_config = 2;
   optional apollo.planning.NaviSpeedDeciderConfig  navi_speed_decider_config = 3;
   optional apollo.planning.NaviObstacleDeciderConfig  navi_obstacle_decider_config = 4;
-}
-
-message ScenarioConfig {
-  enum ScenarioType {
-    // LANE_FOLLOW is the default scenario
-    LANE_FOLLOW = 0;
-
-    // change from one lane to an adjacent lane
-    CHANGE_LANE = 1;
-
-    // go around an object when it blocks the road.
-    SIDE_PASS = 2;
-
-    // approach to an intersection
-    APPROACH = 3;
-
-    // drive at an intersection with 4-way stop sign
-    INTERSECTION_STOP_SIGN_FOUR_WAY = 4;
-
-    // drive at an intersection with 1 or 2 way stop sign
-    INTERSECTION_STOP_SIGN_ONE_OR_TWO_WAY = 5;
-
-    // turn left at an intersection with traffic light
-    INTERSECTION_TRAFFIC_LIGHT_LEFT_TURN = 6;
-
-    // turn right at an intersection with traffic light
-    INTERSECTION_TRAFFIC_LIGHT_RIGHT_TURN = 7;
-
-    // go through an intersection with traffic light
-    INTERSECTION_TRAFFIC_GO_THROUGH = 8;
-  }
-};
-
-message LaneFollowScenarioConfig {
-  repeated TaskType task = 1;
-  optional apollo.planning.DpPolyPathConfig dp_poly_path_config = 2;
-  optional apollo.planning.DpStSpeedConfig dp_st_speed_config = 3;
-  optional apollo.planning.QpSplinePathConfig qp_spline_path_config = 4;
-  optional apollo.planning.QpStSpeedConfig qp_st_speed_config = 5;
-  optional apollo.planning.PolyStSpeedConfig poly_st_speed_config = 6;
 }
 
 message PlanningConfig {
@@ -90,12 +82,9 @@ message PlanningConfig {
     OPENSPACE = 4; // open space planner
   };
   optional PlannerType planner_type = 1 [default = EM];
-
-  optional EMPlannerConfig em_planner_config = 2;
-
-  optional NaviPlannerConfig navi_planner_config = 3;
-
-  optional OpenSpacePlannerConfig open_space_planner_config = 4;
-
-  optional LaneFollowScenarioConfig lane_follow_scenario_config = 5;
+  oneof planner_config {
+    EMPlannerConfig em_planner_config = 2;
+    NaviPlannerConfig navi_planner_config = 3;
+    OpenSpacePlannerConfig open_space_planner_config = 4;
+  }
 }
