@@ -138,6 +138,7 @@ message PlanningData {
   optional LatticeStTraining lattice_st_image = 21;
   optional apollo.relative_map.MapMsg relative_map = 22;
   optional AutoTuningTrainingData auto_tuning_training_data = 23;
+  optional double front_clear_distance = 24;
 }
 
 message LatticeStPixel {
