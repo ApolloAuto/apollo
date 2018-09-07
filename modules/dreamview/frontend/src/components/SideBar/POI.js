@@ -10,7 +10,7 @@ export default class POI extends React.Component {
         const { routeEditingManager, options, inNavigationMode } = this.props;
 
         const entries = Object.keys(routeEditingManager.defaultRoutingEndPoint)
-            .map(key => {
+            .map((key, index) => {
                 return (
                     <RadioItem extraClasses={["poi-button"]}
                                key={`poi_${key}`} id='poi' title={key}
@@ -21,6 +21,7 @@ export default class POI extends React.Component {
                                     }
                                     options.showPOI = false;
                                }}
+                               autoFocus={index === 0}
                                checked={false}/>
                 );
             });
