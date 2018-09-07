@@ -7,6 +7,14 @@ data_files {
   dest_path: "modules/control/conf/lincoln.pb.txt"
 }
 data_files {
+  source_path: "cancard_params/canbus_conf.pb.txt"
+  dest_path: "modules/canbus/conf/canbus_conf.pb.txt"
+}
+data_files {
+  source_path: "cancard_params/conti_radar_conf.pb.txt"
+  dest_path: "modules/drivers/radar/conti_radar/conf/conti_radar_conf.pb.txt"
+}
+data_files {
   source_path: "navigation_lincoln.pb.txt"
   dest_path: "modules/control/conf/navigation_lincoln.pb.txt"
 }
