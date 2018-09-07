@@ -18,8 +18,8 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_SCENARIOS_LANE_FOLLOW_SCENARIO_H_
-#define MODULES_PLANNING_SCENARIOS_LANE_FOLLOW_SCENARIO_H_
+#ifndef MODULES_PLANNING_SCENARIOS_SIDE_PASS_SCENARIO_H_
+#define MODULES_PLANNING_SCENARIOS_SIDE_PASS_SCENARIO_H_
 
 #include <memory>
 #include <string>
@@ -41,10 +41,10 @@
 namespace apollo {
 namespace planning {
 
-class LaneFollowScenario : public Scenario {
+class SidePassScenario : public Scenario {
  public:
-  LaneFollowScenario() : Scenario(ScenarioConfig::LANE_FOLLOW) {}
-  virtual ~LaneFollowScenario() = default;
+  SidePassScenario() : Scenario(ScenarioConfig::SIDE_PASS) {}
+  virtual ~SidePassScenario() = default;
 
   bool Init(const PlanningConfig& config) override;
 
@@ -87,4 +87,4 @@ class LaneFollowScenario : public Scenario {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_SCENARIOS_LANE_FOLLOW_SCENARIO_H_
+#endif  // MODULES_PLANNING_SCENARIOS_SIDE_PASS_SCENARIO_H_
