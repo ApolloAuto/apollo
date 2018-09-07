@@ -77,7 +77,10 @@ Status StdPlanning::Init() {
   CHECK(apollo::common::util::GetProtoFromFile(FLAGS_planning_config_file,
                                                &config_))
       << "failed to load planning config file " << FLAGS_planning_config_file;
-  CheckPlanningConfig();
+  if (!CheckPlanningConfig()) {
+    return Status(ErrorCode::PLANNING_ERROR,
+                  "planning config error: " + config_.DebugString());
+  }
 
   planner_dispatcher_->Init();
 
@@ -458,6 +461,35 @@ void StdPlanning::Stop() {
   GetPlanningStatus()->Clear();
   last_routing_.Clear();
   EgoInfo::instance()->Clear();
+}
+
+bool StdPlanning::CheckPlanningConfig() {
+  if (!config_.has_planner_em_config()) {
+    return false;
+  }
+  if (!config_.planner_em_config().has_scenario_config()) {
+    return false;
+  }
+  if (!config_.planner_em_config().scenario_config()
+      .has_scenario_lane_follow_config()) {
+    return false;
+  }
+  if (!config_.planner_em_config().scenario_config()
+      .scenario_lane_follow_config().has_dp_st_speed_config()) {
+    return false;
+  }
+
+  const auto& dp_st_speed_config = config_.planner_em_config()
+      .scenario_config().scenario_lane_follow_config().dp_st_speed_config();
+  CHECK(dp_st_speed_config.has_matrix_dimension_s());
+  CHECK_GT(dp_st_speed_config.matrix_dimension_s(), 3);
+  CHECK_LT(dp_st_speed_config.matrix_dimension_s(), 10000);
+  CHECK(dp_st_speed_config.has_matrix_dimension_t());
+  CHECK_GT(dp_st_speed_config.matrix_dimension_t(), 3);
+  CHECK_LT(dp_st_speed_config.matrix_dimension_t(), 10000);
+  // TODO(All): check other config params
+
+  return true;
 }
 
 }  // namespace planning

@@ -51,25 +51,6 @@ using apollo::hdmap::HDMapUtil;
 
 PlanningBase::~PlanningBase() {}
 
-void PlanningBase::CheckPlanningConfig() {
-  if (config_.has_planner_em_config() &&
-      config_.planner_em_config().has_scenario_config() &&
-      config_.planner_em_config().scenario_config()
-        .has_scenario_lane_follow_config() &&
-      config_.planner_em_config().scenario_config()
-        .scenario_lane_follow_config().has_dp_st_speed_config()) {
-    const auto& dp_st_speed_config = config_.planner_em_config()
-        .scenario_config().scenario_lane_follow_config().dp_st_speed_config();
-    CHECK(dp_st_speed_config.has_matrix_dimension_s());
-    CHECK_GT(dp_st_speed_config.matrix_dimension_s(), 3);
-    CHECK_LT(dp_st_speed_config.matrix_dimension_s(), 10000);
-    CHECK(dp_st_speed_config.has_matrix_dimension_t());
-    CHECK_GT(dp_st_speed_config.matrix_dimension_t(), 3);
-    CHECK_LT(dp_st_speed_config.matrix_dimension_t(), 10000);
-  }
-  // TODO(All): check other config params
-}
-
 bool PlanningBase::IsVehicleStateValid(const VehicleState& vehicle_state) {
   if (std::isnan(vehicle_state.x()) || std::isnan(vehicle_state.y()) ||
       std::isnan(vehicle_state.z()) || std::isnan(vehicle_state.heading()) ||

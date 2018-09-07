@@ -81,8 +81,9 @@ class PlanningBase : public apollo::common::ApolloApp {
 
   bool IsVehicleStateValid(const common::VehicleState& vehicle_state);
   virtual void SetFallbackTrajectory(ADCTrajectory* cruise_trajectory);
-  void CheckPlanningConfig();
+  virtual bool CheckPlanningConfig() = 0;
 
+ protected:
   double start_time_ = 0.0;
   PlanningConfig config_;
   TrafficRuleConfigs traffic_rule_configs_;
