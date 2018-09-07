@@ -53,7 +53,8 @@ bool PbfHmTrackObjectMatcher::Match(
   std::vector<std::vector<double>> association_mat;
   ComputeAssociationMat(fusion_tracks, sensor_objects,
                         *unassigned_fusion_tracks, *unassigned_sensor_objects,
-                        *(options.ref_point), &association_mat);
+                        *(options.ref_point), *(options.sensor_world_pose),
+                        &association_mat);
 
   track2measurements_dist->assign(fusion_tracks.size(), 0);
   measurement2track_dist->assign(sensor_objects.size(), 0);
@@ -124,7 +125,7 @@ void PbfHmTrackObjectMatcher::ComputeAssociationMat(
     const std::vector<std::shared_ptr<PbfSensorObject>> &sensor_objects,
     const std::vector<int> &unassigned_fusion_tracks,
     const std::vector<int> &unassigned_sensor_objects,
-    const Eigen::Vector3d &ref_point,
+    const Eigen::Vector3d &ref_point, const Eigen::Matrix4d &sensor_world_pose,
     std::vector<std::vector<double>> *association_mat) {
   CHECK_NOTNULL(association_mat);
 
@@ -132,6 +133,7 @@ void PbfHmTrackObjectMatcher::ComputeAssociationMat(
   Eigen::Vector3d local_ref_point = ref_point;
   TrackObjectDistanceOptions options;
   options.ref_point = &local_ref_point;
+  options.sensor_world_pose = &sensor_world_pose;
   association_mat->resize(unassigned_fusion_tracks.size());
   for (size_t i = 0; i < unassigned_fusion_tracks.size(); ++i) {
     int fusion_idx = unassigned_fusion_tracks[i];

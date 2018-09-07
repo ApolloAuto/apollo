@@ -17,7 +17,5 @@
 #include "modules/perception/obstacle/camera/dummy/dummy_algorithms.h"
 
 namespace apollo {
-namespace perception {
-
-}  // namespace perception
+namespace perception {}  // namespace perception
 }  // namespace apollo

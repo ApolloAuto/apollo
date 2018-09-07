@@ -82,7 +82,8 @@ PbfSensorFramePtr AsyncFusion::ConstructFrame(const SensorObjects &frame) {
 }
 
 bool AsyncFusion::Fuse(const std::vector<SensorObjects> &multi_sensor_objects,
-                       std::vector<std::shared_ptr<Object>> *fused_objects) {
+                       std::vector<std::shared_ptr<Object>> *fused_objects,
+                       FusionOptions *options) {
   ACHECK(fused_objects != nullptr) << "parameter fused_objects is nullptr";
 
   AINFO << "number of sensor objects in async fusion is "

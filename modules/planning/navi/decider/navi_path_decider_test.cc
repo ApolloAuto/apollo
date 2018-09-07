@@ -52,7 +52,7 @@ class NaviPathDeciderTest : public ::testing::Test {
 
   static void InitPlannigConfig(PlanningConfig* const plannig_config) {
     DCHECK_NOTNULL(plannig_config);
-    auto* navi_planner_config = plannig_config->mutable_navi_planner_config();
+    auto* navi_planner_config = plannig_config->mutable_planner_navi_config();
     DCHECK_NOTNULL(navi_planner_config);
     auto* navi_path_decider_config =
         navi_planner_config->mutable_navi_path_decider_config();
@@ -109,7 +109,7 @@ TEST_F(NaviPathDeciderTest, MoveToDestLane) {
   GeneratePathData(kMaxS, 0.9, 0.03, &path_points);
   dest_y = path_points[0].y();
   auto navi_path_decider_cfg =
-      config.navi_planner_config().navi_path_decider_config();
+      config.planner_navi_config().navi_path_decider_config();
   expect_y = navi_path_decider_cfg.move_dest_lane_config_talbe()
                  .lateral_shift(0)
                  .max_move_dest_lane_shift_y();
@@ -172,7 +172,7 @@ TEST_F(NaviPathDeciderTest, KeepLane) {
   GeneratePathData(kMaxS, 0.29, 0.03, &path_points);
   dest_y = path_points[0].y();
   auto navi_path_decider_cfg =
-      config.navi_planner_config().navi_path_decider_config();
+      config.planner_navi_config().navi_path_decider_config();
   expect_y = dest_y - navi_path_decider_cfg.min_keep_lane_offset() +
              navi_path_decider_cfg.keep_lane_shift_compensation() + dest_y;
   navi_path_decider.KeepLane(dest_y, &path_points);

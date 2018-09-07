@@ -289,8 +289,7 @@ bool PbfIMFFusion::AdjustCovMatrix() {
   Eigen::Vector4d eigenvalues = es_.eigenvalues().transpose();
   std::cerr << "adjust eigen values for covariance matrix\n";
   std::cerr << "eigen values before \n" << eigenvalues << std::endl;
-  if (eigenvalues.minCoeff() > 0)
-    return false;
+  if (eigenvalues.minCoeff() > 0) return false;
 
   eigenvalues = eigenvalues.cwiseMax(cov_eigen_thresh_);
   std::cerr << "eigen values after \n" << eigenvalues << std::endl;

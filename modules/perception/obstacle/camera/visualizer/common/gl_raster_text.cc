@@ -339,19 +339,17 @@ void GLRasterText::print_string(const std::string s) {
   glPopAttrib();
 }
 
-void GLRasterText::print_multiline(
-    const std::string s,
-    const int top_left_x,
-    const int top_left_y) {
+void GLRasterText::print_multiline(const std::string s, const int top_left_x,
+                                   const int top_left_y) {
   glPushAttrib(GL_LIST_BIT);
   int line_count = 1;
   for (uint i = 0; i < s.size(); ++i) {
     if (s[i] == '\n') {
       // 18: varies to font size
-      glRasterPos2i(top_left_x, top_left_y+18*line_count);
+      glRasterPos2i(top_left_x, top_left_y + 18 * line_count);
       ++line_count;
     }
-    glCallList(s_font_offset_+s[i]);
+    glCallList(s_font_offset_ + s[i]);
   }
   glPopAttrib();
 }

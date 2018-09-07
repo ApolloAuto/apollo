@@ -51,7 +51,7 @@ struct CCLanePostProcessorOptions {
   LaneFrameOptions frame;
 
   CCLanePostProcessorOptions()
-      : space_type(SpaceType::VEHICLE),
+      : space_type(SpaceType::VEHICLECOR),
         lane_map_conf_thresh(0.5),
         cc_split_siz(100.0),
         cc_split_len(50) {}

@@ -53,8 +53,8 @@ void ClassifyBySimple::Perform(const cv::Mat &ros_image,
                                std::vector<LightPtr> *lights) {
   caffe::Blob<float> *input_blob_recog = classify_net_ptr_->input_blobs()[0];
   caffe::Blob<float> *output_blob_recog =
-      classify_net_ptr_->top_vecs()[classify_net_ptr_->top_vecs().size() - 1]
-                                   [0];
+      classify_net_ptr_
+          ->top_vecs()[classify_net_ptr_->top_vecs().size() - 1][0];
   cv::Mat img = ros_image(crop_box_);
   for (LightPtr light : *lights) {
     if (!light->region.is_detected ||

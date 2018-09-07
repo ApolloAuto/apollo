@@ -130,7 +130,7 @@ Status AsyncFusionSubnode::ProcEvents() {
   for (auto event_meta : sub_meta_events_) {
     std::vector<Event> events;
     if (event_meta.event_id == lane_event_id_) {
-        continue;
+      continue;
     }
 
     if (!SubscribeEvents(event_meta, &events)) {
@@ -173,7 +173,7 @@ void AsyncFusionSubnode::PublishDataAndEvent(
   CommonSharedDataKey key(timestamp, device_id);
   bool fusion_succ = fusion_data_->Add(key, data);
   if (!fusion_succ) {
-      AERROR <<"fusion shared data addkey failure";
+    AERROR << "fusion shared data addkey failure";
   }
 
   ADEBUG << "adding key in fusion shared data " << key.ToString();
@@ -233,9 +233,9 @@ Status AsyncFusionSubnode::Process(const EventMeta &event_meta,
 
   // publishing result to pnc
   if (event_meta.event_id == camera_event_id_) {
-      for (auto sensor_obj : sensor_objs) {
-          PublishPerceptionPb(sensor_obj);
-      }
+    for (auto sensor_obj : sensor_objs) {
+      PublishPerceptionPb(sensor_obj);
+    }
   }
 
   error_code_ = common::OK;
@@ -285,8 +285,8 @@ bool AsyncFusionSubnode::SubscribeEvents(const EventMeta &event_meta,
   }
 
   // only obtain latest event from a sensor queue
-  if (event.event_id !=0 && event.timestamp !=0.0) {
-      events->push_back(event);
+  if (event.event_id != 0 && event.timestamp != 0.0) {
+    events->push_back(event);
   }
   return true;
 }
@@ -374,9 +374,7 @@ bool AsyncFusionSubnode::GeneratePbMsg(PerceptionObstacles *obstacles) {
   return true;
 }
 
-void AsyncFusionSubnode::RegistAllAlgorithm() {
-  RegisterFactoryAsyncFusion();
-}
+void AsyncFusionSubnode::RegistAllAlgorithm() { RegisterFactoryAsyncFusion(); }
 
 void AsyncFusionSubnode::OnChassis(const Chassis &chassis) {
   ADEBUG << "Received chassis data: run chassis callback.";

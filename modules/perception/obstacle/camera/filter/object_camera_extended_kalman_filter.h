@@ -38,7 +38,8 @@ class ObjectCameraExtendedKalmanFilter : public BaseCameraFilter {
   bool Init() override { return true; }
 
   bool Filter(const double timestamp,
-              std::vector<std::shared_ptr<VisualObject>> *objects) override;
+              std::vector<std::shared_ptr<VisualObject>> *objects,
+              const FilterOptions &options) override;
 
   std::string Name() const override;
 
@@ -46,8 +47,8 @@ class ObjectCameraExtendedKalmanFilter : public BaseCameraFilter {
    public:
     ObjectFilter() {}
 
-    ObjectFilter(const int track_id, const float last_timestamp) :
-      track_id_(track_id), last_timestamp_(last_timestamp) {}
+    ObjectFilter(const int track_id, const float last_timestamp)
+        : track_id_(track_id), last_timestamp_(last_timestamp) {}
 
     int track_id_ = -1;
     int lost_frame_cnt_ = 0;
@@ -59,7 +60,7 @@ class ObjectCameraExtendedKalmanFilter : public BaseCameraFilter {
   const int kMaxKeptFrameCnt = 5;
 
   void GetState(const int track_id,
-      const std::shared_ptr<VisualObject>& obj_ptr);
+                const std::shared_ptr<VisualObject> &obj_ptr);
 
   // @brief Predict step
   void Predict(const int track_id, const double timestamp);
@@ -67,14 +68,15 @@ class ObjectCameraExtendedKalmanFilter : public BaseCameraFilter {
   // @brief Update step
   void Update(const int track_id, const std::shared_ptr<VisualObject> &obj_ptr);
 
-  ObjectFilter CreateObjectFilter(const int track_id, const float timestamp,
+  ObjectFilter CreateObjectFilter(
+      const int track_id, const float timestamp,
       const std::shared_ptr<VisualObject> &obj_ptr) const;
 
   common::math::ExtendedKalmanFilter<float, 4, 3, 1> InitObjectFilter(
       const float x, const float y, const float theta, const float v) const;
 
   Eigen::Matrix4f UpdateTransitionMatrix(const double theta, const double v,
-      const double dt) const;
+                                         const double dt) const;
 
   std::unordered_map<int, ObjectFilter> tracked_filters_;
 

@@ -45,9 +45,7 @@ class SpeedProfileGenerator {
   std::vector<common::SpeedPoint> GenerateSpeedHotStart(
       const common::TrajectoryPoint& planning_init_point) const;
 
-  FRIEND_TEST(SpeedProfileGeneratorTest, GenerateFallbackSpeedProfile);
-  SpeedData GenerateFallbackSpeedProfile(
-      const ReferenceLineInfo& reference_line_info);
+  SpeedData GenerateFallbackSpeedProfile();
 
  private:
   SpeedData GenerateStopProfile(const double init_speed,

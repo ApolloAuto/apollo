@@ -144,9 +144,8 @@ class Cipv {
                                      LaneLine *right_lane_line);
 
   // transform point to another using motion
-  bool TranformPoint(const Eigen::VectorXf& in,
-                     const MotionType& motion_matrix,
-                     Eigen::Vector3d* out);
+  bool TranformPoint(const Eigen::VectorXf &in, const MotionType &motion_matrix,
+                     Eigen::Vector3d *out);
   // Member variables
   bool b_image_based_cipv_ = false;
   int32_t debug_level_ = 0;
@@ -161,7 +160,7 @@ class Cipv {
 
   std::map<int, size_t> object_id_skip_count_;
   std::map<int, boost::circular_buffer<std::pair<float, float>>>
-    object_trackjectories_;
+      object_trackjectories_;
   std::map<int, std::vector<double>> object_timestamps_;
 };
 

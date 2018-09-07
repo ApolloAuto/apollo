@@ -34,6 +34,7 @@ namespace apollo {
 namespace perception {
 
 TEST(PbfTrackTest, test_pbf_track_constructor) {
+  DSTInitiator::instance().initialize_bba_manager();
   std::shared_ptr<PbfSensorObject> object1(new PbfSensorObject());
   object1->sensor_type = SensorType::VELODYNE_64;
   object1->sensor_id = "velodyne_64";
@@ -56,6 +57,7 @@ TEST(PbfTrackTest, test_pbf_track_constructor) {
 }
 
 TEST(PbfTrackTest, test_pbf_get_object) {
+  DSTInitiator::instance().initialize_bba_manager();
   std::shared_ptr<PbfSensorObject> object1(new PbfSensorObject());
   object1->sensor_type = SensorType::VELODYNE_64;
   object1->sensor_id = "velodyne_64";
@@ -88,7 +90,9 @@ TEST(PbfTrackTest, test_pbf_get_object) {
   obj = track.GetLatestRadarObject();
   CHECK_EQ(obj->timestamp - 0.095 < 0.0001, true);
 }
+
 TEST(PbfTrackTest, test_pbf_update_measurements_life) {
+  DSTInitiator::instance().initialize_bba_manager();
   std::shared_ptr<PbfSensorObject> object1(new PbfSensorObject());
   object1->sensor_type = SensorType::VELODYNE_64;
   object1->sensor_id = "velodyne_64";
@@ -119,6 +123,39 @@ TEST(PbfTrackTest, test_pbf_update_measurements_life) {
       (&track.lidar_objects_), "velodyne_64", 0.35, 0.2, &invisible_state);
   CHECK_EQ(track.lidar_objects_.size(), 1);
   CHECK_EQ(invisible_state, false);
+}
+
+std::shared_ptr<PbfSensorObject> GenerateVelObject(double timestamp) {
+  std::shared_ptr<PbfSensorObject> object1(new PbfSensorObject());
+  object1->sensor_type = SensorType::VELODYNE_64;
+  object1->sensor_id = "velodyne_64";
+  object1->timestamp = timestamp;
+  object1->object->track_id = 1;
+  object1->object->type_probs[static_cast<int>(ObjectType::PEDESTRIAN)] = 1.0f;
+  return object1;
+}
+
+TEST(PbfTrackClassFusionTest, test_pbf_type_fusion) {
+  DSTInitiator::instance().initialize_bba_manager();
+  std::shared_ptr<PbfSensorObject> object1 = GenerateVelObject(0.1);
+  PbfTrack track(object1);
+  BBA* bba = track.GetFusedBBA();
+  ADEBUG << "bba print data" << bba->print_bba();
+  // update track with camera unknown object
+  track.UpdateWithoutSensorObject(SensorType::CAMERA, "1", 0, 0.2);
+  bba = track.GetFusedBBA();
+  double ts = 0.3;
+  for (int i = 0; i < 10; ++i) {
+    std::shared_ptr<PbfSensorObject> obj = GenerateVelObject(ts);
+    track.UpdateWithSensorObject(obj, 0);
+    bba = track.GetFusedBBA();
+    ADEBUG << "bba print data" << bba->print_bba();
+    ts += 0.1;
+    track.UpdateWithoutSensorObject(SensorType::CAMERA, "1", 0, ts);
+    bba = track.GetFusedBBA();
+    ADEBUG << "bba print bba " << bba->print_bba();
+    ts += 0.1;
+  }
 }
 
 }  // namespace perception

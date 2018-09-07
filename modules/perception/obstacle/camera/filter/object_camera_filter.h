@@ -49,7 +49,8 @@ class ObjectCameraFilter : public BaseCameraFilter {
   bool Init() override;
 
   bool Filter(const double timestamp,
-              std::vector<std::shared_ptr<VisualObject>> *objects) override;
+              std::vector<std::shared_ptr<VisualObject>>* objects,
+              const FilterOptions& options) override;
 
   std::string Name() const override;
 
@@ -63,29 +64,43 @@ class ObjectCameraFilter : public BaseCameraFilter {
     common::math::KalmanFilter<float, 2, 1, 1> x_;
     common::math::KalmanFilter<float, 2, 1, 1> y_;
     common::math::KalmanFilter<float, 2, 1, 1> theta_;
+
+    // @brief set offset to avoid huge value float computing
+    Eigen::Vector3d global_to_local_offset_;
   };
 
   void InitFilter(const float x,
-                  common::math::KalmanFilter<float, 2, 1, 1> *filter);
+                  common::math::KalmanFilter<float, 2, 1, 1>* filter);
 
   std::unordered_map<int, ObjectFilter> tracked_filters_;
   const int kMaxKeptFrameCnt = 5;
 
   // @brief Create filters for new track ids
   void Create(const int track_id, const double timestamp,
-              const std::shared_ptr<VisualObject> &obj_ptr);
+              const std::shared_ptr<VisualObject>& obj_ptr,
+              const FilterOptions& options);
 
   // @brief Predict step
   void Predict(const int track_id, const double timestamp);
 
   // @brief Update step
-  void Update(const int track_id, const std::shared_ptr<VisualObject> &obj_ptr);
+  void Update(const int track_id, const std::shared_ptr<VisualObject>& obj_ptr,
+              const FilterOptions& options);
 
   // @brief Get output of estimated state
   void GetState(const int track_id, std::shared_ptr<VisualObject> obj_ptr);
 
   // @brief Destroy old filters
   void Destroy();
+
+  // @brief Transform Pose Global to Local
+  // used by non navigation mode
+  void TransformPoseGlobal2Local(const int track_id, Eigen::Matrix4d* pose);
+
+  // @brief Transform Tracked Object based on pose
+  // used by non navigation mode
+  void TransformObject(std::shared_ptr<VisualObject> obj,
+                       const Eigen::Matrix4f& pose);
 
   DISALLOW_COPY_AND_ASSIGN(ObjectCameraFilter);
 };

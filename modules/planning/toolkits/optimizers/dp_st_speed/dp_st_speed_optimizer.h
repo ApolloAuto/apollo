@@ -18,8 +18,8 @@
  * @file dp_st_speed_optimizer.h
  **/
 
-#ifndef MODULES_PLANNING_TASKS_DP_ST_SPEED_OPTIMIZER_H_
-#define MODULES_PLANNING_TASKS_DP_ST_SPEED_OPTIMIZER_H_
+#ifndef MODULES_PLANNING_TOOLKITS_OPTIMIZERS_DP_ST_SPEED_OPTIMIZER_H_
+#define MODULES_PLANNING_TOOLKITS_OPTIMIZERS_DP_ST_SPEED_OPTIMIZER_H_
 
 #include <string>
 
@@ -71,4 +71,4 @@ class DpStSpeedOptimizer : public SpeedOptimizer {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_TASKS_DP_ST_SPEED_OPTIMIZER_H_
+#endif  // MODULES_PLANNING_TOOLKITS_OPTIMIZERS_DP_ST_SPEED_OPTIMIZER_H_

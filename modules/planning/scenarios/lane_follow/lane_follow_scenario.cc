@@ -33,6 +33,7 @@
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/hdmap/hdmap.h"
 #include "modules/map/hdmap/hdmap_common.h"
+#include "modules/planning/common/ego_info.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/constraint_checker/constraint_checker.h"
@@ -83,7 +84,9 @@ bool LaneFollowScenario::Init(const PlanningConfig& config) {
     return true;
   }
   RegisterTasks();
-  for (const auto task : config.lane_follow_scenario_config().task()) {
+  auto& tasks = config.planner_em_config().scenario_config()
+      .scenario_lane_follow_config().task();
+  for (const auto task : tasks) {
     tasks_.emplace_back(
         task_factory_.CreateObject(static_cast<TaskType>(task)));
     AINFO << "Created task:" << tasks_.back()->Name();
@@ -227,8 +230,7 @@ Status LaneFollowScenario::PlanOnReferenceLine(
     ADEBUG << "Speed fallback.";
 
     *reference_line_info->mutable_speed_data() =
-        speed_profile_generator_.GenerateFallbackSpeedProfile(
-            *reference_line_info);
+        speed_profile_generator_.GenerateFallbackSpeedProfile();
     reference_line_info->AddCost(kSpeedOptimizationFallbackClost);
     reference_line_info->set_trajectory_type(ADCTrajectory::SPEED_FALLBACK);
   }
@@ -299,7 +301,7 @@ Status LaneFollowScenario::PlanOnReferenceLine(
 
 void LaneFollowScenario::GenerateFallbackPathProfile(
     const ReferenceLineInfo* reference_line_info, PathData* path_data) {
-  auto adc_point = reference_line_info->AdcPlanningPoint();
+  auto adc_point = EgoInfo::instance()->start_point();
   double adc_s = reference_line_info->AdcSlBoundary().end_s();
   const double max_s = 150.0;
   const double unit_s = 1.0;

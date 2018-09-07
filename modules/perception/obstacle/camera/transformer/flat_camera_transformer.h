@@ -64,7 +64,7 @@ class FlatCameraTransformer : public BaseCameraTransformer {
 
   // @brief Get Adjusted camera-to-car extrinsics
   // Return false if no valid objects in scene
-  bool GetAdjustedExtrinsics(Eigen::Matrix<double, 4, 4>* extrinsics) override;
+  bool GetAdjustedExtrinsics(Eigen::Matrix<double, 4, 4> *extrinsics) override;
 
   std::string Name() const override;
 
@@ -86,7 +86,7 @@ class FlatCameraTransformer : public BaseCameraTransformer {
   // Real-time (Per-frame) Pitch angle adjustment between camera and ground
   // Assume objects are on ground, and ground is a simple flat plane
   void GetDynamicExtrinsics(
-    const std::vector<std::pair<Eigen::Vector3f, Eigen::Vector3f>> &centers);
+      const std::vector<std::pair<Eigen::Vector3f, Eigen::Vector3f>> &centers);
 
   DISALLOW_COPY_AND_ASSIGN(FlatCameraTransformer);
 };

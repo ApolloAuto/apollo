@@ -33,7 +33,7 @@ class BaseProjector {
 
 class MatrixProjector : public BaseProjector {
  public:
-  explicit MatrixProjector(const std::string &weight_file);
+  explicit MatrixProjector(const std::string& weight_file);
 
   bool project(std::vector<float>* feature) override;
 

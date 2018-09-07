@@ -36,7 +36,7 @@ void GaussianSelect::Select(const cv::Mat &ros_image,
                        });
 
   //  cv::Mat_<int> cost_matrix(hdmap_bboxes.size(), refined_bboxes.size());
-  std::vector<std::vector<double> > score_matrix(
+  std::vector<std::vector<double>> score_matrix(
       hdmap_bboxes.size(), std::vector<double>(refined_bboxes.size(), 0));
   for (size_t row = 0; row < hdmap_bboxes.size(); ++row) {
     cv::Point2f center_hd = GetCenter(hdmap_bboxes[row]->region.rectified_roi);

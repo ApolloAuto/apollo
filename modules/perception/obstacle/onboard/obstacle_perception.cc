@@ -174,7 +174,9 @@ bool ObstaclePerception::Process(
   std::vector<SensorObjects> multi_sensor_objs;
   multi_sensor_objs.push_back(*sensor_objects);
   std::vector<std::shared_ptr<Object>> fused_objects;
-  if (!fusion_->Fuse(multi_sensor_objs, &fused_objects)) {
+  FusionOptions options;
+
+  if (!fusion_->Fuse(multi_sensor_objs, &fused_objects, &options)) {
     AERROR << "Failed to fusion";
     return false;
   }
