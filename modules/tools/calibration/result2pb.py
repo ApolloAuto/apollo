@@ -27,21 +27,21 @@ from modules.control.proto.control_conf_pb2 import ControlConf
 def load_calibration_raw_data(fn):
     speed_table = {}
     with open(fn, 'r') as f:
-    for line in f:
-        items = line.split(',')
-        cmd = round(float(items[0]))
-        speed = float(items[1])
-        acc = round(float(items[2]), 2)
-        if speed in speed_table:
-            cmd_table = speed_table[speed]
-            if cmd in cmd_table:
-                cmd_table[cmd].append(acc)
+        for line in f:
+            items = line.split(',')
+            cmd = round(float(items[0]))
+            speed = float(items[1])
+            acc = round(float(items[2]), 2)
+            if speed in speed_table:
+                cmd_table = speed_table[speed]
+                if cmd in cmd_table:
+                    cmd_table[cmd].append(acc)
+                else:
+                    cmd_table[cmd] = [acc]
             else:
+                cmd_table = {}
                 cmd_table[cmd] = [acc]
-        else:
-            cmd_table = {}
-            cmd_table[cmd] = [acc]
-            speed_table[speed] = cmd_table
+                speed_table[speed] = cmd_table
     for speed, cmd_table in speed_table.items():
         new_cmd_table = {}
         for cmd, acc_list in cmd_table.items():
@@ -62,21 +62,21 @@ def load_calibration_raw_data(fn):
 def load_calibration_raw_data_old(fn):
     speed_table = {}
     with open(fn, 'r') as f:
-    for line in f:
-        items = line.split(',')
-        cmd = round(float(items[0]))
-        speed = float(items[1])
-        acc = round(float(items[2]), 2)
-        if speed in speed_table:
-            acc_table = speed_table[speed]
-            if acc in acc_table:
-                acc_table[acc].append(cmd)
+        for line in f:
+            items = line.split(',')
+            cmd = round(float(items[0]))
+            speed = float(items[1])
+            acc = round(float(items[2]), 2)
+            if speed in speed_table:
+                acc_table = speed_table[speed]
+                if acc in acc_table:
+                    acc_table[acc].append(cmd)
+                else:
+                    acc_table[acc] = [cmd]
             else:
+                acc_table = {}
                 acc_table[acc] = [cmd]
-        else:
-            acc_table = {}
-            acc_table[acc] = [cmd]
-            speed_table[speed] = acc_table
+                speed_table[speed] = acc_table
     return speed_table
 
 def get_calibration_table_pb(speed_table):
