@@ -40,16 +40,16 @@ class AutotuningFeatureBuilder {
    * @param: generated model input feature from raw feature, function output
    */
   virtual common::Status BuildFeature(
-    const autotuning::TrajectoryRawFeature& raw_feature,
-    autotuning::TrajectoryFeature* const input_feature) const = 0;
+      const autotuning::TrajectoryRawFeature& raw_feature,
+      autotuning::TrajectoryFeature* const input_feature) const = 0;
 
   /**
    * @param: pointwise raw feature, function input
    * @param: generated model input feature, function output
    */
   virtual common::Status BuildPointFeature(
-    const autotuning::TrajectoryPointRawFeature& raw_point_feature,
-    autotuning::TrajectoryPointwiseFeature* const point_feature) const = 0;
+      const autotuning::TrajectoryPointRawFeature& raw_point_feature,
+      autotuning::TrajectoryPointwiseFeature* const point_feature) const = 0;
 };
 
 }  // namespace planning
