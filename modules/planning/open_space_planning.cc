@@ -53,7 +53,11 @@ Status OpenSpacePlanning::Init() {
   CHECK(apollo::common::util::GetProtoFromFile(FLAGS_planning_config_file,
                                                &config_))
       << "failed to load planning config file " << FLAGS_planning_config_file;
-  CheckPlanningConfig();
+
+  if (!CheckPlanningConfig()) {
+    return Status(ErrorCode::PLANNING_ERROR,
+                  "planning config error: " + config_.DebugString());
+  }
 
   // clear planning status
   GetPlanningStatus()->Clear();
@@ -192,6 +196,15 @@ common::Status OpenSpacePlanning::InitFrame(
     return status;
   }
   return Status::OK();
+}
+
+bool OpenSpacePlanning::CheckPlanningConfig() {
+  if (!config_.has_planner_open_space_config()) {
+    return false;
+  }
+  // TODO(All): check other config params
+
+  return true;
 }
 
 }  // namespace planning

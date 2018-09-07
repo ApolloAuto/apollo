@@ -89,6 +89,9 @@ class NaviPlanning : public PlanningBase {
                            const common::TrajectoryPoint& planning_start_point,
                            const double start_time,
                            const common::VehicleState& vehicle_state);
+
+  bool CheckPlanningConfig();
+
   /**
    * @brief receiving planning pad message
    */
