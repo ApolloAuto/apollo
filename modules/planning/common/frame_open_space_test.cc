@@ -24,6 +24,7 @@
 
 #include "gtest/gtest.h"
 
+#include "Eigen/Eigen"
 #include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
 
@@ -37,6 +38,7 @@
 namespace apollo {
 namespace planning {
 
+using apollo::common::Status;
 using apollo::perception::PerceptionObstacle;
 
 class FrameTest : public ::testing::Test {
@@ -105,6 +107,31 @@ TEST_F(FrameTest, vehicle_state) {
 TEST_F(FrameTest, sequence_num) {
   double sequence_num_test = 1;
   ASSERT_EQ(test_frame_->SequenceNum(), sequence_num_test);
+}
+
+TEST_F(FrameTest, Hpresentation_Obstacle) {
+  test_frame_->HPresentationObstacle();
+}
+
+TEST_F(FrameTest, obstacle_H_presentation) {
+  std::size_t obstacles_num = 2;
+  Eigen::MatrixXd obstacles_vertices_num(obstacles_num, 1);
+  obstacles_vertices_num << 4, 4;
+  int edges_num = static_cast<int>(obstacles_vertices_num.sum());
+  std::vector<std::vector<Vec2d>> obstacles_vertices_vec = {
+      {Vec2d(0, 0), Vec2d(-1, 1), Vec2d(0, 2), Vec2d(1, 1), Vec2d(0, 0)},
+      {Vec2d(0, -1), Vec2d(2, -1), Vec2d(2, -2), Vec2d(0, -2), Vec2d(0, -1)}};
+  Eigen::MatrixXd expect_A = Eigen::MatrixXd::Zero(edges_num, 2);
+  Eigen::MatrixXd expect_b = Eigen::MatrixXd::Zero(edges_num, 1);
+  ASSERT_TRUE(test_frame_->ObsHRep(obstacles_num, obstacles_vertices_num,
+                                   obstacles_vertices_vec, &expect_A,
+                                   &expect_b));
+  Eigen::MatrixXd actual_A(edges_num, 2);
+  Eigen::MatrixXd actual_b(edges_num, 1);
+  actual_A << -1, -1, -1, 1, 1, 1, 1, -1, 0, 1, 1, 0, 0, -1, -1, 0;
+  actual_b << 0, 2, 2, 0, -1, 2, 2, 0;
+  ASSERT_LT((actual_A - expect_A).norm(), 1e-5);
+  ASSERT_LT((actual_b - expect_b).norm(), 1e-5);
 }
 
 }  // namespace planning
