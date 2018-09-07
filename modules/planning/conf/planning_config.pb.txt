@@ -1,5 +1,5 @@
 planner_type : EM
-em_planner_config {
+planner_em_config {
   scenario_config {
     scenario_lane_follow_config {
       task : DP_POLY_PATH_OPTIMIZER

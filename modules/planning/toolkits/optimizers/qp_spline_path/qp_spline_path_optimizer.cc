@@ -34,7 +34,7 @@ QpSplinePathOptimizer::QpSplinePathOptimizer()
     : PathOptimizer("QpSplinePathOptimizer") {}
 
 bool QpSplinePathOptimizer::Init(const PlanningConfig& config) {
-  qp_spline_path_config_ = config.em_planner_config().scenario_config()
+  qp_spline_path_config_ = config.planner_em_config().scenario_config()
       .scenario_lane_follow_config().qp_spline_path_config();
   std::vector<double> init_knots;
   spline_generator_.reset(
