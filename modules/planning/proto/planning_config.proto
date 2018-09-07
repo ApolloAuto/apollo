@@ -10,7 +10,7 @@ import "modules/planning/proto/poly_st_speed_config.proto";
 import "modules/planning/proto/navi_path_decider_config.proto";
 import "modules/planning/proto/navi_speed_decider_config.proto";
 import "modules/planning/proto/navi_obstacle_decider_config.proto";
-import "modules/planning/proto/open_space_planner_config.proto";
+import "modules/planning/proto/planner_open_space_config.proto";
 
 enum TaskType {
   DP_POLY_PATH_OPTIMIZER = 0;
@@ -62,11 +62,11 @@ message ScenarioConfig {
   }
 };
 
-message EMPlannerConfig {
+message PlannerEMConfig {
   optional ScenarioConfig scenario_config = 1;
 }
 
-message NaviPlannerConfig {
+message PlannerNaviConfig {
   repeated TaskType task = 1;
   optional apollo.planning.NaviPathDeciderConfig  navi_path_decider_config = 2;
   optional apollo.planning.NaviSpeedDeciderConfig  navi_speed_decider_config = 3;
@@ -83,8 +83,8 @@ message PlanningConfig {
   };
   optional PlannerType planner_type = 1 [default = EM];
   oneof planner_config {
-    EMPlannerConfig em_planner_config = 2;
-    NaviPlannerConfig navi_planner_config = 3;
-    OpenSpacePlannerConfig open_space_planner_config = 4;
+    PlannerEMConfig planner_em_config = 2;
+    PlannerNaviConfig planner_navi_config = 3;
+    PlannerOpenSpaceConfig planner_open_space_config = 4;
   }
 }

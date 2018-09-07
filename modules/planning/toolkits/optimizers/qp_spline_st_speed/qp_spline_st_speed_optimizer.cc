@@ -46,7 +46,7 @@ QpSplineStSpeedOptimizer::QpSplineStSpeedOptimizer()
     : SpeedOptimizer("QpSplineStSpeedOptimizer") {}
 
 bool QpSplineStSpeedOptimizer::Init(const PlanningConfig& config) {
-  qp_st_speed_config_ = config.em_planner_config()
+  qp_st_speed_config_ = config.planner_em_config()
       .scenario_config().scenario_lane_follow_config()
       .qp_st_speed_config();
   st_boundary_config_ = qp_st_speed_config_.st_boundary_config();

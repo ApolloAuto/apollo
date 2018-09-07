@@ -144,7 +144,7 @@ proto_library(
         ":navi_obstacle_decider_config_proto_lib",
         ":navi_path_decider_config_proto_lib",
         ":navi_speed_decider_config_proto_lib",
-        ":open_space_planner_config_proto_lib",
+        ":planner_open_space_config_proto_lib",
         ":poly_st_speed_config_proto_lib",
         ":qp_spline_path_config_proto_lib",
         ":qp_st_speed_config_proto_lib",
@@ -345,16 +345,16 @@ proto_library(
 )
 
 proto_library(
-    name = "open_space_planner_config_proto_lib",
+    name = "planner_open_space_config_proto_lib",
     srcs = [
-        "open_space_planner_config.proto",
+        "planner_open_space_config.proto",
     ],
 )
 
 cc_proto_library(
-    name = "open_space_planner_config_proto",
+    name = "planner_open_space_config_proto",
     deps = [
-        ":open_space_planner_config_proto_lib",
+        ":planner_open_space_config_proto_lib",
     ],
 )
 
