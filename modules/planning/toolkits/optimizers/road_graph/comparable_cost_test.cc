@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/planning/toolkits/optimizers/dp_poly_path/comparable_cost.h"
+#include "modules/planning/toolkits/optimizers/road_graph/comparable_cost.h"
 
 #include "gtest/gtest.h"
 
