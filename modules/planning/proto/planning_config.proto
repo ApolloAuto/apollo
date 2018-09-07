@@ -81,6 +81,15 @@ message LaneFollowScenarioConfig {
   optional apollo.planning.PolyStSpeedConfig poly_st_speed_config = 6;
 }
 
+message SidePassScenarioConfig {
+  repeated TaskType task = 1;
+  optional apollo.planning.DpPolyPathConfig dp_poly_path_config = 2;
+  optional apollo.planning.DpStSpeedConfig dp_st_speed_config = 3;
+  optional apollo.planning.QpSplinePathConfig qp_spline_path_config = 4;
+  optional apollo.planning.QpStSpeedConfig qp_st_speed_config = 5;
+  optional apollo.planning.PolyStSpeedConfig poly_st_speed_config = 6;
+}
+
 message PlanningConfig {
   enum PlannerType {
     RTK = 0;
@@ -98,4 +107,6 @@ message PlanningConfig {
   optional OpenSpacePlannerConfig open_space_planner_config = 4;
 
   optional LaneFollowScenarioConfig lane_follow_scenario_config = 5;
+
+  optional LaneFollowScenarioConfig side_pass_scenario_config = 6;
 }

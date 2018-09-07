@@ -28,6 +28,7 @@ cc_library(
         "//modules/common",
         "//modules/planning/common:planning_common",
         "//modules/planning/scenarios/lane_follow",
+        "//modules/planning/scenarios/side_pass",
     ],
 )
 
