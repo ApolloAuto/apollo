@@ -21,8 +21,54 @@
 
 namespace apollo {
 namespace perception {
+
+
 __global__ void
 resize_linear_kernel(const unsigned char *src, float *dst, int channel, int height, int width,
+                     int dst_height, int dst_width, float fx, float fy) {
+    const int dst_x = blockDim.x * blockIdx.x + threadIdx.x;
+    const int dst_y = blockDim.y * blockIdx.y + threadIdx.y;
+    if (dst_x < dst_width && dst_y < dst_height) {
+        float src_x = (dst_x + 0.5) * fx - 0.5;
+        float src_y = (dst_y + 0.5) * fy - 0.5;
+        const int x1 = __float2int_rd(src_x);
+        const int y1 = __float2int_rd(src_y);
+        const int x1_read = max(x1, 0);
+        const int y1_read = max(y1, 0);
+        const int x2 = x1 + 1;
+        const int y2 = y1 + 1;
+        const int x2_read = min(x2, width - 1);
+        const int y2_read = min(y2, height - 1);
+        //(h*width+w)*channel+c
+        float src_reg = 0;
+        for (int c = 0; c < channel; c++) {
+            float out = 0;
+            int idx11 = (y1_read * width + x1_read) * channel;
+            src_reg = (int) src[idx11 + c];
+            out = out + (x2 - src_x) * (y2 - src_y) * src_reg;
+            int idx12 = (y1_read * width + x2_read) * channel;
+            src_reg = (int) src[idx12 + c];
+            out = out + src_reg * (src_x - x1) * (y2 - src_y);
+            int idx21 = (y2_read * width + x1_read) * channel;
+            src_reg = (int) src[idx21 + c];
+            out = out + src_reg * (x2 - src_x) * (src_y - y1);
+            int idx22 = (y2_read * width + x2_read) * channel;
+            src_reg = (int) src[idx22 + c];
+            out = out + src_reg * (src_x - x1) * (src_y - y1);
+            if (out < 0) {
+                out = 0;
+            }
+            if (out > 255) {
+                out = 255;
+            }
+            int dst_idx = (dst_y * dst_width + dst_x) * channel + c;
+            //   printf("%f %d %d %d %d\n",out,x1,y1,x2,y2);
+            dst[dst_idx] = out;
+        }
+    }
+}
+__global__ void
+resize_linear_kernel2(const unsigned char *src, float *dst, int channel, int height, int width,
                      int dst_height, int dst_width, float fx, float fy) {
     const int dst_x = blockDim.x * blockIdx.x + threadIdx.x;
     const int dst_y = blockDim.y * blockIdx.y + threadIdx.y;
@@ -149,6 +195,34 @@ void resize(cv::Mat frame, caffe::Blob<float> *dst, std::shared_ptr <caffe::Sync
     resize_linear_kernel << < grid, block >> > ((const unsigned char *) src_gpu->gpu_data(), dst
             ->mutable_gpu_data(), channel, origin_height, origin_width, height, width, fx, fy);
 
+}
+
+void copy_cpu2gpu(cv::Mat frame, 
+                  caffe::Blob<float> *dst, 
+                  std::shared_ptr <caffe::SyncedMemory> src_gpu, 
+                  int start_axis) {
+    int origin_width = frame.cols;
+    int origin_height = frame.rows;
+
+    int width = dst->height();
+    int height = dst->channels();
+    int channel = dst->width();
+    int size = origin_width * origin_height * channel * sizeof(unsigned char);
+    if (width != origin_width || height != origin_height) {
+      return;
+    }
+
+    if (src_gpu == nullptr) {
+        src_gpu.reset(new caffe::SyncedMemory(size));
+    }
+    src_gpu->set_cpu_data(frame.data);
+    
+    // gpu_memcpy(size, (const unsigned char *) src_gpu->gpu_data(), dst->mutable_gpu_data());
+    
+    CUDA_CHECK(cudaMemcpy(dst->mutable_gpu_data(), 
+                         (const unsigned char *) src_gpu->gpu_data(), 
+                         size, 
+                         cudaMemcpyDeviceToDevice));  
 }
 
 void resize(cv::Mat frame, caffe::Blob<float> *dst, std::shared_ptr <caffe::SyncedMemory> src_gpu,

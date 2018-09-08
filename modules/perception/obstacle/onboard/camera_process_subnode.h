@@ -62,6 +62,8 @@
 namespace apollo {
 namespace perception {
 
+const double dEpsilon = 0.00001f;
+
 class CameraProcessSubnode : public Subnode {
  public:
   CameraProcessSubnode() = default;
@@ -90,10 +92,18 @@ class CameraProcessSubnode : public Subnode {
                            const SharedDataPtr<SensorObjects>& sensor_objects,
                            const SharedDataPtr<CameraItem>& camera_item);
 
-  void PublishPerceptionPbObj(
-      const SharedDataPtr<SensorObjects>& sensor_objects);
+  void PublishDataAndEventPsuedoNarrow(const double timestamp,
+                           const SharedDataPtr<SensorObjects>& sensor_objects,
+                           const SharedDataPtr<CameraItem>& camera_item);
+
+  void PublishPerceptionPbObj(const SharedDataPtr<SensorObjects>&
+                              sensor_objects);
   void PublishPerceptionPbLnMsk(const cv::Mat& mask,
-                                const sensor_msgs::Image& message);
+                                const sensor_msgs::Image &message);
+
+  bool ScaleBack(const Eigen::Matrix<double, 3, 3> &scale_mat,
+                 const Eigen::Vector2d &point2D,
+                 Eigen::Vector2d *scaled_point2D);
   // General
   std::string device_id_ = "camera";
   SeqId seq_num_ = 0;
@@ -102,6 +112,8 @@ class CameraProcessSubnode : public Subnode {
   // Shared Data
   CameraObjectData* cam_obj_data_;
   CameraSharedData* cam_shared_data_;
+  CameraObjectData* cam_obj_data_pnarrow_;
+  CameraSharedData* cam_shared_data_pnarrow_;
 
   // Calibration
   int32_t image_height_ = 1080;
@@ -122,6 +134,12 @@ class CameraProcessSubnode : public Subnode {
   float ln_msk_threshold_ = 0.95f;
   const int num_lines = 13;
 
+  // Variables for pseudo narrow
+  float pseudo_scale_ = 0.5f;
+  float inv_pseudo_scale_ = 1.0f / pseudo_scale_;
+  Eigen::Matrix<double, 3, 3> scale_mat_;
+  Eigen::Matrix<double, 3, 3> pseudo2camera_mat_;
+  cv::Rect pseudo_narrow_roi_;
   // Modules
   std::unique_ptr<BaseCameraDetector> detector_;
   std::unique_ptr<BaseCameraConverter> converter_;

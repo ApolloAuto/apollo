@@ -104,13 +104,17 @@ bool ProbabilisticFusion::Fuse(
              << ", obj_cnt : " << multi_sensor_objects[i].objects.size() << ", "
              << std::fixed << std::setprecision(12)
              << multi_sensor_objects[i].timestamp;
+
       if (is_lidar(sensor_type) && !config_.use_lidar()) {
+        ADEBUG << "sensor_type: lidar and not using it";
         continue;
       }
       if (is_radar(sensor_type) && !config_.use_radar()) {
+        ADEBUG << "sensor_type: radar and not using it";
         continue;
       }
       if (is_camera(sensor_type) && !use_camera_) {
+        ADEBUG << "sensor_type: camera or pseudo and not using it";
         continue;
       }
 

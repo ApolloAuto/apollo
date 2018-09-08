@@ -52,6 +52,7 @@ enum SensorType {
   RADAR = 2,
   CAMERA = 3,
   ULTRASONIC = 4,
+  CAMERA_PSEUDO_NARROW = 5,
   UNKNOWN_SENSOR_TYPE = 10,
 };
 

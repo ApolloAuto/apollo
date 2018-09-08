@@ -57,6 +57,8 @@ std::string GetSensorType(SensorType sensor_type) {
       return "radar";
     case SensorType::CAMERA:
       return "camera";
+    case SensorType::CAMERA_PSEUDO_NARROW:
+      return "camera_pseudo_narrow";
     case SensorType::ULTRASONIC:
       return "ultrasonic";
     case SensorType::UNKNOWN_SENSOR_TYPE:
@@ -74,7 +76,8 @@ bool is_radar(SensorType sensor_type) {
 }
 
 bool is_camera(SensorType sensor_type) {
-  return (sensor_type == SensorType::CAMERA);
+  return (sensor_type == SensorType::CAMERA ||
+          sensor_type == SensorType::CAMERA_PSEUDO_NARROW);
 }
 
 }  // namespace perception

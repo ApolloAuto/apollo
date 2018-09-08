@@ -75,6 +75,8 @@ DEFINE_string(short_camera_extrinsic_file,
 // Ex: /apollo/modules/perception/data/yolo_camera_detector_test/test.jpg
 DEFINE_string(image_file_path, "", "Debug image file");
 DEFINE_bool(image_file_debug, false, "Debug ROS to CV image");
+DEFINE_bool(enable_pseudo_narrow, false, "Enable pseudo narrow camera");
+DEFINE_double(pseudo_narrow_scale, 2, "Zoom scale of pseudo narrow");
 
 /// modules/perception/lib/config_manager/calibration_config_manager.cc
 DEFINE_string(front_camera_extrinsics_file,

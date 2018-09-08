@@ -57,6 +57,10 @@ inline void PerceptionFreeHost(void *ptr, bool use_cuda) {
 
 int divup(int a, int b);
 
+void copy_cpu2gpu(cv::Mat frame, caffe::Blob<float> *dst,
+            std::shared_ptr<caffe::SyncedMemory> src_gpu, int start_axis);
+
+
 void resize(cv::Mat frame, caffe::Blob<float> *dst,
             std::shared_ptr<caffe::SyncedMemory> src_gpu, int start_axis);
 // resize with mean and scale

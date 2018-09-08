@@ -237,8 +237,8 @@ Status FusionSubnode::Process(const EventMeta &event_meta,
     PERF_BLOCK_END("fusion_radar");
   } else if (event_meta.event_id == camera_event_id_) {
     for (auto &obj : sensor_objs) {
-      if (obj.sensor_type == SensorType::CAMERA) {
-        AINFO << "camera object size is " << obj.objects.size();
+      if (obj.sensor_type == SensorType::CAMERA ||
+          obj.sensor_type == SensorType::CAMERA_PSEUDO_NARROW) {
         AINFO << "fusion received image : " << GLOG_TIMESTAMP(obj.timestamp)
               << " at time: " << GLOG_TIMESTAMP(TimeUtil::GetCurrentTime());
         break;
@@ -270,7 +270,8 @@ Status FusionSubnode::Process(const EventMeta &event_meta,
     lidar_timestamp_ = 0;
     radar_timestamp_ = 0;
     for (auto &obj : sensor_objs) {
-      if (obj.sensor_type == SensorType::CAMERA) {
+      if (obj.sensor_type == SensorType::CAMERA
+       || obj.sensor_type == SensorType::CAMERA_PSEUDO_NARROW) {
         cipv_.DetermineCipv(lane_objects_, cipv_options, &objects_);
         camera_timestamp_ = obj.timestamp;
       } else if (obj.sensor_type == SensorType::VELODYNE_64) {
@@ -278,6 +279,10 @@ Status FusionSubnode::Process(const EventMeta &event_meta,
       } else if (obj.sensor_type == SensorType::RADAR) {
         radar_timestamp_ = obj.timestamp;
       }
+        if (obj.sensor_type == SensorType::CAMERA
+         || obj.sensor_type == SensorType::CAMERA_PSEUDO_NARROW) {
+          cipv_.DetermineCipv(lane_objects_, cipv_options, &objects_);
+        }
     }
 
     apollo::common::time::Timer timer;
@@ -382,6 +387,9 @@ bool FusionSubnode::BuildSensorObjs(
       sensor_objects->sensor_type = SensorType::VELODYNE_64;
     } else if (event.event_id == radar_event_id_) {
       sensor_objects->sensor_type = SensorType::RADAR;
+    } else if (event.event_id == camera_event_id_
+            && event.reserve == "camera_pseudo_narrow") {
+      sensor_objects->sensor_type = SensorType::CAMERA_PSEUDO_NARROW;
     } else if (event.event_id == camera_event_id_) {
       sensor_objects->sensor_type = SensorType::CAMERA;
     } else {
@@ -411,6 +419,10 @@ bool FusionSubnode::GetSharedData(const Event &event,
   } else if (event.event_id == radar_event_id_ &&
              radar_object_data_ != nullptr) {
     get_data_succ = radar_object_data_->Get(data_key, objs);
+  } else if (event.event_id == camera_event_id_ &&
+             camera_object_data_ != nullptr &&
+             device_id == "camera_pseudo_narrow") {
+    get_data_succ = camera_object_data_->Get(data_key, objs);
   } else if (event.event_id == camera_event_id_ &&
              camera_object_data_ != nullptr) {
     get_data_succ = camera_object_data_->Get(data_key, objs);

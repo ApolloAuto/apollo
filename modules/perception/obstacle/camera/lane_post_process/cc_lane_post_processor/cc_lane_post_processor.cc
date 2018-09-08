@@ -788,7 +788,6 @@ bool CCLanePostProcessor::ProcessWithoutCC(
   AINFO << "Avg sampling time: " << time_1 / time_num
         << " Avg ransac time: " << time_2 / time_num
         << " Avg writing time: " << time_3 / time_num;
-
   return true;
 }
 

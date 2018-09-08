@@ -56,6 +56,8 @@ DECLARE_string(short_camera_extrinsic_file);
 /// obstacle/onboard/camera_process_subnode.cc
 DECLARE_string(image_file_path);
 DECLARE_bool(image_file_debug);
+DECLARE_bool(enable_pseudo_narrow);
+DECLARE_double(pseudo_narrow_scale);
 
 /// camera config
 DECLARE_string(front_camera_extrinsics_file);
