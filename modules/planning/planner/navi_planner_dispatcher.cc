@@ -22,7 +22,7 @@ namespace apollo {
 namespace planning {
 
 std::unique_ptr<Planner> NaviPlannerDispatcher::DispatchPlanner() {
-  return planner_factory_.CreateObject(PlanningConfig::NAVI);
+  return planner_factory_.CreateObject(PlanningConfig::EM);
 }
 
 }  // namespace planning
