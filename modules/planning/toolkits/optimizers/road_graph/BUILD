@@ -7,11 +7,13 @@ cc_library(
     srcs = [
         "dp_road_graph.cc",
         "trajectory_cost.cc",
+        "waypoint_sampler.cc",
     ],
     hdrs = [
         "comparable_cost.h",
         "dp_road_graph.h",
         "trajectory_cost.h",
+        "waypoint_sampler.h",
     ],
     deps = [
         "//modules/common/configs:vehicle_config_helper",
