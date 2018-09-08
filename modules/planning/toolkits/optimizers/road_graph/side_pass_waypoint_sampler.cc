@@ -18,7 +18,7 @@
  * @file waypoint_sampler.cc
  **/
 
-#include "modules/planning/toolkits/optimizers/road_graph/waypoint_sampler.h"
+#include "modules/planning/toolkits/optimizers/road_graph/side_pass_waypoint_sampler.h"
 
 #include <algorithm>
 #include <utility>
@@ -40,16 +40,7 @@ using apollo::common::Status;
 using apollo::common::math::CartesianFrenetConverter;
 using apollo::common::util::MakeSLPoint;
 
-void WaypointSampler::Init(
-    const ReferenceLineInfo *reference_line_info,
-    const common::SLPoint &init_sl_point,
-    const common::FrenetFramePoint &init_frenet_frame_point) {
-  reference_line_info_ = reference_line_info;
-  init_sl_point_ = init_sl_point;
-  init_frenet_frame_point_ = init_frenet_frame_point;
-}
-
-bool WaypointSampler::SamplePathWaypoints(
+bool SidePassWaypointSampler::SamplePathWaypoints(
     const common::TrajectoryPoint &init_point,
     std::vector<std::vector<common::SLPoint>> *const points) {
   CHECK_NOTNULL(points);
@@ -201,7 +192,7 @@ bool WaypointSampler::SamplePathWaypoints(
   return true;
 }
 
-bool WaypointSampler::HasSidepass() {
+bool SidePassWaypointSampler::HasSidepass() {
   const auto &path_decision = reference_line_info_->path_decision();
   for (const auto &obstacle : path_decision.path_obstacles().Items()) {
     if (obstacle->LateralDecision().has_sidepass()) {

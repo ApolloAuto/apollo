@@ -43,31 +43,30 @@ namespace planning {
 
 class WaypointSampler {
  public:
-  explicit WaypointSampler(
-      const WaypointSamplerConfig &config,
-      const ReferenceLineInfo &reference_line_info,
-      const common::SLPoint &init_sl_point_,
-      const common::FrenetFramePoint &init_frenet_frame_point);
-
+  explicit WaypointSampler(const WaypointSamplerConfig &config)
+      : config_(config) {}
   ~WaypointSampler() = default;
 
-  void SetDebugLogger(apollo::planning_internal::Debug *debug) {
+  virtual void Init(const ReferenceLineInfo *reference_line_info,
+                    const common::SLPoint &init_sl_point_,
+                    const common::FrenetFramePoint &init_frenet_frame_point);
+
+  virtual void SetDebugLogger(apollo::planning_internal::Debug *debug) {
     planning_debug_ = debug;
   }
 
-  bool SamplePathWaypoints(
+  virtual bool SamplePathWaypoints(
       const common::TrajectoryPoint &init_point,
       std::vector<std::vector<common::SLPoint>> *const points);
 
- private:
-  bool HasSidepass();
+ protected:
+  virtual bool HasSidepass();
 
- private:
+ protected:
   const WaypointSamplerConfig &config_;
-  const ReferenceLineInfo &reference_line_info_;
-  const ReferenceLine &reference_line_;
-  const common::SLPoint &init_sl_point_;
-  const common::FrenetFramePoint &init_frenet_frame_point_;
+  const ReferenceLineInfo *reference_line_info_ = nullptr;
+  common::SLPoint init_sl_point_;
+  common::FrenetFramePoint init_frenet_frame_point_;
   apollo::planning_internal::Debug *planning_debug_ = nullptr;
 
   ObjectSidePass sidepass_;
