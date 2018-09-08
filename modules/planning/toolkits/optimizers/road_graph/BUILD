@@ -6,12 +6,14 @@ cc_library(
     name = "road_graph",
     srcs = [
         "dp_road_graph.cc",
+        "side_pass_waypoint_sampler.cc",
         "trajectory_cost.cc",
         "waypoint_sampler.cc",
     ],
     hdrs = [
         "comparable_cost.h",
         "dp_road_graph.h",
+        "side_pass_waypoint_sampler.h",
         "trajectory_cost.h",
         "waypoint_sampler.h",
     ],
