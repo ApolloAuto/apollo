@@ -65,6 +65,23 @@ proto_library(
     srcs = [
         "dp_poly_path_config.proto",
     ],
+    deps = [
+        ":waypoint_sampler_config_proto_lib",
+    ],
+)
+
+cc_proto_library(
+    name = "waypoint_sampler_config_proto",
+    deps = [
+        ":waypoint_sampler_config_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "waypoint_sampler_config_proto_lib",
+    srcs = [
+        "waypoint_sampler_config.proto",
+    ],
 )
 
 cc_proto_library(
