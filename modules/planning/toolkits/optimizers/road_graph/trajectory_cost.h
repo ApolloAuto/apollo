@@ -32,7 +32,7 @@
 #include "modules/planning/common/speed/speed_data.h"
 #include "modules/planning/math/curve1d/quintic_polynomial_curve1d.h"
 #include "modules/planning/reference_line/reference_line.h"
-#include "modules/planning/toolkits/optimizers/dp_poly_path/comparable_cost.h"
+#include "modules/planning/toolkits/optimizers/road_graph/comparable_cost.h"
 
 namespace apollo {
 namespace planning {

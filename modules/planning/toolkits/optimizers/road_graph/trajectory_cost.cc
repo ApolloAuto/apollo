@@ -18,7 +18,7 @@
  * @file
  **/
 
-#include "modules/planning/toolkits/optimizers/dp_poly_path/trajectory_cost.h"
+#include "modules/planning/toolkits/optimizers/road_graph/trajectory_cost.h"
 
 #include <algorithm>
 #include <cmath>
