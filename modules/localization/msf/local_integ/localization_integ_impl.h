@@ -33,6 +33,7 @@
 #include "modules/localization/msf/local_integ/localization_integ_process.h"
 #include "modules/localization/msf/local_integ/localization_lidar_process.h"
 #include "modules/localization/msf/local_integ/measure_republish_process.h"
+#include "modules/localization/proto/localization_status.pb.h"
 
 /**
  * @namespace apollo::localization
@@ -41,6 +42,9 @@
 namespace apollo {
 namespace localization {
 namespace msf {
+
+using apollo::localization::MsfStatus;
+using apollo::localization::MsfSensorMsgStatus;
 
 class MeasureRepublishProcess;
 class LocalizationIntegProcess;
@@ -160,6 +164,12 @@ class LocalizationIntegImpl {
   bool enable_lidar_localization_;
 
   Eigen::Affine3d gnss_antenna_extrinsic_;
+
+  MsfStatus msf_status_;
+  std::mutex msf_status_mutex_;
+  MsfSensorMsgStatus sensor_status_;
+  double latest_gnsspos_timestamp_;
+  double latest_lidar_timestamp_;
 };
 
 }  // namespace msf

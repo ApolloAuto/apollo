@@ -35,6 +35,7 @@
 #include "modules/localization/msf/local_integ/localization_lidar.h"
 #include "modules/localization/msf/local_integ/localization_params.h"
 #include "modules/localization/proto/localization.pb.h"
+#include "modules/localization/proto/localization_status.pb.h"
 #include "modules/localization/proto/measure.pb.h"
 #include "modules/localization/proto/sins_pva.pb.h"
 
@@ -45,6 +46,9 @@
 namespace apollo {
 namespace localization {
 namespace msf {
+
+using apollo::localization::LocalLidarStatus;
+using apollo::localization::LocalLidarQuality;
 
 enum class ForcastState { NOT_VALID = 0, INITIAL, INCREMENT };
 
@@ -137,6 +141,9 @@ class LocalizationLidarProcess {
   // Information used to output.
   Matrix3D location_covariance_;
   LidarState lidar_status_;
+
+  LocalLidarStatus local_lidar_status_;
+  LocalLidarQuality local_lidar_quality_;
 
   bool reinit_flag_;
 

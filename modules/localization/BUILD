@@ -16,6 +16,7 @@ cc_library(
         "//modules/common/status",
         "//modules/localization/common:localization_common",
         "//modules/localization/proto:localization_proto",
+        "//modules/localization/proto:localization_status_proto",
         "@ros//:ros_common",
     ],
 )

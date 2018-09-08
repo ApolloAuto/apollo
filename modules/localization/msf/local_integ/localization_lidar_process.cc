@@ -103,6 +103,8 @@ Status LocalizationLidarProcess::Init(const LocalizationIntegParam& params) {
   velocity_ = Vector3D::Zero();
   location_ = TransformD::Identity();
   location_covariance_ = Matrix3D::Zero();
+  local_lidar_status_ = LocalLidarStatus::MSF_LOCAL_LIDAR_07;
+  local_lidar_quality_ = LocalLidarQuality::MSF_LOCAL_LIDAR_BAD;
 
   bool sucess = LoadLidarExtrinsic(lidar_extrinsic_file_, &lidar_extrinsic_);
   if (!sucess) {
@@ -123,6 +125,7 @@ Status LocalizationLidarProcess::Init(const LocalizationIntegParam& params) {
 
   if (!locator_->Init(map_path_, lidar_filter_size_, lidar_filter_size_,
                       utm_zone_id_)) {
+    local_lidar_status_ = LocalLidarStatus::MSF_LOCAL_LIDAR_03;
     return Status(common::LOCALIZATION_ERROR_LIDAR,
                   "Fail to load localization map!");
   }
@@ -253,6 +256,10 @@ int LocalizationLidarProcess::GetResult(LocalizationEstimate* lidar_local_msg) {
   orientation_std_dev->set_y(0.0);
   orientation_std_dev->set_z(yaw_covariance);
 
+  MsfStatus *msf_status = lidar_local_msg->mutable_msf_status();
+  msf_status->set_local_lidar_status(local_lidar_status_);
+  msf_status->set_local_lidar_quality(local_lidar_quality_);
+
   return static_cast<int>(lidar_status_);
 }
 
@@ -337,16 +344,40 @@ bool LocalizationLidarProcess::CheckState() { return true; }
 
 void LocalizationLidarProcess::UpdateState(const int ret, const double time) {
   if (ret == 0) {  // OK
-    locator_->GetResult(&location_, &location_covariance_);
+    double location_score = 0.0;
+    locator_->GetResult(&location_, &location_covariance_, &location_score);
     lidar_status_ = LidarState::OK;
 
+    double local_uncertainty_x = std::sqrt(location_covariance_(0, 0));
+    double local_uncertainty_y = std::sqrt(location_covariance_(1, 1));
+
+    local_uncertainty_x =
+      local_uncertainty_x > 0.1 ? local_uncertainty_x : 0.1;
+    local_uncertainty_y =
+      local_uncertainty_y > 0.1 ? local_uncertainty_y : 0.1;
     // check covariance
-    double cur_location_std_area = std::sqrt(location_covariance_(0, 0)) *
-                                   std::sqrt(location_covariance_(1, 1));
-    if (cur_location_std_area > unstable_threshold_) {
+    double cur_location_std_area =
+      std::sqrt(local_uncertainty_x * local_uncertainty_x +
+                local_uncertainty_y * local_uncertainty_y);
+    if (cur_location_std_area > unstable_threshold_ ||
+        location_score < 0.8) {
+      local_lidar_quality_ = LocalLidarQuality::MSF_LOCAL_LIDAR_BAD;
+    } else if (cur_location_std_area <= unstable_threshold_ &&
+               location_score < 0.85) {
+      local_lidar_quality_ = LocalLidarQuality::MSF_LOCAL_LIDAR_NOT_BAD;
+    } else if (cur_location_std_area <= unstable_threshold_ &&
+               location_score < 0.95) {
+      local_lidar_quality_ = LocalLidarQuality::MSF_LOCAL_LIDAR_GOOD;
+    } else if (cur_location_std_area <= unstable_threshold_) {
+      local_lidar_quality_ = LocalLidarQuality::MSF_LOCAL_LIDAR_VERY_GOOD;
+    }
+
+    if (local_lidar_quality_ == LocalLidarQuality::MSF_LOCAL_LIDAR_BAD) {
       ++unstable_count_;
+      local_lidar_status_ = LocalLidarStatus::MSF_LOCAL_LIDAR_06;
     } else {
       unstable_count_ = 0;
+      local_lidar_status_ = LocalLidarStatus::MSF_LOCAL_LIDAR_00;
     }
 
     // check if lidar need reset
@@ -365,7 +396,9 @@ void LocalizationLidarProcess::UpdateState(const int ret, const double time) {
     pre_location_time_ = time;
 
   } else if (ret == -2) {  // out of map
-    locator_->GetResult(&location_, &location_covariance_);
+    local_lidar_status_ = LocalLidarStatus::MSF_LOCAL_LIDAR_05;
+    double location_score = 0.0;
+    locator_->GetResult(&location_, &location_covariance_, &location_score);
     lidar_status_ = LidarState::NOT_STABLE;
     pre_location_ = location_;
     pre_location_time_ = time;

@@ -56,13 +56,13 @@ Status MeasureRepublishProcess::Init(const LocalizationIntegParam& params) {
 }
 
 bool MeasureRepublishProcess::NovatelBestgnssposProcess(
-    const GnssBestPose& bestgnsspos_msg, MeasureData* measure) {
+    const GnssBestPose& bestgnsspos_msg, MeasureData* measure, int *status) {
   if (gnss_mode_ != GnssMode::NOVATEL) {
     return false;
   }
   CHECK_NOTNULL(measure);
 
-  if (!CheckBestgnssposeStatus(bestgnsspos_msg)) {
+  if (!CheckBestgnssposeStatus(bestgnsspos_msg, status)) {
     AWARN << "Discard a bestgnsspose msg. "
           << "The status of this msg is not OK.";
     return false;
@@ -482,17 +482,19 @@ bool MeasureRepublishProcess::CheckBestgnssPoseXYStd(
 }
 
 bool MeasureRepublishProcess::CheckBestgnssposeStatus(
-    const GnssBestPose& bestgnsspos_msg) {
+    const GnssBestPose& bestgnsspos_msg, int* status) {
   int gnss_solution_status = static_cast<int>(bestgnsspos_msg.sol_status());
   int gnss_position_type = static_cast<int>(bestgnsspos_msg.sol_type());
   AINFO << "the gnss solution_status and position_type: "
         << gnss_solution_status << " " << gnss_position_type;
 
   if (gnss_solution_status != 0) {
+    *status = 93;
     AINFO << "novatel gnsspos's solution_status is not computed: "
           << gnss_solution_status;
     return false;
   }
+  *status = gnss_position_type;
   if (gnss_position_type == 0 || gnss_position_type == 1 ||
       gnss_position_type == 2) {
     AINFO << "novatel gnsspos's solution_type is invalid "
