@@ -43,8 +43,8 @@ void ApolloApp::ExportFlags() const {
   std::ofstream fout(export_file);
   CHECK(fout) << "Cannot open file " << export_file;
 
-  std::vector<gflags::CommandLineFlagInfo> flags;
-  gflags::GetAllFlags(&flags);
+  std::vector<google::CommandLineFlagInfo> flags;
+  google::GetAllFlags(&flags);
   for (const auto& flag : flags) {
     fout << "# " << flag.type << ", default=" << flag.default_value << "\n"
          << "# " << flag.description << "\n"

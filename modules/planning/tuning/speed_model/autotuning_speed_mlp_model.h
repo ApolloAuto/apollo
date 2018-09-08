@@ -48,6 +48,19 @@ class AutotuningSpeedMLPModel : public AutotuningBaseModel {
    */
   double Evaluate(const autotuning::TrajectoryPointwiseFeature& point_feature)
       const override;
+
+ private:
+  /**
+   * [FlattenFeatures description]
+   * @param feature      [model input proto]
+   * @param flat_feature [eigen matrix, row: time, col: traj point feature]
+   */
+  void FlattenFeatures(const autotuning::TrajectoryFeature& feature,
+                       Eigen::MatrixXf* const flat_feature) const;
+
+  void FlattenFeatures(
+      const autotuning::SpeedPointwiseFeature& speed_point_feature,
+      const int row, Eigen::MatrixXf* const flat_feature) const;
 };
 
 }  // namespace planning

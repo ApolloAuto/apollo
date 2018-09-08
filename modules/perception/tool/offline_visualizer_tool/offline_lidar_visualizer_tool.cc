@@ -212,7 +212,7 @@ int main(int argc, char* argv[]) {
   FLAGS_flagfile =
       "./modules/perception/tool/offline_visualizer_tool/conf/"
       "offline_lidar_perception_test.flag";
-  gflags::ParseCommandLineFlags(&argc, &argv, true);
+  google::ParseCommandLineFlags(&argc, &argv, true);
   apollo::perception::OfflineLidarPerceptionTool tool;
   tool.Init(FLAGS_enable_visualization);
   tool.Run(FLAGS_pcd_path, FLAGS_pose_path, FLAGS_output_path);

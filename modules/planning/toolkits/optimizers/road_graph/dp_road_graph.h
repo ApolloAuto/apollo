@@ -23,6 +23,7 @@
 
 #include <limits>
 #include <list>
+#include <memory>
 #include <vector>
 
 #include "modules/common/proto/pnc_point.pb.h"
@@ -38,6 +39,7 @@
 #include "modules/planning/math/curve1d/quintic_polynomial_curve1d.h"
 #include "modules/planning/reference_line/reference_point.h"
 #include "modules/planning/toolkits/optimizers/road_graph/trajectory_cost.h"
+#include "modules/planning/toolkits/optimizers/road_graph/waypoint_sampler.h"
 
 namespace apollo {
 namespace planning {
@@ -96,10 +98,6 @@ class DpRoadGraph {
   bool GenerateMinCostPath(const std::vector<const PathObstacle *> &obstacles,
                            std::vector<DpRoadGraphNode> *min_cost_path);
 
-  bool SamplePathWaypoints(
-      const common::TrajectoryPoint &init_point,
-      std::vector<std::vector<common::SLPoint>> *const points);
-
   bool CalculateFrenetPoint(const common::TrajectoryPoint &traj_point,
                             common::FrenetFramePoint *const frenet_frame_point);
 
@@ -114,7 +112,6 @@ class DpRoadGraph {
                   const uint32_t level, const uint32_t total_level,
                   TrajectoryCost *trajectory_cost, DpRoadGraphNode *front,
                   DpRoadGraphNode *cur_node);
-  bool HasSidepass();
 
  private:
   DpPolyPathConfig config_;
@@ -127,6 +124,8 @@ class DpRoadGraph {
   apollo::planning_internal::Debug *planning_debug_ = nullptr;
 
   ObjectSidePass sidepass_;
+
+  std::unique_ptr<WaypointSampler> waypoint_sampler_;
 };
 
 }  // namespace planning
