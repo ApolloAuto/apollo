@@ -8,11 +8,15 @@ planner_em_config {
       task : SPEED_DECIDER
       task : QP_SPLINE_ST_SPEED_OPTIMIZER
       dp_poly_path_config {
-        sample_points_num_each_level: 7
-        step_length_max: 40.0
-        step_length_min: 20.0
-        lateral_sample_offset: 0.5
-        lateral_adjust_coeff: 0.5
+        waypoint_sampler_config {
+          sample_points_num_each_level: 7
+          step_length_max: 40.0
+          step_length_min: 20.0
+          lateral_sample_offset: 0.5
+          lateral_adjust_coeff: 0.5
+          sidepass_distance: 2.8
+          navigator_sample_num_each_level: 3
+        }
         eval_time_interval: 0.1
         path_resolution: 1.0
         obstacle_ignore_distance: 20.0
@@ -27,8 +31,6 @@ planner_em_config {
         path_l_cost_param_k: 1.5
         path_out_lane_cost: 1e8
         path_end_l_cost: 1.0e4
-        sidepass_distance: 2.8
-        navigator_sample_num_each_level: 3
       }
       dp_st_speed_config {
         total_path_length: 149
