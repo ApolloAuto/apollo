@@ -46,15 +46,14 @@ using apollo::planning_internal::STGraphDebug;
 PolyStSpeedOptimizer::PolyStSpeedOptimizer()
     : SpeedOptimizer("PolyStSpeedOptimizer") {}
 
-bool PolyStSpeedOptimizer::Init(const PlanningConfig& config) {
+bool PolyStSpeedOptimizer::Init(
+    const ScenarioConfig::ScenarioTaskConfig& config) {
   if (is_init_) {
     AERROR << "Duplicated Init.";
     return false;
   }
-  poly_st_speed_config_ = config.planner_em_config()
-                              .scenario_config(0)
-                              .scenario_lane_follow_config()
-                              .poly_st_speed_config();
+  CHECK(config.has_poly_st_speed_config());
+  poly_st_speed_config_ = config.poly_st_speed_config();
   st_boundary_config_ = poly_st_speed_config_.st_boundary_config();
   is_init_ = true;
   return true;

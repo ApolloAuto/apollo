@@ -46,7 +46,7 @@ class LaneFollowScenario : public Scenario {
   LaneFollowScenario() : Scenario(ScenarioConfig::LANE_FOLLOW) {}
   virtual ~LaneFollowScenario() = default;
 
-  bool Init(const PlanningConfig& config) override;
+  bool Init() override;
 
   common::Status Process(const common::TrajectoryPoint& planning_init_point,
                          Frame* frame) override;
@@ -80,6 +80,8 @@ class LaneFollowScenario : public Scenario {
   apollo::common::util::Factory<TaskType, Task> task_factory_;
 
   std::vector<std::unique_ptr<Task>> tasks_;
+
+  ScenarioConfig config_;
 
   SpeedProfileGenerator speed_profile_generator_;
 };

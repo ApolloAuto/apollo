@@ -33,7 +33,8 @@
 #include "modules/common/math/vec2d.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/obstacle.h"
-#include "modules/planning/toolkits/optimizers/task.h"
+#include "modules/planning/navi/decider/navi_task.h"
+
 /**
  * @namespace apollo::planning
  * @brief apollo::planning
@@ -49,7 +50,7 @@ namespace planning {
  * navigation mode by setting "FLAGS_use_navigation_mode" to "true") and do not
  * use it in standard mode.
  */
-class NaviObstacleDecider : public Task {
+class NaviObstacleDecider : public NaviTask {
  public:
   NaviObstacleDecider();
 

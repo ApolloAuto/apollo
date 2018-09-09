@@ -38,7 +38,7 @@ using apollo::common::Status;
 using apollo::common::math::Box2d;
 using apollo::common::math::Vec2d;
 
-NaviPathDecider::NaviPathDecider() : Task("NaviPathDecider") {
+NaviPathDecider::NaviPathDecider() : NaviTask("NaviPathDecider") {
   // TODO(all): Add your other initialization.
 }
 
@@ -78,7 +78,7 @@ bool NaviPathDecider::Init(const PlanningConfig& config) {
 
 Status NaviPathDecider::Execute(Frame* frame,
                                 ReferenceLineInfo* const reference_line_info) {
-  Task::Execute(frame, reference_line_info);
+  NaviTask::Execute(frame, reference_line_info);
   vehicle_state_ = frame->vehicle_state();
   cur_reference_line_lane_id_ = reference_line_info->Lanes().Id();
   auto ret = Process(reference_line_info->reference_line(),

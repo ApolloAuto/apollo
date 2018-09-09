@@ -29,15 +29,12 @@ namespace planning {
 
 void PlannerDispatcher::RegisterPlanners() {
   planner_factory_.Register(
-      PlanningConfig::RTK, []() -> Planner* { return new RTKReplayPlanner(); });
-  planner_factory_.Register(PlanningConfig::EM,
+      RTK, []() -> Planner* { return new RTKReplayPlanner(); });
+  planner_factory_.Register(ONROAD,
                             []() -> Planner* { return new EMPlanner(); });
-  planner_factory_.Register(PlanningConfig::LATTICE,
-                            []() -> Planner* { return new LatticePlanner(); });
-  planner_factory_.Register(PlanningConfig::OPENSPACE, []() -> Planner* {
-    return new OpenSpacePlanner();
-  });
-  planner_factory_.Register(PlanningConfig::NAVI,
+  planner_factory_.Register(
+      OPENSPACE, []() -> Planner* { return new OpenSpacePlanner(); });
+  planner_factory_.Register(NAVI,
                             []() -> Planner* { return new NaviPlanner(); });
 }
 

@@ -38,11 +38,9 @@ using apollo::common::Status;
 SidePassPathOptimizer::SidePassPathOptimizer()
     : PathOptimizer("SidePassPathOptimizer") {}
 
-bool SidePassPathOptimizer::Init(const PlanningConfig &config) {
-  config_ = config.planner_em_config()
-                .scenario_config(1)
-                .scenario_side_pass_config()
-                .dp_poly_path_config();
+bool SidePassPathOptimizer::Init(
+    const ScenarioConfig::ScenarioTaskConfig &config) {
+  config_ = config.dp_poly_path_config();
   is_init_ = true;
   return true;
 }
