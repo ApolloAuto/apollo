@@ -51,7 +51,7 @@ class PlannerDispatcher {
  protected:
   void RegisterPlanners();
 
-  common::util::Factory<PlanningConfig::PlannerType, Planner> planner_factory_;
+  common::util::Factory<PlannerType, Planner> planner_factory_;
 };
 
 }  // namespace planning

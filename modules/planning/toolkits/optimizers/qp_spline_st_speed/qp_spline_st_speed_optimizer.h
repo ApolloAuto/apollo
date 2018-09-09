@@ -42,7 +42,7 @@ class QpSplineStSpeedOptimizer : public SpeedOptimizer {
  public:
   QpSplineStSpeedOptimizer();
 
-  bool Init(const PlanningConfig& config) override;
+  bool Init(const ScenarioConfig::ScenarioTaskConfig& config) override;
 
  private:
   common::Status Process(const SLBoundary& adc_sl_boundary,

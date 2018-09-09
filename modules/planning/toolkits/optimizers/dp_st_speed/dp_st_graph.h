@@ -59,13 +59,13 @@ class DpStGraph {
   void CalculateCostAt(const uint32_t r, const uint32_t c);
 
   float CalculateEdgeCost(const STPoint& first, const STPoint& second,
-                           const STPoint& third, const STPoint& forth,
-                           const float speed_limit);
+                          const STPoint& third, const STPoint& forth,
+                          const float speed_limit);
   float CalculateEdgeCostForSecondCol(const uint32_t row,
-                                       const float speed_limit);
-  float CalculateEdgeCostForThirdCol(const uint32_t curr_r,
-                                      const uint32_t pre_r,
                                       const float speed_limit);
+  float CalculateEdgeCostForThirdCol(const uint32_t curr_r,
+                                     const uint32_t pre_r,
+                                     const float speed_limit);
 
   void GetRowRange(const StGraphPoint& point, int* highest_row,
                    int* lowest_row);

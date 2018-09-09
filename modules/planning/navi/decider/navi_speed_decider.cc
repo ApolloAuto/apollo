@@ -51,7 +51,7 @@ constexpr double kDecelCompensationLimit = 2.0;
 constexpr double kKappaAdjustRatio = 20.0;
 }  // namespace
 
-NaviSpeedDecider::NaviSpeedDecider() : Task("NaviSpeedDecider") {}
+NaviSpeedDecider::NaviSpeedDecider() : NaviTask("NaviSpeedDecider") {}
 
 bool NaviSpeedDecider::Init(const PlanningConfig& config) {
   CHECK_GT(FLAGS_planning_upper_speed_limit, 0.0);
@@ -173,7 +173,7 @@ bool NaviSpeedDecider::Init(const PlanningConfig& config) {
 
 Status NaviSpeedDecider::Execute(Frame* frame,
                                  ReferenceLineInfo* reference_line_info) {
-  Task::Execute(frame, reference_line_info);
+  NaviTask::Execute(frame, reference_line_info);
 
   // get cruise speed
   const auto& planning_target = reference_line_info_->planning_target();

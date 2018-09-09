@@ -42,11 +42,12 @@ TEST_F(LaneFollowScenarioTest, Simple) {
   scenario_.reset(new LaneFollowScenario());
   EXPECT_EQ(scenario_->scenario_type(), ScenarioConfig::LANE_FOLLOW);
 
-  FLAGS_planning_config_file = "modules/planning/conf/planning_config.pb.txt";
-  PlanningConfig config;
-  EXPECT_TRUE(apollo::common::util::GetProtoFromFile(FLAGS_planning_config_file,
-                                                     &config));
-  EXPECT_TRUE(scenario_->Init(config));
+  FLAGS_lane_follow_scenario_config_file =
+      "modules/planning/conf/lane_follow_scenario_config.pb.txt";
+  ScenarioConfig config;
+  EXPECT_TRUE(apollo::common::util::GetProtoFromFile(
+      FLAGS_lane_follow_scenario_config_file, &config));
+  EXPECT_TRUE(scenario_->Init());
 }
 
 }  // namespace planning

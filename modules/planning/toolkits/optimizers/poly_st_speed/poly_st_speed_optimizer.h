@@ -36,7 +36,7 @@ class PolyStSpeedOptimizer : public SpeedOptimizer {
  public:
   PolyStSpeedOptimizer();
 
-  bool Init(const PlanningConfig& config) override;
+  bool Init(const ScenarioConfig::ScenarioTaskConfig& config) override;
 
  private:
   common::Status Process(const SLBoundary& adc_sl_boundary,

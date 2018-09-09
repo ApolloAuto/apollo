@@ -28,6 +28,7 @@
 #include "modules/common/log.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/common/time/time.h"
+#include "modules/common/util/file.h"
 #include "modules/common/util/string_tokenizer.h"
 #include "modules/common/util/string_util.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
@@ -79,27 +80,23 @@ void LaneFollowScenario::RegisterTasks() {
                          []() -> Task* { return new PolyStSpeedOptimizer(); });
 }
 
-bool LaneFollowScenario::Init(const PlanningConfig& config) {
+bool LaneFollowScenario::Init() {
   if (is_init_) {
     return true;
   }
   RegisterTasks();
-  AERROR << "size = " << config.planner_em_config().scenario_config_size();
-  auto& cfg = config.planner_em_config();
 
-  if (cfg.scenario_config_size() > 0) {
-    auto& tasks = cfg.scenario_config(0).scenario_lane_follow_config().task();
-    for (const auto task : tasks) {
-      tasks_.emplace_back(
-          task_factory_.CreateObject(static_cast<TaskType>(task)));
-      AINFO << "Created task:" << tasks_.back()->Name();
-    }
+  CHECK(apollo::common::util::GetProtoFromFile(
+      FLAGS_lane_follow_scenario_config_file, &config_));
+
+  for (const auto task_cfg : config_.scenario_task_config()) {
+    tasks_.emplace_back(task_factory_.CreateObject(task_cfg.task()));
+    AINFO << "Created task:" << tasks_.back()->Name();
   }
-  for (auto& task : tasks_) {
-    if (!task->Init(config)) {
-      std::string msg(
-          common::util::StrCat("Init task[", task->Name(), "] failed."));
-      AERROR << msg;
+
+  for (size_t i = 0; i < tasks_.size(); ++i) {
+    if (!tasks_[i]->Init(config_.scenario_task_config(i))) {
+      AERROR << "Init task[" << tasks_[i]->Name() << "] failed.";
       return false;
     }
   }
