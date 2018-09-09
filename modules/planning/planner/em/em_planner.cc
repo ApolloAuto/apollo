@@ -32,7 +32,7 @@ Status EMPlanner::Plan(const TrajectoryPoint& planning_start_point,
                        Frame* frame) {
   scenario_manager_.Update(planning_start_point, *frame);
   scenario_ = scenario_manager_.mutable_scenario();
-  scenario_->Init(config_);  // init will be skipped if it was called before
+  scenario_->Init();  // init will be skipped if it was called before
   return scenario_->Process(planning_start_point, frame);
 }
 

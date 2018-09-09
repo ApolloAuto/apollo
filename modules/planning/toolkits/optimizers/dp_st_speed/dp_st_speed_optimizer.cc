@@ -46,11 +46,10 @@ using apollo::planning_internal::STGraphDebug;
 DpStSpeedOptimizer::DpStSpeedOptimizer()
     : SpeedOptimizer("DpStSpeedOptimizer") {}
 
-bool DpStSpeedOptimizer::Init(const PlanningConfig& config) {
-  dp_st_speed_config_ = config.planner_em_config()
-                            .scenario_config(0)
-                            .scenario_lane_follow_config()
-                            .dp_st_speed_config();
+bool DpStSpeedOptimizer::Init(
+    const ScenarioConfig::ScenarioTaskConfig& config) {
+  CHECK(config.has_dp_st_speed_config());
+  dp_st_speed_config_ = config.dp_st_speed_config();
   st_boundary_config_ = dp_st_speed_config_.st_boundary_config();
   is_init_ = true;
   return true;

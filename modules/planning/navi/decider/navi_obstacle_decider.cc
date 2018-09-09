@@ -50,7 +50,7 @@ namespace {
 constexpr double kEpislon = 1e-6;
 }  // namespace
 
-NaviObstacleDecider::NaviObstacleDecider() : Task("NaviObstacleDecider") {}
+NaviObstacleDecider::NaviObstacleDecider() : NaviTask("NaviObstacleDecider") {}
 
 bool NaviObstacleDecider::Init(const PlanningConfig& config) {
   config_ = config.planner_navi_config().navi_obstacle_decider_config();

@@ -25,22 +25,8 @@ enum TaskType {
   NAVI_OBSTACLE_DECIDER = 9;
 };
 
-message ScenarioLaneFollowConfig {
-  repeated TaskType task = 1;
-  optional apollo.planning.DpPolyPathConfig dp_poly_path_config = 2;
-  optional apollo.planning.DpStSpeedConfig dp_st_speed_config = 3;
-  optional apollo.planning.QpSplinePathConfig qp_spline_path_config = 4;
-  optional apollo.planning.QpStSpeedConfig qp_st_speed_config = 5;
-  optional apollo.planning.PolyStSpeedConfig poly_st_speed_config = 6;
-}
-
-message ScenarioSidePassConfig {
-  repeated TaskType task = 1;
-  optional apollo.planning.DpPolyPathConfig dp_poly_path_config = 2;
-  optional apollo.planning.DpStSpeedConfig dp_st_speed_config = 3;
-  optional apollo.planning.QpSplinePathConfig qp_spline_path_config = 4;
-  optional apollo.planning.QpStSpeedConfig qp_st_speed_config = 5;
-  optional apollo.planning.PolyStSpeedConfig poly_st_speed_config = 6;
+message PathDeciderConfig {
+  // place holder
 }
 
 message ScenarioConfig {
@@ -55,45 +41,61 @@ message ScenarioConfig {
     INTERSECTION_TRAFFIC_LIGHT_RIGHT_TURN = 7;
     INTERSECTION_TRAFFIC_LIGHT_GO_THROUGH = 8;
   }
-
   optional ScenarioType scenario_type = 1;
-  oneof scenario {
-    ScenarioLaneFollowConfig scenario_lane_follow_config = 2;
-    ScenarioSidePassConfig scenario_side_pass_config = 3;
+
+  message ScenarioTaskConfig {
+    optional TaskType task = 1;
+    oneof task_config {
+      DpPolyPathConfig dp_poly_path_config = 2;
+      DpStSpeedConfig dp_st_speed_config = 3;
+      QpSplinePathConfig qp_spline_path_config = 4;
+      QpStSpeedConfig qp_st_speed_config = 5;
+      PolyStSpeedConfig poly_st_speed_config = 6;
+      PathDeciderConfig path_decider_config = 7;
+    }
   }
-};
-
-message PlannerRTKonfig {
+  repeated ScenarioTaskConfig scenario_task_config = 2;
 }
 
-message PlannerEMConfig {
-  repeated ScenarioConfig scenario_config = 1;
-}
-
-message PlannerLatticeonfig {
+message PlannerOnRoadConfig {
+  // supported scenario types
+  repeated ScenarioConfig.ScenarioType scenario_type = 1;
 }
 
 message PlannerNaviConfig {
   repeated TaskType task = 1;
-  optional apollo.planning.NaviPathDeciderConfig  navi_path_decider_config = 2;
-  optional apollo.planning.NaviSpeedDeciderConfig  navi_speed_decider_config = 3;
-  optional apollo.planning.NaviObstacleDeciderConfig  navi_obstacle_decider_config = 4;
+  optional NaviPathDeciderConfig  navi_path_decider_config = 2;
+  optional NaviSpeedDeciderConfig  navi_speed_decider_config = 3;
+  optional NaviObstacleDeciderConfig  navi_obstacle_decider_config = 4;
+}
+
+enum PlannerType {
+  RTK = 0;
+  ONROAD = 1;  // expectation maximization
+  OPENSPACE = 2; // open space planner
+  NAVI = 3; // navigation planner
+}
+
+message RtkPlanningConfig {
+  optional PlannerType planner_type = 1;
+}
+
+message StandardPlanningConfig {
+  repeated PlannerType planner_type = 1; // supported planners
+  optional PlannerOnRoadConfig planner_onroad_config = 2;
+}
+
+message NavigationPlanningConfig {
+  repeated PlannerType planner_type = 1; // supported planners
+  optional PlannerNaviConfig planner_navi_config = 4;
 }
 
 message PlanningConfig {
-  enum PlannerType {
-    RTK = 0;
-    EM = 1;  // expectation maximization
-    LATTICE = 2;
-    NAVI = 3; // navigation planner
-    OPENSPACE = 4; // open space planner
-  };
-  optional PlannerType planner_type = 1 [default = EM];
-  oneof planner_config {
-    PlannerRTKonfig planner_rtk_config = 2;
-    PlannerEMConfig planner_em_config = 3;
-    PlannerLatticeonfig planner_lattice_config = 4;
-    PlannerNaviConfig planner_navi_config = 5;
-    PlannerOpenSpaceConfig planner_open_space_config = 6;
+  optional PlannerType planner_type = 1 [deprecated=true];
+  optional PlannerNaviConfig planner_navi_config = 2;
+  oneof planning_config {
+    RtkPlanningConfig rtk_planning_config = 3;
+    StandardPlanningConfig standard_planning_config = 4;
+    NavigationPlanningConfig navigation_planning_config = 5;
   }
 }

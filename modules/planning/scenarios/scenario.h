@@ -43,7 +43,7 @@ class Scenario {
 
   virtual ScenarioConfig::ScenarioType scenario_type() const;
 
-  virtual bool Init(const PlanningConfig& config) = 0;
+  virtual bool Init() = 0;
 
   virtual common::Status Process(
       const common::TrajectoryPoint& planning_init_point, Frame* frame) = 0;

@@ -37,11 +37,10 @@ using apollo::common::Status;
 DpPolyPathOptimizer::DpPolyPathOptimizer()
     : PathOptimizer("DpPolyPathOptimizer") {}
 
-bool DpPolyPathOptimizer::Init(const PlanningConfig &config) {
-  config_ = config.planner_em_config()
-                .scenario_config(0)
-                .scenario_lane_follow_config()
-                .dp_poly_path_config();
+bool DpPolyPathOptimizer::Init(
+    const ScenarioConfig::ScenarioTaskConfig &config) {
+  CHECK(config.has_dp_poly_path_config());
+  config_ = config.dp_poly_path_config();
   is_init_ = true;
   return true;
 }
