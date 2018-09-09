@@ -132,7 +132,7 @@ void NaviPlanning::OnPad(const PadMessage& pad) {
 }
 
 void NaviPlanning::ProcessPadMsg(DrivingAction drvie_action) {
-  if (config_.planner_type() == PlanningConfig::NAVI) {
+  if (config_.planner_type() == NAVI) {
     std::map<std::string, uint32_t> lane_id_to_priority;
     auto& ref_line_info_group = frame_->reference_line_info();
     if (is_received_pad_msg_) {

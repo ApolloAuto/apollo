@@ -199,11 +199,7 @@ common::Status OpenSpacePlanning::InitFrame(
 }
 
 bool OpenSpacePlanning::CheckPlanningConfig() {
-  if (!config_.has_planner_open_space_config()) {
-    return false;
-  }
   // TODO(All): check other config params
-
   return true;
 }
 

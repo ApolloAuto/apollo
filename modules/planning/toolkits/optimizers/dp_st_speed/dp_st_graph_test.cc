@@ -36,25 +36,33 @@ namespace planning {
 class DpStGraphTest : public ::testing::Test {
  public:
   virtual void SetUp() {
-    // dp_config_
-    PlanningConfig config;
     FLAGS_enable_multi_thread_in_dp_st_graph = true;
-    FLAGS_planning_config_file = "modules/planning/conf/planning_config.pb.txt";
-    CHECK(apollo::common::util::GetProtoFromFile(FLAGS_planning_config_file,
-                                                 &config));
-    dp_config_ = config.planner_em_config()
-                     .scenario_config(0)
-                     .scenario_lane_follow_config()
-                     .dp_st_speed_config();
+    FLAGS_lane_follow_scenario_config_file =
+        "modules/planning/conf/lane_follow_scenario_config.pb.txt";
+    ScenarioConfig config;
+    CHECK(apollo::common::util::GetProtoFromFile(
+        FLAGS_lane_follow_scenario_config_file, &config));
+
+    for (const auto& cfg : config.scenario_task_config()) {
+      if (cfg.task() == DP_ST_SPEED_OPTIMIZER) {
+        dp_config_ = cfg.dp_st_speed_config();
+        break;
+      }
+    }
+
+    AERROR << dp_config_.ShortDebugString();
 
     // speed_limit:
     for (float s = 0; s < 200.0; s += 1.0) {
       speed_limit_.AppendSpeedLimit(s, 25.0);
     }
 
-    apollo::common::util::ThreadPool::Init(10);
+    apollo::common::util::ThreadPool::Init(3);
   }
 
+  virtual void TearDown() { apollo::common::util::ThreadPool::Stop(); }
+
+ protected:
   std::list<PathObstacle> path_obstacle_list_;
   std::list<Obstacle> obstacle_list_;
 

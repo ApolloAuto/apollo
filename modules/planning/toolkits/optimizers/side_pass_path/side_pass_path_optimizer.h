@@ -40,7 +40,7 @@ class SidePassPathOptimizer final : public PathOptimizer {
  public:
   SidePassPathOptimizer();
 
-  bool Init(const PlanningConfig &config) override;
+  bool Init(const ScenarioConfig::ScenarioTaskConfig &config) override;
 
  private:
   apollo::common::Status Process(const SpeedData &speed_data,

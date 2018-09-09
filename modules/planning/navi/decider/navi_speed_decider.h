@@ -32,8 +32,8 @@
 #include "modules/planning/common/speed/speed_data.h"
 #include "modules/planning/navi/decider/navi_obstacle_decider.h"
 #include "modules/planning/navi/decider/navi_speed_ts_graph.h"
+#include "modules/planning/navi/decider/navi_task.h"
 #include "modules/planning/proto/planning_config.pb.h"
-#include "modules/planning/toolkits/optimizers/task.h"
 
 /**
  * @namespace apollo::planning
@@ -50,7 +50,7 @@ namespace planning {
  * navigation mode by setting "FLAGS_use_navigation_mode" to "true") and do not
  * use it in standard mode.
  */
-class NaviSpeedDecider : public Task {
+class NaviSpeedDecider : public NaviTask {
  public:
   NaviSpeedDecider();
   virtual ~NaviSpeedDecider() = default;

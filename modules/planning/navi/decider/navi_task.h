@@ -15,44 +15,44 @@
  *****************************************************************************/
 
 /**
- * @file dp_poly_path_optimizer.h
+ * @file
  **/
 
-#ifndef MODULES_PLANNING_TOOLKITS_OPTIMIZERS_DP_POLY_PATH_OPTIMIZER_H_
-#define MODULES_PLANNING_TOOLKITS_OPTIMIZERS_DP_POLY_PATH_OPTIMIZER_H_
+#ifndef MODULES_PLANNING_NAVI_DECIDER_NAVI_TASK_H_
+#define MODULES_PLANNING_NAVI_DECIDER_NAVI_TASK_H_
 
 #include <string>
 
-#include "modules/planning/proto/dp_poly_path_config.pb.h"
-
 #include "modules/planning/proto/planning_config.pb.h"
-#include "modules/planning/toolkits/optimizers/path_optimizer.h"
+
+#include "modules/common/status/status.h"
+#include "modules/planning/common/frame.h"
+#include "modules/planning/common/reference_line_info.h"
 
 namespace apollo {
 namespace planning {
 
-/**
- * @class DpPolyPathOptimizer
- * @brief DpPolyPathOptimizer does path planning with dynamic programming
- * algorithm.
- */
-class DpPolyPathOptimizer : public PathOptimizer {
+class NaviTask {
  public:
-  DpPolyPathOptimizer();
+  explicit NaviTask(const std::string& name);
+  virtual ~NaviTask() = default;
+  virtual const std::string& Name() const;
 
-  bool Init(const ScenarioConfig::ScenarioTaskConfig &config) override;
+  virtual apollo::common::Status Execute(
+      Frame* frame, ReferenceLineInfo* reference_line_info);
+
+  virtual bool Init(const PlanningConfig& config);
+
+ protected:
+  bool is_init_ = false;
+  Frame* frame_ = nullptr;
+  ReferenceLineInfo* reference_line_info_ = nullptr;
 
  private:
-  apollo::common::Status Process(const SpeedData &speed_data,
-                                 const ReferenceLine &reference_line,
-                                 const common::TrajectoryPoint &init_point,
-                                 PathData *const path_data) override;
-
- private:
-  DpPolyPathConfig config_;
+  const std::string name_;
 };
 
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_TOOLKITS_OPTIMIZERS_DP_POLY_PATH_OPTIMIZER_H_
+#endif  // MODULES_PLANNING_NAVI_DECIDER_NAVI_TASK_H_
