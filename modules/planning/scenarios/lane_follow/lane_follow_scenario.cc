@@ -58,8 +58,8 @@ using common::math::Vec2d;
 using common::time::Clock;
 
 namespace {
-constexpr double kPathOptimizationFallbackClost = 2e4;
-constexpr double kSpeedOptimizationFallbackClost = 2e4;
+constexpr double kPathOptimizationFallbackCost = 2e4;
+constexpr double kSpeedOptimizationFallbackCost = 2e4;
 constexpr double kStraightForwardLineCost = 10.0;
 }  // namespace
 
@@ -222,7 +222,7 @@ Status LaneFollowScenario::PlanOnReferenceLine(
     ADEBUG << "Path fallback.";
     GenerateFallbackPathProfile(reference_line_info,
                                 reference_line_info->mutable_path_data());
-    reference_line_info->AddCost(kPathOptimizationFallbackClost);
+    reference_line_info->AddCost(kPathOptimizationFallbackCost);
     reference_line_info->set_trajectory_type(ADCTrajectory::PATH_FALLBACK);
   }
 
@@ -231,7 +231,7 @@ Status LaneFollowScenario::PlanOnReferenceLine(
 
     *reference_line_info->mutable_speed_data() =
         speed_profile_generator_.GenerateFallbackSpeedProfile();
-    reference_line_info->AddCost(kSpeedOptimizationFallbackClost);
+    reference_line_info->AddCost(kSpeedOptimizationFallbackCost);
     reference_line_info->set_trajectory_type(ADCTrajectory::SPEED_FALLBACK);
   }
 
