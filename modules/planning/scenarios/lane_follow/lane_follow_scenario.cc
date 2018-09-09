@@ -84,12 +84,16 @@ bool LaneFollowScenario::Init(const PlanningConfig& config) {
     return true;
   }
   RegisterTasks();
-  auto& tasks = config.planner_em_config().scenario_config()
-      .scenario_lane_follow_config().task();
-  for (const auto task : tasks) {
-    tasks_.emplace_back(
-        task_factory_.CreateObject(static_cast<TaskType>(task)));
-    AINFO << "Created task:" << tasks_.back()->Name();
+  AERROR << "size = " << config.planner_em_config().scenario_config_size();
+  auto& cfg = config.planner_em_config();
+
+  if (cfg.scenario_config_size() > 0) {
+    auto& tasks = cfg.scenario_config(0).scenario_lane_follow_config().task();
+    for (const auto task : tasks) {
+      tasks_.emplace_back(
+          task_factory_.CreateObject(static_cast<TaskType>(task)));
+      AINFO << "Created task:" << tasks_.back()->Name();
+    }
   }
   for (auto& task : tasks_) {
     if (!task->Init(config)) {

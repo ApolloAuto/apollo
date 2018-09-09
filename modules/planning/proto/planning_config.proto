@@ -34,6 +34,15 @@ message ScenarioLaneFollowConfig {
   optional apollo.planning.PolyStSpeedConfig poly_st_speed_config = 6;
 }
 
+message ScenarioSidePassConfig {
+  repeated TaskType task = 1;
+  optional apollo.planning.DpPolyPathConfig dp_poly_path_config = 2;
+  optional apollo.planning.DpStSpeedConfig dp_st_speed_config = 3;
+  optional apollo.planning.QpSplinePathConfig qp_spline_path_config = 4;
+  optional apollo.planning.QpStSpeedConfig qp_st_speed_config = 5;
+  optional apollo.planning.PolyStSpeedConfig poly_st_speed_config = 6;
+}
+
 message ScenarioConfig {
   enum ScenarioType {
     LANE_FOLLOW = 0;  // default scenario
@@ -50,6 +59,7 @@ message ScenarioConfig {
   optional ScenarioType scenario_type = 1;
   oneof scenario {
     ScenarioLaneFollowConfig scenario_lane_follow_config = 2;
+    ScenarioSidePassConfig scenario_side_pass_config = 3;
   }
 };
 
@@ -57,7 +67,7 @@ message PlannerRTKonfig {
 }
 
 message PlannerEMConfig {
-  optional ScenarioConfig scenario_config = 1;
+  repeated ScenarioConfig scenario_config = 1;
 }
 
 message PlannerLatticeonfig {
