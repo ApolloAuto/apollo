@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@
  * @file
  **/
 
-#include "modules/planning/toolkits/optimizers/dp_poly_path/dp_poly_path_optimizer.h"
+#include "modules/planning/toolkits/optimizers/side_pass_path/side_pass_path_optimizer.h"
 
 #include <string>
 #include <utility>
@@ -27,6 +27,7 @@
 #include "modules/common/util/file.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/toolkits/optimizers/road_graph/dp_road_graph.h"
+#include "modules/planning/toolkits/optimizers/road_graph/side_pass_waypoint_sampler.h"
 
 namespace apollo {
 namespace planning {
@@ -34,22 +35,22 @@ namespace planning {
 using apollo::common::ErrorCode;
 using apollo::common::Status;
 
-DpPolyPathOptimizer::DpPolyPathOptimizer()
-    : PathOptimizer("DpPolyPathOptimizer") {}
+SidePassPathOptimizer::SidePassPathOptimizer()
+    : PathOptimizer("SidePassPathOptimizer") {}
 
-bool DpPolyPathOptimizer::Init(const PlanningConfig &config) {
+bool SidePassPathOptimizer::Init(const PlanningConfig &config) {
   config_ = config.planner_em_config()
-                .scenario_config(0)
-                .scenario_lane_follow_config()
+                .scenario_config(1)
+                .scenario_side_pass_config()
                 .dp_poly_path_config();
   is_init_ = true;
   return true;
 }
 
-Status DpPolyPathOptimizer::Process(const SpeedData &speed_data,
-                                    const ReferenceLine &,
-                                    const common::TrajectoryPoint &init_point,
-                                    PathData *const path_data) {
+Status SidePassPathOptimizer::Process(const SpeedData &speed_data,
+                                      const ReferenceLine &,
+                                      const common::TrajectoryPoint &init_point,
+                                      PathData *const path_data) {
   if (!is_init_) {
     AERROR << "Please call Init() before Process().";
     return Status(ErrorCode::PLANNING_ERROR, "Not inited.");
@@ -58,7 +59,7 @@ Status DpPolyPathOptimizer::Process(const SpeedData &speed_data,
   DpRoadGraph dp_road_graph(config_, *reference_line_info_, speed_data);
   dp_road_graph.SetDebugLogger(reference_line_info_->mutable_debug());
   dp_road_graph.SetWaypointSampler(
-      new WaypointSampler(config_.waypoint_sampler_config()));
+      new SidePassWaypointSampler(config_.waypoint_sampler_config()));
 
   if (!dp_road_graph.FindPathTunnel(
           init_point,

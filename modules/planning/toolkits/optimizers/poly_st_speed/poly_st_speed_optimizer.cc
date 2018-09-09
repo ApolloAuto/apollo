@@ -51,8 +51,10 @@ bool PolyStSpeedOptimizer::Init(const PlanningConfig& config) {
     AERROR << "Duplicated Init.";
     return false;
   }
-  poly_st_speed_config_ = config.planner_em_config().scenario_config()
-      .scenario_lane_follow_config().poly_st_speed_config();
+  poly_st_speed_config_ = config.planner_em_config()
+                              .scenario_config(0)
+                              .scenario_lane_follow_config()
+                              .poly_st_speed_config();
   st_boundary_config_ = poly_st_speed_config_.st_boundary_config();
   is_init_ = true;
   return true;

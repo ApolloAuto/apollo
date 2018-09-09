@@ -47,8 +47,9 @@ QpSplineStSpeedOptimizer::QpSplineStSpeedOptimizer()
 
 bool QpSplineStSpeedOptimizer::Init(const PlanningConfig& config) {
   qp_st_speed_config_ = config.planner_em_config()
-      .scenario_config().scenario_lane_follow_config()
-      .qp_st_speed_config();
+                            .scenario_config(0)
+                            .scenario_lane_follow_config()
+                            .qp_st_speed_config();
   st_boundary_config_ = qp_st_speed_config_.st_boundary_config();
   std::vector<double> init_knots;
   spline_generator_.reset(new Spline1dGenerator(init_knots, 5));
