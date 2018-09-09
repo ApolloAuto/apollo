@@ -77,8 +77,6 @@ bool DpRoadGraph::FindPathTunnel(
     return false;
   }
 
-  waypoint_sampler_.reset(
-      new WaypointSampler(config_.waypoint_sampler_config()));
   waypoint_sampler_->Init(&reference_line_info_, init_sl_point_,
                           init_frenet_frame_point_);
   waypoint_sampler_->SetDebugLogger(planning_debug_);
