@@ -130,6 +130,11 @@ function build() {
     echo -e "${YELLOW}Running build under CPU mode. No GPU is required to run the build.${NO_COLOR}"
   fi
   info "Start building, please wait ..."
+  info "Building framework ..."
+  cd /apollo/framework
+  bash cybertron.sh build_fast
+  cd /apollo
+  info "Building modules ..."
   generate_build_targets
   info "Building on $MACHINE_ARCH..."
 
