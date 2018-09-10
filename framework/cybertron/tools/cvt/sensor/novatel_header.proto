@@ -1,0 +1,60 @@
+syntax = "proto2";
+
+package adu.common.sensor;
+
+// On the wire, this header is preceeded by three sync bytes,
+// which are 0xAA 0x44 0x12, and a uint8 which is the header length.
+message NovatelHeader {  
+    // Message ID of the log being output.
+    optional uint32 id = 1;
+
+    // Measurement source, format, response bit.
+    optional uint32 msg_type = 2;
+
+    optional uint32 port_addr = 3;
+    optional uint32 length = 4;
+    optional uint32 sequence = 5;
+
+    optional uint32 idle_time = 6;
+    optional uint32 time_status = 7;
+
+    optional uint32 gps_week = 8;
+    optional uint32 gps_week_milliseconds = 9;
+
+    // Table 3 in the SPAN on OEM6 manual.
+    // See: http://www.novatel.com/assets/Documents/Manuals/OM-20000144UM.pdf#page=13
+    // enum ReceiverStatus {
+    //     ERROR                       = 1;
+    //     TEMPERATURE_WARNING         = 2;
+    //     VOLTAGE_SUPPLY_WARNING      = 4;
+    //     ANTENNA_UNPOWERED           = 8;
+    //     LNA_FAILURE                 = 16;
+    //     ANTENNA_OPEN                = 32;
+    //     ANTENNA_SHORTED             = 64;
+    //     CPU_OVERLOADED              = 128;
+    //     COM1_BUFFER_OVERRUN         = 256;
+    //     COM2_BUFFER_OVERRUN         = 512;
+    //     COM3_BUFFER_OVERRUN         = 1024;
+    //     LINK_OVERLOAD               = 2048;
+    //     AUX_TRANSMIT_OVERRUN        = 8192;
+    //     AGC_OUT_OF_RANGE            = 16384;
+    //     INS_RESET                   = 65536;
+    //     ALMANAC_INVALID             = 262144;
+    //     POSITION_SOLUTION_INVALID   = 524288;
+    //     POSITION_NOT_FIXED          = 1048576;
+    //     CLOCK_STEERING_DISABLED     = 2097152;
+    //     CLOCK_MODEL_INVALID         = 4194304;
+    //     EXTERNAL_OSCILLATOR_LOCKED  = 8388608;
+    //     SOFTWARE_RESOURCE_WARNING   = 16777216;
+    //     AUXILIARY3_EVENT            = 536870912;
+    //     AUXILIARY2_EVENT            = 1073741824;
+    //     AUXILIARY1_EVENT            = 2147483648; // out of range
+    // }
+    // optional ReceiverStatus receiver_status = 10;
+
+    // Cannot use enum type, because 2147483648 is out of interge range
+    optional uint32 receiver_status = 10;  
+
+    optional uint32 reserved = 11;
+    optional uint32 software_version = 12;
+}

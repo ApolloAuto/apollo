@@ -1,0 +1,5 @@
+#ifndef QT_QTQUICKPARTICLES_MODULE_H
+#define QT_QTQUICKPARTICLES_MODULE_H
+#include <QtQuickParticles/QtQuickParticlesDepends>
+#include "qtquickparticlesversion.h"
+#endif

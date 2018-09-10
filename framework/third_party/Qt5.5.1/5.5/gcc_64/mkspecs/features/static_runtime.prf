@@ -1,0 +1,7 @@
+msvc {
+    # -MD becomes -MT, -MDd becomes -MTd
+    QMAKE_CFLAGS ~= s,^-MD(d?)$, -MT\1,g
+    QMAKE_CXXFLAGS ~= s,^-MD(d?)$, -MT\1,g
+} else: mingw {
+    QMAKE_LFLAGS += -static
+}

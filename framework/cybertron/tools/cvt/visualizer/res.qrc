@@ -1,0 +1,19 @@
+<RCC>
+    <qresource prefix="/">
+        <file>grid.vert</file>
+        <file>grid.frag</file>
+        <file>pointcloud.frag</file>
+        <file>pointcloud.vert</file>
+        <file>video_image_plane.vert</file>
+        <file>video_image_plane.frag</file>
+        <file>no_image.png</file>
+        <file>pause.png</file>
+        <file>play.png</file>
+        <file>image.png</file>
+        <file>images.png</file>
+        <file>grid.png</file>
+        <file>pointcloud.png</file>
+        <file>closeimage.png</file>
+        <file>app.ico</file>
+    </qresource>
+</RCC>

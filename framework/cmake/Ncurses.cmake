@@ -1,0 +1,5 @@
+set(NCURSES_ROOT third_party/ncurses5)
+set(NCURSES_INCLUDE_DIRS ${NCURSES_ROOT}/include)
+set(NCURSES_LIBRARY_DIRS ${NCURSES_ROOT}/lib)
+include_directories(${NCURSES_INCLUDE_DIRS})
+link_directories(${NCURSES_LIBRARY_DIRS})

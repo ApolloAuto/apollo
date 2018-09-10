@@ -1,0 +1,22 @@
+syntax = "proto2";
+
+package apollo.sensor.proto;
+
+enum SensorType {
+    Velodyne64 = 1;
+    Velodyne32 = 2;
+    Novatel = 3;
+    Usb_Camera = 4;
+    Radar = 5;
+};
+
+//TODO:add type
+message SensorInfo {
+  required SensorType type = 1;
+  required string conf_path = 2;
+}
+
+message SensorConfig {
+  repeated SensorInfo sensors = 1;
+
+}

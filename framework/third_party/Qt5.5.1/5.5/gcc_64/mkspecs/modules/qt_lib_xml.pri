@@ -1,0 +1,17 @@
+QT.xml.VERSION = 5.5.1
+QT.xml.MAJOR_VERSION = 5
+QT.xml.MINOR_VERSION = 5
+QT.xml.PATCH_VERSION = 1
+QT.xml.name = QtXml
+QT.xml.libs = $$QT_MODULE_LIB_BASE
+QT.xml.rpath = /home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib
+QT.xml.includes = $$QT_MODULE_INCLUDE_BASE $$QT_MODULE_INCLUDE_BASE/QtXml
+QT.xml.bins = $$QT_MODULE_BIN_BASE
+QT.xml.libexecs = $$QT_MODULE_LIBEXEC_BASE
+QT.xml.plugins = $$QT_MODULE_PLUGIN_BASE
+QT.xml.imports = $$QT_MODULE_IMPORT_BASE
+QT.xml.qml = $$QT_MODULE_QML_BASE
+QT.xml.depends = core
+QT.xml.module_config =
+QT.xml.DEFINES = QT_XML_LIB
+QT_MODULES += xml

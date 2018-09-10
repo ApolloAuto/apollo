@@ -1,0 +1,2 @@
+contains(TEMPLATE, vc.*): DEFINES += QT_TESTCASE_BUILDDIR=\"$$OUT_PWD\"
+else: DEFINES += QT_TESTCASE_BUILDDIR=$$shell_quote(\"$$OUT_PWD\")

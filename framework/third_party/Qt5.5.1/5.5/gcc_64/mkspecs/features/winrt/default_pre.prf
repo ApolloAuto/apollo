@@ -1,0 +1,12 @@
+*msvc2015 {
+    # Note that the order is important, ucrt(d) has to be first
+    # Otherwise the linker might use malloc from a different library
+    # but free_dbg() from the runtime, causing assert when deleting
+    # items from different heaps
+    CONFIG(debug, debug|release): \
+        QMAKE_LIBS = ucrtd.lib $$QMAKE_LIBS
+    else: \
+        QMAKE_LIBS = ucrt.lib $$QMAKE_LIBS
+}
+
+load(default_pre)

@@ -1,0 +1,6 @@
+
+QMAKE_PRO_INPUT = clucene.pro
+QMAKE_PRL_TARGET = libQt5CLucene.so.5.5.1
+QMAKE_PRL_CONFIG = lex yacc exceptions depend_includepath testcase_targets import_plugins import_qpa_plugin qt release link_prl incremental shared qpa no_mocdepend release qt_no_framework linux unix posix gcc compile_examples qpa largefile precompile_header enable_new_dtags sse2 sse3 ssse3 sse4_1 sse4_2 avx avx2 pcre use_libmysqlclient_r prefix_build force_independent create_prl link_prl prepare_docs qt_docs_targets no_private_qt_headers_warning QTDIR_build testcase_exceptions qt_example_installs internal_module qmake_cache target_qt need_fwd_pri qt_install_module c++11 hide_symbols bsymbolic_functions qt_install_headers compiler_supports_fpmath create_pc create_libtool explicitlib warn_off hide_symbols exceptions have_target dll thread moc resources
+QMAKE_PRL_VERSION = 5.5.1
+QMAKE_PRL_LIBS = -L$$[QT_INSTALL_LIBS] -lQt5Core -lpthread

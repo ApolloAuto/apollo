@@ -1,0 +1,14 @@
+#ifndef QT_ENGINIO_MODULE_H
+#define QT_ENGINIO_MODULE_H
+#include <Enginio/EnginioDepends>
+#include "enginio.h"
+#include "enginiobasemodel.h"
+#include "enginioclient.h"
+#include "enginioclientconnection.h"
+#include "enginioidentity.h"
+#include "enginiomodel.h"
+#include "enginiooauth2authentication.h"
+#include "enginioreply.h"
+#include "enginioreplystate.h"
+#include "enginioversion.h"
+#endif

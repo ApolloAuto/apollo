@@ -1,0 +1,25 @@
+syntax = "proto2";
+
+package adu.common.sensor;
+
+message RegionOfInterest {
+    // This message is used to specify a region of interest within an image.
+    //
+    // When used to specify the ROI setting of the camera when the image was
+    // taken, the height and width fields should either match the height and
+    // width fields for the associated image; or height = width = 0
+    // indicates that the full resolution image was captured.
+
+    optional uint32 x_offset = 1; // Leftmost pixel of the ROI
+                                  // (0 if the ROI includes the left edge of the image)
+    optional uint32 y_offset = 2; // Topmost pixel of the ROI
+                                  // (0 if the ROI includes the top edge of the image)
+    optional uint32 height = 3;   // Height of ROI
+    optional uint32 width = 4;    // Width of ROI
+
+    // True if a distinct rectified ROI should be calculated from the "raw"
+    // ROI in this message. Typically this should be False if the full image
+    // is captured (ROI not used), and True if a subwindow is captured (ROI
+    // used).
+    optional bool do_rectify = 5;
+}

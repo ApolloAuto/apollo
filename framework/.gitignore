@@ -1,0 +1,31 @@
+# Ignore build for generated files.
+build
+install
+output
+*.tgz
+
+# compiler intermediate files
+*.gch
+*.o
+*.pyc
+*.swp
+.baidu*
+
+# log files
+*.log
+
+# ide files
+.vscode
+.project
+.cproject
+
+# ctags file
+tags
+
+# coverity
+cover
+*.cov
+
+# record
+*.record
+*.record.*

@@ -1,0 +1,34 @@
+CONFIG(release, debug|release) {
+    # We need fat object files when creating static libraries on some platforms
+    # so the linker will know to load a particular object from the library
+    # in the first place. On others, we have special ar and nm to create the symbol
+    # tables so the linker will know  better. For other compilers, we disable LTCG
+    # for static libraries.
+    msvc {
+        # Nothing to do
+    } else {
+        !isEmpty(QMAKE_AR_LTCG): QMAKE_AR = $$QMAKE_AR_LTCG
+        !isEmpty(QMAKE_NM_LTCG): QMAKE_NM = $$QMAKE_NM_LTCG
+
+        equals(QMAKE_RANLIB_LTCG, true): QMAKE_RANLIB =
+        else: !isEmpty(QMAKE_RANLIB_LTCG): QMAKE_RANLIB = $$QMAKE_RANLIB_LTCG
+
+        static:isEmpty(QMAKE_AR_LTCG):isEmpty(QMAKE_RANLIB_LTCG) {
+            # We don't know how to create symbol tables for static libs with this
+            # compiler, so disable LTCG
+            QMAKE_CFLAGS_LTCG =
+            QMAKE_CXXFLAGS_LTCG =
+            QMAKE_LFLAGS_LTCG =
+        }
+    }
+
+    fat-lto {
+        QMAKE_CFLAGS_LTCG += $$QMAKE_CFLAGS_LTCG_FATOBJECTS
+        QMAKE_CXXFLAGS_LTCG += $$QMAKE_CXXFLAGS_LTCG_FATOBJECTS
+    }
+
+    load(link_ltcg)
+    QMAKE_CFLAGS *= $$QMAKE_CFLAGS_LTCG
+    QMAKE_CXXFLAGS *= $$QMAKE_CXXFLAGS_LTCG
+    QMAKE_LFLAGS *= $$QMAKE_LFLAGS_LTCG
+}

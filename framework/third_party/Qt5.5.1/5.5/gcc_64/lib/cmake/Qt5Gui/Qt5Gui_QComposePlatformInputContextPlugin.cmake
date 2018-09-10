@@ -1,0 +1,6 @@
+
+add_library(Qt5::QComposePlatformInputContextPlugin MODULE IMPORTED)
+
+_populate_Gui_plugin_properties(QComposePlatformInputContextPlugin RELEASE "platforminputcontexts/libcomposeplatforminputcontextplugin.so")
+
+list(APPEND Qt5Gui_PLUGINS Qt5::QComposePlatformInputContextPlugin)

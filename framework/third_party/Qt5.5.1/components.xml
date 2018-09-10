@@ -1,0 +1,108 @@
+<Packages>
+    <ApplicationName>Qt 5.5.1</ApplicationName>
+    <ApplicationVersion>1.0.0</ApplicationVersion>
+    <Package>
+        <Name>qt.tools</Name>
+        <Pixmap></Pixmap>
+        <Title>Tools</Title>
+        <Description>IDE, Internationalization, Design and other tools to accelerate development.</Description>
+        <Version>1.0.8-0</Version>
+        <LastUpdateDate></LastUpdateDate>
+        <InstallDate>2018-06-28</InstallDate>
+        <Size>0</Size>
+        <Dependencies></Dependencies>
+    </Package>
+    <Package>
+        <Name>qt.tools.qtcreator</Name>
+        <Pixmap></Pixmap>
+        <Title>Qt Creator 3.5.1</Title>
+        <Description>IDE for Qt application development</Description>
+        <Version>3.5.1-0</Version>
+        <LastUpdateDate></LastUpdateDate>
+        <InstallDate>2018-06-28</InstallDate>
+        <Size>283408421</Size>
+        <Dependencies></Dependencies>
+        <ForcedInstallation>true</ForcedInstallation>
+    </Package>
+    <Package>
+        <Name>qt.license.thirdparty</Name>
+        <Pixmap></Pixmap>
+        <Title>Qt 3rd Party Licenses</Title>
+        <Description></Description>
+        <Version>1.0.0</Version>
+        <LastUpdateDate></LastUpdateDate>
+        <InstallDate>2018-06-28</InstallDate>
+        <Size>23056</Size>
+        <Dependencies></Dependencies>
+        <Virtual>true</Virtual>
+    </Package>
+    <Package>
+        <Name>qt.license.lgpl</Name>
+        <Pixmap></Pixmap>
+        <Title>Qt License LGPL</Title>
+        <Description></Description>
+        <Version>1.0.1</Version>
+        <LastUpdateDate></LastUpdateDate>
+        <InstallDate>2018-06-28</InstallDate>
+        <Size>0</Size>
+        <Dependencies></Dependencies>
+        <Virtual>true</Virtual>
+    </Package>
+    <Package>
+        <Name>qt</Name>
+        <Pixmap></Pixmap>
+        <Title>Qt</Title>
+        <Description>Qt 5.5.1</Description>
+        <Version>5.5.1-0</Version>
+        <LastUpdateDate></LastUpdateDate>
+        <InstallDate>2018-06-28</InstallDate>
+        <Size>0</Size>
+        <Dependencies>qt.license.thirdparty,qt.license.lgpl</Dependencies>
+    </Package>
+    <Package>
+        <Name>qt.55.examples</Name>
+        <Pixmap></Pixmap>
+        <Title>Qt 5.5 Examples</Title>
+        <Description>Qt 5.5 Examples</Description>
+        <Version>5.5.1-0</Version>
+        <LastUpdateDate></LastUpdateDate>
+        <InstallDate>2018-06-28</InstallDate>
+        <Size>73801151</Size>
+        <Dependencies>qt.tools</Dependencies>
+        <Virtual>true</Virtual>
+    </Package>
+    <Package>
+        <Name>qt.55.doc</Name>
+        <Pixmap></Pixmap>
+        <Title>Qt 5.5 Documentation</Title>
+        <Description>Qt 5.5 documentation</Description>
+        <Version>5.5.1-0</Version>
+        <LastUpdateDate></LastUpdateDate>
+        <InstallDate>2018-06-28</InstallDate>
+        <Size>222336347</Size>
+        <Dependencies>qt.tools</Dependencies>
+        <Virtual>true</Virtual>
+    </Package>
+    <Package>
+        <Name>qt.55</Name>
+        <Pixmap></Pixmap>
+        <Title>Qt 5.5</Title>
+        <Description>Qt 5.5.1</Description>
+        <Version>5.5.1-0</Version>
+        <LastUpdateDate></LastUpdateDate>
+        <InstallDate>2018-06-28</InstallDate>
+        <Size>0</Size>
+        <Dependencies>qt.55.doc,qt.55.examples</Dependencies>
+    </Package>
+    <Package>
+        <Name>qt.55.gcc_64</Name>
+        <Pixmap></Pixmap>
+        <Title>Desktop gcc 64-bit</Title>
+        <Description>License options: LGPLv3, LGPLv2.1, Commercial&lt;br>&lt;br>Qt 5.5.1 Prebuilt Components for Desktop gcc 64-bit</Description>
+        <Version>5.5.1-0</Version>
+        <LastUpdateDate></LastUpdateDate>
+        <InstallDate>2018-06-28</InstallDate>
+        <Size>188213296</Size>
+        <Dependencies>qt.tools.qtcreator</Dependencies>
+    </Package>
+</Packages>

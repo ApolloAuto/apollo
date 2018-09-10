@@ -1,0 +1,126 @@
+syntax = "proto2";
+
+package adu.common.sensor;
+
+import "header.proto"; 
+import "novatel_header.proto";    
+import "novatel_position_type.proto";
+
+// Table 29 in the SPAN on OEM6 manual:
+// See: http://www.novatel.com/assets/Documents/Manuals/OM-20000144UM.pdf#page=121
+enum INSStatus {
+    INACTIVE                = 0;
+    ALIGNING                = 1;
+    HIGH_VARIANCE           = 2;
+    SOLUTION_GOOD           = 3;
+    SOLUTION_FREE           = 6;
+    ALIGNMENT_COMPLETE      = 7;
+    DETERMINING_ORIENTATION = 8;
+    WAITING_INITIALPOS      = 9;
+}
+
+
+// message 507
+message INSPVA {
+    optional adu.common.header.Header header = 1;      
+    optional NovatelHeader novatel_header = 2;          
+    optional int32 week = 3;
+    optional double gpssec = 4;
+ 
+    optional double latitude = 5;
+    optional double longitude = 6;
+    optional double altitude = 7;
+ 
+    optional double velx = 8;
+    optional double vely = 9;
+    optional double velz = 10;
+ 
+    optional double roll = 11;
+    optional double pitch = 12;
+    optional double azimuth = 13;
+
+    optional uint32 ins_status = 14;
+}
+
+
+//message 1465
+message INSPVAX {
+    optional adu.common.header.Header header = 1;      
+    optional NovatelHeader novatel_header = 2;          
+
+    optional INSStatus ins_status = 3;
+    optional PositionType position_type = 4;
+
+    optional double latitude = 5;
+    optional double longitude = 6;
+    optional double altitude = 7;
+
+    optional float undulation = 8;
+
+    optional double north_velocity = 9;
+    optional double east_velocity = 10;
+    optional double up_velocity = 11;
+
+    optional double roll = 12;
+    optional double pitch = 13;
+    optional double azimuth = 14;
+
+    optional float latitude_std = 15;
+    optional float longitude_std = 16;
+    optional float altitude_std = 17;
+
+    optional float north_velocity_std = 18;
+    optional float east_velocity_std = 19;
+    optional float up_velocity_std = 20;
+
+    optional float roll_std = 21;
+    optional float pitch_std = 22;
+    optional float azimuth_std = 23;
+    
+//    enum ExtendedStatus {
+//        POSITION_UPDATE_APPLIED = 1;
+//        PHASE_UPDATE_APPLIED    = 2;
+//        ZUPT_APPLIED            = 4;
+//        WHEEL_SENSOR_APPLIED    = 8;
+//        HEADING_UPDATE_APPLIED  = 16;
+//        INS_SOLUTION_CONVERGED  = 64;
+//    }
+    optional uint32 extended_status = 24;
+
+    optional uint32 seconds_since_update = 25;
+}
+
+message INSCOV {
+    optional adu.common.header.Header header = 1;     
+    optional NovatelHeader novatel_header = 2;          
+    optional int32 week = 3;
+    optional double gpssec = 4;
+
+    optional double pos11 = 5; 
+    optional double pos12 = 6;
+    optional double pos13 = 7;
+    optional double pos21 = 8;
+    optional double pos22 = 9;
+    optional double pos23 = 10;
+    optional double pos31 = 11;
+    optional double pos32 = 12;
+    optional double pos33 = 13;
+    optional double att11 = 14;
+    optional double att12 = 15;
+    optional double att13 = 16;
+    optional double att21 = 17;
+    optional double att22 = 18;
+    optional double att23 = 19;
+    optional double att31 = 20;
+    optional double att32 = 21;
+    optional double att33 = 22;
+    optional double vel11 = 23;
+    optional double vel12 = 24;
+    optional double vel13 = 25;
+    optional double vel21 = 26;
+    optional double vel22 = 27;
+    optional double vel23 = 28;
+    optional double vel31 = 29;
+    optional double vel32 = 30;
+    optional double vel33 = 31;
+}

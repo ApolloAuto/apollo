@@ -1,0 +1,15 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=/usr/lib/x86_64-linux-gnu
+includedir=${prefix}/include/ncursesw
+major_version=5
+version=5.9.20140118
+
+Name: tic
+Description: ncurses 5.9 add-on library
+Version: ${version}
+URL: http://invisible-island.net/ncurses
+Requires.private: ncursesw, tinfo
+Libs: -L${libdir} -ltic
+Libs.private:  
+Cflags: -I${includedir}

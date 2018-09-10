@@ -1,0 +1,41 @@
+syntax = "proto2";
+
+package adu.common.sensor;
+
+// Table 22 in the SPAN on OEM6 manual.
+// http://www.novatel.com/assets/Documents/Manuals/OM-20000144UM.pdf#page=100
+enum PositionType {
+    NONE                = 0;
+    FIXED               = 1;
+    FIXEDHEIGHT         = 2;
+    FLOATCONV           = 4;
+    WIDELANE            = 5;
+    NARROWLANE          = 6;
+    DOPPLER_VELOCITY    = 8;
+    SINGLE              = 16;
+    PSRDIFF             = 17;
+    WAAS                = 18;
+    PROPAGATED          = 19;
+    OMNISTAR            = 20;
+    L1_FLOAT            = 32;
+    IONOFREE_FLOAT      = 33;
+    NARROW_FLOAT        = 34;
+    L1_INT              = 48;
+    WIDE_INT            = 49;
+    NARROW_INT          = 50;
+    RTK_DIRECT_INS      = 51;
+    INS_SBAS            = 52;
+    INS_PSRSP           = 53;
+    INS_PSRDIFF         = 54;
+    INS_RTKFLOAT        = 55;
+    INS_RTKFIXED        = 56;
+    INS_OMNISTAR        = 57;
+    INS_OMNISTAR_HP     = 58;
+    INS_OMNISTAR_XP     = 59;
+    OMNISTAR_HP         = 64;
+    OMNISTAR_XP         = 65;
+    PPP_CONVERGING      = 68;
+    PPP                 = 69;
+    INS_PPP_CONVERGING  = 73;
+    INS_PPP             = 74;
+}

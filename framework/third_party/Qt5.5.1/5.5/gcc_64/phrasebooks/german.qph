@@ -1,0 +1,1075 @@
+<!DOCTYPE QPH><QPH language="de">
+<phrase>
+    <source>About</source>
+    <target>Info</target>
+</phrase>
+<phrase>
+    <source>access key</source>
+    <target>Zugriffstaste</target>
+</phrase>
+<phrase>
+    <source>accessibility</source>
+    <target>Eingabehilfe</target>
+</phrase>
+<phrase>
+    <source>action handle</source>
+    <target>Aktionspunkt</target>
+</phrase>
+<phrase>
+    <source>active</source>
+    <target>Aktiv</target>
+</phrase>
+<phrase>
+    <source>active end</source>
+    <target>Aktives Ende</target>
+</phrase>
+<phrase>
+    <source>active object</source>
+    <target>Aktives Objekt</target>
+</phrase>
+<phrase>
+    <source>active window</source>
+    <target>Aktives Fenster</target>
+</phrase>
+<phrase>
+    <source>adornment</source>
+    <target>Zubehör</target>
+</phrase>
+<phrase>
+    <source>Always on Top</source>
+    <target>Immer im Vordergrund</target>
+</phrase>
+<phrase>
+    <source>anchor point</source>
+    <target>Ankerpunkt</target>
+</phrase>
+<phrase>
+    <source>Apply</source>
+    <target>Zuweisen</target>
+</phrase>
+<phrase>
+    <source>auto-exit</source>
+    <target>Textfeld mit automatischer Freigabe</target>
+</phrase>
+<phrase>
+    <source>auto-repeat</source>
+    <target>Automatische Wiederholung</target>
+</phrase>
+<phrase>
+    <source>automatic link</source>
+    <target>Automatische OLE-Verknüpfung</target>
+</phrase>
+<phrase>
+    <source>automatic scrolling</source>
+    <target>Automatischer Bildlauf</target>
+</phrase>
+<phrase>
+    <source>autoscroll</source>
+    <target>Automatischer Bildlauf</target>
+</phrase>
+<phrase>
+    <source>Back</source>
+    <target>Zurück</target>
+</phrase>
+<phrase>
+    <source>barrel button</source>
+    <target>Pen-Knopf</target>
+    <definition>pen</definition>
+</phrase>
+<phrase>
+    <source>barrel-tap</source>
+    <target>Tippen mit Pen-Knopf</target>
+</phrase>
+<phrase>
+    <source>boxed edit</source>
+    <target>Texteditor</target>
+    <definition>control/Steuerelement</definition>
+</phrase>
+<phrase>
+    <source>Browse</source>
+    <target>Durchsuchen</target>
+</phrase>
+<phrase>
+    <source>Cancel</source>
+    <target>Abbrechen</target>
+</phrase>
+<phrase>
+    <source>cascading menu</source>
+    <target>Überlappendes Menü</target>
+</phrase>
+<phrase>
+    <source>check box</source>
+    <target>Kontrollkästchen</target>
+</phrase>
+<phrase>
+    <source>check mark</source>
+    <target>Markierung</target>
+    <definition>Kontrollkästchen</definition>
+</phrase>
+<phrase>
+    <source>child window</source>
+    <target>Untergeordnetes Fenster</target>
+</phrase>
+<phrase>
+    <source>choose</source>
+    <target>Wählen</target>
+</phrase>
+<phrase>
+    <source>click</source>
+    <target>Klicken</target>
+</phrase>
+<phrase>
+    <source>Clipboard</source>
+    <target>Zwischenablage</target>
+</phrase>
+<phrase>
+    <source>Close</source>
+    <target>Schließen</target>
+</phrase>
+<phrase>
+    <source>Close button</source>
+    <target>Schließen</target>
+    <definition>Schaltfläche</definition>
+</phrase>
+<phrase>
+    <source>collapse</source>
+    <target>Ausblenden</target>
+    <definition>outline/Gliederung</definition>
+</phrase>
+<phrase>
+    <source>column heading</source>
+    <target>Spaltenüberschrift</target>
+    <definition>control/Steuerelement</definition>
+</phrase>
+<phrase>
+    <source>combo box</source>
+    <target>Kombinationsfeld</target>
+</phrase>
+<phrase>
+    <source>command button</source>
+    <target>Schaltfläche</target>
+</phrase>
+<phrase>
+    <source>container</source>
+    <target>Container</target>
+</phrase>
+<phrase>
+    <source>context-sensitive Help</source>
+    <target>Kontextbezogene Hilfe</target>
+</phrase>
+<phrase>
+    <source>contextual</source>
+    <target>Kontextbezogen</target>
+</phrase>
+<phrase>
+    <source>control</source>
+    <target>Steuerelement</target>
+</phrase>
+<phrase>
+    <source>Copy</source>
+    <target>Kopieren</target>
+</phrase>
+<phrase>
+    <source>Copy here</source>
+    <target>Hierher kopieren</target>
+</phrase>
+<phrase>
+    <source>Create Shortcut</source>
+    <target>Verknüpfung erstellen</target>
+</phrase>
+<phrase>
+    <source>Create Shortcut Here</source>
+    <target>Hiermit verknüpfen</target>
+</phrase>
+<phrase>
+    <source>Cut</source>
+    <target>Ausschneiden</target>
+</phrase>
+<phrase>
+    <source>default</source>
+    <target>Standard</target>
+</phrase>
+<phrase>
+    <source>default button</source>
+    <target>Standardschaltfläche</target>
+</phrase>
+<phrase>
+    <source>Delete</source>
+    <target>Löschen</target>
+</phrase>
+<phrase>
+    <source>desktop</source>
+    <target>Desktop</target>
+</phrase>
+<phrase>
+    <source>destination</source>
+    <target>Ziel</target>
+</phrase>
+<phrase>
+    <source>dialog box</source>
+    <target>Dialogfeld</target>
+</phrase>
+<phrase>
+    <source>disability</source>
+    <target>Behinderung</target>
+</phrase>
+<phrase>
+    <source>disjoint selection</source>
+    <target>Nichtzusammenhängende Auswahl</target>
+</phrase>
+<phrase>
+    <source>dock</source>
+    <target>Verankern</target>
+</phrase>
+<phrase>
+    <source>document</source>
+    <target>Dokument</target>
+</phrase>
+<phrase>
+    <source>double-click</source>
+    <target>Doppelklicken</target>
+</phrase>
+<phrase>
+    <source>double-tap</source>
+    <target>Doppeltippen</target>
+</phrase>
+<phrase>
+    <source>drag</source>
+    <target>Ziehen</target>
+</phrase>
+<phrase>
+    <source>drag-and-drop</source>
+    <target>Drag &amp; Drop</target>
+</phrase>
+<phrase>
+    <source>drop-down combo box</source>
+    <target>Dropdown-Kombinationsfeld</target>
+</phrase>
+<phrase>
+    <source>drop-down list box</source>
+    <target>Dropdown-Listenfeld</target>
+</phrase>
+<phrase>
+    <source>drop-down menu</source>
+    <target>Dropdown-Menü</target>
+</phrase>
+<phrase>
+    <source>Edit</source>
+    <target>Bearbeiten</target>
+</phrase>
+<phrase>
+    <source>Edit</source>
+    <target>Bearbeiten</target>
+    <definition>menu/Menü</definition>
+</phrase>
+<phrase>
+    <source>ellipsis</source>
+    <target>Auslassungspunkte</target>
+</phrase>
+<phrase>
+    <source>embedded object</source>
+    <target>Eingebettetes</target>
+</phrase>
+<phrase>
+    <source>Exit</source>
+    <target>Beenden</target>
+</phrase>
+<phrase>
+    <source>expand</source>
+    <target>Einblenden</target>
+    <definition>an outline/einer Struktur</definition>
+</phrase>
+<phrase>
+    <source>Explore</source>
+    <target>Explorer</target>
+    <definition>Befehl</definition>
+</phrase>
+<phrase>
+    <source>extended selection</source>
+    <target>Erweiterte Auswahl</target>
+</phrase>
+<phrase>
+    <source>extended selection list box</source>
+    <target>Listenfeld für erweiterte Auswahl</target>
+</phrase>
+<phrase>
+    <source>File</source>
+    <target>Datei</target>
+    <definition>menu</definition>
+</phrase>
+<phrase>
+    <source>file</source>
+    <target>Datei</target>
+</phrase>
+<phrase>
+    <source>Find</source>
+    <target>Suchen</target>
+</phrase>
+<phrase>
+    <source>Find Next</source>
+    <target>Weitersuchen</target>
+</phrase>
+<phrase>
+    <source>Find What</source>
+    <target>Suchen nach</target>
+</phrase>
+<phrase>
+    <source>folder</source>
+    <target>Ordner</target>
+</phrase>
+<phrase>
+    <source>font</source>
+    <target>Schriftart</target>
+</phrase>
+<phrase>
+    <source>font size</source>
+    <target>Schriftgrad</target>
+</phrase>
+<phrase>
+    <source>font style</source>
+    <target>Schriftschnitt</target>
+</phrase>
+<phrase>
+    <source>function key</source>
+    <target>Funktionstaste</target>
+</phrase>
+<phrase>
+    <source>gesture</source>
+    <target>Schriftzug</target>
+</phrase>
+<phrase>
+    <source>glyph</source>
+    <target>Zeichen</target>
+</phrase>
+<phrase>
+    <source>group box</source>
+    <target>Gruppenfeld</target>
+</phrase>
+<phrase>
+    <source>handle</source>
+    <target>Ziehpunkt</target>
+</phrase>
+<phrase>
+    <source>Help</source>
+    <target>?</target>
+    <definition>menu</definition>
+</phrase>
+<phrase>
+    <source>Help</source>
+    <target>Hilfe</target>
+</phrase>
+<phrase>
+    <source>Hide</source>
+    <target>Ausblenden</target>
+</phrase>
+<phrase>
+    <source>hierarchical selection</source>
+    <target>Hierarchische Auswahl</target>
+</phrase>
+<phrase>
+    <source>hold</source>
+    <target>Halten</target>
+</phrase>
+<phrase>
+    <source>hot spot</source>
+    <target>Hot Spot</target>
+</phrase>
+<phrase>
+    <source>hot zone</source>
+    <target>Hot Zone</target>
+</phrase>
+<phrase>
+    <source>icon</source>
+    <target>Symbol</target>
+</phrase>
+<phrase>
+    <source>inactive</source>
+    <target>Inaktiv</target>
+</phrase>
+<phrase>
+    <source>inactive window</source>
+    <target>Inaktives Fenster</target>
+</phrase>
+<phrase>
+    <source>ink</source>
+    <target>Ink</target>
+</phrase>
+<phrase>
+    <source>ink edit</source>
+    <target>Inkeditor</target>
+</phrase>
+<phrase>
+    <source>input focus</source>
+    <target>Eingabefokus</target>
+</phrase>
+<phrase>
+    <source>Insert</source>
+    <target>Einfügen</target>
+    <definition>Menü</definition>
+</phrase>
+<phrase>
+    <source>Insert Object</source>
+    <target>Objekt einfügen</target>
+</phrase>
+<phrase>
+    <source>insertion point</source>
+    <target>Einfügemarke</target>
+</phrase>
+<phrase>
+    <source>italic</source>
+    <target>Kursiv</target>
+</phrase>
+<phrase>
+    <source>label</source>
+    <target>Bezeichnung</target>
+</phrase>
+<phrase>
+    <source>landscape</source>
+    <target>Querformat</target>
+</phrase>
+<phrase>
+    <source>lasso-tap</source>
+    <target>Lasso-tippen</target>
+</phrase>
+<phrase>
+    <source>lens</source>
+    <target>Lupe</target>
+    <definition>control</definition>
+</phrase>
+<phrase>
+    <source>link</source>
+    <target>Verknüpfung</target>
+    <definition>noun</definition>
+</phrase>
+<phrase>
+    <source>link</source>
+    <target>Verknüpfen</target>
+    <definition>verb</definition>
+</phrase>
+<phrase>
+    <source>Link Here</source>
+    <target>Hiermit verknüpfen</target>
+</phrase>
+<phrase>
+    <source>list box</source>
+    <target>Listenfeld</target>
+</phrase>
+<phrase>
+    <source>list view</source>
+    <target>Listenansicht</target>
+    <definition>control</definition>
+</phrase>
+<phrase>
+    <source>manual link</source>
+    <target>Manuelle OLE-Verknüpfung</target>
+</phrase>
+<phrase>
+    <source>Maximize</source>
+    <target>Maximieren</target>
+</phrase>
+<phrase>
+    <source>maximize button</source>
+    <target>Maximieren</target>
+    <definition>Schaltfläche</definition>
+</phrase>
+<phrase>
+    <source>MDI</source>
+    <target>MDI</target>
+</phrase>
+<phrase>
+    <source>menu</source>
+    <target>Menü</target>
+</phrase>
+<phrase>
+    <source>menu bar</source>
+    <target>Menüleiste</target>
+</phrase>
+<phrase>
+    <source>menu button</source>
+    <target>Menü</target>
+    <definition>Schaltfläche</definition>
+</phrase>
+<phrase>
+    <source>menu item</source>
+    <target>Menüelement</target>
+</phrase>
+<phrase>
+    <source>menu title</source>
+    <target>Menütitel</target>
+</phrase>
+<phrase>
+    <source>message box</source>
+    <target>Meldungsfeld</target>
+</phrase>
+<phrase>
+    <source>Minimize</source>
+    <target>Minimieren</target>
+</phrase>
+<phrase>
+    <source>minimize button</source>
+    <target>Minimieren</target>
+    <definition>Schaltfläche</definition>
+</phrase>
+<phrase>
+    <source>mixed-value</source>
+    <target>Gemischt</target>
+</phrase>
+<phrase>
+    <source>modal</source>
+    <target>Modal</target>
+</phrase>
+<phrase>
+    <source>mode</source>
+    <target>Modus</target>
+</phrase>
+<phrase>
+    <source>modeless</source>
+    <target>Interaktiv</target>
+</phrase>
+<phrase>
+    <source>modifier key</source>
+    <target>Zusatztaste</target>
+</phrase>
+<phrase>
+    <source>mouse</source>
+    <target>Maus</target>
+</phrase>
+<phrase>
+    <source>Move</source>
+    <target>Verschieben</target>
+</phrase>
+<phrase>
+    <source>Move Here</source>
+    <target>Hierher verschieben</target>
+</phrase>
+<phrase>
+    <source>Multiple Document Interface</source>
+    <target>MDI</target>
+    <definition>Multiple Document Interface</definition>
+</phrase>
+<phrase>
+    <source>multiple selection list box</source>
+    <target>Listenfeld für Mehrfachauswahl</target>
+</phrase>
+<phrase>
+    <source>My Computer</source>
+    <target>Arbeitsplatz</target>
+    <definition>icon/Symbol</definition>
+</phrase>
+<phrase>
+    <source>Network Neighborhood</source>
+    <target>Netzwerk</target>
+    <definition>icon/Symbol</definition>
+</phrase>
+<phrase>
+    <source>New</source>
+    <target>Neu</target>
+</phrase>
+<phrase>
+    <source>Next</source>
+    <target>Weiter</target>
+</phrase>
+<phrase>
+    <source>object</source>
+    <target>Objekt</target>
+</phrase>
+<phrase>
+    <source>OK</source>
+    <target>OK</target>
+</phrase>
+<phrase>
+    <source>OLE</source>
+    <target>OLE</target>
+</phrase>
+<phrase>
+    <source>OLE drag and drop</source>
+    <target>OLE-Drag &amp; Drop</target>
+</phrase>
+<phrase>
+    <source>OLE embedded object</source>
+    <target>Eingebettetes OLE-Objekt</target>
+</phrase>
+<phrase>
+    <source>OLE linked object</source>
+    <target>Verknüpftes OLE-Objekt</target>
+</phrase>
+<phrase>
+    <source>OLE nondefault drag and drop</source>
+    <target>Vom Standard abweichendes OLE-Drag &amp; Drop</target>
+</phrase>
+<phrase>
+    <source>OLE nondefault drag and drop</source>
+    <target>Aangepast slepen en neerzetten via OLE</target>
+</phrase>
+<phrase>
+    <source>Open</source>
+    <target>Öffnen</target>
+</phrase>
+<phrase>
+    <source>Open With</source>
+    <target>Öffnen mit</target>
+</phrase>
+<phrase>
+    <source>option button</source>
+    <target>Optionsfeld</target>
+</phrase>
+<phrase>
+    <source>option-set</source>
+    <target>Aktivierte Option</target>
+</phrase>
+<phrase>
+    <source>package</source>
+    <target>Paket</target>
+</phrase>
+<phrase>
+    <source>Page Setup</source>
+    <target>Seite einrichten</target>
+</phrase>
+<phrase>
+    <source>palette window</source>
+    <target>Palettenfenster</target>
+</phrase>
+<phrase>
+    <source>pane</source>
+    <target>Fensterbereich</target>
+</phrase>
+<phrase>
+    <source>parent window</source>
+    <target>Übergeordnetes Fenster</target>
+</phrase>
+<phrase>
+    <source>password</source>
+    <target>Kennwort</target>
+</phrase>
+<phrase>
+    <source>Paste</source>
+    <target>Einfügen</target>
+</phrase>
+<phrase>
+    <source>Paste Link</source>
+    <target>Verknüpfung einfügen</target>
+</phrase>
+<phrase>
+    <source>Paste Shortcut</source>
+    <target>Verknüpfung einfügen</target>
+</phrase>
+<phrase>
+    <source>Paste Special</source>
+    <target>Inhalte einfügen</target>
+</phrase>
+<phrase>
+    <source>path</source>
+    <target>Pfad</target>
+</phrase>
+<phrase>
+    <source>Pause</source>
+    <target>Anhalten</target>
+</phrase>
+<phrase>
+    <source>pen</source>
+    <target>Pen</target>
+</phrase>
+<phrase>
+    <source>Play</source>
+    <target>Wiedergeben</target>
+</phrase>
+<phrase>
+    <source>Plug and Play</source>
+    <target>Plug &amp; Play</target>
+</phrase>
+<phrase>
+    <source>point</source>
+    <target>Zeigen</target>
+</phrase>
+<phrase>
+    <source>pointer</source>
+    <target>Zeiger</target>
+</phrase>
+<phrase>
+    <source>pop-up menu</source>
+    <target>Kontextmenü</target>
+</phrase>
+<phrase>
+    <source>pop-up window</source>
+    <target>Popup-Fenster</target>
+</phrase>
+<phrase>
+    <source>portrait</source>
+    <target>Hochformat</target>
+</phrase>
+<phrase>
+    <source>press</source>
+    <target>Drücken</target>
+    <definition>and hold a mouse button/und Halten einer Maustaste</definition>
+</phrase>
+<phrase>
+    <source>press</source>
+    <target>Drücken</target>
+    <definition>a key/einer Taste</definition>
+</phrase>
+<phrase>
+    <source>primary container</source>
+    <target>Primär-Container</target>
+</phrase>
+<phrase>
+    <source>primary window</source>
+    <target>Primärfenster</target>
+</phrase>
+<phrase>
+    <source>Print</source>
+    <target>Drucken</target>
+</phrase>
+<phrase>
+    <source>printer</source>
+    <target>Drucker</target>
+</phrase>
+<phrase>
+    <source>progress indicator</source>
+    <target>Statusanzeige</target>
+    <definition>control</definition>
+</phrase>
+<phrase>
+    <source>project</source>
+    <target>Projekt</target>
+</phrase>
+<phrase>
+    <source>Properties</source>
+    <target>Eigenschaften</target>
+</phrase>
+<phrase>
+    <source>property inspector</source>
+    <target>Eigenschaftenanzeige</target>
+</phrase>
+<phrase>
+    <source>property page</source>
+    <target>Eigenschaftengruppe</target>
+</phrase>
+<phrase>
+    <source>property sheet</source>
+    <target>Eigenschaftenfenster</target>
+</phrase>
+<phrase>
+    <source>property sheet control</source>
+    <target>Eigenschaftenfenster-Steuerelement</target>
+</phrase>
+<phrase>
+    <source>Quick View</source>
+    <target>Schnellansicht</target>
+</phrase>
+<phrase>
+    <source>read-only</source>
+    <target>Schreibgeschützt</target>
+</phrase>
+<phrase>
+    <source>recognition</source>
+    <target>Schrifterkennung</target>
+</phrase>
+<phrase>
+    <source>Recycle Bin</source>
+    <target>Papierkorb</target>
+    <definition>Icon/Symbol</definition>
+</phrase>
+<phrase>
+    <source>Redo</source>
+    <target>Wiederherstellen</target>
+</phrase>
+<phrase>
+    <source>region selection</source>
+    <target>Bereichsauswahl</target>
+</phrase>
+<phrase>
+    <source>registry</source>
+    <target>Registrierung</target>
+</phrase>
+<phrase>
+    <source>Repeat</source>
+    <target>Wiederholen</target>
+</phrase>
+<phrase>
+    <source>Replace</source>
+    <target>Ersetzen</target>
+</phrase>
+<phrase>
+    <source>Restore</source>
+    <target>Wiederherstellen</target>
+</phrase>
+<phrase>
+    <source>Restore button</source>
+    <target>Wiederherstellen </target>
+    <definition>Schaltfläche</definition>
+</phrase>
+<phrase>
+    <source>Resume</source>
+    <target>Fortsetzen</target>
+</phrase>
+<phrase>
+    <source>Retry</source>
+    <target>Wiederholen</target>
+</phrase>
+<phrase>
+    <source>rich-text box</source>
+    <target>RTF-Textfeld</target>
+</phrase>
+<phrase>
+    <source>Run</source>
+    <target>Ausführen</target>
+</phrase>
+<phrase>
+    <source>Save</source>
+    <target>Speichern</target>
+</phrase>
+<phrase>
+    <source>Save as</source>
+    <target>Speichern unter</target>
+</phrase>
+<phrase>
+    <source>scroll</source>
+    <target>Bildlauf durchführen</target>
+</phrase>
+<phrase>
+    <source>scroll arrow</source>
+    <target>Bildlaufpfeil</target>
+</phrase>
+<phrase>
+    <source>scroll bar</source>
+    <target>Bildlaufleiste</target>
+</phrase>
+<phrase>
+    <source>scroll box</source>
+    <target>Bildlauffeld</target>
+</phrase>
+<phrase>
+    <source>secondary window</source>
+    <target>Sekundärfenster</target>
+</phrase>
+<phrase>
+    <source>select</source>
+    <target>Auswählen</target>
+</phrase>
+<phrase>
+    <source>Select All</source>
+    <target>Alle markieren</target>
+</phrase>
+<phrase>
+    <source>selection</source>
+    <target>Auswahl</target>
+</phrase>
+<phrase>
+    <source>selection handle</source>
+    <target>Auswahlpunkt</target>
+</phrase>
+<phrase>
+    <source>Send To</source>
+    <target>Senden an</target>
+</phrase>
+<phrase>
+    <source>separator</source>
+    <target>Trennelement</target>
+</phrase>
+<phrase>
+    <source>Settings</source>
+    <target>Einstellungen</target>
+</phrase>
+<phrase>
+    <source>Setup</source>
+    <target>Einrichten</target>
+</phrase>
+<phrase>
+    <source>shortcut</source>
+    <target>Verknüpfung</target>
+</phrase>
+<phrase>
+    <source>shortcut button</source>
+    <target>Verknüpfte Schaltfläche</target>
+</phrase>
+<phrase>
+    <source>shortcut icon</source>
+    <target>Verknüpfungssymbol</target>
+</phrase>
+<phrase>
+    <source>shortcut key</source>
+    <target>Tastenkombination</target>
+</phrase>
+<phrase>
+    <source>shortcut key control</source>
+    <target>Steuerelement für Tastenbelegung</target>
+</phrase>
+<phrase>
+    <source>Show</source>
+    <target>Anzeigen</target>
+</phrase>
+<phrase>
+    <source>Shutdown</source>
+    <target>Beenden</target>
+</phrase>
+<phrase>
+    <source>single selection list box</source>
+    <target>Listenfeld für Einfachauswahl</target>
+</phrase>
+<phrase>
+    <source>Size</source>
+    <target>Größe ändern</target>
+</phrase>
+<phrase>
+    <source>size grip</source>
+    <target>Element für Größenänderung</target>
+</phrase>
+<phrase>
+    <source>slider</source>
+    <target>Schieber</target>
+</phrase>
+<phrase>
+    <source>spin box</source>
+    <target>Drehfeld</target>
+</phrase>
+<phrase>
+    <source>Split</source>
+    <target>Teilen</target>
+</phrase>
+<phrase>
+    <source>split bar</source>
+    <target>Fensterteiler</target>
+</phrase>
+<phrase>
+    <source>split box</source>
+    <target>Teilungsfeld</target>
+</phrase>
+<phrase>
+    <source>Start button</source>
+    <target>Start</target>
+    <definition>Schaltfläche</definition>
+</phrase>
+<phrase>
+    <source>StartUp folder</source>
+    <target>Autostart</target>
+    <definition>Ordner</definition>
+</phrase>
+<phrase>
+    <source>status bar</source>
+    <target>Statusleiste</target>
+</phrase>
+<phrase>
+    <source>Stop</source>
+    <target>Beenden</target>
+</phrase>
+<phrase>
+    <source>tab control</source>
+    <target>Register</target>
+</phrase>
+<phrase>
+    <source>tap</source>
+    <target>Tippen</target>
+</phrase>
+<phrase>
+    <source>task bar</source>
+    <target>Task-Leiste</target>
+</phrase>
+<phrase>
+    <source>task-oriented Help</source>
+    <target>Vorgangsbezogene Hilfe</target>
+</phrase>
+<phrase>
+    <source>template</source>
+    <target>Vorlage</target>
+</phrase>
+<phrase>
+    <source>text box</source>
+    <target>Textfeld</target>
+</phrase>
+<phrase>
+    <source>title bar</source>
+    <target>Titelleiste</target>
+</phrase>
+<phrase>
+    <source>title text</source>
+    <target>Titeltext</target>
+</phrase>
+<phrase>
+    <source>toggle key</source>
+    <target>Ein-/Aus-Taste</target>
+</phrase>
+<phrase>
+    <source>toolbar</source>
+    <target>Symbolleiste</target>
+</phrase>
+<phrase>
+    <source>tooltip</source>
+    <target>QuickInfo</target>
+</phrase>
+<phrase>
+    <source>tree view control</source>
+    <target>Strukturansicht</target>
+</phrase>
+<phrase>
+    <source>type</source>
+    <target>Eingeben</target>
+    <definition>verb</definition>
+</phrase>
+<phrase>
+    <source>type</source>
+    <target>Typ</target>
+    <definition>noun</definition>
+</phrase>
+<phrase>
+    <source>unavailable</source>
+    <target>Nicht verfügbar</target>
+</phrase>
+<phrase>
+    <source>Undo</source>
+    <target>Rückgängig</target>
+</phrase>
+<phrase>
+    <source>Uninstall</source>
+    <target>Deinstallieren</target>
+</phrase>
+<phrase>
+    <source>View</source>
+    <target>Ansicht</target>
+    <definition>Menü</definition>
+</phrase>
+<phrase>
+    <source>visual editing</source>
+    <target>Direkte Bearbeitung</target>
+</phrase>
+<phrase>
+    <source>well control</source>
+    <target>Steuerelement zur Grafikanzeige</target>
+</phrase>
+<phrase>
+    <source>What&apos;s This?</source>
+    <target>Direkthilfe</target>
+</phrase>
+<phrase>
+    <source>Window</source>
+    <target>Fenster</target>
+    <definition>Menü</definition>
+</phrase>
+<phrase>
+    <source>window</source>
+    <target>Fenster</target>
+</phrase>
+<phrase>
+    <source>Windows Explorer</source>
+    <target>Explorer</target>
+</phrase>
+<phrase>
+    <source>wizard</source>
+    <target>Assistent</target>
+</phrase>
+<phrase>
+    <source>workbook</source>
+    <target>Arbeitsmappe</target>
+</phrase>
+<phrase>
+    <source>workgroup</source>
+    <target>Arbeitsgruppe</target>
+</phrase>
+<phrase>
+    <source>workspace</source>
+    <target>Arbeitsbereich</target>
+</phrase>
+<phrase>
+    <source>Yes</source>
+    <target>Ja</target>
+</phrase>
+</QPH>

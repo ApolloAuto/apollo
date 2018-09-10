@@ -1,0 +1,20 @@
+cmake_minimum_required(VERSION 2.8.3)
+project(benchmark_transport)
+
+add_executable(intra intra.cpp)
+target_link_libraries(intra cybertron)
+install(TARGETS intra DESTINATION bin)
+
+add_executable(interprocess_lower_reach interprocess_lower_reach.cpp)
+target_link_libraries(interprocess_lower_reach cybertron)
+install(TARGETS interprocess_lower_reach DESTINATION bin)
+
+add_executable(interprocess_upper_reach interprocess_upper_reach.cpp)
+target_link_libraries(interprocess_upper_reach cybertron)
+install(TARGETS interprocess_upper_reach DESTINATION bin)
+
+add_executable(likelihood_of_equal_id likelihood_of_equal_id.cpp)
+target_link_libraries(likelihood_of_equal_id cybertron)
+
+add_executable(perf_history perf_history.cpp)
+target_link_libraries(perf_history cybertron)

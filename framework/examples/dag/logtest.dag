@@ -1,0 +1,13 @@
+# Define all coms in DAG streaming.
+
+module_config {
+    module_library : "lib/liblog_component.so"
+    timer_components {
+        class_name : "LogComponent"
+        config {
+            name : "logtest"
+            interval:1000
+        }
+    }
+}
+

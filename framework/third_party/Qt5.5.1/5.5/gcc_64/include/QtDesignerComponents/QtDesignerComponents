@@ -1,0 +1,5 @@
+#ifndef QT_QTDESIGNERCOMPONENTS_MODULE_H
+#define QT_QTDESIGNERCOMPONENTS_MODULE_H
+#include <QtDesignerComponents/QtDesignerComponentsDepends>
+#include "qtdesignercomponentsversion.h"
+#endif

@@ -1,0 +1,33 @@
+syntax = "proto2";
+
+package adu.common;
+
+import "header.proto"; 
+import "common_geometry.proto"; 
+
+message Pose {
+    required Point3D position = 1;
+    required Quaternion orientation = 2;
+}
+
+message Twist {
+    required Vector3 linear = 1;
+    required Vector3 angular = 2;
+}
+
+message PoseWithCovariance {
+    required Pose pose = 1;
+    repeated double covariance = 2;
+}
+
+message TwistWithCovariance {
+    required Twist twist = 1;
+    repeated double covariance = 2;
+}
+
+message Odometry {
+    optional adu.common.header.Header header = 1;
+    required string child_frame_id = 2;
+    required PoseWithCovariance pose = 3;
+    required TwistWithCovariance twist = 4;
+}

@@ -1,0 +1,15 @@
+prefix=/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64
+exec_prefix=${prefix}
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+host_bins=${prefix}/bin
+qt_config=minimal-config small-config medium-config large-config full-config build_all debug_and_release gtk2 gtkstyle fontconfig evdev xlib xrender xcb-plugin xcb-qt xcb-xlib xcb-sm xkbcommon-qt accessibility-atspi-bridge linuxfb c++11 accessibility opengl shared qpa reduce_exports reduce_relocations clock-gettime clock-monotonic posix_fallocate mremap getaddrinfo ipv6ifname getifaddrs inotify eventfd png system-freetype harfbuzz zlib nis cups iconv glib dbus openssl xcb xinput2 rpath alsa pulseaudio gstreamer-0.10 icu concurrent audio-backend debug release
+
+Name: Qt5 Core
+Description: Qt Core module
+Version: 5.5.1
+Libs: -L${libdir} -lQt5Core 
+Libs.private: -lpthread -licui18n -licuuc -licudata -L/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib -lqtpcre -lm -ldl -L/usr/lib64 -lgthread-2.0 -pthread -lrt -lglib-2.0  
+Cflags: -I${includedir}/QtCore -I${includedir}
+

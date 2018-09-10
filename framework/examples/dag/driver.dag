@@ -1,0 +1,23 @@
+module_config {
+    module_library : "lib/libdriver_component.so"
+    timer_components {
+        class_name : "DriverComponent"
+        config {
+            name: "driver"
+            interval : 100
+        }
+    }
+}
+
+module_config {
+    module_library : "lib/libwatchdog_component.so"
+    components {
+        class_name : "WatchdogComponent"
+        config {
+            name : "ham sausage"
+            readers {
+                channel: "/food"
+            }
+        }
+    }
+}

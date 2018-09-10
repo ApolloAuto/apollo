@@ -1,0 +1,8 @@
+syntax = "proto2";
+
+package apollo.cybertron.proto;
+
+message ProtoDesc {
+    required bytes desc = 1;
+    repeated ProtoDesc dependencies = 2;
+}

@@ -1,0 +1,9 @@
+QT.concurrent_private.VERSION = 5.5.1
+QT.concurrent_private.MAJOR_VERSION = 5
+QT.concurrent_private.MINOR_VERSION = 5
+QT.concurrent_private.PATCH_VERSION = 1
+QT.concurrent_private.name = QtConcurrent
+QT.concurrent_private.libs = $$QT_MODULE_LIB_BASE
+QT.concurrent_private.includes = $$QT_MODULE_INCLUDE_BASE/QtConcurrent/5.5.1 $$QT_MODULE_INCLUDE_BASE/QtConcurrent/5.5.1/QtConcurrent
+QT.concurrent_private.depends = concurrent
+QT.concurrent_private.module_config = internal_module no_link

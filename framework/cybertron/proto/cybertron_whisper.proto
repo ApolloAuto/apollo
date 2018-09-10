@@ -1,0 +1,31 @@
+syntax = "proto2";
+
+package apollo.cybertron.proto;
+
+import "header.proto"; 
+
+message CybertronWhisper {
+    optional adu.common.header.Header cyber_header = 1; 
+    optional uint64 seq = 2;
+    optional int32  length = 3;
+    optional int32  position = 4;
+    optional bytes content = 5;
+    optional bytes telling_name = 6;
+    optional bytes channel_name = 7;
+}
+
+message CybertronWhisperConfig {
+    optional bytes name = 1;
+    optional int64 length = 2;
+    optional int64 length_interval = 3;
+    optional int64 length_step = 4;
+    optional int64 start_wait_sec = 5;
+    optional int64 end_wait_sec = 6;
+    optional int64 usleep_time = 7;
+    optional int64 usleep_interval = 8;
+    optional int64 usleep_step = 9;
+    optional int64 num_messages = 10;
+    repeated bytes out_channel_names = 11;
+    repeated bytes in_channel_names = 12;
+}
+

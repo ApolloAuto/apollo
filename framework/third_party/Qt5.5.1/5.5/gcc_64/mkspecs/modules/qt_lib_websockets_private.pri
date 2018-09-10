@@ -1,0 +1,9 @@
+QT.websockets_private.VERSION = 5.5.1
+QT.websockets_private.MAJOR_VERSION = 5
+QT.websockets_private.MINOR_VERSION = 5
+QT.websockets_private.PATCH_VERSION = 1
+QT.websockets_private.name = QtWebSockets
+QT.websockets_private.libs = $$QT_MODULE_LIB_BASE
+QT.websockets_private.includes = $$QT_MODULE_INCLUDE_BASE/QtWebSockets/5.5.1 $$QT_MODULE_INCLUDE_BASE/QtWebSockets/5.5.1/QtWebSockets
+QT.websockets_private.depends = websockets
+QT.websockets_private.module_config = internal_module no_link

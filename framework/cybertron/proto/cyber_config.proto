@@ -1,0 +1,19 @@
+syntax = "proto2";
+
+package apollo.cybertron.proto;
+
+import "routine_conf.proto";
+import "scheduler_conf.proto";
+import "transport_conf.proto";
+import "log_conf.proto";
+import "data_visitor_conf.proto";
+import "perf_conf.proto";
+
+message CyberConfig {
+    optional LogConf log_conf = 1;
+    optional RoutineConf routine_conf = 2;
+    optional SchedulerConf scheduler_conf = 3;
+    optional TransportConf transport_conf = 4;
+    optional DataVisitorConf data_visitor_conf = 5;
+    optional PerfConf perf_conf = 6;
+}

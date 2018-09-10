@@ -1,0 +1,1033 @@
+<!DOCTYPE QPH><QPH language="fi">
+<phrase>
+    <source>About</source>
+    <target>Tietoja</target>
+</phrase>
+<phrase>
+    <source>access key</source>
+    <target>valintanäppäin</target>
+</phrase>
+<phrase>
+    <source>accessibility</source>
+    <target>helppokäyttötoiminto</target>
+</phrase>
+<phrase>
+    <source>action handle</source>
+    <target>toimintokahva</target>
+</phrase>
+<phrase>
+    <source>active</source>
+    <target>aktiivinen</target>
+</phrase>
+<phrase>
+    <source>active end</source>
+    <target>valinnan aktiivinen päätöskohta</target>
+</phrase>
+<phrase>
+    <source>active object</source>
+    <target>aktiivinen objekti</target>
+</phrase>
+<phrase>
+    <source>active window</source>
+    <target>aktiivinen ikkuna</target>
+</phrase>
+<phrase>
+    <source>adornment</source>
+    <target>graafinen lisäke</target>
+</phrase>
+<phrase>
+    <source>Always on Top</source>
+    <target>Aina päällimmäisenä</target>
+</phrase>
+<phrase>
+    <source>anchor point</source>
+    <target>ankkurikohta</target>
+</phrase>
+<phrase>
+    <source>Apply</source>
+    <target>Käytä</target>
+</phrase>
+<phrase>
+    <source>auto-exit</source>
+    <target>automaattinen siirtyminen</target>
+</phrase>
+<phrase>
+    <source>auto-repeat</source>
+    <target>automaattinen toisto</target>
+</phrase>
+<phrase>
+    <source>automatic link</source>
+    <target>automaattinen linkki</target>
+</phrase>
+<phrase>
+    <source>automatic scrolling</source>
+    <target>automaattinen vieritys</target>
+</phrase>
+<phrase>
+    <source>autoscroll</source>
+    <target>automaattinen vieritys</target>
+</phrase>
+<phrase>
+    <source>Back</source>
+    <target>Takaisin</target>
+</phrase>
+<phrase>
+    <source>Browse</source>
+    <target>Selaa</target>
+</phrase>
+<phrase>
+    <source>Cancel</source>
+    <target>Peruuta</target>
+</phrase>
+<phrase>
+    <source>cascading menu</source>
+    <target>alivalikko</target>
+</phrase>
+<phrase>
+    <source>check box</source>
+    <target>valintaruutu</target>
+</phrase>
+<phrase>
+    <source>check mark</source>
+    <target>valintamerkki</target>
+</phrase>
+<phrase>
+    <source>child window</source>
+    <target>ali-ikkuna</target>
+</phrase>
+<phrase>
+    <source>choose</source>
+    <target>valita</target>
+</phrase>
+<phrase>
+    <source>click</source>
+    <target>napsautta</target>
+</phrase>
+<phrase>
+    <source>Clipboard</source>
+    <target>Leikepöytä</target>
+</phrase>
+<phrase>
+    <source>Close</source>
+    <target>Sulje</target>
+</phrase>
+<phrase>
+    <source>Close button</source>
+    <target>sulkemispainike</target>
+</phrase>
+<phrase>
+    <source>collapse</source>
+    <target>tiivistää</target>
+    <definition>outline/jäsennys</definition>
+</phrase>
+<phrase>
+    <source>collapse</source>
+    <target>kutistaa</target>
+    <definition>outline/jäsennys</definition>
+</phrase>
+<phrase>
+    <source>column heading</source>
+    <target>saraketunnus</target>
+    <definition>control/ohjausobjekti</definition>
+</phrase>
+<phrase>
+    <source>column heading</source>
+    <target>sarakeotsikko</target>
+    <definition>control/ohjausobjekti</definition>
+</phrase>
+<phrase>
+    <source>combo box</source>
+    <target>yhdistelmäruutu</target>
+</phrase>
+<phrase>
+    <source>command button</source>
+    <target>painike</target>
+</phrase>
+<phrase>
+    <source>command button</source>
+    <target>komento painike</target>
+</phrase>
+<phrase>
+    <source>container</source>
+    <target>säilö</target>
+</phrase>
+<phrase>
+    <source>context-sensitive Help</source>
+    <target>tilannekohtainen ohje</target>
+</phrase>
+<phrase>
+    <source>contextual</source>
+    <target>tilannekohtainen</target>
+</phrase>
+<phrase>
+    <source>control</source>
+    <target>ohjausobjekti</target>
+</phrase>
+<phrase>
+    <source>Copy</source>
+    <target>Kopioi</target>
+</phrase>
+<phrase>
+    <source>Copy here</source>
+    <target>Kopioi tähän</target>
+</phrase>
+<phrase>
+    <source>Create Shortcut</source>
+    <target>Luo pikakuvake</target>
+</phrase>
+<phrase>
+    <source>Create Shortcut Here</source>
+    <target>Luo pikakuvake tähän</target>
+</phrase>
+<phrase>
+    <source>Cut</source>
+    <target>Leikkaa</target>
+</phrase>
+<phrase>
+    <source>default</source>
+    <target>oletus</target>
+</phrase>
+<phrase>
+    <source>default button</source>
+    <target>oletuspainike</target>
+</phrase>
+<phrase>
+    <source>Delete</source>
+    <target>Poista</target>
+</phrase>
+<phrase>
+    <source>desktop</source>
+    <target>työpöytä</target>
+</phrase>
+<phrase>
+    <source>destination</source>
+    <target>kohde</target>
+</phrase>
+<phrase>
+    <source>dialog box</source>
+    <target>valintaikkuna</target>
+</phrase>
+<phrase>
+    <source>disability</source>
+    <target>invaliditeetti</target>
+</phrase>
+<phrase>
+    <source>disjoint selection</source>
+    <target>hajavalinta</target>
+</phrase>
+<phrase>
+    <source>dock</source>
+    <target>telakoida</target>
+</phrase>
+<phrase>
+    <source>document</source>
+    <target>tiedosto</target>
+</phrase>
+<phrase>
+    <source>document</source>
+    <target>asiakirja</target>
+</phrase>
+<phrase>
+    <source>double-click</source>
+    <target>kaksoisnapsauttaa</target>
+</phrase>
+<phrase>
+    <source>drag</source>
+    <target>vetää</target>
+</phrase>
+<phrase>
+    <source>drag-and-drop</source>
+    <target>vetää ja pudottaa</target>
+</phrase>
+<phrase>
+    <source>drop-down combo box</source>
+    <target>avattava yhdistelmäruutu</target>
+</phrase>
+<phrase>
+    <source>drop-down list box</source>
+    <target>avattava luetteloruutu</target>
+</phrase>
+<phrase>
+    <source>drop-down menu</source>
+    <target>avattava valikko</target>
+</phrase>
+<phrase>
+    <source>Edit</source>
+    <target>Muokkaa</target>
+</phrase>
+<phrase>
+    <source>Edit menu</source>
+    <target>Muokkaa-valikko</target>
+</phrase>
+<phrase>
+    <source>ellipsis</source>
+    <target>kolme pistettä</target>
+</phrase>
+<phrase>
+    <source>embedded object</source>
+    <target>upotettu objekti</target>
+</phrase>
+<phrase>
+    <source>Exit</source>
+    <target>Lopeta</target>
+</phrase>
+<phrase>
+    <source>expand</source>
+    <target>laajentaa</target>
+    <definition>an outline/jäsennys</definition>
+</phrase>
+<phrase>
+    <source>Explore</source>
+    <target>Selaa</target>
+</phrase>
+<phrase>
+    <source>extended selection</source>
+    <target>laajennettu valinta</target>
+</phrase>
+<phrase>
+    <source>extended selection list box</source>
+    <target>laajennettu valinta-luetteloruutu</target>
+</phrase>
+<phrase>
+    <source>file</source>
+    <target>tiedosto</target>
+</phrase>
+<phrase>
+    <source>File menu</source>
+    <target>Tiedosto-valikko</target>
+</phrase>
+<phrase>
+    <source>Find</source>
+    <target>Etsi</target>
+</phrase>
+<phrase>
+    <source>Find Next</source>
+    <target>Etsi seuraava</target>
+</phrase>
+<phrase>
+    <source>Find What</source>
+    <target>Etsittävä</target>
+</phrase>
+<phrase>
+    <source>folder</source>
+    <target>kansio</target>
+</phrase>
+<phrase>
+    <source>font</source>
+    <target>fontti</target>
+</phrase>
+<phrase>
+    <source>font size</source>
+    <target>fonttikoko</target>
+</phrase>
+<phrase>
+    <source>font style</source>
+    <target>fonttityyli</target>
+</phrase>
+<phrase>
+    <source>function key</source>
+    <target>funktionäppäin</target>
+</phrase>
+<phrase>
+    <source>group box</source>
+    <target>ryhmän kehys</target>
+</phrase>
+<phrase>
+    <source>handle</source>
+    <target>kahva</target>
+</phrase>
+<phrase>
+    <source>Help</source>
+    <target>Ohje</target>
+</phrase>
+<phrase>
+    <source>Help menu</source>
+    <target>Ohje-valikko</target>
+</phrase>
+<phrase>
+    <source>Hide</source>
+    <target>Piilota</target>
+</phrase>
+<phrase>
+    <source>hierarchical selection</source>
+    <target>hierarkkinen valinta</target>
+</phrase>
+<phrase>
+    <source>hold</source>
+    <target>pitää painettuna</target>
+</phrase>
+<phrase>
+    <source>hot spot</source>
+    <target>kohdepiste</target>
+</phrase>
+<phrase>
+    <source>hot zone</source>
+    <target>kohdealue</target>
+</phrase>
+<phrase>
+    <source>icon</source>
+    <target>kuvake</target>
+</phrase>
+<phrase>
+    <source>inactive</source>
+    <target>passiivinen</target>
+</phrase>
+<phrase>
+    <source>inactive window</source>
+    <target>passiivinen ikkuna</target>
+</phrase>
+<phrase>
+    <source>input focus</source>
+    <target>syöttöalue</target>
+</phrase>
+<phrase>
+    <source>Insert</source>
+    <target>Lisää-valikko</target>
+</phrase>
+<phrase>
+    <source>Insert Object</source>
+    <target>Lisää objekti</target>
+</phrase>
+<phrase>
+    <source>insertion point</source>
+    <target>lisäyskohta</target>
+</phrase>
+<phrase>
+    <source>italic</source>
+    <target>kursivoitu</target>
+</phrase>
+<phrase>
+    <source>label</source>
+    <target>otsikko</target>
+</phrase>
+<phrase>
+    <source>label</source>
+    <target>nimi</target>
+</phrase>
+<phrase>
+    <source>landscape</source>
+    <target>vaaka</target>
+</phrase>
+<phrase>
+    <source>link</source>
+    <target>linkki</target>
+    <definition>noun</definition>
+</phrase>
+<phrase>
+    <source>link</source>
+    <target>linkittää</target>
+    <definition>verb</definition>
+</phrase>
+<phrase>
+    <source>Link Here</source>
+    <target>Linkitä tähän</target>
+</phrase>
+<phrase>
+    <source>list box</source>
+    <target>luetteloruutu</target>
+</phrase>
+<phrase>
+    <source>list view</source>
+    <target>luettelonäyttö</target>
+    <definition>control/ohjausobjekti</definition>
+</phrase>
+<phrase>
+    <source>manual link</source>
+    <target>manuaalinen linkki</target>
+</phrase>
+<phrase>
+    <source>Maximize</source>
+    <target>Suurenna</target>
+</phrase>
+<phrase>
+    <source>maximize button</source>
+    <target>suurennuspainike</target>
+</phrase>
+<phrase>
+    <source>MDI</source>
+    <target>MDI</target>
+</phrase>
+<phrase>
+    <source>menu</source>
+    <target>valikko</target>
+</phrase>
+<phrase>
+    <source>menu bar</source>
+    <target>valikkorivi</target>
+</phrase>
+<phrase>
+    <source>menu button</source>
+    <target>valikkopainike</target>
+</phrase>
+<phrase>
+    <source>menu item</source>
+    <target>valikon vaihtoehto</target>
+</phrase>
+<phrase>
+    <source>menu title</source>
+    <target>valikon otsikko</target>
+</phrase>
+<phrase>
+    <source>message box</source>
+    <target>sanomaruutu</target>
+</phrase>
+<phrase>
+    <source>Minimize</source>
+    <target>Pienennä</target>
+</phrase>
+<phrase>
+    <source>minimize button</source>
+    <target>pienennyspainike</target>
+</phrase>
+<phrase>
+    <source>mixed-value</source>
+    <target>monitila</target>
+</phrase>
+<phrase>
+    <source>modal</source>
+    <target>modaalinen</target>
+</phrase>
+<phrase>
+    <source>mode</source>
+    <target>tila</target>
+</phrase>
+<phrase>
+    <source>modeless</source>
+    <target>ei-modaalinen</target>
+</phrase>
+<phrase>
+    <source>modifier key</source>
+    <target>yhdistelmänäppäin</target>
+</phrase>
+<phrase>
+    <source>mouse</source>
+    <target>hiiri</target>
+</phrase>
+<phrase>
+    <source>Move</source>
+    <target>Siirrä</target>
+</phrase>
+<phrase>
+    <source>Move Here</source>
+    <target>Siirrä tähän</target>
+</phrase>
+<phrase>
+    <source>Multiple Document Interface</source>
+    <target>MDI-liittymä</target>
+</phrase>
+<phrase>
+    <source>multiple selection list box</source>
+    <target>monivalintainen luetteloruutu</target>
+</phrase>
+<phrase>
+    <source>My Computer</source>
+    <target>Oma tietokone</target>
+    <definition>icon/kuvake</definition>
+</phrase>
+<phrase>
+    <source>Network Neighborhood</source>
+    <target>Verkkoympäristö</target>
+    <definition>icon/kuvake</definition>
+</phrase>
+<phrase>
+    <source>New</source>
+    <target>Uusi</target>
+</phrase>
+<phrase>
+    <source>Next</source>
+    <target>Seuraava</target>
+</phrase>
+<phrase>
+    <source>object</source>
+    <target>objekti</target>
+</phrase>
+<phrase>
+    <source>OK</source>
+    <target>OK</target>
+</phrase>
+<phrase>
+    <source>OLE</source>
+    <target>OLE</target>
+</phrase>
+<phrase>
+    <source>OLE drag and drop</source>
+    <target>vedä ja pudota-OLE-toiminto</target>
+</phrase>
+<phrase>
+    <source>OLE embedded object</source>
+    <target>upotettu OLE-objekti</target>
+</phrase>
+<phrase>
+    <source>OLE linked object</source>
+    <target>linkitetty OLE-objekti</target>
+</phrase>
+<phrase>
+    <source>OLE nondefault drag and drop</source>
+    <target>käyttäjän määrittämä vedä ja pudota-OLE-toiminto</target>
+</phrase>
+<phrase>
+    <source>Open</source>
+    <target>Avaa</target>
+</phrase>
+<phrase>
+    <source>Open With</source>
+    <target>Avaa sovelluksessa</target>
+</phrase>
+<phrase>
+    <source>option button</source>
+    <target>valintanappi</target>
+</phrase>
+<phrase>
+    <source>option-set</source>
+    <target>valitsimen tila</target>
+</phrase>
+<phrase>
+    <source>package</source>
+    <target>pakkaus</target>
+</phrase>
+<phrase>
+    <source>Page Setup</source>
+    <target>Sivun asetukset</target>
+</phrase>
+<phrase>
+    <source>palette window</source>
+    <target>valikoimaikkuna</target>
+</phrase>
+<phrase>
+    <source>pane</source>
+    <target>ruutu</target>
+</phrase>
+<phrase>
+    <source>parent window</source>
+    <target>ylemmän tason ikkuna</target>
+</phrase>
+<phrase>
+    <source>password</source>
+    <target>salasana</target>
+</phrase>
+<phrase>
+    <source>Paste</source>
+    <target>Liitä</target>
+</phrase>
+<phrase>
+    <source>Paste Link</source>
+    <target>Liitä linkki</target>
+</phrase>
+<phrase>
+    <source>Paste Shortcut</source>
+    <target>Liitä pikakuvake</target>
+</phrase>
+<phrase>
+    <source>Paste Special</source>
+    <target>Liitä määräten</target>
+</phrase>
+<phrase>
+    <source>path</source>
+    <target>polku</target>
+</phrase>
+<phrase>
+    <source>Pause</source>
+    <target>Tauko</target>
+</phrase>
+<phrase>
+    <source>Play</source>
+    <target>Soita</target>
+</phrase>
+<phrase>
+    <source>Plug and Play</source>
+    <target>Plug and Play</target>
+</phrase>
+<phrase>
+    <source>point</source>
+    <target>piste</target>
+</phrase>
+<phrase>
+    <source>point</source>
+    <target>osoittaa</target>
+</phrase>
+<phrase>
+    <source>pointer</source>
+    <target>osoitin</target>
+</phrase>
+<phrase>
+    <source>pop-up menu</source>
+    <target>pikavalikko</target>
+</phrase>
+<phrase>
+    <source>pop-up window</source>
+    <target>ponnahdusikkuna</target>
+</phrase>
+<phrase>
+    <source>portrait</source>
+    <target>pysty</target>
+</phrase>
+<phrase>
+    <source>press</source>
+    <target>painaa</target>
+    <definition>and hold a mouse button/ja pitää painettuna hiiripainiketta</definition>
+</phrase>
+<phrase>
+    <source>press</source>
+    <target>painaa</target>
+    <definition>a key/näppäintä</definition>
+</phrase>
+<phrase>
+    <source>primary container</source>
+    <target>ensisijainen säilö</target>
+</phrase>
+<phrase>
+    <source>primary window</source>
+    <target>ensisijainen ikkuna</target>
+</phrase>
+<phrase>
+    <source>Print</source>
+    <target>Tulosta</target>
+</phrase>
+<phrase>
+    <source>printer</source>
+    <target>kirjoitin</target>
+</phrase>
+<phrase>
+    <source>progress indicator</source>
+    <target>tilanneilmaisin</target>
+    <definition>control/ohjausobjekti</definition>
+</phrase>
+<phrase>
+    <source>project</source>
+    <target>projekti</target>
+</phrase>
+<phrase>
+    <source>Properties</source>
+    <target>Ominaisuudet</target>
+</phrase>
+<phrase>
+    <source>property inspector</source>
+    <target>ominaisuuksien tarkastelu</target>
+</phrase>
+<phrase>
+    <source>property page</source>
+    <target>ominaisuusryhmä</target>
+</phrase>
+<phrase>
+    <source>property sheet</source>
+    <target>ominaisuusikkuna</target>
+</phrase>
+<phrase>
+    <source>property sheet control</source>
+    <target>ominaisuusikkuna-ohjausobjekti</target>
+</phrase>
+<phrase>
+    <source>Quick View</source>
+    <target>Pikanäyttö</target>
+</phrase>
+<phrase>
+    <source>read-only</source>
+    <target>vain luku</target>
+</phrase>
+<phrase>
+    <source>Recycle Bin</source>
+    <target>Roskakori</target>
+    <definition>Icon/kuvake</definition>
+</phrase>
+<phrase>
+    <source>Redo</source>
+    <target>Tee uudelleen</target>
+</phrase>
+<phrase>
+    <source>region selection</source>
+    <target>aluevalinta</target>
+</phrase>
+<phrase>
+    <source>registry</source>
+    <target>rekisteri</target>
+</phrase>
+<phrase>
+    <source>Repeat</source>
+    <target>Toista</target>
+</phrase>
+<phrase>
+    <source>Replace</source>
+    <target>Korvaa</target>
+</phrase>
+<phrase>
+    <source>Restore</source>
+    <target>Palauta</target>
+</phrase>
+<phrase>
+    <source>Restore button</source>
+    <target>palautuspainike</target>
+</phrase>
+<phrase>
+    <source>Resume</source>
+    <target>Jatka</target>
+</phrase>
+<phrase>
+    <source>Retry</source>
+    <target>Yritä uudelleen</target>
+</phrase>
+<phrase>
+    <source>rich-text box</source>
+    <target>monimuotoruutu</target>
+</phrase>
+<phrase>
+    <source>Run</source>
+    <target>Suorita</target>
+</phrase>
+<phrase>
+    <source>Save</source>
+    <target>Tallenna</target>
+</phrase>
+<phrase>
+    <source>Save as</source>
+    <target>Tallenna nimellä</target>
+</phrase>
+<phrase>
+    <source>scroll</source>
+    <target>vierittää</target>
+</phrase>
+<phrase>
+    <source>scroll arrow</source>
+    <target>vieritysnuoli</target>
+</phrase>
+<phrase>
+    <source>scroll bar</source>
+    <target>vierityspalkki</target>
+</phrase>
+<phrase>
+    <source>scroll box</source>
+    <target>vieritysruutu</target>
+</phrase>
+<phrase>
+    <source>secondary window</source>
+    <target>toissijainen ikkuna</target>
+</phrase>
+<phrase>
+    <source>select</source>
+    <target>valita</target>
+</phrase>
+<phrase>
+    <source>Select All</source>
+    <target>Valitse kaikki</target>
+</phrase>
+<phrase>
+    <source>selection</source>
+    <target>valinta</target>
+</phrase>
+<phrase>
+    <source>selection handle</source>
+    <target>valintakahva</target>
+</phrase>
+<phrase>
+    <source>Send To</source>
+    <target>Lähetä tiedosto</target>
+</phrase>
+<phrase>
+    <source>separator</source>
+    <target>erotin</target>
+</phrase>
+<phrase>
+    <source>Settings</source>
+    <target>Asetukset</target>
+</phrase>
+<phrase>
+    <source>Setup</source>
+    <target>Asennus</target>
+</phrase>
+<phrase>
+    <source>shortcut</source>
+    <target>pika-</target>
+</phrase>
+<phrase>
+    <source>shortcut button</source>
+    <target>pikapainike</target>
+</phrase>
+<phrase>
+    <source>shortcut icon</source>
+    <target>pikakuvake</target>
+</phrase>
+<phrase>
+    <source>shortcut key</source>
+    <target>pikanäppäin</target>
+</phrase>
+<phrase>
+    <source>shortcut key control</source>
+    <target>pikanäppäin-ohjausobjekti</target>
+</phrase>
+<phrase>
+    <source>Show</source>
+    <target>Näytä</target>
+</phrase>
+<phrase>
+    <source>Shutdown</source>
+    <target>Sammuta</target>
+</phrase>
+<phrase>
+    <source>single selection list box</source>
+    <target>yksivalintainen luetteloruutu</target>
+</phrase>
+<phrase>
+    <source>Size</source>
+    <target>Muuta kokoa</target>
+</phrase>
+<phrase>
+    <source>size grip</source>
+    <target>koonmuuttokahva</target>
+</phrase>
+<phrase>
+    <source>slider</source>
+    <target>liukusäädin</target>
+</phrase>
+<phrase>
+    <source>spin box</source>
+    <target>askellusruutu</target>
+</phrase>
+<phrase>
+    <source>Split</source>
+    <target>Jaa</target>
+</phrase>
+<phrase>
+    <source>split bar</source>
+    <target>jakopalkki</target>
+</phrase>
+<phrase>
+    <source>split box</source>
+    <target>jakoruutu</target>
+</phrase>
+<phrase>
+    <source>Start button</source>
+    <target>Käynnistä-painike</target>
+</phrase>
+<phrase>
+    <source>StartUp folder</source>
+    <target>Käynnistys-kansio</target>
+</phrase>
+<phrase>
+    <source>status bar</source>
+    <target>tilarivi</target>
+</phrase>
+<phrase>
+    <source>Stop</source>
+    <target>Pysäytä</target>
+</phrase>
+<phrase>
+    <source>tab control</source>
+    <target>välilehti</target>
+    <definition>ohjausobjekti</definition>
+</phrase>
+<phrase>
+    <source>task bar</source>
+    <target>tehtäväpalkki</target>
+</phrase>
+<phrase>
+    <source>task-oriented Help</source>
+    <target>tehtäväohje</target>
+</phrase>
+<phrase>
+    <source>template</source>
+    <target>malli</target>
+</phrase>
+<phrase>
+    <source>text box</source>
+    <target>muokkausruutu</target>
+</phrase>
+<phrase>
+    <source>title bar</source>
+    <target>otsikkorivi</target>
+</phrase>
+<phrase>
+    <source>title text</source>
+    <target>otsikkoteksti</target>
+</phrase>
+<phrase>
+    <source>toggle key</source>
+    <target>tilanvaihtonäppäin</target>
+</phrase>
+<phrase>
+    <source>toolbar</source>
+    <target>työkalurivi</target>
+</phrase>
+<phrase>
+    <source>tooltip</source>
+    <target>työkaluvihje</target>
+</phrase>
+<phrase>
+    <source>tree view control</source>
+    <target>puunäyttö</target>
+    <definition>ohjausobjekti</definition>
+</phrase>
+<phrase>
+    <source>type</source>
+    <target>tyyppi</target>
+    <definition>noun</definition>
+</phrase>
+<phrase>
+    <source>type</source>
+    <target>laji</target>
+    <definition>noun</definition>
+</phrase>
+<phrase>
+    <source>type</source>
+    <target>kirjoittaa</target>
+    <definition>verb</definition>
+</phrase>
+<phrase>
+    <source>unavailable</source>
+    <target>ei käytettävissä</target>
+</phrase>
+<phrase>
+    <source>Undo</source>
+    <target>Kumoa</target>
+</phrase>
+<phrase>
+    <source>Uninstall</source>
+    <target>Pura asennus</target>
+</phrase>
+<phrase>
+    <source>View</source>
+    <target>Näytä-valikko</target>
+</phrase>
+<phrase>
+    <source>visual editing</source>
+    <target>visuaalinen muokkaus</target>
+</phrase>
+<phrase>
+    <source>well control</source>
+    <target>graafisen valinnan ohjausobjekti</target>
+</phrase>
+<phrase>
+    <source>What&apos;s This?</source>
+    <target>Lisätietoja</target>
+</phrase>
+<phrase>
+    <source>Window</source>
+    <target>Ikkuna-valikko</target>
+</phrase>
+<phrase>
+    <source>window</source>
+    <target>ikkuna</target>
+</phrase>
+<phrase>
+    <source>Windows Explorer</source>
+    <target>Resurssienhallinta</target>
+</phrase>
+<phrase>
+    <source>wizard</source>
+    <target>ohjattu toiminto</target>
+</phrase>
+<phrase>
+    <source>workbook</source>
+    <target>työkirja</target>
+</phrase>
+<phrase>
+    <source>workgroup</source>
+    <target>työryhmä</target>
+</phrase>
+<phrase>
+    <source>workspace</source>
+    <target>työtila</target>
+</phrase>
+<phrase>
+    <source>Yes</source>
+    <target>Kyllä</target>
+</phrase>
+</QPH>

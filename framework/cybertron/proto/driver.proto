@@ -1,0 +1,13 @@
+syntax = "proto2";
+
+package apollo.cybertron.proto;
+
+message Driver {
+    required uint64 msg_id = 1;
+    required uint64 timestamp = 2;
+};
+
+message CarStatus {
+    required uint64 msg_id = 1;
+    required double result = 2;
+};

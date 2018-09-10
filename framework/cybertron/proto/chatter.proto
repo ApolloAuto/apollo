@@ -1,0 +1,16 @@
+syntax = "proto2";
+
+package apollo.cybertron.proto;
+
+message Chatter {
+    required uint64 timestamp = 1;
+    required uint64 lidar_timestamp = 2;
+    required uint64 seq = 3;
+    required bytes content = 4;
+};
+
+message ChatterBenchmark {
+    optional uint64 stamp =1;
+    optional uint64 seq = 2;
+    optional string content = 3;
+}
