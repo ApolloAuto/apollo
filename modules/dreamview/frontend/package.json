@@ -28,6 +28,7 @@
         "react-rangeslider": "^2.2.0",
         "react-split-pane": "^0.1.66",
         "react-tabs": "^2.2.1",
+        "react-tooltip": "^3.8.1",
         "recorder-js": "^1.0.7",
         "stats.js": "^0.17.0",
         "three": "~0.84.0",
