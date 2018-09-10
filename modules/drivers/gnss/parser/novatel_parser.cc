@@ -24,9 +24,8 @@
 #include <memory>
 #include <vector>
 
-#include "ros/include/ros/ros.h"
+#include "cybertron/cybertron.h"
 
-#include "modules/common/log.h"
 #include "modules/drivers/gnss/parser/novatel_messages.h"
 #include "modules/drivers/gnss/parser/parser.h"
 #include "modules/drivers/gnss/parser/rtcm_decode.h"
@@ -648,7 +647,7 @@ bool NovatelParser::HandleCorrImuData(const novatel::CorrImuData* imu) {
     return false;
   }
 
-  ins_.mutable_header()->set_timestamp_sec(ros::Time::now().toSec());
+  ins_.mutable_header()->set_timestamp_sec(cybertron::Time::Now().ToSecond());
   return true;
 }
 
@@ -697,7 +696,7 @@ bool NovatelParser::HandleInsPva(const novatel::InsPva* pva) {
     return false;
   }
 
-  ins_.mutable_header()->set_timestamp_sec(ros::Time::now().toSec());
+  ins_.mutable_header()->set_timestamp_sec(cybertron::Time::Now().ToSecond());
   return true;
 }
 

@@ -19,8 +19,7 @@
 
 #include <memory>
 
-#include "ros/include/ros/ros.h"
-#include "std_msgs/String.h"
+#include "cybertron/cybertron.h"
 
 #include "modules/drivers/gnss/parser/parser.h"
 
@@ -33,7 +32,7 @@ class RtcmParser {
   RtcmParser() {}
   ~RtcmParser() {}
   bool Init();
-  void ParseRtcmData(const std_msgs::String::ConstPtr &msg);
+  void ParseRtcmData(const std::string& msg);
 
  private:
   void DispatchMessage(Parser::MessageType type, MessagePtr message);

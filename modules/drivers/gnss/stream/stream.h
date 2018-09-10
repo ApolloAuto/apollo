@@ -22,9 +22,8 @@
 #include <stdint.h>
 #include <string>
 #include <vector>
-#include "ros/include/ros/ros.h"
+#include "cybertron/cybertron.h"
 
-#include "modules/common/log.h"
 #include "modules/drivers/gnss/util/macros.h"
 
 namespace apollo {
@@ -81,7 +80,7 @@ class Stream {
       write(login_data_[i]);
       AINFO << "Login: " << login_data_[i];
       // sleep a little to avoid overrun of the slow serial interface.
-      ros::Duration(0.5).sleep();
+      cybertron::Duration(0.5).Sleep();
     }
   }
 

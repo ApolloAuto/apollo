@@ -20,17 +20,14 @@ cc_library(
     ],
     deps = [
         ":novatel_parser",
-        "//external:gflags",
-        "//modules/common:log",
-        "//modules/common/adapters:adapter_manager",
-        "//modules/common/monitor_log",
-        "//modules/drivers/gnss:gnss_gflags",
+        "//modules/common/util:message_util",
         "//modules/drivers/gnss/proto:gnss_proto",
         "//modules/drivers/gnss/util:gnss_util",
         "//modules/localization/proto:gps_proto",
         "//modules/localization/proto:imu_proto",
         "@proj4",
-        "@ros//:ros_common",
+        "//framework:cybertron",
+        "@eigen",
     ],
 )
 
@@ -43,13 +40,10 @@ cc_library(
         "rtcm_decode.h",
     ],
     deps = [
-        "//external:gflags",
-        "//modules/common:log",
-        "//modules/common/monitor_log",
         "//modules/drivers/gnss/proto:gnss_proto",
         "//modules/drivers/gnss/third_party:rtcm",
         "//modules/drivers/gnss/util:gnss_util",
-        "@ros//:ros_common",
+        "//framework:cybertron",
     ],
 )
 
@@ -66,15 +60,10 @@ cc_library(
         "rtcm_parser.h",
     ],
     deps = [
-        "//external:gflags",
-        "//modules/common:log",
-        "//modules/common/adapters:adapter_manager",
-        "//modules/common/monitor_log",
-        "//modules/drivers/gnss:gnss_gflags",
         "//modules/drivers/gnss/proto:gnss_proto",
         "//modules/drivers/gnss/third_party:rtcm",
         "//modules/drivers/gnss/util:gnss_util",
-        "@ros//:ros_common",
+        "//framework:cybertron",
     ],
 )
 

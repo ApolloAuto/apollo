@@ -87,6 +87,7 @@ cc_library(
         "message_util.h",
     ],
     deps = [
+        "//modules/common/time",
         "@com_google_protobuf//:protobuf",
     ],
 )

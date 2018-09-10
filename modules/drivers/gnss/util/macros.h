@@ -47,9 +47,9 @@
 // Creates a thread-safe singleton.
 #define MAKE_SINGLETON(TypeName) \
  public:                         \
-  static TypeName *instance() {  \
-    static TypeName instance;    \
-    return &instance;            \
+  static TypeName *Instance() {  \
+    static TypeName Instance;    \
+    return &Instance;            \
   }                              \
                                  \
  private:                        \

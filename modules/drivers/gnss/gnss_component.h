@@ -13,21 +13,39 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+#ifndef MODULES_DRIVERS_GNSS_COMPONENT_H_
+#define MODULES_DRIVERS_GNSS_COMPONENT_H_
 
-#ifndef MODULES_DRIVERS_GNSS_GNSS_GFLAGS_H_
-#define MODULES_DRIVERS_GNSS_GNSS_GFLAGS_H_
+#include <memory>
+#include <string>
+#include <vector>
 
-#include "gflags/gflags.h"
+#include "cybertron/cybertron.h"
 
-// System gflags
-DECLARE_string(node_name);
-DECLARE_string(adapter_config_filename);
+#include "modules/drivers/gnss/stream/raw_stream.h"
 
-// Config file
-DECLARE_string(sensor_conf_file);
+namespace apollo {
+namespace drivers {
+namespace gnss {
 
-// System gflags
-DECLARE_string(sensor_node_name);
+using apollo::cybertron::Component;
+using apollo::cybertron::Writer;
+using apollo::cybertron::Reader;
+using apollo::drivers::gnss::RawData;
 
-DECLARE_string(gpsbin_folder);
+class GnssDriverComponent : public Component<RawData> {
+ public:
+  GnssDriverComponent();
+  bool Init() override;
+  bool Proc(const std::shared_ptr<RawData>& rawdata) override;
+
+ private:
+  std::unique_ptr<RawStream> raw_stream_ = nullptr;
+};
+
+CYBERTRON_REGISTER_COMPONENT(GnssDriverComponent)
+
+}
+}
+}
 #endif

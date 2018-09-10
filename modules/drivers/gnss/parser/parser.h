@@ -24,7 +24,6 @@
 
 #include "modules/drivers/gnss/proto/config.pb.h"
 
-#include "modules/common/log.h"
 #include "modules/drivers/gnss/util/macros.h"
 
 namespace apollo {

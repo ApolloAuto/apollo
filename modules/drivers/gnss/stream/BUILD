@@ -19,11 +19,11 @@ cc_library(
     hdrs = ["tcp_stream.h"],
     deps = [
         ":stream",
-        "//external:gflags",
-        "//modules/common:log",
-        "//modules/common/monitor_log",
         "//modules/common/util:string_util",
-        "@ros//:ros_common",
+        "//modules/common/proto:pnc_point_proto",
+        "//modules/common/util:util",
+        "//modules/common/math:math",
+        "//framework:cybertron",
     ],
 )
 
@@ -35,13 +35,11 @@ cc_library(
         ":ntrip_stream",
         ":serial_stream",
         ":stream",
-        "//modules/common:log",
-        "//modules/common/adapters:adapter_manager",
-        "//modules/drivers/gnss:gnss_gflags",
         "//modules/drivers/gnss/parser:gnss_parser",
         "//modules/drivers/gnss/proto:gnss_proto",
         "//modules/drivers/gnss/util:gnss_util",
-        "@ros//:ros_common",
+        "//modules/common/util:message_util",
+        "//framework:cybertron",
     ],
 )
 
@@ -50,11 +48,8 @@ cc_library(
     srcs = ["serial_stream.cc"],
     deps = [
         ":stream",
-        "//external:gflags",
-        "//modules/common:log",
-        "//modules/common/monitor_log",
         "//modules/drivers/gnss/util:gnss_util",
-        "@ros//:ros_common",
+        "//framework:cybertron",
     ],
 )
 
@@ -64,10 +59,7 @@ cc_library(
     hdrs = ["tcp_stream.h"],
     deps = [
         ":stream",
-        "//external:gflags",
-        "//modules/common:log",
-        "//modules/common/monitor_log",
-        "@ros//:ros_common",
+        "//framework:cybertron",
     ],
 )
 
@@ -76,11 +68,8 @@ cc_library(
     srcs = ["udp_stream.cc"],
     deps = [
         ":stream",
-        "//external:gflags",
-        "//modules/common:log",
-        "//modules/common/monitor_log",
         "//modules/drivers/gnss/util:gnss_util",
-        "@ros//:ros_common",
+        "//framework:cybertron",
     ],
 )
 
@@ -88,8 +77,8 @@ cc_library(
     name = "stream",
     hdrs = ["stream.h"],
     deps = [
-        "//modules/common:log",
         "//modules/drivers/gnss/util:gnss_util",
+        "//framework:cybertron",
     ],
 )
 

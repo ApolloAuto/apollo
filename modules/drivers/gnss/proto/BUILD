@@ -10,6 +10,7 @@ cc_library(
         ":gnss_best_pose_proto",
         ":config_proto",
         ":imu_proto",
+        ":heading_proto",
         ":gnss_status_proto",
         ":gnss_proto_proto",
     ],
