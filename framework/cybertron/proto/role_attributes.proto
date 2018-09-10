@@ -1,0 +1,29 @@
+syntax = "proto2";
+
+package apollo.cybertron.proto;
+
+import "qos_profile.proto";
+
+message SocketAddr {
+    required string ip = 1;  // dotted decimal
+    required uint32 port = 2;
+};
+
+// TODO@nizhongjun opt
+message RoleAttributes {
+    optional string host_name = 1;
+    optional int32 process_id = 2;
+    optional string node_name = 3;
+    optional uint64 node_id = 4;           // hash value of node_name
+    // especially for WRITER and READER
+    optional string channel_name = 5;
+    optional uint64 channel_id = 6;        // hash value of channel_name
+    optional string message_type = 7;
+    optional bytes proto_desc = 8;
+    optional uint64 id = 9;
+    optional QosProfile qos_profile = 10;
+    optional SocketAddr socket_addr = 11;  // reserved for socket communication
+    // especially for SERVER and CLIENT
+    optional string service_name = 12;
+    optional uint64 service_id = 13;       // hash value of service_name
+};

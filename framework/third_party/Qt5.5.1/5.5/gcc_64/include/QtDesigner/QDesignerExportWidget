@@ -1,0 +1,12 @@
+#ifndef DEPRECATED_HEADER_QtDesigner_QDesignerExportWidget
+#define DEPRECATED_HEADER_QtDesigner_QDesignerExportWidget
+#if defined(__GNUC__)
+#  warning Header <QtDesigner/QDesignerExportWidget> is deprecated. Please include <QtUiPlugin/QDesignerExportWidget> instead.
+#elif defined(_MSC_VER)
+#  pragma message ("Header <QtDesigner/QDesignerExportWidget> is deprecated. Please include <QtUiPlugin/QDesignerExportWidget> instead.")
+#endif
+#include <QtUiPlugin/QDesignerExportWidget>
+#if 0
+#pragma qt_no_master_include
+#endif
+#endif

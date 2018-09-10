@@ -1,0 +1,14 @@
+prefix=/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64
+exec_prefix=${prefix}
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+
+Name: Qt5 PlatformSupport
+Description: Qt PlatformSupport module
+Version: 5.5.1
+Libs: -L${libdir} -lQt5PlatformSupport 
+Libs.private: -L/usr/lib64 -lfontconfig -lfreetype -L/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib -lQt5Gui -lQt5DBus -lQt5Core -lpthread -lgthread-2.0 -pthread -lrt -lglib-2.0 -lXrender -lXext -lX11 -lm -lGL  
+Cflags: -I${includedir}/QtPlatformSupport -I${includedir}
+Requires: Qt5Core Qt5Gui
+

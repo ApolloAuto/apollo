@@ -1,0 +1,13 @@
+# Define all coms in DAG streaming.
+module_config {
+    module_library : "lib/libreceiver_component.so"
+    components {
+        class_name : "ReceiverComponent"
+        config {
+            name : "receiver"
+            readers {
+                channel: "/channel0"
+            }
+        }
+    }
+}

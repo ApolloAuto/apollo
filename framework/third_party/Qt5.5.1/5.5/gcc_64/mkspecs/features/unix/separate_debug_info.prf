@@ -1,0 +1,29 @@
+
+have_target:!static:!isEmpty(QMAKE_OBJCOPY) {
+    qnx {
+        debug_info_suffix = sym
+        debug_info_keep = --keep-file-symbols
+        debug_info_strip = --strip-debug -R.ident
+    } else {
+        debug_info_suffix = debug
+        debug_info_keep = --only-keep-debug
+        debug_info_strip = --strip-debug
+    }
+    load(resolve_target)
+    QMAKE_TARGET_DEBUG_INFO = $${QMAKE_RESOLVED_TARGET}.$$debug_info_suffix
+
+    shell_target = $$shell_quote($$relative_path($$QMAKE_RESOLVED_TARGET, $$OUT_PWD))
+    shell_target_debug_info = $$shell_quote($$relative_path($$QMAKE_TARGET_DEBUG_INFO, $$OUT_PWD))
+    copy_debug_info = $$QMAKE_OBJCOPY $$debug_info_keep $$shell_target $$shell_target_debug_info
+    strip_debug_info = $$QMAKE_OBJCOPY $$debug_info_strip $$shell_target
+    link_debug_info = $$QMAKE_OBJCOPY --add-gnu-debuglink=$$shell_target_debug_info $$shell_target
+    chmod_debug_info = chmod -x $$shell_target_debug_info
+
+    !isEmpty(QMAKE_POST_LINK):QMAKE_POST_LINK = $$escape_expand(\\n\\t)$$QMAKE_POST_LINK
+    QMAKE_POST_LINK = $$copy_debug_info && $$strip_debug_info && $$link_debug_info && $$chmod_debug_info $$QMAKE_POST_LINK
+    silent:QMAKE_POST_LINK = @echo creating $@.$$debug_info_suffix && $$QMAKE_POST_LINK
+
+    target.targets += $$QMAKE_TARGET_DEBUG_INFO
+    QMAKE_DISTCLEAN += $$QMAKE_TARGET_DEBUG_INFO
+}
+

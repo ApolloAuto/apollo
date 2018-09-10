@@ -1,0 +1,46 @@
+syntax = "proto2";
+
+package adu.common.sensor;
+
+import "header.proto";   
+import "novatel_header.proto";   
+
+// message 268
+message RawIMU {
+    optional adu.common.header.Header header = 1;
+    optional NovatelHeader novatel_header = 2;       
+
+    optional int32 week = 3;
+    optional double gpssec = 4;
+
+    optional string status = 5;
+
+    optional int32 accz = 6;
+    optional int32 accy_neg = 7;
+    optional int32 accx = 8;
+
+    optional int32 gyrz = 9;
+    optional int32 gyry_neg = 10;
+    optional int32 gyrx = 11;
+}
+
+// message 812
+// Contains the RAWIMU data corrected for gravity, 
+// the earth's rotation and estimated sensor errors.
+message CorrIMUData {
+    optional adu.common.header.Header header = 1;   
+    optional NovatelHeader novatel_header = 2;       
+
+    optional int32 week = 3;
+    optional double gpssec = 4;
+
+    // Gyro values are instantaneous and in radians, must
+    // multiply by datarate to get rad/s.
+    optional double pitch_rate = 5;
+    optional double roll_rate = 6;
+    optional double yaw_rate = 7;
+
+    optional double x_accel = 8;
+    optional double y_accel = 9;
+    optional double z_accel = 10;
+}

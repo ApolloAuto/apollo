@@ -1,0 +1,39 @@
+syntax = "proto2";
+
+package apollo.cybertron.proto;
+
+enum OptionalMode {
+  HYBRID = 0;
+  INTRA = 1;
+  SHM = 2;
+  RTPS = 3;
+}
+
+message ShmMulticastLocator {
+    required string ip = 1;
+    required int32 port = 2;
+};
+
+message RtpsParticipantAttr {
+    required int32 lease_duration = 1;
+    required int32 announcement_period = 2;
+    required int32 domain_id_gain = 3;
+    required int32 port_base = 4;
+};
+
+message CommunicationMode {
+    required OptionalMode same_proc = 1 [default = INTRA];  // INTRA SHM RTPS
+    required OptionalMode diff_proc = 2 [default = SHM];    // SHM RTPS
+    required OptionalMode diff_host = 3 [default = RTPS];   // RTPS
+};
+
+message ResourceLimit {
+    required uint32 max_history_depth = 1;
+};
+
+message TransportConf {
+    optional ShmMulticastLocator shm_locator = 1;
+    optional RtpsParticipantAttr participant_attr = 2;
+    optional CommunicationMode  communication_mode = 3;
+    optional ResourceLimit resource_limit = 4;
+};

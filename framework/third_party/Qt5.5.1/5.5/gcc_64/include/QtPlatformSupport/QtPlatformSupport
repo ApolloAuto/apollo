@@ -1,0 +1,5 @@
+#ifndef QT_QTPLATFORMSUPPORT_MODULE_H
+#define QT_QTPLATFORMSUPPORT_MODULE_H
+#include <QtPlatformSupport/QtPlatformSupportDepends>
+#include "qtplatformsupportversion.h"
+#endif

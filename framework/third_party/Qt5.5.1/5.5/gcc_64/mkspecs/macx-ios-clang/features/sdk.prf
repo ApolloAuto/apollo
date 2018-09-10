@@ -1,0 +1,33 @@
+# In case the user sets the SDK manually
+contains(QMAKE_MAC_SDK, ^iphonesimulator.*) {
+    iphonesimulator_and_iphoneos: \
+        error("iOS simulator is handled automatically for iphonesimulator_and_iphoneos")
+
+    CONFIG += iphonesimulator
+}
+
+iphonesimulator_and_iphoneos:iphonesimulator: \
+    QMAKE_MAC_SDK ~= s,^iphoneos,iphonesimulator,
+
+load(sdk)
+
+lessThan(QMAKE_MAC_SDK_VERSION, "8.0"): \
+    error("Current $$QMAKE_MAC_SDK SDK version ($$QMAKE_MAC_SDK_VERSION) is too old. Please upgrade Xcode.")
+
+macx-xcode {
+    sdk_path_iphoneos.name = "QMAKE_MAC_SDK_PATH[sdk=iphoneos*]"
+    sdk_path_iphoneos.value = $$QMAKE_MAC_SDK_PATH
+    QMAKE_MAC_SDK_PATH ~= s,iPhoneOS,iPhoneSimulator,
+    sdk_path_iphonesimulator.name = "QMAKE_MAC_SDK_PATH[sdk=iphonesimulator*]"
+    sdk_path_iphonesimulator.value = $$QMAKE_MAC_SDK_PATH
+    QMAKE_MAC_XCODE_SETTINGS += sdk_path_iphoneos sdk_path_iphonesimulator
+    QMAKE_MAC_SDK_PATH = "$(QMAKE_MAC_SDK_PATH)"
+
+    sdk_platform_path_iphoneos.name = "QMAKE_MAC_SDK_PLATFORM_PATH[sdk=iphoneos*]"
+    sdk_platform_path_iphoneos.value = $$QMAKE_MAC_SDK_PLATFORM_PATH
+    QMAKE_MAC_SDK_PLATFORM_PATH ~= s,iPhoneOS,iPhoneSimulator,
+    sdk_platform_path_iphonesimulator.name = "QMAKE_MAC_SDK_PLATFORM_PATH[sdk=iphonesimulator*]"
+    sdk_platform_path_iphonesimulator.value = $$QMAKE_MAC_SDK_PLATFORM_PATH
+    QMAKE_MAC_XCODE_SETTINGS += sdk_platform_path_iphoneos sdk_platform_path_iphonesimulator
+    QMAKE_MAC_SDK_PLATFORM_PATH = "$(QMAKE_MAC_SDK_PLATFORM_PATH)"
+}

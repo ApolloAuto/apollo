@@ -1,0 +1,8 @@
+syntax = "proto2";
+
+package apollo.cybertron.proto;
+
+message Perception {
+    required uint64 msg_id = 1;
+    required double result = 2;
+};

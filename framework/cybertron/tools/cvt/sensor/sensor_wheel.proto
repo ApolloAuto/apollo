@@ -1,0 +1,47 @@
+syntax = "proto2";
+
+package adu.common.sensor;
+
+import "header.proto";
+
+message WheelMeasurement {
+    optional int32 tick_count = 1;  // Cumulative number of ticks.
+
+    optional float tick_rate = 2 [default = nan];  // In counts per second.
+
+    optional float rotational_rate = 3 [default = nan];  // In radians per second.
+
+    optional float speed = 4 [default = nan];  // In meters per second.
+}
+
+// Measurements from a wheel encoder, which usually provides tick counts.
+message Wheel {
+    optional adu.common.header.Header header = 1;
+
+    // The time of wheel measurement, seconds since the GPS epoch (Jan 6, 1980).
+    optional double measurement_time = 2;  // In seconds.
+
+    // When measurement_span is non-zero, the tick rate measurement is averaged for the period from
+    // (measurement_time - measurement_span) to measurement_time. Usually,
+    //      measurement_span = 1 / sampling_frequency.
+    //
+    // When measurement_span is 0, the tick rate is instantaneous at measurement_time.
+    //
+    // When measurement_span is unset or nan, the measurement span is unknown or unspecified.
+    optional float measurement_span = 3 [default = nan];  // In seconds.
+
+    // Measurement of a single wheel.
+    optional WheelMeasurement front_left = 4;
+    optional WheelMeasurement front_right = 5;
+    optional WheelMeasurement rear_left = 6;
+    optional WheelMeasurement rear_right = 7;
+
+    // Averaged measurement of two front wheels.
+    optional WheelMeasurement front_averaged = 8;
+
+    // Averaged measurement of two rear wheels.
+    optional WheelMeasurement rear_averaged = 9;
+
+    // Averaged measurement of all four wheels.
+    optional WheelMeasurement all_averaged = 10;
+}

@@ -1,0 +1,6 @@
+#ifndef QT_QTX11EXTRAS_MODULE_H
+#define QT_QTX11EXTRAS_MODULE_H
+#include <QtX11Extras/QtX11ExtrasDepends>
+#include "qtx11extrasglobal.h"
+#include "qtx11extrasversion.h"
+#endif

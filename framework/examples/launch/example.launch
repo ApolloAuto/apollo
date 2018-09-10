@@ -1,0 +1,23 @@
+<!--this file list the modules which will be loaded dynamicly and
+    their process name to be running in -->
+
+<cybertron>
+    <desc>cybertron modules list config</desc>
+
+    <version>1.0.0</version>
+
+    <module>
+        <name>perception</name>
+        <dag_conf>perception.dag</dag_conf>
+        <process_name></process_name>
+        <version>1.0.0</version>
+    </module>
+
+    <module>
+        <name>driver</name>
+        <dag_conf>driver.dag</dag_conf>
+        <process_name></process_name>
+        <version>1.0.0</version>
+    </module>
+
+</cybertron>

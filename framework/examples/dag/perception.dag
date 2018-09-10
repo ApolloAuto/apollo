@@ -1,0 +1,26 @@
+# Define all coms in DAG streaming.
+module_config {
+    module_library : "lib/libperception_component.so"
+    components {
+        class_name : "PerceptionComponent"
+        config {
+            name : "perception"
+            readers {
+                channel: "/driver/channel"
+            }
+        }
+    }
+}
+
+module_config {
+    module_library : "lib/libwatchdog_component.so"
+    components {
+        class_name : "WatchdogComponent"
+        config {
+            name : "milk"
+            readers {
+                channel: "/food"
+            }
+        }
+    }
+}

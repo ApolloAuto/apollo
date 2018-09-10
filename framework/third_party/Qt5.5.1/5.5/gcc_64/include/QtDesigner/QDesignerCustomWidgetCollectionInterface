@@ -1,0 +1,12 @@
+#ifndef DEPRECATED_HEADER_QtDesigner_QDesignerCustomWidgetCollectionInterface
+#define DEPRECATED_HEADER_QtDesigner_QDesignerCustomWidgetCollectionInterface
+#if defined(__GNUC__)
+#  warning Header <QtDesigner/QDesignerCustomWidgetCollectionInterface> is deprecated. Please include <QtUiPlugin/QDesignerCustomWidgetCollectionInterface> instead.
+#elif defined(_MSC_VER)
+#  pragma message ("Header <QtDesigner/QDesignerCustomWidgetCollectionInterface> is deprecated. Please include <QtUiPlugin/QDesignerCustomWidgetCollectionInterface> instead.")
+#endif
+#include <QtUiPlugin/QDesignerCustomWidgetCollectionInterface>
+#if 0
+#pragma qt_no_master_include
+#endif
+#endif

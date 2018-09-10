@@ -1,0 +1,20 @@
+# Define all coms in DAG streaming.
+module_config {
+    module_library : "lib/libperception_component.so"
+    components {
+        class_name : "PerceptionComponent"
+        config {
+            name : "perception"
+            readers {
+                channel: "perception/channel_name"
+            }
+        }
+    }
+    timer_components {
+        class_name : "DriverComponent"
+        config {
+            name : "driver"
+            interval : 100
+        }
+    }
+}

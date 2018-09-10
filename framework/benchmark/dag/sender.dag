@@ -1,0 +1,10 @@
+module_config {
+    module_library : "lib/libsender_component.so"
+    timer_components {
+        class_name : "SenderComponent"
+        config {
+            name: "sender"
+            interval : 100
+        }
+    }
+}

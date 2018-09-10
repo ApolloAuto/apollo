@@ -1,0 +1,8 @@
+syntax = "proto2";
+
+package apollo.cybertron.proto;
+
+message DataVisitorConf {
+  optional bool async_notify = 1 [default = false];
+}
+

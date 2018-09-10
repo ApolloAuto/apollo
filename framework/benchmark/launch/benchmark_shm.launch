@@ -1,0 +1,16 @@
+<cybertron>
+    <module>
+        <name>sender</name>
+        <dag_conf>sender.dag</dag_conf>
+        <process_name>sender</process_name>
+        <exception_handler>exit</exception_handler>
+    </module>
+
+    <module>
+        <name>receiver</name>
+        <dag_conf>receiver.dag</dag_conf>
+        <process_name>receiver</process_name>
+        <exception_handler>respawn</exception_handler>
+    </module>
+
+</cybertron>

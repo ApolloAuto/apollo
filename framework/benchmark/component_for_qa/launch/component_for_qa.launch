@@ -1,0 +1,8 @@
+<cybertron>
+    <module>
+        <name>component</name>
+        <dag_conf>component_for_qa.dag</dag_conf>
+        <process_name>component</process_name>
+    </module>
+
+</cybertron>

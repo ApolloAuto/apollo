@@ -1,0 +1,5 @@
+module Enginio
+plugin enginioplugin
+typeinfo plugins.qmltypes
+classname EnginioPlugin
+

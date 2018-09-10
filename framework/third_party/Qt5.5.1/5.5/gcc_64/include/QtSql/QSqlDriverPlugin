@@ -1,0 +1,1 @@
+#include "qsqldriverplugin.h"

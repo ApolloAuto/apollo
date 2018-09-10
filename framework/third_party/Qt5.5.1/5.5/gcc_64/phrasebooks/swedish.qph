@@ -1,0 +1,1010 @@
+<!DOCTYPE QPH><QPH language="sv">
+<phrase>
+    <source>About</source>
+    <target>Om</target>
+</phrase>
+<phrase>
+    <source>access key</source>
+    <target>snabbtangent</target>
+</phrase>
+<phrase>
+    <source>accessibility</source>
+    <target>Hjälpmedel</target>
+    <definition>ikonen Accessibility</definition>
+</phrase>
+<phrase>
+    <source>accessibility</source>
+    <target>tillgänglighet</target>
+</phrase>
+<phrase>
+    <source>action handle</source>
+    <target>funktionshandtag</target>
+</phrase>
+<phrase>
+    <source>active</source>
+    <target>aktiv</target>
+</phrase>
+<phrase>
+    <source>active end</source>
+    <target>aktiv slutpunkt</target>
+</phrase>
+<phrase>
+    <source>active object</source>
+    <target>aktivt objekt</target>
+</phrase>
+<phrase>
+    <source>active window</source>
+    <target>aktivt fönster</target>
+</phrase>
+<phrase>
+    <source>adornment</source>
+    <target>fönsterfält</target>
+</phrase>
+<phrase>
+    <source>Always on Top</source>
+    <target>Alltid överst</target>
+</phrase>
+<phrase>
+    <source>anchor point</source>
+    <target>startpunkt</target>
+</phrase>
+<phrase>
+    <source>Apply</source>
+    <target>Verkställ</target>
+</phrase>
+<phrase>
+    <source>auto-exit</source>
+    <target>flytta automatiskt</target>
+</phrase>
+<phrase>
+    <source>auto-repeat</source>
+    <target>upprepa automatiskt</target>
+</phrase>
+<phrase>
+    <source>automatic link</source>
+    <target>automatisk länk</target>
+</phrase>
+<phrase>
+    <source>automatic scrolling</source>
+    <target>automatisk rullning</target>
+</phrase>
+<phrase>
+    <source>autoscroll</source>
+    <target>automatisk rullning</target>
+</phrase>
+<phrase>
+    <source>Back</source>
+    <target>Föregående</target>
+</phrase>
+<phrase>
+    <source>Browse</source>
+    <target>Bläddra</target>
+</phrase>
+<phrase>
+    <source>Cancel</source>
+    <target>Avbryt</target>
+</phrase>
+<phrase>
+    <source>cascading menu</source>
+    <target>undermeny</target>
+</phrase>
+<phrase>
+    <source>check box</source>
+    <target>kryssruta</target>
+</phrase>
+<phrase>
+    <source>check mark</source>
+    <target>markering</target>
+</phrase>
+<phrase>
+    <source>child window</source>
+    <target>underfönster</target>
+</phrase>
+<phrase>
+    <source>choose</source>
+    <target>välj</target>
+</phrase>
+<phrase>
+    <source>click</source>
+    <target>klicka</target>
+</phrase>
+<phrase>
+    <source>Clipboard</source>
+    <target>Urklipp</target>
+</phrase>
+<phrase>
+    <source>Close</source>
+    <target>Stäng</target>
+</phrase>
+<phrase>
+    <source>Close button</source>
+    <target>stängningsknapp</target>
+</phrase>
+<phrase>
+    <source>collapse</source>
+    <target>komprimera</target>
+    <definition>outline</definition>
+</phrase>
+<phrase>
+    <source>column heading</source>
+    <target>kolumnrubrik</target>
+    <definition>control</definition>
+</phrase>
+<phrase>
+    <source>combo box</source>
+    <target>kombinationsruta</target>
+</phrase>
+<phrase>
+    <source>command button</source>
+    <target>kommandoknapp</target>
+</phrase>
+<phrase>
+    <source>container</source>
+    <target>behållare</target>
+</phrase>
+<phrase>
+    <source>context-sensitive Help</source>
+    <target>sammanhangsberoende hjälp</target>
+</phrase>
+<phrase>
+    <source>contextual</source>
+    <target>sammanhangsberoende</target>
+</phrase>
+<phrase>
+    <source>control</source>
+    <target>kontroll</target>
+</phrase>
+<phrase>
+    <source>Copy</source>
+    <target>Kopiera</target>
+</phrase>
+<phrase>
+    <source>Copy here</source>
+    <target>Kopiera hit</target>
+</phrase>
+<phrase>
+    <source>Create Shortcut</source>
+    <target>Skapa genväg</target>
+</phrase>
+<phrase>
+    <source>Create Shortcut Here</source>
+    <target>Skapa genväg här</target>
+</phrase>
+<phrase>
+    <source>Cut</source>
+    <target>Klipp ut</target>
+</phrase>
+<phrase>
+    <source>default</source>
+    <target>standard</target>
+</phrase>
+<phrase>
+    <source>default button</source>
+    <target>standardknapp</target>
+</phrase>
+<phrase>
+    <source>Delete</source>
+    <target>Ta bort</target>
+</phrase>
+<phrase>
+    <source>desktop</source>
+    <target>skrivbord</target>
+</phrase>
+<phrase>
+    <source>destination</source>
+    <target>mål</target>
+</phrase>
+<phrase>
+    <source>dialog box</source>
+    <target>dialogruta</target>
+</phrase>
+<phrase>
+    <source>disability</source>
+    <target>oförmåga</target>
+</phrase>
+<phrase>
+    <source>disjoint selection</source>
+    <target>osammanhängande markering</target>
+</phrase>
+<phrase>
+    <source>dock</source>
+    <target>docka</target>
+</phrase>
+<phrase>
+    <source>document</source>
+    <target>dokument</target>
+</phrase>
+<phrase>
+    <source>double-click</source>
+    <target>dubbelklicka på</target>
+</phrase>
+<phrase>
+    <source>drag</source>
+    <target>dra</target>
+</phrase>
+<phrase>
+    <source>drag-and-drop</source>
+    <target>dra och släpp</target>
+</phrase>
+<phrase>
+    <source>drop-down combo box</source>
+    <target>nedrullningsbar kombinationsruta</target>
+</phrase>
+<phrase>
+    <source>drop-down list box</source>
+    <target>nedrullningsbar listruta</target>
+</phrase>
+<phrase>
+    <source>drop-down menu</source>
+    <target>nedrullningsbar meny</target>
+</phrase>
+<phrase>
+    <source>Edit</source>
+    <target>Redigera</target>
+</phrase>
+<phrase>
+    <source>ellipsis</source>
+    <target>punkter</target>
+</phrase>
+<phrase>
+    <source>embedded object</source>
+    <target>inbäddat objekt</target>
+</phrase>
+<phrase>
+    <source>Exit</source>
+    <target>Avsluta</target>
+</phrase>
+<phrase>
+    <source>expand</source>
+    <target>expandera</target>
+    <definition>an outline</definition>
+</phrase>
+<phrase>
+    <source>Explore</source>
+    <target>Utforska</target>
+</phrase>
+<phrase>
+    <source>extended selection</source>
+    <target>utökad markering</target>
+</phrase>
+<phrase>
+    <source>extended selection list box</source>
+    <target>listruta för utökad markering</target>
+</phrase>
+<phrase>
+    <source>File</source>
+    <target>Arkiv</target>
+    <definition>menu/meny</definition>
+</phrase>
+<phrase>
+    <source>file</source>
+    <target>fil</target>
+</phrase>
+<phrase>
+    <source>Find</source>
+    <target>Sök</target>
+</phrase>
+<phrase>
+    <source>Find Next</source>
+    <target>Sök nästa</target>
+</phrase>
+<phrase>
+    <source>Find What</source>
+    <target>Sök efter</target>
+</phrase>
+<phrase>
+    <source>folder</source>
+    <target>mapp</target>
+</phrase>
+<phrase>
+    <source>font</source>
+    <target>teckensnitt</target>
+</phrase>
+<phrase>
+    <source>font size</source>
+    <target>teckenstorlek</target>
+</phrase>
+<phrase>
+    <source>font style</source>
+    <target>teckenstil</target>
+</phrase>
+<phrase>
+    <source>function key</source>
+    <target>funktionstangent</target>
+</phrase>
+<phrase>
+    <source>group box</source>
+    <target>gruppruta</target>
+</phrase>
+<phrase>
+    <source>handle</source>
+    <target>handtag</target>
+</phrase>
+<phrase>
+    <source>Help</source>
+    <target>Hjälp</target>
+</phrase>
+<phrase>
+    <source>Hide</source>
+    <target>Dölj</target>
+</phrase>
+<phrase>
+    <source>hierarchical selection</source>
+    <target>hierarkisk markering</target>
+</phrase>
+<phrase>
+    <source>hold</source>
+    <target>hålla ned</target>
+</phrase>
+<phrase>
+    <source>hot spot</source>
+    <target>aktiv punkt</target>
+</phrase>
+<phrase>
+    <source>hot zone</source>
+    <target>aktiveringszon</target>
+</phrase>
+<phrase>
+    <source>icon</source>
+    <target>ikon</target>
+</phrase>
+<phrase>
+    <source>inactive</source>
+    <target>inaktiv</target>
+</phrase>
+<phrase>
+    <source>inactive window</source>
+    <target>inaktivt fönster</target>
+</phrase>
+<phrase>
+    <source>input focus</source>
+    <target>inmatningsfokus</target>
+</phrase>
+<phrase>
+    <source>Insert</source>
+    <target>Infoga-meny</target>
+</phrase>
+<phrase>
+    <source>Insert Object</source>
+    <target>Infoga objekt</target>
+</phrase>
+<phrase>
+    <source>insertion point</source>
+    <target>insättningspunkt</target>
+</phrase>
+<phrase>
+    <source>italic</source>
+    <target>kursiv</target>
+</phrase>
+<phrase>
+    <source>label</source>
+    <target>titel</target>
+</phrase>
+<phrase>
+    <source>landscape</source>
+    <target>liggande</target>
+</phrase>
+<phrase>
+    <source>link</source>
+    <target>länk</target>
+    <definition>noun</definition>
+</phrase>
+<phrase>
+    <source>link</source>
+    <target>länka</target>
+    <definition>verb</definition>
+</phrase>
+<phrase>
+    <source>Link Here</source>
+    <target>Länka hit</target>
+</phrase>
+<phrase>
+    <source>list box</source>
+    <target>listruta</target>
+</phrase>
+<phrase>
+    <source>list view</source>
+    <target>listvy</target>
+    <definition>control</definition>
+</phrase>
+<phrase>
+    <source>manual link</source>
+    <target>manuell länk</target>
+</phrase>
+<phrase>
+    <source>Maximize</source>
+    <target>Maximera</target>
+</phrase>
+<phrase>
+    <source>maximize button</source>
+    <target>maximeringsknapp</target>
+</phrase>
+<phrase>
+    <source>MDI</source>
+    <target>MDI</target>
+</phrase>
+<phrase>
+    <source>menu</source>
+    <target>meny</target>
+</phrase>
+<phrase>
+    <source>menu bar</source>
+    <target>menyrad</target>
+</phrase>
+<phrase>
+    <source>menu button</source>
+    <target>menyknapp</target>
+</phrase>
+<phrase>
+    <source>menu item</source>
+    <target>menyobjekt</target>
+</phrase>
+<phrase>
+    <source>menu title</source>
+    <target>menytitel</target>
+</phrase>
+<phrase>
+    <source>message box</source>
+    <target>meddelanderuta</target>
+</phrase>
+<phrase>
+    <source>Minimize</source>
+    <target>Minimera</target>
+</phrase>
+<phrase>
+    <source>minimize button</source>
+    <target>minimeringsknapp</target>
+</phrase>
+<phrase>
+    <source>mixed-value</source>
+    <target>blandvärde</target>
+</phrase>
+<phrase>
+    <source>modal</source>
+    <target>modal</target>
+</phrase>
+<phrase>
+    <source>mode</source>
+    <target>läge</target>
+</phrase>
+<phrase>
+    <source>modeless</source>
+    <target>icke-modal</target>
+</phrase>
+<phrase>
+    <source>modifier key</source>
+    <target>ändringstangent</target>
+</phrase>
+<phrase>
+    <source>mouse</source>
+    <target>mus</target>
+</phrase>
+<phrase>
+    <source>Move</source>
+    <target>Flytta</target>
+</phrase>
+<phrase>
+    <source>Move Here</source>
+    <target>Flytta hit</target>
+</phrase>
+<phrase>
+    <source>Multiple Document Interface</source>
+    <target>multiple document interface</target>
+</phrase>
+<phrase>
+    <source>multiple selection list box</source>
+    <target>listruta för multipel markering</target>
+</phrase>
+<phrase>
+    <source>My Computer</source>
+    <target>Den här datorn</target>
+    <definition>icon</definition>
+</phrase>
+<phrase>
+    <source>Network Neighborhood</source>
+    <target>Nätverket</target>
+    <definition>icon</definition>
+</phrase>
+<phrase>
+    <source>New</source>
+    <target>Ny</target>
+</phrase>
+<phrase>
+    <source>New</source>
+    <target>Nytt</target>
+</phrase>
+<phrase>
+    <source>Next</source>
+    <target>Nästa</target>
+</phrase>
+<phrase>
+    <source>object</source>
+    <target>objekt</target>
+</phrase>
+<phrase>
+    <source>OK</source>
+    <target>OK</target>
+</phrase>
+<phrase>
+    <source>OLE</source>
+    <target>OLE</target>
+</phrase>
+<phrase>
+    <source>OLE drag and drop</source>
+    <target>dra och släpp (OLE)</target>
+</phrase>
+<phrase>
+    <source>OLE embedded object</source>
+    <target>inbäddat objekt (OLE)</target>
+</phrase>
+<phrase>
+    <source>OLE linked object</source>
+    <target>länkat objekt (OLE)</target>
+</phrase>
+<phrase>
+    <source>OLE nondefault drag and drop</source>
+    <target>utökat drag och släpp (OLE)</target>
+</phrase>
+<phrase>
+    <source>Open</source>
+    <target>Öppna</target>
+</phrase>
+<phrase>
+    <source>Open With</source>
+    <target>Öppna med</target>
+</phrase>
+<phrase>
+    <source>option button</source>
+    <target>alternativknapp</target>
+</phrase>
+<phrase>
+    <source>option-set</source>
+    <target>valt alternativ</target>
+</phrase>
+<phrase>
+    <source>package</source>
+    <target>paket</target>
+</phrase>
+<phrase>
+    <source>Page Setup</source>
+    <target>Utskriftsformat</target>
+</phrase>
+<phrase>
+    <source>palette window</source>
+    <target>palettfönster</target>
+</phrase>
+<phrase>
+    <source>pane</source>
+    <target>fönsterruta</target>
+</phrase>
+<phrase>
+    <source>parent window</source>
+    <target>moderfönster</target>
+</phrase>
+<phrase>
+    <source>password</source>
+    <target>lösenord</target>
+</phrase>
+<phrase>
+    <source>Paste</source>
+    <target>Klistra in</target>
+</phrase>
+<phrase>
+    <source>Paste Link</source>
+    <target>Klistra in länk</target>
+</phrase>
+<phrase>
+    <source>Paste Shortcut</source>
+    <target>Klistra in genväg</target>
+</phrase>
+<phrase>
+    <source>Paste Special</source>
+    <target>Klistra in special</target>
+</phrase>
+<phrase>
+    <source>path</source>
+    <target>sökväg</target>
+</phrase>
+<phrase>
+    <source>Pause</source>
+    <target>Paus</target>
+</phrase>
+<phrase>
+    <source>Play</source>
+    <target>Spela upp</target>
+</phrase>
+<phrase>
+    <source>Plug and Play</source>
+    <target>Plug and Play</target>
+</phrase>
+<phrase>
+    <source>point</source>
+    <target>peka</target>
+</phrase>
+<phrase>
+    <source>pointer</source>
+    <target>pekare</target>
+</phrase>
+<phrase>
+    <source>pop-up menu</source>
+    <target>pop up-meny</target>
+</phrase>
+<phrase>
+    <source>pop-up window</source>
+    <target>pop up-fönster</target>
+</phrase>
+<phrase>
+    <source>portrait</source>
+    <target>stående</target>
+</phrase>
+<phrase>
+    <source>press</source>
+    <target>håll ned</target>
+    <definition>and hold a mouse button</definition>
+</phrase>
+<phrase>
+    <source>press</source>
+    <target>tryck på</target>
+    <definition>a key</definition>
+</phrase>
+<phrase>
+    <source>primary container</source>
+    <target>primär behållare</target>
+</phrase>
+<phrase>
+    <source>primary window</source>
+    <target>primärt fönster</target>
+</phrase>
+<phrase>
+    <source>Print</source>
+    <target>Skriv ut</target>
+</phrase>
+<phrase>
+    <source>printer</source>
+    <target>skrivare</target>
+</phrase>
+<phrase>
+    <source>progress indicator</source>
+    <target>förloppsindikator</target>
+    <definition>control</definition>
+</phrase>
+<phrase>
+    <source>project</source>
+    <target>projekt</target>
+</phrase>
+<phrase>
+    <source>Properties</source>
+    <target>Egenskaper</target>
+</phrase>
+<phrase>
+    <source>property inspector</source>
+    <target>egenskapsgranskare</target>
+</phrase>
+<phrase>
+    <source>property page</source>
+    <target>egenskapssida</target>
+</phrase>
+<phrase>
+    <source>property sheet</source>
+    <target>egenskapsförteckning</target>
+</phrase>
+<phrase>
+    <source>property sheet control</source>
+    <target>kontroll i egenskapsförteckning</target>
+</phrase>
+<phrase>
+    <source>Quick View</source>
+    <target>Snabbgranskning</target>
+</phrase>
+<phrase>
+    <source>read-only</source>
+    <target>skrivskydd</target>
+</phrase>
+<phrase>
+    <source>Recycle Bin</source>
+    <target>Papperskorgen</target>
+    <definition>Icon</definition>
+</phrase>
+<phrase>
+    <source>Redo</source>
+    <target>Gör om</target>
+</phrase>
+<phrase>
+    <source>region selection</source>
+    <target>områdesmarkering</target>
+</phrase>
+<phrase>
+    <source>registry</source>
+    <target>Registret</target>
+</phrase>
+<phrase>
+    <source>Repeat</source>
+    <target>Upprepa</target>
+</phrase>
+<phrase>
+    <source>Replace</source>
+    <target>Ersätt</target>
+</phrase>
+<phrase>
+    <source>Restore</source>
+    <target>Återställ</target>
+</phrase>
+<phrase>
+    <source>Restore button</source>
+    <target>knappen Återställ</target>
+</phrase>
+<phrase>
+    <source>Resume</source>
+    <target>Fortsätt</target>
+</phrase>
+<phrase>
+    <source>Retry</source>
+    <target>Försök igen</target>
+</phrase>
+<phrase>
+    <source>rich-text box</source>
+    <target>rich text-ruta</target>
+</phrase>
+<phrase>
+    <source>Run</source>
+    <target>Kör</target>
+</phrase>
+<phrase>
+    <source>Save</source>
+    <target>Spara</target>
+</phrase>
+<phrase>
+    <source>Save as</source>
+    <target>Spara som</target>
+</phrase>
+<phrase>
+    <source>scroll</source>
+    <target>rulla</target>
+</phrase>
+<phrase>
+    <source>scroll arrow</source>
+    <target>rullningspil</target>
+</phrase>
+<phrase>
+    <source>scroll bar</source>
+    <target>rullningslist</target>
+</phrase>
+<phrase>
+    <source>scroll box</source>
+    <target>rullningsruta</target>
+</phrase>
+<phrase>
+    <source>secondary window</source>
+    <target>sekundärt fönster</target>
+</phrase>
+<phrase>
+    <source>select</source>
+    <target>markera</target>
+</phrase>
+<phrase>
+    <source>Select All</source>
+    <target>Markera allt</target>
+</phrase>
+<phrase>
+    <source>selection</source>
+    <target>markering</target>
+</phrase>
+<phrase>
+    <source>selection handle</source>
+    <target>markeringshandtag</target>
+</phrase>
+<phrase>
+    <source>Send To</source>
+    <target>Skicka till</target>
+</phrase>
+<phrase>
+    <source>separator</source>
+    <target>avgränsare</target>
+</phrase>
+<phrase>
+    <source>Settings</source>
+    <target>Inställningar</target>
+</phrase>
+<phrase>
+    <source>Setup</source>
+    <target>installationsprogram</target>
+</phrase>
+<phrase>
+    <source>Setup</source>
+    <target>Inställningar</target>
+</phrase>
+<phrase>
+    <source>shortcut</source>
+    <target>genväg</target>
+</phrase>
+<phrase>
+    <source>shortcut button</source>
+    <target>genvägsknapp</target>
+</phrase>
+<phrase>
+    <source>shortcut icon</source>
+    <target>genvägsikon</target>
+</phrase>
+<phrase>
+    <source>shortcut key</source>
+    <target>kortkommando</target>
+</phrase>
+<phrase>
+    <source>shortcut key control</source>
+    <target>kortkommandokontroll</target>
+</phrase>
+<phrase>
+    <source>Show</source>
+    <target>Visa</target>
+</phrase>
+<phrase>
+    <source>Shutdown</source>
+    <target>Avsluta</target>
+</phrase>
+<phrase>
+    <source>single selection list box</source>
+    <target>listruta för enkel markering</target>
+</phrase>
+<phrase>
+    <source>Size</source>
+    <target>Ändra storlek</target>
+</phrase>
+<phrase>
+    <source>Size</source>
+    <target>Storlek</target>
+</phrase>
+<phrase>
+    <source>size grip</source>
+    <target>storleksgrepp</target>
+</phrase>
+<phrase>
+    <source>slider</source>
+    <target>skjutreglage</target>
+</phrase>
+<phrase>
+    <source>spin box</source>
+    <target>rotationsruta</target>
+</phrase>
+<phrase>
+    <source>Split</source>
+    <target>Dela</target>
+</phrase>
+<phrase>
+    <source>split bar</source>
+    <target>delningslist</target>
+</phrase>
+<phrase>
+    <source>split box</source>
+    <target>delningsruta</target>
+</phrase>
+<phrase>
+    <source>Start button</source>
+    <target>startknappen</target>
+</phrase>
+<phrase>
+    <source>StartUp folder</source>
+    <target>mappen Autostart</target>
+</phrase>
+<phrase>
+    <source>status bar</source>
+    <target>statusfält</target>
+</phrase>
+<phrase>
+    <source>Stop</source>
+    <target>Stanna</target>
+</phrase>
+<phrase>
+    <source>tab control</source>
+    <target>flik</target>
+</phrase>
+<phrase>
+    <source>task bar</source>
+    <target>Aktivitetsfältet</target>
+</phrase>
+<phrase>
+    <source>task-oriented Help</source>
+    <target>aktivitetsberoende hjälp</target>
+</phrase>
+<phrase>
+    <source>template</source>
+    <target>mall</target>
+</phrase>
+<phrase>
+    <source>text box</source>
+    <target>textruta</target>
+</phrase>
+<phrase>
+    <source>title bar</source>
+    <target>namnlist</target>
+</phrase>
+<phrase>
+    <source>title text</source>
+    <target>text i namnlist</target>
+</phrase>
+<phrase>
+    <source>toggle key</source>
+    <target>växlingstangent</target>
+</phrase>
+<phrase>
+    <source>toolbar</source>
+    <target>verktygsfält</target>
+</phrase>
+<phrase>
+    <source>tooltip</source>
+    <target>funktionsbeskrivning</target>
+</phrase>
+<phrase>
+    <source>tree view control</source>
+    <target>trädkontroll</target>
+</phrase>
+<phrase>
+    <source>type</source>
+    <target>typ</target>
+    <definition>noun</definition>
+</phrase>
+<phrase>
+    <source>type</source>
+    <target>skriva</target>
+    <definition>verb</definition>
+</phrase>
+<phrase>
+    <source>unavailable</source>
+    <target>ej tillgänglig</target>
+</phrase>
+<phrase>
+    <source>Undo</source>
+    <target>Ångra</target>
+</phrase>
+<phrase>
+    <source>Uninstall</source>
+    <target>Avinstallera</target>
+</phrase>
+<phrase>
+    <source>View</source>
+    <target>Visa-meny</target>
+</phrase>
+<phrase>
+    <source>visual editing</source>
+    <target>direktredigering</target>
+</phrase>
+<phrase>
+    <source>well control</source>
+    <target>grafikkontroll</target>
+</phrase>
+<phrase>
+    <source>What&apos;s This?</source>
+    <target>Förklaring</target>
+</phrase>
+<phrase>
+    <source>Window</source>
+    <target>Fönster-meny</target>
+</phrase>
+<phrase>
+    <source>window</source>
+    <target>fönster</target>
+</phrase>
+<phrase>
+    <source>Windows Explorer</source>
+    <target>Utforskaren</target>
+</phrase>
+<phrase>
+    <source>wizard</source>
+    <target>guide</target>
+</phrase>
+<phrase>
+    <source>workbook</source>
+    <target>arbetsbok</target>
+</phrase>
+<phrase>
+    <source>workgroup</source>
+    <target>arbetsgrupp</target>
+</phrase>
+<phrase>
+    <source>workspace</source>
+    <target>arbetsyta</target>
+</phrase>
+<phrase>
+    <source>Yes</source>
+    <target>Ja</target>
+</phrase>
+</QPH>

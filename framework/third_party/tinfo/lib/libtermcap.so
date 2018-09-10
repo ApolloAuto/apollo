@@ -1,0 +1,3 @@
+/* We use a linker script rather than a symlink to work around
+   an ldconfig bug, see http://bugs.debian.org/249122. */
+GROUP( libtinfo.so )

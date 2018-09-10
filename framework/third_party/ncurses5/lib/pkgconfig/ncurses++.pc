@@ -1,0 +1,15 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=/usr/lib/x86_64-linux-gnu
+includedir=${prefix}/include
+major_version=5
+version=5.9.20140118
+
+Name: ncurses++
+Description: ncurses 5.9 add-on library
+Version: ${version}
+URL: http://invisible-island.net/ncurses
+Requires.private: panel, menu, form, ncurses, tinfo
+Libs: -L${libdir} -lncurses++
+Libs.private:  
+Cflags: 

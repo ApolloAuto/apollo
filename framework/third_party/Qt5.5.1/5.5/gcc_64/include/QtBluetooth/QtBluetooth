@@ -1,0 +1,24 @@
+#ifndef QT_QTBLUETOOTH_MODULE_H
+#define QT_QTBLUETOOTH_MODULE_H
+#include <QtBluetooth/QtBluetoothDepends>
+#include "qbluetooth.h"
+#include "qbluetoothaddress.h"
+#include "qbluetoothdevicediscoveryagent.h"
+#include "qbluetoothdeviceinfo.h"
+#include "qbluetoothglobal.h"
+#include "qbluetoothhostinfo.h"
+#include "qbluetoothlocaldevice.h"
+#include "qbluetoothserver.h"
+#include "qbluetoothservicediscoveryagent.h"
+#include "qbluetoothserviceinfo.h"
+#include "qbluetoothsocket.h"
+#include "qbluetoothtransfermanager.h"
+#include "qbluetoothtransferreply.h"
+#include "qbluetoothtransferrequest.h"
+#include "qbluetoothuuid.h"
+#include "qlowenergycharacteristic.h"
+#include "qlowenergycontroller.h"
+#include "qlowenergydescriptor.h"
+#include "qlowenergyservice.h"
+#include "qtbluetoothversion.h"
+#endif

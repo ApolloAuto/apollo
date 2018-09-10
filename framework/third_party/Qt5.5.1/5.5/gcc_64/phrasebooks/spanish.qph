@@ -1,0 +1,1086 @@
+<!DOCTYPE QPH><QPH language="es">
+<phrase>
+    <source>About</source>
+    <target>Acerca de</target>
+</phrase>
+<phrase>
+    <source>access key</source>
+    <target>tecla de acceso</target>
+</phrase>
+<phrase>
+    <source>accessibility</source>
+    <target>accesibilidad</target>
+</phrase>
+<phrase>
+    <source>action handle</source>
+    <target>controlador de acciones</target>
+</phrase>
+<phrase>
+    <source>active</source>
+    <target>activo</target>
+</phrase>
+<phrase>
+    <source>active end</source>
+    <target>fin de la selección activa</target>
+</phrase>
+<phrase>
+    <source>active object</source>
+    <target>objeto activo</target>
+</phrase>
+<phrase>
+    <source>active window</source>
+    <target>ventana activa</target>
+</phrase>
+<phrase>
+    <source>adornment</source>
+    <target>opción gráfica</target>
+</phrase>
+<phrase>
+    <source>Always on Top</source>
+    <target>Siempre visible</target>
+</phrase>
+<phrase>
+    <source>anchor point</source>
+    <target>inicio de la selección activa</target>
+</phrase>
+<phrase>
+    <source>Apply</source>
+    <target>Aplicar</target>
+</phrase>
+<phrase>
+    <source>auto-exit</source>
+    <target>salida automática</target>
+</phrase>
+<phrase>
+    <source>auto-repeat</source>
+    <target>repetición automática</target>
+</phrase>
+<phrase>
+    <source>automatic link</source>
+    <target>vínculo automático</target>
+</phrase>
+<phrase>
+    <source>automatic scrolling</source>
+    <target>desplazamiento automático</target>
+</phrase>
+<phrase>
+    <source>autoscroll</source>
+    <target>desplazamiento automático</target>
+</phrase>
+<phrase>
+    <source>Back</source>
+    <target>Atrás</target>
+</phrase>
+<phrase>
+    <source>barrel button</source>
+    <target>botón del lápiz</target>
+    <definition>pen</definition>
+</phrase>
+<phrase>
+    <source>barrel-tap</source>
+    <target>puntenar con el botón presionado</target>
+</phrase>
+<phrase>
+    <source>boxed edit</source>
+    <target>edición en casilla</target>
+    <definition>control</definition>
+</phrase>
+<phrase>
+    <source>Browse</source>
+    <target>Examinar</target>
+</phrase>
+<phrase>
+    <source>Cancel</source>
+    <target>Cancelar</target>
+</phrase>
+<phrase>
+    <source>cascading menu</source>
+    <target>menú en cascada</target>
+</phrase>
+<phrase>
+    <source>check box</source>
+    <target>casilla de verificación</target>
+</phrase>
+<phrase>
+    <source>check mark</source>
+    <target>marca de verificación</target>
+</phrase>
+<phrase>
+    <source>child window</source>
+    <target>ventana secundaria</target>
+</phrase>
+<phrase>
+    <source>choose</source>
+    <target>elegir</target>
+</phrase>
+<phrase>
+    <source>click</source>
+    <target>hacer clic</target>
+</phrase>
+<phrase>
+    <source>Clipboard</source>
+    <target>Portapapeles</target>
+</phrase>
+<phrase>
+    <source>Close</source>
+    <target>Cerrar</target>
+</phrase>
+<phrase>
+    <source>Close button</source>
+    <target>botón &amp;quot;Cerrar&amp;quot;</target>
+</phrase>
+<phrase>
+    <source>collapse</source>
+    <target>contraer</target>
+    <definition>outline/esquerna</definition>
+</phrase>
+<phrase>
+    <source>column heading</source>
+    <target>encabezado de columna</target>
+    <definition>control</definition>
+</phrase>
+<phrase>
+    <source>combo box</source>
+    <target>cuadro combinado</target>
+</phrase>
+<phrase>
+    <source>command button</source>
+    <target>botón de comando</target>
+</phrase>
+<phrase>
+    <source>container</source>
+    <target>contenedor</target>
+</phrase>
+<phrase>
+    <source>context-sensitive Help</source>
+    <target>ayuda interactiva</target>
+</phrase>
+<phrase>
+    <source>contextual</source>
+    <target>contextual</target>
+</phrase>
+<phrase>
+    <source>control</source>
+    <target>control</target>
+</phrase>
+<phrase>
+    <source>Copy</source>
+    <target>Copiar</target>
+</phrase>
+<phrase>
+    <source>Copy here</source>
+    <target>Copiar aquí</target>
+</phrase>
+<phrase>
+    <source>Create Shortcut</source>
+    <target>Crear acceso directo</target>
+</phrase>
+<phrase>
+    <source>Create Shortcut Here</source>
+    <target>Crear acceso directo aquí</target>
+</phrase>
+<phrase>
+    <source>Cut</source>
+    <target>Cortar</target>
+</phrase>
+<phrase>
+    <source>default</source>
+    <target>predeterminado</target>
+</phrase>
+<phrase>
+    <source>default button</source>
+    <target>botón predeterminado</target>
+</phrase>
+<phrase>
+    <source>Delete</source>
+    <target>Eliminar</target>
+</phrase>
+<phrase>
+    <source>desktop</source>
+    <target>escritorio</target>
+</phrase>
+<phrase>
+    <source>destination</source>
+    <target>destino</target>
+</phrase>
+<phrase>
+    <source>dialog box</source>
+    <target>cuadro de diálogo</target>
+</phrase>
+<phrase>
+    <source>disability</source>
+    <target>Discapacidades</target>
+</phrase>
+<phrase>
+    <source>disjoint selection</source>
+    <target>selección disjunta</target>
+</phrase>
+<phrase>
+    <source>dock</source>
+    <target>acoplar</target>
+</phrase>
+<phrase>
+    <source>document</source>
+    <target>documento</target>
+</phrase>
+<phrase>
+    <source>double-click</source>
+    <target>hacer doble clic</target>
+</phrase>
+<phrase>
+    <source>double-tap</source>
+    <target>puntear dos veces</target>
+</phrase>
+<phrase>
+    <source>drag</source>
+    <target>arrastrar</target>
+</phrase>
+<phrase>
+    <source>drag-and-drop</source>
+    <target>arrastrar y colocar</target>
+</phrase>
+<phrase>
+    <source>drop-down combo box</source>
+    <target>cuadro combinado desplegable</target>
+</phrase>
+<phrase>
+    <source>drop-down list box</source>
+    <target>cuadro de lista desplegable</target>
+</phrase>
+<phrase>
+    <source>drop-down menu</source>
+    <target>menú desplegable</target>
+</phrase>
+<phrase>
+    <source>Edit</source>
+    <target>Edición</target>
+</phrase>
+<phrase>
+    <source>Edit menu</source>
+    <target>menú Edición</target>
+</phrase>
+<phrase>
+    <source>ellipsis</source>
+    <target>puntos suspensivos</target>
+</phrase>
+<phrase>
+    <source>embedded object</source>
+    <target>objeto incrustado</target>
+</phrase>
+<phrase>
+    <source>Exit</source>
+    <target>Salir</target>
+</phrase>
+<phrase>
+    <source>expand</source>
+    <target>expandir</target>
+    <definition>an outline/un esquema</definition>
+</phrase>
+<phrase>
+    <source>Explore</source>
+    <target>Explorar</target>
+</phrase>
+<phrase>
+    <source>extended selection</source>
+    <target>selección extendida</target>
+</phrase>
+<phrase>
+    <source>extended selection list box</source>
+    <target>cuadro de lista de selección extendida</target>
+</phrase>
+<phrase>
+    <source>file</source>
+    <target>archivo</target>
+</phrase>
+<phrase>
+    <source>File menu</source>
+    <target>menú Archivo</target>
+</phrase>
+<phrase>
+    <source>Find</source>
+    <target>Buscar</target>
+</phrase>
+<phrase>
+    <source>Find Next</source>
+    <target>Buscar siguiente</target>
+</phrase>
+<phrase>
+    <source>Find What</source>
+    <target>Buscar</target>
+</phrase>
+<phrase>
+    <source>folder</source>
+    <target>carpeta</target>
+</phrase>
+<phrase>
+    <source>font</source>
+    <target>fuente</target>
+</phrase>
+<phrase>
+    <source>font size</source>
+    <target>tamaño de fuente</target>
+</phrase>
+<phrase>
+    <source>font style</source>
+    <target>estilo de fuente</target>
+</phrase>
+<phrase>
+    <source>function key</source>
+    <target>tecla de función</target>
+</phrase>
+<phrase>
+    <source>gesture</source>
+    <target>signo</target>
+</phrase>
+<phrase>
+    <source>glyph</source>
+    <target>símbolo gráfico</target>
+</phrase>
+<phrase>
+    <source>group box</source>
+    <target>cuadro de grupo</target>
+</phrase>
+<phrase>
+    <source>handle</source>
+    <target>controlar</target>
+    <definition>verb</definition>
+</phrase>
+<phrase>
+    <source>handle</source>
+    <target>controlador</target>
+    <definition>noun</definition>
+</phrase>
+<phrase>
+    <source>Help</source>
+    <target>Ayuda</target>
+</phrase>
+<phrase>
+    <source>Help menu</source>
+    <target>menú Ayuda</target>
+</phrase>
+<phrase>
+    <source>Hide</source>
+    <target>Ocultar</target>
+</phrase>
+<phrase>
+    <source>hierarchical selection</source>
+    <target>selección jerárquica</target>
+</phrase>
+<phrase>
+    <source>hold</source>
+    <target>mantener presionado</target>
+</phrase>
+<phrase>
+    <source>hot spot</source>
+    <target>punto interactivo</target>
+</phrase>
+<phrase>
+    <source>hot zone</source>
+    <target>zona interactiva</target>
+</phrase>
+<phrase>
+    <source>icon</source>
+    <target>icono</target>
+</phrase>
+<phrase>
+    <source>inactive</source>
+    <target>inactivo</target>
+</phrase>
+<phrase>
+    <source>inactive window</source>
+    <target>ventana inactiva</target>
+</phrase>
+<phrase>
+    <source>ink</source>
+    <target>trazo</target>
+</phrase>
+<phrase>
+    <source>ink edit</source>
+    <target>editor de trazos</target>
+</phrase>
+<phrase>
+    <source>input focus</source>
+    <target>zona de entrada</target>
+</phrase>
+<phrase>
+    <source>input focus</source>
+    <target>zona de entrada de datos</target>
+</phrase>
+<phrase>
+    <source>Insert</source>
+    <target>menú Insertar</target>
+</phrase>
+<phrase>
+    <source>Insert Object</source>
+    <target>Insertar objeto</target>
+</phrase>
+<phrase>
+    <source>insertion point</source>
+    <target>punto de inserción</target>
+</phrase>
+<phrase>
+    <source>italic</source>
+    <target>cursiva</target>
+</phrase>
+<phrase>
+    <source>label</source>
+    <target>etiqueta</target>
+</phrase>
+<phrase>
+    <source>landscape</source>
+    <target>horizontal</target>
+</phrase>
+<phrase>
+    <source>lasso-tap</source>
+    <target>punteo en la selección</target>
+</phrase>
+<phrase>
+    <source>lens</source>
+    <target>lente</target>
+    <definition>control</definition>
+</phrase>
+<phrase>
+    <source>link</source>
+    <target>vincular</target>
+    <definition>verb</definition>
+</phrase>
+<phrase>
+    <source>link</source>
+    <target>vínculo</target>
+    <definition>noun</definition>
+</phrase>
+<phrase>
+    <source>Link Here</source>
+    <target>Vincular aquí</target>
+</phrase>
+<phrase>
+    <source>list box</source>
+    <target>cuadro de lista</target>
+</phrase>
+<phrase>
+    <source>list view</source>
+    <target>ver lista</target>
+    <definition>control</definition>
+</phrase>
+<phrase>
+    <source>list view</source>
+    <target>presentación de iconos </target>
+    <definition>control</definition>
+</phrase>
+<phrase>
+    <source>manual link</source>
+    <target>vínculo manual</target>
+</phrase>
+<phrase>
+    <source>Maximize</source>
+    <target>Maximizar</target>
+</phrase>
+<phrase>
+    <source>maximize button</source>
+    <target>botón de maximizar</target>
+</phrase>
+<phrase>
+    <source>MDI</source>
+    <target>MDI</target>
+</phrase>
+<phrase>
+    <source>menu</source>
+    <target>menú</target>
+</phrase>
+<phrase>
+    <source>menu bar</source>
+    <target>barra de menús</target>
+</phrase>
+<phrase>
+    <source>menu button</source>
+    <target>botón de menú</target>
+</phrase>
+<phrase>
+    <source>menu item</source>
+    <target>elemento de menú</target>
+</phrase>
+<phrase>
+    <source>menu title</source>
+    <target>título de menú</target>
+</phrase>
+<phrase>
+    <source>message box</source>
+    <target>cuadro de mensaje</target>
+</phrase>
+<phrase>
+    <source>Minimize</source>
+    <target>Minimizar</target>
+</phrase>
+<phrase>
+    <source>minimize button</source>
+    <target>botón de minimizar</target>
+</phrase>
+<phrase>
+    <source>mixed-value</source>
+    <target>valores mezclados</target>
+</phrase>
+<phrase>
+    <source>modal</source>
+    <target>modal</target>
+</phrase>
+<phrase>
+    <source>mode</source>
+    <target>modo</target>
+</phrase>
+<phrase>
+    <source>modeless</source>
+    <target>sin modo</target>
+</phrase>
+<phrase>
+    <source>modifier key</source>
+    <target>tecla modificadora</target>
+</phrase>
+<phrase>
+    <source>mouse</source>
+    <target>mouse</target>
+</phrase>
+<phrase>
+    <source>Move</source>
+    <target>Mover</target>
+</phrase>
+<phrase>
+    <source>Move Here</source>
+    <target>Mover aquí</target>
+</phrase>
+<phrase>
+    <source>Multiple Document Interface</source>
+    <target>interfaz de documentos múltiples</target>
+</phrase>
+<phrase>
+    <source>multiple selection list box</source>
+    <target>cuadro de lista de selección múltiple</target>
+</phrase>
+<phrase>
+    <source>My Computer</source>
+    <target>Mi PC</target>
+    <definition>icon/icono</definition>
+</phrase>
+<phrase>
+    <source>Network Neighborhood</source>
+    <target>Entorno de red</target>
+    <definition>icon/icono</definition>
+</phrase>
+<phrase>
+    <source>New</source>
+    <target>Nuevo</target>
+</phrase>
+<phrase>
+    <source>Next</source>
+    <target>Sigulente</target>
+</phrase>
+<phrase>
+    <source>object</source>
+    <target>objeto</target>
+</phrase>
+<phrase>
+    <source>OK</source>
+    <target>Aceptar</target>
+</phrase>
+<phrase>
+    <source>OLE</source>
+    <target>OLE</target>
+</phrase>
+<phrase>
+    <source>OLE drag and drop</source>
+    <target>Arrastrar y colocar de OLE</target>
+</phrase>
+<phrase>
+    <source>OLE embedded object</source>
+    <target>Objeto incrustado de OLE</target>
+</phrase>
+<phrase>
+    <source>OLE linked object</source>
+    <target>Objeto vinculado de OLE</target>
+</phrase>
+<phrase>
+    <source>OLE nondefault drag and drop</source>
+    <target>Arrastrar y colocar no predeterminado de OLE</target>
+</phrase>
+<phrase>
+    <source>Open</source>
+    <target>Abrir</target>
+</phrase>
+<phrase>
+    <source>Open With</source>
+    <target>Abrir con</target>
+</phrase>
+<phrase>
+    <source>option button</source>
+    <target>botón de opción</target>
+</phrase>
+<phrase>
+    <source>option-set</source>
+    <target>opción establecida</target>
+</phrase>
+<phrase>
+    <source>package</source>
+    <target>paquete</target>
+</phrase>
+<phrase>
+    <source>Page Setup</source>
+    <target>Preparar página</target>
+</phrase>
+<phrase>
+    <source>palette window</source>
+    <target>ventana de paleta</target>
+</phrase>
+<phrase>
+    <source>pane</source>
+    <target>panel</target>
+</phrase>
+<phrase>
+    <source>parent window</source>
+    <target>ventana principal</target>
+</phrase>
+<phrase>
+    <source>password</source>
+    <target>contraseña</target>
+</phrase>
+<phrase>
+    <source>Paste</source>
+    <target>Pegar</target>
+</phrase>
+<phrase>
+    <source>Paste Link</source>
+    <target>Pegar vínculo</target>
+</phrase>
+<phrase>
+    <source>Paste Shortcut</source>
+    <target>Pegar acceso directo</target>
+</phrase>
+<phrase>
+    <source>Paste Special</source>
+    <target>Pegado especial</target>
+</phrase>
+<phrase>
+    <source>path</source>
+    <target>ruta de acceso</target>
+</phrase>
+<phrase>
+    <source>Pause</source>
+    <target>Pausa</target>
+</phrase>
+<phrase>
+    <source>pen</source>
+    <target>lápiz</target>
+</phrase>
+<phrase>
+    <source>Play</source>
+    <target>Reproducir</target>
+</phrase>
+<phrase>
+    <source>Plug and Play</source>
+    <target>Plug and Play</target>
+</phrase>
+<phrase>
+    <source>point</source>
+    <target>señalar</target>
+    <definition>verb</definition>
+</phrase>
+<phrase>
+    <source>point</source>
+    <target>punto</target>
+    <definition>noun</definition>
+</phrase>
+<phrase>
+    <source>pointer</source>
+    <target>puntero</target>
+</phrase>
+<phrase>
+    <source>pop-up menu</source>
+    <target>menú emergente</target>
+</phrase>
+<phrase>
+    <source>pop-up window</source>
+    <target>ventana emergente</target>
+</phrase>
+<phrase>
+    <source>portrait</source>
+    <target>vertical</target>
+</phrase>
+<phrase>
+    <source>press</source>
+    <target>presionar</target>
+    <definition>and hold a mouse button/y mantener presionado un botón del mouse</definition>
+</phrase>
+<phrase>
+    <source>press</source>
+    <target>presionar</target>
+    <definition>a key/una tecla</definition>
+</phrase>
+<phrase>
+    <source>primary container</source>
+    <target>contenedor primario</target>
+</phrase>
+<phrase>
+    <source>primary window</source>
+    <target>ventana principal</target>
+</phrase>
+<phrase>
+    <source>Print</source>
+    <target>Imprimir</target>
+</phrase>
+<phrase>
+    <source>printer</source>
+    <target>impresora</target>
+</phrase>
+<phrase>
+    <source>progress indicator</source>
+    <target>indicador de progreso</target>
+    <definition>control</definition>
+</phrase>
+<phrase>
+    <source>project</source>
+    <target>proyecto</target>
+</phrase>
+<phrase>
+    <source>Properties</source>
+    <target>Propiedades</target>
+</phrase>
+<phrase>
+    <source>property inspector</source>
+    <target>monitor de propiedades</target>
+</phrase>
+<phrase>
+    <source>property page</source>
+    <target>página de propiedades</target>
+</phrase>
+<phrase>
+    <source>property sheet</source>
+    <target>hoja de propiedades</target>
+</phrase>
+<phrase>
+    <source>property sheet control</source>
+    <target>control de la hoja de propiedades</target>
+</phrase>
+<phrase>
+    <source>Quick View</source>
+    <target>Vista rápida</target>
+</phrase>
+<phrase>
+    <source>read-only</source>
+    <target>sólo lectura</target>
+</phrase>
+<phrase>
+    <source>recognition</source>
+    <target>reconocimiento</target>
+</phrase>
+<phrase>
+    <source>Recycle Bin</source>
+    <target>Papelera de reciclaje</target>
+    <definition>Icon/icono</definition>
+</phrase>
+<phrase>
+    <source>Redo</source>
+    <target>Rehacer</target>
+</phrase>
+<phrase>
+    <source>region selection</source>
+    <target>selección de área</target>
+</phrase>
+<phrase>
+    <source>registry</source>
+    <target>Registro de configuraciones</target>
+</phrase>
+<phrase>
+    <source>Repeat</source>
+    <target>Repetir</target>
+</phrase>
+<phrase>
+    <source>Replace</source>
+    <target>Reemplazar</target>
+</phrase>
+<phrase>
+    <source>Restore</source>
+    <target>Restaurar</target>
+</phrase>
+<phrase>
+    <source>Restore button</source>
+    <target>botón &amp;quot;Restaurar&amp;quot;</target>
+</phrase>
+<phrase>
+    <source>Resume</source>
+    <target>Reanudar</target>
+</phrase>
+<phrase>
+    <source>Retry</source>
+    <target>Reintentar</target>
+</phrase>
+<phrase>
+    <source>rich-text box</source>
+    <target>cuadro de texto enriquecido</target>
+</phrase>
+<phrase>
+    <source>Run</source>
+    <target>Ejecutar</target>
+</phrase>
+<phrase>
+    <source>Save</source>
+    <target>Guardar</target>
+</phrase>
+<phrase>
+    <source>Save as</source>
+    <target>Guardar como</target>
+</phrase>
+<phrase>
+    <source>scroll</source>
+    <target>desplazar</target>
+</phrase>
+<phrase>
+    <source>scroll arrow</source>
+    <target>flecha de desplazamiento</target>
+</phrase>
+<phrase>
+    <source>scroll bar</source>
+    <target>barra de desplazamiento</target>
+</phrase>
+<phrase>
+    <source>scroll box</source>
+    <target>cuadro de desplazamiento</target>
+</phrase>
+<phrase>
+    <source>secondary window</source>
+    <target>ventana secundaria</target>
+</phrase>
+<phrase>
+    <source>select</source>
+    <target>seleccionar</target>
+</phrase>
+<phrase>
+    <source>Select All</source>
+    <target>Seleccionar todo</target>
+</phrase>
+<phrase>
+    <source>selection</source>
+    <target>selección</target>
+</phrase>
+<phrase>
+    <source>selection handle</source>
+    <target>controlador de selección</target>
+</phrase>
+<phrase>
+    <source>Send To</source>
+    <target>Enviar a</target>
+</phrase>
+<phrase>
+    <source>separator</source>
+    <target>separador</target>
+</phrase>
+<phrase>
+    <source>Settings</source>
+    <target>Configuración</target>
+</phrase>
+<phrase>
+    <source>Setup</source>
+    <target>Configurar</target>
+    <definition>for a device already installed</definition>
+</phrase>
+<phrase>
+    <source>Setup</source>
+    <target>Instalar</target>
+    <definition>for an application</definition>
+</phrase>
+<phrase>
+    <source>shortcut</source>
+    <target>acceso directo</target>
+</phrase>
+<phrase>
+    <source>shortcut button</source>
+    <target>botón de acceso directo</target>
+</phrase>
+<phrase>
+    <source>shortcut icon</source>
+    <target>icono de acceso directo</target>
+</phrase>
+<phrase>
+    <source>shortcut key</source>
+    <target>tecla de método abreviado</target>
+</phrase>
+<phrase>
+    <source>shortcut key control</source>
+    <target>control de la tecla de método abreviado</target>
+</phrase>
+<phrase>
+    <source>Show</source>
+    <target>Mostrar</target>
+</phrase>
+<phrase>
+    <source>Shutdown</source>
+    <target>Apagar el sistema</target>
+</phrase>
+<phrase>
+    <source>single selection list box</source>
+    <target>cuadro de lista de selección simple</target>
+</phrase>
+<phrase>
+    <source>Size</source>
+    <target>Tamaño</target>
+</phrase>
+<phrase>
+    <source>size grip</source>
+    <target>ajuste de tamaño</target>
+</phrase>
+<phrase>
+    <source>slider</source>
+    <target>control deslizante</target>
+</phrase>
+<phrase>
+    <source>spin box</source>
+    <target>cuadro selector</target>
+</phrase>
+<phrase>
+    <source>Split</source>
+    <target>Dividir</target>
+</phrase>
+<phrase>
+    <source>split bar</source>
+    <target>barra de división</target>
+</phrase>
+<phrase>
+    <source>split box</source>
+    <target>cuadro de división</target>
+</phrase>
+<phrase>
+    <source>Start button</source>
+    <target>botón &amp;quot;Inicio&amp;quot;</target>
+</phrase>
+<phrase>
+    <source>StartUp folder</source>
+    <target>carpeta Inicio</target>
+</phrase>
+<phrase>
+    <source>status bar</source>
+    <target>barra de estado</target>
+</phrase>
+<phrase>
+    <source>Stop</source>
+    <target>Detener</target>
+</phrase>
+<phrase>
+    <source>tab control</source>
+    <target>control de fichas</target>
+</phrase>
+<phrase>
+    <source>tap</source>
+    <target>puntear</target>
+</phrase>
+<phrase>
+    <source>task bar</source>
+    <target>barra de tareas</target>
+</phrase>
+<phrase>
+    <source>task-oriented Help</source>
+    <target>Ayuda relativa a la tarea</target>
+</phrase>
+<phrase>
+    <source>template</source>
+    <target>plantilla</target>
+</phrase>
+<phrase>
+    <source>text box</source>
+    <target>cuadro de texto</target>
+</phrase>
+<phrase>
+    <source>title bar</source>
+    <target>barra de título</target>
+</phrase>
+<phrase>
+    <source>title text</source>
+    <target>texto de título</target>
+</phrase>
+<phrase>
+    <source>toggle key</source>
+    <target>tecla para alternar</target>
+</phrase>
+<phrase>
+    <source>toolbar</source>
+    <target>barra de herramientas</target>
+</phrase>
+<phrase>
+    <source>tooltip</source>
+    <target>sugerencias</target>
+</phrase>
+<phrase>
+    <source>tree view control</source>
+    <target>control de visión en árbol</target>
+</phrase>
+<phrase>
+    <source>type</source>
+    <target>escribir</target>
+    <definition>verb</definition>
+</phrase>
+<phrase>
+    <source>type</source>
+    <target>tipo</target>
+    <definition>noun</definition>
+</phrase>
+<phrase>
+    <source>unavailable</source>
+    <target>no disponible</target>
+</phrase>
+<phrase>
+    <source>Undo</source>
+    <target>Deshacer</target>
+</phrase>
+<phrase>
+    <source>Uninstall</source>
+    <target>Desinstalar</target>
+</phrase>
+<phrase>
+    <source>View</source>
+    <target>menú Ver</target>
+</phrase>
+<phrase>
+    <source>visual editing</source>
+    <target>edición visual</target>
+</phrase>
+<phrase>
+    <source>well control</source>
+    <target>control de opciones gráficas</target>
+</phrase>
+<phrase>
+    <source>What&apos;s This?</source>
+    <target>¿Qué es esto?</target>
+</phrase>
+<phrase>
+    <source>Window</source>
+    <target>menú Ventana</target>
+</phrase>
+<phrase>
+    <source>window</source>
+    <target>ventana</target>
+</phrase>
+<phrase>
+    <source>Windows Explorer</source>
+    <target>Explorador de Windows</target>
+</phrase>
+<phrase>
+    <source>wizard</source>
+    <target>asistente</target>
+</phrase>
+<phrase>
+    <source>workbook</source>
+    <target>libro</target>
+</phrase>
+<phrase>
+    <source>workbook</source>
+    <target>libro de trabajo</target>
+</phrase>
+<phrase>
+    <source>workgroup</source>
+    <target>grupo de trabajo</target>
+</phrase>
+<phrase>
+    <source>workspace</source>
+    <target>área de trabajo</target>
+</phrase>
+<phrase>
+    <source>Yes</source>
+    <target>Sí</target>
+</phrase>
+</QPH>

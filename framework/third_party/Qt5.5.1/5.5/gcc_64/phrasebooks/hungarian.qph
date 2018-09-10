@@ -1,0 +1,752 @@
+<!DOCTYPE QPH>
+<QPH language="hu_HU">
+<phrase>
+    <source>OK</source>
+    <target>OK</target>
+</phrase>
+<phrase>
+    <source>Bookmarks</source>
+    <target>Könyvjelzők</target>
+</phrase>
+<phrase>
+    <source>Remove</source>
+    <target>Törlés</target>
+</phrase>
+<phrase>
+    <source>New Folder</source>
+    <target>Új könyvtár</target>
+</phrase>
+<phrase>
+    <source>Add</source>
+    <target>Hozzáadás</target>
+</phrase>
+<phrase>
+    <source>Previous</source>
+    <target>Előző</target>
+</phrase>
+<phrase>
+    <source>Font</source>
+    <target>Betűtípus</target>
+</phrase>
+<phrase>
+    <source>Help</source>
+    <target>Segítség</target>
+</phrase>
+<phrase>
+    <source>Done</source>
+    <target>Kész</target>
+</phrase>
+<phrase>
+    <source>Install</source>
+    <target>Telepítés</target>
+</phrase>
+<phrase>
+    <source>Cancel</source>
+    <target>Mégsem</target>
+</phrase>
+<phrase>
+    <source>Installation Path:</source>
+    <target>Telepítési útvonal:</target>
+</phrase>
+<phrase>
+    <source>Index</source>
+    <target>Index</target>
+</phrase>
+<phrase>
+    <source>Contents</source>
+    <target>Tartalom</target>
+</phrase>
+<phrase>
+    <source>Search</source>
+    <target>Keresés</target>
+</phrase>
+<phrase>
+    <source>Print Preview...</source>
+    <target>Nyomtatási kép...</target>
+</phrase>
+<phrase>
+    <source>About...</source>
+    <target>Névjegy...</target>
+</phrase>
+<phrase>
+    <source>Toolbars</source>
+    <target>Eszköztárak</target>
+</phrase>
+<phrase>
+    <source>Address:</source>
+    <target>Cím:</target>
+</phrase>
+<phrase>
+    <source>Open Source Edition</source>
+    <target>Nyíltforrású kiadás</target>
+</phrase>
+<phrase>
+    <source>Yes</source>
+    <target>Igen</target>
+</phrase>
+<phrase>
+    <source>No</source>
+    <target>Nem</target>
+</phrase>
+<phrase>
+    <source>Apply</source>
+    <target>Alkalmaz</target>
+</phrase>
+<phrase>
+    <source>Ignore</source>
+    <target>Kihagyás</target>
+</phrase>
+<phrase>
+    <source>Abort</source>
+    <target>Megszakítás</target>
+</phrase>
+<phrase>
+    <source>Play</source>
+    <target>Lejátszás</target>
+</phrase>
+<phrase>
+    <source>Pause</source>
+    <target>Szünet</target>
+</phrase>
+<phrase>
+    <source>File</source>
+    <target>Fájl</target>
+    <definition>menu</definition>
+</phrase>
+<phrase>
+    <source>file</source>
+    <target>fájl</target>
+</phrase>
+<phrase>
+    <source>directory</source>
+    <target>könyvtár</target>
+</phrase>
+<phrase>
+    <source>Symlink</source>
+    <target>Szimbolikus link</target>
+</phrase>
+<phrase>
+    <source>Delete</source>
+    <target>Törlés</target>
+</phrase>
+<phrase>
+    <source>Rename</source>
+    <target>Átnevezés</target>
+</phrase>
+<phrase>
+    <source>Back</source>
+    <target>Vissza</target>
+</phrase>
+<phrase>
+    <source>Forward</source>
+    <target>Előre</target>
+</phrase>
+<phrase>
+    <source>Finish</source>
+    <target>Befejezés</target>
+</phrase>
+<phrase>
+    <source>Quit</source>
+    <target>Kilépés</target>
+</phrase>
+<phrase>
+    <source>Exit</source>
+    <target>Kilépés</target>
+</phrase>
+<phrase>
+    <source>Close</source>
+    <target>Bezárás</target>
+</phrase>
+<phrase>
+    <source>Close All</source>
+    <target>Mindent bezár</target>
+</phrase>
+<phrase>
+    <source>Error</source>
+    <target>Hiba</target>
+</phrase>
+<phrase>
+    <source>Warning</source>
+    <target>Figyelmeztetés</target>
+</phrase>
+<phrase>
+    <source>Information</source>
+    <target>Információ</target>
+</phrase>
+<phrase>
+    <source>Question</source>
+    <target>Kérdés</target>
+</phrase>
+<phrase>
+    <source>document</source>
+    <target>dokumentum</target>
+</phrase>
+<phrase>
+    <source>author</source>
+    <target>szerző</target>
+</phrase>
+<phrase>
+    <source>subsidiary(-ies)</source>
+    <target>leányvállalata(i)</target>
+</phrase>
+<phrase>
+    <source>Help</source>
+    <target>Súgó</target>
+</phrase>
+<phrase>
+    <source>Undo</source>
+    <target>Visszavonás</target>
+</phrase>
+<phrase>
+    <source>Redo</source>
+    <target>Újra</target>
+</phrase>
+<phrase>
+    <source>Open</source>
+    <target>Megnyitás</target>
+</phrase>
+<phrase>
+    <source>Save</source>
+    <target>Mentés</target>
+</phrase>
+<phrase>
+    <source>Save all</source>
+    <target>Mindet menti</target>
+</phrase>
+<phrase>
+    <source>click</source>
+    <target>kattintás</target>
+    <definition>noun</definition>
+</phrase>
+<phrase>
+    <source>click</source>
+    <target>kattintson</target>
+    <definition>ask</definition>
+</phrase>
+<phrase>
+    <source>Recent</source>
+    <target>Előző</target>
+    <definition>Recent files/Előző fájlok</definition>
+</phrase>
+<phrase>
+    <source>Window</source>
+    <target>Ablak</target>
+</phrase>
+<phrase>
+    <source>Cascade</source>
+    <target>Lépcsőzetes</target>
+</phrase>
+<phrase>
+    <source>Tile</source>
+    <target>Mozaikszerű</target>
+</phrase>
+<phrase>
+    <source>Game</source>
+    <target>Játék</target>
+</phrase>
+<phrase>
+    <source>New Game</source>
+    <target>Új játék</target>
+</phrase>
+<phrase>
+    <source>Untitled</source>
+    <target>Névtelen</target>
+</phrase>
+<phrase>
+    <source>Unknown error</source>
+    <target>Ismeretlen hiba</target>
+</phrase>
+<phrase>
+    <source>New Folder</source>
+    <target>Új mappa</target>
+</phrase>
+<phrase>
+    <source>folder</source>
+    <target>mappa</target>
+</phrase>
+<phrase>
+    <source>New Directory</source>
+    <target>Új könyvtár</target>
+</phrase>
+<phrase>
+    <source>unknown</source>
+    <target>ismeretlen</target>
+</phrase>
+<phrase>
+    <source>Copy</source>
+    <target>Másolás</target>
+</phrase>
+<phrase>
+    <source>Cut</source>
+    <target>Kivágás</target>
+</phrase>
+<phrase>
+    <source>Paste</source>
+    <target>Beillesztés</target>
+</phrase>
+<phrase>
+    <source>Paste special</source>
+    <target>Speciális beillesztés</target>
+</phrase>
+<phrase>
+    <source>Insert</source>
+    <target>Beszúrás</target>
+</phrase>
+<phrase>
+    <source>Copy here</source>
+    <target>Másolás ide</target>
+</phrase>
+<phrase>
+    <source>Minimize</source>
+    <target>Minimalizálás</target>
+</phrase>
+<phrase>
+    <source>Zoom</source>
+    <target>Nagyítás</target>
+</phrase>
+<phrase>
+    <source>&amp;Edit</source>
+    <target>S&amp;zerkesztés</target>
+</phrase>
+<phrase>
+    <source>&amp;View</source>
+    <target>&amp;Nézet</target>
+</phrase>
+<phrase>
+    <source>Application</source>
+    <target>Alkalmazás</target>
+</phrase>
+<phrase>
+    <source>Documentation</source>
+    <target>Dokumentáció</target>
+</phrase>
+<phrase>
+    <source>Network</source>
+    <target>Hálózat</target>
+</phrase>
+<phrase>
+    <source>Current Page</source>
+    <target>Aktuális oldal</target>
+</phrase>
+<phrase>
+    <source>Find</source>
+    <target>Keresés</target>
+</phrase>
+<phrase>
+    <source>Locale</source>
+    <target>Nyelv</target>
+</phrase>
+<phrase>
+    <source>Cannot open &apos;%1&apos;.</source>
+    <target>&apos;%1&apos; nem nyitható meg.</target>
+</phrase>
+<phrase>
+    <source>Cannot find the string &apos;%1&apos;.</source>
+    <target>A szöveg nem található: &apos;%1&apos;.</target>
+</phrase>
+<phrase>
+    <source>A file called &apos;%1&apos; already exists.  Please choose another name.</source>
+    <target>&apos;%1&apos; nevű fájl már létezik. Válasszon egy másik nevet.</target>
+</phrase>
+<phrase>
+    <source>The program is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.</source>
+    <target>Ez a program abban a reményben került közreadásra, hogy hasznos lesz, de minden egyéb GARANCIA NÉLKÜL, az ELADHATÓSÁGRA vagy VALAMELY CÉLRA VALÓ ALKALMAZHATÓSÁGRA való származtatott garanciát is beleértve.</target>
+    <definition>License text in most Qt programs</definition>
+</phrase>
+<phrase>
+    <source>Open Link</source>
+    <target>Link megnyitása</target>
+</phrase>
+<phrase>
+    <source>Next</source>
+    <target>Következő</target>
+</phrase>
+<phrase>
+    <source>Case Sensitive</source>
+    <target>Kis/nagybetű érzékeny</target>
+</phrase>
+<phrase>
+    <source>Whole words</source>
+    <target>Teljes szó</target>
+</phrase>
+<phrase>
+    <source>Open Link in New Tab</source>
+    <target>Link megnyitása új lapon</target>
+</phrase>
+<phrase>
+    <source>Download canceled.</source>
+    <target>Letöltés megszakítva.</target>
+</phrase>
+<phrase>
+    <source>The file %1 already exists. Do you want to overwrite it?</source>
+    <target>A(z) &apos;%1&apos; nevű fájl már létezik. Felülírja?</target>
+</phrase>
+<phrase>
+    <source>Qt Assistant</source>
+    <target>Qt Asszisztens</target>
+</phrase>
+<phrase>
+    <source>Preferences...</source>
+    <target>Beállítások...</target>
+</phrase>
+<phrase>
+    <source>&amp;File</source>
+    <target>&amp;Fájl</target>
+</phrase>
+<phrase>
+    <source>Browser</source>
+    <target>Böngésző</target>
+</phrase>
+<phrase>
+    <source>Filters</source>
+    <target>Szűrők</target>
+</phrase>
+<phrase>
+    <source>Delete Folder</source>
+    <target>Mappa törlése</target>
+</phrase>
+<phrase>
+    <source>Rename Folder</source>
+    <target>Mappa átnevezése</target>
+</phrase>
+<phrase>
+    <source>You need a commercial Qt license for development of proprietary (closed source) applications. Please see &lt;a href=&quot;http://www.trolltech.com/company/model.html&quot;&gt;www.trolltech.com/company/model.html&lt;/a&gt; for an overview of Qt licensing.</source>
+    <target>Amennyiben zárt forrású alkalmazás fejlesztéséhez kívánja a Qt-t felhasználni, szüksége lesz a Qt kereskedelmi verziójára. Kérem tekintse meg az &lt;tt&gt;http://www.trolltech.com/company/model.html&lt;/tt&gt; oldalt a Qt licenszelésének áttekintéséhez.</target>
+</phrase>
+<phrase>
+    <source>New Tab</source>
+    <target>Új fül</target>
+</phrase>
+<phrase>
+    <source>Close Tab</source>
+    <target>Fül bezárása</target>
+</phrase>
+<phrase>
+    <source>Close Other Tabs</source>
+    <target>A többi fül bezárása</target>
+</phrase>
+<phrase>
+    <source>True</source>
+    <target>Igaz</target>
+</phrase>
+<phrase>
+    <source>False</source>
+    <target>Hamis</target>
+</phrase>
+<phrase>
+    <source>Update</source>
+    <target>Frissítés</target>
+</phrase>
+<phrase>
+    <source>Normal</source>
+    <target>Normál</target>
+</phrase>
+<phrase>
+    <source>Bold</source>
+    <target>Félkövér</target>
+</phrase>
+<phrase>
+    <source>Italic</source>
+    <target>Dőlt</target>
+</phrase>
+<phrase>
+    <source>Greek</source>
+    <target>Görög</target>
+</phrase>
+<phrase>
+    <source>Cyrillic</source>
+    <target>Cirill</target>
+</phrase>
+<phrase>
+    <source>Armenian</source>
+    <target>Örmény</target>
+</phrase>
+<phrase>
+    <source>Hebrew</source>
+    <target>Héber</target>
+</phrase>
+<phrase>
+    <source>Arabic</source>
+    <target>Arab</target>
+</phrase>
+<phrase>
+    <source>Syriac</source>
+    <target>Szír</target>
+</phrase>
+<phrase>
+    <source>Permission denied</source>
+    <target>Hozzáférés megtagadva</target>
+</phrase>
+<phrase>
+    <source>Too many open files</source>
+    <target>Túl sok fájl van nyitva</target>
+</phrase>
+<phrase>
+    <source>No such file or directory</source>
+    <target>Nincs ilyen fájl vagy könyvtár</target>
+</phrase>
+<phrase>
+    <source>No space left on device</source>
+    <target>Nincs több hely az eszközön</target>
+</phrase>
+<phrase>
+    <source>Width:</source>
+    <target>Szélesség:</target>
+</phrase>
+<phrase>
+    <source>Height:</source>
+    <target>Magasság:</target>
+</phrase>
+<phrase>
+    <source>Margins</source>
+    <target>Margók</target>
+</phrase>
+<phrase>
+    <source>top margin</source>
+    <target>felső margó</target>
+</phrase>
+<phrase>
+    <source>left margin</source>
+    <target>bal margó</target>
+</phrase>
+<phrase>
+    <source>right margin</source>
+    <target>jobb margó</target>
+</phrase>
+<phrase>
+    <source>bottom margin</source>
+    <target>alsó margó</target>
+</phrase>
+<phrase>
+    <source>Next page</source>
+    <target>Következő oldal</target>
+</phrase>
+<phrase>
+    <source>Previous page</source>
+    <target>Előző oldal</target>
+</phrase>
+<phrase>
+    <source>First page</source>
+    <target>Első oldal</target>
+</phrase>
+<phrase>
+    <source>Last page</source>
+    <target>Utolsó oldal</target>
+</phrase>
+<phrase>
+    <source>Fit width</source>
+    <target>Szélesség igazítása</target>
+</phrase>
+<phrase>
+    <source>Fit page</source>
+    <target>Oldal igazítása</target>
+</phrase>
+<phrase>
+    <source>Zoom in</source>
+    <target>Nagyítás</target>
+</phrase>
+<phrase>
+    <source>Zoom out</source>
+    <target>Kicsinyítés</target>
+</phrase>
+<phrase>
+    <source>Portrait</source>
+    <target>Álló</target>
+</phrase>
+<phrase>
+    <source>Landscape</source>
+    <target>Fekvő</target>
+</phrase>
+<phrase>
+    <source>Print</source>
+    <target>Nyomtatás</target>
+</phrase>
+<phrase>
+    <source>Page setup</source>
+    <target>Oldalbeállítás</target>
+</phrase>
+<phrase>
+    <source>Color</source>
+    <target>Szín</target>
+</phrase>
+<phrase>
+    <source>Grayscale</source>
+    <target>Szürkeárnyalatos</target>
+</phrase>
+<phrase>
+    <source>None</source>
+    <target>Nincs</target>
+</phrase>
+<phrase>
+    <source>...</source>
+    <target>...</target>
+</phrase>
+<phrase>
+    <source>Menu</source>
+    <target>Menü</target>
+</phrase>
+<phrase>
+    <source>Keep</source>
+    <target>Meghagy</target>
+</phrase>
+<phrase>
+    <source>Pause</source>
+    <target>Megállít</target>
+</phrase>
+<phrase>
+    <source>Log</source>
+    <target>Napló</target>
+</phrase>
+<phrase>
+    <source>Mi&amp;nimize</source>
+    <target>&amp;Kis méret</target>
+</phrase>
+<phrase>
+    <source>Press</source>
+    <target>Nyomja meg</target>
+</phrase>
+<phrase>
+    <source>Submit</source>
+    <target>Küldés</target>
+</phrase>
+<phrase>
+    <source>Underline</source>
+    <target>Aláhúzott</target>
+</phrase>
+<phrase>
+    <source>Outline</source>
+    <target>Áthúzott</target>
+</phrase>
+<phrase>
+    <source>Direction</source>
+    <target>Irány</target>
+</phrase>
+<phrase>
+    <source>Configuration</source>
+    <target>Konfiguráció</target>
+</phrase>
+<phrase>
+    <source>None</source>
+    <target>Semmi</target>
+</phrase>
+<phrase>
+    <source>Save As...</source>
+    <target>Mentés másként...</target>
+</phrase>
+<phrase>
+    <source>Context</source>
+    <target>Környezet</target>
+</phrase>
+<phrase>
+    <source>Edit</source>
+    <target>Szerkesztés</target>
+</phrase>
+<phrase>
+    <source>Toolbar</source>
+    <target>Eszköztár</target>
+</phrase>
+<phrase>
+    <source>&amp;Print...</source>
+    <target>&amp;Nyomtatás...</target>
+</phrase>
+<phrase>
+    <source>E&amp;xit</source>
+    <target>&amp;Kilépés</target>
+</phrase>
+<phrase>
+    <source>Sidebar</source>
+    <target>Oldalsáv</target>
+</phrase>
+<phrase>
+    <source>Bookmark</source>
+    <target>Könyvjelző</target>
+</phrase>
+<phrase>
+    <source>Save As</source>
+    <target>Mentés másként</target>
+</phrase>
+<phrase>
+    <source>Select All</source>
+    <target>Összes kijelölése</target>
+</phrase>
+<phrase>
+    <source>Name</source>
+    <target>Név</target>
+</phrase>
+<phrase>
+    <source>Type</source>
+    <target>Típus</target>
+</phrase>
+<phrase>
+    <source>Date</source>
+    <target>Dátum</target>
+</phrase>
+<phrase>
+    <source>Name</source>
+    <target>Név</target>
+</phrase>
+<phrase>
+    <source>Unknown</source>
+    <target>Ismeretlen</target>
+</phrase>
+<phrase>
+    <source>Value</source>
+    <target>Érték</target>
+</phrase>
+<phrase>
+    <source>Default</source>
+    <target>Alapértelmezett</target>
+</phrase>
+<phrase>
+    <source>New</source>
+    <target>Új</target>
+</phrase>
+<phrase>
+    <source>Level</source>
+    <target>Szint</target>
+</phrase>
+<phrase>
+    <source>Location</source>
+    <target>Hely</target>
+</phrase>
+<phrase>
+    <source>Reload</source>
+    <target>Újratöltés</target>
+</phrase>
+<phrase>
+    <source>Pictures</source>
+    <target>Képek</target>
+</phrase>
+<phrase>
+    <source>Battery</source>
+    <target>Elem</target>
+</phrase>
+<phrase>
+    <source>No error</source>
+    <target>Nincs hiba</target>
+</phrase>
+<phrase>
+    <source>Whole words</source>
+    <target>Teljes szó</target>
+</phrase>
+<phrase>
+    <source>(Új bejegyzés)</source>
+    <target></target>
+</phrase>
+<phrase>
+    <source>Horizontal</source>
+    <target>Vízszintes</target>
+</phrase>
+<phrase>
+    <source>Enabled</source>
+    <target>Engedélyezve</target>
+</phrase>
+<phrase>
+    <source>Up</source>
+    <target>Fel</target>
+</phrase>
+<phrase>
+    <source>Down</source>
+    <target>Le</target>
+</phrase>
+</QPH>

@@ -1,0 +1,12 @@
+# Define all coms in DAG streaming.
+module_config {
+    module_library : "lib/libapollo_sensor.so"
+    components {
+      class_name : "::apollo::sensor::SensorDriverComponent"
+      config {
+        name : "sensor_driver"
+        config_file_path : "conf/sensor.conf"
+        readers {channel: ""}
+      }
+    }
+}

@@ -1,0 +1,84 @@
+#ifndef MAINWINDOW_H
+#define MAINWINDOW_H
+
+#include <QList>
+#include <QMainWindow>
+#include <QMutex>
+#include <QPixmap>
+#include <QTimer>
+#include <QVector2D>
+#include <QColor>
+#include <memory>
+
+#include "about_dialog.h"
+#include "compositeitem.h"
+
+class QTreeWidgetItem;
+
+class GraphicsScene;
+class QGraphicsItem;
+class Arrow;
+
+namespace Ui {
+class MainWindow;
+}
+
+namespace apollo {
+namespace cybertron {
+namespace proto {
+class ChangeMsg;
+}
+}
+}
+
+class MainWindow : public QMainWindow {
+  Q_OBJECT
+ public:
+  explicit MainWindow(QWidget* parent = nullptr);
+  ~MainWindow();
+
+  void TopologyChanged(const apollo::cybertron::proto::ChangeMsg& change_msg);
+
+ private slots:
+  void UpdateSceneItem(void);
+  void TreeItemChanged(void);
+  void SceneItemSelectionChanged(void);
+
+ private:
+  struct ChannelData;
+
+  void AddSceneItem(const std::string& channelName, const std::string& nodeName,
+                    bool isReader);
+  void RemoveSceneItem(const std::string& channelName,
+                       const std::string& nodeName, bool isReader);
+  using ChangeSceneItemFunc =
+      void (MainWindow::*)(const std::string& channelName,
+                           const std::string& nodeName, bool isReader);
+
+  Arrow* createArrow(CompositeItem* startItem, CompositeItem* endItem);
+  void delSceneItemAndArrow(ChannelData* item);
+
+  void AdjustSceneLayout(void);
+
+  Ui::MainWindow* ui_;
+  AboutDialog* about_dialog_;
+
+  QTreeWidgetItem* all_channel_root_;
+  QTreeWidgetItem* all_reader_root_;
+  QTreeWidgetItem* all_writer_root_;
+  CompositeItem* focused_item_;
+
+  QGraphicsScene* topology_scene_;
+  QTimer refresh_timer_;
+
+  QColor item_raw_color_;
+  QVector2D max_rect_;
+
+  QList<QGraphicsItem*> buffer_list_;
+  QList<ChannelData*> delete_list_;
+
+  struct ChannelDataSet;
+  std::map<std::string, ChannelDataSet*> channel_reader_writer_map_;
+};
+
+#endif  // MAINWINDOW_H

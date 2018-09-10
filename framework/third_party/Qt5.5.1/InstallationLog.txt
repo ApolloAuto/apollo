@@ -1,0 +1,376 @@
+************************************* Invoked: 周四 6月 28 15:02:09 2018
+[0] Arguments:  ./qt-opensource-linux-x64-5.5.1.run
+[1] Operations sanity check succeeded.
+[7] Reading Qt Account settings from disk: "/home/work/.local/share/Qt/qtaccount.ini"
+[7] Qt Account settings file [/home/work/.local/share/Qt/qtaccount.ini] does not exist.
+[7] QtAccount information:
+[7] Login completed: false
+[7] Email: ""
+[7] Email verified: false
+[7] Total number of licenses: 0
+[7] Account type: 4
+[755243] Proceed without Qt Account login
+[915578] Tmp and install folder are on the same volume. Volume mount point: "/" Free space available: "76.63 GiB"
+[915578] Installation space required: "988.21 MiB" Temporary space required: "256.00 MiB" Local repository size: "0.00 bytes"
+[916990] perform  operation: Mkdir
+[916990] 	- arguments: /home/work/baidu/adu-lab/cybertron-apollo/third-party
+[916991] Done
+[916991] backup  operation: Mkdir
+[916991] 	- arguments: /home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1
+[916991] Done
+[916991] perform  operation: Mkdir
+[916991] 	- arguments: /home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1
+[916991] Done
+[916991] Install size: 9 components
+[917106] Register documentation and examples for: /home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64
+[917106] Patching doc & examples for: /home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64
+[917106] qt.conf file: /home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/bin/qt.conf
+[917109] backup qt.tools.qtcreator operation: Extract
+[917109] 	- arguments: installer://qt.tools.qtcreator/3.5.1-0qt-creator-opensource-rhel66-64.7z, /home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1
+[917109] Done
+[917109] perform qt.tools.qtcreator operation: Extract
+[917109] 	- arguments: installer://qt.tools.qtcreator/3.5.1-0qt-creator-opensource-rhel66-64.7z, /home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1
+[924022] Done
+[924026] backup qt.tools.qtcreator operation: InstallIcons
+[924026] 	- arguments: /home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/Tools/QtCreator/share/icons
+[924026] Done
+[924026] perform qt.tools.qtcreator operation: InstallIcons
+[924026] 	- arguments: /home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/Tools/QtCreator/share/icons
+[924031] Done
+[924031] backup qt.tools.qtcreator operation: CreateDesktopEntry
+[924031] 	- arguments: DigiaQt-qtcreator-community.desktop, Type=Application
+Exec=/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/Tools/QtCreator/bin/qtcreator
+Name=Qt Creator (Community)
+GenericName=The IDE of choice for Qt development.
+Icon=QtProject-qtcreator
+Terminal=false
+Categories=Development;IDE;Qt;
+MimeType=text/x-c++src;text/x-c++hdr;text/x-xsrc;application/x-designer;application/vnd.qt.qmakeprofile;application/vnd.qt.xml.resource;text/x-qml;text/x-qt.qml;text/x-qt.qbs;
+[924031] Done
+[924031] perform qt.tools.qtcreator operation: CreateDesktopEntry
+[924031] 	- arguments: DigiaQt-qtcreator-community.desktop, Type=Application
+Exec=/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/Tools/QtCreator/bin/qtcreator
+Name=Qt Creator (Community)
+GenericName=The IDE of choice for Qt development.
+Icon=QtProject-qtcreator
+Terminal=false
+Categories=Development;IDE;Qt;
+MimeType=text/x-c++src;text/x-c++hdr;text/x-xsrc;application/x-designer;application/vnd.qt.qmakeprofile;application/vnd.qt.xml.resource;text/x-qml;text/x-qt.qml;text/x-qt.qbs;
+[924031] Done
+[924031] backup qt.license.thirdparty operation: Extract
+[924031] 	- arguments: installer://qt.license.thirdparty/1.0.0fdl_license.7z, /home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1
+[924031] Done
+[924031] perform qt.license.thirdparty operation: Extract
+[924031] 	- arguments: installer://qt.license.thirdparty/1.0.0fdl_license.7z, /home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1
+[924033] Done
+[924033] backup qt.license.lgpl operation: License
+[924033] 	- arguments: 
+[924033] Done
+[924034] perform qt.license.lgpl operation: License
+[924034] 	- arguments: 
+[924034] Done
+[924034] backup qt.55.examples operation: Extract
+[924034] 	- arguments: installer://qt.55.examples/5.5.1-0qt5_examples.7z, /home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1
+[924034] Done
+[924034] perform qt.55.examples operation: Extract
+[924034] 	- arguments: installer://qt.55.examples/5.5.1-0qt5_examples.7z, /home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1
+[928701] Done
+[928956] backup qt.55.doc operation: Extract
+[928956] 	- arguments: installer://qt.55.doc/5.5.1-0qt5_docs.7z, /home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1
+[928956] Done
+[928956] perform qt.55.doc operation: Extract
+[928957] 	- arguments: installer://qt.55.doc/5.5.1-0qt5_docs.7z, /home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1
+[937394] Done
+[937394] backup qt.55.doc operation: Settings
+[937396] 	- arguments: path=/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1//Tools/QtCreator/share/qtcreator/QtProject/QtCreator.ini, method=add_array_value, key=Help/InstalledDocumentation, value=/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/Docs/Qt-5.5/
+[937396] Done
+[937396] perform qt.55.doc operation: Settings
+[937396] 	- arguments: path=/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1//Tools/QtCreator/share/qtcreator/QtProject/QtCreator.ini, method=add_array_value, key=Help/InstalledDocumentation, value=/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/Docs/Qt-5.5/
+[937402] Done
+[937405] backup qt.55.gcc_64 operation: Extract
+[937405] 	- arguments: installer://qt.55.gcc_64/5.5.1-0icu-linux-g++-Rhel6.6-x64.7z, /home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1
+[937405] Done
+[937405] perform qt.55.gcc_64 operation: Extract
+[937405] 	- arguments: installer://qt.55.gcc_64/5.5.1-0icu-linux-g++-Rhel6.6-x64.7z, /home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1
+[938143] Done
+[938143] backup qt.55.gcc_64 operation: Extract
+[938143] 	- arguments: installer://qt.55.gcc_64/5.5.1-0qt5_addons.7z, /home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1
+[938143] Done
+[938144] perform qt.55.gcc_64 operation: Extract
+[938144] 	- arguments: installer://qt.55.gcc_64/5.5.1-0qt5_addons.7z, /home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1
+[939315] Done
+[939315] backup qt.55.gcc_64 operation: Extract
+[939315] 	- arguments: installer://qt.55.gcc_64/5.5.1-0qt5_essentials.7z, /home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1
+[939315] Done
+[939315] perform qt.55.gcc_64 operation: Extract
+[939315] 	- arguments: installer://qt.55.gcc_64/5.5.1-0qt5_essentials.7z, /home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1
+[942072] Done
+[942115] backup qt.55.gcc_64 operation: Extract
+[942115] 	- arguments: installer://qt.55.gcc_64/5.5.1-0qt5_qtpositioning.7z, /home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1
+[942115] Done
+[942115] perform qt.55.gcc_64 operation: Extract
+[942115] 	- arguments: installer://qt.55.gcc_64/5.5.1-0qt5_qtpositioning.7z, /home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1
+[942141] Done
+[942141] backup qt.55.gcc_64 operation: ConsumeOutput
+[942141] 	- arguments: qt.55.gcc_64_qmakeoutput, /home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/bin/qmake, -query
+[942141] Done
+[942141] perform qt.55.gcc_64 operation: ConsumeOutput
+[942141] 	- arguments: qt.55.gcc_64_qmakeoutput, /home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/bin/qmake, -query
+[942148] Done
+[942148] backup qt.55.gcc_64 operation: QtPatch
+[942148] 	- arguments: linux, /home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64, qt5
+[942148] Done
+[942148] perform qt.55.gcc_64 operation: QtPatch
+[942148] 	- arguments: linux, /home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64, qt5
+[942274] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/libQt5PlatformSupport.prl'
+[942274] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/libQt5Nfc.la'
+[942274] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/libQt5Svg.prl'
+[942274] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/libQt5Bootstrap.la'
+[942274] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/libQt5Positioning.la'
+[942274] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/libQt5DBus.la'
+[942274] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/libQt5QmlDevTools.la'
+[942277] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/libQt5Multimedia.prl'
+[942277] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/libQt5Test.prl'
+[942277] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/libEnginio.prl'
+[942277] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/libQt5CLucene.la'
+[942277] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/libQt5QuickWidgets.la'
+[942277] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/libQt5Sql.prl'
+[942277] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/libQt5QuickParticles.prl'
+[942277] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/libQt5Widgets.prl'
+[942277] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/libQt5MultimediaWidgets.la'
+[942277] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/libQt5QuickTest.prl'
+[942277] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/libQt5Sensors.la'
+[942277] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/libQt5X11Extras.la'
+[942277] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/libQt5Xml.la'
+[942277] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/libqgsttools_p.prl'
+[942277] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/libQt5Sensors.prl'
+[942277] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/libQt5Gui.prl'
+[942277] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/libQt5Multimedia.la'
+[942277] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/libQt5Concurrent.la'
+[942277] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/libQt5X11Extras.prl'
+[942278] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/libQt5UiTools.prl'
+[942278] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/libQt5WebKitWidgets.prl'
+[942278] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/libQt5Concurrent.prl'
+[942278] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/libQt5Sql.la'
+[942278] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/libQt5Quick.la'
+[942278] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/libQt5WebChannel.prl'
+[942278] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/libQt5Bluetooth.prl'
+[942278] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/libQt5Network.la'
+[942278] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/libQt5MultimediaQuick_p.la'
+[942278] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/libQt5Positioning.prl'
+[942278] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/libQt5Core.la'
+[942278] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/libQt5WebChannel.la'
+[942278] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/libQt5XcbQpa.la'
+[942278] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/libQt5XcbQpa.prl'
+[942278] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/libQt5Widgets.la'
+[942278] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/libQt5Help.prl'
+[942278] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/libQt5Bluetooth.la'
+[942278] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/libQt5OpenGLExtensions.la'
+[942278] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/libQt5SerialPort.prl'
+[942278] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/libQt5Designer.la'
+[942278] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/libQt5OpenGL.prl'
+[942278] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/libQt5QuickWidgets.prl'
+[942278] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/libQt5DesignerComponents.prl'
+[942278] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/libQt5Help.la'
+[942279] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/libQt5CLucene.prl'
+[942279] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/libQt5SerialPort.la'
+[942279] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/libEnginio.la'
+[942279] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/libQt5Designer.prl'
+[942279] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/libQt5Nfc.prl'
+[942279] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/libQt5OpenGLExtensions.prl'
+[942279] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/libQt5Gui.la'
+[942279] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/libQt5Qml.la'
+[942279] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/libQt5OpenGL.la'
+[942279] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/libQt5Quick.prl'
+[942279] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/libQt5PrintSupport.prl'
+[942279] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/libQt5DBus.prl'
+[942279] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/libQt5QuickTest.la'
+[942279] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/libQt5Test.la'
+[942279] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/libQt5WebKitWidgets.la'
+[942279] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/libQt5QuickParticles.la'
+[942279] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/libQt5Bootstrap.prl'
+[942279] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/libQt5Xml.prl'
+[942279] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/libQt5WebSockets.la'
+[942279] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/libQt5PlatformSupport.la'
+[942279] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/libQt5DesignerComponents.la'
+[942279] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/libQt5Svg.la'
+[942279] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/libQt5Core.prl'
+[942279] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/libQt5WebSockets.prl'
+[942279] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/libQt5QmlDevTools.prl'
+[942279] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/pkgconfig/Qt5Sensors.pc'
+[942279] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/pkgconfig/Qt5WebSockets.pc'
+[942279] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/pkgconfig/Qt5Widgets.pc'
+[942279] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/pkgconfig/Qt5QuickWidgets.pc'
+[942279] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/pkgconfig/Qt5Help.pc'
+[942279] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/pkgconfig/Qt5OpenGL.pc'
+[942279] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/pkgconfig/Qt5Xml.pc'
+[942279] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/pkgconfig/Qt5Quick.pc'
+[942279] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/pkgconfig/Qt5DBus.pc'
+[942279] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/pkgconfig/Qt5SerialPort.pc'
+[942279] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/pkgconfig/Qt5QuickParticles.pc'
+[942280] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/pkgconfig/Qt5Core.pc'
+[942280] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/pkgconfig/Qt5CLucene.pc'
+[942280] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/pkgconfig/Qt5Gui.pc'
+[942280] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/pkgconfig/Qt5QmlDevTools.pc'
+[942280] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/pkgconfig/Qt5Test.pc'
+[942280] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/pkgconfig/Qt5Multimedia.pc'
+[942280] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/pkgconfig/Qt5Network.pc'
+[942280] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/pkgconfig/Qt5Svg.pc'
+[942280] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/pkgconfig/Qt5Concurrent.pc'
+[942280] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/pkgconfig/Qt5DesignerComponents.pc'
+[942280] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/pkgconfig/Qt5Qml.pc'
+[942280] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/pkgconfig/Qt5UiTools.pc'
+[942280] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/pkgconfig/Enginio.pc'
+[942280] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/pkgconfig/Qt5Designer.pc'
+[942280] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/pkgconfig/Qt5Nfc.pc'
+[942280] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/pkgconfig/Qt5QuickTest.pc'
+[942280] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/pkgconfig/Qt5PlatformSupport.pc'
+[942280] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/pkgconfig/Qt5XcbQpa.pc'
+[942280] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/pkgconfig/Qt5WebKitWidgets.pc'
+[942280] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/pkgconfig/Qt5PrintSupport.pc'
+[942280] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/pkgconfig/Qt5Bluetooth.pc'
+[942280] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/pkgconfig/Qt5WebKit.pc'
+[942280] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/pkgconfig/Qt5WebChannel.pc'
+[942280] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/pkgconfig/Qt5MultimediaWidgets.pc'
+[942280] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/pkgconfig/Qt5OpenGLExtensions.pc'
+[942280] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/pkgconfig/Qt5Positioning.pc'
+[942280] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/pkgconfig/Qt5Bootstrap.pc'
+[942280] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/pkgconfig/Qt5X11Extras.pc'
+[942280] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/pkgconfig/Qt5MultimediaQuick_p.pc'
+[942280] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/pkgconfig/Qt5XmlPatterns.pc'
+[942280] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/pkgconfig/Qt5Sql.pc'
+[942280] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/libQt5MultimediaQuick_p.prl'
+[942280] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/libQt5XmlPatterns.prl'
+[942280] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/libQt5UiTools.la'
+[942280] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/libQt5MultimediaWidgets.prl'
+[942280] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/libQt5Qml.prl'
+[942280] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/libQt5PrintSupport.la'
+[942280] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/libQt5XmlPatterns.la'
+[942280] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/libQt5WebKit.la'
+[942280] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/libQt5Network.prl'
+[942280] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib/libQt5WebKit.prl'
+[942332] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/mkspecs/qconfig.pri'
+[942334] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/mkspecs/qdevice.pri'
+[942337] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/mkspecs/features/dbuscommon.pri'
+[942338] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/mkspecs/qmodule.pri'
+[942338] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/mkspecs/modules/qt_lib_x11extras.pri'
+[942338] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/mkspecs/modules/qt_lib_openglextensions_private.pri'
+[942338] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/mkspecs/modules/qt_lib_multimediawidgets_private.pri'
+[942338] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/mkspecs/modules/qt_lib_core.pri'
+[942338] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/mkspecs/modules/qt_lib_quick.pri'
+[942338] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/mkspecs/modules/qt_lib_concurrent_private.pri'
+[942339] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/mkspecs/modules/qt_lib_widgets.pri'
+[942339] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/mkspecs/modules/qt_lib_multimedia.pri'
+[942339] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/mkspecs/modules/qt_lib_qtmultimediaquicktools_private.pri'
+[942339] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/mkspecs/modules/qt_lib_core_private.pri'
+[942339] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/mkspecs/modules/qt_lib_quick_private.pri'
+[942339] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/mkspecs/modules/qt_lib_serialport_private.pri'
+[942339] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/mkspecs/modules/qt_lib_quickparticles_private.pri'
+[942339] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/mkspecs/modules/qt_lib_designercomponents_private.pri'
+[942339] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/mkspecs/modules/qt_lib_svg_private.pri'
+[942339] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/mkspecs/modules/qt_lib_nfc.pri'
+[942339] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/mkspecs/modules/qt_lib_testlib.pri'
+[942339] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/mkspecs/modules/qt_lib_multimediawidgets.pri'
+[942339] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/mkspecs/modules/qt_lib_qmltest_private.pri'
+[942339] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/mkspecs/modules/qt_lib_webchannel_private.pri'
+[942339] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/mkspecs/modules/qt_lib_webchannel.pri'
+[942339] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/mkspecs/modules/qt_lib_dbus_private.pri'
+[942339] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/mkspecs/modules/qt_lib_quickwidgets_private.pri'
+[942339] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/mkspecs/modules/qt_lib_openglextensions.pri'
+[942339] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/mkspecs/modules/qt_lib_webkit_private.pri'
+[942339] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/mkspecs/modules/qt_lib_printsupport_private.pri'
+[942339] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/mkspecs/modules/qt_lib_webkit.pri'
+[942339] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/mkspecs/modules/qt_lib_bluetooth.pri'
+[942339] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/mkspecs/modules/qt_lib_network_private.pri'
+[942339] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/mkspecs/modules/qt_lib_quickwidgets.pri'
+[942339] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/mkspecs/modules/qt_lib_sensors_private.pri'
+[942339] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/mkspecs/modules/qt_lib_help.pri'
+[942339] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/mkspecs/modules/qt_lib_platformsupport_private.pri'
+[942339] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/mkspecs/modules/qt_lib_uitools_private.pri'
+[942339] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/mkspecs/modules/qt_lib_enginio_private.pri'
+[942339] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/mkspecs/modules/qt_lib_xmlpatterns_private.pri'
+[942339] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/mkspecs/modules/qt_lib_svg.pri'
+[942339] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/mkspecs/modules/qt_lib_xcb_qpa_lib_private.pri'
+[942339] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/mkspecs/modules/qt_lib_gui_private.pri'
+[942339] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/mkspecs/modules/qt_lib_dbus.pri'
+[942339] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/mkspecs/modules/qt_lib_opengl_private.pri'
+[942339] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/mkspecs/modules/qt_lib_network.pri'
+[942339] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/mkspecs/modules/qt_lib_qmldevtools_private.pri'
+[942339] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/mkspecs/modules/qt_lib_serialport.pri'
+[942339] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/mkspecs/modules/qt_lib_designer_private.pri'
+[942339] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/mkspecs/modules/qt_lib_websockets_private.pri'
+[942339] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/mkspecs/modules/qt_lib_positioning.pri'
+[942339] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/mkspecs/modules/qt_lib_xml.pri'
+[942339] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/mkspecs/modules/qt_lib_enginio.pri'
+[942339] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/mkspecs/modules/qt_lib_qmltest.pri'
+[942339] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/mkspecs/modules/qt_lib_webkitwidgets_private.pri'
+[942339] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/mkspecs/modules/qt_lib_qml.pri'
+[942339] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/mkspecs/modules/qt_lib_nfc_private.pri'
+[942339] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/mkspecs/modules/qt_lib_x11extras_private.pri'
+[942339] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/mkspecs/modules/qt_lib_sql.pri'
+[942339] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/mkspecs/modules/qt_lib_xml_private.pri'
+[942339] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/mkspecs/modules/qt_lib_help_private.pri'
+[942339] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/mkspecs/modules/qt_lib_qml_private.pri'
+[942340] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/mkspecs/modules/qt_lib_webkitwidgets.pri'
+[942340] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/mkspecs/modules/qt_lib_widgets_private.pri'
+[942340] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/mkspecs/modules/qt_lib_concurrent.pri'
+[942340] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/mkspecs/modules/qt_lib_bootstrap_private.pri'
+[942340] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/mkspecs/modules/qt_lib_xmlpatterns.pri'
+[942340] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/mkspecs/modules/qt_lib_uiplugin.pri'
+[942340] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/mkspecs/modules/qt_lib_multimedia_private.pri'
+[942340] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/mkspecs/modules/qt_lib_opengl.pri'
+[942340] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/mkspecs/modules/qt_lib_bluetooth_private.pri'
+[942340] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/mkspecs/modules/qt_lib_sensors.pri'
+[942340] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/mkspecs/modules/qt_lib_clucene_private.pri'
+[942340] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/mkspecs/modules/qt_lib_gui.pri'
+[942340] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/mkspecs/modules/qt_lib_sql_private.pri'
+[942340] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/mkspecs/modules/qt_lib_testlib_private.pri'
+[942340] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/mkspecs/modules/qt_lib_websockets.pri'
+[942340] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/mkspecs/modules/qt_lib_printsupport.pri'
+[942340] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/mkspecs/modules/qt_lib_positioning_private.pri'
+[942340] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/mkspecs/modules/qt_lib_designer.pri'
+[942340] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/mkspecs/modules/qt_lib_uitools.pri'
+[942340] QtPatchOperation::getDirContent match: '/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/mkspecs/qfeatures.pri'
+[942357] Done
+[942358] backup qt.55.gcc_64 operation: Execute
+[942358] 	- arguments: /home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1//Tools/QtCreator/bin/sdktool, addQt, --id, qt.55.gcc_64, --name, Qt %{Qt:Version} GCC 64bit, --type, Qt4ProjectManager.QtVersion.Desktop, --qmake, /home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/bin/qmake, UNDOEXECUTE, /home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1//Tools/QtCreator/bin/sdktool, rmQt, --id, qt.55.gcc_64
+[942358] Done
+[942358] perform qt.55.gcc_64 operation: Execute
+[942358] 	- arguments: /home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1//Tools/QtCreator/bin/sdktool, addQt, --id, qt.55.gcc_64, --name, Qt %{Qt:Version} GCC 64bit, --type, Qt4ProjectManager.QtVersion.Desktop, --qmake, /home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/bin/qmake, UNDOEXECUTE, /home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1//Tools/QtCreator/bin/sdktool, rmQt, --id, qt.55.gcc_64
+[942360] /home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1//Tools/QtCreator/bin/sdktool" started, arguments: "addQt --id qt.55.gcc_64 --name Qt %{Qt:Version} GCC 64bit --type Qt4ProjectManager.QtVersion.Desktop --qmake /home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/bin/qmake
+[942385] Done
+[942385] backup qt.55.gcc_64 operation: Execute
+[942385] 	- arguments: /home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1//Tools/QtCreator/bin/sdktool, addKit, --id, qt.55.gcc_64_kit, --name, Desktop Qt %{Qt:Version} GCC 64bit, --toolchain, x86-linux-generic-elf-64bit, --qt, qt.55.gcc_64, --debuggerengine, 1, --devicetype, Desktop, UNDOEXECUTE, /home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1//Tools/QtCreator/bin/sdktool, rmKit, --id, qt.55.gcc_64_kit
+[942385] Done
+[942385] perform qt.55.gcc_64 operation: Execute
+[942385] 	- arguments: /home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1//Tools/QtCreator/bin/sdktool, addKit, --id, qt.55.gcc_64_kit, --name, Desktop Qt %{Qt:Version} GCC 64bit, --toolchain, x86-linux-generic-elf-64bit, --qt, qt.55.gcc_64, --debuggerengine, 1, --devicetype, Desktop, UNDOEXECUTE, /home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1//Tools/QtCreator/bin/sdktool, rmKit, --id, qt.55.gcc_64_kit
+[942387] /home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1//Tools/QtCreator/bin/sdktool" started, arguments: "addKit --id qt.55.gcc_64_kit --name Desktop Qt %{Qt:Version} GCC 64bit --toolchain x86-linux-generic-elf-64bit --qt qt.55.gcc_64 --debuggerengine 1 --devicetype Desktop
+[942405] Done
+[942406] backup qt.55.gcc_64 operation: Settings
+[942406] 	- arguments: path=/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/bin/qt.conf, method=set, key=Paths/Prefix, value=..
+[942406] Done
+[942406] perform qt.55.gcc_64 operation: Settings
+[942406] 	- arguments: path=/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/bin/qt.conf, method=set, key=Paths/Prefix, value=..
+[942408] Done
+[942408] backup qt.55.gcc_64 operation: Settings
+[942408] 	- arguments: path=/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/bin/qt.conf, method=set, key=Paths/Examples, value=../../Examples/Qt-5.5
+[942408] Done
+[942409] perform qt.55.gcc_64 operation: Settings
+[942409] 	- arguments: path=/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/bin/qt.conf, method=set, key=Paths/Examples, value=../../Examples/Qt-5.5
+[942411] Done
+[942411] backup qt.55.gcc_64 operation: Settings
+[942411] 	- arguments: path=/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/bin/qt.conf, method=set, key=Paths/Documentation, value=../../Docs/Qt-5.5
+[942411] Done
+[942411] perform qt.55.gcc_64 operation: Settings
+[942411] 	- arguments: path=/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/bin/qt.conf, method=set, key=Paths/Documentation, value=../../Docs/Qt-5.5
+[942414] Done
+[942414] backup qt.55.gcc_64 operation: LineReplace
+[942414] 	- arguments: /home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/mkspecs/qconfig.pri, QT_EDITION =, QT_EDITION = OpenSource
+[942414] Done
+[942414] perform qt.55.gcc_64 operation: LineReplace
+[942414] 	- arguments: /home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/mkspecs/qconfig.pri, QT_EDITION =, QT_EDITION = OpenSource
+[942414] Done
+[942419] Writing maintenance tool: "/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/MaintenanceTool.new"
+[942515] Wrote permissions for maintenance tool.
+[943352] Maintenance tool restart: false.
+[943366] SHOW FINISHED PAGE

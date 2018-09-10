@@ -1,0 +1,14 @@
+prefix=/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64
+exec_prefix=${prefix}
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+
+Name: Qt5 XcbQpa
+Description: Qt XcbQpa module
+Version: 5.5.1
+Libs: -L${libdir} -lQt5XcbQpa 
+Libs.private: -L/usr/lib64 -ldl -lX11-xcb -lXi -lSM -lICE -lxcb -L/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/qtbase/src/plugins/platforms/xcb/xcb-static -lxcb-static -L/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib -lQt5PlatformSupport -lfontconfig -lfreetype -lQt5DBus -lgthread-2.0 -pthread -lrt -lglib-2.0 -lXrender -lXext -lX11 -lm -lGL -lQt5Gui -lQt5Core -lpthread -lGL  
+Cflags: -I${includedir}/QtXcbQpa -I${includedir}
+Requires: Qt5Core Qt5Gui
+

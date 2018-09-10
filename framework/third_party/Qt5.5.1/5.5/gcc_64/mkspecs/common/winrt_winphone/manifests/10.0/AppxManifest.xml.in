@@ -1,0 +1,50 @@
+<?xml version=\"1.0\" encoding=\"utf-8\"?>
+
+<Package
+  xmlns=\"http://schemas.microsoft.com/appx/manifest/foundation/windows10\"
+  xmlns:mp=\"http://schemas.microsoft.com/appx/2014/phone/manifest\"
+  xmlns:uap=\"http://schemas.microsoft.com/appx/manifest/uap/windows10\"
+  IgnorableNamespaces=\"uap mp\">
+
+  <Identity
+    Name=\"$${WINRT_MANIFEST.identity}\"
+    Publisher=\"$${WINRT_MANIFEST.publisherid}\"
+    Version=\"$${WINRT_MANIFEST.version}\"
+    ProcessorArchitecture=\"$${WINRT_MANIFEST.architecture}\" />
+
+  <mp:PhoneIdentity PhoneProductId=\"$${WINRT_MANIFEST.identity}\" PhonePublisherId=\"$${WINRT_MANIFEST.phone_publisher_id}\"/>
+
+  <Properties>
+    <DisplayName>$${WINRT_MANIFEST.name}</DisplayName>
+    <PublisherDisplayName>$${WINRT_MANIFEST.publisher}</PublisherDisplayName>
+    <Logo>$${WINRT_MANIFEST.logo_store}</Logo>
+  </Properties>
+
+  <Dependencies>
+    <TargetDeviceFamily Name=\"Windows.Universal\" MinVersion=\"10.0.10069.0\" MaxVersionTested=\"10.0.10069.0\" />$${WINRT_MANIFEST.dependencies}
+  </Dependencies>
+
+  <Resources>
+    <Resource Language=\"en\"/>
+  </Resources>
+
+  <Applications>
+    <Application Id=\"App\"
+      Executable=\"$${WINRT_MANIFEST.target}.exe\"
+      EntryPoint=\"$${WINRT_MANIFEST.target}.App\">
+      <uap:VisualElements
+        DisplayName=\"$${WINRT_MANIFEST.name}\"
+        Description=\"$${WINRT_MANIFEST.description}\"
+        BackgroundColor=\"$${WINRT_MANIFEST.background}\"
+        Square150x150Logo=\"$${WINRT_MANIFEST.logo_150x150}\"
+        Square44x44Logo=\"$${WINRT_MANIFEST.logo_44x44}\">
+
+        <uap:SplashScreen Image=\"$${WINRT_MANIFEST.logo_620x300}\" />
+      </uap:VisualElements>
+    </Application>
+  </Applications>
+
+  <Capabilities>
+    <Capability Name=\"internetClient\" />
+  </Capabilities>
+</Package>

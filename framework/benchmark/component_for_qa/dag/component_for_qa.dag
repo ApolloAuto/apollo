@@ -1,0 +1,21 @@
+module_config {
+    module_library : "lib/libcomponent_for_qa.so"
+    timer_components {
+        class_name : "SenderComponent"
+        config {
+            name: "sender"
+            interval : 100
+            config_file_path : "/home/caros/workspace/baidu/adu-lab/cybertron-apollo/install/conf/component_for_qa_receiver.conf"
+        }
+    }
+    components {
+        class_name : "OneChannelReceiverComponent"
+        config {
+            name : "receiver"
+            readers {
+                channel: "communicate_channel"
+            }
+            config_file_path : "/home/caros/workspace/baidu/adu-lab/cybertron-apollo/install/conf/component_for_qa_receiver.conf"
+        }
+    }
+}

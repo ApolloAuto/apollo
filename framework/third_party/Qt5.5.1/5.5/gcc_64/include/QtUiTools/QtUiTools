@@ -1,0 +1,6 @@
+#ifndef QT_QTUITOOLS_MODULE_H
+#define QT_QTUITOOLS_MODULE_H
+#include <QtUiTools/QtUiToolsDepends>
+#include "quiloader.h"
+#include "qtuitoolsversion.h"
+#endif

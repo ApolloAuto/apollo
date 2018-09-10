@@ -1,0 +1,24 @@
+# This file is loaded by qmake right before each actual project file.
+# Note that evaluating variable assignments from the command line
+# still happens in between these two steps.
+
+load(exclusive_builds)
+CONFIG = \
+    lex yacc debug exceptions depend_includepath \
+    testcase_targets import_plugins import_qpa_plugin \
+    $$CONFIG
+
+!build_pass:defined(QT_EDITION, var):!equals(QT_EDITION, "OpenSource"):!equals(QT_EDITION, "Preview") {
+    #
+    # call license checker (but cache result for one day)
+    #
+    today = $$section(_DATE_, " ", 0, 2)
+    !isEqual(QMAKE_LICHECK_TIMESTAMP, $$today) {
+        !system("$$system_quote($$system_path($$[QT_HOST_BINS/src]/$$QT_LICHECK)) check" \
+                "$$QT_RELEASE_DATE $$[QMAKE_SPEC] $$[QMAKE_XSPEC]"): \
+            error("License check failed! Giving up ...")
+
+        cache(QMAKE_LICHECK_TIMESTAMP, set stash, today)
+    }
+    unset(today)
+}

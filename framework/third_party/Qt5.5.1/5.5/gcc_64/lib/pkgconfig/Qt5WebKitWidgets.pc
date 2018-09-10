@@ -1,0 +1,14 @@
+prefix=/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64
+exec_prefix=${prefix}
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+
+Name: Qt5 WebKitWidgets
+Description: Qt WebKitWidgets module
+Version: 5.5.1
+Libs: -L${libdir} -lQt5WebKitWidgets 
+Libs.private: -L/usr/lib64 -L/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib -lQt5Widgets -L/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib -lQt5WebKit -lQt5Gui -lQt5Network -lQt5Core -lpthread -lXext -lX11 -lxslt -lz -lm -lgio-2.0 -L/usr/local/lib -lgstapp-0.10 -lgstinterfaces-0.10 -lgstpbutils-0.10 -lgstvideo-0.10 -lgstbase-0.10 -lgstreamer-0.10 -lgobject-2.0 -lgmodule-2.0 -lgthread-2.0 -pthread -lrt -lglib-2.0 -lxml2 -lsqlite3 -L/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib -lQt5Sensors -L/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib -L/home/work/baidu/adu-lab/cybertron-apollo/third-party/Qt5.5.1/5.5/gcc_64/lib -lQt5Positioning -lQt5PrintSupport -L/usr/lib64 -lQt5OpenGL -lQt5Widgets -lQt5WebKit -lQt5Gui -lQt5Sql -lQt5Network -lQt5Core -lpthread -lGL  
+Cflags: -I${includedir}/QtWebKitWidgets -I${includedir}
+Requires: Qt5Core Qt5Gui Qt5Widgets Qt5Network Qt5WebKit
+

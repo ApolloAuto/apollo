@@ -1,0 +1,28 @@
+syntax = "proto2";
+
+package apollo.cybertron.proto;
+
+enum ProcessStrategy {
+  RQ = 0;
+  CFS = 1;
+  FCFS = 3;
+}
+
+message WaitTimeConf {
+  optional double ratio = 1 [default = 0.6];
+  optional double migrate_num = 2 [default = 1];
+}
+
+message PeriodConf {
+  optional double ratio = 1 [default = 0.6];
+  optional double migrate_num = 2 [default = 1];
+}
+
+message SchedulerConf {
+  optional uint32 processor_num = 1 [default = 8];
+  optional ProcessStrategy process_strategy = 2 [default = RQ];
+  optional int32 duration_us = 3 [default = 500000];
+  optional bool load_balance = 4 [default = false];
+  optional bool buffer_processor = 5 [default = false];
+}
+
