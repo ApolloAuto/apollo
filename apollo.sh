@@ -93,10 +93,12 @@ function check_esd_files() {
 
 function generate_build_targets() {
   if [ -z $NOT_BUILD_PERCEPTION ] ; then
-    BUILD_TARGETS=`bazel query //...`
+    # BUILD_TARGETS=`bazel query //...`
+    BUILD_TARGETS=`bazel query //modules/example/...`
   else
     info 'Skip building perception module!'
-    BUILD_TARGETS=`bazel query //... except //modules/perception/... except //modules/calibration/lidar_ex_checker/...`
+    # BUILD_TARGETS=`bazel query //... except //modules/perception/... except //modules/calibration/lidar_ex_checker/...`
+    BUILD_TARGETS=`bazel query //modules/example/...`
   fi
 
   if [ $? -ne 0 ]; then
