@@ -55,12 +55,6 @@ using apollo::hdmap::MapPathPoint;
 using apollo::hdmap::PncMap;
 using apollo::hdmap::RouteSegments;
 
-ReferenceLineProvider::~ReferenceLineProvider() {
-  if (thread_ && thread_->joinable()) {
-    thread_->join();
-  }
-}
-
 ReferenceLineProvider::ReferenceLineProvider(const hdmap::HDMap *base_map) {
   if (!FLAGS_use_navigation_mode) {
     pnc_map_.reset(new hdmap::PncMap(base_map));
@@ -111,19 +105,13 @@ bool ReferenceLineProvider::Start() {
     return false;
   }
   if (FLAGS_enable_reference_line_provider_thread) {
-    thread_.reset(
-        new std::thread(&ReferenceLineProvider::GenerateThread, this));
+    future_ = std::async(std::launch::async,
+                         &ReferenceLineProvider::GenerateThread, this);
   }
   return true;
 }
 
-void ReferenceLineProvider::Stop() {
-  is_stop_ = true;
-  if (FLAGS_enable_reference_line_provider_thread && thread_ &&
-      thread_->joinable()) {
-    thread_->join();
-  }
-}
+void ReferenceLineProvider::Stop() { is_stop_ = true; }
 
 void ReferenceLineProvider::UpdateReferenceLine(
     const std::list<ReferenceLine> &reference_lines,
