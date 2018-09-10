@@ -1,0 +1,7 @@
+<cybertron>
+    <module>
+        <name>perception</name>
+        <dag_conf>/apollo/modules/example/component_perception/dag/perception.dag</dag_conf>
+        <process_name></process_name>
+    </module>
+</cybertron>
