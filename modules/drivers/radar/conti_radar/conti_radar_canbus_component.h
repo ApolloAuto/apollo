@@ -18,24 +18,19 @@
  * @file
  */
 
-#ifndef MODULES_DRIVERS_RADAR_CONTI_RADAR_CONTI_RADAR_CANBUS_H_
-#define MODULES_DRIVERS_RADAR_CONTI_RADAR_CONTI_RADAR_CANBUS_H_
+#ifndef MODULES_DRIVERS_RADAR_CONTI_RADAR_CONTI_RADAR_CANBUS_COMPONENT_H_
+#define MODULES_DRIVERS_RADAR_CONTI_RADAR_CONTI_RADAR_CANBUS_COMPONENT_H_
 
 #include <memory>
 #include <string>
 #include <utility>
 #include <vector>
 
-#include "ros/include/ros/ros.h"
+#include "cybertron/cybertron.h"
 
-#include "modules/common/adapters/adapter_manager.h"
-#include "modules/common/adapters/proto/adapter_config.pb.h"
-#include "modules/common/apollo_app.h"
 #include "modules/common/macro.h"
-#include "modules/common/monitor_log/monitor_log_buffer.h"
-#include "modules/common/time/time.h"
+// #include "modules/common/monitor_log/monitor_log_buffer.h"
 #include "modules/common/util/util.h"
-#include "modules/control/proto/control_cmd.pb.h"
 #include "modules/drivers/canbus/can_client/can_client.h"
 #include "modules/drivers/canbus/can_client/can_client_factory.h"
 #include "modules/drivers/canbus/can_comm/can_receiver.h"
@@ -43,10 +38,9 @@
 #include "modules/drivers/canbus/can_comm/message_manager.h"
 #include "modules/drivers/canbus/proto/can_card_parameter.pb.h"
 #include "modules/drivers/canbus/proto/sensor_canbus_conf.pb.h"
-#include "modules/drivers/canbus/sensor_gflags.h"
+#include "modules/drivers/proto/conti_radar.pb.h"
 #include "modules/drivers/radar/conti_radar/conti_radar_message_manager.h"
 #include "modules/drivers/radar/conti_radar/protocol/radar_config_200.h"
-#include "modules/drivers/proto/conti_radar.pb.h"
 
 /**
  * @namespace apollo::drivers
@@ -57,70 +51,47 @@ namespace drivers {
 namespace conti_radar {
 
 /**
-* @class ContiRadarCanbus
-*
-* @brief template of canbus-based sensor module main class (e.g., conti_radar).
-*/
+ * @class ContiRadarCanbus
+ *
+ * @brief template of canbus-based sensor module main class (e.g., conti_radar).
+ */
 
-using apollo::common::adapter::AdapterConfig;
-using apollo::common::adapter::AdapterManager;
-using apollo::common::monitor::MonitorMessageItem;
-using apollo::common::Status;
 using apollo::common::ErrorCode;
+// using apollo::common::monitor::MonitorMessageItem;
 using apollo::common::time::Clock;
-using apollo::drivers::canbus::CanClientFactory;
 using apollo::drivers::canbus::CanClient;
+using apollo::drivers::canbus::CanClientFactory;
 using apollo::drivers::canbus::CanReceiver;
 using apollo::drivers::canbus::SenderMessage;
 using apollo::drivers::canbus::SensorCanbusConf;
+template <typename T>
+using Writer = apollo::cybertron::Writer<T>;
 
-class ContiRadarCanbus : public apollo::common::ApolloApp {
+class ContiRadarCanbusComponent : public apollo::cybertron::Component<> {
  public:
-  // TODO(lizh): check whether we need a new msg item, say
-  // MonitorMessageItem::SENSORCANBUS
-  ContiRadarCanbus()
-      : monitor_logger_(apollo::common::monitor::MonitorMessageItem::CANBUS) {}
-
-  /**
-  * @brief obtain module name
-  * @return module name
-  */
-  std::string Name() const override;
-
-  /**
-  * @brief module initialization function
-  * @return initialization status
-  */
-  apollo::common::Status Init() override;
-
-  /**
-  * @brief module start function
-  * @return start status
-  */
-  apollo::common::Status Start() override;
-
-  /**
-  * @brief module stop function
-  */
-  void Stop() override;
+  ContiRadarCanbusComponent();
+  ~ContiRadarCanbusComponent();
+  bool Init() override;
 
  private:
-  void PublishSensorData();
-  Status OnError(const std::string &error_msg);
+  bool OnError(const std::string &error_msg);
   void RegisterCanClients();
   apollo::common::ErrorCode ConfigureRadar();
+  bool Start();
+  void Stop();
 
   ContiRadarConf conti_radar_conf_;
   std::shared_ptr<CanClient> can_client_;
   CanReceiver<ContiRadar> can_receiver_;
   std::unique_ptr<ContiRadarMessageManager> sensor_message_manager_;
+  std::shared_ptr<Writer<ContiRadar>> conti_radar_writer_;
 
   int64_t last_timestamp_ = 0;
-  apollo::common::monitor::MonitorLogger monitor_logger_;
+  //   apollo::common::monitor::MonitorLogger monitor_logger_;
 };
 
 }  // namespace conti_radar
 }  // namespace drivers
 }  // namespace apollo
-
-#endif  // MODULES_DRIVERS_RADAR_CONTI_RADAR_CONTI_RADAR_CANBUS_H_
+CYBERTRON_REGISTER_COMPONENT(apollo::drivers::conti_radar::ContiRadarCanbusComponent)
+#endif  // MODULES_DRIVERS_RADAR_CONTI_RADAR_CONTI_RADAR_CANBUS_COMPONENT_H_

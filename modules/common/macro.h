@@ -24,22 +24,26 @@
 #include <iomanip>
 #include <iostream>
 
+#ifndef DISALLOW_COPY_AND_ASSIGN
 #define DISALLOW_COPY_AND_ASSIGN(classname) \
  private:                                   \
   classname(const classname &);             \
   classname &operator=(const classname &);
+#endif
 
 #define DISALLOW_IMPLICIT_CONSTRUCTORS(classname) \
  private:                                         \
   classname();                                    \
   DISALLOW_COPY_AND_ASSIGN(classname);
 
+#ifndef DECLARE_SINGLETON
 #define DECLARE_SINGLETON(classname)        \
  public:                                    \
-  static classname *instance() {            \
-    static classname instance;              \
-    return &instance;                       \
+  static classname *Instance() {            \
+    static classname Instance;              \
+    return &Instance;                       \
   }                                         \
   DISALLOW_IMPLICIT_CONSTRUCTORS(classname) \
  private:
+#endif
 #endif  // MODULES_COMMON_MACRO_H_

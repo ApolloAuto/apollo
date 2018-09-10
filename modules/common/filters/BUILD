@@ -59,7 +59,7 @@ cc_test(
         ":digital_filter_coefficients",
         "//modules/common",
         "@gtest//:main",
-        "@ros//:ros_common",
+        "//framework:cybertron",
     ],
 )
 
