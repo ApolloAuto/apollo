@@ -20,14 +20,14 @@
  
  // LiDAR-based loclaization module status
  enum LocalLidarStatus {
-     MSF_LOCAL_LIDAR_00 = 0; // Localization result satisfy threshold
-     MSF_LOCAL_LIDAR_01 = 1; // Can't find localization map (config.xml)
-     MSF_LOCAL_LIDAR_02 = 2; // Missing extrinsic parameters
-     MSF_LOCAL_LIDAR_03 = 3; // Fail to load localization map
-     MSF_LOCAL_LIDAR_04 = 4; // No output (comparing to timestamp of imu msg)
-     MSF_LOCAL_LIDAR_05 = 5; // Coverage of online pointcloud and map is lower than threshold 
-     MSF_LOCAL_LIDAR_06 = 6; // Localization result do not meet threshold
-     MSF_LOCAL_LIDAR_07 = 7; // others
+     MSF_LOCAL_LIDAR_NORMAL = 0; // Localization result satisfy threshold
+     MSF_LOCAL_LIDAR_MAP_MISSING = 1; // Can't find localization map (config.xml)
+     MSF_LOCAL_LIDAR_EXTRINSICS_MISSING = 2; // Missing extrinsic parameters
+     MSF_LOCAL_LIDAR_MAP_LOADING_FAILED = 3; // Fail to load localization map
+     MSF_LOCAL_LIDAR_NO_OUTPUT = 4; // No output (comparing to timestamp of imu msg)
+     MSF_LOCAL_LIDAR_OUT_OF_MAP = 5; // Coverage of online pointcloud and map is lower than threshold 
+     MSF_LOCAL_LIDAR_NOT_GOOD = 6; // Localization result do not meet threshold
+     MSF_LOCAL_LIDAR_UNDEFINED_STATUS = 7; // others
  }
  
  enum LocalLidarQuality {

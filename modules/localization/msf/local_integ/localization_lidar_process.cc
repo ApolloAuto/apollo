@@ -103,7 +103,7 @@ Status LocalizationLidarProcess::Init(const LocalizationIntegParam& params) {
   velocity_ = Vector3D::Zero();
   location_ = TransformD::Identity();
   location_covariance_ = Matrix3D::Zero();
-  local_lidar_status_ = LocalLidarStatus::MSF_LOCAL_LIDAR_07;
+  local_lidar_status_ = LocalLidarStatus::MSF_LOCAL_LIDAR_UNDEFINED_STATUS;
   local_lidar_quality_ = LocalLidarQuality::MSF_LOCAL_LIDAR_BAD;
 
   bool sucess = LoadLidarExtrinsic(lidar_extrinsic_file_, &lidar_extrinsic_);
@@ -125,7 +125,7 @@ Status LocalizationLidarProcess::Init(const LocalizationIntegParam& params) {
 
   if (!locator_->Init(map_path_, lidar_filter_size_, lidar_filter_size_,
                       utm_zone_id_)) {
-    local_lidar_status_ = LocalLidarStatus::MSF_LOCAL_LIDAR_03;
+    local_lidar_status_ = LocalLidarStatus::MSF_LOCAL_LIDAR_MAP_LOADING_FAILED;
     return Status(common::LOCALIZATION_ERROR_LIDAR,
                   "Fail to load localization map!");
   }
@@ -374,10 +374,10 @@ void LocalizationLidarProcess::UpdateState(const int ret, const double time) {
 
     if (local_lidar_quality_ == LocalLidarQuality::MSF_LOCAL_LIDAR_BAD) {
       ++unstable_count_;
-      local_lidar_status_ = LocalLidarStatus::MSF_LOCAL_LIDAR_06;
+      local_lidar_status_ = LocalLidarStatus::MSF_LOCAL_LIDAR_NOT_GOOD;
     } else {
       unstable_count_ = 0;
-      local_lidar_status_ = LocalLidarStatus::MSF_LOCAL_LIDAR_00;
+      local_lidar_status_ = LocalLidarStatus::MSF_LOCAL_LIDAR_NORMAL;
     }
 
     // check if lidar need reset
@@ -396,7 +396,7 @@ void LocalizationLidarProcess::UpdateState(const int ret, const double time) {
     pre_location_time_ = time;
 
   } else if (ret == -2) {  // out of map
-    local_lidar_status_ = LocalLidarStatus::MSF_LOCAL_LIDAR_05;
+    local_lidar_status_ = LocalLidarStatus::MSF_LOCAL_LIDAR_OUT_OF_MAP;
     double location_score = 0.0;
     locator_->GetResult(&location_, &location_covariance_, &location_score);
     lidar_status_ = LidarState::NOT_STABLE;
