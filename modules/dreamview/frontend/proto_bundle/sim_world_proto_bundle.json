@@ -2659,6 +2659,10 @@
                 "autoTuningTrainingData": {
                   "type": "AutoTuningTrainingData",
                   "id": 23
+                },
+                "frontClearDistance": {
+                  "type": "double",
+                  "id": 24
                 }
               }
             },
