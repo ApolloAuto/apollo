@@ -49,6 +49,7 @@ cc_library(
         "@com_google_protobuf//:protobuf",
         "@glog",
         "@ros//:ros_common",
+        "//framework:cybertron",
     ],
 )
 
@@ -105,6 +106,9 @@ cc_library(
         "//modules/routing/proto:routing_proto",
         "@glog",
     ],
+    linkopts = [
+        "-latomic",
+    ]
 )
 
 cpplint()

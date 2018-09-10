@@ -34,7 +34,7 @@
 #include "modules/common/macro.h"
 #include "modules/common/transform_listener/transform_listener.h"
 
-#include "ros/include/ros/ros.h"
+#include "cybertron/cybertron.h"
 
 /**
  * @namespace apollo::common::adapter
@@ -56,61 +56,61 @@ namespace adapter {
                            const AdapterConfig &config) {                      \
     CHECK(config.message_history_limit() > 0)                                  \
         << "Message history limit must be greater than 0";                     \
-    instance()->InternalEnable##name(topic_name, config);                      \
+    Instance()->InternalEnable##name(topic_name, config);                      \
   }                                                                            \
   static name##Adapter *Get##name() {                                          \
-    return instance()->InternalGet##name();                                    \
+    return Instance()->InternalGet##name();                                    \
   }                                                                            \
   static AdapterConfig &Get##name##Config() {                                  \
-    return instance()->name##config_;                                          \
+    return Instance()->name##config_;                                          \
   }                                                                            \
   static void Feed##name##Data(const name##Adapter::DataType &data) {          \
-    if (!instance()->name##_) {                                                \
+    if (!Instance()->name##_) {                                                \
       AERROR << "Initialize adapter before feeding protobuf";                  \
       return;                                                                  \
     }                                                                          \
     Get##name()->FeedData(data);                                               \
   }                                                                            \
   static bool Feed##name##File(const std::string &proto_file) {                \
-    if (!instance()->name##_) {                                                \
+    if (!Instance()->name##_) {                                                \
       AERROR << "Initialize adapter before feeding protobuf";                  \
       return false;                                                            \
     }                                                                          \
     return Get##name()->FeedFile(proto_file);                                  \
   }                                                                            \
   static void Publish##name(const name##Adapter::DataType &data) {             \
-    instance()->InternalPublish##name(data);                                   \
+    Instance()->InternalPublish##name(data);                                   \
   }                                                                            \
   template <typename T>                                                        \
   static void Fill##name##Header(const std::string &module_name, T *data) {    \
     static_assert(std::is_same<name##Adapter::DataType, T>::value,             \
                   "Data type must be the same with adapter's type!");          \
-    instance()->name##_->FillHeader(module_name, data);                        \
+    Instance()->name##_->FillHeader(module_name, data);                        \
   }                                                                            \
   static void Add##name##Callback(name##Adapter::Callback callback) {          \
-    CHECK(instance()->name##_)                                                 \
+    CHECK(Instance()->name##_)                                                 \
         << "Initialize adapter before setting callback";                       \
-    instance()->name##_->AddCallback(callback);                                \
+    Instance()->name##_->AddCallback(callback);                                \
   }                                                                            \
   template <class T>                                                           \
   static void Add##name##Callback(                                             \
-      void (T::*fp)(const name##Adapter::DataType &data), T *obj) {            \
+      void (T::*fp)(const name##Adapter::DataPtr &data), T *obj) {             \
     Add##name##Callback(std::bind(fp, obj, std::placeholders::_1));            \
   }                                                                            \
   template <class T>                                                           \
   static void Add##name##Callback(                                             \
-      void (T::*fp)(const name##Adapter::DataType &data)) {                    \
+      void (T::*fp)(const name##Adapter::DataPtr &data)) {                     \
     Add##name##Callback(fp);                                                   \
   }                                                                            \
   /* Returns false if there's no callback to pop out, true otherwise. */       \
   static bool Pop##name##Callback() {                                          \
-    return instance()->name##_->PopCallback();                                 \
+    return Instance()->name##_->PopCallback();                                 \
   }                                                                            \
                                                                                \
  private:                                                                      \
   std::unique_ptr<name##Adapter> name##_;                                      \
-  ros::Publisher name##publisher_;                                             \
-  ros::Subscriber name##subscriber_;                                           \
+  std::shared_ptr<cybertron::Writer<name##Adapter::DataType>> name##writer_;   \
+  std::shared_ptr<cybertron::Reader<name##Adapter::DataType>> name##reader_;   \
   AdapterConfig name##config_;                                                 \
                                                                                \
   void InternalEnable##name(const std::string &topic_name,                     \
@@ -118,13 +118,18 @@ namespace adapter {
     name##_.reset(                                                             \
         new name##Adapter(#name, topic_name, config.message_history_limit())); \
     if (config.mode() != AdapterConfig::PUBLISH_ONLY && IsRos()) {             \
-      name##subscriber_ =                                                      \
-          node_handle_->subscribe(topic_name, config.message_history_limit(),  \
-                                  &name##Adapter::RosCallback, name##_.get()); \
+      cybertron::proto::RoleAttributes attr;                                   \
+      attr.set_channel_name(topic_name);                                       \
+      name##reader_ = node_handle_->CreateReader<name##Adapter::DataType>(     \
+          attr, [=](const std::shared_ptr<name##Adapter::DataType> &m) {       \
+            name##_->ReaderCallback(m);                                        \
+          });                                                                  \
     }                                                                          \
     if (config.mode() != AdapterConfig::RECEIVE_ONLY && IsRos()) {             \
-      name##publisher_ = node_handle_->advertise<name##Adapter::DataType>(     \
-          topic_name, config.message_history_limit(), config.latch());         \
+      cybertron::proto::RoleAttributes attr;                                   \
+      attr.set_channel_name(topic_name);                                       \
+      name##writer_ =                                                          \
+          node_handle_->CreateWriter<name##Adapter::DataType>(attr);           \
     }                                                                          \
                                                                                \
     observers_.push_back([this]() { name##_->Observe(); });                    \
@@ -134,8 +139,9 @@ namespace adapter {
   void InternalPublish##name(const name##Adapter::DataType &data) {            \
     /* Only publish ROS msg if node handle is initialized. */                  \
     if (IsRos()) {                                                             \
-      if (!name##publisher_.getTopic().empty()) {                              \
-        name##publisher_.publish(data);                                        \
+      if (name##writer_) {                                                     \
+        /* TODO: copy */                                                       \
+        name##writer_->Write(std::make_shared<name##Adapter::DataType>(data)); \
       } else {                                                                 \
         AERROR << #name << " is not valid.";                                   \
       }                                                                        \
@@ -198,17 +204,17 @@ class AdapterManager {
   /**
    * @brief Returns whether AdapterManager is running ROS mode.
    */
-  static bool IsRos() { return instance()->node_handle_ != nullptr; }
+  static bool IsRos() { return Instance()->node_handle_ != nullptr; }
 
   /**
    * @brief Returns a reference to static tf2 buffer.
    */
-  static tf2_ros::Buffer &Tf2Buffer() {
-    static tf2_ros::Buffer tf2_buffer;
-    static TransformListener tf2Listener(&tf2_buffer,
-                                         instance()->node_handle_.get());
-    return tf2_buffer;
-  }
+  // static tf2_ros::Buffer &Tf2Buffer() {
+  //   static tf2_ros::Buffer tf2_buffer;
+  //   static TransformListener tf2Listener(&tf2_buffer,
+  //                                        Instance()->node_handle_.get());
+  //   return tf2_buffer;
+  // }
 
   /**
    * @brief create a timer which will call a callback at the specified
@@ -216,24 +222,23 @@ class AdapterManager {
    * object to call the method on.
    */
   template <class T>
-  static ros::Timer CreateTimer(ros::Duration period,
-                                void (T::*callback)(const ros::TimerEvent &),
-                                T *obj, bool oneshot = false,
-                                bool autostart = true) {
+  static cybertron::Timer CreateTimer(uint32_t period,
+                                      std::function<void()> callback,
+                                      bool oneshot = false) {
     if (IsRos()) {
-      return instance()->node_handle_->createTimer(period, callback, obj,
-                                                   oneshot, autostart);
+      // TODO: extend this to use std::bind
+      return cybertron::Timer(period, callback, oneshot);
     } else {
       AWARN << "ROS timer is only available in ROS mode, check your adapter "
                "config file! Return a dummy timer that won't function.";
-      return ros::Timer();
+      return cybertron::Timer();
     }
   }
 
  private:
   /// The node handler of ROS, owned by the \class AdapterManager
   /// singleton.
-  std::unique_ptr<ros::NodeHandle> node_handle_;
+  std::unique_ptr<cybertron::Node> node_handle_;
 
   /// Observe() callbacks that will be used to to call the Observe()
   /// of enabled adapters.
@@ -254,31 +259,31 @@ class AdapterManager {
   REGISTER_ADAPTER(PerceptionObstacles);
   REGISTER_ADAPTER(Planning);
   REGISTER_ADAPTER(PlanningPad);
-  REGISTER_ADAPTER(PointCloud);
-  REGISTER_ADAPTER(VLP16PointCloud);
+  // REGISTER_ADAPTER(PointCloud);
+  // REGISTER_ADAPTER(VLP16PointCloud);
 
   // velodyne fusion sensors
   // hdl-64e or vls-128
-  REGISTER_ADAPTER(PointCloudDense);
-  REGISTER_ADAPTER(PointCloudDenseRaw);
-  REGISTER_ADAPTER(VelodyneScanDense);
+  // REGISTER_ADAPTER(PointCloudDense);
+  // REGISTER_ADAPTER(PointCloudDenseRaw);
+  // REGISTER_ADAPTER(VelodyneScanDense);
 
   // vlp-16
-  REGISTER_ADAPTER(PointCloudSparse1);
-  REGISTER_ADAPTER(PointCloudSparseRaw1);
-  REGISTER_ADAPTER(VelodyneScanSparse1);
-  REGISTER_ADAPTER(PointCloudSparse2);
-  REGISTER_ADAPTER(PointCloudSparseRaw2);
-  REGISTER_ADAPTER(VelodyneScanSparse2);
-  REGISTER_ADAPTER(PointCloudSparse3);
-  REGISTER_ADAPTER(PointCloudSparseRaw3);
-  REGISTER_ADAPTER(VelodyneScanSparse3);
+  // REGISTER_ADAPTER(PointCloudSparse1);
+  // REGISTER_ADAPTER(PointCloudSparseRaw1);
+  // REGISTER_ADAPTER(VelodyneScanSparse1);
+  // REGISTER_ADAPTER(PointCloudSparse2);
+  // REGISTER_ADAPTER(PointCloudSparseRaw2);
+  // REGISTER_ADAPTER(VelodyneScanSparse2);
+  // REGISTER_ADAPTER(PointCloudSparse3);
+  // REGISTER_ADAPTER(PointCloudSparseRaw3);
+  // REGISTER_ADAPTER(VelodyneScanSparse3);
 
-  REGISTER_ADAPTER(ImageFront);
-  REGISTER_ADAPTER(ImageShort);
-  REGISTER_ADAPTER(ImageLong);
-  REGISTER_ADAPTER(CameraImageLong);
-  REGISTER_ADAPTER(CameraImageShort);
+  // REGISTER_ADAPTER(ImageFront);
+  // REGISTER_ADAPTER(ImageShort);
+  // REGISTER_ADAPTER(ImageLong);
+  // REGISTER_ADAPTER(CameraImageLong);
+  // REGISTER_ADAPTER(CameraImageShort);
   REGISTER_ADAPTER(Prediction);
   REGISTER_ADAPTER(TrafficLightDetection);
   REGISTER_ADAPTER(RoutingRequest);
@@ -294,7 +299,7 @@ class AdapterManager {
   REGISTER_ADAPTER(ContiRadar);
   REGISTER_ADAPTER(RacobitRadar);
   REGISTER_ADAPTER(Ultrasonic);
-  REGISTER_ADAPTER(CompressedImage);
+  // REGISTER_ADAPTER(CompressedImage);
   REGISTER_ADAPTER(GnssRtkObs);
   REGISTER_ADAPTER(GnssRtkEph);
   REGISTER_ADAPTER(GnssBestPose);
@@ -306,21 +311,22 @@ class AdapterManager {
   REGISTER_ADAPTER(RelativeMap);
   REGISTER_ADAPTER(Navigation);
   REGISTER_ADAPTER(AudioCapture);
+
   // for pandora
-  REGISTER_ADAPTER(PandoraPointCloud);
-  REGISTER_ADAPTER(PandoraCameraFrontColor);
-  REGISTER_ADAPTER(PandoraCameraRightGray);
-  REGISTER_ADAPTER(PandoraCameraLeftGray);
-  REGISTER_ADAPTER(PandoraCameraFrontGray);
-  REGISTER_ADAPTER(PandoraCameraBackGray);
+  // REGISTER_ADAPTER(PandoraPointCloud);
+  // REGISTER_ADAPTER(PandoraCameraFrontColor);
+  // REGISTER_ADAPTER(PandoraCameraRightGray);
+  // REGISTER_ADAPTER(PandoraCameraLeftGray);
+  // REGISTER_ADAPTER(PandoraCameraFrontGray);
+  // REGISTER_ADAPTER(PandoraCameraBackGray);
   // for lane mask
-  REGISTER_ADAPTER(PerceptionLaneMask)
+  // REGISTER_ADAPTER(PerceptionLaneMask)
 
   REGISTER_ADAPTER(Guardian)
-  REGISTER_ADAPTER(GnssRawData);
+  // REGISTER_ADAPTER(GnssRawData);
   REGISTER_ADAPTER(StreamStatus);
   REGISTER_ADAPTER(GnssHeading);
-  REGISTER_ADAPTER(RtcmData);
+  // REGISTER_ADAPTER(RtcmData);
 
   DECLARE_SINGLETON(AdapterManager);
 };

@@ -26,16 +26,16 @@ namespace adapter {
 AdapterManager::AdapterManager() {}
 
 void AdapterManager::Observe() {
-  for (const auto observe : instance()->observers_) {
+  for (const auto observe : Instance()->observers_) {
     observe();
   }
 }
 
-bool AdapterManager::Initialized() { return instance()->initialized_; }
+bool AdapterManager::Initialized() { return Instance()->initialized_; }
 
 void AdapterManager::Reset() {
-  instance()->initialized_ = false;
-  instance()->observers_.clear();
+  Instance()->initialized_ = false;
+  Instance()->observers_.clear();
 }
 
 void AdapterManager::Init(const std::string &adapter_config_filename) {
@@ -52,19 +52,20 @@ void AdapterManager::Init(const AdapterManagerConfig &configs) {
     return;
   }
 
-  instance()->initialized_ = true;
+  Instance()->initialized_ = true;
   if (configs.is_ros()) {
-    instance()->node_handle_.reset(new ros::NodeHandle());
+    // TODO: node_name
+    Instance()->node_handle_ = cybertron::CreateNode("node_name");
   }
 
   for (const auto &config : configs.config()) {
     switch (config.type()) {
-      case AdapterConfig::POINT_CLOUD:
-        EnablePointCloud(FLAGS_pointcloud_topic, config);
-        break;
-      case AdapterConfig::VLP16_POINT_CLOUD:
-        EnableVLP16PointCloud(FLAGS_vlp16_pointcloud_topic, config);
-        break;
+      // case AdapterConfig::POINT_CLOUD:
+      //   EnablePointCloud(FLAGS_pointcloud_topic, config);
+      //   break;
+      // case AdapterConfig::VLP16_POINT_CLOUD:
+      //   EnableVLP16PointCloud(FLAGS_vlp16_pointcloud_topic, config);
+      //   break;
       case AdapterConfig::GPS:
         EnableGps(FLAGS_gps_topic, config);
         break;
@@ -83,10 +84,10 @@ void AdapterManager::Init(const AdapterManagerConfig &configs) {
       case AdapterConfig::PERCEPTION_OBSTACLES:
         EnablePerceptionObstacles(FLAGS_perception_obstacle_topic, config);
         break;
-      case AdapterConfig::PERCEPTION_LANE_MASK:
-        EnablePerceptionLaneMask(FLAGS_perception_lane_mask_segmentation_topic,
-                                 config);
-        break;
+      // case AdapterConfig::PERCEPTION_LANE_MASK:
+      //   EnablePerceptionLaneMask(FLAGS_perception_lane_mask_segmentation_topic,
+      //                            config);
+      //   break;
       case AdapterConfig::TRAFFIC_LIGHT_DETECTION:
         EnableTrafficLightDetection(FLAGS_traffic_light_detection_topic,
                                     config);
@@ -151,24 +152,24 @@ void AdapterManager::Init(const AdapterManagerConfig &configs) {
       case AdapterConfig::ULTRASONIC_RADAR:
         EnableUltrasonic(FLAGS_ultrasonic_radar_topic, config);
         break;
-      case AdapterConfig::COMPRESSED_IMAGE:
-        EnableCompressedImage(FLAGS_compressed_image_topic, config);
-        break;
-      case AdapterConfig::IMAGE_FRONT:
-        EnableImageFront(FLAGS_image_front_topic, config);
-        break;
-      case AdapterConfig::IMAGE_SHORT:
-        EnableImageShort(FLAGS_image_short_topic, config);
-        break;
-      case AdapterConfig::IMAGE_LONG:
-        EnableImageLong(FLAGS_image_long_topic, config);
-        break;
-      case AdapterConfig::CAMERA_IMAGE_LONG:
-        EnableCameraImageLong(FLAGS_camera_image_long_topic, config);
-        break;
-      case AdapterConfig::CAMERA_IMAGE_SHORT:
-        EnableCameraImageShort(FLAGS_camera_image_short_topic, config);
-        break;
+      // case AdapterConfig::COMPRESSED_IMAGE:
+      //   EnableCompressedImage(FLAGS_compressed_image_topic, config);
+      //   break;
+      // case AdapterConfig::IMAGE_FRONT:
+      //   EnableImageFront(FLAGS_image_front_topic, config);
+      //   break;
+      // case AdapterConfig::IMAGE_SHORT:
+      //   EnableImageShort(FLAGS_image_short_topic, config);
+      //   break;
+      // case AdapterConfig::IMAGE_LONG:
+      //   EnableImageLong(FLAGS_image_long_topic, config);
+      //   break;
+      // case AdapterConfig::CAMERA_IMAGE_LONG:
+      //   EnableCameraImageLong(FLAGS_camera_image_long_topic, config);
+      //   break;
+      // case AdapterConfig::CAMERA_IMAGE_SHORT:
+      //   EnableCameraImageShort(FLAGS_camera_image_short_topic, config);
+      //   break;
       case AdapterConfig::DRIVE_EVENT:
         EnableDriveEvent(FLAGS_drive_event_topic, config);
         break;
@@ -203,83 +204,83 @@ void AdapterManager::Init(const AdapterManagerConfig &configs) {
         EnableAudioCapture(FLAGS_audio_capture_topic, config);
         break;
       // For pandora.
-      case AdapterConfig::PANDORA_POINT_CLOUD:
-        EnablePandoraPointCloud(FLAGS_pandora_pointcloud_topic, config);
-        break;
-      case AdapterConfig::PANDORA_CAMERA_FRONT_COLOR:
-        EnablePandoraCameraFrontColor(FLAGS_pandora_camera_front_color_topic,
-                                      config);
-        break;
-      case AdapterConfig::PANDORA_CAMERA_RIGHT_GRAY:
-        EnablePandoraCameraRightGray(FLAGS_pandora_camera_right_gray_topic,
-                                     config);
-        break;
-      case AdapterConfig::PANDORA_CAMERA_LEFT_GRAY:
-        EnablePandoraCameraLeftGray(FLAGS_pandora_camera_left_gray_topic,
-                                    config);
-        break;
-      case AdapterConfig::PANDORA_CAMERA_FRONT_GRAY:
-        EnablePandoraCameraFrontGray(FLAGS_pandora_camera_front_gray_topic,
-                                     config);
-        break;
-      case AdapterConfig::PANDORA_CAMERA_BACK_GRAY:
-        EnablePandoraCameraBackGray(FLAGS_pandora_camera_back_gray_topic,
-                                    config);
-        break;
+      // case AdapterConfig::PANDORA_POINT_CLOUD:
+      //   EnablePandoraPointCloud(FLAGS_pandora_pointcloud_topic, config);
+      //   break;
+      // case AdapterConfig::PANDORA_CAMERA_FRONT_COLOR:
+      //   EnablePandoraCameraFrontColor(FLAGS_pandora_camera_front_color_topic,
+      //                                 config);
+      //   break;
+      // case AdapterConfig::PANDORA_CAMERA_RIGHT_GRAY:
+      //   EnablePandoraCameraRightGray(FLAGS_pandora_camera_right_gray_topic,
+      //                                config);
+      //   break;
+      // case AdapterConfig::PANDORA_CAMERA_LEFT_GRAY:
+      //   EnablePandoraCameraLeftGray(FLAGS_pandora_camera_left_gray_topic,
+      //                               config);
+      //   break;
+      // case AdapterConfig::PANDORA_CAMERA_FRONT_GRAY:
+      //   EnablePandoraCameraFrontGray(FLAGS_pandora_camera_front_gray_topic,
+      //                                config);
+      //   break;
+      // case AdapterConfig::PANDORA_CAMERA_BACK_GRAY:
+      //   EnablePandoraCameraBackGray(FLAGS_pandora_camera_back_gray_topic,
+      //                               config);
+      //   break;
       case AdapterConfig::GUARDIAN:
         EnableGuardian(FLAGS_guardian_topic, config);
-      case AdapterConfig::GNSS_RAW_DATA:
-        EnableGnssRawData(FLAGS_gnss_raw_data_topic, config);
-        break;
+      // case AdapterConfig::GNSS_RAW_DATA:
+      //   EnableGnssRawData(FLAGS_gnss_raw_data_topic, config);
+      //   break;
       case AdapterConfig::STREAM_STATUS:
         EnableStreamStatus(FLAGS_stream_status_topic, config);
         break;
       case AdapterConfig::GNSS_HEADING:
         EnableGnssHeading(FLAGS_heading_topic, config);
         break;
-      case AdapterConfig::RTCM_DATA:
-        EnableRtcmData(FLAGS_rtcm_data_topic, config);
-        break;
+      // case AdapterConfig::RTCM_DATA:
+      //   EnableRtcmData(FLAGS_rtcm_data_topic, config);
+      //   break;
       // velodyne fusion adapters
-      case AdapterConfig::POINT_CLOUD_DENSE:
-        EnablePointCloudDense(config.topic(), config);
-        break;
-      case AdapterConfig::POINT_CLOUD_DENSE_RAW:
-        EnablePointCloudDenseRaw(config.topic(), config);
-        break;
-      case AdapterConfig::VELODYNE_SCAN_DENSE:
-        EnableVelodyneScanDense(config.topic(), config);
-        break;
+      // case AdapterConfig::POINT_CLOUD_DENSE:
+      //   EnablePointCloudDense(config.topic(), config);
+      //   break;
+      // case AdapterConfig::POINT_CLOUD_DENSE_RAW:
+      //   EnablePointCloudDenseRaw(config.topic(), config);
+      //   break;
+      // case AdapterConfig::VELODYNE_SCAN_DENSE:
+      //   EnableVelodyneScanDense(config.topic(), config);
+      //   break;
 
-      case AdapterConfig::POINT_CLOUD_SPARSE_1:
-        EnablePointCloudSparse1(config.topic(), config);
-        break;
-      case AdapterConfig::POINT_CLOUD_SPARSE_RAW_1:
-        EnablePointCloudSparseRaw1(config.topic(), config);
-        break;
-      case AdapterConfig::VELODYNE_SCAN_SPARSE_1:
-        EnableVelodyneScanSparse1(config.topic(), config);
-        break;
+      // case AdapterConfig::POINT_CLOUD_SPARSE_1:
+      //   EnablePointCloudSparse1(config.topic(), config);
+      //   break;
+      // case AdapterConfig::POINT_CLOUD_SPARSE_RAW_1:
+      //   EnablePointCloudSparseRaw1(config.topic(), config);
+      //   break;
+      // case AdapterConfig::VELODYNE_SCAN_SPARSE_1:
+      //   EnableVelodyneScanSparse1(config.topic(), config);
+      //   break;
 
-      case AdapterConfig::POINT_CLOUD_SPARSE_2:
-        EnablePointCloudSparse2(config.topic(), config);
-        break;
-      case AdapterConfig::POINT_CLOUD_SPARSE_RAW_2:
-        EnablePointCloudSparseRaw2(config.topic(), config);
-        break;
-      case AdapterConfig::VELODYNE_SCAN_SPARSE_2:
-        EnableVelodyneScanSparse2(config.topic(), config);
-        break;
+      // case AdapterConfig::POINT_CLOUD_SPARSE_2:
+      //   EnablePointCloudSparse2(config.topic(), config);
+      //   break;
+      // case AdapterConfig::POINT_CLOUD_SPARSE_RAW_2:
+      //   EnablePointCloudSparseRaw2(config.topic(), config);
+      //   break;
+      // case AdapterConfig::VELODYNE_SCAN_SPARSE_2:
+      //   EnableVelodyneScanSparse2(config.topic(), config);
+      //   break;
 
-      case AdapterConfig::POINT_CLOUD_SPARSE_3:
-        EnablePointCloudSparse3(config.topic(), config);
-        break;
-      case AdapterConfig::POINT_CLOUD_SPARSE_RAW_3:
-        EnablePointCloudSparseRaw3(config.topic(), config);
-        break;
-      case AdapterConfig::VELODYNE_SCAN_SPARSE_3:
-        EnableVelodyneScanSparse3(config.topic(), config);
-        break;
+      // case AdapterConfig::POINT_CLOUD_SPARSE_3:
+      //   EnablePointCloudSparse3(config.topic(), config);
+      //   break;
+      // case AdapterConfig::POINT_CLOUD_SPARSE_RAW_3:
+      //   EnablePointCloudSparseRaw3(config.topic(), config);
+      //   break;
+      // case AdapterConfig::VELODYNE_SCAN_SPARSE_3:
+      //   EnableVelodyneScanSparse3(config.topic(), config);
+      //   break;
 
       default:
         AERROR << "Unknown adapter config type!";
