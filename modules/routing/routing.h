@@ -65,7 +65,7 @@ class Routing : public apollo::common::ApolloApp {
   virtual ~Routing() = default;
 
  private:
-  void OnRoutingRequest(const RoutingRequest &routing_request);
+  void OnRoutingRequest(const std::shared_ptr<RoutingRequest> &routing_request);
 
   RoutingRequest FillLaneInfoIfMissing(const RoutingRequest &routing_request);
 

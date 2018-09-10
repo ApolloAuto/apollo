@@ -131,10 +131,10 @@ class Adapter : public AdapterBase {
   /// The user can use Adapter::DataType to get the type of the
   /// underlying data.
   typedef D DataType;
-  typedef boost::shared_ptr<D const> DataPtr;
+  typedef std::shared_ptr<D> DataPtr;
 
   typedef typename std::list<DataPtr>::const_iterator Iterator;
-  typedef typename std::function<void(const D&)> Callback;
+  typedef typename std::function<void(const DataPtr&)> Callback;
 
   /**
    * @brief Construct the \class Adapter object.
@@ -190,9 +190,7 @@ class Adapter : public AdapterBase {
    * the adapter.
    * @param data the input data.
    */
-  void FeedData(const D& data) {
-    EnqueueData(boost::make_shared<D const>(data));
-  }
+  void FeedData(const D& data) { EnqueueData(std::make_shared<D>(data)); }
 
   /**
    * @brief Data callback when receiving a message. Under the hood it calls
@@ -201,7 +199,7 @@ class Adapter : public AdapterBase {
    * @param message the input data.
    */
   void OnReceive(const D& message) {
-    RosCallback(boost::make_shared<D const>(message));
+    ReaderCallback(std::make_shared<D>(message));
   }
 
   /**
@@ -473,10 +471,10 @@ class Adapter : public AdapterBase {
    * message is received.
    * @param message the newly received message.
    */
-  void RosCallback(DataPtr message) {
+  void ReaderCallback(const DataPtr& message) {
     last_receive_time_ = apollo::common::time::Clock::NowInSeconds();
     EnqueueData(message);
-    FireCallbacks(*message);
+    FireCallbacks(message);
   }
 
   /**
@@ -484,7 +482,7 @@ class Adapter : public AdapterBase {
    * specified data.
    * @param data the specified data.
    */
-  void FireCallbacks(const D& data) {
+  void FireCallbacks(const DataPtr& data) {
     for (const auto& callback : receive_callbacks_) {
       callback(data);
     }
@@ -494,7 +492,7 @@ class Adapter : public AdapterBase {
    * @brief push the shared-pointer-guarded data to the data queue of
    * the adapter.
    */
-  void EnqueueData(DataPtr data) {
+  void EnqueueData(const DataPtr& data) {
     if (enable_dump_) {
       DumpMessage<D>(*data);
     }

@@ -81,18 +81,10 @@ using PadAdapter = Adapter<control::PadMessage>;
 using PerceptionObstaclesAdapter = Adapter<perception::PerceptionObstacles>;
 using PlanningAdapter = Adapter<planning::ADCTrajectory>;
 using PlanningPadAdapter = Adapter<planning::PadMessage>;
-using PointCloudAdapter = Adapter<::sensor_msgs::PointCloud2>;
-using VLP16PointCloudAdapter = Adapter<::sensor_msgs::PointCloud2>;
-using ImageFrontAdapter = Adapter<::sensor_msgs::Image>;
-using ImageShortAdapter = Adapter<::sensor_msgs::Image>;
-using ImageLongAdapter = Adapter<::sensor_msgs::Image>;
-using CameraImageLongAdapter = Adapter<::sensor_msgs::Image>;
-using CameraImageShortAdapter = Adapter<::sensor_msgs::Image>;
-using ImageUSBCamAdapter = Adapter<::sensor_msgs::Image>;
 using PredictionAdapter = Adapter<prediction::PredictionObstacles>;
 using DriveEventAdapter = Adapter<DriveEvent>;
 using TrafficLightDetectionAdapter = Adapter<perception::TrafficLightDetection>;
-using PerceptionLaneMaskAdapter = Adapter<::sensor_msgs::Image>;
+// using PerceptionLaneMaskAdapter = Adapter<::sensor_msgs::Image>;
 using RoutingRequestAdapter = Adapter<routing::RoutingRequest>;
 using RoutingResponseAdapter = Adapter<routing::RoutingResponse>;
 using RelativeOdometryAdapter =
@@ -107,7 +99,7 @@ using DelphiESRAdapter = Adapter<drivers::DelphiESR>;
 using ContiRadarAdapter = Adapter<drivers::ContiRadar>;
 using RacobitRadarAdapter = Adapter<drivers::RacobitRadar>;
 using UltrasonicAdapter = Adapter<drivers::Ultrasonic>;
-using CompressedImageAdapter = Adapter<sensor_msgs::CompressedImage>;
+// using CompressedImageAdapter = Adapter<sensor_msgs::CompressedImage>;
 using GnssRtkObsAdapter = Adapter<apollo::drivers::gnss::EpochObservation>;
 using GnssRtkEphAdapter = Adapter<apollo::drivers::gnss::GnssEphemeris>;
 using GnssBestPoseAdapter = Adapter<apollo::drivers::gnss::GnssBestPose>;
@@ -122,35 +114,46 @@ using LocalizationMsfStatusAdapter =
 using RelativeMapAdapter = Adapter<apollo::relative_map::MapMsg>;
 using NavigationAdapter = Adapter<apollo::relative_map::NavigationInfo>;
 using AudioCaptureAdapter = Adapter<apollo::dreamview::AudioCapture>;
-// for pandora
-using PandoraPointCloudAdapter = Adapter<::sensor_msgs::PointCloud2>;
-using PandoraCameraFrontColorAdapter = Adapter<::sensor_msgs::Image>;
-using PandoraCameraRightGrayAdapter = Adapter<::sensor_msgs::Image>;
-using PandoraCameraLeftGrayAdapter = Adapter<::sensor_msgs::Image>;
-using PandoraCameraFrontGrayAdapter = Adapter<::sensor_msgs::Image>;
-using PandoraCameraBackGrayAdapter = Adapter<::sensor_msgs::Image>;
 using GuardianAdapter = Adapter<apollo::guardian::GuardianCommand>;
-using GnssRawDataAdapter = Adapter<std_msgs::String>;
 using StreamStatusAdapter = Adapter<drivers::gnss_status::StreamStatus>;
 using GnssHeadingAdapter = Adapter<drivers::gnss::Heading>;
-using RtcmDataAdapter = Adapter<std_msgs::String>;
+
+// for pandora
+// using PandoraPointCloudAdapter = Adapter<::sensor_msgs::PointCloud2>;
+// using PandoraCameraFrontColorAdapter = Adapter<::sensor_msgs::Image>;
+// using PandoraCameraRightGrayAdapter = Adapter<::sensor_msgs::Image>;
+// using PandoraCameraLeftGrayAdapter = Adapter<::sensor_msgs::Image>;
+// using PandoraCameraFrontGrayAdapter = Adapter<::sensor_msgs::Image>;
+// using PandoraCameraBackGrayAdapter = Adapter<::sensor_msgs::Image>;
+
+// using GnssRawDataAdapter = Adapter<std_msgs::String>;
+// using RtcmDataAdapter = Adapter<std_msgs::String>;
+
+// using PointCloudAdapter = Adapter<::sensor_msgs::PointCloud2>;
+// using VLP16PointCloudAdapter = Adapter<::sensor_msgs::PointCloud2>;
+// using ImageFrontAdapter = Adapter<::sensor_msgs::Image>;
+// using ImageShortAdapter = Adapter<::sensor_msgs::Image>;
+// using ImageLongAdapter = Adapter<::sensor_msgs::Image>;
+// using CameraImageLongAdapter = Adapter<::sensor_msgs::Image>;
+// using CameraImageShortAdapter = Adapter<::sensor_msgs::Image>;
+// using ImageUSBCamAdapter = Adapter<::sensor_msgs::Image>;
 
 // for velodyne fusion sensors
-using PointCloudDenseAdapter = Adapter<::sensor_msgs::PointCloud2>;
-using PointCloudDenseRawAdapter = Adapter<::sensor_msgs::PointCloud2>;
-using VelodyneScanDenseAdapter = Adapter<velodyne_msgs::VelodyneScanUnified>;
+// using PointCloudDenseAdapter = Adapter<::sensor_msgs::PointCloud2>;
+// using PointCloudDenseRawAdapter = Adapter<::sensor_msgs::PointCloud2>;
+// using VelodyneScanDenseAdapter = Adapter<velodyne_msgs::VelodyneScanUnified>;
 
-using PointCloudSparse1Adapter = Adapter<::sensor_msgs::PointCloud2>;
-using PointCloudSparseRaw1Adapter = Adapter<::sensor_msgs::PointCloud2>;
-using VelodyneScanSparse1Adapter = Adapter<velodyne_msgs::VelodyneScanUnified>;
+// using PointCloudSparse1Adapter = Adapter<::sensor_msgs::PointCloud2>;
+// using PointCloudSparseRaw1Adapter = Adapter<::sensor_msgs::PointCloud2>;
+// using VelodyneScanSparse1Adapter = Adapter<velodyne_msgs::VelodyneScanUnified>;
 
-using PointCloudSparse2Adapter = Adapter<::sensor_msgs::PointCloud2>;
-using PointCloudSparseRaw2Adapter = Adapter<::sensor_msgs::PointCloud2>;
-using VelodyneScanSparse2Adapter = Adapter<velodyne_msgs::VelodyneScanUnified>;
+// using PointCloudSparse2Adapter = Adapter<::sensor_msgs::PointCloud2>;
+// using PointCloudSparseRaw2Adapter = Adapter<::sensor_msgs::PointCloud2>;
+// using VelodyneScanSparse2Adapter = Adapter<velodyne_msgs::VelodyneScanUnified>;
 
-using PointCloudSparse3Adapter = Adapter<::sensor_msgs::PointCloud2>;
-using PointCloudSparseRaw3Adapter = Adapter<::sensor_msgs::PointCloud2>;
-using VelodyneScanSparse3Adapter = Adapter<velodyne_msgs::VelodyneScanUnified>;
+// using PointCloudSparse3Adapter = Adapter<::sensor_msgs::PointCloud2>;
+// using PointCloudSparseRaw3Adapter = Adapter<::sensor_msgs::PointCloud2>;
+// using VelodyneScanSparse3Adapter = Adapter<velodyne_msgs::VelodyneScanUnified>;
 
 }  // namespace adapter
 }  // namespace common

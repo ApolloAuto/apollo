@@ -93,11 +93,12 @@ RoutingRequest Routing::FillLaneInfoIfMissing(
   return fixed_request;
 }
 
-void Routing::OnRoutingRequest(const RoutingRequest& routing_request) {
-  AINFO << "Get new routing request:" << routing_request.DebugString();
+void Routing::OnRoutingRequest(
+    const std::shared_ptr<RoutingRequest>& routing_request) {
+  AINFO << "Get new routing request:" << routing_request->DebugString();
   RoutingResponse routing_response;
   apollo::common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
-  const auto& fixed_request = FillLaneInfoIfMissing(routing_request);
+  const auto& fixed_request = FillLaneInfoIfMissing(*routing_request);
   if (!navigator_ptr_->SearchRoute(fixed_request, &routing_response)) {
     AERROR << "Failed to search route with navigator.";
 
