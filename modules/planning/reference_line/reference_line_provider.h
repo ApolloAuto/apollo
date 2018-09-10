@@ -24,6 +24,7 @@
 #define MODULES_PLANNING_REFERENCE_LINE_REFERENCE_LINE_PROVIDER_H_
 
 #include <condition_variable>
+#include <future>
 #include <list>
 #include <memory>
 #include <mutex>
@@ -68,7 +69,7 @@ class ReferenceLineProvider {
   /**
    * @brief Default destructor.
    */
-  ~ReferenceLineProvider();
+  ~ReferenceLineProvider() = default;
 
   bool UpdateRoutingResponse(const routing::RoutingResponse& routing);
 
@@ -154,7 +155,7 @@ class ReferenceLineProvider {
  private:
   bool is_initialized_ = false;
   bool is_stop_ = false;
-  std::unique_ptr<std::thread> thread_;
+  std::future<void> future_;
 
   std::unique_ptr<ReferenceLineSmoother> smoother_;
   ReferenceLineSmootherConfig smoother_config_;
