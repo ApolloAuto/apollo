@@ -22,8 +22,7 @@
 #include <string>
 #include <thread>
 
-#include "ros/include/ros/ros.h"
-#include "ros/include/std_msgs/String.h"
+#include "cybertron/cybertron.h"
 
 #include "modules/drivers/gnss/proto/config.pb.h"
 #include "modules/drivers/gnss/proto/gnss_status.pb.h"
@@ -38,10 +37,15 @@ namespace gnss {
 
 using apollo::drivers::gnss_status::StreamStatus;
 using apollo::drivers::gnss_status::StreamStatus_Type;
+using apollo::drivers::gnss::RawData;
+
+using apollo::cybertron::Node;
+using apollo::cybertron::Writer;
+using apollo::cybertron::Reader;
 
 class RawStream {
  public:
-  explicit RawStream(const config::Config& config);
+  explicit RawStream(const config::Config& config, const std::shared_ptr<Node>& node);
   ~RawStream();
   bool Init();
 
@@ -63,10 +67,10 @@ class RawStream {
   void PublishRtkData(size_t length);
   void PushGpgga(size_t length);
   void GpsbinSpin();
-  void GpsbinCallback(const std_msgs::String& raw_data);
-  void OnWheelVelocityTimer(const ros::TimerEvent&);
+  void GpsbinCallback(const std::shared_ptr<RawData const>& raw_data);
+//  void OnWheelVelocityTimer(const ros::TimerEvent&);
 
-  ros::Timer wheel_velocity_timer_;
+  cybertron::Timer wheel_velocity_timer_;
   static constexpr size_t BUFFER_SIZE = 2048;
   uint8_t buffer_[BUFFER_SIZE] = {0};
   uint8_t buffer_rtk_[BUFFER_SIZE] = {0};
@@ -96,6 +100,12 @@ class RawStream {
   std::unique_ptr<RtcmParser> rtcm_parser_ptr_;
   std::unique_ptr<std::thread> gpsbin_thread_ptr_;
   std::unique_ptr<std::ofstream> gpsbin_stream_ = nullptr;
+
+  std::shared_ptr<Node> node_ = nullptr;
+  std::shared_ptr<Writer<StreamStatus>> stream_writer_ = nullptr;
+  std::shared_ptr<Writer<RawData>> raw_writer_ = nullptr;
+  std::shared_ptr<Writer<RawData>> rtcm_writer_ = nullptr;
+  std::shared_ptr<Reader<RawData>> gpsbin_reader_ = nullptr;
 };
 
 }  // namespace gnss

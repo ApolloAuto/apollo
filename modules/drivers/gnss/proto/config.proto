@@ -117,4 +117,20 @@ message Config {
   optional TF tf = 12;
   // If given, the driver will send velocity info to novatel with command stream
   optional string wheel_parameters = 13;
+  optional string gpsbin_folder = 14;
+  optional string stream_channel_name = 15;
+  optional string raw_channel_name = 16;
+  optional string gnssstatus_channel_name = 17;
+  optional string insstatus_channel_name = 18;
+  optional string gnss_channel_name = 19;
+  optional string insstat_channel_name = 20;
+  optional string corrimu_channel_name = 21;
+  optional string ins_channel_name = 22;
+  optional string gnssephemeris_channel_name = 23;
+  optional string epochobservation_channel_name = 24;
+  optional string heading_channel_name = 25;
+  optional string rtcm_channel_name = 26;
+  optional string rawimu_channel_name = 27;
+  optional string gps_channel_name = 28;
+
 }

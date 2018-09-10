@@ -26,7 +26,7 @@
 
 #include <iostream>
 
-#include "ros/include/ros/ros.h"
+#include "cybertron/cybertron.h"
 
 #include "modules/drivers/gnss/stream/stream.h"
 #include "modules/drivers/gnss/stream/tcp_stream.h"

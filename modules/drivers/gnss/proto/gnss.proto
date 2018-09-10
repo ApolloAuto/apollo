@@ -100,3 +100,9 @@ message GnssRange {
 
   repeated RangeInfo ranges = 3;
 }
+
+// gnss raw data
+message RawData {
+  optional apollo.common.Header header = 1;
+  required bytes data = 2;
+}

@@ -13,20 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+#include "modules/drivers/gnss/gnss_component.h"
 
-#include "modules/drivers/gnss/gnss_gflags.h"
+namespace apollo {
+namespace drivers {
+namespace gnss {
 
-// System gflags
-DEFINE_string(node_name, "gnss", "The gnss driver module name");
+using apollo::cybertron::proto::RoleAttributes;
 
-DEFINE_string(adapter_config_filename, "modules/drivers/gnss/conf/adapter.conf",
-              "The adapter config file");
-// Config file
-DEFINE_string(sensor_conf_file, "modules/drivers/gnss/conf/gnss_conf.pb.txt",
-              "Sensor conf file");
+GnssDriverComponent::GnssDriverComponent() {}
 
-// System gflags
-DEFINE_string(sensor_node_name, "gnss", "Sensor node name.");
+bool GnssDriverComponent::Init() {
+  config::Config gnss_config;
+  if(!apollo::cybertron::common::GetProtoFromFile(config_file_path_, &gnss_config)){
+    return false;
+  }
+  AINFO << "Gnss config: " << gnss_config.DebugString();
 
-DEFINE_string(gpsbin_folder, "/apollo/data/gpsbin",
-              "gpsbin rawdata folder name.");
+  raw_stream_.reset(new RawStream(gnss_config, node_));
+
+  if (!raw_stream_->Init()) {
+    return false;
+  }
+  return true;
+}
+
+bool GnssDriverComponent::Proc(const std::shared_ptr<RawData>& rawdata) {
+  return true;
+}
+
+}
+}
+}
