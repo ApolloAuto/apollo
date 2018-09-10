@@ -28,6 +28,7 @@
 #include "modules/common/log.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/common/time/time.h"
+#include "modules/common/util/file.h"
 #include "modules/common/util/string_tokenizer.h"
 #include "modules/common/util/string_util.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
@@ -58,8 +59,8 @@ using common::math::Vec2d;
 using common::time::Clock;
 
 namespace {
-constexpr double kPathOptimizationFallbackClost = 2e4;
-constexpr double kSpeedOptimizationFallbackClost = 2e4;
+constexpr double kPathOptimizationFallbackCost = 2e4;
+constexpr double kSpeedOptimizationFallbackCost = 2e4;
 constexpr double kStraightForwardLineCost = 10.0;
 }  // namespace
 
@@ -79,23 +80,23 @@ void LaneFollowScenario::RegisterTasks() {
                          []() -> Task* { return new PolyStSpeedOptimizer(); });
 }
 
-bool LaneFollowScenario::Init(const PlanningConfig& config) {
+bool LaneFollowScenario::Init() {
   if (is_init_) {
     return true;
   }
   RegisterTasks();
-  auto& tasks = config.planner_em_config().scenario_config()
-      .scenario_lane_follow_config().task();
-  for (const auto task : tasks) {
-    tasks_.emplace_back(
-        task_factory_.CreateObject(static_cast<TaskType>(task)));
+
+  CHECK(apollo::common::util::GetProtoFromFile(
+      FLAGS_lane_follow_scenario_config_file, &config_));
+
+  for (const auto task_cfg : config_.scenario_task_config()) {
+    tasks_.emplace_back(task_factory_.CreateObject(task_cfg.task()));
     AINFO << "Created task:" << tasks_.back()->Name();
   }
-  for (auto& task : tasks_) {
-    if (!task->Init(config)) {
-      std::string msg(
-          common::util::StrCat("Init task[", task->Name(), "] failed."));
-      AERROR << msg;
+
+  for (size_t i = 0; i < tasks_.size(); ++i) {
+    if (!tasks_[i]->Init(config_.scenario_task_config(i))) {
+      AERROR << "Init task[" << tasks_[i]->Name() << "] failed.";
       return false;
     }
   }
@@ -222,7 +223,7 @@ Status LaneFollowScenario::PlanOnReferenceLine(
     ADEBUG << "Path fallback.";
     GenerateFallbackPathProfile(reference_line_info,
                                 reference_line_info->mutable_path_data());
-    reference_line_info->AddCost(kPathOptimizationFallbackClost);
+    reference_line_info->AddCost(kPathOptimizationFallbackCost);
     reference_line_info->set_trajectory_type(ADCTrajectory::PATH_FALLBACK);
   }
 
@@ -231,7 +232,7 @@ Status LaneFollowScenario::PlanOnReferenceLine(
 
     *reference_line_info->mutable_speed_data() =
         speed_profile_generator_.GenerateFallbackSpeedProfile();
-    reference_line_info->AddCost(kSpeedOptimizationFallbackClost);
+    reference_line_info->AddCost(kSpeedOptimizationFallbackCost);
     reference_line_info->set_trajectory_type(ADCTrajectory::SPEED_FALLBACK);
   }
 

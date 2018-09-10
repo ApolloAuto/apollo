@@ -3,6 +3,27 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
+    name = "navi_task",
+    srcs = [
+        "navi_task.cc",
+    ],
+    hdrs = [
+        "navi_task.h",
+    ],
+    deps = [
+        "//modules/common:log",
+        "//modules/common/status",
+        "//modules/planning/common:frame",
+        "//modules/planning/common:planning_gflags",
+        "//modules/planning/common:reference_line_info",
+        "//modules/planning/common/trajectory:discretized_trajectory",
+        "//modules/planning/common/trajectory:publishable_trajectory",
+        "//modules/planning/proto:planning_config_proto",
+        "//modules/planning/proto:planning_proto",
+    ],
+)
+
+cc_library(
     name = "navi_path_decider",
     srcs = [
         "navi_path_decider.cc",
@@ -11,6 +32,7 @@ cc_library(
         "navi_path_decider.h",
     ],
     deps = [
+        ":navi_task",
         "//modules/common:log",
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/math",
@@ -37,6 +59,7 @@ cc_library(
         "navi_speed_ts_graph.h",
     ],
     deps = [
+        ":navi_task",
         "//modules/common:log",
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/math",
@@ -61,6 +84,7 @@ cc_library(
         "navi_obstacle_decider.h",
     ],
     deps = [
+        ":navi_task",
         "//modules/common:log",
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/math",

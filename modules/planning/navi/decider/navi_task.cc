@@ -18,41 +18,26 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_TOOLKITS_OPTIMIZERS_TASK_H_
-#define MODULES_PLANNING_TOOLKITS_OPTIMIZERS_TASK_H_
-
-#include <string>
+#include "modules/planning/navi/decider/navi_task.h"
 
 #include "modules/planning/proto/planning_config.pb.h"
-
-#include "modules/common/status/status.h"
-#include "modules/planning/common/frame.h"
-#include "modules/planning/common/reference_line_info.h"
 
 namespace apollo {
 namespace planning {
 
-class Task {
- public:
-  explicit Task(const std::string& name);
-  virtual ~Task() = default;
-  virtual const std::string& Name() const;
+using apollo::common::Status;
 
-  virtual apollo::common::Status Execute(
-      Frame* frame, ReferenceLineInfo* reference_line_info);
+NaviTask::NaviTask(const std::string& name) : name_(name) {}
 
-  virtual bool Init(const ScenarioConfig::ScenarioTaskConfig& config);
+const std::string& NaviTask::Name() const { return name_; }
 
- protected:
-  bool is_init_ = false;
-  Frame* frame_ = nullptr;
-  ReferenceLineInfo* reference_line_info_ = nullptr;
+bool NaviTask::Init(const PlanningConfig& config) { return true; }
 
- private:
-  const std::string name_;
-};
+Status NaviTask::Execute(Frame* frame, ReferenceLineInfo* reference_line_info) {
+  frame_ = frame;
+  reference_line_info_ = reference_line_info;
+  return Status::OK();
+}
 
 }  // namespace planning
 }  // namespace apollo
-
-#endif  // MODULES_PLANNING_TOOLKITS_OPTIMIZERS_TASK_H_

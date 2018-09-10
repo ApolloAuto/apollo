@@ -28,6 +28,10 @@ DEFINE_int32(planning_loop_rate, 10, "Loop rate for planning node");
 DEFINE_bool(enable_collision_detection, false,
             "enable collision detection in planning");
 
+DEFINE_string(lane_follow_scenario_config_file,
+              "modules/planning/conf/lane_follow_scenario_config.pb.txt",
+              "The lane follow scenario configuration file");
+
 DEFINE_string(planning_adapter_config_filename,
               "modules/planning/conf/adapter.conf",
               "The adapter configuration file");

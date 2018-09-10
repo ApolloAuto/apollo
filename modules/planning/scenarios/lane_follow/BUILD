@@ -49,6 +49,9 @@ cc_test(
     srcs = [
         "lane_follow_scenario_test.cc",
     ],
+    data = [
+        "//modules/planning:planning_conf",
+    ],
     deps = [
         ":lane_follow",
         "@gtest//:main",

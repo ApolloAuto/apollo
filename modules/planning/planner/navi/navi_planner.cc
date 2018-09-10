@@ -69,12 +69,9 @@ constexpr double kStraightForwardLineCost = 10.0;
 
 void NaviPlanner::RegisterTasks() {
   task_factory_.Register(NAVI_PATH_DECIDER,
-                         []() -> Task* { return new NaviPathDecider(); });
+                         []() -> NaviTask* { return new NaviPathDecider(); });
   task_factory_.Register(NAVI_SPEED_DECIDER,
-                         []() -> Task* { return new NaviSpeedDecider(); });
-  // task_factory_.Register(NAVI_OBSTACLE_DECIDER,
-  //                        []() -> Task* { return new NaviObstacleDecider();
-  //                        });
+                         []() -> NaviTask* { return new NaviSpeedDecider(); });
 }
 
 Status NaviPlanner::Init(const PlanningConfig& config) {

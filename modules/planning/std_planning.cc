@@ -464,31 +464,15 @@ void StdPlanning::Stop() {
 }
 
 bool StdPlanning::CheckPlanningConfig() {
-  if (!config_.has_planner_em_config()) {
+  if (!config_.has_standard_planning_config()) {
     return false;
   }
-  if (!config_.planner_em_config().has_scenario_config()) {
+  if (config_.standard_planning_config()
+          .planner_onroad_config()
+          .scenario_type_size() == 0) {
     return false;
   }
-  if (!config_.planner_em_config().scenario_config()
-      .has_scenario_lane_follow_config()) {
-    return false;
-  }
-  if (!config_.planner_em_config().scenario_config()
-      .scenario_lane_follow_config().has_dp_st_speed_config()) {
-    return false;
-  }
-
-  const auto& dp_st_speed_config = config_.planner_em_config()
-      .scenario_config().scenario_lane_follow_config().dp_st_speed_config();
-  CHECK(dp_st_speed_config.has_matrix_dimension_s());
-  CHECK_GT(dp_st_speed_config.matrix_dimension_s(), 3);
-  CHECK_LT(dp_st_speed_config.matrix_dimension_s(), 10000);
-  CHECK(dp_st_speed_config.has_matrix_dimension_t());
-  CHECK_GT(dp_st_speed_config.matrix_dimension_t(), 3);
-  CHECK_LT(dp_st_speed_config.matrix_dimension_t(), 10000);
   // TODO(All): check other config params
-
   return true;
 }
 

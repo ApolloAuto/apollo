@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,11 +15,11 @@
  *****************************************************************************/
 
 /**
- * @file dp_poly_path_optimizer.h
+ * @file
  **/
 
-#ifndef MODULES_PLANNING_TOOLKITS_OPTIMIZERS_DP_POLY_PATH_OPTIMIZER_H_
-#define MODULES_PLANNING_TOOLKITS_OPTIMIZERS_DP_POLY_PATH_OPTIMIZER_H_
+#ifndef MODULES_PLANNING_TOOLKITS_OPTIMIZERS_SIDE_PASS_PATH_OPTIMIZER_H_
+#define MODULES_PLANNING_TOOLKITS_OPTIMIZERS_SIDE_PASS_PATH_OPTIMIZER_H_
 
 #include <string>
 
@@ -32,13 +32,13 @@ namespace apollo {
 namespace planning {
 
 /**
- * @class DpPolyPathOptimizer
- * @brief DpPolyPathOptimizer does path planning with dynamic programming
+ * @class SidePassPathOptimizer
+ * @brief SidePassPathOptimizer does path planning with dynamic programming
  * algorithm.
  */
-class DpPolyPathOptimizer : public PathOptimizer {
+class SidePassPathOptimizer final : public PathOptimizer {
  public:
-  DpPolyPathOptimizer();
+  SidePassPathOptimizer();
 
   bool Init(const ScenarioConfig::ScenarioTaskConfig &config) override;
 
@@ -55,4 +55,4 @@ class DpPolyPathOptimizer : public PathOptimizer {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_TOOLKITS_OPTIMIZERS_DP_POLY_PATH_OPTIMIZER_H_
+#endif  // MODULES_PLANNING_TOOLKITS_OPTIMIZERS_SIDE_PASS_PATH_OPTIMIZER_H_

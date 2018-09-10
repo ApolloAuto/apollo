@@ -31,7 +31,7 @@ Task::Task(const std::string& name) : name_(name) {}
 
 const std::string& Task::Name() const { return name_; }
 
-bool Task::Init(const PlanningConfig&) { return true; }
+bool Task::Init(const ScenarioConfig::ScenarioTaskConfig&) { return true; }
 
 Status Task::Execute(Frame* frame, ReferenceLineInfo* reference_line_info) {
   frame_ = frame;

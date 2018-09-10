@@ -43,7 +43,7 @@ class DpStSpeedOptimizer : public SpeedOptimizer {
  public:
   DpStSpeedOptimizer();
 
-  bool Init(const PlanningConfig& config) override;
+  bool Init(const ScenarioConfig::ScenarioTaskConfig& config) override;
 
  private:
   apollo::common::Status Process(const SLBoundary& adc_sl_boundary,
