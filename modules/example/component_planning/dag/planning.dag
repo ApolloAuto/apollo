@@ -1,0 +1,29 @@
+# Define all coms in DAG streaming.
+module_config {
+    module_library : "/apollo/bazel-bin/modules/example/component_planning/libplanning_component.so"
+    components {
+        class_name : "PlanningComponent"
+        config {
+            name : "planning"
+            readers: [
+                {
+                    channel: "/perception/channel"
+                }, {
+                    channel: "/carstatus/channel"
+                }
+            ] 
+        }
+    }
+}
+module_config {
+    module_library : "lib/libwatchdog_component.so"
+    components {
+        class_name : "WatchdogComponent"
+        config {
+            name : "egg"
+            readers {
+                channel: "/food"
+            }
+        }
+    }
+}
