@@ -81,6 +81,16 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "message_util",
+    hdrs = [
+        "message_util.h",
+    ],
+    deps = [
+        "@com_google_protobuf//:protobuf",
+    ],
+)
+
 cc_test(
     name = "string_util_test",
     size = "small",

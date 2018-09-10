@@ -21,6 +21,7 @@
 
 #include "modules/drivers/radar/conti_radar/conti_radar_message_manager.h"
 
+#include "modules/common/util/message_util.h"
 #include "modules/drivers/radar/conti_radar/protocol/cluster_general_info_701.h"
 #include "modules/drivers/radar/conti_radar/protocol/cluster_list_status_600.h"
 #include "modules/drivers/radar/conti_radar/protocol/cluster_quality_info_702.h"
@@ -34,9 +35,9 @@ namespace apollo {
 namespace drivers {
 namespace conti_radar {
 
-using ::apollo::common::adapter::AdapterManager;
-
-ContiRadarMessageManager::ContiRadarMessageManager() {
+ContiRadarMessageManager::ContiRadarMessageManager(
+    const std::shared_ptr<Writer<ContiRadar>> &writer)
+    : conti_radar_writer_(writer) {
   AddRecvProtocolData<RadarState201, true>();
   AddRecvProtocolData<ClusterListStatus600, true>();
   AddRecvProtocolData<ClusterGeneralInfo701, true>();
@@ -90,11 +91,11 @@ void ContiRadarMessageManager::Parse(const uint32_t message_id,
     if (sensor_data_.contiobs_size() <=
         sensor_data_.object_list_status().nof_objects()) {
       // maybe lost a object_list_status msg
-      AdapterManager::PublishContiRadar(sensor_data_);
+      conti_radar_writer_->Write(std::make_shared<ContiRadar>(sensor_data_));
     }
     sensor_data_.Clear();
     // fill header when recieve the general info message
-    AdapterManager::FillContiRadarHeader(FLAGS_sensor_node_name, &sensor_data_);
+    common::util::FillHeader("conti_radar", &sensor_data_);
   }
 
   sensor_protocol_data->Parse(data, length, &sensor_data_);

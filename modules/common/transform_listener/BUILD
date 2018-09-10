@@ -13,7 +13,7 @@ cc_library(
     deps = [
         "//modules/common:log",
         "//modules/common/time",
-        "@ros//:ros_common",
+        "//framework:cybertron",
     ],
 )
 

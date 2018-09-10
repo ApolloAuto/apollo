@@ -32,7 +32,7 @@
 #include "modules/common/configs/config_gflags.h"
 #include "modules/common/log.h"
 #include "modules/common/macro.h"
-#include "ros/include/ros/ros.h"
+#include "cybertron/time/time.h"
 
 /**
  * @namespace apollo::common::time
@@ -152,7 +152,7 @@ class Clock {
   enum ClockMode {
     SYSTEM = 0,
     MOCK = 1,
-    ROS = 2,
+    CYBERTRON = 2,
   };
 
   /**
@@ -164,13 +164,13 @@ class Clock {
       case ClockMode::SYSTEM:
         return SystemNow();
       case ClockMode::MOCK:
-        return instance()->mock_now_;
-      case ClockMode::ROS:
-        return From(ros::Time::now().toSec());
+        return Instance()->mock_now_;
+      case ClockMode::CYBERTRON:
+        return From(cybertron::Time::Now().ToSecond());
       default:
         AFATAL << "Unsupported clock mode: " << mode();
     }
-    return From(ros::Time::now().toSec());
+    return From(cybertron::Time::Now().ToSecond());
   }
 
   /**
@@ -183,20 +183,20 @@ class Clock {
    * @brief Set the behavior of the \class Clock.
    * @param The new clock mode to be set.
    */
-  static void SetMode(ClockMode mode) { instance()->mode_ = mode; }
+  static void SetMode(ClockMode mode) { Instance()->mode_ = mode; }
 
   /**
    * @brief Gets the current clock mode.
    * @return The current clock mode.
    */
-  static ClockMode mode() { return instance()->mode_; }
+  static ClockMode mode() { return Instance()->mode_; }
 
   /**
    * @brief This is for mock clock mode only. It will set the timestamp
    * for the mock clock.
    */
   static void SetNow(const Duration &duration) {
-    Clock *clock = instance();
+    auto clock = Instance();
     if (clock->mode_ != ClockMode::MOCK) {
       AFATAL << "Cannot set now when clock mode is not MOCK!";
     }
@@ -208,7 +208,7 @@ class Clock {
    * for the mock clock with UNIX timestamp in seconds.
    */
   static void SetNowInSeconds(double seconds) {
-    Clock *clock = instance();
+    auto clock = Instance();
     if (clock->mode_ != ClockMode::MOCK) {
       AFATAL << "Cannot set now when clock mode is not MOCK!";
     }
@@ -222,9 +222,7 @@ class Clock {
    * @brief constructs the \class Clock instance
    * @param mode the desired clock mode
    */
-  explicit Clock(ClockMode mode) : mode_(mode), mock_now_(Timestamp()) {
-    ros::Time::init();
-  }
+  explicit Clock(ClockMode mode) : mode_(mode), mock_now_(Timestamp()) { }
 
   /**
    * @brief Returns the current timestamp based on the system clock.
@@ -252,7 +250,7 @@ class Clock {
 };
 
 inline Clock::Clock()
-    : Clock(FLAGS_use_ros_time ? ClockMode::ROS : ClockMode::SYSTEM) {}
+    : Clock(FLAGS_use_ros_time ? ClockMode::CYBERTRON : ClockMode::SYSTEM) {}
 
 // Measure run time of a code block, mostly for debugging purpose.
 // Example usage:
