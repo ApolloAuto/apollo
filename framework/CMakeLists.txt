@@ -20,7 +20,7 @@ add_subdirectory(cybertron/record)
 
 add_subdirectory(cybertron/tools)
 add_subdirectory(examples)
-add_subdirectory(benchmark)
+# add_subdirectory(benchmark)
 add_subdirectory(cybertron/mainboard)
 
 add_subdirectory(sensor)
@@ -101,4 +101,4 @@ install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/cybertron"
   )
 
 enable_testing()
-add_subdirectory(cybertron/test)
+# add_subdirectory(cybertron/test)
