@@ -1,0 +1,5 @@
+chassis_channel: "/apollo/canbus/chassis"
+system_status_channel: "/apollo/monitor/system_status"
+control_command_channel: "/apollo/control"
+guardian_channel: "/apollo/guardian"
+guardian_enable: true
