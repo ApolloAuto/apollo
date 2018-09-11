@@ -1,0 +1,30 @@
+syntax = "proto2";
+
+package apollo.drivers.velodyne.config;
+
+import "modules/drivers/velodyne/proto/velodyne.proto";
+
+message Config {
+  required string frame_id = 1;
+  required string scan_channel = 2;
+  optional double rpm = 3 [default = 600.0];
+  required apollo.drivers.velodyne.Model model = 4;
+  required apollo.drivers.velodyne.Mode mode = 21;
+  optional string pcap = 5;
+  optional int32 prefix_angle = 6;
+  optional int32 firing_data_port = 7;
+  optional int32 positioning_data_port = 8;
+  optional bool use_sensor_sync = 9;
+  optional double max_range = 10;
+  optional double min_range = 11;
+  optional double max_angle = 12;
+  optional double min_angle = 13;
+  optional double view_direction = 14;
+  optional double view_width = 15;
+  optional bool calibration_online = 16;
+  optional string calibration_file = 17;
+  optional bool organized = 18;
+  optional string convert_channel_name = 19;
+  optional int32 npackets = 20;
+  optional string compensator_channel_name = 22;
+}

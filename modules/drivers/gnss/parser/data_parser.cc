@@ -91,7 +91,7 @@ bool DataParser::Init() {
   gnssstatus_writer_ = node_->CreateWriter<GnssStatus>(config_.gnssstatus_channel_name());  
   insstatus_writer_ = node_->CreateWriter<InsStatus>(config_.insstatus_channel_name());
   gnss_writer_ = node_->CreateWriter<Gnss>(config_.gnss_channel_name());
-  gnssbestpose_writer_ = node_->CreateWriter<GnssBestPose>(config_.insstatus_channel_name());
+  gnssbestpose_writer_ = node_->CreateWriter<GnssBestPose>(config_.bestpos_channel_name());
   corrimu_writer_ = node_->CreateWriter<CorrectedImu>(config_.corrimu_channel_name());
   ins_writer_ = node_->CreateWriter<Ins>(config_.ins_channel_name());
   insstat_writer_ = node_->CreateWriter<InsStat>(config_.insstat_channel_name());
