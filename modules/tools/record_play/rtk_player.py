@@ -24,8 +24,9 @@ import atexit
 import logging
 import os
 import sys
+import time
 
-import rospy
+from cybertron import pynode
 import scipy.signal as signal
 from logger import Logger
 from numpy import genfromtxt
@@ -46,7 +47,8 @@ class RtkPlayer(object):
     rtk player class
     """
 
-    def __init__(self, record_file, speedmultiplier, completepath, replan):
+    def __init__(self, record_file, node,
+                 speedmultiplier, completepath, replan):
         """Init player."""
         self.firstvalid = False
         self.logger = Logger.get_logger(tag="RtkPlayer")
@@ -67,8 +69,9 @@ class RtkPlayer(object):
         self.localization_received = False
         self.chassis_received = False
 
-        self.planning_pub = rospy.Publisher(
-            '/apollo/planning', planning_pb2.ADCTrajectory, queue_size=1)
+        self.planning_pub = node.create_writer('/apollo/planning',
+                            planning_pb2.DESCRIPTOR.
+                            message_types_by_name['ADCTrajectory'].full_name)
 
         self.speedmultiplier = speedmultiplier / 100
         self.terminating = False
@@ -124,7 +127,7 @@ class RtkPlayer(object):
 
         self.closestpoint = self.closest_dist()
         self.start = max(self.closestpoint - 100, 0)
-        self.starttime = rospy.get_time()
+        self.starttime = time.time()
         self.end = min(self.start + 1000, len(self.data) - 1)
         self.logger.info("finish replan at time %s, self.closestpoint=%s" %
                          (self.starttime, self.closestpoint))
@@ -144,7 +147,7 @@ class RtkPlayer(object):
         return start
 
     def closest_time(self):
-        time_elapsed = rospy.get_time() - self.starttime
+        time_elapsed = time.time() - self.starttime
         closest_time = self.start
         time_diff = self.data['time'][closest_time] - \
            self.data['time'][self.closestpoint]
@@ -166,7 +169,7 @@ class RtkPlayer(object):
             return
 
         planningdata = planning_pb2.ADCTrajectory()
-        now = rospy.get_time()
+        now = time.time()
         planningdata.header.timestamp_sec = now
         planningdata.header.module_name = "planning"
         planningdata.header.sequence_num = self.sequence_num
@@ -231,17 +234,17 @@ class RtkPlayer(object):
         planningdata.engage_advice.advice = \
             drive_state_pb2.EngageAdvice.READY_TO_ENGAGE
 
-        self.planning_pub.publish(planningdata)
+        self.planning_pub.write(planningdata)
         self.logger.debug("Generated Planning Sequence: " +
                           str(self.sequence_num - 1))
 
     def shutdown(self):
         """
-        shutdown rosnode
+        shutdown node
         """
         self.terminating = True
         self.logger.info("Shutting Down...")
-        rospy.sleep(0.2)
+        time.sleep(0.2)
 
     def quit(self, signum, frame):
         """
@@ -252,7 +255,7 @@ class RtkPlayer(object):
 
 def main():
     """
-    Main rosnode
+    Main node
     """
     parser = argparse.ArgumentParser(
         description='Generate Planning Trajectory from Data File')
@@ -271,7 +274,7 @@ def main():
         default='F')
     args = vars(parser.parse_args())
 
-    rospy.init_node('rtk_player', anonymous=True)
+    node = pynode.Node("rtk_player")
 
     Logger.config(
         log_file=os.path.join(APOLLO_ROOT, 'data/log/rtk_player.log'),
@@ -279,24 +282,25 @@ def main():
         log_level=logging.DEBUG)
 
     record_file = os.path.join(APOLLO_ROOT, 'data/log/garage.csv')
-    player = RtkPlayer(record_file, args['speedmulti'],
+    player = RtkPlayer(record_file, node, args['speedmulti'],
                        args['complete'].lower(), args['replan'].lower())
     atexit.register(player.shutdown)
 
-    rospy.Subscriber('/apollo/canbus/chassis', chassis_pb2.Chassis,
+    node.create_reader('/apollo/canbus/chassis', chassis_pb2.Chassis,
                      player.chassis_callback)
 
-    rospy.Subscriber('/apollo/localization/pose',
+    node.create_reader('/apollo/localization/pose',
                      localization_pb2.LocalizationEstimate,
                      player.localization_callback)
 
-    rospy.Subscriber('/apollo/control/pad', pad_msg_pb2.PadMessage,
+    node.create_reader('/apollo/control/pad', pad_msg_pb2.PadMessage,
                      player.padmsg_callback)
 
-    rate = rospy.Rate(10)
-    while not rospy.is_shutdown():
+    while not node.is_shutdown():
+        now = time.time()
         player.publish_planningmsg()
-        rate.sleep()
+        elapsed = time.time() - now  # how long was it running?
+        time.sleep(0.1 - elapsed)
 
 
 if __name__ == '__main__':
