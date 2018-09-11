@@ -43,38 +43,41 @@ cc_library(
     ],
     deps = [
         ":adapter_gflags",
+        "//framework:cybertron",
         "//modules/common/proto:common_proto",
         "//modules/common/time",
         "//modules/common/util",
         "@com_google_protobuf//:protobuf",
         "@glog",
         "@ros//:ros_common",
-        "//framework:cybertron",
     ],
 )
 
-cc_test(
-    name = "adapter_test",
-    size = "small",
-    srcs = [
-        "adapter_test.cc",
-    ],
-    tags = [
-        "external",
-    ],
-    deps = [
-        ":adapter",
-        ":adapter_gflags",
-        "//modules/localization/proto:localization_proto",
-        "@gtest//:main",
-        "@ros//:ros_common",
-    ],
-)
+# cc_test(
+#     name = "adapter_test",
+#     size = "small",
+#     srcs = [
+#         "adapter_test.cc",
+#     ],
+#     tags = [
+#         "external",
+#     ],
+#     deps = [
+#         ":adapter",
+#         ":adapter_gflags",
+#         "//modules/localization/proto:localization_proto",
+#         "@gtest//:main",
+#         "@ros//:ros_common",
+#     ],
+# )
 
 cc_library(
     name = "message_adapters",
     hdrs = [
         "message_adapters.h",
+    ],
+    linkopts = [
+        "-latomic",
     ],
     deps = [
         ":adapter",
@@ -106,9 +109,6 @@ cc_library(
         "//modules/routing/proto:routing_proto",
         "@glog",
     ],
-    linkopts = [
-        "-latomic",
-    ]
 )
 
 cpplint()

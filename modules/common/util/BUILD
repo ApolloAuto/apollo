@@ -148,24 +148,24 @@ cc_test(
     ],
 )
 
-cc_test(
-    name = "file_test",
-    size = "small",
-    srcs = [
-        "file_test.cc",
-    ],
-    data = [
-        "//modules/perception:perception_data",
-    ],
-    tags = [
-        "external",
-    ],
-    deps = [
-        ":util",
-        "//modules/common/util/testdata:simple_proto",
-        "@gtest//:main",
-    ],
-)
+#cc_test(
+#    name = "file_test",
+#    size = "small",
+#    srcs = [
+#        "file_test.cc",
+#    ],
+#    data = [
+#        "//modules/perception:perception_data",
+#    ],
+#    tags = [
+#        "external",
+#    ],
+#    deps = [
+#        ":util",
+#        "//modules/common/util/testdata:simple_proto",
+#        "@gtest//:main",
+#    ],
+#)
 
 cc_test(
     name = "lru_cache_test",
@@ -245,11 +245,11 @@ cc_library(
 
 cc_library(
     name = "thread_pool",
-    hdrs = [
-        "thread_pool.h",
-    ],
     srcs = [
         "thread_pool.cc",
+    ],
+    hdrs = [
+        "thread_pool.h",
     ],
     deps = [
         "//modules/common:macro",
