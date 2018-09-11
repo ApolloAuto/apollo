@@ -69,6 +69,7 @@ cc_binary(
         "//modules/map/proto:map_proto",
         "//modules/routing/common:routing_gflags",
         "//modules/routing/proto:routing_proto",
+        "@ros//:ros_common",
     ],
 )
 
