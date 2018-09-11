@@ -22,3 +22,17 @@ proto_library(
         "//modules/control/proto:control_proto_lib"
     ],
 )
+
+cc_proto_library(
+    name = "guardian_conf_proto",
+    deps = [
+        ":guardian_conf_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "guardian_conf_proto_lib",
+    srcs = [
+        "guardian_conf.proto",
+    ],
+)

@@ -13,55 +13,58 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include "modules/guardian/guardian.h"
+#include "modules/guardian/guardian_component.h"
 
 #include <cmath>
 
-#include "modules/common/adapters/adapter_gflags.h"
-#include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
-#include "modules/guardian/common/guardian_gflags.h"
-#include "ros/include/ros/ros.h"
+#include "modules/common/util/message_util.h"
 
 namespace apollo {
 namespace guardian {
 
-using apollo::canbus::Chassis;
 using apollo::common::ErrorCode;
-using apollo::common::Status;
-using apollo::common::adapter::AdapterManager;
-using apollo::control::ControlCommand;
-using apollo::guardian::GuardianCommand;
-using apollo::monitor::SystemStatus;
 
-std::string Guardian::Name() const { return FLAGS_module_name; }
+bool GuardianComponent::Init() {
+  if (!GetProtoConfig(&guardian_conf_)) {
+    AERROR << "Unable to load canbus conf file: " << ConfigFilePath();
+    return false;
+  }
 
-Status Guardian::Init() {
-  AdapterManager::Init(FLAGS_adapter_config_filename);
-  CHECK(AdapterManager::GetChassis()) << "Chassis is not initialized.";
-  CHECK(AdapterManager::GetSystemStatus())
-      << "SystemStatus is not initialized.";
-  CHECK(AdapterManager::GetControlCommand()) << "Control is not initialized.";
-  return Status::OK();
+  chassis_reader_ = node_->CreateReader<Chassis>(
+      guardian_conf_.chassis_channel(),
+      [this](const std::shared_ptr<Chassis>& chassis) {
+        ADEBUG << "Received chassis data: run chassis callback.";
+        std::lock_guard<std::mutex> lock(mutex_);
+        chassis_.CopyFrom(*chassis);
+      });
+
+  control_cmd_reader_ = node_->CreateReader<ControlCommand>(
+      guardian_conf_.control_command_channel(),
+      [this](const std::shared_ptr<ControlCommand>& cmd) {
+        ADEBUG << "Received monitor data: run monitor callback.";
+        std::lock_guard<std::mutex> lock(mutex_);
+        control_cmd_.CopyFrom(*cmd);
+      });
+
+  system_status_reader_ = node_->CreateReader<SystemStatus>(
+      guardian_conf_.system_status_channel(),
+      [this](const std::shared_ptr<SystemStatus>& status) {
+        ADEBUG << "Received control data: run control command callback.";
+        std::lock_guard<std::mutex> lock(mutex_);
+        system_status_.CopyFrom(*status);
+      });
+
+  guardian_writer_ =
+      node_->CreateWriter<GuardianCommand>(guardian_conf_.guardian_channel());
+
+  return true;
 }
 
-Status Guardian::Start() {
-  AdapterManager::AddChassisCallback(&Guardian::OnChassis, this);
-  AdapterManager::AddSystemStatusCallback(&Guardian::OnSystemStatus, this);
-  AdapterManager::AddControlCommandCallback(&Guardian::OnControl, this);
-  const double duration = 1.0 / FLAGS_guardian_cmd_freq;
-  timer_ = AdapterManager::CreateTimer(ros::Duration(duration),
-                                       &Guardian::OnTimer, this);
-
-  return Status::OK();
-}
-
-void Guardian::Stop() { timer_.stop(); }
-
-void Guardian::OnTimer(const ros::TimerEvent&) {
-  ADEBUG << "Timer is triggered: publish Guardian result";
+bool GuardianComponent::Proc() {
+  ADEBUG << "Timer is triggered: publish GuardianComponent result";
   bool safety_mode_triggered = false;
-  if (FLAGS_guardian_enabled) {
+  if (guardian_conf_.guardian_enable()) {
     std::lock_guard<std::mutex> lock(mutex_);
     safety_mode_triggered = system_status_.has_safety_mode_trigger_time();
   }
@@ -74,34 +77,17 @@ void Guardian::OnTimer(const ros::TimerEvent&) {
     PassThroughControlCommand();
   }
 
-  AdapterManager::FillGuardianHeader(FLAGS_node_name, &guardian_cmd_);
-  AdapterManager::PublishGuardian(guardian_cmd_);
+  common::util::FillHeader(node_->Name(), &guardian_cmd_);
+  guardian_writer_->Write(std::make_shared<GuardianCommand>(guardian_cmd_));
+  return true;
 }
 
-void Guardian::OnChassis(const Chassis& message) {
-  ADEBUG << "Received chassis data: run chassis callback.";
-  std::lock_guard<std::mutex> lock(mutex_);
-  chassis_.CopyFrom(message);
-}
-
-void Guardian::OnSystemStatus(const SystemStatus& message) {
-  ADEBUG << "Received monitor data: run monitor callback.";
-  std::lock_guard<std::mutex> lock(mutex_);
-  system_status_.CopyFrom(message);
-}
-
-void Guardian::OnControl(const ControlCommand& message) {
-  ADEBUG << "Received control data: run control command callback.";
-  std::lock_guard<std::mutex> lock(mutex_);
-  control_cmd_.CopyFrom(message);
-}
-
-void Guardian::PassThroughControlCommand() {
+void GuardianComponent::PassThroughControlCommand() {
   std::lock_guard<std::mutex> lock(mutex_);
   guardian_cmd_.mutable_control_command()->CopyFrom(control_cmd_);
 }
 
-void Guardian::TriggerSafetyMode() {
+void GuardianComponent::TriggerSafetyMode() {
   AINFO << "Safety state triggered, with system safety mode trigger time : "
         << system_status_.safety_mode_trigger_time();
   std::lock_guard<std::mutex> lock(mutex_);
@@ -140,12 +126,12 @@ void Guardian::TriggerSafetyMode() {
     AINFO << "Emergency stop triggered! with system status from monitor as : "
           << system_status_.require_emergency_stop();
     guardian_cmd_.mutable_control_command()->set_brake(
-        FLAGS_guardian_cmd_emergency_stop_percentage);
+        guardian_conf_.guardian_cmd_emergency_stop_percentage());
   } else {
     AINFO << "Soft stop triggered! with system status from monitor as : "
           << system_status_.require_emergency_stop();
     guardian_cmd_.mutable_control_command()->set_brake(
-        FLAGS_guardian_cmd_soft_stop_percentage);
+        guardian_conf_.guardian_cmd_soft_stop_percentage());
   }
 }
 

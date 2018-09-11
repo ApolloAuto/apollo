@@ -1,0 +1,13 @@
+syntax = "proto2";
+
+package apollo.guardian;
+
+message GuardianConf {
+    optional string chassis_channel = 1;
+    optional string system_status_channel = 2;
+    optional string control_command_channel = 3;
+    optional string guardian_channel = 4;
+    optional bool guardian_enable = 5 [default = false];
+    optional double guardian_cmd_emergency_stop_percentage = 6 [default = 50];
+    optional double guardian_cmd_soft_stop_percentage = 7 [default = 25];
+}

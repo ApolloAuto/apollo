@@ -4,29 +4,26 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "guardian_lib",
-    srcs = ["guardian.cc"],
-    hdrs = ["guardian.h"],
+    srcs = ["guardian_component.cc"],
+    hdrs = ["guardian_component.h"],
     deps = [
-        "//modules/common:apollo_app",
-        "//modules/common:log",
-        "//modules/common/adapters:adapter_manager",
-        "//modules/guardian/common:guardian_gflags",
+        "//modules/common/util:message_util",
         "//modules/canbus/proto:canbus_proto",
         "//modules/control/proto:control_proto",
         "//modules/monitor/proto:system_status_proto",
         "//modules/guardian/proto:guardian_proto",
+        "//modules/guardian/proto:guardian_conf_proto",
+        "//framework:cybertron",
     ],
+    copts = ['-DMODULE_NAME=\\"guardian\\"']
 )
 
 cc_binary(
-    name = "guardian",
-    srcs = ["main.cc"],
+    name = "libguardian.so",
     deps = [
         ":guardian_lib",
-        "//external:gflags",
-        "//modules/common:log",
-        "@ros//:ros_common",
     ],
+    linkopts = ["-shared"],
 )
 
 cpplint()

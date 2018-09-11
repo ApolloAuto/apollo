@@ -18,21 +18,22 @@
  * @file
  */
 
-#ifndef MODEULES_GUARDIAN_GUARDIAN_H_
-#define MODEULES_GUARDIAN_GUARDIAN_H_
+#ifndef MODEULES_GUARDIAN_GUARDIAN_COMPONENT_H_
+#define MODEULES_GUARDIAN_GUARDIAN_COMPONENT_H_
 
 #include <map>
 #include <mutex>
 #include <queue>
 #include <string>
 
+#include "cybertron/component/timer_component.h"
+#include "cybertron/cybertron.h"
 #include "modules/canbus/proto/chassis.pb.h"
-#include "modules/common/apollo_app.h"
 #include "modules/common/macro.h"
 #include "modules/control/proto/control_cmd.pb.h"
 #include "modules/guardian/proto/guardian.pb.h"
+#include "modules/guardian/proto/guardian_conf.pb.h"
 #include "modules/monitor/proto/system_status.pb.h"
-#include "ros/include/ros/ros.h"
 
 /**
  * @namespace apollo::guardian
@@ -41,32 +42,38 @@
 namespace apollo {
 namespace guardian {
 
-class Guardian : public apollo::common::ApolloApp {
+using apollo::canbus::Chassis;
+using apollo::control::ControlCommand;
+using apollo::cybertron::Reader;
+using apollo::cybertron::Writer;
+using apollo::monitor::SystemStatus;
+
+class GuardianComponent : public apollo::cybertron::TimerComponent {
  public:
-  std::string Name() const override;
-  apollo::common::Status Init() override;
-  apollo::common::Status Start() override;
-  void Stop() override;
+  bool Init() override;
+  bool Proc() override;
 
  private:
-  void OnTimer(const ros::TimerEvent&);
-  void OnChassis(const apollo::canbus::Chassis& message);
-  void OnControl(const apollo::control::ControlCommand& message);
-  void OnSystemStatus(const apollo::monitor::SystemStatus& message);
   void PassThroughControlCommand();
   void TriggerSafetyMode();
 
-  apollo::canbus::Chassis chassis_;
-  apollo::monitor::SystemStatus system_status_;
-  apollo::control::ControlCommand control_cmd_;
-  apollo::guardian::GuardianCommand guardian_cmd_;
+  GuardianConf guardian_conf_;
+  Chassis chassis_;
+  SystemStatus system_status_;
+  ControlCommand control_cmd_;
+  GuardianCommand guardian_cmd_;
+
+  std::shared_ptr<Reader<Chassis>> chassis_reader_;
+  std::shared_ptr<Reader<ControlCommand>> control_cmd_reader_;
+  std::shared_ptr<Reader<SystemStatus>> system_status_reader_;
+  std::shared_ptr<Writer<GuardianCommand>> guardian_writer_;
 
   std::mutex mutex_;
-
-  ros::Timer timer_;
 };
+
+CYBERTRON_REGISTER_COMPONENT(GuardianComponent)
 
 }  // namespace guardian
 }  // namespace apollo
 
-#endif  // MODULES_GUARDIAN_GUARDIAN_H_
+#endif  // MODEULES_GUARDIAN_GUARDIAN_COMPONENT_H_
