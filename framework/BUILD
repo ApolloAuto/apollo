@@ -19,7 +19,8 @@ cc_library(
     ],
     deps = [
         ":cybertron_common",
-        "@glog//:glog"
+        "@glog//:glog",
+        "//external:gflags",
     ]
 )
 
