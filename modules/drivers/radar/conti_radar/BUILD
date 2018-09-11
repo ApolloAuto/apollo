@@ -36,6 +36,7 @@ cc_library(
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/radar/conti_radar/protocol:drivers_conti_radar_protocol",
     ],
+    copts = ['-DMODULE_NAME=\\"conti_radar\\"']
 )
 
 cc_binary(

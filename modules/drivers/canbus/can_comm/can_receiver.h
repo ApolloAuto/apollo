@@ -29,7 +29,7 @@
 #include <thread>
 #include <vector>
 
-#include "modules/common/log.h"
+#include "cybertron/scheduler/task.h"
 #include "modules/common/macro.h"
 #include "modules/common/proto/error_code.pb.h"
 #include "modules/drivers/canbus/can_client/can_client.h"
@@ -97,7 +97,6 @@ class CanReceiver {
   int32_t Start(bool is_blocked);
 
  private:
-  std::unique_ptr<std::thread> thread_;
   bool is_running_ = false;
   // CanClient, MessageManager pointer life is managed by outer program
   CanClient *can_client_ = nullptr;
@@ -175,7 +174,7 @@ void CanReceiver<SensorType>::RecvThreadFunc() {
         ADEBUG << "recv_can_frame#" << frame.CanFrameString();
       }
     }
-    std::this_thread::yield();
+    cybertron::croutine::CRoutine::Yield();
   }
   AINFO << "Can client receiver thread stopped.";
 }
@@ -192,11 +191,7 @@ template <typename SensorType>
   }
   is_running_ = true;
 
-  thread_.reset(new std::thread([this] { RecvThreadFunc(); }));
-  if (thread_ == nullptr) {
-    AERROR << "Unable to create can client receiver thread.";
-    return ::apollo::common::ErrorCode::CANBUS_ERROR;
-  }
+  cybertron::Task<>("CanReceiver", [this] { RecvThreadFunc(); });
   return ::apollo::common::ErrorCode::OK;
 }
 
@@ -205,10 +200,6 @@ void CanReceiver<SensorType>::Stop() {
   if (IsRunning()) {
     AINFO << "Stopping can client receiver ...";
     is_running_ = false;
-    if (thread_ != nullptr && thread_->joinable()) {
-      thread_->join();
-    }
-    thread_.reset();
   } else {
     AINFO << "Can client receiver is not running.";
   }
