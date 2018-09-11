@@ -18,7 +18,8 @@
 #include <thread>
 
 #include "gflags/gflags.h"
-#include "ros/ros.h"
+
+#include "cybertron/cybertron.h"
 
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/adapters/proto/adapter_config.pb.h"
@@ -41,7 +42,7 @@ int main(int argc, char** argv) {
 
   google::InitGoogleLogging(argv[0]);
   google::ParseCommandLineFlags(&argc, &argv, true);
-  ros::init(argc, argv, "routing_tester");
+  apollo::cyberton::Init("routing_tester");
 
   FLAGS_alsologtostderr = true;
   AdapterManagerConfig config;
@@ -67,14 +68,13 @@ int main(int argc, char** argv) {
     }
   }
 
-  ros::Rate loop_rate(0.3);  // frequency
+  apollo::cybertron::Rate loop_rate(0.3);  // frequency
 
-  while (ros::ok()) {
+  while (apollo::cybertron::OK()) {
     AdapterManager::FillRoutingRequestHeader("routing", &routing_request);
     AdapterManager::PublishRoutingRequest(routing_request);
     AINFO << "Sending routing request:" << routing_request.DebugString();
-    ros::spinOnce();  // yield
-    loop_rate.sleep();
+    loop_rate.Sleep();
   }
 
   return 0;

@@ -24,11 +24,11 @@
 #include <csignal>
 #include <string>
 
+#include "cybertron/cybertron.h"
+
 #include "gflags/gflags.h"
 #include "modules/common/log.h"
 #include "modules/common/status/status.h"
-
-#include "ros/include/ros/ros.h"
 
 /**
  * @namespace apollo::common
@@ -119,7 +119,7 @@ void apollo_app_sigint_handler(int signal_num);
     google::ParseCommandLineFlags(&argc, &argv, true);         \
     signal(SIGINT, apollo::common::apollo_app_sigint_handler); \
     APP apollo_app_;                                           \
-    ros::init(argc, argv, apollo_app_.Name());                 \
+    apollo::cybertron::Init(apollo_app_.Name().c_str());       \
     apollo_app_.Spin();                                        \
     return 0;                                                  \
   }
