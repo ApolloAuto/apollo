@@ -24,8 +24,9 @@ import logging
 import math
 import os
 import sys
+import time
 
-import rospy
+from cybertron import pynode
 from gflags import FLAGS
 
 from logger import Logger
@@ -170,8 +171,7 @@ def main(argv):
     """
     Main rosnode
     """
-    rospy.init_node('rtk_recorder', anonymous=True)
-
+    node = pynode.Node("rtk_recorder")
     argv = FLAGS(argv)
     log_dir = os.path.dirname(os.path.abspath(__file__)) + "/../../../data/log/"
     if not os.path.exists(log_dir):
@@ -184,14 +184,15 @@ def main(argv):
     record_file = log_dir + "/garage.csv"
     recorder = RtkRecord(record_file)
     atexit.register(recorder.shutdown)
-    rospy.Subscriber('/apollo/canbus/chassis', chassis_pb2.Chassis,
+    node.create_reader('/apollo/canbus/chassis', chassis_pb2.Chassis,
                      recorder.chassis_callback)
 
-    rospy.Subscriber('/apollo/localization/pose',
+    node.create_reader('/apollo/localization/pose',
                      localization_pb2.LocalizationEstimate,
                      recorder.localization_callback)
 
-    rospy.spin()
+    while not node.is_shutdown():
+        time.sleep(0.002)
 
 
 if __name__ == '__main__':
