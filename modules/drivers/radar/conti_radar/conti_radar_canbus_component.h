@@ -87,11 +87,13 @@ class ContiRadarCanbusComponent : public apollo::cybertron::Component<> {
   std::shared_ptr<Writer<ContiRadar>> conti_radar_writer_;
 
   int64_t last_timestamp_ = 0;
+  bool start_success_ = false;
   //   apollo::common::monitor::MonitorLogger monitor_logger_;
 };
+
+CYBERTRON_REGISTER_COMPONENT(ContiRadarCanbusComponent)
 
 }  // namespace conti_radar
 }  // namespace drivers
 }  // namespace apollo
-CYBERTRON_REGISTER_COMPONENT(apollo::drivers::conti_radar::ContiRadarCanbusComponent)
 #endif  // MODULES_DRIVERS_RADAR_CONTI_RADAR_CONTI_RADAR_CANBUS_COMPONENT_H_

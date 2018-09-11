@@ -73,7 +73,8 @@ bool ContiRadarCanbusComponent::Init() {
   }
   AINFO << "The can receiver is successfully initialized.";
 
-  return Start();
+  start_success_ = Start();
+  return start_success_;
 }
 
 apollo::common::ErrorCode ContiRadarCanbusComponent::ConfigureRadar() {
@@ -108,8 +109,10 @@ bool ContiRadarCanbusComponent::Start() {
 }
 
 void ContiRadarCanbusComponent::Stop() {
-  can_receiver_.Stop();
-  can_client_->Stop();
+  if (start_success_) {
+    can_receiver_.Stop();
+    can_client_->Stop();
+  }
 }
 
 // Send the error to monitor and return it
