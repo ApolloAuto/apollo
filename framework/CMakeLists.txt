@@ -50,7 +50,8 @@ file(GLOB CYBERTRON_SRCS
   "cybertron/croutine/context/*.cpp"
   "cybertron/event/*.cpp"
   "cybertron/croutine/system/system_hook.cpp"
-  "cybertron/mainboard/*.cpp"
+  "cybertron/mainboard/module_argument.cpp"
+  "cybertron/mainboard/module_controller.cpp"
   "cybertron/message/*.cpp"
 )
 
@@ -72,6 +73,7 @@ target_link_libraries(cybertron
   fastcdr
   -lrt
   glog
+  gflags
   PocoFoundation
   -Wl,--no-undefined
   atomic

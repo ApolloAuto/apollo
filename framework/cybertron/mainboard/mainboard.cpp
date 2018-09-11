@@ -21,6 +21,7 @@
 #include "cybertron/init.h"
 #include "cybertron/mainboard/module_argument.h"
 #include "cybertron/mainboard/module_controller.h"
+#include "gflags/gflags.h"
 
 using apollo::cybertron::common::WorkRoot;
 using apollo::cybertron::common::GetAbsolutePath;
@@ -32,6 +33,7 @@ using apollo::cybertron::mainboard::ModuleController;
 int main(int argc, char** argv) {
   // Initialize cybertron internal static objects
   apollo::cybertron::Init(argv[0]);
+  google::SetUsageMessage("This program used for load dag and run user apps.");
 
   // parser the argument
   ModuleArgument module_args;
