@@ -142,12 +142,14 @@ Status Prediction::Init() {
   CHECK(AdapterManager::GetPerceptionObstacles())
       << "Perception is not registered.";
 
+  /* TODO(kechxu) recover callbacks according to cybertron
   // Set localization callback function
   AdapterManager::AddLocalizationCallback(&Prediction::OnLocalization, this);
   // Set planning callback function
   AdapterManager::AddPlanningCallback(&Prediction::OnPlanning, this);
   // Set perception obstacle callback function
   AdapterManager::AddPerceptionObstaclesCallback(&Prediction::RunOnce, this);
+  */
 
   if (!FLAGS_use_navigation_mode && !PredictionMap::Ready()) {
     return OnError("Map cannot be loaded.");
@@ -175,7 +177,8 @@ Status Prediction::Init() {
       }
     }
     Stop();
-    ros::shutdown();
+    // TODO(kechxu) accord to cybertron
+    // ros::shutdown();
   }
   return Status::OK();
 }
@@ -214,7 +217,8 @@ void Prediction::RunOnce(const PerceptionObstacles& perception_obstacles) {
   if (FLAGS_prediction_test_mode && FLAGS_prediction_test_duration > 0.0 &&
       (Clock::NowInSeconds() - start_time_ > FLAGS_prediction_test_duration)) {
     AINFO << "Prediction finished running in test mode";
-    ros::shutdown();
+    // TODO(kechxu) accord to cybertron
+    // ros::shutdown();
   }
 
   // Update relative map if needed
