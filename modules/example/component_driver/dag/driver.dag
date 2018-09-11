@@ -9,15 +9,3 @@ module_config {
         }
     }
 }
-module_config {
-    module_library : "lib/libwatchdog_component.so"
-    components {
-        class_name : "WatchdogComponent"
-        config {
-            name : "ham sausage"
-            readers {
-                channel: "/food"
-            }
-        }
-    }
-}
