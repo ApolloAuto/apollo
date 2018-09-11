@@ -38,11 +38,15 @@ using apollo::common::util::StringPrintf;
 AdapterBase *GetAdapterByMessageType(const AdapterConfig::MessageType type) {
   switch (type) {
     case AdapterConfig::POINT_CLOUD:
-      return CHECK_NOTNULL(AdapterManager::GetPointCloud());
+      // TODO(xiaoxq): Enable when relevant code finished migration.
+      // return CHECK_NOTNULL(AdapterManager::GetPointCloud());
+      break;
     case AdapterConfig::IMAGE_LONG:
-      return CHECK_NOTNULL(AdapterManager::GetImageLong());
+      // return CHECK_NOTNULL(AdapterManager::GetImageLong());
+      break;
     case AdapterConfig::IMAGE_SHORT:
-      return CHECK_NOTNULL(AdapterManager::GetImageShort());
+      // return CHECK_NOTNULL(AdapterManager::GetImageShort());
+      break;
     case AdapterConfig::LOCALIZATION:
       return CHECK_NOTNULL(AdapterManager::GetLocalization());
     case AdapterConfig::PERCEPTION_OBSTACLES:

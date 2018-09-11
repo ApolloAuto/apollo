@@ -17,7 +17,6 @@
 
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/monitor/common/monitor_manager.h"
-#include "modules/monitor/hardware/can/can_monitor.h"
 #include "modules/monitor/hardware/gps/gps_monitor.h"
 #include "modules/monitor/hardware/resource_monitor.h"
 #include "modules/monitor/reporters/static_info_reporter.h"
@@ -46,7 +45,8 @@ Monitor::Monitor() : monitor_thread_(FLAGS_monitor_running_interval) {
 Status Monitor::Init() {
   AdapterManager::Init(FLAGS_monitor_adapter_config_filename);
 
-  monitor_thread_.RegisterRunner(make_unique<CanMonitor>());
+  // TODO(xiaoxq): Migrate CAN monitor.
+  // monitor_thread_.RegisterRunner(make_unique<CanMonitor>());
   monitor_thread_.RegisterRunner(make_unique<GpsMonitor>());
   monitor_thread_.RegisterRunner(make_unique<ProcessMonitor>());
 
