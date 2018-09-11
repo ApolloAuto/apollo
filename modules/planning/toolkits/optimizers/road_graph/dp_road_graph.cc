@@ -136,7 +136,7 @@ bool DpRoadGraph::GenerateMinCostPath(
   path_waypoints.insert(path_waypoints.begin(),
                         std::vector<common::SLPoint>{init_sl_point_});
   const auto &vehicle_config =
-      common::VehicleConfigHelper::instance()->GetConfig();
+      common::VehicleConfigHelper::Instance()->GetConfig();
 
   TrajectoryCost trajectory_cost(
       config_, reference_line_, reference_line_info_.IsChangeLanePath(),

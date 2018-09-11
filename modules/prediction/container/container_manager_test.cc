@@ -28,7 +28,7 @@ using apollo::common::adapter::AdapterConfig;
 
 class ContainerManagerTest : public ::testing::Test {
  public:
-  virtual void SetUp() { manager_ = ContainerManager::instance(); }
+  virtual void SetUp() { manager_ = ContainerManager::Instance(); }
 
  protected:
   ContainerManager *manager_ = nullptr;

@@ -21,7 +21,7 @@ cc_library(
         "//modules/common/proto:error_code_proto",
         "//modules/drivers/canbus/can_client",
         "//modules/drivers/canbus/can_comm:message_manager_base",
-        "@gtest//:gtest",
+        "@gtest",
     ],
 )
 

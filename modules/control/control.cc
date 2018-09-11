@@ -293,7 +293,7 @@ Status Control::CheckInput() {
     }
   }
 
-  VehicleStateProvider::instance()->Update(localization_, chassis_);
+  VehicleStateProvider::Instance()->Update(localization_, chassis_);
 
   return Status::OK();
 }

@@ -262,7 +262,7 @@ int main(int32_t argc, char **argv) {
   std::shared_ptr<TestCanParam> param_ptr_a(new TestCanParam());
   std::shared_ptr<TestCanParam> param_ptr_b(new TestCanParam());
 
-  auto *can_client_factory = CanClientFactory::instance();
+  auto *can_client_factory = CanClientFactory::Instance();
   can_client_factory->RegisterCanClients();
 
   if (!apollo::common::util::GetProtoFromFile(FLAGS_can_client_conf_file_a,

@@ -77,7 +77,7 @@ bool MPCController::LoadControlConf(const ControlConf *control_conf) {
     return false;
   }
   vehicle_param_ =
-      VehicleConfigHelper::instance()->GetConfig().vehicle_param();
+      VehicleConfigHelper::Instance()->GetConfig().vehicle_param();
 
   ts_ = control_conf->mpc_controller_conf().ts();
   CHECK_GT(ts_, 0.0) << "[MPCController] Invalid control update interval.";
@@ -279,7 +279,7 @@ Status MPCController::ComputeControlCommand(
     const canbus::Chassis *chassis,
     const planning::ADCTrajectory *planning_published_trajectory,
     ControlCommand *cmd) {
-  VehicleStateProvider::instance()->set_linear_velocity(chassis->speed_mps());
+  VehicleStateProvider::Instance()->set_linear_velocity(chassis->speed_mps());
 
   trajectory_analyzer_ =
       std::move(TrajectoryAnalyzer(planning_published_trajectory));
@@ -301,19 +301,19 @@ Status MPCController::ComputeControlCommand(
     matrix_q_updated_(0, 0) =
         matrix_q_(0, 0) *
         lat_err_interpolation_->Interpolate(
-            VehicleStateProvider::instance()->linear_velocity());
+            VehicleStateProvider::Instance()->linear_velocity());
     matrix_q_updated_(2, 2) =
         matrix_q_(2, 2) *
         heading_err_interpolation_->Interpolate(
-            VehicleStateProvider::instance()->linear_velocity());
+            VehicleStateProvider::Instance()->linear_velocity());
     steer_angle_feedforwardterm_updated_ =
         steer_angle_feedforwardterm_ *
         feedforwardterm_interpolation_->Interpolate(
-            VehicleStateProvider::instance()->linear_velocity());
+            VehicleStateProvider::Instance()->linear_velocity());
     matrix_r_updated_(0, 0) =
         matrix_r_(0, 0) *
         steer_weight_interpolation_->Interpolate(
-            VehicleStateProvider::instance()->linear_velocity());
+            VehicleStateProvider::Instance()->linear_velocity());
   } else {
     matrix_q_updated_ = matrix_q_;
     matrix_r_updated_ = matrix_r_;
@@ -376,8 +376,8 @@ Status MPCController::ComputeControlCommand(
   if (FLAGS_set_steer_limit) {
     const double steer_limit =
         std::atan(max_lat_acc_ * wheelbase_ /
-                  (VehicleStateProvider::instance()->linear_velocity() *
-                   VehicleStateProvider::instance()->linear_velocity())) *
+                  (VehicleStateProvider::Instance()->linear_velocity() *
+                   VehicleStateProvider::Instance()->linear_velocity())) *
         steer_ratio_ * 180 / M_PI / steer_single_direction_max_degree_ * 100;
 
     // Clamp the steer angle
@@ -414,7 +414,7 @@ Status MPCController::ComputeControlCommand(
         std::make_pair(debug->speed_reference(), acceleration_cmd));
   } else {
     calibration_value = control_interpolation_->Interpolate(std::make_pair(
-        VehicleStateProvider::instance()->linear_velocity(), acceleration_cmd));
+        VehicleStateProvider::Instance()->linear_velocity(), acceleration_cmd));
   }
 
   debug->set_calibration_value(calibration_value);
@@ -435,14 +435,14 @@ Status MPCController::ComputeControlCommand(
   cmd->set_throttle(throttle_cmd);
   cmd->set_brake(brake_cmd);
 
-  debug->set_heading(VehicleStateProvider::instance()->heading());
+  debug->set_heading(VehicleStateProvider::Instance()->heading());
   debug->set_steering_position(chassis->steering_percentage());
   debug->set_steer_angle(steer_angle);
   debug->set_steer_angle_feedforward(steer_angle_feedforwardterm_updated_);
   debug->set_steer_angle_feedback(steer_angle_feedback);
   debug->set_steering_position(chassis->steering_percentage());
 
-  if (std::fabs(VehicleStateProvider::instance()->linear_velocity()) <=
+  if (std::fabs(VehicleStateProvider::Instance()->linear_velocity()) <=
           vehicle_param_.max_abs_speed_when_stopped() ||
       chassis->gear_location() == planning_published_trajectory->gear() ||
       chassis->gear_location() == canbus::Chassis::GEAR_NEUTRAL) {
@@ -479,11 +479,11 @@ void MPCController::LoadControlCalibrationTable(
 }
 
 void MPCController::UpdateState(SimpleMPCDebug *debug) {
-  const auto &com = VehicleStateProvider::instance()->ComputeCOMPosition(lr_);
+  const auto &com = VehicleStateProvider::Instance()->ComputeCOMPosition(lr_);
   ComputeLateralErrors(com.x(), com.y(),
-                       VehicleStateProvider::instance()->heading(),
-                       VehicleStateProvider::instance()->linear_velocity(),
-                       VehicleStateProvider::instance()->angular_velocity(),
+                       VehicleStateProvider::Instance()->heading(),
+                       VehicleStateProvider::Instance()->linear_velocity(),
+                       VehicleStateProvider::Instance()->angular_velocity(),
                        trajectory_analyzer_, debug);
 
   // State matrix update;
@@ -496,7 +496,7 @@ void MPCController::UpdateState(SimpleMPCDebug *debug) {
 }
 
 void MPCController::UpdateMatrix(SimpleMPCDebug *debug) {
-  const double v = std::max(VehicleStateProvider::instance()->linear_velocity(),
+  const double v = std::max(VehicleStateProvider::Instance()->linear_velocity(),
                             minimum_speed_protection_);
   matrix_a_(1, 1) = matrix_a_coeff_(1, 1) / v;
   matrix_a_(1, 3) = matrix_a_coeff_(1, 3) / v;
@@ -564,14 +564,14 @@ void MPCController::ComputeLongitudinalErrors(
   double d_dot_matched = 0.0;
 
   const auto matched_point = trajectory_analyzer->QueryMatchedPathPoint(
-      VehicleStateProvider::instance()->x(),
-      VehicleStateProvider::instance()->y());
+      VehicleStateProvider::Instance()->x(),
+      VehicleStateProvider::Instance()->y());
 
   trajectory_analyzer->ToTrajectoryFrame(
-      VehicleStateProvider::instance()->x(),
-      VehicleStateProvider::instance()->y(),
-      VehicleStateProvider::instance()->heading(),
-      VehicleStateProvider::instance()->linear_velocity(), matched_point,
+      VehicleStateProvider::Instance()->x(),
+      VehicleStateProvider::Instance()->y(),
+      VehicleStateProvider::Instance()->heading(),
+      VehicleStateProvider::Instance()->linear_velocity(), matched_point,
       &s_matched, &s_dot_matched, &d_matched, &d_dot_matched);
 
   const double current_control_time = Clock::NowInSeconds();
@@ -591,7 +591,7 @@ void MPCController::ComputeLongitudinalErrors(
 
   debug->set_station_feedback(s_matched);
   debug->set_speed_feedback(
-      VehicleStateProvider::instance()->linear_velocity());
+      VehicleStateProvider::Instance()->linear_velocity());
 }
 
 }  // namespace control

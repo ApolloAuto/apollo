@@ -30,7 +30,7 @@ using apollo::common::Scenario;
 class ScenarioManagerTest : public ::testing::Test {
  public:
   virtual void SetUp() {
-    manager_ = ScenarioManager::instance();
+    manager_ = ScenarioManager::Instance();
   }
 
  protected:
@@ -38,12 +38,12 @@ class ScenarioManagerTest : public ::testing::Test {
 };
 
 TEST_F(ScenarioManagerTest, run) {
-  ContainerManager::instance()->RegisterContainers();
+  ContainerManager::Instance()->RegisterContainers();
   std::unique_ptr<Container> adc_traj_container =
-      ContainerManager::instance()->CreateContainer(
+      ContainerManager::Instance()->CreateContainer(
           AdapterConfig::PLANNING_TRAJECTORY);
   std::unique_ptr<Container> pose_container =
-      ContainerManager::instance()->CreateContainer(
+      ContainerManager::Instance()->CreateContainer(
           AdapterConfig::LOCALIZATION);
   manager_->Run();
   const auto& scenario = manager_->scenario();

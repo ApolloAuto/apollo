@@ -100,7 +100,7 @@ void DataGenerator::RunOnce() {
   ADEBUG << "Localization: " << localization.DebugString();
   const auto& chassis = AdapterManager::GetChassis()->GetLatestObserved();
   ADEBUG << "Chassis: " << chassis.DebugString();
-  VehicleStateProvider::instance()->Update(localization, chassis);
+  VehicleStateProvider::Instance()->Update(localization, chassis);
   AINFO << "VehicleState updated.";
 
   // TODO(Liangliang): register more sensors and use factory to manager.

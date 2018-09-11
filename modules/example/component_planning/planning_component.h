@@ -13,12 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_EXAMPLE_CYBERTRON_PLANNING_COMPONENT_H
-#define MODULES_EXAMPLE_CYBERTRON_PLANNING_COMPONENT_H
+#ifndef MODULES_EXAMPLE_CYBERTRON_PLANNING_COMPONENT_H_
+#define MODULES_EXAMPLE_CYBERTRON_PLANNING_COMPONENT_H_
+
+#include "modules/planning/planning_component.h"
 
 #include "cybertron/class_loader/class_loader.h"
-#include "cybertron/message/raw_message.h"
 #include "cybertron/component/component.h"
+#include "cybertron/message/raw_message.h"
 #include "cybertron/proto/driver.pb.h"
 #include "cybertron/proto/perception.pb.h"
 
@@ -42,6 +44,7 @@ class PlanningComponent : public Component<Perception, CarStatus> {
   bool Proc(const std::shared_ptr<Perception>& msg0,
             const std::shared_ptr<CarStatus>& msg1) override;
   bool Init() override;
+
  private:
   std::shared_ptr<Writer<RawMessage>> dog_writer_ = nullptr;
 };

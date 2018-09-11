@@ -41,11 +41,11 @@ MonitorManager::MonitorManager() :
 }
 
 apollo::common::monitor::MonitorLogBuffer &MonitorManager::LogBuffer() {
-  return instance()->log_buffer_;
+  return Instance()->log_buffer_;
 }
 
 const MonitorConf &MonitorManager::GetConfig() {
-  return instance()->config_;
+  return Instance()->config_;
 }
 
 void MonitorManager::InitFrame(const double current_time) {
@@ -60,13 +60,13 @@ void MonitorManager::InitFrame(const double current_time) {
   }
 
   // Get current DrivingMode, which will affect how we monitor modules.
-  instance()->in_autonomous_driving_ = false;
+  Instance()->in_autonomous_driving_ = false;
   auto* adapter = CHECK_NOTNULL(AdapterManager::GetChassis());
   adapter->Observe();
   if (!adapter->Empty()) {
     const auto& chassis = adapter->GetLatestObserved();
     // Ignore old messages which is likely from replaying.
-    instance()->in_autonomous_driving_ =
+    Instance()->in_autonomous_driving_ =
         chassis.driving_mode() == Chassis::COMPLETE_AUTO_DRIVE &&
         chassis.header().timestamp_sec() + FLAGS_system_status_lifetime_seconds
             >= current_time;
@@ -74,7 +74,7 @@ void MonitorManager::InitFrame(const double current_time) {
 }
 
 SystemStatus *MonitorManager::GetStatus() {
-  return &instance()->status_;
+  return &Instance()->status_;
 }
 
 HardwareStatus *MonitorManager::GetHardwareStatus(
@@ -87,7 +87,7 @@ ModuleStatus *MonitorManager::GetModuleStatus(const std::string &module_name) {
 }
 
 bool MonitorManager::IsInAutonomousDriving() {
-  return instance()->in_autonomous_driving_;
+  return Instance()->in_autonomous_driving_;
 }
 
 }  // namespace monitor

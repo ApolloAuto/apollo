@@ -34,7 +34,7 @@ TEST(NetModelTest, verification_test) {
       "modules/prediction/data/rnn_vehicle_model.bin";
   NetParameter net_parameter = NetParameter();
   EXPECT_TRUE(common::util::GetProtoFromFile(rnn_filename, &net_parameter));
-  EXPECT_TRUE(RnnModel::instance()->LoadModel(net_parameter));
+  EXPECT_TRUE(RnnModel::Instance()->LoadModel(net_parameter));
 
   Eigen::MatrixXf obstacle_feature;
   Eigen::MatrixXf lane_feature;
@@ -45,12 +45,12 @@ TEST(NetModelTest, verification_test) {
     EXPECT_TRUE(LoadTensor(sample.features(0), &obstacle_feature));
     EXPECT_TRUE(LoadTensor(sample.features(1), &lane_feature));
 
-    RnnModel::instance()->Run({obstacle_feature, lane_feature}, &output);
+    RnnModel::Instance()->Run({obstacle_feature, lane_feature}, &output);
     EXPECT_EQ(output.size(), 2);
     EXPECT_TRUE(sample.has_probability());
     EXPECT_NEAR(output(0, 0), sample.probability(), 0.1);
 
-    RnnModel::instance()->ResetState();
+    RnnModel::Instance()->ResetState();
   }
 }
 

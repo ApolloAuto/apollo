@@ -138,7 +138,7 @@ EndConditionSampler::SampleLonEndConditionsForPathTimePoints() const {
 std::vector<SamplePoint>
 EndConditionSampler::QueryPathTimeObstacleSamplePoints() const {
   const auto& vehicle_config =
-      common::VehicleConfigHelper::instance()->GetConfig();
+      common::VehicleConfigHelper::Instance()->GetConfig();
   std::vector<SamplePoint> sample_points;
   for (const auto& path_time_obstacle :
        ptr_path_time_graph_->GetPathTimeObstacles()) {

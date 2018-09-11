@@ -29,16 +29,16 @@ namespace util {
 ThreadPool::ThreadPool() {}
 
 void ThreadPool::Init(int pool_size) {
-  instance()->pool_.reset(new ctpl::thread_pool(pool_size));
+  Instance()->pool_.reset(new ctpl::thread_pool(pool_size));
 }
 
 ctpl::thread_pool* ThreadPool::pool() {
-  return CHECK_NOTNULL(instance()->pool_.get());
+  return CHECK_NOTNULL(Instance()->pool_.get());
 }
 
 void ThreadPool::Stop() {
-  if (instance()->pool_) {
-    instance()->pool_->stop(true);
+  if (Instance()->pool_) {
+    Instance()->pool_->stop(true);
   }
 }
 

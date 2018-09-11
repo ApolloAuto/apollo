@@ -59,7 +59,7 @@ bool WaypointSampler::SamplePathWaypoints(
       init_sl_point_.s() + std::fmax(init_point.v() * 8.0, kMinSampleDistance),
       reference_line_info_->reference_line().Length());
   const auto &vehicle_config =
-      common::VehicleConfigHelper::instance()->GetConfig();
+      common::VehicleConfigHelper::Instance()->GetConfig();
   const float half_adc_width = vehicle_config.vehicle_param().width() / 2.0;
   const size_t num_sample_per_level =
       FLAGS_use_navigation_mode ? config_.navigator_sample_num_each_level()

@@ -105,7 +105,7 @@ Status LonController::Init(const ControlConf *control_conf) {
   speed_pid_controller_.Init(lon_controller_conf.low_speed_pid_conf());
 
   vehicle_param_.CopyFrom(
-      common::VehicleConfigHelper::instance()->GetConfig().vehicle_param());
+      common::VehicleConfigHelper::Instance()->GetConfig().vehicle_param());
 
   SetDigitalFilterPitchAngle(lon_controller_conf);
 
@@ -206,7 +206,7 @@ Status LonController::ComputeControlCommand(
                           speed_controller_input_limit);
 
   double acceleration_cmd_closeloop = 0.0;
-  if (VehicleStateProvider::instance()->linear_velocity() <=
+  if (VehicleStateProvider::Instance()->linear_velocity() <=
       lon_controller_conf.switch_speed()) {
     speed_pid_controller_.SetPID(lon_controller_conf.low_speed_pid_conf());
     acceleration_cmd_closeloop =
@@ -218,7 +218,7 @@ Status LonController::ComputeControlCommand(
   }
 
   double slope_offset_compenstaion = digital_filter_pitch_angle_.Filter(
-      GRA_ACC * std::sin(VehicleStateProvider::instance()->pitch()));
+      GRA_ACC * std::sin(VehicleStateProvider::Instance()->pitch()));
 
   if (isnan(slope_offset_compenstaion)) {
       slope_offset_compenstaion = 0;
@@ -293,7 +293,7 @@ Status LonController::ComputeControlCommand(
   cmd->set_throttle(throttle_cmd);
   cmd->set_brake(brake_cmd);
 
-  if (std::fabs(VehicleStateProvider::instance()->linear_velocity()) <=
+  if (std::fabs(VehicleStateProvider::Instance()->linear_velocity()) <=
           vehicle_param_.max_abs_speed_when_stopped() ||
       chassis->gear_location() == trajectory_message_->gear() ||
       chassis->gear_location() == canbus::Chassis::GEAR_NEUTRAL) {
@@ -327,14 +327,14 @@ void LonController::ComputeLongitudinalErrors(
   double d_dot_matched = 0.0;
 
   auto matched_point = trajectory_analyzer->QueryMatchedPathPoint(
-      VehicleStateProvider::instance()->x(),
-      VehicleStateProvider::instance()->y());
+      VehicleStateProvider::Instance()->x(),
+      VehicleStateProvider::Instance()->y());
 
   trajectory_analyzer->ToTrajectoryFrame(
-      VehicleStateProvider::instance()->x(),
-      VehicleStateProvider::instance()->y(),
-      VehicleStateProvider::instance()->heading(),
-      VehicleStateProvider::instance()->linear_velocity(), matched_point,
+      VehicleStateProvider::Instance()->x(),
+      VehicleStateProvider::Instance()->y(),
+      VehicleStateProvider::Instance()->heading(),
+      VehicleStateProvider::Instance()->linear_velocity(), matched_point,
       &s_matched, &s_dot_matched, &d_matched, &d_dot_matched);
 
   double current_control_time = Clock::NowInSeconds();

@@ -44,7 +44,7 @@ void VehicleStateReporter::RunOnce(const double current_time) {
   *report.mutable_vehicle_info() =
       apollo::data::InfoCollector::GetVehicleInfo();
   *report.mutable_vehicle_state() =
-      apollo::common::VehicleStateProvider::instance()->vehicle_state();
+      apollo::common::VehicleStateProvider::Instance()->vehicle_state();
 
   const nlohmann::json json = apollo::common::util::JsonUtil::ProtoToTypedJson(
       "VehicleStateReport", report);

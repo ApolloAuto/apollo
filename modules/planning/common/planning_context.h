@@ -52,7 +52,7 @@ class PlanningContext {
 void DumpPlanningContext();
 
 inline PlanningStatus* GetPlanningStatus() {
-  return PlanningContext::instance()->GetPlanningStatus();
+  return PlanningContext::Instance()->GetPlanningStatus();
 }
 
 }  // namespace planning

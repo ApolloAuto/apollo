@@ -349,7 +349,7 @@ std::vector<std::pair<double, double>> PathTimeGraph::GetLateralBounds(
   std::size_t num_bound = static_cast<std::size_t>(s_range / s_resolution);
 
   const auto& vehicle_config =
-      common::VehicleConfigHelper::instance()->GetConfig();
+      common::VehicleConfigHelper::Instance()->GetConfig();
   double ego_width = vehicle_config.vehicle_param().width();
 
   // Initialize bounds by reference line width

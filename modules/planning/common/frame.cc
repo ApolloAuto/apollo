@@ -86,7 +86,7 @@ bool Frame::Rerouting() {
     AERROR << "Rerouting not supported in navigation mode";
     return false;
   }
-  auto *adapter_manager = AdapterManager::instance();
+  auto *adapter_manager = AdapterManager::Instance();
   if (adapter_manager->GetRoutingResponse()->Empty()) {
     AERROR << "No previous routing available";
     return false;
@@ -349,7 +349,7 @@ const Obstacle *Frame::CreateStaticVirtualObstacle(const std::string &id,
 Status Frame::Init() {
   hdmap_ = hdmap::HDMapUtil::BaseMapPtr();
   CHECK_NOTNULL(hdmap_);
-  vehicle_state_ = common::VehicleStateProvider::instance()->vehicle_state();
+  vehicle_state_ = common::VehicleStateProvider::Instance()->vehicle_state();
   const auto &point = common::util::MakePointENU(
       vehicle_state_.x(), vehicle_state_.y(), vehicle_state_.z());
   if (std::isnan(point.x()) || std::isnan(point.y())) {
@@ -399,7 +399,7 @@ const Obstacle *Frame::FindCollisionObstacle() const {
     return nullptr;
   }
   const auto &param =
-      common::VehicleConfigHelper::instance()->GetConfig().vehicle_param();
+      common::VehicleConfigHelper::Instance()->GetConfig().vehicle_param();
   Vec2d position(vehicle_state_.x(), vehicle_state_.y());
   Vec2d vec_to_center(
       (param.front_edge_to_center() - param.back_edge_to_center()) / 2.0,

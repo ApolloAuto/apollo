@@ -390,7 +390,7 @@ bool StopSign::CheckADCkStop(ReferenceLineInfo* const reference_line_info) {
   CHECK_NOTNULL(reference_line_info);
 
   double adc_speed =
-      common::VehicleStateProvider::instance()->linear_velocity();
+      common::VehicleStateProvider::Instance()->linear_velocity();
   if (adc_speed > config_.stop_sign().max_stop_speed()) {
     ADEBUG << "ADC not stopped: speed[" << adc_speed << "]";
     return false;

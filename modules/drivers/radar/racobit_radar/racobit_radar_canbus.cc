@@ -47,7 +47,7 @@ apollo::common::Status RacobitRadarCanbus::Init() {
   ADEBUG << "Canbus_conf:" << racobit_radar_conf_.ShortDebugString();
 
   // Init can client
-  auto *can_factory = CanClientFactory::instance();
+  auto *can_factory = CanClientFactory::Instance();
   can_factory->RegisterCanClients();
   can_client_ = can_factory->CreateCANClient(
       racobit_radar_conf_.can_conf().can_card_parameter());

@@ -126,10 +126,10 @@ void UltrasonicObstacleSubnode::BuildSingleObject(
   object_ptr->track_id = 0;
   object_ptr->type = ObjectType::UNKNOWN;
   object_ptr->velocity = {0.0, 0.0, 0.0};
-  double vehicle_x = VehicleStateProvider::instance()->x();
-  double vehicle_y = VehicleStateProvider::instance()->y();
-  double vehicle_z = VehicleStateProvider::instance()->z();
-  double vehicle_heading = VehicleStateProvider::instance()->heading();
+  double vehicle_x = VehicleStateProvider::Instance()->x();
+  double vehicle_y = VehicleStateProvider::Instance()->y();
+  double vehicle_z = VehicleStateProvider::Instance()->z();
+  double vehicle_heading = VehicleStateProvider::Instance()->heading();
   double sonar_x = vehicle_x + sonar.translation().x();
   double sonar_y = vehicle_y + sonar.translation().y();
   double sonar_z = vehicle_z + sonar.translation().z();

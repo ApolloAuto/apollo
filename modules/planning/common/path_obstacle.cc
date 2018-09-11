@@ -96,7 +96,7 @@ double PathObstacle::MinRadiusStopDistance(
 void PathObstacle::BuildReferenceLineStBoundary(
     const ReferenceLine& reference_line, const double adc_start_s) {
   const auto& adc_param =
-      VehicleConfigHelper::instance()->GetConfig().vehicle_param();
+      VehicleConfigHelper::Instance()->GetConfig().vehicle_param();
   const double adc_width = adc_param.width();
   if (obstacle_->IsStatic() ||
       obstacle_->Trajectory().trajectory_point().empty()) {
@@ -148,7 +148,7 @@ bool PathObstacle::BuildTrajectoryStBoundary(
     return false;
   }
   const auto& adc_param =
-      VehicleConfigHelper::instance()->GetConfig().vehicle_param();
+      VehicleConfigHelper::Instance()->GetConfig().vehicle_param();
   const double adc_length = adc_param.length();
   const double adc_half_length = adc_length / 2.0;
   const double adc_width = adc_param.width();

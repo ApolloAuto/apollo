@@ -84,7 +84,7 @@ void Spline2dKernel::AddNthDerivativeKernelMatrix(const uint32_t n,
   for (uint32_t i = 0; i + 1 < t_knots_.size(); ++i) {
     const uint32_t num_params = spline_order_ + 1;
     Eigen::MatrixXd cur_kernel =
-        SplineSegKernel::instance()->NthDerivativeKernel(
+        SplineSegKernel::Instance()->NthDerivativeKernel(
             n, num_params, t_knots_[i + 1] - t_knots_[i]) *
         weight;
     kernel_matrix_.block(2 * i * num_params, 2 * i * num_params, num_params,

@@ -44,7 +44,7 @@ void CanMonitor::RunOnce(const double current_time) {
   CHECK(apollo::common::util::GetProtoFromFile(FLAGS_canbus_conf_file,
                                                &canbus_conf));
 
-  auto *can_chk_factory = CanCheckerFactory::instance();
+  auto *can_chk_factory = CanCheckerFactory::Instance();
   can_chk_factory->RegisterCanCheckers();
   auto can_chk =
       can_chk_factory->CreateCanChecker(canbus_conf.can_card_parameter());

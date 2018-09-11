@@ -118,7 +118,7 @@ class NavigationLaneTest : public testing::Test {
         data_file_dir_ + "localization_info.pb.txt", &localization));
     EXPECT_TRUE(common::util::GetProtoFromFile(
         data_file_dir_ + "chassis_info.pb.txt", &chassis));
-    VehicleStateProvider::instance()->Update(localization, chassis);
+    VehicleStateProvider::Instance()->Update(localization, chassis);
   }
 
  protected:

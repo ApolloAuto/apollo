@@ -34,7 +34,7 @@ namespace apollo {
 namespace perception {
 
 TEST(PbfTrackTest, test_pbf_track_constructor) {
-  DSTInitiator::instance().initialize_bba_manager();
+  DSTInitiator::Instance().initialize_bba_manager();
   std::shared_ptr<PbfSensorObject> object1(new PbfSensorObject());
   object1->sensor_type = SensorType::VELODYNE_64;
   object1->sensor_id = "velodyne_64";
@@ -57,7 +57,7 @@ TEST(PbfTrackTest, test_pbf_track_constructor) {
 }
 
 TEST(PbfTrackTest, test_pbf_get_object) {
-  DSTInitiator::instance().initialize_bba_manager();
+  DSTInitiator::Instance().initialize_bba_manager();
   std::shared_ptr<PbfSensorObject> object1(new PbfSensorObject());
   object1->sensor_type = SensorType::VELODYNE_64;
   object1->sensor_id = "velodyne_64";
@@ -92,7 +92,7 @@ TEST(PbfTrackTest, test_pbf_get_object) {
 }
 
 TEST(PbfTrackTest, test_pbf_update_measurements_life) {
-  DSTInitiator::instance().initialize_bba_manager();
+  DSTInitiator::Instance().initialize_bba_manager();
   std::shared_ptr<PbfSensorObject> object1(new PbfSensorObject());
   object1->sensor_type = SensorType::VELODYNE_64;
   object1->sensor_id = "velodyne_64";
@@ -136,7 +136,7 @@ std::shared_ptr<PbfSensorObject> GenerateVelObject(double timestamp) {
 }
 
 TEST(PbfTrackClassFusionTest, test_pbf_type_fusion) {
-  DSTInitiator::instance().initialize_bba_manager();
+  DSTInitiator::Instance().initialize_bba_manager();
   std::shared_ptr<PbfSensorObject> object1 = GenerateVelObject(0.1);
   PbfTrack track(object1);
   BBA* bba = track.GetFusedBBA();

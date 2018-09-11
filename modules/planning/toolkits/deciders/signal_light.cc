@@ -101,7 +101,7 @@ void SignalLight::MakeDecisions(Frame* const frame,
   signal_light_debug->set_adc_front_s(
       reference_line_info->AdcSlBoundary().end_s());
   signal_light_debug->set_adc_speed(
-      common::VehicleStateProvider::instance()->linear_velocity());
+      common::VehicleStateProvider::Instance()->linear_velocity());
 
   bool has_stop = false;
   for (auto& signal_light : signal_lights_from_path_) {
@@ -148,7 +148,7 @@ void SignalLight::SetCreepForwardSignalDecision(
     hdmap::PathOverlap* const signal_light) const {
   CHECK_NOTNULL(signal_light);
 
-  if (EgoInfo::instance()->start_point().v() >
+  if (EgoInfo::Instance()->start_point().v() >
       config_.signal_light().righ_turn_creep().speed_limit()) {
     ADEBUG << "Do not creep forward due to large speed.";
     return;

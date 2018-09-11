@@ -462,7 +462,7 @@ int PullOver::FindPullOverStop(PointENU* stop_point) {
 
 bool PullOver::CheckPullOverComplete() {
   double adc_speed =
-      common::VehicleStateProvider::instance()->linear_velocity();
+      common::VehicleStateProvider::Instance()->linear_velocity();
   if (adc_speed > config_.pull_over().max_stop_speed()) {
     ADEBUG << "ADC not stopped: speed[" << adc_speed << "]";
     return false;
@@ -594,7 +594,7 @@ int PullOver::BuildInLaneStop(const PointENU& pull_over_stop_point) {
   // for new inlane_stop_point
   if (!inlane_stop_point_set) {
     double adc_speed =
-        common::VehicleStateProvider::instance()->linear_velocity();
+        common::VehicleStateProvider::Instance()->linear_velocity();
     double stop_distance = (adc_speed * adc_speed) /
                            (2 * config_.pull_over().max_stop_deceleration());
     stop_point_sl.set_s(adc_front_edge_s + stop_distance);

@@ -47,7 +47,7 @@ apollo::common::Status UltrasonicRadarCanbus::Init() {
   ADEBUG << "Canbus_conf:" << ultrasonic_radar_conf_.ShortDebugString();
 
   // Init can client
-  auto *can_factory = CanClientFactory::instance();
+  auto *can_factory = CanClientFactory::Instance();
   can_factory->RegisterCanClients();
   can_client_ = can_factory->CreateCANClient(
       ultrasonic_radar_conf_.can_conf().can_card_parameter());

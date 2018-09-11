@@ -113,7 +113,7 @@ void LatControllerFuzzer::target(planning::ADCTrajectory
   auto chassis_pb = LoadChassisPb(
       "modules/control/testdata/lateral_controller_test/1_chassis.pb.txt");
   FLAGS_enable_map_reference_unify = false;
-  auto *vehicle_state = VehicleStateProvider::instance();
+  auto *vehicle_state = VehicleStateProvider::Instance();
   vehicle_state->Update(localization_pb, chassis_pb);
 
   /*auto planning_trajectory_pb = LoadPlanningTrajectoryPb(

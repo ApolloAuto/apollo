@@ -187,10 +187,10 @@ void StdPlanning::RunOnce() {
   ADEBUG << "Get chassis:" << chassis.DebugString();
 
   Status status =
-      VehicleStateProvider::instance()->Update(localization, chassis);
+      VehicleStateProvider::Instance()->Update(localization, chassis);
 
   VehicleState vehicle_state =
-      VehicleStateProvider::instance()->vehicle_state();
+      VehicleStateProvider::Instance()->vehicle_state();
 
   // estimate (x, y) at current timestamp
   // This estimate is only valid if the current time and vehicle state timestamp
@@ -199,7 +199,7 @@ void StdPlanning::RunOnce() {
   DCHECK_GE(start_timestamp, vehicle_state.timestamp());
   if (FLAGS_estimate_current_vehicle_state &&
       start_timestamp - vehicle_state.timestamp() < 0.020) {
-    auto future_xy = VehicleStateProvider::instance()->EstimateFuturePosition(
+    auto future_xy = VehicleStateProvider::Instance()->EstimateFuturePosition(
         start_timestamp - vehicle_state.timestamp());
     vehicle_state.set_x(future_xy.x());
     vehicle_state.set_y(future_xy.y());
@@ -249,7 +249,7 @@ void StdPlanning::RunOnce() {
     return;
   }
 
-  EgoInfo::instance()->Update(stitching_trajectory.back(), vehicle_state,
+  EgoInfo::Instance()->Update(stitching_trajectory.back(), vehicle_state,
                               frame_->obstacles());
 
   auto* trajectory_pb = frame_->mutable_trajectory();
@@ -281,7 +281,7 @@ void StdPlanning::RunOnce() {
     }
 
     auto seq_num = frame_->SequenceNum();
-    FrameHistory::instance()->Add(seq_num, std::move(frame_));
+    FrameHistory::Instance()->Add(seq_num, std::move(frame_));
 
     return;
   }
@@ -333,7 +333,7 @@ void StdPlanning::RunOnce() {
   ADEBUG << "Planning pb:" << trajectory_pb->header().DebugString();
 
   auto seq_num = frame_->SequenceNum();
-  FrameHistory::instance()->Add(seq_num, std::move(frame_));
+  FrameHistory::Instance()->Add(seq_num, std::move(frame_));
 }
 
 void StdPlanning::ExportReferenceLineDebug(planning_internal::Debug* debug) {
@@ -365,7 +365,7 @@ Status StdPlanning::Plan(
   auto status = planner_->Plan(stitching_trajectory.back(), frame_.get());
 
   ptr_debug->mutable_planning_data()->set_front_clear_distance(
-      EgoInfo::instance()->front_clear_distance());
+      EgoInfo::Instance()->front_clear_distance());
   ExportReferenceLineDebug(ptr_debug);
 
   const auto* best_ref_info = frame_->FindDriveReferenceLineInfo();
@@ -457,10 +457,10 @@ void StdPlanning::Stop() {
   last_publishable_trajectory_.reset(nullptr);
   frame_.reset(nullptr);
   planner_.reset(nullptr);
-  FrameHistory::instance()->Clear();
+  FrameHistory::Instance()->Clear();
   GetPlanningStatus()->Clear();
   last_routing_.Clear();
-  EgoInfo::instance()->Clear();
+  EgoInfo::Instance()->Clear();
 }
 
 bool StdPlanning::CheckPlanningConfig() {

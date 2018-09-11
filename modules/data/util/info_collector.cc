@@ -79,11 +79,11 @@ const StaticInfo &InfoCollector::GetStaticInfo() {
   GetHardwareInfo();
   GetSoftwareInfo();
   GetUserInfo();
-  return instance()->static_info_;
+  return Instance()->static_info_;
 }
 
 const VehicleInfo &InfoCollector::GetVehicleInfo() {
-  VehicleInfo *vehicle = instance()->static_info_.mutable_vehicle();
+  VehicleInfo *vehicle = Instance()->static_info_.mutable_vehicle();
 
   const std::string vehicle_name = KVDB::Get("apollo:dreamview:vehicle");
   if (!vehicle_name.empty()) {
@@ -99,7 +99,7 @@ const VehicleInfo &InfoCollector::GetVehicleInfo() {
 }
 
 const EnvironmentInfo &InfoCollector::GetEnvironmentInfo() {
-  EnvironmentInfo *environment = instance()->static_info_.mutable_environment();
+  EnvironmentInfo *environment = Instance()->static_info_.mutable_environment();
 
   const std::string map_name = KVDB::Get("apollo:dreamview:map");
   if (!map_name.empty()) {
@@ -109,14 +109,14 @@ const EnvironmentInfo &InfoCollector::GetEnvironmentInfo() {
 }
 
 const HardwareInfo &InfoCollector::GetHardwareInfo() {
-  HardwareInfo *hardware = instance()->static_info_.mutable_hardware();
+  HardwareInfo *hardware = Instance()->static_info_.mutable_hardware();
   *hardware->mutable_configs() =
-      LoadFiles(instance()->config_.hardware_configs());
+      LoadFiles(Instance()->config_.hardware_configs());
   return *hardware;
 }
 
 const SoftwareInfo &InfoCollector::GetSoftwareInfo() {
-  SoftwareInfo *software = instance()->static_info_.mutable_software();
+  SoftwareInfo *software = Instance()->static_info_.mutable_software();
   software->set_docker_image(GetDockerImage());
 
   const std::string commit_id = KVDB::Get("apollo:data:commit_id");
@@ -130,7 +130,7 @@ const SoftwareInfo &InfoCollector::GetSoftwareInfo() {
   }
 
   *software->mutable_configs() =
-      LoadFiles(instance()->config_.software_configs());
+      LoadFiles(Instance()->config_.software_configs());
 
   // Store latest routing request.
   auto* routing_request_adapter = AdapterManager::GetRoutingRequest();
@@ -148,7 +148,7 @@ const SoftwareInfo &InfoCollector::GetSoftwareInfo() {
 }
 
 const UserInfo &InfoCollector::GetUserInfo() {
-  return instance()->static_info_.user();
+  return Instance()->static_info_.user();
 }
 
 std::string InfoCollector::GetDockerImage() {

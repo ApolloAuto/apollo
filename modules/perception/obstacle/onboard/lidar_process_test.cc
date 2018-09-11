@@ -94,7 +94,7 @@ TEST_F(LidarProcessTest, test_Process) {
   }
   std::shared_ptr<Matrix4d> velodyne_trans = std::make_shared<Matrix4d>();
   (*velodyne_trans) << 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1;
-  lidar_process_.hdmap_input_ = HDMapInput::instance();
+  lidar_process_.hdmap_input_ = HDMapInput::Instance();
   EXPECT_TRUE(lidar_process_.Process(123.0, point_cloud, velodyne_trans));
 }
 

@@ -134,9 +134,9 @@ Status Prediction::Init() {
 
   // Initialization of all managers
   AdapterManager::Init(adapter_conf_);
-  ContainerManager::instance()->Init(adapter_conf_);
-  EvaluatorManager::instance()->Init(prediction_conf_);
-  PredictorManager::instance()->Init(prediction_conf_);
+  ContainerManager::Instance()->Init(adapter_conf_);
+  EvaluatorManager::Instance()->Init(prediction_conf_);
+  PredictorManager::Instance()->Init(prediction_conf_);
 
   CHECK(AdapterManager::GetLocalization()) << "Localization is not registered.";
   CHECK(AdapterManager::GetPerceptionObstacles())
@@ -190,7 +190,7 @@ void Prediction::Stop() {
 
 void Prediction::OnLocalization(const LocalizationEstimate& localization) {
   PoseContainer* pose_container = dynamic_cast<PoseContainer*>(
-      ContainerManager::instance()->GetContainer(AdapterConfig::LOCALIZATION));
+      ContainerManager::Instance()->GetContainer(AdapterConfig::LOCALIZATION));
   CHECK_NOTNULL(pose_container);
   pose_container->Insert(localization);
 
@@ -201,7 +201,7 @@ void Prediction::OnLocalization(const LocalizationEstimate& localization) {
 void Prediction::OnPlanning(const planning::ADCTrajectory& adc_trajectory) {
   ADCTrajectoryContainer* adc_trajectory_container =
       dynamic_cast<ADCTrajectoryContainer*>(
-          ContainerManager::instance()->GetContainer(
+          ContainerManager::Instance()->GetContainer(
               AdapterConfig::PLANNING_TRAJECTORY));
   CHECK_NOTNULL(adc_trajectory_container);
   adc_trajectory_container->Insert(adc_trajectory);
@@ -228,7 +228,7 @@ void Prediction::RunOnce(const PerceptionObstacles& perception_obstacles) {
 
   // Insert obstacle
   ObstaclesContainer* obstacles_container = dynamic_cast<ObstaclesContainer*>(
-      ContainerManager::instance()->GetContainer(
+      ContainerManager::Instance()->GetContainer(
           AdapterConfig::PERCEPTION_OBSTACLES));
   CHECK_NOTNULL(obstacles_container);
   obstacles_container->Insert(perception_obstacles);
@@ -238,9 +238,9 @@ void Prediction::RunOnce(const PerceptionObstacles& perception_obstacles) {
 
   // Update ADC status
   PoseContainer* pose_container = dynamic_cast<PoseContainer*>(
-      ContainerManager::instance()->GetContainer(AdapterConfig::LOCALIZATION));
+      ContainerManager::Instance()->GetContainer(AdapterConfig::LOCALIZATION));
   ADCTrajectoryContainer* adc_container = dynamic_cast<ADCTrajectoryContainer*>(
-      ContainerManager::instance()->GetContainer(
+      ContainerManager::Instance()->GetContainer(
           AdapterConfig::PLANNING_TRAJECTORY));
   CHECK_NOTNULL(pose_container);
   CHECK_NOTNULL(adc_container);
@@ -257,7 +257,7 @@ void Prediction::RunOnce(const PerceptionObstacles& perception_obstacles) {
   }
 
   // Make evaluations
-  EvaluatorManager::instance()->Run(perception_obstacles);
+  EvaluatorManager::Instance()->Run(perception_obstacles);
 
   // No prediction for offline mode
   if (FLAGS_prediction_offline_mode) {
@@ -265,10 +265,10 @@ void Prediction::RunOnce(const PerceptionObstacles& perception_obstacles) {
   }
 
   // Make predictions
-  PredictorManager::instance()->Run(perception_obstacles);
+  PredictorManager::Instance()->Run(perception_obstacles);
 
   auto prediction_obstacles =
-      PredictorManager::instance()->prediction_obstacles();
+      PredictorManager::Instance()->prediction_obstacles();
   prediction_obstacles.set_start_timestamp(start_timestamp);
   prediction_obstacles.set_end_timestamp(Clock::NowInSeconds());
   prediction_obstacles.mutable_header()->set_lidar_timestamp(

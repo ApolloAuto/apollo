@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,23 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+#include "modules/planning/planning_component.h"
 
-#include "modules/dreamview/backend/hmi/vehicle_manager.h"
+namespace apollo {
+namespace planning {
 
-#include "gflags/gflags.h"
-#include "modules/common/log.h"
+using apollo::cybertron::Component;
+using apollo::cybertron::ComponentBase;
 
-DEFINE_string(vehicle_data_path, "modules/calibration/data/mkz_example",
-              "Vehicle data path.");
+bool PlanningComponent::Init() { return true; }
 
-int main(int argc, char **argv) {
-  FLAGS_logtostderr = true;
-  google::InitGoogleLogging(argv[0]);
-  google::ParseCommandLineFlags(&argc, &argv, true);
-
-  apollo::dreamview::VehicleManager::Instance()->UseVehicle(
-      FLAGS_vehicle_data_path);
-  AINFO << "Switched to vehicle with data from " << FLAGS_vehicle_data_path;
-
-  return 0;
+bool PlanningComponent::Proc(
+    const std::shared_ptr<prediction::PredictionObstacles>&
+        prediction_obstacles,
+    const std::shared_ptr<perception::TrafficLightDetection>&
+        traffic_light_detection,
+    const std::shared_ptr<localization::LocalizationEstimate>&
+        localization_estimate) {
+  // implement here
+  return true;
 }
+
+}  // namespace planning
+}  // namespace apollo
