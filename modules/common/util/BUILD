@@ -17,6 +17,7 @@ cc_library(
     ],
     linkopts = [
         "-lboost_filesystem",
+        "-lboost_system",
     ],
     deps = [
         ":string_util",
@@ -148,24 +149,24 @@ cc_test(
     ],
 )
 
-#cc_test(
-#    name = "file_test",
-#    size = "small",
-#    srcs = [
-#        "file_test.cc",
-#    ],
-#    data = [
-#        "//modules/perception:perception_data",
-#    ],
-#    tags = [
-#        "external",
-#    ],
-#    deps = [
-#        ":util",
-#        "//modules/common/util/testdata:simple_proto",
-#        "@gtest//:main",
-#    ],
-#)
+cc_test(
+    name = "file_test",
+    size = "small",
+    srcs = [
+        "file_test.cc",
+    ],
+    data = [
+        "//modules/perception:perception_data",
+    ],
+    tags = [
+        "external",
+    ],
+    deps = [
+        ":util",
+        "//modules/common/util/testdata:simple_proto",
+        "@gtest//:main",
+    ],
+)
 
 cc_test(
     name = "lru_cache_test",
