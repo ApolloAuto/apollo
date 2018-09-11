@@ -14,8 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <pcl/common/time.h>
-#include <cybertron/cybertron.h>
+#include "cybertron/cybertron.h"
 
 #include "modules/drivers/velodyne/parser/util.h"
 #include "modules/drivers/velodyne/parser/velodyne_parser.h"
@@ -24,7 +23,7 @@ namespace apollo {
 namespace drivers {
 namespace velodyne {
 
-double VelodyneParser::get_gps_stamp(double current_packet_stamp,
+uint64_t VelodyneParser::get_gps_stamp(double current_packet_stamp,
                                      double &previous_packet_stamp,
                                      uint64_t &gps_base_usec) {
   if (current_packet_stamp < previous_packet_stamp) {
@@ -48,19 +47,19 @@ double VelodyneParser::get_gps_stamp(double current_packet_stamp,
   }
 
   previous_packet_stamp = current_packet_stamp;
-  double gps_stamp = gps_base_usec + current_packet_stamp;
+  uint64_t gps_stamp = gps_base_usec + current_packet_stamp;
 
-  gps_stamp /= 1e6;
+  gps_stamp = gps_stamp * 1000;
   return gps_stamp;
 }
 
-VPoint VelodyneParser::get_nan_point(double timestamp) {
-  VPoint nan_point;
-  nan_point.timestamp = timestamp;
-  nan_point.x = nan;
-  nan_point.y = nan;
-  nan_point.z = nan;
-  nan_point.intensity = 0;
+PointXYZIT VelodyneParser::get_nan_point(uint64_t timestamp) {
+  PointXYZIT nan_point;
+  nan_point.set_timestamp(timestamp);
+  nan_point.set_x(nan);
+  nan_point.set_y(nan);
+  nan_point.set_z(nan);
+  nan_point.set_intensity(0);
   return nan_point;
 }
 
@@ -122,17 +121,17 @@ bool VelodyneParser::is_scan_valid(int rotation, float range) {
   return true;
 }
 
-void VelodyneParser::compute_coords(const union RawDistance &raw_distance,
+void VelodyneParser::compute_coords(const float& raw_distance,
                                     const LaserCorrection &corrections,
-                                    const uint16_t rotation, VPoint &point) {
+                                    const uint16_t rotation, 
+                                    PointXYZIT* point) {
   // ROS_ASSERT_MSG(rotation < 36000, "rotation must between 0 and 35999");
   assert(rotation < 36000);
   double x = 0.0;
   double y = 0.0;
   double z = 0.0;
 
-  double distance1 = raw_distance.raw_distance * DISTANCE_RESOLUTION;
-  double distance = distance1 + corrections.dist_correction;
+  double distance = raw_distance + corrections.dist_correction;
 
   // cos(a-b) = cos(a)*cos(b) + sin(a)*sin(b)
   // sin(a-b) = sin(a)*cos(b) - cos(a)*sin(b)
@@ -161,7 +160,7 @@ void VelodyneParser::compute_coords(const union RawDistance &raw_distance,
   double distance_corr_x = 0;
   double distance_corr_y = 0;
 
-  if (need_two_pt_correction_ && distance1 <= 2500) {
+  if (need_two_pt_correction_ && raw_distance <= 2500) {
     distance_corr_x =
         (corrections.dist_correction - corrections.dist_correction_x) *
             (xx - 2.4) / 22.64 +
@@ -174,7 +173,7 @@ void VelodyneParser::compute_coords(const union RawDistance &raw_distance,
     distance_corr_x = distance_corr_y = corrections.dist_correction;
   }
 
-  double distance_x = distance1 + distance_corr_x;
+  double distance_x = raw_distance + distance_corr_x;
 
   xy_distance = distance_x * corrections.cos_vert_correction;
   // xy_distance = distance_x * cos_vert_correction - vert_offset *
@@ -183,7 +182,7 @@ void VelodyneParser::compute_coords(const union RawDistance &raw_distance,
   x = xy_distance * sin_rot_angle -
       corrections.horiz_offset_correction * cos_rot_angle;
 
-  double distance_y = distance1 + distance_corr_y;
+  double distance_y = raw_distance + distance_corr_y;
   xy_distance = distance_y * corrections.cos_vert_correction;
   // xy_distance = distance_y * cos_vert_correction - vert_offset *
   // sin_vert_correction;
@@ -195,9 +194,9 @@ void VelodyneParser::compute_coords(const union RawDistance &raw_distance,
   // z = distance * sin_vert_correction + vert_offset * cos_vert_correction;
 
   /** Use standard ROS coordinate system (right-hand rule) */
-  point.x = float(y);
-  point.y = float(-x);
-  point.z = float(z);
+  point->set_x(float(y));
+  point->set_y(float(-x));
+  point->set_z(float(z));
 }
 
 VelodyneParser *VelodyneParserFactory::create_parser(Config source_config) {
@@ -212,8 +211,8 @@ VelodyneParser *VelodyneParserFactory::create_parser(Config source_config) {
              || config.model() == HDL64E_S3D 
              || config.model() == HDL64E_S2) {
     return new Velodyne64Parser(config);
-//  } else if(config.model() == VLS128) {
-//    return new Velodyne128Parser(config);
+  } else if(config.model() == VLS128) {
+    return new Velodyne128Parser(config);
   } else {
     AERROR << "invalid model, must be 64E_S2|64E_S3S"
            << "|64E_S3D_STRONGEST|64E_S3D_LAST|64E_S3D_DUAL|HDL32E|VLP16";

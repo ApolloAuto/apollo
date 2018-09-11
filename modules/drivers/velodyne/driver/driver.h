@@ -116,6 +116,19 @@ class Velodyne16Driver : public VelodyneDriver {
   std::shared_ptr<Input> positioning_input_;
 };
 
+class Velodyne128Driver : public VelodyneDriver {
+ public:
+  explicit Velodyne128Driver(const Config &config);
+  virtual ~Velodyne128Driver() {}
+
+  void init();
+  bool poll(std::shared_ptr<VelodyneScan>& scan);
+  void poll_positioning_packet();
+
+ private:
+  std::shared_ptr<Input> positioning_input_;
+};
+
 class VelodyneDriverFactory {
  public:
   static VelodyneDriver *create_driver(const Config& config);

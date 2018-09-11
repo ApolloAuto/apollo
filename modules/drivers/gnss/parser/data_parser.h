@@ -56,6 +56,8 @@ using ::apollo::localization::Gps;
 using apollo::cybertron::Node;
 using apollo::cybertron::Writer;
 using apollo::cybertron::Reader;
+using cybertron::tf2_cybertron::TransformBroadcaster;
+using adu::common::TransformStamped;
 
 class DataParser {
  public:
@@ -76,13 +78,13 @@ class DataParser {
   void PublishHeading(const MessagePtr message);
   void CheckInsStatus(drivers::gnss::Ins *ins);
   void CheckGnssStatus(drivers::gnss::Gnss *gnss);
-//  void GpsToTransformStamped(const ::apollo::localization::Gps &gps,
-//                             geometry_msgs::TransformStamped *transform);
+  void GpsToTransformStamped(const std::shared_ptr<Gps>& gps,
+                             TransformStamped *transform);
 
   bool inited_flag_ = false;
   config::Config config_;
   std::unique_ptr<Parser> data_parser_;
-  cybertron::tf2_cybertron::TransformBroadcaster tf_broadcaster_;
+  TransformBroadcaster tf_broadcaster_;
 
   GnssStatus gnss_status_;
   InsStatus ins_status_;

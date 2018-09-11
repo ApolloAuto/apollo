@@ -281,6 +281,11 @@ bool RawStream::Init() {
         GpsbinCallback(raw_data);
       });
 
+  chassis_reader_ = node_->CreateReader<Chassis>(config_.chassis_channel_name(),
+      [&](const std::shared_ptr<Chassis>& chassis){
+        chassis_ptr_ = chassis;
+      });
+
   
   return true;
 }
@@ -289,27 +294,35 @@ void RawStream::Start() {
   data_thread_ptr_.reset(new std::thread(&RawStream::DataSpin, this));
   rtk_thread_ptr_.reset(new std::thread(&RawStream::RtkSpin, this));
   if (config_.has_wheel_parameters()) {
-    //wheel_velocity_timer_ = AdapterManager::CreateTimer(
-    //    ros::Duration(1), &RawStream::OnWheelVelocityTimer, this);
+    wheel_velocity_timer_.reset(new Timer(1000, 
+        [this](){
+          this->OnWheelVelocityTimer();
+        }, 
+        false));
+    wheel_velocity_timer_->Start();
   }
 }
 
-//void RawStream::OnWheelVelocityTimer(const ros::TimerEvent &) {
+void RawStream::OnWheelVelocityTimer() {
   //AdapterManager::Observe();
   //if (AdapterManager::GetChassis()->Empty()) {
   //  AINFO << "No chassis message received";
   //  return;
   //}
   //auto chassis = AdapterManager::GetChassis()->GetLatestObservedPtr();
-  //auto latency_sec =
-  //    ros::Time::now().toSec() - chassis->header().timestamp_sec();
-  //auto latency_ms = std::to_string(std::lround(latency_sec * 1000));
-  //auto speed_cmps = std::to_string(std::lround(chassis->speed_mps() * 100));
-  //auto cmd_wheelvelocity =
-  //    "WHEELVELOCITY " + latency_ms + " 100 0 0 0 0 0 " + speed_cmps + "\r\n";
-  //AINFO << "Write command: " << cmd_wheelvelocity;
-  //command_stream_->write(cmd_wheelvelocity);
-//}
+  if (chassis_ptr_ == nullptr) {
+    AINFO << "No chassis message received";
+    return;
+  } 
+  auto latency_sec =
+      cybertron::Time::Now().ToSecond() - chassis_ptr_->header().timestamp_sec();
+  auto latency_ms = std::to_string(std::lround(latency_sec * 1000));
+  auto speed_cmps = std::to_string(std::lround(chassis_ptr_->speed_mps() * 100));
+  auto cmd_wheelvelocity =
+      "WHEELVELOCITY " + latency_ms + " 100 0 0 0 0 0 " + speed_cmps + "\r\n";
+  AINFO << "Write command: " << cmd_wheelvelocity;
+  command_stream_->write(cmd_wheelvelocity);
+}
 
 bool RawStream::Connect() {
   if (data_stream_) {

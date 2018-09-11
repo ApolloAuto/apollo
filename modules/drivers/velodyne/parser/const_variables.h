@@ -23,13 +23,6 @@ namespace apollo {
 namespace drivers {
 namespace velodyne {
 
-// default topics
-const std::string TOPIC_PREFIX = "/apollo/sensor/velodyne/";
-const std::string TOPIC_PACKTES = "VelodyneScanUnified";
-const std::string TOPIC_POINTCLOUD = TOPIC_PREFIX + "PointCloud2";
-const std::string TOPIC_COMPENSATED_POINTCLOUD =
-    TOPIC_PREFIX + "compensator/PointCloud2";
-
 /**
 * @brief Order array for re-ordering point cloud.
 * Refer to Velodyne official manual

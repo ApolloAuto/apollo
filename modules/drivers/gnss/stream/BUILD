@@ -37,6 +37,7 @@ cc_library(
         ":stream",
         "//modules/drivers/gnss/parser:gnss_parser",
         "//modules/drivers/gnss/proto:gnss_proto",
+        "//modules/canbus/proto:canbus_proto",
         "//modules/drivers/gnss/util:gnss_util",
         "//modules/common/util:message_util",
         "//framework:cybertron",

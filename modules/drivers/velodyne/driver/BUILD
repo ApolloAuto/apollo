@@ -27,6 +27,7 @@ cc_library(
         "driver16.cc",
         "driver32.cc",
         "driver64.cc",
+        "driver128.cc",
         "input.cc",
         "socket_input.cc",
     ],
