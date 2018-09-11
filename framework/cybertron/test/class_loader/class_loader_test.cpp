@@ -23,8 +23,8 @@
 #include "cybertron/cybertron.h"
 #include "cybertron/test/class_loader/base.h"
 
-const char LIBRARY_1[] = "libTestPlugins1.so";
-const char LIBRARY_2[] = "libTestPlugins2.so";
+const char LIBRARY_1[] = "./libTestPlugins1.so";
+const char LIBRARY_2[] = "./libTestPlugins2.so";
 using apollo::cybertron::class_loader::ClassLoader;
 using apollo::cybertron::class_loader::ClassLoaderManager;
 using apollo::cybertron::class_loader::utility::IsLibraryLoadedByAnybody;

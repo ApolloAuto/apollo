@@ -20,7 +20,7 @@ TEST(ProcBalancerTest, run) {
 TEST(ProcBalancerTest, Push_routine) {
   auto rt = std::make_shared<CRoutine>(Proc);
   rt->SetId(123);
-  EXPECT_FALSE(ProcBalancer::Instance()->Push(rt));
+  EXPECT_TRUE(ProcBalancer::Instance()->Push(rt));
 }
 
 TEST(ProcBalancerTest, get_proc) {

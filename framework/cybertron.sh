@@ -26,10 +26,10 @@ CORE_NUM=$(grep -c ^processor /proc/cpuinfo)
 TOOLS_HOME="${CYBERTRON_DIR}/tools"
 COV_HOME="${TOOLS_HOME}/ccover/"
 CMAKE_OPTIONS=""
-export COVFILE="${CYBERTRON_DIR}/test_cybertron-apollo.cov"
+export COVFILE="${CYBERTRON_DIR}/test_cybertron.cov"
 export COVFILE_INC="${CYBERTRON_DIR}/test-inc.cov"
 export PATH=${COV_HOME}/bin:$PATH
-TEST_DIR=${CYBERTRON_DIR}/install/test/cybertron-apollo/unit_test/
+TEST_DIR=${CYBERTRON_DIR}/install/test/cybertron/unit_test/
 
 RED='\033[0;31m'
 YELLOW='\e[33m'
