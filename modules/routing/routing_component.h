@@ -29,7 +29,7 @@ class RoutingComponent final : public ::apollo::cybertron::Component<> {
  public:
   bool Init() override;
  private:
-  std::sharred_ptr<::apollo::cybertron::Service<RoutingRequest, RoutingResponse>> service_;
+  std::shared_ptr<::apollo::cybertron::Service<RoutingRequest, RoutingResponse>> service_;
 }
 
 CYBERTRON_REGISTER_COMPONENT(RoutingComponent)
