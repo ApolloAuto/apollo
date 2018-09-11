@@ -24,7 +24,7 @@ cc_library(
         "log.h",
     ],
     deps = [
-        "//framework:cybertron_common",
+        "//framework:cybertron",
     ],
 )
 
@@ -38,9 +38,9 @@ cc_library(
     ],
     deps = [
         ":log",
+        "//framework:cybertron",
         "//modules/common/status",
         "//modules/common/util:string_util",
-        "//framework:cybertron",
     ],
 )
 
