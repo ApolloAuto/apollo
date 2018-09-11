@@ -22,8 +22,9 @@ import os
 import sys
 import time
 import signal
+import time
 
-import rospy
+from cybertron import pynode
 from std_msgs.msg import String
 
 from plot_data import Plotter
@@ -38,11 +39,12 @@ class DataCollector(object):
     DataCollector Class
     """
 
-    def __init__(self):
+    def __init__(self, node):
         self.sequence_num = 0
-        self.control_pub = rospy.Publisher(
-            '/apollo/control', control_cmd_pb2.ControlCommand, queue_size=1)
-        rospy.sleep(0.3)
+        self.control_pub = node.create_writer('/apollo/control',
+                            control_cmd_pb2.DESCRIPTOR.
+                            message_types_by_name['ControlCommand'].full_name)
+        time.sleep(0.3)
         self.controlcmd = control_cmd_pb2.ControlCommand()
 
         self.canmsg_received = False
@@ -85,11 +87,11 @@ class DataCollector(object):
         self.controlcmd.header.module_name = "control"
         self.controlcmd.header.sequence_num = self.sequence_num
         self.sequence_num = self.sequence_num + 1
-        self.controlcmd.header.timestamp_sec = rospy.get_time()
+        self.controlcmd.header.timestamp_sec = time.time()
         self.controlcmd.pad_msg.action = 2
         self.control_pub.publish(self.controlcmd)
 
-        rospy.sleep(0.2)
+        time.sleep(0.2)
         # Set Default Message
         print "Send Default Command"
         self.controlcmd.pad_msg.action = 1
@@ -101,10 +103,12 @@ class DataCollector(object):
 
         self.canmsg_received = False
 
-        rate = rospy.Rate(100)
         while self.in_session:
+            now = time.time()
             self.publish_control()
-            rate.sleep()
+            sleep_time = 0.01 - (time.time() - now)
+            if sleep_time > 0:
+                time.sleep(sleep_time)
 
     def signal_handler(self, signal, frame):
         self.in_session = False
@@ -165,7 +169,7 @@ class DataCollector(object):
             if self.vehicle_speed == 0:
                 self.in_session = False
 
-        self.controlcmd.header.timestamp_sec = rospy.get_time()
+        self.controlcmd.header.timestamp_sec = time.time()
         self.control_pub.publish(self.controlcmd)
         self.write_file(self.controlcmd.header.timestamp_sec, 1)
         if self.in_session == False:
@@ -187,14 +191,14 @@ def main():
     """
     Main function
     """
-    rospy.init_node('data_collector', anonymous=True)
+    node = pynode.Node("data_collector")
 
-    data_collector = DataCollector()
+    data_collector = DataCollector(node)
     plotter = Plotter()
-    localizationsub = rospy.Subscriber('/apollo/localization/pose',
+    node.create_reader('/apollo/localization/pose',
                                        localization_pb2.LocalizationEstimate,
                                        data_collector.callback_localization)
-    canbussub = rospy.Subscriber('/apollo/canbus/chassis', chassis_pb2.Chassis,
+    node.create_reader('/apollo/canbus/chassis', chassis_pb2.Chassis,
                                  data_collector.callback_canbus)
 
     print "Enter q to quit"

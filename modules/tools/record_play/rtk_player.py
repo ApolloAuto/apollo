@@ -299,8 +299,9 @@ def main():
     while not node.is_shutdown():
         now = time.time()
         player.publish_planningmsg()
-        elapsed = time.time() - now  # how long was it running?
-        time.sleep(0.1 - elapsed)
+        sleep_time = 0.1 - (time.time() - now)
+        if sleep_time > 0:
+            time.sleep(sleep_time)
 
 
 if __name__ == '__main__':
