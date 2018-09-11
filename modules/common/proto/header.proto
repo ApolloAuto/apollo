@@ -30,4 +30,6 @@ message Header {
   optional uint32 version = 7 [default = 1];
 
   optional StatusPb status = 8;
+
+  optional string frame_id = 9;
 }

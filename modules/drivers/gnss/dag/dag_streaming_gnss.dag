@@ -3,7 +3,7 @@ module_config {
     module_library : "/apollo/bazel-bin/modules/drivers/gnss/libgnss_component.so"
 
     components {
-      class_name : "::apollo::drivers::gnss::GnssDriverComponent"
+      class_name : "GnssDriverComponent"
       config {
         name : "gnss"
         config_file_path : "/apollo/modules/drivers/gnss/conf/gnss_conf.pb.txt"

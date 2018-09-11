@@ -17,4 +17,6 @@ message PointCloud {
   optional bool is_dense = 3;
   repeated PointXYZIT point = 4;
   optional double measurement_time = 5;
+  optional uint32 width = 6;
+  optional uint32 height = 7;
 }
