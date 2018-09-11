@@ -10,7 +10,6 @@ cc_library(
         "//modules/common:apollo_app",
         "//modules/common/adapters:adapter_manager",
         "//modules/monitor/common:recurrent_runner",
-        "//modules/monitor/hardware/can:can_monitor",
         "//modules/monitor/hardware/gps:gps_monitor",
         "//modules/monitor/hardware:resource_monitor",
         "//modules/monitor/proto:system_status_proto",
