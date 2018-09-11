@@ -42,8 +42,10 @@ Scheduler::Scheduler()
       AWARN << "Processor num cannot be set to 0! For better performance, "
             << "will use the number of cpu cores as default value.";
     } else if (scheduler_conf_.processor_num() > processor_num_) {
-      AWARN << "Processor num is too large! For better performance, "
-            << "will use the number of cpu cores as default value.";
+      AWARN << "Processor num: " << scheduler_conf_.processor_num()
+            << " is too large! For better performance, "
+            << "will use the number of cpu cores as default value:"
+            << processor_num_;
     } else {
       processor_num_ = scheduler_conf_.processor_num();
     }
