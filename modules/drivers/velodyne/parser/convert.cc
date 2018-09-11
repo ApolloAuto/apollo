@@ -16,10 +16,6 @@
 
 #include "modules/drivers/velodyne/parser/convert.h"
 
-#include <pcl/common/time.h>
-// #include <pcl_conversions/pcl_conversions.h>
-// #include <ros/advertise_options.h>
-
 namespace apollo {
 namespace drivers {
 namespace velodyne {
@@ -63,45 +59,31 @@ void Convert::init(const Config& velodyne_config) {
 /** @brief Callback for raw scan messages. */
 void  Convert::convert_packets_to_pointcloud(
     const std::shared_ptr<VelodyneScan>& scan_msg,
-    std::shared_ptr<PointCloud>& point_cloud_out) {
+    std::shared_ptr<PointCloud>& point_cloud) {
   // ROS_INFO_ONCE("********************************************************");
   // ROS_INFO_ONCE("Start convert velodyne packets to pointcloud");
   // ROS_INFO_ONCE("********************************************************");
   // ROS_DEBUG_STREAM(scan_msg->header.seq);
   ADEBUG << "Convert scan msg seq " << scan_msg->header().sequence_num();
 
-  VPointCloud::Ptr pointcloud(new VPointCloud());
-  parser_->generate_pointcloud(scan_msg, pointcloud);
+  parser_->generate_pointcloud(scan_msg, point_cloud);
 
-  if (pointcloud->empty()) {
+  if (point_cloud == nullptr || point_cloud->point_size() == 0) {
+    AERROR << "point cloud has no point";
     return;
   }
 
   if (config_.organized()) {
     ADEBUG << "reorder point cloud";
-    parser_->order(pointcloud);
+    parser_->order(point_cloud);
   }
 
-  point_cloud_out->mutable_point()->Reserve(pointcloud->size());
-
-  point_cloud_out->mutable_header()->set_frame_id(pointcloud->header.frame_id);
-  point_cloud_out->mutable_header()->set_sequence_num(pointcloud->header.seq);
-  point_cloud_out->mutable_header()->set_timestamp_sec(apollo::cybertron::Time().Now().ToSecond());
-  point_cloud_out->set_height(pointcloud->height);
-  point_cloud_out->set_width(pointcloud->width);
-  point_cloud_out->set_frame_id(pointcloud->header.frame_id);
-
-  // copy to protobuf message
-  for (auto &point: pointcloud->points) {
-    auto new_point = point_cloud_out->add_point();
-    new_point->set_x(point.x);
-    new_point->set_y(point.y);
-    new_point->set_z(point.z);
-    new_point->set_intensity(point.intensity);
-    new_point->set_timestamp(point.timestamp); //double
+  if (config_.organized()) {
+    parser_->order(point_cloud);
+    point_cloud->set_is_dense(false);
+  } else {
+    point_cloud->set_is_dense(true);
   }
-  
-  point_cloud_out->set_measurement_time(point_cloud_out->point(0).timestamp() / 1e9);
 
   // publish the accumulated cloud message
   // pointcloud_pub_.publish(pointcloud);

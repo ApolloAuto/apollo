@@ -16,10 +16,6 @@
 
 #include "modules/drivers/velodyne/parser/velodyne_parser.h"
 
-#include <pcl/common/time.h>
-// #include <ros/package.h>
-// #include <ros/ros.h>
-
 namespace apollo {
 namespace drivers {
 namespace velodyne {
@@ -32,35 +28,34 @@ Velodyne32Parser::Velodyne32Parser(Config config)
 
 void Velodyne32Parser::generate_pointcloud(
     const std::shared_ptr<VelodyneScan>& scan_msg,
-    VPointCloud::Ptr& out_msg) {
+    std::shared_ptr<PointCloud>& out_msg) {
   // allocate a point cloud with same time and frame ID as raw data
-  out_msg->header.frame_id = scan_msg->header().frame_id();
-  out_msg->height = 1;
-  out_msg->header.seq = scan_msg->header().sequence_num();
-  out_msg->reserve(80000);
+  out_msg->mutable_header()->set_frame_id(scan_msg->header().frame_id());
+  out_msg->set_height(1);
+  out_msg->mutable_header()->set_sequence_num(scan_msg->header().sequence_num());
   gps_base_usec_ = scan_msg->basetime();
 
   size_t packets_size = scan_msg->firing_pkts_size();
   for (size_t i = 0; i < packets_size; ++i) {
-    unpack(scan_msg->firing_pkts(i), *out_msg);
-    last_time_stamp_ = out_msg->header.stamp;
-    ADEBUG << "stamp: " << std::fixed << out_msg->header.stamp;
+    unpack(scan_msg->firing_pkts(i), out_msg);
+    last_time_stamp_ = out_msg->measurement_time();
+    ADEBUG << "stamp: " << std::fixed << last_time_stamp_;
   }
 
-  if (out_msg->empty()) {
+  if (out_msg->point_size() == 0) {
     // we discard this pointcloud if empty
     AERROR << "All points is NAN!Please check velodyne:" << config_.model();
   }
 }
 
-double Velodyne32Parser::get_timestamp(double base_time, float time_offset,
+uint64_t Velodyne32Parser::get_timestamp(double base_time, float time_offset,
                                        uint16_t block_id) {
   double t = base_time - time_offset;
-  double timestamp = get_gps_stamp(t, previous_packet_stamp_, gps_base_usec_);
+  uint64_t timestamp = get_gps_stamp(t, previous_packet_stamp_, gps_base_usec_);
   return timestamp;
 }
 
-void Velodyne32Parser::unpack(const VelodynePacket& pkt, VPointCloud& pc) {
+void Velodyne32Parser::unpack(const VelodynePacket& pkt, std::shared_ptr<PointCloud>& pc) {
   // const RawPacket* raw = (const RawPacket*)&pkt.data[0];
   const RawPacket* raw = (const RawPacket*)pkt.data().c_str();
   double basetime = raw->gps_timestamp;  // usec
@@ -75,12 +70,12 @@ void Velodyne32Parser::unpack(const VelodynePacket& pkt, VPointCloud& pc) {
       raw_distance.bytes[1] = raw->blocks[i].data[k + 1];
 
       // compute time
-      double timestamp =
+      uint64_t timestamp =
           get_timestamp(basetime, (*inner_time_)[i][laser_id], i);
 
       if (laser_id == SCANS_PER_BLOCK - 1) {
         // set header stamp before organize the point cloud
-        pc.header.stamp = static_cast<uint64_t>(timestamp * 1e6);
+        pc->set_measurement_time(static_cast<double>(timestamp / 1e9));
       }
 
       int rotation = (int)raw->blocks[i].rotation;
@@ -91,44 +86,48 @@ void Velodyne32Parser::unpack(const VelodynePacket& pkt, VPointCloud& pc) {
           !is_scan_valid(rotation, distance)) {
         // if organized append a nan point to the cloud
         if (config_.organized()) {
-          pc.points.emplace_back(get_nan_point(timestamp));
-          ++pc.width;
+          apollo::drivers::PointXYZIT* point_new = pc->add_point();
+          point_new->set_x(nan);
+          point_new->set_y(nan);
+          point_new->set_z(nan);
+          point_new->set_timestamp(timestamp);
+          point_new->set_intensity(0);
         }
         continue;
       }
 
-      VPoint point;
-      point.timestamp = timestamp;
+      apollo::drivers::PointXYZIT* point = pc->add_point();
+      point->set_timestamp(timestamp);
       // Position Calculation, append this point to the cloud
-      compute_coords(raw_distance, corrections, rotation, point);
-      point.intensity = raw->blocks[i].data[k + 2];
+      compute_coords(distance, corrections, rotation, point);
+      point->set_intensity(raw->blocks[i].data[k + 2]);
       // append this point to the cloud
-      pc.points.emplace_back(point);
-      ++pc.width;
     }
   }
 }
 
-void Velodyne32Parser::order(VPointCloud::Ptr& cloud) {
+void Velodyne32Parser::order(std::shared_ptr<PointCloud>& cloud) {
   int width = 32;
-  cloud->width = width;
-  cloud->height = cloud->size() / cloud->width;
-  int height = cloud->height;
+  cloud->set_width(width);
+  int height = cloud->point_size() / cloud->width();
+  cloud->set_height(height);
 
-  VPointCloud target;
-  target.header = cloud->header;
-  target.resize(cloud->size());
-  target.width = width;
-  target.height = height;
+  std::shared_ptr<PointCloud> cloud_origin =
+      std::make_shared<PointCloud>();
+  cloud_origin->CopyFrom(*cloud);
 
   for (int i = 0; i < width; ++i) {
-    int col = ORDER_HDL32E[i];
+      int col = velodyne::ORDER_HDL32E[i];
 
-    for (int j = 0; j < height; ++j) {
-      target.at(i, j) = cloud->at(col, j);
-    }
+      for (int j = 0; j < height; ++j) {
+          // make sure offset is initialized, should be init at setup() just once
+          int target_index = j * width + i;
+          int origin_index = j * width + col;
+          cloud->mutable_point(target_index)->CopyFrom(cloud_origin->point(origin_index));
+
+      }
   }
-  *cloud = target;
+
 }
 
 }  // namespace velodyne

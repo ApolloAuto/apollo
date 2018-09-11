@@ -133,5 +133,6 @@ message Config {
   optional string rawimu_channel_name = 27;
   optional string gps_channel_name = 28;
   optional string bestpos_channel_name = 29;
+  optional string chassis_channel_name = 30;
 
 }

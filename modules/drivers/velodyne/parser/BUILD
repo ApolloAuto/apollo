@@ -25,6 +25,7 @@ cc_library(
         "calibration.cc",
         "convert.cc",
         "online_calibration.cc",
+        "velodyne128_parser.cc",
         "velodyne64_parser.cc",
         "velodyne32_parser.cc",
         "velodyne16_parser.cc",
@@ -36,7 +37,6 @@ cc_library(
         "convert.h",
         "online_calibration.h",
         "const_variables.h",
-        "point_types.h",
         "util.h",
         "velodyne_parser.h",
     ],
@@ -44,7 +44,6 @@ cc_library(
         "//modules/drivers/velodyne/proto:velodyne_proto",
         "//modules/drivers/proto:sensor_proto",
         "//framework:cybertron",
-        "@pcl",
         "@eigen",
         "@yaml_cpp//:yaml",
     ],
@@ -75,7 +74,6 @@ cc_library(
     hdrs = [
         "compensator.h",
         "const_variables.h",
-        "point_types.h",
         "util.h",
     ],
     deps = [

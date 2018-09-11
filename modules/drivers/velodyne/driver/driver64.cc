@@ -76,7 +76,7 @@ bool Velodyne64Driver::poll(std::shared_ptr<VelodyneScan>& scan) {
   // scan->header.stamp = ros::Time().now();
   scan->mutable_header()->set_timestamp_sec(cybertron::Time().Now().ToSecond());
   //TODO:? add new frame id para
-  scan->mutable_header()->set_module_name(config_.frame_id());
+  scan->mutable_header()->set_frame_id(config_.frame_id());
   scan->set_basetime(basetime_);
 
   // output_.publish(scan);

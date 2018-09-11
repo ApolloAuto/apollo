@@ -301,10 +301,9 @@ void DataParser::PublishOdometry(const MessagePtr message) {
   gps_writer_->Write(gps);
   //AdapterManager::PublishGps(gps);
 
-  //TODO
-  //geometry_msgs::TransformStamped transform;
-  //GpsToTransformStamped(gps, &transform);
-  //tf_broadcaster_.sendTransform(transform);
+  TransformStamped transform;
+  GpsToTransformStamped(gps, &transform);
+  tf_broadcaster_.sendTransform(transform);
 }
 
 void DataParser::PublishCorrimu(const MessagePtr message) {
@@ -352,21 +351,22 @@ void DataParser::PublishHeading(const MessagePtr message) {
   //AdapterManager::PublishGnssHeading(heading);
 }
 
-//void DataParser::GpsToTransformStamped(
-//    const ::apollo::localization::Gps &gps,
-//    geometry_msgs::TransformStamped *transform) {
-//  ros::Time time;
-//  transform->header.stamp = time.fromSec(gps.header().timestamp_sec());
-//  transform->header.frame_id = config_.tf().frame_id();
-//  transform->child_frame_id = config_.tf().child_frame_id();
-//  transform->transform.translation.x = gps.localization().position().x();
-//  transform->transform.translation.y = gps.localization().position().y();
-//  transform->transform.translation.z = gps.localization().position().z();
-//  transform->transform.rotation.x = gps.localization().orientation().qx();
-//  transform->transform.rotation.y = gps.localization().orientation().qy();
-//  transform->transform.rotation.z = gps.localization().orientation().qz();
-//  transform->transform.rotation.w = gps.localization().orientation().qw();
-//}
+void DataParser::GpsToTransformStamped(
+    const std::shared_ptr<Gps>& gps,
+    TransformStamped *transform) {
+  transform->mutable_header()->set_stamp(gps->header().timestamp_sec() * 1000000000UL);
+  transform->mutable_header()->set_frame_id(config_.tf().frame_id());
+  transform->set_child_frame_id(config_.tf().child_frame_id());
+  auto translation = transform->mutable_transform()->mutable_translation();
+  translation->set_x(gps->localization().position().x());
+  translation->set_y(gps->localization().position().y());
+  translation->set_z(gps->localization().position().z());
+  auto rotation = transform->mutable_transform()->mutable_rotation();
+  rotation->set_qx(gps->localization().orientation().qx());
+  rotation->set_qy(gps->localization().orientation().qy());
+  rotation->set_qz(gps->localization().orientation().qz());
+  rotation->set_qw(gps->localization().orientation().qw());
+}
 
 }  // namespace gnss
 }  // namespace drivers

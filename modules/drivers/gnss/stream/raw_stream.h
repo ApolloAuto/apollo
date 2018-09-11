@@ -26,6 +26,7 @@
 
 #include "modules/drivers/gnss/proto/config.pb.h"
 #include "modules/drivers/gnss/proto/gnss_status.pb.h"
+#include "modules/canbus/proto/chassis.pb.h"
 
 #include "modules/drivers/gnss/parser/data_parser.h"
 #include "modules/drivers/gnss/parser/rtcm_parser.h"
@@ -38,10 +39,12 @@ namespace gnss {
 using apollo::drivers::gnss_status::StreamStatus;
 using apollo::drivers::gnss_status::StreamStatus_Type;
 using apollo::drivers::gnss::RawData;
+using apollo::canbus::Chassis;
 
 using apollo::cybertron::Node;
 using apollo::cybertron::Writer;
 using apollo::cybertron::Reader;
+using apollo::cybertron::Timer;
 
 class RawStream {
  public:
@@ -68,9 +71,10 @@ class RawStream {
   void PushGpgga(size_t length);
   void GpsbinSpin();
   void GpsbinCallback(const std::shared_ptr<RawData const>& raw_data);
-//  void OnWheelVelocityTimer(const ros::TimerEvent&);
+  void OnWheelVelocityTimer();
 
-  cybertron::Timer wheel_velocity_timer_;
+  std::unique_ptr<cybertron::Timer> wheel_velocity_timer_ = nullptr;
+  std::shared_ptr<Chassis> chassis_ptr_ = nullptr;
   static constexpr size_t BUFFER_SIZE = 2048;
   uint8_t buffer_[BUFFER_SIZE] = {0};
   uint8_t buffer_rtk_[BUFFER_SIZE] = {0};
@@ -106,6 +110,7 @@ class RawStream {
   std::shared_ptr<Writer<RawData>> raw_writer_ = nullptr;
   std::shared_ptr<Writer<RawData>> rtcm_writer_ = nullptr;
   std::shared_ptr<Reader<RawData>> gpsbin_reader_ = nullptr;
+  std::shared_ptr<Reader<Chassis>> chassis_reader_ = nullptr;
 };
 
 }  // namespace gnss

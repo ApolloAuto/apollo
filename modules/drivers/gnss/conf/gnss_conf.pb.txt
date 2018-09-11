@@ -63,6 +63,7 @@ stream_channel_name: "/apollo/sensor/gnss/stream_status"
 rawimu_channel_name: "/apollo/sensor/gnss/imu"
 gps_channel_name: "/apollo/sensor/gnss/odometry"
 bestpos_channel_name: "/apollo/sensor/gnss/best_pose"
+chassis_channel_name: "/apollo/canbus/chassis"
 
 #########################################################################
 # notice: only for debug, won't configure device through driver online!!!
