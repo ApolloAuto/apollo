@@ -6,7 +6,7 @@ target_link_libraries(time_test
   gtest
 )
 
-add_executable(duration_test time_test.cpp)
+add_executable(duration_test duration_test.cpp)
 target_link_libraries(duration_test
   cybertron
   gtest

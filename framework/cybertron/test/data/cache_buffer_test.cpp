@@ -18,13 +18,14 @@ TEST(CacheBufferTest, cache_buffer_test) {
   EXPECT_EQ(30, buffer.Size());
   EXPECT_EQ(0, buffer.Head());
   EXPECT_EQ(30, buffer.Tail());
-  EXPECT_EQ(1, buffer.Front());
   EXPECT_EQ(29, buffer.Back());
-  EXPECT_EQ(1, buffer[0]);
+  EXPECT_EQ(0, buffer[1]);
   EXPECT_EQ(15, buffer.at(16));
   buffer.Fill(31);
   EXPECT_TRUE(buffer.Full());
   EXPECT_EQ(31, buffer.Size());
+  buffer.Fill(32);
+  EXPECT_EQ(0, buffer.Front());
   auto& rw_lock = buffer.RWLock();
   CacheBuffer<int, 32> buffer1(std::move(buffer));
 }
