@@ -105,7 +105,16 @@ function generate_build_targets() {
   else
     info 'Skip building perception module!'
     # BUILD_TARGETS=`bazel query //... except //modules/perception/... except //modules/calibration/lidar_ex_checker/...`
-    BUILD_TARGETS=`bazel query //modules/example/...`
+    BUILD_TARGETS="
+      //modules/example/...
+      //modules/routing/...
+      //modules/common/proto/...
+      //modules/control/proto/...
+      //modules/localization/proto/...
+      //modules/perception/proto/...
+      //modules/planning/proto/...
+      //modules/prediction/proto/...
+    "
   fi
 
   if [ $? -ne 0 ]; then
@@ -786,7 +795,7 @@ function main() {
       if [ "$1" == "opt" ]; then
         shift
         apollo_build_opt $@
-      elif [ "$1" == "dbg" ]; then
+      else
         shift
         apollo_build_dbg $@
       fi
