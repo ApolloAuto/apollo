@@ -55,7 +55,7 @@ PbfTrack::MotionFusionMethod PbfTrack::s_motion_fusion_method_ =
 
 // bba manager ptr
 const BBAManager *PbfTrack::_s_classify_manager_ptr =
-    &BBAManager::instance("classify");
+    &BBAManager::Instance("classify");
 
 std::map<SensorType, double> PbfTrack::_s_sensor_factors = {{VELODYNE_64, 0.5},
                                                             {CAMERA, 0.95}};
@@ -608,7 +608,7 @@ void PbfTrack::PerformClassFusion(std::shared_ptr<PbfSensorObject> obj) {
 }
 
 void PbfTrack::DecideObjectType() {
-  const DSTInitiator &dst_initiator = DSTInitiator::instance();
+  const DSTInitiator &dst_initiator = DSTInitiator::Instance();
   const BBAManager &classify_manager = *_s_classify_manager_ptr;
   const std::vector<double> &fused_bba_vec = _fused_bba.get_bba_vec();
   auto max_iter = std::max_element(fused_bba_vec.begin(), fused_bba_vec.end());
@@ -624,7 +624,7 @@ void PbfTrack::DecideObjectType() {
 
 BBA PbfTrack::TypeProbsToBba(const std::vector<float> &type_probs) {
   const auto &classify_manager = *_s_classify_manager_ptr;
-  const auto &dst_initiator = DSTInitiator::instance();
+  const auto &dst_initiator = DSTInitiator::Instance();
   CHECK(classify_manager.initialized());
   BBA res_bba(&classify_manager);
   double type_probs_sum =

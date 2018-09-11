@@ -127,7 +127,7 @@ bool FrontVehicle::ProcessSidePass(
     }
     case SidePassStatus::DRIVE: {
       constexpr double kAdcStopSpeedThreshold = 0.1;  // unit: m/s
-      const auto& adc_planning_point = EgoInfo::instance()->start_point();
+      const auto& adc_planning_point = EgoInfo::Instance()->start_point();
       if (!passable_obstacle_id.empty() &&
           adc_planning_point.v() < kAdcStopSpeedThreshold) {
         sidepass_status->set_status(SidePassStatus::WAIT);

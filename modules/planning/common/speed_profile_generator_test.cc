@@ -46,7 +46,7 @@ TEST_F(SpeedProfileGeneratorTest, GenerateFallbackSpeedProfile) {
   common::VehicleState vs;
   const std::vector<const Obstacle*> obstacles;
 
-  EgoInfo::instance()->Update(adc_planning_point, vs, obstacles);
+  EgoInfo::Instance()->Update(adc_planning_point, vs, obstacles);
   auto speed_data2 = spg_.GenerateFallbackSpeedProfile();
   EXPECT_FALSE(speed_data2.Empty());
 }

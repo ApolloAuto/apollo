@@ -49,7 +49,7 @@ ErrorCode GemController::Init(
     return ErrorCode::CANBUS_ERROR;
   }
   vehicle_params_.CopyFrom(
-      common::VehicleConfigHelper::instance()->GetConfig().vehicle_param());
+      common::VehicleConfigHelper::Instance()->GetConfig().vehicle_param());
   params_.CopyFrom(params);
   if (!params_.has_driving_mode()) {
     AERROR << "Vehicle conf pb not set driving_mode.";

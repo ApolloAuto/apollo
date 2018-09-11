@@ -58,7 +58,7 @@ bool CollisionChecker::InCollision(
   CHECK_LE(discretized_trajectory.NumOfPoints(),
            predicted_bounding_rectangles_.size());
   const auto& vehicle_config =
-      common::VehicleConfigHelper::instance()->GetConfig();
+      common::VehicleConfigHelper::Instance()->GetConfig();
   double ego_length = vehicle_config.vehicle_param().length();
   double ego_width = vehicle_config.vehicle_param().width();
 

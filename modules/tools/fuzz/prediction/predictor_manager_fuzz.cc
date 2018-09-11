@@ -58,15 +58,15 @@ void PredictorManagerFuzz::target(PerceptionObstacles obstacles) {
   EXPECT_TRUE(ret_load_conf);
   EXPECT_TRUE(adapter_conf_.IsInitialized());
 
-  ContainerManager::instance()->Init(adapter_conf_);
-  EvaluatorManager::instance()->Init(prediction_conf_);
-  PredictorManager::instance()->Init(prediction_conf_);
+  ContainerManager::Instance()->Init(adapter_conf_);
+  EvaluatorManager::Instance()->Init(prediction_conf_);
+  PredictorManager::Instance()->Init(prediction_conf_);
 
-  EvaluatorManager::instance()->Run(obstacles);
-  PredictorManager::instance()->Run(obstacles);
+  EvaluatorManager::Instance()->Run(obstacles);
+  PredictorManager::Instance()->Run(obstacles);
 
   const PredictionObstacles& prediction_obstacles =
-      PredictorManager::instance()->prediction_obstacles();
+      PredictorManager::Instance()->prediction_obstacles();
 }
 
 }  // namespace prediction

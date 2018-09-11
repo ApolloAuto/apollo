@@ -32,7 +32,7 @@ double GetADCStopDeceleration(ReferenceLineInfo* const reference_line_info,
                               const double stop_line_s,
                               const double min_pass_s_distance) {
   double adc_speed =
-      common::VehicleStateProvider::instance()->linear_velocity();
+      common::VehicleStateProvider::Instance()->linear_velocity();
   if (adc_speed < FLAGS_max_stop_speed) {
     return 0.0;
   }

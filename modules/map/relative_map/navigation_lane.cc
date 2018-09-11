@@ -63,7 +63,7 @@ bool NavigationLane::GeneratePath() {
   current_navi_path_tuple_ = std::make_tuple(-1, -1.0, -1.0, nullptr);
 
   // original_pose is in world coordination: ENU
-  original_pose_ = VehicleStateProvider::instance()->original_pose();
+  original_pose_ = VehicleStateProvider::Instance()->original_pose();
 
   int navigation_line_num = navigation_info_.navigation_path_size();
   const auto &lane_marker = perception_obstacles_.lane_marker();
@@ -563,7 +563,7 @@ void NavigationLane::ConvertLaneMarkerToPath(
                    quality_divider;
 
   const double current_speed =
-      VehicleStateProvider::instance()->vehicle_state().linear_velocity();
+      VehicleStateProvider::Instance()->vehicle_state().linear_velocity();
   double path_range = current_speed * FLAGS_ratio_navigation_lane_len_to_speed;
   if (path_range <= FLAGS_min_len_for_navigation_lane) {
     path_range = FLAGS_min_len_for_navigation_lane;

@@ -1121,9 +1121,9 @@ void Obstacle::GetRNNStates(std::vector<Eigen::MatrixXf>* rnn_states) {
 }
 
 void Obstacle::InitRNNStates() {
-  if (network::RnnModel::instance()->IsOk()) {
-    network::RnnModel::instance()->ResetState();
-    network::RnnModel::instance()->State(&rnn_states_);
+  if (network::RnnModel::Instance()->IsOk()) {
+    network::RnnModel::Instance()->ResetState();
+    network::RnnModel::Instance()->State(&rnn_states_);
     rnn_enabled_ = true;
     ADEBUG << "Success to initialize rnn model.";
   } else {

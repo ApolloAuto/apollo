@@ -366,7 +366,7 @@ Status NaviSpeedDecider::AddObstaclesConstraints(
     const std::vector<PathPoint>& path_points,
     const std::vector<const Obstacle*>& obstacles,
     const std::function<const Obstacle*(const std::string&)>& find_obstacle) {
-  const auto& vehicle_config = VehicleConfigHelper::instance()->GetConfig();
+  const auto& vehicle_config = VehicleConfigHelper::Instance()->GetConfig();
   auto front_edge_to_center =
       vehicle_config.vehicle_param().front_edge_to_center();
   auto get_obstacle_distance = [&](double d) -> double {

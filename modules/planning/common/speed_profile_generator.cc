@@ -39,7 +39,7 @@ std::vector<SpeedPoint> SpeedProfileGenerator::GenerateInitSpeedProfile(
     const TrajectoryPoint& planning_init_point,
     const ReferenceLineInfo* reference_line_info) const {
   std::vector<SpeedPoint> speed_profile;
-  const auto* last_frame = FrameHistory::instance()->Latest();
+  const auto* last_frame = FrameHistory::Instance()->Latest();
   if (!last_frame) {
     AWARN << "last frame is empty";
     return speed_profile;
@@ -123,8 +123,8 @@ std::vector<SpeedPoint> SpeedProfileGenerator::GenerateSpeedHotStart(
 }
 
 SpeedData SpeedProfileGenerator::GenerateFallbackSpeedProfile() {
-  const double init_v = EgoInfo::instance()->start_point().v();
-  const double init_a = EgoInfo::instance()->start_point().a();
+  const double init_v = EgoInfo::Instance()->start_point().v();
+  const double init_a = EgoInfo::Instance()->start_point().a();
   if (init_v > FLAGS_polynomial_speed_fallback_velocity) {
     return GenerateStopProfileFromPolynomial(init_v, init_a);
   } else {
@@ -167,7 +167,7 @@ SpeedData SpeedProfileGenerator::GenerateStopProfileFromPolynomial(
   constexpr double kMaxT = 4.0;
   for (double t = 2.0; t <= kMaxT; t += 0.5) {
     for (double s = 0.0;
-         s < std::min(50.0, EgoInfo::instance()->front_clear_distance() - 0.3);
+         s < std::min(50.0, EgoInfo::Instance()->front_clear_distance() - 0.3);
          s += 1.0) {
       QuinticPolynomialCurve1d curve(0.0, init_speed, init_acc, s, 0.0, 0.0, t);
       if (!IsValidProfile(curve)) {

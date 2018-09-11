@@ -38,9 +38,9 @@ using apollo::planning::ADCTrajectory;
 class FeatureExtractorTest : public KMLMapBasedTest {};
 
 TEST_F(FeatureExtractorTest, junction) {
-  ContainerManager::instance()->RegisterContainers();
+  ContainerManager::Instance()->RegisterContainers();
   std::unique_ptr<Container> adc_traj_container =
-      ContainerManager::instance()->CreateContainer(
+      ContainerManager::Instance()->CreateContainer(
           AdapterConfig::PLANNING_TRAJECTORY);
   FeatureExtractor feature_extractor;
   feature_extractor.ExtractFrontJunctionFeatures();

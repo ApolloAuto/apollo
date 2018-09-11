@@ -32,7 +32,7 @@ namespace perception {
 using apollo::common::util::GetProtoFromFile;
 
 bool AsyncFusion::Init() {
-  track_manager_ = PbfTrackManager::instance();
+  track_manager_ = PbfTrackManager::Instance();
   CHECK_NOTNULL(track_manager_);
 
   if (!GetProtoFromFile(FLAGS_async_fusion_config, &config_)) {

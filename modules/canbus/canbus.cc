@@ -51,7 +51,7 @@ Status Canbus::Init() {
   ADEBUG << "Canbus_conf:" << canbus_conf_.ShortDebugString();
 
   // Init can client
-  auto *can_factory = CanClientFactory::instance();
+  auto *can_factory = CanClientFactory::Instance();
   can_factory->RegisterCanClients();
   can_client_ = can_factory->CreateCANClient(canbus_conf_.can_card_parameter());
   if (!can_client_) {

@@ -114,7 +114,7 @@ void LonControllerFuzzer::target(planning::ADCTrajectory trajectory_pb) {
   double time_now = Clock::NowInSeconds();
   trajectory_pb.mutable_header()->set_timestamp_sec(time_now);
 
-  auto *vehicle_state = VehicleStateProvider::instance();
+  auto *vehicle_state = VehicleStateProvider::Instance();
   vehicle_state->Update(localization_pb, chassis_pb);
   TrajectoryAnalyzer trajectory_analyzer(&trajectory_pb);
 

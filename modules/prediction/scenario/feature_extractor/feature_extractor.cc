@@ -36,11 +36,11 @@ namespace prediction {
 
 FeatureExtractor::FeatureExtractor() {
   ego_trajectory_containter_ = dynamic_cast<ADCTrajectoryContainer*>(
-      ContainerManager::instance()->GetContainer(
+      ContainerManager::Instance()->GetContainer(
           AdapterConfig::PLANNING_TRAJECTORY));
 
   pose_container_ = dynamic_cast<PoseContainer*>(
-      ContainerManager::instance()->GetContainer(
+      ContainerManager::Instance()->GetContainer(
           AdapterConfig::LOCALIZATION));
 }
 

@@ -36,10 +36,10 @@ ProbabilisticFusion::~ProbabilisticFusion() {
 }
 
 bool ProbabilisticFusion::Init() {
-  sensor_manager_ = PbfSensorManager::instance();
+  sensor_manager_ = PbfSensorManager::Instance();
   ACHECK(sensor_manager_ != nullptr)
       << "Failed to get PbfSensorManager instance";
-  track_manager_ = PbfTrackManager::instance();
+  track_manager_ = PbfTrackManager::Instance();
   ACHECK(track_manager_ != nullptr) << "Failed to get PbfTrackManager instance";
 
   CHECK(GetProtoFromFile(FLAGS_probabilistic_fusion_config_file, &config_));
@@ -77,7 +77,7 @@ bool ProbabilisticFusion::Init() {
 
   // add camera front narrow intrinsic if have
   // initialize BBAManager
-  if (!DSTInitiator::instance().initialize_bba_manager()) {
+  if (!DSTInitiator::Instance().initialize_bba_manager()) {
     AERROR << "failed to initialize BBAManager!";
     return false;
   }

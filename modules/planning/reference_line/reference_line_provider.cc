@@ -299,7 +299,7 @@ bool ReferenceLineProvider::GetReferenceLinesFromRelativeMap(
   }
   // get curent adc lane info by vehicle state
   common::VehicleState vehicle_state =
-      common::VehicleStateProvider::instance()->vehicle_state();
+      common::VehicleStateProvider::Instance()->vehicle_state();
   hdmap::LaneWaypoint adc_lane_way_point;
   if (!GetNearestWayPointFromNavigationPath(vehicle_state, navigation_lane_ids,
                                             &adc_lane_way_point)) {

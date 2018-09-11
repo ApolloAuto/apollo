@@ -29,7 +29,7 @@ namespace perception {
 
 TEST(HDMapInputTest, test_GetROI) {
   HdmapStructPtr hdmap;
-  auto* hdmap_input = HDMapInput::instance();
+  auto* hdmap_input = HDMapInput::Instance();
   pcl_util::PointD velodyne_pose_world = {587054.96336391149,
                                           4141606.3593586856, 0.0};
   EXPECT_FALSE(

@@ -508,7 +508,7 @@ Status QpSplineStGraph::GetSConstraintByTime(
 }
 
 const SpeedData QpSplineStGraph::GetHistorySpeed() const {
-  const auto* last_frame = FrameHistory::instance()->Latest();
+  const auto* last_frame = FrameHistory::Instance()->Latest();
   if (!last_frame) {
     AWARN << "last frame is empty";
     return SpeedData();

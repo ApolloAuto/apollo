@@ -323,7 +323,7 @@ void NaviPlanning::RunOnce() {
   ADEBUG << "Get chassis:" << chassis.DebugString();
 
   Status status =
-      VehicleStateProvider::instance()->Update(localization, chassis);
+      VehicleStateProvider::Instance()->Update(localization, chassis);
 
   auto vehicle_config = ComputeVehicleConfigFromLocalization(localization);
 
@@ -345,7 +345,7 @@ void NaviPlanning::RunOnce() {
   last_vehicle_config_ = vehicle_config;
 
   VehicleState vehicle_state =
-      VehicleStateProvider::instance()->vehicle_state();
+      VehicleStateProvider::Instance()->vehicle_state();
 
   // estimate (x, y) at current timestamp
   // This estimate is only valid if the current time and vehicle state timestamp
@@ -354,7 +354,7 @@ void NaviPlanning::RunOnce() {
   DCHECK_GE(start_timestamp, vehicle_state.timestamp());
   if (FLAGS_estimate_current_vehicle_state &&
       start_timestamp - vehicle_state.timestamp() < 0.020) {
-    auto future_xy = VehicleStateProvider::instance()->EstimateFuturePosition(
+    auto future_xy = VehicleStateProvider::Instance()->EstimateFuturePosition(
         start_timestamp - vehicle_state.timestamp());
     vehicle_state.set_x(future_xy.x());
     vehicle_state.set_y(future_xy.y());
@@ -393,7 +393,7 @@ void NaviPlanning::RunOnce() {
     return;
   }
 
-  EgoInfo::instance()->Update(stitching_trajectory.back(), vehicle_state,
+  EgoInfo::Instance()->Update(stitching_trajectory.back(), vehicle_state,
                               frame_->obstacles());
 
   auto* trajectory_pb = frame_->mutable_trajectory();
@@ -425,7 +425,7 @@ void NaviPlanning::RunOnce() {
     }
 
     auto seq_num = frame_->SequenceNum();
-    FrameHistory::instance()->Add(seq_num, std::move(frame_));
+    FrameHistory::Instance()->Add(seq_num, std::move(frame_));
 
     return;
   }
@@ -482,13 +482,13 @@ void NaviPlanning::RunOnce() {
   ADEBUG << "Planning pb:" << trajectory_pb->header().DebugString();
 
   auto seq_num = frame_->SequenceNum();
-  FrameHistory::instance()->Add(seq_num, std::move(frame_));
+  FrameHistory::Instance()->Add(seq_num, std::move(frame_));
 }
 
 void NaviPlanning::SetFallbackTrajectory(ADCTrajectory* trajectory_pb) {
   CHECK_NOTNULL(trajectory_pb);
 
-  const double v = VehicleStateProvider::instance()->linear_velocity();
+  const double v = VehicleStateProvider::Instance()->linear_velocity();
   for (double t = 0.0; t < FLAGS_navigation_fallback_cruise_time; t += 0.1) {
     const double s = t * v;
 
@@ -617,7 +617,7 @@ void NaviPlanning::Stop() {
   last_publishable_trajectory_.reset(nullptr);
   frame_.reset(nullptr);
   planner_.reset(nullptr);
-  FrameHistory::instance()->Clear();
+  FrameHistory::Instance()->Clear();
   GetPlanningStatus()->Clear();
 }
 

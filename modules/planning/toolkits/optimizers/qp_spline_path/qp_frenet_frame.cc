@@ -52,7 +52,7 @@ QpFrenetFrame::QpFrenetFrame(const ReferenceLine& reference_line,
     : reference_line_(reference_line),
       speed_data_(speed_data),
       vehicle_param_(
-          common::VehicleConfigHelper::instance()->GetConfig().vehicle_param()),
+          common::VehicleConfigHelper::Instance()->GetConfig().vehicle_param()),
       init_frenet_point_(init_frenet_point),
       feasible_longitudinal_upper_bound_(reference_line_.map_path().length()),
       start_s_(init_frenet_point.s()),

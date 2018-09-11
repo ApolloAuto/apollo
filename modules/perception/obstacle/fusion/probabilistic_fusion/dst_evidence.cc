@@ -165,7 +165,7 @@ void BBAManager::build_names_map(
 BBA::BBA(const BBAManager* bba_manager_ptr) {
   _bba_manager_ptr = bba_manager_ptr;
   if (_bba_manager_ptr == nullptr) {
-    _bba_manager_ptr = &BBAManager::instance();
+    _bba_manager_ptr = &BBAManager::Instance();
   }
   if (!_bba_manager_ptr->initialized()) {
     // LOG_WARN << "create a BBA before BBAManager initialization";

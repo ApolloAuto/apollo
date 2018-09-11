@@ -45,7 +45,7 @@ class DSTInitiator {
     UNKNOWN = (PEDESTRIAN | BICYCLE | VEHICLE | OTHERS)
   };
 
-  static DSTInitiator& instance() {
+  static DSTInitiator& Instance() {
     static DSTInitiator dst_initiator;
     return dst_initiator;
   }
@@ -76,7 +76,7 @@ class DSTInitiator {
     return find_res->second;
   }
   bool initialize_bba_manager() const {
-    if (!BBAManager::instance(_classify_manager_name)
+    if (!BBAManager::Instance(_classify_manager_name)
              .init(_fod_subsets, _subset_names)) {
       return false;
     }

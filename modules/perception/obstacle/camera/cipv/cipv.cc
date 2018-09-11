@@ -26,7 +26,7 @@ namespace perception {
 
 Cipv::Cipv(void)
     : vehicle_param_(
-          common::VehicleConfigHelper::instance()->GetConfig().vehicle_param()),
+          common::VehicleConfigHelper::Instance()->GetConfig().vehicle_param()),
       EGO_CAR_WIDTH_METER(vehicle_param_.width()),
       EGO_CAR_LENGTH_METER(vehicle_param_.length()),
       EGO_CAR_MARGIN_METER(0.5f),
@@ -46,7 +46,7 @@ bool Cipv::Init() {
                      // -x: specific debugging, where x is the specific number
   time_unit_ = AVERAGE_FRATE_RATE;
   vehicle_param_ =
-      common::VehicleConfigHelper::instance()->GetConfig().vehicle_param();
+      common::VehicleConfigHelper::Instance()->GetConfig().vehicle_param();
   return true;
 }
 

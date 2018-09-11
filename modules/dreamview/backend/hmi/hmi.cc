@@ -56,12 +56,12 @@ void HMI::RegisterMessageHandlers() {
   // Send current config and status to new HMI client.
   websocket_->RegisterConnectionReadyHandler(
       [this](WebSocketHandler::Connection *conn) {
-        const auto &config = HMIWorker::instance()->GetConfig();
+        const auto &config = HMIWorker::Instance()->GetConfig();
         websocket_->SendData(
             conn, JsonUtil::ProtoToTypedJson("HMIConfig", config).dump());
         websocket_->SendData(
             conn, JsonUtil::ProtoToTypedJson("HMIStatus",
-                                             HMIWorker::instance()->GetStatus())
+                                             HMIWorker::Instance()->GetStatus())
                       .dump());
 
         SendVehicleParam(conn);
@@ -93,7 +93,7 @@ void HMI::RegisterMessageHandlers() {
         std::string command;
         if (JsonUtil::GetStringFromJson(json, "module", &module) &&
             JsonUtil::GetStringFromJson(json, "command", &command)) {
-          HMIWorker::instance()->RunModuleCommand(module, command);
+          HMIWorker::Instance()->RunModuleCommand(module, command);
         } else {
           AERROR << "Truncated module command.";
         }
@@ -108,7 +108,7 @@ void HMI::RegisterMessageHandlers() {
         std::string command;
         if (JsonUtil::GetStringFromJson(json, "tool", &tool) &&
             JsonUtil::GetStringFromJson(json, "command", &command)) {
-          HMIWorker::instance()->RunToolCommand(tool, command);
+          HMIWorker::Instance()->RunToolCommand(tool, command);
         } else {
           AERROR << "Truncated tool command.";
         }
@@ -122,7 +122,7 @@ void HMI::RegisterMessageHandlers() {
         // Supported commands are: "start", "stop".
         std::string command;
         if (JsonUtil::GetStringFromJson(json, "command", &command)) {
-          HMIWorker::instance()->RunModeCommand(command);
+          HMIWorker::Instance()->RunModeCommand(command);
         } else {
           AERROR << "Truncated mode command.";
         }
@@ -149,7 +149,7 @@ void HMI::RegisterMessageHandlers() {
       });
 
   // HMI client asks for changing map.
-  HMIWorker::instance()->RegisterChangeMapHandler(
+  HMIWorker::Instance()->RegisterChangeMapHandler(
       [this](const std::string &new_map) {
         // Reload simulation map after changing map.
         CHECK(map_service_->ReloadMap(true))
@@ -164,14 +164,14 @@ void HMI::RegisterMessageHandlers() {
         // MapName should be a key of config_.available_maps.
         std::string new_map;
         if (JsonUtil::GetStringFromJson(json, "new_map", &new_map)) {
-          HMIWorker::instance()->ChangeToMap(new_map);
+          HMIWorker::Instance()->ChangeToMap(new_map);
         } else {
           AERROR << "Truncated ChangeMap request.";
         }
       });
 
   // HMI client asks for changing vehicle.
-  HMIWorker::instance()->RegisterChangeVehicleHandler(
+  HMIWorker::Instance()->RegisterChangeVehicleHandler(
       [this](const std::string &new_vehicle) {
         // Broadcast new HMIStatus and VehicleParam.
         DeferredBroadcastHMIStatus();
@@ -184,14 +184,14 @@ void HMI::RegisterMessageHandlers() {
         // VehicleName should be a key of config_.available_vehicles.
         std::string new_vehicle;
         if (JsonUtil::GetStringFromJson(json, "new_vehicle", &new_vehicle)) {
-          HMIWorker::instance()->ChangeToVehicle(new_vehicle);
+          HMIWorker::Instance()->ChangeToVehicle(new_vehicle);
         } else {
           AERROR << "Truncated ChangeVehicle request.";
         }
       });
 
   // HMI client asks for changing mode.
-  HMIWorker::instance()->RegisterChangeModeHandler(
+  HMIWorker::Instance()->RegisterChangeModeHandler(
       [this](const std::string &new_mode) {
         // Broadcast new HMIStatus.
         DeferredBroadcastHMIStatus();
@@ -203,7 +203,7 @@ void HMI::RegisterMessageHandlers() {
         // ModeName should be a key of config_.modes.
         std::string new_mode;
         if (JsonUtil::GetStringFromJson(json, "new_mode", &new_mode)) {
-          HMIWorker::instance()->ChangeToMode(new_mode);
+          HMIWorker::Instance()->ChangeToMode(new_mode);
         } else {
           AERROR << "Truncated ChangeMode request.";
         }
@@ -236,7 +236,7 @@ void HMI::RegisterMessageHandlers() {
       [this](const monitor::SystemStatus &system_status) {
         if (Clock::NowInSeconds() - system_status.header().timestamp_sec() <
             FLAGS_system_status_lifetime_seconds) {
-          HMIWorker::instance()->UpdateSystemStatus(system_status);
+          HMIWorker::Instance()->UpdateSystemStatus(system_status);
           DeferredBroadcastHMIStatus();
         }
       });
@@ -246,8 +246,8 @@ void HMI::RegisterMessageHandlers() {
     if (Clock::NowInSeconds() - chassis.header().timestamp_sec() <
         FLAGS_system_status_lifetime_seconds) {
       if (chassis.signal().high_beam()) {
-        const bool ret = HMIWorker::instance()->Trigger(
-            HMIWorker::instance()->GetConfig().chassis_high_beam_action());
+        const bool ret = HMIWorker::Instance()->Trigger(
+            HMIWorker::Instance()->GetConfig().chassis_high_beam_action());
         AERROR_IF(!ret) << "Failed to execute high_beam action.";
       }
     }
@@ -271,7 +271,7 @@ void HMI::StartBroadcastHMIStatusThread() {
       }
 
       // Get a copy of status.
-      const auto status = HMIWorker::instance()->GetStatus();
+      const auto status = HMIWorker::Instance()->GetStatus();
       websocket_->BroadcastData(
           JsonUtil::ProtoToTypedJson("HMIStatus", status).dump());
 

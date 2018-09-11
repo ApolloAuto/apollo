@@ -25,7 +25,7 @@ namespace drivers {
 namespace canbus {
 
 TEST(CanClientFactoryTest, CreateCanClient) {
-  auto *can_factory = CanClientFactory::instance();
+  auto *can_factory = CanClientFactory::Instance();
   EXPECT_TRUE(can_factory != nullptr);
 
   can_factory->RegisterCanClients();

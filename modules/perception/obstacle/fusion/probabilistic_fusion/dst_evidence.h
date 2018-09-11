@@ -37,7 +37,7 @@ class BBA;
 // intersection.
 class BBAManager {
  public:
-  static BBAManager& instance(const std::string manager_name = "default") {
+  static BBAManager& Instance(const std::string manager_name = "default") {
     static std::map<std::string, std::shared_ptr<BBAManager>> bba_managers_ptrs;
     std::shared_ptr<BBAManager>& manager_ptr = bba_managers_ptrs[manager_name];
     if (manager_ptr == nullptr) {

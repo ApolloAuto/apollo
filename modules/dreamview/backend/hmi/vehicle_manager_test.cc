@@ -41,13 +41,13 @@ class VehicleManagerTest : public ::testing::Test {
 };
 
 TEST_F(VehicleManagerTest, Failure) {
-  EXPECT_FALSE(VehicleManager::instance()->UseVehicle("/somewhere/bad"));
+  EXPECT_FALSE(VehicleManager::Instance()->UseVehicle("/somewhere/bad"));
 }
 
 TEST_F(VehicleManagerTest, Success) {
   ASSERT_TRUE(apollo::common::util::EnsureDirectory(kTargetDir));
 
-  EXPECT_TRUE(VehicleManager::instance()->UseVehicle(kTestVehicle));
+  EXPECT_TRUE(VehicleManager::Instance()->UseVehicle(kTestVehicle));
   EXPECT_TRUE(apollo::common::util::PathExists(
       StrCat(kTargetDir, "/vehicle_data.pb.txt")));
 

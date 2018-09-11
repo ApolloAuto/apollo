@@ -181,7 +181,7 @@ class NaviObstacleDecider : public NaviTask {
 };
 
 inline const apollo::common::VehicleParam &NaviObstacleDecider::VehicleParam() {
-  const auto &vehicle_param = apollo::common::VehicleConfigHelper::instance()
+  const auto &vehicle_param = apollo::common::VehicleConfigHelper::Instance()
                                   ->GetConfig()
                                   .vehicle_param();
   return vehicle_param;

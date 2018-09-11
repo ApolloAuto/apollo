@@ -61,21 +61,21 @@ TEST_F(PredictorManagerTest, General) {
   EXPECT_TRUE(ret_load_conf);
   EXPECT_TRUE(adapter_conf_.IsInitialized());
 
-  ContainerManager::instance()->Init(adapter_conf_);
-  EvaluatorManager::instance()->Init(prediction_conf_);
-  PredictorManager::instance()->Init(prediction_conf_);
+  ContainerManager::Instance()->Init(adapter_conf_);
+  EvaluatorManager::Instance()->Init(prediction_conf_);
+  PredictorManager::Instance()->Init(prediction_conf_);
 
   ObstaclesContainer* obstacles_container = dynamic_cast<ObstaclesContainer*>(
-      ContainerManager::instance()->GetContainer(
+      ContainerManager::Instance()->GetContainer(
           AdapterConfig::PERCEPTION_OBSTACLES));
   CHECK_NOTNULL(obstacles_container);
   obstacles_container->Insert(perception_obstacles_);
 
-  EvaluatorManager::instance()->Run(perception_obstacles_);
-  PredictorManager::instance()->Run(perception_obstacles_);
+  EvaluatorManager::Instance()->Run(perception_obstacles_);
+  PredictorManager::Instance()->Run(perception_obstacles_);
 
   const PredictionObstacles& prediction_obstacles =
-      PredictorManager::instance()->prediction_obstacles();
+      PredictorManager::Instance()->prediction_obstacles();
   EXPECT_EQ(prediction_obstacles.prediction_obstacle_size(), 1);
 }
 

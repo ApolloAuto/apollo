@@ -94,7 +94,7 @@ bool TLPreprocessorSubnode::InitPreprocessor() {
 }
 
 bool TLPreprocessorSubnode::InitHdmap() {
-  hd_map_ = HDMapInput::instance();
+  hd_map_ = HDMapInput::Instance();
   if (hd_map_ == nullptr) {
     AERROR << "TLPreprocessorSubnode get hdmap failed.";
     return false;

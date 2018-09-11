@@ -3,6 +3,19 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
+    name = "planning_component_lib",
+    srcs = ["planning_component.cc"],
+    hdrs = ["planning_component.h"],
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
+    deps = [
+        "//framework:cybertron",
+        "//modules/localization/proto:localization_proto",
+        "//modules/perception/proto:perception_proto",
+        "//modules/prediction/proto:prediction_proto",
+    ],
+)
+
+cc_library(
     name = "planning_lib",
     srcs = [
         "navi_planning.cc",

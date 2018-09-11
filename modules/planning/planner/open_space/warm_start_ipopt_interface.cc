@@ -45,7 +45,7 @@ WarmStartIPOPTInterface::WarmStartIPOPTInterface(
       xf_(xf),
       XYbounds_(XYbounds) {
   /*
-const auto& wheelbase_ = common::VehicleConfigHelper::instance()
+const auto& wheelbase_ = common::VehicleConfigHelper::Instance()
 ->GetConfig().vehicle_param().wheel_base();
 */
   state_result_(horizon_ + 1, 4);

@@ -58,15 +58,15 @@ TEST_F(EvaluatorManagerTest, General) {
   EXPECT_TRUE(ret_load_conf);
   EXPECT_TRUE(adapter_conf_.IsInitialized());
 
-  ContainerManager::instance()->Init(adapter_conf_);
+  ContainerManager::Instance()->Init(adapter_conf_);
   ObstaclesContainer* obstacles_container = dynamic_cast<ObstaclesContainer*>(
-      ContainerManager::instance()->GetContainer(
+      ContainerManager::Instance()->GetContainer(
           AdapterConfig::PERCEPTION_OBSTACLES));
   CHECK_NOTNULL(obstacles_container);
   obstacles_container->Insert(perception_obstacles_);
 
-  EvaluatorManager::instance()->Init(prediction_conf_);
-  EvaluatorManager::instance()->Run(perception_obstacles_);
+  EvaluatorManager::Instance()->Init(prediction_conf_);
+  EvaluatorManager::Instance()->Run(perception_obstacles_);
 
   Obstacle* obstacle_ptr = obstacles_container->GetObstacle(1);
   EXPECT_TRUE(obstacle_ptr != nullptr);

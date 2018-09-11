@@ -302,7 +302,7 @@ Status LaneFollowScenario::PlanOnReferenceLine(
 
 void LaneFollowScenario::GenerateFallbackPathProfile(
     const ReferenceLineInfo* reference_line_info, PathData* path_data) {
-  auto adc_point = EgoInfo::instance()->start_point();
+  auto adc_point = EgoInfo::Instance()->start_point();
   double adc_s = reference_line_info->AdcSlBoundary().end_s();
   const double max_s = 150.0;
   const double unit_s = 1.0;

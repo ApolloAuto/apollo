@@ -120,7 +120,7 @@ ComparableCost TrajectoryCost::CalculatePathCost(
   };
 
   const auto &vehicle_config =
-      common::VehicleConfigHelper::instance()->GetConfig();
+      common::VehicleConfigHelper::Instance()->GetConfig();
   const float width = vehicle_config.vehicle_param().width();
 
   for (float curve_s = 0.0; curve_s < (end_s - start_s);
@@ -208,7 +208,7 @@ ComparableCost TrajectoryCost::CalculateDynamicObstacleCost(
 ComparableCost TrajectoryCost::GetCostFromObsSL(
     const float adc_s, const float adc_l, const SLBoundary &obs_sl_boundary) {
   const auto &vehicle_param =
-      common::VehicleConfigHelper::instance()->GetConfig().vehicle_param();
+      common::VehicleConfigHelper::Instance()->GetConfig().vehicle_param();
 
   ComparableCost obstacle_cost;
 

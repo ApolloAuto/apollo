@@ -136,10 +136,10 @@ void OpenSpacePlanning::RunOnce() {
   ADEBUG << "Get chassis:" << chassis.DebugString();
 
   Status status =
-      VehicleStateProvider::instance()->Update(localization, chassis);
+      VehicleStateProvider::Instance()->Update(localization, chassis);
 
   VehicleState vehicle_state =
-      VehicleStateProvider::instance()->vehicle_state();
+      VehicleStateProvider::Instance()->vehicle_state();
 
   // estimate (x, y) at current timestamp
   // This estimate is only valid if the current time and vehicle state timestamp
@@ -148,7 +148,7 @@ void OpenSpacePlanning::RunOnce() {
   DCHECK_GE(start_timestamp, vehicle_state.timestamp());
   if (FLAGS_estimate_current_vehicle_state &&
       start_timestamp - vehicle_state.timestamp() < 0.020) {
-    auto future_xy = VehicleStateProvider::instance()->EstimateFuturePosition(
+    auto future_xy = VehicleStateProvider::Instance()->EstimateFuturePosition(
         start_timestamp - vehicle_state.timestamp());
     vehicle_state.set_x(future_xy.x());
     vehicle_state.set_y(future_xy.y());

@@ -216,8 +216,8 @@ void Crosswalk::MakeDecisions(Frame* const frame,
             const auto obstacle_v = Vec2d(perception_obstacle.velocity().x(),
                                           perception_obstacle.velocity().y());
             const auto adc_path_point =
-                Vec2d(EgoInfo::instance()->start_point().path_point().x(),
-                      EgoInfo::instance()->start_point().path_point().y());
+                Vec2d(EgoInfo::Instance()->start_point().path_point().x(),
+                      EgoInfo::Instance()->start_point().path_point().y());
             const auto ovstacle_position =
                 Vec2d(perception_obstacle.position().x(),
                       perception_obstacle.position().y());

@@ -323,7 +323,7 @@ void HMIWorker::ChangeToVehicle(const std::string &vehicle_name) {
   }
   apollo::common::KVDB::Put("apollo:dreamview:vehicle", vehicle_name);
 
-  CHECK(VehicleManager::instance()->UseVehicle(*vehicle));
+  CHECK(VehicleManager::Instance()->UseVehicle(*vehicle));
   RunModeCommand("stop");
 
   // Trigger registered change vehicle handlers.

@@ -135,7 +135,7 @@ void TrafficDecider::BuildPlanningTarget(
   }
   if (min_s != std::numeric_limits<double>::infinity()) {
     const auto &vehicle_config =
-        common::VehicleConfigHelper::instance()->GetConfig();
+        common::VehicleConfigHelper::Instance()->GetConfig();
     double front_edge_to_center =
         vehicle_config.vehicle_param().front_edge_to_center();
     stop_point.set_s(min_s - front_edge_to_center +
@@ -164,7 +164,7 @@ Status TrafficDecider::Execute(Frame *frame,
            << TrafficRuleConfig::RuleId_Name(rule_config.rule_id());
   }
 
-  // Creeper::instance()->Run(frame, reference_line_info);
+  // Creeper::Instance()->Run(frame, reference_line_info);
 
   BuildPlanningTarget(reference_line_info);
   return Status::OK();
