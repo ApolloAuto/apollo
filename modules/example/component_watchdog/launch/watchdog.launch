@@ -1,0 +1,7 @@
+<cybertron>
+    <module>
+        <name>watchdog</name>
+        <dag_conf>/apollo/modules/example/component_watchdog/dag/watchdog.dag</dag_conf>
+        <process_name></process_name>
+    </module>
+</cybertron>
