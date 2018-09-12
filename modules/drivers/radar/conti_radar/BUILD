@@ -43,6 +43,7 @@ cc_binary(
     name = "libconti_radar.so",
     deps = [":conti_radar_canbus_lib"],
     linkopts = ["-shared"],
+    linkstatic = False,
 )
 
 cpplint()

@@ -6,6 +6,7 @@ cc_binary(
     name = "libvelodyne_driver_component.so",
     deps = [":velodyne_driver_component_lib"],
     linkopts = ["-shared"],
+    linkstatic = False,
 )
 
 cc_library(

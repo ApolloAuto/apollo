@@ -6,6 +6,7 @@ cc_binary(
     name = "libgnss_component.so",
     deps = [":gnss_component_lib"],
     linkopts = ["-shared"],
+    linkstatic = False,
 )
 
 cc_library(

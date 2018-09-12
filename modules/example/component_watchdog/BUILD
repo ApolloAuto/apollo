@@ -6,6 +6,7 @@ cc_binary(
     name = "libwatchdog_component.so",
     deps = [":watchdog_component_lib"],
     linkopts = ["-shared"],
+    linkstatic = False,
 )
 
 cc_library(

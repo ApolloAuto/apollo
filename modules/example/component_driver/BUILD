@@ -6,6 +6,7 @@ cc_binary(
     name = "libdriver_component.so",
     deps = [":driver_component_lib"],
     linkopts = ["-shared"],
+    linkstatic = False,
 )
 
 cc_library(

@@ -6,6 +6,7 @@ cc_binary(
     name = "libperception_component.so",
     deps = [":perception_component_lib"],
     linkopts = ["-shared"],
+    linkstatic = False,
 )
 
 cc_library(

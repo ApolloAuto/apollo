@@ -6,6 +6,7 @@ cc_binary(
     name = "libplanning_component.so",
     deps = [":planning_component_lib"],
     linkopts = ["-shared"],
+    linkstatic = False,
 )
 
 cc_library(
