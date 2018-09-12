@@ -174,7 +174,7 @@ void OpenSpacePlanning::RunOnce() {
 Status OpenSpacePlanning::Plan(
     const double current_time_stamp,
     const std::vector<common::TrajectoryPoint>& stitching_trajectory,
-    ADCTrajectory* trajectory_pb) {
+    ADCTrajectory* const trajectory_pb) {
   return Status::OK();
 }
 

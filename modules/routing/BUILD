@@ -45,15 +45,6 @@ cc_binary(
     linkopts = ["-shared"],
 )
 
-cc_binary(
-    name = "routing",
-    srcs = ["main.cc"],
-    deps = [
-        ":routing_lib",
-        "//external:gflags",
-    ],
-)
-
 filegroup(
     name = "routing_testdata",
     srcs = glob([

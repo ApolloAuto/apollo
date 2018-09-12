@@ -107,7 +107,5 @@ bool Routing::Process(
   return true;
 }
 
-void Routing::Stop() {}
-
 }  // namespace routing
 }  // namespace apollo

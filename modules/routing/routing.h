@@ -32,7 +32,7 @@
 namespace apollo {
 namespace routing {
 
-class Routing : public apollo::common::ApolloApp {
+class Routing {
   // friend class RoutingTestBase;
  public:
   Routing();
@@ -40,24 +40,19 @@ class Routing : public apollo::common::ApolloApp {
   /**
    * @brief module name
    */
-  std::string Name() const override;
+  std::string Name() const;
 
   /**
    * @brief module initialization function
    * @return initialization status
    */
-  apollo::common::Status Init() override;
+  apollo::common::Status Init();
 
   /**
    * @brief module start function
    * @return start status
    */
-  apollo::common::Status Start() override;
-
-  /**
-   * @brief module stop function
-   */
-  void Stop() override;
+  apollo::common::Status Start();
 
   /**
    * @brief destructor

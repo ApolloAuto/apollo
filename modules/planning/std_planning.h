@@ -71,7 +71,7 @@ class StdPlanning : public PlanningBase {
   apollo::common::Status Plan(
       const double current_time_stamp,
       const std::vector<common::TrajectoryPoint>& stitching_trajectory,
-      ADCTrajectory* trajectory) override;
+      ADCTrajectory* const trajectory) override;
 
  private:
   common::Status InitFrame(const uint32_t sequence_num,

@@ -75,11 +75,11 @@ class PlanningBase {
   virtual apollo::common::Status Plan(
       const double current_time_stamp,
       const std::vector<common::TrajectoryPoint>& stitching_trajectory,
-      ADCTrajectory* trajectory) = 0;
+      ADCTrajectory* const trajectory) = 0;
 
  protected:
-  void PublishPlanningPb(const double timestamp, ADCTrajectory* trajectory_pb);
-  void SetFallbackTrajectory(ADCTrajectory* trajectory_pb);
+  void PublishPlanningPb(const double timestamp, ADCTrajectory* const trajectory_pb);
+  void SetFallbackTrajectory(ADCTrajectory* const trajectory_pb);
 
   const hdmap::HDMap* hdmap_ = nullptr;
   const std::shared_ptr<prediction::PredictionObstacles> prediction_obstacles_;

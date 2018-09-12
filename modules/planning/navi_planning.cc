@@ -485,9 +485,7 @@ void NaviPlanning::RunOnce() {
   FrameHistory::Instance()->Add(seq_num, std::move(frame_));
 }
 
-void NaviPlanning::SetFallbackTrajectory(ADCTrajectory* trajectory_pb) {
-  CHECK_NOTNULL(trajectory_pb);
-
+void NaviPlanning::SetFallbackTrajectory(ADCTrajectory* const trajectory_pb) {
   const double v = VehicleStateProvider::Instance()->linear_velocity();
   for (double t = 0.0; t < FLAGS_navigation_fallback_cruise_time; t += 0.1) {
     const double s = t * v;
@@ -521,7 +519,8 @@ void NaviPlanning::ExportReferenceLineDebug(planning_internal::Debug* debug) {
 Status NaviPlanning::Plan(
     const double current_time_stamp,
     const std::vector<TrajectoryPoint>& stitching_trajectory,
-    ADCTrajectory* trajectory_pb) {
+    ADCTrajectory* const trajectory_pb) {
+  CHECK_NOTNULL(trajectory_pb);
   auto* ptr_debug = trajectory_pb->mutable_debug();
   if (FLAGS_enable_record_debug) {
     ptr_debug->mutable_planning_data()->mutable_init_point()->CopyFrom(

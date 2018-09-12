@@ -32,14 +32,6 @@
 #include "modules/routing/proto/routing.pb.h"
 
 #include "modules/planning/planning_base.h"
-#include "modules/planning/std_planning.h"
-
-namespace apollo {
-namespace cybertron {
-template <typename T>
-class Writer;
-}
-}
 
 namespace apollo {
 namespace planning {
@@ -81,3 +73,4 @@ CYBERTRON_REGISTER_COMPONENT(PlanningComponent)
 }  // namepsace apollo
 
 #endif  // MODULES_PLANNING_PLANNING_COMPONENT_H_
+
