@@ -2,10 +2,12 @@ load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
-cc_library(
-    name = "monitor",
-    srcs = ["monitor.cc"],
-    hdrs = ["monitor.h"],
+cc_binary(
+    name = "libmonitor.so",
+    srcs = [
+        "monitor.cc",
+        "monitor.h",
+    ],
     deps = [
         "//framework:cybertron",
         "//modules/common/util:message_util",
@@ -21,6 +23,7 @@ cc_library(
         "//modules/monitor/software:topic_monitor",
     ],
     copts = ['-DMODULE_NAME=\\"monitor\\"'],
+    linkshared = True,
 )
 
 cpplint()
