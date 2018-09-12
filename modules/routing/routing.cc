@@ -16,7 +16,7 @@
 
 #include "modules/routing/routing.h"
 
-#include "modules/common/adapters/adapter_manager.h"
+#include "modules/common/util/util.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/routing/common/routing_gflags.h"
 #include "modules/routing/core/navigator.h"
@@ -24,14 +24,13 @@
 namespace apollo {
 namespace routing {
 
-using apollo::common::adapter::AdapterManager;
 using apollo::common::monitor::MonitorMessageItem;
 using apollo::common::ErrorCode;
 
 std::string Routing::Name() const { return FLAGS_routing_node_name; }
 
-Routing::Routing()
-    : monitor_logger_(apollo::common::monitor::MonitorMessageItem::ROUTING) {}
+Routing::Routing() {}
+//    : monitor_logger_(apollo::common::monitor::MonitorMessageItem::ROUTING) {}
 
 apollo::common::Status Routing::Init() {
   const auto routing_map_file = apollo::hdmap::RoutingMapFile();
@@ -45,8 +44,6 @@ apollo::common::Status Routing::Init() {
   hdmap_ = apollo::hdmap::HDMapUtil::BaseMapPtr();
   CHECK(hdmap_) << "Failed to load map file:" << apollo::hdmap::BaseMapFile();
 
-  AdapterManager::Init(FLAGS_routing_adapter_config_filename);
-  AdapterManager::AddRoutingRequestCallback(&Routing::OnRoutingRequest, this);
   return apollo::common::Status::OK();
 }
 
@@ -58,8 +55,8 @@ apollo::common::Status Routing::Start() {
   }
   AINFO << "Routing service is ready.";
 
-  apollo::common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
-  buffer.INFO("Routing started");
+  //apollo::common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
+  //buffer.INFO("Routing started");
   return apollo::common::Status::OK();
 }
 
@@ -93,21 +90,21 @@ RoutingRequest Routing::FillLaneInfoIfMissing(
   return fixed_request;
 }
 
-void Routing::OnRoutingRequest(
-    const std::shared_ptr<RoutingRequest>& routing_request) {
+bool Routing::Process(
+    const std::shared_ptr<RoutingRequest>& routing_request,
+    RoutingResponse* const routing_response) {
+  CHECK_NOTNULL(routing_response);
   AINFO << "Get new routing request:" << routing_request->DebugString();
-  RoutingResponse routing_response;
-  apollo::common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
+  //apollo::common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
   const auto& fixed_request = FillLaneInfoIfMissing(*routing_request);
-  if (!navigator_ptr_->SearchRoute(fixed_request, &routing_response)) {
+  if (!navigator_ptr_->SearchRoute(fixed_request, routing_response)) {
     AERROR << "Failed to search route with navigator.";
 
-    buffer.WARN("Routing failed! " + routing_response.status().msg());
-    return;
+    //buffer.WARN("Routing failed! " + routing_response->status().msg());
+    return false;
   }
-  buffer.INFO("Routing success!");
-  AdapterManager::PublishRoutingResponse(routing_response);
-  return;
+  //buffer.INFO("Routing success!");
+  return false;
 }
 
 void Routing::Stop() {}

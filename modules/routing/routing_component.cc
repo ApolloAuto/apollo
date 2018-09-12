@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,24 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/routing/common/routing_gflags.h"
+#include "modules/routing/routing_component.h"
 
-DEFINE_string(routing_conf_file, "/apollo/modules/routing/conf/routing_config.pb.txt",
-              "default routing conf data file");
+namespace apollo {
+namespace routing {
 
-DEFINE_string(routing_node_name, "routing", "the name for this node");
+bool RoutingComponent::Init() {
+  return routing_.Init().ok() && routing_.Start().ok();
+}
 
-DEFINE_double(min_length_for_lane_change, 1.0,
-              "meters, which is 100 feet.  Minimum distance needs to travel on "
-              "a lane before making a lane change. Recommended by "
-              "https://www.oregonlaws.org/ors/811.375");
+bool RoutingComponent::Proc(const std::shared_ptr<RoutingRequest>& request) {
+  RoutingResponse response;
+  if (!routing_.Process(request, &response)) {
+    return false;
+  }
+  writer_->Write(std::make_shared<RoutingResponse>(response));
+  return true;
+}
 
-DEFINE_bool(enable_change_lane_in_result, true,
-            "contain change lane operator in result");
+} // namespace routing
+} // namepsace apollo
+

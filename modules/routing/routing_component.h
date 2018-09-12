@@ -17,25 +17,31 @@
 #ifndef MODULES_ROUTING_ROUTING_COMPONENT_H_
 #define MODULES_ROUTING_ROUTING_COMPONENT_H_
 
+#include "cybertron/class_loader/class_loader.h"
 #include "cybertron/component/component.h"
+
+#include "modules/routing/routing.h"
 
 namespace apollo {
 namespace routing {
 
-class RoutingComponent final : public ::apollo::cybertron::Component<> {
+class RoutingComponent final : public ::apollo::cybertron::Component<RoutingRequest> {
  public:
   RoutingComponent() = default;
   ~RoutingComponent() = default;
  public:
   bool Init() override;
+  bool Proc(const std::shared_ptr<RoutingRequest>& request) override;
  private:
-  std::shared_ptr<::apollo::cybertron::Service<RoutingRequest, RoutingResponse>> service_;
-}
+  std::shared_ptr<::apollo::cybertron::Writer<RoutingResponse>> writer_ = nullptr;
+  Routing routing_;
+};
 
 CYBERTRON_REGISTER_COMPONENT(RoutingComponent)
 
 } // namespace routing
 } // namepsace apollo
+
 
 #endif // MODULES_ROUTING_ROUTING_COMPONENT_H_
 

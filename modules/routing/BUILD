@@ -26,6 +26,26 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "routing_component_lib",
+    srcs = [
+        "routing_component.cc",
+    ],
+    hdrs = [
+        "routing_component.h",
+    ],
+    deps = [
+        ":routing_lib",
+    ],
+    copts = ['-DMODULE_NAME=\\"routing\\"']
+)
+
+cc_binary(
+    name = "librouting_component.so",
+    deps = [":routing_component_lib"],
+    linkopts = ["-shared"],
+)
+
 cc_binary(
     name = "routing",
     srcs = ["main.cc"],
