@@ -64,14 +64,13 @@ class Routing : public apollo::common::ApolloApp {
    */
   virtual ~Routing() = default;
 
+  bool Process(const std::shared_ptr<RoutingRequest> &routing_request,
+                        RoutingResponse* const routing_response);
  private:
-  void OnRoutingRequest(const std::shared_ptr<RoutingRequest> &routing_request);
-
   RoutingRequest FillLaneInfoIfMissing(const RoutingRequest &routing_request);
-
  private:
   std::unique_ptr<Navigator> navigator_ptr_;
-  apollo::common::monitor::MonitorLogger monitor_logger_;
+  //apollo::common::monitor::MonitorLogger monitor_logger_;
 
   RoutingConfig routing_conf_;
   const hdmap::HDMap *hdmap_ = nullptr;

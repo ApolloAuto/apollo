@@ -22,8 +22,6 @@
 DECLARE_string(routing_conf_file);
 DECLARE_string(routing_node_name);
 
-DECLARE_string(routing_adapter_config_filename);
-
 DECLARE_double(min_length_for_lane_change);
 DECLARE_bool(enable_change_lane_in_result);
 
