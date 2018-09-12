@@ -41,48 +41,5 @@ void RecurrentRunner::Tick(const double current_time) {
   }
 }
 
-RecurrentRunnerThread::RecurrentRunnerThread(const double interval)
-    : interval_ms_(interval * 1000) {
-}
-
-void RecurrentRunnerThread::RegisterRunner(
-    std::unique_ptr<RecurrentRunner> runner) {
-  runners_.emplace_back(std::move(runner));
-}
-
-void RecurrentRunnerThread::Start() {
-  CHECK(!thread_) << "Thread has already started.";
-  thread_.reset(new std::thread([this]() {
-    while (true) {
-      {
-        // Check stop sign.
-        std::lock_guard<std::mutex> guard(stop_mutex_);
-        if (stop_) {
-          return;
-        }
-      }
-
-      // Tick runners.
-      const double current_time = Clock::NowInSeconds();
-      MonitorManager::InitFrame(current_time);
-      for (auto &runner : runners_) {
-        runner->Tick(current_time);
-      }
-
-      std::this_thread::sleep_for(std::chrono::milliseconds(interval_ms_));
-    }
-  }));
-}
-
-void RecurrentRunnerThread::Stop() {
-  CHECK(thread_) << "Thread has already stopped.";
-  {
-    std::lock_guard<std::mutex> guard(stop_mutex_);
-    stop_ = true;
-  }
-  thread_->join();
-  thread_.reset(nullptr);
-}
-
 }  // namespace monitor
 }  // namespace apollo

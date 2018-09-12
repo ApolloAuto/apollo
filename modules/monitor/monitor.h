@@ -20,7 +20,8 @@
 #include <memory>
 #include <string>
 
-#include "modules/common/apollo_app.h"
+#include "cybertron/component/timer_component.h"
+#include "cybertron/cybertron.h"
 #include "modules/monitor/common/recurrent_runner.h"
 #include "modules/monitor/proto/system_status.pb.h"
 
@@ -31,18 +32,15 @@
 namespace apollo {
 namespace monitor {
 
-class Monitor : public apollo::common::ApolloApp {
+class Monitor : public apollo::cybertron::TimerComponent {
  public:
-  Monitor();
-  std::string Name() const override { return "SystemMonitor"; }
-
-  apollo::common::Status Init() override;
-  apollo::common::Status Start() override;
-  void Stop() override;
-
+  bool Init() override;
+  bool Proc() override;
  private:
-  RecurrentRunnerThread monitor_thread_;
+  std::vector<std::unique_ptr<RecurrentRunner>> runners_;
 };
+
+CYBERTRON_REGISTER_COMPONENT(Monitor)
 
 }  // namespace monitor
 }  // namespace apollo

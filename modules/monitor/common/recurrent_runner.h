@@ -50,26 +50,6 @@ class RecurrentRunner {
   double next_round_ = 0;
 };
 
-class RecurrentRunnerThread {
- public:
-  explicit RecurrentRunnerThread(const double interval);
-
-  void RegisterRunner(std::unique_ptr<RecurrentRunner> runner);
-
-  // Start the thread of ticking all registered runners.
-  void Start();
-  // Stop the ticking thread.
-  void Stop();
-
- private:
-  int64_t interval_ms_;
-  std::vector<std::unique_ptr<RecurrentRunner>> runners_;
-  std::unique_ptr<std::thread> thread_ = nullptr;
-
-  bool stop_ = false;
-  std::mutex stop_mutex_;
-};
-
 }  // namespace monitor
 }  // namespace apollo
 

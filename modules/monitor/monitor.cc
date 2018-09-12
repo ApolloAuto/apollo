@@ -16,6 +16,7 @@
 #include "modules/monitor/monitor.h"
 
 #include "modules/common/adapters/adapter_manager.h"
+#include "modules/common/time/time.h"
 #include "modules/monitor/common/monitor_manager.h"
 #include "modules/monitor/hardware/gps/gps_monitor.h"
 #include "modules/monitor/hardware/resource_monitor.h"
@@ -35,60 +36,53 @@ DEFINE_double(monitor_running_interval, 0.5, "Monitor running interval.");
 namespace apollo {
 namespace monitor {
 
-using apollo::common::Status;
-using apollo::common::adapter::AdapterManager;
-using std::make_unique;
-
-Monitor::Monitor() : monitor_thread_(FLAGS_monitor_running_interval) {
-}
-
-Status Monitor::Init() {
-  AdapterManager::Init(FLAGS_monitor_adapter_config_filename);
+bool Monitor::Init() {
+  apollo::common::adapter::AdapterManager::Init(
+      FLAGS_monitor_adapter_config_filename);
 
   // TODO(xiaoxq): Migrate CAN monitor.
-  // monitor_thread_.RegisterRunner(make_unique<CanMonitor>());
-  monitor_thread_.RegisterRunner(make_unique<GpsMonitor>());
-  monitor_thread_.RegisterRunner(make_unique<ProcessMonitor>());
+  // runners_.emplace_back(new CanMonitor());
+  runners_.emplace_back(new GpsMonitor());
+  runners_.emplace_back(new ProcessMonitor());
 
   const auto &config = MonitorManager::GetConfig();
   for (const auto &module : config.modules()) {
     if (module.has_topic_conf()) {
       auto *module_status = MonitorManager::GetModuleStatus(module.name());
-      monitor_thread_.RegisterRunner(make_unique<TopicMonitor>(
+      runners_.emplace_back(new TopicMonitor(
           module.topic_conf(), module_status->mutable_topic_status()));
     }
   }
   for (const auto &hardware : config.hardware()) {
     if (hardware.has_topic_conf()) {
       auto *hw_status = MonitorManager::GetHardwareStatus(hardware.name());
-      monitor_thread_.RegisterRunner(make_unique<TopicMonitor>(
+      runners_.emplace_back(new TopicMonitor(
           hardware.topic_conf(), hw_status->mutable_topic_status()));
     }
   }
   // Register resource monitor.
-  monitor_thread_.RegisterRunner(make_unique<ResourceMonitor>(
-      config.resource_conf()));
+  runners_.emplace_back(new ResourceMonitor(config.resource_conf()));
 
   // Register online reporters.
   if (MonitorManager::GetConfig().has_online_report_endpoint()) {
-    monitor_thread_.RegisterRunner(make_unique<VehicleStateReporter>());
+    runners_.emplace_back(new VehicleStateReporter());
   }
   // Register StaticInfo reporter.
-  monitor_thread_.RegisterRunner(make_unique<StaticInfoReporter>());
+  runners_.emplace_back(new StaticInfoReporter());
 
   // Register the SummaryMonitor as last runner, so it will monitor all changes
   // made by the previous runners.
-  monitor_thread_.RegisterRunner(make_unique<SummaryMonitor>());
-  return Status::OK();
+  runners_.emplace_back(new SummaryMonitor());
+  return true;
 }
 
-Status Monitor::Start() {
-  monitor_thread_.Start();
-  return Status::OK();
-}
-
-void Monitor::Stop() {
-  monitor_thread_.Stop();
+bool Monitor::Proc() {
+  const double current_time = apollo::common::time::Clock::NowInSeconds();
+  MonitorManager::InitFrame(current_time);
+  for (auto &runner : runners_) {
+    runner->Tick(current_time);
+  }
+  return true;
 }
 
 }  // namespace monitor
