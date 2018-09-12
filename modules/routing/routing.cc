@@ -24,7 +24,7 @@
 namespace apollo {
 namespace routing {
 
-using apollo::common::monitor::MonitorMessageItem;
+// using apollo::common::monitor::MonitorMessageItem;
 using apollo::common::ErrorCode;
 
 std::string Routing::Name() const { return FLAGS_routing_node_name; }
