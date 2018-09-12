@@ -3,12 +3,12 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "monitor_lib",
+    name = "monitor",
     srcs = ["monitor.cc"],
     hdrs = ["monitor.h"],
     deps = [
-        "//modules/common:apollo_app",
-        "//modules/common/adapters:adapter_manager",
+        "//framework:cybertron",
+        "//modules/common/util:message_util",
         "//modules/monitor/common:recurrent_runner",
         "//modules/monitor/hardware/gps:gps_monitor",
         "//modules/monitor/hardware:resource_monitor",
@@ -20,14 +20,7 @@ cc_library(
         "//modules/monitor/software:summary_monitor",
         "//modules/monitor/software:topic_monitor",
     ],
-)
-
-cc_binary(
-    name = "monitor",
-    srcs = ["main.cc"],
-    deps = [
-        ":monitor_lib",
-    ],
+    copts = ['-DMODULE_NAME=\\"monitor\\"'],
 )
 
 cpplint()
