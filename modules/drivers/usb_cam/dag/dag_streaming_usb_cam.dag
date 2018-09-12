@@ -1,0 +1,33 @@
+# Define all coms in DAG streaming.
+module_config {
+    module_library : "/apollo/bazel-bin/modules/drivers/usb_cam/libusb_cam_component.so"
+
+    components {
+      class_name : "UsbCamComponent"
+      config {
+        name : "usb_cam_driver_short"
+        config_file_path : "/apollo/modules/drivers/usb_cam/conf/usb_cam_short_conf.pb.txt"
+        readers {channel: ""}
+      }
+    }
+
+    components {
+      class_name : "UsbCamComponent"
+      config {
+        name : "usb_cam_driver_long"
+        config_file_path : "/apollo/modules/drivers/usb_cam/conf/usb_cam_long_conf.pb.txt"
+        readers {channel: ""}
+      }
+    }
+
+    components {
+      class_name : "UsbCamComponent"
+      config {
+        name : "usb_cam_driver_front"
+        config_file_path : "/apollo/modules/drivers/usb_cam/conf/usb_cam_front_conf.pb.txt"
+        readers {channel: ""}
+      }
+    }
+
+}
+

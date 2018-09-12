@@ -1,0 +1,26 @@
+
+camera_dev: "/dev/camera/trafficlights"
+frame_id: "camera_long"
+pixel_format: "yuyv"
+io_method: IO_METHOD_MMAP
+width: 1920
+height: 1080
+frame_rate: 30
+monochrome: false
+brightness: -1
+contrast: -1
+saturation: -1
+sharpness: -1
+gain: -1
+auto_focus: false
+focus: -1
+auto_exposure: true
+exposure: 100
+auto_white_balance: true
+white_balance: 4000
+bytes_per_pixel: 2
+trigger_internal: 0 
+trigger_fps: 20
+channel_name: "/apollo/sensor/camera/traffic/image_long"
+device_wait: 2.0
+spin_rate: 0.005 
