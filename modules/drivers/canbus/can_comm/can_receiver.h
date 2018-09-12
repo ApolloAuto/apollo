@@ -29,7 +29,7 @@
 #include <thread>
 #include <vector>
 
-#include "cybertron/scheduler/task.h"
+#include "cybertron/cybertron.h"
 #include "modules/common/macro.h"
 #include "modules/common/proto/error_code.pb.h"
 #include "modules/drivers/canbus/can_client/can_client.h"
@@ -103,6 +103,7 @@ class CanReceiver {
   MessageManager<SensorType> *pt_manager_ = nullptr;
   bool enable_log_ = false;
   bool is_init_ = false;
+  std::unique_ptr<cybertron::Task<>> task_;
 
   DISALLOW_COPY_AND_ASSIGN(CanReceiver);
 };
@@ -135,7 +136,7 @@ void CanReceiver<SensorType>::RecvThreadFunc() {
   int32_t receive_error_count = 0;
   int32_t receive_none_count = 0;
   const int32_t ERROR_COUNT_MAX = 10;
-  std::chrono::duration<double, std::micro> default_period{10 * 1000};
+  auto default_period = 10 * 1000;
 
   while (IsRunning()) {
     std::vector<CanFrame> buf;
@@ -145,7 +146,7 @@ void CanReceiver<SensorType>::RecvThreadFunc() {
       LOG_IF_EVERY_N(ERROR, receive_error_count++ > ERROR_COUNT_MAX,
                      ERROR_COUNT_MAX)
           << "Received " << receive_error_count << " error messages.";
-      std::this_thread::sleep_for(default_period);
+      cybertron::USleep(default_period);
       continue;
     }
     receive_error_count = 0;
@@ -160,7 +161,7 @@ void CanReceiver<SensorType>::RecvThreadFunc() {
       LOG_IF_EVERY_N(ERROR, receive_none_count++ > ERROR_COUNT_MAX,
                      ERROR_COUNT_MAX)
           << "Received " << receive_none_count << " empty messages.";
-      std::this_thread::sleep_for(default_period);
+      cybertron::USleep(default_period);
       continue;
     }
     receive_none_count = 0;
@@ -174,7 +175,7 @@ void CanReceiver<SensorType>::RecvThreadFunc() {
         ADEBUG << "recv_can_frame#" << frame.CanFrameString();
       }
     }
-    cybertron::croutine::CRoutine::Yield();
+    cybertron::Yield();
   }
   AINFO << "Can client receiver thread stopped.";
 }
@@ -191,7 +192,7 @@ template <typename SensorType>
   }
   is_running_ = true;
 
-  cybertron::Task<>("CanReceiver", [this] { RecvThreadFunc(); });
+  task_ = cybertron::CreateTask("CanReceiver", [this] { RecvThreadFunc(); });
   return ::apollo::common::ErrorCode::OK;
 }
 
