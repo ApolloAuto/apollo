@@ -7,7 +7,6 @@ cc_library(
     srcs = ["static_info_reporter.cc"],
     hdrs = ["static_info_reporter.h"],
     deps = [
-        "//modules/common/adapters:adapter_manager",
         "//modules/data/util:info_collector",
         "//modules/monitor/common:recurrent_runner",
     ],

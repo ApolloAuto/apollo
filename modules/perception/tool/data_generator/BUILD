@@ -19,7 +19,6 @@ cc_library(
     deps = [
         "//modules/common:apollo_app",
         "//modules/common:log",
-        "//modules/common/adapters:adapter_manager",
         "//modules/common/util:factory",
         "//modules/common/vehicle_state:vehicle_state_provider",
         "//modules/perception/common:pcl_util",

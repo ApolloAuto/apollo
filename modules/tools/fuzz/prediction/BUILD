@@ -34,7 +34,6 @@ cc_binary(
         "-lubsan",
     ],
     deps = [
-        "//modules/common/adapters:adapter_manager",
         "//modules/common/util",
         "//modules/perception/proto:perception_proto",
         "//modules/prediction/common:kml_map_based_test",
@@ -60,7 +59,6 @@ cc_binary(
         "-lubsan",
     ],
     deps = [
-        "//modules/common/adapters:adapter_manager",
         "//modules/common/util",
         "//modules/perception/proto:perception_proto",
         "//modules/prediction/common:kml_map_based_test",

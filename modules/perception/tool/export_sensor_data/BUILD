@@ -12,7 +12,6 @@ cc_library(
     deps = [
         "//modules/common:apollo_app",
         "//modules/common:log",
-        "//modules/common/adapters:adapter_manager",
         "//modules/perception/common",
         "//modules/perception/common:pcl_util",
         "//modules/perception/lib/base",

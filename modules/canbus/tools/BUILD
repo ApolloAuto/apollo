@@ -20,7 +20,6 @@ cc_binary(
         "//external:gflags",
         "//modules/canbus/proto:canbus_proto",
         "//modules/common",
-        "//modules/common/adapters:adapter_manager",
         "//modules/control/proto:control_proto",
         "@ros//:ros_common",
     ],

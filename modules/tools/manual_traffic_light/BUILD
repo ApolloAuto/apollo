@@ -9,7 +9,6 @@ cc_binary(
     deps = [
         "//external:gflags",
         "//modules/common",
-        "//modules/common/adapters:adapter_manager",
         "//modules/common/configs:config_gflags",
         "//modules/common/util",
         "//modules/common/util:color",

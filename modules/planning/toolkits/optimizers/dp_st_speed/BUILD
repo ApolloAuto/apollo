@@ -71,7 +71,6 @@ cc_library(
     deps = [
         ":dp_st_cost",
         ":dp_st_graph",
-        "//modules/common/adapters:adapter_manager",
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/vehicle_state:vehicle_state_provider",
         "//modules/localization/proto:localization_proto",

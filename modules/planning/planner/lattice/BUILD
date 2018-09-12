@@ -12,7 +12,6 @@ cc_library(
     ],
     deps = [
         "//modules/common:log",
-        "//modules/common/adapters:adapter_manager",
         "//modules/common/math:path_matcher",
         "//modules/common/vehicle_state:vehicle_state_provider",
         "//modules/planning/common:planning_gflags",

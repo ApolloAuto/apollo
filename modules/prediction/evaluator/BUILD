@@ -30,7 +30,6 @@ cc_test(
     ],
     deps = [
         "//modules/common/util",
-        "//modules/common/adapters:adapter_manager",
         "//modules/perception/proto:perception_proto",
         "//modules/prediction/proto:prediction_conf_proto",
         "//modules/prediction/common:kml_map_based_test",

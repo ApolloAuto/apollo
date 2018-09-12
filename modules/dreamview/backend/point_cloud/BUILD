@@ -15,7 +15,6 @@ cc_library(
     ],
     deps = [
         "//modules/common:log",
-        "//modules/common/adapters:adapter_manager",
         "//modules/dreamview/backend/common:dreamview_gflags",
         "//modules/dreamview/backend/handlers:websocket_handler",
         "//modules/dreamview/proto:point_cloud_proto",

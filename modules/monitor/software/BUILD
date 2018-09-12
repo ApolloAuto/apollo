@@ -19,7 +19,6 @@ cc_library(
     srcs = ["topic_monitor.cc"],
     hdrs = ["topic_monitor.h"],
     deps = [
-        "//modules/common/adapters:adapter_manager",
         "//modules/common/util:string_util",
         "//modules/monitor/common:monitor_manager",
         "//modules/monitor/common:recurrent_runner",
@@ -31,7 +30,6 @@ cc_library(
     srcs = ["localization_monitor.cc"],
     hdrs = ["localization_monitor.h"],
     deps = [
-        "//modules/common/adapters:adapter_manager",
         "//modules/monitor/common:recurrent_runner",
     ],
 )
@@ -41,7 +39,6 @@ cc_library(
     srcs = ["safety_manager.cc"],
     hdrs = ["safety_manager.h"],
     deps = [
-        "//modules/common/adapters:adapter_manager",
         "//modules/common/kv_db",
         "//modules/dreamview/backend/common:dreamview_gflags",
         "//modules/dreamview/proto:hmi_config_proto",
@@ -55,7 +52,6 @@ cc_library(
     hdrs = ["summary_monitor.h"],
     deps = [
         ":safety_manager",
-        "//modules/common/adapters:adapter_manager",
         "//modules/common/util:string_util",
         "//modules/monitor/common:monitor_manager",
         "//modules/monitor/common:recurrent_runner",

@@ -14,14 +14,14 @@ limitations under the License.
 =========================================================================*/
 #include "modules/map/hdmap/hdmap_util.h"
 
-#include "modules/common/adapters/adapter_manager.h"
+#include "modules/map/relative_map/proto/navigation.pb.h"
+
 #include "modules/common/util/file.h"
 #include "modules/common/util/string_tokenizer.h"
 
 namespace apollo {
 namespace hdmap {
 
-using apollo::common::adapter::AdapterManager;
 using apollo::relative_map::MapMsg;
 
 namespace {
@@ -109,7 +109,8 @@ std::unique_ptr<HDMap> HDMapUtil::sim_map_ = nullptr;
 std::mutex HDMapUtil::sim_map_mutex_;
 
 const HDMap* HDMapUtil::BaseMapPtr() {
-  if (FLAGS_use_navigation_mode) {
+  //TODO Those logics should be removed to planning
+  /*if (FLAGS_use_navigation_mode) {
     std::lock_guard<std::mutex> lock(base_map_mutex_);
     auto* relative_map = AdapterManager::GetRelativeMap();
     if (!relative_map) {
@@ -129,7 +130,8 @@ const HDMap* HDMapUtil::BaseMapPtr() {
       base_map_ = CreateMap(latest);
       base_map_seq_ = latest.header().sequence_num();
     }
-  } else if (base_map_ == nullptr) {
+  } else*/
+  if (base_map_ == nullptr) {
     std::lock_guard<std::mutex> lock(base_map_mutex_);
     if (base_map_ == nullptr) {  // Double check.
       base_map_ = CreateMap(BaseMapFile());

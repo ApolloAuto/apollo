@@ -23,7 +23,6 @@ cc_library(
         ":navigation_lane_lib",
         "//modules/common",
         "//modules/common:apollo_app",
-        "//modules/common/adapters:adapter_manager",
         "//modules/common/math:geometry",
         "//modules/common/monitor_log",
         "//modules/common/status",

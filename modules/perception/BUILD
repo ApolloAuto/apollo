@@ -11,7 +11,6 @@ cc_library(
     deps = [
         "//modules/common",
         "//modules/common:apollo_app",
-        "//modules/common/adapters:adapter_manager",
         "//modules/perception/common",
         "//modules/perception/lib/base",
         "//modules/perception/obstacle/onboard:camera_subnode",

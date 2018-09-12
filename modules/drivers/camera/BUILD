@@ -18,8 +18,6 @@ cc_library(
         "//modules/common",
         "//modules/common:apollo_app",
         "//modules/common:log",
-        "//modules/common/adapters:adapter",
-        "//modules/common/adapters:adapter_manager",
         "//modules/common/monitor_log",
         "//modules/common/proto:error_code_proto",
         "//modules/common/status",

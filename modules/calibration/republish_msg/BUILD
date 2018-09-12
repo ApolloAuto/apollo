@@ -11,7 +11,6 @@ cc_library(
         "//modules/calibration/republish_msg/proto:relative_odometry_proto",
         "//modules/common:apollo_app",
         "//modules/common:log",
-        "//modules/common/adapters:adapter_manager",
         "//modules/drivers/gnss/proto:ins_proto",
         "//modules/localization/proto:gps_proto",
     ],

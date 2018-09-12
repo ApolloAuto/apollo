@@ -11,7 +11,6 @@ cc_library(
         "ultrasonic_radar_message_manager.h",
     ],
     deps = [
-        "//modules/common/adapters:adapter_manager",
         "//modules/drivers/canbus:sensor_gflags",
         "//modules/drivers/canbus/can_client:can_client_factory",
         "//modules/drivers/canbus/can_comm:can_sender",
@@ -43,7 +42,6 @@ cc_library(
         ":ultrasonic_radar_message_manager",
         "//modules/common",
         "//modules/common:apollo_app",
-        "//modules/common/adapters:adapter_manager",
         "//modules/common/monitor_log",
         "//modules/drivers/canbus:sensor_gflags",
         "//modules/drivers/canbus/can_client:can_client_factory",

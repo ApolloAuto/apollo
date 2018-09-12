@@ -13,7 +13,6 @@ cc_library(
     deps = [
         "//modules/canbus/proto:canbus_proto",
         "//modules/common:log",
-        "//modules/common/adapters:adapter_manager",
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/math:quaternion",
         "//modules/common/monitor_log",
@@ -44,7 +43,6 @@ cc_test(
     ],
     deps = [
         ":simulation_world_service",
-        "//modules/common/adapters:adapter_manager",
         "//modules/common/math:quaternion",
         "@gtest//:main",
     ],

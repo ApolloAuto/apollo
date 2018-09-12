@@ -11,7 +11,6 @@ cc_library(
         "//modules/canbus/vehicle:vehicle_factory",
         "//modules/common",
         "//modules/common:apollo_app",
-        "//modules/common/adapters:adapter_manager",
         "//modules/common/monitor_log",
         "//modules/drivers/canbus/can_client:can_client_factory",
         "//modules/drivers/canbus/can_comm:can_receiver",

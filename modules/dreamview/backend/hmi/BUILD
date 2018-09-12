@@ -39,7 +39,6 @@ cc_library(
     hdrs = ["hmi.h"],
     deps = [
         ":hmi_worker",
-        "//modules/common/adapters:adapter_manager",
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/monitor_log",
         "//modules/common/util:json_util",
@@ -56,7 +55,6 @@ cc_library(
     hdrs = ["hmi_worker.h"],
     deps = [
         ":vehicle_manager",
-        "//modules/common/adapters:adapter_manager",
         "//modules/common/kv_db",
         "//modules/common/util:map_util",
         "//modules/data/util:info_collector",
