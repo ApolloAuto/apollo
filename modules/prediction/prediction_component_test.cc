@@ -13,16 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include "modules/prediction/prediction.h"
+#include "modules/prediction/prediction_component.h"
 
 #include "gtest/gtest.h"
 
 namespace apollo {
 namespace prediction {
 
-TEST(PredictionTest, Simple) {
-  Prediction prediction;
-  EXPECT_EQ(prediction.Name(), "prediction");
+TEST(PredictionComponentTest, Simple) {
+  PredictionComponent prediction_component;
+  EXPECT_EQ(prediction_component.Name(), "prediction");
 }
 
 }  // namespace prediction

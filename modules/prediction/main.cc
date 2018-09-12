@@ -16,8 +16,5 @@
 
 #include "gflags/gflags.h"
 #include "modules/common/log.h"
-#include "ros/include/ros/ros.h"
 
-#include "modules/prediction/prediction.h"
-
-APOLLO_MAIN(apollo::prediction::Prediction);
+#include "modules/prediction/prediction_component.h"

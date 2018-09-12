@@ -3,10 +3,10 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "prediction_lib",
-    srcs = ["prediction.cc"],
+    name = "prediction_component_lib",
+    srcs = ["prediction_component.cc"],
     hdrs = [
-        "prediction.h",
+        "prediction_component.h",
         "prediction_interface.h",
     ],
     deps = [
@@ -32,29 +32,30 @@ cc_library(
         "//modules/prediction/predictor:predictor_manager",
         "//modules/prediction/proto:prediction_conf_proto",
         "//modules/prediction/proto:prediction_proto",
+        "//framework:cybertron",
     ],
 )
 
 cc_test(
-    name = "prediction_test",
+    name = "prediction_component_test",
     size = "small",
-    srcs = ["prediction_test.cc"],
+    srcs = ["prediction_component_test.cc"],
     data = [
         ":prediction_conf",
         ":prediction_data",
         ":prediction_testdata",
     ],
     deps = [
-        ":prediction_lib",
+        ":prediction_component_lib",
         "@gtest//:main",
     ],
 )
 
 cc_binary(
-    name = "prediction",
+    name = "prediction_component",
     srcs = ["main.cc"],
     deps = [
-        ":prediction_lib",
+        ":prediction_component_lib",
         "//external:gflags",
     ],
 )

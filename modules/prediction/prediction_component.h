@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ * Copyright 2017 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,27 +14,95 @@
  * limitations under the License.
  *****************************************************************************/
 
+/**
+ * @file
+ */
+
 #ifndef MODULES_PREDICTION_PREDICTION_COMPONENT_H_
 #define MODULES_PREDICTION_PREDICTION_COMPONENT_H_
 
-#include "cybertron/component/component.h"
+#include <string>
+#include <vector>
 
+#include "cybertron/component/component.h"
+#include "modules/common/adapters/proto/adapter_config.pb.h"
+#include "modules/common/proto/pnc_point.pb.h"
+#include "modules/localization/proto/localization.pb.h"
+#include "modules/perception/proto/perception_obstacle.pb.h"
+#include "modules/planning/proto/planning.pb.h"
+#include "modules/prediction/prediction_interface.h"
+#include "modules/prediction/proto/prediction_conf.pb.h"
+
+/**
+ * @namespace apollo::prediction
+ * @brief apollo::prediction
+ */
 namespace apollo {
 namespace prediction {
 
-class PredictionComponent final : public ::apollo::cybertron::Component<> {
+class PredictionComponent :
+    public apollo::cybertron::Component<perception::PerceptionObstacles> {
  public:
-  PredictionComponent() = default;
+  /**
+   * @brief Destructor
+   */
   ~PredictionComponent() = default;
- public:
+
+  /**
+   * @brief Get name of the node
+   * @return Name of the node
+   */
+  std::string Name() const;
+
+  /**
+   * @brief Initialize the node
+   * @return If initialized
+   */
   bool Init() override;
+
+  bool Proc(const std::shared_ptr<perception::PerceptionObstacles>&
+            perception_obstacles) override;
+
+  /**
+   * @brief Start the node
+   * @return Status of the starting process
+   */
+  common::Status Start();
+
+  /**
+   * @brief Stop the node
+   */
+  void Stop();
+
+  /**
+   * @brief Data callback upon receiving a perception obstacle message.
+   * @param perception_obstacles received message.
+   */
+  void RunOnce(
+      const perception::PerceptionObstacles &perception_obstacles);
+
  private:
-   // TODO(all) service
-}
+  common::Status OnError(const std::string &error_msg);
+
+  void OnLocalization(const localization::LocalizationEstimate &localization);
+
+  void OnPlanning(const planning::ADCTrajectory &adc_trajectory);
+
+  /**
+   * @brief process rosbag in offline mode, mainly for extracting prediction
+   * features.
+   */
+  void ProcessRosbag(const std::string &filename);
+
+ private:
+  double start_time_ = 0.0;
+  PredictionConf prediction_conf_;
+  common::adapter::AdapterManagerConfig adapter_conf_;
+};
 
 CYBERTRON_REGISTER_COMPONENT(PredictionComponent)
 
-} // namespace prediction
-} // namepsace apollo
+}  // namespace prediction
+}  // namespace apollo
 
-#endif // MODULES_PREDICTION_PREDICTION_COMPONENT_H_
+#endif  // MODULES_PREDICTION_PREDICTION_COMPONENT_H_
