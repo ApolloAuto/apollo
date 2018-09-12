@@ -6,6 +6,7 @@ cc_binary(
     name = "libvelodyne_convert_component.so",
     deps = [":velodyne_convert_component_lib"],
     linkopts = ["-shared"],
+    linkstatic = False,
 )
 
 cc_library(
@@ -53,6 +54,7 @@ cc_binary(
     name = "libvelodyne_compensator_component.so",
     deps = [":velodyne_compensator_component_lib"],
     linkopts = ["-shared"],
+    linkstatic = False,
 )
 
 cc_library(

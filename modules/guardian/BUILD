@@ -24,6 +24,7 @@ cc_binary(
         ":guardian_lib",
     ],
     linkopts = ["-shared"],
+    linkstatic = False,
 )
 
 cpplint()
