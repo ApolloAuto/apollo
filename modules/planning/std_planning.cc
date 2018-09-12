@@ -53,9 +53,18 @@ using apollo::common::time::Clock;
 using apollo::hdmap::HDMapUtil;
 using apollo::routing::RoutingResponse;
 
-StdPlanning::~StdPlanning() { Stop(); }
+namespace {
 
-std::string StdPlanning::Name() const { return "std_planning"; }
+bool IsVehicleStateValid(const VehicleState& vehicle_state) {
+  if (std::isnan(vehicle_state.x()) || std::isnan(vehicle_state.y()) ||
+      std::isnan(vehicle_state.z()) || std::isnan(vehicle_state.heading()) ||
+      std::isnan(vehicle_state.kappa()) ||
+      std::isnan(vehicle_state.linear_velocity()) ||
+      std::isnan(vehicle_state.linear_acceleration())) {
+    return false;
+  }
+  return true;
+}
 
 bool IsDifferentRouting(const RoutingResponse& first,
                         const RoutingResponse& second) {
@@ -71,9 +80,22 @@ bool IsDifferentRouting(const RoutingResponse& first,
     return true;
   }
 }
+}  // namespace
+
+StdPlanning::~StdPlanning() {
+  reference_line_provider_->Stop();
+  last_publishable_trajectory_.reset(nullptr);
+  frame_.reset(nullptr);
+  planner_.reset(nullptr);
+  FrameHistory::Instance()->Clear();
+  GetPlanningStatus()->Clear();
+  last_routing_.Clear();
+  EgoInfo::Instance()->Clear();
+}
+
+std::string StdPlanning::Name() const { return "std_planning"; }
 
 Status StdPlanning::Init() {
-  common::util::ThreadPool::Init(FLAGS_max_planning_thread_pool_size);
   CHECK(apollo::common::util::GetProtoFromFile(FLAGS_planning_config_file,
                                                &config_))
       << "failed to load planning config file " << FLAGS_planning_config_file;
@@ -92,19 +114,15 @@ Status StdPlanning::Init() {
   // clear planning status
   GetPlanningStatus()->Clear();
 
-  if (!AdapterManager::Initialized()) {
-    AdapterManager::Init(FLAGS_planning_adapter_config_filename);
-  }
-  CHECK_ADAPTER(Localization);
-  CHECK_ADAPTER(Chassis);
-  CHECK_ADAPTER(RoutingResponse);
-  CHECK_ADAPTER(RoutingRequest);
-  CHECK_ADAPTER(Prediction);
-  CHECK_ADAPTER(TrafficLightDetection);
-
+  // load map
   hdmap_ = HDMapUtil::BaseMapPtr();
   CHECK(hdmap_) << "Failed to load map";
+
+  // instantiate reference line provider
   reference_line_provider_ = std::make_unique<ReferenceLineProvider>(hdmap_);
+  reference_line_provider_->Start();
+
+  // dispatch planner
   planner_ = planner_dispatcher_->DispatchPlanner();
   if (!planner_) {
     return Status(
@@ -112,6 +130,7 @@ Status StdPlanning::Init() {
         "planning is not initialized with config : " + config_.DebugString());
   }
 
+  start_time_ = Clock::NowInSeconds();
   return planner_->Init(config_);
 }
 
@@ -129,32 +148,14 @@ Status StdPlanning::InitFrame(const uint32_t sequence_num,
   return Status::OK();
 }
 
-void StdPlanning::OnTimer(const ros::TimerEvent&) {
-  RunOnce();
-
-  if (FLAGS_planning_test_mode && FLAGS_test_duration > 0.0 &&
-      Clock::NowInSeconds() - start_time_ > FLAGS_test_duration) {
-    Stop();
-    ros::shutdown();
-  }
-}
-
-Status StdPlanning::Start() {
-  timer_ =
-      AdapterManager::CreateTimer(ros::Duration(1.0 / FLAGS_planning_loop_rate),
-                                  &StdPlanning::OnTimer, this);
-
-  reference_line_provider_->Start();
-
-  start_time_ = Clock::NowInSeconds();
-  AINFO << "Planning started";
-  return Status::OK();
-}
-
-void StdPlanning::RunOnce() {
-  // snapshot all coming data
-  AdapterManager::Observe();
-
+void StdPlanning::RunOnce(
+    const std::shared_ptr<prediction::PredictionObstacles>&
+        prediction_obstacles,
+    const std::shared_ptr<canbus::Chassis>& chassis,
+    const std::shared_ptr<localization::LocalizationEstimate>&
+        localization_estimate,
+    const perception::TrafficLightDetection,
+    const routing::RoutingResponse& routing) {
   const double start_timestamp = Clock::NowInSeconds();
 
   ADCTrajectory not_ready_pb;
@@ -162,32 +163,29 @@ void StdPlanning::RunOnce() {
                         ->mutable_main_decision()
                         ->mutable_not_ready();
 
-  if (AdapterManager::GetLocalization()->Empty()) {
+  if (localization_estimate == nullptr) {
     not_ready->set_reason("localization not ready");
-  } else if (AdapterManager::GetChassis()->Empty()) {
+  } else if (chassis == nullptr) {
     not_ready->set_reason("chassis not ready");
-  } else if (AdapterManager::GetRoutingResponse()->Empty()) {
+  } else if (!routing.has_header()) {
     not_ready->set_reason("routing not ready");
   } else if (HDMapUtil::BaseMapPtr() == nullptr) {
     not_ready->set_reason("map not ready");
   }
   if (not_ready->has_reason()) {
     AERROR << not_ready->reason() << "; skip the planning cycle.";
-    PublishPlanningPb(&not_ready_pb, start_timestamp);
+    PublishPlanningPb(start_timestamp, &not_ready_pb);
     return;
   }
 
   // localization
-  const auto& localization =
-      AdapterManager::GetLocalization()->GetLatestObserved();
-  ADEBUG << "Get localization:" << localization.DebugString();
+  ADEBUG << "Get localization:" << localization_estimate->DebugString();
 
   // chassis
-  const auto& chassis = AdapterManager::GetChassis()->GetLatestObserved();
-  ADEBUG << "Get chassis:" << chassis.DebugString();
+  ADEBUG << "Get chassis:" << chassis->DebugString();
 
-  Status status =
-      VehicleStateProvider::Instance()->Update(localization, chassis);
+  Status status = VehicleStateProvider::Instance()->Update(
+      *localization_estimate, *chassis);
 
   VehicleState vehicle_state =
       VehicleStateProvider::Instance()->vehicle_state();
@@ -211,25 +209,21 @@ void StdPlanning::RunOnce() {
     AERROR << msg;
     not_ready->set_reason(msg);
     status.Save(not_ready_pb.mutable_header()->mutable_status());
-    PublishPlanningPb(&not_ready_pb, start_timestamp);
+    PublishPlanningPb(start_timestamp, &not_ready_pb);
     return;
   }
 
-  const auto& latest_routing =
-      AdapterManager::GetRoutingResponse()->GetLatestObserved();
-  if (IsDifferentRouting(last_routing_, latest_routing)) {
-    last_routing_ = latest_routing;
+  if (IsDifferentRouting(last_routing_, routing)) {
+    last_routing_ = routing;
     GetPlanningStatus()->Clear();
-    reference_line_provider_->UpdateRoutingResponse(latest_routing);
-  }
-
-  if (AdapterManager::GetPrediction()->Empty()) {
-    AWARN_EVERY(100) << "prediction is enabled but no prediction provided";
+    reference_line_provider_->UpdateRoutingResponse(routing);
   }
 
   // Update reference line provider and reset pull over if necessary
   reference_line_provider_->UpdateVehicleState(vehicle_state);
 
+  // planning is triggered by prediction data, but we can still use an estimated
+  // cycle time for stitching
   const double planning_cycle_time = 1.0 / FLAGS_planning_loop_rate;
 
   std::vector<TrajectoryPoint> stitching_trajectory;
@@ -237,7 +231,7 @@ void StdPlanning::RunOnce() {
       vehicle_state, start_timestamp, planning_cycle_time,
       last_publishable_trajectory_.get());
 
-  const uint32_t frame_num = AdapterManager::GetPlanning()->GetSeqNum() + 1;
+  const uint32_t frame_num = seq_num_++;
   status = InitFrame(frame_num, stitching_trajectory.back(), start_timestamp,
                      vehicle_state);
   if (!frame_) {
@@ -245,7 +239,7 @@ void StdPlanning::RunOnce() {
     AERROR << msg;
     not_ready->set_reason(msg);
     status.Save(not_ready_pb.mutable_header()->mutable_status());
-    PublishPlanningPb(&not_ready_pb, start_timestamp);
+    PublishPlanningPb(start_timestamp, &not_ready_pb);
     return;
   }
 
@@ -270,14 +264,14 @@ void StdPlanning::RunOnce() {
       estop->set_is_estop(true);
       estop->set_reason(status.error_message());
       status.Save(estop_trajectory.mutable_header()->mutable_status());
-      PublishPlanningPb(&estop_trajectory, start_timestamp);
+      PublishPlanningPb(start_timestamp, &estop_trajectory);
     } else {
       trajectory_pb->mutable_decision()
           ->mutable_main_decision()
           ->mutable_not_ready()
           ->set_reason(status.ToString());
       status.Save(trajectory_pb->mutable_header()->mutable_status());
-      PublishPlanningPb(trajectory_pb, start_timestamp);
+      PublishPlanningPb(start_timestamp, trajectory_pb);
     }
 
     auto seq_num = frame_->SequenceNum();
@@ -329,7 +323,7 @@ void StdPlanning::RunOnce() {
   }
 
   trajectory_pb->set_is_replan(stitching_trajectory.size() == 1);
-  PublishPlanningPb(trajectory_pb, start_timestamp);
+  PublishPlanningPb(start_timestamp, trajectory_pb);
   ADEBUG << "Planning pb:" << trajectory_pb->header().DebugString();
 
   auto seq_num = frame_->SequenceNum();
@@ -448,19 +442,6 @@ Status StdPlanning::Plan(
   best_ref_info->ExportEngageAdvice(trajectory_pb->mutable_engage_advice());
 
   return status;
-}
-
-void StdPlanning::Stop() {
-  AWARN << "Planning Stop is called";
-  common::util::ThreadPool::Stop();
-  reference_line_provider_->Stop();
-  last_publishable_trajectory_.reset(nullptr);
-  frame_.reset(nullptr);
-  planner_.reset(nullptr);
-  FrameHistory::Instance()->Clear();
-  GetPlanningStatus()->Clear();
-  last_routing_.Clear();
-  EgoInfo::Instance()->Clear();
 }
 
 bool StdPlanning::CheckPlanningConfig() {

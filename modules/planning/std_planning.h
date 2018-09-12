@@ -21,7 +21,6 @@
 #include <string>
 #include <vector>
 
-#include "modules/common/util/thread_pool.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/planner/std_planner_dispatcher.h"
 #include "modules/planning/planning_base.h"
@@ -47,7 +46,7 @@ class StdPlanning : public PlanningBase {
   virtual ~StdPlanning();
 
   /**
-   * @brief Planning algorithm name.
+   * @brief Planning name.
    */
   std::string Name() const override;
 
@@ -58,23 +57,16 @@ class StdPlanning : public PlanningBase {
   apollo::common::Status Init() override;
 
   /**
-   * @brief module start function
-   * @return start status
-   */
-  apollo::common::Status Start() override;
-
-  /**
-   * @brief module stop function
-   */
-  void Stop() override;
-
-  /**
-   * @brief main logic of the planning module, runs periodically triggered by
-   * timer.
-   */
-  void RunOnce() override;
-
-  void OnTimer(const ros::TimerEvent&) override;
+  * @brief main logic of the planning module, runs periodically triggered by
+  * timer.
+  */
+  void RunOnce(const std::shared_ptr<prediction::PredictionObstacles>&
+                   prediction_obstacles,
+               const std::shared_ptr<canbus::Chassis>& chassis,
+               const std::shared_ptr<localization::LocalizationEstimate>&
+                   localization_estimate,
+               const perception::TrafficLightDetection,
+               const routing::RoutingResponse& routing) override;
 
   apollo::common::Status Plan(
       const double current_time_stamp,
@@ -98,4 +90,4 @@ class StdPlanning : public PlanningBase {
 }  // namespace planning
 }  // namespace apollo
 
-#endif /* MODULES_PLANNING_STD_PLANNING_H_ */
+#endif  // MODULES_PLANNING_STD_PLANNING_H_
