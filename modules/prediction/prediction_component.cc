@@ -61,7 +61,7 @@ std::string PredictionComponent::Name() const {
   return FLAGS_prediction_module_name;
 }
 
-void GetBagFiles(const boost::filesystem::path& p,
+void GetDataFiles(const boost::filesystem::path& p,
                  std::vector<std::string>* bag_files) {
   CHECK(bag_files);
   if (!boost::filesystem::exists(p)) {
@@ -78,7 +78,7 @@ void GetBagFiles(const boost::filesystem::path& p,
   if (boost::filesystem::is_directory(p)) {
     for (auto& entry : boost::make_iterator_range(
              boost::filesystem::directory_iterator(p), {})) {
-      GetBagFiles(entry.path(), bag_files);
+      GetDataFiles(entry.path(), bag_files);
     }
   }
 }
@@ -172,7 +172,7 @@ bool PredictionComponent::Init() {
     apollo::common::util::split(FLAGS_prediction_offline_bags, ':', &inputs);
     for (const auto& input : inputs) {
       std::vector<std::string> offline_bags;
-      GetBagFiles(boost::filesystem::path(input), &offline_bags);
+      GetDataFiles(boost::filesystem::path(input), &offline_bags);
       std::sort(offline_bags.begin(), offline_bags.end());
       AINFO << "For input " << input << ", found " << offline_bags.size()
             << "  rosbags to process";
