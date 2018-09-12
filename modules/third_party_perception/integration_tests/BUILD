@@ -22,9 +22,3 @@ cc_library(
 )
 
 cpplint()
-proto",
-        "@gtest//:main",
-    ],
-)
-
-cpplint()
