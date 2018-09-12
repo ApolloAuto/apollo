@@ -1,0 +1,7 @@
+<cybertron>
+    <module>
+        <name>usb_cam</name>
+        <dag_conf>/apollo/modules/drivers/usb_cam/dag/dag_streaming_usb_cam.dag</dag_conf>
+        <process_name>usb_cam</process_name>
+    </module>
+</cybertron>
