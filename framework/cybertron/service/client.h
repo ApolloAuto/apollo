@@ -195,10 +195,6 @@ Client<Request, Response>::AsyncSendRequest(SharedRequest request,
   std::lock_guard<std::mutex> lock(pending_requests_mutex_);
   sequence_number_++;
   transport::MessageInfo info(writer_id_, sequence_number_, writer_id_);
-  //  if (WaitForService(std::chrono::seconds(3)) == FAIL) {
-  //    std::cout << "SERVICE "<< service_name_ << " IS NOT READY";
-  //    return SharedFuture();
-  //  }
   request_upper_reach_->Transmit(request, info);
   SharedPromise call_promise = std::make_shared<Promise>();
   SharedFuture f(call_promise->get_future());

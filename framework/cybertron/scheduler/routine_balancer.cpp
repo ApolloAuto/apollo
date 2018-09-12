@@ -35,6 +35,9 @@ RoutineBalancer::RoutineBalancer() : proc_balancer_(ProcBalancer::Instance()) {}
 bool RoutineBalancer::Push(const std::weak_ptr<CRoutine>& croutine) {
   std::lock_guard<std::mutex> lk(rt_list_mutex_);
   auto cr = croutine.lock();
+  if (!cr) {
+    return false;
+  }
   if (rt_id_set_.find(cr->Id()) != rt_id_set_.end()) {
     return false;
   }

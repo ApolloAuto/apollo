@@ -18,7 +18,7 @@
 using apollo::cybertron::croutine::CRoutine;
 using apollo::cybertron::croutine::RoutineFactory;
 using apollo::cybertron::croutine::CreateRoutineFactory;
-using apollo::cybertron::data::DataCache;
+using apollo::cybertron::data::DataDispatcher;
 using apollo::cybertron::scheduler::Scheduler;
 using apollo::cybertron::Component;
 using apollo::cybertron::ComponentBase;
@@ -42,7 +42,6 @@ void RunDriver() {
   uint64_t channel_id_2 = apollo::cybertron::common::Hash(channel_2);
   uint64_t channel_id_3 = apollo::cybertron::common::Hash(channel_3);
   uint64_t channel_id_4 = apollo::cybertron::common::Hash(channel_4);
-
   for (int i = 0; i < MESSAGE_NUM; ++i) {
     auto msg1 = std::make_shared<Driver>();
     auto msg2 = std::make_shared<Driver>();
@@ -53,10 +52,10 @@ void RunDriver() {
     msg3->set_msg_id(3);
     msg4->set_msg_id(4);
     {
-      DataCache::Instance()->WriteDataCache(channel_id_1, msg1);
-      DataCache::Instance()->WriteDataCache(channel_id_2, msg2);
-      DataCache::Instance()->WriteDataCache(channel_id_3, msg3);
-      DataCache::Instance()->WriteDataCache(channel_id_4, msg4);
+      DataDispatcher<Driver>::Instance()->Dispatch(channel_id_1, msg1);
+      DataDispatcher<Driver>::Instance()->Dispatch(channel_id_2, msg2);
+      DataDispatcher<Driver>::Instance()->Dispatch(channel_id_3, msg3);
+      DataDispatcher<Driver>::Instance()->Dispatch(channel_id_4, msg4);
     }
   }
 }

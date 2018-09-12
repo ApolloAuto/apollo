@@ -19,7 +19,9 @@
 
 #include "cybertron/common/log.h"
 #include "cybertron/scheduler/task.h"
+#include "cybertron/time/time.h"
 
+using apollo::cybertron::Time;
 using apollo::cybertron::proto::RoleAttributes;
 
 static std::shared_ptr<Writer<CarStatus>> carstatus_writer_ = nullptr;
@@ -74,11 +76,13 @@ bool DriverComponent::Proc() {
   out_msg->set_timestamp(std::chrono::duration_cast<std::chrono::milliseconds>(
                              t.time_since_epoch())
                              .count());
+  out_msg->mutable_header()->set_timestamp(Time::Now().ToNanosecond());
   driver_writer_->Write(out_msg);
 
   for (int n = 0; n < 10; ++n) {
     static int j = 0;
     auto car_msg = std::make_shared<CarStatus>();
+    car_msg->mutable_header()->set_timestamp(Time::Now().ToNanosecond());
     car_msg->set_msg_id(j++);
     car_msg->set_result(0);
     task_->Execute(car_msg);

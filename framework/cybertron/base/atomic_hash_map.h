@@ -43,9 +43,7 @@ class AtomicHashMap {
    public:
     Entry() {}
     explicit Entry(K key) : key(key) { value_ptr.store(new V()); }
-    Entry(K key, const V &value) : key(key) {
-      value_ptr.store(new V(value));
-    }
+    Entry(K key, const V &value) : key(key) { value_ptr.store(new V(value)); }
     Entry(K key, V &&value) : key(key) {
       value_ptr.store(new V(std::forward<V>(value)));
     }
@@ -74,7 +72,7 @@ class AtomicHashMap {
   // Hash bucket
   class Bucket {
    public:
-    Bucket() { head_ = new Entry(); }
+    Bucket() : head_(new Entry()) {}
     ~Bucket() {
       Entry *ite = head_;
       while (ite) {
@@ -144,6 +142,7 @@ class AtomicHashMap {
               return;
             }
           }
+          delete new_value;
           continue;
         }
         // avoid new when retry
@@ -180,6 +179,7 @@ class AtomicHashMap {
               return;
             }
           }
+          delete new_value;
           continue;
         }
         // avoid new when retry
@@ -215,6 +215,7 @@ class AtomicHashMap {
               return;
             }
           }
+          delete new_value;
           continue;
         }
         // avoid new when retry

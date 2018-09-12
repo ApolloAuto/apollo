@@ -62,8 +62,9 @@ class ComponentBase : public std::enable_shared_from_this<ComponentBase> {
     }
   }
 
+  std::shared_ptr<Node> node_;
   std::string config_file_path_ = "";
-  std::vector<std::shared_ptr<ReaderBase>> readers;
+  std::vector<std::shared_ptr<ReaderBase>> readers_;
 };
 
 }  // namespace cybertron

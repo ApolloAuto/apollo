@@ -118,9 +118,11 @@ void Screen::ClearCurrentColor(ColorPair color) const {
 }
 
 void Screen::AddStr(int x, int y, ColorPair color, const char* str) const {
-  SetCurrentColor(color);
-  AddStr(x, y, str);
-  ClearCurrentColor(color);
+  if (IsInit()) {
+    attron(COLOR_PAIR(color));
+    addstr(str);
+    attroff(COLOR_PAIR(color));
+  }
 }
 
 void Screen::MoveOffsetXY(int offsetX, int offsetY) const {

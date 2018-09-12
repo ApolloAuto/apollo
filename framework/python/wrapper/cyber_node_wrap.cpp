@@ -105,7 +105,6 @@ PyObject *cyber_PyWriter_write(PyObject *self, PyObject *args) {
   }
 
   std::string data_str(data, len);
-  AINFO << "c++:PyWriter_write data->[ " << data_str << "]";
   int ret = writer->write(data_str);
   return PyInt_FromLong((long)ret);
 }
@@ -176,7 +175,7 @@ PyObject *cyber_PyReader_read(PyObject *self, PyObject *args) {
   bool wait = (r == 1 ? true : false);
 
   std::string reader_ret = reader->read(wait);
-  AINFO << "c++:PyReader_read -> " << reader_ret;
+  // AINFO << "c++:PyReader_read -> " << reader_ret;
   return PyString_FromStringAndSize(reader_ret.c_str(), reader_ret.size());
 }
 

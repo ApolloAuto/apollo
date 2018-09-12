@@ -1,230 +1,120 @@
-#include <mutex>
-#include <thread>
+
 #include "gtest/gtest.h"
 
 #include "cybertron/common/log.h"
-#include "cybertron/message/raw_message.h"
-#include "cybertron/data/any.h"
+#include "cybertron/cybertron.h"
 #include "cybertron/data/data_visitor.h"
+#include "cybertron/message/raw_message.h"
 
 namespace apollo {
 namespace cybertron {
 namespace data {
 
 using apollo::cybertron::message::RawMessage;
-
+using apollo::cybertron::proto::RoleAttributes;
 std::hash<std::string> str_hash;
 
-static std::vector<uint64_t> channel_vec({str_hash("channel-0"),
-                                          str_hash("channel-1"),
-                                          str_hash("channel-2"),
-                                          str_hash("channel-3")});
-static std::function<void()> callback = []() {
-  AINFO << "callback ";
-};
+auto channel0 = str_hash("/channel0");
+auto channel1 = str_hash("/channel1");
+auto channel2 = str_hash("/channel2");
+auto channel3 = str_hash("/channel3");
 
-static void fill_msg0(DataVisitor& visitor) {
-  auto message = std::shared_ptr<RawMessage>(new RawMessage(std::to_string(0)));
-  visitor.data_cache_->WriteDataCache<RawMessage>(str_hash("channel-0"),
-                                                  message);
-  uint64_t seq_id = 0;
-  uint64_t drop_num = 0;
-  MetaDataPtr<RawMessage> msg;
-  visitor.data_cache_->ReadDataCache(str_hash("channel-0"), 10, &seq_id,
-                                     &drop_num, msg);
-  msg->time_stamp = 1000 * 1000 * 1000;
+void DispatchMessage(uint64_t channel_id, int num) {
+  for (int i = 0; i < num; ++i) {
+    auto raw_msg = std::make_shared<RawMessage>();
+    DataDispatcher<RawMessage>::Instance()->Dispatch(channel_id, raw_msg);
+  }
 }
 
-static void fill_msg(DataVisitor& visitor, uint64_t channel) {
-  auto message = std::shared_ptr<RawMessage>(new RawMessage(std::to_string(0)));
-  AINFO << "fill_msg: " << channel;
-  visitor.data_cache_->WriteDataCache<RawMessage>(channel, message);
-  message = std::shared_ptr<RawMessage>(new RawMessage(std::to_string(1)));
-  visitor.data_cache_->WriteDataCache<RawMessage>(channel, message);
-  message = std::shared_ptr<RawMessage>(new RawMessage(std::to_string(2)));
-  visitor.data_cache_->WriteDataCache<RawMessage>(channel, message);
+std::vector<std::shared_ptr<ReaderBase>> InitReaders(int num) {
+  cybertron::Init();
+  auto node = CreateNode("data_visitor_test");
+  std::vector<std::shared_ptr<ReaderBase>> readers;
+  for (int i = 0; i < num; ++i) {
+    RoleAttributes attr;
+    attr.set_channel_name("/channel" + std::to_string(i));
+    auto qos_profile = attr.mutable_qos_profile();
+    qos_profile->set_depth(10);
+    auto reader = node->CreateReader<RawMessage>(attr);
+    readers.emplace_back(reader);
+  }
+  return readers;
 }
 
-static void make_msg_fusioned(DataVisitor& visitor, uint64_t channel) {
-  AINFO << "make_msg_fusioned: " << channel;
-  MetaDataPtr<RawMessage> msg;
-  visitor.data_cache_->ReadDataCache(channel, msg);
-  msg->time_stamp = 1000 * 1000 * 1000;
-  visitor.data_cache_->ReadDataCache(channel, msg);
-  AINFO << msg->time_stamp;
+TEST(DataVisitorTest, one_channel) {
+  auto channel0 = str_hash("/channel");
+  auto dv = std::make_shared<DataVisitor<RawMessage>>(channel0, 10);
+
+  DispatchMessage(channel0, 1);
+  std::shared_ptr<RawMessage> msg;
+  EXPECT_TRUE(dv->TryFetch(msg));
+  EXPECT_FALSE(dv->TryFetch(msg));
+  DispatchMessage(channel0, 10);
+  for (int i = 0; i < 10; ++i) {
+    EXPECT_TRUE(dv->TryFetch(msg));
+  }
+  EXPECT_FALSE(dv->TryFetch(msg));
 }
 
-TEST(DataVisitorTest, one_channel_test) {
-  auto channels = channel_vec;
-  DataVisitor newest_visitor(std::move(channels), 1);
-  AINFO << channels.size();
-  channels = channel_vec;
-  DataVisitor callback_visitor(std::move(channels), 1);
-  auto cb = callback;
-  callback_visitor.RegisterCallback(std::move(cb));
-  std::shared_ptr<RawMessage> message;
-  EXPECT_FALSE(newest_visitor.TryFetch<RawMessage>(message));
-  EXPECT_FALSE(callback_visitor.TryFetch<RawMessage>(message));
-  fill_msg0(newest_visitor);
-  EXPECT_TRUE(newest_visitor.TryFetch<RawMessage>(message));
-  EXPECT_EQ("0", message->message);
-}
+TEST(DataVisitorTest, two_channel) {
+  auto dv =
+      std::make_shared<DataVisitor<RawMessage, RawMessage>>(InitReaders(2));
 
-TEST(DataVisitorTest, two_channel_test) {
-  auto channels = channel_vec;
-  DataVisitor newest_visitor(std::move(channels), 1);
-  channels = channel_vec;
-  DataVisitor window_visitor(std::move(channels), 1,
-                             FusionType::TIME_WINDOW);
-  channels = channel_vec;
-  DataVisitor callback_visitor(std::move(channels), 1);
-  auto cb = callback;
-  callback_visitor.RegisterCallback(std::move(cb));
+  DispatchMessage(channel0, 1);
   std::shared_ptr<RawMessage> msg0;
   std::shared_ptr<RawMessage> msg1;
-
-  // empty
-  bool ret;
-  ret = newest_visitor.TryFetch<RawMessage, RawMessage>(msg0, msg1);
-  EXPECT_FALSE(ret);
-  ret = window_visitor.TryFetch<RawMessage, RawMessage>(msg0, msg1);
-  EXPECT_FALSE(ret);
-  ret = callback_visitor.TryFetch<RawMessage, RawMessage>(msg0, msg1);
-  EXPECT_FALSE(ret);
-  // fill msg0, but msg1's cache is still empty
-  fill_msg0(newest_visitor);
-  ret = newest_visitor.TryFetch<RawMessage, RawMessage>(msg0, msg1);
-  EXPECT_FALSE(ret);
-  fill_msg0(window_visitor);
-  ret = window_visitor.TryFetch<RawMessage, RawMessage>(msg0, msg1);
-  EXPECT_FALSE(ret);
-
-  // fill msg1 with now timestamp, not fusioned
-  fill_msg(newest_visitor, str_hash("channel-1"));
-  ret = newest_visitor.TryFetch<RawMessage, RawMessage>(msg0, msg1);
-  EXPECT_TRUE(ret);
-  ret = window_visitor.TryFetch<RawMessage, RawMessage>(msg0, msg1);
-  EXPECT_FALSE(ret);
-  // fusioned
-  make_msg_fusioned(window_visitor, str_hash("channel-1"));
-  ret = window_visitor.TryFetch<RawMessage, RawMessage>(msg0, msg1);
-  EXPECT_TRUE(ret);
+  EXPECT_FALSE(dv->TryFetch(msg0, msg1));
+  DispatchMessage(channel1, 1);
+  EXPECT_TRUE(dv->TryFetch(msg0, msg1));
+  DispatchMessage(channel0, 10);
+  for (int i = 0; i < 10; ++i) {
+    EXPECT_TRUE(dv->TryFetch(msg0, msg1));
+  }
+  EXPECT_FALSE(dv->TryFetch(msg0, msg1));
 }
 
-TEST(DataVisitorTest, three_channel_test) {
-  auto channels = channel_vec;
-  DataVisitor newest_visitor(std::move(channels), 1);
-  channels = channel_vec;
-  DataVisitor window_visitor(std::move(channels), 1,
-                             FusionType::TIME_WINDOW);
-  channels = channel_vec;
-  DataVisitor callback_visitor(std::move(channels), 1);
-  auto cb = callback;
-  callback_visitor.RegisterCallback(std::move(cb));
+TEST(DataVisitorTest, three_channel) {
+  auto dv = std::make_shared<DataVisitor<RawMessage, RawMessage, RawMessage>>(
+      InitReaders(3));
+
+  DispatchMessage(channel0, 1);
   std::shared_ptr<RawMessage> msg0;
   std::shared_ptr<RawMessage> msg1;
   std::shared_ptr<RawMessage> msg2;
-
-  // empty
-  bool ret;
-  ret = newest_visitor.TryFetch<RawMessage, RawMessage>(msg0, msg1, msg2);
-  EXPECT_FALSE(ret);
-  ret = window_visitor.TryFetch<RawMessage, RawMessage>(msg0, msg1, msg2);
-  EXPECT_FALSE(ret);
-  ret = callback_visitor.TryFetch<RawMessage, RawMessage>(msg0, msg1, msg2);
-  EXPECT_FALSE(ret);
-  // fill msg0, but msg1 and msg2's cache is still empty
-  fill_msg0(newest_visitor);
-  ret = newest_visitor.TryFetch<RawMessage, RawMessage>(msg0, msg1, msg2);
-  EXPECT_FALSE(ret);
-  fill_msg0(window_visitor);
-  ret = window_visitor.TryFetch<RawMessage, RawMessage>(msg0, msg1, msg2);
-  EXPECT_FALSE(ret);
-  // fill msg1, but msg2's cache is still empty
-  fill_msg(newest_visitor, str_hash("channel-1"));
-  ret = newest_visitor.TryFetch<RawMessage, RawMessage>(msg0, msg1, msg2);
-  EXPECT_FALSE(ret);
-  fill_msg(window_visitor, str_hash("channel-1"));
-  ret = window_visitor.TryFetch<RawMessage, RawMessage>(msg0, msg1, msg2);
-  EXPECT_FALSE(ret);
-
-  // fill msg2, but not fusioned
-  fill_msg(newest_visitor, str_hash("channel-2"));
-  ret = newest_visitor.TryFetch<RawMessage, RawMessage>(msg0, msg1, msg2);
-  EXPECT_TRUE(ret);
-  fill_msg(window_visitor, str_hash("channel-2"));
-  ret = window_visitor.TryFetch<RawMessage, RawMessage>(msg0, msg1, msg2);
-  EXPECT_FALSE(ret);
-
-  // fusioned
-  make_msg_fusioned(window_visitor, str_hash("channel-1"));
-  make_msg_fusioned(window_visitor, str_hash("channel-2"));
-  ret = window_visitor.TryFetch<RawMessage, RawMessage>(msg0, msg1, msg2);
-  EXPECT_TRUE(ret);
+  EXPECT_FALSE(dv->TryFetch(msg0, msg1, msg2));
+  DispatchMessage(channel1, 1);
+  EXPECT_FALSE(dv->TryFetch(msg0, msg1, msg2));
+  DispatchMessage(channel2, 1);
+  EXPECT_TRUE(dv->TryFetch(msg0, msg1, msg2));
+  DispatchMessage(channel0, 10);
+  for (int i = 0; i < 10; ++i) {
+    EXPECT_TRUE(dv->TryFetch(msg0, msg1, msg2));
+  }
+  EXPECT_FALSE(dv->TryFetch(msg0, msg1, msg2));
 }
 
-TEST(DataVisitorTest, four_channel_test) {
-  auto channels = channel_vec;
-  DataVisitor newest_visitor(std::move(channels), 1);
-  channels = channel_vec;
-  DataVisitor window_visitor(std::move(channels), 1,
-                             FusionType::TIME_WINDOW);
-  channels = channel_vec;
-  DataVisitor callback_visitor(std::move(channels), 1);
-  auto cb = callback;
-  callback_visitor.RegisterCallback(std::move(cb));
+TEST(DataVisitorTest, four_channel) {
+  auto dv = std::make_shared<
+      DataVisitor<RawMessage, RawMessage, RawMessage, RawMessage>>(
+      InitReaders(4));
+
+  DispatchMessage(channel0, 1);
   std::shared_ptr<RawMessage> msg0;
   std::shared_ptr<RawMessage> msg1;
   std::shared_ptr<RawMessage> msg2;
   std::shared_ptr<RawMessage> msg3;
-
-  // empty
-  bool ret;
-  ret = newest_visitor.TryFetch<RawMessage, RawMessage>(msg0, msg1, msg2, msg3);
-  EXPECT_FALSE(ret);
-  ret = window_visitor.TryFetch<RawMessage, RawMessage>(msg0, msg1, msg2, msg3);
-  EXPECT_FALSE(ret);
-  ret =
-      callback_visitor.TryFetch<RawMessage, RawMessage>(msg0, msg1, msg2, msg3);
-  EXPECT_FALSE(ret);
-  // fill msg0, but msg1, msg2 and msg3's cache is still empty
-  fill_msg0(newest_visitor);
-  ret = newest_visitor.TryFetch<RawMessage, RawMessage>(msg0, msg1, msg2, msg3);
-  EXPECT_FALSE(ret);
-  fill_msg0(window_visitor);
-  ret = window_visitor.TryFetch<RawMessage, RawMessage>(msg0, msg1, msg2, msg3);
-  EXPECT_FALSE(ret);
-
-  // fill msg1, but msg2 and msg3's cache is still empty
-  fill_msg(newest_visitor, str_hash("channel-1"));
-  ret = newest_visitor.TryFetch<RawMessage, RawMessage>(msg0, msg1, msg2, msg3);
-  EXPECT_FALSE(ret);
-  fill_msg(window_visitor, str_hash("channel-1"));
-  ret = window_visitor.TryFetch<RawMessage, RawMessage>(msg0, msg1, msg2, msg3);
-  EXPECT_FALSE(ret);
-
-  // fill msg2, but msg3's cache is still empty
-  fill_msg(newest_visitor, str_hash("channel-2"));
-  ret = newest_visitor.TryFetch<RawMessage, RawMessage>(msg0, msg1, msg2, msg3);
-  EXPECT_FALSE(ret);
-  fill_msg(window_visitor, str_hash("channel-2"));
-  ret = window_visitor.TryFetch<RawMessage, RawMessage>(msg0, msg1, msg2, msg3);
-  EXPECT_FALSE(ret);
-
-  // fill msg3, but not fusioned
-  fill_msg(newest_visitor, str_hash("channel-3"));
-  ret = newest_visitor.TryFetch<RawMessage, RawMessage>(msg0, msg1, msg2, msg3);
-  EXPECT_TRUE(ret);
-  fill_msg(window_visitor, str_hash("channel-3"));
-  ret = window_visitor.TryFetch<RawMessage, RawMessage>(msg0, msg1, msg2, msg3);
-  EXPECT_FALSE(ret);
-
-  // fusioned
-  make_msg_fusioned(window_visitor, str_hash("channel-1"));
-  make_msg_fusioned(window_visitor, str_hash("channel-2"));
-  make_msg_fusioned(window_visitor, str_hash("channel-3"));
-  ret = window_visitor.TryFetch<RawMessage, RawMessage>(msg0, msg1, msg2, msg3);
-  EXPECT_TRUE(ret);
+  EXPECT_FALSE(dv->TryFetch(msg0, msg1, msg2, msg3));
+  DispatchMessage(channel1, 1);
+  EXPECT_FALSE(dv->TryFetch(msg0, msg1, msg2, msg3));
+  DispatchMessage(channel2, 1);
+  EXPECT_FALSE(dv->TryFetch(msg0, msg1, msg2, msg3));
+  DispatchMessage(channel3, 1);
+  EXPECT_TRUE(dv->TryFetch(msg0, msg1, msg2, msg3));
+  DispatchMessage(channel0, 10);
+  for (int i = 0; i < 10; ++i) {
+    EXPECT_TRUE(dv->TryFetch(msg0, msg1, msg2, msg3));
+  }
+  EXPECT_FALSE(dv->TryFetch(msg0, msg1, msg2, msg3));
 }
 
 }  // namespace data

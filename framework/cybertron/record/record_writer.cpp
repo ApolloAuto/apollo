@@ -57,11 +57,11 @@ void RecordWriter::SplitOutfile() {
   segment_begin_time_ = 0;
   file_writer_->Open(path_);
   file_writer_->WriteHeader(header_);
-  for (auto channel_name : channel_vec_) {
+  for (const auto& i : channel_message_number_map_) {
     Channel channel;
-    channel.set_name(channel_name);
-    channel.set_message_type(channel_message_type_map_[channel_name]);
-    channel.set_proto_desc(channel_proto_desc_map_[channel_name]);
+    channel.set_name(i.first);
+    channel.set_message_type(channel_message_type_map_[i.first]);
+    channel.set_proto_desc(channel_proto_desc_map_[i.first]);
     file_writer_->WriteChannel(channel);
   }
   AINFO << "split out new file: " << path_;
@@ -71,13 +71,7 @@ bool RecordWriter::WriteChannel(const std::string& channel_name,
                                 const std::string& message_type,
                                 const std::string& proto_desc) {
   std::lock_guard<std::mutex> lg(mutex_);
-  if (std::find(channel_vec_.begin(), channel_vec_.end(), channel_name) !=
-      channel_vec_.end()) {
-    return true;
-  }
-  channel_vec_.push_back(channel_name);
-  channel_message_type_map_[channel_name] = message_type;
-  channel_proto_desc_map_[channel_name] = proto_desc;
+  OnNewChannel(channel_name, message_type, proto_desc);
   Channel channel;
   channel.set_name(channel_name);
   channel.set_message_type(message_type);
@@ -120,7 +114,7 @@ bool RecordWriter::WriteMessage(const SingleMessage& message) {
 void RecordWriter::ShowProgress() {
   static int total = 0;
   std::cout << "\r[RUNNING]  Record : "
-            << "    total channel num : " << channel_vec_.size()
+            << "    total channel num : " << channel_message_number_map_.size()
             << "  total msg num : " << ++total;
   std::cout.flush();
 }

@@ -29,8 +29,8 @@
 #include "cybertron/proto/topology_change.pb.h"
 #include "cybertron/record/record_writer.h"
 
-using apollo::cybertron::topology::Topology;
-using apollo::cybertron::topology::ChannelManager;
+using apollo::cybertron::service_discovery::TopologyManager;
+using apollo::cybertron::service_discovery::ChannelManager;
 using apollo::cybertron::proto::ChangeMsg;
 using apollo::cybertron::proto::RoleType;
 using apollo::cybertron::proto::RoleAttributes;

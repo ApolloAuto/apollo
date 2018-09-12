@@ -44,7 +44,7 @@ int main(int argc, char* argv[]) {
         w.TopologyChanged(change_msg);
       };
 
-  apollo::cybertron::topology::Topology::Instance()
+  apollo::cybertron::service_discovery::TopologyManager::Instance()
       ->channel_manager()
       ->AddChangeListener(topologyCallback);
   w.show();

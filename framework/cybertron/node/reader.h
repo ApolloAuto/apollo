@@ -27,7 +27,7 @@
 #include "cybertron/data/data_visitor.h"
 #include "cybertron/scheduler/scheduler.h"
 #include "cybertron/time/time.h"
-#include "cybertron/topology/topology.h"
+#include "cybertron/service_discovery/topology_manager.h"
 #include "cybertron/transport/transport.h"
 
 #include "cybertron/common/global_data.h"
@@ -45,7 +45,7 @@ template <typename MessageT>
 class Reader : public ReaderBase {
  public:
   using LowerReachPtr = std::shared_ptr<transport::LowerReach<MessageT>>;
-  using ChangeConnection = typename topology::Manager::ChangeConnection;
+  using ChangeConnection = typename service_discovery::Manager::ChangeConnection;
 
   Reader(const proto::RoleAttributes& role_attr,
          const CallbackFunc<MessageT>& reader_func = nullptr);
@@ -64,7 +64,7 @@ class Reader : public ReaderBase {
   std::string croutine_name_;
 
   ChangeConnection change_conn_;
-  topology::ChannelManagerPtr channel_manager_;
+  service_discovery::ChannelManagerPtr channel_manager_;
 };
 
 template <typename MessageT>
@@ -90,12 +90,8 @@ bool Reader<MessageT>::Init() {
     auto sched = scheduler::Scheduler::Instance();
     croutine_name_ = role_attr_.node_name() + "_" + role_attr_.channel_name();
 
-    std::shared_ptr<data::DataVisitor> dv;
-    std::vector<uint64_t> channel_vec;
-    auto id = common::GlobalData::RegisterChannel(role_attr_.channel_name());
-    channel_vec.emplace_back(id);
-    dv = std::make_shared<data::DataVisitor>(std::move(channel_vec),
-                                             role_attr_.qos_profile().depth());
+    auto dv = std::make_shared<data::DataVisitor<MessageT>>(
+        role_attr_.channel_id(), role_attr_.qos_profile().depth());
     // Using factory to wrap templates.
     croutine::RoutineFactory factory =
         croutine::CreateRoutineFactory<MessageT>(reader_func_, dv);
@@ -108,7 +104,7 @@ bool Reader<MessageT>::Init() {
   lower_reach_ = ReaderManager<MessageT>::Instance()->GetReader(role_attr_);
   this->role_attr_.set_id(lower_reach_->id().HashValue());
 
-  channel_manager_ = topology::Topology::Instance()->channel_manager();
+  channel_manager_ = service_discovery::TopologyManager::Instance()->channel_manager();
   JoinTheTopology();
 
   // TODO more check

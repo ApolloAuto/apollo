@@ -9,7 +9,7 @@
 using apollo::cybertron::Node;
 using apollo::cybertron::Time;
 using apollo::cybertron::proto::Chatter;
-using apollo::cybertron::topology::Topology;
+using apollo::cybertron::service_discovery::TopologyManager;
 
 int main(int argc, char *argv[]) {
   AINFO << "benchmark start.";
@@ -45,7 +45,7 @@ int main(int argc, char *argv[]) {
 
   auto client = node->CreateClient<Chatter, Chatter>(service_name);
 
-  auto topology = Topology::Instance();
+  auto topology = TopologyManager::Instance();
   while (apollo::cybertron::OK()) {
     sleep(1);
   }

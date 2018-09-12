@@ -44,9 +44,6 @@ class TransformBroadcaster {
       const std::vector<adu::common::TransformStamped>& transforms);
 
  private:
-  /// Internal reference to cybertron::Node
-  // cybertron::NodeHandle node_;
-  // cybertron::Publisher publisher_;
   std::unique_ptr<cybertron::Node> node_;
   std::shared_ptr<cybertron::Writer<adu::common::TransformStampeds>> publisher_;
 };

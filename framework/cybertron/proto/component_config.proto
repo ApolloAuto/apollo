@@ -9,16 +9,10 @@ message ReaderOption {
     optional QosProfile qos_profile = 2;
 }
 
-enum FusionType {
-    TIME_WINDOW = 1;
-    NEWEST = 2;
-}
-
 message ComponentConfig {
     required string name  = 1;
     optional string config_file_path = 2;
     repeated ReaderOption readers = 3;
-    optional FusionType fusion_type = 4 [default = NEWEST];
 }
 
 message TimerComponentConfig {

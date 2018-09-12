@@ -29,6 +29,7 @@ from proto import chatter_pb2
 
 # begin wrapper cxx interface to py
 _cyber_node = importlib.import_module('_cyber_node') 
+from cybertron import pyinit
     
 subs = {}
 
@@ -57,9 +58,11 @@ def cyber_py_lisener():
     
     while not _cyber_node.py_is_shutdown():
         time.sleep(0.002)
-    
+
 def main():
+    pyinit.init()
     cyber_py_lisener()
+    pyinit.shutdown()
 
 if __name__ == '__main__':
   main()

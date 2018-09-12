@@ -26,13 +26,13 @@
 namespace apollo {
 namespace cybertron {
 
-template <typename M0, typename M1, typename M2>
+template <typename M0, typename M1, typename M2, typename M3>
 class Component;
 class TimerComponent;
 
 class Node {
  public:
-  template <typename M0, typename M1, typename M2>
+  template <typename M0, typename M1, typename M2, typename M3>
   friend class Component;
   friend class TimerComponent;
   friend std::unique_ptr<Node> CreateNode(const std::string&,
@@ -79,7 +79,7 @@ class Node {
 
   std::unique_ptr<NodeChannelImpl> node_channel_impl_ = nullptr;
   std::unique_ptr<NodeServiceImpl> node_service_impl_ = nullptr;
-  std::shared_ptr<topology::NodeManager> node_manager_ = nullptr;
+  std::shared_ptr<service_discovery::NodeManager> node_manager_ = nullptr;
   std::string node_name_;
   std::string name_space_;
   proto::RoleAttributes attr_;

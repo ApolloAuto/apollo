@@ -29,45 +29,66 @@ sys.path.append(cybertron_dir + "/cybertron/")
 from proto import chatter_pb2
 
 
-# begin wrapper cxx interface to py
 _cyber_record = importlib.import_module('_cyber_record') 
 
 #//////////////////////////////record file class//////////////////////////////
-class PyRecordFileReader:
+class RecordReader:
     def __init__(self):
-        self.record_reader = _cyber_record.new_PyRecordFileReader()
+        self.record_reader = _cyber_record.new_PyRecordReader()
 
     def __del__(self):
         print("record_reader __del___")
-        _cyber_record.delete_PyRecordFileReader(self.record_reader)
+        _cyber_record.delete_PyRecordReader(self.record_reader)
 
     def Open(self, path):
-        return _cyber_record.PyRecordFileReader_Open(self.record_reader, path)
+        return _cyber_record.PyRecordReader_Open(self.record_reader, path)
     
     def Close(self):
-        _cyber_record.PyRecordFileReader_Close(self.record_reader)
+        _cyber_record.PyRecordReader_Close(self.record_reader)
 
-class PyRecordFileWriter:
+    def ReadMessage(self):
+        return _cyber_record.PyRecordReader_ReadMessage(self.record_reader)
+
+    def EndOfFile(self):
+        return _cyber_record.PyRecordReader_EndOfFile(self.record_reader)
+    
+    def CurrentMessageChannelName(self):
+        return _cyber_record.PyRecordReader_CurrentMessageChannelName(self.record_reader)
+
+    def CurrentRawMessage(self):
+        return _cyber_record.PyRecordReader_CurrentRawMessage(self.record_reader)
+    
+    def CurrentMessageTime(self):
+        return _cyber_record.PyRecordReader_CurrentMessageTime(self.record_reader)
+    
+    def GetMessageNumber(self, channel_name):
+        return _cyber_record.PyRecordReader_GetMessageNumber(self.record_reader, channel_name)
+
+    def GetMessageType(self, channel_name):
+        return _cyber_record.PyRecordReader_GetMessageType(self.record_reader, channel_name)
+
+    def GetProtoDesc(self, channel_name):
+        return _cyber_record.PyRecordReader_GetProtoDesc(self.record_reader, channel_name)
+
+class RecordWriter:
     def __init__(self):
-        self.record_writer = _cyber_record.new_PyRecordFileWriter()
+        self.record_writer = _cyber_record.new_PyRecordWriter()
 
     def __del__(self):
         print("+++ record_writer __del___")
-        _cyber_record.delete_PyRecordFileWriter(self.record_writer)
+        _cyber_record.delete_PyRecordWriter(self.record_writer)
 
     def Open(self, path):
-        return _cyber_record.PyRecordFileWriter_Open(self.record_writer, path)
+        return _cyber_record.PyRecordWriter_Open(self.record_writer, path)
     
     def Close(self):
-        _cyber_record.PyRecordFileWriter_Close(self.record_writer)
+        _cyber_record.PyRecordWriter_Close(self.record_writer)
 
-    def WriteHeader(self, header_str):
-        return _cyber_record.PyRecordFileWriter_WriteHeader(self.WriteHeader, header_str)
-
-
-#///////////////////////////////////////////////////////////////////////////
-def main():
-    print("no call!")
+    def WriteChannel(self, channel_name, type_name, proto_desc):
+        return _cyber_record.PyRecordWriter_WriteChannel(self.record_writer, channel_name, type_name, proto_desc)
     
-if __name__ == '__main__':
-  main()
+    def WriteMessage(self, single_str):
+        return _cyber_record.PyRecordWriter_WriteMessage(self.record_writer, single_str)
+    
+    def WriteMessage_channel(self, channel_name, rawmessage):
+        return _cyber_record.PyRecordWriter_WriteMessage_channel(self.record_writer, channel_name, rawmessage)

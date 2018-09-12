@@ -19,16 +19,11 @@ add_executable(test_pynode_talker
 target_link_libraries(test_pynode_talker cybertron)
 install(TARGETS test_pynode_talker DESTINATION bin)
 
-add_executable(test_pyrecord_reader
-  test_pyrecord_reader.cpp
+add_executable(test_pyrecord
+  test_pyrecord.cpp
 )
-target_link_libraries(test_pyrecord_reader cybertron cybertron_record)
-install(TARGETS test_pyrecord_reader DESTINATION bin)
+target_link_libraries(test_pyrecord cybertron cybertron_record)
+install(TARGETS test_pyrecord DESTINATION bin)
 
-add_executable(test_pyrecord_writer
-  test_pyrecord_writer.cpp
-)
-target_link_libraries(test_pyrecord_writer cybertron cybertron_record)
-install(TARGETS test_pyrecord_writer DESTINATION bin)
 
 

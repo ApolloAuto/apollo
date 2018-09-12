@@ -184,6 +184,30 @@ class Node:
         _cyber_node.PyService_register_func(s, f_ptr)
         return s
 
+    def spin(self):
+        while not _cyber_node.py_is_shutdown():
+            time.sleep(0.002)
+            self.do_executable()
+
+    def do_executable(self):
+        self.mutex.acquire()
+        for _, v in self.subs.items():
+            msg_str = _cyber_node.PyReader_read( v[0], False)
+            if (len(msg_str) > 0):
+                if v[4]:
+                    if v[2] is None:
+                        v[1](msg_str)
+                    else:
+                        v[1](msg_str, v[2])
+                else:
+                    proto = v[3]()
+                    proto.ParseFromString(msg_str)
+                    if v[2] is None:
+                        v[1](proto)
+                    else:
+                        v[1](proto, v[2])
+        self.mutex.release()
+
     def is_shutdown(self):
         return _cyber_node.py_is_shutdown()
     
@@ -220,12 +244,3 @@ def test_listener_class():
     r = node.create_reader("channel/chatter", chatter_pb2.Chatter, callback)
     while not node.is_shutdown():  
         time.sleep(0.002)
-
-#///////////////////////////////////////////////////////////////////////////
-def main():
-    #test_talker_class()
-    #test_listener_class()
-    print("no call!")
-    
-if __name__ == '__main__':
-  main()

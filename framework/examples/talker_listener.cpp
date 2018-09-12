@@ -8,7 +8,7 @@
 #include "cybertron/time/rate.h"
 #include "cybertron/time/time.h"
 #include "cybertron/transport/qos/qos_profile_conf.h"
-#include "cybertron/topology/topology.h"
+#include "cybertron/service_discovery/topology_manager.h"
 
 using apollo::cybertron::Rate;
 using apollo::cybertron::Time;

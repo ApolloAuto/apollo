@@ -58,6 +58,8 @@ bool PerceptionComponent::Proc(const std::shared_ptr<RawMessage>& msg_str) {
   }
   */
   auto out_msg = std::make_shared<Perception>();
+  out_msg->mutable_header()->set_timestamp(
+      apollo::cybertron::Time::Now().ToNanosecond());
   out_msg->set_msg_id(msg.msg_id());
   out_msg->set_result(0);
   perception_writer_->Write(out_msg);

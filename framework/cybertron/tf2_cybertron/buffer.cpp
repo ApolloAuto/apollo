@@ -71,7 +71,7 @@ void Buffer::SubscriptionCallbackImpl(
       //child_frame_id
       trans_stamped.child_frame_id = msg_evt->transforms(i).child_frame_id();
 
-      // translation
+      //translation
       trans_stamped.transform.translation.x =
           msg_evt->transforms(i).transform().translation().x();
       trans_stamped.transform.translation.y =
@@ -79,7 +79,7 @@ void Buffer::SubscriptionCallbackImpl(
       trans_stamped.transform.translation.z =
           msg_evt->transforms(i).transform().translation().z();
 
-      // rotation
+      //rotation
       trans_stamped.transform.rotation.x =
           msg_evt->transforms(i).transform().rotation().qx();
       trans_stamped.transform.rotation.y =
@@ -113,7 +113,7 @@ void Buffer::tf2MsgToCyber(
   // child_frame_id
   trans_stamped.set_child_frame_id(tf2_trans_stamped.child_frame_id);
 
-  //translation
+  // translation
   trans_stamped.mutable_transform()->mutable_translation()->set_x(
       tf2_trans_stamped.transform.translation.x);
   trans_stamped.mutable_transform()->mutable_translation()->set_y(
@@ -121,7 +121,7 @@ void Buffer::tf2MsgToCyber(
   trans_stamped.mutable_transform()->mutable_translation()->set_z(
       tf2_trans_stamped.transform.translation.z);
 
-  //rotation
+  // rotation
   trans_stamped.mutable_transform()->mutable_rotation()->set_qx(
       tf2_trans_stamped.transform.rotation.x);
   trans_stamped.mutable_transform()->mutable_rotation()->set_qy(
@@ -136,9 +136,7 @@ adu::common::TransformStamped Buffer::lookupTransform(
     const std::string& target_frame, const std::string& source_frame,
     const cybertron::Time& time, const float timeout_second) const {
   (void)timeout_second;
-  //ensure can lookup
   tf2::Time tf2_time(time.ToNanosecond());
-  // canTransform(target_frame, source_frame, time, timeout_second);
   geometry_msgs::TransformStamped tf2_trans_stamped =
       lookupTransform(target_frame, source_frame, tf2_time);
   adu::common::TransformStamped trans_stamped;
@@ -151,9 +149,6 @@ adu::common::TransformStamped Buffer::lookupTransform(
     const std::string& source_frame, const cybertron::Time& source_time,
     const std::string& fixed_frame, const float timeout_second) const {
 
-  // canTransform(target_frame, target_time, source_frame, source_time,
-  //              fixed_frame, timeout_second);
-  //
   (void)timeout_second;
   geometry_msgs::TransformStamped tf2_trans_stamped =
       lookupTransform(target_frame, target_time.ToNanosecond(), source_frame,

@@ -9,11 +9,12 @@ namespace scheduler {
 
 auto sched = Scheduler::Instance();
 
-TEST(SchedulerTest, remove_task) {
-  Scheduler scheduler;
-  EXPECT_FALSE(scheduler.RemoveTask("remove_task"));
-  scheduler.ShutDown();
-  EXPECT_TRUE(scheduler.RemoveTask("remove_task"));
+void proc() {
+}
+
+TEST(SchedulerTest, create_task) {
+  std::string croutine_name = "DriverProc";
+  EXPECT_TRUE(sched->CreateTask(&proc, croutine_name));
 }
 
 TEST(SchedulerTest, print_statistics) {
@@ -21,11 +22,11 @@ TEST(SchedulerTest, print_statistics) {
   scheduler.PrintStatistics();
 }
 
-void proc() {
-}
-TEST(SchedulerTest, create_task) {
-  std::string croutine_name = "DriverProc";
-  EXPECT_TRUE(sched->CreateTask(&proc, croutine_name));
+TEST(SchedulerTest, remove_task) {
+  Scheduler scheduler;
+  EXPECT_FALSE(scheduler.RemoveTask("remove_task"));
+  scheduler.ShutDown();
+  EXPECT_TRUE(scheduler.RemoveTask("remove_task"));
 }
 
 }  // namespace scheduler

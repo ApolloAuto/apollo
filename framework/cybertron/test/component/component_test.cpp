@@ -29,15 +29,15 @@ using apollo::cybertron::proto::ComponentConfig;
 using apollo::cybertron::proto::TimerComponentConfig;
 static bool ret_proc = true;
 static bool ret_init = true;
-template <typename M0, typename M1 = NullType, typename M2 = NullType>
-class Component_A : public Component<M0, M1, M2> {
+template <typename M0, typename M1 = NullType, typename M2 = NullType, typename M3 = NullType>
+class Component_A : public Component<M0, M1, M2, M3> {
  public:
   Component_A() {}
   bool Init() { return ret_init; }
 
  private:
   bool Proc(const std::shared_ptr<M0> &msg0, const std::shared_ptr<M1> &msg1,
-            const std::shared_ptr<M2> &msg2) {
+            const std::shared_ptr<M2> &msg2, const std::shared_ptr<M3> &msg3) {
     return ret_proc;
   }
 };
@@ -71,6 +71,7 @@ TEST(TimerComponent, init) {
   auto msg_str1 = std::make_shared<message::RawMessage>();
   auto msg_str2 = std::make_shared<message::RawMessage>();
   auto msg_str3 = std::make_shared<message::RawMessage>();
+  auto msg_str4 = std::make_shared<message::RawMessage>();
 
   compcfg.set_name("perception");
   apollo::cybertron::proto::ReaderOption *read_opt = compcfg.add_readers();
@@ -89,10 +90,13 @@ TEST(TimerComponent, init) {
   compcfg.set_name("perception3");
   apollo::cybertron::proto::ReaderOption *read_opt3 = compcfg.add_readers();
   read_opt3->set_channel("/driver/channel");
+  compcfg.set_name("perception4");
+  apollo::cybertron::proto::ReaderOption *read_opt4 = compcfg.add_readers();
+  read_opt4->set_channel("/driver/channel");
   auto comA =
-      std::make_shared<Component_A<RawMessage, RawMessage, RawMessage>>();
+      std::make_shared<Component_A<RawMessage, RawMessage, RawMessage, RawMessage>>();
   EXPECT_EQ(true, comA->Initialize(compcfg));
-  EXPECT_EQ(true, comA->Process(msg_str1, msg_str2, msg_str3));
+  EXPECT_EQ(true, comA->Process(msg_str1, msg_str2, msg_str3, msg_str4));
 }
 
 TEST(TimerComponentFail, init) {
@@ -103,6 +107,7 @@ TEST(TimerComponentFail, init) {
   auto msg_str1 = std::make_shared<message::RawMessage>();
   auto msg_str2 = std::make_shared<message::RawMessage>();
   auto msg_str3 = std::make_shared<message::RawMessage>();
+  auto msg_str4 = std::make_shared<message::RawMessage>();
 
   compcfg.set_name("perception_f");
   apollo::cybertron::proto::ReaderOption *read_opt = compcfg.add_readers();
@@ -122,9 +127,9 @@ TEST(TimerComponentFail, init) {
   apollo::cybertron::proto::ReaderOption *read_opt3 = compcfg.add_readers();
   read_opt3->set_channel("/driver/channel");
   auto comA =
-      std::make_shared<Component_A<RawMessage, RawMessage, RawMessage>>();
+      std::make_shared<Component_A<RawMessage, RawMessage, RawMessage, RawMessage>>();
   EXPECT_EQ(false, comA->Initialize(compcfg));
-  EXPECT_EQ(false, comA->Process(msg_str1, msg_str2, msg_str3));
+  EXPECT_EQ(false, comA->Process(msg_str1, msg_str2, msg_str3, msg_str4));
 }
 
 }  // namespace cybertron

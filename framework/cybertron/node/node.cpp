@@ -34,19 +34,12 @@ Node::Node(const std::string& node_name, const std::string& name_space)
   uint64_t node_id = common::GlobalData::RegisterNode(node_name);
   attr_.set_node_id(node_id);
 
-  node_manager_ = topology::Topology::Instance()->node_manager();
-  std::weak_ptr<topology::NodeManager> wk_mgr = node_manager_;
-  if (auto mgr = wk_mgr.lock()) {
-    mgr->Join(attr_, RoleType::ROLE_NODE);
-  }
+  node_manager_ =
+      service_discovery::TopologyManager::Instance()->node_manager();
+  node_manager_->Join(attr_, RoleType::ROLE_NODE);
 }
 
-Node::~Node() {
-  std::weak_ptr<topology::NodeManager> wk_mgr = node_manager_;
-  if (auto mgr = wk_mgr.lock()) {
-    mgr->Leave(attr_, RoleType::ROLE_NODE);
-  }
-}
+Node::~Node() { node_manager_->Leave(attr_, RoleType::ROLE_NODE); }
 
 const std::string& Node::Name() const { return node_name_; }
 

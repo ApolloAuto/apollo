@@ -20,11 +20,6 @@ add_executable(benchmark_switch
 )
 target_link_libraries(benchmark_switch -pthread dl cybertron)
 
-add_executable(data_cache_fetch
-  data_cache_fetch.cpp
-)
-target_link_libraries(data_cache_fetch -pthread dl cybertron)
-
 add_executable(perf_objectpool
   perf_object_pool.cpp
 )
@@ -55,7 +50,7 @@ target_link_libraries(atomic_hash_map cybertron)
 add_executable(tf2_cybertron tf2_cybertron.cpp)
 target_link_libraries(tf2_cybertron cybertron)
 
-add_subdirectory(topology)
+add_subdirectory(service_discovery)
 add_subdirectory(transport)
 add_subdirectory(component)
 add_subdirectory(component_for_qa)

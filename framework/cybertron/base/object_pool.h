@@ -145,7 +145,6 @@ template <typename T>
 void ObjectPool<T>::Dump() {
   Node *n = free_head_;
   while (n) {
-    std::cout << n << "\n";
     n = n->next;
   }
 }

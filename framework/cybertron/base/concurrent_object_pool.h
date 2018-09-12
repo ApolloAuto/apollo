@@ -165,8 +165,6 @@ void CCObjectPool<T>::Dump() {
     c++;
     n = n->next;
   }
-
-  std::cout << "objects:" << c << "\n";
 }
 
 }  // namespace base

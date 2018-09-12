@@ -84,13 +84,10 @@ class ProcessorContext {
 
   bool stop_ = false;
   std::atomic<bool> notified_;
-  int64_t proc_num_ = 0;
   uint32_t index_ = 0;
   uint32_t status_;
   int proc_index_ = -1;
 
-  // statistic issue
-  std::chrono::nanoseconds proc_interval_ = std::chrono::nanoseconds::zero();
 };
 
 bool ProcessorContext::GetState(const uint64_t& routine_id,

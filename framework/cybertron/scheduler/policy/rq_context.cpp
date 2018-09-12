@@ -29,7 +29,6 @@ namespace scheduler {
 using croutine::RoutineState;
 
 std::shared_ptr<CRoutine> RQContext::NextRoutine() {
-  auto start_time = std::chrono::steady_clock::now();
   {
     std::lock_guard<std::mutex> lock(mtx_run_queue_);
     if (run_queue_.empty() || stop_) {
@@ -62,15 +61,11 @@ std::shared_ptr<CRoutine> RQContext::NextRoutine() {
         auto routine = *run_queue_it_;
         routine->SetState(RoutineState::RUNNING);
         ++run_queue_it_;
-        proc_interval_ += std::chrono::steady_clock::now() - start_time;
-        proc_num_++;
         return routine;
       }
       ++run_queue_it_;
     }
   }
-  proc_interval_ += std::chrono::steady_clock::now() - start_time;
-  proc_num_++;
   notified_.store(false);
   return nullptr;
 }

@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef CYBERTRON_RECORD_RECORD_BASE_H_
-#define CYBERTRON_RECORD_RECORD_BASE_H_
+#ifndef CYBERTRON_RECORD_RECORD_FILE_H_
+#define CYBERTRON_RECORD_RECORD_FILE_H_
 
 #include <condition_variable>
 #include <iostream>
@@ -107,8 +107,11 @@ class RecordFileReader : public RecordFile {
   void Close() override;
 
   bool ReadSection(Section* section);
+  void SkipSection(uint64_t size, uint64_t fixed_size = 0);
+
   template <typename T>
   bool ReadSection(uint64_t size, T* message, uint64_t fixed_size = 0);
+
   bool ReadHeader();
   bool ReadIndex();
   bool EndOfFile();
@@ -121,7 +124,8 @@ template <typename T>
 bool RecordFileReader::ReadSection(uint64_t size, T* message,
                                    uint64_t fixed_size) {
   if (size == 0) {
-    return true;
+    AERROR << "size is zero.";
+    return false;
   }
   std::string str;
   str.resize(size);

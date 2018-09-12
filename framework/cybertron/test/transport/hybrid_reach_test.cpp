@@ -85,6 +85,8 @@ TEST_F(HybridReachTest, enable_and_disable_no_param) {
   upper_reach_b_->Enable();
 
   RoleAttributes attr;
+  attr.set_host_name(common::GlobalData::Instance()->HostName());
+  attr.set_process_id(common::GlobalData::Instance()->ProcessId());
   attr.mutable_qos_profile()->CopyFrom(QosProfileConf::QOS_PROFILE_DEFAULT);
   attr.set_channel_name(channel_name_);
   attr.set_channel_id(common::Hash(channel_name_));

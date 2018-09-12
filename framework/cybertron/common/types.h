@@ -22,6 +22,8 @@
 namespace apollo {
 namespace cybertron {
 
+class NullType {};
+
 // Return code definition for cybertron internal function return.
 enum ReturnCode {
   SUCC = 0,

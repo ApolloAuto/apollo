@@ -44,8 +44,8 @@ class PerfEventCache {
  public:
   ~PerfEventCache();
   void AddSchedEvent(int event_id, uint64_t cr_id, int proc_id,
-                     uint64_t t_sleep, uint64_t t_start);
-  void AddTransportEvent(int event_id, uint64_t t_sleep, uint64_t t_start);
+                     uint64_t t_sleep, uint64_t t_start, int try_fetch_result);
+  void AddTransportEvent(int event_id, uint64_t channel_id, uint64_t msg_seq);
   void AddEvent(const std::shared_ptr<PerfEventBase>& event);
 
  private:

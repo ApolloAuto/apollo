@@ -35,7 +35,6 @@ std::shared_ptr<CRoutine> CFSContext::NextRoutine() {
     return nullptr;
   }
 
-  auto start_time = std::chrono::steady_clock::now();
   std::lock_guard<std::mutex> lock(mtx_run_queue_);
 
   for (auto it = run_queue_.begin();
@@ -97,8 +96,6 @@ std::shared_ptr<CRoutine> CFSContext::NextRoutine() {
     }
     ++it;
   }
-  proc_interval_ += std::chrono::steady_clock::now() - start_time;
-  proc_num_++;
   if (croutine == nullptr) {
     notified_.store(false);
   }

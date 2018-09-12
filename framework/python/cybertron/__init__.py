@@ -18,5 +18,6 @@
 
 from . import pynode
 from . import pyrecord
+from . import pyinit
 
 

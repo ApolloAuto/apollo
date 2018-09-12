@@ -105,7 +105,7 @@ void Recorder::FindNewChannel(const RoleAttributes& role_attr) {
 
 bool Recorder::InitReadersImpl() {
   std::shared_ptr<ChannelManager> channel_manager =
-      Topology::Instance()->channel_manager();
+      TopologyManager::Instance()->channel_manager();
 
   // get historical writers
   std::vector<proto::RoleAttributes> role_attr_vec;
@@ -126,7 +126,7 @@ bool Recorder::InitReadersImpl() {
 
 bool Recorder::FreeReadersImpl() {
   std::shared_ptr<ChannelManager> channel_manager =
-      Topology::Instance()->channel_manager();
+      TopologyManager::Instance()->channel_manager();
 
   channel_manager->RemoveChangeListener(change_conn_);
 

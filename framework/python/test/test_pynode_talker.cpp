@@ -31,6 +31,7 @@ using apollo::cybertron::message::PyMessageWrap;
 using namespace apollo::cybertron;
 int main(int argc, char *argv[]) {
   // init cybertron framework
+  apollo::cybertron::Init("cyber_python");
   auto msgChat = std::make_shared<apollo::cybertron::proto::Chatter>();
   apollo::cybertron::PyNode node("talker");
   apollo::cybertron::PyWriter *pw = node.create_writer("channel/chatter", msgChat->GetTypeName());

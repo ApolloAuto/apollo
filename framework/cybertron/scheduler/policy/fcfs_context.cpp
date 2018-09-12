@@ -41,7 +41,7 @@ std::shared_ptr<CRoutine> FCFSContext::NextRoutine() {
   if (stop_) {
     return nullptr;
   }
-  auto start_time = std::chrono::steady_clock::now();
+  auto start_perf_time = apollo::cybertron::Time::Now().ToNanosecond();
   std::shared_ptr<CRoutine> routine = nullptr;
   double min_vfrequency = -1;
   {
@@ -77,8 +77,6 @@ std::shared_ptr<CRoutine> FCFSContext::NextRoutine() {
       ++run_queue_it;
     }
   }
-  proc_num_++;
-  proc_interval_ += std::chrono::steady_clock::now() - start_time;
   if (routine == nullptr) {
     notified_.store(false);
   } else {
@@ -86,7 +84,9 @@ std::shared_ptr<CRoutine> FCFSContext::NextRoutine() {
     routine->IncreaseProcessedNum();
     routine->SetVFrequency(routine->ProcessedNum() / routine->Frequency());
     routine->SetState(RoutineState::RUNNING);
-  }
+    PerfEventCache::Instance()->AddSchedEvent(5, routine->Id(), routine->ProcessorId(), 0, 
+      start_perf_time, -1);
+  } 
   return routine;
 }
 

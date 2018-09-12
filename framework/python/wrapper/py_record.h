@@ -20,97 +20,95 @@
 #include <unistd.h>
 
 #include <iostream>
-#include <iostream>
 #include <memory>
 #include <mutex>
 #include <thread>
 
 #include "cybertron/cybertron.h"
-#include "cybertron/data/data_fusion.h"
-#include "cybertron/data/meta_data.h"
 #include "cybertron/init.h"
 #include "cybertron/message/protobuf_factory.h"
 #include "cybertron/message/py_message.h"
 #include "cybertron/message/raw_message.h"
-#include "cybertron/record/header_builder.h"
-#include "cybertron/record/record_file.h"
+//#include "cybertron/record/header_builder.h"
+#include "cybertron/record/record_reader.h"
+#include "cybertron/record/record_writer.h"
 #include "cybertron/proto/record.pb.h"
 
 using ::apollo::cybertron::proto::Header;
 using ::apollo::cybertron::proto::Channel;
 using ::apollo::cybertron::proto::SingleMessage;
-using ::apollo::cybertron::record::RecordFileReader;
+using ::apollo::cybertron::record::RecordReader;
 using ::apollo::cybertron::record::RecordFileWriter;
 
 namespace apollo {
 namespace cybertron {
 namespace record {
 
-bool py_is_shutdown() { return cybertron::IsShutdown(); }
-bool py_init() {
-  static bool inited = false;
-
-  if (inited) {
-    AINFO << "cybertron already inited.";
-    return true;
-  }
-
-  if (!apollo::cybertron::Init("cyber_python")) {
-    AINFO << "cybertron::Init failed.";
-    return false;
-  }
-  inited = true;
-  AINFO << "cybertron init succ.";
-  return true;
-}
-
-bool py_OK() { return apollo::cybertron::OK(); }
-
-class PyRecordFileReader {
+class PyRecordReader {
  public:
-  PyRecordFileReader()  {
+  PyRecordReader()  {
   }
-  ~PyRecordFileReader() { }
+  ~PyRecordReader() { }
 
-  bool Open(const std::string &path) { return recored_file_reader_.Open(path); }
-  void Close() { recored_file_reader_.Close(); }
+  bool Open(const std::string &path) { return record_reader_.Open(path); }
+  void Close() { record_reader_.Close(); }
 
-  bool ReadHeader() { return recored_file_reader_.ReadHeader(); }
-  bool ReadIndex() { return recored_file_reader_.ReadIndex(); }
-  bool EndOfFile() { return recored_file_reader_.EndOfFile(); }
+  bool ReadMessage() { return record_reader_.ReadMessage(); }
+  bool EndOfFile() { return record_reader_.EndOfFile(); }
+  std::string CurrentMessageChannelName() {
+    return record_reader_.CurrentMessageChannelName(); 
+  }
+  std::string CurrentRawMessage() { 
+    if (record_reader_.CurrentRawMessage()) {
+      return record_reader_.CurrentRawMessage()->message;
+    }
+    return "";
+  }
+  uint64_t CurrentMessageTime() { return record_reader_.CurrentMessageTime(); }
+
+  uint64_t GetMessageNumber(const std::string &channel_name) { 
+    return record_reader_.GetMessageNumber(channel_name); 
+  }
+
+  std::string GetMessageType(const std::string& channel_name) { 
+    return record_reader_.GetMessageType(channel_name); 
+  }
+
+  std::string GetProtoDesc(const std::string& channel_name) { 
+    return record_reader_.GetProtoDesc(channel_name); 
+  }
 
  private:
-  RecordFileReader recored_file_reader_;
+  RecordReader record_reader_;
 };
 
-class PyRecordFileWriter {
+class PyRecordWriter {
  public:
-  PyRecordFileWriter()  {
+  PyRecordWriter()  {
   }
-  ~PyRecordFileWriter() { }
+  ~PyRecordWriter() { }
 
-  bool Open(const std::string &path) { return recored_file_writer_.Open(path); }
-  void Close() { recored_file_writer_.Close(); }
+  bool Open(const std::string &path) { return recored_writer_.Open(path); }
+  void Close() { recored_writer_.Close(); }
 
-  bool WriteHeader(const std::string& header_str) {
-    Header header;
-    header.ParseFromString(header_str);
-    return recored_file_writer_.WriteHeader(header); 
+  bool WriteChannel(const std::string& channel_str, const std::string& type,
+                    const std::string& proto_desc) {
+    return recored_writer_.WriteChannel(channel_str, type, proto_desc); 
   }
-  bool WriteChannel(const std::string& channel_str) {
-    Channel channel;
-    channel.ParseFromString(channel_str);
-    return recored_file_writer_.WriteChannel(channel); 
-  }
-  bool AddSingleMessage(const std::string& single_str) { 
+  bool WriteMessage(const std::string& single_str) { 
     SingleMessage single;
     single.ParseFromString(single_str);
-    return recored_file_writer_.AddSingleMessage(single); 
+    return recored_writer_.WriteMessage(single); 
+  }
+
+  bool WriteMessage_channel(const std::string& channel_name,
+                    const std::string& rawmessage) { 
+    
+    return recored_writer_.WriteMessage(channel_name, std::make_shared<RawMessage>(rawmessage)); 
   }
  private:
-  RecordFileWriter recored_file_writer_;
+  RecordWriter recored_writer_;
 };
-
 
 }  // namespace record
 }  // namespace cybertron

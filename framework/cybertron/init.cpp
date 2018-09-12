@@ -29,10 +29,10 @@
 #include "cybertron/common/file.h"
 #include "cybertron/common/global_data.h"
 #include "cybertron/logger/async_logger.h"
-#include "cybertron/data/data_cache.h"
+#include "cybertron/data/data_dispatcher.h"
 #include "cybertron/node/node.h"
 #include "cybertron/scheduler/scheduler.h"
-#include "cybertron/topology/topology.h"
+#include "cybertron/service_discovery/topology_manager.h"
 #include "cybertron/event/perf_event_cache.h"
 
 namespace apollo {
@@ -43,9 +43,8 @@ using apollo::cybertron::common::GetAbsolutePath;
 using apollo::cybertron::common::GetProtoFromFile;
 using apollo::cybertron::common::WorkRoot;
 using apollo::cybertron::croutine::CRoutine;
-using apollo::cybertron::data::DataCache;
 using apollo::cybertron::scheduler::Scheduler;
-using apollo::cybertron::topology::Topology;
+using apollo::cybertron::service_discovery::TopologyManager;
 using apollo::cybertron::event::PerfEventCache;
 
 static bool g_ok = false;
@@ -84,9 +83,8 @@ bool Init() {
 
   // Initialize internal static objects
   common::GlobalData::Instance();
-  topology::Topology::Instance();
+  service_discovery::TopologyManager::Instance();
   scheduler::Scheduler::Instance();
-  data::DataCache::Instance();
   PerfEventCache::Instance();
 
   // Register exit handlers
@@ -154,8 +152,7 @@ void Shutdown() {
     return;
   }
   scheduler::Scheduler::Instance()->ShutDown();
-  topology::Topology::Instance()->Shutdown();
-  data::DataCache::Instance()->Shutdown();
+  service_discovery::TopologyManager::Instance()->Shutdown();
   g_is_shutdown = true;
   g_ok = false;
 }
