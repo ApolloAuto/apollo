@@ -18,14 +18,20 @@
 #define MODULES_PLANNING_PLANNING_COMPONENT_H_
 
 #include <memory>
+#include <mutex>
 
 #include "cybertron/class_loader/class_loader.h"
 #include "cybertron/component/component.h"
 #include "cybertron/message/raw_message.h"
 
+#include "modules/canbus/proto/chassis.pb.h"
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/perception/proto/traffic_light_detection.pb.h"
+#include "modules/planning/proto/planning.pb.h"
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
+#include "modules/routing/proto/routing.pb.h"
+
+//#include "modules/planning/planning_base.h"
 
 namespace apollo {
 namespace cybertron {
@@ -39,7 +45,7 @@ namespace planning {
 
 class PlanningComponent final
     : public cybertron::Component<prediction::PredictionObstacles,
-                                  perception::TrafficLightDetection,
+                                  canbus::Chassis,
                                   localization::LocalizationEstimate> {
  public:
   PlanningComponent() = default;
@@ -50,10 +56,22 @@ class PlanningComponent final
 
   bool Proc(const std::shared_ptr<prediction::PredictionObstacles>&
                 prediction_obstacles,
-            const std::shared_ptr<perception::TrafficLightDetection>&
-                traffic_light_detection,
+            const std::shared_ptr<canbus::Chassis>& chassis,
             const std::shared_ptr<localization::LocalizationEstimate>&
                 localization_estimate) override;
+
+ private:
+  std::shared_ptr<cybertron::Reader<perception::TrafficLightDetection>>
+      traffic_light_reader_;
+  std::shared_ptr<cybertron::Reader<routing::RoutingResponse>> routing_reader_;
+
+  std::shared_ptr<cybertron::Writer<ADCTrajectory>> writer_;
+
+  std::mutex mutex_;
+  perception::TrafficLightDetection traffic_light_;
+  routing::RoutingResponse routing_;
+
+  // std::unique<PlanningBase> planning_base_;
 };
 
 CYBERTRON_REGISTER_COMPONENT(PlanningComponent)
