@@ -20,70 +20,34 @@
 #include <list>
 #include <vector>
 
-#include "google/protobuf/repeated_field.h"
-
-#include "modules/common/adapters/adapter_manager.h"
-#include "modules/common/math/quaternion.h"
 #include "modules/common/time/time.h"
-#include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/hdmap/hdmap_util.h"
-#include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/common/trajectory/trajectory_stitcher.h"
-#include "modules/planning/planner/em/em_planner.h"
-#include "modules/planning/planner/lattice/lattice_planner.h"
-#include "modules/planning/planner/navi/navi_planner.h"
-#include "modules/planning/planner/open_space/open_space_planner.h"
-#include "modules/planning/planner/rtk/rtk_replay_planner.h"
-#include "modules/planning/toolkits/deciders/traffic_decider.h"
 
 namespace apollo {
 namespace planning {
 
-using apollo::common::ErrorCode;
-using apollo::common::Status;
 using apollo::common::TrajectoryPoint;
-using apollo::common::VehicleState;
-using apollo::common::VehicleStateProvider;
-using apollo::common::adapter::AdapterManager;
 using apollo::common::time::Clock;
 using apollo::hdmap::HDMapUtil;
 
 PlanningBase::~PlanningBase() {}
 
-bool PlanningBase::IsVehicleStateValid(const VehicleState& vehicle_state) {
-  if (std::isnan(vehicle_state.x()) || std::isnan(vehicle_state.y()) ||
-      std::isnan(vehicle_state.z()) || std::isnan(vehicle_state.heading()) ||
-      std::isnan(vehicle_state.kappa()) ||
-      std::isnan(vehicle_state.linear_velocity()) ||
-      std::isnan(vehicle_state.linear_acceleration())) {
-    return false;
-  }
-  return true;
-}
-
-void PlanningBase::PublishPlanningPb(ADCTrajectory* trajectory_pb,
-                                     double timestamp) {
+void PlanningBase::PublishPlanningPb(const double timestamp,
+                                     ADCTrajectory* trajectory_pb) {
   trajectory_pb->mutable_header()->set_timestamp_sec(timestamp);
-  if (AdapterManager::GetPrediction() &&
-      !AdapterManager::GetPrediction()->Empty()) {
-    const auto& prediction =
-        AdapterManager::GetPrediction()->GetLatestObserved();
+  if (prediction_obstacles_ != nullptr &&
+      !prediction_obstacles_->has_header()) {
     trajectory_pb->mutable_header()->set_lidar_timestamp(
-        prediction.header().lidar_timestamp());
+        prediction_obstacles_->header().lidar_timestamp());
     trajectory_pb->mutable_header()->set_camera_timestamp(
-        prediction.header().camera_timestamp());
+        prediction_obstacles_->header().camera_timestamp());
     trajectory_pb->mutable_header()->set_radar_timestamp(
-        prediction.header().radar_timestamp());
+        prediction_obstacles_->header().radar_timestamp());
   }
 
   // TODO(all): integrate reverse gear
   trajectory_pb->set_gear(canbus::Chassis::GEAR_DRIVE);
-  if (AdapterManager::GetRoutingResponse() &&
-      !AdapterManager::GetRoutingResponse()->Empty()) {
-    trajectory_pb->mutable_routing_header()->CopyFrom(
-        AdapterManager::GetRoutingResponse()->GetLatestObserved().header());
-  }
 
   if (FLAGS_use_planning_fallback &&
       trajectory_pb->trajectory_point_size() == 0) {
@@ -102,24 +66,20 @@ void PlanningBase::PublishPlanningPb(ADCTrajectory* trajectory_pb,
       p.set_relative_time(p.relative_time() + dt);
     }
   }
-  Publish(trajectory_pb);
 }
 
 void PlanningBase::SetFallbackTrajectory(ADCTrajectory* trajectory_pb) {
   CHECK_NOTNULL(trajectory_pb);
   // use planning trajecotry from last cycle
-  auto* last_planning = AdapterManager::GetPlanning();
-  if (last_planning != nullptr && !last_planning->Empty()) {
-    const auto& traj = last_planning->GetLatestObserved();
-
+  if (last_planning_ != nullptr) {
     const double current_time_stamp = trajectory_pb->header().timestamp_sec();
-    const double pre_time_stamp = traj.header().timestamp_sec();
+    const double pre_time_stamp = last_planning_->header().timestamp_sec();
 
-    for (int i = 0; i < traj.trajectory_point_size(); ++i) {
-      const double t = traj.trajectory_point(i).relative_time() +
+    for (int i = 0; i < last_planning_->trajectory_point_size(); ++i) {
+      const double t = last_planning_->trajectory_point(i).relative_time() +
                        pre_time_stamp - current_time_stamp;
       auto* p = trajectory_pb->add_trajectory_point();
-      p->CopyFrom(traj.trajectory_point(i));
+      p->CopyFrom(last_planning_->trajectory_point(i));
       p->set_relative_time(t);
     }
   }

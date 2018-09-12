@@ -15,6 +15,8 @@
  *****************************************************************************/
 #include "modules/planning/planning_component.h"
 
+#include "modules/common/util/message_util.h"
+
 namespace apollo {
 namespace planning {
 
@@ -50,17 +52,21 @@ bool PlanningComponent::Proc(
     const std::shared_ptr<canbus::Chassis>& chassis,
     const std::shared_ptr<localization::LocalizationEstimate>&
         localization_estimate) {
+  routing::RoutingResponse routing_copy;
   {
     std::lock_guard<std::mutex> lock(mutex_);
-    // planning_base_->SetRouting(routing);
+    routing_copy = routing_;
   }
+  perception::TrafficLightDetection traffic_light_copy;
   {
     std::lock_guard<std::mutex> lock(mutex_);
-    // planning_base_->SetTrafficLight(traffic_light_);
+    traffic_light_copy = traffic_light_;
   }
 
   ADCTrajectory adc_trajectory_pb;
   // TODO(Liangliang) implement here
+
+  common::util::FillHeader(node_->Name(), &adc_trajectory_pb);
   writer_->Write(std::make_shared<ADCTrajectory>(adc_trajectory_pb));
   return true;
 }
