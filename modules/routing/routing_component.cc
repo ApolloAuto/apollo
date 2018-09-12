@@ -15,20 +15,24 @@
  *****************************************************************************/
 
 #include "modules/routing/routing_component.h"
+#include "modules/common/adapters/adapter_gflags.h"
 
 namespace apollo {
 namespace routing {
 
 bool RoutingComponent::Init() {
+  response_writer_ =
+      node_->CreateWriter<RoutingResponse>(FLAGS_routing_response_topic);
+
   return routing_.Init().ok() && routing_.Start().ok();
 }
 
 bool RoutingComponent::Proc(const std::shared_ptr<RoutingRequest>& request) {
-  RoutingResponse response;
-  if (!routing_.Process(request, &response)) {
+  auto response = std::make_shared<RoutingResponse>();
+  if (!routing_.Process(request, response.get())) {
     return false;
   }
-  writer_->Write(std::make_shared<RoutingResponse>(response));
+  response_writer_->Write(response);
   return true;
 }
 
