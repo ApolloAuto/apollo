@@ -5,7 +5,7 @@ pixel_format: "yuyv"
 io_method: IO_METHOD_MMAP
 width: 1920
 height: 1080
-frame_rate: 30
+frame_rate: 20
 monochrome: false
 brightness: -1
 contrast: -1

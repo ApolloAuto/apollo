@@ -872,7 +872,7 @@ bool UsbCam::read_frame(CameraImagePtr raw_image) {
             return false;
           }
           if (frame_warning_interval_ < diff) {
-            LOG_WARN << "stamp jump.last stamp:" << last_nsec_
+            AWARN << "stamp jump.last stamp:" << last_nsec_
                     << " current stamp:" << camera_timestamp;
           }
           last_nsec_ = camera_timestamp;
@@ -887,7 +887,7 @@ bool UsbCam::read_frame(CameraImagePtr raw_image) {
             warning_stream << "camera time diff exception,diff:"
                     << diff << ";dev:" << config_->camera_dev();
             warning_stream >> warning_str;
-            LOG_WARN << warning_str;
+            AWARN << warning_str;
         }
       }
       if (len < raw_image->width * raw_image->height) {
