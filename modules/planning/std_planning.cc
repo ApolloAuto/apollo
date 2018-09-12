@@ -148,14 +148,7 @@ Status StdPlanning::InitFrame(const uint32_t sequence_num,
   return Status::OK();
 }
 
-void StdPlanning::RunOnce(
-    const std::shared_ptr<prediction::PredictionObstacles>&
-        prediction_obstacles,
-    const std::shared_ptr<canbus::Chassis>& chassis,
-    const std::shared_ptr<localization::LocalizationEstimate>&
-        localization_estimate,
-    const perception::TrafficLightDetection,
-    const routing::RoutingResponse& routing) {
+void StdPlanning::RunOnce(const PlanningData& planning_data) {
   const double start_timestamp = Clock::NowInSeconds();
 
   ADCTrajectory not_ready_pb;
@@ -163,11 +156,11 @@ void StdPlanning::RunOnce(
                         ->mutable_main_decision()
                         ->mutable_not_ready();
 
-  if (localization_estimate == nullptr) {
+  if (planning_data.localization_estimate == nullptr) {
     not_ready->set_reason("localization not ready");
-  } else if (chassis == nullptr) {
+  } else if (planning_data.chassis == nullptr) {
     not_ready->set_reason("chassis not ready");
-  } else if (!routing.has_header()) {
+  } else if (planning_data.routing == nullptr) {
     not_ready->set_reason("routing not ready");
   } else if (HDMapUtil::BaseMapPtr() == nullptr) {
     not_ready->set_reason("map not ready");
@@ -179,13 +172,14 @@ void StdPlanning::RunOnce(
   }
 
   // localization
-  ADEBUG << "Get localization:" << localization_estimate->DebugString();
+  ADEBUG << "Get localization:"
+         << planning_data.localization_estimate->DebugString();
 
   // chassis
-  ADEBUG << "Get chassis:" << chassis->DebugString();
+  ADEBUG << "Get chassis:" << planning_data.chassis->DebugString();
 
   Status status = VehicleStateProvider::Instance()->Update(
-      *localization_estimate, *chassis);
+      *planning_data.localization_estimate, *planning_data.chassis);
 
   VehicleState vehicle_state =
       VehicleStateProvider::Instance()->vehicle_state();
@@ -213,10 +207,10 @@ void StdPlanning::RunOnce(
     return;
   }
 
-  if (IsDifferentRouting(last_routing_, routing)) {
-    last_routing_ = routing;
+  if (IsDifferentRouting(last_routing_, *planning_data.routing)) {
+    last_routing_ = *planning_data.routing;
     GetPlanningStatus()->Clear();
-    reference_line_provider_->UpdateRoutingResponse(routing);
+    reference_line_provider_->UpdateRoutingResponse(*planning_data.routing);
   }
 
   // Update reference line provider and reset pull over if necessary

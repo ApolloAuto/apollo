@@ -15,8 +15,8 @@
  *****************************************************************************/
 #include "modules/planning/planning_component.h"
 
-#include "modules/planning/std_planning.h"
 #include "modules/common/util/message_util.h"
+#include "modules/planning/std_planning.h"
 
 namespace apollo {
 namespace planning {
@@ -44,6 +44,8 @@ bool PlanningComponent::Init() {
         traffic_light_.CopyFrom(*traffic_light);
       });
 
+  writer_ = node_->CreateWriter<ADCTrajectory>("/apollo/planning");
+
   return true;
 }
 
@@ -53,15 +55,19 @@ bool PlanningComponent::Proc(
     const std::shared_ptr<canbus::Chassis>& chassis,
     const std::shared_ptr<localization::LocalizationEstimate>&
         localization_estimate) {
-  routing::RoutingResponse routing_copy;
+  planning_data_.prediction_obstacles = prediction_obstacles;
+  planning_data_.chassis = chassis;
+  planning_data_.localization_estimate = localization_estimate;
   {
     std::lock_guard<std::mutex> lock(mutex_);
-    routing_copy = routing_;
+    planning_data_.routing =
+        std::make_shared<routing::RoutingResponse>(routing_);
   }
   perception::TrafficLightDetection traffic_light_copy;
   {
     std::lock_guard<std::mutex> lock(mutex_);
-    traffic_light_copy = traffic_light_;
+    planning_data_.traffic_light =
+        std::make_shared<TrafficLightDetection>(traffic_light_);
   }
 
   ADCTrajectory adc_trajectory_pb;

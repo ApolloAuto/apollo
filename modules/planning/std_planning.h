@@ -60,13 +60,7 @@ class StdPlanning : public PlanningBase {
   * @brief main logic of the planning module, runs periodically triggered by
   * timer.
   */
-  void RunOnce(const std::shared_ptr<prediction::PredictionObstacles>&
-                   prediction_obstacles,
-               const std::shared_ptr<canbus::Chassis>& chassis,
-               const std::shared_ptr<localization::LocalizationEstimate>&
-                   localization_estimate,
-               const perception::TrafficLightDetection,
-               const routing::RoutingResponse& routing) override;
+  void RunOnce(const PlanningData& planning_data) override;
 
   apollo::common::Status Plan(
       const double current_time_stamp,
