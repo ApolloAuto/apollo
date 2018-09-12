@@ -27,9 +27,14 @@ using apollo::perception::TrafficLightDetection;
 using apollo::routing::RoutingResponse;
 
 bool PlanningComponent::Init() {
+  if (!GetProtoConfig(&planning_conf_)) {
+    AERROR << "Unable to load planning conf file: " << ConfigFilePath();
+    return false;
+  }
+
   planning_base_ = std::unique_ptr<PlanningBase>(new StdPlanning());
   routing_reader_ = node_->CreateReader<RoutingResponse>(
-      "/apollo/routing_response",
+      planning_conf_.routing_response_channel(),
       [this](const std::shared_ptr<RoutingResponse>& routing) {
         ADEBUG << "Received routing data: run routing callback.";
         std::lock_guard<std::mutex> lock(mutex_);
@@ -37,7 +42,7 @@ bool PlanningComponent::Init() {
       });
 
   traffic_light_reader_ = node_->CreateReader<TrafficLightDetection>(
-      "/apollo/perception/traffic_light",
+      planning_conf_.traffic_light_detection_channel(),
       [this](const std::shared_ptr<TrafficLightDetection>& traffic_light) {
         ADEBUG << "Received chassis data: run chassis callback.";
         std::lock_guard<std::mutex> lock(mutex_);

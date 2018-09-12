@@ -27,6 +27,7 @@
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/perception/proto/traffic_light_detection.pb.h"
+#include "modules/planning/proto/planning_conf.pb.h"
 #include "modules/planning/proto/planning.pb.h"
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
 #include "modules/routing/proto/routing.pb.h"
@@ -54,6 +55,7 @@ class PlanningComponent final
                 localization_estimate) override;
 
  private:
+  PlanningConf planning_conf_;
   std::shared_ptr<cybertron::Reader<perception::TrafficLightDetection>>
       traffic_light_reader_;
   std::shared_ptr<cybertron::Reader<routing::RoutingResponse>> routing_reader_;
