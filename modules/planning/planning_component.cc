@@ -20,17 +20,48 @@ namespace planning {
 
 using apollo::cybertron::Component;
 using apollo::cybertron::ComponentBase;
+using apollo::perception::TrafficLightDetection;
+using apollo::routing::RoutingResponse;
 
-bool PlanningComponent::Init() { return true; }
+bool PlanningComponent::Init() {
+  // planning_base_ = std::unique_ptr<PlanningBase>(new StdPlanning());
+  routing_reader_ = node_->CreateReader<RoutingResponse>(
+      "/apollo/routing_response",
+      [this](const std::shared_ptr<RoutingResponse>& routing) {
+        ADEBUG << "Received routing data: run routing callback.";
+        std::lock_guard<std::mutex> lock(mutex_);
+        routing_.CopyFrom(*routing);
+      });
+
+  traffic_light_reader_ = node_->CreateReader<TrafficLightDetection>(
+      "/apollo/perception/traffic_light",
+      [this](const std::shared_ptr<TrafficLightDetection>& traffic_light) {
+        ADEBUG << "Received chassis data: run chassis callback.";
+        std::lock_guard<std::mutex> lock(mutex_);
+        traffic_light_.CopyFrom(*traffic_light);
+      });
+
+  return true;
+}
 
 bool PlanningComponent::Proc(
     const std::shared_ptr<prediction::PredictionObstacles>&
         prediction_obstacles,
-    const std::shared_ptr<perception::TrafficLightDetection>&
-        traffic_light_detection,
+    const std::shared_ptr<canbus::Chassis>& chassis,
     const std::shared_ptr<localization::LocalizationEstimate>&
         localization_estimate) {
-  // implement here
+  {
+    std::lock_guard<std::mutex> lock(mutex_);
+    // planning_base_->SetRouting(routing);
+  }
+  {
+    std::lock_guard<std::mutex> lock(mutex_);
+    // planning_base_->SetTrafficLight(traffic_light_);
+  }
+
+  ADCTrajectory adc_trajectory_pb;
+  // TODO(Liangliang) implement here
+  writer_->Write(std::make_shared<ADCTrajectory>(adc_trajectory_pb));
   return true;
 }
 

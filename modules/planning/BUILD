@@ -4,13 +4,22 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "planning_component_lib",
-    srcs = ["planning_component.cc"],
-    hdrs = ["planning_component.h"],
+    srcs = [
+        #"planning_base.cc",
+        "planning_component.cc",
+    ],
+    hdrs = [
+        #"planning_base.h",
+        "planning_component.h",
+        #"std_planning.h",
+    ],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//framework:cybertron",
+        "//modules/common/util:thread_pool",
         "//modules/localization/proto:localization_proto",
         "//modules/perception/proto:perception_proto",
+        "//modules/planning/proto:planning_proto",
         "//modules/prediction/proto:prediction_proto",
     ],
 )
