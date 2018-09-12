@@ -33,11 +33,11 @@
 #include "modules/routing/proto/routing.pb.h"
 
 #include "modules/common/status/status.h"
+#include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/hdmap/hdmap.h"
-//#include "modules/common/vehicle_state/vehicle_state_provider.h"
-//#include "modules/planning/common/trajectory/publishable_trajectory.h"
-//#include "modules/planning/planner/planner.h"
-//#include "modules/planning/planner/planner_dispatcher.h"
+#include "modules/planning/common/trajectory/publishable_trajectory.h"
+#include "modules/planning/planner/planner.h"
+#include "modules/planning/planner/planner_dispatcher.h"
 
 /**
  * @namespace apollo::planning
@@ -55,6 +55,10 @@ class PlanningBase {
  public:
   PlanningBase() = default;
   virtual ~PlanningBase();
+
+  virtual apollo::common::Status Init() = 0;
+
+  virtual std::string Name() const = 0;
 
   virtual void RunOnce(
       const std::shared_ptr<prediction::PredictionObstacles>&
@@ -83,6 +87,15 @@ class PlanningBase {
   const std::shared_ptr<localization::LocalizationEstimate>
       localization_estimate_;
   const std::shared_ptr<ADCTrajectory> last_planning_;
+
+  double start_time_ = 0.0;
+  std::size_t seq_num_ = 0;
+
+  PlanningConfig config_;
+  TrafficRuleConfigs traffic_rule_configs_;
+  std::unique_ptr<Planner> planner_;
+  std::unique_ptr<PublishableTrajectory> last_publishable_trajectory_;
+  std::unique_ptr<PlannerDispatcher> planner_dispatcher_;
 };
 
 }  // namespace planning

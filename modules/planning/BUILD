@@ -25,9 +25,11 @@ cc_library(
 cc_library(
     name = "planning_lib",
     srcs = [
+        "std_planning.cc",
         "planning_base.cc",
     ],
     hdrs = [
+        "std_planning.h",
         "planning_base.h",
     ],
     deps = [
@@ -36,13 +38,19 @@ cc_library(
         "//modules/common/math:quaternion",
         "//modules/common/proto:pnc_point_proto",
         "//modules/common/util:message_util",
+        "//modules/common/vehicle_state:vehicle_state_provider",
         "//modules/localization/proto:localization_proto",
         "//modules/map/hdmap:hdmap_util",
         "//modules/perception/proto:perception_proto",
+        "//modules/planning/common:planning_common",
         "//modules/planning/common:planning_gflags",
+        "//modules/planning/common/trajectory:trajectory_stitcher",
+        "//modules/planning/planner",
+        "//modules/planning/planner:planner_dispatcher",
         "//modules/planning/proto:planning_config_proto",
         "//modules/planning/proto:planning_proto",
         "//modules/planning/proto:traffic_rule_config_proto",
+        "//modules/planning/toolkits/deciders",
         "//modules/prediction/proto:prediction_proto",
     ],
 )
