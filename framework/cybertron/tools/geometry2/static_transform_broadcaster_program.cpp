@@ -2,8 +2,8 @@
 #include <cstdio>
 
 #include "cybertron/cybertron.h"
-#include "tf2/LinearMath/Quaternion.h"
 #include "cybertron/tf2_cybertron/static_transform_broadcaster.h"
+#include "tf2/LinearMath/Quaternion.h"
 
 int main(int argc, char** argv) {
   apollo::cybertron::Init(argv[0]);
@@ -16,9 +16,8 @@ int main(int argc, char** argv) {
 
   if (argc == 10) {
     if (strcmp(argv[8], argv[9]) == 0) {
-      LOG_ERROR
-          << "target_frame and source frame are the same, this cannot work:"
-          << argv[8] << argv[9];
+      AERROR << "target_frame and source frame are the same, this cannot work:"
+             << argv[8] << argv[9];
       return 1;
     }
 
@@ -43,9 +42,8 @@ int main(int argc, char** argv) {
     return 0;
   } else if (argc == 9) {
     if (strcmp(argv[7], argv[8]) == 0) {
-      LOG_ERROR
-          << "target_frame and source frame are the same, this cannot work:"
-          << argv[8] << argv[9];
+      AERROR << "target_frame and source frame are the same, this cannot work:"
+             << argv[8] << argv[9];
       return 1;
     }
 
@@ -84,8 +82,8 @@ int main(int argc, char** argv) {
         "\nThis transform is the transform of the coordinate frame from "
         "frame_id into the coordinate frame \n");
     printf("of the child_frame_id.  \n");
-    LOG_ERROR << "static_transform_publisher exited due to not having the "
-                 "right number of arguments";
+    AERROR << "static_transform_publisher exited due to not having the "
+              "right number of arguments";
     return -1;
   }
 };

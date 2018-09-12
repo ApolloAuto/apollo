@@ -34,8 +34,8 @@ namespace cybertron {
 using apollo::cybertron::common::GlobalData;
 using apollo::cybertron::proto::RoleAttributes;
 
-template <typename M0, typename M1 = NullType, typename M2 = NullType,
-          typename M3 = NullType>
+template <typename M0 = NullType, typename M1 = NullType,
+          typename M2 = NullType, typename M3 = NullType>
 class Component : public ComponentBase {
  public:
   Component() {}
@@ -53,7 +53,7 @@ class Component : public ComponentBase {
 };
 
 template <>
-class Component<NullType, NullType, NullType> : public ComponentBase {
+class Component<NullType, NullType, NullType, NullType> : public ComponentBase {
  public:
   Component() {}
   ~Component() override {}
@@ -106,6 +106,17 @@ bool Component<M0, NullType, NullType, NullType>::Process(
     const std::shared_ptr<M0>& msg) {
   // TODO(hewei03): Add some protection here.
   return Proc(msg);
+}
+
+inline bool Component<NullType, NullType, NullType>::Initialize(
+    const ComponentConfig& config) {
+  node_.reset(new Node(config.name()));
+  SetConfigFilePath(config);
+  if (!Init()) {
+    AERROR << "Component Init() failed." << std::endl;
+    return false;
+  }
+  return true;
 }
 
 template <typename M0>
@@ -313,16 +324,16 @@ bool Component<M0, M1, M2, M3>::Initialize(const ComponentConfig& config) {
   auto sched = scheduler::Scheduler::Instance();
   std::weak_ptr<Component<M0, M1, M2, M3>> self =
       std::dynamic_pointer_cast<Component<M0, M1, M2, M3>>(shared_from_this());
-  auto func = [self](
-      const std::shared_ptr<M0>& msg0, const std::shared_ptr<M1>& msg1,
-      const std::shared_ptr<M2>& msg2, const std::shared_ptr<M3>& msg3) {
-    auto ptr = self.lock();
-    if (ptr) {
-      ptr->Process(msg0, msg1, msg2, msg3);
-    } else {
-      AERROR << "Component object has been destroyed." << std::endl;
-    }
-  };
+  auto func =
+      [self](const std::shared_ptr<M0>& msg0, const std::shared_ptr<M1>& msg1,
+             const std::shared_ptr<M2>& msg2, const std::shared_ptr<M3>& msg3) {
+        auto ptr = self.lock();
+        if (ptr) {
+          ptr->Process(msg0, msg1, msg2, msg3);
+        } else {
+          AERROR << "Component object has been destroyed." << std::endl;
+        }
+      };
 
   auto dv = std::make_shared<data::DataVisitor<M0, M1, M2, M3>>(readers_);
   croutine::RoutineFactory factory =

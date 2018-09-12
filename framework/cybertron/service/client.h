@@ -216,14 +216,10 @@ void Client<Request, Response>::HandleResponse(
   AINFO << "client recv response.";
   std::lock_guard<std::mutex> lock(pending_requests_mutex_);
   if (request_header.spare_id() != writer_id_) {
-    // //LOG_DEBUG << "gid:" << gid.get_str() << " != writer_guid"
-    //          << _writer_guid.get_str() << " s:" << _service_name;
     return;
   }
   uint64_t sequence_number = request_header.seq_num();
-  // LOG_ERROR << "Received sequence number:" << sequence_number;
   if (this->pending_requests_.count(sequence_number) == 0) {
-    // LOG_DEBUG << "Received invalid sequence number:" << sequence_number;
     return;
   }
   auto tuple = this->pending_requests_[sequence_number];
