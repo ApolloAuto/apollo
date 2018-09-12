@@ -68,7 +68,7 @@ void UsbCamComponent::run() {
     }
 
     if (!camera_device_->poll(raw_image_)) {
-      LOG_ERROR << "camera device poll failed";
+      AERROR << "camera device poll failed";
       continue;
     }
     
