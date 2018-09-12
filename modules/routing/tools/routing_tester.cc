@@ -20,10 +20,12 @@
 #include "gflags/gflags.h"
 
 #include "cybertron/cybertron.h"
+#include "cybertron/time/rate.h"
+#include "cybertron/time/time.h"
 
-#include "modules/common/adapters/adapter_manager.h"
-#include "modules/common/adapters/proto/adapter_config.pb.h"
+#include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/log.h"
+#include "modules/common/util/file.h"
 #include "modules/routing/proto/routing.pb.h"
 
 DEFINE_bool(enable_remove_lane_id, true,
@@ -33,26 +35,15 @@ DEFINE_string(routing_test_file,
               "modules/routing/testdata/routing_tester/routing_test.pb.txt",
               "Used for sending routing request to routing node.");
 
-int main(int argc, char** argv) {
-  using std::this_thread::sleep_for;
+using apollo::cybertron::Rate;
+using apollo::cybertron::Time;
 
-  using apollo::common::adapter::AdapterManager;
-  using apollo::common::adapter::AdapterManagerConfig;
-  using apollo::common::adapter::AdapterConfig;
-
-  google::InitGoogleLogging(argv[0]);
+int main(int argc, char *argv[]) {
   google::ParseCommandLineFlags(&argc, &argv, true);
-  apollo::cyberton::Init("routing_tester");
 
+  // init cybertron framework
+  apollo::cybertron::Init(argv[0]);
   FLAGS_alsologtostderr = true;
-  AdapterManagerConfig config;
-  config.set_is_ros(true);
-  auto* sub_config = config.add_config();
-  sub_config->set_mode(AdapterConfig::PUBLISH_ONLY);
-  sub_config->set_type(AdapterConfig::ROUTING_REQUEST);
-
-  AdapterManager::Init(config);
-  AINFO << "AdapterManager is initialized.";
 
   apollo::routing::RoutingRequest routing_request;
   if (!apollo::common::util::GetProtoFromFile(FLAGS_routing_test_file,
@@ -68,14 +59,16 @@ int main(int argc, char** argv) {
     }
   }
 
-  apollo::cybertron::Rate loop_rate(0.3);  // frequency
+  std::shared_ptr<apollo::cybertron::Node> node(
+      apollo::cybertron::CreateNode("routing_tester"));
+  auto writer = node->CreateWriter<apollo::routing::RoutingRequest>(
+      FLAGS_routing_request_topic);
 
+  Rate rate(1.0);
   while (apollo::cybertron::OK()) {
-    AdapterManager::FillRoutingRequestHeader("routing", &routing_request);
-    AdapterManager::PublishRoutingRequest(routing_request);
-    AINFO << "Sending routing request:" << routing_request.DebugString();
-    loop_rate.Sleep();
+    writer->Write(routing_request);
+    AINFO << "send out routing request: " << routing_request.DebugString();
+    rate.Sleep();
   }
-
   return 0;
 }
