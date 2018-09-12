@@ -18,16 +18,17 @@
  * @file
  */
 
-#ifndef MODULES_CANBUS_CANBUS_H_
-#define MODULES_CANBUS_CANBUS_H_
+#ifndef MODULES_CANBUS_CANBUS_COMPONENT_H_
+#define MODULES_CANBUS_CANBUS_COMPONENT_H_
 
 #include <memory>
 #include <string>
 #include <utility>
 #include <vector>
 
-#include "ros/include/ros/ros.h"
-
+#include "cybertron/component/timer_component.h"
+#include "cybertron/cybertron.h"
+#include "cybertron/timer/timer.h"
 #include "modules/canbus/proto/chassis_detail.pb.h"
 #include "modules/canbus/vehicle/vehicle_controller.h"
 #include "modules/common/apollo_app.h"
@@ -54,9 +55,9 @@ namespace canbus {
  * @brief canbus module main class.
  * It processes the control data to send protocol messages to can card.
  */
-class Canbus : public apollo::common::ApolloApp {
+class CanbusComponent : public apollo::cybertron::TimerComponent {
  public:
-  Canbus()
+  CanbusComponent()
       : monitor_logger_(apollo::common::monitor::MonitorMessageItem::CANBUS) {}
 
   /**
@@ -108,4 +109,4 @@ class Canbus : public apollo::common::ApolloApp {
 }  // namespace canbus
 }  // namespace apollo
 
-#endif  // MODULES_CANBUS_CANBUS_H_
+#endif  // MODULES_CANBUS_CANBUS_COMPONENT_H_
