@@ -104,7 +104,7 @@ bool Routing::Process(
     return false;
   }
   //buffer.INFO("Routing success!");
-  return false;
+  return true;
 }
 
 void Routing::Stop() {}
