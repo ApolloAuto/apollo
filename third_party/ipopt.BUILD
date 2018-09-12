@@ -5,6 +5,7 @@ licenses(["notice"])
 cc_library(
     name = "ipopt",
     includes = ["."],
+    copts = [ "-fPIC"],
     linkopts = [
         "-L/usr/local/ipopt/lib -lipopt",
         "-L/usr/local/ipopt/lib -lcoinmumps",

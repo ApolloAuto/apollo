@@ -26,7 +26,7 @@ using apollo::perception::TrafficLightDetection;
 using apollo::routing::RoutingResponse;
 
 bool PlanningComponent::Init() {
-  // planning_base_ = std::unique_ptr<PlanningBase>(new StdPlanning());
+  planning_base_ = std::unique_ptr<PlanningBase>(new StdPlanning());
   routing_reader_ = node_->CreateReader<RoutingResponse>(
       "/apollo/routing_response",
       [this](const std::shared_ptr<RoutingResponse>& routing) {
