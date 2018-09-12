@@ -4,8 +4,8 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "canbus_lib",
-    srcs = ["canbus.cc"],
-    hdrs = ["canbus.h"],
+    srcs = ["canbus_component.cc"],
+    hdrs = ["canbus_component.h"],
     deps = [
         "//modules/canbus/common:canbus_common",
         "//modules/canbus/vehicle:vehicle_factory",
@@ -15,7 +15,9 @@ cc_library(
         "//modules/drivers/canbus/can_client:can_client_factory",
         "//modules/drivers/canbus/can_comm:can_receiver",
         "//modules/drivers/canbus/can_comm:can_sender",
+        "//framework:cybertron",
     ],
+    copts = ['-DMODULE_NAME=\\"guardian\\"']
 )
 
 cc_test(
@@ -29,8 +31,7 @@ cc_test(
 )
 
 cc_binary(
-    name = "canbus",
-    srcs = ["main.cc"],
+    name = "libcanbus.so",
     deps = [
         ":canbus_lib",
         "//external:gflags",
@@ -41,6 +42,7 @@ cc_binary(
         "//modules/drivers/canbus/common:canbus_common",
         "@ros//:ros_common",
     ],
+    linkopts = ["-shared"],
 )
 
 filegroup(

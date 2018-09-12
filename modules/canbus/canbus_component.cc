@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/canbus.h"
+#include "modules/canbus/canbus_component.h"
 
 #include "modules/canbus/common/canbus_gflags.h"
 #include "modules/canbus/vehicle/vehicle_factory.h"
@@ -35,9 +35,9 @@ using apollo::control::ControlCommand;
 using apollo::drivers::canbus::CanClientFactory;
 using apollo::guardian::GuardianCommand;
 
-std::string Canbus::Name() const { return FLAGS_canbus_module_name; }
+std::string CanbusComponent::Name() const { return FLAGS_canbus_module_name; }
 
-Status Canbus::Init() {
+Status CanbusComponent::Init() {
   AdapterManager::Init(FLAGS_canbus_adapter_config_filename);
   AINFO << "The adapter manager is successfully initialized.";
 
@@ -109,7 +109,7 @@ Status Canbus::Init() {
   return Status::OK();
 }
 
-Status Canbus::Start() {
+Status CanbusComponent::Start() {
   // 1. init and start the can card hardware
   if (can_client_->Start() != ErrorCode::OK) {
     return OnError("Failed to start can client");
@@ -144,7 +144,7 @@ Status Canbus::Start() {
   return Status::OK();
 }
 
-void Canbus::PublishChassis() {
+void CanbusComponent::PublishChassis() {
   Chassis chassis = vehicle_controller_->chassis();
   AdapterManager::FillChassisHeader(FLAGS_canbus_node_name, &chassis);
 
@@ -152,7 +152,7 @@ void Canbus::PublishChassis() {
   ADEBUG << chassis.ShortDebugString();
 }
 
-void Canbus::PublishChassisDetail() {
+void CanbusComponent::PublishChassisDetail() {
   ChassisDetail chassis_detail;
   message_manager_->GetSensorData(&chassis_detail);
   ADEBUG << chassis_detail.ShortDebugString();
@@ -160,14 +160,14 @@ void Canbus::PublishChassisDetail() {
   AdapterManager::PublishChassisDetail(chassis_detail);
 }
 
-void Canbus::OnTimer(const ros::TimerEvent &) {
+void CanbusComponent::OnTimer(const ros::TimerEvent &) {
   PublishChassis();
   if (FLAGS_enable_chassis_detail_pub) {
     PublishChassisDetail();
   }
 }
 
-void Canbus::Stop() {
+void CanbusComponent::Stop() {
   timer_.stop();
 
   can_sender_.Stop();
@@ -176,7 +176,7 @@ void Canbus::Stop() {
   vehicle_controller_->Stop();
 }
 
-void Canbus::OnControlCommand(const ControlCommand &control_command) {
+void CanbusComponent::OnControlCommand(const ControlCommand &control_command) {
   int64_t current_timestamp =
       apollo::common::time::AsInt64<common::time::micros>(Clock::Now());
   // if command coming too soon, just ignore it.
@@ -201,14 +201,14 @@ void Canbus::OnControlCommand(const ControlCommand &control_command) {
   can_sender_.Update();
 }
 
-void Canbus::OnGuardianCommand(const GuardianCommand &guardian_command) {
+void CanbusComponent::OnGuardianCommand(const GuardianCommand &guardian_command) {
   apollo::control::ControlCommand control_command;
   control_command.CopyFrom(guardian_command.control_command());
   OnControlCommand(control_command);
 }
 
 // Send the error to monitor and return it
-Status Canbus::OnError(const std::string &error_msg) {
+Status CanbusComponent::OnError(const std::string &error_msg) {
   apollo::common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
   buffer.ERROR(error_msg);
   return Status(ErrorCode::CANBUS_ERROR, error_msg);
