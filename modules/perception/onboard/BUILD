@@ -27,7 +27,6 @@ cc_library(
     deps = [
         "//modules/common",
         "//modules/common:log",
-        "//modules/common/adapters:adapter_manager",
         "//modules/common/configs:config_gflags",
         "//modules/common/status",
         "//modules/common/time",
@@ -56,6 +55,12 @@ cc_test(
         "//modules/common:log",
         "//modules/perception/common:pcl_util",
         "@gtest",
+        "@gtest//:main",
+    ],
+)
+
+cpplint()
+gtest",
         "@gtest//:main",
     ],
 )

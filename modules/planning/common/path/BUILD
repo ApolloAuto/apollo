@@ -12,6 +12,8 @@ cc_library(
     ],
     deps = [
         "//modules/common/proto:pnc_point_proto",
+        "//modules/common",
+        "//modules/common/math:linear_interpolation",
         "//modules/planning/common:planning_context",
     ],
 )

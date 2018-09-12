@@ -13,7 +13,6 @@ cc_library(
         "//modules/calibration/lidar_ex_checker/common:lidar_ex_checker_common",
         "//modules/common:apollo_app",
         "//modules/common:log",
-        "//modules/common/adapters:adapter_manager",
         "//modules/localization/proto:gps_proto",
         "//modules/perception/common:pcl_util",
         "@vtk",

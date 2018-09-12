@@ -12,12 +12,17 @@ cc_library(
     ],
     deps = [
         "//modules/common:log",
-        "//modules/common/adapters:adapter_manager",
         "//modules/common/proto:common_proto",
         "//modules/common/time",
         "//modules/third_party_perception:third_party_perception_lib",
         "//modules/third_party_perception/common:third_party_perception_gflags",
         "//modules/third_party_perception/proto:third_party_perception_proto",
+        "@gtest//:main",
+    ],
+)
+
+cpplint()
+proto",
         "@gtest//:main",
     ],
 )

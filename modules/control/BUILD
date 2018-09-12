@@ -21,7 +21,6 @@ cc_library(
         "//modules/canbus/proto:canbus_proto",
         "//modules/common",
         "//modules/common:apollo_app",
-        "//modules/common/adapters:adapter_manager",
         "//modules/common/monitor_log",
         "//modules/common/time",
         "//modules/common/util",

@@ -19,7 +19,6 @@ cc_binary(
     deps = [
         "//external:gflags",
         "//modules/common:log",
-        "//modules/common/adapters:adapter_manager",
         "//modules/planning/proto:planning_proto",
         "@ros//:ros_common",
     ],

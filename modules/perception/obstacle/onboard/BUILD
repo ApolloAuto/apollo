@@ -26,7 +26,6 @@ cc_library(
     hdrs = ["lidar_process.h"],
     deps = [
         ":hdmapinput",
-        "//modules/common/adapters:adapter_manager",
         "//modules/perception/common/sequence_type_fuser",
         "//modules/perception/lib/config_manager",
         "//modules/perception/obstacle/lidar/dummy",
@@ -54,7 +53,6 @@ cc_library(
     ],
     deps = [
         ":hdmapinput",
-        "//modules/common/adapters:adapter_manager",
         "//modules/perception/common/sequence_type_fuser",
         "//modules/perception/lib/config_manager",
         "//modules/perception/obstacle/lidar/dummy",
@@ -83,7 +81,6 @@ cc_library(
         ":hdmapinput",
         "//modules/common",
         "//modules/common:log",
-        "//modules/common/adapters:adapter_manager",
         "//modules/common/configs:config_gflags",
         "//modules/common/time",
         "//modules/perception/common",
@@ -113,7 +110,6 @@ cc_library(
     deps = [
         ":perception_obstacle_shared_data",
         "//modules/common:log",
-        "//modules/common/adapters:adapter_manager",
         "//modules/common/time",
         "//modules/perception/common",
         "//modules/perception/lib/config_manager",
@@ -147,7 +143,6 @@ cc_library(
     deps = [
         ":hdmapinput",
         "//modules/canbus/proto:canbus_proto",
-        "//modules/common/adapters:adapter_manager",
         "//modules/common/configs:config_gflags",
         "//modules/common/time",
         "//modules/perception/lib/config_manager",
@@ -172,7 +167,6 @@ cc_library(
     ],
     deps = [
         ":perception_obstacle_shared_data",
-        "//modules/common/adapters:adapter_manager",
         "//modules/perception/lib/config_manager",
         "//modules/perception/obstacle/camera/motion",
         "//modules/perception/onboard",
@@ -191,7 +185,6 @@ cc_library(
     ],
     deps = [
         ":hdmapinput",
-        "//modules/common/adapters:adapter_manager",
         "//modules/perception/lib/config_manager",
         "//modules/perception/obstacle/fusion/async_fusion",
         "//modules/perception/obstacle/fusion/probabilistic_fusion",
@@ -234,7 +227,6 @@ cc_library(
     deps = [
         ":perception_obstacle_shared_data",
         "//modules/common:log",
-        "//modules/common/adapters:adapter_manager",
         "//modules/common/time",
         "//modules/perception/common",
         "//modules/perception/lib/base",
@@ -308,7 +300,6 @@ cc_library(
         "//modules/common:log",
         "//modules/common/configs:config_gflags",
         "//modules/common/configs:vehicle_config_helper",
-        "//modules/common/adapters:adapter_manager",
         "//modules/common/math:quaternion",
         "//modules/common/vehicle_state:vehicle_state_provider",
         "//modules/perception/lib/base",

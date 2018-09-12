@@ -14,7 +14,6 @@ cc_library(
     ],
     deps = [
         "//modules/common:log",
-        "//modules/common/adapters:adapter_manager",
         "//modules/common/monitor_log/proto:monitor_log_proto",
         "//modules/common/proto:common_proto",
         "//modules/common/time",

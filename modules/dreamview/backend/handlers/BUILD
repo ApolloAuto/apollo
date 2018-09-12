@@ -29,7 +29,6 @@ cc_library(
         "image_handler.h",
     ],
     deps = [
-        "//modules/common/adapters:adapter_manager",
         "//modules/perception/traffic_light/util",
         "@civetweb//:civetweb++",
         "@opencv2//:highgui",

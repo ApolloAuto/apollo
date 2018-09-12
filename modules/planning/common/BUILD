@@ -136,7 +136,7 @@ cc_library(
     ],
     deps = [
         ":planning_gflags",
-        "//modules/common/adapters:adapter_manager",
+        "//modules/common:log",
         "//modules/planning/proto:planning_proto",
         "//modules/planning/proto:planning_status_proto",
     ],
@@ -249,8 +249,8 @@ cc_library(
     ],
     deps = [
         ":planning_gflags",
-        "//modules/common/adapters:adapter_manager",
         "//modules/prediction/proto:prediction_proto",
+        "//modules/common:log",
     ],
 )
 
@@ -285,7 +285,6 @@ cc_library(
         ":obstacle",
         ":reference_line_info",
         "//modules/common:log",
-        "//modules/common/adapters:adapter_manager",
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/monitor_log",
         "//modules/common/vehicle_state:vehicle_state_provider",
@@ -312,9 +311,8 @@ cc_library(
         ":indexed_queue",
         ":lag_prediction",
         ":obstacle",
-        "//modules/common:log",
-        "//modules/common/adapters:adapter_manager",
         "//modules/common/configs:vehicle_config_helper",
+        "//modules/common:log",
         "//modules/common/monitor_log",
         "//modules/common/vehicle_state:vehicle_state_provider",
         "//modules/map/hdmap:hdmap_util",

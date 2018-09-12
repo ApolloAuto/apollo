@@ -12,7 +12,6 @@ cc_library(
         ":third_party_perception_fusion",
         "//modules/common:apollo_app",
         "//modules/common:log",
-        "//modules/common/adapters:adapter_manager",
         "//modules/drivers/proto:sensor_proto",
         "//modules/localization/proto:localization_proto",
         "//modules/perception/proto:perception_proto",

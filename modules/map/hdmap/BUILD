@@ -35,10 +35,10 @@ cc_library(
         ":hdmap",
         "//modules/common:log",
         "//modules/common:macro",
-        "//modules/common/adapters:adapter_manager",
         "//modules/common/configs:config_gflags",
         "//modules/common/util",
         "//modules/common/util:string_util",
+        "//modules/map/relative_map/proto:navigation_proto",
     ],
 )
 
@@ -79,7 +79,6 @@ cc_test(
     ],
     deps = [
         ":hdmap_util",
-        "//modules/common/adapters:adapter_manager",
         "@glog//:glog",
         "@gtest//:main",
     ],
