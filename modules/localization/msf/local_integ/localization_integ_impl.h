@@ -113,6 +113,14 @@ class LocalizationIntegImpl {
   void TransferGnssMeasureToLocalization(const MeasureData& measure,
                                          LocalizationEstimate* localization);
 
+  void CheckImuDelayStatus(double cur_imu_time);
+
+  void CheckImuMissingStatus(double cur_imu_time);
+
+  void CheckGnssLidarMsfStatus(double cur_imu_time);
+
+  void SetLocalizationStatus(LocalizationEstimate *integ_localization);
+
  private:
   MeasureRepublishProcess* republish_process_;
   LocalizationIntegProcess* integ_process_;
@@ -169,7 +177,9 @@ class LocalizationIntegImpl {
   std::mutex msf_status_mutex_;
   MsfSensorMsgStatus sensor_status_;
   double latest_gnsspos_timestamp_;
+  std::mutex latest_gnsspos_timestamp_mutex_;
   double latest_lidar_timestamp_;
+  std::mutex latest_lidar_timestamp_mutex_;
 };
 
 }  // namespace msf

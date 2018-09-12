@@ -84,7 +84,7 @@ struct LocalizationIntegParam {
   double imu_lidar_max_delay_time = 0.4;
   int utm_zone_id = 50;
   bool is_lidar_unstable_reset = true;
-  double unstable_reset_threshold = 0.08;
+  double unstable_reset_threshold = 0.3;
 };
 
 enum class LocalizationMeasureState { NOT_VALID = 0, NOT_STABLE, OK, VALID };

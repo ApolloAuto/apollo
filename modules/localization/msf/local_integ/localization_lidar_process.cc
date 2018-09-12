@@ -59,7 +59,7 @@ LocalizationLidarProcess::LocalizationLidarProcess()
       imu_lidar_max_delay_time_(0.5),
       is_unstable_reset_(true),
       unstable_count_(0),
-      unstable_threshold_(0.08),
+      unstable_threshold_(0.3),
       out_map_count_(0),
       forcast_integ_state_(ForcastState::NOT_VALID),
       forcast_timer_(-1) {}

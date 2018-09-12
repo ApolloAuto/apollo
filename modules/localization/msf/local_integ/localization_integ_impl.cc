@@ -48,7 +48,9 @@ LocalizationIntegImpl::LocalizationIntegImpl()
       keep_gnss_running_(false),
       gnss_queue_max_size_(100),
       enable_lidar_localization_(true),
-      gnss_antenna_extrinsic_(Eigen::Affine3d::Identity()) {}
+      gnss_antenna_extrinsic_(Eigen::Affine3d::Identity()),
+      latest_gnsspos_timestamp_(0.0),
+      latest_lidar_timestamp_(0.0) {}
 
 LocalizationIntegImpl::~LocalizationIntegImpl() {
   StopThreadLoop();
@@ -108,7 +110,7 @@ Status LocalizationIntegImpl::Init(const LocalizationIntegParam& params) {
               apollo::localization::MSF_GNSS_CONSISTENCY_03);
   msf_status_.set_local_lidar_status(
               apollo::localization::MSF_LOCAL_LIDAR_UNDEFINED_STATUS);
-  msf_status_.set_gnsspos_position_type(93);
+  msf_status_.set_gnsspos_position_type(apollo::localization::NONE);
   msf_status_.set_msf_running_status(
               apollo::localization::MSF_RUNNING_INIT);
   msf_status_.set_local_lidar_quality(
@@ -214,13 +216,13 @@ void LocalizationIntegImpl::PcdProcessImpl(const LidarFrame& pcd_data) {
   msf_status_.set_local_lidar_quality(
     lidar_localization.msf_status().local_lidar_quality());
   msf_status_mutex_.unlock();
-
+  latest_lidar_timestamp_mutex_.lock();
+  latest_lidar_timestamp_ = lidar_localization.measurement_time();
+  latest_lidar_timestamp_mutex_.unlock();
   MeasureData lidar_measure;
   if (state == 2) {  // only state OK republish lidar msg
     republish_process_->LidarLocalProcess(lidar_localization, &lidar_measure);
     integ_process_->MeasureDataProcess(lidar_measure);
-    latest_lidar_timestamp_ = lidar_measure.time;
-
     imu_altitude_from_lidar_localization_ =
         lidar_localization.pose().position().z();
     imu_altitude_from_lidar_localization_available_ = true;
@@ -287,250 +289,15 @@ void LocalizationIntegImpl::ImuProcessImpl(const ImuData& imu_data) {
   integ_process_->RawImuProcess(imu_data);
 
   double cur_imu_time = imu_data.measurement_time;
-  sensor_status_.set_imu_delay_status(apollo::localization::IMU_DELAY_NORMAL);
-  double cur_system_time = apollo::common::time::Clock::NowInSeconds();
-  double delta_system_time = cur_system_time - cur_imu_time;
-  if (delta_system_time > 0.1) {
-    AINFO << std::setprecision(16)
-          << "the imu delays " << delta_system_time
-          << ", the current system time is "
-          << cur_system_time
-          << ", the imu timestamp is " << cur_imu_time;
-    sensor_status_.set_imu_delay_status(apollo::localization::IMU_DELAY_3);
-  } else if (delta_system_time > 0.05) {
-    AINFO << std::setprecision(16)
-          << "the imu delays " << delta_system_time
-          << ", the current system time is "
-          << cur_system_time
-          << ", the imu timestamp is " << cur_imu_time;
-    sensor_status_.set_imu_delay_status(apollo::localization::IMU_DELAY_2);
-  } else if (delta_system_time > 0.02) {
-    AINFO << std::setprecision(16)
-          << "the imu delays " << delta_system_time
-          << ", the current system time is "
-          << cur_system_time
-          << ", the imu timestamp is " << cur_imu_time;
-    sensor_status_.set_imu_delay_status(apollo::localization::IMU_DELAY_1);
-  }
-  sensor_status_.set_imu_missing_status(
-                 ImuMsgMissingStatus::IMU_MISSING_NORMAL);
-  static double pre_imu_time = cur_imu_time;
-  double delta_time = cur_imu_time - pre_imu_time;
-  if (delta_time > 0.1) {
-    ADEBUG << std::setprecision(16)
-           << "The imu message loss more than 100ms, "
-           << "the pre time and current time: "
-           << pre_imu_time << " "
-           << cur_imu_time;
-    sensor_status_.set_imu_missing_status(
-                   ImuMsgMissingStatus::IMU_MISSING_3);
-  } else if (delta_time > 0.05) {
-    ADEBUG << std::setprecision(16)
-           << "The imu message loss more than 50ms, "
-           << "the pre time and current time: "
-           << pre_imu_time << " "
-           << cur_imu_time;
-    sensor_status_.set_imu_missing_status(
-                   ImuMsgMissingStatus::IMU_MISSING_2);
-  } else if (delta_time > 0.01) {
-    ADEBUG << std::setprecision(16)
-           << "The imu message loss more than 10ms, "
-           << "the pre time and current time: "
-           << pre_imu_time << " "
-           << cur_imu_time;
-    sensor_status_.set_imu_missing_status(
-                   ImuMsgMissingStatus::IMU_MISSING_1);
-  } else if (delta_time < 0.0) {
-    ADEBUG << std::setprecision(16)
-           << "The imu message loss more than 10ms, "
-           << "the pre time and current time: "
-           << pre_imu_time << " "
-           << cur_imu_time;
-    sensor_status_.set_imu_missing_status(
-                   ImuMsgMissingStatus::IMU_MISSING_ABNORMAL);
-  }
-  pre_imu_time = cur_imu_time;
-  msf_status_mutex_.lock();
-  if (cur_imu_time - latest_gnsspos_timestamp_ > 2.0) {
-    AINFO << std::setprecision(15)
-          << "The bestgnsspose msg loses more than 2 seconds: "
-          << "imu time and latest gnss time: "
-          << cur_imu_time << " "
-          << latest_gnsspos_timestamp_;
-    msf_status_.set_gnsspos_position_type(91);
-  }
-  if (cur_imu_time - latest_lidar_timestamp_ > 2.0) {
-    AINFO << std::setprecision(15)
-          << "The local lidar msg loses more than 2 seconds: "
-          << "imu time and latest local lidar time: "
-          << cur_imu_time << " "
-          << latest_lidar_timestamp_;
-    msf_status_.set_local_lidar_status(LocalLidarStatus::MSF_LOCAL_LIDAR_NO_OUTPUT);
-  }
-  msf_status_mutex_.unlock();
+  CheckImuDelayStatus(cur_imu_time);
+  CheckImuMissingStatus(cur_imu_time);
+  CheckGnssLidarMsfStatus(cur_imu_time);
   // integ
   IntegState state;
   LocalizationEstimate integ_localization;
   integ_process_->GetResult(&state, &integ_localization);
-
-  apollo::common::Point3D position_std =
-    integ_localization.uncertainty().position_std_dev();
-    msf_status_mutex_.lock();
-    if (position_std.x() < 0.15 && position_std.y() < 0.15) {
-      if (msf_status_.gnsspos_position_type() == 50 ||
-          msf_status_.gnsspos_position_type() == 49 ||
-          msf_status_.gnsspos_position_type() == 48) {
-          if (msf_status_.local_lidar_status()
-              == apollo::localization::MSF_LOCAL_LIDAR_NORMAL) {
-              msf_status_.set_msf_running_status(
-                apollo::localization::MSF_SOL_LIDAR_GNSS);
-          } else {
-              msf_status_.set_msf_running_status(
-                apollo::localization::MSF_SOL_X_GNSS);
-          }
-      } else if (msf_status_.gnsspos_position_type() == 4 ||
-                 msf_status_.gnsspos_position_type() == 5 ||
-                 msf_status_.gnsspos_position_type() == 6 ||
-                 msf_status_.gnsspos_position_type() == 32 ||
-                 msf_status_.gnsspos_position_type() == 33 ||
-                 msf_status_.gnsspos_position_type() == 34) {
-          if (msf_status_.local_lidar_status()
-                  == apollo::localization::MSF_LOCAL_LIDAR_NORMAL) {
-              msf_status_.set_msf_running_status(
-                apollo::localization::MSF_SOL_LIDAR_X);
-          } else {
-              msf_status_.set_msf_running_status(
-                apollo::localization::MSF_SOL_X_X);
-          }
-      } else if (msf_status_.gnsspos_position_type() == 16 ||
-                 msf_status_.gnsspos_position_type() == 17) {
-          if (msf_status_.local_lidar_status()
-                == apollo::localization::MSF_LOCAL_LIDAR_NORMAL) {
-              msf_status_.set_msf_running_status(
-                apollo::localization::MSF_SOL_LIDAR_XX);
-          } else {
-              msf_status_.set_msf_running_status(
-                apollo::localization::MSF_SOL_X_XX);
-          }
-      } else {
-          if (msf_status_.local_lidar_status()
-                  == apollo::localization::MSF_LOCAL_LIDAR_NORMAL) {
-              msf_status_.set_msf_running_status(
-                apollo::localization::MSF_SOL_LIDAR_XXX);
-          } else {
-              msf_status_.set_msf_running_status(
-                apollo::localization::MSF_SOL_X_XXX);
-          }
-      }
-  } else if (position_std.x() < 0.3 * 0.3 && position_std.y() < 0.3 * 0.3) {
-      if (msf_status_.gnsspos_position_type() == 50 ||
-          msf_status_.gnsspos_position_type() == 49 ||
-          msf_status_.gnsspos_position_type() == 48) {
-          if (msf_status_.local_lidar_status()
-                == apollo::localization::MSF_LOCAL_LIDAR_NORMAL) {
-              msf_status_.set_msf_running_status(
-                apollo::localization::MSF_SSOL_LIDAR_GNSS);
-          } else {
-              msf_status_.set_msf_running_status(
-                apollo::localization::MSF_SSOL_X_GNSS);
-          }
-      } else if (msf_status_.gnsspos_position_type() == 4 ||
-                 msf_status_.gnsspos_position_type() == 5 ||
-                 msf_status_.gnsspos_position_type() == 6 ||
-                 msf_status_.gnsspos_position_type() == 32 ||
-                 msf_status_.gnsspos_position_type() == 33 ||
-                 msf_status_.gnsspos_position_type() == 34) {
-          if (msf_status_.local_lidar_status()
-                == apollo::localization::MSF_LOCAL_LIDAR_NORMAL) {
-              msf_status_.set_msf_running_status(
-                apollo::localization::MSF_SSOL_LIDAR_X);
-          } else {
-              msf_status_.set_msf_running_status(
-                apollo::localization::MSF_SSOL_X_X);
-          }
-      } else if (msf_status_.gnsspos_position_type() == 16 ||
-                 msf_status_.gnsspos_position_type() == 17) {
-          if (msf_status_.local_lidar_status()
-                == apollo::localization::MSF_LOCAL_LIDAR_NORMAL) {
-              msf_status_.set_msf_running_status(
-                apollo::localization::MSF_SSOL_LIDAR_XX);
-          } else {
-              msf_status_.set_msf_running_status(
-                apollo::localization::MSF_SSOL_X_XX);
-          }
-      } else {
-          if (msf_status_.local_lidar_status()
-                == apollo::localization::MSF_LOCAL_LIDAR_NORMAL) {
-              msf_status_.set_msf_running_status(
-                apollo::localization::MSF_SSOL_LIDAR_XXX);
-          } else {
-              msf_status_.set_msf_running_status(
-                apollo::localization::MSF_SSOL_X_XXX);
-          }
-      }
-  } else {
-      if (msf_status_.gnsspos_position_type() == 50 ||
-          msf_status_.gnsspos_position_type() == 49 ||
-          msf_status_.gnsspos_position_type() == 48) {
-          if (msf_status_.local_lidar_status()
-                == apollo::localization::MSF_LOCAL_LIDAR_NORMAL) {
-              msf_status_.set_msf_running_status(
-                apollo::localization::MSF_NOSOL_LIDAR_GNSS);
-          } else {
-              msf_status_.set_msf_running_status(
-                apollo::localization::MSF_NOSOL_X_GNSS);
-          }
-      } else if (msf_status_.gnsspos_position_type() == 4 ||
-                 msf_status_.gnsspos_position_type() == 5 ||
-                 msf_status_.gnsspos_position_type() == 6 ||
-                 msf_status_.gnsspos_position_type() == 32 ||
-                 msf_status_.gnsspos_position_type() == 33 ||
-                 msf_status_.gnsspos_position_type() == 34) {
-          if (msf_status_.local_lidar_status()
-                == apollo::localization::MSF_LOCAL_LIDAR_NORMAL) {
-              msf_status_.set_msf_running_status(
-                apollo::localization::MSF_NOSOL_LIDAR_X);
-          } else {
-              msf_status_.set_msf_running_status(
-                apollo::localization::MSF_NOSOL_X_X);
-          }
-      } else if (msf_status_.gnsspos_position_type() == 16 ||
-                 msf_status_.gnsspos_position_type() == 17) {
-          if (msf_status_.local_lidar_status()
-                == apollo::localization::MSF_LOCAL_LIDAR_NORMAL) {
-              msf_status_.set_msf_running_status(
-                apollo::localization::MSF_NOSOL_LIDAR_XX);
-          } else {
-              msf_status_.set_msf_running_status(
-                apollo::localization::MSF_NOSOL_X_XX);
-          }
-      } else {
-          if (msf_status_.local_lidar_status()
-                == apollo::localization::MSF_LOCAL_LIDAR_NORMAL) {
-              msf_status_.set_msf_running_status(
-                apollo::localization::MSF_NOSOL_LIDAR_XXX);
-          } else {
-              msf_status_.set_msf_running_status(
-                apollo::localization::MSF_NOSOL_X_XXX);
-          }
-      }
-  }
-  MsfStatus *msf_status_ptr = integ_localization.mutable_msf_status();
-  msf_status_ptr->set_local_lidar_consistency(
-    msf_status_.local_lidar_consistency());
-  msf_status_ptr->set_gnss_consistency(msf_status_.gnss_consistency());
-  msf_status_ptr->set_local_lidar_status(msf_status_.local_lidar_status());
-  msf_status_ptr->set_gnsspos_position_type(
-    msf_status_.gnsspos_position_type());
-  msf_status_ptr->set_msf_running_status(msf_status_.msf_running_status());
-  msf_status_ptr->set_local_lidar_quality(msf_status_.local_lidar_quality());
-  msf_status_mutex_.unlock();
-  MsfSensorMsgStatus *sensor_status_ptr =
-    integ_localization.mutable_sensor_status();
-  sensor_status_ptr->set_imu_delay_status(sensor_status_.imu_delay_status());
-  sensor_status_ptr->set_imu_missing_status(
-    sensor_status_.imu_missing_status());
-  sensor_status_ptr->set_imu_data_status(sensor_status_.imu_data_status());
+  // check msf running status and set msf_status in integ_localization
+  SetLocalizationStatus(&integ_localization);
 
   apollo::localization::Pose* posepb_loc = integ_localization.mutable_pose();
 
@@ -734,8 +501,11 @@ void LocalizationIntegImpl::GnssBestPoseProcessImpl(
     LocalizationEstimate gnss_localization;
     TransferGnssMeasureToLocalization(measure, &gnss_localization);
     MsfStatus *status = gnss_localization.mutable_msf_status();
-    status->set_gnsspos_position_type(gnss_status);
+    status->set_gnsspos_position_type(
+      static_cast<apollo::localization::GnssPositionType>(gnss_status));
+    latest_gnsspos_timestamp_mutex_.lock();
     latest_gnsspos_timestamp_ = measure.time;
+    latest_gnsspos_timestamp_mutex_.unlock();
 
     gnss_localization_mutex_.lock();
     gnss_localization_list_.push_back(
@@ -746,7 +516,8 @@ void LocalizationIntegImpl::GnssBestPoseProcessImpl(
     gnss_localization_mutex_.unlock();
   }
   msf_status_mutex_.lock();
-  msf_status_.set_gnsspos_position_type(gnss_status);
+  msf_status_.set_gnsspos_position_type(
+    static_cast<apollo::localization::GnssPositionType>(gnss_status));
   msf_status_mutex_.unlock();
   return;
 }
@@ -880,6 +651,298 @@ void LocalizationIntegImpl::GetGnssLocalizationList(
   gnss_localization_list_.clear();
   gnss_localization_mutex_.unlock();
   return;
+}
+
+void LocalizationIntegImpl::CheckImuDelayStatus(
+    double cur_imu_time) {
+  sensor_status_.set_imu_delay_status(apollo::localization::IMU_DELAY_NORMAL);
+  double cur_system_time = apollo::common::time::Clock::NowInSeconds();
+  double delta_system_time = cur_system_time - cur_imu_time;
+  if (delta_system_time > 0.1) {
+    ADEBUG << std::setprecision(16)
+          << "the imu delays " << delta_system_time
+          << ", the current system time is "
+          << cur_system_time
+          << ", the imu timestamp is " << cur_imu_time;
+    sensor_status_.set_imu_delay_status(apollo::localization::IMU_DELAY_3);
+  } else if (delta_system_time > 0.05) {
+    ADEBUG << std::setprecision(16)
+          << "the imu delays " << delta_system_time
+          << ", the current system time is "
+          << cur_system_time
+          << ", the imu timestamp is " << cur_imu_time;
+    sensor_status_.set_imu_delay_status(apollo::localization::IMU_DELAY_2);
+  } else if (delta_system_time > 0.02) {
+    ADEBUG << std::setprecision(16)
+          << "the imu delays " << delta_system_time
+          << ", the current system time is "
+          << cur_system_time
+          << ", the imu timestamp is " << cur_imu_time;
+    sensor_status_.set_imu_delay_status(apollo::localization::IMU_DELAY_1);
+  }
+}
+
+void LocalizationIntegImpl::CheckImuMissingStatus(double cur_imu_time) {
+  sensor_status_.set_imu_missing_status(
+                 ImuMsgMissingStatus::IMU_MISSING_NORMAL);
+  static double pre_imu_time = cur_imu_time;
+  double delta_time = cur_imu_time - pre_imu_time;
+  if (delta_time > 0.1) {
+    ADEBUG << std::setprecision(16)
+           << "The imu message loss more than 100ms, "
+           << "the pre time and current time: "
+           << pre_imu_time << " "
+           << cur_imu_time;
+    sensor_status_.set_imu_missing_status(
+                   ImuMsgMissingStatus::IMU_MISSING_3);
+  } else if (delta_time > 0.05) {
+    ADEBUG << std::setprecision(16)
+           << "The imu message loss more than 50ms, "
+           << "the pre time and current time: "
+           << pre_imu_time << " "
+           << cur_imu_time;
+    sensor_status_.set_imu_missing_status(
+                   ImuMsgMissingStatus::IMU_MISSING_2);
+  } else if (delta_time > 0.01) {
+    ADEBUG << std::setprecision(16)
+           << "The imu message loss more than 10ms, "
+           << "the pre time and current time: "
+           << pre_imu_time << " "
+           << cur_imu_time;
+    sensor_status_.set_imu_missing_status(
+                   ImuMsgMissingStatus::IMU_MISSING_1);
+  } else if (delta_time < 0.0) {
+    ADEBUG << std::setprecision(16)
+           << "Received imu message's time " 
+           << "is earlier than last imu message,"
+           << "the pre time and current time: "
+           << pre_imu_time << " "
+           << cur_imu_time;
+    sensor_status_.set_imu_missing_status(
+                   ImuMsgMissingStatus::IMU_MISSING_ABNORMAL);
+  }
+  pre_imu_time = cur_imu_time;
+}
+
+void LocalizationIntegImpl::CheckGnssLidarMsfStatus(double cur_imu_time) {
+  msf_status_mutex_.lock();
+  latest_gnsspos_timestamp_mutex_.lock();
+  if (cur_imu_time - latest_gnsspos_timestamp_ > 2.0) {
+    AINFO << std::setprecision(15)
+          << "The bestgnsspose msg loses more than 2 seconds: "
+          << "imu time and latest gnss time: "
+          << cur_imu_time << " "
+          << latest_gnsspos_timestamp_;
+    msf_status_.set_gnsspos_position_type(apollo::localization::MSG_LOSS);
+  }
+  latest_gnsspos_timestamp_mutex_.unlock();
+  latest_lidar_timestamp_mutex_.lock();
+  if (cur_imu_time - latest_lidar_timestamp_ > 2.0) {
+    AINFO << std::setprecision(15)
+          << "The local lidar msg loses more than 2 seconds: "
+          << "imu time and latest local lidar time: "
+          << cur_imu_time << " "
+          << latest_lidar_timestamp_;
+    msf_status_.set_local_lidar_status(LocalLidarStatus::MSF_LOCAL_LIDAR_NO_OUTPUT);
+  }
+  latest_lidar_timestamp_mutex_.unlock();
+  msf_status_mutex_.unlock();
+
+}
+
+void LocalizationIntegImpl::SetLocalizationStatus(
+    LocalizationEstimate *integ_localization) {
+  apollo::common::Point3D position_std =
+    integ_localization->uncertainty().position_std_dev();
+    msf_status_mutex_.lock();
+    if (position_std.x() < 0.15 && position_std.y() < 0.15) {
+      if (msf_status_.gnsspos_position_type()
+            == apollo::localization::NARROW_INT ||
+          msf_status_.gnsspos_position_type()
+            == apollo::localization::WIDE_INT ||
+          msf_status_.gnsspos_position_type()
+            == apollo::localization::L1_INT) {
+          if (msf_status_.local_lidar_status()
+                == apollo::localization::MSF_LOCAL_LIDAR_NORMAL) {
+              msf_status_.set_msf_running_status(
+                apollo::localization::MSF_SOL_LIDAR_GNSS);
+          } else {
+              msf_status_.set_msf_running_status(
+                apollo::localization::MSF_SOL_X_GNSS);
+          }
+      } else if (msf_status_.gnsspos_position_type()
+                  == apollo::localization::FLOATCONV ||
+                msf_status_.gnsspos_position_type()
+                  == apollo::localization::WIDELANE ||
+                msf_status_.gnsspos_position_type()
+                  == apollo::localization::NARROWLANE ||
+                msf_status_.gnsspos_position_type()
+                  == apollo::localization::L1_FLOAT ||
+                msf_status_.gnsspos_position_type()
+                  == apollo::localization::IONOFREE_FLOAT ||
+                msf_status_.gnsspos_position_type()
+                  == apollo::localization::NARROW_FLOAT) {
+          if (msf_status_.local_lidar_status()
+                == apollo::localization::MSF_LOCAL_LIDAR_NORMAL) {
+              msf_status_.set_msf_running_status(
+                apollo::localization::MSF_SOL_LIDAR_X);
+          } else {
+              msf_status_.set_msf_running_status(
+                apollo::localization::MSF_SOL_X_X);
+          }
+      } else if (msf_status_.gnsspos_position_type()
+                  == apollo::localization::SINGLE ||
+                msf_status_.gnsspos_position_type()
+                  == apollo::localization::PSRDIFF) {
+          if (msf_status_.local_lidar_status()
+                == apollo::localization::MSF_LOCAL_LIDAR_NORMAL) {
+              msf_status_.set_msf_running_status(
+                apollo::localization::MSF_SOL_LIDAR_XX);
+          } else {
+              msf_status_.set_msf_running_status(
+                apollo::localization::MSF_SOL_X_XX);
+          }
+      } else {
+          if (msf_status_.local_lidar_status()
+                == apollo::localization::MSF_LOCAL_LIDAR_NORMAL) {
+              msf_status_.set_msf_running_status(
+                apollo::localization::MSF_SOL_LIDAR_XXX);
+          } else {
+              msf_status_.set_msf_running_status(
+                apollo::localization::MSF_SOL_X_XXX);
+          }
+      }
+  } else if (position_std.x() < 0.3 * 0.3 && position_std.y() < 0.3 * 0.3) {
+      if (msf_status_.gnsspos_position_type()
+            == apollo::localization::NARROW_INT ||
+          msf_status_.gnsspos_position_type()
+            == apollo::localization::WIDE_INT ||
+          msf_status_.gnsspos_position_type()
+            == apollo::localization::L1_INT) {
+          if (msf_status_.local_lidar_status()
+                == apollo::localization::MSF_LOCAL_LIDAR_NORMAL) {
+              msf_status_.set_msf_running_status(
+                apollo::localization::MSF_SSOL_LIDAR_GNSS);
+          } else {
+              msf_status_.set_msf_running_status(
+                apollo::localization::MSF_SSOL_X_GNSS);
+          }
+      } else if (msf_status_.gnsspos_position_type()
+                  == apollo::localization::FLOATCONV ||
+                msf_status_.gnsspos_position_type()
+                  == apollo::localization::WIDELANE ||
+                msf_status_.gnsspos_position_type()
+                  == apollo::localization::NARROWLANE ||
+                msf_status_.gnsspos_position_type()
+                  == apollo::localization::L1_FLOAT ||
+                msf_status_.gnsspos_position_type()
+                  == apollo::localization::IONOFREE_FLOAT ||
+                msf_status_.gnsspos_position_type()
+                  == apollo::localization::NARROW_FLOAT) {
+          if (msf_status_.local_lidar_status()
+                == apollo::localization::MSF_LOCAL_LIDAR_NORMAL) {
+              msf_status_.set_msf_running_status(
+                apollo::localization::MSF_SSOL_LIDAR_X);
+          } else {
+              msf_status_.set_msf_running_status(
+                apollo::localization::MSF_SSOL_X_X);
+          }
+      } else if (msf_status_.gnsspos_position_type()
+                  == apollo::localization::SINGLE ||
+                msf_status_.gnsspos_position_type()
+                  == apollo::localization::PSRDIFF) {
+          if (msf_status_.local_lidar_status()
+                == apollo::localization::MSF_LOCAL_LIDAR_NORMAL) {
+              msf_status_.set_msf_running_status(
+                apollo::localization::MSF_SSOL_LIDAR_XX);
+          } else {
+              msf_status_.set_msf_running_status(
+                apollo::localization::MSF_SSOL_X_XX);
+          }
+      } else {
+          if (msf_status_.local_lidar_status()
+                == apollo::localization::MSF_LOCAL_LIDAR_NORMAL) {
+              msf_status_.set_msf_running_status(
+                apollo::localization::MSF_SSOL_LIDAR_XXX);
+          } else {
+              msf_status_.set_msf_running_status(
+                apollo::localization::MSF_SSOL_X_XXX);
+          }
+      }
+  } else {
+      if (msf_status_.gnsspos_position_type()
+            == apollo::localization::NARROW_INT ||
+          msf_status_.gnsspos_position_type()
+            == apollo::localization::WIDE_INT ||
+          msf_status_.gnsspos_position_type()
+            == apollo::localization::L1_INT) {
+          if (msf_status_.local_lidar_status()
+                == apollo::localization::MSF_LOCAL_LIDAR_NORMAL) {
+              msf_status_.set_msf_running_status(
+                apollo::localization::MSF_NOSOL_LIDAR_GNSS);
+          } else {
+              msf_status_.set_msf_running_status(
+                apollo::localization::MSF_NOSOL_X_GNSS);
+          }
+      } else if (msf_status_.gnsspos_position_type()
+                  == apollo::localization::FLOATCONV ||
+                msf_status_.gnsspos_position_type()
+                  == apollo::localization::WIDELANE ||
+                msf_status_.gnsspos_position_type()
+                  == apollo::localization::NARROWLANE ||
+                msf_status_.gnsspos_position_type()
+                  == apollo::localization::L1_FLOAT ||
+                msf_status_.gnsspos_position_type()
+                  == apollo::localization::IONOFREE_FLOAT ||
+                msf_status_.gnsspos_position_type()
+                  == apollo::localization::NARROW_FLOAT) {
+          if (msf_status_.local_lidar_status()
+                == apollo::localization::MSF_LOCAL_LIDAR_NORMAL) {
+              msf_status_.set_msf_running_status(
+                apollo::localization::MSF_NOSOL_LIDAR_X);
+          } else {
+              msf_status_.set_msf_running_status(
+                apollo::localization::MSF_NOSOL_X_X);
+          }
+      } else if (msf_status_.gnsspos_position_type()
+                  == apollo::localization::SINGLE ||
+                msf_status_.gnsspos_position_type()
+                  == apollo::localization::PSRDIFF) {
+          if (msf_status_.local_lidar_status()
+                == apollo::localization::MSF_LOCAL_LIDAR_NORMAL) {
+              msf_status_.set_msf_running_status(
+                apollo::localization::MSF_NOSOL_LIDAR_XX);
+          } else {
+              msf_status_.set_msf_running_status(
+                apollo::localization::MSF_NOSOL_X_XX);
+          }
+      } else {
+          if (msf_status_.local_lidar_status()
+                == apollo::localization::MSF_LOCAL_LIDAR_NORMAL) {
+              msf_status_.set_msf_running_status(
+                apollo::localization::MSF_NOSOL_LIDAR_XXX);
+          } else {
+              msf_status_.set_msf_running_status(
+                apollo::localization::MSF_NOSOL_X_XXX);
+          }
+      }
+  }
+  MsfStatus *msf_status_ptr = integ_localization->mutable_msf_status();
+  msf_status_ptr->set_local_lidar_consistency(
+    msf_status_.local_lidar_consistency());
+  msf_status_ptr->set_gnss_consistency(msf_status_.gnss_consistency());
+  msf_status_ptr->set_local_lidar_status(msf_status_.local_lidar_status());
+  msf_status_ptr->set_gnsspos_position_type(
+    msf_status_.gnsspos_position_type());
+  msf_status_ptr->set_msf_running_status(msf_status_.msf_running_status());
+  msf_status_ptr->set_local_lidar_quality(msf_status_.local_lidar_quality());
+  msf_status_mutex_.unlock();
+  MsfSensorMsgStatus *sensor_status_ptr =
+    integ_localization->mutable_sensor_status();
+  sensor_status_ptr->set_imu_delay_status(sensor_status_.imu_delay_status());
+  sensor_status_ptr->set_imu_missing_status(
+    sensor_status_.imu_missing_status());
+  sensor_status_ptr->set_imu_data_status(sensor_status_.imu_data_status());
 }
 
 }  // namespace msf
