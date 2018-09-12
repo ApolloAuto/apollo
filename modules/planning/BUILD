@@ -69,15 +69,12 @@ cc_library(
 )
 
 cc_binary(
-    name = "planning",
-    srcs = [
-        "main.cc",
-        "planning.h",
-    ],
+    name = "libplanning.so",
     deps = [
-        ":planning_lib",
-        "//external:gflags",
+        ":planning_component_lib",
     ],
+    linkopts = ["-shared"],
+    linkstatic = False,
 )
 
 filegroup(

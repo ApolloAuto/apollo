@@ -31,7 +31,8 @@
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
 #include "modules/routing/proto/routing.pb.h"
 
-//#include "modules/planning/planning_base.h"
+#include "modules/planning/planning_base.h"
+#include "modules/planning/std_planning.h"
 
 namespace apollo {
 namespace cybertron {
@@ -71,7 +72,7 @@ class PlanningComponent final
   perception::TrafficLightDetection traffic_light_;
   routing::RoutingResponse routing_;
 
-  // std::unique<PlanningBase> planning_base_;
+  std::unique_ptr<PlanningBase> planning_base_;
 };
 
 CYBERTRON_REGISTER_COMPONENT(PlanningComponent)
