@@ -36,14 +36,14 @@ PlanningBase::~PlanningBase() {}
 void PlanningBase::PublishPlanningPb(const double timestamp,
                                      ADCTrajectory* const trajectory_pb) {
   trajectory_pb->mutable_header()->set_timestamp_sec(timestamp);
-  if (prediction_obstacles_ != nullptr &&
-      !prediction_obstacles_->has_header()) {
+  if (planning_data_.prediction_obstacles != nullptr &&
+      !planning_data_.prediction_obstacles->has_header()) {
     trajectory_pb->mutable_header()->set_lidar_timestamp(
-        prediction_obstacles_->header().lidar_timestamp());
+        planning_data_.prediction_obstacles->header().lidar_timestamp());
     trajectory_pb->mutable_header()->set_camera_timestamp(
-        prediction_obstacles_->header().camera_timestamp());
+        planning_data_.prediction_obstacles->header().camera_timestamp());
     trajectory_pb->mutable_header()->set_radar_timestamp(
-        prediction_obstacles_->header().radar_timestamp());
+        planning_data_.prediction_obstacles->header().radar_timestamp());
   }
 
   // TODO(all): integrate reverse gear

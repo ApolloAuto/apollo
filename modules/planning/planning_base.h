@@ -45,6 +45,19 @@
  */
 namespace apollo {
 namespace planning {
+/**
+ * @class planning_data
+ *
+ * @brief PlanningData contains all necessary data as planning input
+ */
+
+struct PlanningData {
+  std::shared_ptr<prediction::PredictionObstacles> prediction_obstacles;
+  std::shared_ptr<canbus::Chassis> chassis;
+  std::shared_ptr<localization::LocalizationEstimate> localization_estimate;
+  std::shared_ptr<perception::TrafficLightDetection> traffic_light;
+  std::shared_ptr<routing::RoutingResponse> routing;
+};
 
 /**
  * @class planning
@@ -60,14 +73,7 @@ class PlanningBase {
 
   virtual std::string Name() const = 0;
 
-  virtual void RunOnce(
-      const std::shared_ptr<prediction::PredictionObstacles>&
-          prediction_obstacles,
-      const std::shared_ptr<canbus::Chassis>& chassis,
-      const std::shared_ptr<localization::LocalizationEstimate>&
-          localization_estimate,
-      const perception::TrafficLightDetection,
-      const routing::RoutingResponse& routing) = 0;
+  virtual void RunOnce(const PlanningData& planning_data) = 0;
 
   /**
    * @brief Plan the trajectory given current vehicle state
@@ -78,14 +84,12 @@ class PlanningBase {
       ADCTrajectory* const trajectory) = 0;
 
  protected:
-  void PublishPlanningPb(const double timestamp, ADCTrajectory* const trajectory_pb);
+  void PublishPlanningPb(const double timestamp,
+                         ADCTrajectory* const trajectory_pb);
   void SetFallbackTrajectory(ADCTrajectory* const trajectory_pb);
 
+  PlanningData planning_data_;
   const hdmap::HDMap* hdmap_ = nullptr;
-  const std::shared_ptr<prediction::PredictionObstacles> prediction_obstacles_;
-  const std::shared_ptr<canbus::Chassis> chassis_;
-  const std::shared_ptr<localization::LocalizationEstimate>
-      localization_estimate_;
   const std::shared_ptr<ADCTrajectory> last_planning_;
 
   double start_time_ = 0.0;

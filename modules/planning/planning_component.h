@@ -64,13 +64,14 @@ class PlanningComponent final
   perception::TrafficLightDetection traffic_light_;
   routing::RoutingResponse routing_;
 
+  PlanningData planning_data_;
+
   std::unique_ptr<PlanningBase> planning_base_;
 };
 
 CYBERTRON_REGISTER_COMPONENT(PlanningComponent)
 
 }  // namespace planning
-}  // namepsace apollo
+}  // namespace apollo
 
 #endif  // MODULES_PLANNING_PLANNING_COMPONENT_H_
-
