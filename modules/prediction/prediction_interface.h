@@ -34,7 +34,7 @@ namespace prediction {
  *
  * @brief Interface of the prediction module
  */
-class PredictionInterface : public apollo::common::ApolloApp {
+class PredictionInterface : public common::ApolloApp {
  public:
   /**
    * @brief main logic of the prediction module, triggered upon receiving a new
@@ -47,7 +47,7 @@ class PredictionInterface : public apollo::common::ApolloApp {
    * @brief Fill the header and publish the prediction message.
    */
   void Publish(prediction::PredictionObstacles *prediction_obstacles) {
-    using apollo::common::adapter::AdapterManager;
+    using common::adapter::AdapterManager;
     AdapterManager::FillPredictionHeader(Name(), prediction_obstacles);
     AdapterManager::PublishPrediction(*prediction_obstacles);
   }

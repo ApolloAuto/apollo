@@ -41,7 +41,7 @@ namespace apollo {
 namespace prediction {
 
 class PredictionComponent :
-    public apollo::cybertron::Component<perception::PerceptionObstacles> {
+    public cybertron::Component<perception::PerceptionObstacles> {
  public:
   /**
    * @brief Destructor
