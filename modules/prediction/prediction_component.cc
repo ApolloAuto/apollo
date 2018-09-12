@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/prediction/prediction.h"
+#include "modules/prediction/prediction_component.h"
 
 #include <algorithm>
 #include <cmath>
@@ -57,7 +57,9 @@ using apollo::localization::LocalizationEstimate;
 using apollo::perception::PerceptionObstacle;
 using apollo::perception::PerceptionObstacles;
 
-std::string Prediction::Name() const { return FLAGS_prediction_module_name; }
+std::string PredictionComponent::Name() const {
+  return FLAGS_prediction_module_name;
+}
 
 void GetBagFiles(const boost::filesystem::path& p,
                  std::vector<std::string>* bag_files) {
@@ -81,7 +83,7 @@ void GetBagFiles(const boost::filesystem::path& p,
   }
 }
 
-void Prediction::ProcessRosbag(const std::string& filename) {
+void PredictionComponent::ProcessRosbag(const std::string& filename) {
   const std::vector<std::string> topics{FLAGS_perception_obstacle_topic,
                                         FLAGS_localization_topic};
   rosbag::Bag bag;
@@ -108,15 +110,16 @@ void Prediction::ProcessRosbag(const std::string& filename) {
   bag.close();
 }
 
-Status Prediction::Init() {
+bool PredictionComponent::Init() {
   start_time_ = Clock::NowInSeconds();
 
   // Load prediction conf
   prediction_conf_.Clear();
   if (!common::util::GetProtoFromFile(FLAGS_prediction_conf_file,
                                       &prediction_conf_)) {
-    return OnError("Unable to load prediction conf file: " +
-                   FLAGS_prediction_conf_file);
+    AERROR << "Unable to load prediction conf file: "
+           << FLAGS_prediction_conf_file;
+    return false;
   } else {
     ADEBUG << "Prediction config file is loaded into: "
            << prediction_conf_.ShortDebugString();
@@ -125,8 +128,9 @@ Status Prediction::Init() {
   adapter_conf_.Clear();
   if (!common::util::GetProtoFromFile(FLAGS_prediction_adapter_config_filename,
                                       &adapter_conf_)) {
-    return OnError("Unable to load adapter conf file: " +
-                   FLAGS_prediction_adapter_config_filename);
+    AERROR << "Unable to load adapter conf file: "
+           << FLAGS_prediction_adapter_config_filename;
+    return false;
   } else {
     ADEBUG << "Adapter config file is loaded into: "
            << adapter_conf_.ShortDebugString();
@@ -152,15 +156,17 @@ Status Prediction::Init() {
   */
 
   if (!FLAGS_use_navigation_mode && !PredictionMap::Ready()) {
-    return OnError("Map cannot be loaded.");
+    AERROR << "Map cannot be loaded.";
+    return false;
   }
 
   if (FLAGS_prediction_offline_mode) {
     if (!FeatureOutput::Ready()) {
-      return OnError("Feature output is not ready.");
+      AERROR << "Feature output is not ready.";
+      return false;
     }
     if (FLAGS_prediction_offline_bags.empty()) {
-      return Status::OK();  // use listen to ROS topic mode
+      return true;  // use listen to ROS topic mode
     }
     std::vector<std::string> inputs;
     apollo::common::util::split(FLAGS_prediction_offline_bags, ':', &inputs);
@@ -180,18 +186,25 @@ Status Prediction::Init() {
     // TODO(kechxu) accord to cybertron
     // ros::shutdown();
   }
-  return Status::OK();
+  return true;
 }
 
-Status Prediction::Start() { return Status::OK(); }
+bool PredictionComponent::Proc(
+    const std::shared_ptr<perception::PerceptionObstacles>&
+    perception_obstacles) {
+  // TODO(all) implement
+  return true;
+}
 
-void Prediction::Stop() {
+Status PredictionComponent::Start() { return Status::OK(); }
+
+void PredictionComponent::Stop() {
   if (FLAGS_prediction_offline_mode) {
     FeatureOutput::Close();
   }
 }
 
-void Prediction::OnLocalization(const LocalizationEstimate& localization) {
+void PredictionComponent::OnLocalization(const LocalizationEstimate& localization) {
   PoseContainer* pose_container = dynamic_cast<PoseContainer*>(
       ContainerManager::Instance()->GetContainer(AdapterConfig::LOCALIZATION));
   CHECK_NOTNULL(pose_container);
@@ -201,7 +214,7 @@ void Prediction::OnLocalization(const LocalizationEstimate& localization) {
          << localization.ShortDebugString() << "].";
 }
 
-void Prediction::OnPlanning(const planning::ADCTrajectory& adc_trajectory) {
+void PredictionComponent::OnPlanning(const planning::ADCTrajectory& adc_trajectory) {
   ADCTrajectoryContainer* adc_trajectory_container =
       dynamic_cast<ADCTrajectoryContainer*>(
           ContainerManager::Instance()->GetContainer(
@@ -213,7 +226,8 @@ void Prediction::OnPlanning(const planning::ADCTrajectory& adc_trajectory) {
          << "].";
 }
 
-void Prediction::RunOnce(const PerceptionObstacles& perception_obstacles) {
+void PredictionComponent::RunOnce(
+    const PerceptionObstacles& perception_obstacles) {
   if (FLAGS_prediction_test_mode && FLAGS_prediction_test_duration > 0.0 &&
       (Clock::NowInSeconds() - start_time_ > FLAGS_prediction_test_duration)) {
     AINFO << "Prediction finished running in test mode";
@@ -296,11 +310,11 @@ void Prediction::RunOnce(const PerceptionObstacles& perception_obstacles) {
       }
     }
   }
-
-  Publish(&prediction_obstacles);
+  // TODO(all) accord to cybertron
+  // Publish(&prediction_obstacles);
 }
 
-Status Prediction::OnError(const std::string& error_msg) {
+Status PredictionComponent::OnError(const std::string& error_msg) {
   return Status(ErrorCode::PREDICTION_ERROR, error_msg);
 }
 
