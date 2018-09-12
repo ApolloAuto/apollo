@@ -34,7 +34,7 @@ using apollo::hdmap::HDMapUtil;
 PlanningBase::~PlanningBase() {}
 
 void PlanningBase::PublishPlanningPb(const double timestamp,
-                                     ADCTrajectory* trajectory_pb) {
+                                     ADCTrajectory* const trajectory_pb) {
   trajectory_pb->mutable_header()->set_timestamp_sec(timestamp);
   if (prediction_obstacles_ != nullptr &&
       !prediction_obstacles_->has_header()) {
@@ -68,7 +68,7 @@ void PlanningBase::PublishPlanningPb(const double timestamp,
   }
 }
 
-void PlanningBase::SetFallbackTrajectory(ADCTrajectory* trajectory_pb) {
+void PlanningBase::SetFallbackTrajectory(ADCTrajectory* const trajectory_pb) {
   CHECK_NOTNULL(trajectory_pb);
   // use planning trajecotry from last cycle
   if (last_planning_ != nullptr) {

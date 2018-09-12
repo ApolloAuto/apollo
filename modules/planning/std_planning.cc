@@ -349,7 +349,7 @@ void StdPlanning::ExportReferenceLineDebug(planning_internal::Debug* debug) {
 Status StdPlanning::Plan(
     const double current_time_stamp,
     const std::vector<TrajectoryPoint>& stitching_trajectory,
-    ADCTrajectory* trajectory_pb) {
+    ADCTrajectory* const trajectory_pb) {
   auto* ptr_debug = trajectory_pb->mutable_debug();
   if (FLAGS_enable_record_debug) {
     ptr_debug->mutable_planning_data()->mutable_init_point()->CopyFrom(

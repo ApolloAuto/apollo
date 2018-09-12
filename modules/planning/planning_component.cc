@@ -15,6 +15,7 @@
  *****************************************************************************/
 #include "modules/planning/planning_component.h"
 
+#include "modules/planning/std_planning.h"
 #include "modules/common/util/message_util.h"
 
 namespace apollo {

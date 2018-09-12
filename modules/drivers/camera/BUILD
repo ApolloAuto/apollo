@@ -31,15 +31,4 @@ cc_library(
     ],
 )
 
-cc_binary(
-    name = "camera",
-    srcs = [
-        "main.cc",
-    ],
-    deps = [
-        ":camera_lib",
-        "//external:gflags",
-    ],
-)
-
 cpplint()

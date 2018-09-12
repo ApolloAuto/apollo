@@ -82,7 +82,7 @@ class NaviPlanning : public PlanningBase {
   apollo::common::Status Plan(
       const double current_time_stamp,
       const std::vector<common::TrajectoryPoint>& stitching_trajectory,
-      ADCTrajectory* trajectory) override;
+      ADCTrajectory* const trajectory) override;
 
  private:
   common::Status InitFrame(const uint32_t sequence_num,
@@ -125,7 +125,7 @@ class NaviPlanning : public PlanningBase {
   void GetRightNeighborLanesInfo(
       std::vector<std::pair<std::string, double>>* const lane_info_group);
 
-  void SetFallbackTrajectory(ADCTrajectory* cruise_trajectory) override;
+  void SetFallbackTrajectory(ADCTrajectory* const cruise_trajectory) override;
 
   void ExportReferenceLineDebug(planning_internal::Debug* debug);
 
