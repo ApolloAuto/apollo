@@ -86,7 +86,7 @@ bool Frame::Rerouting() {
     AERROR << "Rerouting not supported in navigation mode";
     return false;
   }
-  auto *adapter_manager = AdapterManager::Instance();
+  auto adapter_manager = AdapterManager::Instance();
   if (adapter_manager->GetRoutingResponse()->Empty()) {
     AERROR << "No previous routing available";
     return false;

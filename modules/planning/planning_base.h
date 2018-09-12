@@ -22,20 +22,22 @@
 #include <utility>
 #include <vector>
 
-#include "ctpl/ctpl_stl.h"
-
+#include "modules/canbus/proto/chassis.pb.h"
 #include "modules/common/proto/pnc_point.pb.h"
+#include "modules/localization/proto/localization.pb.h"
+#include "modules/perception/proto/traffic_light_detection.pb.h"
 #include "modules/planning/proto/planning.pb.h"
 #include "modules/planning/proto/planning_config.pb.h"
 #include "modules/planning/proto/traffic_rule_config.pb.h"
+#include "modules/prediction/proto/prediction_obstacle.pb.h"
+#include "modules/routing/proto/routing.pb.h"
 
-#include "modules/common/adapters/adapter_manager.h"
-#include "modules/common/apollo_app.h"
 #include "modules/common/status/status.h"
-#include "modules/common/vehicle_state/vehicle_state_provider.h"
-#include "modules/planning/common/trajectory/publishable_trajectory.h"
-#include "modules/planning/planner/planner.h"
-#include "modules/planning/planner/planner_dispatcher.h"
+#include "modules/map/hdmap/hdmap.h"
+//#include "modules/common/vehicle_state/vehicle_state_provider.h"
+//#include "modules/planning/common/trajectory/publishable_trajectory.h"
+//#include "modules/planning/planner/planner.h"
+//#include "modules/planning/planner/planner_dispatcher.h"
 
 /**
  * @namespace apollo::planning
@@ -49,15 +51,19 @@ namespace planning {
  *
  * @brief PlanningBase module main class.
  */
-class PlanningBase : public apollo::common::ApolloApp {
+class PlanningBase {
  public:
   PlanningBase() = default;
   virtual ~PlanningBase();
 
-  virtual void RunOnce() = 0;
-
-  // Watch dog timer
-  virtual void OnTimer(const ros::TimerEvent&) = 0;
+  virtual void RunOnce(
+      const std::shared_ptr<prediction::PredictionObstacles>&
+          prediction_obstacles,
+      const std::shared_ptr<canbus::Chassis>& chassis,
+      const std::shared_ptr<localization::LocalizationEstimate>&
+          localization_estimate,
+      const perception::TrafficLightDetection,
+      const routing::RoutingResponse& routing) = 0;
 
   /**
    * @brief Plan the trajectory given current vehicle state
@@ -68,30 +74,15 @@ class PlanningBase : public apollo::common::ApolloApp {
       ADCTrajectory* trajectory) = 0;
 
  protected:
-  void PublishPlanningPb(ADCTrajectory* trajectory_pb, double timestamp);
+  void PublishPlanningPb(const double timestamp, ADCTrajectory* trajectory_pb);
+  void SetFallbackTrajectory(ADCTrajectory* trajectory_pb);
 
-  /**
-   * @brief Fill the header and publish the planning message.
-   */
-  void Publish(planning::ADCTrajectory* trajectory) {
-    using apollo::common::adapter::AdapterManager;
-    AdapterManager::FillPlanningHeader(Name(), trajectory);
-    AdapterManager::PublishPlanning(*trajectory);
-  }
-
-  bool IsVehicleStateValid(const common::VehicleState& vehicle_state);
-  virtual void SetFallbackTrajectory(ADCTrajectory* cruise_trajectory);
-  virtual bool CheckPlanningConfig() = 0;
-
- protected:
-  double start_time_ = 0.0;
-  PlanningConfig config_;
-  TrafficRuleConfigs traffic_rule_configs_;
   const hdmap::HDMap* hdmap_ = nullptr;
-  std::unique_ptr<Planner> planner_;
-  std::unique_ptr<PublishableTrajectory> last_publishable_trajectory_;
-  ros::Timer timer_;
-  std::unique_ptr<PlannerDispatcher> planner_dispatcher_;
+  const std::shared_ptr<prediction::PredictionObstacles> prediction_obstacles_;
+  const std::shared_ptr<canbus::Chassis> chassis_;
+  const std::shared_ptr<localization::LocalizationEstimate>
+      localization_estimate_;
+  const std::shared_ptr<ADCTrajectory> last_planning_;
 };
 
 }  // namespace planning
