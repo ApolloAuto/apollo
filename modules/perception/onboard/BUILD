@@ -60,9 +60,3 @@ cc_test(
 )
 
 cpplint()
-gtest",
-        "@gtest//:main",
-    ],
-)
-
-cpplint()
