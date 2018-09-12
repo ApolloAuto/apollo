@@ -41,7 +41,7 @@ class NodeServiceImpl {
     auto node_id = common::GlobalData::RegisterNode(node_name);
     attr_.set_node_id(node_id);
     // TODO: move topology init
-    topology_ = topology::Topology::Instance();
+    topology_ = service_discovery::TopologyManager::Instance();
   }
 
   NodeServiceImpl() = delete;
@@ -60,7 +60,7 @@ class NodeServiceImpl {
       typename std::shared_ptr<Client<Request, Response>>;
 
   std::shared_ptr<NodeChannelImpl> node_channel_impl_ = nullptr;
-  std::shared_ptr<topology::Topology> topology_ = nullptr;
+  std::shared_ptr<service_discovery::TopologyManager> topology_ = nullptr;
   std::vector<std::shared_ptr<ServiceBase>> service_list_;
   std::vector<std::shared_ptr<ClientBase>> client_list_;
   std::string node_name_;

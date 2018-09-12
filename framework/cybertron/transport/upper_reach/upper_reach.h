@@ -23,6 +23,7 @@
 
 #include "cybertron/transport/common/endpoint.h"
 #include "cybertron/transport/message/message_info.h"
+#include "cybertron/event/perf_event_cache.h"
 
 namespace apollo {
 namespace cybertron {
@@ -68,6 +69,8 @@ UpperReach<MessageT>::~UpperReach() {}
 template <typename MessageT>
 bool UpperReach<MessageT>::Transmit(const MessagePtr& msg) {
   msg_info_.set_seq_num(NextSeqNum());
+  apollo::cybertron::event::PerfEventCache::Instance()->AddTransportEvent(
+                  1, attr_.channel_id(), msg_info_.seq_num());
   return Transmit(msg, msg_info_);
 }
 

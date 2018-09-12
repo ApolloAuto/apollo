@@ -37,7 +37,7 @@
 namespace apollo {
 namespace cybertron {
 namespace data {
-class DataVisitor;
+class DataVisitorBase;
 }
 namespace scheduler {
 
@@ -48,14 +48,14 @@ using apollo::cybertron::proto::RoutineConf;
 using apollo::cybertron::proto::SchedulerConf;
 using croutine::CRoutine;
 using croutine::RoutineFactory;
-using data::DataVisitor;
+using data::DataVisitorBase;
 
 class Scheduler {
  public:
   ~Scheduler();
   bool CreateTask(const RoutineFactory& factory, const std::string& name);
   bool CreateTask(std::function<void()>&& func, const std::string& name,
-                  std::shared_ptr<DataVisitor> visitor = nullptr);
+                  std::shared_ptr<DataVisitorBase> visitor = nullptr);
   bool RemoveTask(const std::string& name);
   void PrintStatistics();
   void ShutDown();

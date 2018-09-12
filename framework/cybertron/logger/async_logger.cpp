@@ -50,7 +50,7 @@ void AsyncLogger::Start() {
   CHECK_EQ(state_, INITTED);
   state_ = RUNNING;
   thread_ = std::thread(&AsyncLogger::RunThread, this);
-  std::cout << "Async Logger Start!" << std::endl;
+  //std::cout << "Async Logger Start!" << std::endl;
 }
 
 void AsyncLogger::Stop() {
@@ -63,7 +63,7 @@ void AsyncLogger::Stop() {
   thread_.join();
   CHECK(active_buf_->messages.empty());
   CHECK(flushing_buf_->messages.empty());
-  std::cout << "Async Logger Stop!" << std::endl;
+  //std::cout << "Async Logger Stop!" << std::endl;
 }
 
 void AsyncLogger::Write(bool force_flush,
@@ -73,7 +73,7 @@ void AsyncLogger::Write(bool force_flush,
   {
     std::unique_lock<std::mutex> lock(mutex_);
     if (state_ != RUNNING) {
-      std::cout << "Async Logger not running!" << std::endl;
+      //std::cout << "Async Logger not running!" << std::endl;
       return;
     }
 
@@ -119,7 +119,7 @@ void AsyncLogger::Write(bool force_flush,
 void AsyncLogger::Flush() {
   std::unique_lock<std::mutex> lock(mutex_);
   if (state_ != RUNNING) {
-    std::cout << "Async Logger not running!" << std::endl;
+    //std::cout << "Async Logger not running!" << std::endl;
     return;
   }
 

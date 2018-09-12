@@ -31,11 +31,6 @@ class Buffer : public BufferInterface, public tf2::BufferCore {
    * @return
    */
   int Init();
-  //Buffer(cybertron::Duration cache_time =
-  //    cybertron::Duration(BufferCore::DEFAULT_CACHE_TIME));
-
-  //Buffer(cybertron::Time cache_time =
-  //           cybertron::Time((double)BufferCore::DEFAULT_CACHE_TIME));
 
   /** \brief Get the transform between two frames by frame ID.
    * \param target_frame The frame to which data should be transformed
@@ -126,12 +121,9 @@ class Buffer : public BufferInterface, public tf2::BufferCore {
       message_subscriber_tf_;
   std::shared_ptr<cybertron::Reader<adu::common::TransformStampeds>>
       message_subscriber_tf_static_;
-  //cybertron::middleware::ReaderBase::SharedPtr message_subscriber_tf_static_;
 
   cybertron::Time last_update_;
-
   std::vector<geometry_msgs::TransformStamped> static_msgs_;
-
   DECLARE_SINGLETON(Buffer)
 };  // class
 

@@ -18,14 +18,14 @@ TEST(ObjectPoolTest, get_object) {
   for (int i = 0; i < 10; i++) {
     EXPECT_EQ(100, pool->GetObject()->value);
   }
-  EXPECT_TRUE(pool->GetObject() != nullptr);
+  EXPECT_TRUE(pool->GetObject());
 
 
   auto pool2 = ObjectPool<TestNode>::Instance(10);
   for (int i = 0; i < 10; i++) {
     EXPECT_EQ(0, pool2->GetObject()->value);
   }
-  EXPECT_TRUE(pool2->GetObject() != nullptr);
+  EXPECT_TRUE(pool2->GetObject());
 }
 
 

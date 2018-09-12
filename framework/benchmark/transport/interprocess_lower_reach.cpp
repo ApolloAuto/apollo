@@ -7,6 +7,7 @@
 #include <memory>
 #include <string>
 
+#include "cybertron/common/global_data.h"
 #include "cybertron/message/raw_message.h"
 #include "cybertron/proto/role_attributes.pb.h"
 #include "cybertron/time/time.h"
@@ -169,7 +170,11 @@ int main(int argc, char* argv[]) {
   signal(SIGINT, SignalHandler);
 
   RoleAttributes attr;
+  attr.set_host_name(GlobalData::Instance()->HostName());
+  attr.set_process_id(GlobalData::Instance()->ProcessId());
   attr.set_channel_name("channel");
+  auto channel_id = GlobalData::Instance()->RegisterChannel("channel");
+  attr.set_channel_id(channel_id);
   auto qos = attr.mutable_qos_profile();
   qos->CopyFrom(QosProfileConf::QOS_PROFILE_DEFAULT);
 

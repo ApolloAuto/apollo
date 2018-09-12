@@ -30,6 +30,7 @@ int cbfun(const char *channel_name) {
 }
 
 int main(int argc, char *argv[]) {
+  apollo::cybertron::Init("cyber_python");
   apollo::cybertron::proto::Chatter chat;    
   apollo::cybertron::PyNode node("listener");
   pr = node.create_reader("channel/chatter", chat.GetTypeName());

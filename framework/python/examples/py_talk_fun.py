@@ -20,6 +20,7 @@ sys.path.append(cybertron_path + "/python/cybertron")
 sys.path.append(cybertron_dir + "/python/")
 sys.path.append(cybertron_dir + "/cybertron/")
 from proto import chatter_pb2
+from cybertron import pyinit
 
 # begin wrapper cxx interface to py
 _cyber_node = importlib.import_module('_cyber_node') 
@@ -54,10 +55,11 @@ def test_talker_fun():
     print("----------end----------")
     _cyber_node.delete_PyWriter(w)
     _cyber_node.delete_PyNode(node)
-    
+
 def main():
+    pyinit.init()
     test_talker_fun()
-    #cyber_py_talker_class()
+    pyinit.shutdown()
 
 if __name__ == '__main__':
   main()

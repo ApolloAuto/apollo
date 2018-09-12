@@ -20,13 +20,14 @@ add_subdirectory(cybertron/record)
 
 add_subdirectory(cybertron/tools)
 add_subdirectory(examples)
-# add_subdirectory(benchmark)
+#add_subdirectory(benchmark)
 add_subdirectory(cybertron/mainboard)
 
 add_subdirectory(sensor)
 add_subdirectory(third_party)
 
 add_subdirectory(python)
+
 file(GLOB CYBERTRON_SRCS
   "cybertron/*.cpp"
   "cybertron/logger/*.cpp"
@@ -42,8 +43,8 @@ file(GLOB CYBERTRON_SRCS
   "cybertron/tf2_cybertron/*.cpp"
   "cybertron/transport/*.cpp"
   "cybertron/transport/*/*.cpp"
-  "cybertron/topology/*.cpp"
-  "cybertron/topology/*/*.cpp"
+  "cybertron/service_discovery/*.cpp"
+  "cybertron/service_discovery/*/*.cpp"
   "cybertron/croutine/*.cpp"
   "cybertron/croutine/swap.S"
   "cybertron/parameter/*.cpp"
@@ -96,11 +97,5 @@ install(DIRECTORY "cybertron"
   PATTERN "*.h"
   )
 
-install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/cybertron"
-  DESTINATION "include"
-  FILES_MATCHING
-  PATTERN "*.pb.h"
-  )
-
 enable_testing()
-# add_subdirectory(cybertron/test)
+#add_subdirectory(cybertron/test)

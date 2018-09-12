@@ -24,6 +24,7 @@ std::unique_ptr<Node> CreateNode(const std::string& node_name,
   if (!OK()) {
     // TODO @nizhongjun
     // add some hint log
+    AERROR << "cybertron has not inited.";
     return nullptr;
   }
   std::unique_ptr<Node> node(new Node(node_name, name_space));

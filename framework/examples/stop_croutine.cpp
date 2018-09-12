@@ -29,10 +29,9 @@ int main(int argc, char* argv[]) {
   auto sched = Scheduler::Instance();
   sched->RemoveTask("testxxx");
   std::string channel_name = "hello/apollo";
-  std::vector<uint64_t> channel_vec;
-  channel_vec.emplace_back(apollo::cybertron::common::Hash(channel_name));
   std::string node_name = "remove_node";
-  auto dv = std::make_shared<DataVisitor>(std::move(channel_vec), 1);
+  auto dv = std::make_shared<DataVisitor<DemoMsg>>(
+      apollo::cybertron::common::Hash(channel_name), 1);
   auto func = [=](const std::shared_ptr<DemoMsg>& msg) { Proc(msg); };
   auto factory = CreateRoutineFactory<DemoMsg>(func, dv);
   sched->CreateTask(factory, node_name);

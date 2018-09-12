@@ -40,32 +40,35 @@ class RoutineFactory {
   using CreateRoutineFunc = std::function<VoidFunc()>;
   // We can use routine_func directly.
   CreateRoutineFunc create_routine;
-  inline std::shared_ptr<data::DataVisitor> GetDataVisitor() const {
+  inline std::shared_ptr<data::DataVisitorBase> GetDataVisitor() const {
     return data_visitor_;
   }
-  inline void SetDataVisitor(const std::shared_ptr<data::DataVisitor>& dv) {
+  inline void SetDataVisitor(const std::shared_ptr<data::DataVisitorBase>& dv) {
     data_visitor_ = dv;
   }
 
  private:
-  std::shared_ptr<data::DataVisitor> data_visitor_ = nullptr;
+  std::shared_ptr<data::DataVisitorBase> data_visitor_ = nullptr;
 };
 
 template <typename M0, typename F>
 RoutineFactory CreateRoutineFactory(
-    F&& f, const std::shared_ptr<data::DataVisitor>& dv) {
+    F&& f, const std::shared_ptr<data::DataVisitor<M0>>& dv) {
   RoutineFactory factory;
   factory.SetDataVisitor(dv);
   factory.create_routine = [=]() {
     return [=]() {
       std::shared_ptr<M0> msg;
       for (;;) {
-        if (dv->template TryFetch<M0>(msg)) {
+        if (dv->TryFetch(msg)) {
           PerfEventCache::Instance()->AddSchedEvent(
               3, CRoutine::GetCurrentRoutine()->Id(),
-              CRoutine::GetCurrentRoutine()->ProcessorId(), 0, 0);
+              CRoutine::GetCurrentRoutine()->ProcessorId(), 0, 0, 1);
           f(msg);
         } else {
+          PerfEventCache::Instance()->AddSchedEvent(
+              3, CRoutine::GetCurrentRoutine()->Id(),
+              CRoutine::GetCurrentRoutine()->ProcessorId(), 0, 0, 0);
           CRoutine::GetCurrentRoutine()->SetState(RoutineState::WAITING_INPUT);
         }
         CRoutine::Yield();
@@ -78,7 +81,7 @@ RoutineFactory CreateRoutineFactory(
 // TODO(hewei03): Use parameter pack here.
 template <typename M0, typename M1, typename F>
 RoutineFactory CreateRoutineFactory(
-    F&& f, const std::shared_ptr<data::DataVisitor>& dv) {
+    F&& f, const std::shared_ptr<data::DataVisitor<M0, M1>>& dv) {
   RoutineFactory factory;
   factory.SetDataVisitor(dv);
   factory.create_routine = [=]() {
@@ -86,12 +89,15 @@ RoutineFactory CreateRoutineFactory(
       std::shared_ptr<M0> msg0;
       std::shared_ptr<M1> msg1;
       for (;;) {
-        if (dv->template TryFetch<M0, M1>(msg0, msg1)) {
+        if (dv->TryFetch(msg0, msg1)) {
           PerfEventCache::Instance()->AddSchedEvent(
               3, CRoutine::GetCurrentRoutine()->Id(),
-              CRoutine::GetCurrentRoutine()->ProcessorId(), 0, 0);
+              CRoutine::GetCurrentRoutine()->ProcessorId(), 0, 0, 1);
           f(msg0, msg1);
         } else {
+          PerfEventCache::Instance()->AddSchedEvent(
+              3, CRoutine::GetCurrentRoutine()->Id(),
+              CRoutine::GetCurrentRoutine()->ProcessorId(), 0, 0, 0);
           CRoutine::GetCurrentRoutine()->SetState(RoutineState::WAITING_INPUT);
         }
         CRoutine::Yield();
@@ -103,7 +109,7 @@ RoutineFactory CreateRoutineFactory(
 
 template <typename M0, typename M1, typename M2, typename F>
 RoutineFactory CreateRoutineFactory(
-    F&& f, const std::shared_ptr<data::DataVisitor>& dv) {
+    F&& f, const std::shared_ptr<data::DataVisitor<M0, M1, M2>>& dv) {
   RoutineFactory factory;
   factory.SetDataVisitor(dv);
   factory.create_routine = [=]() {
@@ -112,12 +118,45 @@ RoutineFactory CreateRoutineFactory(
       std::shared_ptr<M1> msg1;
       std::shared_ptr<M2> msg2;
       for (;;) {
-        if (dv->template TryFetch<M0, M1, M2>(msg0, msg1, msg2)) {
+        if (dv->TryFetch(msg0, msg1, msg2)) {
           PerfEventCache::Instance()->AddSchedEvent(
               3, CRoutine::GetCurrentRoutine()->Id(),
-              CRoutine::GetCurrentRoutine()->ProcessorId(), 0, 0);
+              CRoutine::GetCurrentRoutine()->ProcessorId(), 0, 0, 1);
           f(msg0, msg1, msg2);
         } else {
+          PerfEventCache::Instance()->AddSchedEvent(
+              3, CRoutine::GetCurrentRoutine()->Id(),
+              CRoutine::GetCurrentRoutine()->ProcessorId(), 0, 0, 0);
+          CRoutine::GetCurrentRoutine()->SetState(RoutineState::WAITING_INPUT);
+        }
+        CRoutine::Yield();
+      }
+    };
+  };
+  return factory;
+}
+
+template <typename M0, typename M1, typename M2, typename M3, typename F>
+RoutineFactory CreateRoutineFactory(
+    F&& f, const std::shared_ptr<data::DataVisitor<M0, M1, M2, M3>>& dv) {
+  RoutineFactory factory;
+  factory.SetDataVisitor(dv);
+  factory.create_routine = [=]() {
+    return [=]() {
+      std::shared_ptr<M0> msg0;
+      std::shared_ptr<M1> msg1;
+      std::shared_ptr<M2> msg2;
+      std::shared_ptr<M3> msg3;
+      for (;;) {
+        if (dv->TryFetch(msg0, msg1, msg2, msg3)) {
+          PerfEventCache::Instance()->AddSchedEvent(
+              3, CRoutine::GetCurrentRoutine()->Id(),
+              CRoutine::GetCurrentRoutine()->ProcessorId(), 0, 0, 1);
+          f(msg0, msg1, msg2, msg3);
+        } else {
+          PerfEventCache::Instance()->AddSchedEvent(
+              3, CRoutine::GetCurrentRoutine()->Id(),
+              CRoutine::GetCurrentRoutine()->ProcessorId(), 0, 0, 0);
           CRoutine::GetCurrentRoutine()->SetState(RoutineState::WAITING_INPUT);
         }
         CRoutine::Yield();

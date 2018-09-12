@@ -58,11 +58,6 @@ int main(int argc, char *argv[])
     return 0;
   }
 
-  std::shared_ptr<CCObjectPool<Test>> pool;
-
-  if (!strcmp(argv[1], "pool"))
-    pool = CCObjectPool<Test>::Instance(POOL_SIZE);
-
   int i;
   std::vector<std::thread> v;
 

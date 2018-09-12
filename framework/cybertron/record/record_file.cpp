@@ -48,7 +48,7 @@ bool RecordFileReader::Open(const std::string& path) {
     AERROR << "ifstream open fail, filename: " << path_ << "openmode: " << mode;
     return false;
   }
-  return true;
+  return ReadHeader();
 }
 
 bool RecordFileReader::ReadHeader() {
@@ -126,6 +126,16 @@ bool RecordFileReader::ReadSection(Section* section) {
     return false;
   }
   return true;
+}
+
+void RecordFileReader::SkipSection(uint64_t size, uint64_t fixed_size) {
+  int64_t backup_position = ifstream_.tellg();
+  if (size > 0) {
+    ifstream_.seekg(backup_position + size, std::ios::beg);
+  }
+  if (fixed_size > size) {
+    ifstream_.seekg(backup_position + fixed_size, std::ios::beg);
+  }
 }
 
 bool RecordFileReader::EndOfFile() { return ifstream_.eof(); }

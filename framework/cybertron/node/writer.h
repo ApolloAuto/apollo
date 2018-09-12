@@ -23,7 +23,7 @@
 
 #include "cybertron/common/log.h"
 #include "cybertron/node/writer_base.h"
-#include "cybertron/topology/topology.h"
+#include "cybertron/service_discovery/topology_manager.h"
 #include "cybertron/transport/transport.h"
 
 namespace apollo {
@@ -33,7 +33,7 @@ template <typename MessageT>
 class Writer : public WriterBase {
  public:
   using UpperReachPtr = std::shared_ptr<transport::UpperReach<MessageT>>;
-  using ChangeConnection = typename topology::Manager::ChangeConnection;
+  using ChangeConnection = typename service_discovery::Manager::ChangeConnection;
 
   explicit Writer(const proto::RoleAttributes& role_attr);
   virtual ~Writer();
@@ -41,7 +41,8 @@ class Writer : public WriterBase {
   bool Init() override;
   void Shutdown() override;
 
-  bool Write(const std::shared_ptr<MessageT>& message);
+  bool Write(const MessageT& msg);
+  bool Write(const std::shared_ptr<MessageT>& msg_ptr);
 
  protected:
   void JoinTheTopology();
@@ -51,7 +52,7 @@ class Writer : public WriterBase {
   UpperReachPtr upper_reach_;
 
   ChangeConnection change_conn_;
-  topology::ChannelManagerPtr channel_manager_;
+  service_discovery::ChannelManagerPtr channel_manager_;
 };
 
 template <typename MessageT>
@@ -73,7 +74,7 @@ bool Writer<MessageT>::Init() {
   RETURN_VAL_IF_NULL(upper_reach_, false);
   this->role_attr_.set_id(upper_reach_->id().HashValue());
 
-  channel_manager_ = topology::Topology::Instance()->channel_manager();
+  channel_manager_ = service_discovery::TopologyManager::Instance()->channel_manager();
   JoinTheTopology();
 
   // TODO more check
@@ -92,9 +93,16 @@ void Writer<MessageT>::Shutdown() {
 }
 
 template <typename MessageT>
-bool Writer<MessageT>::Write(const std::shared_ptr<MessageT>& message) {
+bool Writer<MessageT>::Write(const MessageT& msg) {
+  // need copy constructor && extra consumption
+  auto msg_ptr = std::make_shared<MessageT>(msg);
+  return Write(msg_ptr);
+}
+
+template <typename MessageT>
+bool Writer<MessageT>::Write(const std::shared_ptr<MessageT>& msg_ptr) {
   RETURN_VAL_IF(!init_.load(), false);
-  return upper_reach_->Transmit(message);
+  return upper_reach_->Transmit(msg_ptr);
 }
 
 template <typename MessageT>

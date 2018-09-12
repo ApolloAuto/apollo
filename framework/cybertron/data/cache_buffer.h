@@ -17,45 +17,45 @@
 #ifndef CYBERTRON_DATA_CACHE_BUFFER_H_
 #define CYBERTRON_DATA_CACHE_BUFFER_H_
 
-#include <array>
-#include "cybertron/base/atomic_rw_lock.h"
+#include <mutex>
+#include <vector>
 
 namespace apollo {
 namespace cybertron {
 namespace data {
 
-using apollo::cybertron::base::AtomicRWLock;
-
-template <
-    typename T, std::size_t CacheSize,
-    typename std::enable_if<(CacheSize & (CacheSize - 1)) == 0, int>::type = 0>
+template <typename T>
 class CacheBuffer {
  public:
   using value_type = T;
   using size_type = std::size_t;
 
-  CacheBuffer() : mod_num_(CacheSize - 1) {}
+  explicit CacheBuffer(uint32_t size) {
+    capacity_ = size + 1;
+    buffer_.resize(capacity_);
+  }
+
   CacheBuffer(CacheBuffer&& rhs) {
     head_ = rhs.head_;
     tail_ = rhs.head_;
     buffer_ = rhs.buffer_;
-    mod_num_ = rhs.mod_num_;
+    capacity_ = rhs.capacity_;
   }
 
   T& operator[](uint64_t pos) { return buffer_[GetIndex(pos)]; }
   const T& at(uint64_t pos) { return buffer_[GetIndex(pos)]; }
 
-  uint64_t Head() { return head_; }
+  uint64_t Head() { return head_ + 1; }
   uint64_t Tail() { return tail_; }
   uint64_t Size() { return tail_ - head_; }
 
-  const T& Front() { return buffer_[GetIndex(head_)]; }
+  const T& Front() { return buffer_[GetIndex(head_ + 1)]; }
   const T& Back() { return buffer_[GetIndex(tail_)]; }
 
   bool Empty() { return tail_ == 0; }
-  bool Full() { return mod_num_ == tail_ - head_; }
+  bool Full() { return capacity_ - 1 == tail_ - head_; }
 
-  void Fill(T&& value) {
+  void Fill(const T& value) {
     if (Full()) {
       buffer_[GetIndex(head_)] = value;
       ++head_;
@@ -66,17 +66,17 @@ class CacheBuffer {
     }
   }
 
-  AtomicRWLock& RWLock() { return rw_lock_; }
+  std::mutex& Mutex() { return mutex_; }
 
  private:
   CacheBuffer(const CacheBuffer& other) = delete;
   CacheBuffer& operator=(const CacheBuffer& other) = delete;
-  uint64_t GetIndex(uint64_t pos) { return pos & mod_num_; }
-  std::array<T, CacheSize> buffer_;
+  uint64_t GetIndex(uint64_t pos) { return pos % capacity_; }
+  std::vector<T> buffer_;
   uint64_t head_ = 0;
   uint64_t tail_ = 0;
-  uint64_t mod_num_;
-  AtomicRWLock rw_lock_;
+  uint64_t capacity_ = 0;
+  std::mutex mutex_;
 };
 
 }  // namespace data

@@ -2,19 +2,19 @@
     <module>
         <name>driver</name>
         <dag_conf>driver.dag</dag_conf>
-        <process_name></process_name>
+        <process_name>perception</process_name>
     </module>
 
     <module>
         <name>perception</name>
         <dag_conf>perception.dag</dag_conf>
-        <process_name></process_name>
+        <process_name>perception</process_name>
     </module>
 
     <module>
         <name>planning</name>
         <dag_conf>planning.dag</dag_conf>
-        <process_name></process_name>
+        <process_name>planning</process_name>
     </module>
 
 </cybertron>

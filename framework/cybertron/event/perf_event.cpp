@@ -39,6 +39,7 @@ void SchedPerfEvent::SetParams(int count, ...) {
   t_sleep = va_arg(ap, uint64_t);
   t_start = va_arg(ap, uint64_t);
   t_end = va_arg(ap, uint64_t);
+  try_fetch_result = va_arg(ap, int);
   va_end(ap);
 }
 
@@ -46,8 +47,8 @@ void TransportPerfEvent::SetParams(int count, ...) {
   va_list ap;
   va_start(ap, count);
   event_id = va_arg(ap, int);
-  t_sleep = va_arg(ap, uint64_t);
-  t_start = va_arg(ap, uint64_t);
+  channel_id = va_arg(ap, uint64_t);
+  msg_seq = va_arg(ap, uint64_t);
   t_end = va_arg(ap, uint64_t);
   va_end(ap);
 }

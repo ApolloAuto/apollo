@@ -25,11 +25,9 @@
 #include <unordered_map>
 #include <utility>
 #include <vector>
-#include "cybertron/common/log.h"
 #include "cybertron/message/raw_message.h"
-#include "cybertron/proto/record.pb.h"
 #include "cybertron/record/header_builder.h"
-#include "cybertron/record/record_file.h"
+#include "cybertron/record/record_base.h"
 #include "cybertron/time/time.h"
 
 using ::apollo::cybertron::Time;
@@ -40,11 +38,11 @@ namespace apollo {
 namespace cybertron {
 namespace record {
 
-class RecordWriter {
+class RecordWriter : public RecordBase {
  public:
   RecordWriter();
   virtual ~RecordWriter();
-  bool Open(const std::string& filename);
+  bool Open(const std::string& file);
   void Close();
   bool WriteChannel(const std::string& name, const std::string& type,
                     const std::string& proto_desc);
@@ -57,19 +55,11 @@ class RecordWriter {
   void SplitOutfile();
 
   bool is_writing_ = false;
-  std::string file_ = "";
-  std::string path_ = "";
   uint64_t segment_raw_size_ = 0;
   uint64_t segment_begin_time_ = 0;
   uint64_t file_index_ = 0;
-  std::mutex mutex_;
-  std::vector<std::string> channel_vec_;
-  std::unordered_map<std::string, std::string> channel_message_type_map_;
-  std::unordered_map<std::string, std::string> channel_proto_desc_map_;
   std::unique_ptr<RecordFileWriter> file_writer_ = nullptr;
   std::unique_ptr<RecordFileWriter> file_writer_backup_ = nullptr;
-  Header header_;
-  std::mutex flush_mutex_;
 };
 
 inline bool RecordWriter::WriteMessage(

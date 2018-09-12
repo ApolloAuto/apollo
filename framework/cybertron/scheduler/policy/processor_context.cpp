@@ -67,11 +67,11 @@ void ProcessorContext::NotifyProcessor(uint64_t routine_id) {
     return;
   }
 
+  PerfEventCache::Instance()->AddSchedEvent(4, routine_id, proc_index_, 0, 0, -1);
   if (!cr_map_[routine_id]->IsRunning()) {
     cr_map_[routine_id]->SetState(RoutineState::READY);
   }
   if (!notified_.exchange(true)) {
-    PerfEventCache::Instance()->AddSchedEvent(4, routine_id, proc_index_, 0, 0);
     processor_->Notify();
     return;
   }
@@ -90,17 +90,7 @@ void ProcessorContext::ShutDown() {
   processor_->Stop();
 }
 
-// TODO  use perf event
 void ProcessorContext::PrintStatistics() {
-  double average_proc_time = 0.0;
-  uint64_t proc_interval_nano = proc_interval_.count();
-  if (proc_num_ > 0) {
-    average_proc_time = static_cast<double>(proc_interval_nano) / proc_num_;
-  }
-  AINFO << "strategy_proc_time(us)["
-        << static_cast<double>(proc_interval_nano) / 1000 << "] pop_num["
-        << proc_num_ << "] average_proc_time(us)[" << average_proc_time / 1000
-        << "]";
 }
 
 void ProcessorContext::PrintCRoutineStats() {

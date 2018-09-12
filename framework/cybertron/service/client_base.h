@@ -44,9 +44,9 @@ class ClientBase {
     bool has_service = false;
     auto step_duration = std::chrono::nanoseconds(5 * 1000 * 1000);
     while (!has_service && time_out.count() > 0) {
-      has_service =
-          topology::Topology::Instance()->service_manager()->HasService(
-              service_name_);
+      has_service = service_discovery::TopologyManager::Instance()
+                        ->service_manager()
+                        ->HasService(service_name_);
       std::this_thread::sleep_for(step_duration);
       time_out -= step_duration;
     }

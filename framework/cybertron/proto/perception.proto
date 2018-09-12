@@ -3,6 +3,10 @@ syntax = "proto2";
 package apollo.cybertron.proto;
 
 message Perception {
-    required uint64 msg_id = 1;
-    required double result = 2;
+    message Header {
+        required uint64 timestamp = 1;
+    }
+    required Header header = 1;
+    required uint64 msg_id = 2;
+    required double result = 3;
 };

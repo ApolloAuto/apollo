@@ -27,7 +27,7 @@
 
 #include "cybertron/common/global_data.h"
 #include "cybertron/croutine/routine_factory.h"
-#include "cybertron/data/data_cache.h"
+#include "cybertron/data/data_dispatcher.h"
 #include "cybertron/init.h"
 #include "cybertron/scheduler/scheduler.h"
 
@@ -51,11 +51,10 @@ class Task {
 
  private:
   uint32_t num_threads_;
-  uint32_t running_count_;
+  std::atomic<uint32_t> running_count_;
   std::string name_;
   std::vector<uint64_t> name_ids_;
   std::mutex count_lock_;
-  std::condition_variable wait_cv_;
 };
 
 template <>
@@ -73,7 +72,7 @@ template <typename Function>
 Task<T>::Task(const std::string& name, Function&& f, const uint8_t& num_threads)
     : name_(name), num_threads_(num_threads), running_count_(0) {
   auto func =
-      [ f = std::forward<Function&&>(f), this ](const std::shared_ptr<T>& msg) {
+      [ f = std::forward<Function&&>(f), this](const std::shared_ptr<T>& msg) {
     f(msg);
     this->Finish();
   };
@@ -82,15 +81,15 @@ Task<T>::Task(const std::string& name, Function&& f, const uint8_t& num_threads)
     auto channel_name = task_prefix + name_ + std::to_string(i);
     auto name_id = common::GlobalData::RegisterChannel(channel_name);
     name_ids_.push_back(std::move(name_id));
-    auto dv = std::make_shared<data::DataVisitor>(name_id);
-    croutine::RoutineFactory factory =
-        croutine::CreateRoutineFactory<T>(func, dv);
+    auto dv = std::make_shared<data::DataVisitor<T>>(name_id, 1);
+    croutine::RoutineFactory factory = croutine::CreateRoutineFactory<T>(func, dv);
     scheduler::Scheduler::Instance()->CreateTask(factory, channel_name);
   }
 }
 
 template <typename T>
 Task<T>::~Task() {
+  Wait();
   for (int i = 0; i < num_threads_; ++i) {
     auto channel_name = task_prefix + name_ + std::to_string(i);
     scheduler::Scheduler::Instance()->RemoveTask(channel_name);
@@ -103,45 +102,43 @@ void Task<T>::Execute(const std::shared_ptr<T>& val) {
   if (it == name_ids_.end()) {
     it = name_ids_.begin();
   }
-  data::DataCache::Instance()->WriteDataCache(*it, val);
-  {
-    std::lock_guard<std::mutex> lg(count_lock_);
-    running_count_++;
-  }
+
+  data::DataDispatcher<T>::Instance()->Dispatch(*it, val);
+  running_count_++;
   ++it;
 }
 
 template <typename T>
 void Task<T>::Finish() {
-  {
-    std::lock_guard<std::mutex> lg(count_lock_);
-    running_count_--;
-  }
-  wait_cv_.notify_all();
+  std::lock_guard<std::mutex> lg(count_lock_);
+  running_count_--;
 }
 
 template <typename T>
 template <typename Rep, typename Period>
 bool Task<T>::WaitFor(const std::chrono::duration<Rep, Period>& time) {
-  std::unique_lock<std::mutex> ul(count_lock_);
-  if (wait_cv_.wait_for(ul, time, [this]() { return running_count_ == 0; }) ==
-      std::cv_status::timeout) {
-    return false;
+  auto wake_time = std::chrono::steady_clock::now() + time;
+  while (std::chrono::steady_clock::now() < wake_time && !IsShutdown()) {
+    {
+      std::lock_guard<std::mutex> lg(count_lock_);
+      if (running_count_ == 0) {
+        return true;
+      }
+    }
+    usleep(100000);
   }
-  return true;
+  return false;
 }
 
 template <typename T>
 bool Task<T>::Wait() {
-  // TODO: Using Yield() to avoid dead lock.
-  std::unique_lock<std::mutex> ul(count_lock_);
   while (!IsShutdown()) {
-    wait_cv_.wait_for(ul, std::chrono::milliseconds(100));
+    std::lock_guard<std::mutex> lg(count_lock_);
     if (running_count_ == 0) {
-      break;
+      return true;
     }
   }
-  return true;
+  return false;
 }
 
 }  // namespace cybertron

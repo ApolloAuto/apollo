@@ -32,11 +32,6 @@
 #define LOG_WARN AWARN
 #define LOG_ERROR AERROR
 
-#define LOG_DEBUG_FORMAT(...) printf(__VA_ARGS__);
-#define LOG_INFO_FORMAT(...) printf(__VA_ARGS__);
-#define LOG_WARN_FORMAT(...) printf(__VA_ARGS__);
-#define LOG_ERROR_FORMAT(...) printf(__VA_ARGS__);
-
 #define XLOG_ERROR(...) printf(__VA_ARGS__);
 
 namespace apollo {

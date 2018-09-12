@@ -32,28 +32,20 @@ using apollo::cybertron::common::GlobalData;
 uint32_t Scheduler::processor_num_ = std::thread::hardware_concurrency();
 
 Scheduler::Scheduler()
-    : stop_(false),
-      proc_balancer_(ProcBalancer::Instance()),
-      routine_balancer_(RoutineBalancer::Instance()) {
+    : stop_(false) {
   auto global_conf = GlobalData::Instance()->Config();
   if (global_conf.has_scheduler_conf()) {
     scheduler_conf_.CopyFrom(global_conf.scheduler_conf());
-    if (scheduler_conf_.processor_num() == 0) {
-      AWARN << "Processor num cannot be set to 0! For better performance, "
-            << "will use the number of cpu cores as default value.";
-    } else if (scheduler_conf_.processor_num() > processor_num_) {
-      AWARN << "Processor num: " << scheduler_conf_.processor_num()
-            << " is too large! For better performance, "
-            << "will use the number of cpu cores as default value:"
-            << processor_num_;
-    } else {
+    if (scheduler_conf_.processor_num() > 0) {
       processor_num_ = scheduler_conf_.processor_num();
     }
   } else {
     AINFO << "No scheduler conf";
     return;
   }
-
+  AINFO << "processor num: " << processor_num_;
+  proc_balancer_ = ProcBalancer::Instance();
+  routine_balancer_ = RoutineBalancer::Instance();
   if (global_conf.has_routine_conf()) {
     routine_conf_.CopyFrom(global_conf.routine_conf());
   } else {
@@ -88,7 +80,7 @@ bool Scheduler::CreateTask(const RoutineFactory& factory,
 
 bool Scheduler::CreateTask(std::function<void()>&& func,
                            const std::string& name,
-                           std::shared_ptr<DataVisitor> visitor) {
+                           std::shared_ptr<DataVisitorBase> visitor) {
   if (stop_) {
     AERROR << "scheduler is stoped, cannot create task!";
     return false;
@@ -104,8 +96,12 @@ bool Scheduler::CreateTask(std::function<void()>&& func,
   }
 
   if (visitor != nullptr) {
-    visitor->RegisterCallback(
-        [this, task_id]() { this->proc_balancer_->NotifyProcessor(task_id); });
+    visitor->RegisterNotifyCallback([this, task_id, name]() {
+      if (stop_) {
+        return;
+      }
+      this->proc_balancer_->NotifyProcessor(task_id);
+    });
   }
 
   RoutineConfInfo conf_info;

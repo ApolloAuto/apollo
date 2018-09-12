@@ -20,14 +20,11 @@
 #include <unistd.h>
 
 #include <iostream>
-#include <iostream>
 #include <memory>
 #include <mutex>
 #include <thread>
 
 #include "cybertron/cybertron.h"
-#include "cybertron/data/data_fusion.h"
-#include "cybertron/data/meta_data.h"
 #include "cybertron/init.h"
 #include "cybertron/message/protobuf_factory.h"
 #include "cybertron/message/py_message.h"
@@ -270,7 +267,6 @@ class PyClient {
 class PyNode {
  public:
   explicit PyNode(const std::string &node_name) : node_name_(node_name) {
-    py_init();
     node_ = apollo::cybertron::CreateNode(node_name);
   }
   ~PyNode() { }

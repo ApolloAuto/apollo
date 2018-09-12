@@ -131,10 +131,7 @@ TEST(RecordFileTest, TestOneMessageFile) {
   Section sec;
 
   // read header section
-  ASSERT_TRUE(rfr->ReadSection(&sec));
-  ASSERT_EQ(SectionType::SECTION_HEADER, sec.type);
-  Header hdr2;
-  ASSERT_TRUE(rfr->ReadSection<Header>(sec.size, &hdr2, HEADER_LENGTH));
+  Header hdr2 = rfr->GetHeader();
   ASSERT_EQ(hdr2.chunk_number(), hdr1.chunk_number());
   ASSERT_EQ(hdr2.begin_time(), hdr1.begin_time());
   ASSERT_EQ(hdr2.end_time(), hdr1.end_time());

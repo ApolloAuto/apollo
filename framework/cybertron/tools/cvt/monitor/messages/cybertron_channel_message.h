@@ -90,9 +90,9 @@ class ChannelMessage : public RenderableMessage {
   const std::string& message_type(void) const { return message_type_; }
 
   bool has_message_come(void) const { return has_message_come_; }
-  void set_has_message_come(bool b){ has_message_come_ = b; }
 
   double frame_ratio(void) {
+    if(!has_message_come()) return 0.0;
     apollo::cybertron::Time curTime = apollo::cybertron::Time::Now();
     auto deltaTime = curTime - last_time_;
 
@@ -127,6 +127,8 @@ class ChannelMessage : public RenderableMessage {
       }
     }
   }
+
+  void set_has_message_come(bool b){ has_message_come_ = b; }
 
   bool has_message_come_;
   std::string message_type_;

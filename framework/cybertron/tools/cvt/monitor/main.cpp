@@ -21,7 +21,7 @@
 #include "screen.h"
 
 #include "cybertron/init.h"
-#include "cybertron/topology/topology.h"
+#include "cybertron/service_discovery/topology_manager.h"
 
 #include <signal.h>
 #include <iostream>
@@ -67,7 +67,7 @@ int main(int argc, char* argv[]) {
         topologyMsg.TopologyChanged(change_msg);
       };
 
-  apollo::cybertron::topology::Topology::Instance()
+  apollo::cybertron::service_discovery::TopologyManager::Instance()
       ->channel_manager()
       ->AddChangeListener(topologyCallback);
 

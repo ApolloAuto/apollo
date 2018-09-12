@@ -1,7 +1,7 @@
 #include <QApplication>
 #include <QSurfaceFormat>
 #include "cybertron/init.h"
-#include "cybertron/topology/topology.h"
+#include "cybertron/service_discovery/topology_manager.h"
 #include "main_window.h"
 
 int main(int argc, char* argv[]) {
@@ -16,7 +16,7 @@ int main(int argc, char* argv[]) {
       };
 
   auto channelManager =
-      apollo::cybertron::topology::Topology::Instance()->channel_manager();
+      apollo::cybertron::service_discovery::TopologyManager::Instance()->channel_manager();
 
   channelManager->AddChangeListener(topologyCallback);
 

@@ -51,6 +51,7 @@ struct RawMessage {
   }
 
   std::string message;
+  uint64_t timestamp;
 
  private:
   RawMessage(const RawMessage &) = delete;

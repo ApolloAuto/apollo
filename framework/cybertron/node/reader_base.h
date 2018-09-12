@@ -26,11 +26,13 @@
 #include "cybertron/common/macros.h"
 #include "cybertron/common/util.h"
 #include "cybertron/transport/transport.h"
+#include "cybertron/event/perf_event_cache.h"
 
 namespace apollo {
 namespace cybertron {
 
 using apollo::cybertron::common::GlobalData;
+using apollo::cybertron::event::PerfEventCache;
 
 class ReaderBase {
  public:
@@ -49,6 +51,12 @@ class ReaderBase {
   virtual void Shutdown() = 0;
   const std::string& GetChannelName() const {
     return role_attr_.channel_name();
+  }
+
+  const uint64_t ChannelId() const { return role_attr_.channel_id(); }
+
+  const proto::QosProfile& QosProfile() const {
+    return role_attr_.qos_profile();
   }
 
   bool inited() const { return init_.load(); }
@@ -93,8 +101,11 @@ auto ReaderManager<MessageT>::GetReader(const proto::RoleAttributes& role_attr)
                           const proto::RoleAttributes& reader_attr) {
               (void)msg_info;
               (void)reader_attr;
-              data::DataCache::Instance()->template WriteDataCache<MessageT>(
+              PerfEventCache::Instance()->AddTransportEvent(2, reader_attr.channel_id(), msg_info.seq_num());
+              data::DataDispatcher<MessageT>::Instance()->Dispatch(
                   reader_attr.channel_id(), msg);
+              PerfEventCache::Instance()->AddTransportEvent(3, reader_attr.channel_id(), msg_info.seq_num());
+
             });
   }
   return lower_reach_map_[channel_name];

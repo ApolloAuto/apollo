@@ -19,7 +19,7 @@
 #include "cybertron/common/log.h"
 #include "cybertron/croutine/routine_factory.h"
 #include "cybertron/cybertron.h"
-#include "cybertron/data/data_cache.h"
+#include "cybertron/data/data_dispatcher.h"
 #include "cybertron/data/data_visitor.h"
 #include "cybertron/node/node.h"
 #include "cybertron/node/reader.h"

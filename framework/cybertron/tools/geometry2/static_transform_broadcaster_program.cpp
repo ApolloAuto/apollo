@@ -2,12 +2,10 @@
 #include <cstdio>
 
 #include "cybertron/cybertron.h"
-#include "cybertron/tf2/LinearMath/Quaternion.h"
+#include "tf2/LinearMath/Quaternion.h"
 #include "cybertron/tf2_cybertron/static_transform_broadcaster.h"
 
 int main(int argc, char** argv) {
-  // cybertron::Init(argc, argv,"static_transform_publisher",
-  // cybertron::init_options::AnonymousName);
   apollo::cybertron::Init(argv[0]);
   std::shared_ptr<apollo::cybertron::Node> static_node(
       apollo::cybertron::CreateNode(
@@ -38,8 +36,6 @@ int main(int argc, char** argv) {
     msg.set_child_frame_id(argv[9]);
 
     broadcaster.sendTransform(msg);
-    // ROS_INFO("Spinning until killed publishing %s to %s",
-    // msg.header.frame_id.c_str(), msg.child_frame_id.c_str());
     while (apollo::cybertron::OK()) {
       sleep(1);
     }
@@ -58,7 +54,7 @@ int main(int argc, char** argv) {
     msg.mutable_transform()->mutable_translation()->set_y(atof(argv[2]));
     msg.mutable_transform()->mutable_translation()->set_z(atof(argv[3]));
 
-    apollo::cybertron::tf2::Quaternion quat;
+    tf2::Quaternion quat;
     quat.setRPY(atof(argv[6]), atof(argv[5]), atof(argv[4]));
     msg.mutable_transform()->mutable_rotation()->set_qx(quat.x());
     msg.mutable_transform()->mutable_rotation()->set_qy(quat.y());
@@ -71,16 +67,12 @@ int main(int argc, char** argv) {
     msg.set_child_frame_id(argv[8]);
 
     broadcaster.sendTransform(msg);
-    // ROS_INFO("Spinning until killed publishing %s to %s",
-    // msg.header.frame_id.c_str(), msg.child_frame_id.c_str());
-    // cybertron::spin();
     while (apollo::cybertron::OK()) {
       sleep(1);
     }
     return 0;
   } else {
     printf("A command line utility for manually sending a transform.\n");
-    // printf("It will periodicaly republish the given transform. \n");
     printf(
         "Usage: static_transform_publisher x y z qx qy qz qw frame_id "
         "child_frame_id \n");

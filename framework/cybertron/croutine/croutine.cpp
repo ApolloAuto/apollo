@@ -76,7 +76,7 @@ RoutineState CRoutine::Resume() {
   current_routine_ = this;
   // update statistics info
   auto t_start = std::chrono::high_resolution_clock::now();
-  PerfEventCache::Instance()->AddSchedEvent(1, id_, processor_id_, 0, 0);
+  PerfEventCache::Instance()->AddSchedEvent(1, id_, processor_id_, 0, 0, -1);
   SwapContext(GetMainContext(), this->GetContext());
   if (IsRunning()) {
     state_ = RoutineState::READY;
@@ -86,7 +86,7 @@ RoutineState CRoutine::Resume() {
                          t_start.time_since_epoch())
                          .count();
   PerfEventCache::Instance()->AddSchedEvent(2, id_, processor_id_, 0,
-                                            start_nanos);
+                                            start_nanos, -1);
   auto diff =
       std::chrono::duration<double, std::milli>(t_end - t_start).count();
   statistic_info_.exec_time += diff;

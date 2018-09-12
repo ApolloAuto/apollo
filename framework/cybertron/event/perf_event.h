@@ -44,6 +44,7 @@ using apollo::cybertron::common::GlobalData;
 // 2 swap_out
 // 3 try_fetch_out
 // 4 notify_in
+// 5 next_routine
 
 class PerfEventBase {
  public:
@@ -75,6 +76,7 @@ class PerfEventBase {
 // 2 swap_out
 // 3 try_fetch_out
 // 4 notify_in
+// 5 next_routine
 class SchedPerfEvent : public PerfEventBase {
  public:
   SchedPerfEvent() { event_type = 0; }
@@ -87,19 +89,21 @@ class SchedPerfEvent : public PerfEventBase {
     ss << proc_id << "\t";
     ss << t_sleep << "\t";
     ss << t_start << "\t";
-    ss << t_end;
+    ss << t_end << "\t";
+    ss << try_fetch_result;
     return ss.str();
   }
   
  private:
   uint64_t cr_id = -1;
   int proc_id = -1;
-  int t_sleep = 0;
+  uint64_t t_sleep = 0;
+  int try_fetch_result = -1;
 };
 
 // event_id = 1 transport
-// 1 write_data_cache
-// 2 notify listener
+// 1 transport time
+// 2 write_data_cache & notify listener
 class TransportPerfEvent : public PerfEventBase {
   public:
     TransportPerfEvent() { event_type = 1; }
@@ -108,13 +112,14 @@ class TransportPerfEvent : public PerfEventBase {
       std::stringstream ss;
       ss << event_type << "\t";
       ss << event_id << "\t";
-      ss << t_sleep << "\t";
-      ss << t_start << "\t";
+      ss << apollo::cybertron::common::GlobalData::GetChannelById(channel_id) << "\t";
+      ss << msg_seq << "\t";
       ss << t_end;
       return ss.str();
     }
   private:
-    int t_sleep = 0;
+    uint64_t msg_seq = 0;
+    uint64_t channel_id = -1;
 };
 
 }  // namespace event

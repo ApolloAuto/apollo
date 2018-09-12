@@ -17,7 +17,6 @@
 using apollo::cybertron::proto::Driver;
 using apollo::cybertron::proto::Perception;
 using apollo::cybertron::proto::RoleAttributes;
-using apollo::cybertron::data::DataCache;
 using apollo::cybertron::transport::MessageInfo;
 using apollo::cybertron::Reader;
 using apollo::cybertron::Writer;
