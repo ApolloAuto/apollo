@@ -22,8 +22,8 @@
 
 static const uint8_t num_threads = 3;
 
-using apollo::cybertron::proto::Driver;
 using apollo::cybertron::Task;
+using apollo::cybertron::proto::Driver;
 
 struct Message {
   uint64_t msg_id;
@@ -34,21 +34,24 @@ struct Message {
 void AsyncDataProcessor() {
   for (;;) {
     AERROR << "AsyncDataProcesor is running.";
-    usleep(5000000);
+    apollo::cybertron::USleep(5000000);
   }
 }
 
 void TaskProcessor(const std::shared_ptr<Message>& msg) {
   AERROR << "Task Processor[" << msg->task_id
          << "] is running: " << msg->msg_id;
-  usleep(100000);
+  apollo::cybertron::USleep(100000);
 }
 
 int main(int argc, char* argv[]) {
   // Init
   apollo::cybertron::Init(argv[0]);
-  Task<> task0("async_data_processor", &AsyncDataProcessor);
-  Task<Message> task1("task_processor", &TaskProcessor, num_threads);
+  // Task<> task0("async_data_processor", &AsyncDataProcessor);
+  auto task0 = apollo::cybertron::CreateTask("async_data_processor",
+                                             &AsyncDataProcessor);
+  auto task1 = apollo::cybertron::CreateTask<Message>(
+      "task_processor", &TaskProcessor, num_threads);
 
   // Run
   uint64_t i = 0;
@@ -57,9 +60,11 @@ int main(int argc, char* argv[]) {
       auto msg = std::make_shared<Message>();
       msg->msg_id = i++;
       msg->task_id = j;
-      task1.Execute(msg);
+      task1->Execute(msg);
+      apollo::cybertron::Yield();
+      apollo::cybertron::USleep(10000);
     }
-    task1.Wait();
+    task1->Wait();
   }
   AERROR << "All task are finished.";
   return 0;
