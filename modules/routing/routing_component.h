@@ -33,7 +33,8 @@ class RoutingComponent final : public ::apollo::cybertron::Component<RoutingRequ
   bool Init() override;
   bool Proc(const std::shared_ptr<RoutingRequest>& request) override;
  private:
-  std::shared_ptr<::apollo::cybertron::Writer<RoutingResponse>> writer_ = nullptr;
+  std::shared_ptr<::apollo::cybertron::Writer<RoutingResponse>>
+      response_writer_ = nullptr;
   Routing routing_;
 };
 

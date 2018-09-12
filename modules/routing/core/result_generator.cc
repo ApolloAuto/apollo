@@ -22,7 +22,6 @@
 #include <utility>
 #include <vector>
 
-#include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
 #include "modules/common/time/time.h"
 #include "modules/common/util/map_util.h"
@@ -33,7 +32,6 @@
 namespace apollo {
 namespace routing {
 
-using apollo::common::adapter::AdapterManager;
 using apollo::common::util::ContainsKey;
 
 bool IsCloseEnough(double value_1, double value_2) {
@@ -308,7 +306,6 @@ bool ResultGenerator::GeneratePassageRegion(
     const std::string& map_version, const RoutingRequest& request,
     const std::vector<NodeWithRange>& nodes,
     const TopoRangeManager& range_manager, RoutingResponse* const result) {
-  AdapterManager::FillRoutingResponseHeader(FLAGS_routing_node_name, result);
 
   if (!GeneratePassageRegion(nodes, range_manager, result)) {
     return false;
