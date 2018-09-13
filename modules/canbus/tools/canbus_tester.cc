@@ -17,21 +17,17 @@
 #include <thread>
 
 #include "cybertron/cybertron.h"
-#include "cybertron/proto/chatter.pb.h"
 #include "cybertron/time/rate.h"
-#include "cybertron/time/time.h"
 
 #include "gflags/gflags.h"
+#include "modules/canbus/common/canbus_gflags.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/log.h"
-#include "ros/include/ros/ros.h"
-#include "std_msgs/String.h"
-
-#include "modules/canbus/common/canbus_gflags.h"
 #include "modules/common/util/file.h"
 #include "modules/control/proto/control_cmd.pb.h"
 
-using apollo::control::ControlCommand; 
+using apollo::control::ControlCommand;
+using apollo::cybertron::Rate;
 using apollo::cybertron::Reader;
 using apollo::cybertron::Writer;
 
@@ -46,8 +42,8 @@ int main(int32_t argc, char **argv) {
   // ros::Publisher pub =
   //     nh.advertise<std_msgs::String>(FLAGS_control_command_topic, 100);
   std::shared_ptr<apollo::cybertron::Node> node_ = nullptr;
-  std::shared_ptr<Writer<std_msgs::String>> control_command_writer_ =
-      node_->CreateWriter<std_msgs::String>(FLAGS_control_command_topic);
+  std::shared_ptr<Writer<ControlCommand>> control_command_writer_ =
+      node_->CreateWriter<ControlCommand>(FLAGS_control_command_topic);
 
   ControlCommand control_cmd;
   if (!apollo::common::util::GetProtoFromFile(FLAGS_canbus_test_file,
@@ -56,13 +52,12 @@ int main(int32_t argc, char **argv) {
     return -1;
   }
 
-  std_msgs::String msg;
-  control_cmd.SerializeToString(&msg.data);
-  Rate rate(1.0); // frequency
+  Rate rate(1.0);  // frequency
 
   while (apollo::cybertron::OK()) {
     // pub.publish(msg);
-    control_command_writer_->Write(std::make_shared<std_msgs::String>(msg));
+    control_command_writer_->Write(
+        std::make_shared<ControlCommand>(control_cmd));
     rate.Sleep();
   }
 
