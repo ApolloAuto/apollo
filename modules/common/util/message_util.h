@@ -26,6 +26,7 @@
 
 #include "google/protobuf/message.h"
 #include "modules/common/time/time.h"
+#include "modules/common/util/file.h"
 
 /**
  * @namespace apollo::common::util
@@ -47,6 +48,46 @@ static void FillHeader(const std::string& module_name, T* msg) {
   header->set_module_name(module_name);
   header->set_timestamp_sec(timestamp);
   header->set_sequence_num(sequence_num.fetch_add(1));
+}
+
+template <typename T, typename std::enable_if<
+                          !std::is_base_of<Message, T>::value, int>::type = 0>
+static bool DumpMessage(const std::shared_ptr<T>& msg,
+                        const std::string& dump_dir = "/tmp") {
+  return true;
+}
+
+template <typename T, typename std::enable_if<
+                          !std::is_base_of<Message, T>::value, int>::type = 0>
+static bool DumpMessage(const T& msg, const std::string& dump_dir = "/tmp") {
+  return true;
+}
+
+template <typename T, typename std::enable_if<
+                          std::is_base_of<Message, T>::value, int>::type = 0>
+bool DumpMessage(const std::shared_ptr<T>& msg,
+                 const std::string& dump_dir = "/tmp") {
+  auto type_name = T::descriptor()->full_name();
+  std::string dump_path = dump_dir + "/" + type_name;
+  if (!DirectoryExists(dump_path)) {
+    if (!DirectoryExists(dump_path)) {
+      AERROR << "Cannot enable dumping for '" << type_name
+             << "' because the path " << dump_path
+             << " cannot be created or is not a directory.";
+      return false;
+    }
+  }
+
+  auto sequence_num = msg->header().sequence_num();
+  return util::SetProtoToASCIIFile(
+      *msg, util::StrCat(dump_path, "/", sequence_num, ".pb.txt"));
+}
+
+// template <typename T, typename std::enable_if<
+//                           std::is_base_of<Message, T>::value, int>::type = 0>
+// double GetDelaySec(const std::shared_ptr<T>& msg) {
+//   auto now = apollo::common::time::Clock::NowInSeconds();
+//   return now - msg->header().timestamp_sec();
 }
 
 }  // namespace util

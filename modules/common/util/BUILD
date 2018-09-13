@@ -5,21 +5,16 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "util",
     srcs = [
-        "file.cc",
         "string_tokenizer.cc",
         "util.cc",
     ],
     hdrs = [
         "blocking_queue.h",
-        "file.h",
         "string_tokenizer.h",
         "util.h",
     ],
-    linkopts = [
-        "-lboost_filesystem",
-        "-lboost_system",
-    ],
     deps = [
+        ":file_util",
         ":lru_cache",
         ":disjoint_set",
         ":color",
@@ -95,8 +90,25 @@ cc_library(
         "message_util.h",
     ],
     deps = [
+        ":file_util",
         "//modules/common/time",
         "@com_google_protobuf//:protobuf",
+    ],
+)
+
+cc_test(
+    name = "message_util_test",
+    size = "small",
+    srcs = [
+        "message_util_test.cc",
+    ],
+    tags = [
+        "external",
+    ],
+    deps = [
+        ":message_util",
+        "//modules/common/util/testdata:simple_proto",
+        "@gtest//:main",
     ],
 )
 
@@ -153,6 +165,25 @@ cc_test(
         "//modules/common",
         "//modules/common:log",
         "@gtest//:main",
+    ],
+)
+
+cc_library(
+    name = "file_util",
+    srcs = [
+        "file.cc",
+    ],
+    hdrs = [
+        "file.h",
+    ],
+    linkopts = [
+        "-lboost_filesystem",
+        "-lboost_system",
+    ],
+    deps = [
+        ":string_util",
+        "//modules/common:log",
+        "@com_google_protobuf//:protobuf",
     ],
 )
 

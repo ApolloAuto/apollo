@@ -12,4 +12,7 @@ proto_library(
     srcs = [
         "simple.proto",
     ],
+    deps = [
+        "//modules/common/proto:header_proto_lib"
+    ]
 )
