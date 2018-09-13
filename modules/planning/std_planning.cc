@@ -154,16 +154,8 @@ void StdPlanning::RunOnce(const LocalView& local_view,
                         ->mutable_main_decision()
                         ->mutable_not_ready();
 
-  if (local_view.localization_estimate == nullptr) {
-    not_ready->set_reason("localization not ready");
-  } else if (local_view.chassis == nullptr) {
-    not_ready->set_reason("chassis not ready");
-  } else if (local_view.routing == nullptr) {
-    not_ready->set_reason("routing not ready");
-  } else if (HDMapUtil::BaseMapPtr() == nullptr) {
+  if (HDMapUtil::BaseMapPtr() == nullptr) {
     not_ready->set_reason("map not ready");
-  }
-  if (not_ready->has_reason()) {
     AERROR << not_ready->reason() << "; skip the planning cycle.";
     FillPlanningPb(start_timestamp, trajectory_pb);
     return;

@@ -36,8 +36,7 @@ PlanningBase::~PlanningBase() {}
 void PlanningBase::FillPlanningPb(const double timestamp,
                                   ADCTrajectory* const trajectory_pb) {
   trajectory_pb->mutable_header()->set_timestamp_sec(timestamp);
-  if (local_view_.prediction_obstacles != nullptr &&
-      !local_view_.prediction_obstacles->has_header()) {
+  if (!local_view_.prediction_obstacles->has_header()) {
     trajectory_pb->mutable_header()->set_lidar_timestamp(
         local_view_.prediction_obstacles->header().lidar_timestamp());
     trajectory_pb->mutable_header()->set_camera_timestamp(
@@ -59,7 +58,6 @@ void PlanningBase::FillPlanningPb(const double timestamp,
   // relative time of each trajectory point should be modified so that we can
   // use the current timestamp in header.
 
-  // auto* trajectory_points = trajectory_pb.mutable_trajectory_point();
   if (!FLAGS_planning_test_mode) {
     const double dt = timestamp - Clock::NowInSeconds();
     for (auto& p : *trajectory_pb->mutable_trajectory_point()) {
