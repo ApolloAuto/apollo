@@ -12,7 +12,6 @@ cc_library(
     ],
     deps = [
         "//modules/common",
-        "//modules/common:apollo_app",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/status",
         "//modules/common/util",
