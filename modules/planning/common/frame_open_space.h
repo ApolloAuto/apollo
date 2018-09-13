@@ -144,7 +144,7 @@ class FrameOpenSpace {
   ChangeLaneDecider change_lane_decider_;
   ADCTrajectory trajectory_;  // last published trajectory
   std::unique_ptr<LagPrediction> lag_predictor_;
-  apollo::common::monitor::MonitorLogger monitor_logger_;
+  // apollo::common::monitor::MonitorLogger monitor_logger_;
   std::size_t obstacles_num_ = 0;
   Eigen::MatrixXd obstacles_vertices_num_;
 

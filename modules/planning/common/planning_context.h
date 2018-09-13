@@ -23,11 +23,11 @@
 
 #include <string>
 
-#include "modules/common/macro.h"
 #include "modules/common/proto/drive_state.pb.h"
 #include "modules/common/proto/pnc_point.pb.h"
-
 #include "modules/planning/proto/planning_status.pb.h"
+
+#include "modules/common/macro.h"
 
 /**
  * @brief PlanningContext is the runtime context in planning. It is

@@ -26,7 +26,6 @@
 
 #include "modules/planning/proto/sl_boundary.pb.h"
 
-#include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/util/string_util.h"
 #include "modules/common/util/thread_pool.h"
@@ -45,7 +44,7 @@ using apollo::common::SLPoint;
 using apollo::common::TrajectoryPoint;
 using apollo::common::VehicleConfigHelper;
 using apollo::common::VehicleSignal;
-using apollo::common::adapter::AdapterManager;
+// using apollo::common::adapter::AdapterManager;
 using apollo::common::math::Box2d;
 using apollo::common::math::Vec2d;
 using apollo::common::util::ThreadPool;

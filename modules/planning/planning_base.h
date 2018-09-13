@@ -35,6 +35,7 @@
 #include "modules/common/status/status.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/hdmap/hdmap.h"
+#include "modules/planning/common/planning_data.h"
 #include "modules/planning/common/trajectory/publishable_trajectory.h"
 #include "modules/planning/planner/planner.h"
 #include "modules/planning/planner/planner_dispatcher.h"
@@ -45,20 +46,6 @@
  */
 namespace apollo {
 namespace planning {
-/**
- * @class planning_data
- *
- * @brief PlanningData contains all necessary data as planning input
- */
-
-struct PlanningData {
-  std::shared_ptr<prediction::PredictionObstacles> prediction_obstacles;
-  std::shared_ptr<canbus::Chassis> chassis;
-  std::shared_ptr<localization::LocalizationEstimate> localization_estimate;
-  std::shared_ptr<perception::TrafficLightDetection> traffic_light;
-  std::shared_ptr<routing::RoutingResponse> routing;
-};
-
 /**
  * @class planning
  *

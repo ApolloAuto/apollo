@@ -16,21 +16,18 @@
 
 #include "modules/planning/common/planning_context.h"
 
-#include "modules/common/adapters/adapter_manager.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
 namespace planning {
 
-using common::adapter::AdapterManager;
-
 PlanningContext::PlanningContext() {}
 
 void DumpPlanningContext() {
-  AdapterManager::GetLocalization()->DumpLatestMessage();
-  AdapterManager::GetChassis()->DumpLatestMessage();
-  AdapterManager::GetRoutingResponse()->DumpLatestMessage();
-  AdapterManager::GetPrediction()->DumpLatestMessage();
+  //  AdapterManager::GetLocalization()->DumpLatestMessage();
+  //  AdapterManager::GetChassis()->DumpLatestMessage();
+  //  AdapterManager::GetRoutingResponse()->DumpLatestMessage();
+  //  AdapterManager::GetPrediction()->DumpLatestMessage();
 }
 
 void PlanningContext::Clear() { planning_status_.Clear(); }
