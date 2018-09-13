@@ -19,10 +19,8 @@
 #include "modules/planning/proto/planning_config.pb.h"
 
 #include "modules/planning/planner/em/em_planner.h"
-//#include "modules/planning/planner/lattice/lattice_planner.h"
-//#include "modules/planning/planner/navi/navi_planner.h"
-//#include "modules/planning/planner/open_space/open_space_planner.h"
 #include "modules/planning/planner/rtk/rtk_replay_planner.h"
+// #include "modules/planning/planner/open_space/open_space_planner.h"
 
 namespace apollo {
 namespace planning {
@@ -34,8 +32,6 @@ void PlannerDispatcher::RegisterPlanners() {
                             []() -> Planner* { return new EMPlanner(); });
   // planner_factory_.Register(
   //     OPENSPACE, []() -> Planner* { return new OpenSpacePlanner(); });
-  // planner_factory_.Register(NAVI,
-  //                           []() -> Planner* { return new NaviPlanner(); });
 }
 
 }  // namespace planning

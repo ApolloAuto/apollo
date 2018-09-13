@@ -42,8 +42,8 @@
 #include "modules/planning/common/change_lane_decider.h"
 #include "modules/planning/common/indexed_queue.h"
 // #include "modules/planning/common/lag_prediction.h"
+#include "modules/planning/common/local_view.h"
 #include "modules/planning/common/obstacle.h"
-#include "modules/planning/common/planning_data.h"
 #include "modules/planning/common/reference_line_info.h"
 #include "modules/planning/common/trajectory/publishable_trajectory.h"
 #include "modules/planning/reference_line/reference_line_provider.h"
@@ -59,7 +59,7 @@ namespace planning {
 
 class Frame {
  public:
-  explicit Frame(uint32_t sequence_num, const PlanningData &planning_data,
+  explicit Frame(uint32_t sequence_num, const LocalView &local_view,
                  const common::TrajectoryPoint &planning_start_point,
                  const double start_time,
                  const common::VehicleState &vehicle_state,
@@ -120,7 +120,7 @@ class Frame {
   void UpdateReferenceLinePriority(
       const std::map<std::string, uint32_t> &id_to_priority);
 
-  const PlanningData &planning_data() const { return planning_data_; }
+  const LocalView &local_view() const { return local_view_; }
 
  private:
   bool CreateReferenceLineInfo();
@@ -143,7 +143,7 @@ class Frame {
 
  private:
   uint32_t sequence_num_ = 0;
-  const PlanningData planning_data_;
+  const LocalView local_view_;
   const hdmap::HDMap *hdmap_ = nullptr;
   common::TrajectoryPoint planning_start_point_;
   const double start_time_ = 0.0;

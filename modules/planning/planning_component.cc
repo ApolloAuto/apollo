@@ -60,23 +60,22 @@ bool PlanningComponent::Proc(
     const std::shared_ptr<canbus::Chassis>& chassis,
     const std::shared_ptr<localization::LocalizationEstimate>&
         localization_estimate) {
-  planning_data_.prediction_obstacles = prediction_obstacles;
-  planning_data_.chassis = chassis;
-  planning_data_.localization_estimate = localization_estimate;
+  local_view_.prediction_obstacles = prediction_obstacles;
+  local_view_.chassis = chassis;
+  local_view_.localization_estimate = localization_estimate;
   {
     std::lock_guard<std::mutex> lock(mutex_);
-    planning_data_.routing =
-        std::make_shared<routing::RoutingResponse>(routing_);
+    local_view_.routing = std::make_shared<routing::RoutingResponse>(routing_);
   }
   perception::TrafficLightDetection traffic_light_copy;
   {
     std::lock_guard<std::mutex> lock(mutex_);
-    planning_data_.traffic_light =
+    local_view_.traffic_light =
         std::make_shared<TrafficLightDetection>(traffic_light_);
   }
 
   ADCTrajectory adc_trajectory_pb;
-  planning_base_->RunOnce(planning_data_, &adc_trajectory_pb);
+  planning_base_->RunOnce(local_view_, &adc_trajectory_pb);
 
   common::util::FillHeader(node_->Name(), &adc_trajectory_pb);
   writer_->Write(std::make_shared<ADCTrajectory>(adc_trajectory_pb));

@@ -50,7 +50,7 @@ Status SignalLight::ApplyRule(Frame* const frame,
   if (!FindValidSignalLight(reference_line_info)) {
     return Status::OK();
   }
-  ReadSignals(frame->planning_data().traffic_light);
+  ReadSignals(frame->local_view().traffic_light);
   MakeDecisions(frame, reference_line_info);
   return Status::OK();
 }

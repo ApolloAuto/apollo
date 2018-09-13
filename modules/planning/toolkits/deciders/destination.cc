@@ -47,7 +47,7 @@ Status Destination::ApplyRule(Frame* frame,
     return Status::OK();
   }
 
-  const auto& routing = frame->planning_data().routing;
+  const auto& routing = frame->local_view().routing;
 
   common::SLPoint dest_sl;
   const auto& ref_line = reference_line_info->reference_line();
@@ -73,7 +73,7 @@ int Destination::BuildStopDecision(
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
 
-  const auto& routing = frame->planning_data().routing;
+  const auto& routing = frame->local_view().routing;
   if (routing->routing_request().waypoint_size() < 2) {
     AERROR << "routing_request has no end";
     return -1;

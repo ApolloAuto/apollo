@@ -272,9 +272,9 @@ cc_library(
 )
 
 cc_library(
-    name = "planning_data",
+    name = "local_view",
     hdrs = [
-        "planning_data.h",
+        "local_view.h",
     ],
     deps = [
         "//modules/localization/proto:localization_proto",
@@ -293,7 +293,7 @@ cc_library(
         "frame.h",
     ],
     deps = [
-        ":planning_data",
+        ":local_view",
         ":change_lane_decider",
         ":indexed_queue",
         #":lag_prediction",

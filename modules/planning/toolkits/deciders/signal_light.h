@@ -21,6 +21,7 @@
 #ifndef MODULES_PLANNING_TOOLKITS_DECIDERS_SIGNAL_LIGHT_H_
 #define MODULES_PLANNING_TOOLKITS_DECIDERS_SIGNAL_LIGHT_H_
 
+#include <memory>
 #include <string>
 #include <unordered_map>
 #include <vector>

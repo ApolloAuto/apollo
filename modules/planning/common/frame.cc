@@ -54,12 +54,12 @@ constexpr double kMathEpsilon = 1e-8;
 FrameHistory::FrameHistory()
     : IndexedQueue<uint32_t, Frame>(FLAGS_max_history_frame_num) {}
 
-Frame::Frame(uint32_t sequence_num, const PlanningData &planning_data,
+Frame::Frame(uint32_t sequence_num, const LocalView &local_view,
              const common::TrajectoryPoint &planning_start_point,
              const double start_time, const common::VehicleState &vehicle_state,
              ReferenceLineProvider *reference_line_provider)
     : sequence_num_(sequence_num),
-      planning_data_(planning_data),
+      local_view_(local_view),
       planning_start_point_(planning_start_point),
       start_time_(start_time),
       vehicle_state_(vehicle_state),
@@ -85,7 +85,7 @@ bool Frame::Rerouting() {
     AERROR << "Rerouting not supported in navigation mode";
     return false;
   }
-  if (planning_data_.routing == nullptr) {
+  if (local_view_.routing == nullptr) {
     AERROR << "No previous routing available";
     return false;
   }
@@ -93,7 +93,7 @@ bool Frame::Rerouting() {
     AERROR << "Invalid HD Map.";
     return false;
   }
-  auto request = planning_data_.routing->routing_request();
+  auto request = local_view_.routing->routing_request();
   request.clear_header();
   // AdapterManager::FillRoutingRequestHeader("planning", &request);
 
@@ -357,12 +357,12 @@ Status Frame::Init() {
          << FLAGS_align_prediction_time;
 
   // prediction
-  if (planning_data_.prediction_obstacles == nullptr) {
+  if (local_view_.prediction_obstacles == nullptr) {
     // if (FLAGS_enable_lag_prediction && lag_predictor_) {
     // lag_predictor_->GetLaggedPrediction(
-    //    planning_data_.prediction_obstacles.get());
+    //    local_view_.prediction_obstacles.get());
     //}
-    prediction_.CopyFrom(*planning_data_.prediction_obstacles);
+    prediction_.CopyFrom(*local_view_.prediction_obstacles);
 
     if (FLAGS_align_prediction_time) {
       AlignPredictionTime(vehicle_state_.timestamp(), &prediction_);
@@ -452,14 +452,14 @@ void Frame::RecordInputDebug(planning_internal::Debug *debug) {
   }
   auto *planning_debug_data = debug->mutable_planning_data();
   auto *adc_position = planning_debug_data->mutable_adc_position();
-  adc_position->CopyFrom(*planning_data_.localization_estimate);
+  adc_position->CopyFrom(*local_view_.localization_estimate);
 
   auto debug_chassis = planning_debug_data->mutable_chassis();
-  debug_chassis->CopyFrom(*planning_data_.chassis);
+  debug_chassis->CopyFrom(*local_view_.chassis);
 
   if (!FLAGS_use_navigation_mode) {
     auto debug_routing = planning_debug_data->mutable_routing();
-    debug_routing->CopyFrom(*planning_data_.routing);
+    debug_routing->CopyFrom(*local_view_.routing);
   }
 
   planning_debug_data->mutable_prediction_header()->CopyFrom(

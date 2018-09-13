@@ -27,8 +27,8 @@
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/perception/proto/traffic_light_detection.pb.h"
-#include "modules/planning/proto/planning_conf.pb.h"
 #include "modules/planning/proto/planning.pb.h"
+#include "modules/planning/proto/planning_conf.pb.h"
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
 #include "modules/routing/proto/routing.pb.h"
 
@@ -66,7 +66,7 @@ class PlanningComponent final
   perception::TrafficLightDetection traffic_light_;
   routing::RoutingResponse routing_;
 
-  PlanningData planning_data_;
+  LocalView local_view_;
 
   std::unique_ptr<PlanningBase> planning_base_;
 };
