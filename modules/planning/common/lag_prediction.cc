@@ -22,13 +22,11 @@
 
 #include <algorithm>
 
-#include "modules/common/adapters/adapter_manager.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
 namespace planning {
 
-using apollo::common::adapter::AdapterManager;
 using apollo::perception::PerceptionObstacle;
 using apollo::prediction::PredictionObstacle;
 using apollo::prediction::PredictionObstacles;

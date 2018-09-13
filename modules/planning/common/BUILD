@@ -240,20 +240,20 @@ cc_test(
     ],
 )
 
-cc_library(
-    name = "lag_prediction",
-    srcs = [
-        "lag_prediction.cc",
-    ],
-    hdrs = [
-        "lag_prediction.h",
-    ],
-    deps = [
-        ":planning_gflags",
-        "//modules/prediction/proto:prediction_proto",
-        "//modules/common:log",
-    ],
-)
+# cc_library(
+#     name = "lag_prediction",
+#     srcs = [
+#         "lag_prediction.cc",
+#     ],
+#     hdrs = [
+#         "lag_prediction.h",
+#     ],
+#     deps = [
+#         ":planning_gflags",
+#         "//modules/prediction/proto:prediction_proto",
+#         "//modules/common:log",
+#     ],
+# )
 
 cc_library(
     name = "change_lane_decider",
@@ -296,7 +296,7 @@ cc_library(
         ":planning_data",
         ":change_lane_decider",
         ":indexed_queue",
-        ":lag_prediction",
+        #":lag_prediction",
         ":obstacle",
         ":reference_line_info",
         "//modules/common:log",

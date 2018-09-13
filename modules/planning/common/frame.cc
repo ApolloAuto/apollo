@@ -65,11 +65,11 @@ Frame::Frame(uint32_t sequence_num, const PlanningData &planning_data,
       vehicle_state_(vehicle_state),
       reference_line_provider_(reference_line_provider) {
   // monitor_logger_(common::monitor::MonitorMessageItem::PLANNING)
-  if (FLAGS_enable_lag_prediction) {
-    lag_predictor_.reset(
-        new LagPrediction(FLAGS_lag_prediction_min_appear_num,
-                          FLAGS_lag_prediction_max_disappear_num));
-  }
+  // if (FLAGS_enable_lag_prediction) {
+  //   lag_predictor_.reset(
+  //       new LagPrediction(FLAGS_lag_prediction_min_appear_num,
+  //                         FLAGS_lag_prediction_max_disappear_num));
+  // }
 }
 
 const common::TrajectoryPoint &Frame::PlanningStartPoint() const {
@@ -358,12 +358,12 @@ Status Frame::Init() {
 
   // prediction
   if (planning_data_.prediction_obstacles == nullptr) {
-    if (FLAGS_enable_lag_prediction && lag_predictor_) {
-      lag_predictor_->GetLaggedPrediction(
-          planning_data_.prediction_obstacles.get());
-    } else {
-      prediction_.CopyFrom(*planning_data_.prediction_obstacles);
-    }
+    // if (FLAGS_enable_lag_prediction && lag_predictor_) {
+    // lag_predictor_->GetLaggedPrediction(
+    //    planning_data_.prediction_obstacles.get());
+    //}
+    prediction_.CopyFrom(*planning_data_.prediction_obstacles);
+
     if (FLAGS_align_prediction_time) {
       AlignPredictionTime(vehicle_state_.timestamp(), &prediction_);
     }
