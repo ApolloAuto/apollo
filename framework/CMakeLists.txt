@@ -78,7 +78,7 @@ target_link_libraries(cybertron
   PocoFoundation
   -Wl,--no-undefined
   atomic
-  cybertron_cuda
+  # cybertron_cuda
   tf2
   -luuid
  )
