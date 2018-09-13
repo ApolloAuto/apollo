@@ -51,7 +51,7 @@ bool PlanningComponent::Init() {
 
   if (FLAGS_use_navigation_mode) {
     pad_message_reader_ = node_->CreateReader<PadMessage>(
-        planning_conf_.planning_pad_channel(),
+        FLAGS_planning_pad_topic,
         [this](const std::shared_ptr<PadMessage>& pad_message) {
           ADEBUG << "Received chassis data: run chassis callback.";
           std::lock_guard<std::mutex> lock(mutex_);
