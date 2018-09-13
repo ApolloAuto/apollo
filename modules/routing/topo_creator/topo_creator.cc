@@ -14,7 +14,6 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/common/apollo_app.h"
 #include "modules/common/configs/config_gflags.h"
 #include "modules/common/log.h"
 #include "modules/common/util/file.h"
