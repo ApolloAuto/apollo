@@ -193,24 +193,24 @@ modules {
     process_cmd_keywords: "sensor_velodyne16_driver"
   }
 }
-hardware {
-  name: "velodyne"
-  topic_conf {
-    type: POINT_CLOUD
-  }
-}
-hardware {
-  name: "camera_long"
-  topic_conf {
-    type: IMAGE_LONG
-  }
-}
-hardware {
-  name: "camera_short"
-  topic_conf {
-    type: IMAGE_SHORT
-  }
-}
+#hardware {
+#  name: "velodyne"
+#  topic_conf {
+#    type: POINT_CLOUD
+#  }
+#}
+#hardware {
+#  name: "camera_long"
+#  topic_conf {
+#    type: IMAGE_LONG
+#  }
+#}
+#hardware {
+#  name: "camera_short"
+#  topic_conf {
+#    type: IMAGE_SHORT
+#  }
+#}
 resource_conf {
   dir_spaces {
     # For logs.
