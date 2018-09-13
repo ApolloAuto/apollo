@@ -70,7 +70,7 @@ bool DumpMessage(const std::shared_ptr<T>& msg,
   auto type_name = T::descriptor()->full_name();
   std::string dump_path = dump_dir + "/" + type_name;
   if (!DirectoryExists(dump_path)) {
-    if (!DirectoryExists(dump_path)) {
+    if (!EnsureDirectory(dump_path)) {
       AERROR << "Cannot enable dumping for '" << type_name
              << "' because the path " << dump_path
              << " cannot be created or is not a directory.";
@@ -88,7 +88,6 @@ bool DumpMessage(const std::shared_ptr<T>& msg,
 // double GetDelaySec(const std::shared_ptr<T>& msg) {
 //   auto now = apollo::common::time::Clock::NowInSeconds();
 //   return now - msg->header().timestamp_sec();
-}
 
 }  // namespace util
 }  // namespace common
