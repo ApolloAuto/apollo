@@ -1,10 +1,10 @@
 module_config {
-    module_library : "/apollo/bazel-bin/modules/prediction/libprediction.so"
-    timer_components {
+    module_library : "/apollo/bazel-bin/modules/prediction/libprediction_component.so"
+    components {
         class_name : "PredictionComponent"
         config {
             name: "prediction"
-            config_file_path: "/apollo/modules/prediction/conf/prediction_conf.pb.txt"
+            config_file_path: "/apollo/modules/prediction/conf/prediction.conf"
             readers: [
                 {
                     channel: "/apollo/perception/obstacles"
