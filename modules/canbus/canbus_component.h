@@ -49,6 +49,9 @@
 namespace apollo {
 namespace canbus {
 
+using apollo::cybertron::Reader;
+using apollo::cybertron::Writer;
+
 /**
  * @class Canbus
  *
@@ -70,23 +73,16 @@ class CanbusComponent : public apollo::cybertron::TimerComponent {
    * @brief module initialization function
    * @return initialization status
    */
-  apollo::common::Status Init() override;
+  bool Init() override;
 
   /**
-   * @brief module start function
-   * @return start status
+   * @brief module on_time function
    */
-  apollo::common::Status Start() override;
-
-  /**
-   * @brief module stop function
-   */
-  void Stop() override;
+  bool Proc() override;
 
  private:
   void PublishChassis();
   void PublishChassisDetail();
-  void OnTimer(const ros::TimerEvent &event);
   void OnControlCommand(const apollo::control::ControlCommand &control_command);
   void OnGuardianCommand(
       const apollo::guardian::GuardianCommand &guardian_command);
@@ -94,17 +90,20 @@ class CanbusComponent : public apollo::cybertron::TimerComponent {
   void RegisterCanClients();
 
   CanbusConf canbus_conf_;
+  std::shared_ptr<Reader<GuardianCommand>> guardian_cmd_reader_;
   std::unique_ptr<apollo::drivers::canbus::CanClient> can_client_;
   CanSender<ChassisDetail> can_sender_;
   apollo::drivers::canbus::CanReceiver<ChassisDetail> can_receiver_;
   std::unique_ptr<MessageManager<::apollo::canbus::ChassisDetail>>
       message_manager_;
   std::unique_ptr<VehicleController> vehicle_controller_;
-
   int64_t last_timestamp_ = 0;
-  ros::Timer timer_;
   apollo::common::monitor::MonitorLogger monitor_logger_;
+  std::shared_ptr<Writer<Chassis>> chassis_writer_;
+  std::shared_ptr<Writer<ChassisDetail>> chassis_detail_writer_;
 };
+
+CYBERTRON_REGISTER_COMPONENT(CanbusComponent)
 
 }  // namespace canbus
 }  // namespace apollo

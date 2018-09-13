@@ -20,10 +20,12 @@
 #include <memory>
 #include <thread>
 
-#include "ros/include/ros/ros.h"
+#include "cybertron/cybertron.h"
+#include "cybertron/proto/chatter.pb.h"
+#include "cybertron/time/time.h"
 
 #include "modules/canbus/proto/chassis.pb.h"
-#include "modules/common/adapters/adapter_manager.h"
+#include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/log.h"
 #include "modules/common/macro.h"
 #include "modules/common/time/time.h"
@@ -38,11 +40,12 @@ DEFINE_double(steer_inc_delta, 2.0, "steer delta percentage");
 namespace {
 
 using apollo::canbus::Chassis;
-using apollo::common::adapter::AdapterManager;
-using apollo::common::time::Clock;
 using apollo::common::VehicleSignal;
+using apollo::common::time::Clock;
 using apollo::control::ControlCommand;
 using apollo::control::PadMessage;
+using apollo::cybertron::Reader;
+using apollo::cybertron::Writer;
 
 const uint32_t KEYCODE_O = 0x4F;  // '0'
 
@@ -244,14 +247,14 @@ class Teleop {
           }
 
           if (cnt == 0) {
-            control_command_.mutable_signal()->
-              set_turn_signal(VehicleSignal::TURN_NONE);
+            control_command_.mutable_signal()->set_turn_signal(
+                VehicleSignal::TURN_NONE);
           } else if (cnt == 1) {
-            control_command_.mutable_signal()->
-              set_turn_signal(VehicleSignal::TURN_LEFT);
+            control_command_.mutable_signal()->set_turn_signal(
+                VehicleSignal::TURN_LEFT);
           } else if (cnt == 2) {
-            control_command_.mutable_signal()->
-              set_turn_signal(VehicleSignal::TURN_RIGHT);
+            control_command_.mutable_signal()->set_turn_signal(
+                VehicleSignal::TURN_RIGHT);
           }
 
           break;
@@ -282,9 +285,7 @@ class Teleop {
     return;
   }  // end of keyboard loop thread
 
-  ControlCommand &control_command() {
-    return control_command_;
-  }
+  ControlCommand &control_command() { return control_command_; }
 
   Chassis::GearPosition GetGear(int32_t gear) {
     switch (gear) {
@@ -338,8 +339,9 @@ class Teleop {
   }
 
   void Send() {
-    AdapterManager::FillControlCommandHeader("control", &control_command_);
-    AdapterManager::PublishControlCommand(control_command_);
+    common::util::FillHeader("control", &control_command_);
+    control_command_writer_->Write(
+        std::make_shared<ControlCommand>(control_command_));
     ADEBUG << "Control Command send OK:" << control_command_.ShortDebugString();
   }
 
@@ -356,13 +358,11 @@ class Teleop {
     control_command_.set_engine_on_off(false);
     control_command_.set_driving_mode(Chassis::COMPLETE_MANUAL);
     control_command_.set_gear_location(Chassis::GEAR_INVALID);
-    control_command_.mutable_signal()->
-      set_turn_signal(VehicleSignal::TURN_NONE);
+    control_command_.mutable_signal()->set_turn_signal(
+        VehicleSignal::TURN_NONE);
   }
 
-  void OnChassis(const Chassis &chassis) {
-    Send();
-  }
+  void OnChassis(const Chassis &chassis) { Send(); }
 
   int32_t Start() {
     if (is_running_) {
@@ -370,7 +370,12 @@ class Teleop {
       return -1;
     }
     is_running_ = true;
-    AdapterManager::AddChassisCallback(&Teleop::OnChassis, this);
+    chassis_reader_ = node_->CreateReader<Chassis>(
+        FLAGS_chassis_topic, [this](const std::shared_ptr<Chassis> &chassis) {
+          OnChassis(chassis);
+        });
+    control_command_writer_ =
+        node_->CreateWriter<ControlCommand>(FLAGS_control_command_topic);
     keyboard_thread_.reset(
         new std::thread([this] { KeyboardLoopThreadFunc(); }));
     if (keyboard_thread_ == nullptr) {
@@ -391,33 +396,18 @@ class Teleop {
     }
   }
 
-  bool IsRunning() const {
-    return is_running_;
-  }
+  bool IsRunning() const { return is_running_; }
 
  private:
   std::unique_ptr<std::thread> keyboard_thread_;
+  std::shared_ptr<Reader<Chassis>> chassis_reader_;
+  std::shared_ptr<Writer<ControlCommand>> control_command_writer_;
   ControlCommand control_command_;
   bool is_running_ = false;
+  std::shared_ptr<apollo::cybertron::Node> node_ = nullptr;
 };
 
-Teleop::Teleop() {
-  ResetControlCommand();
-}
-
-void signal_handler(int32_t signal_num) {
-  if (signal_num != SIGINT) {
-    // only response for ctrl + c
-    return;
-  }
-  AINFO << "Teleop get signal: " << signal_num;
-  bool static is_stopping = false;
-  if (is_stopping) {
-    return;
-  }
-  is_stopping = true;
-  ros::shutdown();
-}
+Teleop::Teleop() { ResetControlCommand(); }
 
 }  // namespace
 
@@ -428,25 +418,7 @@ int main(int32_t argc, char **argv) {
 
   google::ParseCommandLineFlags(&argc, &argv, true);
 
-  ros::init(argc, argv, "teleop");
-  signal(SIGINT, signal_handler);
-
-  apollo::common::adapter::AdapterManagerConfig config;
-  config.set_is_ros(true);
-  {
-    auto *sub_config = config.add_config();
-    sub_config->set_mode(apollo::common::adapter::AdapterConfig::PUBLISH_ONLY);
-    sub_config->set_type(
-        apollo::common::adapter::AdapterConfig::CONTROL_COMMAND);
-  }
-
-  {
-    auto *sub_config = config.add_config();
-    sub_config->set_mode(apollo::common::adapter::AdapterConfig::RECEIVE_ONLY);
-    sub_config->set_type(apollo::common::adapter::AdapterConfig::CHASSIS);
-  }
-
-  apollo::common::adapter::AdapterManager::Init(config);
+  apollo::cybertron::Init(argv[0]);
 
   Teleop teleop;
 
@@ -455,8 +427,7 @@ int main(int32_t argc, char **argv) {
     return -1;
   }
   Teleop::PrintKeycode();
-
-  ros::spin();
+  apollo::cybertron::WaitForShutdown();
   teleop.Stop();
   AINFO << "Teleop exit done.";
   return 0;

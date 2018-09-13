@@ -12,12 +12,15 @@ cc_library(
         "//modules/common",
         "//modules/common:apollo_app",
         "//modules/common/monitor_log",
+        "//modules/common:log",
         "//modules/drivers/canbus/can_client:can_client_factory",
         "//modules/drivers/canbus/can_comm:can_receiver",
         "//modules/drivers/canbus/can_comm:can_sender",
+        "//modules/drivers/canbus/can_client",
         "//framework:cybertron",
+        "//external:gflags",
     ],
-    copts = ['-DMODULE_NAME=\\"guardian\\"']
+    copts = ['-DMODULE_NAME=\\"canbus\\"']
 )
 
 cc_test(
@@ -34,13 +37,6 @@ cc_binary(
     name = "libcanbus.so",
     deps = [
         ":canbus_lib",
-        "//external:gflags",
-        "//modules/canbus/common:canbus_common",
-        "//modules/common:log",
-        "//modules/common/monitor_log",
-        "//modules/drivers/canbus/can_client",
-        "//modules/drivers/canbus/common:canbus_common",
-        "@ros//:ros_common",
     ],
     linkopts = ["-shared"],
 )

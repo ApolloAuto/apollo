@@ -1,0 +1,11 @@
+module_config {
+    module_library : "/apollo/bazel-bin/modules/canbus/libcanbus.so"
+    timer_components {
+        class_name : "CanbusComponent"
+        config {
+            name: "canbus"
+            config_file_path:  "/apollo/modules/canbus/conf/canbus_conf.pb.txt"
+            interval: 100
+        }
+    }
+}
