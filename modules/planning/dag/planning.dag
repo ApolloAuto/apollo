@@ -6,19 +6,15 @@ module_config {
     config {
       name: "planning"
       config_file_path:  "/apollo/modules/planning/conf/planning_conf.pb.txt"
-      interval: 100
       readers: [
         {
-          channel: "/apollo/routing_response"
-          qos_profile: {
-            depth : 10
-          }
+          channel: "/apollo/prediction"
         }
         {
-          channel: "/apollo/perception/traffic_light"
-          qos_profile: {
-            depth : 10
-          }
+          channel: "/apollo/canbus/chassis"
+        }
+        {
+          channel: "/apollo/localization/pose"
         }
       ]
     }
