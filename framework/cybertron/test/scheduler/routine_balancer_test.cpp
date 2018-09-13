@@ -1,6 +1,6 @@
-#include "gtest/gtest.h"
 #include "cybertron/scheduler/routine_balancer.h"
 #include "cybertron/cybertron.h"
+#include "gtest/gtest.h"
 
 namespace apollo {
 namespace cybertron {
@@ -15,8 +15,7 @@ TEST(RoutineBalancerTest, print_statistics) {
   routine_balancer.PrintStatistics();
 }
 
-void proc() {
-}
+void proc() {}
 
 TEST(RoutineBalancerTest, Push) {
   RoutineBalancer routine_balancer;

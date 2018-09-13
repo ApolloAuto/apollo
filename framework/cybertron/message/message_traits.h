@@ -17,9 +17,9 @@
 #ifndef CYBERTRON_MESSAGE_MESSAGE_TRAITS_H_
 #define CYBERTRON_MESSAGE_MESSAGE_TRAITS_H_
 
-#include "cybertron/message/protobuf_traits.h"
-#include "cybertron/message/raw_message_traits.h"
 #include "cybertron/message/intra_message_traits.h"
+#include "cybertron/message/protobuf_traits.h"
 #include "cybertron/message/py_message_traits.h"
+#include "cybertron/message/raw_message_traits.h"
 
 #endif  // CYBERTRON_MESSAGE_MESSAGE_TRAITS_H_

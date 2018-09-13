@@ -21,10 +21,10 @@
 #ifndef CYBERTRON_COMMON_LOG_H_
 #define CYBERTRON_COMMON_LOG_H_
 
+#include <stdarg.h>
 #include "cybertron/binary.h"
 #include "glog/logging.h"
 #include "glog/raw_logging.h"
-#include <stdarg.h>
 
 #define LEFT_BRACKET "["
 #define RIGHT_BRACKET "] "
@@ -34,8 +34,8 @@
 #define MODULE_NAME DEFAULT_NAME
 #endif
 
-#define ADEBUG VLOG(4) << LEFT_BRACKET << MODULE_NAME << RIGHT_BRACKET \
-                       << "[DEBUG] "
+#define ADEBUG \
+  VLOG(4) << LEFT_BRACKET << MODULE_NAME << RIGHT_BRACKET << "[DEBUG] "
 #define AINFO ALOG_MODULE(MODULE_NAME, INFO)
 #define AWARN ALOG_MODULE(MODULE_NAME, WARN)
 #define AERROR ALOG_MODULE(MODULE_NAME, ERROR)
@@ -102,7 +102,7 @@
   if (ptr == nullptr) {              \
     AWARN << #ptr << " is nullptr."; \
     return val;                      \
-}
+  }
 
 #define RETURN_IF(condition)               \
   if (condition) {                         \
@@ -123,45 +123,42 @@
 #define LOG_FATAL_FORMAT(args...) ALOG_MODULE_ERROR(MODULE_NAME, ##args)
 
 #ifndef ALOG_MODULE_INFO
-#define ALOG_MODULE_INFO(module, fmt, args...) \
-do { \
-  ::apollo::cybertron::common::WriteLog(module, google::INFO, \
-                                  __FILE__, __LINE__, fmt, ##args); \
-} while (0)
+#define ALOG_MODULE_INFO(module, fmt, args...)                            \
+  do {                                                                    \
+    ::apollo::cybertron::common::WriteLog(module, google::INFO, __FILE__, \
+                                          __LINE__, fmt, ##args);         \
+  } while (0)
 #endif
 
 #ifndef ALOG_MODULE_WARN
-#define ALOG_MODULE_WARN(module, fmt, args...) \
-do { \
-  ::apollo::cybertron::common::WriteLog(module, google::WARNING, \
-                                     __FILE__, __LINE__, fmt, ##args); \
-} while (0)
+#define ALOG_MODULE_WARN(module, fmt, args...)                               \
+  do {                                                                       \
+    ::apollo::cybertron::common::WriteLog(module, google::WARNING, __FILE__, \
+                                          __LINE__, fmt, ##args);            \
+  } while (0)
 #endif
 
 #ifndef ALOG_MODULE_ERROR
-#define ALOG_MODULE_ERROR(module, fmt, args...) \
-do { \
-  ::apollo::cybertron::common::WriteLog(module, google::ERROR, \
-                                        __FILE__, __LINE__, fmt, ##args); \
-} while (0)
+#define ALOG_MODULE_ERROR(module, fmt, args...)                            \
+  do {                                                                     \
+    ::apollo::cybertron::common::WriteLog(module, google::ERROR, __FILE__, \
+                                          __LINE__, fmt, ##args);          \
+  } while (0)
 #endif
-
 
 namespace apollo {
 namespace cybertron {
 namespace common {
 
 static void WriteLog(const char* module, google::LogSeverity severity,
-              const char* file, int line, const char* fmt, ...) {
+                     const char* file, int line, const char* fmt, ...) {
   char fmt_buffer[9000];
   va_list arg_ptr;
   va_start(arg_ptr, fmt);
   vsnprintf(fmt_buffer, sizeof(fmt_buffer), fmt, arg_ptr);
   va_end(arg_ptr);
-  google::LogMessage(file, line, severity).stream() << LEFT_BRACKET
-                                                    << module
-                                                    << RIGHT_BRACKET
-                                                    << fmt_buffer;
+  google::LogMessage(file, line, severity).stream()
+      << LEFT_BRACKET << module << RIGHT_BRACKET << fmt_buffer;
 }
 
 }  // namespace common

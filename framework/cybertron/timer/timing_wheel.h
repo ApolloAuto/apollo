@@ -79,7 +79,7 @@ class TimingWheel {
   uint64_t mask_ = TIMING_WHEEL_SIZE - 1;
 
   uint64_t tick_duration_ = 10 * 1000 * 1000;  // 10ms
-  uint64_t resolution_ =  10; // 10ms
+  uint64_t resolution_ = 10;                   // 10ms
 
   // we need implement a lock-free high performance concurrent queue.
   // Now, just a blocking-queue just for works.

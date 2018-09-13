@@ -85,7 +85,8 @@ TEST_F(NodeManagerTest, topo_module_leave) {
   EXPECT_TRUE(node_manager_->Join(role_attr, RoleType::ROLE_NODE));
   EXPECT_TRUE(node_manager_->HasNode("node"));
 
-  node_manager_->OnTopoModuleLeave(role_attr.host_name(), role_attr.process_id());
+  node_manager_->OnTopoModuleLeave(role_attr.host_name(),
+                                   role_attr.process_id());
 
   EXPECT_FALSE(node_manager_->HasNode("node"));
 }

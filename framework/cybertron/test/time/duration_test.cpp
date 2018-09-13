@@ -1,7 +1,7 @@
-#include "gtest/gtest.h"
+#include "cybertron/time/duration.h"
 #include <iostream>
 #include "cybertron/time/time.h"
-#include "cybertron/time/duration.h"
+#include "gtest/gtest.h"
 
 namespace apollo {
 namespace cybertron {

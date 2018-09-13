@@ -20,9 +20,9 @@
 #include <list>
 #include <string>
 
-#include "cybertron/common/types.h"
 #include "cybertron/common/global_data.h"
 #include "cybertron/common/log.h"
+#include "cybertron/common/types.h"
 
 namespace apollo {
 namespace cybertron {

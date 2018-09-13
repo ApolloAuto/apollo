@@ -131,7 +131,7 @@ TEST_F(ServiceManagerTest, topo_module_leave) {
   EXPECT_TRUE(service_manager_->HasService("service"));
 
   service_manager_->OnTopoModuleLeave(role_attr.host_name(),
-                                     role_attr.process_id());
+                                      role_attr.process_id());
   EXPECT_FALSE(service_manager_->HasService("service"));
 }
 

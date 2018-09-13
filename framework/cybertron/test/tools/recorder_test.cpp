@@ -5,9 +5,7 @@
 
 namespace apollo {
 namespace cybertron {
-namespace transport {
-
-}  // namespace transport
+namespace transport {}  // namespace transport
 }  // namespace cybertron
 }  // namespace apollo
 

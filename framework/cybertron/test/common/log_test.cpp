@@ -1,6 +1,6 @@
-#include "gtest/gtest.h"
-#include "glog/logging.h"
 #include "cybertron/common/log.h"
+#include "glog/logging.h"
+#include "gtest/gtest.h"
 
 namespace apollo {
 namespace cybertron {
@@ -18,6 +18,6 @@ TEST(LogTest, TestAll) {
 int main(int argc, char** argv) {
   testing::InitGoogleTest(&argc, argv);
   google::InitGoogleLogging(argv[0]);
-  FLAGS_alsologtostderr=true;
+  FLAGS_alsologtostderr = true;
   return RUN_ALL_TESTS();
 }

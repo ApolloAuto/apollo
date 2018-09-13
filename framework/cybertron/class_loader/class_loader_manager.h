@@ -97,7 +97,7 @@ std::vector<std::string> ClassLoaderManager::GetValidClassNames() {
     std::vector<std::string> class_loaders =
         class_loader->GetValidClassNames<Base>();
     valid_classes.insert(valid_classes.end(), class_loaders.begin(),
-                          class_loaders.end());
+                         class_loaders.end());
   }
   return valid_classes;
 }

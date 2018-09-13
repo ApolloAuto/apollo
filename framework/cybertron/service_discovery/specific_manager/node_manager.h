@@ -22,8 +22,8 @@
 #include <vector>
 
 #include "cybertron/service_discovery/container/single_value_warehouse.h"
-#include "cybertron/service_discovery/specific_manager/manager.h"
 #include "cybertron/service_discovery/role/role.h"
+#include "cybertron/service_discovery/specific_manager/manager.h"
 
 namespace apollo {
 namespace cybertron {

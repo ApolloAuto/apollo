@@ -33,7 +33,8 @@ template <typename MessageT>
 class Writer : public WriterBase {
  public:
   using UpperReachPtr = std::shared_ptr<transport::UpperReach<MessageT>>;
-  using ChangeConnection = typename service_discovery::Manager::ChangeConnection;
+  using ChangeConnection =
+      typename service_discovery::Manager::ChangeConnection;
 
   explicit Writer(const proto::RoleAttributes& role_attr);
   virtual ~Writer();
@@ -74,7 +75,8 @@ bool Writer<MessageT>::Init() {
   RETURN_VAL_IF_NULL(upper_reach_, false);
   this->role_attr_.set_id(upper_reach_->id().HashValue());
 
-  channel_manager_ = service_discovery::TopologyManager::Instance()->channel_manager();
+  channel_manager_ =
+      service_discovery::TopologyManager::Instance()->channel_manager();
   JoinTheTopology();
 
   // TODO more check

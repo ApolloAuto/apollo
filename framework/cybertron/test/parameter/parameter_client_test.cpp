@@ -16,8 +16,8 @@
 
 #include "gtest/gtest.h"
 
-#include "cybertron/message/protobuf_factory.h"
 #include "cybertron/cybertron.h"
+#include "cybertron/message/protobuf_factory.h"
 #include "cybertron/parameter/parameter_client.h"
 #include "cybertron/parameter/parameter_server.h"
 

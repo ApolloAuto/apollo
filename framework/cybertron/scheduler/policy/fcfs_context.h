@@ -45,13 +45,13 @@ class FCFSContext : public ProcessorContext {
   std::shared_ptr<CRoutine> NextRoutine() override;
   bool Enqueue(const std::shared_ptr<CRoutine>& cr) override;
   bool RqEmpty() override;
+
  private:
   std::mutex mtx_run_queue_;
   double min_vfrequency_ = 0.0;
   double max_vfrequency_ = std::numeric_limits<double>::max();
   CRoutineList run_queue_;
 };
-
 
 }  // namespace scheduler
 }  // namespace cybertron

@@ -16,24 +16,24 @@
 
 #include "cybertron/init.h"
 
+#include <libgen.h>
 #include <stdio.h>
 #include <sys/types.h>
 #include <time.h>
 #include <unistd.h>
 #include <csignal>
 #include <string>
-#include <libgen.h>
 
 #include "cybertron/binary.h"
 #include "cybertron/common/environment.h"
 #include "cybertron/common/file.h"
 #include "cybertron/common/global_data.h"
-#include "cybertron/logger/async_logger.h"
 #include "cybertron/data/data_dispatcher.h"
+#include "cybertron/event/perf_event_cache.h"
+#include "cybertron/logger/async_logger.h"
 #include "cybertron/node/node.h"
 #include "cybertron/scheduler/scheduler.h"
 #include "cybertron/service_discovery/topology_manager.h"
-#include "cybertron/event/perf_event_cache.h"
 
 namespace apollo {
 namespace cybertron {

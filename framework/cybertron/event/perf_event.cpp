@@ -22,7 +22,6 @@
 
 #include "cybertron/event/perf_event.h"
 
-
 namespace apollo {
 namespace cybertron {
 namespace event {

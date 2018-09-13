@@ -60,7 +60,7 @@ TEST(ChannelBufferTest, FetchMulti) {
   EXPECT_TRUE(buffer->FetchMulti(1, &vector));
   EXPECT_EQ(1, vector.size());
   EXPECT_EQ(1, *vector[0]);
-  
+
   vector.clear();
   buffer->Buffer()->Fill(std::make_shared<int>(2));
   EXPECT_TRUE(buffer->FetchMulti(1, &vector));

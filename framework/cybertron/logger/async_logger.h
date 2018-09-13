@@ -17,16 +17,16 @@
 #ifndef INCLUDE_CYBERTRON_COMMON_ASYNC_LOGGER_H_
 #define INCLUDE_CYBERTRON_COMMON_ASYNC_LOGGER_H_
 
+#include <condition_variable>
 #include <cstdint>
 #include <ctime>
+#include <iostream>
 #include <memory>
+#include <mutex>
 #include <string>
 #include <thread>
 #include <utility>
 #include <vector>
-#include <mutex>
-#include <condition_variable>
-#include <iostream>
 
 #include <glog/logging.h>
 #include "cybertron/common/macros.h"
@@ -50,14 +50,16 @@ namespace logger {
 // thread blocks.
 //
 // The semantics provided by this wrapper are slightly weaker than the default
-// glog semantics. By default, glog will immediately (synchronously) flush WARNING
+// glog semantics. By default, glog will immediately (synchronously) flush
+// WARNING
 // and above to the underlying file, whereas here we are deferring that flush to
 // the separate thread. This means that a crash just after a 'LOG_WARN' would
 // may be missing the message in the logs, but the perf benefit is probably
 // worth it. We do take care that a glog FATAL message flushes all buffered log
 // messages before exiting.
 //
-// NOTE: the logger limits the total amount of buffer space, so if the underlying
+// NOTE: the logger limits the total amount of buffer space, so if the
+// underlying
 // log blocks for too long, eventually the threads generating the log messages
 // will block as well. This prevents runaway memory usage.
 class AsyncLogger : public google::base::Logger {
@@ -78,16 +80,18 @@ class AsyncLogger : public google::base::Logger {
 
   // Write a message to the log.
   //
-  // 'force_flush' is set by the GLog library based on the configured '--logbuflevel'
-  // flag. Any messages logged at the configured level or higher result in 'force_flush'
-  // being set to true, indicating that the message should be immediately written to the
-  // log rather than buffered in memory. See the class-level docs above for more detail
+  // 'force_flush' is set by the GLog library based on the configured
+  // '--logbuflevel'
+  // flag. Any messages logged at the configured level or higher result in
+  // 'force_flush'
+  // being set to true, indicating that the message should be immediately
+  // written to the
+  // log rather than buffered in memory. See the class-level docs above for more
+  // detail
   // about the implementation provided here.
   //
   // REQUIRES: Start() must have been called.
-  void Write(bool force_flush,
-             time_t timestamp,
-             const char* message,
+  void Write(bool force_flush, time_t timestamp, const char* message,
              int message_len) override;
 
   // Flush any buffered messages.
@@ -111,10 +115,7 @@ class AsyncLogger : public google::base::Logger {
     int32_t level;
 
     Msg(time_t ts, std::string&& message, int32_t level)
-        : ts(ts),
-          message(std::move(message)),
-          level(level) {
-    }
+        : ts(ts), message(std::move(message)), level(level) {}
   };
 
   // A buffer of messages waiting to be flushed.
@@ -176,7 +177,7 @@ class AsyncLogger : public google::base::Logger {
 
   // Signaled by the flusher thread when the flusher has swapped in
   // a free buffer to write to.
-  //std::condition_variable free_buffer_cv_;
+  // std::condition_variable free_buffer_cv_;
 
   // Signaled by the flusher thread when it has completed flushing
   // the current buffer.
@@ -190,18 +191,14 @@ class AsyncLogger : public google::base::Logger {
   std::unique_ptr<Buffer> flushing_buf_;
 
   // Trigger for the logger thread to stop.
-  enum State {
-    INITTED,
-    RUNNING,
-    STOPPED
-  };
+  enum State { INITTED, RUNNING, STOPPED };
   State state_ = INITTED;
 
   DISALLOW_COPY_AND_ASSIGN(AsyncLogger);
 };
 
-} // namespace logger
-} // namespace commmon
-} // namespace cybertron
+}  // namespace logger
+}  // namespace commmon
+}  // namespace cybertron
 
 #endif  // CYBERTRON_COMMON_ASYNC_LOGGER_H_

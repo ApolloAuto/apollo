@@ -33,7 +33,7 @@ class LogFileObject : public google::base::Logger {
   ~LogFileObject();
 
   void Write(bool force_flush, time_t timestamp, const char* message,
-                     int message_len) override;
+             int message_len) override;
 
   void SetBasename(const char* basename);
   void SetExtension(const char* ext);
@@ -71,4 +71,4 @@ class LogFileObject : public google::base::Logger {
 }  // namespace cybertron
 }  // namespace apollo
 
-#endif // CYBERTRON_LOGGER_LOG_FILE_OBJECT_H_
+#endif  // CYBERTRON_LOGGER_LOG_FILE_OBJECT_H_

@@ -58,8 +58,8 @@ class DataNotifier {
 
 inline DataNotifier::DataNotifier() {}
 
-inline void DataNotifier::AddNotifier(uint64_t channel_id,
-                               const std::shared_ptr<Notifier>& notifier) {
+inline void DataNotifier::AddNotifier(
+    uint64_t channel_id, const std::shared_ptr<Notifier>& notifier) {
   std::lock_guard<std::mutex> lock(notifies_map_mutex_);
   NotifyVector* notifies = nullptr;
   if (notifies_map_.Get(channel_id, &notifies)) {

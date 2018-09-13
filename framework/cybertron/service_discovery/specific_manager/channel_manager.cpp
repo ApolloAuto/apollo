@@ -24,8 +24,8 @@
 #include "cybertron/common/log.h"
 #include "cybertron/init.h"
 #include "cybertron/message/message_traits.h"
-#include "cybertron/message/raw_message.h"
 #include "cybertron/message/py_message.h"
+#include "cybertron/message/raw_message.h"
 #include "cybertron/time/time.h"
 
 namespace apollo {
@@ -244,13 +244,13 @@ void ChannelManager::DisposeJoin(const ChangeMsg& msg) {
       const std::string RAW_MESSAGE_TYPE =
           message::MessageType<message::RawMessage>();
       const std::string PY_MESSAGE_TYPE =
-            message::MessageType<message::PyMessageWrap>();
+          message::MessageType<message::PyMessageWrap>();
       if ((exist_msg_type != RAW_MESSAGE_TYPE &&
-          join_msg_type != RAW_MESSAGE_TYPE &&
-          exist_msg_type != join_msg_type)
-          && (exist_msg_type != join_msg_type &&
-          exist_msg_type != PY_MESSAGE_TYPE &&
-          join_msg_type != PY_MESSAGE_TYPE)) {
+           join_msg_type != RAW_MESSAGE_TYPE &&
+           exist_msg_type != join_msg_type) &&
+          (exist_msg_type != join_msg_type &&
+           exist_msg_type != PY_MESSAGE_TYPE &&
+           join_msg_type != PY_MESSAGE_TYPE)) {
         auto newer = role;
         auto older = existing_delegate;
         if (!older->IsEarlierThan(*newer)) {

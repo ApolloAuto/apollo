@@ -17,8 +17,8 @@
 #ifndef CYBERTRON_TIME_RATE_H_
 #define CYBERTRON_TIME_RATE_H_
 
-#include "cybertron/time/time.h"
 #include "cybertron/time/duration.h"
+#include "cybertron/time/time.h"
 
 namespace apollo {
 namespace cybertron {

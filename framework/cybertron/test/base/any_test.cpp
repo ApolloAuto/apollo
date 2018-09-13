@@ -1,9 +1,8 @@
-#include <thread>
 #include <mutex>
+#include <thread>
 
 #include "cybertron/base/any.h"
 #include "gtest/gtest.h"
-
 
 namespace apollo {
 namespace cybertron {
@@ -70,7 +69,7 @@ TEST(AnyTest, get_value_test) {
   EXPECT_EQ(nullptr, empty_any_2.GetValue<int>());
   Any any_2(5);
   EXPECT_EQ(nullptr, any_2.GetValue<std::string>());
-  EXPECT_EQ(5, *any_2.GetValue<int>());  
+  EXPECT_EQ(5, *any_2.GetValue<int>());
 }
 
 TEST(AnyTest, cast_test) {

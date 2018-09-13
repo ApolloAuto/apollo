@@ -29,8 +29,7 @@ namespace logger {
 
 static std::unordered_map<std::string, LogFileObject*> moduleLoggerMap;
 
-Logger::Logger(google::base::Logger* wrapped)
-    : wrapped_(wrapped) {}
+Logger::Logger(google::base::Logger* wrapped) : wrapped_(wrapped) {}
 
 Logger::~Logger() {
   for (auto itr = moduleLoggerMap.begin(); itr != moduleLoggerMap.end();
@@ -39,11 +38,11 @@ Logger::~Logger() {
   }
 }
 
-void Logger::Write(bool force_flush, time_t timestamp,
-                            const char* message, int message_len) {
+void Logger::Write(bool force_flush, time_t timestamp, const char* message,
+                   int message_len) {
   std::string log_message = std::string(message);
   std::string module_name("unknown");
-  // set the same bracket as the bracket in log.h 
+  // set the same bracket as the bracket in log.h
   int lpos = log_message.find('[');
   int rpos = log_message.find(']', lpos);
   if (lpos != std::string::npos && rpos != std::string::npos) {

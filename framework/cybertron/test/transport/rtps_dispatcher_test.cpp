@@ -29,7 +29,7 @@ namespace transport {
 
 TEST(RtpsDispatcherTest, constructor) {
   auto dispatcher = RtpsDispatcher::Instance();
-//   EXPECT_EQ(dispatcher->NumberOfChannel(), 0);
+  //   EXPECT_EQ(dispatcher->NumberOfChannel(), 0);
 }
 
 TEST(RtpsDispatcherTest, add_listener) {

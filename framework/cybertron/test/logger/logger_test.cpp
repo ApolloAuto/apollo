@@ -1,7 +1,7 @@
-#include "gtest/gtest.h"
-#include "glog/logging.h"
-#include "time.h"
 #include "cybertron/logger/logger.h"
+#include "glog/logging.h"
+#include "gtest/gtest.h"
+#include "time.h"
 
 namespace apollo {
 namespace cybertron {

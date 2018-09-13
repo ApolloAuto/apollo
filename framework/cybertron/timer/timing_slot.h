@@ -44,7 +44,6 @@ struct HandlePackage {
   CallHandler handle;
 };
 
-
 class TimingSlot {
  private:
   //  no needs for multi-thread

@@ -104,9 +104,7 @@ void RoutineBalancer::Migrate(const std::weak_ptr<CRoutine>& croutine) {
   */
 }
 
-void RoutineBalancer::PrintStatistics() {
-  return;
-}
+void RoutineBalancer::PrintStatistics() { return; }
 
 void RoutineBalancer::ShutDown() {}
 

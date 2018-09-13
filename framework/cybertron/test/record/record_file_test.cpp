@@ -74,7 +74,6 @@ TEST(ChunkTest, TestAll) {
 }
 
 TEST(RecordFileTest, TestOneMessageFile) {
-
   // writer open one message file
   RecordFileWriter* rfw = new RecordFileWriter();
   ASSERT_TRUE(rfw->Open(TEST_FILE));

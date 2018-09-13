@@ -1,9 +1,9 @@
 #include <chrono>
 
-#include "gtest/gtest.h"
 #include "cybertron/croutine/croutine.h"
 #include "cybertron/croutine/routine_context.h"
 #include "cybertron/cybertron.h"
+#include "gtest/gtest.h"
 
 namespace apollo {
 namespace cybertron {
@@ -51,9 +51,8 @@ TEST(CRoutineTest, croutine_sleep) {
 }
 
 TEST(CRoutineTest, croutine_hangup) {
-  auto cr = std::make_shared<CRoutine>([]() {
-        CRoutine::GetCurrentRoutine()->HangUp();
-  });
+  auto cr = std::make_shared<CRoutine>(
+      []() { CRoutine::GetCurrentRoutine()->HangUp(); });
   auto state = cr->Resume();
   EXPECT_EQ(state, RoutineState::IO_WAIT);
   cr->Wake();
@@ -67,7 +66,8 @@ TEST(CRoutineTest, croutine_hangup) {
 
 int main(int argc, char** argv) {
   apollo::cybertron::Init(argv[0]);
-  auto context = std::make_shared<apollo::cybertron::croutine::RoutineContext>();
+  auto context =
+      std::make_shared<apollo::cybertron::croutine::RoutineContext>();
   apollo::cybertron::croutine::CRoutine::SetMainContext(context);
   testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();

@@ -16,8 +16,8 @@
 
 #include "cybertron/scheduler/proc_balancer.h"
 
-#include "cybertron/croutine/croutine.h"
 #include "cybertron/common/global_data.h"
+#include "cybertron/croutine/croutine.h"
 #include "cybertron/scheduler/policy/cfs_context.h"
 #include "cybertron/scheduler/policy/fcfs_context.h"
 #include "cybertron/scheduler/policy/processor_context.h"
@@ -66,7 +66,7 @@ ProcBalancer::ProcBalancer() {
 }
 
 bool ProcBalancer::Push(uint32_t processor_id,
-                           const std::weak_ptr<CRoutine>& croutine) {
+                        const std::weak_ptr<CRoutine>& croutine) {
   auto cr = croutine.lock();
   if (!cr) {
     return false;

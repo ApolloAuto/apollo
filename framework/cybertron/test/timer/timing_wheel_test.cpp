@@ -63,7 +63,7 @@ TEST(TimingWheelTest, Period) {
     tw.Step();
     if ((i + 1) % 10 == 0) {
       usleep(10 * 1000);
-      ASSERT_EQ((i + 1) , th->count());
+      ASSERT_EQ((i + 1), th->count());
     }
   }
 }
