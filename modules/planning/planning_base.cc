@@ -70,7 +70,7 @@ void PlanningBase::PublishPlanningPb(const double timestamp,
 
 void PlanningBase::SetFallbackTrajectory(ADCTrajectory* const trajectory_pb) {
   CHECK_NOTNULL(trajectory_pb);
-  // use planning trajecotry from last cycle
+  // use planning trajectory from last cycle
   if (last_planning_ != nullptr) {
     const double current_time_stamp = trajectory_pb->header().timestamp_sec();
     const double pre_time_stamp = last_planning_->header().timestamp_sec();

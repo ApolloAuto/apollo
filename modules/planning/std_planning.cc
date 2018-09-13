@@ -148,11 +148,11 @@ Status StdPlanning::InitFrame(const uint32_t sequence_num,
   return Status::OK();
 }
 
-void StdPlanning::RunOnce(const PlanningData& planning_data) {
+void StdPlanning::RunOnce(const PlanningData& planning_data,
+                          ADCTrajectory* const trajectory_pb) {
   const double start_timestamp = Clock::NowInSeconds();
 
-  ADCTrajectory not_ready_pb;
-  auto* not_ready = not_ready_pb.mutable_decision()
+  auto* not_ready = trajectory_pb->mutable_decision()
                         ->mutable_main_decision()
                         ->mutable_not_ready();
 
@@ -167,7 +167,7 @@ void StdPlanning::RunOnce(const PlanningData& planning_data) {
   }
   if (not_ready->has_reason()) {
     AERROR << not_ready->reason() << "; skip the planning cycle.";
-    PublishPlanningPb(start_timestamp, &not_ready_pb);
+    PublishPlanningPb(start_timestamp, trajectory_pb);
     return;
   }
 
@@ -202,8 +202,8 @@ void StdPlanning::RunOnce(const PlanningData& planning_data) {
     std::string msg("Update VehicleStateProvider failed");
     AERROR << msg;
     not_ready->set_reason(msg);
-    status.Save(not_ready_pb.mutable_header()->mutable_status());
-    PublishPlanningPb(start_timestamp, &not_ready_pb);
+    status.Save(trajectory_pb->mutable_header()->mutable_status());
+    PublishPlanningPb(start_timestamp, trajectory_pb);
     return;
   }
 
@@ -232,15 +232,14 @@ void StdPlanning::RunOnce(const PlanningData& planning_data) {
     std::string msg("Failed to init frame");
     AERROR << msg;
     not_ready->set_reason(msg);
-    status.Save(not_ready_pb.mutable_header()->mutable_status());
-    PublishPlanningPb(start_timestamp, &not_ready_pb);
+    status.Save(trajectory_pb->mutable_header()->mutable_status());
+    PublishPlanningPb(start_timestamp, trajectory_pb);
     return;
   }
 
   EgoInfo::Instance()->Update(stitching_trajectory.back(), vehicle_state,
                               frame_->obstacles());
 
-  auto* trajectory_pb = frame_->mutable_trajectory();
   if (FLAGS_enable_record_debug) {
     frame_->RecordInputDebug(trajectory_pb->mutable_debug());
   }
@@ -259,6 +258,7 @@ void StdPlanning::RunOnce(const PlanningData& planning_data) {
       estop->set_reason(status.error_message());
       status.Save(estop_trajectory.mutable_header()->mutable_status());
       PublishPlanningPb(start_timestamp, &estop_trajectory);
+      trajectory_pb->CopyFrom(estop_trajectory);
     } else {
       trajectory_pb->mutable_decision()
           ->mutable_main_decision()
@@ -269,6 +269,8 @@ void StdPlanning::RunOnce(const PlanningData& planning_data) {
     }
 
     auto seq_num = frame_->SequenceNum();
+
+    frame_->mutable_trajectory()->CopyFrom(*trajectory_pb);
     FrameHistory::Instance()->Add(seq_num, std::move(frame_));
 
     return;
@@ -321,6 +323,7 @@ void StdPlanning::RunOnce(const PlanningData& planning_data) {
   ADEBUG << "Planning pb:" << trajectory_pb->header().DebugString();
 
   auto seq_num = frame_->SequenceNum();
+  frame_->mutable_trajectory()->CopyFrom(*trajectory_pb);
   FrameHistory::Instance()->Add(seq_num, std::move(frame_));
 }
 
