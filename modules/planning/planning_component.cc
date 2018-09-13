@@ -33,7 +33,7 @@ bool PlanningComponent::Init() {
   AINFO << "Loading gflag from file: " << ConfigFilePath();
   google::SetCommandLineOption("flagfile", ConfigFilePath().c_str());
 
-  planning_base_ = std::unique_ptr<PlanningBase>(new StdPlanning());
+  planning_base_->Init();
   routing_reader_ = node_->CreateReader<RoutingResponse>(
       FLAGS_routing_response_topic,
       [this](const std::shared_ptr<RoutingResponse>& routing) {
@@ -78,6 +78,10 @@ bool PlanningComponent::Proc(
   // check and process possible rerouting request
   Rerouting();
 
+  if (!CheckInput()) {
+    return false;
+  }
+
   // process fused input data
   local_view_.prediction_obstacles = prediction_obstacles;
   local_view_.chassis = chassis;
@@ -112,6 +116,30 @@ void PlanningComponent::Rerouting() {
   rerouting->set_need_rerouting(false);
   rerouting_writer_->Write(
       std::make_shared<routing::RoutingRequest>(rerouting->routing_request()));
+}
+
+bool PlanningComponent::CheckInput() {
+  ADCTrajectory trajectory_pb;
+  auto* not_ready = trajectory_pb.mutable_decision()
+                        ->mutable_main_decision()
+                        ->mutable_not_ready();
+
+  if (local_view_.localization_estimate == nullptr) {
+    not_ready->set_reason("localization not ready");
+  } else if (local_view_.chassis == nullptr) {
+    not_ready->set_reason("chassis not ready");
+  } else if (local_view_.routing == nullptr) {
+    not_ready->set_reason("routing not ready");
+  } else if (HDMapUtil::BaseMapPtr() == nullptr) {
+    not_ready->set_reason("map not ready");
+  }
+  if (not_ready->has_reason()) {
+    AERROR << not_ready->reason() << "; skip the planning cycle.";
+    common::util::FillHeader(node_->Name(), &trajectory_pb);
+    planning_writer_->Write(std::make_shared<ADCTrajectory>(trajectory_pb));
+    return false;
+  }
+  return true;
 }
 
 }  // namespace planning

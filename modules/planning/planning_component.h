@@ -42,7 +42,10 @@ class PlanningComponent final
                                   canbus::Chassis,
                                   localization::LocalizationEstimate> {
  public:
-  PlanningComponent() = default;
+  PlanningComponent() {
+    planning_base_ = std::unique_ptr<PlanningBase>(new StdPlanning());
+  }
+
   ~PlanningComponent() = default;
 
  public:
@@ -56,6 +59,7 @@ class PlanningComponent final
 
  private:
   void Rerouting();
+  bool CheckInput();
 
   std::shared_ptr<cybertron::Reader<perception::TrafficLightDetection>>
       traffic_light_reader_;
