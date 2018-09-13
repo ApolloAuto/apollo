@@ -23,7 +23,6 @@
 #include "modules/routing/proto/routing.pb.h"
 #include "modules/routing/proto/routing_config.pb.h"
 
-#include "modules/common/apollo_app.h"
 // #include "modules/common/monitor_log/monitor_log_buffer.h"
 #include "modules/common/status/status.h"
 #include "modules/map/hdmap/hdmap_util.h"
