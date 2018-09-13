@@ -1,0 +1,7 @@
+<cybertron>
+    <module>
+        <name>prediction</name>
+        <dag_conf>/apollo/modules/prediction/dag/prediction.dag</dag_conf>
+        <process_name></process_name>
+    </module>
+</cybertron>
