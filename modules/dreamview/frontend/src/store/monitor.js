@@ -63,13 +63,13 @@ export default class Monitor {
         return JSON.stringify(this.items[0]) !== JSON.stringify(newItems[0]);
     }
 
-    // Inserts the provided message into the items. This is for
-    // debug purpose only.
+    // Inserts the provided message into the items. This message won't send to backend
     @action insert(level, message, timestamp) {
         const newItems = [];
         newItems.push({
             msg: message,
-            logLevel: level
+            logLevel: level,
+            timestampMs: timestamp,
         });
 
         for (let i = 0; i < this.items.length; ++i) {
