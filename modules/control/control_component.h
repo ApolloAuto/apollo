@@ -14,22 +14,24 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_CONTROL_CONTROL_H_
-#define MODULES_CONTROL_CONTROL_H_
+#ifndef MODULES_CONTROL_CONTROL_COMPONENT_H_
+#define MODULES_CONTROL_CONTROL_COMPONENT_H_
 
 #include <cstdio>
 #include <memory>
 #include <mutex>
 #include <string>
 
+#include "cybertron/component/timer_component.h"
+
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/common/monitor_log/monitor_log_buffer.h"
 #include "modules/control/proto/control_cmd.pb.h"
 #include "modules/control/proto/control_conf.pb.h"
 #include "modules/control/proto/pad_msg.pb.h"
+#include "modules/localization/proto/localization.pb.h"
 #include "modules/planning/proto/planning.pb.h"
 
-#include "modules/common/apollo_app.h"
 #include "modules/common/util/util.h"
 #include "modules/control/controller/controller_agent.h"
 
@@ -40,45 +42,21 @@
 namespace apollo {
 namespace control {
 
+using apollo::cybertron::Reader;
+using apollo::cybertron::Writer;
 /**
  * @class Control
  *
  * @brief control module main class, it processes localization, chasiss, and
  * pad data to compute throttle, brake and steer values.
  */
-class Control : public apollo::common::ApolloApp {
+class Control : public apollo::cybertron::TimerComponent {
   friend class ControlTestBase;
 
  public:
-  Control()
-      : monitor_logger_(apollo::common::monitor::MonitorMessageItem::CONTROL) {}
+  bool Init() override;
 
-  /**
-   * @brief module name
-   */
-  std::string Name() const override;
-
-  /**
-   * @brief module initialization function
-   * @return initialization status
-   */
-  apollo::common::Status Init() override;
-
-  /**
-   * @brief module start function
-   * @return start status
-   */
-  apollo::common::Status Start() override;
-
-  /**
-   * @brief module stop function
-   */
-  void Stop() override;
-
-  /**
-   * @brief destructor
-   */
-  virtual ~Control() = default;
+  bool Proc() override;
 
  private:
   // Upon receiving pad message
@@ -96,7 +74,7 @@ class Control : public apollo::common::ApolloApp {
   common::Status CheckTimestamp();
   common::Status CheckPad();
 
-  void SendCmd(ControlCommand *control_command);
+  void SendCmd(ControlCommand &control_command);
 
  private:
   double init_time_ = 0.0;
@@ -120,10 +98,17 @@ class Control : public apollo::common::ApolloApp {
   ControlConf control_conf_;
 
   apollo::common::monitor::MonitorLogger monitor_logger_;
-  ros::Timer timer_;
+  std::mutex mutex_;
+
+  std::shared_ptr<Reader<apollo::canbus::Chassis>> chassis_reader_;
+  std::shared_ptr<Reader<apollo::control::PadMessage>> pad_msg_reader_;
+  std::shared_ptr<Reader<apollo::localization::LocalizationEstimate>>
+      localization_reader_;
+  std::shared_ptr<Reader<apollo::planning::ADCTrajectory>> trajectory_reader_;
+  std::shared_ptr<Writer<apollo::control::ControlCommand>> control_cmd_writer_;
 };
 
 }  // namespace control
 }  // namespace apollo
 
-#endif  // MODULES_CONTROL_CONTROL_H_
+#endif  // MODULES_CONTROL_CONTROL_COMPONENT_H_

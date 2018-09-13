@@ -2,25 +2,16 @@ load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
-cc_library(
-    name = "lib_pad_terminal",
-    deps = [
-        "//modules/control/common",
-    ],
-)
-
-cc_library(
-    name = "control_lib",
+cc_binary(
+    name = "libcontrol.so",
     srcs = [
-        "control.cc",
+        "control_component.cc",
+        "control_component.h",
     ],
-    hdrs = glob([
-        "*.h",
-    ]),
     deps = [
         "//modules/canbus/proto:canbus_proto",
         "//modules/common",
-        "//modules/common:apollo_app",
+        "//modules/common/adapters:adapter_gflags",
         "//modules/common/monitor_log",
         "//modules/common/time",
         "//modules/common/util",
@@ -31,38 +22,10 @@ cc_library(
         "//modules/perception/proto:perception_proto",
         "//modules/planning/proto:planning_proto",
         "//modules/prediction/proto:prediction_proto",
-        "@ros//:ros_common",
+        "//framework:cybertron",
     ],
-)
-
-cc_binary(
-    name = "control",
-    srcs = ["main.cc"],
-    deps = [
-        ":control_lib",
-        "//external:gflags",
-        "//modules/control/common",
-    ],
-)
-
-cc_test(
-    name = "control_test",
-    size = "small",
-    srcs = [
-        "control_test.cc",
-    ],
-    data = ["//modules/control:control_testdata"],
-    deps = [
-        ":control_lib",
-        "@gtest//:main",
-    ],
-)
-
-filegroup(
-    name = "control_testdata",
-    srcs = glob([
-        "testdata/**",
-    ]),
+    copts = ['-DMODULE_NAME=\\"control\\"'],
+    linkshared = True,
 )
 
 cpplint()
