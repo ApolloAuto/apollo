@@ -22,11 +22,10 @@
 
 #include "boost/filesystem.hpp"
 #include "boost/range/iterator_range.hpp"
-#include "rosbag/bag.h"
-#include "rosbag/view.h"
+// #include "rosbag/bag.h"
+// #include "rosbag/view.h"
 
 #include "modules/common/adapters/adapter_gflags.h"
-#include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/math/vec2d.h"
 #include "modules/common/time/time.h"
 #include "modules/common/util/file.h"
@@ -49,7 +48,6 @@ using apollo::common::ErrorCode;
 using apollo::common::Status;
 using apollo::common::TrajectoryPoint;
 using apollo::common::adapter::AdapterConfig;
-using apollo::common::adapter::AdapterManager;
 using apollo::common::math::Vec2d;
 using apollo::common::time::Clock;
 using apollo::common::util::DirectoryExists;
@@ -62,31 +60,34 @@ std::string PredictionComponent::Name() const {
   return FLAGS_prediction_module_name;
 }
 
+// void PredictionComponent::ProcessRosbag(const std::string& filename) {
+//   const std::vector<std::string> topics{FLAGS_perception_obstacle_topic,
+//                                         FLAGS_localization_topic};
+//   rosbag::Bag bag;
+//   try {
+//     bag.open(filename, rosbag::bagmode::Read);
+//   } catch (const rosbag::BagIOException& e) {
+//     AERROR << "BagIOException when open bag: " << filename
+//            << " Exception: " << e.what();
+//     bag.close();
+//     return;
+//   } catch (...) {
+//     AERROR << "Failed to open bag: " << filename;
+//     bag.close();
+//     return;
+//   }
+//   rosbag::View view(bag, rosbag::TopicQuery(topics));
+//   for (auto it = view.begin(); it != view.end(); ++it) {
+//     if (it->getTopic() == FLAGS_localization_topic) {
+//       OnLocalization(*(it->instantiate<LocalizationEstimate>()));
+//     } else if (it->getTopic() == FLAGS_perception_obstacle_topic) {
+//       RunOnce(*(it->instantiate<PerceptionObstacles>()));
+//     }
+//   }
+//   bag.close();
+// }
 void PredictionComponent::ProcessRosbag(const std::string& filename) {
-  const std::vector<std::string> topics{FLAGS_perception_obstacle_topic,
-                                        FLAGS_localization_topic};
-  rosbag::Bag bag;
-  try {
-    bag.open(filename, rosbag::bagmode::Read);
-  } catch (const rosbag::BagIOException& e) {
-    AERROR << "BagIOException when open bag: " << filename
-           << " Exception: " << e.what();
-    bag.close();
-    return;
-  } catch (...) {
-    AERROR << "Failed to open bag: " << filename;
-    bag.close();
-    return;
-  }
-  rosbag::View view(bag, rosbag::TopicQuery(topics));
-  for (auto it = view.begin(); it != view.end(); ++it) {
-    if (it->getTopic() == FLAGS_localization_topic) {
-      OnLocalization(*(it->instantiate<LocalizationEstimate>()));
-    } else if (it->getTopic() == FLAGS_perception_obstacle_topic) {
-      RunOnce(*(it->instantiate<PerceptionObstacles>()));
-    }
-  }
-  bag.close();
+  // TODO(all) implement
 }
 
 bool PredictionComponent::Init() {
@@ -116,14 +117,14 @@ bool PredictionComponent::Init() {
   }
 
   // Initialization of all managers
-  AdapterManager::Init(adapter_conf_);
+  // AdapterManager::Init(adapter_conf_);
   ContainerManager::Instance()->Init(adapter_conf_);
   EvaluatorManager::Instance()->Init(prediction_conf_);
   PredictorManager::Instance()->Init(prediction_conf_);
 
-  CHECK(AdapterManager::GetLocalization()) << "Localization is not registered.";
-  CHECK(AdapterManager::GetPerceptionObstacles())
-      << "Perception is not registered.";
+  // CHECK(AdapterManager::GetLocalization()) << "Localization is not registered.";
+  // CHECK(AdapterManager::GetPerceptionObstacles())
+  //     << "Perception is not registered.";
 
   /* TODO(kechxu) recover callbacks according to cybertron
   // Set localization callback function
@@ -215,7 +216,7 @@ void PredictionComponent::RunOnce(
   }
 
   // Update relative map if needed
-  AdapterManager::Observe();
+  // AdapterManager::Observe();
   if (FLAGS_use_navigation_mode && !PredictionMap::Ready()) {
     AERROR << "Relative map is empty.";
     return;

@@ -20,7 +20,6 @@
 #include "gtest/gtest.h"
 
 #include "modules/common/util/file.h"
-#include "modules/common/adapters/adapter_manager.h"
 #include "modules/map/hdmap/hdmap.h"
 #include "modules/common/adapters/proto/adapter_config.pb.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
@@ -34,7 +33,6 @@
 namespace apollo {
 namespace prediction {
 
-using apollo::common::adapter::AdapterManager;
 using apollo::common::adapter::AdapterConfig;
 
 class EvaluatorManagerTest : public KMLMapBasedTest {

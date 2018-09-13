@@ -25,6 +25,7 @@
 #include <vector>
 
 #include "cybertron/component/component.h"
+#include "modules/common/status/status.h"
 #include "modules/common/adapters/proto/adapter_config.pb.h"
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/localization/proto/localization.pb.h"
