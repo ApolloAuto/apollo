@@ -17,7 +17,6 @@ proto_library(
     ],
     deps = [
         ":decision_proto_lib",
-        ":planning_conf_proto_lib",
         ":planning_internal_proto_lib",
         "//modules/canbus/proto:canbus_proto_lib",
         "//modules/common/proto:common_proto_lib",
@@ -141,20 +140,6 @@ proto_library(
     name = "navi_obstacle_decider_config_proto_lib",
     srcs = [
         "navi_obstacle_decider_config.proto",
-    ],
-)
-
-cc_proto_library(
-    name = "planning_conf_proto",
-    deps = [
-        ":planning_conf_proto_lib",
-    ],
-)
-
-proto_library(
-    name = "planning_conf_proto_lib",
-    srcs = [
-        "planning_conf.proto",
     ],
 )
 
