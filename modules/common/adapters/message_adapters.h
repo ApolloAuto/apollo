@@ -17,11 +17,11 @@
 #ifndef MODULES_ADAPTERS_MESSAGE_ADAPTERS_H_
 #define MODULES_ADAPTERS_MESSAGE_ADAPTERS_H_
 
-#include "sensor_msgs/CompressedImage.h"
-#include "sensor_msgs/Image.h"
-#include "sensor_msgs/PointCloud2.h"
-#include "std_msgs/String.h"
-#include "velodyne_msgs/VelodyneScanUnified.h"
+//#include "sensor_msgs/CompressedImage.h"
+//#include "sensor_msgs/Image.h"
+//#include "sensor_msgs/PointCloud2.h"
+//#include "std_msgs/String.h"
+//#include "velodyne_msgs/VelodyneScanUnified.h"
 
 #include "modules/calibration/republish_msg/proto/relative_odometry.pb.h"
 #include "modules/canbus/proto/chassis.pb.h"
@@ -145,15 +145,18 @@ using GnssHeadingAdapter = Adapter<drivers::gnss::Heading>;
 
 // using PointCloudSparse1Adapter = Adapter<::sensor_msgs::PointCloud2>;
 // using PointCloudSparseRaw1Adapter = Adapter<::sensor_msgs::PointCloud2>;
-// using VelodyneScanSparse1Adapter = Adapter<velodyne_msgs::VelodyneScanUnified>;
+// using VelodyneScanSparse1Adapter =
+// Adapter<velodyne_msgs::VelodyneScanUnified>;
 
 // using PointCloudSparse2Adapter = Adapter<::sensor_msgs::PointCloud2>;
 // using PointCloudSparseRaw2Adapter = Adapter<::sensor_msgs::PointCloud2>;
-// using VelodyneScanSparse2Adapter = Adapter<velodyne_msgs::VelodyneScanUnified>;
+// using VelodyneScanSparse2Adapter =
+// Adapter<velodyne_msgs::VelodyneScanUnified>;
 
 // using PointCloudSparse3Adapter = Adapter<::sensor_msgs::PointCloud2>;
 // using PointCloudSparseRaw3Adapter = Adapter<::sensor_msgs::PointCloud2>;
-// using VelodyneScanSparse3Adapter = Adapter<velodyne_msgs::VelodyneScanUnified>;
+// using VelodyneScanSparse3Adapter =
+// Adapter<velodyne_msgs::VelodyneScanUnified>;
 
 }  // namespace adapter
 }  // namespace common

@@ -7,6 +7,9 @@ cc_library(
     deps = [
         ":log",
         ":macro",
+        "//modules/common/math",
+        "//modules/common/status",
+        "//modules/common/util",
         "//framework:cybertron",
     ],
 )
@@ -28,20 +31,20 @@ cc_library(
     ],
 )
 
-cc_library(
-    name = "apollo_app",
-    srcs = [
-        "apollo_app.cc",
-    ],
-    hdrs = [
-        "apollo_app.h",
-    ],
-    deps = [
-        ":log",
-        "//framework:cybertron",
-        "//modules/common/status",
-        "//modules/common/util:string_util",
-    ],
-)
+# cc_library(
+#     name = "apollo_app",
+#     srcs = [
+#         "apollo_app.cc",
+#     ],
+#     hdrs = [
+#         "apollo_app.h",
+#     ],
+#     deps = [
+#         ":log",
+#         "//framework:cybertron",
+#         "//modules/common/status",
+#         "//modules/common/util:string_util",
+#     ],
+# )
 
 cpplint()

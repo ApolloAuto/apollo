@@ -41,11 +41,11 @@
 #include "modules/common/util/string_util.h"
 #include "modules/common/util/util.h"
 
-#include "sensor_msgs/CompressedImage.h"
-#include "sensor_msgs/Image.h"
-#include "sensor_msgs/PointCloud2.h"
-#include "std_msgs/String.h"
-#include "velodyne_msgs/VelodyneScanUnified.h"
+//#include "sensor_msgs/CompressedImage.h"
+//#include "sensor_msgs/Image.h"
+//#include "sensor_msgs/PointCloud2.h"
+//#include "std_msgs/String.h"
+//#include "velodyne_msgs/VelodyneScanUnified.h"
 
 /**
  * @namespace apollo::common::adapter
