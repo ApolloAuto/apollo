@@ -76,8 +76,7 @@ class PullOver : public TrafficRule {
   /**
    * Find a safe place to pull over based on the vehicle's current state.
    */
-  int FindPullOverStop(const double stop_point_s,
-                       common::PointENU* stop_point);
+  int FindPullOverStop(const double stop_point_s, common::PointENU* stop_point);
   int FindPullOverStop(common::PointENU* stop_point);
 
   /**

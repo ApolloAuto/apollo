@@ -63,7 +63,7 @@ Status StopSign::ApplyRule(Frame* const frame,
   CHECK_NOTNULL(reference_line_info);
 
   if (!FindNextStopSign(reference_line_info)) {
-    GetPlanningStatus()->clear_stop_sign();
+    mutable_planning_status()->clear_stop_sign();
     return Status::OK();
   }
 
@@ -124,14 +124,14 @@ void StopSign::MakeDecisions(Frame* frame,
   if (stop_status_ == StopSignStatus::STOP_DONE) {
     // stop done: clear stop_status
     double adc_back_edge_s = reference_line_info->AdcSlBoundary().start_s();
-    StopSignStatus stop_sign_status = GetPlanningStatus()->stop_sign();
+    StopSignStatus stop_sign_status = mutable_planning_status()->stop_sign();
     const std::vector<PathOverlap>& stop_sign_overlaps =
         reference_line_info->reference_line().map_path().stop_sign_overlaps();
     for (const PathOverlap& stop_sign_overlap : stop_sign_overlaps) {
       if (stop_sign_status.stop_sign_id() == stop_sign_overlap.object_id) {
         if (adc_back_edge_s - stop_sign_overlap.end_s >
             config_.stop_sign().min_pass_s_distance()) {
-          GetPlanningStatus()->clear_stop_sign();
+          mutable_planning_status()->clear_stop_sign();
         }
         break;
       }
@@ -164,7 +164,7 @@ void StopSign::MakeDecisions(Frame* frame,
 bool StopSign::FindNextStopSign(ReferenceLineInfo* const reference_line_info) {
   CHECK_NOTNULL(reference_line_info);
 
-  StopSignStatus stop_sign_status = GetPlanningStatus()->stop_sign();
+  StopSignStatus stop_sign_status = mutable_planning_status()->stop_sign();
   const std::vector<PathOverlap>& stop_sign_overlaps =
       reference_line_info->reference_line().map_path().stop_sign_overlaps();
   double adc_front_edge_s = reference_line_info->AdcSlBoundary().end_s();
@@ -201,8 +201,8 @@ bool StopSign::FindNextStopSign(ReferenceLineInfo* const reference_line_info) {
 
   // update stop sign status
   if (stop_sign_status.stop_sign_id() != next_stop_sign_->id().id()) {
-    GetPlanningStatus()->clear_stop_sign();
-    GetPlanningStatus()->mutable_stop_sign()->set_stop_sign_id(
+    mutable_planning_status()->clear_stop_sign();
+    mutable_planning_status()->mutable_stop_sign()->set_stop_sign_id(
         next_stop_sign_->id().id());
   }
 
@@ -309,7 +309,7 @@ int StopSign::ProcessStopStatus(ReferenceLineInfo* const reference_line_info,
   CHECK_NOTNULL(reference_line_info);
 
   // get stop status from PlanningStatus
-  auto* stop_sign_status = GetPlanningStatus()->mutable_stop_sign();
+  auto* stop_sign_status = mutable_planning_status()->mutable_stop_sign();
   if (!stop_sign_status->has_status()) {
     stop_sign_status->set_status(StopSignStatus::UNKNOWN);
   }
@@ -426,7 +426,7 @@ void StopSign::GetWatchVehicles(const StopSignInfo& stop_sign_info,
 
   watch_vehicles->clear();
 
-  StopSignStatus stop_sign_status = GetPlanningStatus()->stop_sign();
+  StopSignStatus stop_sign_status = mutable_planning_status()->stop_sign();
   for (int i = 0; i < stop_sign_status.lane_watch_vehicles_size(); ++i) {
     auto lane_watch_vehicles = stop_sign_status.lane_watch_vehicles(i);
     std::string associated_lane_id = lane_watch_vehicles.lane_id();
@@ -447,7 +447,7 @@ void StopSign::GetWatchVehicles(const StopSignInfo& stop_sign_info,
 void StopSign::UpdateWatchVehicles(StopSignLaneVehicles* watch_vehicles) {
   CHECK_NOTNULL(watch_vehicles);
 
-  auto* stop_sign_status = GetPlanningStatus()->mutable_stop_sign();
+  auto* stop_sign_status = mutable_planning_status()->mutable_stop_sign();
   stop_sign_status->clear_lane_watch_vehicles();
 
   for (auto it = watch_vehicles->begin(); it != watch_vehicles->end(); ++it) {

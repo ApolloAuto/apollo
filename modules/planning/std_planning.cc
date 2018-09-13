@@ -85,7 +85,7 @@ StdPlanning::~StdPlanning() {
   frame_.reset(nullptr);
   planner_.reset(nullptr);
   FrameHistory::Instance()->Clear();
-  GetPlanningStatus()->Clear();
+  mutable_planning_status()->Clear();
   last_routing_.Clear();
   EgoInfo::Instance()->Clear();
 }
@@ -109,7 +109,7 @@ Status StdPlanning::Init() {
       << FLAGS_traffic_rule_config_filename;
 
   // clear planning status
-  GetPlanningStatus()->Clear();
+  mutable_planning_status()->Clear();
 
   // load map
   hdmap_ = HDMapUtil::BaseMapPtr();
@@ -207,7 +207,7 @@ void StdPlanning::RunOnce(const LocalView& local_view,
 
   if (IsDifferentRouting(last_routing_, *local_view.routing)) {
     last_routing_ = *local_view.routing;
-    GetPlanningStatus()->Clear();
+    mutable_planning_status()->Clear();
     reference_line_provider_->UpdateRoutingResponse(*local_view.routing);
   }
 
