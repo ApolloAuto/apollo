@@ -26,13 +26,14 @@
 #include <utility>
 #include <vector>
 
+#include "cybertron/proto/role_attributes.pb.h"
+
 #include "cybertron/common/global_data.h"
 #include "cybertron/common/log.h"
 #include "cybertron/common/types.h"
-#include "cybertron/proto/role_attributes.pb.h"
+#include "cybertron/service_discovery/role/role.h"
 #include "cybertron/time/time.h"
 #include "cybertron/timer/timer_manager.h"
-#include "cybertron/service_discovery/role/role.h"
 #include "cybertron/transport/lower_reach/intra_lower_reach.h"
 #include "cybertron/transport/lower_reach/rtps_lower_reach.h"
 #include "cybertron/transport/lower_reach/shm_lower_reach.h"

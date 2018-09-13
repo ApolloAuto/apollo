@@ -17,6 +17,9 @@
 #include "examples/component_watchdog/watchdog_component.h"
 #include "cybertron/common/log.h"
 
+using apollo::cybertron::Component;
+using Food = apollo::cybertron::message::RawMessage;
+
 WatchdogComponent::WatchdogComponent() {}
 
 bool WatchdogComponent::Init() {

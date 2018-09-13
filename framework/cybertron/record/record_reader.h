@@ -29,12 +29,12 @@
 #include "cybertron/message/raw_message.h"
 #include "cybertron/record/record_base.h"
 
-using ::apollo::cybertron::message::RawMessage;
-using ::apollo::cybertron::record::RecordFileReader;
-
 namespace apollo {
 namespace cybertron {
 namespace record {
+
+using ::apollo::cybertron::message::RawMessage;
+using ::apollo::cybertron::record::RecordFileReader;
 
 class RecordReader : public RecordBase {
  public:
@@ -82,8 +82,8 @@ class RecordReader : public RecordBase {
     uint64_t time;
 
    private:
-    RecordMessage(const RecordMessage &) = delete;
-    RecordMessage &operator=(const RecordMessage &) = delete;
+    RecordMessage(const RecordMessage&) = delete;
+    RecordMessage& operator=(const RecordMessage&) = delete;
   };
   std::shared_ptr<RecordMessage> current_message_;
   std::queue<std::shared_ptr<RecordMessage>> message_queue_;

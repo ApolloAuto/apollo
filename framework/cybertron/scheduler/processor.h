@@ -22,9 +22,10 @@
 #include <mutex>
 #include <thread>
 
+#include "cybertron/proto/scheduler_conf.pb.h"
+
 #include "cybertron/croutine/croutine.h"
 #include "cybertron/croutine/routine_context.h"
-#include "cybertron/proto/scheduler_conf.pb.h"
 #include "cybertron/scheduler/policy/processor_context.h"
 
 namespace apollo {

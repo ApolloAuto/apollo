@@ -19,12 +19,12 @@
 
 #include "cybertron/proto/record.pb.h"
 
-using ::apollo::cybertron::proto::Header;
-using ::apollo::cybertron::proto::CompressType;
-
 namespace apollo {
 namespace cybertron {
 namespace record {
+
+using ::apollo::cybertron::proto::Header;
+using ::apollo::cybertron::proto::CompressType;
 
 class HeaderBuilder {
  public:

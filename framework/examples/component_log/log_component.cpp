@@ -15,18 +15,13 @@
  *****************************************************************************/
 #include "examples/component_log/log_component.h"
 
-using apollo::cybertron::Component;
-using apollo::cybertron::message::RawMessage;
 LogComponent::LogComponent() {}
 
-bool LogComponent::Init() {
-  return true;
-}
+bool LogComponent::Init() { return true; }
 
 bool LogComponent::Proc() {
   while (true) {
     AINFO << "start log !!!";
-    
   }
   return true;
 }

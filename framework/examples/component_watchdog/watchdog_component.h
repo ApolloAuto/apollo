@@ -17,20 +17,19 @@
 #ifndef EXAMPLES_COMPONENT_WATCHDOG_WATCHDOG_COMPONENT_H_
 #define EXAMPLES_COMPONENT_WATCHDOG_WATCHDOG_COMPONENT_H_
 
-#include "cybertron/message/raw_message.h"
 #include "cybertron/component/component.h"
+#include "cybertron/message/raw_message.h"
 #include "cybertron/time/time.h"
 #include "examples/component_watchdog/watchdog.h"
 
-using apollo::cybertron::Component;
-using Food = apollo::cybertron::message::RawMessage;
-
-class WatchdogComponent : public Component<Food> {
+class WatchdogComponent : public apollo::cybertron::Component<
+                              apollo::cybertron::message::RawMessage> {
  public:
   WatchdogComponent();
 
   bool Init() override;
-  bool Proc(const std::shared_ptr<Food>& food) override;
+  bool Proc(const std::shared_ptr<apollo::cybertron::message::RawMessage>& food)
+      override;
 
  private:
   std::shared_ptr<Watchdog> dog_ = nullptr;

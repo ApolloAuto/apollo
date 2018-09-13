@@ -17,9 +17,9 @@
 #define CYBERTRON_EXAMPLES_CYBERTRON_COMPONENT_H
 
 #include "cybertron/class_loader/class_loader.h"
+#include "cybertron/component/component.h"
 #include "cybertron/message/message_traits.h"
 #include "cybertron/message/raw_message.h"
-#include "cybertron/component/component.h"
 #include "cybertron/proto/driver.pb.h"
 #include "cybertron/proto/perception.pb.h"
 

@@ -20,13 +20,10 @@
 #include "cybertron/component/component.h"
 #include "cybertron/component/timer_component.h"
 
-using apollo::cybertron::Component;
-using apollo::cybertron::TimerComponent;
-
-class LogComponent : public TimerComponent {
+class LogComponent : public apollo::cybertron::TimerComponent {
  public:
   LogComponent();
-  
+
   bool Init() override;
   bool Proc() override;
 };

@@ -33,7 +33,6 @@ namespace apollo {
 namespace cybertron {
 namespace scheduler {
 
-
 using apollo::cybertron::base::AtomicHashMap;
 using apollo::cybertron::base::AtomicRWLock;
 using apollo::cybertron::base::ReadLockGuard;
@@ -76,7 +75,7 @@ class ProcessorContext {
   virtual bool IsPriorInverse(uint64_t routine_id) = 0;
   virtual bool Enqueue(const std::shared_ptr<CRoutine>& cr) = 0;
 
-//  std::mutex mtx_cr_map_;
+  //  std::mutex mtx_cr_map_;
   AtomicRWLock rw_lock_;
   CRoutineMap cr_map_;
   AtomicHashMap<uint64_t, std::promise<std::shared_ptr<CRoutine>>> pop_list_;
@@ -87,7 +86,6 @@ class ProcessorContext {
   uint32_t index_ = 0;
   uint32_t status_;
   int proc_index_ = -1;
-
 };
 
 bool ProcessorContext::GetState(const uint64_t& routine_id,

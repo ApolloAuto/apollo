@@ -29,7 +29,7 @@
 namespace apollo {
 namespace cybertron {
 namespace croutineoutine {
-  class croutineoutine;
+class croutineoutine;
 }
 namespace scheduler {
 
@@ -37,7 +37,7 @@ using apollo::cybertron::base::AtomicHashMap;
 
 class ProcBalancer {
  public:
-  ~ProcBalancer(){ ShutDown(); }
+  ~ProcBalancer() { ShutDown(); }
 
   std::shared_ptr<Processor> GetProperProcessor(
       const std::weak_ptr<CRoutine>& croutine);
