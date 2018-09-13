@@ -16,6 +16,9 @@
 
 #include "modules/prediction/util/data_extraction.h"
 
+#include <string>
+#include <vector>
+
 #include "modules/common/log.h"
 
 namespace apollo {

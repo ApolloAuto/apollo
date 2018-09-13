@@ -18,6 +18,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <memory>
 #include <vector>
 
 #include "boost/filesystem.hpp"
@@ -122,7 +123,8 @@ bool PredictionComponent::Init() {
   EvaluatorManager::Instance()->Init(prediction_conf_);
   PredictorManager::Instance()->Init(prediction_conf_);
 
-  // CHECK(AdapterManager::GetLocalization()) << "Localization is not registered.";
+  // CHECK(AdapterManager::GetLocalization())
+  // << "Localization is not registered.";
   // CHECK(AdapterManager::GetPerceptionObstacles())
   //     << "Perception is not registered.";
 
@@ -184,7 +186,8 @@ void PredictionComponent::Stop() {
   }
 }
 
-void PredictionComponent::OnLocalization(const LocalizationEstimate& localization) {
+void PredictionComponent::OnLocalization(
+    const LocalizationEstimate& localization) {
   PoseContainer* pose_container = dynamic_cast<PoseContainer*>(
       ContainerManager::Instance()->GetContainer(AdapterConfig::LOCALIZATION));
   CHECK_NOTNULL(pose_container);
@@ -194,7 +197,8 @@ void PredictionComponent::OnLocalization(const LocalizationEstimate& localizatio
          << localization.ShortDebugString() << "].";
 }
 
-void PredictionComponent::OnPlanning(const planning::ADCTrajectory& adc_trajectory) {
+void PredictionComponent::OnPlanning(
+    const planning::ADCTrajectory& adc_trajectory) {
   ADCTrajectoryContainer* adc_trajectory_container =
       dynamic_cast<ADCTrajectoryContainer*>(
           ContainerManager::Instance()->GetContainer(
