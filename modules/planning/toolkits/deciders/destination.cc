@@ -22,7 +22,6 @@
 
 #include "modules/planning/toolkits/deciders/destination.h"
 
-#include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/time/time.h"
 #include "modules/map/proto/map_lane.pb.h"
 #include "modules/planning/common/planning_context.h"
@@ -32,7 +31,6 @@ namespace apollo {
 namespace planning {
 
 using apollo::common::Status;
-using apollo::common::adapter::AdapterManager;
 using apollo::common::time::Clock;
 using apollo::hdmap::HDMapUtil;
 using apollo::hdmap::LaneSegment;
@@ -49,12 +47,11 @@ Status Destination::ApplyRule(Frame* frame,
     return Status::OK();
   }
 
-  const auto& routing =
-      AdapterManager::GetRoutingResponse()->GetLatestObserved();
+  const auto& routing = frame->planning_data().routing;
 
   common::SLPoint dest_sl;
   const auto& ref_line = reference_line_info->reference_line();
-  const auto& routing_end = *routing.routing_request().waypoint().rbegin();
+  const auto& routing_end = *(routing->routing_request().waypoint().rbegin());
   ref_line.XYToSL({routing_end.pose().x(), routing_end.pose().y()}, &dest_sl);
   const auto& adc_sl = reference_line_info->AdcSlBoundary();
   const auto& dest = GetPlanningStatus()->destination();
@@ -76,15 +73,14 @@ int Destination::BuildStopDecision(
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
 
-  const auto& routing =
-      AdapterManager::GetRoutingResponse()->GetLatestObserved();
-  if (routing.routing_request().waypoint_size() < 2) {
+  const auto& routing = frame->planning_data().routing;
+  if (routing->routing_request().waypoint_size() < 2) {
     AERROR << "routing_request has no end";
     return -1;
   }
 
   const auto* planning_status = GetPlanningStatus();
-  const auto& routing_end = *routing.routing_request().waypoint().rbegin();
+  const auto& routing_end = *(routing->routing_request().waypoint().rbegin());
   double dest_lane_s =
       std::max(0.0, routing_end.s() - FLAGS_virtual_stop_wall_length -
                         config_.destination().stop_distance());

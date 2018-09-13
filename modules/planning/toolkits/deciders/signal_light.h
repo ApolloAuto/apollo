@@ -41,9 +41,10 @@ class SignalLight : public TrafficRule {
                            ReferenceLineInfo* const reference_line_info);
 
  private:
-  void ReadSignals();
+  void ReadSignals(
+      const std::shared_ptr<perception::TrafficLightDetection>& traffic_light);
   bool FindValidSignalLight(ReferenceLineInfo* const reference_line_info);
-  apollo::perception::TrafficLight GetSignal(const std::string& signal_id);
+  perception::TrafficLight GetSignal(const std::string& signal_id);
   void MakeDecisions(Frame* const frame,
                      ReferenceLineInfo* const reference_line_info);
   bool BuildStopDecision(Frame* const frame,

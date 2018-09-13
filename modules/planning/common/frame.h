@@ -120,6 +120,8 @@ class Frame {
   void UpdateReferenceLinePriority(
       const std::map<std::string, uint32_t> &id_to_priority);
 
+  const PlanningData &planning_data() const { return planning_data_; }
+
  private:
   bool CreateReferenceLineInfo();
 

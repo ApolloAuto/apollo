@@ -22,7 +22,6 @@
 
 #include "modules/common/proto/pnc_point.pb.h"
 
-#include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/time/time.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/planning_context.h"
@@ -31,7 +30,6 @@ namespace apollo {
 namespace planning {
 
 using apollo::common::Status;
-using apollo::common::adapter::AdapterManager;
 using apollo::common::time::Clock;
 using apollo::perception::TrafficLight;
 using apollo::perception::TrafficLightDetection;
