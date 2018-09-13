@@ -54,12 +54,25 @@ cc_library(
     ],
 )
 
-cc_binary(
-    name = "relative_map",
-    srcs = ["main.cc"],
+cc_library(
+    name = "relative_map_component_lib",
+    srcs = [
+        "relative_map_component.cc",
+    ],
+    hdrs = [
+        "relative_map_component.h",
+    ],
     deps = [
-        ":relative_map_lib",
+        "//framework:cybertron",
+        #":relative_map_lib",
         "//external:gflags",
+        "//modules/map/relative_map/common:relative_map_gflags",
+        "//modules/perception/proto:perception_proto",
+        "//modules/common/adapters:adapter_gflags",
+        "//modules/localization/proto:localization_proto",
+        "//modules/map/relative_map/proto:relative_map_config_proto",
+        "//modules/map/relative_map/proto:navigation_proto",
+        "//modules/common/vehicle_state:vehicle_state_provider",
     ],
 )
 
@@ -75,15 +88,15 @@ cc_test(
     size = "small",
     srcs = [
         "navigation_lane_test.cc",
-    ], 
+    ],
     data = [
         ":testdata",
-    ],   
+    ],
     deps = [
-        ":relative_map_lib",
-        "//modules/common",        
-        "//third_party/json",
         "@gtest//:main",
+        ":relative_map_lib",
+        "//modules/common",
+        "//third_party/json",
     ],
 )
 
