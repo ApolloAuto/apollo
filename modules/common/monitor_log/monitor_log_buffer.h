@@ -39,14 +39,14 @@ namespace apollo {
 namespace common {
 namespace monitor {
 
-#define REG_MSG_TYPE(TYPE)                             \
-    MonitorLogBuffer &TYPE(const std::string &msg) {   \
-    AddMonitorMsgItem(MonitorMessageItem::TYPE, msg);  \
-    return *this;                                      \
-  }                                                    \
-  MonitorLogBuffer &TYPE() {                           \
-    level_ = MonitorMessageItem::TYPE;                 \
-    return *this;                                      \
+#define REG_MSG_TYPE(TYPE)                            \
+  MonitorLogBuffer &TYPE(const std::string &msg) {    \
+    AddMonitorMsgItem(MonitorMessageItem::TYPE, msg); \
+    return *this;                                     \
+  }                                                   \
+  MonitorLogBuffer &TYPE() {                          \
+    level_ = MonitorMessageItem::TYPE;                \
+    return *this;                                     \
   }
 
 /**
@@ -62,14 +62,9 @@ class MonitorLogBuffer {
    * @brief The constructor of MonitorBuffer.
    * @param a Monitor instance pointer;
    */
-  explicit MonitorLogBuffer(MonitorLogger *monitor);
+  explicit MonitorLogBuffer(const MonitorMessageItem::MessageSource &source);
 
   virtual ~MonitorLogBuffer();
-
-  /**
-   * @brief print a log trace for the last recorded message.
-   */
-  void PrintLog();
 
   /**
    * @brief record an INFO type message
@@ -129,9 +124,10 @@ class MonitorLogBuffer {
   void Publish();
 
  private:
-  MonitorLogger *logger_ = nullptr;
+  std::shared_ptr<MonitorLogger> logger_ = MonitorLogger::Instance();
   MonitorMessageItem::LogLevel level_ = MonitorMessageItem::INFO;
   std::vector<MessageItem> monitor_msg_items_;
+  MonitorMessageItem::MessageSource source_;
 
   FRIEND_TEST(MonitorBufferTest, RegisterMacro);
   FRIEND_TEST(MonitorBufferTest, AddMonitorMsgItem);
