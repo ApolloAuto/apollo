@@ -14,6 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include <memory>
 #include <string>
 
 #include "gtest/gtest.h"
@@ -31,7 +32,7 @@ class ContainerManagerTest : public ::testing::Test {
   virtual void SetUp() { manager_ = ContainerManager::Instance(); }
 
  protected:
-  ContainerManager *manager_ = nullptr;
+  std::shared_ptr<ContainerManager> manager_ = nullptr;
   common::adapter::AdapterManagerConfig conf_;
 };
 

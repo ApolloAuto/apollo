@@ -14,6 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include <memory>
 #include <string>
 
 #include "gtest/gtest.h"
@@ -34,7 +35,7 @@ class ScenarioManagerTest : public ::testing::Test {
   }
 
  protected:
-  ScenarioManager* manager_ = nullptr;
+  std::shared_ptr<ScenarioManager> manager_ = nullptr;
 };
 
 TEST_F(ScenarioManagerTest, run) {

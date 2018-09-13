@@ -21,10 +21,9 @@
 #ifndef MODULES_PREDICTION_PREDICTION_COMPONENT_H_
 #define MODULES_PREDICTION_PREDICTION_COMPONENT_H_
 
+#include <memory>
 #include <string>
 #include <vector>
-#include <memory>
-#include <mutex>
 
 #include "cybertron/component/component.h"
 #include "modules/common/status/status.h"
@@ -93,13 +92,13 @@ class PredictionComponent :
   void OnPlanning(const planning::ADCTrajectory &adc_trajectory);
 
   /**
-   * @brief process rosbag in offline mode, mainly for extracting prediction
+   * @brief process data in offline mode, mainly for extracting prediction
    * features.
    */
   void ProcessOfflineData(const std::string &filename);
 
  private:
-  double start_time_ = 0.0;
+  double component_start_time_ = 0.0;
 
   PredictionConf prediction_conf_;
 
