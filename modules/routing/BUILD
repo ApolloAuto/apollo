@@ -20,7 +20,6 @@ cc_library(
         "//modules/routing/core",
         "//modules/routing/graph",
         "//modules/routing/proto:routing_proto",
-        "@ros//:ros_common",
     ],
 )
 
