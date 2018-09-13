@@ -9,7 +9,7 @@ module_config {
       interval: 100
       readers: [
         {
-          channel: "/apollo/perception/obstacles"
+          channel: "/apollo/routing_response"
           qos_profile: {
             depth : 10
           }
