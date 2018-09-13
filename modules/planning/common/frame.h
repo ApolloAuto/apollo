@@ -37,11 +37,11 @@
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
 #include "modules/routing/proto/routing.pb.h"
 
-#include "modules/common/monitor_log/monitor_log_buffer.h"
+//#include "modules/common/monitor_log/monitor_log_buffer.h"
 #include "modules/common/status/status.h"
 #include "modules/planning/common/change_lane_decider.h"
 #include "modules/planning/common/indexed_queue.h"
-#include "modules/planning/common/lag_prediction.h"
+// #include "modules/planning/common/lag_prediction.h"
 #include "modules/planning/common/obstacle.h"
 #include "modules/planning/common/planning_data.h"
 #include "modules/planning/common/reference_line_info.h"
@@ -158,7 +158,7 @@ class Frame {
   ThreadSafeIndexedObstacles obstacles_;
   ChangeLaneDecider change_lane_decider_;
   ADCTrajectory trajectory_;  // last published trajectory
-  std::unique_ptr<LagPrediction> lag_predictor_;
+  // std::unique_ptr<LagPrediction> lag_predictor_;
   ReferenceLineProvider *reference_line_provider_ = nullptr;
 
   // apollo::common::monitor::MonitorLogger monitor_logger_;
