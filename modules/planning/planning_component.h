@@ -33,6 +33,7 @@
 #include "modules/routing/proto/routing.pb.h"
 
 #include "modules/planning/planning_base.h"
+#include "modules/planning/std_planning.h"
 
 namespace apollo {
 namespace planning {

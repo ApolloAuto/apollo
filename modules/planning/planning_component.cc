@@ -19,7 +19,6 @@
 
 #include "modules/common/util/message_util.h"
 #include "modules/planning/common/planning_context.h"
-#include "modules/planning/std_planning.h"
 
 namespace apollo {
 namespace planning {
@@ -130,8 +129,6 @@ bool PlanningComponent::CheckInput() {
     not_ready->set_reason("chassis not ready");
   } else if (local_view_.routing == nullptr) {
     not_ready->set_reason("routing not ready");
-  } else if (HDMapUtil::BaseMapPtr() == nullptr) {
-    not_ready->set_reason("map not ready");
   }
   if (not_ready->has_reason()) {
     AERROR << not_ready->reason() << "; skip the planning cycle.";
