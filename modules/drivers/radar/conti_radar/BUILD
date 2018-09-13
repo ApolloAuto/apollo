@@ -30,11 +30,12 @@ cc_library(
     deps = [
         ":conti_radar_message_manager",
         "//modules/common",
-        # "//modules/common/monitor_log",
         "//modules/drivers/canbus/can_client:can_client_factory",
         "//modules/drivers/canbus/can_comm:can_receiver",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/radar/conti_radar/protocol:drivers_conti_radar_protocol",
+        "//modules/common/monitor_log",
+        "//framework:cybertron",
     ],
     copts = ['-DMODULE_NAME=\\"conti_radar\\"']
 )

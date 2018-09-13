@@ -30,12 +30,10 @@ namespace apollo {
 namespace drivers {
 namespace conti_radar {
 
-ContiRadarCanbusComponent::ContiRadarCanbusComponent() {}
+ContiRadarCanbusComponent::ContiRadarCanbusComponent()
+    : monitor_logger_buffer_(
+          apollo::common::monitor::MonitorMessageItem::CONTI_RADAR) {}
 ContiRadarCanbusComponent::~ContiRadarCanbusComponent() { Stop(); }
-
-// std::string ContiRadarCanbusComponent::Name() const {
-//   return FLAGS_canbus_driver_name;
-// }
 
 bool ContiRadarCanbusComponent::Init() {
   if (!GetProtoConfig(&conti_radar_conf_)) {
@@ -75,6 +73,7 @@ bool ContiRadarCanbusComponent::Init() {
 
   start_success_ = Start();
   return start_success_;
+  return true;
 }
 
 apollo::common::ErrorCode ContiRadarCanbusComponent::ConfigureRadar() {
@@ -102,8 +101,7 @@ bool ContiRadarCanbusComponent::Start() {
   AINFO << "Can receiver is started.";
 
   // last step: publish monitor messages
-  // apollo::common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
-  // buffer.INFO("Canbus is started.");
+  monitor_logger_buffer_.INFO("Canbus is started.");
 
   return true;
 }
@@ -117,9 +115,7 @@ void ContiRadarCanbusComponent::Stop() {
 
 // Send the error to monitor and return it
 bool ContiRadarCanbusComponent::OnError(const std::string &error_msg) {
-  // apollo::common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
-  // buffer.ERROR(error_msg);
-  // return Status(ErrorCode::CANBUS_ERROR, error_msg);
+  monitor_logger_buffer_.ERROR(error_msg);
   AERROR << error_msg;
   return false;
 }

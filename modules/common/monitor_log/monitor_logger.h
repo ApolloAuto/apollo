@@ -26,6 +26,8 @@
 #include <utility>
 #include <vector>
 
+#include "cybertron/cybertron.h"
+#include "modules/common/util/message_util.h"
 #include "modules/common/monitor_log/proto/monitor_log.pb.h"
 
 /**
@@ -37,6 +39,8 @@ namespace common {
 namespace monitor {
 
 using MessageItem = std::pair<MonitorMessageItem::LogLevel, std::string>;
+using apollo::cybertron::Node;
+using apollo::cybertron::Writer;
 
 /**
  * class MonitorLogger
@@ -48,25 +52,23 @@ using MessageItem = std::pair<MonitorMessageItem::LogLevel, std::string>;
  */
 class MonitorLogger {
  public:
-  /**
-   * @brief Construct the monitor with the source of the monitor messages. The
-   * source is usually the module name who publishes the monitor messages.
-   * @param source the source of the monitor messages.
-   */
-  explicit MonitorLogger(const MonitorMessageItem::MessageSource &source)
-      : source_(source) {}
   virtual ~MonitorLogger() = default;
 
   /**
    * @brief Publish the messages.
    * @param messages a list of messages for
    */
-  virtual void Publish(const std::vector<MessageItem> &messages) const;
+  virtual void Publish(const MonitorMessageItem::MessageSource &source,
+                       const std::vector<MessageItem> &messages) const;
 
  private:
   virtual void DoPublish(MonitorMessage *message) const;
 
   MonitorMessageItem::MessageSource source_;
+  std::unique_ptr<Node> node_;
+  std::shared_ptr<Writer<MonitorMessage>> monitor_msg_writer_;
+
+  DECLARE_SINGLETON(MonitorLogger)
 };
 
 }  // namespace monitor

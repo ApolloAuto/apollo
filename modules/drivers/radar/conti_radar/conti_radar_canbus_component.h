@@ -29,7 +29,7 @@
 #include "cybertron/cybertron.h"
 
 #include "modules/common/macro.h"
-// #include "modules/common/monitor_log/monitor_log_buffer.h"
+#include "modules/common/monitor_log/monitor_log_buffer.h"
 #include "modules/common/util/util.h"
 #include "modules/drivers/canbus/can_client/can_client.h"
 #include "modules/drivers/canbus/can_client/can_client_factory.h"
@@ -88,7 +88,7 @@ class ContiRadarCanbusComponent : public apollo::cybertron::Component<> {
 
   int64_t last_timestamp_ = 0;
   bool start_success_ = false;
-  //   apollo::common::monitor::MonitorLogger monitor_logger_;
+  apollo::common::monitor::MonitorLogBuffer monitor_logger_buffer_;
 };
 
 CYBERTRON_REGISTER_COMPONENT(ContiRadarCanbusComponent)

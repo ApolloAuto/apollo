@@ -15,15 +15,19 @@
  *****************************************************************************/
 #include "modules/common/monitor_log/monitor_logger.h"
 
-#include "modules/common/adapters/adapter_manager.h"
-
 namespace apollo {
 namespace common {
 namespace monitor {
 
-using apollo::common::adapter::AdapterManager;
+MonitorLogger::MonitorLogger() {
+  auto node_name =
+      "monitor_logger" + std::to_string(cybertron::Time::Now().ToNanosecond());
+  node_ = cybertron::CreateNode("node_name");
+  monitor_msg_writer_ = node_->CreateWriter<MonitorMessage>("/apollo/monitor");
+}
 
-void MonitorLogger::Publish(const std::vector<MessageItem> &messages) const {
+void MonitorLogger::Publish(const MonitorMessageItem::MessageSource &source,
+                            const std::vector<MessageItem> &messages) const {
   // compose a monitor message
   if (messages.empty()) {
     return;
@@ -32,7 +36,7 @@ void MonitorLogger::Publish(const std::vector<MessageItem> &messages) const {
 
   for (const auto &msg_item : messages) {
     MonitorMessageItem *monitor_msg_item = monitor_msg.add_item();
-    monitor_msg_item->set_source(source_);
+    monitor_msg_item->set_source(source);
     monitor_msg_item->set_log_level(msg_item.first);
     monitor_msg_item->set_msg(msg_item.second);
   }
@@ -42,12 +46,8 @@ void MonitorLogger::Publish(const std::vector<MessageItem> &messages) const {
 }
 
 void MonitorLogger::DoPublish(MonitorMessage *message) const {
-  CHECK(AdapterManager::Initialized())
-      << "AdapterManager must be initialized before using monitor.";
-  CHECK(AdapterManager::GetMonitor() != nullptr)
-      << "Must register monitor in AdapterManager config.";
-  AdapterManager::FillMonitorHeader("monitor", message);
-  AdapterManager::PublishMonitor(*message);
+  common::util::FillHeader("monitor", message);
+  monitor_msg_writer_->Write(std::make_shared<MonitorMessage>(*message));
 }
 
 }  // namespace monitor
