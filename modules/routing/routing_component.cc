@@ -15,12 +15,19 @@
  *****************************************************************************/
 
 #include "modules/routing/routing_component.h"
+
 #include "modules/common/adapters/adapter_gflags.h"
+#include "modules/routing/common/routing_gflags.h"
+
+DECLARE_string(flagfile);
 
 namespace apollo {
 namespace routing {
 
 bool RoutingComponent::Init() {
+  AINFO << "Loading gflag from file: " << ConfigFilePath();
+  google::SetCommandLineOption("flagfile", ConfigFilePath().c_str());
+
   response_writer_ =
       node_->CreateWriter<RoutingResponse>(FLAGS_routing_response_topic);
 
