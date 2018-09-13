@@ -25,12 +25,11 @@
 #include "cybertron/croutine/croutine.h"
 #include "cybertron/croutine/routine_context.h"
 #include "cybertron/proto/scheduler_conf.pb.h"
+#include "cybertron/scheduler/policy/processor_context.h"
 
 namespace apollo {
 namespace cybertron {
 namespace scheduler {
-
-class ProcessorContext;
 
 using croutine::CRoutine;
 using croutine::RoutineContext;
@@ -44,32 +43,39 @@ struct ProcessorStat {
 
 class Processor {
  public:
-  Processor() : buffer_(true), main_thread_(this), emergency_thread_(this) {
-    routine_context_.reset(new RoutineContext());
-  }
+  Processor()
+      : buffer_(true),
+        main_thread_(this),
+        emergency_thread_(this),
+        routine_context_(new RoutineContext()) {}
   explicit Processor(bool buffer)
-      : buffer_(buffer), main_thread_(this), emergency_thread_(this) {
-    routine_context_.reset(new RoutineContext());
-  }
+      : buffer_(buffer),
+        main_thread_(this),
+        emergency_thread_(this),
+        routine_context_(new RoutineContext()) {}
   virtual ~Processor() {}
 
   void Start();
-  void BindContext(const std::shared_ptr<ProcessorContext>& context) {
-    context_ = context;
+  void Stop();
+  void BindContext(const std::shared_ptr<ProcessorContext>& context);
+  void UpdateStat(ProcessorStat* processor_stat) {
+    context_->UpdateProcessStat(&stat_);
+    *processor_stat = stat_;
   }
-  void SetId(uint32_t id) { id_ = id; }
-  uint32_t Id() { return id_; }
-  void Stop() { running_ = false; }
-  void Notify() { main_thread_.Notify(); }
-  void NotifyEmergencyThread() {
+  inline void Notify() { main_thread_.Notify(); }
+  inline void NotifyEmergencyThread() {
     if (buffer_) {
       emergency_thread_.Notify();
     }
   }
-  void UpdateStat(ProcessorStat* stat);
-  ProcessorStat Stat() { return stat_; }
-  std::shared_ptr<ProcessorContext> Context() { return context_; }
-  bool EnableEmergencyThread() { return buffer_; }
+
+  inline uint32_t Id() const { return id_; }
+  inline void SetId(const uint32_t& id) { id_ = id; }
+  inline const ProcessorStat& Stat() const { return stat_; }
+  inline const std::shared_ptr<ProcessorContext>& Context() const {
+    return context_;
+  }
+  inline bool EnableEmergencyThread() const { return buffer_; }
 
  private:
   class ProcessorThread {
@@ -97,8 +103,6 @@ class Processor {
 
   ProcessorThread main_thread_;
   ProcessorThread emergency_thread_;
-  // there is a lock in context_
-  // std::mutex context_mutex_;
   std::shared_ptr<RoutineContext> routine_context_ = nullptr;
   std::shared_ptr<ProcessorContext> context_ = nullptr;
   bool running_ = false;

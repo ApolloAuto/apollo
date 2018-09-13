@@ -31,8 +31,7 @@ using apollo::cybertron::common::GlobalData;
 
 uint32_t Scheduler::processor_num_ = std::thread::hardware_concurrency();
 
-Scheduler::Scheduler()
-    : stop_(false) {
+Scheduler::Scheduler() : stop_(false) {
   auto global_conf = GlobalData::Instance()->Config();
   if (global_conf.has_scheduler_conf()) {
     scheduler_conf_.CopyFrom(global_conf.scheduler_conf());

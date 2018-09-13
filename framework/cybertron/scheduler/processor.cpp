@@ -39,13 +39,23 @@ void Processor::Start() {
   }
 }
 
+void Processor::Stop() { running_ = false; }
+
+void Processor::BindContext(const std::shared_ptr<ProcessorContext>& context) {
+  context_ = context;
+}
+
 void Processor::ProcessorThread::Start() {
   thread_ = std::thread(&ProcessorThread::Run, this);
-  cpu_set_t set;
-  CPU_ZERO(&set);
-  CPU_SET(processor_->id_, &set);
-  if (pthread_setaffinity_np(thread_.native_handle(), sizeof(set), &set) != 0) {
-    AWARN << "Set cpu affinity failed!" << std::endl;
+  uint32_t core_num = std::thread::hardware_concurrency();
+  if (core_num != 0) {
+    cpu_set_t set;
+    CPU_ZERO(&set);
+    CPU_SET(processor_->id_ % core_num, &set);
+    if (pthread_setaffinity_np(thread_.native_handle(), sizeof(set), &set) !=
+        0) {
+      AWARN << "Set cpu affinity failed!";
+    }
   }
 }
 
@@ -58,8 +68,7 @@ void Processor::ProcessorThread::Run() {
     if (processor_->context_) {
       cur_routine_ = processor_->context_->NextRoutine();
       if (cur_routine_) {
-        if (cur_routine_->Resume() ==
-            croutine::RoutineState::FINISHED) {
+        if (cur_routine_->Resume() == croutine::RoutineState::FINISHED) {
           processor_->context_->RemoveCRoutine(cur_routine_->Id());
         }
 
@@ -81,7 +90,7 @@ void Processor::ProcessorThread::Run() {
       }
     } else {
       // context_lock.unlock();
-      AINFO << "no pcontext bound, wait..." << std::endl;
+      AINFO << "no pcontext bound, wait...";
       std::unique_lock<std::mutex> lk_rq(cv_mutex_);
       cv_.wait(lk_rq, [this] {
         return this->processor_->context_ &&
@@ -99,11 +108,6 @@ void Processor::ProcessorThread::SetHigherPriority() {
   if (pthread_setschedparam(thread_.native_handle(), SCHED_RR, &sch)) {
     AWARN << "Failed to setschedparam: " << std::strerror(errno);
   }
-}
-
-void Processor::UpdateStat(ProcessorStat* processor_stat) {
-  context_->UpdateProcessStat(&stat_);
-  *processor_stat = stat_;
 }
 
 }  // namespace scheduler
