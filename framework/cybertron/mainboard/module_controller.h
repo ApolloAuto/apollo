@@ -26,11 +26,12 @@
 #include "cybertron/mainboard/module_argument.h"
 #include "cybertron/proto/dag_config.pb.h"
 
-using apollo::cybertron::proto::DagConfig;
-
 namespace apollo {
 namespace cybertron {
 namespace mainboard {
+
+using apollo::cybertron::proto::DagConfig;
+
 class ModuleController {
  public:
   explicit ModuleController(const ModuleArgument& args);

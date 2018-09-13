@@ -16,9 +16,9 @@
 #ifndef CYBERTRON_EXAMPLES_COMPONENT_DRIVER_COMPONENT_H
 #define CYBERTRON_EXAMPLES_COMPONENT_DRIVER_COMPONENT_H
 
-#include "cybertron/message/raw_message.h"
 #include "cybertron/component/component.h"
 #include "cybertron/component/timer_component.h"
+#include "cybertron/message/raw_message.h"
 #include "cybertron/proto/driver.pb.h"
 #include "cybertron/scheduler/task.h"
 

@@ -28,7 +28,7 @@
 namespace apollo {
 namespace cybertron {
 namespace croutine {
-  class CRoutine;
+class CRoutine;
 }
 namespace scheduler {
 

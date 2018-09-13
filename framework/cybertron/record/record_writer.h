@@ -30,13 +30,13 @@
 #include "cybertron/record/record_base.h"
 #include "cybertron/time/time.h"
 
-using ::apollo::cybertron::Time;
-using ::apollo::cybertron::message::RawMessage;
-using ::apollo::cybertron::record::RecordFileWriter;
-
 namespace apollo {
 namespace cybertron {
 namespace record {
+
+using ::apollo::cybertron::Time;
+using ::apollo::cybertron::message::RawMessage;
+using ::apollo::cybertron::record::RecordFileWriter;
 
 class RecordWriter : public RecordBase {
  public:
