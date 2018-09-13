@@ -58,7 +58,7 @@ class PublicRoadPlanner : public PlannerWithReferenceLine {
    */
   virtual ~PublicRoadPlanner() = default;
 
-  std::string Name() override { return "EM"; }
+  std::string Name() override { return "PUBLIC_ROAD"; }
 
   common::Status Init(const PlanningConfig& config) override;
 

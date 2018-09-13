@@ -41,7 +41,7 @@ TEST_F(StdPlannerDispatcherTest, Simple) {
   pd_.reset(new StdPlannerDispatcher());
   pd_->Init();
   auto planner = pd_->DispatchPlanner();
-  EXPECT_EQ(planner->Name(), "EM");
+  EXPECT_EQ(planner->Name(), "PUBLIC_ROAD");
 }
 
 }  // namespace planning

@@ -49,6 +49,16 @@ bool PlanningComponent::Init() {
         traffic_light_.CopyFrom(*traffic_light);
       });
 
+  if (FLAGS_use_navigation_mode) {
+    pad_message_reader_ = node_->CreateReader<PadMessage>(
+        planning_conf_.planning_pad_channel(),
+        [this](const std::shared_ptr<PadMessage>& pad_message) {
+          ADEBUG << "Received chassis data: run chassis callback.";
+          std::lock_guard<std::mutex> lock(mutex_);
+          pad_message_.CopyFrom(*pad_message);
+        });
+  }
+
   writer_ = node_->CreateWriter<ADCTrajectory>("/apollo/planning");
 
   return true;

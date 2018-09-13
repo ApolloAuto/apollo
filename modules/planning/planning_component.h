@@ -28,6 +28,7 @@
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/perception/proto/traffic_light_detection.pb.h"
 #include "modules/planning/proto/planning.pb.h"
+#include "modules/planning/proto/pad_msg.pb.h"
 #include "modules/planning/proto/planning_conf.pb.h"
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
 #include "modules/routing/proto/routing.pb.h"
@@ -59,12 +60,14 @@ class PlanningComponent final
   std::shared_ptr<cybertron::Reader<perception::TrafficLightDetection>>
       traffic_light_reader_;
   std::shared_ptr<cybertron::Reader<routing::RoutingResponse>> routing_reader_;
+  std::shared_ptr<cybertron::Reader<planning::PadMessage>> pad_message_reader_;
 
   std::shared_ptr<cybertron::Writer<ADCTrajectory>> writer_;
 
   std::mutex mutex_;
   perception::TrafficLightDetection traffic_light_;
   routing::RoutingResponse routing_;
+  PadMessage pad_message_;
 
   LocalView local_view_;
 
