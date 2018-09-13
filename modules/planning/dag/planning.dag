@@ -1,0 +1,26 @@
+# Define all coms in DAG streaming.
+module_config {
+  module_library : "/apollo/bazel-bin/modules/planning/libplanning.so"
+  components {
+    class_name : "PlanningComponent"
+    config {
+      name: "planning"
+      config_file_path:  "/apollo/modules/planning/conf/planning_conf.pb.txt"
+      interval: 100
+      readers: [
+        {
+          channel: "/apollo/perception/obstacles"
+          qos_profile: {
+            depth : 10
+          }
+        }
+        {
+          channel: "/apollo/perception/traffic_light"
+          qos_profile: {
+            depth : 10
+          }
+        }
+      ]
+    }
+  }
+}
