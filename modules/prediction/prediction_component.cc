@@ -122,28 +122,6 @@ bool PredictionComponent::Init() {
   EvaluatorManager::Instance()->Init(prediction_conf_);
   PredictorManager::Instance()->Init(prediction_conf_);
 
-  localization_reader_ = node_->CreateReader<LocalizationEstimate>(
-    prediction_conf_.pose_channel(),
-    [this](const std::shared_ptr<LocalizationEstimate>& localization) {
-        ADEBUG << "Received localization data: run localization callback.";
-        std::lock_guard<std::mutex> lock(mutex_);
-        OnLocalization(*localization);
-    });
-
-  planning_reader_ = node_->CreateReader<ADCTrajectory>(
-    prediction_conf_.planning_trajectory_channel(),
-    [this](const std::shared_ptr<ADCTrajectory>& adc_trajectory) {
-        ADEBUG << "Received planning data: run planning callback.";
-        std::lock_guard<std::mutex> lock(mutex_);
-        OnPlanning(*adc_trajectory);
-    });
-
-  // TODO(all) accord to cybertron
-  // CHECK(AdapterManager::GetLocalization())
-  // << "Localization is not registered.";
-  // CHECK(AdapterManager::GetPerceptionObstacles())
-  //     << "Perception is not registered.";
-
   if (!FLAGS_use_navigation_mode && !PredictionMap::Ready()) {
     AERROR << "Map cannot be loaded.";
     return false;
@@ -211,7 +189,9 @@ void PredictionComponent::OnPlanning(
 }
 
 bool PredictionComponent::Proc(
-    const std::shared_ptr<PerceptionObstacles>& perception_obstacles) {
+    const std::shared_ptr<PerceptionObstacles>& perception_obstacles,
+    const std::shared_ptr<LocalizationEstimate>& localization,
+    const std::shared_ptr<ADCTrajectory>& adc_trajectory) {
   if (FLAGS_prediction_test_mode &&
       (Clock::NowInSeconds() - start_time_ > FLAGS_prediction_test_duration)) {
     AINFO << "Prediction finished running in test mode";
@@ -227,6 +207,10 @@ bool PredictionComponent::Proc(
   }
 
   double start_timestamp = Clock::NowInSeconds();
+
+  OnLocalization(*localization);
+
+  OnPlanning(*adc_trajectory);
 
   // Insert obstacle
   ObstaclesContainer* obstacles_container = dynamic_cast<ObstaclesContainer*>(

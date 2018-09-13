@@ -44,7 +44,9 @@ namespace apollo {
 namespace prediction {
 
 class PredictionComponent :
-    public cybertron::Component<perception::PerceptionObstacles> {
+    public cybertron::Component<perception::PerceptionObstacles,
+                                localization::LocalizationEstimate,
+                                planning::ADCTrajectory> {
  public:
   /**
    * @brief Destructor
@@ -67,8 +69,10 @@ class PredictionComponent :
    * @brief Data callback upon receiving a perception obstacle message.
    * @param perception_obstacles received message.
    */
-  bool Proc(const std::shared_ptr<perception::PerceptionObstacles>&
-            perception_obstacles) override;
+  bool Proc(
+      const std::shared_ptr<perception::PerceptionObstacles>&,
+      const std::shared_ptr<localization::LocalizationEstimate>&,
+      const std::shared_ptr<planning::ADCTrajectory>&) override;
 
   /**
    * @brief Start the node
