@@ -23,12 +23,13 @@
 DEFINE_string(prediction_module_name, "prediction",
               "Default prediciton module name");
 DEFINE_string(prediction_conf_file,
-              "modules/prediction/conf/prediction_conf.pb.txt",
+              "/apollo/modules/prediction/conf/prediction_conf.pb.txt",
               "Default conf file for prediction");
 DEFINE_string(prediction_adapter_config_filename,
-              "modules/prediction/conf/adapter.conf",
+              "/apollo/modules/prediction/conf/adapter.conf",
               "Default conf file for prediction");
-DEFINE_string(prediction_data_dir, "data/prediction/",
+DEFINE_string(prediction_data_dir,
+              "/apollo/modules/prediction/data/prediction/",
               "Prefix of files to store feature data");
 DEFINE_bool(prediction_test_mode, false, "Set prediction to test mode");
 DEFINE_double(
@@ -106,10 +107,10 @@ DEFINE_double(prediction_pedestrian_total_time, 10.0,
               "Total prediction time for pedestrians");
 DEFINE_double(still_speed, 0.01, "speed considered to be still");
 DEFINE_string(evaluator_vehicle_mlp_file,
-              "modules/prediction/data/mlp_vehicle_model.bin",
+              "/apollo/modules/prediction/data/mlp_vehicle_model.bin",
               "mlp model file for vehicle evaluator");
 DEFINE_string(evaluator_vehicle_rnn_file,
-              "modules/prediction/data/rnn_vehicle_model.bin",
+              "/apollo/modules/prediction/data/rnn_vehicle_model.bin",
               "rnn model file for vehicle evaluator");
 DEFINE_int32(max_num_obstacles, 100,
              "maximal number of obstacles stored in obstacles container.");
