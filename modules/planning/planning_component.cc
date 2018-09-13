@@ -61,7 +61,6 @@ bool PlanningComponent::Init() {
 
   writer_ = node_->CreateWriter<ADCTrajectory>(FLAGS_planning_trajectory_topic);
 
-
   return true;
 }
 

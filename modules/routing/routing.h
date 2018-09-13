@@ -23,7 +23,7 @@
 #include "modules/routing/proto/routing.pb.h"
 #include "modules/routing/proto/routing_config.pb.h"
 
-// #include "modules/common/monitor_log/monitor_log_buffer.h"
+#include "modules/common/monitor_log/monitor_log_buffer.h"
 #include "modules/common/status/status.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/routing/core/navigator.h"
@@ -65,7 +65,7 @@ class Routing {
   RoutingRequest FillLaneInfoIfMissing(const RoutingRequest &routing_request);
 
   std::unique_ptr<Navigator> navigator_ptr_;
-  // apollo::common::monitor::MonitorLogger monitor_logger_;
+  common::monitor::MonitorLogBuffer monitor_logger_buffer_;
 
   RoutingConfig routing_conf_;
   const hdmap::HDMap *hdmap_ = nullptr;
