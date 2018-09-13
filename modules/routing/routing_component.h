@@ -17,6 +17,8 @@
 #ifndef MODULES_ROUTING_ROUTING_COMPONENT_H_
 #define MODULES_ROUTING_ROUTING_COMPONENT_H_
 
+#include <memory>
+
 #include "cybertron/class_loader/class_loader.h"
 #include "cybertron/component/component.h"
 
@@ -25,7 +27,8 @@
 namespace apollo {
 namespace routing {
 
-class RoutingComponent final : public ::apollo::cybertron::Component<RoutingRequest> {
+class RoutingComponent final
+    : public ::apollo::cybertron::Component<RoutingRequest> {
  public:
   RoutingComponent() = default;
   ~RoutingComponent() = default;
@@ -40,9 +43,8 @@ class RoutingComponent final : public ::apollo::cybertron::Component<RoutingRequ
 
 CYBERTRON_REGISTER_COMPONENT(RoutingComponent)
 
-} // namespace routing
-} // namepsace apollo
+}  // namespace routing
+}  // namespace apollo
 
-
-#endif // MODULES_ROUTING_ROUTING_COMPONENT_H_
+#endif  // MODULES_ROUTING_ROUTING_COMPONENT_H_
 

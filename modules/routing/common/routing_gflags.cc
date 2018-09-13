@@ -16,7 +16,8 @@
 
 #include "modules/routing/common/routing_gflags.h"
 
-DEFINE_string(routing_conf_file, "/apollo/modules/routing/conf/routing_config.pb.txt",
+DEFINE_string(routing_conf_file,
+              "/apollo/modules/routing/conf/routing_config.pb.txt",
               "default routing conf data file");
 
 DEFINE_string(routing_node_name, "routing", "the name for this node");

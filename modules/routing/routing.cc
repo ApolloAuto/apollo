@@ -54,9 +54,9 @@ apollo::common::Status Routing::Start() {
                                   "Navigator not ready");
   }
   AINFO << "Routing service is ready.";
-
-  //apollo::common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
-  //buffer.INFO("Routing started");
+  // FIXME(all): migrate monitor log when it is ready.
+  // apollo::common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
+  // buffer.INFO("Routing started");
   return apollo::common::Status::OK();
 }
 
@@ -95,15 +95,15 @@ bool Routing::Process(
     RoutingResponse* const routing_response) {
   CHECK_NOTNULL(routing_response);
   AINFO << "Get new routing request:" << routing_request->DebugString();
-  //apollo::common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
+  // apollo::common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
   const auto& fixed_request = FillLaneInfoIfMissing(*routing_request);
   if (!navigator_ptr_->SearchRoute(fixed_request, routing_response)) {
     AERROR << "Failed to search route with navigator.";
 
-    //buffer.WARN("Routing failed! " + routing_response->status().msg());
+    // buffer.WARN("Routing failed! " + routing_response->status().msg());
     return false;
   }
-  //buffer.INFO("Routing success!");
+  // buffer.INFO("Routing success!");
   return true;
 }
 

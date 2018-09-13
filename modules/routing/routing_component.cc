@@ -36,6 +36,6 @@ bool RoutingComponent::Proc(const std::shared_ptr<RoutingRequest>& request) {
   return true;
 }
 
-} // namespace routing
-} // namepsace apollo
+}  // namespace routing
+}  // namespace apollo
 

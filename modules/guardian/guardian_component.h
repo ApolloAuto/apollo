@@ -22,6 +22,7 @@
 #define MODEULES_GUARDIAN_GUARDIAN_COMPONENT_H_
 
 #include <map>
+#include <memory>
 #include <mutex>
 #include <queue>
 #include <string>
