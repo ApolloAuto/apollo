@@ -125,7 +125,7 @@ bool PredictionComponent::Init() {
 
   // TODO(all) move channel names to conf
   localization_reader_ = node_->CreateReader<LocalizationEstimate>(
-    "/apollo/localization",
+    prediction_conf_.pose_channel(),
     [this](const std::shared_ptr<LocalizationEstimate>& localization) {
         ADEBUG << "Received localization data: run localization callback.";
         std::lock_guard<std::mutex> lock(mutex_);
@@ -133,7 +133,7 @@ bool PredictionComponent::Init() {
     });
 
   planning_reader_ = node_->CreateReader<ADCTrajectory>(
-    "/apollo/planning",
+    prediction_conf_.planning_trajectory_channel(),
     [this](const std::shared_ptr<ADCTrajectory>& adc_trajectory) {
         ADEBUG << "Received planning data: run planning callback.";
         std::lock_guard<std::mutex> lock(mutex_);
