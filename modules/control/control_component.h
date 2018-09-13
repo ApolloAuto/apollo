@@ -50,7 +50,7 @@ using apollo::cybertron::Writer;
  * @brief control module main class, it processes localization, chasiss, and
  * pad data to compute throttle, brake and steer values.
  */
-class Control : public apollo::cybertron::TimerComponent {
+class ControlComponent : public apollo::cybertron::TimerComponent {
   friend class ControlTestBase;
 
  public:
@@ -97,7 +97,6 @@ class Control : public apollo::cybertron::TimerComponent {
 
   ControlConf control_conf_;
 
-  apollo::common::monitor::MonitorLogger monitor_logger_;
   std::mutex mutex_;
 
   std::shared_ptr<Reader<apollo::canbus::Chassis>> chassis_reader_;
@@ -108,6 +107,7 @@ class Control : public apollo::cybertron::TimerComponent {
   std::shared_ptr<Writer<apollo::control::ControlCommand>> control_cmd_writer_;
 };
 
+CYBERTRON_REGISTER_COMPONENT(ControlComponent)
 }  // namespace control
 }  // namespace apollo
 
