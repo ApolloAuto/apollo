@@ -19,6 +19,7 @@
 #include <algorithm>
 #include <cmath>
 #include <memory>
+#include <mutex>
 #include <vector>
 
 #include "boost/filesystem.hpp"
@@ -60,39 +61,39 @@ std::string PredictionComponent::Name() const {
   return FLAGS_prediction_module_name;
 }
 
-// void PredictionComponent::ProcessRosbag(const std::string& filename) {
-//   const std::vector<std::string> topics{FLAGS_perception_obstacle_topic,
-//                                         FLAGS_localization_topic};
-//   rosbag::Bag bag;
-//   try {
-//     bag.open(filename, rosbag::bagmode::Read);
-//   } catch (const rosbag::BagIOException& e) {
-//     AERROR << "BagIOException when open bag: " << filename
-//            << " Exception: " << e.what();
-//     bag.close();
-//     return;
-//   } catch (...) {
-//     AERROR << "Failed to open bag: " << filename;
-//     bag.close();
-//     return;
-//   }
-//   rosbag::View view(bag, rosbag::TopicQuery(topics));
-//   for (auto it = view.begin(); it != view.end(); ++it) {
-//     if (it->getTopic() == FLAGS_localization_topic) {
-//       OnLocalization(*(it->instantiate<LocalizationEstimate>()));
-//     } else if (it->getTopic() == FLAGS_perception_obstacle_topic) {
-//       RunOnce(*(it->instantiate<PerceptionObstacles>()));
-//     }
-//   }
-//   bag.close();
-// }
-
 void PredictionComponent::ProcessOfflineData(const std::string& filename) {
   // TODO(all) implement
+
+  /**
+   const std::vector<std::string> topics{FLAGS_perception_obstacle_topic,
+                                         FLAGS_localization_topic};
+   rosbag::Bag bag;
+   try {
+     bag.open(filename, rosbag::bagmode::Read);
+   } catch (const rosbag::BagIOException& e) {
+     AERROR << "BagIOException when open bag: " << filename
+            << " Exception: " << e.what();
+     bag.close();
+     return;
+   } catch (...) {
+     AERROR << "Failed to open bag: " << filename;
+     bag.close();
+     return;
+   }
+   rosbag::View view(bag, rosbag::TopicQuery(topics));
+   for (auto it = view.begin(); it != view.end(); ++it) {
+     if (it->getTopic() == FLAGS_localization_topic) {
+       OnLocalization(*(it->instantiate<LocalizationEstimate>()));
+     } else if (it->getTopic() == FLAGS_perception_obstacle_topic) {
+       RunOnce(*(it->instantiate<PerceptionObstacles>()));
+     }
+   }
+   bag.close();
+   **/
 }
 
 bool PredictionComponent::Init() {
-  start_time_ = Clock::NowInSeconds();
+  component_start_time_ = Clock::NowInSeconds();
 
   // Load prediction conf
   prediction_conf_.Clear();
@@ -193,7 +194,8 @@ bool PredictionComponent::Proc(
     const std::shared_ptr<LocalizationEstimate>& localization,
     const std::shared_ptr<ADCTrajectory>& adc_trajectory) {
   if (FLAGS_prediction_test_mode &&
-      (Clock::NowInSeconds() - start_time_ > FLAGS_prediction_test_duration)) {
+      (Clock::NowInSeconds() - component_start_time_
+          > FLAGS_prediction_test_duration)) {
     AINFO << "Prediction finished running in test mode";
     // TODO(kechxu) accord to cybertron
     // ros::shutdown();
@@ -238,8 +240,7 @@ bool PredictionComponent::Proc(
     double y = adc->position().y();
     ADEBUG << "Get ADC position [" << std::fixed << std::setprecision(6) << x
            << ", " << std::fixed << std::setprecision(6) << y << "].";
-    Vec2d adc_position(x, y);
-    adc_container->SetPosition(adc_position);
+    adc_container->SetPosition({x, y});
   }
 
   // Make evaluations

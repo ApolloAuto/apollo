@@ -30,7 +30,7 @@
 
 #include "modules/common/adapters/proto/adapter_config.pb.h"
 
-#include "modules/common/macro.h"
+#include "cybertron/common/macros.h"
 #include "modules/prediction/container/container.h"
 
 /**

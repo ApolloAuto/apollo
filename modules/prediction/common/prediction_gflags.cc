@@ -14,14 +14,14 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "modules/prediction/common/prediction_gflags.h"
+
 #include <cmath>
 #include <limits>
 
-#include "modules/prediction/common/prediction_gflags.h"
-
 // System gflags
 DEFINE_string(prediction_module_name, "prediction",
-              "Default prediciton module name");
+              "Default prediction module name");
 DEFINE_string(prediction_conf_file,
               "/apollo/modules/prediction/conf/prediction_conf.pb.txt",
               "Default conf file for prediction");

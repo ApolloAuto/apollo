@@ -21,7 +21,7 @@
 #ifndef MODULES_PREDICTION_SCENARIO_SCENARIO_MANAGER_H_
 #define MODULES_PREDICTION_SCENARIO_SCENARIO_MANAGER_H_
 
-#include "modules/common/macro.h"
+#include "cybertron/common/macros.h"
 #include "modules/common/proto/scenario.pb.h"
 #include "modules/prediction/proto/prediction_conf.pb.h"
 #include "modules/prediction/scenario/feature_extractor/feature_extractor.h"

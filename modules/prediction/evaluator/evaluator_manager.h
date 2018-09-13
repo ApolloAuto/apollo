@@ -25,10 +25,9 @@
 #include <map>
 #include <memory>
 
+#include "cybertron/common/macros.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/prediction/proto/prediction_conf.pb.h"
-
-#include "modules/common/macro.h"
 #include "modules/prediction/evaluator/evaluator.h"
 
 /**
