@@ -21,9 +21,10 @@
 #ifndef MODULES_PREDICTION_PREDICTION_COMPONENT_H_
 #define MODULES_PREDICTION_PREDICTION_COMPONENT_H_
 
-#include <memory>
 #include <string>
 #include <vector>
+#include <memory>
+#include <mutex>
 
 #include "cybertron/component/component.h"
 #include "modules/common/status/status.h"
@@ -61,6 +62,10 @@ class PredictionComponent :
    */
   bool Init() override;
 
+  /**
+   * @brief Data callback upon receiving a perception obstacle message.
+   * @param perception_obstacles received message.
+   */
   bool Proc(const std::shared_ptr<perception::PerceptionObstacles>&
             perception_obstacles) override;
 
@@ -74,13 +79,6 @@ class PredictionComponent :
    * @brief Stop the node
    */
   void Stop();
-
-  /**
-   * @brief Data callback upon receiving a perception obstacle message.
-   * @param perception_obstacles received message.
-   */
-  void RunOnce(
-      const perception::PerceptionObstacles &perception_obstacles);
 
  private:
   common::Status OnError(const std::string &error_msg);
@@ -101,6 +99,11 @@ class PredictionComponent :
   PredictionConf prediction_conf_;
 
   common::adapter::AdapterManagerConfig adapter_conf_;
+  std::shared_ptr<Reader<localization::LocalizationEstimate>>
+  localization_reader_;
+  std::shared_ptr<Reader<planning::ADCTrajectory>> planning_reader_;
+
+  std::mutex mutex_;
 };
 
 CYBERTRON_REGISTER_COMPONENT(PredictionComponent)

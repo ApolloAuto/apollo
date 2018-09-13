@@ -54,6 +54,7 @@ using apollo::common::util::Glob;
 using apollo::localization::LocalizationEstimate;
 using apollo::perception::PerceptionObstacle;
 using apollo::perception::PerceptionObstacles;
+using apollo::planning::ADCTrajectory;
 
 std::string PredictionComponent::Name() const {
   return FLAGS_prediction_module_name;
@@ -122,16 +123,29 @@ bool PredictionComponent::Init() {
   EvaluatorManager::Instance()->Init(prediction_conf_);
   PredictorManager::Instance()->Init(prediction_conf_);
 
+  // TODO(all) move channel names to conf
+  localization_reader_ = node_->CreateReader<LocalizationEstimate>(
+    "/apollo/localization",
+    [this](const std::shared_ptr<LocalizationEstimate>& localization) {
+        ADEBUG << "Received localization data: run localization callback.";
+        std::lock_guard<std::mutex> lock(mutex_);
+        OnLocalization(*localization);
+    });
+
+  planning_reader_ = node_->CreateReader<ADCTrajectory>(
+    "/apollo/planning",
+    [this](const std::shared_ptr<ADCTrajectory>& adc_trajectory) {
+        ADEBUG << "Received planning data: run planning callback.";
+        std::lock_guard<std::mutex> lock(mutex_);
+        OnPlanning(*adc_trajectory);
+    });
+
   // CHECK(AdapterManager::GetLocalization())
   // << "Localization is not registered.";
   // CHECK(AdapterManager::GetPerceptionObstacles())
   //     << "Perception is not registered.";
 
   /* TODO(kechxu) recover callbacks according to cybertron
-  // Set localization callback function
-  AdapterManager::AddLocalizationCallback(&Prediction::OnLocalization, this);
-  // Set planning callback function
-  AdapterManager::AddPlanningCallback(&Prediction::OnPlanning, this);
   // Set perception obstacle callback function
   AdapterManager::AddPerceptionObstaclesCallback(&Prediction::RunOnce, this);
   */
@@ -170,13 +184,6 @@ bool PredictionComponent::Init() {
   return true;
 }
 
-bool PredictionComponent::Proc(
-    const std::shared_ptr<perception::PerceptionObstacles>&
-    perception_obstacles) {
-  // TODO(all) implement
-  return true;
-}
-
 Status PredictionComponent::Start() { return Status::OK(); }
 
 void PredictionComponent::Stop() {
@@ -209,8 +216,8 @@ void PredictionComponent::OnPlanning(
          << "].";
 }
 
-void PredictionComponent::RunOnce(
-    const PerceptionObstacles& perception_obstacles) {
+bool PredictionComponent::Proc(
+    const std::shared_ptr<PerceptionObstacles>& perception_obstacles) {
   if (FLAGS_prediction_test_mode && FLAGS_prediction_test_duration > 0.0 &&
       (Clock::NowInSeconds() - start_time_ > FLAGS_prediction_test_duration)) {
     AINFO << "Prediction finished running in test mode";
@@ -222,7 +229,7 @@ void PredictionComponent::RunOnce(
   // AdapterManager::Observe();
   if (FLAGS_use_navigation_mode && !PredictionMap::Ready()) {
     AERROR << "Relative map is empty.";
-    return;
+    return false;
   }
 
   double start_timestamp = Clock::NowInSeconds();
@@ -232,10 +239,10 @@ void PredictionComponent::RunOnce(
       ContainerManager::Instance()->GetContainer(
           AdapterConfig::PERCEPTION_OBSTACLES));
   CHECK_NOTNULL(obstacles_container);
-  obstacles_container->Insert(perception_obstacles);
+  obstacles_container->Insert(*perception_obstacles);
 
   ADEBUG << "Received a perception message ["
-         << perception_obstacles.ShortDebugString() << "].";
+         << perception_obstacles->ShortDebugString() << "].";
 
   // Update ADC status
   PoseContainer* pose_container = dynamic_cast<PoseContainer*>(
@@ -258,26 +265,26 @@ void PredictionComponent::RunOnce(
   }
 
   // Make evaluations
-  EvaluatorManager::Instance()->Run(perception_obstacles);
+  EvaluatorManager::Instance()->Run(*perception_obstacles);
 
-  // No prediction for offline mode
+  // No prediction trajectories for offline mode
   if (FLAGS_prediction_offline_mode) {
-    return;
+    return true;
   }
 
   // Make predictions
-  PredictorManager::Instance()->Run(perception_obstacles);
+  PredictorManager::Instance()->Run(*perception_obstacles);
 
   auto prediction_obstacles =
       PredictorManager::Instance()->prediction_obstacles();
   prediction_obstacles.set_start_timestamp(start_timestamp);
   prediction_obstacles.set_end_timestamp(Clock::NowInSeconds());
   prediction_obstacles.mutable_header()->set_lidar_timestamp(
-      perception_obstacles.header().lidar_timestamp());
+      perception_obstacles->header().lidar_timestamp());
   prediction_obstacles.mutable_header()->set_camera_timestamp(
-      perception_obstacles.header().camera_timestamp());
+      perception_obstacles->header().camera_timestamp());
   prediction_obstacles.mutable_header()->set_radar_timestamp(
-      perception_obstacles.header().radar_timestamp());
+      perception_obstacles->header().radar_timestamp());
 
   if (FLAGS_prediction_test_mode) {
     for (auto const& prediction_obstacle :
@@ -287,7 +294,7 @@ void PredictionComponent::RunOnce(
           if (!ValidationChecker::ValidTrajectoryPoint(trajectory_point)) {
             AERROR << "Invalid trajectory point ["
                    << trajectory_point.ShortDebugString() << "]";
-            return;
+            return false;
           }
         }
       }
@@ -295,6 +302,7 @@ void PredictionComponent::RunOnce(
   }
   // TODO(all) accord to cybertron
   // Publish(&prediction_obstacles);
+  return true;
 }
 
 Status PredictionComponent::OnError(const std::string& error_msg) {
