@@ -30,7 +30,6 @@
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/planning/proto/planning.pb.h"
-#include "modules/prediction/prediction_interface.h"
 #include "modules/prediction/proto/prediction_conf.pb.h"
 
 /**
