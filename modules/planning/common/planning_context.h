@@ -31,7 +31,7 @@
 
 /**
  * @brief PlanningContext is the runtime context in planning. It is
- * persistant across multiple frames.
+ * persistent across multiple frames.
  */
 namespace apollo {
 namespace planning {

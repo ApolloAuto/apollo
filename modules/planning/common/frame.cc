@@ -35,6 +35,7 @@
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/map/pnc_map/pnc_map.h"
+#include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/reference_line/reference_line_provider.h"
 
@@ -121,7 +122,18 @@ bool Frame::Rerouting() {
     AERROR << "Failed to find future waypoints";
     return false;
   }
-  // AdapterManager::PublishRoutingRequest(request);
+
+  PlanningContext::Instance()
+      ->mutable_planning_status()
+      ->mutable_rerouting()
+      ->set_need_rerouting(true);
+
+  PlanningContext::Instance()
+      ->mutable_planning_status()
+      ->mutable_rerouting()
+      ->mutable_routing_request()
+      ->CopyFrom(request);
+
   // apollo::common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
   // buffer.INFO("Planning send Rerouting request");
   return true;

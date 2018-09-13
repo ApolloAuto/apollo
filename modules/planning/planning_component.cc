@@ -18,6 +18,7 @@
 #include "modules/common/adapters/adapter_gflags.h"
 
 #include "modules/common/util/message_util.h"
+#include "modules/planning/common/planning_context.h"
 #include "modules/planning/std_planning.h"
 
 namespace apollo {
@@ -59,7 +60,11 @@ bool PlanningComponent::Init() {
         });
   }
 
-  writer_ = node_->CreateWriter<ADCTrajectory>(FLAGS_planning_trajectory_topic);
+  planning_writer_ =
+      node_->CreateWriter<ADCTrajectory>(FLAGS_planning_trajectory_topic);
+
+  rerouting_writer_ = node_->CreateWriter<routing::RoutingRequest>(
+      "/apollo/routing/routing_request");
 
   return true;
 }
@@ -70,6 +75,10 @@ bool PlanningComponent::Proc(
     const std::shared_ptr<canbus::Chassis>& chassis,
     const std::shared_ptr<localization::LocalizationEstimate>&
         localization_estimate) {
+  // check and process possible rerouting request
+  Rerouting();
+
+  // process fused input data
   local_view_.prediction_obstacles = prediction_obstacles;
   local_view_.chassis = chassis;
   local_view_.localization_estimate = localization_estimate;
@@ -88,8 +97,21 @@ bool PlanningComponent::Proc(
   planning_base_->RunOnce(local_view_, &adc_trajectory_pb);
 
   common::util::FillHeader(node_->Name(), &adc_trajectory_pb);
-  writer_->Write(std::make_shared<ADCTrajectory>(adc_trajectory_pb));
+  planning_writer_->Write(std::make_shared<ADCTrajectory>(adc_trajectory_pb));
   return true;
+}
+
+void PlanningComponent::Rerouting() {
+  auto* rerouting = PlanningContext::Instance()
+                        ->mutable_planning_status()
+                        ->mutable_rerouting();
+  if (!rerouting->need_rerouting()) {
+    return;
+  }
+  common::util::FillHeader(node_->Name(), rerouting->mutable_routing_request());
+  rerouting->set_need_rerouting(false);
+  rerouting_writer_->Write(
+      std::make_shared<routing::RoutingRequest>(rerouting->routing_request()));
 }
 
 }  // namespace planning
