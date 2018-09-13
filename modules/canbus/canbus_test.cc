@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/canbus.h"
+#include "modules/canbus/canbus_component.h"
 
 #include "gtest/gtest.h"
 
@@ -22,8 +22,8 @@ namespace apollo {
 namespace canbus {
 
 TEST(CanbusTest, Simple) {
-  Canbus cb;
-  EXPECT_EQ(cb.Name(), "canbus");
+  CanbusComponent cb;
+  EXPECT_EQ(cb.Name(), "canbus_component");
 }
 
 }  // namespace canbus

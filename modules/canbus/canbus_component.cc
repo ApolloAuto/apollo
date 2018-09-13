@@ -18,8 +18,9 @@
 
 #include "modules/canbus/common/canbus_gflags.h"
 #include "modules/canbus/vehicle/vehicle_factory.h"
-#include "modules/common/adapters/adapter_manager.h"
-#include "modules/common/adapters/proto/adapter_config.pb.h"
+// #include "modules/common/adapters/adapter_manager.h"
+// #include "modules/common/adapters/proto/adapter_config.pb.h"
+#include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/time/time.h"
 #include "modules/common/util/util.h"
 #include "modules/drivers/canbus/can_client/can_client_factory.h"
@@ -37,14 +38,10 @@ using apollo::guardian::GuardianCommand;
 
 std::string CanbusComponent::Name() const { return FLAGS_canbus_module_name; }
 
-Status CanbusComponent::Init() {
-  AdapterManager::Init(FLAGS_canbus_adapter_config_filename);
-  AINFO << "The adapter manager is successfully initialized.";
-
-  // load conf
-  if (!common::util::GetProtoFromFile(FLAGS_canbus_conf_file, &canbus_conf_)) {
-    return OnError("Unable to load canbus conf file: " +
-                   FLAGS_canbus_conf_file);
+bool CanbusComponent::Init() {
+  if (!GetProtoConfig(&canbus_conf_)) {
+    AERROR << "Unable to load canbus conf file: " << ConfigFilePath();
+    return false;
   }
 
   AINFO << "The canbus conf file is loaded: " << FLAGS_canbus_conf_file;
@@ -97,19 +94,18 @@ Status CanbusComponent::Init() {
   }
   AINFO << "The vehicle controller is successfully initialized.";
 
-  CHECK(AdapterManager::GetControlCommand()) << "Control is not initialized.";
-  CHECK(AdapterManager::GetGuardian()) << "Guardian is not initialized.";
-  // TODO(QiL) : depreacte this
-  if (!FLAGS_receive_guardian) {
-    AdapterManager::AddControlCommandCallback(&Canbus::OnControlCommand, this);
-  } else {
-    AdapterManager::AddGuardianCallback(&Canbus::OnGuardianCommand, this);
-  }
+  guardian_cmd_reader_ = node_->CreateReader<GuardianCommand>(
+      FLAGS_guardian_topic,
+      [this](const std::shared_ptr<GuardianCommand> &cmd) {
+        ADEBUG << "Received guardian data: run canbus callback.";
+        OnGuardianCommand(const GuardianCommand &cmd)
+      });
 
-  return Status::OK();
-}
+  chassis_writer_ = node_->CreateWriter<Chassis>(FLAGS_chassis_topic);
 
-Status CanbusComponent::Start() {
+  chassis_detail_writer_ =
+      node_->CreateWriter<ChassisDetail>(FLAGS_chassis_detail_topic);
+
   // 1. init and start the can card hardware
   if (can_client_->Start() != ErrorCode::OK) {
     return OnError("Failed to start can client");
@@ -132,23 +128,18 @@ Status CanbusComponent::Start() {
     return OnError("Failed to start vehicle controller.");
   }
 
-  // 5. set timer to triger publish info periodly
-  const double duration = 1.0 / FLAGS_chassis_freq;
-  timer_ = AdapterManager::CreateTimer(ros::Duration(duration),
-                                       &Canbus::OnTimer, this);
-
   // last step: publish monitor messages
   apollo::common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
   buffer.INFO("Canbus is started.");
 
-  return Status::OK();
+  return true;
 }
 
 void CanbusComponent::PublishChassis() {
   Chassis chassis = vehicle_controller_->chassis();
-  AdapterManager::FillChassisHeader(FLAGS_canbus_node_name, &chassis);
-
-  AdapterManager::PublishChassis(chassis);
+  // AdapterManager::FillChassisHeader(FLAGS_canbus_node_name, &chassis);
+  // AdapterManager::PublishChassis(chassis);
+  chassis_writer_->Write(std::make_shared<Chassis>(chassis));
   ADEBUG << chassis.ShortDebugString();
 }
 
@@ -156,24 +147,17 @@ void CanbusComponent::PublishChassisDetail() {
   ChassisDetail chassis_detail;
   message_manager_->GetSensorData(&chassis_detail);
   ADEBUG << chassis_detail.ShortDebugString();
-
-  AdapterManager::PublishChassisDetail(chassis_detail);
+  // AdapterManager::PublishChassisDetail(chassis_detail);
+  chassis_detail_writer_->Write(
+      std::make_shared<ChassisDetail>(chassis_detail));
 }
 
-void CanbusComponent::OnTimer(const ros::TimerEvent &) {
+bool CanbusComponent::Proc() {
   PublishChassis();
   if (FLAGS_enable_chassis_detail_pub) {
     PublishChassisDetail();
   }
-}
-
-void CanbusComponent::Stop() {
-  timer_.stop();
-
-  can_sender_.Stop();
-  can_receiver_.Stop();
-  can_client_->Stop();
-  vehicle_controller_->Stop();
+  return true;
 }
 
 void CanbusComponent::OnControlCommand(const ControlCommand &control_command) {
@@ -201,7 +185,8 @@ void CanbusComponent::OnControlCommand(const ControlCommand &control_command) {
   can_sender_.Update();
 }
 
-void CanbusComponent::OnGuardianCommand(const GuardianCommand &guardian_command) {
+void CanbusComponent::OnGuardianCommand(
+    const GuardianCommand &guardian_command) {
   apollo::control::ControlCommand control_command;
   control_command.CopyFrom(guardian_command.control_command());
   OnControlCommand(control_command);
