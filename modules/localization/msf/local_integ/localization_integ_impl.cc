@@ -182,7 +182,6 @@ void LocalizationIntegImpl::PcdThreadLoop() {
         continue;
       }
     }
-
     LidarFrame lidar_frame;
     int waiting_num = 0;
     {
@@ -713,7 +712,7 @@ void LocalizationIntegImpl::CheckImuMissingStatus(double cur_imu_time) {
                    ImuMsgMissingStatus::IMU_MISSING_1);
   } else if (delta_time < 0.0) {
     ADEBUG << std::setprecision(16)
-           << "Received imu message's time " 
+           << "Received imu message's time "
            << "is earlier than last imu message,"
            << "the pre time and current time: "
            << pre_imu_time << " "
@@ -743,11 +742,11 @@ void LocalizationIntegImpl::CheckGnssLidarMsfStatus(double cur_imu_time) {
           << "imu time and latest local lidar time: "
           << cur_imu_time << " "
           << latest_lidar_timestamp_;
-    msf_status_.set_local_lidar_status(LocalLidarStatus::MSF_LOCAL_LIDAR_NO_OUTPUT);
+    msf_status_.set_local_lidar_status(
+      LocalLidarStatus::MSF_LOCAL_LIDAR_NO_OUTPUT);
   }
   latest_lidar_timestamp_mutex_.unlock();
   msf_status_mutex_.unlock();
-
 }
 
 void LocalizationIntegImpl::SetLocalizationStatus(
@@ -812,7 +811,7 @@ void LocalizationIntegImpl::SetLocalizationStatus(
                 apollo::localization::MSF_SOL_X_XXX);
           }
       }
-  } else if (position_std.x() < 0.3 * 0.3 && position_std.y() < 0.3 * 0.3) {
+  } else if (position_std.x() < 0.3 && position_std.y() < 0.3) {
       if (msf_status_.gnsspos_position_type()
             == apollo::localization::NARROW_INT ||
           msf_status_.gnsspos_position_type()

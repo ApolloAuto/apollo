@@ -26,6 +26,7 @@
 #include <functional>
 #include <list>
 #include <queue>
+#include "gtest/gtest_prod.h"
 
 #include "modules/common/status/status.h"
 #include "modules/localization/msf/local_integ/localization_gnss_process.h"
@@ -180,6 +181,10 @@ class LocalizationIntegImpl {
   std::mutex latest_gnsspos_timestamp_mutex_;
   double latest_lidar_timestamp_;
   std::mutex latest_lidar_timestamp_mutex_;
+
+  FRIEND_TEST(LocalizationIntegImplTestSuite, CheckImuDelayStatus);
+  FRIEND_TEST(LocalizationIntegImplTestSuite, CheckImuMissingStatus);
+  FRIEND_TEST(LocalizationIntegImplTestSuite, SetLocalizationStatus);
 };
 
 }  // namespace msf
