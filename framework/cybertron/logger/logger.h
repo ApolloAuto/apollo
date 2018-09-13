@@ -42,4 +42,4 @@ class Logger : public google::base::Logger {
 }  // namespace cybertron
 }  // namespace apollo
 
-#endif // CYBERTRON_LOGGER_LOGGER_H_
+#endif  // CYBERTRON_LOGGER_LOGGER_H_

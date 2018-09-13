@@ -14,9 +14,9 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "cybertron/record/record_file.h"
 #include "cybertron/record/record_reader.h"
 #include "cybertron/record/header_builder.h"
+#include "cybertron/record/record_file.h"
 
 #include <gtest/gtest.h>
 #include <unistd.h>
@@ -35,7 +35,6 @@ const std::string STR_10B = "1234567890";
 const std::string TEST_FILE = "test.record";
 
 TEST(RecordReaderTest, TestOneMessageFile) {
-
   // writer open one message file
   RecordFileWriter* rfw = new RecordFileWriter();
   ASSERT_TRUE(rfw->Open(TEST_FILE));

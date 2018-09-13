@@ -24,9 +24,7 @@ RecordBase::RecordBase() {}
 
 RecordBase::~RecordBase() {}
 
-const Header RecordBase::GetHeader() const{
-  return header_;
-}
+const Header RecordBase::GetHeader() const { return header_; }
 
 void RecordBase::OnNewChannel(const std::string& channel_name,
                               const std::string& message_type,

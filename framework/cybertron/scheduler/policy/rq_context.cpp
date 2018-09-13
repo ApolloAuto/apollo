@@ -73,8 +73,7 @@ std::shared_ptr<CRoutine> RQContext::NextRoutine() {
 bool RQContext::Enqueue(const std::shared_ptr<CRoutine>& cr) {
   std::lock_guard<std::mutex> lg(mtx_run_queue_);
   auto itr = run_queue_.begin();
-  for (auto itr = run_queue_.begin(); itr != run_queue_.end();
-       ++itr) {
+  for (auto itr = run_queue_.begin(); itr != run_queue_.end(); ++itr) {
     if ((*itr)->Priority() < cr->Priority()) {
       run_queue_.insert(itr, cr);
       return true;

@@ -26,8 +26,8 @@
 #include "cybertron/data/cache_buffer.h"
 #include "cybertron/data/channel_buffer.h"
 #include "cybertron/data/data_notifier.h"
-#include "cybertron/time/time.h"
 #include "cybertron/init.h"
+#include "cybertron/time/time.h"
 
 namespace apollo {
 namespace cybertron {

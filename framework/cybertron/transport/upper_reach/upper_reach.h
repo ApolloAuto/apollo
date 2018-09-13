@@ -21,9 +21,9 @@
 #include <memory>
 #include <string>
 
+#include "cybertron/event/perf_event_cache.h"
 #include "cybertron/transport/common/endpoint.h"
 #include "cybertron/transport/message/message_info.h"
-#include "cybertron/event/perf_event_cache.h"
 
 namespace apollo {
 namespace cybertron {
@@ -44,8 +44,7 @@ class UpperReach : public Endpoint {
   virtual void Disable(const RoleAttributes& opposite_attr);
 
   virtual bool Transmit(const MessagePtr& msg);
-  virtual bool Transmit(const MessagePtr& msg,
-                        const MessageInfo& msg_info) = 0;
+  virtual bool Transmit(const MessagePtr& msg, const MessageInfo& msg_info) = 0;
 
   uint64_t NextSeqNum() { return ++seq_num_; }
 
@@ -70,7 +69,7 @@ template <typename MessageT>
 bool UpperReach<MessageT>::Transmit(const MessagePtr& msg) {
   msg_info_.set_seq_num(NextSeqNum());
   apollo::cybertron::event::PerfEventCache::Instance()->AddTransportEvent(
-                  1, attr_.channel_id(), msg_info_.seq_num());
+      1, attr_.channel_id(), msg_info_.seq_num());
   return Transmit(msg, msg_info_);
 }
 

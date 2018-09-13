@@ -29,8 +29,10 @@ namespace logger {
 #define PATH_SEPARATOR '/'
 static bool stop_writing = false;
 static const int NUM_SEVERITIES = 4;
-static const char* const UC_LOG_SEVERITY_NAMES[NUM_SEVERITIES] = {"INFO", "WARNING", "ERROR", "FATAL"};
-static const char* const LC_LOG_SEVERITY_NAMES[NUM_SEVERITIES] = {"info", "warning", "error", "fatal"};
+static const char* const UC_LOG_SEVERITY_NAMES[NUM_SEVERITIES] = {
+    "INFO", "WARNING", "ERROR", "FATAL"};
+static const char* const LC_LOG_SEVERITY_NAMES[NUM_SEVERITIES] = {
+    "info", "warning", "error", "fatal"};
 
 LogFileObject::LogFileObject(google::LogSeverity severity,
                              const char* base_filename)
@@ -140,7 +142,7 @@ bool LogFileObject::CreateLogfile(const std::string& time_pid_string) {
     // Make the symlink be relative (in the same dir) so that if the
     // entire log directory gets relocated the link is still valid.
     const char* linkdest = slash ? (slash + 1) : filename;
-    symlink(linkdest, linkpath.c_str()); // silently ignore failures
+    symlink(linkdest, linkpath.c_str());  // silently ignore failures
   }
   return true;
 }
@@ -154,7 +156,8 @@ void LogFileObject::Write(bool force_flush, time_t timestamp,
     return;
   }
 
-  if (static_cast<int>(file_length_ >> 20) >= ::apollo::cybertron::logger::MaxLogSize() ||
+  if (static_cast<int>(file_length_ >> 20) >=
+          ::apollo::cybertron::logger::MaxLogSize() ||
       apollo::cybertron::logger::PidHasChanged()) {
     if (file_ != NULL) fclose(file_);
     file_ = NULL;
@@ -190,7 +193,8 @@ void LogFileObject::Write(bool force_flush, time_t timestamp,
     if (base_filename_selected_) {
       bool success = false;
 
-      std::string stripped_filename = base_filename_ + ".log." + LC_LOG_SEVERITY_NAMES[severity_] + ".";
+      std::string stripped_filename =
+          base_filename_ + ".log." + LC_LOG_SEVERITY_NAMES[severity_] + ".";
 
       const std::vector<std::string>& log_dirs =
           ::apollo::cybertron::logger::GetLoggingDirectories();
@@ -255,7 +259,7 @@ void LogFileObject::Write(bool force_flush, time_t timestamp,
     if (::apollo::cybertron::logger::CycleClock_Now() >= next_flush_time_) {
       stop_writing = false;  // check to see if disk has free space.
     }
-    return;                  // no need to flush
+    return;  // no need to flush
   }
 
   // See important msgs *now*.  Also, flush logs at least every 10^6 chars,

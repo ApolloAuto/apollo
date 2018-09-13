@@ -22,12 +22,12 @@
 #include <mutex>
 #include <string>
 
+#include "cybertron/common/macros.h"
+#include "cybertron/proto/proto_desc.pb.h"
 #include "google/protobuf/compiler/parser.h"
 #include "google/protobuf/descriptor.h"
 #include "google/protobuf/dynamic_message.h"
 #include "google/protobuf/io/tokenizer.h"
-#include "cybertron/common/macros.h"
-#include "cybertron/proto/proto_desc.pb.h"
 
 namespace apollo {
 namespace cybertron {

@@ -28,11 +28,11 @@ namespace logger {
 
 static std::unordered_map<std::string, LogFileObject*> moduleLoggerMap;
 
-AsyncLogger::AsyncLogger(google::base::Logger* wrapped, int max_buffer_bytes) :
-    max_buffer_bytes_(max_buffer_bytes),
-    wrapped_(wrapped),
-    active_buf_(new Buffer()),
-    flushing_buf_(new Buffer()) {
+AsyncLogger::AsyncLogger(google::base::Logger* wrapped, int max_buffer_bytes)
+    : max_buffer_bytes_(max_buffer_bytes),
+      wrapped_(wrapped),
+      active_buf_(new Buffer()),
+      flushing_buf_(new Buffer()) {
   if (max_buffer_bytes_ <= 0) {
     max_buffer_bytes_ = 2 * 1024 * 1024;
   }
@@ -50,7 +50,7 @@ void AsyncLogger::Start() {
   CHECK_EQ(state_, INITTED);
   state_ = RUNNING;
   thread_ = std::thread(&AsyncLogger::RunThread, this);
-  //std::cout << "Async Logger Start!" << std::endl;
+  // std::cout << "Async Logger Start!" << std::endl;
 }
 
 void AsyncLogger::Stop() {
@@ -63,22 +63,20 @@ void AsyncLogger::Stop() {
   thread_.join();
   CHECK(active_buf_->messages.empty());
   CHECK(flushing_buf_->messages.empty());
-  //std::cout << "Async Logger Stop!" << std::endl;
+  // std::cout << "Async Logger Stop!" << std::endl;
 }
 
-void AsyncLogger::Write(bool force_flush,
-                        time_t timestamp,
-                        const char* message,
+void AsyncLogger::Write(bool force_flush, time_t timestamp, const char* message,
                         int message_len) {
   {
     std::unique_lock<std::mutex> lock(mutex_);
     if (state_ != RUNNING) {
-      //std::cout << "Async Logger not running!" << std::endl;
+      // std::cout << "Async Logger not running!" << std::endl;
       return;
     }
 
     // origin implementation
-    //while (BufferFull(*active_buf_)) {
+    // while (BufferFull(*active_buf_)) {
     //  free_buffer_cv_.wait(lock);
     //}
 
@@ -91,25 +89,30 @@ void AsyncLogger::Write(bool force_flush,
       return;
     }
 
-    switch(message[0]) {
+    switch (message[0]) {
       case 'F': {
-        active_buf_->add(Msg(timestamp, std::string(message, message_len), 3), force_flush);
+        active_buf_->add(Msg(timestamp, std::string(message, message_len), 3),
+                         force_flush);
         break;
       }
       case 'E': {
-        active_buf_->add(Msg(timestamp, std::string(message, message_len), 2), force_flush);
+        active_buf_->add(Msg(timestamp, std::string(message, message_len), 2),
+                         force_flush);
         break;
       }
       case 'W': {
-        active_buf_->add(Msg(timestamp, std::string(message, message_len), 1), force_flush);
+        active_buf_->add(Msg(timestamp, std::string(message, message_len), 1),
+                         force_flush);
         break;
       }
       case 'I': {
-        active_buf_->add(Msg(timestamp, std::string(message, message_len), 0), force_flush);
+        active_buf_->add(Msg(timestamp, std::string(message, message_len), 0),
+                         force_flush);
         break;
       }
       default: {
-        active_buf_->add(Msg(timestamp, std::string(message, message_len), -1), force_flush);
+        active_buf_->add(Msg(timestamp, std::string(message, message_len), -1),
+                         force_flush);
       }
     }
     wake_flusher_cv_.notify_one();
@@ -119,30 +122,28 @@ void AsyncLogger::Write(bool force_flush,
 void AsyncLogger::Flush() {
   std::unique_lock<std::mutex> lock(mutex_);
   if (state_ != RUNNING) {
-    //std::cout << "Async Logger not running!" << std::endl;
+    // std::cout << "Async Logger not running!" << std::endl;
     return;
   }
 
   // Wake up the writer thread at least twice.
   // This ensures that it has completely flushed both buffers.
   uint64_t orig_flush_count = flush_count_;
-  while (flush_count_ < (orig_flush_count + 2) &&
-         state_ == RUNNING) {
+  while (flush_count_ < (orig_flush_count + 2) && state_ == RUNNING) {
     active_buf_->flush = true;
     wake_flusher_cv_.notify_one();
     flush_complete_cv_.wait(lock);
   }
 }
 
-uint32_t AsyncLogger::LogSize() {
-  return wrapped_->LogSize();
-}
+uint32_t AsyncLogger::LogSize() { return wrapped_->LogSize(); }
 
 void AsyncLogger::RunThread() {
   std::unique_lock<std::mutex> lock(mutex_);
   while (state_ == RUNNING || active_buf_->needs_flush_or_write()) {
     while (!active_buf_->needs_flush_or_write() && state_ == RUNNING) {
-      if (wake_flusher_cv_.wait_for(lock, std::chrono::seconds(2)) == std::cv_status::timeout) {
+      if (wake_flusher_cv_.wait_for(lock, std::chrono::seconds(2)) ==
+          std::cv_status::timeout) {
         active_buf_->flush = true;
       }
     }
@@ -170,7 +171,8 @@ void AsyncLogger::RunThread() {
       }
       if (fileobject) {
         const bool should_flush = msg.level > 0;
-        fileobject->Write(should_flush, msg.ts, msg.message.data(), msg.message.size());
+        fileobject->Write(should_flush, msg.ts, msg.message.data(),
+                          msg.message.size());
       }
     }
 
@@ -190,6 +192,6 @@ bool AsyncLogger::BufferFull(const Buffer& buf) const {
   return buf.size > (max_buffer_bytes_ / 2);
 }
 
-} // namespace logger
-} // namespace cybertron
-} // namespace apollo
+}  // namespace logger
+}  // namespace cybertron
+}  // namespace apollo

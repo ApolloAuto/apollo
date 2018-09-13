@@ -63,7 +63,7 @@ void ParameterServer::SetParameter(const Parameter& parameter) {
 }
 
 bool ParameterServer::GetParameter(const std::string& parameter_name,
-                                    Parameter* parameter) {
+                                   Parameter* parameter) {
   std::lock_guard<std::mutex> lock(param_map_mutex_);
   auto ite = param_map_.find(parameter_name);
   if (ite == param_map_.end()) {

@@ -1,8 +1,7 @@
-#include <stdlib.h>
 #include "cybertron/common/file.h"
-#include "cybertron/proto/unit_test.pb.h"
 #include <gtest/gtest.h>
-
+#include <stdlib.h>
+#include "cybertron/proto/unit_test.pb.h"
 
 namespace apollo {
 namespace cybertron {
@@ -17,8 +16,10 @@ TEST(FileTest, proto_set_get_test) {
   EXPECT_TRUE(SetProtoToASCIIFile(message, "message.ascii"));
   EXPECT_TRUE(SetProtoToBinaryFile(message, "message.binary"));
 
-  EXPECT_FALSE(GetProtoFromASCIIFile("not_exists_dir/message.proto", &read_message));
-  EXPECT_FALSE(GetProtoFromBinaryFile("not_exists_dir/message.proto", &read_message));
+  EXPECT_FALSE(
+      GetProtoFromASCIIFile("not_exists_dir/message.proto", &read_message));
+  EXPECT_FALSE(
+      GetProtoFromBinaryFile("not_exists_dir/message.proto", &read_message));
   EXPECT_TRUE(GetProtoFromASCIIFile("message.ascii", &read_message));
   EXPECT_TRUE(GetProtoFromBinaryFile("message.binary", &read_message));
 
@@ -45,9 +46,11 @@ TEST(FileTest, file_utils_test) {
   EXPECT_EQ("/home/caros", GetAbsolutePath("/home/caros", ""));
   EXPECT_EQ("file.txt", GetAbsolutePath("", "file.txt"));
   EXPECT_EQ("/home/caros/README", GetAbsolutePath("", "/home/caros/README"));
-  EXPECT_EQ("/home/caros/file.txt", GetAbsolutePath("/home/caros/", "file.txt"));
+  EXPECT_EQ("/home/caros/file.txt",
+            GetAbsolutePath("/home/caros/", "file.txt"));
   EXPECT_EQ("/home/caros/file.txt", GetAbsolutePath("/home/caros", "file.txt"));
-  EXPECT_EQ("/home/caros/../file.txt", GetAbsolutePath("/home/caros/", "../file.txt"));
+  EXPECT_EQ("/home/caros/../file.txt",
+            GetAbsolutePath("/home/caros/", "../file.txt"));
 
   EXPECT_TRUE(PathExists("./"));
   EXPECT_FALSE(PathExists("not_exits_file"));
@@ -77,7 +80,7 @@ TEST(FileTest, file_utils_test) {
   std::vector<std::string> dirs = ListSubDirectories("/not_exists_directory");
   EXPECT_TRUE(dirs.empty());
   dirs = ListSubDirectories(current_path + "/1");
-  
+
   EXPECT_FALSE(RemoveAllFiles("/not_exists_dir"));
   EXPECT_FALSE(RemoveAllFiles(current_path + "/1"));
   EXPECT_TRUE(RemoveAllFiles(current_path + "/2"));
@@ -93,7 +96,6 @@ TEST(FileTest, file_utils_test) {
 }  // namespace common
 }  // namespace cybertron
 }  // namespace apollo
-
 
 int main(int argc, char** argv) {
   testing::GTEST_FLAG(catch_exceptions) = 1;

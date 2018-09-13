@@ -55,7 +55,8 @@ void TopologyManager::Shutdown() {
   change_signal_.DisconnectAllSlots();
 }
 
-TopologyManager::ChangeConnection TopologyManager::AddChangeListener(const ChangeFunc& func) {
+TopologyManager::ChangeConnection TopologyManager::AddChangeListener(
+    const ChangeFunc& func) {
   return change_signal_.Connect(func);
 }
 
@@ -108,8 +109,8 @@ bool TopologyManager::CreateParticipant() {
   std::string participant_name =
       common::GlobalData::Instance()->HostName() + '+' +
       std::to_string(common::GlobalData::Instance()->ProcessId());
-  participant_listener_ = new ParticipantListener(
-      std::bind(&TopologyManager::OnParticipantChange, this, std::placeholders::_1));
+  participant_listener_ = new ParticipantListener(std::bind(
+      &TopologyManager::OnParticipantChange, this, std::placeholders::_1));
   participant_ = std::make_shared<transport::Participant>(
       participant_name, 11511, participant_listener_);
   return true;
@@ -178,7 +179,8 @@ bool TopologyManager::Convert(const PartInfo& info, ChangeMsg* msg) {
 }
 
 bool TopologyManager::ParseParticipantName(const std::string& participant_name,
-                                    std::string* host_name, int* process_id) {
+                                           std::string* host_name,
+                                           int* process_id) {
   // participant_name format: host_name+process_id
   auto pos = participant_name.find('+');
   if (pos == std::string::npos) {

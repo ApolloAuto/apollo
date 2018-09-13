@@ -1,7 +1,7 @@
-#include "gtest/gtest.h"
-#include "cybertron/croutine/routine_factory.h"
 #include "cybertron/scheduler/scheduler.h"
+#include "cybertron/croutine/routine_factory.h"
 #include "cybertron/cybertron.h"
+#include "gtest/gtest.h"
 
 namespace apollo {
 namespace cybertron {
@@ -9,8 +9,7 @@ namespace scheduler {
 
 auto sched = Scheduler::Instance();
 
-void proc() {
-}
+void proc() {}
 
 TEST(SchedulerTest, create_task) {
   std::string croutine_name = "DriverProc";

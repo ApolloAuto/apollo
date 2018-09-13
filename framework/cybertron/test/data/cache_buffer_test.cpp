@@ -1,5 +1,5 @@
-#include <thread>
 #include <mutex>
+#include <thread>
 #include "gtest/gtest.h"
 
 #include "cybertron/data/cache_buffer.h"
@@ -14,8 +14,8 @@ TEST(CacheBufferTest, cache_buffer_test) {
   for (int i = 0; i < 32 - 1; i++) {
     buffer.Fill(std::move(i));
     EXPECT_FALSE(buffer.Full());
-  EXPECT_EQ(i, buffer[i + 1]);
-  EXPECT_EQ(i, buffer.at(i + 1));
+    EXPECT_EQ(i, buffer[i + 1]);
+    EXPECT_EQ(i, buffer.at(i + 1));
   }
   EXPECT_EQ(31, buffer.Size());
   EXPECT_EQ(1, buffer.Head());
@@ -27,7 +27,6 @@ TEST(CacheBufferTest, cache_buffer_test) {
   EXPECT_EQ(32, buffer.Size());
   CacheBuffer<int> buffer1(std::move(buffer));
 }
-
 
 }  // namespace data
 }  // namespace cybertron

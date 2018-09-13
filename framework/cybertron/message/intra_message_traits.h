@@ -29,43 +29,38 @@ namespace message {
 
 template <typename MessageT,
           typename std::enable_if<
-              std::is_base_of<IntraMessage, MessageT>::value,
-              int>::type = 0>
+              std::is_base_of<IntraMessage, MessageT>::value, int>::type = 0>
 inline bool SerializeToString(const MessageT& message, std::string* str) {
   return message.SerializeToString(str);
 }
 
 template <typename MessageT,
           typename std::enable_if<
-              std::is_base_of<IntraMessage, MessageT>::value,
-              int>::type = 0>
+              std::is_base_of<IntraMessage, MessageT>::value, int>::type = 0>
 inline bool ParseFromString(const std::string& str, MessageT* message) {
   return message->ParseFromString(str);
 }
 
 template <typename MessageT,
           typename std::enable_if<
-              std::is_base_of<IntraMessage, MessageT>::value,
-              int>::type = 0>
+              std::is_base_of<IntraMessage, MessageT>::value, int>::type = 0>
 inline std::string MessageType() {
   return MessageT::TypeName();
 }
 
 template <typename MessageT,
           typename std::enable_if<
-              std::is_base_of<IntraMessage, MessageT>::value,
-              int>::type = 0>
+              std::is_base_of<IntraMessage, MessageT>::value, int>::type = 0>
 std::string MessageType(const MessageT& message) {
   return message.TypeName();
 }
 
 template <typename MessageT,
           typename std::enable_if<
-              std::is_base_of<IntraMessage, MessageT>::value,
-              int>::type = 0>
+              std::is_base_of<IntraMessage, MessageT>::value, int>::type = 0>
 inline void GetDescriptorString(const std::string& type,
                                 std::string* desc_str) {
-  * desc_str = IntraMessage::GetDescriptorString();
+  *desc_str = IntraMessage::GetDescriptorString();
 }
 
 }  // namespace message

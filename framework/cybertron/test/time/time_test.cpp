@@ -1,7 +1,7 @@
-#include "gtest/gtest.h"
-#include <iostream>
 #include "cybertron/time/time.h"
+#include <iostream>
 #include "cybertron/time/duration.h"
+#include "gtest/gtest.h"
 
 namespace apollo {
 namespace cybertron {
@@ -44,9 +44,7 @@ TEST(TimeTest, to_string) {
   std::cout << t1.ToString().c_str() << std::endl;
 }
 
-TEST(TimeTest, now) {
-  std::cout << "Time Now: " << Time::Now() << std::endl;
-}
+TEST(TimeTest, now) { std::cout << "Time Now: " << Time::Now() << std::endl; }
 
 TEST(TimeTest, is_zero) {
   Time time;

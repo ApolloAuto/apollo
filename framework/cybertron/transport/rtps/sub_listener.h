@@ -41,10 +41,9 @@ using SubListenerPtr = std::shared_ptr<SubListener>;
 
 class SubListener : public eprosima::fastrtps::SubscriberListener {
  public:
-  using NewMsgCallback =
-      std::function<void(uint64_t channel_id,
-                         const std::shared_ptr<std::string>& msg_str,
-                         const MessageInfo& msg_info)>;
+  using NewMsgCallback = std::function<void(
+      uint64_t channel_id, const std::shared_ptr<std::string>& msg_str,
+      const MessageInfo& msg_info)>;
 
   explicit SubListener(const NewMsgCallback& callback);
   virtual ~SubListener();

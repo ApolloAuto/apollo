@@ -16,9 +16,9 @@
 
 #include "gtest/gtest.h"
 
-#include "cybertron/message/raw_message.h"
 #include "cybertron/component/component.h"
 #include "cybertron/init.h"
+#include "cybertron/message/raw_message.h"
 
 namespace apollo {
 namespace cybertron {
@@ -29,7 +29,8 @@ using apollo::cybertron::proto::ComponentConfig;
 using apollo::cybertron::proto::TimerComponentConfig;
 static bool ret_proc = true;
 static bool ret_init = true;
-template <typename M0, typename M1 = NullType, typename M2 = NullType, typename M3 = NullType>
+template <typename M0, typename M1 = NullType, typename M2 = NullType,
+          typename M3 = NullType>
 class Component_A : public Component<M0, M1, M2, M3> {
  public:
   Component_A() {}
@@ -93,8 +94,8 @@ TEST(TimerComponent, init) {
   compcfg.set_name("perception4");
   apollo::cybertron::proto::ReaderOption *read_opt4 = compcfg.add_readers();
   read_opt4->set_channel("/driver/channel");
-  auto comA =
-      std::make_shared<Component_A<RawMessage, RawMessage, RawMessage, RawMessage>>();
+  auto comA = std::make_shared<
+      Component_A<RawMessage, RawMessage, RawMessage, RawMessage>>();
   EXPECT_EQ(true, comA->Initialize(compcfg));
   EXPECT_EQ(true, comA->Process(msg_str1, msg_str2, msg_str3, msg_str4));
 }
@@ -126,8 +127,8 @@ TEST(TimerComponentFail, init) {
   compcfg.set_name("perception3_F");
   apollo::cybertron::proto::ReaderOption *read_opt3 = compcfg.add_readers();
   read_opt3->set_channel("/driver/channel");
-  auto comA =
-      std::make_shared<Component_A<RawMessage, RawMessage, RawMessage, RawMessage>>();
+  auto comA = std::make_shared<
+      Component_A<RawMessage, RawMessage, RawMessage, RawMessage>>();
   EXPECT_EQ(false, comA->Initialize(compcfg));
   EXPECT_EQ(false, comA->Process(msg_str1, msg_str2, msg_str3, msg_str4));
 }

@@ -266,9 +266,8 @@ bool Reactor::CreatePipe() {
   RETURN_VAL_IF(!SetNonBlocking(pipe_fd_[0]), false);
   RETURN_VAL_IF(!SetNonBlocking(pipe_fd_[1]), false);
 
-  return Add(
-      pipe_fd_[0], EPOLLIN,
-      std::bind(&Reactor::OnHandlerChanged, this, std::placeholders::_1));
+  return Add(pipe_fd_[0], EPOLLIN, std::bind(&Reactor::OnHandlerChanged, this,
+                                             std::placeholders::_1));
 }
 
 }  // namespace transport

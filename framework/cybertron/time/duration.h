@@ -35,9 +35,9 @@ class Duration {
   explicit Duration(int nanoseconds);
   explicit Duration(double seconds);
   explicit Duration(uint32_t seconds, uint32_t nanoseconds);
-  explicit Duration(const Rate& rate);
-  Duration(const Duration& other);
-  Duration& operator=(const Duration& other);
+  explicit Duration(const Rate &rate);
+  Duration(const Duration &other);
+  Duration &operator=(const Duration &other);
   ~Duration() {}
 
   double ToSecond() const;

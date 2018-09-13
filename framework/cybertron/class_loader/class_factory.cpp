@@ -68,12 +68,12 @@ const std::string AbstractClassFactoryBase::GetRelativeLibraryPath() const {
   return relative_library_path_;
 }
 
-const std::string AbstractClassFactoryBase::GetBaseClassName() const { 
-  return base_class_name_; 
+const std::string AbstractClassFactoryBase::GetBaseClassName() const {
+  return base_class_name_;
 }
 
 const std::string AbstractClassFactoryBase::GetClassName() const {
-  return class_name_; 
+  return class_name_;
 }
 
 }  // namespace utility

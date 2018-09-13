@@ -40,8 +40,7 @@ class RtpsUpperReach : public UpperReach<MessageT> {
  public:
   using MessagePtr = std::shared_ptr<MessageT>;
 
-  RtpsUpperReach(const RoleAttributes& attr,
-                 const ParticipantPtr& participant);
+  RtpsUpperReach(const RoleAttributes& attr, const ParticipantPtr& participant);
   virtual ~RtpsUpperReach();
 
   void Enable() override;

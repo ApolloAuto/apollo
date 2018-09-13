@@ -16,9 +16,9 @@
 
 #include "cybertron/time/duration.h"
 #include <chrono>
-#include <thread>
-#include <iostream>
 #include <iomanip>
+#include <iostream>
+#include <thread>
 #include "cybertron/time/rate.h"
 
 namespace apollo {
@@ -38,9 +38,7 @@ Duration::Duration(uint32_t seconds, uint32_t nanoseconds) {
   nanoseconds_ = static_cast<uint64_t>(seconds) * 1000000000UL + nanoseconds;
 }
 
-Duration::Duration(const Rate& rate) {
-  Duration(rate.ExpectedCycleTime());
-}
+Duration::Duration(const Rate &rate) { Duration(rate.ExpectedCycleTime()); }
 
 Duration::Duration(const Duration &other) { nanoseconds_ = other.nanoseconds_; }
 

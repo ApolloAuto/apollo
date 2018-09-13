@@ -84,9 +84,9 @@ std::shared_ptr<CRoutine> FCFSContext::NextRoutine() {
     routine->IncreaseProcessedNum();
     routine->SetVFrequency(routine->ProcessedNum() / routine->Frequency());
     routine->SetState(RoutineState::RUNNING);
-    PerfEventCache::Instance()->AddSchedEvent(5, routine->Id(), routine->ProcessorId(), 0, 
-      start_perf_time, -1);
-  } 
+    PerfEventCache::Instance()->AddSchedEvent(
+        5, routine->Id(), routine->ProcessorId(), 0, start_perf_time, -1);
+  }
   return routine;
 }
 
@@ -122,8 +122,7 @@ bool FCFSContext::Enqueue(const std::shared_ptr<CRoutine>& cr) {
 
   std::lock_guard<std::mutex> lg(mtx_run_queue_);
   auto itr = run_queue_.begin();
-  for (auto itr = run_queue_.begin(); itr != run_queue_.end();
-       ++itr) {
+  for (auto itr = run_queue_.begin(); itr != run_queue_.end(); ++itr) {
     if ((*itr)->Priority() < cr->Priority()) {
       run_queue_.insert(itr, cr);
       return true;

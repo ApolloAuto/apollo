@@ -93,7 +93,7 @@ class SchedPerfEvent : public PerfEventBase {
     ss << try_fetch_result;
     return ss.str();
   }
-  
+
  private:
   uint64_t cr_id = -1;
   int proc_id = -1;
@@ -105,21 +105,23 @@ class SchedPerfEvent : public PerfEventBase {
 // 1 transport time
 // 2 write_data_cache & notify listener
 class TransportPerfEvent : public PerfEventBase {
-  public:
-    TransportPerfEvent() { event_type = 1; }
-    void SetParams(int count, ...) override;
-    std::string SerializeToString() override {
-      std::stringstream ss;
-      ss << event_type << "\t";
-      ss << event_id << "\t";
-      ss << apollo::cybertron::common::GlobalData::GetChannelById(channel_id) << "\t";
-      ss << msg_seq << "\t";
-      ss << t_end;
-      return ss.str();
-    }
-  private:
-    uint64_t msg_seq = 0;
-    uint64_t channel_id = -1;
+ public:
+  TransportPerfEvent() { event_type = 1; }
+  void SetParams(int count, ...) override;
+  std::string SerializeToString() override {
+    std::stringstream ss;
+    ss << event_type << "\t";
+    ss << event_id << "\t";
+    ss << apollo::cybertron::common::GlobalData::GetChannelById(channel_id)
+       << "\t";
+    ss << msg_seq << "\t";
+    ss << t_end;
+    return ss.str();
+  }
+
+ private:
+  uint64_t msg_seq = 0;
+  uint64_t channel_id = -1;
 };
 
 }  // namespace event

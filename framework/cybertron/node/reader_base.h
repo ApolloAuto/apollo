@@ -25,8 +25,8 @@
 #include "cybertron/common/global_data.h"
 #include "cybertron/common/macros.h"
 #include "cybertron/common/util.h"
-#include "cybertron/transport/transport.h"
 #include "cybertron/event/perf_event_cache.h"
+#include "cybertron/transport/transport.h"
 
 namespace apollo {
 namespace cybertron {
@@ -101,10 +101,12 @@ auto ReaderManager<MessageT>::GetReader(const proto::RoleAttributes& role_attr)
                           const proto::RoleAttributes& reader_attr) {
               (void)msg_info;
               (void)reader_attr;
-              PerfEventCache::Instance()->AddTransportEvent(2, reader_attr.channel_id(), msg_info.seq_num());
+              PerfEventCache::Instance()->AddTransportEvent(
+                  2, reader_attr.channel_id(), msg_info.seq_num());
               data::DataDispatcher<MessageT>::Instance()->Dispatch(
                   reader_attr.channel_id(), msg);
-              PerfEventCache::Instance()->AddTransportEvent(3, reader_attr.channel_id(), msg_info.seq_num());
+              PerfEventCache::Instance()->AddTransportEvent(
+                  3, reader_attr.channel_id(), msg_info.seq_num());
 
             });
   }

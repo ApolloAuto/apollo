@@ -26,8 +26,8 @@
 #include "cybertron/croutine/routine_factory.h"
 #include "cybertron/data/data_visitor.h"
 #include "cybertron/scheduler/scheduler.h"
-#include "cybertron/time/time.h"
 #include "cybertron/service_discovery/topology_manager.h"
+#include "cybertron/time/time.h"
 #include "cybertron/transport/transport.h"
 
 #include "cybertron/common/global_data.h"
@@ -45,7 +45,8 @@ template <typename MessageT>
 class Reader : public ReaderBase {
  public:
   using LowerReachPtr = std::shared_ptr<transport::LowerReach<MessageT>>;
-  using ChangeConnection = typename service_discovery::Manager::ChangeConnection;
+  using ChangeConnection =
+      typename service_discovery::Manager::ChangeConnection;
 
   Reader(const proto::RoleAttributes& role_attr,
          const CallbackFunc<MessageT>& reader_func = nullptr);
@@ -104,7 +105,8 @@ bool Reader<MessageT>::Init() {
   lower_reach_ = ReaderManager<MessageT>::Instance()->GetReader(role_attr_);
   this->role_attr_.set_id(lower_reach_->id().HashValue());
 
-  channel_manager_ = service_discovery::TopologyManager::Instance()->channel_manager();
+  channel_manager_ =
+      service_discovery::TopologyManager::Instance()->channel_manager();
   JoinTheTopology();
 
   // TODO more check

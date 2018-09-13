@@ -20,14 +20,12 @@ TEST(ObjectPoolTest, get_object) {
   }
   EXPECT_NE(nullptr, pool->GetObject());
 
-
   auto pool2 = ObjectPool<TestNode>::Instance(10);
   for (int i = 0; i < 10; i++) {
     EXPECT_EQ(0, pool2->GetObject()->value);
   }
   EXPECT_NE(nullptr, pool2->GetObject());
 }
-
 
 }  // namespace base
 }  // namespace cybertron

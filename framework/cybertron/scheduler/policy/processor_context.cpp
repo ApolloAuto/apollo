@@ -67,7 +67,8 @@ void ProcessorContext::NotifyProcessor(uint64_t routine_id) {
     return;
   }
 
-  PerfEventCache::Instance()->AddSchedEvent(4, routine_id, proc_index_, 0, 0, -1);
+  PerfEventCache::Instance()->AddSchedEvent(4, routine_id, proc_index_, 0, 0,
+                                            -1);
   if (!cr_map_[routine_id]->IsRunning()) {
     cr_map_[routine_id]->SetState(RoutineState::READY);
   }
@@ -90,8 +91,7 @@ void ProcessorContext::ShutDown() {
   processor_->Stop();
 }
 
-void ProcessorContext::PrintStatistics() {
-}
+void ProcessorContext::PrintStatistics() {}
 
 void ProcessorContext::PrintCRoutineStats() {
   ReadLockGuard lg(rw_lock_);

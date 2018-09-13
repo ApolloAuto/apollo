@@ -22,12 +22,12 @@
 
 #include "cybertron/common/macros.h"
 
-
 namespace apollo {
 namespace cybertron {
 namespace message {
 
-static const std::string PY_MESSAGE_FULLNAME = "apollo.cybertron.message.PyMessage";
+static const std::string PY_MESSAGE_FULLNAME =
+    "apollo.cybertron.message.PyMessage";
 static const std::string data_split_pattern = "#@";
 
 class PyMessageWrap {
