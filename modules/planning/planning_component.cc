@@ -76,7 +76,7 @@ bool PlanningComponent::Proc(
   }
 
   ADCTrajectory adc_trajectory_pb;
-  // TODO(Liangliang) implement here
+  planning_base_->RunOnce(planning_data_, &adc_trajectory_pb);
 
   common::util::FillHeader(node_->Name(), &adc_trajectory_pb);
   writer_->Write(std::make_shared<ADCTrajectory>(adc_trajectory_pb));

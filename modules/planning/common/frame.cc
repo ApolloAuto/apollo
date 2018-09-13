@@ -454,27 +454,28 @@ void Frame::RecordInputDebug(planning_internal::Debug *debug) {
     ADEBUG << "Skip record input into debug";
     return;
   }
-  auto *planning_data = debug->mutable_planning_data();
-  auto *adc_position = planning_data->mutable_adc_position();
+  auto *planning_debug_data = debug->mutable_planning_data();
+  auto *adc_position = planning_debug_data->mutable_adc_position();
   const auto &localization =
       AdapterManager::GetLocalization()->GetLatestObserved();
   adc_position->CopyFrom(localization);
 
   const auto &chassis = AdapterManager::GetChassis()->GetLatestObserved();
-  auto debug_chassis = planning_data->mutable_chassis();
+  auto debug_chassis = planning_debug_data->mutable_chassis();
   debug_chassis->CopyFrom(chassis);
 
   if (!FLAGS_use_navigation_mode) {
-    auto debug_routing = planning_data->mutable_routing();
+    auto debug_routing = planning_debug_data->mutable_routing();
     debug_routing->CopyFrom(
         AdapterManager::GetRoutingResponse()->GetLatestObserved());
   }
 
-  planning_data->mutable_prediction_header()->CopyFrom(prediction_.header());
+  planning_debug_data->mutable_prediction_header()->CopyFrom(
+      prediction_.header());
 
   auto relative_map = AdapterManager::GetRelativeMap();
   if (!relative_map->Empty()) {
-    planning_data->mutable_relative_map()->mutable_header()->CopyFrom(
+    planning_debug_data->mutable_relative_map()->mutable_header()->CopyFrom(
         relative_map->GetLatestObserved().header());
   }
 }

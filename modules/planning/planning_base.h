@@ -73,7 +73,8 @@ class PlanningBase {
 
   virtual std::string Name() const = 0;
 
-  virtual void RunOnce(const PlanningData& planning_data) = 0;
+  virtual void RunOnce(const PlanningData& planning_data,
+                       ADCTrajectory* const adc_trajectory) = 0;
 
   /**
    * @brief Plan the trajectory given current vehicle state
