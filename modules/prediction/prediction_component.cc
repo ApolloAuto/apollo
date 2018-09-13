@@ -23,8 +23,6 @@
 
 #include "boost/filesystem.hpp"
 #include "boost/range/iterator_range.hpp"
-// #include "rosbag/bag.h"
-// #include "rosbag/view.h"
 
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/math/vec2d.h"
@@ -87,7 +85,8 @@ std::string PredictionComponent::Name() const {
 //   }
 //   bag.close();
 // }
-void PredictionComponent::ProcessRosbag(const std::string& filename) {
+
+void PredictionComponent::ProcessOfflineData(const std::string& filename) {
   // TODO(all) implement
 }
 
@@ -154,14 +153,14 @@ bool PredictionComponent::Init() {
     apollo::common::util::split(FLAGS_prediction_offline_bags, ':', &inputs);
     for (const auto& input : inputs) {
       std::vector<std::string> offline_bags;
-      GetDataFiles(boost::filesystem::path(input), &offline_bags);
+      GetDataFileNames(boost::filesystem::path(input), &offline_bags);
       std::sort(offline_bags.begin(), offline_bags.end());
       AINFO << "For input " << input << ", found " << offline_bags.size()
             << "  rosbags to process";
       for (std::size_t i = 0; i < offline_bags.size(); ++i) {
         AINFO << "\tProcessing: [ " << i << " / " << offline_bags.size()
               << " ]: " << offline_bags[i];
-        ProcessRosbag(offline_bags[i]);
+        ProcessOfflineData(offline_bags[i]);
       }
     }
     Stop();
