@@ -22,6 +22,7 @@
 #ifndef MODULES_COMMON_MONITOR_LOG_MONITOR_LOG_BUFFER_H_
 #define MODULES_COMMON_MONITOR_LOG_MONITOR_LOG_BUFFER_H_
 
+#include <memory>
 #include <sstream>
 #include <string>
 #include <utility>

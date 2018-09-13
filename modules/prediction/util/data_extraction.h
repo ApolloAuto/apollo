@@ -17,7 +17,8 @@
 #ifndef MODULES_PREDICTION_UTIL_DATA_EXTRACTION_H_
 #define MODULES_PREDICTION_UTIL_DATA_EXTRACTION_H_
 
-#include <string.h>
+#include <string>
+#include <vector>
 
 #include "boost/filesystem.hpp"
 #include "boost/range/iterator_range.hpp"

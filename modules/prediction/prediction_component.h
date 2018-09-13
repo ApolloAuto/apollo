@@ -21,6 +21,7 @@
 #ifndef MODULES_PREDICTION_PREDICTION_COMPONENT_H_
 #define MODULES_PREDICTION_PREDICTION_COMPONENT_H_
 
+#include <memory>
 #include <string>
 #include <vector>
 

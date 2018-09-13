@@ -22,6 +22,7 @@
 #ifndef MODULES_COMMON_MONITOR_LOG_MONITOR_LOGGER_H_
 #define MODULES_COMMON_MONITOR_LOG_MONITOR_LOGGER_H_
 
+#include <memory>
 #include <string>
 #include <utility>
 #include <vector>

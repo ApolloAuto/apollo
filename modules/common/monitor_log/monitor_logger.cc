@@ -15,6 +15,8 @@
  *****************************************************************************/
 #include "modules/common/monitor_log/monitor_logger.h"
 
+#include <memory>
+
 namespace apollo {
 namespace common {
 namespace monitor {
