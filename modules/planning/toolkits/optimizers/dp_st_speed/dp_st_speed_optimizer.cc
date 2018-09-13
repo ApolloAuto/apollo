@@ -25,7 +25,6 @@
 
 #include "modules/planning/proto/planning_internal.pb.h"
 
-#include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/planning_gflags.h"
@@ -39,7 +38,6 @@ using apollo::common::ErrorCode;
 using apollo::common::Status;
 using apollo::common::TrajectoryPoint;
 using apollo::common::VehicleConfigHelper;
-using apollo::common::adapter::AdapterManager;
 using apollo::localization::LocalizationEstimate;
 using apollo::planning_internal::STGraphDebug;
 

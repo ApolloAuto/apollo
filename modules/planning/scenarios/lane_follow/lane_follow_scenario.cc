@@ -24,7 +24,6 @@
 #include <limits>
 #include <utility>
 
-#include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/common/time/time.h"
@@ -54,7 +53,6 @@ using common::SLPoint;
 using common::SpeedPoint;
 using common::Status;
 using common::TrajectoryPoint;
-using common::adapter::AdapterManager;
 using common::math::Vec2d;
 using common::time::Clock;
 

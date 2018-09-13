@@ -26,7 +26,6 @@
 
 #include "modules/routing/proto/routing.pb.h"
 
-#include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/math/quaternion.h"
 #include "modules/common/time/time.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
@@ -35,7 +34,7 @@
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/trajectory/trajectory_stitcher.h"
-#include "modules/planning/planner/navi/navi_planner.h"
+//#include "modules/planning/planner/navi/navi_planner.h"
 #include "modules/planning/planner/rtk/rtk_replay_planner.h"
 #include "modules/planning/reference_line/reference_line_provider.h"
 #include "modules/planning/toolkits/deciders/traffic_decider.h"
@@ -48,7 +47,6 @@ using apollo::common::Status;
 using apollo::common::TrajectoryPoint;
 using apollo::common::VehicleState;
 using apollo::common::VehicleStateProvider;
-using apollo::common::adapter::AdapterManager;
 using apollo::common::time::Clock;
 using apollo::hdmap::HDMapUtil;
 using apollo::routing::RoutingResponse;
@@ -138,8 +136,9 @@ Status StdPlanning::InitFrame(const uint32_t sequence_num,
                               const TrajectoryPoint& planning_start_point,
                               const double start_time,
                               const VehicleState& vehicle_state) {
-  frame_.reset(new Frame(sequence_num, planning_start_point, start_time,
-                         vehicle_state, reference_line_provider_.get()));
+  frame_.reset(new Frame(sequence_num, planning_data_, planning_start_point,
+                         start_time, vehicle_state,
+                         reference_line_provider_.get()));
   auto status = frame_->Init();
   if (!status.ok()) {
     AERROR << "failed to init frame:" << status.ToString();

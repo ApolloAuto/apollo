@@ -26,7 +26,7 @@
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/planning/proto/planning_internal.pb.h"
 
-#include "modules/common/adapters/adapter_manager.h"
+#include "modules/common/time/time.h"
 #include "modules/common/util/map_util.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/ego_info.h"
@@ -37,7 +37,7 @@ namespace apollo {
 namespace planning {
 
 using apollo::common::Status;
-using apollo::common::adapter::AdapterManager;
+using apollo::common::time::Clock;
 using apollo::common::util::WithinBound;
 using apollo::perception::TrafficLight;
 using apollo::perception::TrafficLightDetection;
@@ -50,26 +50,26 @@ Status SignalLight::ApplyRule(Frame* const frame,
   if (!FindValidSignalLight(reference_line_info)) {
     return Status::OK();
   }
-  ReadSignals();
+  ReadSignals(frame->planning_data().traffic_light);
   MakeDecisions(frame, reference_line_info);
   return Status::OK();
 }
 
-void SignalLight::ReadSignals() {
+void SignalLight::ReadSignals(
+    const std::shared_ptr<TrafficLightDetection>& traffic_light) {
   detected_signals_.clear();
-  if (AdapterManager::GetTrafficLightDetection()->Empty()) {
+  if (traffic_light == nullptr) {
     return;
   }
-  if (AdapterManager::GetTrafficLightDetection()->GetDelaySec() >
-      config_.signal_light().signal_expire_time_sec()) {
-    ADEBUG << "traffic signals msg is expired: "
-           << AdapterManager::GetTrafficLightDetection()->GetDelaySec();
+  const double delay =
+      traffic_light->header().timestamp_sec() - Clock::NowInSeconds();
+  if (delay > config_.signal_light().signal_expire_time_sec()) {
+    ADEBUG << "traffic signals msg is expired, delay = " << delay
+           << " seconds.";
     return;
   }
-  const TrafficLightDetection& detection =
-      AdapterManager::GetTrafficLightDetection()->GetLatestObserved();
-  for (int j = 0; j < detection.traffic_light_size(); j++) {
-    const TrafficLight& signal = detection.traffic_light(j);
+  for (int j = 0; j < traffic_light->traffic_light_size(); j++) {
+    const TrafficLight& signal = traffic_light->traffic_light(j);
     detected_signals_[signal.id()] = &signal;
   }
 }
