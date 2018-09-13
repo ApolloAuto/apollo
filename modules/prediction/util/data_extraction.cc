@@ -24,7 +24,7 @@
 namespace apollo {
 namespace prediction {
 
-void GetDataFiles(const boost::filesystem::path& p,
+void GetDataFileNames(const boost::filesystem::path& p,
                  std::vector<std::string>* bag_files) {
   CHECK(bag_files);
   if (!boost::filesystem::exists(p)) {
@@ -41,7 +41,7 @@ void GetDataFiles(const boost::filesystem::path& p,
   if (boost::filesystem::is_directory(p)) {
     for (auto& entry : boost::make_iterator_range(
              boost::filesystem::directory_iterator(p), {})) {
-      GetDataFiles(entry.path(), bag_files);
+      GetDataFileNames(entry.path(), bag_files);
     }
   }
 }

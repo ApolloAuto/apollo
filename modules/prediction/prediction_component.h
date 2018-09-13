@@ -93,11 +93,13 @@ class PredictionComponent :
    * @brief process rosbag in offline mode, mainly for extracting prediction
    * features.
    */
-  void ProcessRosbag(const std::string &filename);
+  void ProcessOfflineData(const std::string &filename);
 
  private:
   double start_time_ = 0.0;
+
   PredictionConf prediction_conf_;
+
   common::adapter::AdapterManagerConfig adapter_conf_;
 };
 

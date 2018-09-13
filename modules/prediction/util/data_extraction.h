@@ -26,8 +26,8 @@
 namespace apollo {
 namespace prediction {
 
-void GetDataFiles(const boost::filesystem::path& p,
-                 std::vector<std::string>* bag_files);
+void GetDataFileNames(const boost::filesystem::path& p,
+                      std::vector<std::string>* data_files);
 
 }  // namespace prediction
 }  // namespace apollo
