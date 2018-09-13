@@ -30,6 +30,7 @@ cc_library(
         "//modules/prediction/predictor:predictor_manager",
         "//modules/prediction/proto:prediction_conf_proto",
         "//modules/prediction/proto:prediction_proto",
+        "//modules/prediction/util:data_extraction", 
         "//framework:cybertron",
     ],
 )

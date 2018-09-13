@@ -40,6 +40,7 @@
 #include "modules/prediction/evaluator/evaluator_manager.h"
 #include "modules/prediction/predictor/predictor_manager.h"
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
+#include "modules/prediction/util/data_extraction.h"
 
 namespace apollo {
 namespace prediction {
@@ -59,28 +60,6 @@ using apollo::perception::PerceptionObstacles;
 
 std::string PredictionComponent::Name() const {
   return FLAGS_prediction_module_name;
-}
-
-void GetDataFiles(const boost::filesystem::path& p,
-                 std::vector<std::string>* bag_files) {
-  CHECK(bag_files);
-  if (!boost::filesystem::exists(p)) {
-    return;
-  }
-  if (boost::filesystem::is_regular_file(p)) {
-    const auto ext = p.extension();
-    if (ext == ".bag" || ext == ".BAG") {
-      AINFO << "Found bag file: " << p.c_str();
-      bag_files->push_back(p.c_str());
-    }
-    return;
-  }
-  if (boost::filesystem::is_directory(p)) {
-    for (auto& entry : boost::make_iterator_range(
-             boost::filesystem::directory_iterator(p), {})) {
-      GetDataFiles(entry.path(), bag_files);
-    }
-  }
 }
 
 void PredictionComponent::ProcessRosbag(const std::string& filename) {
