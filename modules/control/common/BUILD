@@ -129,106 +129,106 @@ cc_library(
     ],
 )
 
-cc_test(
-    name = "hysteresis_filter_test",
-    size = "small",
-    srcs = [
-        "hysteresis_filter_test.cc",
-    ],
-    deps = [
-        ":hysteresis_filter",
-        "@gtest//:main",
-    ],
-)
-
-cc_test(
-    name = "interpolation_1d_test",
-    size = "small",
-    srcs = [
-        "interpolation_1d_test.cc",
-    ],
-    data = ["//modules/control:control_testdata"],
-    deps = [
-        ":interpolation_1d",
-        "//modules/common:log",
-        "//modules/common/util",
-        "//modules/control/proto:control_proto",
-        "@gtest//:main",
-    ],
-)
-
-cc_test(
-    name = "interpolation_2d_test",
-    size = "small",
-    srcs = [
-        "interpolation_2d_test.cc",
-    ],
-    data = ["//modules/control:control_testdata"],
-    deps = [
-        ":interpolation_2d",
-        "//modules/common:log",
-        "//modules/common/util",
-        "//modules/control/proto:control_proto",
-        "@gtest//:main",
-    ],
-)
-
-cc_test(
-    name = "pid_controller_test",
-    size = "small",
-    srcs = [
-        "pid_controller_test.cc",
-    ],
-    data = ["//modules/control:control_testdata"],
-    deps = [
-        ":pid_controller",
-        "//modules/common/util",
-        "//modules/control/proto:control_proto",
-        "@gtest//:main",
-    ],
-)
-
-cc_test(
-    name = "pid_BC_controller_test",
-    size = "small",
-    srcs = [
-        "pid_BC_controller_test.cc",
-    ],
-    data = ["//modules/control:control_testdata"],
-    deps = [
-        ":pid_BC_controller",
-        "//modules/common/util",
-        "//modules/control/proto:control_proto",
-        "@gtest//:main",
-    ],
-)
-
-cc_test(
-    name = "pid_IC_controller_test",
-    size = "small",
-    srcs = [
-        "pid_IC_controller_test.cc",
-    ],
-    data = ["//modules/control:control_testdata"],
-    deps = [
-        ":pid_IC_controller",
-        "//modules/common/util",
-        "//modules/control/proto:control_proto",
-        "@gtest//:main",
-    ],
-)
-
-cc_test(
-    name = "trajectory_analyzer_test",
-    size = "small",
-    srcs = [
-        "trajectory_analyzer_test.cc",
-    ],
-    deps = [
-        ":trajectory_analyzer",
-        "//modules/common/time",
-        "@gtest//:main",
-    ],
-)
+#cc_test(
+#    name = "hysteresis_filter_test",
+#    size = "small",
+#    srcs = [
+#        "hysteresis_filter_test.cc",
+#    ],
+#    deps = [
+#        ":hysteresis_filter",
+#        "@gtest//:main",
+#    ],
+#)
+#
+#cc_test(
+#    name = "interpolation_1d_test",
+#    size = "small",
+#    srcs = [
+#        "interpolation_1d_test.cc",
+#    ],
+#    data = ["//modules/control:control_testdata"],
+#    deps = [
+#        ":interpolation_1d",
+#        "//modules/common:log",
+#        "//modules/common/util",
+#        "//modules/control/proto:control_proto",
+#        "@gtest//:main",
+#    ],
+#)
+#
+#cc_test(
+#    name = "interpolation_2d_test",
+#    size = "small",
+#    srcs = [
+#        "interpolation_2d_test.cc",
+#    ],
+#    data = ["//modules/control:control_testdata"],
+#    deps = [
+#        ":interpolation_2d",
+#        "//modules/common:log",
+#        "//modules/common/util",
+#        "//modules/control/proto:control_proto",
+#        "@gtest//:main",
+#    ],
+#)
+#
+#cc_test(
+#    name = "pid_controller_test",
+#    size = "small",
+#    srcs = [
+#        "pid_controller_test.cc",
+#    ],
+#    data = ["//modules/control:control_testdata"],
+#    deps = [
+#        ":pid_controller",
+#        "//modules/common/util",
+#        "//modules/control/proto:control_proto",
+#        "@gtest//:main",
+#    ],
+#)
+#
+#cc_test(
+#    name = "pid_BC_controller_test",
+#    size = "small",
+#    srcs = [
+#        "pid_BC_controller_test.cc",
+#    ],
+#    data = ["//modules/control:control_testdata"],
+#    deps = [
+#        ":pid_BC_controller",
+#        "//modules/common/util",
+#        "//modules/control/proto:control_proto",
+#        "@gtest//:main",
+#    ],
+#)
+#
+#cc_test(
+#    name = "pid_IC_controller_test",
+#    size = "small",
+#    srcs = [
+#        "pid_IC_controller_test.cc",
+#    ],
+#    data = ["//modules/control:control_testdata"],
+#    deps = [
+#        ":pid_IC_controller",
+#        "//modules/common/util",
+#        "//modules/control/proto:control_proto",
+#        "@gtest//:main",
+#    ],
+#)
+#
+#cc_test(
+#    name = "trajectory_analyzer_test",
+#    size = "small",
+#    srcs = [
+#        "trajectory_analyzer_test.cc",
+#    ],
+#    deps = [
+#        ":trajectory_analyzer",
+#        "//modules/common/time",
+#        "@gtest//:main",
+#    ],
+#)
 
 cpplint()

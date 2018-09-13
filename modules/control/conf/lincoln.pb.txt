@@ -1,3 +1,9 @@
+chassis_channel: "/apollo/canbus/chassis"
+control_command_channel: "/apollo/control"
+localization_channel: "/apollo/localization/LocalizationEstimate"
+planning_channel: "/apollo/planning/ADCTrajectory"
+pad_msg_channel: "/apollo/control/PadMessage"
+
 control_period: 0.01
 trajectory_period: 0.1
 chassis_period: 0.01

@@ -13,20 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include "modules/control/control.h"
+#include "modules/control/control_component.h"
 
 #include <iomanip>
 #include <string>
 
 #include "ros/include/std_msgs/String.h"
 
-#include "modules/localization/proto/localization.pb.h"
-
-#include "modules/common/adapters/adapter_manager.h"
+#include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/log.h"
 #include "modules/common/time/time.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/control/common/control_gflags.h"
+
+DECLARE_string(flagfile);
 
 namespace apollo {
 namespace control {
@@ -35,79 +35,74 @@ using apollo::canbus::Chassis;
 using apollo::common::ErrorCode;
 using apollo::common::Status;
 using apollo::common::VehicleStateProvider;
-using apollo::common::adapter::AdapterManager;
 using apollo::common::monitor::MonitorMessageItem;
 using apollo::common::time::Clock;
+using apollo::control::ControlCommand;
+using apollo::control::PadMessage;
 using apollo::localization::LocalizationEstimate;
 using apollo::planning::ADCTrajectory;
 
-std::string Control::Name() const { return FLAGS_control_node_name; }
-
-Status Control::Init() {
-  init_time_ = Clock::NowInSeconds();
+bool Control::Init() {
+  // init_time_ = Clock::NowInSeconds();
 
   AINFO << "Control init, starting ...";
-  CHECK(common::util::GetProtoFromFile(FLAGS_control_conf_file, &control_conf_))
+
+  AINFO << "Loading gflag from file: " << ConfigFilePath();
+  google::SetCommandLineOption("flagfile", ConfigFilePath().c_str());
+
+  CHECK(apollo::cybertron::common::GetProtoFromFile(FLAGS_control_conf_file,
+                                                    &control_conf_))
       << "Unable to load control conf file: " + FLAGS_control_conf_file;
 
   AINFO << "Conf file: " << FLAGS_control_conf_file << " is loaded.";
 
-  AdapterManager::Init(FLAGS_control_adapter_config_filename);
+  AINFO << "Conf file: " << ConfigFilePath() << " is loaded.";
 
-  common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
+  // common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
 
   // set controller
   if (!controller_agent_.Init(&control_conf_).ok()) {
     std::string error_msg = "Control init controller failed! Stopping...";
-    buffer.ERROR(error_msg);
-    return Status(ErrorCode::CONTROL_INIT_ERROR, error_msg);
+    //  buffer.ERROR(error_msg);
+    return false;
   }
 
-  // lock it in case for after sub, init_vehicle not ready, but msg trigger
-  // come
-  CHECK(AdapterManager::GetLocalization())
-      << "Localization is not initialized.";
+  chassis_reader_ = node_->CreateReader<Chassis>(
+      control_conf_.chassis_channel(),
+      [this](const std::shared_ptr<Chassis> &chassis) {
+        ADEBUG << "Received chassis data: run chassis callback.";
+        std::lock_guard<std::mutex> lock(mutex_);
+        chassis_.CopyFrom(*chassis);
+      });
 
-  CHECK(AdapterManager::GetChassis()) << "Chassis is not initialized.";
+  trajectory_reader_ = node_->CreateReader<ADCTrajectory>(
+      control_conf_.chassis_channel(),
+      [this](const std::shared_ptr<ADCTrajectory> &trajectory) {
+        ADEBUG << "Received chassis data: run trajectory callback.";
+        std::lock_guard<std::mutex> lock(mutex_);
+        trajectory_.CopyFrom(*trajectory);
+      });
 
-  CHECK(AdapterManager::GetPlanning()) << "Planning is not initialized.";
+  localization_reader_ = node_->CreateReader<LocalizationEstimate>(
+      control_conf_.localization_channel(),
+      [this](const std::shared_ptr<LocalizationEstimate> &localization) {
+        ADEBUG << "Received control data: run localization message callback.";
+        std::lock_guard<std::mutex> lock(mutex_);
+        localization_.CopyFrom(*localization);
+      });
 
-  CHECK(AdapterManager::GetPad()) << "Pad is not initialized.";
+  pad_msg_reader_ = node_->CreateReader<PadMessage>(
+      control_conf_.pad_msg_channel(),
+      [this](const std::shared_ptr<PadMessage> &pad_msg) {
+        ADEBUG << "Received control data: run pad message callback.";
+        std::lock_guard<std::mutex> lock(mutex_);
+        pad_msg_.CopyFrom(*pad_msg);
+      });
 
-  CHECK(AdapterManager::GetMonitor()) << "Monitor is not initialized.";
+  control_cmd_writer_ = node_->CreateWriter<ControlCommand>(
+      control_conf_.control_command_channel());
 
-  CHECK(AdapterManager::GetControlCommand())
-      << "ControlCommand publisher is not initialized.";
-
-  AdapterManager::AddPadCallback(&Control::OnPad, this);
-  AdapterManager::AddMonitorCallback(&Control::OnMonitor, this);
-
-  return Status::OK();
-}
-
-Status Control::Start() {
-  // set initial vehicle state by cmd
-  // need to sleep, because advertised channel is not ready immediately
-  // simple test shows a short delay of 80 ms or so
-  AINFO << "Control resetting vehicle state, sleeping for 1000 ms ...";
-  std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-
-  // should init_vehicle first, let car enter work status, then use status msg
-  // trigger control
-
-  AINFO << "Control default driving action is "
-        << DrivingAction_Name(control_conf_.action());
-  pad_msg_.set_action(control_conf_.action());
-
-  timer_ = AdapterManager::CreateTimer(
-      ros::Duration(control_conf_.control_period()), &Control::OnTimer, this);
-
-  AINFO << "Control init done!";
-
-  common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
-  buffer.INFO("control started");
-
-  return Status::OK();
+  return true;
 }
 
 void Control::OnPad(const PadMessage &pad) {
@@ -167,8 +162,9 @@ Status Control::ProduceControlCommand(ControlCommand *control_command) {
   }
 
   // check estop
-  estop_ = FLAGS_enable_persistent_estop ?
-    estop_ || trajectory_.estop().is_estop() : trajectory_.estop().is_estop();
+  estop_ = control_conf_.enable_persistent_estop()
+               ? estop_ || trajectory_.estop().is_estop()
+               : trajectory_.estop().is_estop();
 
   if (trajectory_.estop().is_estop()) {
     estop_reason_ = "estop from planning";
@@ -218,13 +214,27 @@ Status Control::ProduceControlCommand(ControlCommand *control_command) {
   return status;
 }
 
-void Control::OnTimer(const ros::TimerEvent &) {
+bool Control::Proc() {
+  // set initial vehicle state by cmd
+  // need to sleep, because advertised channel is not ready immediately
+  // simple test shows a short delay of 80 ms or so
+  AINFO << "Control resetting vehicle state, sleeping for 1000 ms ...";
+  std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+
+  // should init_vehicle first, let car enter work status, then use status msg
+  // trigger control
+
+  AINFO << "Control default driving action is "
+        << DrivingAction_Name(control_conf_.action());
+  pad_msg_.set_action(control_conf_.action());
+
   double start_timestamp = Clock::NowInSeconds();
 
-  if (FLAGS_is_control_test_mode && FLAGS_control_test_duration > 0 &&
-      (start_timestamp - init_time_) > FLAGS_control_test_duration) {
+  if (control_conf_.is_control_test_mode() &&
+      control_conf_.control_test_duration() > 0 &&
+      (start_timestamp - init_time_) > control_conf_.control_test_duration()) {
     AERROR << "Control finished testing. exit";
-    ros::shutdown();
+    return false;
   }
 
   ControlCommand control_command;
@@ -252,33 +262,28 @@ void Control::OnTimer(const ros::TimerEvent &) {
     control_command.mutable_header()->mutable_status()->set_msg(estop_reason_);
   }
 
-  SendCmd(&control_command);
+  SendCmd(control_command);
+
+  return true;
 }
 
 Status Control::CheckInput() {
-  AdapterManager::Observe();
-  auto localization_adapter = AdapterManager::GetLocalization();
-  if (localization_adapter->Empty()) {
+  if (localization_reader_ == nullptr) {
     AWARN_EVERY(100) << "No Localization msg yet. ";
     return Status(ErrorCode::CONTROL_COMPUTE_ERROR, "No localization msg");
   }
-  localization_ = localization_adapter->GetLatestObserved();
   ADEBUG << "Received localization:" << localization_.ShortDebugString();
 
-  auto chassis_adapter = AdapterManager::GetChassis();
-  if (chassis_adapter->Empty()) {
+  if (chassis_reader_ == nullptr) {
     AWARN_EVERY(100) << "No Chassis msg yet. ";
     return Status(ErrorCode::CONTROL_COMPUTE_ERROR, "No chassis msg");
   }
-  chassis_ = chassis_adapter->GetLatestObserved();
   ADEBUG << "Received chassis:" << chassis_.ShortDebugString();
 
-  auto trajectory_adapter = AdapterManager::GetPlanning();
-  if (trajectory_adapter->Empty()) {
+  if (trajectory_reader_ == nullptr) {
     AWARN_EVERY(100) << "No planning msg yet. ";
     return Status(ErrorCode::CONTROL_COMPUTE_ERROR, "No planning msg");
   }
-  trajectory_ = trajectory_adapter->GetLatestObserved();
   if (!trajectory_.estop().is_estop() &&
       trajectory_.trajectory_point_size() == 0) {
     AWARN_EVERY(100) << "planning has no trajectory point. ";
@@ -299,69 +304,65 @@ Status Control::CheckInput() {
 }
 
 Status Control::CheckTimestamp() {
-  if (!FLAGS_enable_input_timestamp_check || FLAGS_is_control_test_mode) {
+  if (!control_conf_.enable_input_timestamp_check() ||
+      control_conf_.is_control_test_mode()) {
     ADEBUG << "Skip input timestamp check by gflags.";
     return Status::OK();
   }
   double current_timestamp = Clock::NowInSeconds();
   double localization_diff =
       current_timestamp - localization_.header().timestamp_sec();
-  if (localization_diff >
-      (FLAGS_max_localization_miss_num * control_conf_.localization_period())) {
+  if (localization_diff > (control_conf_.max_localization_miss_num() *
+                           control_conf_.localization_period())) {
     AERROR << "Localization msg lost for " << std::setprecision(6)
            << localization_diff << "s";
-    common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
-    buffer.ERROR("Localization msg lost");
+    // common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
+    // buffer.ERROR("Localization msg lost");
     return Status(ErrorCode::CONTROL_COMPUTE_ERROR, "Localization msg timeout");
   }
 
   double chassis_diff = current_timestamp - chassis_.header().timestamp_sec();
   if (chassis_diff >
-      (FLAGS_max_chassis_miss_num * control_conf_.chassis_period())) {
+      (control_conf_.max_chassis_miss_num() * control_conf_.chassis_period())) {
     AERROR << "Chassis msg lost for " << std::setprecision(6) << chassis_diff
            << "s";
-    common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
-    buffer.ERROR("Chassis msg lost");
+    //    common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
+    //    buffer.ERROR("Chassis msg lost");
     return Status(ErrorCode::CONTROL_COMPUTE_ERROR, "Chassis msg timeout");
   }
 
   double trajectory_diff =
       current_timestamp - trajectory_.header().timestamp_sec();
-  if (trajectory_diff >
-      (FLAGS_max_planning_miss_num * control_conf_.trajectory_period())) {
+  if (trajectory_diff > (control_conf_.max_planning_miss_num() *
+                         control_conf_.trajectory_period())) {
     AERROR << "Trajectory msg lost for " << std::setprecision(6)
            << trajectory_diff << "s";
-    common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
-    buffer.ERROR("Trajectory msg lost");
+    //    common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
+    //  buffer.ERROR("Trajectory msg lost");
     return Status(ErrorCode::CONTROL_COMPUTE_ERROR, "Trajectory msg timeout");
   }
   return Status::OK();
 }
 
-void Control::SendCmd(ControlCommand *control_command) {
+void Control::SendCmd(ControlCommand &control_command) {
   // set header
-  if (AdapterManager::GetPlanning() &&
-      !AdapterManager::GetPlanning()->Empty()) {
-    const auto& planning =
-        AdapterManager::GetPlanning()->GetLatestObserved();
-    control_command->mutable_header()->set_lidar_timestamp(
-        planning.header().lidar_timestamp());
-    control_command->mutable_header()->set_camera_timestamp(
-        planning.header().camera_timestamp());
-    control_command->mutable_header()->set_radar_timestamp(
-        planning.header().radar_timestamp());
-  }
-  AdapterManager::FillControlCommandHeader(Name(), control_command);
+  control_command.mutable_header()->set_lidar_timestamp(
+      trajectory_.header().lidar_timestamp());
+  control_command.mutable_header()->set_camera_timestamp(
+      trajectory_.header().camera_timestamp());
+  control_command.mutable_header()->set_radar_timestamp(
+      trajectory_.header().radar_timestamp());
 
-  ADEBUG << control_command->ShortDebugString();
-  if (FLAGS_is_control_test_mode) {
+  common::util::FillHeader(node_->Name(), &control_command);
+
+  ADEBUG << control_command.ShortDebugString();
+  if (control_conf_.is_control_test_mode()) {
     ADEBUG << "Skip publish control command in test mode";
     return;
   }
-  AdapterManager::PublishControlCommand(*control_command);
-}
 
-void Control::Stop() {}
+  control_cmd_writer_->Write(std::make_shared<ControlCommand>(control_command));
+}
 
 }  // namespace control
 }  // namespace apollo

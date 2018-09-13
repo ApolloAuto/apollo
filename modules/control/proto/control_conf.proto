@@ -17,53 +17,54 @@ message ControlConf {
 
   // configs from gflags
   optional string chassis_channel = 1;
-  optional string system_status_channel = 2;
+  optional string control_command_channel = 2;
   optional string localization_channel = 3;
   optional string pad_msg_channel = 4;
-  optional double control_test_duration = 5;
-  optional bool enable_csv_debug = 6 [default = false];
-  optional bool enable_speed_station_preview = 7 [default = false];
-  optional bool is_control_test_mode = 8 [default = false];
-  optional bool use_preview_speed_for_table = 9 [default = false];
-  optional bool enable_input_timestamp_check = 10 [default = false];
-  optional int32 max_localization_miss_num = 11 [default = 20];
-  optional int32 max_chassis_miss_num = 12 [default = 20];
-  optional int32 max_planning_miss_num = 13 [default = 20];
-  optional double max_acceleration_when_stopped = 14 [default = 0.01];
-  optional double steer_angle_rate = 15 [default = 100];
-  optional bool enable_gain_scheduler = 16 [default = true];
-  optional bool set_steer_limit = 17 [default = true];
-  optional bool enable_slope_offset = 18 [default = false];
-  optional double lock_steer_speed = 19 [default = 0.081];
-  optional bool enable_navigation_mode_error_filter = 20 [default = false];
-  optional bool enable_navigation_mode_position_update = 21 [default = true];
-  optional bool enable_persistent_estop = 22 [default = true];
+  optional string planning_channel = 5;
+  optional double control_test_duration = 6 [default = -1];
+  optional bool enable_csv_debug = 7 [default = false];
+  optional bool enable_speed_station_preview = 8 [default = false];
+  optional bool is_control_test_mode = 9 [default = false];
+  optional bool use_preview_speed_for_table = 10 [default = false];
+  optional bool enable_input_timestamp_check = 11 [default = false];
+  optional int32 max_localization_miss_num = 12 [default = 20];
+  optional int32 max_chassis_miss_num = 13 [default = 20];
+  optional int32 max_planning_miss_num = 14 [default = 20];
+  optional double max_acceleration_when_stopped = 15 [default = 0.01];
+  optional double steer_angle_rate = 16 [default = 100];
+  optional bool enable_gain_scheduler = 17 [default = true];
+  optional bool set_steer_limit = 18 [default = true];
+  optional bool enable_slope_offset = 19 [default = false];
+  optional double lock_steer_speed = 20 [default = 0.081];
+  optional bool enable_navigation_mode_error_filter = 21 [default = false];
+  optional bool enable_navigation_mode_position_update = 22 [default = true];
+  optional bool enable_persistent_estop = 23 [default = true];
 
 
   // original config
-  optional double control_period = 23;
-  optional double max_planning_interval_sec = 24;
-  optional double max_planning_delay_threshold = 25;
+  optional double control_period = 24;
+  optional double max_planning_interval_sec = 25;
+  optional double max_planning_delay_threshold = 26;
   // 0 - manual; 1 - auto_drive; 2 - speed_only; 3 - steer_only
-  optional apollo.canbus.Chassis.DrivingMode driving_mode = 26;
+  optional apollo.canbus.Chassis.DrivingMode driving_mode = 27;
   // 0: stop, at first should stop, then receive pad msg to start
-  optional apollo.control.DrivingAction action = 27;
-  optional double soft_estop_brake = 28;
-  repeated ControllerType active_controllers = 29;
-  optional int32 max_steering_percentage_allowed = 30;
-  optional double max_status_interval_sec = 31;
+  optional apollo.control.DrivingAction action = 28;
+  optional double soft_estop_brake = 29;
+  repeated ControllerType active_controllers = 30;
+  optional int32 max_steering_percentage_allowed = 31;
+  optional double max_status_interval_sec = 32;
 
-  optional apollo.control.LatControllerConf lat_controller_conf = 32;
-  optional apollo.control.LonControllerConf lon_controller_conf = 33;
+  optional apollo.control.LatControllerConf lat_controller_conf = 33;
+  optional apollo.control.LonControllerConf lon_controller_conf = 34;
 
-  optional double trajectory_period = 34;
-  optional double chassis_period = 35;
-  optional double localization_period = 36;
+  optional double trajectory_period = 35;
+  optional double chassis_period = 36;
+  optional double localization_period = 37;
 
-  optional double minimum_speed_resolution = 37;
+  optional double minimum_speed_resolution = 38;
 
-  optional apollo.control.MPCControllerConf mpc_controller_conf = 38;
+  optional apollo.control.MPCControllerConf mpc_controller_conf = 39;
 
-  optional double query_relative_time = 39;
-  optional double minimum_speed_protection = 40;
+  optional double query_relative_time = 40;
+  optional double minimum_speed_protection = 41;
 }
