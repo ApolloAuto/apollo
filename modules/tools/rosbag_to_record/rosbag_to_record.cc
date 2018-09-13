@@ -69,6 +69,17 @@ int main(int argc, char** argv) {
   ros::Time start_time = ros::Time::now();
 
   rosbag::View view(bag, rosbag::TopicQuery(channel_info->GetSupportChannels()));
+  
+  for (auto channel_name : channel_info->GetSupportChannels()) {
+    auto desc = channel_info->GetProtoDesc(channel_name);
+    auto record_message_type = channel_info->GetMessageType(channel_name);
+    if (desc == "" || record_message_type == "") {
+      AWARN << "can not find desc or message type";
+    }
+    if (!record_writer->WriteChannel(channel_name, record_message_type, desc)) {
+      AERROR << "write channel info failed";
+    }
+  }
 
   for (const rosbag::MessageInstance m : view) {
     const std::string msg_type = m.getDataType();
@@ -127,14 +138,14 @@ int main(int argc, char** argv) {
       continue;
     }
  
-    auto desc = channel_info->GetProtoDesc(channel_name);
-    auto record_message_type = channel_info->GetMessageType(channel_name);
-    if (desc == "" || record_message_type == "") {
-      AWARN << "can not find desc or message tyep";
-    }
-    if (!record_writer->WriteChannel(channel_name, record_message_type, desc)) {
-      AERROR << "write channel info failed";
-    }
+//    auto desc = channel_info->GetProtoDesc(channel_name);
+//    auto record_message_type = channel_info->GetMessageType(channel_name);
+//    if (desc == "" || record_message_type == "") {
+//      AWARN << "can not find desc or message type";
+//    }
+//    if (!record_writer->WriteChannel(channel_name, record_message_type, desc)) {
+//      AERROR << "write channel info failed";
+//    }
     SingleMessage single_msg;
     single_msg.set_channel_name(channel_name);
     
