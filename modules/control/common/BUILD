@@ -3,6 +3,19 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
+    name = "control_gflags",
+    srcs = [
+        "control_gflags.cc",
+    ],
+    hdrs = [
+        "control_gflags.h",
+    ],
+    deps = [
+        "//external:gflags",
+    ],
+)
+
+cc_library(
     name = "hysteresis_filter",
     srcs = [
         "hysteresis_filter.cc",
@@ -107,6 +120,7 @@ cc_library(
 cc_library(
     name = "common",
     deps = [
+        ":control_gflags",
         ":hysteresis_filter",
         ":interpolation_1d",
         ":interpolation_2d",
