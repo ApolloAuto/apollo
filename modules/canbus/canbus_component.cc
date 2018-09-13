@@ -29,8 +29,6 @@ namespace apollo {
 namespace canbus {
 
 using apollo::common::ErrorCode;
-using apollo::common::Status;
-using apollo::common::adapter::AdapterManager;
 using apollo::common::time::Clock;
 using apollo::control::ControlCommand;
 using apollo::drivers::canbus::CanClientFactory;
@@ -48,11 +46,12 @@ bool CanbusComponent::Init() {
   ADEBUG << "Canbus_conf:" << canbus_conf_.ShortDebugString();
 
   // Init can client
-  auto *can_factory = CanClientFactory::Instance();
+  auto can_factory = CanClientFactory::Instance();
   can_factory->RegisterCanClients();
   can_client_ = can_factory->CreateCANClient(canbus_conf_.can_card_parameter());
   if (!can_client_) {
-    return OnError("Failed to create can client.");
+    AERROR << "Failed to create can client.";
+    return false;
   }
   AINFO << "Can client is successfully created.";
 
@@ -61,36 +60,42 @@ bool CanbusComponent::Init() {
   auto vehicle_object =
       vehicle_factory.CreateVehicle(canbus_conf_.vehicle_parameter());
   if (!vehicle_object) {
-    return OnError("Failed to create vehicle:");
+    AERROR << "Failed to create vehicle:";
+    return false;
   }
 
   message_manager_ = vehicle_object->CreateMessageManager();
   if (message_manager_ == nullptr) {
-    return OnError("Failed to create message manager.");
+    AERROR << "Failed to create message manager.";
+    return false;
   }
   AINFO << "Message manager is successfully created.";
 
   if (can_receiver_.Init(can_client_.get(), message_manager_.get(),
                          canbus_conf_.enable_receiver_log()) != ErrorCode::OK) {
-    return OnError("Failed to init can receiver.");
+    AERROR << "Failed to init can receiver.";
+    return false;
   }
   AINFO << "The can receiver is successfully initialized.";
 
   if (can_sender_.Init(can_client_.get(), canbus_conf_.enable_sender_log()) !=
       ErrorCode::OK) {
-    return OnError("Failed to init can sender.");
+    AERROR << "Failed to init can sender.";
+    return false;
   }
   AINFO << "The can sender is successfully initialized.";
 
   vehicle_controller_ = vehicle_object->CreateVehicleController();
   if (vehicle_controller_ == nullptr) {
-    return OnError("Failed to create vehicle controller.");
+    AERROR << "Failed to create vehicle controller.";
+    return false;
   }
   AINFO << "The vehicle controller is successfully created.";
 
   if (vehicle_controller_->Init(canbus_conf_.vehicle_parameter(), &can_sender_,
                                 message_manager_.get()) != ErrorCode::OK) {
-    return OnError("Failed to init vehicle controller.");
+    AERROR << "Failed to init vehicle controller.";
+    return false;
   }
   AINFO << "The vehicle controller is successfully initialized.";
 
@@ -98,7 +103,7 @@ bool CanbusComponent::Init() {
       FLAGS_guardian_topic,
       [this](const std::shared_ptr<GuardianCommand> &cmd) {
         ADEBUG << "Received guardian data: run canbus callback.";
-        OnGuardianCommand(const GuardianCommand &cmd)
+        OnGuardianCommand(*cmd);
       });
 
   chassis_writer_ = node_->CreateWriter<Chassis>(FLAGS_chassis_topic);
@@ -108,29 +113,33 @@ bool CanbusComponent::Init() {
 
   // 1. init and start the can card hardware
   if (can_client_->Start() != ErrorCode::OK) {
-    return OnError("Failed to start can client");
+    AERROR << "Failed to start can client";
+    return false;
   }
   AINFO << "Can client is started.";
 
   // 2. start receive first then send
   if (can_receiver_.Start() != ErrorCode::OK) {
-    return OnError("Failed to start can receiver.");
+    AERROR << "Failed to start can receiver.";
+    return false;
   }
   AINFO << "Can receiver is started.";
 
   // 3. start send
   if (can_sender_.Start() != ErrorCode::OK) {
-    return OnError("Failed to start can sender.");
+    AERROR << "Failed to start can sender.";
+    return false;
   }
 
   // 4. start controller
   if (vehicle_controller_->Start() == false) {
-    return OnError("Failed to start vehicle controller.");
+    AERROR << "Failed to start vehicle controller.";
+    return false;
   }
 
-  // last step: publish monitor messages
-  apollo::common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
-  buffer.INFO("Canbus is started.");
+  // TODO(HaHa): last step: publish monitor messages
+  // apollo::common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
+  // buffer.INFO("Canbus is started.");
 
   return true;
 }
@@ -192,12 +201,12 @@ void CanbusComponent::OnGuardianCommand(
   OnControlCommand(control_command);
 }
 
-// Send the error to monitor and return it
-Status CanbusComponent::OnError(const std::string &error_msg) {
-  apollo::common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
-  buffer.ERROR(error_msg);
-  return Status(ErrorCode::CANBUS_ERROR, error_msg);
-}
+// TODO(HAHA) : Send the error to monitor and return it
+// Status CanbusComponent::OnError(const std::string &error_msg) {
+//   apollo::common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
+//   buffer.ERROR(error_msg);
+//   return Status(ErrorCode::CANBUS_ERROR, error_msg);
+// }
 
 }  // namespace canbus
 }  // namespace apollo

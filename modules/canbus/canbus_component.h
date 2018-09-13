@@ -31,7 +31,6 @@
 #include "cybertron/timer/timer.h"
 #include "modules/canbus/proto/chassis_detail.pb.h"
 #include "modules/canbus/vehicle/vehicle_controller.h"
-#include "modules/common/apollo_app.h"
 #include "modules/common/macro.h"
 #include "modules/common/monitor_log/monitor_log_buffer.h"
 #include "modules/control/proto/control_cmd.pb.h"
@@ -61,13 +60,14 @@ using apollo::cybertron::Writer;
 class CanbusComponent : public apollo::cybertron::TimerComponent {
  public:
   CanbusComponent()
-      : monitor_logger_(apollo::common::monitor::MonitorMessageItem::CANBUS) {}
+  //   : monitor_logger_(apollo::common::monitor::MonitorMessageItem::CANBUS)
+  {}
 
   /**
    * @brief obtain module name
    * @return module name
    */
-  std::string Name() const override;
+  std::string Name() const;
 
   /**
    * @brief module initialization function
@@ -86,11 +86,12 @@ class CanbusComponent : public apollo::cybertron::TimerComponent {
   void OnControlCommand(const apollo::control::ControlCommand &control_command);
   void OnGuardianCommand(
       const apollo::guardian::GuardianCommand &guardian_command);
-  apollo::common::Status OnError(const std::string &error_msg);
+//   apollo::common::Status OnError(const std::string &error_msg);
   void RegisterCanClients();
 
   CanbusConf canbus_conf_;
-  std::shared_ptr<Reader<GuardianCommand>> guardian_cmd_reader_;
+  std::shared_ptr<Reader<apollo::guardian::GuardianCommand>>
+      guardian_cmd_reader_;
   std::unique_ptr<apollo::drivers::canbus::CanClient> can_client_;
   CanSender<ChassisDetail> can_sender_;
   apollo::drivers::canbus::CanReceiver<ChassisDetail> can_receiver_;
@@ -98,7 +99,7 @@ class CanbusComponent : public apollo::cybertron::TimerComponent {
       message_manager_;
   std::unique_ptr<VehicleController> vehicle_controller_;
   int64_t last_timestamp_ = 0;
-  apollo::common::monitor::MonitorLogger monitor_logger_;
+  //   apollo::common::monitor::MonitorLogger monitor_logger_;
   std::shared_ptr<Writer<Chassis>> chassis_writer_;
   std::shared_ptr<Writer<ChassisDetail>> chassis_detail_writer_;
 };

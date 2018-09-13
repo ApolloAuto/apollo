@@ -29,6 +29,7 @@
 #include "modules/common/log.h"
 #include "modules/common/macro.h"
 #include "modules/common/time/time.h"
+#include "modules/common/util/message_util.h"
 #include "modules/control/proto/control_cmd.pb.h"
 
 // gflags
@@ -339,7 +340,7 @@ class Teleop {
   }
 
   void Send() {
-    common::util::FillHeader("control", &control_command_);
+    apollo::common::util::FillHeader("control", &control_command_);
     control_command_writer_->Write(
         std::make_shared<ControlCommand>(control_command_));
     ADEBUG << "Control Command send OK:" << control_command_.ShortDebugString();
@@ -372,7 +373,7 @@ class Teleop {
     is_running_ = true;
     chassis_reader_ = node_->CreateReader<Chassis>(
         FLAGS_chassis_topic, [this](const std::shared_ptr<Chassis> &chassis) {
-          OnChassis(chassis);
+          OnChassis(*chassis);
         });
     control_command_writer_ =
         node_->CreateWriter<ControlCommand>(FLAGS_control_command_topic);
