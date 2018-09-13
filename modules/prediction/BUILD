@@ -7,7 +7,6 @@ cc_library(
     srcs = ["prediction_component.cc"],
     hdrs = [
         "prediction_component.h",
-        "prediction_interface.h",
     ],
     deps = [
         "//modules/common",
@@ -51,12 +50,12 @@ cc_test(
 )
 
 cc_binary(
-    name = "prediction_component",
-    srcs = ["main.cc"],
+    name = "libprediction_component.so",
     deps = [
         ":prediction_component_lib",
         "//external:gflags",
     ],
+    linkopts = ["-shared"],
 )
 
 filegroup(
