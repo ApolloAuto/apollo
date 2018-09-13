@@ -60,7 +60,7 @@ class StdPlanning : public PlanningBase {
   * @brief main logic of the planning module, runs periodically triggered by
   * timer.
   */
-  void RunOnce(const PlanningData& planning_data,
+  void RunOnce(const LocalView& local_view,
                ADCTrajectory* const trajectory_pb) override;
 
   apollo::common::Status Plan(

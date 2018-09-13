@@ -35,7 +35,7 @@
 #include "modules/common/status/status.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/hdmap/hdmap.h"
-#include "modules/planning/common/planning_data.h"
+#include "modules/planning/common/local_view.h"
 #include "modules/planning/common/trajectory/publishable_trajectory.h"
 #include "modules/planning/planner/planner.h"
 #include "modules/planning/planner/planner_dispatcher.h"
@@ -60,7 +60,7 @@ class PlanningBase {
 
   virtual std::string Name() const = 0;
 
-  virtual void RunOnce(const PlanningData& planning_data,
+  virtual void RunOnce(const LocalView& local_view,
                        ADCTrajectory* const adc_trajectory) = 0;
 
   /**
@@ -76,7 +76,7 @@ class PlanningBase {
                          ADCTrajectory* const trajectory_pb);
   void SetFallbackTrajectory(ADCTrajectory* const trajectory_pb);
 
-  PlanningData planning_data_;
+  LocalView local_view_;
   const hdmap::HDMap* hdmap_ = nullptr;
   const std::shared_ptr<ADCTrajectory> last_planning_;
 

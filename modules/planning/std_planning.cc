@@ -34,7 +34,6 @@
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/trajectory/trajectory_stitcher.h"
-//#include "modules/planning/planner/navi/navi_planner.h"
 #include "modules/planning/planner/rtk/rtk_replay_planner.h"
 #include "modules/planning/reference_line/reference_line_provider.h"
 #include "modules/planning/toolkits/deciders/traffic_decider.h"
@@ -136,7 +135,7 @@ Status StdPlanning::InitFrame(const uint32_t sequence_num,
                               const TrajectoryPoint& planning_start_point,
                               const double start_time,
                               const VehicleState& vehicle_state) {
-  frame_.reset(new Frame(sequence_num, planning_data_, planning_start_point,
+  frame_.reset(new Frame(sequence_num, local_view_, planning_start_point,
                          start_time, vehicle_state,
                          reference_line_provider_.get()));
   auto status = frame_->Init();
@@ -147,7 +146,7 @@ Status StdPlanning::InitFrame(const uint32_t sequence_num,
   return Status::OK();
 }
 
-void StdPlanning::RunOnce(const PlanningData& planning_data,
+void StdPlanning::RunOnce(const LocalView& local_view,
                           ADCTrajectory* const trajectory_pb) {
   const double start_timestamp = Clock::NowInSeconds();
 
@@ -155,11 +154,11 @@ void StdPlanning::RunOnce(const PlanningData& planning_data,
                         ->mutable_main_decision()
                         ->mutable_not_ready();
 
-  if (planning_data.localization_estimate == nullptr) {
+  if (local_view.localization_estimate == nullptr) {
     not_ready->set_reason("localization not ready");
-  } else if (planning_data.chassis == nullptr) {
+  } else if (local_view.chassis == nullptr) {
     not_ready->set_reason("chassis not ready");
-  } else if (planning_data.routing == nullptr) {
+  } else if (local_view.routing == nullptr) {
     not_ready->set_reason("routing not ready");
   } else if (HDMapUtil::BaseMapPtr() == nullptr) {
     not_ready->set_reason("map not ready");
@@ -172,13 +171,13 @@ void StdPlanning::RunOnce(const PlanningData& planning_data,
 
   // localization
   ADEBUG << "Get localization:"
-         << planning_data.localization_estimate->DebugString();
+         << local_view.localization_estimate->DebugString();
 
   // chassis
-  ADEBUG << "Get chassis:" << planning_data.chassis->DebugString();
+  ADEBUG << "Get chassis:" << local_view.chassis->DebugString();
 
   Status status = VehicleStateProvider::Instance()->Update(
-      *planning_data.localization_estimate, *planning_data.chassis);
+      *local_view.localization_estimate, *local_view.chassis);
 
   VehicleState vehicle_state =
       VehicleStateProvider::Instance()->vehicle_state();
@@ -206,10 +205,10 @@ void StdPlanning::RunOnce(const PlanningData& planning_data,
     return;
   }
 
-  if (IsDifferentRouting(last_routing_, *planning_data.routing)) {
-    last_routing_ = *planning_data.routing;
+  if (IsDifferentRouting(last_routing_, *local_view.routing)) {
+    last_routing_ = *local_view.routing;
     GetPlanningStatus()->Clear();
-    reference_line_provider_->UpdateRoutingResponse(*planning_data.routing);
+    reference_line_provider_->UpdateRoutingResponse(*local_view.routing);
   }
 
   // Update reference line provider and reset pull over if necessary

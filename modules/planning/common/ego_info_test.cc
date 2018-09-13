@@ -47,9 +47,9 @@ TEST(EgoInfoTest, EgoInfoSimpleTest) {
   common::VehicleState vehicle_state;
   ReferenceLineProvider reference_line_provider;
 
-  PlanningData dummy_planning_data;
-  Frame frame(sequence_num, dummy_planning_data, planning_start_point,
-              start_time, vehicle_state, &reference_line_provider);
+  LocalView dummy_local_view;
+  Frame frame(sequence_num, dummy_local_view, planning_start_point, start_time,
+              vehicle_state, &reference_line_provider);
   ego_info->CalculateFrontObstacleClearDistance(frame.obstacles());
 }
 

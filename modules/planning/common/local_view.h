@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PLANNING_COMMON_PLANNING_DATA_H_
-#define MODULES_PLANNING_COMMON_PLANNING_DATA_H_
+#ifndef MODULES_PLANNING_COMMON_LOCAL_VIEW_H_
+#define MODULES_PLANNING_COMMON_LOCAL_VIEW_H_
 
 #include <memory>
 
@@ -25,16 +25,15 @@
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
 #include "modules/routing/proto/routing.pb.h"
 
-
 namespace apollo {
 namespace planning {
 
 /**
- * @struct planning_data
- * @brief PlanningData contains all necessary data as planning input
+ * @struct local_view
+ * @brief LocalView contains all necessary data as planning input
  */
 
-struct PlanningData {
+struct LocalView {
   std::shared_ptr<prediction::PredictionObstacles> prediction_obstacles;
   std::shared_ptr<canbus::Chassis> chassis;
   std::shared_ptr<localization::LocalizationEstimate> localization_estimate;
@@ -45,4 +44,4 @@ struct PlanningData {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_COMMON_PLANNING_DATA_H_
+#endif  // MODULES_PLANNING_COMMON_LOCAL_VIEW_H_
