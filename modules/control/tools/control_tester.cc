@@ -18,29 +18,34 @@
 #include <thread>
 
 #include "gflags/gflags.h"
-#include "ros/ros.h"
-#include "std_msgs/String.h"
 
+#include "cybertron/cybertron.h"
+#include "cybertron/time/rate.h"
+#include "cybertron/time/time.h"
+
+#include "modules/canbus/proto/chassis.pb.h"
+#include "modules/common/adapters/adapter_gflags.h"
+#include "modules/common/log.h"
+#include "modules/common/util/file.h"
+#include "modules/control/common/control_gflags.h"
+#include "modules/control/proto/pad_msg.pb.h"
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/planning/proto/planning.pb.h"
 
-#include "modules/canbus/proto/chassis.pb.h"
-#include "modules/common/adapters/adapter_manager.h"
-#include "modules/common/log.h"
-#include "modules/control/common/control_gflags.h"
-
 DEFINE_string(
-    chassis_test_file, "modules/control/testdata/control_tester/chassis.pb.txt",
+    chassis_test_file,
+    "/apollo/modules/control/testdata/control_tester/chassis.pb.txt",
     "Used for sending simulated Chassis content to the control node.");
-DEFINE_string(l10n_test_file,
-              "modules/control/testdata/control_tester/localization.pb.txt",
-              "Used for sending simulated localization to the control node.");
+DEFINE_string(
+    localization_test_file,
+    "/apollo/modules/control/testdata/control_tester/localization.pb.txt",
+    "Used for sending simulated localization to the control node.");
 DEFINE_string(pad_msg_test_file,
-              "modules/control/testdata/control_tester/pad_msg.pb.txt",
+              "/apollo/modules/control/testdata/control_tester/pad_msg.pb.txt",
               "Used for sending simulated PadMsg content to the control node.");
 DEFINE_string(
     planning_test_file,
-    "modules/control/testdata/control_tester/planning.pb.txt",
+    "/apollo/modules/control/testdata/control_tester/planning.pb.txt",
     "Used for sending simulated Planning content to the control node.");
 DEFINE_int32(num_seconds, 10, "Length of execution.");
 DEFINE_int32(feed_frequency, 10,
@@ -49,25 +54,62 @@ DEFINE_int32(feed_frequency, 10,
 int main(int argc, char** argv) {
   using std::this_thread::sleep_for;
 
-  using apollo::canbus::Chassis;
-  using apollo::common::adapter::AdapterManager;
   using apollo::control::PadMessage;
-  using apollo::localization::LocalizationEstimate;
+  using apollo::cybertron::Rate;
+  using apollo::cybertron::Time;
   using apollo::planning::ADCTrajectory;
+  using apollo::canbus::Chassis;
+  using apollo::localization::LocalizationEstimate;
+  using apollo::control::PadMessage;
 
-  google::InitGoogleLogging(argv[0]);
   google::ParseCommandLineFlags(&argc, &argv, true);
+  apollo::cybertron::Init(argv[0]);
   FLAGS_alsologtostderr = true;
-  const std::string& config_file =
-      "modules/control/testdata/control_tester/adapter.conf";
-  ros::init(argc, argv, "control_tester");
-  AdapterManager::Init(config_file);
-  AINFO << "AdapterManager is initialized.";
+
+  Chassis chassis;
+  if (!apollo::common::util::GetProtoFromFile(FLAGS_chassis_test_file,
+                                              &chassis)) {
+    AERROR << "failed to load file: " << FLAGS_chassis_test_file;
+    return -1;
+  }
+
+  LocalizationEstimate localization;
+  if (!apollo::common::util::GetProtoFromFile(FLAGS_localization_test_file,
+                                              &localization)) {
+    AERROR << "failed to load file: " << FLAGS_localization_test_file;
+    return -1;
+  }
+
+  PadMessage pad_msg;
+  if (!apollo::common::util::GetProtoFromFile(FLAGS_pad_msg_test_file,
+                                              &pad_msg)) {
+    AERROR << "failed to load file: " << FLAGS_pad_msg_test_file;
+    return -1;
+  }
+
+  ADCTrajectory trajectory;
+  if (!apollo::common::util::GetProtoFromFile(FLAGS_planning_test_file,
+                                              &trajectory)) {
+    AERROR << "failed to load file: " << FLAGS_planning_test_file;
+    return -1;
+  }
+
+  std::shared_ptr<apollo::cybertron::Node> node(
+      apollo::cybertron::CreateNode("routing_tester"));
+  auto chassis_writer = node->CreateWriter<Chassis>(
+      FLAGS_chassis_topic);
+  auto localization_writer = node->CreateWriter<LocalizationEstimate>(
+      FLAGS_localization_topic);
+  auto pad_msg_writer = node->CreateWriter<PadMessage>(
+      FLAGS_pad_topic);
+  auto planning_writer = node->CreateWriter<ADCTrajectory>(
+      FLAGS_planning_trajectory_topic);
+
   for (int i = 0; i < FLAGS_num_seconds * FLAGS_feed_frequency; ++i) {
-    AdapterManager::FeedChassisFile(FLAGS_chassis_test_file);
-    AdapterManager::FeedLocalizationFile(FLAGS_l10n_test_file);
-    AdapterManager::FeedPadFile(FLAGS_pad_msg_test_file);
-    AdapterManager::FeedPlanningFile(FLAGS_planning_test_file);
+    chassis_writer->Write(chassis);
+    localization_writer->Write(localization);
+    pad_msg_writer->Write(pad_msg);
+    planning_writer->Write(trajectory);
     sleep_for(std::chrono::milliseconds(1000 / FLAGS_feed_frequency));
   }
   AINFO << "Successfully fed proto files.";

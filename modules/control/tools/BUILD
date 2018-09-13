@@ -15,17 +15,20 @@ package(default_visibility = ["//visibility:public"])
 #    ],
 #)
 
-#cc_binary(
-#    name = "control_tester",
-#    srcs = ["control_tester.cc"],
-#    deps = [
-#        "//modules/canbus/proto:canbus_proto",
-#        "//modules/common:log",
-#        "//modules/control/common:control_gflags",
-#        "//modules/localization/proto:localization_proto",
-#        "//modules/planning/proto:planning_proto",
-#        "@ros//:ros_common",
-#    ],
-#)
+cc_binary(
+    name = "control_tester",
+    srcs = ["control_tester.cc"],
+    deps = [
+        "//framework:cybertron",
+        "//modules/canbus/proto:canbus_proto",
+        "//modules/common:log",
+        "//modules/common/adapters:adapter_gflags",
+        "//modules/common/util",
+        "//modules/control/common:control_gflags",
+        "//modules/control/proto:control_proto",
+        "//modules/localization/proto:localization_proto",
+        "//modules/planning/proto:planning_proto",
+    ],
+)
 
 cpplint()
