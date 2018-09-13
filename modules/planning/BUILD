@@ -22,6 +22,12 @@ cc_library(
     ],
 )
 
+cc_binary(
+    name = "libplanning_component.so",
+    deps = [":planning_component_lib"],
+    linkopts = ["-shared"],
+)
+
 cc_library(
     name = "planning_lib",
     srcs = [
