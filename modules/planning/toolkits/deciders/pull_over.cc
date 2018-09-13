@@ -78,7 +78,7 @@ Status PullOver::ApplyRule(Frame* const frame,
  * @brief: check if in pull_over state
  */
 bool PullOver::IsPullOver() const {
-  auto* planning_status = GetPlanningStatus();
+  auto* planning_status = mutable_planning_status();
   return (planning_status->has_pull_over() &&
           planning_status->pull_over().in_pull_over());
 }
@@ -101,7 +101,7 @@ PullOver::ValidateStopPointCode PullOver::IsValidStop(
   }
 
   // note: this check has to be done first
-  const auto& pull_over_status = GetPlanningStatus()->pull_over();
+  const auto& pull_over_status = mutable_planning_status()->pull_over();
   if (pull_over_status.has_inlane_dest_point()) {
     common::SLPoint dest_point_sl;
     reference_line.XYToSL({pull_over_status.inlane_dest_point().x(),
@@ -179,7 +179,7 @@ PullOver::ValidateStopPointCode PullOver::IsValidStop(
  * @brief:get pull_over points(start & stop)
  */
 int PullOver::GetPullOverStopPoint(PointENU* stop_point) {
-  const auto& pull_over_status = GetPlanningStatus()->pull_over();
+  const auto& pull_over_status = mutable_planning_status()->pull_over();
 
   if (inlane_stop_point_.has_x() && inlane_stop_point_.has_y()) {
     // if inlane_stop_point already set
@@ -468,7 +468,7 @@ bool PullOver::CheckPullOverComplete() {
     return false;
   }
 
-  const auto& pull_over_status = GetPlanningStatus()->pull_over();
+  const auto& pull_over_status = mutable_planning_status()->pull_over();
   if (!pull_over_status.has_stop_point()) {
     return false;
   }
@@ -492,7 +492,8 @@ bool PullOver::CheckPullOverComplete() {
   // no stop fence if ADC fully pass stop line
   double adc_end_edge_s = reference_line_info_->AdcSlBoundary().start_s();
   if (adc_end_edge_s > stop_point_sl.s()) {
-    GetPlanningStatus()->mutable_pull_over()->set_status(PullOverStatus::DONE);
+    mutable_planning_status()->mutable_pull_over()->set_status(
+        PullOverStatus::DONE);
 
     return true;
   }
@@ -521,7 +522,7 @@ int PullOver::BuildPullOverStop(const PointENU& stop_point) {
   BuildStopDecision("", stop_line_s, stop_point, stop_point_heading);
 
   // record in PlanningStatus
-  auto* pull_over_status = GetPlanningStatus()->mutable_pull_over();
+  auto* pull_over_status = mutable_planning_status()->mutable_pull_over();
 
   common::SLPoint start_point_sl;
   start_point_sl.set_s(stop_point_sl.s() -
@@ -561,7 +562,7 @@ int PullOver::BuildInLaneStop(const PointENU& pull_over_stop_point) {
   }
 
   // use inlane_dest_point if there's one
-  const auto& pull_over_status = GetPlanningStatus()->pull_over();
+  const auto& pull_over_status = mutable_planning_status()->pull_over();
   if (pull_over_status.has_inlane_dest_point()) {
     reference_line.XYToSL({pull_over_status.inlane_dest_point().x(),
                            pull_over_status.inlane_dest_point().y()},
@@ -619,7 +620,7 @@ int PullOver::BuildInLaneStop(const PointENU& pull_over_stop_point) {
   BuildStopDecision(INLANE_STOP_VO_ID_POSTFIX, stop_line_s, stop_point,
                     stop_point_heading);
 
-  GetPlanningStatus()->clear_pull_over();
+  mutable_planning_status()->clear_pull_over();
 
   return 0;
 }
@@ -634,7 +635,8 @@ int PullOver::BuildStopDecision(const std::string& vistual_obstacle_id_postfix,
   }
 
   // create virtual stop wall
-  const auto& pull_over_reason = GetPlanningStatus()->pull_over().reason();
+  const auto& pull_over_reason =
+      mutable_planning_status()->pull_over().reason();
   std::string virtual_obstacle_id =
       PULL_OVER_VO_ID_PREFIX + PullOverStatus_Reason_Name(pull_over_reason) +
       vistual_obstacle_id_postfix;

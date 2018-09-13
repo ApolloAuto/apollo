@@ -37,7 +37,7 @@
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
 #include "modules/routing/proto/routing.pb.h"
 
-// #include "modules/common/monitor_log/monitor_log_buffer.h"
+#include "modules/common/monitor_log/monitor_log_buffer.h"
 #include "modules/common/status/status.h"
 #include "modules/planning/common/change_lane_decider.h"
 #include "modules/planning/common/indexed_queue.h"
@@ -164,6 +164,7 @@ class Frame {
   ReferenceLineProvider *reference_line_provider_ = nullptr;
 
   // apollo::common::monitor::MonitorLogger monitor_logger_;
+  common::monitor::MonitorLogBuffer monitor_logger_buffer_;
 };
 
 class FrameHistory : public IndexedQueue<uint32_t, Frame> {

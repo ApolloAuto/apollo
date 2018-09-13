@@ -21,11 +21,9 @@
 #ifndef MODULES_PLANNING_TOOLKITS_OPTIMIZERS_SIDE_PASS_PATH_OPTIMIZER_H_
 #define MODULES_PLANNING_TOOLKITS_OPTIMIZERS_SIDE_PASS_PATH_OPTIMIZER_H_
 
-#include <string>
-
 #include "modules/planning/proto/dp_poly_path_config.pb.h"
-
 #include "modules/planning/proto/planning_config.pb.h"
+
 #include "modules/planning/toolkits/optimizers/path_optimizer.h"
 
 namespace apollo {

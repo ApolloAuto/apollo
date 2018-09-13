@@ -77,7 +77,7 @@ bool WaypointSampler::SamplePathWaypoints(
   float accumulated_s = init_sl_point_.s();
   float prev_s = accumulated_s;
 
-  auto *status = GetPlanningStatus();
+  auto *status = mutable_planning_status();
   if (!status->has_pull_over() && status->pull_over().in_pull_over()) {
     status->mutable_pull_over()->set_status(PullOverStatus::IN_OPERATION);
     const auto &start_point = status->pull_over().start_point();

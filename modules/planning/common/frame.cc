@@ -63,8 +63,8 @@ Frame::Frame(uint32_t sequence_num, const LocalView &local_view,
       planning_start_point_(planning_start_point),
       start_time_(start_time),
       vehicle_state_(vehicle_state),
-      reference_line_provider_(reference_line_provider) {
-  // monitor_logger_(common::monitor::MonitorMessageItem::PLANNING)
+      reference_line_provider_(reference_line_provider),
+      monitor_logger_buffer_(common::monitor::MonitorMessageItem::PLANNING) {
   // if (FLAGS_enable_lag_prediction) {
   //   lag_predictor_.reset(
   //       new LagPrediction(FLAGS_lag_prediction_min_appear_num,

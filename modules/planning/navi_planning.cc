@@ -73,7 +73,7 @@ Status NaviPlanning::Init() {
       << FLAGS_traffic_rule_config_filename;
 
   // clear planning status
-  GetPlanningStatus()->Clear();
+  mutable_planning_status()->Clear();
 
   if (!AdapterManager::Initialized()) {
     AdapterManager::Init(FLAGS_planning_adapter_config_filename);
@@ -617,7 +617,7 @@ void NaviPlanning::Stop() {
   frame_.reset(nullptr);
   planner_.reset(nullptr);
   FrameHistory::Instance()->Clear();
-  GetPlanningStatus()->Clear();
+  mutable_planning_status()->Clear();
 }
 
 NaviPlanning::VehicleConfig NaviPlanning::ComputeVehicleConfigFromLocalization(

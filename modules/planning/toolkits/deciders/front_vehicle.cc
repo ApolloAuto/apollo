@@ -89,7 +89,7 @@ bool FrontVehicle::MakeSidePassDecision(
     return false;
   }
 
-  auto* sidepass_status = GetPlanningStatus()->mutable_side_pass();
+  auto* sidepass_status = mutable_planning_status()->mutable_side_pass();
   if (sidepass_status->has_status() &&
       sidepass_status->status() == SidePassStatus::SIDEPASS) {
     ADEBUG << "SIDEPASS: obstacle[" << sidepass_status->pass_obstacle_id()
@@ -113,7 +113,7 @@ bool FrontVehicle::ProcessSidePass(
   // find obstacle being blocked, to process SIDEPASS
   std::string passable_obstacle_id = FindPassableObstacle(reference_line_info);
 
-  auto* sidepass_status = GetPlanningStatus()->mutable_side_pass();
+  auto* sidepass_status = mutable_planning_status()->mutable_side_pass();
   if (!sidepass_status->has_status()) {
     sidepass_status->set_status(SidePassStatus::UNKNOWN);
   }

@@ -303,6 +303,7 @@ cc_library(
         #":lag_prediction",
         ":obstacle",
         ":reference_line_info",
+        "//modules/common/monitor_log",
         "//modules/common:log",
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/vehicle_state:vehicle_state_provider",

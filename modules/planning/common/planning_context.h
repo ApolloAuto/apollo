@@ -40,19 +40,20 @@ class PlanningContext {
  public:
   void Clear();
 
-  PlanningStatus* GetPlanningStatus() { return &planning_status_; }
+  PlanningStatus* mutable_planning_status() { return &planning_status_; }
+  const PlanningStatus& planning_status() const { return planning_status_; }
 
  private:
   PlanningStatus planning_status_;
 
-  // this is a sigleton class
+  // this is a singleton class
   DECLARE_SINGLETON(PlanningContext);
 };
 
 void DumpPlanningContext();
 
-inline PlanningStatus* GetPlanningStatus() {
-  return PlanningContext::Instance()->GetPlanningStatus();
+inline PlanningStatus* mutable_planning_status() {
+  return PlanningContext::Instance()->mutable_planning_status();
 }
 
 }  // namespace planning

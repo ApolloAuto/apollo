@@ -321,6 +321,7 @@ proto_library(
     deps = [
         ":decision_proto_lib",
         ":planning_proto_lib",
+        "//modules/routing/proto:routing_proto_lib",
         "//modules/common/proto:common_proto_lib",
         "//modules/common/proto:drive_state_proto_lib",
     ],

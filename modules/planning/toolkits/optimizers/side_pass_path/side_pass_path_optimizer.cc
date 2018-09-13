@@ -20,7 +20,6 @@
 
 #include "modules/planning/toolkits/optimizers/side_pass_path/side_pass_path_optimizer.h"
 
-#include <string>
 #include <utility>
 #include <vector>
 

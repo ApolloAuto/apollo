@@ -44,7 +44,6 @@ using apollo::common::SLPoint;
 using apollo::common::TrajectoryPoint;
 using apollo::common::VehicleConfigHelper;
 using apollo::common::VehicleSignal;
-// using apollo::common::adapter::AdapterManager;
 using apollo::common::math::Box2d;
 using apollo::common::math::Vec2d;
 using apollo::common::util::ThreadPool;
@@ -132,7 +131,7 @@ bool WithinOverlap(const hdmap::PathOverlap& overlap, double s) {
 
 void ReferenceLineInfo::SetJunctionRightOfWay(double junction_s,
                                               bool is_protected) {
-  auto* right_of_way = GetPlanningStatus()->mutable_right_of_way();
+  auto* right_of_way = mutable_planning_status()->mutable_right_of_way();
   auto* junction_right_of_way = right_of_way->mutable_junction();
   for (const auto& overlap : reference_line_.map_path().junction_overlaps()) {
     if (WithinOverlap(overlap, junction_s)) {
@@ -142,7 +141,7 @@ void ReferenceLineInfo::SetJunctionRightOfWay(double junction_s,
 }
 
 ADCTrajectory::RightOfWayStatus ReferenceLineInfo::GetRightOfWayStatus() const {
-  auto* right_of_way = GetPlanningStatus()->mutable_right_of_way();
+  auto* right_of_way = mutable_planning_status()->mutable_right_of_way();
   auto* junction_right_of_way = right_of_way->mutable_junction();
   for (const auto& overlap : reference_line_.map_path().junction_overlaps()) {
     if (overlap.end_s < sl_boundary_info_.adc_sl_boundary_.start_s()) {
@@ -569,8 +568,9 @@ void ReferenceLineInfo::MakeMainMissionCompleteDecision(
   auto mission_complete =
       decision_result->mutable_main_decision()->mutable_mission_complete();
   if (ReachedDestination()) {
-    GetPlanningStatus()->mutable_destination()->set_has_passed_destination(
-        true);
+    mutable_planning_status()
+        ->mutable_destination()
+        ->set_has_passed_destination(true);
   } else {
     mission_complete->mutable_stop_point()->CopyFrom(main_stop.stop_point());
     mission_complete->set_stop_heading(main_stop.stop_heading());
@@ -656,7 +656,7 @@ void ReferenceLineInfo::SetObjectDecisions(
 
 void ReferenceLineInfo::ExportEngageAdvice(EngageAdvice* engage_advice) const {
   constexpr double kMaxAngleDiff = M_PI / 6.0;
-  auto* prev_advice = GetPlanningStatus()->mutable_engage_advice();
+  auto* prev_advice = mutable_planning_status()->mutable_engage_advice();
   if (!prev_advice->has_advice()) {
     prev_advice->set_advice(EngageAdvice::DISALLOW_ENGAGE);
   }

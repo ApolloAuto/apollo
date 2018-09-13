@@ -2,6 +2,7 @@ syntax = "proto2";
 
 package apollo.planning;
 
+import "modules/routing/proto/routing.proto";
 import "modules/planning/proto/decision.proto";
 import "modules/common/proto/drive_state.proto";
 import "modules/common/proto/geometry.proto";
@@ -59,6 +60,8 @@ message PullOverStatus {
 
 message ReroutingStatus {
   optional double last_rerouting_time = 1;
+  optional bool need_rerouting = 2 [default=false];
+  optional routing.RoutingRequest routing_request = 3;
 }
 
 message RightOfWayStatus {
