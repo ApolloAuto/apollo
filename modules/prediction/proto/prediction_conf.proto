@@ -34,5 +34,9 @@ message ObstacleConf {
 }
 
 message PredictionConf {
-  repeated ObstacleConf obstacle_conf = 1; 
+  repeated ObstacleConf obstacle_conf = 1;
+  optional string perception_obstacle_channel = 2;
+  optional string perception_traffic_light_channel = 3;
+  optional string pose_channel = 4;
+  optional string planning_trajectory_channel = 5;
 }
