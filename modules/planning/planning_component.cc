@@ -74,6 +74,8 @@ bool PlanningComponent::Proc(
     const std::shared_ptr<canbus::Chassis>& chassis,
     const std::shared_ptr<localization::LocalizationEstimate>&
         localization_estimate) {
+  CHECK(prediction_obstacles != nullptr);
+
   // check and process possible rerouting request
   Rerouting();
 

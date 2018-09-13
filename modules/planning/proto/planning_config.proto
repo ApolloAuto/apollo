@@ -90,11 +90,9 @@ message NavigationPlanningConfig {
 }
 
 message PlanningConfig {
-  optional PlannerType planner_type = 1 [deprecated=true];
-  optional PlannerNaviConfig planner_navi_config = 2;
   oneof planning_config {
-    RtkPlanningConfig rtk_planning_config = 3;
-    StandardPlanningConfig standard_planning_config = 4;
-    NavigationPlanningConfig navigation_planning_config = 5;
+    RtkPlanningConfig rtk_planning_config = 1;
+    StandardPlanningConfig standard_planning_config = 2;
+    NavigationPlanningConfig navigation_planning_config = 3;
   }
 }
