@@ -13,25 +13,61 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+
 #include <gtest/gtest.h>
 #include <iostream>
 #include <string>
 #include <thread>
 #include <vector>
+
 #include "cybertron/class_loader/class_loader.h"
 #include "cybertron/class_loader/class_loader_manager.h"
 #include "cybertron/cybertron.h"
 #include "cybertron/test/class_loader/base.h"
 
-const char LIBRARY_1[] = "libTestPlugins1.so";
-const char LIBRARY_2[] = "libTestPlugins2.so";
-using apollo::cybertron::class_loader::ClassLoader;
-using apollo::cybertron::class_loader::ClassLoaderManager;
-using apollo::cybertron::class_loader::utility::IsLibraryLoadedByAnybody;
+namespace apollo {
+namespace cybertron {
+namespace class_loader {
 
-TEST(ClassLoaderTest, createClassObj) {  
-  ClassLoader loader1(LIBRARY_1);
-  EXPECT_EQ(LIBRARY_1, loader1.GetLibraryPath());
+using utility::IsLibraryLoadedByAnybody;
+
+class ClassLoaderTest : public ::testing::Test {
+ protected:
+  ClassLoaderTest() {
+    const char* cybertron_path = ::getenv("CYBERTRON_PATH");
+    std::string test_path(cybertron_path);
+    test_path += "/test/cybertron/unit_test/";
+    library_1_ = test_path + "libTestPlugins1.so";
+    library_2_ = test_path + "libTestPlugins2.so";
+  }
+
+  virtual ~ClassLoaderTest() {}
+
+  virtual void SetUp() {}
+
+  virtual void TearDown() {}
+
+  class InvalidBaseClass {};
+
+  void CreateObj(ClassLoaderManager* loader) {
+    std::vector<std::string> classes = loader->GetValidClassNames<Base>();
+    for (size_t i = 0; i < classes.size(); ++i) {
+      loader->CreateClassObj<Base>(classes[i])->DoSomething();
+    }
+  }
+
+  void LoadLib(ClassLoaderManager* loaderMgr) {
+    loaderMgr->LoadLibrary(library_1_);
+    ASSERT_TRUE(loaderMgr->IsLibraryValid(library_1_));
+  }
+
+  std::string library_1_;
+  std::string library_2_;
+};
+
+TEST_F(ClassLoaderTest, createClassObj) {
+  ClassLoader loader1(library_1_);
+  EXPECT_EQ(library_1_, loader1.GetLibraryPath());
   auto rect_obj = loader1.CreateClassObj<Base>("Rect");
   EXPECT_TRUE(nullptr != rect_obj);
   if (rect_obj) {
@@ -41,8 +77,8 @@ TEST(ClassLoaderTest, createClassObj) {
   SUCCEED();
 }
 
-TEST(ClassLoaderTest, loadLibCounts) {
-  ClassLoader loader1(LIBRARY_1);
+TEST_F(ClassLoaderTest, loadLibCounts) {
+  ClassLoader loader1(library_1_);
   ASSERT_TRUE(loader1.IsLibraryLoaded());
 
   loader1.LoadLibrary();
@@ -67,36 +103,36 @@ TEST(ClassLoaderTest, loadLibCounts) {
   SUCCEED();
 }
 
-TEST(ClassLoaderTest, multiTimesLoadunload) {
-  ClassLoader loader1(LIBRARY_1);
+TEST_F(ClassLoaderTest, multiTimesLoadunload) {
+  ClassLoader loader1(library_1_);
   ASSERT_TRUE(loader1.LoadLibrary());
   loader1.LoadLibrary();
-  ASSERT_TRUE(IsLibraryLoadedByAnybody(LIBRARY_1));
+  ASSERT_TRUE(IsLibraryLoadedByAnybody(library_1_));
   loader1.UnloadLibrary();
-  ASSERT_TRUE(IsLibraryLoadedByAnybody(LIBRARY_1));
+  ASSERT_TRUE(IsLibraryLoadedByAnybody(library_1_));
   loader1.UnloadLibrary();
-  ASSERT_TRUE(IsLibraryLoadedByAnybody(LIBRARY_1));
+  ASSERT_TRUE(IsLibraryLoadedByAnybody(library_1_));
   loader1.UnloadLibrary();
-  ASSERT_FALSE(IsLibraryLoadedByAnybody(LIBRARY_1));
+  ASSERT_FALSE(IsLibraryLoadedByAnybody(library_1_));
 
   return;
 }
 
-TEST(ClassLoaderManagerTest, testClassLoaderManager) {
+TEST_F(ClassLoaderTest, testClassLoaderManager) {
   ClassLoaderManager loader_mgr;
-  ASSERT_TRUE(loader_mgr.LoadLibrary(LIBRARY_1));
-  ASSERT_TRUE(loader_mgr.LoadLibrary(LIBRARY_2));
+  ASSERT_TRUE(loader_mgr.LoadLibrary(library_1_));
+  ASSERT_TRUE(loader_mgr.LoadLibrary(library_2_));
   for (int i = 0; i < 2; ++i) {
     loader_mgr.CreateClassObj<Base>("Rect")->DoSomething();
     loader_mgr.CreateClassObj<Base>("Circle")->DoSomething();
     loader_mgr.CreateClassObj<Base>("Apple")->DoSomething();
   }
 
-  auto pear_obj = loader_mgr.CreateClassObj<Base>("Pear", LIBRARY_2);
+  auto pear_obj = loader_mgr.CreateClassObj<Base>("Pear", library_2_);
   EXPECT_TRUE(nullptr != pear_obj);
   pear_obj->DoSomething();
 
-  auto null_obj = loader_mgr.CreateClassObj<Base>("Pear", LIBRARY_1);
+  auto null_obj = loader_mgr.CreateClassObj<Base>("Pear", library_1_);
   EXPECT_TRUE(nullptr == null_obj);
   auto null_obj1 = loader_mgr.CreateClassObj<Base>("ＣlassNull", "libNull.so");
   EXPECT_TRUE(nullptr == null_obj1);
@@ -112,26 +148,20 @@ TEST(ClassLoaderManagerTest, testClassLoaderManager) {
   EXPECT_FALSE(loader_mgr.IsClassValid<Base>("Hamburger"));
   EXPECT_FALSE(loader_mgr.IsClassValid<Base>("Cake"));
 
-  EXPECT_TRUE(loader_mgr.LoadLibrary(LIBRARY_1));
+  EXPECT_TRUE(loader_mgr.LoadLibrary(library_1_));
   SUCCEED();
 }
 
-void CreateObj(ClassLoaderManager* loader) {
-  std::vector<std::string> classes = loader->GetValidClassNames<Base>();
-  for (unsigned int i = 0; i < classes.size(); i++) {
-    loader->CreateClassObj<Base>(classes[i])->DoSomething();
-  }
-}
-
-TEST(ClassLoaderTest, createObjThreadSafety) {
+TEST_F(ClassLoaderTest, createObjThreadSafety) {
   ClassLoaderManager loader_mgr;
-  ASSERT_TRUE(loader_mgr.LoadLibrary(LIBRARY_1));
-  ASSERT_TRUE(loader_mgr.IsLibraryValid(LIBRARY_1));
+  ASSERT_TRUE(loader_mgr.LoadLibrary(library_1_));
+  ASSERT_TRUE(loader_mgr.IsLibraryValid(library_1_));
 
   std::vector<std::thread*> client_threads;
 
   for (unsigned int i = 0; i < 100; i++) {
-    client_threads.emplace_back(new std::thread(std::bind(&CreateObj, &loader_mgr)));
+    client_threads.emplace_back(new std::thread(
+        std::bind(&ClassLoaderTest::CreateObj, this, &loader_mgr)));
   }
 
   for (unsigned int i = 0; i < client_threads.size(); i++) {
@@ -143,35 +173,29 @@ TEST(ClassLoaderTest, createObjThreadSafety) {
   }
 }
 
-void LoadLib(ClassLoaderManager* loaderMgr) {
-  loaderMgr->LoadLibrary(LIBRARY_1);
-  ASSERT_TRUE(loaderMgr->IsLibraryValid(LIBRARY_1));
-}
-
-TEST(ClassLoaderTest, loadLibThreadSafety) {
+TEST_F(ClassLoaderTest, loadLibThreadSafety) {
   ClassLoaderManager loaderMgr;
   std::vector<std::thread*> client_threads;
 
   for (unsigned int i = 0; i < 100; i++) {
-    client_threads.emplace_back(new std::thread(std::bind(&LoadLib, &loaderMgr)));
+    client_threads.emplace_back(new std::thread(
+        std::bind(&ClassLoaderTest::LoadLib, this, &loaderMgr)));
   }
 
   for (unsigned int i = 0; i < client_threads.size(); i++) {
     client_threads[i]->join();
   }
-  ASSERT_TRUE(loaderMgr.IsLibraryValid(LIBRARY_1));
+  ASSERT_TRUE(loaderMgr.IsLibraryValid(library_1_));
   for (unsigned int i = 0; i < client_threads.size(); i++) {
     delete (client_threads[i]);
   }
 
   loaderMgr.UnloadAllLibrary();
-  ASSERT_FALSE(loaderMgr.IsLibraryValid(LIBRARY_1));
+  ASSERT_FALSE(loaderMgr.IsLibraryValid(library_1_));
 }
 
-class InvalidBaseClass {};
-
-TEST(ClassLoaderTest, invalidBaseClass) {
-  ClassLoader loader1(LIBRARY_1);
+TEST_F(ClassLoaderTest, invalidBaseClass) {
+  ClassLoader loader1(library_1_);
   ASSERT_FALSE(loader1.IsClassValid<InvalidBaseClass>("InvalidBaseClass"));
   if (loader1.IsClassValid<InvalidBaseClass>("Rect")) {
     FAIL() << "Rect is invalid for InvalidBaseClass";
@@ -182,6 +206,10 @@ TEST(ClassLoaderTest, invalidBaseClass) {
     FAIL() << "baseClass not valid for Rect";
   }
 }
+
+}  // namespace class_loader
+}  // namespace cybertron
+}  // namespace apollo
 
 int main(int argc, char** argv) {
   apollo::cybertron::Init(argv[0]);
