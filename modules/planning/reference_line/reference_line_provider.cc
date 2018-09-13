@@ -70,9 +70,9 @@ ReferenceLineProvider::ReferenceLineProvider(const hdmap::HDMap *base_map) {
   if (smoother_config_.has_qp_spline()) {
     smoother_.reset(new QpSplineReferenceLineSmoother(smoother_config_));
   } else if (smoother_config_.has_spiral()) {
-    smoother_.reset(new SpiralReferenceLineSmoother(smoother_config_));
+    // smoother_.reset(new SpiralReferenceLineSmoother(smoother_config_));
   } else if (smoother_config_.has_cos_theta()) {
-    smoother_.reset(new CosThetaReferenceLineSmoother(smoother_config_));
+    // smoother_.reset(new CosThetaReferenceLineSmoother(smoother_config_));
   } else {
     CHECK(false) << "unknown smoother config "
                  << smoother_config_.DebugString();

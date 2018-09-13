@@ -61,28 +61,6 @@ cc_library(
     ],
 )
 
-cc_library(
-    name = "open_space_planning_lib",
-    srcs = [
-        "open_space_planning.cc",
-    ],
-    hdrs = [
-        "open_space_planning.h",
-    ],
-    deps = [
-        ":planning_lib",
-    ],
-)
-
-cc_binary(
-    name = "libplanning.so",
-    deps = [
-        ":planning_component_lib",
-    ],
-    linkopts = ["-shared"],
-    linkstatic = False,
-)
-
 filegroup(
     name = "planning_testdata",
     srcs = glob([

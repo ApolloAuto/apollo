@@ -72,8 +72,8 @@ class PlanningBase {
       ADCTrajectory* const trajectory) = 0;
 
  protected:
-  void PublishPlanningPb(const double timestamp,
-                         ADCTrajectory* const trajectory_pb);
+  void FillPlanningPb(const double timestamp,
+                      ADCTrajectory* const trajectory_pb);
   void SetFallbackTrajectory(ADCTrajectory* const trajectory_pb);
 
   LocalView local_view_;

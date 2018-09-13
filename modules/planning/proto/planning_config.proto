@@ -70,8 +70,8 @@ message PlannerNaviConfig {
 
 enum PlannerType {
   RTK = 0;
-  ONROAD = 1;  // expectation maximization
-  OPENSPACE = 2; // open space planner
+  PUBLIC_ROAD = 1;  // public road planner
+  OPEN_SPACE = 2; // open space planner
   NAVI = 3; // navigation planner
 }
 

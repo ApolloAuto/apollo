@@ -22,7 +22,7 @@ namespace apollo {
 namespace planning {
 
 std::unique_ptr<Planner> StdPlannerDispatcher::DispatchPlanner() {
-  return planner_factory_.CreateObject(ONROAD);
+  return planner_factory_.CreateObject(PUBLIC_ROAD);
 }
 
 }  // namespace planning

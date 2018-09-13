@@ -18,8 +18,12 @@
  * @file: testing cases for autotuning raw feature generator
  **/
 #include "modules/planning/tuning/autotuning_raw_feature_generator.h"
+
 #include <memory>
+
 #include "gtest/gtest.h"
+
+#include "modules/planning/common/local_view.h"
 
 namespace apollo {
 namespace planning {
@@ -35,7 +39,9 @@ class AutotuningRawFeatureGeneratorTest : public ::testing::Test {
     ref_line_info_.reset(
         new ReferenceLineInfo(ego_state, ego_pos, reference_line, segments));
     // pseudo empty frame info
-    frame_.reset(new Frame(0, ego_pos, 0, ego_state, nullptr));
+    LocalView dummy_local_view;
+    frame_.reset(
+        new Frame(0, dummy_local_view, ego_pos, 0, ego_state, nullptr));
     std::vector<double> evaluate_time{1., 2., 3., 4., 5., 6., 7., 8.};
     generator_.reset(new AutotuningRawFeatureGenerator(evaluate_time));
   }

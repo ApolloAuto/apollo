@@ -33,8 +33,8 @@ using apollo::hdmap::HDMapUtil;
 
 PlanningBase::~PlanningBase() {}
 
-void PlanningBase::PublishPlanningPb(const double timestamp,
-                                     ADCTrajectory* const trajectory_pb) {
+void PlanningBase::FillPlanningPb(const double timestamp,
+                                  ADCTrajectory* const trajectory_pb) {
   trajectory_pb->mutable_header()->set_timestamp_sec(timestamp);
   if (local_view_.prediction_obstacles != nullptr &&
       !local_view_.prediction_obstacles->has_header()) {
