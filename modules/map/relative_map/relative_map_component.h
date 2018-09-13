@@ -19,8 +19,8 @@
 
 #include <memory>
 
-#include "cybertron/class_loader/class_loader.h"
-#include "cybertron/component/component.h"
+#include "cybertron/component/timer_component.h"
+#include "cybertron/cybertron.h"
 
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
@@ -30,24 +30,27 @@
 namespace apollo {
 namespace relative_map {
 
-class RelativeMapComponent final
-    : public cybertron::Component<perception::PerceptionObstacles,
-                                  canbus::Chassis,
-                                  localization::LocalizationEstimate> {
- public:
-  RelativeMapComponent() = default;
-  ~RelativeMapComponent() = default;
+class RelativeMapComponent : public apollo::cybertron::TimerComponent {
+
  public:
   bool Init() override;
-  bool Proc(const std::shared_ptr<perception::PerceptionObstacles>&
-            prediction_obstacles,
-            const std::shared_ptr<canbus::Chassis>& chassis,
-            const std::shared_ptr<localization::LocalizationEstimate>&
-            localization_estimate) override;
+  bool Proc() override;
+
  private:
   std::shared_ptr<::apollo::cybertron::Writer<MapMsg>>
       relative_map_writer_ = nullptr;
 
+  std::shared_ptr<cybertron::Reader<perception::PerceptionObstacles>>
+      perception_reader_;
+  std::shared_ptr<cybertron::Reader<canbus::Chassis>> chassis_reader_;
+  std::shared_ptr<cybertron::Reader<localization::LocalizationEstimate>>
+      localization_reader_;
+
+  std::mutex mutex_;
+
+  perception::PerceptionObstacles perception_obstacles_;
+  canbus::Chassis chassis_;
+  localization::LocalizationEstimate localization_;
 };
 
 CYBERTRON_REGISTER_COMPONENT(RelativeMapComponent)

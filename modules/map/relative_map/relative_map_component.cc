@@ -28,16 +28,37 @@ bool RelativeMapComponent::Init() {
   AINFO << "Loading gflag from file: " << ConfigFilePath();
   google::SetCommandLineOption("flagfile", ConfigFilePath().c_str());
 
+  perception_reader_ = node_->CreateReader<PerceptionObstacles>(
+      FLAGS_perception_obstacle_topic,
+      [this](const std::shared_ptr<PerceptionObstacles>& perception_obstacles) {
+        ADEBUG << "Received perception data: run perception callback.";
+        std::lock_guard<std::mutex> lock(mutex_);
+        perception_obstacles_.CopyFrom(*perception_obstacles);
+      });
+
+  chassis_reader_ = node_->CreateReader<Chassis>(
+      FLAGS_chassis_topic,
+      [this](const std::shared_ptr<Chassis>& chassis) {
+        ADEBUG << "Received chassis data: run chassis callback.";
+        std::lock_guard<std::mutex> lock(mutex_);
+        chassis_.CopyFrom(*chassis);
+      });
+
+  localization_reader_ = node_->CreateReader<LocalizationEstimate>(
+      FLAGS_localization_topic,
+      [this](const std::shared_ptr<LocalizationEstimate>& localization) {
+        ADEBUG << "Received chassis data: run chassis callback.";
+        std::lock_guard<std::mutex> lock(mutex_);
+        localization_.CopyFrom(*localization);
+      });
+
   relative_map_writer_ =
       node_->CreateWriter<MapMsg>(FLAGS_relative_map_topic);
 
   return true;
 }
 
-bool RelativeMapComponent::Proc(
-    const std::shared_ptr<PerceptionObstacles>& prediction_obstacles,
-    const std::shared_ptr<Chassis>& chassis,
-    const std::shared_ptr<LocalizationEstimate>& localization_estimate) {
+bool RelativeMapComponent::Proc() {
   //TODO(yifei) migrate implementation
   return true;
 }
