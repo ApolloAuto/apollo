@@ -17,13 +17,15 @@
 #ifndef MODULES_PLANNING_COMMON_PLANNING_DATA_H_
 #define MODULES_PLANNING_COMMON_PLANNING_DATA_H_
 
+#include <memory>
+
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/perception/proto/traffic_light_detection.pb.h"
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
 #include "modules/routing/proto/routing.pb.h"
 
-#
+
 namespace apollo {
 namespace planning {
 
