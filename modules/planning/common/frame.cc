@@ -47,7 +47,6 @@ using apollo::common::Status;
 using apollo::common::VehicleStateProvider;
 using apollo::common::math::Box2d;
 using apollo::common::math::Vec2d;
-// using apollo::common::monitor::MonitorLogBuffer;
 using apollo::prediction::PredictionObstacles;
 
 constexpr double kMathEpsilon = 1e-8;
@@ -134,8 +133,7 @@ bool Frame::Rerouting() {
       ->mutable_routing_request()
       ->CopyFrom(request);
 
-  // apollo::common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
-  // buffer.INFO("Planning send Rerouting request");
+  monitor_logger_buffer_.INFO("Planning send Rerouting request");
   return true;
 }
 
@@ -388,8 +386,7 @@ Status Frame::Init() {
     if (collision_obstacle) {
       std::string err_str =
           "Found collision with obstacle: " + collision_obstacle->Id();
-      // apollo::common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
-      // buffer.ERROR(err_str);
+      monitor_logger_buffer_.ERROR(err_str);
       return Status(ErrorCode::PLANNING_ERROR, err_str);
     }
   }
