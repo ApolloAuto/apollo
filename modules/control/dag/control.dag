@@ -1,0 +1,11 @@
+module_config {
+    module_library : "/apollo/bazel-bin/modules/control/libcontrol.so"
+    timer_components {
+        class_name : "ControlComponent"
+        config {
+            name: "control"
+            config_file_path:  "/apollo/modules/control/conf/control_conf.pb.txt"
+            interval: 100
+        }
+    }
+}
