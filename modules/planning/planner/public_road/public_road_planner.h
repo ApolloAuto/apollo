@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PLANNING_PLANNER_EM_EM_PLANNER_H_
-#define MODULES_PLANNING_PLANNER_EM_EM_PLANNER_H_
+#ifndef MODULES_PLANNING_PLANNER_PUBLIC_ROAD_PUBLIC_ROAD_PLANNER_H_
+#define MODULES_PLANNING_PLANNER_PUBLIC_ROAD_PUBLIC_ROAD_PLANNER_H_
 
 #include <memory>
 #include <string>
@@ -42,21 +42,21 @@ namespace apollo {
 namespace planning {
 
 /**
- * @class EMPlanner
- * @brief EMPlanner is an expectation maximization planner.
+ * @class PublicRoadPlanner
+ * @brief PublicRoadPlanner is an expectation maximization planner.
  */
 
-class EMPlanner : public PlannerWithReferenceLine {
+class PublicRoadPlanner : public PlannerWithReferenceLine {
  public:
   /**
    * @brief Constructor
    */
-  EMPlanner() = default;
+  PublicRoadPlanner() = default;
 
   /**
    * @brief Destructor
    */
-  virtual ~EMPlanner() = default;
+  virtual ~PublicRoadPlanner() = default;
 
   std::string Name() override { return "EM"; }
 
@@ -76,4 +76,4 @@ class EMPlanner : public PlannerWithReferenceLine {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_PLANNER_EM_EM_PLANNER_H_
+#endif  // MODULES_PLANNING_PLANNER_PUBLIC_ROAD_PUBLIC_ROAD_PLANNER_H_

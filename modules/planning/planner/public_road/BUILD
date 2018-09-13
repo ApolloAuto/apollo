@@ -3,12 +3,12 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "em_planner",
+    name = "public_road_planner",
     srcs = [
-        "em_planner.cc",
+        "public_road_planner.cc",
     ],
     hdrs = [
-        "em_planner.h",
+        "public_road_planner.h",
     ],
     deps = [
         "//external:gflags",
@@ -42,13 +42,13 @@ cc_library(
 )
 
 cc_test(
-    name = "em_planner_test",
+    name = "public_road_planner_test",
     size = "small",
     srcs = [
-        "em_planner_test.cc",
+        "public_road_planner_test.cc",
     ],
     deps = [
-        ":em_planner",
+        ":public_road_planner",
         "@gtest//:main",
     ],
 )

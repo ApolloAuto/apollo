@@ -24,6 +24,8 @@
 
 #include "gtest/gtest.h"
 
+#include "modules/planning/common/local_view.h"
+
 namespace apollo {
 namespace planning {
 
@@ -43,7 +45,8 @@ TEST_F(ScenarioManagerTest, Simple) {
   const double start_time = 123.45;
   common::VehicleState vehicle_state;
   ReferenceLineProvider reference_line_provider;
-  Frame frame(sequence_num, tp, start_time, vehicle_state,
+  LocalView dummy_local_view;
+  Frame frame(sequence_num, dummy_local_view, tp, start_time, vehicle_state,
               &reference_line_provider);
 
   scenario_manager_.Update(tp, frame);

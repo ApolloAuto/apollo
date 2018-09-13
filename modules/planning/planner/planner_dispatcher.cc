@@ -18,7 +18,7 @@
 
 #include "modules/planning/proto/planning_config.pb.h"
 
-#include "modules/planning/planner/em/em_planner.h"
+#include "modules/planning/planner/public_road/public_road_planner.h"
 #include "modules/planning/planner/rtk/rtk_replay_planner.h"
 // #include "modules/planning/planner/open_space/open_space_planner.h"
 
@@ -28,8 +28,8 @@ namespace planning {
 void PlannerDispatcher::RegisterPlanners() {
   planner_factory_.Register(
       RTK, []() -> Planner* { return new RTKReplayPlanner(); });
-  planner_factory_.Register(ONROAD,
-                            []() -> Planner* { return new EMPlanner(); });
+  planner_factory_.Register(
+      PUBLIC_ROAD, []() -> Planner* { return new PublicRoadPlanner(); });
   // planner_factory_.Register(
   //     OPENSPACE, []() -> Planner* { return new OpenSpacePlanner(); });
 }

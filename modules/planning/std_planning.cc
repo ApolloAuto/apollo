@@ -165,7 +165,7 @@ void StdPlanning::RunOnce(const LocalView& local_view,
   }
   if (not_ready->has_reason()) {
     AERROR << not_ready->reason() << "; skip the planning cycle.";
-    PublishPlanningPb(start_timestamp, trajectory_pb);
+    FillPlanningPb(start_timestamp, trajectory_pb);
     return;
   }
 
@@ -201,7 +201,7 @@ void StdPlanning::RunOnce(const LocalView& local_view,
     AERROR << msg;
     not_ready->set_reason(msg);
     status.Save(trajectory_pb->mutable_header()->mutable_status());
-    PublishPlanningPb(start_timestamp, trajectory_pb);
+    FillPlanningPb(start_timestamp, trajectory_pb);
     return;
   }
 
@@ -231,7 +231,7 @@ void StdPlanning::RunOnce(const LocalView& local_view,
     AERROR << msg;
     not_ready->set_reason(msg);
     status.Save(trajectory_pb->mutable_header()->mutable_status());
-    PublishPlanningPb(start_timestamp, trajectory_pb);
+    FillPlanningPb(start_timestamp, trajectory_pb);
     return;
   }
 
@@ -255,7 +255,7 @@ void StdPlanning::RunOnce(const LocalView& local_view,
       estop->set_is_estop(true);
       estop->set_reason(status.error_message());
       status.Save(estop_trajectory.mutable_header()->mutable_status());
-      PublishPlanningPb(start_timestamp, &estop_trajectory);
+      FillPlanningPb(start_timestamp, &estop_trajectory);
       trajectory_pb->CopyFrom(estop_trajectory);
     } else {
       trajectory_pb->mutable_decision()
@@ -263,7 +263,7 @@ void StdPlanning::RunOnce(const LocalView& local_view,
           ->mutable_not_ready()
           ->set_reason(status.ToString());
       status.Save(trajectory_pb->mutable_header()->mutable_status());
-      PublishPlanningPb(start_timestamp, trajectory_pb);
+      FillPlanningPb(start_timestamp, trajectory_pb);
     }
 
     auto seq_num = frame_->SequenceNum();
@@ -317,7 +317,7 @@ void StdPlanning::RunOnce(const LocalView& local_view,
   }
 
   trajectory_pb->set_is_replan(stitching_trajectory.size() == 1);
-  PublishPlanningPb(start_timestamp, trajectory_pb);
+  FillPlanningPb(start_timestamp, trajectory_pb);
   ADEBUG << "Planning pb:" << trajectory_pb->header().DebugString();
 
   auto seq_num = frame_->SequenceNum();

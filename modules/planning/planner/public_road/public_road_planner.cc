@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ * Copyright 2017 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,24 +14,26 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/planning/planner/em/em_planner.h"
-
-#include "gtest/gtest.h"
-
-#include "modules/common/proto/drive_state.pb.h"
-#include "modules/common/proto/pnc_point.pb.h"
-#include "modules/map/hdmap/hdmap_common.h"
-#include "modules/map/hdmap/hdmap_util.h"
-#include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/planner/public_road/public_road_planner.h"
 
 namespace apollo {
 namespace planning {
 
-TEST(EMPlannerTest, Simple) {
-  EMPlanner em;
-  PlanningConfig config;
-  EXPECT_EQ(em.Name(), "EM");
-  EXPECT_EQ(em.Init(config), common::Status::OK());
+using common::Status;
+using common::TrajectoryPoint;
+
+Status PublicRoadPlanner::Init(const PlanningConfig& config) {
+  config_ = config;
+  scenario_manager_.Init();
+  return Status::OK();
+}
+
+Status PublicRoadPlanner::Plan(const TrajectoryPoint& planning_start_point,
+                               Frame* frame) {
+  scenario_manager_.Update(planning_start_point, *frame);
+  scenario_ = scenario_manager_.mutable_scenario();
+  scenario_->Init();  // init will be skipped if it was called before
+  return scenario_->Process(planning_start_point, frame);
 }
 
 }  // namespace planning

@@ -225,6 +225,10 @@ cc_library(
         "//modules/common/proto:pnc_point_proto",
         "//modules/planning/common/speed:speed_data",
         "//modules/planning/proto:planning_config_proto",
+        "//modules/planning/math/curve1d",
+        "//modules/planning/math/curve1d:polynomial_curve1d",
+        "//modules/planning/math/curve1d:quintic_polynomial_curve1d",
+        "//modules/planning/math/curve1d:quartic_polynomial_curve1d",
     ],
 )
 

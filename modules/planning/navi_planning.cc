@@ -303,7 +303,7 @@ void NaviPlanning::RunOnce() {
   }
   if (not_ready->has_reason()) {
     AERROR << not_ready->reason() << "; skip the planning cycle.";
-    PublishPlanningPb(&not_ready_pb, start_timestamp);
+    FillPlanningPb(&not_ready_pb, start_timestamp);
     return;
   }
 
@@ -366,7 +366,7 @@ void NaviPlanning::RunOnce() {
     AERROR << msg;
     not_ready->set_reason(msg);
     status.Save(not_ready_pb.mutable_header()->mutable_status());
-    PublishPlanningPb(&not_ready_pb, start_timestamp);
+    FillPlanningPb(&not_ready_pb, start_timestamp);
     return;
   }
 
@@ -389,7 +389,7 @@ void NaviPlanning::RunOnce() {
     AERROR << msg;
     not_ready->set_reason(msg);
     status.Save(not_ready_pb.mutable_header()->mutable_status());
-    PublishPlanningPb(&not_ready_pb, start_timestamp);
+    FillPlanningPb(&not_ready_pb, start_timestamp);
     return;
   }
 
@@ -414,14 +414,14 @@ void NaviPlanning::RunOnce() {
       estop->set_is_estop(true);
       estop->set_reason(status.error_message());
       status.Save(estop_trajectory.mutable_header()->mutable_status());
-      PublishPlanningPb(&estop_trajectory, start_timestamp);
+      FillPlanningPb(&estop_trajectory, start_timestamp);
     } else {
       trajectory_pb->mutable_decision()
           ->mutable_main_decision()
           ->mutable_not_ready()
           ->set_reason(status.ToString());
       status.Save(trajectory_pb->mutable_header()->mutable_status());
-      PublishPlanningPb(trajectory_pb, start_timestamp);
+      FillPlanningPb(trajectory_pb, start_timestamp);
     }
 
     auto seq_num = frame_->SequenceNum();
@@ -478,7 +478,7 @@ void NaviPlanning::RunOnce() {
   }
 
   trajectory_pb->set_is_replan(stitching_trajectory.size() == 1);
-  PublishPlanningPb(trajectory_pb, start_timestamp);
+  FillPlanningPb(trajectory_pb, start_timestamp);
   ADEBUG << "Planning pb:" << trajectory_pb->header().DebugString();
 
   auto seq_num = frame_->SequenceNum();
