@@ -34,9 +34,10 @@ TEST(ClassLoaderTest, createClassObj) {
   EXPECT_EQ(LIBRARY_1, loader1.GetLibraryPath());
   auto rect_obj = loader1.CreateClassObj<Base>("Rect");
   EXPECT_TRUE(nullptr != rect_obj);
-  rect_obj->DoSomething();
+  if (rect_obj) {
+    rect_obj->DoSomething();
+  }
   EXPECT_EQ(nullptr, loader1.CreateClassObj<Base>("Xeee"));
-
   SUCCEED();
 }
 
