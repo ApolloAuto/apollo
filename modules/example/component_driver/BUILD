@@ -1,3 +1,5 @@
+load("//tools:cpplint.bzl", "cpplint")
+
 package(default_visibility = ["//visibility:public"])
 
 # https://docs.bazel.build/versions/master/be/c-cpp.html#cc_library
@@ -19,3 +21,5 @@ cc_library(
     ],
     copts = ['-DMODULE_NAME=\\"driver\\"']
 )
+
+cpplint()

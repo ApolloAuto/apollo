@@ -1,3 +1,5 @@
+load("//tools:cpplint.bzl", "cpplint")
+
 package(default_visibility = ["//visibility:public"])
 
 # https://docs.bazel.build/versions/master/be/c-cpp.html#cc_library
@@ -16,3 +18,5 @@ cc_library(
     deps = ["//framework:cybertron"],
     copts = ['-DMODULE_NAME=\\"planning\\"']
 )
+
+cpplint()
