@@ -43,6 +43,7 @@
 #include "modules/planning/common/indexed_queue.h"
 #include "modules/planning/common/lag_prediction.h"
 #include "modules/planning/common/obstacle.h"
+#include "modules/planning/common/planning_data.h"
 #include "modules/planning/common/reference_line_info.h"
 #include "modules/planning/common/trajectory/publishable_trajectory.h"
 #include "modules/planning/reference_line/reference_line_provider.h"
@@ -58,7 +59,7 @@ namespace planning {
 
 class Frame {
  public:
-  explicit Frame(uint32_t sequence_num,
+  explicit Frame(uint32_t sequence_num, const PlanningData &planning_data,
                  const common::TrajectoryPoint &planning_start_point,
                  const double start_time,
                  const common::VehicleState &vehicle_state,
@@ -140,6 +141,7 @@ class Frame {
 
  private:
   uint32_t sequence_num_ = 0;
+  const PlanningData planning_data_;
   const hdmap::HDMap *hdmap_ = nullptr;
   common::TrajectoryPoint planning_start_point_;
   const double start_time_ = 0.0;
@@ -158,7 +160,8 @@ class Frame {
   ADCTrajectory trajectory_;  // last published trajectory
   std::unique_ptr<LagPrediction> lag_predictor_;
   ReferenceLineProvider *reference_line_provider_ = nullptr;
-  apollo::common::monitor::MonitorLogger monitor_logger_;
+
+  // apollo::common::monitor::MonitorLogger monitor_logger_;
 };
 
 class FrameHistory : public IndexedQueue<uint32_t, Frame> {

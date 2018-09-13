@@ -45,7 +45,7 @@ using apollo::common::VehicleStateProvider;
 using apollo::common::adapter::AdapterManager;
 using apollo::common::math::Box2d;
 using apollo::common::math::Vec2d;
-using apollo::common::monitor::MonitorLogBuffer;
+// using apollo::common::monitor::MonitorLogBuffer;
 using apollo::prediction::PredictionObstacles;
 
 constexpr double kMathEpsilon = 1e-8;
@@ -60,12 +60,12 @@ FrameOpenSpace::FrameOpenSpace(
       planning_start_point_(planning_start_point),
       start_time_(start_time),
       vehicle_state_(vehicle_state),
-      monitor_logger_(common::monitor::MonitorMessageItem::PLANNING) {
-  if (FLAGS_enable_lag_prediction) {
-    lag_predictor_.reset(
-        new LagPrediction(FLAGS_lag_prediction_min_appear_num,
-                          FLAGS_lag_prediction_max_disappear_num));
-  }
+      // monitor_logger_(common::monitor::MonitorMessageItem::PLANNING) {
+      if (FLAGS_enable_lag_prediction) {
+  lag_predictor_.reset(
+      new LagPrediction(FLAGS_lag_prediction_min_appear_num,
+                        FLAGS_lag_prediction_max_disappear_num));
+}
 }
 
 const common::TrajectoryPoint &FrameOpenSpace::PlanningStartPoint() const {
@@ -111,8 +111,8 @@ Status FrameOpenSpace::Init() {
     if (collision_obstacle) {
       std::string err_str =
           "Found collision with obstacle: " + collision_obstacle->Id();
-      apollo::common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
-      buffer.ERROR(err_str);
+      // apollo::common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
+      // buffer.ERROR(err_str);
       return Status(ErrorCode::PLANNING_ERROR, err_str);
     }
   }

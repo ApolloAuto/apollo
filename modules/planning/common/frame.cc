@@ -29,7 +29,6 @@
 
 #include "modules/routing/proto/routing.pb.h"
 
-#include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/log.h"
 #include "modules/common/math/vec2d.h"
@@ -45,10 +44,9 @@ namespace planning {
 using apollo::common::ErrorCode;
 using apollo::common::Status;
 using apollo::common::VehicleStateProvider;
-using apollo::common::adapter::AdapterManager;
 using apollo::common::math::Box2d;
 using apollo::common::math::Vec2d;
-using apollo::common::monitor::MonitorLogBuffer;
+// using apollo::common::monitor::MonitorLogBuffer;
 using apollo::prediction::PredictionObstacles;
 
 constexpr double kMathEpsilon = 1e-8;
@@ -56,16 +54,17 @@ constexpr double kMathEpsilon = 1e-8;
 FrameHistory::FrameHistory()
     : IndexedQueue<uint32_t, Frame>(FLAGS_max_history_frame_num) {}
 
-Frame::Frame(uint32_t sequence_num,
+Frame::Frame(uint32_t sequence_num, const PlanningData &planning_data,
              const common::TrajectoryPoint &planning_start_point,
              const double start_time, const common::VehicleState &vehicle_state,
              ReferenceLineProvider *reference_line_provider)
     : sequence_num_(sequence_num),
+      planning_data_(planning_data),
       planning_start_point_(planning_start_point),
       start_time_(start_time),
       vehicle_state_(vehicle_state),
-      reference_line_provider_(reference_line_provider),
-      monitor_logger_(common::monitor::MonitorMessageItem::PLANNING) {
+      reference_line_provider_(reference_line_provider) {
+  // monitor_logger_(common::monitor::MonitorMessageItem::PLANNING)
   if (FLAGS_enable_lag_prediction) {
     lag_predictor_.reset(
         new LagPrediction(FLAGS_lag_prediction_min_appear_num,
@@ -86,8 +85,7 @@ bool Frame::Rerouting() {
     AERROR << "Rerouting not supported in navigation mode";
     return false;
   }
-  auto adapter_manager = AdapterManager::Instance();
-  if (adapter_manager->GetRoutingResponse()->Empty()) {
+  if (planning_data_.routing == nullptr) {
     AERROR << "No previous routing available";
     return false;
   }
@@ -95,11 +93,10 @@ bool Frame::Rerouting() {
     AERROR << "Invalid HD Map.";
     return false;
   }
-  auto request = adapter_manager->GetRoutingResponse()
-                     ->GetLatestObserved()
-                     .routing_request();
+  auto request = planning_data_.routing->routing_request();
   request.clear_header();
-  AdapterManager::FillRoutingRequestHeader("planning", &request);
+  // AdapterManager::FillRoutingRequestHeader("planning", &request);
+
   auto point = common::util::MakePointENU(
       vehicle_state_.x(), vehicle_state_.y(), vehicle_state_.z());
   double s = 0.0;
@@ -124,9 +121,9 @@ bool Frame::Rerouting() {
     AERROR << "Failed to find future waypoints";
     return false;
   }
-  AdapterManager::PublishRoutingRequest(request);
-  apollo::common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
-  buffer.INFO("Planning send Rerouting request");
+  // AdapterManager::PublishRoutingRequest(request);
+  // apollo::common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
+  // buffer.INFO("Planning send Rerouting request");
   return true;
 }
 
@@ -360,13 +357,12 @@ Status Frame::Init() {
          << FLAGS_align_prediction_time;
 
   // prediction
-  if (AdapterManager::GetPrediction() &&
-      !AdapterManager::GetPrediction()->Empty()) {
+  if (planning_data_.prediction_obstacles == nullptr) {
     if (FLAGS_enable_lag_prediction && lag_predictor_) {
-      lag_predictor_->GetLaggedPrediction(&prediction_);
+      lag_predictor_->GetLaggedPrediction(
+          planning_data_.prediction_obstacles.get());
     } else {
-      prediction_.CopyFrom(
-          AdapterManager::GetPrediction()->GetLatestObserved());
+      prediction_.CopyFrom(*planning_data_.prediction_obstacles);
     }
     if (FLAGS_align_prediction_time) {
       AlignPredictionTime(vehicle_state_.timestamp(), &prediction_);
@@ -380,8 +376,8 @@ Status Frame::Init() {
     if (collision_obstacle) {
       std::string err_str =
           "Found collision with obstacle: " + collision_obstacle->Id();
-      apollo::common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
-      buffer.ERROR(err_str);
+      // apollo::common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
+      // buffer.ERROR(err_str);
       return Status(ErrorCode::PLANNING_ERROR, err_str);
     }
   }
@@ -456,28 +452,26 @@ void Frame::RecordInputDebug(planning_internal::Debug *debug) {
   }
   auto *planning_debug_data = debug->mutable_planning_data();
   auto *adc_position = planning_debug_data->mutable_adc_position();
-  const auto &localization =
-      AdapterManager::GetLocalization()->GetLatestObserved();
-  adc_position->CopyFrom(localization);
+  adc_position->CopyFrom(*planning_data_.localization_estimate);
 
-  const auto &chassis = AdapterManager::GetChassis()->GetLatestObserved();
   auto debug_chassis = planning_debug_data->mutable_chassis();
-  debug_chassis->CopyFrom(chassis);
+  debug_chassis->CopyFrom(*planning_data_.chassis);
 
   if (!FLAGS_use_navigation_mode) {
     auto debug_routing = planning_debug_data->mutable_routing();
-    debug_routing->CopyFrom(
-        AdapterManager::GetRoutingResponse()->GetLatestObserved());
+    debug_routing->CopyFrom(*planning_data_.routing);
   }
 
   planning_debug_data->mutable_prediction_header()->CopyFrom(
       prediction_.header());
 
+  /*
   auto relative_map = AdapterManager::GetRelativeMap();
   if (!relative_map->Empty()) {
     planning_debug_data->mutable_relative_map()->mutable_header()->CopyFrom(
         relative_map->GetLatestObserved().header());
   }
+  */
 }
 
 void Frame::AlignPredictionTime(const double planning_start_time,
