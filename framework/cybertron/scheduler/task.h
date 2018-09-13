@@ -72,7 +72,7 @@ template <typename Function>
 Task<T>::Task(const std::string& name, Function&& f, const uint8_t& num_threads)
     : name_(name), num_threads_(num_threads), running_count_(0) {
   auto func =
-      [ f = std::forward<Function&&>(f), this](const std::shared_ptr<T>& msg) {
+      [ f = std::forward<Function&&>(f), this ](const std::shared_ptr<T>& msg) {
     f(msg);
     this->Finish();
   };
@@ -82,7 +82,8 @@ Task<T>::Task(const std::string& name, Function&& f, const uint8_t& num_threads)
     auto name_id = common::GlobalData::RegisterChannel(channel_name);
     name_ids_.push_back(std::move(name_id));
     auto dv = std::make_shared<data::DataVisitor<T>>(name_id, 1);
-    croutine::RoutineFactory factory = croutine::CreateRoutineFactory<T>(func, dv);
+    croutine::RoutineFactory factory =
+        croutine::CreateRoutineFactory<T>(func, dv);
     scheduler::Scheduler::Instance()->CreateTask(factory, channel_name);
   }
 }
