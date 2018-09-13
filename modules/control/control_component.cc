@@ -18,8 +18,6 @@
 #include <iomanip>
 #include <string>
 
-#include "ros/include/std_msgs/String.h"
-
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/log.h"
 #include "modules/common/time/time.h"
@@ -42,7 +40,7 @@ using apollo::control::PadMessage;
 using apollo::localization::LocalizationEstimate;
 using apollo::planning::ADCTrajectory;
 
-bool Control::Init() {
+bool ControlComponent::Init() {
   // init_time_ = Clock::NowInSeconds();
 
   AINFO << "Control init, starting ...";
@@ -95,8 +93,7 @@ bool Control::Init() {
       control_conf_.pad_msg_channel(),
       [this](const std::shared_ptr<PadMessage> &pad_msg) {
         ADEBUG << "Received control data: run pad message callback.";
-        std::lock_guard<std::mutex> lock(mutex_);
-        pad_msg_.CopyFrom(*pad_msg);
+        OnPad(*pad_msg);
       });
 
   control_cmd_writer_ = node_->CreateWriter<ControlCommand>(
@@ -105,7 +102,7 @@ bool Control::Init() {
   return true;
 }
 
-void Control::OnPad(const PadMessage &pad) {
+void ControlComponent::OnPad(const PadMessage &pad) {
   pad_msg_ = pad;
   ADEBUG << "Received Pad Msg:" << pad.DebugString();
   AERROR_IF(!pad_msg_.has_action()) << "pad message check failed!";
@@ -119,7 +116,7 @@ void Control::OnPad(const PadMessage &pad) {
   pad_received_ = true;
 }
 
-void Control::OnMonitor(
+void ControlComponent::OnMonitor(
     const common::monitor::MonitorMessage &monitor_message) {
   for (const auto &item : monitor_message.item()) {
     if (item.log_level() == MonitorMessageItem::FATAL) {
@@ -129,7 +126,8 @@ void Control::OnMonitor(
   }
 }
 
-Status Control::ProduceControlCommand(ControlCommand *control_command) {
+Status ControlComponent::ProduceControlCommand(
+    ControlCommand *control_command) {
   Status status = CheckInput();
   // check data
 
@@ -214,7 +212,7 @@ Status Control::ProduceControlCommand(ControlCommand *control_command) {
   return status;
 }
 
-bool Control::Proc() {
+bool ControlComponent::Proc() {
   // set initial vehicle state by cmd
   // need to sleep, because advertised channel is not ready immediately
   // simple test shows a short delay of 80 ms or so
@@ -267,7 +265,7 @@ bool Control::Proc() {
   return true;
 }
 
-Status Control::CheckInput() {
+Status ControlComponent::CheckInput() {
   if (localization_reader_ == nullptr) {
     AWARN_EVERY(100) << "No Localization msg yet. ";
     return Status(ErrorCode::CONTROL_COMPUTE_ERROR, "No localization msg");
@@ -303,7 +301,7 @@ Status Control::CheckInput() {
   return Status::OK();
 }
 
-Status Control::CheckTimestamp() {
+Status ControlComponent::CheckTimestamp() {
   if (!control_conf_.enable_input_timestamp_check() ||
       control_conf_.is_control_test_mode()) {
     ADEBUG << "Skip input timestamp check by gflags.";
@@ -344,7 +342,7 @@ Status Control::CheckTimestamp() {
   return Status::OK();
 }
 
-void Control::SendCmd(ControlCommand &control_command) {
+void ControlComponent::SendCmd(ControlCommand &control_command) {
   // set header
   control_command.mutable_header()->set_lidar_timestamp(
       trajectory_.header().lidar_timestamp());
