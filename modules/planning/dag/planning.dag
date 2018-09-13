@@ -5,7 +5,7 @@ module_config {
     class_name : "PlanningComponent"
     config {
       name: "planning"
-      config_file_path:  "/apollo/modules/planning/conf/planning_conf.pb.txt"
+      config_file_path:  "/apollo/modules/planning/conf/planning.conf"
       readers: [
         {
           channel: "/apollo/prediction"

@@ -15,6 +15,8 @@
  *****************************************************************************/
 #include "modules/planning/planning_component.h"
 
+#include "modules/common/adapters/adapter_gflags.h"
+
 #include "modules/common/util/message_util.h"
 #include "modules/planning/std_planning.h"
 
@@ -27,14 +29,12 @@ using apollo::perception::TrafficLightDetection;
 using apollo::routing::RoutingResponse;
 
 bool PlanningComponent::Init() {
-  if (!GetProtoConfig(&planning_conf_)) {
-    AERROR << "Unable to load planning conf file: " << ConfigFilePath();
-    return false;
-  }
+  AINFO << "Loading gflag from file: " << ConfigFilePath();
+  google::SetCommandLineOption("flagfile", ConfigFilePath().c_str());
 
   planning_base_ = std::unique_ptr<PlanningBase>(new StdPlanning());
   routing_reader_ = node_->CreateReader<RoutingResponse>(
-      planning_conf_.routing_response_channel(),
+      FLAGS_routing_response_topic,
       [this](const std::shared_ptr<RoutingResponse>& routing) {
         ADEBUG << "Received routing data: run routing callback.";
         std::lock_guard<std::mutex> lock(mutex_);
@@ -42,7 +42,7 @@ bool PlanningComponent::Init() {
       });
 
   traffic_light_reader_ = node_->CreateReader<TrafficLightDetection>(
-      planning_conf_.traffic_light_detection_channel(),
+      FLAGS_traffic_light_detection_topic,
       [this](const std::shared_ptr<TrafficLightDetection>& traffic_light) {
         ADEBUG << "Received chassis data: run chassis callback.";
         std::lock_guard<std::mutex> lock(mutex_);
@@ -59,7 +59,8 @@ bool PlanningComponent::Init() {
         });
   }
 
-  writer_ = node_->CreateWriter<ADCTrajectory>("/apollo/planning");
+  writer_ = node_->CreateWriter<ADCTrajectory>(FLAGS_planning_trajectory_topic);
+
 
   return true;
 }

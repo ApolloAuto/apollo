@@ -14,6 +14,7 @@ cc_library(
     deps = [
         ":planning_lib",
         "//framework:cybertron",
+        "//modules/common/adapters:adapter_gflags",
         "//modules/common/util:message_util",
         "//modules/localization/proto:localization_proto",
         "//modules/perception/proto:perception_proto",
