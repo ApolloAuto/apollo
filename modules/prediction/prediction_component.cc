@@ -118,12 +118,10 @@ bool PredictionComponent::Init() {
   }
 
   // Initialization of all managers
-  // AdapterManager::Init(adapter_conf_);
   ContainerManager::Instance()->Init(adapter_conf_);
   EvaluatorManager::Instance()->Init(prediction_conf_);
   PredictorManager::Instance()->Init(prediction_conf_);
 
-  // TODO(all) move channel names to conf
   localization_reader_ = node_->CreateReader<LocalizationEstimate>(
     prediction_conf_.pose_channel(),
     [this](const std::shared_ptr<LocalizationEstimate>& localization) {
@@ -140,15 +138,11 @@ bool PredictionComponent::Init() {
         OnPlanning(*adc_trajectory);
     });
 
+  // TODO(all) accord to cybertron
   // CHECK(AdapterManager::GetLocalization())
   // << "Localization is not registered.";
   // CHECK(AdapterManager::GetPerceptionObstacles())
   //     << "Perception is not registered.";
-
-  /* TODO(kechxu) recover callbacks according to cybertron
-  // Set perception obstacle callback function
-  AdapterManager::AddPerceptionObstaclesCallback(&Prediction::RunOnce, this);
-  */
 
   if (!FLAGS_use_navigation_mode && !PredictionMap::Ready()) {
     AERROR << "Map cannot be loaded.";
@@ -300,8 +294,7 @@ bool PredictionComponent::Proc(
       }
     }
   }
-  // TODO(all) accord to cybertron
-  // Publish(&prediction_obstacles);
+  prediction_writer_->Write(prediction_obstacles);
   return true;
 }
 

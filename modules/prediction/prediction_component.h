@@ -34,6 +34,7 @@
 #include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/planning/proto/planning.pb.h"
 #include "modules/prediction/proto/prediction_conf.pb.h"
+#include "modules/prediction/proto/prediction_obstacle.pb.h"
 
 /**
  * @namespace apollo::prediction
@@ -100,8 +101,12 @@ class PredictionComponent :
 
   common::adapter::AdapterManagerConfig adapter_conf_;
   std::shared_ptr<Reader<localization::LocalizationEstimate>>
-  localization_reader_;
-  std::shared_ptr<Reader<planning::ADCTrajectory>> planning_reader_;
+      localization_reader_;
+  std::shared_ptr<apollo::cybertron::Reader<planning::ADCTrajectory>>
+      planning_reader_;
+
+  std::shared_ptr<apollo::cybertron::Writer<PredictionObstacles>>
+      prediction_writer_;
 
   std::mutex mutex_;
 };
