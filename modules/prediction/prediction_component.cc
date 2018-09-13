@@ -212,7 +212,7 @@ void PredictionComponent::OnPlanning(
 
 bool PredictionComponent::Proc(
     const std::shared_ptr<PerceptionObstacles>& perception_obstacles) {
-  if (FLAGS_prediction_test_mode && FLAGS_prediction_test_duration > 0.0 &&
+  if (FLAGS_prediction_test_mode &&
       (Clock::NowInSeconds() - start_time_ > FLAGS_prediction_test_duration)) {
     AINFO << "Prediction finished running in test mode";
     // TODO(kechxu) accord to cybertron

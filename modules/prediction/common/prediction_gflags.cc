@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include <cmath>
+#include <limits>
 
 #include "modules/prediction/common/prediction_gflags.h"
 
@@ -31,7 +32,7 @@ DEFINE_string(prediction_data_dir, "data/prediction/",
               "Prefix of files to store feature data");
 DEFINE_bool(prediction_test_mode, false, "Set prediction to test mode");
 DEFINE_double(
-    prediction_test_duration, -1.0,
+    prediction_test_duration, std::numeric_limits<double>::infinity(),
     "The runtime duration in test mode (in seconds). Negative value will not "
     "restrict the runtime duration.");
 
