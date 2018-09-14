@@ -35,12 +35,12 @@ class MonitorTest : public MonitorLogger {
 
 TEST(MonitorTest, Publish) {
   MonitorTest monitor(MonitorMessageItem::CONTROL);
-  std::vector<std::pair<MonitorMessageItem::LogLevel, std::string>> items{
-      {MonitorMessageItem::INFO, "info message"},
-      {MonitorMessageItem::WARN, "warn message"},
-      {MonitorMessageItem::ERROR, "error message"},
-  };
-  monitor.Publish(items);
+  //  std::vector<std::pair<MonitorMessageItem::LogLevel, std::string>> items{
+  //      {MonitorMessageItem::INFO, "info message"},
+  //      {MonitorMessageItem::WARN, "warn message"},
+  //      {MonitorMessageItem::ERROR, "error message"},
+  //  };
+  //  monitor.Publish(items);
 }
 
 }  // namespace monitor
