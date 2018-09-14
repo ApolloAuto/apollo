@@ -7,7 +7,6 @@ cc_binary(
     srcs = ["event_collector_main.cc"],
     deps = [
         "//modules/common/util",
-        "@ros//:ros_common",
     ],
 )
 

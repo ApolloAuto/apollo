@@ -26,8 +26,6 @@
 #include <memory>
 #include <vector>
 
-#include "ros/include/ros/ros.h"
-
 #include "modules/control/proto/control_cmd.pb.h"
 #include "modules/control/proto/control_conf.pb.h"
 #include "modules/planning/proto/planning.pb.h"
