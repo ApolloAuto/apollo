@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_DRIVERS_GNSS_RTCM_PARSER_H_
-#define MODULES_DRIVERS_GNSS_RTCM_PARSER_H_
+#ifndef MODULES_DRIVERS_PARSER_GNSS_RTCM_PARSER_H_
+#define MODULES_DRIVERS_PARSER_GNSS_RTCM_PARSER_H_
 
 #include <memory>
 #include <string>
@@ -48,4 +48,4 @@ class RtcmParser {
 }  // namespace drivers
 }  // namespace apollo
 
-#endif  // MODULES_DRIVERS_GNSS_RTCM_PARSER_H_
+#endif  // MODULES_DRIVERS_PARSER_GNSS_RTCM_PARSER_H_

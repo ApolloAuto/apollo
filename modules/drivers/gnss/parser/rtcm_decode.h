@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef DRIVERS_GNSS_RTCM_DECODE_H_
-#define DRIVERS_GNSS_RTCM_DECODE_H_
+#ifndef MODULES_DRIVERS_GNSS_PARSER_RTCM_DECODE_H_
+#define MODULES_DRIVERS_GNSS_PARSER_RTCM_DECODE_H_
 
 #include "modules/drivers/gnss/proto/gnss_raw_observation.pb.h"
 #include "modules/drivers/gnss/third_party/rtklib.h"
@@ -184,4 +184,4 @@ static inline bool gnss_time_type(
 }  // namespace gnss
 }  // namespace drivers
 }  // namespace apollo
-#endif
+#endif  // MODULES_DRIVERS_GNSS_PARSER_RTCM_DECODE_H_

@@ -59,4 +59,4 @@ class OnlineCalibration {
 }  // namespace drivers
 }  // namespace apollo
 
-#endif  // MODULES_DRIVERS_VELODYNE_VELODYNE_POINTCLOUD_ONLINE_CALIBRATION_H_
+#endif  // MODULES_DRIVERS_VELODYNE_PARSER_ONLINE_CALIBRATION_H_

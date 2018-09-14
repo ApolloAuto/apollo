@@ -382,4 +382,4 @@ class VelodyneParserFactory {
 }  // namespace drivers
 }  // namespace apollo
 
-#endif  // MODULES_DRIVERS_VELODYNE_VELODYNE_POINTCLOUD_VELODYNE_PARSER_H_
+#endif  // MODULES_DRIVERS_VELODYNE_PARSER_VELODYNE_PARSER_H_

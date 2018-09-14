@@ -86,4 +86,4 @@ class Calibration {
 }  // namespace drivers
 }  // namespace apollo
 
-#endif  // MODULES_DRIVERS_VELODYNE_VELODYNE_POINTCLOUD_CALIBRATION_H_
+#endif  // MODULES_DRIVERS_VELODYNE_PARSER_CALIBRATION_H_

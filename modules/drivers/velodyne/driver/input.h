@@ -73,4 +73,4 @@ class Input {
 }  // namespace drivers
 }  // namespace apollo
 
-#endif  // MODULES_DRIVERS_VELODYNE_VELODYNE_DRIVER_INPUT_H_
+#endif  // MODULES_DRIVERS_VELODYNE_DRIVER_INPUT_H_
