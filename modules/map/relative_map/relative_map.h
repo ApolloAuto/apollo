@@ -28,36 +28,35 @@
 #include "modules/common/monitor_log/monitor_log_buffer.h"
 #include "modules/common/status/status.h"
 #include "modules/map/relative_map/navigation_lane.h"
-#include "modules/map/relative_map/relative_map_interface.h"
 
 namespace apollo {
 namespace relative_map {
 
-class RelativeMap : public RelativeMapInterface {
+class RelativeMap{
  public:
   RelativeMap();
 
   /**
    * @brief module name
    */
-  std::string Name() const override { return "RelativeMap"; };
+  std::string Name() const { return "RelativeMap"; }
 
   /**
    * @brief module initialization function
    * @return initialization status
    */
-  apollo::common::Status Init() override;
+  apollo::common::Status Init();
 
   /**
    * @brief module start function
    * @return start status
    */
-  apollo::common::Status Start() override;
+  apollo::common::Status Start();
 
   /**
    * @brief module stop function
    */
-  void Stop() override;
+  void Stop();
 
   /**
    * @brief destructor
@@ -68,22 +67,25 @@ class RelativeMap : public RelativeMapInterface {
    * @brief main logic of the relative_map module, runs periodically triggered
    * by timer.
    */
-  void RunOnce() override;
+  bool Process(MapMsg* const map_msg);
 
-  void OnTimer(const ros::TimerEvent&);
+  void OnPerception(
+      const perception::PerceptionObstacles& perception_obstacles);
+  void OnChassis(const canbus::Chassis& chassis);
+  void OnLocalization(const localization::LocalizationEstimate& localization);
+  void OnNavigationInfo(const NavigationInfo& navigation_info);
 
  private:
   bool CreateMapFromNavigationLane(MapMsg* map_msg);
-
-  void OnReceiveNavigationInfo(const NavigationInfo& navigation_info);
-
-  common::adapter::AdapterManagerConfig adapter_conf_;
   RelativeMapConfig config_;
-  apollo::common::monitor::MonitorLogger monitor_logger_;
+  apollo::common::monitor::MonitorLogBuffer monitor_logger_buffer_;
 
   NavigationLane navigation_lane_;
+  perception::PerceptionObstacles perception_obstacles_;
+  canbus::Chassis chassis_;
+  localization::LocalizationEstimate localization_;
+
   std::mutex navigation_lane_mutex_;
-  ros::Timer timer_;
 };
 
 }  // namespace relative_map

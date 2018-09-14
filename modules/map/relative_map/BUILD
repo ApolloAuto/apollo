@@ -14,7 +14,6 @@ cc_library(
     ],
     hdrs = [
         "relative_map.h",
-        "relative_map_interface.h",
     ],
     data = [
         ":relative_map_conf",
@@ -22,7 +21,6 @@ cc_library(
     deps = [
         ":navigation_lane_lib",
         "//modules/common",
-        "//modules/common:apollo_app",
         "//modules/common/math:geometry",
         "//modules/common/monitor_log",
         "//modules/common/status",
@@ -63,16 +61,10 @@ cc_library(
         "relative_map_component.h",
     ],
     deps = [
-        "//framework:cybertron",
-        #":relative_map_lib",
+        ":relative_map_lib",
         "//external:gflags",
-        "//modules/map/relative_map/common:relative_map_gflags",
-        "//modules/perception/proto:perception_proto",
+        "//framework:cybertron",
         "//modules/common/adapters:adapter_gflags",
-        "//modules/localization/proto:localization_proto",
-        "//modules/map/relative_map/proto:relative_map_config_proto",
-        "//modules/map/relative_map/proto:navigation_proto",
-        "//modules/common/vehicle_state:vehicle_state_provider",
     ],
 )
 
@@ -83,21 +75,21 @@ filegroup(
     ]),
 )
 
-cc_test(
-    name = "navigation_lane_test",
-    size = "small",
-    srcs = [
-        "navigation_lane_test.cc",
-    ],
-    data = [
-        ":testdata",
-    ],
-    deps = [
-        "@gtest//:main",
-        ":relative_map_lib",
-        "//modules/common",
-        "//third_party/json",
-    ],
-)
+#cc_test(
+#    name = "navigation_lane_test",
+#    size = "small",
+#    srcs = [
+#        "navigation_lane_test.cc",
+#    ],
+#    data = [
+#        ":testdata",
+#    ],
+#    deps = [
+#        "@gtest//:main",
+#        ":relative_map_component_lib",
+#        "//modules/common",
+#        "//third_party/json",
+#    ],
+#)
 
 cpplint()
