@@ -20,67 +20,28 @@ namespace apollo {
 namespace drivers {
 namespace velodyne {
 
-// std::string toBinary(int n) {
-//   std::string r;
-//   while (n != 0) {
-//     r = (n % 2 == 0 ? "0" : "1") + r;
-//     n /= 2;
-//   }
-//   while (r.length() != 8) {
-//     r = '0' + r;
-//   }
-//   return r;
-// }
-//
-// double convertBinaryToDecimal(std::string binaryString) {
-//   double value = 0;
-//   int indexCounter = 0;
-//   for (int i = binaryString.length() - 1; i >= 0; i--) {
-//     if (binaryString[i] == '1') {
-//       value += pow(2, indexCounter);
-//     }
-//     indexCounter++;
-//   }
-//   return value;
-// }
-//
-// double computeTimeStamp(const adu::common::sensor::VelodynePacket& pkt) {
-//   const uint8_t *pkt_data = (const uint8_t*)pkt.data().data();
-//   std::string digit4 = toBinary(pkt_data[1203]);
-//   std::string digit3 = toBinary(pkt_data[1202]);
-//   std::string digit2 = toBinary(pkt_data[1201]);
-//   std::string digit1 = toBinary(pkt_data[1200]);
-//   std::string digit =
-//       digit4 + digit3 + digit2 + digit1;  // string concatenation
-//   double value = convertBinaryToDecimal(digit);
-//   // compute the seconds from the beginning of that hour to when the data being
-//   // captured
-//   double time_stamp = (double)value / 1000000;
-//   return time_stamp;
-// }
-
-Velodyne128Parser::Velodyne128Parser(Config& config)
+Velodyne128Parser::Velodyne128Parser(const Config& config)
     : VelodyneParser(config), previous_packet_stamp_(0), gps_base_usec_(0) {
-  //TODO: wait for lidar128 manual
+  // TODO(dengchengliang): wait for lidar128 manual
   inner_time_ = &velodyne::INNER_TIME_HDL32E;
   need_two_pt_correction_ = false;
 }
 
 void Velodyne128Parser::generate_pointcloud(
     const std::shared_ptr<VelodyneScan>& scan_msg,
-    std::shared_ptr<PointCloud>& out_msg) {
-
+    std::shared_ptr<PointCloud> out_msg) {
   // allocate a point cloud with same time and frame ID as raw data
-  out_msg->mutable_header()->set_frame_id(scan_msg->header().frame_id());      
-  out_msg->mutable_header()->set_timestamp_sec(cybertron::Time().Now().ToSecond());      
+  out_msg->mutable_header()->set_frame_id(scan_msg->header().frame_id());
+  out_msg->mutable_header()->set_timestamp_sec(
+      cybertron::Time().Now().ToSecond());
   out_msg->set_height(1);
 
-  //us
+  // us
   gps_base_usec_ = scan_msg->basetime();
 
   for (int i = 0; i < scan_msg->firing_pkts_size(); ++i) {
     unpack(scan_msg->firing_pkts(i), out_msg);
-    last_time_stamp_ = out_msg->measurement_time();      
+    last_time_stamp_ = out_msg->measurement_time();
   }
 
   size_t size = out_msg->point_size();
@@ -97,22 +58,21 @@ void Velodyne128Parser::generate_pointcloud(
 }
 
 uint64_t Velodyne128Parser::get_timestamp(double base_time, float time_offset,
-                                         uint16_t block_id) {
+                                          uint16_t block_id) {
   (void)block_id;
   double t = base_time - time_offset;
-  uint64_t timestamp = get_gps_stamp(t, previous_packet_stamp_, gps_base_usec_);
+  uint64_t timestamp =
+      get_gps_stamp(t, &previous_packet_stamp_, &gps_base_usec_);
   return timestamp;
 }
 
-//TODO: No manual about order for lidar128 by now.
-void Velodyne128Parser::order(
-    std::shared_ptr<PointCloud>& cloud) {
+// TODO(dengchengliang): No manual about order for lidar128 by now.
+void Velodyne128Parser::order(std::shared_ptr<PointCloud> cloud) {
   (void)cloud;
 }
 
-void Velodyne128Parser::unpack(
-    const VelodynePacket& pkt,
-    std::shared_ptr<PointCloud>& pc) {
+void Velodyne128Parser::unpack(const VelodynePacket& pkt,
+                               std::shared_ptr<PointCloud> pc) {
   float azimuth_diff, azimuth_corrected_f;
   float last_azimuth_diff = 0;
   uint16_t azimuth, azimuth_next, azimuth_corrected;
@@ -121,10 +81,11 @@ void Velodyne128Parser::unpack(
   int intensity;
 
   // const raw_packet_t *raw = (const raw_packet_t *)&pkt.data[0];
-  const RawPacket *raw = (const RawPacket *)pkt.data().c_str();
+  const RawPacket* raw = (const RawPacket*)pkt.data().c_str();
   double basetime = raw->gps_timestamp;
   // double basetime_2 = computeTimeStamp(pkt);
-  // LOG_INFO << "basetime1: " << basetime / 1000000.0  << ", basetime2: " << basetime_2;
+  // LOG_INFO << "basetime1: " << basetime / 1000000.0  << ", basetime2: " <<
+  // basetime_2;
   //
   for (int block = 0; block < BLOCKS_PER_PACKET; block++) {
     // Calculate difference between current and next block's azimuth angle.
@@ -162,7 +123,7 @@ void Velodyne128Parser::unpack(
 
       uint64_t timestamp = get_timestamp(basetime, 0, block);
       if (!is_scan_valid(azimuth, distance)) {
-        //todo orgnized
+        // todo orgnized
         if (config_.organized()) {
           apollo::drivers::PointXYZIT* point_new = pc->add_point();
           point_new->set_x(nan);
@@ -185,25 +146,15 @@ void Velodyne128Parser::unpack(
       azimuth_corrected =
           (static_cast<uint16_t>(round(azimuth_corrected_f))) % 36000;
 
-      //add new point
-      PointXYZIT* point_new = pc->add_point(); 
+      // add new point
+      PointXYZIT* point_new = pc->add_point();
 
-      //compute time , time offset is zero
+      // compute time , time offset is zero
       point_new->set_timestamp(timestamp);
-
-      // LOG_INFO << "intensity: " << intensity << ", azimuth: " << azimuth
-      //          << ", _gps_base_usec: " << _gps_base_usec
-      //          << ", basetime:"  << basetime << ",timestamp: " << timestamp
-      //          << ", distance: " << distance;
-      //
-      // apply calibration file and convert polar coordinates to Euclidean
-      // XYZ
-      // compute_xyzi(chan_id, azimuth_corrected, distance, &intensity,
-      // &x_coord,
-      //              &y_coord, &z_coord);
       compute_coords(distance, corrections, azimuth_corrected, point_new);
 
-      intensity = intensity_compensate(corrections, raw_distance.raw_distance, intensity);
+      intensity = intensity_compensate(corrections, raw_distance.raw_distance,
+                                       intensity);
       point_new->set_intensity(intensity);
     }
     // }
@@ -217,7 +168,8 @@ int Velodyne128Parser::intensity_compensate(const LaserCorrection& corrections,
                        (1 - corrections.focal_distance / 13100);
   float focal_slope = corrections.focal_slope;
 
-  intensity += focal_slope * (abs(focal_offset -
+  intensity +=
+      focal_slope * (abs(focal_offset -
                          256 * (1 - static_cast<float>(raw_distance) / 65535) *
                              (1 - static_cast<float>(raw_distance) / 65535)));
 
@@ -226,11 +178,11 @@ int Velodyne128Parser::intensity_compensate(const LaserCorrection& corrections,
   }
 
   if (intensity > corrections.max_intensity) {
-     intensity = corrections.max_intensity;
+    intensity = corrections.max_intensity;
   }
   return intensity;
 }
 
-}  // namespace velodyne_data
-}
-}
+}  // namespace velodyne
+}  // namespace drivers
+}  // namespace apollo

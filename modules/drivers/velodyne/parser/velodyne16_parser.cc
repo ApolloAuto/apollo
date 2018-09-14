@@ -16,13 +16,11 @@
 
 #include "modules/drivers/velodyne/parser/velodyne_parser.h"
 
-// #include <ros/ros.h>
-
 namespace apollo {
 namespace drivers {
 namespace velodyne {
 
-Velodyne16Parser::Velodyne16Parser(Config config)
+Velodyne16Parser::Velodyne16Parser(const Config& config)
     : VelodyneParser(config), previous_packet_stamp_(0), gps_base_usec_(0) {
   inner_time_ = &velodyne::INNER_TIME_16;
   need_two_pt_correction_ = false;
@@ -30,11 +28,12 @@ Velodyne16Parser::Velodyne16Parser(Config config)
 
 void Velodyne16Parser::generate_pointcloud(
     const std::shared_ptr<VelodyneScan>& scan_msg,
-    std::shared_ptr<PointCloud>& out_msg) {
+    std::shared_ptr<PointCloud> out_msg) {
   // allocate a point cloud with same time and frame ID as raw data
   out_msg->mutable_header()->set_frame_id(scan_msg->header().frame_id());
   out_msg->set_height(1);
-  out_msg->mutable_header()->set_sequence_num(scan_msg->header().sequence_num());
+  out_msg->mutable_header()->set_sequence_num(
+      scan_msg->header().sequence_num());
   gps_base_usec_ = scan_msg->basetime();
 
   size_t packets_size = scan_msg->firing_pkts_size();
@@ -51,10 +50,10 @@ void Velodyne16Parser::generate_pointcloud(
 }
 
 uint64_t Velodyne16Parser::get_timestamp(double base_time, float time_offset,
-                                       uint16_t block_id) {
+                                         uint16_t block_id) {
   double t = base_time - time_offset;
-  uint64_t timestamp = Velodyne16Parser::get_gps_stamp(t, previous_packet_stamp_,
-                                                     gps_base_usec_);
+  uint64_t timestamp = Velodyne16Parser::get_gps_stamp(
+      t, &previous_packet_stamp_, &gps_base_usec_);
   return timestamp;
 }
 
@@ -64,7 +63,7 @@ uint64_t Velodyne16Parser::get_timestamp(double base_time, float time_offset,
  *  @param pc shared pointer to point cloud (points are appended)
  */
 void Velodyne16Parser::unpack(const VelodynePacket& pkt,
-                              std::shared_ptr<PointCloud>& pc) {
+                              std::shared_ptr<PointCloud> pc) {
   float azimuth_diff = 0.0;
   float last_azimuth_diff = 0.0;
   float azimuth_corrected_f = 0.0;
@@ -77,7 +76,8 @@ void Velodyne16Parser::unpack(const VelodynePacket& pkt,
   for (int block = 0; block < BLOCKS_PER_PACKET; block++) {
     float azimuth = static_cast<float>(raw->blocks[block].rotation);
     if (block < (BLOCKS_PER_PACKET - 1)) {
-      azimuth_diff = (float)((36000 + raw->blocks[block + 1].rotation -
+      azimuth_diff =
+          static_cast<float>((36000 + raw->blocks[block + 1].rotation -
                               raw->blocks[block].rotation) %
                              36000);
       last_azimuth_diff = azimuth_diff;
@@ -101,7 +101,8 @@ void Velodyne16Parser::unpack(const VelodynePacket& pkt,
             azimuth + (azimuth_diff * ((dsr * VLP16_DSR_TOFFSET) +
                                        (firing * VLP16_FIRING_TOFFSET)) /
                        VLP16_BLOCK_TDURATION);
-        azimuth_corrected = (int)round(fmod(azimuth_corrected_f, 36000.0));
+        azimuth_corrected =
+            static_cast<int>(round(fmod(azimuth_corrected_f, 36000.0)));
 
         // set 4th param to LOWER_BANK, only use lower_gps_base_usec_ and
         // lower_previous_packet_stamp_
@@ -143,35 +144,34 @@ void Velodyne16Parser::unpack(const VelodynePacket& pkt,
 
         if (block == 0 && firing == 0) {
           ADEBUG << "point x:" << point->x() << "  y:" << point->y()
-                 << "  z:" << point->z() << "  intensity:" << int(point->intensity());
+                 << "  z:" << point->z()
+                 << "  intensity:" << int(point->intensity());
         }
       }
     }
   }
 }
 
-void Velodyne16Parser::order(std::shared_ptr<PointCloud>& cloud) {
+void Velodyne16Parser::order(std::shared_ptr<PointCloud> cloud) {
   int width = 16;
   cloud->set_width(width);
   int height = cloud->point_size() / cloud->width();
   cloud->set_height(height);
 
-  std::shared_ptr<PointCloud> cloud_origin =
-      std::make_shared<PointCloud>();
+  std::shared_ptr<PointCloud> cloud_origin = std::make_shared<PointCloud>();
   cloud_origin->CopyFrom(*cloud);
 
   for (int i = 0; i < width; ++i) {
-      int col = velodyne::ORDER_16[i];
+    int col = velodyne::ORDER_16[i];
 
-      for (int j = 0; j < height; ++j) {
-          // make sure offset is initialized, should be init at setup() just once
-          int target_index = j * width + i;
-          int origin_index = j * width + col;
-          cloud->mutable_point(target_index)->CopyFrom(cloud_origin->point(origin_index));
-
-      }
+    for (int j = 0; j < height; ++j) {
+      // make sure offset is initialized, should be init at setup() just once
+      int target_index = j * width + i;
+      int origin_index = j * width + col;
+      cloud->mutable_point(target_index)
+          ->CopyFrom(cloud_origin->point(origin_index));
+    }
   }
-
 }
 
 }  // namespace velodyne

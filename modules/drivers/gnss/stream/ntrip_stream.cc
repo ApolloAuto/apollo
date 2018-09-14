@@ -31,7 +31,7 @@ template <typename T>
 constexpr bool is_zero(T value) {
   return value == static_cast<T>(0);
 }
-}
+}  // namespace
 
 namespace apollo {
 namespace drivers {
@@ -191,12 +191,12 @@ size_t NtripStream::read(uint8_t* buffer, size_t max_length) {
   }
 
   if (is_zero(data_active_s_)) {
-    data_active_s_ = cybertron::Time::Now().ToSecond(); 
+    data_active_s_ = cybertron::Time::Now().ToSecond();
   }
 
   ret = tcp_stream_->read(buffer, max_length);
   if (ret) {
-    data_active_s_ = cybertron::Time::Now().ToSecond(); 
+    data_active_s_ = cybertron::Time::Now().ToSecond();
   }
 
   // timeout detect

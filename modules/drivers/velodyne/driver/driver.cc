@@ -18,11 +18,11 @@
 #include <ctime>
 #include <string>
 
-#include <cybertron/cybertron.h>
+#include "cybertron/cybertron.h"
 
+#include "modules/drivers/velodyne/driver/driver.h"
 #include "modules/drivers/velodyne/proto/config.pb.h"
 #include "modules/drivers/velodyne/proto/velodyne.pb.h"
-#include "modules/drivers/velodyne/driver/driver.h"
 
 namespace apollo {
 namespace drivers {
@@ -31,7 +31,7 @@ namespace velodyne {
 VelodyneDriver::VelodyneDriver() : basetime_(0), last_gps_time_(0) {}
 
 void VelodyneDriver::set_base_time_from_nmea_time(NMEATimePtr nmea_time,
-                                                  uint64_t& basetime) {
+                                                  uint64_t* basetime) {
   tm time;
   time.tm_year = nmea_time->year + (2000 - 1900);
   time.tm_mon = nmea_time->mon - 1;
@@ -43,10 +43,11 @@ void VelodyneDriver::set_base_time_from_nmea_time(NMEATimePtr nmea_time,
   // set last gps time using gps socket packet
   last_gps_time_ = (nmea_time->min * 60 + nmea_time->sec) * 1e6;
 
-  LOG_INFO_FORMAT("Set base unix time : %d-%d-%d %d:%d:%d", time.tm_year, time.tm_mon,
-           time.tm_mday, time.tm_hour, time.tm_min, time.tm_sec);
+  LOG_INFO_FORMAT("Set base unix time : %d-%d-%d %d:%d:%d", time.tm_year,
+                  time.tm_mon, time.tm_mday, time.tm_hour, time.tm_min,
+                  time.tm_sec);
   uint64_t unix_base = static_cast<uint64_t>(timegm(&time));
-  basetime = unix_base * 1e6;
+  *basetime = unix_base * 1e6;
 }
 
 bool VelodyneDriver::set_base_time() {
@@ -61,12 +62,12 @@ bool VelodyneDriver::set_base_time() {
     }
   }
 
-  set_base_time_from_nmea_time(nmea_time, basetime_);
+  set_base_time_from_nmea_time(nmea_time, &basetime_);
   input_->init(config_.firing_data_port());
   return true;
 }
 
-int VelodyneDriver::poll_standard(std::shared_ptr<VelodyneScan>& scan) {
+int VelodyneDriver::poll_standard(std::shared_ptr<VelodyneScan> scan) {
   // Since the velodyne delivers data at a very high rate, keep reading and
   // publishing scans as fast as possible.
   // scan->packets.resize(config_.npackets);
@@ -105,9 +106,7 @@ void VelodyneDriver::update_gps_top_hour(uint32_t current_time) {
   last_gps_time_ = current_time;
 }
 
-VelodyneDriver* VelodyneDriverFactory::create_driver(
-    const Config& config) {
-
+VelodyneDriver* VelodyneDriverFactory::create_driver(const Config& config) {
   Config new_config = config;
   if (new_config.prefix_angle() > 35900 || new_config.prefix_angle() < 100) {
     AWARN << "invalid prefix angle, prefix_angle must be between 100 and 35900";
@@ -117,9 +116,8 @@ VelodyneDriver* VelodyneDriverFactory::create_driver(
       new_config.set_prefix_angle(100);
     }
   }
-  if (config.model() == HDL64E_S2 
-      || config.model() == HDL64E_S3S 
-      || config.model() == HDL64E_S3D) {
+  if (config.model() == HDL64E_S2 || config.model() == HDL64E_S3S ||
+      config.model() == HDL64E_S3D) {
     return new Velodyne64Driver(config);
   } else if (config.model() == HDL32E) {
     return new Velodyne32Driver(config);

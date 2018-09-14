@@ -37,7 +37,7 @@ PCDExporter::PCDExporter(ros::NodeHandle node, ros::NodeHandle private_nh)
   private_nh.param("queue_size", queue_size_, 10);
 
   sub_ = node.subscribe(topic_pointcloud_, queue_size_,
-                        &PCDExporter::pcd_writer_callback, (PCDExporter *)this);
+                        &PCDExporter::pcd_writer_callback, this);
 }
 
 PCDExporter::~PCDExporter() {
@@ -98,8 +98,8 @@ void PCDExporter::write_pcd_file(sensor_msgs::PointCloud2::ConstPtr msg,
   writer_.writeBinaryCompressed(filename, pcl_cloud);
 }
 
-int PCDExporter::write_pcd_pose_file(
-    sensor_msgs::PointCloud2::ConstPtr msg, int index) {
+int PCDExporter::write_pcd_pose_file(sensor_msgs::PointCloud2::ConstPtr msg,
+                                     int index) {
   double time = msg->header.stamp.toSec();
 
   Eigen::Matrix4d pose;

@@ -24,9 +24,9 @@
 
 #include "cybertron/cybertron.h"
 
+#include "modules/canbus/proto/chassis.pb.h"
 #include "modules/drivers/gnss/proto/config.pb.h"
 #include "modules/drivers/gnss/proto/gnss_status.pb.h"
-#include "modules/canbus/proto/chassis.pb.h"
 
 #include "modules/drivers/gnss/parser/data_parser.h"
 #include "modules/drivers/gnss/parser/rtcm_parser.h"
@@ -36,19 +36,20 @@ namespace apollo {
 namespace drivers {
 namespace gnss {
 
+using apollo::canbus::Chassis;
+using apollo::drivers::gnss::RawData;
 using apollo::drivers::gnss_status::StreamStatus;
 using apollo::drivers::gnss_status::StreamStatus_Type;
-using apollo::drivers::gnss::RawData;
-using apollo::canbus::Chassis;
 
 using apollo::cybertron::Node;
-using apollo::cybertron::Writer;
 using apollo::cybertron::Reader;
 using apollo::cybertron::Timer;
+using apollo::cybertron::Writer;
 
 class RawStream {
  public:
-  explicit RawStream(const config::Config& config, const std::shared_ptr<Node>& node);
+  explicit RawStream(const config::Config& config,
+                     const std::shared_ptr<Node>& node);
   ~RawStream();
   bool Init();
 

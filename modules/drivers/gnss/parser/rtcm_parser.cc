@@ -29,9 +29,8 @@ namespace apollo {
 namespace drivers {
 namespace gnss {
 
-using ::apollo::drivers::gnss::GnssEphemeris;
 using ::apollo::drivers::gnss::EpochObservation;
-//using ::apollo::common::adapter::AdapterManager;
+using ::apollo::drivers::gnss::GnssEphemeris;
 
 bool RtcmParser::Init() {
   rtcm_parser_.reset(new Rtcm3Parser(true));
@@ -62,7 +61,6 @@ void RtcmParser::ParseRtcmData(const std::string& msg) {
 }
 
 void RtcmParser::DispatchMessage(Parser::MessageType type, MessagePtr message) {
-
   switch (type) {
     case Parser::MessageType::EPHEMERIDES:
       PublishEphemeris(message);
@@ -79,12 +77,12 @@ void RtcmParser::DispatchMessage(Parser::MessageType type, MessagePtr message) {
 
 void RtcmParser::PublishEphemeris(const MessagePtr message) {
   GnssEphemeris eph = *As<GnssEphemeris>(message);
-  //AdapterManager::PublishGnssRtkEph(eph);
+  // AdapterManager::PublishGnssRtkEph(eph);
 }
 
 void RtcmParser::PublishObservation(const MessagePtr message) {
   EpochObservation observation = *As<EpochObservation>(message);
-  //AdapterManager::PublishGnssRtkObs(observation);
+  // AdapterManager::PublishGnssRtkObs(observation);
 }
 
 }  // namespace gnss

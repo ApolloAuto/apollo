@@ -20,50 +20,26 @@ namespace apollo {
 namespace drivers {
 namespace velodyne {
 
-using apollo::drivers::velodyne::config::Config;
-using apollo::drivers::velodyne::VelodyneScan;
 using apollo::drivers::PointCloud;
+using apollo::drivers::velodyne::VelodyneScan;
+using apollo::drivers::velodyne::config::Config;
 
 void Convert::init(const Config& velodyne_config) {
-  // private_nh.param("max_range", config_.max_range, 130.0);
   config_ = velodyne_config;
   // we use beijing time by default
-  // private_nh.param("queue_size", queue_size_, 10);
 
   parser_.reset(VelodyneParserFactory::create_parser(config_));
   if (parser_.get() == nullptr) {
-    // ROS_BREAK();
     AFATAL << "Create parser failed.";
     return;
   }
   parser_->setup();
-  // Emphasis no header available in published msg, which enables us to
-  // customize header.seq.
-  // Learn from
-  // http://answers.ros.org/question/55126/why-does-ros-overwrite-my-sequence-number/
-  // ros::AdvertiseOptions opt =
-  //     ros::AdvertiseOptions::create<sensor_msgs::PointCloud2>(
-  //         topic_pointcloud_, queue_size_, &connected, &disconnected,
-  //         ros::VoidPtr(), NULL);
-  // opt.has_header = false;
-  // velodyne_points_output_ = node.advertise(opt);
-  // pointcloud_pub_ =
-  //     node.advertise<sensor_msgs::PointCloud2>(topic_pointcloud_, queue_size_);
-  //
-  // subscribe to VelodyneScan packets
-  // velodyne_scan_ = node.subscribe(
-  //     topic_packets_, queue_size_, &Convert::convert_packets_to_pointcloud,
-  //     (Convert*)this, ros::TransportHints().tcpNoDelay(true));
 }
 
 /** @brief Callback for raw scan messages. */
-void  Convert::convert_packets_to_pointcloud(
+void Convert::convert_packets_to_pointcloud(
     const std::shared_ptr<VelodyneScan>& scan_msg,
-    std::shared_ptr<PointCloud>& point_cloud) {
-  // ROS_INFO_ONCE("********************************************************");
-  // ROS_INFO_ONCE("Start convert velodyne packets to pointcloud");
-  // ROS_INFO_ONCE("********************************************************");
-  // ROS_DEBUG_STREAM(scan_msg->header.seq);
+    std::shared_ptr<PointCloud> point_cloud) {
   ADEBUG << "Convert scan msg seq " << scan_msg->header().sequence_num();
 
   parser_->generate_pointcloud(scan_msg, point_cloud);
@@ -84,9 +60,6 @@ void  Convert::convert_packets_to_pointcloud(
   } else {
     point_cloud->set_is_dense(true);
   }
-
-  // publish the accumulated cloud message
-  // pointcloud_pub_.publish(pointcloud);
 }
 
 }  // namespace velodyne

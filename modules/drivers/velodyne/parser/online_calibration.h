@@ -15,12 +15,13 @@
  *****************************************************************************/
 
 #ifndef MODULES_DRIVERS_VELODYNE_PARSER_ONLINE_CALIBRATION_H_
-#define MODULES_DRIVERS_VELODYNE_PARSER_ONLINE_CALIBRATION_H_ 
+#define MODULES_DRIVERS_VELODYNE_PARSER_ONLINE_CALIBRATION_H_
 
-#include <vector>
 #include <memory>
+#include <string>
+#include <vector>
 
-#include <cybertron/cybertron.h>
+#include "cybertron/cybertron.h"
 
 #include "modules/drivers/velodyne/parser/calibration.h"
 #include "modules/drivers/velodyne/proto/velodyne.pb.h"
@@ -42,12 +43,8 @@ class OnlineCalibration {
   int decode(const std::shared_ptr<VelodyneScan>& scan_msgs);
   void dump(const std::string& file_path);
   void get_unit_index();
-  bool inited() const {
-    return inited_;
-  }
-  Calibration calibration() const {
-    return calibration_;
-  }
+  bool inited() const { return inited_; }
+  Calibration calibration() const { return calibration_; }
 
  private:
   bool inited_;

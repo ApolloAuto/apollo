@@ -32,7 +32,7 @@ namespace apollo {
 namespace drivers {
 namespace gnss {
 
-//using apollo::common::adapter::AdapterManager;
+// using apollo::common::adapter::AdapterManager;
 
 void switch_stream_status(const apollo::drivers::gnss::Stream::Status &status,
                           StreamStatus_Type *report_status_type) {
@@ -51,7 +51,7 @@ void switch_stream_status(const apollo::drivers::gnss::Stream::Status &status,
       break;
   }
 }
-std::string getLocalTimeFileStr(const std::string& gpsbin_folder) {
+std::string getLocalTimeFileStr(const std::string &gpsbin_folder) {
   time_t it = std::time(0);
   char local_time_char[64];
   std::strftime(local_time_char, sizeof(local_time_char), "%Y%m%d_%H%M%S",
@@ -130,9 +130,9 @@ Stream *create_stream(const config::Stream &sd) {
   }
 }
 
-RawStream::RawStream(const config::Config &config, const std::shared_ptr<Node>& node) 
-    : config_(config),
-    node_(node) {
+RawStream::RawStream(const config::Config &config,
+                     const std::shared_ptr<Node> &node)
+    : config_(config), node_(node) {
   data_parser_ptr_.reset(new DataParser(config_, node_));
   rtcm_parser_ptr_.reset(new RtcmParser());
 }
@@ -157,13 +157,14 @@ bool RawStream::Init() {
   stream_status_.set_ins_stream_type(StreamStatus::DISCONNECTED);
   stream_status_.set_rtk_stream_in_type(StreamStatus::DISCONNECTED);
   stream_status_.set_rtk_stream_out_type(StreamStatus::DISCONNECTED);
-  stream_writer_ = node_->CreateWriter<StreamStatus>(config_.stream_channel_name());
+  stream_writer_ =
+      node_->CreateWriter<StreamStatus>(config_.stream_channel_name());
 
   common::util::FillHeader("gnss", &stream_status_);
   stream_writer_->Write(std::make_shared<StreamStatus>(stream_status_));
-  //AdapterManager::FillStreamStatusHeader(FLAGS_sensor_node_name,
+  // AdapterManager::FillStreamStatusHeader(FLAGS_sensor_node_name,
   //                                       &stream_status_);
-  //AdapterManager::PublishStreamStatus(stream_status_);
+  // AdapterManager::PublishStreamStatus(stream_status_);
 
   // Creates streams.
   Stream *s = nullptr;
@@ -272,21 +273,21 @@ bool RawStream::Init() {
   const std::string gpsbin_file = getLocalTimeFileStr(config_.gpsbin_folder());
   gpsbin_stream_.reset(new std::ofstream(
       gpsbin_file, std::ios::app | std::ios::out | std::ios::binary));
-//  AdapterManager::AddGnssRawDataCallback(&RawStream::GpsbinCallback, this);
-  stream_writer_ = node_->CreateWriter<StreamStatus>(config_.stream_channel_name());
+  //  AdapterManager::AddGnssRawDataCallback(&RawStream::GpsbinCallback, this);
+  stream_writer_ =
+      node_->CreateWriter<StreamStatus>(config_.stream_channel_name());
   raw_writer_ = node_->CreateWriter<RawData>(config_.raw_channel_name());
   rtcm_writer_ = node_->CreateWriter<RawData>(config_.rtcm_channel_name());
-  gpsbin_reader_ = node_->CreateReader<RawData>(config_.raw_channel_name(), 
-      [&](const std::shared_ptr<RawData>& raw_data){
+  gpsbin_reader_ = node_->CreateReader<RawData>(
+      config_.raw_channel_name(),
+      [&](const std::shared_ptr<RawData> &raw_data) {
         GpsbinCallback(raw_data);
       });
 
-  chassis_reader_ = node_->CreateReader<Chassis>(config_.chassis_channel_name(),
-      [&](const std::shared_ptr<Chassis>& chassis){
-        chassis_ptr_ = chassis;
-      });
+  chassis_reader_ = node_->CreateReader<Chassis>(
+      config_.chassis_channel_name(),
+      [&](const std::shared_ptr<Chassis> &chassis) { chassis_ptr_ = chassis; });
 
-  
   return true;
 }
 
@@ -294,30 +295,28 @@ void RawStream::Start() {
   data_thread_ptr_.reset(new std::thread(&RawStream::DataSpin, this));
   rtk_thread_ptr_.reset(new std::thread(&RawStream::RtkSpin, this));
   if (config_.has_wheel_parameters()) {
-    wheel_velocity_timer_.reset(new Timer(1000, 
-        [this](){
-          this->OnWheelVelocityTimer();
-        }, 
-        false));
+    wheel_velocity_timer_.reset(
+        new Timer(1000, [this]() { this->OnWheelVelocityTimer(); }, false));
     wheel_velocity_timer_->Start();
   }
 }
 
 void RawStream::OnWheelVelocityTimer() {
-  //AdapterManager::Observe();
-  //if (AdapterManager::GetChassis()->Empty()) {
+  // AdapterManager::Observe();
+  // if (AdapterManager::GetChassis()->Empty()) {
   //  AINFO << "No chassis message received";
   //  return;
   //}
-  //auto chassis = AdapterManager::GetChassis()->GetLatestObservedPtr();
+  // auto chassis = AdapterManager::GetChassis()->GetLatestObservedPtr();
   if (chassis_ptr_ == nullptr) {
     AINFO << "No chassis message received";
     return;
-  } 
-  auto latency_sec =
-      cybertron::Time::Now().ToSecond() - chassis_ptr_->header().timestamp_sec();
+  }
+  auto latency_sec = cybertron::Time::Now().ToSecond() -
+                     chassis_ptr_->header().timestamp_sec();
   auto latency_ms = std::to_string(std::lround(latency_sec * 1000));
-  auto speed_cmps = std::to_string(std::lround(chassis_ptr_->speed_mps() * 100));
+  auto speed_cmps =
+      std::to_string(std::lround(chassis_ptr_->speed_mps() * 100));
   auto cmd_wheelvelocity =
       "WHEELVELOCITY " + latency_ms + " 100 0 0 0 0 0 " + speed_cmps + "\r\n";
   AINFO << "Write command: " << cmd_wheelvelocity;
@@ -468,18 +467,18 @@ void RawStream::StreamStatusCheck() {
   }
 
   if (status_report) {
-    //AdapterManager::FillStreamStatusHeader(FLAGS_sensor_node_name,
+    // AdapterManager::FillStreamStatusHeader(FLAGS_sensor_node_name,
     //                                       &stream_status_);
-    //AdapterManager::PublishStreamStatus(stream_status_);
+    // AdapterManager::PublishStreamStatus(stream_status_);
     common::util::FillHeader("gnss", &stream_status_);
     stream_writer_->Write(std::make_shared<StreamStatus>(stream_status_));
   }
 }
 
 void RawStream::DataSpin() {
-  //AdapterManager::FillStreamStatusHeader(FLAGS_sensor_node_name,
+  // AdapterManager::FillStreamStatusHeader(FLAGS_sensor_node_name,
   //                                       &stream_status_);
-  //AdapterManager::PublishStreamStatus(stream_status_);
+  // AdapterManager::PublishStreamStatus(stream_status_);
   common::util::FillHeader("gnss", &stream_status_);
   stream_writer_->Write(std::make_shared<StreamStatus>(stream_status_));
   while (cybertron::OK()) {
@@ -491,7 +490,8 @@ void RawStream::DataSpin() {
         continue;
       }
       msg_pub->set_data(reinterpret_cast<const char *>(buffer_), length);
-//      AdapterManager::PublishGnssRawData(*msg_pub);  // for data recorder
+      //      AdapterManager::PublishGnssRawData(*msg_pub);  // for data
+      //      recorder
       raw_writer_->Write(msg_pub);
       data_parser_ptr_->ParseRawData(msg_pub->data());
       if (push_location_) {
@@ -530,7 +530,7 @@ void RawStream::PublishRtkData(size_t length) {
   std::shared_ptr<RawData> rtk_msg = std::make_shared<RawData>();
   CHECK_NOTNULL(rtk_msg);
   rtk_msg->set_data(reinterpret_cast<const char *>(buffer_rtk_), length);
-//  AdapterManager::PublishRtcmData(*rtkmsg);
+  //  AdapterManager::PublishRtcmData(*rtkmsg);
   rtcm_writer_->Write(rtk_msg);
   rtcm_parser_ptr_->ParseRtcmData(rtk_msg->data());
 }
@@ -554,7 +554,7 @@ void RawStream::PushGpgga(size_t length) {
   }
 }
 
-void RawStream::GpsbinCallback(const std::shared_ptr<RawData const>& raw_data) {
+void RawStream::GpsbinCallback(const std::shared_ptr<RawData const> &raw_data) {
   if (gpsbin_stream_ == nullptr) {
     return;
   }

@@ -25,7 +25,8 @@ GnssDriverComponent::GnssDriverComponent() {}
 
 bool GnssDriverComponent::Init() {
   config::Config gnss_config;
-  if(!apollo::cybertron::common::GetProtoFromFile(config_file_path_, &gnss_config)){
+  if (!apollo::cybertron::common::GetProtoFromFile(config_file_path_,
+                                                   &gnss_config)) {
     return false;
   }
   AINFO << "Gnss config: " << gnss_config.DebugString();
@@ -43,6 +44,6 @@ bool GnssDriverComponent::Proc(const std::shared_ptr<RawData>& rawdata) {
   return true;
 }
 
-}
-}
-}
+}  // namespace gnss
+}  // namespace drivers
+}  // namespace apollo

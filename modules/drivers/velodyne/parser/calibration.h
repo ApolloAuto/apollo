@@ -26,7 +26,7 @@
  */
 
 #ifndef MODULES_DRIVERS_VELODYNE_PARSER_CALIBRATION_H_
-#define MODULES_DRIVERS_VELODYNE_PARSER_CALIBRATION_H_ 
+#define MODULES_DRIVERS_VELODYNE_PARSER_CALIBRATION_H_
 
 #include <map>
 #include <string>
@@ -74,7 +74,7 @@ class Calibration {
 
  public:
   Calibration() : initialized_(false) {}
-  Calibration(const std::string& calibration_file) {
+  explicit Calibration(const std::string& calibration_file) {
     read(calibration_file);
   }
 

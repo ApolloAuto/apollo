@@ -53,7 +53,7 @@ SocketInput::SocketInput() : sockfd_(-1), port_(0) {}
 /** @brief destructor */
 SocketInput::~SocketInput(void) { (void)close(sockfd_); }
 
-void SocketInput::init(const int& port) {
+void SocketInput::init(const int &port) {
   if (sockfd_ != -1) {
     (void)close(sockfd_);
   }
@@ -75,7 +75,8 @@ void SocketInput::init(const int& port) {
   my_addr.sin_addr.s_addr = INADDR_ANY;      // automatically fill in my IP
   //    my_addr.sin_addr.s_addr = inet_addr("192.168.1.100");
 
-  if (bind(sockfd_, (sockaddr *)&my_addr, sizeof(sockaddr)) == -1) {
+  if (bind(sockfd_, reinterpret_cast<sockaddr *>(&my_addr), sizeof(sockaddr)) ==
+      -1) {
     AERROR << "Socket bind failed! Port " << port_;
     return;
   }
@@ -99,7 +100,8 @@ int SocketInput::get_firing_data_packet(VelodynePacket *pkt) {
     // Receive packets that should now be available from the
     // socket using a blocking read.
     uint8_t bytes[FIRING_DATA_PACKET_SIZE];
-    ssize_t nbytes = recvfrom(sockfd_, bytes, FIRING_DATA_PACKET_SIZE, 0, NULL, NULL);
+    ssize_t nbytes =
+        recvfrom(sockfd_, bytes, FIRING_DATA_PACKET_SIZE, 0, NULL, NULL);
 
     if (nbytes < 0) {
       if (errno != EWOULDBLOCK) {
@@ -185,7 +187,8 @@ bool SocketInput::input_available(int timeout) {
 
     if (retval < 0) {  // poll() error?
       if (errno != EINTR) {
-        AWARN << "Velodyne port " << port_ << "poll() error: " << strerror(errno);
+        AWARN << "Velodyne port " << port_
+              << "poll() error: " << strerror(errno);
       }
       return false;
     }

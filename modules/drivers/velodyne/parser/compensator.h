@@ -15,17 +15,19 @@
  *****************************************************************************/
 
 #ifndef MODULES_DRIVERS_VELODYNE_PARSER_COMPENSATOR_H
-#define MODULES_DRIVERS_VELODYNE_PARSER_COMPENSATOR_H 
+#define MODULES_DRIVERS_VELODYNE_PARSER_COMPENSATOR_H
 
 #include <Eigen/Eigen>
+#include <memory>
+#include <string>
 
 #include "cybertron/cybertron.h"
-#include "cybertron/tf2_cybertron/transform_listener.h"
 #include "cybertron/tf2_cybertron/transform_broadcaster.h"
+#include "cybertron/tf2_cybertron/transform_listener.h"
 
 #include "modules/drivers/proto/pointcloud.pb.h"
-#include "modules/drivers/velodyne/proto/config.pb.h"
 #include "modules/drivers/velodyne/parser/const_variables.h"
+#include "modules/drivers/velodyne/proto/config.pb.h"
 
 namespace apollo {
 namespace drivers {
@@ -36,48 +38,45 @@ using apollo::drivers::PointCloud;
 using apollo::drivers::velodyne::config::Config;
 
 class Compensator {
-
  public:
-  explicit Compensator(Config& velodyne_config);
+  explicit Compensator(const Config& velodyne_config);
   virtual ~Compensator() {}
 
-  bool motion_compensation(
-      const std::shared_ptr<const PointCloud>& msg,
-      std::shared_ptr<PointCloud>& msg_compensated);
+  bool motion_compensation(const std::shared_ptr<const PointCloud>& msg,
+                           std::shared_ptr<PointCloud> msg_compensated);
+
  private:
   /**
-  * @brief get pose affine from tf2 by gps timestamp
-  *   novatel-preprocess broadcast the tf2 transfrom.
-  */
-  bool query_pose_affine_from_tf2(const uint64_t& timestamp,
-                                  void* pose,
+   * @brief get pose affine from tf2 by gps timestamp
+   *   novatel-preprocess broadcast the tf2 transfrom.
+   */
+  bool query_pose_affine_from_tf2(const uint64_t& timestamp, void* pose,
                                   const std::string& child_frame_id);
 
   /**
-  * @brief motion compensation for point cloud
-  */
-  void motion_compensation(
-      const std::shared_ptr<const PointCloud>& msg,
-      std::shared_ptr<PointCloud>& msg_compensated,
-      const uint64_t timestamp_min, const uint64_t timestamp_max,
-      const Eigen::Affine3d& pose_min_time,
-      const Eigen::Affine3d& pose_max_time);
+   * @brief motion compensation for point cloud
+   */
+  void motion_compensation(const std::shared_ptr<const PointCloud>& msg,
+                           std::shared_ptr<PointCloud> msg_compensated,
+                           const uint64_t timestamp_min,
+                           const uint64_t timestamp_max,
+                           const Eigen::Affine3d& pose_min_time,
+                           const Eigen::Affine3d& pose_max_time);
   /**
-  * @brief get min timestamp and max timestamp from points in pointcloud2
-  */
+   * @brief get min timestamp and max timestamp from points in pointcloud2
+   */
   inline void get_timestamp_interval(
-      const std::shared_ptr<const PointCloud>& msg,
-      uint64_t& timestamp_min, uint64_t& timestamp_max);
+      const std::shared_ptr<const PointCloud>& msg, uint64_t* timestamp_min,
+      uint64_t* timestamp_max);
 
-  bool is_valid(Eigen::Vector3d& point);
+  bool is_valid(const Eigen::Vector3d& point);
 
   std::shared_ptr<Buffer> tf2_buffer_ptr_;
   Config config_;
-  
 };
 
 }  // namespace velodyne
-}
-}
+}  // namespace drivers
+}  // namespace apollo
 
 #endif  // ONBOARD_DRIVERS_VELODYNE_INCLUDE_VELODYNE_PARSER_COMPENSATOR_H

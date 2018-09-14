@@ -18,6 +18,7 @@
 #define MODULES_DRIVERS_GNSS_RTCM_PARSER_H_
 
 #include <memory>
+#include <string>
 
 #include "cybertron/cybertron.h"
 

@@ -14,15 +14,11 @@
  * limitations under the License.
  *****************************************************************************/
 
-// #include <nodelet/nodelet.h>
-// #include <pluginlib/class_list_macros.h>
-// #include <ros/ros.h>
-// #include <boost/thread.hpp>
+#include <memory>
 #include <string>
 #include <thread>
-#include <memory>
 
-#include <cybertron/cybertron.h>
+#include "cybertron/cybertron.h"
 
 #include "modules/common/util/message_util.h"
 #include "modules/drivers/velodyne/driver/velodyne_driver_component.h"
@@ -34,7 +30,8 @@ namespace velodyne {
 bool VelodyneDriverComponent::Init() {
   AINFO << "Velodyne driver component init";
   Config velodyne_config;
-  if(!apollo::cybertron::common::GetProtoFromFile(config_file_path_, &velodyne_config)){
+  if (!apollo::cybertron::common::GetProtoFromFile(config_file_path_,
+                                                   &velodyne_config)) {
     return false;
   }
   AINFO << "Velodyne config: " << velodyne_config.DebugString();

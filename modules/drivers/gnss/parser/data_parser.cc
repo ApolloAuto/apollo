@@ -47,17 +47,6 @@ static const boost::array<double, 36> POSE_COVAR = {
     2, 0, 0, 0,    0, 0, 0, 2, 0, 0, 0,    0, 0, 0, 2, 0, 0, 0,
     0, 0, 0, 0.01, 0, 0, 0, 0, 0, 0, 0.01, 0, 0, 0, 0, 0, 0, 0.01};
 
-//template <class T>
-//void PublishMessageRaw(const ros::Publisher &pub, const T *pb) {
-//  std_msgs::String msg_pub;
-//
-//  if (pb->SerializeToString(&msg_pub.data)) {
-//    pub.publish(msg_pub);
-//    return;
-//  }
-//  AERROR << "Failed to serialize message.";
-//}
-
 Parser *CreateParser(config::Config config, bool is_base_station = false) {
   switch (config.data().format()) {
     case config::Stream::NOVATEL_BINARY:
@@ -70,9 +59,9 @@ Parser *CreateParser(config::Config config, bool is_base_station = false) {
 
 }  // namespace
 
-DataParser::DataParser(const config::Config &config, const std::shared_ptr<Node>& node)
-    : config_(config),
-    node_(node) {
+DataParser::DataParser(const config::Config &config,
+                       const std::shared_ptr<Node> &node)
+    : config_(config), node_(node) {
   std::string utm_target_param;
 
   wgs84pj_source_ = pj_init_plus(WGS84_TEXT);
@@ -85,28 +74,34 @@ DataParser::DataParser(const config::Config &config, const std::shared_ptr<Node>
 }
 
 bool DataParser::Init() {
-  ins_status_.mutable_header()->set_timestamp_sec(cybertron::Time::Now().ToSecond());
-  gnss_status_.mutable_header()->set_timestamp_sec(cybertron::Time::Now().ToSecond());
+  ins_status_.mutable_header()->set_timestamp_sec(
+      cybertron::Time::Now().ToSecond());
+  gnss_status_.mutable_header()->set_timestamp_sec(
+      cybertron::Time::Now().ToSecond());
 
-  gnssstatus_writer_ = node_->CreateWriter<GnssStatus>(config_.gnssstatus_channel_name());  
-  insstatus_writer_ = node_->CreateWriter<InsStatus>(config_.insstatus_channel_name());
-  gnssbestpose_writer_ = node_->CreateWriter<GnssBestPose>(config_.bestpos_channel_name());
-  corrimu_writer_ = node_->CreateWriter<CorrectedImu>(config_.corrimu_channel_name());
-  insstat_writer_ = node_->CreateWriter<InsStat>(config_.insstat_channel_name());
-  gnssephemeris_writer_ = node_->CreateWriter<GnssEphemeris>(config_.gnssephemeris_channel_name());
-  epochobservation_writer_ = node_->CreateWriter<EpochObservation>(config_.epochobservation_channel_name());
-  heading_writer_ = node_->CreateWriter<Heading>(config_.heading_channel_name());
+  gnssstatus_writer_ =
+      node_->CreateWriter<GnssStatus>(config_.gnssstatus_channel_name());
+  insstatus_writer_ =
+      node_->CreateWriter<InsStatus>(config_.insstatus_channel_name());
+  gnssbestpose_writer_ =
+      node_->CreateWriter<GnssBestPose>(config_.bestpos_channel_name());
+  corrimu_writer_ =
+      node_->CreateWriter<CorrectedImu>(config_.corrimu_channel_name());
+  insstat_writer_ =
+      node_->CreateWriter<InsStat>(config_.insstat_channel_name());
+  gnssephemeris_writer_ =
+      node_->CreateWriter<GnssEphemeris>(config_.gnssephemeris_channel_name());
+  epochobservation_writer_ = node_->CreateWriter<EpochObservation>(
+      config_.epochobservation_channel_name());
+  heading_writer_ =
+      node_->CreateWriter<Heading>(config_.heading_channel_name());
   rawimu_writer_ = node_->CreateWriter<Imu>(config_.rawimu_channel_name());
   gps_writer_ = node_->CreateWriter<Gps>(config_.gps_channel_name());
-  
+
   common::util::FillHeader("gnss", &ins_status_);
-  insstatus_writer_->Write(std::make_shared<InsStatus>(ins_status_)); 
+  insstatus_writer_->Write(std::make_shared<InsStatus>(ins_status_));
   common::util::FillHeader("gnss", &gnss_status_);
-  gnssstatus_writer_->Write(std::make_shared<GnssStatus>(gnss_status_)); 
-  //AdapterManager::FillInsStatusHeader(FLAGS_sensor_node_name, &ins_status_);
-  //AdapterManager::PublishInsStatus(ins_status_);
-  //AdapterManager::FillGnssStatusHeader(FLAGS_sensor_node_name, &gnss_status_);
-  //AdapterManager::PublishGnssStatus(gnss_status_);
+  gnssstatus_writer_->Write(std::make_shared<GnssStatus>(gnss_status_));
 
   AINFO << "Creating data parser of format: " << config_.data().format();
   data_parser_.reset(CreateParser(config_, false));
@@ -154,12 +149,9 @@ void DataParser::CheckInsStatus(::apollo::drivers::gnss::Ins *ins) {
         ins_status_.set_type(apollo::drivers::gnss_status::InsStatus::INVALID);
         break;
     }
- 
+
     common::util::FillHeader("gnss", &ins_status_);
-    insstatus_writer_->Write(std::make_shared<InsStatus>(ins_status_)); 
- 
-    //AdapterManager::FillInsStatusHeader(FLAGS_sensor_node_name, &ins_status_);
-    //AdapterManager::PublishInsStatus(ins_status_);
+    insstatus_writer_->Write(std::make_shared<InsStatus>(ins_status_));
   }
 }
 
@@ -175,14 +167,10 @@ void DataParser::CheckGnssStatus(::apollo::drivers::gnss::Gnss *gnss) {
     gnss_status_.set_solution_completed(false);
   }
   common::util::FillHeader("gnss", &gnss_status_);
-  gnssstatus_writer_->Write(std::make_shared<GnssStatus>(gnss_status_)); 
-  //AdapterManager::FillGnssStatusHeader(FLAGS_sensor_node_name, &gnss_status_);
-  //AdapterManager::PublishGnssStatus(gnss_status_);
+  gnssstatus_writer_->Write(std::make_shared<GnssStatus>(gnss_status_));
 }
 
 void DataParser::DispatchMessage(Parser::MessageType type, MessagePtr message) {
-  //std_msgs::String msg_pub;
-
   switch (type) {
     case Parser::MessageType::GNSS:
       CheckGnssStatus(As<::apollo::drivers::gnss::Gnss>(message));
@@ -229,24 +217,20 @@ void DataParser::PublishInsStat(const MessagePtr message) {
   auto ins_stat = std::make_shared<InsStat>(*As<InsStat>(message));
   common::util::FillHeader("gnss", ins_stat.get());
   insstat_writer_->Write(ins_stat);
-  //AdapterManager::FillInsStatHeader(FLAGS_sensor_node_name, &ins_stat);
-  //AdapterManager::PublishInsStat(ins_stat);
 }
 
 void DataParser::PublishBestpos(const MessagePtr message) {
   auto bestpos = std::make_shared<GnssBestPose>(*As<GnssBestPose>(message));
   common::util::FillHeader("gnss", bestpos.get());
   gnssbestpose_writer_->Write(bestpos);
-  
-  //AdapterManager::FillGnssBestPoseHeader(FLAGS_sensor_node_name, &bestpos);
-  //AdapterManager::PublishGnssBestPose(bestpos);
 }
 
 void DataParser::PublishImu(const MessagePtr message) {
   auto raw_imu = std::make_shared<Imu>(*As<Imu>(message));
   Imu *imu = As<Imu>(message);
 
-  raw_imu->mutable_linear_acceleration()->set_x(-imu->linear_acceleration().y());
+  raw_imu->mutable_linear_acceleration()->set_x(
+      -imu->linear_acceleration().y());
   raw_imu->mutable_linear_acceleration()->set_y(imu->linear_acceleration().x());
   raw_imu->mutable_linear_acceleration()->set_z(imu->linear_acceleration().z());
 
@@ -256,8 +240,6 @@ void DataParser::PublishImu(const MessagePtr message) {
 
   common::util::FillHeader("gnss", raw_imu.get());
   rawimu_writer_->Write(raw_imu);
-  //AdapterManager::FillRawImuHeader(FLAGS_sensor_node_name, &raw_imu);
-  //AdapterManager::PublishRawImu(raw_imu);
 }
 
 void DataParser::PublishOdometry(const MessagePtr message) {
@@ -297,7 +279,6 @@ void DataParser::PublishOdometry(const MessagePtr message) {
   gps_msg->mutable_linear_velocity()->set_z(ins->linear_velocity().z());
 
   gps_writer_->Write(gps);
-  //AdapterManager::PublishGps(gps);
 
   TransformStamped transform;
   GpsToTransformStamped(gps, &transform);
@@ -325,34 +306,29 @@ void DataParser::PublishCorrimu(const MessagePtr message) {
   imu_msg->mutable_euler_angles()->set_z(ins->euler_angles().z() -
                                          90 * DEG_TO_RAD_LOCAL);
 
-  corrimu_writer_->Write(imu); 
-  //AdapterManager::PublishImu(imu);
+  corrimu_writer_->Write(imu);
 }
 
 void DataParser::PublishEphemeris(const MessagePtr message) {
   auto eph = std::make_shared<GnssEphemeris>(*As<GnssEphemeris>(message));
   gnssephemeris_writer_->Write(eph);
-  //AdapterManager::PublishGnssRtkEph(eph);
 }
 
 void DataParser::PublishObservation(const MessagePtr message) {
   auto observation =
       std::make_shared<EpochObservation>(*As<EpochObservation>(message));
   epochobservation_writer_->Write(observation);
-  //AdapterManager::PublishGnssRtkObs(observation);
 }
 
 void DataParser::PublishHeading(const MessagePtr message) {
   auto heading = std::make_shared<Heading>(*As<Heading>(message));
   heading_writer_->Write(heading);
-  //AdapterManager::FillGnssHeadingHeader(FLAGS_sensor_node_name, &heading);
-  //AdapterManager::PublishGnssHeading(heading);
 }
 
-void DataParser::GpsToTransformStamped(
-    const std::shared_ptr<Gps>& gps,
-    TransformStamped *transform) {
-  transform->mutable_header()->set_stamp(gps->header().timestamp_sec() * 1000000000UL);
+void DataParser::GpsToTransformStamped(const std::shared_ptr<Gps> &gps,
+                                       TransformStamped *transform) {
+  transform->mutable_header()->set_stamp(gps->header().timestamp_sec() *
+                                         1000000000UL);
   transform->mutable_header()->set_frame_id(config_.tf().frame_id());
   transform->set_child_frame_id(config_.tf().child_frame_id());
   auto translation = transform->mutable_transform()->mutable_translation();

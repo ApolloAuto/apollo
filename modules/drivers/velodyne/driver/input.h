@@ -17,10 +17,10 @@
 #ifndef MODULES_DRIVERS_VELODYNE_DRIVER_INPUT_H_
 #define MODULES_DRIVERS_VELODYNE_DRIVER_INPUT_H_
 
-#include <cybertron/cybertron.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <memory>
+#include "cybertron/cybertron.h"
 
 // #include "velodyne_msgs/VelodyneScanUnified.h"
 #include "modules/drivers/velodyne/proto/velodyne.pb.h"

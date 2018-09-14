@@ -24,30 +24,30 @@ namespace drivers {
 namespace velodyne {
 
 uint64_t VelodyneParser::get_gps_stamp(double current_packet_stamp,
-                                     double &previous_packet_stamp,
-                                     uint64_t &gps_base_usec) {
-  if (current_packet_stamp < previous_packet_stamp) {
+                                       double *previous_packet_stamp,
+                                       uint64_t *gps_base_usec) {
+  if (current_packet_stamp < *previous_packet_stamp) {
     // plus 3600 when large jump back, discard little jump back for wrong time
     // in lidar
-    if (std::abs(previous_packet_stamp - current_packet_stamp) > 3599000000) {
-      gps_base_usec += 3600 * 1e6;
+    if (std::abs(*previous_packet_stamp - current_packet_stamp) > 3599000000) {
+      *gps_base_usec += 3600 * 1e6;
       AINFO << "Base time plus 3600s. Model: " << config_.model() << std::fixed
             << ". current:" << current_packet_stamp
-            << ", last time:" << previous_packet_stamp;
+            << ", last time:" << *previous_packet_stamp;
     } else {
       AWARN << "Current stamp:" << std::fixed << current_packet_stamp
-            << " less than previous stamp:" << previous_packet_stamp
+            << " less than previous stamp:" << *previous_packet_stamp
             << ". GPS time stamp maybe incorrect!";
     }
-  } else if (previous_packet_stamp != 0 &&
-             current_packet_stamp - previous_packet_stamp > 100000) {  // 100ms
+  } else if (*previous_packet_stamp != 0 &&
+             current_packet_stamp - *previous_packet_stamp > 100000) {  // 100ms
     AERROR << "Current stamp:" << std::fixed << current_packet_stamp
-           << " ahead previous stamp:" << previous_packet_stamp
+           << " ahead previous stamp:" << *previous_packet_stamp
            << " over 100ms. GPS time stamp incorrect!";
   }
 
-  previous_packet_stamp = current_packet_stamp;
-  uint64_t gps_stamp = gps_base_usec + current_packet_stamp;
+  *previous_packet_stamp = current_packet_stamp;
+  uint64_t gps_stamp = *gps_base_usec + current_packet_stamp;
 
   gps_stamp = gps_stamp * 1000;
   return gps_stamp;
@@ -63,7 +63,7 @@ PointXYZIT VelodyneParser::get_nan_point(uint64_t timestamp) {
   return nan_point;
 }
 
-VelodyneParser::VelodyneParser(Config config)
+VelodyneParser::VelodyneParser(const Config& config)
     : last_time_stamp_(0), config_(config), mode_(STRONGEST) {}
 
 void VelodyneParser::init_angle_params(double view_direction,
@@ -93,7 +93,8 @@ void VelodyneParser::setup() {
     calibration_.read(config_.calibration_file());
 
     if (!calibration_.initialized_) {
-      AFATAL << "Unable to open calibration file: " << config_.calibration_file();
+      AFATAL << "Unable to open calibration file: "
+             << config_.calibration_file();
     }
   }
 
@@ -121,10 +122,10 @@ bool VelodyneParser::is_scan_valid(int rotation, float range) {
   return true;
 }
 
-void VelodyneParser::compute_coords(const float& raw_distance,
+void VelodyneParser::compute_coords(const float &raw_distance,
                                     const LaserCorrection &corrections,
-                                    const uint16_t rotation, 
-                                    PointXYZIT* point) {
+                                    const uint16_t rotation,
+                                    PointXYZIT *point) {
   // ROS_ASSERT_MSG(rotation < 36000, "rotation must between 0 and 35999");
   assert(rotation < 36000);
   double x = 0.0;
@@ -194,9 +195,9 @@ void VelodyneParser::compute_coords(const float& raw_distance,
   // z = distance * sin_vert_correction + vert_offset * cos_vert_correction;
 
   /** Use standard ROS coordinate system (right-hand rule) */
-  point->set_x(float(y));
-  point->set_y(float(-x));
-  point->set_z(float(z));
+  point->set_x(static_cast<float>(y));
+  point->set_y(static_cast<float>(-x));
+  point->set_z(static_cast<float>(z));
 }
 
 VelodyneParser *VelodyneParserFactory::create_parser(Config source_config) {
@@ -207,11 +208,10 @@ VelodyneParser *VelodyneParserFactory::create_parser(Config source_config) {
   } else if (config.model() == HDL32E) {
     config.set_calibration_online(false);
     return new Velodyne32Parser(config);
-  } else if (config.model() == HDL64E_S3S 
-             || config.model() == HDL64E_S3D 
-             || config.model() == HDL64E_S2) {
+  } else if (config.model() == HDL64E_S3S || config.model() == HDL64E_S3D ||
+             config.model() == HDL64E_S2) {
     return new Velodyne64Parser(config);
-  } else if(config.model() == VLS128) {
+  } else if (config.model() == VLS128) {
     return new Velodyne128Parser(config);
   } else {
     AERROR << "invalid model, must be 64E_S2|64E_S3S"

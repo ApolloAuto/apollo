@@ -29,8 +29,7 @@ Velodyne64Driver::Velodyne64Driver(const Config& config) { config_ = config; }
 
 void Velodyne64Driver::init() {
   double packet_rate = 0;  // packet frequency (Hz)
-  if (config_.model() == HDL64E_S2 
-      || config_.model() == HDL64E_S3S) {
+  if (config_.model() == HDL64E_S2 || config_.model() == HDL64E_S3S) {
     packet_rate = 3472.17;  // 1333312 / 384
   } else {                  // 64E_S3D etc.
     packet_rate = 5789;
@@ -54,13 +53,13 @@ void Velodyne64Driver::init() {
  *
  *  @returns true unless end of file reached
  */
-bool Velodyne64Driver::poll(std::shared_ptr<VelodyneScan>& scan) {
+bool Velodyne64Driver::poll(std::shared_ptr<VelodyneScan> scan) {
   // Allocate a new shared pointer for zero-copy sharing with other nodelets.
   // velodyne_msgs::VelodyneScanUnifiedPtr scan(
   //     new velodyne_msgs::VelodyneScanUnified());
 
-  int poll_result =
-      config_.use_sensor_sync() ? poll_standard_sync(scan) : poll_standard(scan);
+  int poll_result = config_.use_sensor_sync() ? poll_standard_sync(scan)
+                                              : poll_standard(scan);
 
   if (poll_result == SOCKET_TIMEOUT || poll_result == RECIEVE_FAIL) {
     return true;  // poll again
@@ -73,9 +72,7 @@ bool Velodyne64Driver::poll(std::shared_ptr<VelodyneScan>& scan) {
 
   // publish message using time of last packet read
   ADEBUG << "Publishing a full Velodyne scan.";
-  // scan->header.stamp = ros::Time().now();
   scan->mutable_header()->set_timestamp_sec(cybertron::Time().Now().ToSecond());
-  //TODO:? add new frame id para
   scan->mutable_header()->set_frame_id(config_.frame_id());
   scan->set_basetime(basetime_);
 
@@ -83,7 +80,7 @@ bool Velodyne64Driver::poll(std::shared_ptr<VelodyneScan>& scan) {
   return true;
 }
 
-bool Velodyne64Driver::check_angle(VelodynePacket& packet) {
+bool Velodyne64Driver::check_angle(const VelodynePacket& packet) {
   // check the angle in every packet
   // for each model of velodyne 64 the data struct is same , so we don't need to
   // check the lidar model
@@ -102,8 +99,7 @@ bool Velodyne64Driver::check_angle(VelodynePacket& packet) {
   return false;
 }
 
-int Velodyne64Driver::poll_standard_sync(
-    std::shared_ptr<VelodyneScan>& scan) {
+int Velodyne64Driver::poll_standard_sync(std::shared_ptr<VelodyneScan> scan) {
   // Since the velodyne delivers data at a very high rate, keep
   // reading and publishing scans as fast as possible.
   while (true) {
@@ -118,8 +114,9 @@ int Velodyne64Driver::poll_standard_sync(
         if (check_angle(*packet) == true &&
             (scan->firing_pkts_size() > 0.5 * config_.npackets())) {
           return 0;
-        } else
+        } else {
           break;  // got a full packet?
+        }
       }
       if (rc < 0) {
         return rc;

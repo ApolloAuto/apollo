@@ -15,25 +15,25 @@
  *****************************************************************************/
 
 #ifndef MODULES_DRIVERS_VELODYNE_DRIVER_DRIVER_H_
-#define MODULES_DRIVERS_VELODYNE_DRIVER_DRIVER_H_ 
+#define MODULES_DRIVERS_VELODYNE_DRIVER_DRIVER_H_
 
-#include <string>
 #include <memory>
+#include <string>
 
 #include "modules/drivers/velodyne/driver/socket_input.h"
-#include "modules/drivers/velodyne/proto/velodyne.pb.h"
 #include "modules/drivers/velodyne/proto/config.pb.h"
+#include "modules/drivers/velodyne/proto/velodyne.pb.h"
 
 namespace apollo {
 namespace drivers {
 namespace velodyne {
 
-using apollo::drivers::velodyne::VelodyneScan;
-using apollo::drivers::velodyne::VelodynePacket;
-using apollo::drivers::velodyne::HDL64E_S3S;
-using apollo::drivers::velodyne::HDL64E_S3D;
-using apollo::drivers::velodyne::HDL64E_S2;
 using apollo::drivers::velodyne::HDL32E;
+using apollo::drivers::velodyne::HDL64E_S2;
+using apollo::drivers::velodyne::HDL64E_S3D;
+using apollo::drivers::velodyne::HDL64E_S3S;
+using apollo::drivers::velodyne::VelodynePacket;
+using apollo::drivers::velodyne::VelodyneScan;
 using apollo::drivers::velodyne::VLP16;
 using apollo::drivers::velodyne::VLP32C;
 using apollo::drivers::velodyne::VLS128;
@@ -43,7 +43,7 @@ constexpr int BLOCKS_PER_PACKET = 12;
 constexpr int BLOCK_SIZE = 100;
 
 // configuration parameters
-//struct Config {
+// struct Config {
 //  std::string frame_id;  ///< tf frame ID
 //  std::string model;     ///< device model name
 //  std::string topic;
@@ -60,7 +60,7 @@ class VelodyneDriver {
   VelodyneDriver();
   virtual ~VelodyneDriver() {}
 
-  virtual bool poll(std::shared_ptr<VelodyneScan>& scan) = 0;
+  virtual bool poll(std::shared_ptr<VelodyneScan> scan) = 0;
   virtual void init() = 0;
 
  protected:
@@ -72,10 +72,10 @@ class VelodyneDriver {
   uint64_t basetime_;
   uint32_t last_gps_time_;
 
-  virtual int poll_standard(std::shared_ptr<VelodyneScan>& scan);
+  virtual int poll_standard(std::shared_ptr<VelodyneScan> scan);
   bool set_base_time();
-  void set_base_time_from_nmea_time(NMEATimePtr nmea_time, uint64_t &basetime);
-  void update_gps_top_hour(unsigned int current_time);
+  void set_base_time_from_nmea_time(NMEATimePtr nmea_time, uint64_t *basetime);
+  void update_gps_top_hour(uint32_t current_time);
 };
 
 class Velodyne64Driver : public VelodyneDriver {
@@ -84,11 +84,11 @@ class Velodyne64Driver : public VelodyneDriver {
   virtual ~Velodyne64Driver() {}
 
   void init();
-  bool poll(std::shared_ptr<VelodyneScan>& scan);
+  bool poll(std::shared_ptr<VelodyneScan> scan);
 
  private:
-  bool check_angle(VelodynePacket &packet);
-  int poll_standard_sync(std::shared_ptr<VelodyneScan> &scan);
+  bool check_angle(const VelodynePacket &packet);
+  int poll_standard_sync(std::shared_ptr<VelodyneScan> scan);
 };
 
 class Velodyne32Driver : public VelodyneDriver {
@@ -96,7 +96,7 @@ class Velodyne32Driver : public VelodyneDriver {
   explicit Velodyne32Driver(const Config &config);
   virtual ~Velodyne32Driver() {}
   void init();
-  bool poll(std::shared_ptr<VelodyneScan>& scan);
+  bool poll(std::shared_ptr<VelodyneScan> scan);
   void poll_positioning_packet();
 
  private:
@@ -109,7 +109,7 @@ class Velodyne16Driver : public VelodyneDriver {
   virtual ~Velodyne16Driver() {}
 
   void init();
-  bool poll(std::shared_ptr<VelodyneScan>& scan);
+  bool poll(std::shared_ptr<VelodyneScan> scan);
   void poll_positioning_packet();
 
  private:
@@ -122,7 +122,7 @@ class Velodyne128Driver : public VelodyneDriver {
   virtual ~Velodyne128Driver() {}
 
   void init();
-  bool poll(std::shared_ptr<VelodyneScan>& scan);
+  bool poll(std::shared_ptr<VelodyneScan> scan);
   void poll_positioning_packet();
 
  private:
@@ -131,7 +131,7 @@ class Velodyne128Driver : public VelodyneDriver {
 
 class VelodyneDriverFactory {
  public:
-  static VelodyneDriver *create_driver(const Config& config);
+  static VelodyneDriver *create_driver(const Config &config);
 };
 
 }  // namespace velodyne

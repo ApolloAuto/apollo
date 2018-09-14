@@ -19,18 +19,19 @@
 
 #include <proj_api.h>
 #include <memory>
+#include <string>
 
 #include "cybertron/cybertron.h"
 #include "cybertron/tf2_cybertron/transform_broadcaster.h"
 
 #include "modules/drivers/gnss/proto/config.pb.h"
 #include "modules/drivers/gnss/proto/gnss.pb.h"
-#include "modules/drivers/gnss/proto/gnss_status.pb.h"
-#include "modules/drivers/gnss/proto/imu.pb.h"
-#include "modules/drivers/gnss/proto/ins.pb.h"
 #include "modules/drivers/gnss/proto/gnss_best_pose.pb.h"
 #include "modules/drivers/gnss/proto/gnss_raw_observation.pb.h"
+#include "modules/drivers/gnss/proto/gnss_status.pb.h"
 #include "modules/drivers/gnss/proto/heading.pb.h"
+#include "modules/drivers/gnss/proto/imu.pb.h"
+#include "modules/drivers/gnss/proto/ins.pb.h"
 #include "modules/localization/proto/gps.pb.h"
 #include "modules/localization/proto/imu.pb.h"
 
@@ -43,28 +44,29 @@ namespace gnss {
 using ::apollo::drivers::gnss_status::GnssStatus;
 using ::apollo::drivers::gnss_status::InsStatus;
 
-using ::apollo::drivers::gnss::InsStat;
+using ::apollo::drivers::gnss::EpochObservation;
 using ::apollo::drivers::gnss::GnssBestPose;
 using ::apollo::drivers::gnss::GnssEphemeris;
-using ::apollo::drivers::gnss::EpochObservation;
 using ::apollo::drivers::gnss::Heading;
 using ::apollo::drivers::gnss::Imu;
-using ::apollo::localization::CorrectedImu;
 using ::apollo::drivers::gnss::Ins;
+using ::apollo::drivers::gnss::InsStat;
+using ::apollo::localization::CorrectedImu;
 using ::apollo::localization::Gps;
 
-using apollo::cybertron::Node;
-using apollo::cybertron::Writer;
-using apollo::cybertron::Reader;
-using cybertron::tf2_cybertron::TransformBroadcaster;
 using adu::common::TransformStamped;
+using apollo::cybertron::Node;
+using apollo::cybertron::Reader;
+using apollo::cybertron::Writer;
+using cybertron::tf2_cybertron::TransformBroadcaster;
 
 class DataParser {
  public:
-  explicit DataParser(const config::Config &config, const std::shared_ptr<Node>& node);
+  explicit DataParser(const config::Config &config,
+                      const std::shared_ptr<Node> &node);
   ~DataParser() {}
   bool Init();
-  void ParseRawData(const std::string& msg);
+  void ParseRawData(const std::string &msg);
 
  private:
   void DispatchMessage(Parser::MessageType type, MessagePtr message);
@@ -78,7 +80,7 @@ class DataParser {
   void PublishHeading(const MessagePtr message);
   void CheckInsStatus(drivers::gnss::Ins *ins);
   void CheckGnssStatus(drivers::gnss::Gnss *gnss);
-  void GpsToTransformStamped(const std::shared_ptr<Gps>& gps,
+  void GpsToTransformStamped(const std::shared_ptr<Gps> &gps,
                              TransformStamped *transform);
 
   bool inited_flag_ = false;
@@ -103,7 +105,6 @@ class DataParser {
   std::shared_ptr<Writer<GnssEphemeris>> gnssephemeris_writer_ = nullptr;
   std::shared_ptr<Writer<EpochObservation>> epochobservation_writer_ = nullptr;
   std::shared_ptr<Writer<Heading>> heading_writer_ = nullptr;
-
 };
 
 }  // namespace gnss

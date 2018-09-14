@@ -28,7 +28,6 @@
 
 #include "cybertron/cybertron.h"
 
-#include "modules/common/macro.h"
 #include "modules/common/monitor_log/monitor_log_buffer.h"
 #include "modules/common/util/util.h"
 #include "modules/drivers/canbus/can_client/can_client.h"
