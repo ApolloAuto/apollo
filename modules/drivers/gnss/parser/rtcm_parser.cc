@@ -50,7 +50,7 @@ void RtcmParser::ParseRtcmData(const std::string& msg) {
     return;
   }
 
-  rtcm_parser_->Update(msg.data());
+  rtcm_parser_->Update(msg);
   Parser::MessageType type;
   MessagePtr msg_ptr;
 
