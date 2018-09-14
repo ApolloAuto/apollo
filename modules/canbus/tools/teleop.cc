@@ -22,7 +22,6 @@
 
 #include "cybertron/common/macros.h"
 #include "cybertron/cybertron.h"
-#include "cybertron/proto/chatter.pb.h"
 #include "cybertron/time/time.h"
 
 #include "modules/canbus/proto/chassis.pb.h"
@@ -46,6 +45,7 @@ using apollo::common::VehicleSignal;
 using apollo::common::time::Clock;
 using apollo::control::ControlCommand;
 using apollo::control::PadMessage;
+using apollo::cybertron::CreateNode;
 using apollo::cybertron::Reader;
 using apollo::cybertron::Writer;
 
@@ -86,7 +86,10 @@ const uint32_t KEYCODE_HELP2 = 0x48;  // 'H'
 
 class Teleop {
  public:
-  Teleop();
+  Teleop() {
+    ResetControlCommand();
+    node_ = CreateNode("teleop");
+  }
   static void PrintKeycode() {
     system("clear");
     printf("=====================    KEYBOARD MAP   ===================\n");
@@ -406,10 +409,8 @@ class Teleop {
   std::shared_ptr<Writer<ControlCommand>> control_command_writer_;
   ControlCommand control_command_;
   bool is_running_ = false;
-  std::shared_ptr<apollo::cybertron::Node> node_ = nullptr;
+  std::shared_ptr<apollo::cybertron::Node> node_;
 };
-
-Teleop::Teleop() { ResetControlCommand(); }
 
 }  // namespace
 

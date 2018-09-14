@@ -52,15 +52,12 @@ DEFINE_int32(feed_frequency, 10,
              "Frequency with which protos are fed to control.");
 
 int main(int argc, char** argv) {
-  using std::this_thread::sleep_for;
-
-  using apollo::control::PadMessage;
-  using apollo::cybertron::Rate;
-  using apollo::cybertron::Time;
-  using apollo::planning::ADCTrajectory;
   using apollo::canbus::Chassis;
-  using apollo::localization::LocalizationEstimate;
   using apollo::control::PadMessage;
+  using apollo::cybertron::Time;
+  using apollo::localization::LocalizationEstimate;
+  using apollo::planning::ADCTrajectory;
+  using std::this_thread::sleep_for;
 
   google::ParseCommandLineFlags(&argc, &argv, true);
   apollo::cybertron::Init(argv[0]);
@@ -95,15 +92,13 @@ int main(int argc, char** argv) {
   }
 
   std::shared_ptr<apollo::cybertron::Node> node(
-      apollo::cybertron::CreateNode("routing_tester"));
-  auto chassis_writer = node->CreateWriter<Chassis>(
-      FLAGS_chassis_topic);
-  auto localization_writer = node->CreateWriter<LocalizationEstimate>(
-      FLAGS_localization_topic);
-  auto pad_msg_writer = node->CreateWriter<PadMessage>(
-      FLAGS_pad_topic);
-  auto planning_writer = node->CreateWriter<ADCTrajectory>(
-      FLAGS_planning_trajectory_topic);
+      apollo::cybertron::CreateNode("control_tester"));
+  auto chassis_writer = node->CreateWriter<Chassis>(FLAGS_chassis_topic);
+  auto localization_writer =
+      node->CreateWriter<LocalizationEstimate>(FLAGS_localization_topic);
+  auto pad_msg_writer = node->CreateWriter<PadMessage>(FLAGS_pad_topic);
+  auto planning_writer =
+      node->CreateWriter<ADCTrajectory>(FLAGS_planning_trajectory_topic);
 
   for (int i = 0; i < FLAGS_num_seconds * FLAGS_feed_frequency; ++i) {
     chassis_writer->Write(chassis);
