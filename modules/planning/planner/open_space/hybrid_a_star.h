@@ -24,52 +24,32 @@
 #include <map>
 #include <queue>
 #include <vector>
+#include <memory>
 
 #include "modules/common/log.h"
-#include "modules/common/math/box2d.h"
 #include "modules/planning/common/obstacle.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/constraint_checker/collision_checker.h"
 
 namespace apollo {
 namespace planning {
 
 using apollo::common::Status;
-using apollo::common::math::Box2d;
 
-class Node {
- public:
-  explicit Node(double x, double y, double phi, double x_grid, double y_grid,
-                double phi_grid);
-  virtual ~Node() = default;
-  Box2d GetBoundingBox(const common::VehicleParam& vehicle_param_);
-  double GetCost() { return current_cost_ + heuristic_cost_; };
-  std::size_t GetGridX() { return x_grid_; };
-  std::size_t GetGridY() { return y_grid_; };
-  std::size_t GetGridPhi() { return phi_grid_; };
-  double GetX() { return x_; };
-  double GetY() { return y_; };
-  double GetPhi() { return phi_; };
-  bool operator==(const Node* right) const;
-
- private:
-  double x_ = 0.0;
-  double y_ = 0.0;
-  double phi_ = 0.0;
-  std::size_t x_grid_ = 0;
-  std::size_t y_grid_ = 0;
-  std::size_t phi_grid_ = 0;
-  double current_cost_ = 0.0;
-  double heuristic_cost_ = 0.0;
-  Node* pre_node = nullptr;
-  double steering_ = 0.0;
-  // true for moving forward and false for moving backward
-  bool direction_ = true;
-};
-
+struct OpenSpaceConf {
+  // for Hybrid A Star Warm Start
+  double xy_grid_resolution;
+  double phi_grid_resolution;
+  double obstacle_grid_resolution;
+  double max_x;
+  double max_y;
+  double max_phi;
+  double min_x;
+  double min_y;
+  double min_phi;
+}
 class HybridAStar {
  public:
-  explicit HybridAStar(Node start_node, Node end_node,
+  explicit HybridAStar(Node3d start_node, Node3d end_node,
                        std::vector<const Obstacle*> obstacles,
                        double xy_grid_resolution, double phi_grid_resolution,
                        double obstacle_grid_resolution);
@@ -91,14 +71,14 @@ class HybridAStar {
   double xy_grid_resolution_;
   double phi_grid_resolution_;
   std::vector<const Obstacle*> obstacles_;
-  std::unique_ptr<Node> start_node_;
-  std::unique_ptr<Node> end_node_;
-  auto cmp = [](Node* left, Node* right) {
+  std::unique_ptr<Node3d> start_node_;
+  std::unique_ptr<Node3d> end_node_;
+  auto cmp = [](SmartPtr<Node3d> left, SmartPtr<Node3d> right) {
     return left->GetCost() <= right->GetCost();
   };
-  std::priority_queue<Node*, std::vector<Node*>, decltype(cmp)> open_pq_(cmp);
-  std::map<double, Node*> open_set_;
-  std::map<double, Node*> close_set_;
+  std::priority_queue<SmartPtr<Node3d>, std::vector<SmartPtr<Node3d>>, decltype(cmp)> open_pq_(cmp);
+  std::map<double, SmartPtr<Node3d>> open_set_;
+  std::map<double, SmartPtr<Node3d>> close_set_;
 };
 
 }  // namespace planning
