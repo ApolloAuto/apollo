@@ -29,49 +29,13 @@ namespace monitor {
 
 class MonitorBufferTest : public ::testing::Test {
  protected:
-  void SetUp() override { buffer_ = new MonitorLogBuffer(nullptr); }
+  void SetUp() override {
+    cybertron::Init();
+    buffer_ = new MonitorLogBuffer(MonitorMessageItem::CONTROL);
+  }
   void TearDown() override { delete buffer_; }
   MonitorLogBuffer *buffer_ = nullptr;
 };
-
-TEST_F(MonitorBufferTest, PrintLog) {
-  FLAGS_logtostderr = true;
-  FLAGS_v = 4;
-  {
-    testing::internal::CaptureStderr();
-    buffer_->PrintLog();
-    EXPECT_TRUE(testing::internal::GetCapturedStderr().empty());
-  }
-  {
-    buffer_->INFO("INFO_msg");
-    testing::internal::CaptureStderr();
-    buffer_->PrintLog();
-    EXPECT_NE(std::string::npos,
-              testing::internal::GetCapturedStderr().find("INFO_msg"));
-  }
-  {
-    buffer_->ERROR("ERROR_msg");
-    testing::internal::CaptureStderr();
-    buffer_->PrintLog();
-    EXPECT_NE(std::string::npos,
-              testing::internal::GetCapturedStderr().find("ERROR_msg"));
-  }
-  {
-    buffer_->WARN("WARN_msg");
-    testing::internal::CaptureStderr();
-    buffer_->PrintLog();
-    EXPECT_NE(std::string::npos,
-              testing::internal::GetCapturedStderr().find("WARN_msg"));
-  }
-  {
-    rlimit core_limit;
-    core_limit.rlim_cur = 0;
-    core_limit.rlim_max = 0;
-    setrlimit(RLIMIT_CORE, &core_limit);
-    buffer_->FATAL("FATAL_msg");
-    EXPECT_DEATH(buffer_->PrintLog(), "");
-  }
-}
 
 TEST_F(MonitorBufferTest, RegisterMacro) {
   {
