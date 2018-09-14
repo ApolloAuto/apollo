@@ -14,22 +14,24 @@ cc_library(
     ],
 )
 
-cc_library(
-    name = "topic_monitor",
-    srcs = ["topic_monitor.cc"],
-    hdrs = ["topic_monitor.h"],
-    deps = [
-        "//modules/common/util:string_util",
-        "//modules/monitor/common:monitor_manager",
-        "//modules/monitor/common:recurrent_runner",
-    ],
-)
+#cc_library(
+#    name = "topic_monitor",
+#    srcs = ["topic_monitor.cc"],
+#    hdrs = ["topic_monitor.h"],
+#    deps = [
+#        "//modules/common/util:string_util",
+#        "//modules/monitor/common:monitor_manager",
+#        "//modules/monitor/common:recurrent_runner",
+#    ],
+#)
 
 cc_library(
     name = "localization_monitor",
     srcs = ["localization_monitor.cc"],
     hdrs = ["localization_monitor.h"],
     deps = [
+        "//modules/localization/proto:localization_proto",
+        "//modules/monitor/common:monitor_manager",
         "//modules/monitor/common:recurrent_runner",
     ],
 )

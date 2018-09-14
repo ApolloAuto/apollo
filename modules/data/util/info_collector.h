@@ -19,7 +19,7 @@
 
 #include <string>
 
-#include "modules/common/macro.h"
+#include "cybertron/common/macros.h"
 #include "modules/data/proto/static_info.pb.h"
 
 /**

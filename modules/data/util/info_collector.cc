@@ -21,7 +21,6 @@
 #include <string>
 
 #include "gflags/gflags.h"
-#include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/kv_db/kv_db.h"
 #include "modules/common/util/file.h"
 
@@ -37,7 +36,6 @@ namespace data {
 namespace {
 
 using apollo::common::KVDB;
-using apollo::common::adapter::AdapterManager;
 using apollo::common::util::GetProtoFromASCIIFile;
 using apollo::common::util::SetProtoToASCIIFile;
 using google::protobuf::Map;
@@ -131,19 +129,6 @@ const SoftwareInfo &InfoCollector::GetSoftwareInfo() {
 
   *software->mutable_configs() =
       LoadFiles(Instance()->config_.software_configs());
-
-  // Store latest routing request.
-  auto* routing_request_adapter = AdapterManager::GetRoutingRequest();
-  if (routing_request_adapter) {
-    routing_request_adapter->Observe();
-    if (!routing_request_adapter->Empty()) {
-      *software->mutable_latest_routing_request() =
-          routing_request_adapter->GetLatestObserved();
-    }
-  } else {
-    AERROR << "RoutingRequest is not registered in AdapterManager config.";
-  }
-
   return *software;
 }
 

@@ -16,8 +16,9 @@
 
 #include "modules/monitor/software/localization_monitor.h"
 
-#include "modules/common/adapters/adapter_manager.h"
 #include "cybertron/common/log.h"
+#include "modules/localization/proto/localization.pb.h"
+#include "modules/monitor/common/monitor_manager.h"
 
 DEFINE_string(localization_monitor_name, "LocalizationMonitor",
               "Name of the localization monitor.");
@@ -27,20 +28,21 @@ DEFINE_double(localization_monitor_interval, 5,
 
 namespace apollo {
 namespace monitor {
-using apollo::common::adapter::AdapterManager;
+using apollo::localization::LocalizationStatus;
 using apollo::localization::MeasureState;
 using apollo::localization::MeasureState_Name;
 
 LocalizationMonitor::LocalizationMonitor()
     : RecurrentRunner(FLAGS_localization_monitor_name,
                       FLAGS_localization_monitor_interval) {
-  CHECK_NOTNULL(AdapterManager::GetLocalizationMsfStatus());
 }
 
 void LocalizationMonitor::RunOnce(const double current_time) {
-  auto* adapter = AdapterManager::GetLocalizationMsfStatus();
-  adapter->Observe();
-  if (adapter->Empty()) {
+  static auto observer = MonitorManager::CreateObserver<LocalizationStatus>(
+      FLAGS_localization_msf_status);
+
+  const auto status = observer->GetLatest();
+  if (status == nullptr) {
     AERROR << "No LocalizationStatus received.";
     return;
   }
@@ -50,18 +52,17 @@ void LocalizationMonitor::RunOnce(const double current_time) {
   //   2. Log to Dreamview as error.
   //   3. Read aloud to passengers.
   //   4. Trigger guardian safety stop.
-  const auto& status = adapter->GetLatestObserved();
-  if (status.gnss_status() != MeasureState::OK) {
+  if (status->gnss_status() != MeasureState::OK) {
     AWARN << "Localization GNSS status "
-          << MeasureState_Name(status.gnss_status());
+          << MeasureState_Name(status->gnss_status());
   }
-  if (status.lidar_status() != MeasureState::OK) {
+  if (status->lidar_status() != MeasureState::OK) {
     AWARN << "Localization lidar status "
-          << MeasureState_Name(status.lidar_status());
+          << MeasureState_Name(status->lidar_status());
   }
-  if (status.fusion_status() != MeasureState::OK) {
+  if (status->fusion_status() != MeasureState::OK) {
     AERROR << "Localization fusion status "
-           << MeasureState_Name(status.fusion_status());
+           << MeasureState_Name(status->fusion_status());
   }
 }
 
