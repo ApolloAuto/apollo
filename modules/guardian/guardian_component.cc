@@ -23,7 +23,12 @@
 namespace apollo {
 namespace guardian {
 
+using apollo::canbus::Chassis;
 using apollo::common::ErrorCode;
+using apollo::control::ControlCommand;
+using apollo::cybertron::Reader;
+using apollo::cybertron::Writer;
+using apollo::monitor::SystemStatus;
 
 bool GuardianComponent::Init() {
   if (!GetProtoConfig(&guardian_conf_)) {
