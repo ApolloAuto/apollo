@@ -25,7 +25,8 @@
 #include <memory>
 #include <unordered_map>
 
-#include "modules/common/macro.h"
+#include "cybertron/common/macros.h"
+
 #include "modules/common/util/factory.h"
 #include "modules/drivers/canbus/can_client/can_client.h"
 

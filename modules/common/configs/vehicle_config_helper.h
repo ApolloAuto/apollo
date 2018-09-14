@@ -23,8 +23,9 @@
 
 #include <string>
 
+#include "cybertron/common/macros.h"
+
 #include "modules/common/configs/proto/vehicle_config.pb.h"
-#include "modules/common/macro.h"
 
 /**
  * @namespace apollo::common

@@ -29,9 +29,11 @@
 #include <thread>
 #include <vector>
 
+#include "cybertron/common/macros.h"
 #include "cybertron/cybertron.h"
-#include "modules/common/macro.h"
+
 #include "modules/common/proto/error_code.pb.h"
+
 #include "modules/drivers/canbus/can_client/can_client.h"
 #include "modules/drivers/canbus/can_comm/message_manager.h"
 #include "modules/drivers/canbus/common/canbus_consts.h"

@@ -20,7 +20,7 @@
 
 #include "modules/common/util/thread_pool.h"
 
-#include "glog/logging.h"
+#include "modules/common/log.h"
 
 namespace apollo {
 namespace common {

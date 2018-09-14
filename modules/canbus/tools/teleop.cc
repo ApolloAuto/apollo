@@ -20,17 +20,18 @@
 #include <memory>
 #include <thread>
 
+#include "cybertron/common/macros.h"
 #include "cybertron/cybertron.h"
 #include "cybertron/proto/chatter.pb.h"
 #include "cybertron/time/time.h"
 
 #include "modules/canbus/proto/chassis.pb.h"
+#include "modules/control/proto/control_cmd.pb.h"
+
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/log.h"
-#include "modules/common/macro.h"
 #include "modules/common/time/time.h"
 #include "modules/common/util/message_util.h"
-#include "modules/control/proto/control_cmd.pb.h"
 
 // gflags
 DEFINE_double(throttle_inc_delta, 2.0,

@@ -27,10 +27,11 @@
 #include <queue>
 #include <string>
 
+#include "cybertron/common/macros.h"
 #include "cybertron/component/timer_component.h"
 #include "cybertron/cybertron.h"
+
 #include "modules/canbus/proto/chassis.pb.h"
-#include "modules/common/macro.h"
 #include "modules/control/proto/control_cmd.pb.h"
 #include "modules/guardian/proto/guardian.pb.h"
 #include "modules/guardian/proto/guardian_conf.pb.h"

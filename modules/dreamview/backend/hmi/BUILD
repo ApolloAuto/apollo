@@ -7,6 +7,7 @@ cc_library(
     srcs = ["vehicle_manager.cc"],
     hdrs = ["vehicle_manager.h"],
     deps = [
+        "//framework:cybertron",
         "//modules/common/util",
         "//modules/common/util:string_util",
         "//modules/dreamview/proto:hmi_config_proto",
