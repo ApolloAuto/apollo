@@ -21,10 +21,12 @@ cc_library(
 cc_library(
     name = "planner_dispatcher",
     srcs = [
+        "navi_planner_dispatcher.cc",
         "planner_dispatcher.cc",
         "std_planner_dispatcher.cc",
     ],
     hdrs = [
+        "navi_planner_dispatcher.h",
         "planner_dispatcher.h",
         "std_planner_dispatcher.h",
     ],
@@ -44,21 +46,21 @@ cc_test(
         "std_planner_dispatcher_test.cc",
     ],
     deps = [
-        ":planner_dispatcher",
         "@gtest//:main",
+        ":planner_dispatcher",
     ],
 )
 
-# cc_test(
-#     name = "navi_planner_dispatcher_test",
-#     size = "small",
-#     srcs = [
-#         "navi_planner_dispatcher_test.cc",
-#     ],
-#     deps = [
-#         ":planner_dispatcher",
-#         "@gtest//:main",
-#     ],
-# )
+cc_test(
+    name = "navi_planner_dispatcher_test",
+    size = "small",
+    srcs = [
+        "navi_planner_dispatcher_test.cc",
+    ],
+    deps = [
+        "@gtest//:main",
+        ":planner_dispatcher",
+    ],
+)
 
 cpplint()
