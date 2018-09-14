@@ -39,16 +39,15 @@ using apollo::localization::LocalizationEstimate;
 using apollo::planning::ADCTrajectory;
 
 ControlComponent::ControlComponent()
-    : monitor_logger_buffer_(
-          common::monitor::MonitorMessageItem::CONTROL) {
-}
+    : monitor_logger_buffer_(common::monitor::MonitorMessageItem::CONTROL) {}
+
 bool ControlComponent::Init() {
   // init_time_ = Clock::NowInSeconds();
 
   AINFO << "Control init, starting ...";
 
-  // AINFO << "Loading gflag from file: " << ConfigFilePath();
-  // google::SetCommandLineOption("flagfile", ConfigFilePath().c_str());
+  AINFO << "Loading gflag from file: " << ConfigFilePath();
+  google::SetCommandLineOption("flagfile", ConfigFilePath().c_str());
 
   CHECK(apollo::common::util::GetProtoFromFile(FLAGS_control_conf_file,
                                                &control_conf_))
@@ -304,7 +303,7 @@ Status ControlComponent::CheckInput() {
                   "planning has no trajectory point.");
   }
 
-  for (auto& trajectory_point : *trajectory_.mutable_trajectory_point()) {
+  for (auto &trajectory_point : *trajectory_.mutable_trajectory_point()) {
     if (trajectory_point.v() < control_conf_.minimum_speed_resolution()) {
       trajectory_point.set_v(0.0);
       trajectory_point.set_a(0.0);
