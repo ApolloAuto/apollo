@@ -40,46 +40,45 @@ cc_library(
     ],
 )
 
-filegroup(
-    name = "testdata",
-    srcs = glob([
-        "test-data/*",
-    ]),
-)
-
-cc_test(
-    name = "hdmap_map_test",
-    size = "medium",
-    timeout = "short",
-    srcs = [
-        "hdmap_common_test.cc",
-        "hdmap_impl_test.cc",
-    ],
-    data = [
-        ":testdata",
-    ],
-    deps = [
-        ":hdmap",
-        "@glog//:glog",
-        "@gtest//:main",
-    ],
-)
-
-cc_test(
-    name = "hdmap_util_test",
-    size = "medium",
-    timeout = "short",
-    srcs = [
-        "hdmap_util_test.cc",
-    ],
-    data = [
-        ":testdata",
-    ],
-    deps = [
-        ":hdmap_util",
-        "@glog//:glog",
-        "@gtest//:main",
-    ],
-)
-
+#filegroup(
+#    name = "testdata",
+#    srcs = glob([
+#        "test-data/*",
+#    ]),
+#)
+#
+#cc_test(
+#    name = "hdmap_map_test",
+#    size = "medium",
+#    timeout = "short",
+#    srcs = [
+#        "hdmap_common_test.cc",
+#        "hdmap_impl_test.cc",
+#    ],
+#    data = [
+#        ":testdata",
+#    ],
+#    deps = [
+#        ":hdmap",
+#        "@glog//:glog",
+#        "@gtest//:main",
+#    ],
+#)
+#
+#cc_test(
+#    name = "hdmap_util_test",
+#    size = "medium",
+#    timeout = "short",
+#    srcs = [
+#        "hdmap_util_test.cc",
+#    ],
+#    data = [
+#        ":testdata",
+#    ],
+#    deps = [
+#        ":hdmap_util",
+#        "@glog//:glog",
+#        "@gtest//:main",
+#    ],
+#)
 cpplint()
