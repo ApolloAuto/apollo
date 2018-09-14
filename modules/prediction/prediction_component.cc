@@ -19,7 +19,6 @@
 #include <algorithm>
 #include <cmath>
 #include <memory>
-#include <mutex>
 #include <vector>
 
 #include "boost/filesystem.hpp"
@@ -56,6 +55,10 @@ using apollo::localization::LocalizationEstimate;
 using apollo::perception::PerceptionObstacle;
 using apollo::perception::PerceptionObstacles;
 using apollo::planning::ADCTrajectory;
+
+PredictionComponent::~PredictionComponent() {
+  Stop();
+}
 
 std::string PredictionComponent::Name() const {
   return FLAGS_prediction_module_name;
@@ -162,8 +165,6 @@ bool PredictionComponent::Init() {
   }
   return true;
 }
-
-Status PredictionComponent::Start() { return Status::OK(); }
 
 void PredictionComponent::Stop() {
   if (FLAGS_prediction_offline_mode) {
@@ -287,10 +288,6 @@ bool PredictionComponent::Proc(
   }
   prediction_writer_->Write(prediction_obstacles);
   return true;
-}
-
-Status PredictionComponent::OnError(const std::string& error_msg) {
-  return Status(ErrorCode::PREDICTION_ERROR, error_msg);
 }
 
 }  // namespace prediction
