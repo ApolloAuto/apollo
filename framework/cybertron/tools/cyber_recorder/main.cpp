@@ -178,7 +178,16 @@ int main(int argc, char** argv) {
         opt_file_vec.push_back(std::string(optarg));
         break;
       case 'c':
-        opt_channel_vec.push_back(std::string(optarg));
+        optind--;
+        while (optind < argc) {
+          if (*argv[optind] != '-') {
+            opt_channel_vec.emplace_back(argv[optind]);
+            optind++;
+          } else {
+            optind--;
+            break;
+          }
+        }
         break;
       case 'o':
         opt_output_vec.push_back(std::string(optarg));

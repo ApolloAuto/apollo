@@ -1,7 +1,5 @@
 #include <Python.h>
 #include <string.h>
-#include <iostream>
-#include <memory>
 
 #include "py_init.h"
 
@@ -41,7 +39,6 @@ static PyObject *cyber_py_waitforshutdown(PyObject *self, PyObject *args) {
   apollo::cybertron::py_waitforshutdown();
   return Py_None;
 }
-
 
 /////////////////////////////////////////////////////////////////////
 //// global for whole page, init module

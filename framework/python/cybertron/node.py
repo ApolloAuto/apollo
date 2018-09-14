@@ -5,19 +5,11 @@ import importlib
 import threading
 import ctypes
 
-from google.protobuf.descriptor_pb2 import FileDescriptorProto
-
 py_callback_type = ctypes.CFUNCTYPE(ctypes.c_int, ctypes.c_char_p)
 py_callback_type_t = ctypes.CFUNCTYPE(ctypes.c_int, ctypes.c_char_p)
 
 # init vars
 cybertron_path = os.environ['CYBERTRON_PATH'] # CYBERTRON_PATH=/home/work/baidu/adu-lab/python-wrapper/install/
-if (cybertron_path == ""):
-    print("CYBERTRON_PATH is null")
-else:
-    print("CYBERTRON_PATH=%s" % cybertron_path)
-    print("env inited succ!")
-
 cybertron_dir=os.path.split(cybertron_path)[0]
 sys.path.append(cybertron_path + "/third_party/")
 sys.path.append(cybertron_path + "/lib/")
@@ -25,8 +17,6 @@ sys.path.append(cybertron_path + "/python/cybertron")
 
 sys.path.append(cybertron_dir + "/python/")
 sys.path.append(cybertron_dir + "/cybertron/")
-
-from proto import chatter_pb2
 
 # begin wrapper cxx interface to py
 _cyber_node = importlib.import_module('_cyber_node')
@@ -38,8 +28,8 @@ class Writer:
         self.writer = writer
         self.data_type = data_type
 
-    def __del__(self):
-        print("+++ Writer __del___")
+    # def __del__(self):
+    #     print("+++ Writer __del___")
         #_cyber_node.delete_PyWriter(self.writer)
 
     def write(self, data):
@@ -51,8 +41,8 @@ class Reader:
         self.reader = reader
         self.data_type = data_type
 
-    def __del__(self):
-        print("+++ Reader __del___")
+    # def __del__(self):
+    #     print("+++ Reader __del___")
 
 class Client:
     def __init__(self, client, data_type):
@@ -85,7 +75,7 @@ class Node:
         self.mutex = threading.Lock()
 
     def __del__(self):
-        print("+++ node __del___")
+        #print("+++ node __del___")
         for w in self.list_writer:
             _cyber_node.delete_PyWriter(w)
         for r in self.list_reader:
@@ -210,37 +200,3 @@ class Node:
 
     def is_shutdown(self):
         return _cyber_node.py_is_shutdown()
-
-#//////////////////////////////class end/////////////////////////////
-
-def test_talker_class():
-    msg = chatter_pb2.Chatter()
-    msg.content = "talker:send Alex!"
-    msg.seq = 0
-    msg.timestamp = 0
-    msg.lidar_timestamp = 0
-
-    node = Node("node_name1")
-    g_count = 1
-    w = node.create_writer("channel/chatter", str(chatter_pb2.Chatter))
-
-    while not node.is_shutdown():
-        time.sleep(1)
-        g_count = g_count + 1
-        msg.seq = g_count
-        w.write(msg)
-
-
-def callback(data):
-    print("="*80)
-    print("reader callback:")
-    print data
-    print type(data)
-    print("="*80)
-
-def test_listener_class():
-    print("=" * 120)
-    node = Node("listener")
-    r = node.create_reader("channel/chatter", chatter_pb2.Chatter, callback)
-    while not node.is_shutdown():
-        time.sleep(0.002)

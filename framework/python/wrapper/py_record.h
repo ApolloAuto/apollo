@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ * Copyright 2017 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,14 +29,11 @@
 #include "cybertron/message/protobuf_factory.h"
 #include "cybertron/message/py_message.h"
 #include "cybertron/message/raw_message.h"
-//#include "cybertron/record/header_builder.h"
+#include "cybertron/proto/record.pb.h"
 #include "cybertron/record/record_reader.h"
 #include "cybertron/record/record_writer.h"
-#include "cybertron/proto/record.pb.h"
 
 using ::apollo::cybertron::proto::Header;
-using ::apollo::cybertron::proto::Channel;
-using ::apollo::cybertron::proto::SingleMessage;
 using ::apollo::cybertron::record::RecordReader;
 using ::apollo::cybertron::record::RecordFileWriter;
 
@@ -46,11 +43,10 @@ namespace record {
 
 class PyRecordReader {
  public:
-  PyRecordReader()  {
-  }
-  ~PyRecordReader() { }
+  PyRecordReader() {}
+  ~PyRecordReader() {}
 
-  bool Open(const std::string &path) { return record_reader_.Open(path); }
+  bool Open(const std::string& path) { return record_reader_.Open(path); }
   void Close() { record_reader_.Close(); }
 
   bool ReadMessage() { return record_reader_.ReadMessage(); }
@@ -66,7 +62,7 @@ class PyRecordReader {
   }
   uint64_t CurrentMessageTime() { return record_reader_.CurrentMessageTime(); }
 
-  uint64_t GetMessageNumber(const std::string &channel_name) {
+  uint64_t GetMessageNumber(const std::string& channel_name) {
     return record_reader_.GetMessageNumber(channel_name);
   }
 
@@ -78,34 +74,36 @@ class PyRecordReader {
     return record_reader_.GetProtoDesc(channel_name);
   }
 
+  std::string GetHeaderString() {
+    std::string org_data;
+    record_reader_.GetHeader().SerializeToString(&org_data);
+    return org_data;
+  }
+
  private:
   RecordReader record_reader_;
 };
 
 class PyRecordWriter {
  public:
-  PyRecordWriter()  {
-  }
-  ~PyRecordWriter() { }
+  PyRecordWriter() {}
+  ~PyRecordWriter() {}
 
-  bool Open(const std::string &path) { return recored_writer_.Open(path); }
+  bool Open(const std::string& path) { return recored_writer_.Open(path); }
+
   void Close() { recored_writer_.Close(); }
 
   bool WriteChannel(const std::string& channel_str, const std::string& type,
                     const std::string& proto_desc) {
     return recored_writer_.WriteChannel(channel_str, type, proto_desc);
   }
-  bool WriteMessage(const std::string& single_str) {
-    SingleMessage single;
-    single.ParseFromString(single_str);
-    return recored_writer_.WriteMessage(single);
+
+  bool WriteMessage(const std::string& channel_name,
+                    const std::string& rawmessage, uint64_t time) {
+    return recored_writer_.WriteMessage(
+        channel_name, std::make_shared<RawMessage>(rawmessage), time);
   }
 
-  bool WriteMessage_channel(const std::string& channel_name,
-                    const std::string& rawmessage) {
-
-    return recored_writer_.WriteMessage(channel_name, std::make_shared<RawMessage>(rawmessage));
-  }
  private:
   RecordWriter recored_writer_;
 };

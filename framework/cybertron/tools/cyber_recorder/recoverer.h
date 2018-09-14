@@ -20,7 +20,6 @@
 #include <algorithm>
 #include <memory>
 #include <string>
-#include <unordered_map>
 #include <vector>
 
 #include "cybertron/common/log.h"
@@ -44,8 +43,8 @@ class Recoverer {
   bool Proc();
 
  private:
-  std::shared_ptr<RecordWriter> writer_;
-  RecordFileReader infileopt_;
+  RecordFileReader reader_;
+  RecordFileWriter writer_;
   std::string input_file_;
   std::string output_file_;
   std::vector<std::string> channel_vec_;

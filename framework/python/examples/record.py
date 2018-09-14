@@ -3,8 +3,8 @@ import sys
 import os
 
 sys.path.append("../")
-from cybertron import pyinit
-from cybertron import pyrecord
+from cybertron import init
+from cybertron import record
 from proto import record_pb2
 
 #TEST_RECORD_FILE = "p20180903154123.record"
@@ -16,30 +16,24 @@ STR_10B = "1234567890"
 TEST_FILE = "test.record"
 
 def test_record_writer(writer_path):
-    fw = pyrecord.RecordWriter()
+    fw = record.RecordWriter()
     if (not fw.Open(writer_path)):
         print("writer open failed!")
         return
     print("+++ begin to writer...")
     fw.WriteChannel(CHAN_1, MSG_TYPE, STR_10B)
-    msg1 = record_pb2.SingleMessage()
-    msg1.channel_name = CHAN_1
-    msg1.content = STR_10B
-    msg1.time = 888
-    msg_str = msg1.SerializeToString()
-    fw.WriteMessage(msg_str)
-    fw.WriteMessage(msg_str)
+    fw.WriteMessage(CHAN_1, STR_10B, 1000)
     fw.Close()
 
 def test_record_reader(reader_path):
-    fr = pyrecord.RecordReader()
+    fr = record.RecordReader()
     if (not fr.Open(reader_path)):
         print("reader open failed!")
         return
     time.sleep(1)
     print("+"*80)
     print("+++begin to read...")
-    count = 0
+    count = 1
     read_msg_succ = True
     while not fr.EndOfFile():
         print("="*80)
@@ -48,21 +42,21 @@ def test_record_reader(reader_path):
         if(read_msg_succ):
             channelname = fr.CurrentMessageChannelName()
             print("chnanel_name -> %s" % fr.CurrentMessageChannelName())
-            #print("msg -> %s" % fr.CurrentRawMessage())
+            print("msg -> %s" % fr.CurrentRawMessage())
             print("msgtime -> %d" % fr.CurrentMessageTime())
             print("msgnum -> %d" % fr.GetMessageNumber(channelname))
             print("msgtype -> %s" % fr.GetMessageType(channelname))
-            #print("pbdesc -> %s" % fr.GetProtoDesc(channelname))
+            print("pbdesc -> %s" % fr.GetProtoDesc(channelname))
             count = count + 1
     fr.Close()
 
-    pyinit.shutdown()
+    init.shutdown()
 
 def main():
-    pyinit.init()
+    init.init()
     test_record_writer(TEST_RECORD_FILE)
     test_record_reader(TEST_RECORD_FILE)
-    pyinit.shutdown()
+    init.shutdown()
 
 if __name__ == '__main__':
   main()

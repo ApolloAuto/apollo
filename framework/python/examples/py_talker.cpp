@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ * Copyright 2017 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,10 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <thread>
-
 #include "cybertron/cybertron.h"
 #include "cybertron/proto/chatter.pb.h"
 #include "cybertron/time/rate.h"
 #include "cybertron/time/time.h"
-#include "cybertron/message/py_message.h"
 #include "python/wrapper/py_node.h"
 
 using apollo::cybertron::Rate;
@@ -34,7 +31,8 @@ int main(int argc, char *argv[]) {
   apollo::cybertron::Init("cyber_python");
   auto msgChat = std::make_shared<apollo::cybertron::proto::Chatter>();
   apollo::cybertron::PyNode node("talker");
-  apollo::cybertron::PyWriter *pw = node.create_writer("channel/chatter", msgChat->GetTypeName());
+  apollo::cybertron::PyWriter *pw =
+      node.create_writer("channel/chatter", msgChat->GetTypeName());
   Rate rate(1.0);
   while (apollo::cybertron::OK()) {
     static uint64_t seq = 0;

@@ -1,7 +1,5 @@
 #include <Python.h>
 #include <string.h>
-#include <iostream>
-#include <memory>
 
 #include "py_node.h"
 
@@ -245,8 +243,8 @@ PyObject *cyber_PyClient_send_request(PyObject *self, PyObject *args) {
   PyObject *pyobj_client = nullptr;
   char *data = nullptr;
   Py_ssize_t len = 0;
-  if (!PyArg_ParseTuple(args, (char *)"Os#:PyClient_send_request", &pyobj_client,
-                        &data, &len)) {
+  if (!PyArg_ParseTuple(args, (char *)"Os#:PyClient_send_request",
+                        &pyobj_client, &data, &len)) {
     AINFO << "cyber_PyClient_send_request:PyArg_ParseTuple failed!";
     return PYOBJECT_NULL_STRING;
   }
@@ -262,13 +260,14 @@ PyObject *cyber_PyClient_send_request(PyObject *self, PyObject *args) {
 
   std::string data_str(data, len);
   AINFO << "c++:PyClient_send_request data->[ " << data_str << "]";
-  std::string response_str = client->send_request((std::string const &)data_str);
+  std::string response_str =
+      client->send_request((std::string const &)data_str);
   AINFO << "c++:response data->[ " << response_str << "]";
   return PyString_FromStringAndSize(response_str.c_str(), response_str.size());
 }
 
 ///////////pyservice methed/////////////////
-///apollo_cybertron_pyservice///////////
+/// apollo_cybertron_pyservice///////////
 PyObject *cyber_new_PyService(PyObject *self, PyObject *args) {
   char *channel_name = 0;
   char *data_type = 0;
@@ -553,7 +552,7 @@ PyObject *cyber_PyNode_register_message(PyObject *self, PyObject *args) {
 PyObject *cyber_test0(PyObject *self, PyObject *args) {
   int channel = 0;
   int data_type = 0;
-  AINFO << "+++++++++++++++++++++begin" ;
+  AINFO << "+++++++++++++++++++++begin";
   if (!PyArg_ParseTuple(args, "ii", &channel, &data_type)) {
     return Py_None;
   }
@@ -643,7 +642,8 @@ static PyMethodDef _cyber_node_methods[] = {
     // PyService fun
     {"new_PyService", cyber_new_PyService, METH_VARARGS, ""},
     {"delete_PyService", cyber_delete_PyService, METH_VARARGS, ""},
-    {"PyService_register_func", cyber_PyService_register_func, METH_VARARGS, ""},
+    {"PyService_register_func", cyber_PyService_register_func, METH_VARARGS,
+     ""},
     {"PyService_read", cyber_PyService_read, METH_VARARGS, ""},
     {"PyService_write", cyber_PyService_write, METH_VARARGS, ""},
     // PyNode fun
@@ -651,7 +651,8 @@ static PyMethodDef _cyber_node_methods[] = {
     {"delete_PyNode", cyber_delete_PyNode, METH_VARARGS, ""},
     {"PyNode_shutdown", cyber_PyNode_shutdown, METH_VARARGS, ""},
     {"PyNode_create_writer", cyber_PyNode_create_writer, METH_VARARGS, ""},
-    {"PyNode_register_message", cyber_PyNode_register_message, METH_VARARGS, ""},
+    {"PyNode_register_message", cyber_PyNode_register_message, METH_VARARGS,
+     ""},
     {"PyNode_create_reader", cyber_PyNode_create_reader, METH_VARARGS, ""},
     {"PyNode_create_client", cyber_PyNode_create_client, METH_VARARGS, ""},
     {"PyNode_create_service", cyber_PyNode_create_service, METH_VARARGS, ""},

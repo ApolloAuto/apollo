@@ -20,13 +20,12 @@
 #include <algorithm>
 #include <memory>
 #include <string>
-#include <unordered_map>
 #include <vector>
 
 #include "cybertron/common/log.h"
 #include "cybertron/proto/record.pb.h"
+#include "cybertron/record/header_builder.h"
 #include "cybertron/record/record_file.h"
-#include "cybertron/record/record_writer.h"
 
 using ::apollo::cybertron::proto::Header;
 using ::apollo::cybertron::proto::ChunkHeader;
@@ -46,18 +45,14 @@ class Spliter {
   bool Proc();
 
  private:
-  bool SplitChunkBody();
-
-  std::shared_ptr<RecordWriter> writer_;
-  RecordFileReader infileopt_;
+  RecordFileReader reader_;
+  RecordFileWriter writer_;
   std::string input_file_;
   std::string output_file_;
   std::vector<std::string> channel_vec_;
   bool all_channels_;
   uint64_t begin_time_;
   uint64_t end_time_;
-  std::unordered_map<std::string, std::string> channel_message_type_map_;
-  std::unordered_map<std::string, std::string> channel_proto_desc_map_;
 };
 
 }  // namespace record

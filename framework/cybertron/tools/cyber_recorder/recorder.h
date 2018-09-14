@@ -72,31 +72,11 @@ class Recorder : public std::enable_shared_from_this<Recorder> {
 
   void TopologyCallback(const ChangeMsg& msg);
 
+  void ReaderCallback(const std::shared_ptr<RawMessage>& message,
+                      const std::string& channel_name);
+
   void FindNewChannel(const RoleAttributes& role_attr);
-
-  template <typename T>
-  void callback_(const std::shared_ptr<const T>& message,
-                 const std::string& channel_name);
 };
-
-template <typename T>
-void Recorder::callback_(const std::shared_ptr<const T>& message,
-                         const std::string& channel_name) {
-  if (!is_started_ || is_stopping_) {
-    AERROR << "record procedure is not started or stopping.";
-    return;
-  }
-
-  if (message == nullptr) {
-    AERROR << "message is nullptr, channel: " << channel_name;
-    return;
-  }
-
-  if (!writer_->WriteMessage(channel_name, message)) {
-    AERROR << "write data fail, channel: " << channel_name;
-    return;
-  }
-}
 
 }  // namespace record
 }  // namespace cybertron

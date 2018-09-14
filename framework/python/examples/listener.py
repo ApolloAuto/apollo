@@ -2,8 +2,8 @@ import time
 import sys
 
 sys.path.append("../")
-from cybertron import pynode
-from cybertron import pyinit
+from cybertron import node
+from cybertron import init
 from proto import chatter_pb2
 
 def callback(data):
@@ -14,16 +14,16 @@ def callback(data):
 
 def test_listener_class():
     print("=" * 120)
-    node = pynode.Node("listener")
-    r = node.create_reader("channel/chatter", chatter_pb2.Chatter, callback)
-    node.spin()
-    # while not node.is_shutdown():
+    test_node = node.Node("listener")    
+    r = test_node.create_reader("channel/chatter", chatter_pb2.Chatter, callback)
+    test_node.spin()
+    # while not node.is_shutdown():  
     #     time.sleep(0.002)
 
 def main():
-    pyinit.init()
+    init.init()
     test_listener_class()
-    pyinit.shutdown()
+    init.shutdown()
 
 if __name__ == '__main__':
   main()

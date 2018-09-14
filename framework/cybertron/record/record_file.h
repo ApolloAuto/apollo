@@ -160,7 +160,7 @@ class RecordFileWriter : public RecordFile {
 
   bool WriteHeader(const Header& header);
   bool WriteChannel(const Channel& channel);
-  bool AddSingleMessage(const SingleMessage& message);
+  bool WriteMessage(const SingleMessage& message);
 
  private:
   void RefreshIndex();

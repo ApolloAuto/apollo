@@ -115,23 +115,10 @@ inline uint64_t GpsToUnixNanoseconds(uint64_t gps_nanoseconds) {
 inline uint64_t StringToUnixSeconds(
     const std::string& time_str,
     const std::string& format_str = "%Y-%m-%d %H:%M:%S") {
-  int year = 1900;
-  int month = 1;
-  int day = 0;
-  int hour = 0;
-  int minute = 0;
-  int second = 0;
-  sscanf(time_str.c_str(), format_str.c_str(), &year, &month, &day, &hour,
-         &minute, &second);
-  struct tm t;
-  t.tm_year = year - 1900;
-  t.tm_mon = month - 1;
-  t.tm_mday = day;
-  t.tm_hour = hour;
-  t.tm_min = minute;
-  t.tm_sec = second;
-  t.tm_isdst = -1;
-  time_t time = mktime(&t);
+  struct tm* tmp_time = (struct tm*)malloc(sizeof(struct tm));
+  strptime(time_str.c_str(), format_str.c_str(), tmp_time);
+  time_t time = mktime(tmp_time);
+  free(tmp_time);
   return (uint64_t)time;
 }
 
