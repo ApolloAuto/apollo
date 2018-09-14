@@ -21,7 +21,7 @@
 #include <QPen>
 
 #include "arrow.h"
-#include "compositeitem.h"
+#include "composite_item.h"
 
 constexpr double PI = 3.14159265358979323846264338327950288419716939937510;
 constexpr double ArrowSize = 10;
