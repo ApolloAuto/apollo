@@ -20,11 +20,9 @@
 #include <sstream>
 
 #include "google/protobuf/text_format.h"
-#include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/util/file.h"
 #include "modules/common/util/util.h"
 #include "modules/third_party_perception/integration_tests/third_party_perception_test_base.h"
-#include "ros/include/ros/ros.h"
 
 DEFINE_string(test_data_dir, "", "the test data folder");
 DEFINE_string(test_localization_file, "", "localization input file");
@@ -35,18 +33,16 @@ DEFINE_bool(test_update_golden_log, false, "true to update golden log file.");
 namespace apollo {
 namespace third_party_perception {
 
-using apollo::common::adapter::AdapterManager;
-using apollo::common::monitor::MonitorMessage;
-
 uint32_t ThirdPartyPerceptionTestBase::s_seq_num_ = 0;
 
 void ThirdPartyPerceptionTestBase::SetUpTestCase() {
-  ros::Time::init();
   FLAGS_adapter_config_filename =
-      "modules/third_party_perception/testdata/conf/adapter.conf";
+      "/apollo/modules/third_party_perception/testdata/conf/adapter.conf";
 }
 
-void ThirdPartyPerceptionTestBase::SetUp() { ++s_seq_num_; }
+void ThirdPartyPerceptionTestBase::SetUp() {
+  ++s_seq_num_;
+}
 
 }  // namespace third_party_perception
 }  // namespace apollo

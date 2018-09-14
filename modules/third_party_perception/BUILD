@@ -10,24 +10,14 @@ cc_library(
         ":third_party_perception_conversion",
         ":third_party_perception_filter",
         ":third_party_perception_fusion",
-        "//modules/common:apollo_app",
+        "//modules/common/adapters:adapter_gflags",
         "//modules/common:log",
+        "//modules/common/util:message_util",
         "//modules/drivers/proto:sensor_proto",
         "//modules/localization/proto:localization_proto",
         "//modules/perception/proto:perception_proto",
         "//modules/third_party_perception/common:third_party_perception_gflags",
         "//modules/third_party_perception/common:third_party_perception_util",
-    ],
-)
-
-cc_binary(
-    name = "third_party_perception",
-    srcs = ["main.cc"],
-    deps = [
-        ":third_party_perception_lib",
-        "//external:gflags",
-        "//modules/common:log",
-        "@ros//:ros_common",
     ],
 )
 
@@ -80,6 +70,27 @@ cc_library(
         "//modules/third_party_perception/common:third_party_perception_util",
         "//modules/third_party_perception/proto:third_party_perception_proto",
     ],
+)
+
+cc_library(
+    name = "third_party_perception_component_lib",
+    srcs = [
+        "third_party_perception_component.cc",
+    ],
+    hdrs = [
+        "third_party_perception_component.h",
+    ],
+    deps = [
+        ":third_party_perception_lib",
+        "//framework:cybertron",
+    ],
+    copts = ['-DMODULE_NAME=\\"third_party_perception\\"']
+)
+
+cc_binary(
+    name = "libthird_party_perception_component.so",
+    deps = [":third_party_perception_component_lib"],
+    linkopts = ["-shared"],
 )
 
 cpplint()
