@@ -21,7 +21,8 @@
 
 #include "Eigen/Dense"
 
-#include "modules/common/macro.h"
+#include "cybertron/common/macros.h"
+
 #include "modules/prediction/network/net_model.h"
 
 namespace apollo {

@@ -6,7 +6,6 @@ cc_library(
     name = "common",
     deps = [
         ":log",
-        ":macro",
         "//modules/common/math",
         "//modules/common/status",
         "//modules/common/util",
@@ -18,6 +17,9 @@ cc_library(
     name = "macro",
     hdrs = [
         "macro.h",
+    ],
+    deps = [
+        "//framework:cybertron",
     ],
 )
 

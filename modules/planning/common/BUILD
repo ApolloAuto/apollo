@@ -136,7 +136,6 @@ cc_library(
     ],
     deps = [
         ":planning_gflags",
-        "//modules/common:macro",
         "//modules/common:log",
         "//modules/planning/proto:planning_proto",
         "//modules/planning/proto:planning_status_proto",

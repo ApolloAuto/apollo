@@ -25,10 +25,11 @@
 #include <utility>
 #include <vector>
 
+#include "cybertron/common/macros.h"
+
 #include "modules/common/proto/pnc_point.pb.h"
 
 #include "modules/common/log.h"
-#include "modules/common/macro.h"
 #include "modules/common/math/cartesian_frenet_conversion.h"
 #include "modules/common/util/string_util.h"
 #include "modules/common/util/util.h"

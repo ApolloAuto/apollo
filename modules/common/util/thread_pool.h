@@ -23,8 +23,9 @@
 
 #include <memory>
 
+#include "cybertron/common/macros.h"
+
 #include "ctpl/ctpl_stl.h"
-#include "modules/common/macro.h"
 
 namespace apollo {
 namespace common {

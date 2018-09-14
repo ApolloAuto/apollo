@@ -12,7 +12,6 @@ cc_library(
     ],
     deps = [
         "//modules/common:log",
-        "//modules/common:macro",
         "//modules/common/configs:config_gflags",
         "//modules/common/math:geometry",
         "//modules/common/math:quaternion",

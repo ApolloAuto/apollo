@@ -71,7 +71,7 @@ cc_library(
         "spline_seg_kernel.h",
     ],
     deps = [
-        "//modules/common:macro",
+        "//framework:cybertron",
         "@eigen",
     ],
 )
@@ -88,7 +88,6 @@ cc_library(
         ":affine_constraint",
         ":spline_1d",
         ":spline_seg_kernel",
-        "//modules/common:macro",
         "@eigen",
     ],
 )

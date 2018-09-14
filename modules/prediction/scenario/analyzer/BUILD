@@ -8,7 +8,6 @@ cc_library(
     hdrs = ["scenario_analyzer.h"],
     deps = [
         "//modules/common:log",
-        "//modules/common:macro",
         "//modules/common/proto:scenario_proto",
         "//modules/prediction/proto:scenario_feature_proto",
     ],

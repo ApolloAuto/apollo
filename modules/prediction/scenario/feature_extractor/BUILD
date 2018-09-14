@@ -9,7 +9,6 @@ cc_library(
     hdrs = ["feature_extractor.h"],
     deps = [
         "//modules/common:log",
-        "//modules/common:macro",
         "//modules/common/math:geometry",
         "//modules/map/hdmap:hdmap_util",
         "//modules/prediction/proto:scenario_feature_proto",

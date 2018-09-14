@@ -30,7 +30,7 @@
 
 #include "Eigen/Core"
 
-#include "modules/common/macro.h"
+#include "cybertron/common/macros.h"
 
 namespace apollo {
 namespace planning {
