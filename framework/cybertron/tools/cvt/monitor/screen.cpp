@@ -120,7 +120,7 @@ void Screen::ClearCurrentColor(ColorPair color) const {
 void Screen::AddStr(int x, int y, ColorPair color, const char* str) const {
   if (IsInit()) {
     attron(COLOR_PAIR(color));
-    addstr(str);
+    mvaddstr(y, x, str);
     attroff(COLOR_PAIR(color));
   }
 }
