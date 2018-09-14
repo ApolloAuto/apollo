@@ -20,20 +20,21 @@
 #include <memory>
 #include <thread>
 
-#include "modules/canbus/vehicle/vehicle_controller.h"
+#include "cybertron/common/macros.h"
 
 #include "modules/canbus/proto/canbus_conf.pb.h"
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/canbus/proto/vehicle_parameter.pb.h"
+#include "modules/common/proto/error_code.pb.h"
+#include "modules/control/proto/control_cmd.pb.h"
+
 #include "modules/canbus/vehicle/gem/protocol/accel_cmd_67.h"
 #include "modules/canbus/vehicle/gem/protocol/brake_cmd_6b.h"
 #include "modules/canbus/vehicle/gem/protocol/global_cmd_69.h"
 #include "modules/canbus/vehicle/gem/protocol/shift_cmd_65.h"
 #include "modules/canbus/vehicle/gem/protocol/steering_cmd_6d.h"
 #include "modules/canbus/vehicle/gem/protocol/turn_cmd_63.h"
-#include "modules/common/macro.h"
-#include "modules/common/proto/error_code.pb.h"
-#include "modules/control/proto/control_cmd.pb.h"
+#include "modules/canbus/vehicle/vehicle_controller.h"
 
 namespace apollo {
 namespace canbus {

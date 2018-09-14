@@ -29,10 +29,11 @@
 #include <stdexcept>
 #include <type_traits>
 
+#include "cybertron/common/macros.h"
+#include "cybertron/time/time.h"
+
 #include "modules/common/configs/config_gflags.h"
 #include "modules/common/log.h"
-#include "modules/common/macro.h"
-#include "cybertron/time/time.h"
 
 /**
  * @namespace apollo::common::time
@@ -222,7 +223,7 @@ class Clock {
    * @brief constructs the \class Clock instance
    * @param mode the desired clock mode
    */
-  explicit Clock(ClockMode mode) : mode_(mode), mock_now_(Timestamp()) { }
+  explicit Clock(ClockMode mode) : mode_(mode), mock_now_(Timestamp()) {}
 
   /**
    * @brief Returns the current timestamp based on the system clock.

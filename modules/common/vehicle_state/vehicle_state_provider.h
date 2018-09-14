@@ -24,11 +24,12 @@
 #include <memory>
 #include <string>
 
+#include "cybertron/common/macros.h"
+
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
 #include "modules/localization/proto/localization.pb.h"
 
-#include "modules/common/macro.h"
 #include "modules/common/math/box2d.h"
 #include "modules/common/math/vec2d.h"
 #include "modules/common/status/status.h"

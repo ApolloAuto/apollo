@@ -26,8 +26,9 @@
 #include <memory>
 #include <utility>
 
+#include "cybertron/common/macros.h"
+
 #include "modules/common/log.h"
-#include "modules/common/macro.h"
 
 /**
  * @namespace apollo::common::util

@@ -19,7 +19,8 @@
 
 #include <string>
 
-#include "modules/common/macro.h"
+#include "cybertron/common/macros.h"
+
 #include "modules/dreamview/proto/hmi_config.pb.h"
 
 /**

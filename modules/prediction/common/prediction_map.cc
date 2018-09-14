@@ -19,18 +19,19 @@
 #include <algorithm>
 #include <cmath>
 #include <iomanip>
+#include <limits>
 #include <memory>
 #include <string>
 #include <unordered_set>
 #include <utility>
 #include <vector>
-#include <limits>
+
+#include "modules/map/proto/map_id.pb.h"
 
 #include "modules/common/math/linear_interpolation.h"
 #include "modules/common/math/polygon2d.h"
 #include "modules/common/math/vec2d.h"
 #include "modules/map/hdmap/hdmap_util.h"
-#include "modules/map/proto/map_id.pb.h"
 #include "modules/prediction/common/prediction_gflags.h"
 
 namespace apollo {
@@ -315,39 +316,32 @@ void PredictionMap::NearbyLanesByCurrentLanes(
 
 std::shared_ptr<const LaneInfo> PredictionMap::GetLeftNeighborLane(
     const std::shared_ptr<const LaneInfo>& ptr_ego_lane,
-    const Eigen::Vector2d& ego_position,
-    const double threshold) {
-
+    const Eigen::Vector2d& ego_position, const double threshold) {
   std::vector<std::string> neighbor_ids;
   for (const auto& lane_id :
-      ptr_ego_lane->lane().left_neighbor_forward_lane_id()) {
+       ptr_ego_lane->lane().left_neighbor_forward_lane_id()) {
     neighbor_ids.push_back(lane_id.id());
   }
 
-  return GetNeighborLane(ptr_ego_lane, ego_position, neighbor_ids,
-      threshold);
+  return GetNeighborLane(ptr_ego_lane, ego_position, neighbor_ids, threshold);
 }
 
 std::shared_ptr<const LaneInfo> PredictionMap::GetRightNeighborLane(
     const std::shared_ptr<const LaneInfo>& ptr_ego_lane,
-    const Eigen::Vector2d& ego_position,
-    const double threshold) {
-
+    const Eigen::Vector2d& ego_position, const double threshold) {
   std::vector<std::string> neighbor_ids;
   for (const auto& lane_id :
-      ptr_ego_lane->lane().right_neighbor_forward_lane_id()) {
+       ptr_ego_lane->lane().right_neighbor_forward_lane_id()) {
     neighbor_ids.push_back(lane_id.id());
   }
 
-  return GetNeighborLane(ptr_ego_lane, ego_position, neighbor_ids,
-      threshold);
+  return GetNeighborLane(ptr_ego_lane, ego_position, neighbor_ids, threshold);
 }
 
 std::shared_ptr<const LaneInfo> PredictionMap::GetNeighborLane(
     const std::shared_ptr<const LaneInfo>& ptr_ego_lane,
     const Eigen::Vector2d& ego_position,
-    const std::vector<std::string>& neighbor_lane_ids,
-    const double threshold) {
+    const std::vector<std::string>& neighbor_lane_ids, const double threshold) {
   double ego_s = 0.0;
   double ego_l = 0.0;
   GetProjection(ego_position, ptr_ego_lane, &ego_s, &ego_l);

@@ -22,9 +22,11 @@
 #include <unordered_map>
 #include <utility>
 
-#include "modules/common/macro.h"
-#include "modules/map/hdmap/hdmap_common.h"
+#include "cybertron/common/macros.h"
+
 #include "modules/prediction/proto/lane_graph.pb.h"
+
+#include "modules/map/hdmap/hdmap_common.h"
 
 namespace apollo {
 namespace prediction {

@@ -21,21 +21,23 @@
 #include <string>
 #include <vector>
 
-#include "modules/common/macro.h"
+#include "cybertron/common/macros.h"
+
 #include "modules/common/proto/geometry.pb.h"
-#include "modules/map/hdmap/hdmap_common.h"
-#include "modules/map/hdmap/hdmap_impl.h"
 #include "modules/map/proto/map_clear_area.pb.h"
 #include "modules/map/proto/map_crosswalk.pb.h"
 #include "modules/map/proto/map_junction.pb.h"
 #include "modules/map/proto/map_lane.pb.h"
 #include "modules/map/proto/map_overlap.pb.h"
+#include "modules/map/proto/map_parking_space.pb.h"
 #include "modules/map/proto/map_road.pb.h"
 #include "modules/map/proto/map_signal.pb.h"
 #include "modules/map/proto/map_speed_bump.pb.h"
 #include "modules/map/proto/map_stop_sign.pb.h"
 #include "modules/map/proto/map_yield_sign.pb.h"
-#include "modules/map/proto/map_parking_space.pb.h"
+
+#include "modules/map/hdmap/hdmap_common.h"
+#include "modules/map/hdmap/hdmap_impl.h"
 
 /**
  * @namespace apollo::hdmap
@@ -165,10 +167,9 @@ class HDMap {
    * @param parking spaces store all clear areas in target range
    * @return 0:success, otherwise failed
    */
-  int GetParkingSpaces(const apollo::common::PointENU& point,
-                       double distance,
-                       std::vector<ParkingSpaceInfoConstPtr>*
-                       parking_spaces) const;
+  int GetParkingSpaces(
+      const apollo::common::PointENU& point, double distance,
+      std::vector<ParkingSpaceInfoConstPtr>* parking_spaces) const;
   /**
    * @brief get nearest lane from target point,
    * @param point the target point

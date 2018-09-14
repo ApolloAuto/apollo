@@ -23,7 +23,8 @@
 
 #include "Eigen/Dense"
 
-#include "modules/common/macro.h"
+#include "cybertron/common/macros.h"
+
 #include "modules/map/hdmap/hdmap_common.h"
 #include "modules/map/hdmap/hdmap_impl.h"
 #include "modules/map/pnc_map/path.h"
@@ -142,12 +143,12 @@ class PredictionMap {
    */
   static bool NearJunction(const Eigen::Vector2d& point, const double radius);
 
-   /**
-   * @brief Check if the obstacle is in a junction.
-   * @param point position
-   * @param radius the radius to search candidate junctions
-   * @return If the obstacle is in a junction.
-   */
+  /**
+  * @brief Check if the obstacle is in a junction.
+  * @param point position
+  * @param radius the radius to search candidate junctions
+  * @return If the obstacle is in a junction.
+  */
   static bool InJunction(const Eigen::Vector2d& point, const double radius);
 
   /**
@@ -197,13 +198,11 @@ class PredictionMap {
 
   static std::shared_ptr<const hdmap::LaneInfo> GetLeftNeighborLane(
       const std::shared_ptr<const hdmap::LaneInfo>& ptr_ego_lane,
-      const Eigen::Vector2d& ego_position,
-      const double threshold);
+      const Eigen::Vector2d& ego_position, const double threshold);
 
   static std::shared_ptr<const hdmap::LaneInfo> GetRightNeighborLane(
       const std::shared_ptr<const hdmap::LaneInfo>& ptr_ego_lane,
-      const Eigen::Vector2d& ego_position,
-      const double threshold);
+      const Eigen::Vector2d& ego_position, const double threshold);
 
   /**
    * @brief Get nearby lanes by a position.

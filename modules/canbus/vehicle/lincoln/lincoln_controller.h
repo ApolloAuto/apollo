@@ -27,20 +27,21 @@
 
 #include "gtest/gtest_prod.h"
 
-#include "modules/canbus/vehicle/vehicle_controller.h"
+#include "cybertron/common/macros.h"
 
 #include "modules/canbus/proto/canbus_conf.pb.h"
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/canbus/proto/chassis_detail.pb.h"
 #include "modules/canbus/proto/vehicle_parameter.pb.h"
+#include "modules/common/proto/error_code.pb.h"
+#include "modules/control/proto/control_cmd.pb.h"
+
 #include "modules/canbus/vehicle/lincoln/protocol/brake_60.h"
 #include "modules/canbus/vehicle/lincoln/protocol/gear_66.h"
 #include "modules/canbus/vehicle/lincoln/protocol/steering_64.h"
 #include "modules/canbus/vehicle/lincoln/protocol/throttle_62.h"
 #include "modules/canbus/vehicle/lincoln/protocol/turnsignal_68.h"
-#include "modules/common/macro.h"
-#include "modules/common/proto/error_code.pb.h"
-#include "modules/control/proto/control_cmd.pb.h"
+#include "modules/canbus/vehicle/vehicle_controller.h"
 
 /**
  * @namespace apollo::canbus::lincoln
