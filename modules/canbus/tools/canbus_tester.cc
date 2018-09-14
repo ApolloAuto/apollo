@@ -37,11 +37,9 @@ int main(int32_t argc, char **argv) {
   FLAGS_alsologtostderr = true;
 
   // init cybertron framework
-  apollo::cybertron::Init("canbus_tester");
-  // ros::NodeHandle nh;
-  // ros::Publisher pub =
-  //     nh.advertise<std_msgs::String>(FLAGS_control_command_topic, 100);
-  std::shared_ptr<apollo::cybertron::Node> node_ = nullptr;
+  apollo::cybertron::Init("testing_canbus_tester");
+  std::shared_ptr<apollo::cybertron::Node> node_(
+      apollo::cybertron::CreateNode("canbus_tester"));
   std::shared_ptr<Writer<ControlCommand>> control_command_writer_ =
       node_->CreateWriter<ControlCommand>(FLAGS_control_command_topic);
 
