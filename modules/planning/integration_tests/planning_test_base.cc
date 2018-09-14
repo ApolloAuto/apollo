@@ -18,16 +18,23 @@
 
 #include <cstdlib>
 
-#include "google/protobuf/io/zero_copy_stream_impl.h"
+#include "cybertron/cybertron.h"
+#include "cybertron/time/rate.h"
+#include "cybertron/time/time.h"
+
+#include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/log.h"
-#include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
 namespace planning {
 
-using apollo::common::adapter::AdapterManager;
+using apollo::canbus::Chassis;
 using apollo::common::time::Clock;
+using apollo::localization::LocalizationEstimate;
+using apollo::perception::TrafficLightDetection;
+using apollo::prediction::PredictionObstacles;
+using apollo::routing::RoutingResponse;
 
 DEFINE_string(test_data_dir, "", "the test data folder");
 DEFINE_bool(test_update_golden_log, false,
@@ -46,8 +53,8 @@ void PlanningTestBase::SetUpTestCase() {
   FLAGS_enable_multi_thread_in_dp_poly_path = false;
   FLAGS_enable_multi_thread_in_dp_st_graph = false;
   FLAGS_planning_config_file = "modules/planning/conf/planning_config.pb.txt";
-  FLAGS_planning_adapter_config_filename =
-      "modules/planning/testdata/conf/adapter.conf";
+  // FLAGS_planning_adapter_config_filename =
+  //      "modules/planning/testdata/conf/adapter.conf";
   FLAGS_smoother_config_filename =
       "modules/planning/conf/qp_spline_smoother_config.pb.txt";
   FLAGS_map_dir = "modules/planning/testdata";
@@ -65,59 +72,88 @@ void PlanningTestBase::SetUpTestCase() {
   FLAGS_enable_lag_prediction = false;
 }
 
-#define FEED_ADAPTER(TYPE, FILENAME)                                           \
-  if (!AdapterManager::Get##TYPE()) {                                          \
-    AERROR << #TYPE                                                            \
-        " is not registered in adapter manager, check adapter file "           \
-           << FLAGS_planning_adapter_config_filename;                          \
-    return false;                                                              \
-  }                                                                            \
-  if (!FILENAME.empty()) {                                                     \
-    if (!AdapterManager::Feed##TYPE##File(FLAGS_test_data_dir + "/" +          \
-                                          FILENAME)) {                         \
-      AERROR << "Failed to feed " #TYPE " file " << FLAGS_test_data_dir << "/" \
-             << FILENAME;                                                      \
-      return false;                                                            \
-    }                                                                          \
-    AINFO << "Using " #TYPE << " provided by " << FLAGS_test_data_dir << "/"   \
-          << FILENAME;                                                         \
+bool PlanningTestBase::FeedTestData() {
+  // chassis
+  if (!apollo::common::util::GetProtoFromFile(
+      FLAGS_test_data_dir + "/" + FLAGS_test_chassis_file, &chassis_)) {
+    AERROR << "failed to load file: " << FLAGS_test_chassis_file;
+    return -1;
+  }
+  // localization
+  if (!apollo::common::util::GetProtoFromFile(
+      FLAGS_test_data_dir + "/" + FLAGS_test_localization_file,
+      &localization_)) {
+    AERROR << "failed to load file: " << FLAGS_test_localization_file;
+    return -1;
+  }
+  // prediction
+  if (!apollo::common::util::GetProtoFromFile(
+      FLAGS_test_data_dir + "/" + FLAGS_test_prediction_file, &prediction_)) {
+    AERROR << "failed to load file: " << FLAGS_test_prediction_file;
+    return -1;
+  }
+  // routing_response
+  if (!apollo::common::util::GetProtoFromFile(
+      FLAGS_test_data_dir + "/" + FLAGS_test_routing_response_file,
+      &routing_response_)) {
+    AERROR << "failed to load file: " << FLAGS_test_routing_response_file;
+    return -1;
+  }
+  // traffic_light_detection
+  if (!apollo::common::util::GetProtoFromFile(
+      FLAGS_test_data_dir + "/" + FLAGS_test_traffic_light_file,
+      &traffic_light_detection_)) {
+    AERROR << "failed to load file: " << FLAGS_test_traffic_light_file;
+    return -1;
   }
 
-bool PlanningTestBase::SetUpAdapters() {
-  if (!AdapterManager::Initialized()) {
-    AdapterManager::Init(FLAGS_planning_adapter_config_filename);
-  }
-  {  // setup timestamp
-    localization::LocalizationEstimate localization;
-    common::util::GetProtoFromFile(
-        FLAGS_test_data_dir + "/" + FLAGS_test_localization_file,
-        &localization);
-    Clock::SetNowInSeconds(localization.header().timestamp_sec());
-  }
-  FEED_ADAPTER(RoutingResponse, FLAGS_test_routing_response_file);
-  FEED_ADAPTER(Localization, FLAGS_test_localization_file);
-  FEED_ADAPTER(Chassis, FLAGS_test_chassis_file);
-  FEED_ADAPTER(RelativeMap, FLAGS_test_relative_map_file);
-  FEED_ADAPTER(Prediction, FLAGS_test_prediction_file);
-  FEED_ADAPTER(TrafficLightDetection, FLAGS_test_traffic_light_file);
-  AdapterManager::Observe();
+  // chassis
+  std::shared_ptr<apollo::cybertron::Node> node(
+      apollo::cybertron::CreateNode("planning_tester"));
+  auto chassis_writer = node->CreateWriter<Chassis>(
+      FLAGS_chassis_topic);
+  chassis_writer->Write(chassis_);
 
+  // localization
+  auto localization_writer = node->CreateWriter<LocalizationEstimate>(
+      FLAGS_localization_topic);
+  localization_writer->Write(localization_);
+
+  // prediction
+  auto prediction_writer = node->CreateWriter<PredictionObstacles>(
+      FLAGS_prediction_topic);
+  prediction_writer->Write(prediction_);
+
+  // routing_response
+  auto routing_response_writer = node->CreateWriter<RoutingResponse>(
+      FLAGS_routing_response_topic);
+  routing_response_writer->Write(routing_response_);
+
+  // traffic_light_detection
+  auto traffic_light_detection_writer =
+      node->CreateWriter<TrafficLightDetection>(
+          FLAGS_traffic_light_detection_topic);
+  traffic_light_detection_writer->Write(traffic_light_detection_);
+
+  AINFO << "Successfully fed proto files.";
   return true;
 }
 
 void PlanningTestBase::SetUp() {
+  apollo::cybertron::Init("planning_tester");
+
   Clock::SetMode(Clock::MOCK);
   // time in nanoseconds
-  if (planning_) {
-    planning_->Stop();
+
+  if (FLAGS_use_navigation_mode) {
+    // TODO(all)
+    // planning_ = std::unique_ptr<PlanningBase>(new NaviPlanning());
   } else {
-    if (FLAGS_use_navigation_mode) {
-      planning_ = std::unique_ptr<PlanningBase>(new NaviPlanning());
-    } else {
-      planning_ = std::unique_ptr<PlanningBase>(new StdPlanning());
-    }
+    planning_ = std::unique_ptr<PlanningBase>(new StdPlanning());
   }
-  CHECK(SetUpAdapters()) << "Failed to setup adapters";
+
+  CHECK(FeedTestData()) << "Failed to feed test data";
+
   CHECK(planning_->Init().ok()) << "Failed to init planning module";
 
   // Do not use fallback trajectory during testing
@@ -140,7 +176,8 @@ void PlanningTestBase::SetUp() {
 }
 
 void PlanningTestBase::UpdateData() {
-  CHECK(SetUpAdapters()) << "Failed to setup adapters";
+  CHECK(FeedTestData()) << "Failed to feed test data";
+
   if (!FLAGS_test_previous_planning_file.empty()) {
     const auto prev_planning_file =
         FLAGS_test_data_dir + "/" + FLAGS_test_previous_planning_file;
@@ -180,22 +217,28 @@ bool PlanningTestBase::RunPlanning(const std::string& test_case_name,
       "result_", test_case_name, "_", case_num, ".pb.txt");
 
   std::string full_golden_path = FLAGS_test_data_dir + "/" + golden_result_file;
-  planning_->RunOnce();
 
-  const ADCTrajectory* trajectory_pointer =
-      AdapterManager::GetPlanning()->GetLatestPublished();
+  // process fused input data
+  LocalView local_view;
+  local_view.prediction_obstacles =
+      std::make_shared<PredictionObstacles>(prediction_);
+  local_view.chassis = std::make_shared<Chassis>(chassis_);
+  local_view.localization_estimate =
+      std::make_shared<LocalizationEstimate>(localization_);
+  local_view.routing =
+      std::make_shared<routing::RoutingResponse>(routing_response_);
+  local_view.traffic_light =
+        std::make_shared<TrafficLightDetection>(traffic_light_detection_);
 
-  if (!trajectory_pointer) {
-    AERROR << " did not get latest adc trajectory";
-    return false;
-  }
+  ADCTrajectory adc_trajectory_pb;
+  planning_->RunOnce(local_view, &adc_trajectory_pb);
 
-  if (!IsValidTrajectory(*trajectory_pointer)) {
+  if (!IsValidTrajectory(adc_trajectory_pb)) {
     AERROR << "Fail to pass trajectory check.";
     return false;
   }
 
-  adc_trajectory_ = *trajectory_pointer;
+  adc_trajectory_ = adc_trajectory_pb;
   TrimPlanning(&adc_trajectory_, no_trajectory_point);
   if (FLAGS_test_update_golden_log) {
     AINFO << "The golden file is regenerated:" << full_golden_path;
