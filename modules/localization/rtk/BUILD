@@ -10,6 +10,7 @@ cc_library(
     hdrs = [
         "rtk_localization_component.h",
     ],
+    copts = ["-DMODULE_NAME=\\\"localization\\\""],
     deps = [
         # "//modules/common/monitor_log",
         "//modules/common/time",
@@ -23,15 +24,14 @@ cc_library(
         "//framework:cybertron",
         "@eigen",
     ],
-    copts = ['-DMODULE_NAME=\\"localization\\"']
 )
 
 cc_binary(
     name = "librtk_localization_component.so",
-    deps = [":rtk_localization_component_lib"],
     linkopts = ["-shared"],
     linkstatic = False,
-)   
+    deps = [":rtk_localization_component_lib"],
+)
 
 # cc_test(
 #     name = "rtk_localization_test",
