@@ -27,6 +27,7 @@
 #include "cybertron/component/component_base.h"
 #include "cybertron/croutine/routine_factory.h"
 #include "cybertron/data/data_visitor.h"
+#include "cybertron/proto/run_mode_conf.pb.h"
 #include "cybertron/scheduler/scheduler.h"
 
 namespace apollo {
@@ -135,20 +136,15 @@ bool Component<M0, NullType, NullType, NullType>::Initialize(
     AERROR << "Component Init() failed.";
     return false;
   }
+
+  bool is_reality_mode = GlobalData::Instance()->IsRealityMode();
+
   RoleAttributes attr;
   attr.set_node_name(config.name());
   attr.set_channel_name(config.readers(0).channel());
   auto qos_profile = attr.mutable_qos_profile();
   *qos_profile = config.readers(0).qos_profile();
-  auto reader = node_->CreateReader<M0>(attr);
-  if (reader == nullptr) {
-    AERROR << "Component create reader failed.";
-    return false;
-  }
-  auto dv = std::make_shared<data::DataVisitor<M0>>(reader);
-  readers_.emplace_back(std::move(reader));
 
-  auto sched = scheduler::Scheduler::Instance();
   std::weak_ptr<Component<M0>> self =
       std::dynamic_pointer_cast<Component<M0>>(shared_from_this());
   auto func = [self](const std::shared_ptr<M0>& msg) {
@@ -160,8 +156,28 @@ bool Component<M0, NullType, NullType, NullType>::Initialize(
     }
   };
 
+  std::shared_ptr<Reader<M0>> reader = nullptr;
+
+  if (is_reality_mode) {
+    reader = node_->CreateReader<M0>(attr);
+  } else {
+    reader = node_->CreateReader<M0>(attr, func);
+  }
+
+  if (reader == nullptr) {
+    AERROR << "Component create reader failed.";
+    return false;
+  }
+  readers_.emplace_back(std::move(reader));
+
+  if (!is_reality_mode) {
+    return true;
+  }
+
+  auto dv = std::make_shared<data::DataVisitor<M0>>(readers_[0]);
   croutine::RoutineFactory factory =
       croutine::CreateRoutineFactory<M0>(func, dv);
+  auto sched = scheduler::Scheduler::Instance();
   return sched->CreateTask(factory, node_->Name());
 }
 
@@ -187,18 +203,49 @@ bool Component<M0, M1, NullType, NullType>::Initialize(
     return false;
   }
 
+  bool is_reality_mode = GlobalData::Instance()->IsRealityMode();
+
   RoleAttributes attr;
   attr.set_node_name(config.name());
-  attr.set_channel_name(config.readers(0).channel());
-  auto reader0 = node_->template CreateReader<M0>(attr);
   attr.set_channel_name(config.readers(1).channel());
   auto reader1 = node_->template CreateReader<M1>(attr);
+
+  attr.set_channel_name(config.readers(0).channel());
+  std::shared_ptr<Reader<M0>> reader0 = nullptr;
+  if (is_reality_mode) {
+    reader0 = node_->template CreateReader<M0>(attr);
+  } else {
+    std::weak_ptr<Component<M0, M1>> self =
+        std::dynamic_pointer_cast<Component<M0, M1>>(shared_from_this());
+
+    auto message1 = dispatcher::Dispatcher::Instance()->GetMessage<M1>(
+        config.readers(1).channel());
+
+    auto func = [self, message1](const std::shared_ptr<M0>& msg0) {
+      auto ptr = self.lock();
+      if (ptr) {
+        if (!message1->IsPublishedEmpty()) {
+          auto msg1 = message1->GetLatestPublishedPtr();
+          ptr->Process(msg0, msg1);
+        }
+      } else {
+        AERROR << "Component object has been destroyed.";
+      }
+    };
+
+    reader0 = node_->template CreateReader<M0>(attr, func);
+  }
+
   if (reader0 == nullptr || reader1 == nullptr) {
     AERROR << "Component create reader failed.";
     return false;
   }
   readers_.push_back(std::move(reader0));
   readers_.push_back(std::move(reader1));
+
+  if (!is_reality_mode) {
+    return true;
+  }
 
   auto sched = scheduler::Scheduler::Instance();
   std::weak_ptr<Component<M0, M1>> self =
@@ -242,14 +289,45 @@ bool Component<M0, M1, M2, NullType>::Initialize(
     return false;
   }
 
+  bool is_reality_mode = GlobalData::Instance()->IsRealityMode();
+
   RoleAttributes attr;
   attr.set_node_name(config.name());
-  attr.set_channel_name(config.readers(0).channel());
-  auto reader0 = node_->template CreateReader<M0>(attr);
   attr.set_channel_name(config.readers(1).channel());
   auto reader1 = node_->template CreateReader<M1>(attr);
   attr.set_channel_name(config.readers(2).channel());
   auto reader2 = node_->template CreateReader<M2>(attr);
+
+  attr.set_channel_name(config.readers(0).channel());
+  std::shared_ptr<Reader<M0>> reader0 = nullptr;
+  if (is_reality_mode) {
+    reader0 = node_->template CreateReader<M0>(attr);
+  } else {
+    std::weak_ptr<Component<M0, M1, M2, NullType>> self =
+        std::dynamic_pointer_cast<Component<M0, M1, M2, NullType>>(
+            shared_from_this());
+
+    auto message1 = dispatcher::Dispatcher::Instance()->GetMessage<M1>(
+        config.readers(1).channel());
+    auto message2 = dispatcher::Dispatcher::Instance()->GetMessage<M2>(
+        config.readers(2).channel());
+
+    auto func = [self, message1, message2](const std::shared_ptr<M0>& msg0) {
+      auto ptr = self.lock();
+      if (ptr) {
+        if (!message1->IsPublishedEmpty() && !message2->IsPublishedEmpty()) {
+          auto msg1 = message1->GetLatestPublishedPtr();
+          auto msg2 = message2->GetLatestPublishedPtr();
+          ptr->Process(msg0, msg1, msg2);
+        }
+      } else {
+        AERROR << "Component object has been destroyed.";
+      }
+    };
+
+    reader0 = node_->template CreateReader<M0>(attr, func);
+  }
+
   if (reader0 == nullptr || reader1 == nullptr || reader2 == nullptr) {
     AERROR << "Component create reader failed.";
     return false;
@@ -257,6 +335,10 @@ bool Component<M0, M1, M2, NullType>::Initialize(
   readers_.push_back(std::move(reader0));
   readers_.push_back(std::move(reader1));
   readers_.push_back(std::move(reader2));
+
+  if (!is_reality_mode) {
+    return true;
+  }
 
   auto sched = scheduler::Scheduler::Instance();
   std::weak_ptr<Component<M0, M1, M2, NullType>> self =
@@ -302,16 +384,52 @@ bool Component<M0, M1, M2, M3>::Initialize(const ComponentConfig& config) {
     return false;
   }
 
+  bool is_reality_mode = GlobalData::Instance()->IsRealityMode();
+
   RoleAttributes attr;
   attr.set_node_name(config.name());
-  attr.set_channel_name(config.readers(0).channel());
-  auto reader0 = node_->template CreateReader<M0>(attr);
   attr.set_channel_name(config.readers(1).channel());
   auto reader1 = node_->template CreateReader<M1>(attr);
   attr.set_channel_name(config.readers(2).channel());
   auto reader2 = node_->template CreateReader<M2>(attr);
   attr.set_channel_name(config.readers(3).channel());
   auto reader3 = node_->template CreateReader<M3>(attr);
+
+  attr.set_channel_name(config.readers(0).channel());
+  std::shared_ptr<Reader<M0>> reader0 = nullptr;
+  if (is_reality_mode) {
+    reader0 = node_->template CreateReader<M0>(attr);
+  } else {
+    std::weak_ptr<Component<M0, M1, M2, M3>> self =
+        std::dynamic_pointer_cast<Component<M0, M1, M2, M3>>(
+            shared_from_this());
+
+    auto message1 = dispatcher::Dispatcher::Instance()->GetMessage<M1>(
+        config.readers(1).channel());
+    auto message2 = dispatcher::Dispatcher::Instance()->GetMessage<M2>(
+        config.readers(2).channel());
+    auto message3 = dispatcher::Dispatcher::Instance()->GetMessage<M3>(
+        config.readers(3).channel());
+
+    auto func = [self, message1, message2,
+                 message3](const std::shared_ptr<M0>& msg0) {
+      auto ptr = self.lock();
+      if (ptr) {
+        if (!message1->IsPublishedEmpty() && !message2->IsPublishedEmpty() &&
+            !message3->IsPublishedEmpty()) {
+          auto msg1 = message1->GetLatestPublishedPtr();
+          auto msg2 = message2->GetLatestPublishedPtr();
+          auto msg3 = message3->GetLatestPublishedPtr();
+          ptr->Process(msg0, msg1, msg2, msg3);
+        }
+      } else {
+        AERROR << "Component object has been destroyed.";
+      }
+    };
+
+    reader0 = node_->template CreateReader<M0>(attr, func);
+  }
+
   if (reader0 == nullptr || reader1 == nullptr || reader2 == nullptr ||
       reader3 == nullptr) {
     AERROR << "Component create reader failed." << std::endl;
@@ -321,6 +439,10 @@ bool Component<M0, M1, M2, M3>::Initialize(const ComponentConfig& config) {
   readers_.push_back(std::move(reader1));
   readers_.push_back(std::move(reader2));
   readers_.push_back(std::move(reader3));
+
+  if (!is_reality_mode) {
+    return true;
+  }
 
   auto sched = scheduler::Scheduler::Instance();
   std::weak_ptr<Component<M0, M1, M2, M3>> self =

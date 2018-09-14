@@ -20,27 +20,50 @@
 #include <memory>
 #include <string>
 
+#include "cybertron/common/global_data.h"
+#include "cybertron/dispatcher/intra_reader.h"
+#include "cybertron/dispatcher/intra_writer.h"
 #include "cybertron/message/message_traits.h"
 #include "cybertron/node/reader.h"
 #include "cybertron/node/writer.h"
+#include "cybertron/proto/run_mode_conf.pb.h"
 
 namespace apollo {
 namespace cybertron {
 
 class Node;
 class NodeChannelImpl {
- public:
   friend class Node;
 
+ public:
+  using NodeManagerPtr = std::shared_ptr<service_discovery::NodeManager>;
+
   explicit NodeChannelImpl(const std::string& node_name)
-      : node_name_(node_name) {
-    // TODO: topology register node
+      : is_reality_mode_(true), node_name_(node_name) {
+    node_attr_.set_host_name(common::GlobalData::Instance()->HostName());
+    node_attr_.set_process_id(common::GlobalData::Instance()->ProcessId());
+    node_attr_.set_node_name(node_name);
+    uint64_t node_id = common::GlobalData::RegisterNode(node_name);
+    node_attr_.set_node_id(node_id);
+
+    is_reality_mode_ = common::GlobalData::Instance()->IsRealityMode();
+
+    if (is_reality_mode_) {
+      node_manager_ =
+          service_discovery::TopologyManager::Instance()->node_manager();
+      node_manager_->Join(node_attr_, RoleType::ROLE_NODE);
+    }
   }
-  virtual ~NodeChannelImpl() {}
+  virtual ~NodeChannelImpl() {
+    if (is_reality_mode_) {
+      node_manager_->Leave(node_attr_, RoleType::ROLE_NODE);
+      node_manager_ = nullptr;
+    }
+  }
+
+  const std::string& NodeName() const { return node_name_; }
 
  private:
-  std::string NodeName() const { return node_name_; }
-
   template <typename MessageT>
   auto CreateWriter(const proto::RoleAttributes& role_attr)
       -> std::shared_ptr<Writer<MessageT>>;
@@ -63,29 +86,29 @@ class NodeChannelImpl {
   auto CreateReader(const proto::RoleAttributes& role_attr)
       -> std::shared_ptr<Reader<MessageT>>;
 
+  template <typename MessageT>
+  void FillInAttr(proto::RoleAttributes* attr);
+
+  bool is_reality_mode_;
   std::string node_name_;
+  proto::RoleAttributes node_attr_;
+  NodeManagerPtr node_manager_ = nullptr;
 };
 
 template <typename MessageT>
 auto NodeChannelImpl::CreateWriter(const proto::RoleAttributes& role_attr)
     -> std::shared_ptr<Writer<MessageT>> {
-  auto channel_id = GlobalData::RegisterChannel(role_attr.channel_name());
-  auto node_id = GlobalData::RegisterNode(node_name_);
+  RETURN_VAL_IF(!role_attr.has_channel_name(), nullptr);
   proto::RoleAttributes new_attr(role_attr);
-  new_attr.set_node_name(node_name_);
-  new_attr.set_node_id(node_id);
-  new_attr.set_channel_id(channel_id);
-  if (!new_attr.has_message_type()) {
-    new_attr.set_message_type(message::MessageType<MessageT>());
+  FillInAttr<MessageT>(&new_attr);
+
+  std::shared_ptr<Writer<MessageT>> writer_ptr = nullptr;
+  if (!is_reality_mode_) {
+    writer_ptr = std::make_shared<dispatcher::IntraWriter<MessageT>>(new_attr);
+  } else {
+    writer_ptr = std::make_shared<Writer<MessageT>>(new_attr);
   }
-  if (!new_attr.has_proto_desc()) {
-    std::string proto_desc("");
-    message::GetDescriptorString<MessageT>(new_attr.message_type(),
-                                           &proto_desc);
-    new_attr.set_proto_desc(proto_desc);
-  }
-  std::shared_ptr<Writer<MessageT>> writer_ptr =
-      std::make_shared<Writer<MessageT>>(new_attr);
+
   RETURN_VAL_IF_NULL(writer_ptr, nullptr);
   RETURN_VAL_IF(!writer_ptr->Init(), nullptr);
   return writer_ptr;
@@ -112,17 +135,18 @@ template <typename MessageT>
 auto NodeChannelImpl::CreateReader(const proto::RoleAttributes& role_attr,
                                    const CallbackFunc<MessageT>& reader_func)
     -> std::shared_ptr<Reader<MessageT>> {
-  auto channel_id = GlobalData::RegisterChannel(role_attr.channel_name());
-  auto node_id = GlobalData::RegisterNode(node_name_);
+  RETURN_VAL_IF(!role_attr.has_channel_name(), nullptr);
   proto::RoleAttributes new_attr(role_attr);
-  new_attr.set_node_name(node_name_);
-  new_attr.set_node_id(node_id);
-  new_attr.set_channel_id(channel_id);
-  if (!new_attr.has_message_type()) {
-    new_attr.set_message_type(message::MessageType<MessageT>());
+  FillInAttr<MessageT>(&new_attr);
+
+  std::shared_ptr<Reader<MessageT>> reader_ptr = nullptr;
+  if (!is_reality_mode_) {
+    reader_ptr = std::make_shared<dispatcher::IntraReader<MessageT>>(
+        new_attr, reader_func);
+  } else {
+    reader_ptr = std::make_shared<Reader<MessageT>>(new_attr, reader_func);
   }
-  std::shared_ptr<Reader<MessageT>> reader_ptr =
-      std::make_shared<Reader<MessageT>>(new_attr, reader_func);
+
   RETURN_VAL_IF_NULL(reader_ptr, nullptr);
   RETURN_VAL_IF(!reader_ptr->Init(), nullptr);
   return reader_ptr;
@@ -131,20 +155,29 @@ auto NodeChannelImpl::CreateReader(const proto::RoleAttributes& role_attr,
 template <typename MessageT>
 auto NodeChannelImpl::CreateReader(const proto::RoleAttributes& role_attr)
     -> std::shared_ptr<Reader<MessageT>> {
-  auto channel_id = GlobalData::RegisterChannel(role_attr.channel_name());
-  auto node_id = GlobalData::RegisterNode(node_name_);
-  proto::RoleAttributes new_attr(role_attr);
-  new_attr.set_node_name(node_name_);
-  new_attr.set_node_id(node_id);
-  new_attr.set_channel_id(channel_id);
-  if (!new_attr.has_message_type()) {
-    new_attr.set_message_type(message::MessageType<MessageT>());
+  return this->template CreateReader<MessageT>(role_attr, nullptr);
+}
+
+template <typename MessageT>
+void NodeChannelImpl::FillInAttr(proto::RoleAttributes* attr) {
+  attr->set_host_name(node_attr_.host_name());
+  attr->set_process_id(node_attr_.process_id());
+  attr->set_node_name(node_attr_.node_name());
+  attr->set_node_id(node_attr_.node_id());
+  auto channel_id = GlobalData::RegisterChannel(attr->channel_name());
+  attr->set_channel_id(channel_id);
+  if (!attr->has_message_type()) {
+    attr->set_message_type(message::MessageType<MessageT>());
   }
-  std::shared_ptr<Reader<MessageT>> reader_ptr =
-      std::make_shared<Reader<MessageT>>(new_attr, nullptr);
-  RETURN_VAL_IF_NULL(reader_ptr, nullptr);
-  RETURN_VAL_IF(!reader_ptr->Init(), nullptr);
-  return reader_ptr;
+  if (!attr->has_proto_desc()) {
+    std::string proto_desc("");
+    message::GetDescriptorString<MessageT>(attr->message_type(), &proto_desc);
+    attr->set_proto_desc(proto_desc);
+  }
+  if (!attr->has_qos_profile()) {
+    attr->mutable_qos_profile()->CopyFrom(
+        transport::QosProfileConf::QOS_PROFILE_DEFAULT);
+  }
 }
 
 }  // namespace cybertron

@@ -15,13 +15,20 @@
  *****************************************************************************/
 
 #include "cybertron/cybertron.h"
+#include "cybertron/common/global_data.h"
+#include "cybertron/proto/run_mode_conf.pb.h"
 
 namespace apollo {
 namespace cybertron {
 
+using apollo::cybertron::common::GlobalData;
+using apollo::cybertron::proto::RunMode;
+
 std::unique_ptr<Node> CreateNode(const std::string& node_name,
                                  const std::string& name_space) {
-  if (!OK()) {
+  static bool is_reality_mode = GlobalData::Instance()->IsRealityMode();
+
+  if (is_reality_mode && !OK()) {
     // TODO @nizhongjun
     // add some hint log
     AERROR << "cybertron has not inited.";

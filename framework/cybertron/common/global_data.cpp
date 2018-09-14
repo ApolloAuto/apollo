@@ -40,6 +40,11 @@ GlobalData::GlobalData() {
   InitConfig();
   process_id_ = getpid();
   process_name_ = "default_" + std::to_string(process_id_);
+  is_reality_mode_ = (config_.has_run_mode_conf() &&
+                      config_.run_mode_conf().run_mode() ==
+                          apollo::cybertron::proto::RunMode::MODE_SIMULATION)
+                         ? false
+                         : true;
 }
 
 GlobalData::~GlobalData() {}
@@ -54,6 +59,8 @@ const std::string& GlobalData::ProcessName() const { return process_name_; }
 const std::string& GlobalData::HostIp() const { return host_ip_; }
 
 const std::string& GlobalData::HostName() const { return host_name_; }
+
+bool GlobalData::IsRealityMode() const { return is_reality_mode_; }
 
 void GlobalData::InitHostInfo() {
   char host_name[1024];

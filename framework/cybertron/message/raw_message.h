@@ -31,6 +31,17 @@ struct RawMessage {
 
   explicit RawMessage(const std::string &data) { message = data; }
 
+  RawMessage(const RawMessage &raw_msg)
+      : message(raw_msg.message), timestamp(raw_msg.timestamp) {}
+
+  RawMessage &operator=(const RawMessage &raw_msg) {
+    if (this != &raw_msg) {
+      this->message = raw_msg.message;
+      this->timestamp = raw_msg.timestamp;
+    }
+    return *this;
+  }
+
   ~RawMessage() {}
 
   bool SerializeToString(std::string *str) const {
@@ -52,10 +63,6 @@ struct RawMessage {
 
   std::string message;
   uint64_t timestamp;
-
- private:
-  RawMessage(const RawMessage &) = delete;
-  RawMessage &operator=(const RawMessage &) = delete;
 };
 
 }  // namespace message

@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "cybertron/timer/timer.h"
+#include "cybertron/common/global_data.h"
 
 namespace apollo {
 namespace cybertron {
@@ -35,6 +36,10 @@ Timer::Timer(uint32_t period, std::function<void()> callback, bool oneshot) {
 void Timer::SetTimerOption(TimerOption opt) { timer_opt_ = opt; }
 
 void Timer::Start() {
+  if (!common::GlobalData::Instance()->IsRealityMode()) {
+    return;
+  }
+
   if (timer_id_ == 0) {
     timer_id_ =
         tm_->Add(timer_opt_.period, timer_opt_.callback, timer_opt_.oneshot);

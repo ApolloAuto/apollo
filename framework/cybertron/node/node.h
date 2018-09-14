@@ -83,14 +83,14 @@ class Node {
   auto CreateReader(const proto::RoleAttributes& role_attr)
       -> std::shared_ptr<Reader<MessageT>>;
 
-  std::unique_ptr<NodeChannelImpl> node_channel_impl_ = nullptr;
-  std::unique_ptr<NodeServiceImpl> node_service_impl_ = nullptr;
-  std::shared_ptr<service_discovery::NodeManager> node_manager_ = nullptr;
   std::string node_name_;
   std::string name_space_;
-  proto::RoleAttributes attr_;
+
   std::mutex readers_mutex_;
   std::map<std::string, std::shared_ptr<ReaderBase>> readers_;
+
+  std::unique_ptr<NodeChannelImpl> node_channel_impl_ = nullptr;
+  std::unique_ptr<NodeServiceImpl> node_service_impl_ = nullptr;
 };
 
 template <typename MessageT>

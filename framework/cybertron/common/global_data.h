@@ -51,6 +51,8 @@ class GlobalData {
 
   const CyberConfig& Config() const;
 
+  bool IsRealityMode() const;
+
   static uint64_t RegisterNode(const std::string& node_name);
   static const std::string& GetNodeById(uint64_t id);
 
@@ -77,6 +79,9 @@ class GlobalData {
   // process info
   int process_id_;
   std::string process_name_;
+
+  // run mode
+  bool is_reality_mode_;
 
   static AtomicHashMap<uint64_t, std::string, 512> node_id_map_;
   static AtomicHashMap<uint64_t, std::string, 256> channel_id_map_;

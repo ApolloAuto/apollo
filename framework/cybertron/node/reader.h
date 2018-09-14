@@ -62,15 +62,15 @@ class Reader : public ReaderBase {
   bool HasReceived() const override;
   bool Empty() const override;
 
-  void Enqueue(const std::shared_ptr<MessageT>& msg);
-  void SetHistoryDepth(const uint32_t& depth);
-  uint32_t GetHistoryDepth() const;
-  const std::shared_ptr<MessageT>& GetLatestObserved() const;
-  const std::shared_ptr<MessageT>& GetOldestObserved() const;
-  Iterator Begin() const { return observed_queue_.begin(); }
-  Iterator End() const { return observed_queue_.end(); }
+  virtual void Enqueue(const std::shared_ptr<MessageT>& msg);
+  virtual void SetHistoryDepth(const uint32_t& depth);
+  virtual uint32_t GetHistoryDepth() const;
+  virtual const std::shared_ptr<MessageT>& GetLatestObserved() const;
+  virtual const std::shared_ptr<MessageT>& GetOldestObserved() const;
+  virtual Iterator Begin() const { return observed_queue_.begin(); }
+  virtual Iterator End() const { return observed_queue_.end(); }
 
- protected:
+ private:
   void JoinTheTopology();
   void LeaveTheTopology();
   void OnChannelChange(const proto::ChangeMsg& change_msg);

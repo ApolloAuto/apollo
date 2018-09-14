@@ -22,7 +22,6 @@
 #include <string>
 #include <unordered_map>
 
-#include "cybertron/common/global_data.h"
 #include "cybertron/common/macros.h"
 #include "cybertron/common/util.h"
 #include "cybertron/event/perf_event_cache.h"
@@ -38,14 +37,7 @@ using apollo::cybertron::event::TransPerf;
 class ReaderBase {
  public:
   explicit ReaderBase(const proto::RoleAttributes& role_attr)
-      : role_attr_(role_attr), init_(false) {
-    if (!role_attr_.has_host_name()) {
-      role_attr_.set_host_name(common::GlobalData::Instance()->HostName());
-    }
-    if (!role_attr_.has_process_id()) {
-      role_attr_.set_process_id(common::GlobalData::Instance()->ProcessId());
-    }
-  }
+      : role_attr_(role_attr), init_(false) {}
   virtual ~ReaderBase() {}
 
   virtual bool Init() = 0;

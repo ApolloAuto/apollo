@@ -42,10 +42,10 @@ class Writer : public WriterBase {
   bool Init() override;
   void Shutdown() override;
 
-  bool Write(const MessageT& msg);
-  bool Write(const std::shared_ptr<MessageT>& msg_ptr);
+  virtual bool Write(const MessageT& msg);
+  virtual bool Write(const std::shared_ptr<MessageT>& msg_ptr);
 
- protected:
+ private:
   void JoinTheTopology();
   void LeaveTheTopology();
   void OnChannelChange(const proto::ChangeMsg& change_msg);
