@@ -184,7 +184,6 @@ cc_library(
         ":planning_gflags",
         "//modules/common:log",
         "//modules/common/proto:pnc_point_proto",
-        "//modules/common/util:thread_pool",
         "//modules/common/vehicle_state:vehicle_state_provider",
         "//modules/map/pnc_map",
         "//modules/map/proto:map_proto",
@@ -223,11 +222,11 @@ cc_library(
         ":reference_line_info",
         "//modules/common/proto:pnc_point_proto",
         "//modules/planning/common/speed:speed_data",
-        "//modules/planning/proto:planning_config_proto",
         "//modules/planning/math/curve1d",
         "//modules/planning/math/curve1d:polynomial_curve1d",
-        "//modules/planning/math/curve1d:quintic_polynomial_curve1d",
         "//modules/planning/math/curve1d:quartic_polynomial_curve1d",
+        "//modules/planning/math/curve1d:quintic_polynomial_curve1d",
+        "//modules/planning/proto:planning_config_proto",
     ],
 )
 
@@ -356,8 +355,8 @@ cc_test(
     deps = [
         ":frame",
         "//modules/common/util",
-        "//modules/planning/proto:planning_config_proto",
         "//modules/map/hdmap:hdmap_util",
+        "//modules/planning/proto:planning_config_proto",
         "@gtest//:main",
     ],
 )

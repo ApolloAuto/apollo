@@ -282,19 +282,4 @@ cc_library(
     ],
 )
 
-cc_library(
-    name = "thread_pool",
-    srcs = [
-        "thread_pool.cc",
-    ],
-    hdrs = [
-        "thread_pool.h",
-    ],
-    deps = [
-        "//framework:cybertron",
-        "//modules/common:log",
-        "@ctpl",
-    ],
-)
-
 cpplint()
