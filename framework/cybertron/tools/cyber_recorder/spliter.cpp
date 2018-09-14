@@ -23,8 +23,7 @@ namespace record {
 Spliter::Spliter(const std::string& input_file, const std::string& output_file,
                  bool all_channels, const std::vector<std::string>& channel_vec,
                  uint64_t begin_time, uint64_t end_time)
-    : writer_(nullptr),
-      input_file_(input_file),
+    : input_file_(input_file),
       output_file_(output_file),
       channel_vec_(channel_vec),
       all_channels_(all_channels),
@@ -34,76 +33,105 @@ Spliter::Spliter(const std::string& input_file, const std::string& output_file,
 Spliter::~Spliter() {}
 
 bool Spliter::Proc() {
-  if (begin_time_ > end_time_) {
-    AERROR << "begin_time_ larger than end_time_, begin_time_: " << begin_time_
-           << "end_time_: " << end_time_;
+  AINFO << "split record file started.";
+  if (begin_time_ >= end_time_) {
+    AERROR << "begin time larger or equal than end time, begin_time_: "
+           << begin_time_ << "end_time_: " << end_time_;
     return false;
   }
-  if (!infileopt_.Open(input_file_)) {
-    AERROR << "infileopt_.Open() fail.";
+
+  // open input file
+  if (!reader_.Open(input_file_)) {
+    AERROR << "open input file failed, file: " << input_file_;
     return false;
   }
-  if (!infileopt_.ReadHeader()) {
-    AERROR << "infileopt_.ReadHeader() fail.";
+  if (!reader_.ReadHeader()) {
+    AERROR << "read input file header fail, file: " << input_file_;
     return false;
   }
-  Header header = infileopt_.GetHeader();
+  Header header = reader_.GetHeader();
   if (begin_time_ > header.end_time() || end_time_ < header.begin_time()) {
     AERROR << "time range " << begin_time_ << " to " << end_time_
            << " is not include in this record file.";
     return false;
   }
-  writer_.reset(new RecordWriter());
-  if (!writer_->Open(output_file_)) {
-    AERROR << "writer_->Open() fail.";
+
+  // open output file
+  HeaderBuilder* header_builder = new HeaderBuilder();
+  Header new_hdr = header_builder->GetHeader();
+  delete header_builder;
+  if (!writer_.Open(output_file_)) {
+    AERROR << "open output file failed. file: " << output_file_;
     return false;
   }
-  infileopt_.ReadIndex();
-  Index index = infileopt_.GetIndex();
-  std::unordered_map<std::string, int> channel_map;
-  for (int i = 0; i < index.indexes_size(); i++) {
-    SingleIndex* single_index = index.mutable_indexes(i);
-    if (single_index->type() != SectionType::SECTION_CHANNEL) {
-      continue;
-    }
-    ChannelCache* channel_cache = single_index->mutable_channel_cache();
-    if (!all_channels_ &&
-        std::find(channel_vec_.begin(), channel_vec_.end(),
-                  channel_cache->name()) == channel_vec_.end()) {
-      continue;
-    }
-    channel_map[channel_cache->name()] = 0;
-    writer_->WriteChannel(channel_cache->name(), channel_cache->message_type(),
-                          channel_cache->proto_desc());
+  if (!writer_.WriteHeader(new_hdr)) {
+    AERROR << "write header to output file failed. file: " << output_file_;
+    return false;
   }
-  int return_value = true;
-  Section section;
-  while (infileopt_.ReadSection(&section)) {
+
+  // read through record file
+  bool skip_next_chunk_body(false);
+  reader_.ReadHeader();
+  while (!reader_.EndOfFile()) {
+    Section section;
+    if (!reader_.ReadSection(&section)) {
+      AERROR << "read section failed.";
+      return false;
+    }
     if (section.type == SectionType::SECTION_INDEX) {
       break;
     }
     switch (section.type) {
       case SectionType::SECTION_CHANNEL: {
-        Channel channel;
-        if (!infileopt_.ReadSection<Channel>(section.size, &channel)) {
-          AERROR << "read message fail.";
+        Channel chan;
+        if (!reader_.ReadSection<Channel>(section.size, &chan)) {
+          AERROR << "read channel section fail.";
           return false;
+        }
+        if (all_channels_ ||
+            std::find(channel_vec_.begin(), channel_vec_.end(), chan.name()) !=
+                channel_vec_.end()) {
+          writer_.WriteChannel(chan);
         }
         break;
       }
       case SectionType::SECTION_CHUNK_HEADER: {
-        ChunkHeader chunk_header;
-        if (!infileopt_.ReadSection<ChunkHeader>(section.size, &chunk_header)) {
-          AERROR << "read message fail.";
+        ChunkHeader chdr;
+        if (!reader_.ReadSection<ChunkHeader>(section.size, &chdr)) {
+          AERROR << "read chunk header section fail.";
           return false;
         }
-        if (begin_time_ > chunk_header.end_time() ||
-            end_time_ < chunk_header.begin_time()) {
-          continue;
+        if (begin_time_ > chdr.end_time() || end_time_ < chdr.begin_time()) {
+          skip_next_chunk_body = true;
         }
-        if (!SplitChunkBody()) {
-          AERROR << "split chunk body fail";
-          return true;
+        break;
+      }
+      case SectionType::SECTION_CHUNK_BODY: {
+        if (skip_next_chunk_body) {
+          reader_.SkipSection(section.size);
+          skip_next_chunk_body = false;
+          break;
+        }
+        ChunkBody cbd;
+        if (!reader_.ReadSection<ChunkBody>(section.size, &cbd)) {
+          AERROR << "read chunk body section fail.";
+          return false;
+        }
+        for (int idx = 0; idx < cbd.messages_size(); ++idx) {
+          if (!all_channels_ &&
+              std::find(channel_vec_.begin(), channel_vec_.end(),
+                        cbd.messages(idx).channel_name()) ==
+                  channel_vec_.end()) {
+            continue;
+          }
+          if (cbd.messages(idx).time() < begin_time_ ||
+              cbd.messages(idx).time() > end_time_) {
+            continue;
+          }
+          if (!writer_.WriteMessage(cbd.messages(idx))) {
+            AERROR << "add new message failed.";
+            return false;
+          }
         }
         break;
       }
@@ -114,39 +142,9 @@ bool Spliter::Proc() {
       }
     }  // end for switch
   }    // end for while
-  AINFO << "split record file done";
+  AINFO << "split record file done.";
   return true;
 }  // end for Proc()
-
-bool Spliter::SplitChunkBody() {
-  Section section;
-  if (!infileopt_.ReadSection(&section)) {
-    AERROR << "read section fail.";
-    return false;
-  }
-  ChunkBody chunk_body;
-  if (!infileopt_.ReadSection<ChunkBody>(section.size, &chunk_body)) {
-    AERROR << "read message fail.";
-    return false;
-  }
-  for (int idx = 0; idx < chunk_body.messages_size(); ++idx) {
-    if (!all_channels_ &&
-        std::find(channel_vec_.begin(), channel_vec_.end(),
-                  chunk_body.messages(idx).channel_name()) ==
-            channel_vec_.end()) {
-      continue;
-    }
-    if (chunk_body.messages(idx).time() < begin_time_ ||
-        chunk_body.messages(idx).time() > end_time_) {
-      continue;
-    }
-    if (!writer_->WriteMessage(chunk_body.messages(idx))) {
-      AERROR << "datafile_->Write() fail.";
-      return false;
-    }
-  }
-  return true;
-}
 
 }  // namespace record
 }  // namespace cybertron

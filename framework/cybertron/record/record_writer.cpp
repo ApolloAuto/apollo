@@ -27,9 +27,6 @@ RecordWriter::~RecordWriter() { Close(); }
 bool RecordWriter::Open(const std::string& file) {
   file_ = file;
   path_ = file_;
-  segment_raw_size_ = 0;
-  segment_begin_time_ = 0;
-  file_index_ = 0;
   file_writer_.reset(new RecordFileWriter());
   HeaderBuilder* header_builder = new HeaderBuilder();
   header_ = header_builder->GetHeader();
@@ -39,14 +36,14 @@ bool RecordWriter::Open(const std::string& file) {
     return false;
   }
   file_writer_->WriteHeader(header_);
-  is_writing_ = true;
-  return true;
+  is_opened_ = true;
+  return is_opened_;
 }
 
 void RecordWriter::Close() {
-  if (is_writing_) {
+  if (is_opened_) {
     file_writer_->Close();
-    is_writing_ = false;
+    is_opened_ = false;
   }
 }
 
@@ -91,7 +88,7 @@ bool RecordWriter::WriteMessage(const SingleMessage& message) {
     segment_begin_time_ = message.time();
   }
 
-  if (!file_writer_->AddSingleMessage(message)) {
+  if (!file_writer_->WriteMessage(message)) {
     AERROR << "write message fail.";
     return false;
   }

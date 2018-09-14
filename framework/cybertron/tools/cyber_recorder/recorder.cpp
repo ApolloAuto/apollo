@@ -144,7 +144,7 @@ bool Recorder::InitReaderImpl(const std::string& channel_name,
       if (!share_this) {
         return;
       }
-      share_this->template callback_<RawMessage>(raw_message, channel_name);
+      share_this->ReaderCallback(raw_message, channel_name);
       share_this->writer_->ShowProgress();
     };
     reader = node_->CreateReader<RawMessage>(channel_name, callback);
@@ -157,6 +157,25 @@ bool Recorder::InitReaderImpl(const std::string& channel_name,
   } catch (const std::bad_weak_ptr& e) {
     AERROR << e.what();
     return false;
+  }
+}
+
+void Recorder::ReaderCallback(const std::shared_ptr<RawMessage>& message,
+                              const std::string& channel_name) {
+  if (!is_started_ || is_stopping_) {
+    AERROR << "record procedure is not started or stopping.";
+    return;
+  }
+
+  if (message == nullptr) {
+    AERROR << "message is nullptr, channel: " << channel_name;
+    return;
+  }
+
+  if (!writer_->WriteMessage(channel_name, message,
+                             Time::Now().ToNanosecond())) {
+    AERROR << "write data fail, channel: " << channel_name;
+    return;
   }
 }
 

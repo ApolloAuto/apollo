@@ -41,20 +41,26 @@ using ::apollo::cybertron::record::RecordFileWriter;
 class RecordWriter : public RecordBase {
  public:
   RecordWriter();
+
   virtual ~RecordWriter();
+
   bool Open(const std::string& file);
+
   void Close();
+
   bool WriteChannel(const std::string& name, const std::string& type,
                     const std::string& proto_desc);
+
   bool WriteMessage(const std::string& channel_name,
-                    const std::shared_ptr<const RawMessage>& message);
-  bool WriteMessage(const SingleMessage& single_msg);
+                    const std::shared_ptr<const RawMessage>& message,
+                    uint64_t time);
+
   void ShowProgress();
 
  private:
+  bool WriteMessage(const SingleMessage& single_msg);
   void SplitOutfile();
 
-  bool is_writing_ = false;
   uint64_t segment_raw_size_ = 0;
   uint64_t segment_begin_time_ = 0;
   uint64_t file_index_ = 0;
@@ -64,15 +70,16 @@ class RecordWriter : public RecordBase {
 
 inline bool RecordWriter::WriteMessage(
     const std::string& channel_name,
-    const std::shared_ptr<const RawMessage>& message) {
+    const std::shared_ptr<const RawMessage>& message, uint64_t time) {
   if (message == nullptr) {
     AERROR << "nullptr error, channel: " << channel_name;
     return false;
   }
+  OnNewMessage(channel_name);
   SingleMessage single_msg;
   single_msg.set_channel_name(channel_name);
   single_msg.set_content(message->message);
-  single_msg.set_time(Time::Now().ToNanosecond());
+  single_msg.set_time(time);
   if (!WriteMessage(std::move(single_msg))) {
     AERROR << "write single msg fail";
     return false;

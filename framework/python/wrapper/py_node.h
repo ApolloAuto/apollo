@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ * Copyright 2017 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -63,16 +63,17 @@ class PyWriter {
            apollo::cybertron::Node *node)
       : channel_name_(channel), data_type_(type), node_(node) {
     std::string proto_desc("");
-    message::ProtobufFactory::Instance()->GetDescriptorString(type, &proto_desc);
+    message::ProtobufFactory::Instance()->GetDescriptorString(type,
+                                                              &proto_desc);
     proto::RoleAttributes role_attr;
     role_attr.set_channel_name(channel_name_);
     role_attr.set_message_type(type);
     role_attr.set_proto_desc(proto_desc);
-    writer_ =
-        node_->CreateWriter<apollo::cybertron::message::PyMessageWrap>(role_attr);
+    writer_ = node_->CreateWriter<apollo::cybertron::message::PyMessageWrap>(
+        role_attr);
   }
 
-  ~PyWriter() { }
+  ~PyWriter() {}
 
   int write(const std::string &data) {
     auto message =
@@ -102,7 +103,7 @@ class PyReader {
         channel, f);
   }
 
-  ~PyReader() { }
+  ~PyReader() {}
 
   void register_func(int (*func)(const char *)) { func_ = func; }
 
@@ -171,7 +172,7 @@ class PyService {
         service_name, f);
   }
 
-  ~PyService() { }
+  ~PyService() {}
 
   void register_func(int (*func)(const char *)) { func_ = func; }
 
@@ -236,7 +237,7 @@ class PyClient {
                             apollo::cybertron::message::PyMessageWrap>(name);
   }
 
-  ~PyClient() { }
+  ~PyClient() {}
 
   std::string send_request(std::string request) {
     std::shared_ptr<apollo::cybertron::message::PyMessageWrap> m;
@@ -247,9 +248,7 @@ class PyClient {
       AINFO << "SendRequest:response is null";
       return std::string("");
     }
-    response->ParseFromString(
-        response
-            ->data());
+    response->ParseFromString(response->data());
 
     return response->data();
   }
@@ -269,7 +268,7 @@ class PyNode {
   explicit PyNode(const std::string &node_name) : node_name_(node_name) {
     node_ = apollo::cybertron::CreateNode(node_name);
   }
-  ~PyNode() { }
+  ~PyNode() {}
 
   void shutdown() {
     node_.reset();

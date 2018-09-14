@@ -15,8 +15,8 @@
  *****************************************************************************/
 
 #include "cybertron/record/record_reader.h"
+#include "cybertron/record/record_writer.h"
 #include "cybertron/record/header_builder.h"
-#include "cybertron/record/record_file.h"
 
 #include <gtest/gtest.h>
 #include <unistd.h>
@@ -28,64 +28,51 @@ namespace apollo {
 namespace cybertron {
 namespace record {
 
-const std::string CHAN_1 = "/test1";
-const std::string CHAN_2 = "/test2";
-const std::string MSG_TYPE = "apollo.cybertron.proto.Test";
+const std::string CHANNEL_NAME = "/test/channel1";
+const std::string MESSAGE_TYPE = "apollo.cybertron.proto.Test";
+const std::string PROTO_DESC = "1234567890";
 const std::string STR_10B = "1234567890";
 const std::string TEST_FILE = "test.record";
+const uint64_t TIME = 1e9;
 
-TEST(RecordReaderTest, TestOneMessageFile) {
-  // writer open one message file
-  RecordFileWriter* rfw = new RecordFileWriter();
-  ASSERT_TRUE(rfw->Open(TEST_FILE));
-  ASSERT_EQ(TEST_FILE, rfw->path_);
-  ASSERT_NE(nullptr, rfw->ofstream_);
-  ASSERT_TRUE(rfw->ofstream_.is_open());
-  ASSERT_NE(nullptr, rfw->chunk_active_);
-  ASSERT_NE(nullptr, rfw->chunk_flush_);
-  ASSERT_TRUE(rfw->is_writing_);
-  ASSERT_NE(nullptr, rfw->flush_thread_);
+TEST(RecordTest, TestOneMessageFile) {
 
-  // write header section
-  HeaderBuilder* hb = new HeaderBuilder();
-  hb->BuildSegmentPart(0, 0);
-  hb->BuildChunkPart(0, 0);
-  Header hdr1 = hb->GetHeader();
-  ASSERT_TRUE(rfw->WriteHeader(hdr1));
-  ASSERT_FALSE(rfw->header_.is_complete());
+  // writer
+  RecordWriter* rw = new RecordWriter();
+  ASSERT_FALSE(rw->is_opened_);
+  ASSERT_EQ("", rw->file_);
+  ASSERT_EQ("", rw->path_);
+  ASSERT_EQ(nullptr, rw->file_writer_);
 
-  // write channel section
-  Channel chan1;
-  chan1.set_name(CHAN_1);
-  chan1.set_message_type(MSG_TYPE);
-  chan1.set_proto_desc(STR_10B);
-  ASSERT_TRUE(rfw->WriteChannel(chan1));
+  ASSERT_TRUE(rw->Open(TEST_FILE));
+  ASSERT_TRUE(rw->is_opened_);
+  ASSERT_EQ(TEST_FILE, rw->file_);
+  ASSERT_EQ(TEST_FILE, rw->path_);
+  ASSERT_TRUE(rw->file_writer_->ofstream_.is_open());
 
-  // write chunk section
-  SingleMessage msg1;
-  msg1.set_channel_name(chan1.name());
-  msg1.set_content(STR_10B);
-  msg1.set_time(1e9);
-  ASSERT_TRUE(rfw->AddSingleMessage(msg1));
-  ASSERT_EQ(1, rfw->channel_message_number_map_[chan1.name()]);
-  ChunkHeader ckh1 = rfw->chunk_active_->header_;
-  ChunkBody ckb1 = rfw->chunk_active_->body_;
+  ASSERT_TRUE(rw->WriteChannel(CHANNEL_NAME, MESSAGE_TYPE, PROTO_DESC));
+  ASSERT_EQ(0, rw->GetMessageNumber(CHANNEL_NAME));
+  ASSERT_EQ(MESSAGE_TYPE, rw->GetMessageType(CHANNEL_NAME));
+  ASSERT_EQ(PROTO_DESC, rw->GetProtoDesc(CHANNEL_NAME));
 
-  // writer close one message file
-  rfw->Close();
-  ASSERT_TRUE(rfw->header_.is_complete());
-  ASSERT_EQ(1, rfw->header_.chunk_number());
-  ASSERT_EQ(1e9, rfw->header_.begin_time());
-  ASSERT_EQ(1e9, rfw->header_.end_time());
-  ASSERT_EQ(1, rfw->header_.message_number());
-  hdr1 = rfw->header_;
-  delete rfw;
+  std::shared_ptr<RawMessage> rm(new RawMessage(STR_10B));
+  ASSERT_TRUE(rw->WriteMessage(CHANNEL_NAME, rm, TIME));
+  ASSERT_EQ(1, rw->GetMessageNumber(CHANNEL_NAME));
 
-  // header open one message file
+  delete rw;
+
+  // reader
   RecordReader* rr = new RecordReader();
+  ASSERT_FALSE(rr->is_opened_);
+  ASSERT_EQ("", rr->file_);
+  ASSERT_EQ("", rr->path_);
+  ASSERT_EQ(nullptr, rr->file_reader_);
+
   ASSERT_TRUE(rr->Open(TEST_FILE));
+  ASSERT_TRUE(rr->is_opened_);
   ASSERT_EQ(TEST_FILE, rr->file_);
   ASSERT_EQ(TEST_FILE, rr->path_);
+  ASSERT_TRUE(rr->file_reader_->ifstream_.is_open());
 
   sleep(1);
 
@@ -96,9 +83,9 @@ TEST(RecordReaderTest, TestOneMessageFile) {
   ASSERT_FALSE(rr->EndOfFile());
   ASSERT_TRUE(rr->ReadMessage());
 
-  ASSERT_EQ(chan1.name(), rr->CurrentMessageChannelName());
+  ASSERT_EQ(CHANNEL_NAME, rr->CurrentMessageChannelName());
   ASSERT_EQ(STR_10B, rr->CurrentRawMessage()->message);
-  ASSERT_EQ(1e9, rr->CurrentMessageTime());
+  ASSERT_EQ(TIME, rr->CurrentMessageTime());
 
   ASSERT_TRUE(rr->EndOfFile());
   ASSERT_FALSE(rr->ReadMessage());

@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ * Copyright 2017 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,17 +16,13 @@
 
 #include "cybertron/cybertron.h"
 #include "cybertron/proto/chatter.pb.h"
-#include "cybertron/message/py_message.h"
 #include "python/wrapper/py_node.h"
-
-using apollo::cybertron::message::PyMessageWrap;
 
 apollo::cybertron::PyReader *pr = NULL;
 
 int cbfun(const char *channel_name) {
   AINFO << "recv->[ " << channel_name << " ]";
-  if (pr)
-    AINFO << "read->[ " << pr->read() << " ]";
+  if (pr) AINFO << "read->[ " << pr->read() << " ]";
 }
 
 int main(int argc, char *argv[]) {

@@ -58,14 +58,14 @@ bool RecordReader::Open(const std::string& file, uint64_t begin_time,
     AERROR << "init loader error.";
     return false;
   }
-  is_reading_ = true;
-  return true;
+  is_opened_ = true;
+  return is_opened_;
 }
 
 void RecordReader::Close() {
-  if (is_reading_) {
+  if (is_opened_) {
     file_reader_->Close();
-    is_reading_ = false;
+    is_opened_ = false;
   }
 }
 

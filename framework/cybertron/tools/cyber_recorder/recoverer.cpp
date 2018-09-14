@@ -22,55 +22,63 @@ namespace record {
 
 Recoverer::Recoverer(const std::string& input_file,
                      const std::string& output_file)
-    : writer_(nullptr), input_file_(input_file), output_file_(output_file) {}
+    : input_file_(input_file), output_file_(output_file) {}
 
 Recoverer::~Recoverer() {}
 
 bool Recoverer::Proc() {
-  if (!infileopt_.Open(input_file_)) {
-    AERROR << "open input file fail, file: " << input_file_;
+  if (!reader_.Open(input_file_)) {
+    AERROR << "open input file failed, file: " << input_file_;
     return false;
   }
-
-  // skip header
-  if (!infileopt_.ReadHeader()) {
+  if (!reader_.ReadHeader()) {
     AERROR << "read input file header fail, file: " << input_file_;
     return false;
   }
-  Header header = infileopt_.GetHeader();
 
-  writer_.reset(new RecordWriter());
-  if (!writer_->Open(output_file_)) {
-    AERROR << "open output file fail, file: " << output_file_;
+  // open output file
+  HeaderBuilder* header_builder = new HeaderBuilder();
+  Header new_hdr = header_builder->GetHeader();
+  delete header_builder;
+  if (!writer_.Open(output_file_)) {
+    AERROR << "open output file failed. file: " << output_file_;
+    return false;
+  }
+  if (!writer_.WriteHeader(new_hdr)) {
+    AERROR << "write header to output file failed. file: " << output_file_;
     return false;
   }
 
-  if (!infileopt_.ReadIndex()) {
+  // write channel sections
+  if (!reader_.ReadIndex()) {
     AINFO << "read input file index fail, file: " << input_file_;
     AINFO << "all information in index section will lost";
   } else {
-    Index index = infileopt_.GetIndex();
+    Index index = reader_.GetIndex();
     for (int i = 0; i < index.indexes_size(); i++) {
       SingleIndex* single_index = index.mutable_indexes(i);
       if (single_index->type() != SectionType::SECTION_CHANNEL) {
         continue;
       }
-      ChannelCache* channel_cache = single_index->mutable_channel_cache();
+      ChannelCache* chan_cache = single_index->mutable_channel_cache();
       if (std::find(channel_vec_.begin(), channel_vec_.end(),
-                    channel_cache->name()) == channel_vec_.end()) {
-        channel_vec_.push_back(channel_cache->name());
-        writer_->WriteChannel(channel_cache->name(),
-                              channel_cache->message_type(),
-                              channel_cache->proto_desc());
+                    chan_cache->name()) == channel_vec_.end()) {
+        channel_vec_.push_back(chan_cache->name());
+        Channel chan;
+        chan.set_name(chan_cache->name());
+        chan.set_message_type(chan_cache->message_type());
+        chan.set_proto_desc(chan_cache->proto_desc());
+        writer_.WriteChannel(chan);
       }
     }
   }
 
-  // sequential reading sections after header
-  Section section;
-  while (!infileopt_.EndOfFile()) {
-    if (!infileopt_.ReadSection(&section)) {
-      AINFO << "read section fail, try next.";
+  // read through record file
+  reader_.ReadHeader();
+  while (!reader_.EndOfFile()) {
+    Section section;
+    if (!reader_.ReadSection(&section)) {
+      AINFO << "read section failed, try next.";
       continue;
     }
     if (section.type == SectionType::SECTION_INDEX) {
@@ -78,35 +86,34 @@ bool Recoverer::Proc() {
     }
     switch (section.type) {
       case SectionType::SECTION_CHANNEL: {
-        Channel channel;
-        if (!infileopt_.ReadSection<Channel>(section.size, &channel)) {
+        Channel chan;
+        if (!reader_.ReadSection<Channel>(section.size, &chan)) {
           AINFO << "one channel section broken, skip it.";
-        } else {
-          if (std::find(channel_vec_.begin(), channel_vec_.end(),
-                        channel.name()) == channel_vec_.end()) {
-            channel_vec_.push_back(channel.name());
-            writer_->WriteChannel(channel.name(), channel.message_type(),
-                                  channel.proto_desc());
-          }
+          break;
+        }
+        if (std::find(channel_vec_.begin(), channel_vec_.end(), chan.name()) ==
+            channel_vec_.end()) {
+          channel_vec_.push_back(chan.name());
+          writer_.WriteChannel(chan);
         }
         break;
       }
       case SectionType::SECTION_CHUNK_HEADER: {
-        ChunkHeader chunk_header;
-        if (!infileopt_.ReadSection<ChunkHeader>(section.size, &chunk_header)) {
+        ChunkHeader chdr;
+        if (!reader_.ReadSection<ChunkHeader>(section.size, &chdr)) {
           AINFO << "one chunk header section broken, skip it.";
         }
         break;
       }
       case SectionType::SECTION_CHUNK_BODY: {
-        ChunkBody chunk_body;
-        if (!infileopt_.ReadSection<ChunkBody>(section.size, &chunk_body)) {
+        ChunkBody cbd;
+        if (!reader_.ReadSection<ChunkBody>(section.size, &cbd)) {
           AINFO << "one chunk body section broken, skip it";
           break;
         }
-        for (int idx = 0; idx < chunk_body.messages_size(); ++idx) {
-          if (!writer_->WriteMessage(chunk_body.messages(idx))) {
-            AERROR << "datafile_->Write() fail.";
+        for (int idx = 0; idx < cbd.messages_size(); ++idx) {
+          if (!writer_.WriteMessage(cbd.messages(idx))) {
+            AERROR << "add new message failed.";
             return false;
           }
         }
@@ -119,7 +126,7 @@ bool Recoverer::Proc() {
       }
     }  // end for switch
   }    // end for while
-  AINFO << "recover record file done";
+  AINFO << "recover record file done.";
   return true;
 }  // end for Proc()
 

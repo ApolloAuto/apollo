@@ -56,6 +56,7 @@ class RecordBase {
   std::unordered_map<std::string, uint64_t> channel_message_number_map_;
   std::unordered_map<std::string, std::string> channel_message_type_map_;
   std::unordered_map<std::string, std::string> channel_proto_desc_map_;
+  bool is_opened_ = false;
 };
 
 }  // namespace record

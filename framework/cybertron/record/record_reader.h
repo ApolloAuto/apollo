@@ -53,7 +53,6 @@ class RecordReader : public RecordBase {
   bool InitLoadThread();
   void LoadChunk(uint64_t from_time, uint64_t to_time);
 
-  bool is_reading_ = false;
   bool looped_readback_ = false;
   bool loaded_all_message_ = false;
   uint64_t begin_time_ = 0;

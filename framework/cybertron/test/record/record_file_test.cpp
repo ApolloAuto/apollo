@@ -74,6 +74,7 @@ TEST(ChunkTest, TestAll) {
 }
 
 TEST(RecordFileTest, TestOneMessageFile) {
+
   // writer open one message file
   RecordFileWriter* rfw = new RecordFileWriter();
   ASSERT_TRUE(rfw->Open(TEST_FILE));
@@ -105,7 +106,7 @@ TEST(RecordFileTest, TestOneMessageFile) {
   msg1.set_channel_name(chan1.name());
   msg1.set_content(STR_10B);
   msg1.set_time(1e9);
-  ASSERT_TRUE(rfw->AddSingleMessage(msg1));
+  ASSERT_TRUE(rfw->WriteMessage(msg1));
   ASSERT_EQ(1, rfw->channel_message_number_map_[chan1.name()]);
   ChunkHeader ckh1 = rfw->chunk_active_->header_;
   ChunkBody ckb1 = rfw->chunk_active_->body_;
@@ -205,21 +206,21 @@ TEST(RecordFileTest, TestOneChunkFile) {
   msg1.set_channel_name(chan1.name());
   msg1.set_content("1234567890");
   msg1.set_time(1e9);
-  ASSERT_TRUE(rfw->AddSingleMessage(msg1));
+  ASSERT_TRUE(rfw->WriteMessage(msg1));
   ASSERT_EQ(1, rfw->channel_message_number_map_[chan1.name()]);
 
   SingleMessage msg2;
   msg2.set_channel_name(chan2.name());
   msg2.set_content("1234567890");
   msg2.set_time(2e9);
-  ASSERT_TRUE(rfw->AddSingleMessage(msg2));
+  ASSERT_TRUE(rfw->WriteMessage(msg2));
   ASSERT_EQ(1, rfw->channel_message_number_map_[chan2.name()]);
 
   SingleMessage msg3;
   msg3.set_channel_name(chan1.name());
   msg3.set_content("1234567890");
   msg3.set_time(3e9);
-  ASSERT_TRUE(rfw->AddSingleMessage(msg3));
+  ASSERT_TRUE(rfw->WriteMessage(msg3));
   ASSERT_EQ(2, rfw->channel_message_number_map_[chan1.name()]);
 
   rfw->Close();

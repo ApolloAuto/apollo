@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ * Copyright 2017 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,12 +22,11 @@
 #include "cybertron/cybertron.h"
 #include "cybertron/init.h"
 
-
 namespace apollo {
 namespace cybertron {
 
 bool py_init() {
- if (!Init("cyber_python")) {
+  if (!Init("cyber_python")) {
     AWARN << "py_cyber_init failed.";
     return false;
   }

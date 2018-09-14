@@ -30,6 +30,7 @@ export COVFILE="${CYBERTRON_DIR}/test_cybertron.cov"
 export COVFILE_INC="${CYBERTRON_DIR}/test-inc.cov"
 export PATH=${COV_HOME}/bin:$PATH
 TEST_DIR=${CYBERTRON_DIR}/install/test/cybertron/unit_test/
+TEST_DIR_PY=${CYBERTRON_DIR}/install/lib/python/test/
 
 RED='\033[0;31m'
 YELLOW='\e[33m'
@@ -93,6 +94,7 @@ function build() {
     cd build
     cmake .. ${CMAKE_OPTIONS}
     make install -j${CORE_NUM} -l${CORE_NUM} || exit $?
+    build_py
 }
 
 function build_fast() {
@@ -104,6 +106,18 @@ function build_fast() {
         cd build
         make install -j${CORE_NUM} -l${CORE_NUM} || exit $?
     fi
+}
+
+function build_py() {
+    info "start build py"
+    cp -rf ${CYBERTRON_DIR}/python/cybertron/* ${CYBERTRON_DIR}/install/lib/python/cybertron && \
+    cp -rf ${CYBERTRON_DIR}/python/examples ${CYBERTRON_DIR}/install/lib/python && \
+    cp -rf ${CYBERTRON_DIR}/python/test ${CYBERTRON_DIR}/install/lib/python
+    PROTO_PATH=${CYBERTRON_DIR}/install/lib/python/proto/
+    if [[ ! -d ${PROTO_PATH} ]]; then
+        mkdir ${PROTO_PATH}
+    fi
+    find ${CYBERTRON_DIR}/cybertron/proto/ -name "*.py" | xargs -i cp -f {} ${PROTO_PATH}
 }
 
 function build_cov() {
@@ -184,6 +198,48 @@ function run_test() {
         print_delim
     fi
     if [[ ${failed} -ne 0 ]]; then
+        print_delim
+        error "Failed Cases:"
+        for c in ${fails[@]}; do
+            echo $c
+        done
+        print_delim
+    fi
+    success "Run ${total} cases, FAILED: ${failed}"
+    cd -
+}
+
+function run_test_py() {
+    source ${CYBERTRON_DIR}/install/setup.bash
+    START_TIME=$(get_now)
+    cd ${TEST_DIR_PY}
+    total=0
+    failed=0
+    fails=()
+    error=0
+    errors=()
+    for test_file in `ls *.py`; do
+        info "Run ${test_file}"
+        python ${test_file}
+        if [[ $? -ne 0 ]]; then
+            ((error=$error+1))
+            errors[${error}]=${test_file}
+            fails[${failed}]=${test_file}:${cls}${line}
+            ((failed=${failed}+1))
+        fi
+        ((total=${total}+1))
+        echo
+    done
+    echo
+    if [[ ${error} -ne 0 ]]; then
+        print_delim
+        error "Errors occured: ${error}"
+        for c in ${errors[@]}; do
+            echo $c
+        done
+        print_delim
+    fi
+    if [[ ${failed} -ne 0 ]]; then 
         print_delim
         error "Failed Cases:"
         for c in ${fails[@]}; do
@@ -434,6 +490,9 @@ function main() {
         ;;
         test)
             run_test
+        ;;
+        test_py)
+            run_test_py
         ;;
         clean)
             clean

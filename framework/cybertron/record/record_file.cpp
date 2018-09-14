@@ -323,7 +323,7 @@ bool RecordFileWriter::WriteChunk(const ChunkHeader& chunk_header,
   return true;
 }
 
-bool RecordFileWriter::AddSingleMessage(const SingleMessage& message) {
+bool RecordFileWriter::WriteMessage(const SingleMessage& message) {
   std::lock_guard<std::recursive_mutex> lock(chunk_mutex_);
 
   chunk_active_->add(message);
