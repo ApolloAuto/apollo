@@ -267,7 +267,15 @@ bool ControlComponent::Proc() {
   control_command.mutable_header()->set_radar_timestamp(
       trajectory_.header().radar_timestamp());
 
-  SendCmd(control_command);
+  common::util::FillHeader(node_->Name(), &control_command);
+
+  ADEBUG << control_command.ShortDebugString();
+  if (control_conf_.is_control_test_mode()) {
+    ADEBUG << "Skip publish control command in test mode";
+    return true;
+  }
+
+  control_cmd_writer_->Write(std::make_shared<ControlCommand>(control_command));
 
   return true;
 }
@@ -347,18 +355,6 @@ Status ControlComponent::CheckTimestamp() {
     return Status(ErrorCode::CONTROL_COMPUTE_ERROR, "Trajectory msg timeout");
   }
   return Status::OK();
-}
-
-void ControlComponent::SendCmd(const ControlCommand &control_command) {
-  common::util::FillHeader(node_->Name(), &control_command);
-
-  ADEBUG << control_command.ShortDebugString();
-  if (control_conf_.is_control_test_mode()) {
-    ADEBUG << "Skip publish control command in test mode";
-    return;
-  }
-
-  control_cmd_writer_->Write(std::make_shared<ControlCommand>(control_command));
 }
 
 }  // namespace control
