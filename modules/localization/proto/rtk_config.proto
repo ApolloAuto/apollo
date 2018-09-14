@@ -1,0 +1,16 @@
+syntax = "proto2";
+
+package apollo.localization.rtk_config;
+
+message Config {
+  required string localization_topic = 1;
+  required string imu_topic = 2;
+  required string gps_topic = 3;
+  required string broadcast_tf_frame_id = 4;
+  required string broadcast_tf_child_frame_id = 5;
+  required int32 imu_list_max_size = 6;
+  required double gps_imu_time_diff_threshold = 7;
+  required double map_offset_x = 8;
+  required double map_offset_y = 9;
+  required double map_offset_z = 10;
+}
