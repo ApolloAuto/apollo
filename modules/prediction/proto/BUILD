@@ -52,8 +52,8 @@ proto_library(
         "//modules/common/proto:error_code_proto_lib",
         "//modules/common/proto:header_proto_lib",
         "//modules/common/proto:pnc_point_proto_lib",
-        "//modules/common/proto:scenario_proto_lib",
         "//modules/perception/proto:perception_proto_lib",
+        "//modules/prediction/proto:scenario_proto_lib",
     ],
 )
 
@@ -156,5 +156,19 @@ proto_library(
     srcs = [
         "network_layers.proto",
         "network_model.proto",
+    ],
+)
+
+proto_library(
+    name = "scenario_proto_lib",
+    srcs = [
+        "scenario.proto",
+    ],
+)
+
+cc_proto_library(
+    name = "scenario_proto",
+    deps = [
+        ":scenario_proto_lib",
     ],
 )

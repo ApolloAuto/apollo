@@ -25,8 +25,6 @@
 namespace apollo {
 namespace prediction {
 
-using apollo::common::Scenario;
-
 class ScenarioAnalyzerTest : public KMLMapBasedTest {};
 
 TEST_F(ScenarioAnalyzerTest, unknown) {
@@ -44,7 +42,7 @@ TEST_F(ScenarioAnalyzerTest, junction) {
   ScenarioAnalyzer scenario_analyzer;
   scenario_analyzer.Analyze(scenario_feature);
   Scenario scenario = scenario_analyzer.scenario();
-  EXPECT_EQ(scenario.type(), Scenario::JUNCTION_UNKNOWN);
+  EXPECT_EQ(scenario.type(), Scenario::JUNCTION);
 }
 
 }  // namespace prediction
