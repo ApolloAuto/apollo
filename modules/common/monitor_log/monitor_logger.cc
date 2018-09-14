@@ -25,7 +25,10 @@ MonitorLogger::MonitorLogger() {
   auto node_name =
       "monitor_logger" + std::to_string(cybertron::Time::Now().ToNanosecond());
   node_ = cybertron::CreateNode("node_name");
-  monitor_msg_writer_ = node_->CreateWriter<MonitorMessage>("/apollo/monitor");
+  if (node_ != nullptr) {
+    monitor_msg_writer_ =
+        node_->CreateWriter<MonitorMessage>("/apollo/monitor");
+  }
 }
 
 void MonitorLogger::Publish(const MonitorMessageItem::MessageSource &source,
@@ -48,6 +51,7 @@ void MonitorLogger::Publish(const MonitorMessageItem::MessageSource &source,
 }
 
 void MonitorLogger::DoPublish(MonitorMessage *message) const {
+  RETURN_IF_NULL(monitor_msg_writer_);
   common::util::FillHeader("monitor", message);
   monitor_msg_writer_->Write(std::make_shared<MonitorMessage>(*message));
 }
