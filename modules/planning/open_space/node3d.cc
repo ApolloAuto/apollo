@@ -23,14 +23,23 @@
 namespace apollo {
 namespace planning {
 
-Node3d::Node3d(double x, double y, double phi, double x_grid, double y_grid,
-           double phi_grid) {
+Node3d::Node3d(double x, double y, double phi,
+               const OpenSpaceConf& open_space_conf) {
   x_ = x;
   y_ = y;
   phi_ = phi;
-  x_grid_ = x_grid;
-  y_grid_ = y_grid;
-  phi_grid_ = phi_grid;
+  x_grid_ = static_cast<std::size_t>(
+      (open_space_conf.max_x - open_space_conf.min_x) / std
+      : abs(x_));
+  y_grid_ = static_cast<std::size_t>(
+      (open_space_conf.max_y - open_space_conf.min_y) / std
+      : abs(y_));
+  phi_grid_ = static_cast<std::size_t>(
+      (open_space_conf.max_phi - open_space_conf.min_phi) / std
+      : abs(phi_));
+  index_ = phi_grid_ * (open_space_conf.max_x - open_space_conf.min_x) *
+               (open_space_conf.max_y - open_space_conf.min_y) +
+           y_grid_ * (open_space_conf.max_x - open_space_conf.min_x) + x_grid_;
 }
 
 Box2d Node3d::GetBoundingBox(const common::VehicleParam& vehicle_param_) {
@@ -50,8 +59,5 @@ bool Node3d::operator==(const SmartPtr<Node3d> right) const {
          phi_grid_ == right->GetGridPhi();
 }
 
-int Node3d::GetIndex() {
-  int index = 
-}
-}
-}
+}  // namespace planning
+}  // namespace apollo

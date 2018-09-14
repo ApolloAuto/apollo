@@ -35,8 +35,8 @@ using apollo::common::math::Box2d;
 
 class Node3d {
  public:
-  explicit Node3d(double x, double y, double phi, double x_grid, double y_grid,
-                double phi_grid);
+  explicit Node3d(double x, double y, double phi,
+                  const OpenSpaceConf& open_space_conf);
   virtual ~Node3d() = default;
   Box2d GetBoundingBox(const common::VehicleParam& vehicle_param_);
   double GetCost() { return current_cost_ + heuristic_cost_; };
@@ -47,7 +47,7 @@ class Node3d {
   double GetY() { return y_; };
   double GetPhi() { return phi_; };
   bool operator==(const SmartPtr<Node3d> right) const;
-  int GetIndex();
+  int GetIndex(return index_;);
 
  private:
   double x_ = 0.0;
@@ -56,6 +56,7 @@ class Node3d {
   std::size_t x_grid_ = 0;
   std::size_t y_grid_ = 0;
   std::size_t phi_grid_ = 0;
+  int index_ = 0;
   double current_cost_ = 0.0;
   double heuristic_cost_ = 0.0;
   SmartPtr<Node3d> pre_node = nullptr;

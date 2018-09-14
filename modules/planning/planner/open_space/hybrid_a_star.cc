@@ -25,18 +25,16 @@ namespace planning {
 
 HybridAStar::HybridAStar(double sx, double sy, double sphi, double ex,
                          double ey, double ephi,
-                         std::vector<const Obstacle*> obstacles,
-                         double xy_grid_resolution,
-                         double phi_grid_resolution) {
+                         std::vector<const Obstacle *> obstacles,
+                         const OpenSpaceConf &open_space_conf) {
   start_node_.reset(new Node3d(sx, sy, sphi, sx / xy_grid_resolution,
-                             sy / xy_grid_resolution,
-                             sphi / phi_grid_resolution));
+                               sy / xy_grid_resolution,
+                               sphi / phi_grid_resolution));
   end_node_.reset(new Node3d(ex, ey, ephi, ex / xy_grid_resolution,
-                           ey / xy_grid_resolution,
-                           ephi / phi_grid_resolution));
+                             ey / xy_grid_resolution,
+                             ephi / phi_grid_resolution));
   obstacles_ = obstacles;
-  xy_grid_resolution_ = xy_grid_resolution;
-  phi_grid_resolution_ = phi_grid_resolution;
+  open_space_conf_ = open_space_conf;
 }
 
 Status HybridAStar::Plan() {}
