@@ -24,6 +24,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <mutex>
 
 #include "cybertron/component/component.h"
 #include "modules/common/status/status.h"
@@ -44,8 +45,7 @@ namespace prediction {
 
 class PredictionComponent :
     public cybertron::Component<perception::PerceptionObstacles,
-                                localization::LocalizationEstimate,
-                                planning::ADCTrajectory> {
+                                localization::LocalizationEstimate> {
  public:
   /**
    * @brief Destructor
@@ -72,8 +72,7 @@ class PredictionComponent :
    */
   bool Proc(
       const std::shared_ptr<perception::PerceptionObstacles>&,
-      const std::shared_ptr<localization::LocalizationEstimate>&,
-      const std::shared_ptr<planning::ADCTrajectory>&) override;
+      const std::shared_ptr<localization::LocalizationEstimate>&) override;
 
  private:
   void OnLocalization(const localization::LocalizationEstimate &localization);
@@ -91,8 +90,13 @@ class PredictionComponent :
 
   common::adapter::AdapterManagerConfig adapter_conf_;
 
+  std::shared_ptr<apollo::cybertron::Reader<planning::ADCTrajectory>>
+       planning_reader_;
+
   std::shared_ptr<apollo::cybertron::Writer<PredictionObstacles>>
       prediction_writer_;
+
+  std::mutex mutex_;
 };
 
 CYBERTRON_REGISTER_COMPONENT(PredictionComponent)

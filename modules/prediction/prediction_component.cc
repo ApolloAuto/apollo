@@ -124,6 +124,14 @@ bool PredictionComponent::Init() {
            << adapter_conf_.ShortDebugString();
   }
 
+  planning_reader_ = node_->CreateReader<ADCTrajectory>(
+     prediction_conf_.planning_trajectory_channel(),
+     [this](const std::shared_ptr<ADCTrajectory>& adc_trajectory) {
+         ADEBUG << "Received planning data: run planning callback.";
+         std::lock_guard<std::mutex> lock(mutex_);
+         OnPlanning(*adc_trajectory);
+     });
+
   // Initialization of all managers
   ContainerManager::Instance()->Init(adapter_conf_);
   EvaluatorManager::Instance()->Init(prediction_conf_);
@@ -198,8 +206,7 @@ void PredictionComponent::OnPlanning(
 
 bool PredictionComponent::Proc(
     const std::shared_ptr<PerceptionObstacles>& perception_obstacles,
-    const std::shared_ptr<LocalizationEstimate>& localization,
-    const std::shared_ptr<ADCTrajectory>& adc_trajectory) {
+    const std::shared_ptr<LocalizationEstimate>& localization) {
   if (FLAGS_prediction_test_mode &&
       (Clock::NowInSeconds() - component_start_time_
           > FLAGS_prediction_test_duration)) {
@@ -218,8 +225,6 @@ bool PredictionComponent::Proc(
   double start_timestamp = Clock::NowInSeconds();
 
   OnLocalization(*localization);
-
-  OnPlanning(*adc_trajectory);
 
   // Insert obstacle
   ObstaclesContainer* obstacles_container = dynamic_cast<ObstaclesContainer*>(
