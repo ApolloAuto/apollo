@@ -82,11 +82,14 @@
              << LEFT_BRACKET << apollo::cybertron::Binary::GetName()    \
              << RIGHT_BRACKET)
 
-#define AINFO_IF(cond) LOG_IF(INFO, cond)
-#define AWARN_IF(cond) LOG_IF(ERROR, cond)
-#define AERROR_IF(cond) LOG_IF(ERROR, cond)
+#define AINFO_IF(cond) ALOG_IF(INFO, cond, MODULE_NAME)
+#define AWARN_IF(cond) ALOG_IF(WARN, cond, MODULE_NAME)
+#define AERROR_IF(cond) ALOG_IF(ERROR, cond, MODULE_NAME)
+#define ALOG_IF(severity, cond, module) \
+  !(cond) ? (void)0                     \
+          : google::LogMessageVoidify() & ALOG_MODULE(module, severity)
 
-#define ACHECK(cond) CHECK(cond)
+#define ACHECK(cond) CHECK(cond) << LEFT_BRACKET << MODULE_NAME << RIGHT_BRACKET
 
 #define AINFO_EVERY(freq) LOG_EVERY_N(INFO, freq)
 #define AWARN_EVERY(freq) LOG_EVERY_N(WARNING, freq)
