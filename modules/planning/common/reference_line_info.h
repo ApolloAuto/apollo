@@ -62,7 +62,7 @@ class ReferenceLineInfo {
 
   bool AddObstacles(const std::vector<const Obstacle*>& obstacles);
   PathObstacle* AddObstacle(const Obstacle* obstacle);
-  bool AddObstacleHelper(const Obstacle* obstacle);
+  bool AddObstacleHelper(const std::shared_ptr<Obstacle>& obstacle);
 
   PathDecision* path_decision();
   const PathDecision& path_decision() const;

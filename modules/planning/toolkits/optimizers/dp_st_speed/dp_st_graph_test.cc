@@ -27,7 +27,6 @@
 
 #include "modules/common/log.h"
 #include "modules/common/util/file.h"
-#include "modules/common/util/thread_pool.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
@@ -56,11 +55,9 @@ class DpStGraphTest : public ::testing::Test {
     for (float s = 0; s < 200.0; s += 1.0) {
       speed_limit_.AppendSpeedLimit(s, 25.0);
     }
-
-    apollo::common::util::ThreadPool::Init(3);
   }
 
-  virtual void TearDown() { apollo::common::util::ThreadPool::Stop(); }
+  virtual void TearDown() {}
 
  protected:
   std::list<PathObstacle> path_obstacle_list_;

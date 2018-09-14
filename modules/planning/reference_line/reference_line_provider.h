@@ -155,7 +155,6 @@ class ReferenceLineProvider {
  private:
   bool is_initialized_ = false;
   bool is_stop_ = false;
-  std::unique_ptr<std::thread> thread_;
 
   std::unique_ptr<ReferenceLineSmoother> smoother_;
   ReferenceLineSmootherConfig smoother_config_;
