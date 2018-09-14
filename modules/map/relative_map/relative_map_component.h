@@ -22,39 +22,36 @@
 #include "cybertron/component/timer_component.h"
 #include "cybertron/cybertron.h"
 
-#include "modules/canbus/proto/chassis.pb.h"
-#include "modules/perception/proto/perception_obstacle.pb.h"
-#include "modules/map/relative_map/proto/navigation.pb.h"
-#include "modules/map/relative_map/proto/relative_map_config.pb.h"
+#include "modules/map/relative_map/relative_map.h"
 
 namespace apollo {
 namespace relative_map {
 
-class RelativeMapComponent : public apollo::cybertron::TimerComponent {
+class RelativeMapComponent final
+    : public ::apollo::cybertron::TimerComponent {
 
  public:
   bool Init() override;
   bool Proc() override;
 
  private:
+  bool InitReaders();
+
   std::shared_ptr<::apollo::cybertron::Writer<MapMsg>>
       relative_map_writer_ = nullptr;
-
   std::shared_ptr<cybertron::Reader<perception::PerceptionObstacles>>
-      perception_reader_;
-  std::shared_ptr<cybertron::Reader<canbus::Chassis>> chassis_reader_;
+      perception_reader_ = nullptr;
+  std::shared_ptr<cybertron::Reader<canbus::Chassis>>
+      chassis_reader_ = nullptr;
   std::shared_ptr<cybertron::Reader<localization::LocalizationEstimate>>
-      localization_reader_;
+      localization_reader_ = nullptr;
+  std::shared_ptr<cybertron::Reader<NavigationInfo>>
+      navigation_reader_ = nullptr;
 
-  std::mutex mutex_;
-
-  perception::PerceptionObstacles perception_obstacles_;
-  canbus::Chassis chassis_;
-  localization::LocalizationEstimate localization_;
+  RelativeMap relative_map_;
 };
 
 CYBERTRON_REGISTER_COMPONENT(RelativeMapComponent)
-
 }  // namespace relative_map
 }  // namespace apollo
 
