@@ -27,19 +27,9 @@ Node::Node(const std::string& node_name, const std::string& name_space)
     : node_name_(node_name), name_space_(name_space) {
   node_channel_impl_.reset(new NodeChannelImpl(node_name));
   node_service_impl_.reset(new NodeServiceImpl(node_name));
-
-  attr_.set_host_name(common::GlobalData::Instance()->HostName());
-  attr_.set_process_id(common::GlobalData::Instance()->ProcessId());
-  attr_.set_node_name(node_name);
-  uint64_t node_id = common::GlobalData::RegisterNode(node_name);
-  attr_.set_node_id(node_id);
-
-  node_manager_ =
-      service_discovery::TopologyManager::Instance()->node_manager();
-  node_manager_->Join(attr_, RoleType::ROLE_NODE);
 }
 
-Node::~Node() { node_manager_->Leave(attr_, RoleType::ROLE_NODE); }
+Node::~Node() {}
 
 const std::string& Node::Name() const { return node_name_; }
 

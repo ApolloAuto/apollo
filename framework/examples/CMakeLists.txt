@@ -82,6 +82,12 @@ add_executable(user_defined_task
 )
 target_link_libraries(user_defined_task -Wl,--no-as-needed -pthread cybertron)
 
+add_executable(dispatcher_example
+  dispatcher_example.cpp
+)
+target_link_libraries(dispatcher_example -pthread dl cybertron perception_component)
+install(TARGETS dispatcher_example DESTINATION bin)
+
 
 install(DIRECTORY dag DESTINATION ${CMAKE_INSTALL_PREFIX})
 

@@ -27,6 +27,7 @@ add_subdirectory(sensor)
 add_subdirectory(third_party)
 
 add_subdirectory(python)
+add_subdirectory(cybertron/dispatcher)
 
 file(GLOB CYBERTRON_SRCS
   "cybertron/*.cpp"
@@ -64,6 +65,7 @@ target_link_libraries(cybertron
   protobuf
   cybertron_proto
   cybertron_common
+  cybertron_dispatcher
   fastrtps
   fastcdr
   -lrt

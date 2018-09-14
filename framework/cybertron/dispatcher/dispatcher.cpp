@@ -14,39 +14,23 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef CYBERTRON_NODE_WRITER_BASE_H_
-#define CYBERTRON_NODE_WRITER_BASE_H_
-
-#include <atomic>
-#include <string>
-
-#include "cybertron/proto/role_attributes.pb.h"
+#include "cybertron/dispatcher/dispatcher.h"
 
 namespace apollo {
 namespace cybertron {
+namespace dispatcher {
 
-class WriterBase {
- public:
-  explicit WriterBase(const proto::RoleAttributes& role_attr)
-      : role_attr_(role_attr), init_(false) {
+Dispatcher::Dispatcher() {}
 
+Dispatcher::~Dispatcher() { messages_.clear(); }
+
+void Dispatcher::Observe() {
+  std::lock_guard<std::mutex> lock(msg_mutex_);
+  for (auto& item : messages_) {
+    item.second->Observe();
   }
-  virtual ~WriterBase() {}
+}
 
-  virtual bool Init() = 0;
-  virtual void Shutdown() = 0;
-  const std::string& GetChannelName() const {
-    return role_attr_.channel_name();
-  }
-
-  bool inited() const { return init_.load(); }
-
- protected:
-  proto::RoleAttributes role_attr_;
-  std::atomic<bool> init_;
-};
-
+}  // namespace dispatcher
 }  // namespace cybertron
 }  // namespace apollo
-
-#endif  // CYBERTRON_NODE_WRITER_BASE_H_
