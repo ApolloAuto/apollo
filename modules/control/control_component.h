@@ -68,9 +68,6 @@ class ControlComponent final : public apollo::cybertron::TimerComponent {
   void OnMonitor(
       const apollo::common::monitor::MonitorMessage &monitor_message);
 
-  // Watch dog timer
-  void OnTimer(const ros::TimerEvent &);
-
   common::Status ProduceControlCommand(ControlCommand *control_command);
   common::Status CheckInput();
   common::Status CheckTimestamp();
