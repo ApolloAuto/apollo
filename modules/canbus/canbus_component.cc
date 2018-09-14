@@ -35,8 +35,8 @@ using apollo::guardian::GuardianCommand;
 std::string CanbusComponent::Name() const { return FLAGS_canbus_module_name; }
 
 CanbusComponent::CanbusComponent()
-    : monitor_logger_buffer_(apollo::common::monitor::MonitorMessageItem::CANBUS) {
-}
+    : monitor_logger_buffer_(
+          apollo::common::monitor::MonitorMessageItem::CANBUS) {}
 
 bool CanbusComponent::Init() {
   if (!GetProtoConfig(&canbus_conf_)) {
@@ -199,7 +199,7 @@ void CanbusComponent::OnGuardianCommand(
   OnControlCommand(control_command);
 }
 
-::apollo::common::Status CanbusComponent::OnError(const std::string &error_msg) {
+common::Status CanbusComponent::OnError(const std::string &error_msg) {
   monitor_logger_buffer_.ERROR(error_msg);
   return ::apollo::common::Status(ErrorCode::CANBUS_ERROR, error_msg);
 }

@@ -118,7 +118,7 @@ void ControlComponent::OnPad(const PadMessage &pad) {
 void ControlComponent::OnMonitor(
     const common::monitor::MonitorMessage &monitor_message) {
   for (const auto &item : monitor_message.item()) {
-    if (item.log_level() == ::apollo::common::monitor::MonitorMessageItem::FATAL) {
+    if (item.log_level() == common::monitor::MonitorMessageItem::FATAL) {
       estop_ = true;
       return;
     }
