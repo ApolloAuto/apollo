@@ -24,6 +24,9 @@
 #include <functional>
 #include <utility>
 
+#include "cybertron/cybertron.h"
+#include "cybertron/scheduler/task.h"
+
 #include "modules/planning/proto/sl_boundary.pb.h"
 
 #include "modules/common/configs/vehicle_config_helper.h"
@@ -46,7 +49,6 @@ using apollo::common::VehicleConfigHelper;
 using apollo::common::VehicleSignal;
 using apollo::common::math::Box2d;
 using apollo::common::math::Vec2d;
-using apollo::common::util::ThreadPool;
 
 ReferenceLineInfo::ReferenceLineInfo(const common::VehicleState& vehicle_state,
                                      const TrajectoryPoint& adc_planning_point,
@@ -237,8 +239,9 @@ void ReferenceLineInfo::SetTrajectory(const DiscretizedTrajectory& trajectory) {
   discretized_trajectory_ = trajectory;
 }
 
-bool ReferenceLineInfo::AddObstacleHelper(const Obstacle* obstacle) {
-  return AddObstacle(obstacle) != nullptr;
+bool ReferenceLineInfo::AddObstacleHelper(
+    const std::shared_ptr<Obstacle>& obstacle) {
+  return AddObstacle(obstacle.get()) != nullptr;
 }
 
 // AddObstacle is thread safe
@@ -287,21 +290,17 @@ PathObstacle* ReferenceLineInfo::AddObstacle(const Obstacle* obstacle) {
 bool ReferenceLineInfo::AddObstacles(
     const std::vector<const Obstacle*>& obstacles) {
   if (FLAGS_use_multi_thread_to_add_obstacles) {
-    std::vector<std::future<bool>> futures;
+    auto task = apollo::cybertron::CreateTask<Obstacle>(
+        "planning_add_obstacles",
+        [this](const std::shared_ptr<Obstacle>& msg) {
+          this->AddObstacleHelper(msg);
+        },
+        FLAGS_max_planning_thread_pool_size);
+
     for (const auto* obstacle : obstacles) {
-      futures.push_back(ThreadPool::pool()->push(
-          std::bind(&ReferenceLineInfo::AddObstacleHelper, this, obstacle)));
+      task->Execute(std::make_shared<Obstacle>(*obstacle));
     }
-
-    for (const auto& f : futures) {
-      f.wait();
-    }
-
-    for (auto& f : futures) {
-      if (!f.get()) {
-        return false;
-      }
-    }
+    task->Wait();
   } else {
     for (const auto* obstacle : obstacles) {
       if (!AddObstacle(obstacle)) {

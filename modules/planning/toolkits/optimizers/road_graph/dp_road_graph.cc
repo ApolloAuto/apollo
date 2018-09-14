@@ -23,6 +23,9 @@
 #include <algorithm>
 #include <utility>
 
+#include "cybertron/cybertron.h"
+#include "cybertron/scheduler/task.h"
+
 #include "modules/common/proto/error_code.pb.h"
 #include "modules/planning/proto/planning_internal.pb.h"
 #include "modules/planning/proto/planning_status.pb.h"
@@ -46,7 +49,6 @@ using apollo::common::SLPoint;
 using apollo::common::Status;
 using apollo::common::math::CartesianFrenetConverter;
 using apollo::common::util::MakeSLPoint;
-using apollo::common::util::ThreadPool;
 
 DpRoadGraph::DpRoadGraph(const DpPolyPathConfig &config,
                          const ReferenceLineInfo &reference_line_info,
@@ -148,33 +150,40 @@ bool DpRoadGraph::GenerateMinCostPath(
   auto &front = graph_nodes.front().front();
   size_t total_level = path_waypoints.size();
 
+  auto task = apollo::cybertron::CreateTask<RoadGraphMessage>(
+      "planning_graph_node_process",
+      [this](const std::shared_ptr<RoadGraphMessage> &msg) {
+        this->UpdateNode(msg);
+      },
+      FLAGS_max_planning_thread_pool_size);
+
   for (std::size_t level = 1; level < path_waypoints.size(); ++level) {
     const auto &prev_dp_nodes = graph_nodes.back();
     const auto &level_points = path_waypoints[level];
 
     graph_nodes.emplace_back();
 
-    std::vector<std::future<void>> futures;
-
     for (size_t i = 0; i < level_points.size(); ++i) {
       const auto &cur_point = level_points[i];
 
       graph_nodes.back().emplace_back(cur_point, nullptr);
       auto &cur_node = graph_nodes.back().back();
-      if (FLAGS_enable_multi_thread_in_dp_poly_path) {
-        futures.push_back(ThreadPool::pool()->push(std::bind(
-            &DpRoadGraph::UpdateNode, this, std::ref(prev_dp_nodes), level,
-            total_level, &trajectory_cost, &(front), &(cur_node))));
 
+      auto msg = std::make_shared<RoadGraphMessage>();
+      msg->prev_nodes = prev_dp_nodes;
+      msg->level = level;
+      msg->total_level = total_level;
+      msg->trajectory_cost = &trajectory_cost;
+      msg->front = &front;
+      msg->cur_node = &cur_node;
+
+      if (FLAGS_enable_multi_thread_in_dp_poly_path) {
+        task->Execute(msg);
       } else {
-        UpdateNode(prev_dp_nodes, level, total_level, &trajectory_cost, &front,
-                   &cur_node);
+        UpdateNode(msg);
       }
     }
-
-    for (const auto &f : futures) {
-      f.wait();
-    }
+    task->Wait();
   }
 
   // find best path
@@ -205,20 +214,17 @@ bool DpRoadGraph::GenerateMinCostPath(
   return true;
 }
 
-void DpRoadGraph::UpdateNode(const std::list<DpRoadGraphNode> &prev_nodes,
-                             const uint32_t level, const uint32_t total_level,
-                             TrajectoryCost *trajectory_cost,
-                             DpRoadGraphNode *front,
-                             DpRoadGraphNode *cur_node) {
-  DCHECK_NOTNULL(trajectory_cost);
-  DCHECK_NOTNULL(front);
-  DCHECK_NOTNULL(cur_node);
-  for (const auto &prev_dp_node : prev_nodes) {
+void DpRoadGraph::UpdateNode(const std::shared_ptr<RoadGraphMessage> &msg) {
+  DCHECK_NOTNULL(msg);
+  DCHECK_NOTNULL(msg->trajectory_cost);
+  DCHECK_NOTNULL(msg->front);
+  DCHECK_NOTNULL(msg->cur_node);
+  for (const auto &prev_dp_node : msg->prev_nodes) {
     const auto &prev_sl_point = prev_dp_node.sl_point;
-    const auto &cur_point = cur_node->sl_point;
+    const auto &cur_point = msg->cur_node->sl_point;
     float init_dl = 0.0;
     float init_ddl = 0.0;
-    if (level == 1) {
+    if (msg->level == 1) {
       init_dl = init_frenet_frame_point_.dl();
       init_ddl = init_frenet_frame_point_.ddl();
     }
@@ -230,26 +236,27 @@ void DpRoadGraph::UpdateNode(const std::list<DpRoadGraphNode> &prev_nodes,
       continue;
     }
     const auto cost =
-        trajectory_cost->Calculate(curve, prev_sl_point.s(), cur_point.s(),
-                                   level, total_level) +
+        msg->trajectory_cost->Calculate(curve, prev_sl_point.s(), cur_point.s(),
+                                        msg->level, msg->total_level) +
         prev_dp_node.min_cost;
 
-    cur_node->UpdateCost(&prev_dp_node, curve, cost);
+    msg->cur_node->UpdateCost(&prev_dp_node, curve, cost);
   }
 
   // try to connect the current point with the first point directly
-  if (level >= 2) {
+  if (msg->level >= 2) {
     const float init_dl = init_frenet_frame_point_.dl();
     const float init_ddl = init_frenet_frame_point_.ddl();
-    QuinticPolynomialCurve1d curve(init_sl_point_.l(), init_dl, init_ddl,
-                                   cur_node->sl_point.l(), 0.0, 0.0,
-                                   cur_node->sl_point.s() - init_sl_point_.s());
+    QuinticPolynomialCurve1d curve(
+        init_sl_point_.l(), init_dl, init_ddl, msg->cur_node->sl_point.l(), 0.0,
+        0.0, msg->cur_node->sl_point.s() - init_sl_point_.s());
     if (!IsValidCurve(curve)) {
       return;
     }
-    const auto cost = trajectory_cost->Calculate(
-        curve, init_sl_point_.s(), cur_node->sl_point.s(), level, total_level);
-    cur_node->UpdateCost(front, curve, cost);
+    const auto cost = msg->trajectory_cost->Calculate(
+        curve, init_sl_point_.s(), msg->cur_node->sl_point.s(), msg->level,
+        msg->total_level);
+    msg->cur_node->UpdateCost(msg->front, curve, cost);
   }
 }
 

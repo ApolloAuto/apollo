@@ -26,6 +26,8 @@
 #include <limits>
 #include <utility>
 
+#include "cybertron/cybertron.h"
+
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/time/time.h"
 #include "modules/common/util/file.h"
@@ -53,11 +55,7 @@ using apollo::hdmap::MapPathPoint;
 using apollo::hdmap::PncMap;
 using apollo::hdmap::RouteSegments;
 
-ReferenceLineProvider::~ReferenceLineProvider() {
-  if (thread_ && thread_->joinable()) {
-    thread_->join();
-  }
-}
+ReferenceLineProvider::~ReferenceLineProvider() {}
 
 ReferenceLineProvider::ReferenceLineProvider(const hdmap::HDMap *base_map) {
   if (!FLAGS_use_navigation_mode) {
@@ -108,20 +106,15 @@ bool ReferenceLineProvider::Start() {
     AERROR << "ReferenceLineProvider has NOT been initiated.";
     return false;
   }
+
   if (FLAGS_enable_reference_line_provider_thread) {
-    thread_.reset(
-        new std::thread(&ReferenceLineProvider::GenerateThread, this));
+    auto task = apollo::cybertron::CreateTask(
+        "async_reference_line_provider", [this]() { this->GenerateThread(); });
   }
   return true;
 }
 
-void ReferenceLineProvider::Stop() {
-  is_stop_ = true;
-  if (FLAGS_enable_reference_line_provider_thread && thread_ &&
-      thread_->joinable()) {
-    thread_->join();
-  }
-}
+void ReferenceLineProvider::Stop() { is_stop_ = true; }
 
 void ReferenceLineProvider::UpdateReferenceLine(
     const std::list<ReferenceLine> &reference_lines,

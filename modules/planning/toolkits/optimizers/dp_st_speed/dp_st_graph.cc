@@ -176,8 +176,6 @@ Status DpStGraph::CalculateTotalCost() {
 
     int count = next_highest_row - next_lowest_row + 1;
     if (count > 0) {
-      std::vector<std::future<void>> futures;
-
       auto task = apollo::cybertron::CreateTask<StGraphMessage>(
           "dp_process",
           [this](const std::shared_ptr<StGraphMessage>& msg) {
