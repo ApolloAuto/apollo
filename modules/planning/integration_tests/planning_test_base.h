@@ -21,26 +21,22 @@
 
 #include "gtest/gtest.h"
 
-#include "modules/planning/proto/dp_poly_path_config.pb.h"
-#include "modules/planning/proto/dp_st_speed_config.pb.h"
-#include "modules/planning/proto/traffic_rule_config.pb.h"
-
-#include "modules/common/adapters/adapter_gflags.h"
-#include "modules/common/adapters/adapter_manager.h"
-#include "modules/common/configs/config_gflags.h"
-#include "modules/common/log.h"
+#include "modules/canbus/proto/chassis.pb.h"
 #include "modules/common/util/file.h"
+#include "modules/localization/proto/localization.pb.h"
+#include "modules/perception/proto/traffic_light_detection.pb.h"
+#include "modules/prediction/proto/prediction_obstacle.pb.h"
+#include "modules/planning/proto/traffic_rule_config.pb.h"
+#include "modules/routing/proto/routing.pb.h"
 
 #define private public
 #define protected public
-#include "modules/planning/navi_planning.h"
+// TODO(all) #include "modules/planning/navi_planning.h"
 #include "modules/planning/planning_base.h"
 #include "modules/planning/std_planning.h"
 
 namespace apollo {
 namespace planning {
-
-using common::adapter::AdapterManager;
 
 #define RUN_GOLDEN_TEST(sub_case_num)                                      \
   {                                                                        \
@@ -83,9 +79,7 @@ DECLARE_string(test_previous_planning_file);
 class PlanningTestBase : public ::testing::Test {
  public:
   static void SetUpTestCase();
-
   virtual void SetUp();
-
   void UpdateData();
 
   /**
@@ -101,12 +95,19 @@ class PlanningTestBase : public ::testing::Test {
 
  protected:
   void TrimPlanning(ADCTrajectory* origin, bool no_trajectory_point);
-  bool SetUpAdapters();
+  bool FeedTestData();
   bool IsValidTrajectory(const ADCTrajectory& trajectory);
 
   std::unique_ptr<PlanningBase> planning_ = nullptr;
   std::map<TrafficRuleConfig::RuleId, bool> rule_enabled_;
   ADCTrajectory adc_trajectory_;
+
+ protected:
+  apollo::canbus::Chassis chassis_;
+  apollo::localization::LocalizationEstimate localization_;
+  apollo::prediction::PredictionObstacles prediction_;
+  apollo::routing::RoutingResponse routing_response_;
+  apollo::perception::TrafficLightDetection traffic_light_detection_;
 };
 
 }  // namespace planning
