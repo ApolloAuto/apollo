@@ -35,7 +35,7 @@ namespace planning {
 class DpStGraphTest : public ::testing::Test {
  public:
   virtual void SetUp() {
-    FLAGS_enable_multi_thread_in_dp_st_graph = true;
+    FLAGS_enable_multi_thread_in_dp_st_graph = false;
     FLAGS_lane_follow_scenario_config_file =
         "modules/planning/conf/lane_follow_scenario_config.pb.txt";
     ScenarioConfig config;
