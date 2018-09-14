@@ -15,10 +15,10 @@
  *****************************************************************************/
 
 #include "modules/common/util/message_util.h"
-#include "modules/common/util/testdata/simple.pb.h"
 
 #include <vector>
 
+#include "modules/common/util/testdata/simple.pb.h"
 #include "gtest/gtest.h"
 
 namespace apollo {

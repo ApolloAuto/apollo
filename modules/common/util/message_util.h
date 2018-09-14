@@ -22,6 +22,7 @@
 #ifndef MODULES_COMMON_UTIL_MESSAGE_UTIL_H_
 #define MODULES_COMMON_UTIL_MESSAGE_UTIL_H_
 
+#include <memory>
 #include <string>
 
 #include "google/protobuf/message.h"
