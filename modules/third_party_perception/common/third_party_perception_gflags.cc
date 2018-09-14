@@ -16,7 +16,8 @@
 
 #include "modules/third_party_perception/common/third_party_perception_gflags.h"
 
-DEFINE_string(third_party_perception_node_name, "third_party_perception", "Node name");
+DEFINE_string(third_party_perception_node_name, "third_party_perception",
+              "Node name");
 
 DEFINE_string(adapter_config_filename, "", "Path for adapter configuration");
 

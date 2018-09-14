@@ -109,7 +109,7 @@ std::unique_ptr<HDMap> HDMapUtil::sim_map_ = nullptr;
 std::mutex HDMapUtil::sim_map_mutex_;
 
 const HDMap* HDMapUtil::BaseMapPtr() {
-  //TODO Those logics should be removed to planning
+  // TODO(all) Those logics should be removed to planning
   /*if (FLAGS_use_navigation_mode) {
     std::lock_guard<std::mutex> lock(base_map_mutex_);
     auto* relative_map = AdapterManager::GetRelativeMap();

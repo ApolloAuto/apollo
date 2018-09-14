@@ -45,16 +45,11 @@ std::string ThirdPartyPerception::Name() const {
   return FLAGS_third_party_perception_node_name;
 }
 
-Status ThirdPartyPerception::Init() {
-  return Status::OK();
-}
+Status ThirdPartyPerception::Init() { return Status::OK(); }
 
-Status ThirdPartyPerception::Start() {
-  return Status::OK();
-}
+Status ThirdPartyPerception::Start() { return Status::OK(); }
 
-void ThirdPartyPerception::Stop() {
-}
+void ThirdPartyPerception::Stop() {}
 
 void ThirdPartyPerception::OnMobileye(const Mobileye& message) {
   ADEBUG << "Received mobileye data: run mobileye callback.";
@@ -111,7 +106,8 @@ bool ThirdPartyPerception::Process(PerceptionObstacles* const response) {
 
   std::lock_guard<std::mutex> lock(third_party_perception_mutex_);
 
-  *response = fusion::MobileyeRadarFusion(mobileye_obstacles_, radar_obstacles_);
+  *response =
+      fusion::MobileyeRadarFusion(mobileye_obstacles_, radar_obstacles_);
 
   common::util::FillHeader(FLAGS_third_party_perception_node_name, response);
 
