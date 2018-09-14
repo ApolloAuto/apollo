@@ -17,6 +17,10 @@
 #pragma once
 
 #include <mutex>
+#include <memory>
+#include <string>
+#include <list>
+#include <vector>
 
 #include "cybertron/class_loader/class_loader.h"
 #include "cybertron/component/component.h"
@@ -25,7 +29,7 @@
 #include "cybertron/tf2_cybertron/buffer.h"
 #include "cybertron/tf2_cybertron/transform_broadcaster.h"
 
-#include "modules/common/monitor_log/monitor_log_buffer.h"
+// #include "modules/common/monitor_log/monitor_log_buffer.h"
 #include "modules/localization/proto/gps.pb.h"
 #include "modules/localization/proto/imu.pb.h"
 #include "modules/localization/proto/localization.pb.h"
@@ -76,7 +80,7 @@ class RTKLocalizationComponent final
       localization_talker_ = nullptr;
 
   std::string module_name_ = "localization";
-  long long localization_seq_num_ = 0;
+  int64_t localization_seq_num_ = 0;
 
   std::string localization_topic_ = "";
   std::string gps_topic_ = "";
@@ -106,7 +110,7 @@ class RTKLocalizationComponent final
 
   std::vector<double> map_offset_;
 
-  apollo::common::monitor::MonitorLogger monitor_logger_;
+//   apollo::common::monitor::MonitorLogger monitor_logger_;
 };
 
 CYBERTRON_REGISTER_COMPONENT(RTKLocalizationComponent);

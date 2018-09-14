@@ -1,4 +1,22 @@
+/******************************************************************************
+ * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
+
 #include "modules/localization/rtk/rtk_localization_component.h"
+
+#include <limits>
 
 #include "modules/common/math/quaternion.h"
 #include "modules/common/time/time.h"
@@ -8,13 +26,13 @@
 namespace apollo {
 namespace localization {
 
-using apollo::common::monitor::MonitorMessageItem;
+// using apollo::common::monitor::MonitorMessageItem;
 using apollo::common::time::Clock;
 using ::Eigen::Vector3d;
 
 RTKLocalizationComponent::RTKLocalizationComponent()
-    : map_offset_{0.0, 0.0,
-                  0.0} monitor_logger_(MonitorMessageItem::LOCALIZATION) {}
+    : map_offset_{0.0, 0.0, 0.0} {}
+// monitor_logger_(MonitorMessageItem::LOCALIZATION) {}
 
 bool RTKLocalizationComponent::Init() {
   if (InitConfig() != true) {
@@ -69,24 +87,24 @@ bool RTKLocalizationComponent::InitIO() {
 bool RTKLocalizationComponent::Proc(
     const std::shared_ptr<localization::Gps>& gps_msg) {
   // check imu list
-  double time_delay =
-      common::time::ToSecond(Clock::Now()) - last_received_timestamp_sec_;
-  common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
-  if (enable_gps_timestamp_ && time_delay > gps_time_delay_tolerance_) {
-    buffer.ERROR() << "GPS message time delay: " << time_delay;
-    buffer.PrintLog();
-  }
+  // double time_delay =
+  //     common::time::ToSecond(Clock::Now()) - last_received_timestamp_sec_;
+  // common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
+  // if (enable_gps_timestamp_ && time_delay > gps_time_delay_tolerance_) {
+  //   buffer.ERROR() << "GPS message time delay: " << time_delay;
+  //   buffer.PrintLog();
+  // }
 
-  {
-    std::unique_lock<std::mutex> lock(imu_list_mutex_);
+  // {
+  //   std::unique_lock<std::mutex> lock(imu_list_mutex_);
 
-    if (imu_list_.empty()) {
-      AERROR << "IMU message buffer is empty.";
-      if (service_started_) {
-        buffer.ERROR("IMU message buffer is empty.");
-      }
-    }
-  }
+  //   if (imu_list_.empty()) {
+  //     AERROR << "IMU message buffer is empty.";
+  //     if (service_started_) {
+  //       buffer.ERROR("IMU message buffer is empty.");
+  //     }
+  //   }
+  // }
 
   // publish localization messages
   PublishLocalization(*gps_msg);
@@ -128,31 +146,31 @@ void RTKLocalizationComponent::RunWatchDog(double gps_timestamp) {
     return;
   }
 
-  common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
+  // common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
 
-  // check GPS time stamp against ROS timer
-  double gps_delay_sec = common::time::ToSecond(Clock::Now()) - gps_timestamp;
-  int64_t gps_delay_cycle_cnt =
-      static_cast<int64_t>(gps_delay_sec * localization_publish_freq_);
+  // // check GPS time stamp against ROS timer
+  // double gps_delay_sec = common::time::ToSecond(Clock::Now()) -
+  // gps_timestamp; int64_t gps_delay_cycle_cnt =
+  //     static_cast<int64_t>(gps_delay_sec * localization_publish_freq_);
 
-  bool msg_lost = false;
-  if (enable_gps_timestamp_ &&
-      (gps_delay_cycle_cnt > report_threshold_err_num_)) {
-    msg_lost = true;
+  // bool msg_lost = false;
+  // if (enable_gps_timestamp_ &&
+  //     (gps_delay_cycle_cnt > report_threshold_err_num_)) {
+  //   msg_lost = true;
 
-    buffer.ERROR() << "Raw GPS Message Lost. GPS message is "
-                   << gps_delay_cycle_cnt << " cycle " << gps_delay_sec
-                   << " sec behind current time.";
-    buffer.PrintLog();
-  }
+  //   buffer.ERROR() << "Raw GPS Message Lost. GPS message is "
+  //                  << gps_delay_cycle_cnt << " cycle " << gps_delay_sec
+  //                  << " sec behind current time.";
+  //   buffer.PrintLog();
+  // }
 
-  // to prevent it from beeping continuously
-  if (msg_lost && (last_reported_timestamp_sec_ < 1. ||
-                   common::time::ToSecond(Clock::Now()) >
-                       last_reported_timestamp_sec_ + 1.)) {
-    AERROR << "gps/imu frame lost!";
-    last_reported_timestamp_sec_ = common::time::ToSecond(Clock::Now());
-  }
+  // // to prevent it from beeping continuously
+  // if (msg_lost && (last_reported_timestamp_sec_ < 1. ||
+  //                  common::time::ToSecond(Clock::Now()) >
+  //                      last_reported_timestamp_sec_ + 1.)) {
+  //   AERROR << "gps/imu frame lost!";
+  //   last_reported_timestamp_sec_ = common::time::ToSecond(Clock::Now());
+  // }
 
   return;
 }
