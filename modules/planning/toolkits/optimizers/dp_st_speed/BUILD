@@ -45,6 +45,7 @@ cc_library(
     deps = [
         ":dp_st_cost",
         ":st_graph_point",
+        "//framework:cybertron",
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/configs/proto:vehicle_config_proto",
         "//modules/common/proto:common_proto",

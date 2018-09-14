@@ -21,6 +21,7 @@
 #ifndef MODULES_PLANNING_TOOLKITS_OPTIMIZERS_DP_ST_SPEED_DP_ST_GRAPH_H_
 #define MODULES_PLANNING_TOOLKITS_OPTIMIZERS_DP_ST_SPEED_DP_ST_GRAPH_H_
 
+#include <memory>
 #include <vector>
 
 #include "modules/common/configs/proto/vehicle_config.pb.h"
@@ -56,7 +57,14 @@ class DpStGraph {
   apollo::common::Status RetrieveSpeedProfile(SpeedData* const speed_data);
 
   apollo::common::Status CalculateTotalCost();
-  void CalculateCostAt(const uint32_t r, const uint32_t c);
+
+  // defined for cybertron task
+  struct StGraphMessage {
+    StGraphMessage(const uint32_t c_, const int32_t r_) : c(c_), r(r_) {}
+    uint32_t c;
+    uint32_t r;
+  };
+  void CalculateCostAt(const std::shared_ptr<StGraphMessage>& msg);
 
   float CalculateEdgeCost(const STPoint& first, const STPoint& second,
                           const STPoint& third, const STPoint& forth,
