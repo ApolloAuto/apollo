@@ -44,7 +44,6 @@ proto_library(
     srcs = ["gps.proto"],
     deps = [
         ":pose_proto_lib",
-        "//modules/common/proto:common_proto_lib",
         "//modules/common/proto:header_proto_lib",
     ],
 )
@@ -129,6 +128,18 @@ proto_library(
     deps = [
         "//modules/drivers/gnss/proto:gnss_raw_observation_lib",
     ],
+)
+
+cc_proto_library(
+    name = "rtk_config_proto",
+    deps = [
+        ":rtk_config_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "rtk_config_proto_lib",
+    srcs = ["rtk_config.proto"],
 )
 
 cpplint()

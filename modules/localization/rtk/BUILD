@@ -3,42 +3,50 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "rtk_localization",
+    name = "rtk_localization_component_lib",
     srcs = [
-        "rtk_localization.cc",
+        "rtk_localization_component.cc",
     ],
     hdrs = [
-        "rtk_localization.h",
+        "rtk_localization_component.h",
     ],
     deps = [
-        "//modules/common",
-        "//modules/common/monitor_log",
-        "//modules/common/proto:common_proto",
-        "//modules/common/status",
+        # "//modules/common/monitor_log",
         "//modules/common/time",
-        "//modules/localization:localization_base",
-        "//modules/localization/common:localization_common",
-        "//modules/localization/proto:localization_config_proto",
+        "//modules/common/math",
+        "//modules/common/util:message_util",
+        "//modules/common/proto:common_proto",
         "//modules/localization/proto:localization_proto",
-        "@gtest",
-        "@ros//:ros_common",
+        "//modules/localization/proto:rtk_config_proto",
+        "//modules/localization/proto:gps_proto",
+        "//modules/localization/proto:imu_proto",
+        "//framework:cybertron",
+        "@eigen",
     ],
+    copts = ['-DMODULE_NAME=\\"localization\\"']
 )
 
-cc_test(
-    name = "rtk_localization_test",
-    size = "small",
-    srcs = [
-        "rtk_localization_test.cc",
-    ],
-    data = ["//modules/localization:localization_testdata"],
-    deps = [
-        "//modules/common:log",
-        "//modules/common/time",
-        "//modules/common/util",
-        "//modules/localization/rtk:rtk_localization",
-        "@gtest//:main",
-    ],
-)
+cc_binary(
+    name = "librtk_localization_component.so",
+    deps = [":rtk_localization_component_lib"],
+    linkopts = ["-shared"],
+    linkstatic = False,
+)   
+
+# cc_test(
+#     name = "rtk_localization_test",
+#     size = "small",
+#     srcs = [
+#         "rtk_localization_test.cc",
+#     ],
+#     data = ["//modules/localization:localization_testdata"],
+#     deps = [
+#         "//modules/common:log",
+#         "//modules/common/time",
+#         "//modules/common/util",
+#         "//modules/localization/rtk:rtk_localization",
+#         "@gtest//:main",
+#     ],
+# )
 
 cpplint()
