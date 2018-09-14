@@ -93,6 +93,9 @@ void PredictionComponent::ProcessOfflineData(const std::string& filename) {
 }
 
 bool PredictionComponent::Init() {
+  AINFO << "Loading gflag from file: " << ConfigFilePath();
+  google::SetCommandLineOption("flagfile", ConfigFilePath().c_str());
+
   component_start_time_ = Clock::NowInSeconds();
 
   // Load prediction conf
