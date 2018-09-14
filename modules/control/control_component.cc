@@ -259,6 +259,14 @@ bool ControlComponent::Proc() {
     control_command.mutable_header()->mutable_status()->set_msg(estop_reason_);
   }
 
+  // set header
+  control_command.mutable_header()->set_lidar_timestamp(
+      trajectory_.header().lidar_timestamp());
+  control_command.mutable_header()->set_camera_timestamp(
+      trajectory_.header().camera_timestamp());
+  control_command.mutable_header()->set_radar_timestamp(
+      trajectory_.header().radar_timestamp());
+
   SendCmd(control_command);
 
   return true;
@@ -341,15 +349,7 @@ Status ControlComponent::CheckTimestamp() {
   return Status::OK();
 }
 
-void ControlComponent::SendCmd(ControlCommand &control_command) {
-  // set header
-  control_command.mutable_header()->set_lidar_timestamp(
-      trajectory_.header().lidar_timestamp());
-  control_command.mutable_header()->set_camera_timestamp(
-      trajectory_.header().camera_timestamp());
-  control_command.mutable_header()->set_radar_timestamp(
-      trajectory_.header().radar_timestamp());
-
+void ControlComponent::SendCmd(const ControlCommand &control_command) {
   common::util::FillHeader(node_->Name(), &control_command);
 
   ADEBUG << control_command.ShortDebugString();

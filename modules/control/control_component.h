@@ -75,7 +75,7 @@ class ControlComponent : public apollo::cybertron::TimerComponent {
   common::Status CheckTimestamp();
   common::Status CheckPad();
 
-  void SendCmd(ControlCommand &control_command);
+  void SendCmd(const ControlCommand &control_command);
 
  private:
   double init_time_ = 0.0;
