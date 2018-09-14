@@ -27,8 +27,6 @@
 #include <vector>
 
 #include "cybertron/common/macros.h"
-
-#include "modules/common/adapters/adapter_manager.h"
 #include "cybertron/common/log.h"
 #include "modules/common/math/cartesian_frenet_conversion.h"
 #include "modules/common/math/path_matcher.h"
@@ -51,7 +49,6 @@ using apollo::common::ErrorCode;
 using apollo::common::PathPoint;
 using apollo::common::Status;
 using apollo::common::TrajectoryPoint;
-using apollo::common::adapter::AdapterManager;
 using apollo::common::math::PathMatcher;
 using apollo::common::math::CartesianFrenetConverter;
 using apollo::common::time::Clock;
@@ -305,9 +302,11 @@ Status LatticePlanner::PlanOnReferenceLine(
     reference_line_info->SetDrivable(true);
 
     // Auto Tuning
-    if (AdapterManager::GetLocalization() == nullptr) {
-      AERROR << "Auto tuning failed since no localization is available.";
-    } else if (FLAGS_enable_auto_tuning) {
+    // TODO(all) add localization check w/o adapter manager
+    // if (AdapterManager::GetLocalization() == nullptr) {
+    //  AERROR << "Auto tuning failed since no localization is available.";
+    // } else
+    if (FLAGS_enable_auto_tuning) {
       // 1. Get future trajectory from localization
       DiscretizedTrajectory future_trajectory = GetFutureTrajectory();
       // 2. Map future trajectory to lon-lat trajectory pair
@@ -432,13 +431,14 @@ Status LatticePlanner::PlanOnReferenceLine(
 
 DiscretizedTrajectory LatticePlanner::GetFutureTrajectory() const {
   // localization
-  const auto& localization =
-      AdapterManager::GetLocalization()->GetLatestObserved();
-  ADEBUG << "Get localization:" << localization.DebugString();
+  // TODO(all) added locaization data w/o adapermanager
+  // const auto& localization =
+  //    AdapterManager::GetLocalization()->GetLatestObserved();
+  // ADEBUG << "Get localization:" << localization.DebugString();
   std::vector<TrajectoryPoint> traj_pts;
-  for (const auto& traj_pt : localization.trajectory_point()) {
-    traj_pts.emplace_back(traj_pt);
-  }
+  // for (const auto& traj_pt : localization.trajectory_point()) {
+  //  traj_pts.emplace_back(traj_pt);
+  // }
   DiscretizedTrajectory ret(traj_pts);
   return ret;
 }
