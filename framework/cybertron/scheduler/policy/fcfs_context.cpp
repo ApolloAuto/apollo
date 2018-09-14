@@ -35,6 +35,7 @@ namespace scheduler {
 
 using apollo::cybertron::common::GlobalData;
 using apollo::cybertron::event::PerfEventCache;
+using apollo::cybertron::event::SchedPerf;
 using croutine::RoutineState;
 
 std::shared_ptr<CRoutine> FCFSContext::NextRoutine() {
@@ -85,7 +86,8 @@ std::shared_ptr<CRoutine> FCFSContext::NextRoutine() {
     routine->SetVFrequency(routine->ProcessedNum() / routine->Frequency());
     routine->SetState(RoutineState::RUNNING);
     PerfEventCache::Instance()->AddSchedEvent(
-        5, routine->Id(), routine->ProcessorId(), 0, start_perf_time, -1);
+        SchedPerf::NEXT_ROUTINE, routine->Id(), routine->ProcessorId(), 0,
+        start_perf_time, -1, -1);
   }
   return routine;
 }

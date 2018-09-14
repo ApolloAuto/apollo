@@ -39,6 +39,7 @@ void SchedPerfEvent::SetParams(int count, ...) {
   t_start = va_arg(ap, uint64_t);
   t_end = va_arg(ap, uint64_t);
   try_fetch_result = va_arg(ap, int);
+  croutine_state = va_arg(ap, int);
   va_end(ap);
 }
 

@@ -28,6 +28,7 @@ namespace cybertron {
 namespace scheduler {
 
 using apollo::cybertron::event::PerfEventCache;
+using apollo::cybertron::event::SchedPerf;
 
 bool ProcessorContext::Pop(uint64_t croutine_id,
                            std::future<std::shared_ptr<CRoutine>>& fut) {
@@ -67,8 +68,8 @@ void ProcessorContext::NotifyProcessor(uint64_t routine_id) {
     return;
   }
 
-  PerfEventCache::Instance()->AddSchedEvent(4, routine_id, proc_index_, 0, 0,
-                                            -1);
+  PerfEventCache::Instance()->AddSchedEvent(SchedPerf::NOTIFY_IN, routine_id,
+                                            proc_index_, 0, 0, -1, -1);
   if (!cr_map_[routine_id]->IsRunning()) {
     cr_map_[routine_id]->SetState(RoutineState::READY);
   }
