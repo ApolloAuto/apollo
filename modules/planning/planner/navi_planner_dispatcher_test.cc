@@ -41,7 +41,7 @@ TEST_F(NaviPlannerDispatcherTest, Simple) {
   pd_.reset(new NaviPlannerDispatcher());
   pd_->Init();
   auto planner = pd_->DispatchPlanner();
-  EXPECT_EQ(planner->Name(), "EM");
+  EXPECT_EQ(planner->Name(), "PUBLIC_ROAD");
 }
 
 }  // namespace planning
