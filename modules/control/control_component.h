@@ -22,6 +22,7 @@
 #include <mutex>
 #include <string>
 
+#include "cybertron/class_loader/class_loader.h"
 #include "cybertron/component/timer_component.h"
 
 #include "modules/canbus/proto/chassis.pb.h"

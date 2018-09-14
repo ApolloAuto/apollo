@@ -1,7 +1,8 @@
 chassis_channel: "/apollo/canbus/chassis"
-system_status_channel: "/apollo/monitor/system_status"
-localization_channel: "/apollo/localization/pose"
-pad_msg_channel: "/apollo/control/pad"
+control_command_channel: "/apollo/control"
+localization_channel: "/apollo/localization/LocalizationEstimate"
+planning_channel: "/apollo/planning/ADCTrajectory"
+pad_msg_channel: "/apollo/control/PadMessage"
 control_test_duration: -1
 enable_csv_debug: false
 enable_speed_station_preview: false
