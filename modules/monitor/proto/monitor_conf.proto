@@ -45,7 +45,7 @@ message MonitorConf {
   repeated HardwareConf hardware = 2;
 
   // End point for vehicle to report status.
-  optional string online_report_endpoint = 3;
+  optional string online_report_endpoint = 3 [deprecated = true];
 
   optional ResourceConf resource_conf = 4;
 }

@@ -17,10 +17,12 @@
 #ifndef MODULES_MONITOR_COMMON_MONITOR_MANAGER_H_
 #define MODULES_MONITOR_COMMON_MONITOR_MANAGER_H_
 
+#include <memory>
 #include <string>
 
-#include "modules/common/macro.h"
+#include "cybertron/common/macros.h"
 #include "modules/common/monitor_log/monitor_log_buffer.h"
+#include "modules/monitor/common/message_observer.h"
 #include "modules/monitor/proto/monitor_conf.pb.h"
 #include "modules/monitor/proto/system_status.pb.h"
 
@@ -33,6 +35,21 @@ namespace monitor {
 
 class MonitorManager {
  public:
+  static void Init(const std::shared_ptr<apollo::cybertron::Node>& node);
+
+  template <class T>
+  static std::unique_ptr<MessageObserver<T>> CreateObserver(
+      const std::string& channel) {
+    return std::unique_ptr<MessageObserver<T>>(
+        new MessageObserver<T>(channel, Instance()->node_.get()));
+  }
+
+  template <class T>
+  static std::shared_ptr<apollo::cybertron::Writer<T>> CreateWriter(
+      const std::string& channel) {
+    return Instance()->node_->CreateWriter<T>(channel);
+  }
+
   static const MonitorConf &GetConfig();
   static void InitFrame(const double current_time);
   static SystemStatus *GetStatus();
@@ -45,9 +62,10 @@ class MonitorManager {
  private:
   MonitorConf config_;
   SystemStatus status_;
-  apollo::common::monitor::MonitorLogger logger_;
   apollo::common::monitor::MonitorLogBuffer log_buffer_;
   bool in_autonomous_driving_ = false;
+
+  std::shared_ptr<apollo::cybertron::Node> node_ = nullptr;
 
   DECLARE_SINGLETON(MonitorManager);
 };

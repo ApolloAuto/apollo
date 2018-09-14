@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,36 +13,45 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_MONITOR_SOFTWARE_SUMMARY_MONITOR_H_
-#define MODULES_MONITOR_SOFTWARE_SUMMARY_MONITOR_H_
+
+#ifndef MODULES_MONITOR_COMMON_MESSAGE_OBSERVER_H_
+#define MODULES_MONITOR_COMMON_MESSAGE_OBSERVER_H_
 
 #include <memory>
+#include <mutex>
 #include <string>
 
-#include "modules/monitor/common/recurrent_runner.h"
-#include "modules/monitor/proto/monitor_conf.pb.h"
-#include "modules/monitor/software/safety_manager.h"
+#include "cybertron/cybertron.h"
+#include "modules/common/adapters/adapter_gflags.h"
 
+/**
+ * @namespace apollo::monitor
+ * @brief apollo::monitor
+ */
 namespace apollo {
 namespace monitor {
 
-// A monitor which summarize other monitors' result and publish the whole status
-// if it has changed.
-class SummaryMonitor : public RecurrentRunner {
+template <class T>
+class MessageObserver {
  public:
-  SummaryMonitor();
-  void RunOnce(const double current_time) override;
+  MessageObserver(const std::string& channel, apollo::cybertron::Node* node) {
+    node->CreateReader<T>(channel, [this](const std::shared_ptr<T>& msg) {
+      std::lock_guard<std::mutex> lock(mutex_);
+      msg_ = msg;
+    });
+  }
+
+  const std::shared_ptr<T> GetLatest() {
+    std::lock_guard<std::mutex> lock(mutex_);
+    return msg_;
+  }
 
  private:
-  static void SummarizeModules();
-  static void SummarizeHardware();
-
-  size_t system_status_fp_ = 0;
-  double last_broadcast_ = 0;
-  std::unique_ptr<SafetyManager> safety_manager_;
+  std::shared_ptr<T> msg_ = nullptr;
+  std::mutex mutex_;
 };
 
 }  // namespace monitor
 }  // namespace apollo
 
-#endif  // MODULES_MONITOR_SOFTWARE_SUMMARY_MONITOR_H_
+#endif  // MODULES_MONITOR_COMMON_MESSAGE_OBSERVER_H_

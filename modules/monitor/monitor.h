@@ -19,6 +19,7 @@
 
 #include <memory>
 #include <string>
+#include <vector>
 
 #include "cybertron/component/timer_component.h"
 #include "cybertron/cybertron.h"

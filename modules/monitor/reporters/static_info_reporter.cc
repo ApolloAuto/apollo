@@ -16,10 +16,10 @@
 
 #include "modules/monitor/reporters/static_info_reporter.h"
 
-#include "gflags/gflags.h"
-#include "modules/common/adapters/adapter_manager.h"
 #include "cybertron/common/log.h"
+#include "gflags/gflags.h"
 #include "modules/data/util/info_collector.h"
+#include "modules/monitor/common/monitor_manager.h"
 
 DEFINE_string(static_info_reporter_name, "StaticInfoReporter",
               "Static info reporter name.");
@@ -36,9 +36,10 @@ StaticInfoReporter::StaticInfoReporter()
 }
 
 void StaticInfoReporter::RunOnce(const double current_time) {
+  static auto writer = MonitorManager::CreateWriter<apollo::data::StaticInfo>(
+      FLAGS_static_info_topic);
   AINFO << "Reported static info.";
-  apollo::common::adapter::AdapterManager::PublishStaticInfo(
-      apollo::data::InfoCollector::GetStaticInfo());
+  writer->Write(apollo::data::InfoCollector::GetStaticInfo());
 }
 
 }  // namespace monitor

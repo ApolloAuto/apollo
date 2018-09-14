@@ -16,7 +16,6 @@
 
 #include "modules/monitor/software/summary_monitor.h"
 
-#include "modules/common/adapters/adapter_manager.h"
 #include "cybertron/common/log.h"
 #include "modules/common/util/string_util.h"
 #include "modules/monitor/common/monitor_manager.h"
@@ -35,9 +34,6 @@ namespace apollo {
 namespace monitor {
 namespace {
 
-using apollo::common::adapter::AdapterBase;
-using apollo::common::adapter::AdapterConfig;
-using apollo::common::adapter::AdapterManager;
 using apollo::common::util::StrCat;
 using apollo::common::util::StringPrintf;
 
@@ -75,8 +71,6 @@ void SummarizeOnTopicStatus(const TopicStatus &topic_status, Status *status) {
 // Set interval to 0, so it runs every time when ticking.
 SummaryMonitor::SummaryMonitor()
     : RecurrentRunner(FLAGS_summary_monitor_name, 0) {
-  CHECK(AdapterManager::GetSystemStatus())
-      << "SystemStatusAdapter is not initialized.";
   if (FLAGS_enable_safety_mode) {
     safety_manager_.reset(new SafetyManager());
   }
@@ -100,15 +94,17 @@ void SummaryMonitor::RunOnce(const double current_time) {
 
   if (system_status_fp_ != new_fp ||
       current_time - last_broadcast_ > FLAGS_broadcast_max_interval) {
-    AdapterManager::FillSystemStatusHeader("SystemMonitor", system_status);
-    AdapterManager::PublishSystemStatus(*system_status);
+    static auto writer = MonitorManager::CreateWriter<SystemStatus>(
+        FLAGS_system_status_topic);
+
+    apollo::common::util::FillHeader("SystemMonitor", system_status);
+    writer->Write(*system_status);
     ADEBUG << "Published system status: " << system_status->DebugString();
     system_status_fp_ = new_fp;
     last_broadcast_ = current_time;
   }
 
   // Print and publish all monitor logs.
-  MonitorManager::LogBuffer().PrintLog();
   MonitorManager::LogBuffer().Publish();
 }
 
@@ -126,7 +122,8 @@ void SummaryMonitor::SummarizeModules() {
     }
 
     if (status->has_topic_status()) {
-      SummarizeOnTopicStatus(status->topic_status(), status);
+      // TODO(xiaoxq): Enable TopicMonitor after migration.
+      // SummarizeOnTopicStatus(status->topic_status(), status);
     }
   }
 }

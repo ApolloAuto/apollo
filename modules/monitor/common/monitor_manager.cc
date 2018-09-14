@@ -18,7 +18,6 @@
 
 #include "gflags/gflags.h"
 #include "modules/canbus/proto/chassis.pb.h"
-#include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/util/file.h"
 #include "modules/common/util/map_util.h"
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
@@ -30,14 +29,17 @@ namespace apollo {
 namespace monitor {
 
 using apollo::canbus::Chassis;
-using apollo::common::adapter::AdapterManager;
 using apollo::common::util::LookupOrInsert;
 
 MonitorManager::MonitorManager() :
-  logger_(apollo::common::monitor::MonitorMessageItem::MONITOR),
-  log_buffer_(&logger_) {
+  log_buffer_(apollo::common::monitor::MonitorMessageItem::MONITOR) {
   CHECK(apollo::common::util::GetProtoFromASCIIFile(FLAGS_monitor_conf_path,
                                                     &config_));
+}
+
+void MonitorManager::Init(
+    const std::shared_ptr<apollo::cybertron::Node>& node) {
+  Instance()->node_ = node;
 }
 
 apollo::common::monitor::MonitorLogBuffer &MonitorManager::LogBuffer() {
@@ -59,18 +61,15 @@ void MonitorManager::InitFrame(const double current_time) {
     hardware.second.clear_msg();
   }
 
-  // Get current DrivingMode, which will affect how we monitor modules.
-  Instance()->in_autonomous_driving_ = false;
-  auto* adapter = CHECK_NOTNULL(AdapterManager::GetChassis());
-  adapter->Observe();
-  if (!adapter->Empty()) {
-    const auto& chassis = adapter->GetLatestObserved();
-    // Ignore old messages which is likely from replaying.
-    Instance()->in_autonomous_driving_ =
-        chassis.driving_mode() == Chassis::COMPLETE_AUTO_DRIVE &&
-        chassis.header().timestamp_sec() + FLAGS_system_status_lifetime_seconds
-            >= current_time;
-  }
+  // Get current DrivingMode, which will affect how we monitor modules, but
+  // ignore old messages which are likely from replaying.
+  static auto chassis_observer = CreateObserver<Chassis>(FLAGS_chassis_topic);
+  const auto chassis = chassis_observer->GetLatest();
+  Instance()->in_autonomous_driving_ =
+      chassis != nullptr &&
+      chassis->driving_mode() == Chassis::COMPLETE_AUTO_DRIVE &&
+      chassis->header().timestamp_sec() + FLAGS_system_status_lifetime_seconds
+          >= current_time;
 }
 
 SystemStatus *MonitorManager::GetStatus() {

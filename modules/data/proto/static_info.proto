@@ -42,7 +42,8 @@ message SoftwareInfo {
   optional string mode = 3;
   // Entries of software config file path and its content.
   map<string, string> configs = 4;
-  optional apollo.routing.RoutingRequest latest_routing_request = 5;
+  optional apollo.routing.RoutingRequest latest_routing_request = 5
+      [deprecated = true];
 }
 
 message UserInfo {
