@@ -26,15 +26,17 @@
 #include <queue>
 #include <string>
 
+#include "cybertron/common/macros.h"
+
 #include "modules/canbus/proto/chassis.pb.h"
-#include "modules/common/macro.h"
-#include "modules/common/status/status.h"
 #include "modules/drivers/proto/conti_radar.pb.h"
 #include "modules/drivers/proto/delphi_esr.pb.h"
 #include "modules/drivers/proto/mobileye.pb.h"
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/third_party_perception/proto/radar_obstacle.pb.h"
+
+#include "modules/common/status/status.h"
 
 /**
  * @namespace apollo::third_party_perception
@@ -63,6 +65,7 @@ class ThirdPartyPerception {
   void OnChassis(const apollo::canbus::Chassis& message);
   // publish perception obstacles when timer is triggered
   bool Process(::apollo::perception::PerceptionObstacles* const response);
+
  private:
   std::mutex third_party_perception_mutex_;
   apollo::perception::PerceptionObstacles mobileye_obstacles_;
