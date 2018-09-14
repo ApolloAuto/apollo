@@ -27,8 +27,8 @@
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/control/proto/control_cmd.pb.h"
 
-#include "modules/common/adapters/adapter_gflags.h"
 #include "cybertron/common/log.h"
+#include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/time/time.h"
 #include "modules/common/util/message_util.h"
 
@@ -415,13 +415,11 @@ class Teleop {
 }  // namespace
 
 int main(int32_t argc, char **argv) {
-  google::InitGoogleLogging(argv[0]);
+  apollo::cybertron::Init(argv[0]);
   FLAGS_alsologtostderr = true;
   FLAGS_v = 3;
 
   google::ParseCommandLineFlags(&argc, &argv, true);
-
-  apollo::cybertron::Init(argv[0]);
 
   Teleop teleop;
 

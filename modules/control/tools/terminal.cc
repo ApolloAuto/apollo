@@ -148,11 +148,10 @@ class Terminal {
 }  // namespace
 
 int main(int argc, char **argv) {
-  google::InitGoogleLogging(argv[0]);
+  apollo::cybertron::Init("running_terminal");
   FLAGS_alsologtostderr = true;
   FLAGS_v = 3;
   google::ParseCommandLineFlags(&argc, &argv, true);
-  apollo::cybertron::Init("running_terminal");
   Terminal terminal;
   terminal.init();
   terminal.help();
