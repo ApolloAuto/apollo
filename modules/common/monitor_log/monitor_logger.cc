@@ -24,7 +24,7 @@ namespace monitor {
 MonitorLogger::MonitorLogger() {
   auto node_name =
       "monitor_logger" + std::to_string(cybertron::Time::Now().ToNanosecond());
-  node_ = cybertron::CreateNode("node_name");
+  node_ = cybertron::CreateNode(node_name);
   if (node_ != nullptr) {
     monitor_msg_writer_ =
         node_->CreateWriter<MonitorMessage>("/apollo/monitor");
