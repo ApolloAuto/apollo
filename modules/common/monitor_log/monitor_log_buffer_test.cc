@@ -29,67 +29,64 @@ namespace monitor {
 
 class MonitorBufferTest : public ::testing::Test {
  protected:
-  void SetUp() override {
-    cybertron::Init();
-    buffer_ = new MonitorLogBuffer(MonitorMessageItem::CONTROL);
-  }
-  void TearDown() override { delete buffer_; }
-  MonitorLogBuffer *buffer_ = nullptr;
+  void SetUp() override { cybertron::Init(); }
+  void TearDown() override {}
+  MonitorLogBuffer buffer_{MonitorMessageItem::CONTROL};
 };
 
 TEST_F(MonitorBufferTest, RegisterMacro) {
   {
-    buffer_->INFO("Info");
-    EXPECT_EQ(MonitorMessageItem::INFO, buffer_->level_);
-    ASSERT_EQ(1, buffer_->monitor_msg_items_.size());
-    const auto &item = buffer_->monitor_msg_items_.back();
+    buffer_.INFO("Info");
+    EXPECT_EQ(MonitorMessageItem::INFO, buffer_.level_);
+    ASSERT_EQ(1, buffer_.monitor_msg_items_.size());
+    const auto &item = buffer_.monitor_msg_items_.back();
     EXPECT_EQ(MonitorMessageItem::INFO, item.first);
     EXPECT_EQ("Info", item.second);
   }
 
   {
-    buffer_->ERROR("Error");
-    EXPECT_EQ(MonitorMessageItem::ERROR, buffer_->level_);
-    ASSERT_EQ(2, buffer_->monitor_msg_items_.size());
-    const auto &item = buffer_->monitor_msg_items_.back();
+    buffer_.ERROR("Error");
+    EXPECT_EQ(MonitorMessageItem::ERROR, buffer_.level_);
+    ASSERT_EQ(2, buffer_.monitor_msg_items_.size());
+    const auto &item = buffer_.monitor_msg_items_.back();
     EXPECT_EQ(MonitorMessageItem::ERROR, item.first);
     EXPECT_EQ("Error", item.second);
   }
 }
 
 TEST_F(MonitorBufferTest, AddMonitorMsgItem) {
-  buffer_->AddMonitorMsgItem(MonitorMessageItem::ERROR, "TestError");
-  EXPECT_EQ(MonitorMessageItem::ERROR, buffer_->level_);
-  ASSERT_EQ(1, buffer_->monitor_msg_items_.size());
-  const auto &item = buffer_->monitor_msg_items_.back();
+  buffer_.AddMonitorMsgItem(MonitorMessageItem::ERROR, "TestError");
+  EXPECT_EQ(MonitorMessageItem::ERROR, buffer_.level_);
+  ASSERT_EQ(1, buffer_.monitor_msg_items_.size());
+  const auto &item = buffer_.monitor_msg_items_.back();
   EXPECT_EQ(MonitorMessageItem::ERROR, item.first);
   EXPECT_EQ("TestError", item.second);
 }
 
 TEST_F(MonitorBufferTest, Operator) {
-  buffer_->ERROR() << "Hi";
-  EXPECT_EQ(MonitorMessageItem::ERROR, buffer_->level_);
-  ASSERT_EQ(1, buffer_->monitor_msg_items_.size());
-  auto &item = buffer_->monitor_msg_items_.back();
+  buffer_.ERROR() << "Hi";
+  EXPECT_EQ(MonitorMessageItem::ERROR, buffer_.level_);
+  ASSERT_EQ(1, buffer_.monitor_msg_items_.size());
+  auto &item = buffer_.monitor_msg_items_.back();
   EXPECT_EQ(MonitorMessageItem::ERROR, item.first);
   EXPECT_EQ("Hi", item.second);
-  (*buffer_) << " How"
-             << " are"
-             << " you";
-  EXPECT_EQ(MonitorMessageItem::ERROR, buffer_->level_);
-  ASSERT_EQ(1, buffer_->monitor_msg_items_.size());
+  buffer_ << " How"
+          << " are"
+          << " you";
+  EXPECT_EQ(MonitorMessageItem::ERROR, buffer_.level_);
+  ASSERT_EQ(1, buffer_.monitor_msg_items_.size());
   EXPECT_EQ(MonitorMessageItem::ERROR, item.first);
   EXPECT_EQ("Hi How are you", item.second);
 
-  buffer_->INFO() << 3 << "pieces";
-  EXPECT_EQ(MonitorMessageItem::INFO, buffer_->level_);
-  ASSERT_EQ(2, buffer_->monitor_msg_items_.size());
-  auto item2 = buffer_->monitor_msg_items_.back();
+  buffer_.INFO() << 3 << "pieces";
+  EXPECT_EQ(MonitorMessageItem::INFO, buffer_.level_);
+  ASSERT_EQ(2, buffer_.monitor_msg_items_.size());
+  auto item2 = buffer_.monitor_msg_items_.back();
   EXPECT_EQ(MonitorMessageItem::INFO, item2.first);
   EXPECT_EQ("3pieces", item2.second);
 
   const char *fake_input = nullptr;
-  EXPECT_TRUE(&(buffer_->INFO() << fake_input) == buffer_);
+  EXPECT_TRUE(&(buffer_.INFO() << fake_input) == &buffer_);
 }
 
 }  // namespace monitor
