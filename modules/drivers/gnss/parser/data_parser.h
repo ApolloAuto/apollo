@@ -95,12 +95,10 @@ class DataParser {
   std::shared_ptr<Node> node_ = nullptr;
   std::shared_ptr<Writer<GnssStatus>> gnssstatus_writer_ = nullptr;
   std::shared_ptr<Writer<InsStatus>> insstatus_writer_ = nullptr;
-  std::shared_ptr<Writer<Gnss>> gnss_writer_ = nullptr;
   std::shared_ptr<Writer<GnssBestPose>> gnssbestpose_writer_ = nullptr;
   std::shared_ptr<Writer<CorrectedImu>> corrimu_writer_ = nullptr;
   std::shared_ptr<Writer<Imu>> rawimu_writer_ = nullptr;
   std::shared_ptr<Writer<Gps>> gps_writer_ = nullptr;
-  std::shared_ptr<Writer<Ins>> ins_writer_ = nullptr;
   std::shared_ptr<Writer<InsStat>> insstat_writer_ = nullptr;
   std::shared_ptr<Writer<GnssEphemeris>> gnssephemeris_writer_ = nullptr;
   std::shared_ptr<Writer<EpochObservation>> epochobservation_writer_ = nullptr;

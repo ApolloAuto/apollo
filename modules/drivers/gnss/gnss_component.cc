@@ -35,6 +35,7 @@ bool GnssDriverComponent::Init() {
   if (!raw_stream_->Init()) {
     return false;
   }
+  raw_stream_->Start();
   return true;
 }
 
