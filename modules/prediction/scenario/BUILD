@@ -7,7 +7,7 @@ cc_library(
     srcs = ["scenario_manager.cc"],
     hdrs = ["scenario_manager.h"],
     deps = [
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/prediction/proto:prediction_conf_proto",
         "//modules/prediction/scenario/analyzer:scenario_analyzer",
         "//modules/prediction/scenario/feature_extractor:feature_extractor",

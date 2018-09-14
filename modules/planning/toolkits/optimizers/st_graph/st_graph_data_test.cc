@@ -22,7 +22,7 @@
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/planning/common/speed/st_boundary.h"
 
 namespace apollo {

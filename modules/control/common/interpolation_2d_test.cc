@@ -20,7 +20,7 @@
 #include <utility>
 
 #include "gtest/gtest.h"
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/common/util/file.h"
 #include "modules/control/proto/control_conf.pb.h"
 

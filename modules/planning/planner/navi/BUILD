@@ -12,7 +12,7 @@ package(default_visibility = ["//visibility:public"])
 #     ],
 #     deps = [
 #         "//external:gflags",
-#         "//modules/common:log",
+#         "//framework:cybertron",
 #         "//modules/common/proto:pnc_point_proto",
 #         "//modules/common/status",
 #         "//modules/common/time",
@@ -42,7 +42,7 @@ package(default_visibility = ["//visibility:public"])
 #     data = ["//modules/planning:planning_testdata"],
 #     deps = [
 #         ":navi_planner",
-#         "//modules/common:log",
+#         "//framework:cybertron",
 #         "//modules/common/time",
 #         "//modules/common/util",
 #         "@gtest//:main",

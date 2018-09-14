@@ -16,7 +16,7 @@
 
 #include "modules/localization/localization.h"
 
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/common/util/file.h"
 #include "modules/localization/common/localization_gflags.h"
 #ifdef __x86_64__

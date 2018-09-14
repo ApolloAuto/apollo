@@ -11,7 +11,7 @@ cc_library(
         ":third_party_perception_filter",
         ":third_party_perception_fusion",
         "//modules/common/adapters:adapter_gflags",
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/common/util:message_util",
         "//modules/drivers/proto:sensor_proto",
         "//modules/localization/proto:localization_proto",

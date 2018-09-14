@@ -23,7 +23,7 @@
 #include "google/protobuf/message.h"
 #include "third_party/json/json.hpp"
 
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 
 namespace apollo {
 namespace common {

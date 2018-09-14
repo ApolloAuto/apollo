@@ -18,7 +18,7 @@ cc_library(
     hdrs = ["cascaded_camera_tracker_util.h"],
     deps = [
         ":base_affinity",
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/perception/lib/base",
         "//modules/perception/obstacle/base",
         "//modules/perception/obstacle/camera/common:util",
@@ -34,7 +34,7 @@ cc_library(
     deps = [
         ":base_affinity",
         ":util",
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/perception/lib/base",
         "//modules/perception/obstacle/base",
         "//modules/perception/obstacle/camera/common",

@@ -17,6 +17,7 @@
 #include <iostream>
 #include <thread>
 
+#include "cybertron/common/log.h"
 #include "cybertron/common/macros.h"
 #include "cybertron/cybertron.h"
 #include "cybertron/time/time.h"
@@ -25,7 +26,6 @@
 #include "modules/control/proto/pad_msg.pb.h"
 
 #include "modules/common/adapters/adapter_gflags.h"
-#include "modules/common/log.h"
 #include "modules/common/time/time.h"
 #include "modules/common/util/message_util.h"
 #include "modules/control/common/control_gflags.h"

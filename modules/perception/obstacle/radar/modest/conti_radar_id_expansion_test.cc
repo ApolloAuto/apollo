@@ -17,7 +17,7 @@
 #include "modules/perception/obstacle/radar/modest/conti_radar_id_expansion.h"
 
 #include "gtest/gtest.h"
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 
 namespace apollo {
 namespace perception {

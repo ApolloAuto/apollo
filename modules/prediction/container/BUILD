@@ -7,7 +7,7 @@ cc_library(
     srcs = ["container_manager.cc"],
     hdrs = ["container_manager.h"],
     deps = [
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/common/adapters/proto:adapter_config_proto",
         "//modules/prediction/container/adc_trajectory:adc_trajectory_container",
         "//modules/prediction/container/obstacles:obstacles_container",

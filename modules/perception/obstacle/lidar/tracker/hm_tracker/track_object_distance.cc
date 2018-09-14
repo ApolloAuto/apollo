@@ -19,7 +19,7 @@
 #include <algorithm>
 #include <vector>
 
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/perception/common/geometry_util.h"
 
 namespace apollo {

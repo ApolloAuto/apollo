@@ -23,7 +23,7 @@
 #include "Eigen/Core"
 #include "Eigen/LU"
 
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/common/math/integral.h"
 #include "modules/planning/math/spiral_curve/spiral_formula.h"
 

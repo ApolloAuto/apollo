@@ -16,7 +16,7 @@
 
 #include "boost/algorithm/string.hpp"
 
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/perception/onboard/subnode_helper.h"
 
 namespace apollo {

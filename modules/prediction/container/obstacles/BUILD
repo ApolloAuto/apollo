@@ -23,7 +23,7 @@ cc_library(
     srcs = ["obstacle.cc"],
     hdrs = ["obstacle.h"],
     deps = [
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/common/configs:config_gflags",
         "//modules/common/filters:digital_filter",
         "//modules/common/math:geometry",

@@ -26,7 +26,7 @@
 #include "modules/perception/obstacle/lidar/segmentation/cnnseg/proto/cnnseg.pb.h"
 #include "modules/perception/proto/cnn_segmentation_config.pb.h"
 
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/common/time/timer.h"
 #include "modules/perception/common/pcl_types.h"
 #include "modules/perception/obstacle/base/object.h"

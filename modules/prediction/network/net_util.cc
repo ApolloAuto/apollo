@@ -18,7 +18,7 @@
 
 #include <unordered_map>
 
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 
 namespace apollo {
 namespace prediction {

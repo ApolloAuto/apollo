@@ -10,7 +10,7 @@ cc_library(
         "lane_frame.h",
     ],
     deps = [
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/perception/obstacle/camera/common:util",
         "//modules/perception/obstacle/camera/lane_post_process/common:connected_component",
         "//modules/perception/obstacle/camera/lane_post_process/common:projector",
@@ -27,7 +27,7 @@ cc_library(
     hdrs = ["cc_lane_post_processor.h"],
     deps = [
         ":lane_frame",
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/perception/lib/config_manager",
         "//modules/perception/obstacle/camera/common:util",
         "//modules/perception/cuda_util",

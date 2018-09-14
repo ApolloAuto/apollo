@@ -12,7 +12,7 @@ cc_library(
     deps = [
         "//modules/calibration/lidar_ex_checker/common:lidar_ex_checker_common",
         "//modules/common:apollo_app",
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/localization/proto:gps_proto",
         "//modules/perception/common:pcl_util",
         "@vtk",
@@ -28,7 +28,7 @@ cc_binary(
     deps = [
         ":lidar_ex_checker_lib",
         "//external:gflags",
-        "//modules/common:log",
+        "//framework:cybertron",
         "@pcl",
         "@ros//:ros_common",
     ],

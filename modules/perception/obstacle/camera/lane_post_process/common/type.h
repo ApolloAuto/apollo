@@ -24,7 +24,7 @@
 #include "Eigen/Core"
 #include "opencv2/opencv.hpp"
 
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/perception/obstacle/camera/lane_post_process/common/base_type.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
 

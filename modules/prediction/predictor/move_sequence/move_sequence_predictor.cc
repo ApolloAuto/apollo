@@ -24,7 +24,7 @@
 
 #include "Eigen/Dense"
 #include "modules/common/adapters/proto/adapter_config.pb.h"
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/common/util/file.h"
 #include "modules/map/hdmap/hdmap_util.h"

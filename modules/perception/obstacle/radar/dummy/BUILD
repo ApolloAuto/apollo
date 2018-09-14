@@ -11,7 +11,7 @@ cc_library(
         "dummy_algorithms.h",
     ],
     deps = [
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/perception/obstacle/common",
         "//modules/perception/obstacle/radar/interface",
         "@eigen",

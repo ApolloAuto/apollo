@@ -11,7 +11,7 @@ cc_library(
     ],
     deps = [
         "//modules/common:apollo_app",
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/perception/common",
         "//modules/perception/common:pcl_util",
         "//modules/perception/lib/base",
@@ -32,7 +32,7 @@ cc_binary(
     deps = [
         ":export_sensor_data_lib",
         "//external:gflags",
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/perception/common",
         "//modules/perception/common:pcl_util",
         "//modules/perception/lib/base",

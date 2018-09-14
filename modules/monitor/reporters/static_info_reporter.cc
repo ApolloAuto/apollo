@@ -18,7 +18,7 @@
 
 #include "gflags/gflags.h"
 #include "modules/common/adapters/adapter_manager.h"
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/data/util/info_collector.h"
 
 DEFINE_string(static_info_reporter_name, "StaticInfoReporter",

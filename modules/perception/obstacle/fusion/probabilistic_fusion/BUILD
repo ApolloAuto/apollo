@@ -41,7 +41,7 @@ cc_library(
     ],
     deps = [
         "//modules/common",
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/common/configs:config_gflags",
         "//modules/perception/common",
         "//modules/perception/onboard",
@@ -70,7 +70,7 @@ cc_test(
     deps = [
         ":probabilistic_fusion",
         "//external:gflags",
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/perception/common:pcl_util",
         "@gtest",
         "@gtest//:main",
@@ -91,7 +91,7 @@ cc_test(
     deps = [
         ":probabilistic_fusion",
         "//external:gflags",
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/perception/common:pcl_util",
         "@gtest",
         "@gtest//:main",
@@ -112,7 +112,7 @@ cc_test(
     deps = [
         ":probabilistic_fusion",
         "//external:gflags",
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/perception/common:pcl_util",
         "@gtest",
         "@gtest//:main",
@@ -133,7 +133,7 @@ cc_test(
     deps = [
         ":probabilistic_fusion",
         "//external:gflags",
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/perception/common:pcl_util",
         "@gtest",
         "@gtest//:main",

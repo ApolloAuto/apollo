@@ -8,7 +8,7 @@ cc_library(
     hdrs = ["hdmap_input.h"],
     deps = [
         "//modules/common",
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/common/configs:config_gflags",
         "//modules/map/hdmap",
         "//modules/map/hdmap:hdmap_util",
@@ -80,7 +80,7 @@ cc_library(
     deps = [
         ":hdmapinput",
         "//modules/common",
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/common/configs:config_gflags",
         "//modules/common/time",
         "//modules/perception/common",
@@ -109,7 +109,7 @@ cc_library(
     ],
     deps = [
         ":perception_obstacle_shared_data",
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/common/time",
         "//modules/perception/common",
         "//modules/perception/lib/config_manager",
@@ -226,7 +226,7 @@ cc_library(
     ],
     deps = [
         ":perception_obstacle_shared_data",
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/common/time",
         "//modules/perception/common",
         "//modules/perception/lib/base",
@@ -252,7 +252,7 @@ cc_library(
     ],
     deps = [
         ":perception_obstacle_shared_data",
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/perception/lib/config_manager",
         "//modules/perception/obstacle/base",
         "//modules/perception/obstacle/camera/common:util",
@@ -297,7 +297,7 @@ cc_library(
     deps = [
         "//modules/perception/proto:perception_ultrasonic_proto",
         "//modules/common",
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/common/configs:config_gflags",
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/math:quaternion",

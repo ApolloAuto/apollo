@@ -33,7 +33,7 @@ cc_library(
         "polynomial_xd.h",
     ],
     deps = [
-        "//modules/common:log",
+        "//framework:cybertron",
     ],
 )
 

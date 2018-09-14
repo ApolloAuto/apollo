@@ -19,7 +19,7 @@
 #include <sstream>
 #include <string>
 
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 
 namespace apollo {
 namespace localization {

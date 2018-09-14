@@ -22,7 +22,7 @@
 
 #include "opencv2/opencv.hpp"
 
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 
 namespace apollo {
 namespace perception {

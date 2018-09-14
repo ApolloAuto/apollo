@@ -17,7 +17,7 @@
 #include "modules/monitor/software/localization_monitor.h"
 
 #include "modules/common/adapters/adapter_manager.h"
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 
 DEFINE_string(localization_monitor_name, "LocalizationMonitor",
               "Name of the localization monitor.");

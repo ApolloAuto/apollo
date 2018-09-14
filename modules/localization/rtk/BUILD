@@ -41,7 +41,7 @@ cc_binary(
 #     ],
 #     data = ["//modules/localization:localization_testdata"],
 #     deps = [
-#         "//modules/common:log",
+#         "//framework:cybertron",
 #         "//modules/common/time",
 #         "//modules/common/util",
 #         "//modules/localization/rtk:rtk_localization",

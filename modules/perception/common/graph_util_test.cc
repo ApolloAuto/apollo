@@ -19,7 +19,7 @@
 #include "Eigen/Core"
 #include "gtest/gtest.h"
 
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 
 namespace apollo {
 namespace perception {

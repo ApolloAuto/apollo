@@ -20,7 +20,7 @@
 #include <bitset>
 #include <utility>
 #include "boost/format.hpp"
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 
 namespace apollo {
 namespace perception {

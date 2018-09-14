@@ -16,7 +16,7 @@
 
 #include "modules/localization/msf/local_map/base_map/base_map.h"
 
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/localization/msf/common/util/system_utility.h"
 
 namespace apollo {

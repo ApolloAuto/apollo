@@ -24,7 +24,7 @@ cc_library(
         "radar_util.h",
     ],
     deps = [
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/perception/lib/config_manager",
         "//modules/perception/obstacle/common",
         "//modules/perception/obstacle/radar/interface",
@@ -43,7 +43,7 @@ cc_test(
     deps = [
         ":modest_detector",
         "//external:gflags",
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/perception/common:pcl_util",
         "@gtest",
         "@gtest//:main",
@@ -64,7 +64,7 @@ cc_test(
     deps = [
         ":modest_detector",
         "//external:gflags",
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/perception/common:pcl_util",
         "@gtest",
         "@gtest//:main",
@@ -85,7 +85,7 @@ cc_test(
     deps = [
         ":modest_detector",
         "//external:gflags",
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/perception/common:pcl_util",
         "@gtest",
         "@gtest//:main",

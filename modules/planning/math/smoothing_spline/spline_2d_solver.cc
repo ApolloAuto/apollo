@@ -24,7 +24,7 @@
 
 #include "Eigen/Core"
 
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/common/math/qp_solver/active_set_qp_solver.h"
 #include "modules/common/math/qp_solver/qp_solver_gflags.h"
 #include "modules/common/time/time.h"

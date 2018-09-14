@@ -12,7 +12,7 @@ cc_library(
     ],
     deps = [
         "//modules/canbus/proto:canbus_proto",
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/math:quaternion",
         "//modules/common/monitor_log",

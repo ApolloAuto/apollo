@@ -42,7 +42,7 @@
 #include "tf/transform_listener.h"
 #include "velodyne_msgs/VelodyneScan.h"
 
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/common/util/file.h"
 
 namespace apollo {

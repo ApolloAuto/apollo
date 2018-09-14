@@ -24,7 +24,7 @@
 
 #include "modules/perception/proto/hdmap_roi_filter_config.pb.h"
 
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/obstacle/base/hdmap_struct.h"
 #include "modules/perception/obstacle/lidar/interface/base_roi_filter.h"

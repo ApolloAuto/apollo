@@ -7,7 +7,7 @@ cc_library(
     srcs = ["free_move_predictor.cc"],
     hdrs = ["free_move_predictor.h"],
     deps = [
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/common/math:geometry",
         "//modules/common/proto:pnc_point_proto",
         "//modules/prediction/common:prediction_gflags",

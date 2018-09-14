@@ -22,7 +22,7 @@ cc_library(
     ],
     deps = [
         "//modules/common",
-        "//modules/common:log",
+        "//framework:cybertron",
         "@gtest",
     ],
 )

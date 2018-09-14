@@ -56,7 +56,7 @@ cc_binary(
         "-lubsan",
     ],
     deps = [
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/common/time",
         "//modules/common/util",
         "//modules/common/vehicle_state:vehicle_state_provider",
@@ -82,7 +82,7 @@ cc_binary(
         "-lubsan",
     ],
     deps = [
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/common/time",
         "//modules/common/util",
         "//modules/common/vehicle_state:vehicle_state_provider",

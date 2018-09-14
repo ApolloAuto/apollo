@@ -22,7 +22,7 @@
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/planning/common/path_obstacle.h"
 #include "modules/planning/reference_line/qp_spline_reference_line_smoother.h"

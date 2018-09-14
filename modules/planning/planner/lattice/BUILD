@@ -11,7 +11,7 @@ package(default_visibility = ["//visibility:public"])
 #         "lattice_planner.h",
 #     ],
 #     deps = [
-#         "//modules/common:log",
+#         "//framework:cybertron",
 #         "//modules/common/math:path_matcher",
 #         "//modules/common/vehicle_state:vehicle_state_provider",
 #         "//modules/planning/common:planning_gflags",

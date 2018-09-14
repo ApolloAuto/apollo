@@ -15,7 +15,7 @@ cc_library(
     ],
     deps = [
         "//external:gflags",
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/common/util",
     ],
 )

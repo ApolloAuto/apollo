@@ -25,7 +25,7 @@
 #include <string>
 
 #include "modules/common/configs/config_gflags.h"
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/common/math/linear_interpolation.h"
 #include "modules/common/util/string_util.h"
 #include "modules/common/util/util.h"

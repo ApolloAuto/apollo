@@ -20,7 +20,7 @@ cc_library(
     ],
     linkopts = ["-lGLU -lGL -lglut"],
     deps = [
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/drivers/proto:sensor_proto",
         "//modules/perception/common:pcl_util",
         "//modules/perception/lib/base",
@@ -49,7 +49,7 @@ cc_binary(
     linkopts = ["-lopencv_core -lopencv_imgproc -lopencv_highgui"],
     deps = [
         "//modules/common",
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/common/adapters:adapter_gflags",
         "//modules/perception/common",
         "//modules/perception/lib/base",

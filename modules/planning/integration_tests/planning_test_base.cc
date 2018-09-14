@@ -18,12 +18,13 @@
 
 #include <cstdlib>
 
+#include "google/protobuf/io/zero_copy_stream_impl.h"
+
 #include "cybertron/cybertron.h"
 #include "cybertron/time/rate.h"
 #include "cybertron/time/time.h"
 
-#include "modules/common/adapters/adapter_gflags.h"
-#include "modules/common/log.h"
+#include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
@@ -75,34 +76,35 @@ void PlanningTestBase::SetUpTestCase() {
 bool PlanningTestBase::FeedTestData() {
   // chassis
   if (!apollo::common::util::GetProtoFromFile(
-      FLAGS_test_data_dir + "/" + FLAGS_test_chassis_file, &chassis_)) {
+          FLAGS_test_data_dir + "/" + FLAGS_test_chassis_file, &chassis_)) {
     AERROR << "failed to load file: " << FLAGS_test_chassis_file;
     return -1;
   }
   // localization
   if (!apollo::common::util::GetProtoFromFile(
-      FLAGS_test_data_dir + "/" + FLAGS_test_localization_file,
-      &localization_)) {
+          FLAGS_test_data_dir + "/" + FLAGS_test_localization_file,
+          &localization_)) {
     AERROR << "failed to load file: " << FLAGS_test_localization_file;
     return -1;
   }
   // prediction
   if (!apollo::common::util::GetProtoFromFile(
-      FLAGS_test_data_dir + "/" + FLAGS_test_prediction_file, &prediction_)) {
+          FLAGS_test_data_dir + "/" + FLAGS_test_prediction_file,
+          &prediction_)) {
     AERROR << "failed to load file: " << FLAGS_test_prediction_file;
     return -1;
   }
   // routing_response
   if (!apollo::common::util::GetProtoFromFile(
-      FLAGS_test_data_dir + "/" + FLAGS_test_routing_response_file,
-      &routing_response_)) {
+          FLAGS_test_data_dir + "/" + FLAGS_test_routing_response_file,
+          &routing_response_)) {
     AERROR << "failed to load file: " << FLAGS_test_routing_response_file;
     return -1;
   }
   // traffic_light_detection
   if (!apollo::common::util::GetProtoFromFile(
-      FLAGS_test_data_dir + "/" + FLAGS_test_traffic_light_file,
-      &traffic_light_detection_)) {
+          FLAGS_test_data_dir + "/" + FLAGS_test_traffic_light_file,
+          &traffic_light_detection_)) {
     AERROR << "failed to load file: " << FLAGS_test_traffic_light_file;
     return -1;
   }
@@ -110,23 +112,22 @@ bool PlanningTestBase::FeedTestData() {
   // chassis
   std::shared_ptr<apollo::cybertron::Node> node(
       apollo::cybertron::CreateNode("planning_tester"));
-  auto chassis_writer = node->CreateWriter<Chassis>(
-      FLAGS_chassis_topic);
+  auto chassis_writer = node->CreateWriter<Chassis>(FLAGS_chassis_topic);
   chassis_writer->Write(chassis_);
 
   // localization
-  auto localization_writer = node->CreateWriter<LocalizationEstimate>(
-      FLAGS_localization_topic);
+  auto localization_writer =
+      node->CreateWriter<LocalizationEstimate>(FLAGS_localization_topic);
   localization_writer->Write(localization_);
 
   // prediction
-  auto prediction_writer = node->CreateWriter<PredictionObstacles>(
-      FLAGS_prediction_topic);
+  auto prediction_writer =
+      node->CreateWriter<PredictionObstacles>(FLAGS_prediction_topic);
   prediction_writer->Write(prediction_);
 
   // routing_response
-  auto routing_response_writer = node->CreateWriter<RoutingResponse>(
-      FLAGS_routing_response_topic);
+  auto routing_response_writer =
+      node->CreateWriter<RoutingResponse>(FLAGS_routing_response_topic);
   routing_response_writer->Write(routing_response_);
 
   // traffic_light_detection
@@ -228,7 +229,7 @@ bool PlanningTestBase::RunPlanning(const std::string& test_case_name,
   local_view.routing =
       std::make_shared<routing::RoutingResponse>(routing_response_);
   local_view.traffic_light =
-        std::make_shared<TrafficLightDetection>(traffic_light_detection_);
+      std::make_shared<TrafficLightDetection>(traffic_light_detection_);
 
   ADCTrajectory adc_trajectory_pb;
   planning_->RunOnce(local_view, &adc_trajectory_pb);

@@ -28,7 +28,7 @@
 #include "pcl/point_cloud.h"
 #include "pcl/point_types.h"
 
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/perception/common/pcl_types.h"
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/obstacle/base/object.h"

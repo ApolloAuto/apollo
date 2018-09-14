@@ -16,7 +16,7 @@
 
 #include "modules/perception/obstacle/lidar/visualizer/opengl_visualizer/frame_content.h"
 
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 
 namespace apollo {
 namespace perception {

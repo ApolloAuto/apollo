@@ -35,7 +35,7 @@
 #include "boost/thread.hpp"
 #include "ros/ros.h"
 
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/drivers/lidar_velodyne/driver/driver.h"
 
 namespace apollo {

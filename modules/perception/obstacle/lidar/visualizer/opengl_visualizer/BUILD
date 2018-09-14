@@ -21,7 +21,7 @@ cc_library(
         "-Wno-deprecated",
     ],
     deps = [
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/perception/common:pcl_util",
         "//modules/perception/lib/base",
         "//modules/perception/obstacle/base",

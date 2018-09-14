@@ -17,7 +17,7 @@
 
 #include <string>
 
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/common/time/time.h"
 #include "modules/common/time/timer.h"
 #include "modules/perception/common/perception_gflags.h"

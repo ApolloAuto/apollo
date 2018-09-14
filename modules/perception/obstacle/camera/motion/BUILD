@@ -15,7 +15,7 @@ cc_library(
     ],
     deps = [
         "//modules/common",
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/perception/obstacle/base",
     ],
 )

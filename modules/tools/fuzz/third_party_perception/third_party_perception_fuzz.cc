@@ -18,7 +18,7 @@
 
 #include "modules/third_party_perception/third_party_perception.h"
 #include "modules/common/adapters/adapter_manager.h"
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/third_party_perception/common/third_party_perception_gflags.h"
 #include "modules/tools/fuzz/third_party_perception/proto/third_party_perception_fuzz.pb.h"
 #include "libfuzzer/libfuzzer_macro.h"

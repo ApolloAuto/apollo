@@ -21,7 +21,7 @@
 #include <sys/types.h>
 #include <fstream>
 
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/perception/obstacle/camera/common/util.h"
 

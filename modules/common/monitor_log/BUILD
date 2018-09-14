@@ -13,13 +13,12 @@ cc_library(
         "monitor_logger.h",
     ],
     deps = [
-        "//modules/common:log",
-        "//modules/common/util:message_util",
+        "//framework:cybertron",
         "//modules/common/monitor_log/proto:monitor_log_proto",
         "//modules/common/proto:common_proto",
         "//modules/common/time",
-        "//framework:cybertron",
-        "@gtest//:gtest",
+        "//modules/common/util:message_util",
+        "@gtest",
     ],
 )
 
@@ -34,7 +33,6 @@ cc_test(
         "@gtest//:main",
     ],
 )
-
 
 # cc_test(
 #     name = "monitor_logger_test",

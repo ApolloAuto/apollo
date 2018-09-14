@@ -29,7 +29,7 @@ cc_library(
     ],
     deps = [
         ":speed_profile_cost",
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/configs/proto:vehicle_config_proto",
         "//modules/common/proto:pnc_point_proto",
@@ -53,7 +53,7 @@ cc_library(
     ],
     deps = [
         ":poly_st_graph",
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/configs/proto:vehicle_config_proto",
         "//modules/common/proto:pnc_point_proto",

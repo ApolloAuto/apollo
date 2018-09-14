@@ -21,7 +21,7 @@
 #include <string>
 #include <vector>
 #include "caffe/caffe.hpp"
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/perception/common/pcl_types.h"
 #include "modules/perception/obstacle/lidar/segmentation/cnnseg/proto/cnnseg.pb.h"
 

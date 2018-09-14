@@ -21,7 +21,7 @@ cc_test(
         ":localization_msf_common_test_data",
     ],
     deps = [
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/localization/msf/common/io:localization_msf_common_io",
         "//modules/localization/msf/common/util:localization_msf_common_util",
         "@gtest//:main",

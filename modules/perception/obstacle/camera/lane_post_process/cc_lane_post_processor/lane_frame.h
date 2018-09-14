@@ -30,7 +30,7 @@
 #include "Eigen/Core"
 #include "opencv2/opencv.hpp"
 
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/perception/obstacle/camera/lane_post_process/cc_lane_post_processor/group.h"
 #include "modules/perception/obstacle/camera/lane_post_process/common/connected_component.h"
 #include "modules/perception/obstacle/camera/lane_post_process/common/projector.h"

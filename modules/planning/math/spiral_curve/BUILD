@@ -40,7 +40,7 @@ cc_library(
     deps = [
         ":spiral_curve",
         ":spiral_formula",
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/common/math",
         "//modules/common/proto:error_code_proto",
         "//modules/common/proto:pnc_point_proto",
@@ -59,7 +59,7 @@ cc_library(
     deps = [
         ":spiral_curve",
         ":spiral_formula",
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/common/math",
         "//modules/common/proto:pnc_point_proto",
         "@eigen//:eigen",

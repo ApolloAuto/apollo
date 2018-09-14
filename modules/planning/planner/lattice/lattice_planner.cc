@@ -29,7 +29,7 @@
 #include "cybertron/common/macros.h"
 
 #include "modules/common/adapters/adapter_manager.h"
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/common/math/cartesian_frenet_conversion.h"
 #include "modules/common/math/path_matcher.h"
 #include "modules/common/time/time.h"

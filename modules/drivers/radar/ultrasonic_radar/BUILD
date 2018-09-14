@@ -68,7 +68,7 @@ cc_binary(
     deps = [
         ":ultrasonic_radar_canbus_lib",
         "//external:gflags",
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/common/monitor_log",
         "//modules/drivers/canbus/common:canbus_common",
         "@ros//:ros_common",

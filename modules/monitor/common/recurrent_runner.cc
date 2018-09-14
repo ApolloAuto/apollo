@@ -18,7 +18,7 @@
 
 #include <utility>
 
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/common/time/time.h"
 #include "modules/monitor/common/monitor_manager.h"
 

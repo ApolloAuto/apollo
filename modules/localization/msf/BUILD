@@ -50,7 +50,7 @@ cc_test(
     data = ["//modules/localization:localization_testdata"],
     deps = [
         ":msf_localization",
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/common/time",
         "//modules/common/util",
         "@gtest//:main",

@@ -19,7 +19,7 @@ limitations under the License.
 #include "modules/dreamview/backend/handlers/image_handler.h"
 
 #include "modules/common/adapters/adapter_manager.h"
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/common/time/time.h"
 #include "modules/perception/traffic_light/util/color_space.h"
 

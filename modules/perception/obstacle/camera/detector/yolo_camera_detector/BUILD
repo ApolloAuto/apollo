@@ -7,7 +7,7 @@ cc_library(
     srcs = ["util.cc"],
     hdrs = ["util.h"],
     deps = [
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/perception/obstacle/base",
         "//modules/perception/obstacle/camera/common",
         "@caffe//:lib",
@@ -22,7 +22,7 @@ cc_library(
     hdrs = ["yolo_camera_detector.h"],
     deps = [
         ":util",
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/perception/common",
         "//modules/perception/cuda_util",
         "//modules/perception/lib/base",

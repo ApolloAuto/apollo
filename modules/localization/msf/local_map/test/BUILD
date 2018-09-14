@@ -27,7 +27,7 @@ cc_test(
         "-lboost_program_options",
     ],
     deps = [
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/localization/msf/common/util:localization_msf_common_util",
         "//modules/localization/msf/local_map/base_map:localization_msf_base_map",
         "//modules/localization/msf/local_map/lossless_map:localization_msf_lossless_map",

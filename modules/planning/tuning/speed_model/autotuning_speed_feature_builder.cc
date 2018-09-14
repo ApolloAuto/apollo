@@ -20,7 +20,7 @@
 #include <sstream>
 #include <string>
 
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/common/proto/error_code.pb.h"
 
 using apollo::common::ErrorCode;

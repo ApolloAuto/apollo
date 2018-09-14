@@ -24,7 +24,7 @@
 
 #include <algorithm>
 
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/planning/math/smoothing_spline/spline_seg_kernel.h"
 
 namespace apollo {

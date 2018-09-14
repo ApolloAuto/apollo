@@ -15,7 +15,7 @@
  *****************************************************************************/
 
 #include "modules/perception/obstacle/camera/visualizer/gl_fusion_visualizer.h"
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 
 namespace apollo {
 namespace perception {

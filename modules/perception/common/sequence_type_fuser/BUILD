@@ -16,7 +16,7 @@ cc_library(
     deps = [
         ":object_sequence",
         "//modules/common",
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/perception/common",
         "//modules/perception/common:pcl_util",
         "//modules/perception/lib/base",
@@ -37,7 +37,7 @@ cc_library(
     ],
     deps = [
         "//modules/common",
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/perception/common",
         "//modules/perception/common:pcl_util",
         "//modules/perception/lib/base",
@@ -76,7 +76,7 @@ cc_test(
     ],
     deps = [
         ":sequence_type_fuser",
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/perception/lib/config_manager",
         "//modules/perception/obstacle/lidar/object_builder/min_box",
         "//modules/perception/obstacle/lidar/tracker/hm_tracker",

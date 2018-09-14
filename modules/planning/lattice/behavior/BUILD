@@ -11,7 +11,7 @@ cc_library(
         "feasible_region.h",
     ],
     deps = [
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/common/proto:pnc_point_proto",
         "//modules/planning/common:planning_gflags",
     ],
@@ -27,7 +27,7 @@ cc_library(
     ],
     deps = [
         "//modules/common",
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/common/math:linear_interpolation",
         "//modules/common/math:path_matcher",
         "//modules/common/proto:pnc_point_proto",

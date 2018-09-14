@@ -97,7 +97,7 @@ cc_test(
     ],
     deps = [
         ":path",
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/common/util",
         "@gtest//:main",
     ],
@@ -115,7 +115,7 @@ cc_test(
     ],
     deps = [
         ":pnc_map",
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/common/util",
         "@gtest//:main",
     ],
@@ -133,7 +133,7 @@ cc_test(
     ],
     deps = [
         ":route_segments",
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/common/util",
         "@gtest//:main",
     ],

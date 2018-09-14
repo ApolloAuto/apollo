@@ -29,7 +29,7 @@
 #include "modules/planning/proto/decision.pb.h"
 
 #include "modules/common/configs/vehicle_config_helper.h"
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/common/util/util.h"
 #include "modules/planning/common/planning_gflags.h"
 

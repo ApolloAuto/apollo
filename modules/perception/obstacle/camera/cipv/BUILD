@@ -7,7 +7,7 @@ cc_library(
     srcs = ["cipv.cc"],
     hdrs = ["cipv.h"],
     deps = [
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/common/configs:vehicle_config_helper",
         "//modules/perception/lib/base",
         "//modules/perception/obstacle/base",

@@ -136,7 +136,7 @@ cc_library(
     ],
     deps = [
         ":planning_gflags",
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/planning/proto:planning_proto",
         "//modules/planning/proto:planning_status_proto",
     ],
@@ -182,7 +182,7 @@ cc_library(
         ":ego_info",
         ":path_decision",
         ":planning_gflags",
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/common/proto:pnc_point_proto",
         "//modules/common/vehicle_state:vehicle_state_provider",
         "//modules/map/pnc_map",
@@ -253,7 +253,7 @@ cc_test(
 #     deps = [
 #         ":planning_gflags",
 #         "//modules/prediction/proto:prediction_proto",
-#         "//modules/common:log",
+#         "//framework:cybertron",
 #     ],
 # )
 
@@ -302,7 +302,7 @@ cc_library(
         ":obstacle",
         ":reference_line_info",
         "//modules/common/monitor_log",
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/vehicle_state:vehicle_state_provider",
         "//modules/map/hdmap:hdmap_util",
@@ -329,7 +329,7 @@ cc_library(
 #         ":lag_prediction",
 #         ":obstacle",
 #         "//modules/common/configs:vehicle_config_helper",
-#         "//modules/common:log",
+#         "//framework:cybertron",
 #         #"//modules/common/monitor_log",
 #         "//modules/common/vehicle_state:vehicle_state_provider",
 #         "//modules/map/hdmap:hdmap_util",
@@ -417,7 +417,7 @@ cc_library(
     ],
     deps = [
         ":obstacle",
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/configs/proto:vehicle_config_proto",
         "//modules/common/math:geometry",
@@ -448,7 +448,7 @@ cc_library(
         #":frame_open_space",
         ":planning_gflags",
         ":speed_limit",
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/localization/common:localization_common",
         "//modules/localization/proto:localization_proto",
         "@eigen",

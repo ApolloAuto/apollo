@@ -25,7 +25,7 @@
 #include <cmath>
 #include <numeric>
 
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/drivers/canbus/common/canbus_consts.h"
 
 /**

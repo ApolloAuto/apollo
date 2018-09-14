@@ -18,7 +18,7 @@
 
 #include <iomanip>
 
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/common/macro.h"
 #include "modules/common/util/file.h"
 #include "modules/perception/common/perception_gflags.h"

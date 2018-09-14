@@ -12,7 +12,7 @@ cc_library(
     ],
     deps = [
         "//modules/common",
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/common/util",
         "//modules/drivers/proto:sensor_proto",
         "//modules/drivers/camera/common:camera_common",

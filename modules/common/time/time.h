@@ -33,7 +33,7 @@
 #include "cybertron/time/time.h"
 
 #include "modules/common/configs/config_gflags.h"
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 
 /**
  * @namespace apollo::common::time

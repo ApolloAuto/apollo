@@ -11,7 +11,7 @@ cc_library(
         "color_space.h",
     ],
     deps = [
-        "//modules/common:log",
+        "//framework:cybertron",
     ],
 )
 

@@ -7,7 +7,7 @@ cc_library(
     srcs = ["adc_trajectory_container.cc"],
     hdrs = ["adc_trajectory_container.h"],
     deps = [
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/common/math:geometry",
         "//modules/planning/proto:planning_proto",
         "//modules/prediction/common:prediction_gflags",

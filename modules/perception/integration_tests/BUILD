@@ -14,7 +14,7 @@ cc_library(
         "//modules/map:map_data",
     ],
     deps = [
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/common/configs:config_gflags",
         "//modules/common/util",
         "//modules/common/vehicle_state:vehicle_state_provider",

@@ -11,7 +11,7 @@ cc_library(
         "tl_preprocessor.h",
     ],
     deps = [
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/common/proto:error_code_proto",
         "//modules/common/proto:header_proto",
         "//modules/perception/proto/traffic_light:preprocessor_config_lib_proto",

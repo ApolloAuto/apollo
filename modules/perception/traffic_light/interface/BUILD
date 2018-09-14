@@ -16,7 +16,7 @@ cc_library(
         "green_interface.h",
     ],
     deps = [
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/common/proto:error_code_proto",
         "//modules/common/proto:header_proto",
         "//modules/map/proto:map_proto",

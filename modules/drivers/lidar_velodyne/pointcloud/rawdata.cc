@@ -52,7 +52,7 @@
 #include "ros/package.h"
 #include "ros/ros.h"
 
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/drivers/lidar_velodyne/common/velodyne_gflags.h"
 
 namespace apollo {

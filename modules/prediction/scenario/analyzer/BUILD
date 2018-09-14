@@ -7,7 +7,7 @@ cc_library(
     srcs = ["scenario_analyzer.cc"],
     hdrs = ["scenario_analyzer.h"],
     deps = [
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/common/proto:scenario_proto",
         "//modules/prediction/proto:scenario_feature_proto",
     ],

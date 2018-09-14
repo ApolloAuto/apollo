@@ -8,7 +8,7 @@ cc_library(
     hdrs = ["min_box.h"],
     deps = [
         "//modules/common",
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/perception/common",
         "//modules/perception/common:convex_hullxy",
         "//modules/perception/common:pcl_util",

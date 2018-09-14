@@ -22,7 +22,7 @@
 #include "Eigen/Core"
 #include "Eigen/QR"
 
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/perception/obstacle/camera/lane_post_process/common/type.h"
 
 #ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_LANE_POST_PROCESS_COMMON_UTIL_H_

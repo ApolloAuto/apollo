@@ -23,7 +23,7 @@
 #include <unordered_set>
 #include <vector>
 
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/routing/graph/topo_node.h"
 #include "modules/routing/proto/topo_graph.pb.h"
 

@@ -40,7 +40,7 @@ cc_library(
     srcs = ["projector.cc"],
     hdrs = ["projector.h"],
     deps = [
-        "//modules/common:log",
+        "//framework:cybertron",
         "@eigen",
     ],
 )

@@ -18,7 +18,7 @@
 
 #include "modules/canbus/vehicle/gem/gem_controller.h"
 #include "modules/canbus/vehicle/gem/gem_message_manager.h"
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/common/util/util.h"
 
 namespace apollo {

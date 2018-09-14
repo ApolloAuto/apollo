@@ -8,7 +8,7 @@ cc_library(
     hdrs = ["low_object_filter.h"],
     deps = [
         "//modules/common",
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/perception/common",
         "//modules/perception/common:pcl_util",
         "//modules/perception/lib/base",

@@ -18,7 +18,7 @@ cc_library(
     deps = [
         ":prediction_gflags",
         ":prediction_map",
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/common/math",
         "//modules/common/proto:pnc_point_proto",
         "//modules/prediction/proto:lane_graph_proto",
@@ -71,7 +71,7 @@ cc_library(
     srcs = ["feature_output.cc"],
     hdrs = ["feature_output.h"],
     deps = [
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/common/util",
         "//modules/prediction/common:prediction_gflags",
         "//modules/prediction/proto:feature_proto",

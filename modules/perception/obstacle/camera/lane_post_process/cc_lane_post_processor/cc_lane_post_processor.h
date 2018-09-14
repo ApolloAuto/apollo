@@ -31,7 +31,7 @@
 
 #include "modules/perception/proto/lane_post_process_config.pb.h"
 
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/perception/cuda_util/connected_component_gpu.h"
 #include "modules/perception/obstacle/base/object_supplement.h"
 #include "modules/perception/obstacle/camera/common/util.h"

@@ -11,7 +11,7 @@ package(default_visibility = ["//visibility:public"])
 #         "navi_task.h",
 #     ],
 #     deps = [
-#         "//modules/common:log",
+#         "//framework:cybertron",
 #         "//modules/common/status",
 #         "//modules/planning/common:frame",
 #         "//modules/planning/common:planning_gflags",
@@ -33,7 +33,7 @@ package(default_visibility = ["//visibility:public"])
 #     ],
 #     deps = [
 #         ":navi_task",
-#         "//modules/common:log",
+#         "//framework:cybertron",
 #         "//modules/common/configs:vehicle_config_helper",
 #         "//modules/common/math",
 #         "//modules/common/status",
@@ -60,7 +60,7 @@ package(default_visibility = ["//visibility:public"])
 #     ],
 #     deps = [
 #         ":navi_task",
-#         "//modules/common:log",
+#         "//framework:cybertron",
 #         "//modules/common/configs:vehicle_config_helper",
 #         "//modules/common/math",
 #         "//modules/common/status",
@@ -85,7 +85,7 @@ package(default_visibility = ["//visibility:public"])
 #     ],
 #     deps = [
 #         ":navi_task",
-#         "//modules/common:log",
+#         "//framework:cybertron",
 #         "//modules/common/configs:vehicle_config_helper",
 #         "//modules/common/math",
 #         "//modules/common/math:path_matcher",

@@ -14,7 +14,6 @@ cc_library(
     ],
     deps = [
         "//framework:cybertron",
-        "//modules/common:log",
         "//modules/common/configs:config_gflags",
     ],
 )

@@ -17,7 +17,7 @@
 #include "modules/monitor/reporters/vehicle_state_reporter.h"
 
 #include "gflags/gflags.h"
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/common/util/http_client.h"
 #include "modules/common/util/json_util.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"

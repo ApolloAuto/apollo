@@ -19,7 +19,7 @@
 #include "ros/include/ros/ros.h"
 
 #include "modules/common/adapters/adapter_manager.h"
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/obstacle/base/object.h"
 #include "modules/perception/obstacle/onboard/async_fusion_subnode.h"

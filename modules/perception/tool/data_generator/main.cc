@@ -15,7 +15,7 @@
  *****************************************************************************/
 
 #include "gflags/gflags.h"
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "ros/include/ros/ros.h"
 
 #include "modules/perception/tool/data_generator/data_generator.h"

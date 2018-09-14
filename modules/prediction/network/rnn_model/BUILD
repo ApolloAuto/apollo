@@ -11,7 +11,7 @@ cc_library(
         "rnn_model.h",
     ],
     deps = [
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/prediction/network:net_layer",
         "//modules/prediction/network:net_model",
         "//modules/prediction/proto:network_model_proto",

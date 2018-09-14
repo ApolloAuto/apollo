@@ -10,7 +10,7 @@ cc_library(
         "type.h",
     ],
     deps = [
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/perception/proto:perception_proto",
         "@eigen",
         "@opencv2//:core",
@@ -23,7 +23,7 @@ cc_library(
     hdrs = ["util.h"],
     deps = [
         ":type",
-        "//modules/common:log",
+        "//framework:cybertron",
     ],
 )
 
@@ -44,7 +44,7 @@ cc_library(
     name = "projector",
     hdrs = ["projector.h"],
     deps = [
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/perception/lib/config_manager",
         "//modules/perception/obstacle/camera/common",
         "@eigen",

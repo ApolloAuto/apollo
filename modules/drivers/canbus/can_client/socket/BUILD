@@ -22,7 +22,7 @@ cc_test(
         "socket_can_client_raw_test.cc",
     ],
     deps = [
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/drivers/canbus/can_client/socket:socket_can_client_raw",
         "//modules/drivers/canbus/common:canbus_common",
         "@gtest//:main",

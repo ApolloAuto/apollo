@@ -17,7 +17,7 @@ cc_library(
     ],
     deps = [
         "//modules/common:apollo_app",
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/common/monitor_log",
         "//modules/common/proto:common_proto",
         "//modules/common/status",

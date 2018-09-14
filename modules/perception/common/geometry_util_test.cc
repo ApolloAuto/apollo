@@ -24,7 +24,7 @@
 #include "boost/algorithm/string.hpp"
 #include "gtest/gtest.h"
 
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/perception/obstacle/lidar/object_builder/min_box/min_box.h"
 
 namespace apollo {

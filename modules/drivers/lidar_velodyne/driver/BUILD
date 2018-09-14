@@ -19,7 +19,7 @@ cc_library(
         "-lpcap",
     ],
     deps = [
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/common/util",
         "//modules/drivers/lidar_velodyne/proto:driver_node_conf_proto",
         "@pcl",

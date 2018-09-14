@@ -16,7 +16,7 @@
 
 #include "modules/localization/msf/local_integ/lidar_msg_transfer.h"
 
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/localization/common/localization_gflags.h"
 
 namespace apollo {

@@ -13,7 +13,7 @@ cc_library(
         "pose_util.h",
     ],
     deps = [
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/common/util",
         "//modules/perception/common:pcl_util",
         "//modules/perception/lib/base",
