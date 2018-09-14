@@ -838,6 +838,10 @@
                 "status": {
                   "type": "StatusPb",
                   "id": 8
+                },
+                "frameId": {
+                  "type": "string",
+                  "id": 9
                 }
               }
             },
@@ -1074,7 +1078,8 @@
                         "MONITOR": 11,
                         "HMI": 12,
                         "RELATIVE_MAP": 13,
-                        "GNSS": 14
+                        "GNSS": 14,
+                        "CONTI_RADAR": 15
                       }
                     },
                     "LogLevel": {

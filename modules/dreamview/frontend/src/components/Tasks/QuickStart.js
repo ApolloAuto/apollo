@@ -2,6 +2,7 @@ import React from "react";
 import { inject, observer } from "mobx-react";
 import classNames from "classnames";
 
+import UTTERANCE from "store/utterance";
 import WS from "store/websocket";
 
 class CommandGroup extends React.Component {
@@ -32,63 +33,52 @@ export default class QuickStarter extends React.Component {
     constructor(props) {
         super(props);
 
-        this.utterance = window.speechSynthesis ? new SpeechSynthesisUtterance() : null;
-
         this.rtKRecord = {
             "Start": () => {
                 WS.executeToolCommand("rtk_record_replay", "start_recorder");
-                this.speechSynthesis('Start RTK recorder');
+                UTTERANCE.speakOnce('Start RTK recorder');
             },
             "Stop": () => {
                 WS.executeToolCommand("rtk_record_replay", "stop_recorder");
-                this.speechSynthesis('Stop RTK recorder');
+                UTTERANCE.speakOnce('Stop RTK recorder');
             },
         };
 
         this.rtkReplay = {
             "Start": () => {
                 WS.executeToolCommand("rtk_record_replay", "start_player");
-                this.speechSynthesis('Start RTK replay');
+                UTTERANCE.speakOnce('Start RTK replay');
             },
             "Stop": () => {
                 WS.executeToolCommand("rtk_record_replay", "stop_player");
-                this.speechSynthesis('Stop RTK replay');
+                UTTERANCE.speakOnce('Stop RTK replay');
             },
         };
 
         this.setup = {
             "Setup": () => {
                 WS.executeModeCommand("start");
-                this.speechSynthesis('Setup');
+                UTTERANCE.speakOnce('Setup');
             },
         };
 
         this.reset = {
             "Reset All": () => {
                 WS.executeModeCommand("stop");
-                this.speechSynthesis('Reset All');
+                UTTERANCE.speakOnce('Reset All');
             },
         };
 
         this.auto = {
             "Start Auto": () => {
                 WS.changeDrivingMode("COMPLETE_AUTO_DRIVE");
-                this.speechSynthesis('Start Auto');
+                UTTERANCE.speakOnce('Start Auto');
             },
         };
     }
 
     componentWillUpdate() {
-        if (this.utterance) {
-            window.speechSynthesis.cancel();
-        }
-    }
-
-    speechSynthesis(phrase) {
-        if (this.utterance) {
-            this.utterance.text = phrase;
-            window.speechSynthesis.speak(this.utterance);
-        }
+        UTTERANCE.cancelAllInQueue();
     }
 
     render() {

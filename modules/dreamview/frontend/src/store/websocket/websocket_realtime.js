@@ -1,6 +1,7 @@
 import STORE from "store";
 import RENDERER from "renderer";
 import MAP_NAVIGATOR from "components/Navigation/MapNavigator";
+import UTTERANCE from "store/utterance";
 import Worker from 'utils/webworker.js';
 
 export default class RosWebSocketEndpoint {
@@ -100,6 +101,20 @@ export default class RosWebSocketEndpoint {
         };
         this.websocket.onclose = event => {
             console.log("WebSocket connection closed, close_code: " + event.code);
+
+            // If connection has been lost for more than 10 sec, send the error message every 2 sec
+            const now = new Date().getTime();
+            const lossDuration = now - this.simWorldLastUpdateTimestamp;
+            const alertDuration = now - STORE.monitor.lastUpdateTimestamp;
+            if (this.simWorldLastUpdateTimestamp !== 0 &&
+                lossDuration > 10000 && alertDuration > 2000) {
+                const message = "Connection to the server has been lost.";
+                STORE.monitor.insert("FATAL", message, now);
+                if (UTTERANCE.getCurrentText() !== message || !UTTERANCE.isSpeaking() ) {
+                    UTTERANCE.speakOnce(message);
+                }
+            }
+
             this.initialize();
         };
 
