@@ -80,13 +80,6 @@ new_http_archive(
     url = "file:///home/tmp/curlpp-0.8.1.tar.gz",
 )
 
-#ros
-new_local_repository(
-    name = "ros",
-    build_file = "third_party/ros.BUILD",
-    path = "/home/tmp/ros",
-)
-
 # OpenCV 2.4.13.2
 new_http_archive(
     name = "opencv2",

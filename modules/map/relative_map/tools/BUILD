@@ -8,7 +8,6 @@ cc_binary(
     deps = [
         "//modules/common",
         "//modules/map/relative_map:relative_map_lib",
-        "@ros//:ros_common",
     ],
 )
 
@@ -19,7 +18,6 @@ cc_binary(
         "//modules/common",
         "//modules/map/relative_map:relative_map_lib",
         "//third_party/json",
-        "@ros//:ros_common",
     ],
 )
 
