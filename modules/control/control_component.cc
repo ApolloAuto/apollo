@@ -32,13 +32,16 @@ using apollo::canbus::Chassis;
 using apollo::common::ErrorCode;
 using apollo::common::Status;
 using apollo::common::VehicleStateProvider;
-using apollo::common::monitor::MonitorMessageItem;
 using apollo::common::time::Clock;
 using apollo::control::ControlCommand;
 using apollo::control::PadMessage;
 using apollo::localization::LocalizationEstimate;
 using apollo::planning::ADCTrajectory;
 
+ControlComponent::ControlComponent()
+    : monitor_logger_buffer_(
+          common::monitor::MonitorMessageItem::CONTROL) {
+}
 bool ControlComponent::Init() {
   // init_time_ = Clock::NowInSeconds();
 
@@ -55,12 +58,9 @@ bool ControlComponent::Init() {
 
   AINFO << "Conf file: " << ConfigFilePath() << " is loaded.";
 
-  // common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
-
   // set controller
   if (!controller_agent_.Init(&control_conf_).ok()) {
-    std::string error_msg = "Control init controller failed! Stopping...";
-    //  buffer.ERROR(error_msg);
+    monitor_logger_buffer_.ERROR("Control init controller failed! Stopping...");
     return false;
   }
 
@@ -118,7 +118,7 @@ void ControlComponent::OnPad(const PadMessage &pad) {
 void ControlComponent::OnMonitor(
     const common::monitor::MonitorMessage &monitor_message) {
   for (const auto &item : monitor_message.item()) {
-    if (item.log_level() == MonitorMessageItem::FATAL) {
+    if (item.log_level() == ::apollo::common::monitor::MonitorMessageItem::FATAL) {
       estop_ = true;
       return;
     }
@@ -304,7 +304,7 @@ Status ControlComponent::CheckInput() {
                   "planning has no trajectory point.");
   }
 
-  for (auto &trajectory_point : *trajectory_.mutable_trajectory_point()) {
+  for (auto& trajectory_point : *trajectory_.mutable_trajectory_point()) {
     if (trajectory_point.v() < control_conf_.minimum_speed_resolution()) {
       trajectory_point.set_v(0.0);
       trajectory_point.set_a(0.0);
@@ -329,8 +329,7 @@ Status ControlComponent::CheckTimestamp() {
                            control_conf_.localization_period())) {
     AERROR << "Localization msg lost for " << std::setprecision(6)
            << localization_diff << "s";
-    // common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
-    // buffer.ERROR("Localization msg lost");
+    monitor_logger_buffer_.ERROR("Localization msg lost");
     return Status(ErrorCode::CONTROL_COMPUTE_ERROR, "Localization msg timeout");
   }
 
@@ -339,8 +338,7 @@ Status ControlComponent::CheckTimestamp() {
       (control_conf_.max_chassis_miss_num() * control_conf_.chassis_period())) {
     AERROR << "Chassis msg lost for " << std::setprecision(6) << chassis_diff
            << "s";
-    //    common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
-    //    buffer.ERROR("Chassis msg lost");
+    monitor_logger_buffer_.ERROR("Chassis msg lost");
     return Status(ErrorCode::CONTROL_COMPUTE_ERROR, "Chassis msg timeout");
   }
 
@@ -350,8 +348,7 @@ Status ControlComponent::CheckTimestamp() {
                          control_conf_.trajectory_period())) {
     AERROR << "Trajectory msg lost for " << std::setprecision(6)
            << trajectory_diff << "s";
-    //    common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
-    //  buffer.ERROR("Trajectory msg lost");
+    monitor_logger_buffer_.ERROR("Trajectory msg lost");
     return Status(ErrorCode::CONTROL_COMPUTE_ERROR, "Trajectory msg timeout");
   }
   return Status::OK();
