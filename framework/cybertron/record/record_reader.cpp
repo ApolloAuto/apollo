@@ -106,11 +106,11 @@ bool RecordReader::EndOfFile() {
 void RecordReader::LoadChunk(uint64_t from_time, uint64_t to_time) {
   uint64_t loop_time = end_time_ - begin_time_;
   uint64_t total_message_number = header_.message_number();
-  if (total_message_number <= 0) {
+  if (total_message_number == 0) {
     AERROR << "total message number is zero.";
     return;
   }
-  uint64_t average_period = average_period = loop_time / total_message_number;
+  uint64_t average_period = loop_time / total_message_number;
   if (average_period < 1e7) {
     average_period = 1e7;  // 10ms
   }
