@@ -16,8 +16,8 @@
 
 // This defines an stream interface for communication via USB, Ethernet, etc.
 
-#ifndef MODULES_DRIVERS_GNSS_STREAM_H_
-#define MODULES_DRIVERS_GNSS_STREAM_H_
+#ifndef MODULES_DRIVERS_GNSS_STREAM_STREAM_H_
+#define MODULES_DRIVERS_GNSS_STREAM_STREAM_H_
 
 #include <stdint.h>
 #include <string>
@@ -109,4 +109,4 @@ class Stream {
 }  // namespace drivers
 }  // namespace apollo
 
-#endif  // MODULES_DRIVERS_GNSS_STREAM_H_
+#endif  // MODULES_DRIVERS_GNSS_STREAM_STREAM_H_

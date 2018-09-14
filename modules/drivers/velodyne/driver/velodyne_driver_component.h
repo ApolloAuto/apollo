@@ -13,6 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+#ifndef MODULES_DRIVERS_VELODYNE_DRIVER_VELODYNE_DRIVER_COMPONENT_H_
+#define MODULES_DRIVERS_VELODYNE_DRIVER_VELODYNE_DRIVER_COMPONENT_H_
 
 #include <memory>
 #include <string>
@@ -52,3 +54,5 @@ CYBERTRON_REGISTER_COMPONENT(VelodyneDriverComponent)
 }  // namespace velodyne
 }  // namespace drivers
 }  // namespace apollo
+
+#endif  // MODULES_DRIVERS_VELODYNE_DRIVER_VELODYNE_DRIVER_COMPONENT_H_

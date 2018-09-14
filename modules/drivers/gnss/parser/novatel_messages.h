@@ -20,8 +20,8 @@
 //  http://www.novatel.com/assets/Documents/Manuals/om-20000129.pdf
 //  http://www.novatel.com/assets/Documents/Manuals/OM-20000144UM.pdf
 
-#ifndef MODULES_DRIVERS_GNSS_NOVATEL_MESSAGES_H_
-#define MODULES_DRIVERS_GNSS_NOVATEL_MESSAGES_H_
+#ifndef MODULES_DRIVERS_GNSS_PARSER_NOVATEL_MESSAGES_H_
+#define MODULES_DRIVERS_GNSS_PARSER_NOVATEL_MESSAGES_H_
 
 #include <stdint.h>
 #include "modules/drivers/gnss/proto/config.pb.h"
@@ -562,4 +562,4 @@ inline ImuParameter GetImuParameter(ImuType type) {
 }  // namespace drivers
 }  // namespace apollo
 
-#endif  // MODULES_DRIVERS_GNSS_NOVATEL_MESSAGES_H_
+#endif  // MODULES_DRIVERS_GNSS_PARSER_NOVATEL_MESSAGES_H_

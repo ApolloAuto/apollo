@@ -226,4 +226,4 @@ const float INNER_TIME_16[12][32] = {
 }  // namespace drivers
 }  // namespace apollo
 
-#endif  // MODULES_DRIVERS_VELODYNE_VELODYNE_POINTCLOUD_CONST_VARIABLES_H_
+#endif  // MODULES_DRIVERS_VELODYNE_PARSER_CONST_VARIABLES_H_

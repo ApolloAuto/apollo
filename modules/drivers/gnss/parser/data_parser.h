@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_DRIVERS_GNSS_DATA_PARSER_H_
-#define MODULES_DRIVERS_GNSS_DATA_PARSER_H_
+#ifndef MODULES_DRIVERS_GNSS_PARSER_DATA_PARSER_H_
+#define MODULES_DRIVERS_GNSS_PARSER_DATA_PARSER_H_
 
 #include <proj_api.h>
 #include <memory>
@@ -111,4 +111,4 @@ class DataParser {
 }  // namespace drivers
 }  // namespace apollo
 
-#endif  // MODULES_DRIVERS_GNSS_DATA_PARSER_H_
+#endif  // MODULES_DRIVERS_GNSS_PARSER_DATA_PARSER_H_
