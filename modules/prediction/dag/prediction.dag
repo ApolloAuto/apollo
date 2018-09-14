@@ -15,7 +15,7 @@ module_config {
                 {
                     channel: "/apollo/localization/pose"
                     qos_profile: {
-                        depth : 10
+                        depth : 1
                     }
                 },
                 {
