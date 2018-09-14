@@ -23,18 +23,18 @@ cc_library(
     ],
 )
 
-# cc_test(
-#     name = "monitor_log_buffer_test",
-#     size = "small",
-#     srcs = [
-#         "monitor_log_buffer_test.cc",
-#     ],
-#     deps = [
-#         ":monitor_log",
-#         "@gtest//:main",
-#     ],
-# )
-# 
+cc_test(
+    name = "monitor_log_buffer_test",
+    size = "small",
+    srcs = [
+        "monitor_log_buffer_test.cc",
+    ],
+    deps = [
+        ":monitor_log",
+        "@gtest//:main",
+    ],
+)
+
 
 # cc_test(
 #     name = "monitor_logger_test",
