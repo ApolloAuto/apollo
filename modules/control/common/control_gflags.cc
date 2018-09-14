@@ -16,11 +16,9 @@
 
 #include "modules/control/common/control_gflags.h"
 
-DEFINE_string(control_conf_file, "modules/control/conf/lincoln.pb.txt",
+DEFINE_string(control_conf_file,
+              "/apollo/modules/control/conf/control_conf.pb.txt",
               "default control conf data file");
-
-DEFINE_string(control_adapter_config_filename,
-              "modules/control/conf/adapter.conf", "The adapter config file");
 
 DEFINE_bool(enable_csv_debug, false, "True to write out csv debug file.");
 DEFINE_bool(enable_speed_station_preview, true, "enable speed/station preview");

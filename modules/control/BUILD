@@ -2,11 +2,9 @@ load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
-cc_binary(
-    name = "libcontrol.so",
+cc_library(
+    name = "control_lib",
     srcs = [
-        "control_component.cc",
-        "control_component.h",
     ],
     deps = [
         "//modules/canbus/proto:canbus_proto",
@@ -23,9 +21,30 @@ cc_binary(
         "//modules/planning/proto:planning_proto",
         "//modules/prediction/proto:prediction_proto",
         "//framework:cybertron",
+#        "//external:gflags",
     ],
-    copts = ['-DMODULE_NAME=\\"control\\"'],
-    linkshared = True,
 )
+
+cc_library(
+    name = "control_component_lib",
+    srcs = [
+        "control_component.cc",
+    ],
+    hdrs = [
+        "control_component.h",
+    ],
+    deps = [
+        ":control_lib",
+    ],
+    copts = ['-DMODULE_NAME=\\"control\\"']
+)
+
+cc_binary(
+    name = "libcontrol_component.so",
+    deps = [":control_component_lib"],
+    linkopts = ["-shared"],
+)
+
+
 
 cpplint()
