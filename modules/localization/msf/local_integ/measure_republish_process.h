@@ -64,7 +64,7 @@ class MeasureRepublishProcess {
 
   // GNSS message process
   bool NovatelBestgnssposProcess(const GnssBestPose& bestgnsspos_msg,
-                                 MeasureData* measure);
+                                 MeasureData* measure, int* status);
   void GnssLocalProcess(const MeasureData& gnss_local_msg,
                         MeasureData* measure);
 
@@ -77,7 +77,8 @@ class MeasureRepublishProcess {
 
  protected:
   bool IsSinsAlign();
-  bool CheckBestgnssposeStatus(const GnssBestPose& bestgnsspos_msg);
+  bool CheckBestgnssposeStatus(const GnssBestPose& bestgnsspos_msg,
+                               int* status);
   bool CheckBestgnssPoseXYStd(const GnssBestPose& bestgnsspos_msg);
   void TransferXYZFromBestgnsspose(const GnssBestPose& bestgnsspos_msg,
                                    MeasureData* measure);

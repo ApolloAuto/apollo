@@ -26,6 +26,7 @@
 #include <functional>
 #include <list>
 #include <queue>
+#include "gtest/gtest_prod.h"
 
 #include "modules/common/status/status.h"
 #include "modules/localization/msf/local_integ/localization_gnss_process.h"
@@ -33,6 +34,7 @@
 #include "modules/localization/msf/local_integ/localization_integ_process.h"
 #include "modules/localization/msf/local_integ/localization_lidar_process.h"
 #include "modules/localization/msf/local_integ/measure_republish_process.h"
+#include "modules/localization/proto/localization_status.pb.h"
 
 /**
  * @namespace apollo::localization
@@ -41,6 +43,9 @@
 namespace apollo {
 namespace localization {
 namespace msf {
+
+using apollo::localization::MsfStatus;
+using apollo::localization::MsfSensorMsgStatus;
 
 class MeasureRepublishProcess;
 class LocalizationIntegProcess;
@@ -109,6 +114,14 @@ class LocalizationIntegImpl {
   void TransferGnssMeasureToLocalization(const MeasureData& measure,
                                          LocalizationEstimate* localization);
 
+  void CheckImuDelayStatus(double cur_imu_time);
+
+  void CheckImuMissingStatus(double cur_imu_time);
+
+  void CheckGnssLidarMsfStatus(double cur_imu_time);
+
+  void SetLocalizationStatus(LocalizationEstimate *integ_localization);
+
  private:
   MeasureRepublishProcess* republish_process_;
   LocalizationIntegProcess* integ_process_;
@@ -160,6 +173,18 @@ class LocalizationIntegImpl {
   bool enable_lidar_localization_;
 
   Eigen::Affine3d gnss_antenna_extrinsic_;
+
+  MsfStatus msf_status_;
+  std::mutex msf_status_mutex_;
+  MsfSensorMsgStatus sensor_status_;
+  double latest_gnsspos_timestamp_;
+  std::mutex latest_gnsspos_timestamp_mutex_;
+  double latest_lidar_timestamp_;
+  std::mutex latest_lidar_timestamp_mutex_;
+
+  FRIEND_TEST(LocalizationIntegImplTestSuite, CheckImuDelayStatus);
+  FRIEND_TEST(LocalizationIntegImplTestSuite, CheckImuMissingStatus);
+  FRIEND_TEST(LocalizationIntegImplTestSuite, SetLocalizationStatus);
 };
 
 }  // namespace msf
