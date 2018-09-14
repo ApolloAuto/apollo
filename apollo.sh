@@ -157,7 +157,7 @@ function build() {
   info "Building on $MACHINE_ARCH..."
 
   MACHINE_ARCH=$(uname -m)
-  JOB_ARG="--ram_utilization_factor 50"
+  JOB_ARG="--jobs=$(nproc) --ram_utilization_factor 80"
   if [ "$MACHINE_ARCH" == 'aarch64' ]; then
     JOB_ARG="--jobs=3"
   fi
