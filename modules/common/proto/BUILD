@@ -108,17 +108,3 @@ cc_proto_library(
         ":drive_state_proto_lib",
     ],
 )
-
-proto_library(
-    name = "scenario_proto_lib",
-    srcs = [
-        "scenario.proto",
-    ],
-)
-
-cc_proto_library(
-    name = "scenario_proto",
-    deps = [
-        ":scenario_proto_lib",
-    ],
-)

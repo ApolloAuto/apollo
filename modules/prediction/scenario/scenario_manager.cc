@@ -19,8 +19,6 @@
 namespace apollo {
 namespace prediction {
 
-using apollo::common::Scenario;
-
 ScenarioManager::ScenarioManager() {}
 
 void ScenarioManager::Run() {

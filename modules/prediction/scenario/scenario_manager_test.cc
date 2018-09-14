@@ -26,7 +26,6 @@ namespace apollo {
 namespace prediction {
 
 using apollo::common::adapter::AdapterConfig;
-using apollo::common::Scenario;
 
 class ScenarioManagerTest : public ::testing::Test {
  public:

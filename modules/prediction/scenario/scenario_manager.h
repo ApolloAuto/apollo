@@ -22,7 +22,7 @@
 #define MODULES_PREDICTION_SCENARIO_SCENARIO_MANAGER_H_
 
 #include "cybertron/common/macros.h"
-#include "modules/common/proto/scenario.pb.h"
+#include "modules/prediction/proto/scenario.pb.h"
 #include "modules/prediction/proto/prediction_conf.pb.h"
 #include "modules/prediction/scenario/feature_extractor/feature_extractor.h"
 #include "modules/prediction/scenario/analyzer/scenario_analyzer.h"
@@ -40,7 +40,7 @@ class ScenarioManager {
   /**
    * @brief Get scenario analysis result
    */
-  const apollo::common::Scenario& scenario() const;
+  const Scenario& scenario() const;
 
  private:
   FeatureExtractor feature_extractor_;
