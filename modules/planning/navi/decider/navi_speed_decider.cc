@@ -53,8 +53,10 @@ constexpr double kKappaAdjustRatio = 20.0;
 
 NaviSpeedDecider::NaviSpeedDecider() : NaviTask("NaviSpeedDecider") {}
 
-bool NaviSpeedDecider::Init(const PlanningConfig& config) {
+bool NaviSpeedDecider::Init(const PlanningConfig& planning_config) {
   CHECK_GT(FLAGS_planning_upper_speed_limit, 0.0);
+  NavigationPlanningConfig config
+      = planning_config.navigation_planning_config();
   CHECK(config.has_planner_navi_config());
   CHECK(config.planner_navi_config().has_navi_speed_decider_config());
   CHECK(config.planner_navi_config()
@@ -168,7 +170,7 @@ bool NaviSpeedDecider::Init(const PlanningConfig& config) {
                          .navi_speed_decider_config()
                          .kappa_threshold();
 
-  return obstacle_decider_.Init(config);
+  return obstacle_decider_.Init(planning_config);
 }
 
 Status NaviSpeedDecider::Execute(Frame* frame,
