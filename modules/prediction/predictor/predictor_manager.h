@@ -29,7 +29,7 @@
 #include "modules/prediction/proto/prediction_conf.pb.h"
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
 
-#include "modules/common/macro.h"
+#include "cybertron/common/macros.h"
 #include "modules/prediction/predictor/predictor.h"
 
 /**
