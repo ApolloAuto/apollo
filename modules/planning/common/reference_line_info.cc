@@ -31,7 +31,6 @@
 
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/util/string_util.h"
-#include "modules/common/util/thread_pool.h"
 #include "modules/common/util/util.h"
 #include "modules/map/hdmap/hdmap_common.h"
 #include "modules/map/hdmap/hdmap_util.h"
