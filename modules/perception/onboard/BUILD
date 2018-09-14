@@ -26,7 +26,7 @@ cc_library(
     ],
     deps = [
         "//modules/common",
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/common/configs:config_gflags",
         "//modules/common/status",
         "//modules/common/time",
@@ -52,7 +52,7 @@ cc_test(
     deps = [
         ":onboard",
         "//external:gflags",
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/perception/common:pcl_util",
         "@gtest",
         "@gtest//:main",

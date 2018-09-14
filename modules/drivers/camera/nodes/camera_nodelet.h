@@ -23,7 +23,7 @@
 #include <pluginlib/class_list_macros.h>
 #include <nodelet/nodelet.h>
 
-// #include "modules/common/log.h"
+// #include "cybertron/common/log.h"
 // #include "modules/common/util/file.h"
 // #include "modules/drivers/camera/common/camera_gflags.h"
 #include "modules/drivers/camera/nodes/usb_cam_wrapper.h"

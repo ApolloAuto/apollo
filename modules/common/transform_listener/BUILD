@@ -11,7 +11,7 @@ package(default_visibility = ["//visibility:public"])
 #        "transform_listener.h",
 #    ],
 #    deps = [
-#        "//modules/common:log",
+#        "//framework:cybertron",
 #        "//modules/common/time",
 #        "//framework:cybertron",
 #    ],

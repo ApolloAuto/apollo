@@ -18,7 +18,7 @@
 
 #include "modules/guardian/guardian.h"
 #include "modules/common/adapters/adapter_manager.h"
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/guardian/common/guardian_gflags.h"
 #include "modules/tools/fuzz/guardian/proto/guardian_fuzz.pb.h"
 #include "libfuzzer/libfuzzer_macro.h"

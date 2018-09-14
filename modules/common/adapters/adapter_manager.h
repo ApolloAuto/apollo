@@ -30,7 +30,7 @@
 #include "modules/common/adapters/adapter.h"
 #include "modules/common/adapters/message_adapters.h"
 #include "modules/common/adapters/proto/adapter_config.pb.h"
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/common/macro.h"
 // #include "modules/common/transform_listener/transform_listener.h"
 

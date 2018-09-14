@@ -21,7 +21,7 @@ cc_library(
         "-lboost_program_options",
     ],
     deps = [
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/common/math",
         "//modules/localization/proto:gps_proto",
         "//modules/localization/proto:localization_proto",
@@ -45,7 +45,7 @@ cc_binary(
     linkstatic = 0,
     deps = [
         ":data_extraction",
-        "//modules/common:log",
+        "//framework:cybertron",
         "@eigen//:eigen",
         "@pcl//:pcl",
         "@ros//:ros_common",
@@ -65,7 +65,7 @@ cc_binary(
     linkstatic = 0,
     deps = [
         ":data_extraction",
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/localization/msf/local_tool/local_visualization/offline_visual:offline_local_visualizer_lib",
         "@eigen//:eigen",
     ],

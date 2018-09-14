@@ -17,7 +17,7 @@
 #include "modules/calibration/republish_msg/common/republish_msg_gflags.h"
 #include "modules/calibration/republish_msg/republish_msg.h"
 #include "modules/common/adapters/adapter_manager.h"
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "ros/include/ros/ros.h"
 
 namespace apollo {

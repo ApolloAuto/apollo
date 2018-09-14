@@ -11,7 +11,7 @@ cc_library(
         "qp_spline_st_graph.h",
     ],
     deps = [
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/common/configs/proto:vehicle_config_proto",
         "//modules/common/math",
         "//modules/common/proto:error_code_proto",
@@ -34,7 +34,7 @@ cc_library(
         "qp_piecewise_st_graph.h",
     ],
     deps = [
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/common/configs/proto:vehicle_config_proto",
         "//modules/common/math",
         "//modules/common/proto:error_code_proto",
@@ -59,7 +59,7 @@ cc_library(
     deps = [
         ":qp_piecewise_st_graph",
         ":qp_spline_st_graph",
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/configs/proto:vehicle_config_proto",
         "//modules/common/proto:pnc_point_proto",

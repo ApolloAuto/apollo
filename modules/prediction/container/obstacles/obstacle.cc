@@ -24,7 +24,7 @@
 #include <utility>
 
 #include "modules/common/configs/config_gflags.h"
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/common/util/map_util.h"
 #include "modules/prediction/common/prediction_gflags.h"

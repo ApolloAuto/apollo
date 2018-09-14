@@ -20,7 +20,7 @@
 #include <thread>
 
 #include "gflags/gflags.h"
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/common/proto/error_code.pb.h"
 #include "modules/common/time/time.h"
 #include "modules/common/util/factory.h"

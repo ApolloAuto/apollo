@@ -21,13 +21,20 @@
 
 #include "gtest/gtest.h"
 
+#include "cybertron/common/log.h"
+
 #include "modules/canbus/proto/chassis.pb.h"
-#include "modules/common/util/file.h"
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/perception/proto/traffic_light_detection.pb.h"
-#include "modules/prediction/proto/prediction_obstacle.pb.h"
+#include "modules/planning/proto/dp_poly_path_config.pb.h"
+#include "modules/planning/proto/dp_st_speed_config.pb.h"
 #include "modules/planning/proto/traffic_rule_config.pb.h"
+#include "modules/prediction/proto/prediction_obstacle.pb.h"
 #include "modules/routing/proto/routing.pb.h"
+
+#include "modules/common/adapters/adapter_gflags.h"
+#include "modules/common/configs/config_gflags.h"
+#include "modules/common/util/file.h"
 
 #define private public
 #define protected public

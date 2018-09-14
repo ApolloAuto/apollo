@@ -20,7 +20,7 @@
 #include <string>
 #include <utility>
 #include <iostream>
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/common/time/time.h"
 #include "modules/common/util/file.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"

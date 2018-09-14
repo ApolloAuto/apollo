@@ -22,7 +22,7 @@
 
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/configs/vehicle_config_helper.h"
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/common/math/quaternion.h"
 #include "modules/common/time/timer.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"

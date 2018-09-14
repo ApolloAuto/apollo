@@ -19,7 +19,7 @@
 #include <algorithm>
 #include <iostream>
 #include <random>
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 
 namespace apollo {
 namespace planning {

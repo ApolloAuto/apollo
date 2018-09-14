@@ -18,7 +18,7 @@
 
 #include "gtest/gtest.h"
 
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/obstacle/base/object.h"
 #include "modules/perception/obstacle/fusion/interface/base_fusion.h"

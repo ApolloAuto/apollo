@@ -23,7 +23,7 @@ cc_library(
         "-lboost_system",
     ],
     deps = [
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/common:macro",
         "@eigen//:eigen",
         "@gtest//:gtest",

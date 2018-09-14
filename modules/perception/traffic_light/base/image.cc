@@ -18,7 +18,7 @@
 
 #include "cv_bridge/cv_bridge.h"
 
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/perception/traffic_light/util/color_space.h"
 
 DEFINE_int32(double_show_precision, 14,

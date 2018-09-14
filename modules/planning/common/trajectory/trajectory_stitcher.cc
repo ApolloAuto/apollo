@@ -25,7 +25,7 @@
 #include <utility>
 
 #include "modules/common/configs/config_gflags.h"
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/common/math/angle.h"
 #include "modules/common/math/quaternion.h"
 #include "modules/common/util/util.h"

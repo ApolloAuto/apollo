@@ -16,7 +16,7 @@ cc_library(
     ],
     deps = [
         "//modules/common",
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/common/configs:config_gflags",
         "//modules/map/hdmap",
         "//modules/map/hdmap:hdmap_util",

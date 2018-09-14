@@ -26,7 +26,7 @@
 
 #include <string>
 
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/common/util/file.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/routing/proto/poi.pb.h"

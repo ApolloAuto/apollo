@@ -26,7 +26,7 @@
 #include "Eigen/LU"
 
 #include "modules/common/configs/vehicle_config_helper.h"
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/common/math/mpc_solver.h"
 #include "modules/common/time/time.h"

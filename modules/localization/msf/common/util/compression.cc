@@ -19,7 +19,7 @@
 #include <zlib.h>
 #include <cstdio>
 
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 
 namespace apollo {
 namespace localization {

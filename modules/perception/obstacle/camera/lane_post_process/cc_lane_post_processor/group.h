@@ -21,7 +21,7 @@
 #include <limits>
 #include <vector>
 
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/perception/obstacle/camera/lane_post_process/common/type.h"
 #include "modules/perception/obstacle/camera/lane_post_process/common/util.h"
 

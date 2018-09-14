@@ -17,7 +17,7 @@
 #include "modules/dreamview/backend/hmi/vehicle_manager.h"
 
 #include "gflags/gflags.h"
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 
 DEFINE_string(vehicle_data_path, "modules/calibration/data/mkz_example",
               "Vehicle data path.");

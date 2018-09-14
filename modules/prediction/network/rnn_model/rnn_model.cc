@@ -16,7 +16,7 @@
 
 #include "modules/prediction/network/rnn_model/rnn_model.h"
 
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 
 namespace apollo {
 namespace prediction {

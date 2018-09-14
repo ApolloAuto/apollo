@@ -22,7 +22,7 @@
 #include <vector>
 #include "Eigen/Dense"
 
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_util.h"

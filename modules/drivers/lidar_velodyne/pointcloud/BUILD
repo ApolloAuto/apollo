@@ -23,7 +23,7 @@ cc_library(
         "transform_nodelet.h",
     ],
     deps = [
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/drivers/lidar_velodyne/common:velodyne_gflags",
         "//modules/drivers/lidar_velodyne/proto:cloud_node_conf_proto",
         "//modules/drivers/lidar_velodyne/proto:transform_node_conf_proto",

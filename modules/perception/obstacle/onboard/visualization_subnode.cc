@@ -19,7 +19,7 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/perception/lib/config_manager/calibration_config_manager.h"
 #include "modules/perception/obstacle/camera/common/util.h"
 #include "modules/perception/obstacle/camera/visualizer/base_visualizer.h"

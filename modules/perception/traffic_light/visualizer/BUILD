@@ -10,7 +10,7 @@ cc_binary(
     linkopts = ["-lopencv_core -lopencv_imgproc -lopencv_highgui"],
     deps = [
         "//modules/common",
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/common/adapters:adapter_gflags",
         "//modules/perception/common",
         "//modules/perception/lib/base",

@@ -23,7 +23,7 @@
 
 #include "caffe/caffe.hpp"
 
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/common/util/disjoint_set.h"
 #include "modules/perception/common/pcl_types.h"
 #include "modules/perception/obstacle/base/object.h"

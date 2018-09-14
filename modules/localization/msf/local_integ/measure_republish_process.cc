@@ -21,7 +21,7 @@
 
 #include "yaml-cpp/yaml.h"
 
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/common/math/euler_angles_zxy.h"
 #include "modules/common/time/time_util.h"
 

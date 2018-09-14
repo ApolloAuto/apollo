@@ -19,7 +19,7 @@
 #include <pcl/io/pcd_io.h>
 #include <yaml-cpp/yaml.h>
 
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/localization/msf/common/io/pcl_point_types.h"
 
 namespace apollo {

@@ -26,7 +26,7 @@
 #include "Eigen/Eigen"
 #include "opencv2/opencv.hpp"
 
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/perception/lib/config_manager/calibration_config_manager.h"
 #include "modules/perception/obstacle/camera/common/util.h"
 

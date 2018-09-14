@@ -46,7 +46,7 @@ cc_test(
     ],
     deps = [
         "//modules/canbus/proto:canbus_proto",
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/drivers/canbus/can_client/fake:fake_can_client",
         "//modules/drivers/canbus/can_comm:can_sender",
         "//modules/drivers/canbus/common:canbus_common",
@@ -62,7 +62,7 @@ cc_test(
     ],
     deps = [
         "//modules/canbus/proto:canbus_proto",
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/drivers/canbus/can_client/fake:fake_can_client",
         "//modules/drivers/canbus/can_comm:can_receiver",
         "//modules/drivers/canbus/common:canbus_common",

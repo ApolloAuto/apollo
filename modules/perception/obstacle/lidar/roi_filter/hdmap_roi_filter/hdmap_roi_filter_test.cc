@@ -25,7 +25,7 @@
 #include "gtest/gtest.h"
 #include "pcl/io/pcd_io.h"
 
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 
 namespace apollo {
 namespace perception {

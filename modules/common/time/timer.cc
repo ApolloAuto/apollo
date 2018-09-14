@@ -16,7 +16,7 @@
 
 #include "modules/common/time/timer.h"
 
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/common/time/time.h"
 
 namespace apollo {

@@ -26,7 +26,7 @@
 #include "Eigen/LU"
 
 #include "modules/common/configs/vehicle_config_helper.h"
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/common/math/linear_quadratic_regulator.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/common/math/quaternion.h"

@@ -20,7 +20,7 @@ cc_library(
         "utils.h",
     ],
     deps = [
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/map/proto:map_proto",
         "//modules/perception/lib/config_manager",
         "//modules/perception/onboard",
@@ -38,7 +38,7 @@ cc_test(
         "utils_structs_test.cc",
     ],
     deps = [
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/map/proto:map_proto",
         "//modules/perception/lib/config_manager",
         "//modules/perception/proto:perception_proto",

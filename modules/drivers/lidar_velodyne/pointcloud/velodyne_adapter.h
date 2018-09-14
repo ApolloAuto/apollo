@@ -22,7 +22,7 @@
 #include "ros/include/velodyne_msgs/VelodyneScanUnified.h"
 
 #include "modules/common/adapters/adapter_manager.h"
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 
 namespace apollo {
 namespace drivers {

@@ -16,7 +16,7 @@
 #include "modules/perception/obstacle/radar/modest/modest_radar_detector.h"
 
 #include "gtest/gtest.h"
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/perception/common/perception_gflags.h"
 
 namespace apollo {

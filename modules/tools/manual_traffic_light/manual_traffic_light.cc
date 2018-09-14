@@ -28,7 +28,7 @@
 #include "modules/perception/proto/traffic_light_detection.pb.h"
 
 #include "modules/common/configs/config_gflags.h"
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/common/util/color.h"
 #include "modules/common/util/file.h"
 #include "modules/common/util/message_util.h"

@@ -16,7 +16,7 @@
 
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_imf_fusion.h"  // NOLINT
 
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/perception/obstacle/base/types.h"
 
 namespace apollo {

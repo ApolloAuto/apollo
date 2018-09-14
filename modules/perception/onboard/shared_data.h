@@ -19,7 +19,7 @@
 
 #include <string>
 
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/common/macro.h"
 #include "modules/perception/lib/base/registerer.h"
 

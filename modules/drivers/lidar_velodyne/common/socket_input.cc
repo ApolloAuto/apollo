@@ -35,7 +35,7 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 
 namespace apollo {
 namespace drivers {

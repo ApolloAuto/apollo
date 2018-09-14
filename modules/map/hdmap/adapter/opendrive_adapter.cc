@@ -16,7 +16,7 @@ limitations under the License.
 
 #include <vector>
 
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/map/hdmap/adapter/proto_organizer.h"
 #include "modules/map/hdmap/adapter/xml_parser/status.h"
 

@@ -22,7 +22,7 @@
 #include "pcl/io/pcd_io.h"
 #include "pcl_conversions/pcl_conversions.h"
 
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/obstacle/base/object.h"
 #include "modules/perception/obstacle/common/pose_util.h"

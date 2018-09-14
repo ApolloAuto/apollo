@@ -25,7 +25,7 @@
 
 #include "modules/drivers/canbus/can_client/hermes_can/hermes_can_client.h"
 
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/common/util/util.h"
 
 namespace apollo {

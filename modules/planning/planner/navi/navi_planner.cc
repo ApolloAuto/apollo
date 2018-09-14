@@ -28,7 +28,7 @@
 #include <vector>
 
 #include "modules/common/adapters/adapter_manager.h"
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/common/time/time.h"
 #include "modules/common/util/string_tokenizer.h"

@@ -22,7 +22,7 @@
 
 #include "Eigen/StdVector"
 
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/perception/obstacle/lidar/roi_filter/hdmap_roi_filter/bitmap2d.h"
 #include "modules/perception/obstacle/lidar/roi_filter/hdmap_roi_filter/polygon_scan_converter.h"
 

@@ -20,7 +20,7 @@
 
 #include <utility>
 
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/common/util/file.h"
 #include "modules/perception/onboard/subnode.h"
 

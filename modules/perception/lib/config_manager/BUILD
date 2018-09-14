@@ -11,7 +11,7 @@ cc_library(
         "calibration_config_manager.h",
     ],
     deps = [
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/common/util",
         "//modules/perception/common",
         "//modules/perception/cuda_util",

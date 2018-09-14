@@ -25,7 +25,7 @@
 #include <limits>
 #include <utility>
 
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/lattice/trajectory1d/constant_deceleration_trajectory1d.h"
 #include "modules/planning/lattice/trajectory1d/piecewise_jerk_trajectory1d.h"

@@ -27,7 +27,7 @@
 
 #include "Eigen/Dense"
 
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/common/math/matrix_operations.h"
 
 /**

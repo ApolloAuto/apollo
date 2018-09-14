@@ -18,7 +18,7 @@
 
 #include "modules/routing/routing.h"
 #include "modules/common/adapters/adapter_manager.h"
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/routing/common/routing_gflags.h"
 #include "modules/tools/fuzz/routing/proto/routing_fuzz.pb.h"
 #include "libfuzzer/libfuzzer_macro.h"

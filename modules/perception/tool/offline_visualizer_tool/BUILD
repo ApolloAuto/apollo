@@ -12,7 +12,7 @@ cc_binary(
     linkstatic = 0,
     deps = [
         "//modules/common",
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/common/util",
         "//modules/perception/common",
         "//modules/perception/common:pcl_util",
@@ -38,7 +38,7 @@ cc_binary(
     linkstatic = 0,
     deps = [
         "//modules/common",
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/perception/common",
         "//modules/perception/common:pcl_util",
         "//modules/perception/lib/base",

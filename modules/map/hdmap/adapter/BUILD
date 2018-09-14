@@ -31,7 +31,7 @@ cc_library(
         "xml_parser/util_xml_parser.h",
     ],
     deps = [
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/common/math",
         "//modules/common/status",
         "//modules/common/util",

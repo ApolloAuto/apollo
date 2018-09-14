@@ -16,7 +16,7 @@
 
 #include "modules/monitor/hardware/can/socketcan/socketcan_test.h"
 
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 
 namespace apollo {
 namespace monitor {

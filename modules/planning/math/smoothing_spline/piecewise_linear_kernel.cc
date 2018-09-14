@@ -21,7 +21,7 @@
 
 #include "modules/planning/math/smoothing_spline/piecewise_linear_kernel.h"
 
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 
 namespace apollo {
 namespace planning {

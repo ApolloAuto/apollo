@@ -11,7 +11,7 @@ cc_library(
         "laser_scan.h",
     ],
     deps = [
-        "//modules/common:log",
+        "//framework:cybertron",
         "@ros//:ros_common",
     ],
 )

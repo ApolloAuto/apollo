@@ -21,7 +21,7 @@
 #include "gmock/gmock.h"
 #include "google/protobuf/text_format.h"
 #include "gtest/gtest.h"
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 
 #include "modules/common/time/time.h"
 #include "modules/common/util/util.h"

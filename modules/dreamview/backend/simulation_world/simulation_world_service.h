@@ -35,7 +35,7 @@
 #include "modules/dreamview/proto/simulation_world.pb.h"
 
 #include "modules/common/adapters/adapter_manager.h"
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/common/monitor_log/monitor_log_buffer.h"
 #include "modules/common/proto/pnc_point.pb.h"
 

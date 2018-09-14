@@ -21,7 +21,7 @@
 #include "ros/include/ros/ros.h"
 
 #include "modules/common/adapters/adapter_manager.h"
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/perception/tool/data_generator/common/data_generator_gflags.h"
 #include "modules/perception/tool/data_generator/velodyne64.h"

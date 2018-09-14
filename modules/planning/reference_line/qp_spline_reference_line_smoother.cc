@@ -26,7 +26,7 @@
 
 #include "modules/common/proto/pnc_point.pb.h"
 
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/common/math/vec2d.h"
 #include "modules/common/util/file.h"
 #include "modules/common/util/util.h"

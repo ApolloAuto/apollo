@@ -7,7 +7,7 @@ cc_library(
     srcs = ["geometry_camera_converter.cc"],
     hdrs = ["geometry_camera_converter.h"],
     deps = [
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/perception/lib/base",
         "//modules/perception/lib/config_manager",
         "//modules/perception/obstacle/camera/common",

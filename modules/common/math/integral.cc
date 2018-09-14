@@ -18,7 +18,7 @@
 
 #include <array>
 
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 
 namespace apollo {
 namespace common {

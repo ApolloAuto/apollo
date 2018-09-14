@@ -21,7 +21,7 @@
 #include "ros/include/ros/ros.h"
 
 #include "modules/common/adapters/adapter_manager.h"
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/common/util/util.h"
 #include "modules/localization/common/localization_gflags.h"
 

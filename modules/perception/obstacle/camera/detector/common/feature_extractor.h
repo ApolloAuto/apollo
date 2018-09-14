@@ -28,7 +28,7 @@
 
 #include "modules/perception/obstacle/camera/detector/common/proto/tracking_feature.pb.h"
 
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/common/macro.h"
 #include "modules/perception/obstacle/base/types.h"
 #include "modules/perception/obstacle/camera/common/visual_object.h"

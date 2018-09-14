@@ -41,7 +41,7 @@ cc_library(
         "vec2d.h",
     ],
     deps = [
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/common/util:string_util",
     ],
 )
@@ -102,11 +102,10 @@ cc_library(
         "matrix_operations.h",
     ],
     deps = [
+        "//framework:cybertron",
         "@eigen",
-        "//modules/common:log",
     ],
 )
-
 
 cc_test(
     name = "matrix_operations_test",
@@ -126,7 +125,7 @@ cc_library(
         "kalman_filter.h",
     ],
     deps = [
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/common/math:matrix_operations",
         "@eigen",
     ],
@@ -138,7 +137,7 @@ cc_library(
         "extended_kalman_filter.h",
     ],
     deps = [
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/common/math:matrix_operations",
         "@eigen",
     ],
@@ -230,7 +229,7 @@ cc_library(
         "integral.h",
     ],
     deps = [
-        "//modules/common:log",
+        "//framework:cybertron",
     ],
 )
 
@@ -243,7 +242,7 @@ cc_library(
         "linear_quadratic_regulator.h",
     ],
     deps = [
-        "//modules/common:log",
+        "//framework:cybertron",
         "@eigen",
     ],
 )
@@ -257,7 +256,7 @@ cc_library(
         "mpc_solver.h",
     ],
     deps = [
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/common/math/qp_solver",
         "//modules/common/math/qp_solver:active_set_qp_solver",
         "@eigen",
@@ -274,7 +273,7 @@ cc_library(
     ],
     deps = [
         ":geometry",
-        "//modules/common:log",
+        "//framework:cybertron",
         "@eigen",
     ],
 )
@@ -285,7 +284,7 @@ cc_library(
         "hermite_spline.h",
     ],
     deps = [
-        "//modules/common:log",
+        "//framework:cybertron",
     ],
 )
 
@@ -323,7 +322,7 @@ cc_test(
     ],
     deps = [
         ":linear_interpolation",
-        "//modules/common:log",
+        "//framework:cybertron",
         "@eigen",
         "@gtest//:main",
     ],

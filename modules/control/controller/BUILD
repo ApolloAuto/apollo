@@ -21,7 +21,7 @@ cc_library(
     ],
     deps = [
         ":controller_interface",
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/filters:digital_filter",
         "//modules/common/filters:digital_filter_coefficients",
@@ -50,7 +50,7 @@ cc_library(
     ],
     deps = [
         ":controller_interface",
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/filters:digital_filter",
         "//modules/common/filters:digital_filter_coefficients",
@@ -75,7 +75,7 @@ cc_library(
     ],
     deps = [
         ":controller_interface",
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/filters:digital_filter",
         "//modules/common/filters:digital_filter_coefficients",
@@ -121,7 +121,7 @@ cc_library(
         ":lon_controller",
         ":mpc_controller",
         "//modules/canbus/proto:canbus_proto",
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/common/time",
         "//modules/common/util:factory",
         "//modules/control/proto:control_proto",
@@ -138,7 +138,7 @@ cc_library(
 #    data = ["//modules/control:control_testdata"],
 #    deps = [
 #        ":lon_controller",
-#        "//modules/common:log",
+#        "//framework:cybertron",
 #        "//modules/common/time",
 #        "//modules/common/util",
 #        "//modules/common/vehicle_state:vehicle_state_provider",
@@ -158,7 +158,7 @@ cc_library(
 #    data = ["//modules/control:control_testdata"],
 #    deps = [
 #        ":lat_controller",
-#        "//modules/common:log",
+#        "//framework:cybertron",
 #        "//modules/common/time",
 #        "//modules/common/util",
 #        "//modules/common/vehicle_state:vehicle_state_provider",
@@ -178,7 +178,7 @@ cc_library(
 #    data = ["//modules/control:control_testdata"],
 #    deps = [
 #        ":mpc_controller",
-#        "//modules/common:log",
+#        "//framework:cybertron",
 #        "//modules/common/time",
 #        "//modules/common/util",
 #        "//modules/common/vehicle_state:vehicle_state_provider",

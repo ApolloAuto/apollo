@@ -23,7 +23,7 @@
 #include <climits>
 #include <vector>
 
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/common/math/qp_solver/qp_solver_gflags.h"
 
 namespace apollo {

@@ -16,7 +16,7 @@
 
 #include "modules/prediction/container/pose/pose_container.h"
 
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/common/math/quaternion.h"
 
 namespace apollo {

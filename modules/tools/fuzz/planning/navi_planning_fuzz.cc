@@ -19,7 +19,7 @@
 
 #include "modules/planning/navi_planning.h"
 #include "modules/common/adapters/adapter_manager.h"
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/tools/fuzz/planning/proto/navi_planning_fuzz.pb.h"

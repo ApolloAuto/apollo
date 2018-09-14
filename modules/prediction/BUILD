@@ -9,8 +9,8 @@ cc_library(
         "prediction_component.h",
     ],
     deps = [
+        "//framework:cybertron",
         "//modules/common",
-        "//modules/common:log",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/adapters/proto:adapter_config_proto",
         "//modules/common/math:geometry",
@@ -29,8 +29,7 @@ cc_library(
         "//modules/prediction/predictor:predictor_manager",
         "//modules/prediction/proto:prediction_conf_proto",
         "//modules/prediction/proto:prediction_proto",
-        "//modules/prediction/util:data_extraction", 
-        "//framework:cybertron",
+        "//modules/prediction/util:data_extraction",
     ],
 )
 
@@ -51,11 +50,11 @@ cc_test(
 
 cc_binary(
     name = "libprediction_component.so",
+    linkopts = ["-shared"],
     deps = [
         ":prediction_component_lib",
         "//external:gflags",
     ],
-    linkopts = ["-shared"],
 )
 
 filegroup(

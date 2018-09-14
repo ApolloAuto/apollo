@@ -17,7 +17,7 @@
 #include <algorithm>
 #include <memory>
 
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/common/math/qp_solver/active_set_qp_solver.h"
 #include "modules/common/math/qp_solver/qp_solver.h"
 

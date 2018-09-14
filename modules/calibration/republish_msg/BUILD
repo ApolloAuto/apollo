@@ -10,7 +10,7 @@ cc_library(
         "//modules/calibration/republish_msg/common:republish_msg_common",
         "//modules/calibration/republish_msg/proto:relative_odometry_proto",
         "//modules/common:apollo_app",
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/drivers/gnss/proto:ins_proto",
         "//modules/localization/proto:gps_proto",
     ],
@@ -26,7 +26,7 @@ cc_binary(
     deps = [
         ":republish_msg_lib",
         "//external:gflags",
-        "//modules/common:log",
+        "//framework:cybertron",
         "@ros//:ros_common",
     ],
 )

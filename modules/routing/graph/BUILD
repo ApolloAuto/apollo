@@ -75,7 +75,7 @@ cc_library(
     deps = [
         ":routing_range_utils",
         ":routing_topo_range",
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/common/proto:common_proto",
         "//modules/common/util:map_util",
         "//modules/map/proto:map_proto",

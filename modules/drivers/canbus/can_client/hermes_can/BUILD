@@ -25,7 +25,7 @@ cc_test(
         "hermes_can_client_test.cc",
     ],
     deps = [
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/drivers/canbus/can_client/hermes_can:hermes_can_client",
         "//modules/drivers/canbus/common:canbus_common",
         "@gtest//:main",

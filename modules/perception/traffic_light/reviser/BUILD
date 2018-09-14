@@ -11,7 +11,7 @@ cc_library(
         "color_decision.h",
     ],
     deps = [
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/common/proto:error_code_proto",
         "//modules/common/proto:header_proto",
         "//modules/map/proto:map_proto",
@@ -35,7 +35,7 @@ cc_test(
     ],
     deps = [
         "perception_traffic_light_reviser",
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/perception/common",
         "//modules/perception/obstacle/base",
         "@caffe//:lib",

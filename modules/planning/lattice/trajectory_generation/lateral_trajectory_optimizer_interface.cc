@@ -22,7 +22,7 @@
 
 #include <utility>
 
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/planning/lattice/trajectory1d/constant_jerk_trajectory1d.h"
 
 namespace apollo {

@@ -19,7 +19,7 @@
 #include <vector>
 
 #include "gflags/gflags.h"
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/perception/traffic_light/base/utils.h"
 
 namespace apollo {

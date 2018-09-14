@@ -23,7 +23,7 @@
 #include "ros/include/ros/ros.h"
 
 #include "modules/common/adapters/adapter_manager.h"
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/common/time/timer.h"
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/common/sequence_type_fuser/sequence_type_fuser.h"

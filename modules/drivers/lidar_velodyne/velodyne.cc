@@ -21,7 +21,7 @@
 #include "ros/include/std_msgs/String.h"
 
 #include "modules/common/adapters/adapter_manager.h"
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/drivers/lidar_velodyne/common/velodyne_gflags.h"
 #include "modules/drivers/lidar_velodyne/driver/driver.h"
 

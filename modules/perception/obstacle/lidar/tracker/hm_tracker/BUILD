@@ -26,7 +26,7 @@ cc_library(
     ],
     deps = [
         "//modules/common",
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/perception/common",
         "//modules/perception/lib/config_manager",
         "//modules/perception/obstacle/base",
@@ -55,7 +55,7 @@ cc_test(
     ],
     deps = [
         ":hm_tracker",
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/common/util",
         "//modules/perception/lib/config_manager",
         "//modules/perception/obstacle/lidar/object_builder/min_box",

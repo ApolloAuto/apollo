@@ -18,7 +18,7 @@ limitations under the License.
 #include <string>
 #include <unordered_set>
 #include <vector>
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/map/proto/map.pb.h"
 
 namespace apollo {

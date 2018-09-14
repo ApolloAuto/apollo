@@ -7,7 +7,7 @@ cc_library(
     srcs = ["evaluator_manager.cc"],
     hdrs = ["evaluator_manager.h"],
     deps = [
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/perception/proto:perception_proto",
         "//modules/prediction/container:container_manager",
         "//modules/prediction/container/obstacles:obstacles_container",

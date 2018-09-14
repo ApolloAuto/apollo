@@ -11,7 +11,7 @@ package(default_visibility = ["//visibility:public"])
 #        "control_test_base.h",
 #    ],
 #    deps = [
-#        "//modules/common:log",
+#        "//framework:cybertron",
 #        "//modules/common/proto:common_proto",
 #        "//modules/common/time",
 #        "//modules/control:control_lib",

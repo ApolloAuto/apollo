@@ -29,7 +29,7 @@
 #include "boost/thread/locks.hpp"
 #include "boost/thread/shared_mutex.hpp"
 
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/common/util/map_util.h"
 
 namespace apollo {

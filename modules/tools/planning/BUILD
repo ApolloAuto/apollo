@@ -18,7 +18,7 @@ cc_binary(
     srcs = ["terminal.cc"],
     deps = [
         "//external:gflags",
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/planning/proto:planning_proto",
         "@ros//:ros_common",
     ],

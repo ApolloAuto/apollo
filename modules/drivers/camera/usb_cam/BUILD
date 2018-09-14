@@ -11,7 +11,7 @@ cc_library(
         "usb_cam.h",
     ],
     deps = [
-        "//modules/common:log",
+        "//framework:cybertron",
         "@adv_plat//:adv_plat",
         "@ros//:ros_common",
     ],

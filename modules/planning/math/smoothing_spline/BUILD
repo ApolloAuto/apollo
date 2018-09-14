@@ -57,7 +57,7 @@ cc_library(
     deps = [
         ":affine_constraint",
         ":spline_1d",
-        "//modules/common:log",
+        "//framework:cybertron",
         "@eigen",
     ],
 )
@@ -204,7 +204,7 @@ cc_library(
         "piecewise_linear_constraint.h",
     ],
     deps = [
-        "//modules/common:log",
+        "//framework:cybertron",
         "@eigen",
     ],
 )
@@ -218,7 +218,7 @@ cc_library(
         "piecewise_linear_kernel.h",
     ],
     deps = [
-        "//modules/common:log",
+        "//framework:cybertron",
         "@eigen",
     ],
 )

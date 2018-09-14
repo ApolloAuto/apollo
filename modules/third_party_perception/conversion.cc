@@ -23,7 +23,7 @@
 #include <vector>
 
 #include "modules/common/configs/config_gflags.h"
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 
 #include "modules/third_party_perception/common/third_party_perception_gflags.h"
 #include "modules/third_party_perception/common/third_party_perception_util.h"

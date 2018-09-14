@@ -56,7 +56,7 @@ cc_test(
     deps = [
         ":convex_hullxy",
         ":pcl_util",
-        "//modules/common:log",
+        "//framework:cybertron",
         "@eigen",
         "@gtest//:main",
     ],

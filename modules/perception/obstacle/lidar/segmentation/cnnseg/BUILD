@@ -7,7 +7,7 @@ cc_library(
     srcs = ["cnn_segmentation.cc"],
     hdrs = ["cnn_segmentation.h"],
     deps = [
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/common/util",
         "//modules/perception/common:pcl_util",
         "//modules/perception/lib/base",
@@ -32,7 +32,7 @@ cc_library(
     srcs = ["feature_generator.cc"],
     hdrs = ["feature_generator.h"],
     deps = [
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/perception/common:pcl_util",
         "//modules/perception/obstacle/lidar/segmentation/cnnseg:cnnseg_util",
         "//modules/perception/obstacle/lidar/segmentation/cnnseg/proto:cnnseg_proto",
@@ -45,7 +45,7 @@ cc_library(
     name = "cnnseg_cluster2d",
     hdrs = ["cluster2d.h"],
     deps = [
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/common/util:disjoint_set",
         "//modules/perception/common:pcl_util",
         "//modules/perception/obstacle/base",
@@ -68,7 +68,7 @@ cc_test(
     ],
     deps = [
         "cnnseg",
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/perception/common",
         "//modules/perception/common:pcl_util",
         "//modules/perception/obstacle/base",

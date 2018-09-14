@@ -7,7 +7,7 @@ cc_library(
     srcs = ["feature_extractor.cc"],
     hdrs = ["feature_extractor.h"],
     deps = [
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/perception/common:pcl_util",
         "//modules/perception/cuda_util",
         "//modules/perception/lib/base",

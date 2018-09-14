@@ -18,7 +18,7 @@
 
 #include <cmath>
 
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/common/math/line_segment2d.h"
 
 namespace apollo {

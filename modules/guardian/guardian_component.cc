@@ -17,7 +17,7 @@
 
 #include <cmath>
 
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/common/util/message_util.h"
 
 namespace apollo {

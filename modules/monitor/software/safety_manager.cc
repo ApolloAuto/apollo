@@ -17,7 +17,7 @@
 #include "modules/monitor/software/safety_manager.h"
 
 #include "modules/common/kv_db/kv_db.h"
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/common/util/file.h"
 #include "modules/common/util/map_util.h"
 #include "modules/common/util/string_util.h"

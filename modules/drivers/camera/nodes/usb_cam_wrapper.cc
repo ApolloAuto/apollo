@@ -19,7 +19,7 @@
 #include "image_transport/camera_common.h"
 #include "image_transport/publisher_plugin.h"
 
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/common/util/file.h"
 #include "modules/drivers/camera/common/camera_gflags.h"
 #include "modules/drivers/proto/sensor_image.pb.h"

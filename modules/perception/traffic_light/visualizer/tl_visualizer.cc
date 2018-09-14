@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/common/adapters/adapter_gflags.h"
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/perception/proto/traffic_light_detection.pb.h"
 #include "modules/perception/traffic_light/base/image_lights.h"
 #include "ros/ros.h"

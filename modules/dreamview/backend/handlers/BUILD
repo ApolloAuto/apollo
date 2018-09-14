@@ -43,7 +43,7 @@ cc_test(
     ],
     deps = [
         ":websocket_handler",
-        "//modules/common:log",
+        "//framework:cybertron",
         "@gtest//:main",
     ],
 )

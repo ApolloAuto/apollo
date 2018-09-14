@@ -7,7 +7,7 @@ cc_library(
     srcs = ["single_lane_predictor.cc"],
     hdrs = ["single_lane_predictor.h"],
     deps = [
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/common/adapters/proto:adapter_config_proto",
         "//modules/common/math",
         "//modules/common/proto:pnc_point_proto",

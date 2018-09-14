@@ -12,7 +12,6 @@ cc_library(
     ],
     deps = [
         "//framework:cybertron",
-        "//modules/common:log",
         "//modules/common/configs:config_gflags",
         "//modules/common/math:geometry",
         "//modules/common/math:quaternion",

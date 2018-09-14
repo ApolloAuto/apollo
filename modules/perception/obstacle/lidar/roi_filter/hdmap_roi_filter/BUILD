@@ -42,7 +42,7 @@ cc_test(
     ],
     deps = [
         "//external:gflags",
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/perception/common:pcl_util",
         "//modules/perception/obstacle/lidar/roi_filter/hdmap_roi_filter",
         "@gtest",

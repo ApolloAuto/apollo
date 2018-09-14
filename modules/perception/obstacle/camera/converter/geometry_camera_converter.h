@@ -32,7 +32,7 @@
 
 #include "modules/perception/proto/geometry_camera_converter_config.pb.h"
 
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/perception/obstacle/base/types.h"
 #include "modules/perception/obstacle/camera/common/camera.h"
 #include "modules/perception/obstacle/camera/common/visual_object.h"

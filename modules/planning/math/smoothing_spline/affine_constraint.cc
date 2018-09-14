@@ -20,7 +20,7 @@
 
 #include "modules/planning/math/smoothing_spline/affine_constraint.h"
 
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 
 namespace apollo {
 namespace planning {

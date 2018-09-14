@@ -14,7 +14,7 @@ cc_binary(
     ],
     linkstatic = 0,
     deps = [
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/localization/msf/common/io:localization_msf_common_io",
         "//modules/localization/msf/common/util:localization_msf_common_util",
         "//modules/localization/msf/local_map/base_map:localization_msf_base_map",
@@ -35,7 +35,7 @@ cc_binary(
     ],
     linkstatic = 0,
     deps = [
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/localization/msf/common/io:localization_msf_common_io",
         "//modules/localization/msf/common/util:localization_msf_common_util",
         "//modules/localization/msf/local_map/base_map:localization_msf_base_map",

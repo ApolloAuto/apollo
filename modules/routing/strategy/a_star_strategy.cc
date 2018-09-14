@@ -20,7 +20,7 @@
 #include <limits>
 #include <queue>
 
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/routing/common/routing_gflags.h"
 #include "modules/routing/graph/sub_topo_graph.h"
 #include "modules/routing/graph/topo_graph.h"

@@ -18,7 +18,7 @@
 
 #include <ostream>
 
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/monitor/hardware/can/esdcan/esdcan_err_str.h"
 
 namespace apollo {

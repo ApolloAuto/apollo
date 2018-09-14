@@ -12,7 +12,7 @@ cc_library(
     ],
     deps = [
         ":digital_filter_coefficients",
-        "//modules/common:log",
+        "//framework:cybertron",
     ],
 )
 
@@ -25,7 +25,7 @@ cc_library(
         "mean_filter.h",
     ],
     deps = [
-        "//modules/common:log",
+        "//framework:cybertron",
     ],
 )
 

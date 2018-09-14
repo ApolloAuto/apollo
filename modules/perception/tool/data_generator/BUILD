@@ -18,7 +18,7 @@ cc_library(
     ],
     deps = [
         "//modules/common:apollo_app",
-        "//modules/common:log",
+        "//framework:cybertron",
         "//modules/common/util:factory",
         "//modules/common/vehicle_state:vehicle_state_provider",
         "//modules/perception/common:pcl_util",
@@ -33,7 +33,7 @@ cc_binary(
     deps = [
         ":data_generator_lib",
         "//external:gflags",
-        "//modules/common:log",
+        "//framework:cybertron",
         "@ros//:ros_common",
     ],
 )

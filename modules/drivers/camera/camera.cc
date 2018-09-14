@@ -16,7 +16,7 @@
 #include "modules/drivers/camera/camera.h"
 
 #include "modules/common/adapters/adapter_manager.h"
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/drivers/camera/common/camera_gflags.h"
 
 namespace apollo {

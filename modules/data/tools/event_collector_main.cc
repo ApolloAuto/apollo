@@ -23,7 +23,7 @@
 #include "ros/include/rosbag/view.h"
 
 #include "modules/common/adapters/adapter_manager.h"
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/common/util/file.h"
 #include "modules/common/util/string_util.h"
 

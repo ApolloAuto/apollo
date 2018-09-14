@@ -24,7 +24,7 @@
 
 #include "Eigen/Core"
 
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/perception/common/pcl_types.h"
 
 namespace apollo {

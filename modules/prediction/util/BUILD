@@ -1,5 +1,4 @@
 load("//tools:cpplint.bzl", "cpplint")
-
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -11,9 +10,8 @@ cc_library(
         "data_extraction.h",
     ],
     deps = [
-        "//modules/common",
-        "//modules/common:log",
         "//framework:cybertron",
+        "//modules/common",
     ],
 )
 

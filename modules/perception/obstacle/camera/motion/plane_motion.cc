@@ -17,7 +17,7 @@
 #include "modules/perception/obstacle/camera/motion/plane_motion.h"
 #include <limits>
 #include <list>
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 namespace apollo {
 namespace perception {
 

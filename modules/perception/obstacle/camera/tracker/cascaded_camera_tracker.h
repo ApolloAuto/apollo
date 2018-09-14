@@ -31,7 +31,7 @@
 
 #include "opencv2/opencv.hpp"
 
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
 #include "modules/common/macro.h"
 #include "modules/perception/lib/base/registerer.h"
 #include "modules/perception/obstacle/camera/common/visual_object.h"
