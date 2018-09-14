@@ -26,6 +26,7 @@
 #include <vector>
 
 #include "cybertron/common/global_data.h"
+#include "cybertron/croutine/croutine.h"
 #include "cybertron/croutine/routine_factory.h"
 #include "cybertron/data/data_dispatcher.h"
 #include "cybertron/init.h"
@@ -126,7 +127,7 @@ bool Task<T>::WaitFor(const std::chrono::duration<Rep, Period>& time) {
         return true;
       }
     }
-    usleep(100000);
+    croutine::CRoutine::GetCurrentRoutine()->Sleep(10000);
   }
   return false;
 }

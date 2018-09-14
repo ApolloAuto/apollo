@@ -31,11 +31,6 @@ add_executable(parameter_example
 )
 target_link_libraries(parameter_example -pthread dl cybertron)
 
-add_executable(system_hook_sample
-  system_hook_sample.cpp
-)
-target_link_libraries(system_hook_sample -pthread dl cybertron)
-
 add_executable(talker_listener
   talker_listener.cpp
 )
