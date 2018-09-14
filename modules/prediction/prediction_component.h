@@ -50,7 +50,7 @@ class PredictionComponent :
   /**
    * @brief Destructor
    */
-  ~PredictionComponent() = default;
+  ~PredictionComponent();
 
   /**
    * @brief Get name of the node
@@ -66,36 +66,23 @@ class PredictionComponent :
 
   /**
    * @brief Data callback upon receiving a perception obstacle message.
-   * @param perception_obstacles received message.
+   * @param Perception obstacle message.
+   * @param Localization message.
+   * @param Planning trajectory message.
    */
   bool Proc(
       const std::shared_ptr<perception::PerceptionObstacles>&,
       const std::shared_ptr<localization::LocalizationEstimate>&,
       const std::shared_ptr<planning::ADCTrajectory>&) override;
 
-  /**
-   * @brief Start the node
-   * @return Status of the starting process
-   */
-  common::Status Start();
-
-  /**
-   * @brief Stop the node
-   */
-  void Stop();
-
  private:
-  common::Status OnError(const std::string &error_msg);
-
   void OnLocalization(const localization::LocalizationEstimate &localization);
 
   void OnPlanning(const planning::ADCTrajectory &adc_trajectory);
 
-  /**
-   * @brief process data in offline mode, mainly for extracting prediction
-   * features.
-   */
   void ProcessOfflineData(const std::string &filename);
+
+  void Stop();
 
  private:
   double component_start_time_ = 0.0;
@@ -103,15 +90,9 @@ class PredictionComponent :
   PredictionConf prediction_conf_;
 
   common::adapter::AdapterManagerConfig adapter_conf_;
-  std::shared_ptr<Reader<localization::LocalizationEstimate>>
-      localization_reader_;
-  std::shared_ptr<apollo::cybertron::Reader<planning::ADCTrajectory>>
-      planning_reader_;
 
   std::shared_ptr<apollo::cybertron::Writer<PredictionObstacles>>
       prediction_writer_;
-
-  std::mutex mutex_;
 };
 
 CYBERTRON_REGISTER_COMPONENT(PredictionComponent)
