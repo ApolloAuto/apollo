@@ -12,12 +12,18 @@ namespace apollo {
 namespace cybertron {
 namespace scheduler {
 void VoidTask() { AINFO << "VoidTask running"; }
-void UserTask(const std::shared_ptr<CarStatus>& msg) { AINFO << "receive msg"; }
+
+int UserTask(const std::shared_ptr<CarStatus>& msg) {
+  AINFO << "receive msg";
+  return 0;
+}
+
 TEST(TaskTest, all) {
-  std::shared_ptr<apollo::cybertron::Task<CarStatus>> task_ = nullptr;
-  std::shared_ptr<apollo::cybertron::Task<void>> void_task_ = nullptr;
-  task_.reset(new apollo::cybertron::Task<CarStatus>("task", &UserTask));
-  void_task_.reset(new apollo::cybertron::Task<void>("void_task", &VoidTask));
+  std::shared_ptr<apollo::cybertron::Task<CarStatus, int>> task_ = nullptr;
+  std::shared_ptr<apollo::cybertron::Task<>> void_task_ = nullptr;
+  task_.reset(new apollo::cybertron::Task<CarStatus, int>("task", &UserTask));
+  void_task_.reset(
+      new apollo::cybertron::Task<void, void>("void_task", &VoidTask));
 }
 
 }  // namespace scheduler
