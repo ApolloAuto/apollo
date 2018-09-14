@@ -34,6 +34,10 @@ using apollo::guardian::GuardianCommand;
 
 std::string CanbusComponent::Name() const { return FLAGS_canbus_module_name; }
 
+CanbusComponent::CanbusComponent()
+    : monitor_logger_buffer_(apollo::common::monitor::MonitorMessageItem::CANBUS) {
+}
+
 bool CanbusComponent::Init() {
   if (!GetProtoConfig(&canbus_conf_)) {
     AERROR << "Unable to load canbus conf file: " << ConfigFilePath();
@@ -135,9 +139,7 @@ bool CanbusComponent::Init() {
     return false;
   }
 
-  // TODO(Jinyun): last step: publish monitor messages
-  // apollo::common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
-  // buffer.INFO("Canbus is started.");
+  monitor_logger_buffer_.INFO("Canbus is started.");
 
   return true;
 }
@@ -197,12 +199,10 @@ void CanbusComponent::OnGuardianCommand(
   OnControlCommand(control_command);
 }
 
-// TODO(Jinyun) : Send the error to monitor and return it
-// Status CanbusComponent::OnError(const std::string &error_msg) {
-//   apollo::common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
-//   buffer.ERROR(error_msg);
-//   return Status(ErrorCode::CANBUS_ERROR, error_msg);
-// }
+::apollo::common::Status CanbusComponent::OnError(const std::string &error_msg) {
+  monitor_logger_buffer_.ERROR(error_msg);
+  return ::apollo::common::Status(ErrorCode::CANBUS_ERROR, error_msg);
+}
 
 }  // namespace canbus
 }  // namespace apollo

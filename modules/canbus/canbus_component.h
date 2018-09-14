@@ -32,6 +32,7 @@
 #include "modules/canbus/proto/chassis_detail.pb.h"
 #include "modules/canbus/vehicle/vehicle_controller.h"
 #include "modules/common/macro.h"
+#include "modules/common/status/status.h"
 #include "modules/common/monitor_log/monitor_log_buffer.h"
 #include "modules/control/proto/control_cmd.pb.h"
 #include "modules/drivers/canbus/can_client/can_client.h"
@@ -59,10 +60,7 @@ using apollo::cybertron::Writer;
  */
 class CanbusComponent : public apollo::cybertron::TimerComponent {
  public:
-  CanbusComponent()
-  //   : monitor_logger_(apollo::common::monitor::MonitorMessageItem::CANBUS)
-  {}
-
+  CanbusComponent();
   /**
    * @brief obtain module name
    * @return module name
@@ -86,7 +84,7 @@ class CanbusComponent : public apollo::cybertron::TimerComponent {
   void OnControlCommand(const apollo::control::ControlCommand &control_command);
   void OnGuardianCommand(
       const apollo::guardian::GuardianCommand &guardian_command);
-//   apollo::common::Status OnError(const std::string &error_msg);
+  apollo::common::Status OnError(const std::string &error_msg);
   void RegisterCanClients();
 
   CanbusConf canbus_conf_;
@@ -99,7 +97,7 @@ class CanbusComponent : public apollo::cybertron::TimerComponent {
       message_manager_;
   std::unique_ptr<VehicleController> vehicle_controller_;
   int64_t last_timestamp_ = 0;
-  //   apollo::common::monitor::MonitorLogger monitor_logger_;
+  ::apollo::common::monitor::MonitorLogBuffer monitor_logger_buffer_;
   std::shared_ptr<Writer<Chassis>> chassis_writer_;
   std::shared_ptr<Writer<ChassisDetail>> chassis_detail_writer_;
 };
