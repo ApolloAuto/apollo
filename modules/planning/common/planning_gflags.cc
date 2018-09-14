@@ -28,24 +28,25 @@ DEFINE_int32(planning_loop_rate, 10, "Loop rate for planning node");
 DEFINE_bool(enable_collision_detection, false,
             "enable collision detection in planning");
 
-DEFINE_string(lane_follow_scenario_config_file,
-              "modules/planning/conf/lane_follow_scenario_config.pb.txt",
-              "The lane follow scenario configuration file");
+DEFINE_string(
+    lane_follow_scenario_config_file,
+    "/apollo/modules/planning/conf/lane_follow_scenario_config.pb.txt",
+    "The lane follow scenario configuration file");
 
 DEFINE_string(planning_adapter_config_filename,
-              "modules/planning/conf/adapter.conf",
+              "/apollo/modules/planning/conf/adapter.conf",
               "The adapter configuration file");
 
 DEFINE_string(traffic_rule_config_filename,
-              "modules/planning/conf/traffic_rule_config.pb.txt",
+              "/apollo/modules/planning/conf/traffic_rule_config.pb.txt",
               "Traffic rule config filename");
 
 DEFINE_string(smoother_config_filename,
-              "modules/planning/conf/qp_spline_smoother_config.pb.txt",
+              "/apollo/modules/planning/conf/qp_spline_smoother_config.pb.txt",
               "The configuration file for qp_spline smoother");
 
 DEFINE_string(reopt_smoother_config_filename,
-              "modules/planning/conf/qp_spline_smoother_config.pb.txt",
+              "/apollo/modules/planning/conf/qp_spline_smoother_config.pb.txt",
               "The configuration file for qp_spline smoother");
 
 DEFINE_string(rtk_trajectory_filename, "modules/planning/data/garage.csv",
@@ -236,7 +237,7 @@ DEFINE_double(
 
 // planning config file
 DEFINE_string(planning_config_file,
-              "modules/planning/conf/planning_config.pb.txt",
+              "/apollo/modules/planning/conf/planning_config.pb.txt",
               "planning config file");
 
 DEFINE_int32(trajectory_point_num_for_debug, 10,
