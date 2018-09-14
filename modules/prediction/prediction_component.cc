@@ -131,6 +131,9 @@ bool PredictionComponent::Init() {
     return false;
   }
 
+  prediction_writer_ =
+      node_->CreateWriter<PredictionObstacles>(FLAGS_prediction_topic);
+
   if (FLAGS_prediction_offline_mode) {
     if (!FeatureOutput::Ready()) {
       AERROR << "Feature output is not ready.";
@@ -199,7 +202,7 @@ bool PredictionComponent::Proc(
   if (FLAGS_prediction_test_mode &&
       (Clock::NowInSeconds() - component_start_time_
           > FLAGS_prediction_test_duration)) {
-    AINFO << "Prediction finished running in test mode";
+    ADEBUG << "Prediction finished running in test mode";
     // TODO(kechxu) accord to cybertron
     // ros::shutdown();
   }
