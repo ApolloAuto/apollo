@@ -1,6 +1,5 @@
 import React from "react";
 import { inject, observer } from "mobx-react";
-import classNames from "classnames";
 import ReactTooltip from "react-tooltip";
 import _ from "lodash";
 

@@ -1,6 +1,7 @@
 import { observable, action, computed } from "mobx";
 
 import WS from "store/websocket";
+import UTTERANCE from "store/utterance";
 
 export default class HMI {
 
@@ -29,7 +30,6 @@ export default class HMI {
 
     displayName = {};
     utmZoneId = 10;
-    utterance = window.speechSynthesis ? new SpeechSynthesisUtterance() : null;
 
     @observable dockerImage = 'unknown';
 
@@ -90,28 +90,9 @@ export default class HMI {
                     this.hardwareStatus.set(key, newStatus.systemStatus.hardware[key].summary);
                 }
             }
-            if (this.utterance &&
-                typeof newStatus.systemStatus.passengerMsg === "string" &&
-                newStatus.systemStatus.passengerMsg !== this.utterance.text) {
-                    this.utterance.text = newStatus.systemStatus.passengerMsg;
-                this.speakPassengerMessage();
+            if (typeof newStatus.systemStatus.passengerMsg === "string") {
+                UTTERANCE.speakRepeatedly(newStatus.systemStatus.passengerMsg);
             }
-        }
-    }
-
-    speakPassengerMessage() {
-        if (this.utterance.text) {
-            // if speaking, don't interrupt
-            if (!window.speechSynthesis.speaking) {
-                window.speechSynthesis.speak(this.utterance);
-            }
-
-            // repeat this message until a new one is given
-            this.utterance.onend = () => {
-                window.speechSynthesis.speak(this.utterance);
-            };
-        } else {
-            this.utterance.onend = null;
         }
     }
 
