@@ -27,7 +27,6 @@
 #include <utility>
 #include <vector>
 
-#include "modules/common/adapters/adapter_manager.h"
 #include "cybertron/common/log.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/common/time/time.h"
@@ -56,7 +55,6 @@ using common::SLPoint;
 using common::SpeedPoint;
 using common::Status;
 using common::TrajectoryPoint;
-using common::adapter::AdapterManager;
 using common::math::Vec2d;
 using common::time::Clock;
 
@@ -85,7 +83,9 @@ Status NaviPlanner::Init(const PlanningConfig& config) {
 
   AINFO << "In NaviPlanner::Init()";
   RegisterTasks();
-  for (const auto task : config.planner_navi_config().task()) {
+  PlannerNaviConfig planner_conf =
+      config.navigation_planning_config().planner_navi_config();
+  for (const auto task : planner_conf.task()) {
     tasks_.emplace_back(
         task_factory_.CreateObject(static_cast<TaskType>(task)));
     AINFO << "Created task:" << tasks_.back()->Name();
