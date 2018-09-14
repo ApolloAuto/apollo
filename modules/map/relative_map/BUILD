@@ -68,6 +68,12 @@ cc_library(
     ],
 )
 
+cc_binary(
+    name = "librelative_map_component.so",
+    linkopts = ["-shared"],
+    deps = [":relative_map_component_lib"],
+)
+
 filegroup(
     name = "testdata",
     srcs = glob([
