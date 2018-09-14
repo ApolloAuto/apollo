@@ -25,11 +25,12 @@
 #include <string>
 #include <utility>
 
+#include "cybertron/scheduler/task.h"
+
+#include "modules/common/proto/pnc_point.pb.h"
+
 #include "modules/common/log.h"
 #include "modules/common/math/vec2d.h"
-#include "modules/common/proto/pnc_point.pb.h"
-#include "modules/common/util/thread_pool.h"
-
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
@@ -40,7 +41,6 @@ using apollo::common::SpeedPoint;
 using apollo::common::Status;
 using apollo::common::VehicleParam;
 using apollo::common::math::Vec2d;
-using apollo::common::util::ThreadPool;
 
 namespace {
 
@@ -178,18 +178,22 @@ Status DpStGraph::CalculateTotalCost() {
     if (count > 0) {
       std::vector<std::future<void>> futures;
 
+      auto task = apollo::cybertron::CreateTask<StGraphMessage>(
+          "dp_process",
+          [this](const std::shared_ptr<StGraphMessage>& msg) {
+            this->CalculateCostAt(msg);
+          },
+          FLAGS_max_planning_thread_pool_size);
+
       for (uint32_t r = next_lowest_row; r <= next_highest_row; ++r) {
+        auto msg = std::make_shared<StGraphMessage>(c, r);
         if (FLAGS_enable_multi_thread_in_dp_st_graph) {
-          futures.push_back(ThreadPool::pool()->push(
-              std::bind(&DpStGraph::CalculateCostAt, this, c, r)));
+          task->Execute(msg);
         } else {
-          CalculateCostAt(c, r);
+          CalculateCostAt(msg);
         }
       }
-
-      for (const auto& f : futures) {
-        f.wait();
-      }
+      task->Wait();
     }
 
     for (uint32_t r = next_lowest_row; r <= next_highest_row; ++r) {
@@ -241,7 +245,9 @@ void DpStGraph::GetRowRange(const StGraphPoint& point, int* next_highest_row,
   }
 }
 
-void DpStGraph::CalculateCostAt(const uint32_t c, const uint32_t r) {
+void DpStGraph::CalculateCostAt(const std::shared_ptr<StGraphMessage>& msg) {
+  const uint32_t c = msg->c;
+  const uint32_t r = msg->r;
   auto& cost_cr = cost_table_[c][r];
   cost_cr.SetObstacleCost(dp_st_cost_.GetObstacleCost(cost_cr));
   if (cost_cr.obstacle_cost() > std::numeric_limits<float>::max()) {
