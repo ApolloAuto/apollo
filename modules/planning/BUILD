@@ -25,19 +25,19 @@ cc_library(
 
 cc_binary(
     name = "libplanning_component.so",
-    deps = [":planning_component_lib"],
     linkopts = ["-shared"],
+    deps = [":planning_component_lib"],
 )
 
 cc_library(
     name = "planning_lib",
     srcs = [
-        "std_planning.cc",
         "planning_base.cc",
+        "std_planning.cc",
     ],
     hdrs = [
-        "std_planning.h",
         "planning_base.h",
+        "std_planning.h",
     ],
     deps = [
         "//modules/common",
