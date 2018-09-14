@@ -123,7 +123,7 @@
   <customwidget>
    <class>InteractiveGraphicsView</class>
    <extends>QGraphicsView</extends>
-   <header>interactivegraphicsview.h</header>
+   <header>interactive_graphicsview.h</header>
   </customwidget>
  </customwidgets>
  <resources/>
