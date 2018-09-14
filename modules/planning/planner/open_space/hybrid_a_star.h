@@ -51,8 +51,7 @@ class HybridAStar {
  public:
   explicit HybridAStar(Node3d start_node, Node3d end_node,
                        std::vector<const Obstacle*> obstacles,
-                       double xy_grid_resolution, double phi_grid_resolution,
-                       double obstacle_grid_resolution);
+                       const OpenSpaceConf &open_space_conf);
   virtual ~HybridAStar() = default;
   Status Plan();
 
@@ -68,8 +67,7 @@ class HybridAStar {
  private:
   const common::VehicleParam& vehicle_param_ =
       common::VehicleConfigHelper::GetConfig().vehicle_param();
-  double xy_grid_resolution_;
-  double phi_grid_resolution_;
+  OpenSpaceConf& open_space_conf_;
   std::vector<const Obstacle*> obstacles_;
   std::unique_ptr<Node3d> start_node_;
   std::unique_ptr<Node3d> end_node_;
