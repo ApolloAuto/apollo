@@ -83,14 +83,10 @@ def perf_data_process(input_file):
                 if event_id == '5':
                     notify_tag_map[rt_name] = False
 
-                if sched_fusion_map[rt_name].pre_id == None:
-                    sched_fusion_map[rt_name].pre_id = event_id
-                    sched_fusion_map[rt_name].id_index[event_id] += 1
-                    continue
-
                 e.id = event_id
                 e.pre_id = sched_fusion_map[rt_name].pre_id
-                e.pre_id_index = sched_fusion_map[rt_name].id_index[e.pre_id]
+                if e.pre_id:
+                    e.pre_id_index = sched_fusion_map[rt_name].id_index[e.pre_id]
                 e.stamp = stamp
                 e.notify_stamp = notify_stamp
                 sched_event_map[identify_id].append(e)
