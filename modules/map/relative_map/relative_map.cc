@@ -148,7 +148,7 @@ bool RelativeMap::CreateMapFromNavigationLane(MapMsg* map_msg) {
   }
 
   ADEBUG << "There is/are " << map_msg->navigation_path().size()
-        << " navigation path(s) in the current reltative map.";
+         << " navigation path(s) in the current reltative map.";
   return true;
 }
 

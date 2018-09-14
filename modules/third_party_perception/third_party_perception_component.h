@@ -33,22 +33,26 @@ class ThirdPartyPerceptionComponent final
  public:
   ThirdPartyPerceptionComponent() = default;
   ~ThirdPartyPerceptionComponent() = default;
+
  public:
   bool Init() override;
   bool Proc() override;
+
  private:
-  std::shared_ptr<::apollo::cybertron::Reader
-      <::apollo::drivers::Mobileye>> mobileye_reader_ = nullptr;
-  std::shared_ptr<::apollo::cybertron::Reader
-      <::apollo::drivers::DelphiESR>> delphi_esr_reader_ = nullptr;
-  std::shared_ptr<::apollo::cybertron::Reader
-      <::apollo::drivers::ContiRadar>> conti_radar_reader_ = nullptr;
-  std::shared_ptr<::apollo::cybertron::Reader
-      <::apollo::localization::LocalizationEstimate>> localization_reader_ = nullptr;
-  std::shared_ptr
-      <::apollo::cybertron::Reader<::apollo::canbus::Chassis>> chassis_reader_ = nullptr;
-  std::shared_ptr<::apollo::cybertron::Writer
-      <::apollo::perception::PerceptionObstacles>> writer_ = nullptr;
+  std::shared_ptr<::apollo::cybertron::Reader<::apollo::drivers::Mobileye>>
+      mobileye_reader_ = nullptr;
+  std::shared_ptr<::apollo::cybertron::Reader<::apollo::drivers::DelphiESR>>
+      delphi_esr_reader_ = nullptr;
+  std::shared_ptr<::apollo::cybertron::Reader<::apollo::drivers::ContiRadar>>
+      conti_radar_reader_ = nullptr;
+  std::shared_ptr<
+      ::apollo::cybertron::Reader<::apollo::localization::LocalizationEstimate>>
+      localization_reader_ = nullptr;
+  std::shared_ptr<::apollo::cybertron::Reader<::apollo::canbus::Chassis>>
+      chassis_reader_ = nullptr;
+  std::shared_ptr<
+      ::apollo::cybertron::Writer<::apollo::perception::PerceptionObstacles>>
+      writer_ = nullptr;
   ThirdPartyPerception perception_;
 };
 
@@ -57,4 +61,3 @@ CYBERTRON_REGISTER_COMPONENT(ThirdPartyPerceptionComponent)
 }  // namespace apollo
 
 #endif  // MODULES_THIRD_PARTY_PERCEPTION_THIRD_PARTY_PERCEPTION_COMPONENT_H_
-
