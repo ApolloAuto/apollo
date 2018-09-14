@@ -191,7 +191,9 @@ Status DpStGraph::CalculateTotalCost() {
           CalculateCostAt(msg);
         }
       }
-      task->Wait();
+      if (FLAGS_enable_multi_thread_in_dp_st_graph) {
+        task->Wait();
+      }
     }
 
     for (uint32_t r = next_lowest_row; r <= next_highest_row; ++r) {
