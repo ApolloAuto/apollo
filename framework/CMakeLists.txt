@@ -50,16 +50,10 @@ file(GLOB CYBERTRON_SRCS
   "cybertron/parameter/*.cpp"
   "cybertron/croutine/context/*.cpp"
   "cybertron/event/*.cpp"
-  "cybertron/croutine/system/system_hook.cpp"
   "cybertron/mainboard/module_argument.cpp"
   "cybertron/mainboard/module_controller.cpp"
   "cybertron/message/*.cpp"
 )
-
-add_library(cybertron_cuda
-  cybertron/croutine/system/cuda_async.cpp
-)
-target_link_libraries(cybertron_cuda ${CUDA_LIBRARIES})
 
 add_library(cybertron SHARED
   ${CYBERTRON_SRCS}
@@ -78,7 +72,6 @@ target_link_libraries(cybertron
   PocoFoundation
   -Wl,--no-undefined
   atomic
-  # cybertron_cuda
   tf2
   -luuid
  )
@@ -86,7 +79,6 @@ target_link_libraries(cybertron
 install(TARGETS cybertron LIBRARY DESTINATION lib)
 install(DIRECTORY cybertron/conf DESTINATION .)
 
-install(TARGETS cybertron_cuda LIBRARY DESTINATION lib)
 install(DIRECTORY "cybertron"
   DESTINATION "include"
   FILES_MATCHING
