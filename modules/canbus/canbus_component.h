@@ -58,7 +58,7 @@ using apollo::cybertron::Writer;
  * @brief canbus module main class.
  * It processes the control data to send protocol messages to can card.
  */
-class CanbusComponent : public apollo::cybertron::TimerComponent {
+class CanbusComponent final : public apollo::cybertron::TimerComponent {
  public:
   CanbusComponent();
   /**
