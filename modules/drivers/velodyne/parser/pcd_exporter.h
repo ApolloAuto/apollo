@@ -83,8 +83,7 @@ class PCDExporter {
   /**
    * @brief Write pose info with the index of message to a file
    */
-  int write_pcd_pose_file(sensor_msgs::PointCloud2::ConstPtr msg,
-                          int index);
+  int write_pcd_pose_file(sensor_msgs::PointCloud2::ConstPtr msg, int index);
 };
 
 }  // namespace velodyne

@@ -15,31 +15,32 @@
  *****************************************************************************/
 
 #ifndef MODULES_DRIVERS_VELODYNE_PARSER_VELODYNE_COMPENSATOR_COMPONENT_H
-#define MODULES_DRIVERS_VELODYNE_PARSER_VELODYNE_COMPENSATOR_COMPONENT_H 
+#define MODULES_DRIVERS_VELODYNE_PARSER_VELODYNE_COMPENSATOR_COMPONENT_H
 
 #include <memory>
+#include <vector>
 
 #include "cybertron/cybertron.h"
 
 #include "modules/drivers/proto/pointcloud.pb.h"
-#include "modules/drivers/velodyne/proto/velodyne.pb.h"
 #include "modules/drivers/velodyne/parser/compensator.h"
+#include "modules/drivers/velodyne/proto/velodyne.pb.h"
 
 namespace apollo {
 namespace drivers {
 namespace velodyne {
 
-using apollo::drivers::velodyne::config::Config;
-using apollo::drivers::PointCloud;
 using apollo::cybertron::Component;
-using apollo::cybertron::Writer;
 using apollo::cybertron::Reader;
+using apollo::cybertron::Writer;
+using apollo::drivers::PointCloud;
+using apollo::drivers::velodyne::config::Config;
 
 class VelodyneCompensatorComponent : public Component<PointCloud> {
  public:
   bool Init() override;
-  bool Proc(
-      const std::shared_ptr<PointCloud>& point_cloud) override;
+  bool Proc(const std::shared_ptr<PointCloud>& point_cloud) override;
+
  private:
   std::unique_ptr<Compensator> _compensator = nullptr;
   std::vector<std::shared_ptr<PointCloud>> compensator_deque_;
@@ -50,8 +51,8 @@ class VelodyneCompensatorComponent : public Component<PointCloud> {
 };
 
 CYBERTRON_REGISTER_COMPONENT(VelodyneCompensatorComponent)
-}
-}
-}  // namespace cybertron
+}  // namespace velodyne
+}  // namespace drivers
+}  // namespace apollo
 
-#endif  // ONBOARD_DRIVERS_VELODYNE_INCLUDE_VELODYNE_COMPONENT_COMPONENT_COMPENSATOR_H
+#endif  // MODULES_DRIVERS_VELODYNE_PARSER_VELODYNE_COMPENSATOR_COMPONENT_H

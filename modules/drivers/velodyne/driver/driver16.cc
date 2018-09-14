@@ -19,24 +19,22 @@
 #include <string>
 #include <thread>
 
-#include "modules/drivers/velodyne/proto/velodyne.pb.h"
 #include "modules/drivers/velodyne/driver/driver.h"
+#include "modules/drivers/velodyne/proto/velodyne.pb.h"
 
 namespace apollo {
 namespace drivers {
 namespace velodyne {
 
-Velodyne16Driver::Velodyne16Driver(const Config &config) {
-  config_ = config;
-}
+Velodyne16Driver::Velodyne16Driver(const Config &config) { config_ = config; }
 
 void Velodyne16Driver::init() {
-  double packet_rate = 754;                 // packet frequency (Hz)
+  double packet_rate = 754;                   // packet frequency (Hz)
   double frequency = (config_.rpm() / 60.0);  // expected Hz rate
 
   // default number of packets for each scan is a single revolution
   // (fractions rounded up)
-  config_.set_npackets((int)ceil(packet_rate / frequency));
+  config_.set_npackets(static_cast<int>(ceil(packet_rate / frequency)));
   AINFO << "publishing " << config_.npackets() << " packets per scan";
 
   // open Velodyne input device
@@ -57,7 +55,7 @@ void Velodyne16Driver::init() {
  *
  *  @returns true unless end of file reached
  */
-bool Velodyne16Driver::poll(std::shared_ptr<VelodyneScan>& scan) {
+bool Velodyne16Driver::poll(std::shared_ptr<VelodyneScan> scan) {
   // Allocate a new shared pointer for zero-copy sharing with other nodelets.
   // velodyne_msgs::VelodyneScanUnifiedPtr scan(
   //     new velodyne_msgs::VelodyneScanUnified);
@@ -88,8 +86,8 @@ bool Velodyne16Driver::poll(std::shared_ptr<VelodyneScan>& scan) {
   // in cloud nodelet, will update base time packet by packet
   // uint32_t current_secs =
   //     *((uint32_t *)(&scan->packets.front().data[0] + 1200));
-   uint32_t current_secs =
-      *((uint32_t *)(scan->firing_pkts(0).data().c_str() + 1200));
+  uint32_t current_secs = *(reinterpret_cast<uint32_t *>(
+      const_cast<char *>(scan->firing_pkts(0).data().c_str() + 1200)));
 
   update_gps_top_hour(current_secs);
   scan->set_basetime(basetime_);
@@ -117,7 +115,7 @@ void Velodyne16Driver::poll_positioning_packet(void) {
     }
 
     if (basetime_ == 0 && ret) {
-      set_base_time_from_nmea_time(nmea_time, basetime_);
+      set_base_time_from_nmea_time(nmea_time, &basetime_);
     }
   }
 }

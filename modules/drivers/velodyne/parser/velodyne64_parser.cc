@@ -20,7 +20,8 @@ namespace apollo {
 namespace drivers {
 namespace velodyne {
 
-Velodyne64Parser::Velodyne64Parser(Config config) : VelodyneParser(config) {
+Velodyne64Parser::Velodyne64Parser(const Config& config)
+    : VelodyneParser(config) {
   for (int i = 0; i < 4; i++) {
     gps_base_usec_[i] = 0;
     previous_packet_stamp_[i] = 0;
@@ -93,9 +94,9 @@ void Velodyne64Parser::set_base_time_from_packets(const VelodynePacket& pkt) {
       hour >= 0 && minute >= 0 && second >= 0) {
     if (gps_status != 65) {
       AWARN << "Sync failed because Velodyne-GPS Sync is NOT good! "
-                      << "Status: " << (int)gps_status
-                      << " (65 = both; 86 = gps only; 80 = PPS only; 0 "
-                      << "= GPS not connected)";
+            << "Status: " << static_cast<int>(gps_status)
+            << " (65 = both; 86 = gps only; 80 = PPS only; 0 "
+            << "= GPS not connected)";
     }
 
     time.tm_year = year - 1900;
@@ -105,8 +106,8 @@ void Velodyne64Parser::set_base_time_from_packets(const VelodynePacket& pkt) {
     time.tm_min = 0;
     time.tm_sec = 0;
 
-//    AINFO << "Set base unix time: (%d.%d.%d %d:%d:%d)", time.tm_year,
-//        time.tm_mon, time.tm_mday, time.tm_hour, time.tm_min, time.tm_sec;
+    //    AINFO << "Set base unix time: (%d.%d.%d %d:%d:%d)", time.tm_year,
+    //        time.tm_mon, time.tm_mday, time.tm_hour, time.tm_min, time.tm_sec;
 
     uint64_t unix_base = static_cast<uint64_t>(timegm(&time));
     for (int i = 0; i < 4; ++i) {
@@ -124,7 +125,7 @@ void Velodyne64Parser::check_gps_status(const VelodynePacket& pkt) {
   if (status_type == StatusType::GPS_STATUS) {
     if (status_value != 65) {
       AWARN << "Sync failed because Velodyne-GPS Sync is NOT good! "
-            << "Status: " << (int)status_value
+            << "Status: " << static_cast<int>(status_value)
             << " (65 = both; 86 = gps only; 80 = PPS only; "
             << "0 = GPS not connected)";
     }
@@ -139,14 +140,15 @@ void Velodyne64Parser::init_offsets() {
     // compute offset, NOTICE: std::map doesn't have const [] since [] may
     // insert new values into map
     const LaserCorrection& corrections = calibration_.laser_corrections_[col];
-    int offset = int(corrections.rot_correction / ANGULAR_RESOLUTION + 0.5);
+    int offset =
+        static_cast<int>(corrections.rot_correction / ANGULAR_RESOLUTION + 0.5);
     offsets_[i] = offset;
   }
 }
 
 void Velodyne64Parser::generate_pointcloud(
     const std::shared_ptr<VelodyneScan>& scan_msg,
-    std::shared_ptr<PointCloud>& pointcloud) {
+    std::shared_ptr<PointCloud> pointcloud) {
   if (config_.calibration_online() && !calibration_.initialized_) {
     if (online_calibration_.decode(scan_msg) == -1) {
       return;
@@ -160,7 +162,8 @@ void Velodyne64Parser::generate_pointcloud(
   // allocate a point cloud with same time and frame ID as raw data
   pointcloud->mutable_header()->set_frame_id(scan_msg->header().frame_id());
   pointcloud->set_height(1);
-  pointcloud->mutable_header()->set_sequence_num(scan_msg->header().sequence_num());
+  pointcloud->mutable_header()->set_sequence_num(
+      scan_msg->header().sequence_num());
 
   bool skip = false;
   size_t packets_size = scan_msg->firing_pkts_size();
@@ -195,7 +198,7 @@ void Velodyne64Parser::generate_pointcloud(
 }
 
 uint64_t Velodyne64Parser::get_timestamp(double base_time, float time_offset,
-                                       uint16_t block_id) {
+                                         uint16_t block_id) {
   double t = base_time - time_offset;
   double timestamp = 0;
   int index = 0;
@@ -204,12 +207,12 @@ uint64_t Velodyne64Parser::get_timestamp(double base_time, float time_offset,
     index = block_id & 1;  // % 2
     double& previous_packet_stamp = previous_packet_stamp_[index];
     uint64_t& gps_base_usec = gps_base_usec_[index];
-    timestamp = get_gps_stamp(t, previous_packet_stamp, gps_base_usec);
+    timestamp = get_gps_stamp(t, &previous_packet_stamp, &gps_base_usec);
   } else {                 // 64E_S3
     index = block_id & 3;  // % 4
     double& previous_packet_stamp = previous_packet_stamp_[index];
     uint64_t& gps_base_usec = gps_base_usec_[index];
-    timestamp = get_gps_stamp(t, previous_packet_stamp, gps_base_usec);
+    timestamp = get_gps_stamp(t, &previous_packet_stamp, &gps_base_usec);
   }
   return timestamp;
 }
@@ -231,7 +234,8 @@ int Velodyne64Parser::intensity_compensate(const LaserCorrection& corrections,
   return intensity;
 }
 
-void Velodyne64Parser::unpack(const VelodynePacket& pkt, std::shared_ptr<PointCloud>& pc) {
+void Velodyne64Parser::unpack(const VelodynePacket& pkt,
+                              std::shared_ptr<PointCloud> pc) {
   ADEBUG << "Received packet, time: " << pkt.stamp();
 
   // const RawPacket* raw = (const RawPacket*)&pkt.data[0];
@@ -295,32 +299,28 @@ void Velodyne64Parser::unpack(const VelodynePacket& pkt, std::shared_ptr<PointCl
   }
 }
 
-void Velodyne64Parser::order(std::shared_ptr<PointCloud>& cloud) {
-
+void Velodyne64Parser::order(std::shared_ptr<PointCloud> cloud) {
   int height = 64;
   cloud->set_height(height);
   int width = cloud->point_size() / cloud->height();
   cloud->set_width(width);
 
-  std::shared_ptr<PointCloud> cloud_origin =
-      std::make_shared<PointCloud>();
+  std::shared_ptr<PointCloud> cloud_origin = std::make_shared<PointCloud>();
   cloud_origin->CopyFrom(*cloud);
 
   for (int i = 0; i < height; ++i) {
-      int col = velodyne::ORDER_64[i];
+    int col = velodyne::ORDER_64[i];
 
-      for (int j = 0; j < width; ++j) {
-          // make sure offset is initialized, should be init at setup() just once
-          int row = (j + offsets_[i] + width) % width;
-          int target_index = j * height + i;
-          int origin_index = row * height + col;
-          cloud->mutable_point(target_index)->CopyFrom(cloud_origin->point(origin_index));
-
-      }
+    for (int j = 0; j < width; ++j) {
+      // make sure offset is initialized, should be init at setup() just once
+      int row = (j + offsets_[i] + width) % width;
+      int target_index = j * height + i;
+      int origin_index = row * height + col;
+      cloud->mutable_point(target_index)
+          ->CopyFrom(cloud_origin->point(origin_index));
+    }
   }
-
 }
-
 }  // namespace velodyne
 }  // namespace drivers
 }  // namespace apollo

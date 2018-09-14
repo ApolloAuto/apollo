@@ -34,23 +34,22 @@
  *
  *********************************************************************/
 
-#ifndef MODULES_DRIVERS_USB_CAM_USB_CAM_H_ 
-#define MODULES_DRIVERS_USB_CAM_USB_CAM_H_ 
+#ifndef MODULES_DRIVERS_USB_CAM_USB_CAM_H_
+#define MODULES_DRIVERS_USB_CAM_USB_CAM_H_
 
 #include <asm/types.h> /* for videodev2.h */
-#include <memory>
+#include <malloc.h>
 #include <sys/ioctl.h>
 #include <sys/mman.h>
-#include <malloc.h>
 
 #include <immintrin.h>
 #include <x86intrin.h>
 
 extern "C" {
-#include <linux/videodev2.h>
 #include <libavcodec/avcodec.h>
-#include <libswscale/swscale.h>
 #include <libavutil/mem.h>
+#include <libswscale/swscale.h>
+#include <linux/videodev2.h>
 }
 
 #include <libavcodec/version.h>
@@ -58,8 +57,9 @@ extern "C" {
 #define AV_CODEC_ID_MJPEG CODEC_ID_MJPEG
 #endif
 
-#include <string>
+#include <memory>
 #include <sstream>
+#include <string>
 
 #include "cybertron/cybertron.h"
 
@@ -70,10 +70,10 @@ namespace drivers {
 namespace usb_cam {
 
 using apollo::drivers::usb_cam::config::Config;
-using apollo::drivers::usb_cam::config::IO_METHOD_READ;
 using apollo::drivers::usb_cam::config::IO_METHOD_MMAP;
-using apollo::drivers::usb_cam::config::IO_METHOD_USERPTR;
+using apollo::drivers::usb_cam::config::IO_METHOD_READ;
 using apollo::drivers::usb_cam::config::IO_METHOD_UNKNOWN;
+using apollo::drivers::usb_cam::config::IO_METHOD_USERPTR;
 
 // camera raw image struct
 struct CameraImage {
@@ -88,7 +88,7 @@ struct CameraImage {
 
   ~CameraImage() {
     if (image != nullptr) {
-      free((void*)image);
+      free(reinterpret_cast<void*>(image));
       image = nullptr;
     }
   }
@@ -106,8 +106,7 @@ class UsbCam {
   UsbCam();
   virtual ~UsbCam();
 
-  virtual bool init(
-      std::shared_ptr<Config>& camera_config);
+  virtual bool init(const std::shared_ptr<Config>& camera_config);
   // user use this function to get camera frame data
   virtual bool poll(const CameraImagePtr& raw_image);
 
@@ -115,7 +114,7 @@ class UsbCam {
   bool wait_for_device(void);
 
  private:
-  int xioctl(int fd, int request, void * arg);
+  int xioctl(int fd, int request, void* arg);
   bool init_device(void);
   bool uninit_device(void);
 
@@ -148,7 +147,7 @@ class UsbCam {
   buffer* buffers_;
   unsigned int n_buffers_;
   bool is_capturing_;
-  long image_seq_;
+  uint64_t image_seq_;
 
   AVFrame* avframe_camera_;
   AVFrame* avframe_rgb_;
@@ -163,10 +162,9 @@ class UsbCam {
   float device_wait_sec_;
   uint64_t last_nsec_;
   float frame_drop_interval_;
-
 };
-}
-}
-}
+}  // namespace usb_cam
+}  // namespace drivers
+}  // namespace apollo
 
 #endif  // ONBOARD_DRIVERS_USB_CAMERA_INCLUDE_USB_CAMERA_CAMERA_DEVICE_H

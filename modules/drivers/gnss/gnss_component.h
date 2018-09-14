@@ -29,8 +29,8 @@ namespace drivers {
 namespace gnss {
 
 using apollo::cybertron::Component;
-using apollo::cybertron::Writer;
 using apollo::cybertron::Reader;
+using apollo::cybertron::Writer;
 using apollo::drivers::gnss::RawData;
 
 class GnssDriverComponent : public Component<RawData> {
@@ -45,7 +45,7 @@ class GnssDriverComponent : public Component<RawData> {
 
 CYBERTRON_REGISTER_COMPONENT(GnssDriverComponent)
 
-}
-}
-}
+}  // namespace gnss
+}  // namespace drivers
+}  // namespace apollo
 #endif

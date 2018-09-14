@@ -14,15 +14,11 @@
  * limitations under the License.
  *****************************************************************************/
 
-// #include <nodelet/nodelet.h>
-// #include <pluginlib/class_list_macros.h>
-// #include <ros/ros.h>
-// #include <boost/thread.hpp>
+#include <memory>
 #include <string>
 #include <thread>
-#include <memory>
 
-#include <cybertron/cybertron.h>
+#include "cybertron/cybertron.h"
 
 #include "modules/drivers/velodyne/parser/velodyne_convert_component.h"
 
@@ -32,14 +28,16 @@ namespace velodyne {
 
 bool VelodyneConvertComponent::Init() {
   Config velodyne_config;
-  if(!apollo::cybertron::common::GetProtoFromFile(config_file_path_, &velodyne_config)){
+  if (!apollo::cybertron::common::GetProtoFromFile(config_file_path_,
+                                                   &velodyne_config)) {
     AWARN << "Load config failed, config file" << config_file_path_;
     return false;
   }
 
   conv_.reset(new Convert());
   conv_->init(velodyne_config);
-  writer_ = node_->CreateWriter<PointCloud>(velodyne_config.convert_channel_name());
+  writer_ =
+      node_->CreateWriter<PointCloud>(velodyne_config.convert_channel_name());
   for (int i = 0; i < queue_size_; ++i) {
     point_cloud_deque_.push_back(std::make_shared<PointCloud>());
     if (point_cloud_deque_[i] == nullptr) {
@@ -52,7 +50,8 @@ bool VelodyneConvertComponent::Init() {
   return true;
 }
 
-bool VelodyneConvertComponent::Proc(const std::shared_ptr<VelodyneScan>& scan_msg) {
+bool VelodyneConvertComponent::Proc(
+    const std::shared_ptr<VelodyneScan>& scan_msg) {
   if (index_ >= queue_size_) {
     index_ = 0;
   }
@@ -70,7 +69,6 @@ bool VelodyneConvertComponent::Proc(const std::shared_ptr<VelodyneScan>& scan_ms
   }
   writer_->Write(point_cloud_out);
   return true;
-
 }
 
 }  // namespace velodyne

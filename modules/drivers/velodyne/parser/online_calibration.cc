@@ -28,7 +28,8 @@ int OnlineCalibration::decode(const std::shared_ptr<VelodyneScan>& scan_msgs) {
     return 0;
   }
   for (auto& packet : scan_msgs->firing_pkts()) {
-    uint8_t *data = (uint8_t*)packet.data().c_str();
+    uint8_t* data =
+        reinterpret_cast<uint8_t*>(const_cast<char*>(packet.data().c_str()));
     status_types_.emplace_back(data[1204]);
     status_values_.emplace_back(data[1205]);
   }
@@ -63,25 +64,33 @@ int OnlineCalibration::decode(const std::shared_ptr<VelodyneScan>& scan_msgs) {
     laser_correction.laser_ring = status_values_[index_16];
 
     laser_correction.vert_correction =
-        *(int16_t*)(&status_values_[index_16 + 1]) / 100.0 * DEGRESS_TO_RADIANS;
+        *reinterpret_cast<int16_t*>(&status_values_[index_16 + 1]) / 100.0 *
+        DEGRESS_TO_RADIANS;
     laser_correction.rot_correction =
-        *(int16_t*)(&status_values_[index_16 + 3]) / 100.0 * DEGRESS_TO_RADIANS;
+        *reinterpret_cast<int16_t*>(&status_values_[index_16 + 3]) / 100.0 *
+        DEGRESS_TO_RADIANS;
     laser_correction.dist_correction =
-        *(int16_t*)(&status_values_[index_16 + 5]) / 10.0 / 100.0;  // to meter
+        *reinterpret_cast<int16_t*>(&status_values_[index_16 + 5]) / 10.0 /
+        100.0;  // to meter
     laser_correction.dist_correction_x =
-        *(int16_t*)(&status_values_[index_32]) / 10.0 / 100.0;  // to meter
+        *reinterpret_cast<int16_t*>(&status_values_[index_32]) / 10.0 /
+        100.0;  // to meter
     laser_correction.dist_correction_y =
-        *(int16_t*)(&status_values_[index_32 + 2]) / 10.0 / 100.0;  // to meter
+        *reinterpret_cast<int16_t*>(&status_values_[index_32 + 2]) / 10.0 /
+        100.0;  // to meter
     laser_correction.vert_offset_correction =
-        *(int16_t*)(&status_values_[index_32 + 4]) / 10.0 / 100.0;  // to meter
+        *reinterpret_cast<int16_t*>(&status_values_[index_32 + 4]) / 10.0 /
+        100.0;  // to meter
     laser_correction.horiz_offset_correction =
         (int16_t)((int16_t)status_values_[index_48] << 8 |
                   status_values_[index_32 + 6]) /
         10.0 / 100.0;  // to meter
     laser_correction.focal_distance =
-        *(int16_t*)(&status_values_[index_48 + 1]) / 10.0 / 100.0;  // to meter
+        *reinterpret_cast<int16_t*>(&status_values_[index_48 + 1]) / 10.0 /
+        100.0;  // to meter
     laser_correction.focal_slope =
-        *(int16_t*)(&status_values_[index_48 + 3]) / 10.0;  // to meter
+        *reinterpret_cast<int16_t*>(&status_values_[index_48 + 3]) /
+        10.0;  // to meter
     laser_correction.max_intensity = status_values_[index_48 + 6];
     laser_correction.min_intensity = status_values_[index_48 + 5];
 

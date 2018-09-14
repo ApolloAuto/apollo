@@ -15,7 +15,7 @@
  *****************************************************************************/
 
 #ifndef MODULES_DRIVERS_VELODYNE_PARSER_CONST_VARIABLES_H_
-#define MODULES_DRIVERS_VELODYNE_PARSER_CONST_VARIABLES_H_ 
+#define MODULES_DRIVERS_VELODYNE_PARSER_CONST_VARIABLES_H_
 
 #include <iostream>
 
@@ -24,9 +24,9 @@ namespace drivers {
 namespace velodyne {
 
 /**
-* @brief Order array for re-ordering point cloud.
-* Refer to Velodyne official manual
-*/
+ * @brief Order array for re-ordering point cloud.
+ * Refer to Velodyne official manual
+ */
 const int ORDER_16[16] = {0, 2, 4, 6, 8, 10, 12, 14, 1, 3, 5, 7, 9, 11, 13, 15};
 
 const int ORDER_HDL32E[32] = {0,  2,  4,  6,  8,  10, 12, 14, 16, 18, 20,

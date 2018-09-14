@@ -15,22 +15,23 @@
  *****************************************************************************/
 
 #ifndef MODULES_DRIVERS_VELODYNE_PARSER_CONVERT_H_
-#define MODULES_DRIVERS_VELODYNE_PARSER_CONVERT_H_ 
+#define MODULES_DRIVERS_VELODYNE_PARSER_CONVERT_H_
 
 #include <memory>
+#include <string>
 
-#include "modules/drivers/velodyne/parser/velodyne_parser.h"
-#include "modules/drivers/velodyne/proto/velodyne.pb.h"
-#include "modules/drivers/velodyne/proto/config.pb.h"
 #include "modules/drivers/proto/pointcloud.pb.h"
+#include "modules/drivers/velodyne/parser/velodyne_parser.h"
+#include "modules/drivers/velodyne/proto/config.pb.h"
+#include "modules/drivers/velodyne/proto/velodyne.pb.h"
 
 namespace apollo {
 namespace drivers {
 namespace velodyne {
 
-using apollo::drivers::velodyne::config::Config;
-using apollo::drivers::velodyne::VelodyneScan;
 using apollo::drivers::PointCloud;
+using apollo::drivers::velodyne::VelodyneScan;
+using apollo::drivers::velodyne::config::Config;
 
 // convert velodyne data to pointcloud and republish
 class Convert {
@@ -45,7 +46,7 @@ class Convert {
   // convert velodyne data to pointcloud and public
   void convert_packets_to_pointcloud(
       const std::shared_ptr<VelodyneScan>& scan_msg,
-      std::shared_ptr<PointCloud>& point_cloud_out);
+      std::shared_ptr<PointCloud> point_cloud_out);
 
  private:
   // RawData class for converting data to point cloud

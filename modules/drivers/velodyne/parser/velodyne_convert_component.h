@@ -14,35 +14,33 @@
  * limitations under the License.
  *****************************************************************************/
 
-// #include <nodelet/nodelet.h>
-// #include <pluginlib/class_list_macros.h>
-// #include <ros/ros.h>
-// #include <boost/thread.hpp>
+#include <memory>
 #include <string>
 #include <thread>
-#include <memory>
+#include <deque>
 
-#include <cybertron/cybertron.h>
+#include "cybertron/cybertron.h"
 
-#include "modules/drivers/velodyne/proto/velodyne.pb.h"
-#include "modules/drivers/velodyne/proto/config.pb.h"
 #include "modules/drivers/velodyne/parser/convert.h"
+#include "modules/drivers/velodyne/proto/config.pb.h"
+#include "modules/drivers/velodyne/proto/velodyne.pb.h"
 
 namespace apollo {
 namespace drivers {
 namespace velodyne {
 
+using apollo::cybertron::Component;
+using apollo::cybertron::Reader;
+using apollo::cybertron::Writer;
+using apollo::drivers::PointCloud;
 using apollo::drivers::velodyne::VelodyneScan;
 using apollo::drivers::velodyne::config::Config;
-using apollo::drivers::PointCloud;
-using apollo::cybertron::Component;
-using apollo::cybertron::Writer;
-using apollo::cybertron::Reader;
 
 class VelodyneConvertComponent : public Component<VelodyneScan> {
  public:
   bool Init() override;
   bool Proc(const std::shared_ptr<VelodyneScan>& scan_msg) override;
+
  private:
   std::shared_ptr<Writer<PointCloud>> writer_;
   std::unique_ptr<Convert> conv_ = nullptr;
@@ -56,4 +54,3 @@ CYBERTRON_REGISTER_COMPONENT(VelodyneConvertComponent)
 }  // namespace velodyne
 }  // namespace drivers
 }  // namespace apollo
-

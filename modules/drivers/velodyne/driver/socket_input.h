@@ -17,13 +17,10 @@
 #ifndef MODULES_DRIVERS_VELODYNE_DRIVER_SOCKET_INPUT_H_
 #define MODULES_DRIVERS_VELODYNE_DRIVER_SOCKET_INPUT_H_
 
-// #include <ros/ros.h>
 #include <stdio.h>
 #include <unistd.h>
 
-// #include "roslibmetric/metric_handle.h"
-
-#include "input.h"
+#include "modules/drivers/velodyne/driver/input.h"
 
 namespace apollo {
 namespace drivers {
@@ -31,8 +28,8 @@ namespace velodyne {
 
 using apollo::drivers::velodyne::VelodynePacket;
 
-//static int FIRING_DATA_PORT = 2368;
-//static int POSITIONING_DATA_PORT = 8308;
+// static int FIRING_DATA_PORT = 2368;
+// static int POSITIONING_DATA_PORT = 8308;
 static const int POLL_TIMEOUT = 1000;  // one second (in msec)
 
 /** @brief Live Velodyne input from socket. */
@@ -41,7 +38,7 @@ class SocketInput : public Input {
   SocketInput();
   virtual ~SocketInput();
   void init(const int& port) override;
-  int get_firing_data_packet(VelodynePacket *pkt);
+  int get_firing_data_packet(VelodynePacket* pkt);
   int get_positioning_data_packet(NMEATimePtr nmea_time);
 
  private:

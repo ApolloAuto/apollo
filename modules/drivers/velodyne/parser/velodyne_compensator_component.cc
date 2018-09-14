@@ -23,14 +23,15 @@ namespace drivers {
 namespace velodyne {
 
 bool VelodyneCompensatorComponent::Init() {
-
   Config velodyne_config;
-  if(!apollo::cybertron::common::GetProtoFromFile(config_file_path_, &velodyne_config)){
+  if (!apollo::cybertron::common::GetProtoFromFile(config_file_path_,
+                                                   &velodyne_config)) {
     AWARN << "Load config failed, config file" << config_file_path_;
     return false;
   }
 
-  writer_ = node_->CreateWriter<PointCloud>(velodyne_config.compensator_channel_name());
+  writer_ = node_->CreateWriter<PointCloud>(
+      velodyne_config.compensator_channel_name());
 
   _compensator.reset(new Compensator(velodyne_config));
 
@@ -51,12 +52,13 @@ bool VelodyneCompensatorComponent::Proc(
   if (index_ >= queue_size_) {
     index_ = 0;
   }
-  std::shared_ptr<PointCloud> point_cloud_compensated = compensator_deque_[index_++];
+  std::shared_ptr<PointCloud> point_cloud_compensated =
+      compensator_deque_[index_++];
   point_cloud_compensated->Clear();
   if (_compensator->motion_compensation(point_cloud, point_cloud_compensated)) {
     uint64_t diff = cybertron::Time().Now().ToNanosecond() - start;
-    AINFO << "compenstator diff:" << diff 
-        << ";meta:" << point_cloud_compensated->header().lidar_timestamp();
+    AINFO << "compenstator diff:" << diff
+          << ";meta:" << point_cloud_compensated->header().lidar_timestamp();
     point_cloud_compensated->mutable_header()->set_sequence_num(seq_);
     writer_->Write(point_cloud_compensated);
     seq_++;
@@ -65,7 +67,6 @@ bool VelodyneCompensatorComponent::Proc(
   return true;
 }
 
-}
-}
-}  // namespace cybertron
-
+}  // namespace velodyne
+}  // namespace drivers
+}  // namespace apollo

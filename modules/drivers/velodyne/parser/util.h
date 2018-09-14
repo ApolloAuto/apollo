@@ -15,12 +15,11 @@
  *****************************************************************************/
 
 #ifndef MODULES_DRIVERS_VELODYNE_PARSER_UTIL_H_
-#define MODULES_DRIVERS_VELODYNE_PARSER_UTIL_H_ 
+#define MODULES_DRIVERS_VELODYNE_PARSER_UTIL_H_
 
-// #include <angles/angles.h>
-// #include <ros/ros.h>
-#include <fstream>
 #include <cmath>
+#include <fstream>
+#include <string>
 
 namespace apollo {
 namespace drivers {

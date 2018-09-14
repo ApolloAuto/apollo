@@ -16,26 +16,27 @@
 
 #include "modules/drivers/velodyne/parser/compensator.h"
 
+#include <limits>
+#include <memory>
+#include <string>
+
 namespace apollo {
 namespace drivers {
 namespace velodyne {
 
-Compensator::Compensator(Config& velodyne_config) {
+Compensator::Compensator(const Config& velodyne_config) {
   tf2_buffer_ptr_ = Buffer::Instance();
   config_ = velodyne_config;
 }
 
 bool Compensator::query_pose_affine_from_tf2(
-    const uint64_t& timestamp, void* pose,
-    const std::string& child_frame_id) {
-
+    const uint64_t& timestamp, void* pose, const std::string& child_frame_id) {
   cybertron::Time query_time(timestamp);
   std::string err_string;
   if (!tf2_buffer_ptr_->canTransform("world", child_frame_id, query_time, 0.02,
-                                &err_string)) {
+                                     &err_string)) {
     AERROR << "Can not find transform. " << timestamp
-               << " frame_id:" << child_frame_id
-               << " Error info: " << err_string;
+           << " frame_id:" << child_frame_id << " Error info: " << err_string;
     return false;
   }
 
@@ -44,27 +45,26 @@ bool Compensator::query_pose_affine_from_tf2(
   try {
     stamped_transform =
         tf2_buffer_ptr_->lookupTransform("world", child_frame_id, query_time);
-  }
-  catch (tf2::TransformException& ex) {
+  } catch (tf2::TransformException& ex) {
     AERROR << ex.what();
     return false;
   }
 
-  Eigen::Affine3d* tmp_pose = (Eigen::Affine3d* ) pose;
-  *tmp_pose = Eigen::Translation3d(stamped_transform.transform().translation().x(),
-                              stamped_transform.transform().translation().y(),
-                              stamped_transform.transform().translation().z()) *
-         Eigen::Quaterniond(stamped_transform.transform().rotation().qw(),
-                            stamped_transform.transform().rotation().qx(),
-                            stamped_transform.transform().rotation().qy(),
-                            stamped_transform.transform().rotation().qz());
+  Eigen::Affine3d* tmp_pose = (Eigen::Affine3d*)pose;
+  *tmp_pose =
+      Eigen::Translation3d(stamped_transform.transform().translation().x(),
+                           stamped_transform.transform().translation().y(),
+                           stamped_transform.transform().translation().z()) *
+      Eigen::Quaterniond(stamped_transform.transform().rotation().qw(),
+                         stamped_transform.transform().rotation().qx(),
+                         stamped_transform.transform().rotation().qy(),
+                         stamped_transform.transform().rotation().qz());
   return true;
 }
 
 bool Compensator::motion_compensation(
     const std::shared_ptr<const PointCloud>& msg,
-    std::shared_ptr<PointCloud>& msg_compensated) {
-
+    std::shared_ptr<PointCloud> msg_compensated) {
   uint64_t start = cybertron::Time::Now().ToNanosecond();
   Eigen::Affine3d pose_min_time;
   Eigen::Affine3d pose_max_time;
@@ -72,18 +72,20 @@ bool Compensator::motion_compensation(
   uint64_t timestamp_min = 0;
   uint64_t timestamp_max = 0;
   std::string frame_id = msg->header().frame_id();
-  get_timestamp_interval(msg, timestamp_min, timestamp_max);
+  get_timestamp_interval(msg, &timestamp_min, &timestamp_max);
 
-  msg_compensated->mutable_header()->set_timestamp_sec(cybertron::Time::Now().ToSecond());
+  msg_compensated->mutable_header()->set_timestamp_sec(
+      cybertron::Time::Now().ToSecond());
   msg_compensated->mutable_header()->set_frame_id(msg->header().frame_id());
-  msg_compensated->mutable_header()->set_lidar_timestamp(msg->header().lidar_timestamp());
+  msg_compensated->mutable_header()->set_lidar_timestamp(
+      msg->header().lidar_timestamp());
   msg_compensated->set_measurement_time(msg->measurement_time());
   msg_compensated->set_height(msg->height());
   msg_compensated->set_is_dense(msg->is_dense());
-  
+
   uint64_t new_time = cybertron::Time().Now().ToNanosecond();
   AINFO << "compenstator new msg diff:" << new_time - start
-    << ";meta:" << msg->header().lidar_timestamp();
+        << ";meta:" << msg->header().lidar_timestamp();
   msg_compensated->mutable_point()->Reserve(140000);
 
   // compensate point cloud, remove nan point
@@ -91,45 +93,43 @@ bool Compensator::motion_compensation(
       query_pose_affine_from_tf2(timestamp_max, &pose_max_time, frame_id)) {
     uint64_t tf_time = cybertron::Time().Now().ToNanosecond();
     AINFO << "compenstator tf msg diff:" << tf_time - new_time
-      << ";meta:" << msg->header().lidar_timestamp();
+          << ";meta:" << msg->header().lidar_timestamp();
     motion_compensation(msg, msg_compensated, timestamp_min, timestamp_max,
                         pose_min_time, pose_max_time);
     uint64_t com_time = cybertron::Time().Now().ToNanosecond();
 
     msg_compensated->set_width(msg_compensated->point_size() / msg->height());
     AINFO << "compenstator com msg diff:" << com_time - tf_time
-      << ";meta:" << msg->header().lidar_timestamp();
+          << ";meta:" << msg->header().lidar_timestamp();
     return true;
   }
   return false;
 }
 
 inline void Compensator::get_timestamp_interval(
-    const std::shared_ptr<const PointCloud>& msg,
-    uint64_t& timestamp_min, uint64_t& timestamp_max) {
-
-  timestamp_max = 0;
-  timestamp_min = std::numeric_limits<uint64_t>::max();
+    const std::shared_ptr<const PointCloud>& msg, uint64_t* timestamp_min,
+    uint64_t* timestamp_max) {
+  *timestamp_max = 0;
+  *timestamp_min = std::numeric_limits<uint64_t>::max();
 
   for (auto& point : msg->point()) {
     uint64_t timestamp = point.timestamp();
-    if (timestamp < timestamp_min) {
-      timestamp_min = timestamp;
+    if (timestamp < *timestamp_min) {
+      *timestamp_min = timestamp;
     }
 
-    if (timestamp > timestamp_max) {
-      timestamp_max = timestamp;
+    if (timestamp > *timestamp_max) {
+      *timestamp_max = timestamp;
     }
   }
 }
 
-inline bool Compensator::is_valid(Eigen::Vector3d& point) {
+inline bool Compensator::is_valid(const Eigen::Vector3d& point) {
   float x = point.x();
   float y = point.y();
   float z = point.z();
-  if ( abs(x) > config_.max_range()
-      || abs(y) > config_.max_range()
-      || abs(z) > config_.max_range()) {
+  if (abs(x) > config_.max_range() || abs(y) > config_.max_range() ||
+      abs(z) > config_.max_range()) {
     return false;
   }
   return true;
@@ -137,14 +137,12 @@ inline bool Compensator::is_valid(Eigen::Vector3d& point) {
 
 void Compensator::motion_compensation(
     const std::shared_ptr<const PointCloud>& msg,
-    std::shared_ptr<PointCloud>& msg_compensated,
-    const uint64_t timestamp_min, const uint64_t timestamp_max,
-    const Eigen::Affine3d& pose_min_time,
+    std::shared_ptr<PointCloud> msg_compensated, const uint64_t timestamp_min,
+    const uint64_t timestamp_max, const Eigen::Affine3d& pose_min_time,
     const Eigen::Affine3d& pose_max_time) {
-
   using std::abs;
-  using std::sin;
   using std::acos;
+  using std::sin;
 
   Eigen::Vector3d translation =
       pose_min_time.translation() - pose_max_time.translation();
@@ -199,7 +197,7 @@ void Compensator::motion_compensation(
       Eigen::Affine3d trans = ti * qi;
       p = trans * p;
 
-      if (!is_valid(p)){
+      if (!is_valid(p)) {
         if (config_.organized()) {
           auto* point_new = msg_compensated->add_point();
           point_new->CopyFrom(point);
@@ -233,7 +231,7 @@ void Compensator::motion_compensation(
 
     p = ti * p;
 
-    if (!is_valid(p)){
+    if (!is_valid(p)) {
       AINFO << "invaid point,x:" << p.x() << ";y:" << p.y() << ";z:" << p.z();
       continue;
     }
@@ -246,6 +244,6 @@ void Compensator::motion_compensation(
   }
 }
 
-}  // namespace velodyne_pointcloud
-}
-}
+}  // namespace velodyne
+}  // namespace drivers
+}  // namespace apollo

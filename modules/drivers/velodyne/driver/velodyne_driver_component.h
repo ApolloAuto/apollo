@@ -14,33 +14,30 @@
  * limitations under the License.
  *****************************************************************************/
 
-// #include <nodelet/nodelet.h>
-// #include <pluginlib/class_list_macros.h>
-// #include <ros/ros.h>
-// #include <boost/thread.hpp>
+#include <memory>
 #include <string>
 #include <thread>
-#include <memory>
 
-#include <cybertron/cybertron.h>
+#include "cybertron/cybertron.h"
 
-#include "modules/drivers/velodyne/proto/velodyne.pb.h"
-#include "modules/drivers/velodyne/proto/config.pb.h"
 #include "modules/drivers/velodyne/driver/driver.h"
+#include "modules/drivers/velodyne/proto/config.pb.h"
+#include "modules/drivers/velodyne/proto/velodyne.pb.h"
 
 namespace apollo {
 namespace drivers {
 namespace velodyne {
 
+using apollo::cybertron::Component;
+using apollo::cybertron::Reader;
+using apollo::cybertron::Writer;
 using apollo::drivers::velodyne::VelodyneScan;
 using apollo::drivers::velodyne::config::Config;
-using apollo::cybertron::Component;
-using apollo::cybertron::Writer;
-using apollo::cybertron::Reader;
 
 class VelodyneDriverComponent : public Component<> {
  public:
   bool Init() override;
+
  private:
   void device_poll();
   volatile bool runing_;  ///< device thread is running
@@ -55,4 +52,3 @@ CYBERTRON_REGISTER_COMPONENT(VelodyneDriverComponent)
 }  // namespace velodyne
 }  // namespace drivers
 }  // namespace apollo
-
