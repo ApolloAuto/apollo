@@ -13,8 +13,8 @@ cc_library(
         "timer.h",
     ],
     deps = [
-        "//modules/common:log",
         "//modules/common:macro",
+        "//modules/common:log",
         "//modules/common/configs:config_gflags",
         "//framework:cybertron",
     ],

@@ -23,11 +23,12 @@
 #include <iterator>
 #include <limits>
 
+#include "cybertron/common/macros.h"
+
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/planning/proto/planning.pb.h"
 
 #include "modules/common/configs/vehicle_config_helper.h"
-#include "modules/common/macro.h"
 #include "modules/common/math/linear_interpolation.h"
 #include "modules/common/util/util.h"
 #include "modules/planning/common/planning_context.h"

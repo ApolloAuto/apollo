@@ -18,9 +18,9 @@
 * @file
 **/
 
-#include "glog/logging.h"
-
 #include "modules/common/util/thread_pool.h"
+
+#include "glog/logging.h"
 
 namespace apollo {
 namespace common {

@@ -24,7 +24,6 @@ cc_library(
     ],
     deps = [
         ":trajectory",
-        "//modules/common:macro",
         "//modules/common/math:linear_interpolation",
         "//modules/common/proto:pnc_point_proto",
         "//modules/planning/common:planning_context",

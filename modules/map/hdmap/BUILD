@@ -16,7 +16,6 @@ cc_library(
         "hdmap_util.h",
     ],
     deps = [
-        "//modules/common:macro",
         "//modules/common/configs:config_gflags",
         "//modules/common/math",
         "//modules/common/math:linear_interpolation",
@@ -34,7 +33,6 @@ cc_library(
     deps = [
         ":hdmap",
         "//modules/common:log",
-        "//modules/common:macro",
         "//modules/common/configs:config_gflags",
         "//modules/common/util",
         "//modules/common/util:string_util",

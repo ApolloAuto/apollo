@@ -91,7 +91,6 @@ cc_library(
         "obstacle_clusters.h",
     ],
     deps = [
-        "//modules/common:macro",
         "//modules/map/hdmap:hdmap_util",
         "//modules/prediction/common:road_graph",
         "//modules/prediction/proto:lane_graph_proto",

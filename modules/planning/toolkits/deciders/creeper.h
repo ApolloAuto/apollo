@@ -21,7 +21,8 @@
 #ifndef MODULES_PLANNING_TOOLKITS_DECIDERS_CREEPER_H_
 #define MODULES_PLANNING_TOOLKITS_DECIDERS_CREEPER_H_
 
-#include "modules/common/macro.h"
+#include "cybertron/common/macros.h"
+
 #include "modules/map/pnc_map/path.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/reference_line_info.h"

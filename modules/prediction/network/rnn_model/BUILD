@@ -12,7 +12,6 @@ cc_library(
     ],
     deps = [
         "//modules/common:log",
-        "//modules/common:macro",
         "//modules/prediction/network:net_layer",
         "//modules/prediction/network:net_model",
         "//modules/prediction/proto:network_model_proto",

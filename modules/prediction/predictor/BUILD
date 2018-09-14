@@ -7,7 +7,6 @@ cc_library(
     srcs = ["predictor_manager.cc"],
     hdrs = ["predictor_manager.h"],
     deps = [
-        "//modules/common:macro",
         "//modules/perception/proto:perception_proto",
         "//modules/prediction/common:prediction_gflags",
         "//modules/prediction/container",
