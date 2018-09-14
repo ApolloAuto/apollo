@@ -9,7 +9,7 @@ export default class RosWebSocketEndpoint {
         this.serverAddr = serverAddr;
         this.websocket = null;
         this.simWorldUpdatePeriodMs = 100;
-        this.simWorldLastUpdateTimestamp = new Date().getTime();
+        this.simWorldLastUpdateTimestamp = 0;
         this.mapUpdatePeriodMs = 1000;
         this.mapLastUpdateTimestamp = 0;
         this.updatePOI = true;
@@ -104,8 +104,10 @@ export default class RosWebSocketEndpoint {
 
             // If connection has been lost for more than 10 sec, send the error message every 2 sec
             const now = new Date().getTime();
-            if ((now - this.simWorldLastUpdateTimestamp) > 10000 &&
-                ((now - STORE.monitor.lastUpdateTimestamp) > 2000)) {
+            const lossDuration = now - this.simWorldLastUpdateTimestamp;
+            const alertDuration = now - STORE.monitor.lastUpdateTimestamp;
+            if (this.simWorldLastUpdateTimestamp !== 0 &&
+                lossDuration > 10000 && alertDuration > 2000) {
                 const message = "Connection to the server has been lost.";
                 STORE.monitor.insert("FATAL", message, now);
                 if (UTTERANCE.getCurrentText() !== message || !UTTERANCE.isSpeaking() ) {
