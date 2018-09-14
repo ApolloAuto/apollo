@@ -26,6 +26,7 @@ namespace cybertron {
 namespace croutine {
 
 using apollo::cybertron::event::PerfEventCache;
+using apollo::cybertron::event::SchedPerf;
 
 thread_local CRoutine *CRoutine::current_routine_;
 thread_local std::shared_ptr<RoutineContext> CRoutine::main_context_;
@@ -76,17 +77,19 @@ RoutineState CRoutine::Resume() {
   current_routine_ = this;
   // update statistics info
   auto t_start = std::chrono::high_resolution_clock::now();
-  PerfEventCache::Instance()->AddSchedEvent(1, id_, processor_id_, 0, 0, -1);
+  PerfEventCache::Instance()->AddSchedEvent(SchedPerf::SWAP_IN, id_,
+                                            processor_id_, 0, 0, -1, -1);
   SwapContext(GetMainContext(), this->GetContext());
-  if (IsRunning()) {
-    state_ = RoutineState::READY;
-  }
   auto t_end = std::chrono::high_resolution_clock::now();
   auto start_nanos = std::chrono::duration_cast<std::chrono::nanoseconds>(
                          t_start.time_since_epoch())
                          .count();
-  PerfEventCache::Instance()->AddSchedEvent(2, id_, processor_id_, 0,
-                                            start_nanos, -1);
+  PerfEventCache::Instance()->AddSchedEvent(
+      SchedPerf::SWAP_OUT, id_, processor_id_, 0, start_nanos, -1, int(state_));
+  if (IsRunning()) {
+    state_ = RoutineState::READY;
+  }
+
   auto diff =
       std::chrono::duration<double, std::milli>(t_end - t_start).count();
   statistic_info_.exec_time += diff;

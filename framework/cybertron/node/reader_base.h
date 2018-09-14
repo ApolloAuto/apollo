@@ -33,6 +33,7 @@ namespace cybertron {
 
 using apollo::cybertron::common::GlobalData;
 using apollo::cybertron::event::PerfEventCache;
+using apollo::cybertron::event::TransPerf;
 
 class ReaderBase {
  public:
@@ -102,11 +103,14 @@ auto ReaderManager<MessageT>::GetReader(const proto::RoleAttributes& role_attr)
               (void)msg_info;
               (void)reader_attr;
               PerfEventCache::Instance()->AddTransportEvent(
-                  2, reader_attr.channel_id(), msg_info.seq_num());
+                  TransPerf::TRANS_TO, reader_attr.channel_id(),
+                  msg_info.seq_num());
               data::DataDispatcher<MessageT>::Instance()->Dispatch(
                   reader_attr.channel_id(), msg);
               PerfEventCache::Instance()->AddTransportEvent(
-                  3, reader_attr.channel_id(), msg_info.seq_num());
+                  TransPerf::WRITE_NOTIFY, reader_attr.channel_id(),
+                  msg_info.seq_num());
+
             });
   }
   return lower_reach_map_[channel_name];

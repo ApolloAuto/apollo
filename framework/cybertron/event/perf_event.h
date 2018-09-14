@@ -39,6 +39,18 @@ namespace event {
 using apollo::cybertron::base::BoundedQueue;
 using apollo::cybertron::common::GlobalData;
 
+enum class EventType { SCHED_EVENT = 0, TRANS_EVENT = 1 };
+
+enum class SchedPerf {
+  SWAP_IN = 1,
+  SWAP_OUT = 2,
+  TRY_FETCH_OUT = 3,
+  NOTIFY_IN = 4,
+  NEXT_ROUTINE = 5
+};
+
+enum class TransPerf { TRANS_FROM = 1, TRANS_TO = 2, WRITE_NOTIFY = 3 };
+
 // event_id
 // 1 swap_in
 // 2 swap_out
@@ -79,7 +91,7 @@ class PerfEventBase {
 // 5 next_routine
 class SchedPerfEvent : public PerfEventBase {
  public:
-  SchedPerfEvent() { event_type = 0; }
+  SchedPerfEvent() { event_type = int(EventType::SCHED_EVENT); }
   void SetParams(int count, ...) override;
   std::string SerializeToString() override {
     std::stringstream ss;
@@ -90,7 +102,8 @@ class SchedPerfEvent : public PerfEventBase {
     ss << t_sleep << "\t";
     ss << t_start << "\t";
     ss << t_end << "\t";
-    ss << try_fetch_result;
+    ss << try_fetch_result << "\t";
+    ss << croutine_state;
     return ss.str();
   }
 
@@ -99,6 +112,7 @@ class SchedPerfEvent : public PerfEventBase {
   int proc_id = -1;
   uint64_t t_sleep = 0;
   int try_fetch_result = -1;
+  int croutine_state = -1;
 };
 
 // event_id = 1 transport
@@ -106,7 +120,7 @@ class SchedPerfEvent : public PerfEventBase {
 // 2 write_data_cache & notify listener
 class TransportPerfEvent : public PerfEventBase {
  public:
-  TransportPerfEvent() { event_type = 1; }
+  TransportPerfEvent() { event_type = int(EventType::TRANS_EVENT); }
   void SetParams(int count, ...) override;
   std::string SerializeToString() override {
     std::stringstream ss;

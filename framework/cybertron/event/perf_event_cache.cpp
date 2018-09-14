@@ -65,9 +65,10 @@ void PerfEventCache::AddEvent(const std::shared_ptr<PerfEventBase>& event) {
   }
 }
 
-void PerfEventCache::AddSchedEvent(int event_id, uint64_t cr_id, int proc_id,
-                                   uint64_t t_sleep, uint64_t t_start,
-                                   int try_fetch_result) {
+void PerfEventCache::AddSchedEvent(SchedPerf event_id, uint64_t cr_id,
+                                   int proc_id, uint64_t t_sleep,
+                                   uint64_t t_start, int try_fetch_result,
+                                   int croutine_state) {
   if (!enable_) {
     return;
   }
@@ -76,14 +77,15 @@ void PerfEventCache::AddSchedEvent(int event_id, uint64_t cr_id, int proc_id,
   }
 
   std::shared_ptr<PerfEventBase> event = std::make_shared<SchedPerfEvent>();
-  event->SetParams(7, event_id, cr_id, proc_id, t_sleep, t_start,
-                   Time::Now().ToNanosecond(), try_fetch_result);
+  event->SetParams(8, event_id, cr_id, proc_id, t_sleep, t_start,
+                   Time::Now().ToNanosecond(), try_fetch_result,
+                   croutine_state);
   if (!event_queue_.Enqueue(event)) {
     // AWARN << "msg dropped... " << event_id;
   }
 }
 
-void PerfEventCache::AddTransportEvent(int event_id, uint64_t channel_id,
+void PerfEventCache::AddTransportEvent(TransPerf event_id, uint64_t channel_id,
                                        uint64_t msg_seq) {
   if (!enable_) {
     return;

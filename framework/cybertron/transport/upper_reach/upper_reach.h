@@ -29,6 +29,9 @@ namespace apollo {
 namespace cybertron {
 namespace transport {
 
+using apollo::cybertron::event::PerfEventCache;
+using apollo::cybertron::event::TransPerf;
+
 template <typename MessageT>
 class UpperReach : public Endpoint {
  public:
@@ -68,8 +71,8 @@ UpperReach<MessageT>::~UpperReach() {}
 template <typename MessageT>
 bool UpperReach<MessageT>::Transmit(const MessagePtr& msg) {
   msg_info_.set_seq_num(NextSeqNum());
-  apollo::cybertron::event::PerfEventCache::Instance()->AddTransportEvent(
-      1, attr_.channel_id(), msg_info_.seq_num());
+  PerfEventCache::Instance()->AddTransportEvent(
+      TransPerf::TRANS_FROM, attr_.channel_id(), msg_info_.seq_num());
   return Transmit(msg, msg_info_);
 }
 
