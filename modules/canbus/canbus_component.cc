@@ -18,8 +18,6 @@
 
 #include "modules/canbus/common/canbus_gflags.h"
 #include "modules/canbus/vehicle/vehicle_factory.h"
-// #include "modules/common/adapters/adapter_manager.h"
-// #include "modules/common/adapters/proto/adapter_config.pb.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/time/time.h"
 #include "modules/common/util/util.h"
@@ -137,7 +135,7 @@ bool CanbusComponent::Init() {
     return false;
   }
 
-  // TODO(HaHa): last step: publish monitor messages
+  // TODO(Jinyun): last step: publish monitor messages
   // apollo::common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
   // buffer.INFO("Canbus is started.");
 
@@ -146,8 +144,7 @@ bool CanbusComponent::Init() {
 
 void CanbusComponent::PublishChassis() {
   Chassis chassis = vehicle_controller_->chassis();
-  // AdapterManager::FillChassisHeader(FLAGS_canbus_node_name, &chassis);
-  // AdapterManager::PublishChassis(chassis);
+  common::util::FillHeader(node_->Name(), &chassis);
   chassis_writer_->Write(std::make_shared<Chassis>(chassis));
   ADEBUG << chassis.ShortDebugString();
 }
@@ -156,7 +153,6 @@ void CanbusComponent::PublishChassisDetail() {
   ChassisDetail chassis_detail;
   message_manager_->GetSensorData(&chassis_detail);
   ADEBUG << chassis_detail.ShortDebugString();
-  // AdapterManager::PublishChassisDetail(chassis_detail);
   chassis_detail_writer_->Write(
       std::make_shared<ChassisDetail>(chassis_detail));
 }
@@ -201,7 +197,7 @@ void CanbusComponent::OnGuardianCommand(
   OnControlCommand(control_command);
 }
 
-// TODO(HAHA) : Send the error to monitor and return it
+// TODO(Jinyun) : Send the error to monitor and return it
 // Status CanbusComponent::OnError(const std::string &error_msg) {
 //   apollo::common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
 //   buffer.ERROR(error_msg);
