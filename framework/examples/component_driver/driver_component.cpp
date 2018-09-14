@@ -18,26 +18,12 @@
 #include <chrono>
 
 #include "cybertron/common/log.h"
-#include "cybertron/scheduler/task.h"
 #include "cybertron/time/time.h"
 
 using apollo::cybertron::Time;
 using apollo::cybertron::proto::RoleAttributes;
 
 static std::shared_ptr<Writer<CarStatus>> carstatus_writer_ = nullptr;
-
-void VoidTask() {
-  uint64_t i = 0;
-  for (;;) {
-    AINFO << "VoidTask running: " << i++;
-    usleep(1000000);
-  }
-}
-
-void UserTask(const std::shared_ptr<CarStatus>& msg) {
-  carstatus_writer_->Write(msg);
-}
-
 DriverComponent::DriverComponent() {}
 
 bool DriverComponent::Init() {
@@ -63,8 +49,6 @@ bool DriverComponent::Init() {
     return false;
   }
 
-  task_.reset(new apollo::cybertron::Task<CarStatus>("test", &UserTask));
-  void_task_.reset(new apollo::cybertron::Task<void>("void_task", &VoidTask));
   return true;
 }
 
