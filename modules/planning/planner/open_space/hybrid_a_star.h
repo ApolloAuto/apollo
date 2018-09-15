@@ -22,9 +22,9 @@
 #define MODULES_PLANNING_PLANNER_OPEN_SPACE_HYBRID_A_STAR_H_
 
 #include <map>
+#include <memory>
 #include <queue>
 #include <vector>
-#include <memory>
 
 #include "modules/common/log.h"
 #include "modules/planning/common/obstacle.h"
@@ -37,46 +37,66 @@ using apollo::common::Status;
 
 struct OpenSpaceConf {
   // for Hybrid A Star Warm Start
-  double xy_grid_resolution;
+  double x_grid_resolution;
+  double y_grid_resolution;
   double phi_grid_resolution;
-  double obstacle_grid_resolution;
   double max_x;
   double max_y;
   double max_phi;
   double min_x;
   double min_y;
   double min_phi;
-}
+  double max_steering;
+  double next_node_num;
+};
+
+struct Result {
+  std::vector<double> x;
+  std::vector<double> y;
+  std::vector<double> phi;
+};
+
 class HybridAStar {
  public:
   explicit HybridAStar(Node3d start_node, Node3d end_node,
                        std::vector<const Obstacle*> obstacles,
-                       const OpenSpaceConf &open_space_conf);
+                       const OpenSpaceConf& open_space_conf);
   virtual ~HybridAStar() = default;
   Status Plan();
 
  private:
-  AnalyticExpansion();
+  // not complete
+  bool AnalyticExpansion(std::shared_ptr<Node3d> current_node);
+  // not complete
   KinemeticModelExpansion();
-  double cost();
+  // check collision and validity
+  bool Validitycheck(std::shared_ptr<Node3d> next_node);
+  void Next_node_generator(std::size_t next_node_index);
+  double Cost();
   double HeuristicCost();
   double HoloObstacleHeuristic();
   double NonHoloNoObstacleHeuristic();
   double EuclidDist();
+  Result GetResult();
 
  private:
   const common::VehicleParam& vehicle_param_ =
       common::VehicleConfigHelper::GetConfig().vehicle_param();
   OpenSpaceConf& open_space_conf_;
   std::vector<const Obstacle*> obstacles_;
-  std::unique_ptr<Node3d> start_node_;
-  std::unique_ptr<Node3d> end_node_;
-  auto cmp = [](SmartPtr<Node3d> left, SmartPtr<Node3d> right) {
-    return left->GetCost() <= right->GetCost();
+  std::shared_ptr<Node3d> start_node_;
+  std::shared_ptr<Node3d> end_node_;
+  auto cmp = [](std::pair<std::size_t, double> left,
+                std::pair<std::size_t, double> right) {
+    return left.second <= right.second;
   };
-  std::priority_queue<SmartPtr<Node3d>, std::vector<SmartPtr<Node3d>>, decltype(cmp)> open_pq_(cmp);
-  std::map<double, SmartPtr<Node3d>> open_set_;
-  std::map<double, SmartPtr<Node3d>> close_set_;
+  std::priority_queue<std::pair<std::size_t, double>,
+                      std::vector<std::pair<std::size_t, double>>,
+                      decltype(cmp)>
+      open_pq_(cmp);
+  std::map<std::size_t, shared_ptr<Node3d>> open_set_;
+  std::map<std::size_t, shared_ptr<Node3d>> close_set_;
+  Result result_;
 };
 
 }  // namespace planning

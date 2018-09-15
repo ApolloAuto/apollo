@@ -27,17 +27,46 @@ HybridAStar::HybridAStar(double sx, double sy, double sphi, double ex,
                          double ey, double ephi,
                          std::vector<const Obstacle *> obstacles,
                          const OpenSpaceConf &open_space_conf) {
-  start_node_.reset(new Node3d(sx, sy, sphi, sx / xy_grid_resolution,
-                               sy / xy_grid_resolution,
-                               sphi / phi_grid_resolution));
-  end_node_.reset(new Node3d(ex, ey, ephi, ex / xy_grid_resolution,
-                             ey / xy_grid_resolution,
-                             ephi / phi_grid_resolution));
+  start_node_.reset(new Node3d(sx, sy, sphi, open_space_conf));
+  end_node_.reset(new Node3d(ex, ey, ephi, open_space_conf));
   obstacles_ = obstacles;
   open_space_conf_ = open_space_conf;
 }
 
 Status HybridAStar::Plan() {}
+  open_set_.insert(std::make_pair<std::size_t, Node3d>(start_node_.GetIndex(), start_node_));
+  open_pq_.push(std::make_pair<std::size_t, double>(start_node_.GetIndex(),start_node_.GetCost()));
+  while(!open_pq.empty()) {
+    std::size_t current_id = open_pq_.pop().first;
+    std::shared_ptr<Node3d> current_node = open_set_[current_id];
+    // check if a analystic curve could be connected from current configuration to the end configuration
+    if(AnalyticExpansion(current_node)) {
+      AINFO<<"Reach the end configuration with Reed Sharp";
+      close_set_.insert(std::make_pair<std::size_t, Node3d>(end_node_.GetIndex(), end_node_));
+      break;
+    }
+    close_set_.insert(std::make_pair<std::size_t, Node3d>(current_id, current_node));
+    // 
+    for (std::size_t i = 0; i < open_space_conf.next_node_num; i++) {
+       std::shared_ptr<Node3d> next_node = Next_node_generator(i);
+       // boundary and validity check
+       if (!Validitycheck(next_node)) {
+         continue;
+       }
+       // check if the node is already in the close set
+       if (close_set_.find(next_node.GetIndex() != close_set_.end()) {
+         continue;
+       }
 
+      if (open_set_.find(next_node.GetIndex() == open_set_.end())) {
+        open_set_.insert(std::make_pair<std::size_t, Node3d>(next_node.GetIndex(),next_node));
+        // TODO: only calculate cost here
+        open_pq_.push(std::make_pair<std::size_t, double>(next_node.GetIndex(),next_node.GetCost()));
+      } else {
+        // reintial the cost for rewiring
+      }
+    }
+  }
+  result_ = GetResult();
 }  // namespace planning
 }  // namespace apollo
