@@ -169,15 +169,14 @@ bool DpRoadGraph::GenerateMinCostPath(
       const auto &cur_point = level_points[i];
 
       graph_nodes.back().emplace_back(cur_point, nullptr);
-      auto &cur_node = graph_nodes.back().back();
 
       auto msg = std::make_shared<RoadGraphMessage>();
-      msg->prev_nodes = prev_dp_nodes;
+      msg->prev_nodes = &prev_dp_nodes;
       msg->level = level;
       msg->total_level = total_level;
       msg->trajectory_cost = &trajectory_cost;
       msg->front = &front;
-      msg->cur_node = &cur_node;
+      msg->cur_node = &(graph_nodes.back().back());
 
       if (FLAGS_enable_multi_thread_in_dp_poly_path) {
         task->Execute(msg);
@@ -220,10 +219,11 @@ bool DpRoadGraph::GenerateMinCostPath(
 
 void DpRoadGraph::UpdateNode(const std::shared_ptr<RoadGraphMessage> &msg) {
   DCHECK_NOTNULL(msg);
+  DCHECK_NOTNULL(msg->prev_nodes);
   DCHECK_NOTNULL(msg->trajectory_cost);
   DCHECK_NOTNULL(msg->front);
   DCHECK_NOTNULL(msg->cur_node);
-  for (const auto &prev_dp_node : msg->prev_nodes) {
+  for (const auto &prev_dp_node : *(msg->prev_nodes)) {
     const auto &prev_sl_point = prev_dp_node.sl_point;
     const auto &cur_point = msg->cur_node->sl_point;
     float init_dl = 0.0;

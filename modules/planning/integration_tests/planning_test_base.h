@@ -36,7 +36,6 @@
 #include "modules/common/configs/config_gflags.h"
 #include "modules/common/util/file.h"
 
-#define private public
 #define protected public
 // TODO(all) #include "modules/planning/navi_planning.h"
 #include "modules/planning/planning_base.h"

@@ -98,15 +98,6 @@ class DpRoadGraph {
                                std::numeric_limits<float>::infinity()};
     QuinticPolynomialCurve1d min_cost_curve;
   };
-  struct RoadGraphMessage {
-    std::list<DpRoadGraphNode> prev_nodes;
-    uint32_t level;
-    uint32_t total_level;
-    TrajectoryCost *trajectory_cost = nullptr;
-    DpRoadGraphNode *front = nullptr;
-    DpRoadGraphNode *cur_node = nullptr;
-  };
-
   bool GenerateMinCostPath(const std::vector<const PathObstacle *> &obstacles,
                            std::vector<DpRoadGraphNode> *min_cost_path);
 
@@ -120,6 +111,14 @@ class DpRoadGraph {
                     const float end_s, const uint32_t curr_level,
                     const uint32_t total_level, ComparableCost *cost);
 
+  struct RoadGraphMessage {
+    const std::list<DpRoadGraphNode> *prev_nodes = nullptr;
+    uint32_t level;
+    uint32_t total_level;
+    TrajectoryCost *trajectory_cost = nullptr;
+    DpRoadGraphNode *front = nullptr;
+    DpRoadGraphNode *cur_node = nullptr;
+  };
   void UpdateNode(const std::shared_ptr<RoadGraphMessage> &msg);
 
  private:
