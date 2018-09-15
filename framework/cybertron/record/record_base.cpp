@@ -58,7 +58,7 @@ const std::string& RecordBase::GetMessageType(
   if (search != channel_message_type_map_.end()) {
     return search->second;
   }
-  return "";
+  return g_empty_string;
 }
 
 const std::string& RecordBase::GetProtoDesc(
@@ -67,7 +67,7 @@ const std::string& RecordBase::GetProtoDesc(
   if (search != channel_proto_desc_map_.end()) {
     return search->second;
   }
-  return "";
+  return g_empty_string;
 }
 
 }  // namespace record
