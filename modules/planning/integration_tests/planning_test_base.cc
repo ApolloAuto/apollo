@@ -18,13 +18,11 @@
 
 #include <cstdlib>
 
-#include "google/protobuf/io/zero_copy_stream_impl.h"
-
 #include "cybertron/cybertron.h"
 #include "cybertron/time/rate.h"
 #include "cybertron/time/time.h"
 
-#include "modules/common/vehicle_state/vehicle_state_provider.h"
+#include "modules/common/adapters/adapter_gflags.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
@@ -76,58 +74,59 @@ void PlanningTestBase::SetUpTestCase() {
 bool PlanningTestBase::FeedTestData() {
   // chassis
   if (!apollo::common::util::GetProtoFromFile(
-          FLAGS_test_data_dir + "/" + FLAGS_test_chassis_file, &chassis_)) {
+      FLAGS_test_data_dir + "/" + FLAGS_test_chassis_file, &chassis_)) {
     AERROR << "failed to load file: " << FLAGS_test_chassis_file;
     return -1;
   }
   // localization
   if (!apollo::common::util::GetProtoFromFile(
-          FLAGS_test_data_dir + "/" + FLAGS_test_localization_file,
-          &localization_)) {
+      FLAGS_test_data_dir + "/" + FLAGS_test_localization_file,
+      &localization_)) {
     AERROR << "failed to load file: " << FLAGS_test_localization_file;
     return -1;
   }
   // prediction
   if (!apollo::common::util::GetProtoFromFile(
-          FLAGS_test_data_dir + "/" + FLAGS_test_prediction_file,
-          &prediction_)) {
+      FLAGS_test_data_dir + "/" + FLAGS_test_prediction_file, &prediction_)) {
     AERROR << "failed to load file: " << FLAGS_test_prediction_file;
     return -1;
   }
   // routing_response
   if (!apollo::common::util::GetProtoFromFile(
-          FLAGS_test_data_dir + "/" + FLAGS_test_routing_response_file,
-          &routing_response_)) {
+      FLAGS_test_data_dir + "/" + FLAGS_test_routing_response_file,
+      &routing_response_)) {
     AERROR << "failed to load file: " << FLAGS_test_routing_response_file;
     return -1;
   }
   // traffic_light_detection
   if (!apollo::common::util::GetProtoFromFile(
-          FLAGS_test_data_dir + "/" + FLAGS_test_traffic_light_file,
-          &traffic_light_detection_)) {
+      FLAGS_test_data_dir + "/" + FLAGS_test_traffic_light_file,
+      &traffic_light_detection_)) {
     AERROR << "failed to load file: " << FLAGS_test_traffic_light_file;
     return -1;
   }
 
-  // chassis
   std::shared_ptr<apollo::cybertron::Node> node(
       apollo::cybertron::CreateNode("planning_tester"));
-  auto chassis_writer = node->CreateWriter<Chassis>(FLAGS_chassis_topic);
+
+  // chassis
+  auto chassis_writer = node->CreateWriter<Chassis>(
+      FLAGS_chassis_topic);
   chassis_writer->Write(chassis_);
 
   // localization
-  auto localization_writer =
-      node->CreateWriter<LocalizationEstimate>(FLAGS_localization_topic);
+  auto localization_writer = node->CreateWriter<LocalizationEstimate>(
+      FLAGS_localization_topic);
   localization_writer->Write(localization_);
 
   // prediction
-  auto prediction_writer =
-      node->CreateWriter<PredictionObstacles>(FLAGS_prediction_topic);
+  auto prediction_writer = node->CreateWriter<PredictionObstacles>(
+      FLAGS_prediction_topic);
   prediction_writer->Write(prediction_);
 
   // routing_response
-  auto routing_response_writer =
-      node->CreateWriter<RoutingResponse>(FLAGS_routing_response_topic);
+  auto routing_response_writer = node->CreateWriter<RoutingResponse>(
+      FLAGS_routing_response_topic);
   routing_response_writer->Write(routing_response_);
 
   // traffic_light_detection
@@ -141,10 +140,9 @@ bool PlanningTestBase::FeedTestData() {
 }
 
 void PlanningTestBase::SetUp() {
-  apollo::cybertron::Init("planning_tester");
+  Clock::SetMode(Clock::CYBERTRON);
 
-  Clock::SetMode(Clock::MOCK);
-  // time in nanoseconds
+  apollo::cybertron::Init("planning_tester");
 
   if (FLAGS_use_navigation_mode) {
     // TODO(all)
