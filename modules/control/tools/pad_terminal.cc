@@ -42,9 +42,9 @@ using apollo::cybertron::Node;
 using apollo::cybertron::Reader;
 using apollo::cybertron::Writer;
 
-class Terminal {
+class PadTerminal {
  public:
-  Terminal() : node_(CreateNode("terminal")) {}
+  PadTerminal() : node_(CreateNode("pad_terminal")) {}
   void init() {
     chassis_reader_ = node_->CreateReader<Chassis>(
         FLAGS_chassis_topic, [this](const std::shared_ptr<Chassis> &chassis) {
@@ -148,14 +148,14 @@ class Terminal {
 }  // namespace
 
 int main(int argc, char **argv) {
-  apollo::cybertron::Init("running_terminal");
+  apollo::cybertron::Init("pad_terminal");
   FLAGS_alsologtostderr = true;
   FLAGS_v = 3;
   google::ParseCommandLineFlags(&argc, &argv, true);
-  Terminal terminal;
-  terminal.init();
-  terminal.help();
+  PadTerminal pad_terminal;
+  pad_terminal.init();
+  pad_terminal.help();
   apollo::cybertron::WaitForShutdown();
-  terminal.stop();
+  pad_terminal.stop();
   return 0;
 }

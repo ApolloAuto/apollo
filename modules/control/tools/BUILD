@@ -19,7 +19,7 @@ cc_binary(
 
 cc_binary(
     name = "pad_terminal",
-    srcs = ["terminal.cc"],
+    srcs = ["pad_terminal.cc"],
     deps = [
         "//external:gflags",
         "//framework:cybertron",
