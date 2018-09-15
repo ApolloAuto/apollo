@@ -105,11 +105,10 @@ class PlanningTestBase : public ::testing::Test {
   bool FeedTestData();
   bool IsValidTrajectory(const ADCTrajectory& trajectory);
 
+ protected:
   std::unique_ptr<PlanningBase> planning_ = nullptr;
   std::map<TrafficRuleConfig::RuleId, bool> rule_enabled_;
   ADCTrajectory adc_trajectory_;
-
- protected:
   apollo::canbus::Chassis chassis_;
   apollo::localization::LocalizationEstimate localization_;
   apollo::prediction::PredictionObstacles prediction_;
