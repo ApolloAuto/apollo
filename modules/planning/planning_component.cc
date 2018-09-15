@@ -23,10 +23,9 @@
 namespace apollo {
 namespace planning {
 
-using apollo::cybertron::Component;
-using apollo::cybertron::ComponentBase;
 using apollo::perception::TrafficLightDetection;
 using apollo::routing::RoutingResponse;
+using apollo::routing::RoutingRequest;
 
 bool PlanningComponent::Init() {
   AINFO << "Loading gflag from file: " << ConfigFilePath();
@@ -62,8 +61,8 @@ bool PlanningComponent::Init() {
   planning_writer_ =
       node_->CreateWriter<ADCTrajectory>(FLAGS_planning_trajectory_topic);
 
-  rerouting_writer_ = node_->CreateWriter<routing::RoutingRequest>(
-      "/apollo/routing/routing_request");
+  rerouting_writer_ =
+      node_->CreateWriter<RoutingRequest>("/apollo/routing/routing_request");
 
   return true;
 }
@@ -116,7 +115,7 @@ void PlanningComponent::Rerouting() {
   common::util::FillHeader(node_->Name(), rerouting->mutable_routing_request());
   rerouting->set_need_rerouting(false);
   rerouting_writer_->Write(
-      std::make_shared<routing::RoutingRequest>(rerouting->routing_request()));
+      std::make_shared<RoutingRequest>(rerouting->routing_request()));
 }
 
 bool PlanningComponent::CheckInput() {
