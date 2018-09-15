@@ -19,8 +19,6 @@
 #include <cuda_runtime_api.h>
 #include <device_functions.h>
 
-#include "modules/common/log.h"
-
 namespace apollo {
 namespace pnc_map {
 
