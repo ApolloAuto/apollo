@@ -29,8 +29,8 @@
 
 #include "modules/routing/proto/routing.pb.h"
 
-#include "modules/common/configs/vehicle_config_helper.h"
 #include "cybertron/common/log.h"
+#include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/vec2d.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/hdmap/hdmap_util.h"
@@ -366,20 +366,19 @@ Status Frame::Init() {
   ADEBUG << "Enabled align prediction time ? : " << std::boolalpha
          << FLAGS_align_prediction_time;
 
-  // prediction
-  if (local_view_.prediction_obstacles == nullptr) {
-    // if (FLAGS_enable_lag_prediction && lag_predictor_) {
-    // lag_predictor_->GetLaggedPrediction(
-    //    local_view_.prediction_obstacles.get());
-    //}
-    prediction_.CopyFrom(*local_view_.prediction_obstacles);
+  // if (FLAGS_enable_lag_prediction && lag_predictor_) {
+  // lag_predictor_->GetLaggedPrediction(
+  //    local_view_.prediction_obstacles.get());
+  //}
+  auto prediction = *(local_view_.prediction_obstacles);
 
-    if (FLAGS_align_prediction_time) {
-      AlignPredictionTime(vehicle_state_.timestamp(), &prediction_);
-    }
-    for (auto &ptr : Obstacle::CreateObstacles(prediction_)) {
-      AddObstacle(*ptr);
-    }
+  if (FLAGS_align_prediction_time) {
+    AlignPredictionTime(vehicle_state_.timestamp(), &prediction);
+    local_view_.prediction_obstacles->CopyFrom(prediction);
+  }
+  for (auto &ptr :
+       Obstacle::CreateObstacles(*local_view_.prediction_obstacles)) {
+    AddObstacle(*ptr);
   }
   if (FLAGS_enable_collision_detection) {
     const auto *collision_obstacle = FindCollisionObstacle();
@@ -472,7 +471,7 @@ void Frame::RecordInputDebug(planning_internal::Debug *debug) {
   }
 
   planning_debug_data->mutable_prediction_header()->CopyFrom(
-      prediction_.header());
+      local_view_.prediction_obstacles->header());
 
   /*
   auto relative_map = AdapterManager::GetRelativeMap();
