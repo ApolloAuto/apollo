@@ -30,8 +30,8 @@
 #include "modules/planning/proto/planning_internal.pb.h"
 #include "modules/planning/proto/planning_status.pb.h"
 
-#include "modules/common/configs/vehicle_config_helper.h"
 #include "cybertron/common/log.h"
+#include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/cartesian_frenet_conversion.h"
 #include "modules/common/util/util.h"
 #include "modules/map/hdmap/hdmap_util.h"
@@ -149,12 +149,15 @@ bool DpRoadGraph::GenerateMinCostPath(
   auto &front = graph_nodes.front().front();
   size_t total_level = path_waypoints.size();
 
-  auto task = apollo::cybertron::CreateTask<RoadGraphMessage>(
-      "planning_graph_node_process",
-      [this](const std::shared_ptr<RoadGraphMessage> &msg) {
-        this->UpdateNode(msg);
-      },
-      FLAGS_max_planning_thread_pool_size);
+  std::unique_ptr<cybertron::Task<RoadGraphMessage>> task;
+  if (FLAGS_enable_multi_thread_in_dp_poly_path) {
+    task = cybertron::CreateTask<RoadGraphMessage>(
+        "planning_graph_node_process",
+        [this](const std::shared_ptr<RoadGraphMessage> &msg) {
+          this->UpdateNode(msg);
+        },
+        FLAGS_max_planning_thread_pool_size);
+  }
 
   for (std::size_t level = 1; level < path_waypoints.size(); ++level) {
     const auto &prev_dp_nodes = graph_nodes.back();
@@ -182,7 +185,9 @@ bool DpRoadGraph::GenerateMinCostPath(
         UpdateNode(msg);
       }
     }
-    task->Wait();
+    if (FLAGS_enable_multi_thread_in_dp_poly_path) {
+      task->Wait();
+    }
   }
 
   // find best path

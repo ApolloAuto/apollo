@@ -164,13 +164,13 @@ void StdPlanning::RunOnce(const LocalView& local_view,
 
   // localization
   ADEBUG << "Get localization:"
-         << local_view.localization_estimate->DebugString();
+         << local_view_.localization_estimate->DebugString();
 
   // chassis
-  ADEBUG << "Get chassis:" << local_view.chassis->DebugString();
+  ADEBUG << "Get chassis:" << local_view_.chassis->DebugString();
 
   Status status = VehicleStateProvider::Instance()->Update(
-      *local_view.localization_estimate, *local_view.chassis);
+      *local_view_.localization_estimate, *local_view_.chassis);
 
   VehicleState vehicle_state =
       VehicleStateProvider::Instance()->vehicle_state();
@@ -198,10 +198,10 @@ void StdPlanning::RunOnce(const LocalView& local_view,
     return;
   }
 
-  if (IsDifferentRouting(last_routing_, *local_view.routing)) {
-    last_routing_ = *local_view.routing;
+  if (IsDifferentRouting(last_routing_, *local_view_.routing)) {
+    last_routing_ = *local_view_.routing;
     mutable_planning_status()->Clear();
-    reference_line_provider_->UpdateRoutingResponse(*local_view.routing);
+    reference_line_provider_->UpdateRoutingResponse(*local_view_.routing);
   }
 
   // Update reference line provider and reset pull over if necessary

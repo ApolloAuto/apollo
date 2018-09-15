@@ -74,66 +74,38 @@ void PlanningTestBase::SetUpTestCase() {
 bool PlanningTestBase::FeedTestData() {
   // chassis
   if (!apollo::common::util::GetProtoFromFile(
-      FLAGS_test_data_dir + "/" + FLAGS_test_chassis_file, &chassis_)) {
+          FLAGS_test_data_dir + "/" + FLAGS_test_chassis_file, &chassis_)) {
     AERROR << "failed to load file: " << FLAGS_test_chassis_file;
     return -1;
   }
   // localization
   if (!apollo::common::util::GetProtoFromFile(
-      FLAGS_test_data_dir + "/" + FLAGS_test_localization_file,
-      &localization_)) {
+          FLAGS_test_data_dir + "/" + FLAGS_test_localization_file,
+          &localization_)) {
     AERROR << "failed to load file: " << FLAGS_test_localization_file;
     return -1;
   }
   // prediction
   if (!apollo::common::util::GetProtoFromFile(
-      FLAGS_test_data_dir + "/" + FLAGS_test_prediction_file, &prediction_)) {
+          FLAGS_test_data_dir + "/" + FLAGS_test_prediction_file,
+          &prediction_)) {
     AERROR << "failed to load file: " << FLAGS_test_prediction_file;
     return -1;
   }
   // routing_response
   if (!apollo::common::util::GetProtoFromFile(
-      FLAGS_test_data_dir + "/" + FLAGS_test_routing_response_file,
-      &routing_response_)) {
+          FLAGS_test_data_dir + "/" + FLAGS_test_routing_response_file,
+          &routing_response_)) {
     AERROR << "failed to load file: " << FLAGS_test_routing_response_file;
     return -1;
   }
   // traffic_light_detection
   if (!apollo::common::util::GetProtoFromFile(
-      FLAGS_test_data_dir + "/" + FLAGS_test_traffic_light_file,
-      &traffic_light_detection_)) {
+          FLAGS_test_data_dir + "/" + FLAGS_test_traffic_light_file,
+          &traffic_light_detection_)) {
     AERROR << "failed to load file: " << FLAGS_test_traffic_light_file;
     return -1;
   }
-
-  std::shared_ptr<apollo::cybertron::Node> node(
-      apollo::cybertron::CreateNode("planning_tester"));
-
-  // chassis
-  auto chassis_writer = node->CreateWriter<Chassis>(
-      FLAGS_chassis_topic);
-  chassis_writer->Write(chassis_);
-
-  // localization
-  auto localization_writer = node->CreateWriter<LocalizationEstimate>(
-      FLAGS_localization_topic);
-  localization_writer->Write(localization_);
-
-  // prediction
-  auto prediction_writer = node->CreateWriter<PredictionObstacles>(
-      FLAGS_prediction_topic);
-  prediction_writer->Write(prediction_);
-
-  // routing_response
-  auto routing_response_writer = node->CreateWriter<RoutingResponse>(
-      FLAGS_routing_response_topic);
-  routing_response_writer->Write(routing_response_);
-
-  // traffic_light_detection
-  auto traffic_light_detection_writer =
-      node->CreateWriter<TrafficLightDetection>(
-          FLAGS_traffic_light_detection_topic);
-  traffic_light_detection_writer->Write(traffic_light_detection_);
 
   AINFO << "Successfully fed proto files.";
   return true;
@@ -141,8 +113,6 @@ bool PlanningTestBase::FeedTestData() {
 
 void PlanningTestBase::SetUp() {
   Clock::SetMode(Clock::CYBERTRON);
-
-  apollo::cybertron::Init("planning_tester");
 
   if (FLAGS_use_navigation_mode) {
     // TODO(all)
@@ -261,6 +231,7 @@ bool PlanningTestBase::RunPlanning(const std::string& test_case_name,
       return false;
     }
   }
+  planning_.reset(nullptr);
   return true;
 }
 

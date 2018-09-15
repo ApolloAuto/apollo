@@ -37,6 +37,9 @@ DECLARE_string(test_chassis_file);
 class GarageTest : public PlanningTestBase {
  public:
   virtual void SetUp() {
+    FLAGS_use_multi_thread_to_add_obstacles = false;
+    FLAGS_enable_multi_thread_in_dp_poly_path = false;
+    FLAGS_enable_multi_thread_in_dp_st_graph = false;
     FLAGS_use_navigation_mode = false;
     FLAGS_map_dir = "modules/planning/testdata/garage_map";
     FLAGS_base_map_filename = "base_map.txt";
@@ -50,7 +53,6 @@ class GarageTest : public PlanningTestBase {
 /*
  * test stop for not-nudgable obstacle
  */
-/*
 TEST_F(GarageTest, stop_obstacle) {
   FLAGS_test_prediction_file = "stop_obstacle_prediction.pb.txt";
   FLAGS_test_localization_file = "stop_obstacle_localization.pb.txt";
@@ -64,7 +66,6 @@ TEST_F(GarageTest, stop_obstacle) {
 
   RUN_GOLDEN_TEST(0);
 }
-*/
 /*
  * test follow head_vehicle
  */

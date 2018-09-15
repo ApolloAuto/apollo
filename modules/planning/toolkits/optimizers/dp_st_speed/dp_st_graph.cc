@@ -176,12 +176,15 @@ Status DpStGraph::CalculateTotalCost() {
 
     int count = next_highest_row - next_lowest_row + 1;
     if (count > 0) {
-      auto task = apollo::cybertron::CreateTask<StGraphMessage>(
-          "dp_process",
-          [this](const std::shared_ptr<StGraphMessage>& msg) {
-            this->CalculateCostAt(msg);
-          },
-          FLAGS_max_planning_thread_pool_size);
+      std::unique_ptr<cybertron::Task<StGraphMessage>> task;
+      if (FLAGS_enable_multi_thread_in_dp_st_graph) {
+        task = apollo::cybertron::CreateTask<StGraphMessage>(
+            "dp_process",
+            [this](const std::shared_ptr<StGraphMessage>& msg) {
+              this->CalculateCostAt(msg);
+            },
+            FLAGS_max_planning_thread_pool_size);
+      }
 
       for (uint32_t r = next_lowest_row; r <= next_highest_row; ++r) {
         auto msg = std::make_shared<StGraphMessage>(c, r);
