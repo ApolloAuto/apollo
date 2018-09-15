@@ -70,6 +70,7 @@ class SunnyvaleBigLoopTest : public PlanningTestBase {
  *   adc status: null => DRIVE
  *   decision: STOP
  */
+/*
 TEST_F(SunnyvaleBigLoopTest, stop_sign_01) {
   ENABLE_RULE(TrafficRuleConfig::STOP_SIGN, true);
 
@@ -87,12 +88,13 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_01) {
   EXPECT_TRUE(stop_sign_status.has_status() &&
               stop_sign_status.status() == StopSignStatus::DRIVE);
 }
-
+*/
 /*
  * stop_sign: adc stopped (speed and distance to stop_line)
  *   adc status: DRIVE => STOP
  *   decision: STOP
  */
+/*
 TEST_F(SunnyvaleBigLoopTest, stop_sign_02) {
   ENABLE_RULE(TrafficRuleConfig::STOP_SIGN, true);
 
@@ -114,12 +116,14 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_02) {
   EXPECT_TRUE(stop_sign_status->has_status() &&
               stop_sign_status->status() == StopSignStatus::STOP);
 }
+*/
 
 /*
  * stop_sign: adc stopped + wait_time < STOP_DURATION
  *   adc status: STOP => STOP
  *   decision: STOP
  */
+/*
 TEST_F(SunnyvaleBigLoopTest, stop_sign_03) {
   ENABLE_RULE(TrafficRuleConfig::STOP_SIGN, true);
 
@@ -147,12 +151,14 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_03) {
   EXPECT_TRUE(stop_sign_status->has_status() &&
               stop_sign_status->status() == StopSignStatus::STOP);
 }
+*/
 
 /*
  * stop_sign: adc stopped + wait time > STOP_DURATION
  *   adc status: STOP => STOP_DONE
  *   decision: CRUISE
  */
+/*
 TEST_F(SunnyvaleBigLoopTest, stop_sign_04) {
   ENABLE_RULE(TrafficRuleConfig::STOP_SIGN, true);
 
@@ -187,7 +193,7 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_04) {
   EXPECT_TRUE(stop_sign_status->has_status() &&
               stop_sign_status->status() == StopSignStatus::STOP_DONE);
 }
-
+*/
 /*
  * stop_sign:
  * bag: 2018-01-24-11-32-28/2018-01-24-11-32-30_0.bag

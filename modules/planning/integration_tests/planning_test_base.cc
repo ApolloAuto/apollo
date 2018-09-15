@@ -51,7 +51,10 @@ void PlanningTestBase::SetUpTestCase() {
   FLAGS_use_multi_thread_to_add_obstacles = false;
   FLAGS_enable_multi_thread_in_dp_poly_path = false;
   FLAGS_enable_multi_thread_in_dp_st_graph = false;
-  FLAGS_planning_config_file = "modules/planning/conf/planning_config.pb.txt";
+  FLAGS_planning_config_file =
+      "/apollo/modules/planning/conf/planning_config.pb.txt";
+  FLAGS_traffic_rule_config_filename =
+      "/apollo/modules/planning/conf/traffic_rule_config.pb.txt";
   // FLAGS_planning_adapter_config_filename =
   //      "modules/planning/testdata/conf/adapter.conf";
   FLAGS_smoother_config_filename =
@@ -231,7 +234,6 @@ bool PlanningTestBase::RunPlanning(const std::string& test_case_name,
       return false;
     }
   }
-  planning_.reset(nullptr);
   return true;
 }
 
