@@ -28,15 +28,12 @@ Node3d::Node3d(double x, double y, double phi,
   x_ = x;
   y_ = y;
   phi_ = phi;
-  x_grid_ = static_cast<std::size_t>(
-      (open_space_conf.max_x - open_space_conf.min_x) / std
-      : abs(x_));
-  y_grid_ = static_cast<std::size_t>(
-      (open_space_conf.max_y - open_space_conf.min_y) / std
-      : abs(y_));
-  phi_grid_ = static_cast<std::size_t>(
-      (open_space_conf.max_phi - open_space_conf.min_phi) / std
-      : abs(phi_));
+  x_grid_ = static_cast<std::size_t>((x_ - open_space_conf.min_x) /
+                                     open_space_conf.x_grid_resolution);
+  y_grid_ = static_cast<std::size_t>((y_ - open_space_conf.min_y) /
+                                     open_space_conf.y_grid_resolution);
+  phi_grid_ = static_cast<std::size_t>((phi_ open_space_conf.min_phi) /
+                                       open_space_conf.phi_grid_resolution);
   index_ = phi_grid_ * (open_space_conf.max_x - open_space_conf.min_x) *
                (open_space_conf.max_y - open_space_conf.min_y) +
            y_grid_ * (open_space_conf.max_x - open_space_conf.min_x) + x_grid_;
@@ -54,7 +51,7 @@ Box2d Node3d::GetBoundingBox(const common::VehicleParam& vehicle_param_) {
   return ego_box;
 }
 
-bool Node3d::operator==(const SmartPtr<Node3d> right) const {
+bool Node3d::operator==(const shared_ptr<Node3d> right) const {
   return x_grid_ == right->GetGridX() && y_grid_ == right->GetGridY() &&
          phi_grid_ == right->GetGridPhi();
 }

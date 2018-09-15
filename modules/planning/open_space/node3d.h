@@ -46,8 +46,8 @@ class Node3d {
   double GetX() { return x_; };
   double GetY() { return y_; };
   double GetPhi() { return phi_; };
-  bool operator==(const SmartPtr<Node3d> right) const;
-  int GetIndex(return index_;);
+  bool operator==(const shared_ptr<Node3d> right) const;
+  std::size_t GetIndex() {return index_;};
 
  private:
   double x_ = 0.0;
@@ -56,10 +56,10 @@ class Node3d {
   std::size_t x_grid_ = 0;
   std::size_t y_grid_ = 0;
   std::size_t phi_grid_ = 0;
-  int index_ = 0;
+  std::size_t index_ = 0;
   double current_cost_ = 0.0;
   double heuristic_cost_ = 0.0;
-  SmartPtr<Node3d> pre_node = nullptr;
+  shared_ptr<Node3d> pre_node = nullptr;
   double steering_ = 0.0;
   // true for moving forward and false for moving backward
   bool direction_ = true;
