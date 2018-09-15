@@ -20,6 +20,7 @@
 #include <gtest/gtest.h>
 #include <unistd.h>
 #include <atomic>
+#include <string>
 
 #include "cybertron/common/log.h"
 
@@ -27,11 +28,11 @@ namespace apollo {
 namespace cybertron {
 namespace record {
 
-const std::string CHAN_1 = "/test1";
-const std::string CHAN_2 = "/test2";
-const std::string MSG_TYPE = "apollo.cybertron.proto.Test";
-const std::string STR_10B = "1234567890";
-const std::string TEST_FILE = "test.record";
+const char CHAN_1[] = "/test1";
+const char CHAN_2[] = "/test2";
+const char MSG_TYPE[] = "apollo.cybertron.proto.Test";
+const char STR_10B[] = "1234567890";
+const char TEST_FILE[] = "test.record";
 
 TEST(ChunkTest, TestAll) {
   Chunk* ck = new Chunk();
@@ -74,7 +75,6 @@ TEST(ChunkTest, TestAll) {
 }
 
 TEST(RecordFileTest, TestOneMessageFile) {
-
   // writer open one message file
   RecordFileWriter* rfw = new RecordFileWriter();
   ASSERT_TRUE(rfw->Open(TEST_FILE));

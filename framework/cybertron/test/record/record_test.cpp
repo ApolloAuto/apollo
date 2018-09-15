@@ -14,13 +14,15 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "cybertron/record/header_builder.h"
 #include "cybertron/record/record_reader.h"
 #include "cybertron/record/record_writer.h"
-#include "cybertron/record/header_builder.h"
 
 #include <gtest/gtest.h>
 #include <unistd.h>
 #include <atomic>
+#include <memory>
+#include <string>
 
 #include "cybertron/common/log.h"
 
@@ -28,15 +30,14 @@ namespace apollo {
 namespace cybertron {
 namespace record {
 
-const std::string CHANNEL_NAME = "/test/channel1";
-const std::string MESSAGE_TYPE = "apollo.cybertron.proto.Test";
-const std::string PROTO_DESC = "1234567890";
-const std::string STR_10B = "1234567890";
-const std::string TEST_FILE = "test.record";
+const char CHANNEL_NAME[] = "/test/channel1";
+const char MESSAGE_TYPE[] = "apollo.cybertron.proto.Test";
+const char PROTO_DESC[] = "1234567890";
+const char STR_10B[] = "1234567890";
+const char TEST_FILE[] = "test.record";
 const uint64_t TIME = 1e9;
 
 TEST(RecordTest, TestOneMessageFile) {
-
   // writer
   RecordWriter* rw = new RecordWriter();
   ASSERT_FALSE(rw->is_opened_);
