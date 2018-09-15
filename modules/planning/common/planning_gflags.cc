@@ -109,10 +109,10 @@ DEFINE_bool(ignore_overlapped_obstacle, false,
             "ingore obstacle that overlapps with ADC. Only enable this flag "
             "when you found fake obstacle result from poorly lidar");
 
-DEFINE_double(replan_lateral_distance_threshold, 5.0,
-              "The distance threshold of replan");
-DEFINE_double(replan_longitudinal_distance_threshold, 5.0,
-              "The distance threshold of replan");
+DEFINE_double(replan_lateral_distance_threshold, 0.5,
+              "The lateral distance threshold of replan");
+DEFINE_double(replan_longitudinal_distance_threshold, 2.5,
+              "The longitudinal distance threshold of replan");
 DEFINE_bool(estimate_current_vehicle_state, true,
             "Estimate current vehicle state.");
 
