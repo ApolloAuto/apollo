@@ -148,6 +148,7 @@ Status StdPlanning::InitFrame(const uint32_t sequence_num,
 
 void StdPlanning::RunOnce(const LocalView& local_view,
                           ADCTrajectory* const trajectory_pb) {
+  local_view_ = local_view;
   const double start_timestamp = Clock::NowInSeconds();
 
   auto* not_ready = trajectory_pb->mutable_decision()
