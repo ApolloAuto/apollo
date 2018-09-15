@@ -1,5 +1,4 @@
 header {
-  module_name: "std_planning"
 }
 is_replan: true
 gear: GEAR_DRIVE
@@ -48,11 +47,6 @@ decision {
   vehicle_signal {
     turn_signal: TURN_LEFT
   }
-}
-routing_header {
-  timestamp_sec: 1522099749.8459234
-  module_name: "routing"
-  sequence_num: 887
 }
 right_of_way_status: PROTECTED
 lane_id {
