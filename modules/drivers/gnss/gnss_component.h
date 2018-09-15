@@ -21,6 +21,7 @@
 #include <vector>
 
 #include "cybertron/cybertron.h"
+#include "modules/common/monitor_log/monitor_log_buffer.h"
 
 #include "modules/drivers/gnss/stream/raw_stream.h"
 
@@ -41,6 +42,7 @@ class GnssDriverComponent : public Component<RawData> {
 
  private:
   std::unique_ptr<RawStream> raw_stream_ = nullptr;
+  apollo::common::monitor::MonitorLogBuffer monitor_logger_buffer_;
 };
 
 CYBERTRON_REGISTER_COMPONENT(GnssDriverComponent)
