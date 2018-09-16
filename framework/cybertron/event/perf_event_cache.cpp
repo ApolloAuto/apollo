@@ -20,7 +20,6 @@
 #include <unordered_map>
 
 #include "cybertron/event/perf_event_cache.h"
-
 #include "cybertron/common/global_data.h"
 #include "cybertron/init.h"
 #include "cybertron/time/time.h"
@@ -65,10 +64,12 @@ void PerfEventCache::AddEvent(const std::shared_ptr<PerfEventBase>& event) {
   }
 }
 
-void PerfEventCache::AddSchedEvent(SchedPerf event_id, uint64_t cr_id,
-                                   int proc_id, uint64_t t_sleep,
-                                   uint64_t t_start, int try_fetch_result,
-                                   int croutine_state) {
+void PerfEventCache::AddSchedEvent(const SchedPerf event_id,
+                                   const uint64_t cr_id, const int proc_id,
+                                   const uint64_t t_sleep,
+                                   const uint64_t t_start,
+                                   const int try_fetch_result,
+                                   const int croutine_state) {
   if (!enable_) {
     return;
   }
@@ -85,8 +86,9 @@ void PerfEventCache::AddSchedEvent(SchedPerf event_id, uint64_t cr_id,
   }
 }
 
-void PerfEventCache::AddTransportEvent(TransPerf event_id, uint64_t channel_id,
-                                       uint64_t msg_seq) {
+void PerfEventCache::AddTransportEvent(const TransPerf event_id,
+                                       const uint64_t channel_id,
+                                       const uint64_t msg_seq) {
   if (!enable_) {
     return;
   }

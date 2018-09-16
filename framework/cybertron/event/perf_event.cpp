@@ -29,7 +29,7 @@ namespace event {
 using apollo::cybertron::base::BoundedQueue;
 using apollo::cybertron::common::GlobalData;
 
-void SchedPerfEvent::SetParams(int count, ...) {
+void SchedPerfEvent::SetParams(const int count, ...) {
   va_list ap;
   va_start(ap, count);
   event_id = va_arg(ap, int);
@@ -43,7 +43,7 @@ void SchedPerfEvent::SetParams(int count, ...) {
   va_end(ap);
 }
 
-void TransportPerfEvent::SetParams(int count, ...) {
+void TransportPerfEvent::SetParams(const int count, ...) {
   va_list ap;
   va_start(ap, count);
   event_id = va_arg(ap, int);
