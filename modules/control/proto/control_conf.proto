@@ -40,7 +40,6 @@ message ControlConf {
   optional bool enable_navigation_mode_position_update = 22 [default = true];
   optional bool enable_persistent_estop = 23 [default = true];
 
-
   // original config
   optional double control_period = 24;
   optional double max_planning_interval_sec = 25;

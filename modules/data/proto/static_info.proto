@@ -10,9 +10,7 @@ import "modules/routing/proto/routing.proto";
 
 message VehicleInfo {
   optional string name = 1;
-  enum Brand {
-    LINCOLN = 1;
-  }
+  enum Brand { LINCOLN = 1; }
   optional Brand brand = 2;
   enum Model {
     // Lincoln model

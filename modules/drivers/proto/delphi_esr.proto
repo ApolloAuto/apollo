@@ -5,7 +5,7 @@ package apollo.drivers;
 import "modules/common/proto/header.proto";
 
 message Esr_status9_5e8 {
-// Report Message
+  // Report Message
   // [] [0|64]
   optional int32 can_tx_path_id_acc_3 = 1;
   // [] [0|64]
@@ -23,7 +23,7 @@ message Esr_status9_5e8 {
 }
 
 message Esr_status6_5e5 {
-// Report Message
+  // Report Message
   enum Can_tx_vertical_align_updatedType {
     CAN_TX_VERTICAL_ALIGN_UPDATED_NOT_UPDATED = 0;
     CAN_TX_VERTICAL_ALIGN_UPDATED_UPDATED = 1;
@@ -91,7 +91,7 @@ message Esr_status6_5e5 {
 }
 
 message Esr_status5_5e4 {
-// Report Message
+  // Report Message
   // [] [0|0]
   optional int32 can_tx_supply_10v_a2d = 1;
   // [] [0|0]
@@ -111,7 +111,7 @@ message Esr_status5_5e4 {
 }
 
 message Esr_status3_4e2 {
-// Report Message
+  // Report Message
   // [] [0|0]
   optional int32 can_tx_sw_version_pld = 1;
   // [] [0|0]
@@ -125,7 +125,7 @@ message Esr_status3_4e2 {
 }
 
 message Esr_status4_4e3 {
-// Report Message
+  // Report Message
   enum Can_tx_truck_target_detType {
     CAN_TX_TRUCK_TARGET_DET_NOT_DETECTED = 0;
     CAN_TX_TRUCK_TARGET_DET_DETECTED = 1;
@@ -151,7 +151,8 @@ message Esr_status4_4e3 {
   // [] [0|0]
   optional Can_tx_truck_target_detType can_tx_truck_target_det = 1;
   // [] [0|0]
-  optional Can_tx_lr_only_grating_lobe_detType can_tx_lr_only_grating_lobe_det = 2;
+  optional Can_tx_lr_only_grating_lobe_detType can_tx_lr_only_grating_lobe_det =
+      2;
   // [] [0|0]
   optional Can_tx_sidelobe_blockageType can_tx_sidelobe_blockage = 3;
   // [] [0|0]
@@ -177,7 +178,7 @@ message Esr_status4_4e3 {
 }
 
 message Esr_trackmotionpower_540 {
-// Report Message
+  // Report Message
   // [] [0|1]
   optional bool can_tx_track_rolling_count_2 = 1;
   optional int32 can_tx_track_can_id_group = 2;
@@ -191,7 +192,7 @@ message Esr_trackmotionpower_540 {
 }
 
 message Acm_inst_req_7e0 {
-// Report Message
+  // Report Message
   // [] [0|0]
   optional int32 command_ctr = 1;
   // [] [0|0]
@@ -207,7 +208,7 @@ message Acm_inst_req_7e0 {
 }
 
 message Esr_track01_500 {
-// Report Message
+  // Report Message
   enum Can_tx_track_grouping_changedType {
     CAN_TX_TRACK_GROUPING_CHANGED_GROUPINGUNCHANGED = 0;
     CAN_TX_TRACK_GROUPING_CHANGED_GROUPINGCHANGED = 1;
@@ -263,7 +264,7 @@ message Esr_track01_500 {
 }
 
 message Esr_valid1_5d0 {
-// Report Message
+  // Report Message
   // [] [0|0]
   optional int32 can_tx_valid_lr_sn = 1;
   // [m/s] [-128|127]
@@ -277,7 +278,7 @@ message Esr_valid1_5d0 {
 }
 
 message Esr_valid2_5d1 {
-// Report Message
+  // Report Message
   // [] [0|0]
   optional int32 can_tx_valid_mr_sn = 1;
   // [m/s] [-128|127]
@@ -291,7 +292,7 @@ message Esr_valid2_5d1 {
 }
 
 message Acm_inst_resp_7e4 {
-// Report Message
+  // Report Message
   // [] [0|0]
   optional int32 data_7 = 1;
   // [] [0|0]
@@ -311,7 +312,7 @@ message Acm_inst_resp_7e4 {
 }
 
 message Vehicle2_4f1 {
-// Report Message
+  // Report Message
   enum Can_rx_mr_only_transmitType {
     CAN_RX_MR_ONLY_TRANSMIT_OFF = 0;
     CAN_RX_MR_ONLY_TRANSMIT_ON = 1;
@@ -403,7 +404,7 @@ message Vehicle2_4f1 {
 }
 
 message Vehicle1_4f0 {
-// Report Message
+  // Report Message
   enum Can_rx_steering_angle_validityType {
     CAN_RX_STEERING_ANGLE_VALIDITY_INVALID = 0;
     CAN_RX_STEERING_ANGLE_VALIDITY_VALID = 1;
@@ -425,13 +426,15 @@ message Vehicle1_4f0 {
     CAN_RX_VEHICLE_SPEED_DIRECTION_REVERSE = 1;
   }
   // [] [0|0]
-  optional Can_rx_steering_angle_validityType can_rx_steering_angle_validity = 1;
+  optional Can_rx_steering_angle_validityType can_rx_steering_angle_validity =
+      1;
   // [deg/s] [0|2047]
   optional int32 can_rx_steering_angle_rate = 2;
   // [] [0|0]
   optional Can_rx_steering_angle_signType can_rx_steering_angle_sign = 3;
   // [] [0|0]
-  optional Can_rx_steering_angle_rate_signType can_rx_steering_angle_rate_sign = 4;
+  optional Can_rx_steering_angle_rate_signType can_rx_steering_angle_rate_sign =
+      4;
   // [deg] [0|2047]
   optional int32 can_rx_steering_angle = 5;
   // [m] [-8192|8191]
@@ -441,13 +444,14 @@ message Vehicle1_4f0 {
   // [deg/s] [-128|127.9375]
   optional double can_rx_yaw_rate = 8;
   // [] [0|0]
-  optional Can_rx_vehicle_speed_directionType can_rx_vehicle_speed_direction = 9;
+  optional Can_rx_vehicle_speed_directionType can_rx_vehicle_speed_direction =
+      9;
   // [m/s] [0|127.9375]
   optional double can_rx_vehicle_speed = 10;
 }
 
 message Esr_sim1_5c0 {
-// Report Message
+  // Report Message
   enum Can_rx_sim_track_idType {
     CAN_RX_SIM_TRACK_ID_NO_TARGET = 0;
     CAN_RX_SIM_TRACK_ID_TARGET_1 = 1;
@@ -490,7 +494,7 @@ message Esr_sim1_5c0 {
 }
 
 message Esr_status1_4e0 {
-// Report Message
+  // Report Message
   // [ms] [0|254]
   optional double can_tx_dsp_timestamp = 1;
   // [] [0|0]
@@ -508,7 +512,7 @@ message Esr_status1_4e0 {
 }
 
 message Esr_status2_4e1 {
-// Report Message
+  // Report Message
   enum Can_tx_raw_data_modeType {
     CAN_TX_RAW_DATA_MODE_FILTERED = 0;
     CAN_TX_RAW_DATA_MODE_RAW = 1;
@@ -564,7 +568,7 @@ message Esr_status2_4e1 {
 }
 
 message Esr_status8_5e7 {
-// Report Message
+  // Report Message
   // [] [0|0]
   optional int32 can_tx_history_fault_7 = 1;
   // [] [0|0]
@@ -584,7 +588,7 @@ message Esr_status8_5e7 {
 }
 
 message Esr_status7_5e6 {
-// Report Message
+  // Report Message
   // [] [0|0]
   optional int32 can_tx_active_fault_7 = 1;
   // [] [0|0]
@@ -604,7 +608,7 @@ message Esr_status7_5e6 {
 }
 
 message Vehicle3_5f2 {
-// Report Message
+  // Report Message
   enum Can_rx_serv_align_typeType {
     CAN_RX_SERV_ALIGN_TYPE_AUTO_OR_DEALER = 0;
     CAN_RX_SERV_ALIGN_TYPE_VOLVO_SHORT_TRACK = 1;
@@ -668,7 +672,7 @@ message Vehicle3_5f2 {
 }
 
 message Vehicle4_5f3 {
-// Report Message
+  // Report Message
   enum Can_rx_fac_align_cmd_2Type {
     CAN_RX_FAC_ALIGN_CMD_2_OFF = 0;
     CAN_RX_FAC_ALIGN_CMD_2_ON = 1;
@@ -700,7 +704,7 @@ message Vehicle4_5f3 {
 }
 
 message Vehicle5_5f4 {
-// Report Message
+  // Report Message
   enum Can_rx_yaw_rate_bias_shiftType {
     CAN_RX_YAW_RATE_BIAS_SHIFT_NO_DETECT = 0;
     CAN_RX_YAW_RATE_BIAS_SHIFT_DETECT = 1;
@@ -726,7 +730,7 @@ message Vehicle5_5f4 {
 }
 
 message Vehicle6_5f5 {
-// Report Message
+  // Report Message
   // [m] [-2|10]
   optional double can_rx_inner_funnel_offset_right = 1;
   // [m] [-2|10]
@@ -741,26 +745,27 @@ message Vehicle6_5f5 {
 
 message DelphiESR {
   optional apollo.common.Header header = 1;
-  optional Esr_status9_5e8 esr_status9_5e8 = 2; // report message
-  optional Esr_status6_5e5 esr_status6_5e5 = 3; // report message
-  optional Esr_status5_5e4 esr_status5_5e4 = 4; // report message
-  optional Esr_status3_4e2 esr_status3_4e2 = 5; // report message
-  optional Esr_status4_4e3 esr_status4_4e3 = 6; // report message
-  repeated Esr_trackmotionpower_540 esr_trackmotionpower_540 = 7; // report message
-  optional Acm_inst_req_7e0 acm_inst_req_7e0 = 8; // report message
-  repeated Esr_track01_500 esr_track01_500 = 9; // report message
-  optional Esr_valid1_5d0 esr_valid1_5d0 = 10; // report message
-  optional Esr_valid2_5d1 esr_valid2_5d1 = 11; // report message
-  optional Acm_inst_resp_7e4 acm_inst_resp_7e4 = 12; // report message
-  optional Vehicle2_4f1 vehicle2_4f1 = 13; // report message
-  optional Vehicle1_4f0 vehicle1_4f0 = 14; // report message
-  optional Esr_sim1_5c0 esr_sim1_5c0 = 15; // report message
-  optional Esr_status1_4e0 esr_status1_4e0 = 16; // report message
-  optional Esr_status2_4e1 esr_status2_4e1 = 17; // report message
-  optional Esr_status8_5e7 esr_status8_5e7 = 18; // report message
-  optional Esr_status7_5e6 esr_status7_5e6 = 19; // report message
-  optional Vehicle3_5f2 vehicle3_5f2 = 20; // report message
-  optional Vehicle4_5f3 vehicle4_5f3 = 21; // report message
-  optional Vehicle5_5f4 vehicle5_5f4 = 22; // report message
-  optional Vehicle6_5f5 vehicle6_5f5 = 23; // report message
+  optional Esr_status9_5e8 esr_status9_5e8 = 2;  // report message
+  optional Esr_status6_5e5 esr_status6_5e5 = 3;  // report message
+  optional Esr_status5_5e4 esr_status5_5e4 = 4;  // report message
+  optional Esr_status3_4e2 esr_status3_4e2 = 5;  // report message
+  optional Esr_status4_4e3 esr_status4_4e3 = 6;  // report message
+  repeated Esr_trackmotionpower_540 esr_trackmotionpower_540 =
+      7;                                              // report message
+  optional Acm_inst_req_7e0 acm_inst_req_7e0 = 8;     // report message
+  repeated Esr_track01_500 esr_track01_500 = 9;       // report message
+  optional Esr_valid1_5d0 esr_valid1_5d0 = 10;        // report message
+  optional Esr_valid2_5d1 esr_valid2_5d1 = 11;        // report message
+  optional Acm_inst_resp_7e4 acm_inst_resp_7e4 = 12;  // report message
+  optional Vehicle2_4f1 vehicle2_4f1 = 13;            // report message
+  optional Vehicle1_4f0 vehicle1_4f0 = 14;            // report message
+  optional Esr_sim1_5c0 esr_sim1_5c0 = 15;            // report message
+  optional Esr_status1_4e0 esr_status1_4e0 = 16;      // report message
+  optional Esr_status2_4e1 esr_status2_4e1 = 17;      // report message
+  optional Esr_status8_5e7 esr_status8_5e7 = 18;      // report message
+  optional Esr_status7_5e6 esr_status7_5e6 = 19;      // report message
+  optional Vehicle3_5f2 vehicle3_5f2 = 20;            // report message
+  optional Vehicle4_5f3 vehicle4_5f3 = 21;            // report message
+  optional Vehicle5_5f4 vehicle5_5f4 = 22;            // report message
+  optional Vehicle6_5f5 vehicle6_5f5 = 23;            // report message
 }

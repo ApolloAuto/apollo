@@ -7,6 +7,6 @@ message GainScheduler {
 }
 
 message GainSchedulerInfo {
-  optional double speed = 1; // m/s
+  optional double speed = 1;  // m/s
   optional double ratio = 2;
 }

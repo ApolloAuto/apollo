@@ -5,8 +5,8 @@ package apollo.hdmap;
 import "modules/map/proto/map_id.proto";
 
 message LaneOverlapInfo {
-  optional double start_s = 1;  //position (s-coordinate)
-  optional double end_s = 2;    //position (s-coordinate)
+  optional double start_s = 1;  // position (s-coordinate)
+  optional double end_s = 2;    // position (s-coordinate)
   optional bool is_merge = 3;
 }
 

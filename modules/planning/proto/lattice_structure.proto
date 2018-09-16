@@ -31,7 +31,7 @@ message StopPoint {
     HARD = 0;
     SOFT = 1;
   }
-  required Type type = 2 [default = HARD]; 
+  required Type type = 2 [default = HARD];
 }
 
 message PlanningTarget {

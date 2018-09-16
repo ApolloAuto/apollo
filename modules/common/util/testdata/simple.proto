@@ -11,5 +11,5 @@ message SimpleMessage {
 }
 
 message SimpleRepeatedMessage {
-    repeated SimpleMessage message = 1;
+  repeated SimpleMessage message = 1;
 }

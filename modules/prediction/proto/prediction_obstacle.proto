@@ -15,7 +15,7 @@ message Trajectory {
 
 // estimated obstacle intent
 message ObstacleIntent {
-   enum Type {
+  enum Type {
     UNKNOWN = 0;
     STOP = 1;
     STATIONARY = 2;
@@ -31,7 +31,7 @@ message ObstacleIntent {
 
 // self driving car intent
 message Intent {
-   enum Type {
+  enum Type {
     UNKNOWN = 0;
     STOP = 1;
     CRUISE = 2;

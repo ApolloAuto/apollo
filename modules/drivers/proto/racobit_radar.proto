@@ -28,19 +28,19 @@ message RacobitRadarState_201 {
 }
 
 message RacobitRadarObs {
-//                x axis  ^
-//                        | longitude_dist
-//                        |
-//                        |
-//                        |
-//          lateral_dist  |
-//          y axis        |
-//        <----------------
-//        ooooooooooooo   //radar front surface
+  //                x axis  ^
+  //                        | longitude_dist
+  //                        |
+  //                        |
+  //                        |
+  //          lateral_dist  |
+  //          y axis        |
+  //        <----------------
+  //        ooooooooooooo   //radar front surface
 
   optional apollo.common.Header header = 1;
-  optional bool clusterortrack = 2; // 0 = track, 1 = cluster
-  optional int32 obstacle_id = 3; // obstacle Id
+  optional bool clusterortrack = 2;  // 0 = track, 1 = cluster
+  optional int32 obstacle_id = 3;    // obstacle Id
   // longitude distance to the radar; (+) = forward; unit = m
   required double longitude_dist = 4;
   // lateral distance to the radar; (+) = left; unit = m
@@ -58,15 +58,17 @@ message RacobitRadarObs {
   optional double longitude_dist_rms = 10;
   // lateral distance standard deviationto the radar; (+) = left; unit = m
   optional double lateral_dist_rms = 11;
-  // longitude velocity standard deviation to the radar; (+) = farword; unit = m/s
+  // longitude velocity standard deviation to the radar; (+) = farword; unit =
+  // m/s
   optional double longitude_vel_rms = 12;
-  //lateral velocity standard deviation to the radar; (+) = left; unit = m/s
+  // lateral velocity standard deviation to the radar; (+) = left; unit = m/s
   optional double lateral_vel_rms = 13;
   // obstacle probablity of existence
   optional double probexist = 14;
 
-  //The following is only valid for the track object message
-  // 0 = deleted, 1 = new, 2 = measured, 3 = predicted, 4 = deleted for, 5 = new from merge
+  // The following is only valid for the track object message
+  // 0 = deleted, 1 = new, 2 = measured, 3 = predicted, 4 = deleted for, 5 = new
+  // from merge
   optional int32 meas_state = 15;
   // longitude acceleration to the radar; (+) = farword; unit = m/s2
   optional double longitude_accel = 16;
@@ -74,21 +76,25 @@ message RacobitRadarObs {
   optional double lateral_accel = 17;
   // oritation angle to the radar; (+) = conterclockwise; unit = degree
   optional double oritation_angle = 18;
-  // longitude acceleration standard deviation to the radar; (+) = farword; unit = m/s2
+  // longitude acceleration standard deviation to the radar; (+) = farword; unit
+  // = m/s2
   optional double longitude_accel_rms = 19;
-  // lateral acclearation standard deviation to the radar; (+) = left; unit = m/s2
+  // lateral acclearation standard deviation to the radar; (+) = left; unit =
+  // m/s2
   optional double lateral_accel_rms = 20;
-  // oritation angle standard deviation to the radar; (+) = conterclockwise; unit = degree
+  // oritation angle standard deviation to the radar; (+) = conterclockwise;
+  // unit = degree
   optional double oritation_angle_rms = 21;
-  optional double length = 22; // obstacle length; unit = m
-  optional double width = 23;//obstacle width; unit = m
-  // 0: point; 1: car; 2: truck; 3: pedestrian; 4: motocycle; 5: bicycle; 6: wide; 7: unknown
+  optional double length = 22;  // obstacle length; unit = m
+  optional double width = 23;   // obstacle width; unit = m
+  // 0: point; 1: car; 2: truck; 3: pedestrian; 4: motocycle; 5: bicycle; 6:
+  // wide; 7: unknown
   optional int32 obstacle_class = 24;
 }
 
 message RacobitRadar {
   optional apollo.common.Header header = 1;
-  repeated RacobitRadarObs contiobs = 2;  //conti radar obstacle array
+  repeated RacobitRadarObs contiobs = 2;  // conti radar obstacle array
   optional RacobitRadarState_201 radar_state = 3;
   optional RacobitClusterListStatus_600 cluster_list_status = 4;
   optional RacobitObjectListStatus_60A object_list_status = 5;

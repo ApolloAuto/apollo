@@ -23,8 +23,8 @@ import "modules/drivers/gnss/proto/gnss_best_pose.proto";
 import "modules/drivers/gnss/proto/gnss_raw_observation.proto";
 
 message MSFLocalizationFuzzMessage {
-    required apollo.drivers.gnss.Imu imu = 1;
-    required apollo.drivers.gnss.GnssBestPose gnss_best_pose = 2;
-    required apollo.drivers.gnss.EpochObservation gnss_rtk_obs = 3;
-    required apollo.drivers.gnss.GnssEphemeris gnss_rtk_eph = 4;
+  required apollo.drivers.gnss.Imu imu = 1;
+  required apollo.drivers.gnss.GnssBestPose gnss_best_pose = 2;
+  required apollo.drivers.gnss.EpochObservation gnss_rtk_obs = 3;
+  required apollo.drivers.gnss.GnssEphemeris gnss_rtk_eph = 4;
 }

@@ -15,4 +15,3 @@ message NaviObstacleDeciderConfig {
   optional double speed_decider_detect_range = 10 [default = 1.0];
   optional uint32 max_keep_nudge_cycles = 11 [default = 100];
 }
-

@@ -28,7 +28,8 @@ message ControlCommand {
   // target brake in percentage [0, 100]
   optional double brake = 4;
 
-  // target non-directional steering rate, in percentage of full scale per second [0, 100]
+  // target non-directional steering rate, in percentage of full scale per
+  // second [0, 100]
   optional double steering_rate = 6;
 
   // target steering angle, in percentage of full scale [-100, 100]
@@ -49,7 +50,8 @@ message ControlCommand {
   optional bool engine_on_off = 17;
   // completion percentage of trajectory planned in last cycle
   optional double trajectory_fraction = 18;
-  optional apollo.canbus.Chassis.DrivingMode driving_mode = 19 [deprecated = true];
+  optional apollo.canbus.Chassis.DrivingMode driving_mode = 19
+      [deprecated = true];
   optional apollo.canbus.Chassis.GearPosition gear_location = 20;
 
   optional Debug debug = 22;
@@ -143,15 +145,15 @@ message SimpleMPCDebug {
   optional double acceleration_lookup = 28;
   optional double speed_lookup = 29;
   optional double calibration_value = 30;
-  repeated double matrix_q_updated = 31;     // matrix_q_updated_ size = 6
-  repeated double matrix_r_updated = 32;    // matrix_r_updated_ size = 2
+  repeated double matrix_q_updated = 31;  // matrix_q_updated_ size = 6
+  repeated double matrix_r_updated = 32;  // matrix_r_updated_ size = 2
 }
 
 message InputDebug {
   optional apollo.common.Header localization_header = 1;
   optional apollo.common.Header canbus_header = 2;
   optional apollo.common.Header trajectory_header = 3;
-  }
+}
 
 message Debug {
   optional SimpleLongitudinalDebug simple_lon_debug = 1;

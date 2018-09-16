@@ -56,15 +56,15 @@ enum ErrorCode {
   HTTP_RUNTIME_ERROR = 10001;
 
   // Relative Map error codes.
-  RELATIVE_MAP_ERROR = 11000; // general relative map error code
+  RELATIVE_MAP_ERROR = 11000;  // general relative map error code
   RELATIVE_MAP_NOT_READY = 11001;
 
   // Driver error codes.
   DRIVER_ERROR_GNSS = 12000;
-  DRIVER_ERROR_VELODYNE = 13000; 
+  DRIVER_ERROR_VELODYNE = 13000;
 }
 
 message StatusPb {
-	optional ErrorCode error_code = 1 [default = OK];
-	optional string msg = 2;
+  optional ErrorCode error_code = 1 [default = OK];
+  optional string msg = 2;
 }

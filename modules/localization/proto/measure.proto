@@ -8,26 +8,26 @@ import "modules/common/proto/geometry.proto";
 message IntegMeasure {
   optional apollo.common.Header header = 1;
 
-  enum MeasureType{
-    //the measure data only include gnss position
+  enum MeasureType {
+    // the measure data only include gnss position
     GNSS_POS_ONLY = 0;
-    //the measure data include gnss position and velocity
+    // the measure data include gnss position and velocity
     GNSS_POS_VEL = 1;
-    //the measure data include gnss position
+    // the measure data include gnss position
     GNSS_POS_XY = 2;
-    //the measure data only include gnss velocity
-    GNSS_VEL_ONLY = 3;  
-    //the measure data only include point cloud position
+    // the measure data only include gnss velocity
+    GNSS_VEL_ONLY = 3;
+    // the measure data only include point cloud position
     POINT_CLOUD_POS = 4;
-    //the measure data only include odometer velocity
+    // the measure data only include odometer velocity
     ODOMETER_VEL_ONLY = 5;
-    //trigger measure update using vehicle constraint
+    // trigger measure update using vehicle constraint
     VEHICLE_CONSTRAINT = 6;
   }
 
   optional MeasureType measure_type = 2;
 
-  enum FrameType{
+  enum FrameType {
     // Position give the longitude and latitude unit:rad.
     ENU = 0;
     // Position give x y and z from earth center.

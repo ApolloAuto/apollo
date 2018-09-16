@@ -32,8 +32,10 @@ message RoadROIBoundary {
   repeated RoadBoundary road_boundaries = 2;
 }
 
-// road section defines a road cross-section, At least one section must be defined in order to
-// use a road, If multiple road sections are defined, they must be listed in order along the road
+// road section defines a road cross-section, At least one section must be
+// defined in order to
+// use a road, If multiple road sections are defined, they must be listed in
+// order along the road
 message RoadSection {
   optional Id id = 1;
   // lanes contained in this section
@@ -42,7 +44,8 @@ message RoadSection {
   optional RoadBoundary boundary = 3;
 }
 
-// The road is a collection of traffic elements, such as lanes, road boundary etc.
+// The road is a collection of traffic elements, such as lanes, road boundary
+// etc.
 // It provides general information about the road.
 message Road {
   optional Id id = 1;

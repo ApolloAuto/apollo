@@ -13,10 +13,10 @@ message LaneWaypoint {
 }
 
 message LaneSegment {
-    optional string id = 1;
-    optional double start_s = 2;
-    optional double end_s = 3;
-  }
+  optional string id = 1;
+  optional double start_s = 2;
+  optional double end_s = 3;
+}
 
 message RoutingRequest {
   optional apollo.common.Header header = 1;
@@ -33,16 +33,15 @@ message Measurement {
 }
 
 enum ChangeLaneType {
-    FORWARD = 0;
-    LEFT = 1;
-    RIGHT = 2;
+  FORWARD = 0;
+  LEFT = 1;
+  RIGHT = 2;
 };
 
-
 message Passage {
-   repeated LaneSegment segment = 1;
-   optional bool can_exit = 2;
-   optional ChangeLaneType change_lane_type = 3 [default = FORWARD];
+  repeated LaneSegment segment = 1;
+  optional bool can_exit = 2;
+  optional ChangeLaneType change_lane_type = 3 [default = FORWARD];
 }
 
 message RoadSegment {

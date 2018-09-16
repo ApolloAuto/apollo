@@ -21,7 +21,7 @@ message CurveSegment {
   }
   optional double s = 6;  // start position (s-coordinate)
   optional apollo.common.PointENU start_position = 7;
-  optional double heading = 8; // start orientation
+  optional double heading = 8;  // start orientation
   optional double length = 9;
 }
 

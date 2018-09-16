@@ -18,22 +18,22 @@ message MonitorMessageItem {
     ROUTING = 10;
     MONITOR = 11;
     HMI = 12;
-    RELATIVE_MAP=13;
+    RELATIVE_MAP = 13;
     GNSS = 14;
     CONTI_RADAR = 15;
   }
 
-  optional MessageSource source = 1 [ default = UNKNOWN ];
+  optional MessageSource source = 1 [default = UNKNOWN];
 
   optional string msg = 2;
 
   enum LogLevel {
-      INFO = 0;
-      WARN = 1;
-      ERROR = 2;
-      FATAL = 3;
+    INFO = 0;
+    WARN = 1;
+    ERROR = 2;
+    FATAL = 3;
   }
-  optional LogLevel log_level = 3 [ default = INFO ];
+  optional LogLevel log_level = 3 [default = INFO];
 }
 
 message MonitorMessage {

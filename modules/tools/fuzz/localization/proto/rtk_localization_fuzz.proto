@@ -22,6 +22,6 @@ import "modules/localization/proto/imu.proto";
 import "modules/localization/proto/gps.proto";
 
 message RTKLocalizationFuzzMessage {
-    required apollo.localization.CorrectedImu imu = 1;
-    required apollo.localization.Gps gps = 2;
+  required apollo.localization.CorrectedImu imu = 1;
+  required apollo.localization.Gps gps = 2;
 }

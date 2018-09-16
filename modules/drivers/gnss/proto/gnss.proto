@@ -10,7 +10,8 @@ import "modules/common/proto/geometry.proto";
 message Gnss {
   optional apollo.common.Header header = 1;
 
-  // The time of position measurement, seconds since the GPS epoch (Jan 6, 1980).
+  // The time of position measurement, seconds since the GPS epoch (Jan 6,
+  // 1980).
   optional double measurement_time = 2;  // In seconds.
 
   // When velocity is computed from differentiating successive position
@@ -36,20 +37,20 @@ message Gnss {
   enum Type {
     // It is recommended not using the GNSS solution if solution type is INVALID
     // or PROPAGATED.
-    INVALID = 0;  // Invalid solution due to insufficient observations,
-                  // integrity warning, etc.
+    INVALID = 0;     // Invalid solution due to insufficient observations,
+                     // integrity warning, etc.
     PROPAGATED = 1;  // Propagated by a Kalman filter without new observations.
 
     // It is recommended using the following types of solution.
-    SINGLE = 2;  // Standard GNSS solution without any corrections.
-    PSRDIFF = 3;  // Pseudorange differential solution, including WAAS/SBAS
-                  // solution.
-    PPP = 4;  // Precise Point Positioning (PPP) solution.
-    RTK_FLOAT = 5;  // Real Time Kinematic (RTK) float solution.
-    RTK_INTEGER= 6;  // RTK integer solution.
+    SINGLE = 2;       // Standard GNSS solution without any corrections.
+    PSRDIFF = 3;      // Pseudorange differential solution, including WAAS/SBAS
+                      // solution.
+    PPP = 4;          // Precise Point Positioning (PPP) solution.
+    RTK_FLOAT = 5;    // Real Time Kinematic (RTK) float solution.
+    RTK_INTEGER = 6;  // RTK integer solution.
   }
   optional Type type = 9;
-  optional uint32 solution_status= 10;
+  optional uint32 solution_status = 10;
   optional uint32 position_type = 11;
 }
 

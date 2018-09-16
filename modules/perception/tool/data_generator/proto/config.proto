@@ -7,14 +7,15 @@ import "modules/common/proto/geometry.proto";
 // Ground Truth obstacle information
 message DataGeneratorObstacle {
   optional string id = 1;  // obstacle ID.
-  optional apollo.common.Point2D position = 2;  // obstacle position in the world coordinate
-                                  // system.
+  optional apollo.common.Point2D position =
+      2;                      // obstacle position in the world coordinate
+                              // system.
   optional double theta = 3;  // heading in the world coordinate system.
   optional apollo.common.Point3D velocity = 4;  // obstacle velocity.
 
   // Size of obstacle bounding box.
   optional double length = 5;  // obstacle length.
-  optional double width = 6;  // obstacle width.
+  optional double width = 6;   // obstacle width.
   optional double height = 7;  // obstacle height.
 
   repeated apollo.common.Point3D polygon_point = 8;  // obstacle corner points.
@@ -23,7 +24,7 @@ message DataGeneratorObstacle {
     UNKNOWN = 0;
     ROAD_SIGN = 1;
     PEDESTRIAN = 2;  // Pedestrian
-    BICYCLE = 3;  // bike, motor bike
+    BICYCLE = 3;     // bike, motor bike
     SEDAN = 4;
     SUV = 5;
     BUS = 6;
@@ -49,6 +50,5 @@ message SensorConfig {
 message DataGeneratorInfo {
   optional ROI roi = 1;
   repeated DataGeneratorObstacle obstacle = 2;  // an array of obstacles
-  repeated SensorConfig config = 3; // an array of sensors
+  repeated SensorConfig config = 3;             // an array of sensors
 }
-

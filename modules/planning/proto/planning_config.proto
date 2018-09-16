@@ -33,7 +33,7 @@ message ScenarioConfig {
     LANE_FOLLOW = 0;  // default scenario
     CHANGE_LANE = 1;
     SIDE_PASS = 2;  // go around an object when it blocks the road
-    APPROACH = 3;  // approach to an intersection
+    APPROACH = 3;   // approach to an intersection
     INTERSECTION_STOP_SIGN_FOUR_WAY = 4;
     INTERSECTION_STOP_SIGN_ONE_OR_TWO_WAY = 5;
     INTERSECTION_TRAFFIC_LIGHT_LEFT_TURN = 6;
@@ -63,16 +63,16 @@ message PlannerOnRoadConfig {
 
 message PlannerNaviConfig {
   repeated TaskType task = 1;
-  optional NaviPathDeciderConfig  navi_path_decider_config = 2;
-  optional NaviSpeedDeciderConfig  navi_speed_decider_config = 3;
-  optional NaviObstacleDeciderConfig  navi_obstacle_decider_config = 4;
+  optional NaviPathDeciderConfig navi_path_decider_config = 2;
+  optional NaviSpeedDeciderConfig navi_speed_decider_config = 3;
+  optional NaviObstacleDeciderConfig navi_obstacle_decider_config = 4;
 }
 
 enum PlannerType {
   RTK = 0;
   PUBLIC_ROAD = 1;  // public road planner
-  OPEN_SPACE = 2; // open space planner
-  NAVI = 3; // navigation planner
+  OPEN_SPACE = 2;   // open space planner
+  NAVI = 3;         // navigation planner
 }
 
 message RtkPlanningConfig {
@@ -80,12 +80,12 @@ message RtkPlanningConfig {
 }
 
 message StandardPlanningConfig {
-  repeated PlannerType planner_type = 1; // supported planners
+  repeated PlannerType planner_type = 1;  // supported planners
   optional PlannerOnRoadConfig planner_onroad_config = 2;
 }
 
 message NavigationPlanningConfig {
-  repeated PlannerType planner_type = 1; // supported planners
+  repeated PlannerType planner_type = 1;  // supported planners
   optional PlannerNaviConfig planner_navi_config = 4;
 }
 
