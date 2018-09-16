@@ -29,11 +29,9 @@ apollo::cybertron::class_loader::ClassLoaderManager loader;
 class PlanningComponent;
 
 std::string channel_per = "/perception/channel";
-std::string channel_dri = "/driver/channel";
-// std::string perception_lib = "./libperception_component.so";
+std::string channel_dir = "/driver/channel";
 std::string perception_lib =
-    "/home/work/workspace/baidu/adu-lab/cybertron-apollo/install/lib/"
-    "libperception_component.so";
+    "/apollo/framework/install/lib/libperception_component.so";
 
 std::shared_ptr<ComponentBase> perception = nullptr;
 std::shared_ptr<PlanningComponent> planning = nullptr;
@@ -60,14 +58,12 @@ bool PlanningComponent::Proc(const std::shared_ptr<Perception>& msg) {
   }
   out_msg->set_result(result);
 }
-/*
- */
 
 void RunDriver() {
   // Mock Drivers
   RoleAttributes attr;
   attr.set_node_name("Driver");
-  attr.set_channel_name(channel_dri);
+  attr.set_channel_name(channel_dir);
   driver_writer = node->CreateWriter<Driver>(attr);
   if (driver_writer == nullptr) {
     AINFO << "Driver create writer failed." << std::endl;
@@ -85,7 +81,7 @@ void RunDriver() {
 void InitPerception() {
   ComponentConfig config;
   config.set_name("Perception");
-  config.add_readers()->set_channel(channel_dri);
+  config.add_readers()->set_channel(channel_dir);
 
   if (loader.LoadLibrary(perception_lib)) {
     perception = loader.CreateClassObj<ComponentBase>("PerceptionComponent");
@@ -113,6 +109,6 @@ int main(int argc, char** argv) {
   InitPerception();
   InitPlanning();
   RunDriver();
-//  apollo::cybertron::PrintSchedulerStatistics();
+  //  apollo::cybertron::PrintSchedulerStatistics();
   return 0;
 }
