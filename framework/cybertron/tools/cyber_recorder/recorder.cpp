@@ -139,7 +139,7 @@ bool Recorder::InitReaderImpl(const std::string& channel_name,
     std::weak_ptr<Recorder> weak_this = shared_from_this();
     std::shared_ptr<ReaderBase> reader = nullptr;
     auto callback = [weak_this, channel_name](
-                        const std::shared_ptr<RawMessage>& raw_message) {
+        const std::shared_ptr<RawMessage>& raw_message) {
       auto share_this = weak_this.lock();
       if (!share_this) {
         return;

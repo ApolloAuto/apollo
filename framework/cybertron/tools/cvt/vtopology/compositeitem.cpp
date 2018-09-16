@@ -7,8 +7,12 @@
 
 CompositeItem::CompositeItem(ItemType itemType, const QString &text,
                              QGraphicsItem *parent)
-    : QGraphicsItemGroup(parent), item_type_(itemType), old_pen_(Qt::black),
-      current_pen_(Qt::black), text_(text), shape_() {
+    : QGraphicsItemGroup(parent),
+      item_type_(itemType),
+      old_pen_(Qt::black),
+      current_pen_(Qt::black),
+      text_(text),
+      shape_() {
   QRectF rect = text_.boundingRect();
   QPainterPath path;
 
@@ -38,7 +42,6 @@ QPolygonF CompositeItem::polygon() const { return shape_.polygon(); }
 void CompositeItem::paint(QPainter *painter,
                           const QStyleOptionGraphicsItem *option,
                           QWidget *widget) {
-
   text_.setDefaultTextColor(current_pen_.color());
   text_.paint(painter, option, widget);
 
@@ -46,15 +49,13 @@ void CompositeItem::paint(QPainter *painter,
   shape_.paint(painter, option, widget);
 }
 
-void CompositeItem::hoverEnterEvent(QGraphicsSceneHoverEvent */*event*/)
-{
-    old_pen_ = current_pen_;
-    current_pen_.setColor(Qt::red);
+void CompositeItem::hoverEnterEvent(QGraphicsSceneHoverEvent * /*event*/) {
+  old_pen_ = current_pen_;
+  current_pen_.setColor(Qt::red);
 }
 
-void CompositeItem::hoverLeaveEvent(QGraphicsSceneHoverEvent */*event*/)
-{
-    current_pen_ = old_pen_;
+void CompositeItem::hoverLeaveEvent(QGraphicsSceneHoverEvent * /*event*/) {
+  current_pen_ = old_pen_;
 }
 
 void CompositeItem::removeArrow(Arrow *arrow) {

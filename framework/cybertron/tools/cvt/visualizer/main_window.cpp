@@ -130,7 +130,8 @@ MainWindow::MainWindow(QWidget* parent)
   }
 
   connect(ui_->actionAbout, SIGNAL(triggered(bool)), this, SLOT(showMessage()));
-  connect(ui_->actionLicense, SIGNAL(triggered(bool)), this, SLOT(showMessage()));
+  connect(ui_->actionLicense, SIGNAL(triggered(bool)), this,
+          SLOT(showMessage()));
 
   pointcloud_button_->setCheckable(true);
   pointcloud_button_->setStyleSheet(globalTreeItemStyle);
@@ -141,8 +142,10 @@ MainWindow::MainWindow(QWidget* parent)
   connect(pointcloud_comboBox_, SIGNAL(currentIndexChanged(int)), this,
           SLOT(ChangePointCloudChannel()));
 
-  connect(ui_->treeWidget, SIGNAL(itemSelectionChanged()), this, SLOT(UpdateActions()));
-  connect(ui_->treeWidget, SIGNAL(visibilityChanged(bool)), ui_->actionGlobal, SLOT(setChecked(bool)));
+  connect(ui_->treeWidget, SIGNAL(itemSelectionChanged()), this,
+          SLOT(UpdateActions()));
+  connect(ui_->treeWidget, SIGNAL(visibilityChanged(bool)), ui_->actionGlobal,
+          SLOT(setChecked(bool)));
   connect(ui_->actionPlay, SIGNAL(triggered(bool)), this, SLOT(PlayPause()));
   connect(ui_->actionPause, SIGNAL(triggered(bool)), this, SLOT(PlayPause()));
 }
@@ -862,20 +865,18 @@ void MainWindow::TopologyChanged(
 }
 
 void MainWindow::PlayPause(void) {
+  QObject* obj = QObject::sender();
+  bool b = true;
+  if (obj == ui_->actionPause) b = false;
 
-    QObject* obj = QObject::sender();
-    bool b = true;
-    if(obj == ui_->actionPause)
-        b = false;
-
-    if(pointcloud_top_item_) {
-        pointcloud_button_->setChecked(b);
-        PlayRenderableObject(b);
-    }
-    foreach(VideoImgProxy* p, video_image_viewer_list_) {
-        p->action_item_button_.setChecked(b);
-        DoPlayVideoImage(b, p);
-    }
+  if (pointcloud_top_item_) {
+    pointcloud_button_->setChecked(b);
+    PlayRenderableObject(b);
+  }
+  foreach (VideoImgProxy* p, video_image_viewer_list_) {
+    p->action_item_button_.setChecked(b);
+    DoPlayVideoImage(b, p);
+  }
 }
 
 void MainWindow::resizeEvent(QResizeEvent* event) {

@@ -26,10 +26,10 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
-#include "cybertron/message/message_traits.h"
-#include "cybertron/message/protobuf_factory.h"
 #include "cybertron/common/time_conversion.h"
 #include "cybertron/cybertron.h"
+#include "cybertron/message/message_traits.h"
+#include "cybertron/message/protobuf_factory.h"
 #include "cybertron/proto/record.pb.h"
 #include "cybertron/record/record_file.h"
 
