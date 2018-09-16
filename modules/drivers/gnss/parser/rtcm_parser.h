@@ -24,24 +24,38 @@
 
 #include "modules/drivers/gnss/parser/parser.h"
 
+#include "modules/drivers/gnss/proto/gnss_raw_observation.pb.h"
+
 namespace apollo {
 namespace drivers {
 namespace gnss {
 
+using ::apollo::drivers::gnss::EpochObservation;
+using ::apollo::drivers::gnss::GnssEphemeris;
+
+using apollo::cybertron::Node;
+using apollo::cybertron::Reader;
+using apollo::cybertron::Writer;
+
 class RtcmParser {
  public:
-  RtcmParser() {}
+  RtcmParser(const config::Config &config,
+             const std::shared_ptr<Node> &node);
   ~RtcmParser() {}
   bool Init();
   void ParseRtcmData(const std::string& msg);
 
  private:
   void DispatchMessage(Parser::MessageType type, MessagePtr message);
-  void PublishEphemeris(const MessagePtr message);
-  void PublishObservation(const MessagePtr message);
+  void PublishEphemeris(const MessagePtr& message);
+  void PublishObservation(const MessagePtr& message);
 
+  config::Config config_;
+  std::shared_ptr<Node> node_ = nullptr;
+  std::shared_ptr<Writer<GnssEphemeris>> gnssephemeris_writer_ = nullptr;
+  std::shared_ptr<Writer<EpochObservation>> epochobservation_writer_ = nullptr;
   bool inited_flag_ = false;
-  std::unique_ptr<Parser> rtcm_parser_;
+  std::unique_ptr<Parser> rtcm_parser_ = nullptr;
 };
 
 }  // namespace gnss

@@ -134,7 +134,7 @@ RawStream::RawStream(const config::Config &config,
                      const std::shared_ptr<Node> &node)
     : config_(config), node_(node) {
   data_parser_ptr_.reset(new DataParser(config_, node_));
-  rtcm_parser_ptr_.reset(new RtcmParser());
+  rtcm_parser_ptr_.reset(new RtcmParser(config_, node_));
 }
 
 RawStream::~RawStream() {
