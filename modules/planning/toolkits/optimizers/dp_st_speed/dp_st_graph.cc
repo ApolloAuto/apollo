@@ -186,16 +186,19 @@ Status DpStGraph::CalculateTotalCost() {
             FLAGS_max_planning_thread_pool_size);
       }
 
+      std::vector<std::future<void>> results;
       for (uint32_t r = next_lowest_row; r <= next_highest_row; ++r) {
         auto msg = std::make_shared<StGraphMessage>(c, r);
         if (FLAGS_enable_multi_thread_in_dp_st_graph) {
-          task->Execute(msg);
+          results.push_back(task->Execute(msg));
         } else {
           CalculateCostAt(msg);
         }
       }
       if (FLAGS_enable_multi_thread_in_dp_st_graph) {
-        task->Wait();
+        for (auto& result: results) {
+          result.get();
+        }
       }
     }
 
