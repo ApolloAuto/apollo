@@ -19,6 +19,7 @@
 
 #include <chrono>
 #include <fstream>
+#include <memory>
 #include <sstream>
 #include <thread>
 #include <unordered_map>
@@ -60,7 +61,7 @@ class PerfEventCache {
   std::ofstream of_;
   DECLARE_SINGLETON(PerfEventCache)
 };
-}
+}  // namespace event
 }  // namespace cybertron
 }  // namespace apollo
 

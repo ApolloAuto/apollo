@@ -3,9 +3,9 @@
 
 #include <vector>
 
+#include <geometry_msgs/transform_stamped.h>
 #include <tf2/buffer_core.h>
 #include <tf2/convert.h>
-#include <geometry_msgs/transform_stamped.h>
 #include <tf2/time.h>
 
 #include "cybertron/node/node.h"
@@ -19,9 +19,8 @@ namespace tf2_cybertron {
 // extend the BufferInterface class and BufferCore class
 class Buffer : public BufferInterface, public tf2::BufferCore {
  public:
-
-  using tf2::BufferCore::lookupTransform;
   using tf2::BufferCore::canTransform;
+  using tf2::BufferCore::lookupTransform;
 
   /**
    * @brief  Constructor for a Buffer object
@@ -104,7 +103,6 @@ class Buffer : public BufferInterface, public tf2::BufferCore {
                             std::string* errstr = NULL) const;
 
  private:
-
   void SubscriptionCallback(
       const std::shared_ptr<const adu::common::TransformStampeds>& transform);
   void StaticSubscriptionCallback(
@@ -114,7 +112,7 @@ class Buffer : public BufferInterface, public tf2::BufferCore {
       bool is_static);
 
   void tf2MsgToCyber(const geometry_msgs::TransformStamped& tf2_trans_stamped,
-                  adu::common::TransformStamped& trans_stamped) const;
+                     adu::common::TransformStamped& trans_stamped) const;
 
   std::unique_ptr<cybertron::Node> node_;
   std::shared_ptr<cybertron::Reader<adu::common::TransformStampeds>>
@@ -133,8 +131,8 @@ static const std::string threading_error =
     "will always timeout.  If you have a seperate thread servicing tf "
     "messages, call setUsingDedicatedThread(true) on your Buffer instance.";
 
-}  // namespace
-}  // namespace
-}  // namespace
+}  // namespace tf2_cybertron
+}  // namespace cybertron
+}  // namespace apollo
 
 #endif  // INCLUDE_CYBERTRON_TF2_CYBERTRON_BUFFER_H_

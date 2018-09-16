@@ -198,7 +198,7 @@ class AsyncLogger : public google::base::Logger {
 };
 
 }  // namespace logger
-}  // namespace commmon
 }  // namespace cybertron
+}  // namespace apollo
 
 #endif  // CYBERTRON_COMMON_ASYNC_LOGGER_H_

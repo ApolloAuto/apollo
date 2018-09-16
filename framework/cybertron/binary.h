@@ -33,4 +33,4 @@ class Binary {
 }  // namespace cybertron
 }  // namespace apollo
 
-#endif
+#endif  // CYBERTRON_BINARY_H_

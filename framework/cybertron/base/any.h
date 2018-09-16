@@ -17,7 +17,9 @@
 #ifndef CYBERTRON_BASE_ANY_H_
 #define CYBERTRON_BASE_ANY_H_
 
+#include <memory>
 #include <typeinfo>
+#include <utility>
 
 namespace apollo {
 namespace cybertron {
@@ -130,7 +132,7 @@ inline Any::Any(const ValueType& value) {
 }
 
 inline Any::~Any() {
-  if ((void*)storage_ == &stack_) {
+  if (reinterpret_cast<void*>(storage_) == &stack_) {
     storage_->Destroy();
     storage_ = nullptr;
   } else {
@@ -141,7 +143,7 @@ inline Any::~Any() {
 inline Any& Any::operator=(const Any& rhs) {
   if (this != &rhs && !rhs.Empty()) {
     AnyStorage* tmp = rhs.storage_->Clone(&stack_);
-    if ((void*)storage_ == &stack_) {
+    if (reinterpret_cast<void*>(storage_) == &stack_) {
       storage_->Destroy();
       storage_ = nullptr;
     } else {

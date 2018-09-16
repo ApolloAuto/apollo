@@ -52,8 +52,8 @@ void Buffer::SubscriptionCallbackImpl(
   if (now.ToNanosecond() < last_update_.ToNanosecond()) {
     AINFO << "Detected jump back in time. Clearing TF buffer.";
     clear();
-    //cache static transform stamped again.
-    for (auto &msg : static_msgs_) {
+    // cache static transform stamped again.
+    for (auto& msg : static_msgs_) {
       setTransform(msg, authority, true);
     }
   }
@@ -63,15 +63,16 @@ void Buffer::SubscriptionCallbackImpl(
     try {
       geometry_msgs::TransformStamped trans_stamped;
 
-      //header
+      // header
       trans_stamped.header.stamp = msg_evt->transforms(i).header().stamp();
-      trans_stamped.header.frame_id = msg_evt->transforms(i).header().frame_id();
+      trans_stamped.header.frame_id =
+          msg_evt->transforms(i).header().frame_id();
       trans_stamped.header.seq = msg_evt->transforms(i).header().sequence_num();
 
-      //child_frame_id
+      // child_frame_id
       trans_stamped.child_frame_id = msg_evt->transforms(i).child_frame_id();
 
-      //translation
+      // translation
       trans_stamped.transform.translation.x =
           msg_evt->transforms(i).transform().translation().x();
       trans_stamped.transform.translation.y =
@@ -79,7 +80,7 @@ void Buffer::SubscriptionCallbackImpl(
       trans_stamped.transform.translation.z =
           msg_evt->transforms(i).transform().translation().z();
 
-      //rotation
+      // rotation
       trans_stamped.transform.rotation.x =
           msg_evt->transforms(i).transform().rotation().qx();
       trans_stamped.transform.rotation.y =
@@ -89,7 +90,7 @@ void Buffer::SubscriptionCallbackImpl(
       trans_stamped.transform.rotation.w =
           msg_evt->transforms(i).transform().rotation().qw();
 
-      if (is_static){
+      if (is_static) {
         static_msgs_.push_back(trans_stamped);
       }
       setTransform(trans_stamped, authority, is_static);
@@ -148,7 +149,6 @@ adu::common::TransformStamped Buffer::lookupTransform(
     const std::string& target_frame, const cybertron::Time& target_time,
     const std::string& source_frame, const cybertron::Time& source_time,
     const std::string& fixed_frame, const float timeout_second) const {
-
   (void)timeout_second;
   geometry_msgs::TransformStamped tf2_trans_stamped =
       lookupTransform(target_frame, target_time.ToNanosecond(), source_frame,
@@ -165,15 +165,17 @@ bool Buffer::canTransform(const std::string& target_frame,
                           std::string* errstr) const {
   uint64_t timeout_ns = timeout_second * 1000000000;
   uint64_t start_time = cybertron::Time::Now().ToNanosecond();
-  while (cybertron::Time::Now().ToNanosecond() < start_time + timeout_ns &&
-         !canTransform(target_frame, source_frame, time.ToNanosecond(), errstr) &&
-         !cybertron::IsShutdown())  // Make sure we haven't been stopped (won't
-                                    // work for
-                                    // pytf)
+  while (
+      cybertron::Time::Now().ToNanosecond() < start_time + timeout_ns &&
+      !canTransform(target_frame, source_frame, time.ToNanosecond(), errstr) &&
+      !cybertron::IsShutdown())  // Make sure we haven't been stopped (won't
+                                 // work for
+                                 // pytf)
   {
     usleep(3000);
   }
-  bool retval = canTransform(target_frame, source_frame, time.ToNanosecond(), errstr);
+  bool retval =
+      canTransform(target_frame, source_frame, time.ToNanosecond(), errstr);
   // conditionally_append_timeout_info(errstr, start_time, timeout);
   return retval;
 }
@@ -185,26 +187,22 @@ bool Buffer::canTransform(const std::string& target_frame,
                           const std::string& fixed_frame,
                           const float timeout_second,
                           std::string* errstr) const {
-  // if (!checkAndErrorDedicatedThreadPresent(errstr))
-  //   return false;
-
   // poll for transform if timeout is set
   uint64_t timeout_ns = timeout_second * 1000000000;
   uint64_t start_time = cybertron::Time::Now().ToNanosecond();
   while (cybertron::Time::Now().ToNanosecond() < start_time + timeout_ns &&
-         !canTransform(target_frame, target_time.ToNanosecond(), source_frame, source_time.ToNanosecond(),
+         !canTransform(target_frame, target_time.ToNanosecond(), source_frame,
+                       source_time.ToNanosecond(),
                        fixed_frame) &&
-         !cybertron::IsShutdown())  // Make sure we haven't been stopped
-                                    // (won't work for pytf)
-  {
+         !cybertron::IsShutdown()) {  // Make sure we haven't been stopped
     usleep(3000);
   }
-  bool retval = canTransform(target_frame, target_time.ToNanosecond(), source_frame,
-                             source_time.ToNanosecond(), fixed_frame, errstr);
-  // conditionally_append_timeout_info(errstr, start_time, timeout);
+  bool retval =
+      canTransform(target_frame, target_time.ToNanosecond(), source_frame,
+                   source_time.ToNanosecond(), fixed_frame, errstr);
   return retval;
 }
 
-}
-}
-}
+}  // namespace tf2_cybertron
+}  // namespace cybertron
+}  // namespace apollo

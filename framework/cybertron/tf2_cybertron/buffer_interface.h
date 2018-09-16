@@ -3,13 +3,13 @@
 #define CYBERTRON_TF2_CYBERTRON_BUFFER_INTERFACE_H_
 
 #include <tf2/buffer_core.h>
-#include <tf2/transform_datatypes.h>
-#include <tf2/exceptions.h>
-#include <sstream>
 #include <tf2/convert.h>
+#include <tf2/exceptions.h>
+#include <tf2/transform_datatypes.h>
+#include <sstream>
 
-#include "cybertron/time/time.h"
 #include "cybertron/proto/common_geometry.pb.h"
+#include "cybertron/time/time.h"
 
 namespace apollo {
 namespace cybertron {
@@ -52,7 +52,8 @@ class BufferInterface {
   virtual adu::common::TransformStamped lookupTransform(
       const std::string& target_frame, const cybertron::Time& target_time,
       const std::string& source_frame, const cybertron::Time& source_time,
-      const std::string& fixed_frame, const float timeout_second = 0.01) const = 0;
+      const std::string& fixed_frame,
+      const float timeout_second = 0.01) const = 0;
 
   /** \brief Test if a transform is possible
    * \param target_frame The frame into which to transform
@@ -94,8 +95,9 @@ class BufferInterface {
   T& transform(const T& in, T& out, const std::string& target_frame,
                float timeout = 0.0) const {
     // do the transform
-    tf2::doTransform(in, out, lookupTransform(target_frame, tf2::getFrameId(in),
-                                              tf2::getTimestamp(in), timeout));
+    tf2::doTransform(in, out,
+                     lookupTransform(target_frame, tf2::getFrameId(in),
+                                     tf2::getTimestamp(in), timeout));
     return out;
   }
 
@@ -123,8 +125,9 @@ class BufferInterface {
                const std::string& fixed_frame, float timeout = 0.0) const {
     // do the transform
     tf2::doTransform(
-        in, out, lookupTransform(target_frame, target_time, tf2::getFrameId(in),
-                                 tf2::getTimestamp(in), fixed_frame, timeout));
+        in, out,
+        lookupTransform(target_frame, target_time, tf2::getFrameId(in),
+                        tf2::getTimestamp(in), fixed_frame, timeout));
     return out;
   }
 
@@ -150,8 +153,8 @@ class BufferInterface {
 
 };  // class
 
-}  // namespace
-}  // namespace
-}  // namespace
+}  // namespace tf2_cybertron
+}  // namespace cybertron
+}  // namespace apollo
 
 #endif  // INCLUDE_CYBERTRON_TF2_CYBERTRON_BUFFER_INTERFACE_H_

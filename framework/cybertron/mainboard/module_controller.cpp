@@ -16,6 +16,8 @@
 
 #include "cybertron/mainboard/module_controller.h"
 
+#include <utility>
+
 #include "cybertron/common/environment.h"
 #include "cybertron/common/file.h"
 #include "cybertron/component/component_base.h"
@@ -140,6 +142,6 @@ bool ModuleController::LoadModule(const std::string& path) {
   }
 }
 
-}  // mainboard
-}  // cybertron
-}  // apollo
+}  // namespace mainboard
+}  // namespace cybertron
+}  // namespace apollo

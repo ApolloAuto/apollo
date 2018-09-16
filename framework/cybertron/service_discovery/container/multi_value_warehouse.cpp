@@ -17,6 +17,7 @@
 #include "cybertron/service_discovery/container/multi_value_warehouse.h"
 
 #include <algorithm>
+#include <utility>
 
 #include "cybertron/common/log.h"
 

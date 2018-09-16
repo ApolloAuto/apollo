@@ -19,6 +19,7 @@
 
 #include <cstdint>
 #include <unordered_map>
+#include <vector>
 
 #include "cybertron/base/atomic_rw_lock.h"
 #include "cybertron/service_discovery/container/warehouse_base.h"

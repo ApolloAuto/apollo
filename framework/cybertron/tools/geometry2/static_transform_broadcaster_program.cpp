@@ -1,5 +1,6 @@
 
 #include <cstdio>
+#include <memory>
 
 #include "cybertron/cybertron.h"
 #include "cybertron/tf2_cybertron/static_transform_broadcaster.h"
@@ -86,4 +87,4 @@ int main(int argc, char** argv) {
               "right number of arguments";
     return -1;
   }
-};
+}

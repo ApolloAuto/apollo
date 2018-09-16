@@ -3,6 +3,7 @@
 #define CYBERTRON_TF2_CYBERTRON_TRANSFORM_BROADCASTER_H_
 
 #include <memory>
+#include <vector>
 
 #include "cybertron/cybertron.h"
 #include "cybertron/proto/common_geometry.pb.h"
@@ -47,8 +48,8 @@ class TransformBroadcaster {
   std::unique_ptr<cybertron::Node> node_;
   std::shared_ptr<cybertron::Writer<adu::common::TransformStampeds>> publisher_;
 };
-}
-}
-}
+}  // namespace tf2_cybertron
+}  // namespace cybertron
+}  // namespace apollo
 
 #endif  // INCLUDE_CYBERTRON_TF2_CYBERTRON_TRANSFORM_BROADCASTER_H_
