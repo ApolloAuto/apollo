@@ -22,9 +22,9 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
-#include "cybertron/message/raw_message.h"
 #include "cybertron/base/signal.h"
 #include "cybertron/cybertron.h"
+#include "cybertron/message/raw_message.h"
 #include "cybertron/proto/record.pb.h"
 #include "cybertron/proto/topology_change.pb.h"
 #include "cybertron/record/record_writer.h"

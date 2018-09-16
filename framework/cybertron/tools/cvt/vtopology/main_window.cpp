@@ -84,8 +84,8 @@ MainWindow::MainWindow(QWidget* parent)
   connect(ui_->actionAbout, SIGNAL(triggered()), about_dialog_, SLOT(show()));
   connect(ui_->treeWidget, SIGNAL(doubleClicked(QModelIndex)), this,
           SLOT(TreeItemChanged(void)));
-  connect(topology_scene_, SIGNAL(selectionChanged()),
-          this, SLOT(SceneItemSelectionChanged(void)));
+  connect(topology_scene_, SIGNAL(selectionChanged()), this,
+          SLOT(SceneItemSelectionChanged(void)));
 
   refresh_timer_.setInterval(40);
   connect(&refresh_timer_, SIGNAL(timeout()), this, SLOT(UpdateSceneItem()));
@@ -196,8 +196,7 @@ void MainWindow::AddSceneItem(const std::string& channelName,
       return;
     }
 
-    updateMaxVec(dataSet->_channelData->_sceneItem.boundingRect(),
-                 max_rect_);
+    updateMaxVec(dataSet->_channelData->_sceneItem.boundingRect(), max_rect_);
 
     if (isReader) {
       dataSet->_reader_nodes.push_back(nodeData);
@@ -285,12 +284,11 @@ void MainWindow::RemoveSceneItem(const std::string& channelName,
 }
 
 void MainWindow::AdjustSceneLayout(void) {
-
   int index = 0;
   int baseH = 0;
 
   int maxCellHeight = max_rect_.y();
-  int maxCellWidth = max_rect_.x(); 
+  int maxCellWidth = max_rect_.x();
   maxCellWidth += 5;
   int w2 = (topology_scene_->width() - maxCellWidth) / 2;
 
@@ -306,7 +304,8 @@ void MainWindow::AdjustSceneLayout(void) {
     iter->second->_channelData->_sceneItem.setPos(w2, baseH);
 
     int rwH, rwIndex;
-    int w = w2 - maxCellWidth/3 - (iter->second->_writer_nodes.size() + 1) / 2 * maxCellWidth;
+    int w = w2 - maxCellWidth / 3 -
+            (iter->second->_writer_nodes.size() + 1) / 2 * maxCellWidth;
     rwIndex = 0;
     auto rwIter = iter->second->_writer_nodes.begin();
     for (; rwIter != iter->second->_writer_nodes.end(); ++rwIter, ++rwIndex) {
@@ -319,7 +318,8 @@ void MainWindow::AdjustSceneLayout(void) {
       (*rwIter)->_sceneItem.setPos(w + (rwIndex + 1) / 2 * maxCellWidth, rwH);
     }
 
-    w = w2 + maxCellWidth/3 + (iter->second->_reader_nodes.size() + 1) / 2 * maxCellWidth;
+    w = w2 + maxCellWidth / 3 +
+        (iter->second->_reader_nodes.size() + 1) / 2 * maxCellWidth;
     rwIndex = 0;
     rwIter = iter->second->_reader_nodes.begin();
     for (; rwIter != iter->second->_reader_nodes.end(); ++rwIter, ++rwIndex) {
@@ -346,12 +346,12 @@ void MainWindow::TreeItemChanged(void) {
     ChannelData* channelData =
         StructPtrByMemberPtr(item, ChannelData, _treeItem);
 
-    if(focused_item_ == &channelData->_sceneItem){
-        return;
+    if (focused_item_ == &channelData->_sceneItem) {
+      return;
     }
 
-    if(focused_item_){
-        focused_item_->SetPenColor(item_raw_color_);
+    if (focused_item_) {
+      focused_item_->SetPenColor(item_raw_color_);
     }
 
     focused_item_ = &channelData->_sceneItem;
@@ -363,28 +363,28 @@ void MainWindow::TreeItemChanged(void) {
   }
 }
 
-void MainWindow::SceneItemSelectionChanged(void)
-{
-    QGraphicsItem* item = topology_scene_->mouseGrabberItem();
-    if(item == nullptr){
-        ui_->graphicsView->clearFocus();
-        ui_->treeWidget->clearFocus();
-        return;
-    }
+void MainWindow::SceneItemSelectionChanged(void) {
+  QGraphicsItem* item = topology_scene_->mouseGrabberItem();
+  if (item == nullptr) {
+    ui_->graphicsView->clearFocus();
+    ui_->treeWidget->clearFocus();
+    return;
+  }
 
-    item = item->parentItem();
-    if(item == nullptr) return;
-    if(item == focused_item_) return;
+  item = item->parentItem();
+  if (item == nullptr) return;
+  if (item == focused_item_) return;
 
-    if(focused_item_){
-       focused_item_->SetPenColor(item_raw_color_);
-    }
+  if (focused_item_) {
+    focused_item_->SetPenColor(item_raw_color_);
+  }
 
-    focused_item_ = static_cast<CompositeItem*>(item);
-    item_raw_color_ = focused_item_->OldPenColor();
-    focused_item_->SetPenColor(Qt::green);
+  focused_item_ = static_cast<CompositeItem*>(item);
+  item_raw_color_ = focused_item_->OldPenColor();
+  focused_item_->SetPenColor(Qt::green);
 
-    ChannelData* channelData = StructPtrByMemberPtr(focused_item_, ChannelData, _sceneItem);
-    channelData->_treeItem.parent()->setExpanded(true);
-    ui_->treeWidget->setCurrentItem(&channelData->_treeItem);
+  ChannelData* channelData =
+      StructPtrByMemberPtr(focused_item_, ChannelData, _sceneItem);
+  channelData->_treeItem.parent()->setExpanded(true);
+  ui_->treeWidget->setCurrentItem(&channelData->_treeItem);
 }

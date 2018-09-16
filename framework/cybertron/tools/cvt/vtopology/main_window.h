@@ -1,13 +1,13 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include <QColor>
 #include <QList>
 #include <QMainWindow>
 #include <QMutex>
 #include <QPixmap>
 #include <QTimer>
 #include <QVector2D>
-#include <QColor>
 #include <memory>
 
 #include "about_dialog.h"

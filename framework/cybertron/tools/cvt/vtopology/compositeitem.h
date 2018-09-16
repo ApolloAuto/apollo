@@ -5,8 +5,8 @@
 #include <QGraphicsPolygonItem>
 #include <QGraphicsTextItem>
 #include <QList>
-#include <QVariant>
 #include <QPen>
+#include <QVariant>
 
 class Arrow;
 
@@ -17,9 +17,12 @@ class CompositeItem : public QGraphicsItemGroup {
 
   CompositeItem(ItemType itemType, const QString& text,
                 QGraphicsItem* parent = 0);
-  void SetPenColor(const QColor& c){ old_pen_.setColor(c); current_pen_.setColor(c); }
-  QColor CurrentPenColor(void)const{ return current_pen_.color(); }
-  QColor OldPenColor(void)const{ return old_pen_.color(); }
+  void SetPenColor(const QColor& c) {
+    old_pen_.setColor(c);
+    current_pen_.setColor(c);
+  }
+  QColor CurrentPenColor(void) const { return current_pen_.color(); }
+  QColor OldPenColor(void) const { return old_pen_.color(); }
 
   virtual void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
                      QWidget* widget = 0) override;
@@ -40,8 +43,8 @@ class CompositeItem : public QGraphicsItemGroup {
  protected:
   QVariant itemChange(GraphicsItemChange change,
                       const QVariant& value) override;
-  virtual void hoverEnterEvent(QGraphicsSceneHoverEvent * event);
-  virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent * event);
+  virtual void hoverEnterEvent(QGraphicsSceneHoverEvent* event);
+  virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent* event);
 
  private:
   ItemType item_type_;
