@@ -138,6 +138,9 @@ Status StdPlanning::InitFrame(const uint32_t sequence_num,
   frame_.reset(new Frame(sequence_num, local_view_, planning_start_point,
                          start_time, vehicle_state,
                          reference_line_provider_.get()));
+  if (frame_ == nullptr) {
+    return Status(ErrorCode::PLANNING_ERROR, "Fail to init frame: nullptr.");
+  }
   auto status = frame_->Init();
   if (!status.ok()) {
     AERROR << "failed to init frame:" << status.ToString();
@@ -151,17 +154,6 @@ void StdPlanning::RunOnce(const LocalView& local_view,
   local_view_ = local_view;
   const double start_timestamp = Clock::NowInSeconds();
 
-  auto* not_ready = trajectory_pb->mutable_decision()
-                        ->mutable_main_decision()
-                        ->mutable_not_ready();
-
-  if (HDMapUtil::BaseMapPtr() == nullptr) {
-    not_ready->set_reason("map not ready");
-    AERROR << not_ready->reason() << "; skip the planning cycle.";
-    FillPlanningPb(start_timestamp, trajectory_pb);
-    return;
-  }
-
   // localization
   ADEBUG << "Get localization:"
          << local_view_.localization_estimate->DebugString();
@@ -174,12 +166,12 @@ void StdPlanning::RunOnce(const LocalView& local_view,
 
   VehicleState vehicle_state =
       VehicleStateProvider::Instance()->vehicle_state();
+  DCHECK_GE(start_timestamp, vehicle_state.timestamp());
 
   // estimate (x, y) at current timestamp
   // This estimate is only valid if the current time and vehicle state timestamp
   // differs only a small amount (20ms). When the different is too large, the
   // estimation is invalid.
-  DCHECK_GE(start_timestamp, vehicle_state.timestamp());
   if (FLAGS_estimate_current_vehicle_state &&
       start_timestamp - vehicle_state.timestamp() < 0.020) {
     auto future_xy = VehicleStateProvider::Instance()->EstimateFuturePosition(
@@ -188,6 +180,10 @@ void StdPlanning::RunOnce(const LocalView& local_view,
     vehicle_state.set_y(future_xy.y());
     vehicle_state.set_timestamp(start_timestamp);
   }
+
+  auto* not_ready = trajectory_pb->mutable_decision()
+                        ->mutable_main_decision()
+                        ->mutable_not_ready();
 
   if (!status.ok() || !IsVehicleStateValid(vehicle_state)) {
     std::string msg("Update VehicleStateProvider failed");
@@ -219,24 +215,15 @@ void StdPlanning::RunOnce(const LocalView& local_view,
   const uint32_t frame_num = seq_num_++;
   status = InitFrame(frame_num, stitching_trajectory.back(), start_timestamp,
                      vehicle_state);
-  if (!frame_) {
-    std::string msg("Failed to init frame");
-    AERROR << msg;
-    not_ready->set_reason(msg);
-    status.Save(trajectory_pb->mutable_header()->mutable_status());
-    FillPlanningPb(start_timestamp, trajectory_pb);
-    return;
-  }
-
-  EgoInfo::Instance()->Update(stitching_trajectory.back(), vehicle_state,
-                              frame_->obstacles());
+  bool update_ego_info = EgoInfo::Instance()->Update(
+      stitching_trajectory.back(), vehicle_state, frame_->obstacles());
 
   if (FLAGS_enable_record_debug) {
     frame_->RecordInputDebug(trajectory_pb->mutable_debug());
   }
   trajectory_pb->mutable_latency_stats()->set_init_frame_time_ms(
       Clock::NowInSeconds() - start_timestamp);
-  if (!status.ok()) {
+  if (!status.ok() || !update_ego_info) {
     AERROR << status.ToString();
     if (FLAGS_publish_estop) {
       // Because the function "Control::ProduceControlCommand()" checks the
@@ -259,11 +246,9 @@ void StdPlanning::RunOnce(const LocalView& local_view,
       FillPlanningPb(start_timestamp, trajectory_pb);
     }
 
-    auto seq_num = frame_->SequenceNum();
-
     frame_->mutable_trajectory()->CopyFrom(*trajectory_pb);
-    FrameHistory::Instance()->Add(seq_num, std::move(frame_));
-
+    const uint32_t n = frame_->SequenceNum();
+    FrameHistory::Instance()->Add(n, std::move(frame_));
     return;
   }
 
@@ -313,9 +298,9 @@ void StdPlanning::RunOnce(const LocalView& local_view,
   FillPlanningPb(start_timestamp, trajectory_pb);
   ADEBUG << "Planning pb:" << trajectory_pb->header().DebugString();
 
-  auto seq_num = frame_->SequenceNum();
   frame_->mutable_trajectory()->CopyFrom(*trajectory_pb);
-  FrameHistory::Instance()->Add(seq_num, std::move(frame_));
+  const uint32_t n = frame_->SequenceNum();
+  FrameHistory::Instance()->Add(n, std::move(frame_));
 }
 
 void StdPlanning::ExportReferenceLineDebug(planning_internal::Debug* debug) {

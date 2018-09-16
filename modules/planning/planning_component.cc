@@ -18,6 +18,7 @@
 #include "modules/common/adapters/adapter_gflags.h"
 
 #include "modules/common/util/message_util.h"
+#include "modules/map/hdmap/hdmap_util.h"
 #include "modules/planning/common/planning_context.h"
 
 namespace apollo {
@@ -26,6 +27,7 @@ namespace planning {
 using apollo::perception::TrafficLightDetection;
 using apollo::routing::RoutingResponse;
 using apollo::routing::RoutingRequest;
+using apollo::hdmap::HDMapUtil;
 
 bool PlanningComponent::Init() {
   AINFO << "Loading gflag from file: " << ConfigFilePath();
@@ -130,7 +132,10 @@ bool PlanningComponent::CheckInput() {
     not_ready->set_reason("chassis not ready");
   } else if (local_view_.routing == nullptr) {
     not_ready->set_reason("routing not ready");
+  } else if (HDMapUtil::BaseMapPtr() == nullptr) {
+    not_ready->set_reason("map not ready");
   }
+
   if (not_ready->has_reason()) {
     AERROR << not_ready->reason() << "; skip the planning cycle.";
     common::util::FillHeader(node_->Name(), &trajectory_pb);
