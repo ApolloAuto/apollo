@@ -1,5 +1,5 @@
-#include "cybertron/transport/qos/qos_profile_conf.h"
 #include "cybertron/tf2_cybertron/static_transform_broadcaster.h"
+#include "cybertron/transport/qos/qos_profile_conf.h"
 
 namespace apollo {
 namespace cybertron {
@@ -10,10 +10,11 @@ StaticTransformBroadcaster::StaticTransformBroadcaster(
     : node_(node) {
   proto::RoleAttributes attr;
   attr.set_channel_name("/tf_static");
-  attr.mutable_qos_profile()->CopyFrom(transport::QosProfileConf::QOS_PROFILE_TF_STATIC);
+  attr.mutable_qos_profile()->CopyFrom(
+      transport::QosProfileConf::QOS_PROFILE_TF_STATIC);
   publisher_ = node_->CreateWriter<adu::common::TransformStampeds>(attr);
   net_message_ = std::make_shared<adu::common::TransformStampeds>();
-};
+}
 
 void StaticTransformBroadcaster::sendTransform(
     const adu::common::TransformStamped& msgtf) {
@@ -24,9 +25,7 @@ void StaticTransformBroadcaster::sendTransform(
 
 void StaticTransformBroadcaster::sendTransform(
     const std::vector<adu::common::TransformStamped>& msgtf) {
-  for (std::vector<adu::common::TransformStamped>::const_iterator it_in =
-           msgtf.begin();
-       it_in != msgtf.end(); ++it_in) {
+  for (auto it_in = msgtf.begin(); it_in != msgtf.end(); ++it_in) {
     bool match_found = false;
     int size = net_message_->transforms_size();
 
@@ -46,6 +45,6 @@ void StaticTransformBroadcaster::sendTransform(
   }
   publisher_->Write(net_message_);
 }
-}
-}
-}
+}  // namespace tf2_cybertron
+}  // namespace cybertron
+}  // namespace apollo

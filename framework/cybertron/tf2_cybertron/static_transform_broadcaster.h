@@ -3,6 +3,7 @@
 #define CYBERTRON_TF2_CYBERTRON_STATIC_TRANSFORM_BROADCASTER_H_
 
 #include <memory>
+#include <vector>
 
 #include "cybertron/cybertron.h"
 #include "cybertron/node/node.h"
@@ -10,7 +11,7 @@
 
 #include "cybertron/proto/common_geometry.pb.h"
 
-namespace apollo{
+namespace apollo {
 namespace cybertron {
 namespace tf2_cybertron {
 
@@ -23,7 +24,8 @@ namespace tf2_cybertron {
 class StaticTransformBroadcaster {
  public:
   /** \brief Constructor (needs a cybertron::Node reference) */
-  StaticTransformBroadcaster(const std::shared_ptr<cybertron::Node>& node);
+  explicit StaticTransformBroadcaster(
+      const std::shared_ptr<cybertron::Node>& node);
 
   /** \brief Send a TransformStamped message
    * The stamped data structure includes frame_id, and time, and parent_id
@@ -41,8 +43,8 @@ class StaticTransformBroadcaster {
   std::shared_ptr<cybertron::Writer<adu::common::TransformStampeds>> publisher_;
   std::shared_ptr<adu::common::TransformStampeds> net_message_;
 };
-}
-}
-}
+}  // namespace tf2_cybertron
+}  // namespace cybertron
+}  // namespace apollo
 
 #endif  // INCLUDE_CYBERTRON_TF2_CYBERTRON_STATIC_TRANSFORM_BROADCASTER_H_

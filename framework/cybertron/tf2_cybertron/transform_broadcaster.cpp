@@ -1,5 +1,5 @@
-#include "cybertron/time/time.h"
 #include "cybertron/tf2_cybertron/transform_broadcaster.h"
+#include "cybertron/time/time.h"
 
 namespace apollo {
 namespace cybertron {
@@ -14,7 +14,7 @@ TransformBroadcaster::TransformBroadcaster() {
     attr.set_channel_name("/tf");
     publisher_ = node_->CreateWriter<::adu::common::TransformStampeds>(attr);
   }
-};
+}
 
 void TransformBroadcaster::sendTransform(
     const ::adu::common::TransformStamped& msgtf) {
@@ -36,6 +36,6 @@ void TransformBroadcaster::sendTransform(
   publisher_->Write(message);
 }
 
-}
-}
-}
+}  // namespace tf2_cybertron
+}  // namespace cybertron
+}  // namespace apollo

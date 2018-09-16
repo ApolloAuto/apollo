@@ -18,6 +18,7 @@
 #define CYBERTRON_COMPONENT_COMPONENT_H_
 
 #include <memory>
+#include <utility>
 #include <vector>
 
 #include "cybertron/common/global_data.h"

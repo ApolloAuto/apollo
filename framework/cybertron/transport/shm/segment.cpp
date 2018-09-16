@@ -220,7 +220,7 @@ bool Segment::OpenOnly() {
   }
 
   // get field state_
-  state_ = (State*)managed_shm_;
+  state_ = reinterpret_cast<State*>(managed_shm_);
   if (state_ == nullptr) {
     AERROR << "get state failed.";
     shmdt(managed_shm_);

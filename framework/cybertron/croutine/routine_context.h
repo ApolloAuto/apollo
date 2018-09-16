@@ -46,7 +46,8 @@ struct RoutineContext {
 void MakeContext(const func& f1, const void* arg, RoutineContext* ctx);
 
 inline void SwapContext(RoutineContext* src_ctx, RoutineContext* dst_ctx) {
-  ctx_swap((void**)src_ctx, (void**)dst_ctx);
+  ctx_swap(reinterpret_cast<void**>(src_ctx),
+           reinterpret_cast<void**>(dst_ctx));
 }
 
 }  // namespace croutine

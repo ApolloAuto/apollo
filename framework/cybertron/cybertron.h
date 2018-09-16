@@ -17,7 +17,9 @@
 #ifndef CYBERTRON_CYBERTRON_H_
 #define CYBERTRON_CYBERTRON_H_
 
+#include <memory>
 #include <string>
+#include <utility>
 
 #include "cybertron/common/log.h"
 #include "cybertron/component/component.h"

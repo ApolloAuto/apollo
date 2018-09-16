@@ -30,20 +30,20 @@
 #include "cybertron/tools/cyber_recorder/recoverer.h"
 #include "cybertron/tools/cyber_recorder/spliter.h"
 
-using apollo::cybertron::record::Info;
-using apollo::cybertron::record::Recorder;
-using apollo::cybertron::record::Player;
-using apollo::cybertron::record::Spliter;
-using apollo::cybertron::record::Recoverer;
 using apollo::cybertron::common::GetFileName;
 using apollo::cybertron::common::StringToUnixSeconds;
 using apollo::cybertron::common::UnixSecondsToString;
+using apollo::cybertron::record::Info;
+using apollo::cybertron::record::Player;
+using apollo::cybertron::record::Recorder;
+using apollo::cybertron::record::Recoverer;
+using apollo::cybertron::record::Spliter;
 
-const std::string INFO_OPTIONS("f:ah");
-const std::string RECORD_OPTIONS("o:ac:h");
-const std::string PLAY_OPTIONS("f:ac:lr:b:e:s:d:h");
-const std::string SPLIT_OPTIONS("f:o:ac:b:e:h");
-const std::string RECOVER_OPTIONS("f:o:h");
+const char* INFO_OPTIONS("f:ah");
+const char* RECORD_OPTIONS("o:ac:h");
+const char* PLAY_OPTIONS("f:ac:lr:b:e:s:d:h");
+const char* SPLIT_OPTIONS("f:o:ac:b:e:h");
+const char* RECOVER_OPTIONS("f:o:h");
 
 void DisplayUsage(const std::string& binary);
 void DisplayUsage(const std::string& binary, const std::string& command);

@@ -23,9 +23,9 @@ namespace croutine {
 void MakeContext(const func &f1, const void *arg, RoutineContext *ctx) {
   memset(ctx->regs, 0, sizeof(ctx->regs));
   char *sp = ctx->stack + stack_size;
-  ctx->regs[8] = sp - sizeof(void *);  // return address
-  ctx->regs[6] = (char *)f1;           // rax
-  ctx->regs[5] = (char *)arg;          // rdi
+  ctx->regs[8] = sp - sizeof(void *);           // return address
+  ctx->regs[6] = reinterpret_cast<char *>(f1);  // rax
+  ctx->regs[5] = reinterpret_cast<char *>(const_cast<void *>(arg));  // rdi
 }
 
 }  // namespace croutine
