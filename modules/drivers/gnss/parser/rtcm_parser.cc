@@ -32,6 +32,11 @@ namespace gnss {
 using ::apollo::drivers::gnss::EpochObservation;
 using ::apollo::drivers::gnss::GnssEphemeris;
 
+RtcmParser::RtcmParser(const config::Config &config,
+           const std::shared_ptr<Node> &node)
+    : config_(config), node_(node) {
+}
+
 bool RtcmParser::Init() {
   rtcm_parser_.reset(new Rtcm3Parser(true));
 
@@ -39,6 +44,11 @@ bool RtcmParser::Init() {
     AERROR << "Failed to create rtcm parser.";
     return false;
   }
+
+  gnssephemeris_writer_ =
+      node_->CreateWriter<GnssEphemeris>(config_.gnssephemeris_channel_name());
+  epochobservation_writer_ = node_->CreateWriter<EpochObservation>(
+      config_.epochobservation_channel_name());
 
   inited_flag_ = true;
   return true;
@@ -75,14 +85,15 @@ void RtcmParser::DispatchMessage(Parser::MessageType type, MessagePtr message) {
   }
 }
 
-void RtcmParser::PublishEphemeris(const MessagePtr message) {
-  GnssEphemeris eph = *As<GnssEphemeris>(message);
-  // AdapterManager::PublishGnssRtkEph(eph);
+void RtcmParser::PublishEphemeris(const MessagePtr& message) {
+  auto eph = std::make_shared<GnssEphemeris>(*As<GnssEphemeris>(message));
+  gnssephemeris_writer_->Write(eph);
 }
 
-void RtcmParser::PublishObservation(const MessagePtr message) {
-  EpochObservation observation = *As<EpochObservation>(message);
-  // AdapterManager::PublishGnssRtkObs(observation);
+void RtcmParser::PublishObservation(const MessagePtr& message) {
+  auto observation =
+      std::make_shared<EpochObservation>(*As<EpochObservation>(message));
+  epochobservation_writer_->Write(observation);
 }
 
 }  // namespace gnss
