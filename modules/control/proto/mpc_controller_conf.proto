@@ -8,17 +8,17 @@ import "modules/control/proto/gain_scheduler_conf.proto";
 
 // simple optimal steer control param
 message MPCControllerConf {
-  optional double ts = 1;            // sample time (dt) 0.01 now, configurable
+  optional double ts = 1;  // sample time (dt) 0.01 now, configurable
   optional double cf = 2;
-  optional double cr = 3;            // N/rad
+  optional double cr = 3;  // N/rad
   optional int32 mass_fl = 4;
   optional int32 mass_fr = 5;
   optional int32 mass_rl = 6;
   optional int32 mass_rr = 7;
-  optional double eps = 8;          // converge threshold
-  repeated double matrix_q = 9;     // matrix_q size = 6
-  repeated double matrix_r = 10;    // matrix_r size = 2
-  optional int32 cutoff_freq = 11;   // cutoff frequency
+  optional double eps = 8;                      // converge threshold
+  repeated double matrix_q = 9;                 // matrix_q size = 6
+  repeated double matrix_r = 10;                // matrix_r size = 2
+  optional int32 cutoff_freq = 11;              // cutoff frequency
   optional int32 mean_filter_window_size = 12;  // window size of mean filter
   // for a normal car, it should be in range[16, 18]
   optional int32 max_iteration = 13;  // maximum iteration for lqr solve

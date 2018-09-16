@@ -24,13 +24,13 @@ message Prediction {
 // Next-id: 13
 message Decision {
   enum Type {
-    IGNORE = 0; // Ignore the object
-    STOP = 1; // Stop at a distance from the object
-    NUDGE = 2; // Go around the object
-    YIELD = 3; // Go after the object
-    OVERTAKE = 4; // Go before the object
-    FOLLOW = 5; // Follow the object in the same lane
-    SIDEPASS = 6; // Pass the object in neighboring lane
+    IGNORE = 0;    // Ignore the object
+    STOP = 1;      // Stop at a distance from the object
+    NUDGE = 2;     // Go around the object
+    YIELD = 3;     // Go after the object
+    OVERTAKE = 4;  // Go before the object
+    FOLLOW = 5;    // Follow the object in the same lane
+    SIDEPASS = 6;  // Pass the object in neighboring lane
   }
   optional Type type = 1 [default = IGNORE];
 
@@ -87,8 +87,8 @@ message Object {
 
   // Motion Info
   // For objects with motion info such as ADC.
-  optional double speed = 11; // in m/s
-  optional double speed_acceleration = 12; // in m/s^2
+  optional double speed = 11;               // in m/s
+  optional double speed_acceleration = 12;  // in m/s^2
   optional double speed_jerk = 13;
   optional double spin = 14;
   optional double spin_acceleration = 15;
@@ -133,10 +133,10 @@ message Object {
     UNKNOWN_MOVABLE = 1;
     UNKNOWN_UNMOVABLE = 2;
     PEDESTRIAN = 3;  // pedestrian, usually determined by moving behavior.
-    BICYCLE = 4;  // bike, motor bike.
-    VEHICLE = 5;  // passenger car or truck.
-    VIRTUAL = 6; // virtual object created by decision module.
-    CIPV = 7; // closest in-path vehicle determined by perception module.
+    BICYCLE = 4;     // bike, motor bike.
+    VEHICLE = 5;     // passenger car or truck.
+    VIRTUAL = 6;     // virtual object created by decision module.
+    CIPV = 7;        // closest in-path vehicle determined by perception module.
   };
 
   optional Type type = 29;  // obstacle type
@@ -151,7 +151,7 @@ message DelaysInMs {
   optional double localization = 3;
   optional double perception_obstacle = 4;
   optional double planning = 5;
-  optional double prediction= 7;
+  optional double prediction = 7;
   optional double traffic_light = 8;
   optional double control = 9;
 }
@@ -215,7 +215,7 @@ message SimulationWorld {
   repeated Object planning_trajectory = 8;
 
   // Main decision
-  optional Object main_stop = 9 [deprecated=true];
+  optional Object main_stop = 9 [deprecated = true];
   optional Object main_decision = 10;
 
   // Speed limit
@@ -225,7 +225,8 @@ message SimulationWorld {
   optional DelaysInMs delay = 12;
 
   // Notification
-  optional apollo.common.monitor.MonitorMessage monitor = 13 [deprecated=true];
+  optional apollo.common.monitor.MonitorMessage monitor = 13
+      [deprecated = true];
   repeated Notification notification = 14;
 
   // Engage advice from planning

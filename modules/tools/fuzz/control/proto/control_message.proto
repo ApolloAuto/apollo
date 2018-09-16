@@ -23,10 +23,9 @@ import "modules/control/proto/pad_msg.proto";
 import "modules/planning/proto/planning.proto";
 import "modules/canbus/proto/chassis.proto";
 
-
-message ControlFuzzMessage{
-	required apollo.localization.LocalizationEstimate localization = 1;
-	required apollo.control.PadMessage pad = 2;
-	required apollo.planning.ADCTrajectory planning = 3;
-	required apollo.canbus.Chassis chassis = 4;
+message ControlFuzzMessage {
+  required apollo.localization.LocalizationEstimate localization = 1;
+  required apollo.control.PadMessage pad = 2;
+  required apollo.planning.ADCTrajectory planning = 3;
+  required apollo.canbus.Chassis chassis = 4;
 }

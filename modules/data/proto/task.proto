@@ -4,7 +4,6 @@ package apollo.data;
 
 import "modules/data/proto/static_info.proto";
 
-
 message MapPoint {
   optional double latitude = 1;
   optional double longitude = 2;

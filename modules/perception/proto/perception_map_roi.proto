@@ -9,7 +9,7 @@ import "modules/map/proto/map.proto";
 // Will be deprecated once the HOI map is ready.
 // Next id: 9
 message PerceptionMapROI {
-  optional apollo.common.Header header = 1;  // Header.
+  optional apollo.common.Header header = 1;       // Header.
   optional apollo.hdmap.Header hdmap_header = 8;  // HDMap header.
 
   // Minimum x and y values in the map.
@@ -17,8 +17,8 @@ message PerceptionMapROI {
   optional double origin_y = 3;
 
   // Partition the map into cells of grid.
-  optional double grid_size = 4;  // in meters.
-  optional int32 num_rows = 5;  // respect to x.
+  optional double grid_size = 4;   // in meters.
+  optional int32 num_rows = 5;     // respect to x.
   optional int32 num_columns = 6;  // respect to y.
 
   // ROI regions on the grid.

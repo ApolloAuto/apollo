@@ -52,7 +52,7 @@ message CosThetaSmootherConfig {
   // The weight of cosine of included angle between points
   optional double weight_cos_included_angle = 3 [default = 10000.0];
 
-  // The tolerance of optimization 
+  // The tolerance of optimization
   optional double acceptable_tol = 4 [default = 1e-1];
 
   // Relax constraint on end condition
@@ -60,7 +60,7 @@ message CosThetaSmootherConfig {
 
   // Reopt bound for anchor points
   optional double reopt_qp_bound = 6 [default = 0.05];
-  }
+}
 
 message ReferenceLineSmootherConfig {
   enum DrivingSide {

@@ -6,7 +6,7 @@ import "modules/map/proto/map_id.proto";
 import "modules/map/proto/map_geometry.proto";
 
 message SpeedBump {
-    optional Id id = 1;
-    repeated Id overlap_id = 2;
-    repeated Curve position = 3;
+  optional Id id = 1;
+  repeated Id overlap_id = 2;
+  repeated Curve position = 3;
 }

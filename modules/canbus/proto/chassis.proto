@@ -101,7 +101,7 @@ message Chassis {
   optional Surround surround = 31;
 
   // Vehicle registration information
-  optional License license = 32;  
+  optional License license = 32;
 }
 
 message ChassisGPS {
@@ -137,12 +137,12 @@ enum GpsQuality {
 }
 
 message WheelSpeed {
-enum WheelSpeedType {
-  FORWARD = 0;
-  BACKWARD = 1;
-  STANDSTILL = 2;
-  INVALID = 3;
-}
+  enum WheelSpeedType {
+    FORWARD = 0;
+    BACKWARD = 1;
+    STANDSTILL = 2;
+    INVALID = 3;
+  }
   optional bool is_wheel_spd_rr_valid = 1 [default = false];
   optional WheelSpeedType wheel_direction_rr = 2 [default = INVALID];
   optional double wheel_spd_rr = 3 [default = 0.0];
@@ -158,7 +158,7 @@ enum WheelSpeedType {
 }
 
 message Sonar {
-  optional double range = 1;  // Meter
+  optional double range = 1;                       // Meter
   optional apollo.common.Point3D translation = 2;  // Meter
   optional apollo.common.Quaternion rotation = 3;
 }

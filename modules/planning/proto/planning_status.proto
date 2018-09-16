@@ -8,15 +8,16 @@ import "modules/common/proto/drive_state.proto";
 import "modules/common/proto/geometry.proto";
 
 /*
-  This file defines the data types that represents the internal state of the planning module.
+  This file defines the data types that represents the internal state of the
+  planning module.
   It will not be refreshed in each planning cycle.
 */
 
 message ChangeLaneStatus {
   enum Status {
-    IN_CHANGE_LANE = 1; // during change lane state
-    CHANGE_LANE_FAILED = 2; // change lane failed
-    CHANGE_LANE_SUCCESS = 3; // change lane failed
+    IN_CHANGE_LANE = 1;       // during change lane state
+    CHANGE_LANE_FAILED = 2;   // change lane failed
+    CHANGE_LANE_SUCCESS = 3;  // change lane failed
   }
   optional Status status = 1;
   // the id of the route segment that the vehicle is driving on
@@ -39,7 +40,7 @@ message CrosswalkStatus {
 
 message PullOverStatus {
   enum Reason {
-    DESTINATION = 1; // upon arriving destination
+    DESTINATION = 1;  // upon arriving destination
   }
   enum Status {
     UNKNOWN = 1;
@@ -48,7 +49,7 @@ message PullOverStatus {
     DISABLED = 4;
   }
 
-  optional bool in_pull_over = 1 [default=false];
+  optional bool in_pull_over = 1 [default = false];
   optional Status status = 2;
   optional apollo.common.PointENU inlane_dest_point = 3;
   optional apollo.common.PointENU start_point = 4;
@@ -60,7 +61,7 @@ message PullOverStatus {
 
 message ReroutingStatus {
   optional double last_rerouting_time = 1;
-  optional bool need_rerouting = 2 [default=false];
+  optional bool need_rerouting = 2 [default = false];
   optional routing.RoutingRequest routing_request = 3;
 }
 
@@ -105,7 +106,7 @@ message StopSignStatus {
 }
 
 message DestinationStatus {
-    optional bool has_passed_destination = 1 [default = false];
+  optional bool has_passed_destination = 1 [default = false];
 }
 
 message PlanningStatus {
@@ -116,7 +117,6 @@ message PlanningStatus {
   optional RightOfWayStatus right_of_way = 5;
   optional SidePassStatus side_pass = 6;
   optional StopSignStatus stop_sign = 7;
-  optional DestinationStatus destination  = 8;
+  optional DestinationStatus destination = 8;
   optional PullOverStatus pull_over = 9;
 }
-

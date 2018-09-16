@@ -37,12 +37,14 @@ message LaneSampleAssociation {
   optional double width = 2;
 }
 
-// A lane is part of a roadway, that is designated for use by a single line of vehicles.
+// A lane is part of a roadway, that is designated for use by a single line of
+// vehicles.
 // Most public roads (include highways) have more than two lanes.
 message Lane {
   optional Id id = 1;
 
-  // Central lane as reference trajectory, not necessary to be the geometry central.
+  // Central lane as reference trajectory, not necessary to be the geometry
+  // central.
   optional Curve central_curve = 2;
 
   // Lane boundary curve.
@@ -103,4 +105,3 @@ message Lane {
   repeated LaneSampleAssociation left_road_sample = 20;
   repeated LaneSampleAssociation right_road_sample = 21;
 }
-

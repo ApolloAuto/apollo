@@ -25,10 +25,10 @@ message Extrinsics {
 // By default, all are measured with the SI units (meters, meters per second,
 // etc.).
 message VehicleParam {
-enum VehicleBrand {
-  LINCOLN_MKZ = 0;
-  GEM = 1;
-}
+  enum VehicleBrand {
+    LINCOLN_MKZ = 0;
+    GEM = 1;
+  }
 
   optional VehicleBrand brand = 1;
   // Car center point is car reference point, i.e., center of rear axle.
@@ -45,7 +45,8 @@ enum VehicleBrand {
   optional double max_acceleration = 10;
   optional double max_deceleration = 11;
 
-  // The following items are used to compute trajectory constraints in planning/control/canbus,
+  // The following items are used to compute trajectory constraints in
+  // planning/control/canbus,
   // vehicle max steer angle
   optional double max_steer_angle = 12;
   // vehicle max steer rate; how fast can the steering wheel turn.

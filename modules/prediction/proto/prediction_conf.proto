@@ -5,7 +5,7 @@ package apollo.prediction;
 import "modules/perception/proto/perception_obstacle.proto";
 
 message ObstacleConf {
-   enum ObstacleStatus {
+  enum ObstacleStatus {
     ON_LANE = 0;
     OFF_LANE = 1;
     STATIONARY = 3;
@@ -15,7 +15,7 @@ message ObstacleConf {
   enum EvaluatorType {
     MLP_EVALUATOR = 0;
     RNN_EVALUATOR = 1;
-    COST_EVALUATOR = 2;    // navi mode can only support this evaluator
+    COST_EVALUATOR = 2;  // navi mode can only support this evaluator
   }
 
   enum PredictorType {

@@ -179,5 +179,3 @@ message CloudReferenceLineRoutingRequest {
 message CloudReferenceLineResponse {
   repeated apollo.common.Path segment = 1;
 }
-
-

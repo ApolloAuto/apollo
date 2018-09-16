@@ -15,5 +15,3 @@ message RecognizerConfig {
 message ModelConfigs {
   repeated RecognizerConfig recognizer_config = 1;
 }
-
-

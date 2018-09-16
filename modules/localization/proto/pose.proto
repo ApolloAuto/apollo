@@ -43,7 +43,8 @@ message Pose {
   optional apollo.common.Point3D angular_velocity = 5;
 
   // Heading
-  // The heading is zero when the car is facing East and positive when facing North.
+  // The heading is zero when the car is facing East and positive when facing
+  // North.
   optional double heading = 6;
 
   // Linear acceleration of the VRP in the vehicle reference frame.

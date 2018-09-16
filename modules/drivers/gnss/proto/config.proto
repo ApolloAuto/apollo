@@ -61,20 +61,19 @@ message NovatelConfig {
 message UbloxConfig {
 }
 
-
 enum ImuType {
   // We currently use the following IMUs. We'll extend this list when a new IMU
   // is introduced.
-  IMAR_FSAS = 13;       // iMAR iIMU-FSAS
-  ISA100C = 26;         // Northrop Grumman Litef ISA-100C
-  ADIS16488 = 31;       // Analog Devices ADIS16488
-  STIM300 = 32;         // Sensonor STIM300
-  ISA100 = 34;          // Northrop Grumman Litef ISA-100
-  ISA100_400HZ = 38;    // Northrop Grumman Litef ISA-100
-  ISA100C_400HZ = 39;   // Northrop Grumman Litef ISA-100
-  G320N = 40;           // EPSON G320N
-  CPT_XW5651 = 41;      // IMU@SPAN-CPT, and XingWangYuda 5651
-  UM442 = 42;           // UM442
+  IMAR_FSAS = 13;      // iMAR iIMU-FSAS
+  ISA100C = 26;        // Northrop Grumman Litef ISA-100C
+  ADIS16488 = 31;      // Analog Devices ADIS16488
+  STIM300 = 32;        // Sensonor STIM300
+  ISA100 = 34;         // Northrop Grumman Litef ISA-100
+  ISA100_400HZ = 38;   // Northrop Grumman Litef ISA-100
+  ISA100C_400HZ = 39;  // Northrop Grumman Litef ISA-100
+  G320N = 40;          // EPSON G320N
+  CPT_XW5651 = 41;     // IMU@SPAN-CPT, and XingWangYuda 5651
+  UM442 = 42;          // UM442
 }
 
 message TF {
@@ -134,5 +133,4 @@ message Config {
   optional string gps_channel_name = 28;
   optional string bestpos_channel_name = 29;
   optional string chassis_channel_name = 30;
-
 }

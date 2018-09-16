@@ -4,7 +4,6 @@ package apollo.data;
 
 import "modules/data/proto/task.proto";
 
-
 message SearchRequest {
   // Search criteria.
   optional string vehicle_name = 1;

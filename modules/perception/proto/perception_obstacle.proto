@@ -14,15 +14,15 @@ message Point {
 }
 
 message PerceptionObstacle {
-  optional int32 id = 1;  // obstacle ID.
+  optional int32 id = 1;        // obstacle ID.
   optional Point position = 2;  // obstacle position in the world coordinate
                                 // system.
-  optional double theta = 3;  // heading in the world coordinate system.
+  optional double theta = 3;    // heading in the world coordinate system.
   optional Point velocity = 4;  // obstacle velocity.
 
   // Size of obstacle bounding box.
   optional double length = 5;  // obstacle length.
-  optional double width = 6;  // obstacle width.
+  optional double width = 6;   // obstacle width.
   optional double height = 7;  // obstacle height.
 
   repeated Point polygon_point = 8;  // obstacle corner points.
@@ -34,10 +34,10 @@ message PerceptionObstacle {
     UNKNOWN_MOVABLE = 1;
     UNKNOWN_UNMOVABLE = 2;
     PEDESTRIAN = 3;  // Pedestrian, usually determined by moving behaviour.
-    BICYCLE = 4;  // bike, motor bike
-    VEHICLE = 5;  // Passenger car or truck.
+    BICYCLE = 4;     // bike, motor bike
+    VEHICLE = 5;     // Passenger car or truck.
   };
-  optional Type type = 10;  // obstacle type
+  optional Type type = 10;         // obstacle type
   optional double timestamp = 11;  // GPS time in seconds.
 
   // Just for offline debugging, onboard will not fill this field.
@@ -46,9 +46,9 @@ message PerceptionObstacle {
 
   optional double confidence = 13 [default = 1.0];
   enum ConfidenceType {
-      CONFIDENCE_UNKNOWN = 0;
-      CONFIDENCE_CNN = 1;
-      CONFIDENCE_RADAR = 2;
+    CONFIDENCE_UNKNOWN = 0;
+    CONFIDENCE_CNN = 1;
+    CONFIDENCE_RADAR = 2;
   };
   optional ConfidenceType confidence_type = 14 [default = CONFIDENCE_CNN];
   repeated Point drops = 15;  // trajectory of object.
@@ -61,7 +61,7 @@ message CIPVInfo {
 
 message LaneMarker {
   optional apollo.hdmap.LaneBoundaryType.Type lane_type = 1;
-  optional double quality = 2; // range = [0,1]; 1 = the best quality
+  optional double quality = 2;  // range = [0,1]; 1 = the best quality
   optional int32 model_degree = 3;
   // equation X = c3 * Z^3 + c2 * Z^2 + c1 * Z + c0
   optional double c0_position = 4;
@@ -82,8 +82,8 @@ message LaneMarkers {
 
 message PerceptionObstacles {
   repeated PerceptionObstacle perception_obstacle = 1;  // An array of obstacles
-  optional apollo.common.Header header = 2;  // Header
+  optional apollo.common.Header header = 2;             // Header
   optional apollo.common.ErrorCode error_code = 3 [default = OK];
   optional LaneMarkers lane_marker = 4;
-  optional CIPVInfo cipv_info = 5; // closest in path vehicle
+  optional CIPVInfo cipv_info = 5;  // closest in path vehicle
 }
