@@ -51,20 +51,13 @@ enum class SchedPerf {
 
 enum class TransPerf { TRANS_FROM = 1, TRANS_TO = 2, WRITE_NOTIFY = 3 };
 
-// event_id
-// 1 swap_in
-// 2 swap_out
-// 3 try_fetch_out
-// 4 notify_in
-// 5 next_routine
-
 class PerfEventBase {
  public:
   int event_type = 0;
   int event_id;
   uint64_t t_start = -1;
   uint64_t t_end = -1;
-  virtual void SetParams(int count, ...) {
+  virtual void SetParams(const int count, ...) {
     va_list ap;
     va_start(ap, count);
     event_type = va_arg(ap, int);
@@ -92,7 +85,7 @@ class PerfEventBase {
 class SchedPerfEvent : public PerfEventBase {
  public:
   SchedPerfEvent() { event_type = int(EventType::SCHED_EVENT); }
-  void SetParams(int count, ...) override;
+  void SetParams(const int count, ...) override;
   std::string SerializeToString() override {
     std::stringstream ss;
     ss << event_type << "\t";
@@ -121,7 +114,7 @@ class SchedPerfEvent : public PerfEventBase {
 class TransportPerfEvent : public PerfEventBase {
  public:
   TransportPerfEvent() { event_type = int(EventType::TRANS_EVENT); }
-  void SetParams(int count, ...) override;
+  void SetParams(const int count, ...) override;
   std::string SerializeToString() override {
     std::stringstream ss;
     ss << event_type << "\t";
