@@ -296,10 +296,13 @@ bool ReferenceLineInfo::AddObstacles(
         },
         FLAGS_max_planning_thread_pool_size);
 
+    std::vector<std::future<void>> results;
     for (const auto* obstacle : obstacles) {
-      task->Execute(std::make_shared<Obstacle>(*obstacle));
+      results.push_back(task->Execute(std::make_shared<Obstacle>(*obstacle)));
     }
-    task->Wait();
+    for (auto& result: results) {
+      result.get();
+    }
   } else {
     for (const auto* obstacle : obstacles) {
       if (!AddObstacle(obstacle)) {

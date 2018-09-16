@@ -164,6 +164,7 @@ bool DpRoadGraph::GenerateMinCostPath(
     const auto &level_points = path_waypoints[level];
 
     graph_nodes.emplace_back();
+    std::vector<std::future<void>> results;
 
     for (size_t i = 0; i < level_points.size(); ++i) {
       const auto &cur_point = level_points[i];
@@ -179,13 +180,15 @@ bool DpRoadGraph::GenerateMinCostPath(
       msg->cur_node = &(graph_nodes.back().back());
 
       if (FLAGS_enable_multi_thread_in_dp_poly_path) {
-        task->Execute(msg);
+        results.push_back(task->Execute(msg));
       } else {
         UpdateNode(msg);
       }
     }
     if (FLAGS_enable_multi_thread_in_dp_poly_path) {
-      task->Wait();
+      for (auto& result: results) {
+        result.get();
+      }
     }
   }
 
