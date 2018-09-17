@@ -50,12 +50,14 @@ const char Screen::InteractiveCmdStr[] =
     "   t | T -- show channel message type\n"
     "   PgDn | ^d -- show next page\n"
     "   PgUp | ^u -- show previous page\n\n"
+    "   Space -- Enable|Disable channel Message\n\n"
     "Commands for Channel:\n"
     "   i | I -- show Reader and Writers of Channel\n"
     "   b | B -- show Debug String of Channel Message\n";
 
 Screen::Screen()
     : current_state_(State::RenderMessage),
+      highlight_line_no_(1),
       highlight_direction_(0),
       current_render_obj_(nullptr) {}
 
@@ -176,9 +178,9 @@ void Screen::Run() {
     return;
   }
 
-  int y = 1;
+  // int y = 1;
   highlight_direction_ = 0;
-  move(y, 0);
+  move(highlight_line_no_, 0);
 
   void (Screen::*showFuncs[])(int&, int) = {&Screen::ShowRenderMessage,
                                             &Screen::ShowInteractiveCmd};
@@ -190,7 +192,7 @@ void Screen::Run() {
 
     SwitchState(ch);
 
-    (this->*showFuncs[static_cast<int>(current_state_)])(y, ch);
+    (this->*showFuncs[static_cast<int>(current_state_)])(highlight_line_no_, ch);
   } while (true);
 }
 

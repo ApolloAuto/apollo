@@ -77,6 +77,7 @@ class ChannelMessage : public RenderableMessage {
 
   explicit ChannelMessage(RenderableMessage* parent = nullptr)
       : RenderableMessage(parent),
+        is_enabled_(true),
         has_message_come_(false),
         message_type_(),
         frame_counter_(0),
@@ -90,10 +91,13 @@ class ChannelMessage : public RenderableMessage {
   }
   const std::string& message_type(void) const { return message_type_; }
 
+  bool is_enabled(void)const{ return is_enabled_; }
+  void set_enabled(bool b){ is_enabled_ = b; if(!b) set_has_message_come(false); }
+
   bool has_message_come(void) const { return has_message_come_; }
 
   double frame_ratio(void) {
-    if(!has_message_come()) return 0.0;
+    if (!is_enabled_ || !has_message_come()) return 0.0;
     apollo::cybertron::Time curTime = apollo::cybertron::Time::Now();
     auto deltaTime = curTime - last_time_;
 
@@ -131,6 +135,7 @@ class ChannelMessage : public RenderableMessage {
 
   void set_has_message_come(bool b){ has_message_come_ = b; }
 
+  bool is_enabled_;
   bool has_message_come_;
   std::string message_type_;
   int frame_counter_;
@@ -156,6 +161,8 @@ class CybertronChannelMessage : public ChannelMessage {
 
  protected:
   void updateRawMessage(const std::shared_ptr<MessageType>& rawMsg) {
+    if(!is_enabled_){ return; }
+
     ++frame_counter_;
     std::lock_guard<std::mutex> _g(inner_lock_);
     set_has_message_come(true);
