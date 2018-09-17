@@ -1,9 +1,24 @@
+/******************************************************************************
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
+
 #include <Python.h>
-#include <string.h>
+#include <string>
 
-#include "py_record.h"
+#include "python/wrapper/py_record.h"
 
-/////////////////general functions////////////////////////////////////
 #define PYOBJECT_NULL_STRING PyString_FromStringAndSize("", 0)
 
 template <typename T>
@@ -15,7 +30,6 @@ T PyObjectToPtr(PyObject *pyobj, const std::string &type_ptr) {
   return obj_ptr;
 }
 
-///////////PyRecordReader methed////////////////////////////
 PyObject *cyber_new_PyRecordReader(PyObject *self, PyObject *args) {
   apollo::cybertron::record::PyRecordReader *reader =
       new apollo::cybertron::record::PyRecordReader();
@@ -26,7 +40,7 @@ PyObject *cyber_new_PyRecordReader(PyObject *self, PyObject *args) {
 
 PyObject *cyber_delete_PyRecordReader(PyObject *self, PyObject *args) {
   PyObject *pyobj_rec_reader = nullptr;
-  if (!PyArg_ParseTuple(args, (char *)"O:delete_PyRecordReader",
+  if (!PyArg_ParseTuple(args, const_cast<char *>("O:delete_PyRecordReader"),
                         &pyobj_rec_reader)) {
     return Py_None;
   }
@@ -46,7 +60,8 @@ PyObject *cyber_PyRecordReader_Open(PyObject *self, PyObject *args) {
   PyObject *pyobj_reader = nullptr;
   char *path = nullptr;
   Py_ssize_t len = 0;
-  if (!PyArg_ParseTuple(args, (char *)"Os#:cyber_PyRecordReader_Open",
+  if (!PyArg_ParseTuple(args,
+                        const_cast<char *>("Os#:cyber_PyRecordReader_Open"),
                         &pyobj_reader, &path, &len)) {
     AINFO << "cyber_PyRecordReader_Open:PyRecordReader failed!";
     Py_RETURN_FALSE;
@@ -70,7 +85,7 @@ PyObject *cyber_PyRecordReader_Open(PyObject *self, PyObject *args) {
 
 PyObject *cyber_PyRecordReader_Close(PyObject *self, PyObject *args) {
   PyObject *pyobj_reader = nullptr;
-  if (!PyArg_ParseTuple(args, (char *)"O:PyRecordReader_Close",
+  if (!PyArg_ParseTuple(args, const_cast<char *>("O:PyRecordReader_Close"),
                         &pyobj_reader)) {
     return Py_None;
   }
@@ -88,7 +103,8 @@ PyObject *cyber_PyRecordReader_Close(PyObject *self, PyObject *args) {
 
 PyObject *cyber_PyRecordReader_ReadMessage(PyObject *self, PyObject *args) {
   PyObject *pyobj_reader = nullptr;
-  if (!PyArg_ParseTuple(args, (char *)"O:PyRecordReader_ReadMessage",
+  if (!PyArg_ParseTuple(args,
+                        const_cast<char *>("O:PyRecordReader_ReadMessage"),
                         &pyobj_reader)) {
     Py_RETURN_FALSE;
   }
@@ -109,7 +125,7 @@ PyObject *cyber_PyRecordReader_ReadMessage(PyObject *self, PyObject *args) {
 
 PyObject *cyber_PyRecordReader_EndOfFile(PyObject *self, PyObject *args) {
   PyObject *pyobj_reader = nullptr;
-  if (!PyArg_ParseTuple(args, (char *)"O:PyRecordReader_EndOfFile",
+  if (!PyArg_ParseTuple(args, const_cast<char *>("O:PyRecordReader_EndOfFile"),
                         &pyobj_reader)) {
     Py_RETURN_FALSE;
   }
@@ -131,9 +147,10 @@ PyObject *cyber_PyRecordReader_EndOfFile(PyObject *self, PyObject *args) {
 PyObject *cyber_PyRecordReader_CurrentMessageChannelName(PyObject *self,
                                                          PyObject *args) {
   PyObject *pyobj_reader = nullptr;
-  if (!PyArg_ParseTuple(
-          args, (char *)"O:cyber_PyRecordReader_CurrentMessageChannelName",
-          &pyobj_reader)) {
+  if (!PyArg_ParseTuple(args,
+                        const_cast<char *>(
+                            "O:cyber_PyRecordReader_CurrentMessageChannelName"),
+                        &pyobj_reader)) {
     return PYOBJECT_NULL_STRING;
   }
 
@@ -152,9 +169,9 @@ PyObject *cyber_PyRecordReader_CurrentMessageChannelName(PyObject *self,
 PyObject *cyber_PyRecordReader_CurrentRawMessage(PyObject *self,
                                                  PyObject *args) {
   PyObject *pyobj_reader = nullptr;
-  if (!PyArg_ParseTuple(args,
-                        (char *)"O:cyber_PyRecordReader_CurrentRawMessage",
-                        &pyobj_reader)) {
+  if (!PyArg_ParseTuple(
+          args, const_cast<char *>("O:cyber_PyRecordReader_CurrentRawMessage"),
+          &pyobj_reader)) {
     return PYOBJECT_NULL_STRING;
   }
 
@@ -173,9 +190,9 @@ PyObject *cyber_PyRecordReader_CurrentRawMessage(PyObject *self,
 PyObject *cyber_PyRecordReader_CurrentMessageTime(PyObject *self,
                                                   PyObject *args) {
   PyObject *pyobj_reader = nullptr;
-  if (!PyArg_ParseTuple(args,
-                        (char *)"O:cyber_PyRecordReader_CurrentMessageTime",
-                        &pyobj_reader)) {
+  if (!PyArg_ParseTuple(
+          args, const_cast<char *>("O:cyber_PyRecordReader_CurrentMessageTime"),
+          &pyobj_reader)) {
     return PyLong_FromLong(0);
   }
 
@@ -196,7 +213,8 @@ PyObject *cyber_PyRecordReader_GetMessageNumber(PyObject *self,
   PyObject *pyobj_reader = nullptr;
   char *channel_name = nullptr;
   Py_ssize_t len = 0;
-  if (!PyArg_ParseTuple(args, (char *)"Os:cyber_PyRecordReader_Open",
+  if (!PyArg_ParseTuple(args,
+                        const_cast<char *>("Os:cyber_PyRecordReader_Open"),
                         &pyobj_reader, &channel_name)) {
     AINFO << "PyRecordReader_GetMessageNumber:PyRecordReader failed!";
     return PyLong_FromLong(0);
@@ -218,8 +236,9 @@ PyObject *cyber_PyRecordReader_GetMessageType(PyObject *self, PyObject *args) {
   PyObject *pyobj_reader = nullptr;
   char *channel_name = nullptr;
   Py_ssize_t len = 0;
-  if (!PyArg_ParseTuple(args, (char *)"Os:cyber_PyRecordReader_GetMessageType",
-                        &pyobj_reader, &channel_name)) {
+  if (!PyArg_ParseTuple(
+          args, const_cast<char *>("Os:cyber_PyRecordReader_GetMessageType"),
+          &pyobj_reader, &channel_name)) {
     AINFO << "PyRecordReader_GetMessageType:PyRecordReader failed!";
     return PYOBJECT_NULL_STRING;
   }
@@ -240,7 +259,8 @@ PyObject *cyber_PyRecordReader_GetProtoDesc(PyObject *self, PyObject *args) {
   PyObject *pyobj_reader = nullptr;
   char *channel_name = nullptr;
   Py_ssize_t len = 0;
-  if (!PyArg_ParseTuple(args, (char *)"Os:cyber_PyRecordReader_Open",
+  if (!PyArg_ParseTuple(args,
+                        const_cast<char *>("Os:cyber_PyRecordReader_Open"),
                         &pyobj_reader, &channel_name)) {
     AINFO << "PyRecordReader_GetProtoDesc:PyRecordReader failed!";
     return PYOBJECT_NULL_STRING;
@@ -260,8 +280,9 @@ PyObject *cyber_PyRecordReader_GetProtoDesc(PyObject *self, PyObject *args) {
 
 PyObject *cyber_PyRecordReader_GetHeaderString(PyObject *self, PyObject *args) {
   PyObject *pyobj_reader = nullptr;
-  if (!PyArg_ParseTuple(args, (char *)"O:cyber_PyRecordReader_GetHeaderString",
-                        &pyobj_reader)) {
+  if (!PyArg_ParseTuple(
+          args, const_cast<char *>("O:cyber_PyRecordReader_GetHeaderString"),
+          &pyobj_reader)) {
     return PYOBJECT_NULL_STRING;
   }
 
@@ -277,7 +298,7 @@ PyObject *cyber_PyRecordReader_GetHeaderString(PyObject *self, PyObject *args) {
   return PyString_FromStringAndSize(header_string.c_str(),
                                     header_string.size());
 }
-///////////PyRecordWriter methed////////////////////////////
+
 PyObject *cyber_new_PyRecordWriter(PyObject *self, PyObject *args) {
   apollo::cybertron::record::PyRecordWriter *writer =
       new apollo::cybertron::record::PyRecordWriter();
@@ -288,7 +309,7 @@ PyObject *cyber_new_PyRecordWriter(PyObject *self, PyObject *args) {
 
 PyObject *cyber_delete_PyRecordWriter(PyObject *self, PyObject *args) {
   PyObject *pyobj_rec_writer = nullptr;
-  if (!PyArg_ParseTuple(args, (char *)"O:delete_PyRecordWriter",
+  if (!PyArg_ParseTuple(args, const_cast<char *>("O:delete_PyRecordWriter"),
                         &pyobj_rec_writer)) {
     return Py_None;
   }
@@ -308,7 +329,8 @@ PyObject *cyber_PyRecordWriter_Open(PyObject *self, PyObject *args) {
   PyObject *pyobj_rec_writer = nullptr;
   char *path = nullptr;
   Py_ssize_t len = 0;
-  if (!PyArg_ParseTuple(args, (char *)"Os#:cyber_PyRecordWriter_Open",
+  if (!PyArg_ParseTuple(args,
+                        const_cast<char *>("Os#:cyber_PyRecordWriter_Open"),
                         &pyobj_rec_writer, &path, &len)) {
     AERROR << "cyber_PyRecordWriter_Open:PyRecordWriter_Open failed!";
     Py_RETURN_FALSE;
@@ -332,7 +354,7 @@ PyObject *cyber_PyRecordWriter_Open(PyObject *self, PyObject *args) {
 
 PyObject *cyber_PyRecordWriter_Close(PyObject *self, PyObject *args) {
   PyObject *pyobj_rec_writer = nullptr;
-  if (!PyArg_ParseTuple(args, (char *)"O:delete_PyRecordWriter",
+  if (!PyArg_ParseTuple(args, const_cast<char *>("O:delete_PyRecordWriter"),
                         &pyobj_rec_writer)) {
     return Py_None;
   }
@@ -354,9 +376,9 @@ PyObject *cyber_PyRecordWriter_WriteChannel(PyObject *self, PyObject *args) {
   char *type = nullptr;
   char *proto_desc = nullptr;
   Py_ssize_t len = 0;
-  if (!PyArg_ParseTuple(args, (char *)"Osss#:cyber_PyRecordWriter_WriteChannel",
-                        &pyobj_rec_writer, &channel, &type, &proto_desc,
-                        &len)) {
+  if (!PyArg_ParseTuple(
+          args, const_cast<char *>("Osss#:cyber_PyRecordWriter_WriteChannel"),
+          &pyobj_rec_writer, &channel, &type, &proto_desc, &len)) {
     AERROR << "cyber_PyRecordWriter_WriteChannel parsetuple failed!";
     Py_RETURN_FALSE;
   }
@@ -382,9 +404,9 @@ PyObject *cyber_PyRecordWriter_WriteMessage(PyObject *self, PyObject *args) {
   char *rawmessage = nullptr;
   Py_ssize_t len = 0;
   uint64_t time = 0;
-  if (!PyArg_ParseTuple(args, (char *)"Oss#i:cyber_PyRecordWriter_WriteMessage",
-                        &pyobj_rec_writer, &channel_name, &rawmessage, &len,
-                        &time)) {
+  if (!PyArg_ParseTuple(
+          args, const_cast<char *>("Oss#i:cyber_PyRecordWriter_WriteMessage"),
+          &pyobj_rec_writer, &channel_name, &rawmessage, &len, &time)) {
     AINFO << "cyber_PyRecordWriter_WriteMessage parsetuple failed!";
     Py_RETURN_FALSE;
   }
@@ -403,9 +425,7 @@ PyObject *cyber_PyRecordWriter_WriteMessage(PyObject *self, PyObject *args) {
   }
   Py_RETURN_TRUE;
 }
-/////////////////////////////////////////////////////////////////////
-//// global for whole page, init module
-/////////////////////////////////////////////////////////////////////
+
 static PyMethodDef _cyber_record_methods[] = {
     // PyRecordReader fun
     {"new_PyRecordReader", cyber_new_PyRecordReader, METH_VARARGS, ""},

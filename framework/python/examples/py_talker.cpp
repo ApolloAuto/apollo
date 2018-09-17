@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,9 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include <memory>
+#include <string>
+
 #include "cybertron/cybertron.h"
 #include "cybertron/proto/chatter.pb.h"
 #include "cybertron/time/rate.h"
@@ -25,7 +28,7 @@ using apollo::cybertron::Time;
 using apollo::cybertron::proto::Chatter;
 
 using apollo::cybertron::message::PyMessageWrap;
-using namespace apollo::cybertron;
+
 int main(int argc, char *argv[]) {
   // init cybertron framework
   apollo::cybertron::Init("cyber_python");
