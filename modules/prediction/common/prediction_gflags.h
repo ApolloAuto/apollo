@@ -45,6 +45,9 @@ DECLARE_double(lane_search_radius);
 DECLARE_double(lane_search_radius_in_junction);
 DECLARE_double(junction_search_radius);
 
+// Scenario
+DECLARE_double(junction_distance_threshold);
+
 // Obstacle features
 DECLARE_bool(enable_kf_tracking);
 DECLARE_double(max_acc);

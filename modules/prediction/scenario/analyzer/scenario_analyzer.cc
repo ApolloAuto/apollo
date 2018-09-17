@@ -15,13 +15,14 @@
  *****************************************************************************/
 
 #include "modules/prediction/scenario/analyzer/scenario_analyzer.h"
+#include "modules/prediction/common/prediction_gflags.h"
 
 namespace apollo {
 namespace prediction {
 
 void ScenarioAnalyzer::Analyze(const ScenarioFeature& scenario_feature) {
   if (scenario_feature.has_junction_id() &&
-      scenario_feature.dist_to_junction() < 10.0) {  // TODO(kechxu) gflags
+      scenario_feature.dist_to_junction() < FLAGS_junction_distance_threshold) {
     scenario_.set_type(Scenario::JUNCTION);
   } else if (scenario_feature.has_curr_lane_id()) {
     scenario_.set_type(Scenario::CRUISE);
