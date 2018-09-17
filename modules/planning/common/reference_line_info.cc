@@ -289,19 +289,22 @@ PathObstacle* ReferenceLineInfo::AddObstacle(const Obstacle* obstacle) {
 bool ReferenceLineInfo::AddObstacles(
     const std::vector<const Obstacle*>& obstacles) {
   if (FLAGS_use_multi_thread_to_add_obstacles) {
-    auto task = apollo::cybertron::CreateTask<Obstacle>(
+    auto task = std::make_shared<apollo::cybertron::Task<Obstacle, bool>>(
         "planning_add_obstacles",
-        [this](const std::shared_ptr<Obstacle>& msg) {
-          this->AddObstacleHelper(msg);
+        [this](const std::shared_ptr<Obstacle>& msg) -> bool {
+          return this->AddObstacleHelper(msg);
         },
         FLAGS_max_planning_thread_pool_size);
 
-    std::vector<std::future<void>> results;
+    std::vector<std::future<bool>> results;
     for (const auto* obstacle : obstacles) {
       results.push_back(task->Execute(std::make_shared<Obstacle>(*obstacle)));
     }
     for (auto& result : results) {
-      result.get();
+      if (!result.get()) {
+        AERROR << "Fail to add obstacles.";
+        return false;
+      }
     }
   } else {
     for (const auto* obstacle : obstacles) {
