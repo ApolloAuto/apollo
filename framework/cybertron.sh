@@ -94,7 +94,6 @@ function build() {
     cd build
     cmake .. ${CMAKE_OPTIONS}
     make install -j${CORE_NUM} -l${CORE_NUM} || exit $?
-    build_py
 }
 
 function build_fast() {
@@ -106,18 +105,6 @@ function build_fast() {
         cd build
         make install -j${CORE_NUM} -l${CORE_NUM} || exit $?
     fi
-}
-
-function build_py() {
-    info "start build py"
-    cp -rf ${CYBERTRON_DIR}/python/cybertron/* ${CYBERTRON_DIR}/install/lib/python/cybertron && \
-    cp -rf ${CYBERTRON_DIR}/python/examples ${CYBERTRON_DIR}/install/lib/python && \
-    cp -rf ${CYBERTRON_DIR}/python/test ${CYBERTRON_DIR}/install/lib/python
-    PROTO_PATH=${CYBERTRON_DIR}/install/lib/python/proto/
-    if [[ ! -d ${PROTO_PATH} ]]; then
-        mkdir ${PROTO_PATH}
-    fi
-    find ${CYBERTRON_DIR}/cybertron/proto/ -name "*.py" | xargs -i cp -f {} ${PROTO_PATH}
 }
 
 function build_cov() {
@@ -475,9 +462,6 @@ function main() {
         ;;
         show_cov)
             show_cov
-        ;;
-        build_py)
-            build_py
         ;;
         doc)
             gen_doc
