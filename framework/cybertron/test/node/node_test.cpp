@@ -31,7 +31,6 @@ TEST(NodeTest, constructor) {
 
 TEST(NodeTest, create_writer_with_channel_name) {
   Node node("create_writer_with_channel_name");
-
   auto writer = node.CreateWriter<proto::UnitTest>("channel");
   ASSERT_TRUE(writer != nullptr);
   EXPECT_EQ(writer->GetChannelName(), "channel");
@@ -106,6 +105,29 @@ TEST(NodeTest, create_client) {
   auto client =
       node.CreateClient<proto::UnitTest, proto::UnitTest>("create_client");
   ASSERT_TRUE(client != nullptr);
+}
+
+TEST(NodeTest, observe) {
+  Node node("observe");
+  auto reader = node.CreateReader<proto::UnitTest>("test_reader", nullptr);
+  ASSERT_EQ(node.GetReader<proto::UnitTest>("test_reader"), reader);
+
+  node.Observe();
+  EXPECT_TRUE(reader->Empty());
+  EXPECT_FALSE(reader->HasReceived());
+
+  auto msg = std::make_shared<proto::UnitTest>();
+  msg->set_case_name("test_observe");
+  reader->Enqueue(msg);
+  EXPECT_TRUE(reader->Empty());
+  EXPECT_TRUE(reader->HasReceived());
+
+  node.Observe();
+  EXPECT_FALSE(reader->Empty());
+
+  node.ClearData();
+  EXPECT_TRUE(reader->Empty());
+  EXPECT_FALSE(reader->HasReceived());
 }
 
 }  // namespace cybertron
