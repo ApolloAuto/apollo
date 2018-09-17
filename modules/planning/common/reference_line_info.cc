@@ -300,7 +300,7 @@ bool ReferenceLineInfo::AddObstacles(
     for (const auto* obstacle : obstacles) {
       results.push_back(task->Execute(std::make_shared<Obstacle>(*obstacle)));
     }
-    for (auto& result: results) {
+    for (auto& result : results) {
       result.get();
     }
   } else {
