@@ -33,7 +33,7 @@ cc_test(
         "//modules/common/adapters/proto:adapter_config_proto",
         "//modules/common/time",
         "@gtest//:main",
-        "@ros//:ros_common",
+        # "@ros//:ros_common",
     ],
 )
 

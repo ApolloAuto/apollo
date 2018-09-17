@@ -18,7 +18,7 @@
 
 #include <cmath>
 
-#include "ros/include/ros/ros.h"
+// #include "ros/include/ros/ros.h"
 
 #include "modules/common/adapters/proto/adapter_config.pb.h"
 

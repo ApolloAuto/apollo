@@ -14,6 +14,29 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "cybertron/init.h"
 #include "modules/dreamview/backend/dreamview.h"
 
-APOLLO_MAIN(apollo::dreamview::Dreamview);
+int main(int argc, char *argv[]) {
+  google::ParseCommandLineFlags(&argc, &argv, true);
+  apollo::cybertron::Init(argv[0]);
+
+  apollo::dreamview::Dreamview dreamview_;
+  const bool init = dreamview_.Init().ok() && dreamview_.Start().ok();
+  if (!init) {
+    AERROR << "Failed to initialize dreamview server";
+    return 0;
+  }
+
+  uint64_t count = 0;
+  auto timer = apollo::cybertron::Timer(100,
+                                        [&count]() {
+                                          AINFO << "timer shot count: "
+                                                << count;
+                                          count++;
+                                        },
+                                        false);
+  timer.Start();
+  apollo::cybertron::WaitForShutdown();
+  return 0;
+}
