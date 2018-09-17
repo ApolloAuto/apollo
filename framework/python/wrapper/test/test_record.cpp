@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,19 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include <string>
+
 #include "cybertron/cybertron.h"
 #include "cybertron/proto/chatter.pb.h"
 #include "gtest/gtest.h"
 #include "python/wrapper/py_record.h"
 
-const std::string TEST_RECORD_FILE = "test02.record";
-const std::string CHAN_1 = "channel/chatter";
-const std::string CHAN_2 = "/test2";
-const std::string MSG_TYPE = "apollo.cybertron.proto.Test";
-const std::string STR_10B = "1234567890";
-const std::string TEST_FILE = "test.record";
+const char TEST_RECORD_FILE[] = "test02.record";
+const char CHAN_1[] = "channel/chatter";
+const char CHAN_2[] = "/test2";
+const char MSG_TYPE[] = "apollo.cybertron.proto.Test";
+const char STR_10B[] = "1234567890";
+const char TEST_FILE[] = "test.record";
 
 TEST(CyberRecordTest, record_readerwriter) {
   apollo::cybertron::record::PyRecordWriter rec_writer;
