@@ -147,7 +147,7 @@ void IntegrationTestBase::SetUp() {
   Clock::SetMode(Clock::CYBERTRON);
   apollo::cybertron::Init(node_name);
   CHECK(FeedTestData()) << "Failed to feed test data";
-  // planning_.reset(new PlanningComponent());
+  planning_.reset(new PlanningComponent());
 }
 
 void IntegrationTestBase::UpdateData() {

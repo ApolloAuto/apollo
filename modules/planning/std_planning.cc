@@ -80,7 +80,9 @@ bool IsDifferentRouting(const RoutingResponse& first,
 }  // namespace
 
 StdPlanning::~StdPlanning() {
-  reference_line_provider_->Stop();
+  if (reference_line_provider_) {
+    reference_line_provider_->Stop();
+  }
   last_publishable_trajectory_.reset(nullptr);
   frame_.reset(nullptr);
   planner_.reset(nullptr);
