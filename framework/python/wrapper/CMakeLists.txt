@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8.3)
 project(python_wrapper)
 
 # python install path
-set(CYBER_PYTHON_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/lib/python/cybertron)
+set(CYBER_PYTHON_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/lib/python)
 
 add_compile_options(-g)
 

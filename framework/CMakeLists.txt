@@ -89,11 +89,5 @@ install(DIRECTORY "cybertron"
   PATTERN "*.h"
   )
 
-install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/cybertron"
-  DESTINATION "include"
-  FILES_MATCHING
-  PATTERN "*.pb.h"
-  )
-
 enable_testing()
 #add_subdirectory(cybertron/test)
