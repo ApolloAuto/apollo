@@ -80,10 +80,6 @@ bool PlanningComponent::Proc(
   // check and process possible rerouting request
   Rerouting();
 
-  if (!CheckInput()) {
-    return false;
-  }
-
   // process fused input data
   local_view_.prediction_obstacles = prediction_obstacles;
   local_view_.chassis = chassis;
@@ -97,6 +93,10 @@ bool PlanningComponent::Proc(
     std::lock_guard<std::mutex> lock(mutex_);
     local_view_.traffic_light =
         std::make_shared<TrafficLightDetection>(traffic_light_);
+  }
+
+  if (!CheckInput()) {
+    return false;
   }
 
   ADCTrajectory adc_trajectory_pb;
@@ -130,7 +130,7 @@ bool PlanningComponent::CheckInput() {
     not_ready->set_reason("localization not ready");
   } else if (local_view_.chassis == nullptr) {
     not_ready->set_reason("chassis not ready");
-  } else if (local_view_.routing == nullptr) {
+  } else if (!local_view_.routing->has_header()) {
     not_ready->set_reason("routing not ready");
   } else if (HDMapUtil::BaseMapPtr() == nullptr) {
     not_ready->set_reason("map not ready");
