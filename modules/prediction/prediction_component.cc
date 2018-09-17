@@ -32,6 +32,7 @@
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_map.h"
 #include "modules/prediction/common/validation_checker.h"
+#include "modules/prediction/scenario/scenario_manager.h"
 #include "modules/prediction/container/container_manager.h"
 #include "modules/prediction/container/obstacles/obstacles_container.h"
 #include "modules/prediction/container/pose/pose_container.h"
@@ -232,6 +233,9 @@ bool PredictionComponent::Proc(
           AdapterConfig::PERCEPTION_OBSTACLES));
   CHECK_NOTNULL(obstacles_container);
   obstacles_container->Insert(*perception_obstacles);
+
+  // Scenario analysis
+  ScenarioManager::Instance()->Run();
 
   obstacles_container->BuildLaneGraph();
 
