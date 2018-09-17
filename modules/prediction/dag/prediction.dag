@@ -17,12 +17,6 @@ module_config {
                     qos_profile: {
                         depth : 1
                     }
-                },
-                {
-                    channel: "/apollo/planning"
-                    qos_profile: {
-                        depth : 1
-                    }
                 }
             ]
         }

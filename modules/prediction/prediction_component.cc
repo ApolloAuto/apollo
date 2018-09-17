@@ -125,7 +125,7 @@ bool PredictionComponent::Init() {
   }
 
   planning_reader_ = node_->CreateReader<ADCTrajectory>(
-     prediction_conf_.planning_trajectory_channel(),
+     FLAGS_planning_trajectory_topic,
      [this](const std::shared_ptr<ADCTrajectory>& adc_trajectory) {
          ADEBUG << "Received planning data: run planning callback.";
          std::lock_guard<std::mutex> lock(mutex_);
