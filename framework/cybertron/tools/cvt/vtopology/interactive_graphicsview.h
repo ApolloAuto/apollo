@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef INTERACTIVEGRAPHICSVIEW_H
-#define INTERACTIVEGRAPHICSVIEW_H
+#ifndef TOOLS_CVT_VTOPOLOGY_INTERACTIVEGRAPHICSVIEW_H_
+#define TOOLS_CVT_VTOPOLOGY_INTERACTIVEGRAPHICSVIEW_H_
 
 #include <QGraphicsView>
 

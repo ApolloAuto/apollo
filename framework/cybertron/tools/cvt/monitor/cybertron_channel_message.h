@@ -14,15 +14,16 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef CYBERTRONCHANNELMESSAGE_H
-#define CYBERTRONCHANNELMESSAGE_H
+#ifndef TOOLS_CVT_MONITOR_CYBERTRON_CHANNEL_MESSAGE_H_
+#define TOOLS_CVT_MONITOR_CYBERTRON_CHANNEL_MESSAGE_H_
 
-#include <cybertron/cybertron.h>
-#include <fstream>
-#include <mutex>
 #include "cybertron/time/duration.h"
 #include "cybertron/time/time.h"
 #include "renderable_message.h"
+#include "cybertron/cybertron.h"
+
+#include <fstream>
+#include <mutex>
 
 class Screen;
 
@@ -92,7 +93,7 @@ class ChannelMessage : public RenderableMessage {
   bool has_message_come(void) const { return has_message_come_; }
 
   double frame_ratio(void) {
-    if (!has_message_come()) return 0.0;
+    if(!has_message_come()) return 0.0;
     apollo::cybertron::Time curTime = apollo::cybertron::Time::Now();
     auto deltaTime = curTime - last_time_;
 
@@ -107,13 +108,13 @@ class ChannelMessage : public RenderableMessage {
 
   const std::string& NodeName(void) const { return channel_node_->Name(); }
 
-  void addReader(const std::string& reader) { readers_.push_back(reader); }
-  void delReader(const std::string& reader) { DoDelete(readers_, reader); }
+  void add_reader(const std::string& reader) { readers_.push_back(reader); }
+  void del_reader(const std::string& reader) { DoDelete(readers_, reader); }
 
-  void addWriter(const std::string& writer) { writers_.push_back(writer); }
-  void delWriter(const std::string& writer) {
-    DoDelete(writers_, writer);
-    if (!writers_.size()) {
+  void add_writer(const std::string& writer) { writers_.push_back(writer); }
+  void del_writer(const std::string& writer) { 
+    DoDelete(writers_, writer); 
+    if(!writers_.size()){
       set_has_message_come(false);
     }
   }
@@ -128,7 +129,7 @@ class ChannelMessage : public RenderableMessage {
     }
   }
 
-  void set_has_message_come(bool b) { has_message_come_ = b; }
+  void set_has_message_come(bool b){ has_message_come_ = b; }
 
   bool has_message_come_;
   std::string message_type_;
@@ -176,35 +177,35 @@ class CybertronChannelMessage : public ChannelMessage {
   mutable std::mutex inner_lock_;
 };
 
-#define RegisterChannelMsgClass(ChannelMsgSubClass, MessageType)            \
-  static ChannelMessage* Instance(const std::string& channelName,           \
-                                  const std::string& nodeName) {            \
-    ChannelMessage* ret = castErrorCode2Ptr(ErrorCode::NewSubClassFailed);  \
-    ChannelMsgSubClass* subClass = new ChannelMsgSubClass();                \
-    if (subClass) {                                                         \
-      ret = subClass;                                                       \
-      subClass->channel_node_ = apollo::cybertron::CreateNode(nodeName);    \
-      if (subClass->channel_node_ == nullptr) {                             \
-        delete subClass;                                                    \
-        subClass = nullptr;                                                 \
-        ret = castErrorCode2Ptr(ErrorCode::CreateNodeFailed);               \
-      } else {                                                              \
-        auto callBack =                                                     \
-            [subClass](const std::shared_ptr<MessageType>& rawMsg) {        \
-              subClass->updateRawMessage(rawMsg);                           \
-            };                                                              \
-        subClass->channel_reader_ =                                         \
-            subClass->channel_node_->CreateReader<MessageType>(channelName, \
-                                                               callBack);   \
-        if (subClass->channel_reader_ == nullptr) {                         \
-          subClass->channel_node_.reset();                                  \
-          delete subClass;                                                  \
-          subClass = nullptr;                                               \
-          ret = castErrorCode2Ptr(ErrorCode::CreateReaderFailed);           \
-        }                                                                   \
-      }                                                                     \
-    }                                                                       \
-    return ret;                                                             \
+#define RegisterChannelMsgClass(ChannelMsgSubClass, MessageType)              \
+  static ChannelMessage* Instance(const std::string& channelName,             \
+                                  const std::string& nodeName) {              \
+    ChannelMessage* ret = castErrorCode2Ptr(ErrorCode::NewSubClassFailed);    \
+    ChannelMsgSubClass* subClass = new ChannelMsgSubClass();                  \
+    if (subClass) {                                                           \
+      ret = subClass;                                                         \
+      subClass->channel_node_ = apollo::cybertron::CreateNode(nodeName);      \
+      if (subClass->channel_node_ == nullptr) {                               \
+        delete subClass;                                                      \
+        subClass = nullptr;                                                   \
+        ret = castErrorCode2Ptr(ErrorCode::CreateNodeFailed);                 \
+      } else {                                                                \
+        auto callBack =                                                       \
+            [subClass](const std::shared_ptr<MessageType>& rawMsg) {          \
+              subClass->updateRawMessage(rawMsg);                             \
+            };                                                                \
+        subClass->channel_reader_ =                                           \
+            subClass->channel_node_->CreateReader<MessageType>(channelName,   \
+                                                               callBack);     \
+        if (subClass->channel_reader_ == nullptr) {                           \
+          subClass->channel_node_.reset();                                    \
+          delete subClass;                                                    \
+          subClass = nullptr;                                                 \
+          ret = castErrorCode2Ptr(ErrorCode::CreateReaderFailed);             \
+        }                                                                     \
+      }                                                                       \
+    }                                                                         \
+    return ret;                                                               \
   }
 
 #define BegDefineChannelMsgSubClass(SubClassName, MessageType)              \
@@ -220,4 +221,4 @@ class CybertronChannelMessage : public ChannelMessage {
 
 #define EndDefineChannelMsgSubClass(SubClassName) } /* SubClassName */
 
-#endif  // CYBERTRONCHANNELMESSAGE_H
+#endif  // TOOLS_CVT_MONITOR_CYBERTRON_CHANNEL_MESSAGE_H_

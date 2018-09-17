@@ -15,11 +15,12 @@
  *****************************************************************************/
 
 #include "time_line_row.h"
-#include <QGraphicsScene>
-#include <iostream>
 #include "time_block_item.h"
 #include "time_block_item_pool.h"
 #include "time_line_scene.h"
+
+#include <QGraphicsScene>
+#include <iostream>
 
 TimeLineRow::TimeLineRow(QGraphicsItem *parent, const QString &rowName)
     : QGraphicsItemGroup(parent), _headerText(rowName), _backgroud() {

@@ -15,12 +15,13 @@
  *****************************************************************************/
 
 #include "find_widget.h"
-#include <QRegExp>
-#include <memory>
 #include "ui_find_event_id.h"
 #include "ui_find_timelength.h"
 #include "ui_find_timepoint.h"
 #include "ui_find_widget.h"
+
+#include <QRegExp>
+#include <memory>
 
 namespace {
 

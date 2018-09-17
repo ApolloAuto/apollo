@@ -14,13 +14,13 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef TIMELINETABLE_H
-#define TIMELINETABLE_H
+#ifndef TOOLS_CVT_VPERF_TIMELINETABLE_H_
+#define TOOLS_CVT_VPERF_TIMELINETABLE_H_
 
+#include "perf_data_base.h"
 #include <QGraphicsItemGroup>
 #include <QGraphicsRectItem>
 #include <QList>
-#include "perf_data_base.h"
 
 class TimeLineRow;
 

@@ -14,25 +14,25 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef UNKNOWNMESSAGE_H
-#define UNKNOWNMESSAGE_H
+#ifndef TOOLS_CVT_MONITOR_GENERAL_MESSAGE_H_
+#define TOOLS_CVT_MONITOR_GENERAL_MESSAGE_H_
 
-#include <cybertron/message/raw_message.h>
 #include "cybertron_channel_message.h"
+#include <cybertron/message/raw_message.h>
 
-BegDefineChannelMsgSubClass(UnknownMessage,
+BegDefineChannelMsgSubClass(GeneralMessage,
                             apollo::cybertron::message::RawMessage),
     current_state_(State::ShowDebugString), page_index_(0) {}
 
 void RenderDebugString(const Screen* s, int key);
 void RenderInfo(const Screen* s, int key);
-void splitPages(int key);
+void SplitPages(int key);
 
 enum class State { ShowDebugString, ShowInfo } current_state_;
 
 int pages_;
 int page_index_;
 
-EndDefineChannelMsgSubClass(UnknownMessage);
+EndDefineChannelMsgSubClass(GeneralMessage);
 
-#endif  // UNKNOWNMESSAGE_H
+#endif  // TOOLS_CVT_MONITOR_GENERAL_MESSAGE_H_

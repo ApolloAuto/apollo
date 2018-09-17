@@ -15,6 +15,13 @@
  *****************************************************************************/
 
 #include "time_line_scene.h"
+#include "time_block_item.h"
+#include "time_line_axis.h"
+#include "time_line_legend.h"
+#include "time_line_legend_item.h"
+#include "time_line_table.h"
+#include "time_line_view.h"
+
 #include <QGraphicsSceneMouseEvent>
 #include <QGraphicsSceneWheelEvent>
 #include <QGraphicsView>
@@ -24,12 +31,6 @@
 #include <cstdlib>
 #include <ctime>
 #include <iostream>
-#include "time_block_item.h"
-#include "time_line_axis.h"
-#include "time_line_legend.h"
-#include "time_line_legend_item.h"
-#include "time_line_table.h"
-#include "time_line_view.h"
 
 namespace {
 

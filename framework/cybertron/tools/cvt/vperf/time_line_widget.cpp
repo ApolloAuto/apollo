@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ * Copyright 2017 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,6 @@
  *****************************************************************************/
 
 #include "time_line_widget.h"
-#include <QAction>
-#include <QMenu>
-#include <QWheelEvent>
-#include <iostream>
 #include "has_data_come_event.h"
 #include "perf_data_base.h"
 #include "time_block_item.h"
@@ -30,6 +26,11 @@
 #include "ui_find_timepoint.h"
 #include "ui_find_widget.h"
 #include "ui_time_line_widget.h"
+
+#include <QAction>
+#include <QMenu>
+#include <QWheelEvent>
+#include <iostream>
 
 TimeLineWidget::TimeLineWidget(QWidget *parent)
     : QWidget(parent),

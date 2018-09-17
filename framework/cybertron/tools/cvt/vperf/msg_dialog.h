@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MESSAGEDIALOG_H
-#define MESSAGEDIALOG_H
+#ifndef TOOLS_CVT_VPERF_MESSAGEDIALOG_H_
+#define TOOLS_CVT_VPERF_MESSAGEDIALOG_H_
 
 #include <QDialog>
 

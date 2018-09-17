@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef TARGETCAMERA_H
-#define TARGETCAMERA_H
+#ifndef TOOLS_CVT_VISUALIZER_TARGETCAMERA_H_
+#define TOOLS_CVT_VISUALIZER_TARGETCAMERA_H_
 
 #include "abstract_camera.h"
 
@@ -56,4 +56,4 @@ class TargetCamera : public AbstractCamera {
   float distance_;
 };
 
-#endif  // TARGETCAMERA_H
+#endif  // TOOLS_CVT_VISUALIZER_TARGETCAMERA_H_

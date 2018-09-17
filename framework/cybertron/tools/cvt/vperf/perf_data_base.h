@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef PERFDATABASE_H
-#define PERFDATABASE_H
+#ifndef TOOLS_CVT_VPERF_PERFDATABASE_H_
+#define TOOLS_CVT_VPERF_PERFDATABASE_H_
 
 #include <cstdint>
 #include <list>
@@ -248,4 +248,4 @@ class PerfDatabase {
   std::vector<PerfBlockDatabase*> _datum;
 };
 
-#endif  // PERFDATABASE_H
+#endif  // TOOLS_CVT_VPERF_PERFDATABASE_H_

@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef TIMELINEVIEW_H
-#define TIMELINEVIEW_H
+#ifndef TOOLS_CVT_VPERF_TIMELINEVIEW_H_
+#define TOOLS_CVT_VPERF_TIMELINEVIEW_H_
 
 #include <QGraphicsView>
 

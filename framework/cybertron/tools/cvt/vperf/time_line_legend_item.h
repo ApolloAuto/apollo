@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef TIMELINELEGENDITEM_H
-#define TIMELINELEGENDITEM_H
+#ifndef TOOLS_CVT_VPERF_TIMELINELEGENDITEM_H_
+#define TOOLS_CVT_VPERF_TIMELINELEGENDITEM_H_
 
 #include <QBrush>
 #include <QGraphicsItemGroup>

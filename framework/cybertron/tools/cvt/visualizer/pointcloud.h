@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef POINTCLOUD_H
-#define POINTCLOUD_H
+#ifndef TOOLS_CVT_VISUALIZER_POINTCLOUD_H_
+#define TOOLS_CVT_VISUALIZER_POINTCLOUD_H_
 
 #include <sensor_pointcloud.pb.h>
 #include "renderable_object.h"
@@ -40,4 +40,4 @@ class PointCloud : public RenderableObject {
   GLfloat* buffer_;
 };
 
-#endif  // POINTCLOUD_H
+#endif  // TOOLS_CVT_VISUALIZER_POINTCLOUD_H_

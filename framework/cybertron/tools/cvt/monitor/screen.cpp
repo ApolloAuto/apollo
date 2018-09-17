@@ -15,6 +15,8 @@
  *****************************************************************************/
 
 #include "screen.h"
+#include "renderable_message.h"
+
 #include <ncurses.h>
 #include <unistd.h>
 #include <cstdio>
@@ -22,7 +24,6 @@
 #include <iostream>
 #include <mutex>
 #include <string>
-#include "messages/renderable_message.h"
 
 Screen* Screen::Instance(void) {
   static Screen s;

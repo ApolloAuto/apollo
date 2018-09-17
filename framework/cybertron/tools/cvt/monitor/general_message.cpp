@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "unknown_message.h"
+#include "general_message.h"
 #include "screen.h"
 
 #include <cybertron/message/raw_message.h>
@@ -22,19 +22,23 @@
 #include <iomanip>
 #include <sstream>
 
-namespace {
-constexpr int ReaderWriterOffset = 4;
-int lineCount(const std::string& str) {
-  int ret = 0;
-  for (int i = 0; i < str.length(); ++i) {
-    if (str.at(i) == '\n') ++ret;
+namespace{
+  constexpr int ReaderWriterOffset = 4;
+  constexpr int PageItemCountOffset = 3;
+  int lineCount(const std::string& str)
+  {
+    int ret = 0;
+    for(int i = 0; i < str.length(); ++i)
+    {
+      if(str.at(i) == '\n')
+        ++ret;
+    }
+
+    return ret + 1;
   }
-
-  return ret + 1;
-}
 }
 
-void UnknownMessage::Render(const Screen* s, int key) {
+void GeneralMessage::Render(const Screen *s, int key) {
   switch (key) {
     case 'b':
     case 'B':
@@ -56,8 +60,9 @@ void UnknownMessage::Render(const Screen* s, int key) {
   }
 }
 
-void UnknownMessage::splitPages(int key) {
-  switch (key) {
+void GeneralMessage::SplitPages(int key)
+{
+    switch(key){
     case CTRL('d'):
     case KEY_NPAGE:
       ++page_index_;
@@ -70,20 +75,20 @@ void UnknownMessage::splitPages(int key) {
       if (page_index_ < 1) page_index_ = 0;
       break;
     default:;
-  }
+    }
 }
 
-void UnknownMessage::RenderInfo(const Screen* s, int key) {
-  int pageItemCount = s->Height() - 3;
-  pages_ = (readers_.size() + writers_.size() + 3) / pageItemCount + 1;
-  splitPages(key);
+void GeneralMessage::RenderInfo(const Screen *s, int key) {
+  int pageItemCount = s->Height() - PageItemCountOffset;
+  pages_ = (readers_.size() + writers_.size() + PageItemCountOffset)/pageItemCount + 1;
+  SplitPages(key);
 
   bool hasReader = true;
-  std::vector<std::string>* vec = &readers_;
+  std::vector< std::string >* vec = &readers_;
 
   auto iter = vec->cbegin();
   int y = page_index_ * pageItemCount;
-  if (y < vec->size()) {
+  if(y < vec->size()){
     while (y < page_index_ * pageItemCount) {
       ++iter;
       ++y;
@@ -92,7 +97,8 @@ void UnknownMessage::RenderInfo(const Screen* s, int key) {
     y -= vec->size();
     vec = &writers_;
     iter = vec->cbegin();
-    while (y) {
+    while(y)
+    {
       ++iter;
       --y;
     }
@@ -110,15 +116,16 @@ void UnknownMessage::RenderInfo(const Screen* s, int key) {
   s->AddStr(0, y++, "MessageType: ");
   s->AddStr(message_type().c_str());
 
-  y++;
+  ++y;
 
-  if (hasReader) {
+  if(hasReader)
+  {
     s->AddStr(0, y++, "Readers:");
     for (; iter != vec->cend(); ++iter) {
       s->AddStr(ReaderWriterOffset, y++, iter->c_str());
     }
 
-    y++;
+    ++y;
     vec = &writers_;
     iter = vec->cbegin();
   }
@@ -131,7 +138,7 @@ void UnknownMessage::RenderInfo(const Screen* s, int key) {
   s->ClearCurrentColor(Screen::WHITE_BLACK);
 }
 
-void UnknownMessage::RenderDebugString(const Screen* s, int key) {
+void GeneralMessage::RenderDebugString(const Screen *s, int key) {
   unsigned y = 0;
 
   s->SetCurrentColor(Screen::WHITE_BLACK);
@@ -141,9 +148,10 @@ void UnknownMessage::RenderDebugString(const Screen* s, int key) {
 
   s->AddStr(0, y++, "MessageType: ");
   s->AddStr(message_type().c_str());
-  y++;
+  ++y;
 
   if (has_message_come()) {
+
     auto rawFactory = apollo::cybertron::message::ProtobufFactory::Instance();
     auto rawMsg = rawFactory->GenerateMessageByType(message_type());
 
@@ -162,13 +170,14 @@ void UnknownMessage::RenderDebugString(const Screen* s, int key) {
         std::string debugStr = rawMsg->DebugString();
 
         int pageItemCount = s->Height() - 4;
-        pages_ = lineCount(debugStr) / pageItemCount + 1;
-        splitPages(key);
+        pages_ = lineCount(debugStr)/pageItemCount + 1;
+        SplitPages(key);
         int jumpline = page_index_ * pageItemCount;
         const char* ptr = debugStr.c_str();
-        while (*ptr != '\0') {
-          if (*ptr == '\n') --jumpline;
-          if (!jumpline) break;
+        while(*ptr != '\0')
+        { 
+          if(*ptr == '\n') --jumpline;
+          if(!jumpline) break;
           ++ptr;
         }
 

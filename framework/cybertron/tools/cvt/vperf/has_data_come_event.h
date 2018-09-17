@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef HASDATACOMEEVENT_H
-#define HASDATACOMEEVENT_H
+#ifndef TOOLS_CVT_VPERF_HASDATACOMEEVENT_H_
+#define TOOLS_CVT_VPERF_HASDATACOMEEVENT_H_
 
 #include <QEvent>
 
@@ -35,4 +35,4 @@ class HasDataComeEvent : public QEvent {
   int _dataBlockIndex;
 };
 
-#endif  // HASDATACOMEEVENT_H
+#endif  // TOOLS_CVT_VPERF_HASDATACOMEEVENT_H_

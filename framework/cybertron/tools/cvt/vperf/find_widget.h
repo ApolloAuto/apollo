@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef FIND_WIDGET_H
-#define FIND_WIDGET_H
+#ifndef TOOLS_CVT_VPERF_FIND_WIDGET_H_
+#define TOOLS_CVT_VPERF_FIND_WIDGET_H_
 
 #include <QWidget>
 
@@ -63,4 +63,4 @@ class FindWidget : public QWidget {
   friend class TimeLineWidget;
 };
 
-#endif  // FIND_WIDGET_H
+#endif  // TOOLS_CVT_VPERF_FIND_WIDGET_H_

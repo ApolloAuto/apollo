@@ -82,7 +82,7 @@ void CybertronTopologyMessage::TopologyChanged(
 
   if (::apollo::cybertron::proto::OperateType::OPT_JOIN ==
       changeMsg.operate_type()) {
-    if (CybertronChannelMsgFactory::Instance()->isFromHere(nodeName)) {
+    if (ChannelMsgFactory::Instance()->isFromHere(nodeName)) {
       return;
     }
 
@@ -96,20 +96,20 @@ void CybertronTopologyMessage::TopologyChanged(
 
         if (iter == all_channels_map_.cend()) {
           ChannelMessage* channelMsg =
-              CybertronChannelMsgFactory::Instance()->CreateChannelMessage(
+              ChannelMsgFactory::Instance()->CreateChannelMessage(
                   msgTypeName, channelName);
 
           if (!ChannelMessage::isErrorCode(channelMsg)) {
             channelMsg->set_parent(this);
             channelMsg->set_message_type(msgTypeName);
 
-            channelMsg->addReader(channelMsg->NodeName());
+            channelMsg->add_reader(channelMsg->NodeName());
 
             if (::apollo::cybertron::proto::RoleType::ROLE_WRITER ==
                 changeMsg.role_type()) {
-              channelMsg->addWriter(nodeName);
+              channelMsg->add_writer(nodeName);
             } else {
-              channelMsg->addReader(nodeName);
+              channelMsg->add_reader(nodeName);
             }
           }
 
@@ -118,11 +118,11 @@ void CybertronTopologyMessage::TopologyChanged(
           if (!ChannelMessage::isErrorCode(iter->second)) {
             if (::apollo::cybertron::proto::RoleType::ROLE_WRITER ==
                 changeMsg.role_type()) {
-              iter->second->addWriter(nodeName);
+              iter->second->add_writer(nodeName);
             }
             if (::apollo::cybertron::proto::RoleType::ROLE_READER ==
                 changeMsg.role_type()) {
-              iter->second->addReader(nodeName);
+              iter->second->add_reader(nodeName);
             }
           }
         }
@@ -137,11 +137,11 @@ void CybertronTopologyMessage::TopologyChanged(
           !ChannelMessage::isErrorCode(iter->second)) {
         if (::apollo::cybertron::proto::RoleType::ROLE_WRITER ==
             changeMsg.role_type()) {
-          iter->second->delWriter(nodeName);
+          iter->second->del_writer(nodeName);
         }
         if (::apollo::cybertron::proto::RoleType::ROLE_READER ==
             changeMsg.role_type()) {
-          iter->second->delReader(nodeName);
+          iter->second->del_reader(nodeName);
         }
       }
     }
