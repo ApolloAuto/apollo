@@ -72,7 +72,7 @@ bool ControlComponent::Init() {
       });
 
   trajectory_reader_ = node_->CreateReader<ADCTrajectory>(
-      control_conf_.chassis_channel(),
+      control_conf_.planning_channel(),
       [this](const std::shared_ptr<ADCTrajectory> &trajectory) {
         ADEBUG << "Received chassis data: run trajectory callback.";
         std::lock_guard<std::mutex> lock(mutex_);
