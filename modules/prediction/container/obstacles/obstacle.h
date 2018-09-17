@@ -151,6 +151,11 @@ class Obstacle {
   bool IsNearJunction();
 
   /**
+   * @brief Build obstacle's lane graph
+   */
+  void BuildLaneGraph();
+
+  /**
    * @brief Set RNN state
    * @param RNN state matrix
    */
@@ -220,8 +225,6 @@ class Obstacle {
   void SetCurrentLanes(Feature* feature);
 
   void SetNearbyLanes(Feature* feature);
-
-  void SetLaneGraphFeature(Feature* feature);
 
   void SetLanePoints(Feature* feature);
 

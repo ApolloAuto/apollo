@@ -54,6 +54,7 @@ TEST_F(SequencePredictorTest, General) {
   MLPEvaluator mlp_evaluator;
   ObstaclesContainer container;
   container.Insert(perception_obstacles_);
+  container.BuildLaneGraph();
   Obstacle* obstacle_ptr = container.GetObstacle(1);
   EXPECT_TRUE(obstacle_ptr != nullptr);
   mlp_evaluator.Evaluate(obstacle_ptr);
