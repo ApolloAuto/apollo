@@ -19,8 +19,7 @@
 import sys
 
 sys.path.append("../")
-from cybertron import node
-from cybertron import init
+from cybertron import cybertron
 from proto import chatter_pb2
 
 def callback(data):
@@ -37,12 +36,12 @@ def test_listener_class():
     reader message.
     """
     print "=" * 120
-    test_node = node.Node("listener")
+    test_node = cybertron.Node("listener")
     test_node.create_reader("channel/chatter",
             chatter_pb2.Chatter, callback)
     test_node.spin()
 
 if __name__ == '__main__':
-    init.init()
+    cybertron.init()
     test_listener_class()
-    init.shutdown()
+    cybertron.shutdown()
