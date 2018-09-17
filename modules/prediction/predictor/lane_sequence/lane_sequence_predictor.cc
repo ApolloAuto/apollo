@@ -83,7 +83,7 @@ void LaneSequencePredictor::Predict(Obstacle* obstacle) {
     }
 
     if (FLAGS_enable_trajectory_validation_check &&
-        !ValidationChecker::ValidCentripedalAcceleration(points)) {
+        !ValidationChecker::ValidCentripetalAcceleration(points)) {
       continue;
     }
 

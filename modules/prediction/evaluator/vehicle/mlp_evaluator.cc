@@ -88,7 +88,7 @@ void MLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     double probability = ComputeProbability(feature_values);
 
     double centripetal_acc_probability =
-        ValidationChecker::ProbabilityByCentripedalAcceleration(
+        ValidationChecker::ProbabilityByCentripetalAcceleration(
             *lane_sequence_ptr, speed);
     probability *= centripetal_acc_probability;
     lane_sequence_ptr->set_probability(probability);

@@ -32,21 +32,21 @@ namespace prediction {
 class ValidationChecker {
  public:
   /**
-   * @brief Compute the probability by centripedal acceleration
+   * @brief Compute the probability by centripetal acceleration
    * @param lane sequence
    * @param current speed of obstacle
    * @return probability
    */
-  static double ProbabilityByCentripedalAcceleration(
+  static double ProbabilityByCentripetalAcceleration(
       const LaneSequence& lane_sequence, const double speed);
 
   /**
-   * @brief Check the validity of trajectory's centripedal acceleration
-   * @param trajectory_points The input trajectory points
-   * @return The validity of trajectory's centripedal acceleration
+   * @brief Check the validity of trajectory's centripetal acceleration
+   * @param The discretized trajectory
+   * @return The validity of trajectory's centripetal acceleration
    */
-  static bool ValidCentripedalAcceleration(
-      const std::vector<::apollo::common::TrajectoryPoint>& trajectory_points);
+  static bool ValidCentripetalAcceleration(
+      const std::vector<common::TrajectoryPoint>& discretized_trajectory);
 
   /**
    * @brief Check if a trajectory point is valid
@@ -54,7 +54,7 @@ class ValidationChecker {
    * @return True if the trajectory point is valid
    */
   static bool ValidTrajectoryPoint(
-      const ::apollo::common::TrajectoryPoint& trajectory_point);
+      const common::TrajectoryPoint& trajectory_point);
 
  private:
   ValidationChecker() = delete;
