@@ -100,6 +100,7 @@ bool RTKLocalizationComponent::Proc(
 
     if (imu_list_.empty()) {
       AERROR << "IMU message buffer is empty.";
+      // TODO(zhouyao4321): Add monitor log.
       // if (service_started_) {
       //   buffer.ERROR("IMU message buffer is empty.");
       // }
