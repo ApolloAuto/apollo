@@ -91,9 +91,9 @@
 
 #define ACHECK(cond) CHECK(cond) << LEFT_BRACKET << MODULE_NAME << RIGHT_BRACKET
 
-#define AINFO_EVERY(freq) LOG_EVERY_N(INFO, freq)
-#define AWARN_EVERY(freq) LOG_EVERY_N(WARNING, freq)
-#define AERROR_EVERY(freq) LOG_EVERY_N(ERROR, freq)
+#define AINFO_EVERY(freq) LOG_EVERY_N(INFO, freq) << LEFT_BRACKET << MODULE_NAME << RIGHT_BRACKET
+#define AWARN_EVERY(freq) LOG_EVERY_N(WARNING, freq) << LEFT_BRACKET << MODULE_NAME << RIGHT_BRACKET
+#define AERROR_EVERY(freq) LOG_EVERY_N(ERROR, freq) << LEFT_BRACKET << MODULE_NAME << RIGHT_BRACKET
 
 #define RETURN_IF_NULL(ptr)          \
   if (ptr == nullptr) {              \
