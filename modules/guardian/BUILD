@@ -9,6 +9,7 @@ cc_binary(
         "guardian_component.h",
     ],
     deps = [
+        "//modules/common/adapters:adapter_gflags",
         "//modules/common/util:message_util",
         "//modules/canbus/proto:canbus_proto",
         "//modules/control/proto:control_proto",
