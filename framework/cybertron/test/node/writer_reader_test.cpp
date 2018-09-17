@@ -156,6 +156,55 @@ TEST(WriterReaderTest, messaging) {
   reader_b.Shutdown();
 }
 
+TEST(WriterReaderTest, observe) {
+  proto::RoleAttributes attr;
+  attr.set_channel_name("test_reader");
+  Reader<proto::UnitTest> reader(attr);
+  EXPECT_TRUE(reader.Empty());
+  EXPECT_FALSE(reader.HasReceived());
+
+  auto msg1 = std::make_shared<proto::UnitTest>();
+  msg1->set_case_name("message_1");
+  reader.Enqueue(msg1);
+  EXPECT_TRUE(reader.HasReceived());
+
+  auto msg2 = std::make_shared<proto::UnitTest>();
+  msg2->set_case_name("message_2");
+  reader.Enqueue(msg2);
+
+  reader.Observe();
+  EXPECT_FALSE(reader.Empty());
+
+  auto latest = reader.GetLatestObserved();
+  auto oldest = reader.GetOldestObserved();
+  ASSERT_NE(latest, nullptr);
+  EXPECT_EQ(latest->case_name(), "message_2");
+  ASSERT_NE(oldest, nullptr);
+  EXPECT_EQ(oldest->case_name(), "message_1");
+
+  auto msg3 = std::make_shared<proto::UnitTest>();
+  msg3->set_case_name("message_3");
+  for (int i = 0; i < 5; ++i) {
+    reader.Enqueue(msg3);
+  }
+  reader.Observe();
+  oldest = reader.GetOldestObserved();
+  EXPECT_EQ(oldest->case_name(), "message_1");
+
+  reader.SetHistoryDepth(5);
+  reader.Observe();
+  oldest = reader.GetOldestObserved();
+  EXPECT_EQ(oldest->case_name(), "message_3");
+
+  for (auto it = reader.Begin(); it != reader.End(); ++it) {
+    EXPECT_EQ(oldest->case_name(), "message_3");
+  }
+
+  reader.ClearData();
+  EXPECT_TRUE(reader.Empty());
+  EXPECT_FALSE(reader.HasReceived());
+}
+
 }  // namespace cybertron
 }  // namespace apollo
 
