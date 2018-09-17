@@ -34,6 +34,8 @@
 #include <unordered_set>
 #include <vector>
 
+#include "cybertron/cybertron.h"
+
 #include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
 #include "modules/map/relative_map/proto/navigation.pb.h"
 #include "modules/planning/proto/planning_config.pb.h"
@@ -176,6 +178,9 @@ class ReferenceLineProvider {
 
   std::queue<std::list<ReferenceLine>> reference_line_history_;
   std::queue<std::list<hdmap::RouteSegments>> route_segments_history_;
+
+  std::shared_ptr<cybertron::Task<int>> task_;
+  std::future<void> task_future_;
 };
 
 }  // namespace planning

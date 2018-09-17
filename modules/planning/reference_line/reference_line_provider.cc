@@ -26,8 +26,6 @@
 #include <limits>
 #include <utility>
 
-#include "cybertron/cybertron.h"
-
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/time/time.h"
 #include "modules/common/util/file.h"
@@ -108,13 +106,20 @@ bool ReferenceLineProvider::Start() {
   }
 
   if (FLAGS_enable_reference_line_provider_thread) {
-    auto task = apollo::cybertron::CreateTask(
-        "async_reference_line_provider", [this]() { this->GenerateThread(); });
+    task_ = std::make_shared<apollo::cybertron::Task<int>>(
+        "async_reference_line_provider",
+        [this](const std::shared_ptr<int> &) { this->GenerateThread(); });
+    task_future_ = task_->Execute(std::make_shared<int>());
   }
   return true;
 }
 
-void ReferenceLineProvider::Stop() { is_stop_ = true; }
+void ReferenceLineProvider::Stop() {
+  is_stop_ = true;
+  if (FLAGS_enable_reference_line_provider_thread) {
+    task_future_.get();
+  }
+}
 
 void ReferenceLineProvider::UpdateReferenceLine(
     const std::list<ReferenceLine> &reference_lines,
