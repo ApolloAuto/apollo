@@ -477,7 +477,7 @@ function main() {
             show_cov
         ;;
         build_py)
-            build_py_proto
+            build_py
         ;;
         doc)
             gen_doc
