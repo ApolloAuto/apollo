@@ -18,6 +18,7 @@
 #include <cmath>
 
 #include "cybertron/common/log.h"
+#include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/util/message_util.h"
 
 namespace apollo {
@@ -37,15 +38,14 @@ bool GuardianComponent::Init() {
   }
 
   chassis_reader_ = node_->CreateReader<Chassis>(
-      guardian_conf_.chassis_channel(),
-      [this](const std::shared_ptr<Chassis>& chassis) {
+      FLAGS_chassis_topic, [this](const std::shared_ptr<Chassis>& chassis) {
         ADEBUG << "Received chassis data: run chassis callback.";
         std::lock_guard<std::mutex> lock(mutex_);
         chassis_.CopyFrom(*chassis);
       });
 
   control_cmd_reader_ = node_->CreateReader<ControlCommand>(
-      guardian_conf_.control_command_channel(),
+      FLAGS_control_command_topic,
       [this](const std::shared_ptr<ControlCommand>& cmd) {
         ADEBUG << "Received monitor data: run monitor callback.";
         std::lock_guard<std::mutex> lock(mutex_);
@@ -53,15 +53,13 @@ bool GuardianComponent::Init() {
       });
 
   system_status_reader_ = node_->CreateReader<SystemStatus>(
-      guardian_conf_.system_status_channel(),
-      [this](const std::shared_ptr<SystemStatus>& status) {
+      FLAGS_monitor_topic, [this](const std::shared_ptr<SystemStatus>& status) {
         ADEBUG << "Received control data: run control command callback.";
         std::lock_guard<std::mutex> lock(mutex_);
         system_status_.CopyFrom(*status);
       });
 
-  guardian_writer_ =
-      node_->CreateWriter<GuardianCommand>(guardian_conf_.guardian_channel());
+  guardian_writer_ = node_->CreateWriter<GuardianCommand>(FLAGS_guardian_topic);
 
   return true;
 }
