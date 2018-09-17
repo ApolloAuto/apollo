@@ -95,16 +95,17 @@ bool RTKLocalizationComponent::Proc(
   //   buffer.PrintLog();
   // }
 
-  // {
-  //   std::unique_lock<std::mutex> lock(imu_list_mutex_);
+  {
+    std::unique_lock<std::mutex> lock(imu_list_mutex_);
 
-  //   if (imu_list_.empty()) {
-  //     AERROR << "IMU message buffer is empty.";
-  //     if (service_started_) {
-  //       buffer.ERROR("IMU message buffer is empty.");
-  //     }
-  //   }
-  // }
+    if (imu_list_.empty()) {
+      AERROR << "IMU message buffer is empty.";
+      // if (service_started_) {
+      //   buffer.ERROR("IMU message buffer is empty.");
+      // }
+      return false;
+    }
+  }
 
   // publish localization messages
   PublishLocalization(*gps_msg);
