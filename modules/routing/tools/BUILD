@@ -13,4 +13,16 @@ cc_binary(
    ],
 )
 
+cc_binary(
+    name = "routing_dump",
+    srcs = ["routing_dump.cc"],
+    deps = [
+        "//modules/common",
+        "//modules/common/util",
+        "//modules/planning/proto:planning_proto",
+        "//modules/routing:routing_lib",
+        "//framework:cybertron",
+   ],
+)
+
 cpplint()
