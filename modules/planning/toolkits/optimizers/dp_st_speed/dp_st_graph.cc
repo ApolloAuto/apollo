@@ -196,7 +196,7 @@ Status DpStGraph::CalculateTotalCost() {
         }
       }
       if (FLAGS_enable_multi_thread_in_dp_st_graph) {
-        for (auto& result: results) {
+        for (auto& result : results) {
           result.get();
         }
       }

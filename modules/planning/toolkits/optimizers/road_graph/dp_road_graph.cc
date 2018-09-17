@@ -186,7 +186,7 @@ bool DpRoadGraph::GenerateMinCostPath(
       }
     }
     if (FLAGS_enable_multi_thread_in_dp_poly_path) {
-      for (auto& result: results) {
+      for (auto& result : results) {
         result.get();
       }
     }
