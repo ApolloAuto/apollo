@@ -19,15 +19,16 @@
 #include <algorithm>
 #include <cmath>
 
+#include "modules/common/math/math_utils.h"
 #include "modules/prediction/common/prediction_gflags.h"
 
 namespace apollo {
 namespace prediction {
 
-using ::apollo::common::PathPoint;
-using ::apollo::common::TrajectoryPoint;
+using apollo::common::PathPoint;
+using apollo::common::TrajectoryPoint;
 
-double ValidationChecker::ProbabilityByCentripedalAcceleration(
+double ValidationChecker::ProbabilityByCentripetalAcceleration(
     const LaneSequence& lane_sequence, const double speed) {
   double centripetal_acc_cost_sum = 0.0;
   double centripetal_acc_cost_sqr_sum = 0.0;
@@ -44,7 +45,7 @@ double ValidationChecker::ProbabilityByCentripedalAcceleration(
   return std::exp(-FLAGS_centripetal_acc_coeff * mean_cost);
 }
 
-bool ValidationChecker::ValidCentripedalAcceleration(
+bool ValidationChecker::ValidCentripetalAcceleration(
     const std::vector<TrajectoryPoint>& trajectory_points) {
   std::size_t num_point = trajectory_points.size();
   if (num_point < 2) {
@@ -54,8 +55,9 @@ bool ValidationChecker::ValidCentripedalAcceleration(
   for (std::size_t i = 0; i + 1 < num_point; ++i) {
     const auto& first_point = trajectory_points[i];
     const auto& second_point = trajectory_points[i + 1];
-    double theta_diff = std::abs(second_point.path_point().theta() -
-                                 first_point.path_point().theta());
+    double theta_diff = std::abs(common::math::NormalizeAngle(
+        second_point.path_point().theta() -
+        first_point.path_point().theta()));
     double time_diff =
         std::abs(second_point.relative_time() - first_point.relative_time());
     if (time_diff < FLAGS_double_precision) {

@@ -47,7 +47,7 @@ TEST_F(ValidationCheckerTest, valid_centripedal_acc) {
   }
   EXPECT_EQ(trajectory_points.size(), 3);
   EXPECT_TRUE(
-      ValidationChecker::ValidCentripedalAcceleration(trajectory_points));
+      ValidationChecker::ValidCentripetalAcceleration(trajectory_points));
 }
 
 TEST_F(ValidationCheckerTest, invalid_centripedal_acc) {
@@ -65,7 +65,7 @@ TEST_F(ValidationCheckerTest, invalid_centripedal_acc) {
   }
   EXPECT_EQ(trajectory_points.size(), 3);
   EXPECT_TRUE(
-      !ValidationChecker::ValidCentripedalAcceleration(trajectory_points));
+      !ValidationChecker::ValidCentripetalAcceleration(trajectory_points));
 }
 
 TEST_F(ValidationCheckerTest, valid_trajectory_point) {

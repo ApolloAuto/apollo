@@ -135,6 +135,7 @@ cc_library(
         "//modules/common/proto:pnc_point_proto",
         "//modules/prediction/common:prediction_gflags",
         "//modules/prediction/proto:lane_graph_proto",
+        "//modules/common/math",
     ],
 )
 
