@@ -33,6 +33,7 @@ ObstaclesContainer::ObstaclesContainer()
     : obstacles_(FLAGS_max_num_obstacles) {}
 
 void ObstaclesContainer::Insert(const ::google::protobuf::Message& message) {
+  curr_frame_predictable_obstacle_ids_.clear();
   PerceptionObstacles perception_obstacles;
   perception_obstacles.CopyFrom(
       dynamic_cast<const PerceptionObstacles&>(message));
@@ -91,6 +92,7 @@ void ObstaclesContainer::InsertPerceptionObstacle(
     ADEBUG << "Perception obstacle [" << id << "] is not predictable.";
     return;
   }
+  curr_frame_predictable_obstacle_ids_.push_back(id);
   Obstacle* obstacle_ptr = obstacles_.GetSilently(id);
   if (obstacle_ptr != nullptr) {
     obstacle_ptr->Insert(perception_obstacle, timestamp);
@@ -98,6 +100,18 @@ void ObstaclesContainer::InsertPerceptionObstacle(
     Obstacle obstacle;
     obstacle.Insert(perception_obstacle, timestamp);
     obstacles_.Put(id, std::move(obstacle));
+  }
+}
+
+void ObstaclesContainer::BuildLaneGraph() {
+  // TODO(kechxu) implement building lane graph, lane sequences
+  for (const int id : curr_frame_predictable_obstacle_ids_) {
+    Obstacle* obstacle_ptr = obstacles_.GetSilently(id);
+    if (obstacle_ptr == nullptr) {
+      AERROR << "Null obstacle found.";
+      continue;
+    }
+    obstacle_ptr->BuildLaneGraph();
   }
 }
 

@@ -22,6 +22,8 @@
 #ifndef MODULES_PREDICTION_CONTAINER_OBSTACLES_OBSTACLES_CONTAINER_H_
 #define MODULES_PREDICTION_CONTAINER_OBSTACLES_OBSTACLES_CONTAINER_H_
 
+#include <vector>
+
 #include "cybertron/common/macros.h"
 
 #include "modules/common/util/lru_cache.h"
@@ -60,6 +62,11 @@ class ObstaclesContainer : public Container {
       const double timestamp);
 
   /**
+   * @brief Build lane graph for obstacles
+   */
+  void BuildLaneGraph();
+
+  /**
    * @brief Get obstacle pointer
    * @param Obstacle ID
    * @return Obstacle pointer
@@ -82,6 +89,7 @@ class ObstaclesContainer : public Container {
  private:
   double timestamp_ = -1.0;
   common::util::LRUCache<int, Obstacle> obstacles_;
+  std::vector<int> curr_frame_predictable_obstacle_ids_;
 };
 
 }  // namespace prediction

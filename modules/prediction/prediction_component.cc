@@ -233,6 +233,8 @@ bool PredictionComponent::Proc(
   CHECK_NOTNULL(obstacles_container);
   obstacles_container->Insert(*perception_obstacles);
 
+  obstacles_container->BuildLaneGraph();
+
   ADEBUG << "Received a perception message ["
          << perception_obstacles->ShortDebugString() << "].";
 

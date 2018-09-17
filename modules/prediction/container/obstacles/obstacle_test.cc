@@ -52,6 +52,7 @@ class ObstacleTest : public KMLMapBasedTest {
       perception::PerceptionObstacles perception_obstacles;
       common::util::GetProtoFromFile(filename, &perception_obstacles);
       container_.Insert(perception_obstacles);
+      container_.BuildLaneGraph();
     }
   }
 

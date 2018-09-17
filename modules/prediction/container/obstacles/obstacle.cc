@@ -177,7 +177,6 @@ void Obstacle::Insert(const PerceptionObstacle& perception_obstacle,
   // Set obstacle lane features
   SetCurrentLanes(&feature);
   SetNearbyLanes(&feature);
-  SetLaneGraphFeature(&feature);
 
   if (FLAGS_adjust_vehicle_heading_by_lane &&
      type_ == PerceptionObstacle::VEHICLE) {
@@ -837,7 +836,12 @@ void Obstacle::SetNearbyLanes(Feature* feature) {
   }
 }
 
-void Obstacle::SetLaneGraphFeature(Feature* feature) {
+void Obstacle::BuildLaneGraph() {
+  if (history_size() == 0) {
+    AERROR << "No feature found.";
+    return;
+  }
+  Feature* feature = mutable_latest_feature();
   double speed = feature->speed();
   double road_graph_distance = std::max(
       speed * FLAGS_prediction_duration +

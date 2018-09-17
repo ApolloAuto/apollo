@@ -54,6 +54,7 @@ TEST_F(SingleLanePredictorTest, OnLaneCase) {
   CostEvaluator cost_evaluator;
   ObstaclesContainer container;
   container.Insert(perception_obstacles_);
+  container.BuildLaneGraph();
   Obstacle* obstacle_ptr = container.GetObstacle(1);
   EXPECT_TRUE(obstacle_ptr != nullptr);
   cost_evaluator.Evaluate(obstacle_ptr);
