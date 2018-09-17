@@ -35,11 +35,11 @@ QMatrix4x4 AbstractCamera::YawPitchRoll(float yaw, float pitch, float roll) {
   Result(0, 0) = tmpCy * tmpCr + tmpSy * tmpSp * tmpSr;
   Result(1, 0) = tmpSr * tmpCp;
   Result(2, 0) = -tmpSy * tmpCr + tmpCy * tmpSp * tmpSr;
-  Result(3, 0) = static_cast<float>(0);
+  Result(3, 0) = 0.0f;
   Result(0, 1) = -tmpCy * tmpSr + tmpSy * tmpSp * tmpCr;
   Result(1, 1) = tmpCr * tmpCp;
   Result(2, 1) = tmpSr * tmpSy + tmpCy * tmpSp * tmpCr;
-  Result(3, 1) = static_cast<float>(0);
+  Result(3, 1) = 0.0f;
   Result(0, 2) = tmpSy * tmpCp;
   Result(1, 2) = -tmpSp;
   Result(2, 2) = tmpCy * tmpCp;
