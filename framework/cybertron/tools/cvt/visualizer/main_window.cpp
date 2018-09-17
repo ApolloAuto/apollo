@@ -679,26 +679,21 @@ void MainWindow::ImageReaderCallback(
     const std::shared_ptr<const adu::common::sensor::CompressedImage>& imgData,
     VideoImgProxy* theVideoImgProxy) {
   theVideoImgProxy->video_image_reader_mutex_.lock();
-  if (theVideoImgProxy->dynamic_texture_ == nullptr) {
-    return;
-  }
-  if (imgData == nullptr) {
-    return;
-  }
-
-  QImage img;
-  if (img.loadFromData((const unsigned char*)(imgData->data().c_str()),
-                       imgData->ByteSize())) {
-    if (theVideoImgProxy->dynamic_texture_->UpdateData(img)) {
-      theVideoImgProxy->video_image_viewer_.SetupDynamicTexture(
-          theVideoImgProxy->dynamic_texture_);
+  if (theVideoImgProxy->dynamic_texture_ != nullptr && imgData != nullptr) {
+    QImage img;
+    if (img.loadFromData((const unsigned char*)(imgData->data().c_str()),
+                        imgData->ByteSize())) {
+      if (theVideoImgProxy->dynamic_texture_->UpdateData(img)) {
+        theVideoImgProxy->video_image_viewer_.SetupDynamicTexture(
+            theVideoImgProxy->dynamic_texture_);
+      } else {
+        std::cerr << "--------Cannot update dynamic Texture Data--------"
+                  << std::endl;
+      }
     } else {
-      std::cerr << "--------Cannot update dynamic Texture Data--------"
+      std::cerr << "-----------Cannot load compressed image from data with QImage"
                 << std::endl;
     }
-  } else {
-    std::cerr << "-----------Cannot load compressed image from data with QImage"
-              << std::endl;
   }
   theVideoImgProxy->video_image_reader_mutex_.unlock();
 }
