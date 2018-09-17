@@ -1,6 +1,6 @@
 
 #ifndef SENSOR_VELODYNE_VELODYNE_PARSER_H
-#define SENSOR_VELODYNE_VELODYNE_PARSER_H 
+#define SENSOR_VELODYNE_VELODYNE_PARSER_H
 
 #include <errno.h>
 #include <stdint.h>
@@ -178,4 +178,4 @@ class VelodyneParserFactory {
 }
 }
 
-#endif  // SENSOR_VELODYNE_VELODYNE_PARSER_H 
+#endif  // SENSOR_VELODYNE_VELODYNE_PARSER_H

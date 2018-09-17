@@ -1,9 +1,9 @@
 ##################################################################################################
-# 
+#
 # CMake script for finding TinyXML.
-# 
+#
 # Input variables:
-# 
+#
 # - TinyXML_ROOT_DIR (optional): When specified, header files and libraries will be searched for in
 #     ${TinyXML_ROOT_DIR}/include
 #     ${TinyXML_ROOT_DIR}/libs
@@ -13,23 +13,23 @@
 #   preference is given to the CMake variable.
 #   Use this variable for finding packages installed in a nonstandard location, or for enforcing
 #   that one of multiple package installations is picked up.
-# 
-# 
+#
+#
 # Cache variables (not intended to be used in CMakeLists.txt files)
-# 
+#
 # - TinyXML_INCLUDE_DIR: Absolute path to package headers.
 # - TinyXML_LIBRARY: Absolute path to library.
-# 
-# 
+#
+#
 # Output variables:
-# 
+#
 # - TinyXML_FOUND: Boolean that indicates if the package was found
 # - TinyXML_INCLUDE_DIRS: Paths to the necessary header files
 # - TinyXML_LIBRARIES: Package libraries
-# 
-# 
+#
+#
 # Example usage:
-# 
+#
 #  find_package(TinyXML)
 #  if(NOT TinyXML_FOUND)
 #    # Error handling
@@ -38,7 +38,7 @@
 #  include_directories(${TinyXML_INCLUDE_DIRS} ...)
 #  ...
 #  target_link_libraries(my_target ${TinyXML_LIBRARIES})
-# 
+#
 ##################################################################################################
 
 # Get package location hint from environment variable (if any)

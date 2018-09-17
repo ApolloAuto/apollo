@@ -15,7 +15,7 @@ bool SensorDriverComponent::Init() {
   if(!GetProtoConfig(&sensor_config)){
       return false;
     }
-  
+
   sensor_manager_.reset(new SensorManager(sensor_config, node_));
 
   sensor_manager_->Init();

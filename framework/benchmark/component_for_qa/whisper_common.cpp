@@ -28,7 +28,7 @@ int32_t WhisperCommon::sleep_for(int32_t value, int32_t interval,
   }
   if (value > 0) {
     std::this_thread::sleep_for(std::chrono::milliseconds(value));
-  }   
+  }
 }
 
 WhisperCommon::WhisperCommon(const std::string& me,
@@ -103,7 +103,7 @@ std::string WhisperCommon::show(const WhisperCommon::ConstChannelPtr& whisper) {
   int position = whisper->position();
   size_t length = whisper->content().size();
   bool length_equal = whisper->length() == length;
-  bool content_equal = 
+  bool content_equal =
       _data_pool->compare(whisper->content().c_str(), length, position);
   int64_t receive_interval = 0;
   if (_last_receive_time != 0) {

@@ -29,7 +29,7 @@ bool SenderComponent::Proc() {
     for (const auto& channel : _out_channel_names) {
       WhisperCommon::ChannelPtr msg = _whispers[channel]->next();
       _writers[channel]->Write(msg);
-    }   
+    }
 
     WhisperCommon::sleep_for(_usleep_time, _usleep_interval, _usleep_step);
   } else if (_seq == _num_messages) {
@@ -40,7 +40,7 @@ bool SenderComponent::Proc() {
 }
 
 bool OneChannelReceiverComponent::Init() {
-  return ComponentTest::Init(node_, config_file_path_); 
+  return ComponentTest::Init(node_, config_file_path_);
 }
 
 bool OneChannelReceiverComponent::Proc(const std::shared_ptr<CybertronWhisper>& whisper) {
@@ -58,7 +58,7 @@ bool OneChannelReceiverComponent::Proc(const std::shared_ptr<CybertronWhisper>& 
 }
 
 bool TwoChannelReceiverComponent::Init() {
-  return ComponentTest::Init(node_, config_file_path_); 
+  return ComponentTest::Init(node_, config_file_path_);
 }
 
 bool TwoChannelReceiverComponent::Proc(const WhisperCommon::ChannelPtr& whisper1,
@@ -78,7 +78,7 @@ bool TwoChannelReceiverComponent::Proc(const WhisperCommon::ChannelPtr& whisper1
 }
 
 bool ThreeChannelReceiverComponent::Init() {
-  return ComponentTest::Init(node_, config_file_path_); 
+  return ComponentTest::Init(node_, config_file_path_);
 }
 
 bool ThreeChannelReceiverComponent::Proc(const WhisperCommon::ChannelPtr& whisper1,

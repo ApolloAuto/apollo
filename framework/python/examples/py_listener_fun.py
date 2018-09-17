@@ -13,10 +13,10 @@ py_callback_type_t = ctypes.CFUNCTYPE(ctypes.c_int, ctypes.c_char_p)
 # first excute for init vars
 cybertron_path = os.environ['CYBERTRON_PATH'] # CYBERTRON_PATH=/home/work/baidu/adu-lab/python-wrapper/install/
 if (cybertron_path == ""):
-    print("CYBERTRON_PATH is null")  
+    print("CYBERTRON_PATH is null")
 else:
     print("CYBERTRON_PATH=%s" % cybertron_path)
-    print("env inited succ!") 
+    print("env inited succ!")
 
 cybertron_dir=os.path.split(cybertron_path)[0]
 sys.path.append(cybertron_path + "/third_party/")
@@ -28,13 +28,13 @@ sys.path.append(cybertron_dir + "/cybertron/")
 from proto import chatter_pb2
 
 # begin wrapper cxx interface to py
-_cyber_node = importlib.import_module('_cyber_node') 
+_cyber_node = importlib.import_module('_cyber_node')
 from cybertron import pyinit
-    
+
 subs = {}
 
 def reader_callback(name):
-    v = subs[name]        
+    v = subs[name]
     msg_str = _cyber_node.PyReader_read( v[0], False)
     print("="*80)
     print("py:PyReader_read-> [ %s ]" % msg_str)
@@ -55,7 +55,7 @@ def cyber_py_lisener():
     f = py_callback_type(reader_callback)
     f_ptr = ctypes.cast(f, ctypes.c_void_p).value
     _cyber_node.PyReader_register_func(reader, f_ptr)
-    
+
     while not _cyber_node.py_is_shutdown():
         time.sleep(0.002)
 

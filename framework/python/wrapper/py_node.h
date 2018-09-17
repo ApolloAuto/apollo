@@ -300,14 +300,14 @@ class PyNode {
                             const std::string &type) {
     if (node_) {
       new PyService(service, type, node_.get());
-    }                          
+    }
     return nullptr;
   }
 
   PyClient *create_client(const std::string &service, const std::string &type) {
     if (node_) {
       new PyClient(service, type, node_.get());
-    }                          
+    }
     return nullptr;
   }
 

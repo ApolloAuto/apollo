@@ -56,9 +56,9 @@ class PyRecordReader {
   bool ReadMessage() { return record_reader_.ReadMessage(); }
   bool EndOfFile() { return record_reader_.EndOfFile(); }
   std::string CurrentMessageChannelName() {
-    return record_reader_.CurrentMessageChannelName(); 
+    return record_reader_.CurrentMessageChannelName();
   }
-  std::string CurrentRawMessage() { 
+  std::string CurrentRawMessage() {
     if (record_reader_.CurrentRawMessage()) {
       return record_reader_.CurrentRawMessage()->message;
     }
@@ -66,16 +66,16 @@ class PyRecordReader {
   }
   uint64_t CurrentMessageTime() { return record_reader_.CurrentMessageTime(); }
 
-  uint64_t GetMessageNumber(const std::string &channel_name) { 
-    return record_reader_.GetMessageNumber(channel_name); 
+  uint64_t GetMessageNumber(const std::string &channel_name) {
+    return record_reader_.GetMessageNumber(channel_name);
   }
 
-  std::string GetMessageType(const std::string& channel_name) { 
-    return record_reader_.GetMessageType(channel_name); 
+  std::string GetMessageType(const std::string& channel_name) {
+    return record_reader_.GetMessageType(channel_name);
   }
 
-  std::string GetProtoDesc(const std::string& channel_name) { 
-    return record_reader_.GetProtoDesc(channel_name); 
+  std::string GetProtoDesc(const std::string& channel_name) {
+    return record_reader_.GetProtoDesc(channel_name);
   }
 
  private:
@@ -93,18 +93,18 @@ class PyRecordWriter {
 
   bool WriteChannel(const std::string& channel_str, const std::string& type,
                     const std::string& proto_desc) {
-    return recored_writer_.WriteChannel(channel_str, type, proto_desc); 
+    return recored_writer_.WriteChannel(channel_str, type, proto_desc);
   }
-  bool WriteMessage(const std::string& single_str) { 
+  bool WriteMessage(const std::string& single_str) {
     SingleMessage single;
     single.ParseFromString(single_str);
-    return recored_writer_.WriteMessage(single); 
+    return recored_writer_.WriteMessage(single);
   }
 
   bool WriteMessage_channel(const std::string& channel_name,
-                    const std::string& rawmessage) { 
-    
-    return recored_writer_.WriteMessage(channel_name, std::make_shared<RawMessage>(rawmessage)); 
+                    const std::string& rawmessage) {
+
+    return recored_writer_.WriteMessage(channel_name, std::make_shared<RawMessage>(rawmessage));
   }
  private:
   RecordWriter recored_writer_;

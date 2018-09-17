@@ -13,7 +13,7 @@ aux_source_directory(writer ${PROJECT_NAME}_SRCS)
 
 add_library(${PROJECT_NAME} ${${PROJECT_NAME}_SRCS})
 
-target_link_libraries(${PROJECT_NAME} 
+target_link_libraries(${PROJECT_NAME}
   protobuf
   cybertron_proto
   fastrtps

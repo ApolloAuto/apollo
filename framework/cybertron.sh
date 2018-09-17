@@ -183,7 +183,7 @@ function run_test() {
         done
         print_delim
     fi
-    if [[ ${failed} -ne 0 ]]; then 
+    if [[ ${failed} -ne 0 ]]; then
         print_delim
         error "Failed Cases:"
         for c in ${fails[@]}; do
@@ -202,7 +202,7 @@ function run_bash_lint() {
 
 function run_cpp_lint() {
     START_TIME=$(get_now)
-    
+
     if [ -z $1 ]; then
       find ./cybertron -name "*.h" | grep -v ".pb.h" | xargs ./cpplint.py --verbose=3 --filter=-build/c++11,-build/include_order
       find ./cybertron -name "*.cpp" -exec ./cpplint.py --verbose=3 --filter=-build/c++11,-build/include_order {} \;
@@ -227,7 +227,7 @@ function run_clang_format() {
         sudo apt-get install clang-format-3.8 &&
         ok 'install clang-format-3.8 success'
     }
-    
+
     find ${FORMAT_DIR} -name "*.h" | grep -v tf2 | xargs clang-format-3.8 -style=file -i
     find ${FORMAT_DIR} -name "*.c" | grep -v tf2 | xargs clang-format-3.8 -style=file -i
     find ${FORMAT_DIR} -name "*.cpp" | grep -v tf2 | xargs clang-format-3.8 -style=file -i
@@ -292,9 +292,9 @@ function ccover_select() {
     echo -e "ccover clear file lists"
     #目录下的所有.h .cpp或者.cc文件添加到统计队列，过滤掉test、idl、pb等不需要关心的
     for line in `find cybertron -name "*.h" -o -name "*.cpp" -o -name "*.cc"`
-    do  
+    do
         if [[ "${line}" =~ .*test.* || "${line}" =~ .*bc_out.*
-           || "${line}" =~ cybertron/tools/cvt/* || "${line}" =~ cybertron/tf2/* 
+           || "${line}" =~ cybertron/tools/cvt/* || "${line}" =~ cybertron/tf2/*
            || "${line}" =~ .*idl.* || "${line}" =~ .*pb.* ]]; then
             echo -e "ccover ignore file ${DIRNAME}/${line}"
         else
@@ -314,7 +314,7 @@ function ccover_report() {
             module_dict[array[2]] = 0;
         } else if (len == 2) {
             file_dict_content[NR] = $0;
-        } 
+        }
     } END {
         g_total_fn = 0;
         g_cov_fn = 0;
@@ -382,7 +382,7 @@ function ccover_report() {
 function print_usage() {
     echo -e "\n${RED}Usage${NONE}:
     .${BOLD}/cybertron.sh${NONE} [OPTION]"
-    
+
     echo -e "\n${RED}Options${NONE}:
   ${BLUE}build${NONE}: run build only
   ${BLUE}build_fast${NONE}: build fast

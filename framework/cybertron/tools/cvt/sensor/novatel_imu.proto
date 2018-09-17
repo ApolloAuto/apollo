@@ -2,13 +2,13 @@ syntax = "proto2";
 
 package adu.common.sensor;
 
-import "header.proto";   
-import "novatel_header.proto";   
+import "header.proto";
+import "novatel_header.proto";
 
 // message 268
 message RawIMU {
     optional adu.common.header.Header header = 1;
-    optional NovatelHeader novatel_header = 2;       
+    optional NovatelHeader novatel_header = 2;
 
     optional int32 week = 3;
     optional double gpssec = 4;
@@ -25,11 +25,11 @@ message RawIMU {
 }
 
 // message 812
-// Contains the RAWIMU data corrected for gravity, 
+// Contains the RAWIMU data corrected for gravity,
 // the earth's rotation and estimated sensor errors.
 message CorrIMUData {
-    optional adu.common.header.Header header = 1;   
-    optional NovatelHeader novatel_header = 2;       
+    optional adu.common.header.Header header = 1;
+    optional NovatelHeader novatel_header = 2;
 
     optional int32 week = 3;
     optional double gpssec = 4;

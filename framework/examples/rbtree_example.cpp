@@ -33,11 +33,11 @@ class MyNode : public RBNode {
 
 bool MyNode::Compare(RBNode *node) {
   MyNode *n = reinterpret_cast<MyNode *>(node);
-  
+
   if (key_ > n->key_)
     return true;
   else
-    return false; 
+    return false;
 }
 
 int MyNode::Compare(void *key) {
@@ -55,7 +55,7 @@ void MyNode::Print() {
 
 int main(int argc, char **argv) {
   int len = 9, i;
-  RBTree t1, t2, t3; 
+  RBTree t1, t2, t3;
   MyNode *n1[len], *n2[len], *n3[len];
   int a1[] = { 10, 40, 30, 60, 90, 70, 20, 50, 80 };
   int a2[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9 };

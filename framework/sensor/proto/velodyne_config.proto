@@ -2,7 +2,7 @@ syntax = "proto2";
 
 package apollo.sensor.proto;
 
-import "sensor_velodyne.proto"; 
+import "sensor_velodyne.proto";
 
 message VelodyneConfig {
     required string frame_id = 1;

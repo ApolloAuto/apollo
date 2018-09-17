@@ -105,7 +105,7 @@ void LocalProc(const std::string& node_name,
            << "] chain_latency[" << proc_stamp - lidar_stamp
            << "] proc_latency[" << end_stamp - proc_stamp << "] lidar_stamp["
            << lidar_stamp << "] end_stamp[" << end_stamp << "] proc_stamp["
-           << proc_stamp << "] proc_id[" << proc_id << "]"; 
+           << proc_stamp << "] proc_id[" << proc_id << "]";
     chain_latency_list.emplace_back(proc_stamp - lidar_stamp);
     if (msg->seq() == 0 && channel_name_out == "") {
       return;
@@ -156,7 +156,7 @@ int GenGaussianDag() {
         apollo::cybertron::proto::RoleAttributes attr;
         attr.set_channel_name("channel/chatter_" + std::to_string(LAYER_NUM) +
                               "_" + std::to_string(0));
-        
+
         auto qos = attr.mutable_qos_profile();
         qos->CopyFrom(
             apollo::cybertron::transport::QosProfileConf::QOS_PROFILE_DEFAULT);
@@ -270,8 +270,8 @@ int main(int argc, char* argv[]) {
   // 0: usleep; 1: cpu computer; 2: gpu computer
   PROC_TYPE = std::stoi(argv[4]);
   MSG_NUM = std::stoi(argv[5]);
-  
-  
+
+
   GenGaussianDag();
   while (!apollo::cybertron::IsShutdown()) {
     std::this_thread::sleep_for(std::chrono::milliseconds(200));

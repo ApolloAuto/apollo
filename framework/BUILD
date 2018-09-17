@@ -10,7 +10,7 @@ cc_library(
     ]),
     hdrs = glob([
         "install/include/**/*.h",
-        "third_party/**/*.h"    
+        "third_party/**/*.h"
     ]),
     includes = [
         "install/include",
@@ -29,7 +29,7 @@ cc_library(
         "install/lib/libcybertron_common.so",
     ]),
     hdrs = glob([
-        "install/include/cybertron/common/*.h", 
+        "install/include/cybertron/common/*.h",
     ]),
     includes = [
         "install/include",
@@ -43,7 +43,7 @@ cc_library(
 cc_library(
     name = "cybertron_base",
     hdrs = glob([
-        "install/include/cybertron/base/*.h", 
+        "install/include/cybertron/base/*.h",
     ]),
     includes = [
         "install/include",

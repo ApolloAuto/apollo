@@ -48,7 +48,7 @@ bool SenderComponent::Proc() {
   auto out_msg = std::make_shared<Driver>();
   out_msg->set_msg_id(i++);
   auto t = std::chrono::steady_clock::now();
-  out_msg->set_timestamp(apollo::cybertron::Time::Now().ToNanosecond()); 
+  out_msg->set_timestamp(apollo::cybertron::Time::Now().ToNanosecond());
   sender_writer_->Write(out_msg);
 
   static int j = 0;

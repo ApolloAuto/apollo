@@ -36,7 +36,7 @@ class PerceptionComponent : public Component<Driver> {
     }
     count[msg->msg_id()] = 1;
   }
-  
+
 };
 
 #endif

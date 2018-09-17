@@ -18,7 +18,7 @@ target_link_libraries(object_pool_test  gtest)
 add_executable(atomic_hash_map_test atomic_hash_map_test.cpp)
 target_link_libraries(atomic_hash_map_test  gtest)
 
-install(TARGETS 
+install(TARGETS
   any_test
   atomic_rw_lock_test
   bounded_queue_test

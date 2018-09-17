@@ -44,8 +44,8 @@ bool EpollDispatcher::Start() {
       AERROR << "epoll was not created";
       return false;
   }
-  
-  run_thread_ = std::thread(std::bind(&EpollDispatcher::Run, this));  
+
+  run_thread_ = std::thread(std::bind(&EpollDispatcher::Run, this));
   return true;
 }
 
@@ -67,7 +67,7 @@ void EpollDispatcher::Join() {
 }
 
 bool EpollDispatcher::AddHandler(int fd, unsigned int event, Handler_callback handler) {
-  
+
   AINFO << "add fd:" << fd;
   if (epfd_ < 0) {
       errno = EINVAL;
@@ -88,7 +88,7 @@ bool EpollDispatcher::AddHandler(int fd, unsigned int event, Handler_callback ha
     return true;
   } else {
     AINFO << "fd already has handler:" << fd;
-    return false; 
+    return false;
   }
 }
 
@@ -129,4 +129,4 @@ void EpollDispatcher::Run() {
 }
 
 } // namespace drivers
-} // namespace apollo 
+} // namespace apollo

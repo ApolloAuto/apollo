@@ -7,13 +7,13 @@ function _cyber_launch_complete() {
   local pattern="*.launch"
   case $cmd in
   'cyber_launch')
-    COMPREPLY=( $(compgen -W "start" -- ${word}) ) 
+    COMPREPLY=( $(compgen -W "start" -- ${word}) )
     ;;
   'start')
     compopt -o nospace
     local files=`cd ${MODULE_PATH}/launch/ 2>/dev/null && ls -l *.launch |awk '{print $NF}' 2>/dev/null`
-    COMPREPLY=( $(compgen -W "$files" -- ${word}) ) 
-    #COMPREPLY=( $(compgen -d -f -G "$pattern" -- ${word}) ) 
+    COMPREPLY=( $(compgen -W "$files" -- ${word}) )
+    #COMPREPLY=( $(compgen -d -f -G "$pattern" -- ${word}) )
     ;;
   '*')
     ;;

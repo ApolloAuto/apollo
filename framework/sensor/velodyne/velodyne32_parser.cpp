@@ -19,14 +19,14 @@ void Velodyne32Parser::generate_pointcloud(
     std::shared_ptr<proto::PointCloud>& out_msg) {
 
   // allocate a point cloud with same time and frame ID as raw data
-  out_msg->mutable_header()->set_frame_id(_config.frame_id());      
-  out_msg->mutable_header()->set_stamp(apollo::cybertron::Time().Now().ToNanosecond());      
+  out_msg->mutable_header()->set_frame_id(_config.frame_id());
+  out_msg->mutable_header()->set_stamp(apollo::cybertron::Time().Now().ToNanosecond());
   out_msg->set_height(1);
   _gps_base_usec = scan_msg->basetime();
 
   for (int i = 0; i < scan_msg->firing_pkts_size(); ++i) {
     unpack(scan_msg->firing_pkts(i), out_msg);
-    _last_time_stamp = out_msg->header().stamp();      
+    _last_time_stamp = out_msg->header().stamp();
   }
 
   if (out_msg->point_size() == 0) {
@@ -76,7 +76,7 @@ void Velodyne32Parser::unpack(
 
       if (laser_id == SCANS_PER_BLOCK - 1) {
         // set header stamp before organize the point cloud
-        pc->mutable_header()->set_stamp(timestamp);      
+        pc->mutable_header()->set_stamp(timestamp);
       }
 
       int rotation = (int)raw->blocks[i].rotation;
@@ -129,6 +129,6 @@ void Velodyne32Parser::order(
   // *cloud = target;
 }
 
-} 
+}
 }
 }

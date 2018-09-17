@@ -2,11 +2,11 @@
 # Reserved.
 #
 # --- begin cisst license - do not edit ---
-# 
+#
 # This software is provided "as is" under an open source license, with
 # no warranty.  The complete license can be found in license.txt and
 # http://www.cisst.org/cisst/license.txt.
-# 
+#
 # --- end cisst license ---
 #
 # CMake script for finding Xenomai
@@ -16,9 +16,9 @@
 #
 # - NATIVE
 # - POSIX
-# 
+#
 # Input variables:
-# 
+#
 # - ${Xenomai_ROOT_DIR} (optional): Used as a hint to find the Xenomai root dir
 # - $ENV{XENOMAI_ROOT_DIR} (optional): Used as a hint to find the Xenomai root dir
 #
@@ -48,7 +48,7 @@
 #   - Xenomai_NATIVE_LIBRARY_DIRS
 #   - Xenomai_NATIVE_LIBRARIES
 #   - Xenomai_NATIVE_LDFLAGS
-# 
+#
 # - POSIX Flags:
 #   - Xenomai_POSIX_FOUND: Boolean that indicates if the posix skin was found
 #   - Xenomai_POSIX_DEFINITIONS
@@ -75,18 +75,18 @@ if( UNIX )
 
   # set the search paths
   set( Xenomai_SEARCH_PATH /usr/local /usr $ENV{XENOMAI_ROOT_DIR} ${Xenomai_ROOT_DIR})
-  
+
   # find xeno_config.h
   find_path( Xenomai_INCLUDE_DIR
-    xeno_config.h 
-    PATHS ${Xenomai_SEARCH_PATH} 
+    xeno_config.h
+    PATHS ${Xenomai_SEARCH_PATH}
     PATH_SUFFIXES xenomai include xenomai/include include/xenomai
     )
 
   # did we find xeno_config.h?
-  if(Xenomai_INCLUDE_DIR) 
+  if(Xenomai_INCLUDE_DIR)
     MESSAGE(STATUS "xenomai found: \"${Xenomai_INCLUDE_DIR}\"")
-    
+
     # set the root directory
     if( "${Xenomai_INCLUDE_DIR}" MATCHES "/usr/include/xenomai" )
       # on ubuntu linux, xenomai install is not rooted to a single dir
@@ -103,7 +103,7 @@ if( UNIX )
 
     # get xenomai version
     execute_process(COMMAND ${Xenomai_XENO_CONFIG} --version OUTPUT_VARIABLE Xenomai_VERSION)
-    
+
     # find the xenomai pthread library
     find_library( Xenomai_LIBRARY_NATIVE     native     ${Xenomai_ROOT_DIR}/lib )
     find_library( Xenomai_LIBRARY_XENOMAI    xenomai    ${Xenomai_ROOT_DIR}/lib )
@@ -144,7 +144,7 @@ if( UNIX )
     set( Xenomai_RTDM_INCLUDE_DIRS ${Xenomai_INCLUDE_DIR} )
 
     # Compatibility
-    set( Xenomai_LIBRARIES 
+    set( Xenomai_LIBRARIES
       ${Xenomai_LIBRARY_XENOMAI}
       ${Xenomai_LIBRARY_NATIVE}
       ${Xenomai_LIBRARY_PTHREAD_RT}
@@ -166,21 +166,21 @@ find_package_handle_standard_args(Xenomai DEFAULT_MSG
   Xenomai_LIBRARY_XENOMAI
   Xenomai_LIBRARY_RTDK
   )
-  
+
 set(Xenomai_FOUND ${XENOMAI_FOUND}) # Set appropriately cased variable
 
-if(Xenomai_LIBRARY_XENOMAI AND Xenomai_LIBRARY_NATIVE) 
+if(Xenomai_LIBRARY_XENOMAI AND Xenomai_LIBRARY_NATIVE)
   message(STATUS "Xenomai Native skin found")
   set(Xenomai_NATIVE_FOUND True)
 endif()
-  
-if(Xenomai_LIBRARY_XENOMAI AND Xenomai_LIBRARY_PTHREAD_RT) 
+
+if(Xenomai_LIBRARY_XENOMAI AND Xenomai_LIBRARY_PTHREAD_RT)
   message(STATUS "Xenomai POSIX skin found")
   set(Xenomai_POSIX_FOUND True)
 endif()
-  
-if(Xenomai_LIBRARY_XENOMAI AND Xenomai_LIBRARY_RTDM) 
+
+if(Xenomai_LIBRARY_XENOMAI AND Xenomai_LIBRARY_RTDM)
   message(STATUS "Xenomai RTDM skin found")
   set(Xenomai_RTDM_FOUND True)
 endif()
-  
+

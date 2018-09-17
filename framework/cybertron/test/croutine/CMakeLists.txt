@@ -1,6 +1,6 @@
 project(croutine_test)
 
-add_executable(croutine_test 
+add_executable(croutine_test
   croutine_test.cpp
   routine_factory_test.cpp
 )

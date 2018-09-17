@@ -1,6 +1,6 @@
 
 #ifndef SENSOR_VELODYNE_PARSER_H_
-#define SENSOR_VELODYNE_PARSER_H_ 
+#define SENSOR_VELODYNE_PARSER_H_
 
 #include "sensor/velodyne/velodyne_parser.h"
 #include "sensor/proto/sensor_pointcloud.pb.h"
@@ -31,4 +31,4 @@ class Convert {
 }
 }
 
-#endif  // SENSOR_VELODYNE_PARSER_H_ 
+#endif  // SENSOR_VELODYNE_PARSER_H_

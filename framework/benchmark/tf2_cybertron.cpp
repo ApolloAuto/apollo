@@ -86,7 +86,7 @@ void set_transform_200hz() {
     msgtf.mutable_transform()->mutable_rotation()->set_qy(0.0);
     msgtf.mutable_transform()->mutable_rotation()->set_qz(0.0);
     msgtf.mutable_transform()->mutable_rotation()->set_qw(1.0);
-    
+
     msgtf.mutable_transform()->mutable_translation()->set_x(1.0);
     msgtf.mutable_transform()->mutable_translation()->set_y(1.0);
     msgtf.mutable_transform()->mutable_translation()->set_z(1.0);
@@ -103,9 +103,9 @@ void set_transform_200hz() {
 
 void can_thread(const std::string& source_frame, const std::string& target_frame) {
   std::shared_ptr<Buffer> buffer = Buffer::Instance();
-  std::string errstr; 
+  std::string errstr;
   for (uint64_t i = 0; i < 1000; ++i ) {
-    uint64_t stamp = now_time_ns() - 10 * 1e6; 
+    uint64_t stamp = now_time_ns() - 10 * 1e6;
     apollo::cybertron::Time time(stamp);
     uint64_t start = now_time_ns();
     bool ret = buffer->canTransform(target_frame, source_frame, time, 10, &errstr);
@@ -126,7 +126,7 @@ void lookup_thread(const std::string& source_frame,
   // Buffer buffer;
   std::string errstr;
   for (uint64_t i = 0; i < 1000; ++i) {
-    uint64_t stamp = now_time_ns() - 10 * 1e6; 
+    uint64_t stamp = now_time_ns() - 10 * 1e6;
     apollo::cybertron::Time time(stamp);
     uint64_t start = now_time_ns();
     adu::common::TransformStamped ret;
@@ -139,7 +139,7 @@ void lookup_thread(const std::string& source_frame,
     if (thread_nums == 1) {
       cout << "lookupTransform, source_frame: " << source_frame
            << ", target_frame: " << target_frame
-           << ", stamp: " << ret.header().stamp() 
+           << ", stamp: " << ret.header().stamp()
            << ", frame_id: " << ret.header().frame_id()
            << ", child_frame_id: " << ret.child_frame_id()
            << ", x: " << ret.transform().translation().x()
@@ -157,7 +157,7 @@ void lookup_thread(const std::string& source_frame,
 
 int main(int argc, char** argv) {
   apollo::cybertron::Init(argv[0]);
-  if (argc  == 2) { 
+  if (argc  == 2) {
     thread_nums = atoi(argv[1]);
   }
 
@@ -190,7 +190,7 @@ int main(int argc, char** argv) {
     std::cout << "canTransform, Threads: " << i
               << ", Exec Cnt: " << can_cnt.load()
               << ", Total Time(ms): " << static_cast<double>(can_total_cost.load()) / 1e6
-              << ", Avg Time(ms): " << static_cast<double>(can_total_cost.load()) / 1e6 / can_cnt.load() 
+              << ", Avg Time(ms): " << static_cast<double>(can_total_cost.load()) / 1e6 / can_cnt.load()
               << endl;
 
     std::cout << "lookupTransform, Threads: " << i

@@ -51,7 +51,7 @@ PyObject *cyber_PyRecordReader_Open(PyObject *self, PyObject *args) {
     AINFO << "cyber_PyRecordReader_Open:PyRecordReader failed!";
     Py_RETURN_FALSE;
   }
-  
+
   apollo::cybertron::record::PyRecordReader *reader =
       PyObjectToPtr<apollo::cybertron::record::PyRecordReader *>(pyobj_reader,
                                               "apollo_cybertron_record_pyrecordfilereader");
@@ -97,7 +97,7 @@ PyObject *cyber_PyRecordReader_ReadMessage(PyObject *self, PyObject *args) {
     AINFO << "PyRecordReader_ReadMessage ptr is null!";
     Py_RETURN_FALSE;
   }
-  
+
   if(!reader->ReadMessage()) {
     Py_RETURN_FALSE;
   }
@@ -116,7 +116,7 @@ PyObject *cyber_PyRecordReader_EndOfFile(PyObject *self, PyObject *args) {
     AINFO << "PyRecordReader_EndOfFile ptr is null!";
     Py_RETURN_FALSE;
   }
-  
+
   if(!reader->EndOfFile()) {
     Py_RETURN_FALSE;
   }
@@ -135,7 +135,7 @@ PyObject *cyber_PyRecordReader_CurrentMessageChannelName(PyObject *self, PyObjec
     AINFO << "PyRecordReader_CurrentMessageChannelName ptr is null!";
     return PYOBJECT_NULL_STRING;
   }
-  
+
   std::string channel_name = reader->CurrentMessageChannelName();
   return PyString_FromStringAndSize(channel_name.c_str(), channel_name.size());
 }
@@ -152,7 +152,7 @@ PyObject *cyber_PyRecordReader_CurrentRawMessage(PyObject *self, PyObject *args)
     AINFO << "PyRecordReader_CurrentRawMessage ptr is null!";
     return PYOBJECT_NULL_STRING;
   }
-  
+
   std::string msg = reader->CurrentRawMessage();
   return PyString_FromStringAndSize(msg.c_str(), msg.size());
 }
@@ -169,7 +169,7 @@ PyObject *cyber_PyRecordReader_CurrentMessageTime(PyObject *self, PyObject *args
     AINFO << "PyRecordReader_CurrentMessageTime ptr is null!";
     return PyLong_FromLong(0);
   }
-  
+
   uint64_t cur_time = reader->CurrentMessageTime();
   return PyLong_FromLong(cur_time);
 }
@@ -190,7 +190,7 @@ PyObject *cyber_PyRecordReader_GetMessageNumber(PyObject *self, PyObject *args) 
     AINFO << "PyRecordReader_GetMessageNumber ptr is null!";
     return PyLong_FromLong(0);
   }
-  
+
   uint64_t cur_time = reader->GetMessageNumber(channel_name);
   return PyLong_FromLong(cur_time);
 }
@@ -211,7 +211,7 @@ PyObject *cyber_PyRecordReader_GetMessageType(PyObject *self, PyObject *args) {
     AINFO << "PyRecordReader_GetMessageType ptr is null!";
     return PYOBJECT_NULL_STRING;
   }
-  
+
   std::string msg_type = reader->GetMessageType(channel_name);
   return PyString_FromStringAndSize(msg_type.c_str(), msg_type.size());
 }
@@ -232,7 +232,7 @@ PyObject *cyber_PyRecordReader_GetProtoDesc(PyObject *self, PyObject *args) {
     AINFO << "PyRecordReader_GetProtoDesc ptr is null!";
     return PYOBJECT_NULL_STRING;
   }
-  
+
   std::string pb_desc = reader->GetProtoDesc(channel_name);
   return PyString_FromStringAndSize(pb_desc.c_str(), pb_desc.size());
 }
@@ -410,7 +410,7 @@ static PyMethodDef _cyber_record_methods[] = {
     {"PyRecordWriter_WriteChannel", cyber_PyRecordWriter_WriteChannel, METH_VARARGS, ""},
     {"PyRecordWriter_WriteMessage", cyber_PyRecordWriter_WriteMessage, METH_VARARGS, ""},
     {"PyRecordWriter_WriteMessage_channel", cyber_PyRecordWriter_WriteMessage_channel, METH_VARARGS, ""},
-    
+
     {NULL, NULL, 0, NULL} /* sentinel */
 };
 

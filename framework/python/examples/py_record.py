@@ -19,7 +19,7 @@ def test_record_writer(writer_path):
     fw = pyrecord.RecordWriter()
     if (not fw.Open(writer_path)):
         print("writer open failed!")
-        return 
+        return
     print("+++ begin to writer...")
     fw.WriteChannel(CHAN_1, MSG_TYPE, STR_10B)
     msg1 = record_pb2.SingleMessage()
@@ -35,7 +35,7 @@ def test_record_reader(reader_path):
     fr = pyrecord.RecordReader()
     if (not fr.Open(reader_path)):
         print("reader open failed!")
-        return 
+        return
     time.sleep(1)
     print("+"*80)
     print("+++begin to read...")
@@ -66,4 +66,4 @@ def main():
 
 if __name__ == '__main__':
   main()
-  
+

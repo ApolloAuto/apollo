@@ -2,8 +2,8 @@ syntax = "proto2";
 
 package adu.common.sensor;
 
-import "header.proto"; 
-import "novatel_header.proto";    
+import "header.proto";
+import "novatel_header.proto";
 import "novatel_position_type.proto";
 
 // Table 29 in the SPAN on OEM6 manual:
@@ -22,19 +22,19 @@ enum INSStatus {
 
 // message 507
 message INSPVA {
-    optional adu.common.header.Header header = 1;      
-    optional NovatelHeader novatel_header = 2;          
+    optional adu.common.header.Header header = 1;
+    optional NovatelHeader novatel_header = 2;
     optional int32 week = 3;
     optional double gpssec = 4;
- 
+
     optional double latitude = 5;
     optional double longitude = 6;
     optional double altitude = 7;
- 
+
     optional double velx = 8;
     optional double vely = 9;
     optional double velz = 10;
- 
+
     optional double roll = 11;
     optional double pitch = 12;
     optional double azimuth = 13;
@@ -45,8 +45,8 @@ message INSPVA {
 
 //message 1465
 message INSPVAX {
-    optional adu.common.header.Header header = 1;      
-    optional NovatelHeader novatel_header = 2;          
+    optional adu.common.header.Header header = 1;
+    optional NovatelHeader novatel_header = 2;
 
     optional INSStatus ins_status = 3;
     optional PositionType position_type = 4;
@@ -76,7 +76,7 @@ message INSPVAX {
     optional float roll_std = 21;
     optional float pitch_std = 22;
     optional float azimuth_std = 23;
-    
+
 //    enum ExtendedStatus {
 //        POSITION_UPDATE_APPLIED = 1;
 //        PHASE_UPDATE_APPLIED    = 2;
@@ -91,12 +91,12 @@ message INSPVAX {
 }
 
 message INSCOV {
-    optional adu.common.header.Header header = 1;     
-    optional NovatelHeader novatel_header = 2;          
+    optional adu.common.header.Header header = 1;
+    optional NovatelHeader novatel_header = 2;
     optional int32 week = 3;
     optional double gpssec = 4;
 
-    optional double pos11 = 5; 
+    optional double pos11 = 5;
     optional double pos12 = 6;
     optional double pos13 = 7;
     optional double pos21 = 8;
