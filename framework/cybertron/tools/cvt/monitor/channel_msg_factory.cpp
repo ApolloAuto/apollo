@@ -15,18 +15,18 @@
  *****************************************************************************/
 
 #include "channel_msg_factory.h"
-#include "messages/unknown_message.h"
+#include "general_message.h"
 
 #include <unistd.h>
 
-CybertronChannelMsgFactory* CybertronChannelMsgFactory::Instance() {
-  static CybertronChannelMsgFactory factory;
+ChannelMsgFactory* ChannelMsgFactory::Instance() {
+  static ChannelMsgFactory factory;
   return &factory;
 }
 
-CybertronChannelMsgFactory::CybertronChannelMsgFactory(void) : pid_(getpid()) {}
+ChannelMsgFactory::ChannelMsgFactory(void) : pid_(getpid()) {}
 
-bool CybertronChannelMsgFactory::isFromHere(const std::string& nodeName) {
+bool ChannelMsgFactory::isFromHere(const std::string& nodeName) {
   std::ostringstream outStr;
   outStr << "MonitorReader" << pid_;
 
@@ -36,7 +36,7 @@ bool CybertronChannelMsgFactory::isFromHere(const std::string& nodeName) {
   return (templateName.compare(baseName) == 0);
 }
 
-bool CybertronChannelMsgFactory::SetDefaultChildFactory(
+bool ChannelMsgFactory::SetDefaultChildFactory(
     const std::string& defautlMsgType) {
   auto iter = general_factory_.find(defautlMsgType);
   if (iter == general_factory_.cend()) {
@@ -48,7 +48,7 @@ bool CybertronChannelMsgFactory::SetDefaultChildFactory(
   return true;
 }
 
-ChannelMessage* CybertronChannelMsgFactory::CreateChannelMessage(
+ChannelMessage* ChannelMsgFactory::CreateChannelMessage(
     const std::string& msgTypeName, const std::string& channelName) {
   static int index = 0;
 

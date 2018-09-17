@@ -14,8 +14,11 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#ifndef TOOLS_CVT_VISUALIZER_MAINWINDOW_H_
+#define TOOLS_CVT_VISUALIZER_MAINWINDOW_H_
+
+#include "channel_reader.h"
+#include "msg_dialog.h"
 
 #include <QMainWindow>
 #include <QMenu>
@@ -25,9 +28,6 @@
 #include <sensor_image.pb.h>
 #include <sensor_pointcloud.pb.h>
 #include <memory>
-
-#include "channel_reader.h"
-#include "msg_dialog.h"
 
 class FixedAspectRatioWidget;
 class Texture;
@@ -126,4 +126,4 @@ class MainWindow : public QMainWindow {
   QList<VideoImgProxy*> closed_video_image_viewer_list_;
 };
 
-#endif  // MAINWINDOW_H
+#endif  // TOOLS_CVT_VISUALIZER_MAINWINDOW_H_

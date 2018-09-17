@@ -14,11 +14,11 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef GRID_H
-#define GRID_H
+#ifndef TOOLS_CVT_VISUALIZER_GRID_H_
+#define TOOLS_CVT_VISUALIZER_GRID_H_
 
-#include <QColor>
 #include "renderable_object.h"
+#include <QColor>
 
 class Grid : public RenderableObject {
  public:
@@ -56,4 +56,4 @@ class Grid : public RenderableObject {
   QColor grid_color_;
 };
 
-#endif  // GRID_H
+#endif  // TOOLS_CVT_VISUALIZER_GRID_H_

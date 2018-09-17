@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef SCREEN_H
-#define SCREEN_H
+#ifndef TOOLS_CVT_MONITOR_SCREEN_H_
+#define TOOLS_CVT_MONITOR_SCREEN_H_
 
 #include <map>
 #include <string>
@@ -82,4 +82,4 @@ class Screen final {
   RenderableMessage* current_render_obj_;
 };
 
-#endif  // SCREEN_H
+#endif  // TOOLS_CVT_MONITOR_SCREEN_H_

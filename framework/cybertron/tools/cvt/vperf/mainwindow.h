@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#ifndef TOOLS_CVT_VPERF_MAINWINDOW_H_
+#define TOOLS_CVT_VPERF_MAINWINDOW_H_
 
 #include <QMainWindow>
 

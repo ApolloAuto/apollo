@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef TIME_LINE_WIDGET_H
-#define TIME_LINE_WIDGET_H
+#ifndef TOOLS_CVT_VPERF_TIME_LINE_WIDGET_H_
+#define TOOLS_CVT_VPERF_TIME_LINE_WIDGET_H_
 
 #include <QWidget>
 #include "time_line_scene.h"

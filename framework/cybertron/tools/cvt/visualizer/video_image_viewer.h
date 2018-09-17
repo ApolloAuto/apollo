@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef VIDEOIMGVIEWER_H
-#define VIDEOIMGVIEWER_H
+#ifndef TOOLS_CVT_VISUALIZER_VIDEOIMGVIEWER_H_
+#define TOOLS_CVT_VISUALIZER_VIDEOIMGVIEWER_H_
 
 #include <memory>
 

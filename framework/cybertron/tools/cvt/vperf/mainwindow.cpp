@@ -15,10 +15,6 @@
  *****************************************************************************/
 
 #include "mainwindow.h"
-#include <QFileDialog>
-#include <QMessageBox>
-#include <QWheelEvent>
-#include <iostream>
 #include "has_data_come_event.h"
 #include "loader_thread.h"
 #include "msg_dialog.h"
@@ -28,6 +24,11 @@
 #include "time_line_scene.h"
 #include "time_line_widget.h"
 #include "ui_mainwindow.h"
+
+#include <QFileDialog>
+#include <QMessageBox>
+#include <QWheelEvent>
+#include <iostream>
 
 namespace {
 const char* aboutMessage =

@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef TEXTURE_H
-#define TEXTURE_H
+#ifndef TOOLS_CVT_VISUALIZER_TEXTURE_H_
+#define TOOLS_CVT_VISUALIZER_TEXTURE_H_
 
 #include <sensor_image.pb.h>
 #include <QImage>
@@ -59,4 +59,4 @@ class Texture {
   GLubyte* data_;
 };
 
-#endif  // TEXTURE_H
+#endif  // TOOLS_CVT_VISUALIZER_TEXTURE_H_

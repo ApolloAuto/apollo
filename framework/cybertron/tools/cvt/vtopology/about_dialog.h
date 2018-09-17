@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef ABOUTDIALOG_H
-#define ABOUTDIALOG_H
+#ifndef TOOLS_CVT_VTOPOLOGY_ABOUTDIALOG_H_
+#define TOOLS_CVT_VTOPOLOGY_ABOUTDIALOG_H_
 
 #include <QDialog>
 
@@ -34,4 +34,4 @@ class AboutDialog : public QDialog {
   Ui::AboutDialog *ui_;
 };
 
-#endif  // ABOUTDIALOG_H
+#endif  // TOOLS_CVT_VTOPOLOGY_ABOUTDIALOG_H_

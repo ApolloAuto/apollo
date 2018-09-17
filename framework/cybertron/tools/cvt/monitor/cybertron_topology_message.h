@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef CYBERTRONTOPOLOGYMESSAGE_H
-#define CYBERTRONTOPOLOGYMESSAGE_H
+#ifndef TOOLS_CVT_MONITOR_CYBERTRON_TOPOLOGY_MESSAGE_H_
+#define TOOLS_CVT_MONITOR_CYBERTRON_TOPOLOGY_MESSAGE_H_
 
 #include <map>
 #include "renderable_message.h"
@@ -54,4 +54,4 @@ class CybertronTopologyMessage : public RenderableMessage {
   std::map<std::string, ChannelMessage*> all_channels_map_;
 };
 
-#endif  // CYBERTRONTOPOLOGYMESSAGE_H
+#endif  // TOOLS_CVT_MONITOR_CYBERTRON_TOPOLOGY_MESSAGE_H_

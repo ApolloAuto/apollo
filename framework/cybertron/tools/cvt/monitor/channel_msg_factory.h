@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef CYBERTRONCHANNELMSGFACTORY_H
-#define CYBERTRONCHANNELMSGFACTORY_H
+#ifndef TOOLS_CVT_MONITOR_CHANNEL_MSG_FACTORY_H_
+#define TOOLS_CVT_MONITOR_CHANNEL_MSG_FACTORY_H_
 
 #include <functional>
 #include <iostream>
@@ -27,11 +27,11 @@ class ChannelMessage;
 using CreatorFunction =
     std::function<ChannelMessage*(const std::string&, const std::string&)>;
 
-class CybertronChannelMsgFactory final {
+class ChannelMsgFactory final {
  public:
-  static CybertronChannelMsgFactory* Instance(void);
+  static ChannelMsgFactory* Instance(void);
 
-  ~CybertronChannelMsgFactory() {}
+  ~ChannelMsgFactory() {}
 
   bool RegisterChildFactory(const std::string& msgTypeName, CreatorFunction f) {
     if (msgTypeName.empty() || f == nullptr) {
@@ -66,9 +66,9 @@ class CybertronChannelMsgFactory final {
   bool isFromHere(const std::string& nodeName);
 
  private:
-  explicit CybertronChannelMsgFactory();
-  CybertronChannelMsgFactory(const CybertronChannelMsgFactory& other) = delete;
-  CybertronChannelMsgFactory& operator=(const CybertronChannelMsgFactory&) =
+  explicit ChannelMsgFactory();
+  ChannelMsgFactory(const ChannelMsgFactory& other) = delete;
+  ChannelMsgFactory& operator=(const ChannelMsgFactory&) =
       delete;
 
   int pid_;
@@ -76,4 +76,4 @@ class CybertronChannelMsgFactory final {
   std::map<std::string, CreatorFunction> general_factory_;
 };
 
-#endif  // CYBERTRONCHANNELMSGFACTORY_H
+#endif  // TOOLS_CVT_MONITOR_CHANNEL_MSG_FACTORY_H_

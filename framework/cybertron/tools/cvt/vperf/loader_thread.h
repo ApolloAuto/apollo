@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef LOADER_THREAD_H
-#define LOADER_THREAD_H
+#ifndef TOOLS_CVT_VPERF_LOADER_THREAD_H_
+#define TOOLS_CVT_VPERF_LOADER_THREAD_H_
 
 #include <QString>
 #include <QThread>

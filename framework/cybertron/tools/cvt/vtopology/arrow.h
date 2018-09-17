@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef ARROW_H
-#define ARROW_H
+#ifndef TOOLS_CVT_VTOPOLOGY_ARROW_H_
+#define TOOLS_CVT_VTOPOLOGY_ARROW_H_
 
 #include <QColor>
 #include <QGraphicsLineItem>
@@ -59,4 +59,4 @@ class Arrow : public QGraphicsLineItem {
   QPolygonF polygon_;
 };
 
-#endif  // ARROW_H
+#endif  // TOOLS_CVT_VTOPOLOGY_ARROW_H_

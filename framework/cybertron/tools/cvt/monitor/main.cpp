@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "messages/cybertron_topology_message.h"
-#include "messages/unknown_message.h"
+#include "cybertron_topology_message.h"
+#include "general_message.h"
 
 #include "channel_msg_factory.h"
 #include "screen.h"
@@ -55,9 +55,9 @@ int main(int argc, char* argv[]) {
   FLAGS_alsologtostderr = 0;
   FLAGS_colorlogtostderr = 0;
 
-  CybertronChannelMsgFactory* f = CybertronChannelMsgFactory::Instance();
+  ChannelMsgFactory* f = ChannelMsgFactory::Instance();
   f->RegisterChildFactory("apollo::cybertron::message::RawMessage",
-                          UnknownMessage::Instance);
+                          GeneralMessage::Instance);
   f->SetDefaultChildFactory("apollo::cybertron::message::RawMessage");
 
   CybertronTopologyMessage topologyMsg;

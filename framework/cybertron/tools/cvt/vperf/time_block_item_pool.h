@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef TIMEBLOCKITEMPOOL_H
-#define TIMEBLOCKITEMPOOL_H
+#ifndef TOOLS_CVT_VPERF_TIMEBLOCKITEMPOOL_H_
+#define TOOLS_CVT_VPERF_TIMEBLOCKITEMPOOL_H_
 
 #include <memory>
 #include <vector>

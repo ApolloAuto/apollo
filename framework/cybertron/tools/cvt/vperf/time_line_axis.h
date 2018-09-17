@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef TIMELINEAXIS_H
-#define TIMELINEAXIS_H
+#ifndef TOOLS_CVT_VPERF_TIMELINEAXIS_H_
+#define TOOLS_CVT_VPERF_TIMELINEAXIS_H_
 
 #include <QGraphicsItemGroup>
 #include <QGraphicsTextItem>

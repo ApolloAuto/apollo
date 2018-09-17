@@ -14,12 +14,12 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef PLANE_H
-#define PLANE_H
+#ifndef TOOLS_CVT_VISUALIZER_PLANE_H_
+#define TOOLS_CVT_VISUALIZER_PLANE_H_
 
-#include <memory>
 #include "renderable_object.h"
 #include "texture.h"
+#include <memory>
 
 class Plane : public RenderableObject {
   /*
@@ -57,4 +57,4 @@ class Plane : public RenderableObject {
   std::shared_ptr<Texture> texture_;
 };
 
-#endif  // PLANE_H
+#endif  // TOOLS_CVT_VISUALIZER_PLANE_H_

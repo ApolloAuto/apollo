@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef RENDERABLEMESSAGE_H
-#define RENDERABLEMESSAGE_H
+#ifndef TOOLS_CVT_MONITOR_RENDERABLE_MESSAGE_H_
+#define TOOLS_CVT_MONITOR_RENDERABLE_MESSAGE_H_
 
 #include <string>
 
@@ -60,4 +60,4 @@ class RenderableMessage {
   RenderableMessage* parent_;
 };
 
-#endif  // RENDERABLEMESSAGE_H
+#endif  // TOOLS_CVT_MONITOR_RENDERABLE_MESSAGE_H_
