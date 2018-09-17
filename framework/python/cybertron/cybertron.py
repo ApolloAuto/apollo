@@ -14,11 +14,12 @@
 # limitations under the License.
 # ****************************************************************************
 # -*- coding: utf-8 -*-
-"""Module for wrapper cybertron node."""
+"""Module for init environment."""
 
-import time
 import sys
 import os
+import importlib
+import time
 import importlib
 import threading
 import ctypes
@@ -36,14 +37,51 @@ sys.path.append(CYBERTRON_PATH + "/python/cybertron")
 sys.path.append(CYERTRON_DIR + "/python/")
 sys.path.append(CYERTRON_DIR + "/cybertron/")
 
-# begin wrapper cxx interface to py
+_CYBER_INIT = importlib.import_module('_cyber_init')
 _CYBER_NODE = importlib.import_module('_cyber_node')
 
-#//////////////////////////////class//////////////////////////////
+
+def init():
+    """
+    init cybertron.
+    """
+    return _CYBER_INIT.py_init()
+
+
+def ok():
+    """
+    is cybertron envi ok.
+    """
+    return _CYBER_INIT.py_ok()
+
+
+def shutdown():
+    """
+    shutdown cybertron envi.
+    """
+    return _CYBER_INIT.py_shutdown()
+
+
+def is_shutdown():
+    """
+    is cybertron shutdown.
+    """
+    return _CYBER_INIT.py_is_shutdown()
+
+
+def waitforshutdown():
+    """
+    waitforshutdown.
+    """
+    return _CYBER_INIT.py_waitforshutdown()
+
+# //////////////////////////////class//////////////////////////////
+
 class Writer(object):
     """
     Class for cybertron writer wrapper.
     """
+
     def __init__(self, name, writer, data_type):
         self.name = name
         self.writer = writer
@@ -55,19 +93,23 @@ class Writer(object):
         """
         return _CYBER_NODE.PyWriter_write(self.writer, data.SerializeToString())
 
+
 class Reader(object):
     """
     Class for cybertron reader wrapper.
     """
+
     def __init__(self, name, reader, data_type):
         self.name = name
         self.reader = reader
         self.data_type = data_type
 
+
 class Client(object):
     """
     Class for cybertron service client wrapper.
     """
+
     def __init__(self, client, data_type):
         self.client = client
         self.data_type = data_type
@@ -88,10 +130,12 @@ class Client(object):
         response.ParseFromString(response_str)
         return response
 
+
 class Node(object):
     """
     Class for cybertron Node wrapper.
     """
+
     def __init__(self, name):
         self.node = _CYBER_NODE.new_PyNode(name)
         self.list_writer = []
@@ -135,7 +179,7 @@ class Node(object):
         if len(msg_str) > 0:
             proto = sub[3]()
             proto.ParseFromString(msg_str)
-            response = None
+            # response = None
             if sub[2] is None:
                 sub[1](proto)
             else:
@@ -183,7 +227,7 @@ class Node(object):
         """
         datatype = request_data_type.DESCRIPTOR.full_name
         client = _CYBER_NODE.PyNode_create_client(
-                    self.node, name, str(datatype))
+            self.node, name, str(datatype))
         self.list_client.append(client)
         return Client(client, response_data_type)
 
@@ -262,4 +306,3 @@ class Node(object):
                     else:
                         item[1](proto, item[2])
         self.mutex.release()
-

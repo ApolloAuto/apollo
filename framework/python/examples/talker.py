@@ -20,8 +20,8 @@ import time
 import sys
 
 sys.path.append("../")
-from cybertron import node
-from cybertron import init
+from cybertron import cybertron
+# from cybertron import init
 from proto import chatter_pb2
 
 def test_talker_class():
@@ -34,12 +34,12 @@ def test_talker_class():
     msg.timestamp = 0
     msg.lidar_timestamp = 0
 
-    test_node = node.Node("node_name1")
+    test_node = cybertron.Node("node_name1")
     g_count = 1
 
     writer = test_node.create_writer("channel/chatter",
             chatter_pb2.Chatter.DESCRIPTOR.full_name)
-    while not init.is_shutdown():
+    while not cybertron.is_shutdown():
         time.sleep(1)
         g_count = g_count + 1
         msg.seq = g_count
@@ -48,6 +48,6 @@ def test_talker_class():
         writer.write(msg)
 
 if __name__ == '__main__':
-    init.init()
+    cybertron.init()
     test_talker_class()
-    init.shutdown()
+    cybertron.shutdown()
