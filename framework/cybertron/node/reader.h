@@ -18,6 +18,7 @@
 #define CYBERTRON_NODE_READER_H_
 
 #include <memory>
+#include <mutex>
 #include <string>
 #include <unordered_map>
 #include <utility>
@@ -47,6 +48,8 @@ class Reader : public ReaderBase {
   using LowerReachPtr = std::shared_ptr<transport::LowerReach<MessageT>>;
   using ChangeConnection =
       typename service_discovery::Manager::ChangeConnection;
+  using Iterator =
+      typename std::list<std::shared_ptr<MessageT>>::const_iterator;
 
   Reader(const proto::RoleAttributes& role_attr,
          const CallbackFunc<MessageT>& reader_func = nullptr);
@@ -54,6 +57,18 @@ class Reader : public ReaderBase {
 
   bool Init() override;
   void Shutdown() override;
+  void Observe() override;
+  void ClearData() override;
+  bool HasReceived() const override;
+  bool Empty() const override;
+
+  void Enqueue(const std::shared_ptr<MessageT>& msg);
+  void SetHistoryDepth(const uint32_t& depth);
+  uint32_t GetHistoryDepth() const;
+  const std::shared_ptr<MessageT>& GetLatestObserved() const;
+  const std::shared_ptr<MessageT>& GetOldestObserved() const;
+  Iterator Begin() const { return observed_queue_.begin(); }
+  Iterator End() const { return observed_queue_.end(); }
 
  protected:
   void JoinTheTopology();
@@ -66,6 +81,11 @@ class Reader : public ReaderBase {
 
   ChangeConnection change_conn_;
   service_discovery::ChannelManagerPtr channel_manager_;
+
+  mutable std::mutex mutex_;
+  uint32_t history_depth_ = 10;
+  std::list<std::shared_ptr<MessageT>> history_queue_;
+  std::list<std::shared_ptr<MessageT>> observed_queue_;
 };
 
 template <typename MessageT>
@@ -83,6 +103,18 @@ Reader<MessageT>::~Reader() {
 }
 
 template <typename MessageT>
+void Reader<MessageT>::Enqueue(const std::shared_ptr<MessageT>& msg) {
+  std::lock_guard<std::mutex> lg(mutex_);
+  history_queue_.push_front(msg);
+}
+
+template <typename MessageT>
+void Reader<MessageT>::Observe() {
+  std::lock_guard<std::mutex> lg(mutex_);
+  observed_queue_ = history_queue_;
+}
+
+template <typename MessageT>
 bool Reader<MessageT>::Init() {
   if (init_.exchange(true)) {
     return true;
@@ -90,12 +122,16 @@ bool Reader<MessageT>::Init() {
   if (reader_func_ != nullptr) {
     auto sched = scheduler::Scheduler::Instance();
     croutine_name_ = role_attr_.node_name() + "_" + role_attr_.channel_name();
+    auto func = [this](const std::shared_ptr<MessageT>& msg) {
+      this->Enqueue(msg);
+      this->reader_func_(msg);
+    };
 
     auto dv = std::make_shared<data::DataVisitor<MessageT>>(
         role_attr_.channel_id(), role_attr_.qos_profile().depth());
     // Using factory to wrap templates.
     croutine::RoutineFactory factory =
-        croutine::CreateRoutineFactory<MessageT>(reader_func_, dv);
+        croutine::CreateRoutineFactory<MessageT>(std::move(func), dv);
     if (!sched->CreateTask(factory, croutine_name_)) {
       init_.exchange(false);
       return false;
@@ -167,6 +203,57 @@ void Reader<MessageT>::OnChannelChange(const proto::ChangeMsg& change_msg) {
   } else {
     lower_reach_->Disable(writer_attr);
   }
+}
+
+template <typename MessageT>
+bool Reader<MessageT>::HasReceived() const {
+  std::lock_guard<std::mutex> lg(mutex_);
+  return !history_queue_.empty();
+}
+
+template <typename MessageT>
+bool Reader<MessageT>::Empty() const {
+  std::lock_guard<std::mutex> lg(mutex_);
+  return observed_queue_.empty();
+}
+
+template <typename MessageT>
+const std::shared_ptr<MessageT>& Reader<MessageT>::GetLatestObserved() const {
+  std::lock_guard<std::mutex> lg(mutex_);
+  if (observed_queue_.empty()) {
+    return nullptr;
+  }
+  return observed_queue_.front();
+}
+
+template <typename MessageT>
+const std::shared_ptr<MessageT>& Reader<MessageT>::GetOldestObserved() const {
+  std::lock_guard<std::mutex> lg(mutex_);
+  if (observed_queue_.empty()) {
+    return nullptr;
+  }
+  return observed_queue_.back();
+}
+
+template <typename MessageT>
+void Reader<MessageT>::ClearData() {
+  std::lock_guard<std::mutex> lg(mutex_);
+  history_queue_.clear();
+  observed_queue_.clear();
+}
+
+template <typename MessageT>
+void Reader<MessageT>::SetHistoryDepth(const uint32_t& depth) {
+  std::lock_guard<std::mutex> lg(mutex_);
+  history_depth_ = depth;
+  while (history_queue_.size() > history_depth_) {
+    history_queue_.pop_back();
+  }
+}
+
+template <typename MessageT>
+uint32_t Reader<MessageT>::GetHistoryDepth() const {
+  return history_depth_;
 }
 
 }  // namespace cybertron
