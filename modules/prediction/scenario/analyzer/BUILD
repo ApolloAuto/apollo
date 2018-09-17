@@ -10,6 +10,7 @@ cc_library(
         "//framework:cybertron",
         "//modules/prediction/proto:scenario_proto",
         "//modules/prediction/proto:scenario_feature_proto",
+        "//modules/prediction/common:prediction_gflags",
     ],
 )
 

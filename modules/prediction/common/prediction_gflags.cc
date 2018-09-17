@@ -62,6 +62,10 @@ DEFINE_double(lane_search_radius_in_junction, 15.0,
               "Search radius for a candidate lane");
 DEFINE_double(junction_search_radius, 1.0, "Search radius for a junction");
 
+// Scenario
+DEFINE_double(junction_distance_threshold, 10.0, "Distance threshold "
+              "to junction to consider as junction scenario");
+
 // Obstacle features
 DEFINE_bool(enable_kf_tracking, false, "Use measurements with KF tracking");
 DEFINE_double(max_acc, 4.0, "Upper bound of acceleration");
