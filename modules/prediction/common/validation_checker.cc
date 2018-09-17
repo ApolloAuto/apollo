@@ -48,12 +48,11 @@ double ValidationChecker::ProbabilityByCentripetalAcceleration(
 bool ValidationChecker::ValidCentripetalAcceleration(
     const std::vector<TrajectoryPoint>& trajectory_points) {
   double max_centripetal_acc = 0.0;
-  for (auto i = 0; i + 1 < trajectory_points.size(); ++i) {
+  for (size_t i = 0; i + 1 < trajectory_points.size(); ++i) {
     const auto& first_point = trajectory_points[i];
     const auto& second_point = trajectory_points[i + 1];
     double theta_diff = std::abs(common::math::NormalizeAngle(
-        second_point.path_point().theta() -
-        first_point.path_point().theta()));
+        second_point.path_point().theta() - first_point.path_point().theta()));
     double time_diff =
         std::abs(second_point.relative_time() - first_point.relative_time());
     if (time_diff < FLAGS_double_precision) {
