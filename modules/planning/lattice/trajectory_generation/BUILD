@@ -133,8 +133,8 @@ cc_library(
         "lateral_trajectory_optimizer_interface.h",
     ],
     deps = [
-        "@ipopt",
         "//modules/planning/lattice/trajectory1d:constant_jerk_trajectory1d",
+        "@ipopt",
     ],
 )
 
@@ -147,11 +147,11 @@ cc_library(
         "lateral_trajectory_optimizer.h",
     ],
     deps = [
-        "@ipopt",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/lattice/behavior:path_time_graph",
         "//modules/planning/lattice/trajectory1d:piecewise_jerk_trajectory1d",
         "//modules/planning/lattice/trajectory_generation:lateral_trajectory_optimizer_interface",
+        "@ipopt",
     ],
 )
 
@@ -164,10 +164,10 @@ cc_library(
         "lateral_qp_optimizer.h",
     ],
     deps = [
-        "@qpOASES",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/lattice/behavior:path_time_graph",
         "//modules/planning/lattice/trajectory1d:piecewise_jerk_trajectory1d",
+        "@qpOASES",
     ],
 )
 
