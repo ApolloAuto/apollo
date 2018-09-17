@@ -35,7 +35,3 @@ obstacle_conf {
   obstacle_status: OFF_LANE
   predictor_type: FREE_MOVE_PREDICTOR
 }
-
-perception_obstacle_channel: "/apollo//apollo/perception/obstacles"
-pose_channel: "/apollo/localization/pose"
-planning_trajectory_channel: "/apollo/planning"
