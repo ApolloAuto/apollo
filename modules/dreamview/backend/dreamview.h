@@ -21,16 +21,17 @@
 #include <string>
 
 #include "CivetServer.h"
-
-#include "modules/common/apollo_app.h"
-
-#include "modules/dreamview/backend/handlers/image_handler.h"
+#include "cybertron/cybertron.h"
+// #include "cybertron/node/node.h"
+// #include "modules/common/apollo_app.h"
+#include "modules/common/status/status.h"
+// #include "modules/dreamview/backend/handlers/image_handler.h"
 #include "modules/dreamview/backend/handlers/websocket_handler.h"
-#include "modules/dreamview/backend/hmi/hmi.h"
+// #include "modules/dreamview/backend/hmi/hmi.h"
 #include "modules/dreamview/backend/map/map_service.h"
-#include "modules/dreamview/backend/point_cloud/point_cloud_updater.h"
-#include "modules/dreamview/backend/sim_control/sim_control.h"
-#include "modules/dreamview/backend/simulation_world/simulation_world_updater.h"
+// #include "modules/dreamview/backend/point_cloud/point_cloud_updater.h"
+// #include "modules/dreamview/backend/sim_control/sim_control.h"
+// #include "modules/dreamview/backend/simulation_world/simulation_world_updater.h"
 
 /**
  * @namespace apollo::dreamview
@@ -39,30 +40,31 @@
 namespace apollo {
 namespace dreamview {
 
-class Dreamview : public apollo::common::ApolloApp {
+class Dreamview {
  public:
-  std::string Name() const override;
-  apollo::common::Status Init() override;
-  apollo::common::Status Start() override;
-  void Stop() override;
+  std::string Name() const;
+  apollo::common::Status Init();
+  apollo::common::Status Start();
+  void Stop();
   virtual ~Dreamview() = default;
 
  private:
-  void TerminateProfilingMode(const ros::TimerEvent& event);
-  void CheckAdapters();
+  // void TerminateProfilingMode(const ros::TimerEvent& event);
+  // void CheckAdapters();
 
-  ros::Timer exit_timer_;
+  // ros::Timer exit_timer_;
+  std::unique_ptr<apollo::cybertron::Node> node_;
 
-  std::unique_ptr<SimulationWorldUpdater> sim_world_updater_;
-  std::unique_ptr<PointCloudUpdater> point_cloud_updater_;
+  // std::unique_ptr<SimulationWorldUpdater> sim_world_updater_;
+  // std::unique_ptr<PointCloudUpdater> point_cloud_updater_;
+  // std::unique_ptr<SimControl> sim_control_;
   std::unique_ptr<CivetServer> server_;
-  std::unique_ptr<SimControl> sim_control_;
   std::unique_ptr<WebSocketHandler> websocket_;
   std::unique_ptr<WebSocketHandler> map_ws_;
   std::unique_ptr<WebSocketHandler> point_cloud_ws_;
-  std::unique_ptr<ImageHandler> image_;
+  // std::unique_ptr<ImageHandler> image_;
   std::unique_ptr<MapService> map_service_;
-  std::unique_ptr<HMI> hmi_;
+  // std::unique_ptr<HMI> hmi_;
 };
 
 }  // namespace dreamview

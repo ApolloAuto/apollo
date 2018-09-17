@@ -1,0 +1,9 @@
+<cybertron>
+    <module>
+        <name>dreamview</name>
+        <dag_conf></dag_conf>
+        <type>binary</type>
+        <process_name>/apollo/bazel-bin/modules/dreamview/dreamview</process_name>
+        <exception_handler>respawn</exception_handler>
+    </module>
+</cybertron>
