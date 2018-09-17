@@ -18,8 +18,8 @@
 #include <iomanip>
 #include <string>
 
-#include "modules/common/adapters/adapter_gflags.h"
 #include "cybertron/common/log.h"
+#include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/time/time.h"
 #include "modules/common/util/file.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
@@ -96,6 +96,19 @@ bool ControlComponent::Init() {
 
   control_cmd_writer_ = node_->CreateWriter<ControlCommand>(
       control_conf_.control_command_channel());
+
+  // set initial vehicle state by cmd
+  // need to sleep, because advertised channel is not ready immediately
+  // simple test shows a short delay of 80 ms or so
+  AINFO << "Control resetting vehicle state, sleeping for 1000 ms ...";
+  std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+
+  // should init_vehicle first, let car enter work status, then use status msg
+  // trigger control
+
+  AINFO << "Control default driving action is "
+        << DrivingAction_Name(control_conf_.action());
+  pad_msg_.set_action(control_conf_.action());
 
   return true;
 }
@@ -211,19 +224,6 @@ Status ControlComponent::ProduceControlCommand(
 }
 
 bool ControlComponent::Proc() {
-  // set initial vehicle state by cmd
-  // need to sleep, because advertised channel is not ready immediately
-  // simple test shows a short delay of 80 ms or so
-  AINFO << "Control resetting vehicle state, sleeping for 1000 ms ...";
-  std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-
-  // should init_vehicle first, let car enter work status, then use status msg
-  // trigger control
-
-  AINFO << "Control default driving action is "
-        << DrivingAction_Name(control_conf_.action());
-  pad_msg_.set_action(control_conf_.action());
-
   double start_timestamp = Clock::NowInSeconds();
 
   if (control_conf_.is_control_test_mode() &&
