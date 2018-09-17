@@ -64,15 +64,14 @@ bool ControlComponent::Init() {
   }
 
   chassis_reader_ = node_->CreateReader<Chassis>(
-      control_conf_.chassis_channel(),
-      [this](const std::shared_ptr<Chassis> &chassis) {
+      FLAGS_chassis_topic, [this](const std::shared_ptr<Chassis> &chassis) {
         ADEBUG << "Received chassis data: run chassis callback.";
         std::lock_guard<std::mutex> lock(mutex_);
         chassis_.CopyFrom(*chassis);
       });
 
   trajectory_reader_ = node_->CreateReader<ADCTrajectory>(
-      control_conf_.planning_channel(),
+      FLAGS_planning_trajectory_topic,
       [this](const std::shared_ptr<ADCTrajectory> &trajectory) {
         ADEBUG << "Received chassis data: run trajectory callback.";
         std::lock_guard<std::mutex> lock(mutex_);
@@ -80,7 +79,7 @@ bool ControlComponent::Init() {
       });
 
   localization_reader_ = node_->CreateReader<LocalizationEstimate>(
-      control_conf_.localization_channel(),
+      FLAGS_localization_topic,
       [this](const std::shared_ptr<LocalizationEstimate> &localization) {
         ADEBUG << "Received control data: run localization message callback.";
         std::lock_guard<std::mutex> lock(mutex_);
@@ -88,14 +87,13 @@ bool ControlComponent::Init() {
       });
 
   pad_msg_reader_ = node_->CreateReader<PadMessage>(
-      control_conf_.pad_msg_channel(),
-      [this](const std::shared_ptr<PadMessage> &pad_msg) {
+      FLAGS_pad_topic, [this](const std::shared_ptr<PadMessage> &pad_msg) {
         ADEBUG << "Received control data: run pad message callback.";
         OnPad(*pad_msg);
       });
 
-  control_cmd_writer_ = node_->CreateWriter<ControlCommand>(
-      control_conf_.control_command_channel());
+  control_cmd_writer_ =
+      node_->CreateWriter<ControlCommand>(FLAGS_control_command_topic);
 
   // set initial vehicle state by cmd
   // need to sleep, because advertised channel is not ready immediately

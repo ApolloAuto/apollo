@@ -32,13 +32,13 @@
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_map.h"
 #include "modules/prediction/common/validation_checker.h"
-#include "modules/prediction/scenario/scenario_manager.h"
 #include "modules/prediction/container/container_manager.h"
 #include "modules/prediction/container/obstacles/obstacles_container.h"
 #include "modules/prediction/container/pose/pose_container.h"
 #include "modules/prediction/evaluator/evaluator_manager.h"
 #include "modules/prediction/predictor/predictor_manager.h"
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
+#include "modules/prediction/scenario/scenario_manager.h"
 #include "modules/prediction/util/data_extraction.h"
 
 namespace apollo {
@@ -57,9 +57,7 @@ using apollo::perception::PerceptionObstacle;
 using apollo::perception::PerceptionObstacles;
 using apollo::planning::ADCTrajectory;
 
-PredictionComponent::~PredictionComponent() {
-  Stop();
-}
+PredictionComponent::~PredictionComponent() { Stop(); }
 
 std::string PredictionComponent::Name() const {
   return FLAGS_prediction_module_name;
@@ -126,12 +124,12 @@ bool PredictionComponent::Init() {
   }
 
   planning_reader_ = node_->CreateReader<ADCTrajectory>(
-     FLAGS_planning_trajectory_topic,
-     [this](const std::shared_ptr<ADCTrajectory>& adc_trajectory) {
-         ADEBUG << "Received planning data: run planning callback.";
-         std::lock_guard<std::mutex> lock(mutex_);
-         OnPlanning(*adc_trajectory);
-     });
+      FLAGS_planning_trajectory_topic,
+      [this](const std::shared_ptr<ADCTrajectory>& adc_trajectory) {
+        ADEBUG << "Received planning data: run planning callback.";
+        std::lock_guard<std::mutex> lock(mutex_);
+        OnPlanning(*adc_trajectory);
+      });
 
   // Initialization of all managers
   ContainerManager::Instance()->Init(adapter_conf_);
@@ -170,7 +168,6 @@ bool PredictionComponent::Init() {
     }
     Stop();
     // TODO(kechxu) accord to cybertron
-    // ros::shutdown();
   }
   return true;
 }
@@ -209,8 +206,8 @@ bool PredictionComponent::Proc(
     const std::shared_ptr<PerceptionObstacles>& perception_obstacles,
     const std::shared_ptr<LocalizationEstimate>& localization) {
   if (FLAGS_prediction_test_mode &&
-      (Clock::NowInSeconds() - component_start_time_
-          > FLAGS_prediction_test_duration)) {
+      (Clock::NowInSeconds() - component_start_time_ >
+       FLAGS_prediction_test_duration)) {
     ADEBUG << "Prediction finished running in test mode";
     // TODO(kechxu) accord to cybertron
     // ros::shutdown();
