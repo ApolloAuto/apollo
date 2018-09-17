@@ -39,6 +39,8 @@ bool RoutingComponent::Proc(const std::shared_ptr<RoutingRequest>& request) {
   if (!routing_.Process(request, response.get())) {
     return false;
   }
+  common::util::FillHeader(node_->Name(), response.get());
+
   response_writer_->Write(response);
   return true;
 }
