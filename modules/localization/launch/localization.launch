@@ -1,0 +1,7 @@
+<cybertron>
+    <module>
+        <name>localization</name>
+        <dag_conf>/apollo/modules/localization/dag/localization.dag</dag_conf>
+        <process_name>localization</process_name>
+    </module>
+</cybertron>
