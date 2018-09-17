@@ -41,7 +41,7 @@ class CybertronTopologyMessage : public RenderableMessage {
   void TopologyChanged(const apollo::cybertron::proto::ChangeMsg& change_msg);
 
  private:
-  void ChangeState(int key);
+  void ChangeState(const Screen* s, int key);
 
   enum class SecondColumnType { MessageType, MessageFrameRatio };
   SecondColumnType second_column_;
