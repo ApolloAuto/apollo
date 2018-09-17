@@ -43,5 +43,17 @@ Node::~Node() { node_manager_->Leave(attr_, RoleType::ROLE_NODE); }
 
 const std::string& Node::Name() const { return node_name_; }
 
+void Node::Observe() {
+  for (auto& reader : readers_) {
+    reader.second->Observe();
+  }
+}
+
+void Node::ClearData() {
+  for (auto& reader : readers_) {
+    reader.second->ClearData();
+  }
+}
+
 }  // namespace cybertron
 }  // namespace apollo
