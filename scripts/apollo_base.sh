@@ -84,9 +84,9 @@ function set_lib_path() {
     PY_LIB_PATH=/apollo/lib
     PY_TOOLS_PATH=/apollo/modules/tools
   else
-    local ROS_SETUP="/home/tmp/ros/setup.bash"
-    if [ -e "${ROS_SETUP}" ]; then
-      source "${ROS_SETUP}"
+    local CYBERTRON_SETUP="/apollo/framework/install/setup.bash"
+    if [ -e "${CYBERTRON_SETUP}" ]; then
+      source "${CYBERTRON_SETUP}"
     fi
     PY_LIB_PATH=${APOLLO_ROOT_DIR}/py_proto
     PY_TOOLS_PATH=${APOLLO_ROOT_DIR}/modules/tools
@@ -212,7 +212,7 @@ function decide_task_dir() {
 function is_stopped_customized_path() {
   MODULE_PATH=$1
   MODULE=$2
-  NUM_PROCESSES="$(pgrep -c -f "modules/${MODULE_PATH}/${MODULE}")"
+  NUM_PROCESSES="$(pgrep -c -f "modules/${MODULE_PATH}/dag/${MODULE}.dag")"
   if [ "${NUM_PROCESSES}" -eq 0 ]; then
     return 1
   else
@@ -225,12 +225,9 @@ function start_customized_path() {
   MODULE=$2
   shift 2
 
-  LOG="${APOLLO_ROOT_DIR}/data/log/${MODULE}.out"
   is_stopped_customized_path "${MODULE_PATH}" "${MODULE}"
   if [ $? -eq 1 ]; then
-    eval "nohup ${APOLLO_BIN_PREFIX}/modules/${MODULE_PATH}/${MODULE} \
-        --flagfile=modules/${MODULE_PATH}/conf/${MODULE}.conf \
-        --log_dir=${APOLLO_ROOT_DIR}/data/log $@ </dev/null >${LOG} 2>&1 &"
+    eval "nohup cyber_launch start /apollo/modules/${MODULE_PATH}/launch/${MODULE}.launch &"
     sleep 0.5
     is_stopped_customized_path "${MODULE_PATH}" "${MODULE}"
     if [ $? -eq 0 ]; then
@@ -329,7 +326,7 @@ function stop_customized_path() {
   MODULE_PATH=$1
   MODULE=$2
 
-  pkill -SIGKILL -f "modules/${MODULE_PATH}/${MODULE}"
+  cyber_launch stop "/apollo/modules/${MODULE_PATH}/launch/${MODULE}.launch"
   if [ $? -eq 0 ]; then
     echo "Successfully stopped module ${MODULE}."
   else
