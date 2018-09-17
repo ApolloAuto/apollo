@@ -146,7 +146,7 @@ MARK_AS_ADVANCED(
      GSL_LINK_DIRECTORIES
 )
 
- ELSE(GSL_INCLUDE_DIRS) 
+ ELSE(GSL_INCLUDE_DIRS)
 MESSAGE("FindGSL.cmake: gsl-config/pkg-config gsl not found. Please set it manually. GSL_CONFIG=${GSL_CONFIG}")
  ENDIF(GSL_INCLUDE_DIRS)
 

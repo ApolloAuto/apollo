@@ -18,15 +18,15 @@ void Velodyne16Parser::generate_pointcloud(
     const std::shared_ptr<proto::VelodyneScan const>& scan_msg,
     std::shared_ptr<proto::PointCloud>& out_msg) {
   // allocate a point cloud with same time and frame ID as raw data
-  out_msg->mutable_header()->set_frame_id(scan_msg->header().frame_id());      
+  out_msg->mutable_header()->set_frame_id(scan_msg->header().frame_id());
   out_msg->mutable_header()->set_stamp(apollo::cybertron::Time().Now().ToNanosecond());
-  out_msg->mutable_header()->set_timestamp_sec(apollo::cybertron::Time().Now().ToSecond());      
+  out_msg->mutable_header()->set_timestamp_sec(apollo::cybertron::Time().Now().ToSecond());
   out_msg->set_height(1);
   _gps_base_usec = scan_msg->basetime() * 1000000UL;
 
   for (int i = 0; i < scan_msg->firing_pkts_size(); ++i) {
     unpack(scan_msg->firing_pkts(i), out_msg);
-    _last_time_stamp = out_msg->header().stamp();      
+    _last_time_stamp = out_msg->header().stamp();
   }
 
   if (out_msg->point_size() == 0) {
@@ -108,7 +108,7 @@ void Velodyne16Parser::unpack(
             firing == VLP16_FIRINGS_PER_BLOCK - 1 &&
             dsr == VLP16_SCANS_PER_FIRING - 1) {
           // set header stamp before organize the point cloud
-          pc->mutable_header()->set_stamp(timestamp);      
+          pc->mutable_header()->set_stamp(timestamp);
         }
 
         float distance = raw_distance.raw_distance * DISTANCE_RESOLUTION +

@@ -7,10 +7,10 @@ import importlib
 # first excute for init vars
 cybertron_path = os.environ['CYBERTRON_PATH'] # CYBERTRON_PATH=/home/work/baidu/adu-lab/python-wrapper/install/
 if (cybertron_path == ""):
-    print("CYBERTRON_PATH is null")  
+    print("CYBERTRON_PATH is null")
 else:
     print("CYBERTRON_PATH=%s" % cybertron_path)
-    print("env inited succ!") 
+    print("env inited succ!")
 
 cybertron_dir=os.path.split(cybertron_path)[0]
 sys.path.append(cybertron_path + "/third_party/")
@@ -23,7 +23,7 @@ from proto import chatter_pb2
 from cybertron import pyinit
 
 # begin wrapper cxx interface to py
-_cyber_node = importlib.import_module('_cyber_node') 
+_cyber_node = importlib.import_module('_cyber_node')
 
 #////////////////////////////////fun///////////////////////////////
 def test_talker_fun():
@@ -35,7 +35,7 @@ def test_talker_fun():
 
     _cyber_node.cyber_test0(33, 77)
     node = _cyber_node.new_PyNode("node_name1")
-    
+
     g_count = 1
     w = _cyber_node.PyNode_create_writer(node, "channel/chatter", chatter_pb2.DESCRIPTOR.message_types_by_name['Chatter'].full_name)
 
@@ -43,8 +43,8 @@ def test_talker_fun():
     # print(type(str1))
     # print("++++++" + str1)
     # return
-          
-    while not _cyber_node.py_is_shutdown():  
+
+    while not _cyber_node.py_is_shutdown():
         time.sleep(1)
         g_count = g_count + 1
         msg.seq = g_count

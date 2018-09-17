@@ -13,10 +13,10 @@ py_callback_type_t = ctypes.CFUNCTYPE(ctypes.c_int, ctypes.c_char_p)
 # init vars
 cybertron_path = os.environ['CYBERTRON_PATH']
 if (cybertron_path == ""):
-    print("CYBERTRON_PATH is null")  
+    print("CYBERTRON_PATH is null")
 else:
     print("CYBERTRON_PATH=%s" % cybertron_path)
-    print("env inited succ!") 
+    print("env inited succ!")
 
 cybertron_dir=os.path.split(cybertron_path)[0]
 sys.path.append(cybertron_path + "/third_party/")
@@ -29,7 +29,7 @@ sys.path.append(cybertron_dir + "/cybertron/")
 from proto import chatter_pb2
 
 
-_cyber_record = importlib.import_module('_cyber_record') 
+_cyber_record = importlib.import_module('_cyber_record')
 
 #//////////////////////////////record file class//////////////////////////////
 class RecordReader:
@@ -42,7 +42,7 @@ class RecordReader:
 
     def Open(self, path):
         return _cyber_record.PyRecordReader_Open(self.record_reader, path)
-    
+
     def Close(self):
         _cyber_record.PyRecordReader_Close(self.record_reader)
 
@@ -51,16 +51,16 @@ class RecordReader:
 
     def EndOfFile(self):
         return _cyber_record.PyRecordReader_EndOfFile(self.record_reader)
-    
+
     def CurrentMessageChannelName(self):
         return _cyber_record.PyRecordReader_CurrentMessageChannelName(self.record_reader)
 
     def CurrentRawMessage(self):
         return _cyber_record.PyRecordReader_CurrentRawMessage(self.record_reader)
-    
+
     def CurrentMessageTime(self):
         return _cyber_record.PyRecordReader_CurrentMessageTime(self.record_reader)
-    
+
     def GetMessageNumber(self, channel_name):
         return _cyber_record.PyRecordReader_GetMessageNumber(self.record_reader, channel_name)
 
@@ -80,15 +80,15 @@ class RecordWriter:
 
     def Open(self, path):
         return _cyber_record.PyRecordWriter_Open(self.record_writer, path)
-    
+
     def Close(self):
         _cyber_record.PyRecordWriter_Close(self.record_writer)
 
     def WriteChannel(self, channel_name, type_name, proto_desc):
         return _cyber_record.PyRecordWriter_WriteChannel(self.record_writer, channel_name, type_name, proto_desc)
-    
+
     def WriteMessage(self, single_str):
         return _cyber_record.PyRecordWriter_WriteMessage(self.record_writer, single_str)
-    
+
     def WriteMessage_channel(self, channel_name, rawmessage):
         return _cyber_record.PyRecordWriter_WriteMessage_channel(self.record_writer, channel_name, rawmessage)

@@ -58,6 +58,6 @@ bool InitUdp(const char* ip, uint32_t port, int& fd) {
 
 }
 
-} // namespace sensor 
-} // namespace apollo 
+} // namespace sensor
+} // namespace apollo
 

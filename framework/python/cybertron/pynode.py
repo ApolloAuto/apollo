@@ -13,10 +13,10 @@ py_callback_type_t = ctypes.CFUNCTYPE(ctypes.c_int, ctypes.c_char_p)
 # init vars
 cybertron_path = os.environ['CYBERTRON_PATH'] # CYBERTRON_PATH=/home/work/baidu/adu-lab/python-wrapper/install/
 if (cybertron_path == ""):
-    print("CYBERTRON_PATH is null")  
+    print("CYBERTRON_PATH is null")
 else:
     print("CYBERTRON_PATH=%s" % cybertron_path)
-    print("env inited succ!") 
+    print("env inited succ!")
 
 cybertron_dir=os.path.split(cybertron_path)[0]
 sys.path.append(cybertron_path + "/third_party/")
@@ -29,7 +29,7 @@ sys.path.append(cybertron_dir + "/cybertron/")
 from proto import chatter_pb2
 
 # begin wrapper cxx interface to py
-_cyber_node = importlib.import_module('_cyber_node') 
+_cyber_node = importlib.import_module('_cyber_node')
 
 #//////////////////////////////class//////////////////////////////
 class Writer:
@@ -61,17 +61,17 @@ class Client:
 
     def __del__(self):
         print("+++ Client __del___")
-    
+
     def send_request(self, data):
         # c++ fun can use msgbin
         response_str =  _cyber_node.PyClient_send_request(self.client, data.SerializeToString())
         if len(response_str) == 0:
             return None
-        
+
         response = self.data_type()
         response.ParseFromString(response_str)
         return response
-        
+
 class Node:
     def __init__(self, name):
         self.node = _cyber_node.new_PyNode(name)
@@ -100,9 +100,9 @@ class Node:
         w = _cyber_node.PyNode_create_writer(self.node, name, data_type)
         self.list_writer.append(w)
         return Writer(name, w, data_type)
-    
+
     def reader_callback(self, name):
-        v = self.subs[name]        
+        v = self.subs[name]
         msg_str = _cyber_node.PyReader_read( v[0], False)
         if (len(msg_str) > 0):
             proto = v[3]()
@@ -136,7 +136,7 @@ class Node:
         f_ptr = ctypes.cast(f, ctypes.c_void_p).value
         #reader.register_func(f_ptr)
         _cyber_node.PyReader_register_func(reader, f_ptr)
-        
+
         return Reader(name, reader, data_type)
 
     def create_client(self, name, request_data_type, response_data_type):
@@ -146,7 +146,7 @@ class Node:
         return Client(c, response_data_type)
 
     def service_callback(self, name):
-        v = self.services[name]                
+        v = self.services[name]
         msg_str = _cyber_node.PyService_read(v[0])
 
         if (len(msg_str) > 0):
@@ -210,7 +210,7 @@ class Node:
 
     def is_shutdown(self):
         return _cyber_node.py_is_shutdown()
-    
+
 #//////////////////////////////class end/////////////////////////////
 
 def test_talker_class():
@@ -224,7 +224,7 @@ def test_talker_class():
     g_count = 1
     w = node.create_writer("channel/chatter", str(chatter_pb2.Chatter))
 
-    while not node.is_shutdown():  
+    while not node.is_shutdown():
         time.sleep(1)
         g_count = g_count + 1
         msg.seq = g_count
@@ -240,7 +240,7 @@ def callback(data):
 
 def test_listener_class():
     print("=" * 120)
-    node = Node("listener")    
+    node = Node("listener")
     r = node.create_reader("channel/chatter", chatter_pb2.Chatter, callback)
-    while not node.is_shutdown():  
+    while not node.is_shutdown():
         time.sleep(0.002)

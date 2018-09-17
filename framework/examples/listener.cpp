@@ -25,7 +25,7 @@ void MessageCallback(
 
 int main(int argc, char *argv[]) {
   // init cybertron framework
-  apollo::cybertron::Init(argv[0]);  
+  apollo::cybertron::Init(argv[0]);
 
   // create listener node
   auto listener_node = apollo::cybertron::CreateNode("listener");

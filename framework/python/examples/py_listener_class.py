@@ -13,10 +13,10 @@ py_callback_type_t = ctypes.CFUNCTYPE(ctypes.c_int, ctypes.c_char_p)
 # first excute for init vars
 cybertron_path = os.environ['CYBERTRON_PATH'] # CYBERTRON_PATH=/home/work/baidu/adu-lab/python-wrapper/install
 if (cybertron_path == ""):
-    print("CYBERTRON_PATH is null")  
+    print("CYBERTRON_PATH is null")
 else:
     print("CYBERTRON_PATH=%s" % cybertron_path)
-    print("env inited succ!") 
+    print("env inited succ!")
 
 cybertron_dir=os.path.split(cybertron_path)[0]
 sys.path.append(cybertron_path + "/third_party/")
@@ -37,9 +37,9 @@ def callback(data):
 
 def test_listener_class():
     print("=" * 120)
-    node = pynode.Node("listener")    
+    node = pynode.Node("listener")
     r = node.create_reader("channel/chatter", chatter_pb2.Chatter, callback)
-    while not node.is_shutdown():  
+    while not node.is_shutdown():
         time.sleep(0.002)
 
 def main():

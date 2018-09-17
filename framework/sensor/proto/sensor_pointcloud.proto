@@ -13,7 +13,7 @@ message PointXYZIT {
 }
 
 message PointCloud {
-    optional apollo.sensor.proto.SensorHeader header = 1; 
+    optional apollo.sensor.proto.SensorHeader header = 1;
     optional string frame_id = 2;
     optional bool is_dense = 3;
     repeated PointXYZIT point = 4;

@@ -67,7 +67,7 @@ void test() {
 
   AINFO << "wo shi 111";
   sleep(1);
-  
+
   std::string err_string;
   bool res1 = buffer->canTransform(
       "world", "car", apollo::cybertron::Time((uint64_t)0), 0.1,

@@ -2,13 +2,13 @@ syntax = "proto2";
 
 package adu.common.sensor;
 
-import "header.proto";  
-import "novatel_header.proto";    
+import "header.proto";
+import "novatel_header.proto";
 import "novatel_position_type.proto";
 
 message Heading {
     optional adu.common.header.Header header = 20;
-    optional NovatelHeader novatel_header = 1;    
+    optional NovatelHeader novatel_header = 1;
 
     optional uint32 solution_status = 2;
     optional uint32 position_type = 3;
@@ -16,7 +16,7 @@ message Heading {
     optional float baseline_length = 4;
     optional float heading = 5;
     optional float pitch = 6;
- 
+
     optional float reserved = 7;
     optional float heading_std_dev = 8;
     optional float pitch_std_dev = 9;
@@ -32,4 +32,4 @@ message Heading {
     optional uint32 extended_solution_status = 16;
     optional uint32 galileo_beidou_sig_mask = 17;
     optional uint32 gps_glonass_sig_mask = 18;
-} 
+}

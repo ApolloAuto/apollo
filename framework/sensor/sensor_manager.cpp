@@ -9,15 +9,15 @@
 namespace apollo {
 namespace sensor {
 
-SensorManager::SensorManager(const proto::SensorConfig& sensor_config, 
-    const std::shared_ptr<cybertron::Node>& node) 
+SensorManager::SensorManager(const proto::SensorConfig& sensor_config,
+    const std::shared_ptr<cybertron::Node>& node)
   : sensor_config_(sensor_config)
   , node_(node) {
 }
 
 bool SensorManager::Init() {
 
-  epoll_dispatcher_ = EpollDispatcher::Instance();  
+  epoll_dispatcher_ = EpollDispatcher::Instance();
   for(auto& conf : sensor_config_.sensors()) {
     if (!CreateDriver(conf)) {
       return false;
@@ -50,7 +50,7 @@ bool SensorManager::CreateDriver(const proto::SensorInfo& sensor_info) {
         } else {
           return false;
         }
-      } 
+      }
       break;
     default:
         return false;
@@ -82,6 +82,6 @@ std::string SensorManager::GetConfPath(const std::string& conf_path) {
   return load_path;
 }
 
-} // namespace sensor 
-} // namespace apollo 
+} // namespace sensor
+} // namespace apollo
 

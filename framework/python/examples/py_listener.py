@@ -14,10 +14,10 @@ def callback(data):
 
 def test_listener_class():
     print("=" * 120)
-    node = pynode.Node("listener")    
+    node = pynode.Node("listener")
     r = node.create_reader("channel/chatter", chatter_pb2.Chatter, callback)
     node.spin()
-    # while not node.is_shutdown():  
+    # while not node.is_shutdown():
     #     time.sleep(0.002)
 
 def main():

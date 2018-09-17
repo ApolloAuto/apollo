@@ -49,6 +49,6 @@ void Convert::convert_velodyne_to_pointcloud(
   // writer.writeBinaryCompressed(filename, pcl_cloud);
 }
 
-}  // namespace 
+}  // namespace
 }
 }

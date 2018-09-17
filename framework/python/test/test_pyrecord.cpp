@@ -35,7 +35,7 @@ void test_write(const std::string &writefile) {
   rec_writer.WriteChannel(CHAN_1, MSG_TYPE, STR_10B);
 
   SingleMessage msg1;
-  
+
   msg1.set_channel_name(CHAN_1);
   msg1.set_content(STR_10B);
   msg1.set_time(888);
@@ -61,7 +61,7 @@ void test_read(const std::string &readfile) {
       AINFO << "========================";
       std::string channel_name = rec_reader.CurrentMessageChannelName();
       AINFO << "read msg[" << count << "]";
-      AINFO << "cur channel:[" <<  channel_name 
+      AINFO << "cur channel:[" <<  channel_name
       << "] msg total:" << rec_reader.GetMessageNumber(channel_name)
       << "] " << "cur msg:[ " << rec_reader.CurrentRawMessage() << " ]";
       AINFO << "curMsgTime: " << rec_reader.CurrentMessageTime();
@@ -78,7 +78,7 @@ int main(int argc, char *argv[]) {
   test_write(TEST_RECORD_FILE);
   sleep(1);
   test_read(TEST_RECORD_FILE);
-  
-  
+
+
   return 0;
 }

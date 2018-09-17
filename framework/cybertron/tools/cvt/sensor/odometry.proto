@@ -2,8 +2,8 @@ syntax = "proto2";
 
 package adu.common;
 
-import "header.proto"; 
-import "common_geometry.proto"; 
+import "header.proto";
+import "common_geometry.proto";
 
 message Pose {
     required Point3D position = 1;

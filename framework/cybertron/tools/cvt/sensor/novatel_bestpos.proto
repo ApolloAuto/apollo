@@ -2,14 +2,14 @@ syntax = "proto2";
 
 package adu.common.sensor;
 
-import "header.proto";  
-import "novatel_header.proto";    
+import "header.proto";
+import "novatel_header.proto";
 import "novatel_position_type.proto";
 
 // message 42
 message BestPos {
     optional adu.common.header.Header header = 24;
-    optional NovatelHeader novatel_header = 1;    
+    optional NovatelHeader novatel_header = 1;
 
     // Table 21 in the SPAN on OEM6 manual.
     // See: http://www.novatel.com/assets/Documents/Manuals/OM-20000144UM.pdf#page=99
@@ -35,19 +35,19 @@ message BestPos {
     optional double latitude = 4;
     optional double longitude = 5;
     optional double altitude = 6;
- 
+
     optional float undulation = 7;
     optional uint32 datum_id = 8;
- 
+
     optional float latitude_std = 9;
     optional float longitude_std = 10;
     optional float altitude_std = 11;
- 
+
     optional bytes stn_id = 12;
- 
+
     optional float diff_age = 13;
     optional float sol_age = 14;
- 
+
     optional uint32 svs = 15;
     optional uint32 sol_svs = 16;
     optional uint32 l1_svs = 17;
@@ -56,4 +56,4 @@ message BestPos {
     optional uint32 extsolstat = 20;
     optional uint32 gal_sig_mask = 21;
     optional uint32 sig_mask = 22;
-} 
+}

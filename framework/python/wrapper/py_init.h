@@ -31,7 +31,7 @@ bool py_init() {
     AWARN << "py_cyber_init failed.";
     return false;
   }
-  
+
   return Init();
 }
 

@@ -5,10 +5,10 @@ import os
 # first excute for init vars
 cybertron_path = os.environ['CYBERTRON_PATH'] # CYBERTRON_PATH=/home/work/baidu/adu-lab/python-wrapper/install/
 if (cybertron_path == ""):
-    print("CYBERTRON_PATH is null")  
+    print("CYBERTRON_PATH is null")
 else:
     print("CYBERTRON_PATH=%s" % cybertron_path)
-    print("env inited succ!") 
+    print("env inited succ!")
 
 cybertron_dir=os.path.split(cybertron_path)[0]
 sys.path.append(cybertron_path + "/third_party/")
@@ -30,10 +30,10 @@ def test_talker_class():
 
     node = pynode.Node("node_name1")
     g_count = 1
-    
+
     w = node.create_writer("channel/chatter", chatter_pb2.DESCRIPTOR.message_types_by_name['Chatter'].full_name)
-    
-    while not node.is_shutdown():  
+
+    while not node.is_shutdown():
         time.sleep(1)
         g_count = g_count + 1
         msg.seq = g_count

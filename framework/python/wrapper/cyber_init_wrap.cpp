@@ -53,7 +53,7 @@ static PyMethodDef _cyber_init_methods[] = {
     {"py_shutdown", cyber_py_shutdown, METH_NOARGS, ""},
     {"py_is_shutdown", cyber_py_is_shutdown, METH_NOARGS, ""},
     {"py_waitforshutdown", cyber_py_waitforshutdown, METH_NOARGS, ""},
-    
+
     {NULL, NULL, 0, NULL} /* sentinel */
 };
 

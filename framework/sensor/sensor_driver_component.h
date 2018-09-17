@@ -1,6 +1,6 @@
 
 #ifndef SENSOR_SENSOR_DRIVER_COMPONENT_H_
-#define SENSOR_SENSOR_DRIVER_COMPONENT_H_ 
+#define SENSOR_SENSOR_DRIVER_COMPONENT_H_
 
 #include "cybertron/node/node.h"
 #include "cybertron/component/component.h"

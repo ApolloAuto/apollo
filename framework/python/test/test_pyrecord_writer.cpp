@@ -24,6 +24,6 @@ int main(int argc, char *argv[]) {
   apollo::cybertron::Init("cyber_python");
   apollo::cybertron::record::PyRecordFileWriter rec_file_writer;
   AINFO << "++++ begin pyrecfilereader";
-  
+
   return 0;
 }

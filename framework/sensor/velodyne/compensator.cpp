@@ -5,13 +5,13 @@ namespace sensor {
 namespace velodyne {
 
 Compensator::Compensator(proto::VelodyneConfig& velodyne_config) {
-  _tf2_buffer_ptr = apollo::cybertron::tf2_cybertron::Buffer::Instance();  
+  _tf2_buffer_ptr = apollo::cybertron::tf2_cybertron::Buffer::Instance();
   _config = velodyne_config;
 }
 
-bool Compensator::query_pose(const uint64_t& timestamp, 
+bool Compensator::query_pose(const uint64_t& timestamp,
     void* pose,
-    const std::string& child_frame_id, 
+    const std::string& child_frame_id,
     const std::string& parent_frame_id) {
 
   apollo::cybertron::Time query_time(timestamp);
@@ -100,7 +100,7 @@ bool Compensator::motion_compensation(
   msg_compensated->mutable_header()->set_lidar_timestamp(msg->header().lidar_timestamp());
   msg_compensated->set_measurement_time(msg->measurement_time());
   msg_compensated->set_height(msg->height());
-  
+
   uint64_t new_time = apollo::cybertron::Time().Now().ToNanosecond();
   AINFO << "compenstator new msg diff:" << new_time - start
     << ";meta:" << msg->header().lidar_timestamp();

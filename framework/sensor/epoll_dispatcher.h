@@ -41,6 +41,6 @@ private:
 };
 
 } // namespace drivers
-} // namespace apollo 
+} // namespace apollo
 
 #endif //CYBERTRON_DRIVERS_EPOLL_DISPATCHER_H

@@ -17,7 +17,7 @@ def test_talker_class():
     g_count = 1
 
     w = node.create_writer("channel/chatter", chatter_pb2.DESCRIPTOR.message_types_by_name['Chatter'].full_name)
-    while not node.is_shutdown():  
+    while not node.is_shutdown():
         time.sleep(1)
         g_count = g_count + 1
         msg.seq = g_count

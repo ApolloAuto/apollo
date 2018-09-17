@@ -152,7 +152,7 @@ PyObject *cyber_delete_PyReader(PyObject *self, PyObject *args) {
 PyObject *cyber_PyReader_read(PyObject *self, PyObject *args) {
   PyObject *pyobj_reader = nullptr;
   PyObject *pyobj_iswait = nullptr;
-  
+
   if (!PyArg_ParseTuple(args, (char *)"OO:cyber_PyReader_read", &pyobj_reader,
                         &pyobj_iswait)) {
     AINFO << "cyber_PyReader_read:PyArg_ParseTuple failed!";
@@ -189,7 +189,7 @@ PyObject *cyber_PyReader_register_func(PyObject *self, PyObject *args) {
                         &pyobj_reader, &pyobj_regist_fun)) {
     return Py_None;
   }
-  
+
   apollo::cybertron::PyReader *reader =
       PyObjectToPtr<apollo::cybertron::PyReader *>(pyobj_reader,
                                                    "apollo_cybertron_pyreader");
@@ -587,9 +587,9 @@ PyObject *cyber_test1(PyObject *self, PyObject *args) {
     return Py_None;
   }
   std::string str(s, len);
-  
+
   AINFO << "p3: " << str;
-  AINFO << "++++len: " << len;  
+  AINFO << "++++len: " << len;
   AINFO << str;
 
   AINFO << "channel, data_type->:" << channel << ":" << data_type;
@@ -624,7 +624,7 @@ static PyMethodDef _cyber_node_methods[] = {
     {"py_is_shutdown", cyber_py_is_shutdown, METH_NOARGS, ""},
     {"py_init", cyber_py_init, METH_NOARGS, ""},
     {"py_OK", cyber_py_ok, METH_NOARGS, ""},
-    
+
     // PyWriter fun
     {"new_PyWriter", cyber_new_PyWriter, METH_VARARGS, ""},
     {"delete_PyWriter", cyber_delete_PyWriter, METH_VARARGS, ""},
@@ -643,7 +643,7 @@ static PyMethodDef _cyber_node_methods[] = {
     // PyService fun
     {"new_PyService", cyber_new_PyService, METH_VARARGS, ""},
     {"delete_PyService", cyber_delete_PyService, METH_VARARGS, ""},
-    {"PyService_register_func", cyber_PyService_register_func, METH_VARARGS, ""},     
+    {"PyService_register_func", cyber_PyService_register_func, METH_VARARGS, ""},
     {"PyService_read", cyber_PyService_read, METH_VARARGS, ""},
     {"PyService_write", cyber_PyService_write, METH_VARARGS, ""},
     // PyNode fun

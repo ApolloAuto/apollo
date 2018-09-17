@@ -25,7 +25,7 @@ void fpool()
   std::shared_ptr<Test> t;
   while (c < NUM_OBJECT)
       if ( t = pool->GetObject()) c++;
-  
+
   auto end = std::chrono::steady_clock::now();
 
   std::chrono::duration<double> diff = end-start;
@@ -35,7 +35,7 @@ void fpool()
 void fnpool()
 {
   auto start = std::chrono::steady_clock::now();
-  
+
   int c = 0;
   int i = 0;
   Test *t[NUM_OBJECT];

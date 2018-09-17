@@ -2,7 +2,7 @@ syntax = "proto2";
 
 package adu.common.sensor;
 
-import "header.proto"; 
+import "header.proto";
 import "camera_region_of_interest.proto";
 
 // This message defines meta information for a camera. It should be in a

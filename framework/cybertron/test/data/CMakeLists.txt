@@ -12,7 +12,7 @@ target_link_libraries(channel_buffer_test cybertron gtest)
 add_executable(data_dispatcher_test data_dispatcher_test.cpp)
 target_link_libraries(data_dispatcher_test cybertron gtest)
 
-install(TARGETS 
+install(TARGETS
   cache_buffer_test
   data_visitor_test
   channel_buffer_test

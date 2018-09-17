@@ -1,20 +1,20 @@
 
 #ifndef SENSOR_SENSOR_MANAGER_H_
-#define SENSOR_SENSOR_MANAGER_H_ 
+#define SENSOR_SENSOR_MANAGER_H_
 
 #include "cybertron/node/node.h"
 #include "sensor/proto/sensor_config.pb.h"
- 
-#include "sensor/epoll_dispatcher.h" 
-#include "sensor/sensor.h" 
+
+#include "sensor/epoll_dispatcher.h"
+#include "sensor/sensor.h"
 
 namespace apollo {
 namespace sensor {
 
-//Load all into epoll dispatcher 
+//Load all into epoll dispatcher
 class SensorManager {
  public:
-  SensorManager(const proto::SensorConfig& sensor_config, 
+  SensorManager(const proto::SensorConfig& sensor_config,
     const std::shared_ptr<cybertron::Node>& node);
   virtual ~SensorManager() {}
   bool Init();
@@ -33,7 +33,7 @@ class SensorManager {
   SensorManager &operator=(SensorManager &) = delete;
 };
 
-} // namespace sensor 
-} // namespace apollo 
+} // namespace sensor
+} // namespace apollo
 
 #endif //SENSOR_EPOLL_HANDLER_H

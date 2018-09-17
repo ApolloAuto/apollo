@@ -40,9 +40,9 @@
 #
 #============================================================================
 
-#   
+#
 # Example usage:
-#   
+#
 #   # Passing the version means NUMPY_FOUND will only be TRUE if a
 #   # version >= the provided version is found.
 #   find_package(NUMPY 1.7)
@@ -51,7 +51,7 @@
 #   endif()
 #   ...
 #   include_directories(${NUMPY_INCLUDE_DIRS} ...)
-# 
+#
 
 # Finding NumPy involves calling the Python interpreter
 if(NumPy_FIND_REQUIRED)

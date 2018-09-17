@@ -41,7 +41,7 @@ def perf_data_process(input_file):
         for line in f:
             line=line.strip('\n')
             items = line.split()
-            
+
             if int(items[0]) == 1:
                 event_type = items[0]
                 event_id = items[1]
@@ -54,7 +54,7 @@ def perf_data_process(input_file):
                 e.stamp = stamp
                 e.id = event_id
                 trans_event_map[identify_id].append(e)
-            
+
             elif int(items[0]) == 0:
                 event_type = items[0]
                 event_id = items[1]
@@ -69,7 +69,7 @@ def perf_data_process(input_file):
                     sched_fusion_map[rt_name] = e_v;
                 if not notify_tag_map.has_key(rt_name):
                     notify_tag_map[rt_name] = False
-                
+
                 event_trace_map[stamp] = line
 
                 identify_id = rt_name + split_str + event_id

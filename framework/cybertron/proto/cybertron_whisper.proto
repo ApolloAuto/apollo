@@ -2,10 +2,10 @@ syntax = "proto2";
 
 package apollo.cybertron.proto;
 
-import "header.proto"; 
+import "header.proto";
 
 message CybertronWhisper {
-    optional adu.common.header.Header cyber_header = 1; 
+    optional adu.common.header.Header cyber_header = 1;
     optional uint64 seq = 2;
     optional int32  length = 3;
     optional int32  position = 4;

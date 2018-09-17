@@ -169,8 +169,8 @@ Syntax: cpplint.py [--verbose=#] [--output=vs7] [--filter=-x,+y,...]
 
     The "root" option is similar in function to the --root flag (see example
     above).
-    
-    The "headers" option is similar in function to the --headers flag 
+
+    The "headers" option is similar in function to the --headers flag
     (see example above).
 
     CPPLINT.cfg has an effect on files in the same directory and all

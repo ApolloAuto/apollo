@@ -7,13 +7,13 @@ function _cyber_launch_complete() {
   local pattern="*.launch"
   case $cmd in
   'cyber_launch')
-    COMPREPLY=( $(compgen -W "start" -- ${word}) ) 
+    COMPREPLY=( $(compgen -W "start" -- ${word}) )
     ;;
   'start')
     compopt -o nospace
     local files=`cd ${CYBERTRON_PATH}/launch/ 2>/dev/null && ls -l *.launch |awk '{print $NF}' 2>/dev/null`
-    COMPREPLY=( $(compgen -W "$files" -- ${word}) ) 
-    #COMPREPLY=( $(compgen -d -f -G "$pattern" -- ${word}) ) 
+    COMPREPLY=( $(compgen -W "$files" -- ${word}) )
+    #COMPREPLY=( $(compgen -d -f -G "$pattern" -- ${word}) )
     ;;
   '*')
     ;;
@@ -28,7 +28,7 @@ function _cyber_recorder_complete() {
   local pattern="*.record"
   case $cmd in
   'cyber_recorder')
-    COMPREPLY=( $(compgen -W "$subcmd" -- ${word}) ) 
+    COMPREPLY=( $(compgen -W "$subcmd" -- ${word}) )
     ;;
   *)
     ;;
@@ -42,7 +42,7 @@ function _cyber_channel_complete() {
   local subcmd="list echo info hz bw"
   case $cmd in
   'cyber_channel')
-    COMPREPLY=( $(compgen -W "$subcmd" -- ${word}) ) 
+    COMPREPLY=( $(compgen -W "$subcmd" -- ${word}) )
     ;;
   '*')
     ;;
@@ -56,7 +56,7 @@ function _cyber_param_complete() {
   local subcmd="list get set remove load dump"
   case $cmd in
   'cyber_param')
-    COMPREPLY=( $(compgen -W "$subcmd" -- ${word}) ) 
+    COMPREPLY=( $(compgen -W "$subcmd" -- ${word}) )
     ;;
   '*')
     ;;
@@ -70,7 +70,7 @@ function _cyber_service_complete() {
   local subcmd="list info"
   case $cmd in
   'cyber_service')
-    COMPREPLY=( $(compgen -W "$subcmd" -- ${word}) ) 
+    COMPREPLY=( $(compgen -W "$subcmd" -- ${word}) )
     ;;
   '*')
     ;;
@@ -84,7 +84,7 @@ function _cyber_node_complete() {
   local subcmd="list info"
   case $cmd in
   'cyber_node')
-    COMPREPLY=( $(compgen -W "$subcmd" -- ${word}) ) 
+    COMPREPLY=( $(compgen -W "$subcmd" -- ${word}) )
     ;;
   '*')
     ;;

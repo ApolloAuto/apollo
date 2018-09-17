@@ -1,6 +1,6 @@
 
 #ifndef SENSOR_VELODYNE_DATA_TYPE_H
-#define SENSOR_VELODYNE_DATA_TYPE_H 
+#define SENSOR_VELODYNE_DATA_TYPE_H
 
 #include <memory>
 #include <limits>
@@ -147,4 +147,4 @@ typedef std::shared_ptr<NMEATime> NMEATimePtr;
 }
 } // namespace apollo
 
-#endif  // DRIVERS_VELODYNE_DATA_TYPE_H 
+#endif  // DRIVERS_VELODYNE_DATA_TYPE_H

@@ -33,7 +33,7 @@ function main() {
     sleep $RUN_TIME_SEC
     daily_run.bash stop >>$LOG_DIR/$LOG_NAME 2>&1
   done
-  
+
   error_info=$(grep -i -E "core|terminate|error" $LOG_DIR/$LOG_NAME | wc -l)
   if [ $error_info -ne 0 ]; then
     echo "daily run failed, please check log: $LOG_DIR/$LOG_NAME for more details."

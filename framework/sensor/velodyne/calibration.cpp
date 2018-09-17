@@ -214,6 +214,6 @@ void Calibration::write(const std::string& calibration_file) {
   fout.close();
 }
 
-} 
+}
 }
 }

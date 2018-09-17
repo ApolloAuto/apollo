@@ -1,6 +1,6 @@
 
 #ifndef SENSOR_VELODYNE_CALIBRATION_H
-#define SENSOR_VELODYNE_CALIBRATION_H 
+#define SENSOR_VELODYNE_CALIBRATION_H
 
 #include <memory>
 #include <map>
@@ -53,4 +53,4 @@ class Calibration {
 }
 }
 
-#endif  // SENSOR_VELODYNE_CALIBRATION_H 
+#endif  // SENSOR_VELODYNE_CALIBRATION_H

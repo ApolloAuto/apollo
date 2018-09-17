@@ -4,7 +4,7 @@ package adu.common.sensor;
 
 // On the wire, this header is preceeded by three sync bytes,
 // which are 0xAA 0x44 0x12, and a uint8 which is the header length.
-message NovatelHeader {  
+message NovatelHeader {
     // Message ID of the log being output.
     optional uint32 id = 1;
 
@@ -53,7 +53,7 @@ message NovatelHeader {
     // optional ReceiverStatus receiver_status = 10;
 
     // Cannot use enum type, because 2147483648 is out of interge range
-    optional uint32 receiver_status = 10;  
+    optional uint32 receiver_status = 10;
 
     optional uint32 reserved = 11;
     optional uint32 software_version = 12;
