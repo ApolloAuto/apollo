@@ -21,35 +21,39 @@
 #include <vector>
 
 #include "gflags/gflags.h"
-#include "modules/common/adapters/adapter_manager.h"
+#include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/util/json_util.h"
 #include "modules/common/util/map_util.h"
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
 #include "modules/dreamview/backend/hmi/hmi_worker.h"
-#include "modules/dreamview/proto/audio_capture.pb.h"
-#include "modules/monitor/proto/system_status.pb.h"
 
 namespace apollo {
 namespace dreamview {
 
 using apollo::canbus::Chassis;
 using apollo::common::VehicleConfigHelper;
-using apollo::common::adapter::AdapterManager;
 using apollo::common::time::Clock;
 using apollo::common::util::JsonUtil;
 using Json = WebSocketHandler::Json;
 using RLock = boost::shared_lock<boost::shared_mutex>;
 
 HMI::HMI(WebSocketHandler *websocket, MapService *map_service)
-    : websocket_(websocket),
+    : node_(cybertron::CreateNode("hmi")),
+      websocket_(websocket),
       map_service_(map_service),
-      logger_(apollo::common::monitor::MonitorMessageItem::HMI) {
+      monitor_log_buffer_(apollo::common::monitor::MonitorMessageItem::HMI) {
   // Register websocket message handlers.
   if (websocket_) {
     RegisterMessageHandlers();
     StartBroadcastHMIStatusThread();
   }
+
+  // TODO(linvivian): make sure the writers are thread-safe
+  audio_capture_writer_ =
+      node_->CreateWriter<AudioCapture>(FLAGS_audio_capture_topic);
+
+  HMIWorker::Instance()->Init(node_);
 }
 
 void HMI::RegisterMessageHandlers() {
@@ -77,7 +81,7 @@ void HMI::RegisterMessageHandlers() {
           AudioCapture audio;
           audio.set_connection_id(reinterpret_cast<uint64_t>(conn));
           audio.set_wav_stream(apollo::common::util::DecodeBase64(data));
-          AdapterManager::PublishAudioCapture(audio);
+          audio_capture_writer_->Write(std::make_shared<AudioCapture>(audio));
         } else {
           AERROR << "Truncated audio piece.";
         }
@@ -217,41 +221,43 @@ void HMI::RegisterMessageHandlers() {
         uint64_t event_time_ms;
         std::string event_msg;
         std::vector<std::string> event_types;
-        apollo::common::monitor::MonitorLogBuffer log_buffer(&logger_);
         if (JsonUtil::GetNumberFromJson(json, "event_time_ms",
                                         &event_time_ms) &&
             JsonUtil::GetStringFromJson(json, "event_msg", &event_msg) &&
             JsonUtil::GetStringVectorFromJson(json, "event_type",
                                               &event_types)) {
           HMIWorker::SubmitDriveEvent(event_time_ms, event_msg, event_types);
-          log_buffer.INFO("Drive event added.");
+          monitor_log_buffer_.INFO("Drive event added.");
         } else {
           AERROR << "Truncated SubmitDriveEvent request.";
-          log_buffer.WARN("Failed to submit a drive event.");
+          monitor_log_buffer_.WARN("Failed to submit a drive event.");
         }
       });
 
   // Received new system status, broadcast to clients.
-  AdapterManager::AddSystemStatusCallback(
-      [this](const monitor::SystemStatus &system_status) {
-        if (Clock::NowInSeconds() - system_status.header().timestamp_sec() <
+  system_status_reader_ = node_->CreateReader<monitor::SystemStatus>(
+      FLAGS_system_status_topic,
+      [this](const std::shared_ptr<monitor::SystemStatus> &system_status) {
+        ADEBUG << "Received system status: run system_status callback.";
+        if (Clock::NowInSeconds() - system_status->header().timestamp_sec() <
             FLAGS_system_status_lifetime_seconds) {
-          HMIWorker::Instance()->UpdateSystemStatus(system_status);
+          HMIWorker::Instance()->UpdateSystemStatus(*system_status);
           DeferredBroadcastHMIStatus();
         }
       });
 
   // Received Chassis, trigger action if there is high beam signal.
-  AdapterManager::AddChassisCallback([this](const Chassis &chassis) {
-    if (Clock::NowInSeconds() - chassis.header().timestamp_sec() <
-        FLAGS_system_status_lifetime_seconds) {
-      if (chassis.signal().high_beam()) {
-        const bool ret = HMIWorker::Instance()->Trigger(
-            HMIWorker::Instance()->GetConfig().chassis_high_beam_action());
-        AERROR_IF(!ret) << "Failed to execute high_beam action.";
-      }
-    }
-  });
+  chassis_reader_ = node_->CreateReader<Chassis>(
+      FLAGS_chassis_topic, [this](const std::shared_ptr<Chassis> &chassis) {
+        if (Clock::NowInSeconds() - chassis->header().timestamp_sec() <
+            FLAGS_system_status_lifetime_seconds) {
+          if (chassis->signal().high_beam()) {
+            const bool ret = HMIWorker::Instance()->Trigger(
+                HMIWorker::Instance()->GetConfig().chassis_high_beam_action());
+            AERROR_IF(!ret) << "Failed to execute high_beam action.";
+          }
+        }
+      });
 }
 
 void HMI::StartBroadcastHMIStatusThread() {
@@ -276,12 +282,11 @@ void HMI::StartBroadcastHMIStatusThread() {
           JsonUtil::ProtoToTypedJson("HMIStatus", status).dump());
 
       // Broadcast messages.
-      apollo::common::monitor::MonitorLogBuffer log_buffer(&logger_);
       if (status.current_map().empty()) {
-        log_buffer.WARN("You haven't selected a map yet!");
+        monitor_log_buffer_.WARN("You haven't selected a map yet!");
       }
       if (status.current_vehicle().empty()) {
-        log_buffer.WARN("You haven't selected a vehicle yet!");
+        monitor_log_buffer_.WARN("You haven't selected a vehicle yet!");
       }
     }
   }));

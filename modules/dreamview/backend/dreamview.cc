@@ -83,7 +83,7 @@ Status Dreamview::Init() {
       websocket_.get(), map_ws_.get(), sim_control_.get(), map_service_.get(),
       FLAGS_routing_from_file));
   //   point_cloud_updater_.reset(new PointCloudUpdater(point_cloud_ws_.get()));
-  //   hmi_.reset(new HMI(websocket_.get(), map_service_.get()));
+  hmi_.reset(new HMI(websocket_.get(), map_service_.get()));
 
   server_->addWebSocketHandler("/websocket", *websocket_);
   server_->addWebSocketHandler("/map", *map_ws_);

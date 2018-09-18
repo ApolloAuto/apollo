@@ -1,22 +1,22 @@
 data_files {
   source_path: "vehicle_param.pb.txt"
-  dest_path: "modules/common/data/mkz_config.pb.txt"
+  dest_path: "/apollo/modules/common/data/mkz_config.pb.txt"
 }
 data_files {
   source_path: "calibration_table.pb.txt"
-  dest_path: "modules/control/conf/lincoln.pb.txt"
+  dest_path: "/apollo/modules/control/conf/lincoln.pb.txt"
 }
 data_files {
   source_path: "cancard_params/canbus_conf.pb.txt"
-  dest_path: "modules/canbus/conf/canbus_conf.pb.txt"
+  dest_path: "/apollo/modules/canbus/conf/canbus_conf.pb.txt"
 }
 data_files {
   source_path: "cancard_params/conti_radar_conf.pb.txt"
-  dest_path: "modules/drivers/radar/conti_radar/conf/conti_radar_conf.pb.txt"
+  dest_path: "/apollo/modules/drivers/radar/conti_radar/conf/conti_radar_conf.pb.txt"
 }
 data_files {
   source_path: "navigation_lincoln.pb.txt"
-  dest_path: "modules/control/conf/navigation_lincoln.pb.txt"
+  dest_path: "/apollo/modules/control/conf/navigation_lincoln.pb.txt"
 }
 data_files {
   source_path: "start_velodyne.launch"
@@ -52,11 +52,11 @@ data_files {
 }
 data_files {
   source_path: "velodyne_params"
-  dest_path: "modules/localization/msf/params/velodyne_params"
+  dest_path: "/apollo/modules/localization/msf/params/velodyne_params"
 }
 data_files {
   source_path: "camera_params"
-  dest_path: "modules/perception/data/params"
+  dest_path: "/apollo/modules/perception/data/params"
 }
 data_files {
   source_path: "camera_params/start_leopard.launch"
@@ -68,21 +68,21 @@ data_files {
 }
 data_files {
   source_path: "radar_params"
-  dest_path: "modules/perception/data/params"
+  dest_path: "/apollo/modules/perception/data/params"
 }
 data_files {
   source_path: "gnss_params/gnss_conf.pb.txt"
-  dest_path: "modules/drivers/gnss/conf/gnss_conf.pb.txt"
+  dest_path: "/apollo/modules/drivers/gnss/conf/gnss_conf.pb.txt"
 }
 data_files {
   source_path: "gnss_params/ant_imu_leverarm.yaml"
-  dest_path: "modules/localization/msf/params/gnss_params/ant_imu_leverarm.yaml"
+  dest_path: "/apollo/modules/localization/msf/params/gnss_params/ant_imu_leverarm.yaml"
 }
 data_files {
   source_path: "vehicle_params"
-  dest_path: "modules/localization/msf/params/vehicle_params"
+  dest_path: "/apollo/modules/localization/msf/params/vehicle_params"
 }
 data_files {
   source_path: "vehicle_info.pb.txt"
-  dest_path: "modules/tools/ota/vehicle_info.pb.txt"
+  dest_path: "/apollo/modules/tools/ota/vehicle_info.pb.txt"
 }
