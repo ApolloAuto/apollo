@@ -68,6 +68,10 @@ template <typename T, typename std::enable_if<
                           std::is_base_of<Message, T>::value, int>::type = 0>
 bool DumpMessage(const std::shared_ptr<T>& msg,
                  const std::string& dump_dir = "/tmp") {
+  if (!msg) {
+    AWARN << "Message to be dumped is NULL!";
+  }
+
   auto type_name = T::descriptor()->full_name();
   std::string dump_path = dump_dir + "/" + type_name;
   if (!DirectoryExists(dump_path)) {
