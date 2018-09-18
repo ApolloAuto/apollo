@@ -2385,7 +2385,7 @@ static int decodef(char* p, int n, double* v) {
     v[i] = 0.0;
   }
   for (i = 0, p = strtok(p, " "); p && i < n; p = strtok(NULL, " ")) {
-    v[++i] = atof(p) * 1E-3;
+    v[i++] = atof(p) * 1E-3;
   }
   return i;
 }
