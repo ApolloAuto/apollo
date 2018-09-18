@@ -171,22 +171,18 @@ bool DpRoadGraph::GenerateMinCostPath(
 
       graph_nodes.back().emplace_back(cur_point, nullptr);
 
-      auto msg = std::make_shared<RoadGraphMessage>();
-      msg->prev_nodes = &prev_dp_nodes;
-      msg->level = level;
-      msg->total_level = total_level;
-      msg->trajectory_cost = &trajectory_cost;
-      msg->front = &front;
-      msg->cur_node = &(graph_nodes.back().back());
+      auto msg = std::make_shared<RoadGraphMessage>(
+          prev_dp_nodes, level, total_level, &trajectory_cost, &front,
+          &(graph_nodes.back().back()));
 
       if (FLAGS_enable_multi_thread_in_dp_poly_path) {
-        results.push_back(task->Execute(msg));
+        results.emplace_back(task->Execute(msg));
       } else {
         UpdateNode(msg);
       }
     }
     if (FLAGS_enable_multi_thread_in_dp_poly_path) {
-      for (auto& result : results) {
+      for (auto &result : results) {
         result.get();
       }
     }
@@ -222,11 +218,10 @@ bool DpRoadGraph::GenerateMinCostPath(
 
 void DpRoadGraph::UpdateNode(const std::shared_ptr<RoadGraphMessage> &msg) {
   DCHECK_NOTNULL(msg);
-  DCHECK_NOTNULL(msg->prev_nodes);
   DCHECK_NOTNULL(msg->trajectory_cost);
   DCHECK_NOTNULL(msg->front);
   DCHECK_NOTNULL(msg->cur_node);
-  for (const auto &prev_dp_node : *(msg->prev_nodes)) {
+  for (const auto &prev_dp_node : msg->prev_nodes) {
     const auto &prev_sl_point = prev_dp_node.sl_point;
     const auto &cur_point = msg->cur_node->sl_point;
     float init_dl = 0.0;

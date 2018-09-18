@@ -112,9 +112,19 @@ class DpRoadGraph {
                     const uint32_t total_level, ComparableCost *cost);
 
   struct RoadGraphMessage {
-    const std::list<DpRoadGraphNode> *prev_nodes = nullptr;
-    uint32_t level;
-    uint32_t total_level;
+    RoadGraphMessage(const std::list<DpRoadGraphNode> &_prev_nodes,
+                     const uint32_t _level, const uint32_t _total_level,
+                     TrajectoryCost *_trajectory_cost, DpRoadGraphNode *_front,
+                     DpRoadGraphNode *_cur_node)
+        : prev_nodes(_prev_nodes),
+          level(_level),
+          total_level(_total_level),
+          trajectory_cost(_trajectory_cost),
+          front(_front),
+          cur_node(_cur_node) {}
+    const std::list<DpRoadGraphNode> &prev_nodes;
+    const uint32_t level;
+    const uint32_t total_level;
     TrajectoryCost *trajectory_cost = nullptr;
     DpRoadGraphNode *front = nullptr;
     DpRoadGraphNode *cur_node = nullptr;
