@@ -22,22 +22,23 @@
 #define MODULES_DRIVERS_RADAR_RACOBIT_RADAR_RACOBIT_RADAR_MESSAGE_MANAGER_H_
 
 #include <memory>
+
+#include "cybertron/cybertron.h"
+
 #include "modules/drivers/canbus/can_client/can_client_factory.h"
 #include "modules/drivers/canbus/can_comm/can_sender.h"
 #include "modules/drivers/canbus/can_comm/message_manager.h"
 #include "modules/drivers/proto/racobit_radar.pb.h"
 #include "modules/drivers/radar/racobit_radar/protocol/radar_config_200.h"
 
-#include "modules/common/adapters/adapter_manager.h"
 #include "modules/drivers/canbus/sensor_gflags.h"
 
 namespace apollo {
 namespace drivers {
 namespace racobit_radar {
 
-using ::apollo::drivers::canbus::ProtocolData;
-using ::apollo::common::adapter::AdapterManager;
 using ::apollo::drivers::canbus::MessageManager;
+using ::apollo::drivers::canbus::ProtocolData;
 using Clock = ::apollo::common::time::Clock;
 using micros = std::chrono::microseconds;
 using ::apollo::common::ErrorCode;
@@ -47,7 +48,8 @@ using apollo::drivers::racobit_radar::RadarConfig200;
 
 class RacobitRadarMessageManager : public MessageManager<RacobitRadar> {
  public:
-  RacobitRadarMessageManager();
+  RacobitRadarMessageManager(
+      std::shared_ptr<cybertron::Writer<RacobitRadar>> writer);
   virtual ~RacobitRadarMessageManager() {}
   void set_radar_conf(RadarConf radar_conf);
   ProtocolData<RacobitRadar> *GetMutableProtocolDataById(
@@ -59,6 +61,7 @@ class RacobitRadarMessageManager : public MessageManager<RacobitRadar> {
   bool is_configured_ = false;
   RadarConfig200 radar_config_;
   std::shared_ptr<CanClient> can_client_;
+  std::shared_ptr<cybertron::Writer<RacobitRadar>> writer_;
 };
 
 }  // namespace racobit_radar

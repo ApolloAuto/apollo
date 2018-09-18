@@ -34,15 +34,15 @@ cc_library(
 cc_library(
     name = "racobit_radar_canbus_lib",
     srcs = [
-        "racobit_radar_canbus.cc",
+        "racobit_radar_canbus_component.cc",
     ],
     hdrs = [
-        "racobit_radar_canbus.h",
+        "racobit_radar_canbus_component.h",
     ],
     deps = [
         ":racobit_radar_message_manager",
+        "//framework:cybertron",
         "//modules/common",
-        "//modules/common:apollo_app",
         "//modules/common/monitor_log",
         "//modules/drivers/canbus:sensor_gflags",
         "//modules/drivers/canbus/can_client:can_client_factory",
@@ -52,29 +52,10 @@ cc_library(
     ],
 )
 
-# cc_test(
-#     name = "racobit_radar_canbus_test",
-#     size = "small",
-#     srcs = ["racobit_radar_canbus_test.cc"],
-#     deps = [
-#         ":racobit_radar_canbus_lib",
-#         ":racobit_radar_message_manager",
-#         "//modules/drivers/proto:sensor_proto",
-#         "@gtest//:main",
-#     ],
-# )
-
 cc_binary(
-    name = "racobit_radar",
-    srcs = ["main.cc"],
-    deps = [
-        ":racobit_radar_canbus_lib",
-        "//external:gflags",
-        "//framework:cybertron",
-        "//modules/common/monitor_log",
-        "//modules/drivers/canbus/common:canbus_common",
-        "@ros//:ros_common",
-    ],
+    name = "libracobit_radar_canbus_component.so",
+    linkopts = ["-shared"],
+    deps = [":racobit_radar_canbus_lib"],
 )
 
 cpplint()

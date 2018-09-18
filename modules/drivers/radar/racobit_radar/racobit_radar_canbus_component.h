@@ -18,20 +18,16 @@
  * @file
  */
 
-#ifndef MODULES_DRIVERS_RADAR_RACOBIT_RADAR_RACOBIT_RADAR_CANBUS_H_
-#define MODULES_DRIVERS_RADAR_RACOBIT_RADAR_RACOBIT_RADAR_CANBUS_H_
+#ifndef MODULES_DRIVERS_RADAR_RACOBIT_RADAR_RACOBIT_RADAR_CANBUS_COMPONENT_H_
+#define MODULES_DRIVERS_RADAR_RACOBIT_RADAR_RACOBIT_RADAR_CANBUS_COMPONENT_H_
 
 #include <memory>
 #include <string>
 #include <utility>
 #include <vector>
 
-#include "ros/include/ros/ros.h"
+#include "cybertron/cybertron.h"
 
-#include "modules/common/adapters/adapter_manager.h"
-#include "modules/common/adapters/proto/adapter_config.pb.h"
-#include "modules/common/apollo_app.h"
-#include "modules/common/macro.h"
 #include "modules/common/monitor_log/monitor_log_buffer.h"
 #include "modules/common/time/time.h"
 #include "modules/common/util/util.h"
@@ -57,71 +53,69 @@ namespace drivers {
 namespace racobit_radar {
 
 /**
-* @class RacobitRadarCanbus
-*
-* @brief template of canbus-based sensor module main class (e.g.,
-* racobit_radar).
-*/
+ * @class RacobitRadarCanbus
+ *
+ * @brief template of canbus-based sensor module main class (e.g.,
+ * racobit_radar).
+ */
 
-using apollo::common::adapter::AdapterConfig;
-using apollo::common::adapter::AdapterManager;
-using apollo::common::monitor::MonitorMessageItem;
-using apollo::common::Status;
 using apollo::common::ErrorCode;
+using apollo::common::Status;
+using apollo::common::monitor::MonitorMessageItem;
 using apollo::common::time::Clock;
-using apollo::drivers::canbus::CanClientFactory;
 using apollo::drivers::canbus::CanClient;
+using apollo::drivers::canbus::CanClientFactory;
 using apollo::drivers::canbus::CanReceiver;
 using apollo::drivers::canbus::SenderMessage;
 using apollo::drivers::canbus::SensorCanbusConf;
 
-class RacobitRadarCanbus : public apollo::common::ApolloApp {
+class RacobitRadarCanbus : public apollo::cybertron::Component<> {
  public:
   // TODO(lizh): check whether we need a new msg item, say
   // MonitorMessageItem::SENSORCANBUS
   RacobitRadarCanbus()
       : monitor_logger_(apollo::common::monitor::MonitorMessageItem::CANBUS) {}
+  ~RacobitRadarCanbus();
 
   /**
-  * @brief obtain module name
-  * @return module name
-  */
-  std::string Name() const override;
+   * @brief module initialization function
+   * @return initialization success(true) or not(false).
+   */
+  bool Init() override;
 
+ private:
   /**
-  * @brief module initialization function
-  * @return initialization status
-  */
-  apollo::common::Status Init() override;
-
-  /**
-  * @brief module start function
-  * @return start status
-  */
+   * @brief module start function
+   * @return start status
+   */
   apollo::common::Status Start() override;
 
   /**
-  * @brief module stop function
-  */
+   * @brief module stop function
+   */
   void Stop() override;
 
- private:
-  void PublishSensorData();
   Status OnError(const std::string &error_msg);
   void RegisterCanClients();
   apollo::common::ErrorCode ConfigureRadar();
 
-  RacobitRadarConf racobit_radar_conf_;
   std::shared_ptr<CanClient> can_client_;
   CanReceiver<RacobitRadar> can_receiver_;
   std::unique_ptr<RacobitRadarMessageManager> sensor_message_manager_;
 
   int64_t last_timestamp_ = 0;
   apollo::common::monitor::MonitorLogger monitor_logger_;
+
+  bool start_success_ = false;
+  // cybertron
+  RacobitRadarConf racobit_radar_conf_;
+  std::shared_ptr<cybertron::Writer<RacobitRadar>> racobit_radar_writer_;
 };
+
+CYBERTRON_REGISTER_COMPONENT(RacobitRadarCanbus)
 
 }  // namespace racobit_radar
 }  // namespace drivers
 }  // namespace apollo
 
-#endif  // MODULES_DRIVERS_RADAR_RACOBIT_RADAR_RACOBIT_RADAR_CANBUS_H_
+#endif  // MODULES_DRIVERS_RADAR_RACOBIT_RADAR_RACOBIT_RADAR_CANBUS_COMPONENT_H_

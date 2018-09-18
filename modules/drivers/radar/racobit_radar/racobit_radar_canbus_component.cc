@@ -18,7 +18,8 @@
  * @file
  */
 
-#include "modules/drivers/radar/racobit_radar/racobit_radar_canbus.h"
+#include "modules/drivers/radar/racobit_radar/racobit_radar_canbus_component.h"
+
 #include "modules/drivers/proto/racobit_radar.pb.h"
 #include "modules/drivers/radar/racobit_radar/racobit_radar_message_manager.h"
 
@@ -35,8 +36,14 @@ std::string RacobitRadarCanbus::Name() const {
 }
 
 apollo::common::Status RacobitRadarCanbus::Init() {
-  AdapterManager::Init(FLAGS_adapter_config_filename);
-  AINFO << "The adapter manager is successfully initialized.";
+  if (!GetProtoConfig(&racobit_radar_conf_)) {
+    return OnError("Unable to load canbus conf file: " + ConfigFilePath());
+  }
+
+  AINFO << "The canbus conf file is loaded: " << ConfigFilePath();
+  ADEBUG << "Canbus_conf:" << racobit_radar_conf_.ShortDebugString();
+  racobit_radar_writer_ = node_->CreateWriter<RacobitRadar>(
+      racobit_radar_conf_.radar_conf().channel_name());
   if (!::apollo::common::util::GetProtoFromFile(FLAGS_sensor_conf_file,
                                                 &racobit_radar_conf_)) {
     return OnError("Unable to load canbus conf file: " +
@@ -47,7 +54,7 @@ apollo::common::Status RacobitRadarCanbus::Init() {
   ADEBUG << "Canbus_conf:" << racobit_radar_conf_.ShortDebugString();
 
   // Init can client
-  auto *can_factory = CanClientFactory::Instance();
+  auto can_factory = CanClientFactory::Instance();
   can_factory->RegisterCanClients();
   can_client_ = can_factory->CreateCANClient(
       racobit_radar_conf_.can_conf().can_card_parameter());
@@ -57,7 +64,7 @@ apollo::common::Status RacobitRadarCanbus::Init() {
   AINFO << "Can client is successfully created.";
 
   sensor_message_manager_ = std::unique_ptr<RacobitRadarMessageManager>(
-      new RacobitRadarMessageManager());
+      new RacobitRadarMessageManager(racobit_radar_writer_));
   if (sensor_message_manager_ == nullptr) {
     return OnError("Failed to create message manager.");
   }
@@ -104,22 +111,24 @@ apollo::common::Status RacobitRadarCanbus::Start() {
   apollo::common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
   buffer.INFO("Canbus is started.");
 
-  return Status::OK();
+  start_success_ = start();
+  return start_success_;
 }
 
-void RacobitRadarCanbus::Stop() {
-  can_receiver_.Stop();
-  can_client_->Stop();
+void RacobitRadarCanbus::~RacobitRadarCanbus() {
+  if (start_success_) {
+    can_receiver_.Stop();
+    can_client_->Stop();
+  }
 }
 
 void RacobitRadarCanbus::PublishSensorData() {
-  RacobitRadar racobit_radar;
-  sensor_message_manager_->GetSensorData(&racobit_radar);
+  auto racobit_radar = std::make_shared<RacobitRadar>();
+  sensor_message_manager_->GetSensorData(racobit_radar.get());
   ADEBUG << racobit_radar.ShortDebugString();
 
-  AdapterManager::FillRacobitRadarHeader(FLAGS_sensor_node_name,
-                                         &racobit_radar);
-  AdapterManager::PublishRacobitRadar(racobit_radar);
+  common::util::FillHeader("racobit_radar", racobit_radar);
+  racobit_radar_writer_->Write(racobit_radar);
 }
 
 // Send the error to monitor and return it
