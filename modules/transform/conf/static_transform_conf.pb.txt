@@ -1,0 +1,6 @@
+extrinsic_file {
+    frame_id: "novatel"
+    child_frame_id: "velodyne64"
+    file_path: "/apollo/modules/calibration/data/mkz_example/velodyne_params/velodyne64_novatel_extrinsics_example.yaml"
+    enable: true
+}

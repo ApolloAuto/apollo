@@ -1,0 +1,11 @@
+# Define all coms in DAG streaming.
+module_config {
+    module_library : "/apollo/bazel-bin/modules/transform/libstatic_transform_component.so"
+    components {
+        class_name : "StaticTransformComponent"
+        config {
+            name : "static_transform"
+            config_file_path: "/apollo/modules/transform/conf/static_transform_conf.pb.txt"
+        }
+    }
+}
