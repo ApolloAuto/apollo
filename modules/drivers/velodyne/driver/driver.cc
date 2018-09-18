@@ -43,9 +43,9 @@ void VelodyneDriver::set_base_time_from_nmea_time(NMEATimePtr nmea_time,
   // set last gps time using gps socket packet
   last_gps_time_ = (nmea_time->min * 60 + nmea_time->sec) * 1e6;
 
-  LOG_INFO_FORMAT("Set base unix time : %d-%d-%d %d:%d:%d", time.tm_year,
-                  time.tm_mon, time.tm_mday, time.tm_hour, time.tm_min,
-                  time.tm_sec);
+  AINFO << "Set base unix time : " << time.tm_year << "-" << time.tm_mon << "-"
+        << time.tm_mday << " " << time.tm_hour << ":" << time.tm_min << ":"
+        << time.tm_sec;
   uint64_t unix_base = static_cast<uint64_t>(timegm(&time));
   *basetime = unix_base * 1e6;
 }

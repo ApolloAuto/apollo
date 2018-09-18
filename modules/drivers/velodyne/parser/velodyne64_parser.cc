@@ -87,8 +87,8 @@ void Velodyne64Parser::set_base_time_from_packets(const VelodynePacket& pkt) {
       break;
   }
 
-  LOG_INFO_FORMAT("Get base time from packets. Obtained (%d.%d.%d %d:%d:%d)",
-                  year, month, day, hour, minute, second);
+  AINFO << "Get base time from packets. Obtained (" << year << "." << month
+        << "." << day << " " << hour << ":" << minute << ":" << second;
 
   if (status_type == GPS_STATUS && year > 0 && month > 0 && day > 0 &&
       hour >= 0 && minute >= 0 && second >= 0) {
