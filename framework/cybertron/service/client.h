@@ -120,7 +120,7 @@ bool Client<Request, Response>::Init() {
   request_upper_reach_ = transport::Transport::CreateUpperReach<Request>(
       role, proto::OptionalMode::RTPS);
   if (request_upper_reach_ == nullptr) {
-    AINFO << "Create request pub failed.";
+    AERROR << "Create request pub failed.";
     return false;
   }
   writer_id_ = request_upper_reach_->id();
@@ -143,7 +143,7 @@ bool Client<Request, Response>::Init() {
       },
       proto::OptionalMode::RTPS);
   if (response_lower_reach_ == nullptr) {
-    AINFO << "Create response sub failed.";
+    AERROR << "Create response sub failed.";
     return false;
   }
 
@@ -213,7 +213,7 @@ template <typename Request, typename Response>
 void Client<Request, Response>::HandleResponse(
     const std::shared_ptr<Response>& response,
     const transport::MessageInfo& request_header) {
-  AINFO << "client recv response.";
+  ADEBUG << "client recv response.";
   std::lock_guard<std::mutex> lock(pending_requests_mutex_);
   if (request_header.spare_id() != writer_id_) {
     return;

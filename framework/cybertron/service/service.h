@@ -95,7 +95,7 @@ bool Service<Request, Response>::Init() {
   response_upper_reach_ = transport::Transport::CreateUpperReach<Response>(
       role, proto::OptionalMode::RTPS);
   if (response_upper_reach_ == nullptr) {
-    AINFO << " Create response pub failed.";
+    AERROR << " Create response pub failed.";
     return false;
   }
 
@@ -118,7 +118,7 @@ bool Service<Request, Response>::Init() {
       },
       proto::OptionalMode::RTPS);
   if (request_lower_reach_ == nullptr) {
-    AINFO << " Create request sub failed." << request_channel_;
+    AERROR << " Create request sub failed." << request_channel_;
     return false;
   }
   init_ = true;
@@ -133,7 +133,7 @@ void Service<Request, Response>::HandleRequest(
     // LOG_DEBUG << "not inited error.";
     return;
   }
-  AINFO << "handling request:" << request_channel_;
+  ADEBUG << "handling request:" << request_channel_;
   std::lock_guard<std::mutex> lk(service_handle_request_mutex_);
   auto response = std::make_shared<Response>();
   service_callback_(request, response);

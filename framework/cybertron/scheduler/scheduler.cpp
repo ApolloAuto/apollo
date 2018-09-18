@@ -39,7 +39,7 @@ Scheduler::Scheduler() : stop_(false) {
       processor_num_ = scheduler_conf_.processor_num();
     }
   } else {
-    AINFO << "No scheduler conf";
+    ADEBUG << "No scheduler conf";
     return;
   }
   AINFO << "processor num: " << processor_num_;
@@ -48,7 +48,7 @@ Scheduler::Scheduler() : stop_(false) {
   if (global_conf.has_routine_conf()) {
     routine_conf_.CopyFrom(global_conf.routine_conf());
   } else {
-    AINFO << "No routine conf";
+    ADEBUG << "No routine conf";
   }
 
   if (scheduler_conf_.load_balance()) {

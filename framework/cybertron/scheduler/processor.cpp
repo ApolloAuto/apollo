@@ -90,7 +90,7 @@ void Processor::ProcessorThread::Run() {
       }
     } else {
       // context_lock.unlock();
-      AINFO << "no pcontext bound, wait...";
+      ADEBUG << "no pcontext bound, wait...";
       std::unique_lock<std::mutex> lk_rq(cv_mutex_);
       cv_.wait(lk_rq, [this] {
         return this->processor_->context_ &&

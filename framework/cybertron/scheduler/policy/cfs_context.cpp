@@ -81,7 +81,7 @@ std::shared_ptr<CRoutine> CFSContext::NextRoutine() {
     // TODO: We should use asynchronous notification mechanism later.
     if (cr->IsSleep() || cr->IsWaitingInput()) {
       wait_queue_.emplace_back(cr);
-      AINFO << "pop from rq routine[" << cr_id << "] size["
+      ADEBUG << "pop from rq routine[" << cr_id << "] size["
             << wait_queue_.size() << "]";
       it = rb_map_.erase(it);
       continue;
