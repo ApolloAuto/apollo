@@ -32,7 +32,7 @@ class IntraWriter : public apollo::cybertron::Writer<MessageT> {
   using MessagePtr = std::shared_ptr<MessageT>;
   using DispatcherPtr = std::shared_ptr<dispatcher::Dispatcher>;
 
-  IntraWriter(const proto::RoleAttributes& attr);
+  explicit IntraWriter(const proto::RoleAttributes& attr);
   virtual ~IntraWriter();
 
   bool Init() override;

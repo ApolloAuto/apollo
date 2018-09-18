@@ -23,6 +23,7 @@
 
 #include "cybertron/common/log.h"
 #include "cybertron/node/writer_base.h"
+#include "cybertron/proto/topology_change.pb.h"
 #include "cybertron/service_discovery/topology_manager.h"
 #include "cybertron/transport/transport.h"
 
@@ -121,13 +122,13 @@ void Writer<MessageT>::JoinTheTopology() {
     upper_reach_->Enable(reader);
   }
 
-  channel_manager_->Join(this->role_attr_, RoleType::ROLE_WRITER);
+  channel_manager_->Join(this->role_attr_, proto::RoleType::ROLE_WRITER);
 }
 
 template <typename MessageT>
 void Writer<MessageT>::LeaveTheTopology() {
   channel_manager_->RemoveChangeListener(change_conn_);
-  channel_manager_->Leave(this->role_attr_, RoleType::ROLE_WRITER);
+  channel_manager_->Leave(this->role_attr_, proto::RoleType::ROLE_WRITER);
 }
 
 template <typename MessageT>

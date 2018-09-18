@@ -20,6 +20,7 @@
 #include <map>
 #include <memory>
 #include <string>
+#include <utility>
 
 #include "cybertron/node/node_channel_impl.h"
 #include "cybertron/node/node_service_impl.h"
@@ -110,7 +111,8 @@ auto Node::CreateReader(const proto::RoleAttributes& role_attr)
     -> std::shared_ptr<Reader<MessageT>> {
   std::lock_guard<std::mutex> lg(readers_mutex_);
   if (readers_.find(role_attr.channel_name()) != readers_.end()) {
-    AWARN << "Failed to create reader: reader with the same channel already exists.";
+    AWARN << "Failed to create reader: reader with the same channel already "
+             "exists.";
     return nullptr;
   }
   auto reader = node_channel_impl_->template CreateReader<MessageT>(role_attr);
@@ -124,7 +126,8 @@ auto Node::CreateReader(const proto::RoleAttributes& role_attr,
     -> std::shared_ptr<Reader<MessageT>> {
   std::lock_guard<std::mutex> lg(readers_mutex_);
   if (readers_.find(role_attr.channel_name()) != readers_.end()) {
-    AWARN << "Failed to create reader: reader with the same channel already exists.";
+    AWARN << "Failed to create reader: reader with the same channel already "
+             "exists.";
     return nullptr;
   }
   auto reader = node_channel_impl_->template CreateReader<MessageT>(
@@ -139,7 +142,8 @@ auto Node::CreateReader(const std::string& channel_name,
     -> std::shared_ptr<Reader<MessageT>> {
   std::lock_guard<std::mutex> lg(readers_mutex_);
   if (readers_.find(channel_name) != readers_.end()) {
-    AWARN << "Failed to create reader: reader with the same channel already exists.";
+    AWARN << "Failed to create reader: reader with the same channel already "
+             "exists.";
     return nullptr;
   }
   auto reader = node_channel_impl_->template CreateReader<MessageT>(
