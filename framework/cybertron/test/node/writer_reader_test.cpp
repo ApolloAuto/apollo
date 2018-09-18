@@ -94,8 +94,8 @@ TEST(WriterReaderTest, init_and_shutdown) {
   EXPECT_TRUE(reader_b.inited());
 
   Reader<proto::UnitTest> reader_c(attr);
-  EXPECT_TRUE(reader_c.Init());
-  EXPECT_TRUE(reader_c.inited());
+  EXPECT_FALSE(reader_c.Init());
+  EXPECT_FALSE(reader_c.inited());
 
   writer_a.Shutdown();
   // repeated call
@@ -158,8 +158,13 @@ TEST(WriterReaderTest, messaging) {
 
 TEST(WriterReaderTest, observe) {
   proto::RoleAttributes attr;
-  attr.set_channel_name("test_reader");
+  attr.set_node_name("node");
+  attr.set_channel_name("channel");
+  auto channel_id = common::GlobalData::RegisterChannel(attr.channel_name());
+  attr.set_channel_id(channel_id);
+
   Reader<proto::UnitTest> reader(attr);
+  reader.Init();
   EXPECT_TRUE(reader.Empty());
   EXPECT_FALSE(reader.HasReceived());
 
@@ -203,6 +208,16 @@ TEST(WriterReaderTest, observe) {
   reader.ClearData();
   EXPECT_TRUE(reader.Empty());
   EXPECT_FALSE(reader.HasReceived());
+
+  Writer<proto::UnitTest> writer(attr);
+  writer.Init();
+  writer.Write(msg1);
+  usleep(10000);
+  ASSERT_TRUE(reader.HasReceived());
+  reader.Observe();
+  ASSERT_FALSE(reader.Empty());
+  latest = reader.GetLatestObserved();
+  EXPECT_EQ(latest->case_name(), "message_1");
 }
 
 }  // namespace cybertron

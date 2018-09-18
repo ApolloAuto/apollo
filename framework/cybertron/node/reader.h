@@ -107,6 +107,9 @@ template <typename MessageT>
 void Reader<MessageT>::Enqueue(const std::shared_ptr<MessageT>& msg) {
   std::lock_guard<std::mutex> lg(mutex_);
   history_queue_.push_front(msg);
+  while (history_queue_.size() > history_depth_) {
+    history_queue_.pop_back();
+  }
 }
 
 template <typename MessageT>
@@ -120,23 +123,29 @@ bool Reader<MessageT>::Init() {
   if (init_.exchange(true)) {
     return true;
   }
+
+  std::function<void(const std::shared_ptr<MessageT>&)> func;
   if (reader_func_ != nullptr) {
-    auto sched = scheduler::Scheduler::Instance();
-    croutine_name_ = role_attr_.node_name() + "_" + role_attr_.channel_name();
-    auto func = [this](const std::shared_ptr<MessageT>& msg) {
+    func = [this](const std::shared_ptr<MessageT>& msg) {
       this->Enqueue(msg);
       this->reader_func_(msg);
     };
-
-    auto dv = std::make_shared<data::DataVisitor<MessageT>>(
-        role_attr_.channel_id(), role_attr_.qos_profile().depth());
-    // Using factory to wrap templates.
-    croutine::RoutineFactory factory =
-        croutine::CreateRoutineFactory<MessageT>(std::move(func), dv);
-    if (!sched->CreateTask(factory, croutine_name_)) {
-      init_.exchange(false);
-      return false;
-    }
+  } else {
+    func = [this](const std::shared_ptr<MessageT>& msg) {
+      this->Enqueue(msg);
+    };
+  }
+  auto sched = scheduler::Scheduler::Instance();
+  croutine_name_ = role_attr_.node_name() + "_" + role_attr_.channel_name();
+  auto dv = std::make_shared<data::DataVisitor<MessageT>>(
+      role_attr_.channel_id(), role_attr_.qos_profile().depth());
+  // Using factory to wrap templates.
+  croutine::RoutineFactory factory =
+      croutine::CreateRoutineFactory<MessageT>(std::move(func), dv);
+  if (!sched->CreateTask(factory, croutine_name_)) {
+    AERROR << "Create Failed!";
+    init_.exchange(false);
+    return false;
   }
 
   lower_reach_ = ReaderManager<MessageT>::Instance()->GetReader(role_attr_);
