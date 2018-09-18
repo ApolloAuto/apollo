@@ -24,7 +24,7 @@ ScenarioManager::ScenarioManager() {}
 void ScenarioManager::Run() {
   feature_extractor_.ExtractFeatures();
   scenario_analyzer_.Analyze(feature_extractor_.GetScenarioFeatures());
-  // TODO(kechxu) deal with scenario output
+  // TODO(all) other functionalities including lane, junction filters
 }
 
 const Scenario& ScenarioManager::scenario() const {

@@ -67,6 +67,11 @@ class ObstaclesContainer : public Container {
   void BuildLaneGraph();
 
   /**
+   * @brief Set obstacles' priority to predict
+   */
+  void PrioritizeObstacles();
+
+  /**
    * @brief Get obstacle pointer
    * @param Obstacle ID
    * @return Obstacle pointer
