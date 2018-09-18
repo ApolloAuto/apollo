@@ -21,6 +21,8 @@ message MonitorMessageItem {
     RELATIVE_MAP = 13;
     GNSS = 14;
     CONTI_RADAR = 15;
+    RACOBIT_RADAR = 16;
+    ULTRASONIC_RADAR = 17;
   }
 
   optional MessageSource source = 1 [default = UNKNOWN];

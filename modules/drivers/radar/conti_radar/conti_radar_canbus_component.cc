@@ -73,7 +73,6 @@ bool ContiRadarCanbusComponent::Init() {
 
   start_success_ = Start();
   return start_success_;
-  return true;
 }
 
 apollo::common::ErrorCode ContiRadarCanbusComponent::ConfigureRadar() {
