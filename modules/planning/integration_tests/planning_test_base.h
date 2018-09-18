@@ -16,6 +16,7 @@
 
 #include <map>
 #include <memory>
+#include <mutex>
 #include <string>
 #include <vector>
 
@@ -44,6 +45,8 @@
 namespace apollo {
 namespace planning {
 
+class PlanningComponent;
+
 #define RUN_GOLDEN_TEST(sub_case_num)                                      \
   {                                                                        \
     const ::testing::TestInfo* const test_info =                           \
@@ -68,6 +71,7 @@ namespace planning {
   int main(int argc, char** argv) {                      \
     ::testing::InitGoogleTest(&argc, argv);              \
     ::google::ParseCommandLineFlags(&argc, &argv, true); \
+    apollo::cybertron::Init("planning_test");            \
     return RUN_ALL_TESTS();                              \
   }
 
@@ -103,8 +107,27 @@ class PlanningTestBase : public ::testing::Test {
   void TrimPlanning(ADCTrajectory* origin, bool no_trajectory_point);
   bool FeedTestData();
   bool IsValidTrajectory(const ADCTrajectory& trajectory);
+  void SetupCybertron();
 
  protected:
+  std::mutex mutex_;
+  cybertron::ComponentConfig config_;
+
+  // cybertron readers/writers
+  std::shared_ptr<cybertron::Writer<
+      apollo::canbus::Chassis>> chassis_writer_;
+  std::shared_ptr<cybertron::Writer<
+      apollo::localization::LocalizationEstimate>> localization_writer_;
+  std::shared_ptr<cybertron::Writer<
+      apollo::prediction::PredictionObstacles>> prediction_writer_;
+  std::shared_ptr<cybertron::Writer<
+      apollo::routing::RoutingResponse>> routing_response_writer_;
+  std::shared_ptr<cybertron::Writer<
+      apollo::perception::TrafficLightDetection>>
+      traffic_light_detection_writer_;
+  std::shared_ptr<cybertron::Reader<ADCTrajectory>> planning_reader_;
+
+  std::shared_ptr<PlanningComponent> planning_component_ = nullptr;
   std::unique_ptr<PlanningBase> planning_ = nullptr;
   std::map<TrafficRuleConfig::RuleId, bool> rule_enabled_;
   ADCTrajectory adc_trajectory_;
