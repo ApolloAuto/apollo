@@ -83,17 +83,17 @@ TEST(TimerComponent, init) {
 
   compcfg.set_name("perception2");
   apollo::cybertron::proto::ReaderOption *read_opt2 = compcfg.add_readers();
-  read_opt2->set_channel("/driver/channel");
+  read_opt2->set_channel("/driver/channel1");
   auto comB = std::make_shared<Component_B<RawMessage, RawMessage>>();
   EXPECT_EQ(true, comB->Initialize(compcfg));
   EXPECT_EQ(true, comB->Process(msg_str1, msg_str2));
 
   compcfg.set_name("perception3");
   apollo::cybertron::proto::ReaderOption *read_opt3 = compcfg.add_readers();
-  read_opt3->set_channel("/driver/channel");
+  read_opt3->set_channel("/driver/channel2");
   compcfg.set_name("perception4");
   apollo::cybertron::proto::ReaderOption *read_opt4 = compcfg.add_readers();
-  read_opt4->set_channel("/driver/channel");
+  read_opt4->set_channel("/driver/channel3");
   auto comA = std::make_shared<
       Component_A<RawMessage, RawMessage, RawMessage, RawMessage>>();
   EXPECT_EQ(true, comA->Initialize(compcfg));

@@ -78,18 +78,22 @@ TEST(NodeTest, create_reader_with_attr) {
   Node node("create_reader_with_attr");
 
   proto::RoleAttributes attr;
-  attr.set_channel_name("channel");
+  attr.set_channel_name("channel_a");
   auto reader_a = node.CreateReader<proto::UnitTest>(attr, nullptr);
   ASSERT_TRUE(reader_a != nullptr);
-  EXPECT_EQ(reader_a->GetChannelName(), "channel");
+  EXPECT_EQ(reader_a->GetChannelName(), "channel_a");
   EXPECT_TRUE(reader_a->inited());
   reader_a->Shutdown();
 
+  attr.set_channel_name("channel_b");
   auto reader_b = node.CreateReader<proto::UnitTest>(attr);
   ASSERT_TRUE(reader_b != nullptr);
-  EXPECT_EQ(reader_b->GetChannelName(), "channel");
+  EXPECT_EQ(reader_b->GetChannelName(), "channel_b");
   EXPECT_TRUE(reader_b->inited());
   reader_b->Shutdown();
+
+  auto reader_c = node.CreateReader<proto::UnitTest>(attr);
+  ASSERT_EQ(reader_c, nullptr);
 }
 
 TEST(NodeTest, create_service) {
