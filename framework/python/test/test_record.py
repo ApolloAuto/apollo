@@ -21,7 +21,7 @@ import sys
 import unittest
 
 sys.path.append("../")
-from cybertron import init
+from cybertron import cybertron
 from cybertron import record
 from proto import record_pb2
 
@@ -41,7 +41,7 @@ class TestRecord(unittest.TestCase):
         """
         unit test of record.
         """
-        self.assertTrue(init.init())
+        self.assertTrue(cybertron.init())
 
         # writer
         fwriter = record.RecordWriter()
@@ -75,7 +75,7 @@ class TestRecord(unittest.TestCase):
         self.assertTrue(fread.endoffile())
         fread.close()
 
-        init.shutdown()
+        cybertron.shutdown()
 
 if __name__ == '__main__':
     unittest.main()

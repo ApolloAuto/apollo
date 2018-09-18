@@ -20,8 +20,7 @@ import sys
 import unittest
 
 sys.path.append("../")
-from cybertron import node
-from cybertron import init
+from cybertron import cybertron
 from proto import chatter_pb2
 
 def callback(data):
@@ -39,11 +38,11 @@ class TestNode(unittest.TestCase):
     """
     @classmethod
     def setUpClass(cls):
-        init.init()
+        cybertron.init()
 
     @classmethod
     def tearDownClass(cls):
-        init.shutdown()
+        cybertron.shutdown()
 
     def test_writer(self):
         """
@@ -55,8 +54,8 @@ class TestNode(unittest.TestCase):
         msg.timestamp = 0
         msg.lidar_timestamp = 0
 
-        self.assertTrue(init.ok())
-        test_node = node.Node("node_name1")
+        self.assertTrue(cybertron.ok())
+        test_node = cybertron.Node("node_name1")
         writer = test_node.create_writer("channel/chatter",
                 chatter_pb2.Chatter.DESCRIPTOR.full_name)
         self.assertEqual(writer.name, "channel/chatter")
@@ -67,8 +66,8 @@ class TestNode(unittest.TestCase):
         """
         unit test of reader.
         """
-        self.assertTrue(init.ok())
-        test_node = node.Node("listener")
+        self.assertTrue(cybertron.ok())
+        test_node = cybertron.Node("listener")
         reader = test_node.create_reader("channel/chatter",
                 chatter_pb2.Chatter, callback)
         self.assertEqual(reader.name, "channel/chatter")

@@ -20,7 +20,7 @@ import sys
 import unittest
 
 sys.path.append("../")
-from cybertron import init
+from cybertron import cybertron
 
 class TestInit(unittest.TestCase):
     """
@@ -28,12 +28,12 @@ class TestInit(unittest.TestCase):
     """
     def test_init(self):
         """
-        test init.
+        test cybertron.
         """
-        self.assertTrue(init.init())
-        self.assertTrue(init.ok())
-        init.shutdown()
-        self.assertTrue(init.is_shutdown())
+        self.assertTrue(cybertron.init())
+        self.assertTrue(cybertron.ok())
+        cybertron.shutdown()
+        self.assertTrue(cybertron.is_shutdown())
 
 if __name__ == '__main__':
     unittest.main()
