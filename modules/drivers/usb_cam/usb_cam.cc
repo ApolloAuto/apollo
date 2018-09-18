@@ -38,6 +38,7 @@
 #include <string>
 
 #include "adv_plat/include/adv_trigger.h"
+#include "modules/drivers/usb_cam/util.h"
 #include "modules/drivers/usb_cam/usb_cam.h"
 
 #define __STDC_CONSTANT_MACROS
@@ -268,20 +269,14 @@ bool UsbCam::init_device(void) {
   if (-1 == xioctl(fd_, VIDIOC_QUERYCAP, &cap)) {
     if (EINVAL == errno) {
       AERROR << config_->camera_dev() << " is no V4L2 device";
-      // exit(EXIT_FAILURE);
-      // reconnect();
       return false;
     }
-    // errno_exit("VIDIOC_QUERYCAP");
     AERROR << "VIDIOC_QUERYCAP";
-    // reconnect();
     return false;
   }
 
   if (!(cap.capabilities & V4L2_CAP_VIDEO_CAPTURE)) {
     AERROR << config_->camera_dev() << " is no video capture device";
-    // exit(EXIT_FAILURE);
-    // reconnect();
     return false;
   }
 
@@ -289,8 +284,6 @@ bool UsbCam::init_device(void) {
     case IO_METHOD_READ:
       if (!(cap.capabilities & V4L2_CAP_READWRITE)) {
         AERROR << config_->camera_dev() << " does not support read i/o";
-        // exit(EXIT_FAILURE);
-        // reconnect();
         return false;
       }
 
@@ -300,16 +293,12 @@ bool UsbCam::init_device(void) {
     case IO_METHOD_USERPTR:
       if (!(cap.capabilities & V4L2_CAP_STREAMING)) {
         AERROR << config_->camera_dev() << " does not support streaming i/o";
-        // exit(EXIT_FAILURE);
-        // reconnect();
         return false;
       }
 
       break;
     case IO_METHOD_UNKNOWN:
       AERROR << config_->camera_dev() << " does not support unknown i/o";
-      // exit(EXIT_FAILURE);
-      // reconnect();
       return false;
       break;
   }
@@ -341,10 +330,8 @@ bool UsbCam::init_device(void) {
   fmt.fmt.pix.field = V4L2_FIELD_INTERLACED;
 
   if (-1 == xioctl(fd_, VIDIOC_S_FMT, &fmt)) {
-    // errno_exit("VIDIOC_S_FMT");
     AERROR << "VIDIOC_S_FMT";
     return false;
-    // reconnect();
   }
 
   /* Note VIDIOC_S_FMT may change width and height. */
@@ -447,8 +434,6 @@ bool UsbCam::init_read(unsigned int buffer_size) {
 
   if (!buffers_[0].start) {
     AERROR << "Out of memory";
-    // exit(EXIT_FAILURE);
-    // reconnect();
     return false;
   }
 
@@ -466,26 +451,15 @@ bool UsbCam::init_mmap(void) {
   if (-1 == xioctl(fd_, VIDIOC_REQBUFS, &req)) {
     if (EINVAL == errno) {
       AERROR << config_->camera_dev() << " does not support memory mapping";
-      // exit(EXIT_FAILURE);
-      // reconnect();
       return false;
     }
-    // errno_exit("VIDIOC_REQBUFS");
-    // reconnect();
     return false;
   }
-
-  // if (req.count < 2) {
-  //  AERROR << "Insufficient buffer memory on " << config_->camera_dev();
-  //  exit(EXIT_FAILURE);
-  //}
 
   buffers_ = reinterpret_cast<buffer*>(calloc(req.count, sizeof(*buffers_)));
 
   if (!buffers_) {
     AERROR << "Out of memory";
-    // exit(EXIT_FAILURE);
-    // reconnect();
     return false;
   }
 
@@ -498,8 +472,6 @@ bool UsbCam::init_mmap(void) {
     buf.index = n_buffers_;
 
     if (-1 == xioctl(fd_, VIDIOC_QUERYBUF, &buf)) {
-      // errno_exit("VIDIOC_QUERYBUF");
-      // reconnect();
       AERROR << "VIDIOC_QUERYBUF";
       return false;
     }
@@ -509,8 +481,6 @@ bool UsbCam::init_mmap(void) {
                                       MAP_SHARED, fd_, buf.m.offset);
 
     if (MAP_FAILED == buffers_[n_buffers_].start) {
-      // errno_exit("mmap");
-      // reconnect();
       AERROR << "mmap";
       return false;
     }
@@ -537,12 +507,8 @@ bool UsbCam::init_userp(unsigned int buffer_size) {
       AERROR << config_->camera_dev()
              << " does not support "
                 "user pointer i/o";
-      // exit(EXIT_FAILURE);
-      // reconnect();
       return false;
     }
-    // errno_exit("VIDIOC_REQBUFS");
-    // reconnect();
     AERROR << "VIDIOC_REQBUFS";
     return false;
   }
@@ -551,8 +517,6 @@ bool UsbCam::init_userp(unsigned int buffer_size) {
 
   if (!buffers_) {
     AERROR << "Out of memory";
-    // exit(EXIT_FAILURE);
-    // reconnect();
     return false;
   }
 
@@ -563,8 +527,6 @@ bool UsbCam::init_userp(unsigned int buffer_size) {
 
     if (!buffers_[n_buffers_].start) {
       AERROR << "Out of memory";
-      // exit(EXIT_FAILURE);
-      // reconnect();
       return false;
     }
   }
@@ -594,8 +556,6 @@ bool UsbCam::start_capturing(void) {
         buf.memory = V4L2_MEMORY_MMAP;
         buf.index = i;
         if (-1 == xioctl(fd_, VIDIOC_QBUF, &buf)) {
-          // errno_exit("VIDIOC_QBUF");
-          // reconnect();
           AERROR << "VIDIOC_QBUF";
           return false;
         }
@@ -604,8 +564,6 @@ bool UsbCam::start_capturing(void) {
       type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 
       if (-1 == xioctl(fd_, VIDIOC_STREAMON, &type)) {
-        // errno_exit("VIDIOC_STREAMON");
-        // reconnect();
         AERROR << "VIDIOC_STREAMON";
         return false;
       }
@@ -625,8 +583,6 @@ bool UsbCam::start_capturing(void) {
         buf.length = buffers_[i].length;
 
         if (-1 == xioctl(fd_, VIDIOC_QBUF, &buf)) {
-          // errno_exit("VIDIOC_QBUF");
-          // reconnect();
           AERROR << "VIDIOC_QBUF";
           return false;
         }
@@ -635,8 +591,6 @@ bool UsbCam::start_capturing(void) {
       type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 
       if (-1 == xioctl(fd_, VIDIOC_STREAMON, &type)) {
-        // errno_exit("VIDIOC_STREAMON");
-        // reconnect();
         AERROR << "VIDIOC_STREAMON";
         return false;
       }
@@ -644,8 +598,6 @@ bool UsbCam::start_capturing(void) {
       break;
 
     case IO_METHOD_UNKNOWN:
-      // errno_exit("unknown IO");
-      // reconnect();
       AERROR << "unknown IO";
       return false;
       break;
@@ -715,7 +667,6 @@ bool UsbCam::uninit_device(void) {
     case IO_METHOD_MMAP:
       for (i = 0; i < n_buffers_; ++i) {
         if (-1 == munmap(buffers_[i].start, buffers_[i].length)) {
-          // errno_exit("munmap");
           AERROR << "munmap";
           return false;
         }
@@ -740,8 +691,6 @@ bool UsbCam::uninit_device(void) {
 
 bool UsbCam::close_device(void) {
   if (-1 == close(fd_)) {
-    // errno_exit("close");
-    // reconnect();
     AERROR << "close";
     return false;
   }
@@ -768,8 +717,6 @@ bool UsbCam::stop_capturing(void) {
       type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 
       if (-1 == xioctl(fd_, VIDIOC_STREAMOFF, &type)) {
-        // errno_exit("VIDIOC_STREAMOFF");
-        // reconnect();
         AERROR << "VIDIOC_STREAMOFF";
         return false;
       }
@@ -806,8 +753,6 @@ bool UsbCam::read_frame(CameraImagePtr raw_image) {
             /* fall through */
 
           default:
-            // errno_exit("read");
-            // reconnect();
             AERROR << "read";
             return false;
         }
@@ -835,8 +780,6 @@ bool UsbCam::read_frame(CameraImagePtr raw_image) {
             /* fall through */
 
           default:
-            // errno_exit("VIDIOC_DQBUF");
-            // reconnect();
             AERROR << "VIDIOC_DQBUF";
             reconnect();
             return false;
@@ -891,8 +834,6 @@ bool UsbCam::read_frame(CameraImagePtr raw_image) {
       }
 
       if (-1 == xioctl(fd_, VIDIOC_QBUF, &buf)) {
-        // errno_exit("VIDIOC_QBUF");
-        // reconnect();
         AERROR << "VIDIOC_QBUF";
         return false;
       }
@@ -917,8 +858,6 @@ bool UsbCam::read_frame(CameraImagePtr raw_image) {
             /* fall through */
 
           default:
-            // errno_exit("VIDIOC_DQBUF");
-            // reconnect();
             AERROR << "VIDIOC_DQBUF";
             return false;
         }
@@ -936,8 +875,6 @@ bool UsbCam::read_frame(CameraImagePtr raw_image) {
       process_image(reinterpret_cast<void*>(buf.m.userptr), len, raw_image);
 
       if (-1 == xioctl(fd_, VIDIOC_QBUF, &buf)) {
-        // errno_exit("VIDIOC_QBUF");
-        // reconnect();
         AERROR << "VIDIOC_QBUF";
         return false;
       }
@@ -960,7 +897,17 @@ bool UsbCam::process_image(const void* src, int len, CameraImagePtr dest) {
   }
   if (pixel_format_ == V4L2_PIX_FMT_YUYV ||
       pixel_format_ == V4L2_PIX_FMT_UYVY) {
-    memcpy(dest->image, src, dest->width * dest->height * 2);
+    if (config_->output_type() == YUYV) {
+      memcpy(dest->image, src, dest->width * dest->height * 2);
+    } else if (config_->output_type() == RGB) {
+      yuyv2rgb_avx(
+          (unsigned char*)src,
+          (unsigned char*)dest->image,
+          dest->width * dest->height);
+    } else {
+      AERROR << "unsupported output format:" << config_->output_type();
+      return false;
+    }
   } else {
     AERROR << "unsupported pixel format:" << pixel_format_;
     return false;
@@ -1062,13 +1009,8 @@ bool UsbCam::wait_for_device() {
     close_device();
     return false;
   }
-  if (!set_adv_trigger()) {
-    stop_capturing();
-    uninit_device();
-    close_device();
-
-    return false;
-  }
+  // will continue when trigger failed for self-trigger camera
+  set_adv_trigger();
   return true;
 }
 

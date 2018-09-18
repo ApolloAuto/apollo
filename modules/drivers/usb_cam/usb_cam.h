@@ -74,6 +74,8 @@ using apollo::drivers::usb_cam::config::IO_METHOD_MMAP;
 using apollo::drivers::usb_cam::config::IO_METHOD_READ;
 using apollo::drivers::usb_cam::config::IO_METHOD_UNKNOWN;
 using apollo::drivers::usb_cam::config::IO_METHOD_USERPTR;
+using apollo::drivers::usb_cam::config::YUYV;
+using apollo::drivers::usb_cam::config::RGB;
 
 // camera raw image struct
 struct CameraImage {

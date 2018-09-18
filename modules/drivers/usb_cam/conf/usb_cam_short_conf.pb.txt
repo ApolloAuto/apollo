@@ -23,4 +23,5 @@ trigger_internal: 0
 trigger_fps: 20
 channel_name: "/apollo/sensor/camera/traffic/image_short"
 device_wait: 2.0
-spin_rate: 0.005 
+spin_rate: 0.005
+output_type: RGB
