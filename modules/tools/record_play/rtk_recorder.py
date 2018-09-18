@@ -26,7 +26,7 @@ import os
 import sys
 import time
 
-from cybertron import pynode
+from cybertron import cybertron
 from gflags import FLAGS
 
 from logger import Logger
@@ -158,20 +158,19 @@ class RtkRecord(object):
 
     def shutdown(self):
         """
-        shutdown rosnode
+        shutdown node
         """
         self.terminating = True
         self.logger.info("Shutting Down...")
         self.logger.info("file is written into %s" % self.record_file)
         self.file_handler.close()
-        rospy.sleep(0.1)
 
 
 def main(argv):
     """
-    Main rosnode
+    Main node
     """
-    node = pynode.Node("rtk_recorder")
+    node = cybertron.Node("rtk_recorder")
     argv = FLAGS(argv)
     log_dir = os.path.dirname(os.path.abspath(__file__)) + "/../../../data/log/"
     if not os.path.exists(log_dir):
@@ -191,9 +190,11 @@ def main(argv):
                      localization_pb2.LocalizationEstimate,
                      recorder.localization_callback)
 
-    while not node.is_shutdown():
+    while not cybertron.is_shutdown():
         time.sleep(0.002)
 
 
 if __name__ == '__main__':
+    cybertron.init()
     main(sys.argv)
+    cybertron.shutdown()
