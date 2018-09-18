@@ -35,21 +35,6 @@ namespace planning {
 
 using apollo::common::Status;
 
-struct OpenSpaceConf {
-  // for Hybrid A Star Warm Start
-  double x_grid_resolution;
-  double y_grid_resolution;
-  double phi_grid_resolution;
-  double max_x;
-  double max_y;
-  double max_phi;
-  double min_x;
-  double min_y;
-  double min_phi;
-  double max_steering;
-  double next_node_num;
-};
-
 struct Result {
   std::vector<double> x;
   std::vector<double> y;
@@ -58,9 +43,8 @@ struct Result {
 
 class HybridAStar {
  public:
-  explicit HybridAStar(Node3d start_node, Node3d end_node,
-                       std::vector<const Obstacle*> obstacles,
-                       const OpenSpaceConf& open_space_conf);
+  explicit HybridAStar(double sx, double sy, double sphi, double ex, double ey,
+                       double ephi, std::vector<const Obstacle*> obstacles);
   virtual ~HybridAStar() = default;
   Status Plan();
 
@@ -80,9 +64,9 @@ class HybridAStar {
   Result GetResult();
 
  private:
-  const common::VehicleParam& vehicle_param_ =
-      common::VehicleConfigHelper::GetConfig().vehicle_param();
-  OpenSpaceConf& open_space_conf_;
+  PlannerOpenSpaceConfig open_space_conf_;
+  const common::VehicleParam& vehicle_param_;
+  std::size_t next_node_num_ = 0;
   std::vector<const Obstacle*> obstacles_;
   std::shared_ptr<Node3d> start_node_;
   std::shared_ptr<Node3d> end_node_;

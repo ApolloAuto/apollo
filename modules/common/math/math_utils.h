@@ -204,6 +204,9 @@ inline void L2Norm(int feat_dim, float *feat_data) {
   }
 }
 
+// Cartesian coordinates to Polar coordianates
+std::pair<double, double> Cartesian2Polar(double x, double y);
+
 }  // namespace math
 }  // namespace common
 }  // namespace apollo
