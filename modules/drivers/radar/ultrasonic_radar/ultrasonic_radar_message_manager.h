@@ -54,7 +54,7 @@ class UltrasonicRadarMessageManager : public MessageManager<Ultrasonic> {
 
  private:
   int entrance_num_ = 0;
-  std::shared_ptr<::apollo::cybertron::Writer<Ultrasonic>> ultrasonic_radar_writer_;
+  std::shared_ptr<cybertron::Writer<Ultrasonic>> ultrasonic_radar_writer_;
   std::shared_ptr<CanClient> can_client_;
 };
 
