@@ -227,20 +227,7 @@ void SimulationWorldUpdater::RegisterMessageHandlers() {
 
   websocket_->RegisterMessageHandler(
       "Dump", [this](const Json &json, WebSocketHandler::Connection *conn) {
-        // DumpMessage(AdapterManager::GetChassis(), "Chassis");
-        // DumpMessage(AdapterManager::GetPrediction(), "Prediction");
-        // DumpMessage(AdapterManager::GetRoutingRequest(), "RoutingRequest");
-        // DumpMessage(AdapterManager::GetRoutingResponse(), "RoutingResponse");
-        // DumpMessage(AdapterManager::GetLocalization(), "Localization");
-        // DumpMessage(AdapterManager::GetPlanning(), "Planning");
-        // DumpMessage(AdapterManager::GetControlCommand(), "Control");
-        // DumpMessage(AdapterManager::GetPerceptionObstacles(), "Perception");
-        // DumpMessage(AdapterManager::GetTrafficLightDetection(),
-        // "TrafficLight");
-        // DumpMessage(AdapterManager::GetRelativeMap(), "RelativeMap");
-        // DumpMessage(AdapterManager::GetNavigation(), "Navigation");
-        // DumpMessage(AdapterManager::GetContiRadar(), "ContiRadar");
-        // DumpMessage(AdapterManager::GetMobileye(), "Mobileye");
+        sim_world_service_.DumpMessages();
       });
 
   websocket_->RegisterMessageHandler(

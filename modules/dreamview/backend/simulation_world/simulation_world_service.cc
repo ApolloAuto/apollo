@@ -245,50 +245,28 @@ SimulationWorldService::SimulationWorldService(const MapService *map_service,
   auto_driving_car->set_length(vehicle_param.length());
 }
 
-template <>
-void SimulationWorldService::UpdateSimulationWorld(
-    const MonitorMessage &monitor_msg) {
-  // TODO(siyangy): handle concurrency update
-
-  const int updated_size = std::min(monitor_msg.item_size(),
-                                    SimulationWorldService::kMaxMonitorItems);
-  // Save the latest messages at the end of the history.
-  for (int idx = 0; idx < updated_size; ++idx) {
-    auto *notification = world_.add_notification();
-    notification->mutable_item()->CopyFrom(monitor_msg.item(idx));
-    notification->set_timestamp_sec(monitor_msg.header().timestamp_sec());
-  }
-
-  int remove_size =
-      world_.notification_size() - SimulationWorldService::kMaxMonitorItems;
-  if (remove_size > 0) {
-    auto *notifications = world_.mutable_notification();
-    notifications->erase(notifications->begin(),
-                         notifications->begin() + remove_size);
-  }
-}
-
 void SimulationWorldService::InitReaders() {
-  routing_response_reader_ = node_->CreateReader<RoutingResponse>(
-      FLAGS_routing_response_topic, nullptr);
-  chassis_reader_ = node_->CreateReader<Chassis>(FLAGS_chassis_topic, nullptr);
-  gps_reader_ = node_->CreateReader<Gps>(FLAGS_gps_topic, nullptr);
-  localization_reader_ = node_->CreateReader<LocalizationEstimate>(
-      FLAGS_localization_topic, nullptr);
-  perception_obstacle_reader_ = node_->CreateReader<PerceptionObstacles>(
-      FLAGS_perception_obstacle_topic, nullptr);
+  routing_request_reader_ =
+      node_->CreateReader<RoutingRequest>(FLAGS_routing_request_topic);
+  routing_response_reader_ =
+      node_->CreateReader<RoutingResponse>(FLAGS_routing_response_topic);
+  chassis_reader_ = node_->CreateReader<Chassis>(FLAGS_chassis_topic);
+  gps_reader_ = node_->CreateReader<Gps>(FLAGS_gps_topic);
+  localization_reader_ =
+      node_->CreateReader<LocalizationEstimate>(FLAGS_localization_topic);
+  perception_obstacle_reader_ =
+      node_->CreateReader<PerceptionObstacles>(FLAGS_perception_obstacle_topic);
   perception_traffic_light_reader_ = node_->CreateReader<TrafficLightDetection>(
-      FLAGS_traffic_light_detection_topic, nullptr);
+      FLAGS_traffic_light_detection_topic);
   prediction_obstacle_reader_ =
-      node_->CreateReader<PredictionObstacles>(FLAGS_prediction_topic, nullptr);
-  planning_reader_ = node_->CreateReader<ADCTrajectory>(
-      FLAGS_planning_trajectory_topic, nullptr);
+      node_->CreateReader<PredictionObstacles>(FLAGS_prediction_topic);
+  planning_reader_ =
+      node_->CreateReader<ADCTrajectory>(FLAGS_planning_trajectory_topic);
   control_command_reader_ =
-      node_->CreateReader<ControlCommand>(FLAGS_control_command_topic, nullptr);
+      node_->CreateReader<ControlCommand>(FLAGS_control_command_topic);
   navigation_reader_ =
-      node_->CreateReader<NavigationInfo>(FLAGS_navigation_topic, nullptr);
-  relative_map_reader_ =
-      node_->CreateReader<MapMsg>(FLAGS_relative_map_topic, nullptr);
+      node_->CreateReader<NavigationInfo>(FLAGS_navigation_topic);
+  relative_map_reader_ = node_->CreateReader<MapMsg>(FLAGS_relative_map_topic);
 
   drive_event_reader_ = node_->CreateReader<DriveEvent>(
       FLAGS_drive_event_topic,
@@ -299,7 +277,8 @@ void SimulationWorldService::InitReaders() {
   monitor_reader_ = node_->CreateReader<MonitorMessage>(
       FLAGS_monitor_topic,
       [this](const std::shared_ptr<MonitorMessage> &monitor_message) {
-        this->UpdateSimulationWorld(*monitor_message);
+        std::unique_lock<std::mutex> lock(monitor_msgs_mutex_);
+        monitor_msgs_.push_back(monitor_message);
       });
 }
 
@@ -328,6 +307,9 @@ void SimulationWorldService::Update() {
   }
 
   node_->Observe();
+
+  UpdateMonitorMessages();
+
   UpdateWithLatestObserved(routing_response_reader_.get(), false);
   UpdateWithLatestObserved(chassis_reader_.get());
   UpdateWithLatestObserved(gps_reader_.get());
@@ -1067,6 +1049,47 @@ void SimulationWorldService::UpdateSimulationWorld(const MapMsg &map_msg) {
       DownsampleCurve(lane->mutable_right_boundary()->mutable_curve());
     }
   }
+}
+
+void SimulationWorldService::UpdateMonitorMessages() {
+  std::list<std::shared_ptr<MonitorMessage>> monitor_msgs;
+  {
+    std::unique_lock<std::mutex> lock(monitor_msgs_mutex_);
+    monitor_msgs = monitor_msgs_;
+  }
+
+  for (const auto &monitor_msg : monitor_msgs) {
+    const int updated_size = std::min(monitor_msg->item_size(),
+                                      SimulationWorldService::kMaxMonitorItems);
+    // Save the latest messages at the end of the history.
+    for (int idx = 0; idx < updated_size; ++idx) {
+      auto *notification = world_.add_notification();
+      notification->mutable_item()->CopyFrom(monitor_msg->item(idx));
+      notification->set_timestamp_sec(monitor_msg->header().timestamp_sec());
+    }
+
+    int remove_size =
+        world_.notification_size() - SimulationWorldService::kMaxMonitorItems;
+    if (remove_size > 0) {
+      auto *notifications = world_.mutable_notification();
+      notifications->erase(notifications->begin(),
+                           notifications->begin() + remove_size);
+    }
+  }
+}
+
+void SimulationWorldService::DumpMessages() {
+  DumpMessageFromReader(chassis_reader_.get());
+  DumpMessageFromReader(prediction_obstacle_reader_.get());
+  DumpMessageFromReader(routing_request_reader_.get());
+  DumpMessageFromReader(routing_response_reader_.get());
+  DumpMessageFromReader(localization_reader_.get());
+  DumpMessageFromReader(planning_reader_.get());
+  DumpMessageFromReader(control_command_reader_.get());
+  DumpMessageFromReader(perception_obstacle_reader_.get());
+  DumpMessageFromReader(perception_traffic_light_reader_.get());
+  DumpMessageFromReader(relative_map_reader_.get());
+  DumpMessageFromReader(navigation_reader_.get());
 }
 
 void SimulationWorldService::PublishNavigationInfo(

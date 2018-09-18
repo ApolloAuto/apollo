@@ -150,6 +150,8 @@ class SimulationWorldService {
 
   nlohmann::json GetRoutePathAsJson() const;
 
+  void DumpMessages();
+
  private:
   void InitReaders();
   void InitWriters();
@@ -160,6 +162,8 @@ class SimulationWorldService {
    */
   template <typename DataType>
   void UpdateSimulationWorld(const DataType &data);
+
+  void UpdateMonitorMessages();
 
   Object &CreateWorldObjectIfAbsent(
       const apollo::perception::PerceptionObstacle &obstacle);
@@ -227,6 +231,21 @@ class SimulationWorldService {
     UpdateSimulationWorld(*msg);
   }
 
+  /**
+   * @brief Get the latest observed data from reader and dump it to a local
+   * file.
+   */
+  template <typename MessageT>
+  void DumpMessageFromReader(cybertron::Reader<MessageT> *reader) {
+    if (reader->Empty()) {
+      AWARN << "Has not received any data from " << reader->GetChannelName()
+            << ". Cannot dump message!";
+      return;
+    }
+
+    apollo::common::util::DumpMessage(reader->GetLatestObserved());
+  }
+
   void ReadRoutingFromFile(const std::string &routing_response_file);
 
   void UpdateDelays();
@@ -268,6 +287,10 @@ class SimulationWorldService {
   // The map holding obstacle string id to the actual object
   std::unordered_map<std::string, Object> obj_map_;
 
+  // A temporary cache for all the monitor messages coming in.
+  std::mutex monitor_msgs_mutex_;
+  std::list<std::shared_ptr<common::monitor::MonitorMessage>> monitor_msgs_;
+
   // The SIMULATOR monitor for publishing messages.
   apollo::common::monitor::MonitorLogBuffer monitor_logger_buffer_;
 
@@ -304,6 +327,8 @@ class SimulationWorldService {
       drive_event_reader_;
   std::shared_ptr<cybertron::Reader<apollo::common::monitor::MonitorMessage>>
       monitor_reader_;
+  std::shared_ptr<cybertron::Reader<apollo::routing::RoutingRequest>>
+      routing_request_reader_;
   std::shared_ptr<cybertron::Reader<apollo::routing::RoutingResponse>>
       routing_response_reader_;
 
