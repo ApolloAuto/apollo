@@ -26,7 +26,7 @@
 #include "cybertron/common/global_data.h"
 #include "cybertron/croutine/croutine.h"
 #include "cybertron/croutine/routine_factory.h"
-#include "cybertron/data/data_dispatcher.h"
+#include "cybertron/data/data_notifier.h"
 #include "cybertron/init.h"
 #include "cybertron/scheduler/scheduler.h"
 
@@ -36,8 +36,7 @@ namespace cybertron {
 static const char* task_prefix = "/internal/task/";
 
 template <typename Type, typename Ret>
-class TaskData {
- public:
+struct TaskData {
   std::shared_ptr<Type> raw_data;
   std::promise<Ret> prom;
 };
@@ -45,52 +44,45 @@ class TaskData {
 template <typename T, typename R, typename Derived>
 class TaskBase {
  public:
-  ~TaskBase();
+  virtual ~TaskBase();
+  void Stop();
+  bool IsRunning() const;
   std::future<R> Execute(const std::shared_ptr<T>& val);
+  std::shared_ptr<TaskData<T, R>> GetTaskData();
 
  protected:
   void RegisterCallback(
       std::function<void(const std::shared_ptr<TaskData<T, R>>&)>&& func);
   void RegisterCallback(std::function<void()>&& func);
-  uint32_t num_threads_;
-  std::string name_;
-  std::vector<uint64_t> name_ids_;
 
  private:
   TaskBase(const std::string& name, const uint8_t& num_threads = 1);
   friend Derived;
+  std::string name_;
+  bool running_;
+  uint32_t num_threads_;
+  uint64_t task_id_;
+  mutable std::mutex mutex_;
+  std::list<std::shared_ptr<TaskData<T, R>>> data_list_;
 };
 
 template <typename T, typename R, typename Derived>
 TaskBase<T, R, Derived>::TaskBase(const std::string& name,
                                   const uint8_t& num_threads)
-    : num_threads_(num_threads) {
-  name_ = task_prefix + name;
-  name_ids_.reserve(num_threads);
-}
-
-template <typename T, typename R, typename Derived>
-void TaskBase<T, R, Derived>::RegisterCallback(
-    std::function<void(const std::shared_ptr<TaskData<T, R>>&)>&& func) {
-  for (int i = 0; i < num_threads_; ++i) {
-    auto channel_name = name_ + std::to_string(i);
-    auto name_id = common::GlobalData::RegisterChannel(channel_name);
-    name_ids_.push_back(std::move(name_id));
-    auto dv = std::make_shared<data::DataVisitor<TaskData<T, R>>>(name_id, 1);
-    croutine::RoutineFactory factory =
-        croutine::CreateRoutineFactory<TaskData<T, R>>(func, dv);
-    scheduler::Scheduler::Instance()->CreateTask(factory, channel_name);
+    : num_threads_(num_threads), running_(true) {
+  if (num_threads_ > scheduler::Scheduler::ProcessorNum()) {
+    num_threads_ = scheduler::Scheduler::ProcessorNum();
   }
+  name_ = task_prefix + name;
+  task_id_ = common::GlobalData::RegisterChannel(name_);
 }
 
 template <typename T, typename R, typename Derived>
 void TaskBase<T, R, Derived>::RegisterCallback(std::function<void()>&& func) {
+  croutine::RoutineFactory factory = croutine::CreateRoutineFactory(func);
   for (int i = 0; i < num_threads_; ++i) {
-    auto channel_name = name_ + std::to_string(i);
-    auto name_id = common::GlobalData::RegisterChannel(channel_name);
-    name_ids_.push_back(std::move(name_id));
-    croutine::RoutineFactory factory = croutine::CreateRoutineFactory(func);
-    scheduler::Scheduler::Instance()->CreateTask(factory, channel_name);
+    scheduler::Scheduler::Instance()->CreateTask(factory,
+                                                 name_ + std::to_string(i));
   }
 }
 
@@ -106,9 +98,16 @@ template <typename Function>
 Task<T, R>::Task(const std::string& name, Function&& f,
                  const uint8_t& num_threads)
     : TaskBase<T, R, Task<T, R>>(name, num_threads) {
-  auto func = [f = std::forward<Function&&>(f)](
-      const std::shared_ptr<TaskData<T, R>>& msg) {
-    msg->prom.set_value(f(msg->raw_data));
+  auto func = [ f = std::forward<Function&&>(f), this ]() {
+    while (this->IsRunning()) {
+      auto msg = this->GetTaskData();
+      if (msg == nullptr) {
+        auto routine = croutine::CRoutine::GetCurrentRoutine();
+        routine->Sleep(1000);
+        continue;
+      }
+      msg->prom.set_value(f(msg->raw_data));
+    }
   };
   this->RegisterCallback(std::move(func));
 }
@@ -128,33 +127,67 @@ template <typename Function>
 Task<T, void>::Task(const std::string& name, Function&& f,
                     const uint8_t& num_threads)
     : TaskBase<T, void, Task<T, void>>(name, num_threads) {
-  auto func = [f = std::forward<Function&&>(f)](
-      const std::shared_ptr<TaskData<T, void>>& msg) {
-    f(msg->raw_data);
-    msg->prom.set_value();
+  auto func = [ f = std::forward<Function&&>(f), this ]() {
+    while (this->IsRunning()) {
+      auto msg = this->GetTaskData();
+      if (msg == nullptr) {
+        auto routine = croutine::CRoutine::GetCurrentRoutine();
+        routine->Sleep(1000);
+        continue;
+      }
+      f(msg->raw_data);
+      msg->prom.set_value();
+    }
   };
   this->RegisterCallback(std::move(func));
 }
 
 template <typename T, typename R, typename Derived>
+bool TaskBase<T, R, Derived>::IsRunning() const {
+  std::lock_guard<std::mutex> lg(mutex_);
+  return running_;
+}
+
+template <typename T, typename R, typename Derived>
+void TaskBase<T, R, Derived>::Stop() {
+  std::lock_guard<std::mutex> lg(mutex_);
+  data_list_.clear();
+  running_ = false;
+}
+
+template <typename T, typename R, typename Derived>
 TaskBase<T, R, Derived>::~TaskBase() {
+  Stop();
   for (int i = 0; i < num_threads_; ++i) {
-    auto channel_name = task_prefix + name_ + std::to_string(i);
-    scheduler::Scheduler::Instance()->RemoveTask(channel_name);
+    scheduler::Scheduler::Instance()->RemoveTask(name_ + std::to_string(i));
   }
 }
 
 template <typename T, typename R, typename Derived>
 std::future<R> TaskBase<T, R, Derived>::Execute(const std::shared_ptr<T>& val) {
-  static auto it = name_ids_.begin();
-  if (it == name_ids_.end()) {
-    it = name_ids_.begin();
-  }
   auto task = std::make_shared<TaskData<T, R>>();
   task->raw_data = val;
-  data::DataDispatcher<TaskData<T, R>>::Instance()->Dispatch(*it, task);
-  ++it;
+  {
+    std::lock_guard<std::mutex> lg(mutex_);
+    data_list_.emplace_back(task);
+  }
+  // data::DataNotifier::Instance()->Notify(task_id_);
   return task->prom.get_future();
+}
+
+template <typename T, typename R, typename Derived>
+std::shared_ptr<TaskData<T, R>> TaskBase<T, R, Derived>::GetTaskData() {
+  std::lock_guard<std::mutex> lg(mutex_);
+  if (!running_) {
+    return nullptr;
+  }
+
+  if (data_list_.empty()) {
+    return nullptr;
+  }
+  auto task = data_list_.front();
+  data_list_.pop_front();
+  return task;
 }
 
 template <>

@@ -44,7 +44,7 @@ int TaskProcessor(const std::shared_ptr<Message>& msg) {
 }
 
 void VoidTaskProcessor(const std::shared_ptr<Message>& msg) {
-  AINFO << "Task Processor[" << msg->task_id
+  ADEBUG << "Task Processor[" << msg->task_id
          << "] is running: " << msg->msg_id;
 }
 
@@ -63,7 +63,7 @@ int main(int argc, char* argv[]) {
   uint64_t i = 0;
   while (!apollo::cybertron::IsShutdown()) {
     std::vector<std::future<int>> futures;
-    for (int j = 0; j < num_threads; ++j) {
+    for (int j = 0; j < 1000; ++j) {
       auto msg = std::make_shared<Message>();
       msg->msg_id = i++;
       msg->task_id = j;
@@ -76,7 +76,7 @@ int main(int argc, char* argv[]) {
       break;
     }
     for (auto& future: futures) {
-      AINFO << "Finish task:" << future.get();
+      //AINFO << "Finish task:" << future.get();
     }
     AINFO << "All task are finished.";
   }
