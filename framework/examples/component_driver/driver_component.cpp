@@ -69,7 +69,6 @@ bool DriverComponent::Proc() {
     car_msg->mutable_header()->set_timestamp(Time::Now().ToNanosecond());
     car_msg->set_msg_id(j++);
     car_msg->set_result(0);
-    task_->Execute(car_msg);
   }
 
   auto food = std::make_shared<RawMessage>("ham sausage");
