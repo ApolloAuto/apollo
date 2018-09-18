@@ -37,6 +37,22 @@
 #include "modules/localization/proto/gps.pb.h"
 #include "modules/localization/proto/imu.pb.h"
 #include "modules/common/proto/drive_event.pb.h"
+#include "modules/common/monitor_log/proto/monitor_log.pb.h"
+#include "modules/monitor/proto/system_status.pb.h"
+#include "modules/data/proto/static_info.pb.h"
+#include "modules/canbus/proto/chassis_detail.pb.h"
+#include "modules/control/proto/pad_msg.pb.h"
+#include "modules/map/relative_map/proto/navigation.pb.h"
+#include "modules/routing/proto/routing.pb.h"
+#include "cybertron/tf2_cybertron/transform_broadcaster.h"
+#include "modules/drivers/proto/conti_radar.pb.h"
+#include "modules/drivers/proto/delphi_esr.pb.h"
+#include "modules/drivers/gnss/proto/gnss_best_pose.pb.h"
+#include "modules/drivers/gnss/proto/gnss.pb.h"
+#include "modules/drivers/gnss/proto/gnss_raw_observation.pb.h"
+#include "modules/drivers/gnss/proto/gnss_status.pb.h"
+#include "modules/drivers/gnss/proto/imu.pb.h"
+#include "modules/drivers/gnss/proto/ins.pb.h"
 
 namespace apollo {
 namespace tools {

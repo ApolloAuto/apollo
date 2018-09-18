@@ -35,6 +35,13 @@ cc_library(
         "//modules/localization/proto:imu_proto",
         "//modules/localization/proto:gps_proto",
         "//modules/common/proto:drive_event_proto",
+        "//modules/monitor/proto:system_status_proto",
+        "//modules/data/proto:static_info_proto",
+        "//modules/common/monitor_log/proto:monitor_log_proto",
+        "//modules/map/relative_map/proto:navigation_proto",
+        "//modules/routing/proto:routing_proto",
+        "//modules/drivers/proto:sensor_proto",
+        "//modules/drivers/gnss/proto:gnss_proto",
     ],
 )
 
