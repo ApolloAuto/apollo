@@ -25,7 +25,7 @@
 #include "modules/common/util/file.h"
 
 DEFINE_string(static_info_conf_file,
-              "modules/data/conf/static_info_conf.pb.txt",
+              "/apollo/modules/data/conf/static_info_conf.pb.txt",
               "Path of the StaticInfo config file.");
 
 DEFINE_string(container_meta_ini, "/apollo/meta.ini",
