@@ -26,14 +26,9 @@ namespace prediction {
 class FeatureOutput {
  public:
   /**
-   * @brief Constructor
+   * @brief Constructor; disabled
    */
-  FeatureOutput() = default;
-
-  /**
-   * @brief Destructor
-   */
-  ~FeatureOutput() = default;
+  FeatureOutput() = delete;
 
   /**
    * @brief Close the output stream
@@ -70,7 +65,8 @@ class FeatureOutput {
 
  private:
   static Features features_;
-  static size_t index_;
+
+  static std::size_t index_;
 };
 
 }  // namespace prediction

@@ -47,7 +47,7 @@ class PredictionMap {
    * @return The position with coordinates.
    */
   static Eigen::Vector2d PositionOnLane(
-      std::shared_ptr<const hdmap::LaneInfo> lane_info, const double s);
+      const std::shared_ptr<const hdmap::LaneInfo> lane_info, const double s);
 
   /**
    * @brief Get the heading of a point on a specific distance along a lane.
@@ -55,8 +55,8 @@ class PredictionMap {
    * @param s The distance along the lane.
    * @return The heading of the point.
    */
-  static double HeadingOnLane(std::shared_ptr<const hdmap::LaneInfo> lane_info,
-                              const double s);
+  static double HeadingOnLane(
+      const std::shared_ptr<const hdmap::LaneInfo> lane_info, const double s);
 
   /**
    * @brief Get the curvature of a point on a specific distance along a lane.
@@ -72,8 +72,8 @@ class PredictionMap {
    * @param s The distance along the lane.
    * @return The width on the distance s.
    */
-  static double LaneTotalWidth(std::shared_ptr<const hdmap::LaneInfo> lane_info,
-                               const double s);
+  static double LaneTotalWidth(
+      const std::shared_ptr<const hdmap::LaneInfo> lane_info, const double s);
 
   /**
    * @brief Get a shared pointer to a lane by lane ID.
@@ -89,9 +89,10 @@ class PredictionMap {
    * @param s The longitudinal coordinate of the position.
    * @param l The lateral coordinate of the position.
    */
-  static bool GetProjection(const Eigen::Vector2d& position,
-                            std::shared_ptr<const hdmap::LaneInfo> lane_info,
-                            double* s, double* l);
+  static bool GetProjection(
+      const Eigen::Vector2d& position,
+      const std::shared_ptr<const hdmap::LaneInfo> lane_info,
+      double* s, double* l);
 
   /**
    * @brief Get the nearest path point to a longitudinal coordinate on a lane.

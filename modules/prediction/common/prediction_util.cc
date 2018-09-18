@@ -30,7 +30,7 @@ namespace prediction {
 namespace math_util {
 
 double Normalize(const double value, const double mean, const double std) {
-  constexpr double eps = 1e-10;
+  const double eps = 1e-10;
   return (value - mean) / (std + eps);
 }
 

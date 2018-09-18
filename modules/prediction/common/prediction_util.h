@@ -92,7 +92,7 @@ namespace predictor_util {
  * @param point The point to be translated.
  */
 void TranslatePoint(const double translate_x, const double translate_y,
-                    ::apollo::common::TrajectoryPoint* point);
+                    common::TrajectoryPoint* point);
 
 /**
  * @brief Generate a set of free move trajectory points
