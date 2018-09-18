@@ -33,7 +33,7 @@ namespace apollo {
 namespace cybertron {
 namespace record {
 
-static std::string g_empty_string = "";
+const char g_empty_string[] = "";
 
 class RecordBase {
  public:
