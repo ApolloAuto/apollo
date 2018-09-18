@@ -23,6 +23,7 @@
 #ifndef MODULES_PLANNING_REFERENCE_LINE_REFERENCE_LINE_PROVIDER_H_
 #define MODULES_PLANNING_REFERENCE_LINE_REFERENCE_LINE_PROVIDER_H_
 
+#include <atomic>
 #include <condition_variable>
 #include <list>
 #include <memory>
@@ -156,7 +157,7 @@ class ReferenceLineProvider {
 
  private:
   bool is_initialized_ = false;
-  bool is_stop_ = false;
+  std::atomic<bool> is_stop_{false};
 
   std::unique_ptr<ReferenceLineSmoother> smoother_;
   ReferenceLineSmootherConfig smoother_config_;
