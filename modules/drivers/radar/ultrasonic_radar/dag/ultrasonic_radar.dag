@@ -1,11 +1,10 @@
 module_config {
-    module_library :
-"/apollo/bazel-bin/modules/drivers/radar/ultrasonic_radar/libultrasonic_radar_canbus_component.so"
+    module_library: "/apollo/bazel-bin/modules/drivers/radar/ultrasonic_radar/libultrasonic_radar_canbus_component.so"
     components {
-        class_name : "UltrasonicRadarCanbusComponent"
+        class_name: "UltrasonicRadarCanbusComponent"
         config {
             name: "ultrasonic_radar"
-            config_file_path:  "/apollo/modules/drivers/radar/ultrasonic_radar/conf/ultrasonic_radar_conf.pb.txt"
+            config_file_path: "/apollo/modules/drivers/radar/ultrasonic_radar/conf/ultrasonic_radar_conf.pb.txt"
         }
     }
 }
