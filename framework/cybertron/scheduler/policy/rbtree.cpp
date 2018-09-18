@@ -288,8 +288,10 @@ void RBTree::Delete(RBNode *node) {
 
     if (color) DeleteRebalance(child, parent);
   } else {
-    node_set_black(child);
     root_ = child;
+    if (child) {
+      node_set_black(child);
+    }
   }
 }
 
