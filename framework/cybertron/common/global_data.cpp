@@ -18,6 +18,7 @@
 
 #include <arpa/inet.h>
 #include <netdb.h>
+#include <stdlib.h>
 #include <unistd.h>
 #include <functional>
 
@@ -45,6 +46,14 @@ GlobalData::GlobalData() {
                           apollo::cybertron::proto::RunMode::MODE_SIMULATION)
                          ? false
                          : true;
+
+  const char* run_mode_val = ::getenv("CYBER_RUN_MODE");
+  if (run_mode_val != nullptr) {
+    std::string run_mode_str(run_mode_val);
+    if (run_mode_str == "simulation") {
+      is_reality_mode_ = false;
+    }
+  }
 }
 
 GlobalData::~GlobalData() {}
