@@ -104,7 +104,6 @@ void ObstaclesContainer::InsertPerceptionObstacle(
 }
 
 void ObstaclesContainer::BuildLaneGraph() {
-  // TODO(kechxu) implement building lane graph, lane sequences
   for (const int id : curr_frame_predictable_obstacle_ids_) {
     Obstacle* obstacle_ptr = obstacles_.GetSilently(id);
     if (obstacle_ptr == nullptr) {
@@ -113,6 +112,12 @@ void ObstaclesContainer::BuildLaneGraph() {
     }
     obstacle_ptr->BuildLaneGraph();
   }
+}
+
+void ObstaclesContainer::PrioritizeObstacles() {
+  // TODO(all) implement
+  // According to scenario and filtered lanes and junctions, etc
+  // set priorities for obstacles
 }
 
 bool ObstaclesContainer::IsPredictable(

@@ -66,4 +66,11 @@ message Feature {
   optional bool is_still = 22 [default = false];
   optional apollo.perception.PerceptionObstacle.Type type = 23;
   optional double label_update_time_delta = 24;
+
+  enum Priority {
+    CAUTION = 1;
+    NORMAL = 2;
+    IGNORE = 3;
+  }
+  optional Priority priority = 25;
 }
