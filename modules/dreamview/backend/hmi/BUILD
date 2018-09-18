@@ -55,6 +55,9 @@ cc_library(
     name = "hmi_worker",
     srcs = ["hmi_worker.cc"],
     hdrs = ["hmi_worker.h"],
+    linkopts = [
+        "-lboost_thread",
+    ],
     deps = [
         ":vehicle_manager",
         "//framework:cybertron",

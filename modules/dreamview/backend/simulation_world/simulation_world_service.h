@@ -22,6 +22,8 @@
 #define MODULES_DREAMVIEW_BACKEND_SIMULATION_WORLD_SIM_WORLD_H_
 
 #include <functional>
+#include <list>
+#include <memory>
 #include <string>
 #include <unordered_map>
 #include <utility>

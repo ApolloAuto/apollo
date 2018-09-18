@@ -20,9 +20,10 @@
 
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
-#include "modules/common/time/time.h"
 
+#include "modules/canbus/proto/chassis.pb.h"
 #include "modules/common/math/quaternion.h"
+#include "modules/common/time/time.h"
 
 using apollo::canbus::Chassis;
 using apollo::common::math::HeadingToQuaternion;
@@ -105,9 +106,13 @@ TEST_F(SimControlTest, Test) {
     Clock::SetNow(timestamp.time_since_epoch());
     sim_control_->RunOnce();
 
-    // const Chassis *chassis = AdapterManager::GetChassis()->GetLatestPublished();
+    // const Chassis *chassis =
+    // AdapterManager::GetChassis()->GetLatestPublished();
     // const LocalizationEstimate *localization =
     //     AdapterManager::GetLocalization()->GetLatestPublished();
+    // FIXME
+    const Chassis *chassis;
+    const LocalizationEstimate *localization;
 
     EXPECT_TRUE(chassis->engine_started());
     EXPECT_EQ(Chassis::COMPLETE_AUTO_DRIVE, chassis->driving_mode());

@@ -21,6 +21,7 @@
 #ifndef MODULES_DREAMVIEW_BACKEND_SIM_CONTROL_SIM_CONTROL_H_
 #define MODULES_DREAMVIEW_BACKEND_SIM_CONTROL_SIM_CONTROL_H_
 
+#include <memory>
 #include <string>
 
 #include "cybertron/cybertron.h"
