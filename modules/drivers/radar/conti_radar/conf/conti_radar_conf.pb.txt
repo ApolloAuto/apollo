@@ -32,4 +32,9 @@ radar_conf {
   sort_index: 0
   store_in_nvm: 1
   rcs_threshold: RCS_THRESHOLD_STANDARD
+
+  channel_name: "/apollo/sensor/conti_radar"
+  pose_channel_name: "/apollo/localization/pose"
+  # unit: nano seconds, 20ms for 50hz
+  input_send_interval: 20000000 
 }
