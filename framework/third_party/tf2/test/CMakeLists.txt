@@ -4,7 +4,7 @@ ADD_DEFINITIONS(-Dprotected=public -Dprivate=public -DUNIT_TEST=1)
 add_executable(cache_unittest cache_unittest.cpp)
 target_link_libraries(cache_unittest 
   gtest
-  tf2
+  tf2_core
 )
 
 # install(TARGETS cache_unittest 
@@ -13,7 +13,7 @@ target_link_libraries(cache_unittest
 add_executable(simple_tf2_core simple_tf2_core.cpp)
 target_link_libraries(simple_tf2_core
   gtest
-  tf2
+  tf2_core
 )
 
 # install(TARGETS simple_tf2_core 
@@ -22,7 +22,7 @@ target_link_libraries(simple_tf2_core
 add_executable(tf2_speed_test speed_test.cpp)
 target_link_libraries(tf2_speed_test
   gtest
-  tf2
+  tf2_core
 )
 #
 # install(TARGETS tf2_speed_test
@@ -32,7 +32,7 @@ target_link_libraries(tf2_speed_test
 add_executable(tf2_static_cache_test static_cache_test.cpp)
 target_link_libraries(tf2_static_cache_test
   gtest
-  tf2
+  tf2_core
 )
 
 # install(TARGETS tf2_static_cache_test
@@ -41,7 +41,7 @@ target_link_libraries(tf2_static_cache_test
 add_executable(tf2_speed_2_test speed_2_test.cpp)
 target_link_libraries(tf2_speed_2_test
   gtest
-  tf2
+  tf2_core
 )
 
 # install(TARGETS tf2_speed_2_test

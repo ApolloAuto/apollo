@@ -20,6 +20,8 @@
 #include <geometry_msgs/Transform.h>
 #include <geometry_msgs/TransformStamped.h>
 #include <tf2_msgs/TFMessage.h>
+#include <sensor_msgs/PointCloud.h>
+#include <sensor_msgs/PointCloud2.h>
 
 #include "modules/tools/rosbag_to_record/rosbag_to_record.h"
 #include "modules/tools/rosbag_to_record/channel_info.h"
@@ -41,6 +43,61 @@ void PrintUsage() {
             << "  rosbag_to_record myfile.bag" << std::endl;
 }
 
+int convert_PointCloud(std::shared_ptr<apollo::drivers::PointCloud> proto,
+                       sensor_msgs::PointCloud2::ConstPtr rawdata) {
+  auto header = proto->mutable_header();
+  header->set_timestamp_sec(rawdata->header.stamp.toSec());
+  header->set_frame_id(rawdata->header.frame_id);
+  header->set_sequence_num(rawdata->header.seq);
+  proto->set_frame_id(rawdata->header.frame_id);
+  proto->set_measurement_time(rawdata->header.stamp.toSec());
+  proto->set_width(rawdata->width);
+  proto->set_height(rawdata->height);
+
+  int field_size = rawdata->fields.size();
+  int x_offset = -1;
+  int y_offset = -1;
+  int z_offset = -1;
+  int stamp_offset = -1;
+  int intensity_offset = -1;
+  for (int i = 0; i < field_size; ++i) {
+    auto f = rawdata->fields[i];
+    if (f.name == "x") {
+      x_offset = f.offset;
+    } else if (f.name == "y") {
+      y_offset = f.offset;
+    } else if (f.name == "z") {
+      z_offset = f.offset;
+    } else if (f.name == "timestamp") {
+      stamp_offset = f.offset;
+    } else if (f.name == "intensity") {
+      intensity_offset = f.offset;
+    }
+  }
+
+  if (x_offset == -1 || y_offset == -1 || z_offset == -1 ||
+      stamp_offset == -1 || intensity_offset == -1) {
+    std::cerr << "Field not contains x, y, z, timestamp, instensity"
+              << std::endl;
+    return 0;
+  }
+
+  int total = rawdata->width * rawdata->height;
+  auto data = rawdata->data;
+  for (int i = 0; i < total; ++i) {
+    auto cyber_point = proto->add_point();
+    int offset = i * rawdata->point_step;
+    cyber_point->set_x(*reinterpret_cast<float *>(&data[offset + x_offset]));
+    cyber_point->set_y(*reinterpret_cast<float *>(&data[offset + y_offset]));
+    cyber_point->set_z(*reinterpret_cast<float *>(&data[offset + z_offset]));
+    cyber_point->set_intensity(
+        *reinterpret_cast<uint8_t *>(&data[offset + intensity_offset]));
+    cyber_point->set_timestamp(
+        *reinterpret_cast<double *>(&data[offset + stamp_offset]) * 1e9);
+  }
+
+  return 1;
+}
 int main(int argc, char** argv) {
   if (argc != 2) {
     PrintUsage();
@@ -222,6 +279,11 @@ int main(int argc, char** argv) {
       pb_msg->SerializeToString(&serialized_str);
     } else if (channel_name == "/apollo/sensor/gnss/rtk_obs") {
       auto pb_msg = m.instantiate<apollo::drivers::gnss::EpochObservation>();
+      pb_msg->SerializeToString(&serialized_str);
+    } else if (channel_name == "/apollo/sensor/velodyne64/compensator/PointCloud2") {
+      auto ros_msg = m.instantiate<sensor_msgs::PointCloud2>();
+      auto pb_msg = std::make_shared<apollo::drivers::PointCloud>();
+      convert_PointCloud(pb_msg, ros_msg);
       pb_msg->SerializeToString(&serialized_str);
     } else {
       AWARN << "not support channel:" << channel_name;

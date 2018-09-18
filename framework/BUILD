@@ -7,7 +7,7 @@ cc_library(
     name = "cybertron",
     srcs = glob([
         "install/lib/libcybertron*.so",
-        "install/lib/libtf2.so",
+#        "install/lib/libtf2.so",
         "install/third_party/**/libfast*.so",
     ]),
     hdrs = glob([

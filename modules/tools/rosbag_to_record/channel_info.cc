@@ -111,6 +111,8 @@ void ChannelInfo::InitChannels() {
       "/apollo/sensor/gnss/rtk_eph", "apollo.drivers.gnss.GnssEphemeris");
   InitChannelInfo<apollo::drivers::gnss::EpochObservation>(
       "/apollo/sensor/gnss/rtk_obs", "apollo.drivers.gnss.EpochObservation");
+  InitChannelInfo<apollo::drivers::PointCloud>(
+      "/apollo/sensor/velodyne64/compensator/PointCloud2", "apollo.drivers.PointCloud");
 }
 
 }  // namespace tools
