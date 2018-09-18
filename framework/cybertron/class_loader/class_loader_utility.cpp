@@ -221,15 +221,15 @@ bool LoadLibrary(const std::string& library_path, ClassLoader* loader) {
     } catch (const Poco::LibraryLoadException& e) {
       SetCurLoadingLibraryName("");
       SetCurActiveClassLoader(nullptr);
-      AINFO << "poco LibraryLoadException: " << e.message();
+      AERROR << "poco LibraryLoadException: " << e.message();
     } catch (const Poco::LibraryAlreadyLoadedException& e) {
       SetCurLoadingLibraryName("");
       SetCurActiveClassLoader(nullptr);
-      AINFO << "poco LibraryAlreadyLoadedException: " << e.message();
+      AERROR << "poco LibraryAlreadyLoadedException: " << e.message();
     } catch (const Poco::NotFoundException& e) {
       SetCurLoadingLibraryName("");
       SetCurActiveClassLoader(nullptr);
-      AINFO << "poco NotFoundException: " << e.message();
+      AERROR << "poco NotFoundException: " << e.message();
     }
 
     SetCurLoadingLibraryName("");
@@ -260,7 +260,7 @@ void UnloadLibrary(const std::string& library_path, ClassLoader* loader) {
     LibpathPocolibVector& opened_libraries = GetLibPathPocoShareLibVector();
     LibpathPocolibVector::iterator itr = FindLoadedLibrary(library_path);
     if (itr == opened_libraries.end()) {
-      AINFO << "attempt to UnloadLibrary lib,but can't find lib "
+      AERROR << "attempt to UnloadLibrary lib,but can't find lib "
             << library_path;
       return;
     }

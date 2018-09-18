@@ -99,7 +99,7 @@ RoutineState CRoutine::Resume() {
 
 void CRoutine::Routine() {
   while (true) {
-    AINFO << "inner routine" << std::endl;
+    ADEBUG << "inner routine" << std::endl;
     usleep(1000000);
   }
 }

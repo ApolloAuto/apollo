@@ -122,7 +122,7 @@ bool Segment::OpenOrCreate() {
       Remove();
       ++retry;
     } else if (EEXIST == errno) {
-      AINFO << "shm already exist, open only.";
+      ADEBUG << "shm already exist, open only.";
       return OpenOnly();
     } else {
       break;
@@ -299,9 +299,9 @@ void Segment::Reset() {
 
 bool Segment::Remap() {
   init_ = false;
-  AINFO << "before reset.";
+  ADEBUG << "before reset.";
   Reset();
-  AINFO << "after reset.";
+  ADEBUG << "after reset.";
   return OpenOnly();
 }
 

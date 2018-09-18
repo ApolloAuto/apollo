@@ -37,7 +37,7 @@ TimerManager::~TimerManager() {
 void TimerManager::Start() {
   std::lock_guard<std::mutex> lock(running_mutex_);
   if (!running_) {
-    AINFO << "TimerManager->Start() ok";
+    ADEBUG << "TimerManager->Start() ok";
     running_ = true;
     scheduler_thread_ = std::thread([this]() { this->ThreadFuncImpl(); });
   }
