@@ -25,4 +25,15 @@ cc_binary(
    ],
 )
 
+cc_binary(
+    name = "routing_cast",
+    srcs = ["routing_cast.cc"],
+    deps = [
+        "//modules/common",
+        "//modules/common/util",
+        "//modules/routing:routing_lib",
+        "//framework:cybertron",
+   ],
+)
+
 cpplint()
