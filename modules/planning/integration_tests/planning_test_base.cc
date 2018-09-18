@@ -24,6 +24,7 @@
 
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/planning_component.h"
 
 namespace apollo {
 namespace planning {
@@ -74,6 +75,39 @@ void PlanningTestBase::SetUpTestCase() {
   FLAGS_enable_lag_prediction = false;
 }
 
+void PlanningTestBase::SetupCybertron() {
+  Clock::SetMode(Clock::CYBERTRON);
+
+  std::shared_ptr<apollo::cybertron::Node> node(
+      apollo::cybertron::CreateNode("planning_tester"));
+
+  config_.set_name("planning_test");
+  // note: the sequence to add_readers() must be the same
+  //       as what's in PlanningComponent::Proc()
+  config_.add_readers()->set_channel(FLAGS_prediction_topic);
+  config_.add_readers()->set_channel(FLAGS_chassis_topic);
+  config_.add_readers()->set_channel(FLAGS_localization_topic);
+
+  chassis_writer_ = node->CreateWriter<Chassis>(FLAGS_chassis_topic);
+  localization_writer_ = node->CreateWriter<LocalizationEstimate>(
+      FLAGS_localization_topic);
+  prediction_writer_ = node->CreateWriter<PredictionObstacles>(
+      FLAGS_prediction_topic);
+  routing_response_writer_ = node->CreateWriter<RoutingResponse>(
+      FLAGS_routing_response_topic);
+  traffic_light_detection_writer_ =
+      node->CreateWriter<TrafficLightDetection>(
+          FLAGS_traffic_light_detection_topic);
+
+  planning_reader_ = node->CreateReader<ADCTrajectory>(
+      FLAGS_planning_trajectory_topic,
+      [this](const std::shared_ptr<ADCTrajectory>& adc_trajectory) {
+        ADEBUG << "Received planning data: run planning callback.";
+        std::lock_guard<std::mutex> lock(mutex_);
+        adc_trajectory_.CopyFrom(*adc_trajectory);
+      });
+}
+
 bool PlanningTestBase::FeedTestData() {
   // chassis
   if (!apollo::common::util::GetProtoFromFile(
@@ -115,7 +149,7 @@ bool PlanningTestBase::FeedTestData() {
 }
 
 void PlanningTestBase::SetUp() {
-  Clock::SetMode(Clock::CYBERTRON);
+  SetupCybertron();
 
   if (FLAGS_use_navigation_mode) {
     // TODO(all)
@@ -190,27 +224,25 @@ bool PlanningTestBase::RunPlanning(const std::string& test_case_name,
 
   std::string full_golden_path = FLAGS_test_data_dir + "/" + golden_result_file;
 
-  // process fused input data
-  LocalView local_view;
-  local_view.prediction_obstacles =
-      std::make_shared<PredictionObstacles>(prediction_);
-  local_view.chassis = std::make_shared<Chassis>(chassis_);
-  local_view.localization_estimate =
-      std::make_shared<LocalizationEstimate>(localization_);
-  local_view.routing =
-      std::make_shared<routing::RoutingResponse>(routing_response_);
-  local_view.traffic_light =
-      std::make_shared<TrafficLightDetection>(traffic_light_detection_);
+  planning_component_.reset(new PlanningComponent());
+  planning_component_->Initialize(config_);
 
-  ADCTrajectory adc_trajectory_pb;
-  planning_->RunOnce(local_view, &adc_trajectory_pb);
+  usleep(1000);  // sleep 1ms
 
-  if (!IsValidTrajectory(adc_trajectory_pb)) {
+  routing_response_writer_->Write(routing_response_);
+  traffic_light_detection_writer_->Write(traffic_light_detection_);
+  chassis_writer_->Write(chassis_);
+  localization_writer_->Write(localization_);
+  // note: main channel must be written last
+  prediction_writer_->Write(prediction_);
+
+  usleep(300000);  // sleep 300ms
+
+  if (!IsValidTrajectory(adc_trajectory_)) {
     AERROR << "Fail to pass trajectory check.";
     return false;
   }
 
-  adc_trajectory_ = adc_trajectory_pb;
   TrimPlanning(&adc_trajectory_, no_trajectory_point);
   if (FLAGS_test_update_golden_log) {
     AINFO << "The golden file is regenerated:" << full_golden_path;
