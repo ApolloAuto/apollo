@@ -48,13 +48,13 @@ using apollo::hdmap::MapPathPoint;
 bool PredictionMap::Ready() { return HDMapUtil::BaseMapPtr() != nullptr; }
 
 Eigen::Vector2d PredictionMap::PositionOnLane(
-    std::shared_ptr<const LaneInfo> lane_info, const double s) {
+    const std::shared_ptr<const LaneInfo> lane_info, const double s) {
   common::PointENU point = lane_info->GetSmoothPoint(s);
   return {point.x(), point.y()};
 }
 
-double PredictionMap::HeadingOnLane(std::shared_ptr<const LaneInfo> lane_info,
-                                    const double s) {
+double PredictionMap::HeadingOnLane(
+    const std::shared_ptr<const LaneInfo> lane_info, const double s) {
   return lane_info->Heading(s);
 }
 
@@ -65,7 +65,7 @@ double PredictionMap::CurvatureOnLane(const std::string& lane_id,
 }
 
 double PredictionMap::LaneTotalWidth(
-    std::shared_ptr<const hdmap::LaneInfo> lane_info, const double s) {
+    const std::shared_ptr<const hdmap::LaneInfo> lane_info, const double s) {
   double left = 0.0;
   double right = 0.0;
   lane_info->GetWidth(s, &left, &right);
@@ -77,14 +77,14 @@ std::shared_ptr<const LaneInfo> PredictionMap::LaneById(
   return HDMapUtil::BaseMap().GetLaneById(hdmap::MakeMapId(str_id));
 }
 
-bool PredictionMap::GetProjection(const Eigen::Vector2d& position,
-                                  std::shared_ptr<const LaneInfo> lane_info,
-                                  double* s, double* l) {
+bool PredictionMap::GetProjection(
+    const Eigen::Vector2d& pos,
+    const std::shared_ptr<const LaneInfo> lane_info,
+    double* s, double* l) {
   if (lane_info == nullptr) {
     return false;
   }
-  const common::math::Vec2d pos(position[0], position[1]);
-  return lane_info->GetProjection(pos, s, l);
+  return lane_info->GetProjection({pos.x(), pos.y()}, s, l);
 }
 
 bool PredictionMap::ProjectionFromLane(
@@ -107,7 +107,7 @@ bool PredictionMap::IsVirtualLane(const std::string& lane_id) {
   if (lane_info == nullptr) {
     return false;
   }
-  const apollo::hdmap::Lane& lane = lane_info->lane();
+  const hdmap::Lane& lane = lane_info->lane();
   bool left_virtual = lane.has_left_boundary() &&
                       lane.left_boundary().has_virtual_() &&
                       lane.left_boundary().virtual_();
@@ -196,8 +196,8 @@ void PredictionMap::OnLane(
 bool PredictionMap::NearJunction(const Eigen::Vector2d& point,
                                  const double radius) {
   common::PointENU hdmap_point;
-  hdmap_point.set_x(point[0]);
-  hdmap_point.set_y(point[1]);
+  hdmap_point.set_x(point.x());
+  hdmap_point.set_y(point.y());
   std::vector<std::shared_ptr<const JunctionInfo>> junctions;
   HDMapUtil::BaseMap().GetJunctions(hdmap_point, radius, &junctions);
   return junctions.size() > 0;
@@ -206,8 +206,8 @@ bool PredictionMap::NearJunction(const Eigen::Vector2d& point,
 std::vector<std::shared_ptr<const JunctionInfo>> PredictionMap::GetJunctions(
     const Eigen::Vector2d& point, const double radius) {
   common::PointENU hdmap_point;
-  hdmap_point.set_x(point[0]);
-  hdmap_point.set_y(point[1]);
+  hdmap_point.set_x(point.x());
+  hdmap_point.set_y(point.y());
   std::vector<std::shared_ptr<const JunctionInfo>> junctions;
   HDMapUtil::BaseMap().GetJunctions(hdmap_point, radius, &junctions);
   return junctions;
@@ -216,7 +216,6 @@ std::vector<std::shared_ptr<const JunctionInfo>> PredictionMap::GetJunctions(
 bool PredictionMap::InJunction(const Eigen::Vector2d& point,
                                const double radius) {
   auto junction_infos = GetJunctions(point, radius);
-  Vec2d vec(point[0], point[1]);
   if (junction_infos.empty()) {
     return false;
   }
@@ -232,7 +231,7 @@ bool PredictionMap::InJunction(const Eigen::Vector2d& point,
       continue;
     }
     Polygon2d junction_polygon{vertices};
-    if (junction_polygon.IsPointIn(vec)) {
+    if (junction_polygon.IsPointIn({point.x(), point.y()})) {
       return true;
     }
   }
@@ -241,10 +240,9 @@ bool PredictionMap::InJunction(const Eigen::Vector2d& point,
 
 double PredictionMap::PathHeading(std::shared_ptr<const LaneInfo> lane_info,
                                   const common::PointENU& point) {
-  common::math::Vec2d vec_point = {point.x(), point.y()};
-  double s = -1.0;
+  double s = 0.0;
   double l = 0.0;
-  if (lane_info->GetProjection(vec_point, &s, &l)) {
+  if (lane_info->GetProjection({point.x(), point.y()}, &s, &l)) {
     return HeadingOnLane(lane_info, s);
   } else {
     return M_PI;
@@ -260,8 +258,8 @@ bool PredictionMap::SmoothPointFromLane(const std::string& id, const double s,
   std::shared_ptr<const LaneInfo> lane = LaneById(id);
   common::PointENU hdmap_point = lane->GetSmoothPoint(s);
   *heading = PathHeading(lane, hdmap_point);
-  point->operator[](0) = hdmap_point.x() - std::sin(*heading) * l;
-  point->operator[](1) = hdmap_point.y() + std::cos(*heading) * l;
+  point->x() = hdmap_point.x() - std::sin(*heading) * l;
+  point->y() = hdmap_point.y() + std::cos(*heading) * l;
   return true;
 }
 

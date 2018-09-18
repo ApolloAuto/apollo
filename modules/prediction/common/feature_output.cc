@@ -27,7 +27,7 @@ namespace apollo {
 namespace prediction {
 
 Features FeatureOutput::features_;
-size_t FeatureOutput::index_ = 0;
+std::size_t FeatureOutput::index_ = 0;
 
 void FeatureOutput::Close() {
   ADEBUG << "Close feature output";
@@ -56,7 +56,7 @@ void FeatureOutput::Write() {
   }
   const std::string file_name =
       FLAGS_prediction_data_dir + "/feature." + std::to_string(index_) + ".bin";
-  ::apollo::common::util::SetProtoToBinaryFile(features_, file_name);
+  common::util::SetProtoToBinaryFile(features_, file_name);
   features_.Clear();
   ++index_;
 }
