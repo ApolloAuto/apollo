@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef CYBERTRON_DISPATCHER_MESSAGE_H_
-#define CYBERTRON_DISPATCHER_MESSAGE_H_
+#ifndef CYBERTRON_BLOCKER_BLOCKER_H_
+#define CYBERTRON_BLOCKER_BLOCKER_H_
 
 #include <assert.h>
 #include <stddef.h>
@@ -29,11 +29,11 @@
 
 namespace apollo {
 namespace cybertron {
-namespace dispatcher {
+namespace blocker {
 
-class MessageBase {
+class BlockerBase {
  public:
-  virtual ~MessageBase() = default;
+  virtual ~BlockerBase() = default;
 
   virtual void ClearPublished() = 0;
   virtual void Observe() = 0;
@@ -46,13 +46,13 @@ class MessageBase {
   virtual const std::string& channel_name() const = 0;
 };
 
-struct MessageAttr {
-  MessageAttr() : capacity(10), channel_name("") {}
-  explicit MessageAttr(const std::string& channel)
+struct BlockerAttr {
+  BlockerAttr() : capacity(10), channel_name("") {}
+  explicit BlockerAttr(const std::string& channel)
       : capacity(10), channel_name(channel) {}
-  MessageAttr(size_t cap, const std::string& channel)
+  BlockerAttr(size_t cap, const std::string& channel)
       : capacity(cap), channel_name(channel) {}
-  MessageAttr(const MessageAttr& attr)
+  BlockerAttr(const BlockerAttr& attr)
       : capacity(attr.capacity), channel_name(attr.channel_name) {}
 
   size_t capacity;
@@ -60,7 +60,7 @@ struct MessageAttr {
 };
 
 template <typename T>
-class Message : public MessageBase {
+class Blocker : public BlockerBase {
  public:
   using MessageType = T;
   using MessagePtr = std::shared_ptr<T>;
@@ -69,8 +69,8 @@ class Message : public MessageBase {
   using CallbackMap = std::unordered_map<std::string, Callback>;
   using Iterator = typename std::list<std::shared_ptr<T>>::const_iterator;
 
-  explicit Message(const MessageAttr& attr);
-  virtual ~Message();
+  explicit Blocker(const BlockerAttr& attr);
+  virtual ~Blocker();
 
   void Publish(const MessageType& msg);
   void Publish(const MessagePtr& msg);
@@ -100,7 +100,7 @@ class Message : public MessageBase {
   void Notify(const MessagePtr& msg);
 
   bool is_full_;
-  MessageAttr attr_;
+  BlockerAttr attr_;
   MessageQueue observed_msg_queue_;
   MessageQueue published_msg_queue_;
   mutable std::mutex msg_mutex_;
@@ -110,52 +110,52 @@ class Message : public MessageBase {
 };
 
 template <typename T>
-Message<T>::Message(const MessageAttr& attr) : is_full_(false), attr_(attr) {}
+Blocker<T>::Blocker(const BlockerAttr& attr) : is_full_(false), attr_(attr) {}
 
 template <typename T>
-Message<T>::~Message() {
+Blocker<T>::~Blocker() {
   published_msg_queue_.clear();
   observed_msg_queue_.clear();
   published_callbacks_.clear();
 }
 
 template <typename T>
-void Message<T>::Publish(const MessageType& msg) {
+void Blocker<T>::Publish(const MessageType& msg) {
   Publish(std::make_shared<MessageType>(msg));
 }
 
 template <typename T>
-void Message<T>::Publish(const MessagePtr& msg) {
+void Blocker<T>::Publish(const MessagePtr& msg) {
   Enqueue(msg);
   Notify(msg);
 }
 
 template <typename T>
-void Message<T>::ClearPublished() {
+void Blocker<T>::ClearPublished() {
   std::lock_guard<std::mutex> lock(msg_mutex_);
   published_msg_queue_.clear();
 }
 
 template <typename T>
-void Message<T>::Observe() {
+void Blocker<T>::Observe() {
   std::lock_guard<std::mutex> lock(msg_mutex_);
   observed_msg_queue_ = published_msg_queue_;
 }
 
 template <typename T>
-bool Message<T>::IsObservedEmpty() const {
+bool Blocker<T>::IsObservedEmpty() const {
   std::lock_guard<std::mutex> lock(msg_mutex_);
   return observed_msg_queue_.empty();
 }
 
 template <typename T>
-bool Message<T>::IsPublishedEmpty() const {
+bool Blocker<T>::IsPublishedEmpty() const {
   std::lock_guard<std::mutex> lock(msg_mutex_);
   return published_msg_queue_.empty();
 }
 
 template <typename T>
-bool Message<T>::Subscribe(const std::string& callback_id,
+bool Blocker<T>::Subscribe(const std::string& callback_id,
                            const Callback& callback) {
   std::lock_guard<std::mutex> lock(cb_mutex_);
   if (published_callbacks_.find(callback_id) != published_callbacks_.end()) {
@@ -166,82 +166,82 @@ bool Message<T>::Subscribe(const std::string& callback_id,
 }
 
 template <typename T>
-bool Message<T>::Unsubscribe(const std::string& callback_id) {
+bool Blocker<T>::Unsubscribe(const std::string& callback_id) {
   std::lock_guard<std::mutex> lock(cb_mutex_);
   return published_callbacks_.erase(callback_id) != 0;
 }
 
 template <typename T>
-auto Message<T>::GetLatestObserved() const -> const MessageType& {
+auto Blocker<T>::GetLatestObserved() const -> const MessageType& {
   std::lock_guard<std::mutex> lock(msg_mutex_);
   assert(!observed_msg_queue_.empty());
-  return *observed_msg_queue_.back();
+  return *observed_msg_queue_.front();
 }
 
 template <typename T>
-auto Message<T>::GetLatestObservedPtr() const -> const MessagePtr {
-  std::lock_guard<std::mutex> lock(msg_mutex_);
-  assert(!observed_msg_queue_.empty());
-  return observed_msg_queue_.back();
-}
-
-template <typename T>
-auto Message<T>::GetOldestObservedPtr() const -> const MessagePtr {
+auto Blocker<T>::GetLatestObservedPtr() const -> const MessagePtr {
   std::lock_guard<std::mutex> lock(msg_mutex_);
   assert(!observed_msg_queue_.empty());
   return observed_msg_queue_.front();
 }
 
 template <typename T>
-auto Message<T>::GetLatestPublishedPtr() const -> const MessagePtr {
+auto Blocker<T>::GetOldestObservedPtr() const -> const MessagePtr {
   std::lock_guard<std::mutex> lock(msg_mutex_);
-  assert(!published_msg_queue_.empty());
-  return published_msg_queue_.back();
+  assert(!observed_msg_queue_.empty());
+  return observed_msg_queue_.back();
 }
 
 template <typename T>
-auto Message<T>::ObservedBegin() const -> Iterator {
+auto Blocker<T>::GetLatestPublishedPtr() const -> const MessagePtr {
+  std::lock_guard<std::mutex> lock(msg_mutex_);
+  assert(!published_msg_queue_.empty());
+  return published_msg_queue_.front();
+}
+
+template <typename T>
+auto Blocker<T>::ObservedBegin() const -> Iterator {
   return observed_msg_queue_.begin();
 }
 
 template <typename T>
-auto Message<T>::ObservedEnd() const -> Iterator {
+auto Blocker<T>::ObservedEnd() const -> Iterator {
   return observed_msg_queue_.end();
 }
 
 template <typename T>
-size_t Message<T>::capacity() const {
+size_t Blocker<T>::capacity() const {
   return attr_.capacity;
 }
 
 template <typename T>
-void Message<T>::set_capacity(size_t capacity) {
+void Blocker<T>::set_capacity(size_t capacity) {
   std::lock_guard<std::mutex> lock(msg_mutex_);
   if (capacity > attr_.capacity) {
     is_full_ = false;
   }
   attr_.capacity = capacity;
   while (published_msg_queue_.size() > capacity) {
-    published_msg_queue_.pop_front();
+    published_msg_queue_.pop_back();
   }
 }
 
 template <typename T>
-const std::string& Message<T>::channel_name() const {
+const std::string& Blocker<T>::channel_name() const {
   return attr_.channel_name;
 }
 
 template <typename T>
-void Message<T>::Enqueue(const MessagePtr& msg) {
+void Blocker<T>::Enqueue(const MessagePtr& msg) {
   if (attr_.capacity == 0) {
     return;
   }
   std::lock_guard<std::mutex> lock(msg_mutex_);
   if (is_full_) {
-    published_msg_queue_.pop_front();
+    published_msg_queue_.pop_back();
   }
 
-  published_msg_queue_.push_back(msg);
+  published_msg_queue_.push_front(msg);
 
   if (!is_full_) {
     if (published_msg_queue_.size() >= attr_.capacity) {
@@ -251,15 +251,15 @@ void Message<T>::Enqueue(const MessagePtr& msg) {
 }
 
 template <typename T>
-void Message<T>::Notify(const MessagePtr& msg) {
+void Blocker<T>::Notify(const MessagePtr& msg) {
   std::lock_guard<std::mutex> lock(cb_mutex_);
   for (const auto& item : published_callbacks_) {
     item.second(msg);
   }
 }
 
-}  // namespace dispatcher
+}  // namespace blocker
 }  // namespace cybertron
 }  // namespace apollo
 
-#endif  // CYBERTRON_DISPATCHER_MESSAGE_H_
+#endif  // CYBERTRON_BLOCKER_BLOCKER_H_

@@ -16,59 +16,59 @@
 
 #include "gtest/gtest.h"
 
-#include "cybertron/dispatcher/dispatcher.h"
+#include "cybertron/blocker/blocker_manager.h"
 #include "cybertron/proto/unit_test.pb.h"
 
 namespace apollo {
 namespace cybertron {
-namespace dispatcher {
+namespace blocker {
 
 using apollo::cybertron::proto::UnitTest;
 
-TEST(DispatcherTest, constructor) {
-  Dispatcher dispatcher;
-  auto msg = dispatcher.GetMessage<UnitTest>("channel");
-  EXPECT_EQ(msg, nullptr);
+TEST(BlockerManagerTest, constructor) {
+  BlockerManager blocker_manager;
+  auto blocker = blocker_manager.GetBlocker<UnitTest>("channel");
+  EXPECT_EQ(blocker, nullptr);
 }
 
-TEST(DispatcherTest, publish) {
-  Dispatcher dispatcher;
+TEST(BlockerManagerTest, publish) {
+  BlockerManager blocker_manager;
 
   auto msg1 = std::make_shared<UnitTest>();
   msg1->set_class_name("MessageTest");
   msg1->set_case_name("publish_1");
 
-  dispatcher.Publish<UnitTest>("channel1", msg1);
-  auto message1 = dispatcher.GetMessage<UnitTest>("channel1");
-  EXPECT_NE(message1, nullptr);
-  EXPECT_FALSE(message1->IsPublishedEmpty());
+  blocker_manager.Publish<UnitTest>("channel1", msg1);
+  auto blocker1 = blocker_manager.GetBlocker<UnitTest>("channel1");
+  EXPECT_NE(blocker1, nullptr);
+  EXPECT_FALSE(blocker1->IsPublishedEmpty());
 
   UnitTest msg2;
   msg2.set_class_name("MessageTest");
   msg2.set_case_name("publish_2");
 
-  dispatcher.Publish<UnitTest>("channel2", msg2);
-  auto message2 = dispatcher.GetMessage<UnitTest>("channel2");
-  EXPECT_NE(message2, nullptr);
-  EXPECT_FALSE(message2->IsPublishedEmpty());
+  blocker_manager.Publish<UnitTest>("channel2", msg2);
+  auto blocker2 = blocker_manager.GetBlocker<UnitTest>("channel2");
+  EXPECT_NE(blocker2, nullptr);
+  EXPECT_FALSE(blocker2->IsPublishedEmpty());
 
-  EXPECT_TRUE(message1->IsObservedEmpty());
-  EXPECT_TRUE(message2->IsObservedEmpty());
+  EXPECT_TRUE(blocker1->IsObservedEmpty());
+  EXPECT_TRUE(blocker2->IsObservedEmpty());
 
-  dispatcher.Observe();
+  blocker_manager.Observe();
 
-  EXPECT_FALSE(message1->IsObservedEmpty());
-  EXPECT_FALSE(message2->IsObservedEmpty());
+  EXPECT_FALSE(blocker1->IsObservedEmpty());
+  EXPECT_FALSE(blocker2->IsObservedEmpty());
 }
 
-TEST(DispatcherTest, subscribe) {
-  Dispatcher dispatcher;
+TEST(BlockerManagerTest, subscribe) {
+  BlockerManager blocker_manager;
 
   auto received_msg = std::make_shared<UnitTest>();
-  bool res = dispatcher.Subscribe<UnitTest>(
-      "channel", 10, "DispatcherTest",
-      [&received_msg](const std::shared_ptr<UnitTest>& msg) {
-        received_msg->CopyFrom(*msg);
+  bool res = blocker_manager.Subscribe<UnitTest>(
+      "channel", 10, "BlockerManagerTest",
+      [&received_msg](const std::shared_ptr<UnitTest>& blocker) {
+        received_msg->CopyFrom(*blocker);
       });
 
   EXPECT_TRUE(res);
@@ -77,24 +77,26 @@ TEST(DispatcherTest, subscribe) {
   msg1->set_class_name("MessageTest");
   msg1->set_case_name("publish_1");
 
-  dispatcher.Publish<UnitTest>("channel", msg1);
+  blocker_manager.Publish<UnitTest>("channel", msg1);
   EXPECT_EQ(received_msg->class_name(), msg1->class_name());
   EXPECT_EQ(received_msg->case_name(), msg1->case_name());
 
-  res = dispatcher.Unsubscribe<UnitTest>("channel", "DispatcherTest");
+  res = blocker_manager.Unsubscribe<UnitTest>("channel", "BlockerManagerTest");
   EXPECT_TRUE(res);
 
-  res = dispatcher.Unsubscribe<UnitTest>("channel", "DispatcherTest");
+  res = blocker_manager.Unsubscribe<UnitTest>("channel", "BlockerManagerTest");
   EXPECT_FALSE(res);
 
-  res = dispatcher.Unsubscribe<UnitTest>("channel", "DispatcherTest_11");
+  res =
+      blocker_manager.Unsubscribe<UnitTest>("channel", "BlockerManagerTest_11");
   EXPECT_FALSE(res);
 
-  res = dispatcher.Unsubscribe<UnitTest>("channel_11", "DispatcherTest");
+  res =
+      blocker_manager.Unsubscribe<UnitTest>("channel_11", "BlockerManagerTest");
   EXPECT_FALSE(res);
 }
 
-}  // namespace dispatcher
+}  // namespace blocker
 }  // namespace cybertron
 }  // namespace apollo
 

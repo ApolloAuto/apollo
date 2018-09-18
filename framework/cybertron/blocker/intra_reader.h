@@ -14,19 +14,20 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef CYBERTRON_DISPATCHER_INTRA_READER_H_
-#define CYBERTRON_DISPATCHER_INTRA_READER_H_
+#ifndef CYBERTRON_BLOCKER_INTRA_READER_H_
+#define CYBERTRON_BLOCKER_INTRA_READER_H_
 
 #include <functional>
 #include <list>
 #include <memory>
 
-#include "cybertron/dispatcher/dispatcher.h"
+#include "cybertron/blocker/blocker.h"
+#include "cybertron/blocker/blocker_manager.h"
 #include "cybertron/node/reader.h"
 
 namespace apollo {
 namespace cybertron {
-namespace dispatcher {
+namespace blocker {
 
 template <typename MessageT>
 class IntraReader : public apollo::cybertron::Reader<MessageT> {
@@ -59,13 +60,13 @@ class IntraReader : public apollo::cybertron::Reader<MessageT> {
   void OnMessage(const MessagePtr& msg_ptr);
 
   Callback msg_callback_;
-  std::shared_ptr<Message<MessageT>> message_;
+  std::shared_ptr<Blocker<MessageT>> blocker_;
 };
 
 template <typename MessageT>
 IntraReader<MessageT>::IntraReader(const proto::RoleAttributes& attr,
                                    const Callback& callback)
-    : Reader<MessageT>(attr), msg_callback_(callback), message_(nullptr) {}
+    : Reader<MessageT>(attr), msg_callback_(callback), blocker_(nullptr) {}
 
 template <typename MessageT>
 IntraReader<MessageT>::~IntraReader() {
@@ -77,13 +78,13 @@ bool IntraReader<MessageT>::Init() {
   if (this->init_.exchange(true)) {
     return true;
   }
-  MessageAttr attr(this->role_attr_.qos_profile().depth(),
+  BlockerAttr attr(this->role_attr_.qos_profile().depth(),
                    this->role_attr_.channel_name());
-  message_ = Dispatcher::Instance()->GetOrCreateMessage<MessageT>(attr);
-  if (message_ == nullptr) {
+  blocker_ = BlockerManager::Instance()->GetOrCreateBlocker<MessageT>(attr);
+  if (blocker_ == nullptr) {
     return false;
   }
-  return message_->Subscribe(this->role_attr_.node_name(),
+  return blocker_->Subscribe(this->role_attr_.node_name(),
                              std::bind(&IntraReader<MessageT>::OnMessage, this,
                                        std::placeholders::_1));
 }
@@ -93,94 +94,94 @@ void IntraReader<MessageT>::Shutdown() {
   if (!this->init_.exchange(false)) {
     return;
   }
-  message_->Unsubscribe(this->role_attr_.node_name());
-  message_ = nullptr;
+  blocker_->Unsubscribe(this->role_attr_.node_name());
+  blocker_ = nullptr;
 }
 
 template <typename MessageT>
 void IntraReader<MessageT>::ClearData() {
-  if (message_ == nullptr) {
+  if (blocker_ == nullptr) {
     return;
   }
-  message_->ClearPublished();
+  blocker_->ClearPublished();
 }
 
 template <typename MessageT>
 void IntraReader<MessageT>::Observe() {
-  if (message_ == nullptr) {
+  if (blocker_ == nullptr) {
     return;
   }
-  message_->Observe();
+  blocker_->Observe();
 }
 
 template <typename MessageT>
 bool IntraReader<MessageT>::Empty() const {
-  if (message_ == nullptr) {
+  if (blocker_ == nullptr) {
     return true;
   }
-  return message_->IsObservedEmpty();
+  return blocker_->IsObservedEmpty();
 }
 
 template <typename MessageT>
 bool IntraReader<MessageT>::HasReceived() const {
-  if (message_ == nullptr) {
+  if (blocker_ == nullptr) {
     return false;
   }
-  return !message_->IsPublishedEmpty();
+  return !blocker_->IsPublishedEmpty();
 }
 
 template <typename MessageT>
 void IntraReader<MessageT>::Enqueue(const std::shared_ptr<MessageT>& msg) {
-  if (message_ == nullptr) {
+  if (blocker_ == nullptr) {
     return;
   }
-  message_->Publish(msg);
+  blocker_->Publish(msg);
 }
 
 template <typename MessageT>
 void IntraReader<MessageT>::SetHistoryDepth(const uint32_t& depth) {
-  if (message_ == nullptr) {
+  if (blocker_ == nullptr) {
     return;
   }
-  message_->set_capacity(depth);
+  blocker_->set_capacity(depth);
 }
 
 template <typename MessageT>
 uint32_t IntraReader<MessageT>::GetHistoryDepth() const {
-  if (message_ == nullptr) {
+  if (blocker_ == nullptr) {
     return 0;
   }
-  return message_->capacity();
+  return blocker_->capacity();
 }
 
 template <typename MessageT>
 const std::shared_ptr<MessageT>& IntraReader<MessageT>::GetLatestObserved()
     const {
-  if (message_ == nullptr) {
+  if (blocker_ == nullptr) {
     return nullptr;
   }
-  return message_->GetLatestObservedPtr();
+  return blocker_->GetLatestObservedPtr();
 }
 
 template <typename MessageT>
 const std::shared_ptr<MessageT>& IntraReader<MessageT>::GetOldestObserved()
     const {
-  if (message_ == nullptr) {
+  if (blocker_ == nullptr) {
     return nullptr;
   }
-  return message_->GetOldestObservedPtr();
+  return blocker_->GetOldestObservedPtr();
 }
 
 template <typename MessageT>
 auto IntraReader<MessageT>::Begin() const -> Iterator {
-  assert(message_ != nullptr);
-  return message_->ObservedBegin();
+  assert(blocker_ != nullptr);
+  return blocker_->ObservedBegin();
 }
 
 template <typename MessageT>
 auto IntraReader<MessageT>::End() const -> Iterator {
-  assert(message_ != nullptr);
-  return message_->ObservedEnd();
+  assert(blocker_ != nullptr);
+  return blocker_->ObservedEnd();
 }
 
 template <typename MessageT>
@@ -190,8 +191,8 @@ void IntraReader<MessageT>::OnMessage(const MessagePtr& msg_ptr) {
   }
 }
 
-}  // namespace dispatcher
+}  // namespace blocker
 }  // namespace cybertron
 }  // namespace apollo
 
-#endif  // CYBERTRON_DISPATCHER_INTRA_READER_H_
+#endif  // CYBERTRON_BLOCKER_INTRA_READER_H_
