@@ -26,8 +26,8 @@ namespace apollo {
 namespace cybertron {
 namespace scheduler {
 
-using apollo::cybertron::proto::RoutineConfInfo;
 using apollo::cybertron::common::GlobalData;
+using apollo::cybertron::proto::RoutineConfInfo;
 
 uint32_t Scheduler::processor_num_ = std::thread::hardware_concurrency();
 
@@ -135,7 +135,12 @@ bool Scheduler::RemoveTask(const std::string& name) {
   if (stop_) {
     return true;
   }
-  return proc_balancer_->RemoveCRoutine(common::Hash(name));
+  auto task_id = GlobalData::RegisterTaskName(name);
+  {
+    std::lock_guard<std::mutex> lock(task_id_map_mutex_);
+    task_id_map_.erase(task_id);
+  }
+  return proc_balancer_->RemoveCRoutine(task_id);
 }
 
 void Scheduler::StartSourceBalance() {
