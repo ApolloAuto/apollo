@@ -23,16 +23,21 @@ void MessageCallback(
   AINFO << "msgcontent->" << msg->content();
 }
 
-int main(int argc, char *argv[]) {
+int main(int argc, char* argv[]) {
   // init cybertron framework
   apollo::cybertron::Init(argv[0]);
 
   // create listener node
   auto listener_node = apollo::cybertron::CreateNode("listener");
+
   // create listener
+  apollo::cybertron::proto::RoleAttributes attr;
+  attr.set_channel_name("channel/chatter");
+  auto qos_profile = attr.mutable_qos_profile();
+  qos_profile->set_depth(10);
   auto listener =
       listener_node->CreateReader<apollo::cybertron::proto::Chatter>(
-          "channel/chatter", MessageCallback);
+          attr, MessageCallback);
 
   apollo::cybertron::WaitForShutdown();
   return 0;
