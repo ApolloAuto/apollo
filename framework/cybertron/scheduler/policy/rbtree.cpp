@@ -363,8 +363,7 @@ void RBTree::DeleteRebalance(RBNode *node, RBNode *parent) {
       }
 
       if ((!sibling->left_ || node_is_black(sibling->left_)) &&
-              (!sibling->right_) ||
-          node_is_black(sibling->right_)) {
+              (!sibling->right_ || node_is_black(sibling->right_))) {
         // Case 2: Sibling is black and its both child ard black
         node_set_red(sibling);
         node = parent;
