@@ -18,36 +18,16 @@
 
 #include "google/protobuf/text_format.h"
 #include "gtest/gtest.h"
-#include "ros/include/ros/ros.h"
 
-#include "modules/common/adapters/adapter_manager.h"
 #include "cybertron/common/log.h"
 #include "modules/common/util/util.h"
-#include "modules/localization/common/localization_gflags.h"
-
-using apollo::common::adapter::AdapterConfig;
-using apollo::common::adapter::AdapterManager;
-using apollo::common::adapter::AdapterManagerConfig;
 
 namespace apollo {
 namespace localization {
 
 class RTKLocalizationTest : public ::testing::Test {
  public:
-  virtual void SetUp() {
-    FLAGS_v = 3;
-    rtk_localizatoin_.reset(new RTKLocalization());
-
-    // Setup AdapterManager.
-    AdapterManagerConfig config;
-    config.set_is_ros(false);
-    {
-      auto *sub_config = config.add_config();
-      sub_config->set_mode(AdapterConfig::PUBLISH_ONLY);
-      sub_config->set_type(AdapterConfig::LOCALIZATION);
-    }
-    AdapterManager::Init(config);
-  }
+  virtual void SetUp() { rtk_localizatoin_.reset(new RTKLocalization()); }
 
  protected:
   template <class T>
@@ -136,33 +116,7 @@ TEST_F(RTKLocalizationTest, InterpolateIMU) {
 }
 
 TEST_F(RTKLocalizationTest, ComposeLocalizationMsg) {
-  // FLAGS_enable_map_reference_unify: false
   {
-    FLAGS_enable_map_reference_unify = false;
-
-    apollo::localization::Gps gps;
-    load_data("modules/localization/testdata/3_gps_1.pb.txt", &gps);
-
-    apollo::localization::CorrectedImu imu;
-    load_data("modules/localization/testdata/3_imu_1.pb.txt", &imu);
-
-    apollo::localization::LocalizationEstimate expected_result;
-    load_data("modules/localization/testdata/3_localization_result_1.pb.txt",
-              &expected_result);
-
-    apollo::localization::LocalizationEstimate localization;
-    rtk_localizatoin_->ComposeLocalizationMsg(gps, imu, &localization);
-
-    EXPECT_EQ(1, localization.header().sequence_num());
-    EXPECT_STREQ("localization", localization.header().module_name().c_str());
-    EXPECT_STREQ(expected_result.pose().DebugString().c_str(),
-                 localization.pose().DebugString().c_str());
-  }
-
-  // FLAGS_enable_map_reference_unify: true
-  {
-    FLAGS_enable_map_reference_unify = true;
-
     apollo::localization::Gps gps;
     load_data("modules/localization/testdata/3_gps_1.pb.txt", &gps);
 
@@ -176,7 +130,7 @@ TEST_F(RTKLocalizationTest, ComposeLocalizationMsg) {
     apollo::localization::LocalizationEstimate localization;
     rtk_localizatoin_->ComposeLocalizationMsg(gps, imu, &localization);
 
-    EXPECT_EQ(2, localization.header().sequence_num());
+    EXPECT_EQ(1, localization.header().sequence_num());
     EXPECT_STREQ("localization", localization.header().module_name().c_str());
     EXPECT_STREQ(expected_result.pose().DebugString().c_str(),
                  localization.pose().DebugString().c_str());
