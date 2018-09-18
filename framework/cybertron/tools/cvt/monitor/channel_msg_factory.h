@@ -68,8 +68,7 @@ class ChannelMsgFactory final {
  private:
   explicit ChannelMsgFactory();
   ChannelMsgFactory(const ChannelMsgFactory& other) = delete;
-  ChannelMsgFactory& operator=(const ChannelMsgFactory&) =
-      delete;
+  ChannelMsgFactory& operator=(const ChannelMsgFactory&) = delete;
 
   int pid_;
   std::map<std::string, CreatorFunction>::const_iterator default_child_factory_;
