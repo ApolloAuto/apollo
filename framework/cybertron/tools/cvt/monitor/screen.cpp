@@ -34,26 +34,35 @@ const char Screen::InteractiveCmdStr[] =
     "Common Commands:\n"
     "   q | Q | Esc -- quit\n"
     "   Backspace -- go back\n"
-    "   h | H -- go to show help info\n\n"
-
-    "Commands for top-level topology message:\n"
+    "   h | H -- go to show help info\n"
+    "\n"
+    "   PgDn | ^d -- show next page\n"
+    "   PgUp | ^u -- show previous page\n"
+    "\n"
     "   Up Arrow -- move up one line\n"
     "   Down Arrow -- move down one line\n"
-    "   Right Arrow -- show the selected channel Data\n"
-    "   Left Arrow -- go back to the upper level\n\n"
+    "   Right Arrow -- enter the selected Channel or Repeated Data Item\n"
+    "   Left Arrow -- go back to the upper level\n"
+    "\n"
     "   Enter -- the same with Right Arrow key\n"
     "   a | A -- the same with Left Arrow key\n"
     "   d | D -- the same with Right Arrow key\n"
     "   w | W -- the same with Up Arrow key\n"
-    "   s | S -- the same with Down Arrow key\n\n"
+    "   s | S -- the same with Down Arrow key\n"
+    "\n"
+    "Commands for top-level topology message:\n"
     "   f | F -- show frame ratio for all channel messages\n"
     "   t | T -- show channel message type\n"
-    "   PgDn | ^d -- show next page\n"
-    "   PgUp | ^u -- show previous page\n\n"
-    "   Space -- Enable|Disable channel Message\n\n"
+    "\n"
+    "   Space -- Enable|Disable channel Message\n"
+    "\n"
     "Commands for Channel:\n"
     "   i | I -- show Reader and Writers of Channel\n"
-    "   b | B -- show Debug String of Channel Message\n";
+    "   b | B -- show Debug String of Channel Message\n"
+    "\n"
+    "Commands for "
+    "   n | N -- next repeated data item\n"
+    "   m | M -- previous repeated data item\n";
 
 Screen::Screen()
     : current_state_(State::RenderMessage),
@@ -192,7 +201,8 @@ void Screen::Run() {
 
     SwitchState(ch);
 
-    (this->*showFuncs[static_cast<int>(current_state_)])(highlight_line_no_, ch);
+    (this->*showFuncs[static_cast<int>(current_state_)])(highlight_line_no_,
+                                                         ch);
   } while (true);
 }
 

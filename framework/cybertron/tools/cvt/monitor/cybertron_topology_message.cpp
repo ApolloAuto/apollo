@@ -96,8 +96,8 @@ void CybertronTopologyMessage::TopologyChanged(
 
         if (iter == all_channels_map_.cend()) {
           ChannelMessage* channelMsg =
-              ChannelMsgFactory::Instance()->CreateChannelMessage(
-                  msgTypeName, channelName);
+              ChannelMsgFactory::Instance()->CreateChannelMessage(msgTypeName,
+                                                                  channelName);
 
           if (!ChannelMessage::isErrorCode(channelMsg)) {
             channelMsg->set_parent(this);
@@ -172,10 +172,10 @@ void CybertronTopologyMessage::ChangeState(const Screen* s, int key) {
       if (page_index_ < 1) page_index_ = 0;
       break;
 
-    case ' ':
-    {
-      ChannelMessage* child = static_cast<ChannelMessage*>(Child(s->highlight_line_no()));
-      if(child){
+    case ' ': {
+      ChannelMessage* child =
+          static_cast<ChannelMessage*>(Child(s->highlight_line_no()));
+      if (child) {
         child->set_enabled(!child->is_enabled());
       }
     }
@@ -223,7 +223,8 @@ void CybertronTopologyMessage::Render(const Screen* s, int key) {
     color = Screen::RED_BLACK;
 
     if (!ChannelMessage::isErrorCode(iter->second)) {
-      if (iter->second->is_enabled() && iter->second->has_message_come()) color = Screen::GREEN_BLACK;
+      if (iter->second->is_enabled() && iter->second->has_message_come())
+        color = Screen::GREEN_BLACK;
     }
 
     s->SetCurrentColor(color);
