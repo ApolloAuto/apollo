@@ -23,6 +23,7 @@
 
 #include "google/protobuf/util/json_util.h"
 #include "modules/canbus/proto/chassis.pb.h"
+#include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/quaternion.h"
 #include "modules/common/proto/geometry.pb.h"
@@ -32,26 +33,22 @@
 #include "modules/common/util/map_util.h"
 #include "modules/common/util/points_downsampler.h"
 #include "modules/common/util/util.h"
+
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
 #include "modules/dreamview/backend/util/trajectory_point_collector.h"
 #include "modules/dreamview/proto/simulation_world.pb.h"
-#include "modules/localization/proto/localization.pb.h"
-#include "modules/perception/proto/traffic_light_detection.pb.h"
-#include "modules/planning/proto/planning.pb.h"
-#include "modules/planning/proto/planning_internal.pb.h"
-#include "modules/prediction/proto/prediction_obstacle.pb.h"
 
 namespace apollo {
 namespace dreamview {
 
 using apollo::canbus::Chassis;
 using apollo::common::DriveEvent;
+using apollo::common::util::FillHeader;
 using apollo::common::PathPoint;
 using apollo::common::Point3D;
 using apollo::common::PointENU;
 using apollo::common::TrajectoryPoint;
 using apollo::common::VehicleConfigHelper;
-using apollo::common::adapter::AdapterManager;
 using apollo::common::monitor::MonitorMessage;
 using apollo::common::monitor::MonitorMessageItem;
 using apollo::common::time::Clock;
@@ -76,6 +73,7 @@ using apollo::prediction::PredictionObstacle;
 using apollo::prediction::PredictionObstacles;
 using apollo::relative_map::MapMsg;
 using apollo::relative_map::NavigationInfo;
+using apollo::routing::RoutingRequest;
 using apollo::routing::RoutingResponse;
 
 using Json = nlohmann::json;
@@ -228,10 +226,13 @@ constexpr int SimulationWorldService::kMaxMonitorItems;
 
 SimulationWorldService::SimulationWorldService(const MapService *map_service,
                                                bool routing_from_file)
-    : map_service_(map_service),
-      monitor_logger_(MonitorMessageItem::SIMULATOR),
+    : node_(cybertron::CreateNode("simulation_world")),
+      map_service_(map_service),
+      monitor_logger_buffer_(MonitorMessageItem::SIMULATOR),
       ready_to_push_(false) {
-  RegisterMessageCallbacks();
+  InitReaders();
+  InitWriters();
+
   if (routing_from_file) {
     ReadRoutingFromFile(FLAGS_routing_response_file);
   }
@@ -244,17 +245,77 @@ SimulationWorldService::SimulationWorldService(const MapService *map_service,
   auto_driving_car->set_length(vehicle_param.length());
 }
 
+template <>
+void SimulationWorldService::UpdateSimulationWorld(
+    const MonitorMessage &monitor_msg) {
+  // TODO(siyangy): handle concurrency update
+
+  const int updated_size = std::min(monitor_msg.item_size(),
+                                    SimulationWorldService::kMaxMonitorItems);
+  // Save the latest messages at the end of the history.
+  for (int idx = 0; idx < updated_size; ++idx) {
+    auto *notification = world_.add_notification();
+    notification->mutable_item()->CopyFrom(monitor_msg.item(idx));
+    notification->set_timestamp_sec(monitor_msg.header().timestamp_sec());
+  }
+
+  int remove_size =
+      world_.notification_size() - SimulationWorldService::kMaxMonitorItems;
+  if (remove_size > 0) {
+    auto *notifications = world_.mutable_notification();
+    notifications->erase(notifications->begin(),
+                         notifications->begin() + remove_size);
+  }
+}
+
+void SimulationWorldService::InitReaders() {
+  routing_response_reader_ = node_->CreateReader<RoutingResponse>(
+      FLAGS_routing_response_topic, nullptr);
+  chassis_reader_ = node_->CreateReader<Chassis>(FLAGS_chassis_topic, nullptr);
+  gps_reader_ = node_->CreateReader<Gps>(FLAGS_gps_topic, nullptr);
+  localization_reader_ = node_->CreateReader<LocalizationEstimate>(
+      FLAGS_localization_topic, nullptr);
+  perception_obstacle_reader_ = node_->CreateReader<PerceptionObstacles>(
+      FLAGS_perception_obstacle_topic, nullptr);
+  perception_traffic_light_reader_ = node_->CreateReader<TrafficLightDetection>(
+      FLAGS_traffic_light_detection_topic, nullptr);
+  prediction_obstacle_reader_ =
+      node_->CreateReader<PredictionObstacles>(FLAGS_prediction_topic, nullptr);
+  planning_reader_ = node_->CreateReader<ADCTrajectory>(
+      FLAGS_planning_trajectory_topic, nullptr);
+  control_command_reader_ =
+      node_->CreateReader<ControlCommand>(FLAGS_control_command_topic, nullptr);
+  navigation_reader_ =
+      node_->CreateReader<NavigationInfo>(FLAGS_navigation_topic, nullptr);
+  relative_map_reader_ =
+      node_->CreateReader<MapMsg>(FLAGS_relative_map_topic, nullptr);
+
+  drive_event_reader_ = node_->CreateReader<DriveEvent>(
+      FLAGS_drive_event_topic,
+      [this](const std::shared_ptr<DriveEvent> &drive_event) {
+        this->PublishMonitorMessage(MonitorMessageItem::WARN,
+                                    drive_event->event());
+      });
+  monitor_reader_ = node_->CreateReader<MonitorMessage>(
+      FLAGS_monitor_topic,
+      [this](const std::shared_ptr<MonitorMessage> &monitor_message) {
+        this->UpdateSimulationWorld(*monitor_message);
+      });
+}
+
+void SimulationWorldService::InitWriters() {
+  navigation_writer_ =
+      node_->CreateWriter<NavigationInfo>(FLAGS_navigation_topic);
+  routing_request_writer_ =
+      node_->CreateWriter<RoutingRequest>(FLAGS_routing_request_topic);
+  routing_response_writer_ =
+      node_->CreateWriter<RoutingResponse>(FLAGS_routing_response_topic);
+}
+
 void SimulationWorldService::Update() {
   if (to_clear_) {
     // Clears received data.
-    AdapterManager::GetChassis()->ClearData();
-    AdapterManager::GetGps()->ClearData();
-    AdapterManager::GetLocalization()->ClearData();
-    AdapterManager::GetPerceptionObstacles()->ClearData();
-    AdapterManager::GetPlanning()->ClearData();
-    AdapterManager::GetPrediction()->ClearData();
-    AdapterManager::GetRoutingResponse()->ClearData();
-    AdapterManager::GetMonitor()->ClearData();
+    node_->ClearData();
 
     // Clears simulation world except for the car information.
     auto car = world_.auto_driving_car();
@@ -266,10 +327,11 @@ void SimulationWorldService::Update() {
     to_clear_ = false;
   }
 
-  AdapterManager::Observe();
-  UpdateWithLatestObserved("Chassis", AdapterManager::GetChassis());
-  UpdateWithLatestObserved("Gps", AdapterManager::GetGps());
-  UpdateWithLatestObserved("Localization", AdapterManager::GetLocalization());
+  node_->Observe();
+  UpdateWithLatestObserved(routing_response_reader_.get(), false);
+  UpdateWithLatestObserved(chassis_reader_.get());
+  UpdateWithLatestObserved(gps_reader_.get());
+  UpdateWithLatestObserved(localization_reader_.get());
 
   // Clear objects received from last frame and populate with the new objects.
   // TODO(siyangy, unacao): For now we are assembling the simulation_world with
@@ -277,18 +339,13 @@ void SimulationWorldService::Update() {
   // may not always be perfectly aligned and belong to the same frame.
   obj_map_.clear();
   world_.clear_object();
-  UpdateWithLatestObserved("PerceptionObstacles",
-                           AdapterManager::GetPerceptionObstacles());
-  UpdateWithLatestObserved("PerceptionTrafficLight",
-                           AdapterManager::GetTrafficLightDetection(), false);
-  UpdateWithLatestObserved("PredictionObstacles",
-                           AdapterManager::GetPrediction());
-  UpdateWithLatestObserved("Planning", AdapterManager::GetPlanning());
-  UpdateWithLatestObserved("ControlCommand",
-                           AdapterManager::GetControlCommand());
-  UpdateWithLatestObserved("Navigation", AdapterManager::GetNavigation(),
-                           FLAGS_use_navigation_mode);
-  UpdateWithLatestObserved("RelativeMap", AdapterManager::GetRelativeMap(),
+  UpdateWithLatestObserved(perception_obstacle_reader_.get());
+  UpdateWithLatestObserved(perception_traffic_light_reader_.get(), false);
+  UpdateWithLatestObserved(prediction_obstacle_reader_.get());
+  UpdateWithLatestObserved(planning_reader_.get());
+  UpdateWithLatestObserved(control_command_reader_.get());
+  UpdateWithLatestObserved(navigation_reader_.get(), FLAGS_use_navigation_mode);
+  UpdateWithLatestObserved(relative_map_reader_.get(),
                            FLAGS_use_navigation_mode);
 
   for (const auto &kv : obj_map_) {
@@ -302,19 +359,19 @@ void SimulationWorldService::Update() {
 }
 
 void SimulationWorldService::UpdateDelays() {
-  auto *delays = world_.mutable_delay();
-  delays->set_chassis(SecToMs(AdapterManager::GetChassis()->GetDelaySec()));
-  delays->set_localization(
-      SecToMs(AdapterManager::GetLocalization()->GetDelaySec()));
-  delays->set_perception_obstacle(
-      SecToMs(AdapterManager::GetPerceptionObstacles()->GetDelaySec()));
-  delays->set_planning(SecToMs(AdapterManager::GetPlanning()->GetDelaySec()));
-  delays->set_prediction(
-      SecToMs(AdapterManager::GetPrediction()->GetDelaySec()));
-  delays->set_traffic_light(
-      SecToMs(AdapterManager::GetTrafficLightDetection()->GetDelaySec()));
-  delays->set_control(
-      SecToMs(AdapterManager::GetControlCommand()->GetDelaySec()));
+  // auto *delays = world_.mutable_delay();
+  // delays->set_chassis(SecToMs(AdapterManager::GetChassis()->GetDelaySec()));
+  // delays->set_localization(
+  //     SecToMs(AdapterManager::GetLocalization()->GetDelaySec()));
+  // delays->set_perception_obstacle(
+  //     SecToMs(AdapterManager::GetPerceptionObstacles()->GetDelaySec()));
+  // delays->set_planning(SecToMs(AdapterManager::GetPlanning()->GetDelaySec()));
+  // delays->set_prediction(
+  //     SecToMs(AdapterManager::GetPrediction()->GetDelaySec()));
+  // delays->set_traffic_light(
+  //     SecToMs(AdapterManager::GetTrafficLightDetection()->GetDelaySec()));
+  // delays->set_control(
+  //     SecToMs(AdapterManager::GetControlCommand()->GetDelaySec()));
 }
 
 void SimulationWorldService::GetWireFormatString(
@@ -359,27 +416,6 @@ void SimulationWorldService::PopulateMapInfo(double radius) {
 
 const Map &SimulationWorldService::GetRelativeMap() const {
   return relative_map_;
-}
-
-template <>
-void SimulationWorldService::UpdateSimulationWorld(
-    const MonitorMessage &monitor_msg) {
-  const int updated_size = std::min(monitor_msg.item_size(),
-                                    SimulationWorldService::kMaxMonitorItems);
-  // Save the latest messages at the end of the history.
-  for (int idx = 0; idx < updated_size; ++idx) {
-    auto *notification = world_.add_notification();
-    notification->mutable_item()->CopyFrom(monitor_msg.item(idx));
-    notification->set_timestamp_sec(monitor_msg.header().timestamp_sec());
-  }
-
-  int remove_size =
-      world_.notification_size() - SimulationWorldService::kMaxMonitorItems;
-  if (remove_size > 0) {
-    auto *notifications = world_.mutable_notification();
-    notifications->erase(notifications->begin(),
-                         notifications->begin() + remove_size);
-  }
 }
 
 template <>
@@ -890,6 +926,12 @@ void SimulationWorldService::UpdateSimulationWorld(
 template <>
 void SimulationWorldService::UpdateSimulationWorld(
     const RoutingResponse &routing_response) {
+  if (world_.has_routing_time() &&
+      world_.routing_time() == routing_response.header().timestamp_sec()) {
+    // This routing response has been processed.
+    return;
+  }
+
   std::vector<Path> paths;
   if (!map_service_->GetPathsFromRouting(routing_response, &paths)) {
     return;
@@ -921,16 +963,12 @@ void SimulationWorldService::UpdateSimulationWorld(
   }
 }
 
-template <>
-void SimulationWorldService::UpdateSimulationWorld(
-    const DriveEvent &drive_event) {
-  PublishMonitorMessage(MonitorMessageItem::WARN, drive_event.event());
-}
-
 Json SimulationWorldService::GetRoutePathAsJson() const {
   Json response;
   response["routingTime"] = world_.routing_time();
   response["routePath"] = Json::array();
+  // TODO(simulation): there might be a race if there are multiple
+  // RoutingResponse arrived at the same time.
   for (const auto &route_path : route_paths_) {
     Json path;
     path["point"] = Json::array();
@@ -946,8 +984,9 @@ Json SimulationWorldService::GetRoutePathAsJson() const {
 
 void SimulationWorldService::ReadRoutingFromFile(
     const std::string &routing_response_file) {
-  RoutingResponse routing_response;
-  if (!GetProtoFromFile(routing_response_file, &routing_response)) {
+  std::shared_ptr<RoutingResponse> routing_response =
+      std::make_shared<RoutingResponse>();
+  if (!GetProtoFromFile(routing_response_file, routing_response.get())) {
     AWARN << "Unable to read routing response from file: "
           << routing_response_file;
     return;
@@ -956,17 +995,8 @@ void SimulationWorldService::ReadRoutingFromFile(
 
   sleep(1);  // Wait to make sure the connection has been established before
              // publishing.
-  AdapterManager::PublishRoutingResponse(routing_response);
+  routing_response_writer_->Write(routing_response);
   AINFO << "Published RoutingResponse read from file.";
-}
-
-void SimulationWorldService::RegisterMessageCallbacks() {
-  AdapterManager::AddDriveEventCallback(
-      &SimulationWorldService::UpdateSimulationWorld, this);
-  AdapterManager::AddMonitorCallback(
-      &SimulationWorldService::UpdateSimulationWorld, this);
-  AdapterManager::AddRoutingResponseCallback(
-      &SimulationWorldService::UpdateSimulationWorld, this);
 }
 
 template <>
@@ -1037,6 +1067,18 @@ void SimulationWorldService::UpdateSimulationWorld(const MapMsg &map_msg) {
       DownsampleCurve(lane->mutable_right_boundary()->mutable_curve());
     }
   }
+}
+
+void SimulationWorldService::PublishNavigationInfo(
+    const std::shared_ptr<NavigationInfo> &navigation_info) {
+  FillHeader(FLAGS_dreamview_module_name, navigation_info.get());
+  navigation_writer_->Write(navigation_info);
+}
+
+void SimulationWorldService::PublishRoutingRequest(
+    const std::shared_ptr<RoutingRequest> &routing_request) {
+  FillHeader(FLAGS_dreamview_module_name, routing_request.get());
+  routing_request_writer_->Write(routing_request);
 }
 
 }  // namespace dreamview

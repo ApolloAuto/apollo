@@ -22,11 +22,8 @@ DEFINE_bool(dreamview_profiling_mode, false, "Run dreamview in profiling mode");
 
 DEFINE_double(
     dreamview_profiling_duration, -1.0,
-    "Dreamview profiling duration. Negative value will not restrict the "
+    "Dreamview profiling duration in ms. Negative value will not restrict the "
     "profiling time");
-
-// DEFINE_string(dreamview_adapter_config_filename,
-//               "modules/dreamview/conf/adapter.conf", "The adapter config file");
 
 DEFINE_string(hmi_config_filename, "/apollo/modules/dreamview/conf/hmi.conf",
               "The HMI config file");
@@ -47,7 +44,7 @@ DEFINE_string(routing_response_file,
               "modules/map/data/demo/garage_routing.pb.txt",
               "File path of the routing response that SimControl will read the "
               "start point from. If this is absent, SimControl will directly "
-              "take the RoutingResponse from ROS to determine the start "
+              "take the RoutingResponse from external to determine the start "
               "point.");
 
 DEFINE_string(websocket_timeout_ms, "36000000",
@@ -63,8 +60,6 @@ DEFINE_string(ssl_certificate, "",
 DEFINE_double(sim_map_radius, 200.0,
               "The radius within which Dreamview will find all the map "
               "elements around the car.");
-
-DEFINE_int32(dreamview_worker_num, 1, "number of dreamview thread workers");
 
 DEFINE_bool(enable_update_size_check, true,
             "True to check if the update byte number is less than threshold");

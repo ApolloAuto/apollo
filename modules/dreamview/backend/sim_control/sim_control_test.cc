@@ -18,20 +18,13 @@
 
 #include <cmath>
 
-// #include "ros/include/ros/ros.h"
-
-#include "modules/common/adapters/proto/adapter_config.pb.h"
-
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 #include "modules/common/time/time.h"
 
-#include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/math/quaternion.h"
 
 using apollo::canbus::Chassis;
-using apollo::common::adapter::AdapterManager;
-using apollo::common::adapter::AdapterManagerConfig;
 using apollo::common::math::HeadingToQuaternion;
 using apollo::common::time::Clock;
 using apollo::localization::LocalizationEstimate;
@@ -48,48 +41,6 @@ class SimControlTest : public ::testing::Test {
 
     map_service_.reset(new MapService(false));
     sim_control_.reset(new SimControl(map_service_.get()));
-
-    AdapterManagerConfig config;
-    config.set_is_ros(false);
-    {
-      auto *sub_config = config.add_config();
-      sub_config->set_mode(
-          apollo::common::adapter::AdapterConfig::PUBLISH_ONLY);
-      sub_config->set_type(apollo::common::adapter::AdapterConfig::CHASSIS);
-    }
-
-    {
-      auto *sub_config = config.add_config();
-      sub_config->set_mode(
-          apollo::common::adapter::AdapterConfig::PUBLISH_ONLY);
-      sub_config->set_type(
-          apollo::common::adapter::AdapterConfig::LOCALIZATION);
-    }
-
-    {
-      auto *sub_config = config.add_config();
-      sub_config->set_mode(
-          apollo::common::adapter::AdapterConfig::RECEIVE_ONLY);
-      sub_config->set_type(
-          apollo::common::adapter::AdapterConfig::PLANNING_TRAJECTORY);
-    }
-
-    {
-      auto *sub_config = config.add_config();
-      sub_config->set_mode(
-          apollo::common::adapter::AdapterConfig::RECEIVE_ONLY);
-      sub_config->set_type(
-          apollo::common::adapter::AdapterConfig::ROUTING_RESPONSE);
-    }
-
-    {
-      auto *sub_config = config.add_config();
-      sub_config->set_mode(
-          apollo::common::adapter::AdapterConfig::RECEIVE_ONLY);
-      sub_config->set_type(apollo::common::adapter::AdapterConfig::NAVIGATION);
-    }
-
-    AdapterManager::Init(config);
 
     sim_control_->Start();
   }
@@ -146,7 +97,7 @@ TEST_F(SimControlTest, Test) {
   adc_trajectory.mutable_header()->set_timestamp_sec(timestamp);
 
   sim_control_->SetStartPoint(adc_trajectory.trajectory_point(0));
-  AdapterManager::PublishPlanning(adc_trajectory);
+  // AdapterManager::PublishPlanning(adc_trajectory);
 
   {
     Clock::SetMode(Clock::MOCK);
@@ -154,9 +105,9 @@ TEST_F(SimControlTest, Test) {
     Clock::SetNow(timestamp.time_since_epoch());
     sim_control_->RunOnce();
 
-    const Chassis *chassis = AdapterManager::GetChassis()->GetLatestPublished();
-    const LocalizationEstimate *localization =
-        AdapterManager::GetLocalization()->GetLatestPublished();
+    // const Chassis *chassis = AdapterManager::GetChassis()->GetLatestPublished();
+    // const LocalizationEstimate *localization =
+    //     AdapterManager::GetLocalization()->GetLatestPublished();
 
     EXPECT_TRUE(chassis->engine_started());
     EXPECT_EQ(Chassis::COMPLETE_AUTO_DRIVE, chassis->driving_mode());

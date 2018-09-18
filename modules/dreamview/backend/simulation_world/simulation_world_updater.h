@@ -27,6 +27,8 @@
 #include "boost/thread/shared_mutex.hpp"
 
 #include "cybertron/common/log.h"
+#include "cybertron/cybertron.h"
+
 #include "modules/common/util/string_util.h"
 #include "modules/dreamview/backend/handlers/websocket_handler.h"
 #include "modules/dreamview/backend/map/map_service.h"
@@ -75,9 +77,8 @@ class SimulationWorldUpdater {
   /**
    * @brief The callback function to get updates from SimulationWorldService,
    * and update simulation_world_json_.
-   * @param event Timer event
    */
-  void OnTimer(const ros::TimerEvent &event);
+  void OnTimer();
 
   /**
    * @brief The function to construct a routing request from the given json,
@@ -121,7 +122,8 @@ class SimulationWorldUpdater {
 
   void RegisterMessageHandlers();
 
-  ros::Timer timer_;
+  std::unique_ptr<cybertron::Timer> timer_;
+
   SimulationWorldService sim_world_service_;
   const MapService *map_service_ = nullptr;
   WebSocketHandler *websocket_ = nullptr;
