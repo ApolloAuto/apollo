@@ -16,10 +16,8 @@
 
 #pragma once
 
-#include <mutex>
 #include <memory>
 #include <string>
-#include <list>
 #include <vector>
 
 #include "cybertron/class_loader/class_loader.h"
@@ -29,10 +27,11 @@
 #include "cybertron/tf2_cybertron/buffer.h"
 #include "cybertron/tf2_cybertron/transform_broadcaster.h"
 
-// #include "modules/common/monitor_log/monitor_log_buffer.h"
 #include "modules/localization/proto/gps.pb.h"
 #include "modules/localization/proto/imu.pb.h"
 #include "modules/localization/proto/localization.pb.h"
+#include "modules/localization/proto/rtk_config.pb.h"
+#include "modules/localization/rtk/rtk_localization.h"
 
 namespace apollo {
 namespace localization {
@@ -45,32 +44,16 @@ class RTKLocalizationComponent final
 
   bool Init() override;
 
-  bool Proc(const std::shared_ptr<localization::Gps>& gps_msg) override;
+  bool Proc(const std::shared_ptr<localization::Gps> &gps_msg) override;
 
-  void ImuCallback(const std::shared_ptr<localization::CorrectedImu>& imu_msg);
+  void ImuCallback(const std::shared_ptr<localization::CorrectedImu> &imu_msg);
 
  private:
   bool InitConfig();
   bool InitIO();
 
-  void PublishLocalization(const localization::Gps& gps_msg);
-  void RunWatchDog(double gps_timestamp);
-
-  void PrepareLocalizationMsg(const localization::Gps& gps_msg,
-                              LocalizationEstimate *localization);
-  void ComposeLocalizationMsg(const localization::Gps &gps,
-                              const localization::CorrectedImu &imu,
-                              LocalizationEstimate *localization);
-  void FillLocalizationMsgHeader(LocalizationEstimate *localization);
-
-  bool FindMatchingIMU(const double gps_timestamp_sec, CorrectedImu *imu_msg);
-  bool InterpolateIMU(const CorrectedImu &imu1, const CorrectedImu &imu2,
-                      const double timestamp_sec, CorrectedImu *imu_msg);
-  template <class T>
-  T InterpolateXYZ(const T &p1, const T &p2, const double frac1);
-
-  void PublishPoseBroadcastTF(const LocalizationEstimate& localization);
-  void PublishPoseBroadcastTopic(const LocalizationEstimate& localization);
+  void PublishPoseBroadcastTF(const LocalizationEstimate &localization);
+  void PublishPoseBroadcastTopic(const LocalizationEstimate &localization);
 
  private:
   std::shared_ptr<cybertron::Reader<localization::CorrectedImu>>
@@ -78,9 +61,6 @@ class RTKLocalizationComponent final
 
   std::shared_ptr<cybertron::Writer<LocalizationEstimate>>
       localization_talker_ = nullptr;
-
-  std::string module_name_ = "localization";
-  int64_t localization_seq_num_ = 0;
 
   std::string localization_topic_ = "";
   std::string gps_topic_ = "";
@@ -90,27 +70,7 @@ class RTKLocalizationComponent final
   std::string broadcast_tf_child_frame_id_ = "";
   cybertron::tf2_cybertron::TransformBroadcaster tf2_broadcaster_;
 
-  bool enable_gps_timestamp_ = false;
-  double gps_time_delay_tolerance_ = 1.0;
-
-  double gps_imu_time_diff_threshold_ = 0.02;
-
-  double last_received_timestamp_sec_ = 0.0;
-  double last_reported_timestamp_sec_ = 0.0;
-
-  bool enable_watch_dog_ = true;
-  bool service_started_ = false;
-
-  int localization_publish_freq_ = 100;
-  int report_threshold_err_num_ = 10;
-
-  std::list<localization::CorrectedImu> imu_list_;
-  size_t imu_list_max_size_ = 20;
-  std::mutex imu_list_mutex_;
-
-  std::vector<double> map_offset_;
-
-//   apollo::common::monitor::MonitorLogger monitor_logger_;
+  std::unique_ptr<RTKLocalization> localization_;
 };
 
 CYBERTRON_REGISTER_COMPONENT(RTKLocalizationComponent);
