@@ -297,7 +297,7 @@ bool PredictionComponent::Proc(
       }
     }
   }
-  prediction_writer_->Write(prediction_obstacles);
+  prediction_writer_->Write(std::make_shared<PredictionObstacles>(prediction_obstacles));
   return true;
 }
 
