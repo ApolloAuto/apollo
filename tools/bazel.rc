@@ -31,6 +31,7 @@ test:cpplint --build_tests_only
 
 # Regular unit tests.
 test:unit_test --test_tag_filters=-cpplint
+test:unit_test --jobs=1
 
 # Coverage tests
 test:coverage --test_tag_filters=-cpplint
