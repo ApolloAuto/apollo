@@ -12,7 +12,7 @@ cc_library(
     ],
     deps = [
         "//framework:cybertron",
-        "//modules/common/proto:common_proto",
+        "//modules/common/proto:geometry_proto",
         "//modules/common/time",
         "//modules/third_party_perception:third_party_perception_lib",
         "//modules/third_party_perception/common:third_party_perception_gflags",

@@ -19,7 +19,7 @@ proto_library(
         ":decision_proto_lib",
         ":planning_internal_proto_lib",
         "//modules/canbus/proto:canbus_proto_lib",
-        "//modules/common/proto:common_proto_lib",
+        "//modules/common/proto:geometry_proto_lib",
         "//modules/common/proto:drive_state_proto_lib",
         "//modules/common/proto:error_code_proto_lib",
         "//modules/common/proto:header_proto_lib",
@@ -47,7 +47,7 @@ proto_library(
         "decision.proto",
     ],
     deps = [
-        "//modules/common/proto:common_proto_lib",
+        "//modules/common/proto:geometry_proto_lib",
         "//modules/common/proto:vehicle_signal_proto_lib",
         "//modules/routing/proto:routing_proto_lib",
     ],
@@ -322,7 +322,7 @@ proto_library(
         ":decision_proto_lib",
         ":planning_proto_lib",
         "//modules/routing/proto:routing_proto_lib",
-        "//modules/common/proto:common_proto_lib",
+        "//modules/common/proto:geometry_proto_lib",
         "//modules/common/proto:drive_state_proto_lib",
     ],
 )

@@ -13,7 +13,7 @@ proto_library(
         "monitor_log.proto",
     ],
     deps = [
-        "//modules/common/proto:common_proto_lib",
+        "//modules/common/proto:geometry_proto_lib",
         "//modules/common/proto:header_proto_lib",
     ],
 )

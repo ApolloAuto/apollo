@@ -13,6 +13,6 @@ proto_library(
         "config.proto",
     ],
     deps = [
-        "//modules/common/proto:common_proto_lib",
+        "//modules/common/proto:geometry_proto_lib",
     ],
 )

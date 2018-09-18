@@ -46,14 +46,14 @@ proto_library(
 )
 
 cc_proto_library(
-    name = "common_proto",
+    name = "geometry_proto",
     deps = [
-        ":common_proto_lib",
+        ":geometry_proto_lib",
     ],
 )
 
 proto_library(
-    name = "common_proto_lib",
+    name = "geometry_proto_lib",
     srcs = [
         "geometry.proto",
     ],

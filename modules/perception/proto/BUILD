@@ -14,7 +14,7 @@ proto_library(
         "traffic_light_detection.proto",
     ],
     deps = [
-        "//modules/common/proto:common_proto_lib",
+        "//modules/common/proto:geometry_proto_lib",
         "//modules/common/proto:error_code_proto_lib",
         "//modules/common/proto:header_proto_lib",
         "//modules/map/proto:map_proto_lib",
@@ -188,7 +188,7 @@ proto_library(
         "perception_ultrasonic.proto",
     ],
     deps = [
-        "//modules/common/proto:common_proto_lib",
+        "//modules/common/proto:geometry_proto_lib",
         "//modules/common/proto:error_code_proto_lib",
         "//modules/common/proto:header_proto_lib",
     ],

@@ -17,7 +17,7 @@ cc_library(
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/math:quaternion",
         "//modules/common/monitor_log",
-        "//modules/common/proto:common_proto",
+        "//modules/common/proto:geometry_proto",
         "//modules/common/proto:drive_event_proto",
         "//modules/common/util",
         "//modules/common/util:map_util",

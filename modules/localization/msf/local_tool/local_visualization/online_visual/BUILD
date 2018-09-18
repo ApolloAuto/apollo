@@ -19,7 +19,7 @@ cc_library(
         "//modules/common:apollo_app",
         "//framework:cybertron",
         "//modules/common/monitor_log",
-        "//modules/common/proto:common_proto",
+        "//modules/common/proto:geometry_proto",
         "//modules/common/status",
         "//modules/common/time",
         "//modules/common/util",
