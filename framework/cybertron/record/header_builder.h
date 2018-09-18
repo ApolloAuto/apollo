@@ -40,10 +40,10 @@ class HeaderBuilder {
   const uint32_t major_version_ = 1;
   const uint32_t minor_version_ = 0;
   const CompressType compress_type_ = CompressType::COMPRESS_NONE;
-  const uint64_t chunk_interval_ = 20 * 1e9L;                 // 20s
-  const uint64_t segment_interval_ = 60 * 1e9L;               // 60s
-  const uint64_t chunk_raw_size_ = 200 * 1024 * 1024;         // 200MB
-  const uint64_t segment_raw_size_ = 2 * 1024 * 1024 * 1024;  // 2GB
+  const uint64_t chunk_interval_ = 20 * 1e9L;                    // 20s
+  const uint64_t segment_interval_ = 60 * 1e9L;                  // 60s
+  const uint64_t chunk_raw_size_ = 200 * 1024 * 1024;            // 200MB
+  const uint64_t segment_raw_size_ = 2ULL * 1024 * 1024 * 1024;  // 2GB
 };
 
 }  // namespace record
