@@ -20,7 +20,7 @@ import time
 import sys
 
 sys.path.append("../")
-from cybertron import init
+from cybertron import cybertron
 from cybertron import record
 
 TEST_RECORD_FILE = "test02.record"
@@ -71,10 +71,10 @@ def test_record_reader(reader_path):
             count = count + 1
     freader.close()
 
-    init.shutdown()
+    cybertron.shutdown()
 
 if __name__ == '__main__':
-    init.init()
+    cybertron.init()
     test_record_writer(TEST_RECORD_FILE)
     test_record_reader(TEST_RECORD_FILE)
-    init.shutdown()
+    cybertron.shutdown()

@@ -30,7 +30,7 @@ export COVFILE="${CYBERTRON_DIR}/test_cybertron.cov"
 export COVFILE_INC="${CYBERTRON_DIR}/test-inc.cov"
 export PATH=${COV_HOME}/bin:$PATH
 TEST_DIR=${CYBERTRON_DIR}/install/test/cybertron/unit_test/
-TEST_DIR_PY=${CYBERTRON_DIR}/install/lib/python/test/
+TEST_DIR_PY=${CYBERTRON_DIR}/install/test/cybertron/python/test/
 
 RED='\033[0;31m'
 YELLOW='\e[33m'
@@ -175,6 +175,10 @@ function run_test() {
         done
         echo
     done
+    run_test_py
+    failed=0
+    failed=0
+    total=0
     echo
     if [[ ${error} -ne 0 ]]; then
         print_delim
@@ -234,7 +238,7 @@ function run_test_py() {
         done
         print_delim
     fi
-    success "Run ${total} cases, FAILED: ${failed}"
+    success "Run Python ${total} cases, FAILED: ${failed}"
     cd -
 }
 
