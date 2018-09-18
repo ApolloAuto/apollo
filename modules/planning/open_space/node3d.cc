@@ -24,19 +24,25 @@ namespace apollo {
 namespace planning {
 
 Node3d::Node3d(double x, double y, double phi,
-               const OpenSpaceConf& open_space_conf) {
+               const PlannerOpenSpaceConfig& open_space_conf) {
   x_ = x;
   y_ = y;
   phi_ = phi;
-  x_grid_ = static_cast<std::size_t>((x_ - open_space_conf.min_x) /
-                                     open_space_conf.x_grid_resolution);
-  y_grid_ = static_cast<std::size_t>((y_ - open_space_conf.min_y) /
-                                     open_space_conf.y_grid_resolution);
-  phi_grid_ = static_cast<std::size_t>((phi_ open_space_conf.min_phi) /
-                                       open_space_conf.phi_grid_resolution);
-  index_ = phi_grid_ * (open_space_conf.max_x - open_space_conf.min_x) *
-               (open_space_conf.max_y - open_space_conf.min_y) +
-           y_grid_ * (open_space_conf.max_x - open_space_conf.min_x) + x_grid_;
+  x_grid_ = static_cast<std::size_t>((x_ - open_space_conf.min_x()) /
+                                     open_space_conf.x_grid_resolution());
+  y_grid_ = static_cast<std::size_t>((y_ - open_space_conf.min_y()) /
+                                     open_space_conf.y_grid_resolution());
+  phi_grid_ = static_cast<std::size_t>((phi_ - (- M_PI)) /
+                                       open_space_conf.phi_grid_resolution());
+  index_ = phi_grid_ * (open_space_conf.max_x() - open_space_conf.min_x()) *
+               (open_space_conf.max_y() - open_space_conf.min_y()) +
+           y_grid_ * (open_space_conf.max_x() - open_space_conf.min_x()) + x_grid_;
+}
+
+Node3d::Node3d(double x, double y, double phi) {
+  x_ = x;
+  y_ = y;
+  phi_ = phi;
 }
 
 Box2d Node3d::GetBoundingBox(const common::VehicleParam& vehicle_param_) {

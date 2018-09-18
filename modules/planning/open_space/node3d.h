@@ -23,10 +23,12 @@
 
 #include <memory>
 #include <vector>
+#include <math.h>
 
 #include "modules/common/math/box2d.h"
 #include "modules/planning/common/obstacle.h"
 #include "modules/planning/constraint_checker/collision_checker.h"
+
 
 namespace apollo {
 namespace planning {
@@ -36,7 +38,8 @@ using apollo::common::math::Box2d;
 class Node3d {
  public:
   explicit Node3d(double x, double y, double phi,
-                  const OpenSpaceConf& open_space_conf);
+                  const PlannerOpenSpaceConfig& open_space_conf);
+  explicit Node3d(double x, double y, double phi);
   virtual ~Node3d() = default;
   Box2d GetBoundingBox(const common::VehicleParam& vehicle_param_);
   double GetCost() { return current_cost_ + heuristic_cost_; };
