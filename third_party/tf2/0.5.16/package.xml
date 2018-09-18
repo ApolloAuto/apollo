@@ -1,0 +1,34 @@
+<package>
+  <name>tf2</name>
+  <version>0.5.16</version>
+  <description>
+    tf2 is the second generation of the transform library, which lets
+    the user keep track of multiple coordinate frames over time. tf2
+    maintains the relationship between coordinate frames in a tree
+    structure buffered in time, and lets the user transform points,
+    vectors, etc between any two coordinate frames at any desired
+    point in time.
+  </description>
+  <author>Tully Foote</author>
+  <author>Eitan Marder-Eppstein</author>
+  <author>Wim Meeussen</author>
+  <maintainer email="tfoote@osrfoundation.org">Tully Foote</maintainer>
+  <license>BSD</license>
+
+  <url type="website">http://www.ros.org/wiki/tf2</url>
+    
+  <buildtool_depend version_gte="0.5.68">catkin</buildtool_depend>
+
+  <build_depend>libconsole-bridge-dev</build_depend>
+  <build_depend>geometry_msgs</build_depend>
+  <build_depend>rostime</build_depend>
+  <build_depend>tf2_msgs</build_depend>
+
+  <run_depend>libconsole-bridge-dev</run_depend>
+  <run_depend>geometry_msgs</run_depend>
+  <run_depend>rostime</run_depend>
+  <run_depend>tf2_msgs</run_depend>
+
+</package>
+
+
