@@ -107,7 +107,6 @@ auto ReaderManager<MessageT>::GetReader(const proto::RoleAttributes& role_attr)
               PerfEventCache::Instance()->AddTransportEvent(
                   TransPerf::WRITE_NOTIFY, reader_attr.channel_id(),
                   msg_info.seq_num());
-
             });
   }
   return lower_reach_map_[channel_name];

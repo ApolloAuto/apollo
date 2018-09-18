@@ -48,7 +48,7 @@ class MessageBase {
 
 struct MessageAttr {
   MessageAttr() : capacity(10), channel_name("") {}
-  MessageAttr(const std::string& channel)
+  explicit MessageAttr(const std::string& channel)
       : capacity(10), channel_name(channel) {}
   MessageAttr(size_t cap, const std::string& channel)
       : capacity(cap), channel_name(channel) {}
@@ -69,7 +69,7 @@ class Message : public MessageBase {
   using CallbackMap = std::unordered_map<std::string, Callback>;
   using Iterator = typename std::list<std::shared_ptr<T>>::const_iterator;
 
-  Message(const MessageAttr& attr);
+  explicit Message(const MessageAttr& attr);
   virtual ~Message();
 
   void Publish(const MessageType& msg);

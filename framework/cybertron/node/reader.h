@@ -17,6 +17,7 @@
 #ifndef CYBERTRON_NODE_READER_H_
 #define CYBERTRON_NODE_READER_H_
 
+#include <list>
 #include <memory>
 #include <mutex>
 #include <string>
@@ -24,15 +25,15 @@
 #include <utility>
 #include <vector>
 
+#include "cybertron/common/global_data.h"
 #include "cybertron/croutine/routine_factory.h"
 #include "cybertron/data/data_visitor.h"
+#include "cybertron/node/reader_base.h"
+#include "cybertron/proto/topology_change.pb.h"
 #include "cybertron/scheduler/scheduler.h"
 #include "cybertron/service_discovery/topology_manager.h"
 #include "cybertron/time/time.h"
 #include "cybertron/transport/transport.h"
-
-#include "cybertron/common/global_data.h"
-#include "cybertron/node/reader_base.h"
 
 namespace apollo {
 namespace cybertron {
@@ -177,13 +178,13 @@ void Reader<MessageT>::JoinTheTopology() {
   for (auto& writer : writers) {
     lower_reach_->Enable(writer);
   }
-  channel_manager_->Join(this->role_attr_, RoleType::ROLE_READER);
+  channel_manager_->Join(this->role_attr_, proto::RoleType::ROLE_READER);
 }
 
 template <typename MessageT>
 void Reader<MessageT>::LeaveTheTopology() {
   channel_manager_->RemoveChangeListener(change_conn_);
-  channel_manager_->Leave(this->role_attr_, RoleType::ROLE_READER);
+  channel_manager_->Leave(this->role_attr_, proto::RoleType::ROLE_READER);
 }
 
 template <typename MessageT>

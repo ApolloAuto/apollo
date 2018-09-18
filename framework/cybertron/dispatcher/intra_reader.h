@@ -18,6 +18,7 @@
 #define CYBERTRON_DISPATCHER_INTRA_READER_H_
 
 #include <functional>
+#include <list>
 #include <memory>
 
 #include "cybertron/dispatcher/dispatcher.h"

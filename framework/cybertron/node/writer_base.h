@@ -28,9 +28,7 @@ namespace cybertron {
 class WriterBase {
  public:
   explicit WriterBase(const proto::RoleAttributes& role_attr)
-      : role_attr_(role_attr), init_(false) {
-
-  }
+      : role_attr_(role_attr), init_(false) {}
   virtual ~WriterBase() {}
 
   virtual bool Init() = 0;
