@@ -92,7 +92,7 @@ bool WarmStartProblem::Solve(Eigen::MatrixXd* state_result,
   Ipopt::ApplicationReturnStatus status = app->Initialize();
   if (status != Ipopt::Solve_Succeeded) {
     ADEBUG << "*** Wart start problem error during initialization!";
-    return static_cast<int>(status);
+    return false;
   }
 
   status = app->OptimizeTNLP(problem);
