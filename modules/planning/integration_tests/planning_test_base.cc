@@ -20,9 +20,15 @@
 
 #include "cybertron/common/log.h"
 
+#include "modules/canbus/proto/chassis.pb.h"
+#include "modules/localization/proto/localization.pb.h"
+#include "modules/perception/proto/traffic_light_detection.pb.h"
+#include "modules/prediction/proto/prediction_obstacle.pb.h"
+#include "modules/routing/proto/routing.pb.h"
+
 #include "modules/common/adapters/adapter_gflags.h"
+#include "modules/common/util/file.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/planning_component.h"
 
 namespace apollo {
 namespace planning {
@@ -54,8 +60,6 @@ void PlanningTestBase::SetUpTestCase() {
       "/apollo/modules/planning/conf/planning_config.pb.txt";
   FLAGS_traffic_rule_config_filename =
       "/apollo/modules/planning/conf/traffic_rule_config.pb.txt";
-  // FLAGS_planning_adapter_config_filename =
-  //      "modules/planning/testdata/conf/adapter.conf";
   FLAGS_smoother_config_filename =
       "modules/planning/conf/qp_spline_smoother_config.pb.txt";
   FLAGS_map_dir = "modules/planning/testdata";
