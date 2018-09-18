@@ -26,16 +26,11 @@
 #include <utility>
 #include <vector>
 
-#include "ros/include/ros/ros.h"
+#include "cybertron/common/macros.h"
 
-#include "modules/common/adapters/adapter_manager.h"
-#include "modules/common/adapters/proto/adapter_config.pb.h"
-#include "modules/common/apollo_app.h"
-#include "modules/common/macro.h"
 #include "modules/common/monitor_log/monitor_log_buffer.h"
 #include "modules/common/time/time.h"
-#include "modules/common/util/util.h"
-#include "modules/control/proto/control_cmd.pb.h"
+#include "modules/common/status/status.h"
 #include "modules/drivers/canbus/can_client/can_client.h"
 #include "modules/drivers/canbus/can_client/can_client_factory.h"
 #include "modules/drivers/canbus/can_comm/can_receiver.h"
@@ -62,8 +57,6 @@ namespace ultrasonic_radar {
 * @brief template of canbus-based sensor module main class (e.g., ultrasonic_radar).
 */
 
-using apollo::common::adapter::AdapterConfig;
-using apollo::common::adapter::AdapterManager;
 using apollo::common::monitor::MonitorMessageItem;
 using apollo::common::Status;
 using apollo::common::ErrorCode;
@@ -74,38 +67,32 @@ using apollo::drivers::canbus::CanReceiver;
 using apollo::drivers::canbus::SenderMessage;
 using apollo::drivers::canbus::SensorCanbusConf;
 
-class UltrasonicRadarCanbus : public apollo::common::ApolloApp {
+class UltrasonicRadarCanbus {
  public:
-  // TODO(lizh): check whether we need a new msg item, say
-  // MonitorMessageItem::SENSORCANBUS
-  UltrasonicRadarCanbus()
-      : monitor_logger_(apollo::common::monitor::MonitorMessageItem::CANBUS) {}
+  UltrasonicRadarCanbus();
+  ~UltrasonicRadarCanbus();
 
   /**
   * @brief obtain module name
   * @return module name
   */
-  std::string Name() const override;
+  std::string Name() const;
 
   /**
   * @brief module initialization function
   * @return initialization status
   */
-  apollo::common::Status Init() override;
+  apollo::common::Status Init(
+    const std::string& config_path,
+    const std::shared_ptr<::apollo::cybertron::Writer<Ultrasonic>>& writer);
 
   /**
   * @brief module start function
   * @return start status
   */
-  apollo::common::Status Start() override;
-
-  /**
-  * @brief module stop function
-  */
-  void Stop() override;
+  apollo::common::Status Start();
 
  private:
-  void PublishSensorData();
   Status OnError(const std::string &error_msg);
   void RegisterCanClients();
 
@@ -115,7 +102,7 @@ class UltrasonicRadarCanbus : public apollo::common::ApolloApp {
   std::unique_ptr<UltrasonicRadarMessageManager> sensor_message_manager_;
 
   int64_t last_timestamp_ = 0;
-  apollo::common::monitor::MonitorLogger monitor_logger_;
+  apollo::common::monitor::MonitorLogBuffer monitor_logger_buffer_;
 };
 
 }  // namespace ultrasonic_radar

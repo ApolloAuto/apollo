@@ -14,8 +14,23 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/common/apollo_app.h"
-#include "modules/drivers/radar/ultrasonic_radar/ultrasonic_radar_canbus.h"
+#include "modules/drivers/radar/ultrasonic_radar/ultrasonic_radar_canbus_component.h"
+#include "modules/common/adapters/adapter_gflags.h"
 
-using ::apollo::drivers::ultrasonic_radar::UltrasonicRadarCanbus;
-APOLLO_MAIN(UltrasonicRadarCanbus);
+namespace apollo {
+namespace drivers {
+namespace ultrasonic_radar {
+
+UltrasonicRadarCanbusComponent::UltrasonicRadarCanbusComponent() {
+  writer_ = node_->CreateWriter<Ultrasonic>(FLAGS_ultrasonic_radar_topic);
+}
+
+bool UltrasonicRadarCanbusComponent::Init() {
+  return utralsonic_radar_canbus_.Init(ConfigFilePath(), writer_).ok()
+      && utralsonic_radar_canbus_.Start().ok();
+}
+
+}  // namespace ultrasonic_radar
+}  // namespace drivers
+}  // namespace apollo
+

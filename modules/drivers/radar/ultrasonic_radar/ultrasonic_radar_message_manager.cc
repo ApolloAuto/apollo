@@ -20,17 +20,16 @@
  */
 
 #include "modules/drivers/radar/ultrasonic_radar/ultrasonic_radar_message_manager.h"
-
+#include "modules/common/util/message_util.h"
 
 namespace apollo {
 namespace drivers {
 namespace ultrasonic_radar {
 
-using ::apollo::common::adapter::AdapterManager;
-
-UltrasonicRadarMessageManager::UltrasonicRadarMessageManager(int entrance_num)
-    : MessageManager<Ultrasonic>(),
-      entrance_num_(entrance_num) {
+UltrasonicRadarMessageManager::UltrasonicRadarMessageManager(
+    const int entrance_num,
+    const std::shared_ptr<::apollo::cybertron::Writer<Ultrasonic>> &writer)
+    : entrance_num_(entrance_num), ultrasonic_radar_writer_(writer) {
   sensor_data_.mutable_ranges()->Resize(entrance_num_, 0.0);
 }
 
@@ -57,8 +56,8 @@ void UltrasonicRadarMessageManager::Parse(const uint32_t message_id,
   } else if (message_id == 0x304) {
     sensor_data_.set_ranges(10, data[1]);
     sensor_data_.set_ranges(11, data[2]);
-    AdapterManager::FillUltrasonicHeader(FLAGS_sensor_node_name, &sensor_data_);
-    AdapterManager::PublishUltrasonic(sensor_data_);
+    common::util::FillHeader("ultrasonic_radar", &sensor_data_);
+    ultrasonic_radar_writer_->Write(std::make_shared<Ultrasonic>(sensor_data_));
   }
 
   received_ids_.insert(message_id);

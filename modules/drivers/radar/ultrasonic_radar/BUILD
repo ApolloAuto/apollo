@@ -15,12 +15,14 @@ cc_library(
         "//modules/drivers/canbus/can_client:can_client_factory",
         "//modules/drivers/canbus/can_comm:can_sender",
         "//modules/drivers/canbus/can_comm:message_manager_base",
+        "//modules/drivers/proto:sensor_proto",
+        "//modules/common/util:message_util",
     ],
 )
 
-# cc_test(
-#     name = "ultrasonic_radar_message_manager_test",
-#     size = "small",
+#  cc_test(
+#    name = "ultrasonic_radar_message_manager_test",
+#    size = "small",
 #     srcs = [
 #         "ultrasonic_radar_message_manager_test.cc",
 #     ],
@@ -41,12 +43,12 @@ cc_library(
     deps = [
         ":ultrasonic_radar_message_manager",
         "//modules/common",
-        "//modules/common:apollo_app",
         "//modules/common/monitor_log",
         "//modules/drivers/canbus:sensor_gflags",
         "//modules/drivers/canbus/can_client:can_client_factory",
         "//modules/drivers/canbus/can_comm:can_receiver",
         "//modules/drivers/canbus/can_comm:message_manager_base",
+        "//modules/drivers/proto:sensor_proto",
     ],
 )
 
@@ -62,17 +64,25 @@ cc_library(
 #     ],
 # )
 
-cc_binary(
-    name = "ultrasonic_radar",
-    srcs = ["main.cc"],
+cc_library(
+    name = "ultrasonic_radar_canbus_component_lib",
+    srcs = [
+        "ultrasonic_radar_canbus_component.cc",
+    ],
+    hdrs = [
+        "ultrasonic_radar_canbus_component.h",
+    ],
     deps = [
         ":ultrasonic_radar_canbus_lib",
-        "//external:gflags",
-        "//framework:cybertron",
-        "//modules/common/monitor_log",
-        "//modules/drivers/canbus/common:canbus_common",
-        "@ros//:ros_common",
+        "//modules/common/adapters:adapter_gflags",
     ],
+    copts = ['-DMODULE_NAME=\\"ultrasonic_radar_canbus\\"']
+)
+
+cc_binary(
+    name = "libultrasonic_radar_canbus_component.so",
+    deps = [":ultrasonic_radar_canbus_component_lib"],
+    linkopts = ["-shared"],
 )
 
 cpplint()
