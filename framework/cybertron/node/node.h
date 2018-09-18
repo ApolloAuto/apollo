@@ -47,18 +47,18 @@ class Node {
       -> std::shared_ptr<Writer<MessageT>>;
 
   template <typename MessageT>
+  auto CreateReader(const std::string& channel_name,
+                    const CallbackFunc<MessageT>& reader_func = nullptr)
+      -> std::shared_ptr<cybertron::Reader<MessageT>>;
+
+  template <typename MessageT>
   auto CreateReader(const proto::RoleAttributes& role_attr,
-                    const CallbackFunc<MessageT>& reader_func)
+                    const CallbackFunc<MessageT>& reader_func = nullptr)
       -> std::shared_ptr<cybertron::Reader<MessageT>>;
 
   template <typename MessageT>
   auto CreateWriter(const std::string& channel_name)
       -> std::shared_ptr<Writer<MessageT>>;
-
-  template <typename MessageT>
-  auto CreateReader(const std::string& channel_name,
-                    const CallbackFunc<MessageT>& reader_func)
-      -> std::shared_ptr<Reader<MessageT>>;
 
   template <typename Request, typename Response>
   auto CreateService(const std::string& service_name,
@@ -80,9 +80,6 @@ class Node {
  private:
   explicit Node(const std::string& node_name,
                 const std::string& name_space = "");
-  template <typename MessageT>
-  auto CreateReader(const proto::RoleAttributes& role_attr)
-      -> std::shared_ptr<Reader<MessageT>>;
 
   std::string node_name_;
   std::string name_space_;
@@ -104,20 +101,6 @@ template <typename MessageT>
 auto Node::CreateWriter(const std::string& channel_name)
     -> std::shared_ptr<Writer<MessageT>> {
   return node_channel_impl_->template CreateWriter<MessageT>(channel_name);
-}
-
-template <typename MessageT>
-auto Node::CreateReader(const proto::RoleAttributes& role_attr)
-    -> std::shared_ptr<Reader<MessageT>> {
-  std::lock_guard<std::mutex> lg(readers_mutex_);
-  if (readers_.find(role_attr.channel_name()) != readers_.end()) {
-    AWARN << "Failed to create reader: reader with the same channel already "
-             "exists.";
-    return nullptr;
-  }
-  auto reader = node_channel_impl_->template CreateReader<MessageT>(role_attr);
-  readers_.emplace(std::make_pair(role_attr.channel_name(), reader));
-  return reader;
 }
 
 template <typename MessageT>
