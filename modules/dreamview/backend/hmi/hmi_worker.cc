@@ -17,6 +17,7 @@
 #include "modules/dreamview/backend/hmi/hmi_worker.h"
 
 #include <chrono>
+#include <memory>
 #include <vector>
 
 #include "gflags/gflags.h"

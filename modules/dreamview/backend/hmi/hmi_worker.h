@@ -17,6 +17,7 @@
 #ifndef MODULES_DREAMVIEW_BACKEND_HMI_HMI_WORKER_H_
 #define MODULES_DREAMVIEW_BACKEND_HMI_HMI_WORKER_H_
 
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -46,7 +47,7 @@ using ChangeVehicleHandler = std::function<void(const std::string&)>;
 // Singleton worker which does the actual work of HMI actions.
 class HMIWorker {
  public:
-  HMIWorker(const std::shared_ptr<apollo::cybertron::Node>& node);
+  explicit HMIWorker(const std::shared_ptr<apollo::cybertron::Node>& node);
 
   // High level HMI action trigger.
   bool Trigger(const HMIAction action);
