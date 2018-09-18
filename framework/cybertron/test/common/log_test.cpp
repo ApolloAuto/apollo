@@ -8,7 +8,6 @@ namespace common {
 
 TEST(LogTest, TestAll) {
   AINFO << "11111";
-  LOG_INFO_FORMAT("%d", 123456);
 }
 
 }  // namespace logger
