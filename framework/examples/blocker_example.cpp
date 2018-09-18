@@ -16,14 +16,24 @@
 
 #include <iostream>
 
-#include "cybertron/dispatcher/dispatcher.h"
+#include "cybertron/blocker/blocker_manager.h"
+#include "cybertron/common/global_data.h"
 #include "cybertron/proto/component_config.pb.h"
 #include "examples/component_perception/perception_component.h"
 
-// To use this example, we need set run_mode to MODE_SIMULATION
-// (run_mode is in file conf/cybertron.pb.conf)
-
 int main(int argc, char* argv[]) {
+  bool is_reality_mode =
+      apollo::cybertron::common::GlobalData::Instance()->IsRealityMode();
+
+  if (is_reality_mode) {
+    std::cout << "To use this example:\n"
+                 "we need to set run_mode to MODE_SIMULATION (run_mode is in\n"
+                 "file conf/cybertron.pb.conf)\n"
+                 "Or export CYBER_RUN_MODE=simulation firstly."
+              << std::endl;
+    return 0;
+  }
+
   apollo::cybertron::proto::ComponentConfig config;
   config.set_name("perception");
   auto reader = config.add_readers();
@@ -43,10 +53,11 @@ int main(int argc, char* argv[]) {
 
   perception->Proc(driver_raw_msg);
 
-  auto message = apollo::cybertron::dispatcher::Dispatcher::Instance()
-                     ->GetMessage<Perception>("/perception/channel");
+  auto blocker = apollo::cybertron::blocker::BlockerManager::Instance()
+                     ->GetBlocker<apollo::cybertron::proto::Perception>(
+                         "/perception/channel");
 
-  bool is_empty = message->IsPublishedEmpty();
+  bool is_empty = blocker->IsPublishedEmpty();
 
   if (is_empty) {
     std::cout << "simulation failed." << std::endl;

@@ -21,13 +21,13 @@
 #include <utility>
 #include <vector>
 
+#include "cybertron/blocker/blocker_manager.h"
 #include "cybertron/common/global_data.h"
 #include "cybertron/common/types.h"
 #include "cybertron/common/util.h"
 #include "cybertron/component/component_base.h"
 #include "cybertron/croutine/routine_factory.h"
 #include "cybertron/data/data_visitor.h"
-#include "cybertron/proto/run_mode_conf.pb.h"
 #include "cybertron/scheduler/scheduler.h"
 
 namespace apollo {
@@ -218,14 +218,14 @@ bool Component<M0, M1, NullType, NullType>::Initialize(
     std::weak_ptr<Component<M0, M1>> self =
         std::dynamic_pointer_cast<Component<M0, M1>>(shared_from_this());
 
-    auto message1 = dispatcher::Dispatcher::Instance()->GetMessage<M1>(
+    auto blocker1 = blocker::BlockerManager::Instance()->GetBlocker<M1>(
         config.readers(1).channel());
 
-    auto func = [self, message1](const std::shared_ptr<M0>& msg0) {
+    auto func = [self, blocker1](const std::shared_ptr<M0>& msg0) {
       auto ptr = self.lock();
       if (ptr) {
-        if (!message1->IsPublishedEmpty()) {
-          auto msg1 = message1->GetLatestPublishedPtr();
+        if (!blocker1->IsPublishedEmpty()) {
+          auto msg1 = blocker1->GetLatestPublishedPtr();
           ptr->Process(msg0, msg1);
         }
       } else {
@@ -307,17 +307,17 @@ bool Component<M0, M1, M2, NullType>::Initialize(
         std::dynamic_pointer_cast<Component<M0, M1, M2, NullType>>(
             shared_from_this());
 
-    auto message1 = dispatcher::Dispatcher::Instance()->GetMessage<M1>(
+    auto blocker1 = blocker::BlockerManager::Instance()->GetBlocker<M1>(
         config.readers(1).channel());
-    auto message2 = dispatcher::Dispatcher::Instance()->GetMessage<M2>(
+    auto blocker2 = blocker::BlockerManager::Instance()->GetBlocker<M2>(
         config.readers(2).channel());
 
-    auto func = [self, message1, message2](const std::shared_ptr<M0>& msg0) {
+    auto func = [self, blocker1, blocker2](const std::shared_ptr<M0>& msg0) {
       auto ptr = self.lock();
       if (ptr) {
-        if (!message1->IsPublishedEmpty() && !message2->IsPublishedEmpty()) {
-          auto msg1 = message1->GetLatestPublishedPtr();
-          auto msg2 = message2->GetLatestPublishedPtr();
+        if (!blocker1->IsPublishedEmpty() && !blocker2->IsPublishedEmpty()) {
+          auto msg1 = blocker1->GetLatestPublishedPtr();
+          auto msg2 = blocker2->GetLatestPublishedPtr();
           ptr->Process(msg0, msg1, msg2);
         }
       } else {
@@ -404,22 +404,22 @@ bool Component<M0, M1, M2, M3>::Initialize(const ComponentConfig& config) {
         std::dynamic_pointer_cast<Component<M0, M1, M2, M3>>(
             shared_from_this());
 
-    auto message1 = dispatcher::Dispatcher::Instance()->GetMessage<M1>(
+    auto blocker1 = blocker::BlockerManager::Instance()->GetBlocker<M1>(
         config.readers(1).channel());
-    auto message2 = dispatcher::Dispatcher::Instance()->GetMessage<M2>(
+    auto blocker2 = blocker::BlockerManager::Instance()->GetBlocker<M2>(
         config.readers(2).channel());
-    auto message3 = dispatcher::Dispatcher::Instance()->GetMessage<M3>(
+    auto blocker3 = blocker::BlockerManager::Instance()->GetBlocker<M3>(
         config.readers(3).channel());
 
-    auto func = [self, message1, message2,
-                 message3](const std::shared_ptr<M0>& msg0) {
+    auto func = [self, blocker1, blocker2,
+                 blocker3](const std::shared_ptr<M0>& msg0) {
       auto ptr = self.lock();
       if (ptr) {
-        if (!message1->IsPublishedEmpty() && !message2->IsPublishedEmpty() &&
-            !message3->IsPublishedEmpty()) {
-          auto msg1 = message1->GetLatestPublishedPtr();
-          auto msg2 = message2->GetLatestPublishedPtr();
-          auto msg3 = message3->GetLatestPublishedPtr();
+        if (!blocker1->IsPublishedEmpty() && !blocker2->IsPublishedEmpty() &&
+            !blocker3->IsPublishedEmpty()) {
+          auto msg1 = blocker1->GetLatestPublishedPtr();
+          auto msg2 = blocker2->GetLatestPublishedPtr();
+          auto msg3 = blocker3->GetLatestPublishedPtr();
           ptr->Process(msg0, msg1, msg2, msg3);
         }
       } else {
@@ -447,16 +447,16 @@ bool Component<M0, M1, M2, M3>::Initialize(const ComponentConfig& config) {
   auto sched = scheduler::Scheduler::Instance();
   std::weak_ptr<Component<M0, M1, M2, M3>> self =
       std::dynamic_pointer_cast<Component<M0, M1, M2, M3>>(shared_from_this());
-  auto func = [self](
-      const std::shared_ptr<M0>& msg0, const std::shared_ptr<M1>& msg1,
-      const std::shared_ptr<M2>& msg2, const std::shared_ptr<M3>& msg3) {
-    auto ptr = self.lock();
-    if (ptr) {
-      ptr->Process(msg0, msg1, msg2, msg3);
-    } else {
-      AERROR << "Component object has been destroyed." << std::endl;
-    }
-  };
+  auto func =
+      [self](const std::shared_ptr<M0>& msg0, const std::shared_ptr<M1>& msg1,
+             const std::shared_ptr<M2>& msg2, const std::shared_ptr<M3>& msg3) {
+        auto ptr = self.lock();
+        if (ptr) {
+          ptr->Process(msg0, msg1, msg2, msg3);
+        } else {
+          AERROR << "Component object has been destroyed." << std::endl;
+        }
+      };
 
   auto dv = std::make_shared<data::DataVisitor<M0, M1, M2, M3>>(readers_);
   croutine::RoutineFactory factory =

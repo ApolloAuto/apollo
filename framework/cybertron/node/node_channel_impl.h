@@ -20,9 +20,9 @@
 #include <memory>
 #include <string>
 
+#include "cybertron/blocker/intra_reader.h"
+#include "cybertron/blocker/intra_writer.h"
 #include "cybertron/common/global_data.h"
-#include "cybertron/dispatcher/intra_reader.h"
-#include "cybertron/dispatcher/intra_writer.h"
 #include "cybertron/message/message_traits.h"
 #include "cybertron/node/reader.h"
 #include "cybertron/node/writer.h"
@@ -104,7 +104,7 @@ auto NodeChannelImpl::CreateWriter(const proto::RoleAttributes& role_attr)
 
   std::shared_ptr<Writer<MessageT>> writer_ptr = nullptr;
   if (!is_reality_mode_) {
-    writer_ptr = std::make_shared<dispatcher::IntraWriter<MessageT>>(new_attr);
+    writer_ptr = std::make_shared<blocker::IntraWriter<MessageT>>(new_attr);
   } else {
     writer_ptr = std::make_shared<Writer<MessageT>>(new_attr);
   }
@@ -141,8 +141,8 @@ auto NodeChannelImpl::CreateReader(const proto::RoleAttributes& role_attr,
 
   std::shared_ptr<Reader<MessageT>> reader_ptr = nullptr;
   if (!is_reality_mode_) {
-    reader_ptr = std::make_shared<dispatcher::IntraReader<MessageT>>(
-        new_attr, reader_func);
+    reader_ptr =
+        std::make_shared<blocker::IntraReader<MessageT>>(new_attr, reader_func);
   } else {
     reader_ptr = std::make_shared<Reader<MessageT>>(new_attr, reader_func);
   }

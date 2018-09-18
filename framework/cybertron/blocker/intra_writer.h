@@ -14,23 +14,23 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef CYBERTRON_DISPATCHER_INTRA_WRITER_H_
-#define CYBERTRON_DISPATCHER_INTRA_WRITER_H_
+#ifndef CYBERTRON_BLOCKER_INTRA_WRITER_H_
+#define CYBERTRON_BLOCKER_INTRA_WRITER_H_
 
 #include <memory>
 
-#include "cybertron/dispatcher/dispatcher.h"
+#include "cybertron/blocker/blocker.h"
+#include "cybertron/blocker/blocker_manager.h"
 #include "cybertron/node/writer.h"
 
 namespace apollo {
 namespace cybertron {
-namespace dispatcher {
+namespace blocker {
 
 template <typename MessageT>
 class IntraWriter : public apollo::cybertron::Writer<MessageT> {
  public:
   using MessagePtr = std::shared_ptr<MessageT>;
-  using DispatcherPtr = std::shared_ptr<dispatcher::Dispatcher>;
 
   explicit IntraWriter(const proto::RoleAttributes& attr);
   virtual ~IntraWriter();
@@ -42,14 +42,12 @@ class IntraWriter : public apollo::cybertron::Writer<MessageT> {
   bool Write(const MessagePtr& msg_ptr) override;
 
  private:
-  DispatcherPtr dispatcher_;
+  std::shared_ptr<Blocker<MessageT>> blocker_;
 };
 
 template <typename MessageT>
 IntraWriter<MessageT>::IntraWriter(const proto::RoleAttributes& attr)
-    : Writer<MessageT>(attr) {
-  dispatcher_ = dispatcher::Dispatcher::Instance();
-}
+    : Writer<MessageT>(attr) {}
 
 template <typename MessageT>
 IntraWriter<MessageT>::~IntraWriter() {
@@ -58,13 +56,25 @@ IntraWriter<MessageT>::~IntraWriter() {
 
 template <typename MessageT>
 bool IntraWriter<MessageT>::Init() {
-  this->init_.exchange(true);
+  if (this->init_.exchange(true)) {
+    return true;
+  }
+
+  BlockerAttr attr(this->role_attr_.channel_name());
+  blocker_ = BlockerManager::Instance()->GetOrCreateBlocker<MessageT>(attr);
+  if (blocker_ == nullptr) {
+    this->init_.exchange(false);
+    return false;
+  }
   return true;
 }
 
 template <typename MessageT>
 void IntraWriter<MessageT>::Shutdown() {
-  this->init_.exchange(false);
+  if (!this->init_.exchange(false)) {
+    return;
+  }
+  blocker_ = nullptr;
 }
 
 template <typename MessageT>
@@ -72,7 +82,8 @@ bool IntraWriter<MessageT>::Write(const MessageT& msg) {
   if (!this->init_.load()) {
     return false;
   }
-  return Write(std::make_shared<MessageT>(msg));
+  blocker_->Publish(msg);
+  return true;
 }
 
 template <typename MessageT>
@@ -80,12 +91,12 @@ bool IntraWriter<MessageT>::Write(const MessagePtr& msg_ptr) {
   if (!this->init_.load()) {
     return false;
   }
-  return dispatcher_->Publish<MessageT>(this->role_attr_.channel_name(),
-                                        msg_ptr);
+  blocker_->Publish(msg_ptr);
+  return true;
 }
 
-}  // namespace dispatcher
+}  // namespace blocker
 }  // namespace cybertron
 }  // namespace apollo
 
-#endif  // CYBERTRON_DISPATCHER_INTRA_WRITER_H_
+#endif  // CYBERTRON_BLOCKER_INTRA_WRITER_H_

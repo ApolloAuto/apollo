@@ -14,23 +14,23 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "cybertron/dispatcher/dispatcher.h"
+#include "cybertron/blocker/blocker_manager.h"
 
 namespace apollo {
 namespace cybertron {
-namespace dispatcher {
+namespace blocker {
 
-Dispatcher::Dispatcher() {}
+BlockerManager::BlockerManager() {}
 
-Dispatcher::~Dispatcher() { messages_.clear(); }
+BlockerManager::~BlockerManager() { blockers_.clear(); }
 
-void Dispatcher::Observe() {
-  std::lock_guard<std::mutex> lock(msg_mutex_);
-  for (auto& item : messages_) {
+void BlockerManager::Observe() {
+  std::lock_guard<std::mutex> lock(blocker_mutex_);
+  for (auto& item : blockers_) {
     item.second->Observe();
   }
 }
 
-}  // namespace dispatcher
+}  // namespace blocker
 }  // namespace cybertron
 }  // namespace apollo

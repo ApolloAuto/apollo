@@ -16,105 +16,105 @@
 
 #include "gtest/gtest.h"
 
-#include "cybertron/dispatcher/message.h"
+#include "cybertron/blocker/blocker.h"
 #include "cybertron/proto/unit_test.pb.h"
 
 namespace apollo {
 namespace cybertron {
-namespace dispatcher {
+namespace blocker {
 
 using apollo::cybertron::proto::UnitTest;
 
-TEST(MessageTest, constructor) {
-  MessageAttr attr(10, "channel");
-  Message<UnitTest> message(attr);
-  EXPECT_EQ(message.capacity(), 10);
-  EXPECT_EQ(message.channel_name(), "channel");
+TEST(BlockerTest, constructor) {
+  BlockerAttr attr(10, "channel");
+  Blocker<UnitTest> blocker(attr);
+  EXPECT_EQ(blocker.capacity(), 10);
+  EXPECT_EQ(blocker.channel_name(), "channel");
 
-  message.set_capacity(20);
-  EXPECT_EQ(message.capacity(), 20);
+  blocker.set_capacity(20);
+  EXPECT_EQ(blocker.capacity(), 20);
 }
 
-TEST(MessageTest, publish) {
-  MessageAttr attr(10, "channel");
-  Message<UnitTest> message(attr);
+TEST(BlockerTest, publish) {
+  BlockerAttr attr(10, "channel");
+  Blocker<UnitTest> blocker(attr);
 
   auto msg1 = std::make_shared<UnitTest>();
-  msg1->set_class_name("MessageTest");
+  msg1->set_class_name("BlockerTest");
   msg1->set_case_name("publish_1");
 
   UnitTest msg2;
-  msg2.set_class_name("MessageTest");
+  msg2.set_class_name("BlockerTest");
   msg2.set_case_name("publish_2");
 
-  EXPECT_TRUE(message.IsPublishedEmpty());
-  message.Publish(msg1);
-  message.Publish(msg2);
-  EXPECT_FALSE(message.IsPublishedEmpty());
+  EXPECT_TRUE(blocker.IsPublishedEmpty());
+  blocker.Publish(msg1);
+  blocker.Publish(msg2);
+  EXPECT_FALSE(blocker.IsPublishedEmpty());
 
-  EXPECT_TRUE(message.IsObservedEmpty());
-  message.Observe();
-  EXPECT_FALSE(message.IsObservedEmpty());
+  EXPECT_TRUE(blocker.IsObservedEmpty());
+  blocker.Observe();
+  EXPECT_FALSE(blocker.IsObservedEmpty());
 
-  auto& latest_observed_msg = message.GetLatestObserved();
-  EXPECT_EQ(latest_observed_msg.class_name(), "MessageTest");
+  auto& latest_observed_msg = blocker.GetLatestObserved();
+  EXPECT_EQ(latest_observed_msg.class_name(), "BlockerTest");
   EXPECT_EQ(latest_observed_msg.case_name(), "publish_2");
 
-  auto latest_observed_msg_ptr = message.GetLatestObservedPtr();
-  EXPECT_EQ(latest_observed_msg_ptr->class_name(), "MessageTest");
+  auto latest_observed_msg_ptr = blocker.GetLatestObservedPtr();
+  EXPECT_EQ(latest_observed_msg_ptr->class_name(), "BlockerTest");
   EXPECT_EQ(latest_observed_msg_ptr->case_name(), "publish_2");
 
-  auto latest_published_ptr = message.GetLatestPublishedPtr();
-  EXPECT_EQ(latest_published_ptr->class_name(), "MessageTest");
+  auto latest_published_ptr = blocker.GetLatestPublishedPtr();
+  EXPECT_EQ(latest_published_ptr->class_name(), "BlockerTest");
   EXPECT_EQ(latest_published_ptr->case_name(), "publish_2");
 
-  message.ClearPublished();
-  EXPECT_TRUE(message.IsPublishedEmpty());
-  EXPECT_FALSE(message.IsObservedEmpty());
+  blocker.ClearPublished();
+  EXPECT_TRUE(blocker.IsPublishedEmpty());
+  EXPECT_FALSE(blocker.IsObservedEmpty());
 }
 
-TEST(MessageTest, subscribe) {
-  MessageAttr attr(10, "channel");
-  Message<UnitTest> message(attr);
+TEST(BlockerTest, subscribe) {
+  BlockerAttr attr(10, "channel");
+  Blocker<UnitTest> blocker(attr);
 
   auto received_msg = std::make_shared<UnitTest>();
-  bool res = message.Subscribe(
-      "MessageTest1", [&received_msg](const std::shared_ptr<UnitTest>& msg) {
+  bool res = blocker.Subscribe(
+      "BlockerTest1", [&received_msg](const std::shared_ptr<UnitTest>& msg) {
         received_msg->CopyFrom(*msg);
       });
 
   EXPECT_TRUE(res);
 
   auto msg1 = std::make_shared<UnitTest>();
-  msg1->set_class_name("MessageTest");
+  msg1->set_class_name("BlockerTest");
   msg1->set_case_name("publish_1");
 
-  message.Publish(msg1);
+  blocker.Publish(msg1);
 
   EXPECT_EQ(received_msg->class_name(), msg1->class_name());
   EXPECT_EQ(received_msg->case_name(), msg1->case_name());
 
-  res = message.Subscribe(
-      "MessageTest1", [&received_msg](const std::shared_ptr<UnitTest>& msg) {
+  res = blocker.Subscribe(
+      "BlockerTest1", [&received_msg](const std::shared_ptr<UnitTest>& msg) {
         received_msg->CopyFrom(*msg);
       });
 
   EXPECT_FALSE(res);
 
-  res = message.Unsubscribe("MessageTest1");
+  res = blocker.Unsubscribe("BlockerTest1");
   EXPECT_TRUE(res);
-  res = message.Unsubscribe("MessageTest1");
+  res = blocker.Unsubscribe("BlockerTest1");
   EXPECT_FALSE(res);
 
   UnitTest msg2;
-  msg2.set_class_name("MessageTest");
+  msg2.set_class_name("BlockerTest");
   msg2.set_case_name("publish_2");
 
-  message.Publish(msg2);
+  blocker.Publish(msg2);
   EXPECT_NE(received_msg->case_name(), msg2.case_name());
 }
 
-}  // namespace dispatcher
+}  // namespace blocker
 }  // namespace cybertron
 }  // namespace apollo
 
