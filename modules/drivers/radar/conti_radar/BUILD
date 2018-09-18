@@ -35,6 +35,9 @@ cc_library(
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/radar/conti_radar/protocol:drivers_conti_radar_protocol",
         "//modules/common/monitor_log",
+        "//modules/localization/proto:pose_proto",
+        "//modules/localization/proto:localization_proto",
+        "@eigen//:eigen",
         "//framework:cybertron",
     ],
     copts = ['-DMODULE_NAME=\\"conti_radar\\"']

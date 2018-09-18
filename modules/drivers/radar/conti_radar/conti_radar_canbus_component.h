@@ -38,8 +38,11 @@
 #include "modules/drivers/canbus/proto/can_card_parameter.pb.h"
 #include "modules/drivers/canbus/proto/sensor_canbus_conf.pb.h"
 #include "modules/drivers/proto/conti_radar.pb.h"
+#include "modules/localization/proto/localization.pb.h"
 #include "modules/drivers/radar/conti_radar/conti_radar_message_manager.h"
 #include "modules/drivers/radar/conti_radar/protocol/radar_config_200.h"
+#include "modules/drivers/radar/conti_radar/protocol/motion_input_speed_300.h"
+#include "modules/drivers/radar/conti_radar/protocol/motion_input_yawrate_301.h"
 
 /**
  * @namespace apollo::drivers
@@ -63,8 +66,9 @@ using apollo::drivers::canbus::CanClientFactory;
 using apollo::drivers::canbus::CanReceiver;
 using apollo::drivers::canbus::SenderMessage;
 using apollo::drivers::canbus::SensorCanbusConf;
-template <typename T>
-using Writer = apollo::cybertron::Writer<T>;
+using apollo::localization::LocalizationEstimate;
+using apollo::cybertron::Writer;
+using apollo::cybertron::Reader;
 
 class ContiRadarCanbusComponent : public apollo::cybertron::Component<> {
  public:
@@ -84,6 +88,9 @@ class ContiRadarCanbusComponent : public apollo::cybertron::Component<> {
   CanReceiver<ContiRadar> can_receiver_;
   std::unique_ptr<ContiRadarMessageManager> sensor_message_manager_;
   std::shared_ptr<Writer<ContiRadar>> conti_radar_writer_;
+  std::shared_ptr<Reader<LocalizationEstimate>> pose_reader_;
+  void PoseCallback(const std::shared_ptr<LocalizationEstimate>& pose);
+  uint64_t last_nsec_ = 0;
 
   int64_t last_timestamp_ = 0;
   bool start_success_ = false;
