@@ -106,8 +106,8 @@ void TranslatePoint(const double translate_x, const double translate_y,
 void GenerateFreeMoveTrajectoryPoints(
     Eigen::Matrix<double, 6, 1>* state,
     const Eigen::Matrix<double, 6, 6>& transition, double theta,
-    const size_t num, const double period,
-    std::vector<apollo::common::TrajectoryPoint>* points);
+    const std::size_t num, const double period,
+    std::vector<common::TrajectoryPoint>* points);
 
 /**
  * @brief Adjust a speed value according to a curvature. If the input speed

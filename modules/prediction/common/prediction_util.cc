@@ -34,7 +34,9 @@ double Normalize(const double value, const double mean, const double std) {
   return (value - mean) / (std + eps);
 }
 
-double Sigmoid(const double value) { return 1 / (1 + std::exp(-1.0 * value)); }
+double Sigmoid(const double value) {
+  return 1.0 / (1.0 + std::exp(-1.0 * value));
+}
 
 double Relu(const double value) { return (value > 0.0) ? value : 0.0; }
 
@@ -43,9 +45,9 @@ int SolveQuadraticEquation(const std::vector<double>& coefficients,
   if (coefficients.size() != 3) {
     return -1;
   }
-  const double a = coefficients[0];
-  const double b = coefficients[1];
-  const double c = coefficients[2];
+  const double& a = coefficients[0];
+  const double& b = coefficients[1];
+  const double& c = coefficients[2];
   if (std::fabs(a) <= std::numeric_limits<double>::epsilon()) {
     return -1;
   }
@@ -55,8 +57,9 @@ int SolveQuadraticEquation(const std::vector<double>& coefficients,
     return -1;
   }
 
-  roots->first = (0.0 - b + std::sqrt(delta)) / (2.0 * a);
-  roots->second = (0.0 - b - std::sqrt(delta)) / (2.0 * a);
+  double sqrt_delta = std::sqrt(delta);
+  roots->first = (-b + sqrt_delta) * 0.5 / a;
+  roots->second = (-b - sqrt_delta) * 0.5 / a;
   return 0;
 }
 
@@ -153,8 +156,8 @@ double EvaluateQuarticPolynomial(
 
 namespace predictor_util {
 
-using ::apollo::common::PathPoint;
-using ::apollo::common::TrajectoryPoint;
+using apollo::common::PathPoint;
+using apollo::common::TrajectoryPoint;
 
 void TranslatePoint(const double translate_x, const double translate_y,
                     TrajectoryPoint* point) {
@@ -171,7 +174,7 @@ void TranslatePoint(const double translate_x, const double translate_y,
 void GenerateFreeMoveTrajectoryPoints(
     Eigen::Matrix<double, 6, 1>* state,
     const Eigen::Matrix<double, 6, 6>& transition, double theta,
-    const size_t num, const double period,
+    const std::size_t num, const double period,
     std::vector<TrajectoryPoint>* points) {
   double x = (*state)(0, 0);
   double y = (*state)(1, 0);
@@ -180,7 +183,7 @@ void GenerateFreeMoveTrajectoryPoints(
   double acc_x = (*state)(4, 0);
   double acc_y = (*state)(5, 0);
 
-  for (size_t i = 0; i < num; ++i) {
+  for (std::size_t i = 0; i < num; ++i) {
     double speed = std::hypot(v_x, v_y);
     double acc = 0.0;
     if (speed <= std::numeric_limits<double>::epsilon()) {
@@ -230,7 +233,7 @@ void GenerateFreeMoveTrajectoryPoints(
     trajectory_point.mutable_path_point()->CopyFrom(path_point);
     trajectory_point.set_v(speed);
     trajectory_point.set_a(acc);
-    trajectory_point.set_relative_time(static_cast<double>(i) * period);
+    trajectory_point.set_relative_time(i * period);
     points->emplace_back(std::move(trajectory_point));
 
     // Update position, velocity and acceleration
@@ -249,7 +252,7 @@ double AdjustSpeedByCurvature(const double speed, const double curvature) {
     return speed;
   }
   if (std::abs(curvature) > FLAGS_turning_curvature_upper_bound) {
-    return 3.0;
+    return FLAGS_speed_at_upper_curvature;
   }
   return apollo::common::math::lerp(FLAGS_speed_at_lower_curvature,
                                     FLAGS_turning_curvature_lower_bound,
