@@ -21,6 +21,7 @@
 #ifndef MODULES_DREAMVIEW_BACKEND_SIMULATION_WORLD_SIM_WORLD_UPDATER_H_
 #define MODULES_DREAMVIEW_BACKEND_SIMULATION_WORLD_SIM_WORLD_UPDATER_H_
 
+#include <memory>
 #include <string>
 
 #include "boost/thread/locks.hpp"

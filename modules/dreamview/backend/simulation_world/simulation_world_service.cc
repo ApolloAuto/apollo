@@ -1051,6 +1051,27 @@ void SimulationWorldService::UpdateSimulationWorld(const MapMsg &map_msg) {
   }
 }
 
+template <>
+void SimulationWorldService::UpdateSimulationWorld(
+    const MonitorMessage &monitor_msg) {
+  const int updated_size = std::min(monitor_msg.item_size(),
+                                    SimulationWorldService::kMaxMonitorItems);
+  // Save the latest messages at the end of the history.
+  for (int idx = 0; idx < updated_size; ++idx) {
+    auto *notification = world_.add_notification();
+    notification->mutable_item()->CopyFrom(monitor_msg.item(idx));
+    notification->set_timestamp_sec(monitor_msg.header().timestamp_sec());
+  }
+
+  int remove_size =
+      world_.notification_size() - SimulationWorldService::kMaxMonitorItems;
+  if (remove_size > 0) {
+    auto *notifications = world_.mutable_notification();
+    notifications->erase(notifications->begin(),
+                         notifications->begin() + remove_size);
+  }
+}
+
 void SimulationWorldService::UpdateMonitorMessages() {
   std::list<std::shared_ptr<MonitorMessage>> monitor_msgs;
   {
@@ -1059,22 +1080,7 @@ void SimulationWorldService::UpdateMonitorMessages() {
   }
 
   for (const auto &monitor_msg : monitor_msgs) {
-    const int updated_size = std::min(monitor_msg->item_size(),
-                                      SimulationWorldService::kMaxMonitorItems);
-    // Save the latest messages at the end of the history.
-    for (int idx = 0; idx < updated_size; ++idx) {
-      auto *notification = world_.add_notification();
-      notification->mutable_item()->CopyFrom(monitor_msg->item(idx));
-      notification->set_timestamp_sec(monitor_msg->header().timestamp_sec());
-    }
-
-    int remove_size =
-        world_.notification_size() - SimulationWorldService::kMaxMonitorItems;
-    if (remove_size > 0) {
-      auto *notifications = world_.mutable_notification();
-      notifications->erase(notifications->begin(),
-                           notifications->begin() + remove_size);
-    }
+    UpdateSimulationWorld(*monitor_msg);
   }
 }
 
