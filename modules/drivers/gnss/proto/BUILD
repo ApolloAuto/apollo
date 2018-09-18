@@ -30,7 +30,7 @@ proto_library(
         "ins.proto",
     ],
     deps = [
-        "//modules/common/proto:common_proto_lib",
+        "//modules/common/proto:geometry_proto_lib",
         "//modules/common/proto:error_code_proto_lib",
         "//modules/common/proto:header_proto_lib",
     ],
@@ -47,7 +47,7 @@ proto_library(
     name = "gnss_raw_observation_lib",
     srcs = ["gnss_raw_observation.proto"],
     deps = [
-        "//modules/common/proto:common_proto_lib",
+        "//modules/common/proto:geometry_proto_lib",
         "//modules/common/proto:error_code_proto_lib",
         "//modules/common/proto:header_proto_lib",
     ],
@@ -64,7 +64,7 @@ proto_library(
     name = "gnss_best_pose_lib",
     srcs = ["gnss_best_pose.proto"],
     deps = [
-        "//modules/common/proto:common_proto_lib",
+        "//modules/common/proto:geometry_proto_lib",
         "//modules/common/proto:error_code_proto_lib",
         "//modules/common/proto:header_proto_lib",
     ],
@@ -95,7 +95,7 @@ proto_library(
     name = "imu_lib",
     srcs = ["imu.proto"],
     deps = [
-        "//modules/common/proto:common_proto_lib",
+        "//modules/common/proto:geometry_proto_lib",
         "//modules/common/proto:error_code_proto_lib",
         "//modules/common/proto:header_proto_lib",
     ],
@@ -114,7 +114,7 @@ proto_library(
         "gnss_status.proto",
     ],
     deps = [
-        "//modules/common/proto:common_proto_lib",
+        "//modules/common/proto:geometry_proto_lib",
         "//modules/common/proto:error_code_proto_lib",
         "//modules/common/proto:header_proto_lib",
     ],
@@ -133,7 +133,7 @@ proto_library(
         "gnss.proto",
     ],
     deps = [
-        "//modules/common/proto:common_proto_lib",
+        "//modules/common/proto:geometry_proto_lib",
         "//modules/common/proto:error_code_proto_lib",
         "//modules/common/proto:header_proto_lib",
     ],
@@ -152,7 +152,7 @@ proto_library(
         "heading.proto",
     ],
     deps = [
-        "//modules/common/proto:common_proto_lib",
+        "//modules/common/proto:geometry_proto_lib",
         "//modules/common/proto:error_code_proto_lib",
         "//modules/common/proto:header_proto_lib",
     ],

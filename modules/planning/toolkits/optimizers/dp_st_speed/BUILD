@@ -48,7 +48,7 @@ cc_library(
         "//framework:cybertron",
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/configs/proto:vehicle_config_proto",
-        "//modules/common/proto:common_proto",
+        "//modules/common/proto:geometry_proto",
         "//modules/common/proto:pnc_point_proto",
         "//modules/common/status",
         "//modules/planning/common:path_decision",

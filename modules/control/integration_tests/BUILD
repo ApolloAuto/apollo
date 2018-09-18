@@ -12,7 +12,7 @@ package(default_visibility = ["//visibility:public"])
 #    ],
 #    deps = [
 #        "//framework:cybertron",
-#        "//modules/common/proto:common_proto",
+#        "//modules/common/proto:geometry_proto",
 #        "//modules/common/time",
 #        "//modules/control:control_lib",
 #        "//modules/control/common:control_gflags",

@@ -88,7 +88,7 @@ cc_library(
     deps = [
         ":euler_angles_zxy",
         ":geometry",
-        "//modules/common/proto:common_proto",
+        "//modules/common/proto:geometry_proto",
         "@eigen",
     ],
 )

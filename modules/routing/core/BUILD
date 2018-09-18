@@ -20,7 +20,7 @@ cc_library(
     deps = [
         ":routing_black_list_range_generator",
         ":routing_result_generator",
-        "//modules/common/proto:common_proto",
+        "//modules/common/proto:geometry_proto",
         "//modules/common/time",
         "//modules/common/util",
         "//modules/routing/common:routing_gflags",

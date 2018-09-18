@@ -13,7 +13,7 @@ proto_library(
         "radar_obstacle.proto",
     ],
     deps = [
-        "//modules/common/proto:common_proto_lib",
+        "//modules/common/proto:geometry_proto_lib",
         "//modules/common/proto:error_code_proto_lib",
         "//modules/common/proto:header_proto_lib",
         "//modules/perception/proto:perception_proto_lib",

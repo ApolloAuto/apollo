@@ -13,7 +13,7 @@ proto_library(
     name = "localization_config_proto_lib",
     srcs = ["localization_config.proto"],
     deps = [
-        "//modules/common/proto:common_proto_lib",
+        "//modules/common/proto:geometry_proto_lib",
     ],
 )
 
@@ -28,7 +28,7 @@ proto_library(
     name = "pose_proto_lib",
     srcs = ["pose.proto"],
     deps = [
-        "//modules/common/proto:common_proto_lib",
+        "//modules/common/proto:geometry_proto_lib",
     ],
 )
 
@@ -60,7 +60,7 @@ proto_library(
     srcs = ["imu.proto"],
     deps = [
         ":pose_proto_lib",
-        "//modules/common/proto:common_proto_lib",
+        "//modules/common/proto:geometry_proto_lib",
         "//modules/common/proto:header_proto_lib",
     ],
 )
@@ -77,7 +77,7 @@ proto_library(
     srcs = ["localization.proto"],
     deps = [
         ":pose_proto_lib",
-        "//modules/common/proto:common_proto_lib",
+        "//modules/common/proto:geometry_proto_lib",
         "//modules/common/proto:header_proto_lib",
         "//modules/common/proto:pnc_point_proto_lib",
     ],
@@ -94,7 +94,7 @@ proto_library(
     name = "measure_proto_lib",
     srcs = ["measure.proto"],
     deps = [
-        "//modules/common/proto:common_proto_lib",
+        "//modules/common/proto:geometry_proto_lib",
         "//modules/common/proto:header_proto_lib",
     ],
 )
@@ -110,7 +110,7 @@ proto_library(
     name = "sins_pva_proto_lib",
     srcs = ["sins_pva.proto"],
     deps = [
-        "//modules/common/proto:common_proto_lib",
+        "//modules/common/proto:geometry_proto_lib",
         "//modules/common/proto:header_proto_lib",
     ],
 )

@@ -16,7 +16,7 @@ cc_library(
     deps = [
         "//modules/common",
         "//modules/common/monitor_log",
-        "//modules/common/proto:common_proto",
+        "//modules/common/proto:geometry_proto",
         "//modules/common/status",
         "//modules/common/time",
         "//modules/common/util",

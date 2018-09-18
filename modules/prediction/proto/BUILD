@@ -30,7 +30,7 @@ proto_library(
         "prediction_conf.proto",
     ],
     deps = [
-        "//modules/common/proto:common_proto_lib",
+        "//modules/common/proto:geometry_proto_lib",
         "//modules/perception/proto:perception_proto_lib",
     ],
 )
@@ -48,7 +48,7 @@ proto_library(
         "prediction_obstacle.proto",
     ],
     deps = [
-        "//modules/common/proto:common_proto_lib",
+        "//modules/common/proto:geometry_proto_lib",
         "//modules/common/proto:error_code_proto_lib",
         "//modules/common/proto:header_proto_lib",
         "//modules/common/proto:pnc_point_proto_lib",
@@ -70,7 +70,7 @@ proto_library(
         "lane_graph.proto",
     ],
     deps = [
-        "//modules/common/proto:common_proto_lib",
+        "//modules/common/proto:geometry_proto_lib",
         "//modules/common/proto:pnc_point_proto_lib",
     ],
 )
@@ -88,7 +88,7 @@ proto_library(
         "feature.proto",
     ],
     deps = [
-        "//modules/common/proto:common_proto_lib",
+        "//modules/common/proto:geometry_proto_lib",
         "//modules/perception/proto:perception_proto_lib",
         "//modules/prediction/proto:lane_graph_proto_lib",
     ],

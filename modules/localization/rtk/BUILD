@@ -18,7 +18,7 @@ cc_library(
         "//modules/common/time",
         "//modules/common/math",
         "//modules/common/util:message_util",
-        "//modules/common/proto:common_proto",
+        "//modules/common/proto:geometry_proto",
         "//modules/localization/proto:localization_proto",
         "//modules/localization/proto:rtk_config_proto",
         "//modules/localization/proto:gps_proto",
