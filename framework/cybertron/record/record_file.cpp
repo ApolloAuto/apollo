@@ -116,7 +116,7 @@ bool RecordFileReader::ReadSection(Section* section) {
   }
   ifstream_.read(reinterpret_cast<char*>(section), sizeof(*section));
   if (ifstream_.eof()) {
-    AERROR << "input file stream is eof, file: " << path_;
+    AINFO << "input file stream is eof, file: " << path_;
     return false;
   }
   if (ifstream_.gcount() != sizeof(*section)) {

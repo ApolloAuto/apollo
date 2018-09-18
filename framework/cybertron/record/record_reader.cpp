@@ -30,11 +30,14 @@ RecordReader::~RecordReader() {
 }
 
 bool RecordReader::Open(const std::string& file, uint64_t begin_time,
-                        uint64_t end_time) {
+                        uint64_t end_time,
+                        const std::vector<std::string>& channel_vec) {
   file_ = file;
   path_ = file_;
   begin_time_ = begin_time;
   end_time_ = end_time;
+  channel_vec_ = channel_vec;
+  all_channels_ = channel_vec_.empty() ? true : false;
   file_reader_.reset(new RecordFileReader());
   current_message_.reset(new RecordMessage());
 
@@ -174,6 +177,11 @@ void RecordReader::LoadChunk(uint64_t from_time, uint64_t to_time) {
               continue;
             }
             std::string channel_name(cbd.messages(idx).channel_name());
+            if (!all_channels_ &&
+                std::find(channel_vec_.begin(), channel_vec_.end(),
+                          channel_name) == channel_vec_.end()) {
+              continue;
+            }
             std::shared_ptr<RawMessage> raw_message(
                 new RawMessage(cbd.messages(idx).content()));
             std::shared_ptr<RecordMessage> message_queue_item(new RecordMessage(

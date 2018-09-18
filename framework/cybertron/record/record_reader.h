@@ -40,11 +40,14 @@ class RecordReader : public RecordBase {
  public:
   RecordReader();
   virtual ~RecordReader();
-  bool Open(const std::string& filename, uint64_t begin_time = 0,
-            uint64_t end_time = UINT64_MAX);
+  bool Open(
+      const std::string& filename, uint64_t begin_time = 0,
+      uint64_t end_time = UINT64_MAX,
+      const std::vector<std::string>& channel_vec = std::vector<std::string>());
   void Close();
   bool ReadMessage();
   bool EndOfFile();
+
   const std::string& CurrentMessageChannelName();
   std::shared_ptr<RawMessage> CurrentRawMessage();
   uint64_t CurrentMessageTime();
@@ -53,6 +56,7 @@ class RecordReader : public RecordBase {
   bool InitLoadThread();
   void LoadChunk(uint64_t from_time, uint64_t to_time);
 
+  bool all_channels_ = false;
   bool looped_readback_ = false;
   bool loaded_all_message_ = false;
   uint64_t begin_time_ = 0;
@@ -61,6 +65,7 @@ class RecordReader : public RecordBase {
   uint32_t min_queue_size_ = 2000;
   std::unique_ptr<RecordFileReader> file_reader_ = nullptr;
   std::shared_ptr<std::thread> load_thread_ = nullptr;
+  std::vector<std::string> channel_vec_;
 
   struct RecordMessage {
    public:

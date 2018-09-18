@@ -30,12 +30,15 @@ namespace apollo {
 namespace cybertron {
 namespace record {
 
-const char CHANNEL_NAME[] = "/test/channel1";
+const char CHANNEL_NAME_1[] = "/test/channel1";
+const char CHANNEL_NAME_2[] = "/test/channel2";
 const char MESSAGE_TYPE[] = "apollo.cybertron.proto.Test";
 const char PROTO_DESC[] = "1234567890";
 const char STR_10B[] = "1234567890";
 const char TEST_FILE[] = "test.record";
-const uint64_t TIME = 1e9;
+const uint64_t TIME_1 = 1000 * 1e6;
+const uint64_t TIME_2 = 1010 * 1e6;
+const uint64_t TIME_3 = 1020 * 1e6;
 
 TEST(RecordTest, TestOneMessageFile) {
   // writer
@@ -51,14 +54,14 @@ TEST(RecordTest, TestOneMessageFile) {
   ASSERT_EQ(TEST_FILE, rw->path_);
   ASSERT_TRUE(rw->file_writer_->ofstream_.is_open());
 
-  ASSERT_TRUE(rw->WriteChannel(CHANNEL_NAME, MESSAGE_TYPE, PROTO_DESC));
-  ASSERT_EQ(0, rw->GetMessageNumber(CHANNEL_NAME));
-  ASSERT_EQ(MESSAGE_TYPE, rw->GetMessageType(CHANNEL_NAME));
-  ASSERT_EQ(PROTO_DESC, rw->GetProtoDesc(CHANNEL_NAME));
+  ASSERT_TRUE(rw->WriteChannel(CHANNEL_NAME_1, MESSAGE_TYPE, PROTO_DESC));
+  ASSERT_EQ(0, rw->GetMessageNumber(CHANNEL_NAME_1));
+  ASSERT_EQ(MESSAGE_TYPE, rw->GetMessageType(CHANNEL_NAME_1));
+  ASSERT_EQ(PROTO_DESC, rw->GetProtoDesc(CHANNEL_NAME_1));
 
   std::shared_ptr<RawMessage> rm(new RawMessage(STR_10B));
-  ASSERT_TRUE(rw->WriteMessage(CHANNEL_NAME, rm, TIME));
-  ASSERT_EQ(1, rw->GetMessageNumber(CHANNEL_NAME));
+  ASSERT_TRUE(rw->WriteMessage(CHANNEL_NAME_1, rm, TIME_1));
+  ASSERT_EQ(1, rw->GetMessageNumber(CHANNEL_NAME_1));
 
   delete rw;
 
@@ -84,9 +87,79 @@ TEST(RecordTest, TestOneMessageFile) {
   ASSERT_FALSE(rr->EndOfFile());
   ASSERT_TRUE(rr->ReadMessage());
 
-  ASSERT_EQ(CHANNEL_NAME, rr->CurrentMessageChannelName());
+  ASSERT_EQ(CHANNEL_NAME_1, rr->CurrentMessageChannelName());
   ASSERT_EQ(STR_10B, rr->CurrentRawMessage()->message);
-  ASSERT_EQ(TIME, rr->CurrentMessageTime());
+  ASSERT_EQ(TIME_1, rr->CurrentMessageTime());
+
+  ASSERT_TRUE(rr->EndOfFile());
+  ASSERT_FALSE(rr->ReadMessage());
+
+  delete rr;
+}
+
+TEST(RecordTest, TestMutiMessageFile) {
+  // writer
+  RecordWriter* rw = new RecordWriter();
+  ASSERT_FALSE(rw->is_opened_);
+  ASSERT_EQ("", rw->file_);
+  ASSERT_EQ("", rw->path_);
+  ASSERT_EQ(nullptr, rw->file_writer_);
+
+  ASSERT_TRUE(rw->Open(TEST_FILE));
+  ASSERT_TRUE(rw->is_opened_);
+  ASSERT_EQ(TEST_FILE, rw->file_);
+  ASSERT_EQ(TEST_FILE, rw->path_);
+  ASSERT_TRUE(rw->file_writer_->ofstream_.is_open());
+
+  ASSERT_TRUE(rw->WriteChannel(CHANNEL_NAME_1, MESSAGE_TYPE, PROTO_DESC));
+  ASSERT_EQ(0, rw->GetMessageNumber(CHANNEL_NAME_1));
+  ASSERT_EQ(MESSAGE_TYPE, rw->GetMessageType(CHANNEL_NAME_1));
+  ASSERT_EQ(PROTO_DESC, rw->GetProtoDesc(CHANNEL_NAME_1));
+
+  ASSERT_TRUE(rw->WriteChannel(CHANNEL_NAME_2, MESSAGE_TYPE, PROTO_DESC));
+  ASSERT_EQ(0, rw->GetMessageNumber(CHANNEL_NAME_2));
+  ASSERT_EQ(MESSAGE_TYPE, rw->GetMessageType(CHANNEL_NAME_2));
+  ASSERT_EQ(PROTO_DESC, rw->GetProtoDesc(CHANNEL_NAME_2));
+
+  std::shared_ptr<RawMessage> rm(new RawMessage(STR_10B));
+  ASSERT_TRUE(rw->WriteMessage(CHANNEL_NAME_1, rm, TIME_1));
+  ASSERT_EQ(1, rw->GetMessageNumber(CHANNEL_NAME_1));
+
+  ASSERT_TRUE(rw->WriteMessage(CHANNEL_NAME_2, rm, TIME_2));
+  ASSERT_EQ(1, rw->GetMessageNumber(CHANNEL_NAME_2));
+
+  ASSERT_TRUE(rw->WriteMessage(CHANNEL_NAME_1, rm, TIME_3));
+  ASSERT_EQ(2, rw->GetMessageNumber(CHANNEL_NAME_1));
+
+  delete rw;
+
+  // reader
+  RecordReader* rr = new RecordReader();
+  ASSERT_FALSE(rr->is_opened_);
+  ASSERT_EQ("", rr->file_);
+  ASSERT_EQ("", rr->path_);
+  ASSERT_EQ(nullptr, rr->file_reader_);
+
+  std::vector<std::string> channel_vec = std::vector<std::string>();
+  channel_vec.push_back(CHANNEL_NAME_2);
+  ASSERT_TRUE(rr->Open(TEST_FILE, TIME_1, TIME_2, channel_vec));
+  ASSERT_TRUE(rr->is_opened_);
+  ASSERT_EQ(TEST_FILE, rr->file_);
+  ASSERT_EQ(TEST_FILE, rr->path_);
+  ASSERT_TRUE(rr->file_reader_->ifstream_.is_open());
+
+  sleep(1);
+
+  ASSERT_EQ("", rr->CurrentMessageChannelName());
+  ASSERT_EQ("", rr->CurrentRawMessage()->message);
+  ASSERT_EQ(0, rr->CurrentMessageTime());
+
+  ASSERT_FALSE(rr->EndOfFile());
+  ASSERT_TRUE(rr->ReadMessage());
+
+  ASSERT_EQ(CHANNEL_NAME_2, rr->CurrentMessageChannelName());
+  ASSERT_EQ(STR_10B, rr->CurrentRawMessage()->message);
+  ASSERT_EQ(TIME_2, rr->CurrentMessageTime());
 
   ASSERT_TRUE(rr->EndOfFile());
   ASSERT_FALSE(rr->ReadMessage());
