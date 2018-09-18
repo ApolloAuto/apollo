@@ -53,6 +53,7 @@
 #include "modules/drivers/gnss/proto/gnss_status.pb.h"
 #include "modules/drivers/gnss/proto/imu.pb.h"
 #include "modules/drivers/gnss/proto/ins.pb.h"
+#include "modules/drivers/proto/pointcloud.pb.h"
 
 namespace apollo {
 namespace tools {

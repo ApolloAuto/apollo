@@ -75,7 +75,7 @@ target_link_libraries(cybertron
   PocoFoundation
   -Wl,--no-undefined
   atomic
-  tf2
+  tf2_core
   -luuid
  )
 
