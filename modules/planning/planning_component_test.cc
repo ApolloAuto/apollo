@@ -269,7 +269,7 @@ TEST_F(PlanningComponentTest, garage_stop_obstacle) {
   FLAGS_test_localization_file = "stop_obstacle_localization.pb.txt";
   FLAGS_test_chassis_file = "stop_obstacle_chassis.pb.txt";
 
-  bool run_planning_success = RunPlanning("stop_obstacle");
+  bool run_planning_success = RunPlanning("planning_componnet_stop_obstacle");
   EXPECT_TRUE(run_planning_success);
 }
 

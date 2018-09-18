@@ -18,9 +18,7 @@
 
 #include <cstdlib>
 
-#include "cybertron/cybertron.h"
-#include "cybertron/time/rate.h"
-#include "cybertron/time/time.h"
+#include "cybertron/common/log.h"
 
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/planning/common/planning_gflags.h"
@@ -75,82 +73,62 @@ void PlanningTestBase::SetUpTestCase() {
   FLAGS_enable_lag_prediction = false;
 }
 
-void PlanningTestBase::SetupCybertron() {
-  Clock::SetMode(Clock::CYBERTRON);
-
-  std::shared_ptr<apollo::cybertron::Node> node(
-      apollo::cybertron::CreateNode("planning_tester"));
-
-  config_.set_name("planning_test");
-  // note: the sequence to add_readers() must be the same
-  //       as what's in PlanningComponent::Proc()
-  config_.add_readers()->set_channel(FLAGS_prediction_topic);
-  config_.add_readers()->set_channel(FLAGS_chassis_topic);
-  config_.add_readers()->set_channel(FLAGS_localization_topic);
-
-  chassis_writer_ = node->CreateWriter<Chassis>(FLAGS_chassis_topic);
-  localization_writer_ = node->CreateWriter<LocalizationEstimate>(
-      FLAGS_localization_topic);
-  prediction_writer_ = node->CreateWriter<PredictionObstacles>(
-      FLAGS_prediction_topic);
-  routing_response_writer_ = node->CreateWriter<RoutingResponse>(
-      FLAGS_routing_response_topic);
-  traffic_light_detection_writer_ =
-      node->CreateWriter<TrafficLightDetection>(
-          FLAGS_traffic_light_detection_topic);
-
-  planning_reader_ = node->CreateReader<ADCTrajectory>(
-      FLAGS_planning_trajectory_topic,
-      [this](const std::shared_ptr<ADCTrajectory>& adc_trajectory) {
-        ADEBUG << "Received planning data: run planning callback.";
-        std::lock_guard<std::mutex> lock(mutex_);
-        adc_trajectory_.CopyFrom(*adc_trajectory);
-      });
-}
-
 bool PlanningTestBase::FeedTestData() {
   // chassis
+  Chassis chassis;
   if (!apollo::common::util::GetProtoFromFile(
-          FLAGS_test_data_dir + "/" + FLAGS_test_chassis_file, &chassis_)) {
+          FLAGS_test_data_dir + "/" + FLAGS_test_chassis_file, &chassis)) {
     AERROR << "failed to load file: " << FLAGS_test_chassis_file;
     return -1;
   }
   // localization
+  LocalizationEstimate localization;
   if (!apollo::common::util::GetProtoFromFile(
           FLAGS_test_data_dir + "/" + FLAGS_test_localization_file,
-          &localization_)) {
+          &localization)) {
     AERROR << "failed to load file: " << FLAGS_test_localization_file;
     return -1;
   }
   // prediction
+  PredictionObstacles prediction;
   if (!apollo::common::util::GetProtoFromFile(
           FLAGS_test_data_dir + "/" + FLAGS_test_prediction_file,
-          &prediction_)) {
+          &prediction)) {
     AERROR << "failed to load file: " << FLAGS_test_prediction_file;
     return -1;
   }
   // routing_response
+  RoutingResponse routing_response;
   if (!apollo::common::util::GetProtoFromFile(
           FLAGS_test_data_dir + "/" + FLAGS_test_routing_response_file,
-          &routing_response_)) {
+          &routing_response)) {
     AERROR << "failed to load file: " << FLAGS_test_routing_response_file;
     return -1;
   }
   // traffic_light_detection
+  TrafficLightDetection traffic_light_detection;
   if (!apollo::common::util::GetProtoFromFile(
           FLAGS_test_data_dir + "/" + FLAGS_test_traffic_light_file,
-          &traffic_light_detection_)) {
+          &traffic_light_detection)) {
     AERROR << "failed to load file: " << FLAGS_test_traffic_light_file;
     return -1;
   }
+
+  local_view_.prediction_obstacles =
+      std::make_shared<PredictionObstacles>(prediction);
+  local_view_.chassis = std::make_shared<Chassis>(chassis);
+  local_view_.localization_estimate =
+      std::make_shared<LocalizationEstimate>(localization);
+  local_view_.routing =
+      std::make_shared<routing::RoutingResponse>(routing_response);
+  local_view_.traffic_light =
+      std::make_shared<TrafficLightDetection>(traffic_light_detection);
 
   AINFO << "Successfully feed proto files.";
   return true;
 }
 
 void PlanningTestBase::SetUp() {
-  SetupCybertron();
-
   if (FLAGS_use_navigation_mode) {
     // TODO(all)
     // planning_ = std::unique_ptr<PlanningBase>(new NaviPlanning());
@@ -224,25 +202,15 @@ bool PlanningTestBase::RunPlanning(const std::string& test_case_name,
 
   std::string full_golden_path = FLAGS_test_data_dir + "/" + golden_result_file;
 
-  planning_component_.reset(new PlanningComponent());
-  planning_component_->Initialize(config_);
+  ADCTrajectory adc_trajectory_pb;
+  planning_->RunOnce(local_view_, &adc_trajectory_pb);
 
-  usleep(1000);  // sleep 1ms
-
-  routing_response_writer_->Write(routing_response_);
-  traffic_light_detection_writer_->Write(traffic_light_detection_);
-  chassis_writer_->Write(chassis_);
-  localization_writer_->Write(localization_);
-  // note: main channel must be written last
-  prediction_writer_->Write(prediction_);
-
-  usleep(300000);  // sleep 300ms
-
-  if (!IsValidTrajectory(adc_trajectory_)) {
+  if (!IsValidTrajectory(adc_trajectory_pb)) {
     AERROR << "Fail to pass trajectory check.";
     return false;
   }
 
+  adc_trajectory_ = adc_trajectory_pb;
   TrimPlanning(&adc_trajectory_, no_trajectory_point);
   if (FLAGS_test_update_golden_log) {
     AINFO << "The golden file is regenerated:" << full_golden_path;
