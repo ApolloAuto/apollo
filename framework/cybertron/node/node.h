@@ -108,8 +108,12 @@ auto Node::CreateWriter(const std::string& channel_name)
 template <typename MessageT>
 auto Node::CreateReader(const proto::RoleAttributes& role_attr)
     -> std::shared_ptr<Reader<MessageT>> {
-  auto reader = node_channel_impl_->template CreateReader<MessageT>(role_attr);
   std::lock_guard<std::mutex> lg(readers_mutex_);
+  if (readers_.find(role_attr.channel_name()) != readers_.end()) {
+    AWARN << "Failed to create reader: reader with the same channel already exists.";
+    return nullptr;
+  }
+  auto reader = node_channel_impl_->template CreateReader<MessageT>(role_attr);
   readers_.emplace(std::make_pair(role_attr.channel_name(), reader));
   return reader;
 }
@@ -118,9 +122,13 @@ template <typename MessageT>
 auto Node::CreateReader(const proto::RoleAttributes& role_attr,
                         const CallbackFunc<MessageT>& reader_func)
     -> std::shared_ptr<Reader<MessageT>> {
+  std::lock_guard<std::mutex> lg(readers_mutex_);
+  if (readers_.find(role_attr.channel_name()) != readers_.end()) {
+    AWARN << "Failed to create reader: reader with the same channel already exists.";
+    return nullptr;
+  }
   auto reader = node_channel_impl_->template CreateReader<MessageT>(
       role_attr, reader_func);
-  std::lock_guard<std::mutex> lg(readers_mutex_);
   readers_.emplace(std::make_pair(role_attr.channel_name(), reader));
   return reader;
 }
@@ -129,9 +137,13 @@ template <typename MessageT>
 auto Node::CreateReader(const std::string& channel_name,
                         const CallbackFunc<MessageT>& reader_func)
     -> std::shared_ptr<Reader<MessageT>> {
+  std::lock_guard<std::mutex> lg(readers_mutex_);
+  if (readers_.find(channel_name) != readers_.end()) {
+    AWARN << "Failed to create reader: reader with the same channel already exists.";
+    return nullptr;
+  }
   auto reader = node_channel_impl_->template CreateReader<MessageT>(
       channel_name, reader_func);
-  std::lock_guard<std::mutex> lg(readers_mutex_);
   readers_.emplace(std::make_pair(channel_name, reader));
   return reader;
 }
