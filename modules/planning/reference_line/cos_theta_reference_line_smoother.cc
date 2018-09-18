@@ -159,7 +159,7 @@ bool CosThetaReferenceLineSmoother::Smooth(
   Ipopt::ApplicationReturnStatus status = app->Initialize();
   if (status != Ipopt::Solve_Succeeded) {
     AINFO << "*** Error during initialization!";
-    return static_cast<int>(status);
+    return false;
   }
 
   status = app->OptimizeTNLP(problem);
