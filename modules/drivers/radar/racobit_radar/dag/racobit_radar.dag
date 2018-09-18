@@ -1,0 +1,10 @@
+module_config {
+    module_library : "/apollo/bazel-bin/modules/drivers/radar/racobit_radar/libracobit_radar_canbus_component.so"
+    components {
+        class_name : "RacobitRadarCanbusComponent"
+        config {
+            name: "racobit_radar"
+            config_file_path:  "/apollo/modules/drivers/radar/racobit_radar/conf/racobit_radar_conf.pb.txt"
+        }
+    }
+}

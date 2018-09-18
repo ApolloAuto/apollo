@@ -20,8 +20,8 @@
 
 #include "Eigen/Geometry"
 
-#include "modules/drivers/radar/conti_radar/conti_radar_canbus_component.h"
 #include "modules/drivers/proto/conti_radar.pb.h"
+#include "modules/drivers/radar/conti_radar/conti_radar_canbus_component.h"
 #include "modules/drivers/radar/conti_radar/conti_radar_message_manager.h"
 
 /**
@@ -58,7 +58,7 @@ bool ContiRadarCanbusComponent::Init() {
       conti_radar_conf_.radar_conf().channel_name());
   pose_reader_ = node_->CreateReader<LocalizationEstimate>(
       conti_radar_conf_.radar_conf().pose_channel_name(),
-      [&](const std::shared_ptr<LocalizationEstimate>& pose){
+      [&](const std::shared_ptr<LocalizationEstimate>& pose) {
         PoseCallback(pose);
       });
 
@@ -120,7 +120,7 @@ void ContiRadarCanbusComponent::Stop() {
 }
 
 // Send the error to monitor and return it
-bool ContiRadarCanbusComponent::OnError(const std::string &error_msg) {
+bool ContiRadarCanbusComponent::OnError(const std::string& error_msg) {
   monitor_logger_buffer_.ERROR(error_msg);
   AERROR << error_msg;
   return false;
@@ -135,31 +135,28 @@ void ContiRadarCanbusComponent::PoseCallback(
   }
   last_nsec_ = now_nsec;
   Eigen::Quaterniond orientation_vehicle_world(
-      pose_msg->pose().orientation().qw(),
-      pose_msg->pose().orientation().qx(),
-      pose_msg->pose().orientation().qy(),
-      pose_msg->pose().orientation().qz());
+      pose_msg->pose().orientation().qw(), pose_msg->pose().orientation().qx(),
+      pose_msg->pose().orientation().qy(), pose_msg->pose().orientation().qz());
   Eigen::Matrix3d rotation_matrix =
       orientation_vehicle_world.toRotationMatrix().inverse();
   Eigen::Vector3d speed_v(pose_msg->pose().linear_velocity().x(),
-      pose_msg->pose().linear_velocity().y(),
-      pose_msg->pose().linear_velocity().z());
+                          pose_msg->pose().linear_velocity().y(),
+                          pose_msg->pose().linear_velocity().z());
   float speed = (rotation_matrix * speed_v).y();
-  float yaw_rate = pose_msg->pose().angular_velocity().z()
-                    * 180 / M_PI;
+  float yaw_rate = pose_msg->pose().angular_velocity().z() * 180 / M_PI;
 
   AINFO << "radar speed:" << speed << ";yaw rate:" << yaw_rate;
   MotionInputSpeed300 input_speed;
   input_speed.SetSpeed(speed);
-  SenderMessage<ContiRadar> sender_message_speed(
-      MotionInputSpeed300::ID, &input_speed);
+  SenderMessage<ContiRadar> sender_message_speed(MotionInputSpeed300::ID,
+                                                 &input_speed);
   sender_message_speed.Update();
   can_client_->SendSingleFrame({sender_message_speed.CanFrame()});
 
   MotionInputYawRate301 input_yawrate;
   input_yawrate.SetYawRate(yaw_rate);
-  SenderMessage<ContiRadar> sender_message_yawrate(
-      MotionInputYawRate301::ID, &input_yawrate);
+  SenderMessage<ContiRadar> sender_message_yawrate(MotionInputYawRate301::ID,
+                                                   &input_yawrate);
   sender_message_yawrate.Update();
   can_client_->SendSingleFrame({sender_message_yawrate.CanFrame()});
 }

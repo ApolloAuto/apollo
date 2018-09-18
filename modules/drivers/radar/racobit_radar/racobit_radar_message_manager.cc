@@ -21,6 +21,7 @@
 
 #include "modules/drivers/radar/racobit_radar/racobit_radar_message_manager.h"
 
+#include "modules/common/util/message_util.h"
 #include "modules/drivers/radar/racobit_radar/protocol/cluster_general_info_701.h"
 #include "modules/drivers/radar/racobit_radar/protocol/cluster_list_status_600.h"
 #include "modules/drivers/radar/racobit_radar/protocol/cluster_quality_info_702.h"
@@ -34,9 +35,9 @@ namespace apollo {
 namespace drivers {
 namespace racobit_radar {
 
-using ::apollo::common::adapter::AdapterManager;
-
-RacobitRadarMessageManager::RacobitRadarMessageManager() {
+RacobitRadarMessageManager::RacobitRadarMessageManager(
+    std::shared_ptr<cybertron::Writer<RacobitRadar>> writer)
+    : writer_(std::move(writer)) {
   AddRecvProtocolData<RadarState201, true>();
   AddRecvProtocolData<ClusterListStatus600, true>();
   AddRecvProtocolData<ClusterGeneralInfo701, true>();
@@ -83,6 +84,8 @@ void RacobitRadarMessageManager::Parse(const uint32_t message_id,
     return;
   }
 
+  common::util::FillHeader(FLAGS_sensor_node_name, &sensor_data_);
+
   // trigger publishment
   if (message_id == ClusterListStatus600::ID ||
       message_id == ObjectListStatus60A::ID) {
@@ -91,12 +94,10 @@ void RacobitRadarMessageManager::Parse(const uint32_t message_id,
     if (sensor_data_.contiobs_size() <=
         sensor_data_.object_list_status().nof_objects()) {
       // maybe lost a object_list_status msg
-      AdapterManager::PublishRacobitRadar(sensor_data_);
+      writer_->Write(sensor_data_);
     }
     sensor_data_.Clear();
     // fill header when recieve the general info message
-    AdapterManager::FillRacobitRadarHeader(FLAGS_sensor_node_name,
-                                           &sensor_data_);
   }
 
   sensor_protocol_data->Parse(data, length, &sensor_data_);
