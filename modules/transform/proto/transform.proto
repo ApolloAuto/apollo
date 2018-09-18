@@ -1,0 +1,23 @@
+syntax = "proto2";
+
+package apollo.transform;
+
+import "modules/common/proto/header.proto";
+import "modules/common/proto/geometry.proto";
+
+
+message Transform {
+    required apollo.common.Point3D translation = 1;
+    required apollo.common.Quaternion rotation = 2;
+}
+
+message TransformStamped {
+    optional apollo.common.Header header = 1;
+    required string child_frame_id = 2;
+    required Transform transform = 3;
+}
+
+message TransformStampeds {
+    optional apollo.common.Header header = 1;
+    repeated TransformStamped transforms = 2;
+}
