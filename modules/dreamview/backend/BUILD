@@ -15,7 +15,7 @@ cc_library(
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/status",
         "//modules/dreamview/backend/handlers:websocket_handler",
-        # "//modules/dreamview/backend/hmi",
+        "//modules/dreamview/backend/hmi",
         "//modules/dreamview/backend/map:map_service",
         # "//modules/dreamview/backend/point_cloud:point_cloud_updater",
         "//modules/dreamview/backend/sim_control",

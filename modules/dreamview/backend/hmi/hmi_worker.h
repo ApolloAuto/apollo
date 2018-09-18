@@ -23,8 +23,12 @@
 #include "boost/thread/locks.hpp"
 #include "boost/thread/shared_mutex.hpp"
 
+#include "cybertron/common/macros.h"
+#include "cybertron/cybertron.h"
+
 #include "modules/canbus/proto/chassis.pb.h"
-#include "modules/common/macro.h"
+#include "modules/common/proto/drive_event.pb.h"
+#include "modules/control/proto/pad_msg.pb.h"
 #include "modules/dreamview/proto/hmi_config.pb.h"
 #include "modules/dreamview/proto/hmi_status.pb.h"
 #include "modules/monitor/proto/system_status.pb.h"
@@ -43,6 +47,8 @@ using ChangeVehicleHandler = std::function<void(const std::string&)>;
 // Singleton worker which does the actual work of HMI actions.
 class HMIWorker {
  public:
+  void Init(const std::shared_ptr<apollo::cybertron::Node>& node);
+
   // High level HMI action trigger.
   bool Trigger(const HMIAction action);
 
@@ -98,6 +104,13 @@ class HMIWorker {
   std::vector<ChangeModeHandler> change_mode_handlers_;
   std::vector<ChangeMapHandler> change_map_handlers_;
   std::vector<ChangeVehicleHandler> change_vehicle_handlers_;
+
+  static std::shared_ptr<cybertron::Reader<apollo::canbus::Chassis>>
+      chassis_reader_;
+  static std::shared_ptr<cybertron::Writer<apollo::control::PadMessage>>
+      pad_writer_;
+  static std::shared_ptr<cybertron::Writer<apollo::common::DriveEvent>>
+      drive_event_writer_;
 
   DECLARE_SINGLETON(HMIWorker);
 };

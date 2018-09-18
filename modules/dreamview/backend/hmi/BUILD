@@ -40,6 +40,7 @@ cc_library(
     hdrs = ["hmi.h"],
     deps = [
         ":hmi_worker",
+        "//modules/common/adapters:adapter_gflags",
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/monitor_log",
         "//modules/common/util:json_util",
@@ -56,8 +57,13 @@ cc_library(
     hdrs = ["hmi_worker.h"],
     deps = [
         ":vehicle_manager",
+        "//framework:cybertron",
+        "//modules/common/adapters:adapter_gflags",
+        "//modules/common/configs:config_gflags",
         "//modules/common/kv_db",
+        "//modules/common/proto:drive_event_proto",
         "//modules/common/util:map_util",
+        "//modules/common/util:message_util",
         "//modules/data/util:info_collector",
         "//modules/dreamview/backend/common:dreamview_gflags",
         "//modules/dreamview/proto:hmi_config_proto",

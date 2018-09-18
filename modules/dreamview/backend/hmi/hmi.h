@@ -21,8 +21,11 @@
 #include <mutex>
 
 #include "modules/common/monitor_log/monitor_log_buffer.h"
+#include "modules/common/proto/drive_event.pb.h"
 #include "modules/dreamview/backend/handlers/websocket_handler.h"
 #include "modules/dreamview/backend/map/map_service.h"
+#include "modules/dreamview/proto/audio_capture.pb.h"
+#include "modules/monitor/proto/system_status.pb.h"
 
 /**
  * @namespace apollo::dreamview
@@ -45,6 +48,12 @@ class HMI {
 
   void RegisterMessageHandlers();
 
+  std::shared_ptr<cybertron::Node> node_;
+  std::shared_ptr<cybertron::Reader<apollo::monitor::SystemStatus>>
+      system_status_reader_;
+  std::shared_ptr<cybertron::Reader<apollo::canbus::Chassis>> chassis_reader_;
+  std::shared_ptr<cybertron::Writer<AudioCapture>> audio_capture_writer_;
+
   // No ownership.
   WebSocketHandler *websocket_;
   MapService *map_service_;
@@ -54,7 +63,7 @@ class HMI {
   bool need_broadcast_ = false;
   std::mutex need_broadcast_mutex_;
 
-  apollo::common::monitor::MonitorLogger logger_;
+  apollo::common::monitor::MonitorLogBuffer monitor_log_buffer_;
 };
 
 }  // namespace dreamview

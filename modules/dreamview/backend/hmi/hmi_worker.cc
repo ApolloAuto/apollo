@@ -16,16 +16,18 @@
 
 #include "modules/dreamview/backend/hmi/hmi_worker.h"
 
+#include <chrono>
 #include <vector>
 
 #include "gflags/gflags.h"
-#include "modules/common/adapters/adapter_manager.h"
+#include "modules/common/adapters/adapter_gflags.h"
+#include "modules/common/configs/config_gflags.h"
 #include "modules/common/kv_db/kv_db.h"
 #include "modules/common/util/file.h"
 #include "modules/common/util/map_util.h"
+#include "modules/common/util/message_util.h"
 #include "modules/common/util/string_tokenizer.h"
 #include "modules/common/util/string_util.h"
-#include "modules/control/proto/pad_msg.pb.h"
 #include "modules/data/util/info_collector.h"
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
 #include "modules/dreamview/backend/hmi/vehicle_manager.h"
@@ -43,11 +45,12 @@ namespace {
 
 using apollo::canbus::Chassis;
 using apollo::common::DriveEvent;
-using apollo::common::adapter::AdapterManager;
 using apollo::common::util::ContainsKey;
 using apollo::common::util::FindOrNull;
 using apollo::common::util::StringTokenizer;
 using apollo::control::DrivingAction;
+using apollo::cybertron::Reader;
+using apollo::cybertron::Writer;
 using google::protobuf::Map;
 using RLock = boost::shared_lock<boost::shared_mutex>;
 using WLock = boost::unique_lock<boost::shared_mutex>;
@@ -169,6 +172,21 @@ HMIWorker::HMIWorker() {
   }
 }
 
+std::shared_ptr<cybertron::Reader<apollo::canbus::Chassis>>
+    HMIWorker::chassis_reader_;
+std::shared_ptr<cybertron::Writer<apollo::control::PadMessage>>
+    HMIWorker::pad_writer_;
+std::shared_ptr<cybertron::Writer<apollo::common::DriveEvent>>
+    HMIWorker::drive_event_writer_;
+
+void HMIWorker::Init(const std::shared_ptr<apollo::cybertron::Node> &node) {
+  HMIWorker::chassis_reader_ = node->GetReader<Chassis>(FLAGS_chassis_topic);
+  HMIWorker::pad_writer_ =
+      node->CreateWriter<control::PadMessage>(FLAGS_pad_topic);
+  HMIWorker::drive_event_writer_ =
+      node->CreateWriter<apollo::common::DriveEvent>(FLAGS_drive_event_topic);
+}
+
 bool HMIWorker::Trigger(const HMIAction action) {
   AINFO << "HMIAction " << HMIAction_Name(action) << " was triggered!";
   switch (action) {
@@ -207,18 +225,19 @@ void HMIWorker::SubmitDriveEvent(const uint64_t event_time_ms,
                                  const std::string &event_msg,
                                  const std::vector<std::string> &event_types) {
   DriveEvent drive_event;
-  AdapterManager::FillDriveEventHeader("HMI", &drive_event);
-  drive_event.mutable_header()->set_timestamp_sec(event_time_ms / 1000.0);
+  common::util::FillHeader("HMI", &drive_event);
   drive_event.set_event(event_msg);
   for (const auto &type_name : event_types) {
     DriveEvent::Type type;
     if (DriveEvent::Type_Parse(type_name, &type)) {
       drive_event.add_type(type);
     } else {
-      AERROR << "Failed to parse drive event type:" <<type_name;
+      AERROR << "Failed to parse drive event type:" << type_name;
     }
   }
-  AdapterManager::PublishDriveEvent(drive_event);
+  CHECK_NOTNULL(HMIWorker::drive_event_writer_);
+  HMIWorker::drive_event_writer_->Write(
+      std::make_shared<DriveEvent>(drive_event));
 }
 
 bool HMIWorker::ChangeToDrivingMode(const Chassis::DrivingMode mode) {
@@ -246,17 +265,20 @@ bool HMIWorker::ChangeToDrivingMode(const Chassis::DrivingMode mode) {
 
   constexpr int kMaxTries = 3;
   constexpr auto kTryInterval = std::chrono::milliseconds(500);
-  auto *chassis = CHECK_NOTNULL(AdapterManager::GetChassis());
+  CHECK_NOTNULL(HMIWorker::pad_writer_);
+  CHECK_NOTNULL(HMIWorker::chassis_reader_);
   for (int i = 0; i < kMaxTries; ++i) {
     // Send driving action periodically until entering target driving mode.
-    AdapterManager::FillPadHeader("HMI", &pad);
-    AdapterManager::PublishPad(pad);
+    common::util::FillHeader("HMI", &pad);
+    HMIWorker::pad_writer_->Write(std::make_shared<control::PadMessage>(pad));
 
     std::this_thread::sleep_for(kTryInterval);
-    chassis->Observe();
-    if (chassis->Empty()) {
+
+    HMIWorker::chassis_reader_->Observe();
+    if (HMIWorker::chassis_reader_->Empty()) {
       AERROR << "No Chassis message received!";
-    } else if (chassis->GetLatestObserved().driving_mode() == mode) {
+    } else if (HMIWorker::chassis_reader_->GetLatestObserved()
+                   ->driving_mode() == mode) {
       return true;
     }
   }
