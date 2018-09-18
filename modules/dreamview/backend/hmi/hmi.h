@@ -23,6 +23,7 @@
 #include "modules/common/monitor_log/monitor_log_buffer.h"
 #include "modules/common/proto/drive_event.pb.h"
 #include "modules/dreamview/backend/handlers/websocket_handler.h"
+#include "modules/dreamview/backend/hmi/hmi_worker.h"
 #include "modules/dreamview/backend/map/map_service.h"
 #include "modules/dreamview/proto/audio_capture.pb.h"
 #include "modules/monitor/proto/system_status.pb.h"
@@ -49,10 +50,9 @@ class HMI {
   void RegisterMessageHandlers();
 
   std::shared_ptr<cybertron::Node> node_;
-  std::shared_ptr<cybertron::Reader<apollo::monitor::SystemStatus>>
-      system_status_reader_;
-  std::shared_ptr<cybertron::Reader<apollo::canbus::Chassis>> chassis_reader_;
   std::shared_ptr<cybertron::Writer<AudioCapture>> audio_capture_writer_;
+
+  std::unique_ptr<HMIWorker> hmi_worker_;
 
   // No ownership.
   WebSocketHandler *websocket_;
