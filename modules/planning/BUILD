@@ -23,6 +23,22 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "planning_component_test",
+    size = "small",
+    srcs = [
+        "planning_component_test.cc",
+    ],
+    data = [
+      "//modules/common/configs:config_gflags",
+      "//modules/planning:planning_testdata",
+    ],
+    deps = [
+      ":planning_component_lib",
+      "@gtest//:main",
+    ],
+)
+
 cc_binary(
     name = "libplanning_component.so",
     linkopts = ["-shared"],

@@ -144,7 +144,7 @@ bool PlanningTestBase::FeedTestData() {
     return -1;
   }
 
-  AINFO << "Successfully fed proto files.";
+  AINFO << "Successfully feed proto files.";
   return true;
 }
 
