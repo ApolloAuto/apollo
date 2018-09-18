@@ -22,7 +22,8 @@
 #include "modules/common/util/map_util.h"
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
 
-DEFINE_string(monitor_conf_path, "modules/monitor/conf/monitor_conf.pb.txt",
+DEFINE_string(monitor_conf_path,
+              "/apollo/modules/monitor/conf/monitor_conf.pb.txt",
               "Path of the monitor config file.");
 
 namespace apollo {
