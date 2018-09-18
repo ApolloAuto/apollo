@@ -9,6 +9,11 @@ enum IOMethod {
   IO_METHOD_USERPTR = 3;
 }
 
+enum OutputType {
+  YUYV = 0;
+  RGB = 1;
+}
+
 message Config {
   required string camera_dev = 1;
   required string frame_id = 2;
@@ -41,4 +46,5 @@ message Config {
   optional float device_wait = 24 [default = 2.0];
   // camera select spin time
   optional float spin_rate = 25 [default = 0.005];
+  required OutputType output_type = 26;
 }

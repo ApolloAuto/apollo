@@ -30,9 +30,11 @@ cc_library(
     name = "usb_cam",
     srcs = [
         "usb_cam.cc",
+        "util.cc",
     ],
     hdrs = [
         "usb_cam.h",
+        "util.h",
     ],
     
     deps = [
@@ -40,6 +42,7 @@ cc_library(
         "//framework:cybertron",
         "@adv_plat//:adv_plat",
     ],
+    copts = ['-mavx2']
 )
 
 cpplint()
