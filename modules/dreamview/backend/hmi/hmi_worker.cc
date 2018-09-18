@@ -49,8 +49,6 @@ using apollo::common::util::ContainsKey;
 using apollo::common::util::FindOrNull;
 using apollo::common::util::StringTokenizer;
 using apollo::control::DrivingAction;
-using apollo::cybertron::Reader;
-using apollo::cybertron::Writer;
 using google::protobuf::Map;
 using RLock = boost::shared_lock<boost::shared_mutex>;
 using WLock = boost::unique_lock<boost::shared_mutex>;
@@ -123,7 +121,7 @@ void SetGlobalFlag(const std::string &flag_name, const ValueType &value,
 
 }  // namespace
 
-HMIWorker::HMIWorker() {
+HMIWorker::HMIWorker(const std::shared_ptr<apollo::cybertron::Node> &node) {
   // Init HMIConfig.
   CHECK(common::util::GetProtoFromFile(FLAGS_hmi_config_filename, &config_))
       << "Unable to parse HMI config file " << FLAGS_hmi_config_filename;
@@ -170,20 +168,15 @@ HMIWorker::HMIWorker() {
       }
     }
   }
+
+  InitReadersAndWriters(node);
 }
 
-std::shared_ptr<cybertron::Reader<apollo::canbus::Chassis>>
-    HMIWorker::chassis_reader_;
-std::shared_ptr<cybertron::Writer<apollo::control::PadMessage>>
-    HMIWorker::pad_writer_;
-std::shared_ptr<cybertron::Writer<apollo::common::DriveEvent>>
-    HMIWorker::drive_event_writer_;
-
-void HMIWorker::Init(const std::shared_ptr<apollo::cybertron::Node> &node) {
-  HMIWorker::chassis_reader_ = node->GetReader<Chassis>(FLAGS_chassis_topic);
-  HMIWorker::pad_writer_ =
-      node->CreateWriter<control::PadMessage>(FLAGS_pad_topic);
-  HMIWorker::drive_event_writer_ =
+void HMIWorker::InitReadersAndWriters(
+    const std::shared_ptr<apollo::cybertron::Node> &node) {
+  chassis_reader_ = node->GetReader<Chassis>(FLAGS_chassis_topic);
+  pad_writer_ = node->CreateWriter<control::PadMessage>(FLAGS_pad_topic);
+  drive_event_writer_ =
       node->CreateWriter<apollo::common::DriveEvent>(FLAGS_drive_event_topic);
 }
 
@@ -224,20 +217,18 @@ int HMIWorker::RunToolCommand(const std::string &tool,
 void HMIWorker::SubmitDriveEvent(const uint64_t event_time_ms,
                                  const std::string &event_msg,
                                  const std::vector<std::string> &event_types) {
-  DriveEvent drive_event;
-  common::util::FillHeader("HMI", &drive_event);
-  drive_event.set_event(event_msg);
+  std::shared_ptr<DriveEvent> drive_event = std::make_shared<DriveEvent>();
+  common::util::FillHeader("HMI", drive_event.get());
+  drive_event->set_event(event_msg);
   for (const auto &type_name : event_types) {
     DriveEvent::Type type;
     if (DriveEvent::Type_Parse(type_name, &type)) {
-      drive_event.add_type(type);
+      drive_event->add_type(type);
     } else {
       AERROR << "Failed to parse drive event type:" << type_name;
     }
   }
-  CHECK_NOTNULL(HMIWorker::drive_event_writer_);
-  HMIWorker::drive_event_writer_->Write(
-      std::make_shared<DriveEvent>(drive_event));
+  HMIWorker::drive_event_writer_->Write(drive_event);
 }
 
 bool HMIWorker::ChangeToDrivingMode(const Chassis::DrivingMode mode) {
@@ -250,13 +241,14 @@ bool HMIWorker::ChangeToDrivingMode(const Chassis::DrivingMode mode) {
     }
   }
 
-  control::PadMessage pad;
+  std::shared_ptr<control::PadMessage> pad =
+      std::make_shared<control::PadMessage>();
   switch (mode) {
     case Chassis::COMPLETE_MANUAL:
-      pad.set_action(DrivingAction::RESET);
+      pad->set_action(DrivingAction::RESET);
       break;
     case Chassis::COMPLETE_AUTO_DRIVE:
-      pad.set_action(DrivingAction::START);
+      pad->set_action(DrivingAction::START);
       break;
     default:
       AFATAL << "Unknown action to change driving mode to "
@@ -265,12 +257,10 @@ bool HMIWorker::ChangeToDrivingMode(const Chassis::DrivingMode mode) {
 
   constexpr int kMaxTries = 3;
   constexpr auto kTryInterval = std::chrono::milliseconds(500);
-  CHECK_NOTNULL(HMIWorker::pad_writer_);
-  CHECK_NOTNULL(HMIWorker::chassis_reader_);
   for (int i = 0; i < kMaxTries; ++i) {
     // Send driving action periodically until entering target driving mode.
-    common::util::FillHeader("HMI", &pad);
-    HMIWorker::pad_writer_->Write(std::make_shared<control::PadMessage>(pad));
+    common::util::FillHeader("HMI", pad.get());
+    HMIWorker::pad_writer_->Write(pad);
 
     std::this_thread::sleep_for(kTryInterval);
 

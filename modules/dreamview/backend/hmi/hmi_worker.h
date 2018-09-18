@@ -23,7 +23,6 @@
 #include "boost/thread/locks.hpp"
 #include "boost/thread/shared_mutex.hpp"
 
-#include "cybertron/common/macros.h"
 #include "cybertron/cybertron.h"
 
 #include "modules/canbus/proto/chassis.pb.h"
@@ -47,7 +46,7 @@ using ChangeVehicleHandler = std::function<void(const std::string&)>;
 // Singleton worker which does the actual work of HMI actions.
 class HMIWorker {
  public:
-  void Init(const std::shared_ptr<apollo::cybertron::Node>& node);
+  HMIWorker(const std::shared_ptr<apollo::cybertron::Node>& node);
 
   // High level HMI action trigger.
   bool Trigger(const HMIAction action);
@@ -79,13 +78,12 @@ class HMIWorker {
   void ChangeToMode(const std::string& mode_name);
   void ChangeToMap(const std::string& map_name);
   void ChangeToVehicle(const std::string& vehicle_name);
-  static bool ChangeToDrivingMode(
-      const apollo::canbus::Chassis::DrivingMode mode);
+  bool ChangeToDrivingMode(const apollo::canbus::Chassis::DrivingMode mode);
 
   // Submit a DriveEvent.
-  static void SubmitDriveEvent(const uint64_t event_time_ms,
-                               const std::string& event_msg,
-                               const std::vector<std::string>& event_types);
+  void SubmitDriveEvent(const uint64_t event_time_ms,
+                        const std::string& event_msg,
+                        const std::vector<std::string>& event_types);
 
   // Get current config and status.
   inline const HMIConfig& GetConfig() const { return config_; }
@@ -97,6 +95,9 @@ class HMIWorker {
   inline boost::shared_mutex& GetStatusMutex() { return status_mutex_; }
 
  private:
+  void InitReadersAndWriters(
+      const std::shared_ptr<apollo::cybertron::Node>& node);
+
   HMIConfig config_;
   HMIStatus status_;
   mutable boost::shared_mutex status_mutex_;
@@ -105,14 +106,10 @@ class HMIWorker {
   std::vector<ChangeMapHandler> change_map_handlers_;
   std::vector<ChangeVehicleHandler> change_vehicle_handlers_;
 
-  static std::shared_ptr<cybertron::Reader<apollo::canbus::Chassis>>
-      chassis_reader_;
-  static std::shared_ptr<cybertron::Writer<apollo::control::PadMessage>>
-      pad_writer_;
-  static std::shared_ptr<cybertron::Writer<apollo::common::DriveEvent>>
+  std::shared_ptr<cybertron::Reader<apollo::canbus::Chassis>> chassis_reader_;
+  std::shared_ptr<cybertron::Writer<apollo::control::PadMessage>> pad_writer_;
+  std::shared_ptr<cybertron::Writer<apollo::common::DriveEvent>>
       drive_event_writer_;
-
-  DECLARE_SINGLETON(HMIWorker);
 };
 
 }  // namespace dreamview
