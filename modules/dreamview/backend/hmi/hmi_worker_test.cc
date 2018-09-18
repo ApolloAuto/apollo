@@ -17,11 +17,17 @@
 
 #include "gtest/gtest.h"
 
+#include "cybertron/cybertron.h"
+
 namespace apollo {
 namespace dreamview {
 
 TEST(HMIWorkerTest, Init) {
-  const auto& hmi_config = HMIWorker::Instance()->GetConfig();
+  apollo::cybertron::Init();
+  std::shared_ptr<apollo::cybertron::Node> node(
+      apollo::cybertron::CreateNode("hmi_worker_tester"));
+  HMIWorker worker(node);
+  const auto& hmi_config = worker.GetConfig();
   EXPECT_GT(hmi_config.available_vehicles().size(), 0);
 }
 
