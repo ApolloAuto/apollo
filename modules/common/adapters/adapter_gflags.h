@@ -20,7 +20,6 @@
 #include "gflags/gflags.h"
 
 DECLARE_bool(enable_adapter_dump);
-DECLARE_string(monitor_topic);
 DECLARE_string(gps_topic);
 DECLARE_string(imu_topic);
 DECLARE_string(raw_imu_topic);

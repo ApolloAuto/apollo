@@ -19,7 +19,6 @@
 #include <iostream>
 #include "gtest/gtest.h"
 
-#include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/quaternion.h"
 
@@ -36,9 +35,6 @@ using apollo::planning::DecisionResult;
 using apollo::prediction::PredictionObstacle;
 using apollo::prediction::PredictionObstacles;
 
-using apollo::common::adapter::AdapterConfig;
-using apollo::common::adapter::AdapterManager;
-using apollo::common::adapter::AdapterManagerConfig;
 using apollo::common::util::StrCat;
 
 namespace apollo {
@@ -49,27 +45,6 @@ const float kEpsilon = 0.01;
 class SimulationWorldServiceTest : public ::testing::Test {
  public:
   virtual void SetUp() {
-    // Setup AdapterManager.
-    AdapterManagerConfig config;
-    config.set_is_ros(false);
-    {
-      auto* sub_config = config.add_config();
-      sub_config->set_mode(AdapterConfig::PUBLISH_ONLY);
-      sub_config->set_type(AdapterConfig::MONITOR);
-    }
-    {
-      auto* sub_config = config.add_config();
-      sub_config->set_mode(AdapterConfig::PUBLISH_ONLY);
-      sub_config->set_type(AdapterConfig::ROUTING_RESPONSE);
-    }
-    {
-      auto* sub_config = config.add_config();
-      sub_config->set_mode(AdapterConfig::DUPLEX);
-      sub_config->set_type(AdapterConfig::DRIVE_EVENT);
-    }
-    AdapterManager::Reset();
-    AdapterManager::Init(config);
-
     FLAGS_routing_response_file =
         "modules/dreamview/backend/testdata/routing.pb.txt";
     apollo::common::VehicleConfigHelper::Init();
@@ -472,8 +447,8 @@ TEST_F(SimulationWorldServiceTest, UpdateRouting) {
   // Load routing from file
   sim_world_service_.reset(
       new SimulationWorldService(map_service_.get(), true));
-  sim_world_service_->UpdateSimulationWorld(
-      *AdapterManager::GetRoutingResponse()->GetLatestPublished());
+  // sim_world_service_->UpdateSimulationWorld(
+  //     *AdapterManager::GetRoutingResponse()->GetLatestPublished());
 
   auto& world = sim_world_service_->world_;
   EXPECT_EQ(world.routing_time(), 1234.5);

@@ -23,11 +23,13 @@
 
 #include <string>
 
+#include "cybertron/cybertron.h"
+
 #include "gtest/gtest_prod.h"
 
 #include "modules/map/relative_map/proto/navigation.pb.h"
+#include "modules/planning/proto/planning.pb.h"
 
-#include "modules/common/adapters/adapter_manager.h"
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
 #include "modules/dreamview/backend/map/map_service.h"
 #include "modules/dreamview/backend/sim_control/sim_control_interface.h"
@@ -105,14 +107,14 @@ class SimControl : SimControlInterface {
 
   void Freeze();
 
-  void TimerCallback(const ros::TimerEvent &event);
+  void TimerCallback();
 
   void ClearPlanning();
 
   const MapService *map_service_ = nullptr;
 
   // The timer to publish simulated localization and chassis messages.
-  ros::Timer sim_control_timer_;
+  std::unique_ptr<cybertron::Timer> sim_control_timer_;
 
   // Time interval of the timer, in seconds.
   static constexpr double kSimControlInterval = 0.01;

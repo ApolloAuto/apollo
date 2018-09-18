@@ -25,8 +25,6 @@ DECLARE_bool(dreamview_profiling_mode);
 
 DECLARE_double(dreamview_profiling_duration);
 
-// DECLARE_string(dreamview_adapter_config_filename);
-
 DECLARE_string(hmi_config_filename);
 
 DECLARE_string(static_file_dir);

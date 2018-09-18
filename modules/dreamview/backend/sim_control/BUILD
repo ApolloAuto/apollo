@@ -12,9 +12,11 @@ cc_library(
         "sim_control_interface.h",
     ],
     deps = [
+        "//framework:cybertron",
         "//modules/dreamview/backend/common:dreamview_gflags",
         "//modules/dreamview/backend/map:map_service",
         "//modules/map/relative_map/proto:navigation_proto",
+        "//modules/planning/proto:planning_proto",
         "@gtest//:gtest",
     ],
 )
@@ -30,10 +32,8 @@ cc_test(
     ],
     deps = [
         ":sim_control",
-        "//modules/common/adapters/proto:adapter_config_proto",
         "//modules/common/time",
         "@gtest//:main",
-        # "@ros//:ros_common",
     ],
 )
 

@@ -21,22 +21,13 @@ int main(int argc, char *argv[]) {
   google::ParseCommandLineFlags(&argc, &argv, true);
   apollo::cybertron::Init(argv[0]);
 
-  apollo::dreamview::Dreamview dreamview_;
-  const bool init = dreamview_.Init().ok() && dreamview_.Start().ok();
-  if (!init) {
+  apollo::dreamview::Dreamview dreamview;
+  const bool init_success = dreamview.Init().ok() && dreamview.Start().ok();
+  if (!init_success) {
     AERROR << "Failed to initialize dreamview server";
-    return 0;
+    return -1;
   }
 
-  uint64_t count = 0;
-  auto timer = apollo::cybertron::Timer(100,
-                                        [&count]() {
-                                          AINFO << "timer shot count: "
-                                                << count;
-                                          count++;
-                                        },
-                                        false);
-  timer.Start();
   apollo::cybertron::WaitForShutdown();
   return 0;
 }

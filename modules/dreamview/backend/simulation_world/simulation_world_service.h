@@ -27,6 +27,8 @@
 #include <utility>
 #include <vector>
 
+#include "cybertron/common/log.h"
+
 #include "gtest/gtest_prod.h"
 
 #include "third_party/json/json.hpp"
@@ -34,10 +36,16 @@
 #include "modules/dreamview/backend/map/map_service.h"
 #include "modules/dreamview/proto/simulation_world.pb.h"
 
-#include "modules/common/adapters/adapter_manager.h"
-#include "cybertron/common/log.h"
 #include "modules/common/monitor_log/monitor_log_buffer.h"
+#include "modules/common/proto/drive_event.pb.h"
 #include "modules/common/proto/pnc_point.pb.h"
+#include "modules/control/proto/control_cmd.pb.h"
+#include "modules/localization/proto/gps.pb.h"
+#include "modules/localization/proto/localization.pb.h"
+#include "modules/perception/proto/traffic_light_detection.pb.h"
+#include "modules/planning/proto/planning.pb.h"
+#include "modules/planning/proto/planning_internal.pb.h"
+#include "modules/prediction/proto/prediction_obstacle.pb.h"
 
 /**
  * @namespace apollo::dreamview
@@ -102,8 +110,8 @@ class SimulationWorldService {
 
   /**
    * @brief The function Update() is periodically called to check for updates
-   * from the adapters. All the updates will be written to the SimulationWorld
-   * object to reflect the latest status.
+   * from the external messages. All the updates will be written to the
+   * SimulationWorld object to reflect the latest status.
    */
   void Update();
 
@@ -128,9 +136,13 @@ class SimulationWorldService {
   void PublishMonitorMessage(
       apollo::common::monitor::MonitorMessageItem::LogLevel log_level,
       const std::string &msg) {
-    apollo::common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
-    buffer.AddMonitorMsgItem(log_level, msg);
+    monitor_logger_buffer_.AddMonitorMsgItem(log_level, msg);
   }
+
+  void PublishNavigationInfo(
+      const std::shared_ptr<apollo::relative_map::NavigationInfo> &);
+  void PublishRoutingRequest(
+      const std::shared_ptr<apollo::routing::RoutingRequest> &);
 
   void GetMapElementIds(double radius, MapElementIds *ids) const;
 
@@ -139,6 +151,9 @@ class SimulationWorldService {
   nlohmann::json GetRoutePathAsJson() const;
 
  private:
+  void InitReaders();
+  void InitWriters();
+
   /**
    * @brief Update simulation world with incoming data, e.g., chassis,
    * localization, planning, perception, etc.
@@ -194,24 +209,23 @@ class SimulationWorldService {
   void PopulateMapInfo(double radius);
 
   /**
-   * @brief Get the latest observed data from the adapter manager to update the
+   * @brief Get the latest observed data from reader to update the
    * SimulationWorld object when triggered by refresh timer.
    */
-  template <typename AdapterType>
-  void UpdateWithLatestObserved(const std::string &adapter_name,
-                                AdapterType *adapter, bool logging = true) {
-    if (adapter->Empty()) {
+  template <typename MessageT>
+  void UpdateWithLatestObserved(cybertron::Reader<MessageT> *reader,
+                                bool logging = true) {
+    if (reader->Empty()) {
       if (logging) {
-        AINFO_EVERY(100) << adapter_name
-                         << " adapter has not received any data yet.";
+        AINFO_EVERY(100) << "Has not received any data from "
+                         << reader->GetChannelName();
       }
       return;
     }
 
-    UpdateSimulationWorld(adapter->GetLatestObserved());
+    const std::shared_ptr<MessageT> msg = reader->GetLatestObserved();
+    UpdateSimulationWorld(*msg);
   }
-
-  void RegisterMessageCallbacks();
 
   void ReadRoutingFromFile(const std::string &routing_response_file);
 
@@ -239,6 +253,8 @@ class SimulationWorldService {
     point->set_v(points[points.size() - 1].v());
   }
 
+  std::unique_ptr<cybertron::Node> node_;
+
   // The underlying SimulationWorld object, owned by the
   // SimulationWorldService instance.
   SimulationWorld world_;
@@ -253,7 +269,7 @@ class SimulationWorldService {
   std::unordered_map<std::string, Object> obj_map_;
 
   // The SIMULATOR monitor for publishing messages.
-  apollo::common::monitor::MonitorLogger monitor_logger_;
+  apollo::common::monitor::MonitorLogBuffer monitor_logger_buffer_;
 
   // Whether to clear the SimulationWorld in the next timer cycle, set by
   // frontend request.
@@ -264,6 +280,40 @@ class SimulationWorldService {
 
   // Whether the sim_world is ready to push to frontend
   std::atomic<bool> ready_to_push_;
+
+  // Readers.
+  std::shared_ptr<cybertron::Reader<apollo::canbus::Chassis>> chassis_reader_;
+  std::shared_ptr<cybertron::Reader<apollo::localization::Gps>> gps_reader_;
+  std::shared_ptr<cybertron::Reader<apollo::localization::LocalizationEstimate>>
+      localization_reader_;
+  std::shared_ptr<cybertron::Reader<apollo::perception::PerceptionObstacles>>
+      perception_obstacle_reader_;
+  std::shared_ptr<cybertron::Reader<apollo::perception::TrafficLightDetection>>
+      perception_traffic_light_reader_;
+  std::shared_ptr<cybertron::Reader<apollo::prediction::PredictionObstacles>>
+      prediction_obstacle_reader_;
+  std::shared_ptr<cybertron::Reader<apollo::planning::ADCTrajectory>>
+      planning_reader_;
+  std::shared_ptr<cybertron::Reader<apollo::control::ControlCommand>>
+      control_command_reader_;
+  std::shared_ptr<cybertron::Reader<apollo::relative_map::NavigationInfo>>
+      navigation_reader_;
+  std::shared_ptr<cybertron::Reader<apollo::relative_map::MapMsg>>
+      relative_map_reader_;
+  std::shared_ptr<cybertron::Reader<apollo::common::DriveEvent>>
+      drive_event_reader_;
+  std::shared_ptr<cybertron::Reader<apollo::common::monitor::MonitorMessage>>
+      monitor_reader_;
+  std::shared_ptr<cybertron::Reader<apollo::routing::RoutingResponse>>
+      routing_response_reader_;
+
+  // Writers.
+  std::shared_ptr<cybertron::Writer<apollo::relative_map::NavigationInfo>>
+      navigation_writer_;
+  std::shared_ptr<cybertron::Writer<apollo::routing::RoutingRequest>>
+      routing_request_writer_;
+  std::shared_ptr<cybertron::Writer<apollo::routing::RoutingResponse>>
+      routing_response_writer_;
 
   FRIEND_TEST(SimulationWorldServiceTest, UpdateMonitorSuccess);
   FRIEND_TEST(SimulationWorldServiceTest, UpdateMonitorRemove);

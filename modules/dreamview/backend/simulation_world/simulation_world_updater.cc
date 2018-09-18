@@ -25,13 +25,14 @@
 namespace apollo {
 namespace dreamview {
 
-using apollo::common::adapter::AdapterManager;
 using apollo::common::monitor::MonitorMessageItem;
 using apollo::common::util::ContainsKey;
 using apollo::common::util::GetProtoFromASCIIFile;
 using apollo::common::util::JsonUtil;
 using apollo::hdmap::EndWayPointFile;
+using apollo::relative_map::NavigationInfo;
 using apollo::routing::RoutingRequest;
+
 using Json = nlohmann::json;
 using google::protobuf::util::JsonStringToMessage;
 using google::protobuf::util::MessageToJsonString;
@@ -93,11 +94,10 @@ void SimulationWorldUpdater::RegisterMessageHandlers() {
       "Binary",
       [this](const std::string &data, WebSocketHandler::Connection *conn) {
         // Navigation info in binary format
-        apollo::relative_map::NavigationInfo navigation_info;
-        if (navigation_info.ParseFromString(data)) {
-          AdapterManager::FillNavigationHeader(FLAGS_dreamview_module_name,
-                                               &navigation_info);
-          AdapterManager::PublishNavigation(navigation_info);
+        std::shared_ptr<NavigationInfo> navigation_info =
+            std::make_shared<NavigationInfo>();
+        if (navigation_info->ParseFromString(data)) {
+          sim_world_service_.PublishNavigationInfo(navigation_info);
         } else {
           AERROR << "Failed to parse navigation info from string. String size: "
                  << data.size();
@@ -135,17 +135,12 @@ void SimulationWorldUpdater::RegisterMessageHandlers() {
   websocket_->RegisterMessageHandler(
       "SendRoutingRequest",
       [this](const Json &json, WebSocketHandler::Connection *conn) {
-        RoutingRequest routing_request;
+        std::shared_ptr<RoutingRequest> routing_request =
+            std::make_shared<RoutingRequest>();
 
-        bool succeed = ConstructRoutingRequest(json, &routing_request);
+        bool succeed = ConstructRoutingRequest(json, routing_request.get());
         if (succeed) {
-          AdapterManager::FillRoutingRequestHeader(FLAGS_dreamview_module_name,
-                                                   &routing_request);
-          AdapterManager::PublishRoutingRequest(routing_request);
-        }
-
-        // Publish monitor message.
-        if (succeed) {
+          sim_world_service_.PublishRoutingRequest(routing_request);
           sim_world_service_.PublishMonitorMessage(MonitorMessageItem::INFO,
                                                    "Routing request sent.");
         } else {
@@ -232,19 +227,20 @@ void SimulationWorldUpdater::RegisterMessageHandlers() {
 
   websocket_->RegisterMessageHandler(
       "Dump", [this](const Json &json, WebSocketHandler::Connection *conn) {
-        DumpMessage(AdapterManager::GetChassis(), "Chassis");
-        DumpMessage(AdapterManager::GetPrediction(), "Prediction");
-        DumpMessage(AdapterManager::GetRoutingRequest(), "RoutingRequest");
-        DumpMessage(AdapterManager::GetRoutingResponse(), "RoutingResponse");
-        DumpMessage(AdapterManager::GetLocalization(), "Localization");
-        DumpMessage(AdapterManager::GetPlanning(), "Planning");
-        DumpMessage(AdapterManager::GetControlCommand(), "Control");
-        DumpMessage(AdapterManager::GetPerceptionObstacles(), "Perception");
-        DumpMessage(AdapterManager::GetTrafficLightDetection(), "TrafficLight");
-        DumpMessage(AdapterManager::GetRelativeMap(), "RelativeMap");
-        DumpMessage(AdapterManager::GetNavigation(), "Navigation");
-        DumpMessage(AdapterManager::GetContiRadar(), "ContiRadar");
-        DumpMessage(AdapterManager::GetMobileye(), "Mobileye");
+        // DumpMessage(AdapterManager::GetChassis(), "Chassis");
+        // DumpMessage(AdapterManager::GetPrediction(), "Prediction");
+        // DumpMessage(AdapterManager::GetRoutingRequest(), "RoutingRequest");
+        // DumpMessage(AdapterManager::GetRoutingResponse(), "RoutingResponse");
+        // DumpMessage(AdapterManager::GetLocalization(), "Localization");
+        // DumpMessage(AdapterManager::GetPlanning(), "Planning");
+        // DumpMessage(AdapterManager::GetControlCommand(), "Control");
+        // DumpMessage(AdapterManager::GetPerceptionObstacles(), "Perception");
+        // DumpMessage(AdapterManager::GetTrafficLightDetection(),
+        // "TrafficLight");
+        // DumpMessage(AdapterManager::GetRelativeMap(), "RelativeMap");
+        // DumpMessage(AdapterManager::GetNavigation(), "Navigation");
+        // DumpMessage(AdapterManager::GetContiRadar(), "ContiRadar");
+        // DumpMessage(AdapterManager::GetMobileye(), "Mobileye");
       });
 
   websocket_->RegisterMessageHandler(
@@ -337,13 +333,12 @@ bool SimulationWorldUpdater::ValidateCoordinate(const nlohmann::json &json) {
 }
 
 void SimulationWorldUpdater::Start() {
-  // start ROS timer, one-shot = false, auto-start = true
-  timer_ =
-      AdapterManager::CreateTimer(ros::Duration(kSimWorldTimeIntervalMs / 1000),
-                                  &SimulationWorldUpdater::OnTimer, this);
+  timer_.reset(new cybertron::Timer(kSimWorldTimeIntervalMs,
+                                    [this]() { this->OnTimer(); }, false));
+  timer_->Start();
 }
 
-void SimulationWorldUpdater::OnTimer(const ros::TimerEvent &event) {
+void SimulationWorldUpdater::OnTimer() {
   sim_world_service_.Update();
 
   {
