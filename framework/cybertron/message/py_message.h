@@ -27,8 +27,7 @@ namespace apollo {
 namespace cybertron {
 namespace message {
 
-static const char* PY_MESSAGE_FULLNAME =
-    "apollo.cybertron.message.PyMessage";
+static const char* PY_MESSAGE_FULLNAME = "apollo.cybertron.message.PyMessage";
 // static const std::string data_split_pattern = "#@";
 
 class PyMessageWrap {

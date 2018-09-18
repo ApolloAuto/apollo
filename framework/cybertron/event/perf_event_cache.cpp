@@ -19,8 +19,8 @@
 #include <string>
 #include <unordered_map>
 
-#include "cybertron/event/perf_event_cache.h"
 #include "cybertron/common/global_data.h"
+#include "cybertron/event/perf_event_cache.h"
 #include "cybertron/init.h"
 #include "cybertron/time/time.h"
 
