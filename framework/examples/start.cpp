@@ -23,8 +23,7 @@ using apollo::cybertron::Writer;
 using apollo::cybertron::Component;
 using apollo::cybertron::ComponentBase;
 using apollo::cybertron::proto::ComponentConfig;
-
-apollo::cybertron::class_loader::ClassLoaderManager loader;
+using apollo::cybertron::class_loader::ClassLoaderManager;
 
 class PlanningComponent;
 
@@ -75,16 +74,19 @@ void RunDriver() {
     msg->set_msg_id(i);
     driver_writer->Write(msg);
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    if (apollo::cybertron::IsShutdown()) {
+      break;
+    }
   }
 }
 
-void InitPerception() {
+void InitPerception(ClassLoaderManager* loader) {
   ComponentConfig config;
   config.set_name("Perception");
   config.add_readers()->set_channel(channel_dir);
 
-  if (loader.LoadLibrary(perception_lib)) {
-    perception = loader.CreateClassObj<ComponentBase>("PerceptionComponent");
+  if (loader->LoadLibrary(perception_lib)) {
+    perception = loader->CreateClassObj<ComponentBase>("PerceptionComponent");
     if (perception != nullptr) {
       perception->Initialize(config);
     } else {
@@ -105,8 +107,9 @@ void InitPlanning() {
 
 int main(int argc, char** argv) {
   apollo::cybertron::Init(argv[0]);
+  ClassLoaderManager class_loader;
   node = apollo::cybertron::CreateNode("start_node");
-  InitPerception();
+  InitPerception(&class_loader);
   InitPlanning();
   RunDriver();
   //  apollo::cybertron::PrintSchedulerStatistics();

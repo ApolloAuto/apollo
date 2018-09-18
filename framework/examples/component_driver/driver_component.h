@@ -45,8 +45,6 @@ class DriverComponent : public TimerComponent {
  private:
   std::shared_ptr<Writer<Driver>> driver_writer_ = nullptr;
   std::shared_ptr<Writer<RawMessage>> dog_writer_ = nullptr;
-  std::shared_ptr<apollo::cybertron::Task<CarStatus>> task_ = nullptr;
-  std::shared_ptr<apollo::cybertron::Task<void>> void_task_ = nullptr;
 };
 
 CYBERTRON_REGISTER_COMPONENT(DriverComponent)
