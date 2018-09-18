@@ -45,8 +45,8 @@ cc_test(
         "can_sender_test.cc",
     ],
     deps = [
-        "//modules/canbus/proto:canbus_proto",
         "//framework:cybertron",
+        "//modules/canbus/proto:canbus_proto",
         "//modules/drivers/canbus/can_client/fake:fake_can_client",
         "//modules/drivers/canbus/can_comm:can_sender",
         "//modules/drivers/canbus/common:canbus_common",
@@ -61,8 +61,8 @@ cc_test(
         "can_receiver_test.cc",
     ],
     deps = [
-        "//modules/canbus/proto:canbus_proto",
         "//framework:cybertron",
+        "//modules/canbus/proto:canbus_proto",
         "//modules/drivers/canbus/can_client/fake:fake_can_client",
         "//modules/drivers/canbus/can_comm:can_receiver",
         "//modules/drivers/canbus/common:canbus_common",
@@ -88,6 +88,7 @@ cc_test(
     size = "small",
     srcs = ["message_manager_test.cc"],
     deps = [
+        "//framework:cybertron",
         "//modules/canbus/proto:canbus_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "@gtest//:main",
