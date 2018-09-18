@@ -146,6 +146,7 @@ class Node(object):
         self.pubs = {}
         self.services = {}
         self.mutex = threading.Lock()
+        self.callbacks = {}
 
     def __del__(self):
         #print("+++ node __del___")
@@ -216,7 +217,8 @@ class Node(object):
         self.subs[name] = sub
         self.mutex.release()
         fun_reader_cb = PY_CALLBACK_TYPE(self.reader_callback)
-        f_ptr = ctypes.cast(fun_reader_cb, ctypes.c_void_p).value
+        self.callbacks[name] = fun_reader_cb
+        f_ptr = ctypes.cast(self.callbacks[name], ctypes.c_void_p).value
         _CYBER_NODE.PyReader_register_func(reader, f_ptr)
 
         return Reader(name, reader, data_type)
@@ -270,7 +272,8 @@ class Node(object):
         self.mutex.release()
 
         fun_svr_cb = PY_CALLBACK_TYPE(self.service_callback)
-        f_ptr = ctypes.cast(fun_svr_cb, ctypes.c_void_p).value
+        self.callbacks[name] = fun_svr_cb
+        f_ptr = ctypes.cast(self.callbacks[name], ctypes.c_void_p).value
 
         _CYBER_NODE.PyService_register_func(svr, f_ptr)
         return svr
