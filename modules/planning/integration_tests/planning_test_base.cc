@@ -83,7 +83,7 @@ bool PlanningTestBase::FeedTestData() {
   if (!apollo::common::util::GetProtoFromFile(
           FLAGS_test_data_dir + "/" + FLAGS_test_chassis_file, &chassis)) {
     AERROR << "failed to load file: " << FLAGS_test_chassis_file;
-    return -1;
+    return false;
   }
   // localization
   LocalizationEstimate localization;
@@ -91,7 +91,7 @@ bool PlanningTestBase::FeedTestData() {
           FLAGS_test_data_dir + "/" + FLAGS_test_localization_file,
           &localization)) {
     AERROR << "failed to load file: " << FLAGS_test_localization_file;
-    return -1;
+    return false;
   }
   // prediction
   PredictionObstacles prediction;
@@ -99,7 +99,7 @@ bool PlanningTestBase::FeedTestData() {
           FLAGS_test_data_dir + "/" + FLAGS_test_prediction_file,
           &prediction)) {
     AERROR << "failed to load file: " << FLAGS_test_prediction_file;
-    return -1;
+    return false;
   }
   // routing_response
   RoutingResponse routing_response;
@@ -107,7 +107,7 @@ bool PlanningTestBase::FeedTestData() {
           FLAGS_test_data_dir + "/" + FLAGS_test_routing_response_file,
           &routing_response)) {
     AERROR << "failed to load file: " << FLAGS_test_routing_response_file;
-    return -1;
+    return false;
   }
   // traffic_light_detection
   TrafficLightDetection traffic_light_detection;
@@ -115,7 +115,7 @@ bool PlanningTestBase::FeedTestData() {
           FLAGS_test_data_dir + "/" + FLAGS_test_traffic_light_file,
           &traffic_light_detection)) {
     AERROR << "failed to load file: " << FLAGS_test_traffic_light_file;
-    return -1;
+    return false;
   }
 
   local_view_.prediction_obstacles =
