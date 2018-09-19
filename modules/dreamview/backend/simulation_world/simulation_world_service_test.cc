@@ -44,6 +44,11 @@ const float kEpsilon = 0.01;
 
 class SimulationWorldServiceTest : public ::testing::Test {
  public:
+  static void SetUpTestCase() {
+    // init cybertron framework
+    apollo::cybertron::Init("simulation_world_service_test");
+  }
+
   virtual void SetUp() {
     FLAGS_routing_response_file =
         "modules/dreamview/backend/testdata/routing.pb.txt";
@@ -445,10 +450,17 @@ TEST_F(SimulationWorldServiceTest, UpdatePrediction) {
 
 TEST_F(SimulationWorldServiceTest, UpdateRouting) {
   // Load routing from file
+  sim_world_service_.reset(nullptr);
   sim_world_service_.reset(
       new SimulationWorldService(map_service_.get(), true));
-  // sim_world_service_->UpdateSimulationWorld(
-  //     *AdapterManager::GetRoutingResponse()->GetLatestPublished());
+
+  // Wait until the message has been published
+  while (sim_world_service_->routing_response_reader_->Empty()) {
+    sleep(1);
+    sim_world_service_->routing_response_reader_->Observe();
+  }
+  sim_world_service_->UpdateWithLatestObserved(
+      sim_world_service_->routing_response_reader_.get());
 
   auto& world = sim_world_service_->world_;
   EXPECT_EQ(world.routing_time(), 1234.5);

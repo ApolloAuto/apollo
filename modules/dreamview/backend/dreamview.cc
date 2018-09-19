@@ -101,7 +101,7 @@ Status Dreamview::Start() {
 
 void Dreamview::Stop() {
   server_->close();
-  //   sim_control_->Stop();
+  sim_control_->Stop();
   //   point_cloud_updater_->Stop();
 }
 

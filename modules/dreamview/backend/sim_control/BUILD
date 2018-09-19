@@ -13,6 +13,7 @@ cc_library(
     ],
     deps = [
         "//framework:cybertron",
+        "//modules/common/adapters:adapter_gflags",
         "//modules/dreamview/backend/common:dreamview_gflags",
         "//modules/dreamview/backend/map:map_service",
         "//modules/map/relative_map/proto:navigation_proto",

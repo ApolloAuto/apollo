@@ -28,6 +28,7 @@
 
 #include "gtest/gtest_prod.h"
 
+#include "modules/localization/proto/localization.pb.h"
 #include "modules/map/relative_map/proto/navigation.pb.h"
 #include "modules/planning/proto/planning.pb.h"
 
@@ -84,10 +85,13 @@ class SimControl : SimControlInterface {
   void RunOnce() override;
 
  private:
-  void OnPlanning(const apollo::planning::ADCTrajectory &trajectory);
-  void OnRoutingResponse(const apollo::routing::RoutingResponse &routing);
+  void OnPlanning(
+      const std::shared_ptr<apollo::planning::ADCTrajectory> &trajectory);
+  void OnRoutingResponse(
+      const std::shared_ptr<apollo::routing::RoutingResponse> &routing);
   void OnReceiveNavigationInfo(
-      const relative_map::NavigationInfo &navigation_info);
+      const std::shared_ptr<apollo::relative_map::NavigationInfo>
+          &navigation_info);
 
   /**
    * @brief Predict the next trajectory point using perfect control model
@@ -98,7 +102,7 @@ class SimControl : SimControlInterface {
 
   void PublishLocalization(const apollo::common::TrajectoryPoint &point);
 
-  void InitAdapter();
+  void InitTimerAndIO();
 
   void InitStartPoint(double start_velocity, double start_acceleration);
 
@@ -108,20 +112,35 @@ class SimControl : SimControlInterface {
 
   void Freeze();
 
-  void TimerCallback();
-
   void ClearPlanning();
 
+  void InternalReset();
+
   const MapService *map_service_ = nullptr;
+
+  std::unique_ptr<cybertron::Node> node_;
+
+  std::shared_ptr<cybertron::Reader<apollo::localization::LocalizationEstimate>>
+      localization_reader_;
+  std::shared_ptr<cybertron::Reader<apollo::planning::ADCTrajectory>>
+      planning_reader_;
+  std::shared_ptr<cybertron::Reader<apollo::routing::RoutingResponse>>
+      routing_response_reader_;
+  std::shared_ptr<cybertron::Reader<apollo::relative_map::NavigationInfo>>
+      navigation_reader_;
+
+  std::shared_ptr<cybertron::Writer<apollo::localization::LocalizationEstimate>>
+      localization_writer_;
+  std::shared_ptr<cybertron::Writer<apollo::canbus::Chassis>> chassis_writer_;
 
   // The timer to publish simulated localization and chassis messages.
   std::unique_ptr<cybertron::Timer> sim_control_timer_;
 
-  // Time interval of the timer, in seconds.
-  static constexpr double kSimControlInterval = 0.01;
+  // Time interval of the timer, in milliseconds.
+  static constexpr double kSimControlIntervalMs = 10;
 
   // The latest received planning trajectory.
-  apollo::planning::ADCTrajectory current_trajectory_;
+  std::shared_ptr<apollo::planning::ADCTrajectory> current_trajectory_;
   // The index of the previous and next point with regard to the
   // current_trajectory.
   int prev_point_index_ = 0;
@@ -139,9 +158,6 @@ class SimControl : SimControlInterface {
   // Whether the sim control is enabled.
   bool enabled_ = false;
 
-  // Whether the adapter setup has been initialized.
-  bool adapter_inited_ = false;
-
   // Whether start point is initialized from actual localization data
   bool start_point_from_localization_ = false;
 
@@ -153,9 +169,9 @@ class SimControl : SimControlInterface {
 
   common::PathPoint adc_position_;
 
-  static constexpr int kPlanningCountToStart = 5;
+  std::mutex mutex_;
 
-  relative_map::NavigationInfo navigation_info_;
+  static constexpr int kPlanningCountToStart = 5;
 
   FRIEND_TEST(SimControlTest, Test);
 };
