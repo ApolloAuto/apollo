@@ -11,7 +11,6 @@ message TrafficLightBox {
   optional int32 height = 4;
   optional TrafficLight.Color color = 5;
   optional bool selected = 6;
-  optional string camera_name = 7;
 }
 
 message TrafficLightDebug {
@@ -23,10 +22,7 @@ message TrafficLightDebug {
   optional double ts_diff_sys = 6;
   optional int32 project_error = 7;
   optional double distance_to_stop_line = 8;
-  repeated TrafficLightBox crop_roi = 9;
-  repeated TrafficLightBox projected_roi = 10;
-  repeated TrafficLightBox rectified_roi = 11;
-  repeated TrafficLightBox debug_roi = 12;
+  optional int32 camera_id = 9;
 }
 
 message TrafficLight {
@@ -37,37 +33,18 @@ message TrafficLight {
     GREEN = 3;
     BLACK = 4;
   };
-
   optional Color color = 1;
-
   // Traffic light string-ID in the map data.
   optional string id = 2;
-
   // How confidence about the detected results, between 0 and 1.
   optional double confidence = 3 [default = 1.0];
-
   // Duration of the traffic light since detected.
   optional double tracking_time = 4;
-
-  // Is traffic blinking
-  optional bool blink = 5;
 }
 
 message TrafficLightDetection {
-  enum CameraID {
-    CAMERA_FRONT_LONG = 0;
-    CAMERA_FRONT_NARROW = 1;
-    CAMERA_FRONT_SHORT = 2;
-    CAMERA_FRONT_WIDE = 3;
-  };
-
   optional apollo.common.Header header = 2;
-
   repeated TrafficLight traffic_light = 1;
-
   optional TrafficLightDebug traffic_light_debug = 3;
-
   optional bool contain_lights = 4;
-
-  optional CameraID camera_id = 5;
 }
