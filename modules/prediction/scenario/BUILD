@@ -8,7 +8,9 @@ cc_library(
     hdrs = ["scenario_manager.h"],
     deps = [
         "//framework:cybertron",
+        "//modules/common/adapters:adapter_gflags",
         "//modules/prediction/proto:prediction_conf_proto",
+        "//modules/prediction/container:container_manager",
         "//modules/prediction/scenario/analyzer:scenario_analyzer",
         "//modules/prediction/scenario/feature_extractor:feature_extractor",
     ],

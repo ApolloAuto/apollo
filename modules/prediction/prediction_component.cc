@@ -231,10 +231,6 @@ bool PredictionComponent::Proc(
   // Scenario analysis
   ScenarioManager::Instance()->Run();
 
-  // Prioritize obstacles
-  obstacles_container->PrioritizeObstacles(
-      ScenarioManager::Instance()->scenario());
-
   obstacles_container->BuildLaneGraph();
 
   ADEBUG << "Received a perception message ["
