@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PREDICTION_COMMON_SCENARIO_FEATURES_H_
-#define MODULES_PREDICTION_COMMON_SCENARIO_FEATURES_H_
+#ifndef MODULES_PREDICTION_COMMON_ENVIRONMENT_FEATURES_H_
+#define MODULES_PREDICTION_COMMON_ENVIRONMENT_FEATURES_H_
 
 #include <string>
 #include <utility>
@@ -24,11 +24,11 @@
 namespace apollo {
 namespace prediction {
 
-class ScenarioFeatures {
+class EnvironmentFeatures {
  public:
-  ScenarioFeatures() = default;
+  EnvironmentFeatures() = default;
 
-  virtual ~ScenarioFeatures() = default;
+  virtual ~EnvironmentFeatures() = default;
 
   void set_ego_velocity(const double ego_velocity);
 
@@ -111,4 +111,4 @@ class ScenarioFeatures {
 }  // namespace prediction
 }  // namespace apollo
 
-#endif /* MODULES_PREDICTION_COMMON_SCENARIO_FEATURES_H_ */
+#endif /* MODULES_PREDICTION_COMMON_ENVIRONMENT_FEATURES_H_ */

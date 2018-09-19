@@ -72,13 +72,13 @@ void FeatureExtractor::ExtractFeatures() {
 }
 
 const ScenarioFeature& FeatureExtractor::GetScenarioFeatures() const {
-  return scenario_feature_;
+  return scenario_features_;
 }
 
 void FeatureExtractor::ExtractEgoVehicleFeatures() {
   // TODO(all): change this to ego_speed and ego_heading
-  scenario_feature_.set_speed(pose_container_->GetSpeed());
-  scenario_feature_.set_heading(pose_container_->GetTheta());
+  scenario_features_.set_speed(pose_container_->GetSpeed());
+  scenario_features_.set_heading(pose_container_->GetTheta());
   // TODO(all): add acceleration if needed
 }
 
@@ -89,11 +89,11 @@ void FeatureExtractor::ExtractEgoLaneFeatures(const LaneInfoPtr& ptr_ego_lane,
     AERROR << "Ego vehicle is not on any lane.";
     return;
   }
-  scenario_feature_.set_curr_lane_id(ptr_ego_lane->id().id());
+  scenario_features_.set_curr_lane_id(ptr_ego_lane->id().id());
   double curr_lane_s = 0.0;
   double curr_lane_l = 0.0;
   ptr_ego_lane->GetProjection(ego_position, &curr_lane_s, &curr_lane_l);
-  scenario_feature_.set_curr_lane_s(curr_lane_s);
+  scenario_features_.set_curr_lane_s(curr_lane_s);
 }
 
 void FeatureExtractor::ExtractNeighborLaneFeatures(
@@ -111,7 +111,7 @@ void FeatureExtractor::ExtractNeighborLaneFeatures(
       ptr_ego_lane, {ego_position.x(), ego_position.y()}, threshold);
 
   if (ptr_left_neighbor_lane != nullptr) {
-    scenario_feature_.set_left_neighbor_lane_id(
+    scenario_features_.set_left_neighbor_lane_id(
         ptr_left_neighbor_lane->id().id());
   }
 
@@ -119,7 +119,7 @@ void FeatureExtractor::ExtractNeighborLaneFeatures(
       ptr_ego_lane, {ego_position.x(), ego_position.y()}, threshold);
 
   if (ptr_right_neighbor_lane != nullptr) {
-    scenario_feature_.set_right_neighbor_lane_id(
+    scenario_features_.set_right_neighbor_lane_id(
         ptr_right_neighbor_lane->id().id());
   }
 }
@@ -131,8 +131,8 @@ void FeatureExtractor::ExtractFrontJunctionFeatures() {
   }
   JunctionInfoPtr junction = ego_trajectory_containter_->ADCJunction();
   if (junction != nullptr) {
-    scenario_feature_.set_junction_id(junction->id().id());
-    scenario_feature_.set_dist_to_junction(
+    scenario_features_.set_junction_id(junction->id().id());
+    scenario_features_.set_dist_to_junction(
         ego_trajectory_containter_->ADCDistanceToJunction());
   }
 }

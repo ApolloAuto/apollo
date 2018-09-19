@@ -82,7 +82,7 @@ class FeatureExtractor {
 
   PoseContainer* pose_container_;
 
-  ScenarioFeature scenario_feature_;
+  ScenarioFeature scenario_features_;
 };
 
 }  // namespace prediction
