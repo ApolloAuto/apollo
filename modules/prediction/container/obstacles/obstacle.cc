@@ -123,6 +123,13 @@ bool Obstacle::IsOnLane() {
   return false;
 }
 
+bool Obstacle::ToIgnore() {
+  if (history_size() == 0) {
+    return true;
+  }
+  return latest_feature().priority() == Feature::IGNORE;
+}
+
 bool Obstacle::IsNearJunction() {
   if (feature_history_.size() <= 0) {
     return false;

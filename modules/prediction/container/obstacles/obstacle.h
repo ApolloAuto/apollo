@@ -145,6 +145,12 @@ class Obstacle {
   bool IsOnLane();
 
   /**
+   * @brief Check if the obstacle can be ignored.
+   * @return If the obstacle can be ignored.
+   */
+  bool ToIgnore();
+
+  /**
    * @brief Check if the obstacle is near a junction.
    * @return If the obstacle is near a junction.
    */
