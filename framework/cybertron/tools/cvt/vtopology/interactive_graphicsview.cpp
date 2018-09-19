@@ -46,7 +46,7 @@ void InteractiveGraphicsView::init(void) {
   setCursor(Qt::PointingHandCursor);
   setRenderHint(QPainter::Antialiasing);
 
-  setSceneRect(-INT_MIN / 2, -INT_MIN / 2, INT_MAX, INT_MAX);
+  setSceneRect(INT_MIN, INT_MIN, INT_MAX, INT_MAX);
   centerOn(0, 0);
 }
 
