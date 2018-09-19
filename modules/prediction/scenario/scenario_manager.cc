@@ -15,15 +15,21 @@
  *****************************************************************************/
 
 #include "modules/prediction/scenario/scenario_manager.h"
+#include "modules/common/adapters/adapter_gflags.h"
+#include "modules/prediction/container/container_manager.h"
+#include "modules/prediction/container/obstacles/obstacles_container.h"
 
 namespace apollo {
 namespace prediction {
+
+using apollo::common::adapter::AdapterConfig;
 
 ScenarioManager::ScenarioManager() {}
 
 void ScenarioManager::Run() {
   feature_extractor_.ExtractFeatures();
   scenario_analyzer_.Analyze(feature_extractor_.GetScenarioFeatures());
+  PrioritizeObstacles();
   // TODO(all) other functionalities including lane, junction filters
 }
 
@@ -31,10 +37,11 @@ const Scenario& ScenarioManager::scenario() const {
   return scenario_analyzer_.scenario();
 }
 
-std::vector<std::string> ScenarioManager::GetFocusedLaneIds() const {
-  // TODO(all) use scenario feature to get lane ids
-  std::vector<std::string> focused_lane_ids;
-  return focused_lane_ids;
+void ScenarioManager::PrioritizeObstacles() {
+  ObstaclesContainer* obstacles_container = dynamic_cast<ObstaclesContainer*>(
+      ContainerManager::Instance()->GetContainer(
+          AdapterConfig::PERCEPTION_OBSTACLES));
+  obstacles_container->PrioritizeObstacles(scenario_analyzer_.scenario());
 }
 
 }  // namespace prediction

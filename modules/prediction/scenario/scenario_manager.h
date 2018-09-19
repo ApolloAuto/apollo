@@ -45,11 +45,8 @@ class ScenarioManager {
    */
   const Scenario& scenario() const;
 
-  /**
-   * @brief Get the IDs of the focused lanes based on the scenario
-   * @return The IDs of the focused lanes based on the scenario
-   */
-  std::vector<std::string> GetFocusedLaneIds() const;
+ private:
+  void PrioritizeObstacles();
 
  private:
   FeatureExtractor feature_extractor_;
