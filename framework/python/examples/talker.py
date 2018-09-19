@@ -21,7 +21,6 @@ import sys
 
 sys.path.append("../")
 from cybertron import cybertron
-# from cybertron import init
 from proto import chatter_pb2
 
 def test_talker_class():
@@ -38,11 +37,12 @@ def test_talker_class():
     g_count = 1
 
     writer = test_node.create_writer("channel/chatter",
-            chatter_pb2.Chatter.DESCRIPTOR.full_name)
+        chatter_pb2.Chatter)
     while not cybertron.is_shutdown():
         time.sleep(1)
         g_count = g_count + 1
         msg.seq = g_count
+        msg.timestamp = long(time.time())
         print "="*80
         print "write msg -> %s" % msg
         writer.write(msg)

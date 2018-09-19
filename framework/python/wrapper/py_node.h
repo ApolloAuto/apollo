@@ -68,9 +68,13 @@ class PyWriter {
     std::string proto_desc("");
     message::ProtobufFactory::Instance()->GetDescriptorString(type,
                                                               &proto_desc);
+    if (proto_desc.empty()) {
+      AWARN << "cpp cann't find proto_desc msgtyp->" << data_type_;
+      return;
+    }
     proto::RoleAttributes role_attr;
     role_attr.set_channel_name(channel_name_);
-    role_attr.set_message_type(type);
+    role_attr.set_message_type(data_type_);
     role_attr.set_proto_desc(proto_desc);
     writer_ = node_->CreateWriter<apollo::cybertron::message::PyMessageWrap>(
         role_attr);
