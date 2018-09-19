@@ -65,7 +65,7 @@ void LagPrediction::GetLaggedPrediction(PredictionObstacles* obstacles) const {
   for (const auto& obstacle : latest_prediction->prediction_obstacle()) {
     const auto& perception = obstacle.perception_obstacle();
     if (perception.confidence() < FLAGS_perception_confidence_threshold &&
-        perception.type() != perception::VEHICLE) {
+        perception.type() != PerceptionObstacle::VEHICLE) {
       continue;
     }
     double distance =
@@ -84,7 +84,7 @@ void LagPrediction::GetLaggedPrediction(PredictionObstacles* obstacles) const {
       const auto& perception = obstacle.perception_obstacle();
       auto id = perception.id();
       if (perception.confidence() < FLAGS_perception_confidence_threshold &&
-          perception.type() != perception::VEHICLE) {
+          perception.type() != PerceptionObstacle::VEHICLE) {
         continue;
       }
       if (protected_obstacles.count(id) > 0) {

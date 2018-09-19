@@ -79,9 +79,9 @@ TrajectoryCost::TrajectoryCost(
     const auto *ptr_obstacle = ptr_path_obstacle->obstacle();
     bool is_bycycle_or_pedestrian =
         (ptr_obstacle->Perception().type() ==
-             perception::BICYCLE ||
+             perception::PerceptionObstacle::BICYCLE ||
          ptr_obstacle->Perception().type() ==
-             perception::PEDESTRIAN);
+             perception::PerceptionObstacle::PEDESTRIAN);
 
     if (Obstacle::IsVirtualObstacle(ptr_obstacle->Perception())) {
       // Virtual obstacle

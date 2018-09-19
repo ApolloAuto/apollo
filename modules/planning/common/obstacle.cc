@@ -110,7 +110,7 @@ common::TrajectoryPoint* Obstacle::AddTrajectoryPoint() {
 }
 
 bool Obstacle::IsStaticObstacle(const PerceptionObstacle& perception_obstacle) {
-  if (perception_obstacle.type() == perception::UNKNOWN_UNMOVABLE) {
+  if (perception_obstacle.type() == PerceptionObstacle::UNKNOWN_UNMOVABLE) {
     return true;
   }
   auto moving_speed = std::hypot(perception_obstacle.velocity().x(),
@@ -250,7 +250,7 @@ std::unique_ptr<Obstacle> Obstacle::CreateStaticVirtualObstacles(
   perception_obstacle.set_width(obstacle_box.width());
   perception_obstacle.set_height(FLAGS_virtual_stop_wall_height);
   perception_obstacle.set_type(
-      perception::UNKNOWN_UNMOVABLE);
+      perception::PerceptionObstacle::UNKNOWN_UNMOVABLE);
   perception_obstacle.set_tracking_time(1.0);
 
   std::vector<common::math::Vec2d> corner_points;
