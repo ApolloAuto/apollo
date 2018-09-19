@@ -75,7 +75,7 @@ class ControlComponent final : public apollo::cybertron::TimerComponent {
       const apollo::common::monitor::MonitorMessage &monitor_message);
 
   common::Status ProduceControlCommand(ControlCommand *control_command);
-  common::Status CheckInput(LocalView& local_view);
+  common::Status CheckInput(LocalView* local_view);
   common::Status CheckTimestamp(const LocalView& local_view);
   common::Status CheckPad();
 

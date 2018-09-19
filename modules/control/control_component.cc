@@ -142,7 +142,7 @@ void ControlComponent::OnMonitor(
 
 Status ControlComponent::ProduceControlCommand(
     ControlCommand *control_command) {
-  Status status = CheckInput(local_view_);
+  Status status = CheckInput(&local_view_);
   // check data
 
   if (!status.ok()) {
@@ -205,7 +205,8 @@ Status ControlComponent::ProduceControlCommand(
              << " with localization: "
              << local_view_.localization.ShortDebugString()
              << " with chassis: " << local_view_.chassis.ShortDebugString()
-             << " with trajectory: " << local_view_.trajectory.ShortDebugString()
+             << " with trajectory: "
+             << local_view_.trajectory.ShortDebugString()
              << " with cmd: " << control_command->ShortDebugString()
              << " status:" << status_compute.error_message();
       estop_ = true;
@@ -294,28 +295,28 @@ bool ControlComponent::Proc() {
   return true;
 }
 
-Status ControlComponent::CheckInput(LocalView& local_view) {
+Status ControlComponent::CheckInput(LocalView* local_view) {
   ADEBUG << "Received localization:"
-         << local_view.localization.ShortDebugString();
-  ADEBUG << "Received chassis:" << local_view.chassis.ShortDebugString();
+         << local_view->localization.ShortDebugString();
+  ADEBUG << "Received chassis:" << local_view->chassis.ShortDebugString();
 
-  if (!local_view.trajectory.estop().is_estop() &&
-      local_view.trajectory.trajectory_point_size() == 0) {
+  if (!local_view->trajectory.estop().is_estop() &&
+      local_view->trajectory.trajectory_point_size() == 0) {
     AWARN_EVERY(100) << "planning has no trajectory point. ";
     return Status(ErrorCode::CONTROL_COMPUTE_ERROR,
                   "planning has no trajectory point.");
   }
 
   for (auto &trajectory_point :
-       *local_view.trajectory.mutable_trajectory_point()) {
+       *local_view->trajectory.mutable_trajectory_point()) {
     if (trajectory_point.v() < control_conf_.minimum_speed_resolution()) {
       trajectory_point.set_v(0.0);
       trajectory_point.set_a(0.0);
     }
   }
 
-  VehicleStateProvider::Instance()->Update(local_view.localization,
-                                           local_view.chassis);
+  VehicleStateProvider::Instance()->Update(local_view->localization,
+                                           local_view->chassis);
 
   return Status::OK();
 }
