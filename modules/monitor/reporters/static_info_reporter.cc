@@ -18,8 +18,10 @@
 
 #include "cybertron/common/log.h"
 #include "gflags/gflags.h"
+#include "modules/common/adapters/adapter_gflags.h"
 #include "modules/data/util/info_collector.h"
 #include "modules/monitor/common/monitor_manager.h"
+#include "modules/routing/proto/routing.pb.h"
 
 DEFINE_string(static_info_reporter_name, "StaticInfoReporter",
               "Static info reporter name.");
@@ -30,16 +32,19 @@ DEFINE_double(static_info_report_interval, 40,
 namespace apollo {
 namespace monitor {
 
+using apollo::data::InfoCollector;
+
 StaticInfoReporter::StaticInfoReporter()
     : RecurrentRunner(FLAGS_static_info_reporter_name,
                       FLAGS_static_info_report_interval) {
+  InfoCollector::Init(CHECK_NOTNULL(MonitorManager::CurrentNode()));
 }
 
 void StaticInfoReporter::RunOnce(const double current_time) {
   static auto writer = MonitorManager::CreateWriter<apollo::data::StaticInfo>(
       FLAGS_static_info_topic);
   AINFO << "Reported static info.";
-  writer->Write(apollo::data::InfoCollector::GetStaticInfo());
+  writer->Write(InfoCollector::GetStaticInfo());
 }
 
 }  // namespace monitor

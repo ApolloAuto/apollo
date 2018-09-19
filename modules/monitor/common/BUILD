@@ -14,20 +14,12 @@ cc_library(
 )
 
 cc_library(
-    name = "message_observer",
-    hdrs = ["message_observer.h"],
-    deps = [
-        "//modules/common/adapters:adapter_gflags",
-    ],
-)
-
-cc_library(
     name = "monitor_manager",
     srcs = ["monitor_manager.cc"],
     hdrs = ["monitor_manager.h"],
     deps = [
-        ":message_observer",
         "//modules/canbus/proto:canbus_proto",
+        "//modules/common/adapters:adapter_gflags",
         "//modules/common/monitor_log",
         "//modules/common/util",
         "//modules/common/util:map_util",

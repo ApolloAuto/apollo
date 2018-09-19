@@ -17,6 +17,7 @@
 #include "modules/monitor/software/localization_monitor.h"
 
 #include "cybertron/common/log.h"
+#include "modules/common/adapters/adapter_gflags.h"
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/monitor/common/monitor_manager.h"
 
@@ -38,10 +39,10 @@ LocalizationMonitor::LocalizationMonitor()
 }
 
 void LocalizationMonitor::RunOnce(const double current_time) {
-  static auto observer = MonitorManager::CreateObserver<LocalizationStatus>(
+  static auto reader = MonitorManager::CreateReader<LocalizationStatus>(
       FLAGS_localization_msf_status);
-
-  const auto status = observer->GetLatest();
+  reader->Observe();
+  const auto status = reader->GetLatestObserved();
   if (status == nullptr) {
     AERROR << "No LocalizationStatus received.";
     return;
