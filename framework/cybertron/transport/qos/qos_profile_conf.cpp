@@ -42,7 +42,7 @@ const size_t QosProfileConf::QOS_HISTORY_DEPTH_SYSTEM_DEFAULT = 0;
 const size_t QosProfileConf::QOS_MPS_SYSTEM_DEFAULT = 0;
 
 const QosProfile QosProfileConf::QOS_PROFILE_DEFAULT = CreateQosProfile(
-    QosHistoryPolicy::HISTORY_KEEP_LAST, 2000, QOS_MPS_SYSTEM_DEFAULT,
+    QosHistoryPolicy::HISTORY_KEEP_LAST, 1, QOS_MPS_SYSTEM_DEFAULT,
     QosReliabilityPolicy::RELIABILITY_RELIABLE,
     QosDurabilityPolicy::DURABILITY_VOLATILE);
 
