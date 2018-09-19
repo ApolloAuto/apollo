@@ -51,6 +51,9 @@ class GlobalData {
 
   const CyberConfig& Config() const;
 
+  void EnableSimulationMode();
+  void DisableSimulationMode();
+
   bool IsRealityMode() const;
 
   static uint64_t RegisterNode(const std::string& node_name);

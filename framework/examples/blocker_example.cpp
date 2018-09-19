@@ -29,9 +29,10 @@ int main(int argc, char* argv[]) {
     std::cout << "To use this example:\n"
                  "we need to set run_mode to MODE_SIMULATION (run_mode is in\n"
                  "file conf/cybertron.pb.conf)\n"
-                 "Or export CYBER_RUN_MODE=simulation firstly."
+                 "Or export CYBER_RUN_MODE=simulation\n"
+                 "Or EnableSimulationMode."
               << std::endl;
-    return 0;
+    apollo::cybertron::common::GlobalData::Instance()->EnableSimulationMode();
   }
 
   apollo::cybertron::proto::ComponentConfig config;

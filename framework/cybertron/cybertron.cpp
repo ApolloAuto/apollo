@@ -26,12 +26,11 @@ using apollo::cybertron::proto::RunMode;
 
 std::unique_ptr<Node> CreateNode(const std::string& node_name,
                                  const std::string& name_space) {
-  static bool is_reality_mode = GlobalData::Instance()->IsRealityMode();
-
+  bool is_reality_mode = GlobalData::Instance()->IsRealityMode();
   if (is_reality_mode && !OK()) {
     // TODO @nizhongjun
     // add some hint log
-    AERROR << "cybertron has not inited.";
+    AERROR << "please initialize cybertron firstly.";
     return nullptr;
   }
   std::unique_ptr<Node> node(new Node(node_name, name_space));

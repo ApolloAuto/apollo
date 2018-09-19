@@ -69,6 +69,10 @@ const std::string& GlobalData::HostIp() const { return host_ip_; }
 
 const std::string& GlobalData::HostName() const { return host_name_; }
 
+void GlobalData::EnableSimulationMode() { is_reality_mode_ = false; }
+
+void GlobalData::DisableSimulationMode() { is_reality_mode_ = true; }
+
 bool GlobalData::IsRealityMode() const { return is_reality_mode_; }
 
 void GlobalData::InitHostInfo() {
