@@ -21,9 +21,7 @@
 #include <memory>
 #include <string>
 
-#include "cybertron/cybertron.h"
-#include "cybertron/tf2_cybertron/transform_broadcaster.h"
-#include "cybertron/tf2_cybertron/buffer.h"
+#include "modules/transform/buffer.h"
 
 #include "modules/drivers/proto/pointcloud.pb.h"
 #include "modules/drivers/velodyne/parser/const_variables.h"
@@ -33,7 +31,7 @@ namespace apollo {
 namespace drivers {
 namespace velodyne {
 
-using apollo::cybertron::tf2_cybertron::Buffer;
+using apollo::transform::Buffer;
 using apollo::drivers::PointCloud;
 using apollo::drivers::velodyne::config::Config;
 

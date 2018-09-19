@@ -81,6 +81,7 @@ cc_library(
     deps = [
         "//modules/drivers/velodyne/proto:velodyne_proto",
         "//modules/drivers/proto:sensor_proto",
+        "//modules/transform:tf2_buffer_lib",
         "//framework:cybertron",
         "@eigen",
     ],
