@@ -1232,7 +1232,8 @@ static int decode_type1045(rtcm_t* rtcm) {
   eph_t eph = {0};
   double toc, sqrtA;
   char* msg;
-  int i = 24 + 12, prn, sat, week, e5a_hs, e5a_dvs, rsv, sys = SYS_GAL;
+  //int i = 24 + 12, prn, sat, week, e5a_hs, e5a_dvs, rsv, sys = SYS_GAL;
+  int i = 24 + 12, prn, sat, week, e5a_hs, e5a_dvs, sys = SYS_GAL;
 
   if (i + 484 <= rtcm->len * 8) {
     prn = getbitu(rtcm->buff, i, 6);
@@ -1289,7 +1290,8 @@ static int decode_type1045(rtcm_t* rtcm) {
     i += 2; /* OSHS */
     e5a_dvs = getbitu(rtcm->buff, i, 1);
     i += 1; /* OSDVS */
-    rsv = getbitu(rtcm->buff, i, 7);
+    //rsv = getbitu(rtcm->buff, i, 7);
+    getbitu(rtcm->buff, i, 7);
   } else {
     trace(2, "rtcm3 1045 length error: len=%d\n", rtcm->len);
     return -1;
@@ -2185,7 +2187,8 @@ static int decode_msm_head(rtcm_t* rtcm, int sys, int* sync, int* iod,
   msm_h_t h0 = {0};
   double tow, tod;
   char* msg;
-  int i = 24, j, dow, mask, staid, type, ncell = 0;
+  //int i = 24, j, dow, mask, staid, type, ncell = 0;
+  int i = 24, j, mask, staid, type, ncell = 0;
 
   type = getbitu(rtcm->buff, i, 12);
   i += 12;
@@ -2196,7 +2199,8 @@ static int decode_msm_head(rtcm_t* rtcm, int sys, int* sync, int* iod,
     i += 12;
 
     if (sys == SYS_GLO) {
-      dow = getbitu(rtcm->buff, i, 3);
+      //dow = getbitu(rtcm->buff, i, 3);
+      getbitu(rtcm->buff, i, 3);
       i += 3;
       tod = getbitu(rtcm->buff, i, 27) * 0.001;
       i += 27;

@@ -1025,6 +1025,7 @@ static int decode_galephemerisb(raw_t* raw) {
   rcv_fnav = U4(p) & 1;
   p += 4;
   rcv_inav = U4(p) & 1;
+  (void)rcv_inav;
   p += 4;
   svh_e1b = U1(p) & 3;
   p += 1;
@@ -1159,8 +1160,10 @@ static int decode_galalmanacb(raw_t* raw) {
   prn = U4(p);
   p += 4;
   rcv_fnav = U4(p) & 1;
+  (void)rcv_fnav; 
   p += 4;
   rcv_inav = U4(p) & 1;
+  (void)rcv_inav;
   p += 4;
   svh_e1b = U1(p) & 3;
   p += 1;
@@ -1169,6 +1172,7 @@ static int decode_galalmanacb(raw_t* raw) {
   svh_e5b = U1(p) & 3;
   p += 1 + 1;
   ioda = U4(p);
+  (void)ioda;
   p += 4;
   alm.week = U4(p);
   p += 4; /* gst week */
@@ -1208,17 +1212,17 @@ static int decode_galclockb(raw_t* raw) {
   unsigned char* p = raw->buff + OEM4HLEN;
   double a0 = 0.0;
   double a1 = 0.0;
-  double a0g = 0.0;
-  double a1g = 0.0;
+  //double a0g = 0.0;
+  //double a1g = 0.0;
 
-  int leaps = 0;
+  //int leaps = 0;
   int tot = 0;
   int wnt = 0;
-  int wnlsf = 0;
-  int dn = 0;
-  int dtlsf = 0;
-  int t0g = 0;
-  int wn0g = 0;
+  //int wnlsf = 0;
+  //int dn = 0;
+  //int dtlsf = 0;
+  //int t0g = 0;
+  //int wn0g = 0;
 
   trace(3, "decode_galclockb: len=%d\n", raw->len);
 
@@ -1230,25 +1234,33 @@ static int decode_galclockb(raw_t* raw) {
   p += 8;
   a1 = R8(p);
   p += 8;
-  leaps = I4(p);
+  //leaps = I4(p);
+  I4(p);
   p += 4;
   tot = U4(p);
   p += 4;
   wnt = U4(p);
   p += 4;
-  wnlsf = U4(p);
+  //wnlsf = U4(p);
+  U4(p);
   p += 4;
-  dn = U4(p);
+  //dn = U4(p);
+  U4(p);
   p += 4;
-  dtlsf = U4(p);
+  //dtlsf = U4(p);
+  U4(p);
   p += 4;
-  a0g = R8(p);
+  //a0g = R8(p);
+  R8(p);
   p += 8;
-  a1g = R8(p);
+  //a1g = R8(p);
+  R8(p);
   p += 8;
-  t0g = U4(p);
+  //t0g = U4(p);
+  U4(p);
   p += 4;
-  wn0g = U4(p);
+  //wn0g = U4(p);
+  U4(p);
 
   raw->nav.utc_gal[0] = a0;
   raw->nav.utc_gal[1] = a1;
@@ -1285,6 +1297,7 @@ static int decode_galionob(raw_t* raw) {
   sf[3] = U1(p);
   p += 1;
   sf[4] = U1(p);
+  (void)sf;
 
   for (i = 0; i < 3; ++i) {
     raw->nav.ion_gal[i] = ai[i];
@@ -1297,7 +1310,7 @@ static int decode_galfnavrawpageb(raw_t* raw) {
   unsigned char* p = raw->buff + OEM4HLEN;
   unsigned char buff[27];
   int i = 0;
-  int sigch = 0;
+  //int sigch = 0;
   int satid = 0;
   int page = 0;
 
@@ -1307,7 +1320,8 @@ static int decode_galfnavrawpageb(raw_t* raw) {
     trace(2, "oem4 galfnavrawpageb length error: len=%d\n", raw->len);
     return -1;
   }
-  sigch = U4(p);
+  //sigch = U4(p);
+  U4(p);
   p += 4;
   satid = U4(p);
   p += 4;
@@ -1330,7 +1344,7 @@ static int decode_galinavrawwordb(raw_t* raw) {
   gtime_t time = raw->time;
   char* sig = NULL;
   int i = 0;
-  int sigch = 0;
+  //int sigch = 0;
   int satid = 0;
   int sigtype = 0;
   int type = 0;
@@ -1343,7 +1357,8 @@ static int decode_galinavrawwordb(raw_t* raw) {
     trace(2, "oem4 galinavrawwordb length error: len=%d\n", raw->len);
     return -1;
   }
-  sigch = U4(p);
+  //sigch = U4(p);
+  U4(p);
   p += 4;
   satid = U4(p);
   p += 4;
@@ -1396,6 +1411,7 @@ static int decode_rawcnavframeb(raw_t* raw) {
     return -1;
   }
   sigch = U4(p);
+  (void)sigch;
   p += 4;
   prn = U4(p);
   p += 4;

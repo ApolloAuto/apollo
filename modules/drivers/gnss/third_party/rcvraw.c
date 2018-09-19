@@ -435,11 +435,11 @@ extern int decode_glostr(const unsigned char* buff, geph_t* geph) {
   double tod = 0.0;
   double tof = 0.0;
   double toe = 0.0;
-  int P = 0;
-  int P1 = 0;
-  int P2 = 0;
-  int P3 = 0;
-  int P4 = 0;
+//  int P = 0;
+//  int P1 = 0;
+//  int P2 = 0;
+//  int P3 = 0;
+//  int P4 = 0;
   int tk_h = 0;
   int tk_m = 0;
   int tk_s = 0;
@@ -457,7 +457,8 @@ extern int decode_glostr(const unsigned char* buff, geph_t* geph) {
   /* frame 1 */
   frn1 = getbitu(buff, i, 4);
   i += 4 + 2;
-  P1 = getbitu(buff, i, 2);
+  //P1 = getbitu(buff, i, 2);
+  getbitu(buff, i, 2);
   i += 2;
   tk_h = getbitu(buff, i, 5);
   i += 5;
@@ -477,7 +478,8 @@ extern int decode_glostr(const unsigned char* buff, geph_t* geph) {
   i += 4;
   geph->svh = getbitu(buff, i, 3);
   i += 3;
-  P2 = getbitu(buff, i, 1);
+  //P2 = getbitu(buff, i, 1);
+  getbitu(buff, i, 1);
   i += 1;
   tb = getbitu(buff, i, 7);
   i += 7 + 5;
@@ -491,13 +493,16 @@ extern int decode_glostr(const unsigned char* buff, geph_t* geph) {
   /* frame 3 */
   frn3 = getbitu(buff, i, 4);
   i += 4;
-  P3 = getbitu(buff, i, 1);
+  //P3 = getbitu(buff, i, 1);
+  getbitu(buff, i, 1);
   i += 1;
   geph->gamn = getbitg(buff, i, 11) * P2_40;
   i += 11 + 1;
-  P = getbitu(buff, i, 2);
+  //P = getbitu(buff, i, 2);
+  getbitu(buff, i, 2);
   i += 2;
-  int ln = getbitu(buff, i, 1);
+  //int ln = getbitu(buff, i, 1);
+  getbitu(buff, i, 1);
   i += 1;
   geph->vel[2] = getbitg(buff, i, 24) * P2_20 * 1E3;
   i += 24;
@@ -515,15 +520,18 @@ extern int decode_glostr(const unsigned char* buff, geph_t* geph) {
   i += 5;
   geph->age = getbitu(buff, i, 5);
   i += 5 + 14;
-  P4 = getbitu(buff, i, 1);
+  //P4 = getbitu(buff, i, 1);
+  getbitu(buff, i, 1);
   i += 1;
   geph->sva = getbitu(buff, i, 4);
   i += 4 + 3;
-  int NT = getbitu(buff, i, 11);
+  //int NT = getbitu(buff, i, 11);
+  getbitu(buff, i, 11);
   i += 11;
   slot = getbitu(buff, i, 5);
   i += 5;
-  int M = getbitu(buff, i, 2);
+  //int M = getbitu(buff, i, 2);
+  getbitu(buff, i, 2);
 
   if (frn1 != 1 || frn2 != 2 || frn3 != 3 || frn4 != 4) {
     trace(3, "decode_glostr error: frn=%d %d %d %d %d\n", frn1, frn2, frn3,
