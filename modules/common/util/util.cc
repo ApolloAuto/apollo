@@ -54,15 +54,6 @@ PointENU MakePointENU(const math::Vec2d& xy) {
   return point_enu;
 }
 
-apollo::perception::Point MakePerceptionPoint(const double x, const double y,
-                                              const double z) {
-  perception::Point point3d;
-  point3d.set_x(x);
-  point3d.set_y(y);
-  point3d.set_z(z);
-  return point3d;
-}
-
 SpeedPoint MakeSpeedPoint(const double s, const double t, const double v,
                           const double a, const double da) {
   SpeedPoint speed_point;
