@@ -212,6 +212,9 @@ bool PlanningComponentTest::RunPlanning(const std::string& test_case_name) {
   traffic_light_detection_writer_->Write(local_view.traffic_light);
   chassis_writer_->Write(local_view.chassis);
   localization_writer_->Write(local_view.localization_estimate);
+
+  usleep(1000);  // sleep 1ms to resolve race condition
+
   // note: main channel must be written last
   prediction_writer_->Write(local_view.prediction_obstacles);
 
