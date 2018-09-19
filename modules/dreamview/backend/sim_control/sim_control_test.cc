@@ -125,8 +125,21 @@ TEST_F(SimControlTest, Test) {
     sim_control_->RunOnce();
 
     node_->Observe();
+    int32_t count = 100;
+    while (count-- > 0 && nullptr == chassis_reader_->GetLatestObserved()) {
+      usleep(10000);
+      continue;
+    }
+    count = 100;
+    while (count-- > 0 && nullptr == localization_reader_->GetLatestObserved()) {
+      usleep(10000);
+      continue;
+    }
     const auto chassis = chassis_reader_->GetLatestObserved();
     const auto localization = localization_reader_->GetLatestObserved();
+
+    ASSERT_TRUE(chassis != nullptr);
+    ASSERT_TRUE(localization != nullptr);
 
     EXPECT_TRUE(chassis->engine_started());
     EXPECT_EQ(Chassis::COMPLETE_AUTO_DRIVE, chassis->driving_mode());
