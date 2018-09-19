@@ -118,8 +118,8 @@ void Velodyne16Parser::unpack(const VelodynePacket& pkt,
           pc->set_measurement_time(static_cast<double>(timestamp / 1e9));
         }
 
-        float distance = raw_distance.raw_distance * DISTANCE_RESOLUTION +
-                         corrections.dist_correction;
+        float real_distance = raw_distance.raw_distance * DISTANCE_RESOLUTION;
+        float distance = real_distance + corrections.dist_correction;
 
         if (raw_distance.raw_distance == 0 ||
             !is_scan_valid(azimuth_corrected, distance)) {
@@ -138,7 +138,7 @@ void Velodyne16Parser::unpack(const VelodynePacket& pkt,
         PointXYZIT* point = pc->add_point();
         point->set_timestamp(timestamp);
         // append this point to the cloud
-        compute_coords(distance, corrections, azimuth_corrected, point);
+        compute_coords(real_distance, corrections, azimuth_corrected, point);
         point->set_intensity(raw->blocks[block].data[k + 2]);
         // append this point to the cloud
 

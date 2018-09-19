@@ -87,6 +87,44 @@ int VelodyneDriver::poll_standard(std::shared_ptr<VelodyneScan> scan) {
   return 0;
 }
 
+void VelodyneDriver::poll_positioning_packet(void) {
+  while (true) {
+    NMEATimePtr nmea_time(new NMEATime);
+    bool ret = true;
+    if (config_.has_use_gps_time() && !config_.use_gps_time()) {
+      time_t t = time(NULL);
+      struct tm current_time;
+      localtime_r(&t, &current_time);
+      nmea_time->year = current_time.tm_year - 100;
+      nmea_time->mon = current_time.tm_mon + 1;
+      nmea_time->day = current_time.tm_mday;
+      nmea_time->hour = current_time.tm_hour;
+      nmea_time->min = current_time.tm_min;
+      nmea_time->sec = current_time.tm_sec;
+      AINFO << "Get NMEA Time from local time :"
+                << "year:" << nmea_time->year << "mon:" << nmea_time->mon
+                << "day:" << nmea_time->day << "hour:" << nmea_time->hour
+                << "min:" << nmea_time->min << "sec:" << nmea_time->sec;
+    } else {
+      while (true) {
+        int rc = positioning_input_->get_positioning_data_packet(nmea_time);
+        if (rc == 0) {
+          break;  // got a full packet
+        }
+        if (rc < 0) {
+          ret = false;  // end of file reached
+        }
+      }
+    }
+
+    if (basetime_ == 0 && ret) {
+      set_base_time_from_nmea_time(nmea_time, &basetime_);
+    } else {
+      usleep(1000);
+    }
+  }
+}
+
 void VelodyneDriver::update_gps_top_hour(uint32_t current_time) {
   if (last_gps_time_ == 0) {
     last_gps_time_ = current_time;
@@ -124,7 +162,7 @@ VelodyneDriver* VelodyneDriverFactory::create_driver(const Config& config) {
   } else if (config.model() == VLP16) {
     return new Velodyne16Driver(config);
   } else if (config.model() == VLS128) {
-    return nullptr;
+    return new Velodyne128Driver(config);
   } else {
     AERROR << "invalid model, must be 64E_S2|64E_S3S"
            << "|64E_S3D|VLP16|HDL32E|VLS128";

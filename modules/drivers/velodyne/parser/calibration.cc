@@ -76,7 +76,11 @@ void operator>>(const YAML::Node& node,
   node[DIST_CORRECTION_X] >> correction.second.dist_correction_x;
   node[DIST_CORRECTION_Y] >> correction.second.dist_correction_y;
   node[VERT_OFFSET_CORRECTION] >> correction.second.vert_offset_correction;
-  node[HORIZ_OFFSET_CORRECTION] >> correction.second.horiz_offset_correction;
+  if (node[HORIZ_OFFSET_CORRECTION]) {
+    node[HORIZ_OFFSET_CORRECTION] >> correction.second.horiz_offset_correction;
+  } else {
+    correction.second.horiz_offset_correction = 0.0;
+  }
 
   if (node[MAX_INTENSITY]) {
     node[MAX_INTENSITY] >> correction.second.max_intensity;
