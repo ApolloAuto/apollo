@@ -72,5 +72,5 @@ message Feature {
     NORMAL = 2;
     IGNORE = 3;
   }
-  optional Priority priority = 25;
+  optional Priority priority = 25 [default = NORMAL];
 }

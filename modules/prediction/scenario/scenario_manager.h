@@ -21,6 +21,9 @@
 #ifndef MODULES_PREDICTION_SCENARIO_SCENARIO_MANAGER_H_
 #define MODULES_PREDICTION_SCENARIO_SCENARIO_MANAGER_H_
 
+#include <vector>
+#include <string>
+
 #include "cybertron/common/macros.h"
 #include "modules/prediction/proto/scenario.pb.h"
 #include "modules/prediction/proto/prediction_conf.pb.h"
@@ -41,6 +44,12 @@ class ScenarioManager {
    * @brief Get scenario analysis result
    */
   const Scenario& scenario() const;
+
+  /**
+   * @brief Get the IDs of the focused lanes based on the scenario
+   * @return The IDs of the focused lanes based on the scenario
+   */
+  std::vector<std::string> GetFocusedLaneIds() const;
 
  private:
   FeatureExtractor feature_extractor_;

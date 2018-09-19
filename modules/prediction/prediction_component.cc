@@ -167,7 +167,6 @@ bool PredictionComponent::Init() {
       }
     }
     Stop();
-    // TODO(kechxu) accord to cybertron
   }
   return true;
 }
@@ -209,8 +208,6 @@ bool PredictionComponent::Proc(
       (Clock::NowInSeconds() - component_start_time_ >
        FLAGS_prediction_test_duration)) {
     ADEBUG << "Prediction finished running in test mode";
-    // TODO(kechxu) accord to cybertron
-    // ros::shutdown();
   }
 
   // Update relative map if needed

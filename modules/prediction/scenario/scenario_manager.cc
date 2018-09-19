@@ -31,5 +31,11 @@ const Scenario& ScenarioManager::scenario() const {
   return scenario_analyzer_.scenario();
 }
 
+std::vector<std::string> ScenarioManager::GetFocusedLaneIds() const {
+  // TODO(all) use scenario feature to get lane ids
+  std::vector<std::string> focused_lane_ids;
+  return focused_lane_ids;
+}
+
 }  // namespace prediction
 }  // namespace apollo
