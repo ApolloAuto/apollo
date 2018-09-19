@@ -1,7 +1,7 @@
 <cybertron>
     <module>
         <name>gnss</name>
-        <dag_conf>/apollo/modules/drivers/gnss/dag/dag_streaming_gnss.dag</dag_conf>
+        <dag_conf>/apollo/modules/drivers/velodyne/dag/velodyne.dag</dag_conf>
         <process_name>gnss</process_name>
     </module>
 </cybertron>
