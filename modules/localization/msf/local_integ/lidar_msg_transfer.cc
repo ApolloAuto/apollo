@@ -32,8 +32,8 @@ void LidarMsgTransfer::Transfer(const drivers::PointCloud &msg,
   CHECK_NOTNULL(lidar_frame);
 
   if (msg.height() > 1 && msg.width() > 1) {
-    for (int i = 0; i < msg.height(); ++i) {
-      for (int j = 0; j < msg.width(); ++j) {
+    for (unsigned int i = 0; i < msg.height(); ++i) {
+      for (unsigned int j = 0; j < msg.width(); ++j) {
         Eigen::Vector3d pt3d;
         pt3d[0] = static_cast<double>(msg.point(i * msg.width() + j).x());
         pt3d[1] = static_cast<double>(msg.point(i * msg.width() + j).y());
