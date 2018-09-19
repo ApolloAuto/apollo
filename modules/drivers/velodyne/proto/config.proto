@@ -27,4 +27,5 @@ message Config {
   optional string convert_channel_name = 19;
   optional int32 npackets = 20;
   optional string compensator_channel_name = 22;
+  optional bool use_gps_time = 23;
 }

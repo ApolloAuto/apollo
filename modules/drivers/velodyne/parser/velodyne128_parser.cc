@@ -23,7 +23,7 @@ namespace velodyne {
 Velodyne128Parser::Velodyne128Parser(const Config& config)
     : VelodyneParser(config), previous_packet_stamp_(0), gps_base_usec_(0) {
   // TODO(dengchengliang): wait for lidar128 manual
-  inner_time_ = &velodyne::INNER_TIME_HDL32E;
+  inner_time_ = &velodyne::INNER_TIME_128;
   need_two_pt_correction_ = false;
 }
 
@@ -77,9 +77,6 @@ void Velodyne128Parser::unpack(const VelodynePacket& pkt,
   float last_azimuth_diff = 0;
   uint16_t azimuth, azimuth_next, azimuth_corrected;
   // float x_coord, y_coord, z_coord;
-  float distance;
-  int intensity;
-
   // const raw_packet_t *raw = (const raw_packet_t *)&pkt.data[0];
   const RawPacket* raw = (const RawPacket*)pkt.data().c_str();
   double basetime = raw->gps_timestamp;
@@ -119,9 +116,13 @@ void Velodyne128Parser::unpack(const VelodynePacket& pkt,
       union RawDistance raw_distance;
       raw_distance.bytes[0] = raw->blocks[block].data[k];
       raw_distance.bytes[1] = raw->blocks[block].data[k + 1];
-      distance = raw_distance.raw_distance * VSL128_DISTANCE_RESOLUTION;
 
-      uint64_t timestamp = get_timestamp(basetime, 0, block);
+      float real_distance =
+          raw_distance.raw_distance * VSL128_DISTANCE_RESOLUTION;
+      float distance = real_distance + corrections.dist_correction;
+
+      uint64_t timestamp =
+          get_timestamp(basetime, (*inner_time_)[block][j], block);
       if (!is_scan_valid(azimuth, distance)) {
         // todo orgnized
         if (config_.organized()) {
@@ -136,7 +137,7 @@ void Velodyne128Parser::unpack(const VelodynePacket& pkt,
       }
 
       // if (pointInRange(distance)) {
-      intensity = static_cast<float>(raw->blocks[block].data[k + 2]);
+      float intensity = static_cast<float>(raw->blocks[block].data[k + 2]);
 
       /** correct for the laser rotation as a function of timing during the
        * firings **/
@@ -151,7 +152,7 @@ void Velodyne128Parser::unpack(const VelodynePacket& pkt,
 
       // compute time , time offset is zero
       point_new->set_timestamp(timestamp);
-      compute_coords(distance, corrections, azimuth_corrected, point_new);
+      compute_coords(real_distance, corrections, azimuth_corrected, point_new);
 
       intensity = intensity_compensate(corrections, raw_distance.raw_distance,
                                        intensity);

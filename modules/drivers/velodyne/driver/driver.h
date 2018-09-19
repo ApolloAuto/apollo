@@ -62,11 +62,12 @@ class VelodyneDriver {
 
   virtual bool poll(std::shared_ptr<VelodyneScan> scan) = 0;
   virtual void init() = 0;
+  virtual void poll_positioning_packet();
 
  protected:
   Config config_;
-  std::shared_ptr<Input> input_;
-  // ros::Publisher output_;
+  std::unique_ptr<Input> input_ = nullptr;
+  std::unique_ptr<Input> positioning_input_ = nullptr;
   std::string topic_;
 
   uint64_t basetime_;
@@ -83,8 +84,8 @@ class Velodyne64Driver : public VelodyneDriver {
   explicit Velodyne64Driver(const Config &config);
   virtual ~Velodyne64Driver() {}
 
-  void init();
-  bool poll(std::shared_ptr<VelodyneScan> scan);
+  void init() override;
+  bool poll(std::shared_ptr<VelodyneScan> scan) override;
 
  private:
   bool check_angle(const VelodynePacket &packet);
@@ -95,12 +96,8 @@ class Velodyne32Driver : public VelodyneDriver {
  public:
   explicit Velodyne32Driver(const Config &config);
   virtual ~Velodyne32Driver() {}
-  void init();
-  bool poll(std::shared_ptr<VelodyneScan> scan);
-  void poll_positioning_packet();
-
- private:
-  std::shared_ptr<Input> positioning_input_;
+  void init() override;
+  bool poll(std::shared_ptr<VelodyneScan> scan) override;
 };
 
 class Velodyne16Driver : public VelodyneDriver {
@@ -108,12 +105,8 @@ class Velodyne16Driver : public VelodyneDriver {
   explicit Velodyne16Driver(const Config &config);
   virtual ~Velodyne16Driver() {}
 
-  void init();
-  bool poll(std::shared_ptr<VelodyneScan> scan);
-  void poll_positioning_packet();
-
- private:
-  std::shared_ptr<Input> positioning_input_;
+  void init() override;
+  bool poll(std::shared_ptr<VelodyneScan> scan) override;
 };
 
 class Velodyne128Driver : public VelodyneDriver {
@@ -121,12 +114,8 @@ class Velodyne128Driver : public VelodyneDriver {
   explicit Velodyne128Driver(const Config &config);
   virtual ~Velodyne128Driver() {}
 
-  void init();
-  bool poll(std::shared_ptr<VelodyneScan> scan);
-  void poll_positioning_packet();
-
- private:
-  std::shared_ptr<Input> positioning_input_;
+  void init() override;
+  bool poll(std::shared_ptr<VelodyneScan> scan) override;
 };
 
 class VelodyneDriverFactory {

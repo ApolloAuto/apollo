@@ -271,8 +271,8 @@ void Velodyne64Parser::unpack(const VelodynePacket& pkt,
         pc->set_measurement_time(static_cast<double>(timestamp / 1e9));
       }
 
-      float distance = raw_distance.raw_distance * DISTANCE_RESOLUTION +
-                       corrections.dist_correction;
+      float real_distance = raw_distance.raw_distance * DISTANCE_RESOLUTION;
+      float distance = real_distance + corrections.dist_correction;
 
       if (raw_distance.raw_distance == 0 ||
           !is_scan_valid(raw->blocks[i].rotation, distance)) {
@@ -291,7 +291,8 @@ void Velodyne64Parser::unpack(const VelodynePacket& pkt,
       apollo::drivers::PointXYZIT* point = pc->add_point();
       point->set_timestamp(timestamp);
       // Position Calculation, append this point to the cloud
-      compute_coords(distance, corrections, raw->blocks[i].rotation, point);
+      compute_coords(real_distance, corrections, raw->blocks[i].rotation,
+                     point);
       point->set_intensity(intensity_compensate(
           corrections, raw_distance.raw_distance, raw->blocks[i].data[k + 2]));
       // append this point to the cloud

@@ -96,30 +96,6 @@ bool Velodyne16Driver::poll(std::shared_ptr<VelodyneScan> scan) {
   return true;
 }
 
-/** poll the device
- *
- *  @returns true unless end of file reached
- */
-void Velodyne16Driver::poll_positioning_packet(void) {
-  while (true) {
-    NMEATimePtr nmea_time(new NMEATime);
-    bool ret = true;
-    while (true) {
-      int rc = positioning_input_->get_positioning_data_packet(nmea_time);
-      if (rc == 0) {
-        break;  // got a full packet
-      }
-      if (rc < 0) {
-        ret = false;  // end of file reached
-      }
-    }
-
-    if (basetime_ == 0 && ret) {
-      set_base_time_from_nmea_time(nmea_time, &basetime_);
-    }
-  }
-}
-
 }  // namespace velodyne
 }  // namespace drivers
 }  // namespace apollo

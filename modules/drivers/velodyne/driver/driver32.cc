@@ -21,8 +21,6 @@
 #include <thread>
 
 #include "modules/drivers/velodyne/driver/driver.h"
-// #include <ros/ros.h>
-// #include <tf/transform_listener.h>
 
 namespace apollo {
 namespace drivers {
@@ -46,9 +44,6 @@ void Velodyne32Driver::init() {
   input_->init(config_.firing_data_port());
   positioning_input_->init(config_.positioning_data_port());
 
-  // raw data output topic
-  // output_ =
-  //     node.advertise<velodyne_msgs::VelodyneScanUnified>(config_.topic, 10);
   std::thread thread(&Velodyne32Driver::poll_positioning_packet, this);
   thread.detach();
 }
@@ -59,8 +54,6 @@ void Velodyne32Driver::init() {
  */
 bool Velodyne32Driver::poll(std::shared_ptr<VelodyneScan> scan) {
   // Allocate a new shared pointer for zero-copy sharing with other nodelets.
-  // velodyne_msgs::VelodyneScanUnifiedPtr scan(
-  //     new velodyne_msgs::VelodyneScanUnified);
   if (basetime_ == 0) {
     AWARN << "basetime is zero";
     usleep(100);
@@ -78,45 +71,16 @@ bool Velodyne32Driver::poll(std::shared_ptr<VelodyneScan> scan) {
     return true;
   }
 
-  // publish message using time of last packet read
   ADEBUG << "Publishing a full Velodyne scan.";
-  // scan->header.stamp = ros::Time().now();
   scan->mutable_header()->set_timestamp_sec(cybertron::Time().Now().ToSecond());
   scan->mutable_header()->set_frame_id(config_.frame_id());
   // we use first packet gps time update gps base hour
   // in cloud nodelet, will update base time packet by packets
   uint32_t current_secs = *(reinterpret_cast<uint32_t*>(
       const_cast<char*>(scan->firing_pkts(0).data().c_str() + 1200)));
-  // uint32_t current_secs = *((uint32_t*)(&scan->packetsfront().data[0] +
-  // 1200));
   update_gps_top_hour(current_secs);
   scan->set_basetime(basetime_);
-  // output_.publish(scan);
   return true;
-}
-
-/** poll the device
- *
- *  @returns true unless end of file reached
- */
-void Velodyne32Driver::poll_positioning_packet(void) {
-  while (true) {
-    NMEATimePtr nmea_time(new NMEATime);
-    bool ret = true;
-    while (true) {
-      int rc = positioning_input_->get_positioning_data_packet(nmea_time);
-      if (rc == 0) {
-        break;  // got a full packet
-      }
-      if (rc < 0) {
-        ret = false;  // end of file reached
-      }
-    }
-
-    if (basetime_ == 0 && ret) {
-      set_base_time_from_nmea_time(nmea_time, &basetime_);
-    }
-  }
 }
 
 }  // namespace velodyne
