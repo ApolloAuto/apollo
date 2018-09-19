@@ -153,4 +153,13 @@ cc_test(
     ],
 )
 
+cc_library(
+    name = "scenario_features",
+    srcs = ["scenario_features.cc"],
+    hdrs = ["scenario_features.h"],
+    deps = [
+        "//framework:cybertron",
+    ],
+)
+
 cpplint()
