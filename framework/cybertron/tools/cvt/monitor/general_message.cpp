@@ -203,8 +203,6 @@ void GeneralMessage::Render(const Screen* s, int key) {
     case State::ShowInfo:
       RenderInfo(s, key, lineNo);
       break;
-    case State::ShowRepeatedItems:
-      break;
   }
   s->ClearCurrentColor(Screen::WHITE_BLACK);
 }
