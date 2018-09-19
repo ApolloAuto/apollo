@@ -17,6 +17,7 @@ cc_library(
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/util:message_util",
         "//modules/localization/proto:localization_proto",
+        "//modules/map/relative_map/proto:navigation_proto",
         "//modules/perception/proto:perception_proto",
         "//modules/planning/proto:planning_proto",
         "//modules/prediction/proto:prediction_proto",
@@ -30,12 +31,12 @@ cc_test(
         "planning_component_test.cc",
     ],
     data = [
-      "//modules/common/configs:config_gflags",
-      "//modules/planning:planning_testdata",
+        "//modules/common/configs:config_gflags",
+        "//modules/planning:planning_testdata",
     ],
     deps = [
-      ":planning_component_lib",
-      "@gtest//:main",
+        "@gtest//:main",
+        ":planning_component_lib",
     ],
 )
 
