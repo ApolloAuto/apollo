@@ -232,7 +232,6 @@ Status ControlComponent::ProduceControlCommand(
 }
 
 bool ControlComponent::Proc() {
-  std::lock_guard<std::mutex> lock(mutex_);
   double start_timestamp = Clock::NowInSeconds();
 
   if (control_conf_.is_control_test_mode() &&
