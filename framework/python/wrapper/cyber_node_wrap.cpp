@@ -548,9 +548,10 @@ PyObject *cyber_PyNode_shutdown(PyObject *self, PyObject *args) {
 PyObject *cyber_PyNode_register_message(PyObject *self, PyObject *args) {
   PyObject *pyobj_node = nullptr;
   char *desc = nullptr;
+  int len = 0;
   if (!PyArg_ParseTuple(args,
-                        const_cast<char *>("Os:cyber_PyNode_register_message"),
-                        &pyobj_node, &desc)) {
+                        const_cast<char *>("Os#:cyber_PyNode_register_message"),
+                        &pyobj_node, &desc, &len)) {
     AINFO << "cyber_PyNode_register_message: failed!";
     return Py_None;
   }
@@ -560,7 +561,8 @@ PyObject *cyber_PyNode_register_message(PyObject *self, PyObject *args) {
     AINFO << "cyber_PyNode_register_message:node ptr is null! desc->" << desc;
     return Py_None;
   }
-  node->register_message((std::string const &)desc);
+  std::string desc_str(desc, len);
+  node->register_message((std::string const &)desc_str);
   return Py_None;
 }
 

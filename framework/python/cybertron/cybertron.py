@@ -20,9 +20,10 @@ import sys
 import os
 import importlib
 import time
-import importlib
 import threading
 import ctypes
+
+from google.protobuf.descriptor_pb2 import FileDescriptorProto
 
 PY_CALLBACK_TYPE = ctypes.CFUNCTYPE(ctypes.c_int, ctypes.c_char_p)
 PY_CALLBACK_TYPE_T = ctypes.CFUNCTYPE(ctypes.c_int, ctypes.c_char_p)
@@ -160,6 +161,18 @@ class Node(object):
             _CYBER_NODE.delete_PyService(service)
         _CYBER_NODE.delete_PyNode(self.node)
 
+    def register_message(self, file_desc):
+        """
+        register proto message desc file.
+        """
+        for dep in file_desc.dependencies:
+            self.register_message(dep)
+        proto = FileDescriptorProto()
+        file_desc.CopyToProto(proto)
+        proto.name = file_desc.name
+        desc_str = proto.SerializeToString()
+        _CYBER_NODE.PyNode_register_message(self.node, desc_str)
+
     def create_writer(self, name, data_type):
         """
         create a topic writer for send message to topic.
@@ -167,9 +180,11 @@ class Node(object):
         @param name str: topic name
         @param data_type proto: message class for serialization
         """
-        writer = _CYBER_NODE.PyNode_create_writer(self.node, name, data_type)
+        self.register_message(data_type.DESCRIPTOR.file)
+        datatype = data_type.DESCRIPTOR.full_name
+        writer = _CYBER_NODE.PyNode_create_writer(self.node, name, datatype)
         self.list_writer.append(writer)
-        return Writer(name, writer, data_type)
+        return Writer(name, writer, datatype)
 
     def reader_callback(self, name):
         """
