@@ -29,7 +29,6 @@
 #include "modules/transform/proto/transform.pb.h"
 
 namespace apollo {
-namespace cybertron {
 namespace transform {
 
 // extend the BufferInterface class and BufferCore class
@@ -150,7 +149,6 @@ static const std::string threading_error =
     "messages, call setUsingDedicatedThread(true) on your Buffer instance.";
 
 }  // namespace transform
-}  // namespace cybertron
 }  // namespace apollo
 
 #endif  // INCLUDE_CYBERTRON_TF2_CYBERTRON_BUFFER_H_

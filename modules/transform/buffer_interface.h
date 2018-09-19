@@ -12,7 +12,6 @@
 #include "cybertron/time/time.h"
 
 namespace apollo {
-namespace cybertron {
 namespace transform {
 
 // extend the TFCore class and the TFCpp class
@@ -154,7 +153,6 @@ class BufferInterface {
 };  // class
 
 }  // namespace transform
-}  // namespace cybertron
 }  // namespace apollo
 
 #endif  // INCLUDE_CYBERTRON_TF2_CYBERTRON_BUFFER_INTERFACE_H_

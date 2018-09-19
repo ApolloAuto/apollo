@@ -17,6 +17,20 @@ cc_library(
         "//third_party/tf2:tf2"
     ],
 )
+cc_library(
+    name = "transform_broadcaster_lib",
+    srcs = [
+        "transform_broadcaster.cc",
+    ],
+    hdrs = [
+        "transform_broadcaster.h",
+    ],
+    deps = [
+        "//modules/transform/proto:transform_proto",
+        "//framework:cybertron",
+        "//third_party/tf2:tf2"
+    ],
+)
 
 cc_library(
     name = "static_transform_component_lib",
