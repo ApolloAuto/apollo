@@ -66,8 +66,8 @@ class Reader : public ReaderBase {
   virtual void Enqueue(const std::shared_ptr<MessageT>& msg);
   virtual void SetHistoryDepth(const uint32_t& depth);
   virtual uint32_t GetHistoryDepth() const;
-  virtual const std::shared_ptr<MessageT>& GetLatestObserved() const;
-  virtual const std::shared_ptr<MessageT>& GetOldestObserved() const;
+  virtual std::shared_ptr<MessageT> GetLatestObserved() const;
+  virtual std::shared_ptr<MessageT> GetOldestObserved() const;
   virtual Iterator Begin() const { return observed_queue_.begin(); }
   virtual Iterator End() const { return observed_queue_.end(); }
 
@@ -228,7 +228,7 @@ bool Reader<MessageT>::Empty() const {
 }
 
 template <typename MessageT>
-const std::shared_ptr<MessageT>& Reader<MessageT>::GetLatestObserved() const {
+std::shared_ptr<MessageT> Reader<MessageT>::GetLatestObserved() const {
   std::lock_guard<std::mutex> lg(mutex_);
   if (observed_queue_.empty()) {
     return nullptr;
@@ -237,7 +237,7 @@ const std::shared_ptr<MessageT>& Reader<MessageT>::GetLatestObserved() const {
 }
 
 template <typename MessageT>
-const std::shared_ptr<MessageT>& Reader<MessageT>::GetOldestObserved() const {
+std::shared_ptr<MessageT> Reader<MessageT>::GetOldestObserved() const {
   std::lock_guard<std::mutex> lg(mutex_);
   if (observed_queue_.empty()) {
     return nullptr;

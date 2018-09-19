@@ -167,6 +167,10 @@ TEST(WriterReaderTest, observe) {
   reader.Init();
   EXPECT_TRUE(reader.Empty());
   EXPECT_FALSE(reader.HasReceived());
+  auto latest = reader.GetLatestObserved();
+  auto oldest = reader.GetOldestObserved();
+  EXPECT_EQ(latest, nullptr);
+  EXPECT_EQ(oldest, nullptr);
 
   auto msg1 = std::make_shared<proto::UnitTest>();
   msg1->set_case_name("message_1");
@@ -180,8 +184,8 @@ TEST(WriterReaderTest, observe) {
   reader.Observe();
   EXPECT_FALSE(reader.Empty());
 
-  auto latest = reader.GetLatestObserved();
-  auto oldest = reader.GetOldestObserved();
+  latest = reader.GetLatestObserved();
+  oldest = reader.GetOldestObserved();
   ASSERT_NE(latest, nullptr);
   EXPECT_EQ(latest->case_name(), "message_2");
   ASSERT_NE(oldest, nullptr);

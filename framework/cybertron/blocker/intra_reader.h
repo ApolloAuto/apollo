@@ -51,8 +51,8 @@ class IntraReader : public apollo::cybertron::Reader<MessageT> {
   void Enqueue(const std::shared_ptr<MessageT>& msg) override;
   void SetHistoryDepth(const uint32_t& depth) override;
   uint32_t GetHistoryDepth() const override;
-  const std::shared_ptr<MessageT>& GetLatestObserved() const override;
-  const std::shared_ptr<MessageT>& GetOldestObserved() const override;
+  std::shared_ptr<MessageT> GetLatestObserved() const override;
+  std::shared_ptr<MessageT> GetOldestObserved() const override;
   Iterator Begin() const override;
   Iterator End() const override;
 
@@ -155,7 +155,7 @@ uint32_t IntraReader<MessageT>::GetHistoryDepth() const {
 }
 
 template <typename MessageT>
-const std::shared_ptr<MessageT>& IntraReader<MessageT>::GetLatestObserved()
+std::shared_ptr<MessageT> IntraReader<MessageT>::GetLatestObserved()
     const {
   if (blocker_ == nullptr) {
     return nullptr;
@@ -164,7 +164,7 @@ const std::shared_ptr<MessageT>& IntraReader<MessageT>::GetLatestObserved()
 }
 
 template <typename MessageT>
-const std::shared_ptr<MessageT>& IntraReader<MessageT>::GetOldestObserved()
+std::shared_ptr<MessageT> IntraReader<MessageT>::GetOldestObserved()
     const {
   if (blocker_ == nullptr) {
     return nullptr;
