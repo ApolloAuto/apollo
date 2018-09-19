@@ -15,9 +15,9 @@ cc_library(
         "-lboost_thread",
     ],
     deps = [
+        "//framework:cybertron",
         "//modules/common",
         "//modules/common:apollo_app",
-        "//framework:cybertron",
         "//modules/common/monitor_log",
         "//modules/common/proto:error_code_proto",
         "//modules/common/status",
