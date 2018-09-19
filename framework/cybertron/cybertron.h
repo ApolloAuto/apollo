@@ -57,6 +57,17 @@ std::unique_ptr<Task<T>> CreateTask(const std::string& name, Function&& f,
   return std::move(task);
 }
 
+template <typename T, typename ReturnType, typename Function>
+std::unique_ptr<Task<T, ReturnType>> CreateTask(
+    const std::string& name, Function&& f, const uint8_t& num_threads = 1) {
+  if (!OK()) {
+    return nullptr;
+  }
+  std::unique_ptr<Task<T, ReturnType>> task(
+      new Task<T, ReturnType>(name, std::forward<Function>(f), num_threads));
+  return std::move(task);
+}
+
 inline static void Yield() {
   if (croutine::CRoutine::GetCurrentRoutine()) {
     croutine::CRoutine::Yield();

@@ -76,8 +76,8 @@ class ClassFactory : public AbstractClassFactory<Base> {
   Base* CreateObj() const { return new ClassObject; }
 };
 
-}  // End namespace utility
-}  // End namespace class_loader
+}  // namespace utility
+}  // namespace class_loader
 }  // namespace cybertron
 }  // namespace apollo
 

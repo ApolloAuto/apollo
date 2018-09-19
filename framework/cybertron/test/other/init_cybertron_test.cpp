@@ -21,9 +21,18 @@
 #include "cybertron/common/log.h"
 #include "cybertron/cybertron.h"
 #include "cybertron/init.h"
+#include "cybertron/proto/driver.pb.h"
+using apollo::cybertron::proto::CarStatus;
 
 namespace apollo {
 namespace cybertron {
+
+void VoidTask() { AINFO << "VoidTask running"; }
+
+int UserTask(const std::shared_ptr<CarStatus>& msg) {
+  AINFO << "receive msg";
+  return 0;
+}
 
 TEST(InitCybertronTest, create_node) {
   auto node = CreateNode("create_node");
@@ -56,6 +65,11 @@ TEST(InitCybertronTest, all_in_one) {
   EXPECT_FALSE(Init());
   // repeated call
   Shutdown();
+}
+
+TEST(InitCybertronTest, create_task) {
+  auto task_ = apollo::cybertron::CreateTask<CarStatus, int>("task", &UserTask);
+  auto void_task_ = apollo::cybertron::CreateTask<>("void_task", &VoidTask);
 }
 
 }  // namespace cybertron
