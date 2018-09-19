@@ -27,9 +27,12 @@ namespace message {
 
 struct RawMessage {
  public:
-  RawMessage() { message = ""; }
+  RawMessage() : message(""), timestamp(0) {}
 
-  explicit RawMessage(const std::string &data) { message = data; }
+  explicit RawMessage(const std::string &data) : message(data), timestamp(0) {}
+
+  RawMessage(const std::string &data, uint64_t ts)
+      : message(data), timestamp(ts) {}
 
   RawMessage(const RawMessage &raw_msg)
       : message(raw_msg.message), timestamp(raw_msg.timestamp) {}

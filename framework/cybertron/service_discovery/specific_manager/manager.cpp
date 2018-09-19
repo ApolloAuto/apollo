@@ -35,6 +35,7 @@ using transport::QosProfileConf;
 Manager::Manager()
     : init_(false),
       allowed_role_(0),
+      change_type_(proto::ChangeType::CHANGE_PARTICIPANT),
       channel_name_(""),
       publisher_(nullptr),
       subscriber_(nullptr),
