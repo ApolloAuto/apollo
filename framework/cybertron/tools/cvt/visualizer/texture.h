@@ -27,7 +27,7 @@ class Texture {
   Texture(void);
   ~Texture() {
     if (data_) {
-      delete data_;
+      delete [] data_;
       data_ = nullptr;
     }
   }
