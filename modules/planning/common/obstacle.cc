@@ -115,7 +115,8 @@ bool Obstacle::IsStaticObstacle(const PerceptionObstacle& perception_obstacle) {
   }
   auto moving_speed = std::hypot(perception_obstacle.velocity().x(),
                                  perception_obstacle.velocity().y());
-  return moving_speed <= FLAGS_static_obstacle_speed_threshold;
+  return std::isnan(moving_speed) ||
+    moving_speed <= FLAGS_static_obstacle_speed_threshold;
 }
 
 bool Obstacle::IsVirtualObstacle(
