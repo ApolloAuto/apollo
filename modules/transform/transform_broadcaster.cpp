@@ -2,7 +2,6 @@
 #include "cybertron/time/time.h"
 
 namespace apollo {
-namespace cybertron {
 namespace transform {
 
 TransformBroadcaster::TransformBroadcaster() {
@@ -37,5 +36,4 @@ void TransformBroadcaster::sendTransform(
 }
 
 }  // namespace transform
-}  // namespace cybertron
 }  // namespace apollo

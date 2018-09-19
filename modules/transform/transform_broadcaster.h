@@ -9,7 +9,6 @@
 #include "modules/transform/proto/transform.pb.h"
 
 namespace apollo {
-namespace cybertron {
 namespace transform {
 
 /** \brief This class provides an easy way to publish coordinate frame transform
@@ -49,7 +48,6 @@ class TransformBroadcaster {
   std::shared_ptr<cybertron::Writer<apollo::transform::TransformStampeds>> publisher_;
 };
 }  // namespace transform
-}  // namespace cybertron
 }  // namespace apollo
 
 #endif  // INCLUDE_CYBERTRON_TF2_CYBERTRON_TRANSFORM_BROADCASTER_H_

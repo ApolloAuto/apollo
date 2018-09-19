@@ -21,7 +21,6 @@
 #include "modules/transform/proto/transform.pb.h"
 
 namespace apollo {
-namespace cybertron {
 namespace transform {
 
 Buffer::Buffer() : BufferCore() { Init(); }
@@ -30,7 +29,7 @@ int Buffer::Init() {
   std::string node_name = "transform_listener_" +
                           std::to_string(cybertron::Time::Now().ToNanosecond());
   node_ = cybertron::CreateNode(node_name);
-  proto::RoleAttributes attr;
+  apollo::cybertron::proto::RoleAttributes attr;
   attr.set_channel_name("/tf");
   message_subscriber_tf_ =
       node_->CreateReader<apollo::transform::TransformStampeds>(
@@ -41,7 +40,7 @@ int Buffer::Init() {
   apollo::cybertron::proto::RoleAttributes attr_static;
   attr_static.set_channel_name("/tf_static");
   attr_static.mutable_qos_profile()->CopyFrom(
-      transport::QosProfileConf::QOS_PROFILE_TF_STATIC);
+      apollo::cybertron::transport::QosProfileConf::QOS_PROFILE_TF_STATIC);
   message_subscriber_tf_static_ =
       node_->CreateReader<apollo::transform::TransformStampeds>(
           attr_static,
@@ -226,5 +225,4 @@ bool Buffer::canTransform(const std::string& target_frame,
 }
 
 }  // namespace transform
-}  // namespace cybertron
 }  // namespace apollo
