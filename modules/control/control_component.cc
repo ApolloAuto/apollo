@@ -67,33 +67,38 @@ bool ControlComponent::Init() {
       FLAGS_chassis_topic, [this](const std::shared_ptr<Chassis> &chassis) {
         ADEBUG << "Received chassis data: run chassis callback.";
         std::lock_guard<std::mutex> lock(mutex_);
-        chassis_.CopyFrom(*chassis);
+        latest_chassis_.CopyFrom(*chassis);
       });
+  CHECK(chassis_reader_ != nullptr);
 
   trajectory_reader_ = node_->CreateReader<ADCTrajectory>(
       FLAGS_planning_trajectory_topic,
       [this](const std::shared_ptr<ADCTrajectory> &trajectory) {
         ADEBUG << "Received chassis data: run trajectory callback.";
         std::lock_guard<std::mutex> lock(mutex_);
-        trajectory_.CopyFrom(*trajectory);
+        latest_trajectory_.CopyFrom(*trajectory);
       });
+  CHECK(trajectory_reader_ != nullptr);
 
   localization_reader_ = node_->CreateReader<LocalizationEstimate>(
       FLAGS_localization_topic,
       [this](const std::shared_ptr<LocalizationEstimate> &localization) {
         ADEBUG << "Received control data: run localization message callback.";
         std::lock_guard<std::mutex> lock(mutex_);
-        localization_.CopyFrom(*localization);
+        latest_localization_.CopyFrom(*localization);
       });
+  CHECK(localization_reader_ != nullptr);
 
   pad_msg_reader_ = node_->CreateReader<PadMessage>(
       FLAGS_pad_topic, [this](const std::shared_ptr<PadMessage> &pad_msg) {
         ADEBUG << "Received control data: run pad message callback.";
         OnPad(*pad_msg);
       });
+  CHECK(pad_msg_reader_ != nullptr);
 
   control_cmd_writer_ =
       node_->CreateWriter<ControlCommand>(FLAGS_control_command_topic);
+  CHECK(control_cmd_writer_ != nullptr);
 
   // set initial vehicle state by cmd
   // need to sleep, because advertised channel is not ready immediately
@@ -137,7 +142,7 @@ void ControlComponent::OnMonitor(
 
 Status ControlComponent::ProduceControlCommand(
     ControlCommand *control_command) {
-  Status status = CheckInput();
+  Status status = CheckInput(local_view_);
   // check data
 
   if (!status.ok()) {
@@ -150,12 +155,12 @@ Status ControlComponent::ProduceControlCommand(
     estop_ = true;
     estop_reason_ = status.error_message();
   } else {
-    Status status_ts = CheckTimestamp();
+    Status status_ts = CheckTimestamp(local_view_);
     if (!status_ts.ok()) {
       AERROR << "Input messages timeout";
       // estop_ = true;
       status = status_ts;
-      if (chassis_.driving_mode() !=
+      if (local_view_.chassis.driving_mode() !=
           apollo::canbus::Chassis::COMPLETE_AUTO_DRIVE) {
         control_command->mutable_engage_advice()->set_advice(
             apollo::common::EngageAdvice::DISALLOW_ENGAGE);
@@ -170,33 +175,37 @@ Status ControlComponent::ProduceControlCommand(
 
   // check estop
   estop_ = control_conf_.enable_persistent_estop()
-               ? estop_ || trajectory_.estop().is_estop()
-               : trajectory_.estop().is_estop();
+               ? estop_ || local_view_.trajectory.estop().is_estop()
+               : local_view_.trajectory.estop().is_estop();
 
-  if (trajectory_.estop().is_estop()) {
+  if (local_view_.trajectory.estop().is_estop()) {
     estop_reason_ = "estop from planning";
   }
 
   // if planning set estop, then no control process triggered
   if (!estop_) {
-    if (chassis_.driving_mode() == Chassis::COMPLETE_MANUAL) {
+    if (local_view_.chassis.driving_mode() == Chassis::COMPLETE_MANUAL) {
       controller_agent_.Reset();
       AINFO_EVERY(100) << "Reset Controllers in Manual Mode";
     }
 
     auto debug = control_command->mutable_debug()->mutable_input_debug();
-    debug->mutable_localization_header()->CopyFrom(localization_.header());
-    debug->mutable_canbus_header()->CopyFrom(chassis_.header());
-    debug->mutable_trajectory_header()->CopyFrom(trajectory_.header());
+    debug->mutable_localization_header()->CopyFrom(
+        local_view_.localization.header());
+    debug->mutable_canbus_header()->CopyFrom(local_view_.chassis.header());
+    debug->mutable_trajectory_header()->CopyFrom(
+        local_view_.trajectory.header());
 
     Status status_compute = controller_agent_.ComputeControlCommand(
-        &localization_, &chassis_, &trajectory_, control_command);
+        &local_view_.localization, &local_view_.chassis,
+        &local_view_.trajectory, control_command);
 
     if (!status_compute.ok()) {
       AERROR << "Control main function failed"
-             << " with localization: " << localization_.ShortDebugString()
-             << " with chassis: " << chassis_.ShortDebugString()
-             << " with trajectory: " << trajectory_.ShortDebugString()
+             << " with localization: "
+             << local_view_.localization.ShortDebugString()
+             << " with chassis: " << local_view_.chassis.ShortDebugString()
+             << " with trajectory: " << local_view_.trajectory.ShortDebugString()
              << " with cmd: " << control_command->ShortDebugString()
              << " status:" << status_compute.error_message();
       estop_ = true;
@@ -214,9 +223,9 @@ Status ControlComponent::ProduceControlCommand(
     control_command->set_gear_location(Chassis::GEAR_DRIVE);
   }
   // check signal
-  if (trajectory_.decision().has_vehicle_signal()) {
+  if (local_view_.trajectory.decision().has_vehicle_signal()) {
     control_command->mutable_signal()->CopyFrom(
-        trajectory_.decision().vehicle_signal());
+        local_view_.trajectory.decision().vehicle_signal());
   }
   return status;
 }
@@ -230,6 +239,13 @@ bool ControlComponent::Proc() {
       (start_timestamp - init_time_) > control_conf_.control_test_duration()) {
     AERROR << "Control finished testing. exit";
     return false;
+  }
+
+  {
+    std::lock_guard<std::mutex> lock(mutex_);
+    local_view_.chassis = latest_chassis_;
+    local_view_.trajectory = latest_trajectory_;
+    local_view_.localization = latest_localization_;
   }
 
   ControlCommand control_command;
@@ -259,11 +275,11 @@ bool ControlComponent::Proc() {
 
   // set header
   control_command.mutable_header()->set_lidar_timestamp(
-      trajectory_.header().lidar_timestamp());
+      local_view_.trajectory.header().lidar_timestamp());
   control_command.mutable_header()->set_camera_timestamp(
-      trajectory_.header().camera_timestamp());
+      local_view_.trajectory.header().camera_timestamp());
   control_command.mutable_header()->set_radar_timestamp(
-      trajectory_.header().radar_timestamp());
+      local_view_.trajectory.header().radar_timestamp());
 
   common::util::FillHeader(node_->Name(), &control_command);
 
@@ -278,43 +294,33 @@ bool ControlComponent::Proc() {
   return true;
 }
 
-Status ControlComponent::CheckInput() {
-  if (localization_reader_ == nullptr) {
-    AWARN_EVERY(100) << "No Localization msg yet. ";
-    return Status(ErrorCode::CONTROL_COMPUTE_ERROR, "No localization msg");
-  }
-  ADEBUG << "Received localization:" << localization_.ShortDebugString();
+Status ControlComponent::CheckInput(LocalView& local_view) {
+  ADEBUG << "Received localization:"
+         << local_view.localization.ShortDebugString();
+  ADEBUG << "Received chassis:" << local_view.chassis.ShortDebugString();
 
-  if (chassis_reader_ == nullptr) {
-    AWARN_EVERY(100) << "No Chassis msg yet. ";
-    return Status(ErrorCode::CONTROL_COMPUTE_ERROR, "No chassis msg");
-  }
-  ADEBUG << "Received chassis:" << chassis_.ShortDebugString();
-
-  if (trajectory_reader_ == nullptr) {
-    AWARN_EVERY(100) << "No planning msg yet. ";
-    return Status(ErrorCode::CONTROL_COMPUTE_ERROR, "No planning msg");
-  }
-  if (!trajectory_.estop().is_estop() &&
-      trajectory_.trajectory_point_size() == 0) {
+  if (!local_view.trajectory.estop().is_estop() &&
+      local_view.trajectory.trajectory_point_size() == 0) {
     AWARN_EVERY(100) << "planning has no trajectory point. ";
     return Status(ErrorCode::CONTROL_COMPUTE_ERROR,
                   "planning has no trajectory point.");
   }
 
-  for (auto &trajectory_point : *trajectory_.mutable_trajectory_point()) {
+  for (auto &trajectory_point :
+       *local_view.trajectory.mutable_trajectory_point()) {
     if (trajectory_point.v() < control_conf_.minimum_speed_resolution()) {
       trajectory_point.set_v(0.0);
       trajectory_point.set_a(0.0);
     }
   }
 
-  VehicleStateProvider::Instance()->Update(localization_, chassis_);
+  VehicleStateProvider::Instance()->Update(local_view.localization,
+                                           local_view.chassis);
 
   return Status::OK();
 }
 
-Status ControlComponent::CheckTimestamp() {
+Status ControlComponent::CheckTimestamp(const LocalView& local_view) {
   if (!control_conf_.enable_input_timestamp_check() ||
       control_conf_.is_control_test_mode()) {
     ADEBUG << "Skip input timestamp check by gflags.";
@@ -322,7 +328,7 @@ Status ControlComponent::CheckTimestamp() {
   }
   double current_timestamp = Clock::NowInSeconds();
   double localization_diff =
-      current_timestamp - localization_.header().timestamp_sec();
+      current_timestamp - local_view.localization.header().timestamp_sec();
   if (localization_diff > (control_conf_.max_localization_miss_num() *
                            control_conf_.localization_period())) {
     AERROR << "Localization msg lost for " << std::setprecision(6)
@@ -331,7 +337,8 @@ Status ControlComponent::CheckTimestamp() {
     return Status(ErrorCode::CONTROL_COMPUTE_ERROR, "Localization msg timeout");
   }
 
-  double chassis_diff = current_timestamp - chassis_.header().timestamp_sec();
+  double chassis_diff =
+      current_timestamp - local_view.chassis.header().timestamp_sec();
   if (chassis_diff >
       (control_conf_.max_chassis_miss_num() * control_conf_.chassis_period())) {
     AERROR << "Chassis msg lost for " << std::setprecision(6) << chassis_diff
@@ -341,7 +348,7 @@ Status ControlComponent::CheckTimestamp() {
   }
 
   double trajectory_diff =
-      current_timestamp - trajectory_.header().timestamp_sec();
+      current_timestamp - local_view.trajectory.header().timestamp_sec();
   if (trajectory_diff > (control_conf_.max_planning_miss_num() *
                          control_conf_.trajectory_period())) {
     AERROR << "Trajectory msg lost for " << std::setprecision(6)

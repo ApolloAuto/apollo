@@ -60,6 +60,12 @@ class ControlComponent final : public apollo::cybertron::TimerComponent {
 
   bool Proc() override;
 
+  struct LocalView {
+    canbus::Chassis chassis;
+    planning::ADCTrajectory trajectory;
+    localization::LocalizationEstimate localization;
+  };
+
  private:
   // Upon receiving pad message
   void OnPad(const apollo::control::PadMessage &pad);
@@ -69,16 +75,16 @@ class ControlComponent final : public apollo::cybertron::TimerComponent {
       const apollo::common::monitor::MonitorMessage &monitor_message);
 
   common::Status ProduceControlCommand(ControlCommand *control_command);
-  common::Status CheckInput();
-  common::Status CheckTimestamp();
+  common::Status CheckInput(LocalView& local_view);
+  common::Status CheckTimestamp(const LocalView& local_view);
   common::Status CheckPad();
 
  private:
   double init_time_ = 0.0;
 
-  localization::LocalizationEstimate localization_;
-  canbus::Chassis chassis_;
-  planning::ADCTrajectory trajectory_;
+  localization::LocalizationEstimate latest_localization_;
+  canbus::Chassis latest_chassis_;
+  planning::ADCTrajectory latest_trajectory_;
   PadMessage pad_msg_;
 
   ControllerAgent controller_agent_;
@@ -103,6 +109,8 @@ class ControlComponent final : public apollo::cybertron::TimerComponent {
   std::shared_ptr<Reader<apollo::planning::ADCTrajectory>> trajectory_reader_;
   std::shared_ptr<Writer<apollo::control::ControlCommand>> control_cmd_writer_;
   common::monitor::MonitorLogBuffer monitor_logger_buffer_;
+
+  LocalView local_view_;
 };
 
 CYBERTRON_REGISTER_COMPONENT(ControlComponent)
