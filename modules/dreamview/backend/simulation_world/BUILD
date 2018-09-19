@@ -10,6 +10,7 @@ cc_library(
     hdrs = [
         "simulation_world_service.h",
     ],
+    copts = ['-DMODULE_NAME=\\"dreamview\\"'],
     deps = [
         "//modules/canbus/proto:canbus_proto",
         "//framework:cybertron",
@@ -62,6 +63,7 @@ cc_library(
     hdrs = [
         "simulation_world_updater.h",
     ],
+    copts = ['-DMODULE_NAME=\\"dreamview\\"'],
     linkopts = [
         "-lboost_thread",
     ],
