@@ -146,10 +146,12 @@ void LocalizationIntegImpl::StopThreadLoop() {
 }
 
 void LocalizationIntegImpl::PcdProcess(const LidarFrame& lidar_frame) {
-  lidar_data_queue_mutex_.lock();
-  lidar_data_queue_.push(lidar_frame);
-  lidar_data_signal_.notify_one();
-  lidar_data_queue_mutex_.unlock();
+  PcdProcessImpl(lidar_frame);
+
+  // lidar_data_queue_mutex_.lock();
+  // lidar_data_queue_.push(lidar_frame);
+  // lidar_data_signal_.notify_one();
+  // lidar_data_queue_mutex_.unlock();
   return;
 }
 
@@ -216,11 +218,13 @@ void LocalizationIntegImpl::PcdProcessImpl(const LidarFrame& pcd_data) {
 }
 
 void LocalizationIntegImpl::RawImuProcessRfu(const ImuData& imu_data) {
-  // push to imu_data_queue
-  imu_data_queue_mutex_.lock();
-  imu_data_queue_.push(imu_data);
-  imu_data_signal_.notify_one();
-  imu_data_queue_mutex_.unlock();
+  ImuProcessImpl(imu_data);
+
+  // // push to imu_data_queue
+  // imu_data_queue_mutex_.lock();
+  // imu_data_queue_.push(imu_data);
+  // imu_data_signal_.notify_one();
+  // imu_data_queue_mutex_.unlock();
 }
 
 void LocalizationIntegImpl::ImuThreadLoop() {
@@ -353,12 +357,16 @@ void LocalizationIntegImpl::RawObservationProcess(
     return;
   }
 
-  // push process function to queue
-  gnss_function_queue_mutex_.lock();
-  gnss_function_queue_.push(std::function<void()>(std::bind(
-      &LocalizationIntegImpl::RawObservationProcessImpl, this, raw_obs_msg)));
-  gnss_function_signal_.notify_one();
-  gnss_function_queue_mutex_.unlock();
+  RawObservationProcessImpl(raw_obs_msg);
+
+  // TODO(zhouyao4321): Use cybertron::Task instead.
+  // // push process function to queue
+  // gnss_function_queue_mutex_.lock();
+  // gnss_function_queue_.push(std::function<void()>(std::bind(
+  //     &LocalizationIntegImpl::RawObservationProcessImpl, this,
+  //     raw_obs_msg)));
+  // gnss_function_signal_.notify_one();
+  // gnss_function_queue_mutex_.unlock();
 
   return;
 }
@@ -369,12 +377,16 @@ void LocalizationIntegImpl::RawEphemerisProcess(
     return;
   }
 
-  // push process function to queue
-  gnss_function_queue_mutex_.lock();
-  gnss_function_queue_.push(std::function<void()>(std::bind(
-      &LocalizationIntegImpl::RawEphemerisProcessImpl, this, gnss_orbit_msg)));
-  gnss_function_signal_.notify_one();
-  gnss_function_queue_mutex_.unlock();
+  RawEphemerisProcessImpl(gnss_orbit_msg);
+
+  // TODO(zhouyao4321): Use cybertron::Task instead.
+  // // push process function to queue
+  // gnss_function_queue_mutex_.lock();
+  // gnss_function_queue_.push(std::function<void()>(std::bind(
+  //     &LocalizationIntegImpl::RawEphemerisProcessImpl, this,
+  //     gnss_orbit_msg)));
+  // gnss_function_signal_.notify_one();
+  // gnss_function_queue_mutex_.unlock();
 
   return;
 }
@@ -385,12 +397,16 @@ void LocalizationIntegImpl::GnssBestPoseProcess(
     return;
   }
 
-  // push process function to queue
-  gnss_function_queue_mutex_.lock();
-  gnss_function_queue_.push(std::function<void()>(std::bind(
-      &LocalizationIntegImpl::GnssBestPoseProcessImpl, this, bestgnsspos_msg)));
-  gnss_function_signal_.notify_one();
-  gnss_function_queue_mutex_.unlock();
+  GnssBestPoseProcessImpl(bestgnsspos_msg);
+
+  // TODO(zhouyao4321): Use cybertron::Task instead.
+  // // push process function to queue
+  // gnss_function_queue_mutex_.lock();
+  // gnss_function_queue_.push(std::function<void()>(std::bind(
+  //     &LocalizationIntegImpl::GnssBestPoseProcessImpl, this,
+  //     bestgnsspos_msg)));
+  // gnss_function_signal_.notify_one();
+  // gnss_function_queue_mutex_.unlock();
 
   return;
 }

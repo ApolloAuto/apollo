@@ -24,7 +24,7 @@
 
 #include <cstdint>
 
-#include "sensor_msgs/PointCloud2.h"
+#include "modules/drivers/proto/pointcloud.pb.h"
 #include "modules/localization/msf/local_integ/localization_lidar.h"
 
 /**
@@ -37,38 +37,13 @@ namespace msf {
 
 class LidarMsgTransfer {
  public:
-  LidarMsgTransfer();
+  LidarMsgTransfer() = default;
 
-  static void Transfer(
-      const sensor_msgs::PointCloud2 &message, LidarFrame *lidar_frame);
-  void TransferCloud(
-      const sensor_msgs::PointCloud2 &message, LidarFrame *lidar_frame);
+  void Transfer(
+      const drivers::PointCloud &message, LidarFrame *lidar_frame);
 
  protected:
-  void ParseCloudField(const sensor_msgs::PointCloud2 &message);
-  void TransferOrganizedCloud32(
-      const sensor_msgs::PointCloud2 &message, LidarFrame *lidar_frame);
-  void TransferOrganizedCloud64(
-      const sensor_msgs::PointCloud2 &message, LidarFrame *lidar_frame);
-  void TransferUnorganizedCloud32(
-      const sensor_msgs::PointCloud2 &message, LidarFrame *lidar_frame);
-  void TransferUnorganizedCloud64(
-      const sensor_msgs::PointCloud2 &message, LidarFrame *lidar_frame);
-
- protected:
-  uint32_t width_;
-  uint32_t height_;
-  uint32_t x_offset_;
-  uint32_t y_offset_;
-  uint32_t z_offset_;
-  uint32_t t_offset_;
-  uint32_t i_offset_;
-  uint8_t x_datatype_;
-  uint8_t y_datatype_;
-  uint8_t z_datatype_;
-  uint32_t x_count_;
-  uint32_t y_count_;
-  uint32_t z_count_;
+  double max_height_ = 100.0;
 };
 
 }  // namespace msf

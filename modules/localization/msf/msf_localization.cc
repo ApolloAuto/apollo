@@ -21,7 +21,6 @@
 
 #include "modules/drivers/gnss/proto/config.pb.h"
 
-#include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/math/euler_angles_zxy.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/common/math/quaternion.h"
@@ -29,98 +28,31 @@
 #include "modules/common/util/file.h"
 #include "modules/common/util/string_tokenizer.h"
 #include "modules/localization/common/localization_gflags.h"
+#include "modules/localization/msf/msf_localization_component.h"
 
 namespace apollo {
 namespace localization {
 
 using apollo::common::Status;
-using apollo::common::adapter::AdapterManager;
-using apollo::common::adapter::ImuAdapter;
 using apollo::common::monitor::MonitorMessageItem;
 using apollo::common::time::Clock;
 using ::Eigen::Vector3d;
 
 MSFLocalization::MSFLocalization()
-    : monitor_logger_(MonitorMessageItem::LOCALIZATION),
+    : monitor_logger_(
+          apollo::common::monitor::MonitorMessageItem::LOCALIZATION),
       localization_state_(msf::LocalizationMeasureState::OK),
       pcd_msg_index_(-1),
       latest_lidar_localization_status_(MeasureState::NOT_VALID),
       latest_gnss_localization_status_(MeasureState::NOT_VALID) {}
 
-Status MSFLocalization::Start() {
-  AdapterManager::Init(FLAGS_msf_adapter_config_file);
-
-  Status &&status = Init();
-  if (!status.ok()) {
-    return status;
-  }
-
-  common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
-
-  // Raw Imu
-  if (!AdapterManager::GetRawImu()) {
-    buffer.ERROR(
-        "Raw IMU input not initialized. Check your adapter.conf file!");
-    buffer.PrintLog();
-    return Status(common::LOCALIZATION_ERROR_MSG, "no Raw IMU adapter");
-  }
-  AdapterManager::AddRawImuCallback(&MSFLocalization::OnRawImu, this);
-
-  // Point Cloud
-  if (FLAGS_enable_lidar_localization) {
-    if (!AdapterManager::GetPointCloud()) {
-      buffer.ERROR(
-          "PointCloud input not initialized. Check your adapter.conf file!");
-      buffer.PrintLog();
-      return Status(common::LOCALIZATION_ERROR_MSG, "no PointCloud adapter");
-    }
-    AdapterManager::AddPointCloudCallback(&MSFLocalization::OnPointCloud, this);
-  }
-
-  if (FLAGS_gnss_mode == 1) {
-    // Gnss Rtk Obs
-    if (!AdapterManager::GetGnssRtkObs()) {
-      buffer.ERROR(
-          "GnssRtkObs input not initialized. Check your adapter.conf file!");
-      buffer.PrintLog();
-      return Status(common::LOCALIZATION_ERROR_MSG, "no GnssRtkObs adapter");
-    }
-    AdapterManager::AddGnssRtkObsCallback(&MSFLocalization::OnGnssRtkObs, this);
-
-    // Gnss Rtk Eph
-    if (!AdapterManager::GetGnssRtkEph()) {
-      buffer.ERROR(
-          "GnssRtkEph input not initialized. Check your adapter.conf file!");
-      buffer.PrintLog();
-      return Status(common::LOCALIZATION_ERROR_MSG, "no GnssRtkEph adapter");
-    }
-    AdapterManager::AddGnssRtkEphCallback(&MSFLocalization::OnGnssRtkEph, this);
-  } else {
-    // Gnss Best Pose
-    if (!AdapterManager::GetGnssBestPose()) {
-      buffer.ERROR(
-          "GnssBestPose input not initialized. Check your adapter.conf file!");
-      buffer.PrintLog();
-      return Status(common::LOCALIZATION_ERROR_MSG, "no GnssBestPose adapter");
-    }
-    AdapterManager::AddGnssBestPoseCallback(&MSFLocalization::OnGnssBestPose,
-                                            this);
-  }
-
-  tf2_broadcaster_.reset(new tf2_ros::TransformBroadcaster);
-
-  return Status::OK();
-}
-
-Status MSFLocalization::Stop() { return Status::OK(); }
-
-Status MSFLocalization::Init() {
-  InitParams();
+Status MSFLocalization::Init(const msf_config::Config &config) {
+  InitParams(config);
 
   return localization_integ_.Init(localizaiton_param_);
 }
 
-void MSFLocalization::InitParams() {
+void MSFLocalization::InitParams(const msf_config::Config &config) {
   // integration module
   localizaiton_param_.is_ins_can_self_align = FLAGS_integ_ins_can_self_align;
   localizaiton_param_.is_sins_align_with_vel = FLAGS_integ_sins_align_with_vel;
@@ -137,7 +69,7 @@ void MSFLocalization::InitParams() {
   localizaiton_param_.enable_ins_aid_rtk = FLAGS_enable_ins_aid_rtk;
 
   // lidar module
-  localizaiton_param_.map_path = FLAGS_map_dir + "/" + FLAGS_local_map_name;
+  localizaiton_param_.map_path = config.map_dir() + "/" + FLAGS_local_map_name;
   localizaiton_param_.lidar_extrinsic_file = FLAGS_lidar_extrinsics_file;
   localizaiton_param_.lidar_height_file = FLAGS_lidar_height_file;
   localizaiton_param_.lidar_height_default = FLAGS_lidar_height_default;
@@ -235,13 +167,14 @@ void MSFLocalization::InitParams() {
   }
 }
 
-void MSFLocalization::OnPointCloud(const sensor_msgs::PointCloud2 &message) {
+void MSFLocalization::OnPointCloud(
+    const std::shared_ptr<drivers::PointCloud> &message) {
   ++pcd_msg_index_;
   if (pcd_msg_index_ % FLAGS_point_cloud_step != 0) {
     return;
   }
 
-  localization_integ_.PcdProcess(message);
+  localization_integ_.PcdProcess(*message);
 
   if (FLAGS_lidar_debug_log_flag) {
     std::list<msf::LocalizationResult> lidar_localization_list;
@@ -254,7 +187,7 @@ void MSFLocalization::OnPointCloud(const sensor_msgs::PointCloud2 &message) {
       if (itr->state() == msf::LocalizationMeasureState::OK ||
           itr->state() == msf::LocalizationMeasureState::VALID) {
         // publish lidar message to debug
-        AdapterManager::PublishLocalizationMsfLidar(itr->localization());
+        // AdapterManager::PublishLocalizationMsfLidar(itr->localization());
       }
     }
   }
@@ -262,11 +195,12 @@ void MSFLocalization::OnPointCloud(const sensor_msgs::PointCloud2 &message) {
   return;
 }
 
-void MSFLocalization::OnRawImu(const drivers::gnss::Imu &imu_msg) {
+void MSFLocalization::OnRawImu(
+    const std::shared_ptr<drivers::gnss::Imu> &imu_msg) {
   if (FLAGS_imu_coord_rfu) {
-    localization_integ_.RawImuProcessRfu(imu_msg);
+    localization_integ_.RawImuProcessRfu(*imu_msg);
   } else {
-    localization_integ_.RawImuProcessFlu(imu_msg);
+    localization_integ_.RawImuProcessFlu(*imu_msg);
   }
 
   std::list<msf::LocalizationResult> integ_localization_list;
@@ -283,7 +217,7 @@ void MSFLocalization::OnRawImu(const drivers::gnss::Imu &imu_msg) {
     status.set_lidar_status(latest_lidar_localization_status_);
     status.set_gnss_status(latest_gnss_localization_status_);
     status.set_measurement_time(itr->localization().measurement_time());
-    AdapterManager::PublishLocalizationMsfStatus(status);
+    // AdapterManager::PublishLocalizationMsfStatus(status);
 
     if (itr->state() == msf::LocalizationMeasureState::OK ||
         itr->state() == msf::LocalizationMeasureState::VALID) {
@@ -311,8 +245,8 @@ void MSFLocalization::OnRawImu(const drivers::gnss::Imu &imu_msg) {
       eulerangles->set_y(euler_angle.roll());
       eulerangles->set_z(euler_angle.yaw());
 
-      PublishPoseBroadcastTF(local_result);
-      AdapterManager::PublishLocalization(local_result);
+      publisher_->PublishPoseBroadcastTF(local_result);
+      publisher_->PublishPoseBroadcastTopic(local_result);
     }
   }
 
@@ -324,14 +258,14 @@ void MSFLocalization::OnRawImu(const drivers::gnss::Imu &imu_msg) {
 }  // namespace localization
 
 void MSFLocalization::OnGnssBestPose(
-    const drivers::gnss::GnssBestPose &bestgnsspos_msg) {
+    const std::shared_ptr<drivers::gnss::GnssBestPose> &bestgnsspos_msg) {
   if ((localization_state_ == msf::LocalizationMeasureState::OK ||
        localization_state_ == msf::LocalizationMeasureState::VALID) &&
       FLAGS_gnss_only_init) {
     return;
   }
 
-  localization_integ_.GnssBestPoseProcess(bestgnsspos_msg);
+  localization_integ_.GnssBestPoseProcess(*bestgnsspos_msg);
 
   if (FLAGS_gnss_debug_log_flag) {
     std::list<msf::LocalizationResult> gnss_localization_list;
@@ -343,7 +277,7 @@ void MSFLocalization::OnGnssBestPose(
           static_cast<MeasureState>(itr->state());
       if (itr->state() == msf::LocalizationMeasureState::OK ||
           itr->state() == msf::LocalizationMeasureState::VALID) {
-        AdapterManager::PublishLocalizationMsfGnss(itr->localization());
+        // AdapterManager::PublishLocalizationMsfGnss(itr->localization());
       }
     }
   }
@@ -352,14 +286,14 @@ void MSFLocalization::OnGnssBestPose(
 }
 
 void MSFLocalization::OnGnssRtkObs(
-    const drivers::gnss::EpochObservation &raw_obs_msg) {
+    const std::shared_ptr<drivers::gnss::EpochObservation> &raw_obs_msg) {
   if ((localization_state_ == msf::LocalizationMeasureState::OK ||
        localization_state_ == msf::LocalizationMeasureState::VALID) &&
       FLAGS_gnss_only_init) {
     return;
   }
 
-  localization_integ_.RawObservationProcess(raw_obs_msg);
+  localization_integ_.RawObservationProcess(*raw_obs_msg);
 
   if (FLAGS_gnss_debug_log_flag) {
     std::list<msf::LocalizationResult> gnss_localization_list;
@@ -371,7 +305,7 @@ void MSFLocalization::OnGnssRtkObs(
           static_cast<MeasureState>(itr->state());
       if (itr->state() == msf::LocalizationMeasureState::OK ||
           itr->state() == msf::LocalizationMeasureState::VALID) {
-        AdapterManager::PublishLocalizationMsfGnss(itr->localization());
+        // AdapterManager::PublishLocalizationMsfGnss(itr->localization());
       }
     }
   }
@@ -380,15 +314,20 @@ void MSFLocalization::OnGnssRtkObs(
 }
 
 void MSFLocalization::OnGnssRtkEph(
-    const drivers::gnss::GnssEphemeris &gnss_orbit_msg) {
+    const std::shared_ptr<drivers::gnss::GnssEphemeris> &gnss_orbit_msg) {
   if ((localization_state_ == msf::LocalizationMeasureState::OK ||
        localization_state_ == msf::LocalizationMeasureState::VALID) &&
       FLAGS_gnss_only_init) {
     return;
   }
 
-  localization_integ_.RawEphemerisProcess(gnss_orbit_msg);
+  localization_integ_.RawEphemerisProcess(*gnss_orbit_msg);
   return;
+}
+
+void MSFLocalization::SetPublisher(
+    const std::shared_ptr<LocalizationMsgPublisher> &publisher) {
+  publisher_ = publisher;
 }
 
 bool MSFLocalization::LoadGnssAntennaExtrinsic(

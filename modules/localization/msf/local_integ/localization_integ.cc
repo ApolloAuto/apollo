@@ -44,9 +44,10 @@ Status LocalizationInteg::Init(
   return localization_integ_impl_->Init(params);
 }
 
-void LocalizationInteg::PcdProcess(const sensor_msgs::PointCloud2& message) {
+void LocalizationInteg::PcdProcess(const drivers::PointCloud &message) {
   LidarFrame lidar_frame;
-  LidarMsgTransfer::Transfer(message, &lidar_frame);
+  LidarMsgTransfer transfer;
+  transfer.Transfer(message, &lidar_frame);
   localization_integ_impl_->PcdProcess(lidar_frame);
   return;
 }

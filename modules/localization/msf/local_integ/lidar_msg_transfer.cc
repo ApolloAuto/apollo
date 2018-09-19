@@ -16,207 +16,74 @@
 
 #include "modules/localization/msf/local_integ/lidar_msg_transfer.h"
 
+#include "Eigen/Core"
+#include "Eigen/Geometry"
+
 #include "cybertron/common/log.h"
+#include "cybertron/time/time.h"
 #include "modules/localization/common/localization_gflags.h"
 
 namespace apollo {
 namespace localization {
 namespace msf {
 
-LidarMsgTransfer::LidarMsgTransfer()
-    : width_(0), height_(0), x_offset_(0), y_offset_(0), z_offset_(0),
-      t_offset_(0), i_offset_(0), x_datatype_(0), y_datatype_(0),
-      z_datatype_(0), x_count_(0), y_count_(0), z_count_(0) {}
-
-void LidarMsgTransfer::Transfer(
-    const sensor_msgs::PointCloud2 &message, LidarFrame *lidar_frame) {
-  LidarMsgTransfer transfer;
-  transfer.TransferCloud(message, lidar_frame);
-  return;
-}
-
-void LidarMsgTransfer::TransferCloud(
-    const sensor_msgs::PointCloud2 &lidar_data, LidarFrame *lidar_frame) {
+void LidarMsgTransfer::Transfer(const drivers::PointCloud &msg,
+                                LidarFrame *lidar_frame) {
   CHECK_NOTNULL(lidar_frame);
 
-  ParseCloudField(lidar_data);
-  // organized point cloud
-  if (lidar_data.height > 1 && lidar_data.width > 1) {
-    if (x_datatype_ == sensor_msgs::PointField::FLOAT32) {
-      TransferOrganizedCloud32(lidar_data, lidar_frame);
-    } else if (x_datatype_ == sensor_msgs::PointField::FLOAT64) {
-      TransferOrganizedCloud64(lidar_data, lidar_frame);
-    } else {
-      AERROR << "The point cloud data type is not right!";
+  if (msg.height() > 1 && msg.width() > 1) {
+    for (int i = 0; i < msg.height(); ++i) {
+      for (int j = 0; j < msg.width(); ++j) {
+        Eigen::Vector3d pt3d;
+        pt3d[0] = static_cast<double>(msg.point(i * msg.width() + j).x());
+        pt3d[1] = static_cast<double>(msg.point(i * msg.width() + j).y());
+        pt3d[2] = static_cast<double>(msg.point(i * msg.width() + j).z());
+        if (!std::isnan(pt3d[0])) {
+          Eigen::Vector3d pt3d_tem = pt3d;
+
+          if (pt3d_tem[2] > max_height_) {
+            continue;
+          }
+          unsigned char intensity = static_cast<unsigned char>(
+              msg.point(i * msg.width() + j).intensity());
+          lidar_frame->pt_xs.push_back(pt3d[0]);
+          lidar_frame->pt_ys.push_back(pt3d[1]);
+          lidar_frame->pt_zs.push_back(pt3d[2]);
+          lidar_frame->intensities.push_back(intensity);
+        }
+      }
     }
-  } else {  // unorganized point cloud
-    if (x_datatype_ == sensor_msgs::PointField::FLOAT32) {
-      TransferUnorganizedCloud32(lidar_data, lidar_frame);
-    } else if (x_datatype_ == sensor_msgs::PointField::FLOAT64) {
-      TransferUnorganizedCloud64(lidar_data, lidar_frame);
-    } else {
-      AERROR << "The point cloud data type is not right!";
+  } else {
+    AINFO << "Receiving un-origanized-point-cloud, width " << msg.width()
+          << " height " << msg.height() << "size " << msg.point_size();
+    for (int i = 0; i < msg.point_size(); ++i) {
+      Eigen::Vector3d pt3d;
+      pt3d[0] = static_cast<double>(msg.point(i).x());
+      pt3d[1] = static_cast<double>(msg.point(i).y());
+      pt3d[2] = static_cast<double>(msg.point(i).z());
+      if (!std::isnan(pt3d[0])) {
+        Eigen::Vector3d pt3d_tem = pt3d;
+
+        if (pt3d_tem[2] > max_height_) {
+          continue;
+        }
+        unsigned char intensity =
+            static_cast<unsigned char>(msg.point(i).intensity());
+        lidar_frame->pt_xs.push_back(pt3d[0]);
+        lidar_frame->pt_ys.push_back(pt3d[1]);
+        lidar_frame->pt_zs.push_back(pt3d[2]);
+        lidar_frame->intensities.push_back(intensity);
+      }
     }
   }
-  lidar_frame->measurement_time = lidar_data.header.stamp.toSec();
 
+  lidar_frame->measurement_time =
+      cybertron::Time(msg.measurement_time()).ToSecond();
   if (FLAGS_lidar_debug_log_flag) {
-    AINFO << std::setprecision(16)
-          << "LidarMsgTransfer Debug Log: lidar msg. "
-          << "[time:" << lidar_frame->measurement_time << "]"
-          << "[height:" << lidar_data.height << "]"
-          << "[width:" << lidar_data.width << "]"
-          << "[point_step:" << lidar_data.point_step << "]"
-          << "[data_type:" << x_datatype_ << "]"
-          << "[point_cnt:" << x_count_ << "]"
-          << "[intensity_cnt:"
-          << static_cast<unsigned int>(lidar_frame->intensities.size())
-          << "]";
-  }
-  return;
-}
-
-void LidarMsgTransfer::ParseCloudField(
-    const sensor_msgs::PointCloud2 &lidar_data) {
-  width_ = lidar_data.width;
-  height_ = lidar_data.height;
-
-  for (size_t i = 0; i < lidar_data.fields.size(); ++i) {
-    const sensor_msgs::PointField& f = lidar_data.fields[i];
-    if (f.name == "x") {
-      x_offset_ = f.offset;
-      x_datatype_ = f.datatype;
-      x_count_ = f.count;
-    } else if (f.name == "y") {
-      y_offset_ = f.offset;
-      y_datatype_ = f.datatype;
-      y_count_ = f.count;
-    } else if (f.name == "z") {
-      z_offset_ = f.offset;
-      z_datatype_ = f.datatype;
-      z_count_ = f.count;
-    } else if (f.name == "timestamp") {
-      t_offset_ = f.offset;
-    } else if (f.name == "intensity") {
-      i_offset_ = f.offset;
-    }
-  }
-
-  CHECK(x_datatype_ == y_datatype_ && y_datatype_ == z_datatype_);
-  CHECK(x_datatype_ == 7 || x_datatype_ == 8);
-  CHECK(x_count_ > 0 && y_count_ > 0 && z_count_ >0);
-
-  return;
-}
-
-void LidarMsgTransfer::TransferOrganizedCloud32(
-    const sensor_msgs::PointCloud2 &lidar_data, LidarFrame *lidar_frame) {
-  CHECK_NOTNULL(lidar_frame);
-
-  for (uint32_t i = 0; i < lidar_data.height; ++i) {
-    for (uint32_t j = 0; j < lidar_data.width; ++j) {
-      uint32_t index = i * lidar_data.width + j;
-      Eigen::Vector3d pt3d;
-      uint32_t offset = index * lidar_data.point_step;
-      pt3d[0] = static_cast<const double>(*reinterpret_cast<const float*>(
-          &lidar_data.data[offset + x_offset_]));
-      pt3d[1] = static_cast<const double>(*reinterpret_cast<const float*>(
-          &lidar_data.data[offset + y_offset_]));
-      pt3d[2] = static_cast<const double>(*reinterpret_cast<const float*>(
-          &lidar_data.data[offset + z_offset_]));
-      if (!std::isnan(pt3d[0])) {
-        unsigned char intensity = *reinterpret_cast<const unsigned char*>(
-            &lidar_data.data[offset + i_offset_]);
-        lidar_frame->pt_xs.push_back(pt3d[0]);
-        lidar_frame->pt_ys.push_back(pt3d[1]);
-        lidar_frame->pt_zs.push_back(pt3d[2]);
-        lidar_frame->intensities.push_back(intensity);
-      }
-    }
-  }
-  return;
-}
-
-void LidarMsgTransfer::TransferOrganizedCloud64(
-    const sensor_msgs::PointCloud2 &lidar_data, LidarFrame *lidar_frame) {
-  CHECK_NOTNULL(lidar_frame);
-
-  for (uint32_t i = 0; i < lidar_data.height; ++i) {
-    for (uint32_t j = 0; j < lidar_data.width; ++j) {
-      uint32_t index = i * lidar_data.width + j;
-      Eigen::Vector3d pt3d;
-      uint32_t offset = index * lidar_data.point_step;
-      pt3d[0] = *reinterpret_cast<const double*>(
-          &lidar_data.data[offset + x_offset_]);
-      pt3d[1] = *reinterpret_cast<const double*>(
-          &lidar_data.data[offset + y_offset_]);
-      pt3d[2] = *reinterpret_cast<const double*>(
-          &lidar_data.data[offset + z_offset_]);
-      if (!std::isnan(pt3d[0])) {
-        unsigned char intensity = *reinterpret_cast<const unsigned char*>(
-            &lidar_data.data[offset + i_offset_]);
-        lidar_frame->pt_xs.push_back(pt3d[0]);
-        lidar_frame->pt_ys.push_back(pt3d[1]);
-        lidar_frame->pt_zs.push_back(pt3d[2]);
-        lidar_frame->intensities.push_back(intensity);
-      }
-    }
-  }
-  return;
-}
-
-void LidarMsgTransfer::TransferUnorganizedCloud32(
-    const sensor_msgs::PointCloud2 &lidar_data, LidarFrame *lidar_frame) {
-  CHECK_NOTNULL(lidar_frame);
-
-  for (uint32_t i = 0; i < lidar_data.height; ++i) {
-    for (uint32_t j = 0; j < lidar_data.width; ++j) {
-      uint32_t index = i * lidar_data.width + j;
-      Eigen::Vector3d pt3d;
-      uint32_t offset = index * lidar_data.point_step;
-      pt3d[0] = static_cast<const double>(*reinterpret_cast<const float*>(
-          &lidar_data.data[offset + x_offset_]));
-      pt3d[1] = static_cast<const double>(*reinterpret_cast<const float*>(
-          &lidar_data.data[offset + y_offset_]));
-      pt3d[2] = static_cast<const double>(*reinterpret_cast<const float*>(
-          &lidar_data.data[offset + z_offset_]));
-      if (!std::isnan(pt3d[0])) {
-        unsigned char intensity = *reinterpret_cast<const unsigned char*>(
-            &lidar_data.data[offset + i_offset_]);
-        lidar_frame->pt_xs.push_back(pt3d[0]);
-        lidar_frame->pt_ys.push_back(pt3d[1]);
-        lidar_frame->pt_zs.push_back(pt3d[2]);
-        lidar_frame->intensities.push_back(intensity);
-      }
-    }
-  }
-  return;
-}
-
-void LidarMsgTransfer::TransferUnorganizedCloud64(
-    const sensor_msgs::PointCloud2 &lidar_data, LidarFrame *lidar_frame) {
-  CHECK_NOTNULL(lidar_frame);
-
-  for (uint32_t i = 0; i < lidar_data.height; ++i) {
-    for (uint32_t j = 0; j < lidar_data.width; ++j) {
-      uint32_t index = i * lidar_data.width + j;
-      Eigen::Vector3d pt3d;
-      uint32_t offset = index * lidar_data.point_step;
-      pt3d[0] = *reinterpret_cast<const double*>(
-          &lidar_data.data[offset + x_offset_]);
-      pt3d[1] = *reinterpret_cast<const double*>(
-          &lidar_data.data[offset + y_offset_]);
-      pt3d[2] = *reinterpret_cast<const double*>(
-          &lidar_data.data[offset + z_offset_]);
-      if (!std::isnan(pt3d[0])) {
-        unsigned char intensity = *reinterpret_cast<const unsigned char*>(
-            &lidar_data.data[offset + i_offset_]);
-        lidar_frame->pt_xs.push_back(pt3d[0]);
-        lidar_frame->pt_ys.push_back(pt3d[1]);
-        lidar_frame->pt_zs.push_back(pt3d[2]);
-        lidar_frame->intensities.push_back(intensity);
-      }
-    }
+    AINFO << std::setprecision(15) << "LocalLidar Debug Log: velodyne msg. "
+          << "[time:" << lidar_frame->measurement_time
+          << "][height:" << msg.height() << "][width:" << msg.width()
+          << "][point_cnt:" << msg.point_size() << "]";
   }
   return;
 }

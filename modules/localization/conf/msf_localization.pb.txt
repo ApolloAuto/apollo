@@ -1,0 +1,7 @@
+localization_topic: "/apollo/localization/pose"
+imu_topic: "/apollo/sensor/gnss/imu"
+lidar_topic: "/apollo/sensor/velodyne64/compensator/PointCloud2"
+bestgnsspos_topic: "/apollo/sensor/gnss/best_pose"
+broadcast_tf_frame_id: "world"
+broadcast_tf_child_frame_id: "localization"
+map_dir: "/apollo/modules/map/data/sunnyvale_big_loop"

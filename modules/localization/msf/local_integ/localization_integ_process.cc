@@ -16,6 +16,7 @@
 
 #include "modules/localization/msf/local_integ/localization_integ_process.h"
 
+#include <iomanip>
 #include "yaml-cpp/yaml.h"
 
 #include "cybertron/common/log.h"
@@ -36,7 +37,6 @@ LocalizationIntegProcess::LocalizationIntegProcess()
       ins_pva_(),
       pva_covariance_{0.0},
       keep_running_(false),
-      measure_data_thread_(),
       measure_data_queue_size_(150),
       delay_output_counter_(0) {}
 
@@ -249,7 +249,7 @@ void LocalizationIntegProcess::MeasureDataProcess(
     const MeasureData &measure_msg) {
   measure_data_queue_mutex_.lock();
   measure_data_queue_.push(measure_msg);
-  new_measure_data_signal_.notify_one();
+  // new_measure_data_signal_.notify_one();
   measure_data_queue_mutex_.unlock();
 }
 
@@ -257,14 +257,15 @@ void LocalizationIntegProcess::StartThreadLoop() {
   keep_running_ = true;
   measure_data_queue_size_ = 150;
   const auto &loop_func = [this] { MeasureDataThreadLoop(); };
-  measure_data_thread_ = std::thread(loop_func);
+  // measure_data_thread_ = std::thread(loop_func);
+  measure_data_task_ = cybertron::CreateTask("SinsMeasureReceiver", loop_func);
 }
 
 void LocalizationIntegProcess::StopThreadLoop() {
   if (keep_running_.load()) {
     keep_running_ = false;
-    new_measure_data_signal_.notify_one();
-    measure_data_thread_.join();
+    // new_measure_data_signal_.notify_one();
+    // measure_data_thread_.join();
   }
 }
 
@@ -279,7 +280,8 @@ void LocalizationIntegProcess::MeasureDataThreadLoop() {
         --size;
       }
       if (measure_data_queue_.size() == 0) {
-        new_measure_data_signal_.wait(lock);
+        // new_measure_data_signal_.wait(lock);
+        cybertron::Yield();
         continue;
       }
     }

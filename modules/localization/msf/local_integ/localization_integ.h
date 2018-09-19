@@ -28,8 +28,8 @@
 #include <vector>
 #include <list>
 
-#include "sensor_msgs/PointCloud2.h"
 #include "modules/common/status/status.h"
+#include "modules/drivers/proto/pointcloud.pb.h"
 #include "modules/drivers/gnss/proto/gnss_best_pose.pb.h"
 #include "modules/drivers/gnss/proto/gnss_raw_observation.pb.h"
 #include "modules/drivers/gnss/proto/imu.pb.h"
@@ -63,7 +63,7 @@ class LocalizationInteg {
   common::Status Init(const LocalizationIntegParam& params);
 
   // Lidar pcd process.
-  void PcdProcess(const sensor_msgs::PointCloud2& message);
+  void PcdProcess(const drivers::PointCloud &message);
   // Raw Imu process.
   // void CorrectedImuProcess(const Imu& imu_msg);
   void RawImuProcessFlu(const drivers::gnss::Imu& imu_msg);
