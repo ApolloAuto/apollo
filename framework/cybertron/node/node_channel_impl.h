@@ -119,7 +119,7 @@ auto NodeChannelImpl::CreateWriter(const std::string& channel_name)
     -> std::shared_ptr<Writer<MessageT>> {
   proto::RoleAttributes role_attr;
   role_attr.set_channel_name(channel_name);
-  return this->template CreateWriter<MessageT>(role_attr);
+  return this->CreateWriter<MessageT>(role_attr);
 }
 
 template <typename MessageT>

@@ -58,7 +58,7 @@ bool ModuleArgument::ParseArgument(const int argc, char* const argv[]) {
   return true;
 }
 
-void ModuleArgument::GetOptions(const int& argc, char* const argv[]) {
+void ModuleArgument::GetOptions(const int argc, char* const argv[]) {
   opterr = 0;  // extern int opterr
   int long_index = 0;
   const std::string short_opts = "h::d:p:";
