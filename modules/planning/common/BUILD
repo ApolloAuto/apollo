@@ -22,9 +22,9 @@ cc_test(
         "indexed_list_test.cc",
     ],
     deps = [
+        "@gtest//:main",
         ":indexed_list",
         "//modules/common/util",
-        "@gtest//:main",
     ],
 )
 
@@ -45,9 +45,9 @@ cc_test(
         "indexed_queue_test.cc",
     ],
     deps = [
+        "@gtest//:main",
         ":indexed_queue",
         "//modules/common/util",
-        "@gtest//:main",
     ],
 )
 
@@ -88,10 +88,10 @@ cc_test(
         "//modules/planning/common:common_testdata",
     ],
     deps = [
+        "@gtest//:main",
         ":obstacle",
         "//modules/common/util",
         "//modules/perception/proto:perception_proto",
-        "@gtest//:main",
     ],
 )
 
@@ -121,8 +121,8 @@ cc_test(
         "path_obstacle_test.cc",
     ],
     deps = [
-        ":path_obstacle",
         "@gtest//:main",
+        ":path_obstacle",
     ],
 )
 
@@ -179,6 +179,7 @@ cc_library(
         "reference_line_info.h",
     ],
     deps = [
+        "@eigen",
         ":ego_info",
         ":path_decision",
         ":planning_gflags",
@@ -193,7 +194,6 @@ cc_library(
         "//modules/planning/common/trajectory:publishable_trajectory",
         "//modules/planning/proto:lattice_structure_proto",
         "//modules/planning/reference_line",
-        "@eigen",
     ],
 )
 
@@ -204,8 +204,8 @@ cc_test(
         "reference_line_info_test.cc",
     ],
     deps = [
-        ":reference_line_info",
         "@gtest//:main",
+        ":reference_line_info",
     ],
 )
 
@@ -237,8 +237,8 @@ cc_test(
         "speed_profile_generator_test.cc",
     ],
     deps = [
-        ":speed_profile_generator",
         "@gtest//:main",
+        ":speed_profile_generator",
     ],
 )
 
@@ -280,6 +280,7 @@ cc_library(
     ],
     deps = [
         "//modules/localization/proto:localization_proto",
+        "//modules/map/relative_map/proto:navigation_proto",
         "//modules/perception/proto:perception_proto",
         "//modules/planning/proto:planning_proto",
         "//modules/prediction/proto:prediction_proto",
@@ -353,11 +354,11 @@ cc_test(
         "//modules/planning/common:common_testdata",
     ],
     deps = [
+        "@gtest//:main",
         ":frame",
         "//modules/common/util",
         "//modules/map/hdmap:hdmap_util",
         "//modules/planning/proto:planning_config_proto",
-        "@gtest//:main",
     ],
 )
 
@@ -402,8 +403,8 @@ cc_test(
         "speed_limit_test.cc",
     ],
     deps = [
-        ":speed_limit",
         "@gtest//:main",
+        ":speed_limit",
     ],
 )
 
@@ -416,6 +417,7 @@ cc_library(
         "ego_info.h",
     ],
     deps = [
+        "@eigen",
         ":obstacle",
         "//framework:cybertron",
         "//modules/common/configs:vehicle_config_helper",
@@ -423,7 +425,6 @@ cc_library(
         "//modules/common/math:geometry",
         "//modules/common/vehicle_state/proto:vehicle_state_proto",
         "//modules/planning/reference_line",
-        "@eigen",
     ],
 )
 
@@ -434,9 +435,9 @@ cc_test(
         "ego_info_test.cc",
     ],
     deps = [
+        "@gtest//:main",
         ":ego_info",
         ":frame",
-        "@gtest//:main",
     ],
 )
 

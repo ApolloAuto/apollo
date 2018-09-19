@@ -27,6 +27,7 @@ namespace planning {
 using apollo::perception::TrafficLightDetection;
 using apollo::routing::RoutingResponse;
 using apollo::routing::RoutingRequest;
+using apollo::relative_map::MapMsg;
 using apollo::hdmap::HDMapUtil;
 
 bool PlanningComponent::Init() {
@@ -54,9 +55,16 @@ bool PlanningComponent::Init() {
     pad_message_reader_ = node_->CreateReader<PadMessage>(
         FLAGS_planning_pad_topic,
         [this](const std::shared_ptr<PadMessage>& pad_message) {
-          ADEBUG << "Received chassis data: run chassis callback.";
+          ADEBUG << "Received pad data: run pad callback.";
           std::lock_guard<std::mutex> lock(mutex_);
           pad_message_.CopyFrom(*pad_message);
+        });
+    relative_map_reader_ = node_->CreateReader<MapMsg>(
+        FLAGS_planning_pad_topic,
+        [this](const std::shared_ptr<MapMsg>& map_message) {
+          ADEBUG << "Received relative map data: run relative map callback.";
+          std::lock_guard<std::mutex> lock(mutex_);
+          relative_map_.CopyFrom(*map_message);
         });
   }
 
@@ -64,7 +72,7 @@ bool PlanningComponent::Init() {
       node_->CreateWriter<ADCTrajectory>(FLAGS_planning_trajectory_topic);
 
   rerouting_writer_ =
-      node_->CreateWriter<RoutingRequest>("/apollo/routing/routing_request");
+      node_->CreateWriter<RoutingRequest>(FLAGS_routing_request_topic);
 
   return true;
 }

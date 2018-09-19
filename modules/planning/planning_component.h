@@ -66,6 +66,7 @@ class PlanningComponent final
       traffic_light_reader_;
   std::shared_ptr<cybertron::Reader<routing::RoutingResponse>> routing_reader_;
   std::shared_ptr<cybertron::Reader<planning::PadMessage>> pad_message_reader_;
+  std::shared_ptr<cybertron::Reader<relative_map::MapMsg>> relative_map_reader_;
 
   std::shared_ptr<cybertron::Writer<ADCTrajectory>> planning_writer_;
   std::shared_ptr<cybertron::Writer<routing::RoutingRequest>> rerouting_writer_;
@@ -74,6 +75,7 @@ class PlanningComponent final
   perception::TrafficLightDetection traffic_light_;
   routing::RoutingResponse routing_;
   PadMessage pad_message_;
+  relative_map::MapMsg relative_map_;
 
   LocalView local_view_;
 
