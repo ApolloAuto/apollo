@@ -160,7 +160,7 @@ TEST(ObjectTest, test_Deserialize) {
   pb_obj.set_width(1.0);
   pb_obj.set_height(1.5);
   pb_obj.set_tracking_time(20.1);
-  pb_obj.set_type(PerceptionObstacle::BICYCLE);
+  pb_obj.set_type(perception::BICYCLE);
   pb_obj.set_timestamp(1147012345.678);
 
   PolygonDType polygon;

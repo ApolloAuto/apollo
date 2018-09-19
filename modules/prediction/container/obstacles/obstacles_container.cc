@@ -123,7 +123,7 @@ void ObstaclesContainer::PrioritizeObstacles() {
 bool ObstaclesContainer::IsPredictable(
     const PerceptionObstacle& perception_obstacle) {
   if (!perception_obstacle.has_type() ||
-      perception_obstacle.type() == PerceptionObstacle::UNKNOWN_UNMOVABLE) {
+      perception_obstacle.type() == perception::UNKNOWN_UNMOVABLE) {
     return false;
   }
   return true;

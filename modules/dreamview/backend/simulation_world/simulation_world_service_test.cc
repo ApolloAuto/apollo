@@ -208,23 +208,23 @@ TEST_F(SimulationWorldServiceTest, UpdatePerceptionObstacles) {
   PerceptionObstacles obstacles;
   PerceptionObstacle* obstacle1 = obstacles.add_perception_obstacle();
   obstacle1->set_id(1);
-  apollo::perception::Point* point1 = obstacle1->add_polygon_point();
+  apollo::common::Point3D* point1 = obstacle1->add_polygon_point();
   point1->set_x(0.0);
   point1->set_y(0.0);
-  apollo::perception::Point* point2 = obstacle1->add_polygon_point();
+  apollo::common::Point3D* point2 = obstacle1->add_polygon_point();
   point2->set_x(0.0);
   point2->set_y(1.0);
-  apollo::perception::Point* point3 = obstacle1->add_polygon_point();
+  apollo::common::Point3D* point3 = obstacle1->add_polygon_point();
   point3->set_x(-1.0);
   point3->set_y(0.0);
-  apollo::perception::Point* point4 = obstacle1->add_polygon_point();
+  apollo::common::Point3D* point4 = obstacle1->add_polygon_point();
   point4->set_x(-1.0);
   point4->set_y(0.0);
   obstacle1->set_timestamp(1489794020.123);
-  obstacle1->set_type(apollo::perception::PerceptionObstacle_Type_UNKNOWN);
+  obstacle1->set_type(apollo::perception::UNKNOWN);
   PerceptionObstacle* obstacle2 = obstacles.add_perception_obstacle();
   obstacle2->set_id(2);
-  apollo::perception::Point* point = obstacle2->mutable_position();
+  apollo::common::Point3D* point = obstacle2->mutable_position();
   point->set_x(1.0);
   point->set_y(2.0);
   obstacle2->set_theta(3.0);
@@ -233,7 +233,7 @@ TEST_F(SimulationWorldServiceTest, UpdatePerceptionObstacles) {
   obstacle2->set_height(6.0);
   obstacle2->mutable_velocity()->set_x(3.0);
   obstacle2->mutable_velocity()->set_y(4.0);
-  obstacle2->set_type(apollo::perception::PerceptionObstacle_Type_VEHICLE);
+  obstacle2->set_type(apollo::perception::VEHICLE);
 
   sim_world_service_->UpdateSimulationWorld(obstacles);
   sim_world_service_->world_.clear_object();

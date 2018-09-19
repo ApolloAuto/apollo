@@ -90,9 +90,9 @@ bool PathDecider::MakeStaticObstacleDecision(
     const auto &obstacle = *path_obstacle->obstacle();
     bool is_bycycle_or_pedestrain =
         (obstacle.Perception().type() ==
-             perception::PerceptionObstacle::BICYCLE ||
+             perception::BICYCLE ||
          obstacle.Perception().type() ==
-             perception::PerceptionObstacle::PEDESTRIAN);
+             perception::PEDESTRIAN);
 
     if (!is_bycycle_or_pedestrain && !obstacle.IsStatic()) {
       continue;

@@ -146,7 +146,7 @@ void Object::Serialize(PerceptionObstacle* pb_obj) const {
   pb_obj->set_confidence(score);
   pb_obj->set_confidence_type(score_type);
   pb_obj->set_tracking_time(tracking_time);
-  pb_obj->set_type(static_cast<PerceptionObstacle::Type>(type));
+  pb_obj->set_type(static_cast<perception::Type>(type));
   pb_obj->set_timestamp(latest_tracked_time);  // in seconds.
 }
 

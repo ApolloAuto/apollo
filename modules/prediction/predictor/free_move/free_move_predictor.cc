@@ -57,7 +57,7 @@ void FreeMovePredictor::Predict(Obstacle* obstacle) {
 
   std::vector<TrajectoryPoint> points(0);
   double prediction_total_time = FLAGS_prediction_duration;
-  if (obstacle->type() == PerceptionObstacle::PEDESTRIAN) {
+  if (obstacle->type() == perception::PEDESTRIAN) {
     prediction_total_time = FLAGS_prediction_pedestrian_total_time;
   }
   DrawFreeMoveTrajectoryPoints(position, velocity, acc, theta,

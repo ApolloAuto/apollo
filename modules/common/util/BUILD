@@ -26,7 +26,6 @@ cc_library(
         "//modules/common/math",
         "//modules/common/proto:pnc_point_proto",
         "//modules/common/time",
-        "//modules/perception/proto:perception_proto",
     ],
 )
 

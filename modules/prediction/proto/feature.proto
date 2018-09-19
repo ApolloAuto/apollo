@@ -64,7 +64,7 @@ message Feature {
   optional double t_acc = 21 [deprecated = true];
 
   optional bool is_still = 22 [default = false];
-  optional apollo.perception.PerceptionObstacle.Type type = 23;
+  optional apollo.perception.Type type = 23;
   optional double label_update_time_delta = 24;
 
   enum Priority {

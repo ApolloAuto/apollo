@@ -48,19 +48,19 @@ TEST_F(ObstaclesContainerTest, Vehicles) {
   Obstacle* obstacle_ptr0 = container_.GetObstacle(0);
   EXPECT_TRUE(obstacle_ptr0 != nullptr);
   EXPECT_EQ(obstacle_ptr0->id(), 0);
-  EXPECT_EQ(obstacle_ptr0->type(), perception::PerceptionObstacle::VEHICLE);
+  EXPECT_EQ(obstacle_ptr0->type(), perception::VEHICLE);
   Obstacle* obstacle_ptr1 = container_.GetObstacle(1);
   EXPECT_TRUE(obstacle_ptr1 != nullptr);
   EXPECT_EQ(obstacle_ptr1->id(), 1);
-  EXPECT_EQ(obstacle_ptr1->type(), perception::PerceptionObstacle::VEHICLE);
+  EXPECT_EQ(obstacle_ptr1->type(), perception::VEHICLE);
   Obstacle* obstacle_ptr2 = container_.GetObstacle(2);
   EXPECT_TRUE(obstacle_ptr2 != nullptr);
   EXPECT_EQ(obstacle_ptr2->id(), 2);
-  EXPECT_EQ(obstacle_ptr2->type(), perception::PerceptionObstacle::VEHICLE);
+  EXPECT_EQ(obstacle_ptr2->type(), perception::VEHICLE);
   Obstacle* obstacle_ptr3 = container_.GetObstacle(3);
   EXPECT_TRUE(obstacle_ptr3 != nullptr);
   EXPECT_EQ(obstacle_ptr3->id(), 3);
-  EXPECT_EQ(obstacle_ptr3->type(), perception::PerceptionObstacle::VEHICLE);
+  EXPECT_EQ(obstacle_ptr3->type(), perception::VEHICLE);
   Obstacle* obstacle_ptr4 = container_.GetObstacle(4);
   EXPECT_TRUE(obstacle_ptr4 == nullptr);
 }
@@ -70,12 +70,12 @@ TEST_F(ObstaclesContainerTest, Pedestrian) {
   EXPECT_TRUE(obstacle_ptr101 != nullptr);
   EXPECT_EQ(obstacle_ptr101->id(), 101);
   EXPECT_EQ(obstacle_ptr101->type(),
-            perception::PerceptionObstacle::PEDESTRIAN);
+            perception::PEDESTRIAN);
   Obstacle* obstacle_ptr102 = container_.GetObstacle(102);
   EXPECT_TRUE(obstacle_ptr102 != nullptr);
   EXPECT_EQ(obstacle_ptr102->id(), 102);
   EXPECT_EQ(obstacle_ptr102->type(),
-            perception::PerceptionObstacle::PEDESTRIAN);
+            perception::PEDESTRIAN);
   Obstacle* obstacle_ptr103 = container_.GetObstacle(103);
   EXPECT_TRUE(obstacle_ptr103 == nullptr);
 }

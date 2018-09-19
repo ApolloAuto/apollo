@@ -64,7 +64,7 @@ TEST_F(ObstacleTest, VehicleBasic) {
   Obstacle* obstacle_ptr = container_.GetObstacle(1);
   EXPECT_TRUE(obstacle_ptr != nullptr);
   EXPECT_EQ(obstacle_ptr->id(), 1);
-  EXPECT_EQ(obstacle_ptr->type(), perception::PerceptionObstacle::VEHICLE);
+  EXPECT_EQ(obstacle_ptr->type(), perception::VEHICLE);
   EXPECT_TRUE(obstacle_ptr->IsOnLane());
   EXPECT_EQ(obstacle_ptr->history_size(), 3);
   EXPECT_DOUBLE_EQ(obstacle_ptr->timestamp(), 0.2);
@@ -143,7 +143,7 @@ TEST_F(ObstacleTest, PedestrianBasic) {
   Obstacle* obstacle_ptr = container_.GetObstacle(101);
   EXPECT_TRUE(obstacle_ptr != nullptr);
   EXPECT_EQ(obstacle_ptr->id(), 101);
-  EXPECT_EQ(obstacle_ptr->type(), perception::PerceptionObstacle::PEDESTRIAN);
+  EXPECT_EQ(obstacle_ptr->type(), perception::PEDESTRIAN);
   EXPECT_EQ(obstacle_ptr->history_size(), 3);
   EXPECT_DOUBLE_EQ(obstacle_ptr->timestamp(), 0.2);
 }

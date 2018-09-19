@@ -77,7 +77,7 @@ class PoseContainer : public Container {
    * @brief Get adc position
    * @return adc position
    */
-  apollo::perception::Point GetPosition() const;
+  apollo::common::Point3D GetPosition() const;
 
  private:
   /**
@@ -88,8 +88,8 @@ class PoseContainer : public Container {
 
  public:
   static const int ID = -1;
-  static const perception::PerceptionObstacle::Type type_ =
-      perception::PerceptionObstacle::VEHICLE;
+  static const perception::Type type_ =
+      perception::VEHICLE;
 
  private:
   std::unique_ptr<perception::PerceptionObstacle> obstacle_ptr_;
