@@ -306,15 +306,6 @@ void GeneralMessage::RenderDebugString(const Screen* s, int key,
         PrintMessage(*raw_msg_class_, s, lineNo, 0,
                      page_index_ * pageItemCount);
 
-        outStr.str("");
-        outStr << "Child Count: " << children_map_.size();
-        s->AddStr(0, lineNo++, outStr.str().c_str());
-        for (auto& iter : children_map_) {
-          outStr.str("");
-          outStr << "lineNo = " << iter.first;
-          s->AddStr(0, lineNo++, outStr.str().c_str());
-        }
-
       } else {
         s->AddStr(0, lineNo++, "Cannot parse the raw message");
       }
