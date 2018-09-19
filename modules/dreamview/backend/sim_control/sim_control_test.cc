@@ -131,7 +131,8 @@ TEST_F(SimControlTest, Test) {
       continue;
     }
     count = 100;
-    while (count-- > 0 && nullptr == localization_reader_->GetLatestObserved()) {
+    while (count-- > 0 &&
+           nullptr == localization_reader_->GetLatestObserved()) {
       usleep(10000);
       continue;
     }
