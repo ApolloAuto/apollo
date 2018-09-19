@@ -27,8 +27,8 @@ PointCloud::PointCloud(int pointCount, int vertexElementCount,
 
 PointCloud::~PointCloud(void) {
   if (buffer_) {
-    delete buffer_;
-    buffer_ = 0;
+    delete [] buffer_;
+    buffer_ = nullptr;
   }
 }
 
