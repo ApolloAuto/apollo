@@ -18,6 +18,7 @@
 
 #include "gflags/gflags.h"
 #include "modules/canbus/proto/chassis.pb.h"
+#include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/util/file.h"
 #include "modules/common/util/map_util.h"
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
@@ -64,8 +65,9 @@ void MonitorManager::InitFrame(const double current_time) {
 
   // Get current DrivingMode, which will affect how we monitor modules, but
   // ignore old messages which are likely from replaying.
-  static auto chassis_observer = CreateObserver<Chassis>(FLAGS_chassis_topic);
-  const auto chassis = chassis_observer->GetLatest();
+  static auto chassis_reader = CreateReader<Chassis>(FLAGS_chassis_topic);
+  chassis_reader->Observe();
+  const auto chassis = chassis_reader->GetLatestObserved();
   Instance()->in_autonomous_driving_ =
       chassis != nullptr &&
       chassis->driving_mode() == Chassis::COMPLETE_AUTO_DRIVE &&

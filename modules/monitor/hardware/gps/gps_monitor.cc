@@ -19,10 +19,10 @@
 #include <algorithm>
 
 #include "cybertron/common/log.h"
+#include "modules/common/adapters/adapter_gflags.h"
 #include "modules/drivers/gnss/proto/gnss_best_pose.pb.h"
 #include "modules/drivers/gnss/proto/gnss_status.pb.h"
 #include "modules/drivers/gnss/proto/ins.pb.h"
-#include "modules/monitor/common/message_observer.h"
 #include "modules/monitor/common/monitor_manager.h"
 
 DEFINE_string(gps_hardware_name, "GPS", "Name of the GPS hardware.");
@@ -52,9 +52,10 @@ void GpsMonitor::RunOnce(const double current_time) {
       FLAGS_gps_hardware_name);
 
   // Check Gnss status.
-  static auto gnss_status_observer =
-      MonitorManager::CreateObserver<GnssStatus>(FLAGS_gnss_status_topic);
-  const auto gnss_status = gnss_status_observer->GetLatest();
+  static auto gnss_status_reader =
+      MonitorManager::CreateReader<GnssStatus>(FLAGS_gnss_status_topic);
+  gnss_status_reader->Observe();
+  const auto gnss_status = gnss_status_reader->GetLatestObserved();
   if (gnss_status == nullptr) {
     status->set_status(HardwareStatus::ERR);
     status->set_detailed_msg("No GNSS status message.");
@@ -67,9 +68,10 @@ void GpsMonitor::RunOnce(const double current_time) {
   }
 
   // Check Ins status.
-  static auto ins_status_observer =
-      MonitorManager::CreateObserver<InsStatus>(FLAGS_ins_status_topic);
-  const auto ins_status = ins_status_observer->GetLatest();
+  static auto ins_status_reader =
+      MonitorManager::CreateReader<InsStatus>(FLAGS_ins_status_topic);
+  ins_status_reader->Observe();
+  const auto ins_status = ins_status_reader->GetLatestObserved();
   if (ins_status == nullptr) {
     status->set_status(HardwareStatus::ERR);
     status->set_detailed_msg("No INS status message.");
@@ -90,9 +92,10 @@ void GpsMonitor::RunOnce(const double current_time) {
   }
 
   // Check Gnss BestPose.
-  static auto best_pose_observer =
-      MonitorManager::CreateObserver<GnssBestPose>(FLAGS_gnss_best_pose_topic);
-  const auto best_pose = best_pose_observer->GetLatest();
+  static auto best_pose_reader =
+      MonitorManager::CreateReader<GnssBestPose>(FLAGS_gnss_best_pose_topic);
+  best_pose_reader->Observe();
+  const auto best_pose = best_pose_reader->GetLatestObserved();
   if (best_pose == nullptr) {
     status->set_status(HardwareStatus::ERR);
     status->set_detailed_msg("No Gnss BestPose message.");

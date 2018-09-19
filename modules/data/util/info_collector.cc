@@ -21,8 +21,10 @@
 #include <string>
 
 #include "gflags/gflags.h"
+#include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/kv_db/kv_db.h"
 #include "modules/common/util/file.h"
+#include "modules/routing/proto/routing.pb.h"
 
 DEFINE_string(static_info_conf_file,
               "/apollo/modules/data/conf/static_info_conf.pb.txt",
@@ -38,6 +40,7 @@ namespace {
 using apollo::common::KVDB;
 using apollo::common::util::GetProtoFromASCIIFile;
 using apollo::common::util::SetProtoToASCIIFile;
+using apollo::routing::RoutingRequest;
 using google::protobuf::Map;
 using google::protobuf::RepeatedPtrField;
 
@@ -68,6 +71,12 @@ InfoCollector::InfoCollector() {
   for (auto& conf_file : *config_.mutable_software_configs()) {
     conf_file = apollo::common::util::TranslatePath(conf_file);
   }
+}
+
+void InfoCollector::Init(const std::shared_ptr<apollo::cybertron::Node>& node) {
+  Instance()->routing_request_reader_ =
+      node->CreateReader<apollo::routing::RoutingRequest>(
+          FLAGS_routing_request_topic);
 }
 
 const StaticInfo &InfoCollector::GetStaticInfo() {
@@ -129,6 +138,19 @@ const SoftwareInfo &InfoCollector::GetSoftwareInfo() {
 
   *software->mutable_configs() =
       LoadFiles(Instance()->config_.software_configs());
+
+  const auto routing_request_reader = Instance()->routing_request_reader_;
+  if (routing_request_reader != nullptr) {
+    routing_request_reader->Observe();
+    const auto routing_request = routing_request_reader->GetLatestObserved();
+    if (routing_request != nullptr) {
+      *software->mutable_latest_routing_request() = *routing_request;
+    } else {
+      AERROR << "No RoutingRequest has been received.";
+    }
+  } else {
+    AERROR << "RoutingRequest observer is not inited.";
+  }
   return *software;
 }
 

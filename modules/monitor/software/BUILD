@@ -30,6 +30,7 @@ cc_library(
     srcs = ["localization_monitor.cc"],
     hdrs = ["localization_monitor.h"],
     deps = [
+        "//modules/common/adapters:adapter_gflags",
         "//modules/localization/proto:localization_proto",
         "//modules/monitor/common:monitor_manager",
         "//modules/monitor/common:recurrent_runner",
@@ -54,6 +55,7 @@ cc_library(
     hdrs = ["summary_monitor.h"],
     deps = [
         ":safety_manager",
+        "//modules/common/adapters:adapter_gflags",
         "//modules/common/util:string_util",
         "//modules/monitor/common:monitor_manager",
         "//modules/monitor/common:recurrent_runner",

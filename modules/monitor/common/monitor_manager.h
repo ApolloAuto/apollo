@@ -22,7 +22,6 @@
 
 #include "cybertron/common/macros.h"
 #include "modules/common/monitor_log/monitor_log_buffer.h"
-#include "modules/monitor/common/message_observer.h"
 #include "modules/monitor/proto/monitor_conf.pb.h"
 #include "modules/monitor/proto/system_status.pb.h"
 
@@ -37,17 +36,20 @@ class MonitorManager {
  public:
   static void Init(const std::shared_ptr<apollo::cybertron::Node>& node);
 
-  template <class T>
-  static std::unique_ptr<MessageObserver<T>> CreateObserver(
-      const std::string& channel) {
-    return std::unique_ptr<MessageObserver<T>>(
-        new MessageObserver<T>(channel, Instance()->node_.get()));
+  static inline std::shared_ptr<apollo::cybertron::Node> CurrentNode() {
+    return Instance()->node_;
   }
 
   template <class T>
-  static std::shared_ptr<apollo::cybertron::Writer<T>> CreateWriter(
+  static inline std::shared_ptr<cybertron::Reader<T>> CreateReader(
       const std::string& channel) {
-    return Instance()->node_->CreateWriter<T>(channel);
+    return CHECK_NOTNULL(CurrentNode())->CreateReader<T>(channel);
+  }
+
+  template <class T>
+  static inline std::shared_ptr<cybertron::Writer<T>> CreateWriter(
+      const std::string& channel) {
+    return CHECK_NOTNULL(CurrentNode())->CreateWriter<T>(channel);
   }
 
   static const MonitorConf &GetConfig();
@@ -65,7 +67,7 @@ class MonitorManager {
   apollo::common::monitor::MonitorLogBuffer log_buffer_;
   bool in_autonomous_driving_ = false;
 
-  std::shared_ptr<apollo::cybertron::Node> node_ = nullptr;
+  std::shared_ptr<apollo::cybertron::Node> node_;
 
   DECLARE_SINGLETON(MonitorManager);
 };
