@@ -121,7 +121,8 @@ function generate_build_targets() {
     //modules/prediction/...
     //modules/routing/...
     //modules/third_party_perception/...
-    //modules/tools/manual_traffic_light/..." 
+    //modules/tools/manual_traffic_light/...
+    //modules/tools/prediction/fake_prediction/..."
     # //modules/data/...
 
   if [ $? -ne 0 ]; then
@@ -210,6 +211,8 @@ function build() {
   # fi
   if [ $? -eq 0 ]; then
     success 'Build passed!'
+  else
+    fail 'Build failed'
   fi
 }
 

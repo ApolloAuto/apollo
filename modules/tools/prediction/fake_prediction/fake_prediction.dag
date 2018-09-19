@@ -1,0 +1,10 @@
+module_config {
+    module_library : "/apollo/bazel-bin/modules/tools/prediction/fake_prediction/libfake_prediction_component.so"
+    timer_components {
+        class_name : "FakePredictionComponent"
+        config {
+            name: "fake_prediction"
+            interval: 100
+        }
+    }
+}
