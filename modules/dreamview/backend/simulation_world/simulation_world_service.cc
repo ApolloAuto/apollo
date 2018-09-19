@@ -125,22 +125,22 @@ void SetObstacleType(const PerceptionObstacle &obstacle, Object *world_object) {
   }
 
   switch (obstacle.type()) {
-    case PerceptionObstacle::UNKNOWN:
+    case perception::UNKNOWN:
       world_object->set_type(Object_Type_UNKNOWN);
       break;
-    case PerceptionObstacle::UNKNOWN_MOVABLE:
+    case perception::UNKNOWN_MOVABLE:
       world_object->set_type(Object_Type_UNKNOWN_MOVABLE);
       break;
-    case PerceptionObstacle::UNKNOWN_UNMOVABLE:
+    case perception::UNKNOWN_UNMOVABLE:
       world_object->set_type(Object_Type_UNKNOWN_UNMOVABLE);
       break;
-    case PerceptionObstacle::PEDESTRIAN:
+    case perception::PEDESTRIAN:
       world_object->set_type(Object_Type_PEDESTRIAN);
       break;
-    case PerceptionObstacle::BICYCLE:
+    case perception::BICYCLE:
       world_object->set_type(Object_Type_BICYCLE);
       break;
-    case PerceptionObstacle::VEHICLE:
+    case perception::VEHICLE:
       world_object->set_type(Object_Type_VEHICLE);
       break;
     default:
@@ -505,7 +505,8 @@ void SimulationWorldService::SetObstacleInfo(const PerceptionObstacle &obstacle,
   world_object->set_speed_heading(
       std::atan2(obstacle.velocity().y(), obstacle.velocity().x()));
   world_object->set_timestamp_sec(obstacle.timestamp());
-  world_object->set_confidence(obstacle.confidence());
+  // FIXME(all): adjust to new perception pb
+  // world_object->set_confidence(obstacle.confidence());
 }
 
 void SimulationWorldService::SetObstaclePolygon(

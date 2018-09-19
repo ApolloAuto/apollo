@@ -61,7 +61,7 @@ Obstacle::Obstacle() {
                                           {heading_filter_param}};
 }
 
-PerceptionObstacle::Type Obstacle::type() const { return type_; }
+perception::Type Obstacle::type() const { return type_; }
 
 int Obstacle::id() const { return id_; }
 
@@ -161,7 +161,7 @@ void Obstacle::Insert(const PerceptionObstacle& perception_obstacle,
       InitKFMotionTracker(feature);
     }
     UpdateKFMotionTracker(feature);
-    if (type_ == PerceptionObstacle::PEDESTRIAN) {
+    if (type_ == perception::PEDESTRIAN) {
       if (!kf_pedestrian_tracker_.IsInitialized()) {
         InitKFPedestrianTracker(feature);
       }
@@ -179,7 +179,7 @@ void Obstacle::Insert(const PerceptionObstacle& perception_obstacle,
   SetNearbyLanes(&feature);
 
   if (FLAGS_adjust_vehicle_heading_by_lane &&
-     type_ == PerceptionObstacle::VEHICLE) {
+     type_ == perception::VEHICLE) {
     AdjustHeadingByLane(&feature);
   }
 
@@ -262,7 +262,7 @@ void Obstacle::UpdateStatus(Feature* feature) {
          << "].";
 
   // Update pedestrian motion belief
-  if (type_ == PerceptionObstacle::PEDESTRIAN) {
+  if (type_ == perception::PEDESTRIAN) {
     if (!kf_pedestrian_tracker_.IsInitialized()) {
       ADEBUG << "Obstacle [" << id_
              << "] has not initialized pedestrian tracker.";
@@ -408,8 +408,8 @@ void Obstacle::SetVelocity(const PerceptionObstacle& perception_obstacle,
       }
     }
     double filtered_heading = heading_filter_.Filter(velocity_heading);
-    if (type_ == PerceptionObstacle::BICYCLE ||
-        type_ == PerceptionObstacle::PEDESTRIAN) {
+    if (type_ == perception::BICYCLE ||
+        type_ == perception::PEDESTRIAN) {
       velocity_heading = filtered_heading;
     }
     velocity_x = speed * std::cos(velocity_heading);
@@ -795,7 +795,7 @@ void Obstacle::SetNearbyLanes(Feature* feature) {
     }
 
     // Ignore bike and sidewalk lanes for vehicles
-    if (type_ == PerceptionObstacle::VEHICLE &&
+    if (type_ == perception::VEHICLE &&
         nearby_lane->lane().has_type() &&
         (nearby_lane->lane().type() == ::apollo::hdmap::Lane::BIKING ||
          nearby_lane->lane().type() == ::apollo::hdmap::Lane::SIDEWALK)) {
@@ -1038,8 +1038,8 @@ void Obstacle::SetMotionStatus() {
 
   double std = FLAGS_still_obstacle_position_std;
   double speed_threshold = FLAGS_still_obstacle_speed_threshold;
-  if (type_ == PerceptionObstacle::PEDESTRIAN ||
-      type_ == PerceptionObstacle::BICYCLE) {
+  if (type_ == perception::PEDESTRIAN ||
+      type_ == perception::BICYCLE) {
     speed_threshold = FLAGS_still_pedestrian_speed_threshold;
     std = FLAGS_still_pedestrian_position_std;
   }

@@ -235,9 +235,9 @@ std::string FrontVehicle::FindPassableObstacle(
     const PerceptionObstacle& perception_obstacle =
         path_obstacle->obstacle()->Perception();
     const std::string& obstacle_id = std::to_string(perception_obstacle.id());
-    PerceptionObstacle::Type obstacle_type = perception_obstacle.type();
+    perception::Type obstacle_type = perception_obstacle.type();
     std::string obstacle_type_name =
-        PerceptionObstacle_Type_Name(obstacle_type);
+        perception::Type_Name(obstacle_type);
 
     if (path_obstacle->obstacle()->IsVirtual() ||
         !path_obstacle->obstacle()->IsStatic()) {
@@ -313,9 +313,9 @@ void FrontVehicle::MakeStopDecision(ReferenceLineInfo* reference_line_info) {
     const PerceptionObstacle& perception_obstacle =
         path_obstacle->obstacle()->Perception();
     const std::string& obstacle_id = std::to_string(perception_obstacle.id());
-    PerceptionObstacle::Type obstacle_type = perception_obstacle.type();
+    perception::Type obstacle_type = perception_obstacle.type();
     std::string obstacle_type_name =
-        PerceptionObstacle_Type_Name(obstacle_type);
+        perception::Type_Name(obstacle_type);
 
     if (path_obstacle->obstacle()->IsVirtual() ||
         !path_obstacle->obstacle()->IsStatic()) {
@@ -388,9 +388,9 @@ void FrontVehicle::MakeStopDecision(ReferenceLineInfo* reference_line_info) {
 
       ObjectDecisionType stop;
       auto stop_decision = stop.mutable_stop();
-      if (obstacle_type == PerceptionObstacle::UNKNOWN_MOVABLE ||
-          obstacle_type == PerceptionObstacle::BICYCLE ||
-          obstacle_type == PerceptionObstacle::VEHICLE) {
+      if (obstacle_type == perception::UNKNOWN_MOVABLE ||
+          obstacle_type == perception::BICYCLE ||
+          obstacle_type == perception::VEHICLE) {
         stop_decision->set_reason_code(
             StopReasonCode::STOP_REASON_HEAD_VEHICLE);
       } else {

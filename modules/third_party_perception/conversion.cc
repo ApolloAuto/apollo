@@ -44,7 +44,7 @@ using apollo::drivers::Mobileye;
 using apollo::localization::LocalizationEstimate;
 using apollo::perception::PerceptionObstacle;
 using apollo::perception::PerceptionObstacles;
-using apollo::perception::Point;
+using apollo::common::Point3D;
 
 std::map<std::int32_t, ::apollo::hdmap::LaneBoundaryType_Type>
     lane_conversion_map = {{0, apollo::hdmap::LaneBoundaryType::DOTTED_YELLOW},
@@ -157,7 +157,7 @@ PerceptionObstacles MobileyeToPerceptionObstacles(
     mob_x += FLAGS_mobileye_pos_adjust;  // offset: imu <-> mobileye
     mob_x += mob_l / 2.0;  // make x the middle point of the vehicle.
 
-    Point xy_point = SLtoXY(mob_x, mob_y, adc_theta);
+    Point3D xy_point = SLtoXY(mob_x, mob_y, adc_theta);
 
     // TODO(QiL) : Clean this up after data collection and validation
     double converted_x = 0.0;
@@ -225,20 +225,20 @@ PerceptionObstacles MobileyeToPerceptionObstacles(
     switch (mob_type) {
       case 0:
       case 1: {
-        mob->set_type(PerceptionObstacle::VEHICLE);  // VEHICLE
+        mob->set_type(perception::VEHICLE);  // VEHICLE
         break;
       }
       case 2:
       case 4: {
-        mob->set_type(PerceptionObstacle::BICYCLE);  // BIKE
+        mob->set_type(perception::BICYCLE);  // BIKE
         break;
       }
       case 3: {
-        mob->set_type(PerceptionObstacle::PEDESTRIAN);  // PED
+        mob->set_type(perception::PEDESTRIAN);  // PED
         break;
       }
       default: {
-        mob->set_type(PerceptionObstacle::UNKNOWN);  // UNKNOWN
+        mob->set_type(perception::UNKNOWN);  // UNKNOWN
         break;
       }
     }
@@ -256,7 +256,8 @@ PerceptionObstacles MobileyeToPerceptionObstacles(
                           mob->position().z(), mob->length(), mob->width(),
                           mob->height(), mob->theta());
 
-    mob->set_confidence(0.5);
+    // FIXME(all): adjust based on new perception pb
+    // mob->set_confidence(0.5);
   }
 
   return obstacles;
@@ -287,15 +288,15 @@ RadarObstacles ContiToRadarObstacles(
     rob.set_width(GetDefaultObjectWidth(4));
     rob.set_height(3.0);
 
-    Point relative_pos_sl;
+    Point3D relative_pos_sl;
 
     // TODO(QiL): load the radar configs here
     relative_pos_sl.set_x(contiobs.longitude_dist());
     relative_pos_sl.set_y(contiobs.lateral_dist());
     rob.mutable_relative_position()->CopyFrom(relative_pos_sl);
 
-    Point relative_pos_xy = SLtoXY(relative_pos_sl, adc_theta);
-    Point absolute_pos;
+    Point3D relative_pos_xy = SLtoXY(relative_pos_sl, adc_theta);
+    Point3D absolute_pos;
     absolute_pos.set_x(adc_pos.x() + relative_pos_xy.x());
     absolute_pos.set_y(adc_pos.y() + relative_pos_xy.y());
     absolute_pos.set_z(adc_pos.z());
@@ -305,7 +306,7 @@ RadarObstacles ContiToRadarObstacles(
     rob.mutable_relative_velocity()->set_y(contiobs.lateral_vel());
 
     const auto iter = last_radar_obstacles.radar_obstacle().find(index);
-    Point absolute_vel;
+    Point3D absolute_vel;
     if (iter == last_radar_obstacles.radar_obstacle().end()) {
       rob.set_count(0);
       rob.set_movable(false);
@@ -422,7 +423,7 @@ RadarObstacles DelphiToRadarObstacles(
 
     const double range = data_500.can_tx_track_range();
     const double angle = data_500.can_tx_track_angle() * M_PI / 180.0;
-    Point relative_pos_sl;
+    Point3D relative_pos_sl;
     relative_pos_sl.set_x(range * std::cos(angle) +
                           FLAGS_radar_pos_adjust +  // offset: imu <-> mobileye
                           rob.length() /
@@ -430,8 +431,8 @@ RadarObstacles DelphiToRadarObstacles(
     relative_pos_sl.set_y(range * std::sin(angle));
     rob.mutable_relative_position()->CopyFrom(relative_pos_sl);
 
-    Point relative_pos_xy = SLtoXY(relative_pos_sl, adc_theta);
-    Point absolute_pos;
+    Point3D relative_pos_xy = SLtoXY(relative_pos_sl, adc_theta);
+    Point3D absolute_pos;
     absolute_pos.set_x(adc_pos.x() + relative_pos_xy.x());
     absolute_pos.set_y(adc_pos.y() + relative_pos_xy.y());
     absolute_pos.set_z(adc_pos.z());
@@ -448,7 +449,7 @@ RadarObstacles DelphiToRadarObstacles(
                                            lateral_vel * std::cos(angle));
 
     const auto iter = last_radar_obstacles.radar_obstacle().find(index);
-    Point absolute_vel;
+    Point3D absolute_vel;
     if (iter == last_radar_obstacles.radar_obstacle().end()) {
       rob.set_count(0);
       rob.set_movable(false);
@@ -499,7 +500,7 @@ PerceptionObstacles RadarObstaclesToPerceptionObstacles(
 
     pob->set_id(radar_obstacle.id() + FLAGS_radar_id_offset);
 
-    pob->set_type(PerceptionObstacle::VEHICLE);
+    pob->set_type(perception::VEHICLE);
     pob->set_length(radar_obstacle.length());
     pob->set_width(radar_obstacle.width());
     pob->set_height(radar_obstacle.height());
@@ -518,7 +519,8 @@ PerceptionObstacles RadarObstaclesToPerceptionObstacles(
     FillPerceptionPolygon(pob, pob->position().x(), pob->position().y(),
                           pob->position().z(), pob->length(), pob->width(),
                           pob->height(), pob->theta());
-    pob->set_confidence(0.01);
+    // FIXME(all): adjust based on new perception pb
+    // pob->set_confidence(0.01);
   }
 
   obstacles.mutable_header()->CopyFrom(radar_obstacles.header());

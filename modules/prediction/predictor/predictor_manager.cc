@@ -63,7 +63,7 @@ void PredictorManager::Init(const PredictionConf& config) {
     }
 
     switch (obstacle_conf.obstacle_type()) {
-      case PerceptionObstacle::VEHICLE: {
+      case perception::VEHICLE: {
         if (obstacle_conf.has_obstacle_status()) {
           if (obstacle_conf.obstacle_status() == ObstacleConf::ON_LANE) {
             vehicle_on_lane_predictor_ = obstacle_conf.predictor_type();
@@ -74,7 +74,7 @@ void PredictorManager::Init(const PredictionConf& config) {
         }
         break;
       }
-      case PerceptionObstacle::BICYCLE: {
+      case perception::BICYCLE: {
         if (obstacle_conf.has_obstacle_status()) {
           if (obstacle_conf.obstacle_status() == ObstacleConf::ON_LANE) {
             cyclist_on_lane_predictor_ = obstacle_conf.predictor_type();
@@ -85,11 +85,11 @@ void PredictorManager::Init(const PredictionConf& config) {
         }
         break;
       }
-      case PerceptionObstacle::PEDESTRIAN: {
+      case perception::PEDESTRIAN: {
         pedestrian_predictor_ = obstacle_conf.predictor_type();
         break;
       }
-      case PerceptionObstacle::UNKNOWN: {
+      case perception::UNKNOWN: {
         if (obstacle_conf.has_obstacle_status()) {
           if (obstacle_conf.obstacle_status() == ObstacleConf::ON_LANE) {
             default_on_lane_predictor_ = obstacle_conf.predictor_type();
@@ -160,7 +160,7 @@ void PredictorManager::Run(const PerceptionObstacles& perception_obstacles) {
         predictor = GetPredictor(ObstacleConf::EMPTY_PREDICTOR);
       } else {
         switch (perception_obstacle.type()) {
-          case PerceptionObstacle::VEHICLE: {
+          case perception::VEHICLE: {
             if (obstacle->IsOnLane()) {
               predictor = GetPredictor(vehicle_on_lane_predictor_);
             } else {
@@ -168,11 +168,11 @@ void PredictorManager::Run(const PerceptionObstacles& perception_obstacles) {
             }
             break;
           }
-          case PerceptionObstacle::PEDESTRIAN: {
+          case perception::PEDESTRIAN: {
             predictor = GetPredictor(pedestrian_predictor_);
             break;
           }
-          case PerceptionObstacle::BICYCLE: {
+          case perception::BICYCLE: {
             if (obstacle->IsOnLane() && !obstacle->IsNearJunction()) {
               predictor = GetPredictor(cyclist_on_lane_predictor_);
             } else {
@@ -194,7 +194,7 @@ void PredictorManager::Run(const PerceptionObstacles& perception_obstacles) {
       if (predictor != nullptr) {
         predictor->Predict(obstacle);
         if (FLAGS_enable_trim_prediction_trajectory &&
-            obstacle->type() == PerceptionObstacle::VEHICLE) {
+            obstacle->type() == perception::VEHICLE) {
           CHECK_NOTNULL(adc_trajectory_container);
           predictor->TrimTrajectories(obstacle, adc_trajectory_container);
         }

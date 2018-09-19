@@ -55,18 +55,18 @@ void EvaluatorManager::Init(const PredictionConf& config) {
     if (obstacle_conf.has_obstacle_status() &&
         obstacle_conf.obstacle_status() == ObstacleConf::ON_LANE) {
       switch (obstacle_conf.obstacle_type()) {
-        case PerceptionObstacle::VEHICLE: {
+        case perception::VEHICLE: {
           vehicle_on_lane_evaluator_ = obstacle_conf.evaluator_type();
           break;
         }
-        case PerceptionObstacle::BICYCLE: {
+        case perception::BICYCLE: {
           cyclist_on_lane_evaluator_ = obstacle_conf.evaluator_type();
           break;
         }
-        case PerceptionObstacle::PEDESTRIAN: {
+        case perception::PEDESTRIAN: {
           break;
         }
-        case PerceptionObstacle::UNKNOWN: {
+        case perception::UNKNOWN: {
           default_on_lane_evaluator_ = obstacle_conf.evaluator_type();
           break;
         }
@@ -116,21 +116,21 @@ void EvaluatorManager::Run(
     }
 
     switch (perception_obstacle.type()) {
-      case PerceptionObstacle::VEHICLE: {
+      case perception::VEHICLE: {
         if (obstacle->IsOnLane()) {
           evaluator = GetEvaluator(vehicle_on_lane_evaluator_);
           CHECK_NOTNULL(evaluator);
         }
         break;
       }
-      case PerceptionObstacle::BICYCLE: {
+      case perception::BICYCLE: {
         if (obstacle->IsOnLane()) {
           evaluator = GetEvaluator(cyclist_on_lane_evaluator_);
           CHECK_NOTNULL(evaluator);
         }
         break;
       }
-      case PerceptionObstacle::PEDESTRIAN: {
+      case perception::PEDESTRIAN: {
         break;
       }
       default: {

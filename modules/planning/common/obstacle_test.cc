@@ -45,22 +45,22 @@ TEST(Obstacle, IsStaticObstacle) {
   perception_obstacle.mutable_velocity()->set_y(0.5);
   EXPECT_FALSE(Obstacle::IsStaticObstacle(perception_obstacle));
 
-  perception_obstacle.set_type(PerceptionObstacle::UNKNOWN);
+  perception_obstacle.set_type(perception::UNKNOWN);
   EXPECT_FALSE(Obstacle::IsStaticObstacle(perception_obstacle));
 
-  perception_obstacle.set_type(PerceptionObstacle::UNKNOWN_UNMOVABLE);
+  perception_obstacle.set_type(perception::UNKNOWN_UNMOVABLE);
   EXPECT_TRUE(Obstacle::IsStaticObstacle(perception_obstacle));
 
-  perception_obstacle.set_type(PerceptionObstacle::UNKNOWN_MOVABLE);
+  perception_obstacle.set_type(perception::UNKNOWN_MOVABLE);
   EXPECT_FALSE(Obstacle::IsStaticObstacle(perception_obstacle));
 
-  perception_obstacle.set_type(PerceptionObstacle::PEDESTRIAN);
+  perception_obstacle.set_type(perception::PEDESTRIAN);
   EXPECT_FALSE(Obstacle::IsStaticObstacle(perception_obstacle));
 
-  perception_obstacle.set_type(PerceptionObstacle::BICYCLE);
+  perception_obstacle.set_type(perception::BICYCLE);
   EXPECT_FALSE(Obstacle::IsStaticObstacle(perception_obstacle));
 
-  perception_obstacle.set_type(PerceptionObstacle::VEHICLE);
+  perception_obstacle.set_type(perception::VEHICLE);
   EXPECT_FALSE(Obstacle::IsStaticObstacle(perception_obstacle));
 
   perception_obstacle.mutable_velocity()->set_x(0.5);

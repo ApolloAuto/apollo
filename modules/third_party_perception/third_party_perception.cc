@@ -39,7 +39,7 @@ using apollo::drivers::Mobileye;
 using apollo::localization::LocalizationEstimate;
 using apollo::perception::PerceptionObstacle;
 using apollo::perception::PerceptionObstacles;
-using apollo::perception::Point;
+using apollo::common::Point3D;
 
 std::string ThirdPartyPerception::Name() const {
   return FLAGS_third_party_perception_node_name;

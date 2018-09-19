@@ -34,7 +34,6 @@
 
 #include "modules/common/proto/geometry.pb.h"
 #include "modules/common/proto/pnc_point.pb.h"
-#include "modules/perception/proto/perception_obstacle.pb.h"
 
 #include "modules/common/math/vec2d.h"
 
@@ -127,8 +126,8 @@ PointENU operator+(const PointENU enu, const math::Vec2d& xy);
 
 PointENU MakePointENU(const math::Vec2d& xy);
 
-apollo::perception::Point MakePerceptionPoint(const double x, const double y,
-                                              const double z);
+apollo::common::Point3D MakePoint3D(const double x, const double y,
+                                    const double z);
 
 SpeedPoint MakeSpeedPoint(const double s, const double t, const double v,
                           const double a, const double da);

@@ -38,7 +38,7 @@ using apollo::common::PointENU;
 using apollo::common::Quaternion;
 using apollo::hdmap::HDMapUtil;
 using apollo::perception::PerceptionObstacle;
-using apollo::perception::Point;
+using apollo::common::Point3D;
 
 double GetAngleFromQuaternion(const Quaternion quaternion) {
   double theta = std::atan2(2.0 * quaternion.qw() * quaternion.qz() +
@@ -123,18 +123,18 @@ double GetDefaultObjectWidth(const int object_type) {
   return default_object_width;
 }
 
-Point SLtoXY(const Point& point, const double theta) {
+Point3D SLtoXY(const Point3D& point, const double theta) {
   return SLtoXY(point.x(), point.y(), theta);
 }
 
-Point SLtoXY(const double x, const double y, const double theta) {
-  Point converted_point;
+Point3D SLtoXY(const double x, const double y, const double theta) {
+  Point3D converted_point;
   converted_point.set_x(x * std::cos(theta) + y * std::sin(theta));
   converted_point.set_y(x * std::sin(theta) - y * std::cos(theta));
   return converted_point;
 }
 
-double Distance(const Point& point1, const Point& point2) {
+double Distance(const Point3D& point1, const Point3D& point2) {
   double distance =
       std::sqrt((point1.x() - point2.x()) * (point1.x() - point2.x()) +
                 (point1.y() - point2.y()) * (point1.y() - point2.y()));
@@ -166,7 +166,7 @@ double GetNearestLaneHeading(const PointENU& point_enu) {
   return lane_heading;
 }
 
-double GetNearestLaneHeading(const Point& point) {
+double GetNearestLaneHeading(const Point3D& point) {
   auto* hdmap = HDMapUtil::BaseMapPtr();
   if (hdmap == nullptr) {
     AERROR << "Failed to get nearest lane for point " << point.DebugString();
@@ -197,7 +197,7 @@ double GetNearestLaneHeading(const double x, const double y, const double z) {
   return GetNearestLaneHeading(point_enu);
 }
 
-double GetLateralDistanceToNearestLane(const Point& point) {
+double GetLateralDistanceToNearestLane(const Point3D& point) {
   auto* hdmap = HDMapUtil::BaseMapPtr();
   if (hdmap == nullptr) {
     AERROR << "Failed to get nearest lane for point " << point.DebugString();
@@ -224,7 +224,7 @@ double GetLateralDistanceToNearestLane(const Point& point) {
   return nearest_l;
 }
 
-double Speed(const Point& point) {
+double Speed(const Point3D& point) {
   return std::sqrt(point.x() * point.x() + point.y() + point.y());
 }
 
