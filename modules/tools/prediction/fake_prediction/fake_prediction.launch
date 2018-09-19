@@ -1,0 +1,7 @@
+<cybertron>
+    <module>
+        <name>fake_prediction</name>
+        <dag_conf>/apollo/modules/tools/prediction/fake_prediction/fake_prediction.dag</dag_conf>
+        <process_name></process_name>
+    </module>
+</cybertron>
