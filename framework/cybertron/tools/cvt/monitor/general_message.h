@@ -53,7 +53,7 @@ static void PrintFieldValue(const google::protobuf::Message& msg,
 static void PrintMessage(const google::protobuf::Message& msg, const Screen* s,
                   unsigned& lineNo, int indent, int jumpLines = 0);
 
-enum class State { ShowDebugString, ShowInfo, ShowRepeatedItems } current_state_;
+enum class State { ShowDebugString, ShowInfo } current_state_;
 
 int pages_;
 int page_index_;
