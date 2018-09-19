@@ -5,7 +5,7 @@ module_config {
         config {
             name: "guardian"
             config_file_path: "/apollo/modules/guardian/conf/guardian_conf.pb.txt"
-            interval: 100
+            interval: 10
         }
     }
 }
