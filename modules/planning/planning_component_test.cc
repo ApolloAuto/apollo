@@ -15,8 +15,8 @@
  *****************************************************************************/
 #include <memory>
 
-#include "gtest/gtest.h"
 #include "gflags/gflags.h"
+#include "gtest/gtest.h"
 
 #include "cybertron/cybertron.h"
 
@@ -26,8 +26,8 @@
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
 #include "modules/routing/proto/routing.pb.h"
 
-#include "modules/common/util/file.h"
 #include "modules/common/adapters/adapter_gflags.h"
+#include "modules/common/util/file.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/planning_component.h"
 
@@ -116,17 +116,15 @@ void PlanningComponentTest::SetupCybertron() {
   std::shared_ptr<apollo::cybertron::Node> node(
       apollo::cybertron::CreateNode("planning_test"));
 
-  chassis_writer_ = node->CreateWriter<Chassis>(
-      FLAGS_chassis_topic);
-  localization_writer_ = node->CreateWriter<LocalizationEstimate>(
-      FLAGS_localization_topic);
-  prediction_writer_ = node->CreateWriter<PredictionObstacles>(
-      FLAGS_prediction_topic);
-  routing_response_writer_ = node->CreateWriter<RoutingResponse>(
-      FLAGS_routing_response_topic);
-  traffic_light_detection_writer_ =
-      node->CreateWriter<TrafficLightDetection>(
-          FLAGS_traffic_light_detection_topic);
+  chassis_writer_ = node->CreateWriter<Chassis>(FLAGS_chassis_topic);
+  localization_writer_ =
+      node->CreateWriter<LocalizationEstimate>(FLAGS_localization_topic);
+  prediction_writer_ =
+      node->CreateWriter<PredictionObstacles>(FLAGS_prediction_topic);
+  routing_response_writer_ =
+      node->CreateWriter<RoutingResponse>(FLAGS_routing_response_topic);
+  traffic_light_detection_writer_ = node->CreateWriter<TrafficLightDetection>(
+      FLAGS_traffic_light_detection_topic);
 
   planning_reader_ = node->CreateReader<ADCTrajectory>(
       FLAGS_planning_trajectory_topic,
@@ -151,8 +149,8 @@ bool PlanningComponentTest::FeedTestData(LocalView* local_view) {
   // localization
   LocalizationEstimate localization;
   if (!apollo::common::util::GetProtoFromFile(
-      FLAGS_test_data_dir + "/" + FLAGS_test_localization_file,
-      &localization)) {
+          FLAGS_test_data_dir + "/" + FLAGS_test_localization_file,
+          &localization)) {
     AERROR << "failed to load file: " << FLAGS_test_localization_file;
     return -1;
   }
@@ -160,8 +158,8 @@ bool PlanningComponentTest::FeedTestData(LocalView* local_view) {
   // prediction
   PredictionObstacles prediction;
   if (!apollo::common::util::GetProtoFromFile(
-      FLAGS_test_data_dir + "/" + FLAGS_test_prediction_file,
-      &prediction)) {
+          FLAGS_test_data_dir + "/" + FLAGS_test_prediction_file,
+          &prediction)) {
     AERROR << "failed to load file: " << FLAGS_test_prediction_file;
     return -1;
   }
@@ -169,8 +167,8 @@ bool PlanningComponentTest::FeedTestData(LocalView* local_view) {
   // routing_response
   RoutingResponse routing_response;
   if (!apollo::common::util::GetProtoFromFile(
-      FLAGS_test_data_dir + "/" + FLAGS_test_routing_response_file,
-      &routing_response)) {
+          FLAGS_test_data_dir + "/" + FLAGS_test_routing_response_file,
+          &routing_response)) {
     AERROR << "failed to load file: " << FLAGS_test_routing_response_file;
     return -1;
   }
@@ -178,12 +176,11 @@ bool PlanningComponentTest::FeedTestData(LocalView* local_view) {
   // traffic_light_detection
   TrafficLightDetection traffic_light_detection;
   if (!apollo::common::util::GetProtoFromFile(
-      FLAGS_test_data_dir + "/" + FLAGS_test_traffic_light_file,
-      &traffic_light_detection)) {
+          FLAGS_test_data_dir + "/" + FLAGS_test_traffic_light_file,
+          &traffic_light_detection)) {
     AERROR << "failed to load file: " << FLAGS_test_traffic_light_file;
     // return -1;
   }
-
 
   local_view->chassis = std::make_shared<Chassis>(chassis);
   local_view->localization_estimate =
@@ -222,8 +219,8 @@ bool PlanningComponentTest::RunPlanning(const std::string& test_case_name) {
 
   TrimPlanning(&adc_trajectory_);
 
-  const std::string golden_result_file = apollo::common::util::StrCat(
-      "result_", test_case_name, "_0.pb.txt");
+  const std::string golden_result_file =
+      apollo::common::util::StrCat("result_", test_case_name, "_0.pb.txt");
   std::string full_golden_path = FLAGS_test_data_dir + "/" + golden_result_file;
   if (FLAGS_test_update_golden_log) {
     AINFO << "The golden file is regenerated:" << full_golden_path;
@@ -271,6 +268,8 @@ TEST_F(PlanningComponentTest, garage_stop_obstacle) {
   FLAGS_test_prediction_file = "stop_obstacle_prediction.pb.txt";
   FLAGS_test_localization_file = "stop_obstacle_localization.pb.txt";
   FLAGS_test_chassis_file = "stop_obstacle_chassis.pb.txt";
+  FLAGS_enable_multi_thread_in_dp_poly_path = true;
+  FLAGS_enable_multi_thread_in_dp_st_graph = true;
 
   bool run_planning_success = RunPlanning("planning_componnet_stop_obstacle");
   EXPECT_TRUE(run_planning_success);
