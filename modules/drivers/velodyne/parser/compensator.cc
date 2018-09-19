@@ -40,7 +40,7 @@ bool Compensator::query_pose_affine_from_tf2(
     return false;
   }
 
-  adu::common::TransformStamped stamped_transform;
+  apollo::transform::TransformStamped stamped_transform;
 
   try {
     stamped_transform =
