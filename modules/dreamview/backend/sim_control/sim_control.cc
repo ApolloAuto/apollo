@@ -18,11 +18,14 @@
 
 #include <cmath>
 
+#include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/math/linear_interpolation.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/common/math/quaternion.h"
 #include "modules/common/time/time.h"
 #include "modules/common/util/file.h"
+#include "modules/common/util/message_util.h"
+#include "modules/common/util/util.h"
 
 namespace apollo {
 namespace dreamview {
@@ -38,8 +41,11 @@ using apollo::common::math::InterpolateUsingLinearApproximation;
 using apollo::common::math::NormalizeAngle;
 using apollo::common::math::QuaternionToHeading;
 using apollo::common::time::Clock;
+using apollo::common::util::FillHeader;
 using apollo::common::util::GetProtoFromFile;
 using apollo::localization::LocalizationEstimate;
+using apollo::planning::ADCTrajectory;
+using apollo::relative_map::NavigationInfo;
 using apollo::routing::RoutingResponse;
 
 namespace {
@@ -61,44 +67,45 @@ bool IsSameHeader(const Header& lhs, const Header& rhs) {
 }  // namespace
 
 SimControl::SimControl(const MapService* map_service)
-    : map_service_(map_service) {}
+    : map_service_(map_service),
+      node_(cybertron::CreateNode("sim_control")),
+      current_trajectory_(std::make_shared<ADCTrajectory>()) {
+  InitTimerAndIO();
+}
 
 void SimControl::Init(bool set_start_point, double start_velocity,
                       double start_acceleration) {
   if (set_start_point && !FLAGS_use_navigation_mode) {
     InitStartPoint(start_velocity, start_acceleration);
   }
-  InitAdapter();
 }
 
-void SimControl::InitAdapter() {
-  if (adapter_inited_) {
-    return;
-  }
+void SimControl::InitTimerAndIO() {
+  localization_reader_ =
+      node_->CreateReader<LocalizationEstimate>(FLAGS_localization_topic);
+  planning_reader_ = node_->CreateReader<ADCTrajectory>(
+      FLAGS_planning_trajectory_topic,
+      [this](const std::shared_ptr<ADCTrajectory>& trajectory) {
+        this->OnPlanning(trajectory);
+      });
+  routing_response_reader_ = node_->CreateReader<RoutingResponse>(
+      FLAGS_routing_response_topic,
+      [this](const std::shared_ptr<RoutingResponse>& routing) {
+        this->OnRoutingResponse(routing);
+      });
+  navigation_reader_ = node_->CreateReader<NavigationInfo>(
+      FLAGS_navigation_topic,
+      [this](const std::shared_ptr<NavigationInfo>& navigation_info) {
+        this->OnReceiveNavigationInfo(navigation_info);
+      });
 
-  // Setup planning and routing result data callback.
-  // AdapterManager::AddPlanningCallback(&SimControl::OnPlanning, this);
-  // AdapterManager::AddRoutingResponseCallback(&SimControl::OnRoutingResponse,
-  //                                            this);
-  // AdapterManager::AddNavigationCallback(&SimControl::OnReceiveNavigationInfo,
-  //                                       this);
+  localization_writer_ =
+      node_->CreateWriter<LocalizationEstimate>(FLAGS_localization_topic);
+  chassis_writer_ = node_->CreateWriter<Chassis>(FLAGS_chassis_topic);
 
-  // // Start timer to publish localization and chassis messages.
-  // sim_control_timer_ = AdapterManager::CreateTimer(
-  //     ros::Duration(kSimControlInterval), &SimControl::TimerCallback, this);
-
-  adapter_inited_ = true;
-}
-
-void SimControl::OnReceiveNavigationInfo(
-    const relative_map::NavigationInfo& navigation_info) {
-  navigation_info_ = navigation_info;
-  if (navigation_info_.navigation_path_size() > 0) {
-    const auto& path = navigation_info_.navigation_path(0).path();
-    if (path.path_point_size() > 0) {
-      adc_position_ = path.path_point(0);
-    }
-  }
+  // Start timer to publish localization and chassis messages.
+  sim_control_timer_.reset(new cybertron::Timer(
+      kSimControlIntervalMs, [this]() { this->RunOnce(); }, false));
 }
 
 void SimControl::InitStartPoint(double start_velocity,
@@ -106,48 +113,47 @@ void SimControl::InitStartPoint(double start_velocity,
   TrajectoryPoint point;
   // Use the latest localization position as start point,
   // fall back to a dummy point from map
-  // AdapterManager::GetLocalization()->Observe();
-  // if (AdapterManager::GetLocalization()->Empty()) {
-  //   start_point_from_localization_ = false;
-  //   apollo::common::PointENU start_point;
-  //   if (!map_service_->GetStartPoint(&start_point)) {
-  //     AWARN << "Failed to get a dummy start point from map!";
-  //     return;
-  //   }
-  //   point.mutable_path_point()->set_x(start_point.x());
-  //   point.mutable_path_point()->set_y(start_point.y());
-  //   point.mutable_path_point()->set_z(start_point.z());
-  //   double theta = 0.0;
-  //   double s = 0.0;
-  //   map_service_->GetPoseWithRegardToLane(start_point.x(), start_point.y(),
-  //                                         &theta, &s);
-  //   point.mutable_path_point()->set_theta(theta);
-  //   point.set_v(start_velocity);
-  //   point.set_a(start_acceleration);
-  // } else {
-  //   start_point_from_localization_ = true;
-  //   const auto& localization = AdapterManager::GetLocalization()
-  //       ->GetLatestObserved();
-  //   const auto& pose = localization.pose();
-  //   point.mutable_path_point()->set_x(pose.position().x());
-  //   point.mutable_path_point()->set_y(pose.position().y());
-  //   point.mutable_path_point()->set_z(pose.position().z());
-  //   point.mutable_path_point()->set_theta(pose.heading());
-  //   point.set_v(std::hypot(pose.linear_velocity().x(),
-  //               pose.linear_velocity().y()));
-  //   // Calculates the dot product of acceleration and velocity. The sign
-  //   // of this projection indicates whether this is acceleration or
-  //   // deceleration.
-  //   double projection = pose.linear_acceleration().x()
-  //       * pose.linear_velocity().x()
-  //       + pose.linear_acceleration().y() * pose.linear_velocity().y();
+  localization_reader_->Observe();
+  if (localization_reader_->Empty()) {
+    start_point_from_localization_ = false;
+    apollo::common::PointENU start_point;
+    if (!map_service_->GetStartPoint(&start_point)) {
+      AWARN << "Failed to get a dummy start point from map!";
+      return;
+    }
+    point.mutable_path_point()->set_x(start_point.x());
+    point.mutable_path_point()->set_y(start_point.y());
+    point.mutable_path_point()->set_z(start_point.z());
+    double theta = 0.0;
+    double s = 0.0;
+    map_service_->GetPoseWithRegardToLane(start_point.x(), start_point.y(),
+                                          &theta, &s);
+    point.mutable_path_point()->set_theta(theta);
+    point.set_v(start_velocity);
+    point.set_a(start_acceleration);
+  } else {
+    start_point_from_localization_ = true;
+    const auto& localization = localization_reader_->GetLatestObserved();
+    const auto& pose = localization->pose();
+    point.mutable_path_point()->set_x(pose.position().x());
+    point.mutable_path_point()->set_y(pose.position().y());
+    point.mutable_path_point()->set_z(pose.position().z());
+    point.mutable_path_point()->set_theta(pose.heading());
+    point.set_v(
+        std::hypot(pose.linear_velocity().x(), pose.linear_velocity().y()));
+    // Calculates the dot product of acceleration and velocity. The sign
+    // of this projection indicates whether this is acceleration or
+    // deceleration.
+    double projection =
+        pose.linear_acceleration().x() * pose.linear_velocity().x() +
+        pose.linear_acceleration().y() * pose.linear_velocity().y();
 
-  //   // Calculates the magnitude of the acceleration. Negate the value if
-  //   // it is indeed a deceleration.
-  //   double magnitude = std::hypot(pose.linear_acceleration().x(),
-  //                                 pose.linear_acceleration().y());
-  //   point.set_a(std::signbit(projection) ? -magnitude : magnitude);
-  // }
+    // Calculates the magnitude of the acceleration. Negate the value if
+    // it is indeed a deceleration.
+    double magnitude = std::hypot(pose.linear_acceleration().x(),
+                                  pose.linear_acceleration().y());
+    point.set_a(std::signbit(projection) ? -magnitude : magnitude);
+  }
   SetStartPoint(point);
 }
 
@@ -157,35 +163,56 @@ void SimControl::SetStartPoint(const TrajectoryPoint& start_point) {
   received_planning_ = false;
 }
 
+void SimControl::Reset() {
+  std::unique_lock<std::mutex> lock(mutex_);
+  InternalReset();
+}
+
+void SimControl::InternalReset() {
+  current_routing_header_.Clear();
+  re_routing_triggered_ = false;
+  ClearPlanning();
+}
+
 void SimControl::ClearPlanning() {
-  current_trajectory_.Clear();
+  current_trajectory_->Clear();
   received_planning_ = false;
   if (planning_count_ > 0) {
     planning_count_ = 0;
   }
 }
 
-void SimControl::Reset() {
-  current_routing_header_.Clear();
-  re_routing_triggered_ = false;
-  ClearPlanning();
+void SimControl::OnReceiveNavigationInfo(
+    const std::shared_ptr<NavigationInfo>& navigation_info) {
+  std::unique_lock<std::mutex> lock(mutex_);
+
+  if (navigation_info->navigation_path_size() > 0) {
+    const auto& path = navigation_info->navigation_path(0).path();
+    if (path.path_point_size() > 0) {
+      adc_position_ = path.path_point(0);
+    }
+  }
 }
 
-void SimControl::OnRoutingResponse(const RoutingResponse& routing) {
+void SimControl::OnRoutingResponse(
+    const std::shared_ptr<RoutingResponse>& routing) {
+  std::unique_lock<std::mutex> lock(mutex_);
+
   if (!enabled_) {
     return;
   }
 
-  CHECK_GE(routing.routing_request().waypoint_size(), 2)
+  CHECK_GE(routing->routing_request().waypoint_size(), 2)
       << "routing should have at least two waypoints";
-  const auto& start_pose = routing.routing_request().waypoint(0).pose();
+  const auto& start_pose = routing->routing_request().waypoint(0).pose();
 
-  current_routing_header_ = routing.header();
+  current_routing_header_ = routing->header();
 
-  // If this is from a planning re-routing request, or the start point has been
+  // If this is from a planning re-routing request, or the start point has
+  // been
   // initialized by an actual localization pose, don't reset the start point.
   re_routing_triggered_ =
-      routing.routing_request().header().module_name() == "planning";
+      routing->routing_request().header().module_name() == "planning";
   if (!re_routing_triggered_ && !start_point_from_localization_) {
     ClearPlanning();
     TrajectoryPoint point;
@@ -203,28 +230,34 @@ void SimControl::OnRoutingResponse(const RoutingResponse& routing) {
 }
 
 void SimControl::Start() {
+  std::unique_lock<std::mutex> lock(mutex_);
+
   if (!enabled_) {
     // When there is no localization yet, Init(true) will use a
     // dummy point from the current map as an arbitrary start.
     // When localization is already available, we do not need to
     // reset/override the start point.
-    // AdapterManager::GetLocalization()->Observe();
-    // Init(AdapterManager::GetLocalization()->Empty());
+    localization_reader_->Observe();
+    Init(localization_reader_->Empty());
 
-    Reset();
+    InternalReset();
     sim_control_timer_->Start();
     enabled_ = true;
   }
 }
 
 void SimControl::Stop() {
+  std::unique_lock<std::mutex> lock(mutex_);
+
   if (enabled_) {
     sim_control_timer_->Stop();
     enabled_ = false;
   }
 }
 
-void SimControl::OnPlanning(const apollo::planning::ADCTrajectory& trajectory) {
+void SimControl::OnPlanning(const std::shared_ptr<ADCTrajectory>& trajectory) {
+  std::unique_lock<std::mutex> lock(mutex_);
+
   if (!enabled_) {
     return;
   }
@@ -232,7 +265,7 @@ void SimControl::OnPlanning(const apollo::planning::ADCTrajectory& trajectory) {
   // Reset current trajectory and the indices upon receiving a new trajectory.
   // The routing SimControl owns must match with the one Planning has.
   if (re_routing_triggered_ ||
-      IsSameHeader(trajectory.routing_header(), current_routing_header_)) {
+      IsSameHeader(trajectory->routing_header(), current_routing_header_)) {
     // Hold a few cycles until the position information is fully refreshed on
     // planning side. Don't wait for the very first planning received.
     ++planning_count_;
@@ -254,14 +287,15 @@ void SimControl::Freeze() {
   prev_point_ = next_point_;
 }
 
-void SimControl::TimerCallback() { RunOnce(); }
-
 void SimControl::RunOnce() {
+  std::unique_lock<std::mutex> lock(mutex_);
+
   TrajectoryPoint trajectory_point;
   if (!PerfectControlModel(&trajectory_point)) {
     AERROR << "Failed to calculate next point with perfect control model";
     return;
   }
+
   PublishChassis(trajectory_point.v());
   PublishLocalization(trajectory_point);
 }
@@ -269,13 +303,13 @@ void SimControl::RunOnce() {
 bool SimControl::PerfectControlModel(TrajectoryPoint* point) {
   // Result of the interpolation.
   auto relative_time =
-      Clock::NowInSeconds() - current_trajectory_.header().timestamp_sec();
-  const auto& trajectory = current_trajectory_.trajectory_point();
+      Clock::NowInSeconds() - current_trajectory_->header().timestamp_sec();
+  const auto& trajectory = current_trajectory_->trajectory_point();
 
   if (!received_planning_) {
     prev_point_ = next_point_;
   } else {
-    if (current_trajectory_.estop().is_estop() ||
+    if (current_trajectory_->estop().is_estop() ||
         next_point_index_ >= trajectory.size()) {
       // Freeze the car when there's an estop or the current trajectory has
       // been exhausted.
@@ -314,25 +348,26 @@ bool SimControl::PerfectControlModel(TrajectoryPoint* point) {
 }
 
 void SimControl::PublishChassis(double cur_speed) {
-  Chassis chassis;
-  // AdapterManager::FillChassisHeader("SimControl", &chassis);
+  std::shared_ptr<Chassis> chassis = std::make_shared<Chassis>();
+  FillHeader("SimControl", chassis.get());
 
-  chassis.set_engine_started(true);
-  chassis.set_driving_mode(Chassis::COMPLETE_AUTO_DRIVE);
-  chassis.set_gear_location(Chassis::GEAR_DRIVE);
+  chassis->set_engine_started(true);
+  chassis->set_driving_mode(Chassis::COMPLETE_AUTO_DRIVE);
+  chassis->set_gear_location(Chassis::GEAR_DRIVE);
 
-  chassis.set_speed_mps(cur_speed);
-  chassis.set_throttle_percentage(0.0);
-  chassis.set_brake_percentage(0.0);
+  chassis->set_speed_mps(cur_speed);
+  chassis->set_throttle_percentage(0.0);
+  chassis->set_brake_percentage(0.0);
 
-  // AdapterManager::PublishChassis(chassis);
+  chassis_writer_->Write(chassis);
 }
 
 void SimControl::PublishLocalization(const TrajectoryPoint& point) {
-  LocalizationEstimate localization;
-  // AdapterManager::FillLocalizationHeader("SimControl", &localization);
+  std::shared_ptr<LocalizationEstimate> localization =
+      std::make_shared<LocalizationEstimate>();
+  FillHeader("SimControl", localization.get());
 
-  auto* pose = localization.mutable_pose();
+  auto* pose = localization->mutable_pose();
   auto prev = prev_point_.path_point();
   auto next = next_point_.path_point();
 
@@ -388,7 +423,7 @@ void SimControl::PublishLocalization(const TrajectoryPoint& point) {
   TransformToVRF(pose->linear_acceleration(), pose->orientation(),
                  pose->mutable_linear_acceleration_vrf());
 
-  // AdapterManager::PublishLocalization(localization);
+  localization_writer_->Write(localization);
 
   adc_position_.set_x(pose->position().x());
   adc_position_.set_y(pose->position().y());

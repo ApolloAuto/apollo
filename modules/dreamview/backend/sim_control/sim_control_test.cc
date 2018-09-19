@@ -22,6 +22,7 @@
 #include "gtest/gtest.h"
 
 #include "modules/canbus/proto/chassis.pb.h"
+#include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/math/quaternion.h"
 #include "modules/common/time/time.h"
 
@@ -29,6 +30,7 @@ using apollo::canbus::Chassis;
 using apollo::common::math::HeadingToQuaternion;
 using apollo::common::time::Clock;
 using apollo::localization::LocalizationEstimate;
+using apollo::planning::ADCTrajectory;
 using apollo::routing::RoutingResponse;
 
 namespace apollo {
@@ -36,17 +38,30 @@ namespace dreamview {
 
 class SimControlTest : public ::testing::Test {
  public:
-  SimControlTest() {
+  static void SetUpTestCase() {
+    // init cybertron framework
+    apollo::cybertron::Init("simulation_world_service_test");
+  }
+
+  virtual void SetUp() {
     FLAGS_map_dir = "modules/dreamview/backend/testdata";
     FLAGS_base_map_filename = "garage.bin";
 
     map_service_.reset(new MapService(false));
     sim_control_.reset(new SimControl(map_service_.get()));
 
-    sim_control_->Start();
+    node_ = cybertron::CreateNode("sim_control_test");
+    chassis_reader_ = node_->CreateReader<Chassis>(FLAGS_chassis_topic);
+    localization_reader_ =
+        node_->CreateReader<LocalizationEstimate>(FLAGS_localization_topic);
   }
 
  protected:
+  std::shared_ptr<cybertron::Node> node_;
+
+  std::shared_ptr<cybertron::Reader<Chassis>> chassis_reader_;
+  std::shared_ptr<cybertron::Reader<LocalizationEstimate>> localization_reader_;
+
   std::unique_ptr<MapService> map_service_;
   std::unique_ptr<SimControl> sim_control_;
 };
@@ -71,6 +86,9 @@ void SetTrajectory(const std::vector<double> &xs, const std::vector<double> &ys,
 }
 
 TEST_F(SimControlTest, Test) {
+  sim_control_->Init(false);
+  sim_control_->enabled_ = true;
+
   planning::ADCTrajectory adc_trajectory;
   std::vector<double> xs(5);
   std::vector<double> ys(5);
@@ -98,7 +116,7 @@ TEST_F(SimControlTest, Test) {
   adc_trajectory.mutable_header()->set_timestamp_sec(timestamp);
 
   sim_control_->SetStartPoint(adc_trajectory.trajectory_point(0));
-  // AdapterManager::PublishPlanning(adc_trajectory);
+  sim_control_->OnPlanning(std::make_shared<ADCTrajectory>(adc_trajectory));
 
   {
     Clock::SetMode(Clock::MOCK);
@@ -106,13 +124,9 @@ TEST_F(SimControlTest, Test) {
     Clock::SetNow(timestamp.time_since_epoch());
     sim_control_->RunOnce();
 
-    // const Chassis *chassis =
-    // AdapterManager::GetChassis()->GetLatestPublished();
-    // const LocalizationEstimate *localization =
-    //     AdapterManager::GetLocalization()->GetLatestPublished();
-    // FIXME
-    const Chassis *chassis;
-    const LocalizationEstimate *localization;
+    node_->Observe();
+    const auto chassis = chassis_reader_->GetLatestObserved();
+    const auto localization = localization_reader_->GetLatestObserved();
 
     EXPECT_TRUE(chassis->engine_started());
     EXPECT_EQ(Chassis::COMPLETE_AUTO_DRIVE, chassis->driving_mode());
