@@ -47,14 +47,15 @@ bool GuardianComponent::Init() {
   control_cmd_reader_ = node_->CreateReader<ControlCommand>(
       FLAGS_control_command_topic,
       [this](const std::shared_ptr<ControlCommand>& cmd) {
-        ADEBUG << "Received monitor data: run monitor callback.";
+        ADEBUG << "Received control data: run control callback.";
         std::lock_guard<std::mutex> lock(mutex_);
         control_cmd_.CopyFrom(*cmd);
       });
 
   system_status_reader_ = node_->CreateReader<SystemStatus>(
-      FLAGS_monitor_topic, [this](const std::shared_ptr<SystemStatus>& status) {
-        ADEBUG << "Received control data: run control command callback.";
+      FLAGS_system_status_topic,
+      [this](const std::shared_ptr<SystemStatus>& status) {
+        ADEBUG << "Received system status data: run system status callback.";
         std::lock_guard<std::mutex> lock(mutex_);
         system_status_.CopyFrom(*status);
       });
