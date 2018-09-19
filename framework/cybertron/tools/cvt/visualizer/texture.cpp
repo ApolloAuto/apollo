@@ -29,7 +29,7 @@ Texture::Texture()
 bool Texture::UpdateData(const QImage &img) {
   if (data_size_ < img.byteCount()) {
     if (!data_) {
-      delete data_;
+      delete [] data_;
     }
 
     data_ = new GLubyte[img.byteCount()];
