@@ -48,12 +48,17 @@ class RecordWriter : public RecordBase {
 
   void Close();
 
-  bool WriteChannel(const std::string& name, const std::string& type,
+  bool WriteChannel(const std::string& channel_name,
+                    const std::string& message_type,
                     const std::string& proto_desc);
 
   bool WriteMessage(const std::string& channel_name,
                     const std::shared_ptr<const RawMessage>& message,
-                    uint64_t time);
+                    const uint64_t time);
+
+  template <typename MessageT>
+  bool WritePbMessage(const std::string& channel_name, const MessageT& message,
+                      const uint64_t time, const std::string& proto_desc = "");
 
   void ShowProgress();
 
@@ -70,7 +75,7 @@ class RecordWriter : public RecordBase {
 
 inline bool RecordWriter::WriteMessage(
     const std::string& channel_name,
-    const std::shared_ptr<const RawMessage>& message, uint64_t time) {
+    const std::shared_ptr<const RawMessage>& message, const uint64_t time) {
   if (message == nullptr) {
     AERROR << "nullptr error, channel: " << channel_name;
     return false;
@@ -79,6 +84,41 @@ inline bool RecordWriter::WriteMessage(
   SingleMessage single_msg;
   single_msg.set_channel_name(channel_name);
   single_msg.set_content(message->message);
+  single_msg.set_time(time);
+  if (!WriteMessage(std::move(single_msg))) {
+    AERROR << "write single msg fail";
+    return false;
+  }
+  return true;
+}
+
+template <typename MessageT>
+bool RecordWriter::WritePbMessage(const std::string& channel_name,
+                                  const MessageT& message, const uint64_t time,
+                                  const std::string& proto_desc) {
+  std::string message_type = GetMessageType(channel_name);
+  if (message_type.empty()) {
+    if (!WriteChannel(channel_name, MessageT::descriptor()->full_name(),
+                      proto_desc)) {
+      AERROR << "Write channel fail, channel: " << channel_name;
+      return false;
+    }
+  } else {
+    if (MessageT::descriptor()->full_name() != message_type) {
+      AERROR << "Message type is invalid, expect: " << message_type
+             << ", actual: " << MessageT::descriptor()->full_name();
+      return false;
+    }
+  }
+  std::string content("");
+  if (!message.SerializeToString(&content)) {
+    AERROR << "Failed to serialize message, channel: " << channel_name;
+    return false;
+  }
+  OnNewMessage(channel_name);
+  SingleMessage single_msg;
+  single_msg.set_channel_name(channel_name);
+  single_msg.set_content(content);
   single_msg.set_time(time);
   if (!WriteMessage(std::move(single_msg))) {
     AERROR << "write single msg fail";
