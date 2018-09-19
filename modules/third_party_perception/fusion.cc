@@ -78,8 +78,7 @@ PerceptionObstacles MobileyeRadarFusion(
     for (auto& radar_obstacle :
          *(radar_obstacles_fusion.mutable_perception_obstacle())) {
       if (HasOverlap(mobileye_obstacle, radar_obstacle)) {
-        // FIXME(all): adjust based on new perception pb.
-        // mobileye_obstacle.set_confidence(0.99);
+        mobileye_obstacle.set_confidence(0.99);
         mobileye_obstacle.mutable_velocity()->CopyFrom(
             radar_obstacle.velocity());
       }

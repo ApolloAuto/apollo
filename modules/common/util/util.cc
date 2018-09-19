@@ -54,9 +54,9 @@ PointENU MakePointENU(const math::Vec2d& xy) {
   return point_enu;
 }
 
-apollo::common::Point3D MakePoint3D(const double x, const double y,
-                                    const double z) {
-  common::Point3D point3d;
+apollo::perception::Point MakePerceptionPoint(const double x, const double y,
+                                              const double z) {
+  perception::Point point3d;
   point3d.set_x(x);
   point3d.set_y(y);
   point3d.set_z(z);

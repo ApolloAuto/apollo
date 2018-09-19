@@ -73,7 +73,7 @@ class Obstacle {
    * @brief Get the type of perception obstacle's type.
    * @return The type pf perception obstacle.
    */
-  perception::Type type() const;
+  perception::PerceptionObstacle::Type type() const;
 
   /**
    * @brief Get the obstacle's ID.
@@ -244,8 +244,8 @@ class Obstacle {
 
  private:
   int id_ = -1;
-  perception::Type type_ =
-      perception::UNKNOWN_UNMOVABLE;
+  perception::PerceptionObstacle::Type type_ =
+      perception::PerceptionObstacle::UNKNOWN_UNMOVABLE;
   std::deque<Feature> feature_history_;
   common::math::KalmanFilter<double, 6, 2, 0> kf_motion_tracker_;
   common::math::KalmanFilter<double, 2, 2, 4> kf_pedestrian_tracker_;

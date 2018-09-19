@@ -42,7 +42,7 @@ void FillPerceptionPolygon(
     const double length, const double width, const double height,
     const double heading);
 
-// TODO(lizh): change it to perception::VEHICLE or so
+// TODO(lizh): change it to PerceptionObstacle::VEHICLE or so
 //             when perception obstacle type is extended.
 // object type | int
 // car         | 0
@@ -54,26 +54,26 @@ double GetDefaultObjectLength(const int object_type);
 
 double GetDefaultObjectWidth(const int object_type);
 
-apollo::common::Point3D SLtoXY(const double x, const double y,
+apollo::perception::Point SLtoXY(const double x, const double y,
                                  const double theta);
 
-apollo::common::Point3D SLtoXY(const apollo::common::Point3D& point,
+apollo::perception::Point SLtoXY(const apollo::perception::Point& point,
                                  const double theta);
 
-double Distance(const apollo::common::Point3D& point1,
-                const apollo::common::Point3D& point2);
+double Distance(const apollo::perception::Point& point1,
+                const apollo::perception::Point& point2);
 
-double Speed(const apollo::common::Point3D& point);
+double Speed(const apollo::perception::Point& point);
 
 double Speed(const double vx, const double vy);
 
 double GetNearestLaneHeading(const apollo::common::PointENU& point_enu);
 
-double GetNearestLaneHeading(const apollo::common::Point3D& point);
+double GetNearestLaneHeading(const apollo::perception::Point& point);
 
 double GetNearestLaneHeading(const double x, const double y, const double z);
 
-double GetLateralDistanceToNearestLane(const apollo::common::Point3D& point);
+double GetLateralDistanceToNearestLane(const apollo::perception::Point& point);
 
 double HeadingDifference(const double theta1, const double theta2);
 

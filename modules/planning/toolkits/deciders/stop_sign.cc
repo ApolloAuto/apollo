@@ -474,14 +474,14 @@ int StopSign::AddWatchVehicle(const PathObstacle& path_obstacle,
   const PerceptionObstacle& perception_obstacle =
       path_obstacle.obstacle()->Perception();
   const std::string& obstacle_id = std::to_string(perception_obstacle.id());
-  perception::Type obstacle_type = perception_obstacle.type();
-  std::string obstacle_type_name = perception::Type_Name(obstacle_type);
+  PerceptionObstacle::Type obstacle_type = perception_obstacle.type();
+  std::string obstacle_type_name = PerceptionObstacle_Type_Name(obstacle_type);
 
   // check type
-  if (obstacle_type != perception::UNKNOWN &&
-      obstacle_type != perception::UNKNOWN_MOVABLE &&
-      obstacle_type != perception::BICYCLE &&
-      obstacle_type != perception::VEHICLE) {
+  if (obstacle_type != PerceptionObstacle::UNKNOWN &&
+      obstacle_type != PerceptionObstacle::UNKNOWN_MOVABLE &&
+      obstacle_type != PerceptionObstacle::BICYCLE &&
+      obstacle_type != PerceptionObstacle::VEHICLE) {
     ADEBUG << "obstacle_id[" << obstacle_id << "] type[" << obstacle_type_name
            << "]. skip";
     return 0;
@@ -572,8 +572,8 @@ int StopSign::RemoveWatchVehicle(
   const PerceptionObstacle& perception_obstacle =
       path_obstacle.obstacle()->Perception();
   const std::string& obstacle_id = std::to_string(perception_obstacle.id());
-  perception::Type obstacle_type = perception_obstacle.type();
-  std::string obstacle_type_name = perception::Type_Name(obstacle_type);
+  PerceptionObstacle::Type obstacle_type = perception_obstacle.type();
+  std::string obstacle_type_name = PerceptionObstacle_Type_Name(obstacle_type);
 
   // check if being watched
   if (std::find(watch_vehicle_ids.begin(), watch_vehicle_ids.end(),
@@ -584,10 +584,10 @@ int StopSign::RemoveWatchVehicle(
   }
 
   // check type
-  if (obstacle_type != perception::UNKNOWN &&
-      obstacle_type != perception::UNKNOWN_MOVABLE &&
-      obstacle_type != perception::BICYCLE &&
-      obstacle_type != perception::VEHICLE) {
+  if (obstacle_type != PerceptionObstacle::UNKNOWN &&
+      obstacle_type != PerceptionObstacle::UNKNOWN_MOVABLE &&
+      obstacle_type != PerceptionObstacle::BICYCLE &&
+      obstacle_type != PerceptionObstacle::VEHICLE) {
     ADEBUG << "obstacle_id[" << obstacle_id << "] type[" << obstacle_type_name
            << "]. skip";
     return 0;

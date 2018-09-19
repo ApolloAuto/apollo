@@ -71,7 +71,7 @@ TEST_F(FreeMovePredictorTest, General) {
 
 TEST_F(FreeMovePredictorTest, Pedestrian) {
   perception_obstacles_.mutable_perception_obstacle(0)->set_type(
-      ::apollo::perception::PEDESTRIAN);
+      ::apollo::perception::PerceptionObstacle::PEDESTRIAN);
   apollo::perception::PerceptionObstacle perception_obstacle =
       perception_obstacles_.perception_obstacle(0);
   ObstaclesContainer container;

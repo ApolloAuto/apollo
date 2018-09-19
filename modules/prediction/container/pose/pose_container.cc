@@ -24,7 +24,7 @@ namespace prediction {
 
 using apollo::localization::LocalizationEstimate;
 using apollo::perception::PerceptionObstacle;
-using apollo::common::Point3D;
+using apollo::perception::Point;
 
 void PoseContainer::Insert(const ::google::protobuf::Message& message) {
   localization::LocalizationEstimate localization;
@@ -56,7 +56,7 @@ void PoseContainer::Update(
   obstacle_ptr_->Clear();
 
   obstacle_ptr_->set_id(ID);
-  Point3D position;
+  Point position;
   position.set_x(localization.pose().position().x());
   position.set_y(localization.pose().position().y());
   position.set_z(localization.pose().position().z());
@@ -76,7 +76,7 @@ void PoseContainer::Update(
   }
   obstacle_ptr_->set_theta(theta);
 
-  Point3D velocity;
+  Point velocity;
   velocity.set_x(localization.pose().linear_velocity().x());
   velocity.set_y(localization.pose().linear_velocity().y());
   velocity.set_z(localization.pose().linear_velocity().z());
@@ -110,7 +110,7 @@ double PoseContainer::GetTheta() const {
   return obstacle_ptr_->theta();
 }
 
-common::Point3D PoseContainer::GetPosition() const {
+Point PoseContainer::GetPosition() const {
   return obstacle_ptr_->position();
 }
 

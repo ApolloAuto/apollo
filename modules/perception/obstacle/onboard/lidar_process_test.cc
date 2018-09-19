@@ -114,9 +114,9 @@ TEST_F(LidarProcessTest, test_GeneratePbMsg) {
   lidar_process_.GeneratePbMsg(&obstacles);
   EXPECT_EQ(obstacles.perception_obstacle_size(), 2);
   EXPECT_EQ(obstacles.perception_obstacle(0).type(),
-            perception::VEHICLE);
+            PerceptionObstacle::VEHICLE);
   EXPECT_EQ(obstacles.perception_obstacle(1).type(),
-            perception::PEDESTRIAN);
+            PerceptionObstacle::PEDESTRIAN);
 }
 
 }  // namespace perception

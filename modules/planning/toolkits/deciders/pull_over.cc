@@ -148,9 +148,9 @@ PullOver::ValidateStopPointCode PullOver::IsValidStop(
     const PerceptionObstacle& perception_obstacle =
         path_obstacle->obstacle()->Perception();
     const std::string& obstacle_id = std::to_string(perception_obstacle.id());
-    perception::Type obstacle_type = perception_obstacle.type();
+    PerceptionObstacle::Type obstacle_type = perception_obstacle.type();
     std::string obstacle_type_name =
-        perception::Type_Name(obstacle_type);
+        PerceptionObstacle_Type_Name(obstacle_type);
 
     if (path_obstacle->obstacle()->IsVirtual() ||
         !path_obstacle->obstacle()->IsStatic()) {
