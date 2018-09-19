@@ -1,8 +1,0 @@
-/**
-\mainpage
-\htmlinclude manifest.html
-
-Nodes and nodelets for converting raw Velodyne 3D LIDAR data to point
-clouds.
-
-*/
