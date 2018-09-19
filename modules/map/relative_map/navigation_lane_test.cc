@@ -130,8 +130,6 @@ class NavigationLaneTest : public testing::Test {
 };
 
 TEST_F(NavigationLaneTest, GenerateOneLaneMap) {
-  navigation_line_filenames_.clear();
-  navigation_info_.Clear();
   navigation_line_filenames_.emplace_back(data_file_dir_ + "left.smoothed");
   EXPECT_TRUE(
       GenerateNavigationInfo(navigation_line_filenames_, &navigation_info_));
@@ -142,11 +140,17 @@ TEST_F(NavigationLaneTest, GenerateOneLaneMap) {
   MapMsg map_msg;
   EXPECT_TRUE(navigation_lane_.CreateMap(map_param_, &map_msg));
   EXPECT_EQ(1, map_msg.hdmap().lane_size());
+
+  auto iter = map_msg.navigation_path().begin();
+  EXPECT_EQ(0, iter->second.path_priority());
+  const auto& first_path = iter->second.path();
+  EXPECT_DOUBLE_EQ(-1.1603367640051669, first_path.path_point(0).x())
+      << "Path 0: actual x: " << first_path.path_point(0).x();
+  EXPECT_DOUBLE_EQ(2.760810222539626, first_path.path_point(0).y())
+      << "Path 0: actual y: " << first_path.path_point(0).y();
 }
 
 TEST_F(NavigationLaneTest, GenerateTwoLaneMap) {
-  navigation_line_filenames_.clear();
-  navigation_info_.Clear();
   navigation_line_filenames_.emplace_back(data_file_dir_ + "left.smoothed");
   navigation_line_filenames_.emplace_back(data_file_dir_ + "right.smoothed");
   EXPECT_TRUE(
@@ -158,11 +162,28 @@ TEST_F(NavigationLaneTest, GenerateTwoLaneMap) {
   MapMsg map_msg;
   EXPECT_TRUE(navigation_lane_.CreateMap(map_param_, &map_msg));
   EXPECT_EQ(2, map_msg.hdmap().lane_size());
+
+  for (auto iter = map_msg.navigation_path().begin();
+       iter != map_msg.navigation_path().end(); ++iter) {
+    if (0 == iter->second.path_priority()) {
+      const auto& first_path = iter->second.path();
+      EXPECT_DOUBLE_EQ(-1.1603367640051669, first_path.path_point(0).x())
+          << "Path 0: actual x: " << first_path.path_point(0).x();
+      EXPECT_DOUBLE_EQ(2.760810222539626, first_path.path_point(0).y())
+          << "Path 0: actual y: " << first_path.path_point(0).y();
+    }
+
+    if (1 == iter->second.path_priority()) {
+      const auto& second_path = iter->second.path();
+      EXPECT_DOUBLE_EQ(-1.3377519530092672, second_path.path_point(0).x())
+          << "Path 1: actual x: " << second_path.path_point(0).x();
+      EXPECT_DOUBLE_EQ(-3.1906635795653755, second_path.path_point(0).y())
+          << "Path 1: actual y: " << second_path.path_point(0).y();
+    }
+  }
 }
 
 TEST_F(NavigationLaneTest, GenerateThreeLaneMap) {
-  navigation_line_filenames_.clear();
-  navigation_info_.Clear();
   navigation_line_filenames_.emplace_back(data_file_dir_ + "left.smoothed");
   navigation_line_filenames_.emplace_back(data_file_dir_ + "middle.smoothed");
   navigation_line_filenames_.emplace_back(data_file_dir_ + "right.smoothed");
@@ -175,6 +196,33 @@ TEST_F(NavigationLaneTest, GenerateThreeLaneMap) {
   MapMsg map_msg;
   EXPECT_TRUE(navigation_lane_.CreateMap(map_param_, &map_msg));
   EXPECT_EQ(3, map_msg.hdmap().lane_size());
+
+  for (auto iter = map_msg.navigation_path().begin();
+       iter != map_msg.navigation_path().end(); ++iter) {
+    if (0 == iter->second.path_priority()) {
+      const auto& first_path = iter->second.path();
+      EXPECT_DOUBLE_EQ(-1.2892630711168522, first_path.path_point(0).x())
+          << "Path 0: actual x: " << first_path.path_point(0).x();
+      EXPECT_DOUBLE_EQ(3.0675669139329176, first_path.path_point(0).y())
+          << "Path 0: actual y: " << first_path.path_point(0).y();
+    }
+
+    if (1 == iter->second.path_priority()) {
+      const auto& second_path = iter->second.path();
+      EXPECT_DOUBLE_EQ(-1.1466795765610884, second_path.path_point(0).x())
+          << "Path 1: actual x: " << second_path.path_point(0).x();
+      EXPECT_DOUBLE_EQ(-0.092193218761606729, second_path.path_point(0).y())
+          << "Path 1: actual y: " << second_path.path_point(0).y();
+    }
+
+    if (2 == iter->second.path_priority()) {
+      const auto& third_path = iter->second.path();
+      EXPECT_DOUBLE_EQ(-1.3377519530092672, third_path.path_point(0).x())
+          << "Path 2: actual x: " << third_path.path_point(0).x();
+      EXPECT_DOUBLE_EQ(-3.1906635795653755, third_path.path_point(0).y())
+          << "Path 2: actual y: " << third_path.path_point(0).y();
+    }
+  }
 }
 
 }  // namespace relative_map
