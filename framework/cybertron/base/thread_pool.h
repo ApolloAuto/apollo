@@ -64,6 +64,7 @@ inline ThreadPool::ThreadPool(std::size_t threads, std::size_t max_task_num)
   }
 }
 
+// before using the return value, you should check value.valid()
 template <typename F, typename... Args>
 auto ThreadPool::Enqueue(F&& f, Args&&... args)
     -> std::future<typename std::result_of<F(Args...)>::type> {
@@ -76,7 +77,7 @@ auto ThreadPool::Enqueue(F&& f, Args&&... args)
 
   // don't allow enqueueing after stopping the pool
   if (stop_) {
-    throw std::runtime_error("enqueue on stopped ThreadPool");
+    return std::future<return_type>();
   }
   task_queue_.Enqueue([task]() { (*task)(); });
   return res;
