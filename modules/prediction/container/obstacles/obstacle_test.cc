@@ -200,5 +200,10 @@ TEST_F(ObstacleTest, PedestrianHeading) {
   EXPECT_DOUBLE_EQ(latest_feature.theta(), 1.220);
 }
 
+TEST_F(ObstacleTest, Priority) {
+  Obstacle* obstacle_ptr = container_.GetObstacle(101);
+  EXPECT_FALSE(obstacle_ptr->ToIgnore());
+}
+
 }  // namespace prediction
 }  // namespace apollo

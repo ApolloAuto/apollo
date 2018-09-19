@@ -110,6 +110,10 @@ void ObstaclesContainer::BuildLaneGraph() {
       AERROR << "Null obstacle found.";
       continue;
     }
+    if (obstacle_ptr->ToIgnore()) {
+      ADEBUG << "Ignore obstacle [" << obstacle_ptr->id() << "]";
+      continue;
+    }
     obstacle_ptr->BuildLaneGraph();
   }
 }
