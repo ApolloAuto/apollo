@@ -232,7 +232,8 @@ bool PredictionComponent::Proc(
   ScenarioManager::Instance()->Run();
 
   // Prioritize obstacles
-  obstacles_container->PrioritizeObstacles();
+  obstacles_container->PrioritizeObstacles(
+      ScenarioManager::Instance()->scenario());
 
   obstacles_container->BuildLaneGraph();
 

@@ -11,6 +11,7 @@ cc_library(
         "//modules/common/util:lru_cache",
         "//modules/prediction/common:feature_output",
         "//modules/prediction/common:prediction_gflags",
+        "//modules/prediction/proto:scenario_proto",
         "//modules/prediction/container",
         "//modules/prediction/container/obstacles:obstacle",
         "//modules/prediction/container/obstacles:obstacle_clusters",
