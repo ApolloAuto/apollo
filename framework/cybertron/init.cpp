@@ -122,7 +122,12 @@ bool Init(const char* argv) {
 
   // Set flags
   FLAGS_log_dir = abs_log_dir;
-  FLAGS_minloglevel = log_conf.min_log_level();
+  if (log_conf.min_log_level() >= google::INFO) {
+    FLAGS_minloglevel = log_conf.min_log_level();
+  } else {
+    FLAGS_minloglevel = google::INFO;
+    FLAGS_v = 4;
+  }
   FLAGS_alsologtostderr = log_conf.log_to_stderr();
   FLAGS_colorlogtostderr = log_conf.color_log_to_stderr();
   google::InitGoogleLogging(argv);

@@ -3,6 +3,7 @@ syntax = "proto2";
 package apollo.cybertron.proto;
 
 enum LogLevel {
+  DEBUG = -1;
   INFO = 0;
   WARNING = 1;
   ERROR = 2;
