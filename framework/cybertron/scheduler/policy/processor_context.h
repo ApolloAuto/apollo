@@ -59,7 +59,7 @@ class ProcessorContext {
   void PrintCRoutineStats();
   void UpdateProcessStat(ProcessorStat* stat);
 
-  inline void SetId(const int& id) { proc_index_ = id; }
+  inline void SetId(const int id) { proc_index_ = id; }
   inline bool GetState(const uint64_t& routine_id, RoutineState* state);
   inline bool SetState(const uint64_t& routine_id, const RoutineState& state);
 
