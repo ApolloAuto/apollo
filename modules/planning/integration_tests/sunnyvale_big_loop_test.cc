@@ -70,7 +70,6 @@ class SunnyvaleBigLoopTest : public PlanningTestBase {
  *   adc status: null => DRIVE
  *   decision: STOP
  */
-/*
 TEST_F(SunnyvaleBigLoopTest, stop_sign_01) {
   ENABLE_RULE(TrafficRuleConfig::STOP_SIGN, true);
 
@@ -88,13 +87,12 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_01) {
   EXPECT_TRUE(stop_sign_status.has_status() &&
               stop_sign_status.status() == StopSignStatus::DRIVE);
 }
-*/
+
 /*
  * stop_sign: adc stopped (speed and distance to stop_line)
  *   adc status: DRIVE => STOP
  *   decision: STOP
  */
-/*
 TEST_F(SunnyvaleBigLoopTest, stop_sign_02) {
   ENABLE_RULE(TrafficRuleConfig::STOP_SIGN, true);
 
@@ -116,14 +114,12 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_02) {
   EXPECT_TRUE(stop_sign_status->has_status() &&
               stop_sign_status->status() == StopSignStatus::STOP);
 }
-*/
 
 /*
  * stop_sign: adc stopped + wait_time < STOP_DURATION
  *   adc status: STOP => STOP
  *   decision: STOP
  */
-/*
 TEST_F(SunnyvaleBigLoopTest, stop_sign_03) {
   ENABLE_RULE(TrafficRuleConfig::STOP_SIGN, true);
 
@@ -151,14 +147,12 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_03) {
   EXPECT_TRUE(stop_sign_status->has_status() &&
               stop_sign_status->status() == StopSignStatus::STOP);
 }
-*/
 
 /*
  * stop_sign: adc stopped + wait time > STOP_DURATION
  *   adc status: STOP => STOP_DONE
  *   decision: CRUISE
  */
-/*
 TEST_F(SunnyvaleBigLoopTest, stop_sign_04) {
   ENABLE_RULE(TrafficRuleConfig::STOP_SIGN, true);
 
@@ -176,16 +170,13 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_04) {
       PlanningTestBase::GetTrafficRuleConfig(TrafficRuleConfig::STOP_SIGN);
   stop_sign_config->mutable_stop_sign()->mutable_creep()->set_enabled(false);
 
-  // update clock
-  double stop_duration = stop_sign_config->stop_sign().stop_duration();
-  // add 0.5 seconds as buffer time.
-  std::chrono::duration<double> time_sec(Clock::NowInSeconds() + stop_duration +
-                                         0.5);
-  Clock::SetNow(std::chrono::duration_cast<std::chrono::nanoseconds>(time_sec));
-
   auto* stop_sign_status = mutable_planning_status()->mutable_stop_sign();
   stop_sign_status->set_stop_sign_id("1017");
   stop_sign_status->set_status(StopSignStatus::STOP);
+  double stop_duration = stop_sign_config->stop_sign().stop_duration();
+  double wait_time = stop_duration + 0.5;
+  double stop_start_time = Clock::NowInSeconds() - wait_time;
+  stop_sign_status->set_stop_start_time(stop_start_time);
 
   RUN_GOLDEN_TEST_DECISION(1);
 
@@ -193,7 +184,7 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_04) {
   EXPECT_TRUE(stop_sign_status->has_status() &&
               stop_sign_status->status() == StopSignStatus::STOP_DONE);
 }
-*/
+
 /*
  * stop_sign:
  * bag: 2018-01-24-11-32-28/2018-01-24-11-32-30_0.bag
