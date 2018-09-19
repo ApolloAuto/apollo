@@ -18,6 +18,8 @@
 
 #include <cmath>
 
+#include "cybertron/blocker/blocker_manager.h"
+
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
@@ -32,6 +34,7 @@ using apollo::common::time::Clock;
 using apollo::localization::LocalizationEstimate;
 using apollo::planning::ADCTrajectory;
 using apollo::routing::RoutingResponse;
+using apollo::cybertron::blocker::BlockerManager;
 
 namespace apollo {
 namespace dreamview {
@@ -39,8 +42,7 @@ namespace dreamview {
 class SimControlTest : public ::testing::Test {
  public:
   static void SetUpTestCase() {
-    // init cybertron framework
-    apollo::cybertron::Init("simulation_world_service_test");
+    cybertron::GlobalData::Instance()->EnableSimulationMode();
   }
 
   virtual void SetUp() {
@@ -49,19 +51,9 @@ class SimControlTest : public ::testing::Test {
 
     map_service_.reset(new MapService(false));
     sim_control_.reset(new SimControl(map_service_.get()));
-
-    node_ = cybertron::CreateNode("sim_control_test");
-    chassis_reader_ = node_->CreateReader<Chassis>(FLAGS_chassis_topic);
-    localization_reader_ =
-        node_->CreateReader<LocalizationEstimate>(FLAGS_localization_topic);
   }
 
  protected:
-  std::shared_ptr<cybertron::Node> node_;
-
-  std::shared_ptr<cybertron::Reader<Chassis>> chassis_reader_;
-  std::shared_ptr<cybertron::Reader<LocalizationEstimate>> localization_reader_;
-
   std::unique_ptr<MapService> map_service_;
   std::unique_ptr<SimControl> sim_control_;
 };
@@ -124,23 +116,14 @@ TEST_F(SimControlTest, Test) {
     Clock::SetNow(timestamp.time_since_epoch());
     sim_control_->RunOnce();
 
-    node_->Observe();
-    int32_t count = 100;
-    while (count-- > 0 && nullptr == chassis_reader_->GetLatestObserved()) {
-      usleep(10000);
-      continue;
-    }
-    count = 100;
-    while (count-- > 0 &&
-           nullptr == localization_reader_->GetLatestObserved()) {
-      usleep(10000);
-      continue;
-    }
-    const auto chassis = chassis_reader_->GetLatestObserved();
-    const auto localization = localization_reader_->GetLatestObserved();
-
-    ASSERT_TRUE(chassis != nullptr);
-    ASSERT_TRUE(localization != nullptr);
+    BlockerManager::Instance()->Observe();
+    auto localization =
+        BlockerManager::Instance()
+            ->GetBlocker<LocalizationEstimate>(FLAGS_localization_topic)
+            ->GetLatestObservedPtr();
+    auto chassis = BlockerManager::Instance()
+                       ->GetBlocker<Chassis>(FLAGS_chassis_topic)
+                       ->GetLatestObservedPtr();
 
     EXPECT_TRUE(chassis->engine_started());
     EXPECT_EQ(Chassis::COMPLETE_AUTO_DRIVE, chassis->driving_mode());
