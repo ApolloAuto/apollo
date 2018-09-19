@@ -57,10 +57,6 @@ proto_library(
     srcs = [
         "geometry.proto",
     ],
-    deps = [
-        ":error_code_proto_lib",
-        ":header_proto_lib",
-    ],
 )
 
 cc_proto_library(
