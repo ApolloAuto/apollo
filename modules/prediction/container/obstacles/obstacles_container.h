@@ -27,6 +27,7 @@
 #include "cybertron/common/macros.h"
 
 #include "modules/common/util/lru_cache.h"
+#include "modules/prediction/proto/scenario.pb.h"
 #include "modules/prediction/container/container.h"
 #include "modules/prediction/container/obstacles/obstacle.h"
 #include "modules/prediction/container/pose/pose_container.h"
@@ -69,7 +70,7 @@ class ObstaclesContainer : public Container {
   /**
    * @brief Set obstacles' priority to predict
    */
-  void PrioritizeObstacles();
+  void PrioritizeObstacles(const Scenario& scenario);
 
   /**
    * @brief Get obstacle pointer
@@ -90,6 +91,8 @@ class ObstaclesContainer : public Container {
    * @return True if the obstacle is predictable; otherwise false;
    */
   bool IsPredictable(const perception::PerceptionObstacle& perception_obstacle);
+
+  void PrioritizeObstaclesInCruise();
 
  private:
   double timestamp_ = -1.0;

@@ -114,10 +114,15 @@ void ObstaclesContainer::BuildLaneGraph() {
   }
 }
 
-void ObstaclesContainer::PrioritizeObstacles() {
+void ObstaclesContainer::PrioritizeObstacles(const Scenario& scenario) {
   // TODO(all) implement
   // According to scenario and filtered lanes and junctions, etc
   // set priorities for obstacles
+  if (scenario.type() == Scenario::CRUISE ||
+      scenario.type() == Scenario::CRUISE_URBAN ||
+      scenario.type() == Scenario::CRUISE_HIGHWAY) {
+    PrioritizeObstaclesInCruise();
+  }
 }
 
 bool ObstaclesContainer::IsPredictable(
@@ -127,6 +132,10 @@ bool ObstaclesContainer::IsPredictable(
     return false;
   }
   return true;
+}
+
+void ObstaclesContainer::PrioritizeObstaclesInCruise() {
+  // TODO(kechxu) implement
 }
 
 }  // namespace prediction

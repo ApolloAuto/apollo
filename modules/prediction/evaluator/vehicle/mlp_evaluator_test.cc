@@ -53,7 +53,6 @@ TEST_F(MLPEvaluatorTest, OnLaneCase) {
   MLPEvaluator mlp_evaluator;
   ObstaclesContainer container;
   container.Insert(perception_obstacles_);
-  container.PrioritizeObstacles();
   container.BuildLaneGraph();
   Obstacle* obstacle_ptr = container.GetObstacle(1);
   EXPECT_TRUE(obstacle_ptr != nullptr);
