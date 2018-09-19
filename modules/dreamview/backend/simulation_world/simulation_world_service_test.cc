@@ -27,6 +27,8 @@
 using apollo::canbus::Chassis;
 using apollo::common::TrajectoryPoint;
 using apollo::common::monitor::MonitorMessage;
+using apollo::common::util::StrCat;
+using apollo::cybertron::blocker::BlockerManager;
 using apollo::localization::LocalizationEstimate;
 using apollo::perception::PerceptionObstacle;
 using apollo::perception::PerceptionObstacles;
@@ -34,8 +36,6 @@ using apollo::planning::ADCTrajectory;
 using apollo::planning::DecisionResult;
 using apollo::prediction::PredictionObstacle;
 using apollo::prediction::PredictionObstacles;
-
-using apollo::common::util::StrCat;
 
 namespace apollo {
 namespace dreamview {
@@ -45,8 +45,7 @@ const float kEpsilon = 0.01;
 class SimulationWorldServiceTest : public ::testing::Test {
  public:
   static void SetUpTestCase() {
-    // init cybertron framework
-    apollo::cybertron::Init("simulation_world_service_test");
+    cybertron::GlobalData::Instance()->EnableSimulationMode();
   }
 
   virtual void SetUp() {
@@ -454,11 +453,7 @@ TEST_F(SimulationWorldServiceTest, UpdateRouting) {
   sim_world_service_.reset(
       new SimulationWorldService(map_service_.get(), true));
 
-  // Wait until the message has been published
-  while (sim_world_service_->routing_response_reader_->Empty()) {
-    sleep(1);
-    sim_world_service_->routing_response_reader_->Observe();
-  }
+  BlockerManager::Instance()->Observe();
   sim_world_service_->UpdateWithLatestObserved(
       sim_world_service_->routing_response_reader_.get());
 
