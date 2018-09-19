@@ -23,10 +23,11 @@
 #include <mutex>
 #include <queue>
 #include <string>
-#include <thread>
+#include <memory>
 
 #include "Eigen/Core"
 #include "Eigen/Geometry"
+#include "cybertron/cybertron.h"
 
 #include "include/sins.h"
 #include "modules/common/status/status.h"
@@ -95,8 +96,9 @@ class LocalizationIntegProcess {
   double pva_covariance_[9][9];
 
   std::atomic<bool> keep_running_;
-  std::thread measure_data_thread_;
-  std::condition_variable new_measure_data_signal_;
+  // std::thread measure_data_thread_;
+  std::unique_ptr<cybertron::Task<>> measure_data_task_;
+  // std::condition_variable new_measure_data_signal_;
   std::queue<MeasureData> measure_data_queue_;
   int measure_data_queue_size_;
   std::mutex measure_data_queue_mutex_;
