@@ -43,6 +43,7 @@ cc_library(
     deps = [
         "//framework:cybertron",
         "//modules/common/util:string_util",
+        "@osqp",
     ],
 )
 

@@ -136,6 +136,13 @@ new_http_archive(
     url = "file:///home/tmp/qp-oases-3.2.1-1.zip",
 )
 
+# OSQP
+new_local_repository(
+    name = "osqp",
+    build_file = "third_party/osqp.BUILD",
+    path = "/usr/local/osqp/",
+)
+
 # IpOpt
 new_local_repository(
     name = "ipopt",
