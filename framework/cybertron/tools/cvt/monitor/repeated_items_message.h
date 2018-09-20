@@ -19,30 +19,52 @@
 
 #include <cybertron/cybertron.h>
 #include <cybertron/message/raw_message.h>
-#include "renderable_message.h"
+#include "general_message_base.h"
+// #include "renderable_message.h"
 
 class GeneralMessage;
 class Screen;
 
-class RepeatedItemsMessage : public RenderableMessage {
+class RepeatedItemsMessage : public GeneralMessageBase {
  public:
-  explicit RepeatedItemsMessage(GeneralMessage* parent, int fieldIndex);
-  ~RepeatedItemsMessage() {}
+  enum { Type = GeneralMessageBase::Type + 2 };
+  explicit RepeatedItemsMessage(GeneralMessage* parent, const google::protobuf::Message* msg, const google::protobuf::FieldDescriptor* field);
+  explicit RepeatedItemsMessage(RepeatedItemsMessage* parent, const google::protobuf::Message* msg, 
+                                /* const google::protobuf::Reflection* reflection, */
+                                const google::protobuf::FieldDescriptor* field);
+
+  ~RepeatedItemsMessage() { }
+
+  int type(void) const { return Type; }
 
   void Render(const Screen* s, int key) override;
+  bool isRR(void) const { return drawType_ == RR; }
+  bool isGR(void) const { return drawType_ == GR; }
+
+  RenderableMessage* Child(int lineNo) const override;
 
  private:
   RepeatedItemsMessage(const RepeatedItemsMessage&) = delete;
   RepeatedItemsMessage& operator=(const RepeatedItemsMessage&) = delete;
 
-  static void PrintFieldValue(const Screen* s, unsigned& lineNo, int indent,
-                              const google::protobuf::Message& message,
-                              const google::protobuf::Reflection* reflection,
-                              const google::protobuf::FieldDescriptor* field, int index);
+  enum DrawType{ GR, RR, RG, GG, };
 
-  int fieldIndex_;
+  void PrintRepeatedField(const Screen* s, unsigned& lineNo, int indent,
+                                 const google::protobuf::Message& message,
+                                 const google::protobuf::Reflection* reflection,
+                                 const google::protobuf::FieldDescriptor* field,
+                                 int index);
+
+  void drawGR(const Screen* s, int key);
+  void drawRR(const Screen* s, int key);
+
   int itemIndex_;
-  std::shared_ptr<apollo::cybertron::message::RawMessage> channel_message_;
+
+  const google::protobuf::FieldDescriptor* field_;
+  RepeatedItemsMessage* repeatedItemListParent_;
+  const google::protobuf::Message* message_ptr_;
+  const google::protobuf::Reflection* reflection_ptr_;
+  DrawType drawType_;
 };
 
 #endif  // TOOLS_CVT_MONITOR_REPEATED_ITEMS_MESSAGE_H_

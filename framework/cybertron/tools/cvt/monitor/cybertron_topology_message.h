@@ -29,6 +29,7 @@ class ChangeMsg;
 }  // apollo
 
 class ChannelMessage;
+// class GeneralMessage;
 
 class CybertronTopologyMessage : public RenderableMessage {
  public:

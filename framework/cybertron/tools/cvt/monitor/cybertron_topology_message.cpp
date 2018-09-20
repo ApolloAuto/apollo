@@ -18,7 +18,7 @@
 #include "channel_msg_factory.h"
 #include "cybertron/message/message_traits.h"
 #include "cybertron/proto/topology_change.pb.h"
-#include "cybertron_channel_message.h"
+#include "general_message.h"
 #include "screen.h"
 
 #include <ncurses.h>
@@ -28,7 +28,7 @@
 constexpr int SecondColumnOffset = 4;
 
 CybertronTopologyMessage::CybertronTopologyMessage()
-    : RenderableMessage(),
+    : RenderableMessage(nullptr, 1),
       second_column_(SecondColumnType::MessageFrameRatio),
       pages_(1),
       page_item_count_(24),

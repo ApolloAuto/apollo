@@ -19,50 +19,51 @@
 
 #include <cybertron/message/raw_message.h>
 #include "cybertron_channel_message.h"
+#include "general_message_base.h"
 
 class RepeatedItemsMessage;
 
-BegDefineChannelMsgSubClass(GeneralMessage,
-                            apollo::cybertron::message::RawMessage);
-SubClassDeconstructor(GeneralMessage) {
-  if (raw_msg_class_) {
-    delete raw_msg_class_;
-    raw_msg_class_ = nullptr;
+class GeneralMessage
+    : public CybertronChannelMessage<apollo::cybertron::message::RawMessage> {
+ public:
+  enum { Type = GeneralMessageBase::Type + 1 };
+  RegisterChannelMsgClass(GeneralMessage,
+                          apollo::cybertron::message::RawMessage);
+  virtual void Render(const Screen* s, int key) override;
+  ~GeneralMessage() {
+    if (raw_msg_class_) {
+      delete raw_msg_class_;
+      raw_msg_class_ = nullptr;
+    }
   }
 
-  for(auto& iter : children_map_){
-      delete iter.second;
-  }
-}
+  int type(void) const override { return Type; }
 
-RenderableMessage* Child(int lineNo) const override;
+  RenderableMessage* Child(int lineNo) const override;
 
-SubClassConstructor(GeneralMessage, apollo::cybertron::message::RawMessage),
-    current_state_(State::ShowDebugString), page_index_(0),
-    raw_msg_class_(nullptr), children_map_() {}
+  explicit GeneralMessage(RenderableMessage* parent = nullptr)
+      : CybertronChannelMessage<apollo::cybertron::message::RawMessage>(parent),
+        current_state_(State::ShowDebugString),
+        page_index_(0),
+        raw_msg_class_(nullptr) {}
 
-void RenderDebugString(const Screen* s, int key, unsigned lineNo);
-void RenderInfo(const Screen* s, int key, unsigned lineNo);
-void SplitPages(int key);
+ private:
+  GeneralMessage(const GeneralMessage&) = delete;
+  GeneralMessage& operator=(const GeneralMessage&) = delete;
 
-static void PrintFieldValue(const google::protobuf::Message& msg, 
-  const google::protobuf::Reflection* reflection, 
-  const Screen* s, unsigned& lineNo, int indent, 
-  const google::protobuf::FieldDescriptor* field);
+  void RenderDebugString(const Screen* s, int key, unsigned lineNo);
+  void RenderInfo(const Screen* s, int key, unsigned lineNo);
+  void SplitPages(int key);
 
-static void PrintMessage(const google::protobuf::Message& msg, const Screen* s,
-                  unsigned& lineNo, int indent, int jumpLines = 0);
+  enum class State { ShowDebugString, ShowInfo } current_state_;
 
-enum class State { ShowDebugString, ShowInfo } current_state_;
+  int pages_;
+  int page_index_;
+  google::protobuf::Message* raw_msg_class_;
 
-int pages_;
-int page_index_;
-google::protobuf::Message* raw_msg_class_;
+  friend class RepeatedItemsMessage;
+  friend class GeneralMessageBase;
 
-std::map<const int /* lineNo */, RepeatedItemsMessage*> children_map_;
-
-friend class RepeatedItemsMessage;
-
-EndDefineChannelMsgSubClass(GeneralMessage);
+};  // GeneralMessage
 
 #endif  // TOOLS_CVT_MONITOR_GENERAL_MESSAGE_H_

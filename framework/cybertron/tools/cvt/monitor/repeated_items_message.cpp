@@ -20,7 +20,11 @@
 
 #include <sstream>
 
-void RepeatedItemsMessage::PrintFieldValue(
+RenderableMessage* RepeatedItemsMessage::Child(int lineNo) const {
+  return GeneralMessageBase::Child(lineNo);
+}
+
+void RepeatedItemsMessage::PrintRepeatedField(
     const Screen* s, unsigned& lineNo, int indent,
     const google::protobuf::Message& message,
     const google::protobuf::Reflection* reflection,
@@ -30,9 +34,11 @@ void RepeatedItemsMessage::PrintFieldValue(
   outStr << fieldName << ": ";
 
   switch (field->cpp_type()) {
-#define OUTPUT_FIELD(CPPTYPE, METHOD)                                 \
-  case google::protobuf::FieldDescriptor::CPPTYPE_##CPPTYPE:          \
-    outStr << reflection->GetRepeated##METHOD(message, field, index); \
+#define OUTPUT_FIELD(CPPTYPE, METHOD)                            \
+  case google::protobuf::FieldDescriptor::CPPTYPE_##CPPTYPE:     \
+    outStr << field->is_repeated()                               \
+        ? reflection->GetRepeated##METHOD(message, field, index) \
+        : reflection->Get##METHOD(message, field);               \
     break
 
     OUTPUT_FIELD(INT32, Int32);
@@ -46,14 +52,15 @@ void RepeatedItemsMessage::PrintFieldValue(
 
     case google::protobuf::FieldDescriptor::CPPTYPE_STRING: {
       std::string scratch;
-      const std::string& value = reflection->GetRepeatedStringReference(
-          message, field, index, &scratch);
+      const std::string& value = field->is_repeated() ? reflection->GetRepeatedStringReference(
+          message, field, index, &scratch) : reflection->GetStringReference(message, field, &scratch);
       outStr << value;
       break;
     }
 
     case google::protobuf::FieldDescriptor::CPPTYPE_ENUM: {
-      int enum_value = reflection->GetRepeatedEnumValue(message, field, index);
+      int enum_value = field->is_repeated() ? reflection->GetRepeatedEnumValue(message, field, index) :
+                  reflection->GetEnumValue(message, field);
       outStr << enum_value;
       break;
     }
@@ -61,27 +68,64 @@ void RepeatedItemsMessage::PrintFieldValue(
     case google::protobuf::FieldDescriptor::CPPTYPE_MESSAGE:
       outStr << "[" << index << "]";
       s->AddStr(indent, lineNo++, outStr.str().c_str());
-      GeneralMessage::PrintMessage(
-          reflection->GetRepeatedMessage(message, field, index), s, lineNo, indent + 2);
-      outStr.str("");
+          GeneralMessageBase::PrintMessage(
+              this, field->is_repeated() ? reflection->GetRepeatedMessage(message, field, index) : reflection->GetMessage(message, field), s,
+              lineNo, indent + 2);
+          outStr.str("");
       break;
   }
 
   s->AddStr(indent, lineNo++, outStr.str().c_str());
 }
 
-RepeatedItemsMessage::RepeatedItemsMessage(GeneralMessage* parent,
-                                           int fieldIndex)
-    : RenderableMessage(parent),
-      fieldIndex_(fieldIndex),
+RepeatedItemsMessage::RepeatedItemsMessage(
+    GeneralMessage* parent, const google::protobuf::Message* msg, const google::protobuf::FieldDescriptor* field)
+    : GeneralMessageBase(parent),
+      field_(field),repeatedItemListParent_(nullptr),
       itemIndex_(0),
-      channel_message_(parent->channel_message_) {}
+      message_ptr_(msg),
+      drawType_(GR) {}
+
+RepeatedItemsMessage::RepeatedItemsMessage(
+    RepeatedItemsMessage* parent, const google::protobuf::Message* msg, /* const google::protobuf::Reflection* reflection, */
+    const google::protobuf::FieldDescriptor* field)
+    : GeneralMessageBase(parent),
+      field_(field), repeatedItemListParent_(parent),
+      itemIndex_(0),
+      message_ptr_(msg), reflection_ptr_(/* reflection */ nullptr),
+      drawType_(RR) {}
 
 void RepeatedItemsMessage::Render(const Screen* s, int key) {
+  s->SetCurrentColor(Screen::WHITE_BLACK);
+
+  if (isGR()) {
+    drawGR(s, key);
+  } else {
+    drawRR(s, key);
+  }
+
+  s->ClearCurrentColor(Screen::WHITE_BLACK);
+}
+
+// const google::protobuf::FieldDescriptor* RepeatedItemsMessage::getFiled(
+//     const google::protobuf::Message& msg, int index) {
+//   const google::protobuf::Reflection* reflection = msg.GetReflection();
+
+//   std::vector<const google::protobuf::FieldDescriptor*> fields;
+//   reflection->ListFields(msg, &fields);
+
+//   return fields[index];
+// }
+
+// const google::protobuf::Message*  RepeatedItemsMessage::upperMsg(void){
+//   if(upper_msg_) return upper_msg_;
+//   else return static_cast<GeneralMessage*>(parent())->raw_msg_class_;
+// }
+
+void RepeatedItemsMessage::drawGR(const Screen* s, int key) {
   unsigned lineNo = 0;
 
   GeneralMessage* parentPtr = static_cast<GeneralMessage*>(parent());
-  s->SetCurrentColor(Screen::WHITE_BLACK);
   s->AddStr(0, lineNo++, "ChannelName: ");
   s->AddStr(parentPtr->GetChannelName().c_str());
 
@@ -93,18 +137,14 @@ void RepeatedItemsMessage::Render(const Screen* s, int key) {
   s->AddStr(0, lineNo++, "FrameRatio: ");
   s->AddStr(outStr.str().c_str());
 
-  if (parentPtr->raw_msg_class_->ParseFromString(channel_message_->message)) {
-    const google::protobuf::Descriptor* descriptor =
-        parentPtr->raw_msg_class_->GetDescriptor();
+  if (message_ptr_) {
+
     const google::protobuf::Reflection* reflection =
-        parentPtr->raw_msg_class_->GetReflection();
+        message_ptr_->GetReflection();
 
-    std::vector<const google::protobuf::FieldDescriptor*> fields;
-    reflection->ListFields(*(parentPtr->raw_msg_class_), &fields);
-
-    const google::protobuf::FieldDescriptor* field = fields[fieldIndex_];
-
-    int size = reflection->FieldSize(*(parentPtr->raw_msg_class_), field);
+    int size = 0;
+    if(field_->is_repeated())
+      size = reflection->FieldSize(*message_ptr_, field_);
 
     switch (key) {
       case 'n':
@@ -122,8 +162,58 @@ void RepeatedItemsMessage::Render(const Screen* s, int key) {
       default:;
     }
 
-    RepeatedItemsMessage::PrintFieldValue(s, lineNo, 0,
-                                          *(parentPtr->raw_msg_class_),
-                                          reflection, field, itemIndex_);
+    PrintRepeatedField(s, lineNo, 0, *message_ptr_, reflection,
+                       field_, itemIndex_);
+  }
+}
+void RepeatedItemsMessage::drawRR(const Screen* s, int key) {
+  unsigned lineNo = 0;
+  s->AddStr(0, lineNo, "in drawRR");
+
+  RepeatedItemsMessage* p = this;
+  while(p->repeatedItemListParent_){
+    p = p->repeatedItemListParent_;
+  }
+
+  GeneralMessage* parentPtr = static_cast<GeneralMessage*>(p->parent());
+  s->AddStr(0, lineNo++, "ChannelName: ");
+  s->AddStr(parentPtr->GetChannelName().c_str());
+
+  s->AddStr(0, lineNo++, "MessageType: ");
+  s->AddStr(parentPtr->message_type().c_str());
+
+  std::ostringstream outStr;
+  outStr << std::fixed << std::setprecision(2) << parentPtr->frame_ratio();
+  s->AddStr(0, lineNo++, "FrameRatio: ");
+  s->AddStr(outStr.str().c_str());
+
+  if (message_ptr_) {
+    const google::protobuf::Reflection* reflection =
+        message_ptr_->GetReflection();
+
+    s->AddStr(0, lineNo++, field_->type_name());
+
+    int size = 0;
+    if(field_->is_repeated())
+      size = reflection->FieldSize(*message_ptr_, field_);
+
+    switch (key) {
+      case 'n':
+      case 'N':
+        ++itemIndex_;
+        if (itemIndex_ >= size) itemIndex_ = 0;
+        break;
+
+      case 'm':
+      case 'M':
+        --itemIndex_;
+        if (itemIndex_ < 0) itemIndex_ = size - 1;
+        break;
+
+      default:;
+    }
+
+    PrintRepeatedField(s, lineNo, 0, *message_ptr_, reflection,
+                       field_, itemIndex_);
   }
 }
