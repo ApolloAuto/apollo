@@ -123,7 +123,7 @@ void Buffer::SubscriptionCallbackImpl(
   }
 };
 
-void Buffer::tf2MsgToCyber(
+void Buffer::TF2MsgToCyber(
     const geometry_msgs::TransformStamped& tf2_trans_stamped,
     apollo::transform::TransformStamped& trans_stamped) const {
   // header
@@ -162,7 +162,7 @@ apollo::transform::TransformStamped Buffer::lookupTransform(
   geometry_msgs::TransformStamped tf2_trans_stamped =
       lookupTransform(target_frame, source_frame, tf2_time);
   apollo::transform::TransformStamped trans_stamped;
-  tf2MsgToCyber(tf2_trans_stamped, trans_stamped);
+  TF2MsgToCyber(tf2_trans_stamped, trans_stamped);
   return trans_stamped;
 }
 
@@ -175,7 +175,7 @@ apollo::transform::TransformStamped Buffer::lookupTransform(
       lookupTransform(target_frame, target_time.ToNanosecond(), source_frame,
                       source_time.ToNanosecond(), fixed_frame);
   apollo::transform::TransformStamped trans_stamped;
-  tf2MsgToCyber(tf2_trans_stamped, trans_stamped);
+  TF2MsgToCyber(tf2_trans_stamped, trans_stamped);
   return trans_stamped;
 }
 

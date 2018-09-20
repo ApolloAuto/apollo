@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/localization/rtk/rtk_localization_component.h"
 #include "modules/common/time/time.h"
+#include "modules/localization/rtk/rtk_localization_component.h"
 
 namespace apollo {
 namespace localization {
@@ -27,7 +27,7 @@ RTKLocalizationComponent::RTKLocalizationComponent()
 
 bool RTKLocalizationComponent::Init() {
   Clock::SetMode(Clock::CYBERTRON);
-
+  tf2_broadcaster_.reset(new apollo::transform::TransformBroadcaster(node_));
   if (InitConfig() != true) {
     AERROR << "Init Config falseed.";
     return false;
@@ -99,11 +99,10 @@ void RTKLocalizationComponent::ImuCallback(
 void RTKLocalizationComponent::PublishPoseBroadcastTF(
     const LocalizationEstimate& localization) {
   // broadcast tf message
-  adu::common::TransformStamped tf2_msg;
+  apollo::transform::TransformStamped tf2_msg;
 
   auto mutable_head = tf2_msg.mutable_header();
-  mutable_head->set_stamp(
-      cybertron::Time(localization.measurement_time()).ToNanosecond());
+  mutable_head->set_timestamp_sec(localization.measurement_time());
   mutable_head->set_frame_id(broadcast_tf_frame_id_);
   tf2_msg.set_child_frame_id(broadcast_tf_child_frame_id_);
 
@@ -118,7 +117,7 @@ void RTKLocalizationComponent::PublishPoseBroadcastTF(
   mutable_rotation->set_qz(localization.pose().orientation().qz());
   mutable_rotation->set_qw(localization.pose().orientation().qw());
 
-  tf2_broadcaster_.sendTransform(tf2_msg);
+  tf2_broadcaster_->sendTransform(tf2_msg);
   return;
 }
 

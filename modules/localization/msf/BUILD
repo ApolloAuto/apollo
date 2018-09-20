@@ -38,6 +38,7 @@ cc_library(
         "//modules/localization/proto:measure_proto",
         "//modules/localization/proto:sins_pva_proto",
         "//modules/localization/proto:msf_config_proto",
+        "//modules/transform:transform_broadcaster_lib",
         "//framework:cybertron",
         "@glog",
         "@gtest",

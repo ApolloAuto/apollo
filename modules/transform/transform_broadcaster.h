@@ -1,6 +1,21 @@
+/******************************************************************************
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
 
-#ifndef CYBERTRON_TF2_CYBERTRON_TRANSFORM_BROADCASTER_H_
-#define CYBERTRON_TF2_CYBERTRON_TRANSFORM_BROADCASTER_H_
+#ifndef MODULES_TRANSFORM_TRANSFORM_BROADCASTER_H_
+#define MODULES_TRANSFORM_TRANSFORM_BROADCASTER_H_
 
 #include <memory>
 #include <vector>
@@ -20,17 +35,7 @@ namespace transform {
 class TransformBroadcaster {
  public:
   /** \brief Constructor (needs a cybertron::Node reference) */
-  TransformBroadcaster();
-
-  /** \brief Send a StampedTransform
-   * The stamped data structure includes frame_id, and time, and parent_id
-   * already.  */
-  //  void sendTransform(const StampedTransform & transform);
-
-  /** \brief Send a vector of StampedTransforms
-   * The stamped data structure includes frame_id, and time, and parent_id
-   * already.  */
-  // void sendTransform(const std::vector<StampedTransform> & transforms);
+  explicit TransformBroadcaster(const std::shared_ptr<cybertron::Node>& node);
 
   /** \brief Send a TransformStamped message
    * The stamped data structure includes frame_id, and time, and parent_id
@@ -44,10 +49,11 @@ class TransformBroadcaster {
       const std::vector<apollo::transform::TransformStamped>& transforms);
 
  private:
-  std::unique_ptr<cybertron::Node> node_;
-  std::shared_ptr<cybertron::Writer<apollo::transform::TransformStampeds>> publisher_;
+  std::shared_ptr<cybertron::Node> node_;
+  std::shared_ptr<cybertron::Writer<apollo::transform::TransformStampeds>>
+      writer_;
 };
 }  // namespace transform
 }  // namespace apollo
 
-#endif  // INCLUDE_CYBERTRON_TF2_CYBERTRON_TRANSFORM_BROADCASTER_H_
+#endif  // MODULES_TRANSFORM_TRANSFORM_BROADCASTER_H_

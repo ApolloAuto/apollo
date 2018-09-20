@@ -14,15 +14,16 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef CYBERTRON_TF2_CYBERTRON_BUFFER_H_
-#define CYBERTRON_TF2_CYBERTRON_BUFFER_H_
+#ifndef MODULES_TRANSFORM_BUFFER_H_
+#define MODULES_TRANSFORM_BUFFER_H_
 
+#include <string>
 #include <vector>
 
-#include "tf2/transform_stamped.h"
 #include <tf2/buffer_core.h>
 #include <tf2/convert.h>
 #include <tf2/time.h>
+#include "tf2/transform_stamped.h"
 
 #include "cybertron/node/node.h"
 #include "modules/transform/buffer_interface.h"
@@ -125,11 +126,12 @@ class Buffer : public BufferInterface, public tf2::BufferCore {
       const std::shared_ptr<const apollo::transform::TransformStampeds>&
           transform);
   void SubscriptionCallbackImpl(
-      const std::shared_ptr<const apollo::transform::TransformStampeds>& transform,
+      const std::shared_ptr<const apollo::transform::TransformStampeds>&
+          transform,
       bool is_static);
 
-  void tf2MsgToCyber(const geometry_msgs::TransformStamped& tf2_trans_stamped,
-                     apollo::transform::TransformStamped& trans_stamped) const;
+  void TF2MsgToCyber(const geometry_msgs::TransformStamped& tf2_trans_stamped,
+                     apollo::transform::TransformStamped& trans_stamped) const; // NOLINT
 
   std::unique_ptr<cybertron::Node> node_;
   std::shared_ptr<cybertron::Reader<apollo::transform::TransformStampeds>>
@@ -142,13 +144,7 @@ class Buffer : public BufferInterface, public tf2::BufferCore {
   DECLARE_SINGLETON(Buffer)
 };  // class
 
-static const std::string threading_error =
-    "Do not call canTransform or lookupTransform with a timeout unless you are "
-    "using another thread for populating data. Without a dedicated thread it "
-    "will always timeout.  If you have a seperate thread servicing tf "
-    "messages, call setUsingDedicatedThread(true) on your Buffer instance.";
-
 }  // namespace transform
 }  // namespace apollo
 
-#endif  // INCLUDE_CYBERTRON_TF2_CYBERTRON_BUFFER_H_
+#endif  // MODULES_TRANSFORM_BUFFER_H_
