@@ -25,7 +25,6 @@
 
 #include "google/protobuf/repeated_field.h"
 
-#include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/math/quaternion.h"
 #include "modules/common/time/time.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
@@ -47,11 +46,30 @@ using apollo::common::Status;
 using apollo::common::TrajectoryPoint;
 using apollo::common::VehicleState;
 using apollo::common::VehicleStateProvider;
-using apollo::common::adapter::AdapterManager;
 using apollo::common::time::Clock;
 using apollo::hdmap::HDMapUtil;
 
-NaviPlanning::~NaviPlanning() { Stop(); }
+namespace {
+
+bool IsVehicleStateValid(const VehicleState &vehicle_state) {
+  if (std::isnan(vehicle_state.x()) || std::isnan(vehicle_state.y()) ||
+      std::isnan(vehicle_state.z()) || std::isnan(vehicle_state.heading()) ||
+      std::isnan(vehicle_state.kappa()) ||
+      std::isnan(vehicle_state.linear_velocity()) ||
+      std::isnan(vehicle_state.linear_acceleration())) {
+    return false;
+  }
+  return true;
+}
+}  // namespace
+
+NaviPlanning::~NaviPlanning() {
+  last_publishable_trajectory_.reset(nullptr);
+  frame_.reset(nullptr);
+  planner_.reset(nullptr);
+  FrameHistory::Instance()->Clear();
+  mutable_planning_status()->Clear();
+}
 
 std::string NaviPlanning::Name() const { return "navi_planning"; }
 
@@ -75,21 +93,6 @@ Status NaviPlanning::Init() {
   // clear planning status
   mutable_planning_status()->Clear();
 
-  if (!AdapterManager::Initialized()) {
-    AdapterManager::Init(FLAGS_planning_adapter_config_filename);
-  }
-  CHECK_ADAPTER(Localization);
-  CHECK_ADAPTER(Chassis);
-  CHECK_ADAPTER(RoutingResponse);
-  CHECK_ADAPTER(RoutingRequest);
-  CHECK_ADAPTER(RelativeMap);
-  CHECK_ADAPTER(PerceptionObstacles);
-  CHECK_ADAPTER(Prediction);
-  CHECK_ADAPTER(TrafficLightDetection);
-  CHECK_ADAPTER(PlanningPad);
-
-  AdapterManager::AddPlanningPadCallback(&NaviPlanning::OnPad, this);
-
   planner_ = planner_dispatcher_->DispatchPlanner();
   if (!planner_) {
     return Status(
@@ -104,8 +107,9 @@ Status NaviPlanning::InitFrame(const uint32_t sequence_num,
                                const TrajectoryPoint& planning_start_point,
                                const double start_time,
                                const VehicleState& vehicle_state) {
-  frame_.reset(new Frame(sequence_num, planning_start_point, start_time,
-                         vehicle_state, reference_line_provider_.get()));
+  frame_.reset(new Frame(sequence_num, local_view_, planning_start_point,
+                         start_time, vehicle_state,
+                         reference_line_provider_.get()));
   auto status = frame_->Init();
   if (!status.ok()) {
     AERROR << "failed to init frame:" << status.ToString();
@@ -114,14 +118,187 @@ Status NaviPlanning::InitFrame(const uint32_t sequence_num,
   return Status::OK();
 }
 
-void NaviPlanning::OnTimer(const ros::TimerEvent&) {
-  RunOnce();
+void NaviPlanning::RunOnce(const LocalView& local_view,
+                           ADCTrajectory* const trajectory_pb) {
+  local_view_ = local_view;
+  const double start_timestamp = Clock::NowInSeconds();
 
-  if (FLAGS_planning_test_mode && FLAGS_test_duration > 0.0 &&
-      Clock::NowInSeconds() - start_time_ > FLAGS_test_duration) {
-    Stop();
-    ros::shutdown();
+  // recreate reference line provider in every cycle
+  // TODO(all) change this to relative map
+  hdmap_ = HDMapUtil::BaseMapPtr();
+  // Prefer "std::make_unique" to direct use of "new".
+  // Reference "https://herbsutter.com/gotw/_102/" for details.
+  reference_line_provider_ = std::make_unique<ReferenceLineProvider>(hdmap_);
+
+  // localization
+  ADEBUG << "Get localization:"
+         << local_view_.localization_estimate->DebugString();
+
+  // chassis
+  ADEBUG << "Get chassis:" << local_view_.chassis->DebugString();
+
+  Status status = VehicleStateProvider::Instance()->Update(
+          *local_view_.localization_estimate, *local_view_.chassis);
+
+  auto vehicle_config = ComputeVehicleConfigFromLocalization(
+      *local_view_.localization_estimate);
+
+  if (last_vehicle_config_.is_valid_ && vehicle_config.is_valid_) {
+    auto x_diff_map = vehicle_config.x_ - last_vehicle_config_.x_;
+    auto y_diff_map = vehicle_config.y_ - last_vehicle_config_.y_;
+
+    auto cos_map_veh = std::cos(last_vehicle_config_.theta_);
+    auto sin_map_veh = std::sin(last_vehicle_config_.theta_);
+
+    auto x_diff_veh = cos_map_veh * x_diff_map + sin_map_veh * y_diff_map;
+    auto y_diff_veh = -sin_map_veh * x_diff_map + cos_map_veh * y_diff_map;
+
+    auto theta_diff = vehicle_config.theta_ - last_vehicle_config_.theta_;
+
+    TrajectoryStitcher::TransformLastPublishedTrajectory(
+        x_diff_veh, y_diff_veh, theta_diff, last_publishable_trajectory_.get());
   }
+  last_vehicle_config_ = vehicle_config;
+
+  VehicleState vehicle_state =
+      VehicleStateProvider::Instance()->vehicle_state();
+
+  // estimate (x, y) at current timestamp
+  // This estimate is only valid if the current time and vehicle state timestamp
+  // differs only a small amount (20ms). When the different is too large, the
+  // estimation is invalid.
+  DCHECK_GE(start_timestamp, vehicle_state.timestamp());
+  if (FLAGS_estimate_current_vehicle_state &&
+      start_timestamp - vehicle_state.timestamp() < 0.020) {
+    auto future_xy = VehicleStateProvider::Instance()->EstimateFuturePosition(
+        start_timestamp - vehicle_state.timestamp());
+    vehicle_state.set_x(future_xy.x());
+    vehicle_state.set_y(future_xy.y());
+    vehicle_state.set_timestamp(start_timestamp);
+  }
+
+  auto* not_ready = trajectory_pb->mutable_decision()
+      ->mutable_main_decision()
+      ->mutable_not_ready();
+
+  if (!status.ok() || !IsVehicleStateValid(vehicle_state)) {
+    std::string msg("Update VehicleStateProvider failed");
+    AERROR << msg;
+    not_ready->set_reason(msg);
+    status.Save(trajectory_pb->mutable_header()->mutable_status());
+    FillPlanningPb(start_timestamp, trajectory_pb);
+    return;
+  }
+
+  const double planning_cycle_time = 1.0 / FLAGS_planning_loop_rate;
+
+  std::vector<TrajectoryPoint> stitching_trajectory;
+  stitching_trajectory = TrajectoryStitcher::ComputeStitchingTrajectory(
+      vehicle_state, start_timestamp, planning_cycle_time,
+      last_publishable_trajectory_.get());
+
+  const uint32_t frame_num = seq_num_++;
+  status = InitFrame(frame_num, stitching_trajectory.back(), start_timestamp,
+                     vehicle_state);
+  if (!frame_) {
+    std::string msg("Failed to init frame");
+    AERROR << msg;
+    not_ready->set_reason(msg);
+    status.Save(trajectory_pb->mutable_header()->mutable_status());
+    FillPlanningPb(start_timestamp, trajectory_pb);
+    return;
+  }
+
+  EgoInfo::Instance()->Update(stitching_trajectory.back(), vehicle_state,
+                              frame_->obstacles());
+
+  if (FLAGS_enable_record_debug) {
+    frame_->RecordInputDebug(trajectory_pb->mutable_debug());
+  }
+  trajectory_pb->mutable_latency_stats()->set_init_frame_time_ms(
+      Clock::NowInSeconds() - start_timestamp);
+  if (!status.ok()) {
+    AERROR << status.ToString();
+    if (FLAGS_publish_estop) {
+      // Because the function "Control::ProduceControlCommand()" checks the
+      // "estop" signal with the following line (Line 170 in control.cc):
+      // estop_ = estop_ || trajectory_.estop().is_estop();
+      // we should add more information to ensure the estop being triggered.
+      ADCTrajectory estop_trajectory;
+      EStop* estop = estop_trajectory.mutable_estop();
+      estop->set_is_estop(true);
+      estop->set_reason(status.error_message());
+      status.Save(estop_trajectory.mutable_header()->mutable_status());
+      FillPlanningPb(start_timestamp, &estop_trajectory);
+    } else {
+      trajectory_pb->mutable_decision()
+          ->mutable_main_decision()
+          ->mutable_not_ready()
+          ->set_reason(status.ToString());
+      status.Save(trajectory_pb->mutable_header()->mutable_status());
+      FillPlanningPb(start_timestamp, trajectory_pb);
+    }
+
+    frame_->mutable_trajectory()->CopyFrom(*trajectory_pb);
+    auto seq_num = frame_->SequenceNum();
+    FrameHistory::Instance()->Add(seq_num, std::move(frame_));
+
+    return;
+  }
+
+  // Use planning pad message to make driving decisions
+  if (FLAGS_enable_planning_pad_msg) {
+    ProcessPadMsg(driving_action_);
+  }
+
+  for (auto& ref_line_info : frame_->reference_line_info()) {
+    TrafficDecider traffic_decider;
+    traffic_decider.Init(traffic_rule_configs_);
+    auto traffic_status = traffic_decider.Execute(frame_.get(), &ref_line_info);
+    if (!traffic_status.ok() || !ref_line_info.IsDrivable()) {
+      ref_line_info.SetDrivable(false);
+      AWARN << "Reference line " << ref_line_info.Lanes().Id()
+            << " traffic decider failed";
+      continue;
+    }
+  }
+
+  status = Plan(start_timestamp, stitching_trajectory, trajectory_pb);
+
+  const auto time_diff_ms = (Clock::NowInSeconds() - start_timestamp) * 1000;
+  ADEBUG << "total planning time spend: " << time_diff_ms << " ms.";
+
+  trajectory_pb->mutable_latency_stats()->set_total_time_ms(time_diff_ms);
+  ADEBUG << "Planning latency: "
+         << trajectory_pb->latency_stats().DebugString();
+
+  auto* ref_line_task =
+      trajectory_pb->mutable_latency_stats()->add_task_stats();
+  ref_line_task->set_time_ms(reference_line_provider_->LastTimeDelay() *
+      1000.0);
+  ref_line_task->set_name("ReferenceLineProvider");
+
+  if (!status.ok()) {
+    status.Save(trajectory_pb->mutable_header()->mutable_status());
+    AERROR << "Planning failed:" << status.ToString();
+    if (FLAGS_publish_estop) {
+      AERROR << "Planning failed and set estop";
+      // Because the function "Control::ProduceControlCommand()" checks the
+      // "estop" signal with the following line (Line 170 in control.cc):
+      // estop_ = estop_ || trajectory_.estop().is_estop();
+      // we should add more information to ensure the estop being triggered.
+      EStop* estop = trajectory_pb->mutable_estop();
+      estop->set_is_estop(true);
+      estop->set_reason(status.error_message());
+    }
+  }
+
+  trajectory_pb->set_is_replan(stitching_trajectory.size() == 1);
+  FillPlanningPb(start_timestamp, trajectory_pb);
+  ADEBUG << "Planning pb:" << trajectory_pb->header().DebugString();
+
+  auto seq_num = frame_->SequenceNum();
+  FrameHistory::Instance()->Add(seq_num, std::move(frame_));
 }
 
 void NaviPlanning::OnPad(const PadMessage& pad) {
@@ -132,7 +309,7 @@ void NaviPlanning::OnPad(const PadMessage& pad) {
 }
 
 void NaviPlanning::ProcessPadMsg(DrivingAction drvie_action) {
-  if (config_.planner_type() == NAVI) {
+  if (config_.has_navigation_planning_config()) {
     std::map<std::string, uint32_t> lane_id_to_priority;
     auto& ref_line_info_group = frame_->reference_line_info();
     if (is_received_pad_msg_) {
@@ -274,232 +451,6 @@ void NaviPlanning::GetRightNeighborLanesInfo(
             });
 }
 
-Status NaviPlanning::Start() {
-  timer_ =
-      AdapterManager::CreateTimer(ros::Duration(1.0 / FLAGS_planning_loop_rate),
-                                  &NaviPlanning::OnTimer, this);
-
-  start_time_ = Clock::NowInSeconds();
-  AINFO << "Planning started";
-  return Status::OK();
-}
-
-void NaviPlanning::RunOnce() {
-  // snapshot all coming data
-  AdapterManager::Observe();
-
-  const double start_timestamp = Clock::NowInSeconds();
-
-  ADCTrajectory not_ready_pb;
-  auto* not_ready = not_ready_pb.mutable_decision()
-                        ->mutable_main_decision()
-                        ->mutable_not_ready();
-  if (AdapterManager::GetLocalization()->Empty()) {
-    not_ready->set_reason("localization not ready");
-  } else if (AdapterManager::GetChassis()->Empty()) {
-    not_ready->set_reason("chassis not ready");
-  } else if (HDMapUtil::BaseMapPtr() == nullptr) {
-    not_ready->set_reason("map not ready");
-  }
-  if (not_ready->has_reason()) {
-    AERROR << not_ready->reason() << "; skip the planning cycle.";
-    FillPlanningPb(&not_ready_pb, start_timestamp);
-    return;
-  }
-
-  // recreate reference line provider in every cycle
-  hdmap_ = HDMapUtil::BaseMapPtr();
-  // Prefer "std::make_unique" to direct use of "new".
-  // Reference "https://herbsutter.com/gotw/_102/" for details.
-  reference_line_provider_ = std::make_unique<ReferenceLineProvider>(hdmap_);
-
-  // localization
-  const auto& localization =
-      AdapterManager::GetLocalization()->GetLatestObserved();
-  ADEBUG << "Get localization:" << localization.DebugString();
-
-  // chassis
-  const auto& chassis = AdapterManager::GetChassis()->GetLatestObserved();
-  ADEBUG << "Get chassis:" << chassis.DebugString();
-
-  Status status =
-      VehicleStateProvider::Instance()->Update(localization, chassis);
-
-  auto vehicle_config = ComputeVehicleConfigFromLocalization(localization);
-
-  if (last_vehicle_config_.is_valid_ && vehicle_config.is_valid_) {
-    auto x_diff_map = vehicle_config.x_ - last_vehicle_config_.x_;
-    auto y_diff_map = vehicle_config.y_ - last_vehicle_config_.y_;
-
-    auto cos_map_veh = std::cos(last_vehicle_config_.theta_);
-    auto sin_map_veh = std::sin(last_vehicle_config_.theta_);
-
-    auto x_diff_veh = cos_map_veh * x_diff_map + sin_map_veh * y_diff_map;
-    auto y_diff_veh = -sin_map_veh * x_diff_map + cos_map_veh * y_diff_map;
-
-    auto theta_diff = vehicle_config.theta_ - last_vehicle_config_.theta_;
-
-    TrajectoryStitcher::TransformLastPublishedTrajectory(
-        x_diff_veh, y_diff_veh, theta_diff, last_publishable_trajectory_.get());
-  }
-  last_vehicle_config_ = vehicle_config;
-
-  VehicleState vehicle_state =
-      VehicleStateProvider::Instance()->vehicle_state();
-
-  // estimate (x, y) at current timestamp
-  // This estimate is only valid if the current time and vehicle state timestamp
-  // differs only a small amount (20ms). When the different is too large, the
-  // estimation is invalid.
-  DCHECK_GE(start_timestamp, vehicle_state.timestamp());
-  if (FLAGS_estimate_current_vehicle_state &&
-      start_timestamp - vehicle_state.timestamp() < 0.020) {
-    auto future_xy = VehicleStateProvider::Instance()->EstimateFuturePosition(
-        start_timestamp - vehicle_state.timestamp());
-    vehicle_state.set_x(future_xy.x());
-    vehicle_state.set_y(future_xy.y());
-    vehicle_state.set_timestamp(start_timestamp);
-  }
-
-  if (!status.ok() || !IsVehicleStateValid(vehicle_state)) {
-    std::string msg("Update VehicleStateProvider failed");
-    AERROR << msg;
-    not_ready->set_reason(msg);
-    status.Save(not_ready_pb.mutable_header()->mutable_status());
-    FillPlanningPb(&not_ready_pb, start_timestamp);
-    return;
-  }
-
-  if (AdapterManager::GetPrediction()->Empty()) {
-    AWARN_EVERY(100) << "prediction is enabled but no prediction provided";
-  }
-
-  const double planning_cycle_time = 1.0 / FLAGS_planning_loop_rate;
-
-  std::vector<TrajectoryPoint> stitching_trajectory;
-  stitching_trajectory = TrajectoryStitcher::ComputeStitchingTrajectory(
-      vehicle_state, start_timestamp, planning_cycle_time,
-      last_publishable_trajectory_.get());
-
-  const uint32_t frame_num = AdapterManager::GetPlanning()->GetSeqNum() + 1;
-  status = InitFrame(frame_num, stitching_trajectory.back(), start_timestamp,
-                     vehicle_state);
-  if (!frame_) {
-    std::string msg("Failed to init frame");
-    AERROR << msg;
-    not_ready->set_reason(msg);
-    status.Save(not_ready_pb.mutable_header()->mutable_status());
-    FillPlanningPb(&not_ready_pb, start_timestamp);
-    return;
-  }
-
-  EgoInfo::Instance()->Update(stitching_trajectory.back(), vehicle_state,
-                              frame_->obstacles());
-
-  auto* trajectory_pb = frame_->mutable_trajectory();
-  if (FLAGS_enable_record_debug) {
-    frame_->RecordInputDebug(trajectory_pb->mutable_debug());
-  }
-  trajectory_pb->mutable_latency_stats()->set_init_frame_time_ms(
-      Clock::NowInSeconds() - start_timestamp);
-  if (!status.ok()) {
-    AERROR << status.ToString();
-    if (FLAGS_publish_estop) {
-      // Because the function "Control::ProduceControlCommand()" checks the
-      // "estop" signal with the following line (Line 170 in control.cc):
-      // estop_ = estop_ || trajectory_.estop().is_estop();
-      // we should add more information to ensure the estop being triggered.
-      ADCTrajectory estop_trajectory;
-      EStop* estop = estop_trajectory.mutable_estop();
-      estop->set_is_estop(true);
-      estop->set_reason(status.error_message());
-      status.Save(estop_trajectory.mutable_header()->mutable_status());
-      FillPlanningPb(&estop_trajectory, start_timestamp);
-    } else {
-      trajectory_pb->mutable_decision()
-          ->mutable_main_decision()
-          ->mutable_not_ready()
-          ->set_reason(status.ToString());
-      status.Save(trajectory_pb->mutable_header()->mutable_status());
-      FillPlanningPb(trajectory_pb, start_timestamp);
-    }
-
-    auto seq_num = frame_->SequenceNum();
-    FrameHistory::Instance()->Add(seq_num, std::move(frame_));
-
-    return;
-  }
-
-  // Use planning pad message to make driving decisions
-  if (FLAGS_enable_planning_pad_msg) {
-    ProcessPadMsg(driving_action_);
-  }
-
-  for (auto& ref_line_info : frame_->reference_line_info()) {
-    TrafficDecider traffic_decider;
-    traffic_decider.Init(traffic_rule_configs_);
-    auto traffic_status = traffic_decider.Execute(frame_.get(), &ref_line_info);
-    if (!traffic_status.ok() || !ref_line_info.IsDrivable()) {
-      ref_line_info.SetDrivable(false);
-      AWARN << "Reference line " << ref_line_info.Lanes().Id()
-            << " traffic decider failed";
-      continue;
-    }
-  }
-
-  status = Plan(start_timestamp, stitching_trajectory, trajectory_pb);
-
-  const auto time_diff_ms = (Clock::NowInSeconds() - start_timestamp) * 1000;
-  ADEBUG << "total planning time spend: " << time_diff_ms << " ms.";
-
-  trajectory_pb->mutable_latency_stats()->set_total_time_ms(time_diff_ms);
-  ADEBUG << "Planning latency: "
-         << trajectory_pb->latency_stats().DebugString();
-
-  auto* ref_line_task =
-      trajectory_pb->mutable_latency_stats()->add_task_stats();
-  ref_line_task->set_time_ms(reference_line_provider_->LastTimeDelay() *
-                             1000.0);
-  ref_line_task->set_name("ReferenceLineProvider");
-
-  if (!status.ok()) {
-    status.Save(trajectory_pb->mutable_header()->mutable_status());
-    AERROR << "Planning failed:" << status.ToString();
-    if (FLAGS_publish_estop) {
-      AERROR << "Planning failed and set estop";
-      // Because the function "Control::ProduceControlCommand()" checks the
-      // "estop" signal with the following line (Line 170 in control.cc):
-      // estop_ = estop_ || trajectory_.estop().is_estop();
-      // we should add more information to ensure the estop being triggered.
-      EStop* estop = trajectory_pb->mutable_estop();
-      estop->set_is_estop(true);
-      estop->set_reason(status.error_message());
-    }
-  }
-
-  trajectory_pb->set_is_replan(stitching_trajectory.size() == 1);
-  FillPlanningPb(trajectory_pb, start_timestamp);
-  ADEBUG << "Planning pb:" << trajectory_pb->header().DebugString();
-
-  auto seq_num = frame_->SequenceNum();
-  FrameHistory::Instance()->Add(seq_num, std::move(frame_));
-}
-
-void NaviPlanning::SetFallbackTrajectory(ADCTrajectory* const trajectory_pb) {
-  const double v = VehicleStateProvider::Instance()->linear_velocity();
-  for (double t = 0.0; t < FLAGS_navigation_fallback_cruise_time; t += 0.1) {
-    const double s = t * v;
-
-    auto* cruise_point = trajectory_pb->add_trajectory_point();
-    cruise_point->mutable_path_point()->CopyFrom(
-        common::util::MakePathPoint(s, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
-    cruise_point->mutable_path_point()->set_s(s);
-    cruise_point->set_v(v);
-    cruise_point->set_a(0.0);
-    cruise_point->set_relative_time(t);
-  }
-}
-
 void NaviPlanning::ExportReferenceLineDebug(planning_internal::Debug* debug) {
   if (!FLAGS_enable_record_debug) {
     return;
@@ -611,14 +562,14 @@ Status NaviPlanning::Plan(
   return status;
 }
 
-void NaviPlanning::Stop() {
+/*void NaviPlanning::Stop() {
   AWARN << "Planning Stop is called";
   last_publishable_trajectory_.reset(nullptr);
   frame_.reset(nullptr);
   planner_.reset(nullptr);
   FrameHistory::Instance()->Clear();
   mutable_planning_status()->Clear();
-}
+}*/
 
 NaviPlanning::VehicleConfig NaviPlanning::ComputeVehicleConfigFromLocalization(
     const localization::LocalizationEstimate& localization) const {
@@ -645,7 +596,7 @@ NaviPlanning::VehicleConfig NaviPlanning::ComputeVehicleConfigFromLocalization(
 }
 
 bool NaviPlanning::CheckPlanningConfig() {
-  if (!config_.has_planner_navi_config()) {
+  if (!config_.has_navigation_planning_config()) {
     return false;
   }
   // TODO(All): check other config params

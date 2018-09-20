@@ -61,23 +61,12 @@ class NaviPlanning : public PlanningBase {
   apollo::common::Status Init() override;
 
   /**
-   * @brief module start function
-   * @return start status
-   */
-  apollo::common::Status Start() override;
-
-  /**
-   * @brief module stop function
-   */
-  void Stop() override;
-
-  /**
    * @brief main logic of the planning module, runs periodically triggered by
    * timer.
    */
-  void RunOnce() override;
+  void RunOnce(const LocalView& local_view,
+               ADCTrajectory* const trajectory_pb) override;
 
-  void OnTimer(const ros::TimerEvent&) override;
 
   apollo::common::Status Plan(
       const double current_time_stamp,
@@ -124,8 +113,6 @@ class NaviPlanning : public PlanningBase {
    */
   void GetRightNeighborLanesInfo(
       std::vector<std::pair<std::string, double>>* const lane_info_group);
-
-  void SetFallbackTrajectory(ADCTrajectory* const cruise_trajectory) override;
 
   void ExportReferenceLineDebug(planning_internal::Debug* debug);
 
