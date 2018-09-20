@@ -38,6 +38,10 @@ class EnvironmentFeatures {
 
   double get_ego_acceleration() const;
 
+  void set_ego_heading(const double ego_heading);
+
+  double get_ego_heading() const;
+
   bool has_ego_lane() const;
 
   void reset_ego_lane();

@@ -27,7 +27,7 @@
 #include "gtest/gtest.h"
 
 #include "modules/map/hdmap/hdmap_common.h"
-#include "modules/prediction/proto/scenario_feature.pb.h"
+#include "modules/prediction/common/environment_features.h"
 #include "modules/prediction/container/container_manager.h"
 #include "modules/prediction/container/adc_trajectory/adc_trajectory_container.h"
 #include "modules/prediction/container/pose/pose_container.h"
@@ -56,7 +56,7 @@ class FeatureExtractor {
    * @brief Get scenario features
    * @return Scenario features
    */
-  const ScenarioFeature& GetScenarioFeatures() const;
+  const EnvironmentFeatures& GetEnvironmentFeatures() const;
 
   FRIEND_TEST(FeatureExtractorTest, junction);
 
@@ -82,7 +82,7 @@ class FeatureExtractor {
 
   PoseContainer* pose_container_;
 
-  ScenarioFeature scenario_features_;
+  EnvironmentFeatures environment_features_;
 };
 
 }  // namespace prediction

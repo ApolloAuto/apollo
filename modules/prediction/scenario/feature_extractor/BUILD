@@ -11,7 +11,7 @@ cc_library(
         "//framework:cybertron",
         "//modules/common/math:geometry",
         "//modules/map/hdmap:hdmap_util",
-        "//modules/prediction/proto:scenario_feature_proto",
+        "//modules/prediction/common:environment_features",
         "//modules/prediction/container:container_manager",
         "//modules/prediction/container/adc_trajectory:adc_trajectory_container",
         "//modules/prediction/container/pose:pose_container",

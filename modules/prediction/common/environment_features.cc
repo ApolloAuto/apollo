@@ -28,6 +28,14 @@ double EnvironmentFeatures::get_ego_velocity() const {
   return ego_velocity_;
 }
 
+void EnvironmentFeatures::set_ego_heading(const double ego_heading) {
+  ego_heading_ = ego_heading;
+}
+
+double EnvironmentFeatures::get_ego_heading() const {
+  return ego_heading_;
+}
+
 void EnvironmentFeatures::set_ego_acceleration(const double ego_acceleration) {
   ego_acceleration_ = ego_acceleration;
 }

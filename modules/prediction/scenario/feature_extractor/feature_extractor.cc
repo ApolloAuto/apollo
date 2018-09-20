@@ -71,14 +71,14 @@ void FeatureExtractor::ExtractFeatures() {
   // TODO(all): add other features
 }
 
-const ScenarioFeature& FeatureExtractor::GetScenarioFeatures() const {
-  return scenario_features_;
+const EnvironmentFeatures& FeatureExtractor::GetEnvironmentFeatures() const {
+  return environment_features_;
 }
 
 void FeatureExtractor::ExtractEgoVehicleFeatures() {
   // TODO(all): change this to ego_speed and ego_heading
-  scenario_features_.set_speed(pose_container_->GetSpeed());
-  scenario_features_.set_heading(pose_container_->GetTheta());
+  environment_features_.set_ego_velocity(pose_container_->GetSpeed());
+  environment_features_.set_ego_heading(pose_container_->GetTheta());
   // TODO(all): add acceleration if needed
 }
 
@@ -89,11 +89,10 @@ void FeatureExtractor::ExtractEgoLaneFeatures(const LaneInfoPtr& ptr_ego_lane,
     AERROR << "Ego vehicle is not on any lane.";
     return;
   }
-  scenario_features_.set_curr_lane_id(ptr_ego_lane->id().id());
   double curr_lane_s = 0.0;
   double curr_lane_l = 0.0;
   ptr_ego_lane->GetProjection(ego_position, &curr_lane_s, &curr_lane_l);
-  scenario_features_.set_curr_lane_s(curr_lane_s);
+  environment_features_.SetEgoLane(ptr_ego_lane->id().id(), curr_lane_s);
 }
 
 void FeatureExtractor::ExtractNeighborLaneFeatures(
@@ -110,17 +109,27 @@ void FeatureExtractor::ExtractNeighborLaneFeatures(
   auto ptr_left_neighbor_lane = PredictionMap::GetLeftNeighborLane(
       ptr_ego_lane, {ego_position.x(), ego_position.y()}, threshold);
 
+  double left_neighbor_lane_s = 0.0;
+  double left_neighbor_lane_l = 0.0;
+  ptr_left_neighbor_lane->GetProjection(ego_position,
+      &left_neighbor_lane_s, &left_neighbor_lane_l);
+
   if (ptr_left_neighbor_lane != nullptr) {
-    scenario_features_.set_left_neighbor_lane_id(
-        ptr_left_neighbor_lane->id().id());
+    environment_features_.SetLeftNeighborLane(
+        ptr_left_neighbor_lane->id().id(), left_neighbor_lane_s);
   }
 
   auto ptr_right_neighbor_lane = PredictionMap::GetRightNeighborLane(
       ptr_ego_lane, {ego_position.x(), ego_position.y()}, threshold);
 
+  double right_neighbor_lane_s = 0.0;
+  double right_neighbor_lane_l = 0.0;
+  ptr_left_neighbor_lane->GetProjection(ego_position,
+      &right_neighbor_lane_s, &right_neighbor_lane_l);
+
   if (ptr_right_neighbor_lane != nullptr) {
-    scenario_features_.set_right_neighbor_lane_id(
-        ptr_right_neighbor_lane->id().id());
+    environment_features_.SetRightNeighborLane(
+        ptr_right_neighbor_lane->id().id(), right_neighbor_lane_s);
   }
 }
 
@@ -131,8 +140,7 @@ void FeatureExtractor::ExtractFrontJunctionFeatures() {
   }
   JunctionInfoPtr junction = ego_trajectory_containter_->ADCJunction();
   if (junction != nullptr) {
-    scenario_features_.set_junction_id(junction->id().id());
-    scenario_features_.set_dist_to_junction(
+    environment_features_.SetFrontJunction(junction->id().id(),
         ego_trajectory_containter_->ADCDistanceToJunction());
   }
 }

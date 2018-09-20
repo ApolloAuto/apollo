@@ -18,7 +18,7 @@
 
 #include "gtest/gtest.h"
 
-#include "modules/prediction/proto/scenario_feature.pb.h"
+#include "modules/prediction/common/environment_features.h"
 #include "modules/prediction/common/kml_map_based_test.h"
 #include "modules/prediction/common/prediction_gflags.h"
 
@@ -28,19 +28,18 @@ namespace prediction {
 class ScenarioAnalyzerTest : public KMLMapBasedTest {};
 
 TEST_F(ScenarioAnalyzerTest, unknown) {
-  ScenarioFeature scenario_feature;
+  EnvironmentFeatures environment_features;
   ScenarioAnalyzer scenario_analyzer;
-  scenario_analyzer.Analyze(scenario_feature);
+  scenario_analyzer.Analyze(environment_features);
   Scenario scenario = scenario_analyzer.scenario();
   EXPECT_EQ(scenario.type(), Scenario::UNKNOWN);
 }
 
 TEST_F(ScenarioAnalyzerTest, junction) {
-  ScenarioFeature scenario_feature;
-  scenario_feature.set_junction_id("1");
-  scenario_feature.set_dist_to_junction(3.0);
+  EnvironmentFeatures environment_features;
+  environment_features.SetFrontJunction("1", 3.0);
   ScenarioAnalyzer scenario_analyzer;
-  scenario_analyzer.Analyze(scenario_feature);
+  scenario_analyzer.Analyze(environment_features);
   Scenario scenario = scenario_analyzer.scenario();
   EXPECT_EQ(scenario.type(), Scenario::JUNCTION);
 }

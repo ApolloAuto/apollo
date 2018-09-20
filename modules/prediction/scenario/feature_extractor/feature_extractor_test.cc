@@ -44,9 +44,9 @@ TEST_F(FeatureExtractorTest, junction) {
           AdapterConfig::PLANNING_TRAJECTORY);
   FeatureExtractor feature_extractor;
   feature_extractor.ExtractFrontJunctionFeatures();
-  ScenarioFeature scenario_feature =
-      feature_extractor.GetScenarioFeatures();
-  EXPECT_TRUE(!scenario_feature.has_junction_id());
+  EnvironmentFeatures environment_features =
+      feature_extractor.GetEnvironmentFeatures();
+  EXPECT_TRUE(!environment_features.has_front_junction());
 }
 
 }  // namespace prediction

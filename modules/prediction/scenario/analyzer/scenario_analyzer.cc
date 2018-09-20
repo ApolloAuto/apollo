@@ -20,11 +20,13 @@
 namespace apollo {
 namespace prediction {
 
-void ScenarioAnalyzer::Analyze(const ScenarioFeature& scenario_feature) {
-  if (scenario_feature.has_junction_id() &&
-      scenario_feature.dist_to_junction() < FLAGS_junction_distance_threshold) {
+void ScenarioAnalyzer::Analyze(
+    const EnvironmentFeatures& environment_features) {
+  if (environment_features.has_front_junction() &&
+      environment_features.GetFrontJunction().second <
+          FLAGS_junction_distance_threshold) {
     scenario_.set_type(Scenario::JUNCTION);
-  } else if (scenario_feature.has_curr_lane_id()) {
+  } else if (environment_features.has_ego_lane()) {
     scenario_.set_type(Scenario::CRUISE);
   }
 }
