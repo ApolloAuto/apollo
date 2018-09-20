@@ -24,175 +24,92 @@ Info::Info() {}
 
 Info::~Info() {}
 
-bool Info::Display(const std::string& file, bool all_sections) {
-  RecordFileReader infileopt;
-  if (!infileopt.Open(file)) {
+bool Info::Display(const std::string& file) {
+  RecordFileReader file_reader;
+  if (!file_reader.Open(file)) {
     AERROR << "open record file error. file: " << file;
     return false;
   }
-  if (!infileopt.ReadHeader()) {
+
+  // read header section
+  if (!file_reader.ReadHeader()) {
     AERROR << "read header section of the file fail. file: " << file;
     return false;
   }
-  Header header = infileopt.GetHeader();
+  Header hdr = file_reader.GetHeader();
 
-  auto begin_time_s = header.begin_time() / 1e9;
-  auto end_time_s = header.end_time() / 1e9;
-  auto begin_time_str = UnixSecondsToString(begin_time_s);
-  auto end_time_str = UnixSecondsToString(end_time_s);
+  auto begin_time_s = hdr.begin_time() / 1e9;
+  auto end_time_s = hdr.end_time() / 1e9;
 
-  if (header.end_time() < header.begin_time()) {
-    std::cout << "header time invalid, please reindex_.first." << std::endl;
-    std::cout << "recorder begin_time: " << header.begin_time()
-              << ", end_time: " << header.end_time() << std::endl;
+  if (hdr.end_time() < hdr.begin_time()) {
+    std::cout << "hdr time invalid, please \"cyber_recorder recover\" first."
+              << std::endl;
+    std::cout << "recorder begin_time: " << hdr.begin_time()
+              << ", end_time: " << hdr.end_time() << std::endl;
     return false;
   }
 
-  if (all_sections) {
-    std::cout << "************** header section ******************"
-              << std::endl;
-  }
-
   auto duration_s = end_time_s - begin_time_s;
+  auto begin_time_str = UnixSecondsToString(begin_time_s);
+  auto end_time_str = UnixSecondsToString(end_time_s);
 
   std::cout << setiosflags(std::ios::left);
   std::cout << setiosflags(std::ios::fixed);
-  unsigned int field_width = 15;
-  std::cout << std::setw(field_width) << "path:" << file << std::endl
-            << std::setw(field_width) << "version:" << header.major_version()
-            << "." << header.minor_version() << std::endl
-            << std::setw(field_width) << "duration:" << duration_s << " s"
+  unsigned int w = 16;
+  std::cout << std::setw(w) << "record_file:" << file << std::endl
+            << std::setw(w) << "version:" << hdr.major_version() << "."
+            << hdr.minor_version() << std::endl
+            << std::setw(w) << "duration:" << duration_s << " Seconds"
             << std::endl
-            << std::setw(field_width) << "begin_time:" << begin_time_str
-            << std::endl
-            << std::setw(field_width) << "end_time:" << end_time_str
-            << std::endl
-            << std::setw(field_width)
-            << "message_number:" << header.message_number() << std::endl
-            << std::setw(field_width)
-            << "chunk_number:" << header.chunk_number() << std::endl
-            << std::setw(field_width)
-            << "index_position:" << header.index_position() << std::endl
-            << std::setw(field_width) << "size:" << header.size() << " bytes";
-
-  if (header.size() >= (1024 * 1024 * 1024)) {
-    std::cout << " (" << header.size() / (1024 * 1024 * 1024.0) << " GB)";
-  } else if (header.size() >= (1024 * 1024)) {
-    std::cout << " (" << header.size() / (1024 * 1024.0) << " MB)";
-  } else if (header.size() >= 1024) {
-    std::cout << " (" << header.size() / 1024.0 << " KB)";
+            << std::setw(w) << "begin_time:" << begin_time_str << std::endl
+            << std::setw(w) << "end_time:" << end_time_str << std::endl
+            << std::setw(w) << "size:" << hdr.size() << " Bytes";
+  if (hdr.size() >= (1024 * 1024 * 1024)) {
+    std::cout << " (" << hdr.size() / (1024 * 1024 * 1024.0) << " GB)";
+  } else if (hdr.size() >= (1024 * 1024)) {
+    std::cout << " (" << hdr.size() / (1024 * 1024.0) << " MB)";
+  } else if (hdr.size() >= 1024) {
+    std::cout << " (" << hdr.size() / 1024.0 << " KB)";
   }
   std::cout << std::endl;
 
-  if (!all_sections) {
-    return true;
+  // is_complete
+  std::cout << std::setw(w) << "is_complete:";
+  if (hdr.is_complete()) {
+    std::cout << "true";
+  } else {
+    std::cout << "false";
   }
-  std::cout << "******************** all sections **************" << std::endl;
+  std::cout << std::endl;
 
-  std::cout << "header|major_version=" << header.major_version()
-            << "|minor_version=" << header.minor_version()
-            << "|compress=" << header.compress()
-            << "|chunk_interval=" << header.chunk_interval()
-            << "|segment_interval=" << header.segment_interval()
-            << "|index_position=" << header.index_position()
-            << "|chunk_number=" << header.chunk_number()
-            << "|channel_number=" << header.channel_number()
-            << "|begin_time=" << header.begin_time()
-            << "|end_time=" << header.end_time()
-            << "|message_number=" << header.message_number()
-            << "|size=" << header.size()
-            << "|is_complete=" << header.is_complete()
-            << "|chunk_raw_size=" << header.chunk_raw_size()
-            << "|segment_raw_size=" << header.segment_raw_size() << std::endl;
+  // channel_number
+  std::cout << std::setw(w) << "message_number:" << hdr.message_number()
+            << std::endl;
+  std::cout << std::setw(w) << "channel_number:" << hdr.channel_number()
+            << std::endl;
 
-  Section section;
-  while (infileopt.ReadSection(&section)) {
-    switch (section.type) {
-      case SectionType::SECTION_CHANNEL: {
-        Channel channel;
-        if (!infileopt.ReadSection<Channel>(section.size, &channel)) {
-          AERROR << "read message fail.";
-          return false;
-        }
-        std::cout << "channel|name=" << channel.name()
-                  << "|message_type=" << channel.message_type()
-                  << "|proto_desc=..." << std::endl;
-        break;
-      }
-      case SectionType::SECTION_CHUNK_HEADER: {
-        ChunkHeader chunk_header;
-        if (!infileopt.ReadSection<ChunkHeader>(section.size, &chunk_header)) {
-          AERROR << "read message fail.";
-          return false;
-        }
-        std::cout << "chunk_header|message_number="
-                  << chunk_header.message_number()
-                  << "|begin_time=" << chunk_header.begin_time()
-                  << "|end_time=" << chunk_header.end_time()
-                  << "|raw_size=" << chunk_header.raw_size() << std::endl;
-        break;
-      }
-      case SectionType::SECTION_CHUNK_BODY: {
-        ChunkBody chunk_body;
-        if (!infileopt.ReadSection<ChunkBody>(section.size, &chunk_body)) {
-          AERROR << "read message fail.";
-          return false;
-        }
-        std::cout << "chunk_body|messages=..." << std::endl;
-        break;
-      }
-      case SectionType::SECTION_INDEX: {
-        if (!infileopt.ReadSection<Index>(section.size, &index_)) {
-          AERROR << "read message fail.";
-          return false;
-        }
-        DisplayIndex();
-        break;
-      }
-      default:
-        break;
-    }
+  // read index section
+  if (!file_reader.ReadIndex()) {
+    AERROR << "read index section of the file fail. file: " << file;
+    return false;
   }
-  std::cout << "************** end of file *********************" << std::endl;
-  return true;
-}
+  Index idx = file_reader.GetIndex();
 
-bool Info::DisplayIndex() {
-  for (int i = 0; i < index_.indexes_size(); i++) {
-    SingleIndex* single_index = index_.mutable_indexes(i);
-    std::cout << "index|postion=" << single_index->position() << "|type=";
-    switch (single_index->type()) {
-      case SectionType::SECTION_CHUNK_HEADER: {
-        ChunkHeaderCache* chunk_header_cache =
-            single_index->mutable_chunk_header_cache();
-        std::cout << "chunk_header|message_number="
-                  << chunk_header_cache->message_number()
-                  << "|begin_time=" << chunk_header_cache->begin_time()
-                  << "|end_time=" << chunk_header_cache->end_time()
-                  << "|raw_size=" << chunk_header_cache->raw_size()
-                  << std::endl;
-        break;
+  for (int i = 0; i < idx.indexes_size(); i++) {
+    ChannelCache* cache = idx.mutable_indexes(i)->mutable_channel_cache();
+    if (idx.mutable_indexes(i)->type() == SectionType::SECTION_CHANNEL) {
+      if (i == 0) {
+        std::cout << std::setw(w) << "channel_info:";
+      } else {
+        std::cout << std::setw(w) << "";
       }
-      case SectionType::SECTION_CHUNK_BODY: {
-        ChunkBodyCache* chunk_body_cache =
-            single_index->mutable_chunk_body_cache();
-        std::cout << "chunk_body|message_number="
-                  << chunk_body_cache->message_number() << std::endl;
-        break;
-      }
-      case SectionType::SECTION_CHANNEL: {
-        ChannelCache* channel_cache = single_index->mutable_channel_cache();
-        std::cout << "channel|message_number="
-                  << channel_cache->message_number()
-                  << "|name=" << channel_cache->name()
-                  << "|message_type=" << channel_cache->message_type()
-                  << "|proto_desc=bytes" << std::endl;
-        break;
-      }
-      default: {
-        std::cout << "unknown type";
-        break;
-      }
+      std::cout << resetiosflags(std::ios::right);
+      std::cout << std::setw(50) << cache->name();
+      std::cout << setiosflags(std::ios::right);
+      std::cout << std::setw(8) << cache->message_number();
+      std::cout << std::setw(0) << " messages : ";
+      std::cout << cache->message_type();
+      std::cout << std::endl;
     }
   }
   return true;

@@ -30,19 +30,19 @@
 #include "cybertron/tools/cyber_recorder/recoverer.h"
 #include "cybertron/tools/cyber_recorder/spliter.h"
 
+using apollo::cybertron::record::Info;
+using apollo::cybertron::record::Recorder;
+using apollo::cybertron::record::Player;
+using apollo::cybertron::record::Spliter;
+using apollo::cybertron::record::Recoverer;
 using apollo::cybertron::common::GetFileName;
 using apollo::cybertron::common::StringToUnixSeconds;
 using apollo::cybertron::common::UnixSecondsToString;
-using apollo::cybertron::record::Info;
-using apollo::cybertron::record::Player;
-using apollo::cybertron::record::Recorder;
-using apollo::cybertron::record::Recoverer;
-using apollo::cybertron::record::Spliter;
 
-const char INFO_OPTIONS[] = "f:ah";
+const char INFO_OPTIONS[] = "f:h";
 const char RECORD_OPTIONS[] = "o:ac:h";
-const char PLAY_OPTIONS[] = "f:ac:lr:b:e:s:d:h";
-const char SPLIT_OPTIONS[] = "f:o:ac:b:e:h";
+const char PLAY_OPTIONS[] = "f:c:lr:b:e:s:d:h";
+const char SPLIT_OPTIONS[] = "f:o:c:b:e:h";
 const char RECOVER_OPTIONS[] = "f:o:h";
 
 void DisplayUsage(const std::string& binary);
@@ -249,8 +249,7 @@ int main(int argc, char** argv) {
     Info info;
     bool info_result = true;
     for (auto& opt_file : opt_file_vec) {
-      info_result =
-          info_result && info.Display(opt_file, opt_all) ? true : false;
+      info_result = info_result && info.Display(opt_file) ? true : false;
     }
     ::apollo::cybertron::Shutdown();
     return info_result ? 0 : -1;
@@ -274,14 +273,6 @@ int main(int argc, char** argv) {
     return recover_result ? 0 : -1;
   }
 
-  // common check
-  if (opt_channel_vec.empty() && !opt_all) {
-    std::cout
-        << "MUST specify channels option (-c) or all channels option (-a)."
-        << std::endl;
-    return -1;
-  }
-
   if (command == "play") {
     if (opt_file_vec.empty()) {
       std::cout << "MUST specify file option (-f)." << std::endl;
@@ -291,14 +282,21 @@ int main(int argc, char** argv) {
     // TODO @baownayu order input record file
     bool play_result = true;
     for (auto& opt_file : opt_file_vec) {
-      Player player(opt_file_vec[0], opt_all, opt_channel_vec, opt_loop,
-                    opt_rate, opt_begin, opt_end, opt_start, opt_delay);
+      Player player(opt_file_vec[0], opt_channel_vec.empty(), opt_channel_vec,
+                    opt_loop, opt_rate, opt_begin, opt_end, opt_start,
+                    opt_delay);
       play_result = play_result && player.Init() ? true : false;
       play_result = play_result && player.Start() ? true : false;
     }
     ::apollo::cybertron::Shutdown();
     return play_result ? 0 : -1;
   } else if (command == "record") {
+    if (opt_channel_vec.empty() && !opt_all) {
+      std::cout
+          << "MUST specify channels option (-c) or all channels option (-a)."
+          << std::endl;
+      return -1;
+    }
     if (opt_output_vec.size() > 1) {
       std::cout << "TOO many ouput file option (-o)." << std::endl;
       return -1;
@@ -335,7 +333,7 @@ int main(int argc, char** argv) {
       opt_output_vec.push_back(default_output_file);
     }
     ::apollo::cybertron::Init(argv[0]);
-    Spliter spliter(opt_file_vec[0], opt_output_vec[0], opt_all,
+    Spliter spliter(opt_file_vec[0], opt_output_vec[0], opt_channel_vec.empty(),
                     opt_channel_vec, opt_begin, opt_end);
     bool split_result = spliter.Proc();
     ::apollo::cybertron::Shutdown();
