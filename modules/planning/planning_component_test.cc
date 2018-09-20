@@ -179,7 +179,7 @@ bool PlanningComponentTest::FeedTestData(LocalView* local_view) {
           FLAGS_test_data_dir + "/" + FLAGS_test_traffic_light_file,
           &traffic_light_detection)) {
     AERROR << "failed to load file: " << FLAGS_test_traffic_light_file;
-    // return false;
+    return false;
   }
 
   local_view->chassis = std::make_shared<Chassis>(chassis);
