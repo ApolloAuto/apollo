@@ -118,7 +118,8 @@ void ObstaclesContainer::BuildLaneGraph() {
   }
 }
 
-void ObstaclesContainer::PrioritizeObstacles(const Scenario& scenario) {
+void ObstaclesContainer::PrioritizeObstacles(const Scenario& scenario,
+    const EnvironmentFeatures& environment_features) {
   // TODO(all) implement
   // According to scenario and filtered lanes and junctions, etc
   // set priorities for obstacles
