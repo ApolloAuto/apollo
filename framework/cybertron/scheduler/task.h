@@ -41,14 +41,40 @@ struct TaskData {
   std::promise<Ret> prom;
 };
 
+template <typename T, typename R>
+class SharedData {
+ public:
+   std::shared_ptr<TaskData<T, R>> GetTaskData() {
+    std::lock_guard<std::mutex> lg(mutex_);
+    if (data_list_.empty()) {
+      return nullptr;
+    }
+    auto task = data_list_.front();
+    data_list_.pop_front();
+    return task;
+  }
+
+  void ClearData() {
+    std::lock_guard<std::mutex> lg(mutex_);
+    data_list_.clear();
+  }
+
+  void Enqueue(const std::shared_ptr<TaskData<T, R>>& data) {
+    std::lock_guard<std::mutex> lg(mutex_);
+    data_list_.push_back(data);
+  }
+
+ private:
+  std::mutex mutex_;
+  std::list<std::shared_ptr<TaskData<T,R>>> data_list_;
+};
+
 template <typename T, typename R, typename Derived>
 class TaskBase {
  public:
   virtual ~TaskBase();
   void Stop();
-  bool IsRunning() const;
   std::future<R> Execute(const std::shared_ptr<T>& val);
-  std::shared_ptr<TaskData<T, R>> GetTaskData();
 
  protected:
   void RegisterCallback(
@@ -56,20 +82,18 @@ class TaskBase {
   void RegisterCallback(std::function<void()>&& func);
 
  private:
-  TaskBase(const std::string& name, const uint8_t& num_threads = 1);
+  TaskBase(const std::string& name, const uint8_t num_threads = 1);
   friend Derived;
   std::string name_;
-  bool running_;
-  uint32_t num_threads_;
+  uint8_t num_threads_;
   uint64_t task_id_;
-  mutable std::mutex mutex_;
-  std::list<std::shared_ptr<TaskData<T, R>>> data_list_;
+  std::shared_ptr<SharedData<T, R>> shared_data_;
 };
 
 template <typename T, typename R, typename Derived>
 TaskBase<T, R, Derived>::TaskBase(const std::string& name,
-                                  const uint8_t& num_threads)
-    : num_threads_(num_threads), running_(true) {
+                                  const uint8_t num_threads)
+    : num_threads_(num_threads), shared_data_(new SharedData<T,R>()) {
   if (num_threads_ > scheduler::Scheduler::ProcessorNum()) {
     num_threads_ = scheduler::Scheduler::ProcessorNum();
   }
@@ -90,17 +114,17 @@ template <typename T = void, typename R = void>
 class Task : public TaskBase<T, R, Task<T, R>> {
  public:
   template <typename Function>
-  Task(const std::string& name, Function&& f, const uint8_t& num_threads = 1);
+  Task(const std::string& name, Function&& f, const uint8_t num_threads = 1);
 };
 
 template <typename T, typename R>
 template <typename Function>
 Task<T, R>::Task(const std::string& name, Function&& f,
-                 const uint8_t& num_threads)
+                 const uint8_t num_threads)
     : TaskBase<T, R, Task<T, R>>(name, num_threads) {
-  auto func = [ f = std::forward<Function&&>(f), this ]() {
-    while (this->IsRunning()) {
-      auto msg = this->GetTaskData();
+  auto func = [ f = std::forward<Function&&>(f), data = this->shared_data_]() {
+    while (true) {
+      auto msg = data->GetTaskData();
       if (msg == nullptr) {
         auto routine = croutine::CRoutine::GetCurrentRoutine();
         routine->Sleep(1000);
@@ -114,22 +138,19 @@ Task<T, R>::Task(const std::string& name, Function&& f,
 
 template <typename T>
 class Task<T, void> : public TaskBase<T, void, Task<T, void>> {
- private:
-  typedef TaskBase<T, void, Task<T, void>> Base;
-
  public:
   template <typename Function>
-  Task(const std::string& name, Function&& f, const uint8_t& num_threads = 1);
+  Task(const std::string& name, Function&& f, const uint8_t num_threads = 1);
 };
 
 template <typename T>
 template <typename Function>
 Task<T, void>::Task(const std::string& name, Function&& f,
-                    const uint8_t& num_threads)
+                    const uint8_t num_threads)
     : TaskBase<T, void, Task<T, void>>(name, num_threads) {
-  auto func = [ f = std::forward<Function&&>(f), this ]() {
-    while (this->IsRunning()) {
-      auto msg = this->GetTaskData();
+  auto func = [ f = std::forward<Function&&>(f), data = this->shared_data_ ]() {
+    while (true) {
+      auto msg = data->GetTaskData();
       if (msg == nullptr) {
         auto routine = croutine::CRoutine::GetCurrentRoutine();
         routine->Sleep(1000);
@@ -143,57 +164,30 @@ Task<T, void>::Task(const std::string& name, Function&& f,
 }
 
 template <typename T, typename R, typename Derived>
-bool TaskBase<T, R, Derived>::IsRunning() const {
-  std::lock_guard<std::mutex> lg(mutex_);
-  return running_;
-}
-
-template <typename T, typename R, typename Derived>
 void TaskBase<T, R, Derived>::Stop() {
-  std::lock_guard<std::mutex> lg(mutex_);
-  data_list_.clear();
-  running_ = false;
-}
-
-template <typename T, typename R, typename Derived>
-TaskBase<T, R, Derived>::~TaskBase() {
-  Stop();
+  shared_data_->ClearData();
   for (int i = 0; i < num_threads_; ++i) {
     scheduler::Scheduler::Instance()->RemoveTask(name_ + std::to_string(i));
   }
 }
 
 template <typename T, typename R, typename Derived>
-std::future<R> TaskBase<T, R, Derived>::Execute(const std::shared_ptr<T>& val) {
-  auto task = std::make_shared<TaskData<T, R>>();
-  task->raw_data = val;
-  {
-    std::lock_guard<std::mutex> lg(mutex_);
-    data_list_.emplace_back(task);
-  }
-  // data::DataNotifier::Instance()->Notify(task_id_);
-  return task->prom.get_future();
+TaskBase<T, R, Derived>::~TaskBase() {
+  Stop();
 }
 
 template <typename T, typename R, typename Derived>
-std::shared_ptr<TaskData<T, R>> TaskBase<T, R, Derived>::GetTaskData() {
-  std::lock_guard<std::mutex> lg(mutex_);
-  if (!running_) {
-    return nullptr;
-  }
-
-  if (data_list_.empty()) {
-    return nullptr;
-  }
-  auto task = data_list_.front();
-  data_list_.pop_front();
-  return task;
+std::future<R> TaskBase<T, R, Derived>::Execute(const std::shared_ptr<T>& val) {
+  auto task = std::make_shared<TaskData<T, R>>();
+  task->raw_data = val;
+  shared_data_->Enqueue(task);
+  return task->prom.get_future();
 }
 
 template <>
 template <typename Function>
 Task<void, void>::Task(const std::string& name, Function&& f,
-                       const uint8_t& num_threads)
+                       const uint8_t num_threads)
     : TaskBase<void, void, Task<void, void>>(name, num_threads) {
   auto data = std::make_shared<TaskData<void, void>>();
   auto func = [ f = std::forward<Function&&>(f), data ]() {
