@@ -49,10 +49,12 @@ cc_binary(
 cc_library(
     name = "planning_lib",
     srcs = [
+        "navi_planning.cc",
         "planning_base.cc",
         "std_planning.cc",
     ],
     hdrs = [
+        "navi_planning.h",
         "planning_base.h",
         "std_planning.h",
     ],
