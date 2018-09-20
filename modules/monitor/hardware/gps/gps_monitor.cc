@@ -40,8 +40,8 @@ namespace apollo {
 namespace monitor {
 
 using apollo::drivers::gnss::GnssBestPose;
-using apollo::drivers::gnss_status::GnssStatus;
-using apollo::drivers::gnss_status::InsStatus;
+using apollo::drivers::gnss::GnssStatus;
+using apollo::drivers::gnss::InsStatus;
 
 GpsMonitor::GpsMonitor() : RecurrentRunner(FLAGS_gps_monitor_name,
                                            FLAGS_gps_monitor_interval) {

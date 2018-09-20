@@ -37,6 +37,11 @@ namespace apollo {
 namespace drivers {
 namespace gnss {
 
+using ::apollo::localization::CorrectedImu;
+using ::apollo::localization::Gps;
+
+using apollo::transform::TransformStamped;
+
 namespace {
 
 constexpr double DEG_TO_RAD_LOCAL = M_PI / 180.0;
@@ -60,7 +65,7 @@ Parser *CreateParser(config::Config config, bool is_base_station = false) {
 }  // namespace
 
 DataParser::DataParser(const config::Config &config,
-                       const std::shared_ptr<Node> &node)
+                       const std::shared_ptr<apollo::cybertron::Node> &node)
     : config_(config), tf_broadcaster_(node), node_(node) {
   std::string utm_target_param;
 
@@ -110,12 +115,12 @@ bool DataParser::Init() {
     return false;
   }
 
-  inited_flag_ = true;
+  init_flag_ = true;
   return true;
 }
 
 void DataParser::ParseRawData(const std::string &msg) {
-  if (!inited_flag_) {
+  if (!init_flag_) {
     AERROR << "Data parser not init.";
     return;
   }
@@ -136,17 +141,16 @@ void DataParser::CheckInsStatus(::apollo::drivers::gnss::Ins *ins) {
     ins_status_record_ = static_cast<uint32_t>(ins->type());
     switch (ins->type()) {
       case apollo::drivers::gnss::Ins::GOOD:
-        ins_status_.set_type(apollo::drivers::gnss_status::InsStatus::GOOD);
+        ins_status_.set_type(apollo::drivers::gnss::InsStatus::GOOD);
         break;
 
       case apollo::drivers::gnss::Ins::CONVERGING:
-        ins_status_.set_type(
-            apollo::drivers::gnss_status::InsStatus::CONVERGING);
+        ins_status_.set_type(apollo::drivers::gnss::InsStatus::CONVERGING);
         break;
 
       case apollo::drivers::gnss::Ins::INVALID:
       default:
-        ins_status_.set_type(apollo::drivers::gnss_status::InsStatus::INVALID);
+        ins_status_.set_type(apollo::drivers::gnss::InsStatus::INVALID);
         break;
     }
 

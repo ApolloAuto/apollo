@@ -33,7 +33,7 @@ using ::apollo::drivers::gnss::EpochObservation;
 using ::apollo::drivers::gnss::GnssEphemeris;
 
 RtcmParser::RtcmParser(const config::Config &config,
-           const std::shared_ptr<Node> &node)
+           const std::shared_ptr<apollo::cybertron::Node> &node)
     : config_(config), node_(node) {
 }
 
@@ -50,12 +50,12 @@ bool RtcmParser::Init() {
   epochobservation_writer_ = node_->CreateWriter<EpochObservation>(
       config_.epochobservation_channel_name());
 
-  inited_flag_ = true;
+  init_flag_ = true;
   return true;
 }
 
 void RtcmParser::ParseRtcmData(const std::string& msg) {
-  if (!inited_flag_) {
+  if (!init_flag_) {
     return;
   }
 

@@ -41,12 +41,9 @@ namespace gnss {
 
 #define EPOCH_AND_SYSTEM_DIFF_SECONDS 315964800
 
-// A general pointer to a protobuf message.
-using MessagePtr = ::google::protobuf::Message *;
-
 // A helper function that returns a pointer to a protobuf message of type T.
 template <class T>
-inline T *As(MessagePtr message_ptr) {
+inline T *As(::google::protobuf::Message *message_ptr) {
   return dynamic_cast<T *>(message_ptr);
 }
 
@@ -54,6 +51,8 @@ inline T *As(MessagePtr message_ptr) {
 // One should use the create_xxx() functions to create a Parser object.
 class Parser {
  public:
+  // A general pointer to a protobuf message.
+  using MessagePtr = ::google::protobuf::Message *;
   // Return a pointer to a NovAtel parser. The caller should take ownership.
   static Parser *CreateNovatel(const config::Config &config);
 
