@@ -134,7 +134,7 @@ TEST(RecordTest, TestMutiMessageFile) {
   std::string pbmsg_content("");
   pbmsg.SerializeToString(&pbmsg_content);
 
-  ASSERT_TRUE(rw->WritePbMessage<Channel>(CHANNEL_NAME_2, pbmsg, TIME_2, PROTO_DESC));
+  ASSERT_TRUE(rw->WriteMessage<Channel>(CHANNEL_NAME_2, pbmsg, TIME_2, PROTO_DESC));
   ASSERT_EQ(1, rw->GetMessageNumber(CHANNEL_NAME_2));
 
   ASSERT_TRUE(rw->WriteMessage(CHANNEL_NAME_1, rm, TIME_3));
