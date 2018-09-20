@@ -27,7 +27,6 @@
 #include "cybertron/cybertron.h"
 #include "cybertron/message/raw_message.h"
 #include "cybertron/tf2_cybertron/buffer.h"
-#include "cybertron/tf2_cybertron/transform_broadcaster.h"
 
 #include "modules/localization/msf/msf_localization.h"
 
@@ -37,6 +36,7 @@
 #include "modules/drivers/proto/pointcloud.pb.h"
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/localization/proto/msf_config.pb.h"
+#include "modules/transform/transform_broadcaster.h"
 
 namespace apollo {
 namespace localization {
@@ -99,7 +99,7 @@ class LocalizationMsgPublisher {
 
   std::string broadcast_tf_frame_id_ = "";
   std::string broadcast_tf_child_frame_id_ = "";
-  cybertron::tf2_cybertron::TransformBroadcaster tf2_broadcaster_;
+  apollo::transform::TransformBroadcaster tf2_broadcaster_;
 };
 
 }  // namespace localization

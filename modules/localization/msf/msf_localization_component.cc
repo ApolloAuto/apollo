@@ -116,7 +116,7 @@ bool MSFLocalizationComponent::Proc(
 
 LocalizationMsgPublisher::LocalizationMsgPublisher(
     const std::shared_ptr<cybertron::Node>& node)
-    : node_(node) {}
+    : node_(node), tf2_broadcaster_(node) {}
 
 bool LocalizationMsgPublisher::InitConfig(const msf_config::Config& config) {
   localization_topic_ = config.localization_topic();
@@ -134,11 +134,10 @@ bool LocalizationMsgPublisher::InitIO() {
 void LocalizationMsgPublisher::PublishPoseBroadcastTF(
     const LocalizationEstimate& localization) {
   // broadcast tf message
-  adu::common::TransformStamped tf2_msg;
+  apollo::transform::TransformStamped tf2_msg;
 
   auto mutable_head = tf2_msg.mutable_header();
-  mutable_head->set_stamp(
-      cybertron::Time(localization.measurement_time()).ToNanosecond());
+  mutable_head->set_timestamp_sec(localization.measurement_time());
   mutable_head->set_frame_id(broadcast_tf_frame_id_);
   tf2_msg.set_child_frame_id(broadcast_tf_child_frame_id_);
 

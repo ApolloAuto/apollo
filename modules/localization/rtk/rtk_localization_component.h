@@ -24,14 +24,13 @@
 #include "cybertron/component/component.h"
 #include "cybertron/cybertron.h"
 #include "cybertron/message/raw_message.h"
-#include "cybertron/tf2_cybertron/buffer.h"
-#include "cybertron/tf2_cybertron/transform_broadcaster.h"
 
 #include "modules/localization/proto/gps.pb.h"
 #include "modules/localization/proto/imu.pb.h"
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/localization/proto/rtk_config.pb.h"
 #include "modules/localization/rtk/rtk_localization.h"
+#include "modules/transform/transform_broadcaster.h"
 
 namespace apollo {
 namespace localization {
@@ -68,7 +67,7 @@ class RTKLocalizationComponent final
 
   std::string broadcast_tf_frame_id_ = "";
   std::string broadcast_tf_child_frame_id_ = "";
-  cybertron::tf2_cybertron::TransformBroadcaster tf2_broadcaster_;
+  std::unique_ptr<apollo::transform::TransformBroadcaster> tf2_broadcaster_;
 
   std::unique_ptr<RTKLocalization> localization_;
 };

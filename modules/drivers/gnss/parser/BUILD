@@ -25,6 +25,7 @@ cc_library(
         "//modules/drivers/gnss/util:gnss_util",
         "//modules/localization/proto:gps_proto",
         "//modules/localization/proto:imu_proto",
+        "//modules/transform:transform_broadcaster_lib",
         "@proj4",
         "//framework:cybertron",
         "@eigen",

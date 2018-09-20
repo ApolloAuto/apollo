@@ -61,7 +61,7 @@ Parser *CreateParser(config::Config config, bool is_base_station = false) {
 
 DataParser::DataParser(const config::Config &config,
                        const std::shared_ptr<Node> &node)
-    : config_(config), node_(node) {
+    : config_(config), tf_broadcaster_(node), node_(node) {
   std::string utm_target_param;
 
   wgs84pj_source_ = pj_init_plus(WGS84_TEXT);
@@ -327,8 +327,7 @@ void DataParser::PublishHeading(const MessagePtr message) {
 
 void DataParser::GpsToTransformStamped(const std::shared_ptr<Gps> &gps,
                                        TransformStamped *transform) {
-  transform->mutable_header()->set_stamp(gps->header().timestamp_sec() *
-                                         1000000000UL);
+  transform->mutable_header()->set_timestamp_sec(gps->header().timestamp_sec());
   transform->mutable_header()->set_frame_id(config_.tf().frame_id());
   transform->set_child_frame_id(config_.tf().child_frame_id());
   auto translation = transform->mutable_transform()->mutable_translation();

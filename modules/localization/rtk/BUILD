@@ -23,6 +23,7 @@ cc_library(
         "//modules/localization/proto:rtk_config_proto",
         "//modules/localization/proto:gps_proto",
         "//modules/localization/proto:imu_proto",
+        "//modules/transform:transform_broadcaster_lib",
         "//framework:cybertron",
         "@eigen",
         "@gtest",
