@@ -17,8 +17,11 @@
 #ifndef MODULES_PREDICTION_SCENARIO_ANALYZER_SCENARIO_ANALYZER_H_
 #define MODULES_PREDICTION_SCENARIO_ANALYZER_SCENARIO_ANALYZER_H_
 
+#include <memory>
+
 #include "modules/prediction/proto/scenario.pb.h"
 #include "modules/prediction/common/environment_features.h"
+#include "modules/prediction/scenario/scenario_features/scenario_features.h"
 
 namespace apollo {
 namespace prediction {
@@ -33,6 +36,7 @@ class ScenarioAnalyzer {
 
   const Scenario& scenario() const;
 
+  std::shared_ptr<const ScenarioFeatures> GetScenarioFeatures() const;
  private:
   Scenario scenario_;
 };
