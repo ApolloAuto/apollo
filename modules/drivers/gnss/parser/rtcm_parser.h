@@ -30,17 +30,11 @@ namespace apollo {
 namespace drivers {
 namespace gnss {
 
-using ::apollo::drivers::gnss::EpochObservation;
-using ::apollo::drivers::gnss::GnssEphemeris;
-
-using apollo::cybertron::Node;
-using apollo::cybertron::Reader;
-using apollo::cybertron::Writer;
-
 class RtcmParser {
  public:
-  RtcmParser(const config::Config &config,
-             const std::shared_ptr<Node> &node);
+  using MessagePtr = ::google::protobuf::Message*;
+  RtcmParser(const config::Config& config,
+             const std::shared_ptr<apollo::cybertron::Node>& node);
   ~RtcmParser() {}
   bool Init();
   void ParseRtcmData(const std::string& msg);
@@ -51,10 +45,12 @@ class RtcmParser {
   void PublishObservation(const MessagePtr& message);
 
   config::Config config_;
-  std::shared_ptr<Node> node_ = nullptr;
-  std::shared_ptr<Writer<GnssEphemeris>> gnssephemeris_writer_ = nullptr;
-  std::shared_ptr<Writer<EpochObservation>> epochobservation_writer_ = nullptr;
-  bool inited_flag_ = false;
+  std::shared_ptr<apollo::cybertron::Node> node_ = nullptr;
+  std::shared_ptr<apollo::cybertron::Writer<GnssEphemeris>>
+      gnssephemeris_writer_ = nullptr;
+  std::shared_ptr<apollo::cybertron::Writer<EpochObservation>>
+      epochobservation_writer_ = nullptr;
+  bool init_flag_ = false;
   std::unique_ptr<Parser> rtcm_parser_ = nullptr;
 };
 

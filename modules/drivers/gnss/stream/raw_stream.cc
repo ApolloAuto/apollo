@@ -32,7 +32,7 @@ namespace apollo {
 namespace drivers {
 namespace gnss {
 
-// using apollo::common::adapter::AdapterManager;
+using apollo::canbus::Chassis;
 
 void switch_stream_status(const apollo::drivers::gnss::Stream::Status &status,
                           StreamStatus_Type *report_status_type) {
@@ -131,7 +131,7 @@ Stream *create_stream(const config::Stream &sd) {
 }
 
 RawStream::RawStream(const config::Config &config,
-                     const std::shared_ptr<Node> &node)
+                     const std::shared_ptr<apollo::cybertron::Node> &node)
     : config_(config), node_(node) {
   data_parser_ptr_.reset(new DataParser(config_, node_));
   rtcm_parser_ptr_.reset(new RtcmParser(config_, node_));
@@ -162,9 +162,6 @@ bool RawStream::Init() {
 
   common::util::FillHeader("gnss", &stream_status_);
   stream_writer_->Write(std::make_shared<StreamStatus>(stream_status_));
-  // AdapterManager::FillStreamStatusHeader(FLAGS_sensor_node_name,
-  //                                       &stream_status_);
-  // AdapterManager::PublishStreamStatus(stream_status_);
 
   // Creates streams.
   Stream *s = nullptr;
@@ -273,7 +270,6 @@ bool RawStream::Init() {
   const std::string gpsbin_file = getLocalTimeFileStr(config_.gpsbin_folder());
   gpsbin_stream_.reset(new std::ofstream(
       gpsbin_file, std::ios::app | std::ios::out | std::ios::binary));
-  //  AdapterManager::AddGnssRawDataCallback(&RawStream::GpsbinCallback, this);
   stream_writer_ =
       node_->CreateWriter<StreamStatus>(config_.stream_channel_name());
   raw_writer_ = node_->CreateWriter<RawData>(config_.raw_channel_name());
@@ -295,19 +291,13 @@ void RawStream::Start() {
   data_thread_ptr_.reset(new std::thread(&RawStream::DataSpin, this));
   rtk_thread_ptr_.reset(new std::thread(&RawStream::RtkSpin, this));
   if (config_.has_wheel_parameters()) {
-    wheel_velocity_timer_.reset(
-        new Timer(1000, [this]() { this->OnWheelVelocityTimer(); }, false));
+    wheel_velocity_timer_.reset(new cybertron::Timer(
+        1000, [this]() { this->OnWheelVelocityTimer(); }, false));
     wheel_velocity_timer_->Start();
   }
 }
 
 void RawStream::OnWheelVelocityTimer() {
-  // AdapterManager::Observe();
-  // if (AdapterManager::GetChassis()->Empty()) {
-  //  AINFO << "No chassis message received";
-  //  return;
-  //}
-  // auto chassis = AdapterManager::GetChassis()->GetLatestObservedPtr();
   if (chassis_ptr_ == nullptr) {
     AINFO << "No chassis message received";
     return;
@@ -467,18 +457,12 @@ void RawStream::StreamStatusCheck() {
   }
 
   if (status_report) {
-    // AdapterManager::FillStreamStatusHeader(FLAGS_sensor_node_name,
-    //                                       &stream_status_);
-    // AdapterManager::PublishStreamStatus(stream_status_);
     common::util::FillHeader("gnss", &stream_status_);
     stream_writer_->Write(std::make_shared<StreamStatus>(stream_status_));
   }
 }
 
 void RawStream::DataSpin() {
-  // AdapterManager::FillStreamStatusHeader(FLAGS_sensor_node_name,
-  //                                       &stream_status_);
-  // AdapterManager::PublishStreamStatus(stream_status_);
   common::util::FillHeader("gnss", &stream_status_);
   stream_writer_->Write(std::make_shared<StreamStatus>(stream_status_));
   while (cybertron::OK()) {
@@ -490,8 +474,6 @@ void RawStream::DataSpin() {
         continue;
       }
       msg_pub->set_data(reinterpret_cast<const char *>(buffer_), length);
-      //      AdapterManager::PublishGnssRawData(*msg_pub);  // for data
-      //      recorder
       raw_writer_->Write(msg_pub);
       data_parser_ptr_->ParseRawData(msg_pub->data());
       if (push_location_) {
@@ -526,16 +508,15 @@ void RawStream::RtkSpin() {
   }
 }
 
-void RawStream::PublishRtkData(size_t length) {
+void RawStream::PublishRtkData(const size_t length) {
   std::shared_ptr<RawData> rtk_msg = std::make_shared<RawData>();
   CHECK_NOTNULL(rtk_msg);
   rtk_msg->set_data(reinterpret_cast<const char *>(buffer_rtk_), length);
-  //  AdapterManager::PublishRtcmData(*rtkmsg);
   rtcm_writer_->Write(rtk_msg);
   rtcm_parser_ptr_->ParseRtcmData(rtk_msg->data());
 }
 
-void RawStream::PushGpgga(size_t length) {
+void RawStream::PushGpgga(const size_t length) {
   if (!in_rtk_stream_) {
     return;
   }

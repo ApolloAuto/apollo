@@ -36,20 +36,10 @@ namespace apollo {
 namespace drivers {
 namespace gnss {
 
-using apollo::canbus::Chassis;
-using apollo::drivers::gnss::RawData;
-using apollo::drivers::gnss_status::StreamStatus;
-using apollo::drivers::gnss_status::StreamStatus_Type;
-
-using apollo::cybertron::Node;
-using apollo::cybertron::Reader;
-using apollo::cybertron::Timer;
-using apollo::cybertron::Writer;
-
 class RawStream {
  public:
   explicit RawStream(const config::Config& config,
-                     const std::shared_ptr<Node>& node);
+                     const std::shared_ptr<apollo::cybertron::Node>& node);
   ~RawStream();
   bool Init();
 
@@ -75,7 +65,7 @@ class RawStream {
   void OnWheelVelocityTimer();
 
   std::unique_ptr<cybertron::Timer> wheel_velocity_timer_ = nullptr;
-  std::shared_ptr<Chassis> chassis_ptr_ = nullptr;
+  std::shared_ptr<apollo::canbus::Chassis> chassis_ptr_ = nullptr;
   static constexpr size_t BUFFER_SIZE = 2048;
   uint8_t buffer_[BUFFER_SIZE] = {0};
   uint8_t buffer_rtk_[BUFFER_SIZE] = {0};
@@ -106,12 +96,14 @@ class RawStream {
   std::unique_ptr<std::thread> gpsbin_thread_ptr_;
   std::unique_ptr<std::ofstream> gpsbin_stream_ = nullptr;
 
-  std::shared_ptr<Node> node_ = nullptr;
-  std::shared_ptr<Writer<StreamStatus>> stream_writer_ = nullptr;
-  std::shared_ptr<Writer<RawData>> raw_writer_ = nullptr;
-  std::shared_ptr<Writer<RawData>> rtcm_writer_ = nullptr;
-  std::shared_ptr<Reader<RawData>> gpsbin_reader_ = nullptr;
-  std::shared_ptr<Reader<Chassis>> chassis_reader_ = nullptr;
+  std::shared_ptr<apollo::cybertron::Node> node_ = nullptr;
+  std::shared_ptr<apollo::cybertron::Writer<StreamStatus>> stream_writer_ =
+      nullptr;
+  std::shared_ptr<apollo::cybertron::Writer<RawData>> raw_writer_ = nullptr;
+  std::shared_ptr<apollo::cybertron::Writer<RawData>> rtcm_writer_ = nullptr;
+  std::shared_ptr<apollo::cybertron::Reader<RawData>> gpsbin_reader_ = nullptr;
+  std::shared_ptr<apollo::cybertron::Reader<apollo::canbus::Chassis>>
+      chassis_reader_ = nullptr;
 };
 
 }  // namespace gnss
