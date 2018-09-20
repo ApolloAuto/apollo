@@ -39,8 +39,8 @@ class Screen;
 
 class RenderableMessage {
  public:
-  explicit RenderableMessage(RenderableMessage* parent = nullptr)
-      : parent_(parent) {}
+  explicit RenderableMessage(RenderableMessage* parent = nullptr, int lineNo = 0)
+      : parent_(parent), line_no_(lineNo) {}
 
   virtual ~RenderableMessage() { parent_ = nullptr; }
 
@@ -55,9 +55,15 @@ class RenderableMessage {
   }
 
   virtual RenderableMessage* Child(int /* lineNo */) const { return nullptr; }
-
+  
  protected:
+  int LineNo(void)const{return line_no_; }
+  void set_line_no(int lineNo){ line_no_ = lineNo; }
+
+  int line_no_;
   RenderableMessage* parent_;
+
+  friend class Screen;
 };
 
 #endif  // TOOLS_CVT_MONITOR_RENDERABLE_MESSAGE_H_

@@ -25,150 +25,10 @@
 namespace {
 constexpr int ReaderWriterOffset = 4;
 constexpr int PageItemCountOffset = 3;
-int lineCount(const google::protobuf::Message& msg, int screenWidth,
-              std::map<const int, RepeatedItemsMessage*>* childrenMap = nullptr,
-              GeneralMessage* gMsg = nullptr) {
-  const google::protobuf::Descriptor* descriptor = msg.GetDescriptor();
-  const google::protobuf::Reflection* reflection = msg.GetReflection();
-
-  std::vector<const google::protobuf::FieldDescriptor*> fields;
-  reflection->ListFields(msg, &fields);
-
-  int fsize = fields.size();
-  int ret = 0;
-  for (int i = 0; i < fsize; ++i, ++ret) {
-    const google::protobuf::FieldDescriptor* field = fields[i];
-    if (childrenMap && field->is_repeated()) {
-      RepeatedItemsMessage* item = new RepeatedItemsMessage(gMsg, i);
-      childrenMap->insert(std::make_pair(ret, item));
-    }
-
-    if (!field->is_repeated()) {
-      switch (field->cpp_type()) {
-        case google::protobuf::FieldDescriptor::CPPTYPE_STRING: {
-          std::string scratch;
-          const std::string& value =
-              reflection->GetStringReference(msg, field, &scratch);
-          ret += value.size() / screenWidth;
-          break;
-        }
-
-        case google::protobuf::FieldDescriptor::CPPTYPE_MESSAGE:
-          const google::protobuf::Message& childMsg =
-              reflection->GetMessage(msg, field);
-          ret += lineCount(childMsg, screenWidth) + 1;
-          break;
-
-      }  // end switch
-    }
-  }  // end for
-
-  return ret;
-}
 }  // namespace
 
-void GeneralMessage::PrintMessage(const google::protobuf::Message& msg, const Screen* s,
-                  unsigned& lineNo, int indent, int jumpLines) {
-  // const google::protobuf::Descriptor* descriptor = msg.GetDescriptor();
-  const google::protobuf::Reflection* reflection = msg.GetReflection();
-
-  std::vector<const google::protobuf::FieldDescriptor*> fields;
-  reflection->ListFields(msg, &fields);
-
-  int i = 0;
-  for (; i < fields.size() && jumpLines > 1; ++i) {
-    const google::protobuf::FieldDescriptor* field = fields[i];
-    --jumpLines;
-
-    if (!field->is_repeated()) {
-      switch (field->cpp_type()) {
-        case google::protobuf::FieldDescriptor::CPPTYPE_STRING: {
-          std::string scratch;
-          const std::string& value =
-              reflection->GetStringReference(msg, field, &scratch);
-          jumpLines -= value.size() / s->Width();
-          break;
-        }
-
-        case google::protobuf::FieldDescriptor::CPPTYPE_MESSAGE:
-          jumpLines -=
-              lineCount(reflection->GetMessage(msg, field), s->Width());
-          break;
-      }  // end switch
-    }
-  }
-
-  for (; i < fields.size(); ++i) {
-    GeneralMessage::PrintFieldValue(msg, reflection, s, lineNo, indent,
-                                    fields[i]);
-  }  // end for
-}
-
-void GeneralMessage::PrintFieldValue(
-    const google::protobuf::Message& msg,
-    const google::protobuf::Reflection* reflection, const Screen* s,
-    unsigned& lineNo, int indent,
-    const google::protobuf::FieldDescriptor* field) {
-      
-  const std::string& fieldName = field->name();
-  std::ostringstream outStr;
-
-  outStr << fieldName << ": ";
-  if (field->is_repeated()) {
-    outStr << "+[" << reflection->FieldSize(msg, field) << " items]";
-  } else {
-    switch (field->cpp_type()) {
-#define OUTPUT_FIELD(CPPTYPE, METHOD)                        \
-  case google::protobuf::FieldDescriptor::CPPTYPE_##CPPTYPE: \
-    outStr << reflection->Get##METHOD(msg, field);           \
-    break
-
-      OUTPUT_FIELD(INT32, Int32);
-      OUTPUT_FIELD(INT64, Int64);
-      OUTPUT_FIELD(UINT32, UInt32);
-      OUTPUT_FIELD(UINT64, UInt64);
-      OUTPUT_FIELD(FLOAT, Float);
-      OUTPUT_FIELD(DOUBLE, Double);
-      OUTPUT_FIELD(BOOL, Bool);
-#undef OUTPUT_FIELD
-
-      case google::protobuf::FieldDescriptor::CPPTYPE_ENUM: {
-        int enum_value = reflection->GetEnumValue(msg, field);
-        outStr << enum_value;
-        break;
-      }
-
-      case google::protobuf::FieldDescriptor::CPPTYPE_STRING: {
-        std::string scratch;
-        const std::string& value =
-            reflection->GetStringReference(msg, field, &scratch);
-        outStr << value;
-        break;
-      }
-
-      case google::protobuf::FieldDescriptor::CPPTYPE_MESSAGE:
-        s->AddStr(indent, lineNo++, outStr.str().c_str());
-        PrintMessage(reflection->GetMessage(msg, field), s, lineNo, indent + 2);
-        outStr.str("");
-        break;
-    }  // end switch
-  }    // end else
-
-  s->AddStr(indent, lineNo++, outStr.str().c_str());
-}
-
 RenderableMessage* GeneralMessage::Child(int lineNo) const {
-  lineNo -= 3;  // 3 is the fixed offset value, 0 for ChannelName, 1 for
-                // MessageType, 2 for FrameRatio
-  if (lineNo < 0) {
-    return nullptr;
-  }
-  auto iter = children_map_.find(lineNo);
-  if (iter == children_map_.cend()) {
-    return nullptr;
-  }
-
-  return iter->second;
+  return GeneralMessageBase::Child(lineNo);
 }
 
 void GeneralMessage::Render(const Screen* s, int key) {
@@ -278,11 +138,7 @@ void GeneralMessage::RenderDebugString(const Screen* s, int key,
       raw_msg_class_ = rawFactory->GenerateMessageByType(message_type());
     }
 
-    for (auto& iter : children_map_) {
-      delete iter.second;
-    }
-
-    children_map_.clear();
+    clear();
 
     if (raw_msg_class_ == nullptr) {
       s->AddStr(0, lineNo++, "Cannot Generate Message by Message Type");
@@ -296,12 +152,12 @@ void GeneralMessage::RenderDebugString(const Screen* s, int key,
 
       if (raw_msg_class_->ParseFromString(channelMsg->message)) {
         int lcount =
-            lineCount(*raw_msg_class_, s->Width(), &children_map_, this);
+            lineCount(*raw_msg_class_, s->Width());
         int pageItemCount = s->Height() - lineNo;
         pages_ = lcount / pageItemCount + 1;
         SplitPages(key);
 
-        PrintMessage(*raw_msg_class_, s, lineNo, 0,
+        PrintMessage(this, *raw_msg_class_, s, lineNo, 0,
                      page_index_ * pageItemCount);
 
       } else {

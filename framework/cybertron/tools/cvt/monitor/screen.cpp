@@ -188,6 +188,7 @@ void Screen::Run() {
   }
 
   // int y = 1;
+  highlight_line_no_ = current_render_obj_->LineNo();
   highlight_direction_ = 0;
   move(highlight_line_no_, 0);
 
@@ -249,6 +250,7 @@ void Screen::ShowRenderMessage(int& y, int ch) {
         RenderableMessage* p = current_render_obj_->parent();
         if (p) {
           current_render_obj_ = p;
+          y = p->LineNo();
           clear();
         }
       }
@@ -263,7 +265,9 @@ void Screen::ShowRenderMessage(int& y, int ch) {
         RenderableMessage* child = current_render_obj_->Child(y);
 
         if (child) {
+          current_render_obj_->set_line_no(y);
           current_render_obj_ = child;
+          highlight_line_no_ = child->LineNo();
           clear();
         }
       }

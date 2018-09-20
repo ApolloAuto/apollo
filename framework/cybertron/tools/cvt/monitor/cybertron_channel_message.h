@@ -21,13 +21,14 @@
 #include "cybertron/time/duration.h"
 #include "cybertron/time/time.h"
 #include "renderable_message.h"
+#include "general_message_base.h"
 
 #include <fstream>
 #include <mutex>
 
 class Screen;
 
-class ChannelMessage : public RenderableMessage {
+class ChannelMessage /* : public RenderableMessage */ : public GeneralMessageBase {
  public:
   enum class ErrorCode {
     NewSubClassFailed = -1,
@@ -76,7 +77,7 @@ class ChannelMessage : public RenderableMessage {
   }
 
   explicit ChannelMessage(RenderableMessage* parent = nullptr)
-      : RenderableMessage(parent),
+      : GeneralMessageBase(parent),
         is_enabled_(true),
         has_message_come_(false),
         message_type_(),
@@ -222,23 +223,23 @@ class CybertronChannelMessage : public ChannelMessage {
     return ret;                                                             \
   }
 
-#define BegDefineChannelMsgSubClass(SubClassName, MessageType)            \
-  class SubClassName : public CybertronChannelMessage<MessageType> {      \
-   public:                                                                \
-  RegisterChannelMsgClass(SubClassName, MessageType) virtual void Render( \
-      const Screen* s, int key) override
+// #define BegDefineChannelMsgSubClass(SubClassName, MessageType)            \
+//   class SubClassName : public CybertronChannelMessage<MessageType> {      \
+//    public:                                                                \
+//   RegisterChannelMsgClass(SubClassName, MessageType) virtual void Render( \
+//       const Screen* s, int key) override
 
-#define SubClassDeconstructor(SubClassName) \
- public:                                    \
-  virtual ~SubClassName()
+// #define SubClassDeconstructor(SubClassName) \
+//  public:                                    \
+//   virtual ~SubClassName()
 
-#define SubClassConstructor(SubClassName, MessageType)       \
- private:                                                    \
-  SubClassName(const SubClassName&) = delete;                \
-  SubClassName& operator=(const SubClassName&) = delete;     \
-  explicit SubClassName(RenderableMessage* parent = nullptr) \
-      : CybertronChannelMessage<MessageType>(parent)
+// #define SubClassConstructor(SubClassName, MessageType)       \
+//  private:                                                    \
+//   SubClassName(const SubClassName&) = delete;                \
+//   SubClassName& operator=(const SubClassName&) = delete;     \
+//   explicit SubClassName(RenderableMessage* parent = nullptr) \
+//       : CybertronChannelMessage<MessageType>(parent)
 
-#define EndDefineChannelMsgSubClass(SubClassName) } /* SubClassName */
+// #define EndDefineChannelMsgSubClass(SubClassName) } /* SubClassName */
 
 #endif  // TOOLS_CVT_MONITOR_CYBERTRON_CHANNEL_MESSAGE_H_
