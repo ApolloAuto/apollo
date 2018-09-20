@@ -17,7 +17,6 @@
 #ifndef CYBERTRON_BLOCKER_BLOCKER_H_
 #define CYBERTRON_BLOCKER_BLOCKER_H_
 
-#include <assert.h>
 #include <stddef.h>
 #include <functional>
 #include <list>
@@ -107,10 +106,13 @@ class Blocker : public BlockerBase {
 
   CallbackMap published_callbacks_;
   mutable std::mutex cb_mutex_;
+
+  MessageType dummy_msg_;
 };
 
 template <typename T>
-Blocker<T>::Blocker(const BlockerAttr& attr) : is_full_(false), attr_(attr) {}
+Blocker<T>::Blocker(const BlockerAttr& attr)
+    : is_full_(false), attr_(attr), dummy_msg_() {}
 
 template <typename T>
 Blocker<T>::~Blocker() {
@@ -174,28 +176,36 @@ bool Blocker<T>::Unsubscribe(const std::string& callback_id) {
 template <typename T>
 auto Blocker<T>::GetLatestObserved() const -> const MessageType& {
   std::lock_guard<std::mutex> lock(msg_mutex_);
-  assert(!observed_msg_queue_.empty());
+  if (observed_msg_queue_.empty()) {
+    return dummy_msg_;
+  }
   return *observed_msg_queue_.front();
 }
 
 template <typename T>
 auto Blocker<T>::GetLatestObservedPtr() const -> const MessagePtr {
   std::lock_guard<std::mutex> lock(msg_mutex_);
-  assert(!observed_msg_queue_.empty());
+  if (observed_msg_queue_.empty()) {
+    return nullptr;
+  }
   return observed_msg_queue_.front();
 }
 
 template <typename T>
 auto Blocker<T>::GetOldestObservedPtr() const -> const MessagePtr {
   std::lock_guard<std::mutex> lock(msg_mutex_);
-  assert(!observed_msg_queue_.empty());
+  if (observed_msg_queue_.empty()) {
+    return nullptr;
+  }
   return observed_msg_queue_.back();
 }
 
 template <typename T>
 auto Blocker<T>::GetLatestPublishedPtr() const -> const MessagePtr {
   std::lock_guard<std::mutex> lock(msg_mutex_);
-  assert(!published_msg_queue_.empty());
+  if (published_msg_queue_.empty()) {
+    return nullptr;
+  }
   return published_msg_queue_.front();
 }
 
