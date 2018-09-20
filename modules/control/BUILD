@@ -42,7 +42,7 @@ cc_library(
 cc_binary(
     name = "libcontrol_component.so",
     deps = [":control_component_lib"],
-    linkopts = ["-shared"],
+    linkshared = True,
 )
 
 

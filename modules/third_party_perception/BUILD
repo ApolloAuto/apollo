@@ -90,7 +90,7 @@ cc_library(
 cc_binary(
     name = "libthird_party_perception_component.so",
     deps = [":third_party_perception_component_lib"],
-    linkopts = ["-shared"],
+    linkshared = True,
 )
 
 cpplint()

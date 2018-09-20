@@ -41,7 +41,7 @@ cc_library(
 cc_binary(
     name = "librouting_component.so",
     deps = [":routing_component_lib"],
-    linkopts = ["-shared"],
+    linkshared = True,
 )
 
 filegroup(
