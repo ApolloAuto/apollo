@@ -28,10 +28,28 @@ namespace apollo {
 namespace drivers {
 namespace velodyne {
 
-VelodyneDriver::VelodyneDriver() : basetime_(0), last_gps_time_(0) {}
+void VelodyneDriver::Init() {
+  double frequency = (config_.rpm() / 60.0);  // expected Hz rate
 
-void VelodyneDriver::set_base_time_from_nmea_time(NMEATimePtr nmea_time,
-                                                  uint64_t* basetime) {
+  // default number of packets for each scan is a single revolution
+  // (fractions rounded up)
+  config_.set_npackets(static_cast<int>(ceil(packet_rate_ / frequency)));
+  AINFO << "publishing " << config_.npackets() << " packets per scan";
+
+  // open Velodyne input device
+
+  input_.reset(new SocketInput());
+  positioning_input_.reset(new SocketInput());
+  input_->init(config_.firing_data_port());
+  positioning_input_->init(config_.positioning_data_port());
+
+  // raw data output topic
+  std::thread thread(&VelodyneDriver::PollPositioningPacket, this);
+  thread.detach();
+}
+
+void VelodyneDriver::SetBaseTimeFromNmeaTime(NMEATimePtr nmea_time,
+                                             uint64_t* basetime) {
   tm time;
   time.tm_year = nmea_time->year + (2000 - 1900);
   time.tm_mon = nmea_time->mon - 1;
@@ -50,7 +68,7 @@ void VelodyneDriver::set_base_time_from_nmea_time(NMEATimePtr nmea_time,
   *basetime = unix_base * 1e6;
 }
 
-bool VelodyneDriver::set_base_time() {
+bool VelodyneDriver::SetBaseTime() {
   NMEATimePtr nmea_time(new NMEATime);
   while (true) {
     int rc = input_->get_positioning_data_packet(nmea_time);
@@ -62,15 +80,52 @@ bool VelodyneDriver::set_base_time() {
     }
   }
 
-  set_base_time_from_nmea_time(nmea_time, &basetime_);
+  SetBaseTimeFromNmeaTime(nmea_time, &basetime_);
   input_->init(config_.firing_data_port());
   return true;
 }
 
-int VelodyneDriver::poll_standard(std::shared_ptr<VelodyneScan> scan) {
+/** poll the device
+ *
+ *  @returns true unless end of file reached
+ */
+bool VelodyneDriver::Poll(std::shared_ptr<VelodyneScan> scan) {
+  // Allocate a new shared pointer for zero-copy sharing with other nodelets.
+  if (basetime_ == 0) {
+    usleep(100);  // waiting for positioning data
+    AWARN << "basetime is zero";
+    return false;
+  }
+
+  int poll_result = PollStandard(scan);
+
+  if (poll_result == SOCKET_TIMEOUT || poll_result == RECIEVE_FAIL) {
+    return false;  // poll again
+  }
+
+  if (scan->firing_pkts_size() <= 0) {
+    AINFO << "Get a empty scan from port: " << config_.firing_data_port();
+    return false;
+  }
+
+  // publish message using time of last packet read
+  ADEBUG << "Publishing a full Velodyne scan.";
+  scan->mutable_header()->set_timestamp_sec(cybertron::Time().Now().ToSecond());
+  scan->mutable_header()->set_frame_id(config_.frame_id());
+  // we use first packet gps time update gps base hour
+  // in cloud nodelet, will update base time packet by packet
+  uint32_t current_secs = *(reinterpret_cast<uint32_t*>(
+      const_cast<char*>(scan->firing_pkts(0).data().data() + 1200)));
+
+  UpdateGpsTopHour(current_secs);
+  scan->set_basetime(basetime_);
+
+  return true;
+}
+
+int VelodyneDriver::PollStandard(std::shared_ptr<VelodyneScan> scan) {
   // Since the velodyne delivers data at a very high rate, keep reading and
   // publishing scans as fast as possible.
-  // scan->packets.resize(config_.npackets);
   for (int i = 0; i < config_.npackets(); ++i) {
     while (true) {
       // keep reading until full packet received
@@ -87,7 +142,7 @@ int VelodyneDriver::poll_standard(std::shared_ptr<VelodyneScan> scan) {
   return 0;
 }
 
-void VelodyneDriver::poll_positioning_packet(void) {
+void VelodyneDriver::PollPositioningPacket(void) {
   while (true) {
     NMEATimePtr nmea_time(new NMEATime);
     bool ret = true;
@@ -102,9 +157,9 @@ void VelodyneDriver::poll_positioning_packet(void) {
       nmea_time->min = current_time.tm_min;
       nmea_time->sec = current_time.tm_sec;
       AINFO << "Get NMEA Time from local time :"
-                << "year:" << nmea_time->year << "mon:" << nmea_time->mon
-                << "day:" << nmea_time->day << "hour:" << nmea_time->hour
-                << "min:" << nmea_time->min << "sec:" << nmea_time->sec;
+            << "year:" << nmea_time->year << "mon:" << nmea_time->mon
+            << "day:" << nmea_time->day << "hour:" << nmea_time->hour
+            << "min:" << nmea_time->min << "sec:" << nmea_time->sec;
     } else {
       while (true) {
         int rc = positioning_input_->get_positioning_data_packet(nmea_time);
@@ -118,14 +173,14 @@ void VelodyneDriver::poll_positioning_packet(void) {
     }
 
     if (basetime_ == 0 && ret) {
-      set_base_time_from_nmea_time(nmea_time, &basetime_);
+      SetBaseTimeFromNmeaTime(nmea_time, &basetime_);
     } else {
       usleep(1000);
     }
   }
 }
 
-void VelodyneDriver::update_gps_top_hour(uint32_t current_time) {
+void VelodyneDriver::UpdateGpsTopHour(uint32_t current_time) {
   if (last_gps_time_ == 0) {
     last_gps_time_ = current_time;
     return;
@@ -144,8 +199,9 @@ void VelodyneDriver::update_gps_top_hour(uint32_t current_time) {
   last_gps_time_ = current_time;
 }
 
-VelodyneDriver* VelodyneDriverFactory::create_driver(const Config& config) {
-  Config new_config = config;
+VelodyneDriver* VelodyneDriverFactory::CreateDriver(
+    const config::Config& config) {
+  auto new_config = config;
   if (new_config.prefix_angle() > 35900 || new_config.prefix_angle() < 100) {
     AWARN << "invalid prefix angle, prefix_angle must be between 100 and 35900";
     if (new_config.prefix_angle() > 35900) {
@@ -154,20 +210,44 @@ VelodyneDriver* VelodyneDriverFactory::create_driver(const Config& config) {
       new_config.set_prefix_angle(100);
     }
   }
-  if (config.model() == HDL64E_S2 || config.model() == HDL64E_S3S ||
-      config.model() == HDL64E_S3D) {
-    return new Velodyne64Driver(config);
-  } else if (config.model() == HDL32E) {
-    return new Velodyne32Driver(config);
-  } else if (config.model() == VLP16) {
-    return new Velodyne16Driver(config);
-  } else if (config.model() == VLS128) {
-    return new Velodyne128Driver(config);
-  } else {
-    AERROR << "invalid model, must be 64E_S2|64E_S3S"
-           << "|64E_S3D|VLP16|HDL32E|VLS128";
-    return nullptr;
+  VelodyneDriver* driver = nullptr;
+  switch (config.model()) {
+    case HDL64E_S2: {
+      driver = new Velodyne64Driver(config);
+      driver->SetPacketRate(PACKET_RATE_HDL64E_S2);
+      break;
+    }
+    case HDL64E_S3S: {
+      driver = new Velodyne64Driver(config);
+      driver->SetPacketRate(PACKET_RATE_HDL64E_S3S);
+      break;
+    }
+    case HDL64E_S3D: {
+      driver = new Velodyne64Driver(config);
+      driver->SetPacketRate(PACKET_RATE_HDL64E_S3D);
+      break;
+    }
+    case HDL32E: {
+      driver = new VelodyneDriver(config);
+      driver->SetPacketRate(PACKET_RATE_HDL32E);
+      break;
+    }
+    case VLP16: {
+      driver = new VelodyneDriver(config);
+      driver->SetPacketRate(PACKET_RATE_VLP16);
+      break;
+    }
+    case VLS128: {
+      driver = new VelodyneDriver(config);
+      driver->SetPacketRate(PACKET_RATE_VLS128);
+      break;
+    }
+    default:
+      AERROR << "invalid model, must be 64E_S2|64E_S3S"
+             << "|64E_S3D|VLP16|HDL32E|VLS128";
+      break;
   }
+  return driver;
 }
 
 }  // namespace velodyne

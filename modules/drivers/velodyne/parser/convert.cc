@@ -28,7 +28,7 @@ void Convert::init(const Config& velodyne_config) {
   config_ = velodyne_config;
   // we use beijing time by default
 
-  parser_.reset(VelodyneParserFactory::create_parser(config_));
+  parser_.reset(VelodyneParserFactory::CreateParser(config_));
   if (parser_.get() == nullptr) {
     AFATAL << "Create parser failed.";
     return;
@@ -37,12 +37,12 @@ void Convert::init(const Config& velodyne_config) {
 }
 
 /** @brief Callback for raw scan messages. */
-void Convert::convert_packets_to_pointcloud(
+void Convert::ConvertPacketsToPointcloud(
     const std::shared_ptr<VelodyneScan>& scan_msg,
     std::shared_ptr<PointCloud> point_cloud) {
   ADEBUG << "Convert scan msg seq " << scan_msg->header().sequence_num();
 
-  parser_->generate_pointcloud(scan_msg, point_cloud);
+  parser_->GeneratePointcloud(scan_msg, point_cloud);
 
   if (point_cloud == nullptr || point_cloud->point_size() == 0) {
     AERROR << "point cloud has no point";
@@ -51,11 +51,11 @@ void Convert::convert_packets_to_pointcloud(
 
   if (config_.organized()) {
     ADEBUG << "reorder point cloud";
-    parser_->order(point_cloud);
+    parser_->Order(point_cloud);
   }
 
   if (config_.organized()) {
-    parser_->order(point_cloud);
+    parser_->Order(point_cloud);
     point_cloud->set_is_dense(false);
   } else {
     point_cloud->set_is_dense(true);

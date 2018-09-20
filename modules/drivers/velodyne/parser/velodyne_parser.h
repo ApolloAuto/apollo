@@ -30,7 +30,7 @@
  *
  *  \ingroup velodyne
  *
- *  These classes unpack raw Velodyne LIDAR packets into several
+ *  These classes Unpack raw Velodyne LIDAR packets into several
  *  useful formats.
  *
  *     velodyne::Data -- virtual base class for unpacking data into
@@ -214,7 +214,7 @@ struct RawPacket {
 //  bool calibration_online;
 //  std::string calibration_file;
 //  std::string model;  // VLP16,32E, 64E_32
-//  bool organized;     // is point cloud order
+//  bool organized;     // is point cloud Order
 //};
 
 // enum Mode { STRONGEST, LAST, DUAL };
@@ -239,12 +239,12 @@ class VelodyneParser {
    *  @returns 0 if successful;
    *           errno value for failure
    */
-  virtual void generate_pointcloud(
+  virtual void GeneratePointcloud(
       const std::shared_ptr<VelodyneScan>& scan_msg,
       std::shared_ptr<PointCloud> out_msg) = 0;
   virtual void setup();
-  // order point cloud fod IDL by velodyne model
-  virtual void order(std::shared_ptr<PointCloud> cloud) = 0;
+  // Order point cloud fod IDL by velodyne model
+  virtual void Order(std::shared_ptr<PointCloud> cloud) = 0;
 
   const Calibration& get_calibration() { return calibration_; }
   const double get_last_timestamp() { return last_time_stamp_; }
@@ -269,7 +269,7 @@ class VelodyneParser {
    * @param tmp A two bytes union store the value of laser distance information
    * @param index The index of block
    */
-  void compute_coords(const float& raw_distance,
+  void ComputeCoords(const float& raw_distance,
                       const LaserCorrection& corrections,
                       const uint16_t rotation, PointXYZIT* point);
 
@@ -279,13 +279,13 @@ class VelodyneParser {
    * \brief Unpack velodyne packet
    *
    */
-  virtual void unpack(const VelodynePacket& pkt,
+  virtual void Unpack(const VelodynePacket& pkt,
                       std::shared_ptr<PointCloud> pc) = 0;
 
-  uint64_t get_gps_stamp(double current_stamp, double* previous_stamp,
+  uint64_t GetGpsStamp(double current_stamp, double* previous_stamp,
                          uint64_t* gps_base_usec);
 
-  virtual uint64_t get_timestamp(double base_time, float time_offset,
+  virtual uint64_t GetTimestamp(double base_time, float time_offset,
                                  uint16_t laser_block_id) = 0;
 };  // class VelodyneParser
 
@@ -294,19 +294,19 @@ class Velodyne64Parser : public VelodyneParser {
   explicit Velodyne64Parser(const Config& config);
   ~Velodyne64Parser() {}
 
-  void generate_pointcloud(const std::shared_ptr<VelodyneScan>& scan_msg,
+  void GeneratePointcloud(const std::shared_ptr<VelodyneScan>& scan_msg,
                            std::shared_ptr<PointCloud> out_msg);
-  void order(std::shared_ptr<PointCloud> cloud);
+  void Order(std::shared_ptr<PointCloud> cloud);
   void setup() override;
 
  private:
-  void set_base_time_from_packets(const VelodynePacket& pkt);
-  void check_gps_status(const VelodynePacket& pkt);
-  uint64_t get_timestamp(double base_time, float time_offset,
+  void SetBaseTimeFromPackets(const VelodynePacket& pkt);
+  void CheckGpsStatus(const VelodynePacket& pkt);
+  uint64_t GetTimestamp(double base_time, float time_offset,
                          uint16_t laser_block_id);
-  void unpack(const VelodynePacket& pkt, std::shared_ptr<PointCloud> pc);
-  void init_offsets();
-  int intensity_compensate(const LaserCorrection& corrections,
+  void Unpack(const VelodynePacket& pkt, std::shared_ptr<PointCloud> pc);
+  void InitOffsets();
+  int IntensityCompensate(const LaserCorrection& corrections,
                            const uint16_t raw_distance, int intensity);
   // Previous Velodyne packet time stamp. (offset to the top hour)
   double previous_packet_stamp_[4];
@@ -322,14 +322,14 @@ class Velodyne32Parser : public VelodyneParser {
   explicit Velodyne32Parser(const Config& config);
   ~Velodyne32Parser() {}
 
-  void generate_pointcloud(const std::shared_ptr<VelodyneScan>& scan_msg,
+  void GeneratePointcloud(const std::shared_ptr<VelodyneScan>& scan_msg,
                            std::shared_ptr<PointCloud> out_msg);
-  void order(std::shared_ptr<PointCloud> cloud);
+  void Order(std::shared_ptr<PointCloud> cloud);
 
  private:
-  uint64_t get_timestamp(double base_time, float time_offset,
+  uint64_t GetTimestamp(double base_time, float time_offset,
                          uint16_t laser_block_id);
-  void unpack(const VelodynePacket& pkt, std::shared_ptr<PointCloud> pc);
+  void Unpack(const VelodynePacket& pkt, std::shared_ptr<PointCloud> pc);
   // Previous Velodyne packet time stamp. (offset to the top hour)
   double previous_packet_stamp_;
   uint64_t gps_base_usec_;  // full time
@@ -340,14 +340,14 @@ class Velodyne16Parser : public VelodyneParser {
   explicit Velodyne16Parser(const Config& config);
   ~Velodyne16Parser() {}
 
-  void generate_pointcloud(const std::shared_ptr<VelodyneScan>& scan_msg,
+  void GeneratePointcloud(const std::shared_ptr<VelodyneScan>& scan_msg,
                            std::shared_ptr<PointCloud> out_msg);
-  void order(std::shared_ptr<PointCloud> cloud);
+  void Order(std::shared_ptr<PointCloud> cloud);
 
  private:
-  uint64_t get_timestamp(double base_time, float time_offset,
+  uint64_t GetTimestamp(double base_time, float time_offset,
                          uint16_t laser_block_id);
-  void unpack(const VelodynePacket& pkt, std::shared_ptr<PointCloud> pc);
+  void Unpack(const VelodynePacket& pkt, std::shared_ptr<PointCloud> pc);
   // Previous Velodyne packet time stamp. (offset to the top hour)
   double previous_packet_stamp_;
   uint64_t gps_base_usec_;  // full time
@@ -358,15 +358,15 @@ class Velodyne128Parser : public VelodyneParser {
   explicit Velodyne128Parser(const Config& config);
   ~Velodyne128Parser() {}
 
-  void generate_pointcloud(const std::shared_ptr<VelodyneScan>& scan_msg,
+  void GeneratePointcloud(const std::shared_ptr<VelodyneScan>& scan_msg,
                            std::shared_ptr<PointCloud> out_msg);
-  void order(std::shared_ptr<PointCloud> cloud);
+  void Order(std::shared_ptr<PointCloud> cloud);
 
  private:
-  uint64_t get_timestamp(double base_time, float time_offset,
+  uint64_t GetTimestamp(double base_time, float time_offset,
                          uint16_t laser_block_id);
-  void unpack(const VelodynePacket& pkt, std::shared_ptr<PointCloud> pc);
-  int intensity_compensate(const LaserCorrection& corrections,
+  void Unpack(const VelodynePacket& pkt, std::shared_ptr<PointCloud> pc);
+  int IntensityCompensate(const LaserCorrection& corrections,
                            const uint16_t raw_distance, int intensity);
   // Previous Velodyne packet time stamp. (offset to the top hour)
   double previous_packet_stamp_;
@@ -375,7 +375,7 @@ class Velodyne128Parser : public VelodyneParser {
 
 class VelodyneParserFactory {
  public:
-  static VelodyneParser* create_parser(Config config);
+  static VelodyneParser* CreateParser(Config config);
 };
 
 }  // namespace velodyne

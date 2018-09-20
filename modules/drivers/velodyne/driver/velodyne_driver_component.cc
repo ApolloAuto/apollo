@@ -30,20 +30,18 @@ namespace velodyne {
 bool VelodyneDriverComponent::Init() {
   AINFO << "Velodyne driver component init";
   Config velodyne_config;
-  if (!apollo::cybertron::common::GetProtoFromFile(config_file_path_,
-                                                   &velodyne_config)) {
+  if (!GetProtoConfig(&velodyne_config)) {
     return false;
   }
   AINFO << "Velodyne config: " << velodyne_config.DebugString();
   // start the driver
   writer_ = node_->CreateWriter<VelodyneScan>(velodyne_config.scan_channel());
-  VelodyneDriver *driver =
-      VelodyneDriverFactory::create_driver(velodyne_config);
+  VelodyneDriver *driver = VelodyneDriverFactory::CreateDriver(velodyne_config);
   if (driver == nullptr) {
     return false;
   }
   dvr_.reset(driver);
-  dvr_->init();
+  dvr_->Init();
   // spawn device poll thread
   runing_ = true;
   device_thread_ = std::shared_ptr<std::thread>(
@@ -58,7 +56,7 @@ void VelodyneDriverComponent::device_poll() {
   while (!apollo::cybertron::IsShutdown()) {
     // poll device until end of file
     std::shared_ptr<VelodyneScan> scan = std::make_shared<VelodyneScan>();
-    bool ret = dvr_->poll(scan);
+    bool ret = dvr_->Poll(scan);
     if (ret) {
       common::util::FillHeader("velodyne", scan.get());
       writer_->Write(scan);

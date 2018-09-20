@@ -22,12 +22,11 @@ namespace velodyne {
 
 Velodyne128Parser::Velodyne128Parser(const Config& config)
     : VelodyneParser(config), previous_packet_stamp_(0), gps_base_usec_(0) {
-  // TODO(dengchengliang): wait for lidar128 manual
   inner_time_ = &velodyne::INNER_TIME_128;
   need_two_pt_correction_ = false;
 }
 
-void Velodyne128Parser::generate_pointcloud(
+void Velodyne128Parser::GeneratePointcloud(
     const std::shared_ptr<VelodyneScan>& scan_msg,
     std::shared_ptr<PointCloud> out_msg) {
   // allocate a point cloud with same time and frame ID as raw data
@@ -40,7 +39,7 @@ void Velodyne128Parser::generate_pointcloud(
   gps_base_usec_ = scan_msg->basetime();
 
   for (int i = 0; i < scan_msg->firing_pkts_size(); ++i) {
-    unpack(scan_msg->firing_pkts(i), out_msg);
+    Unpack(scan_msg->firing_pkts(i), out_msg);
     last_time_stamp_ = out_msg->measurement_time();
   }
 
@@ -57,21 +56,21 @@ void Velodyne128Parser::generate_pointcloud(
   out_msg->set_width(out_msg->point_size());
 }
 
-uint64_t Velodyne128Parser::get_timestamp(double base_time, float time_offset,
+uint64_t Velodyne128Parser::GetTimestamp(double base_time, float time_offset,
                                           uint16_t block_id) {
   (void)block_id;
   double t = base_time - time_offset;
   uint64_t timestamp =
-      get_gps_stamp(t, &previous_packet_stamp_, &gps_base_usec_);
+      GetGpsStamp(t, &previous_packet_stamp_, &gps_base_usec_);
   return timestamp;
 }
 
 // TODO(dengchengliang): No manual about order for lidar128 by now.
-void Velodyne128Parser::order(std::shared_ptr<PointCloud> cloud) {
+void Velodyne128Parser::Order(std::shared_ptr<PointCloud> cloud) {
   (void)cloud;
 }
 
-void Velodyne128Parser::unpack(const VelodynePacket& pkt,
+void Velodyne128Parser::Unpack(const VelodynePacket& pkt,
                                std::shared_ptr<PointCloud> pc) {
   float azimuth_diff, azimuth_corrected_f;
   float last_azimuth_diff = 0;
@@ -80,10 +79,7 @@ void Velodyne128Parser::unpack(const VelodynePacket& pkt,
   // const raw_packet_t *raw = (const raw_packet_t *)&pkt.data[0];
   const RawPacket* raw = (const RawPacket*)pkt.data().c_str();
   double basetime = raw->gps_timestamp;
-  // double basetime_2 = computeTimeStamp(pkt);
-  // LOG_INFO << "basetime1: " << basetime / 1000000.0  << ", basetime2: " <<
-  // basetime_2;
-  //
+
   for (int block = 0; block < BLOCKS_PER_PACKET; block++) {
     // Calculate difference between current and next block's azimuth angle.
     if (block == 0) {
@@ -102,9 +98,6 @@ void Velodyne128Parser::unpack(const VelodynePacket& pkt,
 
     /*condition added to avoid calculating points which are not
       in the interesting defined area (min_angle < area < max_angle)*/
-    // if ((config_.min_angle < config_.max_angle &&
-    //      azimuth >= config_.min_angle && azimuth <= config_.max_angle) ||
-    //     (config_.min_angle > config_.max_angle)) {
     for (int j = 0, k = 0; j < SCANS_PER_BLOCK; j++, k += RAW_SCAN_SIZE) {
       uint8_t group = block % 4;
       uint8_t chan_id = j + group * 32;
@@ -122,7 +115,7 @@ void Velodyne128Parser::unpack(const VelodynePacket& pkt,
       float distance = real_distance + corrections.dist_correction;
 
       uint64_t timestamp =
-          get_timestamp(basetime, (*inner_time_)[block][j], block);
+          GetTimestamp(basetime, (*inner_time_)[block][j], block);
       if (!is_scan_valid(azimuth, distance)) {
         // todo orgnized
         if (config_.organized()) {
@@ -152,9 +145,9 @@ void Velodyne128Parser::unpack(const VelodynePacket& pkt,
 
       // compute time , time offset is zero
       point_new->set_timestamp(timestamp);
-      compute_coords(real_distance, corrections, azimuth_corrected, point_new);
+      ComputeCoords(real_distance, corrections, azimuth_corrected, point_new);
 
-      intensity = intensity_compensate(corrections, raw_distance.raw_distance,
+      intensity = IntensityCompensate(corrections, raw_distance.raw_distance,
                                        intensity);
       point_new->set_intensity(intensity);
     }
@@ -162,7 +155,7 @@ void Velodyne128Parser::unpack(const VelodynePacket& pkt,
   }
 }
 
-int Velodyne128Parser::intensity_compensate(const LaserCorrection& corrections,
+int Velodyne128Parser::IntensityCompensate(const LaserCorrection& corrections,
                                             const uint16_t raw_distance,
                                             int intensity) {
   float focal_offset = 256 * (1 - corrections.focal_distance / 13100) *
@@ -170,9 +163,9 @@ int Velodyne128Parser::intensity_compensate(const LaserCorrection& corrections,
   float focal_slope = corrections.focal_slope;
 
   intensity +=
-      focal_slope * (abs(focal_offset -
-                         256 * (1 - static_cast<float>(raw_distance) / 65535) *
-                             (1 - static_cast<float>(raw_distance) / 65535)));
+      focal_slope *
+      (abs(focal_offset - 256 * (1 - static_cast<float>(raw_distance) / 65535) *
+                              (1 - static_cast<float>(raw_distance) / 65535)));
 
   if (intensity < corrections.min_intensity) {
     intensity = corrections.min_intensity;

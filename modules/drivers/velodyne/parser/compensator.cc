@@ -29,7 +29,7 @@ Compensator::Compensator(const Config& velodyne_config) {
   config_ = velodyne_config;
 }
 
-bool Compensator::query_pose_affine_from_tf2(
+bool Compensator::QueryPoseAffineFromTF2(
     const uint64_t& timestamp, void* pose, const std::string& child_frame_id) {
   cybertron::Time query_time(timestamp);
   std::string err_string;
@@ -62,7 +62,7 @@ bool Compensator::query_pose_affine_from_tf2(
   return true;
 }
 
-bool Compensator::motion_compensation(
+bool Compensator::MotionCompensation(
     const std::shared_ptr<const PointCloud>& msg,
     std::shared_ptr<PointCloud> msg_compensated) {
   uint64_t start = cybertron::Time::Now().ToNanosecond();
@@ -72,7 +72,7 @@ bool Compensator::motion_compensation(
   uint64_t timestamp_min = 0;
   uint64_t timestamp_max = 0;
   std::string frame_id = msg->header().frame_id();
-  get_timestamp_interval(msg, &timestamp_min, &timestamp_max);
+  GetTimestampInterval(msg, &timestamp_min, &timestamp_max);
 
   msg_compensated->mutable_header()->set_timestamp_sec(
       cybertron::Time::Now().ToSecond());
@@ -89,12 +89,12 @@ bool Compensator::motion_compensation(
   msg_compensated->mutable_point()->Reserve(140000);
 
   // compensate point cloud, remove nan point
-  if (query_pose_affine_from_tf2(timestamp_min, &pose_min_time, frame_id) &&
-      query_pose_affine_from_tf2(timestamp_max, &pose_max_time, frame_id)) {
+  if (QueryPoseAffineFromTF2(timestamp_min, &pose_min_time, frame_id) &&
+      QueryPoseAffineFromTF2(timestamp_max, &pose_max_time, frame_id)) {
     uint64_t tf_time = cybertron::Time().Now().ToNanosecond();
     AINFO << "compenstator tf msg diff:" << tf_time - new_time
           << ";meta:" << msg->header().lidar_timestamp();
-    motion_compensation(msg, msg_compensated, timestamp_min, timestamp_max,
+    MotionCompensation(msg, msg_compensated, timestamp_min, timestamp_max,
                         pose_min_time, pose_max_time);
     uint64_t com_time = cybertron::Time().Now().ToNanosecond();
 
@@ -106,13 +106,13 @@ bool Compensator::motion_compensation(
   return false;
 }
 
-inline void Compensator::get_timestamp_interval(
+inline void Compensator::GetTimestampInterval(
     const std::shared_ptr<const PointCloud>& msg, uint64_t* timestamp_min,
     uint64_t* timestamp_max) {
   *timestamp_max = 0;
   *timestamp_min = std::numeric_limits<uint64_t>::max();
 
-  for (auto& point : msg->point()) {
+  for (const auto& point : msg->point()) {
     uint64_t timestamp = point.timestamp();
     if (timestamp < *timestamp_min) {
       *timestamp_min = timestamp;
@@ -124,7 +124,7 @@ inline void Compensator::get_timestamp_interval(
   }
 }
 
-inline bool Compensator::is_valid(const Eigen::Vector3d& point) {
+inline bool Compensator::IsValid(const Eigen::Vector3d& point) {
   float x = point.x();
   float y = point.y();
   float z = point.z();
@@ -135,7 +135,7 @@ inline bool Compensator::is_valid(const Eigen::Vector3d& point) {
   return true;
 }
 
-void Compensator::motion_compensation(
+void Compensator::MotionCompensation(
     const std::shared_ptr<const PointCloud>& msg,
     std::shared_ptr<PointCloud> msg_compensated, const uint64_t timestamp_min,
     const uint64_t timestamp_max, const Eigen::Affine3d& pose_min_time,
@@ -169,8 +169,7 @@ void Compensator::motion_compensation(
     double theta = acos(abs_d);
     double sin_theta = sin(theta);
     double c1_sign = (d > 0) ? 1 : -1;
-    // for (int i = 0; i < total; ++i) {
-    for (auto& point : msg->point()) {
+    for (const auto& point : msg->point()) {
       float x_scalar = point.x();
       if (std::isnan(x_scalar)) {
         if (config_.organized()) {
@@ -197,7 +196,7 @@ void Compensator::motion_compensation(
       Eigen::Affine3d trans = ti * qi;
       p = trans * p;
 
-      if (!is_valid(p)) {
+      if (!IsValid(p)) {
         if (config_.organized()) {
           auto* point_new = msg_compensated->add_point();
           point_new->CopyFrom(point);
@@ -231,7 +230,7 @@ void Compensator::motion_compensation(
 
     p = ti * p;
 
-    if (!is_valid(p)) {
+    if (!IsValid(p)) {
       AINFO << "invaid point,x:" << p.x() << ";y:" << p.y() << ";z:" << p.z();
       continue;
     }
