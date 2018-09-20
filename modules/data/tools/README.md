@@ -1,10 +1,5 @@
 # Data Tools
 
-## Recorder
-
-A customized rosbag recorder written in Python, which will be upgraded to newer
-version soon.
-
 ## Event Collector
 
 Collect events which we are interested in, including *drive events* and
