@@ -51,8 +51,9 @@ class FrameTest : public ::testing::Test {
     start_time_ = 1535757683;
     vehicle_state_.set_x(587419.24);
     vehicle_state_.set_y(4141269.79);
-    test_frame_ = new FrameOpenSpace(sequence_num_, planning_start_point_,
-                                     start_time_, vehicle_state_);
+    test_frame_ =
+        new FrameOpenSpace(sequence_num_, local_view_, planning_start_point_,
+                           start_time_, vehicle_state_);
   }
 
  protected:
@@ -62,6 +63,7 @@ class FrameTest : public ::testing::Test {
   apollo::common::TrajectoryPoint planning_start_point_;
   double start_time_;
   apollo::common::VehicleState vehicle_state_;
+  const LocalView local_view_;
 };
 
 TEST_F(FrameTest, AlignPredictionTime) {

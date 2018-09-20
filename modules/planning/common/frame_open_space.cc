@@ -27,9 +27,8 @@
 #include <string>
 #include <utility>
 
-#include "modules/common/adapters/adapter_manager.h"
-#include "modules/common/configs/vehicle_config_helper.h"
 #include "cybertron/common/log.h"
+#include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/vec2d.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/hdmap/hdmap_util.h"
@@ -42,7 +41,6 @@ namespace planning {
 using apollo::common::ErrorCode;
 using apollo::common::Status;
 using apollo::common::VehicleStateProvider;
-using apollo::common::adapter::AdapterManager;
 using apollo::common::math::Box2d;
 using apollo::common::math::Vec2d;
 // using apollo::common::monitor::MonitorLogBuffer;
@@ -54,19 +52,15 @@ FrameOpenSpaceHistory::FrameOpenSpaceHistory()
     : IndexedQueue<uint32_t, FrameOpenSpace>(FLAGS_max_history_frame_num) {}
 
 FrameOpenSpace::FrameOpenSpace(
-    uint32_t sequence_num, const common::TrajectoryPoint &planning_start_point,
+    uint32_t sequence_num, const LocalView &local_view,
+    const common::TrajectoryPoint &planning_start_point,
     const double start_time, const common::VehicleState &vehicle_state)
     : sequence_num_(sequence_num),
+      local_view_(local_view),
       planning_start_point_(planning_start_point),
       start_time_(start_time),
       vehicle_state_(vehicle_state),
-      // monitor_logger_(common::monitor::MonitorMessageItem::PLANNING) {
-      if (FLAGS_enable_lag_prediction) {
-  lag_predictor_.reset(
-      new LagPrediction(FLAGS_lag_prediction_min_appear_num,
-                        FLAGS_lag_prediction_max_disappear_num));
-}
-}
+      monitor_logger_buffer_(common::monitor::MonitorMessageItem::PLANNING) {}
 
 const common::TrajectoryPoint &FrameOpenSpace::PlanningStartPoint() const {
   return planning_start_point_;
@@ -90,20 +84,15 @@ Status FrameOpenSpace::Init() {
          << FLAGS_align_prediction_time;
 
   // prediction
-  if (AdapterManager::GetPrediction() &&
-      !AdapterManager::GetPrediction()->Empty()) {
-    if (FLAGS_enable_lag_prediction && lag_predictor_) {
-      lag_predictor_->GetLaggedPrediction(&prediction_);
-    } else {
-      prediction_.CopyFrom(
-          AdapterManager::GetPrediction()->GetLatestObserved());
-    }
-    if (FLAGS_align_prediction_time) {
-      AlignPredictionTime(vehicle_state_.timestamp(), &prediction_);
-    }
-    for (auto &ptr : Obstacle::CreateObstacles(prediction_)) {
-      AddObstacle(*ptr);
-    }
+  auto prediction = *(local_view_.prediction_obstacles);
+
+  if (FLAGS_align_prediction_time) {
+    AlignPredictionTime(vehicle_state_.timestamp(), &prediction);
+    local_view_.prediction_obstacles->CopyFrom(prediction);
+  }
+  for (auto &ptr :
+       Obstacle::CreateObstacles(*local_view_.prediction_obstacles)) {
+    AddObstacle(*ptr);
   }
   // check collision
   if (FLAGS_enable_collision_detection) {
@@ -186,17 +175,21 @@ void FrameOpenSpace::RecordInputDebug(planning_internal::Debug *debug) {
     ADEBUG << "Skip record input into debug";
     return;
   }
-  auto *planning_data = debug->mutable_planning_data();
-  auto *adc_position = planning_data->mutable_adc_position();
-  const auto &localization =
-      AdapterManager::GetLocalization()->GetLatestObserved();
-  adc_position->CopyFrom(localization);
 
-  const auto &chassis = AdapterManager::GetChassis()->GetLatestObserved();
-  auto debug_chassis = planning_data->mutable_chassis();
-  debug_chassis->CopyFrom(chassis);
+  auto *planning_debug_data = debug->mutable_planning_data();
+  auto *adc_position = planning_debug_data->mutable_adc_position();
+  adc_position->CopyFrom(*local_view_.localization_estimate);
 
-  planning_data->mutable_prediction_header()->CopyFrom(prediction_.header());
+  auto debug_chassis = planning_debug_data->mutable_chassis();
+  debug_chassis->CopyFrom(*local_view_.chassis);
+
+  if (!FLAGS_use_navigation_mode) {
+    auto debug_routing = planning_debug_data->mutable_routing();
+    debug_routing->CopyFrom(*local_view_.routing);
+  }
+
+  planning_debug_data->mutable_prediction_header()->CopyFrom(
+      local_view_.prediction_obstacles->header());
 }
 
 void FrameOpenSpace::AlignPredictionTime(

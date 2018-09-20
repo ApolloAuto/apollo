@@ -242,20 +242,20 @@ cc_test(
     ],
 )
 
-# cc_library(
-#     name = "lag_prediction",
-#     srcs = [
-#         "lag_prediction.cc",
-#     ],
-#     hdrs = [
-#         "lag_prediction.h",
-#     ],
-#     deps = [
-#         ":planning_gflags",
-#         "//modules/prediction/proto:prediction_proto",
-#         "//framework:cybertron",
-#     ],
-# )
+#cc_library(
+#    name = "lag_prediction",
+#    srcs = [
+#        "lag_prediction.cc",
+#    ],
+#    hdrs = [
+#        "lag_prediction.h",
+#    ],
+#    deps = [
+#        ":planning_gflags",
+#        "//modules/prediction/proto:prediction_proto",
+#        "//framework:cybertron",
+#    ],
+#)
 
 cc_library(
     name = "change_lane_decider",
@@ -316,33 +316,34 @@ cc_library(
     ],
 )
 
-# cc_library(
-#     name = "frame_open_space",
-#     srcs = [
-#         "frame_open_space.cc",
-#     ],
-#     hdrs = [
-#         "frame_open_space.h",
-#     ],
-#     deps = [
-#         ":change_lane_decider",
-#         ":indexed_queue",
-#         ":lag_prediction",
-#         ":obstacle",
-#         "//modules/common/configs:vehicle_config_helper",
-#         "//framework:cybertron",
-#         #"//modules/common/monitor_log",
-#         "//modules/common/vehicle_state:vehicle_state_provider",
-#         "//modules/map/hdmap:hdmap_util",
-#         "//modules/map/pnc_map",
-#         "//modules/planning/common/trajectory:discretized_trajectory",
-#         "//modules/planning/common/trajectory:publishable_trajectory",
-#         "//modules/planning/proto:planning_config_proto",
-#         "//modules/planning/proto:planning_proto",
-#         "//modules/common/math:geometry",
-#         "@eigen",
-#     ],
-# )
+cc_library(
+    name = "frame_open_space",
+    srcs = [
+        "frame_open_space.cc",
+    ],
+    hdrs = [
+        "frame_open_space.h",
+    ],
+    deps = [
+        ":change_lane_decider",
+        ":indexed_queue",
+        ":local_view",
+        #":lag_prediction",
+        ":obstacle",
+        "//modules/common/configs:vehicle_config_helper",
+        "//framework:cybertron",
+        "//modules/common/monitor_log",
+        "//modules/common/vehicle_state:vehicle_state_provider",
+        "//modules/map/hdmap:hdmap_util",
+        "//modules/map/pnc_map",
+        "//modules/planning/common/trajectory:discretized_trajectory",
+        "//modules/planning/common/trajectory:publishable_trajectory",
+        "//modules/planning/proto:planning_config_proto",
+        "//modules/planning/proto:planning_proto",
+        "//modules/common/math:geometry",
+        "@eigen",
+    ],
+)
 
 cc_test(
     name = "frame_test",
@@ -362,25 +363,25 @@ cc_test(
     ],
 )
 
-# cc_test(
-#     name = "frame_open_space_test",
-#     size = "small",
-#     srcs = [
-#         "frame_open_space_test.cc",
-#     ],
-#     data = [
-#         "//modules/planning/common:common_testdata",
-#     ],
-#     deps = [
-#         ":frame_open_space",
-#         "//modules/common/proto:pnc_point_proto",
-#         "//modules/common/util",
-#         "//modules/common/vehicle_state/proto:vehicle_state_proto",
-#         "//modules/planning/proto:planning_config_proto",
-#         "@eigen",
-#         "@gtest//:main",
-#     ],
-# )
+cc_test(
+    name = "frame_open_space_test",
+    size = "small",
+    srcs = [
+        "frame_open_space_test.cc",
+    ],
+    data = [
+        "//modules/planning/common:common_testdata",
+    ],
+    deps = [
+        ":frame_open_space",
+        "//modules/common/proto:pnc_point_proto",
+        "//modules/common/util",
+        "//modules/common/vehicle_state/proto:vehicle_state_proto",
+        "//modules/planning/proto:planning_config_proto",
+        "@eigen",
+        "@gtest//:main",
+    ],
+)
 
 cc_library(
     name = "speed_limit",

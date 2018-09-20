@@ -41,9 +41,10 @@
 #include "modules/common/math/vec2d.h"
 #include "modules/common/monitor_log/monitor_log_buffer.h"
 #include "modules/common/status/status.h"
+#include "modules/common/util/util.h"
 #include "modules/planning/common/change_lane_decider.h"
 #include "modules/planning/common/indexed_queue.h"
-#include "modules/planning/common/lag_prediction.h"
+#include "modules/planning/common/local_view.h"
 #include "modules/planning/common/obstacle.h"
 #include "modules/planning/common/trajectory/publishable_trajectory.h"
 
@@ -59,7 +60,7 @@ using common::math::Vec2d;
 
 class FrameOpenSpace {
  public:
-  explicit FrameOpenSpace(uint32_t sequence_num,
+  explicit FrameOpenSpace(uint32_t sequence_num, const LocalView &local_view,
                           const common::TrajectoryPoint &planning_start_point,
                           const double start_time,
                           const common::VehicleState &vehicle_state);
@@ -132,9 +133,12 @@ class FrameOpenSpace {
 
   void AddObstacle(const Obstacle &obstacle);
 
+  const LocalView &local_view() const { return local_view_; }
+
  private:
   uint32_t sequence_num_ = 0;
   const hdmap::HDMap *hdmap_ = nullptr;
+  const LocalView local_view_;
   common::TrajectoryPoint planning_start_point_;
   const double start_time_;
   common::VehicleState vehicle_state_;
@@ -143,8 +147,7 @@ class FrameOpenSpace {
   ThreadSafeIndexedObstacles obstacles_;
   ChangeLaneDecider change_lane_decider_;
   ADCTrajectory trajectory_;  // last published trajectory
-  std::unique_ptr<LagPrediction> lag_predictor_;
-  // apollo::common::monitor::MonitorLogger monitor_logger_;
+  common::monitor::MonitorLogBuffer monitor_logger_buffer_;
   std::size_t obstacles_num_ = 0;
   Eigen::MatrixXd obstacles_vertices_num_;
 
