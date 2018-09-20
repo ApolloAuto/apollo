@@ -24,6 +24,7 @@
 #include "cybertron/blocker/blocker.h"
 #include "cybertron/blocker/blocker_manager.h"
 #include "cybertron/node/reader.h"
+#include "cybertron/time/time.h"
 
 namespace apollo {
 namespace cybertron {
@@ -155,8 +156,7 @@ uint32_t IntraReader<MessageT>::GetHistoryDepth() const {
 }
 
 template <typename MessageT>
-std::shared_ptr<MessageT> IntraReader<MessageT>::GetLatestObserved()
-    const {
+std::shared_ptr<MessageT> IntraReader<MessageT>::GetLatestObserved() const {
   if (blocker_ == nullptr) {
     return nullptr;
   }
@@ -164,8 +164,7 @@ std::shared_ptr<MessageT> IntraReader<MessageT>::GetLatestObserved()
 }
 
 template <typename MessageT>
-std::shared_ptr<MessageT> IntraReader<MessageT>::GetOldestObserved()
-    const {
+std::shared_ptr<MessageT> IntraReader<MessageT>::GetOldestObserved() const {
   if (blocker_ == nullptr) {
     return nullptr;
   }
@@ -186,6 +185,8 @@ auto IntraReader<MessageT>::End() const -> Iterator {
 
 template <typename MessageT>
 void IntraReader<MessageT>::OnMessage(const MessagePtr& msg_ptr) {
+  this->second_to_lastest_recv_time_sec_ = this->latest_recv_time_sec_;
+  this->latest_recv_time_sec_ = apollo::cybertron::Time::Now().ToSecond();
   if (msg_callback_ != nullptr) {
     msg_callback_(msg_ptr);
   }

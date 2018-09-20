@@ -46,6 +46,7 @@ class ReaderBase {
   virtual void Observe() = 0;
   virtual bool Empty() const = 0;
   virtual bool HasReceived() const = 0;
+  virtual double GetDelaySec() const = 0;
 
   const std::string& GetChannelName() const {
     return role_attr_.channel_name();

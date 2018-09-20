@@ -17,6 +17,7 @@
 #ifndef CYBERTRON_NODE_READER_H_
 #define CYBERTRON_NODE_READER_H_
 
+#include <algorithm>
 #include <list>
 #include <memory>
 #include <mutex>
@@ -62,6 +63,7 @@ class Reader : public ReaderBase {
   void ClearData() override;
   bool HasReceived() const override;
   bool Empty() const override;
+  double GetDelaySec() const override;
 
   virtual void Enqueue(const std::shared_ptr<MessageT>& msg);
   virtual void SetHistoryDepth(const uint32_t& depth);
@@ -70,6 +72,10 @@ class Reader : public ReaderBase {
   virtual std::shared_ptr<MessageT> GetOldestObserved() const;
   virtual Iterator Begin() const { return observed_queue_.begin(); }
   virtual Iterator End() const { return observed_queue_.end(); }
+
+ protected:
+  double latest_recv_time_sec_;
+  double second_to_lastest_recv_time_sec_;
 
  private:
   void JoinTheTopology();
@@ -93,6 +99,8 @@ template <typename MessageT>
 Reader<MessageT>::Reader(const proto::RoleAttributes& role_attr,
                          const CallbackFunc<MessageT>& reader_func)
     : ReaderBase(role_attr),
+      latest_recv_time_sec_(-1.0),
+      second_to_lastest_recv_time_sec_(-1.0),
       reader_func_(reader_func),
       lower_reach_(nullptr),
       croutine_name_(""),
@@ -105,6 +113,8 @@ Reader<MessageT>::~Reader() {
 
 template <typename MessageT>
 void Reader<MessageT>::Enqueue(const std::shared_ptr<MessageT>& msg) {
+  second_to_lastest_recv_time_sec_ = latest_recv_time_sec_;
+  latest_recv_time_sec_ = Time::Now().ToSecond();
   std::lock_guard<std::mutex> lg(mutex_);
   history_queue_.push_front(msg);
   while (history_queue_.size() > history_depth_) {
@@ -131,9 +141,7 @@ bool Reader<MessageT>::Init() {
       this->reader_func_(msg);
     };
   } else {
-    func = [this](const std::shared_ptr<MessageT>& msg) {
-      this->Enqueue(msg);
-    };
+    func = [this](const std::shared_ptr<MessageT>& msg) { this->Enqueue(msg); };
   }
   auto sched = scheduler::Scheduler::Instance();
   croutine_name_ = role_attr_.node_name() + "_" + role_attr_.channel_name();
@@ -225,6 +233,18 @@ template <typename MessageT>
 bool Reader<MessageT>::Empty() const {
   std::lock_guard<std::mutex> lg(mutex_);
   return observed_queue_.empty();
+}
+
+template <typename MessageT>
+double Reader<MessageT>::GetDelaySec() const {
+  if (latest_recv_time_sec_ < 0) {
+    return -1.0;
+  }
+  if (second_to_lastest_recv_time_sec_ < 0) {
+    return Time::Now().ToSecond() - latest_recv_time_sec_;
+  }
+  return std::max((Time::Now().ToSecond() - latest_recv_time_sec_),
+                  (latest_recv_time_sec_ - second_to_lastest_recv_time_sec_));
 }
 
 template <typename MessageT>

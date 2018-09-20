@@ -224,6 +224,24 @@ TEST(WriterReaderTest, observe) {
   EXPECT_EQ(latest->case_name(), "message_1");
 }
 
+TEST(WriterReaderTest, get_delay_sec) {
+  proto::RoleAttributes attr;
+  attr.set_node_name("node");
+  attr.set_channel_name("channel");
+  auto channel_id = common::GlobalData::RegisterChannel(attr.channel_name());
+  attr.set_channel_id(channel_id);
+
+  Reader<proto::UnitTest> reader(attr);
+  reader.Init();
+
+  EXPECT_LT(reader.GetDelaySec(), 0);
+  reader.Enqueue(std::make_shared<proto::UnitTest>());
+  EXPECT_GT(reader.GetDelaySec(), 0);
+  sleep(1);
+  reader.Enqueue(std::make_shared<proto::UnitTest>());
+  EXPECT_GT(reader.GetDelaySec(), 1);
+}
+
 }  // namespace cybertron
 }  // namespace apollo
 
