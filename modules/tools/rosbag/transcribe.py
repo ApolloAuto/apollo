@@ -19,15 +19,12 @@
 This program can transcribe a protobuf message to file
 """
 
-import rosbag
-import std_msgs
+from cybertron import cybertron
 import argparse
 import shutil
 import os
-import rospy
 import sys
-
-from std_msgs.msg import String
+import time
 
 import common.proto_utils as proto_utils
 from common.message_manager import PbMessageManager
@@ -65,6 +62,8 @@ if __name__ == "__main__":
     if not meta_msg:
         print "Unknown topic name: %s" % (g_args.topic)
         sys.exit(0)
-    rospy.init_node('trascribe_node', anonymous=True)
-    rospy.Subscriber(g_args.topic, meta_msg.msg_type(), transcribe)
-    rospy.spin()
+    cybertron.init()
+    node = cybertron.Node("transcribe_node")
+    node.create_reader(g_args.topic, meta_msg.msg_type(), transcribe)
+    while not cybertron.is_shutdown():
+        time.sleep(0.005)
