@@ -68,7 +68,7 @@ ErrorCode HermesCanClient::Start() {
            << ", channel id: " << _card_port;
     return ErrorCode::CAN_CLIENT_ERROR_BASE;
   }
-  AERROR << "Open device succ code: " << ret << ", channel id: " << _card_port;
+  AINFO << "Open device succ code: " << ret << ", channel id: " << _card_port;
 
   // 1. set baudrate to 500k
   ret = bcan_set_baudrate(_dev_handler, BCAN_BAUDRATE_500K);
