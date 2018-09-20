@@ -41,13 +41,11 @@ bool UsbCamComponent::Init() {
   spin_rate_ = camera_config_->spin_rate();
 
   if (camera_config_->output_type() == YUYV) {
-    raw_image_->image_size =
-        raw_image_->width * raw_image_->height * 2;
+    raw_image_->image_size = raw_image_->width * raw_image_->height * 2;
     pb_image_->set_encoding("yuyv");
     pb_image_->set_step(2 * raw_image_->width);
   } else if (camera_config_->output_type() == RGB) {
-    raw_image_->image_size =
-        raw_image_->width * raw_image_->height * 3;
+    raw_image_->image_size = raw_image_->width * raw_image_->height * 3;
     pb_image_->set_encoding("rgb8");
     pb_image_->set_step(3 * raw_image_->width);
   }
@@ -63,9 +61,8 @@ bool UsbCamComponent::Init() {
 
   writer_ = node_->CreateWriter<Image>(camera_config_->channel_name());
 
-  device_thread_ = std::shared_ptr<std::thread>(
-      new std::thread(std::bind(&UsbCamComponent::run, this)));
-  device_thread_->detach();
+  task_.reset(new apollo::cybertron::Task<>(
+      "usb_cam_task", std::bind(&UsbCamComponent::run, this), 1));
   return true;
 }
 
