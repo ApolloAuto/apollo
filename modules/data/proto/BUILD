@@ -17,11 +17,6 @@ proto_library(
 )
 
 proto_library(
-    name = "recorder_info_proto_lib",
-    srcs = ["recorder_info.proto"],
-)
-
-proto_library(
     name = "task_proto_lib",
     srcs = ["task.proto"],
     deps = [
