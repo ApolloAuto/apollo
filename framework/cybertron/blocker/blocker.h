@@ -34,6 +34,8 @@ class BlockerBase {
  public:
   virtual ~BlockerBase() = default;
 
+  virtual void Reset() = 0;
+  virtual void ClearObserved() = 0;
   virtual void ClearPublished() = 0;
   virtual void Observe() = 0;
   virtual bool IsObservedEmpty() const = 0;
@@ -60,6 +62,8 @@ struct BlockerAttr {
 
 template <typename T>
 class Blocker : public BlockerBase {
+  friend class BlockerManager;
+
  public:
   using MessageType = T;
   using MessagePtr = std::shared_ptr<T>;
@@ -74,6 +78,7 @@ class Blocker : public BlockerBase {
   void Publish(const MessageType& msg);
   void Publish(const MessagePtr& msg);
 
+  void ClearObserved() override;
   void ClearPublished() override;
   void Observe() override;
   bool IsObservedEmpty() const override;
@@ -95,10 +100,10 @@ class Blocker : public BlockerBase {
   const std::string& channel_name() const override;
 
  private:
+  void Reset() override;
   void Enqueue(const MessagePtr& msg);
   void Notify(const MessagePtr& msg);
 
-  bool is_full_;
   BlockerAttr attr_;
   MessageQueue observed_msg_queue_;
   MessageQueue published_msg_queue_;
@@ -111,8 +116,7 @@ class Blocker : public BlockerBase {
 };
 
 template <typename T>
-Blocker<T>::Blocker(const BlockerAttr& attr)
-    : is_full_(false), attr_(attr), dummy_msg_() {}
+Blocker<T>::Blocker(const BlockerAttr& attr) : attr_(attr), dummy_msg_() {}
 
 template <typename T>
 Blocker<T>::~Blocker() {
@@ -130,6 +134,25 @@ template <typename T>
 void Blocker<T>::Publish(const MessagePtr& msg) {
   Enqueue(msg);
   Notify(msg);
+}
+
+template <typename T>
+void Blocker<T>::Reset() {
+  {
+    std::lock_guard<std::mutex> lock(msg_mutex_);
+    observed_msg_queue_.clear();
+    published_msg_queue_.clear();
+  }
+  {
+    std::lock_guard<std::mutex> lock(cb_mutex_);
+    published_callbacks_.clear();
+  }
+}
+
+template <typename T>
+void Blocker<T>::ClearObserved() {
+  std::lock_guard<std::mutex> lock(msg_mutex_);
+  observed_msg_queue_.clear();
 }
 
 template <typename T>
@@ -227,9 +250,6 @@ size_t Blocker<T>::capacity() const {
 template <typename T>
 void Blocker<T>::set_capacity(size_t capacity) {
   std::lock_guard<std::mutex> lock(msg_mutex_);
-  if (capacity > attr_.capacity) {
-    is_full_ = false;
-  }
   attr_.capacity = capacity;
   while (published_msg_queue_.size() > capacity) {
     published_msg_queue_.pop_back();
@@ -247,16 +267,9 @@ void Blocker<T>::Enqueue(const MessagePtr& msg) {
     return;
   }
   std::lock_guard<std::mutex> lock(msg_mutex_);
-  if (is_full_) {
-    published_msg_queue_.pop_back();
-  }
-
   published_msg_queue_.push_front(msg);
-
-  if (!is_full_) {
-    if (published_msg_queue_.size() >= attr_.capacity) {
-      is_full_ = true;
-    }
+  while (published_msg_queue_.size() > attr_.capacity) {
+    published_msg_queue_.pop_back();
   }
 }
 

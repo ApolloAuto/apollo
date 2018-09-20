@@ -59,6 +59,10 @@ TEST(BlockerManagerTest, publish) {
 
   EXPECT_FALSE(blocker1->IsObservedEmpty());
   EXPECT_FALSE(blocker2->IsObservedEmpty());
+
+  blocker_manager.Reset();
+  auto blocker3 = blocker_manager.GetBlocker<UnitTest>("channel2");
+  EXPECT_EQ(blocker3, nullptr);
 }
 
 TEST(BlockerManagerTest, subscribe) {

@@ -69,8 +69,9 @@ TEST(BlockerTest, publish) {
   EXPECT_EQ(latest_published_ptr->case_name(), "publish_2");
 
   blocker.ClearPublished();
+  blocker.ClearObserved();
   EXPECT_TRUE(blocker.IsPublishedEmpty());
-  EXPECT_FALSE(blocker.IsObservedEmpty());
+  EXPECT_TRUE(blocker.IsObservedEmpty());
 }
 
 TEST(BlockerTest, subscribe) {
@@ -100,6 +101,17 @@ TEST(BlockerTest, subscribe) {
       });
 
   EXPECT_FALSE(res);
+
+  blocker.Reset();
+  res = blocker.Subscribe(
+      "BlockerTest1", [&received_msg](const std::shared_ptr<UnitTest>& msg) {
+        received_msg->CopyFrom(*msg);
+      });
+  EXPECT_TRUE(res);
+  blocker.Publish(msg1);
+
+  EXPECT_EQ(received_msg->class_name(), msg1->class_name());
+  EXPECT_EQ(received_msg->case_name(), msg1->case_name());
 
   res = blocker.Unsubscribe("BlockerTest1");
   EXPECT_TRUE(res);
