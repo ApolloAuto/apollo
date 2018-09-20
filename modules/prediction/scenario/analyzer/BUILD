@@ -9,7 +9,7 @@ cc_library(
     deps = [
         "//framework:cybertron",
         "//modules/prediction/proto:scenario_proto",
-        "//modules/prediction/proto:scenario_feature_proto",
+        "//modules/prediction/common:environment_features",
         "//modules/prediction/common:prediction_gflags",
     ],
 )

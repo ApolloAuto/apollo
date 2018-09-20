@@ -28,7 +28,7 @@ ScenarioManager::ScenarioManager() {}
 
 void ScenarioManager::Run() {
   feature_extractor_.ExtractFeatures();
-  scenario_analyzer_.Analyze(feature_extractor_.GetScenarioFeatures());
+  scenario_analyzer_.Analyze(feature_extractor_.GetEnvironmentFeatures());
   PrioritizeObstacles();
   // TODO(all) other functionalities including lane, junction filters
 }
