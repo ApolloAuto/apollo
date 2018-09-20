@@ -21,8 +21,8 @@
 #include <list>
 #include <memory>
 
-#include "cybertron/blocker/blocker.h"
 #include "cybertron/blocker/blocker_manager.h"
+#include "cybertron/common/log.h"
 #include "cybertron/node/reader.h"
 #include "cybertron/time/time.h"
 
@@ -61,13 +61,12 @@ class IntraReader : public apollo::cybertron::Reader<MessageT> {
   void OnMessage(const MessagePtr& msg_ptr);
 
   Callback msg_callback_;
-  std::shared_ptr<Blocker<MessageT>> blocker_;
 };
 
 template <typename MessageT>
 IntraReader<MessageT>::IntraReader(const proto::RoleAttributes& attr,
                                    const Callback& callback)
-    : Reader<MessageT>(attr), msg_callback_(callback), blocker_(nullptr) {}
+    : Reader<MessageT>(attr), msg_callback_(callback) {}
 
 template <typename MessageT>
 IntraReader<MessageT>::~IntraReader() {
@@ -79,15 +78,11 @@ bool IntraReader<MessageT>::Init() {
   if (this->init_.exchange(true)) {
     return true;
   }
-  BlockerAttr attr(this->role_attr_.qos_profile().depth(),
-                   this->role_attr_.channel_name());
-  blocker_ = BlockerManager::Instance()->GetOrCreateBlocker<MessageT>(attr);
-  if (blocker_ == nullptr) {
-    return false;
-  }
-  return blocker_->Subscribe(this->role_attr_.node_name(),
-                             std::bind(&IntraReader<MessageT>::OnMessage, this,
-                                       std::placeholders::_1));
+  return BlockerManager::Instance()->Subscribe<MessageT>(
+      this->role_attr_.channel_name(), this->role_attr_.qos_profile().depth(),
+      this->role_attr_.node_name(),
+      std::bind(&IntraReader<MessageT>::OnMessage, this,
+                std::placeholders::_1));
 }
 
 template <typename MessageT>
@@ -95,92 +90,108 @@ void IntraReader<MessageT>::Shutdown() {
   if (!this->init_.exchange(false)) {
     return;
   }
-  blocker_->Unsubscribe(this->role_attr_.node_name());
-  blocker_ = nullptr;
+  BlockerManager::Instance()->Unsubscribe<MessageT>(
+      this->role_attr_.channel_name(), this->role_attr_.node_name());
 }
 
 template <typename MessageT>
 void IntraReader<MessageT>::ClearData() {
-  if (blocker_ == nullptr) {
-    return;
+  auto blocker = BlockerManager::Instance()->GetBlocker<MessageT>(
+      this->role_attr_.channel_name());
+  if (blocker != nullptr) {
+    blocker->ClearObserved();
+    blocker->ClearPublished();
   }
-  blocker_->ClearPublished();
 }
 
 template <typename MessageT>
 void IntraReader<MessageT>::Observe() {
-  if (blocker_ == nullptr) {
-    return;
+  auto blocker = BlockerManager::Instance()->GetBlocker<MessageT>(
+      this->role_attr_.channel_name());
+  if (blocker != nullptr) {
+    blocker->Observe();
   }
-  blocker_->Observe();
 }
 
 template <typename MessageT>
 bool IntraReader<MessageT>::Empty() const {
-  if (blocker_ == nullptr) {
-    return true;
+  auto blocker = BlockerManager::Instance()->GetBlocker<MessageT>(
+      this->role_attr_.channel_name());
+  if (blocker != nullptr) {
+    return blocker->IsObservedEmpty();
   }
-  return blocker_->IsObservedEmpty();
+  return true;
 }
 
 template <typename MessageT>
 bool IntraReader<MessageT>::HasReceived() const {
-  if (blocker_ == nullptr) {
-    return false;
+  auto blocker = BlockerManager::Instance()->GetBlocker<MessageT>(
+      this->role_attr_.channel_name());
+  if (blocker != nullptr) {
+    return !blocker->IsPublishedEmpty();
   }
-  return !blocker_->IsPublishedEmpty();
+  return false;
 }
 
 template <typename MessageT>
 void IntraReader<MessageT>::Enqueue(const std::shared_ptr<MessageT>& msg) {
-  if (blocker_ == nullptr) {
-    return;
-  }
-  blocker_->Publish(msg);
+  BlockerManager::Instance()->Publish<MessageT>(this->role_attr_.channel_name(),
+                                                msg);
 }
 
 template <typename MessageT>
 void IntraReader<MessageT>::SetHistoryDepth(const uint32_t& depth) {
-  if (blocker_ == nullptr) {
-    return;
+  auto blocker = BlockerManager::Instance()->GetBlocker<MessageT>(
+      this->role_attr_.channel_name());
+  if (blocker != nullptr) {
+    blocker->set_capacity(depth);
   }
-  blocker_->set_capacity(depth);
 }
 
 template <typename MessageT>
 uint32_t IntraReader<MessageT>::GetHistoryDepth() const {
-  if (blocker_ == nullptr) {
-    return 0;
+  auto blocker = BlockerManager::Instance()->GetBlocker<MessageT>(
+      this->role_attr_.channel_name());
+  if (blocker != nullptr) {
+    return blocker->capacity();
   }
-  return blocker_->capacity();
+  return 0;
 }
 
 template <typename MessageT>
 std::shared_ptr<MessageT> IntraReader<MessageT>::GetLatestObserved() const {
-  if (blocker_ == nullptr) {
-    return nullptr;
+  auto blocker = BlockerManager::Instance()->GetBlocker<MessageT>(
+      this->role_attr_.channel_name());
+  if (blocker != nullptr) {
+    return blocker->GetLatestObservedPtr();
   }
-  return blocker_->GetLatestObservedPtr();
+  return nullptr;
 }
 
 template <typename MessageT>
 std::shared_ptr<MessageT> IntraReader<MessageT>::GetOldestObserved() const {
-  if (blocker_ == nullptr) {
-    return nullptr;
+  auto blocker = BlockerManager::Instance()->GetBlocker<MessageT>(
+      this->role_attr_.channel_name());
+  if (blocker != nullptr) {
+    return blocker->GetOldestObservedPtr();
   }
-  return blocker_->GetOldestObservedPtr();
+  return nullptr;
 }
 
 template <typename MessageT>
 auto IntraReader<MessageT>::Begin() const -> Iterator {
-  assert(blocker_ != nullptr);
-  return blocker_->ObservedBegin();
+  auto blocker = BlockerManager::Instance()->GetBlocker<MessageT>(
+      this->role_attr_.channel_name());
+  ACHECK(blocker != nullptr);
+  return blocker->ObservedBegin();
 }
 
 template <typename MessageT>
 auto IntraReader<MessageT>::End() const -> Iterator {
-  assert(blocker_ != nullptr);
-  return blocker_->ObservedEnd();
+  auto blocker = BlockerManager::Instance()->GetBlocker<MessageT>(
+      this->role_attr_.channel_name());
+  ACHECK(blocker != nullptr);
+  return blocker->ObservedBegin();
 }
 
 template <typename MessageT>

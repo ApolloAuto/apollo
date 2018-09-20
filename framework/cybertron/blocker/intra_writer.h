@@ -19,7 +19,6 @@
 
 #include <memory>
 
-#include "cybertron/blocker/blocker.h"
 #include "cybertron/blocker/blocker_manager.h"
 #include "cybertron/node/writer.h"
 
@@ -31,6 +30,7 @@ template <typename MessageT>
 class IntraWriter : public apollo::cybertron::Writer<MessageT> {
  public:
   using MessagePtr = std::shared_ptr<MessageT>;
+  using BlockerManagerPtr = std::shared_ptr<BlockerManager>;
 
   explicit IntraWriter(const proto::RoleAttributes& attr);
   virtual ~IntraWriter();
@@ -42,7 +42,7 @@ class IntraWriter : public apollo::cybertron::Writer<MessageT> {
   bool Write(const MessagePtr& msg_ptr) override;
 
  private:
-  std::shared_ptr<Blocker<MessageT>> blocker_;
+  BlockerManagerPtr blocker_manager_;
 };
 
 template <typename MessageT>
@@ -60,12 +60,7 @@ bool IntraWriter<MessageT>::Init() {
     return true;
   }
 
-  BlockerAttr attr(this->role_attr_.channel_name());
-  blocker_ = BlockerManager::Instance()->GetOrCreateBlocker<MessageT>(attr);
-  if (blocker_ == nullptr) {
-    this->init_.exchange(false);
-    return false;
-  }
+  blocker_manager_ = BlockerManager::Instance();
   return true;
 }
 
@@ -74,7 +69,7 @@ void IntraWriter<MessageT>::Shutdown() {
   if (!this->init_.exchange(false)) {
     return;
   }
-  blocker_ = nullptr;
+  blocker_manager_ = nullptr;
 }
 
 template <typename MessageT>
@@ -82,8 +77,8 @@ bool IntraWriter<MessageT>::Write(const MessageT& msg) {
   if (!this->init_.load()) {
     return false;
   }
-  blocker_->Publish(msg);
-  return true;
+  return blocker_manager_->Publish<MessageT>(this->role_attr_.channel_name(),
+                                             msg);
 }
 
 template <typename MessageT>
@@ -91,8 +86,8 @@ bool IntraWriter<MessageT>::Write(const MessagePtr& msg_ptr) {
   if (!this->init_.load()) {
     return false;
   }
-  blocker_->Publish(msg_ptr);
-  return true;
+  return blocker_manager_->Publish<MessageT>(this->role_attr_.channel_name(),
+                                             msg_ptr);
 }
 
 }  // namespace blocker

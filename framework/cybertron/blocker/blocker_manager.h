@@ -65,6 +65,7 @@ class BlockerManager {
   std::shared_ptr<Blocker<T>> GetOrCreateBlocker(const BlockerAttr& attr);
 
   void Observe();
+  void Reset();
 
  private:
   BlockerManager();
