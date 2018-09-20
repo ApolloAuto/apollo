@@ -190,7 +190,7 @@ class Recorder(object):
 
     def stop(self):
         """Stop recording."""
-        shell_cmd('kill -TERM $(pgrep -f "rosbag/record" | grep -v pgrep)')
+        shell_cmd('kill -TERM $(pgrep -f "cyber_recorder record" | grep -v pgrep)')
         shell_cmd('kill -INT $(pgrep -f "{}" | grep -v pgrep)'.format(
             Recorder.kEventCollector))
 
@@ -201,22 +201,23 @@ class Recorder(object):
         print('Recording bag to {}'.format(task_dir))
 
         log_file = '/apollo/data/log/apollo_record.out'
-        topics_str = ' '.join(topics)
+        topics_str = ' -c '.join(topics)
 
         os.makedirs(task_dir)
         cmd = '''
             cd "{}"
             source /apollo/scripts/apollo_base.sh
-            nohup rosbag record --split --duration={} -b 2048 {} >{} 2>&1 &
+            source /apollo/framework/install/setup.bash
+            nohup cyber_recorder record {} >{} 2>&1 &
             nohup ${{APOLLO_BIN_PREFIX}}/{} >/dev/null 2>&1 &
-        '''.format(task_dir, self.args.split_duration, topics_str, log_file,
+        '''.format(task_dir, topics_str, log_file,
                    Recorder.kEventCollector)
         shell_cmd(cmd)
 
     @staticmethod
     def is_running():
         """Test if the given process running."""
-        _, stdout, _ = shell_cmd('pgrep -c -f "rosbag/record"', False)
+        _, stdout, _ = shell_cmd('pgrep -c -f "cyber_recorder record"', False)
         # If stdout is the pgrep command itself, no such process is running.
         return stdout.strip() != '1' if stdout else False
 
