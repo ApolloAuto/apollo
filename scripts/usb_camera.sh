@@ -25,16 +25,15 @@ source "${DIR}/apollo_base.sh"
 
 function start() {
     LOG="${APOLLO_ROOT_DIR}/data/log/usb_cam.out"
-    CMD="roslaunch usb_cam start_leopard.launch"
-    NUM_PROCESSES="$(pgrep -c -f "camera_nodelet_manager")"
+    CMD="cyber_launch start /apollo/modules/drivers/usb_cam/launch/usb_cam.launch"
+    NUM_PROCESSES="$(pgrep -c -f "modules/drivers/usb_cam/dag/camera.dag")"
     if [ "${NUM_PROCESSES}" -eq 0 ]; then
        eval "nohup ${CMD} </dev/null >${LOG} 2>&1 &"
     fi
 }
 
 function stop() {
-    pkill -9 -f start_leopard
-    pkill -9 -f camera_nodelet_manager
+    eval "nohup cyber_launch stop /apollo/modules/drivers/usb_cam/launch/usb_cam.launch < /dev/null 2>&1 &"
 }
 
 # run command_name module_name
