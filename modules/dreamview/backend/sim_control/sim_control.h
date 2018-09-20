@@ -31,6 +31,7 @@
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/map/relative_map/proto/navigation.pb.h"
 #include "modules/planning/proto/planning.pb.h"
+#include "modules/prediction/proto/prediction_obstacle.pb.h"
 
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
 #include "modules/dreamview/backend/map/map_service.h"
@@ -92,6 +93,9 @@ class SimControl : SimControlInterface {
   void OnReceiveNavigationInfo(
       const std::shared_ptr<apollo::relative_map::NavigationInfo>
           &navigation_info);
+  void OnPredictionObstacles(
+      const std::shared_ptr<apollo::prediction::PredictionObstacles>
+          &obstacles);
 
   /**
    * @brief Predict the next trajectory point using perfect control model
@@ -101,6 +105,8 @@ class SimControl : SimControlInterface {
   void PublishChassis(double cur_speed);
 
   void PublishLocalization(const apollo::common::TrajectoryPoint &point);
+
+  void PublishDummyPrediction();
 
   void InitTimerAndIO();
 
@@ -128,16 +134,24 @@ class SimControl : SimControlInterface {
       routing_response_reader_;
   std::shared_ptr<cybertron::Reader<apollo::relative_map::NavigationInfo>>
       navigation_reader_;
+  std::shared_ptr<cybertron::Reader<apollo::prediction::PredictionObstacles>>
+      prediction_reader_;
 
   std::shared_ptr<cybertron::Writer<apollo::localization::LocalizationEstimate>>
       localization_writer_;
   std::shared_ptr<cybertron::Writer<apollo::canbus::Chassis>> chassis_writer_;
+  std::shared_ptr<cybertron::Writer<apollo::prediction::PredictionObstacles>>
+      prediction_writer_;
 
   // The timer to publish simulated localization and chassis messages.
   std::unique_ptr<cybertron::Timer> sim_control_timer_;
 
+  // The timer to publish dummy prediction
+  std::unique_ptr<cybertron::Timer> sim_prediction_timer_;
+
   // Time interval of the timer, in milliseconds.
   static constexpr double kSimControlIntervalMs = 10;
+  static constexpr double kSimPredictionIntervalMs = 100;
 
   // The latest received planning trajectory.
   std::shared_ptr<apollo::planning::ADCTrajectory> current_trajectory_;
@@ -161,6 +175,9 @@ class SimControl : SimControlInterface {
   // Whether start point is initialized from actual localization data
   bool start_point_from_localization_ = false;
 
+  // Whether to send dummy predictions
+  bool send_dummy_prediction_ = true;
+
   // The header of the routing planning is following.
   apollo::common::Header current_routing_header_;
 
@@ -174,6 +191,7 @@ class SimControl : SimControlInterface {
   static constexpr int kPlanningCountToStart = 5;
 
   FRIEND_TEST(SimControlTest, Test);
+  FRIEND_TEST(SimControlTest, TestDummyPrediction);
 };
 
 }  // namespace dreamview

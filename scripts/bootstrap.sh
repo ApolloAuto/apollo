@@ -31,9 +31,6 @@ function start() {
         DEBUG_MODE="no"
     fi
 
-    # Start roscore.
-    bash scripts/roscore.sh start
-
     if [ "$DEBUG_MODE" == "yes" ]; then
         ./scripts/monitor.sh start
         ./scripts/dreamview.sh start
@@ -68,7 +65,6 @@ function stop() {
         supervisorctl stop dreamview
         supervisorctl stop monitor
     fi
-    source scripts/roscore.sh stop
 }
 
 case $1 in

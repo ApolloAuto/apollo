@@ -36,8 +36,8 @@ using apollo::common::Point3D;
 using apollo::common::Quaternion;
 using apollo::common::TrajectoryPoint;
 using apollo::common::math::HeadingToQuaternion;
-using apollo::common::math::InverseQuaternionRotate;
 using apollo::common::math::InterpolateUsingLinearApproximation;
+using apollo::common::math::InverseQuaternionRotate;
 using apollo::common::math::NormalizeAngle;
 using apollo::common::math::QuaternionToHeading;
 using apollo::common::time::Clock;
@@ -45,6 +45,7 @@ using apollo::common::util::FillHeader;
 using apollo::common::util::GetProtoFromFile;
 using apollo::localization::LocalizationEstimate;
 using apollo::planning::ADCTrajectory;
+using apollo::prediction::PredictionObstacles;
 using apollo::relative_map::NavigationInfo;
 using apollo::routing::RoutingResponse;
 
@@ -98,14 +99,25 @@ void SimControl::InitTimerAndIO() {
       [this](const std::shared_ptr<NavigationInfo>& navigation_info) {
         this->OnReceiveNavigationInfo(navigation_info);
       });
+  prediction_reader_ = node_->CreateReader<PredictionObstacles>(
+      FLAGS_navigation_topic,
+      [this](const std::shared_ptr<PredictionObstacles>& obstacles) {
+        std::unique_lock<std::mutex> lock(mutex_);
+        this->OnPredictionObstacles(obstacles);
+      });
 
   localization_writer_ =
       node_->CreateWriter<LocalizationEstimate>(FLAGS_localization_topic);
   chassis_writer_ = node_->CreateWriter<Chassis>(FLAGS_chassis_topic);
+  prediction_writer_ =
+      node_->CreateWriter<PredictionObstacles>(FLAGS_prediction_topic);
 
   // Start timer to publish localization and chassis messages.
   sim_control_timer_.reset(new cybertron::Timer(
       kSimControlIntervalMs, [this]() { this->RunOnce(); }, false));
+  sim_prediction_timer_.reset(new cybertron::Timer(
+      kSimPredictionIntervalMs, [this]() { this->PublishDummyPrediction(); },
+      false));
 }
 
 void SimControl::InitStartPoint(double start_velocity,
@@ -171,6 +183,7 @@ void SimControl::Reset() {
 void SimControl::InternalReset() {
   current_routing_header_.Clear();
   re_routing_triggered_ = false;
+  send_dummy_prediction_ = true;
   ClearPlanning();
 }
 
@@ -229,6 +242,17 @@ void SimControl::OnRoutingResponse(
   }
 }
 
+void SimControl::OnPredictionObstacles(
+    const std::shared_ptr<PredictionObstacles>& obstacles) {
+  std::unique_lock<std::mutex> lock(mutex_);
+
+  if (!enabled_) {
+    return;
+  }
+
+  send_dummy_prediction_ = obstacles->header().module_name() == "SimPrediction";
+}
+
 void SimControl::Start() {
   std::unique_lock<std::mutex> lock(mutex_);
 
@@ -242,6 +266,7 @@ void SimControl::Start() {
 
     InternalReset();
     sim_control_timer_->Start();
+    sim_prediction_timer_->Start();
     enabled_ = true;
   }
 }
@@ -251,6 +276,7 @@ void SimControl::Stop() {
 
   if (enabled_) {
     sim_control_timer_->Stop();
+    sim_prediction_timer_->Stop();
     enabled_ = false;
   }
 }
@@ -428,6 +454,20 @@ void SimControl::PublishLocalization(const TrajectoryPoint& point) {
   adc_position_.set_x(pose->position().x());
   adc_position_.set_y(pose->position().y());
   adc_position_.set_z(pose->position().z());
+}
+
+void SimControl::PublishDummyPrediction() {
+  std::unique_lock<std::mutex> lock(mutex_);
+
+  if (!send_dummy_prediction_) {
+    return;
+  }
+
+  std::shared_ptr<PredictionObstacles> prediction =
+      std::make_shared<PredictionObstacles>();
+  FillHeader("SimPrediction", prediction.get());
+
+  prediction_writer_->Write(prediction);
 }
 
 }  // namespace dreamview
