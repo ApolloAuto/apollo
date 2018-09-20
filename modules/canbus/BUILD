@@ -39,6 +39,7 @@ cc_binary(
     deps = [
         ":canbus_lib",
     ],
+    linkshared = True,
 )
 
 filegroup(

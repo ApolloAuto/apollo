@@ -21,8 +21,8 @@ cc_library(
 
 cc_binary(
     name = "libmanual_traffic_light_component.so",
-    linkopts = ["-shared"],
     deps = [":manual_traffic_light"],
+    linkshared = True,
 )
 
 cpplint()

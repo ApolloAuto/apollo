@@ -51,11 +51,11 @@ cc_test(
 
 cc_binary(
     name = "libprediction_component.so",
-    linkopts = ["-shared"],
     deps = [
         ":prediction_component_lib",
         "//external:gflags",
     ],
+    linkshared = True,
 )
 
 filegroup(

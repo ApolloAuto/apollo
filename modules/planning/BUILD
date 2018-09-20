@@ -42,8 +42,8 @@ cc_test(
 
 cc_binary(
     name = "libplanning_component.so",
-    linkopts = ["-shared"],
     deps = [":planning_component_lib"],
+    linkshared = True,
 )
 
 cc_library(
@@ -77,6 +77,7 @@ cc_library(
         "//modules/planning/toolkits/deciders",
         "//modules/prediction/proto:prediction_proto",
     ],
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
 )
 
 filegroup(
