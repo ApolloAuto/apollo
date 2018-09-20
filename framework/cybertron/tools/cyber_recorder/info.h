@@ -34,11 +34,7 @@ class Info {
  public:
   Info();
   ~Info();
-  bool Display(const std::string& file, bool all_sections);
-
- private:
-  bool DisplayIndex();
-  Index index_;
+  bool Display(const std::string& file);
 };
 
 }  // namespace record
