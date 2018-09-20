@@ -41,7 +41,9 @@ void ScenarioManager::PrioritizeObstacles() {
   ObstaclesContainer* obstacles_container = dynamic_cast<ObstaclesContainer*>(
       ContainerManager::Instance()->GetContainer(
           AdapterConfig::PERCEPTION_OBSTACLES));
-  obstacles_container->PrioritizeObstacles(scenario_analyzer_.scenario());
+  obstacles_container->PrioritizeObstacles(
+      scenario_analyzer_.scenario(),
+      feature_extractor_.GetEnvironmentFeatures());
 }
 
 }  // namespace prediction

@@ -28,6 +28,7 @@
 
 #include "modules/common/util/lru_cache.h"
 #include "modules/prediction/proto/scenario.pb.h"
+#include "modules/prediction/common/environment_features.h"
 #include "modules/prediction/container/container.h"
 #include "modules/prediction/container/obstacles/obstacle.h"
 #include "modules/prediction/container/pose/pose_container.h"
@@ -70,7 +71,8 @@ class ObstaclesContainer : public Container {
   /**
    * @brief Set obstacles' priority to predict
    */
-  void PrioritizeObstacles(const Scenario& scenario);
+  void PrioritizeObstacles(const Scenario& scenario,
+                           const EnvironmentFeatures& environment_features);
 
   /**
    * @brief Get obstacle pointer
