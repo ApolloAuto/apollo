@@ -201,9 +201,13 @@ int main(int argc, char** argv) {
       case 'r':
         try {
           opt_rate = std::stof(optarg);
-        } catch (std::invalid_argument& ia) {
+        } catch (const std::invalid_argument& ia) {
           std::cout << "Invalid argument: -r/--rate " << std::string(optarg)
                     << std::endl;
+          return -1;
+        } catch (const std::out_of_range& e) {
+          std::cout << "Argument is out of range: -r/--rate "
+                    << std::string(optarg) << std::endl;
           return -1;
         }
         break;
@@ -216,9 +220,13 @@ int main(int argc, char** argv) {
       case 's':
         try {
           opt_start = std::stoi(optarg);
-        } catch (std::invalid_argument& ia) {
+        } catch (const std::invalid_argument& ia) {
           std::cout << "Invalid argument: -s/--start " << std::string(optarg)
                     << std::endl;
+          return -1;
+        } catch (const std::out_of_range& e) {
+          std::cout << "Argument is out of range: -s/--start "
+                    << std::string(optarg) << std::endl;
           return -1;
         }
         break;
@@ -228,6 +236,10 @@ int main(int argc, char** argv) {
         } catch (std::invalid_argument& ia) {
           std::cout << "Invalid argument: -d/--delay " << std::string(optarg)
                     << std::endl;
+          return -1;
+        } catch (const std::out_of_range& e) {
+          std::cout << "Argument is out of range: -d/--delay "
+                    << std::string(optarg) << std::endl;
           return -1;
         }
         break;
