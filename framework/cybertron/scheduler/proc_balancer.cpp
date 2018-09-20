@@ -90,7 +90,7 @@ bool ProcBalancer::Push(const std::weak_ptr<CRoutine>& croutine) {
   cr->SetProcessorId(processor->Id());
   processor->Context()->Push(cr);
   croutine_pos_map_.Set(cr->Id(), processor->Id());
-  AINFO << "push routine[" << GlobalData::GetTaskNameById(cr->Id())
+  ADEBUG << "push routine[" << GlobalData::GetTaskNameById(cr->Id())
         << "] into processor[" << processor->Id() << "]";
   return true;
 }

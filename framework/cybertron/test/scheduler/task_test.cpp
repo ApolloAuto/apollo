@@ -20,7 +20,10 @@ struct Message {
 
 void Task1() { ADEBUG << "Task1 running"; }
 
-void Task2(const std::shared_ptr<Message>& input) { ADEBUG << "Task2 running"; }
+void Task2(const std::shared_ptr<Message>& input) { 
+  usleep(10000);
+  ADEBUG << "Task2 running"; 
+}
 
 uint64_t Task3(const std::shared_ptr<Message>& input) {
   ADEBUG << "Task3 running";
@@ -57,9 +60,14 @@ TEST(TaskTest, return_value) {
   usleep(100000);
   task_1.reset();
 
-  auto task_2 = std::make_shared<Task<Message, void>>("task2", &Task2);
-  auto ret_2 = task_2->Execute(msg);
-  ret_2.get();
+  auto task_2 = std::make_shared<Task<Message, void>>("task2", &Task2, 10);
+  std::vector<std::future<void>> results;
+  for (int i = 0; i < 2000; ++i) {
+    results.push_back(task_2->Execute(msg));
+  }
+  for (auto& result: results) {
+    result.get();
+  }
 
   auto msg3 = std::make_shared<Message>();
   msg3->id = 1;
@@ -71,13 +79,14 @@ TEST(TaskTest, return_value) {
   EXPECT_EQ(ret_3.get(), 1);
 
   auto task_4 = std::make_shared<Task<Message, uint64_t>>("task4", &Task4, 20);
-  std::vector<std::future<uint64_t>> results;
+  std::vector<std::future<uint64_t>> results_4;
   for (int i = 0; i < 1000; i++) {
-    results.emplace_back(task_4->Execute(msg));
+    results_4.emplace_back(task_4->Execute(msg));
   }
-  for (auto& result : results) {
+  for (auto& result : results_4) {
     result.get();
   }
+  task_4.reset();
 }
 
 }  // namespace scheduler
