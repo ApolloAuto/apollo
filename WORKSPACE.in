@@ -140,7 +140,7 @@ new_http_archive(
 new_local_repository(
     name = "osqp",
     build_file = "third_party/osqp.BUILD",
-    path = "/usr/local/osqp/",
+    path = "/usr/local/include/osqp/include",
 )
 
 # IpOpt
