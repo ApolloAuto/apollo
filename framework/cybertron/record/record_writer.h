@@ -52,14 +52,9 @@ class RecordWriter : public RecordBase {
                     const std::string& message_type,
                     const std::string& proto_desc);
 
-  bool WriteMessage(const std::string& channel_name,
-                    const std::shared_ptr<const RawMessage>& message,
-                    const uint64_t time);
-
   template <typename MessageT>
-  bool WritePbMessage(const std::string& channel_name, const MessageT& message,
-                      const uint64_t time, const std::string& proto_desc = "");
-
+  bool WriteMessage(const std::string& channel_name, const MessageT& message,
+                    const uint64_t time, const std::string& proto_desc = "");
   void ShowProgress();
 
  private:
@@ -73,34 +68,40 @@ class RecordWriter : public RecordBase {
   std::unique_ptr<RecordFileWriter> file_writer_backup_ = nullptr;
 };
 
+template <>
+inline bool RecordWriter::WriteMessage(const std::string& channel_name,
+                                       const std::string& content,
+                                       const uint64_t time,
+                                       const std::string& proto_desc) {
+  OnNewMessage(channel_name);
+  SingleMessage single_msg;
+  single_msg.set_channel_name(channel_name);
+  single_msg.set_content(content);
+  single_msg.set_time(time);
+  return WriteMessage(single_msg);
+}
+
+template <>
 inline bool RecordWriter::WriteMessage(
-    const std::string& channel_name,
-    const std::shared_ptr<const RawMessage>& message, const uint64_t time) {
+    const std::string& channel_name, const std::shared_ptr<RawMessage>& message,
+    const uint64_t time, const std::string& proto_desc) {
   if (message == nullptr) {
     AERROR << "nullptr error, channel: " << channel_name;
     return false;
   }
-  OnNewMessage(channel_name);
-  SingleMessage single_msg;
-  single_msg.set_channel_name(channel_name);
-  single_msg.set_content(message->message);
-  single_msg.set_time(time);
-  if (!WriteMessage(std::move(single_msg))) {
-    AERROR << "write single msg fail";
-    return false;
-  }
-  return true;
+  return WriteMessage(channel_name, message->message, time);
 }
 
 template <typename MessageT>
-bool RecordWriter::WritePbMessage(const std::string& channel_name,
-                                  const MessageT& message, const uint64_t time,
-                                  const std::string& proto_desc) {
-  std::string message_type = GetMessageType(channel_name);
+bool RecordWriter::WriteMessage(const std::string& channel_name,
+                                const MessageT& message, const uint64_t time,
+                                const std::string& proto_desc) {
+  const std::string& message_type = GetMessageType(channel_name);
   if (message_type.empty()) {
     if (!WriteChannel(channel_name, MessageT::descriptor()->full_name(),
                       proto_desc)) {
-      AERROR << "Write channel fail, channel: " << channel_name;
+      AERROR << "Failed to write meta data to channel [" << channel_name
+             << "].";
       return false;
     }
   } else {
@@ -115,16 +116,7 @@ bool RecordWriter::WritePbMessage(const std::string& channel_name,
     AERROR << "Failed to serialize message, channel: " << channel_name;
     return false;
   }
-  OnNewMessage(channel_name);
-  SingleMessage single_msg;
-  single_msg.set_channel_name(channel_name);
-  single_msg.set_content(content);
-  single_msg.set_time(time);
-  if (!WriteMessage(std::move(single_msg))) {
-    AERROR << "write single msg fail";
-    return false;
-  }
-  return true;
+  return WriteMessage(channel_name, content, time);
 }
 
 }  // namespace record
