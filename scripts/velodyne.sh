@@ -25,15 +25,15 @@ source "${DIR}/apollo_base.sh"
 
 function start() {
     LOG="${APOLLO_ROOT_DIR}/data/log/velodyne.out"
-    CMD="roslaunch velodyne start_velodyne.launch"
-    NUM_PROCESSES="$(pgrep -c -f "sensor_velodyne64")"
+    CMD="cyber_launch start /apollo/modules/drivers/velodyne/launch/velodyne.launch"
+    NUM_PROCESSES="$(pgrep -c -f "/apollo/modules/drivers/velodyne/dag/velodyne.dag")"
     if [ "${NUM_PROCESSES}" -eq 0 ]; then
        eval "nohup ${CMD} </dev/null >${LOG} 2>&1 &"
     fi
 }
 
 function stop() {
-    pkill -SIGTERM -f start_velodyne.launch
+    eval "nohup cyber_launch stop /apollo/modules/drivers/velodyne/launch/velodyne.launch < /dev/null 2>&1 &"
 }
 
 # run command_name module_name
