@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,55 +15,52 @@
  *****************************************************************************/
 
 /**
- * @file spline_2d_solver.h
+ * @file
  **/
 
-#ifndef MODULES_PLANNING_SMOOTHING_SPLINE_SPLINE_2D_SOLVER_H_
-#define MODULES_PLANNING_SMOOTHING_SPLINE_SPLINE_2D_SOLVER_H_
+#ifndef MODULES_PLANNING_SMOOTHING_SPLINE_ACTIVE_SET_SPLINE_2D_SOLVER_H_
+#define MODULES_PLANNING_SMOOTHING_SPLINE_ACTIVE_SET_SPLINE_2D_SOLVER_H_
 
 #include <qpOASES.hpp>
 
 #include <memory>
 #include <vector>
 
-#include "modules/common/math/qp_solver/qp_solver.h"
 #include "modules/planning/math/smoothing_spline/spline_2d.h"
 #include "modules/planning/math/smoothing_spline/spline_2d_constraint.h"
 #include "modules/planning/math/smoothing_spline/spline_2d_kernel.h"
+#include "modules/planning/math/smoothing_spline/spline_2d_solver.h"
 
 namespace apollo {
 namespace planning {
 
-class Spline2dSolver {
+class ActiveSetSpline2dSolver final : public Spline2dSolver {
  public:
-  Spline2dSolver(const std::vector<double>& t_knots, const uint32_t order)
-      : spline_(t_knots, order),
-        kernel_(t_knots, order),
-        constraint_(t_knots, order) {}
+  ActiveSetSpline2dSolver(const std::vector<double>& t_knots,
+                          const uint32_t order);
 
-  ~Spline2dSolver() = default;
-
-  virtual void Reset(const std::vector<double>& t_knots,
-                     const uint32_t order) = 0;
+  void Reset(const std::vector<double>& t_knots, const uint32_t order) override;
 
   // customize setup
-  virtual Spline2dConstraint* mutable_constraint() = 0;
-  virtual Spline2dKernel* mutable_kernel() = 0;
-  virtual Spline2d* mutable_spline() = 0;
+  Spline2dConstraint* mutable_constraint() override;
+  Spline2dKernel* mutable_kernel() override;
+  Spline2d* mutable_spline() override;
 
   // solve
-  virtual bool Solve() = 0;
+  bool Solve() override;
 
   // extract
-  virtual const Spline2d& spline() const = 0;
+  const Spline2d& spline() const override;
 
- protected:
-  Spline2d spline_;
-  Spline2dKernel kernel_;
-  Spline2dConstraint constraint_;
+ private:
+  std::unique_ptr<::qpOASES::SQProblem> sqp_solver_;
+
+  int last_num_constraint_ = 0;
+  int last_num_param_ = 0;
+  bool last_problem_success_ = false;
 };
 
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_SMOOTHING_SPLINE_SPLINE_2D_SOLVER_H_
+#endif  // MODULES_PLANNING_SMOOTHING_SPLINE_ACTIVE_SET_SPLINE_2D_SOLVER_H_

@@ -177,9 +177,10 @@ cc_library(
 cc_library(
     name = "spline_2d_solver",
     srcs = [
-        "spline_2d_solver.cc",
+        "active_set_spline_2d_solver.cc",
     ],
     hdrs = [
+        "active_set_spline_2d_solver.h",
         "spline_2d_solver.h",
     ],
     deps = [

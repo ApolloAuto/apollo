@@ -17,7 +17,7 @@
 /**
  * @file
  **/
-#include "modules/planning/math/smoothing_spline/spline_2d_solver.h"
+#include "modules/planning/math/smoothing_spline/active_set_spline_2d_solver.h"
 
 #include "gtest/gtest.h"
 
@@ -32,7 +32,7 @@ using Eigen::MatrixXd;
 TEST(constraint_test, test_suit_one) {
   std::vector<double> t_knots{0, 1, 2, 3, 4, 5};
   std::size_t order = 5;
-  Spline2dSolver spline_solver(t_knots, order);
+  ActiveSetSpline2dSolver spline_solver(t_knots, order);
 
   Spline2dConstraint* constraint = spline_solver.mutable_constraint();
   Spline2dKernel* kernel = spline_solver.mutable_kernel();

@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,17 +15,16 @@
  *****************************************************************************/
 
 /**
- * @file spline_smoother_solver.cc
+ * @file
  **/
 
-#include "modules/planning/math/smoothing_spline/spline_2d_solver.h"
+#include "modules/planning/math/smoothing_spline/active_set_spline_2d_solver.h"
 
 #include <algorithm>
 
 #include "Eigen/Core"
-
 #include "cybertron/common/log.h"
-#include "modules/common/math/qp_solver/active_set_qp_solver.h"
+
 #include "modules/common/math/qp_solver/qp_solver_gflags.h"
 #include "modules/common/time/time.h"
 #include "modules/planning/common/planning_gflags.h"
@@ -40,29 +39,27 @@ constexpr double kRoadBound = 1e10;
 using apollo::common::time::Clock;
 using Eigen::MatrixXd;
 
-Spline2dSolver::Spline2dSolver(const std::vector<double>& t_knots,
-                               const uint32_t order)
-    : spline_(t_knots, order),
-      kernel_(t_knots, order),
-      constraint_(t_knots, order) {}
+ActiveSetSpline2dSolver::ActiveSetSpline2dSolver(
+    const std::vector<double>& t_knots, const uint32_t order)
+    : Spline2dSolver(t_knots, order) {}
 
-void Spline2dSolver::Reset(const std::vector<double>& t_knots,
-                           const uint32_t order) {
+void ActiveSetSpline2dSolver::Reset(const std::vector<double>& t_knots,
+                                    const uint32_t order) {
   spline_ = Spline2d(t_knots, order);
   kernel_ = Spline2dKernel(t_knots, order);
   constraint_ = Spline2dConstraint(t_knots, order);
 }
 
 // customize setup
-Spline2dConstraint* Spline2dSolver::mutable_constraint() {
+Spline2dConstraint* ActiveSetSpline2dSolver::mutable_constraint() {
   return &constraint_;
 }
 
-Spline2dKernel* Spline2dSolver::mutable_kernel() { return &kernel_; }
+Spline2dKernel* ActiveSetSpline2dSolver::mutable_kernel() { return &kernel_; }
 
-Spline2d* Spline2dSolver::mutable_spline() { return &spline_; }
+Spline2d* ActiveSetSpline2dSolver::mutable_spline() { return &spline_; }
 
-bool Spline2dSolver::Solve() {
+bool ActiveSetSpline2dSolver::Solve() {
   const MatrixXd& kernel_matrix = kernel_.kernel_matrix();
   const MatrixXd& offset = kernel_.offset();
   const MatrixXd& inequality_constraint_matrix =
@@ -182,7 +179,7 @@ bool Spline2dSolver::Solve() {
   ::qpOASES::returnValue ret;
   const double start_timestamp = Clock::NowInSeconds();
   if (use_hotstart) {
-    ADEBUG << "Spline2dSolver is using SQP hotstart.";
+    ADEBUG << "ActiveSetSpline2dSolver is using SQP hotstart.";
     ret = sqp_solver_->hotstart(
         h_matrix, g_matrix, affine_constraint_matrix, lower_bound, upper_bound,
         constraint_lower_bound, constraint_upper_bound, max_iter);
@@ -193,13 +190,13 @@ bool Spline2dSolver::Solve() {
                               constraint_upper_bound, max_iter);
     }
   } else {
-    AINFO << "Spline2dSolver is NOT using SQP hotstart.";
+    AINFO << "ActiveSetSpline2dSolver is NOT using SQP hotstart.";
     ret = sqp_solver_->init(h_matrix, g_matrix, affine_constraint_matrix,
                             lower_bound, upper_bound, constraint_lower_bound,
                             constraint_upper_bound, max_iter);
   }
   const double end_timestamp = Clock::NowInSeconds();
-  ADEBUG << "Spline2dSolver QP time: "
+  ADEBUG << "ActiveSetSpline2dSolver QP time: "
          << (end_timestamp - start_timestamp) * 1000 << " ms.";
   ADEBUG << "return status is" << getSimpleStatus(ret);
   if (ret != qpOASES::SUCCESSFUL_RETURN) {
@@ -232,6 +229,6 @@ bool Spline2dSolver::Solve() {
 }
 
 // extract
-const Spline2d& Spline2dSolver::spline() const { return spline_; }
+const Spline2d& ActiveSetSpline2dSolver::spline() const { return spline_; }
 }  // namespace planning
 }  // namespace apollo
