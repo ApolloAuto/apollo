@@ -43,7 +43,6 @@ namespace dreamview {
 
 using apollo::canbus::Chassis;
 using apollo::common::DriveEvent;
-using apollo::common::util::FillHeader;
 using apollo::common::PathPoint;
 using apollo::common::Point3D;
 using apollo::common::PointENU;
@@ -55,6 +54,7 @@ using apollo::common::time::Clock;
 using apollo::common::time::ToSecond;
 using apollo::common::time::millis;
 using apollo::common::util::DownsampleByAngle;
+using apollo::common::util::FillHeader;
 using apollo::common::util::GetProtoFromFile;
 using apollo::control::ControlCommand;
 using apollo::hdmap::Curve;
@@ -341,19 +341,16 @@ void SimulationWorldService::Update() {
 }
 
 void SimulationWorldService::UpdateDelays() {
-  // auto *delays = world_.mutable_delay();
-  // delays->set_chassis(SecToMs(AdapterManager::GetChassis()->GetDelaySec()));
-  // delays->set_localization(
-  //     SecToMs(AdapterManager::GetLocalization()->GetDelaySec()));
-  // delays->set_perception_obstacle(
-  //     SecToMs(AdapterManager::GetPerceptionObstacles()->GetDelaySec()));
-  // delays->set_planning(SecToMs(AdapterManager::GetPlanning()->GetDelaySec()));
-  // delays->set_prediction(
-  //     SecToMs(AdapterManager::GetPrediction()->GetDelaySec()));
-  // delays->set_traffic_light(
-  //     SecToMs(AdapterManager::GetTrafficLightDetection()->GetDelaySec()));
-  // delays->set_control(
-  //     SecToMs(AdapterManager::GetControlCommand()->GetDelaySec()));
+  auto *delays = world_.mutable_delay();
+  delays->set_chassis(SecToMs(chassis_reader_->GetDelaySec()));
+  delays->set_localization(SecToMs(localization_reader_->GetDelaySec()));
+  delays->set_perception_obstacle(
+      SecToMs(perception_obstacle_reader_->GetDelaySec()));
+  delays->set_planning(SecToMs(planning_reader_->GetDelaySec()));
+  delays->set_prediction(SecToMs(prediction_obstacle_reader_->GetDelaySec()));
+  delays->set_traffic_light(
+      SecToMs(perception_traffic_light_reader_->GetDelaySec()));
+  delays->set_control(SecToMs(control_command_reader_->GetDelaySec()));
 }
 
 void SimulationWorldService::GetWireFormatString(

@@ -31,10 +31,11 @@
 using apollo::canbus::Chassis;
 using apollo::common::math::HeadingToQuaternion;
 using apollo::common::time::Clock;
+using apollo::cybertron::blocker::BlockerManager;
 using apollo::localization::LocalizationEstimate;
 using apollo::planning::ADCTrajectory;
+using apollo::prediction::PredictionObstacles;
 using apollo::routing::RoutingResponse;
-using apollo::cybertron::blocker::BlockerManager;
 
 namespace apollo {
 namespace dreamview {
@@ -167,5 +168,51 @@ TEST_F(SimControlTest, Test) {
   }
 }
 
+TEST_F(SimControlTest, TestDummyPrediction) {
+  Clock::SetMode(Clock::MOCK);
+
+  sim_control_->Init(false);
+  sim_control_->enabled_ = true;
+
+  std::shared_ptr<PredictionObstacles> obstacles =
+      std::make_shared<PredictionObstacles>();
+
+  {
+    const double timestamp = 100.01;
+    Clock::SetNow(apollo::common::time::From(timestamp).time_since_epoch());
+    obstacles->mutable_header()->set_timestamp_sec(timestamp);
+    obstacles->mutable_header()->set_module_name("NoneSimPrediction");
+    sim_control_->OnPredictionObstacles(obstacles);
+
+    sim_control_->PublishDummyPrediction();
+
+    BlockerManager::Instance()->Observe();
+    EXPECT_FALSE(sim_control_->send_dummy_prediction_);
+    EXPECT_TRUE(BlockerManager::Instance()
+                    ->GetBlocker<PredictionObstacles>(FLAGS_prediction_topic)
+                    ->IsObservedEmpty());
+  }
+
+  sim_control_->InternalReset();
+
+  {
+    const double timestamp = 100.2;
+    Clock::SetNow(apollo::common::time::From(timestamp).time_since_epoch());
+    obstacles->mutable_header()->set_timestamp_sec(timestamp);
+    obstacles->mutable_header()->set_module_name("SimPrediction");
+    sim_control_->OnPredictionObstacles(obstacles);
+
+    sim_control_->PublishDummyPrediction();
+
+    EXPECT_TRUE(sim_control_->send_dummy_prediction_);
+    BlockerManager::Instance()->Observe();
+    auto prediction =
+        BlockerManager::Instance()
+            ->GetBlocker<PredictionObstacles>(FLAGS_prediction_topic)
+            ->GetLatestObservedPtr();
+    EXPECT_EQ("SimPrediction", prediction->header().module_name());
+    EXPECT_DOUBLE_EQ(prediction->header().timestamp_sec(), timestamp);
+  }
+}
 }  // namespace dreamview
 }  // namespace apollo
