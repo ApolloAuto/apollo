@@ -23,7 +23,7 @@ namespace apollo {
 namespace drivers {
 namespace velodyne {
 
-uint64_t VelodyneParser::get_gps_stamp(double current_packet_stamp,
+uint64_t VelodyneParser::GetGpsStamp(double current_packet_stamp,
                                        double *previous_packet_stamp,
                                        uint64_t *gps_base_usec) {
   if (current_packet_stamp < *previous_packet_stamp) {
@@ -122,7 +122,7 @@ bool VelodyneParser::is_scan_valid(int rotation, float range) {
   return true;
 }
 
-void VelodyneParser::compute_coords(const float &raw_distance,
+void VelodyneParser::ComputeCoords(const float &raw_distance,
                                     const LaserCorrection &corrections,
                                     const uint16_t rotation,
                                     PointXYZIT *point) {
@@ -200,7 +200,7 @@ void VelodyneParser::compute_coords(const float &raw_distance,
   point->set_z(static_cast<float>(z));
 }
 
-VelodyneParser *VelodyneParserFactory::create_parser(Config source_config) {
+VelodyneParser *VelodyneParserFactory::CreateParser(Config source_config) {
   Config config = source_config;
   if (config.model() == VLP16) {
     config.set_calibration_online(false);

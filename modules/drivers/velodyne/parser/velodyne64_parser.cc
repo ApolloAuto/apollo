@@ -27,7 +27,7 @@ Velodyne64Parser::Velodyne64Parser(const Config& config)
     previous_packet_stamp_[i] = 0;
   }
   need_two_pt_correction_ = true;
-  // init unpack function and order function by model.
+  // init Unpack function and order function by model.
   if (config_.model() == HDL64E_S2) {
     inner_time_ = &velodyne::INNER_TIME_64;
     is_s2_ = true;
@@ -46,11 +46,11 @@ Velodyne64Parser::Velodyne64Parser(const Config& config)
 void Velodyne64Parser::setup() {
   VelodyneParser::setup();
   if (!config_.calibration_online() && config_.organized()) {
-    init_offsets();
+    InitOffsets();
   }
 }
 
-void Velodyne64Parser::set_base_time_from_packets(const VelodynePacket& pkt) {
+void Velodyne64Parser::SetBaseTimeFromPackets(const VelodynePacket& pkt) {
   // const RawPacket* raw = (const RawPacket*)&pkt.data[0];
   const RawPacket* raw = (const RawPacket*)pkt.data().c_str();
   StatusType status_type = StatusType(raw->status_type);
@@ -116,7 +116,7 @@ void Velodyne64Parser::set_base_time_from_packets(const VelodynePacket& pkt) {
   }
 }
 
-void Velodyne64Parser::check_gps_status(const VelodynePacket& pkt) {
+void Velodyne64Parser::CheckGpsStatus(const VelodynePacket& pkt) {
   // const RawPacket* raw = (const RawPacket*)&pkt.data[0];
   const RawPacket* raw = (const RawPacket*)pkt.data().c_str();
   StatusType status_type = StatusType(raw->status_type);
@@ -132,7 +132,7 @@ void Velodyne64Parser::check_gps_status(const VelodynePacket& pkt) {
   }
 }
 
-void Velodyne64Parser::init_offsets() {
+void Velodyne64Parser::InitOffsets() {
   int width = 64;
   // pre compute col offsets
   for (int i = 0; i < width; ++i) {
@@ -146,7 +146,7 @@ void Velodyne64Parser::init_offsets() {
   }
 }
 
-void Velodyne64Parser::generate_pointcloud(
+void Velodyne64Parser::GeneratePointcloud(
     const std::shared_ptr<VelodyneScan>& scan_msg,
     std::shared_ptr<PointCloud> pointcloud) {
   if (config_.calibration_online() && !calibration_.initialized_) {
@@ -155,7 +155,7 @@ void Velodyne64Parser::generate_pointcloud(
     }
     calibration_ = online_calibration_.calibration();
     if (config_.organized()) {
-      init_offsets();
+      InitOffsets();
     }
   }
 
@@ -170,12 +170,12 @@ void Velodyne64Parser::generate_pointcloud(
   for (size_t i = 0; i < packets_size; ++i) {
     if (gps_base_usec_[0] == 0) {
       // only set one time type when call this function, so cannot break
-      set_base_time_from_packets(scan_msg->firing_pkts(i));
+      SetBaseTimeFromPackets(scan_msg->firing_pkts(i));
       // If base time not ready then set empty_unpack true
       skip = true;
     } else {
-      check_gps_status(scan_msg->firing_pkts(i));
-      unpack(scan_msg->firing_pkts(i), pointcloud);
+      CheckGpsStatus(scan_msg->firing_pkts(i));
+      Unpack(scan_msg->firing_pkts(i), pointcloud);
       last_time_stamp_ = pointcloud->measurement_time();
       ADEBUG << "stamp: " << std::fixed << last_time_stamp_;
     }
@@ -197,7 +197,7 @@ void Velodyne64Parser::generate_pointcloud(
   }
 }
 
-uint64_t Velodyne64Parser::get_timestamp(double base_time, float time_offset,
+uint64_t Velodyne64Parser::GetTimestamp(double base_time, float time_offset,
                                          uint16_t block_id) {
   double t = base_time - time_offset;
   double timestamp = 0;
@@ -207,17 +207,17 @@ uint64_t Velodyne64Parser::get_timestamp(double base_time, float time_offset,
     index = block_id & 1;  // % 2
     double& previous_packet_stamp = previous_packet_stamp_[index];
     uint64_t& gps_base_usec = gps_base_usec_[index];
-    timestamp = get_gps_stamp(t, &previous_packet_stamp, &gps_base_usec);
+    timestamp = GetGpsStamp(t, &previous_packet_stamp, &gps_base_usec);
   } else {                 // 64E_S3
     index = block_id & 3;  // % 4
     double& previous_packet_stamp = previous_packet_stamp_[index];
     uint64_t& gps_base_usec = gps_base_usec_[index];
-    timestamp = get_gps_stamp(t, &previous_packet_stamp, &gps_base_usec);
+    timestamp = GetGpsStamp(t, &previous_packet_stamp, &gps_base_usec);
   }
   return timestamp;
 }
 
-int Velodyne64Parser::intensity_compensate(const LaserCorrection& corrections,
+int Velodyne64Parser::IntensityCompensate(const LaserCorrection& corrections,
                                            const uint16_t raw_distance,
                                            int intensity) {
   float tmp = 1 - static_cast<float>(raw_distance) / 65535;
@@ -234,7 +234,7 @@ int Velodyne64Parser::intensity_compensate(const LaserCorrection& corrections,
   return intensity;
 }
 
-void Velodyne64Parser::unpack(const VelodynePacket& pkt,
+void Velodyne64Parser::Unpack(const VelodynePacket& pkt,
                               std::shared_ptr<PointCloud> pc) {
   ADEBUG << "Received packet, time: " << pkt.stamp();
 
@@ -264,7 +264,7 @@ void Velodyne64Parser::unpack(const VelodynePacket& pkt,
       raw_distance.bytes[1] = raw->blocks[i].data[k + 1];
 
       // compute time
-      uint64_t timestamp = get_timestamp(basetime, (*inner_time_)[i][j], i);
+      uint64_t timestamp = GetTimestamp(basetime, (*inner_time_)[i][j], i);
 
       if (j == SCANS_PER_BLOCK - 1) {
         // set header stamp before organize the point cloud
@@ -291,16 +291,16 @@ void Velodyne64Parser::unpack(const VelodynePacket& pkt,
       apollo::drivers::PointXYZIT* point = pc->add_point();
       point->set_timestamp(timestamp);
       // Position Calculation, append this point to the cloud
-      compute_coords(real_distance, corrections, raw->blocks[i].rotation,
+      ComputeCoords(real_distance, corrections, raw->blocks[i].rotation,
                      point);
-      point->set_intensity(intensity_compensate(
+      point->set_intensity(IntensityCompensate(
           corrections, raw_distance.raw_distance, raw->blocks[i].data[k + 2]));
       // append this point to the cloud
     }
   }
 }
 
-void Velodyne64Parser::order(std::shared_ptr<PointCloud> cloud) {
+void Velodyne64Parser::Order(std::shared_ptr<PointCloud> cloud) {
   int height = 64;
   cloud->set_height(height);
   int width = cloud->point_size() / cloud->height();

@@ -28,99 +28,59 @@ namespace apollo {
 namespace drivers {
 namespace velodyne {
 
-using apollo::drivers::velodyne::HDL32E;
-using apollo::drivers::velodyne::HDL64E_S2;
-using apollo::drivers::velodyne::HDL64E_S3D;
-using apollo::drivers::velodyne::HDL64E_S3S;
-using apollo::drivers::velodyne::VelodynePacket;
-using apollo::drivers::velodyne::VelodyneScan;
-using apollo::drivers::velodyne::VLP16;
-using apollo::drivers::velodyne::VLP32C;
-using apollo::drivers::velodyne::VLS128;
-using apollo::drivers::velodyne::config::Config;
-
 constexpr int BLOCKS_PER_PACKET = 12;
 constexpr int BLOCK_SIZE = 100;
 
-// configuration parameters
-// struct Config {
-//  std::string frame_id;  ///< tf frame ID
-//  std::string model;     ///< device model name
-//  std::string topic;
-//  int npackets = 0;  ///< number of packets to collect
-//  double rpm = 0.0;  ///< device rotation rate (RPMs)
-//  int firing_data_port = 0;
-//  int positioning_data_port = 0;
-//  int prefix_angle = 0;  // prefix angle to recv
-//  bool use_sensor_sync = false;
-//};
+constexpr double PACKET_RATE_VLP16 = 754;
+constexpr double PACKET_RATE_HDL32E = 1808.0;
+constexpr double PACKET_RATE_HDL64E_S2 = 3472.17;
+constexpr double PACKET_RATE_HDL64E_S3S = 3472.17;
+constexpr double PACKET_RATE_HDL64E_S3D = 5789;
+constexpr double PACKET_RATE_VLS128 = 6250.0;
 
 class VelodyneDriver {
  public:
-  VelodyneDriver();
+  explicit VelodyneDriver(const config::Config &config) : config_(config) {}
   virtual ~VelodyneDriver() {}
 
-  virtual bool poll(std::shared_ptr<VelodyneScan> scan) = 0;
-  virtual void init() = 0;
-  virtual void poll_positioning_packet();
+  virtual bool Poll(std::shared_ptr<VelodyneScan> scan);
+  virtual void Init();
+  virtual void PollPositioningPacket();
+  void SetPacketRate(const double packet_rate) { packet_rate_ = packet_rate; }
 
  protected:
-  Config config_;
+  config::Config config_;
   std::unique_ptr<Input> input_ = nullptr;
   std::unique_ptr<Input> positioning_input_ = nullptr;
   std::string topic_;
+  double packet_rate_ = 0.0;
 
-  uint64_t basetime_;
-  uint32_t last_gps_time_;
+  uint64_t basetime_ = 0;
+  uint32_t last_gps_time_ = 0;
 
-  virtual int poll_standard(std::shared_ptr<VelodyneScan> scan);
-  bool set_base_time();
-  void set_base_time_from_nmea_time(NMEATimePtr nmea_time, uint64_t *basetime);
-  void update_gps_top_hour(uint32_t current_time);
+  virtual int PollStandard(std::shared_ptr<VelodyneScan> scan);
+  bool SetBaseTime();
+  void SetBaseTimeFromNmeaTime(NMEATimePtr nmea_time, uint64_t *basetime);
+  void UpdateGpsTopHour(uint32_t current_time);
 };
 
 class Velodyne64Driver : public VelodyneDriver {
  public:
-  explicit Velodyne64Driver(const Config &config);
+  explicit Velodyne64Driver(const config::Config &config)
+      : VelodyneDriver(config) {}
   virtual ~Velodyne64Driver() {}
 
-  void init() override;
-  bool poll(std::shared_ptr<VelodyneScan> scan) override;
+  void Init() override;
+  bool Poll(std::shared_ptr<VelodyneScan> scan) override;
 
  private:
-  bool check_angle(const VelodynePacket &packet);
-  int poll_standard_sync(std::shared_ptr<VelodyneScan> scan);
-};
-
-class Velodyne32Driver : public VelodyneDriver {
- public:
-  explicit Velodyne32Driver(const Config &config);
-  virtual ~Velodyne32Driver() {}
-  void init() override;
-  bool poll(std::shared_ptr<VelodyneScan> scan) override;
-};
-
-class Velodyne16Driver : public VelodyneDriver {
- public:
-  explicit Velodyne16Driver(const Config &config);
-  virtual ~Velodyne16Driver() {}
-
-  void init() override;
-  bool poll(std::shared_ptr<VelodyneScan> scan) override;
-};
-
-class Velodyne128Driver : public VelodyneDriver {
- public:
-  explicit Velodyne128Driver(const Config &config);
-  virtual ~Velodyne128Driver() {}
-
-  void init() override;
-  bool poll(std::shared_ptr<VelodyneScan> scan) override;
+  bool CheckAngle(const VelodynePacket &packet);
+  int PollStandardSync(std::shared_ptr<VelodyneScan> scan);
 };
 
 class VelodyneDriverFactory {
  public:
-  static VelodyneDriver *create_driver(const Config &config);
+  static VelodyneDriver *CreateDriver(const config::Config &config);
 };
 
 }  // namespace velodyne

@@ -24,8 +24,7 @@ namespace velodyne {
 
 bool VelodyneCompensatorComponent::Init() {
   Config velodyne_config;
-  if (!apollo::cybertron::common::GetProtoFromFile(config_file_path_,
-                                                   &velodyne_config)) {
+  if (!GetProtoConfig(&velodyne_config)) {
     AWARN << "Load config failed, config file" << config_file_path_;
     return false;
   }
@@ -55,7 +54,7 @@ bool VelodyneCompensatorComponent::Proc(
   std::shared_ptr<PointCloud> point_cloud_compensated =
       compensator_deque_[index_++];
   point_cloud_compensated->Clear();
-  if (_compensator->motion_compensation(point_cloud, point_cloud_compensated)) {
+  if (_compensator->MotionCompensation(point_cloud, point_cloud_compensated)) {
     uint64_t diff = cybertron::Time().Now().ToNanosecond() - start;
     AINFO << "compenstator diff:" << diff
           << ";meta:" << point_cloud_compensated->header().lidar_timestamp();

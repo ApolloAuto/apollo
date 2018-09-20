@@ -44,7 +44,7 @@ class Convert {
   void init(const Config& velodyne_config);
 
   // convert velodyne data to pointcloud and public
-  void convert_packets_to_pointcloud(
+  void ConvertPacketsToPointcloud(
       const std::shared_ptr<VelodyneScan>& scan_msg,
       std::shared_ptr<PointCloud> point_cloud_out);
 

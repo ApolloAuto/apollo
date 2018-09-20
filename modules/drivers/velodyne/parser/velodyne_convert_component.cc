@@ -28,8 +28,7 @@ namespace velodyne {
 
 bool VelodyneConvertComponent::Init() {
   Config velodyne_config;
-  if (!apollo::cybertron::common::GetProtoFromFile(config_file_path_,
-                                                   &velodyne_config)) {
+  if (!!GetProtoConfig(&velodyne_config)) {
     AWARN << "Load config failed, config file" << config_file_path_;
     return false;
   }
@@ -61,7 +60,7 @@ bool VelodyneConvertComponent::Proc(
     return false;
   }
   point_cloud_out->Clear();
-  conv_->convert_packets_to_pointcloud(scan_msg, point_cloud_out);
+  conv_->ConvertPacketsToPointcloud(scan_msg, point_cloud_out);
 
   if (point_cloud_out == nullptr || point_cloud_out->point_size() == 0) {
     AWARN << "point_cloud_out convert is empty.";
