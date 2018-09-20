@@ -47,8 +47,8 @@ class RtkPlayer(object):
     rtk player class
     """
 
-    def __init__(self, record_file, node,
-                 speedmultiplier, completepath, replan):
+    def __init__(self, record_file, node, speedmultiplier, completepath,
+                 replan):
         """Init player."""
         self.firstvalid = False
         self.logger = Logger.get_logger(tag="RtkPlayer")
@@ -70,8 +70,7 @@ class RtkPlayer(object):
         self.chassis_received = False
 
         self.planning_pub = node.create_writer('/apollo/planning',
-                            planning_pb2.DESCRIPTOR.
-                            message_types_by_name['ADCTrajectory'].full_name)
+                                               planning_pb2.ADCTrajectory)
 
         self.speedmultiplier = speedmultiplier / 100
         self.terminating = False
@@ -287,14 +286,14 @@ def main():
     atexit.register(player.shutdown)
 
     node.create_reader('/apollo/canbus/chassis', chassis_pb2.Chassis,
-                     player.chassis_callback)
+                       player.chassis_callback)
 
     node.create_reader('/apollo/localization/pose',
-                     localization_pb2.LocalizationEstimate,
-                     player.localization_callback)
+                       localization_pb2.LocalizationEstimate,
+                       player.localization_callback)
 
     node.create_reader('/apollo/control/pad', pad_msg_pb2.PadMessage,
-                     player.padmsg_callback)
+                       player.padmsg_callback)
 
     while not cybertron.is_shutdown():
         now = time.time()
