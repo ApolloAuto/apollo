@@ -26,7 +26,7 @@ namespace prediction {
 
 class ScenarioFeatures {
  public:
-  ScenarioFeatures() = 0;
+  ScenarioFeatures() = default;
 
   ~ScenarioFeatures() = default;
 };

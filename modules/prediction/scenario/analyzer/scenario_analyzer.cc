@@ -35,5 +35,10 @@ const Scenario& ScenarioAnalyzer::scenario() const {
   return scenario_;
 }
 
+std::shared_ptr<const ScenarioFeatures>
+ScenarioAnalyzer::GetScenarioFeatures() const {
+  return nullptr;
+}
+
 }  // namespace prediction
 }  // namespace apollo

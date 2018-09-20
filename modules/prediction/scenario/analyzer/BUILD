@@ -11,6 +11,7 @@ cc_library(
         "//modules/prediction/proto:scenario_proto",
         "//modules/prediction/common:environment_features",
         "//modules/prediction/common:prediction_gflags",
+        "//modules/prediction/scenario/scenario_features:scenario_features",
     ],
 )
 

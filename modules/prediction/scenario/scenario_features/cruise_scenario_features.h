@@ -24,10 +24,12 @@
 #include <string>
 #include <unordered_set>
 
+#include "modules/prediction/scenario/scenario_features/scenario_features.h"
+
 namespace apollo {
 namespace prediction {
 
-class CruiseScenarioFeatures {
+class CruiseScenarioFeatures : public ScenarioFeatures {
  public:
   CruiseScenarioFeatures();
 
