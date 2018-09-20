@@ -33,21 +33,21 @@ namespace apollo {
 namespace planning {
 
 struct ReedSheppPath {
-  std::vector<double> segs_lengths;
-  double total_length;
+  double segs_lengths[];
+  char segs_types[];
+  double total_length = 0.0;
   std::vector<double> x;
   std::vector<double> y;
-  std::vector<double> final_phi;
+  std::vector<double> phi;
   // true for driving forward and false for driving backward
   std::vector<bool> gear;
 };
 
 struct RSPParam {
-  bool flag;
-  bool backward;
-  double t;
-  double u;
-  double v;
+  bool flag = false;
+  double t = 0.0;
+  double u = 0.0;
+  double v = 0.0;
 }
 
 class ReedShepp {
@@ -73,11 +73,16 @@ class ReedShepp {
                    std::vector<ReedSheppPath>* all_possible_paths);
   // Set local exact configurations profile of each movement primitive
   bool GenerateLocalConfigurations(
+      const std::shared_ptr<Node3d> start_node,
+      const std::shared_ptr<Node3d> end_node,
       std::vector<ReedSheppPath>* all_possible_paths);
   // Interpolation usde in GenetateLocalConfiguration
-  std::vector<ReedSheppPath> Interpolation();
+  void Interpolation(double index, double pd, char m, double ox, double oy,
+                     double ophi, double& px[], double& py[], double& pphi[],
+                     bool& pgear[]);
   // motion primitives combination setup function
-  std::vector<ReedSheppPath> SetRSP(RSPParam& param, std::vector<ReedSheppPath>* all_possible_paths);
+  bool SetRSP(double lengths[], char types[],
+              std::vector<ReedSheppPath>* all_possible_paths);
   // Six different combination of motion primitive in Reed Shepp path used in
   // GenerateRSP()
   bool SCS(double x, double y, double phi,
@@ -102,6 +107,8 @@ class ReedShepp {
   void LRSR(double x, double y, double phi, RSPParam* param);
   void LRSL(double x, double y, double phi, RSPParam* param);
   void LRSLR(double x, double y, double phi, RSPParam* param);
+  std::pair<double, double> calc_tau_omega(double u, double v, double xi,
+                                           double eta, double phi);
 
  private:
   common::VehicleParam vehicle_param_;
