@@ -19,17 +19,14 @@
 This program can publish drive event message
 """
 
-import rosbag
-import std_msgs
+from cybertron import cybertron
+
 import argparse
 import datetime
 import shutil
 import time
 import os
-import rospy
 import sys
-
-from std_msgs.msg import String
 
 from common.message_manager import PbMessageManager
 from common import proto_utils
@@ -79,17 +76,15 @@ if __name__ == "__main__":
             g_args.localization_topic)
         sys.exit(0)
 
-    rospy.init_node('drive_event_node', anonymous=True)
+    cybertron.init()
+    node = cybertron.Node("derive_event_node")
+    node.create_reader(localization_meta_msg.topic(),
+                       localization_meta_msg.msg_type(), OnReceiveLocalization)
 
-    rospy.Subscriber(localization_meta_msg.topic(),
-                     localization_meta_msg.msg_type(), OnReceiveLocalization)
-
-    pub = rospy.Publisher(
-        drive_event_meta_msg.topic(),
-        drive_event_meta_msg.msg_type(),
-        queue_size=10)
+    writer = node.create_writer(drive_event_meta_msg.topic(),
+                                drive_event_meta_msg.msg_type())
     seq_num = 0
-    while not rospy.is_shutdown():
+    while not cybertron.is_shutdown():
         event_type = raw_input(
             "Type in Event Type('d') and press Enter (current time: " +
             str(datetime.datetime.now()) + ")\n>")
@@ -112,9 +107,10 @@ if __name__ == "__main__":
         event_msg.event = event_str
         if g_localization:
             event_msg.location.CopyFrom(g_localization.pose)
-        pub.publish(event_msg)
+        writer.write(event_msg)
         time_str = datetime.datetime.fromtimestamp(current_time).strftime(
             "%Y%m%d%H%M%S")
         filename = os.path.join(g_args.dir, "%s_drive_event.pb.txt" % time_str)
         proto_utils.write_pb_to_text_file(event_msg, filename)
         print("logged to rosbag and written to file %s" % filename)
+        time.sleep(0.1)
