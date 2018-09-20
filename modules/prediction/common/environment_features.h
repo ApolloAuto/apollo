@@ -79,10 +79,6 @@ class EnvironmentFeatures {
 
   const std::vector<int>& get_obstacle_ids() const;
 
-  bool IsLaneOfInterest(const std::string lane_id) const;
-
-  void InsertLaneOfInterest(const std::string lane_id);
-
  private:
   double ego_velocity_ = 0.0;
 
@@ -115,8 +111,6 @@ class EnvironmentFeatures {
   double dist_to_front_junction_ = 0.0;
 
   std::vector<int> obstacle_ids_;
-
-  std::unordered_set<std::string> lane_ids_of_interest_;
 };
 
 }  // namespace prediction

@@ -134,13 +134,5 @@ const std::vector<int>& EnvironmentFeatures::get_obstacle_ids() const {
   return obstacle_ids_;
 }
 
-bool EnvironmentFeatures::IsLaneOfInterest(const std::string lane_id) const {
-  return lane_ids_of_interest_.find(lane_id) != lane_ids_of_interest_.end();
-}
-
-void EnvironmentFeatures::InsertLaneOfInterest(const std::string lane_id) {
-  lane_ids_of_interest_.insert(lane_id);
-}
-
 }  // namespace prediction
 }  // namespace apollo
