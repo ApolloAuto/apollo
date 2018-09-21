@@ -61,6 +61,8 @@ bool IntraWriter<MessageT>::Init() {
   }
 
   blocker_manager_ = BlockerManager::Instance();
+  blocker_manager_->GetOrCreateBlocker<MessageT>(
+      BlockerAttr(this->role_attr_.channel_name()));
   return true;
 }
 
