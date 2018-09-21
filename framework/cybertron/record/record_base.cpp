@@ -26,15 +26,22 @@ RecordBase::~RecordBase() {}
 
 const Header RecordBase::GetHeader() const { return header_; }
 
+bool RecordBase::IsNewChannel(const std::string& channel_name) {
+  auto search = channel_message_number_map_.find(channel_name);
+  if (search == channel_message_number_map_.end()) {
+    return true;
+  }
+  return false;
+}
+
 void RecordBase::OnNewChannel(const std::string& channel_name,
                               const std::string& message_type,
                               const std::string& proto_desc) {
-  auto search = channel_message_number_map_.find(channel_name);
-  if (search == channel_message_number_map_.end()) {
+  if (IsNewChannel(channel_name)) {
     channel_message_number_map_[channel_name] = 0;
+    channel_message_type_map_[channel_name] = message_type;
+    channel_proto_desc_map_[channel_name] = proto_desc;
   }
-  channel_message_type_map_[channel_name] = message_type;
-  channel_proto_desc_map_[channel_name] = proto_desc;
 }
 
 void RecordBase::OnNewMessage(const std::string& channel_name) {

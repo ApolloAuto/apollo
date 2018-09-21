@@ -68,14 +68,19 @@ bool RecordWriter::WriteChannel(const std::string& channel_name,
                                 const std::string& message_type,
                                 const std::string& proto_desc) {
   std::lock_guard<std::mutex> lg(mutex_);
-  OnNewChannel(channel_name, message_type, proto_desc);
-  Channel channel;
-  channel.set_name(channel_name);
-  channel.set_message_type(message_type);
-  channel.set_proto_desc(proto_desc);
-  if (!file_writer_->WriteChannel(channel)) {
-    AERROR << "write channel fail.";
-    return false;
+  if (IsNewChannel(channel_name)) {
+    OnNewChannel(channel_name, message_type, proto_desc);
+    Channel channel;
+    channel.set_name(channel_name);
+    channel.set_message_type(message_type);
+    channel.set_proto_desc(proto_desc);
+    if (!file_writer_->WriteChannel(channel)) {
+      AERROR << "write channel fail.";
+      return false;
+    }
+  } else {
+    AWARN << "intercept write channel request, duplicate channel: "
+          << channel_name;
   }
   return true;
 }
@@ -83,28 +88,23 @@ bool RecordWriter::WriteChannel(const std::string& channel_name,
 bool RecordWriter::WriteMessage(const SingleMessage& message) {
   std::lock_guard<std::mutex> lg(mutex_);
 
-  segment_raw_size_ += message.content().size();
-  if (segment_begin_time_ == 0) {
-    segment_begin_time_ = message.time();
-  }
-
   if (!file_writer_->WriteMessage(message)) {
     AERROR << "write message fail.";
     return false;
   }
 
-  if (0 == header_.segment_interval() && 0 == header_.segment_raw_size()) {
-    return true;
+  segment_raw_size_ += message.content().size();
+  if (segment_begin_time_ == 0) {
+    segment_begin_time_ = message.time();
   }
-
-  if (message.time() - segment_begin_time_ < header_.segment_interval() &&
-      segment_raw_size_ < header_.segment_raw_size()) {
-    return true;
+  if ((header_.segment_interval() > 0 &&
+       message.time() - segment_begin_time_ > header_.segment_interval()) ||
+      (header_.segment_raw_size() > 0 &&
+       segment_raw_size_ > header_.segment_raw_size())) {
+    file_writer_backup_.swap(file_writer_);
+    file_writer_backup_->Close();
+    SplitOutfile();
   }
-
-  file_writer_backup_.swap(file_writer_);
-  file_writer_backup_->Close();
-  SplitOutfile();
   return true;
 }
 

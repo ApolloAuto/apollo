@@ -42,7 +42,7 @@ using apollo::cybertron::common::UnixSecondsToString;
 const char INFO_OPTIONS[] = "f:h";
 const char RECORD_OPTIONS[] = "o:ac:h";
 const char PLAY_OPTIONS[] = "f:c:lr:b:e:s:d:h";
-const char SPLIT_OPTIONS[] = "f:o:c:b:e:h";
+const char SPLIT_OPTIONS[] = "f:o:c:k:b:e:h";
 const char RECOVER_OPTIONS[] = "f:o:h";
 
 void DisplayUsage(const std::string& binary);
@@ -95,7 +95,11 @@ void DisplayUsage(const std::string& binary, const std::string& command,
         std::cout << "\t-a, --all\t\t\t\t" << command << " all" << std::endl;
         break;
       case 'c':
-        std::cout << "\t-c, --channel <name>\t\t\tonly " << command
+        std::cout << "\t-c, --white-channel <name>\t\t\tonly " << command
+                  << " the specified channel" << std::endl;
+        break;
+      case 'k':
+        std::cout << "\t-k, --black-channel <name>\t\t\tnot " << command
                   << " the specified channel" << std::endl;
         break;
       case 'l':
@@ -142,10 +146,11 @@ int main(int argc, char** argv) {
   const std::string command(argv[1]);
 
   int long_index = 0;
-  const std::string short_opts = "f:c:o:alr:b:e:s:d:h";
+  const std::string short_opts = "f:c:k:o:alr:b:e:s:d:h";
   static const struct option long_opts[] = {
       {"files", required_argument, NULL, 'f'},
-      {"channel", required_argument, NULL, 'c'},
+      {"white-channel", required_argument, NULL, 'c'},
+      {"black-channel", required_argument, NULL, 'k'},
       {"output", required_argument, NULL, 'o'},
       {"all", no_argument, NULL, 'a'},
       {"loop", no_argument, NULL, 'l'},
@@ -158,7 +163,8 @@ int main(int argc, char** argv) {
 
   std::vector<std::string> opt_file_vec;
   std::vector<std::string> opt_output_vec;
-  std::vector<std::string> opt_channel_vec;
+  std::vector<std::string> opt_white_channels;
+  std::vector<std::string> opt_black_channels;
   bool opt_all = false;
   bool opt_loop = false;
   float opt_rate = 1.0f;
@@ -181,7 +187,19 @@ int main(int argc, char** argv) {
         optind--;
         while (optind < argc) {
           if (*argv[optind] != '-') {
-            opt_channel_vec.emplace_back(argv[optind]);
+            opt_white_channels.emplace_back(argv[optind]);
+            optind++;
+          } else {
+            optind--;
+            break;
+          }
+        }
+        break;
+      case 'k':
+        optind--;
+        while (optind < argc) {
+          if (*argv[optind] != '-') {
+            opt_black_channels.emplace_back(argv[optind]);
             optind++;
           } else {
             optind--;
@@ -294,16 +312,16 @@ int main(int argc, char** argv) {
     // TODO @baownayu order input record file
     bool play_result = true;
     for (auto& opt_file : opt_file_vec) {
-      Player player(opt_file_vec[0], opt_channel_vec.empty(), opt_channel_vec,
-                    opt_loop, opt_rate, opt_begin, opt_end, opt_start,
-                    opt_delay);
+      Player player(opt_file_vec[0], opt_white_channels.empty(),
+                    opt_white_channels, opt_loop, opt_rate, opt_begin, opt_end,
+                    opt_start, opt_delay);
       play_result = play_result && player.Init() ? true : false;
       play_result = play_result && player.Start() ? true : false;
     }
     ::apollo::cybertron::Shutdown();
     return play_result ? 0 : -1;
   } else if (command == "record") {
-    if (opt_channel_vec.empty() && !opt_all) {
+    if (opt_white_channels.empty() && !opt_all) {
       std::cout
           << "MUST specify channels option (-c) or all channels option (-a)."
           << std::endl;
@@ -320,8 +338,8 @@ int main(int argc, char** argv) {
     }
     bool record_result = true;
     ::apollo::cybertron::Init(argv[0]);
-    auto recorder =
-        std::make_shared<Recorder>(opt_output_vec[0], opt_all, opt_channel_vec);
+    auto recorder = std::make_shared<Recorder>(opt_output_vec[0], opt_all,
+                                               opt_white_channels);
     record_result = record_result && recorder->Start() ? true : false;
     if (record_result) {
       while (::apollo::cybertron::OK()) {
@@ -345,8 +363,8 @@ int main(int argc, char** argv) {
       opt_output_vec.push_back(default_output_file);
     }
     ::apollo::cybertron::Init(argv[0]);
-    Spliter spliter(opt_file_vec[0], opt_output_vec[0], opt_channel_vec.empty(),
-                    opt_channel_vec, opt_begin, opt_end);
+    Spliter spliter(opt_file_vec[0], opt_output_vec[0], opt_white_channels,
+                    opt_black_channels, opt_begin, opt_end);
     bool split_result = spliter.Proc();
     ::apollo::cybertron::Shutdown();
     return split_result ? 0 : -1;

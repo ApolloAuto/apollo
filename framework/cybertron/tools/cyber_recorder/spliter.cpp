@@ -21,24 +21,35 @@ namespace cybertron {
 namespace record {
 
 Spliter::Spliter(const std::string& input_file, const std::string& output_file,
-                 bool all_channels, const std::vector<std::string>& channel_vec,
+                 const std::vector<std::string>& white_channels,
+                 const std::vector<std::string>& black_channels,
                  uint64_t begin_time, uint64_t end_time)
     : input_file_(input_file),
       output_file_(output_file),
-      channel_vec_(channel_vec),
-      all_channels_(all_channels),
+      white_channels_(white_channels),
+      black_channels_(black_channels),
       begin_time_(begin_time),
       end_time_(end_time) {}
 
 Spliter::~Spliter() {}
 
 bool Spliter::Proc() {
-  AINFO << "split record file started.";
+  // check params
   if (begin_time_ >= end_time_) {
     AERROR << "begin time larger or equal than end time, begin_time_: "
            << begin_time_ << "end_time_: " << end_time_;
     return false;
   }
+  for (auto channel_name : white_channels_) {
+    if (std::find(black_channels_.begin(), black_channels_.end(),
+                  channel_name) != black_channels_.end()) {
+      AERROR << "find channel in both of white list and black list, channel: "
+             << channel_name;
+      return false;
+    }
+  }
+
+  AINFO << "split record file started.";
 
   // open input file
   if (!reader_.Open(input_file_)) {
@@ -88,10 +99,13 @@ bool Spliter::Proc() {
           AERROR << "read channel section fail.";
           return false;
         }
-        if (all_channels_ ||
-            std::find(channel_vec_.begin(), channel_vec_.end(), chan.name()) !=
-                channel_vec_.end()) {
-          writer_.WriteChannel(chan);
+        if (white_channels_.empty() ||
+            std::find(white_channels_.begin(), white_channels_.end(),
+                      chan.name()) != white_channels_.end()) {
+          if (std::find(black_channels_.begin(), black_channels_.end(),
+                        chan.name()) == black_channels_.end()) {
+            writer_.WriteChannel(chan);
+          }
         }
         break;
       }
@@ -118,10 +132,15 @@ bool Spliter::Proc() {
           return false;
         }
         for (int idx = 0; idx < cbd.messages_size(); ++idx) {
-          if (!all_channels_ &&
-              std::find(channel_vec_.begin(), channel_vec_.end(),
+          if (!white_channels_.empty() &&
+              std::find(white_channels_.begin(), white_channels_.end(),
                         cbd.messages(idx).channel_name()) ==
-                  channel_vec_.end()) {
+                  white_channels_.end()) {
+            continue;
+          }
+          if (std::find(black_channels_.begin(), black_channels_.end(),
+                        cbd.messages(idx).channel_name()) !=
+              black_channels_.end()) {
             continue;
           }
           if (cbd.messages(idx).time() < begin_time_ ||
