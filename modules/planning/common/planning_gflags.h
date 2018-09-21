@@ -208,7 +208,12 @@ DECLARE_double(navigation_fallback_cruise_time);
 DECLARE_bool(enable_stitch_last_trajectory);
 DECLARE_bool(enable_planning_pad_msg);
 
+<<<<<<< b34aa1626f8970820961ef7766f26fe0f5390769
 // open space planner
 DECLARE_string(planner_open_space_config_filename);
 
+=======
+// Open space planner
+DECLARE_string(open_space_config_filename);
+>>>>>>> Planning: Reed Shepp Path (check)
 #endif  // MODULES_PLANNING_COMMON_PLANNING_GFLAGS_H_

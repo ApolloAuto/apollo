@@ -45,7 +45,7 @@ class CollisionChecker {
       const std::shared_ptr<PathTimeGraph>& ptr_path_time_graph);
 
   bool InCollision(const DiscretizedTrajectory& discretized_trajectory);
-  bool InCollision(const Box2d ego_car, const std::vector<Box2d> obstacles);
+  bool InCollision(const common::math::Box2d ego_car, const std::vector<common::math::Box2d> obstacles);
 
  private:
   void BuildPredictedEnvironment(
