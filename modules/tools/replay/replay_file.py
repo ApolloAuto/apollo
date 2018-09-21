@@ -16,15 +16,17 @@
 # limitations under the License.
 ###############################################################################
 """
-This program can replay a planning output pb file via ros
+This program can replay a message pb file
 """
 import os.path
 import sys
 import argparse
-import rospy
 import glob
-from std_msgs.msg import String
+import time
+
 from google.protobuf import text_format
+
+from cybertron import cybertron
 
 import common.proto_utils as proto_utils
 from common.message_manager import PbMessageManager
@@ -34,7 +36,8 @@ g_message_manager = PbMessageManager()
 
 def topic_publisher(topic, filename, period):
     """publisher"""
-    rospy.init_node('replay_node', anonymous=True)
+    cybertron.init()
+    node = cybertron.Node("replay_file")
     meta_msg = None
     msg = None
     if not topic:
@@ -56,19 +59,19 @@ def topic_publisher(topic, filename, period):
         print("Unknown topic: %s" % topic)
         return False
 
-    pub = rospy.Publisher(topic, meta_msg.msg_type(), queue_size=1)
+    writer = node.create_writer(topic, meta_msg.msg_type())
+
     if period == 0:
-        while not rospy.is_shutdown():
+        while not cybertron.is_shutdown():
             raw_input("Press any key to publish one message...")
-            pub.publish(msg)
+            writer.write(msg)
             print("Topic[%s] message published" % topic)
     else:
-        rate = rospy.Rate(int(1.0 / period))
         print("started to publish topic[%s] message with rate period %s" %
               (topic, period))
-        while not rospy.is_shutdown():
-            pub.publish(msg)
-            rate.sleep()
+        while not cybertron.is_shutdown():
+            writer.write(msg)
+            time.sleep(period)
 
 
 if __name__ == '__main__':
@@ -106,7 +109,4 @@ if __name__ == '__main__':
         print "Will publish file[%d]: %s" % (selected_file,
                                              files[selected_file])
         to_replay = files[selected_file]
-    try:
-        topic_publisher(args.topic, to_replay, period)
-    except rospy.ROSInterruptException:
-        print "failed to replay message"
+    topic_publisher(args.topic, to_replay, period)
