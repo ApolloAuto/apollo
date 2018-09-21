@@ -6,11 +6,8 @@ dist: trusty
 os: linux
 env:
     - JOB=lint
-    - JOB=cibuild
-    - JOB=citest_basic
-    - JOB=citest_map
-    - JOB=citest_dreamview
-    - JOB=citest_perception
+    - JOB=build_cpu
+    - JOB=test
 cache:
   directories:
   - $HOME/.cache/bazel
@@ -18,7 +15,7 @@ install: skip
 before_script:
     - cp scripts/AGREEMENT.txt ${HOME}/.apollo_agreement.txt
 script:
-    - ./docker/scripts/dev_start.sh -t dev-x86_64-20180906_2002-ci
+    - ./docker/scripts/dev_start.sh -t dev-x86_64-20180920_1434
     - ./apollo_docker.sh ${JOB}
     - rm -rf "${HOME}/.cache/bazel/_bazel_${USER}/install"
 notifications:

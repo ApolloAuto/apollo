@@ -24,8 +24,7 @@ cc_library(
     ],
     deps = [
         "//framework:cybertron",
-        "@eigen//:eigen",
-        "@gtest//:gtest",
+        "@eigen",
     ],
 )
 

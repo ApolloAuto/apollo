@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "modules/localization/msf/common/util/system_utility.h"
+
 #include <gtest/gtest.h>
 #include <boost/filesystem.hpp>
 
