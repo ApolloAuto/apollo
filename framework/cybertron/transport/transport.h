@@ -57,7 +57,7 @@ class Transport {
       const OptionalMode& mode = OptionalMode::HYBRID) ->
       typename std::shared_ptr<LowerReach<MessageT>>;
 
-  static ParticipantPtr participant() { return participant_; }
+  static ParticipantPtr participant();
 
  private:
   static ParticipantPtr CreateParticipant();
@@ -86,12 +86,12 @@ auto Transport::CreateUpperReach(const RoleAttributes& attr,
 
     case OptionalMode::RTPS:
       upper_reach = std::make_shared<RtpsUpperReach<MessageT>>(modified_attr,
-                                                               participant_);
+                                                               participant());
       break;
 
     default:
       upper_reach = std::make_shared<HybridUpperReach<MessageT>>(modified_attr,
-                                                                 participant_);
+                                                                 participant());
       break;
   }
 
@@ -132,7 +132,7 @@ auto Transport::CreateLowerReach(
 
     default:
       lower_reach = std::make_shared<HybridLowerReach<MessageT>>(
-          modified_attr, msg_listener, participant_);
+          modified_attr, msg_listener, participant());
       break;
   }
 

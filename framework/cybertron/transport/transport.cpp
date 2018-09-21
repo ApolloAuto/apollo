@@ -15,11 +15,18 @@
  *****************************************************************************/
 
 #include "cybertron/transport/transport.h"
+
+#include <mutex>
+
 #include "cybertron/common/global_data.h"
 
 namespace apollo {
 namespace cybertron {
 namespace transport {
+
+static std::mutex participant_mutex_;
+
+ParticipantPtr Transport::participant_ = nullptr;
 
 Transport::Transport() {}
 
@@ -32,7 +39,16 @@ ParticipantPtr Transport::CreateParticipant() {
   return std::make_shared<Participant>(participant_name, 11512);
 }
 
-ParticipantPtr Transport::participant_ = CreateParticipant();
+ParticipantPtr Transport::participant() {
+  if (participant_ != nullptr) {
+    return participant_;
+  }
+  std::lock_guard<std::mutex> lck(participant_mutex_);
+  if (participant_ == nullptr) {
+    participant_ = CreateParticipant();
+  }
+  return participant_;
+}
 
 }  // namespace transport
 }  // namespace cybertron
