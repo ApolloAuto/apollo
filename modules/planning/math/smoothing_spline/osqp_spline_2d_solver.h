@@ -24,6 +24,8 @@
 #include <memory>
 #include <vector>
 
+#include "Eigen/Core"
+#include "gtest/gtest_prod.h"
 #include "osqp/include/osqp.h"
 
 #include "modules/planning/math/smoothing_spline/spline_2d.h"
@@ -48,6 +50,12 @@ class OsqpSpline2dSolver final : public Spline2dSolver {
 
   // extract
   const Spline2d& spline() const override;
+
+ private:
+  FRIEND_TEST(OSQPSolverTest, basic_test);
+  void ToCSCMatrix(const Eigen::MatrixXd& dense_matrix,
+                   std::vector<double>* data, std::vector<double>* indices,
+                   std::vector<double>* indptr) const;
 
  private:
   OSQPSettings* osqp_settings_ = nullptr;

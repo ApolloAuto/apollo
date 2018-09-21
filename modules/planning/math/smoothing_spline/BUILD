@@ -307,6 +307,7 @@ cc_test(
     name = "spline_2d_solver_test",
     size = "small",
     srcs = [
+        "osqp_spline_2d_solver_test.cc",
         "spline_2d_solver_test.cc",
     ],
     deps = [

@@ -22,7 +22,6 @@
 
 #include <algorithm>
 
-#include "Eigen/Core"
 #include "cybertron/common/log.h"
 
 #include "modules/common/math/qp_solver/qp_solver_gflags.h"
@@ -76,6 +75,26 @@ bool OsqpSpline2dSolver::Solve() {
 
 // extract
 const Spline2d& OsqpSpline2dSolver::spline() const { return spline_; }
+
+void OsqpSpline2dSolver::ToCSCMatrix(const MatrixXd& dense_matrix,
+                                     std::vector<double>* data,
+                                     std::vector<double>* indices,
+                                     std::vector<double>* indptr) const {
+  constexpr double epsilon = 1e-9;
+  int data_count = 0;
+  for (int c = 0; c < dense_matrix.cols(); ++c) {
+    indptr->emplace_back(data_count);
+    for (int r = 0; r < dense_matrix.cols(); ++r) {
+      if (std::fabs(dense_matrix(r, c)) < epsilon) {
+        continue;
+      }
+      data->emplace_back(dense_matrix(r, c));
+      ++data_count;
+      indices->emplace_back(r);
+    }
+  }
+  indptr->emplace_back(data_count);
+}
 
 }  // namespace planning
 }  // namespace apollo
