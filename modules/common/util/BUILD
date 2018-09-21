@@ -193,7 +193,7 @@ cc_test(
         "file_test.cc",
     ],
     data = [
-        "//modules/perception:perception_data",
+        "//modules/common/util/testdata:data",
     ],
     tags = [
         "external",
