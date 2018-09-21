@@ -1594,6 +1594,10 @@ decision {
     turn_signal: TURN_NONE
   }
 }
+routing_header {
+  timestamp_sec: 1505348717.2942326
+  module_name: "routing"
+}
 right_of_way_status: UNPROTECTED
 lane_id {
   id: "37_1_-4"
