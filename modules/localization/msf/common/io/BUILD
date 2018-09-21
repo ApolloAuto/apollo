@@ -8,8 +8,8 @@ cc_library(
     hdrs = glob(["*.h"]),
     deps = [
         "//framework:cybertron",
-        "@eigen//:eigen",
-        "@pcl//:pcl",
+        "@eigen",
+        "@pcl",
         "@yaml_cpp//:yaml",
     ],
 )
