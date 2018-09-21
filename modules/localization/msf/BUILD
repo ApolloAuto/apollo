@@ -6,16 +6,19 @@ cc_library(
     name = "msf_localization_component_lib",
     srcs = [
         "msf_localization.cc",
-        "msf_localization_component.cc"
+        "msf_localization_component.cc",
     ],
     hdrs = [
         "msf_localization.h",
-        "msf_localization_component.h"
+        "msf_localization_component.h",
     ],
     linkopts = [
         "-lboost_system",
     ],
-    copts = ["-DMODULE_NAME=\\\"localization\\\""],
+    copts = [
+        "-O2",
+        "-DMODULE_NAME=\\\"localization\\\"",
+    ],
     deps = [
         "//modules/common",
         "//modules/common/monitor_log",

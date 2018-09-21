@@ -23,26 +23,20 @@
 #define MODULES_LOCALIZATION_MSF_LOCAL_TOOL_ONLINE_LOCAL_VISUALIZER_H
 
 #include <Eigen/Geometry>
+#include <memory>
 #include <sstream>
 #include <string>
 #include <utility>
 #include <vector>
 
-#include "ros/include/ros/ros.h"
-#include "sensor_msgs/PointCloud2.h"
-
-// #include "modules/drivers/gnss/proto/imu.pb.h"
-// #include "modules/localization/proto/gps.pb.h"
-// #include "modules/localization/proto/imu.pb.h"
-#include "modules/localization/proto/localization.pb.h"
-// #include "modules/localization/proto/measure.pb.h"
-// #include "modules/localization/proto/sins_pva.pb.h"
-
 #include "glog/logging.h"
 #include "gtest/gtest_prod.h"
 
-#include "modules/common/apollo_app.h"
-#include "modules/common/monitor_log/monitor_log_buffer.h"
+#include "cybertron/cybertron.h"
+
+#include "modules/drivers/proto/pointcloud.pb.h"
+#include "modules/localization/proto/localization.pb.h"
+
 #include "modules/common/status/status.h"
 #include "modules/localization/msf/local_tool/local_visualization/engine/visualization_manager.h"
 
@@ -54,52 +48,53 @@ namespace apollo {
 namespace localization {
 namespace msf {
 
-class OnlineLocalVisualizer : public apollo::common::ApolloApp {
+class OnlineVisualizerComponent final
+    : public cybertron::Component<drivers::PointCloud> {
  public:
-  OnlineLocalVisualizer();
-  ~OnlineLocalVisualizer();
-
-  /**
-   * @brief module name
-   * @return module name
-   */
-  std::string Name() const override;
-
-  /**
-   * @brief module start function
-   * @return start status
-   */
-  apollo::common::Status Start() override;
+  OnlineVisualizerComponent();
+  ~OnlineVisualizerComponent();
 
   /**
    * @brief module initialization function
    * @return initialization status
    */
-  apollo::common::Status Init() override;
+  bool Init() override;
 
-  /**
-   * @brief module stop function
-   * @return stop status
-   */
-  void Stop() override;
+  bool Proc(const std::shared_ptr<drivers::PointCloud> &msg) override;
 
  private:
-  void InitParams();
-  void OnPointCloud(const sensor_msgs::PointCloud2 &message);
-  void OnLidarLocalization(const LocalizationEstimate &message);
-  void OnGNSSLocalization(const LocalizationEstimate &message);
-  void OnFusionLocalization(const LocalizationEstimate &message);
+  bool InitConfig();
+  bool InitIO();
+  void OnLidarLocalization(
+      const std::shared_ptr<LocalizationEstimate> &message);
+  void OnGNSSLocalization(const std::shared_ptr<LocalizationEstimate> &message);
+  void OnFusionLocalization(
+      const std::shared_ptr<LocalizationEstimate> &message);
 
-  void ParsePointCloudMessage(const sensor_msgs::PointCloud2 &message,
-                              std::vector<Eigen::Vector3d> *pt3ds,
-                              std::vector<unsigned char> *intensities);
+  void ParsePointCloudMessage(
+      const std::shared_ptr<drivers::PointCloud> &message,
+      std::vector<Eigen::Vector3d> *pt3ds,
+      std::vector<unsigned char> *intensities);
 
  private:
-  apollo::common::monitor::MonitorLogger monitor_logger_;
   std::string lidar_extrinsic_file_;
   std::string map_folder_;
   std::string map_visual_folder_;
+
+  std::shared_ptr<cybertron::Reader<LocalizationEstimate>>
+      lidar_local_listener_ = nullptr;
+  std::string lidar_local_topic_ = "";
+
+  std::shared_ptr<cybertron::Reader<LocalizationEstimate>>
+      gnss_local_listener_ = nullptr;
+  std::string gnss_local_topic_ = "";
+
+  std::shared_ptr<cybertron::Reader<LocalizationEstimate>>
+      fusion_local_listener_ = nullptr;
+  std::string fusion_local_topic_ = "";
 };
+
+CYBERTRON_REGISTER_COMPONENT(OnlineVisualizerComponent);
 
 }  // namespace msf
 }  // namespace localization

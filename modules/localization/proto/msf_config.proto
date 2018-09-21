@@ -3,11 +3,13 @@ syntax = "proto2";
 package apollo.localization.msf_config;
 
 message Config {
-  required string localization_topic = 1;
+  optional string localization_topic = 1 [default = "/apollo/localization/pose"];
   required string imu_topic = 2;
   required string lidar_topic = 3;
   required string bestgnsspos_topic = 4;
   required string broadcast_tf_frame_id = 5;
   required string broadcast_tf_child_frame_id = 6;
   required string map_dir = 7;
+  optional string lidar_localization_topic = 8 [default = "/apollo/localization/msf_lidar"];
+  optional string gnss_localization_topic = 9 [default = "/apollo/localization/msf_gnss"];
 }

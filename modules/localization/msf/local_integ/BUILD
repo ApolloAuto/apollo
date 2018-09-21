@@ -6,6 +6,10 @@ cc_library(
     name = "localization_msf_local_integ",
     srcs = glob(["*.cc",]),
     hdrs = glob(["*.h",]),
+    copts = [
+        "-O2",
+        "-DMODULE_NAME=\\\"localization\\\"",
+    ],
     linkopts = [
         "-lboost_system",
         "-lboost_thread",

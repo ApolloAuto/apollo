@@ -176,22 +176,18 @@ void MSFLocalization::OnPointCloud(
 
   localization_integ_.PcdProcess(*message);
 
-  if (FLAGS_lidar_debug_log_flag) {
-    std::list<msf::LocalizationResult> lidar_localization_list;
-    localization_integ_.GetLidarLocalizationList(&lidar_localization_list);
+  std::list<msf::LocalizationResult> lidar_localization_list;
+  localization_integ_.GetLidarLocalizationList(&lidar_localization_list);
 
-    for (auto itr = lidar_localization_list.begin();
-         itr != lidar_localization_list.end(); ++itr) {
-      latest_lidar_localization_status_ =
-          static_cast<MeasureState>(itr->state());
-      if (itr->state() == msf::LocalizationMeasureState::OK ||
-          itr->state() == msf::LocalizationMeasureState::VALID) {
-        // publish lidar message to debug
-        // AdapterManager::PublishLocalizationMsfLidar(itr->localization());
-      }
+  for (auto itr = lidar_localization_list.begin();
+       itr != lidar_localization_list.end(); ++itr) {
+    latest_lidar_localization_status_ = static_cast<MeasureState>(itr->state());
+    if (itr->state() == msf::LocalizationMeasureState::OK ||
+        itr->state() == msf::LocalizationMeasureState::VALID) {
+      // publish lidar message to debug
+      publisher_->PublishLocalizationMsfLidar(itr->localization());
     }
   }
-
   return;
 }
 
@@ -267,18 +263,15 @@ void MSFLocalization::OnGnssBestPose(
 
   localization_integ_.GnssBestPoseProcess(*bestgnsspos_msg);
 
-  if (FLAGS_gnss_debug_log_flag) {
-    std::list<msf::LocalizationResult> gnss_localization_list;
-    localization_integ_.GetGnssLocalizationList(&gnss_localization_list);
+  std::list<msf::LocalizationResult> gnss_localization_list;
+  localization_integ_.GetGnssLocalizationList(&gnss_localization_list);
 
-    for (auto itr = gnss_localization_list.begin();
-         itr != gnss_localization_list.end(); ++itr) {
-      latest_gnss_localization_status_ =
-          static_cast<MeasureState>(itr->state());
-      if (itr->state() == msf::LocalizationMeasureState::OK ||
-          itr->state() == msf::LocalizationMeasureState::VALID) {
-        // AdapterManager::PublishLocalizationMsfGnss(itr->localization());
-      }
+  for (auto itr = gnss_localization_list.begin();
+       itr != gnss_localization_list.end(); ++itr) {
+    latest_gnss_localization_status_ = static_cast<MeasureState>(itr->state());
+    if (itr->state() == msf::LocalizationMeasureState::OK ||
+        itr->state() == msf::LocalizationMeasureState::VALID) {
+      publisher_->PublishLocalizationMsfGnss(itr->localization());
     }
   }
 
@@ -295,18 +288,15 @@ void MSFLocalization::OnGnssRtkObs(
 
   localization_integ_.RawObservationProcess(*raw_obs_msg);
 
-  if (FLAGS_gnss_debug_log_flag) {
-    std::list<msf::LocalizationResult> gnss_localization_list;
-    localization_integ_.GetGnssLocalizationList(&gnss_localization_list);
+  std::list<msf::LocalizationResult> gnss_localization_list;
+  localization_integ_.GetGnssLocalizationList(&gnss_localization_list);
 
-    for (auto itr = gnss_localization_list.begin();
-         itr != gnss_localization_list.end(); ++itr) {
-      latest_gnss_localization_status_ =
-          static_cast<MeasureState>(itr->state());
-      if (itr->state() == msf::LocalizationMeasureState::OK ||
-          itr->state() == msf::LocalizationMeasureState::VALID) {
-        // AdapterManager::PublishLocalizationMsfGnss(itr->localization());
-      }
+  for (auto itr = gnss_localization_list.begin();
+       itr != gnss_localization_list.end(); ++itr) {
+    latest_gnss_localization_status_ = static_cast<MeasureState>(itr->state());
+    if (itr->state() == msf::LocalizationMeasureState::OK ||
+        itr->state() == msf::LocalizationMeasureState::VALID) {
+      publisher_->PublishLocalizationMsfGnss(itr->localization());
     }
   }
 

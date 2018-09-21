@@ -12,6 +12,10 @@ cc_library(
         "visualization_engine.h",
         "visualization_manager.h",
     ],
+    copts = [
+        "-O2",
+        "-DMODULE_NAME=\\\"localization_visualizer\\\"",
+    ],
     linkopts = [
         "-lboost_filesystem",
         "-lboost_system",
