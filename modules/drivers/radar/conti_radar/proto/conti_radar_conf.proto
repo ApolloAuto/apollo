@@ -47,9 +47,7 @@ message RadarConf {
   optional uint32 store_in_nvm = 19 [default = 1];
   optional RcsThreshold rcs_threshold = 20 [default = RCS_THRESHOLD_STANDARD];
 
-  optional string channel_name = 21;
-  optional string pose_channel_name = 22;
-  optional uint64 input_send_interval = 23;
+  optional uint64 input_send_interval = 21;
 }
 
 message ContiRadarConf {

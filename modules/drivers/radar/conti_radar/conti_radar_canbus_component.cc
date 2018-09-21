@@ -20,6 +20,7 @@
 
 #include "Eigen/Geometry"
 
+#include "modules/common/adapters/adapter_gflags.h"
 #include "modules/drivers/proto/conti_radar.pb.h"
 #include "modules/drivers/radar/conti_radar/conti_radar_canbus_component.h"
 #include "modules/drivers/radar/conti_radar/conti_radar_message_manager.h"
@@ -54,10 +55,10 @@ bool ContiRadarCanbusComponent::Init() {
     return OnError("Failed to create can client.");
   }
   AINFO << "Can client is successfully created.";
-  conti_radar_writer_ = node_->CreateWriter<ContiRadar>(
-      conti_radar_conf_.radar_conf().channel_name());
+  conti_radar_writer_ =
+      node_->CreateWriter<ContiRadar>(FLAGS_conti_radar_topic);
   pose_reader_ = node_->CreateReader<LocalizationEstimate>(
-      conti_radar_conf_.radar_conf().pose_channel_name(),
+      FLAGS_localization_topic,
       [&](const std::shared_ptr<LocalizationEstimate>& pose) {
         PoseCallback(pose);
       });

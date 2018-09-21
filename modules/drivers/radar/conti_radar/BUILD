@@ -30,6 +30,7 @@ cc_library(
     deps = [
         ":conti_radar_message_manager",
         "//modules/common",
+        "//modules/common/adapters:adapter_gflags",
         "//modules/drivers/canbus/can_client:can_client_factory",
         "//modules/drivers/canbus/can_comm:can_receiver",
         "//modules/drivers/canbus/can_comm:message_manager_base",
