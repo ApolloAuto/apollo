@@ -1571,6 +1571,11 @@ decision {
     turn_signal: TURN_RIGHT
   }
 }
+routing_header {
+  timestamp_sec: 1509683595.9515159
+  module_name: "routing"
+  sequence_num: 2
+}
 right_of_way_status: PROTECTED
 lane_id {
   id: "12_1_-3"
