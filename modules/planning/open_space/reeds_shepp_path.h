@@ -26,15 +26,19 @@
 #include <string>
 #include <vector>
 
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
+#include "cybertron/common/macros.h"
+#include "modules/common/configs/proto/vehicle_config.pb.h"
 #include "modules/common/math/math_utils.h"
+#include "modules/planning/open_space/node3d.h"
+#include "modules/planning/proto/planner_open_space_config.pb.h"
 
 namespace apollo {
 namespace planning {
 
 struct ReedSheppPath {
-  double segs_lengths[];
-  char segs_types[];
+  std::vector<double> segs_lengths;
+  std::vector<char> segs_types;
   double total_length = 0.0;
   std::vector<double> x;
   std::vector<double> y;
@@ -48,7 +52,7 @@ struct RSPParam {
   double t = 0.0;
   double u = 0.0;
   double v = 0.0;
-}
+};
 
 class ReedShepp {
  public:
@@ -57,7 +61,7 @@ class ReedShepp {
   virtual ~ReedShepp() = default;
   // Pick the shortest path from all possible combination of movement primitives
   // by Reed Shepp
-  bool ShortestRSP(const std::shared_ptr<Node3d> start_node;
+  bool ShortestRSP(const std::shared_ptr<Node3d> start_node,
                    const std::shared_ptr<Node3d> end_node,
                    ReedSheppPath* optimal_path);
 
@@ -78,8 +82,9 @@ class ReedShepp {
       std::vector<ReedSheppPath>* all_possible_paths);
   // Interpolation usde in GenetateLocalConfiguration
   void Interpolation(double index, double pd, char m, double ox, double oy,
-                     double ophi, double& px[], double& py[], double& pphi[],
-                     bool& pgear[]);
+                   double ophi, std::vector<double>& px,
+                   std ::vector<double>& py, std::vector<double>& pphi,
+                   std::vector<bool>& pgear);
   // motion primitives combination setup function
   bool SetRSP(double lengths[], char types[],
               std::vector<ReedSheppPath>* all_possible_paths);

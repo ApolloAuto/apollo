@@ -46,18 +46,18 @@ Node3d::Node3d(double x, double y, double phi) {
 }
 
 Box2d Node3d::GetBoundingBox(const common::VehicleParam& vehicle_param_) {
-  double ego_length = vehicle_config_.vehicle_param().length();
-  double ego_width = vehicle_config_.vehicle_param().width();
+  double ego_length = vehicle_param_.length();
+  double ego_width = vehicle_param_.width();
   Box2d ego_box({x_, y_}, phi_, ego_length, ego_width);
   double shift_distance =
-      ego_length / 2.0 - vehicle_config.vehicle_param().back_edge_to_center();
+      ego_length / 2.0 - vehicle_param_.back_edge_to_center();
   Vec2d shift_vec{shift_distance * std::cos(phi_),
                   shift_distance * std::sin(phi_)};
   ego_box.Shift(shift_vec);
   return ego_box;
 }
 
-bool Node3d::operator==(const shared_ptr<Node3d> right) const {
+bool Node3d::operator==(const std::shared_ptr<Node3d> right) const {
   return x_grid_ == right->GetGridX() && y_grid_ == right->GetGridY() &&
          phi_grid_ == right->GetGridPhi();
 }

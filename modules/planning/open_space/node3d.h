@@ -28,12 +28,14 @@
 #include "modules/common/math/box2d.h"
 #include "modules/planning/common/obstacle.h"
 #include "modules/planning/constraint_checker/collision_checker.h"
+#include "modules/planning/proto/planner_open_space_config.pb.h"
 
 
 namespace apollo {
 namespace planning {
 
 using apollo::common::math::Box2d;
+using apollo::common::math::Vec2d;
 
 class Node3d {
  public:
@@ -49,7 +51,7 @@ class Node3d {
   double GetX() { return x_; };
   double GetY() { return y_; };
   double GetPhi() { return phi_; };
-  bool operator==(const shared_ptr<Node3d> right) const;
+  bool operator==(const std::shared_ptr<Node3d> right) const;
   std::size_t GetIndex() {return index_;};
 
  private:
@@ -62,7 +64,7 @@ class Node3d {
   std::size_t index_ = 0;
   double current_cost_ = 0.0;
   double heuristic_cost_ = 0.0;
-  shared_ptr<Node3d> pre_node = nullptr;
+  std::shared_ptr<Node3d> pre_node = nullptr;
   double steering_ = 0.0;
   // true for moving forward and false for moving backward
   bool direction_ = true;
