@@ -61,11 +61,12 @@ T PyObjectToPtr(PyObject *pyobj, const std::string &type_ptr) {
 PyObject *cyber_new_PyWriter(PyObject *self, PyObject *args) {
   char *channel_name = nullptr;
   char *data_type = nullptr;
+  uint32_t qos_depth = 1;
   apollo::cybertron::Node *node = nullptr;
 
   PyObject *node_pyobj = nullptr;
-  if (!PyArg_ParseTuple(args, const_cast<char *>("ssO:new_PyWriter"),
-                        &channel_name, &data_type, &node_pyobj)) {
+  if (!PyArg_ParseTuple(args, const_cast<char *>("ssIO:new_PyWriter"),
+                        &channel_name, &data_type, &qos_depth, &node_pyobj)) {
     return Py_None;
   }
 
@@ -76,9 +77,9 @@ PyObject *cyber_new_PyWriter(PyObject *self, PyObject *args) {
     return Py_None;
   }
 
-  apollo::cybertron::PyWriter *writer =
-      new apollo::cybertron::PyWriter((std::string const &)*channel_name,
-                                      (std::string const &)*data_type, node);
+  apollo::cybertron::PyWriter *writer = new apollo::cybertron::PyWriter(
+      (std::string const &)*channel_name, (std::string const &)*data_type,
+      qos_depth, node);
   PyObject *pyobj_writer =
       PyCapsule_New(writer, "apollo_cybertron_pywriter", NULL);
   return pyobj_writer;
@@ -419,12 +420,13 @@ PyObject *cyber_delete_PyNode(PyObject *self, PyObject *args) {
 }
 
 PyObject *cyber_PyNode_create_writer(PyObject *self, PyObject *args) {
+  PyObject *pyobj_node = nullptr;
   char *channel_name = nullptr;
   char *type_name = nullptr;
-  PyObject *pyobj_node = nullptr;
+  int qos_depth = 1;
 
-  if (!PyArg_ParseTuple(args, const_cast<char *>("Oss:PyNode_create_writer"),
-                        &pyobj_node, &channel_name, &type_name)) {
+  if (!PyArg_ParseTuple(args, const_cast<char *>("OssI:PyNode_create_writer"),
+                        &pyobj_node, &channel_name, &type_name, &qos_depth)) {
     AINFO << "cyber_PyNode_create_writer:PyArg_ParseTuple failed!";
     return Py_None;
   }
@@ -438,7 +440,8 @@ PyObject *cyber_PyNode_create_writer(PyObject *self, PyObject *args) {
 
   apollo::cybertron::PyWriter *writer =
       (apollo::cybertron::PyWriter *)(node->create_writer(
-          (std::string const &)channel_name, (std::string const &)type_name));
+          (std::string const &)channel_name, (std::string const &)type_name,
+          qos_depth));
 
   PyObject *pyobj_writer =
       PyCapsule_New(writer, "apollo_cybertron_pywriter", NULL);

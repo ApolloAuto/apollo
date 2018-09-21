@@ -56,7 +56,7 @@ class TestNode(unittest.TestCase):
 
         self.assertTrue(cybertron.ok())
         test_node = cybertron.Node("node_name1")
-        writer = test_node.create_writer("channel/chatter", chatter_pb2.Chatter)
+        writer = test_node.create_writer("channel/chatter", chatter_pb2.Chatter, 7)
         self.assertEqual(writer.name, "channel/chatter")
         self.assertEqual(writer.data_type, "apollo.cybertron.proto.Chatter")
         self.assertTrue(writer.write(msg))

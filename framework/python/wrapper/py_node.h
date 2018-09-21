@@ -63,8 +63,11 @@ bool py_OK() { return apollo::cybertron::OK(); }
 class PyWriter {
  public:
   PyWriter(const std::string &channel, const std::string &type,
-           apollo::cybertron::Node *node)
-      : channel_name_(channel), data_type_(type), node_(node) {
+           uint32_t qos_depth, apollo::cybertron::Node *node)
+      : channel_name_(channel),
+        data_type_(type),
+        qos_depth_(qos_depth),
+        node_(node) {
     std::string proto_desc("");
     message::ProtobufFactory::Instance()->GetDescriptorString(type,
                                                               &proto_desc);
@@ -76,6 +79,8 @@ class PyWriter {
     role_attr.set_channel_name(channel_name_);
     role_attr.set_message_type(data_type_);
     role_attr.set_proto_desc(proto_desc);
+    auto qos_profile = role_attr.mutable_qos_profile();
+    qos_profile->set_depth(qos_depth_);
     writer_ = node_->CreateWriter<apollo::cybertron::message::PyMessageWrap>(
         role_attr);
   }
@@ -93,6 +98,7 @@ class PyWriter {
   apollo::cybertron::Node *node_;
   std::string channel_name_;
   std::string data_type_;
+  uint32_t qos_depth_;
   std::shared_ptr<
       apollo::cybertron::Writer<apollo::cybertron::message::PyMessageWrap>>
       writer_;
@@ -282,9 +288,10 @@ class PyNode {
     AINFO << "PyNode " << node_name_ << " exit.";
   }
 
-  PyWriter *create_writer(const std::string &channel, const std::string &type) {
+  PyWriter *create_writer(const std::string &channel, const std::string &type,
+                          uint32_t qos_depth = 1) {
     if (node_) {
-      return new PyWriter(channel, type, node_.get());
+      return new PyWriter(channel, type, qos_depth, node_.get());
     }
     AINFO << "Py_Node: node_ is null, new PyWriter failed!";
     return nullptr;

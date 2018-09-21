@@ -50,7 +50,7 @@ TEST(CyberNodeTest, create_writer) {
   auto msgChat = std::make_shared<apollo::cybertron::proto::Chatter>();
   apollo::cybertron::PyNode node("talker");
   apollo::cybertron::PyWriter *pw =
-      node.create_writer("channel/chatter", msgChat->GetTypeName());
+      node.create_writer("channel/chatter", msgChat->GetTypeName(), 10);
   EXPECT_TRUE(pw != nullptr);
 
   EXPECT_TRUE(apollo::cybertron::OK());
