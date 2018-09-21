@@ -201,12 +201,3 @@ new_http_archive(
     sha256 = "0a58dadab924b520d5b5a58ef82fc0f76c2aa4feaaabd49ec9873228c125d513",
     url = "https://github.com/ApolloAuto/apollo-contrib/releases/download/v3.0.0/plat-sw-3.0.0.1.zip",
 )
-
-#libprotobuf-mutator
-new_http_archive(
-    name = "libprotobuf_mutator",
-    build_file = "third_party/libprotobuf_mutator.BUILD",
-    sha256 = "9e8c92b4e70c2639d355eb5e99c89f9f5f760ca9cb87a400e3c38e10711e58b6",
-    strip_prefix = "libprotobuf-mutator-1.0",
-    url = "https://github.com/BaiduXLab/libprotobuf-mutator/archive/v1.0.tar.gz",
-)
