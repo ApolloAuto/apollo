@@ -173,7 +173,7 @@ class Node(object):
         desc_str = proto.SerializeToString()
         _CYBER_NODE.PyNode_register_message(self.node, desc_str)
 
-    def create_writer(self, name, data_type):
+    def create_writer(self, name, data_type, qos_depth=1):
         """
         create a topic writer for send message to topic.
         @param self
@@ -182,7 +182,8 @@ class Node(object):
         """
         self.register_message(data_type.DESCRIPTOR.file)
         datatype = data_type.DESCRIPTOR.full_name
-        writer = _CYBER_NODE.PyNode_create_writer(self.node, name, datatype)
+        writer = _CYBER_NODE.PyNode_create_writer(self.node, name,
+            datatype, qos_depth)
         self.list_writer.append(writer)
         return Writer(name, writer, datatype)
 

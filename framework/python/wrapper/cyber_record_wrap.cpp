@@ -405,7 +405,7 @@ PyObject *cyber_PyRecordWriter_WriteMessage(PyObject *self, PyObject *args) {
   Py_ssize_t len = 0;
   uint64_t time = 0;
   if (!PyArg_ParseTuple(
-          args, const_cast<char *>("Oss#i:cyber_PyRecordWriter_WriteMessage"),
+          args, const_cast<char *>("Oss#K:cyber_PyRecordWriter_WriteMessage"),
           &pyobj_rec_writer, &channel_name, &rawmessage, &len, &time)) {
     AINFO << "cyber_PyRecordWriter_WriteMessage parsetuple failed!";
     Py_RETURN_FALSE;

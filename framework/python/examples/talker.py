@@ -37,7 +37,7 @@ def test_talker_class():
     g_count = 1
 
     writer = test_node.create_writer("channel/chatter",
-        chatter_pb2.Chatter)
+        chatter_pb2.Chatter, 6)
     while not cybertron.is_shutdown():
         time.sleep(1)
         g_count = g_count + 1
