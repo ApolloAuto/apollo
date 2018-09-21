@@ -54,7 +54,7 @@ class AtomicHashMap {
       }
     }
 
-    K key;
+    K key = 0;
     std::atomic<V *> value_ptr = {nullptr};
     std::atomic<Entry *> next = {nullptr};
     // reference counter, avoid ABA problem
