@@ -105,7 +105,15 @@ class NavigationLaneTest : public testing::Test {
     EXPECT_TRUE(common::util::GetProtoFromFile(
         FLAGS_relative_map_config_filename, &config));
 
-    navigation_lane_.SetConfig(config.navigation_lane());
+    const auto& lane_config_ = config.navigation_lane();
+    left_expand_lane_num_ = lane_config_.left_expand_lane_num();
+    right_expand_lane_num_ = lane_config_.right_expand_lane_num();
+    left_expand_lane_start_priority_ =
+        lane_config_.left_expand_lane_start_priority();
+    right_expand_lane_start_priority_ =
+        lane_config_.right_expand_lane_start_priority();
+
+    navigation_lane_.SetConfig(lane_config_);
     map_param_ = config.map_param();
     navigation_lane_.SetDefaultWidth(map_param_.default_left_width(),
                                      map_param_.default_right_width());
@@ -127,6 +135,10 @@ class NavigationLaneTest : public testing::Test {
   MapGenerationParam map_param_;
   std::vector<std::string> navigation_line_filenames_;
   std::string data_file_dir_;
+  unsigned left_expand_lane_num_;
+  unsigned right_expand_lane_num_;
+  unsigned left_expand_lane_start_priority_;
+  unsigned right_expand_lane_start_priority_;
 };
 
 TEST_F(NavigationLaneTest, GenerateOneLaneMap) {
@@ -139,15 +151,34 @@ TEST_F(NavigationLaneTest, GenerateOneLaneMap) {
 
   MapMsg map_msg;
   EXPECT_TRUE(navigation_lane_.CreateMap(map_param_, &map_msg));
-  EXPECT_EQ(1, map_msg.hdmap().lane_size());
 
-  auto iter = map_msg.navigation_path().begin();
-  EXPECT_EQ(0, iter->second.path_priority());
-  const auto& path = iter->second.path();
-  EXPECT_DOUBLE_EQ(-1.1603367640051669, path.path_point(0).x())
-      << "Path 0: actual x: " << path.path_point(0).x();
-  EXPECT_DOUBLE_EQ(2.760810222539626, path.path_point(0).y())
-      << "Path 0: actual y: " << path.path_point(0).y();
+  EXPECT_EQ(1 + left_expand_lane_num_ + right_expand_lane_num_,
+            map_msg.hdmap().lane_size());
+
+  for (auto iter = map_msg.navigation_path().begin();
+       iter != map_msg.navigation_path().end(); ++iter) {
+    const auto& path = iter->second.path();
+    unsigned priority = iter->second.path_priority();
+    switch (priority) {
+      case 0:
+        EXPECT_DOUBLE_EQ(-1.1603367640051669, path.path_point(0).x())
+            << "Path 0: actual x: " << path.path_point(0).x();
+        EXPECT_DOUBLE_EQ(2.760810222539626, path.path_point(0).y())
+            << "Path 0: actual y: " << path.path_point(0).y();
+        break;
+
+      default:
+        bool is_expanded = (priority >= left_expand_lane_start_priority_ &&
+                            priority < left_expand_lane_start_priority_ +
+                                           left_expand_lane_num_) ||
+                           (priority >= right_expand_lane_start_priority_ &&
+                            priority < right_expand_lane_start_priority_ +
+                                           right_expand_lane_num_);
+        if (!is_expanded) {
+          FAIL() << "We shouldn't get here.";
+        }
+    }
+  }
 }
 
 TEST_F(NavigationLaneTest, GenerateTwoLaneMap) {
@@ -161,12 +192,14 @@ TEST_F(NavigationLaneTest, GenerateTwoLaneMap) {
 
   MapMsg map_msg;
   EXPECT_TRUE(navigation_lane_.CreateMap(map_param_, &map_msg));
-  EXPECT_EQ(2, map_msg.hdmap().lane_size());
+  EXPECT_EQ(2 + left_expand_lane_num_ + right_expand_lane_num_,
+            map_msg.hdmap().lane_size());
 
   for (auto iter = map_msg.navigation_path().begin();
        iter != map_msg.navigation_path().end(); ++iter) {
     const auto& path = iter->second.path();
-    switch (iter->second.path_priority()) {
+    unsigned priority = iter->second.path_priority();
+    switch (priority) {
       case 0:
         EXPECT_DOUBLE_EQ(-1.1603367640051669, path.path_point(0).x())
             << "Path 0: actual x: " << path.path_point(0).x();
@@ -182,7 +215,15 @@ TEST_F(NavigationLaneTest, GenerateTwoLaneMap) {
         break;
 
       default:
-        FAIL() << "We shouldn't get here.";
+        bool is_expanded = (priority >= left_expand_lane_start_priority_ &&
+                            priority < left_expand_lane_start_priority_ +
+                                           left_expand_lane_num_) ||
+                           (priority >= right_expand_lane_start_priority_ &&
+                            priority < right_expand_lane_start_priority_ +
+                                           right_expand_lane_num_);
+        if (!is_expanded) {
+          FAIL() << "We shouldn't get here.";
+        }
     }
   }
 }
@@ -199,12 +240,14 @@ TEST_F(NavigationLaneTest, GenerateThreeLaneMap) {
 
   MapMsg map_msg;
   EXPECT_TRUE(navigation_lane_.CreateMap(map_param_, &map_msg));
-  EXPECT_EQ(3, map_msg.hdmap().lane_size());
+  EXPECT_EQ(3 + left_expand_lane_num_ + right_expand_lane_num_,
+            map_msg.hdmap().lane_size());
 
   for (auto iter = map_msg.navigation_path().begin();
        iter != map_msg.navigation_path().end(); ++iter) {
     const auto& path = iter->second.path();
-    switch (iter->second.path_priority()) {
+    unsigned priority = iter->second.path_priority();
+    switch (priority) {
       case 0:
         EXPECT_DOUBLE_EQ(-1.2892630711168522, path.path_point(0).x())
             << "Path 0: actual x: " << path.path_point(0).x();
@@ -227,7 +270,15 @@ TEST_F(NavigationLaneTest, GenerateThreeLaneMap) {
         break;
 
       default:
-        FAIL() << "We shouldn't get here.";
+        bool is_expanded = (priority >= left_expand_lane_start_priority_ &&
+                            priority < left_expand_lane_start_priority_ +
+                                           left_expand_lane_num_) ||
+                           (priority >= right_expand_lane_start_priority_ &&
+                            priority < right_expand_lane_start_priority_ +
+                                           right_expand_lane_num_);
+        if (!is_expanded) {
+          FAIL() << "We shouldn't get here.";
+        }
     }
   }
 }

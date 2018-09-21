@@ -120,6 +120,8 @@ class NavigationLane {
 
   void UpdateStitchIndexInfo();
 
+  void ExpandNavigationPath();
+
  private:
   NavigationLaneConfig config_;
 

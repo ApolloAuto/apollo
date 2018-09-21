@@ -15,6 +15,10 @@ message NavigationLaneConfig {
       OFFLINE_GENERATED = 2;
     }
     optional LaneSource lane_source = 2;
+    optional uint32 left_expand_lane_num = 3 [default=0];
+    optional uint32 right_expand_lane_num = 4 [default=0];
+    optional uint32 left_expand_lane_start_priority = 5 [default=20];
+    optional uint32 right_expand_lane_start_priority = 6 [default=30];
 }
 
 message RelativeMapConfig {
