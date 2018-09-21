@@ -16,3 +16,11 @@ proto_library(
         "//modules/common/proto:header_proto_lib"
     ]
 )
+
+filegroup(
+    name = "data",
+    srcs = glob([
+        "hm_tracker_test/**/*",
+    ]),
+)
+

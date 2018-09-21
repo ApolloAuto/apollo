@@ -17,9 +17,9 @@
 #include "modules/common/util/file.h"
 
 #include "boost/filesystem.hpp"
+#include "cybertron/common/log.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
-#include "cybertron/common/log.h"
 #include "modules/common/util/testdata/simple.pb.h"
 
 namespace apollo {
@@ -122,10 +122,12 @@ TEST_F(FileTest, Glob) {
   EXPECT_THAT(Glob("/apollo"), testing::ElementsAre(std::string("/apollo")));
   EXPECT_THAT(Glob("/apol?o"), testing::ElementsAre(std::string("/apollo")));
   // Match multiple.
-  EXPECT_THAT(Glob("/apol?o/modules/p*"), testing::AllOf(
-      testing::Contains(std::string("/apollo/modules/perception")),
-      testing::Contains(std::string("/apollo/modules/planning")),
-      testing::Contains(std::string("/apollo/modules/prediction"))));
+  EXPECT_THAT(
+      Glob("/apol?o/modules/p*"),
+      testing::AllOf(
+          testing::Contains(std::string("/apollo/modules/perception")),
+          testing::Contains(std::string("/apollo/modules/planning")),
+          testing::Contains(std::string("/apollo/modules/prediction"))));
 }
 
 TEST_F(FileTest, GetAbsolutePath) {
@@ -138,7 +140,7 @@ TEST_F(FileTest, GetAbsolutePath) {
 }
 
 TEST_F(FileTest, GetFileNamesInFolderById) {
-  std::string data_path = "modules/perception/data/hm_tracker_test/";
+  std::string data_path = "modules/common/util/testdata/hm_tracker_test/";
   std::vector<std::string> seg_filenames;
   GetFileNamesInFolderById(data_path, ".seg", &seg_filenames);
   std::vector<std::string> pose_filenames;
