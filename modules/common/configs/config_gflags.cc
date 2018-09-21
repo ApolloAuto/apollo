@@ -38,9 +38,9 @@ DEFINE_string(vehicle_config_path,
               "/apollo/modules/common/data/mkz_config.pb.txt",
               "the file path of vehicle config file");
 
-DEFINE_bool(use_ros_time, false,
+DEFINE_bool(use_cybertron_time, false,
             "Whether Clock::Now() gets time from system_clock::now() or from "
-            "ros::Time::now().");
+            "Cybertron.");
 
 DEFINE_string(localization_tf2_frame_id, "world", "the tf2 transform frame id");
 DEFINE_string(localization_tf2_child_frame_id, "localization",

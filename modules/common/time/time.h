@@ -32,8 +32,8 @@
 #include "cybertron/common/macros.h"
 #include "cybertron/time/time.h"
 
-#include "modules/common/configs/config_gflags.h"
 #include "cybertron/common/log.h"
+#include "modules/common/configs/config_gflags.h"
 
 /**
  * @namespace apollo::common::time
@@ -251,7 +251,8 @@ class Clock {
 };
 
 inline Clock::Clock()
-    : Clock(FLAGS_use_ros_time ? ClockMode::CYBERTRON : ClockMode::SYSTEM) {}
+    : Clock(FLAGS_use_cybertron_time ? ClockMode::CYBERTRON
+                                     : ClockMode::SYSTEM) {}
 
 // Measure run time of a code block, mostly for debugging purpose.
 // Example usage:
