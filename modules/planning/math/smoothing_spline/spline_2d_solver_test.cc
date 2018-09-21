@@ -22,7 +22,6 @@
 #include "gtest/gtest.h"
 
 #include "modules/planning/math/curve_math.h"
-#include "modules/planning/math/smoothing_spline/osqp_spline_2d_solver.h"
 
 namespace apollo {
 namespace planning {
@@ -147,13 +146,6 @@ TEST(constraint_test, test_suit_one) {
     EXPECT_NEAR(kappa, gold_res(i, 5), 1e-4);
     t += 0.1;
   }
-}
-
-TEST(OSQPSolverTest, basic_test) {
-  std::vector<double> t_knots{0, 1, 2, 3, 4, 5};
-  std::size_t order = 5;
-  OsqpSpline2dSolver spline_solver(t_knots, order);
-  EXPECT_TRUE(spline_solver.Solve());
 }
 
 }  // namespace planning
