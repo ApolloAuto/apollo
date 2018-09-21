@@ -43,7 +43,9 @@ using ::Eigen::Vector3d;
 MSFLocalization::MSFLocalization()
     : monitor_logger_(MonitorMessageItem::LOCALIZATION),
       localization_state_(msf::LocalizationMeasureState::OK),
-      pcd_msg_index_(-1) {}
+      pcd_msg_index_(-1),
+      latest_lidar_localization_status_(MeasureState::NOT_VALID),
+      latest_gnss_localization_status_(MeasureState::NOT_VALID) {}
 
 Status MSFLocalization::Start() {
   AdapterManager::Init(FLAGS_msf_adapter_config_file);
@@ -247,6 +249,8 @@ void MSFLocalization::OnPointCloud(const sensor_msgs::PointCloud2 &message) {
 
     for (auto itr = lidar_localization_list.begin();
          itr != lidar_localization_list.end(); ++itr) {
+      latest_lidar_localization_status_ =
+        static_cast<MeasureState>(itr->state());
       if (itr->state() == msf::LocalizationMeasureState::OK ||
           itr->state() == msf::LocalizationMeasureState::VALID) {
         // publish lidar message to debug
@@ -270,31 +274,42 @@ void MSFLocalization::OnRawImu(const drivers::gnss::Imu &imu_msg) {
 
   for (auto itr = integ_localization_list.begin();
        itr != integ_localization_list.end(); ++itr) {
-     // caculate orientation_vehicle_world
-      LocalizationEstimate local_result = itr->localization();
-      apollo::localization::Pose *posepb_loc = local_result.mutable_pose();
-      const apollo::common::Quaternion &orientation = posepb_loc->orientation();
-      const Eigen::Quaternion<double> quaternion(
-          orientation.qw(), orientation.qx(), orientation.qy(),
-          orientation.qz());
-      Eigen::Quaternion<double> quat_vehicle_world =
-          quaternion * imu_vehicle_quat_;
+    // compose localization status
+    LocalizationStatus status;
+    apollo::common::Header *status_headerpb = status.mutable_header();
+    status_headerpb->set_timestamp_sec(
+      itr->localization().header().timestamp_sec());
+    status.set_fusion_status(static_cast<MeasureState>(itr->state()));
+    status.set_lidar_status(latest_lidar_localization_status_);
+    status.set_gnss_status(latest_gnss_localization_status_);
+    status.set_measurement_time(itr->localization().measurement_time());
+    AdapterManager::PublishLocalizationMsfStatus(status);
 
-      // set heading according to rotation of vehicle
-      posepb_loc->set_heading(common::math::QuaternionToHeading(
-          quat_vehicle_world.w(), quat_vehicle_world.x(),
-          quat_vehicle_world.y(), quat_vehicle_world.z()));
+    // caculate orientation_vehicle_world
+    LocalizationEstimate local_result = itr->localization();
+    apollo::localization::Pose *posepb_loc = local_result.mutable_pose();
+    const apollo::common::Quaternion &orientation = posepb_loc->orientation();
+    const Eigen::Quaternion<double> quaternion(
+        orientation.qw(), orientation.qx(), orientation.qy(),
+        orientation.qz());
+    Eigen::Quaternion<double> quat_vehicle_world =
+        quaternion * imu_vehicle_quat_;
 
-      // set euler angles according to rotation of vehicle
-      apollo::common::Point3D *eulerangles = posepb_loc->mutable_euler_angles();
-      common::math::EulerAnglesZXYd euler_angle(
-          quat_vehicle_world.w(), quat_vehicle_world.x(),
-          quat_vehicle_world.y(), quat_vehicle_world.z());
-      eulerangles->set_x(euler_angle.pitch());
-      eulerangles->set_y(euler_angle.roll());
-      eulerangles->set_z(euler_angle.yaw());
+    // set heading according to rotation of vehicle
+    posepb_loc->set_heading(common::math::QuaternionToHeading(
+        quat_vehicle_world.w(), quat_vehicle_world.x(),
+        quat_vehicle_world.y(), quat_vehicle_world.z()));
 
-      AdapterManager::PublishLocalization(local_result);
+    // set euler angles according to rotation of vehicle
+    apollo::common::Point3D *eulerangles = posepb_loc->mutable_euler_angles();
+    common::math::EulerAnglesZXYd euler_angle(
+        quat_vehicle_world.w(), quat_vehicle_world.x(),
+        quat_vehicle_world.y(), quat_vehicle_world.z());
+    eulerangles->set_x(euler_angle.pitch());
+    eulerangles->set_y(euler_angle.roll());
+    eulerangles->set_z(euler_angle.yaw());
+
+    AdapterManager::PublishLocalization(local_result);
     if (itr->state() == msf::LocalizationMeasureState::OK ||
         itr->state() == msf::LocalizationMeasureState::VALID) {
       PublishPoseBroadcastTF(local_result);
@@ -324,6 +339,8 @@ void MSFLocalization::OnGnssBestPose(
 
     for (auto itr = gnss_localization_list.begin();
          itr != gnss_localization_list.end(); ++itr) {
+      latest_gnss_localization_status_ =
+        static_cast<MeasureState>(itr->state());
       if (itr->state() == msf::LocalizationMeasureState::OK ||
           itr->state() == msf::LocalizationMeasureState::VALID) {
         AdapterManager::PublishLocalizationMsfGnss(itr->localization());
@@ -350,6 +367,8 @@ void MSFLocalization::OnGnssRtkObs(
 
     for (auto itr = gnss_localization_list.begin();
          itr != gnss_localization_list.end(); ++itr) {
+      latest_gnss_localization_status_ =
+        static_cast<MeasureState>(itr->state());
       if (itr->state() == msf::LocalizationMeasureState::OK ||
           itr->state() == msf::LocalizationMeasureState::VALID) {
         AdapterManager::PublishLocalizationMsfGnss(itr->localization());

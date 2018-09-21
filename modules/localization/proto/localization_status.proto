@@ -156,8 +156,7 @@
    optional LocalLidarConsistency local_lidar_consistency = 1;
    optional GnssConsistency gnss_consistency = 2;
    optional LocalLidarStatus local_lidar_status = 3;
-//   optional uint32 gnsspos_position_type = 4; 
-   optional GnssPositionType gnsspos_position_type = 4;
-   optional MsfRunningStatus msf_running_status = 5;
-   optional LocalLidarQuality local_lidar_quality = 6;
+   optional LocalLidarQuality local_lidar_quality = 4;
+   optional GnssPositionType gnsspos_position_type = 5;
+   optional MsfRunningStatus msf_running_status = 6;
  }
