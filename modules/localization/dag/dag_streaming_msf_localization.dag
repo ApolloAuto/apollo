@@ -10,6 +10,9 @@ module_config {
         readers: [
           {
             channel: "/apollo/sensor/gnss/imu"
+            qos_profile: {
+              depth : 50
+            }
           }
         ]
       }

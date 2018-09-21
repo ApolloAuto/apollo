@@ -26,6 +26,7 @@
 namespace apollo {
 namespace localization {
 
+using apollo::cybertron::proto::RoleAttributes;
 using apollo::common::time::Clock;
 
 MSFLocalizationComponent::MSFLocalizationComponent() {}
@@ -83,11 +84,14 @@ bool MSFLocalizationComponent::InitIO() {
   //       this->node_->CreateReader <
   //       cybertron::Reader<drivers::gnss::Imu>(imu_topic_, imu_register_call);
 
+  RoleAttributes attr;
+  attr.set_channel_name(lidar_topic_);
+  attr.mutable_qos_profile()->set_depth(2);
   std::function<void(const std::shared_ptr<drivers::PointCloud>&)>
       lidar_register_call = std::bind(&MSFLocalization::OnPointCloud,
                                       &localization_, std::placeholders::_1);
   lidar_listener_ = this->node_->CreateReader<drivers::PointCloud>(
-      lidar_topic_, lidar_register_call);
+      attr, lidar_register_call);
 
   std::function<void(const std::shared_ptr<drivers::gnss::GnssBestPose>&)>
       bestgnsspos_register_call =
@@ -122,12 +126,20 @@ bool LocalizationMsgPublisher::InitConfig(const msf_config::Config& config) {
   localization_topic_ = config.localization_topic();
   broadcast_tf_frame_id_ = config.broadcast_tf_frame_id();
   broadcast_tf_child_frame_id_ = config.broadcast_tf_child_frame_id();
+  lidar_local_topic_ = config.lidar_localization_topic();
+  gnss_local_topic_ = config.gnss_localization_topic();
   return true;
 }
 
 bool LocalizationMsgPublisher::InitIO() {
   localization_talker_ =
       node_->CreateWriter<LocalizationEstimate>(localization_topic_);
+
+  lidar_local_talker_ =
+      node_->CreateWriter<LocalizationEstimate>(lidar_local_topic_);
+
+  gnss_local_talker_ =
+      node_->CreateWriter<LocalizationEstimate>(gnss_local_topic_);
   return true;
 }
 
@@ -159,6 +171,18 @@ void LocalizationMsgPublisher::PublishPoseBroadcastTF(
 void LocalizationMsgPublisher::PublishPoseBroadcastTopic(
     const LocalizationEstimate& localization) {
   localization_talker_->Write(localization);
+  return;
+}
+
+void LocalizationMsgPublisher::PublishLocalizationMsfGnss(
+    const LocalizationEstimate& localization) {
+  gnss_local_talker_->Write(localization);
+  return;
+}
+
+void LocalizationMsgPublisher::PublishLocalizationMsfLidar(
+    const LocalizationEstimate& localization) {
+  lidar_local_talker_->Write(localization);
   return;
 }
 

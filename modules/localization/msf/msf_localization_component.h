@@ -41,8 +41,6 @@
 namespace apollo {
 namespace localization {
 
-class LocalizationMsgPublisher;
-
 class MSFLocalizationComponent final
     : public cybertron::Component<drivers::gnss::Imu> {
  public:
@@ -89,7 +87,9 @@ class LocalizationMsgPublisher {
   void PublishPoseBroadcastTF(const LocalizationEstimate& localization);
   void PublishPoseBroadcastTopic(const LocalizationEstimate& localization);
 
-  //   void PublishLocalizationMsfGnss();
+  void PublishLocalizationMsfGnss(const LocalizationEstimate& localization);
+  void PublishLocalizationMsfLidar(const LocalizationEstimate& localization);
+
  private:
   std::shared_ptr<cybertron::Node> node_;
 
@@ -100,6 +100,14 @@ class LocalizationMsgPublisher {
   std::string broadcast_tf_frame_id_ = "";
   std::string broadcast_tf_child_frame_id_ = "";
   apollo::transform::TransformBroadcaster tf2_broadcaster_;
+
+  std::string lidar_local_topic_ = "";
+  std::shared_ptr<cybertron::Writer<LocalizationEstimate>>
+      lidar_local_talker_ = nullptr;
+
+  std::string gnss_local_topic_ = "";
+  std::shared_ptr<cybertron::Writer<LocalizationEstimate>>
+      gnss_local_talker_ = nullptr;
 };
 
 }  // namespace localization

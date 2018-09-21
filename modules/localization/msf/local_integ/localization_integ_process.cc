@@ -287,11 +287,18 @@ void LocalizationIntegProcess::MeasureDataThreadLoop() {
     }
 
     MeasureData measure;
+    int waiting_num = 0;
     {
       std::unique_lock<std::mutex> lock(measure_data_queue_mutex_);
       measure = measure_data_queue_.front();
       measure_data_queue_.pop();
+      waiting_num = measure_data_queue_.size();
     }
+
+    if (waiting_num > measure_data_queue_size_ / 4) {
+      AWARN << waiting_num << " measure are waiting to process.";
+    }
+
     MeasureDataProcessImpl(measure);
   }
   AINFO << "Exited measure data process thread";
