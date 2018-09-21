@@ -1,7 +1,0 @@
-<cybertron>
-    <module>
-        <name>planning</name>
-        <dag_conf>/apollo/modules/example/component_planning/dag/planning.dag</dag_conf>
-        <process_name></process_name>
-    </module>
-</cybertron>
