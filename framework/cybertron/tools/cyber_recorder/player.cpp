@@ -175,9 +175,8 @@ bool Player::InitWriters() {
     std::string channel_name = pair.first;
     std::string message_type = pair.second;
 
-    if (all_channels_ ||
-        std::find(channel_vec_.begin(), channel_vec_.end(), channel_name) !=
-            channel_vec_.end()) {
+    if (all_channels_ || std::find(channel_vec_.begin(), channel_vec_.end(),
+                                   channel_name) != channel_vec_.end()) {
       RoleAttributes role_attributes;
       role_attributes.set_channel_name(channel_name);
       role_attributes.set_message_type(message_type);
@@ -196,11 +195,11 @@ bool Player::InitWriters() {
 }
 
 bool Player::InitLoader() {
-  if (start_seconds_ > 0) {
-    begin_time_ += start_seconds_ * 1e6;
-  }
   if (begin_time_ < header_.begin_time()) {
     begin_time_ = header_.begin_time();
+  }
+  if (start_seconds_ > 0) {
+    begin_time_ += start_seconds_ * 1e9;
   }
   if (end_time_ > header_.end_time()) {
     end_time_ = header_.end_time();
