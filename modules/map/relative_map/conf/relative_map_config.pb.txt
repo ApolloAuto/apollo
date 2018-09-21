@@ -7,4 +7,8 @@ map_param {
 navigation_lane {
   min_lane_marker_quality: 0.49
   lane_source: OFFLINE_GENERATED
+  left_expand_lane_num: 2
+  right_expand_lane_num: 2
+  left_expand_lane_start_priority: 20
+  right_expand_lane_start_priority: 30
 }

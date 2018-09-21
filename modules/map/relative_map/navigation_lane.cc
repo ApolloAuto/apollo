@@ -19,6 +19,7 @@
 #include <algorithm>
 #include <cmath>
 #include <limits>
+#include <string>
 
 #include "modules/map/proto/map_lane.pb.h"
 
@@ -39,6 +40,38 @@ using apollo::common::util::DistanceXY;
 using apollo::hdmap::Lane;
 using apollo::common::util::operator+;
 using apollo::perception::PerceptionObstacles;
+
+namespace {
+// Expand one navigation path.
+void ExpandOneNavigationPath(const std::shared_ptr<NavigationPath> &src_path,
+                             const std::string &path_name,
+                             const int path_priority, const int lane_width,
+                             const bool is_left_expand,
+                             NavigationPath *dst_path) {
+  CHECK_NOTNULL(src_path);
+  CHECK_NOTNULL(dst_path);
+
+  dst_path->CopyFrom(*src_path);
+  dst_path->set_path_priority(path_priority);
+  auto *path_data = dst_path->mutable_path();
+  path_data->set_name(path_name);
+
+  for (int i = 0; i < path_data->path_point_size(); ++i) {
+    auto *path_point = path_data->mutable_path_point(i);
+    if (is_left_expand) {
+      path_point->set_x(path_point->x() +
+                        lane_width * std::cos(path_point->theta() + M_PI_2));
+      path_point->set_y(path_point->y() +
+                        lane_width * std::sin(path_point->theta() + M_PI_2));
+    } else {
+      path_point->set_x(path_point->x() +
+                        lane_width * std::cos(path_point->theta() - M_PI_2));
+      path_point->set_y(path_point->y() +
+                        lane_width * std::sin(path_point->theta() - M_PI_2));
+    }
+  }
+}
+}  // namespace
 
 NavigationLane::NavigationLane(const NavigationLaneConfig &config)
     : config_(config) {}
@@ -220,6 +253,9 @@ bool NavigationLane::GeneratePath() {
         }
       }
     }
+
+    // Expand navigation paths for the navigation_path_list_.
+    ExpandNavigationPath();
 
     return true;
   }
@@ -818,6 +854,46 @@ void NavigationLane::UpdateStitchIndexInfo() {
             << min_index_pair.second << ") for the navigation line: " << i;
       stitch_index_map_[i] = min_index_pair;
     }
+  }
+}
+
+// Expand navigation paths for the navigation_path_list_.
+// The navigation_path_list_ must has been sorted.
+void NavigationLane::ExpandNavigationPath() {
+  std::string path_name;
+  int lane_width = 0;
+  bool is_left_expand = false;
+  int path_priority = config_.left_expand_lane_start_priority();
+
+  // Expand left navigation paths.
+  for (unsigned i = 0; i < config_.left_expand_lane_num(); ++i) {
+    path_name = "Left expanded path with index " + std::to_string(i);
+    NaviPathTuple path_tuple = navigation_path_list_.front();
+    lane_width = std::get<1>(path_tuple) * 2.0;
+    path_priority += i;
+    auto dst_path = std::make_shared<NavigationPath>();
+    is_left_expand = true;
+    ExpandOneNavigationPath(std::get<3>(path_tuple), path_name, path_priority,
+                            lane_width, is_left_expand, dst_path.get());
+    navigation_path_list_.emplace_front(-1, default_left_width_,
+                                        default_right_width_, dst_path);
+  }
+
+  // Expand right navigation paths.
+  if (config_.right_expand_lane_num() > 0) {
+    path_priority = config_.right_expand_lane_start_priority();
+  }
+  for (unsigned j = 0; j < config_.right_expand_lane_num(); ++j) {
+    path_name = "Rigth expanded path with index " + std::to_string(j);
+    NaviPathTuple path_tuple = navigation_path_list_.back();
+    lane_width = std::get<2>(path_tuple) * 2.0;
+    path_priority += j;
+    auto dst_path = std::make_shared<NavigationPath>();
+    is_left_expand = false;
+    ExpandOneNavigationPath(std::get<3>(path_tuple), path_name, path_priority,
+                            lane_width, is_left_expand, dst_path.get());
+    navigation_path_list_.emplace_back(-1, default_left_width_,
+                                       default_right_width_, dst_path);
   }
 }
 
