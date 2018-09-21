@@ -1,7 +1,0 @@
-<cybertron>
-    <module>
-        <name>driver</name>
-        <dag_conf>/apollo/modules/example/component_driver/dag/driver.dag</dag_conf>
-        <process_name></process_name>
-    </module>
-</cybertron>

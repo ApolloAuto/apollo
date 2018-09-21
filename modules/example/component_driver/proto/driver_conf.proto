@@ -1,8 +1,0 @@
-syntax = "proto2";
-
-package apollo.modules.example.component_driver.proto;
-
-message DriverConf {
-  optional string channel1 = 1;
-  optional string channel2 = 2;
-}
