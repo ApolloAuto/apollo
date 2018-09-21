@@ -97,8 +97,11 @@ void Recorder::FindNewChannel(const RoleAttributes& role_attr) {
   }
   if (channel_reader_map_.find(role_attr.channel_name()) ==
       channel_reader_map_.end()) {
-    writer_->WriteChannel(role_attr.channel_name(), role_attr.message_type(),
-                          role_attr.proto_desc());
+    if (!writer_->WriteChannel(role_attr.channel_name(),
+                               role_attr.message_type(),
+                               role_attr.proto_desc())) {
+      AERROR << "write channel fail, channel:" << role_attr.channel_name();
+    }
     InitReaderImpl(role_attr.channel_name(), role_attr.message_type());
   }
 }

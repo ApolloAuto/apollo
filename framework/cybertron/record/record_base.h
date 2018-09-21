@@ -45,6 +45,8 @@ class RecordBase {
   const Header GetHeader() const;
 
  protected:
+  bool IsNewChannel(const std::string& channel_name);
+
   void OnNewChannel(const std::string& channel_name,
                     const std::string& message_type,
                     const std::string& proto_desc);
