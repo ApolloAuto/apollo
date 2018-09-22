@@ -14,24 +14,23 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef CYBERTRON_TRANSPORT_LOWER_REACH_INTRA_LOWER_REACH_H_
-#define CYBERTRON_TRANSPORT_LOWER_REACH_INTRA_LOWER_REACH_H_
+#ifndef CYBERTRON_TRANSPORT_RECEIVER_INTRA_RECEIVER_H_
+#define CYBERTRON_TRANSPORT_RECEIVER_INTRA_RECEIVER_H_
 
 #include "cybertron/common/log.h"
 #include "cybertron/transport/dispatcher/intra_dispatcher.h"
-#include "cybertron/transport/lower_reach/lower_reach.h"
+#include "cybertron/transport/receiver/receiver.h"
 
 namespace apollo {
 namespace cybertron {
 namespace transport {
 
-template <typename MessageT>
-class IntraLowerReach : public LowerReach<MessageT> {
+template <typename M>
+class IntraReceiver : public Receiver<M> {
  public:
-  IntraLowerReach(
-      const RoleAttributes& attr,
-      const typename LowerReach<MessageT>::MessageListener& msg_listener);
-  virtual ~IntraLowerReach();
+  IntraReceiver(const RoleAttributes& attr,
+                const typename Receiver<M>::MessageListener& msg_listener);
+  virtual ~IntraReceiver();
 
   void Enable() override;
   void Disable() override;
@@ -43,54 +42,54 @@ class IntraLowerReach : public LowerReach<MessageT> {
   IntraDispatcherPtr dispatcher_;
 };
 
-template <typename MessageT>
-IntraLowerReach<MessageT>::IntraLowerReach(
+template <typename M>
+IntraReceiver<M>::IntraReceiver(
     const RoleAttributes& attr,
-    const typename LowerReach<MessageT>::MessageListener& msg_listener)
-    : LowerReach<MessageT>(attr, msg_listener) {
+    const typename Receiver<M>::MessageListener& msg_listener)
+    : Receiver<M>(attr, msg_listener) {
   dispatcher_ = IntraDispatcher::Instance();
 }
 
-template <typename MessageT>
-IntraLowerReach<MessageT>::~IntraLowerReach() {
+template <typename M>
+IntraReceiver<M>::~IntraReceiver() {
   Disable();
 }
 
-template <typename MessageT>
-void IntraLowerReach<MessageT>::Enable() {
+template <typename M>
+void IntraReceiver<M>::Enable() {
   if (this->enabled_) {
     return;
   }
-  dispatcher_->AddListener<MessageT>(
-      this->attr_, std::bind(&IntraLowerReach<MessageT>::OnNewMessage, this,
+  dispatcher_->AddListener<M>(
+      this->attr_, std::bind(&IntraReceiver<M>::OnNewMessage, this,
                              std::placeholders::_1, std::placeholders::_2));
   this->enabled_ = true;
 }
 
-template <typename MessageT>
-void IntraLowerReach<MessageT>::Disable() {
+template <typename M>
+void IntraReceiver<M>::Disable() {
   if (!this->enabled_) {
     return;
   }
-  dispatcher_->RemoveListener<MessageT>(this->attr_);
+  dispatcher_->RemoveListener<M>(this->attr_);
   this->enabled_ = false;
 }
 
-template <typename MessageT>
-void IntraLowerReach<MessageT>::Enable(const RoleAttributes& opposite_attr) {
-  dispatcher_->AddListener<MessageT>(
+template <typename M>
+void IntraReceiver<M>::Enable(const RoleAttributes& opposite_attr) {
+  dispatcher_->AddListener<M>(
       this->attr_, opposite_attr,
-      std::bind(&IntraLowerReach<MessageT>::OnNewMessage, this,
-                std::placeholders::_1, std::placeholders::_2));
+      std::bind(&IntraReceiver<M>::OnNewMessage, this, std::placeholders::_1,
+                std::placeholders::_2));
 }
 
-template <typename MessageT>
-void IntraLowerReach<MessageT>::Disable(const RoleAttributes& opposite_attr) {
-  dispatcher_->RemoveListener<MessageT>(this->attr_, opposite_attr);
+template <typename M>
+void IntraReceiver<M>::Disable(const RoleAttributes& opposite_attr) {
+  dispatcher_->RemoveListener<M>(this->attr_, opposite_attr);
 }
 
 }  // namespace transport
 }  // namespace cybertron
 }  // namespace apollo
 
-#endif  // CYBERTRON_TRANSPORT_LOWER_REACH_INTRA_LOWER_REACH_H_
+#endif  // CYBERTRON_TRANSPORT_RECEIVER_INTRA_RECEIVER_H_

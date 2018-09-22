@@ -24,17 +24,17 @@ target_link_libraries(shm_dispatcher_test cybertron gtest)
 add_executable(rtps_dispatcher_test rtps_dispatcher_test.cpp)
 target_link_libraries(rtps_dispatcher_test cybertron gtest)
 
-add_executable(intra_reach_test intra_reach_test.cpp)
-target_link_libraries(intra_reach_test cybertron gtest)
+add_executable(intra_transceiver_test intra_transceiver_test.cpp)
+target_link_libraries(intra_transceiver_test cybertron gtest)
 
-add_executable(shm_reach_test shm_reach_test.cpp)
-target_link_libraries(shm_reach_test cybertron gtest)
+add_executable(shm_transceiver_test shm_transceiver_test.cpp)
+target_link_libraries(shm_transceiver_test cybertron gtest)
 
-add_executable(rtps_reach_test rtps_reach_test.cpp)
-target_link_libraries(rtps_reach_test cybertron gtest)
+add_executable(rtps_transceiver_test rtps_transceiver_test.cpp)
+target_link_libraries(rtps_transceiver_test cybertron gtest)
 
-add_executable(hybrid_reach_test hybrid_reach_test.cpp)
-target_link_libraries(hybrid_reach_test cybertron gtest)
+add_executable(hybrid_transceiver_test hybrid_transceiver_test.cpp)
+target_link_libraries(hybrid_transceiver_test cybertron gtest)
 
 add_executable(transport_test transport_test.cpp)
 target_link_libraries(transport_test cybertron gtest)
@@ -51,10 +51,10 @@ install(TARGETS
   intra_dispatcher_test
   shm_dispatcher_test
   rtps_dispatcher_test
-  intra_reach_test
-  shm_reach_test
-  rtps_reach_test
-  hybrid_reach_test
+  intra_transceiver_test
+  shm_transceiver_test
+  rtps_transceiver_test
+  hybrid_transceiver_test
   transport_test
   reactor_test
   DESTINATION ${UNIT_TEST_INSTALL_PREFIX}

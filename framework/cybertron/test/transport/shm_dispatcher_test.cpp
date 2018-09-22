@@ -65,12 +65,12 @@ TEST(ShmDispatcherTest, on_message) {
   Identity oppo_id;
   oppo_attr.set_id(oppo_id.HashValue());
 
-  auto upper_reach = Transport::CreateUpperReach<message::RawMessage>(
+  auto transmitter = Transport::CreateTransmitter<message::RawMessage>(
       oppo_attr, proto::OptionalMode::SHM);
-  EXPECT_TRUE(upper_reach != nullptr);
+  EXPECT_TRUE(transmitter != nullptr);
 
   auto send_msg = std::make_shared<message::RawMessage>("raw_message");
-  upper_reach->Transmit(send_msg);
+  transmitter->Transmit(send_msg);
 
   sleep(1);
 
@@ -88,7 +88,7 @@ TEST(ShmDispatcherTest, on_message) {
         recv_msg->message = msg->message;
       });
 
-  upper_reach->Transmit(send_msg);
+  transmitter->Transmit(send_msg);
 
   sleep(1);
   EXPECT_EQ(recv_msg->message, send_msg->message);

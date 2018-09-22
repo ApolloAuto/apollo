@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef CYBERTRON_TRANSPORT_UPPER_REACH_SHM_UPPER_REACH_H_
-#define CYBERTRON_TRANSPORT_UPPER_REACH_SHM_UPPER_REACH_H_
+#ifndef CYBERTRON_TRANSPORT_TRANSMITTER_SHM_TRANSMITTER_H_
+#define CYBERTRON_TRANSPORT_TRANSMITTER_SHM_TRANSMITTER_H_
 
 #include <arpa/inet.h>
 #include <netinet/in.h>
@@ -36,19 +36,19 @@
 #include "cybertron/transport/common/syscall_wrapper.h"
 #include "cybertron/transport/shm/readable_info.h"
 #include "cybertron/transport/shm/segment.h"
-#include "cybertron/transport/upper_reach/upper_reach.h"
+#include "cybertron/transport/transmitter/transmitter.h"
 
 namespace apollo {
 namespace cybertron {
 namespace transport {
 
-template <typename MessageT>
-class ShmUpperReach : public UpperReach<MessageT> {
+template <typename M>
+class ShmTransmitter : public Transmitter<M> {
  public:
-  using MessagePtr = std::shared_ptr<MessageT>;
+  using MessagePtr = std::shared_ptr<M>;
 
-  explicit ShmUpperReach(const RoleAttributes& attr);
-  virtual ~ShmUpperReach();
+  explicit ShmTransmitter(const RoleAttributes& attr);
+  virtual ~ShmTransmitter();
 
   void Enable() override;
   void Disable() override;
@@ -56,7 +56,7 @@ class ShmUpperReach : public UpperReach<MessageT> {
   bool Transmit(const MessagePtr& msg, const MessageInfo& msg_info) override;
 
  private:
-  bool Transmit(const MessageT& msg, const MessageInfo& msg_info);
+  bool Transmit(const M& msg, const MessageInfo& msg_info);
 
   SegmentPtr segment_;
   std::string channel_name_;
@@ -67,9 +67,9 @@ class ShmUpperReach : public UpperReach<MessageT> {
   std::shared_ptr<proto::ShmMulticastLocator> locator_;
 };
 
-template <typename MessageT>
-ShmUpperReach<MessageT>::ShmUpperReach(const RoleAttributes& attr)
-    : UpperReach<MessageT>(attr),
+template <typename M>
+ShmTransmitter<M>::ShmTransmitter(const RoleAttributes& attr)
+    : Transmitter<M>(attr),
       segment_(nullptr),
       channel_name_(attr.channel_name()),
       channel_id_(attr.channel_id()),
@@ -80,13 +80,13 @@ ShmUpperReach<MessageT>::ShmUpperReach(const RoleAttributes& attr)
   locator_ = std::make_shared<proto::ShmMulticastLocator>();
 }
 
-template <typename MessageT>
-ShmUpperReach<MessageT>::~ShmUpperReach() {
+template <typename M>
+ShmTransmitter<M>::~ShmTransmitter() {
   Disable();
 }
 
-template <typename MessageT>
-void ShmUpperReach<MessageT>::Enable() {
+template <typename M>
+void ShmTransmitter<M>::Enable() {
   if (this->enabled_) {
     return;
   }
@@ -107,8 +107,8 @@ void ShmUpperReach<MessageT>::Enable() {
   this->enabled_ = true;
 }
 
-template <typename MessageT>
-void ShmUpperReach<MessageT>::Disable() {
+template <typename M>
+void ShmTransmitter<M>::Disable() {
   if (this->enabled_) {
     segment_ = nullptr;
     CloseAndReset(&sfd_);
@@ -116,15 +116,14 @@ void ShmUpperReach<MessageT>::Disable() {
   }
 }
 
-template <typename MessageT>
-bool ShmUpperReach<MessageT>::Transmit(const MessagePtr& msg,
-                                       const MessageInfo& msg_info) {
+template <typename M>
+bool ShmTransmitter<M>::Transmit(const MessagePtr& msg,
+                                 const MessageInfo& msg_info) {
   return Transmit(*msg, msg_info);
 }
 
-template <typename MessageT>
-bool ShmUpperReach<MessageT>::Transmit(const MessageT& msg,
-                                       const MessageInfo& msg_info) {
+template <typename M>
+bool ShmTransmitter<M>::Transmit(const M& msg, const MessageInfo& msg_info) {
   if (!this->enabled_) {
     ADEBUG << "not enable.";
     return false;
@@ -152,4 +151,4 @@ bool ShmUpperReach<MessageT>::Transmit(const MessageT& msg,
 }  // namespace cybertron
 }  // namespace apollo
 
-#endif  // CYBERTRON_TRANSPORT_UPPER_REACH_SHM_UPPER_REACH_H_
+#endif  // CYBERTRON_TRANSPORT_TRANSMITTER_SHM_TRANSMITTER_H_

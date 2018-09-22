@@ -47,7 +47,7 @@ using proto::RoleType;
 template <typename MessageT>
 class Reader : public ReaderBase {
  public:
-  using LowerReachPtr = std::shared_ptr<transport::LowerReach<MessageT>>;
+  using ReceiverPtr = std::shared_ptr<transport::Receiver<MessageT>>;
   using ChangeConnection =
       typename service_discovery::Manager::ChangeConnection;
   using Iterator =
@@ -83,7 +83,7 @@ class Reader : public ReaderBase {
   void OnChannelChange(const proto::ChangeMsg& change_msg);
 
   CallbackFunc<MessageT> reader_func_;
-  LowerReachPtr lower_reach_;
+  ReceiverPtr receiver_;
   std::string croutine_name_;
 
   ChangeConnection change_conn_;
@@ -102,7 +102,7 @@ Reader<MessageT>::Reader(const proto::RoleAttributes& role_attr,
       latest_recv_time_sec_(-1.0),
       second_to_lastest_recv_time_sec_(-1.0),
       reader_func_(reader_func),
-      lower_reach_(nullptr),
+      receiver_(nullptr),
       croutine_name_(""),
       channel_manager_(nullptr) {}
 
@@ -156,8 +156,8 @@ bool Reader<MessageT>::Init() {
     return false;
   }
 
-  lower_reach_ = ReaderManager<MessageT>::Instance()->GetReader(role_attr_);
-  this->role_attr_.set_id(lower_reach_->id().HashValue());
+  receiver_ = ReceiverManager<MessageT>::Instance()->GetReceiver(role_attr_);
+  this->role_attr_.set_id(receiver_->id().HashValue());
 
   channel_manager_ =
       service_discovery::TopologyManager::Instance()->channel_manager();
@@ -174,7 +174,7 @@ void Reader<MessageT>::Shutdown() {
     return;
   }
   LeaveTheTopology();
-  lower_reach_ = nullptr;
+  receiver_ = nullptr;
   channel_manager_ = nullptr;
 
   if (!croutine_name_.empty()) {
@@ -193,7 +193,7 @@ void Reader<MessageT>::JoinTheTopology() {
   std::vector<proto::RoleAttributes> writers;
   channel_manager_->GetWritersOfChannel(channel_name, &writers);
   for (auto& writer : writers) {
-    lower_reach_->Enable(writer);
+    receiver_->Enable(writer);
   }
   channel_manager_->Join(this->role_attr_, proto::RoleType::ROLE_READER);
 }
@@ -217,9 +217,9 @@ void Reader<MessageT>::OnChannelChange(const proto::ChangeMsg& change_msg) {
 
   auto operate_type = change_msg.operate_type();
   if (operate_type == proto::OperateType::OPT_JOIN) {
-    lower_reach_->Enable(writer_attr);
+    receiver_->Enable(writer_attr);
   } else {
-    lower_reach_->Disable(writer_attr);
+    receiver_->Disable(writer_attr);
   }
 }
 

@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef CYBERTRON_TRANSPORT_UPPER_REACH_HYBRID_UPPER_REACH_H_
-#define CYBERTRON_TRANSPORT_UPPER_REACH_HYBRID_UPPER_REACH_H_
+#ifndef CYBERTRON_TRANSPORT_TRANSMITTER_HYBRID_TRANSMITTER_H_
+#define CYBERTRON_TRANSPORT_TRANSMITTER_HYBRID_TRANSMITTER_H_
 
 #include <chrono>
 #include <map>
@@ -33,10 +33,10 @@
 #include "cybertron/proto/transport_conf.pb.h"
 #include "cybertron/transport/message/history.h"
 #include "cybertron/transport/rtps/participant.h"
-#include "cybertron/transport/upper_reach/intra_upper_reach.h"
-#include "cybertron/transport/upper_reach/rtps_upper_reach.h"
-#include "cybertron/transport/upper_reach/shm_upper_reach.h"
-#include "cybertron/transport/upper_reach/upper_reach.h"
+#include "cybertron/transport/transmitter/intra_transmitter.h"
+#include "cybertron/transport/transmitter/rtps_transmitter.h"
+#include "cybertron/transport/transmitter/shm_transmitter.h"
+#include "cybertron/transport/transmitter/transmitter.h"
 
 namespace apollo {
 namespace cybertron {
@@ -46,23 +46,23 @@ using apollo::cybertron::proto::OptionalMode;
 using apollo::cybertron::proto::QosDurabilityPolicy;
 using apollo::cybertron::proto::RoleAttributes;
 
-template <typename MessageT>
-class HybridUpperReach : public UpperReach<MessageT> {
+template <typename M>
+class HybridTransmitter : public Transmitter<M> {
  public:
-  using MessagePtr = std::shared_ptr<MessageT>;
-  using HistoryPtr = std::shared_ptr<History<MessageT>>;
-  using UpperReachPtr = std::shared_ptr<UpperReach<MessageT>>;
-  using UpperReachContainer =
-      std::unordered_map<OptionalMode, UpperReachPtr, std::hash<int>>;
-  using LowerReachContainer =
+  using MessagePtr = std::shared_ptr<M>;
+  using HistoryPtr = std::shared_ptr<History<M>>;
+  using TransmitterPtr = std::shared_ptr<Transmitter<M>>;
+  using TransmitterMap =
+      std::unordered_map<OptionalMode, TransmitterPtr, std::hash<int>>;
+  using ReceiverMap =
       std::unordered_map<OptionalMode, std::set<uint64_t>, std::hash<int>>;
   using CommunicationModePtr = std::shared_ptr<proto::CommunicationMode>;
   using MappingTable =
       std::unordered_map<Relation, OptionalMode, std::hash<int>>;
 
-  HybridUpperReach(const RoleAttributes& attr,
-                   const ParticipantPtr& participant);
-  virtual ~HybridUpperReach();
+  HybridTransmitter(const RoleAttributes& attr,
+                    const ParticipantPtr& participant);
+  virtual ~HybridTransmitter();
 
   void Enable() override;
   void Disable() override;
@@ -75,17 +75,17 @@ class HybridUpperReach : public UpperReach<MessageT> {
   void InitMode();
   void ObtainConfig();
   void InitHistory();
-  void InitUpperReaches();
-  void ClearUpperReaches();
-  void InitLowerReaches();
-  void ClearLowerReaches();
+  void InitTransmitters();
+  void ClearTransmitters();
+  void InitReceivers();
+  void ClearReceivers();
   void TransmitHistoryMsg(const RoleAttributes& opposite_attr);
   void ThreadFunc(const RoleAttributes& opposite_attr);
   Relation GetRelation(const RoleAttributes& opposite_attr);
 
   HistoryPtr history_;
-  UpperReachContainer upper_reaches_;
-  LowerReachContainer lower_reaches_;
+  TransmitterMap transmitters_;
+  ReceiverMap receivers_;
   std::mutex mutex_;
 
   CommunicationModePtr mode_;
@@ -94,90 +94,90 @@ class HybridUpperReach : public UpperReach<MessageT> {
   ParticipantPtr participant_;
 };
 
-template <typename MessageT>
-HybridUpperReach<MessageT>::HybridUpperReach(const RoleAttributes& attr,
-                                             const ParticipantPtr& participant)
-    : UpperReach<MessageT>(attr),
+template <typename M>
+HybridTransmitter<M>::HybridTransmitter(const RoleAttributes& attr,
+                                        const ParticipantPtr& participant)
+    : Transmitter<M>(attr),
       history_(nullptr),
       mode_(nullptr),
       participant_(participant) {
   InitMode();
   ObtainConfig();
   InitHistory();
-  InitUpperReaches();
-  InitLowerReaches();
+  InitTransmitters();
+  InitReceivers();
 }
 
-template <typename MessageT>
-HybridUpperReach<MessageT>::~HybridUpperReach() {
-  ClearLowerReaches();
-  ClearUpperReaches();
+template <typename M>
+HybridTransmitter<M>::~HybridTransmitter() {
+  ClearReceivers();
+  ClearTransmitters();
 }
 
-template <typename MessageT>
-void HybridUpperReach<MessageT>::Enable() {
+template <typename M>
+void HybridTransmitter<M>::Enable() {
   std::lock_guard<std::mutex> lock(mutex_);
-  for (auto& item : upper_reaches_) {
+  for (auto& item : transmitters_) {
     item.second->Enable();
   }
 }
 
-template <typename MessageT>
-void HybridUpperReach<MessageT>::Disable() {
+template <typename M>
+void HybridTransmitter<M>::Disable() {
   std::lock_guard<std::mutex> lock(mutex_);
-  for (auto& item : upper_reaches_) {
+  for (auto& item : transmitters_) {
     item.second->Disable();
   }
 }
 
-template <typename MessageT>
-void HybridUpperReach<MessageT>::Enable(const RoleAttributes& opposite_attr) {
+template <typename M>
+void HybridTransmitter<M>::Enable(const RoleAttributes& opposite_attr) {
   auto relation = GetRelation(opposite_attr);
   if (relation == NO_RELATION) {
     return;
   }
   uint64_t id = opposite_attr.id();
   std::lock_guard<std::mutex> lock(mutex_);
-  lower_reaches_[mapping_table_[relation]].insert(id);
-  upper_reaches_[mapping_table_[relation]]->Enable();
+  receivers_[mapping_table_[relation]].insert(id);
+  transmitters_[mapping_table_[relation]]->Enable();
   TransmitHistoryMsg(opposite_attr);
 }
 
-template <typename MessageT>
-void HybridUpperReach<MessageT>::Disable(const RoleAttributes& opposite_attr) {
+template <typename M>
+void HybridTransmitter<M>::Disable(const RoleAttributes& opposite_attr) {
   auto relation = GetRelation(opposite_attr);
   if (relation == NO_RELATION) {
     return;
   }
   uint64_t id = opposite_attr.id();
   std::lock_guard<std::mutex> lock(mutex_);
-  lower_reaches_[mapping_table_[relation]].erase(id);
-  if (lower_reaches_[mapping_table_[relation]].empty()) {
-    upper_reaches_[mapping_table_[relation]]->Disable();
+  receivers_[mapping_table_[relation]].erase(id);
+  if (receivers_[mapping_table_[relation]].empty()) {
+    transmitters_[mapping_table_[relation]]->Disable();
   }
 }
 
-template <typename MessageT>
-bool HybridUpperReach<MessageT>::Transmit(const MessagePtr& msg,
-                                          const MessageInfo& msg_info) {
+template <typename M>
+bool HybridTransmitter<M>::Transmit(const MessagePtr& msg,
+                                    const MessageInfo& msg_info) {
   std::lock_guard<std::mutex> lock(mutex_);
   history_->Add(msg, msg_info);
-  for (auto& item : upper_reaches_) {
+  for (auto& item : transmitters_) {
     item.second->Transmit(msg, msg_info);
   }
   return true;
 }
 
-template <typename MessageT>
-void HybridUpperReach<MessageT>::InitMode() {
+template <typename M>
+void HybridTransmitter<M>::InitMode() {
   mode_ = std::make_shared<proto::CommunicationMode>();
   mapping_table_[SAME_PROC] = mode_->same_proc();
   mapping_table_[DIFF_PROC] = mode_->diff_proc();
   mapping_table_[DIFF_HOST] = mode_->diff_host();
 }
 
-template <typename MessageT>
-void HybridUpperReach<MessageT>::ObtainConfig() {
+template <typename M>
+void HybridTransmitter<M>::ObtainConfig() {
   auto global_conf = common::GlobalData::Instance()->Config();
   RETURN_IF(!global_conf.has_transport_conf());
   RETURN_IF(!global_conf.transport_conf().has_communication_mode());
@@ -189,19 +189,19 @@ void HybridUpperReach<MessageT>::ObtainConfig() {
   mapping_table_[DIFF_HOST] = mode_->diff_host();
 }
 
-template <typename MessageT>
-void HybridUpperReach<MessageT>::InitHistory() {
+template <typename M>
+void HybridTransmitter<M>::InitHistory() {
   HistoryAttributes history_attr(this->attr_.qos_profile().history(),
                                  this->attr_.qos_profile().depth());
-  history_ = std::make_shared<History<MessageT>>(history_attr);
+  history_ = std::make_shared<History<M>>(history_attr);
   if (this->attr_.qos_profile().durability() ==
       QosDurabilityPolicy::DURABILITY_TRANSIENT_LOCAL) {
     history_->Enable();
   }
 }
 
-template <typename MessageT>
-void HybridUpperReach<MessageT>::InitUpperReaches() {
+template <typename M>
+void HybridTransmitter<M>::InitTransmitters() {
   std::set<OptionalMode> modes;
   modes.insert(mode_->same_proc());
   modes.insert(mode_->diff_proc());
@@ -209,44 +209,43 @@ void HybridUpperReach<MessageT>::InitUpperReaches() {
   for (auto& mode : modes) {
     switch (mode) {
       case OptionalMode::INTRA:
-        upper_reaches_[mode] =
-            std::make_shared<IntraUpperReach<MessageT>>(this->attr_);
+        transmitters_[mode] =
+            std::make_shared<IntraTransmitter<M>>(this->attr_);
         break;
       case OptionalMode::SHM:
-        upper_reaches_[mode] =
-            std::make_shared<ShmUpperReach<MessageT>>(this->attr_);
+        transmitters_[mode] = std::make_shared<ShmTransmitter<M>>(this->attr_);
         break;
       default:
-        upper_reaches_[mode] = std::make_shared<RtpsUpperReach<MessageT>>(
-            this->attr_, participant_);
+        transmitters_[mode] =
+            std::make_shared<RtpsTransmitter<M>>(this->attr_, participant_);
         break;
     }
   }
 }
 
-template <typename MessageT>
-void HybridUpperReach<MessageT>::ClearUpperReaches() {
-  for (auto& item : upper_reaches_) {
+template <typename M>
+void HybridTransmitter<M>::ClearTransmitters() {
+  for (auto& item : transmitters_) {
     item.second->Disable();
   }
-  upper_reaches_.clear();
+  transmitters_.clear();
 }
 
-template <typename MessageT>
-void HybridUpperReach<MessageT>::InitLowerReaches() {
+template <typename M>
+void HybridTransmitter<M>::InitReceivers() {
   std::set<uint64_t> empty;
-  for (auto& item : upper_reaches_) {
-    lower_reaches_[item.first] = empty;
+  for (auto& item : transmitters_) {
+    receivers_[item.first] = empty;
   }
 }
 
-template <typename MessageT>
-void HybridUpperReach<MessageT>::ClearLowerReaches() {
-  lower_reaches_.clear();
+template <typename M>
+void HybridTransmitter<M>::ClearReceivers() {
+  receivers_.clear();
 }
 
-template <typename MessageT>
-void HybridUpperReach<MessageT>::TransmitHistoryMsg(
+template <typename M>
+void HybridTransmitter<M>::TransmitHistoryMsg(
     const RoleAttributes& opposite_attr) {
   // check qos
   if (this->attr_.qos_profile().durability() !=
@@ -257,15 +256,14 @@ void HybridUpperReach<MessageT>::TransmitHistoryMsg(
   }
 
   auto trans_th =
-      std::thread(&HybridUpperReach<MessageT>::ThreadFunc, this, opposite_attr);
+      std::thread(&HybridTransmitter<M>::ThreadFunc, this, opposite_attr);
   trans_th.detach();
 }
 
-template <typename MessageT>
-void HybridUpperReach<MessageT>::ThreadFunc(
-    const RoleAttributes& opposite_attr) {
+template <typename M>
+void HybridTransmitter<M>::ThreadFunc(const RoleAttributes& opposite_attr) {
   // get unsent messages
-  std::vector<typename History<MessageT>::CachedMessage> unsent_msgs;
+  std::vector<typename History<M>::CachedMessage> unsent_msgs;
   history_->GetCachedMessage(&unsent_msgs);
   if (unsent_msgs.empty()) {
     return;
@@ -279,7 +277,7 @@ void HybridUpperReach<MessageT>::ThreadFunc(
   new_attr.set_channel_name(new_channel_name);
   new_attr.set_channel_id(channel_id);
   auto new_upper_reach =
-      std::make_shared<RtpsUpperReach<MessageT>>(new_attr, participant_);
+      std::make_shared<RtpsTransmitter<M>>(new_attr, participant_);
   new_upper_reach->Enable();
 
   for (auto& item : unsent_msgs) {
@@ -289,8 +287,8 @@ void HybridUpperReach<MessageT>::ThreadFunc(
   ADEBUG << "trans threadfunc exit.";
 }
 
-template <typename MessageT>
-Relation HybridUpperReach<MessageT>::GetRelation(
+template <typename M>
+Relation HybridTransmitter<M>::GetRelation(
     const RoleAttributes& opposite_attr) {
   if (opposite_attr.channel_name() != this->attr_.channel_name()) {
     return NO_RELATION;
@@ -309,4 +307,4 @@ Relation HybridUpperReach<MessageT>::GetRelation(
 }  // namespace cybertron
 }  // namespace apollo
 
-#endif  // CYBERTRON_TRANSPORT_UPPER_REACH_HYBRID_UPPER_REACH_H_
+#endif  // CYBERTRON_TRANSPORT_TRANSMITTER_HYBRID_TRANSMITTER_H_

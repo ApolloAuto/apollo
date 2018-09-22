@@ -74,9 +74,9 @@ TEST(RtpsDispatcherTest, on_message) {
         recv_msg->CopyFrom(*msg);
       });
 
-  auto upper_reach = Transport::CreateUpperReach<proto::Chatter>(
+  auto transmitter = Transport::CreateTransmitter<proto::Chatter>(
       self_attr, proto::OptionalMode::RTPS);
-  EXPECT_TRUE(upper_reach != nullptr);
+  EXPECT_TRUE(transmitter != nullptr);
 
   auto send_msg = std::make_shared<proto::Chatter>();
   send_msg->set_timestamp(123);
@@ -84,7 +84,7 @@ TEST(RtpsDispatcherTest, on_message) {
   send_msg->set_seq(789);
   send_msg->set_content("on_message");
 
-  upper_reach->Transmit(send_msg);
+  transmitter->Transmit(send_msg);
   sleep(1);
 
   EXPECT_EQ(recv_msg->timestamp(), send_msg->timestamp());

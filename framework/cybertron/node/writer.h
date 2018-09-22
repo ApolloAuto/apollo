@@ -33,7 +33,7 @@ namespace cybertron {
 template <typename MessageT>
 class Writer : public WriterBase {
  public:
-  using UpperReachPtr = std::shared_ptr<transport::UpperReach<MessageT>>;
+  using TransmitterPtr = std::shared_ptr<transport::Transmitter<MessageT>>;
   using ChangeConnection =
       typename service_discovery::Manager::ChangeConnection;
 
@@ -51,7 +51,7 @@ class Writer : public WriterBase {
   void LeaveTheTopology();
   void OnChannelChange(const proto::ChangeMsg& change_msg);
 
-  UpperReachPtr upper_reach_;
+  TransmitterPtr transmitter_;
 
   ChangeConnection change_conn_;
   service_discovery::ChannelManagerPtr channel_manager_;
@@ -59,7 +59,7 @@ class Writer : public WriterBase {
 
 template <typename MessageT>
 Writer<MessageT>::Writer(const proto::RoleAttributes& role_attr)
-    : WriterBase(role_attr), upper_reach_(nullptr), channel_manager_(nullptr) {}
+    : WriterBase(role_attr), transmitter_(nullptr), channel_manager_(nullptr) {}
 
 template <typename MessageT>
 Writer<MessageT>::~Writer() {
@@ -72,9 +72,9 @@ bool Writer<MessageT>::Init() {
     return true;
   }
   // TODO: singleton by channel name
-  upper_reach_ = transport::Transport::CreateUpperReach<MessageT>(role_attr_);
-  RETURN_VAL_IF_NULL(upper_reach_, false);
-  this->role_attr_.set_id(upper_reach_->id().HashValue());
+  transmitter_ = transport::Transport::CreateTransmitter<MessageT>(role_attr_);
+  RETURN_VAL_IF_NULL(transmitter_, false);
+  this->role_attr_.set_id(transmitter_->id().HashValue());
 
   channel_manager_ =
       service_discovery::TopologyManager::Instance()->channel_manager();
@@ -91,7 +91,7 @@ void Writer<MessageT>::Shutdown() {
   }
 
   LeaveTheTopology();
-  upper_reach_ = nullptr;
+  transmitter_ = nullptr;
   channel_manager_ = nullptr;
 }
 
@@ -105,7 +105,7 @@ bool Writer<MessageT>::Write(const MessageT& msg) {
 template <typename MessageT>
 bool Writer<MessageT>::Write(const std::shared_ptr<MessageT>& msg_ptr) {
   RETURN_VAL_IF(!init_.load(), false);
-  return upper_reach_->Transmit(msg_ptr);
+  return transmitter_->Transmit(msg_ptr);
 }
 
 template <typename MessageT>
@@ -119,7 +119,7 @@ void Writer<MessageT>::JoinTheTopology() {
   std::vector<proto::RoleAttributes> readers;
   channel_manager_->GetReadersOfChannel(channel_name, &readers);
   for (auto& reader : readers) {
-    upper_reach_->Enable(reader);
+    transmitter_->Enable(reader);
   }
 
   channel_manager_->Join(this->role_attr_, proto::RoleType::ROLE_WRITER);
@@ -144,9 +144,9 @@ void Writer<MessageT>::OnChannelChange(const proto::ChangeMsg& change_msg) {
 
   auto operate_type = change_msg.operate_type();
   if (operate_type == proto::OperateType::OPT_JOIN) {
-    upper_reach_->Enable(reader_attr);
+    transmitter_->Enable(reader_attr);
   } else {
-    upper_reach_->Disable(reader_attr);
+    transmitter_->Disable(reader_attr);
   }
 }
 

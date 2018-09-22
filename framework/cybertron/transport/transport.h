@@ -21,18 +21,18 @@
 #include <string>
 
 #include "cybertron/proto/transport_conf.pb.h"
-#include "cybertron/transport/lower_reach/hybrid_lower_reach.h"
-#include "cybertron/transport/lower_reach/intra_lower_reach.h"
-#include "cybertron/transport/lower_reach/lower_reach.h"
-#include "cybertron/transport/lower_reach/rtps_lower_reach.h"
-#include "cybertron/transport/lower_reach/shm_lower_reach.h"
 #include "cybertron/transport/qos/qos_profile_conf.h"
+#include "cybertron/transport/receiver/hybrid_receiver.h"
+#include "cybertron/transport/receiver/intra_receiver.h"
+#include "cybertron/transport/receiver/receiver.h"
+#include "cybertron/transport/receiver/rtps_receiver.h"
+#include "cybertron/transport/receiver/shm_receiver.h"
 #include "cybertron/transport/rtps/participant.h"
-#include "cybertron/transport/upper_reach/hybrid_upper_reach.h"
-#include "cybertron/transport/upper_reach/intra_upper_reach.h"
-#include "cybertron/transport/upper_reach/rtps_upper_reach.h"
-#include "cybertron/transport/upper_reach/shm_upper_reach.h"
-#include "cybertron/transport/upper_reach/upper_reach.h"
+#include "cybertron/transport/transmitter/hybrid_transmitter.h"
+#include "cybertron/transport/transmitter/intra_transmitter.h"
+#include "cybertron/transport/transmitter/rtps_transmitter.h"
+#include "cybertron/transport/transmitter/shm_transmitter.h"
+#include "cybertron/transport/transmitter/transmitter.h"
 
 namespace apollo {
 namespace cybertron {
@@ -45,17 +45,17 @@ class Transport {
   Transport();
   virtual ~Transport();
 
-  template <typename MessageT>
-  static auto CreateUpperReach(const RoleAttributes& attr,
-                               const OptionalMode& mode = OptionalMode::HYBRID)
-      -> typename std::shared_ptr<UpperReach<MessageT>>;
+  template <typename M>
+  static auto CreateTransmitter(const RoleAttributes& attr,
+                                const OptionalMode& mode = OptionalMode::HYBRID)
+      -> typename std::shared_ptr<Transmitter<M>>;
 
-  template <typename MessageT>
-  static auto CreateLowerReach(
+  template <typename M>
+  static auto CreateReceiver(
       const RoleAttributes& attr,
-      const typename LowerReach<MessageT>::MessageListener& msg_listener,
+      const typename Receiver<M>::MessageListener& msg_listener,
       const OptionalMode& mode = OptionalMode::HYBRID) ->
-      typename std::shared_ptr<LowerReach<MessageT>>;
+      typename std::shared_ptr<Receiver<M>>;
 
   static ParticipantPtr participant();
 
@@ -65,11 +65,11 @@ class Transport {
   static ParticipantPtr participant_;
 };
 
-template <typename MessageT>
-auto Transport::CreateUpperReach(const RoleAttributes& attr,
-                                 const OptionalMode& mode) ->
-    typename std::shared_ptr<UpperReach<MessageT>> {
-  std::shared_ptr<UpperReach<MessageT>> upper_reach = nullptr;
+template <typename M>
+auto Transport::CreateTransmitter(const RoleAttributes& attr,
+                                  const OptionalMode& mode) ->
+    typename std::shared_ptr<Transmitter<M>> {
+  std::shared_ptr<Transmitter<M>> transmitter = nullptr;
   RoleAttributes modified_attr = attr;
   if (!modified_attr.has_qos_profile()) {
     modified_attr.mutable_qos_profile()->CopyFrom(
@@ -77,38 +77,37 @@ auto Transport::CreateUpperReach(const RoleAttributes& attr,
   }
   switch (mode) {
     case OptionalMode::INTRA:
-      upper_reach = std::make_shared<IntraUpperReach<MessageT>>(modified_attr);
+      transmitter = std::make_shared<IntraTransmitter<M>>(modified_attr);
       break;
 
     case OptionalMode::SHM:
-      upper_reach = std::make_shared<ShmUpperReach<MessageT>>(modified_attr);
+      transmitter = std::make_shared<ShmTransmitter<M>>(modified_attr);
       break;
 
     case OptionalMode::RTPS:
-      upper_reach = std::make_shared<RtpsUpperReach<MessageT>>(modified_attr,
-                                                               participant());
+      transmitter =
+          std::make_shared<RtpsTransmitter<M>>(modified_attr, participant());
       break;
 
     default:
-      upper_reach = std::make_shared<HybridUpperReach<MessageT>>(modified_attr,
-                                                                 participant());
+      transmitter =
+          std::make_shared<HybridTransmitter<M>>(modified_attr, participant());
       break;
   }
 
-  RETURN_VAL_IF_NULL(upper_reach, nullptr);
+  RETURN_VAL_IF_NULL(transmitter, nullptr);
   if (mode != OptionalMode::HYBRID) {
-    upper_reach->Enable();
+    transmitter->Enable();
   }
-  return upper_reach;
+  return transmitter;
 }
 
-template <typename MessageT>
-auto Transport::CreateLowerReach(
+template <typename M>
+auto Transport::CreateReceiver(
     const RoleAttributes& attr,
-    const typename LowerReach<MessageT>::MessageListener& msg_listener,
-    const OptionalMode& mode) ->
-    typename std::shared_ptr<LowerReach<MessageT>> {
-  std::shared_ptr<LowerReach<MessageT>> lower_reach = nullptr;
+    const typename Receiver<M>::MessageListener& msg_listener,
+    const OptionalMode& mode) -> typename std::shared_ptr<Receiver<M>> {
+  std::shared_ptr<Receiver<M>> receiver = nullptr;
   RoleAttributes modified_attr = attr;
   if (!modified_attr.has_qos_profile()) {
     modified_attr.mutable_qos_profile()->CopyFrom(
@@ -116,31 +115,29 @@ auto Transport::CreateLowerReach(
   }
   switch (mode) {
     case OptionalMode::INTRA:
-      lower_reach = std::make_shared<IntraLowerReach<MessageT>>(modified_attr,
-                                                                msg_listener);
+      receiver =
+          std::make_shared<IntraReceiver<M>>(modified_attr, msg_listener);
       break;
 
     case OptionalMode::SHM:
-      lower_reach = std::make_shared<ShmLowerReach<MessageT>>(modified_attr,
-                                                              msg_listener);
+      receiver = std::make_shared<ShmReceiver<M>>(modified_attr, msg_listener);
       break;
 
     case OptionalMode::RTPS:
-      lower_reach = std::make_shared<RtpsLowerReach<MessageT>>(modified_attr,
-                                                               msg_listener);
+      receiver = std::make_shared<RtpsReceiver<M>>(modified_attr, msg_listener);
       break;
 
     default:
-      lower_reach = std::make_shared<HybridLowerReach<MessageT>>(
+      receiver = std::make_shared<HybridReceiver<M>>(
           modified_attr, msg_listener, participant());
       break;
   }
 
-  RETURN_VAL_IF_NULL(lower_reach, nullptr);
+  RETURN_VAL_IF_NULL(receiver, nullptr);
   if (mode != OptionalMode::HYBRID) {
-    lower_reach->Enable();
+    receiver->Enable();
   }
-  return lower_reach;
+  return receiver;
 }
 
 }  // namespace transport

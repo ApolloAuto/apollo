@@ -94,8 +94,8 @@ class Client : public ClientBase {
       pending_requests_;
   std::mutex pending_requests_mutex_;
 
-  std::shared_ptr<transport::UpperReach<Request>> request_upper_reach_;
-  std::shared_ptr<transport::LowerReach<Response>> response_lower_reach_;
+  std::shared_ptr<transport::Transmitter<Request>> request_transmitter_;
+  std::shared_ptr<transport::Receiver<Response>> response_receiver_;
   std::string request_channel_;
   std::string response_channel_;
 
@@ -117,13 +117,13 @@ bool Client<Request, Response>::Init() {
   role.set_channel_id(channel_id);
   role.mutable_qos_profile()->CopyFrom(
       transport::QosProfileConf::QOS_PROFILE_SERVICES_DEFAULT);
-  request_upper_reach_ = transport::Transport::CreateUpperReach<Request>(
+  request_transmitter_ = transport::Transport::CreateTransmitter<Request>(
       role, proto::OptionalMode::RTPS);
-  if (request_upper_reach_ == nullptr) {
+  if (request_transmitter_ == nullptr) {
     AERROR << "Create request pub failed.";
     return false;
   }
-  writer_id_ = request_upper_reach_->id();
+  writer_id_ = request_transmitter_->id();
 
   response_callback_ =
       std::bind(&Client<Request, Response>::HandleResponse, this,
@@ -132,7 +132,7 @@ bool Client<Request, Response>::Init() {
   role.set_channel_name(response_channel_);
   channel_id = common::GlobalData::RegisterChannel(response_channel_);
   role.set_channel_id(channel_id);
-  response_lower_reach_ = transport::Transport::CreateLowerReach<Response>(
+  response_receiver_ = transport::Transport::CreateReceiver<Response>(
       role,
       [=](const std::shared_ptr<Response>& request,
           const transport::MessageInfo& message_info,
@@ -142,7 +142,7 @@ bool Client<Request, Response>::Init() {
         response_callback_(request, message_info);
       },
       proto::OptionalMode::RTPS);
-  if (response_lower_reach_ == nullptr) {
+  if (response_receiver_ == nullptr) {
     AERROR << "Create response sub failed.";
     return false;
   }
@@ -195,7 +195,7 @@ Client<Request, Response>::AsyncSendRequest(SharedRequest request,
   std::lock_guard<std::mutex> lock(pending_requests_mutex_);
   sequence_number_++;
   transport::MessageInfo info(writer_id_, sequence_number_, writer_id_);
-  request_upper_reach_->Transmit(request, info);
+  request_transmitter_->Transmit(request, info);
   SharedPromise call_promise = std::make_shared<Promise>();
   SharedFuture f(call_promise->get_future());
   pending_requests_[info.seq_num()] =
