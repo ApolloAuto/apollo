@@ -24,4 +24,30 @@ cc_test(
     ],
 )
 
+cc_library(
+    name = "graph_segmentor",
+    srcs = [
+        "graph_segmentor.cc",
+    ],
+    hdrs = [
+        "graph_segmentor.h",
+    ],
+    deps = [
+        "//framework:cybertron",
+        ":disjoint_set",
+    ],
+)
+
+cc_test(
+    name = "graph_segmentor_test",
+    size = "small",
+    srcs = [
+        "graph_segmentor_test.cc",
+    ],
+    deps = [
+        ":graph_segmentor",
+        "@gtest//:main",
+    ],
+)
+
 cpplint()
