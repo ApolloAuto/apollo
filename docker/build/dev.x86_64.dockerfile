@@ -65,5 +65,7 @@ RUN bash /tmp/installers/install_user.sh
 RUN bash /tmp/installers/install_yarn.sh
 RUN bash /tmp/installers/post_install.sh
 
+# TODO(xiaoxq): Install TensorRT 3 properly.
+
 WORKDIR /apollo
 USER apollo
