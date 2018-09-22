@@ -1,3 +1,0 @@
-name: "GeometryCameraConverter"
-version: "1.0.0"
-camera_intrinsic_file: "modules/perception/data/params/front_camera_intrinsics.yaml"
