@@ -38,13 +38,14 @@ using apollo::common::PointENU;
 using apollo::common::Quaternion;
 using apollo::hdmap::HDMapUtil;
 using apollo::perception::PerceptionObstacle;
-using apollo::perception::Point;
+using Point = apollo::common::Point3D;
 
 double GetAngleFromQuaternion(const Quaternion quaternion) {
   double theta = std::atan2(2.0 * quaternion.qw() * quaternion.qz() +
                                 quaternion.qx() * quaternion.qy(),
-                            1.0 - 2.0 * (quaternion.qy() * quaternion.qy() +
-                                         quaternion.qz() * quaternion.qz())) +
+                            1.0 -
+                                2.0 * (quaternion.qy() * quaternion.qy() +
+                                       quaternion.qz() * quaternion.qz())) +
                  std::acos(-1.0) / 2.0;
   return theta;
 }

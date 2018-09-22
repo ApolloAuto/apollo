@@ -54,26 +54,26 @@ double GetDefaultObjectLength(const int object_type);
 
 double GetDefaultObjectWidth(const int object_type);
 
-apollo::perception::Point SLtoXY(const double x, const double y,
-                                 const double theta);
+apollo::common::Point3D SLtoXY(const double x, const double y,
+                               const double theta);
 
-apollo::perception::Point SLtoXY(const apollo::perception::Point& point,
-                                 const double theta);
+apollo::common::Point3D SLtoXY(const apollo::common::Point3D& point,
+                               const double theta);
 
-double Distance(const apollo::perception::Point& point1,
-                const apollo::perception::Point& point2);
+double Distance(const apollo::common::Point3D& point1,
+                const apollo::common::Point3D& point2);
 
-double Speed(const apollo::perception::Point& point);
+double Speed(const apollo::common::Point3D& point);
 
 double Speed(const double vx, const double vy);
 
 double GetNearestLaneHeading(const apollo::common::PointENU& point_enu);
 
-double GetNearestLaneHeading(const apollo::perception::Point& point);
+double GetNearestLaneHeading(const apollo::common::Point3D& point);
 
 double GetNearestLaneHeading(const double x, const double y, const double z);
 
-double GetLateralDistanceToNearestLane(const apollo::perception::Point& point);
+double GetLateralDistanceToNearestLane(const apollo::common::Point3D& point);
 
 double HeadingDifference(const double theta1, const double theta2);
 

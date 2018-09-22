@@ -22,8 +22,8 @@
 #include <map>
 #include <vector>
 
-#include "modules/common/configs/config_gflags.h"
 #include "cybertron/common/log.h"
+#include "modules/common/configs/config_gflags.h"
 
 #include "modules/third_party_perception/common/third_party_perception_gflags.h"
 #include "modules/third_party_perception/common/third_party_perception_util.h"
@@ -44,7 +44,7 @@ using apollo::drivers::Mobileye;
 using apollo::localization::LocalizationEstimate;
 using apollo::perception::PerceptionObstacle;
 using apollo::perception::PerceptionObstacles;
-using apollo::perception::Point;
+using Point = apollo::common::Point3D;
 
 std::map<std::int32_t, ::apollo::hdmap::LaneBoundaryType_Type>
     lane_conversion_map = {{0, apollo::hdmap::LaneBoundaryType::DOTTED_YELLOW},
