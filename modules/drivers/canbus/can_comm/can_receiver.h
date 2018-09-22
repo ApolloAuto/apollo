@@ -105,7 +105,6 @@ class CanReceiver {
   MessageManager<SensorType> *pt_manager_ = nullptr;
   bool enable_log_ = false;
   bool is_init_ = false;
-  std::unique_ptr<cybertron::Task<>> task_;
 
   DISALLOW_COPY_AND_ASSIGN(CanReceiver);
 };
@@ -194,7 +193,7 @@ template <typename SensorType>
   }
   is_running_ = true;
 
-  task_ = cybertron::CreateTask("CanReceiver", [this] { RecvThreadFunc(); });
+  cybertron::Async(&CanReceiver<SensorType>::RecvThreadFunc, this);
   return ::apollo::common::ErrorCode::OK;
 }
 

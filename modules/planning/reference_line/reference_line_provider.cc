@@ -106,10 +106,8 @@ bool ReferenceLineProvider::Start() {
   }
 
   if (FLAGS_enable_reference_line_provider_thread) {
-    task_.reset(new apollo::cybertron::Task<int>(
-        "async_reference_line_provider",
-        [this](const std::shared_ptr<int> &) { this->GenerateThread(); }));
-    task_future_ = task_->Execute(std::make_shared<int>());
+    task_future_ =
+        cybertron::Async(&ReferenceLineProvider::GenerateThread, this);
   }
   return true;
 }

@@ -24,11 +24,9 @@
 #include <functional>
 #include <utility>
 
-#include "cybertron/cybertron.h"
-#include "cybertron/scheduler/task.h"
+#include "cybertron/task/task.h"
 
 #include "modules/planning/proto/sl_boundary.pb.h"
-
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/util/string_util.h"
 #include "modules/common/util/util.h"
@@ -289,16 +287,10 @@ PathObstacle* ReferenceLineInfo::AddObstacle(const Obstacle* obstacle) {
 bool ReferenceLineInfo::AddObstacles(
     const std::vector<const Obstacle*>& obstacles) {
   if (FLAGS_use_multi_thread_to_add_obstacles) {
-    auto task = std::make_shared<apollo::cybertron::Task<Obstacle, bool>>(
-        "planning_add_obstacles",
-        [this](const std::shared_ptr<Obstacle>& msg) -> bool {
-          return this->AddObstacleHelper(msg);
-        },
-        FLAGS_max_planning_thread_pool_size);
-
-    std::vector<std::future<bool>> results;
+    std::vector<std::future<PathObstacle*>> results;
     for (const auto* obstacle : obstacles) {
-      results.push_back(task->Execute(std::make_shared<Obstacle>(*obstacle)));
+      results.push_back(
+          cybertron::Async(&ReferenceLineInfo::AddObstacle, this, obstacle));
     }
     for (auto& result : results) {
       if (!result.get()) {
