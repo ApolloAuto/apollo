@@ -50,4 +50,48 @@ cc_test(
     ],
 )
 
+cc_library(
+    name = "secure_matrix",
+    hdrs = [
+        "secure_matrix.h",
+    ],
+    deps = [
+        "@eigen",
+    ],
+)
+
+cc_test(
+    name = "secure_matrix_test",
+    size = "small",
+    srcs = [
+        "secure_matrix_test.cc",
+    ],
+    deps = [
+        ":secure_matrix",
+        "@gtest//:main",
+        "@eigen",
+    ],
+)
+cc_library(
+    name = "hungarian_optimizer",
+    hdrs = [
+        "hungarian_optimizer.h",
+    ],
+    deps = [
+        "@eigen",
+    ],
+)
+
+cc_test(
+    name = "hungarian_optimizer_test",
+    size = "small",
+    srcs = [
+        "hungarian_optimizer_test.cc",
+    ],
+    deps = [
+        ":hungarian_optimizer",
+        ":secure_matrix",
+        "@gtest//:main",
+    ],
+)
 cpplint()
