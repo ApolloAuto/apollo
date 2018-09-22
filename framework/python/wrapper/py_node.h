@@ -63,7 +63,7 @@ bool py_OK() { return apollo::cybertron::OK(); }
 class PyWriter {
  public:
   PyWriter(const std::string &channel, const std::string &type,
-           uint32_t qos_depth, apollo::cybertron::Node *node)
+           const uint32_t qos_depth, apollo::cybertron::Node *node)
       : channel_name_(channel),
         data_type_(type),
         qos_depth_(qos_depth),
@@ -95,10 +95,10 @@ class PyWriter {
   }
 
  private:
-  apollo::cybertron::Node *node_;
   std::string channel_name_;
   std::string data_type_;
   uint32_t qos_depth_;
+  apollo::cybertron::Node *node_ = nullptr;
   std::shared_ptr<
       apollo::cybertron::Writer<apollo::cybertron::message::PyMessageWrap>>
       writer_;
