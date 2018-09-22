@@ -21,8 +21,8 @@ using namespace apollo::cybertron::transport;
 using namespace apollo::cybertron::proto;
 
 struct RunConfig {
-  RunConfig() : lower_reach_num(1), mode(OptionalMode::SHM) {}
-  int lower_reach_num;
+  RunConfig() : receiver_num(1), mode(OptionalMode::SHM) {}
+  int receiver_num;
   OptionalMode mode;
 };
 
@@ -43,9 +43,9 @@ struct RunStatistic {
 };
 
 RunConfig cfg;
-const int MAX_LOWER_REACH_NUM = 30;
-std::shared_ptr<LowerReach<RawMessage>> lower_reach[MAX_LOWER_REACH_NUM];
-std::map<std::string, RunStatistic> statistic[MAX_LOWER_REACH_NUM];
+const int MAX_RECEIVER_NUM = 30;
+std::shared_ptr<Receiver<RawMessage>> receiver[MAX_RECEIVER_NUM];
+std::map<std::string, RunStatistic> statistic[MAX_RECEIVER_NUM];
 volatile bool shut_down = false;
 
 bool Parse(const std::string& src, std::string& writer_name,
@@ -67,9 +67,9 @@ void SignalHandler(int signal) {
   RunStatistic total;
 
   // show result
-  for (int i = 0; i < cfg.lower_reach_num; ++i) {
+  for (int i = 0; i < cfg.receiver_num; ++i) {
     RunStatistic each_total;
-    std::cout << "lower_reach[" << i << "]" << std::endl;
+    std::cout << "receiver[" << i << "]" << std::endl;
     for (auto each_lower : statistic[i]) {
       std::string writer_name = each_lower.first;
       RunStatistic& each_statistic = each_lower.second;
@@ -130,10 +130,10 @@ void SignalHandler(int signal) {
 bool Init(char* argv[], RunConfig* cfg) {
   int tmp = 0;
   tmp = atoi(argv[1]);
-  if (tmp < 1 || tmp > MAX_LOWER_REACH_NUM) {
+  if (tmp < 1 || tmp > MAX_RECEIVER_NUM) {
     return false;
   } else {
-    cfg->lower_reach_num = tmp;
+    cfg->receiver_num = tmp;
   }
 
   std::string mode(argv[2], strlen(argv[2]));
@@ -152,8 +152,8 @@ int main(int argc, char* argv[]) {
   if (argc != 3) {
     std::cout << "Usage:" << std::endl;
     std::cout << "     argv[0] program name" << std::endl;
-    std::cout << "     argv[1] lower_reach number(1~" << MAX_LOWER_REACH_NUM
-              << ")" << std::endl;
+    std::cout << "     argv[1] receiver number(1~" << MAX_RECEIVER_NUM << ")"
+              << std::endl;
     std::cout << "     argv[2] transport mode(shm or rtps)" << std::endl;
     return 0;
   }
@@ -164,7 +164,7 @@ int main(int argc, char* argv[]) {
   }
 
   std::cout << "***** Run Config *****" << std::endl;
-  std::cout << "lower_reach num: " << cfg.lower_reach_num << std::endl;
+  std::cout << "receiver num: " << cfg.receiver_num << std::endl;
   std::cout << " transport mode: " << argv[2] << std::endl;
 
   signal(SIGINT, SignalHandler);
@@ -178,10 +178,10 @@ int main(int argc, char* argv[]) {
   auto qos = attr.mutable_qos_profile();
   qos->CopyFrom(QosProfileConf::QOS_PROFILE_DEFAULT);
 
-  // create lower_reach
-  for (int i = 0; i < cfg.lower_reach_num; ++i) {
+  // create receiver
+  for (int i = 0; i < cfg.receiver_num; ++i) {
     try {
-      lower_reach[i] = Transport::CreateLowerReach<RawMessage>(
+      receiver[i] = Transport::CreateReceiver<RawMessage>(
           attr,
           [i](const std::shared_ptr<RawMessage>& msg,
               const MessageInfo& msg_info, const RoleAttributes& attr) {

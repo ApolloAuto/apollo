@@ -14,27 +14,27 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef CYBERTRON_TRANSPORT_UPPER_REACH_INTRA_UPPER_REACH_H_
-#define CYBERTRON_TRANSPORT_UPPER_REACH_INTRA_UPPER_REACH_H_
+#ifndef CYBERTRON_TRANSPORT_TRANSMITTER_INTRA_TRANSMITTER_H_
+#define CYBERTRON_TRANSPORT_TRANSMITTER_INTRA_TRANSMITTER_H_
 
 #include <memory>
 #include <string>
 
 #include "cybertron/common/log.h"
 #include "cybertron/transport/dispatcher/intra_dispatcher.h"
-#include "cybertron/transport/upper_reach/upper_reach.h"
+#include "cybertron/transport/transmitter/transmitter.h"
 
 namespace apollo {
 namespace cybertron {
 namespace transport {
 
-template <typename MessageT>
-class IntraUpperReach : public UpperReach<MessageT> {
+template <typename M>
+class IntraTransmitter : public Transmitter<M> {
  public:
-  using MessagePtr = std::shared_ptr<MessageT>;
+  using MessagePtr = std::shared_ptr<M>;
 
-  explicit IntraUpperReach(const RoleAttributes& attr);
-  virtual ~IntraUpperReach();
+  explicit IntraTransmitter(const RoleAttributes& attr);
+  virtual ~IntraTransmitter();
 
   void Enable() override;
   void Disable() override;
@@ -46,36 +46,36 @@ class IntraUpperReach : public UpperReach<MessageT> {
   IntraDispatcherPtr dispatcher_;
 };
 
-template <typename MessageT>
-IntraUpperReach<MessageT>::IntraUpperReach(const RoleAttributes& attr)
-    : UpperReach<MessageT>(attr),
+template <typename M>
+IntraTransmitter<M>::IntraTransmitter(const RoleAttributes& attr)
+    : Transmitter<M>(attr),
       channel_id_(attr.channel_id()),
       dispatcher_(nullptr) {}
 
-template <typename MessageT>
-IntraUpperReach<MessageT>::~IntraUpperReach() {
+template <typename M>
+IntraTransmitter<M>::~IntraTransmitter() {
   Disable();
 }
 
-template <typename MessageT>
-void IntraUpperReach<MessageT>::Enable() {
+template <typename M>
+void IntraTransmitter<M>::Enable() {
   if (!this->enabled_) {
     dispatcher_ = IntraDispatcher::Instance();
     this->enabled_ = true;
   }
 }
 
-template <typename MessageT>
-void IntraUpperReach<MessageT>::Disable() {
+template <typename M>
+void IntraTransmitter<M>::Disable() {
   if (this->enabled_) {
     dispatcher_ = nullptr;
     this->enabled_ = false;
   }
 }
 
-template <typename MessageT>
-bool IntraUpperReach<MessageT>::Transmit(const MessagePtr& msg,
-                                         const MessageInfo& msg_info) {
+template <typename M>
+bool IntraTransmitter<M>::Transmit(const MessagePtr& msg,
+                                   const MessageInfo& msg_info) {
   if (!this->enabled_) {
     ADEBUG << "not enable.";
     return false;
@@ -88,4 +88,4 @@ bool IntraUpperReach<MessageT>::Transmit(const MessagePtr& msg,
 }  // namespace cybertron
 }  // namespace apollo
 
-#endif  // CYBERTRON_TRANSPORT_UPPER_REACH_INTRA_UPPER_REACH_H_
+#endif  // CYBERTRON_TRANSPORT_TRANSMITTER_INTRA_TRANSMITTER_H_

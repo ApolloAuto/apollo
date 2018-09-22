@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef CYBERTRON_TRANSPORT_UPPER_REACH_RTPS_UPPER_REACH_H_
-#define CYBERTRON_TRANSPORT_UPPER_REACH_RTPS_UPPER_REACH_H_
+#ifndef CYBERTRON_TRANSPORT_TRANSMITTER_RTPS_TRANSMITTER_H_
+#define CYBERTRON_TRANSPORT_TRANSMITTER_RTPS_TRANSMITTER_H_
 
 #include <memory>
 #include <string>
@@ -29,19 +29,20 @@
 #include "cybertron/message/message_traits.h"
 #include "cybertron/transport/rtps/attributes_filler.h"
 #include "cybertron/transport/rtps/participant.h"
-#include "cybertron/transport/upper_reach/upper_reach.h"
+#include "cybertron/transport/transmitter/transmitter.h"
 
 namespace apollo {
 namespace cybertron {
 namespace transport {
 
-template <typename MessageT>
-class RtpsUpperReach : public UpperReach<MessageT> {
+template <typename M>
+class RtpsTransmitter : public Transmitter<M> {
  public:
-  using MessagePtr = std::shared_ptr<MessageT>;
+  using MessagePtr = std::shared_ptr<M>;
 
-  RtpsUpperReach(const RoleAttributes& attr, const ParticipantPtr& participant);
-  virtual ~RtpsUpperReach();
+  RtpsTransmitter(const RoleAttributes& attr,
+                  const ParticipantPtr& participant);
+  virtual ~RtpsTransmitter();
 
   void Enable() override;
   void Disable() override;
@@ -49,26 +50,24 @@ class RtpsUpperReach : public UpperReach<MessageT> {
   bool Transmit(const MessagePtr& msg, const MessageInfo& msg_info) override;
 
  private:
-  bool Transmit(const MessageT& msg, const MessageInfo& msg_info);
+  bool Transmit(const M& msg, const MessageInfo& msg_info);
 
   ParticipantPtr participant_;
   eprosima::fastrtps::Publisher* publisher_;
 };
 
-template <typename MessageT>
-RtpsUpperReach<MessageT>::RtpsUpperReach(const RoleAttributes& attr,
-                                         const ParticipantPtr& participant)
-    : UpperReach<MessageT>(attr),
-      participant_(participant),
-      publisher_(nullptr) {}
+template <typename M>
+RtpsTransmitter<M>::RtpsTransmitter(const RoleAttributes& attr,
+                                    const ParticipantPtr& participant)
+    : Transmitter<M>(attr), participant_(participant), publisher_(nullptr) {}
 
-template <typename MessageT>
-RtpsUpperReach<MessageT>::~RtpsUpperReach() {
+template <typename M>
+RtpsTransmitter<M>::~RtpsTransmitter() {
   Disable();
 }
 
-template <typename MessageT>
-void RtpsUpperReach<MessageT>::Enable() {
+template <typename M>
+void RtpsTransmitter<M>::Enable() {
   if (this->enabled_) {
     return;
   }
@@ -84,23 +83,22 @@ void RtpsUpperReach<MessageT>::Enable() {
   this->enabled_ = true;
 }
 
-template <typename MessageT>
-void RtpsUpperReach<MessageT>::Disable() {
+template <typename M>
+void RtpsTransmitter<M>::Disable() {
   if (this->enabled_) {
     publisher_ = nullptr;
     this->enabled_ = false;
   }
 }
 
-template <typename MessageT>
-bool RtpsUpperReach<MessageT>::Transmit(const MessagePtr& msg,
-                                        const MessageInfo& msg_info) {
+template <typename M>
+bool RtpsTransmitter<M>::Transmit(const MessagePtr& msg,
+                                  const MessageInfo& msg_info) {
   return Transmit(*msg, msg_info);
 }
 
-template <typename MessageT>
-bool RtpsUpperReach<MessageT>::Transmit(const MessageT& msg,
-                                        const MessageInfo& msg_info) {
+template <typename M>
+bool RtpsTransmitter<M>::Transmit(const M& msg, const MessageInfo& msg_info) {
   if (!this->enabled_) {
     ADEBUG << "not enable.";
     return false;
@@ -129,4 +127,4 @@ bool RtpsUpperReach<MessageT>::Transmit(const MessageT& msg,
 }  // namespace cybertron
 }  // namespace apollo
 
-#endif  // CYBERTRON_TRANSPORT_UPPER_REACH_RTPS_UPPER_REACH_H_
+#endif  // CYBERTRON_TRANSPORT_TRANSMITTER_RTPS_TRANSMITTER_H_

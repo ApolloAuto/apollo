@@ -21,25 +21,23 @@
 #include "cybertron/common/global_data.h"
 #include "cybertron/common/util.h"
 #include "cybertron/proto/unit_test.pb.h"
-#include "cybertron/transport/lower_reach/hybrid_lower_reach.h"
 #include "cybertron/transport/qos/qos_profile_conf.h"
+#include "cybertron/transport/receiver/hybrid_receiver.h"
+#include "cybertron/transport/transmitter/hybrid_transmitter.h"
 #include "cybertron/transport/transport.h"
-#include "cybertron/transport/upper_reach/hybrid_upper_reach.h"
 
 namespace apollo {
 namespace cybertron {
 namespace transport {
 
-class HybridReachTest : public ::testing::Test {
+class HybridTransceiverTest : public ::testing::Test {
  protected:
-  using Upper = HybridUpperReach<proto::UnitTest>;
-  using Lower = HybridLowerReach<proto::UnitTest>;
-  using UpperPtr = std::shared_ptr<UpperReach<proto::UnitTest>>;
-  using LowerPtr = std::shared_ptr<LowerReach<proto::UnitTest>>;
+  using TransmitterPtr = std::shared_ptr<Transmitter<proto::UnitTest>>;
+  using ReceiverPtr = std::shared_ptr<Receiver<proto::UnitTest>>;
 
-  HybridReachTest() : channel_name_("hybrid_channel") {}
+  HybridTransceiverTest() : channel_name_("hybrid_channel") {}
 
-  virtual ~HybridReachTest() {}
+  virtual ~HybridTransceiverTest() {}
 
   virtual void SetUp() {
     RoleAttributes attr;
@@ -48,41 +46,45 @@ class HybridReachTest : public ::testing::Test {
     attr.set_channel_name(channel_name_);
     attr.set_channel_id(common::Hash(channel_name_));
     attr.mutable_qos_profile()->CopyFrom(QosProfileConf::QOS_PROFILE_DEFAULT);
-    upper_reach_a_ = std::make_shared<Upper>(attr, Transport::participant());
+    transmitter_a_ = std::make_shared<HybridTransmitter<proto::UnitTest>>(
+        attr, Transport::participant());
 
     attr.set_process_id(54321);
     attr.mutable_qos_profile()->CopyFrom(
         QosProfileConf::QOS_PROFILE_TOPO_CHANGE);
-    upper_reach_b_ = std::make_shared<Upper>(attr, Transport::participant());
+    transmitter_b_ = std::make_shared<HybridTransmitter<proto::UnitTest>>(
+        attr, Transport::participant());
   }
 
   virtual void TearDown() {
-    upper_reach_a_ = nullptr;
-    upper_reach_b_ = nullptr;
+    transmitter_a_ = nullptr;
+    transmitter_b_ = nullptr;
   }
 
   std::string channel_name_;
-  UpperPtr upper_reach_a_ = nullptr;
-  UpperPtr upper_reach_b_ = nullptr;
+  TransmitterPtr transmitter_a_ = nullptr;
+  TransmitterPtr transmitter_b_ = nullptr;
 };
 
-TEST_F(HybridReachTest, constructor) {
+TEST_F(HybridTransceiverTest, constructor) {
   RoleAttributes attr;
-  UpperPtr upper = std::make_shared<Upper>(attr, Transport::participant());
-  LowerPtr lower =
-      std::make_shared<Lower>(attr, nullptr, Transport::participant());
+  TransmitterPtr transmitter =
+      std::make_shared<HybridTransmitter<proto::UnitTest>>(
+          attr, Transport::participant());
+  ReceiverPtr receiver = std::make_shared<HybridReceiver<proto::UnitTest>>(
+      attr, nullptr, Transport::participant());
 
-  EXPECT_EQ(upper->seq_num(), 0);
+  EXPECT_EQ(transmitter->seq_num(), 0);
 
-  auto& upper_id = upper->id();
-  auto& lower_id = lower->id();
+  auto& transmitter_id = transmitter->id();
+  auto& receiver_id = receiver->id();
 
-  EXPECT_NE(upper_id.ToString(), lower_id.ToString());
+  EXPECT_NE(transmitter_id.ToString(), receiver_id.ToString());
 }
 
-TEST_F(HybridReachTest, enable_and_disable_no_param) {
-  upper_reach_a_->Enable();
-  upper_reach_b_->Enable();
+TEST_F(HybridTransceiverTest, enable_and_disable_no_param) {
+  transmitter_a_->Enable();
+  transmitter_b_->Enable();
 
   RoleAttributes attr;
   attr.set_host_name(common::GlobalData::Instance()->HostName());
@@ -92,7 +94,7 @@ TEST_F(HybridReachTest, enable_and_disable_no_param) {
   attr.set_channel_id(common::Hash(channel_name_));
 
   std::vector<proto::UnitTest> msgs;
-  LowerPtr lower = std::make_shared<Lower>(
+  ReceiverPtr receiver = std::make_shared<HybridReceiver<proto::UnitTest>>(
       attr,
       [&msgs](const std::shared_ptr<proto::UnitTest>& msg,
               const MessageInfo& msg_info, const RoleAttributes& attr) {
@@ -102,16 +104,16 @@ TEST_F(HybridReachTest, enable_and_disable_no_param) {
       },
       Transport::participant());
 
-  lower->Enable();
+  receiver->Enable();
 
   auto msg = std::make_shared<proto::UnitTest>();
-  std::string class_name("HybridReachTest");
+  std::string class_name("HybridTransceiverTest");
   std::string case_name("enable_and_disable_no_param");
   msg->set_class_name(class_name);
   msg->set_case_name(case_name);
 
-  upper_reach_a_->Transmit(msg);
-  upper_reach_b_->Transmit(msg);
+  transmitter_a_->Transmit(msg);
+  transmitter_b_->Transmit(msg);
   std::this_thread::sleep_for(std::chrono::milliseconds(200));
   EXPECT_EQ(msgs.size(), 6);
   for (auto& item : msgs) {
@@ -120,19 +122,19 @@ TEST_F(HybridReachTest, enable_and_disable_no_param) {
   }
 
   msgs.clear();
-  upper_reach_b_->Disable();
-  upper_reach_b_->Transmit(msg);
+  transmitter_b_->Disable();
+  transmitter_b_->Transmit(msg);
   std::this_thread::sleep_for(std::chrono::milliseconds(200));
   EXPECT_EQ(msgs.size(), 0);
 
   msgs.clear();
-  lower->Disable();
-  upper_reach_a_->Transmit(msg);
+  receiver->Disable();
+  transmitter_a_->Transmit(msg);
   std::this_thread::sleep_for(std::chrono::milliseconds(200));
   EXPECT_EQ(msgs.size(), 0);
 }
 
-TEST_F(HybridReachTest, enable_and_disable_with_param_no_relation) {
+TEST_F(HybridTransceiverTest, enable_and_disable_with_param_no_relation) {
   RoleAttributes attr;
   attr.set_host_name(common::GlobalData::Instance()->HostName());
   attr.set_process_id(common::GlobalData::Instance()->ProcessId());
@@ -143,7 +145,7 @@ TEST_F(HybridReachTest, enable_and_disable_with_param_no_relation) {
 
   std::mutex mtx;
   std::vector<proto::UnitTest> msgs;
-  LowerPtr lower_a = std::make_shared<Lower>(
+  ReceiverPtr receiver_a = std::make_shared<HybridReceiver<proto::UnitTest>>(
       attr,
       [&](const std::shared_ptr<proto::UnitTest>& msg,
           const MessageInfo& msg_info, const RoleAttributes& attr) {
@@ -155,7 +157,7 @@ TEST_F(HybridReachTest, enable_and_disable_with_param_no_relation) {
       Transport::participant());
 
   attr.mutable_qos_profile()->CopyFrom(QosProfileConf::QOS_PROFILE_TOPO_CHANGE);
-  LowerPtr lower_b = std::make_shared<Lower>(
+  ReceiverPtr receiver_b = std::make_shared<HybridReceiver<proto::UnitTest>>(
       attr,
       [&](const std::shared_ptr<proto::UnitTest>& msg,
           const MessageInfo& msg_info, const RoleAttributes& attr) {
@@ -167,26 +169,26 @@ TEST_F(HybridReachTest, enable_and_disable_with_param_no_relation) {
       Transport::participant());
 
   auto msg = std::make_shared<proto::UnitTest>();
-  msg->set_class_name("HybridReachTest");
+  msg->set_class_name("HybridTransceiverTest");
   msg->set_case_name("enable_and_disable_with_param_no_relation");
 
-  upper_reach_a_->Enable(lower_a->attributes());
-  upper_reach_a_->Enable(lower_b->attributes());
-  lower_a->Enable(upper_reach_a_->attributes());
-  lower_b->Enable(upper_reach_a_->attributes());
+  transmitter_a_->Enable(receiver_a->attributes());
+  transmitter_a_->Enable(receiver_b->attributes());
+  receiver_a->Enable(transmitter_a_->attributes());
+  receiver_b->Enable(transmitter_a_->attributes());
 
-  upper_reach_a_->Transmit(msg);
+  transmitter_a_->Transmit(msg);
   std::this_thread::sleep_for(std::chrono::milliseconds(200));
   EXPECT_EQ(msgs.size(), 0);
 
   msgs.clear();
-  upper_reach_a_->Disable(lower_a->attributes());
-  upper_reach_a_->Disable(lower_b->attributes());
-  lower_a->Disable(upper_reach_a_->attributes());
-  lower_b->Disable(upper_reach_a_->attributes());
+  transmitter_a_->Disable(receiver_a->attributes());
+  transmitter_a_->Disable(receiver_b->attributes());
+  receiver_a->Disable(transmitter_a_->attributes());
+  receiver_b->Disable(transmitter_a_->attributes());
 }
 
-TEST_F(HybridReachTest, enable_and_disable_with_param_same_process) {
+TEST_F(HybridTransceiverTest, enable_and_disable_with_param_same_process) {
   RoleAttributes attr;
   attr.set_host_name(common::GlobalData::Instance()->HostName());
   attr.set_process_id(common::GlobalData::Instance()->ProcessId());
@@ -196,7 +198,7 @@ TEST_F(HybridReachTest, enable_and_disable_with_param_same_process) {
 
   std::mutex mtx;
   std::vector<proto::UnitTest> msgs;
-  LowerPtr lower_a = std::make_shared<Lower>(
+  ReceiverPtr receiver_a = std::make_shared<HybridReceiver<proto::UnitTest>>(
       attr,
       [&](const std::shared_ptr<proto::UnitTest>& msg,
           const MessageInfo& msg_info, const RoleAttributes& attr) {
@@ -208,7 +210,7 @@ TEST_F(HybridReachTest, enable_and_disable_with_param_same_process) {
       Transport::participant());
 
   attr.mutable_qos_profile()->CopyFrom(QosProfileConf::QOS_PROFILE_TOPO_CHANGE);
-  LowerPtr lower_b = std::make_shared<Lower>(
+  ReceiverPtr receiver_b = std::make_shared<HybridReceiver<proto::UnitTest>>(
       attr,
       [&](const std::shared_ptr<proto::UnitTest>& msg,
           const MessageInfo& msg_info, const RoleAttributes& attr) {
@@ -219,23 +221,23 @@ TEST_F(HybridReachTest, enable_and_disable_with_param_same_process) {
       },
       Transport::participant());
 
-  std::string class_name("HybridReachTest");
+  std::string class_name("HybridTransceiverTest");
   std::string case_name("enable_and_disable_with_param_same_process");
   auto msg = std::make_shared<proto::UnitTest>();
   msg->set_class_name(class_name);
   msg->set_case_name(case_name);
 
   // this msg will lose
-  upper_reach_a_->Transmit(msg);
+  transmitter_a_->Transmit(msg);
 
-  upper_reach_a_->Enable(lower_a->attributes());
-  upper_reach_a_->Enable(lower_b->attributes());
-  lower_a->Enable(upper_reach_a_->attributes());
-  lower_b->Enable(upper_reach_a_->attributes());
+  transmitter_a_->Enable(receiver_a->attributes());
+  transmitter_a_->Enable(receiver_b->attributes());
+  receiver_a->Enable(transmitter_a_->attributes());
+  receiver_b->Enable(transmitter_a_->attributes());
   // repeated call
-  lower_b->Enable(upper_reach_a_->attributes());
+  receiver_b->Enable(transmitter_a_->attributes());
 
-  upper_reach_a_->Transmit(msg);
+  transmitter_a_->Transmit(msg);
   std::this_thread::sleep_for(std::chrono::milliseconds(200));
   EXPECT_EQ(msgs.size(), 2);
   for (auto& item : msgs) {
@@ -244,20 +246,21 @@ TEST_F(HybridReachTest, enable_and_disable_with_param_same_process) {
   }
 
   msgs.clear();
-  upper_reach_a_->Disable(lower_a->attributes());
-  upper_reach_a_->Disable(lower_b->attributes());
-  lower_a->Disable(upper_reach_a_->attributes());
-  lower_b->Disable(upper_reach_a_->attributes());
+  transmitter_a_->Disable(receiver_a->attributes());
+  transmitter_a_->Disable(receiver_b->attributes());
+  receiver_a->Disable(transmitter_a_->attributes());
+  receiver_b->Disable(transmitter_a_->attributes());
   // repeated call
-  lower_b->Disable(upper_reach_a_->attributes());
+  receiver_b->Disable(transmitter_a_->attributes());
 
-  upper_reach_a_->Transmit(msg);
+  transmitter_a_->Transmit(msg);
   std::this_thread::sleep_for(std::chrono::milliseconds(200));
 
   EXPECT_EQ(msgs.size(), 0);
 }
 
-TEST_F(HybridReachTest, enable_and_disable_with_param_same_host_diff_proc) {
+TEST_F(HybridTransceiverTest,
+       enable_and_disable_with_param_same_host_diff_proc) {
   RoleAttributes attr;
   attr.set_host_name(common::GlobalData::Instance()->HostName());
   attr.set_process_id(1);
@@ -267,7 +270,7 @@ TEST_F(HybridReachTest, enable_and_disable_with_param_same_host_diff_proc) {
 
   std::mutex mtx;
   std::vector<proto::UnitTest> msgs;
-  LowerPtr lower_a = std::make_shared<Lower>(
+  ReceiverPtr receiver_a = std::make_shared<HybridReceiver<proto::UnitTest>>(
       attr,
       [&](const std::shared_ptr<proto::UnitTest>& msg,
           const MessageInfo& msg_info, const RoleAttributes& attr) {
@@ -279,7 +282,7 @@ TEST_F(HybridReachTest, enable_and_disable_with_param_same_host_diff_proc) {
       Transport::participant());
 
   attr.mutable_qos_profile()->CopyFrom(QosProfileConf::QOS_PROFILE_TOPO_CHANGE);
-  LowerPtr lower_b = std::make_shared<Lower>(
+  ReceiverPtr receiver_b = std::make_shared<HybridReceiver<proto::UnitTest>>(
       attr,
       [&](const std::shared_ptr<proto::UnitTest>& msg,
           const MessageInfo& msg_info, const RoleAttributes& attr) {
@@ -290,23 +293,23 @@ TEST_F(HybridReachTest, enable_and_disable_with_param_same_host_diff_proc) {
       },
       Transport::participant());
 
-  std::string class_name("HybridReachTest");
+  std::string class_name("HybridTransceiverTest");
   std::string case_name("enable_and_disable_with_param_same_host_diff_proc");
   auto msg = std::make_shared<proto::UnitTest>();
   msg->set_class_name(class_name);
   msg->set_case_name(case_name);
 
-  upper_reach_b_->Transmit(msg);
+  transmitter_b_->Transmit(msg);
 
-  upper_reach_b_->Enable(lower_a->attributes());
-  upper_reach_b_->Enable(lower_b->attributes());
-  lower_a->Enable(upper_reach_b_->attributes());
-  lower_b->Enable(upper_reach_b_->attributes());
+  transmitter_b_->Enable(receiver_a->attributes());
+  transmitter_b_->Enable(receiver_b->attributes());
+  receiver_a->Enable(transmitter_b_->attributes());
+  receiver_b->Enable(transmitter_b_->attributes());
 
   std::this_thread::sleep_for(std::chrono::milliseconds(200));
-  upper_reach_b_->Transmit(msg);
+  transmitter_b_->Transmit(msg);
   std::this_thread::sleep_for(std::chrono::milliseconds(200));
-  // 2 from lower_b(transient_local), 1 from lower_a(volatile)
+  // 2 from receiver_b(transient_local), 1 from receiver_a(volatile)
   EXPECT_EQ(msgs.size(), 3);
   for (auto& item : msgs) {
     EXPECT_EQ(item.class_name(), class_name);
@@ -314,18 +317,18 @@ TEST_F(HybridReachTest, enable_and_disable_with_param_same_host_diff_proc) {
   }
 
   msgs.clear();
-  upper_reach_b_->Disable(lower_a->attributes());
-  upper_reach_b_->Disable(lower_b->attributes());
-  lower_a->Disable(upper_reach_b_->attributes());
-  lower_b->Disable(upper_reach_b_->attributes());
+  transmitter_b_->Disable(receiver_a->attributes());
+  transmitter_b_->Disable(receiver_b->attributes());
+  receiver_a->Disable(transmitter_b_->attributes());
+  receiver_b->Disable(transmitter_b_->attributes());
 
-  upper_reach_b_->Transmit(msg);
+  transmitter_b_->Transmit(msg);
   std::this_thread::sleep_for(std::chrono::milliseconds(200));
 
   EXPECT_EQ(msgs.size(), 0);
 }
 
-TEST_F(HybridReachTest, enable_and_disable_with_param_diff_host) {
+TEST_F(HybridTransceiverTest, enable_and_disable_with_param_diff_host) {
   RoleAttributes attr;
   attr.set_host_name("sorac");
   attr.set_process_id(12345);
@@ -335,7 +338,7 @@ TEST_F(HybridReachTest, enable_and_disable_with_param_diff_host) {
 
   std::mutex mtx;
   std::vector<proto::UnitTest> msgs;
-  LowerPtr lower_a = std::make_shared<Lower>(
+  ReceiverPtr receiver_a = std::make_shared<HybridReceiver<proto::UnitTest>>(
       attr,
       [&](const std::shared_ptr<proto::UnitTest>& msg,
           const MessageInfo& msg_info, const RoleAttributes& attr) {
@@ -347,7 +350,7 @@ TEST_F(HybridReachTest, enable_and_disable_with_param_diff_host) {
       Transport::participant());
 
   attr.mutable_qos_profile()->CopyFrom(QosProfileConf::QOS_PROFILE_TOPO_CHANGE);
-  LowerPtr lower_b = std::make_shared<Lower>(
+  ReceiverPtr receiver_b = std::make_shared<HybridReceiver<proto::UnitTest>>(
       attr,
       [&](const std::shared_ptr<proto::UnitTest>& msg,
           const MessageInfo& msg_info, const RoleAttributes& attr) {
@@ -358,21 +361,21 @@ TEST_F(HybridReachTest, enable_and_disable_with_param_diff_host) {
       },
       Transport::participant());
 
-  std::string class_name("HybridReachTest");
+  std::string class_name("HybridTransceiverTest");
   std::string case_name("enable_and_disable_with_param_same_host_diff_proc");
   auto msg = std::make_shared<proto::UnitTest>();
   msg->set_class_name(class_name);
   msg->set_case_name(case_name);
 
-  upper_reach_b_->Enable(lower_a->attributes());
-  upper_reach_b_->Enable(lower_b->attributes());
-  lower_a->Enable(upper_reach_b_->attributes());
-  lower_b->Enable(upper_reach_b_->attributes());
+  transmitter_b_->Enable(receiver_a->attributes());
+  transmitter_b_->Enable(receiver_b->attributes());
+  receiver_a->Enable(transmitter_b_->attributes());
+  receiver_b->Enable(transmitter_b_->attributes());
 
   std::this_thread::sleep_for(std::chrono::milliseconds(200));
-  upper_reach_b_->Transmit(msg);
+  transmitter_b_->Transmit(msg);
   std::this_thread::sleep_for(std::chrono::milliseconds(200));
-  // 1 from lower_b(transient_local), 1 from lower_a(volatile)
+  // 1 from receiver_b(transient_local), 1 from receiver_a(volatile)
   EXPECT_EQ(msgs.size(), 2);
   for (auto& item : msgs) {
     EXPECT_EQ(item.class_name(), class_name);
@@ -380,9 +383,9 @@ TEST_F(HybridReachTest, enable_and_disable_with_param_diff_host) {
   }
 
   msgs.clear();
-  upper_reach_b_->Disable(lower_a->attributes());
-  upper_reach_b_->Disable(lower_b->attributes());
-  upper_reach_b_->Transmit(msg);
+  transmitter_b_->Disable(receiver_a->attributes());
+  transmitter_b_->Disable(receiver_b->attributes());
+  transmitter_b_->Transmit(msg);
   std::this_thread::sleep_for(std::chrono::milliseconds(200));
 
   EXPECT_EQ(msgs.size(), 0);

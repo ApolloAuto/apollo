@@ -66,35 +66,36 @@ class ReaderBase {
 };
 
 template <typename MessageT>
-class ReaderManager {
+class ReceiverManager {
  public:
-  ~ReaderManager() { lower_reach_map_.clear(); }
+  ~ReceiverManager() { receiver_map_.clear(); }
 
-  auto GetReader(const proto::RoleAttributes& role_attr) ->
-      typename std::shared_ptr<transport::LowerReach<MessageT>>;
+  auto GetReceiver(const proto::RoleAttributes& role_attr) ->
+      typename std::shared_ptr<transport::Receiver<MessageT>>;
 
  private:
   std::unordered_map<std::string,
-                     typename std::shared_ptr<transport::LowerReach<MessageT>>>
-      lower_reach_map_;
-  std::mutex lower_reach_map_mutex_;
+                     typename std::shared_ptr<transport::Receiver<MessageT>>>
+      receiver_map_;
+  std::mutex receiver_map_mutex_;
 
-  DECLARE_SINGLETON(ReaderManager<MessageT>)
+  DECLARE_SINGLETON(ReceiverManager<MessageT>)
 };
 
 template <typename MessageT>
-ReaderManager<MessageT>::ReaderManager() {}
+ReceiverManager<MessageT>::ReceiverManager() {}
 
 template <typename MessageT>
-auto ReaderManager<MessageT>::GetReader(const proto::RoleAttributes& role_attr)
-    -> typename std::shared_ptr<transport::LowerReach<MessageT>> {
-  std::lock_guard<std::mutex> lock(lower_reach_map_mutex_);
+auto ReceiverManager<MessageT>::GetReceiver(
+    const proto::RoleAttributes& role_attr) ->
+    typename std::shared_ptr<transport::Receiver<MessageT>> {
+  std::lock_guard<std::mutex> lock(receiver_map_mutex_);
   // because multi reader for one channel will write datacache multi times,
   // so reader for datacache we use map to keep one instance for per channel
   const std::string& channel_name = role_attr.channel_name();
-  if (lower_reach_map_.count(channel_name) == 0) {
-    lower_reach_map_[channel_name] =
-        transport::Transport::CreateLowerReach<MessageT>(
+  if (receiver_map_.count(channel_name) == 0) {
+    receiver_map_[channel_name] =
+        transport::Transport::CreateReceiver<MessageT>(
             role_attr, [](const std::shared_ptr<MessageT>& msg,
                           const transport::MessageInfo& msg_info,
                           const proto::RoleAttributes& reader_attr) {
@@ -110,7 +111,7 @@ auto ReaderManager<MessageT>::GetReader(const proto::RoleAttributes& role_attr)
                   msg_info.seq_num());
             });
   }
-  return lower_reach_map_[channel_name];
+  return receiver_map_[channel_name];
 }
 
 }  // namespace cybertron

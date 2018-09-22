@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef CYBERTRON_TRANSPORT_UPPER_REACH_UPPER_REACH_H_
-#define CYBERTRON_TRANSPORT_UPPER_REACH_UPPER_REACH_H_
+#ifndef CYBERTRON_TRANSPORT_TRANSMITTER_TRANSMITTER_H_
+#define CYBERTRON_TRANSPORT_TRANSMITTER_TRANSMITTER_H_
 
 #include <cstdint>
 #include <memory>
@@ -32,13 +32,13 @@ namespace transport {
 using apollo::cybertron::event::PerfEventCache;
 using apollo::cybertron::event::TransPerf;
 
-template <typename MessageT>
-class UpperReach : public Endpoint {
+template <typename M>
+class Transmitter : public Endpoint {
  public:
-  using MessagePtr = std::shared_ptr<MessageT>;
+  using MessagePtr = std::shared_ptr<M>;
 
-  explicit UpperReach(const RoleAttributes& attr);
-  virtual ~UpperReach();
+  explicit Transmitter(const RoleAttributes& attr);
+  virtual ~Transmitter();
 
   virtual void Enable() = 0;
   virtual void Disable() = 0;
@@ -58,32 +58,32 @@ class UpperReach : public Endpoint {
   MessageInfo msg_info_;
 };
 
-template <typename MessageT>
-UpperReach<MessageT>::UpperReach(const RoleAttributes& attr)
+template <typename M>
+Transmitter<M>::Transmitter(const RoleAttributes& attr)
     : Endpoint(attr), seq_num_(0) {
   msg_info_.set_sender_id(this->id_);
   msg_info_.set_seq_num(this->seq_num_);
 }
 
-template <typename MessageT>
-UpperReach<MessageT>::~UpperReach() {}
+template <typename M>
+Transmitter<M>::~Transmitter() {}
 
-template <typename MessageT>
-bool UpperReach<MessageT>::Transmit(const MessagePtr& msg) {
+template <typename M>
+bool Transmitter<M>::Transmit(const MessagePtr& msg) {
   msg_info_.set_seq_num(NextSeqNum());
   PerfEventCache::Instance()->AddTransportEvent(
       TransPerf::TRANS_FROM, attr_.channel_id(), msg_info_.seq_num());
   return Transmit(msg, msg_info_);
 }
 
-template <typename MessageT>
-void UpperReach<MessageT>::Enable(const RoleAttributes& opposite_attr) {
+template <typename M>
+void Transmitter<M>::Enable(const RoleAttributes& opposite_attr) {
   (void)opposite_attr;
   Enable();
 }
 
-template <typename MessageT>
-void UpperReach<MessageT>::Disable(const RoleAttributes& opposite_attr) {
+template <typename M>
+void Transmitter<M>::Disable(const RoleAttributes& opposite_attr) {
   (void)opposite_attr;
   Disable();
 }
@@ -92,4 +92,4 @@ void UpperReach<MessageT>::Disable(const RoleAttributes& opposite_attr) {
 }  // namespace cybertron
 }  // namespace apollo
 
-#endif  // CYBERTRON_TRANSPORT_UPPER_REACH_UPPER_REACH_H_
+#endif  // CYBERTRON_TRANSPORT_TRANSMITTER_TRANSMITTER_H_

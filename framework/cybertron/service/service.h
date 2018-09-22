@@ -68,8 +68,8 @@ class Service : public ServiceBase {
   std::function<void(const std::shared_ptr<Request>&,
                      const transport::MessageInfo&)>
       request_callback_;
-  std::shared_ptr<transport::UpperReach<Response>> response_upper_reach_;
-  std::shared_ptr<transport::LowerReach<Request>> request_lower_reach_;
+  std::shared_ptr<transport::Transmitter<Response>> response_transmitter_;
+  std::shared_ptr<transport::Receiver<Request>> request_receiver_;
   std::string request_channel_;
   std::string response_channel_;
   std::mutex service_handle_request_mutex_;
@@ -92,9 +92,9 @@ bool Service<Request, Response>::Init() {
   role.set_channel_id(channel_id);
   role.mutable_qos_profile()->CopyFrom(
       transport::QosProfileConf::QOS_PROFILE_SERVICES_DEFAULT);
-  response_upper_reach_ = transport::Transport::CreateUpperReach<Response>(
+  response_transmitter_ = transport::Transport::CreateTransmitter<Response>(
       role, proto::OptionalMode::RTPS);
-  if (response_upper_reach_ == nullptr) {
+  if (response_transmitter_ == nullptr) {
     AERROR << " Create response pub failed.";
     return false;
   }
@@ -106,7 +106,7 @@ bool Service<Request, Response>::Init() {
   role.set_channel_name(request_channel_);
   channel_id = common::GlobalData::RegisterChannel(request_channel_);
   role.set_channel_id(channel_id);
-  request_lower_reach_ = transport::Transport::CreateLowerReach<Request>(
+  request_receiver_ = transport::Transport::CreateReceiver<Request>(
       role,
       [=](const std::shared_ptr<Request>& request,
           const transport::MessageInfo& message_info,
@@ -117,7 +117,7 @@ bool Service<Request, Response>::Init() {
         _thread.detach();
       },
       proto::OptionalMode::RTPS);
-  if (request_lower_reach_ == nullptr) {
+  if (request_receiver_ == nullptr) {
     AERROR << " Create request sub failed." << request_channel_;
     return false;
   }
@@ -138,7 +138,7 @@ void Service<Request, Response>::HandleRequest(
   auto response = std::make_shared<Response>();
   service_callback_(request, response);
   transport::MessageInfo msg_info(message_info);
-  msg_info.set_sender_id(response_upper_reach_->id());
+  msg_info.set_sender_id(response_transmitter_->id());
   SendResponse(msg_info, response);
 }
 
@@ -152,7 +152,7 @@ void Service<Request, Response>::SendResponse(
   }
   // publish return value ?
   // LOG_DEBUG << "send response id:" << message_id.sequence_number;
-  response_upper_reach_->Transmit(response, message_info);
+  response_transmitter_->Transmit(response, message_info);
 }
 
 }  // namespace cybertron

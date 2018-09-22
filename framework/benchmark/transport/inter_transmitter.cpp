@@ -124,11 +124,11 @@ int main(int argc, char* argv[]) {
   std::vector<std::thread> ths;
   for (int i = 0; i < writer_num; i++) {
     ths.push_back(std::thread([i, attr, cfg] {
-      // create upper_reach
-      std::shared_ptr<apollo::cybertron::transport::UpperReach<RawMessage>>
-          upper_reach;
+      // create transmitter
+      std::shared_ptr<apollo::cybertron::transport::Transmitter<RawMessage>>
+          transmitter;
       try {
-        upper_reach = Transport::CreateUpperReach<RawMessage>(attr, cfg.mode);
+        transmitter = Transport::CreateTransmitter<RawMessage>(attr, cfg.mode);
       } catch (...) {
         return -1;
       }
@@ -143,7 +143,7 @@ int main(int argc, char* argv[]) {
       msg->message.replace(0, 3, name.str());
       for (int i = 0; i < cfg.msg_num; ++i) {
         Fill(&msg->message);
-        upper_reach->Transmit(msg);
+        transmitter->Transmit(msg);
         usleep(cfg.sleep_us);
 
         /*static int last_percent = 0;

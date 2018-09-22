@@ -14,26 +14,25 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef CYBERTRON_TRANSPORT_LOWER_REACH_SHM_LOWER_REACH_H_
-#define CYBERTRON_TRANSPORT_LOWER_REACH_SHM_LOWER_REACH_H_
+#ifndef CYBERTRON_TRANSPORT_RECEIVER_SHM_RECEIVER_H_
+#define CYBERTRON_TRANSPORT_RECEIVER_SHM_RECEIVER_H_
 
 #include <functional>
 
 #include "cybertron/common/log.h"
 #include "cybertron/transport/dispatcher/shm_dispatcher.h"
-#include "cybertron/transport/lower_reach/lower_reach.h"
+#include "cybertron/transport/receiver/receiver.h"
 
 namespace apollo {
 namespace cybertron {
 namespace transport {
 
-template <typename MessageT>
-class ShmLowerReach : public LowerReach<MessageT> {
+template <typename M>
+class ShmReceiver : public Receiver<M> {
  public:
-  ShmLowerReach(
-      const RoleAttributes& attr,
-      const typename LowerReach<MessageT>::MessageListener& msg_listener);
-  virtual ~ShmLowerReach();
+  ShmReceiver(const RoleAttributes& attr,
+              const typename Receiver<M>::MessageListener& msg_listener);
+  virtual ~ShmReceiver();
 
   void Enable() override;
   void Disable() override;
@@ -45,54 +44,54 @@ class ShmLowerReach : public LowerReach<MessageT> {
   ShmDispatcherPtr dispatcher_;
 };
 
-template <typename MessageT>
-ShmLowerReach<MessageT>::ShmLowerReach(
+template <typename M>
+ShmReceiver<M>::ShmReceiver(
     const RoleAttributes& attr,
-    const typename LowerReach<MessageT>::MessageListener& msg_listener)
-    : LowerReach<MessageT>(attr, msg_listener) {
+    const typename Receiver<M>::MessageListener& msg_listener)
+    : Receiver<M>(attr, msg_listener) {
   dispatcher_ = ShmDispatcher::Instance();
 }
 
-template <typename MessageT>
-ShmLowerReach<MessageT>::~ShmLowerReach() {
+template <typename M>
+ShmReceiver<M>::~ShmReceiver() {
   Disable();
 }
 
-template <typename MessageT>
-void ShmLowerReach<MessageT>::Enable() {
+template <typename M>
+void ShmReceiver<M>::Enable() {
   if (this->enabled_) {
     return;
   }
-  dispatcher_->AddListener<MessageT>(
-      this->attr_, std::bind(&ShmLowerReach<MessageT>::OnNewMessage, this,
+  dispatcher_->AddListener<M>(
+      this->attr_, std::bind(&ShmReceiver<M>::OnNewMessage, this,
                              std::placeholders::_1, std::placeholders::_2));
   this->enabled_ = true;
 }
 
-template <typename MessageT>
-void ShmLowerReach<MessageT>::Disable() {
+template <typename M>
+void ShmReceiver<M>::Disable() {
   if (!this->enabled_) {
     return;
   }
-  dispatcher_->RemoveListener<MessageT>(this->attr_);
+  dispatcher_->RemoveListener<M>(this->attr_);
   this->enabled_ = false;
 }
 
-template <typename MessageT>
-void ShmLowerReach<MessageT>::Enable(const RoleAttributes& opposite_attr) {
-  dispatcher_->AddListener<MessageT>(
+template <typename M>
+void ShmReceiver<M>::Enable(const RoleAttributes& opposite_attr) {
+  dispatcher_->AddListener<M>(
       this->attr_, opposite_attr,
-      std::bind(&ShmLowerReach<MessageT>::OnNewMessage, this,
-                std::placeholders::_1, std::placeholders::_2));
+      std::bind(&ShmReceiver<M>::OnNewMessage, this, std::placeholders::_1,
+                std::placeholders::_2));
 }
 
-template <typename MessageT>
-void ShmLowerReach<MessageT>::Disable(const RoleAttributes& opposite_attr) {
-  dispatcher_->RemoveListener<MessageT>(this->attr_, opposite_attr);
+template <typename M>
+void ShmReceiver<M>::Disable(const RoleAttributes& opposite_attr) {
+  dispatcher_->RemoveListener<M>(this->attr_, opposite_attr);
 }
 
 }  // namespace transport
 }  // namespace cybertron
 }  // namespace apollo
 
-#endif  // CYBERTRON_TRANSPORT_LOWER_REACH_SHM_LOWER_REACH_H_
+#endif  // CYBERTRON_TRANSPORT_RECEIVER_SHM_RECEIVER_H_

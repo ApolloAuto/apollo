@@ -21,68 +21,68 @@
 #include "cybertron/common/global_data.h"
 #include "cybertron/common/util.h"
 #include "cybertron/proto/unit_test.pb.h"
-#include "cybertron/transport/lower_reach/shm_lower_reach.h"
-#include "cybertron/transport/upper_reach/shm_upper_reach.h"
+#include "cybertron/transport/receiver/shm_receiver.h"
+#include "cybertron/transport/transmitter/shm_transmitter.h"
 
 namespace apollo {
 namespace cybertron {
 namespace transport {
 
-class ShmReachTest : public ::testing::Test {
+class ShmTransceiverTest : public ::testing::Test {
  protected:
-  using Upper = ShmUpperReach<proto::UnitTest>;
-  using Lower = ShmLowerReach<proto::UnitTest>;
-  using UpperPtr = std::shared_ptr<UpperReach<proto::UnitTest>>;
-  using LowerPtr = std::shared_ptr<LowerReach<proto::UnitTest>>;
+  using TransmitterPtr = std::shared_ptr<Transmitter<proto::UnitTest>>;
+  using ReceiverPtr = std::shared_ptr<Receiver<proto::UnitTest>>;
 
-  ShmReachTest() : channel_name_("shm_channel") {}
+  ShmTransceiverTest() : channel_name_("shm_channel") {}
 
-  virtual ~ShmReachTest() {}
+  virtual ~ShmTransceiverTest() {}
 
   virtual void SetUp() {
     RoleAttributes attr;
     attr.set_host_name(common::GlobalData::Instance()->HostName());
     attr.set_channel_name(channel_name_);
     attr.set_channel_id(common::Hash(channel_name_));
-    upper_reach_a_ = std::make_shared<Upper>(attr);
-    upper_reach_b_ = std::make_shared<Upper>(attr);
+    transmitter_a_ = std::make_shared<ShmTransmitter<proto::UnitTest>>(attr);
+    transmitter_b_ = std::make_shared<ShmTransmitter<proto::UnitTest>>(attr);
 
-    upper_reach_a_->Enable();
-    upper_reach_b_->Enable();
+    transmitter_a_->Enable();
+    transmitter_b_->Enable();
   }
 
   virtual void TearDown() {
-    upper_reach_a_ = nullptr;
-    upper_reach_b_ = nullptr;
+    transmitter_a_ = nullptr;
+    transmitter_b_ = nullptr;
   }
 
   std::string channel_name_;
-  UpperPtr upper_reach_a_ = nullptr;
-  UpperPtr upper_reach_b_ = nullptr;
+  TransmitterPtr transmitter_a_ = nullptr;
+  TransmitterPtr transmitter_b_ = nullptr;
 };
 
-TEST_F(ShmReachTest, constructor) {
+TEST_F(ShmTransceiverTest, constructor) {
   RoleAttributes attr;
-  UpperPtr upper = std::make_shared<Upper>(attr);
-  LowerPtr lower = std::make_shared<Lower>(attr, nullptr);
+  TransmitterPtr transmitter =
+      std::make_shared<ShmTransmitter<proto::UnitTest>>(attr);
+  ReceiverPtr receiver =
+      std::make_shared<ShmReceiver<proto::UnitTest>>(attr, nullptr);
 
-  EXPECT_EQ(upper->seq_num(), 0);
+  EXPECT_EQ(transmitter->seq_num(), 0);
 
-  auto& upper_id = upper->id();
-  auto& lower_id = lower->id();
+  auto& transmitter_id = transmitter->id();
+  auto& receiver_id = receiver->id();
 
-  EXPECT_NE(upper_id.ToString(), lower_id.ToString());
+  EXPECT_NE(transmitter_id.ToString(), receiver_id.ToString());
 }
 
-TEST_F(ShmReachTest, enable_and_disable) {
+TEST_F(ShmTransceiverTest, enable_and_disable) {
   // repeated call
-  upper_reach_a_->Enable();
+  transmitter_a_->Enable();
 
   std::vector<proto::UnitTest> msgs;
   RoleAttributes attr;
   attr.set_channel_name(channel_name_);
   attr.set_channel_id(common::Hash(channel_name_));
-  LowerPtr lower = std::make_shared<Lower>(
+  ReceiverPtr receiver = std::make_shared<ShmReceiver<proto::UnitTest>>(
       attr, [&msgs](const std::shared_ptr<proto::UnitTest>& msg,
                     const MessageInfo& msg_info, const RoleAttributes& attr) {
         (void)msg_info;
@@ -90,55 +90,56 @@ TEST_F(ShmReachTest, enable_and_disable) {
         msgs.emplace_back(*msg);
       });
 
-  lower->Enable();
+  receiver->Enable();
   // repeated call
-  lower->Enable();
+  receiver->Enable();
 
-  LowerPtr lower_null_cb = std::make_shared<Lower>(attr, nullptr);
-  lower_null_cb->Enable();
+  ReceiverPtr receiver_null_cb =
+      std::make_shared<ShmReceiver<proto::UnitTest>>(attr, nullptr);
+  receiver_null_cb->Enable();
 
   auto msg = std::make_shared<proto::UnitTest>();
-  msg->set_class_name("ShmReachTest");
+  msg->set_class_name("ShmTransceiverTest");
   msg->set_case_name("enable_and_disable");
 
-  EXPECT_TRUE(upper_reach_a_->Transmit(msg));
+  EXPECT_TRUE(transmitter_a_->Transmit(msg));
   std::this_thread::sleep_for(std::chrono::milliseconds(100));
   EXPECT_EQ(msgs.size(), 1);
 
-  EXPECT_TRUE(upper_reach_b_->Transmit(msg));
+  EXPECT_TRUE(transmitter_b_->Transmit(msg));
   std::this_thread::sleep_for(std::chrono::milliseconds(100));
   EXPECT_EQ(msgs.size(), 2);
 
   for (auto& item : msgs) {
-    EXPECT_EQ(item.class_name(), "ShmReachTest");
+    EXPECT_EQ(item.class_name(), "ShmTransceiverTest");
     EXPECT_EQ(item.case_name(), "enable_and_disable");
   }
 
-  upper_reach_b_->Disable(lower->attributes());
-  EXPECT_FALSE(upper_reach_b_->Transmit(msg));
+  transmitter_b_->Disable(receiver->attributes());
+  EXPECT_FALSE(transmitter_b_->Transmit(msg));
 
-  upper_reach_b_->Enable(lower->attributes());
-  auto& upper_b_attr = upper_reach_b_->attributes();
+  transmitter_b_->Enable(receiver->attributes());
+  auto& transmitter_b_attr = transmitter_b_->attributes();
 
-  lower->Disable();
-  lower->Enable(upper_b_attr);
+  receiver->Disable();
+  receiver->Enable(transmitter_b_attr);
 
   msgs.clear();
-  EXPECT_TRUE(upper_reach_a_->Transmit(msg));
+  EXPECT_TRUE(transmitter_a_->Transmit(msg));
   std::this_thread::sleep_for(std::chrono::milliseconds(100));
   EXPECT_EQ(msgs.size(), 0);
 
-  EXPECT_TRUE(upper_reach_b_->Transmit(msg));
+  EXPECT_TRUE(transmitter_b_->Transmit(msg));
   std::this_thread::sleep_for(std::chrono::milliseconds(100));
   EXPECT_EQ(msgs.size(), 1);
   for (auto& item : msgs) {
-    EXPECT_EQ(item.class_name(), "ShmReachTest");
+    EXPECT_EQ(item.class_name(), "ShmTransceiverTest");
     EXPECT_EQ(item.case_name(), "enable_and_disable");
   }
 
-  lower->Disable(upper_b_attr);
+  receiver->Disable(transmitter_b_attr);
   msgs.clear();
-  EXPECT_TRUE(upper_reach_b_->Transmit(msg));
+  EXPECT_TRUE(transmitter_b_->Transmit(msg));
   std::this_thread::sleep_for(std::chrono::milliseconds(100));
   EXPECT_EQ(msgs.size(), 0);
 }

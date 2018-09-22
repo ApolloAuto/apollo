@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef CYBERTRON_TRANSPORT_LOWER_REACH_LOWER_REACH_H_
-#define CYBERTRON_TRANSPORT_LOWER_REACH_LOWER_REACH_H_
+#ifndef CYBERTRON_TRANSPORT_RECEIVER_RECEIVER_H_
+#define CYBERTRON_TRANSPORT_RECEIVER_RECEIVER_H_
 
 #include <functional>
 #include <memory>
@@ -28,15 +28,15 @@ namespace apollo {
 namespace cybertron {
 namespace transport {
 
-template <typename MessageT>
-class LowerReach : public Endpoint {
+template <typename M>
+class Receiver : public Endpoint {
  public:
-  using MessagePtr = std::shared_ptr<MessageT>;
+  using MessagePtr = std::shared_ptr<M>;
   using MessageListener = std::function<void(
       const MessagePtr&, const MessageInfo&, const RoleAttributes&)>;
 
-  LowerReach(const RoleAttributes& attr, const MessageListener& msg_listener);
-  virtual ~LowerReach();
+  Receiver(const RoleAttributes& attr, const MessageListener& msg_listener);
+  virtual ~Receiver();
 
   virtual void Enable() = 0;
   virtual void Disable() = 0;
@@ -49,17 +49,17 @@ class LowerReach : public Endpoint {
   MessageListener msg_listener_;
 };
 
-template <typename MessageT>
-LowerReach<MessageT>::LowerReach(const RoleAttributes& attr,
-                                 const MessageListener& msg_listener)
+template <typename M>
+Receiver<M>::Receiver(const RoleAttributes& attr,
+                      const MessageListener& msg_listener)
     : Endpoint(attr), msg_listener_(msg_listener) {}
 
-template <typename MessageT>
-LowerReach<MessageT>::~LowerReach() {}
+template <typename M>
+Receiver<M>::~Receiver() {}
 
-template <typename MessageT>
-void LowerReach<MessageT>::OnNewMessage(const MessagePtr& msg,
-                                        const MessageInfo& msg_info) {
+template <typename M>
+void Receiver<M>::OnNewMessage(const MessagePtr& msg,
+                               const MessageInfo& msg_info) {
   if (msg_listener_ != nullptr) {
     msg_listener_(msg, msg_info, attr_);
   }
@@ -69,4 +69,4 @@ void LowerReach<MessageT>::OnNewMessage(const MessagePtr& msg,
 }  // namespace cybertron
 }  // namespace apollo
 
-#endif  // CYBERTRON_TRANSPORT_LOWER_REACH_LOWER_REACH_H_
+#endif  // CYBERTRON_TRANSPORT_RECEIVER_RECEIVER_H_

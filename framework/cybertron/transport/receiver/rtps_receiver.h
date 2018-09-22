@@ -14,24 +14,23 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef CYBERTRON_TRANSPORT_LOWER_REACH_RTPS_LOWER_REACH_H_
-#define CYBERTRON_TRANSPORT_LOWER_REACH_RTPS_LOWER_REACH_H_
+#ifndef CYBERTRON_TRANSPORT_RECEIVER_RTPS_RECEIVER_H_
+#define CYBERTRON_TRANSPORT_RECEIVER_RTPS_RECEIVER_H_
 
 #include "cybertron/common/log.h"
 #include "cybertron/transport/dispatcher/rtps_dispatcher.h"
-#include "cybertron/transport/lower_reach/lower_reach.h"
+#include "cybertron/transport/receiver/receiver.h"
 
 namespace apollo {
 namespace cybertron {
 namespace transport {
 
-template <typename MessageT>
-class RtpsLowerReach : public LowerReach<MessageT> {
+template <typename M>
+class RtpsReceiver : public Receiver<M> {
  public:
-  RtpsLowerReach(
-      const RoleAttributes& attr,
-      const typename LowerReach<MessageT>::MessageListener& msg_listener);
-  virtual ~RtpsLowerReach();
+  RtpsReceiver(const RoleAttributes& attr,
+               const typename Receiver<M>::MessageListener& msg_listener);
+  virtual ~RtpsReceiver();
 
   void Enable() override;
   void Disable() override;
@@ -43,54 +42,54 @@ class RtpsLowerReach : public LowerReach<MessageT> {
   RtpsDispatcherPtr dispatcher_;
 };
 
-template <typename MessageT>
-RtpsLowerReach<MessageT>::RtpsLowerReach(
+template <typename M>
+RtpsReceiver<M>::RtpsReceiver(
     const RoleAttributes& attr,
-    const typename LowerReach<MessageT>::MessageListener& msg_listener)
-    : LowerReach<MessageT>(attr, msg_listener) {
+    const typename Receiver<M>::MessageListener& msg_listener)
+    : Receiver<M>(attr, msg_listener) {
   dispatcher_ = RtpsDispatcher::Instance();
 }
 
-template <typename MessageT>
-RtpsLowerReach<MessageT>::~RtpsLowerReach() {
+template <typename M>
+RtpsReceiver<M>::~RtpsReceiver() {
   Disable();
 }
 
-template <typename MessageT>
-void RtpsLowerReach<MessageT>::Enable() {
+template <typename M>
+void RtpsReceiver<M>::Enable() {
   if (this->enabled_) {
     return;
   }
-  dispatcher_->AddListener<MessageT>(
-      this->attr_, std::bind(&RtpsLowerReach<MessageT>::OnNewMessage, this,
+  dispatcher_->AddListener<M>(
+      this->attr_, std::bind(&RtpsReceiver<M>::OnNewMessage, this,
                              std::placeholders::_1, std::placeholders::_2));
   this->enabled_ = true;
 }
 
-template <typename MessageT>
-void RtpsLowerReach<MessageT>::Disable() {
+template <typename M>
+void RtpsReceiver<M>::Disable() {
   if (!this->enabled_) {
     return;
   }
-  dispatcher_->RemoveListener<MessageT>(this->attr_);
+  dispatcher_->RemoveListener<M>(this->attr_);
   this->enabled_ = false;
 }
 
-template <typename MessageT>
-void RtpsLowerReach<MessageT>::Enable(const RoleAttributes& opposite_attr) {
-  dispatcher_->AddListener<MessageT>(
+template <typename M>
+void RtpsReceiver<M>::Enable(const RoleAttributes& opposite_attr) {
+  dispatcher_->AddListener<M>(
       this->attr_, opposite_attr,
-      std::bind(&RtpsLowerReach<MessageT>::OnNewMessage, this,
-                std::placeholders::_1, std::placeholders::_2));
+      std::bind(&RtpsReceiver<M>::OnNewMessage, this, std::placeholders::_1,
+                std::placeholders::_2));
 }
 
-template <typename MessageT>
-void RtpsLowerReach<MessageT>::Disable(const RoleAttributes& opposite_attr) {
-  dispatcher_->RemoveListener<MessageT>(this->attr_, opposite_attr);
+template <typename M>
+void RtpsReceiver<M>::Disable(const RoleAttributes& opposite_attr) {
+  dispatcher_->RemoveListener<M>(this->attr_, opposite_attr);
 }
 
 }  // namespace transport
 }  // namespace cybertron
 }  // namespace apollo
 
-#endif  // CYBERTRON_TRANSPORT_LOWER_REACH_RTPS_LOWER_REACH_H_
+#endif  // CYBERTRON_TRANSPORT_RECEIVER_RTPS_RECEIVER_H_
