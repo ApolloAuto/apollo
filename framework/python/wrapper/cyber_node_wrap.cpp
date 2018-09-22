@@ -423,7 +423,7 @@ PyObject *cyber_PyNode_create_writer(PyObject *self, PyObject *args) {
   PyObject *pyobj_node = nullptr;
   char *channel_name = nullptr;
   char *type_name = nullptr;
-  int qos_depth = 1;
+  uint32_t qos_depth = 1;
 
   if (!PyArg_ParseTuple(args, const_cast<char *>("OssI:PyNode_create_writer"),
                         &pyobj_node, &channel_name, &type_name, &qos_depth)) {
@@ -443,6 +443,10 @@ PyObject *cyber_PyNode_create_writer(PyObject *self, PyObject *args) {
           (std::string const &)channel_name, (std::string const &)type_name,
           qos_depth));
 
+  if (nullptr == writer) {
+    AERROR << "cyber_PyNode_create_writer:writer is null!";
+    return Py_None;
+  }
   PyObject *pyobj_writer =
       PyCapsule_New(writer, "apollo_cybertron_pywriter", NULL);
   return pyobj_writer;
