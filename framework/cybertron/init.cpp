@@ -34,6 +34,7 @@
 #include "cybertron/node/node.h"
 #include "cybertron/scheduler/scheduler.h"
 #include "cybertron/service_discovery/topology_manager.h"
+#include "cybertron/task/task.h"
 
 namespace apollo {
 namespace cybertron {
@@ -85,6 +86,7 @@ bool Init() {
   common::GlobalData::Instance();
   service_discovery::TopologyManager::Instance();
   scheduler::Scheduler::Instance();
+  TaskManager::Instance();
   PerfEventCache::Instance();
 
   // Register exit handlers

@@ -67,11 +67,6 @@ TEST(InitCybertronTest, all_in_one) {
   Shutdown();
 }
 
-TEST(InitCybertronTest, create_task) {
-  auto task_ = apollo::cybertron::CreateTask<CarStatus, int>("task", &UserTask);
-  auto void_task_ = apollo::cybertron::CreateTask<>("void_task", &VoidTask);
-}
-
 }  // namespace cybertron
 }  // namespace apollo
 

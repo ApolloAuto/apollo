@@ -180,7 +180,6 @@ class ReferenceLineProvider {
   std::queue<std::list<ReferenceLine>> reference_line_history_;
   std::queue<std::list<hdmap::RouteSegments>> route_segments_history_;
 
-  std::unique_ptr<cybertron::Task<int>> task_;
   std::future<void> task_future_;
 };
 

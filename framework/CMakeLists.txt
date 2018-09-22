@@ -39,6 +39,7 @@ file(GLOB CYBERTRON_SRCS
   "cybertron/data/*.cpp"
   "cybertron/component/timer_component.cpp"
   "cybertron/class_loader/*.cpp"
+  "cybertron/task/*.cpp"
   "cybertron/time/*.cpp"
   "cybertron/timer/*.cpp"
   "cybertron/tf2_cybertron/*.cpp"

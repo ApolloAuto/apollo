@@ -97,7 +97,6 @@ class LocalizationIntegProcess {
 
   std::atomic<bool> keep_running_;
   // std::thread measure_data_thread_;
-  std::unique_ptr<cybertron::Task<>> measure_data_task_;
   // std::condition_variable new_measure_data_signal_;
   std::queue<MeasureData> measure_data_queue_;
   int measure_data_queue_size_;

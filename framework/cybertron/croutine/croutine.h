@@ -30,6 +30,7 @@ namespace croutine {
 
 using routine_t = uint32_t;
 using CRoutineFunc = std::function<void()>;
+using Duration = std::chrono::microseconds;
 
 enum class RoutineState {
   READY,
@@ -90,12 +91,11 @@ class CRoutine {
     CRoutine::Yield();
   }
 
-  // TODO(hewei03): use cybertron::Time instead
-  inline void Sleep(const useconds_t &usec) {
+  inline void Sleep(const Duration& sleep_duration) {
     state_ = RoutineState::SLEEP;
     wake_time_ =
-        std::chrono::steady_clock::now() + std::chrono::microseconds(usec);
-    statistic_info_.sleep_time += usec / 1000;
+        std::chrono::steady_clock::now() + sleep_duration;
+    statistic_info_.sleep_time += sleep_duration.count() / 1000;
     CRoutine::Yield();
   }
 

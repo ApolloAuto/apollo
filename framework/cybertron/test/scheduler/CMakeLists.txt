@@ -34,10 +34,3 @@ target_link_libraries(scheduler_policy_test
   gtest
 )
 install(TARGETS scheduler_policy_test DESTINATION ${UNIT_TEST_INSTALL_PREFIX})
-
-add_executable(task_test task_test.cpp)
-target_link_libraries(task_test
-  cybertron
-  gtest
-)
-install(TARGETS task_test DESTINATION ${UNIT_TEST_INSTALL_PREFIX})

@@ -18,11 +18,10 @@
 #include "cybertron/common/log.h"
 #include "cybertron/cybertron.h"
 #include "cybertron/proto/driver.pb.h"
-#include "cybertron/scheduler/task.h"
+#include "cybertron/task/task.h"
 
 static const uint8_t num_threads = 3;
 
-using apollo::cybertron::Task;
 using apollo::cybertron::proto::Driver;
 
 struct Message {
@@ -31,16 +30,24 @@ struct Message {
   std::string content;
 };
 
-void AsyncDataProcessor() {
-  for (;;) {
-    AINFO << "AsyncDataProcesor is running.";
-    apollo::cybertron::USleep(5000000);
-  }
+int TaskProcessor(const Message& msg) {
+  //apollo::cybertron::USleep(100000);
+  usleep(100000);
+  AINFO << "ID is: " << msg.msg_id;
+  return msg.msg_id;
 }
 
-int TaskProcessor(const std::shared_ptr<Message>& msg) {
-  apollo::cybertron::USleep(100000);
-  return msg->msg_id;
+void AsyncDataProcessor() {
+  std::vector<std::future<int>> results;
+  for (int i = 0; i < 1000; i++) {
+    Message msg;
+    msg.msg_id = i;
+    results.push_back(apollo::cybertron::Async(&TaskProcessor, msg));
+  }
+
+  for (auto& result: results) {
+    AINFO << "Result is: " << result.get();
+  }
 }
 
 void VoidTaskProcessor(const std::shared_ptr<Message>& msg) {
@@ -49,37 +56,8 @@ void VoidTaskProcessor(const std::shared_ptr<Message>& msg) {
 }
 
 int main(int argc, char* argv[]) {
-  // Init
   apollo::cybertron::Init(argv[0]);
-  Task<> task0("async_data_processor", &AsyncDataProcessor, 1);
-
-  Task<Message, int> task1(
-      "task_processor", &TaskProcessor, num_threads);
-
-  Task<Message, void> task2(
-      "void_task_processor", &VoidTaskProcessor, num_threads);
-
-  // Run
-  uint64_t i = 0;
-  while (!apollo::cybertron::IsShutdown()) {
-    std::vector<std::future<int>> futures;
-    for (int j = 0; j < 1000; ++j) {
-      auto msg = std::make_shared<Message>();
-      msg->msg_id = i++;
-      msg->task_id = j;
-      futures.emplace_back(task1.Execute(msg));
-      task2.Execute(msg);
-    }
-
-    apollo::cybertron::USleep(500000);
-    if (apollo::cybertron::IsShutdown()) {
-      break;
-    }
-    for (auto& future: futures) {
-      //AINFO << "Finish task:" << future.get();
-    }
-    AINFO << "All task are finished.";
-  }
-  AINFO << "Return";
+  auto ret = apollo::cybertron::Async(&AsyncDataProcessor);
+  ret.get();
   return 0;
 }

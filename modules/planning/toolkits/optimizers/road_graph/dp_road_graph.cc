@@ -23,8 +23,7 @@
 #include <algorithm>
 #include <utility>
 
-#include "cybertron/cybertron.h"
-#include "cybertron/scheduler/task.h"
+#include "cybertron/task/task.h"
 
 #include "modules/common/proto/error_code.pb.h"
 #include "modules/planning/proto/planning_internal.pb.h"
@@ -149,16 +148,6 @@ bool DpRoadGraph::GenerateMinCostPath(
   auto &front = graph_nodes.front().front();
   size_t total_level = path_waypoints.size();
 
-  std::unique_ptr<cybertron::Task<RoadGraphMessage>> task;
-  if (FLAGS_enable_multi_thread_in_dp_poly_path) {
-    task = cybertron::CreateTask<RoadGraphMessage>(
-        "planning_graph_node_process",
-        [this](const std::shared_ptr<RoadGraphMessage> &msg) {
-          this->UpdateNode(msg);
-        },
-        FLAGS_max_planning_thread_pool_size);
-  }
-
   for (std::size_t level = 1; level < path_waypoints.size(); ++level) {
     const auto &prev_dp_nodes = graph_nodes.back();
     const auto &level_points = path_waypoints[level];
@@ -176,7 +165,8 @@ bool DpRoadGraph::GenerateMinCostPath(
           &(graph_nodes.back().back()));
 
       if (FLAGS_enable_multi_thread_in_dp_poly_path) {
-        results.emplace_back(task->Execute(msg));
+        results.emplace_back(
+            cybertron::Async(&DpRoadGraph::UpdateNode, this, msg));
       } else {
         UpdateNode(msg);
       }

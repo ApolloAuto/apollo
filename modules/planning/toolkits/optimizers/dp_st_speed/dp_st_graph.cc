@@ -25,7 +25,7 @@
 #include <string>
 #include <utility>
 
-#include "cybertron/scheduler/task.h"
+#include "cybertron/task/task.h"
 
 #include "modules/common/proto/pnc_point.pb.h"
 
@@ -176,21 +176,12 @@ Status DpStGraph::CalculateTotalCost() {
 
     int count = next_highest_row - next_lowest_row + 1;
     if (count > 0) {
-      std::unique_ptr<cybertron::Task<StGraphMessage>> task;
-      if (FLAGS_enable_multi_thread_in_dp_st_graph) {
-        task = apollo::cybertron::CreateTask<StGraphMessage>(
-            "dp_process",
-            [this](const std::shared_ptr<StGraphMessage>& msg) {
-              this->CalculateCostAt(msg);
-            },
-            FLAGS_max_planning_thread_pool_size);
-      }
-
       std::vector<std::future<void>> results;
       for (uint32_t r = next_lowest_row; r <= next_highest_row; ++r) {
         auto msg = std::make_shared<StGraphMessage>(c, r);
         if (FLAGS_enable_multi_thread_in_dp_st_graph) {
-          results.push_back(task->Execute(msg));
+          results.push_back(
+              cybertron::Async(&DpStGraph::CalculateCostAt, this, msg));
         } else {
           CalculateCostAt(msg);
         }

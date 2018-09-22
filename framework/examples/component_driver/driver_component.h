@@ -20,7 +20,7 @@
 #include "cybertron/component/timer_component.h"
 #include "cybertron/message/raw_message.h"
 #include "cybertron/proto/driver.pb.h"
-#include "cybertron/scheduler/task.h"
+#include "cybertron/task/task.h"
 
 namespace apollo {
 namespace cybertron {

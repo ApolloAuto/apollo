@@ -256,9 +256,9 @@ void LocalizationIntegProcess::MeasureDataProcess(
 void LocalizationIntegProcess::StartThreadLoop() {
   keep_running_ = true;
   measure_data_queue_size_ = 150;
-  const auto &loop_func = [this] { MeasureDataThreadLoop(); };
+  // const auto &loop_func = [this] { MeasureDataThreadLoop(); };
   // measure_data_thread_ = std::thread(loop_func);
-  measure_data_task_ = cybertron::CreateTask("SinsMeasureReceiver", loop_func);
+  cybertron::Async(&LocalizationIntegProcess::MeasureDataThreadLoop, this);
 }
 
 void LocalizationIntegProcess::StopThreadLoop() {

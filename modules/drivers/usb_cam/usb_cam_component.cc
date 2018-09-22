@@ -60,9 +60,7 @@ bool UsbCamComponent::Init() {
   pb_image_->mutable_data()->reserve(raw_image_->image_size);
 
   writer_ = node_->CreateWriter<Image>(camera_config_->channel_name());
-
-  task_.reset(new apollo::cybertron::Task<>(
-      "usb_cam_task", std::bind(&UsbCamComponent::run, this), 1));
+  cybertron::Async(&UsbCamComponent::run, this);
   return true;
 }
 
