@@ -17,8 +17,8 @@
 
 #include <cmath>
 
-#include "modules/common/adapters/adapter_gflags.h"
 #include "cybertron/common/log.h"
+#include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/util/message_util.h"
 #include "modules/third_party_perception/common/third_party_perception_gflags.h"
 #include "modules/third_party_perception/common/third_party_perception_util.h"
@@ -39,7 +39,7 @@ using apollo::drivers::Mobileye;
 using apollo::localization::LocalizationEstimate;
 using apollo::perception::PerceptionObstacle;
 using apollo::perception::PerceptionObstacles;
-using apollo::perception::Point;
+using Point = apollo::common::Point3D;
 
 std::string ThirdPartyPerception::Name() const {
   return FLAGS_third_party_perception_node_name;

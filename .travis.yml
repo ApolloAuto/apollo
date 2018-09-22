@@ -6,8 +6,7 @@ dist: trusty
 os: linux
 env:
     - JOB=lint
-    - JOB=build_cpu
-    - JOB=check
+    - JOB=cibuild
 cache:
   directories:
   - $HOME/.cache/bazel
@@ -18,6 +17,7 @@ script:
     - ./docker/scripts/dev_start.sh -t dev-x86_64-20180920_1434
     - ./apollo_docker.sh ${JOB}
     - rm -rf "${HOME}/.cache/bazel/_bazel_${USER}/install"
+    - rm -rf "/apollo/data/core"
 notifications:
     email:
         on_success: change

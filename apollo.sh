@@ -219,8 +219,12 @@ function build() {
 }
 
 function cibuild() {
-  echo "Start building, please wait ..."
-  generate_build_targets
+  info "Building framework ..."
+  cd /apollo/framework
+  bash cybertron.sh build_fast
+
+  cd /apollo
+  info "Building modules ..."
 
   JOB_ARG="--jobs=$(nproc)"
   if [ "$MACHINE_ARCH" == 'aarch64' ]; then
@@ -229,26 +233,18 @@ function cibuild() {
 
   info "Building with $JOB_ARG for $MACHINE_ARCH"
   BUILD_TARGETS="
-  //modules/common/...
-  //modules/canbus:canbus_lib
-  //modules/control/...
-  //modules/dreamview/...
-  //modules/drivers/...
-  //modules/localization/...
-  //modules/map/...
-  //modules/monitor/...
-  //modules/perception/...
-  //modules/planning/...
-  //modules/prediction/...
-  //modules/routing/...
-  "
+    //modules/common/...
+    //modules/control/...
+    //modules/localization/proto/...
+    //modules/localization/rtk/...
+    `bazel query //modules/localization/msf/... except //modules/localization/msf/local_tool/...`
+    `bazel query //modules/localization/msf/local_tool/local_visualization/...`
+    //modules/perception/proto/...
+    //modules/planning/...
+    //modules/prediction/...
+    //modules/routing/..."
+
   bazel build $JOB_ARG $DEFINES $@ $BUILD_TARGETS
-
-  # current velodyne drivers
-  build_velodyne
-
-  # future velodyne drivers
-  build_velodyne_vls128
 
   if [ $? -eq 0 ]; then
     success 'Build passed!'
@@ -480,10 +476,17 @@ function citest_map() {
 }
 
 function citest_basic() {
-  generate_build_targets
-
-  # common related test
-  echo "$BUILD_TARGETS" | grep "common\/" | xargs bazel test $DEFINES --config=unit_test -c dbg --test_verbose_timeout_warnings $@
+  BUILD_TARGETS="
+    //modules/common/...
+    //modules/control/...
+    //modules/localization/proto/...
+    //modules/localization/rtk/...
+    `bazel query //modules/localization/msf/... except //modules/localization/msf/local_tool/...`
+    `bazel query //modules/localization/msf/local_tool/local_visualization/...`
+    //modules/perception/proto/...
+    //modules/planning/...
+    //modules/prediction/...
+    //modules/routing/..."
 
   # control related test
   echo "$BUILD_TARGETS" | grep "control\/" | xargs bazel test $DEFINES --config=unit_test -c dbg --test_verbose_timeout_warnings $@
@@ -504,10 +507,12 @@ function citest_basic() {
 }
 
 function citest() {
+  info "Building framework ..."
+  cd /apollo/framework
+  bash cybertron.sh build_fast
+  cd /apollo
+
   citest_basic
-  citest_perception
-  citest_map
-  citest_dreamview
   if [ $? -eq 0 ]; then
     success 'Test passed!'
     return 0

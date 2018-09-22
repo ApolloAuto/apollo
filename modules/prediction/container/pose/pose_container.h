@@ -67,17 +67,17 @@ class PoseContainer : public Container {
    */
   double GetSpeed() const;
 
-   /**
-   * @brief Get heading of adc
-   * @return heading of adc
-   */
+  /**
+  * @brief Get heading of adc
+  * @return heading of adc
+  */
   double GetTheta() const;
 
   /**
    * @brief Get adc position
    * @return adc position
    */
-  apollo::perception::Point GetPosition() const;
+  apollo::common::Point3D GetPosition() const;
 
  private:
   /**
