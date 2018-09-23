@@ -18,9 +18,9 @@
 #define CYBERTRON_TRANSPORT_MESSAGE_HISTORY_H_
 
 #include <cstdint>
+#include <list>
 #include <memory>
 #include <mutex>
-#include <queue>
 #include <vector>
 
 #include "cybertron/common/global_data.h"
@@ -63,7 +63,7 @@ class History {
   uint32_t depth_;
   uint32_t max_depth_;
   bool is_full_;
-  std::queue<CachedMessage> msgs_;
+  std::list<CachedMessage> msgs_;
   std::mutex msgs_mutex_;
 };
 
@@ -100,10 +100,10 @@ void History<MessageT>::Add(const MessagePtr& msg,
   }
   std::lock_guard<std::mutex> lock(msgs_mutex_);
   if (is_full_) {
-    msgs_.pop();
+    msgs_.pop_front();
   }
 
-  msgs_.emplace(msg, msg_info);
+  msgs_.emplace_back(msg, msg_info);
 
   if (!is_full_) {
     if (msgs_.size() == depth_) {
@@ -115,9 +115,7 @@ void History<MessageT>::Add(const MessagePtr& msg,
 template <typename MessageT>
 void History<MessageT>::Clear() {
   std::lock_guard<std::mutex> lock(msgs_mutex_);
-  while (!msgs_.empty()) {
-    msgs_.pop();
-  }
+  msgs_.clear();
 }
 
 template <typename MessageT>
@@ -125,15 +123,13 @@ void History<MessageT>::GetCachedMessage(std::vector<CachedMessage>* msgs) {
   if (msgs == nullptr) {
     return;
   }
-  std::queue<CachedMessage> local_msgs;
+
   {
     std::lock_guard<std::mutex> lock(msgs_mutex_);
-    local_msgs = msgs_;
-  }
-
-  while (!local_msgs.empty()) {
-    msgs->emplace_back(local_msgs.front());
-    local_msgs.pop();
+    msgs->reserve(msgs_.size());
+    for (auto& item : msgs_) {
+      msgs->emplace_back(item);
+    }
   }
 }
 
