@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -86,13 +86,13 @@ class Layer {
 
   /**
    * @brief Name of a layer
-   * @reture Name of a layer
+   * @return Name of a layer
    */
   std::string Name() const { return name_; }
 
   /**
    * @brief Order number of a layer in a network
-   * @reture Order numer of a layer in a network
+   * @return Order numer of a layer in a network
    */
   int OrderNumber() const { return order_number_; }
 
@@ -322,7 +322,7 @@ class Input : public Layer {
 };
 
 /**
- * @class Concatenate, layer that concatenates a vector of inputs, return
+ * @class Concatenate, layer that concatenates a vector of inputs,and returns
  *                     a single matrix.
  */
 class Concatenate : public Layer {
