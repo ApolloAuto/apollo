@@ -27,6 +27,7 @@ cc_test(
         ":scenario_analyzer",
         "//modules/prediction/common:kml_map_based_test",
         "//modules/prediction/common:prediction_gflags",
+        "//modules/prediction/scenario/scenario_features:scenario_features",
         "@gtest//:main",
     ],
 )

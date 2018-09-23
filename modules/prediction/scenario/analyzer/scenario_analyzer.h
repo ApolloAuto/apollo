@@ -28,7 +28,7 @@ namespace prediction {
 
 class ScenarioAnalyzer {
  public:
-  ScenarioAnalyzer() = default;
+  ScenarioAnalyzer();
 
   virtual ~ScenarioAnalyzer() = default;
 
@@ -37,8 +37,15 @@ class ScenarioAnalyzer {
   const Scenario& scenario() const;
 
   std::shared_ptr<ScenarioFeatures> GetScenarioFeatures();
+
+ private:
+  void BuildCruiseScenarioFeatures(
+      const EnvironmentFeatures& environment_features);
+
  private:
   Scenario scenario_;
+
+  std::shared_ptr<ScenarioFeatures> scenario_features_;
 };
 
 }  // namespace prediction
