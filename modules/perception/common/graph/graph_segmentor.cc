@@ -17,6 +17,7 @@
 #include "modules/perception/common/graph/graph_segmentor.h"
 
 #include <cfloat>
+#include <limits>
 
 #include "cybertron/common/log.h"
 
@@ -33,7 +34,7 @@ void GraphSegmentor::Init(const float initial_threshold) {
   thresholds_.reserve(kMaxVerticesNum);
 
   thresholds_table_.resize(kMaxThresholdsNum);
-  thresholds_table_[0] = FLT_MAX;
+  thresholds_table_[0] = std::numeric_limits<float>::max();
   for (size_t i = 1; i < kMaxThresholdsNum; ++i) {
     thresholds_table_[i] = GetThreshold(i, initial_threshold_);
   }
