@@ -22,6 +22,8 @@
 #include <utility>
 #include <vector>
 
+#include "modules/common/proto/geometry.pb.h"
+
 namespace apollo {
 namespace prediction {
 
@@ -31,9 +33,13 @@ class EnvironmentFeatures {
 
   virtual ~EnvironmentFeatures() = default;
 
-  void set_ego_velocity(const double ego_velocity);
+  void set_ego_position(const double x, const double y);
 
-  double get_ego_velocity() const;
+  const apollo::common::Point3D& get_ego_position() const;
+
+  void set_ego_speed(const double ego_speed);
+
+  double get_ego_speed() const;
 
   void set_ego_acceleration(const double ego_acceleration);
 
@@ -80,7 +86,9 @@ class EnvironmentFeatures {
   const std::vector<int>& get_obstacle_ids() const;
 
  private:
-  double ego_velocity_ = 0.0;
+  apollo::common::Point3D ego_position_;
+
+  double ego_speed_ = 0.0;
 
   double ego_acceleration_ = 0.0;
 

@@ -35,8 +35,8 @@ const Scenario& ScenarioAnalyzer::scenario() const {
   return scenario_;
 }
 
-std::shared_ptr<const ScenarioFeatures>
-ScenarioAnalyzer::GetScenarioFeatures() const {
+std::shared_ptr<ScenarioFeatures>
+ScenarioAnalyzer::GetScenarioFeatures() {
   return nullptr;
 }
 

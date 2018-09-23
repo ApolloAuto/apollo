@@ -158,6 +158,7 @@ cc_library(
     srcs = ["environment_features.cc"],
     hdrs = ["environment_features.h"],
     deps = [
+        "//modules/common/proto:geometry_proto",
         "//framework:cybertron",
     ],
 )

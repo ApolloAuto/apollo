@@ -69,17 +69,17 @@ class ObstaclesContainer : public Container {
   void BuildLaneGraph();
 
   /**
-   * @brief Set obstacles' priority to predict
-   */
-  void PrioritizeObstacles(const Scenario& scenario,
-                           const EnvironmentFeatures& environment_features);
-
-  /**
    * @brief Get obstacle pointer
    * @param Obstacle ID
    * @return Obstacle pointer
    */
   Obstacle* GetObstacle(const int id);
+
+  /**
+   * @brief Get predictable obstacle IDs in the current frame
+   * @return Predictable obstacle IDs in the current frame
+   */
+  const std::vector<int>& GetCurrentFramePredictableObstacleIds() const;
 
   /**
    * @brief Clear obstacle container
@@ -93,8 +93,6 @@ class ObstaclesContainer : public Container {
    * @return True if the obstacle is predictable; otherwise false;
    */
   bool IsPredictable(const perception::PerceptionObstacle& perception_obstacle);
-
-  void PrioritizeObstaclesInCruise();
 
  private:
   double timestamp_ = -1.0;

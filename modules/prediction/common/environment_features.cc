@@ -20,12 +20,22 @@
 namespace apollo {
 namespace prediction {
 
-void EnvironmentFeatures::set_ego_velocity(const double ego_velocity) {
-  ego_velocity_ = ego_velocity;
+void EnvironmentFeatures::set_ego_position(const double x, const double y) {
+  ego_position_.set_x(x);
+  ego_position_.set_y(y);
+  ego_position_.set_z(0.0);
 }
 
-double EnvironmentFeatures::get_ego_velocity() const {
-  return ego_velocity_;
+const apollo::common::Point3D& EnvironmentFeatures::get_ego_position() const {
+  return ego_position_;
+}
+
+void EnvironmentFeatures::set_ego_speed(const double ego_speed) {
+  ego_speed_ = ego_speed;
+}
+
+double EnvironmentFeatures::get_ego_speed() const {
+  return ego_speed_;
 }
 
 void EnvironmentFeatures::set_ego_heading(const double ego_heading) {
