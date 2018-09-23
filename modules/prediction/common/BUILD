@@ -163,4 +163,16 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "environment_features_test",
+    size = "small",
+    srcs = ["environment_features_test.cc"],
+    deps = [
+        ":environment_features",
+        "//modules/common/proto:geometry_proto",
+        "//framework:cybertron",
+        "@gtest//:main",
+    ],
+)
+
 cpplint()

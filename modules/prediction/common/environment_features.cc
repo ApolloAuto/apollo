@@ -60,6 +60,8 @@ bool EnvironmentFeatures::has_ego_lane() const {
 
 void EnvironmentFeatures::reset_ego_lane() {
   has_ego_lane_ = false;
+  ego_lane_id_ = "";
+  ego_lane_s_ = -1.0;
 }
 
 void EnvironmentFeatures::SetEgoLane(const std::string& lane_id,
