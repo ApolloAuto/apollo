@@ -63,6 +63,8 @@ TEST_F(ObstaclesContainerTest, Vehicles) {
   EXPECT_EQ(obstacle_ptr3->type(), perception::PerceptionObstacle::VEHICLE);
   Obstacle* obstacle_ptr4 = container_.GetObstacle(4);
   EXPECT_TRUE(obstacle_ptr4 == nullptr);
+
+  EXPECT_EQ(container_.GetCurrentFramePredictableObstacleIds().size(), 6);
 }
 
 TEST_F(ObstaclesContainerTest, Pedestrian) {
