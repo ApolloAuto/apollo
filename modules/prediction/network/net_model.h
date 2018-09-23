@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ * Copyright 2017 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@ namespace network {
 /**
  * @class NetModel
  * @brief NetModel is a base class for specific network model
- *        It contains a pure virtual function Run which must be implemented
+ *        It contains four pure virtual functions (Run ,SetState, State and ResetState) all of which must be implemented
  *        in the derived class(es)
  */
 class NetModel {
@@ -66,18 +66,18 @@ class NetModel {
    * @brief Set the internal state of a network model
    * @param A specified internal state in a vector of Eigen::MatrixXf
    */
-  virtual void SetState(const std::vector<Eigen::MatrixXf>& states) {}
+  virtual void SetState(const std::vector<Eigen::MatrixXf>& states) = 0;
 
   /**
    * @brief Access to the internal state of a network model
    * @return Internal state in a vector of Eigen::MatrixXf of the model
    */
-  virtual void State(std::vector<Eigen::MatrixXf>* states) const {}
+  virtual void State(std::vector<Eigen::MatrixXf>* states) const = 0;
 
   /**
    * @brief Reset the internal state of a network model
    */
-  virtual void ResetState() const {}
+  virtual void ResetState() const = 0;
 
   /**
    * @brief Load network parameters from a protobuf message
