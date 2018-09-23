@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,7 +40,7 @@ namespace network {
  * @class NetModel
  * @brief NetModel is a base class for specific network model
  *        It contains a pure virtual function Run which must be implemented
- *        in derived class
+ *        in the derived class(es)
  */
 class NetModel {
  public:
@@ -75,8 +75,7 @@ class NetModel {
   virtual void State(std::vector<Eigen::MatrixXf>* states) const {}
 
   /**
-   * @brief Set the internal state of a model
-   * @param A specified internal state in a vector of Eigen::MatrixXf
+   * @brief Reset the internal state of a network model
    */
   virtual void ResetState() const {}
 
