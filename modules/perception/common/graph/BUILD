@@ -72,6 +72,7 @@ cc_test(
         "@eigen",
     ],
 )
+
 cc_library(
     name = "hungarian_optimizer",
     hdrs = [
@@ -94,4 +95,28 @@ cc_test(
         "@gtest//:main",
     ],
 )
+
+cc_library(
+    name = "connected_component_analysis",
+    hdrs = [
+        "connected_component_analysis.h",
+    ],
+    deps = [
+        "//framework:cybertron",
+    ],
+)
+
+cc_test(
+    name = "connected_component_analysis_test",
+    size = "small",
+    srcs = [
+        "connected_component_analysis_test.cc",
+    ],
+    deps = [
+        ":connected_component_analysis",
+        "@eigen",
+        "@gtest//:main",
+    ],
+)
+
 cpplint()
