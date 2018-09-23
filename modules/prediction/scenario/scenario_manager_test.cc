@@ -38,6 +38,7 @@ class ScenarioManagerTest : public ::testing::Test {
 };
 
 TEST_F(ScenarioManagerTest, run) {
+  // TODO(kechxu) add unit tests with concrete contents
   ContainerManager::Instance()->RegisterContainers();
   std::unique_ptr<Container> adc_traj_container =
       ContainerManager::Instance()->CreateContainer(

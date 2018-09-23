@@ -76,6 +76,11 @@ Obstacle* ObstaclesContainer::GetObstacle(const int id) {
   return obstacles_.GetSilently(id);
 }
 
+const std::vector<int>&
+ObstaclesContainer::GetCurrentFramePredictableObstacleIds() const {
+  return curr_frame_predictable_obstacle_ids_;
+}
+
 void ObstaclesContainer::Clear() {
   obstacles_.Clear();
   timestamp_ = -1.0;
@@ -118,18 +123,6 @@ void ObstaclesContainer::BuildLaneGraph() {
   }
 }
 
-void ObstaclesContainer::PrioritizeObstacles(const Scenario& scenario,
-    const EnvironmentFeatures& environment_features) {
-  // TODO(all) implement
-  // According to scenario and filtered lanes and junctions, etc
-  // set priorities for obstacles
-  if (scenario.type() == Scenario::CRUISE ||
-      scenario.type() == Scenario::CRUISE_URBAN ||
-      scenario.type() == Scenario::CRUISE_HIGHWAY) {
-    PrioritizeObstaclesInCruise();
-  }
-}
-
 bool ObstaclesContainer::IsPredictable(
     const PerceptionObstacle& perception_obstacle) {
   if (!perception_obstacle.has_type() ||
@@ -137,10 +130,6 @@ bool ObstaclesContainer::IsPredictable(
     return false;
   }
   return true;
-}
-
-void ObstaclesContainer::PrioritizeObstaclesInCruise() {
-  // TODO(kechxu) implement
 }
 
 }  // namespace prediction

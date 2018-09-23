@@ -36,7 +36,7 @@ class ScenarioAnalyzer {
 
   const Scenario& scenario() const;
 
-  std::shared_ptr<const ScenarioFeatures> GetScenarioFeatures() const;
+  std::shared_ptr<ScenarioFeatures> GetScenarioFeatures();
  private:
   Scenario scenario_;
 };

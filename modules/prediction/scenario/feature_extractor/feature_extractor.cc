@@ -77,7 +77,7 @@ const EnvironmentFeatures& FeatureExtractor::GetEnvironmentFeatures() const {
 
 void FeatureExtractor::ExtractEgoVehicleFeatures() {
   // TODO(all): change this to ego_speed and ego_heading
-  environment_features_.set_ego_velocity(pose_container_->GetSpeed());
+  environment_features_.set_ego_speed(pose_container_->GetSpeed());
   environment_features_.set_ego_heading(pose_container_->GetTheta());
   // TODO(all): add acceleration if needed
 }

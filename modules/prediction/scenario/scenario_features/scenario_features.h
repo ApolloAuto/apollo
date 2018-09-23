@@ -28,7 +28,7 @@ class ScenarioFeatures {
  public:
   ScenarioFeatures() = default;
 
-  ~ScenarioFeatures() = default;
+  virtual ~ScenarioFeatures() = default;
 };
 
 }  // namespace prediction
