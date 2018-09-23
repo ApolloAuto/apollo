@@ -39,6 +39,23 @@ class AutotuningMLPModel : public prediction::network::NetModel {
    */
   void Run(const std::vector<Eigen::MatrixXf>& inputs,
            Eigen::MatrixXf* output) const override;
+
+  /**
+   * @brief Set the internal state of a network model
+   * @param A specified internal state in a vector of Eigen::MatrixXf
+   */
+   void SetState(const std::vector<Eigen::MatrixXf>& states)override{}
+
+  /**
+   * @brief Access to the internal state of a network model
+   * @return Internal state in a vector of Eigen::MatrixXf of the model
+   */
+   void State(std::vector<Eigen::MatrixXf>* states) const override{}
+
+  /**
+   * @brief Reset the internal state of a network model
+   */
+   void ResetState() const override{}
 };
 
 }  // namespace planning
