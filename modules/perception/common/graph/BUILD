@@ -119,4 +119,29 @@ cc_test(
     ],
 )
 
+cc_library(
+    name = "conditional_clustering",
+    hdrs = [
+        "conditional_clustering.h",
+    ],
+    deps = [
+        "//modules/perception/base:point_cloud",
+        "//modules/perception/common/geometry:basic",
+        "@eigen",
+    ],
+)
+
+cc_test(
+    name = "conditional_clustering_test",
+    size = "small",
+    srcs = [
+        "conditional_clustering_test.cc",
+    ],
+    deps = [
+        ":conditional_clustering",
+        "@gtest//:main",
+    ],
+)
+
+
 cpplint()
