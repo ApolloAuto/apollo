@@ -16,9 +16,12 @@
 
 #include "modules/prediction/scenario/analyzer/scenario_analyzer.h"
 #include "modules/prediction/common/prediction_gflags.h"
+#include "modules/prediction/scenario/scenario_features/cruise_scenario_features.h"
 
 namespace apollo {
 namespace prediction {
+
+ScenarioAnalyzer::ScenarioAnalyzer() : scenario_features_(nullptr) {}
 
 void ScenarioAnalyzer::Analyze(
     const EnvironmentFeatures& environment_features) {
@@ -37,7 +40,14 @@ const Scenario& ScenarioAnalyzer::scenario() const {
 
 std::shared_ptr<ScenarioFeatures>
 ScenarioAnalyzer::GetScenarioFeatures() {
-  return nullptr;
+  return scenario_features_;
+}
+
+void ScenarioAnalyzer::BuildCruiseScenarioFeatures(
+    const EnvironmentFeatures& environment_features) {
+  // TODO(kechxu) implement
+  std::shared_ptr<CruiseScenarioFeatures> cruise_scenario_features;
+  scenario_features_ = cruise_scenario_features;
 }
 
 }  // namespace prediction
