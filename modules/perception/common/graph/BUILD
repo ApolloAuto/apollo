@@ -3,6 +3,19 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
+    name = "graph",
+    deps = [
+        ":disjoint_set",
+        ":graph_segmentor",
+        ":secure_matrix",
+        ":hungarian_optimizer",
+        ":connected_component_analysis",
+        ":conditional_clustering",
+        ":gated_hungarian_bigraph_matcher",
+    ],
+)
+
+cc_library(
     name = "disjoint_set",
     srcs = [
         "disjoint_set.cc",
@@ -143,5 +156,29 @@ cc_test(
     ],
 )
 
+cc_library(
+    name = "gated_hungarian_bigraph_matcher",
+    hdrs = [
+        "gated_hungarian_bigraph_matcher.h",
+    ],
+    deps = [
+        "//framework:cybertron",
+        ":connected_component_analysis",
+        ":hungarian_optimizer",
+        ":secure_matrix",
+    ],
+)
+
+cc_test(
+    name = "gated_hungarian_bigraph_matcher_test",
+    size = "small",
+    srcs = [
+        "gated_hungarian_bigraph_matcher_test.cc",
+    ],
+    deps = [
+        ":gated_hungarian_bigraph_matcher",
+        "@gtest//:main",
+    ],
+)
 
 cpplint()
