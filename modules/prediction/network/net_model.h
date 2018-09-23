@@ -66,18 +66,18 @@ class NetModel {
    * @brief Set the internal state of a network model
    * @param A specified internal state in a vector of Eigen::MatrixXf
    */
-  virtual void SetState(const std::vector<Eigen::MatrixXf>& states){}
+  virtual void SetState(const std::vector<Eigen::MatrixXf>& states) {}
 
   /**
    * @brief Access to the internal state of a network model
    * @return Internal state in a vector of Eigen::MatrixXf of the model
    */
-  virtual void State(std::vector<Eigen::MatrixXf>* states) const{}
+  virtual void State(std::vector<Eigen::MatrixXf>* states) const {}
 
   /**
    * @brief Reset the internal state of a network model
    */
-  virtual void ResetState() const{}
+  virtual void ResetState() const {}
 
   /**
    * @brief Load network parameters from a protobuf message
