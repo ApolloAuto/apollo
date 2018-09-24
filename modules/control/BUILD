@@ -21,7 +21,7 @@ cc_library(
         "//modules/planning/proto:planning_proto",
         "//modules/prediction/proto:prediction_proto",
         "//framework:cybertron",
-#        "//external:gflags",
+        "//external:gflags",
     ],
 )
 
@@ -44,6 +44,19 @@ cc_binary(
     deps = [":control_component_lib"],
     linkshared = True,
 )
+
+#cc_test(
+#    name = "control_test",
+#    size = "small",
+#    srcs = [
+#        "control_test.cc",
+#    ],
+#    data = ["//modules/control:control_testdata"],
+#    deps = [
+#        ":control_lib",
+#        "@gtest//:main",
+#    ],
+#)
 
 filegroup(
     name = "control_testdata",

@@ -20,12 +20,10 @@
 #include <sstream>
 
 #include "google/protobuf/text_format.h"
-#include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/util/file.h"
 #include "modules/common/util/util.h"
 #include "modules/control/integration_tests/control_test_base.h"
 #include "modules/control/proto/control_cmd.pb.h"
-#include "ros/include/ros/ros.h"
 
 DEFINE_string(test_chassis_file, "", "chassis input file");
 DEFINE_string(test_data_dir, "", "the test data folder");
@@ -38,10 +36,15 @@ DEFINE_bool(test_update_golden_log, false, "true to update golden log file.");
 namespace apollo {
 namespace control {
 
-using apollo::common::adapter::AdapterManager;
+using apollo::canbus::Chassis;
 using apollo::common::monitor::MonitorMessage;
-using apollo::control::ControlCommand;
+using apollo::common::time::Clock;
 using apollo::control::PadMessage;
+using apollo::control::PadMessage;
+using apollo::localization::LocalizationEstimate;
+using apollo::perception::TrafficLightDetection;
+using apollo::planning::ADCTrajectory;
+using apollo::routing::RoutingResponse;
 
 uint32_t ControlTestBase::s_seq_num_ = 0;
 
@@ -61,10 +64,10 @@ bool ControlTestBase::test_control() {
   }
   control_.controller_agent_.Reset();
 
-  AdapterManager::Init(FLAGS_control_adapter_config_filename);
+  // Pad message
   if (!FLAGS_test_pad_file.empty()) {
     PadMessage pad_message;
-    if (!apollo::common::util::GetProtoFromFile(
+    if (!common::util::GetProtoFromFile(
             FLAGS_test_data_dir + FLAGS_test_pad_file, &pad_message)) {
       AERROR << "Failed to load PadMesssage from file " << FLAGS_test_data_dir
              << FLAGS_test_pad_file;
@@ -72,37 +75,48 @@ bool ControlTestBase::test_control() {
     }
     control_.OnPad(pad_message);
   }
+
+  // Localization
   if (!FLAGS_test_localization_file.empty()) {
-    if (!AdapterManager::FeedLocalizationFile(FLAGS_test_data_dir +
-                                              FLAGS_test_localization_file)) {
+    LocalizationEstimate localization;
+    if (!common::util::GetProtoFromFile(
+            FLAGS_test_data_dir + FLAGS_test_localization_file,
+            &localization)) {
       AERROR << "Failed to load localization file " << FLAGS_test_data_dir
              << FLAGS_test_localization_file;
       return false;
     }
   }
+
+  // Planning
   if (!FLAGS_test_planning_file.empty()) {
-    if (!AdapterManager::FeedPlanningFile(FLAGS_test_data_dir +
-                                          FLAGS_test_planning_file)) {
+    ADCTrajectory trajectory;
+    if (!common::util::GetProtoFromFile(
+            FLAGS_test_data_dir + FLAGS_test_planning_file, &trajectory)) {
       AERROR << "Failed to load planning file " << FLAGS_test_data_dir
              << FLAGS_test_planning_file;
       return false;
     }
   }
+
+  // Chassis
   if (!FLAGS_test_chassis_file.empty()) {
-    if (!AdapterManager::FeedChassisFile(FLAGS_test_data_dir +
-                                         FLAGS_test_chassis_file)) {
+    Chassis chassis;
+    if (!common::util::GetProtoFromFile(
+            FLAGS_test_data_dir + FLAGS_test_chassis_file, &chassis)) {
       AERROR << "Failed to load chassis file " << FLAGS_test_data_dir
              << FLAGS_test_chassis_file;
     }
   }
+
+  // Monitor
+
   if (!FLAGS_test_monitor_file.empty()) {
     MonitorMessage monitor_message;
     apollo::common::util::GetProtoFromFile(
         FLAGS_test_data_dir + FLAGS_test_monitor_file, &monitor_message);
     control_.OnMonitor(monitor_message);
   }
-
-  AdapterManager::Observe();
 
   auto err = control_.ProduceControlCommand(&control_command_);
   if (!err.ok()) {
@@ -160,16 +174,11 @@ bool ControlTestBase::test_control(const std::string &test_case_name,
 }
 
 void ControlTestBase::SetUpTestCase() {
-  ros::Time::init();
   FLAGS_control_conf_file = "modules/control/testdata/conf/lincoln.pb.txt";
-  FLAGS_control_adapter_config_filename =
-      "modules/control/testdata/conf/adapter.conf";
   FLAGS_is_control_test_mode = true;
 }
 
-void ControlTestBase::SetUp() {
-  ++s_seq_num_;
-}
+void ControlTestBase::SetUp() { ++s_seq_num_; }
 
 }  // namespace control
 }  // namespace apollo

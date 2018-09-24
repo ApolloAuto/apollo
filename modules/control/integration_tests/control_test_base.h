@@ -21,9 +21,8 @@
 #include <vector>
 
 #include "gtest/gtest.h"
-#include "modules/common/macro.h"
 #include "modules/control/common/control_gflags.h"
-#include "modules/control/control.h"
+#include "modules/control/control_component.h"
 #include "modules/control/proto/control_cmd.pb.h"
 
 #define RUN_GOLDEN_TEST                                            \
@@ -60,7 +59,7 @@ class ControlTestBase : public ::testing::Test {
  private:
   void trim_control_command(apollo::control::ControlCommand *origin);
   ControlCommand control_command_;
-  Control control_;
+  ControlComponent control_;
   static uint32_t s_seq_num_;
 };
 
