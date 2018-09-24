@@ -186,6 +186,7 @@ class SimControl : SimControlInterface {
 
   common::PathPoint adc_position_;
 
+  // Linearize reader/timer callbacks and external operations.
   std::mutex mutex_;
 
   static constexpr int kPlanningCountToStart = 5;
