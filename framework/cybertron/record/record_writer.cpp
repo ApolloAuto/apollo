@@ -28,9 +28,7 @@ bool RecordWriter::Open(const std::string& file) {
   file_ = file;
   path_ = file_;
   file_writer_.reset(new RecordFileWriter());
-  HeaderBuilder* header_builder = new HeaderBuilder();
-  header_ = header_builder->GetHeader();
-  delete header_builder;
+  header_ = HeaderBuilder::GetHeader();
   if (!file_writer_->Open(path_)) {
     AERROR << "open outfile failed. file: " << path_;
     return false;

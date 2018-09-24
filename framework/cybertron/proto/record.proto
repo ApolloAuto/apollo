@@ -56,14 +56,14 @@ message Header {
     required CompressType compress   = 3;
     required uint64 chunk_interval   = 4;
     required uint64 segment_interval = 5;
-    required uint64 index_position   = 6;
-    required uint64 chunk_number     = 7;
-    required uint64 channel_number   = 8;
-    required uint64 begin_time       = 9;
-    required uint64 end_time         = 10;
-    required uint64 message_number   = 11;
-    required uint64 size             = 12;
-    required bool is_complete        = 13;
+    required uint64 index_position   = 6 [default = 0];
+    required uint64 chunk_number     = 7 [default = 0];
+    required uint64 channel_number   = 8 [default = 0];
+    required uint64 begin_time       = 9 [default = 0];
+    required uint64 end_time         = 10 [default = 0];
+    required uint64 message_number   = 11 [default = 0];
+    required uint64 size             = 12 [default = 0];
+    required bool is_complete        = 13 [default = false];
     required uint64 chunk_raw_size   = 14;
     required uint64 segment_raw_size = 15;
 }
