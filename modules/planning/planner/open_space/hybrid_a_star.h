@@ -26,9 +26,14 @@
 #include <queue>
 #include <vector>
 
-#include "modules/common/log.h"
+#include "cybertron/common/log.h"
+#include "cybertron/common/macros.h"
+#include "modules/common/configs/proto/vehicle_config.pb.h"
+#include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/planning/common/obstacle.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/open_space/node3d.h"
+#include "modules/planning/proto/planner_open_space_config.pb.h"
 
 namespace apollo {
 namespace planning {
@@ -46,16 +51,16 @@ class HybridAStar {
   explicit HybridAStar(double sx, double sy, double sphi, double ex, double ey,
                        double ephi, std::vector<const Obstacle*> obstacles);
   virtual ~HybridAStar() = default;
-  Status Plan();
+  bool Plan();
 
  private:
   // not complete
   bool AnalyticExpansion(std::shared_ptr<Node3d> current_node);
   // not complete
-  KinemeticModelExpansion();
+  std::vector<std::shared_ptr<Node3d>> KinemeticModelExpansion();
   // check collision and validity
   bool Validitycheck(std::shared_ptr<Node3d> next_node);
-  void Next_node_generator(std::size_t next_node_index);
+  std::shared_ptr<Node3d> Next_node_generator(std::size_t next_node_index);
   double Cost();
   double HeuristicCost();
   double HoloObstacleHeuristic();
@@ -65,21 +70,23 @@ class HybridAStar {
 
  private:
   PlannerOpenSpaceConfig open_space_conf_;
-  const common::VehicleParam& vehicle_param_;
+  common::VehicleParam vehicle_param_ =
+      common::VehicleConfigHelper::GetConfig().vehicle_param();
   std::size_t next_node_num_ = 0;
   std::vector<const Obstacle*> obstacles_;
   std::shared_ptr<Node3d> start_node_;
   std::shared_ptr<Node3d> end_node_;
-  auto cmp = [](std::pair<std::size_t, double> left,
-                std::pair<std::size_t, double> right) {
-    return left.second <= right.second;
+  struct cmp {
+    bool operator()(const std::pair<std::size_t, double> left,
+                    const std::pair<std::size_t, double> right) const {
+      return left.second <= right.second;
+    }
   };
   std::priority_queue<std::pair<std::size_t, double>,
-                      std::vector<std::pair<std::size_t, double>>,
-                      decltype(cmp)>
-      open_pq_(cmp);
-  std::map<std::size_t, shared_ptr<Node3d>> open_set_;
-  std::map<std::size_t, shared_ptr<Node3d>> close_set_;
+                      std::vector<std::pair<std::size_t, double>>, cmp>
+      open_pq_;
+  std::map<std::size_t, std::shared_ptr<Node3d>> open_set_;
+  std::map<std::size_t, std::shared_ptr<Node3d>> close_set_;
   Result result_;
 };
 
