@@ -1,0 +1,13 @@
+syntax = "proto2";
+package apollo.perception.lidar;
+
+message SpatioTemporalGroundDetectorConfig {
+  optional uint32 grid_size = 1 [default = 16];
+  optional float ground_thres = 2 [default = 0.25];
+  optional float roi_rad_x = 3 [default = 120.0];
+  optional float roi_rad_y = 4 [default = 120.0];
+  optional float roi_rad_z = 5 [default = 100.0];
+  optional uint32 nr_smooth_iter = 6 [default = 5];
+  optional bool use_roi = 7 [default = true];
+  optional bool use_ground_service = 8 [default = true];
+}

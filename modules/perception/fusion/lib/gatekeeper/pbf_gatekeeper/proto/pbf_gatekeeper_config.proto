@@ -1,0 +1,22 @@
+syntax = "proto2";
+
+package apollo.perception.fusion;
+
+message PbfGatekeeperConfig {
+  required bool publish_if_has_lidar = 1 [default = true];
+  required bool publish_if_has_radar = 2 [default = true];
+  required bool publish_if_has_camera = 3 [default = true];
+  required bool use_camera_3d = 4 [default = true];
+
+  required double min_radar_confident_distance = 5;
+  required double max_radar_confident_angle = 6;
+  required double min_camera_publish_distance = 7;
+  required double invisible_period_threshold = 8;
+  required double toic_threshold = 9;
+
+  required bool use_track_time_pub_strategy = 10;
+  required int32 pub_track_time_thresh = 11;
+
+  required double existance_threshold = 12;
+  required double radar_existance_threshold = 13;
+}

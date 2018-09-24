@@ -1,0 +1,10 @@
+syntax = "proto2";
+package apollo.perception.lidar;
+
+message HDMapRoiFilterConfig {
+  required double range = 1 [default = 120.0];
+  required double cell_size = 2 [default = 0.25];
+  required double extend_dist = 3 [default = 0.0];
+  required bool no_edge_table = 4 [default = false];
+  required bool set_roi_service = 5 [default = false];
+}

@@ -1,0 +1,35 @@
+sensor_meta {
+    name: "velodyne_64"
+    type: VELODYNE_64
+    orientation: FRONT
+}
+
+sensor_meta {
+    name: "ldlidar4"
+    type: LDLIDAR_4
+    orientation: FRONT
+}
+
+sensor_meta {
+    name: "radar"
+    type: LONG_RANGE_RADAR
+    orientation: FRONT
+}
+
+sensor_meta {
+    name: "camera_smartereye"
+    type: STEREO_CAMERA
+    orientation: FRONT
+}
+
+sensor_meta {
+    name: "ultrasonic"
+    type: ULTRASONIC
+    orientation: FRONT
+}
+
+sensor_meta {
+    name: "radar_rear"
+    type: LONG_RANGE_RADAR
+    orientation: REAR
+}

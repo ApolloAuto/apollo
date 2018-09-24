@@ -1,0 +1,82 @@
+/******************************************************************************
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
+#ifndef PERCEPTION_ONBOARD_INNER_COMPONENT_MESSAGES_H_
+#define PERCEPTION_ONBOARD_INNER_COMPONENT_MESSAGES_H_
+
+#include <Eigen/Core>
+#include <memory>
+#include <string>
+#include <vector>
+
+#include "modules/perception/base/frame.h"
+#include "modules/perception/base/hdmap_struct.h"
+#include "modules/perception/base/impending_collision_edge.h"
+#include "modules/perception/base/point_cloud_types.h"
+#include "modules/perception/proto/perception_obstacle.pb.h"  // NOLINT
+
+#include "cybertron/cybertron.h"
+
+namespace apollo {
+namespace perception {
+namespace onboard {
+
+enum class ProcessStage {
+  LIDAR_PREPROCESS = 0,
+  LIDAR_SEGMENTATION = 1,
+  LIDAR_RECOGNITION = 2,
+  STEREO_CAMERA_DETECTION = 3,
+  MONOCULAR_CAMERA_DETECTION = 4,
+  LONG_RANGE_RADAR_DETECTION = 5,
+  SHORT_RANGE_RADAR_DETECTION = 6,
+  ULTRASONIC_DETECTION = 7,
+  SENSOR_FUSION = 8,
+  UNKNOWN_STAGE = 9,
+  PROCESSSTAGE_COUNT = 10
+};
+
+class Descriptor {
+ public:
+  std::string full_name() { return "name"; }
+};
+
+class SensorFrameMessage : public apollo::cybertron::message::IntraMessage {
+ public:
+  SensorFrameMessage() { type_name_ = "SensorFrameMessage"; }
+  ~SensorFrameMessage() = default;
+  std::string GetTypeName() { return type_name_; }
+  SensorFrameMessage* New() const { return new SensorFrameMessage; }
+  bool SerializeToString(std::string* str) const { return false; }
+  bool ParseFromString(const std::string& str) { return false; }
+  static Descriptor* descriptor() { return new Descriptor(); }
+
+ public:
+  apollo::common::ErrorCode error_code_ = apollo::common::ErrorCode::OK;
+
+  std::string sensor_id_;
+  double timestamp_ = 0.0;
+  uint32_t seq_num_ = 0;
+  base::HdmapStructConstPtr hdmap_;
+
+  base::FramePtr frame_;
+
+  ProcessStage process_stage_ = ProcessStage::UNKNOWN_STAGE;
+};
+
+}  // namespace onboard
+}  // namespace perception
+}  // namespace apollo
+
+#endif  // PERCEPTION_ONBOARD_INNER_COMPONENT_MESSAGES_H_

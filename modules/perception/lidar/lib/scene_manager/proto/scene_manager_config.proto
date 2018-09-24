@@ -1,0 +1,6 @@
+syntax = "proto2";
+package apollo.perception.lidar;
+
+message SceneManagerConfig {
+  repeated string service_name = 1;
+}

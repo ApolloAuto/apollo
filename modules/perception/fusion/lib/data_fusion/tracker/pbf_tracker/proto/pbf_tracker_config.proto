@@ -1,0 +1,10 @@
+syntax = "proto2";
+
+package apollo.perception.fusion;
+
+message PbfTrackerConfig {
+  required string type_fusion_method = 1 [default = "DstTypeFusion"];
+  required string motion_fusion_method = 2 [default = "KalmanMotionFusion"];
+  required string shape_fusion_method = 3 [default = "PbfShapeFusion"];
+  required string existance_fusion_method = 4 [default = "DstExistanceFusion"];
+}

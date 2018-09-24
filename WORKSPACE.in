@@ -119,6 +119,12 @@ new_local_repository(
     build_file = "third_party/caffe.BUILD",
     path = "/usr/include/caffe",
 )
+## tensorrt
+new_local_repository(
+    name = "tensorrt",
+    build_file = "third_party/tensorrt.BUILD",
+    path = "/usr/include/tensorrt",
+)
 
 # YAML-CPP
 new_http_archive(

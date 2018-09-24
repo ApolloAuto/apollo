@@ -1,0 +1,47 @@
+sensor_meta {
+    name: "velodyne16"
+    type: VELODYNE_16
+    orientation: PANORAMIC
+}
+
+sensor_meta {
+    name: "radar_front"
+    type: LONG_RANGE_RADAR
+    orientation: FRONT
+}
+
+sensor_meta {
+    name: "camera_smartereye"
+    type: STEREO_CAMERA
+    orientation: FRONT
+}
+
+sensor_meta {
+    name: "camera_left_forward"
+    type: MONOCULAR_CAMERA
+    orientation: LEFT_FORWARD
+}
+
+sensor_meta {
+    name: "camera_right_forward"
+    type: MONOCULAR_CAMERA
+    orientation: RIGHT_FORWARD
+}
+
+sensor_meta {
+    name: "camera_left_backward"
+    type: MONOCULAR_CAMERA
+    orientation: LEFT_BACKWARD
+}
+
+sensor_meta {
+    name: "camera_right_backward"
+    type: MONOCULAR_CAMERA
+    orientation: RIGHT_BACKWARD
+}
+
+sensor_meta {
+    name: "camera_rear"
+    type: MONOCULAR_CAMERA
+    orientation: REAR
+}
