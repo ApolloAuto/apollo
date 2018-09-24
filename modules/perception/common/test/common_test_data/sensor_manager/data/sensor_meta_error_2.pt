@@ -1,0 +1,5 @@
+sensor_meta {
+    name: "camera_smartereye_front"
+    type: STEREO_CAMERA
+    orientation: FRONT
+}

@@ -1,0 +1,22 @@
+header: 
+  seq: 0
+  stamp: 
+    secs: 0
+    nsecs:         0
+  frame_id: camera_smartereye
+height: 712
+width: 1192
+distortion_model: plumb_bob
+D: [0.0, 0.0, 0.0, 0.0, 0.0]
+K: [1.4643960833168799e+03, 0., 4.6927379272059784e+02, 0.,
+       1.4650521175674853e+03, 3.5503232507376339e+02, 0., 0., 1. ]
+R: [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]
+P: [1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0]
+binning_x: 0
+binning_y: 0
+roi: 
+  x_offset: 0
+  y_offset: 0
+  height: 0
+  width: 0
+  do_rectify: False

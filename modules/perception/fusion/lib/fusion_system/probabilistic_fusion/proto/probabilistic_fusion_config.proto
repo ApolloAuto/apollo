@@ -1,0 +1,13 @@
+syntax = "proto2";
+
+package apollo.perception.fusion;
+
+message ProbabilisticFusionConfig {
+  required bool use_lidar = 1 [default = true];
+  required bool use_radar = 2 [default = true];
+  required bool use_camera = 3 [default = true];
+  required string tracker_method = 4 [default = "PbfTracker"];
+  required string data_association_method = 5 [default = "HMAssociation"];
+  required string gate_keeper_method = 6 [default = "PbfGatekeeper"];
+  repeated string prohibition_sensors = 7;
+}

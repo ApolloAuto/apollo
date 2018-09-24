@@ -1,0 +1,9 @@
+reduce1_add
+reduce2_add
+reduce3_add
+reduce4_add
+conv_out
+res6b_input_64
+res5b_input_32
+res4d_input_16
+res3c_input_8

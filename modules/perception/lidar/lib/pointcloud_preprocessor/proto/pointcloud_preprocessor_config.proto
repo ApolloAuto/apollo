@@ -1,0 +1,13 @@
+syntax = "proto2";
+package apollo.perception.lidar;
+
+message PointCloudPreprocessorConfig {
+  optional bool filter_naninf_points = 1 [default = true];
+  optional bool filter_nearby_box_points = 2 [default = false];
+  optional float box_forward_x = 3 [default = 0];
+  optional float box_backward_x = 4 [default = 0];
+  optional float box_forward_y = 5 [default = 0];
+  optional float box_backward_y = 6 [default = 0];
+  optional bool filter_high_z_points = 7 [default = false];
+  optional float z_threshold = 8 [default = 5.0];
+}

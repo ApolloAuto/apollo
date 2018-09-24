@@ -1,0 +1,4 @@
+ type_fusion_method: "DstTypeFusion"
+ motion_fusion_method: "KalmanMotionFusion"
+ shape_fusion_method: "PbfShapeFusion"
+ existance_fusion_method: "DstExistanceFusion"

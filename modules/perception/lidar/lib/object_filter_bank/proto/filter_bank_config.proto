@@ -1,0 +1,6 @@
+syntax = "proto2";
+package apollo.perception.lidar;
+
+message FilterBankConfig {
+  repeated string filter_name = 1;
+}

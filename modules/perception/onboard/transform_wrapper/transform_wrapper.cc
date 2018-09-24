@@ -1,0 +1,277 @@
+/******************************************************************************
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
+#include "modules/perception/onboard/transform_wrapper/transform_wrapper.h"
+
+#include "modules/perception/base/log.h"
+#include "modules/perception/common/sensor_manager/sensor_manager.h"
+
+namespace apollo {
+namespace perception {
+namespace onboard {
+
+DEFINE_string(obs_sensor2novatel_tf2_frame_id, "",
+              "sensor to novatel frame id");
+DEFINE_string(obs_novatel2world_tf2_frame_id, "", "novatel to world frame id");
+DEFINE_string(obs_novatel2world_tf2_child_frame_id, "",
+              "novatel to world child frame id");
+DEFINE_double(obs_tf2_buff_size, 0.01,
+              "query Cybertron TF buffer size in second");
+DEFINE_double(obs_transform_cache_size, 1.0, "transform cache size in second");
+DEFINE_double(obs_max_local_pose_extrapolation_latency, 0.15,
+              "max local pose extrapolation period in second");
+DEFINE_bool(obs_enable_local_pose_extrapolation, true,
+            "use local pose extrapolation");
+
+void TransformCache::AddTransform(const StampedTransform& transform) {
+  if (transforms_.empty()) {
+    transforms_.push_back(transform);
+    return;
+  }
+  double delt = transform.timestamp - transforms_.back().timestamp;
+  if (delt < 0.0) {
+    LOG_INFO << "ERROR: add earlier transform to transform cache";
+    return;
+  }
+
+  while (!transforms_.empty()) {
+    delt = transform.timestamp - transforms_.front().timestamp;
+    if (delt > cache_duration_) {
+      transforms_.pop_front();
+    } else {
+      break;
+    }
+  }
+
+  transforms_.push_back(transform);
+}
+
+bool TransformCache::QueryTransform(double timestamp,
+                                    StampedTransform* transform,
+                                    double max_duration) {
+  if (transforms_.empty() || transform == nullptr) {
+    return false;
+  }
+
+  double delt = timestamp - transforms_.back().timestamp;
+  if (delt > max_duration) {
+    LOG_INFO << "ERROR: query timestamp is " << delt
+             << "s later than cached timestamp";
+    return false;
+  } else if (delt < 0.0) {
+    LOG_INFO << "ERROR: query earlier timestamp than transform cache";
+    return false;
+  }
+
+  int size = transforms_.size();
+  if (size == 1) {
+    (*transform) = transforms_.back();
+    transform->timestamp = timestamp;
+    LOG_INFO << "use transform at "
+             << GLOG_TIMESTAMP(transforms_.back().timestamp) << " for "
+             << GLOG_TIMESTAMP(timestamp);
+  } else {
+    double ratio =
+        (timestamp - transforms_[size - 2].timestamp) /
+        (transforms_[size - 1].timestamp - transforms_[size - 2].timestamp);
+
+    transform->rotation = transforms_[size - 2].rotation.slerp(
+        ratio, transforms_[size - 1].rotation);
+
+    transform->translation.x() =
+        transforms_[size - 2].translation.x() * (1 - ratio) +
+        transforms_[size - 1].translation.x() * ratio;
+    transform->translation.y() =
+        transforms_[size - 2].translation.y() * (1 - ratio) +
+        transforms_[size - 1].translation.y() * ratio;
+    transform->translation.z() =
+        transforms_[size - 2].translation.z() * (1 - ratio) +
+        transforms_[size - 1].translation.z() * ratio;
+
+    LOG_INFO << "estimate pose at " << GLOG_TIMESTAMP(timestamp)
+             << " from poses at "
+             << GLOG_TIMESTAMP(transforms_[size - 2].timestamp) << " and "
+             << GLOG_TIMESTAMP(transforms_[size - 1].timestamp);
+  }
+  return true;
+}
+
+void TransformWrapper::Init(
+    const std::string& sensor2novatel_tf2_child_frame_id) {
+  sensor2novatel_tf2_frame_id_ = FLAGS_obs_sensor2novatel_tf2_frame_id;
+  sensor2novatel_tf2_child_frame_id_ = sensor2novatel_tf2_child_frame_id;
+  novatel2world_tf2_frame_id_ = FLAGS_obs_novatel2world_tf2_frame_id;
+  novatel2world_tf2_child_frame_id_ =
+      FLAGS_obs_novatel2world_tf2_child_frame_id;
+  transform_cache_.SetCacheDuration(FLAGS_obs_transform_cache_size);
+  inited_ = true;
+}
+
+void TransformWrapper::Init(
+    const std::string& sensor2novatel_tf2_frame_id,
+    const std::string& sensor2novatel_tf2_child_frame_id,
+    const std::string& novatel2world_tf2_frame_id,
+    const std::string& novatel2world_tf2_child_frame_id) {
+  sensor2novatel_tf2_frame_id_ = sensor2novatel_tf2_frame_id;
+  sensor2novatel_tf2_child_frame_id_ = sensor2novatel_tf2_child_frame_id;
+  novatel2world_tf2_frame_id_ = novatel2world_tf2_frame_id;
+  novatel2world_tf2_child_frame_id_ = novatel2world_tf2_child_frame_id;
+  transform_cache_.SetCacheDuration(FLAGS_obs_transform_cache_size);
+  inited_ = true;
+}
+
+bool TransformWrapper::GetSensor2worldTrans(
+    double timestamp, Eigen::Affine3d* sensor2world_trans,
+    Eigen::Affine3d* novatel2world_trans) {
+  if (!inited_) {
+    LOG_ERROR << "TransformWrapper not Initialized,"
+              << " unable to call GetSensor2worldTrans.";
+    return false;
+  }
+
+  if (sensor2novatel_extrinsics_ == nullptr) {
+    StampedTransform trans_sensor2novatel;
+    if (QueryTrans(timestamp, &trans_sensor2novatel,
+                   sensor2novatel_tf2_frame_id_,
+                   sensor2novatel_tf2_child_frame_id_) != true) {
+      return false;
+    }
+    sensor2novatel_extrinsics_.reset(new Eigen::Affine3d);
+    *sensor2novatel_extrinsics_ =
+        trans_sensor2novatel.translation * trans_sensor2novatel.rotation;
+    LOG_INFO << "Get sensor2novatel extrinsics successfully.";
+  }
+
+  StampedTransform trans_novatel2world;
+  trans_novatel2world.timestamp = timestamp;
+  Eigen::Affine3d novatel2world;
+
+  if (QueryTrans(timestamp, &trans_novatel2world, novatel2world_tf2_frame_id_,
+                 novatel2world_tf2_child_frame_id_) != true) {
+    if (FLAGS_obs_enable_local_pose_extrapolation) {
+      if (!transform_cache_.QueryTransform(
+              timestamp, &trans_novatel2world,
+              FLAGS_obs_max_local_pose_extrapolation_latency)) {
+        return false;
+      }
+    } else {
+      return false;
+    }
+  } else if (FLAGS_obs_enable_local_pose_extrapolation) {
+    transform_cache_.AddTransform(trans_novatel2world);
+  }
+
+  novatel2world =
+      trans_novatel2world.translation * trans_novatel2world.rotation;
+  *sensor2world_trans = novatel2world * (*sensor2novatel_extrinsics_);
+  if (novatel2world_trans != nullptr) {
+    *novatel2world_trans = novatel2world;
+  }
+  LOG_INFO << "Get pose timestamp: " << GLOG_TIMESTAMP(timestamp)
+           << ", pose: " << std::endl
+           << (*sensor2world_trans).matrix();
+  return true;
+}
+
+bool TransformWrapper::GetExtrinsics(Eigen::Affine3d* trans) {
+  if (!inited_ || trans == nullptr || sensor2novatel_extrinsics_ == nullptr) {
+    LOG_ERROR << "TransformWrapper get extrinsics failed";
+    return false;
+  }
+  *trans = *sensor2novatel_extrinsics_;
+  return true;
+}
+
+bool TransformWrapper::GetTrans(double timestamp, Eigen::Affine3d* trans,
+                                const std::string& frame_id,
+                                const std::string& child_frame_id) {
+  StampedTransform transform;
+  if (QueryTrans(timestamp, &transform, frame_id, child_frame_id) != true) {
+    if (FLAGS_obs_enable_local_pose_extrapolation) {
+      if (!transform_cache_.QueryTransform(
+              timestamp, &transform,
+              FLAGS_obs_max_local_pose_extrapolation_latency)) {
+        return false;
+      }
+    } else {
+      return false;
+    }
+  } else if (FLAGS_obs_enable_local_pose_extrapolation) {
+    transform_cache_.AddTransform(transform);
+  }
+
+  *trans = transform.translation * transform.rotation;
+  return true;
+}
+
+bool TransformWrapper::QueryTrans(double timestamp, StampedTransform* trans,
+                                  const std::string& frame_id,
+                                  const std::string& child_frame_id) {
+  cybertron::Time query_time(timestamp);
+  std::string err_string;
+  if (!tf2_buffer_->canTransform(frame_id, child_frame_id, query_time,
+                                 FLAGS_obs_tf2_buff_size, &err_string)) {
+    LOG_ERROR << "Can not find transform. " << GLOG_TIMESTAMP(timestamp)
+              << " frame_id: " << frame_id
+              << " child_frame_id: " << child_frame_id
+              << " Error info: " << err_string;
+    return false;
+  }
+
+  apollo::transform::TransformStamped stamped_transform;
+  try {
+    stamped_transform =
+        tf2_buffer_->lookupTransform(frame_id, child_frame_id, query_time);
+
+    trans->translation =
+        Eigen::Translation3d(stamped_transform.transform().translation().x(),
+                             stamped_transform.transform().translation().y(),
+                             stamped_transform.transform().translation().z());
+    trans->rotation =
+        Eigen::Quaterniond(stamped_transform.transform().rotation().qw(),
+                           stamped_transform.transform().rotation().qx(),
+                           stamped_transform.transform().rotation().qy(),
+                           stamped_transform.transform().rotation().qz());
+  } catch (tf2::TransformException& ex) {
+    LOG_ERROR << ex.what();
+    return false;
+  }
+  return true;
+}
+
+bool TransformWrapper::GetExtrinsicsBySensorId(
+    const std::string& from_sensor_id, const std::string& to_sensor_id,
+    Eigen::Affine3d* trans) {
+  if (trans == nullptr) {
+    LOG_ERROR << "TransformWrapper get extrinsics failed";
+    return false;
+  }
+
+  common::SensorManager* sensor_manager =
+      lib::Singleton<common::SensorManager>::get_instance();
+  std::string frame_id = sensor_manager->GetFrameId(to_sensor_id);
+  std::string child_frame_id = sensor_manager->GetFrameId(from_sensor_id);
+
+  StampedTransform transform;
+  bool status = QueryTrans(0.0, &transform, frame_id, child_frame_id);
+  if (status == true) {
+    *trans = transform.translation * transform.rotation;
+  }
+  return status;
+}
+
+}  // namespace onboard
+}  // namespace perception
+}  // namespace apollo

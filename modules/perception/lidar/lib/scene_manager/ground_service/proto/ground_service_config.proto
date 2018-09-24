@@ -1,0 +1,8 @@
+syntax = "proto2";
+package apollo.perception.lidar;
+
+message GroundServiceConfig {
+  optional double roi_rad_x = 1 [default = 120.0];
+  optional double roi_rad_y = 2 [default = 120.0];
+  optional uint32 grid_size = 3 [default = 16];
+}
