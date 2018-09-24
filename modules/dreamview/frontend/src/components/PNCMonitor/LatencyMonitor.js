@@ -13,10 +13,10 @@ export default class LatencyMonitor extends React.Component {
             return null;
         }
 
-        const graphs = Object.keys(data).map(moduleName => {
-            setting.title = moduleName;
-            return generateScatterGraph(setting, { data: data[moduleName] });
+        const graphs = {};
+        Object.keys(data).forEach(moduleName => {
+            graphs[moduleName] = data[moduleName];
         });
-        return <div>{graphs}</div>;
+        return generateScatterGraph(setting, graphs);
     }
 }
