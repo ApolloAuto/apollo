@@ -2,25 +2,25 @@ load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
-#cc_library(
-#    name = "control_test_base",
-#    srcs = [
-#        "control_test_base.cc",
-#    ],
-#    hdrs = [
-#        "control_test_base.h",
-#    ],
-#    deps = [
-#        "//framework:cybertron",
-#        "//modules/common/proto:geometry_proto",
-#        "//modules/common/time",
-#        "//modules/control:control_lib",
-#        "//modules/control/common:control_gflags",
-#        "//modules/control/proto:control_proto",
-#        "@gtest//:main",
-#    ],
-#)
-#
+cc_library(
+    name = "control_test_base",
+    srcs = [
+        "control_test_base.cc",
+    ],
+    hdrs = [
+        "control_test_base.h",
+    ],
+    deps = [
+        "//framework:cybertron",
+        "//modules/common/proto:geometry_proto",
+        "//modules/common/time",
+        "//modules/control:control_component_lib",
+        "//modules/control/common:control_gflags",
+        "//modules/control/proto:control_proto",
+        "@gtest//:main",
+    ],
+)
+
 #cc_test(
 #    name = "simple_control_test",
 #    size = "small",

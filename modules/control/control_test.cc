@@ -14,13 +14,13 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/control/control.h"
+#include "modules/control/control_component.h"
 
 #include <string>
 #include <utility>
 
-#include "gtest/gtest.h"
 #include "cybertron/common/log.h"
+#include "gtest/gtest.h"
 #include "modules/common/util/file.h"
 #include "modules/control/common/control_gflags.h"
 #include "modules/control/proto/control_conf.pb.h"
