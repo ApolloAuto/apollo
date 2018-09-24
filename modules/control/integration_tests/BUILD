@@ -27,7 +27,7 @@ package(default_visibility = ["//visibility:public"])
 #    srcs = [
 #        "simple_control_test.cc",
 #    ],
-#    data = ["//modules/control:control_testdata"],
+#    data = ["//modules/control/testdata:control_testdata"],
 #    deps = [
 #        ":control_test_base",
 #        "@gtest//:gtest",
@@ -40,7 +40,7 @@ package(default_visibility = ["//visibility:public"])
 #    srcs = [
 #        "relative_position_test.cc",
 #    ],
-#    data = ["//modules/control:control_testdata"],
+#    data = ["//modules/control/testdata:control_testdata"],
 #    deps = [
 #        ":control_test_base",
 #        "@gtest//:gtest",
@@ -53,7 +53,7 @@ package(default_visibility = ["//visibility:public"])
 #    srcs = [
 #        "mpc_controller_test.cc",
 #    ],
-#    data = ["//modules/control:control_testdata"],
+#    data = ["//modules/control/testdata:control_testdata"],
 #    deps = [
 #        ":control_test_base",
 #        "@gtest//:gtest",

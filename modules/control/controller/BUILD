@@ -135,7 +135,7 @@ cc_library(
 #    srcs = [
 #        "lon_controller_test.cc",
 #    ],
-#    data = ["//modules/control:control_testdata"],
+#    data = ["//modules/control/testdata:control_testdata"],
 #    deps = [
 #        ":lon_controller",
 #        "//framework:cybertron",
@@ -155,7 +155,7 @@ cc_library(
 #    srcs = [
 #        "lat_controller_test.cc",
 #    ],
-#    data = ["//modules/control:control_testdata"],
+#    data = ["//modules/control/testdata:control_testdata"],
 #    deps = [
 #        ":lat_controller",
 #        "//framework:cybertron",
@@ -175,7 +175,7 @@ cc_library(
 #    srcs = [
 #        "mpc_controller_test.cc",
 #    ],
-#    data = ["//modules/control:control_testdata"],
+#    data = ["//modules/control/testdata:control_testdata"],
 #    deps = [
 #        ":mpc_controller",
 #        "//framework:cybertron",

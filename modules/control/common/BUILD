@@ -147,7 +147,7 @@ cc_test(
     srcs = [
         "interpolation_1d_test.cc",
     ],
-    data = ["//modules/control:control_testdata"],
+    data = ["//modules/control/testdata:control_testdata"],
     deps = [
         ":interpolation_1d",
         "//framework:cybertron",
@@ -163,7 +163,7 @@ cc_test(
     srcs = [
         "interpolation_2d_test.cc",
     ],
-    data = ["//modules/control:control_testdata"],
+    data = ["//modules/control/testdata:control_testdata"],
     deps = [
         ":interpolation_2d",
         "//framework:cybertron",
@@ -179,7 +179,7 @@ cc_test(
     srcs = [
         "pid_controller_test.cc",
     ],
-    data = ["//modules/control:control_testdata"],
+    data = ["//modules/control/testdata:control_testdata"],
     deps = [
         ":pid_controller",
         "//modules/common/util",
@@ -194,7 +194,7 @@ cc_test(
     srcs = [
         "pid_BC_controller_test.cc",
     ],
-    data = ["//modules/control:control_testdata"],
+    data = ["//modules/control/testdata:control_testdata"],
     deps = [
         ":pid_BC_controller",
         "//modules/common/util",
@@ -209,7 +209,7 @@ cc_test(
     srcs = [
         "pid_IC_controller_test.cc",
     ],
-    data = ["//modules/control:control_testdata"],
+    data = ["//modules/control/testdata:control_testdata"],
     deps = [
         ":pid_IC_controller",
         "//modules/common/util",
