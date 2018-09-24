@@ -87,10 +87,9 @@ TEST(RecordFileTest, TestOneMessageFile) {
   ASSERT_NE(nullptr, rfw->flush_thread_);
 
   // write header section
-  HeaderBuilder* hb = new HeaderBuilder();
-  hb->BuildSegmentPart(0, 0);
-  hb->BuildChunkPart(0, 0);
-  Header hdr1 = hb->GetHeader();
+  Header hdr1 = GetHeaderWithSegmentParams(0, 0);
+  hdr1.set_chunk_interval(0);
+  hdr1.set_chunk_raw_size(0);
   ASSERT_TRUE(rfw->WriteHeader(hdr1));
   ASSERT_FALSE(rfw->header_.is_complete());
 
@@ -183,10 +182,9 @@ TEST(RecordFileTest, TestOneChunkFile) {
   ASSERT_TRUE(rfw->is_writing_);
   ASSERT_NE(nullptr, rfw->flush_thread_);
 
-  HeaderBuilder* hb = new HeaderBuilder();
-  hb->BuildSegmentPart(0, 0);
-  hb->BuildChunkPart(0, 0);
-  Header header = hb->GetHeader();
+  Header header = HeaderBuilder::GetHeaderWithChunkParams(0, 0);
+  header.set_segment_interval(0);
+  header.set_segment_raw_size(0);
   ASSERT_TRUE(rfw->WriteHeader(header));
   ASSERT_FALSE(rfw->header_.is_complete());
 

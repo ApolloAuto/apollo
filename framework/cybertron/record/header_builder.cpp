@@ -20,41 +20,45 @@ namespace apollo {
 namespace cybertron {
 namespace record {
 
-HeaderBuilder::HeaderBuilder() { BuildDefault(); }
+using ::apollo::cybertron::proto::CompressType;
 
-HeaderBuilder::~HeaderBuilder() {}
-
-void HeaderBuilder::BuildDefault() {
-  header_.set_major_version(major_version_);
-  header_.set_minor_version(minor_version_);
-  header_.set_compress(compress_type_);
-  header_.set_chunk_interval(chunk_interval_);
-  header_.set_segment_interval(segment_interval_);
-  header_.set_index_position(0);
-  header_.set_chunk_number(0);
-  header_.set_channel_number(0);
-  header_.set_begin_time(0);
-  header_.set_end_time(0);
-  header_.set_message_number(0);
-  header_.set_size(0);
-  header_.set_is_complete(false);
-  header_.set_chunk_raw_size(chunk_raw_size_);
-  header_.set_segment_raw_size(segment_raw_size_);
+proto::Header HeaderBuilder::GetHeader() {
+  proto::Header header;
+  header.set_major_version(MAJOR_VERSION_);
+  header.set_minor_version(MINOR_VERSION_);
+  header.set_compress(COMPRESS_TYPE_);
+  header.set_chunk_interval(CHUNK_INTERVAL_);
+  header.set_segment_interval(SEGMENT_INTERVAL_);
+  header.set_chunk_raw_size(CHUNK_RAW_SIZE_);
+  header.set_segment_raw_size(SEGMENT_RAW_SIZE_);
+  return header;
 }
 
-void HeaderBuilder::BuildSegmentPart(uint64_t segment_interval,
-                                     uint64_t segment_raw_size) {
-  header_.set_segment_interval(segment_interval);
-  header_.set_segment_raw_size(segment_raw_size);
+proto::Header HeaderBuilder::GetHeaderWithSegmentParams(
+    const uint64_t segment_interval, const uint64_t segment_raw_size) {
+  proto::Header header;
+  header.set_major_version(MAJOR_VERSION_);
+  header.set_minor_version(MINOR_VERSION_);
+  header.set_compress(COMPRESS_TYPE_);
+  header.set_chunk_interval(CHUNK_INTERVAL_);
+  header.set_chunk_raw_size(CHUNK_RAW_SIZE_);
+  header.set_segment_raw_size(segment_raw_size);
+  header.set_segment_interval(segment_interval);
+  return header;
 }
 
-void HeaderBuilder::BuildChunkPart(uint64_t chunk_interval,
-                                   uint64_t chunk_raw_size) {
-  header_.set_chunk_interval(chunk_interval);
-  header_.set_chunk_raw_size(chunk_raw_size);
+proto::Header HeaderBuilder::GetHeaderWithChunkParams(
+    const uint64_t chunk_interval, const uint64_t chunk_raw_size) {
+  proto::Header header;
+  header.set_major_version(MAJOR_VERSION_);
+  header.set_minor_version(MINOR_VERSION_);
+  header.set_compress(COMPRESS_TYPE_);
+  header.set_segment_interval(SEGMENT_INTERVAL_);
+  header.set_segment_raw_size(SEGMENT_RAW_SIZE_);
+  header.set_chunk_interval(chunk_interval);
+  header.set_chunk_raw_size(chunk_raw_size);
+  return header;
 }
-
-const Header HeaderBuilder::GetHeader() { return header_; }
 
 }  // namespace record
 }  // namespace cybertron

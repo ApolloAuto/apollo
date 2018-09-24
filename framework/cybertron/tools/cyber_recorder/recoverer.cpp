@@ -37,9 +37,7 @@ bool Recoverer::Proc() {
   }
 
   // open output file
-  HeaderBuilder* header_builder = new HeaderBuilder();
-  Header new_hdr = header_builder->GetHeader();
-  delete header_builder;
+  Header new_hdr = HeaderBuilder::GetHeader();
   if (!writer_.Open(output_file_)) {
     AERROR << "open output file failed. file: " << output_file_;
     return false;
