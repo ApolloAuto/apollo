@@ -23,9 +23,6 @@ import matplotlib.animation as animation
 import matplotlib.pyplot as plt
 from subprocess import call
 import numpy as np
-import rosbag
-import rospy
-from std_msgs.msg import String
 from google.protobuf import text_format
 from mpl_toolkits.mplot3d import Axes3D
 

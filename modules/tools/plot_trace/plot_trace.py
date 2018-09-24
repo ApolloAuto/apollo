@@ -21,9 +21,6 @@ import sys
 import matplotlib.animation as animation
 import matplotlib.pyplot as plt
 import numpy as np
-import rosbag
-import rospy
-from std_msgs.msg import String
 
 from modules.canbus.proto import chassis_pb2
 from modules.localization.proto import localization_pb2
@@ -56,11 +53,13 @@ def localization_callback(localization_data):
         GPS_Y.append(localization_data.pose.position.y)
 
 
-def setup_listener():
-    rospy.init_node('plot_listener', anonymous=True)
-    rospy.Subscriber(CHASSIS_TOPIC, chassis_pb2.Chassis, chassis_callback)
-    rospy.Subscriber(LOCALIZATION_TOPIC, localization_pb2.LocalizationEstimate,
-                     localization_callback)
+def setup_listener(node):
+    node.create_reader(CHASSIS_TOPIC, chassis_pb2.Chassis, chassis_callback)
+    node.create_reader(LOCALIZATION_TOPIC,
+                       localization_pb2.LocalizationEstimate,
+                       localization_callback)
+    while not cybertron.is_shutdown():
+        time.sleep(0.002)
 
 
 def update(frame_number):
@@ -79,10 +78,10 @@ if __name__ == '__main__':
         and plot the autonomous driving trace in real time.
         The manual driving trace is the blue lines, and the autonomous driving trace is the red lines.
         It is visualization a way to verify the precision of the autonomous driving trace.
-        If you have a rosbag, you can play the rosbag and the tool will plot the received localization
+        If you have a cybertron record file, you can play the record and the tool will plot the received localization
         message in realtime. To do that, start this tool first with a manual driving trace, and then
-        play rosbag use another terminal with the following command [replace your_bag_file.bag to your
-        own rosbag file]: rosbag play your_bag_file.bag
+        play record use another terminal with the following command [replace your_file.record to your
+        own record file]: cyber_record play -f your_file.record
         """)
     parser.add_argument(
         "trace",
@@ -99,7 +98,9 @@ if __name__ == '__main__':
     ax.plot(trace_data['x'], trace_data['y'], 'b-', alpha=0.5, linewidth=1)
     handle.close()
 
-    setup_listener()
+    cybertron.init()
+    node = cybertron.Node("plot_trace")
+    setup_listener(node)
 
     x_min = min(trace_data['x'])
     x_max = max(trace_data['x'])
