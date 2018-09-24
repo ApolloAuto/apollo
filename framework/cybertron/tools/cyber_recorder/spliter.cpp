@@ -40,7 +40,7 @@ bool Spliter::Proc() {
            << begin_time_ << "end_time_: " << end_time_;
     return false;
   }
-  for (auto channel_name : white_channels_) {
+  for (const auto& channel_name : white_channels_) {
     if (std::find(black_channels_.begin(), black_channels_.end(),
                   channel_name) != black_channels_.end()) {
       AERROR << "find channel in both of white list and black list, channel: "

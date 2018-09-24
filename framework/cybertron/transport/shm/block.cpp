@@ -31,8 +31,7 @@ Block::Block()
 Block::~Block() {}
 
 bool Block::TryLockForWrite() {
-  // std::lock_guard<std::mutex> lock(read_write_mutex_);
-  WriteLockGuard lock(read_write_mutex_);
+  WriteLockGuard<AtomicRWLock> lock(read_write_mutex_);
   if (is_writing_.load()) {
     ADEBUG << "block is writing.";
     return false;
@@ -45,8 +44,7 @@ bool Block::TryLockForWrite() {
 }
 
 bool Block::TryLockForRead() {
-  // std::lock_guard<std::mutex> lock(read_write_mutex_);
-  ReadLockGuard lock(read_write_mutex_);
+  ReadLockGuard<AtomicRWLock> lock(read_write_mutex_);
   if (is_writing_.load()) {
     ADEBUG << "block is writing.";
     return false;

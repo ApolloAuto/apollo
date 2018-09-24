@@ -1,8 +1,13 @@
-#include "cybertron/base/atomic_rw_lock.h"
 #include <atomic>
 #include <mutex>
 #include <string>
+#include "cybertron/base/atomic_rw_lock.h"
 #include "cybertron/time/time.h"
+
+using apollo::cybertron::base::AtomicRWLock;
+using apollo::cybertron::base::ReadLockGuard;
+using apollo::cybertron::base::WriteLockGuard;
+
 volatile bool ready = false;
 int main(int argc, char const *argv[]) {
   if (argc != 5) {
@@ -15,11 +20,11 @@ int main(int argc, char const *argv[]) {
     return 0;
   }
 
-  apollo::cybertron::base::AtomicRWLock rw_lock(false);
+  AtomicRWLock rw_lock(false);
   std::mutex mutex;
   auto start = apollo::cybertron::Time::MonoTime();
   for (int i = 0; i < 1000000; i++) {
-    apollo::cybertron::base::WriteLockGuard lg(rw_lock);
+    WriteLockGuard<AtomicRWLock> lg(rw_lock);
   }
   auto end = apollo::cybertron::Time::MonoTime();
   std::cout << "rw lock 1000000 times: " << end - start << std::endl;
@@ -46,7 +51,7 @@ int main(int argc, char const *argv[]) {
         asm volatile("rep; nop" ::: "memory");
       }
       for (int j = 0; j < read_lock_times; j++) {
-        apollo::cybertron::base::ReadLockGuard lg(rw_lock);
+        ReadLockGuard<AtomicRWLock> lg(rw_lock);
         usleep(1);
       }
       count++;
@@ -59,7 +64,7 @@ int main(int argc, char const *argv[]) {
         asm volatile("rep; nop" ::: "memory");
       }
       for (int j = 0; j < write_lock_times; j++) {
-        apollo::cybertron::base::WriteLockGuard lg(rw_lock);
+        WriteLockGuard<AtomicRWLock> lg(rw_lock);
         usleep(1);
       }
       count++;

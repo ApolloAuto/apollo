@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef CYBERTRON_BASE_ATOMIC_RW_LOCK_H_
-#define CYBERTRON_BASE_ATOMIC_RW_LOCK_H_
+#ifndef CYBERTRON_BASE_REENTRANT_RW_LOCK_H_
+#define CYBERTRON_BASE_REENTRANT_RW_LOCK_H_
 
 #include <stdint.h>
 #include <unistd.h>
@@ -31,16 +31,18 @@ namespace apollo {
 namespace cybertron {
 namespace base {
 
-class AtomicRWLock {
-  friend class ReadLockGuard<AtomicRWLock>;
-  friend class WriteLockGuard<AtomicRWLock>;
+static const std::thread::id NULL_THREAD_ID = std::thread::id();
+class ReentrantRWLock {
+  friend class ReadLockGuard<ReentrantRWLock>;
+  friend class WriteLockGuard<ReentrantRWLock>;
 
  public:
   static const int32_t RW_LOCK_FREE = 0;
   static const int32_t WRITE_EXCLUSIVE = -1;
   static const uint32_t MAX_RETRY_TIMES = 5;
-  AtomicRWLock() {}
-  explicit AtomicRWLock(bool write_first) : write_first_(write_first) {}
+  static const std::thread::id null_thread;
+  ReentrantRWLock() {}
+  explicit ReentrantRWLock(bool write_first) : write_first_(write_first) {}
 
  private:
   // all these function only can used by ReadLockGuard/WriteLockGuard;
@@ -50,14 +52,19 @@ class AtomicRWLock {
   void ReadUnlock();
   void WriteUnlock();
 
-  AtomicRWLock(const AtomicRWLock&) = delete;
-  AtomicRWLock& operator=(const AtomicRWLock&) = delete;
+  ReentrantRWLock(const ReentrantRWLock&) = delete;
+  ReentrantRWLock& operator=(const ReentrantRWLock&) = delete;
+  std::thread::id write_thread_id_ = {NULL_THREAD_ID};
   std::atomic<uint32_t> write_lock_wait_num_ = {0};
   std::atomic<int32_t> lock_num_ = {0};
   bool write_first_ = true;
 };
 
-inline void AtomicRWLock::ReadLock() {
+inline void ReentrantRWLock::ReadLock() {
+  if (write_thread_id_ == std::this_thread::get_id()) {
+    return;
+  }
+
   uint32_t retry_times = 0;
   int32_t lock_num = lock_num_.load();
   if (write_first_) {
@@ -89,7 +96,12 @@ inline void AtomicRWLock::ReadLock() {
   }
 }
 
-inline void AtomicRWLock::WriteLock() {
+inline void ReentrantRWLock::WriteLock() {
+  auto this_thread_id = std::this_thread::get_id();
+  if (write_thread_id_ == this_thread_id) {
+    lock_num_.fetch_sub(1);
+    return;
+  }
   int32_t rw_lock_free = RW_LOCK_FREE;
   uint32_t retry_times = 0;
   write_lock_wait_num_.fetch_add(1);
@@ -104,15 +116,25 @@ inline void AtomicRWLock::WriteLock() {
       retry_times = 0;
     }
   }
+  write_thread_id_ = this_thread_id;
   write_lock_wait_num_.fetch_sub(1);
 }
 
-inline void AtomicRWLock::ReadUnlock() { lock_num_.fetch_sub(1); }
+inline void ReentrantRWLock::ReadUnlock() {
+  if (write_thread_id_ == std::this_thread::get_id()) {
+    return;
+  }
+  lock_num_.fetch_sub(1);
+}
 
-inline void AtomicRWLock::WriteUnlock() { lock_num_.fetch_add(1); }
+inline void ReentrantRWLock::WriteUnlock() {
+  if (lock_num_.fetch_add(1) == WRITE_EXCLUSIVE) {
+    write_thread_id_ = NULL_THREAD_ID;
+  }
+}
 
 }  // namespace base
 }  // namespace cybertron
 }  // namespace apollo
 
-#endif  // CYBERTRON_BASE_ATOMIC_RW_LOCK_H_
+#endif  // CYBERTRON_BASE_REENTRANT_RW_LOCK_H_

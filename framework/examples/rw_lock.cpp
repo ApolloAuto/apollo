@@ -1,58 +1,48 @@
-#include <iostream>
-#include <thread>
-#include <mutex>
 #include <chrono>
+#include <iostream>
+#include <mutex>
+#include <thread>
 #include "cybertron/base/atomic_rw_lock.h"
+#include "cybertron/base/reentrant_rw_lock.h"
 
-using namespace apollo::cybertron::base;
-
-// using AtomicRWLock = std::mutex;
-// using ReadLockGuard = std::lock_guard<std::mutex>;
-// using WriteLockGuard = std::lock_guard<std::mutex>;
+using apollo::cybertron::base::AtomicRWLock;
+using apollo::cybertron::base::ReadLockGuard;
+using apollo::cybertron::base::ReentrantRWLock;
+using apollo::cybertron::base::WriteLockGuard;
 
 int x = 0;
 AtomicRWLock rw_lock;
+ReentrantRWLock reentrant_lock;
 
-void readlock() {
-  ReadLockGuard lock(rw_lock);
-//   std::cout << "read lock x: " << x << std::endl;
-  usleep(1);
+void read_lock() {
+  ReadLockGuard<AtomicRWLock> lock(rw_lock);
+  std::cout << "read lock x: " << x << std::endl;
 }
 
-void writelock() {
-  WriteLockGuard lock(rw_lock);
-  x += 1;
-  // std::cout << "write lock x: " << x << std::endl;
-//   usleep(1);
-  readlock();
+void write_lock() {
+  WriteLockGuard<AtomicRWLock> lock(rw_lock);
+  std::cout << "write lock x: " << ++x << std::endl;
 }
 
-void readloop() {
-  for (int i = 0; i < 10000; ++i) {
-    readlock();
-  }
+void reentrant_read_lock() {
+  ReadLockGuard<ReentrantRWLock> lock(reentrant_lock);
+  std::cout << "read lock x: " << x << std::endl;
 }
 
-void writeloop() {
-  for (int i = 0; i < 10000; ++i) {
-    writelock();
-  }
+void reentrant_write_lock() {
+  WriteLockGuard<ReentrantRWLock> lock(reentrant_lock);
+  std::cout << "write lock x: " << x++ << std::endl;
+}
+
+void reentrant_read_write() {
+  WriteLockGuard<AtomicRWLock> lock(rw_lock);
+  std::cout << "write lock x: " << x++ << std::endl;
+  reentrant_read_lock();
+  reentrant_write_lock();
 }
 
 int main() {
-  auto start = std::chrono::steady_clock::now();
-  std::thread rt[30];
-  for (int i = 0; i < 30; ++i) {
-    rt[i] = std::thread(readloop);
-  }
-
-  std::thread t(writeloop);
-
-  t.join();
-  for (int i = 0; i < 30; ++i) {
-    rt[i].join();
-  }
-  auto end = std::chrono::steady_clock::now();
-  std::chrono::duration<double> diff = end - start;
-  std::cout << std::fixed << diff.count() << " s\n";
+  read_lock();
+  write_lock();
+  reentrant_read_write();
 }

@@ -100,7 +100,7 @@ void Graph::Insert(const Edge& e) {
   if (!e.IsValid()) {
     return;
   }
-  WriteLockGuard lock(rw_lock_);
+  WriteLockGuard<AtomicRWLock> lock(rw_lock_);
   auto& e_v = e.value();
   if (edges_.find(e_v) == edges_.end()) {
     edges_[e_v] = RelatedVertices();
@@ -118,7 +118,7 @@ void Graph::Delete(const Edge& e) {
   if (!e.IsValid()) {
     return;
   }
-  WriteLockGuard lock(rw_lock_);
+  WriteLockGuard<AtomicRWLock> lock(rw_lock_);
   auto& e_v = e.value();
   if (edges_.find(e_v) == edges_.end()) {
     return;
@@ -133,7 +133,7 @@ void Graph::Delete(const Edge& e) {
 }
 
 uint32_t Graph::GetNumOfEdge() {
-  ReadLockGuard lock(rw_lock_);
+  ReadLockGuard<AtomicRWLock> lock(rw_lock_);
   uint32_t num = 0;
   for (auto& item : list_) {
     num += item.second.size();
@@ -145,7 +145,7 @@ FlowDirection Graph::GetDirectionOf(const Vertice& lhs, const Vertice& rhs) {
   if (lhs.IsDummy() || rhs.IsDummy()) {
     return UNREACHABLE;
   }
-  ReadLockGuard lock(rw_lock_);
+  ReadLockGuard<AtomicRWLock> lock(rw_lock_);
   if (list_.count(lhs.GetKey()) == 0 || list_.count(rhs.GetKey()) == 0) {
     return UNREACHABLE;
   }

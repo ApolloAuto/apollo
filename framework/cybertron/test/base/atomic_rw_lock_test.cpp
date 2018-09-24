@@ -13,7 +13,7 @@ TEST(AtomicRWLockTest, read_lock) {
   AtomicRWLock lock;
   EXPECT_EQ(0, lock.lock_num_.load());
   auto f = [&]() {
-    ReadLockGuard lg(lock);
+    ReadLockGuard<AtomicRWLock> lg(lock);
     count++;
     thread_init++;
     while (flag) {
@@ -31,16 +31,16 @@ TEST(AtomicRWLockTest, read_lock) {
   t1.join();
   t2.join();
   {
-    ReadLockGuard lg1(lock);
+    ReadLockGuard<AtomicRWLock> lg1(lock);
     EXPECT_EQ(1, lock.lock_num_.load());
     {
-      ReadLockGuard lg2(lock);
+      ReadLockGuard<AtomicRWLock> lg2(lock);
       EXPECT_EQ(2, lock.lock_num_.load());
       {
-        ReadLockGuard lg3(lock);
+        ReadLockGuard<AtomicRWLock> lg3(lock);
         EXPECT_EQ(3, lock.lock_num_.load());
         {
-          ReadLockGuard lg4(lock);
+          ReadLockGuard<AtomicRWLock> lg4(lock);
           EXPECT_EQ(4, lock.lock_num_.load());
         }
         EXPECT_EQ(3, lock.lock_num_.load());
@@ -59,7 +59,7 @@ TEST(AtomicRWLockTest, write_lock) {
   AtomicRWLock lock(false);
   auto f = [&]() {
     thread_run++;
-    WriteLockGuard lg(lock);
+    WriteLockGuard<AtomicRWLock> lg(lock);
     count++;
     while (flag) {
       std::this_thread::yield();
@@ -77,13 +77,13 @@ TEST(AtomicRWLockTest, write_lock) {
   t2.join();
 
   {
-    WriteLockGuard lg1(lock);
+    WriteLockGuard<AtomicRWLock> lg1(lock);
     EXPECT_EQ(-1, lock.lock_num_.load());
     {
-      WriteLockGuard lg2(lock);
+      WriteLockGuard<AtomicRWLock> lg2(lock);
       EXPECT_EQ(-2, lock.lock_num_.load());
       {
-        ReadLockGuard lg3(lock);
+        ReadLockGuard<AtomicRWLock> lg3(lock);
         EXPECT_EQ(-2, lock.lock_num_.load());
       }
     }

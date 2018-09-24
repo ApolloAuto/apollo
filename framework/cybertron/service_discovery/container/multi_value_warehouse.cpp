@@ -27,7 +27,7 @@ namespace service_discovery {
 
 bool MultiValueWarehouse::Add(uint64_t key, const RolePtr& role,
                               bool ignore_if_exist) {
-  WriteLockGuard lock(rw_lock_);
+  WriteLockGuard<AtomicRWLock> lock(rw_lock_);
   if (!ignore_if_exist) {
     if (roles_.find(key) != roles_.end()) {
       return false;
@@ -39,22 +39,22 @@ bool MultiValueWarehouse::Add(uint64_t key, const RolePtr& role,
 }
 
 void MultiValueWarehouse::Clear() {
-  WriteLockGuard lock(rw_lock_);
+  WriteLockGuard<AtomicRWLock> lock(rw_lock_);
   roles_.clear();
 }
 
 std::size_t MultiValueWarehouse::Size() {
-  ReadLockGuard lock(rw_lock_);
+  ReadLockGuard<AtomicRWLock> lock(rw_lock_);
   return roles_.size();
 }
 
 void MultiValueWarehouse::Remove(uint64_t key) {
-  WriteLockGuard lock(rw_lock_);
+  WriteLockGuard<AtomicRWLock> lock(rw_lock_);
   roles_.erase(key);
 }
 
 void MultiValueWarehouse::Remove(uint64_t key, const RolePtr& role) {
-  WriteLockGuard lock(rw_lock_);
+  WriteLockGuard<AtomicRWLock> lock(rw_lock_);
   auto range = roles_.equal_range(key);
   for (auto it = range.first; it != range.second;) {
     if (it->second->Match(role->attributes())) {
@@ -66,7 +66,7 @@ void MultiValueWarehouse::Remove(uint64_t key, const RolePtr& role) {
 }
 
 void MultiValueWarehouse::Remove(const RoleAttributes& target_attr) {
-  WriteLockGuard lock(rw_lock_);
+  WriteLockGuard<AtomicRWLock> lock(rw_lock_);
   for (auto it = roles_.begin(); it != roles_.end();) {
     auto curr_role = it->second;
     if (curr_role->Match(target_attr)) {
@@ -84,7 +84,7 @@ bool MultiValueWarehouse::Search(uint64_t key) {
 
 bool MultiValueWarehouse::Search(uint64_t key, RolePtr* first_matched_role) {
   RETURN_VAL_IF_NULL(first_matched_role, false);
-  ReadLockGuard lock(rw_lock_);
+  ReadLockGuard<AtomicRWLock> lock(rw_lock_);
   auto search = roles_.find(key);
   if (search == roles_.end()) {
     return false;
@@ -138,7 +138,7 @@ bool MultiValueWarehouse::Search(const RoleAttributes& target_attr) {
 bool MultiValueWarehouse::Search(const RoleAttributes& target_attr,
                                  RolePtr* first_matched_role) {
   RETURN_VAL_IF_NULL(first_matched_role, false);
-  ReadLockGuard lock(rw_lock_);
+  ReadLockGuard<AtomicRWLock> lock(rw_lock_);
   for (auto& item : roles_) {
     if (item.second->Match(target_attr)) {
       *first_matched_role = item.second;
@@ -163,7 +163,7 @@ bool MultiValueWarehouse::Search(const RoleAttributes& target_attr,
                                  std::vector<RolePtr>* matched_roles) {
   RETURN_VAL_IF_NULL(matched_roles, false);
   bool find = false;
-  ReadLockGuard lock(rw_lock_);
+  ReadLockGuard<AtomicRWLock> lock(rw_lock_);
   for (auto& item : roles_) {
     if (item.second->Match(target_attr)) {
       matched_roles->emplace_back(item.second);
@@ -178,7 +178,7 @@ bool MultiValueWarehouse::Search(
     std::vector<RoleAttributes>* matched_roles_attr) {
   RETURN_VAL_IF_NULL(matched_roles_attr, false);
   bool find = false;
-  ReadLockGuard lock(rw_lock_);
+  ReadLockGuard<AtomicRWLock> lock(rw_lock_);
   for (auto& item : roles_) {
     if (item.second->Match(target_attr)) {
       matched_roles_attr->emplace_back(item.second->attributes());
@@ -190,7 +190,7 @@ bool MultiValueWarehouse::Search(
 
 void MultiValueWarehouse::GetAllRoles(std::vector<RolePtr>* roles) {
   RETURN_IF_NULL(roles);
-  ReadLockGuard lock(rw_lock_);
+  ReadLockGuard<AtomicRWLock> lock(rw_lock_);
   for (auto& item : roles_) {
     roles->emplace_back(item.second);
   }
@@ -198,7 +198,7 @@ void MultiValueWarehouse::GetAllRoles(std::vector<RolePtr>* roles) {
 
 void MultiValueWarehouse::GetAllRoles(std::vector<RoleAttributes>* roles_attr) {
   RETURN_IF_NULL(roles_attr);
-  ReadLockGuard lock(rw_lock_);
+  ReadLockGuard<AtomicRWLock> lock(rw_lock_);
   for (auto& item : roles_) {
     roles_attr->emplace_back(item.second->attributes());
   }

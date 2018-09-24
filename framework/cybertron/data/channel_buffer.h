@@ -40,9 +40,9 @@ class ChannelBuffer {
   ChannelBuffer(uint64_t channel_id, BufferType* buffer)
       : channel_id_(channel_id), buffer_(buffer) {}
 
-  bool Fetch(uint64_t* index, std::shared_ptr<T>& m);
+  bool Fetch(uint64_t* index, std::shared_ptr<T>& m);  // NOLINT
 
-  bool Latest(std::shared_ptr<T>& m);
+  bool Latest(std::shared_ptr<T>& m);  // NOLINT
 
   bool FetchMulti(uint64_t fetch_size, std::vector<std::shared_ptr<T>>* vec);
 
@@ -55,7 +55,8 @@ class ChannelBuffer {
 };
 
 template <typename T>
-bool ChannelBuffer<T>::Fetch(uint64_t* index, std::shared_ptr<T>& m) {
+bool ChannelBuffer<T>::Fetch(uint64_t* index,
+                             std::shared_ptr<T>& m) {  // NOLINT
   std::lock_guard<std::mutex> lock(buffer_->Mutex());
   if (buffer_->Empty()) {
     return false;
@@ -77,7 +78,7 @@ bool ChannelBuffer<T>::Fetch(uint64_t* index, std::shared_ptr<T>& m) {
 }
 
 template <typename T>
-bool ChannelBuffer<T>::Latest(std::shared_ptr<T>& m) {
+bool ChannelBuffer<T>::Latest(std::shared_ptr<T>& m) {  // NOLINT
   std::lock_guard<std::mutex> lock(buffer_->Mutex());
   if (buffer_->Empty()) {
     return false;

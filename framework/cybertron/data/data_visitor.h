@@ -59,8 +59,8 @@ class DataVisitor : public DataVisitorBase {
         buffer_m0_, buffer_m1_, buffer_m2_, buffer_m3_);
   }
 
-  bool TryFetch(std::shared_ptr<M0>& m0, std::shared_ptr<M1>& m1,
-                std::shared_ptr<M2>& m2, std::shared_ptr<M3>& m3) {
+  bool TryFetch(std::shared_ptr<M0>& m0, std::shared_ptr<M1>& m1,    // NOLINT
+                std::shared_ptr<M2>& m2, std::shared_ptr<M3>& m3) {  // NOLINT
     if (data_fusion_->Fusion(&next_msg_index_, m0, m1, m2, m3)) {
       next_msg_index_++;
       return true;
@@ -100,8 +100,8 @@ class DataVisitor<M0, M1, M2, NullType> : public DataVisitorBase {
     }
   }
 
-  bool TryFetch(std::shared_ptr<M0>& m0, std::shared_ptr<M1>& m1,
-                std::shared_ptr<M2>& m2) {
+  bool TryFetch(std::shared_ptr<M0>& m0, std::shared_ptr<M1>& m1,  // NOLINT
+                std::shared_ptr<M2>& m2) {                         // NOLINT
     if (data_fusion_->Fusion(&next_msg_index_, m0, m1, m2)) {
       next_msg_index_++;
       return true;
@@ -136,7 +136,7 @@ class DataVisitor<M0, M1, NullType, NullType> : public DataVisitorBase {
     }
   }
 
-  bool TryFetch(std::shared_ptr<M0>& m0, std::shared_ptr<M1>& m1) {
+  bool TryFetch(std::shared_ptr<M0>& m0, std::shared_ptr<M1>& m1) {  // NOLINT
     if (data_fusion_->Fusion(&next_msg_index_, m0, m1)) {
       next_msg_index_++;
       return true;
@@ -166,7 +166,7 @@ class DataVisitor<M0, NullType, NullType, NullType> : public DataVisitorBase {
     data_notifier_->AddNotifier(buffer_.ChannelId(), notifier_);
   }
 
-  bool TryFetch(std::shared_ptr<M0>& m0) {
+  bool TryFetch(std::shared_ptr<M0>& m0) {  // NOLINT
     if (buffer_.Fetch(&next_msg_index_, m0)) {
       next_msg_index_++;
       return true;

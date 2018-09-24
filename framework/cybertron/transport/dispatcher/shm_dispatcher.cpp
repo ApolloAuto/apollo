@@ -43,7 +43,7 @@ void ShmDispatcher::Shutdown() {
 
 void ShmDispatcher::AddSegment(const RoleAttributes& self_attr) {
   uint64_t channel_id = self_attr.channel_id();
-  WriteLockGuard lock(segments_lock_);
+  WriteLockGuard<AtomicRWLock> lock(segments_lock_);
   if (segments_.count(channel_id) > 0) {
     return;
   }
@@ -91,7 +91,7 @@ void ShmDispatcher::ThreadFunc() {
     uint32_t block_index = readable_info.block_index();
 
     {
-      ReadLockGuard lock(segments_lock_);
+      ReadLockGuard<AtomicRWLock> lock(segments_lock_);
       if (segments_.count(channel_id) > 0) {
         if (!segments_[channel_id]->Read(block_index, msg_str_ptr.get(),
                                          &msg_info_str)) {

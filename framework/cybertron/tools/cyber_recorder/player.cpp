@@ -359,7 +359,7 @@ bool Player::GenerateTask(const SingleMessage& msg, const uint64_t& plus_time) {
 
 bool Player::Start() {
   if (!is_initialized_) {
-    AERROR << "NOT initializated";
+    AERROR << "NOT initialized";
     return false;
   }
   if (is_started_) {
@@ -367,7 +367,7 @@ bool Player::Start() {
     return false;
   }
   is_started_ = true;
-  std::cout << "\nplease wait for loading and playing back record...\n"
+  std::cout << "\nPlease wait for loading and playing back record...\n"
             << "Hit Ctrl+C to stop replay, or Space to pause.\n"
             << std::endl;
   std::ios::fmtflags before(std::cout.flags());

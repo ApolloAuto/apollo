@@ -31,9 +31,6 @@ namespace cybertron {
 namespace common {
 
 using ::apollo::cybertron::base::AtomicHashMap;
-using ::apollo::cybertron::base::AtomicRWLock;
-using ::apollo::cybertron::base::ReadLockGuard;
-using ::apollo::cybertron::base::WriteLockGuard;
 using ::apollo::cybertron::proto::CyberConfig;
 
 class GlobalData {
