@@ -57,6 +57,7 @@ class Scheduler {
   bool CreateTask(std::function<void()>&& func, const std::string& name,
                   std::shared_ptr<DataVisitorBase> visitor = nullptr);
   bool RemoveTask(const std::string& name);
+  bool NotifyTask(uint64_t task_id) const;
   void PrintStatistics();
   void ShutDown();
   static uint32_t ProcessorNum() { return processor_num_; }

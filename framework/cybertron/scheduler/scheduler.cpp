@@ -130,7 +130,13 @@ bool Scheduler::CreateTask(std::function<void()>&& func,
   return true;
 }
 
-// TODO(xinjiankang)
+bool Scheduler::NotifyTask(uint64_t task_id) const {
+  if (stop_) {
+    return true;
+  }
+  return proc_balancer_->NotifyProcessor(task_id);
+}
+
 bool Scheduler::RemoveTask(const std::string& name) {
   if (stop_) {
     return true;
