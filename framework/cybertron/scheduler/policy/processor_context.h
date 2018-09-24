@@ -90,7 +90,7 @@ class ProcessorContext {
 
 bool ProcessorContext::GetState(const uint64_t& routine_id,
                                 RoutineState* state) {
-  ReadLockGuard lg(rw_lock_);
+  ReadLockGuard<AtomicRWLock> lg(rw_lock_);
   auto it = cr_map_.find(routine_id);
   if (it != cr_map_.end()) {
     *state = it->second->State();
@@ -101,7 +101,7 @@ bool ProcessorContext::GetState(const uint64_t& routine_id,
 
 bool ProcessorContext::SetState(const uint64_t& routine_id,
                                 const RoutineState& state) {
-  ReadLockGuard lg(rw_lock_);
+  ReadLockGuard<AtomicRWLock> lg(rw_lock_);
   auto it = cr_map_.find(routine_id);
   if (it != cr_map_.end()) {
     it->second->SetState(state);

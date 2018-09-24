@@ -101,14 +101,14 @@ void ListenerHandler<MessageT>::Connect(uint64_t self_id,
   if (!connection.IsConnected()) {
     return;
   }
-  WriteLockGuard lock(rw_lock_);
+  WriteLockGuard<AtomicRWLock> lock(rw_lock_);
   signal_conns_[self_id] = connection;
 }
 
 template <typename MessageT>
 void ListenerHandler<MessageT>::Connect(uint64_t self_id, uint64_t oppo_id,
                                         const Listener& listener) {
-  WriteLockGuard lock(rw_lock_);
+  WriteLockGuard<AtomicRWLock> lock(rw_lock_);
   if (signals_.find(oppo_id) == signals_.end()) {
     signals_[oppo_id] = std::make_shared<MessageSignal>();
   }
@@ -125,7 +125,7 @@ void ListenerHandler<MessageT>::Connect(uint64_t self_id, uint64_t oppo_id,
 
 template <typename MessageT>
 void ListenerHandler<MessageT>::Disconnect(uint64_t self_id) {
-  WriteLockGuard lock(rw_lock_);
+  WriteLockGuard<AtomicRWLock> lock(rw_lock_);
   if (signal_conns_.find(self_id) == signal_conns_.end()) {
     return;
   }
@@ -135,7 +135,7 @@ void ListenerHandler<MessageT>::Disconnect(uint64_t self_id) {
 
 template <typename MessageT>
 void ListenerHandler<MessageT>::Disconnect(uint64_t self_id, uint64_t oppo_id) {
-  WriteLockGuard lock(rw_lock_);
+  WriteLockGuard<AtomicRWLock> lock(rw_lock_);
   if (signals_conns_.find(oppo_id) == signals_conns_.end()) {
     return;
   }
@@ -151,7 +151,7 @@ void ListenerHandler<MessageT>::Run(const Message& msg,
                                     const MessageInfo& msg_info) {
   signal_(msg, msg_info);
   uint64_t oppo_id = msg_info.sender_id().HashValue();
-  ReadLockGuard lock(rw_lock_);
+  ReadLockGuard<AtomicRWLock> lock(rw_lock_);
   if (signals_.find(oppo_id) == signals_.end()) {
     return;
   }

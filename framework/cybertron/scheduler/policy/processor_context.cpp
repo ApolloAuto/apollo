@@ -34,7 +34,7 @@ bool ProcessorContext::Pop(uint64_t croutine_id,
                            std::future<std::shared_ptr<CRoutine>>& fut) {
   std::promise<std::shared_ptr<CRoutine>> prom;
   fut = prom.get_future();
-  WriteLockGuard lg(rw_lock_);
+  WriteLockGuard<AtomicRWLock> lg(rw_lock_);
   if (cr_map_.erase(croutine_id) != 0) {
     pop_list_.Set(croutine_id, std::move(prom));
     return true;
@@ -44,7 +44,7 @@ bool ProcessorContext::Pop(uint64_t croutine_id,
 
 void ProcessorContext::Push(const std::shared_ptr<CRoutine>& cr) {
   {
-    WriteLockGuard lg(rw_lock_);
+    WriteLockGuard<AtomicRWLock> lg(rw_lock_);
     if (cr_map_.find(cr->Id()) != cr_map_.end() || pop_list_.Has(cr->Id())) {
       return;
     }
@@ -54,7 +54,7 @@ void ProcessorContext::Push(const std::shared_ptr<CRoutine>& cr) {
 }
 
 void ProcessorContext::RemoveCRoutine(uint64_t croutine_id) {
-  WriteLockGuard lg(rw_lock_);
+  WriteLockGuard<AtomicRWLock> lg(rw_lock_);
   auto it = cr_map_.find(croutine_id);
   if (it != cr_map_.end()) {
     it->second->Stop();
@@ -63,7 +63,7 @@ void ProcessorContext::RemoveCRoutine(uint64_t croutine_id) {
 }
 
 void ProcessorContext::NotifyProcessor(uint64_t routine_id) {
-  ReadLockGuard lg(rw_lock_);
+  ReadLockGuard<AtomicRWLock> lg(rw_lock_);
   if (cr_map_.find(routine_id) == cr_map_.end()) {
     return;
   }
@@ -95,14 +95,14 @@ void ProcessorContext::ShutDown() {
 void ProcessorContext::PrintStatistics() {}
 
 void ProcessorContext::PrintCRoutineStats() {
-  ReadLockGuard lg(rw_lock_);
+  ReadLockGuard<AtomicRWLock> lg(rw_lock_);
   for (auto it = cr_map_.begin(); it != cr_map_.end(); ++it) {
     it->second->PrintStatistics();
   }
 }
 
 void ProcessorContext::UpdateProcessStat(ProcessorStat* stat) {
-  ReadLockGuard lg(rw_lock_);
+  ReadLockGuard<AtomicRWLock> lg(rw_lock_);
   for (auto it = cr_map_.begin(); it != cr_map_.end(); ++it) {
     auto s = it->second->GetStatistics();
     stat->exec_time += s.exec_time;
