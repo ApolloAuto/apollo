@@ -395,21 +395,9 @@ Status StdPlanning::Plan(
 
   ADEBUG << "current_time_stamp: " << std::to_string(current_time_stamp);
 
-  // Navi Panner doesn't need to stitch the last path planning
-  // trajectory.Otherwise, it will cause the Dremview planning track to display
-  // flashing or bouncing
   if (FLAGS_enable_stitch_last_trajectory) {
     last_publishable_trajectory_->PrependTrajectoryPoints(
         stitching_trajectory.begin(), stitching_trajectory.end() - 1);
-  }
-
-  for (size_t i = 0; i < last_publishable_trajectory_->NumOfPoints(); ++i) {
-    if (last_publishable_trajectory_->TrajectoryPointAt(i).relative_time() >
-        FLAGS_trajectory_time_high_density_period) {
-      break;
-    }
-    ADEBUG << last_publishable_trajectory_->TrajectoryPointAt(i)
-                  .ShortDebugString();
   }
 
   last_publishable_trajectory_->PopulateTrajectoryProtobuf(trajectory_pb);
