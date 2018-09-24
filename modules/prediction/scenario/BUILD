@@ -11,6 +11,7 @@ cc_library(
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/math:geometry",
         "//modules/prediction/proto:prediction_conf_proto",
+        "//modules/prediction/common:prediction_gflags",
         "//modules/prediction/container:container_manager",
         "//modules/prediction/scenario/analyzer:scenario_analyzer",
         "//modules/prediction/scenario/feature_extractor:feature_extractor",

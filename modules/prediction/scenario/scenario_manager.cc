@@ -21,6 +21,7 @@
 
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/math/vec2d.h"
+#include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/container/container_manager.h"
 #include "modules/prediction/container/obstacles/obstacles_container.h"
 
@@ -35,7 +36,9 @@ ScenarioManager::ScenarioManager() {}
 void ScenarioManager::Run() {
   feature_extractor_.ExtractFeatures();
   scenario_analyzer_.Analyze(feature_extractor_.GetEnvironmentFeatures());
-  PrioritizeObstacles();
+  if (FLAGS_enable_prioritize_obstacles) {
+    PrioritizeObstacles();
+  }
   // TODO(all) other functionalities including lane, junction filters
 }
 

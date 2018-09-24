@@ -47,6 +47,7 @@ DECLARE_double(junction_search_radius);
 
 // Scenario
 DECLARE_double(junction_distance_threshold);
+DECLARE_bool(enable_prioritize_obstacles);
 
 // Obstacle features
 DECLARE_bool(enable_kf_tracking);
