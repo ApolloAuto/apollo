@@ -65,6 +65,8 @@ DEFINE_double(junction_search_radius, 1.0, "Search radius for a junction");
 // Scenario
 DEFINE_double(junction_distance_threshold, 10.0, "Distance threshold "
               "to junction to consider as junction scenario");
+DEFINE_bool(enable_prioritize_obstacles, false,
+            "If to enable the functionality to prioritize obstacles");
 
 // Obstacle features
 DEFINE_bool(enable_kf_tracking, false, "Use measurements with KF tracking");
