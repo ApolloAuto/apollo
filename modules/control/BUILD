@@ -45,18 +45,18 @@ cc_binary(
     linkshared = True,
 )
 
-#cc_test(
-#    name = "control_test",
-#    size = "small",
-#    srcs = [
-#        "control_test.cc",
-#    ],
-#    data = ["//modules/control:control_testdata"],
-#    deps = [
-#        ":control_lib",
-#        "@gtest//:main",
-#    ],
-#)
+cc_test(
+    name = "control_test",
+    size = "small",
+    srcs = [
+        "control_test.cc",
+    ],
+    data = ["//modules/control:control_testdata"],
+    deps = [
+        ":control_component_lib",
+        "@gtest//:main",
+    ],
+)
 
 filegroup(
     name = "control_testdata",

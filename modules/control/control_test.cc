@@ -33,16 +33,12 @@ class ControlTest : public ::testing::Test {
   virtual void SetUp() {}
 
  protected:
-  Control control_;
+  ControlComponent control_;
 };
-
-TEST_F(ControlTest, Name) { EXPECT_EQ("control", control_.Name()); }
 
 TEST_F(ControlTest, Init) {
   FLAGS_control_conf_file = "modules/control/testdata/conf/lincoln.pb.txt";
-  FLAGS_control_adapter_config_filename =
-      "modules/control/testdata/conf/adapter.conf";
-  EXPECT_EQ(common::Status::OK(), control_.Init());
+  EXPECT_EQ(true, control_.Init());
 }
 
 }  // namespace control
