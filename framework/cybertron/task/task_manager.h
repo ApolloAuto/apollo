@@ -21,7 +21,7 @@
 #include <string>
 
 #include "cybertron/base/bounded_queue.h"
-#include "cybertron/scheduler/proc_balancer.h"
+#include "cybertron/scheduler/scheduler.h"
 
 namespace apollo {
 namespace cybertron {
@@ -38,7 +38,7 @@ class TaskManager {
         std::bind(std::forward<F>(func), std::forward<Args>(args)...));
     task_queue_->Enqueue([task]() { (*task)(); });
     for (auto& task : tasks_) {
-      scheduler::ProcBalancer::Instance()->NotifyProcessor(task);
+      scheduler::Scheduler::Instance()->NotifyTask(task);
     }
     std::future<return_type> res(task->get_future());
     return res;
