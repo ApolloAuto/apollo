@@ -74,13 +74,6 @@ SimControl::SimControl(const MapService* map_service)
   InitTimerAndIO();
 }
 
-void SimControl::Init(bool set_start_point, double start_velocity,
-                      double start_acceleration) {
-  if (set_start_point && !FLAGS_use_navigation_mode) {
-    InitStartPoint(start_velocity, start_acceleration);
-  }
-}
-
 void SimControl::InitTimerAndIO() {
   localization_reader_ =
       node_->CreateReader<LocalizationEstimate>(FLAGS_localization_topic);
@@ -102,7 +95,6 @@ void SimControl::InitTimerAndIO() {
   prediction_reader_ = node_->CreateReader<PredictionObstacles>(
       FLAGS_navigation_topic,
       [this](const std::shared_ptr<PredictionObstacles>& obstacles) {
-        std::unique_lock<std::mutex> lock(mutex_);
         this->OnPredictionObstacles(obstacles);
       });
 
@@ -118,6 +110,13 @@ void SimControl::InitTimerAndIO() {
   sim_prediction_timer_.reset(new cybertron::Timer(
       kSimPredictionIntervalMs, [this]() { this->PublishDummyPrediction(); },
       false));
+}
+
+void SimControl::Init(bool set_start_point, double start_velocity,
+                      double start_acceleration) {
+  if (set_start_point && !FLAGS_use_navigation_mode) {
+    InitStartPoint(start_velocity, start_acceleration);
+  }
 }
 
 void SimControl::InitStartPoint(double start_velocity,
