@@ -45,6 +45,11 @@ cc_binary(
     linkshared = True,
 )
 
-
+filegroup(
+    name = "control_testdata",
+    srcs = glob([
+        "testdata/**",
+    ]),
+)
 
 cpplint()
