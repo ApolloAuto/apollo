@@ -18,10 +18,10 @@
 #include <string>
 #include <utility>
 
+#include "cybertron/common/log.h"
 #include "gmock/gmock.h"
 #include "google/protobuf/text_format.h"
 #include "gtest/gtest.h"
-#include "cybertron/common/log.h"
 
 #include "modules/common/time/time.h"
 #include "modules/common/util/util.h"
@@ -39,7 +39,6 @@ class MPCControllerTest : public ControlTestBase {
     FLAGS_test_data_dir = "modules/control/testdata/mpc_controller_test/";
     FLAGS_control_conf_file =
         "modules/control/testdata/mpc_controller_test/lincoln.pb.txt";
-
     FLAGS_use_navigation_mode = false;
   }
 };
