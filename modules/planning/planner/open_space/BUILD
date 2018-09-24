@@ -157,4 +157,21 @@ cc_test(
     ],
 )
 
+cc_library(
+    name = "hybrid_a_star",
+    srcs = [
+        "hybrid_a_star.cc",
+    ],
+    hdrs = [
+        "hybrid_a_star.h",
+    ],
+    deps = [
+        "//framework:cybertron",
+        "//modules/planning/common:obstacle",
+        "//modules/common/configs:vehicle_config_helper",
+        "//modules/planning/proto:planner_open_space_config_proto",
+        "//modules/planning/open_space:node3d",
+    ],
+)
+
 cpplint()
