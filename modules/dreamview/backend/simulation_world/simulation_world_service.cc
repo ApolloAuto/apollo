@@ -16,7 +16,6 @@
 
 #include "modules/dreamview/backend/simulation_world/simulation_world_service.h"
 
-#include <algorithm>
 #include <chrono>
 #include <unordered_set>
 #include <vector>
@@ -335,6 +334,7 @@ void SimulationWorldService::Update() {
   }
 
   UpdateDelays();
+  UpdateLatencies();
 
   world_.set_sequence_num(world_.sequence_num() + 1);
   world_.set_timestamp(apollo::common::time::AsInt64<millis>(Clock::Now()));
@@ -351,6 +351,15 @@ void SimulationWorldService::UpdateDelays() {
   delays->set_traffic_light(
       SecToMs(perception_traffic_light_reader_->GetDelaySec()));
   delays->set_control(SecToMs(control_command_reader_->GetDelaySec()));
+}
+
+void SimulationWorldService::UpdateLatencies() {
+  UpdateLatency("chassis", chassis_reader_.get());
+  UpdateLatency("localization", localization_reader_.get());
+  UpdateLatency("perception", perception_obstacle_reader_.get());
+  UpdateLatency("planning", planning_reader_.get());
+  UpdateLatency("prediction", prediction_obstacle_reader_.get());
+  UpdateLatency("control", control_command_reader_.get());
 }
 
 void SimulationWorldService::GetWireFormatString(

@@ -19,6 +19,7 @@
 #include <iostream>
 #include "gtest/gtest.h"
 
+#include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/quaternion.h"
 
@@ -53,6 +54,8 @@ class SimulationWorldServiceTest : public ::testing::Test {
         "modules/dreamview/backend/testdata/routing.pb.txt";
     apollo::common::VehicleConfigHelper::Init();
     sim_world_service_.reset(new SimulationWorldService(map_service_.get()));
+
+    SetupCybertron();
   }
 
  protected:
@@ -62,10 +65,28 @@ class SimulationWorldServiceTest : public ::testing::Test {
     FLAGS_sim_world_with_routing_path = true;
     map_service_.reset(new MapService(false));
   }
+  void SetupCybertron();
 
   std::unique_ptr<SimulationWorldService> sim_world_service_;
   std::unique_ptr<MapService> map_service_;
+
+  bool is_cybertron_initialized_ = false;
+  std::shared_ptr<cybertron::Writer<apollo::control::ControlCommand>>
+      control_writer_;
 };
+
+void SimulationWorldServiceTest::SetupCybertron() {
+  if (is_cybertron_initialized_) {
+    return;
+  }
+
+  std::unique_ptr<cybertron::Node> node =
+      cybertron::CreateNode("sim_world_service_test");
+  control_writer_ = node->CreateWriter<apollo::control::ControlCommand>(
+      FLAGS_control_command_topic);
+
+  is_cybertron_initialized_ = true;
+}
 
 TEST_F(SimulationWorldServiceTest, UpdateMonitorSuccess) {
   MonitorMessage monitor;
@@ -575,6 +596,26 @@ TEST_F(SimulationWorldServiceTest, DownsampleSpeedPointsByInterval) {
     EXPECT_DOUBLE_EQ(kept_index[i] * 1.2, point.t());
     EXPECT_DOUBLE_EQ(kept_index[i] * 1.3, point.v());
   }
+}
+
+TEST_F(SimulationWorldServiceTest, UpdateLatency) {
+  std::shared_ptr<apollo::control::ControlCommand> control_command =
+      std::make_shared<apollo::control::ControlCommand>();
+  auto* header = control_command->mutable_header();
+  header->set_timestamp_sec(2000.9);
+  header->set_radar_timestamp(2000 * 1e9);
+  header->set_lidar_timestamp(2000.1 * 1e9);
+  header->set_camera_timestamp(2000.2 * 1e9);
+  control_writer_->Write(control_command);
+
+  BlockerManager::Instance()->Observe();
+  sim_world_service_->UpdateLatency(
+      "control", sim_world_service_->control_command_reader_.get());
+
+  EXPECT_EQ(1, sim_world_service_->world_.latency_size());
+  const Latency latency = sim_world_service_->world_.latency().at("control");
+  EXPECT_DOUBLE_EQ(2000.9, latency.timestamp_sec());
+  EXPECT_NEAR(0.7 * 1e3, latency.total_time_ms(), kEpsilon);
 }
 
 }  // namespace dreamview

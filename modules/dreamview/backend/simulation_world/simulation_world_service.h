@@ -21,6 +21,7 @@
 #ifndef MODULES_DREAMVIEW_BACKEND_SIMULATION_WORLD_SIM_WORLD_H_
 #define MODULES_DREAMVIEW_BACKEND_SIMULATION_WORLD_SIM_WORLD_H_
 
+#include <algorithm>
 #include <functional>
 #include <list>
 #include <memory>
@@ -250,7 +251,29 @@ class SimulationWorldService {
 
   void ReadRoutingFromFile(const std::string &routing_response_file);
 
+  template <typename MessageT>
+  void UpdateLatency(const std::string module_name,
+                     cybertron::Reader<MessageT> *reader) {
+    if (reader->Empty()) {
+      return;
+    }
+
+    const auto header = reader->GetLatestObserved()->header();
+    const double publish_time_sec = header.timestamp_sec();
+    const double sensor_time_sec =
+        apollo::cybertron::Time(
+            std::max({header.lidar_timestamp(), header.camera_timestamp(),
+                      header.radar_timestamp()}))
+            .ToSecond();
+
+    Latency latency;
+    latency.set_timestamp_sec(publish_time_sec);
+    latency.set_total_time_ms((publish_time_sec - sensor_time_sec) * 1.0e3);
+    (*world_.mutable_latency())[module_name] = latency;
+  }
+
   void UpdateDelays();
+  void UpdateLatencies();
 
   template <typename Points>
   void DownsampleSpeedPointsByInterval(const Points &points,
@@ -346,6 +369,7 @@ class SimulationWorldService {
   FRIEND_TEST(SimulationWorldServiceTest, UpdateMonitorRemove);
   FRIEND_TEST(SimulationWorldServiceTest, UpdateMonitorTruncate);
   FRIEND_TEST(SimulationWorldServiceTest, UpdateChassisInfo);
+  FRIEND_TEST(SimulationWorldServiceTest, UpdateLatency);
   FRIEND_TEST(SimulationWorldServiceTest, UpdateLocalization);
   FRIEND_TEST(SimulationWorldServiceTest, UpdatePerceptionObstacles);
   FRIEND_TEST(SimulationWorldServiceTest, UpdatePlanningTrajectory);
