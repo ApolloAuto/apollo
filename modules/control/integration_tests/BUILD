@@ -21,43 +21,43 @@ cc_library(
     ],
 )
 
-#cc_test(
-#    name = "simple_control_test",
-#    size = "small",
-#    srcs = [
-#        "simple_control_test.cc",
-#    ],
-#    data = ["//modules/control/testdata:control_testdata"],
-#    deps = [
-#        ":control_test_base",
-#        "@gtest//:gtest",
-#    ],
-#)
-#
-#cc_test(
-#    name = "relative_position_test",
-#    size = "small",
-#    srcs = [
-#        "relative_position_test.cc",
-#    ],
-#    data = ["//modules/control/testdata:control_testdata"],
-#    deps = [
-#        ":control_test_base",
-#        "@gtest//:gtest",
-#    ],
-#)
-#
-#cc_test(
-#    name = "mpc_controller_test",
-#    size = "small",
-#    srcs = [
-#        "mpc_controller_test.cc",
-#    ],
-#    data = ["//modules/control/testdata:control_testdata"],
-#    deps = [
-#        ":control_test_base",
-#        "@gtest//:gtest",
-#    ],
-#)
+cc_test(
+    name = "simple_control_test",
+    size = "small",
+    srcs = [
+        "simple_control_test.cc",
+    ],
+    data = ["//modules/control:control_testdata"],
+    deps = [
+        ":control_test_base",
+        "@gtest//:gtest",
+    ],
+)
+
+cc_test(
+    name = "relative_position_test",
+    size = "small",
+    srcs = [
+        "relative_position_test.cc",
+    ],
+    data = ["//modules/control:control_testdata"],
+    deps = [
+        ":control_test_base",
+        "@gtest//:gtest",
+    ],
+)
+
+cc_test(
+    name = "mpc_controller_test",
+    size = "small",
+    srcs = [
+        "mpc_controller_test.cc",
+    ],
+    data = ["//modules/control:control_testdata"],
+    deps = [
+        ":control_test_base",
+        "@gtest//:gtest",
+    ],
+)
 
 cpplint()
