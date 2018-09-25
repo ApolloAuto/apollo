@@ -13,10 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include <gtest/gtest.h>
+#include "modules/perception/base/object_pool.h"
 #include "modules/perception/base/light_object_pool.h"
 #include "modules/perception/base/object.h"
 #include "modules/perception/base/object_pool_types.h"
+
+#include "gtest/gtest.h"
 
 namespace apollo {
 namespace perception {
@@ -33,7 +35,7 @@ TEST(ObjectPoolTest, basic_test) {
 
 TEST(ObjectPoolTest, dummy_object_pool_test) {
   typedef DummyObjectPool<Object> TestObjectPool;
-  ObjectPtr obj = TestObjectPool::Instance().Get();
+  std::shared_ptr<Object> obj = TestObjectPool::Instance().Get();
   EXPECT_NE(obj, nullptr);
   TestObjectPool::Instance().set_capacity(10);
   EXPECT_EQ(TestObjectPool::Instance().get_capacity(), 0);
@@ -41,7 +43,7 @@ TEST(ObjectPoolTest, dummy_object_pool_test) {
 
   obj->id = 0;
   // vector test
-  std::vector<ObjectPtr> objects_vector;
+  std::vector<std::shared_ptr<Object>> objects_vector;
   objects_vector.push_back(obj);
   EXPECT_EQ(objects_vector.size(), 1);
   TestObjectPool::Instance().BatchGet(5, &objects_vector);
@@ -51,7 +53,7 @@ TEST(ObjectPoolTest, dummy_object_pool_test) {
     EXPECT_EQ(objects_vector[i]->id, -1);
   }
   // list test
-  std::list<ObjectPtr> objects_list;
+  std::list<std::shared_ptr<Object>> objects_list;
   objects_list.push_front(obj);
   EXPECT_EQ(objects_list.size(), 1);
   TestObjectPool::Instance().BatchGet(2, true, &objects_list);
@@ -62,7 +64,7 @@ TEST(ObjectPoolTest, dummy_object_pool_test) {
   objects_list.pop_front();
   EXPECT_EQ(objects_list.front()->id, 0);
   // dequeue test
-  std::deque<ObjectPtr> objects_dequeue;
+  std::deque<std::shared_ptr<Object>> objects_dequeue;
   objects_dequeue.push_front(obj);
   EXPECT_EQ(objects_dequeue.size(), 1);
   TestObjectPool::Instance().BatchGet(2, true, &objects_dequeue);
@@ -99,7 +101,7 @@ TEST(ObjectPoolTest, concurrent_object_pool_get_test) {
   EXPECT_EQ(instance.RemainedNum(), 0);
 #endif
   {
-    ObjectPtr obj = instance.Get();
+    std::shared_ptr<Object> obj = instance.Get();
     EXPECT_NE(obj, nullptr);
   }
 #ifndef PERCEPTION_BASE_DISABLE_POOL
@@ -118,12 +120,12 @@ TEST(ObjectPoolTest, concurrent_object_pool_batch_get_vec_test) {
   }
   EXPECT_EQ(instance.RemainedNum(), 1);
 #endif
-  ObjectPtr obj = instance.Get();
+  std::shared_ptr<Object> obj = instance.Get();
   EXPECT_NE(obj, nullptr);
   obj->id = 0;
   // vector test
   {
-    std::vector<ObjectPtr> objects_vector;
+    std::vector<std::shared_ptr<Object>> objects_vector;
     objects_vector.push_back(obj);
     EXPECT_EQ(objects_vector.size(), 1);
     TestObjectPool::Instance().BatchGet(5, &objects_vector);
@@ -149,12 +151,12 @@ TEST(ObjectPoolTest, concurrent_object_pool_batch_get_list_test) {
   }
   EXPECT_EQ(instance.RemainedNum(), 1);
 #endif
-  ObjectPtr obj = instance.Get();
+  std::shared_ptr<Object> obj = instance.Get();
   EXPECT_NE(obj, nullptr);
   obj->id = 0;
   // list test
   {
-    std::list<ObjectPtr> objects_list;
+    std::list<std::shared_ptr<Object>> objects_list;
     objects_list.push_front(obj);
     EXPECT_EQ(objects_list.size(), 1);
     TestObjectPool::Instance().BatchGet(2, true, &objects_list);
@@ -181,12 +183,12 @@ TEST(ObjectPoolTest, concurrent_object_pool_batch_get_deque_test) {
   }
   EXPECT_EQ(instance.RemainedNum(), 1);
 #endif
-  ObjectPtr obj = instance.Get();
+  std::shared_ptr<Object> obj = instance.Get();
   EXPECT_NE(obj, nullptr);
   obj->id = 0;
   // dequeue test
   {
-    std::deque<ObjectPtr> objects_dequeue;
+    std::deque<std::shared_ptr<Object>> objects_dequeue;
     objects_dequeue.push_front(obj);
     EXPECT_EQ(objects_dequeue.size(), 1);
     TestObjectPool::Instance().BatchGet(2, true, &objects_dequeue);
@@ -222,17 +224,17 @@ TEST(ObjectPoolTest, concurrent_object_pool_initializer_test) {
   {
     typedef ConcurrentObjectPool<Object, 10, TestObjectPoolInitializer>
         TestObjectPool;
-    ObjectPtr ptr = TestObjectPool::Instance().Get();
+    std::shared_ptr<Object> ptr = TestObjectPool::Instance().Get();
     EXPECT_EQ(ptr->id, 1);
     {
-      std::vector<ObjectPtr> object_vec;
+      std::vector<std::shared_ptr<Object>> object_vec;
       TestObjectPool::Instance().BatchGet(2, &object_vec);
       for (auto& ptr : object_vec) {
         EXPECT_EQ(ptr->id, 1);
       }
     }
     {
-      std::list<ObjectPtr> object_list;
+      std::list<std::shared_ptr<Object>> object_list;
       TestObjectPool::Instance().BatchGet(2, true, &object_list);
       TestObjectPool::Instance().BatchGet(2, false, &object_list);
       for (auto& ptr : object_list) {
@@ -240,7 +242,7 @@ TEST(ObjectPoolTest, concurrent_object_pool_initializer_test) {
       }
     }
     {
-      std::deque<ObjectPtr> object_deque;
+      std::deque<std::shared_ptr<Object>> object_deque;
       TestObjectPool::Instance().BatchGet(2, true, &object_deque);
       TestObjectPool::Instance().BatchGet(2, false, &object_deque);
       for (auto& ptr : object_deque) {
@@ -251,17 +253,17 @@ TEST(ObjectPoolTest, concurrent_object_pool_initializer_test) {
 #endif
   {
     typedef ConcurrentObjectPool<Object> TestObjectPool;
-    ObjectPtr ptr = TestObjectPool::Instance().Get();
+    std::shared_ptr<Object> ptr = TestObjectPool::Instance().Get();
     EXPECT_EQ(ptr->id, -1);
     {
-      std::vector<ObjectPtr> object_vec;
+      std::vector<std::shared_ptr<Object>> object_vec;
       TestObjectPool::Instance().BatchGet(2, &object_vec);
       for (auto& ptr : object_vec) {
         EXPECT_EQ(ptr->id, -1);
       }
     }
     {
-      std::list<ObjectPtr> object_list;
+      std::list<std::shared_ptr<Object>> object_list;
       TestObjectPool::Instance().BatchGet(2, true, &object_list);
       TestObjectPool::Instance().BatchGet(2, false, &object_list);
       for (auto& ptr : object_list) {
@@ -269,7 +271,7 @@ TEST(ObjectPoolTest, concurrent_object_pool_initializer_test) {
       }
     }
     {
-      std::deque<ObjectPtr> object_deque;
+      std::deque<std::shared_ptr<Object>> object_deque;
       TestObjectPool::Instance().BatchGet(2, true, &object_deque);
       TestObjectPool::Instance().BatchGet(2, false, &object_deque);
       for (auto& ptr : object_deque) {
@@ -280,14 +282,18 @@ TEST(ObjectPoolTest, concurrent_object_pool_initializer_test) {
 }
 
 TEST(ObjectPoolTest, light_object_pool_capacity_test) {
-  typedef LightObjectPool<Object> TestObjectPool;
+  typedef LightObjectPool<Object, kPoolDefaultSize, TestObjectPoolInitializer>
+      TestObjectPool;
+  /*
   size_t capacity = TestObjectPool::Instance().RemainedNum();
   TestObjectPool::Instance().set_capacity(capacity - 10);
   EXPECT_EQ(TestObjectPool::Instance().RemainedNum(), capacity);
   TestObjectPool::Instance().set_capacity(capacity + 10);
   EXPECT_EQ(TestObjectPool::Instance().RemainedNum(), capacity + 10);
+  */
 }
 
+/*
 TEST(ObjectPoolTest, light_object_pool_get_test) {
   typedef LightObjectPool<Object> TestObjectPool;
   auto& instance = TestObjectPool::Instance();
@@ -298,7 +304,7 @@ TEST(ObjectPoolTest, light_object_pool_get_test) {
   }
   EXPECT_EQ(instance.RemainedNum(), 0);
   {
-    ObjectPtr obj = instance.Get();
+    std::shared_ptr<Object> obj = instance.Get();
     EXPECT_NE(obj, nullptr);
   }
   EXPECT_GE(instance.RemainedNum(), 1);
@@ -313,12 +319,12 @@ TEST(ObjectPoolTest, light_object_pool_batch_get_vec_test) {
     memory.push_back(instance.Get());
   }
   EXPECT_EQ(instance.RemainedNum(), 1);
-  ObjectPtr obj = instance.Get();
+  std::shared_ptr<Object> obj = instance.Get();
   EXPECT_NE(obj, nullptr);
   obj->id = 0;
   // vector test
   {
-    std::vector<ObjectPtr> objects_vector;
+    std::vector<std::shared_ptr<Object>> objects_vector;
     objects_vector.push_back(obj);
     EXPECT_EQ(objects_vector.size(), 1);
     TestObjectPool::Instance().BatchGet(5, &objects_vector);
@@ -340,12 +346,12 @@ TEST(ObjectPoolTest, light_object_pool_batch_get_list_test) {
     memory.push_back(instance.Get());
   }
   EXPECT_EQ(instance.RemainedNum(), 1);
-  ObjectPtr obj = instance.Get();
+  std::shared_ptr<Object> obj = instance.Get();
   EXPECT_NE(obj, nullptr);
   obj->id = 0;
   // list test
   {
-    std::list<ObjectPtr> objects_list;
+    std::list<std::shared_ptr<Object>> objects_list;
     objects_list.push_front(obj);
     EXPECT_EQ(objects_list.size(), 1);
     TestObjectPool::Instance().BatchGet(2, true, &objects_list);
@@ -368,12 +374,12 @@ TEST(ObjectPoolTest, light_object_pool_batch_get_deque_test) {
     memory.push_back(instance.Get());
   }
   EXPECT_EQ(instance.RemainedNum(), 1);
-  ObjectPtr obj = instance.Get();
+  std::shared_ptr<Object> obj = instance.Get();
   EXPECT_NE(obj, nullptr);
   obj->id = 0;
   // dequeue test
   {
-    std::deque<ObjectPtr> objects_dequeue;
+    std::deque<std::shared_ptr<Object>> objects_dequeue;
     objects_dequeue.push_front(obj);
     EXPECT_EQ(objects_dequeue.size(), 1);
     TestObjectPool::Instance().BatchGet(2, true, &objects_dequeue);
@@ -400,17 +406,17 @@ TEST(ObjectPoolTest, light_object_pool_initializer_test) {
   {
     typedef LightObjectPool<Object, 10, TestObjectPoolInitializer>
         TestObjectPool;
-    ObjectPtr ptr = TestObjectPool::Instance().Get();
+    std::shared_ptr<Object> ptr = TestObjectPool::Instance().Get();
     EXPECT_EQ(ptr->id, 1);
     {
-      std::vector<ObjectPtr> object_vec;
+      std::vector<std::shared_ptr<Object>> object_vec;
       TestObjectPool::Instance().BatchGet(2, &object_vec);
       for (auto& ptr : object_vec) {
         EXPECT_EQ(ptr->id, 1);
       }
     }
     {
-      std::list<ObjectPtr> object_list;
+      std::list<std::shared_ptr<Object>> object_list;
       TestObjectPool::Instance().BatchGet(2, true, &object_list);
       TestObjectPool::Instance().BatchGet(2, false, &object_list);
       for (auto& ptr : object_list) {
@@ -418,7 +424,7 @@ TEST(ObjectPoolTest, light_object_pool_initializer_test) {
       }
     }
     {
-      std::deque<ObjectPtr> object_deque;
+      std::deque<std::shared_ptr<Object>> object_deque;
       TestObjectPool::Instance().BatchGet(2, true, &object_deque);
       TestObjectPool::Instance().BatchGet(2, false, &object_deque);
       for (auto& ptr : object_deque) {
@@ -428,17 +434,17 @@ TEST(ObjectPoolTest, light_object_pool_initializer_test) {
   }
   {
     typedef LightObjectPool<Object> TestObjectPool;
-    ObjectPtr ptr = TestObjectPool::Instance().Get();
+    std::shared_ptr<Object> ptr = TestObjectPool::Instance().Get();
     EXPECT_EQ(ptr->id, -1);
     {
-      std::vector<ObjectPtr> object_vec;
+      std::vector<std::shared_ptr<Object>> object_vec;
       TestObjectPool::Instance().BatchGet(2, &object_vec);
       for (auto& ptr : object_vec) {
         EXPECT_EQ(ptr->id, -1);
       }
     }
     {
-      std::list<ObjectPtr> object_list;
+      std::list<std::shared_ptr<Object>> object_list;
       TestObjectPool::Instance().BatchGet(2, true, &object_list);
       TestObjectPool::Instance().BatchGet(2, false, &object_list);
       for (auto& ptr : object_list) {
@@ -446,7 +452,7 @@ TEST(ObjectPoolTest, light_object_pool_initializer_test) {
       }
     }
     {
-      std::deque<ObjectPtr> object_deque;
+      std::deque<std::shared_ptr<Object>> object_deque;
       TestObjectPool::Instance().BatchGet(2, true, &object_deque);
       TestObjectPool::Instance().BatchGet(2, false, &object_deque);
       for (auto& ptr : object_deque) {
@@ -455,6 +461,7 @@ TEST(ObjectPoolTest, light_object_pool_initializer_test) {
     }
   }
 }
+*/
 
 }  // namespace base
 }  // namespace perception

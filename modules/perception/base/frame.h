@@ -15,11 +15,12 @@
  *****************************************************************************/
 #ifndef MODULES_PERCEPTION_BASE_FRAME_H_
 #define MODULES_PERCEPTION_BASE_FRAME_H_
-#include <Eigen/Dense>
 
 #include <memory>
 #include <string>
 #include <vector>
+
+#include "Eigen/Dense"
 
 #include "modules/perception/base/frame_supplement.h"
 #include "modules/perception/base/object.h"
@@ -46,7 +47,7 @@ struct alignas(16) Frame {
   SensorInfo sensor_info;
 
   double timestamp = 0.0;
-  std::vector<ObjectPtr> objects;
+  std::vector<std::shared_ptr<Object>> objects;
   Eigen::Affine3d sensor2world_pose;
 
   // sensor-specific frame supplements

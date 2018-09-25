@@ -41,14 +41,14 @@ enum class TLDetectionClass {
 //@brief Light Region in the Image
 struct LightRegion {
   // roi is marked by map & projection, it may be too large or not accuracy.
-  base::RectI projection_roi;
-  base::RectI crop_roi;
+  Rect<int> projection_roi;
+  Rect<int> crop_roi;
   bool outside_image = false;
 
-  std::vector<base::RectI> debug_roi;
+  std::vector<Rect<int>> debug_roi;
   std::vector<float> debug_roi_detect_scores;
 
-  base::RectI detection_roi;
+  Rect<int> detection_roi;
   bool is_detected = false;
   bool is_selected = false;
   TLDetectionClass detect_class_id = TLDetectionClass::TL_UNKNOWN_CLASS;

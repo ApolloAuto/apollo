@@ -15,10 +15,13 @@
  *****************************************************************************/
 #ifndef MODULES_PERCEPTION_BASE_LIGHT_OBJECT_POOL_H_
 #define MODULES_PERCEPTION_BASE_LIGHT_OBJECT_POOL_H_
+
 #include <deque>
 #include <list>
+#include <memory>
 #include <queue>
 #include <vector>
+
 #include "modules/perception/base/concurrent_object_pool.h"
 #include "modules/perception/base/sensor_meta.h"
 
@@ -33,7 +36,7 @@ template <class ObjectType, size_t N = kPoolDefaultSize,
           SensorType sensor_type = SensorType::UNKNOWN_SENSOR_TYPE>
 class LightObjectPool : public BaseObjectPool<ObjectType> {
  public:
-  using typename BaseObjectPool<ObjectType>::ObjectTypePtr;
+  using ObjectTypePtr = typename BaseObjectPool<ObjectType>::ObjectTypePtr;
   using BaseObjectPool<ObjectType>::capacity_;
   // @brief Only allow accessing from global instance
   static LightObjectPool& Instance() {

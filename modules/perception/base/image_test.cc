@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+#include "modules/perception/base/image.h"
 #include <gtest/gtest.h>
 #include <limits>
 #include <vector>
-#include "modules/perception/base/image.h"
 
 namespace apollo {
 namespace perception {
@@ -52,7 +52,7 @@ TEST(ImageTest, image8u_test) {
       EXPECT_EQ(image.total(), 75);
       EXPECT_EQ(image.type(), Color::RGB);
 
-      RectI roi(0, 1, 2, 3);
+      Rect<int> roi(0, 1, 2, 3);
       Image8U image_roi = image(roi);
       EXPECT_EQ(image_roi.cpu_ptr(0)[0], 15);
       EXPECT_EQ(image_roi.cpu_ptr(0)[1], 16);
@@ -93,7 +93,7 @@ TEST(ImageTest, image8u_test) {
     image_shared = Image8U();
     image_assigned = Image8U();
 
-    RectI roi(0, 1, 2, 3);
+    Rect<int> roi(0, 1, 2, 3);
     Image8U image_roi = image(roi);
     EXPECT_EQ(blob.use_count(), 3);
     EXPECT_EQ(image_roi.cpu_ptr(0)[0], 15);
