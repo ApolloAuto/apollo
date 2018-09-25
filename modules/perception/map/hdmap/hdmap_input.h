@@ -13,26 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+
 #ifndef MODULES_PERCEPTION_MAP_HDMAP_HDMAP_INPUT_H_
 #define MODULES_PERCEPTION_MAP_HDMAP_HDMAP_INPUT_H_
+
 #include <gflags/gflags.h>
+#include <memory>
 // #include <hdmap.h>
 #include <string>
 #include <vector>
 #include "modules/perception/base/hdmap_struct.h"
-#include "modules/perception/base/point_cloud_types.h"
+// #include "modules/perception/base/point_cloud_types.h"
 #include "modules/perception/lib/singleton/singleton.h"
-#include "modules/perception/lib/thread/mutex.h"
+// #include "modules/perception/lib/thread/mutex.h"
+
 namespace apollo {
 namespace perception {
 namespace map {
+
 class HDMapInput {
  public:
   // thread safe
   bool Init();
   bool Reset();
   bool GetRoiHDMapStruct(const base::PointD& pointd, const double distance,
-                         base::HdmapStructPtr hdmap_struct_prt);
+                         std::shared_ptr<base::HdmapStruct> hdmap_struct_prt);
   bool GetNearestLaneDirection(const base::PointD& pointd,
                                Eigen::Vector3d* lane_direction);
   //   bool GetSignals(const Eigen::Vector3d& pointd,
@@ -51,27 +56,34 @@ class HDMapInput {
   //       std::vector<base::RoadBoundary>* road_boundaries_ptr,
   //       std::vector<base::PolygonDType>* road_polygons_ptr,
   //       std::vector<base::PolygonDType>* junction_polygons_ptr);
+
   bool GetRoadBoundaryFilteredByJunctions(
       const std::vector<base::RoadBoundary>& road_boundaries,
-      const std::vector<base::PolygonDType>& junctions,
+      const std::vector<base::PointCloud<base::PointD>>& junctions,
       std::vector<base::RoadBoundary>* flt_road_boundaries_ptr);
-  void DownsamplePoints(const base::PointDCloudPtr& raw_cloud_ptr,
-                        base::PolygonDType* polygon_ptr,
-                        int min_points_num_for_sample = 15) const;
-  void SplitBoundary(const base::PolygonDType& boundary_line,
-                     const std::vector<base::PolygonDType>& junctions,
-                     std::vector<base::PolygonDType>* boundary_line_vec_ptr);
+
+  void DownsamplePoints(
+      const std::shared_ptr<base::PointCloud<base::PointD>>& raw_cloud_ptr,
+      base::PointCloud<base::PointD>* polygon_ptr,
+      int min_points_num_for_sample = 15) const;
+
+  void SplitBoundary(
+      const base::PointCloud<base::PointD>& boundary_line,
+      const std::vector<base::PointCloud<base::PointD>>& junctions,
+      std::vector<base::PointCloud<base::PointD>>* boundary_line_vec_ptr);
   //   bool GetSignalsFromHDMap(const Eigen::Vector3d& pointd,
   //     double forward_distance,
   //     std::vector<adu::common::hdmap::Signal>* signals);
   bool inited_ = false;
-  lib::Mutex mutex_;
+  // lib::Mutex mutex_;
   //   std::unique_ptr<adu::hdmap::HDMap> hdmap_;
   //   int hdmap_sample_step_ = 5;
   //   std::string hdmap_file_;
   friend class lib::Singleton<HDMapInput>;
 };
+
 }  // namespace map
 }  // namespace perception
 }  // namespace apollo
+
 #endif  // MODULES_PERCEPTION_MAP_HDMAP_HDMAP_INPUT_H_

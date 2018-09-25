@@ -13,21 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+
 #include "modules/perception/map/hdmap/hdmap_input.h"
-#include <stdlib.h>
+
 #include <algorithm>
-#include <string>
-#include <vector>
-#include "modules/perception/base/log.h"
-#include "modules/perception/common/geometry/common.h"
+// #include "modules/perception/base/log.h"
+// #include "modules/perception/common/geometry/common.h"
 // #include "hdmap_definitions.h"  // NOLINT
 // #include "hdmap_trajectory.h"  // NOLINT
-#include "modules/perception/base/object_pool_types.h"
-#include "modules/perception/lib/config_manager/config_manager.h"
-#include "modules/perception/lib/io/file_util.h"
+// #include "modules/perception/base/object_pool_types.h"
+// #include "modules/perception/lib/config_manager/config_manager.h"
+// #include "modules/perception/lib/io/file_util.h"
+
 namespace apollo {
 namespace perception {
 namespace map {
+
 // using adu::common::math::Polygon2d;
 // using adu::common::math::Vec2d;
 // using adu::hdmap::JunctionInfo;
@@ -36,17 +37,20 @@ namespace map {
 // using adu::hdmap::BoundaryLine;
 // using adu::hdmap::SignalInfoConstPtr;
 // using adu::hdmap::LaneInfoConstPtr;
-using lib::ConfigManager;
-using base::PolygonDType;
+// using lib::ConfigManager;
+// using base::PolygonDType;
+
 using base::RoadBoundary;
 using base::PointD;
-using base::PointDCloud;
-using base::PointDCloudPtr;
+// using base::PointDCloud;
+// using base::PointDCloudPtr;
 // HDMapInput
+
 bool HDMapInput::Init() {
   // lib::MutexLock lock(&mutex_);
   return InitInternal();
 }
+
 bool HDMapInput::InitInternal() {
   // if (inited_) {
   //   return true;
@@ -57,11 +61,13 @@ bool HDMapInput::InitInternal() {
   // inited_ = true;
   return true;
 }
+
 bool HDMapInput::Reset() {
   // lib::MutexLock lock(&mutex_);
   // inited_ = false;
   return InitInternal();
 }
+
 bool HDMapInput::InitHDMap() {
   // hdmap_.reset(new adu::hdmap::HDMap());
   // ConfigManager* config_manager =
@@ -92,9 +98,11 @@ bool HDMapInput::InitHDMap() {
   // LOG_INFO << "load hdmap file: " << hdmap_file_;
   return true;
 }
-bool HDMapInput::GetRoiHDMapStruct(const base::PointD& pointd,
-                                   const double distance,
-                                   base::HdmapStructPtr hdmap_struct_prt) {
+
+bool HDMapInput::GetRoiHDMapStruct(
+    const base::PointD& pointd,
+    const double distance,
+    std::shared_ptr<base::HdmapStruct> hdmap_struct_prt) {
   // lib::MutexLock lock(&mutex_);
   // CHECK_NOTNULL(hdmap_.get());
   // // get original road boundary and junction
@@ -135,6 +143,7 @@ bool HDMapInput::GetRoiHDMapStruct(const base::PointD& pointd,
   //     &(hdmap_struct_prt->road_boundary));
   return true;
 }
+
 // void HDMapInput::MergeBoundaryJunction(
 //     const std::vector<adu::hdmap::RoiRoadBoundaryPtr>& boundary,
 //     const std::vector<adu::hdmap::JunctionInfoConstPtr>& junctions,
@@ -221,9 +230,10 @@ bool HDMapInput::GetRoiHDMapStruct(const base::PointD& pointd,
 //     }
 //   }
 // }
+
 bool HDMapInput::GetRoadBoundaryFilteredByJunctions(
     const std::vector<base::RoadBoundary>& road_boundaries,
-    const std::vector<base::PolygonDType>& junctions,
+    const std::vector<base::PointCloud<PointD>>& junctions,
     std::vector<base::RoadBoundary>* flt_road_boundaries_ptr) {
   // for (size_t n_rd = 0; n_rd < road_boundaries.size(); ++n_rd) {
   //   const base::RoadBoundary& temp_road_boundary = road_boundaries[n_rd];
@@ -250,9 +260,11 @@ bool HDMapInput::GetRoadBoundaryFilteredByJunctions(
   // }
   return true;
 }
-void HDMapInput::DownsamplePoints(const base::PointDCloudPtr& raw_cloud_ptr,
-                                  base::PolygonDType* polygon_ptr,
-                                  int min_points_num_for_sample) const {
+
+void HDMapInput::DownsamplePoints(
+    const std::shared_ptr<base::PointCloud<base::PointD>>& raw_cloud_ptr,
+    base::PointCloud<base::PointD>* polygon_ptr,
+    int min_points_num_for_sample) const {
   // const PointDCloud& raw_cloud = *raw_cloud_ptr;
   // unsigned int spt = 0;
   // double acos_theta = 0.0;
@@ -297,10 +309,11 @@ void HDMapInput::DownsamplePoints(const base::PointDCloudPtr& raw_cloud_ptr,
   // LOG_INFO << "Downsample road boundary points from "
   //   << raw_cloud_size << " to " << polygon_ptr->size();
 }
+
 void HDMapInput::SplitBoundary(
-    const base::PolygonDType& boundary_line,
-    const std::vector<base::PolygonDType>& junctions,
-    std::vector<base::PolygonDType>* boundary_line_vec_ptr) {
+    const base::PointCloud<base::PointD>& boundary_line,
+    const std::vector<base::PointCloud<base::PointD>>& junctions,
+    std::vector<base::PointCloud<base::PointD>>* boundary_line_vec_ptr) {
   // std::vector<bool> boundary_flag(boundary_line.size());
   // for (size_t npt = 0; npt < boundary_line.size(); ++npt) {
   //   const PointD& pointd = boundary_line[npt];
@@ -343,6 +356,7 @@ void HDMapInput::SplitBoundary(
   //   boundary_line_vec_ptr->push_back(temp_line);
   // }
 }
+
 bool HDMapInput::GetNearestLaneDirection(const base::PointD& pointd,
                                          Eigen::Vector3d* lane_direction) {
   // if (hdmap_ == nullptr) {
@@ -371,6 +385,7 @@ bool HDMapInput::GetNearestLaneDirection(const base::PointD& pointd,
   // *lane_direction = Eigen::Vector3d(cos(lane_heading), sin(lane_heading), 0);
   return true;
 }
+
 // bool HDMapInput::GetSignalsFromHDMap(const Eigen::Vector3d& pointd,
 //     double forward_distance,
 //     std::vector<adu::common::hdmap::Signal>* signals) {
@@ -413,6 +428,7 @@ bool HDMapInput::GetNearestLaneDirection(const base::PointD& pointd,
 //     return GetSignalsFromHDMap(pointd, forward_distance, signals);
 // }
 // add end
+
 }  // namespace map
 }  // namespace perception
 }  // namespace apollo

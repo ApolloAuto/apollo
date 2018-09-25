@@ -13,10 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+
 #include <gflags/gflags.h>
 #include <gtest/gtest.h>
-#include "modules/perception/base/log.h"
-#include "modules/perception/lib/config_manager/config_manager.h"
+// #include "modules/perception/base/log.h"
+// #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/map/hdmap/hdmap_input.h"
 namespace apollo {
 namespace perception {
@@ -24,24 +25,24 @@ namespace lib {
 DECLARE_string(config_manager_path);
 }
 namespace map {
-using apollo::perception::lib::ConfigManager;
+// using apollo::perception::lib::ConfigManager;
 // using adu::hdmap::JunctionInfo;
 // using adu::hdmap::JunctionInfoConstPtr;
 // using adu::hdmap::RoiRoadBoundaryPtr;
 class HDMapInputTest : public testing::Test {
  protected:
   virtual void SetUp() {
-    char* cybertron_path = "CYBERTRON_PATH=";
-    putenv(cybertron_path);
-    char* module_path = "MODULE_PATH=";
-    putenv(module_path);
-    lib::FLAGS_config_manager_path = "./map_test_data/hdmap/conf";
-    config_manager_ = lib::Singleton<ConfigManager>::get_instance();
-    ASSERT_TRUE(config_manager_ != NULL);
+//    char* cybertron_path = "CYBERTRON_PATH=";
+//    putenv(cybertron_path);
+//    char* module_path = "MODULE_PATH=";
+//    putenv(module_path);
+//    lib::FLAGS_config_manager_path = "./map_test_data/hdmap/conf";
+//    config_manager_ = lib::Singleton<ConfigManager>::get_instance();
+//    ASSERT_TRUE(config_manager_ != NULL);
   }
 
  protected:
-  ConfigManager* config_manager_;
+  // ConfigManager* config_manager_;
   HDMapInput hdmap_input_;
 };
 // TEST_F(HDMapInputTest, test_GetSignals) {
