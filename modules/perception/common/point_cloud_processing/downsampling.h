@@ -13,14 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef PERCEPTION_COMMON_POINT_CLOUD_PROCESSING_DOWNSAMPLING_H_
-#define PERCEPTION_COMMON_POINT_CLOUD_PROCESSING_DOWNSAMPLING_H_
+
+#ifndef MODULES_PERCEPTION_COMMON_POINT_CLOUD_PROCESSING_DOWNSAMPLING_H_
+#define MODULES_PERCEPTION_COMMON_POINT_CLOUD_PROCESSING_DOWNSAMPLING_H_
+
 #include <memory>
 #include <utility>
 #include <vector>
-#include "modules/perception/base/log.h"
+
+#include "cybertron/common/log.h"
+
 #include "modules/perception/base/point_cloud.h"
 #include "modules/perception/common/geometry/basic.h"
+
 namespace apollo {
 namespace perception {
 namespace common {
@@ -216,4 +221,4 @@ void DownsamplingRectangleNeighbour(
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // PERCEPTION_COMMON_POINT_CLOUD_PROCESSING_DOWNSAMPLING_H_
+#endif  // MODULES_PERCEPTION_COMMON_POINT_CLOUD_PROCESSING_DOWNSAMPLING_H_
