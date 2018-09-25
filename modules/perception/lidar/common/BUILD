@@ -58,8 +58,8 @@ cc_library(
         "lidar_frame_pool.h",
     ],
     deps = [
-        "//modules/perception/base",
         ":lidar_log",
+        "//modules/perception/base",
     ],
 )
 
@@ -72,8 +72,19 @@ cc_library(
         "lidar_object_util.h",
     ],
     deps = [
-        "//modules/perception/base",
         ":lidar_log",
+        "//modules/perception/base",
+    ],
+)
+
+cc_library(
+    name = "pcl_util",
+    hdrs = [
+        "pcl_util.h",
+    ],
+    deps = [
+        ":lidar_log",
+        "//modules/perception/base",
     ],
 )
 

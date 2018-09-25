@@ -28,8 +28,8 @@ cc_library(
     name = "base_type",
     hdrs = [
         "hdmap_struct.h",
-        "lane_struct.h",
         "landmark_struct.h",
+        "lane_struct.h",
         "sensor_meta.h",
         "vehicle_struct.h",
     ],
@@ -167,9 +167,9 @@ cc_library(
         "frame_supplement.h",
     ],
     deps = [
+        ":base_type",
         ":blob",
         ":image",
-        ":base_type",
         ":impending_collision_edge",
         "@eigen",
     ],
@@ -182,8 +182,8 @@ cc_library(
         "image_8u.h",
     ],
     deps = [
-        ":blob",
         ":base_type",
+        ":blob",
     ],
 )
 
@@ -223,18 +223,18 @@ cc_test(
 
 cc_library(
     name = "object",
+    srcs = [
+        "object.cc",
+    ],
     hdrs = [
         "object.h",
         "object_supplement.h",
         "object_types.h",
         "vehicle_struct.h",
     ],
-    srcs = [
-        "object.cc",
-    ],
     deps = [
-        ":point_cloud",
         ":box",
+        ":point_cloud",
         "@eigen",
     ],
 )
@@ -270,12 +270,12 @@ cc_test(
         "object_pool_test.cc",
     ],
     deps = [
-        "//framework:cybertron",
-        ":object",
         ":frame",
-        ":point_cloud",
+        ":object",
         ":object_pool",
         ":object_pool_types",
+        ":point_cloud",
+        "//framework:cybertron",
         "@eigen",
         "@gtest//:main",
     ],
@@ -283,35 +283,35 @@ cc_test(
 
 cc_library(
     name = "object_pool_types",
-    hdrs = [
-        "object_pool_types.h",
-    ],
     srcs = [
         "object_pool_types.cc",
     ],
+    hdrs = [
+        "object_pool_types.h",
+    ],
     deps = [
-        "//framework:cybertron",
-        ":object",
         ":frame",
-        ":point_cloud",
+        ":object",
         ":object_pool",
+        ":point_cloud",
+        "//framework:cybertron",
         "@eigen",
     ],
 )
 
 cc_library(
     name = "omnidirectional_model",
-    hdrs = [
-        "omnidirectional_model.h",
-    ],
     srcs = [
         "omnidirectional_model.cc",
     ],
+    hdrs = [
+        "omnidirectional_model.h",
+    ],
     deps = [
-        "//framework:cybertron",
         ":camera",
         ":distortion_model",
         ":polynomial",
+        "//framework:cybertron",
         "@eigen",
     ],
 )
@@ -353,11 +353,11 @@ cc_test(
 
 cc_library(
     name = "polynomial",
-    hdrs = [
-        "polynomial.h",
-    ],
     srcs = [
         "polynomial.cc",
+    ],
+    hdrs = [
+        "polynomial.h",
     ],
     deps = [
     ],
