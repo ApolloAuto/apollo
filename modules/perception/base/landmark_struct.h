@@ -26,6 +26,7 @@
 namespace apollo {
 namespace perception {
 namespace base {
+
 struct alignas(16) Landmark {
   // @brief object type, required
   VisualLandmarkType type = VisualLandmarkType::RoadArrow;
@@ -37,8 +38,9 @@ struct alignas(16) Landmark {
   BBox2DF box;
 };
 
-typedef std::shared_ptr<Landmark> LandmarkPtr;
-typedef std::shared_ptr<const Landmark> LandmarkConstPtr;
+// TODO(all): to remove
+// typedef std::shared_ptr<Landmark> LandmarkPtr;
+// typedef std::shared_ptr<const Landmark> LandmarkConstPtr;
 
 }  // namespace base
 }  // namespace perception

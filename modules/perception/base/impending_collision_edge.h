@@ -35,24 +35,27 @@ struct alignas(16) ImpendingCollisionEdge {
   std::vector<Eigen::Vector3d> points;
 };
 
-typedef std::shared_ptr<ImpendingCollisionEdge> ImpendingCollisionEdgePtr;
-typedef std::shared_ptr<const ImpendingCollisionEdge>
-    ImpendingCollisionEdgeConstPtr;
+// TODO(all): to remove
+// typedef std::shared_ptr<ImpendingCollisionEdge> ImpendingCollisionEdgePtr;
+// typedef std::shared_ptr<const ImpendingCollisionEdge>
+//    ImpendingCollisionEdgeConstPtr;
 
 // Sensor single frame objects.
 struct ImpendingCollisionEdges {
   double timestamp = 0.0;
 
   // edges
-  std::vector<ImpendingCollisionEdgePtr> impending_collision_edges;
+  std::vector<std::shared_ptr<
+      ImpendingCollisionEdge>> impending_collision_edges;
 
   // sensor to world position
   Eigen::Matrix4d sensor2world_pose = Eigen::Matrix4d::Zero();
 };
 
-typedef std::shared_ptr<ImpendingCollisionEdges> ImpendingCollisionEdgesPtr;
-typedef std::shared_ptr<const ImpendingCollisionEdges>
-    ImpendingCollisionEdgesConstPtr;
+// TODO(all): to remove
+// typedef std::shared_ptr<ImpendingCollisionEdges> ImpendingCollisionEdgesPtr;
+// typedef std::shared_ptr<const ImpendingCollisionEdges>
+//    ImpendingCollisionEdgesConstPtr;
 
 }  // namespace base
 }  // namespace perception

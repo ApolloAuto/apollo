@@ -17,7 +17,6 @@
 #define MODULES_PERCEPTION_BASE_HDMAP_STRUCT_H_
 #include <memory>
 #include <vector>
-#include "modules/perception/base/point_cloud_types.h"
 
 namespace apollo {
 namespace perception {
@@ -40,8 +39,9 @@ struct alignas(16) HdmapStruct {
   std::vector<PolygonDType> junction_polygons;
 };
 
-typedef std::shared_ptr<HdmapStruct> HdmapStructPtr;
-typedef std::shared_ptr<const HdmapStruct> HdmapStructConstPtr;
+// TODO(all): tp remove
+// typedef std::shared_ptr<HdmapStruct> HdmapStructPtr;
+// typedef std::shared_ptr<const HdmapStruct> HdmapStructConstPtr;
 
 }  // namespace base
 }  // namespace perception
