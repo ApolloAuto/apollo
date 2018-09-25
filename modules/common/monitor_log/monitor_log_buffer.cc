@@ -28,28 +28,10 @@ MonitorLogBuffer::MonitorLogBuffer(
     : source_(source) {}
 
 void MonitorLogBuffer::Publish() {
-  if (!monitor_msg_items_.empty() && logger_) {
+  if (!monitor_msg_items_.empty()) {
     logger_->Publish(source_, monitor_msg_items_);
     monitor_msg_items_.clear();
     level_ = MonitorMessageItem::INFO;
-  }
-}
-
-MonitorLogBuffer &MonitorLogBuffer::operator<<(const std::string &msg) {
-  if (monitor_msg_items_.empty() || monitor_msg_items_.back().first != level_) {
-    AddMonitorMsgItem(level_, msg);
-  } else {
-    monitor_msg_items_.back().second += msg;
-  }
-  return *this;
-}
-
-MonitorLogBuffer &MonitorLogBuffer::operator<<(const char *msg) {
-  if (msg) {
-    std::string msg_str(msg);
-    return operator<<(msg_str);
-  } else {
-    return *this;
   }
 }
 

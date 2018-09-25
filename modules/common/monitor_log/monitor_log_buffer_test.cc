@@ -63,32 +63,6 @@ TEST_F(MonitorBufferTest, AddMonitorMsgItem) {
   EXPECT_EQ("TestError", item.second);
 }
 
-TEST_F(MonitorBufferTest, Operator) {
-  buffer_.ERROR() << "Hi";
-  EXPECT_EQ(MonitorMessageItem::ERROR, buffer_.level_);
-  ASSERT_EQ(1, buffer_.monitor_msg_items_.size());
-  auto &item = buffer_.monitor_msg_items_.back();
-  EXPECT_EQ(MonitorMessageItem::ERROR, item.first);
-  EXPECT_EQ("Hi", item.second);
-  buffer_ << " How"
-          << " are"
-          << " you";
-  EXPECT_EQ(MonitorMessageItem::ERROR, buffer_.level_);
-  ASSERT_EQ(1, buffer_.monitor_msg_items_.size());
-  EXPECT_EQ(MonitorMessageItem::ERROR, item.first);
-  EXPECT_EQ("Hi How are you", item.second);
-
-  buffer_.INFO() << 3 << "pieces";
-  EXPECT_EQ(MonitorMessageItem::INFO, buffer_.level_);
-  ASSERT_EQ(2, buffer_.monitor_msg_items_.size());
-  auto item2 = buffer_.monitor_msg_items_.back();
-  EXPECT_EQ(MonitorMessageItem::INFO, item2.first);
-  EXPECT_EQ("3pieces", item2.second);
-
-  const char *fake_input = nullptr;
-  EXPECT_TRUE(&(buffer_.INFO() << fake_input) == &buffer_);
-}
-
 }  // namespace monitor
 }  // namespace common
 }  // namespace apollo
