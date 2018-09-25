@@ -62,14 +62,16 @@ bool EasyConditionFalse(const base::PointF& p1, const base::PointF& p2,
 }  // namespace
 
 using IndicesClusters = std::vector<base::PointIndices>;
+using base::PointCloud;
+using base::PointF;
 
 TEST(ConditionalClusteringTest, conditional_clustering_test) {
   ConditionClustering<base::PointF> condition_clustering =
       ConditionClustering<base::PointF>(false);
-  std::shared_ptr<base::PolygonFType> polygon_in_ptr =
-      std::shared_ptr<base::PolygonFType>(
-          new base::PolygonFType(16, 16, base::PointF()));
-  base::PolygonFType polygon_out;
+  std::shared_ptr<PointCloud<PointF>> polygon_in_ptr =
+      std::shared_ptr<PointCloud<PointF>>(
+          new PointCloud<PointF>(16, 16, base::PointF()));
+  PointCloud<PointF> polygon_out;
   base::PointF tmp_pt;
   size_t i, j;
   for (i = 0; i < 8; ++i) {
@@ -127,10 +129,10 @@ TEST(ConditionalClusteringTest, conditional_clustering_test) {
 TEST(ConditionalClusteringTest, conditional_clustering_test1) {
   ConditionClustering<base::PointF> condition_clustering =
       ConditionClustering<base::PointF>(true);
-  std::shared_ptr<base::PolygonFType> polygon_in_ptr =
-      std::shared_ptr<base::PolygonFType>(
-          new base::PolygonFType(16, 16, base::PointF()));
-  base::PolygonFType polygon_out;
+  std::shared_ptr<PointCloud<PointF>> polygon_in_ptr =
+      std::shared_ptr<PointCloud<PointF>>(
+          new PointCloud<PointF>(16, 16, base::PointF()));
+  PointCloud<PointF> polygon_out;
   base::PointF tmp_pt;
   size_t i, j;
   for (i = 0; i < 8; ++i) {

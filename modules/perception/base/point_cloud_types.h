@@ -29,14 +29,6 @@ namespace base {
 using PointF = PointXYZIF;
 using PointD = PointXYZID;
 
-// point cloud
-using PointFCloud = AttributePointCloud<PointXYZIF>;
-using PointDCloud = AttributePointCloud<PointXYZID>;
-
-// polygon
-using PolygonFType = PointCloud<PointF>;
-using PolygonDType = PointCloud<PointD>;
-
 }  // namespace base
 }  // namespace perception
 }  // namespace apollo
