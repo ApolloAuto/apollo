@@ -13,12 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef PERCEPTION_COMMON_GEOMETRY_CONVEX_HULL_2D_H_
-#define PERCEPTION_COMMON_GEOMETRY_CONVEX_HULL_2D_H_
-#include <float.h>
-#include <Eigen/Dense>
+#ifndef MODULES_PERCEPTION_COMMON_GEOMETRY_CONVEX_HULL_2D_H_
+#define MODULES_PERCEPTION_COMMON_GEOMETRY_CONVEX_HULL_2D_H_
+
+#include <cfloat>
 #include <algorithm>
 #include <vector>
+
+#include "Eigen/Dense"
+
 namespace apollo {
 namespace perception {
 namespace common {
@@ -231,4 +234,4 @@ bool ConvexHull2D<CLOUD_IN_TYPE, CLOUD_OUT_TYPE>::GetConvexHullMonotoneChain(
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // PERCEPTION_COMMON_GEOMETRY_CONVEX_HULL_2D_H_
+#endif  // MODULES_PERCEPTION_COMMON_GEOMETRY_CONVEX_HULL_2D_H_

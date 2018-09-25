@@ -25,6 +25,16 @@ cc_library(
 )
 
 
+cc_library(
+    name = "convex_hull_2d",
+    hdrs = [
+        "convex_hull_2d.h",
+    ],
+    deps = [
+        "@eigen",
+    ],
+)
+
 cc_test(
     name = "basic_test",
     size = "small",
@@ -36,6 +46,5 @@ cc_test(
         "@gtest//:main",
     ],
 )
-
 
 cpplint()
