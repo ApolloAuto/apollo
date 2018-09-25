@@ -24,11 +24,11 @@
 namespace apollo {
 namespace planning {
 
-using apollo::perception::TrafficLightDetection;
-using apollo::routing::RoutingResponse;
-using apollo::routing::RoutingRequest;
-using apollo::relative_map::MapMsg;
 using apollo::hdmap::HDMapUtil;
+using apollo::perception::TrafficLightDetection;
+using apollo::relative_map::MapMsg;
+using apollo::routing::RoutingRequest;
+using apollo::routing::RoutingResponse;
 
 bool PlanningComponent::Init() {
   AINFO << "Loading gflag from file: " << ConfigFilePath();
@@ -86,7 +86,7 @@ bool PlanningComponent::Proc(
   CHECK(prediction_obstacles != nullptr);
 
   // check and process possible rerouting request
-  Rerouting();
+  CheckRerouting();
 
   // process fused input data
   local_view_.prediction_obstacles = prediction_obstacles;
@@ -96,7 +96,6 @@ bool PlanningComponent::Proc(
     std::lock_guard<std::mutex> lock(mutex_);
     local_view_.routing = std::make_shared<routing::RoutingResponse>(routing_);
   }
-  perception::TrafficLightDetection traffic_light_copy;
   {
     std::lock_guard<std::mutex> lock(mutex_);
     local_view_.traffic_light =
@@ -115,7 +114,7 @@ bool PlanningComponent::Proc(
   return true;
 }
 
-void PlanningComponent::Rerouting() {
+void PlanningComponent::CheckRerouting() {
   auto* rerouting = PlanningContext::Instance()
                         ->mutable_planning_status()
                         ->mutable_rerouting();

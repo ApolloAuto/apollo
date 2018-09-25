@@ -59,7 +59,7 @@ class PlanningComponent final
                 localization_estimate) override;
 
  private:
-  void Rerouting();
+  void CheckRerouting();
   bool CheckInput();
 
   std::shared_ptr<cybertron::Reader<perception::TrafficLightDetection>>
