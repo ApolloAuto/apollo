@@ -15,7 +15,7 @@
  *****************************************************************************/
 #include <gtest/gtest.h>
 #include <iostream>
-#include "modules/perception/base/log.h"
+#include "cybertron/common/log.h"
 #include "modules/perception/fusion/common/information_filter.h"
 
 namespace apollo {

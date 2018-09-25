@@ -19,7 +19,7 @@
 #include <set>
 #include <vector>
 
-#include "modules/perception/base/log.h"
+#include "cybertron/common/log.h"
 #include "modules/perception/inference/tensorrt/plugins/argmax_plugin.h"
 #include "modules/perception/inference/tensorrt/plugins/slice_plugin.h"
 #include "modules/perception/inference/tensorrt/plugins/softmax_plugin.h"

@@ -13,7 +13,10 @@ cc_library(
     deps = [
         "//modules/perception/base:base_type",
         "//modules/perception/base:point_cloud",
+        "//modules/perception/common/geometry:common",
+        "//modules/perception/lib/config_manager",
         "//modules/perception/lib/singleton",
+        "//modules/perception/proto:perception_config_schema_proto",
     ],
 )
 
@@ -24,8 +27,8 @@ cc_test(
         "hdmap_input_test.cc",
     ],
     deps = [
-        "@gtest//:main",
         ":hdmap_input",
+        "@gtest//:main",
     ],
 )
 

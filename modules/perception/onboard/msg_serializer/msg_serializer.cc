@@ -16,7 +16,7 @@
 #include "modules/perception/onboard/msg_serializer/msg_serializer.h"
 #include "modules/perception/onboard/common_flags/common_flags.h"
 
-#include "modules/perception/base/log.h"
+#include "cybertron/common/log.h"
 #include "modules/perception/lib/utils/time_util.h"
 
 namespace apollo {
