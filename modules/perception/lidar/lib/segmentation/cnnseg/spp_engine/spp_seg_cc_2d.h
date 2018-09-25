@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef PERCEPTION_LIDAR_LIB_SEGMENTATION_CNNSEG_SPP_ENGINE_SPP_SEG_CC_2D_H_
-#define PERCEPTION_LIDAR_LIB_SEGMENTATION_CNNSEG_SPP_ENGINE_SPP_SEG_CC_2D_H_
+#ifndef MODULES_PERCEPTION_LIDAR_LIB_SEGMENTATION_CNNSEG_SPP_ENGINE_SPP_SEG_CC_2D_H_
+#define MODULES_PERCEPTION_LIDAR_LIB_SEGMENTATION_CNNSEG_SPP_ENGINE_SPP_SEG_CC_2D_H_
 
 #include <map>
 #include <vector>
@@ -148,4 +148,4 @@ class SppCCDetector {
 }  // namespace lidar
 }  // namespace perception
 }  // namespace apollo
-#endif  // PERCEPTION_LIDAR_LIB_SEGMENTATION_CNNSEG_SPP_ENGINE_SPP_SEG_CC_2D_H_
+#endif  // MODULES_PERCEPTION_LIDAR_LIB_SEGMENTATION_CNNSEG_SPP_ENGINE_SPP_SEG_CC_2D_H_

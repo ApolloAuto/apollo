@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef PERCEPTION_COMMON_IMAGE_PROCESSING_HOUGH_H_
-#define PERCEPTION_COMMON_IMAGE_PROCESSING_HOUGH_H_
+#ifndef MODULES_PERCEPTION_COMMON_IMAGE_PROCESSING_HOUGH_H_
+#define MODULES_PERCEPTION_COMMON_IMAGE_PROCESSING_HOUGH_H_
 
 #include <math.h>
 #include <memory.h>
@@ -124,4 +124,4 @@ class HoughTransfer {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // PERCEPTION_COMMON_IMAGE_PROCESSING_HOUGH_H_
+#endif  // MODULES_PERCEPTION_COMMON_IMAGE_PROCESSING_HOUGH_H_

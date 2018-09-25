@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef PERCEPTION_ONBOARD_LIDAR_ONBOARD_INNER_COMPONENT_MESSAGES_H_
-#define PERCEPTION_ONBOARD_LIDAR_ONBOARD_INNER_COMPONENT_MESSAGES_H_
+#ifndef MODULES_PERCEPTION_ONBOARD_LIDAR_ONBOARD_INNER_COMPONENT_MESSAGES_H_
+#define MODULES_PERCEPTION_ONBOARD_LIDAR_ONBOARD_INNER_COMPONENT_MESSAGES_H_
 
 #include <string>
 #include "cybertron/cybertron.h"
@@ -55,4 +55,4 @@ class LidarFrameMessage : public apollo::cybertron::message::IntraMessage {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // PERCEPTION_ONBOARD_LIDAR_ONBOARD_INNER_COMPONENT_MESSAGES_H_
+#endif  // MODULES_PERCEPTION_ONBOARD_LIDAR_ONBOARD_INNER_COMPONENT_MESSAGES_H_

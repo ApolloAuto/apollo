@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef PERCEPTION_LIDAR_LIB_ROI_FILTER_HDMAP_ROI_FILTER_POLYGON_MASK_H_
-#define PERCEPTION_LIDAR_LIB_ROI_FILTER_HDMAP_ROI_FILTER_POLYGON_MASK_H_
+#ifndef MODULES_PERCEPTION_LIDAR_LIB_ROI_FILTER_HDMAP_ROI_FILTER_POLYGON_MASK_H_
+#define MODULES_PERCEPTION_LIDAR_LIB_ROI_FILTER_HDMAP_ROI_FILTER_POLYGON_MASK_H_
 #include <algorithm>
 #include <boost/format.hpp>
 #include <limits>
@@ -153,4 +153,4 @@ bool DrawPolygonsMask(
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // PERCEPTION_LIDAR_LIB_ROI_FILTER_HDMAP_ROI_FILTER_POLYGON_MASK_H_
+#endif  // MODULES_PERCEPTION_LIDAR_LIB_ROI_FILTER_HDMAP_ROI_FILTER_POLYGON_MASK_H_

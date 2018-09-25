@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef PERCEPTION_LIDAR_LIB_TRACKER_HM_TRACKER_GNN_BIPARTITE_GRAPH_MATCHER_H_
-#define PERCEPTION_LIDAR_LIB_TRACKER_HM_TRACKER_GNN_BIPARTITE_GRAPH_MATCHER_H_
+#ifndef MODULES_PERCEPTION_LIDAR_LIB_TRACKER_HM_TRACKER_GNN_BIPARTITE_GRAPH_MATCHER_H_
+#define MODULES_PERCEPTION_LIDAR_LIB_TRACKER_HM_TRACKER_GNN_BIPARTITE_GRAPH_MATCHER_H_
 
 #include <cstdio>
 #include <string>
@@ -73,4 +73,4 @@ class GnnBipartiteGraphMatcher : public BaseBipartiteGraphMatcher {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // PERCEPTION_LIDAR_LIB_TRACKER_HM_TRACKER_GNN_BIPARTITE_GRAPH_MATCHER_H_
+#endif  // MODULES_PERCEPTION_LIDAR_LIB_TRACKER_HM_TRACKER_GNN_BIPARTITE_GRAPH_MATCHER_H_

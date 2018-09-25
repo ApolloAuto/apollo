@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef PERCEPTION_FUSION_LIB_INTERFACE_BASE_FUSION_SYSTEM_H_
-#define PERCEPTION_FUSION_LIB_INTERFACE_BASE_FUSION_SYSTEM_H_
+#ifndef MODULES_PERCEPTION_FUSION_LIB_INTERFACE_BASE_FUSION_SYSTEM_H_
+#define MODULES_PERCEPTION_FUSION_LIB_INTERFACE_BASE_FUSION_SYSTEM_H_
 
 #include <string>
 #include <utility>
@@ -67,4 +67,4 @@ PERCEPTION_REGISTER_REGISTERER(BaseFusionSystem);
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // PERCEPTION_FUSION_LIB_INTERFACE_BASE_DATA_ASSOCIATION_H_
+#endif  // MODULES_PERCEPTION_FUSION_LIB_INTERFACE_BASE_DATA_ASSOCIATION_H_

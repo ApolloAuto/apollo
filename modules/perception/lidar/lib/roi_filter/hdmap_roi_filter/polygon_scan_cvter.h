@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef PERCEPTION_LIDAR_LIB_HDMAP_ROI_FILTER_POLYGON_SCAN_CVTER_H_
-#define PERCEPTION_LIDAR_LIB_HDMAP_ROI_FILTER_POLYGON_SCAN_CVTER_H_
+#ifndef MODULES_PERCEPTION_LIDAR_LIB_HDMAP_ROI_FILTER_POLYGON_SCAN_CVTER_H_
+#define MODULES_PERCEPTION_LIDAR_LIB_HDMAP_ROI_FILTER_POLYGON_SCAN_CVTER_H_
 #include <Eigen/Core>
 #include <Eigen/StdVector>
 #include <algorithm>
@@ -494,4 +494,4 @@ bool PolygonScanCvter<T>::ConvertSegment(const size_t seg_id,
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // PERCEPTION_LIDAR_LIB_HDMAP_ROI_FILTER_POLYGON_SCAN_CVTER_H_
+#endif  // MODULES_PERCEPTION_LIDAR_LIB_HDMAP_ROI_FILTER_POLYGON_SCAN_CVTER_H_

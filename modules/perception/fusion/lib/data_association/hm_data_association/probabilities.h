@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef PERCEPTION_FUSION_LIB_DATA_ASSOCIATION_PROBABILITIES_H_
-#define PERCEPTION_FUSION_LIB_DATA_ASSOCIATION_PROBABILITIES_H_
+#ifndef MODULES_PERCEPTION_FUSION_LIB_DATA_ASSOCIATION_PROBABILITIES_H_
+#define MODULES_PERCEPTION_FUSION_LIB_DATA_ASSOCIATION_PROBABILITIES_H_
 
 #include <algorithm>
 #include <vector>
@@ -62,4 +62,4 @@ double FuseMultipleProbabilities(const std::vector<double>& probs);
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // PERCEPTION_FUSION_LIB_DATA_ASSOCIATION_PROBABILITIES_H_
+#endif  // MODULES_PERCEPTION_FUSION_LIB_DATA_ASSOCIATION_PROBABILITIES_H_

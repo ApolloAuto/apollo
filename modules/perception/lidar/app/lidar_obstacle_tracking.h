@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef PERCEPTION_LIDAR_APP_LIDAR_OBSTACLE_TRACKING_H_
-#define PERCEPTION_LIDAR_APP_LIDAR_OBSTACLE_TRACKING_H_
+#ifndef MODULES_PERCEPTION_LIDAR_APP_LIDAR_OBSTACLE_TRACKING_H_
+#define MODULES_PERCEPTION_LIDAR_APP_LIDAR_OBSTACLE_TRACKING_H_
 #include <string>
 #include "modules/perception/lidar/common/lidar_error_code.h"
 #include "modules/perception/lidar/lib/interface/base_classifier.h"
@@ -54,4 +54,4 @@ class LidarObstacleTracking {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // PERCEPTION_LIDAR_APP_LIDAR_OBSTACLE_TRACKING_H_
+#endif  // MODULES_PERCEPTION_LIDAR_APP_LIDAR_OBSTACLE_TRACKING_H_

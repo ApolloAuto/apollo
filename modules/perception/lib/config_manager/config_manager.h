@@ -117,6 +117,7 @@
 #include <sstream>
 #include <string>
 #include <typeinfo>
+#include <utility>
 #include <vector>
 
 #include "modules/perception/lib/singleton/singleton.h"

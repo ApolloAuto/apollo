@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef PERCEPTION_ONBOARD_COMPONENT_FUSION_COMPONENT_H_
-#define PERCEPTION_ONBOARD_COMPONENT_FUSION_COMPONENT_H_
+#ifndef MODULES_PERCEPTION_ONBOARD_COMPONENT_FUSION_COMPONENT_H_
+#define MODULES_PERCEPTION_ONBOARD_COMPONENT_FUSION_COMPONENT_H_
 
 #include <memory>
 #include <mutex>  // NOLINT
@@ -62,4 +62,4 @@ CYBERTRON_REGISTER_COMPONENT(FusionComponent);
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // PERCEPTION_ONBOARD_COMPONENT_FUSION_COMPONENT_H_
+#endif  // MODULES_PERCEPTION_ONBOARD_COMPONENT_FUSION_COMPONENT_H_

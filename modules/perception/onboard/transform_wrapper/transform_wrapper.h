@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef PERCEPTION_ONBOARD_TRANSFORM_WRAPPER_H_
-#define PERCEPTION_ONBOARD_TRANSFORM_WRAPPER_H_
+#ifndef MODULES_PERCEPTION_ONBOARD_TRANSFORM_WRAPPER_H_
+#define MODULES_PERCEPTION_ONBOARD_TRANSFORM_WRAPPER_H_
 
 #include <Eigen/Core>
 #include <Eigen/Dense>
@@ -107,4 +107,4 @@ class TransformWrapper {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // PERCEPTION_ONBOARD_TRANSFORM_WRAPPER_H_
+#endif  // MODULES_PERCEPTION_ONBOARD_TRANSFORM_WRAPPER_H_
