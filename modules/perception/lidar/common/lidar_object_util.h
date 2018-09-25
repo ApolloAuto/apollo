@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef PERCEPTION_LIDAR_COMMON_LIDAR_OBJECT_UTIL_H_
-#define PERCEPTION_LIDAR_COMMON_LIDAR_OBJECT_UTIL_H_
+#ifndef MODULES_PERCEPTION_LIDAR_COMMON_LIDAR_OBJECT_UTIL_H_
+#define MODULES_PERCEPTION_LIDAR_COMMON_LIDAR_OBJECT_UTIL_H_
 #include "modules/perception/base/object.h"
 
 namespace apollo {
@@ -38,4 +38,4 @@ void ComputeObjectShapeFromPolygon(base::ObjectPtr object,
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // PERCEPTION_LIDAR_COMMON_LIDAR_OBJECT_UTIL_H_
+#endif  // MODULES_PERCEPTION_LIDAR_COMMON_LIDAR_OBJECT_UTIL_H_

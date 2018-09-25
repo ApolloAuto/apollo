@@ -3,6 +3,27 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
+    name = "base",
+    deps = [
+        ":base_type",
+        ":blob",
+        ":box",
+        ":camera",
+        ":common",
+        ":distortion_model",
+        ":frame",
+        ":image",
+        ":impending_collision_edge",
+        ":object",
+        ":object_pool",
+        ":omnidirectional_model",
+        ":point_cloud",
+        ":polynomial",
+        ":syncedmem",
+    ],
+)
+
+cc_library(
     name = "base_type",
     hdrs = [
         "hdmap_struct.h",

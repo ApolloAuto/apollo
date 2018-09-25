@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef PERCEPTION_LIDAR_COMMON_LIDAR_FRAME_H_
-#define PERCEPTION_LIDAR_COMMON_LIDAR_FRAME_H_
+#ifndef MODULES_PERCEPTION_LIDAR_COMMON_LIDAR_FRAME_H_
+#define MODULES_PERCEPTION_LIDAR_COMMON_LIDAR_FRAME_H_
 
 #include <Eigen/Dense>
 #include <vector>
@@ -75,4 +75,4 @@ struct LidarFrame {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // PERCEPTION_LIDAR_COMMON_LIDAR_FRAME_H_
+#endif  // MODULES_PERCEPTION_LIDAR_COMMON_LIDAR_FRAME_H_
