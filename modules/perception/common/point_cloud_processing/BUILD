@@ -19,6 +19,7 @@ cc_library(
     name = "point_cloud_processing_test",
     srcs = [
         "common_test.cc",
+        "downsampling_test.cc",
     ],
     deps = [
         ":point_cloud_processing",

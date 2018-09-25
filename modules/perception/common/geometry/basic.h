@@ -64,12 +64,12 @@ inline typename PointT::Type CalculateEuclidenDist(const PointT &pt1,
   return sqrt(dist);
 }
 
-// @brief calculate the Eucliden distance between two points in X-Y plane
+// @brief calculate the Euclidean distance between two points in X-Y plane
 // old name: euclidean_dist_2d_xy
 template <typename PointT>
-inline typename PointT::T CalculateEuclidenDist2DXY(const PointT &pt1,
-                                                    const PointT &pt2) {
-  typename PointT::T dist = (pt1.x - pt2.x) * (pt1.x - pt2.x);
+inline typename PointT::Type CalculateEuclidenDist2DXY(const PointT &pt1,
+                                                       const PointT &pt2) {
+  typename PointT::Type dist = (pt1.x - pt2.x) * (pt1.x - pt2.x);
   dist += (pt1.y - pt2.y) * (pt1.y - pt2.y);
   return sqrt(dist);
 }
