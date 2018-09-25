@@ -101,4 +101,17 @@ cc_test(
     ],
 )
 
+cc_test(
+    name = "convex_hull_2d_test",
+    size = "small",
+    srcs = [
+        "convex_hull_2d_test.cc",
+    ],
+    deps = [
+        ":convex_hull_2d",
+        "//modules/perception/base:point_cloud",
+        "@gtest//:main",
+    ],
+)
+
 cpplint()
