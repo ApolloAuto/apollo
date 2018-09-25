@@ -16,6 +16,7 @@
 #ifndef PERCEPTION_COMMON_GEOMETRY_ROI_FILTER_H_
 #define PERCEPTION_COMMON_GEOMETRY_ROI_FILTER_H_
 #include <vector>
+#include <memory>
 #include "modules/perception/base/hdmap_struct.h"
 #include "modules/perception/base/object.h"
 #include "modules/perception/base/point_cloud_types.h"
@@ -24,27 +25,33 @@ namespace perception {
 namespace common {
 
 // @brief: whether a point is in ROI.
-bool IsPtInRoi(const base::HdmapStructConstPtr roi, const base::PointD pt);
+bool IsPtInRoi(
+    const std::shared_ptr<const apollo::perception::base::HdmapStruct> roi,
+    const apollo::perception::base::PointD pt);
 
 // @brief: whether a object's center is in ROI.
-bool IsObjectInRoi(const base::HdmapStructConstPtr roi,
-                   const base::ObjectConstPtr obj);
+bool IsObjectInRoi(
+    const std::shared_ptr<const apollo::perception::base::HdmapStruct> roi,
+    const std::shared_ptr<const apollo::perception::base::Object> obj);
 
 // @brief: whether a object's bbox is in ROI.
-bool IsObjectBboxInRoi(const base::HdmapStructConstPtr roi,
-                       const base::ObjectConstPtr obj);
+bool IsObjectBboxInRoi(
+    const std::shared_ptr<const apollo::perception::base::HdmapStruct> roi,
+    const std::shared_ptr<const apollo::perception::base::Object> obj);
 
 // @brief: whether objects' center are in ROI. If return True,
 //         you can get objects in ROI by param valid_objects.
-bool ObjectInRoiCheck(const base::HdmapStructConstPtr roi,
-                      const std::vector<base::ObjectPtr>& objects,
-                      std::vector<base::ObjectPtr>* valid_objects);
+bool ObjectInRoiCheck(
+    const std::shared_ptr<const apollo::perception::base::HdmapStruct> roi,
+    const std::vector<std::shared_ptr<apollo::perception::base::Object>>& objs,
+    std::vector<std::shared_ptr<apollo::perception::base::Object>>* valid_objs);
 
 // @brief: whether objects' center and bbox is in ROI. If return True,
 //         you can get objects in ROI by param valid_objects.
-bool ObjectInRoiSlackCheck(const base::HdmapStructConstPtr roi,
-                           const std::vector<base::ObjectPtr>& objects,
-                           std::vector<base::ObjectPtr>* valid_objects);
+bool ObjectInRoiSlackCheck(
+    const std::shared_ptr<const apollo::perception::base::HdmapStruct> roi,
+    const std::vector<std::shared_ptr<apollo::perception::base::Object>>& objs,
+    std::vector<std::shared_ptr<apollo::perception::base::Object>>* valid_objs);
 
 }  // namespace common
 }  // namespace perception
