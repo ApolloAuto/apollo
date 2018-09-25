@@ -58,9 +58,9 @@ new_http_archive(
 new_http_archive(
     name = "civetweb",
     build_file = "third_party/civetweb.BUILD",
-    sha256 = "e6958f005aa01b02645bd3ff9760dd085e83d30530cdd97b584632419195bea5",
-    strip_prefix = "civetweb-1.10",
-    url = "file:///home/tmp/civetweb-1.10.tar.gz",
+    sha256 = "de7d5e7a2d9551d325898c71e41d437d5f7b51e754b242af897f7be96e713a42",
+    strip_prefix = "civetweb-1.11",
+    url = "file:///home/tmp/v1.11.tar.gz",
 )
 
 # curlpp
