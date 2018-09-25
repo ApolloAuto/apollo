@@ -16,7 +16,6 @@
 #include <gflags/gflags.h>
 #include <gtest/gtest.h>
 
-#include "modules/perception/base/log.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 
 namespace apollo {
