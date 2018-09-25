@@ -5,8 +5,10 @@ THE APOLLO OPEN PLATFORM (“PLATFORM”) FOR AND ON BEHALF OF ITSELF AND ITS SU
 4. DISCLAIMER OF WARRANTY. THE SOFTWARE IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND. BAIDU FURTHER DISCLAIMS ALL WARRANTIES, EXPRESS AND IMPLIED, INCLUDING WITHOUT LIMITATION, ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE OR NONINFRINGEMENT.
 5. LIMITATION OF LIABILITY. IN NO EVENT SHALL BAIDU BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, PUNITIVE OR CONSEQUENTIAL DAMAGES, OR DAMAGES FOR LOSS OF PROFITS, REVENUE, DATA OR DATA USE, INCURRED BY YOU OR ANY THIRD PARTY, WHETHER IN AN ACTION IN CONTRACT OR TORT, EVEN IF BAIDU HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. BAIDU’S ENTIRE LIABILITY FOR DAMAGES HEREUNDER SHALL IN NO EVENT EXCEED ONE CENT (U.S. $0.01).
 
-Copyright (c) 2017 Various License Holders. All Rights Reserved
+Copyright (c) 2018 Various License Holders. All Rights Reserved
 
 Apollo software is built on top of various other open source software packages, a complete list of licenses are located at https://github.com/ApolloAuto/apollo/blob/master/third_party/ACKNOWLEDGEMENT.txt
+
+By accepting this Service License Agreements, you confirm that you are not a resident or citizen of any country currently embargoed by the U.S. and that you are not otherwise prohibited from receiving the Licensed Software. 
 
 You agree to the terms of all the License Agreements.
