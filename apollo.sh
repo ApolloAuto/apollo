@@ -802,7 +802,7 @@ function main() {
       cibuild $@
       ;;
     build_opt)
-      DEFINES="${DEFINES} --cxxopt=-DCPU_ONLY"
+      DEFINES="${DEFINES} --cxxopt=-DCPU_ONLY --copt=-fpic"
       apollo_build_opt $@
       ;;
     build_gpu)
@@ -811,7 +811,7 @@ function main() {
       apollo_build_dbg $@
       ;;
     build_opt_gpu)
-      DEFINES="${DEFINES} --define USE_GPU=true --cxxopt=-DUSE_GPU"
+      DEFINES="${DEFINES} --define USE_GPU=true --cxxopt=-DUSE_GPU --copt=-fpic"
       USE_GPU="1"
       apollo_build_opt $@
       ;;
