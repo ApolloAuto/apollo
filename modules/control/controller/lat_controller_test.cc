@@ -45,7 +45,7 @@ class LatControllerTest : public ::testing::Test, LatController {
   virtual void SetUp() {
     FLAGS_v = 3;
     std::string control_conf_file =
-        "modules/control/testdata/conf/lincoln.pb.txt";
+        "/apollo/modules/control/testdata/conf/lincoln.pb.txt";
     ControlConf control_conf;
     CHECK(apollo::common::util::GetProtoFromFile(control_conf_file,
                                                  &control_conf));

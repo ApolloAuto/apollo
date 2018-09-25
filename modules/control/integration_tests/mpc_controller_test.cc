@@ -36,9 +36,10 @@ namespace control {
 class MPCControllerTest : public ControlTestBase {
  public:
   virtual void SetUp() {
-    FLAGS_test_data_dir = "modules/control/testdata/mpc_controller_test/";
+    FLAGS_test_data_dir =
+        "/apollo/modules/control/testdata/mpc_controller_test/";
     FLAGS_control_conf_file =
-        "modules/control/testdata/mpc_controller_test/lincoln.pb.txt";
+        "/apollo/modules/control/testdata/mpc_controller_test/lincoln.pb.txt";
     FLAGS_use_navigation_mode = false;
   }
 };

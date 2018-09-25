@@ -18,10 +18,10 @@
 #include <string>
 #include <utility>
 
+#include "cybertron/common/log.h"
 #include "gmock/gmock.h"
 #include "google/protobuf/text_format.h"
 #include "gtest/gtest.h"
-#include "cybertron/common/log.h"
 
 #include "modules/common/time/time.h"
 #include "modules/common/util/util.h"
@@ -36,7 +36,8 @@ namespace control {
 class SimpleControlTest : public ControlTestBase {
  public:
   virtual void SetUp() {
-    FLAGS_test_data_dir = "modules/control/testdata/simple_control_test/";
+    FLAGS_test_data_dir =
+        "/apollo/modules/control/testdata/simple_control_test/";
   }
 };
 

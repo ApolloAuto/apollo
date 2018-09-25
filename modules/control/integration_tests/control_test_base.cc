@@ -17,6 +17,7 @@
 #include <unistd.h>
 #include <climits>
 #include <fstream>
+#include <memory>
 #include <sstream>
 
 #include "google/protobuf/text_format.h"
@@ -73,7 +74,7 @@ bool ControlTestBase::test_control() {
              << FLAGS_test_pad_file;
       return false;
     }
-    control_.OnPad(pad_message);
+    control_.OnPad(std::make_shared<apollo::control::PadMessage>(pad_message));
   }
 
   // Localization
@@ -86,6 +87,9 @@ bool ControlTestBase::test_control() {
              << FLAGS_test_localization_file;
       return false;
     }
+    control_.OnLocalization(
+        std::make_shared<apollo::localization::LocalizationEstimate>(
+            localization));
   }
 
   // Planning
@@ -97,6 +101,8 @@ bool ControlTestBase::test_control() {
              << FLAGS_test_planning_file;
       return false;
     }
+    control_.OnPlanning(
+        std::make_shared<apollo::planning::ADCTrajectory>(trajectory));
   }
 
   // Chassis
@@ -107,10 +113,10 @@ bool ControlTestBase::test_control() {
       AERROR << "Failed to load chassis file " << FLAGS_test_data_dir
              << FLAGS_test_chassis_file;
     }
+    control_.OnChassis(std::make_shared<apollo::canbus::Chassis>(chassis));
   }
 
   // Monitor
-
   if (!FLAGS_test_monitor_file.empty()) {
     MonitorMessage monitor_message;
     apollo::common::util::GetProtoFromFile(
@@ -174,7 +180,8 @@ bool ControlTestBase::test_control(const std::string &test_case_name,
 }
 
 void ControlTestBase::SetUpTestCase() {
-  FLAGS_control_conf_file = "modules/control/testdata/conf/lincoln.pb.txt";
+  FLAGS_control_conf_file =
+      "/apollo/modules/control/testdata/conf/lincoln.pb.txt";
   FLAGS_is_control_test_mode = true;
 }
 
