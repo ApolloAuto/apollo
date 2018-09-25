@@ -64,6 +64,6 @@ if __name__ == "__main__":
         sys.exit(0)
     cybertron.init()
     node = cybertron.Node("transcribe_node")
-    node.create_reader(g_args.topic, meta_msg.msg_type(), transcribe)
+    node.create_reader(g_args.topic, meta_msg.msg_type, transcribe)
     while not cybertron.is_shutdown():
         time.sleep(0.005)

@@ -27,6 +27,7 @@ from google.protobuf import text_format
 
 import common.message_manager as message_manager
 
+
 def generate_message(filename, pb_type):
     f_handle = file(filename, 'r')
     message = pb_type()
@@ -40,9 +41,9 @@ def seq_publisher(seq_num, period):
     rospy.init_node('replay_node', anonymous=True)
     messages = {}
     for msg in message_manager.topic_pb_list:
-        topic = msg.topic()
-        name = msg.name()
-        msg_type = msg.msg_type()
+        topic = msg.topic
+        name = msg.name
+        msg_type = msg.msg_type
         messages[topic] = {}
         filename = str(seq_num) + "_" + name + ".pb.txt"
         print "trying to load pb file:", filename
@@ -59,8 +60,7 @@ def seq_publisher(seq_num, period):
         for topic in messages:
             if messages[topic]["value"] is not None:
                 print "publish: ", topic
-                messages[topic]["publisher"].publish(
-                    messages[topic]["value"])
+                messages[topic]["publisher"].publish(messages[topic]["value"])
         rate.sleep()
 
 

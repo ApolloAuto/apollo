@@ -78,11 +78,11 @@ if __name__ == "__main__":
 
     cybertron.init()
     node = cybertron.Node("derive_event_node")
-    node.create_reader(localization_meta_msg.topic(),
-                       localization_meta_msg.msg_type(), OnReceiveLocalization)
+    node.create_reader(localization_meta_msg.topic,
+                       localization_meta_msg.msg_type, OnReceiveLocalization)
 
-    writer = node.create_writer(drive_event_meta_msg.topic(),
-                                drive_event_meta_msg.msg_type())
+    writer = node.create_writer(drive_event_meta_msg.topic,
+                                drive_event_meta_msg.msg_type)
     seq_num = 0
     while not cybertron.is_shutdown():
         event_type = raw_input(
@@ -98,7 +98,7 @@ if __name__ == "__main__":
         while not event_str:
             event_str = raw_input("Type Event:>")
             event_str = event_str.strip()
-        event_msg = drive_event_meta_msg.msg_type()()
+        event_msg = drive_event_meta_msg.msg_type()
         event_msg.header.timestamp_sec = current_time
         event_msg.header.module_name = "drive_event"
         seq_num += 1

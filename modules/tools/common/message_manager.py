@@ -34,18 +34,9 @@ import proto_utils
 
 class MessageType:
     def __init__(self, name, topic, msg_type):
-        self.__name = name
-        self.__topic = topic
-        self.__msg_type = msg_type
-
-    def name(self):
-        return self.__name
-
-    def topic(self):
-        return self.__topic
-
-    def msg_type(self):
-        return self.__msg_type
+        self.name = name
+        self.topic = topic
+        self.msg_type = msg_type
 
     def instance(self):
         return self.__msg_type()
@@ -90,8 +81,8 @@ class PbMessageManager:
         self.__name_dict = {}
 
         for msg in topic_pb_list:
-            self.__topic_dict[msg.topic()] = msg
-            self.__name_dict[msg.name()] = msg
+            self.__topic_dict[msg.topic] = msg
+            self.__name_dict[msg.name] = msg
 
     def topic_dict(self):
         return self.__topic_dict
