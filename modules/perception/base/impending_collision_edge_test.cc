@@ -38,7 +38,8 @@ TEST_F(ImpendingCollisionEdgeTest, ImpendingCollisionEdges) {
   ImpendingCollisionEdges edges;
 
   edges.timestamp = 1.0;
-  ImpendingCollisionEdgePtr collision_edge_ptr(new ImpendingCollisionEdge());
+  std::shared_ptr<ImpendingCollisionEdge> collision_edge_ptr(
+      new ImpendingCollisionEdge());
   edges.impending_collision_edges.push_back(collision_edge_ptr);
 
   EXPECT_DOUBLE_EQ(edges.timestamp, 1.0);

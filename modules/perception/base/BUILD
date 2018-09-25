@@ -187,6 +187,7 @@ cc_library(
     deps = [
         ":point_cloud",
         ":box",
+        "@eigen",
     ],
 )
 
@@ -209,6 +210,19 @@ cc_library(
         "concurrent_object_pool.h",
     ],
     deps = [
+    ],
+)
+
+cc_test(
+    name = "object_pool_test",
+    size = "small",
+    srcs = [
+        "object_pool_test.cc",
+    ],
+    deps = [
+        ":object",
+        ":object_pool",
+        "@gtest//:main",
     ],
 )
 
