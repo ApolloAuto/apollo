@@ -9,6 +9,7 @@ cc_library(
         "lane_struct.h",
         "landmark_struct.h",
         "sensor_meta.h",
+        "vehicle_struct.h",
     ],
     deps = [
     ],
