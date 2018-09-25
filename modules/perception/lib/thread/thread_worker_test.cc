@@ -15,7 +15,6 @@
  *****************************************************************************/
 #include <gtest/gtest.h>
 
-#include "modules/perception/base/log.h"
 #include "modules/perception/lib/thread/thread_worker.h"
 
 namespace apollo {

@@ -1,0 +1,80 @@
+load("//tools:cpplint.bzl", "cpplint")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "thread",
+    srcs = [
+        "thread_pool.cc",
+        "thread_worker.cc",
+        "thread.cc",
+    ],
+    hdrs = [
+        "concurrent_queue.h",
+        "mutex.h",
+        "thread_pool.h",
+        "thread_worker.h",
+        "thread.h",
+    ],
+    deps = [
+        "//framework:cybertron",
+    ],
+)
+
+cc_library(
+    name = "concurrent_queue",
+    hdrs = [
+        "concurrent_queue.h",
+    ],
+)
+
+cc_test(
+    name = "concurrent_queue_test",
+    size = "small",
+    srcs = [
+        "concurrent_queue_test.cc",
+    ],
+    deps = [
+        ":thread",
+        "@gtest//:main",
+    ],
+)
+
+cc_test(
+    name = "thread_pool_test",
+    size = "small",
+    srcs = [
+        "thread_pool_test.cc",
+    ],
+    deps = [
+        ":thread",
+        "@com_google_protobuf//:protobuf",
+        "@gtest//:main",
+    ],
+)
+
+cc_test(
+    name = "thread_test",
+    size = "small",
+    srcs = [
+        "thread_test.cc",
+    ],
+    deps = [
+        ":thread",
+        "@gtest//:main",
+    ],
+)
+
+cc_test(
+    name = "thread_worker_test",
+    size = "small",
+    srcs = [
+        "thread_worker_test.cc",
+    ],
+    deps = [
+        ":thread",
+        "@gtest//:main",
+    ],
+)
+
+cpplint()

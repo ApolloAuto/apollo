@@ -15,7 +15,8 @@
  *****************************************************************************/
 #include <gtest/gtest.h>
 
-#include "modules/perception/base/log.h"
+#include "cybertron/common/log.h"
+
 #include "modules/perception/lib/thread/concurrent_queue.h"
 #include "modules/perception/lib/thread/thread.h"
 
@@ -33,18 +34,18 @@ class PushThread : public Thread {
   void Run() override {
     for (int idx = 1; idx < 10; ++idx) {
       queue_->Push(idx);
-      LOG_INFO << "PushThread push value: " << idx;
+      AINFO << "PushThread push value: " << idx;
       ::usleep(100);
     }
     queue_->Push(0);
 
     for (int idx = 10; idx < 15; ++idx) {
       queue_->Push(idx);
-      LOG_INFO << "PushThread push value: " << idx;
+      AINFO << "PushThread push value: " << idx;
       ::usleep(100);
     }
 
-    LOG_INFO << "PushThread finished.";
+    AINFO << "PushThread finished.";
   }
 
  private:
@@ -64,11 +65,11 @@ class PopThread : public Thread {
       queue_->Pop(&value);
 
       if (value == 0) {
-        LOG_INFO << "PopThread finished.";
+        AINFO << "PopThread finished.";
         break;
       }
 
-      LOG_INFO << "PopThread pop value: " << value;
+      AINFO << "PopThread pop value: " << value;
     }
   }
 
