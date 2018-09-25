@@ -19,9 +19,15 @@
 
 #include "gflags/gflags.h"
 
+// sensor_manager
 DECLARE_string(obs_sensor_intrinsic_path);
 DECLARE_string(obs_sensor_meta_path);
 
 DECLARE_bool(enable_base_object_pool);
+
+// config_manager
+DECLARE_string(config_manager_path);
+DECLARE_string(work_root);
+DECLARE_string(adu_data);
 
 #endif  // MODULES_PERCEPTION_COMMON_PERCEPTION_GFLAGS_H_

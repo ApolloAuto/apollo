@@ -1,5 +1,5 @@
 syntax = "proto2";
-package apollo.perception.lib;
+package apollo.perception;
 
 message KeyValueInt {
     required string name = 1;
