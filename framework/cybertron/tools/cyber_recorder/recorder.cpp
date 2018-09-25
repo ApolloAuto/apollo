@@ -150,7 +150,10 @@ bool Recorder::InitReaderImpl(const std::string& channel_name,
       share_this->ReaderCallback(raw_message, channel_name);
       share_this->writer_->ShowProgress();
     };
-    reader = node_->CreateReader<RawMessage>(channel_name, callback);
+    ReaderConfig config;
+    config.channel_name = channel_name;
+    config.pending_queue_size = 20;
+    reader = node_->CreateReader<RawMessage>(config, callback);
     if (reader == nullptr) {
       AERROR << "Create reader failed.";
       return false;
