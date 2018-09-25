@@ -13,10 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include <gtest/gtest.h>
+
+#include "modules/perception/base/box.h"
+
 #include <limits>
 #include <vector>
-#include "modules/perception/base/box.h"
+
+#include "gtest/gtest.h"
 
 namespace apollo {
 namespace perception {

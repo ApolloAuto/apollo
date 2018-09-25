@@ -396,6 +396,7 @@ function gen_coverage() {
 }
 
 function run_test() {
+
   generate_build_targets
   if [ "$USE_GPU" == "1" ]; then
     echo -e "${YELLOW}Running tests under GPU mode. GPU is required to run the tests.${NO_COLOR}"
@@ -497,7 +498,7 @@ function citest() {
   bash cybertron.sh build_fast
   cd /apollo
 
-  citest_basic
+  run_test
   if [ $? -eq 0 ]; then
     success 'Test passed!'
     return 0

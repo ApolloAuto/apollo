@@ -17,6 +17,7 @@
 #define MODULES_PERCEPTION_BASE_OBJECT_TYPES_H_
 
 #include <map>
+#include <string>
 
 namespace apollo {
 namespace perception {
@@ -93,6 +94,7 @@ enum class VisualLandmarkType {
   TrafficLight,
   MAX_LANDMARK_TYPE,
 };
+
 const std::map<VisualLandmarkType, std::string> kVisualLandmarkType2NameMap = {
     {VisualLandmarkType::RoadArrow, "RoadArrow"},
     {VisualLandmarkType::RoadText, "RoadText"},
@@ -228,4 +230,5 @@ const std::map<std::string, ObjectSubType> kName2SubTypeMap = {
 }  // namespace base
 }  // namespace perception
 }  // namespace apollo
+
 #endif  // MODULES_PERCEPTION_BASE_OBJECT_TYPES_H_
