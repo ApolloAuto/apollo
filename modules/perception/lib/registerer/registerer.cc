@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+
 #include "modules/perception/lib/registerer/registerer.h"
 
 namespace apollo {
@@ -31,7 +32,7 @@ bool GetRegisteredClasses(
   BaseClassMap &map = GlobalFactoryMap();
   auto iter = map.find(base_class_name);
   if (iter == map.end()) {
-    LOG_ERROR << "class not registered:" << base_class_name;
+    AERROR << "class not registered:" << base_class_name;
     return false;
   }
   for (auto pair : iter->second) {
