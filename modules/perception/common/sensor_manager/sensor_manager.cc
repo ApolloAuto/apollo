@@ -22,10 +22,9 @@
 
 #include "cybertron/common/log.h"
 
-//#include "modules/perception/common/io/io_util.h"
+// #include "modules/perception/common/io/io_util.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lib/io/file_util.h"
-//#include "modules/perception/lib/thread/mutex.h"
 #include "modules/perception/proto/sensor_meta_schema.pb.h"
 
 namespace apollo {

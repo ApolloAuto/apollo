@@ -16,10 +16,9 @@
 #include "modules/perception/lib/config_manager/config_manager.h"
 
 #include <utility>
-
-#include "cybertron/common/log.h"
 #include "google/protobuf/text_format.h"
 
+#include "cybertron/common/log.h"
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/lib/io/file_util.h"
 
@@ -28,12 +27,6 @@ namespace perception {
 namespace lib {
 
 using google::protobuf::TextFormat;
-using std::map;
-using std::move;
-using std::pair;
-using std::string;
-using std::stringstream;
-using std::vector;
 
 ConfigManager::ConfigManager() {
   work_root_ = FLAGS_work_root;
@@ -64,7 +57,7 @@ bool ConfigManager::InitInternal() {
   }
   model_config_map_.clear();
 
-  string config_module_path =
+  std::string config_module_path =
       FileUtil::GetAbsolutePath(work_root_, FLAGS_config_manager_path);
   AINFO << "WORK_ROOT: " << work_root_
         << " config_root_path: " << config_module_path
@@ -94,11 +87,11 @@ bool ConfigManager::InitInternal() {
       return false;
     }
 
-    for (const string &model_config_file :
+    for (const std::string &model_config_file :
          file_list_proto.model_config_path()) {
-      string abs_path =
+      std::string abs_path =
           FileUtil::GetAbsolutePath(work_root_, model_config_file);
-      string config_content;
+      std::string config_content;
       if (!FileUtil::GetFileContent(abs_path, &config_content)) {
         AERROR << "failed to get file content: " << abs_path;
         return false;
@@ -121,7 +114,7 @@ bool ConfigManager::InitInternal() {
 
         AINFO << "load ModelConfig succ. name: " << model_config->name();
 
-        pair<std::map<std::string, ModelConfig *>::iterator, bool> result =
+        std::pair<std::map<std::string, ModelConfig *>::iterator, bool> result =
             model_config_map_.emplace(model_config->name(), model_config);
         if (!result.second) {
           AWARN << "duplicate ModelConfig, name: " << model_config->name();
@@ -154,7 +147,7 @@ std::string ConfigManager::get_env(const std::string &var_name) {
   return std::string(var);
 }
 
-bool ConfigManager::GetModelConfig(const string &model_name,
+bool ConfigManager::GetModelConfig(const std::string &model_name,
                                    const ModelConfig **model_config) {
   if (!inited_ && !Init()) {
     return false;
@@ -214,34 +207,34 @@ bool ModelConfig::Reset(const ModelConfigProto &proto) {
   }
 
   for (const KeyValueArrayInt &pair : proto.array_integer_params()) {
-    vector<int> values;
+    std::vector<int> values;
     RepeatedToVector(pair.values(), &values);
     array_integer_param_map_.emplace(pair.name(), values);
   }
 
   for (const KeyValueArrayString &pair : proto.array_string_params()) {
-    vector<string> values;
+    std::vector<std::string> values;
     values.reserve(pair.values_size());
-    for (const string &value : pair.values()) {
+    for (const std::string &value : pair.values()) {
       values.push_back(value);
     }
     array_string_param_map_.emplace(pair.name(), values);
   }
 
   for (const KeyValueArrayDouble &pair : proto.array_double_params()) {
-    vector<double> values;
+    std::vector<double> values;
     RepeatedToVector(pair.values(), &values);
     array_double_param_map_.emplace(pair.name(), values);
   }
 
   for (const KeyValueArrayFloat &pair : proto.array_float_params()) {
-    vector<float> values;
+    std::vector<float> values;
     RepeatedToVector(pair.values(), &values);
     array_float_param_map_.emplace(pair.name(), values);
   }
 
   for (const KeyValueArrayBool &pair : proto.array_bool_params()) {
-    vector<bool> values;
+    std::vector<bool> values;
     RepeatedToVector(pair.values(), &values);
     array_bool_param_map_.emplace(pair.name(), values);
   }
