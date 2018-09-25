@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef PERCEPTION_BASE_HDMAP_STRUCT_H_
-#define PERCEPTION_BASE_HDMAP_STRUCT_H_
+#ifndef MODULES_PERCEPTION_BASE_HDMAP_STRUCT_H_
+#define MODULES_PERCEPTION_BASE_HDMAP_STRUCT_H_
 #include <memory>
 #include <vector>
 #include "modules/perception/base/point_cloud_types.h"
@@ -47,4 +47,4 @@ typedef std::shared_ptr<const HdmapStruct> HdmapStructConstPtr;
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // PERCEPTION_BASE_HDMAP_STRUCT_H_
+#endif  // MODULES_PERCEPTION_BASE_HDMAP_STRUCT_H_

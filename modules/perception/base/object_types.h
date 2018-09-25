@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef PERCEPTION_BASE_OBJECT_TYPES_H_
-#define PERCEPTION_BASE_OBJECT_TYPES_H_
+#ifndef MODULES_PERCEPTION_BASE_OBJECT_TYPES_H_
+#define MODULES_PERCEPTION_BASE_OBJECT_TYPES_H_
 
 #include <map>
 
@@ -228,4 +228,4 @@ const std::map<std::string, ObjectSubType> kName2SubTypeMap = {
 }  // namespace base
 }  // namespace perception
 }  // namespace apollo
-#endif  // PERCEPTION_BASE_OBJECT_TYPES_H_
+#endif  // MODULES_PERCEPTION_BASE_OBJECT_TYPES_H_

@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef PERCEPTION_BASE_BLOB_H_
-#define PERCEPTION_BASE_BLOB_H_
+#ifndef MODULES_PERCEPTION_BASE_BLOB_H_
+#define MODULES_PERCEPTION_BASE_BLOB_H_
 
 #include <algorithm>
 #include <memory>
@@ -274,4 +274,4 @@ using BlobConstPtr = std::shared_ptr<const Blob<Dtype>>;
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // PERCEPTION_BASE_BLOB_H_
+#endif  // MODULES_PERCEPTION_BASE_BLOB_H_

@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef PERCEPTION_BASE_VEHICLE_STRUCT_H_
-#define PERCEPTION_BASE_VEHICLE_STRUCT_H_
+#ifndef MODULES_PERCEPTION_BASE_VEHICLE_STRUCT_H_
+#define MODULES_PERCEPTION_BASE_VEHICLE_STRUCT_H_
 namespace apollo {
 namespace perception {
 namespace base {
@@ -39,4 +39,4 @@ struct CarLight {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // PERCEPTION_BASE_VEHICLE_STRUCT_H_
+#endif  // MODULES_PERCEPTION_BASE_VEHICLE_STRUCT_H_

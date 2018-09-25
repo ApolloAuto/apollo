@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef PERCEPTION_BASE_IMAGE_H_
-#define PERCEPTION_BASE_IMAGE_H_
+#ifndef MODULES_PERCEPTION_BASE_IMAGE_H_
+#define MODULES_PERCEPTION_BASE_IMAGE_H_
 
 #include "modules/perception/base/image_8u.h"
 
-#endif  // PERCEPTION_BASE_IMAGE_H_
+#endif  // MODULES_PERCEPTION_BASE_IMAGE_H_
