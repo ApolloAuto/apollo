@@ -65,6 +65,8 @@ bool IsVehicleStateValid(const VehicleState& vehicle_state) {
 
 bool IsDifferentRouting(const RoutingResponse& first,
                         const RoutingResponse& second) {
+  AERROR << "first routing:" << first.header().DebugString()
+         << " second routing:" << second.header().DebugString();
   if (first.has_header() && second.has_header()) {
     if (first.header().sequence_num() != second.header().sequence_num()) {
       return true;

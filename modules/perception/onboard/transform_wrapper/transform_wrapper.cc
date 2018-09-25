@@ -42,7 +42,7 @@ void TransformCache::AddTransform(const StampedTransform& transform) {
   }
   double delt = transform.timestamp - transforms_.back().timestamp;
   if (delt < 0.0) {
-    LOG_INFO << "ERROR: add earlier transform to transform cache";
+    AINFO << "ERROR: add earlier transform to transform cache";
     return;
   }
 
@@ -67,11 +67,11 @@ bool TransformCache::QueryTransform(double timestamp,
 
   double delt = timestamp - transforms_.back().timestamp;
   if (delt > max_duration) {
-    LOG_INFO << "ERROR: query timestamp is " << delt
+    AINFO << "ERROR: query timestamp is " << delt
              << "s later than cached timestamp";
     return false;
   } else if (delt < 0.0) {
-    LOG_INFO << "ERROR: query earlier timestamp than transform cache";
+    AINFO << "ERROR: query earlier timestamp than transform cache";
     return false;
   }
 
@@ -79,9 +79,9 @@ bool TransformCache::QueryTransform(double timestamp,
   if (size == 1) {
     (*transform) = transforms_.back();
     transform->timestamp = timestamp;
-    LOG_INFO << "use transform at "
-             << GLOG_TIMESTAMP(transforms_.back().timestamp) << " for "
-             << GLOG_TIMESTAMP(timestamp);
+    AINFO << "use transform at "
+             << std::to_string(transforms_.back().timestamp) << " for "
+             << std::to_string(timestamp);
   } else {
     double ratio =
         (timestamp - transforms_[size - 2].timestamp) /
@@ -100,10 +100,10 @@ bool TransformCache::QueryTransform(double timestamp,
         transforms_[size - 2].translation.z() * (1 - ratio) +
         transforms_[size - 1].translation.z() * ratio;
 
-    LOG_INFO << "estimate pose at " << GLOG_TIMESTAMP(timestamp)
+    AINFO << "estimate pose at " << std::to_string(timestamp)
              << " from poses at "
-             << GLOG_TIMESTAMP(transforms_[size - 2].timestamp) << " and "
-             << GLOG_TIMESTAMP(transforms_[size - 1].timestamp);
+             << std::to_string(transforms_[size - 2].timestamp) << " and "
+             << std::to_string(transforms_[size - 1].timestamp);
   }
   return true;
 }
@@ -136,7 +136,7 @@ bool TransformWrapper::GetSensor2worldTrans(
     double timestamp, Eigen::Affine3d* sensor2world_trans,
     Eigen::Affine3d* novatel2world_trans) {
   if (!inited_) {
-    LOG_ERROR << "TransformWrapper not Initialized,"
+    AERROR << "TransformWrapper not Initialized,"
               << " unable to call GetSensor2worldTrans.";
     return false;
   }
@@ -151,7 +151,7 @@ bool TransformWrapper::GetSensor2worldTrans(
     sensor2novatel_extrinsics_.reset(new Eigen::Affine3d);
     *sensor2novatel_extrinsics_ =
         trans_sensor2novatel.translation * trans_sensor2novatel.rotation;
-    LOG_INFO << "Get sensor2novatel extrinsics successfully.";
+    AINFO << "Get sensor2novatel extrinsics successfully.";
   }
 
   StampedTransform trans_novatel2world;
@@ -179,7 +179,7 @@ bool TransformWrapper::GetSensor2worldTrans(
   if (novatel2world_trans != nullptr) {
     *novatel2world_trans = novatel2world;
   }
-  LOG_INFO << "Get pose timestamp: " << GLOG_TIMESTAMP(timestamp)
+  AINFO << "Get pose timestamp: " << std::to_string(timestamp)
            << ", pose: " << std::endl
            << (*sensor2world_trans).matrix();
   return true;
@@ -187,7 +187,7 @@ bool TransformWrapper::GetSensor2worldTrans(
 
 bool TransformWrapper::GetExtrinsics(Eigen::Affine3d* trans) {
   if (!inited_ || trans == nullptr || sensor2novatel_extrinsics_ == nullptr) {
-    LOG_ERROR << "TransformWrapper get extrinsics failed";
+    AERROR << "TransformWrapper get extrinsics failed";
     return false;
   }
   *trans = *sensor2novatel_extrinsics_;
@@ -223,7 +223,7 @@ bool TransformWrapper::QueryTrans(double timestamp, StampedTransform* trans,
   std::string err_string;
   if (!tf2_buffer_->canTransform(frame_id, child_frame_id, query_time,
                                  FLAGS_obs_tf2_buff_size, &err_string)) {
-    LOG_ERROR << "Can not find transform. " << GLOG_TIMESTAMP(timestamp)
+    AERROR << "Can not find transform. " << std::to_string(timestamp)
               << " frame_id: " << frame_id
               << " child_frame_id: " << child_frame_id
               << " Error info: " << err_string;
@@ -245,7 +245,7 @@ bool TransformWrapper::QueryTrans(double timestamp, StampedTransform* trans,
                            stamped_transform.transform().rotation().qy(),
                            stamped_transform.transform().rotation().qz());
   } catch (tf2::TransformException& ex) {
-    LOG_ERROR << ex.what();
+    AERROR << ex.what();
     return false;
   }
   return true;
@@ -255,7 +255,7 @@ bool TransformWrapper::GetExtrinsicsBySensorId(
     const std::string& from_sensor_id, const std::string& to_sensor_id,
     Eigen::Affine3d* trans) {
   if (trans == nullptr) {
-    LOG_ERROR << "TransformWrapper get extrinsics failed";
+    AERROR << "TransformWrapper get extrinsics failed";
     return false;
   }
 

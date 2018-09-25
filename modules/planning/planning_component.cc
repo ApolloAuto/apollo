@@ -38,7 +38,8 @@ bool PlanningComponent::Init() {
   routing_reader_ = node_->CreateReader<RoutingResponse>(
       FLAGS_routing_response_topic,
       [this](const std::shared_ptr<RoutingResponse>& routing) {
-        ADEBUG << "Received routing data: run routing callback.";
+        AINFO << "Received routing data: run routing callback 2:"
+               << routing->header().DebugString();
         std::lock_guard<std::mutex> lock(mutex_);
         routing_.CopyFrom(*routing);
       });
