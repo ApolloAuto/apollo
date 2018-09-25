@@ -21,8 +21,21 @@ cc_test(
         "point_cloud_test.cc",
     ],
     deps = [
-        ":point_cloud",
         "@gtest//:main",
+        ":point_cloud",
+    ],
+)
+
+cc_library(
+    name = "camera",
+    srcs = [
+        "camera.cc",
+    ],
+    hdrs = [
+        "camera.h",
+    ],
+    deps = [
+        "@eigen",
     ],
 )
 
