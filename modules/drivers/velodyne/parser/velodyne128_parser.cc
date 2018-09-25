@@ -59,7 +59,7 @@ void Velodyne128Parser::GeneratePointcloud(
 uint64_t Velodyne128Parser::GetTimestamp(double base_time, float time_offset,
                                           uint16_t block_id) {
   (void)block_id;
-  double t = base_time - time_offset;
+  double t = base_time + time_offset;
   uint64_t timestamp =
       GetGpsStamp(t, &previous_packet_stamp_, &gps_base_usec_);
   return timestamp;
