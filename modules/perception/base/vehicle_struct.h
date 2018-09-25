@@ -15,9 +15,11 @@
  *****************************************************************************/
 #ifndef MODULES_PERCEPTION_BASE_VEHICLE_STRUCT_H_
 #define MODULES_PERCEPTION_BASE_VEHICLE_STRUCT_H_
+
 namespace apollo {
 namespace perception {
 namespace base {
+
 struct CarLight {
   float brake_visible = 0;
   float brake_switch_on = 0;
@@ -35,6 +37,7 @@ struct CarLight {
     right_turn_switch_on = 0;
   }
 };
+
 }  // namespace base
 }  // namespace perception
 }  // namespace apollo

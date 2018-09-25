@@ -15,10 +15,11 @@
  *****************************************************************************/
 #ifndef MODULES_PERCEPTION_BASE_OBJECT_H_
 #define MODULES_PERCEPTION_BASE_OBJECT_H_
-#include <Eigen/Core>
 
 #include <string>
 #include <vector>
+
+#include "Eigen/Core"
 
 #include "modules/perception/base/object_supplement.h"
 #include "modules/perception/base/object_types.h"
@@ -28,6 +29,7 @@
 namespace apollo {
 namespace perception {
 namespace base {
+
 struct alignas(16) Object {
   Object();
   Object(const Object &) = default;
@@ -39,7 +41,7 @@ struct alignas(16) Object {
   int id = -1;
 
   // @brief convex hull of the object, required
-  PolygonDType polygon;
+  PointCloud<PointD> polygon;
 
   // oriented boundingbox information
   // @brief main direction of the object, required
@@ -109,9 +111,6 @@ struct alignas(16) Object {
   CameraObjectSupplement camera_supplement;
   FusionObjectSupplement fusion_supplement;
 };
-
-typedef std::shared_ptr<Object> ObjectPtr;
-typedef std::shared_ptr<const Object> ObjectConstPtr;
 
 }  // namespace base
 }  // namespace perception

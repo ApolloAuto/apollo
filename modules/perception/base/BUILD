@@ -26,4 +26,56 @@ cc_test(
     ],
 )
 
+cc_library(
+    name = "object",
+    hdrs = [
+        "object.h",
+        "object_supplement.h",
+        "object_types.h",
+        "vehicle_struct.h",
+    ],
+    srcs = [
+        "object.cc",
+    ],
+    deps = [
+        ":point_cloud",
+        ":box",
+    ],
+)
+
+cc_test(
+    name = "object_test",
+    size = "small",
+    srcs = [
+        "object_test.cc",
+    ],
+    deps = [
+        ":object",
+        "@gtest//:main",
+    ],
+)
+
+cc_library(
+    name = "box",
+    hdrs = [
+        "box.h",
+        "comparison_traits.h",
+    ],
+    deps = [
+        ":point_cloud",
+    ],
+)
+
+cc_test(
+    name = "box_test",
+    size = "small",
+    srcs = [
+        "box_test.cc",
+    ],
+    deps = [
+        ":box",
+        "@gtest//:main",
+    ],
+)
+
 cpplint()

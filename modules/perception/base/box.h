@@ -13,25 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_BASE_IMAGE_CORE_H_
-#define MODULES_PERCEPTION_BASE_IMAGE_CORE_H_
+#ifndef MODULES_PERCEPTION_BASE_BOX_H_
+#define MODULES_PERCEPTION_BASE_BOX_H_
 
-#include <float.h>
-#include <stdint.h>
 #include <algorithm>
+#include <cfloat>
+#include <cstdint>
 #include <memory>
 #include <sstream>
 #include <string>
 #include <vector>
+
 #include "modules/perception/base/comparison_traits.h"
 #include "modules/perception/base/point.h"
 
 namespace apollo {
 namespace perception {
 namespace base {
-
-template <typename T>
-struct Rect;
 
 template <typename T>
 struct BBox2D;
@@ -163,16 +161,8 @@ struct BBox2D {
   T ymax = 0;  // bottom-right
 };
 
-typedef Rect<int> RectI;
-typedef Rect<float> RectF;
-typedef Rect<double> RectD;
-
-typedef BBox2D<int> BBox2DI;
-typedef BBox2D<float> BBox2DF;
-typedef BBox2D<double> BBox2DD;
-
 }  // namespace base
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_BASE_IMAGE_CORE_H_
+#endif  // MODULES_PERCEPTION_BASE_BOX_H_

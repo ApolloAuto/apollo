@@ -15,6 +15,7 @@
  *****************************************************************************/
 #ifndef MODULES_PERCEPTION_BASE_OBJECT_SUPPLEMENT_H_
 #define MODULES_PERCEPTION_BASE_OBJECT_SUPPLEMENT_H_
+
 #include <memory>
 #include <string>
 #include <vector>
@@ -47,9 +48,9 @@ struct alignas(16) LidarObjectSupplement {
   // @brief valid only for on_use = true
   bool on_use = false;
   // @brief cloud of the object in lidar coordinates
-  PointFCloud cloud;
+  base::AttributePointCloud<PointF> cloud;
   // @brief cloud of the object in world coordinates
-  PointDCloud cloud_world;
+  base::AttributePointCloud<PointD> cloud_world;
   // @brief background indicator
   bool is_background = false;
   // @brief false positive indicator
@@ -107,10 +108,10 @@ struct alignas(16) CameraObjectSupplement {
     pts8.clear();
     object_feature.clear();
     alpha = 0.0;
-    box = BBox2DF();
-    projected_box = BBox2DF();
-    front_box = BBox2DF();
-    back_box = BBox2DF();
+    box = BBox2D<float>();
+    projected_box = BBox2D<float>();
+    front_box = BBox2D<float>();
+    back_box = BBox2D<float>();
     local_center = Eigen::Vector3f(0.0f, 0.0f, 0.0f);
     visual_type = VisualObjectType::MAX_OBJECT_TYPE;
     visual_type_probs.resize(
@@ -130,10 +131,10 @@ struct alignas(16) CameraObjectSupplement {
   std::string sensor_name;
 
   // @brief  2d box
-  BBox2DF box;
+  BBox2D<float> box;
 
   // @brief projected 2d box
-  BBox2DF projected_box;
+  BBox2D<float> projected_box;
 
   // @brief local track id
   int local_track_id = -1;
@@ -142,10 +143,10 @@ struct alignas(16) CameraObjectSupplement {
   std::vector<float> pts8;
 
   // @brief front box
-  BBox2DF front_box;
+  BBox2D<float> front_box;
 
   // @brief back box
-  BBox2DF back_box;
+  BBox2D<float> back_box;
   std::vector<float> object_feature;
 
   // @brief alpha angle from KITTI: Observation angle of object, in [-pi..pi]
@@ -191,7 +192,7 @@ struct SensorObjectMeasurement {
     size = Eigen::Vector3f(0, 0, 0);
     velocity = Eigen::Vector3f(0, 0, 0);
     type = ObjectType::UNKNOWN;
-    box = BBox2DF();
+    box = BBox2D<float>();
   }
 
   std::string sensor_id = "unknown_sensor";
@@ -203,7 +204,7 @@ struct SensorObjectMeasurement {
   Eigen::Vector3f velocity = Eigen::Vector3f(0, 0, 0);
   ObjectType type = ObjectType::UNKNOWN;
   // @brief only for camera measurement
-  BBox2DF box;
+  BBox2D<float> box;
 };
 
 struct alignas(16) FusionObjectSupplement {
