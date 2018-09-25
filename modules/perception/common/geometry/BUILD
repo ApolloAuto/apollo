@@ -77,4 +77,16 @@ cc_test(
     ],
 )
 
+cc_test(
+    name = "camera_homography_test",
+    size = "small",
+    srcs = [
+        "camera_homography_test.cc",
+    ],
+    deps = [
+        ":camera_homography",
+        "@gtest//:main",
+    ],
+)
+
 cpplint()
