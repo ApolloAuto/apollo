@@ -13,11 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef PERCEPTION_COMMON_SENSOR_MANAGER_SENSOR_MANAGER_H_
-#define PERCEPTION_COMMON_SENSOR_MANAGER_SENSOR_MANAGER_H_
-
-#include <google/protobuf/message.h>
-#include <google/protobuf/text_format.h>
+#ifndef MODULES_PERCEPTION_COMMON_SENSOR_MANAGER_SENSOR_MANAGER_H_
+#define MODULES_PERCEPTION_COMMON_SENSOR_MANAGER_SENSOR_MANAGER_H_
 
 #include <memory>
 #include <mutex>
@@ -25,19 +22,18 @@
 #include <unordered_map>
 #include <vector>
 
-#include "gflags/gflags.h"
-
 #include "modules/perception/base/camera.h"
-#include "modules/perception/base/distortion_model.h"
 #include "modules/perception/base/sensor_meta.h"
+#include "modules/perception/base/distortion_model.h"
+#include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/lib/singleton/singleton.h"
-#include "modules/perception/lib/thread/mutex.h"
 
 namespace apollo {
 namespace perception {
 namespace common {
 
-DECLARE_string(obs_sensor_intrinsic_path);
+using apollo::perception::base::BaseCameraDistortionModel;
+using apollo::perception::base::BaseCameraModel;
 
 class SensorManager {
  public:
@@ -49,28 +45,28 @@ class SensorManager {
   bool IsSensorExist(const std::string& name) const;
 
   bool GetSensorInfo(const std::string& name,
-                     base::SensorInfo* sensor_info) const;
+                     apollo::perception::base::SensorInfo* sensor_info) const;
 
-  base::BaseCameraDistortionModelPtr GetDistortCameraModel(
+  std::shared_ptr<BaseCameraDistortionModel> GetDistortCameraModel(
       const std::string& name) const;
 
-  base::BaseCameraModelPtr GetUndistortCameraModel(
+  std::shared_ptr<BaseCameraModel> GetUndistortCameraModel(
       const std::string& name) const;
 
   // sensor type functions
   bool IsHdLidar(const std::string& name) const;
-  bool IsHdLidar(base::SensorType type) const;
+  bool IsHdLidar(const apollo::perception::base::SensorType& type) const;
   bool IsLdLidar(const std::string& name) const;
-  bool IsLdLidar(base::SensorType type) const;
+  bool IsLdLidar(const apollo::perception::base::SensorType& type) const;
 
   bool IsLidar(const std::string& name) const;
-  bool IsLidar(base::SensorType type) const;
+  bool IsLidar(const apollo::perception::base::SensorType& type) const;
   bool IsRadar(const std::string& name) const;
-  bool IsRadar(base::SensorType type) const;
+  bool IsRadar(const apollo::perception::base::SensorType& type) const;
   bool IsCamera(const std::string& name) const;
-  bool IsCamera(base::SensorType type) const;
+  bool IsCamera(const apollo::perception::base::SensorType& type) const;
   bool IsUltrasonic(const std::string& name) const;
-  bool IsUltrasonic(base::SensorType type) const;
+  bool IsUltrasonic(const apollo::perception::base::SensorType& type) const;
 
   // sensor frame id function
   std::string GetFrameId(const std::string& name) const;
@@ -79,7 +75,7 @@ class SensorManager {
   SensorManager();
   ~SensorManager() = default;
 
-  friend class lib::Singleton<SensorManager>;
+  friend class apollo::perception::lib::Singleton<SensorManager>;
 
   inline std::string IntrinsicPath(const std::string& frame_id) {
     std::string intrinsics =
@@ -91,17 +87,16 @@ class SensorManager {
   std::mutex mutex_;
   bool inited_ = false;
 
-  std::unordered_map<std::string, base::SensorInfo> sensor_info_map_;
-
-  std::unordered_map<std::string, base::BaseCameraDistortionModelPtr>
-      distort_model_map_;
-
-  std::unordered_map<std::string, base::BaseCameraModelPtr>
-      undistort_model_map_;
+  std::unordered_map<std::string,
+      apollo::perception::base::SensorInfo> sensor_info_map_;
+  std::unordered_map<std::string,
+      std::shared_ptr<BaseCameraDistortionModel>> distort_model_map_;
+  std::unordered_map<std::string,
+      std::shared_ptr<BaseCameraModel>> undistort_model_map_;
 };
 
 }  // namespace common
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // PERCEPTION_COMMON_SENSOR_MANAGER_SENSOR_MANAGER_H_
+#endif  // MODULES_PERCEPTION_COMMON_SENSOR_MANAGER_SENSOR_MANAGER_H_

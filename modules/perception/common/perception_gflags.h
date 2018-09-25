@@ -19,7 +19,7 @@
 
 #include "gflags/gflags.h"
 
-DECLARE_string(obs_sensor_intrinsic_pat);
+DECLARE_string(obs_sensor_intrinsic_path);
 DECLARE_string(obs_sensor_meta_path);
 
 #endif  // MODULES_PERCEPTION_COMMON_PERCEPTION_GFLAGS_H_
