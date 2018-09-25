@@ -23,7 +23,7 @@
 
 #include <Eigen/Dense>
 
-#include "modules/perception/base/point_cloud_types.h"
+#include "modules/perception/base/point_cloud.h"
 #include "modules/perception/lib/io/file_util.h"
 
 namespace apollo {

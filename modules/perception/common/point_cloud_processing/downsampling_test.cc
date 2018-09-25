@@ -18,7 +18,7 @@
 
 #include "gtest/gtest.h"
 
-#include "modules/perception/base/point_cloud_types.h"
+#include "modules/perception/base/point_cloud.h"
 #include "modules/perception/common/point_cloud_processing/downsampling.h"
 
 namespace apollo {

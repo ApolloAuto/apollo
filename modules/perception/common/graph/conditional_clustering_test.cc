@@ -20,7 +20,7 @@
 
 #include "gtest/gtest.h"
 
-#include "modules/perception/base/point_cloud_types.h"
+#include "modules/perception/base/point_cloud.h"
 #include "modules/perception/common/geometry/basic.h"
 
 namespace apollo {

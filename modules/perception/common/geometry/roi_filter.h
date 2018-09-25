@@ -15,11 +15,14 @@
  *****************************************************************************/
 #ifndef MODULES_PERCEPTION_COMMON_GEOMETRY_ROI_FILTER_H_
 #define MODULES_PERCEPTION_COMMON_GEOMETRY_ROI_FILTER_H_
-#include <vector>
+
 #include <memory>
+#include <vector>
+
 #include "modules/perception/base/hdmap_struct.h"
 #include "modules/perception/base/object.h"
-#include "modules/perception/base/point_cloud_types.h"
+#include "modules/perception/base/point_cloud.h"
+
 namespace apollo {
 namespace perception {
 namespace common {

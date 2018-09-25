@@ -19,7 +19,7 @@
 #include "modules/perception/base/concurrent_object_pool.h"
 #include "modules/perception/base/frame.h"
 #include "modules/perception/base/object.h"
-#include "modules/perception/base/point_cloud_types.h"
+#include "modules/perception/base/point_cloud.h"
 
 namespace apollo {
 namespace perception {

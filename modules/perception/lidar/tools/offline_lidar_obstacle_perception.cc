@@ -25,7 +25,7 @@
 
 #include "modules/perception/base/object.h"
 #include "modules/perception/base/object_types.h"
-#include "modules/perception/base/point_cloud_types.h"
+#include "modules/perception/base/point_cloud.h"
 #include "modules/perception/common/io/io_util.h"
 #include "modules/perception/common/point_cloud_processing/common.h"
 #include "modules/perception/lib/config_manager/config_manager.h"

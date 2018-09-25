@@ -20,7 +20,7 @@
 #include <string>
 #include <vector>
 
-#include "modules/perception/base/point_cloud_types.h"
+#include "modules/perception/base/point_cloud.h"
 #include "modules/perception/lidar/lib/interface/base_roi_filter.h"
 #include "modules/perception/lidar/lib/roi_filter/hdmap_roi_filter/bitmap2d.h"
 #include "modules/perception/lidar/lib/scene_manager/roi_service/roi_service.h"

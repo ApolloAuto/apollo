@@ -333,7 +333,6 @@ cc_library(
     hdrs = [
         "point.h",
         "point_cloud.h",
-        "point_cloud_types.h",
     ],
     deps = [
         "@eigen",

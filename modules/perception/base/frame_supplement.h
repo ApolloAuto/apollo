@@ -19,7 +19,7 @@
 #include "modules/perception/base/blob.h"
 #include "modules/perception/base/image.h"
 #include "modules/perception/base/impending_collision_edge.h"
-#include "modules/perception/base/point_cloud_types.h"
+#include "modules/perception/base/point_cloud.h"
 
 namespace apollo {
 namespace perception {

@@ -19,7 +19,7 @@
 #include <string>
 #include <vector>
 #include "modules/perception/base/object.h"
-#include "modules/perception/base/point_cloud_types.h"
+#include "modules/perception/base/point_cloud.h"
 #include "modules/perception/lib/registerer/registerer.h"
 #include "modules/perception/lidar/common/lidar_frame.h"
 

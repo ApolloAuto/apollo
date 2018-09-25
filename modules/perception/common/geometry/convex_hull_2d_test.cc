@@ -15,13 +15,11 @@
  *****************************************************************************/
 #include "modules/perception/common/geometry/convex_hull_2d.h"
 
-#include <limits>
 #include <cfloat>
+#include <limits>
 #include "gtest/gtest.h"
 
-#include "modules/perception/base/point_cloud_types.h"
 #include "modules/perception/base/point_cloud.h"
-#include "modules/perception/base/point.h"
 
 namespace apollo {
 namespace perception {

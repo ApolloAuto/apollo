@@ -18,6 +18,7 @@
 #include "Eigen/Dense"
 
 #include "modules/perception/base/object_types.h"
+#include "modules/perception/base/point_cloud.h"
 #include "modules/perception/common/geometry/common.h"
 
 namespace apollo {
@@ -45,8 +46,7 @@ bool IsPtInRoi(const HdmapStructConstPtr roi, const PointD pt) {
   return false;
 }
 
-bool IsObjectInRoi(const HdmapStructConstPtr roi,
-                   const ObjectConstPtr obj) {
+bool IsObjectInRoi(const HdmapStructConstPtr roi, const ObjectConstPtr obj) {
   PointD ct;
   ct.x = obj->center[0];
   ct.y = obj->center[1];

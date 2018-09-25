@@ -20,7 +20,7 @@
 #include <string>
 #include <vector>
 
-#include "modules/perception/base/point_cloud_types.h"
+#include "modules/perception/base/point_cloud.h"
 #include "modules/perception/lidar/lib/interface/base_object_filter.h"
 
 namespace apollo {
