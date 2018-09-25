@@ -36,19 +36,20 @@ namespace apollo {
 namespace monitor {
 
 std::shared_ptr<cybertron::ReaderBase> TopicMonitor::CreateReaderFromChannel(
-    const std::string& channel) {
+    const std::string &channel) {
   if (channel == FLAGS_control_command_topic) {
     return MonitorManager::CreateReader<apollo::control::ControlCommand>(
         FLAGS_control_command_topic);
   } else if (channel == FLAGS_localization_topic) {
-    return MonitorManager::CreateReader<apollo::localization::Pose>(
-        FLAGS_localization_topic);
+    return MonitorManager::CreateReader<
+        apollo::localization::LocalizationEstimate>(FLAGS_localization_topic);
   } else if (channel == FLAGS_perception_obstacle_topic) {
-    return MonitorManager::CreateReader<apollo::perception::PerceptionObstacle>(
+    return MonitorManager::CreateReader<
+        apollo::perception::PerceptionObstacles>(
         FLAGS_perception_obstacle_topic);
   } else if (channel == FLAGS_prediction_topic) {
-    return MonitorManager::CreateReader<apollo::prediction::PredictionObstacle>(
-        FLAGS_prediction_topic);
+    return MonitorManager::CreateReader<
+        apollo::prediction::PredictionObstacles>(FLAGS_prediction_topic);
   } else if (channel == FLAGS_planning_trajectory_topic) {
     return MonitorManager::CreateReader<apollo::planning::ADCTrajectory>(
         FLAGS_planning_trajectory_topic);
@@ -64,8 +65,9 @@ std::shared_ptr<cybertron::ReaderBase> TopicMonitor::CreateReaderFromChannel(
 }
 
 TopicMonitor::TopicMonitor(const TopicConf &config, TopicStatus *status)
-    : RecurrentRunner(FLAGS_topic_monitor_name, FLAGS_topic_monitor_interval)
-    , config_(config), status_(status) {
+    : RecurrentRunner(FLAGS_topic_monitor_name, FLAGS_topic_monitor_interval),
+      config_(config),
+      status_(status) {
   reader_ = CreateReaderFromChannel(config.channel());
 }
 
