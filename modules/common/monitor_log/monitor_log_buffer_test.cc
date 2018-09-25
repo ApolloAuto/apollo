@@ -38,19 +38,13 @@ TEST_F(MonitorBufferTest, RegisterMacro) {
   {
     buffer_.INFO("Info");
     EXPECT_EQ(MonitorMessageItem::INFO, buffer_.level_);
-    ASSERT_EQ(1, buffer_.monitor_msg_items_.size());
-    const auto &item = buffer_.monitor_msg_items_.back();
-    EXPECT_EQ(MonitorMessageItem::INFO, item.first);
-    EXPECT_EQ("Info", item.second);
+    ASSERT_EQ(0, buffer_.monitor_msg_items_.size());
   }
 
   {
     buffer_.ERROR("Error");
-    EXPECT_EQ(MonitorMessageItem::ERROR, buffer_.level_);
-    ASSERT_EQ(2, buffer_.monitor_msg_items_.size());
-    const auto &item = buffer_.monitor_msg_items_.back();
-    EXPECT_EQ(MonitorMessageItem::ERROR, item.first);
-    EXPECT_EQ("Error", item.second);
+    EXPECT_EQ(MonitorMessageItem::INFO, buffer_.level_);
+    ASSERT_EQ(0, buffer_.monitor_msg_items_.size());
   }
 }
 
