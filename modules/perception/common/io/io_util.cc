@@ -25,6 +25,7 @@
 #include <algorithm>
 #include <fstream>
 #include <iomanip>
+#include <vector>
 
 #include "modules/perception/base/camera.h"
 #include "cybertron/common/log.h"
@@ -37,13 +38,13 @@ namespace common {
 bool ReadPoseFile(const std::string &filename, Eigen::Affine3d *pose,
                   int *frame_id, double *time_stamp) {
   if (pose == nullptr || frame_id == nullptr || time_stamp == nullptr) {
-    LOG_ERROR << "Nullptr error.";
+    AERROR << "Nullptr error.";
     return false;
   }
 
   std::ifstream fin(filename.c_str());
   if (!fin.is_open()) {
-    LOG_ERROR << "Failed to open file " << filename;
+    AERROR << "Failed to open file " << filename;
     return false;
   }
 
@@ -73,7 +74,7 @@ bool LoadBrownCameraIntrinsic(const std::string &yaml_file,
 
   YAML::Node node = YAML::LoadFile(yaml_file);
   if (node.IsNull()) {
-    LOG_INFO << "Load " << yaml_file << " failed! please check!";
+    AINFO << "Load " << yaml_file << " failed! please check!";
     return false;
   }
 
@@ -92,7 +93,7 @@ bool LoadBrownCameraIntrinsic(const std::string &yaml_file,
 
     model->set_params(camera_width, camera_height, params);
   } catch (YAML::Exception &e) {
-    LOG_ERROR << "load camera intrisic file " << yaml_file
+    AERROR << "load camera intrisic file " << yaml_file
               << " with error, YAML exception: " << e.what();
     return false;
   }
@@ -114,7 +115,7 @@ bool LoadOmnidirectionalCameraIntrinsics(
 
   YAML::Node node = YAML::LoadFile(yaml_file);
   if (node.IsNull()) {
-    LOG_INFO << "Load " << yaml_file << " failed! please check!";
+    AINFO << "Load " << yaml_file << " failed! please check!";
     return false;
   }
 
@@ -122,7 +123,7 @@ bool LoadOmnidirectionalCameraIntrinsics(
       !node["center"].IsDefined() || !node["affine"].IsDefined() ||
       !node["cam2world"].IsDefined() || !node["world2cam"].IsDefined() ||
       !node["focallength"].IsDefined() || !node["principalpoint"].IsDefined()) {
-    LOG_INFO << "Invalid intrinsics file for an omnidirectional camera.";
+    AINFO << "Invalid intrinsics file for an omnidirectional camera.";
     return false;
   }
 
@@ -165,7 +166,7 @@ bool LoadOmnidirectionalCameraIntrinsics(
 
     model->set_params(camera_width, camera_height, eigen_params);
   } catch (YAML::Exception &e) {
-    LOG_ERROR << "load camera intrisic file " << yaml_file
+    AERROR << "load camera intrisic file " << yaml_file
               << " with error, YAML exception: " << e.what();
     return false;
   }
