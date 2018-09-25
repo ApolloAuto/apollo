@@ -9,6 +9,9 @@ cc_library(
     hdrs = ["cruise_scenario_features.h", 
             "scenario_features.h"],
     deps = [
+        "//modules/prediction/common:prediction_gflags",
+        "//modules/prediction/common:prediction_map",
+        "//modules/prediction/common:environment_features",
         "//framework:cybertron",
     ],
 )

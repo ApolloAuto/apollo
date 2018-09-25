@@ -15,8 +15,10 @@
  *****************************************************************************/
 
 #include "modules/prediction/scenario/analyzer/scenario_analyzer.h"
+
+#include <string>
+
 #include "modules/prediction/common/prediction_gflags.h"
-#include "modules/prediction/scenario/scenario_features/cruise_scenario_features.h"
 
 namespace apollo {
 namespace prediction {
@@ -32,6 +34,13 @@ void ScenarioAnalyzer::Analyze(
   } else if (environment_features.has_ego_lane()) {
     scenario_.set_type(Scenario::CRUISE);
   }
+
+  if (scenario_.type() == Scenario::CRUISE) {
+    std::shared_ptr<CruiseScenarioFeatures> cruise_scenario_features =
+        std::make_shared<CruiseScenarioFeatures>();
+    cruise_scenario_features->BuildCruiseScenarioFeatures(environment_features);
+    scenario_features_ = cruise_scenario_features;
+  }
 }
 
 const Scenario& ScenarioAnalyzer::scenario() const {
@@ -41,13 +50,6 @@ const Scenario& ScenarioAnalyzer::scenario() const {
 std::shared_ptr<ScenarioFeatures>
 ScenarioAnalyzer::GetScenarioFeatures() {
   return scenario_features_;
-}
-
-void ScenarioAnalyzer::BuildCruiseScenarioFeatures(
-    const EnvironmentFeatures& environment_features) {
-  // TODO(kechxu) implement
-  std::shared_ptr<CruiseScenarioFeatures> cruise_scenario_features;
-  scenario_features_ = cruise_scenario_features;
 }
 
 }  // namespace prediction

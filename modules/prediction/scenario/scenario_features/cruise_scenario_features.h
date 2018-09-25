@@ -25,6 +25,7 @@
 #include <unordered_set>
 
 #include "modules/prediction/scenario/scenario_features/scenario_features.h"
+#include "modules/prediction/common/environment_features.h"
 
 namespace apollo {
 namespace prediction {
@@ -38,6 +39,14 @@ class CruiseScenarioFeatures : public ScenarioFeatures {
   bool IsLaneOfInterest(const std::string lane_id) const;
 
   void InsertLaneOfInterest(const std::string lane_id);
+
+  void BuildCruiseScenarioFeatures(
+      const EnvironmentFeatures& environment_features);
+
+ private:
+  void SearchAndInsertLanes(
+      const std::string& lane_id, const double start_lane_s,
+      const double range);
 
  private:
   std::unordered_set<std::string> lane_ids_of_interest_;
