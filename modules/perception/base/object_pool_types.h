@@ -15,6 +15,7 @@
  *****************************************************************************/
 #ifndef MODULES_PERCEPTION_BASE_OBJECT_POOL_TYPES_H_
 #define MODULES_PERCEPTION_BASE_OBJECT_POOL_TYPES_H_
+
 #include "modules/perception/base/concurrent_object_pool.h"
 #include "modules/perception/base/frame.h"
 #include "modules/perception/base/object.h"

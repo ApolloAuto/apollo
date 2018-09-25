@@ -15,11 +15,13 @@
  *****************************************************************************/
 #ifndef MODULES_PERCEPTION_BASE_CONCURRENT_OBJECT_POOL_H_
 #define MODULES_PERCEPTION_BASE_CONCURRENT_OBJECT_POOL_H_
+
 #include <deque>
 #include <list>
 #include <mutex>
 #include <queue>
 #include <vector>
+
 #include "modules/perception/base/object_pool.h"
 
 #define PERCEPTION_BASE_DISABLE_POOL
@@ -50,6 +52,7 @@ class ConcurrentObjectPool : public BaseObjectPool<ObjectType> {
   }
   // @brief overrided function to get object smart pointer
   ObjectTypePtr Get() override {
+// TODO(All): remove conditional build
 #ifndef PERCEPTION_BASE_DISABLE_POOL
     ObjectType* ptr = nullptr;
     {

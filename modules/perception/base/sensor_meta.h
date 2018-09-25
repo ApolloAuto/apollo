@@ -68,7 +68,8 @@ struct SensorInfo {
   }
 };
 
-typedef std::shared_ptr<SensorInfo> SensorInfoPtr;
+// TODO(All): remove
+// typedef std::shared_ptr<SensorInfo> SensorInfoPtr;
 
 }  // namespace base
 }  // namespace perception
