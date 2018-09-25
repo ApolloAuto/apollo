@@ -14,6 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/perception/lidar/common/lidar_frame_pool.h"
+
 #include "modules/perception/lidar/common/lidar_log.h"
 
 namespace apollo {
@@ -23,7 +24,7 @@ namespace lidar {
 // @brief call pool instance once to intialize memory
 __attribute__((constructor)) void LidarFramePoolInitialize() {
   LidarFramePool::Instance();
-  LOG_INFO << "Initialize lidar frame pool.";
+  AINFO << "Initialize lidar frame pool.";
 }
 
 }  // namespace lidar

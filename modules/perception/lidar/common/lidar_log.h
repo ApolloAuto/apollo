@@ -15,7 +15,8 @@
  *****************************************************************************/
 #ifndef MODULES_PERCEPTION_LIDAR_COMMON_LIDAR_LOG_H_
 #define MODULES_PERCEPTION_LIDAR_COMMON_LIDAR_LOG_H_
-#include "modules/perception/base/log.h"
+
+#include "cybertron/common/log.h"
 
 // 100-199 reserve for hd lidar(64...) module error
 #define HDLIDAR_SOURCE_DATA_ERROR 100

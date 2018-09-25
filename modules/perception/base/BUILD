@@ -16,6 +16,7 @@ cc_library(
         ":impending_collision_edge",
         ":object",
         ":object_pool",
+        ":object_pool_types",
         ":omnidirectional_model",
         ":point_cloud",
         ":polynomial",

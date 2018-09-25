@@ -15,28 +15,31 @@
  *****************************************************************************/
 #ifndef MODULES_PERCEPTION_BASE_HDMAP_STRUCT_H_
 #define MODULES_PERCEPTION_BASE_HDMAP_STRUCT_H_
+
 #include <memory>
 #include <vector>
+
+#include "modules/perception/base/point_cloud_types.h"
 
 namespace apollo {
 namespace perception {
 namespace base {
 
 struct alignas(16) RoadBoundary {
-  PolygonDType left_boundary;
-  PolygonDType right_boundary;
+  PointCloud<PointD> left_boundary;
+  PointCloud<PointD> right_boundary;
 };
 
 struct alignas(16) LaneBoundary {
-  PolygonDType left_boundary;
-  PolygonDType right_boundary;
+  PointCloud<PointD> left_boundary;
+  PointCloud<PointD> right_boundary;
 };
 
 struct alignas(16) HdmapStruct {
   std::vector<RoadBoundary> road_boundary;
-  std::vector<PolygonDType> road_polygons;
-  std::vector<PolygonDType> hole_polygons;
-  std::vector<PolygonDType> junction_polygons;
+  std::vector<PointCloud<PointD>> road_polygons;
+  std::vector<PointCloud<PointD>> hole_polygons;
+  std::vector<PointCloud<PointD>> junction_polygons;
 };
 
 // TODO(all): tp remove

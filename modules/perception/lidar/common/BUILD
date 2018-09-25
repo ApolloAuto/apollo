@@ -15,29 +15,52 @@ cc_library(
     ],
 )
 
-# cc_library(
-#     name = "base_type",
-#     hdrs = [
-#         "hdmap_struct.h",
-#         "lane_struct.h",
-#         "landmark_struct.h",
-#         "sensor_meta.h",
-#         "vehicle_struct.h",
-#     ],
-# )
-#
-# cc_test(
-#     name = "syncedmem_test",
-#     size = "small",
-#     srcs = [
-#         "syncedmem_test.cc",
-#     ],
-#     deps = [
-#         ":syncedmem",
-#         "//modules/perception/base/test:test_helper",
-#         "@cuda",
-#         "@gtest//:main",
-#     ],
-# )
+cc_test(
+    name = "cloud_mask_test",
+    size = "small",
+    srcs = [
+        "cloud_mask_test.cc",
+    ],
+    deps = [
+        ":cloud_mask",
+        "@gtest//:main",
+    ],
+)
+
+cc_library(
+    name = "lidar_log",
+    hdrs = [
+        "lidar_log.h",
+    ],
+    deps = [
+        "//framework:cybertron",
+    ],
+)
+
+cc_library(
+    name = "feature_descriptor",
+    hdrs = [
+        "feature_descriptor.h",
+    ],
+    deps = [
+        "//framework:cybertron",
+        "//modules/perception/base:point_cloud",
+    ],
+)
+
+cc_library(
+    name = "lidar_frame",
+    srcs = [
+        "lidar_frame_pool.cc",
+    ],
+    hdrs = [
+        "lidar_frame.h",
+        "lidar_frame_pool.h",
+    ],
+    deps = [
+        "//modules/perception/base",
+        ":lidar_log",
+    ],
+)
 
 cpplint()
