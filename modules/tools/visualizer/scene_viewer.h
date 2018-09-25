@@ -45,14 +45,7 @@ class SceneViewer : public QOpenGLWidget, protected QOpenGLFunctions {
   bool is_init(void) const { return is_init_; }
   bool IsFreeCamera(void) const { return current_cameraPtr_ == &free_camera_; }
 
-  bool AddTempRenderableObj(RenderableObject* renderObj) {
-    if (renderObj && renderObj->haveShaderProgram() && is_init_) {
-      tmp_renderable_obj_list_.append(renderObj);
-      return true;
-    } else
-      return false;
-  }
-
+  bool AddTempRenderableObj(const std::string& tmpObjGroupName, RenderableObject* renderObj);
   bool AddPermanentRenderObj(RenderableObject* obj) {
     if (obj && obj->haveShaderProgram() && is_init_) {
       permanent_renderable_obj_list_.append(obj);
@@ -61,6 +54,8 @@ class SceneViewer : public QOpenGLWidget, protected QOpenGLFunctions {
       return false;
     }
   }
+
+  void setTempObjGroupEnabled(const std::string& tmpObjGroupName, bool b);
 
   const QVector3D& CameraPos(void) const {
     return current_cameraPtr_->position();
@@ -150,7 +145,9 @@ class SceneViewer : public QOpenGLWidget, protected QOpenGLFunctions {
   std::map<const std::string, std::shared_ptr<QOpenGLShaderProgram>>
       managed_shader_prog_;
 
-  QList<RenderableObject*> tmp_renderable_obj_list_;
+  struct TempRenderableObjGroup;
+
+  std::map< const std::string, TempRenderableObjGroup* > tmp_renderable_obj_list_;
   QList<RenderableObject*> permanent_renderable_obj_list_;
 };
 

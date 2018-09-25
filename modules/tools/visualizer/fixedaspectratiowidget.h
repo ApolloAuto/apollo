@@ -23,6 +23,7 @@
 
 class FixedAspectRatioWidget : public QWidget {
   Q_OBJECT
+  
  public:
   explicit FixedAspectRatioWidget(QWidget *parent = nullptr, int index = 0);
 

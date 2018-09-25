@@ -17,7 +17,7 @@
 #ifndef TOOLS_CVT_VISUALIZER_POINTCLOUD_H_
 #define TOOLS_CVT_VISUALIZER_POINTCLOUD_H_
 
-#include <sensor_pointcloud.pb.h>
+#include "modules/drivers/proto/pointcloud.pb.h"
 #include "renderable_object.h"
 
 class QOpenGLShaderProgram;
@@ -32,7 +32,7 @@ class PointCloud : public RenderableObject {
   virtual GLenum GetPrimitiveType(void) const { return GL_POINTS; }
 
   bool FillData(
-      const std::shared_ptr<const adu::common::sensor::PointCloud>& pData);
+      const std::shared_ptr<const apollo::drivers::PointCloud>& pData);
 
  private:
   virtual bool FillVertexBuffer(GLfloat* vertexBuffer);

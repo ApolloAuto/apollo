@@ -15,12 +15,36 @@
  *****************************************************************************/
 
 #include "scene_viewer.h"
+#include "scene_camera_dialog.h"
 #include <QMessageBox>
 #include <QTimer>
 #include <QWheelEvent>
 #include <iomanip>
 #include <iostream>
-#include "scene_camera_dialog.h"
+
+struct SceneViewer::TempRenderableObjGroup{
+      bool isEnabled_;
+      QList<RenderableObject*> objGroupList_;
+
+      explicit TempRenderableObjGroup(void):isEnabled_(true), objGroupList_(){}
+      ~TempRenderableObjGroup(void){
+          while(!objGroupList_.isEmpty()){
+              delete objGroupList_.takeFirst();
+          }
+
+          objGroupList_.clear();
+      }
+
+      bool isEmpty(void)const{
+          return objGroupList_.isEmpty();
+      }
+
+      bool isEnabled(void)const{ return isEnabled_; }
+
+      void append(RenderableObject* obj){ objGroupList_.append(obj); }
+      RenderableObject* takeFirst(void){ return objGroupList_.takeFirst(); }
+      RenderableObject* takeLast(void){ return objGroupList_.takeLast(); }
+};
 
 SceneViewer::SceneViewer(QWidget *parent)
     : QOpenGLWidget(parent),
@@ -58,9 +82,11 @@ SceneViewer::~SceneViewer() {
 
     managed_shader_prog_.clear();
 
-    while (!tmp_renderable_obj_list_.isEmpty()) {
-      delete tmp_renderable_obj_list_.takeFirst();
+    for(auto& iter : tmp_renderable_obj_list_){
+        delete iter.second;
     }
+
+    tmp_renderable_obj_list_.clear();
 
     while (!permanent_renderable_obj_list_.isEmpty()) {
       delete permanent_renderable_obj_list_.takeFirst();
@@ -70,10 +96,38 @@ SceneViewer::~SceneViewer() {
   }
 }
 
+void SceneViewer::setTempObjGroupEnabled(const std::string &tmpObjGroupName, bool b){
+    auto iter = tmp_renderable_obj_list_.find(tmpObjGroupName);
+    if(iter != tmp_renderable_obj_list_.cend()){
+        iter->second->isEnabled_ = b;
+    }
+}
+
+bool SceneViewer::AddTempRenderableObj(const std::string& tmpObjGroupName, RenderableObject* renderObj) {
+  bool ret = false;
+  if (renderObj && renderObj->haveShaderProgram() && is_init_) {
+    auto iter = tmp_renderable_obj_list_.find(tmpObjGroupName);
+    if(iter == tmp_renderable_obj_list_.cend()){
+        TempRenderableObjGroup* objGroup = new TempRenderableObjGroup();
+        if(objGroup){
+            objGroup->append(renderObj);
+            tmp_renderable_obj_list_.insert(std::make_pair(tmpObjGroupName, objGroup));
+            ret = true;
+        }
+    } else {
+        iter->second->objGroupList_.append(renderObj);
+        ret = true;
+    }
+  }
+
+  return ret;
+}
+
 void SceneViewer::initializeGL() {
   initializeOpenGLFunctions();
 
   glPointSize(1.0f);
+  glEnable(GL_PROGRAM_POINT_SIZE);
   glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
   refreshTimer_ = new QTimer(this);
@@ -118,15 +172,24 @@ void SceneViewer::paintGL() {
       if (item->Init()) item->Render();
     }
 
-    if (!tmp_renderable_obj_list_.isEmpty()) {
-      auto lastItem = tmp_renderable_obj_list_.takeLast();
-      if (lastItem->Init()) lastItem->Render();
+    for(auto& iter : tmp_renderable_obj_list_) {
+      if(!iter.second->isEmpty()){
 
-      while (!tmp_renderable_obj_list_.isEmpty()) {
-        delete tmp_renderable_obj_list_.takeFirst();
+          RenderableObject* lastItem = nullptr;
+
+          if(iter.second->isEnabled()){
+              lastItem = iter.second->takeLast();
+              if (lastItem->Init()) lastItem->Render();
+          }
+
+          while (!iter.second->isEmpty()) {
+            delete iter.second->takeFirst();
+          }
+
+          if(lastItem){
+            iter.second->append(lastItem);
+          }
       }
-
-      tmp_renderable_obj_list_.append(lastItem);
     }
   }
 }
