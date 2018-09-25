@@ -16,12 +16,40 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "blob_test",
+    size = "small",
+    srcs = [
+        "blob_test.cc",
+    ],
+    deps = [
+        ":blob",
+        "//modules/perception/base/test:test_helper",
+        "@cuda",
+        "@gtest//:main",
+    ],
+)
+
 cc_library(
     name = "common",
     hdrs = [
         "common.h",
     ],
     deps = [
+    ],
+)
+
+cc_test(
+    name = "common_test",
+    size = "small",
+    srcs = [
+        "common_test.cc",
+    ],
+    deps = [
+        ":common",
+        "//modules/perception/base/test:test_helper",
+        "@cuda",
+        "@gtest//:main",
     ],
 )
 
@@ -124,6 +152,21 @@ cc_library(
     ],
     deps = [
         ":common",
+        "//framework:cybertron",
+    ],
+)
+
+cc_test(
+    name = "syncedmem_test",
+    size = "small",
+    srcs = [
+        "syncedmem_test.cc",
+    ],
+    deps = [
+        ":syncedmem",
+        "//modules/perception/base/test:test_helper",
+        "@cuda",
+        "@gtest//:main",
     ],
 )
 
