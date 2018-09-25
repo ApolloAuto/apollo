@@ -210,10 +210,11 @@ function main(){
         fi
     fi
 
-    docker ps -a --format "{{.Names}}" | grep 'apollo_dev' 1>/dev/null
+    APOLLO_DEV="apollo_dev_${USER}"
+    docker ps -a --format "{{.Names}}" | grep "$APOLLO_DEV" 1>/dev/null
     if [ $? == 0 ]; then
-        docker stop apollo_dev 1>/dev/null
-        docker rm -v -f apollo_dev 1>/dev/null
+        docker stop $APOLLO_DEV 1>/dev/null
+        docker rm -v -f $APOLLO_DEV 1>/dev/null
     fi
 
     # Included default maps.
@@ -242,21 +243,21 @@ function main(){
         mkdir "$HOME/.cache"
     fi
 
-    LOCALIZATION_VOLUME=apollo_localization_volume
+    LOCALIZATION_VOLUME=apollo_localization_volume_$USER
     docker stop ${LOCALIZATION_VOLUME} > /dev/null 2>&1
 
     LOCALIZATION_VOLUME_IMAGE=${DOCKER_REPO}:localization_volume-${ARCH}-latest
     docker pull ${LOCALIZATION_VOLUME_IMAGE}
     docker run -it -d --rm --name ${LOCALIZATION_VOLUME} ${LOCALIZATION_VOLUME_IMAGE}
 
-    YOLO3D_VOLUME=apollo_yolo3d_volume
+    YOLO3D_VOLUME=apollo_yolo3d_volume_$USER
     docker stop ${YOLO3D_VOLUME} > /dev/null 2>&1
 
     YOLO3D_VOLUME_IMAGE=${DOCKER_REPO}:yolo3d_volume-${ARCH}-latest
     docker pull ${YOLO3D_VOLUME_IMAGE}
     docker run -it -d --rm --name ${YOLO3D_VOLUME} ${YOLO3D_VOLUME_IMAGE}
 
-    info "Starting docker container \"apollo_dev\" ..."
+    info "Starting docker container \"${APOLLO_DEV}\" ..."
 
     DOCKER_CMD="nvidia-docker"
     if ! [ -x "$(command -v ${DOCKER_CMD})" ]; then
@@ -266,7 +267,7 @@ function main(){
     ${DOCKER_CMD} run -it \
         -d \
         --privileged \
-        --name apollo_dev \
+        --name $APOLLO_DEV \
         ${MAP_VOLUME_CONF} \
         --volumes-from ${LOCALIZATION_VOLUME} \
         --volumes-from ${YOLO3D_VOLUME} \
@@ -290,12 +291,12 @@ function main(){
         /bin/bash
 
     if [ $? -ne 0 ];then
-        error "Failed to start docker container \"apollo_dev\" based on image: $IMG"
+        error "Failed to start docker container \"${APOLLO_DEV}\" based on image: $IMG"
         exit 1
     fi
 
     if [ "${USER}" != "root" ]; then
-        docker exec apollo_dev bash -c '/apollo/scripts/docker_adduser.sh'
+        docker exec $APOLLO_DEV bash -c '/apollo/scripts/docker_adduser.sh'
     fi
 
     ok "Finished setting up Apollo docker environment. Now you can enter with: \nbash docker/scripts/dev_into.sh"

@@ -17,10 +17,10 @@
 ###############################################################################
 
 function check_docker_open() {
-  docker ps --format "{{.Names}}" | grep apollo_dev 1>/dev/null 2>&1
-  if [ $? != 0 ]; then       
-    echo "The docker is not started, please start it first. "  
-    exit 1  
+  docker ps --format "{{.Names}}" | grep apollo_dev_$USER 1>/dev/null 2>&1
+  if [ $? != 0 ]; then
+    echo "The docker is not started, please start it first. "
+    exit 1
   fi
 }
 
@@ -34,12 +34,12 @@ function print_usage() {
   .${BOLD}/dev_debug_server.sh${NONE} MODULE_NAME PORT_NUMBER"
 
   echo -e "${RED}MODULE_NAME${NONE}:
-  ${BLUE}planning${NONE}: debug the planning module. 
+  ${BLUE}planning${NONE}: debug the planning module.
   ${BLUE}control${NONE}: debug the control module.
   ${BLUE}routing${NONE}: debug the routing module.
   ..., and so on."
 
-  echo -e "${RED}PORT_NUMBER${NONE}: 
+  echo -e "${RED}PORT_NUMBER${NONE}:
   ${NONE}a port number, such as '1111'."
 }
 
@@ -57,6 +57,6 @@ xhost +local:root 1>/dev/null 2>&1
 #echo $@
 docker exec \
     -u $USER \
-    -it apollo_dev \
+    -it apollo_dev_$USER \
     /bin/bash scripts/start_gdb_server.sh $@
 xhost -local:root 1>/dev/null 2>&1

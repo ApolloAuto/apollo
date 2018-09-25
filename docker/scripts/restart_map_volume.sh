@@ -22,7 +22,7 @@
 map_name=$1
 map_version=$2
 
-MAP_VOLUME="apollo_map_volume-${map_name}"
+MAP_VOLUME="apollo_map_volume-${map_name}_${USER}"
 if [[ ${MAP_VOLUME_CONF} == *"${MAP_VOLUME}"* ]]; then
   echo "Map ${map_name} has already been included!"
 else
