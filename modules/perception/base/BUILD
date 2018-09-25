@@ -137,6 +137,14 @@ cc_test(
 )
 
 cc_library(
+    name = "frame",
+    hdrs = [
+        "frame.h",
+        "frame_supplement.h",
+    ],
+)
+
+cc_library(
     name = "object",
     hdrs = [
         "object.h",
@@ -162,6 +170,16 @@ cc_test(
     deps = [
         ":object",
         "@gtest//:main",
+    ],
+)
+
+cc_library(
+    name = "object_pool",
+    hdrs = [
+        "object_pool.h",
+        "concurrent_object_pool.h",
+    ],
+    deps = [
     ],
 )
 
@@ -241,6 +259,14 @@ cc_test(
         "@gtest//:main",
     ],
 )
+
+cc_library(
+    name = "sensor_meta",
+    hdrs = [
+        "sensor_meta.h",
+    ],
+)
+
 
 cc_library(
     name = "syncedmem",
