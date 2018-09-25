@@ -16,16 +16,13 @@
 #include <gflags/gflags.h>
 #include <gtest/gtest.h>
 
+#define private public
+#define protected public
 #include "modules/perception/lib/config_manager/config_manager.h"
 
 namespace apollo {
 namespace perception {
 namespace lib {
-
-using std::string;
-using std::vector;
-
-DECLARE_string(config_manager_path);
 
 class ConfigManagerTest : public testing::Test {
  protected:
@@ -63,7 +60,7 @@ TEST_F(ConfigManagerTest, TestInit) {
 }
 
 TEST_F(ConfigManagerTest, TestGetModelConfig) {
-  string model_name = "FrameClassifier";
+  std::string model_name = "FrameClassifier";
   const ModelConfig* model_config = NULL;
 
   EXPECT_TRUE(config_manager_->GetModelConfig(model_name, &model_config));
@@ -77,7 +74,7 @@ TEST_F(ConfigManagerTest, TestGetModelConfig) {
 }
 
 TEST_F(ConfigManagerTest, TestModelConfig) {
-  string model_name = "FrameClassifier";
+  std::string model_name = "FrameClassifier";
   const ModelConfig* model_config = NULL;
   ASSERT_TRUE(config_manager_->Init());
   ASSERT_EQ(config_manager_->NumModels(), 2u);
@@ -93,7 +90,7 @@ TEST_F(ConfigManagerTest, TestModelConfig) {
   EXPECT_TRUE(model_config->get_value("threshold2", &int_value));
   EXPECT_EQ(int_value, 2);
 
-  string str_value;
+  std::string str_value;
   EXPECT_TRUE(model_config->get_value("threshold3", &str_value));
   EXPECT_EQ(str_value, "str3");
 
@@ -111,22 +108,22 @@ TEST_F(ConfigManagerTest, TestModelConfig) {
   EXPECT_TRUE(model_config->get_value("bool_value_false", &bool_value));
   EXPECT_EQ(bool_value, false);
 
-  vector<int> int_list;
+  std::vector<int> int_list;
   EXPECT_TRUE(model_config->get_value("array_p1", &int_list));
   EXPECT_EQ(int_list.size(), 3u);
   EXPECT_EQ(int_list[2], 3);
 
-  vector<string> str_list;
+  std::vector<std::string> str_list;
   EXPECT_TRUE(model_config->get_value("array_p2", &str_list));
   EXPECT_EQ(str_list.size(), 4u);
   EXPECT_EQ(str_list[2], "str3");
 
-  vector<double> double_list;
+  std::vector<double> double_list;
   EXPECT_TRUE(model_config->get_value("array_p4", &double_list));
   EXPECT_EQ(double_list.size(), 4u);
   EXPECT_EQ(double_list[2], 1.3);
 
-  vector<bool> bool_list;
+  std::vector<bool> bool_list;
   EXPECT_TRUE(model_config->get_value("array_bool", &bool_list));
   EXPECT_EQ(bool_list.size(), 4u);
   EXPECT_EQ(bool_list[2], true);

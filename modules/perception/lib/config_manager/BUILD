@@ -20,15 +20,15 @@ cc_library(
     ],
 )
 
-#cc_test(
-#    name = "config_manager_test",
-#    size = "small",
-#    srcs = [
-#        "config_manager_test.cc",
-#    ],
-#    deps = [
-#        ":config_manager",
-#        "@gtest//:main",
-#    ],
-#)
+cc_test(
+    name = "config_manager_test",
+    size = "small",
+    srcs = [
+        "config_manager_test.cc",
+    ],
+    deps = [
+        ":config_manager",
+        "@gtest//:main",
+    ],
+)
 cpplint()
