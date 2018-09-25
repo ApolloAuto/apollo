@@ -37,7 +37,8 @@ class ControlTest : public ::testing::Test {
 };
 
 TEST_F(ControlTest, Init) {
-  FLAGS_control_conf_file = "modules/control/testdata/conf/lincoln.pb.txt";
+  FLAGS_control_conf_file =
+      "/apollo/modules/control/testdata/conf/lincoln.pb.txt";
   EXPECT_EQ(true, control_.Init());
 }
 

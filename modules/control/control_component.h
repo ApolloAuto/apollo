@@ -68,15 +68,25 @@ class ControlComponent final : public apollo::cybertron::TimerComponent {
 
  private:
   // Upon receiving pad message
-  void OnPad(const apollo::control::PadMessage &pad);
+  void OnPad(const std::shared_ptr<apollo::control::PadMessage> &pad);
+
+  void OnChassis(const std::shared_ptr<apollo::canbus::Chassis> &chassis);
+
+  void OnPlanning(
+      const std::shared_ptr<apollo::planning::ADCTrajectory> &trajectory);
+
+  void OnLocalization(
+      const std::shared_ptr<apollo::localization::LocalizationEstimate>
+          &localization);
 
   // Upon receiving monitor message
   void OnMonitor(
       const apollo::common::monitor::MonitorMessage &monitor_message);
 
-  common::Status ProduceControlCommand(ControlCommand *control_command);
-  common::Status CheckInput(LocalView* local_view);
-  common::Status CheckTimestamp(const LocalView& local_view);
+  common::Status ProduceControlCommand(
+      apollo::control::ControlCommand *control_command);
+  common::Status CheckInput(LocalView *local_view);
+  common::Status CheckTimestamp(const LocalView &local_view);
   common::Status CheckPad();
 
  private:
