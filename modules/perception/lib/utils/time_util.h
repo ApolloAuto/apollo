@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef PERCEPTION_LIB_UTILS_TIME_UTIL_H_
-#define PERCEPTION_LIB_UTILS_TIME_UTIL_H_
+#ifndef MODULES_PERCEPTION_LIB_UTILS_TIME_UTIL_H_
+#define MODULES_PERCEPTION_LIB_UTILS_TIME_UTIL_H_
 
 #include <sys/time.h>
 
@@ -63,4 +63,4 @@ class TimeUtil {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // PERCEPTION_LIB_UTILS_TIME_UTIL_H_
+#endif  // MODULES_PERCEPTION_LIB_UTILS_TIME_UTIL_H_

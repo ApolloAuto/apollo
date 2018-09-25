@@ -1,0 +1,64 @@
+load("//tools:cpplint.bzl", "cpplint")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "perception_perf",
+    hdrs = ["perf.h"],
+)
+
+cc_library(
+    name = "perception_timer",
+    srcs = ["timer.cc"],
+    hdrs = ["timer.h"],
+    deps = [
+        "//framework:cybertron",
+        ":perception_perf",
+    ],
+)
+
+cc_test(
+    name = "perception_timer_test",
+    size = "small",
+    srcs = ["timer_test.cc"],
+    deps = [
+        ":perception_timer",
+        "@gtest//:main",
+    ],
+)
+
+cc_library(
+    name = "perception_time_util",
+    hdrs = ["time_util.h"],
+)
+
+cc_test(
+    name = "perception_time_util_test",
+    size = "small",
+    srcs = ["time_util_test.cc"],
+    deps = [
+        ":perception_time_util",
+        "@gtest//:main",
+    ],
+)
+
+cc_library(
+    name = "perception_string_util",
+    srcs = ["string_util.cc"],
+    hdrs = ["string_util.h"],
+    deps = [
+        "//framework:cybertron",
+    ],
+)
+
+cc_test(
+    name = "perception_string_util_test",
+    size = "small",
+    srcs = ["string_util_test.cc"],
+    deps = [
+        ":perception_string_util",
+        "@gtest//:main",
+    ],
+)
+
+cpplint()

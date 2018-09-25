@@ -17,7 +17,7 @@
 
 #include <algorithm>
 
-#include "modules/perception/base/log.h"
+#include "cybertron/common/log.h"
 
 namespace apollo {
 namespace perception {
@@ -63,7 +63,7 @@ void StringUtil::Trim(TrimType type, string *result_str) {
       Trim(TRIM_RIGHT, result_str);
       break;
     default:
-      LOG_ERROR << "Invalid trim type, type: " << type;
+      AERROR << "Invalid trim type, type: " << type;
       break;
   }
 }
@@ -121,7 +121,7 @@ bool StringUtil::StrToInt(const string &str, int *ret_val) {
     *ret_val = std::stoi(str);
     return true;
   } catch (...) {
-    LOG_ERROR << "std::stoi() failed.str:" << str;
+    AERROR << "std::stoi() failed.str:" << str;
     return false;
   }
 }

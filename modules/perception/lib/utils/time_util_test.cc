@@ -17,7 +17,6 @@
 
 #include <cmath>
 
-#include "modules/perception/base/log.h"
 #include "modules/perception/lib/utils/time_util.h"
 
 namespace apollo {
@@ -49,9 +48,6 @@ TEST(TimeUtilTest, TestGetCurrentTime) {
     uint64_t current_time = ::time(NULL);
     if (std::fabs(unix_time - current_time) < 1) {
       return;
-    } else {
-      LOG_INFO << "unix_time=" << unix_time
-               << " , current_time=" << current_time;
     }
     usleep(50000);  // 50ms
   }
