@@ -13,13 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef PERCEPTION_COMMON_POINT_CLOUD_PROCESSING_COMMON_H_
-#define PERCEPTION_COMMON_POINT_CLOUD_PROCESSING_COMMON_H_
-#include <Eigen/Core>
+
+#ifndef MODULES_PERCEPTION_COMMON_POINT_CLOUD_PROCESSING_COMMON_H_
+#define MODULES_PERCEPTION_COMMON_POINT_CLOUD_PROCESSING_COMMON_H_
+
 #include <algorithm>
 #include <limits>
+#include <memory>
 #include <vector>
+
+#include "Eigen/Core"
+
+#include "modules/perception/base/point_cloud.h"
 #include "modules/perception/base/point_cloud_types.h"
+
 namespace apollo {
 namespace perception {
 namespace common {
@@ -38,74 +45,27 @@ void TransformPoint(const PointT &point_in, const Eigen::Affine3d &pose,
 
 // @brief transform a point cloud
 // old name: transform_point_cloud
-template <typename PointCloudT>
-void TransformPointCloud(const PointCloudT &cloud_in,
-                         const Eigen::Affine3d &pose, PointCloudT *cloud_out) {
+template <typename PointT>
+void TransformPointCloud(const base::AttributePointCloud<PointT> &cloud_in,
+                         const Eigen::Affine3d &pose,
+                         base::AttributePointCloud<PointT> *cloud_out) {
   if (cloud_out->size() < cloud_in.size()) {
     cloud_out->resize(cloud_in.size());
   }
   for (size_t i = 0; i < cloud_in.size(); ++i) {
-    const auto &p = cloud_in[i];
-    Eigen::Vector3d point3d(p.x, p.y, p.z);
-    point3d = pose * point3d;
-    auto &pd = (*cloud_out)[i];
-    pd.x = point3d.x();
-    pd.y = point3d.y();
-    pd.z = point3d.z();
-  }
-}
-
-// @brief transform a point cloud
-// old name: transform_point_cloud
-template <typename PointCloudT>
-void TransformPointCloud(const std::shared_ptr<const PointCloudT> cloud_in,
-                         const Eigen::Affine3d &pose,
-                         std::shared_ptr<PointCloudT> cloud_out) {
-  if (cloud_out->size() < cloud_in->size()) {
-    cloud_out->resize(cloud_in->size());
-  }
-  for (size_t i = 0; i < cloud_in->size(); ++i) {
-    const auto &p = cloud_in->at(i);
-    Eigen::Vector3d point3d(p.x, p.y, p.z);
-    point3d = pose * point3d;
-    auto &pd = cloud_out->at(i);
-    pd.x = point3d.x();
-    pd.y = point3d.y();
-    pd.z = point3d.z();
+    TransformPoint<PointT>(cloud_in.at(i), pose, &(cloud_out->at(i)));
   }
 }
 
 // @brief transform a point cloud
 // old name:transform_point_cloud
-template <typename PointCloudT>
+template <typename PointT>
 void TransformPointCloud(const Eigen::Affine3d &pose,
-                         PointCloudT *cloud_in_out) {
-  for (size_t i = 0; i < cloud_in_out->size(); ++i) {
-    auto &p = cloud_in_out->at(i);
-    Eigen::Vector3d point3d(p.x, p.y, p.z);
-    point3d = pose * point3d;
-    p.x = point3d.x();
-    p.y = point3d.y();
-    p.z = point3d.z();
-  }
+                         base::AttributePointCloud<PointT> *cloud_in_out) {
+  TransformPointCloud<PointT>(*cloud_in_out, pose, cloud_in_out);
 }
 
-// @brief transform a point cloud
-// old name:transform_point_cloud
-template <typename PointCloudT>
-void TransformPointCloud(const Eigen::Affine3d &pose,
-                         std::shared_ptr<PointCloudT> cloud_in_out) {
-  for (size_t i = 0; i < cloud_in_out->size(); ++i) {
-    auto &p = cloud_in_out->at(i);
-    Eigen::Vector3d point3d(p.x, p.y, p.z);
-    point3d = pose * point3d;
-    p.x = point3d.x();
-    p.y = point3d.y();
-    p.z = point3d.z();
-  }
-}
-
-// @brief extract the indiced points from apoint cloud
+// @brief extract the indexed points from a point cloud
 // old name: transform_cloud
 template <typename PointCloudT>
 void ExtractIndicedCloud(const std::shared_ptr<const PointCloudT> cloud,
@@ -124,120 +84,59 @@ void ExtractIndicedCloud(const std::shared_ptr<const PointCloudT> cloud,
   }
 }
 
-// @brief get the maxmium and minimium in each axis of a indiced point cloud
+// @brief get the maximum and minimum in each axis of a point cloud
 // old name: du_get_min_max_3d
-template <typename PointCloudT>
-void GetMinMaxIn3D(
-    const PointCloudT &cloud, const base::PointIndices &indices,
-    Eigen::Matrix<typename PointCloudT::PointType::PointType, 4, 1> *min_p,
-    Eigen::Matrix<typename PointCloudT::PointType::PointType, 4, 1> *max_p) {
-  typedef typename PointCloudT::PointType::PointType Type;
-  (*min_p)[0] = (*min_p)[1] = (*min_p)[2] = std::numeric_limits<Type>::max();
-  (*max_p)[0] = (*max_p)[1] = (*max_p)[2] = -std::numeric_limits<Type>::max();
+template <typename PointT>
+void GetMinMaxIn3DWithRange(const base::AttributePointCloud<PointT> &cloud,
+                            const size_t range,
+                            Eigen::Matrix<typename PointT::Type, 4, 1> *min_p,
+                            Eigen::Matrix<typename PointT::Type, 4, 1> *max_p) {
+  using T = typename PointT::Type;
+  (*min_p)[0] = (*min_p)[1] = (*min_p)[2] = std::numeric_limits<T>::max();
+  (*max_p)[0] = (*max_p)[1] = (*max_p)[2] = -std::numeric_limits<T>::max();
   (*min_p)[3] = 0.0;
   (*max_p)[3] = 0.0;
-  for (size_t i = 0; i < indices.indices.size(); ++i) {
-    const auto &pt = cloud.at(indices.indices[i]);
-    if (std::isnan(pt.x) || std::isnan(pt.y) || std::isnan(pt.z)) {
-      continue;
-    }
-    (*min_p)[0] = std::min((*min_p)[0], static_cast<Type>(pt.x));
-    (*max_p)[0] = std::max((*max_p)[0], static_cast<Type>(pt.x));
-    (*min_p)[1] = std::min((*min_p)[1], static_cast<Type>(pt.y));
-    (*max_p)[1] = std::max((*max_p)[1], static_cast<Type>(pt.y));
-    (*min_p)[2] = std::min((*min_p)[2], static_cast<Type>(pt.z));
-    (*max_p)[2] = std::max((*max_p)[2], static_cast<Type>(pt.z));
-  }
-}
-
-// @brief get the maxmium and minimium in each axis of a point cloud
-// old name: du_get_min_max_3d
-template <typename PointCloudT>
-void GetMinMaxIn3D(
-    const PointCloudT &cloud,
-    Eigen::Matrix<typename PointCloudT::PointType::PointType, 4, 1> *min_p,
-    Eigen::Matrix<typename PointCloudT::PointType::PointType, 4, 1> *max_p) {
-  typedef typename PointCloudT::PointType::PointType Type;
-  (*min_p)[0] = (*min_p)[1] = (*min_p)[2] = std::numeric_limits<Type>::max();
-  (*max_p)[0] = (*max_p)[1] = (*max_p)[2] = -std::numeric_limits<Type>::max();
-  (*min_p)[3] = 0.0;
-  (*max_p)[3] = 0.0;
-  for (size_t i = 0; i < cloud.size(); ++i) {
+  for (size_t i = 0; i < range; ++i) {
     const auto &pt = cloud.at(i);
     if (std::isnan(pt.x) || std::isnan(pt.y) || std::isnan(pt.z)) {
       continue;
     }
-    (*min_p)[0] = std::min((*min_p)[0], static_cast<Type>(pt.x));
-    (*max_p)[0] = std::max((*max_p)[0], static_cast<Type>(pt.x));
-    (*min_p)[1] = std::min((*min_p)[1], static_cast<Type>(pt.y));
-    (*max_p)[1] = std::max((*max_p)[1], static_cast<Type>(pt.y));
-    (*min_p)[2] = std::min((*min_p)[2], static_cast<Type>(pt.z));
-    (*max_p)[2] = std::max((*max_p)[2], static_cast<Type>(pt.z));
+    (*min_p)[0] = std::min((*min_p)[0], static_cast<T>(pt.x));
+    (*max_p)[0] = std::max((*max_p)[0], static_cast<T>(pt.x));
+    (*min_p)[1] = std::min((*min_p)[1], static_cast<T>(pt.y));
+    (*max_p)[1] = std::max((*max_p)[1], static_cast<T>(pt.y));
+    (*min_p)[2] = std::min((*min_p)[2], static_cast<T>(pt.z));
+    (*max_p)[2] = std::max((*max_p)[2], static_cast<T>(pt.z));
   }
 }
 
-// @brief get the maxmium and minimium in each axis of a indiced point cloud
+// @brief get the maximum and minimum in each axis of a indexed point cloud
 // old name: du_get_min_max_3d
-template <typename PointCloudT>
-void GetMinMaxIn3D(
-    const std::shared_ptr<const PointCloudT> cloud,
-    const base::PointIndices &indices,
-    Eigen::Matrix<typename PointCloudT::PointType::PointType, 4, 1> *min_p,
-    Eigen::Matrix<typename PointCloudT::PointType::PointType, 4, 1> *max_p) {
-  typedef typename PointCloudT::PointType::PointType Type;
-  (*min_p)[0] = (*min_p)[1] = (*min_p)[2] = std::numeric_limits<Type>::max();
-  (*max_p)[0] = (*max_p)[1] = (*max_p)[2] = -std::numeric_limits<Type>::max();
-  (*min_p)[3] = 0.0;
-  (*max_p)[3] = 0.0;
-  for (size_t i = 0; i < indices.indices.size(); ++i) {
-    const auto &pt = cloud->at(indices.indices[i]);
-    if (std::isnan(pt.x) || std::isnan(pt.y) || std::isnan(pt.z)) {
-      continue;
-    }
-    (*min_p)[0] = std::min((*min_p)[0], static_cast<Type>(pt.x));
-    (*max_p)[0] = std::max((*max_p)[0], static_cast<Type>(pt.x));
-    (*min_p)[1] = std::min((*min_p)[1], static_cast<Type>(pt.y));
-    (*max_p)[1] = std::max((*max_p)[1], static_cast<Type>(pt.y));
-    (*min_p)[2] = std::min((*min_p)[2], static_cast<Type>(pt.z));
-    (*max_p)[2] = std::max((*max_p)[2], static_cast<Type>(pt.z));
-  }
+template <typename PointT>
+void GetMinMaxIn3D(const base::AttributePointCloud<PointT> &cloud,
+                   const base::PointIndices &indices,
+                   Eigen::Matrix<typename PointT::Type, 4, 1> *min_p,
+                   Eigen::Matrix<typename PointT::Type, 4, 1> *max_p) {
+  GetMinMaxIn3DWithRange<PointT>(cloud, indices.indices.size(), min_p, max_p);
 }
 
-// @brief get the maxmium and minimium in each axis of a point cloud
+// @brief get the maximum and minimum in each axis of a point cloud
 // old name: du_get_min_max_3d
-template <typename PointCloudT>
-void GetMinMaxIn3D(
-    const std::shared_ptr<const PointCloudT> cloud,
-    Eigen::Matrix<typename PointCloudT::PointType::PointType, 4, 1> *min_p,
-    Eigen::Matrix<typename PointCloudT::PointType::PointType, 4, 1> *max_p) {
-  typedef typename PointCloudT::PointType::PointType Type;
-  (*min_p)[0] = (*min_p)[1] = (*min_p)[2] = std::numeric_limits<Type>::max();
-  (*max_p)[0] = (*max_p)[1] = (*max_p)[2] = -std::numeric_limits<Type>::max();
-  (*min_p)[3] = 0.0;
-  (*max_p)[3] = 0.0;
-  for (size_t i = 0; i < cloud->size(); ++i) {
-    const auto &pt = cloud->at(i);
-    if (std::isnan(pt.x) || std::isnan(pt.y) || std::isnan(pt.z)) {
-      continue;
-    }
-    (*min_p)[0] = std::min((*min_p)[0], static_cast<Type>(pt.x));
-    (*max_p)[0] = std::max((*max_p)[0], static_cast<Type>(pt.x));
-    (*min_p)[1] = std::min((*min_p)[1], static_cast<Type>(pt.y));
-    (*max_p)[1] = std::max((*max_p)[1], static_cast<Type>(pt.y));
-    (*min_p)[2] = std::min((*min_p)[2], static_cast<Type>(pt.z));
-    (*max_p)[2] = std::max((*max_p)[2], static_cast<Type>(pt.z));
-  }
+template <typename PointT>
+void GetMinMaxIn3D(const base::AttributePointCloud<PointT> &cloud,
+                   Eigen::Matrix<typename PointT::Type, 4, 1> *min_p,
+                   Eigen::Matrix<typename PointT::Type, 4, 1> *max_p) {
+  GetMinMaxIn3DWithRange<PointT>(cloud, cloud.size(), min_p, max_p);
 }
 
 // @brief calculate the centroid of a point cloud
 // old name: get_barycenter
-template <typename PointCloudT>
-Eigen::Matrix<typename PointCloudT::PointType::PointType, 3, 1>
-CalculateCentroid(const PointCloudT &cloud) {
-  typedef typename PointCloudT::PointType::PointType Type;
+template <typename T>
+Eigen::Matrix<T, 3, 1> CalculateCentroid(
+    const base::AttributePointCloud<base::Point<T>> &cloud) {
   size_t point_num = cloud.size();
-  Eigen::Matrix<Type, 3, 1> centroid(0.0, 0.0, 0.0);
-  for (const auto &pt : cloud) {
+  Eigen::Matrix<T, 3, 1> centroid(0.0, 0.0, 0.0);
+  for (const auto &pt : cloud.points()) {
     centroid[0] += pt.x;
     centroid[1] += pt.y;
     centroid[2] += pt.z;
@@ -253,4 +152,5 @@ CalculateCentroid(const PointCloudT &cloud) {
 }  // namespace common
 }  // namespace perception
 }  // namespace apollo
-#endif  // PERCEPTION_COMMON_POINT_CLOUD_PROCESSING_COMMON_H_
+
+#endif  // MODULES_PERCEPTION_COMMON_POINT_CLOUD_PROCESSING_COMMON_H_
