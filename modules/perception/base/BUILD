@@ -3,6 +3,15 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
+    name = "base_type",
+    hdrs = [
+        "sensor_meta.h",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
     name = "blob",
     srcs = [
         "blob.cc",
@@ -84,6 +93,46 @@ cc_library(
         "common.h",
     ],
     deps = [
+        "@cuda",
+    ],
+)
+
+cc_test(
+    name = "common_test",
+    size = "small",
+    srcs = [
+        "common_test.cc",
+    ],
+    deps = [
+        ":common",
+        "@gtest//:main",
+    ],
+)
+
+cc_library(
+    name = "distortion_model",
+    srcs = [
+        "distortion_model.cc",
+    ],
+    hdrs = [
+        "distortion_model.h",
+    ],
+    deps = [
+        ":camera",
+        "//framework:cybertron",
+        "@eigen",
+    ],
+)
+
+cc_test(
+    name = "distortion_model_test",
+    size = "small",
+    srcs = [
+        "distortion_model_test.cc",
+    ],
+    deps = [
+        ":distortion_model",
+        "@gtest//:main",
     ],
 )
 

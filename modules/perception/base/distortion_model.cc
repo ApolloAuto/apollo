@@ -15,8 +15,8 @@
  *****************************************************************************/
 #include "modules/perception/base/distortion_model.h"
 #include <cmath>
-#include "glog/logging.h"
-#include "modules/perception/base/camera.h"
+
+#include "cybertron/common/log.h"
 
 namespace apollo {
 namespace perception {
@@ -66,8 +66,9 @@ Eigen::Vector2f BrownCameraDistortionModel::Project(
   return pt2d_img;
 }
 
-BaseCameraModelPtr BrownCameraDistortionModel::get_camera_model() {
-  PinholeCameraModelPtr camera_model(new PinholeCameraModel());
+std::shared_ptr<BaseCameraModel>
+    BrownCameraDistortionModel::get_camera_model() {
+  std::shared_ptr<PinholeCameraModel> camera_model(new PinholeCameraModel());
   camera_model->set_width(width_);
   camera_model->set_height(height_);
   camera_model->set_intrinsic_params(intrinsic_params_);

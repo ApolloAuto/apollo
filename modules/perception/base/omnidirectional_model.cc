@@ -54,7 +54,8 @@ Eigen::Vector2f OmnidirectionalCameraDistortionModel::Project(
   return projection;
 }
 
-BaseCameraModelPtr OmnidirectionalCameraDistortionModel::get_camera_model() {
+std::shared_ptr<BaseCameraModel>
+    OmnidirectionalCameraDistortionModel::get_camera_model() {
   PinholeCameraModelPtr camera_model(new PinholeCameraModel());
   camera_model->set_width(width_);
   camera_model->set_height(height_);

@@ -51,9 +51,11 @@ class BaseCameraDistortionModel {
   size_t height_ = 0;
 };
 
+/* TODO(all): to remove
 typedef std::shared_ptr<BaseCameraDistortionModel> BaseCameraDistortionModelPtr;
 typedef std::shared_ptr<const BaseCameraDistortionModel>
     BaseCameraDistortionModelConstPtr;
+*/
 
 class BrownCameraDistortionModel : public BaseCameraDistortionModel {
  public:
@@ -62,7 +64,7 @@ class BrownCameraDistortionModel : public BaseCameraDistortionModel {
 
   Eigen::Vector2f Project(const Eigen::Vector3f& point3d) override;
 
-  BaseCameraModelPtr get_camera_model() override;
+  std::shared_ptr<BaseCameraModel> get_camera_model() override;
 
   std::string name() const override { return "BrownCameraDistortionModel"; }
 
@@ -82,10 +84,12 @@ class BrownCameraDistortionModel : public BaseCameraDistortionModel {
   Eigen::Matrix<float, 5, 1> distort_params_;
 };
 
+/* TODO(all): to remove
 typedef std::shared_ptr<BrownCameraDistortionModel>
     BrownCameraDistortionModelPtr;
 typedef std::shared_ptr<const BrownCameraDistortionModel>
     BrownCameraDistortionModelConstPtr;
+*/
 
 }  // namespace base
 }  // namespace perception
