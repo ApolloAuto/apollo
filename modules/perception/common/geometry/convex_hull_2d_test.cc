@@ -13,28 +13,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include <gtest/gtest.h>
-#include <limits>
-#include "modules/perception/base/point_cloud_types.h"
 #include "modules/perception/common/geometry/convex_hull_2d.h"
+
+#include <limits>
+#include <cfloat>
+#include "gtest/gtest.h"
+
+#include "modules/perception/base/point_cloud_types.h"
+#include "modules/perception/base/point_cloud.h"
+#include "modules/perception/base/point.h"
+
 namespace apollo {
 namespace perception {
 namespace common {
+
+using PointF = apollo::perception::base::PointXYZIT<float>;
+using PointFCloud = apollo::perception::base::PointCloud<PointF>;
+
 TEST(ConvexHull2DTest, convex_hull_2d) {
-  ConvexHull2D<base::PointFCloud, base::PointFCloud> convex_hull_2d;
-  base::PointFCloud pointcloud_in, pointcloud_out;
-  base::PointF pt;
+  ConvexHull2D<PointFCloud, PointFCloud> convex_hull_2d;
+  PointFCloud pointcloud_in, pointcloud_out;
   bool flag = true;
   flag = convex_hull_2d.GetConvexHull(pointcloud_in, &pointcloud_out);
   EXPECT_FALSE(flag);
-  float heigh = 0.0f;
+  // float heigh = 0.0f;
   for (size_t i = 0; i < 10; i++) {
     for (size_t j = 0; j < 10; j++) {
+      PointF pt;
       pt.x = i;
       pt.y = j;
       pt.z = 0.0;
-      heigh = i * 1.0f;
-      pointcloud_in.push_back(pt, 0.0, heigh);
+      pointcloud_in.push_back(pt, 0.0, i * 1.0f);
     }
   }
   flag = convex_hull_2d.GetConvexHull(pointcloud_in, &pointcloud_out);
@@ -88,18 +97,18 @@ TEST(ConvexHull2DTest, convex_hull_2d) {
 }
 
 TEST(ConvexHull2DTest1, convex_hull_2d1) {
-  ConvexHull2D<base::PointFCloud, base::PointFCloud> convex_hull_2d;
-  base::PointFCloudPtr pointcloud_in_ptr =
-      base::PointFCloudPtr(new base::PointFCloud(128, 128, base::PointF()));
-  base::PointFCloud pointcloud_out;
-  base::PointF tmp_pt;
-  float heigh = 0.0f;
+  ConvexHull2D<PointFCloud, PointFCloud> convex_hull_2d;
+  PointFCloudPtr pointcloud_in_ptr =
+      PointFCloudPtr(new PointFCloud(128, 128, PointF()));
+  PointFCloud pointcloud_out;
+  PointF tmp_pt;
+  // float heigh = 0.0f;
   for (size_t i = 0; i < 128; i++) {
     for (size_t j = 0; j < 128; j++) {
       tmp_pt.x = 1.f * i;
       tmp_pt.y = 1.f * j;
       tmp_pt.z = 1.f * i;
-      heigh = i * 1.0f;
+      float heigh = i * 1.0f;
       *(pointcloud_in_ptr->at(i, j)) = tmp_pt;
       *(pointcloud_in_ptr->points_height(i, j)) = heigh;
     }
@@ -119,6 +128,7 @@ TEST(ConvexHull2DTest1, convex_hull_2d1) {
   EXPECT_TRUE(flag);
   EXPECT_EQ(pointcloud_out.size(), 4);
 }
+
 }  // namespace common
 }  // namespace perception
 }  // namespace apollo
