@@ -63,4 +63,18 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "lidar_object_util",
+    srcs = [
+        "lidar_object_util.cc",
+    ],
+    hdrs = [
+        "lidar_object_util.h",
+    ],
+    deps = [
+        "//modules/perception/base",
+        ":lidar_log",
+    ],
+)
+
 cpplint()

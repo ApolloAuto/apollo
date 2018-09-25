@@ -15,7 +15,10 @@
  *****************************************************************************/
 #ifndef MODULES_PERCEPTION_LIDAR_COMMON_LIDAR_OBJECT_UTIL_H_
 #define MODULES_PERCEPTION_LIDAR_COMMON_LIDAR_OBJECT_UTIL_H_
+
 #include "modules/perception/base/object.h"
+
+#include <memory>
 
 namespace apollo {
 namespace perception {
@@ -25,13 +28,13 @@ namespace lidar {
 // @param [in]: object
 // @param [in]: expand valud, in meter
 // @param [out]: bounding box vertices(4 in xy plane)
-void GetBoundingBox2d(const base::ObjectPtr object, base::PolygonDType* box,
-                      double expand = 0.0);
+void GetBoundingBox2d(const std::shared_ptr<base::Object> object,
+                      base::PointCloud<base::PointD>* box, double expand = 0.0);
 
 // @brief: compute object shape(center, size) from given direction and polygon
 // @param [in/out]: input object, center and size will be updated
 // @param [in]: whether use world cloud or local cloud
-void ComputeObjectShapeFromPolygon(base::ObjectPtr object,
+void ComputeObjectShapeFromPolygon(std::shared_ptr<base::Object> object,
                                    bool use_world_cloud = false);
 
 }  // namespace lidar

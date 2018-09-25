@@ -14,14 +14,23 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/perception/lidar/common/lidar_object_util.h"
+
+#include <algorithm>
+
+#include "modules/perception/base/point_cloud_types.h"
 #include "modules/perception/lidar/common/lidar_log.h"
 
 namespace apollo {
 namespace perception {
 namespace lidar {
 
-void GetBoundingBox2d(const base::ObjectPtr object, base::PolygonDType* box,
-                      double expand) {
+using base::Object;
+using base::PointF;
+using base::PointD;
+using base::PointCloud;
+
+void GetBoundingBox2d(const std::shared_ptr<Object> object,
+                      PointCloud<PointD>* box, double expand) {
   box->clear();
   box->resize(4);
 
@@ -48,15 +57,15 @@ void GetBoundingBox2d(const base::ObjectPtr object, base::PolygonDType* box,
                  object->center(1);
 }
 
-void ComputeObjectShapeFromPolygon(base::ObjectPtr object,
+void ComputeObjectShapeFromPolygon(std::shared_ptr<Object> object,
                                    bool use_world_cloud) {
-  const base::PolygonDType& polygon = object->polygon;
-  const base::PointFCloud& cloud = object->lidar_supplement.cloud;
-  const base::PointDCloud& world_cloud = object->lidar_supplement.cloud_world;
+  const PointCloud<PointD>& polygon = object->polygon;
+  const PointCloud<PointF>& cloud = object->lidar_supplement.cloud;
+  const PointCloud<PointD>& world_cloud = object->lidar_supplement.cloud_world;
 
   if (polygon.size() == 0 || cloud.size() == 0) {
-    LOG_INFO << "Failed to compute box, polygon size: " << polygon.size()
-             << " cloud size: " << cloud.size();
+    AINFO << "Failed to compute box, polygon size: " << polygon.size()
+          << " cloud size: " << cloud.size();
     return;
   }
 
@@ -73,7 +82,7 @@ void ComputeObjectShapeFromPolygon(base::ObjectPtr object,
   // note we keep this offset to avoid numeric precision issues in world frame
   Eigen::Vector2d offset(object->polygon[0].x, object->polygon[0].y);
 
-  for (const auto& point : object->polygon) {
+  for (const auto& point : object->polygon.points()) {
     polygon_xy << point.x, point.y;
     polygon_xy -= offset;
     projected_polygon_xy(0) = direction.dot(polygon_xy);
@@ -89,14 +98,14 @@ void ComputeObjectShapeFromPolygon(base::ObjectPtr object,
   if (use_world_cloud) {
     min_z = world_cloud[0].z;
     max_z = world_cloud[0].z;
-    for (const auto& point : world_cloud) {
+    for (const auto& point : world_cloud.points()) {
       min_z = std::min(min_z, point.z);
       max_z = std::max(max_z, point.z);
     }
   } else {
     min_z = cloud[0].z;
     max_z = cloud[0].z;
-    for (const auto& point : cloud) {
+    for (const auto& point : cloud.points()) {
       min_z = std::min(min_z, static_cast<double>(point.z));
       max_z = std::max(max_z, static_cast<double>(point.z));
     }
