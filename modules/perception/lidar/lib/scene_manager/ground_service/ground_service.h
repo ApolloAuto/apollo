@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef PERCEPTION_LIDAR_LIB_SCENE_MANAGER_GROUND_SERVICE_GROUND_SERVICE_H_
-#define PERCEPTION_LIDAR_LIB_SCENE_MANAGER_GROUND_SERVICE_GROUND_SERVICE_H_
+#ifndef MODULES_PERCEPTION_LIDAR_LIB_SCENE_MANAGER_GROUND_SERVICE_GROUND_SERVICE_H_
+#define MODULES_PERCEPTION_LIDAR_LIB_SCENE_MANAGER_GROUND_SERVICE_GROUND_SERVICE_H_
 #include <mutex>
 #include "modules/perception/lidar/lib/scene_manager/ground_service/ground_struct.h"
 #include "modules/perception/lidar/lib/scene_manager/scene_service.h"
@@ -102,4 +102,4 @@ typedef std::shared_ptr<const GroundService> GroundServiceConstPtr;
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // PERCEPTION_LIDAR_LIB_SCENE_MANAGER_GROUND_SERVICE_GROUND_SERVICE_H_
+#endif  // MODULES_PERCEPTION_LIDAR_LIB_SCENE_MANAGER_GROUND_SERVICE_GROUND_SERVICE_H_

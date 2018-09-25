@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef PERCEPTION_LIDAR_LIB_SCENE_MANAGER_ROI_SERVICE_ROI_SERVICE_H_
-#define PERCEPTION_LIDAR_LIB_SCENE_MANAGER_ROI_SERVICE_ROI_SERVICE_H_
+#ifndef MODULES_PERCEPTION_LIDAR_LIB_SCENE_MANAGER_ROI_SERVICE_ROI_SERVICE_H_
+#define MODULES_PERCEPTION_LIDAR_LIB_SCENE_MANAGER_ROI_SERVICE_ROI_SERVICE_H_
 #include <Eigen/Dense>
 #include "modules/perception/lidar/lib/scene_manager/scene_service.h"
 
@@ -84,4 +84,4 @@ typedef std::shared_ptr<const ROIService> ROIServiceConstPtr;
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // PERCEPTION_LIDAR_LIB_SCENE_MANAGER_ROI_SERVICE_ROI_SERVICE_H_
+#endif  // MODULES_PERCEPTION_LIDAR_LIB_SCENE_MANAGER_ROI_SERVICE_ROI_SERVICE_H_

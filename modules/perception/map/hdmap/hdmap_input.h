@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef PERCEPTION_MAP_HDMAP_HDMAP_INPUT_H_
-#define PERCEPTION_MAP_HDMAP_HDMAP_INPUT_H_
+#ifndef MODULES_PERCEPTION_MAP_HDMAP_HDMAP_INPUT_H_
+#define MODULES_PERCEPTION_MAP_HDMAP_HDMAP_INPUT_H_
 #include <gflags/gflags.h>
 // #include <hdmap.h>
 #include <string>
@@ -74,4 +74,4 @@ class HDMapInput {
 }  // namespace map
 }  // namespace perception
 }  // namespace apollo
-#endif  // PERCEPTION_MAP_HDMAP_HDMAP_INPUT_H_
+#endif  // MODULES_PERCEPTION_MAP_HDMAP_HDMAP_INPUT_H_

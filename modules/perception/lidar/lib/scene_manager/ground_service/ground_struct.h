@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef PERCEPTION_LIDAR_LIB_SCENE_MANAGER_GROUND_SERVICE_GROUND_STRUCT_H_
-#define PERCEPTION_LIDAR_LIB_SCENE_MANAGER_GROUND_SERVICE_GROUND_STRUCT_H_
+#ifndef MODULES_PERCEPTION_LIDAR_LIB_SCENE_MANAGER_GROUND_SERVICE_GROUND_STRUCT_H_
+#define MODULES_PERCEPTION_LIDAR_LIB_SCENE_MANAGER_GROUND_SERVICE_GROUND_STRUCT_H_
 #include <Eigen/Dense>
 #include <vector>
 
@@ -116,4 +116,4 @@ class GroundGrid {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // PERCEPTION_LIDAR_LIB_SCENE_MANAGER_GROUND_SERVICE_GROUND_STRUCT_H_
+#endif  // MODULES_PERCEPTION_LIDAR_LIB_SCENE_MANAGER_GROUND_SERVICE_GROUND_STRUCT_H_

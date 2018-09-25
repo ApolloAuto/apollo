@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef PERCEPTION_ONBOARD_COMPONENT_LIDAR_OUTPUT_COMPONENT_H_
-#define PERCEPTION_ONBOARD_COMPONENT_LIDAR_OUTPUT_COMPONENT_H_
+#ifndef MODULES_PERCEPTION_ONBOARD_COMPONENT_LIDAR_OUTPUT_COMPONENT_H_
+#define MODULES_PERCEPTION_ONBOARD_COMPONENT_LIDAR_OUTPUT_COMPONENT_H_
 
 #include "cybertron/component/component.h"
 #include "modules/perception/onboard/inner_component_messages/inner_component_messages.h"
@@ -42,4 +42,4 @@ CYBERTRON_REGISTER_COMPONENT(LidarOutputComponent);
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // PERCEPTION_ONBOARD_COMPONENT_LIDAR_OUTPUT_COMPONENT_H_
+#endif  // MODULES_PERCEPTION_ONBOARD_COMPONENT_LIDAR_OUTPUT_COMPONENT_H_

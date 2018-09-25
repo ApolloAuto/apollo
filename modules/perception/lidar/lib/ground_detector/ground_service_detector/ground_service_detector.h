@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef PERCEPTION_LIDAR_LIB_GROUND_SERVICE_DETECTOR_H_
-#define PERCEPTION_LIDAR_LIB_GROUND_SERVICE_DETECTOR_H_
+#ifndef MODULES_PERCEPTION_LIDAR_LIB_GROUND_SERVICE_DETECTOR_H_
+#define MODULES_PERCEPTION_LIDAR_LIB_GROUND_SERVICE_DETECTOR_H_
 
 #include "modules/perception/lidar/lib/interface/base_ground_detector.h"
 #include "modules/perception/lidar/lib/scene_manager/ground_service/ground_service.h"
@@ -46,4 +46,4 @@ class GroundServiceDetector : public BaseGroundDetector {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // PERCEPTION_LIDAR_LIB_GROUND_SERVICE_DETECTOR_H_
+#endif  // MODULES_PERCEPTION_LIDAR_LIB_GROUND_SERVICE_DETECTOR_H_

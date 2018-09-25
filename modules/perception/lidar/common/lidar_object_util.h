@@ -16,9 +16,9 @@
 #ifndef MODULES_PERCEPTION_LIDAR_COMMON_LIDAR_OBJECT_UTIL_H_
 #define MODULES_PERCEPTION_LIDAR_COMMON_LIDAR_OBJECT_UTIL_H_
 
-#include "modules/perception/base/object.h"
-
 #include <memory>
+
+#include "modules/perception/base/object.h"
 
 namespace apollo {
 namespace perception {

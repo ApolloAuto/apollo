@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef PERCEPTION_FUSION_BASE_SENSOR_H_
-#define PERCEPTION_FUSION_BASE_SENSOR_H_
+#ifndef MODULES_PERCEPTION_FUSION_BASE_SENSOR_H_
+#define MODULES_PERCEPTION_FUSION_BASE_SENSOR_H_
 #include <deque>
 #include <memory>
 #include <string>
@@ -74,4 +74,4 @@ class Sensor : public std::enable_shared_from_this<Sensor> {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // PERCEPTION_FUSION_BASE_SENSOR_H_
+#endif  // MODULES_PERCEPTION_FUSION_BASE_SENSOR_H_

@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef PERCEPTION_FUSION_LIB_DATA_ASSOCIATION_TRACK_OBJECT_SIMILARITY_H_
-#define PERCEPTION_FUSION_LIB_DATA_ASSOCIATION_TRACK_OBJECT_SIMILARITY_H_
+#ifndef MODULES_PERCEPTION_FUSION_LIB_DATA_ASSOCIATION_TRACK_OBJECT_SIMILARITY_H_
+#define MODULES_PERCEPTION_FUSION_LIB_DATA_ASSOCIATION_TRACK_OBJECT_SIMILARITY_H_
 #include <vector>
 #include "modules/perception/fusion/base/sensor_object.h"
 #include "modules/perception/fusion/lib/data_association/hm_data_association/chi_squared_cdf_1_0.0500_0.999900.h"
@@ -115,4 +115,4 @@ double ComputeRadarCameraVelocitySimilarity(const SensorObjectConstPtr& radar,
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // PERCEPTION_FUSION_LIB_DATA_ASSOCIATION_TRACK_OBJECT_SIMILARITY_H_
+#endif  // MODULES_PERCEPTION_FUSION_LIB_DATA_ASSOCIATION_TRACK_OBJECT_SIMILARITY_H_

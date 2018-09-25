@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef PERCEPTION_FUSION_COMMON_INFORMATION_FILTER_H_
-#define PERCEPTION_FUSION_COMMON_INFORMATION_FILTER_H_
+#ifndef MODULES_PERCEPTION_FUSION_COMMON_INFORMATION_FILTER_H_
+#define MODULES_PERCEPTION_FUSION_COMMON_INFORMATION_FILTER_H_
 
 #include "modules/perception/fusion/common/base_filter.h"
 
@@ -97,4 +97,4 @@ class InformationFilter : public BaseFilter {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // PERCEPTION_FUSION_COMMON_INFORMATION_FILTER_H_
+#endif  // MODULES_PERCEPTION_FUSION_COMMON_INFORMATION_FILTER_H_

@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef PERCEPTION_COMMON_IO_POSE_UTIL_H_
-#define PERCEPTION_COMMON_IO_POSE_UTIL_H_
+#ifndef MODULES_PERCEPTION_COMMON_IO_POSE_UTIL_H_
+#define MODULES_PERCEPTION_COMMON_IO_POSE_UTIL_H_
 
 #include <google/protobuf/message.h>
 #include <Eigen/Dense>
@@ -43,4 +43,4 @@ bool LoadOmnidirectionalCameraIntrinsics(
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // PERCEPTION_COMMON_IO_POSE_UTIL_H_
+#endif  // MODULES_PERCEPTION_COMMON_IO_POSE_UTIL_H_

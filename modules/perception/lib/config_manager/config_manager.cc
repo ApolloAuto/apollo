@@ -17,9 +17,9 @@
 
 #include <utility>
 
-#include <google/protobuf/text_format.h>
-
 #include "cybertron/common/log.h"
+#include "google/protobuf/text_format.h"
+
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/lib/io/file_util.h"
 
@@ -67,14 +67,14 @@ bool ConfigManager::InitInternal() {
   string config_module_path =
       FileUtil::GetAbsolutePath(work_root_, FLAGS_config_manager_path);
   AINFO << "WORK_ROOT: " << work_root_
-      << " config_root_path: " << config_module_path
-      << " ADU_DATA: " << adu_data_;
+        << " config_root_path: " << config_module_path
+        << " ADU_DATA: " << adu_data_;
 
   std::vector<std::string> model_config_files;
   if (!FileUtil::GetFileList(config_module_path, "config_manager.config",
                              &model_config_files)) {
     AERROR << "config_root_path : " << config_module_path
-        << " get file list error.";
+           << " get file list error.";
     return false;
   }
 
@@ -82,7 +82,7 @@ bool ConfigManager::InitInternal() {
     std::string content;
     if (!FileUtil::GetFileContent(model_config_file, &content)) {
       AERROR << "failed to get ConfigManager config path: "
-          << model_config_file;
+             << model_config_file;
       return false;
     }
 
@@ -90,7 +90,7 @@ bool ConfigManager::InitInternal() {
 
     if (!TextFormat::ParseFromString(content, &file_list_proto)) {
       AERROR << "invalid ModelConfigFileListProto file: "
-          << FLAGS_config_manager_path;
+             << FLAGS_config_manager_path;
       return false;
     }
 
@@ -132,7 +132,7 @@ bool ConfigManager::InitInternal() {
   }
 
   AINFO << "finish to load ModelConfigs. NumModels: "
-      << model_config_map_.size();
+        << model_config_map_.size();
 
   inited_ = true;
 
@@ -247,19 +247,17 @@ bool ModelConfig::Reset(const ModelConfigProto &proto) {
   }
 
   AINFO << "reset ModelConfig. model_name: " << name_
-      << " integer_param_map's size: " << integer_param_map_.size()
-      << " string_param_map's size: " << string_param_map_.size()
-      << " double_param_map's size: " << double_param_map_.size()
-      << " float_param_map's size: " << float_param_map_.size()
-      << " bool_param_map's size: " << bool_param_map_.size()
-      << " array_integer_param_map's size: "
-      << array_integer_param_map_.size()
-      << " array_string_param_map's size: "
-      << array_string_param_map_.size()
-      << " array_double_param_map's size: "
-      << array_double_param_map_.size()
-      << " array_float_param_map's size: " << array_float_param_map_.size()
-      << " array_bool_param_map's size: " << array_bool_param_map_.size();
+        << " integer_param_map's size: " << integer_param_map_.size()
+        << " string_param_map's size: " << string_param_map_.size()
+        << " double_param_map's size: " << double_param_map_.size()
+        << " float_param_map's size: " << float_param_map_.size()
+        << " bool_param_map's size: " << bool_param_map_.size()
+        << " array_integer_param_map's size: "
+        << array_integer_param_map_.size()
+        << " array_string_param_map's size: " << array_string_param_map_.size()
+        << " array_double_param_map's size: " << array_double_param_map_.size()
+        << " array_float_param_map's size: " << array_float_param_map_.size()
+        << " array_bool_param_map's size: " << array_bool_param_map_.size();
 
   return true;
 }

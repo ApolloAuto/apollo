@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef PERCEPTION_FUSION_LIB_SENSOR_HM_TRACKS_OBJECTS_MATCH_H_
-#define PERCEPTION_FUSION_LIB_SENSOR_HM_TRACKS_OBJECTS_MATCH_H_
+#ifndef MODULES_PERCEPTION_FUSION_LIB_SENSOR_HM_TRACKS_OBJECTS_MATCH_H_
+#define MODULES_PERCEPTION_FUSION_LIB_SENSOR_HM_TRACKS_OBJECTS_MATCH_H_
 #include <string>
 #include <vector>
 #include "modules/perception/common/graph/gated_hungarian_bigraph_matcher.h"
@@ -100,4 +100,4 @@ class HMTrackersObjectsAssociation : public BaseDataAssociation {
 }  // namespace fusion
 }  // namespace perception
 }  // namespace apollo
-#endif  // PERCEPTION_FUSION_LIB_SENSOR_HM_TRACKS_OBJECTS_MATCH_H_
+#endif  // MODULES_PERCEPTION_FUSION_LIB_SENSOR_HM_TRACKS_OBJECTS_MATCH_H_

@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef PERCEPTION_LIDAR_COMMON_LIDAR_OPITON_DEFINE_H_
-#define PERCEPTION_LIDAR_COMMON_LIDAR_OPITON_DEFINE_H_
+#ifndef MODULES_PERCEPTION_LIDAR_COMMON_LIDAR_OPITON_DEFINE_H_
+#define MODULES_PERCEPTION_LIDAR_COMMON_LIDAR_OPITON_DEFINE_H_
 
 // build perception-lidar with message proto in common
 #cmakedefine PERCEPTION_LIDAR_USE_COMMON_MESSAGE
 
-#endif  // PERCEPTION_LIDAR_COMMON_LIDAR_OPITON_DEFINE_H_
+#endif  // MODULES_PERCEPTION_LIDAR_COMMON_LIDAR_OPITON_DEFINE_H_
