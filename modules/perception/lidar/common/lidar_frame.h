@@ -16,9 +16,12 @@
 #ifndef MODULES_PERCEPTION_LIDAR_COMMON_LIDAR_FRAME_H_
 #define MODULES_PERCEPTION_LIDAR_COMMON_LIDAR_FRAME_H_
 
-#include <Eigen/Dense>
+#include <memory>
+#include <string>
 #include <vector>
-// #include <hdmap.h>
+
+#include "Eigen/Dense"
+
 #include "modules/perception/base/hdmap_struct.h"
 #include "modules/perception/base/object_pool_types.h"
 #include "modules/perception/base/point_cloud_types.h"
@@ -29,19 +32,19 @@ namespace lidar {
 
 struct LidarFrame {
   // point cloud
-  base::PointFCloudPtr cloud = nullptr;
+  std::shared_ptr<base::AttributePointCloud<base::PointF>> cloud;
   // world point cloud
-  base::PointDCloudPtr world_cloud = nullptr;
+  std::shared_ptr<base::AttributePointCloud<base::PointD>> world_cloud;
   // timestamp
   double timestamp = 0.0;
   // lidar to world pose
   Eigen::Affine3d lidar2world_pose = Eigen::Affine3d::Identity();
   // hdmap struct
-  base::HdmapStructPtr hdmap_struct = nullptr;
+  std::shared_ptr<base::HdmapStruct> hdmap_struct = nullptr;
   // segmented objects
-  std::vector<base::ObjectPtr> segmented_objects;
+  std::vector<std::shared_ptr<base::Object>> segmented_objects;
   // tracked objects
-  std::vector<base::ObjectPtr> tracked_objects;
+  std::vector<std::shared_ptr<base::Object>> tracked_objects;
   // point cloud roi indices
   base::PointIndices roi_indices;
   // point cloud non ground indices

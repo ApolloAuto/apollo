@@ -16,9 +16,10 @@
 #ifndef MODULES_PERCEPTION_LIDAR_COMMON_FEATURE_DESCRIPTOR_H_
 #define MODULES_PERCEPTION_LIDAR_COMMON_FEATURE_DESCRIPTOR_H_
 
-#include <float.h>
 #include <algorithm>
+#include <cfloat>
 #include <vector>
+
 #include "modules/perception/base/point_cloud_types.h"
 
 namespace apollo {

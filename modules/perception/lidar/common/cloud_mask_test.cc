@@ -13,12 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include <gtest/gtest.h>
 #include "modules/perception/lidar/common/cloud_mask.h"
+
+#include "gtest/gtest.h"
 
 namespace apollo {
 namespace perception {
 namespace lidar {
+
+using base::PointF;
+using base::AttributePointCloud;
 
 TEST(LidarCloudMaskTest, lidar_cloud_mask_test) {
   CloudMask mask;
@@ -42,7 +46,7 @@ TEST(LidarCloudMaskTest, lidar_cloud_mask_test) {
   mask.clear();
   EXPECT_EQ(mask.size(), 0);
 
-  base::PointFCloud source_cloud;
+  AttributePointCloud<PointF> source_cloud;
   source_cloud.resize(6);
   for (size_t i = 0; i < 6; ++i) {
     source_cloud[i].x = static_cast<float>(i);
@@ -63,7 +67,7 @@ TEST(LidarCloudMaskTest, lidar_cloud_mask_test) {
   mask.AddIndicesOfIndices(p_indices, p_indices_of_indices);
   EXPECT_EQ(mask.ValidIndicesCount(), 1);
 
-  base::PointFCloud target_cloud;
+  AttributePointCloud<PointF> target_cloud;
   mask.GetValidCloud(source_cloud, nullptr);
   mask.GetValidCloud(source_cloud, &target_cloud);
   EXPECT_EQ(target_cloud.size(), 1);
