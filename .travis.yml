@@ -7,6 +7,7 @@ os: linux
 env:
     - JOB=lint
     - JOB=cibuild
+    - JOB=test_cpu
 cache:
   directories:
   - $HOME/.cache/bazel
