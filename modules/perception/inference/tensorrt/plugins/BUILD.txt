@@ -1,0 +1,29 @@
+// DO NOT MODIFY
+// THIS FILE IS GENERATED AUTOMATICALLY TO HELP WRITE BUILD FILE.
+// DELETE THIS FILE WHEN YOU HAVE CREATED THE COMPLETE BUILD FILE
+cc_library(
+    name = "softmax_plugin",
+    hdrs = [
+        "softmax_plugin.h",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
+    name = "argmax_plugin",
+    hdrs = [
+        "argmax_plugin.h",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
+    name = "slice_plugin",
+    hdrs = [
+        "slice_plugin.h",
+    ],
+    deps = [
+    ],
+)

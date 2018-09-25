@@ -1,0 +1,38 @@
+// DO NOT MODIFY
+// THIS FILE IS GENERATED AUTOMATICALLY TO HELP WRITE BUILD FILE.
+// DELETE THIS FILE WHEN YOU HAVE CREATED THE COMPLETE BUILD FILE
+cc_library(
+    name = "lane_sample",
+    srcs = [
+        "lane_sample.cc",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
+    name = "cal_table_generator",
+    srcs = [
+        "cal_table_generator.cc",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
+    name = "denseline_sample",
+    srcs = [
+        "denseline_sample.cc",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
+    name = "yolo_sample",
+    srcs = [
+        "yolo_sample.cc",
+    ],
+    deps = [
+    ],
+)

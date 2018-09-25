@@ -1,0 +1,50 @@
+// DO NOT MODIFY
+// THIS FILE IS GENERATED AUTOMATICALLY TO HELP WRITE BUILD FILE.
+// DELETE THIS FILE WHEN YOU HAVE CREATED THE COMPLETE BUILD FILE
+cc_library(
+    name = "lidar_obstacle_tracking",
+    srcs = [
+        "lidar_obstacle_tracking.cc",
+    ],
+    hdrs = [
+        "lidar_obstacle_tracking.h",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
+    name = "lidar_obstacle_segmentation",
+    srcs = [
+        "lidar_obstacle_segmentation.cc",
+    ],
+    hdrs = [
+        "lidar_obstacle_segmentation.h",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
+    name = "lidar_obstacle_tracking",
+    srcs = [
+        "lidar_obstacle_tracking.cc",
+    ],
+    hdrs = [
+        "lidar_obstacle_tracking.h",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
+    name = "lidar_obstacle_segmentation",
+    srcs = [
+        "lidar_obstacle_segmentation.cc",
+    ],
+    hdrs = [
+        "lidar_obstacle_segmentation.h",
+    ],
+    deps = [
+    ],
+)

@@ -1,0 +1,119 @@
+// DO NOT MODIFY
+// THIS FILE IS GENERATED AUTOMATICALLY TO HELP WRITE BUILD FILE.
+// DELETE THIS FILE WHEN YOU HAVE CREATED THE COMPLETE BUILD FILE
+cc_library(
+    name = "projection_cache",
+    hdrs = [
+        "projection_cache.h",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
+    name = "track_object_similarity",
+    srcs = [
+        "track_object_similarity.cc",
+    ],
+    hdrs = [
+        "track_object_similarity.h",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
+    name = "chi_squared_cdf_2_0",
+    deps = [
+    ],
+)
+
+cc_library(
+    name = "track_object_distance",
+    srcs = [
+        "track_object_distance.cc",
+    ],
+    hdrs = [
+        "track_object_distance.h",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
+    name = "hm_tracks_objects_match",
+    srcs = [
+        "hm_tracks_objects_match.cc",
+    ],
+    hdrs = [
+        "hm_tracks_objects_match.h",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
+    name = "probabilities",
+    srcs = [
+        "probabilities.cc",
+    ],
+    hdrs = [
+        "probabilities.h",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
+    name = "chi_squared_cdf_1_0",
+    deps = [
+    ],
+)
+
+cc_library(
+    name = "track_object_similarity",
+    srcs = [
+        "track_object_similarity.cc",
+    ],
+    hdrs = [
+        "track_object_similarity.h",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
+    name = "hm_tracks_objects_match",
+    srcs = [
+        "hm_tracks_objects_match.cc",
+    ],
+    hdrs = [
+        "hm_tracks_objects_match.h",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
+    name = "probabilities",
+    srcs = [
+        "probabilities.cc",
+    ],
+    hdrs = [
+        "probabilities.h",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
+    name = "track_object_distance",
+    srcs = [
+        "track_object_distance.cc",
+    ],
+    hdrs = [
+        "track_object_distance.h",
+    ],
+    deps = [
+    ],
+)

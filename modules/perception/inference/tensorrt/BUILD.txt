@@ -1,0 +1,107 @@
+// DO NOT MODIFY
+// THIS FILE IS GENERATED AUTOMATICALLY TO HELP WRITE BUILD FILE.
+// DELETE THIS FILE WHEN YOU HAVE CREATED THE COMPLETE BUILD FILE
+cc_library(
+    name = "batch_stream",
+    srcs = [
+        "batch_stream.cc",
+    ],
+    hdrs = [
+        "batch_stream.h",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
+    name = "batch_stream",
+    srcs = [
+        "batch_stream.cc",
+    ],
+    hdrs = [
+        "batch_stream.h",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
+    name = "rt_utils",
+    srcs = [
+        "rt_utils.cc",
+    ],
+    hdrs = [
+        "rt_utils.h",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
+    name = "rt_common",
+    srcs = [
+        "rt_common.cc",
+    ],
+    hdrs = [
+        "rt_common.h",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
+    name = "rt_common",
+    srcs = [
+        "rt_common.cc",
+    ],
+    hdrs = [
+        "rt_common.h",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
+    name = "rt_utils",
+    srcs = [
+        "rt_utils.cc",
+    ],
+    hdrs = [
+        "rt_utils.h",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
+    name = "rt_net",
+    srcs = [
+        "rt_net.cc",
+    ],
+    hdrs = [
+        "rt_net.h",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
+    name = "entropy_calibrator",
+    hdrs = [
+        "entropy_calibrator.h",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
+    name = "rt_net",
+    srcs = [
+        "rt_net.cc",
+    ],
+    hdrs = [
+        "rt_net.h",
+    ],
+    deps = [
+    ],
+)

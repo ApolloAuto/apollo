@@ -1,0 +1,101 @@
+// DO NOT MODIFY
+// THIS FILE IS GENERATED AUTOMATICALLY TO HELP WRITE BUILD FILE.
+// DELETE THIS FILE WHEN YOU HAVE CREATED THE COMPLETE BUILD FILE
+cc_library(
+    name = "inference_rt_net_test",
+    srcs = [
+        "inference_rt_net_test.cc",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
+    name = "inference_yolo_io_test",
+    srcs = [
+        "inference_yolo_io_test.cc",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
+    name = "inference_utils_binary_data_test",
+    srcs = [
+        "inference_utils_binary_data_test.cc",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
+    name = "inference_caffe_net_test",
+    srcs = [
+        "inference_caffe_net_test.cc",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
+    name = "inference_rt_common_test",
+    srcs = [
+        "inference_rt_common_test.cc",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
+    name = "inference_roipooling_layer_test",
+    srcs = [
+        "inference_roipooling_layer_test.cc",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
+    name = "inference_entropy_calibrator_test",
+    srcs = [
+        "inference_entropy_calibrator_test.cc",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
+    name = "inference_batch_stream_test",
+    srcs = [
+        "inference_batch_stream_test.cc",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
+    name = "inference_yolo_batch_test",
+    srcs = [
+        "inference_yolo_batch_test.cc",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
+    name = "inference_plugins_test",
+    srcs = [
+        "inference_plugins_test.cc",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
+    name = "inference_util_test",
+    srcs = [
+        "inference_util_test.cc",
+    ],
+    deps = [
+    ],
+)
