@@ -41,6 +41,7 @@ class GeneralChannelMessage
   explicit GeneralChannelMessage(RenderableMessage* parent = nullptr)
       : CybertronChannelMessage<apollo::cybertron::message::RawMessage>(parent),
         current_state_(State::ShowDebugString),
+        pages_(0),
         page_index_(0),
         raw_msg_class_(nullptr) {}
 
