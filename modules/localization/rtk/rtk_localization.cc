@@ -17,6 +17,7 @@
 #include "modules/localization/rtk/rtk_localization.h"
 
 #include <limits>
+#include <sstream>
 
 #include "modules/common/math/quaternion.h"
 #include "modules/common/time/time.h"
@@ -47,7 +48,9 @@ void RTKLocalization::GpsCallback(
   double time_delay =
       common::time::ToSecond(Clock::Now()) - last_received_timestamp_sec_;
   if (time_delay > gps_time_delay_tolerance_) {
-    monitor_logger_.WARN() << "GPS message time interval: " << time_delay;
+    std::stringstream ss;
+    ss << "GPS message time interval: " << time_delay;
+    monitor_logger_.WARN(ss.str());
   }
 
   {
@@ -105,9 +108,10 @@ void RTKLocalization::RunWatchDog(double gps_timestamp) {
   bool msg_delay = false;
   if (gps_delay_cycle_cnt > report_threshold_err_num_) {
     msg_delay = true;
-    monitor_logger_.ERROR()
-        << "Raw GPS Message Delay. GPS message is " << gps_delay_cycle_cnt
-        << " cycle " << gps_delay_sec << " sec behind current time.";
+    std::stringstream ss;
+    ss << "Raw GPS Message Delay. GPS message is " << gps_delay_cycle_cnt
+       << " cycle " << gps_delay_sec << " sec behind current time.";
+    monitor_logger_.ERROR(ss.str());
   }
 
   // check IMU time stamp against system time
@@ -120,15 +124,16 @@ void RTKLocalization::RunWatchDog(double gps_timestamp) {
       static_cast<int64_t>(imu_delay_sec * localization_publish_freq_);
   if (imu_delay_cycle_cnt > report_threshold_err_num_) {
     msg_delay = true;
-    monitor_logger_.ERROR()
-        << "Raw GPS Message Delay. IMU message is " << imu_delay_cycle_cnt
-        << " cycle " << imu_delay_sec << " sec behind current time.";
+    std::stringstream ss;
+    ss << "Raw GPS Message Delay. IMU message is " << imu_delay_cycle_cnt
+       << " cycle " << imu_delay_sec << " sec behind current time.";
+    monitor_logger_.ERROR(ss.str());
   }
 
   // to prevent it from beeping continuously
   if (msg_delay && (last_reported_timestamp_sec_ < 1. ||
-                   common::time::ToSecond(Clock::Now()) >
-                       last_reported_timestamp_sec_ + 1.)) {
+                    common::time::ToSecond(Clock::Now()) >
+                        last_reported_timestamp_sec_ + 1.)) {
     AERROR << "gps/imu frame Delay!";
     last_reported_timestamp_sec_ = common::time::ToSecond(Clock::Now());
   }

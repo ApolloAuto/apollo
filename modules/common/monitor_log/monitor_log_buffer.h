@@ -43,6 +43,7 @@ namespace monitor {
 #define REG_MSG_TYPE(TYPE)                            \
   MonitorLogBuffer &TYPE(const std::string &msg) {    \
     AddMonitorMsgItem(MonitorMessageItem::TYPE, msg); \
+    Publish();                                        \
     return *this;                                     \
   }                                                   \
   MonitorLogBuffer &TYPE() {                          \
@@ -94,30 +95,6 @@ class MonitorLogBuffer {
    */
   void AddMonitorMsgItem(const MonitorMessageItem::LogLevel log_level,
                          const std::string &msg);
-
-  /**
-   * @brief overload operator << to help join messages
-   */
-  template <typename T>
-  MonitorLogBuffer &operator<<(const T &msg) {
-    if (monitor_msg_items_.empty() ||
-        monitor_msg_items_.back().first != level_) {
-      AddMonitorMsgItem(level_, std::to_string(msg));
-    } else {
-      monitor_msg_items_.back().second += std::to_string(msg);
-    }
-    return *this;
-  }
-
-  /**
-   * @brief overload operator << to help join string messages
-   */
-  MonitorLogBuffer &operator<<(const std::string &msg);
-
-  /**
-   * @brief overload operator << to help join char messages
-   */
-  MonitorLogBuffer &operator<<(const char *msg);
 
   /**
    * @brief publish the monitor messages
