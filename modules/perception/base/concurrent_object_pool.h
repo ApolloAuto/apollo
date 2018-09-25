@@ -18,6 +18,7 @@
 
 #include <deque>
 #include <list>
+#include <memory>
 #include <mutex>
 #include <queue>
 #include <vector>
@@ -25,7 +26,6 @@
 #include "modules/perception/base/object_pool.h"
 
 #define PERCEPTION_BASE_DISABLE_POOL
-
 namespace apollo {
 namespace perception {
 namespace base {
@@ -43,7 +43,7 @@ template <class ObjectType, size_t N = kPoolDefaultSize,
           class Initializer = ObjectPoolDefaultInitializer<ObjectType>>
 class ConcurrentObjectPool : public BaseObjectPool<ObjectType> {
  public:
-  using typename BaseObjectPool<ObjectType>::ObjectTypePtr;
+  using ObjectTypePtr = typename BaseObjectPool<ObjectType>::ObjectTypePtr;
   using BaseObjectPool<ObjectType>::capacity_;
   // @brief Only allow accessing from global instance
   static ConcurrentObjectPool& Instance() {

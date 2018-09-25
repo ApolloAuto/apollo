@@ -44,23 +44,15 @@ static const size_t kObjectPoolSize = 10000;
 static const size_t kPointCloudPoolSize = 1000;
 static const size_t kFramePoolSize = 100;
 
-// pool typedef collections,
-// developer should add pool type to the PoolInitialize function in .cc file
-typedef ConcurrentObjectPool<Object, kObjectPoolSize, ObjectInitializer>
-    ObjectPool;
-
-typedef ConcurrentObjectPool<PointFCloud, kPointCloudPoolSize,
-                             PointCloudInitializer<float>>
-    PointFCloudPool;
-
-typedef ConcurrentObjectPool<PointDCloud, kPointCloudPoolSize,
-                             PointCloudInitializer<double>>
-    PointDCloudPool;
-
-typedef ConcurrentObjectPool<Frame, kFramePoolSize, FrameInitializer> FramePool;
-
-// dummy version, still allocating memory each time
-// typedef DummyObjectPool<Object> ObjectPool;
+using ObjectPool =
+    ConcurrentObjectPool<Object, kObjectPoolSize, ObjectInitializer>;
+using PointFCloudPool =
+    ConcurrentObjectPool<AttributePointCloud<PointF>, kPointCloudPoolSize,
+                         PointCloudInitializer<float>>;
+using PointDCloudPool =
+    ConcurrentObjectPool<AttributePointCloud<PointD>, kPointCloudPoolSize,
+                         PointCloudInitializer<double>>;
+using FramePool = ConcurrentObjectPool<Frame, kFramePoolSize, FrameInitializer>;
 
 }  // namespace base
 }  // namespace perception

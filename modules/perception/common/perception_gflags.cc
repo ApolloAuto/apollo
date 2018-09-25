@@ -22,3 +22,5 @@ DEFINE_string(obs_sensor_intrinsic_path, "/home/caros/cybertron/params",
 DEFINE_string(obs_sensor_meta_path,
               "./data/perception/modules/perception/common/sensor_meta.pt",
               "The SensorManager config file.");
+
+DEFINE_bool(enable_base_object_pool, false, "Enable base object pool.");

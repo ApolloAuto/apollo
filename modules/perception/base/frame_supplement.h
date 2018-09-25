@@ -30,7 +30,7 @@ struct alignas(16) LidarFrameSupplement {
   bool on_use = false;
 
   // @brief only reference of the original cloud in lidar coordinate system
-  PointFCloudPtr cloud_ptr = nullptr;
+  std::shared_ptr<AttributePointCloud<PointF>> cloud_ptr;
 
   void Reset() {
     on_use = false;
@@ -77,7 +77,7 @@ struct alignas(16) UltrasonicFrameSupplement {
   bool on_use = false;
 
   // @brief only refrence of the image data
-  ImpendingCollisionEdgesPtr impending_collision_edges_ptr = nullptr;
+  std::shared_ptr<ImpendingCollisionEdges> impending_collision_edges_ptr;
 
   void Reset() {
     on_use = false;

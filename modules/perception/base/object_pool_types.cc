@@ -14,7 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/perception/base/object_pool_types.h"
-#include "modules/perception/base/log.h"
+
+#include "cybertron/common/log.h"
 
 namespace apollo {
 namespace perception {
@@ -27,9 +28,9 @@ __attribute__((constructor)) void PoolInitialize() {
   PointDCloudPool::Instance();
   FramePool::Instance();
 #ifndef PERCEPTION_BASE_DISABLE_POOL
-  LOG_INFO << "Initialize base object pool (no-malloc).";
+  AINFO << "Initialize base object pool (no-malloc).";
 #else
-  LOG_INFO << "Initialize base object pool (malloc).";
+  AINFO << "Initialize base object pool (malloc).";
 #endif
 }
 

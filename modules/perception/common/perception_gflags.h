@@ -22,4 +22,6 @@
 DECLARE_string(obs_sensor_intrinsic_path);
 DECLARE_string(obs_sensor_meta_path);
 
+DECLARE_bool(enable_base_object_pool);
+
 #endif  // MODULES_PERCEPTION_COMMON_PERCEPTION_GFLAGS_H_

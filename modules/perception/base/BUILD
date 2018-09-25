@@ -146,6 +146,34 @@ cc_library(
         "frame.h",
         "frame_supplement.h",
     ],
+    deps = [
+        ":blob",
+        ":image",
+        ":base_type",
+        ":impending_collision_edge",
+        "@eigen",
+    ],
+)
+
+cc_library(
+    name = "image",
+    hdrs = [
+        "image.h",
+        "image_8u.h",
+    ],
+    deps = [
+        ":blob",
+        ":base_type",
+    ],
+)
+
+cc_test(
+    name = "image_test",
+    size = "small",
+    deps = [
+        ":image",
+        "@gtest//:main",
+    ],
 )
 
 cc_library(
@@ -206,25 +234,50 @@ cc_test(
 cc_library(
     name = "object_pool",
     hdrs = [
-        "object_pool.h",
         "concurrent_object_pool.h",
+        "light_object_pool.h",
+        "object_pool.h",
     ],
     deps = [
+        ":base_type",
     ],
 )
 
-#cc_test(
-#    name = "object_pool_test",
-#    size = "small",
-#    srcs = [
-#        "object_pool_test.cc",
-#    ],
-#    deps = [
-#        ":object",
-#        ":object_pool",
-#        "@gtest//:main",
-#    ],
-#)
+cc_test(
+    name = "object_pool_test",
+    size = "small",
+    srcs = [
+        "object_pool_test.cc",
+    ],
+    deps = [
+        "//framework:cybertron",
+        ":object",
+        ":frame",
+        ":point_cloud",
+        ":object_pool",
+        ":object_pool_types",
+        "@eigen",
+        "@gtest//:main",
+    ],
+)
+
+cc_library(
+    name = "object_pool_types",
+    hdrs = [
+        "object_pool_types.h",
+    ],
+    srcs = [
+        "object_pool_types.cc",
+    ],
+    deps = [
+        "//framework:cybertron",
+        ":object",
+        ":frame",
+        ":point_cloud",
+        ":object_pool",
+        "@eigen",
+    ],
+)
 
 cc_library(
     name = "omnidirectional_model",
@@ -235,10 +288,10 @@ cc_library(
         "omnidirectional_model.cc",
     ],
     deps = [
+        "//framework:cybertron",
         ":camera",
         ":distortion_model",
         ":polynomial",
-        "//framework:cybertron",
         "@eigen",
     ],
 )
