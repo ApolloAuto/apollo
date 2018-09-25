@@ -89,4 +89,16 @@ cc_test(
     ],
 )
 
+cc_test(
+    name = "roi_filter_test",
+    size = "small",
+    srcs = [
+        "roi_filter_test.cc",
+    ],
+    deps = [
+        ":roi_filter",
+        "@gtest//:main",
+    ],
+)
+
 cpplint()
