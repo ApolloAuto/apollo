@@ -3,6 +3,19 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
+    name = "common",
+    deps = [
+        ":cloud_mask",
+        ":lidar_frame",
+        ":lidar_log",
+        ":lidar_object_util",
+        ":lidar_point_label",
+        ":lidar_timer",
+        ":pcl_util",
+    ],
+)
+
+cc_library(
     name = "cloud_mask",
     srcs = [
         "cloud_mask.cc",
@@ -74,6 +87,20 @@ cc_library(
     deps = [
         ":lidar_log",
         "//modules/perception/base",
+    ],
+)
+
+cc_library(
+    name = "lidar_point_label",
+    hdrs = [
+        "lidar_point_label.h",
+    ],
+)
+
+cc_library(
+    name = "lidar_timer",
+    hdrs = [
+        "lidar_timer.h",
     ],
 )
 

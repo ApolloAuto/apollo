@@ -68,7 +68,7 @@ bool TransformCache::QueryTransform(double timestamp,
   double delt = timestamp - transforms_.back().timestamp;
   if (delt > max_duration) {
     AINFO << "ERROR: query timestamp is " << delt
-             << "s later than cached timestamp";
+          << "s later than cached timestamp";
     return false;
   } else if (delt < 0.0) {
     AINFO << "ERROR: query earlier timestamp than transform cache";
@@ -79,9 +79,8 @@ bool TransformCache::QueryTransform(double timestamp,
   if (size == 1) {
     (*transform) = transforms_.back();
     transform->timestamp = timestamp;
-    AINFO << "use transform at "
-             << std::to_string(transforms_.back().timestamp) << " for "
-             << std::to_string(timestamp);
+    AINFO << "use transform at " << std::to_string(transforms_.back().timestamp)
+          << " for " << std::to_string(timestamp);
   } else {
     double ratio =
         (timestamp - transforms_[size - 2].timestamp) /
@@ -101,9 +100,9 @@ bool TransformCache::QueryTransform(double timestamp,
         transforms_[size - 1].translation.z() * ratio;
 
     AINFO << "estimate pose at " << std::to_string(timestamp)
-             << " from poses at "
-             << std::to_string(transforms_[size - 2].timestamp) << " and "
-             << std::to_string(transforms_[size - 1].timestamp);
+          << " from poses at "
+          << std::to_string(transforms_[size - 2].timestamp) << " and "
+          << std::to_string(transforms_[size - 1].timestamp);
   }
   return true;
 }
@@ -137,7 +136,7 @@ bool TransformWrapper::GetSensor2worldTrans(
     Eigen::Affine3d* novatel2world_trans) {
   if (!inited_) {
     AERROR << "TransformWrapper not Initialized,"
-              << " unable to call GetSensor2worldTrans.";
+           << " unable to call GetSensor2worldTrans.";
     return false;
   }
 
@@ -180,8 +179,8 @@ bool TransformWrapper::GetSensor2worldTrans(
     *novatel2world_trans = novatel2world;
   }
   AINFO << "Get pose timestamp: " << std::to_string(timestamp)
-           << ", pose: " << std::endl
-           << (*sensor2world_trans).matrix();
+        << ", pose: " << std::endl
+        << (*sensor2world_trans).matrix();
   return true;
 }
 
@@ -224,9 +223,8 @@ bool TransformWrapper::QueryTrans(double timestamp, StampedTransform* trans,
   if (!tf2_buffer_->canTransform(frame_id, child_frame_id, query_time,
                                  FLAGS_obs_tf2_buff_size, &err_string)) {
     AERROR << "Can not find transform. " << std::to_string(timestamp)
-              << " frame_id: " << frame_id
-              << " child_frame_id: " << child_frame_id
-              << " Error info: " << err_string;
+           << " frame_id: " << frame_id << " child_frame_id: " << child_frame_id
+           << " Error info: " << err_string;
     return false;
   }
 

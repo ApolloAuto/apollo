@@ -35,15 +35,15 @@ cc_test(
         "//modules/planning:planning_testdata",
     ],
     deps = [
-        "@gtest//:main",
         ":planning_component_lib",
+        "@gtest//:main",
     ],
 )
 
 cc_binary(
     name = "libplanning_component.so",
-    deps = [":planning_component_lib"],
     linkshared = True,
+    deps = [":planning_component_lib"],
 )
 
 cc_library(
@@ -58,6 +58,7 @@ cc_library(
         "planning_base.h",
         "std_planning.h",
     ],
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//modules/common",
         "//modules/common/configs:config_gflags",
@@ -79,7 +80,6 @@ cc_library(
         "//modules/planning/toolkits/deciders",
         "//modules/prediction/proto:prediction_proto",
     ],
-    copts = ["-DMODULE_NAME=\\\"planning\\\""],
 )
 
 filegroup(

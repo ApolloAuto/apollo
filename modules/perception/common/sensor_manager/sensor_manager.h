@@ -23,8 +23,8 @@
 #include <vector>
 
 #include "modules/perception/base/camera.h"
-#include "modules/perception/base/sensor_meta.h"
 #include "modules/perception/base/distortion_model.h"
+#include "modules/perception/base/sensor_meta.h"
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/lib/singleton/singleton.h"
 
@@ -87,12 +87,12 @@ class SensorManager {
   std::mutex mutex_;
   bool inited_ = false;
 
-  std::unordered_map<std::string,
-      apollo::perception::base::SensorInfo> sensor_info_map_;
-  std::unordered_map<std::string,
-      std::shared_ptr<BaseCameraDistortionModel>> distort_model_map_;
-  std::unordered_map<std::string,
-      std::shared_ptr<BaseCameraModel>> undistort_model_map_;
+  std::unordered_map<std::string, apollo::perception::base::SensorInfo>
+      sensor_info_map_;
+  std::unordered_map<std::string, std::shared_ptr<BaseCameraDistortionModel>>
+      distort_model_map_;
+  std::unordered_map<std::string, std::shared_ptr<BaseCameraModel>>
+      undistort_model_map_;
 };
 
 }  // namespace common
