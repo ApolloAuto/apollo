@@ -16,6 +16,8 @@
 #ifndef MODULES_PERCEPTION_BASE_LANE_STRUCT_H_
 #define MODULES_PERCEPTION_BASE_LANE_STRUCT_H_
 
+#include <vector>
+
 #include "modules/perception/base/point.h"
 
 namespace apollo {

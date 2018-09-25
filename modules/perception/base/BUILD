@@ -5,6 +5,9 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "base_type",
     hdrs = [
+        "hdmap_struct.h",
+        "lane_struct.h",
+        "landmark_struct.h",
         "sensor_meta.h",
     ],
     deps = [
@@ -141,6 +144,19 @@ cc_library(
     hdrs = [
         "frame.h",
         "frame_supplement.h",
+    ],
+)
+
+cc_library(
+    name = "impending_collision_edge",
+    srcs = [
+    ],
+    hdrs = [
+        "impending_collision_edge.h",
+    ],
+    deps = [
+        "//framework:cybertron",
+        "@eigen",
     ],
 )
 
