@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef PERCEPTION_LIDAR_COMMON_CLOUD_MASK_H_
-#define PERCEPTION_LIDAR_COMMON_CLOUD_MASK_H_
+#ifndef MODULES_PERCEPTION_LIDAR_COMMON_CLOUD_MASK_H_
+#define MODULES_PERCEPTION_LIDAR_COMMON_CLOUD_MASK_H_
 
 #include <vector>
 #include "modules/perception/base/point_cloud_types.h"
@@ -27,56 +27,71 @@ class CloudMask {
  public:
   CloudMask() = default;
   ~CloudMask() = default;
+
   // @brief: set mask size and inital value
   // @param [in]: size, mask size
   // @param [in]: value, initial value
   inline void Set(size_t size, int init_value) {
     mask_.assign(size, init_value);
   }
+
   // @brief: fill mask with given value
   // @param [in]: value
   inline void Fill(int value) { std::fill(mask_.begin(), mask_.end(), value); }
+
   // @brief: get mask data
   // @return: mask data
   inline const std::vector<int>& mask() const { return mask_; }
+
   // @brief: overloading [] to get mask element
   // @param [in]: id
   // @return: mask element, at id
   inline int& operator[](int id) { return mask_[id]; }
+
   // @brief: overloading [] to get mask element, const version
   // @param [in]: id
   // @return: mask element, at id
   inline const int& operator[](int id) const { return mask_[id]; }
+
   // @brief: get size of mask data
   // @return: size
   inline size_t size() const { return mask_.size(); }
+
   // @brief: clear mask data
   inline void clear() { mask_.clear(); }
+
   // @brief: get valid (positive) indices count
   // @return: count
   size_t ValidIndicesCount() const;
+
   // @brief: get valid (positive) indices count
   // @param [in]: indices
   // @return: count
   template <typename IntegerType>
   size_t ValidIndicesCount(const std::vector<IntegerType>& indices) const;
+
   // @brief: get valid (positive) point cloud from mask
   // @param [in]: source point cloud
   // @param [out]: target point cloud with valid points
-  void GetValidCloud(const base::PointFCloud& source_cloud,
-                     base::PointFCloud* target_cloud) const;
+  void GetValidCloud(
+      const base::AttributePointCloud<base::PointF>& source_cloud,
+      base::AttributePointCloud<base::PointF>* target_cloud) const;
+
   // @brief: flip the mask data, positive to zero and zero to one
   // @brief: note, flip twice is not guaranteed to recover the original mask
   void Flip();
+
   // @brief: add point indices, base::PointIndices version
   // @param [in]: indices
   // @param [in]: value
   void AddIndices(const base::PointIndices& indices, int value = 1);
+
   // @brief: add point indices, std::vector<IntegerType> version
   // @param [in]: indices
   // @param [in]: value
   template <typename IntegerType>
   void AddIndices(const std::vector<IntegerType>& indices, int value = 1);
+
   // @brief: add point indices of indices
   // @param [in]: indices
   // @param [in]: indices of indices (first param)
@@ -84,21 +99,26 @@ class CloudMask {
   void AddIndicesOfIndices(const base::PointIndices& indices,
                            const base::PointIndices& indices_of_indices,
                            int value = 1);
+
   // @brief: remove point indices, base::PointIndices version
   // @param [in]: indices
   void RemoveIndices(const base::PointIndices& indices);
+
   // @brief: remove point indices, std::vector<IntegerType> version
   // @param [in]: indices
   template <typename IntegerType>
   void RemoveIndices(const std::vector<IntegerType>& indices);
+
   // @brief: remove point indices of indices
   // @param [in]: indices
   // @param [in]: indices of indices (first param)
   void RemoveIndicesOfIndices(const base::PointIndices& indices,
                               const base::PointIndices& indices_of_indices);
+
   // @brief: get and store valid (positive) value to another mask
   // @param [out]: target mask
   void GetValidMask(CloudMask* rhs) const;
+
   // @brief: reset source value in mask to target value
   // @param [in]: source value
   // @param [in]: target value
@@ -107,6 +127,7 @@ class CloudMask {
  private:
   // @brief mask data
   std::vector<int> mask_;
+
   // @brief point indices buffer
   mutable std::vector<int> indices_;
 };
@@ -129,7 +150,7 @@ template <typename IntegerType>
 size_t CloudMask::ValidIndicesCount(
     const std::vector<IntegerType>& indices) const {
   size_t count = 0;
-  for (auto& id : indices) {
+  for (const auto& id : indices) {
     if (mask_[id]) {
       ++count;
     }
@@ -141,4 +162,4 @@ size_t CloudMask::ValidIndicesCount(
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // PERCEPTION_LIDAR_COMMON_CLOUD_MASK_H_
+#endif  // MODULES_PERCEPTION_LIDAR_COMMON_CLOUD_MASK_H_

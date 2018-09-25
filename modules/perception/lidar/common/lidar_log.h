@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef PERCEPTION_LIDAR_COMMON_LIDAR_LOG_H_
-#define PERCEPTION_LIDAR_COMMON_LIDAR_LOG_H_
+#ifndef MODULES_PERCEPTION_LIDAR_COMMON_LIDAR_LOG_H_
+#define MODULES_PERCEPTION_LIDAR_COMMON_LIDAR_LOG_H_
 #include "modules/perception/base/log.h"
 
 // 100-199 reserve for hd lidar(64...) module error
@@ -40,4 +40,4 @@
 #define LDLIDAR_TIME_SYNCHRONIZE_ERROR 214
 #define LDLIDAR_GET_CONFIG_ERROR 220
 
-#endif  // PERCEPTION_LIDAR_COMMON_LIDAR_LOG_H_
+#endif  // MODULES_PERCEPTION_LIDAR_COMMON_LIDAR_LOG_H_

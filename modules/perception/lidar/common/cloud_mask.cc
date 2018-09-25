@@ -19,6 +19,9 @@ namespace apollo {
 namespace perception {
 namespace lidar {
 
+using base::PointF;
+using base::AttributePointCloud;
+
 size_t CloudMask::ValidIndicesCount() const {
   size_t count = 0;
   for (auto& i : mask_) {
@@ -29,8 +32,8 @@ size_t CloudMask::ValidIndicesCount() const {
   return count;
 }
 
-void CloudMask::GetValidCloud(const base::PointFCloud& source_cloud,
-                              base::PointFCloud* target_cloud) const {
+void CloudMask::GetValidCloud(const AttributePointCloud<PointF>& source_cloud,
+                              AttributePointCloud<PointF>* target_cloud) const {
   if (target_cloud == nullptr) {
     return;
   }
