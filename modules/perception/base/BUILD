@@ -31,49 +31,25 @@ cc_test(
 )
 
 cc_library(
-    name = "common",
+    name = "box",
     hdrs = [
-        "common.h",
+        "box.h",
+        "comparison_traits.h",
     ],
     deps = [
-    ],
-)
-
-cc_test(
-    name = "common_test",
-    size = "small",
-    srcs = [
-        "common_test.cc",
-    ],
-    deps = [
-        ":common",
-        "//modules/perception/base/test:test_helper",
-        "@cuda",
-        "@gtest//:main",
-    ],
-)
-
-cc_library(
-    name = "point_cloud",
-    hdrs = [
-        "point.h",
-        "point_cloud.h",
-        "point_cloud_types.h",
-    ],
-    deps = [
-        "@eigen",
-    ],
-)
-
-cc_test(
-    name = "point_cloud_test",
-    size = "small",
-    srcs = [
-        "point_cloud_test.cc",
-    ],
-    deps = [
-        "@gtest//:main",
         ":point_cloud",
+    ],
+)
+
+cc_test(
+    name = "box_test",
+    size = "small",
+    srcs = [
+        "box_test.cc",
+    ],
+    deps = [
+        ":box",
+        "@gtest//:main",
     ],
 )
 
@@ -87,6 +63,27 @@ cc_library(
     ],
     deps = [
         "@eigen",
+    ],
+)
+
+cc_test(
+    name = "camera_test",
+    size = "small",
+    srcs = [
+        "camera_test.cc",
+    ],
+    deps = [
+        ":camera",
+        "@gtest//:main",
+    ],
+)
+
+cc_library(
+    name = "common",
+    hdrs = [
+        "common.h",
+    ],
+    deps = [
     ],
 )
 
@@ -120,25 +117,26 @@ cc_test(
 )
 
 cc_library(
-    name = "box",
+    name = "point_cloud",
     hdrs = [
-        "box.h",
-        "comparison_traits.h",
+        "point.h",
+        "point_cloud.h",
+        "point_cloud_types.h",
     ],
     deps = [
-        ":point_cloud",
+        "@eigen",
     ],
 )
 
 cc_test(
-    name = "box_test",
+    name = "point_cloud_test",
     size = "small",
     srcs = [
-        "box_test.cc",
+        "point_cloud_test.cc",
     ],
     deps = [
-        ":box",
         "@gtest//:main",
+        ":point_cloud",
     ],
 )
 
