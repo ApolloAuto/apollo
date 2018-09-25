@@ -64,36 +64,23 @@ bool ControlComponent::Init() {
   }
 
   chassis_reader_ = node_->CreateReader<Chassis>(
-      FLAGS_chassis_topic, [this](const std::shared_ptr<Chassis> &chassis) {
-        ADEBUG << "Received chassis data: run chassis callback.";
-        std::lock_guard<std::mutex> lock(mutex_);
-        latest_chassis_.CopyFrom(*chassis);
-      });
+      FLAGS_chassis_topic,
+      std::bind(&ControlComponent::OnChassis, this, std::placeholders::_1));
   CHECK(chassis_reader_ != nullptr);
 
   trajectory_reader_ = node_->CreateReader<ADCTrajectory>(
       FLAGS_planning_trajectory_topic,
-      [this](const std::shared_ptr<ADCTrajectory> &trajectory) {
-        ADEBUG << "Received chassis data: run trajectory callback.";
-        std::lock_guard<std::mutex> lock(mutex_);
-        latest_trajectory_.CopyFrom(*trajectory);
-      });
+      std::bind(&ControlComponent::OnPlanning, this, std::placeholders::_1));
   CHECK(trajectory_reader_ != nullptr);
 
   localization_reader_ = node_->CreateReader<LocalizationEstimate>(
-      FLAGS_localization_topic,
-      [this](const std::shared_ptr<LocalizationEstimate> &localization) {
-        ADEBUG << "Received control data: run localization message callback.";
-        std::lock_guard<std::mutex> lock(mutex_);
-        latest_localization_.CopyFrom(*localization);
-      });
+      FLAGS_localization_topic, std::bind(&ControlComponent::OnLocalization,
+                                          this, std::placeholders::_1));
   CHECK(localization_reader_ != nullptr);
 
   pad_msg_reader_ = node_->CreateReader<PadMessage>(
-      FLAGS_pad_topic, [this](const std::shared_ptr<PadMessage> &pad_msg) {
-        ADEBUG << "Received control data: run pad message callback.";
-        OnPad(*pad_msg);
-      });
+      FLAGS_pad_topic,
+      std::bind(&ControlComponent::OnPad, this, std::placeholders::_1));
   CHECK(pad_msg_reader_ != nullptr);
 
   control_cmd_writer_ =
@@ -116,9 +103,9 @@ bool ControlComponent::Init() {
   return true;
 }
 
-void ControlComponent::OnPad(const PadMessage &pad) {
-  pad_msg_ = pad;
-  ADEBUG << "Received Pad Msg:" << pad.DebugString();
+void ControlComponent::OnPad(const std::shared_ptr<PadMessage> &pad) {
+  pad_msg_.CopyFrom(*pad);
+  ADEBUG << "Received Pad Msg:" << pad_msg_.DebugString();
   AERROR_IF(!pad_msg_.has_action()) << "pad message check failed!";
 
   // do something according to pad message
@@ -128,6 +115,26 @@ void ControlComponent::OnPad(const PadMessage &pad) {
     estop_reason_.clear();
   }
   pad_received_ = true;
+}
+
+void ControlComponent::OnChassis(const std::shared_ptr<Chassis> &chassis) {
+  ADEBUG << "Received chassis data: run chassis callback.";
+  std::lock_guard<std::mutex> lock(mutex_);
+  latest_chassis_.CopyFrom(*chassis);
+}
+
+void ControlComponent::OnPlanning(
+    const std::shared_ptr<ADCTrajectory> &trajectory) {
+  ADEBUG << "Received chassis data: run trajectory callback.";
+  std::lock_guard<std::mutex> lock(mutex_);
+  latest_trajectory_.CopyFrom(*trajectory);
+}
+
+void ControlComponent::OnLocalization(
+    const std::shared_ptr<LocalizationEstimate> &localization) {
+  ADEBUG << "Received control data: run localization message callback.";
+  std::lock_guard<std::mutex> lock(mutex_);
+  latest_localization_.CopyFrom(*localization);
 }
 
 void ControlComponent::OnMonitor(
@@ -142,6 +149,13 @@ void ControlComponent::OnMonitor(
 
 Status ControlComponent::ProduceControlCommand(
     ControlCommand *control_command) {
+  {
+    std::lock_guard<std::mutex> lock(mutex_);
+    local_view_.chassis = latest_chassis_;
+    local_view_.trajectory = latest_trajectory_;
+    local_view_.localization = latest_localization_;
+  }
+
   Status status = CheckInput(&local_view_);
   // check data
 
@@ -241,13 +255,6 @@ bool ControlComponent::Proc() {
     return false;
   }
 
-  {
-    std::lock_guard<std::mutex> lock(mutex_);
-    local_view_.chassis = latest_chassis_;
-    local_view_.trajectory = latest_trajectory_;
-    local_view_.localization = latest_localization_;
-  }
-
   ControlCommand control_command;
 
   Status status = ProduceControlCommand(&control_command);
@@ -294,7 +301,7 @@ bool ControlComponent::Proc() {
   return true;
 }
 
-Status ControlComponent::CheckInput(LocalView* local_view) {
+Status ControlComponent::CheckInput(LocalView *local_view) {
   ADEBUG << "Received localization:"
          << local_view->localization.ShortDebugString();
   ADEBUG << "Received chassis:" << local_view->chassis.ShortDebugString();
@@ -320,7 +327,7 @@ Status ControlComponent::CheckInput(LocalView* local_view) {
   return Status::OK();
 }
 
-Status ControlComponent::CheckTimestamp(const LocalView& local_view) {
+Status ControlComponent::CheckTimestamp(const LocalView &local_view) {
   if (!control_conf_.enable_input_timestamp_check() ||
       control_conf_.is_control_test_mode()) {
     ADEBUG << "Skip input timestamp check by gflags.";
