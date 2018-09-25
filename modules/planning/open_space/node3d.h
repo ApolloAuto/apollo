@@ -53,6 +53,7 @@ class Node3d {
   double GetPhi() { return phi_; };
   bool operator==(const std::shared_ptr<Node3d> right) const;
   std::size_t GetIndex() {return index_;};
+  void SetPre(std::shared_ptr<Node3d> pre_node){pre_node_ = pre_node;};
 
  private:
   double x_ = 0.0;
@@ -64,7 +65,8 @@ class Node3d {
   std::size_t index_ = 0;
   double current_cost_ = 0.0;
   double heuristic_cost_ = 0.0;
-  std::shared_ptr<Node3d> pre_node = nullptr;
+  double cost_ = 0.0;
+  std::shared_ptr<Node3d> pre_node_ = nullptr;
   double steering_ = 0.0;
   // true for moving forward and false for moving backward
   bool direction_ = true;

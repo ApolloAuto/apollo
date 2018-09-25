@@ -26,13 +26,16 @@
 #include <queue>
 #include <vector>
 
+#include "modules/planning/open_space/node3d.h"
+#include "modules/planning/open_space/reeds_shepp_path.h"
+
 #include "cybertron/common/log.h"
 #include "cybertron/common/macros.h"
 #include "modules/common/configs/proto/vehicle_config.pb.h"
 #include "modules/common/configs/vehicle_config_helper.h"
+#include "modules/planning/constraint_checker/collision_checker.h"
 #include "modules/planning/common/obstacle.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/open_space/node3d.h"
 #include "modules/planning/proto/planner_open_space_config.pb.h"
 
 namespace apollo {
@@ -55,11 +58,17 @@ class HybridAStar {
 
  private:
   // not complete
-  bool AnalyticExpansion(std::shared_ptr<Node3d> current_node);
+  bool AnalyticExpansion(std::shared_ptr<Node3d> current_node,
+                         ReedSheppPath* reeds_shepp_to_end);
   // not complete
   std::vector<std::shared_ptr<Node3d>> KinemeticModelExpansion();
   // check collision and validity
-  bool Validitycheck(std::shared_ptr<Node3d> next_node);
+  bool ValidityCheck(Node3d& node);
+  // check Reeds Shepp path collision and validity
+  bool RSPCheck(const ReedSheppPath* reeds_shepp_to_end);
+  // load the whole RSP as nodes and add to the close set
+  void LoadRSPinCS(const ReedSheppPath* reeds_shepp_to_end,
+                   std::shared_ptr<Node3d> current_node);
   std::shared_ptr<Node3d> Next_node_generator(std::size_t next_node_index);
   double Cost();
   double HeuristicCost();
@@ -88,6 +97,7 @@ class HybridAStar {
   std::map<std::size_t, std::shared_ptr<Node3d>> open_set_;
   std::map<std::size_t, std::shared_ptr<Node3d>> close_set_;
   Result result_;
+  std::unique_ptr<ReedShepp> reed_shepp_generator_;
 };
 
 }  // namespace planning
