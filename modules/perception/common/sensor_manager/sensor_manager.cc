@@ -15,17 +15,16 @@
  *****************************************************************************/
 #include "modules/perception/common/sensor_manager/sensor_manager.h"
 
-#include <google/protobuf/text_format.h>
-
 #include <string>
 #include <utility>
 
 #include "cybertron/common/log.h"
+#include "google/protobuf/text_format.h"
 
-// #include "modules/perception/common/io/io_util.h"
+#include "modules/perception/proto/sensor_meta_schema.pb.h"
+
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lib/io/file_util.h"
-#include "modules/perception/proto/sensor_meta_schema.pb.h"
 
 namespace apollo {
 namespace perception {
@@ -36,9 +35,7 @@ using apollo::perception::base::SensorInfo;
 using apollo::perception::base::SensorOrientation;
 using apollo::perception::base::SensorType;
 
-SensorManager::SensorManager() {
-  CHECK_EQ(this->Init(), true);
-}
+SensorManager::SensorManager() { CHECK_EQ(this->Init(), true); }
 
 bool SensorManager::Init() {
   std::lock_guard<std::mutex> lock(mutex_);
@@ -59,7 +56,7 @@ bool SensorManager::Init() {
   std::string content;
   if (!lib::FileUtil::GetFileContent(file_path, &content)) {
     AERROR << "Failed to get SensorManager config path: "
-              << FLAGS_obs_sensor_meta_path;
+           << FLAGS_obs_sensor_meta_path;
     return false;
   }
 
@@ -95,10 +92,9 @@ bool SensorManager::Init() {
         return false;
       }
       */
-      distort_model_map_.insert(
-          make_pair(sensor_meta_proto.name(),
-                    std::dynamic_pointer_cast<BaseCameraDistortionModel>(
-                        distort_model)));
+      distort_model_map_.insert(make_pair(
+          sensor_meta_proto.name(),
+          std::dynamic_pointer_cast<BaseCameraDistortionModel>(distort_model)));
       undistort_model_map_.insert(make_pair(sensor_meta_proto.name(),
                                             distort_model->get_camera_model()));
     }
@@ -173,8 +169,7 @@ bool SensorManager::IsHdLidar(const std::string& name) const {
 }
 
 bool SensorManager::IsHdLidar(const SensorType& type) const {
-  return type == SensorType::VELODYNE_64 ||
-         type == SensorType::VELODYNE_32 ||
+  return type == SensorType::VELODYNE_64 || type == SensorType::VELODYNE_32 ||
          type == SensorType::VELODYNE_16;
 }
 
@@ -189,8 +184,7 @@ bool SensorManager::IsLdLidar(const std::string& name) const {
 }
 
 bool SensorManager::IsLdLidar(const SensorType& type) const {
-  return type == SensorType::LDLIDAR_4 ||
-         type == SensorType::LDLIDAR_1;
+  return type == SensorType::LDLIDAR_4 || type == SensorType::LDLIDAR_1;
 }
 
 bool SensorManager::IsLidar(const std::string& name) const {
