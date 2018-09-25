@@ -17,7 +17,7 @@
 #include <iostream>
 #include <vector>
 #define private public
-#include "modules/perception/base/log.h"
+#include "cybertron/common/log.h"
 #include "modules/perception/fusion/common/kalman_filter.h"
 
 namespace apollo {

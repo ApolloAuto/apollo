@@ -17,7 +17,7 @@
 #include <algorithm>
 #include <cstdio>
 #include <string>
-#include "modules/perception/base/log.h"
+#include "cybertron/common/log.h"
 
 namespace apollo {
 namespace perception {

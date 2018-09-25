@@ -15,7 +15,7 @@
  *****************************************************************************/
 #include "modules/perception/onboard/transform_wrapper/transform_wrapper.h"
 
-#include "modules/perception/base/log.h"
+#include "cybertron/common/log.h"
 #include "modules/perception/common/sensor_manager/sensor_manager.h"
 
 namespace apollo {

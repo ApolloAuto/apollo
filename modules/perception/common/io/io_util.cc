@@ -27,7 +27,7 @@
 #include <iomanip>
 
 #include "modules/perception/base/camera.h"
-#include "modules/perception/base/log.h"
+#include "cybertron/common/log.h"
 #include "modules/perception/lib/io/file_util.h"
 
 namespace apollo {

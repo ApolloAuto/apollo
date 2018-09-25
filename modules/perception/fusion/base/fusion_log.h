@@ -15,7 +15,7 @@
  *****************************************************************************/
 #ifndef MODULES_PERCEPTION_FUSION_BASE_LOG_H_
 #define MODULES_PERCEPTION_FUSION_BASE_LOG_H_
-#include "modules/perception/base/log.h"
+#include "cybertron/common/log.h"
 // 500-599 reserve for fusion module error
 #define FUSION_GET_POSE_ERROR 500          // get pose error
 #define FUSION_GET_HDMAP_ERROR 501         // get hdmap error

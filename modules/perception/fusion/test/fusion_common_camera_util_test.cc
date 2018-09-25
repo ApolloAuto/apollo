@@ -16,7 +16,7 @@
 #include <gtest/gtest.h>
 #include <iostream>
 #include <vector>
-#include "modules/perception/base/log.h"
+#include "cybertron/common/log.h"
 #include "modules/perception/fusion/base/sensor_data_manager.h"
 #include "modules/perception/fusion/common/camera_util.h"
 

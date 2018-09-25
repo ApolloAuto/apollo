@@ -15,7 +15,7 @@
  *****************************************************************************/
 #include "modules/perception/lidar/lib/tracker/hm_tracker/multi_hm_bipartite_graph_matcher.h"
 #include <Eigen/Core>
-#include "modules/perception/base/log.h"
+#include "cybertron/common/log.h"
 #include "modules/perception/common/graph/gated_hungarian_bigraph_matcher.h"
 
 namespace apollo {

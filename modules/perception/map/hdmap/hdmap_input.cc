@@ -17,8 +17,11 @@
 #include "modules/perception/map/hdmap/hdmap_input.h"
 
 #include <algorithm>
-// #include "modules/perception/base/log.h"
-// #include "modules/perception/common/geometry/common.h"
+#include <string>
+#include <vector>
+#include "cybertron/common/log.h"
+#include "modules/perception/common/geometry/common.h"
+
 // #include "hdmap_definitions.h"  // NOLINT
 // #include "hdmap_trajectory.h"  // NOLINT
 // #include "modules/perception/base/object_pool_types.h"
@@ -40,8 +43,8 @@ namespace map {
 // using lib::ConfigManager;
 // using base::PolygonDType;
 
-using base::RoadBoundary;
 using base::PointD;
+using base::RoadBoundary;
 // using base::PointDCloud;
 // using base::PointDCloudPtr;
 // HDMapInput
@@ -100,8 +103,7 @@ bool HDMapInput::InitHDMap() {
 }
 
 bool HDMapInput::GetRoiHDMapStruct(
-    const base::PointD& pointd,
-    const double distance,
+    const base::PointD& pointd, const double distance,
     std::shared_ptr<base::HdmapStruct> hdmap_struct_prt) {
   // lib::MutexLock lock(&mutex_);
   // CHECK_NOTNULL(hdmap_.get());

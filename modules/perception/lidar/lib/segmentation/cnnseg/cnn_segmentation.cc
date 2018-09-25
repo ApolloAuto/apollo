@@ -17,7 +17,7 @@
 #include <string>
 #include <vector>
 
-#include "modules/perception/base/log.h"
+#include "cybertron/common/log.h"
 #include "modules/perception/base/object_pool_types.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lib/io/file_util.h"

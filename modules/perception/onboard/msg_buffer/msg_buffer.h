@@ -25,7 +25,7 @@
 
 #include "cybertron/component/component.h"
 #include "float.h"
-#include "modules/perception/base/log.h"
+#include "cybertron/common/log.h"
 
 namespace apollo {
 namespace perception {

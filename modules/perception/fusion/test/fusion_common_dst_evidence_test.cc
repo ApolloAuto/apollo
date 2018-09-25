@@ -21,7 +21,7 @@
 
 #include "boost/format.hpp"
 #include "gtest/gtest.h"
-#include "modules/perception/base/log.h"
+#include "cybertron/common/log.h"
 
 #include "modules/perception/fusion/common/dst_evidence.h"
 
