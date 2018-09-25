@@ -33,6 +33,7 @@ namespace base {
 template <class PointT>
 class PointCloud {
  public:
+  using PointType = PointT;
   // @brief default constructor
   PointCloud() = default;
   // @brief copy constructor
