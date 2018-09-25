@@ -16,17 +16,20 @@
 # limitations under the License.
 ###############################################################################
 """
-This program can dump a rosbag into separate text files that contains the pb messages
+This program can dump a cybertron record into separate text files that contains the pb messages
 """
 
-import rosbag
-import std_msgs
 import argparse
 import shutil
 import os
+import time
 import sys
 
-from std_msgs.msg import String
+from cybertron import cybertron
+from cybertron import record
+from common.message_manager import PbMessageManager
+
+g_message_manager = PbMessageManager()
 
 
 def write_to_file(file_path, topic_pb):
@@ -36,43 +39,65 @@ def write_to_file(file_path, topic_pb):
     f.close()
 
 
-def dump_bag(in_bag, out_dir, start_time, duration, filter_topic):
-    """out_bag = in_bag + routing_bag"""
-    bag = rosbag.Bag(in_bag, 'r')
+def dump_record(in_record, out_dir, start_time, duration, filter_topic):
+    freader = record.RecordReader()
+    if not freader.open(in_record):
+        print("Failed to open: %s" % in_record)
+        return
+    time.sleep(1)
     seq = 0
-    for topic, msg, t in bag.read_messages():
-        t_sec = t.secs + t.nsecs / 1.0e9
+    while not freader.endoffile():
+        read_msg_succ = freader.read_message()
+        if not read_msg_succ:
+            print("Read failed")
+            return
+        t_sec = freader.currentmessage_time()
         if start_time and t_sec < start_time:
             print "not yet reached the start time"
             continue
         if start_time and t_sec >= start_time + duration:
             print "done"
             break
+        topic = freader.currentmessage_channelname()
+        msg_type = freader.get_messagetype(topic)
         if topic == "/apollo/sensor/mobileye":
             continue
         if not filter_topic or topic == filter_topic:
-            print "export at time ", t
             message_file = topic.replace("/", "_")
             file_path = os.path.join(out_dir,
                                      str(seq) + message_file + ".pb.txt")
+            meta_msg = g_message_manager.get_msg_meta_by_topic(topic)
+            if meta_msg is None:
+                print("Unknown topic: %s " % topic)
+                continue
+            msg = meta_msg.msg_type()()
+            msg.ParseFromString(freader.current_rawmessage())
             write_to_file(file_path, msg)
         seq += 1
+    freader.close()
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description=
-        "A tool to dump the protobuf messages in a ros bag into text files")
+        "A tool to dump the protobuf messages in a cybertron record into text files"
+    )
     parser.add_argument(
-        "in_rosbag", action="store", type=str, help="the input ros bag")
+        "in_record",
+        action="store",
+        type=str,
+        help="the input cybertron record")
     parser.add_argument(
-        "--start_time", action="store", type=float, help="the input ros bag")
+        "--start_time",
+        action="store",
+        type=float,
+        help="the input cybertron record")
     parser.add_argument(
         "--duration",
         action="store",
         type=float,
         default=1.0,
-        help="the input ros bag")
+        help="the input cybertron record")
     parser.add_argument(
         "out_dir",
         action="store",
@@ -85,8 +110,8 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
     if not os.path.exists(args.out_dir):
-        print("%s does not exist" % args.out_dir);
+        print("%s does not exist" % args.out_dir)
         sys.exit(0)
 
-    dump_bag(args.in_rosbag, args.out_dir, args.start_time, args.duration,
-             args.topic)
+    dump_record(args.in_record, args.out_dir, args.start_time, args.duration,
+                args.topic)

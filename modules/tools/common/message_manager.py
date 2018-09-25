@@ -27,6 +27,7 @@ from modules.control.proto import control_cmd_pb2
 from modules.canbus.proto import chassis_pb2
 from modules.common.proto import drive_event_pb2
 from modules.map.relative_map.proto import navigation_pb2
+from modules.guardian.proto import guardian_pb2
 
 import proto_utils
 
@@ -64,7 +65,7 @@ topic_pb_list = [
     MessageType("chassis", "/apollo/canbus/chassis", chassis_pb2.Chassis),
     MessageType("prediction", "/apollo/prediction",
                 prediction_obstacle_pb2.PredictionObstacles),
-    MessageType("perception", "/apollo/perception",
+    MessageType("perception", "/apollo/perception/obstacles",
                 perception_obstacle_pb2.PerceptionObstacles),
     MessageType("routing_response", "/apollo/routing_response",
                 routing_pb2.RoutingResponse),
@@ -77,8 +78,9 @@ topic_pb_list = [
     MessageType("drive_event", "/apollo/drive_event",
                 drive_event_pb2.DriveEvent),
     MessageType("relative_map", "/apollo/relative_map", navigation_pb2.MapMsg),
-    MessageType("relative_map", "/apollo/navigation",
+    MessageType("navigation", "/apollo/navigation",
                 navigation_pb2.NavigationInfo),
+    MessageType("guardian", "/apollo/guardian", guardian_pb2.GuardianCommand),
 ]
 
 
