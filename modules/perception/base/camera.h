@@ -13,21 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+
 #ifndef MODULES_PERCEPTION_BASE_CAMERA_H_
 #define MODULES_PERCEPTION_BASE_CAMERA_H_
-#include <Eigen/Core>
 
 #include <memory>
 #include <string>
+
+#include "Eigen/Core"
 
 namespace apollo {
 namespace perception {
 namespace base {
 
+// TODO(all) remove later
+// typedef std::shared_ptr<BaseCameraModel> BaseCameraModelPtr;
+// typedef std::shared_ptr<const BaseCameraModel> BaseCameraModelConstPtr;
+// typedef std::shared_ptr<PinholeCameraModel> PinholeCameraModelPtr;
+// typedef std::shared_ptr<const PinholeCameraModel> PinholeCameraModelConstPtr;
+
 class BaseCameraModel {
  public:
   BaseCameraModel() = default;
   virtual ~BaseCameraModel() = default;
+
   virtual Eigen::Vector2f Project(const Eigen::Vector3f& point3d) = 0;
   virtual Eigen::Vector3f UnProject(const Eigen::Vector2f& point2d) = 0;
   virtual std::string name() const = 0;
@@ -36,7 +45,6 @@ class BaseCameraModel {
   inline void set_height(size_t height) { image_height_ = height; }
 
   inline size_t get_width() const { return image_width_; }
-
   inline size_t get_height() const { return image_height_; }
 
  protected:
@@ -44,13 +52,11 @@ class BaseCameraModel {
   size_t image_height_ = 0;
 };
 
-typedef std::shared_ptr<BaseCameraModel> BaseCameraModelPtr;
-typedef std::shared_ptr<const BaseCameraModel> BaseCameraModelConstPtr;
-
 class PinholeCameraModel : public BaseCameraModel {
  public:
   PinholeCameraModel() = default;
   ~PinholeCameraModel() = default;
+
   Eigen::Vector2f Project(const Eigen::Vector3f& point3d) override;
   Eigen::Vector3f UnProject(const Eigen::Vector2f& point2d) override;
   std::string name() const override { return "PinholeCameraModel"; }
@@ -58,6 +64,7 @@ class PinholeCameraModel : public BaseCameraModel {
   inline void set_intrinsic_params(const Eigen::Matrix3f& params) {
     intrinsic_params_ = params;
   }
+
   inline Eigen::Matrix3f get_intrinsic_params() const {
     return intrinsic_params_;
   }
@@ -69,9 +76,6 @@ class PinholeCameraModel : public BaseCameraModel {
   */
   Eigen::Matrix3f intrinsic_params_;
 };
-
-typedef std::shared_ptr<PinholeCameraModel> PinholeCameraModelPtr;
-typedef std::shared_ptr<const PinholeCameraModel> PinholeCameraModelConstPtr;
 
 }  // namespace base
 }  // namespace perception
