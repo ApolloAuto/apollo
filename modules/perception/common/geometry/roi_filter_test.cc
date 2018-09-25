@@ -13,20 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include <gtest/gtest.h>
+#include "modules/perception/common/geometry/roi_filter.h"
+
 #include <limits>
+#include "gtest/gtest.h"
+
 #include "modules/perception/base/hdmap_struct.h"
 #include "modules/perception/base/object.h"
 #include "modules/perception/base/point_cloud_types.h"
-#include "modules/perception/common/geometry/roi_filter.h"
+
 namespace apollo {
 namespace perception {
 namespace common {
 
+using apollo::perception::base::HdmapStruct;
+using HdmapStructConstPtr =
+    std::shared_ptr<const apollo::perception::base::HdmapStruct>;
+using HdmapStructPtr = std::shared_ptr<apollo::perception::base::HdmapStruct>;
+using apollo::perception::base::PointD;
+using apollo::perception::base::Object;
+using ObjectConstPtr = std::shared_ptr<const apollo::perception::base::Object>;
+using ObjectPtr = std::shared_ptr<apollo::perception::base::Object>;
+
 TEST(IsPtInRoiTest, test_roi) {
-  base::HdmapStructPtr hdmap = base::HdmapStructPtr(new base::HdmapStruct());
+  HdmapStructPtr hdmap = HdmapStructPtr(new HdmapStruct());
   hdmap->junction_polygons.resize(1);
-  base::PointD pt;
+  PointD pt;
   pt.x = -1.0;
   pt.y = -1.0;
   pt.z = 0.0;
@@ -43,7 +55,7 @@ TEST(IsPtInRoiTest, test_roi) {
   pt.x = 0.0;
   pt.y = 0.0;
   pt.z = 0.0;
-  const base::HdmapStructConstPtr hdmo_const = hdmap;
+  const HdmapStructConstPtr hdmo_const = hdmap;
   flag = IsPtInRoi(hdmo_const, pt);
   EXPECT_TRUE(flag);
   pt.x = 10.0;
@@ -54,9 +66,9 @@ TEST(IsPtInRoiTest, test_roi) {
 }
 
 TEST(IsObjectInRoiTest, test_roi) {
-  base::HdmapStructPtr hdmap = base::HdmapStructPtr(new base::HdmapStruct());
+  HdmapStructPtr hdmap = HdmapStructPtr(new HdmapStruct());
   hdmap->junction_polygons.resize(1);
-  base::PointD pt;
+  PointD pt;
   pt.x = -1.0;
   pt.y = -1.0;
   pt.z = 0.0;
@@ -70,16 +82,16 @@ TEST(IsObjectInRoiTest, test_roi) {
   pt.z = 0.0;
   hdmap->junction_polygons[0].push_back(pt);
   bool flag = false;
-  base::ObjectConstPtr obj = base::ObjectPtr(new base::Object());
-  const base::HdmapStructConstPtr hdmo_const = hdmap;
+  ObjectConstPtr obj = ObjectPtr(new Object());
+  const HdmapStructConstPtr hdmo_const = hdmap;
   flag = IsObjectInRoi(hdmo_const, obj);
   EXPECT_TRUE(flag);
 }
 
 TEST(IsObjectBboxInRoiTest, test_roi) {
-  base::HdmapStructPtr hdmap = base::HdmapStructPtr(new base::HdmapStruct());
+  HdmapStructPtr hdmap = HdmapStructPtr(new HdmapStruct());
   hdmap->junction_polygons.resize(1);
-  base::PointD pt;
+  PointD pt;
   pt.x = -1.0;
   pt.y = -1.0;
   pt.z = 0.0;
@@ -93,12 +105,12 @@ TEST(IsObjectBboxInRoiTest, test_roi) {
   pt.z = 0.0;
   hdmap->junction_polygons[0].push_back(pt);
   bool flag = false;
-  base::ObjectConstPtr obj = base::ObjectPtr(new base::Object());
-  const base::HdmapStructConstPtr hdmo_const = hdmap;
+  ObjectConstPtr obj = ObjectPtr(new Object());
+  const HdmapStructConstPtr hdmo_const = hdmap;
   flag = IsObjectBboxInRoi(hdmo_const, obj);
   EXPECT_TRUE(flag);
 
-  base::ObjectPtr obj_unconst = base::ObjectPtr(new base::Object());
+  ObjectPtr obj_unconst = ObjectPtr(new Object());
   obj_unconst->center[0] = 10.0;
   obj_unconst->center[1] = 10.0;
   obj_unconst->center[2] = 10.0;
@@ -114,23 +126,23 @@ TEST(IsObjectBboxInRoiTest, test_roi) {
 }
 
 TEST(ObjectInRoiTest, test_roi) {
-  base::HdmapStructPtr hdmap = nullptr;
-  std::vector<base::ObjectPtr> objects;
-  std::vector<base::ObjectPtr> valid_objects;
+  HdmapStructPtr hdmap = nullptr;
+  std::vector<ObjectPtr> objects;
+  std::vector<ObjectPtr> valid_objects;
 
-  base::ObjectPtr obj(new base::Object);
+  ObjectPtr obj(new Object);
   obj->center = Eigen::Vector3d(0, 0, 0);
   objects.push_back(obj);
   ObjectInRoiCheck(hdmap, objects, &valid_objects);
   EXPECT_EQ(valid_objects.size(), 1);
 
-  hdmap.reset(new base::HdmapStruct());
+  hdmap.reset(new HdmapStruct());
   valid_objects.clear();
   ObjectInRoiCheck(hdmap, objects, &valid_objects);
   EXPECT_EQ(valid_objects.size(), 1);
 
   hdmap->road_polygons.resize(1);
-  base::PointD pt;
+  PointD pt;
   pt.x = -1.0;
   pt.y = -1.0;
   pt.z = 0;
@@ -154,10 +166,10 @@ TEST(ObjectInRoiTest, test_roi) {
 }
 
 TEST(ObjectInRoiSlackTest, test_roi) {
-  base::HdmapStructPtr hdmap = nullptr;
-  std::vector<base::ObjectPtr> objects;
-  std::vector<base::ObjectPtr> valid_objects;
-  base::ObjectPtr obj(new base::Object);
+  HdmapStructPtr hdmap = nullptr;
+  std::vector<ObjectPtr> objects;
+  std::vector<ObjectPtr> valid_objects;
+  ObjectPtr obj(new Object);
   obj->center = Eigen::Vector3d(0, 0, 0);
   obj->direction = Eigen::Vector3f(1, 0, 0);
   objects.push_back(obj);
@@ -165,13 +177,13 @@ TEST(ObjectInRoiSlackTest, test_roi) {
   ObjectInRoiSlackCheck(hdmap, objects, &valid_objects);
   EXPECT_EQ(valid_objects.size(), 1);
 
-  hdmap.reset(new base::HdmapStruct());
+  hdmap.reset(new HdmapStruct());
   valid_objects.clear();
   ObjectInRoiSlackCheck(hdmap, objects, &valid_objects);
   EXPECT_EQ(valid_objects.size(), 1);
 
   hdmap->road_polygons.resize(1);
-  base::PointD pt;
+  PointD pt;
   pt.x = -1.0;
   pt.y = -1.0;
   pt.z = 0;
