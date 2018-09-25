@@ -92,7 +92,7 @@ bool WebSocketHandler::BroadcastData(const std::string &data, bool skippable) {
 
 bool WebSocketHandler::SendBinaryData(Connection *conn, const std::string &data,
                                       bool skippable) {
-  return SendData(conn, data, skippable, WEBSOCKET_OPCODE_BINARY);
+  return SendData(conn, data, skippable, MG_WEBSOCKET_OPCODE_BINARY);
 }
 
 bool WebSocketHandler::SendData(Connection *conn, const std::string &data,
@@ -168,7 +168,7 @@ thread_local std::stringstream WebSocketHandler::data_;
 bool WebSocketHandler::handleData(CivetServer *server, Connection *conn,
                                   int bits, char *data, size_t data_len) {
   // Ignore connection close request.
-  if ((bits & 0x0F) == WEBSOCKET_OPCODE_CONNECTION_CLOSE) {
+  if ((bits & 0x0F) == MG_WEBSOCKET_OPCODE_CONNECTION_CLOSE) {
     return false;
   }
 
@@ -185,10 +185,10 @@ bool WebSocketHandler::handleData(CivetServer *server, Connection *conn,
   bool is_final_fragment = bits & 0x80;
   if (is_final_fragment) {
     switch (current_opcode_) {
-      case WEBSOCKET_OPCODE_TEXT:
+      case MG_WEBSOCKET_OPCODE_TEXT:
         result = handleJsonData(conn, data_.str());
         break;
-      case WEBSOCKET_OPCODE_BINARY:
+      case MG_WEBSOCKET_OPCODE_BINARY:
         result = handleBinaryData(conn, data_.str());
         break;
       default:
