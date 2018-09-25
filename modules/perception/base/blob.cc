@@ -17,7 +17,6 @@
 #include <vector>
 
 #include "modules/perception/base/blob.h"
-#include "modules/perception/base/syncedmem.h"
 
 namespace apollo {
 namespace perception {

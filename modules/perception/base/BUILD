@@ -3,6 +3,29 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
+    name = "blob",
+    srcs = [
+        "blob.cc",
+    ],
+    hdrs = [
+        "blob.h",
+    ],
+    deps = [
+        ":common",
+        ":syncedmem",
+    ],
+)
+
+cc_library(
+    name = "common",
+    hdrs = [
+        "common.h",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
     name = "point_cloud",
     hdrs = [
         "point.h",
@@ -88,6 +111,19 @@ cc_test(
     deps = [
         ":box",
         "@gtest//:main",
+    ],
+)
+
+cc_library(
+    name = "syncedmem",
+    srcs = [
+        "syncedmem.cc",
+    ],
+    hdrs = [
+        "syncedmem.h",
+    ],
+    deps = [
+        ":common",
     ],
 )
 

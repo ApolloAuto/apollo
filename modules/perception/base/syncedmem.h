@@ -55,19 +55,26 @@ inline void PerceptionFreeHost(void* ptr, bool use_cuda) {
  */
 class SyncedMemory {
  public:
+  enum SyncedHead {
+    UNINITIALIZED,
+    HEAD_AT_CPU,
+    HEAD_AT_GPU,
+    SYNCED
+  };
+
   explicit SyncedMemory(bool use_cuda);
   explicit SyncedMemory(size_t size, bool use_cuda);
   SyncedMemory(const SyncedMemory&) = delete;
   void operator=(const SyncedMemory&) = delete;
-
   ~SyncedMemory();
+
   const void* cpu_data();
   void set_cpu_data(void* data);
   const void* gpu_data();
   void set_gpu_data(void* data);
   void* mutable_cpu_data();
   void* mutable_gpu_data();
-  enum SyncedHead { UNINITIALIZED, HEAD_AT_CPU, HEAD_AT_GPU, SYNCED };
+
   SyncedHead head() const { return head_; }
   void set_head(SyncedHead head) { head_ = head; }
   void set_head_gpu() { set_head(HEAD_AT_GPU); }
@@ -80,9 +87,10 @@ class SyncedMemory {
 
  private:
   void check_device();
-
   void to_cpu();
   void to_gpu();
+
+ private:
   void* cpu_ptr_;
   void* gpu_ptr_;
   size_t size_;

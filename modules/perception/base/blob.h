@@ -16,9 +16,7 @@
 #ifndef MODULES_PERCEPTION_BASE_BLOB_H_
 #define MODULES_PERCEPTION_BASE_BLOB_H_
 
-#include <algorithm>
 #include <memory>
-#include <sstream>
 #include <string>
 #include <vector>
 
