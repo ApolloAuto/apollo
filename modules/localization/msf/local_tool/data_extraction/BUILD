@@ -7,13 +7,12 @@ cc_library(
     srcs = [
         "location_exporter.cc",
         "pcd_exporter.cc",
-        "rosbag_reader.cc",
+        "cyber_record_reader.cc",
     ],
     hdrs = [
-        "base_exporter.h",
         "location_exporter.h",
         "pcd_exporter.h",
-        "rosbag_reader.h",
+        "cyber_record_reader.h"
     ],
     linkopts = [
         "-lboost_filesystem",
@@ -26,16 +25,17 @@ cc_library(
         "//modules/localization/proto:gps_proto",
         "//modules/localization/proto:localization_proto",
         "//modules/localization/proto:measure_proto",
+        "//modules/drivers/proto:sensor_proto",
+        "//modules/localization/msf/common/io:localization_msf_common_io",
         "@eigen//:eigen",
         "@pcl//:pcl",
-        "@ros//:ros_common",
     ],
 )
 
 cc_binary(
-    name = "monitor_data_exporter",
+    name = "cyber_record_parser",
     srcs = [
-        "monitor_data_exporter.cc",
+        "cyber_record_parser.cc",
     ],
     linkopts = [
         "-lboost_filesystem",
@@ -48,7 +48,6 @@ cc_binary(
         "//framework:cybertron",
         "@eigen//:eigen",
         "@pcl//:pcl",
-        "@ros//:ros_common",
     ],
 )
 
@@ -66,7 +65,6 @@ cc_binary(
     deps = [
         ":data_extraction",
         "//framework:cybertron",
-        "//modules/localization/msf/local_tool/local_visualization/offline_visual:offline_local_visualizer_lib",
         "@eigen//:eigen",
     ],
 )

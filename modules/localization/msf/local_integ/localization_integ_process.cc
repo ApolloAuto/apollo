@@ -159,9 +159,6 @@ void LocalizationIntegProcess::GetResult(IntegState *state,
   // state
   *state = integ_state_;
 
-  // // IntegSinsPva
-  // *sins_pva = ins_pva_;
-
   if (*state != IntegState::NOT_INIT) {
     ADEBUG << std::setprecision(16)
            << "IntegratedLocalization Debug Log: integ_pose msg: "
@@ -183,7 +180,6 @@ void LocalizationIntegProcess::GetResult(IntegState *state,
 
   localization->set_measurement_time(ins_pva_.time);
   headerpb_loc->set_timestamp_sec(apollo::common::time::Clock::NowInSeconds());
-  // headerpb_loc->set_module_name(_param.publish_frame_id);
 
   apollo::common::PointENU *position_loc = posepb_loc->mutable_position();
   apollo::common::Quaternion *quaternion = posepb_loc->mutable_orientation();
@@ -249,23 +245,18 @@ void LocalizationIntegProcess::MeasureDataProcess(
     const MeasureData &measure_msg) {
   measure_data_queue_mutex_.lock();
   measure_data_queue_.push(measure_msg);
-  // new_measure_data_signal_.notify_one();
   measure_data_queue_mutex_.unlock();
 }
 
 void LocalizationIntegProcess::StartThreadLoop() {
   keep_running_ = true;
   measure_data_queue_size_ = 150;
-  // const auto &loop_func = [this] { MeasureDataThreadLoop(); };
-  // measure_data_thread_ = std::thread(loop_func);
   cybertron::Async(&LocalizationIntegProcess::MeasureDataThreadLoop, this);
 }
 
 void LocalizationIntegProcess::StopThreadLoop() {
   if (keep_running_.load()) {
     keep_running_ = false;
-    // new_measure_data_signal_.notify_one();
-    // measure_data_thread_.join();
   }
 }
 
@@ -280,7 +271,7 @@ void LocalizationIntegProcess::MeasureDataThreadLoop() {
         --size;
       }
       if (measure_data_queue_.size() == 0) {
-        // new_measure_data_signal_.wait(lock);
+        lock.unlock();
         cybertron::Yield();
         continue;
       }

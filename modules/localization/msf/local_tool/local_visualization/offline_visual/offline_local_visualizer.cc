@@ -138,8 +138,6 @@ void OfflineLocalVisualizer::Visualize() {
       AINFO << "Find lidar pose.";
       const Eigen::Affine3d &lidar_pose = pose_found_iter->second;
       const Eigen::Vector3d &lidar_std = std_found_iter->second;
-      // lidar_loc_info.set(lidar_pose, "Lidar.", pcd_timestamps_[idx], idx +
-      // 1);
       lidar_loc_info.set(Eigen::Translation3d(lidar_pose.translation()),
                          Eigen::Quaterniond(lidar_pose.linear()), lidar_std,
                          "Lidar.", pcd_timestamps_[idx], idx + 1);
@@ -152,7 +150,6 @@ void OfflineLocalVisualizer::Visualize() {
       AINFO << "Find gnss pose.";
       const Eigen::Affine3d &gnss_pose = pose_found_iter->second;
       const Eigen::Vector3d &gnss_std = std_found_iter->second;
-      // gnss_loc_info.set(gnss_pose, "GNSS.", pcd_timestamps_[idx], idx + 1);
       gnss_loc_info.set(Eigen::Translation3d(gnss_pose.translation()), gnss_std,
                         "GNSS.", pcd_timestamps_[idx], idx + 1);
     }
@@ -164,8 +161,6 @@ void OfflineLocalVisualizer::Visualize() {
       AINFO << "Find fusion pose.";
       const Eigen::Affine3d &fusion_pose = pose_found_iter->second;
       const Eigen::Vector3d &fusion_std = std_found_iter->second;
-      // fusion_loc_info.set(fusion_pose, "Fusion.", pcd_timestamps_[idx],
-      //                    idx + 1);
       fusion_loc_info.set(Eigen::Translation3d(fusion_pose.translation()),
                           Eigen::Quaterniond(fusion_pose.linear()), fusion_std,
                           "Fusion.", pcd_timestamps_[idx], idx + 1);
@@ -180,7 +175,6 @@ void OfflineLocalVisualizer::Visualize() {
     std::ostringstream ss;
     ss << idx + 1;
     pcd_file_path = pcd_folder_ + "/" + ss.str() + ".pcd";
-    // std::cout << "pcd_file_path: " << pcd_file_path << std::endl;
     std::vector<Eigen::Vector3d> pt3ds;
     std::vector<unsigned char> intensities;
     apollo::localization::msf::velodyne::LoadPcds(
@@ -215,7 +209,6 @@ bool OfflineLocalVisualizer::LidarLocFileHandler(
   std::vector<Eigen::Affine3d> poses;
   std::vector<Eigen::Vector3d> stds;
   std::vector<double> timestamps;
-  // velodyne::LoadPcdPoses(lidar_loc_file_, poses, pcd_timestamps_);
   velodyne::LoadPosesAndStds(lidar_loc_file_, &poses, &stds, &timestamps);
 
   PoseAndStdInterpolationByTime(poses, stds, timestamps, pcd_timestamps,
@@ -229,10 +222,8 @@ bool OfflineLocalVisualizer::GnssLocFileHandler(
   std::vector<Eigen::Affine3d> poses;
   std::vector<Eigen::Vector3d> stds;
   std::vector<double> timestamps;
-  // velodyne::LoadPcdPoses(gnss_loc_file_, poses, timestamps);
   velodyne::LoadPosesAndStds(gnss_loc_file_, &poses, &stds, &timestamps);
 
-  // PoseInterpolationByTime(poses, timestamps, pcd_timestamps, gnss_poses_);
   PoseAndStdInterpolationByTime(poses, stds, timestamps, pcd_timestamps,
                                 &gnss_poses_, &gnss_stds_);
 
@@ -244,67 +235,12 @@ bool OfflineLocalVisualizer::FusionLocFileHandler(
   std::vector<Eigen::Affine3d> poses;
   std::vector<Eigen::Vector3d> stds;
   std::vector<double> timestamps;
-  // velodyne::LoadPcdPoses(fusion_loc_file_, poses, timestamps);
   velodyne::LoadPosesAndStds(fusion_loc_file_, &poses, &stds, &timestamps);
 
-  // PoseInterpolationByTime(poses, timestamps, pcd_timestamps, fusion_poses_);
   PoseAndStdInterpolationByTime(poses, stds, timestamps, pcd_timestamps,
                                 &fusion_poses_, &fusion_stds_);
   return true;
 }
-
-// TODO(Localization): remove the commented code
-
-// void OfflineLocalVisualizer::PoseInterpolationByTime(
-//     const std::vector<Eigen::Affine3d> &in_poses,
-//     const std::vector<double> &in_timestamps,
-//     const std::vector<double> &ref_timestamps,
-//     std::map<unsigned int, Eigen::Affine3d> &out_poses) {
-//   unsigned int index = 0;
-//   for (size_t i = 0; i < ref_timestamps.size(); i++) {
-//     double ref_timestamp = ref_timestamps[i];
-//     // unsigned int ref_frame_id = i;
-//     // unsigned int matched_index = 0;
-//     while (in_timestamps[index] < ref_timestamp &&
-//            index < in_timestamps.size()) {
-//       ++index;
-//     }
-
-//     if (index < in_timestamps.size()) {
-//       if (index >= 1) {
-//         double cur_timestamp = in_timestamps[index];
-//         double pre_timestamp = in_timestamps[index - 1];
-//         assert(cur_timestamp != pre_timestamp);
-
-//         double t =
-//             (cur_timestamp - ref_timestamp) / (cur_timestamp -
-//             pre_timestamp);
-//         assert(t >= 0.0);
-//         assert(t <= 1.0);
-
-//         Eigen::Affine3d pre_pose = in_poses[index - 1];
-//         Eigen::Affine3d cur_pose = in_poses[index];
-//         Eigen::Quaterniond pre_quatd(pre_pose.linear());
-//         Eigen::Translation3d pre_transd(pre_pose.translation());
-//         Eigen::Quaterniond cur_quatd(cur_pose.linear());
-//         Eigen::Translation3d cur_transd(cur_pose.translation());
-
-//         Eigen::Quaterniond res_quatd = pre_quatd.slerp(1 - t, cur_quatd);
-
-//         Eigen::Translation3d re_transd;
-//         re_transd.x() = pre_transd.x() * t + cur_transd.x() * (1 - t);
-//         re_transd.y() = pre_transd.y() * t + cur_transd.y() * (1 - t);
-//         re_transd.z() = pre_transd.z() * t + cur_transd.z() * (1 - t);
-
-//         out_poses[i] = re_transd * res_quatd;
-//       }
-//     } else {
-//       std::cerr << "[ERROR] No more poses. Exit now." << std::endl;
-//       break;
-//     }
-//     // std::cout << "Frame_id: " << i << std::endl;
-//   }
-// }
 
 void OfflineLocalVisualizer::PoseAndStdInterpolationByTime(
     const std::vector<Eigen::Affine3d> &in_poses,
