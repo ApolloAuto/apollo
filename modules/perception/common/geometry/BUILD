@@ -7,6 +7,35 @@ cc_library(
     hdrs = [
         "basic.h",
     ],
+    deps = [
+        ":common",
+        "@eigen",
+    ],
 )
+
+cc_library(
+    name = "common",
+    hdrs = [
+        "common.h",
+    ],
+    deps = [
+        "//modules/perception/base:box",
+        "//modules/perception/base:point_cloud",
+    ],
+)
+
+
+cc_test(
+    name = "basic_test",
+    size = "small",
+    srcs = [
+        "basic_test.cc",
+    ],
+    deps = [
+        ":basic",
+        "@gtest//:main",
+    ],
+)
+
 
 cpplint()

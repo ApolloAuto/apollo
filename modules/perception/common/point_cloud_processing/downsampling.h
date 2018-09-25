@@ -107,7 +107,6 @@ void DownsamplingCircularOrgPartial(
     const typename std::shared_ptr<const base::PointCloud<PointT>> cloud,
     typename std::shared_ptr<base::PointCloud<PointT>> down_cloud,
     std::vector<std::pair<int, int>>* all_org_idx_ptr) {
-  int smp_step = smp_ratio * velodyne_model;
   int smp_height = cloud->height() / smp_ratio;
   int smp_width = org_num;
   CHECK(smp_width >= 1 && smp_width < velodyne_model) << "org_num error!";
@@ -149,7 +148,6 @@ void DownsamplingRectangleOrgPartial(
     typename std::shared_ptr<const base::PointCloud<PointT>> cloud,
     typename std::shared_ptr<base::PointCloud<PointT>> down_cloud,
     std::vector<std::pair<int, int>>* all_org_idx_ptr) {
-  int smp_step = smp_ratio * velodyne_model;
   int smp_height = cloud->height() / smp_ratio;
   int smp_width = org_num;
   CHECK(smp_width >= 1 && smp_width < velodyne_model) << "org_num error!";

@@ -13,14 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef PERCEPTION_COMMON_GEOMETRY_COMMON_H_
-#define PERCEPTION_COMMON_GEOMETRY_COMMON_H_
-#include <Eigen/Core>
+
+#ifndef MODULES_PERCEPTION_COMMON_GEOMETRY_COMMON_H_
+#define MODULES_PERCEPTION_COMMON_GEOMETRY_COMMON_H_
+
 #include <algorithm>
 #include <limits>
 #include <vector>
+
+#include "Eigen/Core"
+
 #include "modules/perception/base/box.h"
 #include "modules/perception/base/point_cloud_types.h"
+
 namespace apollo {
 namespace perception {
 namespace common {
@@ -30,7 +35,7 @@ namespace common {
 template <typename PointT>
 bool IsPointXYInPolygon2DXY(const PointT &point,
                             const base::PointCloud<PointT> &polygon) {
-  typedef typename PointT::PointType Type;
+  using Type = typename PointT::Type;
   bool in_poly = false;
   Type x1 = 0.0;
   Type x2 = 0.0;
@@ -78,24 +83,24 @@ bool IsPointXYInPolygon2DXY(const PointT &point,
 // @brief check a point is in bounding-box or not
 // old name: is_point_in_boundingbox
 template <typename PointT>
-bool IsPointInBBox(const Eigen::Matrix<typename PointT::PointType, 3, 1> &gnd_c,
-                   const Eigen::Matrix<typename PointT::PointType, 3, 1> &dir_x,
-                   const Eigen::Matrix<typename PointT::PointType, 3, 1> &dir_y,
-                   const Eigen::Matrix<typename PointT::PointType, 3, 1> &dir_z,
-                   const Eigen::Matrix<typename PointT::PointType, 3, 1> &size,
+bool IsPointInBBox(const Eigen::Matrix<typename PointT::Type, 3, 1> &gnd_c,
+                   const Eigen::Matrix<typename PointT::Type, 3, 1> &dir_x,
+                   const Eigen::Matrix<typename PointT::Type, 3, 1> &dir_y,
+                   const Eigen::Matrix<typename PointT::Type, 3, 1> &dir_z,
+                   const Eigen::Matrix<typename PointT::Type, 3, 1> &size,
                    const PointT &point) {
-  typedef typename PointT::PointType Type;
-  Eigen::Matrix<Type, 3, 1> eig(point.x, point.y, point.z);
-  Eigen::Matrix<Type, 3, 1> diff = eig - gnd_c;
-  Type x = diff.dot(dir_x);
+  using T = typename PointT::Type;
+  Eigen::Matrix<T, 3, 1> eig(point.x, point.y, point.z);
+  Eigen::Matrix<T, 3, 1> diff = eig - gnd_c;
+  T x = diff.dot(dir_x);
   if (fabs(x) > size[0] * 0.5) {
     return false;
   }
-  Type y = diff.dot(dir_y);
+  T y = diff.dot(dir_y);
   if (fabs(y) > size[1] * 0.5) {
     return false;
   }
-  Type z = diff.dot(dir_z);
+  T z = diff.dot(dir_z);
   if (fabs(z) > size[2] * 0.5) {
     return false;
   }
@@ -209,16 +214,16 @@ Type CalculateIOUBBox(const base::BBox2D<Type> &box1,
 // @brief given a point and segments,
 // calculate the distance and direction to the nearest segment
 // old name: calculate_distance_and_direction_to_segments_xy
-template <typename PointCloudT>
+template <typename PointT>
 bool CalculateDistAndDirToSegs(
-    const Eigen::Matrix<typename PointCloudT::PointType::PointType, 3, 1> &pt,
-    const PointCloudT &segs, typename PointCloudT::PointType::PointType *dist,
-    Eigen::Matrix<typename PointCloudT::PointType::PointType, 3, 1> *dir) {
+    const Eigen::Matrix<typename PointT::Type, 3, 1> &pt,
+    const base::AttributePointCloud<PointT> &segs, typename PointT::Type *dist,
+    Eigen::Matrix<typename PointT::Type, 3, 1> *dir) {
   if (segs.size() < 2) {
     return false;
   }
 
-  typedef typename PointCloudT::PointType::PointType Type;
+  using Type = typename PointT::Type;
   Eigen::Matrix<Type, 3, 1> seg_point(segs[0].x, segs[0].y, 0);
   Type min_dist = (pt - seg_point).head(2).norm();
 
@@ -275,13 +280,14 @@ bool CalculateDistAndDirToSegs(
 // @brief given a point and two boundaries,
 // calculate the distance and direction to the nearer boundary
 // old name: calculate_distance_and_direction_to_boundary_xy
-template <typename PointCloudT>
+template <typename PointT>
 void CalculateDistAndDirToBoundary(
-    const Eigen::Matrix<typename PointCloudT::PointType::PointType, 3, 1> &pt,
-    const PointCloudT &left_boundary, const PointCloudT &right_boundary,
-    typename PointCloudT::PointType::PointType *dist,
-    Eigen::Matrix<typename PointCloudT::PointType::PointType, 3, 1> *dir) {
-  typedef typename PointCloudT::PointType::PointType Type;
+    const Eigen::Matrix<typename PointT::Type, 3, 1> &pt,
+    const base::AttributePointCloud<PointT> &left_boundary,
+    const base::AttributePointCloud<PointT> &right_boundary,
+    typename PointT::Type *dist,
+    Eigen::Matrix<typename PointT::Type, 3, 1> *dir) {
+  using Type = typename PointT::Type;
   Type dist_to_left = std::numeric_limits<Type>::max();
   Eigen::Matrix<Type, 3, 1> direction_left;
   Type dist_to_right = std::numeric_limits<Type>::max();
@@ -304,14 +310,14 @@ void CalculateDistAndDirToBoundary(
 // @brief given a point and two boundaries sets,
 // calculate the distance and direction to the nearest boundary
 // old name: calculate_distance_and_direction_to_boundary_xy
-template <typename PointCloudT>
+template <typename PointT>
 void CalculateDistAndDirToBoundary(
-    const Eigen::Matrix<typename PointCloudT::PointType::PointType, 3, 1> &pt,
-    const std::vector<PointCloudT> &left_boundary,
-    const std::vector<PointCloudT> &right_boundary,
-    typename PointCloudT::PointType::PointType *dist,
-    Eigen::Matrix<typename PointCloudT::PointType::PointType, 3, 1> *dir) {
-  typedef typename PointCloudT::PointType::PointType Type;
+    const Eigen::Matrix<typename PointT::Type, 3, 1> &pt,
+    const std::vector<base::AttributePointCloud<PointT>> &left_boundary,
+    const std::vector<base::AttributePointCloud<PointT>> &right_boundary,
+    typename PointT::Type *dist,
+    Eigen::Matrix<typename PointT::Type, 3, 1> *dir) {
+  using Type = typename PointT::Type;
   Type dist_to_left = std::numeric_limits<Type>::max();
   Eigen::Matrix<Type, 3, 1> direction_left;
   Type dist_to_right = std::numeric_limits<Type>::max();
@@ -352,4 +358,5 @@ void CalculateDistAndDirToBoundary(
 }  // namespace common
 }  // namespace perception
 }  // namespace apollo
-#endif  // PERCEPTION_COMMON_GEOMETRY_COMMON_H_
+
+#endif  // MODULES_PERCEPTION_COMMON_GEOMETRY_COMMON_H_
