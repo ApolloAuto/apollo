@@ -14,6 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/perception/common/geometry/camera_homography.h"
+
 #include <limits>
 
 namespace apollo {

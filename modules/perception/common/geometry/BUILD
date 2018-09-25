@@ -24,13 +24,26 @@ cc_library(
     ],
 )
 
-
 cc_library(
     name = "convex_hull_2d",
     hdrs = [
         "convex_hull_2d.h",
     ],
     deps = [
+        "@eigen",
+    ],
+)
+
+cc_library(
+    name = "camera_homography",
+    srcs = [
+        "camera_homography.cc",
+    ],
+    hdrs = [
+        "camera_homography.h",
+    ],
+    deps = [
+        "//modules/perception/base:camera",
         "@eigen",
     ],
 )
