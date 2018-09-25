@@ -24,6 +24,7 @@
 #include "cybertron/common/global_data.h"
 #include "cybertron/service/client.h"
 #include "cybertron/service/service.h"
+#include "cybertron/service_discovery/topology_manager.h"
 
 namespace apollo {
 namespace cybertron {
@@ -40,8 +41,6 @@ class NodeServiceImpl {
     attr_.set_node_name(node_name);
     auto node_id = common::GlobalData::RegisterNode(node_name);
     attr_.set_node_id(node_id);
-    // TODO: move topology init
-    topology_ = service_discovery::TopologyManager::Instance();
   }
 
   NodeServiceImpl() = delete;
@@ -59,10 +58,8 @@ class NodeServiceImpl {
   auto CreateClient(const std::string& service_name) ->
       typename std::shared_ptr<Client<Request, Response>>;
 
-  std::shared_ptr<NodeChannelImpl> node_channel_impl_ = nullptr;
-  std::shared_ptr<service_discovery::TopologyManager> topology_ = nullptr;
-  std::vector<std::shared_ptr<ServiceBase>> service_list_;
-  std::vector<std::shared_ptr<ClientBase>> client_list_;
+  std::vector<std::weak_ptr<ServiceBase>> service_list_;
+  std::vector<std::weak_ptr<ClientBase>> client_list_;
   std::string node_name_;
   proto::RoleAttributes attr_;
 };
@@ -73,31 +70,32 @@ auto NodeServiceImpl::CreateService(
     const typename Service<Request, Response>::ServiceCallback&
         service_calllback) ->
     typename std::shared_ptr<Service<Request, Response>> {
-  typename std::shared_ptr<Service<Request, Response>> service_ptr =
-      std::make_shared<Service<Request, Response>>(node_name_, service_name,
-                                                   service_calllback);
+  auto service_ptr = std::make_shared<Service<Request, Response>>(
+      node_name_, service_name, service_calllback);
   RETURN_VAL_IF(!service_ptr->Init(), nullptr);
 
-  // service_list_.emplace_back(service_ptr);
+  service_list_.emplace_back(service_ptr);
   attr_.set_service_name(service_name);
   auto service_id = common::GlobalData::RegisterService(service_name);
   attr_.set_service_id(service_id);
-  topology_->service_manager()->Join(attr_, RoleType::ROLE_SERVER);
+  service_discovery::TopologyManager::Instance()->service_manager()->Join(
+      attr_, RoleType::ROLE_SERVER);
   return service_ptr;
 }
 
 template <typename Request, typename Response>
 auto NodeServiceImpl::CreateClient(const std::string& service_name) ->
     typename std::shared_ptr<Client<Request, Response>> {
-  typename std::shared_ptr<Client<Request, Response>> client_ptr =
+  auto client_ptr =
       std::make_shared<Client<Request, Response>>(node_name_, service_name);
   RETURN_VAL_IF(!client_ptr->Init(), nullptr);
 
-  // client_list_.emplace_back(client_ptr);
+  client_list_.emplace_back(client_ptr);
   attr_.set_service_name(service_name);
   auto service_id = common::GlobalData::RegisterService(service_name);
   attr_.set_service_id(service_id);
-  topology_->service_manager()->Join(attr_, RoleType::ROLE_CLIENT);
+  service_discovery::TopologyManager::Instance()->service_manager()->Join(
+      attr_, RoleType::ROLE_CLIENT);
   return client_ptr;
 }
 
