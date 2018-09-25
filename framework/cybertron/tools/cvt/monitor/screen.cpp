@@ -66,7 +66,7 @@ const char Screen::InteractiveCmdStr[] =
 
 Screen::Screen()
     : current_state_(State::RenderMessage),
-      highlight_line_no_(1),
+      /* highlight_line_no_(1), */
       highlight_direction_(0),
       current_render_obj_(nullptr) {}
 
@@ -187,10 +187,9 @@ void Screen::Run() {
     return;
   }
 
-  // int y = 1;
-  highlight_line_no_ = current_render_obj_->LineNo();
+  int y = current_render_obj_->line_no();
   highlight_direction_ = 0;
-  move(highlight_line_no_, 0);
+  move(y, 0);
 
   void (Screen::*showFuncs[])(int&, int) = {&Screen::ShowRenderMessage,
                                             &Screen::ShowInteractiveCmd};
@@ -202,7 +201,7 @@ void Screen::Run() {
 
     SwitchState(ch);
 
-    (this->*showFuncs[static_cast<int>(current_state_)])(highlight_line_no_,
+    (this->*showFuncs[static_cast<int>(current_state_)])(y,
                                                          ch);
   } while (true);
 }
@@ -250,7 +249,7 @@ void Screen::ShowRenderMessage(int& y, int ch) {
         RenderableMessage* p = current_render_obj_->parent();
         if (p) {
           current_render_obj_ = p;
-          y = p->LineNo();
+          y = p->line_no();
           clear();
         }
       }
@@ -267,7 +266,7 @@ void Screen::ShowRenderMessage(int& y, int ch) {
         if (child) {
           current_render_obj_->set_line_no(y);
           current_render_obj_ = child;
-          highlight_line_no_ = child->LineNo();
+          y = child->line_no();
           clear();
         }
       }

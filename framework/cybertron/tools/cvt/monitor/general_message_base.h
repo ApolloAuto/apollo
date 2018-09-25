@@ -20,14 +20,9 @@
 #include "cybertron/cybertron.h"
 #include "renderable_message.h"
 
-class RepeatedItemsMessage;
 class Screen;
 
 class GeneralMessageBase : public RenderableMessage {
- public:
-  virtual int type(void) const = 0;  // all children's type should return one
-                                     // identical value, e.g. { return Type;}
-
  protected:
   enum { Type = 0 };
   static void PrintMessage(GeneralMessageBase* baseMsg,

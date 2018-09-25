@@ -15,7 +15,7 @@
  *****************************************************************************/
 
 #include "channel_msg_factory.h"
-#include "general_message.h"
+#include "general_channel_message.h"
 
 #include <unistd.h>
 

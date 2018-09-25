@@ -18,7 +18,7 @@
 #include "channel_msg_factory.h"
 #include "cybertron/message/message_traits.h"
 #include "cybertron/proto/topology_change.pb.h"
-#include "general_message.h"
+#include "general_channel_message.h"
 #include "screen.h"
 
 #include <ncurses.h>
@@ -160,7 +160,7 @@ void CybertronTopologyMessage::ChangeState(const Screen* s, int key) {
 
     case ' ': {
       ChannelMessage* child =
-          static_cast<ChannelMessage*>(Child(s->highlight_line_no()));
+          static_cast<ChannelMessage*>(Child(line_no()));
       if (child) {
         child->set_enabled(!child->is_enabled());
       }

@@ -17,53 +17,41 @@
 #ifndef TOOLS_CVT_MONITOR_GENERAL_MESSAGE_H_
 #define TOOLS_CVT_MONITOR_GENERAL_MESSAGE_H_
 
+#include <cybertron/cybertron.h>
 #include <cybertron/message/raw_message.h>
-#include "cybertron_channel_message.h"
 #include "general_message_base.h"
 
-class RepeatedItemsMessage;
+class Screen;
 
-class GeneralMessage
-    : public CybertronChannelMessage<apollo::cybertron::message::RawMessage> {
+class GeneralMessage : public GeneralMessageBase {
  public:
-  enum { Type = GeneralMessageBase::Type + 1 };
-  RegisterChannelMsgClass(GeneralMessage,
-                          apollo::cybertron::message::RawMessage);
-  virtual void Render(const Screen* s, int key) override;
+  explicit GeneralMessage(GeneralMessageBase* parent,
+                                const google::protobuf::Message* msg,
+                                const google::protobuf::Reflection* reflection,
+                                const google::protobuf::FieldDescriptor* field);
+
   ~GeneralMessage() {
-    if (raw_msg_class_) {
-      delete raw_msg_class_;
-      raw_msg_class_ = nullptr;
-    }
+    field_ = nullptr;
+    message_ptr_ = nullptr;
+    reflection_ptr_ = nullptr;
   }
 
-  int type(void) const override { return Type; }
+  void Render(const Screen* s, int key) override;
 
   RenderableMessage* Child(int lineNo) const override;
-
-  explicit GeneralMessage(RenderableMessage* parent = nullptr)
-      : CybertronChannelMessage<apollo::cybertron::message::RawMessage>(parent),
-        current_state_(State::ShowDebugString),
-        page_index_(0),
-        raw_msg_class_(nullptr) {}
 
  private:
   GeneralMessage(const GeneralMessage&) = delete;
   GeneralMessage& operator=(const GeneralMessage&) = delete;
 
-  void RenderDebugString(const Screen* s, int key, unsigned lineNo);
-  void RenderInfo(const Screen* s, int key, unsigned lineNo);
-  void SplitPages(int key);
+  void PrintRepeatedField(const Screen* s, unsigned& lineNo, int indent,
+                          int index);
 
-  enum class State { ShowDebugString, ShowInfo } current_state_;
+  int itemIndex_;
 
-  int pages_;
-  int page_index_;
-  google::protobuf::Message* raw_msg_class_;
-
-  friend class RepeatedItemsMessage;
-  friend class GeneralMessageBase;
-
-};  // GeneralMessage
+  const google::protobuf::FieldDescriptor* field_;
+  const google::protobuf::Message* message_ptr_;
+  const google::protobuf::Reflection* reflection_ptr_;
+};
 
 #endif  // TOOLS_CVT_MONITOR_GENERAL_MESSAGE_H_
