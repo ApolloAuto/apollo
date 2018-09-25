@@ -28,7 +28,7 @@
 #include <cstring>
 #include <fstream>
 
-#include "modules/perception/base/log.h"
+#include "cybertron/common/log.h"
 #include "modules/perception/lib/utils/string_util.h"
 
 namespace apollo {
@@ -50,7 +50,7 @@ bool FileUtil::GetType(const string &filename, FileType *type) {
   } else if (S_ISREG(stat_buf.st_mode) != 0) {
     *type = TYPE_FILE;
   } else {
-    LOG_WARN << "failed to get type: " << filename;
+    AWARN << "failed to get type: " << filename;
     return false;
   }
   return true;
@@ -67,7 +67,7 @@ bool FileUtil::DeleteFile(const string &filename) {
   // file，remove directly
   if (type == TYPE_FILE) {
     if (remove(filename.c_str()) != 0) {
-      LOG_ERROR << "failed to remove file: " << filename;
+      AERROR << "failed to remove file: " << filename;
       return false;
     }
     return true;
@@ -76,7 +76,7 @@ bool FileUtil::DeleteFile(const string &filename) {
   // directory，remove iteratively
   DIR *dir = opendir(filename.c_str());
   if (dir == NULL) {
-    LOG_WARN << "failed to opendir: " << filename;
+    AWARN << "failed to opendir: " << filename;
     return false;
   }
   dirent *dir_info = NULL;
@@ -89,7 +89,7 @@ bool FileUtil::DeleteFile(const string &filename) {
     string temp_file = filename + "/" + string(dir_info->d_name);
     FileType temp_type;
     if (!GetType(temp_file, &temp_type)) {
-      LOG_WARN << "failed to get file type: " << temp_file;
+      AWARN << "failed to get file type: " << temp_file;
       closedir(dir);
       return false;
     }
@@ -97,14 +97,14 @@ bool FileUtil::DeleteFile(const string &filename) {
       DeleteFile(temp_file);
     }
     if (temp_type == TYPE_FILE && remove(temp_file.c_str()) != 0) {
-      LOG_ERROR << "failed to remove temp_file: " << temp_file;
+      AERROR << "failed to remove temp_file: " << temp_file;
       closedir(dir);
       return false;
     }
   }
   closedir(dir);
   if (remove(filename.c_str()) != 0) {
-    LOG_ERROR << "failed to remove filename: " << filename;
+    AERROR << "failed to remove filename: " << filename;
     return false;
   }
 
@@ -114,7 +114,7 @@ bool FileUtil::DeleteFile(const string &filename) {
 bool FileUtil::Exists(const string &file) {
   int ret = access(file.c_str(), F_OK);
   if (ret != 0) {
-    LOG_INFO << "file not exist. file: " << file << " ret: " << strerror(errno);
+    AINFO << "file not exist. file: " << file << " ret: " << strerror(errno);
     return false;
   }
   return true;
@@ -138,9 +138,9 @@ bool FileUtil::RenameFile(const string &old_file, const string &new_file) {
   }
   int ret = rename(old_file.c_str(), new_file.c_str());
   if (ret != 0) {
-    LOG_WARN << "failed to rename [old file: " << old_file
-             << "] to [newfile: " << new_file << "] [err: " << strerror(errno)
-             << "]";
+    AWARN << "failed to rename [old file: " << old_file
+        << "] to [newfile: " << new_file << "] [err: " << strerror(errno)
+        << "]";
     return false;
   }
   return true;
@@ -157,8 +157,8 @@ bool FileUtil::CreateDir(const string &dir) {
     }
     int ret = mkdir(multi_layer_dir.c_str(), S_IRWXU | S_IRWXG | S_IRWXO);
     if (ret != 0) {
-      LOG_WARN << "failed to create dir. [dir: " << multi_layer_dir
-               << "] [err: " << strerror(errno) << "]";
+      AWARN << "failed to create dir. [dir: " << multi_layer_dir
+          << "] [err: " << strerror(errno) << "]";
       return false;
     }
   }
@@ -172,12 +172,12 @@ bool FileUtil::GetFileContent(const string &path, string *content) {
 
   int fd = ::open(path.c_str(), O_RDONLY);
   if (fd < 0) {
-    LOG_WARN << "failed to open file: " << path;
+    AWARN << "failed to open file: " << path;
     return false;
   }
   struct stat buf;
   if (::fstat(fd, &buf) != 0) {
-    LOG_WARN << "failed to lstat file: " << path;
+    AWARN << "failed to lstat file: " << path;
     ::close(fd);
     return false;
   }
@@ -190,7 +190,7 @@ bool FileUtil::GetFileContent(const string &path, string *content) {
   do {
     size = ::read(fd, data + has_read, fsize - has_read);
     if (size < 0) {
-      LOG_WARN << "failed to read file: " << path;
+      AWARN << "failed to read file: " << path;
       ::close(fd);
       return false;
     }
@@ -231,7 +231,7 @@ std::string FileUtil::RemoveFileSuffix(std::string filename) {
 bool FileUtil::GetFileList(const std::string &path, const std::string &suffix,
                            std::vector<std::string> *files) {
   if (!Exists(path)) {
-    LOG_INFO << path << " not exist.";
+    AINFO << path << " not exist.";
     return false;
   }
 
@@ -244,7 +244,7 @@ bool FileUtil::GetFileList(const std::string &path, const std::string &suffix,
       }
       ++itr;
     } catch (const std::exception &ex) {
-      LOG_WARN << "Caught execption: " << ex.what();
+      AWARN << "Caught execption: " << ex.what();
       continue;
     }
   }
@@ -312,7 +312,7 @@ bool FileUtil::CompareFile(const string &file_left, const string &file_right,
       return std::lexicographical_compare(name_left.begin(), name_left.end(),
                                           name_right.begin(), name_right.end());
     default:
-      LOG_ERROR << "Unknown compare type!";
+      AERROR << "Unknown compare type!";
   }
 
   return true;
