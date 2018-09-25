@@ -11,4 +11,16 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "registerer_test",
+    size = "small",
+    srcs = [
+        "registerer_test.cc",
+    ],
+    deps = [
+        "@gtest//:main",
+        ":registerer",
+    ],
+)
+
 cpplint()
