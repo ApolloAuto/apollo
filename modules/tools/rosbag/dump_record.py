@@ -70,7 +70,7 @@ def dump_record(in_record, out_dir, start_time, duration, filter_topic):
             if meta_msg is None:
                 print("Unknown topic: %s " % topic)
                 continue
-            msg = meta_msg.msg_type()()
+            msg = meta_msg.msg_type()
             msg.ParseFromString(freader.current_rawmessage())
             write_to_file(file_path, msg)
         seq += 1

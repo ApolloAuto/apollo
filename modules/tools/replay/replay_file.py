@@ -59,7 +59,7 @@ def topic_publisher(topic, filename, period):
         print("Unknown topic: %s" % topic)
         return False
 
-    writer = node.create_writer(topic, meta_msg.msg_type())
+    writer = node.create_writer(topic, meta_msg.msg_type)
 
     if period == 0:
         while not cybertron.is_shutdown():

@@ -92,7 +92,7 @@ def on_receive_planning(planning_msg):
 def dump_bag(in_bag, msg_meta, fhandle):
     bag = rosbag.Bag(in_bag, 'r')
     for topic, msg, t in bag.read_messages():
-        if topic != msg_meta.topic():
+        if topic != msg_meta.topic:
             continue
         ss = stat_planning(msg)
         print_stat(ss, g_args.report)
@@ -129,7 +129,7 @@ if __name__ == "__main__":
         dump_bag(g_args.rosbag, meta_msg, g_args.report)
     else:
         rospy.init_node("stat_planning", anonymous=True)
-        rospy.Subscriber(g_args.topic, meta_msg.msg_type(),
+        rospy.Subscriber(g_args.topic, meta_msg.msg_type,
                          on_receive_planning)
         rospy.spin()
 
