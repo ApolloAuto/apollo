@@ -19,6 +19,7 @@ cc_binary(
         "//modules/monitor/software:localization_monitor",
         "//modules/monitor/software:process_monitor",
         "//modules/monitor/software:summary_monitor",
+        "//modules/monitor/software:topic_monitor",
     ],
     copts = ['-DMODULE_NAME=\\"monitor\\"'],
     linkshared = True,

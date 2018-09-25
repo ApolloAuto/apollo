@@ -16,9 +16,10 @@
 #ifndef MODULES_MONITOR_SOFTWARE_TOPIC_MONITOR_H_
 #define MODULES_MONITOR_SOFTWARE_TOPIC_MONITOR_H_
 
+#include <memory>
 #include <string>
 
-#include "modules/common/adapters/adapter.h"
+#include "cybertron/cybertron.h"
 #include "modules/monitor/common/recurrent_runner.h"
 #include "modules/monitor/proto/monitor_conf.pb.h"
 
@@ -30,9 +31,13 @@ class TopicMonitor : public RecurrentRunner {
   TopicMonitor(const TopicConf &config, TopicStatus *status);
   void RunOnce(const double current_time) override;
 
+  static std::shared_ptr<cybertron::ReaderBase> CreateReaderFromChannel(
+      const std::string& channel);
+
  private:
   const TopicConf &config_;
   TopicStatus *status_;
+  std::shared_ptr<cybertron::ReaderBase> reader_;
 };
 
 }  // namespace monitor
