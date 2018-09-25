@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef PERCEPTION_BASE_LIGHT_OBJECT_POOL_H_
-#define PERCEPTION_BASE_LIGHT_OBJECT_POOL_H_
+#ifndef MODULES_PERCEPTION_BASE_LIGHT_OBJECT_POOL_H_
+#define MODULES_PERCEPTION_BASE_LIGHT_OBJECT_POOL_H_
 #include <deque>
 #include <list>
 #include <queue>
@@ -166,4 +166,4 @@ class LightObjectPool : public BaseObjectPool<ObjectType> {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // PERCEPTION_BASE_LIGHT_OBJECT_POOL_H_
+#endif  // MODULES_PERCEPTION_BASE_LIGHT_OBJECT_POOL_H_

@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef PERCEPTION_BASE_IMPENDING_COLLISION_EDGE_H
-#define PERCEPTION_BASE_IMPENDING_COLLISION_EDGE_H
+#ifndef MODULES_PERCEPTION_BASE_IMPENDING_COLLISION_EDGE_H
+#define MODULES_PERCEPTION_BASE_IMPENDING_COLLISION_EDGE_H
 
 #include <Eigen/Core>
 #include <memory>
@@ -58,4 +58,4 @@ typedef std::shared_ptr<const ImpendingCollisionEdges>
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // PERCEPTION_BASE_IMPENDING_COLLISION_EDGE_H
+#endif  // MODULES_PERCEPTION_BASE_IMPENDING_COLLISION_EDGE_H

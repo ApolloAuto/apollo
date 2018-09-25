@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef PERCEPTION_BASE_COMMON_H_
-#define PERCEPTION_BASE_COMMON_H_
+#ifndef MODULES_PERCEPTION_BASE_COMMON_H_
+#define MODULES_PERCEPTION_BASE_COMMON_H_
 
 #include <assert.h>
 #include "modules/perception/base/options_define.h"
@@ -57,4 +57,4 @@ inline void GPUAssert(cudaError_t code, const char *file, int line,
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // PERCEPTION_BASE_COMMON_H_
+#endif  // MODULES_PERCEPTION_BASE_COMMON_H_

@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef PERCEPTION_BASE_TRAFFIC_LIGHT_H_
-#define PERCEPTION_BASE_TRAFFIC_LIGHT_H_
+#ifndef MODULES_PERCEPTION_BASE_TRAFFIC_LIGHT_H_
+#define MODULES_PERCEPTION_BASE_TRAFFIC_LIGHT_H_
 
 #include "modules/perception/base/box.h"
 
@@ -89,4 +89,4 @@ typedef std::vector<TrafficLightPtr> TrafficLightPtrs;
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // PERCEPTION_BASE_TRAFFIC_LIGHT_H_
+#endif  // MODULES_PERCEPTION_BASE_TRAFFIC_LIGHT_H_

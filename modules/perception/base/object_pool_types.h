@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef PERCEPTION_BASE_OBJECT_POOL_TYPES_H_
-#define PERCEPTION_BASE_OBJECT_POOL_TYPES_H_
+#ifndef MODULES_PERCEPTION_BASE_OBJECT_POOL_TYPES_H_
+#define MODULES_PERCEPTION_BASE_OBJECT_POOL_TYPES_H_
 #include "modules/perception/base/concurrent_object_pool.h"
 #include "modules/perception/base/frame.h"
 #include "modules/perception/base/object.h"
@@ -65,4 +65,4 @@ typedef ConcurrentObjectPool<Frame, kFramePoolSize, FrameInitializer> FramePool;
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // PERCEPTION_BASE_OBJECT_POOL_TYPES_H_
+#endif  // MODULES_PERCEPTION_BASE_OBJECT_POOL_TYPES_H_

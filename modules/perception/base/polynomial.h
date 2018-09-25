@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef PERCEPTION_BASE_POLYNOMIAL_H
-#define PERCEPTION_BASE_POLYNOMIAL_H
+#ifndef MODULES_PERCEPTION_BASE_POLYNOMIAL_H
+#define MODULES_PERCEPTION_BASE_POLYNOMIAL_H
 
 #include <iostream>
 #include <map>

@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef PERCEPTION_BASE_COMPARISON_TRAITS_H_
-#define PERCEPTION_BASE_COMPARISON_TRAITS_H_
+#ifndef MODULES_PERCEPTION_BASE_COMPARISON_TRAITS_H_
+#define MODULES_PERCEPTION_BASE_COMPARISON_TRAITS_H_
 
 #include <cmath>
 #include <limits>
@@ -42,4 +42,4 @@ typename std::enable_if<std::is_floating_point<T>::value, bool>::type Equal(
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // PERCEPTION_BASE_COMPARISON_TRAITS_H_
+#endif  // MODULES_PERCEPTION_BASE_COMPARISON_TRAITS_H_

@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef PERCEPTION_BASE_LOG_H_
-#define PERCEPTION_BASE_LOG_H_
+#ifndef MODULES_PERCEPTION_BASE_LOG_H_
+#define MODULES_PERCEPTION_BASE_LOG_H_
 
 #include "glog/logging.h"
 #include "modules/perception/base/options_define.h"
@@ -81,4 +81,4 @@
 
 #define GLOG_TIMESTAMP(timestamp) std::to_string(timestamp)
 
-#endif  // PERCEPTION_BASE_LOG_H_
+#endif  // MODULES_PERCEPTION_BASE_LOG_H_

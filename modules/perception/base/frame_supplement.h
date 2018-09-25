@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef PERCEPTION_BASE_FRAME_SUPPLEMENT_H_
-#define PERCEPTION_BASE_FRAME_SUPPLEMENT_H_
+#ifndef MODULES_PERCEPTION_BASE_FRAME_SUPPLEMENT_H_
+#define MODULES_PERCEPTION_BASE_FRAME_SUPPLEMENT_H_
 #include <memory>
 #include "modules/perception/base/blob.h"
 #include "modules/perception/base/image.h"
@@ -93,4 +93,4 @@ typedef std::shared_ptr<const UltrasonicFrameSupplement>
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // PERCEPTION_BASE_FRAME_SUPPLEMENT_H_
+#endif  // MODULES_PERCEPTION_BASE_FRAME_SUPPLEMENT_H_

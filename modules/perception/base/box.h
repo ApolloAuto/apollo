@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef PERCEPTION_BASE_IMAGE_CORE_H_
-#define PERCEPTION_BASE_IMAGE_CORE_H_
+#ifndef MODULES_PERCEPTION_BASE_IMAGE_CORE_H_
+#define MODULES_PERCEPTION_BASE_IMAGE_CORE_H_
 
 #include <float.h>
 #include <stdint.h>
@@ -175,4 +175,4 @@ typedef BBox2D<double> BBox2DD;
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // PERCEPTION_BASE_IMAGE_CORE_H_
+#endif  // MODULES_PERCEPTION_BASE_IMAGE_CORE_H_
