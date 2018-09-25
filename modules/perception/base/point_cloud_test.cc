@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/perception/base/point_cloud_types.h"
+#include "modules/perception/base/point_cloud.h"
 
 #include <limits>
 
@@ -26,57 +26,57 @@ namespace base {
 
 TEST(PointTest, point_test) {
   {
-    PointXYZIF point;
+    PointF point;
     EXPECT_EQ(point.x, 0.f);
     EXPECT_EQ(point.y, 0.f);
     EXPECT_EQ(point.z, 0.f);
     EXPECT_EQ(point.intensity, 0.f);
   }
   {
-    PointXYZID point;
+    PointD point;
     EXPECT_EQ(point.x, 0.0);
     EXPECT_EQ(point.y, 0.0);
     EXPECT_EQ(point.z, 0.0);
     EXPECT_EQ(point.intensity, 0.0);
   }
   {
-    PointXYZITF point;
+    PointXYZIT<float> point;
     EXPECT_EQ(point.x, 0.f);
     EXPECT_EQ(point.timestamp, 0.0);
   }
   {
-    PointXYZITD point;
+    PointXYZIT<double> point;
     EXPECT_EQ(point.x, 0.0);
     EXPECT_EQ(point.timestamp, 0.0);
   }
   {
-    PointXYZITHF point;
+    PointXYZITH<float> point;
     EXPECT_EQ(point.x, 0.f);
     EXPECT_EQ(point.timestamp, 0.0);
     EXPECT_EQ(point.height, std::numeric_limits<float>::max());
   }
   {
-    PointXYZITHD point;
+    PointXYZITH<double> point;
     EXPECT_EQ(point.x, 0.0);
     EXPECT_EQ(point.timestamp, 0.0);
     EXPECT_EQ(point.height, std::numeric_limits<float>::max());
   }
   {
-    PointXYZITHBF point;
+    PointXYZITHB<float> point;
     EXPECT_EQ(point.x, 0.f);
     EXPECT_EQ(point.timestamp, 0.0);
     EXPECT_EQ(point.height, std::numeric_limits<float>::max());
     EXPECT_EQ(point.beam_id, -1);
   }
   {
-    PointXYZITHBD point;
+    PointXYZITHB<double> point;
     EXPECT_EQ(point.x, 0.0);
     EXPECT_EQ(point.timestamp, 0.0);
     EXPECT_EQ(point.height, std::numeric_limits<float>::max());
     EXPECT_EQ(point.beam_id, -1);
   }
   {
-    PointXYZITHBLF point;
+    PointXYZITHBL<float> point;
     EXPECT_EQ(point.x, 0.f);
     EXPECT_EQ(point.timestamp, 0.0);
     EXPECT_EQ(point.height, std::numeric_limits<float>::max());
@@ -84,7 +84,7 @@ TEST(PointTest, point_test) {
     EXPECT_EQ(point.label, 0);
   }
   {
-    PointXYZITHBLD point;
+    PointXYZITHBL<double> point;
     EXPECT_EQ(point.x, 0.0);
     EXPECT_EQ(point.timestamp, 0.0);
     EXPECT_EQ(point.height, std::numeric_limits<float>::max());

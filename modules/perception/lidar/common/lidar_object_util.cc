@@ -17,7 +17,7 @@
 
 #include <algorithm>
 
-#include "modules/perception/base/point_cloud_types.h"
+#include "modules/perception/base/point_cloud.h"
 #include "modules/perception/lidar/common/lidar_log.h"
 
 namespace apollo {

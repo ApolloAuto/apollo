@@ -17,7 +17,7 @@
 #include <string>
 #include <vector>
 #include "modules/perception/base/object_types.h"
-#include "modules/perception/base/point_cloud_types.h"
+#include "modules/perception/base/point_cloud.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lib/io/file_util.h"
 #include "modules/perception/lib/io/protobuf_util.h"

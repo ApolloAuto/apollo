@@ -23,7 +23,6 @@
 
 #include "modules/perception/base/point.h"
 #include "modules/perception/base/point_cloud.h"
-#include "modules/perception/base/point_cloud_types.h"
 
 namespace apollo {
 namespace perception {

@@ -17,7 +17,7 @@
 #define MODULES_PERCEPTION_LIDAR_COMMON_CLOUD_MASK_H_
 
 #include <vector>
-#include "modules/perception/base/point_cloud_types.h"
+#include "modules/perception/base/point_cloud.h"
 
 namespace apollo {
 namespace perception {

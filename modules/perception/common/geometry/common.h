@@ -24,7 +24,7 @@
 #include "Eigen/Core"
 
 #include "modules/perception/base/box.h"
-#include "modules/perception/base/point_cloud_types.h"
+#include "modules/perception/base/point_cloud.h"
 
 namespace apollo {
 namespace perception {

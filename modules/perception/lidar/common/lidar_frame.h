@@ -24,7 +24,7 @@
 
 #include "modules/perception/base/hdmap_struct.h"
 #include "modules/perception/base/object_pool_types.h"
-#include "modules/perception/base/point_cloud_types.h"
+#include "modules/perception/base/point_cloud.h"
 
 namespace apollo {
 namespace perception {

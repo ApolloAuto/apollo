@@ -19,7 +19,7 @@
 #include <memory>
 #include <vector>
 
-#include "modules/perception/base/point_cloud_types.h"
+#include "modules/perception/base/point_cloud.h"
 
 namespace apollo {
 namespace perception {

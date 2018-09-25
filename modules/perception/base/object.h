@@ -23,7 +23,7 @@
 
 #include "modules/perception/base/object_supplement.h"
 #include "modules/perception/base/object_types.h"
-#include "modules/perception/base/point_cloud_types.h"
+#include "modules/perception/base/point_cloud.h"
 #include "modules/perception/base/vehicle_struct.h"
 
 namespace apollo {

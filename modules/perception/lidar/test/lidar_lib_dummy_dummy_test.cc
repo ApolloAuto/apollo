@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 #include <gtest/gtest.h>
-#include "modules/perception/base/point_cloud_types.h"
+#include "modules/perception/base/point_cloud.h"
 #include "modules/perception/lidar/lib/dummy/dummy_classifier.h"
 #include "modules/perception/lidar/lib/dummy/dummy_ground_detector.h"
 #include "modules/perception/lidar/lib/dummy/dummy_multi_target_tracker.h"
