@@ -44,6 +44,8 @@ using CallbackFunc = std::function<void(const std::shared_ptr<M0>&)>;
 
 using proto::RoleType;
 
+const uint32_t DEFAULT_PENDING_QUEUE_SIZE = 1;
+
 template <typename MessageT>
 class Reader : public ReaderBase {
  public:
@@ -54,7 +56,8 @@ class Reader : public ReaderBase {
       typename std::list<std::shared_ptr<MessageT>>::const_iterator;
 
   Reader(const proto::RoleAttributes& role_attr,
-         const CallbackFunc<MessageT>& reader_func = nullptr);
+         const CallbackFunc<MessageT>& reader_func = nullptr,
+         uint32_t pending_queue_size = DEFAULT_PENDING_QUEUE_SIZE);
   virtual ~Reader();
 
   bool Init() override;
@@ -85,26 +88,30 @@ class Reader : public ReaderBase {
   CallbackFunc<MessageT> reader_func_;
   ReceiverPtr receiver_;
   std::string croutine_name_;
+  uint32_t pending_queue_size_;
 
   ChangeConnection change_conn_;
   service_discovery::ChannelManagerPtr channel_manager_;
 
   mutable std::mutex mutex_;
-  uint32_t history_depth_ = 10;
+  uint32_t history_depth_;
   std::list<std::shared_ptr<MessageT>> history_queue_;
   std::list<std::shared_ptr<MessageT>> observed_queue_;
 };
 
 template <typename MessageT>
 Reader<MessageT>::Reader(const proto::RoleAttributes& role_attr,
-                         const CallbackFunc<MessageT>& reader_func)
+                         const CallbackFunc<MessageT>& reader_func,
+                         uint32_t pending_queue_size)
     : ReaderBase(role_attr),
       latest_recv_time_sec_(-1.0),
       second_to_lastest_recv_time_sec_(-1.0),
       reader_func_(reader_func),
       receiver_(nullptr),
       croutine_name_(""),
-      channel_manager_(nullptr) {}
+      pending_queue_size_(pending_queue_size),
+      channel_manager_(nullptr),
+      history_depth_(role_attr.qos_profile().depth()) {}
 
 template <typename MessageT>
 Reader<MessageT>::~Reader() {
@@ -146,7 +153,7 @@ bool Reader<MessageT>::Init() {
   auto sched = scheduler::Scheduler::Instance();
   croutine_name_ = role_attr_.node_name() + "_" + role_attr_.channel_name();
   auto dv = std::make_shared<data::DataVisitor<MessageT>>(
-      role_attr_.channel_id(), role_attr_.qos_profile().depth());
+      role_attr_.channel_id(), pending_queue_size_);
   // Using factory to wrap templates.
   croutine::RoutineFactory factory =
       croutine::CreateRoutineFactory<MessageT>(std::move(func), dv);

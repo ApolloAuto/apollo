@@ -32,6 +32,28 @@ namespace apollo {
 namespace cybertron {
 
 class Node;
+
+struct ReaderConfig {
+  ReaderConfig() {
+    qos_profile.set_history(proto::QosHistoryPolicy::HISTORY_KEEP_LAST);
+    qos_profile.set_depth(1);
+    qos_profile.set_mps(0);
+    qos_profile.set_reliability(
+        proto::QosReliabilityPolicy::RELIABILITY_RELIABLE);
+    qos_profile.set_durability(proto::QosDurabilityPolicy::DURABILITY_VOLATILE);
+
+    pending_queue_size = DEFAULT_PENDING_QUEUE_SIZE;
+  }
+  ReaderConfig(const ReaderConfig& other)
+      : channel_name(other.channel_name),
+        qos_profile(other.qos_profile),
+        pending_queue_size(other.pending_queue_size) {}
+
+  std::string channel_name;
+  proto::QosProfile qos_profile;
+  uint32_t pending_queue_size;
+};
+
 class NodeChannelImpl {
   friend class Node;
 
@@ -78,8 +100,14 @@ class NodeChannelImpl {
       -> std::shared_ptr<Reader<MessageT>>;
 
   template <typename MessageT>
-  auto CreateReader(const proto::RoleAttributes& role_attr,
+  auto CreateReader(const ReaderConfig& config,
                     const CallbackFunc<MessageT>& reader_func)
+      -> std::shared_ptr<Reader<MessageT>>;
+
+  template <typename MessageT>
+  auto CreateReader(const proto::RoleAttributes& role_attr,
+                    const CallbackFunc<MessageT>& reader_func,
+                    uint32_t pending_queue_size = DEFAULT_PENDING_QUEUE_SIZE)
       -> std::shared_ptr<Reader<MessageT>>;
 
   template <typename MessageT>
@@ -132,8 +160,20 @@ auto NodeChannelImpl::CreateReader(const std::string& channel_name,
 }
 
 template <typename MessageT>
-auto NodeChannelImpl::CreateReader(const proto::RoleAttributes& role_attr,
+auto NodeChannelImpl::CreateReader(const ReaderConfig& config,
                                    const CallbackFunc<MessageT>& reader_func)
+    -> std::shared_ptr<Reader<MessageT>> {
+  proto::RoleAttributes role_attr;
+  role_attr.set_channel_name(config.channel_name);
+  role_attr.mutable_qos_profile()->CopyFrom(config.qos_profile);
+  return this->template CreateReader<MessageT>(role_attr, reader_func,
+                                               config.pending_queue_size);
+}
+
+template <typename MessageT>
+auto NodeChannelImpl::CreateReader(const proto::RoleAttributes& role_attr,
+                                   const CallbackFunc<MessageT>& reader_func,
+                                   uint32_t pending_queue_size)
     -> std::shared_ptr<Reader<MessageT>> {
   RETURN_VAL_IF(!role_attr.has_channel_name(), nullptr);
   proto::RoleAttributes new_attr(role_attr);
@@ -144,7 +184,8 @@ auto NodeChannelImpl::CreateReader(const proto::RoleAttributes& role_attr,
     reader_ptr =
         std::make_shared<blocker::IntraReader<MessageT>>(new_attr, reader_func);
   } else {
-    reader_ptr = std::make_shared<Reader<MessageT>>(new_attr, reader_func);
+    reader_ptr = std::make_shared<Reader<MessageT>>(new_attr, reader_func,
+                                                    pending_queue_size);
   }
 
   RETURN_VAL_IF_NULL(reader_ptr, nullptr);
