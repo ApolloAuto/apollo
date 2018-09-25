@@ -86,7 +86,7 @@ class ReedShepp {
                    std ::vector<double>& py, std::vector<double>& pphi,
                    std::vector<bool>& pgear);
   // motion primitives combination setup function
-  bool SetRSP(double lengths[], char types[],
+  bool SetRSP(int size, double lengths[], char types[],
               std::vector<ReedSheppPath>* all_possible_paths);
   // Six different combination of motion primitive in Reed Shepp path used in
   // GenerateRSP()

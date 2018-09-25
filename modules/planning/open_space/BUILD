@@ -30,4 +30,18 @@ cc_library(
     deps = ["//modules/planning/open_space:reeds_shepp_path",
             "//modules/planning/open_space:node3d",]
 )
+
+cc_test(
+    name = "reeds_shepp_path_test",
+    size = "small",
+    srcs = ["reeds_shepp_path_test.cc"],
+    deps = [
+        "//framework:cybertron",
+        "//modules/planning/open_space:open_space_utils",
+        "//modules/common/math",
+        "//modules/common/configs:vehicle_config_helper",
+        "//modules/planning/proto:planner_open_space_config_proto",
+        "@gtest//:main",],
+)
+
 cpplint()
