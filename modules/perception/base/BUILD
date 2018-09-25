@@ -213,18 +213,18 @@ cc_library(
     ],
 )
 
-cc_test(
-    name = "object_pool_test",
-    size = "small",
-    srcs = [
-        "object_pool_test.cc",
-    ],
-    deps = [
-        ":object",
-        ":object_pool",
-        "@gtest//:main",
-    ],
-)
+#cc_test(
+#    name = "object_pool_test",
+#    size = "small",
+#    srcs = [
+#        "object_pool_test.cc",
+#    ],
+#    deps = [
+#        ":object",
+#        ":object_pool",
+#        "@gtest//:main",
+#    ],
+#)
 
 cc_library(
     name = "omnidirectional_model",
