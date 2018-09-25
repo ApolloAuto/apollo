@@ -161,6 +161,18 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "impending_collision_edge_test",
+    size = "small",
+    srcs = [
+        "impending_collision_edge_test.cc",
+    ],
+    deps = [
+        ":impending_collision_edge",
+        "@gtest//:main",
+    ],
+)
+
 cc_library(
     name = "object",
     hdrs = [
