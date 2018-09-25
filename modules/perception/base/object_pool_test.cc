@@ -282,18 +282,17 @@ TEST(ObjectPoolTest, concurrent_object_pool_initializer_test) {
 }
 
 TEST(ObjectPoolTest, light_object_pool_capacity_test) {
-  typedef LightObjectPool<Object, kPoolDefaultSize, TestObjectPoolInitializer>
+  typedef LightObjectPool<Object, kPoolDefaultSize, TestObjectPoolInitializer,
+                          SensorType::UNKNOWN_SENSOR_TYPE>
       TestObjectPool;
-  /*
+
   size_t capacity = TestObjectPool::Instance().RemainedNum();
   TestObjectPool::Instance().set_capacity(capacity - 10);
   EXPECT_EQ(TestObjectPool::Instance().RemainedNum(), capacity);
   TestObjectPool::Instance().set_capacity(capacity + 10);
   EXPECT_EQ(TestObjectPool::Instance().RemainedNum(), capacity + 10);
-  */
 }
 
-/*
 TEST(ObjectPoolTest, light_object_pool_get_test) {
   typedef LightObjectPool<Object> TestObjectPool;
   auto& instance = TestObjectPool::Instance();
@@ -461,7 +460,6 @@ TEST(ObjectPoolTest, light_object_pool_initializer_test) {
     }
   }
 }
-*/
 
 }  // namespace base
 }  // namespace perception
