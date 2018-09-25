@@ -304,14 +304,6 @@ cc_test(
 )
 
 cc_library(
-    name = "sensor_meta",
-    hdrs = [
-        "sensor_meta.h",
-    ],
-)
-
-
-cc_library(
     name = "syncedmem",
     srcs = [
         "syncedmem.cc",
