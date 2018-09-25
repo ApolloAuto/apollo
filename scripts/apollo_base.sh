@@ -293,9 +293,13 @@ function start_fe_customized_path() {
   MODULE=$2
   shift 2
 
-  eval "${APOLLO_BIN_PREFIX}/modules/${MODULE_PATH}/${MODULE} \
-      --flagfile=modules/${MODULE_PATH}/conf/${MODULE}.conf \
-      --alsologtostderr --log_dir=${APOLLO_ROOT_DIR}/data/log $@"
+  is_stopped_customized_path "${MODULE_PATH}" "${MODULE}"
+  if [ $? -eq 1 ]; then
+    eval "cyber_launch start /apollo/modules/${MODULE_PATH}/launch/${MODULE}.launch"
+  else
+    echo "Module ${MODULE} is already running - skipping."
+    return 2
+  fi
 }
 
 function start_fe() {

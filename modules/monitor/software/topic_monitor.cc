@@ -16,10 +16,17 @@
 
 #include "modules/monitor/software/topic_monitor.h"
 
-#include "modules/common/adapters/adapter_manager.h"
 #include "cybertron/common/log.h"
+#include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/util/string_util.h"
+#include "modules/control/proto/control_cmd.pb.h"
+#include "modules/drivers/proto/conti_radar.pb.h"
+#include "modules/localization/proto/pose.pb.h"
+#include "modules/map/relative_map/proto/navigation.pb.h"
 #include "modules/monitor/common/monitor_manager.h"
+#include "modules/perception/proto/perception_obstacle.pb.h"
+#include "modules/planning/proto/planning.pb.h"
+#include "modules/prediction/proto/prediction_obstacle.pb.h"
 
 DEFINE_string(topic_monitor_name, "TopicMonitor", "Name of the topic monitor.");
 
@@ -27,61 +34,47 @@ DEFINE_double(topic_monitor_interval, 5, "Topic status checking interval (s).");
 
 namespace apollo {
 namespace monitor {
-namespace {
 
-using apollo::common::adapter::AdapterBase;
-using apollo::common::adapter::AdapterConfig;
-using apollo::common::adapter::AdapterManager;
-using apollo::common::util::StrCat;
-using apollo::common::util::StringPrintf;
-
-AdapterBase *GetAdapterByMessageType(const AdapterConfig::MessageType type) {
-  switch (type) {
-    case AdapterConfig::POINT_CLOUD:
-      // TODO(xiaoxq): Enable when relevant code finished migration.
-      // return CHECK_NOTNULL(AdapterManager::GetPointCloud());
-      break;
-    case AdapterConfig::IMAGE_LONG:
-      // return CHECK_NOTNULL(AdapterManager::GetImageLong());
-      break;
-    case AdapterConfig::IMAGE_SHORT:
-      // return CHECK_NOTNULL(AdapterManager::GetImageShort());
-      break;
-    case AdapterConfig::LOCALIZATION:
-      return CHECK_NOTNULL(AdapterManager::GetLocalization());
-    case AdapterConfig::PERCEPTION_OBSTACLES:
-      return CHECK_NOTNULL(AdapterManager::GetPerceptionObstacles());
-    case AdapterConfig::PREDICTION:
-      return CHECK_NOTNULL(AdapterManager::GetPrediction());
-    case AdapterConfig::PLANNING_TRAJECTORY:
-      return CHECK_NOTNULL(AdapterManager::GetPlanning());
-    case AdapterConfig::CONTROL_COMMAND:
-      return CHECK_NOTNULL(AdapterManager::GetControlCommand());
-    case AdapterConfig::CONTI_RADAR:
-      return CHECK_NOTNULL(AdapterManager::GetContiRadar());
-    case AdapterConfig::RELATIVE_MAP:
-      return CHECK_NOTNULL(AdapterManager::GetRelativeMap());
-    default:
-      break;
+std::shared_ptr<cybertron::ReaderBase> TopicMonitor::CreateReaderFromChannel(
+    const std::string& channel) {
+  if (channel == FLAGS_control_command_topic) {
+    return MonitorManager::CreateReader<apollo::control::ControlCommand>(
+        FLAGS_control_command_topic);
+  } else if (channel == FLAGS_localization_topic) {
+    return MonitorManager::CreateReader<apollo::localization::Pose>(
+        FLAGS_localization_topic);
+  } else if (channel == FLAGS_perception_obstacle_topic) {
+    return MonitorManager::CreateReader<apollo::perception::PerceptionObstacle>(
+        FLAGS_perception_obstacle_topic);
+  } else if (channel == FLAGS_prediction_topic) {
+    return MonitorManager::CreateReader<apollo::prediction::PredictionObstacle>(
+        FLAGS_prediction_topic);
+  } else if (channel == FLAGS_planning_trajectory_topic) {
+    return MonitorManager::CreateReader<apollo::planning::ADCTrajectory>(
+        FLAGS_planning_trajectory_topic);
+  } else if (channel == FLAGS_conti_radar_topic) {
+    return MonitorManager::CreateReader<apollo::drivers::ContiRadar>(
+        FLAGS_conti_radar_topic);
+  } else if (channel == FLAGS_relative_map_topic) {
+    return MonitorManager::CreateReader<apollo::relative_map::MapMsg>(
+        FLAGS_relative_map_topic);
   }
-  AFATAL << "No adapter registered for " << type;
+  AFATAL << "Channel is not registered: " << channel;
   return nullptr;
 }
-
-}  // namespace
 
 TopicMonitor::TopicMonitor(const TopicConf &config, TopicStatus *status)
     : RecurrentRunner(FLAGS_topic_monitor_name, FLAGS_topic_monitor_interval)
     , config_(config), status_(status) {
+  reader_ = CreateReaderFromChannel(config.channel());
 }
 
 void TopicMonitor::RunOnce(const double current_time) {
-  auto *adapter = GetAdapterByMessageType(config_.type());
-  if (!adapter->HasReceived()) {
+  if (!reader_->HasReceived()) {
     status_->set_message_delay(-1);
     return;
   }
-  const double delay = adapter->GetDelaySec();
+  const double delay = reader_->GetDelaySec();
   if (delay > config_.acceptable_delay()) {
     status_->set_message_delay(delay);
   } else {

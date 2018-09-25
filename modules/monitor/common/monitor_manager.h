@@ -19,6 +19,7 @@
 
 #include <memory>
 #include <string>
+#include <unordered_map>
 
 #include "cybertron/common/macros.h"
 #include "modules/common/monitor_log/monitor_log_buffer.h"
@@ -43,7 +44,12 @@ class MonitorManager {
   template <class T>
   static inline std::shared_ptr<cybertron::Reader<T>> CreateReader(
       const std::string& channel) {
-    return CHECK_NOTNULL(CurrentNode())->CreateReader<T>(channel);
+    auto* readers = &(Instance()->readers_);
+    if (readers->find(channel) == readers->end()) {
+      readers->emplace(channel,
+                       CHECK_NOTNULL(CurrentNode())->CreateReader<T>(channel));
+    }
+    return std::dynamic_pointer_cast<cybertron::Reader<T>>((*readers)[channel]);
   }
 
   template <class T>
@@ -68,6 +74,8 @@ class MonitorManager {
   bool in_autonomous_driving_ = false;
 
   std::shared_ptr<apollo::cybertron::Node> node_;
+  std::unordered_map<std::string, std::shared_ptr<cybertron::ReaderBase>>
+      readers_;
 
   DECLARE_SINGLETON(MonitorManager);
 };
