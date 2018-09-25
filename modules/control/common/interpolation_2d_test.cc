@@ -19,8 +19,8 @@
 #include <string>
 #include <utility>
 
-#include "gtest/gtest.h"
 #include "cybertron/common/log.h"
+#include "gtest/gtest.h"
 #include "modules/common/util/file.h"
 #include "modules/control/proto/control_conf.pb.h"
 
@@ -31,9 +31,8 @@ class Interpolation2DTest : public ::testing::Test {
  public:
   virtual void SetUp() {
     std::string control_conf_file =
-        "modules/control/testdata/conf/lincoln.pb.txt";
-    CHECK(common::util::GetProtoFromFile(control_conf_file,
-                                                   &control_conf_));
+        "/apollo/modules/control/testdata/conf/lincoln.pb.txt";
+    CHECK(common::util::GetProtoFromFile(control_conf_file, &control_conf_));
   }
 
  protected:
