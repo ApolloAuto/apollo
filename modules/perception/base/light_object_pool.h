@@ -162,7 +162,9 @@ class LightObjectPool : public BaseObjectPool<ObjectType> {
   const size_t kDefaultCacheSize;
   // @brief list to store extended memory, not as efficient
   std::list<ObjectType*> extended_cache_;
-  static const Initializer kInitializer;
+  // TODO(All): Fix lint issue with static const
+  // static const Initializer kInitializer;
+  Initializer kInitializer;
 };
 
 }  // namespace base
