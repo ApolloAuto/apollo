@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef PERCEPTION_LIB_SINGLETON_SINGLETON_H_
-#define PERCEPTION_LIB_SINGLETON_SINGLETON_H_
+#ifndef MODULES_PERCEPTION_LIB_SINGLETON_SINGLETON_H_
+#define MODULES_PERCEPTION_LIB_SINGLETON_SINGLETON_H_
 
 #include <pthread.h>
 
@@ -61,4 +61,4 @@ T *Singleton<T>::instance_ = NULL;
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // PERCEPTION_LIB_SINGLETON_SINGLETON_H_
+#endif  // MODULES_PERCEPTION_LIB_SINGLETON_SINGLETON_H_

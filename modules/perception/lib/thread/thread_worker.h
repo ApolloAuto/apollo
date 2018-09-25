@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef PERCEPTION_LIB_THREAD_THREAD_WORKER_H_
-#define PERCEPTION_LIB_THREAD_THREAD_WORKER_H_
+#ifndef MODULES_PERCEPTION_LIB_THREAD_THREAD_WORKER_H_
+#define MODULES_PERCEPTION_LIB_THREAD_THREAD_WORKER_H_
 
 #include <condition_variable>
 #include <functional>
@@ -65,4 +65,4 @@ class ThreadWorker {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // PERCEPTION_LIB_THREAD_THREAD_WORKER_H_
+#endif  // MODULES_PERCEPTION_LIB_THREAD_THREAD_WORKER_H_

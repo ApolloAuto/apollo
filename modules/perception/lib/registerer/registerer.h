@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef PERCEPTION_LIB_REGISTERER_REGISTERER_H_
-#define PERCEPTION_LIB_REGISTERER_REGISTERER_H_
+#ifndef MODULES_PERCEPTION_LIB_REGISTERER_REGISTERER_H_
+#define MODULES_PERCEPTION_LIB_REGISTERER_REGISTERER_H_
 
 #include <map>
 #include <string>
@@ -156,4 +156,4 @@ bool GetRegisteredClasses(
   }                                                                           \
   }  // namespace
 
-#endif  // PERCEPTION_LIB_REGISTERER_REGISTERER_H_
+#endif  // MODULES_PERCEPTION_LIB_REGISTERER_REGISTERER_H_
