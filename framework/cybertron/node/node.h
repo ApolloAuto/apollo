@@ -52,6 +52,11 @@ class Node {
       -> std::shared_ptr<cybertron::Reader<MessageT>>;
 
   template <typename MessageT>
+  auto CreateReader(const ReaderConfig& config,
+                    const CallbackFunc<MessageT>& reader_func = nullptr)
+      -> std::shared_ptr<cybertron::Reader<MessageT>>;
+
+  template <typename MessageT>
   auto CreateReader(const proto::RoleAttributes& role_attr,
                     const CallbackFunc<MessageT>& reader_func = nullptr)
       -> std::shared_ptr<cybertron::Reader<MessageT>>;
@@ -116,6 +121,22 @@ auto Node::CreateReader(const proto::RoleAttributes& role_attr,
   auto reader = node_channel_impl_->template CreateReader<MessageT>(
       role_attr, reader_func);
   readers_.emplace(std::make_pair(role_attr.channel_name(), reader));
+  return reader;
+}
+
+template <typename MessageT>
+auto Node::CreateReader(const ReaderConfig& config,
+                        const CallbackFunc<MessageT>& reader_func)
+    -> std::shared_ptr<cybertron::Reader<MessageT>> {
+  std::lock_guard<std::mutex> lg(readers_mutex_);
+  if (readers_.find(config.channel_name) != readers_.end()) {
+    AWARN << "Failed to create reader: reader with the same channel already "
+             "exists.";
+    return nullptr;
+  }
+  auto reader =
+      node_channel_impl_->template CreateReader<MessageT>(config, reader_func);
+  readers_.emplace(std::make_pair(config.channel_name, reader));
   return reader;
 }
 
