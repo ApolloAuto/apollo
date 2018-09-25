@@ -14,7 +14,6 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/perception/base/polynomial.h"
-#include <vector>
 
 namespace apollo {
 namespace perception {
@@ -52,7 +51,7 @@ double Polynomial::operator()(const double& x) {
 
   for (auto& item : power_cache_) {
     item.second = x;
-    for (int i = 0; i < item.first - 1; ++i) {
+    for (size_t i = 0; i < item.first - 1; ++i) {
       item.second *= x;
     }
   }
@@ -71,7 +70,7 @@ double Polynomial::operator()(const double& x) {
 
 std::ostream& operator<<(std::ostream& o, const Polynomial& p) {
   const std::map<uint32_t, double>& coeff = p.getCoeff();
-  int i = 0;
+  size_t i = 0;
   for (auto it = coeff.rbegin(); it != coeff.rend(); ++it) {
     const uint32_t& order = it->first;
     const double& c = it->second;
@@ -86,6 +85,6 @@ std::ostream& operator<<(std::ostream& o, const Polynomial& p) {
   return o;
 }
 
-}  // base
-}  // perception
-}  // apollo
+}  // namespace base
+}  // namespace perception
+}  // namespace apollo

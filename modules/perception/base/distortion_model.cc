@@ -14,6 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/perception/base/distortion_model.h"
+
 #include <cmath>
 
 #include "cybertron/common/log.h"
