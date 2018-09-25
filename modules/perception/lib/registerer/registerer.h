@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+
 #ifndef MODULES_PERCEPTION_LIB_REGISTERER_REGISTERER_H_
 #define MODULES_PERCEPTION_LIB_REGISTERER_REGISTERER_H_
 
@@ -20,7 +21,7 @@
 #include <string>
 #include <vector>
 
-#include "modules/perception/base/log.h"
+#include "cybertron/common/log.h"
 
 namespace apollo {
 namespace perception {
@@ -101,9 +102,9 @@ bool GetRegisteredClasses(
       FactoryMap::iterator iter = map.find(name);                     \
       if (iter == map.end()) {                                        \
         for (auto c : map) {                                          \
-          LOG_ERROR << "Instance:" << c.first;                        \
+          AERROR << "Instance:" << c.first;                           \
         }                                                             \
-        LOG_ERROR << "Get instance " << name << " failed.";           \
+        AERROR << "Get instance " << name << " failed.";              \
         return NULL;                                                  \
       }                                                               \
       Any object = iter->second->NewInstance();                       \
