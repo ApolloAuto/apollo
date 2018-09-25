@@ -16,7 +16,8 @@
 #include <google/protobuf/stubs/common.h>
 #include <gtest/gtest.h>
 
-#include "modules/perception/base/log.h"
+#include "cybertron/common/log.h"
+
 #include "modules/perception/lib/thread/concurrent_queue.h"
 #include "modules/perception/lib/thread/thread_pool.h"
 
@@ -32,14 +33,14 @@ using google::protobuf::NewPermanentCallback;
 using std::vector;
 
 void Callback(int tag, BlockingCounter* counter) {
-  LOG_INFO << "callback executed, tag: " << tag;
+  AINFO << "callback executed, tag: " << tag;
   counter->Decrement();
 }
 
 class MyCallback {
  public:
   void Callback(int tag, BlockingCounter* counter) {
-    LOG_INFO << "MyCallback::callback executed, tag: " << tag;
+    AINFO << "MyCallback::callback executed, tag: " << tag;
     counter->Decrement();
   }
 };

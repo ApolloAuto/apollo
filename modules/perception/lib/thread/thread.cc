@@ -18,7 +18,7 @@
 #include <assert.h>
 #include <signal.h>
 
-#include "modules/perception/base/log.h"
+#include "cybertron/common/log.h"
 
 namespace apollo {
 namespace perception {
@@ -60,7 +60,7 @@ bool Thread::IsAlive() {
     return false;
   }
   if (ret == EINVAL) {
-    LOG_WARN << "Invalid singal.";
+    AWARN << "Invalid singal.";
     return false;
   }
 
