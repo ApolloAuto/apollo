@@ -31,7 +31,7 @@ class PidControllerTest : public ::testing::Test {
  public:
   virtual void SetUp() {
     std::string control_conf_file =
-        "modules/control/testdata/conf/lincoln.pb.txt";
+        "/apollo/modules/control/testdata/conf/lincoln.pb.txt";
     CHECK(common::util::GetProtoFromFile(control_conf_file,
                                                    &control_conf_));
     lon_controller_conf_ = control_conf_.lon_controller_conf();
