@@ -24,8 +24,8 @@
 #include <cmath>
 #include <utility>
 
-#include "modules/common/configs/vehicle_config_helper.h"
 #include "cybertron/common/log.h"
+#include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/path_matcher.h"
 #include "modules/common/math/vec2d.h"
 #include "modules/planning/common/planning_gflags.h"
@@ -80,10 +80,6 @@ bool CollisionChecker::InCollision(
     }
   }
   return false;
-}
-
-bool InCollision(const Box2d ego_car, const std::vector<Box2d> obstacles) {
-  return true;
 }
 
 void CollisionChecker::BuildPredictedEnvironment(
