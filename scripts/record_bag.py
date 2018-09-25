@@ -160,8 +160,6 @@ class DiskManager(object):
 
 class Recorder(object):
     """Data recorder."""
-    kEventCollector='modules/data/tools/event_collector_main'
-
 
     def __init__(self, args):
         self.args = args
@@ -191,8 +189,6 @@ class Recorder(object):
     def stop(self):
         """Stop recording."""
         shell_cmd('kill -TERM $(pgrep -f "cyber_recorder record" | grep -v pgrep)')
-        shell_cmd('kill -INT $(pgrep -f "{}" | grep -v pgrep)'.format(
-            Recorder.kEventCollector))
 
     def record_task(self, disk, topics):
         """Record tasks into the <disk>/data/bag/<task_id> directory."""
@@ -208,10 +204,8 @@ class Recorder(object):
             cd "{}"
             source /apollo/scripts/apollo_base.sh
             source /apollo/framework/install/setup.bash
-            nohup cyber_recorder record {} >{} 2>&1 &
-            nohup ${{APOLLO_BIN_PREFIX}}/{} >/dev/null 2>&1 &
-        '''.format(task_dir, topics_str, log_file,
-                   Recorder.kEventCollector)
+            nohup cyber_recorder record -c {} >{} 2>&1 &
+        '''.format(task_dir, topics_str, log_file)
         shell_cmd(cmd)
 
     @staticmethod
