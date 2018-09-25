@@ -93,7 +93,7 @@ void SimControl::InitTimerAndIO() {
         this->OnReceiveNavigationInfo(navigation_info);
       });
   prediction_reader_ = node_->CreateReader<PredictionObstacles>(
-      FLAGS_navigation_topic,
+      FLAGS_prediction_topic,
       [this](const std::shared_ptr<PredictionObstacles>& obstacles) {
         this->OnPredictionObstacles(obstacles);
       });
