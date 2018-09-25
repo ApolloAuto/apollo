@@ -22,6 +22,7 @@
 #include "modules/prediction/proto/scenario.pb.h"
 #include "modules/prediction/common/environment_features.h"
 #include "modules/prediction/scenario/scenario_features/scenario_features.h"
+#include "modules/prediction/scenario/scenario_features/cruise_scenario_features.h"
 
 namespace apollo {
 namespace prediction {
@@ -37,10 +38,6 @@ class ScenarioAnalyzer {
   const Scenario& scenario() const;
 
   std::shared_ptr<ScenarioFeatures> GetScenarioFeatures();
-
- private:
-  void BuildCruiseScenarioFeatures(
-      const EnvironmentFeatures& environment_features);
 
  private:
   Scenario scenario_;
