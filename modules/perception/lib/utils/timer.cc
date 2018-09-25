@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+
 #include <sys/time.h>
 
-#include "modules/perception/base/log.h"
+#include "cybertron/common/log.h"
 #include "modules/perception/lib/utils/timer.h"
 
 namespace apollo {
@@ -37,7 +38,7 @@ uint64_t Timer::End(const string &msg) {
   end_time_ = tv.tv_sec * 1000 + tv.tv_usec / 1000;
   uint64_t elapsed_time = end_time_ - start_time_;
 
-  LOG_INFO << "TIMER " << msg << " elapsed_time: " << elapsed_time << " ms";
+  ADEBUG << "TIMER " << msg << " elapsed_time: " << elapsed_time << " ms";
 
   // start new timer.
   start_time_ = end_time_;
