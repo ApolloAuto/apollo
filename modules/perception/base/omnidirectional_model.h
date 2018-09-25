@@ -34,7 +34,7 @@ class OmnidirectionalCameraDistortionModel : public BaseCameraDistortionModel {
 
   Eigen::Vector2f Project(const Eigen::Vector3f& point3d) override;
 
-  BaseCameraModelPtr get_camera_model() override;
+  std::shared_ptr<BaseCameraModel> get_camera_model() override;
 
   std::string name() const override {
     return "OmnidirectionalCameraDistortionModel";
