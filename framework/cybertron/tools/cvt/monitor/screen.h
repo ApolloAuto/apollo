@@ -63,7 +63,7 @@ class Screen final {
     }
   }
 
-  int highlight_line_no(void) const { return highlight_line_no_; }
+  // int highlight_line_no(void) const { return highlight_line_no_; }
 
  private:
   explicit Screen();
@@ -80,7 +80,7 @@ class Screen final {
 
   enum class State { RenderMessage, RenderInterCmdInfo };
   State current_state_;
-  int highlight_line_no_;
+  // int highlight_line_no_;
   int highlight_direction_;
   RenderableMessage* current_render_obj_;
 };

@@ -16,12 +16,11 @@
 
 #include "general_message_base.h"
 #include "screen.h"
-#include "repeated_items_message.h"
+#include "general_channel_message.h"
 #include "general_message.h"
 
 int GeneralMessageBase::lineCount(const google::protobuf::Message& msg,
                                   int screenWidth) {
-  // const google::protobuf::Descriptor* descriptor = msg.GetDescriptor();
   const google::protobuf::Reflection* reflection = msg.GetReflection();
 
   std::vector<const google::protobuf::FieldDescriptor*> fields;
@@ -94,12 +93,7 @@ void GeneralMessageBase::PrintMessage(GeneralMessageBase* baseMsg,
     if (field->is_repeated()) {
       outStr << "+[" << reflection->FieldSize(msg, field) << " items]";
 
-        RepeatedItemsMessage* item = nullptr;
-        if(baseMsg->type() == RepeatedItemsMessage::Type){
-          item = new RepeatedItemsMessage(static_cast<RepeatedItemsMessage*>(baseMsg), &msg, field);
-        } else {
-          item = new RepeatedItemsMessage(static_cast<GeneralMessage*>(baseMsg), &msg, field);
-        }
+        GeneralMessage* item = new GeneralMessage(baseMsg, &msg, reflection, field);
 
         if(item) {
           baseMsg->insertRepeatedMessage(lineNo, item);

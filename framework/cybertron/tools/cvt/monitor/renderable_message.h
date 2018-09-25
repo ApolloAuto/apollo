@@ -57,7 +57,7 @@ class RenderableMessage {
   virtual RenderableMessage* Child(int /* lineNo */) const { return nullptr; }
   
  protected:
-  int LineNo(void)const{return line_no_; }
+  int line_no(void) const {return line_no_; }
   void set_line_no(int lineNo){ line_no_ = lineNo; }
 
   int line_no_;

@@ -15,7 +15,7 @@
  *****************************************************************************/
 
 #include "cybertron_topology_message.h"
-#include "general_message.h"
+#include "general_channel_message.h"
 
 #include "channel_msg_factory.h"
 #include "screen.h"
@@ -57,7 +57,7 @@ int main(int argc, char* argv[]) {
 
   ChannelMsgFactory* f = ChannelMsgFactory::Instance();
   f->RegisterChildFactory("apollo::cybertron::message::RawMessage",
-                          GeneralMessage::Instance);
+                          GeneralChannelMessage::Instance);
   f->SetDefaultChildFactory("apollo::cybertron::message::RawMessage");
 
   CybertronTopologyMessage topologyMsg;
