@@ -22,8 +22,8 @@ cuda_arch = " ".join([
 def cuda_library_impl(ctx):
     flags = ' '.join(ctx.attr.flags)
     output = ctx.outputs.out
-    lib_flags = ["-std=c++11", "--shared", "--compiler-options -fPIC", "-lcudart", "-lcublas"]
-    args = [f.path for f in ctx.files.srcs] + [f.path for f in ctx.files.deps]
+    lib_flags = ["-std=c++11", "--shared", "--compiler-options -fPIC"]
+    args = [f.path for f in ctx.files.srcs]
     deps_flags=[]
     for f in ctx.attr.deps:
       deps_flags += f.cc.link_flags
@@ -41,7 +41,7 @@ def cuda_library_impl(ctx):
 
 def cuda_binary_impl(ctx):
     flags = ' '.join(ctx.attr.flags)
-    args = ctx.attr.flags + [f.path for f in ctx.files.srcs] + [f.path for f in ctx.files.hdrs] + [f.path for f in ctx.attr.deps]
+    args = ctx.attr.flags + [f.path for f in ctx.files.srcs] + [f.path for f in ctx.files.hdrs]
     deps_flags=[]
     for f in ctx.attr.deps:
       deps_flags += f.cc.link_flags
