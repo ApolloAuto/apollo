@@ -13,7 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include <pcl/io/pcd_io.h>
+#include <string>
+
+#include "pcl/io/pcd_io.h"
+
 #include "modules/perception/base/point_cloud.h"
 #include "modules/perception/lidar/common/lidar_log.h"
 
