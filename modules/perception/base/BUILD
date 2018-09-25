@@ -11,8 +11,6 @@ cc_library(
         "sensor_meta.h",
         "vehicle_struct.h",
     ],
-    deps = [
-    ],
 )
 
 cc_library(
@@ -327,8 +325,8 @@ cc_test(
         "point_cloud_test.cc",
     ],
     deps = [
-        "@gtest//:main",
         ":point_cloud",
+        "@gtest//:main",
     ],
 )
 
