@@ -26,12 +26,6 @@ namespace apollo {
 namespace perception {
 namespace base {
 
-// TODO(all) remove later
-// typedef std::shared_ptr<BaseCameraModel> BaseCameraModelPtr;
-// typedef std::shared_ptr<const BaseCameraModel> BaseCameraModelConstPtr;
-// typedef std::shared_ptr<PinholeCameraModel> PinholeCameraModelPtr;
-// typedef std::shared_ptr<const PinholeCameraModel> PinholeCameraModelConstPtr;
-
 class BaseCameraModel {
  public:
   BaseCameraModel() = default;
@@ -76,6 +70,12 @@ class PinholeCameraModel : public BaseCameraModel {
   */
   Eigen::Matrix3f intrinsic_params_;
 };
+
+// TODO(all) remove later
+typedef std::shared_ptr<BaseCameraModel> BaseCameraModelPtr;
+typedef std::shared_ptr<const BaseCameraModel> BaseCameraModelConstPtr;
+typedef std::shared_ptr<PinholeCameraModel> PinholeCameraModelPtr;
+typedef std::shared_ptr<const PinholeCameraModel> PinholeCameraModelConstPtr;
 
 }  // namespace base
 }  // namespace perception
