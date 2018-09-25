@@ -19,6 +19,6 @@
 xhost +local:root 1>/dev/null 2>&1
 docker exec \
     -u $USER \
-    -it apollo_dev \
+    -it apollo_dev_$USER \
     /bin/bash
 xhost -local:root 1>/dev/null 2>&1
