@@ -166,6 +166,35 @@ cc_test(
 )
 
 cc_library(
+    name = "omnidirectional_model",
+    hdrs = [
+        "omnidirectional_model.h",
+    ],
+    srcs = [
+        "omnidirectional_model.cc",
+    ],
+    deps = [
+        ":camera",
+        ":distortion_model",
+        ":polynomial",
+        "//framework:cybertron",
+        "@eigen",
+    ],
+)
+
+cc_test(
+    name = "omnidirectional_model_test",
+    size = "small",
+    srcs = [
+        "omnidirectional_model_test.cc",
+    ],
+    deps = [
+        ":omnidirectional_model",
+        "@gtest//:main",
+    ],
+)
+
+cc_library(
     name = "point_cloud",
     hdrs = [
         "point.h",
@@ -186,6 +215,30 @@ cc_test(
     deps = [
         "@gtest//:main",
         ":point_cloud",
+    ],
+)
+
+cc_library(
+    name = "polynomial",
+    hdrs = [
+        "polynomial.h",
+    ],
+    srcs = [
+        "polynomial.cc",
+    ],
+    deps = [
+    ],
+)
+
+cc_test(
+    name = "polynomial_test",
+    size = "small",
+    srcs = [
+        "polynomial_test.cc",
+    ],
+    deps = [
+        ":polynomial",
+        "@gtest//:main",
     ],
 )
 

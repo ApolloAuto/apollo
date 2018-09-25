@@ -43,8 +43,8 @@ class Polynomial {
 
 std::ostream& operator<<(std::ostream& o, const Polynomial& p);
 
-}  // base
-}  // perception
-}  // apollo
+}  // namespace base
+}  // namespace perception
+}  // namespace apollo
 
-#endif
+#endif  // MODULES_PERCEPTION_BASE_POLYNOMIAL_H

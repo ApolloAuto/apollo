@@ -14,11 +14,13 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/perception/base/omnidirectional_model.h"
-#include "modules/perception/base/camera.h"
-#include "polynomial.h"
 
 #include <cmath>
-#include "modules/perception/base/log.h"
+#include <limits>
+
+#include "cybertron/common/log.h"
+#include "modules/perception/base/camera.h"
+#include "modules/perception/base/polynomial.h"
 
 namespace apollo {
 namespace perception {
@@ -56,7 +58,7 @@ Eigen::Vector2f OmnidirectionalCameraDistortionModel::Project(
 
 std::shared_ptr<BaseCameraModel>
     OmnidirectionalCameraDistortionModel::get_camera_model() {
-  PinholeCameraModelPtr camera_model(new PinholeCameraModel());
+  std::shared_ptr<PinholeCameraModel> camera_model(new PinholeCameraModel());
   camera_model->set_width(width_);
   camera_model->set_height(height_);
   camera_model->set_intrinsic_params(intrinsic_params_);
@@ -67,25 +69,25 @@ std::shared_ptr<BaseCameraModel>
 bool OmnidirectionalCameraDistortionModel::set_params(
     size_t width, size_t height, const Eigen::VectorXf& params) {
   if (params.size() < 9) {
-    LOG_INFO << "Missing cam2world and world2cam model.";
+    AINFO << "Missing cam2world and world2cam model.";
     return false;
   }
 
   uint32_t cam2world_order = uint32_t(params(8));
-  LOG_INFO << "cam2world order: " << cam2world_order
-           << ", size: " << params.size() << std::endl;
+  AINFO << "cam2world order: " << cam2world_order
+      << ", size: " << params.size() << std::endl;
 
   if (params.size() < 9 + cam2world_order + 1) {
-    LOG_INFO << "Incomplete cam2world model or missing world2cam model.";
+    AINFO << "Incomplete cam2world model or missing world2cam model.";
     return false;
   }
 
   uint32_t world2cam_order = uint32_t(params(9 + cam2world_order));
-  LOG_INFO << "world2cam order: " << world2cam_order
-           << ", size: " << params.size() << std::endl;
+  AINFO << "world2cam order: " << world2cam_order
+      << ", size: " << params.size() << std::endl;
 
   if (params.size() < 9 + cam2world_order + 1 + world2cam_order) {
-    LOG_INFO << "Incomplete world2cam model.";
+    AINFO << "Incomplete world2cam model.";
     return false;
   }
 
