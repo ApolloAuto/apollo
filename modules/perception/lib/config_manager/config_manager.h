@@ -121,13 +121,13 @@
 
 #include "modules/perception/lib/singleton/singleton.h"
 #include "modules/perception/lib/thread/mutex.h"
+#include "modules/perception/proto/perception_config_schema.pb.h"
 
 namespace apollo {
 namespace perception {
 namespace lib {
 
 class ModelConfig;
-class ModelConfigProto;
 
 class ConfigManager {
  public:
@@ -162,12 +162,14 @@ class ConfigManager {
 
   friend class lib::Singleton<ConfigManager>;
 
+  /* TODO(all): to remove
   typedef std::map<std::string, ModelConfig *> ModelConfigMap;
   typedef ModelConfigMap::iterator ModelConfigMapIterator;
   typedef ModelConfigMap::const_iterator ModelConfigMapConstIterator;
+  */
 
   // key: model_name
-  ModelConfigMap model_config_map_;
+  std::map<std::string, ModelConfig *> model_config_map_;
   Mutex mutex_;  // multi-thread init safe.
   bool inited_ = false;
   std::string work_root_;  // ConfigManager work root dir.
@@ -179,7 +181,7 @@ class ModelConfig {
   ModelConfig() {}
   ~ModelConfig() {}
 
-  bool Reset(const ModelConfigProto &proto);
+  bool Reset(const apollo::perception::ModelConfigProto &proto);
 
   std::string name() const { return name_; }
 
@@ -246,6 +248,7 @@ class ModelConfig {
   std::string name_;
   std::string version_;
 
+  /* TODO(all): to remove
   typedef std::map<std::string, int> IntegerParamMap;
   typedef std::map<std::string, std::string> StringParamMap;
   typedef std::map<std::string, double> DoubleParamMap;
@@ -256,17 +259,18 @@ class ModelConfig {
   typedef std::map<std::string, std::vector<double>> ArrayDoubleParamMap;
   typedef std::map<std::string, std::vector<float>> ArrayFloatParamMap;
   typedef std::map<std::string, std::vector<bool>> ArrayBoolParamMap;
+  */
 
-  IntegerParamMap integer_param_map_;
-  StringParamMap string_param_map_;
-  DoubleParamMap double_param_map_;
-  FloatParamMap float_param_map_;
-  BoolParamMap bool_param_map_;
-  ArrayIntegerParamMap array_integer_param_map_;
-  ArrayStringParamMap array_string_param_map_;
-  ArrayDoubleParamMap array_double_param_map_;
-  ArrayFloatParamMap array_float_param_map_;
-  ArrayBoolParamMap array_bool_param_map_;
+  std::map<std::string, int> integer_param_map_;
+  std::map<std::string, std::string> string_param_map_;
+  std::map<std::string, double> double_param_map_;
+  std::map<std::string, float> float_param_map_;
+  std::map<std::string, bool> bool_param_map_;
+  std::map<std::string, std::vector<int>> array_integer_param_map_;
+  std::map<std::string, std::vector<std::string>> array_string_param_map_;
+  std::map<std::string, std::vector<double>> array_double_param_map_;
+  std::map<std::string, std::vector<float>> array_float_param_map_;
+  std::map<std::string, std::vector<bool>> array_bool_param_map_;
 };
 
 template <typename T>

@@ -15,23 +15,17 @@
  *****************************************************************************/
 #include "modules/perception/lib/config_manager/config_manager.h"
 
-#include <gflags/gflags.h>
-#include <google/protobuf/text_format.h>
-
 #include <utility>
 
-#include "modules/perception/base/log.h"
-#include "modules/perception/lib/config_manager/proto/perception_config_schema.pb.h"
+#include <google/protobuf/text_format.h>
+
+#include "cybertron/common/log.h"
+#include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/lib/io/file_util.h"
 
 namespace apollo {
 namespace perception {
 namespace lib {
-
-DEFINE_string(config_manager_path, "./conf", "The ModelConfig config paths.");
-DEFINE_string(work_root, "", "Project work root direcotry.");
-DEFINE_string(adu_data, "/home/caros/adu_data",
-              "ADU shared data path, including maps, routings...");
 
 using google::protobuf::TextFormat;
 using std::map;
@@ -63,7 +57,8 @@ bool ConfigManager::InitInternal() {
   if (inited_) {
     return true;
   }
-  ModelConfigMapIterator iter = model_config_map_.begin();
+  std::map<std::string, ModelConfig *>::iterator iter =
+      model_config_map_.begin();
   for (; iter != model_config_map_.end(); ++iter) {
     delete iter->second;
   }
@@ -71,31 +66,31 @@ bool ConfigManager::InitInternal() {
 
   string config_module_path =
       FileUtil::GetAbsolutePath(work_root_, FLAGS_config_manager_path);
-  LOG_INFO << "WORK_ROOT: " << work_root_
-           << " config_root_path: " << config_module_path
-           << " ADU_DATA: " << adu_data_;
+  AINFO << "WORK_ROOT: " << work_root_
+      << " config_root_path: " << config_module_path
+      << " ADU_DATA: " << adu_data_;
 
   std::vector<std::string> model_config_files;
   if (!FileUtil::GetFileList(config_module_path, "config_manager.config",
                              &model_config_files)) {
-    LOG_ERROR << "config_root_path : " << config_module_path
-              << " get file list error.";
+    AERROR << "config_root_path : " << config_module_path
+        << " get file list error.";
     return false;
   }
 
   for (auto &model_config_file : model_config_files) {
     std::string content;
     if (!FileUtil::GetFileContent(model_config_file, &content)) {
-      LOG_ERROR << "failed to get ConfigManager config path: "
-                << model_config_file;
+      AERROR << "failed to get ConfigManager config path: "
+          << model_config_file;
       return false;
     }
 
     ModelConfigFileListProto file_list_proto;
 
     if (!TextFormat::ParseFromString(content, &file_list_proto)) {
-      LOG_ERROR << "invalid ModelConfigFileListProto file: "
-                << FLAGS_config_manager_path;
+      AERROR << "invalid ModelConfigFileListProto file: "
+          << FLAGS_config_manager_path;
       return false;
     }
 
@@ -105,7 +100,7 @@ bool ConfigManager::InitInternal() {
           FileUtil::GetAbsolutePath(work_root_, model_config_file);
       string config_content;
       if (!FileUtil::GetFileContent(abs_path, &config_content)) {
-        LOG_ERROR << "failed to get file content: " << abs_path;
+        AERROR << "failed to get file content: " << abs_path;
         return false;
       }
 
@@ -113,7 +108,7 @@ bool ConfigManager::InitInternal() {
 
       if (!TextFormat::ParseFromString(config_content,
                                        &multi_model_config_proto)) {
-        LOG_ERROR << "invalid MultiModelConfigProto file: " << abs_path;
+        AERROR << "invalid MultiModelConfigProto file: " << abs_path;
         return false;
       }
 
@@ -124,20 +119,20 @@ bool ConfigManager::InitInternal() {
           return false;
         }
 
-        LOG_INFO << "load ModelConfig succ. name: " << model_config->name();
+        AINFO << "load ModelConfig succ. name: " << model_config->name();
 
-        pair<ModelConfigMapIterator, bool> result =
+        pair<std::map<std::string, ModelConfig *>::iterator, bool> result =
             model_config_map_.emplace(model_config->name(), model_config);
         if (!result.second) {
-          LOG_WARN << "duplicate ModelConfig, name: " << model_config->name();
+          AWARN << "duplicate ModelConfig, name: " << model_config->name();
           return false;
         }
       }
     }
   }
 
-  LOG_INFO << "finish to load ModelConfigs. NumModels: "
-           << model_config_map_.size();
+  AINFO << "finish to load ModelConfigs. NumModels: "
+      << model_config_map_.size();
 
   inited_ = true;
 
@@ -165,7 +160,8 @@ bool ConfigManager::GetModelConfig(const string &model_name,
     return false;
   }
 
-  ModelConfigMapConstIterator citer = model_config_map_.find(model_name);
+  std::map<std::string, ModelConfig *>::const_iterator citer =
+      model_config_map_.find(model_name);
 
   if (citer == model_config_map_.end()) {
     return false;
@@ -175,7 +171,8 @@ bool ConfigManager::GetModelConfig(const string &model_name,
 }
 
 ConfigManager::~ConfigManager() {
-  ModelConfigMapIterator iter = model_config_map_.begin();
+  std::map<std::string, ModelConfig *>::iterator iter =
+      model_config_map_.begin();
   for (; iter != model_config_map_.end(); ++iter) {
     delete iter->second;
   }
@@ -249,20 +246,20 @@ bool ModelConfig::Reset(const ModelConfigProto &proto) {
     array_bool_param_map_.emplace(pair.name(), values);
   }
 
-  LOG_INFO << "reset ModelConfig. model_name: " << name_
-           << " integer_param_map's size: " << integer_param_map_.size()
-           << " string_param_map's size: " << string_param_map_.size()
-           << " double_param_map's size: " << double_param_map_.size()
-           << " float_param_map's size: " << float_param_map_.size()
-           << " bool_param_map's size: " << bool_param_map_.size()
-           << " array_integer_param_map's size: "
-           << array_integer_param_map_.size()
-           << " array_string_param_map's size: "
-           << array_string_param_map_.size()
-           << " array_double_param_map's size: "
-           << array_double_param_map_.size()
-           << " array_float_param_map's size: " << array_float_param_map_.size()
-           << " array_bool_param_map's size: " << array_bool_param_map_.size();
+  AINFO << "reset ModelConfig. model_name: " << name_
+      << " integer_param_map's size: " << integer_param_map_.size()
+      << " string_param_map's size: " << string_param_map_.size()
+      << " double_param_map's size: " << double_param_map_.size()
+      << " float_param_map's size: " << float_param_map_.size()
+      << " bool_param_map's size: " << bool_param_map_.size()
+      << " array_integer_param_map's size: "
+      << array_integer_param_map_.size()
+      << " array_string_param_map's size: "
+      << array_string_param_map_.size()
+      << " array_double_param_map's size: "
+      << array_double_param_map_.size()
+      << " array_float_param_map's size: " << array_float_param_map_.size()
+      << " array_bool_param_map's size: " << array_bool_param_map_.size();
 
   return true;
 }
