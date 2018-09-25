@@ -25,8 +25,9 @@
 #include <QMutex>
 #include <QPixmap>
 
-#include <sensor_image.pb.h>
-#include <sensor_pointcloud.pb.h>
+#include "modules/drivers/proto/sensor_image.pb.h"
+#include "modules/drivers/proto/pointcloud.pb.h"
+#include "modules/drivers/proto/radar.pb.h"
 #include <memory>
 
 class FixedAspectRatioWidget;
@@ -80,17 +81,22 @@ class MainWindow : public QMainWindow {
   void ActionOpenImages(void);
   void AddVideoImages(void);
 
+  void ActionOpenRadarChannel(void);
+  void openRadarChannel(bool b);
+  void EnableRadarPoints(bool b);
+
   void showMessage(void);
 
   void PlayPause(void);
 
  private:
   struct VideoImgProxy;
+  struct RadarData;
 
   void PointCloudReaderCallback(
-      const std::shared_ptr<const adu::common::sensor::PointCloud>& pdata);
+      const std::shared_ptr<const apollo::drivers::PointCloud>& pdata);
   void ImageReaderCallback(
-      const std::shared_ptr<const adu::common::sensor::CompressedImage>&
+      const std::shared_ptr<const apollo::drivers::CompressedImage>&
           imgData,
       VideoImgProxy* proxy);
 
@@ -113,7 +119,7 @@ class MainWindow : public QMainWindow {
   QTreeWidgetItem* pointcloud_top_item_;
   QComboBox* pointcloud_comboBox_;
   QPushButton* pointcloud_button_;
-  CyberChannReader<adu::common::sensor::PointCloud>* pointcloud_channel_Reader_;
+  CyberChannReader<apollo::drivers::PointCloud>* pointcloud_channel_Reader_;
 
   QMutex pointcloud_reader_mutex_;
 

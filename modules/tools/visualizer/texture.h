@@ -17,7 +17,7 @@
 #ifndef TOOLS_CVT_VISUALIZER_TEXTURE_H_
 #define TOOLS_CVT_VISUALIZER_TEXTURE_H_
 
-#include <sensor_image.pb.h>
+#include "modules/drivers/proto/sensor_image.pb.h"
 #include <QImage>
 #include <QOpenGLBuffer>
 #include <memory>
