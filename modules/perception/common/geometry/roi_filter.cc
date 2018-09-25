@@ -14,14 +14,24 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/perception/common/geometry/roi_filter.h"
-#include <Eigen/Dense>
-#include "modules/perception/base/point_cloud_types.h"
+
+#include "Eigen/Dense"
+
+#include "modules/perception/base/object_types.h"
 #include "modules/perception/common/geometry/common.h"
+
 namespace apollo {
 namespace perception {
 namespace common {
 
-bool IsPtInRoi(const base::HdmapStructConstPtr roi, const base::PointD pt) {
+using HdmapStructConstPtr =
+    std::shared_ptr<const apollo::perception::base::HdmapStruct>;
+using apollo::perception::base::PointD;
+using ObjectConstPtr = std::shared_ptr<const apollo::perception::base::Object>;
+using ObjectPtr = std::shared_ptr<apollo::perception::base::Object>;
+using apollo::perception::base::ObjectType;
+
+bool IsPtInRoi(const HdmapStructConstPtr roi, const PointD pt) {
   for (std::size_t j = 0; j < roi->road_polygons.size(); j++) {
     if (IsPointXYInPolygon2DXY(pt, roi->road_polygons[j])) {
       return true;
@@ -35,19 +45,19 @@ bool IsPtInRoi(const base::HdmapStructConstPtr roi, const base::PointD pt) {
   return false;
 }
 
-bool IsObjectInRoi(const base::HdmapStructConstPtr roi,
-                   const base::ObjectConstPtr obj) {
-  base::PointD ct;
+bool IsObjectInRoi(const HdmapStructConstPtr roi,
+                   const ObjectConstPtr obj) {
+  PointD ct;
   ct.x = obj->center[0];
   ct.y = obj->center[1];
   ct.z = obj->center[2];
   return IsPtInRoi(roi, ct);
 }
 
-bool IsObjectBboxInRoi(const base::HdmapStructConstPtr roi,
-                       const base::ObjectConstPtr obj) {
+bool IsObjectBboxInRoi(const HdmapStructConstPtr roi,
+                       const ObjectConstPtr obj) {
   Eigen::Vector3d bbox_center = obj->center;
-  base::PointD ct;
+  PointD ct;
   ct.x = bbox_center[0];
   ct.y = bbox_center[1];
   ct.z = bbox_center[2];
@@ -71,7 +81,7 @@ bool IsObjectBboxInRoi(const base::HdmapStructConstPtr roi,
   bbox_corners[3] = bbox_center - bbox_dir * bbox_length / 2 -
                     bbox_ortho_dir * bbox_width / 2;
   for (int i = 0; i < 4; ++i) {
-    base::PointD corner;
+    PointD corner;
     corner.x = bbox_corners[i][0];
     corner.y = bbox_corners[i][1];
     corner.z = bbox_corners[i][2];
@@ -82,9 +92,9 @@ bool IsObjectBboxInRoi(const base::HdmapStructConstPtr roi,
   return false;
 }
 
-bool ObjectInRoiCheck(const base::HdmapStructConstPtr roi,
-                      const std::vector<base::ObjectPtr>& objects,
-                      std::vector<base::ObjectPtr>* valid_objects) {
+bool ObjectInRoiCheck(const HdmapStructConstPtr roi,
+                      const std::vector<ObjectPtr>& objects,
+                      std::vector<ObjectPtr>* valid_objects) {
   if (roi == nullptr ||
       roi->road_polygons.size() + roi->junction_polygons.size() == 0) {
     valid_objects->assign(objects.begin(), objects.end());
@@ -101,9 +111,9 @@ bool ObjectInRoiCheck(const base::HdmapStructConstPtr roi,
   return true;
 }
 
-bool ObjectInRoiSlackCheck(const base::HdmapStructConstPtr roi,
-                           const std::vector<base::ObjectPtr>& objects,
-                           std::vector<base::ObjectPtr>* valid_objects) {
+bool ObjectInRoiSlackCheck(const HdmapStructConstPtr roi,
+                           const std::vector<ObjectPtr>& objects,
+                           std::vector<ObjectPtr>* valid_objects) {
   if (roi == nullptr ||
       roi->road_polygons.size() + roi->junction_polygons.size() == 0) {
     valid_objects->assign(objects.begin(), objects.end());
@@ -118,9 +128,9 @@ bool ObjectInRoiSlackCheck(const base::HdmapStructConstPtr roi,
       continue;
     }
     // keep known object when its bbox in roi
-    if (objects[i]->type == base::ObjectType::UNKNOWN ||
-        objects[i]->type == base::ObjectType::UNKNOWN_MOVABLE ||
-        objects[i]->type == base::ObjectType::UNKNOWN_UNMOVABLE) {
+    if (objects[i]->type == ObjectType::UNKNOWN ||
+        objects[i]->type == ObjectType::UNKNOWN_MOVABLE ||
+        objects[i]->type == ObjectType::UNKNOWN_UNMOVABLE) {
       continue;
     }
     if (IsObjectBboxInRoi(roi, objects[i])) {

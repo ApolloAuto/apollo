@@ -35,6 +35,23 @@ cc_library(
 )
 
 cc_library(
+    name = "roi_filter",
+    srcs = [
+        "roi_filter.cc",
+    ],
+    hdrs = [
+        "roi_filter.h",
+    ],
+    deps = [
+        ":common",
+        "//modules/perception/base:base_type",
+        "//modules/perception/base:point_cloud",
+        "//modules/perception/base:object",
+        "@eigen",
+    ],
+)
+
+cc_library(
     name = "camera_homography",
     srcs = [
         "camera_homography.cc",
