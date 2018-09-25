@@ -53,7 +53,7 @@ class LonControllerTest : public ::testing::Test, LonController {
 
     ControlConf control_conf;
     std::string control_conf_file =
-        "modules/control/testdata/conf/lincoln.pb.txt";
+        "/apollo/modules/control/testdata/conf/lincoln.pb.txt";
 
     CHECK(apollo::common::util::GetProtoFromFile(control_conf_file,
                                                  &control_conf));
