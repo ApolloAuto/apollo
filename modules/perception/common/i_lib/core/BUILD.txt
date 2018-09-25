@@ -1,0 +1,56 @@
+// DO NOT MODIFY
+// THIS FILE IS GENERATED AUTOMATICALLY TO HELP WRITE BUILD FILE.
+// DELETE THIS FILE WHEN YOU HAVE CREATED THE COMPLETE BUILD FILE
+cc_library(
+    name = "i_basic",
+    hdrs = [
+        "i_basic.h",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
+    name = "i_blas",
+    hdrs = [
+        "i_blas.h",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
+    name = "i_constant",
+    hdrs = [
+        "i_constant.h",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
+    name = "i_rand",
+    hdrs = [
+        "i_rand.h",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
+    name = "i_alloc",
+    hdrs = [
+        "i_alloc.h",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
+    name = "i_struct",
+    hdrs = [
+        "i_struct.h",
+    ],
+    deps = [
+    ],
+)

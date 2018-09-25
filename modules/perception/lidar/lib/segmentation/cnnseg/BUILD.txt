@@ -1,0 +1,68 @@
+// DO NOT MODIFY
+// THIS FILE IS GENERATED AUTOMATICALLY TO HELP WRITE BUILD FILE.
+// DELETE THIS FILE WHEN YOU HAVE CREATED THE COMPLETE BUILD FILE
+cc_library(
+    name = "feature_generator",
+    srcs = [
+        "feature_generator.cc",
+    ],
+    hdrs = [
+        "feature_generator.h",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
+    name = "feature_generator",
+    srcs = [
+        "feature_generator.cc",
+    ],
+    hdrs = [
+        "feature_generator.h",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
+    name = "disjoint_set",
+    hdrs = [
+        "disjoint_set.h",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
+    name = "cnn_segmentation",
+    srcs = [
+        "cnn_segmentation.cc",
+    ],
+    hdrs = [
+        "cnn_segmentation.h",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
+    name = "util",
+    hdrs = [
+        "util.h",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
+    name = "cnn_segmentation",
+    srcs = [
+        "cnn_segmentation.cc",
+    ],
+    hdrs = [
+        "cnn_segmentation.h",
+    ],
+    deps = [
+    ],
+)

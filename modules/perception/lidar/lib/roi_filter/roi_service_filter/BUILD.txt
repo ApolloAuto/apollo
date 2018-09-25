@@ -1,0 +1,26 @@
+// DO NOT MODIFY
+// THIS FILE IS GENERATED AUTOMATICALLY TO HELP WRITE BUILD FILE.
+// DELETE THIS FILE WHEN YOU HAVE CREATED THE COMPLETE BUILD FILE
+cc_library(
+    name = "roi_service_filter",
+    srcs = [
+        "roi_service_filter.cc",
+    ],
+    hdrs = [
+        "roi_service_filter.h",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
+    name = "roi_service_filter",
+    srcs = [
+        "roi_service_filter.cc",
+    ],
+    hdrs = [
+        "roi_service_filter.h",
+    ],
+    deps = [
+    ],
+)

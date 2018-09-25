@@ -1,0 +1,107 @@
+// DO NOT MODIFY
+// THIS FILE IS GENERATED AUTOMATICALLY TO HELP WRITE BUILD FILE.
+// DELETE THIS FILE WHEN YOU HAVE CREATED THE COMPLETE BUILD FILE
+cc_library(
+    name = "information_filter",
+    srcs = [
+        "information_filter.cc",
+    ],
+    hdrs = [
+        "information_filter.h",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
+    name = "dst_evidence",
+    srcs = [
+        "dst_evidence.cc",
+    ],
+    hdrs = [
+        "dst_evidence.h",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
+    name = "dst_evidence",
+    srcs = [
+        "dst_evidence.cc",
+    ],
+    hdrs = [
+        "dst_evidence.h",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
+    name = "camera_util",
+    srcs = [
+        "camera_util.cc",
+    ],
+    hdrs = [
+        "camera_util.h",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
+    name = "information_filter",
+    srcs = [
+        "information_filter.cc",
+    ],
+    hdrs = [
+        "information_filter.h",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
+    name = "kalman_filter",
+    srcs = [
+        "kalman_filter.cc",
+    ],
+    hdrs = [
+        "kalman_filter.h",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
+    name = "kalman_filter",
+    srcs = [
+        "kalman_filter.cc",
+    ],
+    hdrs = [
+        "kalman_filter.h",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
+    name = "camera_util",
+    srcs = [
+        "camera_util.cc",
+    ],
+    hdrs = [
+        "camera_util.h",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
+    name = "base_filter",
+    hdrs = [
+        "base_filter.h",
+    ],
+    deps = [
+    ],
+)

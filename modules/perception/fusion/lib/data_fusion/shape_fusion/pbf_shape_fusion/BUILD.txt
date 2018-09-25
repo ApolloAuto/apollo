@@ -1,0 +1,26 @@
+// DO NOT MODIFY
+// THIS FILE IS GENERATED AUTOMATICALLY TO HELP WRITE BUILD FILE.
+// DELETE THIS FILE WHEN YOU HAVE CREATED THE COMPLETE BUILD FILE
+cc_library(
+    name = "pbf_shape_fusion",
+    srcs = [
+        "pbf_shape_fusion.cc",
+    ],
+    hdrs = [
+        "pbf_shape_fusion.h",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
+    name = "pbf_shape_fusion",
+    srcs = [
+        "pbf_shape_fusion.cc",
+    ],
+    hdrs = [
+        "pbf_shape_fusion.h",
+    ],
+    deps = [
+    ],
+)
