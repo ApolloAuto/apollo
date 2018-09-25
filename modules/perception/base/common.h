@@ -17,7 +17,6 @@
 #define MODULES_PERCEPTION_BASE_COMMON_H_
 
 #include <assert.h>
-#include "modules/perception/base/options_define.h"
 
 #ifndef PERCEPTION_CPU_ONLY
 
