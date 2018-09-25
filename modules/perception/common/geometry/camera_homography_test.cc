@@ -13,10 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include <gtest/gtest.h>
+#include "modules/perception/common/geometry/camera_homography.h"
+
+#include "gtest/gtest.h"
 
 #include "modules/perception/base/camera.h"
-#include "modules/perception/common/geometry/camera_homography.h"
 
 namespace apollo {
 namespace perception {
