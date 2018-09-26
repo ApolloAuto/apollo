@@ -829,8 +829,6 @@ int PlaneFitGroundDetector::fit_grid_with_neighbors(
   int nr_inliers = 0;
   int nr_inliers_best = -1;
   float angle_best = FLT_MAX;
-  int i = 0;
-  int j = 0;
   int rseed = I_DEFAULT_SEED;
   int indices_trial[] = {0, 0, 0};
   int nr_samples = candi.prune(_param.nr_samples_min_threshold,
@@ -845,13 +843,13 @@ int PlaneFitGroundDetector::fit_grid_with_neighbors(
   int r_n = 0;
   int c_n = 0;
   float angle = -1.f;
-  for (i = 0; i < nr_samples; ++i) {
+  for (int i = 0; i < nr_samples; ++i) {
     assert(candi[i] < (int)nr_points);
     i_copy3(point_cloud + (nr_point_element * candi[i]), pdst);
     pdst += _dim_point;
   }
   // generate plane hypothesis and vote
-  for (i = 0; i < _param.nr_ransac_iter_threshold; ++i) {
+  for (int i = 0; i < _param.nr_ransac_iter_threshold; ++i) {
     i_random_sample(indices_trial, 3, nr_samples, rseed);
     i_scale3(indices_trial, _dim_point);
     i_copy3(_pf_threeds + indices_trial[0], samples);
@@ -867,7 +865,7 @@ int PlaneFitGroundDetector::fit_grid_with_neighbors(
     // threshold
     psrc = _pf_threeds;
     nr_inliers = 0;
-    for (j = 0; j < nr_samples; ++j) {
+    for (int j = 0; j < nr_samples; ++j) {
       ptp_dist =
           i_plane_to_point_distance_w_unit_norm(hypothesis[i].params, psrc);
       if (ptp_dist < dist_thre) {
@@ -883,7 +881,7 @@ int PlaneFitGroundDetector::fit_grid_with_neighbors(
     }
   }
 
-  for (i = 0; i < neighbors.size(); ++i) {
+  for (size_t i = 0; i < neighbors.size(); ++i) {
     r_n = neighbors[i].first;
     c_n = neighbors[i].second;
     if (_ground_planes[r_n][c_n].is_valid()) {
@@ -891,7 +889,7 @@ int PlaneFitGroundDetector::fit_grid_with_neighbors(
           _ground_planes[r_n][c_n];
       psrc = _pf_threeds;
       nr_inliers = 0;
-      for (j = 0; j < nr_samples; ++j) {
+      for (int j = 0; j < nr_samples; ++j) {
         ptp_dist = i_plane_to_point_distance_w_unit_norm(
             hypothesis[i + _param.nr_ransac_iter_threshold].params, psrc);
         if (ptp_dist < dist_thre) {
@@ -909,7 +907,7 @@ int PlaneFitGroundDetector::fit_grid_with_neighbors(
   }
 
   nr_inliers_best = -1;
-  for (i = 0; i < nr_iter; ++i) {
+  for (int i = 0; i < nr_iter; ++i) {
     if (!(hypothesis[i].is_valid())) {
       continue;
     }
@@ -944,7 +942,7 @@ int PlaneFitGroundDetector::fit_grid_with_neighbors(
   nr_inliers = 0;
   psrc = _pf_threeds;
   pdst = _pf_threeds;
-  for (i = 0; i < nr_samples; ++i) {
+  for (int i = 0; i < nr_samples; ++i) {
     ptp_dist = i_plane_to_point_distance_w_unit_norm(groundplane.params, psrc);
     if (ptp_dist < dist_thre) {
       i_copy3(psrc, pdst);
@@ -1234,7 +1232,7 @@ bool PlaneFitGroundDetector::detect(const float *point_cloud,
   int nr_valid_grid = 0;
   unsigned int r = 0;
   unsigned int c = 0;
-  unsigned int iter = 0;
+  // unsigned int iter = 0;
   // filter to generate plane fitting candidates
   nr_candis = filter();
   // std::cout << "# of plane candidates: " << nr_candis << std::endl;
@@ -1244,7 +1242,7 @@ bool PlaneFitGroundDetector::detect(const float *point_cloud,
   // std::cout << "# of valid plane geometry (fitting): " << nr_valid_grid <<
   // std::endl;
   // smooth plane using neighborhood information:
-  for (iter = 0; iter < _param.nr_smooth_iter; ++iter) {
+  for (int iter = 0; iter < _param.nr_smooth_iter; ++iter) {
     nr_valid_grid = smooth();
   }
 
@@ -1332,7 +1330,8 @@ void i_plane_spher_to_eucli(const GroundPlaneSpherical &src,
     dst.set_status(src.get_status());
   }
 }
-} /*namespace idl*/
+
+} // namespace idl
 
 /*
 int PlaneFitGroundDetector::compare_z_16(const float* point_cloud,

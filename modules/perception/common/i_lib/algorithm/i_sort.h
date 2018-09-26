@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef I_LIB_ALGORITHM_I_SORT_H
-#define I_LIB_ALGORITHM_I_SORT_H
+#ifndef MODULES_PERCEPTION_COMMON_I_LIB_ALGORITHM_I_SORT_H_
+#define MODULES_PERCEPTION_COMMON_I_LIB_ALGORITHM_I_SORT_H_
 
 #include <assert.h>
 #include "../core/i_basic.h"
@@ -258,6 +258,6 @@ T i_quick_select(T *a, int n, int k, T *wa) {
   return (pivot); /*unreachable! put here to avoid warning*/
 }
 
-} /* namespace idl */
+} // namespace idl
 
-#endif
+#endif  // MODULES_PERCEPTION_COMMON_I_LIB_ALGORITHM_I_SORT_H_
