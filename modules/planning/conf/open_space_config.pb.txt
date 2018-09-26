@@ -1,5 +1,4 @@
-x_grid_resolution : 0.2
-y_grid_resolution : 0.2
+xy_grid_resolution : 0.2
 phi_grid_resolution : 0.05
 max_x : 25.0
 max_y : 25.0
@@ -7,5 +6,5 @@ min_x : -25.0
 min_y : -25.0
 max_steering : 0.6
 next_node_num : 10
-step_size : 1.0
+step_size : 0.5
 planning_horizon : 10

@@ -29,20 +29,43 @@ Node3d::Node3d(double x, double y, double phi,
   y_ = y;
   phi_ = phi;
   x_grid_ = static_cast<std::size_t>((x_ - open_space_conf.min_x()) /
-                                     open_space_conf.x_grid_resolution());
+                                     open_space_conf.xy_grid_resolution());
   y_grid_ = static_cast<std::size_t>((y_ - open_space_conf.min_y()) /
-                                     open_space_conf.y_grid_resolution());
-  phi_grid_ = static_cast<std::size_t>((phi_ - (- M_PI)) /
+                                     open_space_conf.xy_grid_resolution());
+  phi_grid_ = static_cast<std::size_t>((phi_ - (-M_PI)) /
                                        open_space_conf.phi_grid_resolution());
   index_ = phi_grid_ * (open_space_conf.max_x() - open_space_conf.min_x()) *
                (open_space_conf.max_y() - open_space_conf.min_y()) +
-           y_grid_ * (open_space_conf.max_x() - open_space_conf.min_x()) + x_grid_;
+           y_grid_ * (open_space_conf.max_x() - open_space_conf.min_x()) +
+           x_grid_;
 }
 
 Node3d::Node3d(double x, double y, double phi) {
   x_ = x;
   y_ = y;
   phi_ = phi;
+}
+
+Node3d::Node3d(double x, double y, double phi, std::vector<double> traversed_x,
+               std::vector<double> traversed_y,
+               std::vector<double> traversed_phi,
+               const PlannerOpenSpaceConfig& open_space_conf) {
+  x_ = x;
+  y_ = y;
+  phi_ = phi;
+  x_grid_ = static_cast<std::size_t>((x_ - open_space_conf.min_x()) /
+                                     open_space_conf.xy_grid_resolution());
+  y_grid_ = static_cast<std::size_t>((y_ - open_space_conf.min_y()) /
+                                     open_space_conf.xy_grid_resolution());
+  phi_grid_ = static_cast<std::size_t>((phi_ - (-M_PI)) /
+                                       open_space_conf.phi_grid_resolution());
+  index_ = phi_grid_ * (open_space_conf.max_x() - open_space_conf.min_x()) *
+               (open_space_conf.max_y() - open_space_conf.min_y()) +
+           y_grid_ * (open_space_conf.max_x() - open_space_conf.min_x()) +
+           x_grid_;
+  traversed_x_ = traversed_x;
+  traversed_y_ = traversed_y;
+  traversed_phi_ = traversed_phi;                
 }
 
 Box2d Node3d::GetBoundingBox(const common::VehicleParam& vehicle_param_) {
