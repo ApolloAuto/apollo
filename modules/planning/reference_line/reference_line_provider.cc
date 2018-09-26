@@ -26,6 +26,7 @@
 #include <limits>
 #include <utility>
 
+#include "cybertron/task/task.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/time/time.h"
 #include "modules/common/util/file.h"
@@ -169,10 +170,8 @@ void ReferenceLineProvider::UpdateReferenceLine(
 
 void ReferenceLineProvider::GenerateThread() {
   while (!is_stop_) {
-    std::this_thread::yield();
     constexpr int32_t kSleepTime = 50;  // milliseconds
-    std::this_thread::sleep_for(
-        std::chrono::duration<double, std::milli>(kSleepTime));
+    cybertron::SleepFor(std::chrono::milliseconds(kSleepTime));
     double start_time = Clock::NowInSeconds();
     if (!has_routing_) {
       AERROR << "Routing is not ready.";
