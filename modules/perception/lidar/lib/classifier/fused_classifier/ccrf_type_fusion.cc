@@ -14,20 +14,24 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/perception/lidar/lib/classifier/fused_classifier/ccrf_type_fusion.h"
+
 #include <string>
 #include <vector>
+
+#include "cybertron/common/log.h"
+#include "modules/common/util/file.h"
 #include "modules/perception/base/object_types.h"
 #include "modules/perception/base/point_cloud.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lib/io/file_util.h"
-#include "modules/perception/lib/io/protobuf_util.h"
-#include "modules/perception/lidar/lib/classifier/fused_classifier/proto/ccrf_type_fusion_config.pb.h"
+#include "modules/perception/proto/ccrf_type_fusion_config.pb.h"
 
 namespace apollo {
 namespace perception {
 namespace lidar {
-using base::ObjectPtr;
-using base::ObjectType;
+
+using ObjectPtr = std::shared_ptr<apollo::perception::base::Object>;
+using apollo::perception::base::ObjectType;
 
 bool CCRFOneShotTypeFusion::Init(const TypeFusionInitOption& option) {
   lib::ConfigManager* config_manager =
@@ -43,7 +47,7 @@ bool CCRFOneShotTypeFusion::Init(const TypeFusionInitOption& option) {
   config_file =
       lib::FileUtil::GetAbsolutePath(config_file, "ccrf_type_fusion.conf");
   CcrfTypeFusionConfig config;
-  CHECK(lib::ParseProtobufFromFile(config_file, &config));
+  CHECK(common::util::GetProtoFromFile(config_file, &config));
   std::string classifiers_property_file_path = lib::FileUtil::GetAbsolutePath(
       work_root, config.classifiers_property_file_path());
   CHECK(util::LoadMultipleMatricesFile(classifiers_property_file_path,
@@ -140,7 +144,7 @@ bool CCRFSequenceTypeFusion::Init(const TypeFusionInitOption& option) {
   config_file =
       lib::FileUtil::GetAbsolutePath(config_file, "ccrf_type_fusion.conf");
   CcrfTypeFusionConfig config;
-  CHECK(lib::ParseProtobufFromFile(config_file, &config));
+  CHECK(common::util::GetProtoFromFile(config_file, &config));
   std::string transition_property_file_path = lib::FileUtil::GetAbsolutePath(
       work_root, config.transition_property_file_path());
   s_alpha_ = config.transition_matrix_alpha();

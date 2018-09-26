@@ -29,4 +29,26 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "ccrf_type_fusion",
+    srcs = [
+        "ccrf_type_fusion.cc",
+    ],
+    hdrs = [
+        "ccrf_type_fusion.h",
+    ],
+    deps = [
+        ":util",
+        ":type_fusion_interface",
+        "//modules/common/util:file_util",
+        "//modules/perception/base:object",
+        "//modules/perception/base:point_cloud",
+        "//modules/perception/lib/config_manager:config_manager",
+        "//modules/perception/lib/io:file_util",
+        "//modules/perception/lidar/common:object_sequence",
+        "//modules/perception/proto:ccrf_type_fusion_config_proto",
+        "//framework:cybertron",
+    ],
+)
+
 cpplint()
