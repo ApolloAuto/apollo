@@ -17,6 +17,7 @@
 #define MODULES_PERCEPTION_LIDAR_LIB_SEGMENTATION_CNNSEG_FEATURE_GENERATOR_H_
 
 #include <cmath>
+#include <memory>
 #include <string>
 #include <vector>
 

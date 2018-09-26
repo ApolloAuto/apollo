@@ -58,7 +58,7 @@ class GroundGrid {
     size_ = rows_ * cols_;
     data_.resize(size_);
     nodes_.resize(rows_);
-    for (size_t i = 0; i < rows_; ++i) {
+    for (int i = 0; i < rows_; ++i) {
       nodes_[i] = data_.data() + i * cols_;
     }
     Reset();

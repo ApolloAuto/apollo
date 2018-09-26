@@ -73,10 +73,10 @@ bool HdmapROIFilter::Init(const ROIFilterInitOptions& options) {
 
   // output input parameters
   AINFO << " HDMap Roi Filter Parameters: "
-           << " range: " << range_ << " cell_size: " << cell_size_
-           << " extend_dist: " << extend_dist_
-           << " no_edge_table: " << no_edge_table_
-           << " set_roi_service: " << set_roi_service_;
+        << " range: " << range_ << " cell_size: " << cell_size_
+        << " extend_dist: " << extend_dist_
+        << " no_edge_table: " << no_edge_table_
+        << " set_roi_service: " << set_roi_service_;
   return true;
 }
 
@@ -116,11 +116,13 @@ bool HdmapROIFilter::Filter(const ROIFilterOptions& options,
 
   // set roi points label
   if (ret) {
-    for (auto index : frame->roi_indices.indices) {
-       auto& pt_label = frame->cloud->points_label().at(index);
-      // TODO(all) fix this block
-      // pt_label = static_cast<uint8_t>(LidarPointLabel::ROI);
+    /*
+     TODO(all) fix this block
+     for (auto index : frame->roi_indices.indices) {
+        auto& pt_label = frame->cloud->points_label().at(index);
+        pt_label = static_cast<uint8_t>(LidarPointLabel::ROI);
     }
+    */
   }
 
   // set roi service

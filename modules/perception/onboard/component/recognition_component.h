@@ -16,7 +16,10 @@
 #ifndef MODULES_PERCEPTION_ONBOARD_COMPONENT_RECOGNITION_COMPONENT_H_
 #define MODULES_PERCEPTION_ONBOARD_COMPONENT_RECOGNITION_COMPONENT_H_
 
+#include <memory>
+
 #include "cybertron/cybertron.h"
+
 #include "modules/perception/base/sensor_meta.h"
 #include "modules/perception/lidar/app/lidar_obstacle_tracking.h"
 #include "modules/perception/onboard/component/lidar_inner_component_messages.h"
