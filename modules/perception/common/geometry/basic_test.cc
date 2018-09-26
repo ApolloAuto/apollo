@@ -28,7 +28,6 @@ namespace common {
 
 using base::PointF;
 using base::PointCloud;
-using base::AttributePointCloud;
 
 TEST(GeometryBasicTest, cross_product_test) {
   Eigen::Vector2f p1(0.0, 0.0);
@@ -153,7 +152,7 @@ TEST(GeometryBasicTest, convert_cartesian_to_polar_coordinate) {
 
 TEST(GeometryCommonTest, is_point_xy_in_polygon_2d_xy) {
   base::PointF pt, temp;
-  AttributePointCloud<PointF> polygon;
+  PointCloud<PointF> polygon;
   temp.x = 10.f;
   temp.y = 10.f;
   temp.z = 10.f;
@@ -221,7 +220,7 @@ TEST(GeometryCommonTest, is_point_in_bbox) {
 TEST(GeometryCommonTest, calculate_bbox_size_center_2d_xy) {
   Eigen::Vector3f size;
   Eigen::Vector3d center;
-  AttributePointCloud<PointF> cloud;
+  PointCloud<PointF> cloud;
   base::PointF temp;
   temp.x = 10.f;
   temp.y = 10.f;
@@ -237,7 +236,7 @@ TEST(GeometryCommonTest, calculate_bbox_size_center_2d_xy) {
   cloud.push_back(temp);
 
   Eigen::Vector3f direction(1.0, 0.0, 0.0);
-  CalculateBBoxSizeCenter2DXY<AttributePointCloud<PointF>>(cloud, direction,
+  CalculateBBoxSizeCenter2DXY<PointCloud<PointF>>(cloud, direction,
                                                            &size, &center);
   EXPECT_NEAR(size(0), 30.f, std::numeric_limits<float>::epsilon());
   EXPECT_NEAR(size(1), 25.f, std::numeric_limits<float>::epsilon());
@@ -283,7 +282,7 @@ TEST(GeometryCommonTest, calculate_iou_2d_xy) {
 
 TEST(GeometryCommonTest, calculate_dist_and_dir_to_segs) {
   Eigen::Vector3f pt(0.0, 0.0, 0.0);
-  AttributePointCloud<PointF> cloud;
+  PointCloud<PointF> cloud;
   base::PointF temp;
   temp.x = 10.f;
   temp.y = 0.f;
@@ -316,7 +315,7 @@ TEST(GeometryCommonTest, calculate_dist_and_dir_to_segs) {
 
 TEST(GeometryCommonTest, calculate_dist_and_dir_to_boundary) {
   Eigen::Vector3f pt(0.0, 0.0, 0.0);
-  AttributePointCloud<PointF> left, right;
+  PointCloud<PointF> left, right;
   base::PointF temp;
   temp.x = 10.f;
   temp.y = 0.f;
@@ -350,8 +349,8 @@ TEST(GeometryCommonTest, calculate_dist_and_dir_to_boundary) {
 
 TEST(GeometryCommonTest, calculate_dist_and_dir_to_boundary_list) {
   Eigen::Vector3f pt(0.0, 0.0, 0.0);
-  AttributePointCloud<PointF> left, right;
-  std::vector<AttributePointCloud<PointF>> left_list, right_list;
+  PointCloud<PointF> left, right;
+  std::vector<PointCloud<PointF>> left_list, right_list;
   base::PointF temp;
   temp.x = 10.f;
   temp.y = 0.f;
