@@ -33,6 +33,10 @@ HybridAStar::HybridAStar() {
   max_steer_ = open_space_conf_.max_steering();
   step_size_ = open_space_conf_.step_size();
   xy_grid_resolution_ = open_space_conf_.xy_grid_resolution();
+  back_penalty_ = open_space_conf_.back_penalty();
+  gear_switch_penalty_ = open_space_conf_.gear_switch_penalty();
+  steer_penalty_ = open_space_conf_.steer_penalty();
+  steer_change_penalty_ = open_space_conf_.steer_change_penalty();
 }
 
 bool HybridAStar::AnalyticExpansion(std::shared_ptr<Node3d> current_node,
@@ -76,6 +80,7 @@ void HybridAStar::LoadRSPinCS(const ReedSheppPath* reeds_shepp_to_end,
       reeds_shepp_to_end->phi.back(), reeds_shepp_to_end->x,
       reeds_shepp_to_end->y, reeds_shepp_to_end->phi, open_space_conf_));
   end_node->SetPre(current_node);
+  end_node->SetTrajCost(CalculateRSPCost(reeds_shepp_to_end));
   close_set_.insert(std::make_pair(end_node->GetIndex(), end_node));
 }
 
@@ -123,20 +128,74 @@ std::shared_ptr<Node3d> HybridAStar::Next_node_generator(
       new Node3d(last_x, last_y, last_phi, intermediate_x, intermediate_y,
                  intermediate_phi, open_space_conf_));
   next_node->SetPre(current_node);
-  next_node->SetDirec(traveled_distance>0);
+  next_node->SetDirec(traveled_distance > 0);
+  next_node->SetSteer(steering);
+
   return next_node;
 }
 
-bool CalculateCost(std::shared_ptr<Node3d> current_node, std::shared_ptr<Node3d> next_node) {
-  //evaluate cost on the trajectory and add current cost
-  //evaluate heuristic cost
-  return true;
+void HybridAStar::CalculateNodeCost(std::shared_ptr<Node3d> current_node,
+                                    std::shared_ptr<Node3d> next_node,
+                                    const ReedSheppPath* reeds_shepp_to_end) {
+  // evaluate cost on the trajectory and add current cost
+  double piecewise_cost = 0.0;
+  if (next_node->GetDirec()) {
+    piecewise_cost += xy_grid_resolution_;
+  } else {
+    piecewise_cost += xy_grid_resolution_ * back_penalty_;
+  }
+  if (current_node->GetDirec() != next_node->GetDirec()) {
+    piecewise_cost += gear_switch_penalty_;
+  }
+  piecewise_cost += steer_penalty_ * std::abs(next_node->GetSteer());
+  piecewise_cost += steer_change_penalty_ *
+                    std::abs(next_node->GetSteer() - current_node->GetSteer());
+  next_node->SetTrajCost(current_node->GetTrajCost() + piecewise_cost);
+  // evaluate heuristic cost
+  next_node->SetHeuCost(NonHoloNoObstacleHeuristic(reeds_shepp_to_end));
 }
 
-double NonHoloNoObstacleHeuristic() {
-  return 0.0;
+double HybridAStar::NonHoloNoObstacleHeuristic(
+    const ReedSheppPath* reeds_shepp_to_end) {
+  return CalculateRSPCost(reeds_shepp_to_end);
 }
 
+double HybridAStar::CalculateRSPCost(const ReedSheppPath* reeds_shepp_to_end) {
+  double RSP_cost = 0.0;
+  for (std::size_t i = 0; i < reeds_shepp_to_end->segs_lengths.size(); i++) {
+    if (reeds_shepp_to_end->segs_lengths[i] > 0.0) {
+      RSP_cost += reeds_shepp_to_end->segs_lengths[i];
+    } else {
+      RSP_cost += reeds_shepp_to_end->segs_lengths[i] * back_penalty_;
+    }
+  }
+
+  for (std::size_t i = 0; i < reeds_shepp_to_end->segs_lengths.size() - 1;
+       i++) {
+    if (reeds_shepp_to_end->segs_lengths[i] *
+            reeds_shepp_to_end->segs_lengths[i + 1] <
+        0.0) {
+      RSP_cost += gear_switch_penalty_;
+    }
+  }
+  // steering cost
+  bool first_nonS_flag = false;
+  char last_turning;
+  for (std::size_t i = 0; i < reeds_shepp_to_end->segs_types.size(); i++) {
+    if (reeds_shepp_to_end->segs_types[i] != 'S') {
+      RSP_cost += steer_penalty_ * max_steer_;
+      if (!first_nonS_flag) {
+        last_turning = reeds_shepp_to_end->segs_types[i];
+        first_nonS_flag = true;
+        continue;
+      }
+      if (reeds_shepp_to_end->segs_types[i] != last_turning) {
+        RSP_cost += 2 * steer_change_penalty_ * max_steer_;
+      }
+    }
+  }
+  return RSP_cost;
+}
 
 bool HybridAStar::Plan(double sx, double sy, double sphi, double ex, double ey,
                        double ephi, std::vector<const Obstacle*> obstacles) {
@@ -184,7 +243,9 @@ bool HybridAStar::Plan(double sx, double sy, double sphi, double ex, double ey,
 
       if (open_set_.find(next_node->GetIndex()) == open_set_.end()) {
         // TODO: only calculate cost here
-
+        ReedSheppPath reeds_shepp_heuristic;
+        AnalyticExpansion(next_node, &reeds_shepp_heuristic);
+        CalculateNodeCost(current_node, next_node, &reeds_shepp_heuristic);
         open_set_.insert(std::make_pair(next_node->GetIndex(), next_node));
         open_pq_.push(
             std::make_pair(next_node->GetIndex(), next_node->GetCost()));

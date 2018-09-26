@@ -49,6 +49,7 @@ class Node3d {
   virtual ~Node3d() = default;
   Box2d GetBoundingBox(const common::VehicleParam& vehicle_param_);
   double GetCost() { return traj_cost_ + heuristic_cost_; };
+  double GetTrajCost() { return traj_cost_; };
   std::size_t GetGridX() { return x_grid_; };
   std::size_t GetGridY() { return y_grid_; };
   std::size_t GetGridPhi() { return phi_grid_; };
@@ -57,8 +58,13 @@ class Node3d {
   double GetPhi() { return phi_; };
   bool operator==(const std::shared_ptr<Node3d> right) const;
   std::size_t GetIndex() { return index_; };
+  bool GetDirec() { return direction_; };
+  double GetSteer() { return steering_; };
   void SetPre(std::shared_ptr<Node3d> pre_node) { pre_node_ = pre_node; };
-  void SetDirec(bool direction) {direction_ = direction;};
+  void SetDirec(bool direction) { direction_ = direction; };
+  void SetTrajCost(double cost) { traj_cost_ = cost; };
+  void SetHeuCost(double cost) { heuristic_cost_ = cost; };
+  void SetSteer(double steering) { steering_ = steering; };
 
  private:
   double x_ = 0.0;

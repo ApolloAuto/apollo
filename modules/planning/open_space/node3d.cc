@@ -65,7 +65,7 @@ Node3d::Node3d(double x, double y, double phi, std::vector<double> traversed_x,
            x_grid_;
   traversed_x_ = traversed_x;
   traversed_y_ = traversed_y;
-  traversed_phi_ = traversed_phi;                
+  traversed_phi_ = traversed_phi;
 }
 
 Box2d Node3d::GetBoundingBox(const common::VehicleParam& vehicle_param_) {

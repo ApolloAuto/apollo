@@ -31,9 +31,9 @@
 
 #include "cybertron/common/log.h"
 #include "cybertron/common/macros.h"
-#include "modules/common/math/math_utils.h"
 #include "modules/common/configs/proto/vehicle_config.pb.h"
 #include "modules/common/configs/vehicle_config_helper.h"
+#include "modules/common/math/math_utils.h"
 #include "modules/planning/common/obstacle.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/constraint_checker/collision_checker.h"
@@ -55,7 +55,7 @@ class HybridAStar {
   explicit HybridAStar();
   virtual ~HybridAStar() = default;
   bool Plan(double sx, double sy, double sphi, double ex, double ey,
-                       double ephi, std::vector<const Obstacle*> obstacles);
+            double ephi, std::vector<const Obstacle*> obstacles);
 
  private:
   // not complete
@@ -72,11 +72,14 @@ class HybridAStar {
                    std::shared_ptr<Node3d> current_node);
   std::shared_ptr<Node3d> Next_node_generator(
       std::shared_ptr<Node3d> current_node, std::size_t next_node_index);
-  bool CalculateCost(std::shared_ptr<Node3d> current_node, std::shared_ptr<Node3d> next_node);
+  void CalculateNodeCost(std::shared_ptr<Node3d> current_node,
+                         std::shared_ptr<Node3d> next_node,
+                         const ReedSheppPath* reeds_shepp_to_end);
   double HeuristicCost();
   double HoloObstacleHeuristic();
-  double NonHoloNoObstacleHeuristic();
+  double NonHoloNoObstacleHeuristic(const ReedSheppPath* reeds_shepp_to_end);
   double EuclidDist();
+  double CalculateRSPCost(const ReedSheppPath* reeds_shepp_to_end);
   Result GetResult();
 
  private:
@@ -87,6 +90,10 @@ class HybridAStar {
   double max_steer_ = 0.0;
   double step_size_ = 0.0;
   double xy_grid_resolution_ = 0.0;
+  double back_penalty_ = 0.0;
+  double gear_switch_penalty_ = 0.0;
+  double steer_penalty_ = 0.0;
+  double steer_change_penalty_ = 0.0;
   std::vector<const Obstacle*> obstacles_;
   std::shared_ptr<Node3d> start_node_;
   std::shared_ptr<Node3d> end_node_;
