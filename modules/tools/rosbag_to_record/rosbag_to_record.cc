@@ -196,7 +196,9 @@ int main(int argc, char** argv) {
       pb_msg->SerializeToString(&serialized_str);
     } else if (channel_name == "/apollo/sensor/gnss/corrected_imu") {
       auto pb_msg = m.instantiate<apollo::localization::CorrectedImu>();
-      pb_msg->SerializeToString(&serialized_str);
+      if (pb_msg) {
+      	pb_msg->SerializeToString(&serialized_str);
+      }
     } else if (channel_name == "/apollo/sensor/gnss/odometry") {
       auto pb_msg = m.instantiate<apollo::localization::Gps>();
       pb_msg->SerializeToString(&serialized_str);
@@ -266,7 +268,7 @@ int main(int argc, char** argv) {
       auto pb_msg = m.instantiate<apollo::drivers::gnss::GnssBestPose>();
       pb_msg->SerializeToString(&serialized_str);
     } else if (channel_name == "/apollo/sensor/gnss/gnss_status") {
-      auto pb_msg = m.instantiate<apollo::drivers::gnss_status::GnssStatus>();
+      auto pb_msg = m.instantiate<apollo::drivers::gnss::GnssStatus>();
       pb_msg->SerializeToString(&serialized_str);
     } else if (channel_name == "/apollo/sensor/gnss/imu") {
       auto pb_msg = m.instantiate<apollo::drivers::gnss::Imu>();

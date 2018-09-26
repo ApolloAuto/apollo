@@ -101,7 +101,7 @@ void ChannelInfo::InitChannels() {
       "/apollo/sensor/delphi_esr", "apollo.drivers.DelphiESR");
   InitChannelInfo<apollo::drivers::gnss::GnssBestPose>(
       "/apollo/sensor/gnss/best_pose", "apollo.drivers.gnss.GnssBestPose");
-  InitChannelInfo<apollo::drivers::gnss_status::GnssStatus>(
+  InitChannelInfo<apollo::drivers::gnss::GnssStatus>(
       "/apollo/sensor/gnss/gnss_status", "apollo.drivers.gnss_status.GnssStatus");
   InitChannelInfo<apollo::drivers::gnss::Imu>(
       "/apollo/sensor/gnss/imu", "apollo.drivers.gnss.Imu");
