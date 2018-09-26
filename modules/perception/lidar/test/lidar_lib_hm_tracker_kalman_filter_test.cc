@@ -45,7 +45,8 @@ class KalmanFilterTest : public testing::Test {
     putenv(cybertron_path);
     char *module_path = "MODULE_PATH=";
     putenv(module_path);
-    lib::FLAGS_work_root = "./lidar_test_data/lib/tracker/hm_tracker";
+    lib::FLAGS_work_root =
+        "modules/perception/testdata/lidar/lib/tracker/hm_tracker";
     object_builder_ = new ObjectBuilder();
     filter_.reset(new KalmanFilter);
     config_manager_ = lib::Singleton<lib::ConfigManager>::get_instance();

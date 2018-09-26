@@ -71,7 +71,7 @@ TEST(CNNSegmentationTest, cnn_segmentation_sequence_test) {
   putenv(cybertron_path);
   char module_path[100] = "MODULE_PATH=";
   putenv(module_path);
-  lib::FLAGS_work_root = "./lidar_test_data/lib/segmentation/cnnseg/";
+  lib::FLAGS_work_root = "modules/perception/testdata/lidar/lib/segmentation/cnnseg/";
 
   std::shared_ptr<CNNSegmentation> segmentation(new CNNSegmentation);
   SegmentationOptions options;
@@ -86,8 +86,8 @@ TEST(CNNSegmentationTest, cnn_segmentation_sequence_test) {
   EXPECT_TRUE(segmentation->InitClusterAndBackgroundSegmentation());
 
   std::string pcd_path =
-      "./lidar_test_data/lib/segmentation/cnnseg/data/perception/modules/"
-      "perception/lidar/files/";
+      "modules/perception/testdata/lidar/lib/"
+      "segmentation/cnnseg/data/perception/modules/perception/lidar/files/";
   std::vector<std::string> pcd_file_names;
   lib::FileUtil::GetFileList(pcd_path, ".pcd", &pcd_file_names);
   std::string file_name;
@@ -118,20 +118,22 @@ TEST(CNNSegmentationTest, cnn_segmentation_test) {
   putenv(cybertron_path);
   char module_path[100] = "MODULE_PATH=";
   putenv(module_path);
-  lib::FLAGS_work_root = "./lidar_test_data/lib/segmentation/cnnseg/";
+  lib::FLAGS_work_root =
+      "modules/perception/testdata/lidar/lib/segmentation/cnnseg/";
 
   // load pcd data
   base::PointFCloudPtr pc_ptr;
   pc_ptr.reset(new base::PointFCloud);
-  std::string filename =
-      "./lidar_test_data/lib/segmentation/cnnseg/pcd_data/3_car_1_person.pcd";
+  std::string filename = "modules/perception/testdata/lidar/lib/"
+      "segmentation/cnnseg/pcd_data/3_car_1_person.pcd";
   bool ret = LoadPCDFile(filename, pc_ptr);
   CHECK(ret) << "Failed to load " << filename;
   // load non ground indices
   base::PointIndices non_ground_indices;
   auto& indices = non_ground_indices.indices;
   std::ifstream in_file(
-      "./lidar_test_data/lib/segmentation/cnnseg/pcd_data/3_car_1_person.txt");
+      "modules/perception/testdata/lidar/lib/"
+      "segmentation/cnnseg/pcd_data/3_car_1_person.txt");
   ASSERT_TRUE(in_file.good());
   std::string line;
   while (getline(in_file, line)) {

@@ -104,13 +104,14 @@ TEST(FeatureGeneratorTest, feature_generator_test) {
   putenv(cybertron_path);
   char module_path[100] = "MODULE_PATH=";
   putenv(module_path);
-  lib::FLAGS_work_root = "./lidar_test_data/lib/segmentation/cnnseg/";
+  lib::FLAGS_work_root = "modules/perception/testdata/lidar/lib/segmentation/cnnseg/";
 
   // load pcd data
   base::PointFCloudPtr pc_ptr;
   pc_ptr.reset(new base::PointFCloud);
   std::string filename =
-      "./lidar_test_data/lib/segmentation/cnnseg/pcd_data/3_car_1_person.pcd";
+      "modules/perception/testdata/lidar/lib/segmentation" +
+      "/cnnseg/pcd_data/3_car_1_person.pcd";
   bool ret = LoadPCLPCD(filename, pc_ptr.get());
   CHECK(ret) << "Failed to load " << filename;
 

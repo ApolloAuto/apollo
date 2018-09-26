@@ -31,7 +31,8 @@ class PointCloudPreprocessorTest : public testing::Test {
     putenv(cybertron_path);
     char module_path[100] = "MODULE_PATH=";
     putenv(module_path);
-    lib::FLAGS_work_root = "./lidar_test_data/lib/pointcloud_preprocessor";
+    lib::FLAGS_work_root =
+        "modules/perception/testdata/lidar/lib/pointcloud_preprocessor";
   }
   void TearDown() {}
 

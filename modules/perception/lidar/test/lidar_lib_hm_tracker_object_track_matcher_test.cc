@@ -44,7 +44,8 @@ class ObjectTrackMatcherTest : public testing::Test {
     putenv(cybertron_path);
     char* module_path = "MODULE_PATH=";
     putenv(module_path);
-    lib::FLAGS_work_root = "./lidar_test_data/lib/tracker/hm_tracker";
+    lib::FLAGS_work_root =
+        "modules/perception/testdata/lidar/lib/tracker/hm_tracker";
     object_builder_ = new ObjectBuilder();
     config_manager_ = lib::Singleton<lib::ConfigManager>::get_instance();
     CHECK_NOTNULL(config_manager_);
@@ -63,7 +64,7 @@ class ObjectTrackMatcherTest : public testing::Test {
 
 bool ConstructPointCloud(std::vector<base::ObjectPtr>* objects) {
   std::string pcd_data(
-      "./lidar_test_data/lib/tracker/hm_tracker/data/objects.pcd");
+      "modules/perception/testdata/lidar/lib/tracker/hm_tracker/data/objects.pcd");
   std::ifstream cluster_ifs(pcd_data.c_str(), std::ifstream::in);
   std::string point_buf;
   while (cluster_ifs.good()) {

@@ -43,7 +43,7 @@ class LidarLibROIServiceFilterTest : public testing::Test {
     char* module_path = "MODULE_PATH=";
     putenv(module_path);
     lib::FLAGS_work_root =
-        "./lidar_test_data/lib/roi_filter/roi_service_filter";
+        "modules/perception/testdata/lidar/lib/roi_filter/roi_service_filter";
     lib::FLAGS_config_manager_path = "./conf";
     lib::ConfigManager* config_manager =
         lib::Singleton<lib::ConfigManager>::get_instance();
@@ -59,10 +59,10 @@ class LidarLibROIServiceFilterTest : public testing::Test {
 
 void MockData(LidarFrame* frame) {
   std::string pcd =
-      "./lidar_test_data/lib/roi_filter/"
+      "modules/perception/testdata/lidar/lib/roi_filter/"
       "roi_service_filter/data/pcd/1532063882.176900.pcd";
   std::string pose =
-      "./lidar_test_data/lib/roi_filter/"
+      "modules/perception/testdata/lidar/lib/roi_filter/"
       "roi_service_filter/data/pose/1532063882.176900.pose";
   // a. load pcd
   frame->cloud = base::PointFCloudPool::Instance().Get();
