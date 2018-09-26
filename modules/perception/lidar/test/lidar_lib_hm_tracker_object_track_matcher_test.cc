@@ -95,7 +95,7 @@ void ConstructTrackedObjects(const std::vector<base::ObjectPtr>& objects,
   // Construct tracked objects via necessary transformation & feature computing
   int num_objects = objects.size();
   CHECK(objects.size() == tracked_objects->size());
-  // LOG_INFO<< "test1" <<objects.size();
+  // AINFO<< "test1" <<objects.size();
   for (size_t i = 0; i < num_objects; ++i) {
     ((*tracked_objects)[i])->AttachObject(objects[i], pose);
     // compute foreground objects' shape feature
@@ -116,7 +116,7 @@ TEST_F(ObjectTrackMatcherTest, foreground_matcher) {
   EXPECT_EQ(6, objects.size());
   EXPECT_TRUE(object_builder_->Build(builder_options, frame));
 
-  // LOG_INFO<< "to string" <<objects[0]->ToString();
+  // AINFO<< "to string" <<objects[0]->ToString();
   Eigen::Affine3d pose(Eigen::Affine3d::Identity());
   // pose.AffinePart = Eigen::Matrix3d::Identity();
   // pose.LinearPart = Eigen::vector3d::Zero();
@@ -124,7 +124,7 @@ TEST_F(ObjectTrackMatcherTest, foreground_matcher) {
   TrackedObjectPool::Instance().BatchGet(frame->segmented_objects.size(),
                                          &tracked_objects);
   ConstructTrackedObjects(objects, &tracked_objects, pose);
-  // LOG_INFO<< "tracked object size " <<tracked_objects.size();
+  // AINFO<< "tracked object size " <<tracked_objects.size();
   std::vector<TrackDataPtr> tracks_data;
   std::vector<TrackedObjectPtr> foreground_tracked_objects;
   std::vector<Eigen::VectorXf> foreground_predicts;

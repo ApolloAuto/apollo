@@ -68,14 +68,14 @@ void TrackPostProcessor::SmoothTrackVelocity(TrackDataPtr track_data) {
   }
 
   if (need_keep_motion && (!current_object->converged)) {
-    // LOG_INFO << "track " << track_data->track_id_ << " filterrrr keep
+    // AINFO << "track " << track_data->track_id_ << " filterrrr keep
     // motion";
     Eigen::Vector3d current_velocity = Eigen::Vector3d::Zero();
     current_velocity = previous_object->output_velocity;
     current_object->output_velocity = current_velocity;
     UpdateTrackConvergenceState(track_data);
     UpdateTrackVelocityOnlineCovariance(track_data);
-    LOG_INFO << "TrackPostProcessor::keep motion because of extraodinary "
+    AINFO << "TrackPostProcessor::keep motion because of extraodinary "
                 "acceleration.";
     // keep static hypothesis
     return;
@@ -86,11 +86,11 @@ void TrackPostProcessor::SmoothTrackVelocity(TrackDataPtr track_data) {
                               CheckStaticHypothesisByState(track_data);
 
   if (is_static_hypothesis) {
-    // LOG_INFO << "track " << track_data->track_id_ << " filterrrr static";
+    // AINFO << "track " << track_data->track_id_ << " filterrrr static";
     current_object->output_velocity = Eigen::Vector3d::Zero();
     UpdateTrackConvergenceState(track_data);
     UpdateTrackVelocityOnlineCovariance(track_data);
-    LOG_INFO
+    AINFO
         << "TrackPostProcessor::set velocity to zero because of noise claping.";
   }
 }
@@ -233,7 +233,7 @@ bool TrackPostProcessor::CheckStaticHypothesisByVelocityAngleChange(
       reasonable_angle_change_maximum;
   if (reasonable_angle_change_maximum < 0 ||
       reasonable_angle_change_maximum > M_PI) {
-    LOG_WARN
+    AWARN
         << "illegal angle change maximum! use default one (PI / 4) instead";
     local_reasonable_angle_change_maximum = M_PI / 4.0;
   }

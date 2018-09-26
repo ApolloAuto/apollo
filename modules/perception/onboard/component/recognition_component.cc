@@ -108,7 +108,7 @@ bool RecognitionComponent::InternalProc(
   if (ret.error_code != lidar::LidarErrorCode::Succeed) {
     out_message->error_code_ =
         apollo::common::ErrorCode::PERCEPTION_ERROR_PROCESS;
-    LOG_ERROR << "Lidar recognition process error, " << ret.log;
+    AERROR << "Lidar recognition process error, " << ret.log;
     return true;
   }
   // TODO(shigintmin)

@@ -44,15 +44,15 @@ bool ObjectFilterBank::Init(const ObjectFilterInitOptions& options) {
     BaseObjectFilter* filter =
         BaseObjectFilterRegisterer::GetInstanceByName(name);
     if (!filter) {
-      LOG_INFO << "Failed to find object filter: " << name << ", skipped";
+      AINFO << "Failed to find object filter: " << name << ", skipped";
       continue;
     }
     if (!filter->Init()) {
-      LOG_INFO << "Failed to init object filter: " << name << ", skipped";
+      AINFO << "Failed to init object filter: " << name << ", skipped";
       continue;
     }
     filter_bank_.push_back(filter);
-    LOG_INFO << "Filter bank add filter: " << name;
+    AINFO << "Filter bank add filter: " << name;
   }
   return true;
 }
@@ -62,10 +62,10 @@ bool ObjectFilterBank::Filter(const ObjectFilterOptions& options,
   size_t object_number = frame->segmented_objects.size();
   for (auto& filter : filter_bank_) {
     if (!filter->Filter(options, frame)) {
-      LOG_INFO << "Failed to filter objects in: " << filter->Name();
+      AINFO << "Failed to filter objects in: " << filter->Name();
     }
   }
-  LOG_INFO << "Object filter bank, filtered objects size: from "
+  AINFO << "Object filter bank, filtered objects size: from "
            << object_number << " to " << frame->segmented_objects.size();
   return true;
 }

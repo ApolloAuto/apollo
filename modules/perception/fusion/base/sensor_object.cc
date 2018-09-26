@@ -15,8 +15,6 @@
  *****************************************************************************/
 #include "modules/perception/fusion/base/sensor_object.h"
 
-#include <assert.h>
-
 #include "modules/perception/base/object_pool_types.h"
 #include "modules/perception/common/sensor_manager/sensor_manager.h"
 #include "modules/perception/fusion/base/sensor_frame.h"
@@ -43,7 +41,7 @@ double SensorObject::GetTimestamp() const {
 }
 
 bool SensorObject::GetRelatedFramePose(Eigen::Affine3d* pose) const {
-  assert(pose != nullptr);
+  CHECK_NOTNULL(pose);
   if (!this->CheckFrameExist()) {
     return false;
   }

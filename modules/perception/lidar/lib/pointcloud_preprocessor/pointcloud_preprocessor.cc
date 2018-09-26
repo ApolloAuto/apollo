@@ -143,7 +143,7 @@ bool PointCloudPreprocessor::Preprocess(
     }
     frame->cloud->resize(i);
     TransformCloud(frame->cloud, frame->lidar2world_pose, frame->world_cloud);
-    LOG_INFO << "Preprocessor filter points: " << size << " to " << i;
+    AINFO << "Preprocessor filter points: " << size << " to " << i;
   }
   return true;
 }

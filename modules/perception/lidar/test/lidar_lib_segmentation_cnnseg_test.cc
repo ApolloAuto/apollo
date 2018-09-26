@@ -30,7 +30,7 @@ bool LoadPCDFile(const std::string& file_path, base::PointFCloudPtr cloud_out) {
   int ret = 0;
   pcl::PointCloud<pcl::PointXYZI> org_cloud;
   if ((ret = pcl::io::loadPCDFile(file_path, org_cloud)) < 0) {
-    LOG_ERROR << "Failed to load pcd file: " << file_path << " " << ret;
+    AERROR << "Failed to load pcd file: " << file_path << " " << ret;
     return false;
   }
 
@@ -53,11 +53,11 @@ bool LoadPCDFile(const std::string& file_path, base::PointFCloudPtr cloud_out) {
 }
 
 void PrintObjects(const std::vector<base::ObjectPtr>& objects) {
-  LOG_INFO << "Total objects num: " << objects.size();
+  AINFO << "Total objects num: " << objects.size();
   int obj_id = 0;
   for (auto object : objects) {
     unsigned cloud_size = object->lidar_supplement.cloud.size();
-    LOG_INFO << "Point num of Segment: " << cloud_size;
+    AINFO << "Point num of Segment: " << cloud_size;
     std::cout << "-- Object " << obj_id++ << " : ";
     std::cout << object->ToString() << ", type_probs: " << object->type_probs[0]
               << ", " << object->type_probs[1] << ", " << object->type_probs[2]

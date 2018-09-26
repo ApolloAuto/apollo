@@ -89,7 +89,7 @@ size_t SppCCDetector::Detect(SppLabelImage* labels) {
   worker_.WakeUp();  // for next use
   double collect_time = timer.toc(true);
 
-  LOG_INFO << "SppSegCC2D: init: " << init_time << "\tsync: " << sync_time
+  AINFO << "SppSegCC2D: init: " << init_time << "\tsync: " << sync_time
            << "\ttraverse: " << traverse_time << "\tunion: " << union_time
            << "\tcollect: " << collect_time << "\t#obj: " << num;
 

@@ -51,18 +51,18 @@ bool ROIBoundaryFilter::Init(const ObjectFilterInitOptions& options) {
 bool ROIBoundaryFilter::Filter(const ObjectFilterOptions& options,
                                LidarFrame* frame) {
   if (!frame) {
-    LOG_INFO << "Lidar frame is nullptr.";
+    AINFO << "Lidar frame is nullptr.";
     return false;
   }
   if (!frame->hdmap_struct) {
-    LOG_INFO << "HDMap struct is nullptr.";
+    AINFO << "HDMap struct is nullptr.";
     return true;
   }
   if (frame->hdmap_struct->road_boundary.size() +
           frame->hdmap_struct->road_polygons.size() +
           frame->hdmap_struct->junction_polygons.size() ==
       0) {
-    LOG_INFO << "Donot find roi polygons, skip boundary filter.";
+    AINFO << "Donot find roi polygons, skip boundary filter.";
     for (auto& object : frame->segmented_objects) {
       object->lidar_supplement.is_in_roi = true;
     }
@@ -92,7 +92,7 @@ bool ROIBoundaryFilter::Filter(const ObjectFilterOptions& options,
     }
   }
   objects.resize(count);
-  LOG_INFO << "Roi boundary filter, " << objects_valid_flag_.size() << " to "
+  AINFO << "Roi boundary filter, " << objects_valid_flag_.size() << " to "
            << count;
   return true;
 }
@@ -177,7 +177,7 @@ void ROIBoundaryFilter::FilterObjectsOutsideBoundary(
         }
       }
       if (!(*objects_valid_flag)[i]) {
-        LOG_DEBUG << "Roi boundary filter: min_dist_to_boundary exceed "
+        ADEBUG << "Roi boundary filter: min_dist_to_boundary exceed "
                   << distance_to_boundary_threshold_ << ", id " << obj->id
                   << ", center " << obj->center.head<2>().transpose()
                   << ", distance " << min_dist_to_boundary;
@@ -220,7 +220,7 @@ void ROIBoundaryFilter::FilterObjectsInsideBoundary(
         }
       }
       if (!(*objects_valid_flag)[i]) {
-        LOG_DEBUG << "Roi boundary filter: inside_distance within "
+        ADEBUG << "Roi boundary filter: inside_distance within "
                   << inside_threshold_ << ", id " << obj->id << ", center "
                   << obj->center.head<2>().transpose() << ", distance "
                   << min_dist_to_boundary;
@@ -236,7 +236,7 @@ void ROIBoundaryFilter::FilterObjectsByConfidence(
   for (size_t i = 0; i < objects.size(); ++i) {
     if (objects_cross_roi_[i] || !objects[i]->lidar_supplement.is_in_roi) {
       if (objects[i]->confidence < confidence_threshold_) {
-        LOG_DEBUG << "Roi boundary filter: confidence "
+        ADEBUG << "Roi boundary filter: confidence "
                   << objects[i]->confidence << " below "
                   << confidence_threshold_ << ", id " << objects[i]->id
                   << ", center " << objects[i]->center.head<2>().transpose()

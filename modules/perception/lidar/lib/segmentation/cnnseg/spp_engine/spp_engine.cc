@@ -146,7 +146,7 @@ size_t SppEngine::ProcessConnectedComponentCluster(
   clusters_.RemoveEmptyClusters();
   double remove_time = timer.toc(true);
 
-  LOG_INFO << "SegForeground: sync1 " << sync_time1
+  AINFO << "SegForeground: sync1 " << sync_time1
            << "\tdetect: " << detect_time << "\tsync2: " << sync_time2
            << "\tfilter: " << filter_time << "\tchz: " << chz_time
            << "\tmapping: " << mapping_time << "\tremove: " << remove_time;
@@ -158,7 +158,7 @@ size_t SppEngine::ProcessForegroundSegmentation(
     const base::PointFCloudConstPtr point_cloud) {
   mask_.clear();
   ProcessConnectedComponentCluster(point_cloud, mask_);
-  LOG_INFO << "Foreground: " << clusters_.size() << " clusters";
+  AINFO << "Foreground: " << clusters_.size() << " clusters";
   return clusters_.size();
 }
 

@@ -509,7 +509,7 @@ void KalmanFilter::ComputeNewObjectConvergenceAndBoostupBelief() {
   }
   // boostup belief if not converged yet
   if (!new_object_->converged) {
-    LOG_INFO << "boostup unconverged filter!";
+    AINFO << "boostup unconverged filter!";
     BoostupBelief(useable_measure_velocity_size);
     ComputeConvergenceConfidence(useable_measure_velocity_size);
     UpdateConverged(useable_measure_velocity_size);

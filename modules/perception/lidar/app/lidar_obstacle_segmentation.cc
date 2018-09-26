@@ -59,7 +59,7 @@ bool LidarObstacleSegmentation::Init(
   if (use_map_manager_) {
     MapManagerInitOptions map_manager_init_options;
     if (!map_manager_.Init(map_manager_init_options)) {
-      LOG_INFO << "Failed to init map manager.";
+      AINFO << "Failed to init map manager.";
       use_map_manager_ = false;
     }
   }

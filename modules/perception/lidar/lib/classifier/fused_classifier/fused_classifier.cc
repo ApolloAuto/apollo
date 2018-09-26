@@ -66,7 +66,7 @@ bool FusedClassifier::Classify(const ClassifierOptions& options,
                                               : &(frame->segmented_objects);
   if (enable_temporal_fusion_ && frame->timestamp > 0.0) {
     // sequence fusion
-    LOG_INFO << "Combined classifier, temporal fusion";
+    AINFO << "Combined classifier, temporal fusion";
     sequence_.AddTrackedFrameObjects(*objects, frame->timestamp);
     ObjectSequence::TrackedObjects tracked_objects;
     for (auto& object : *objects) {
@@ -82,21 +82,21 @@ bool FusedClassifier::Classify(const ClassifierOptions& options,
       sequence_.GetTrackInTemporalWindow(track_id, &tracked_objects,
                                          temporal_window_);
       if (tracked_objects.size() == 0) {
-        LOG_ERROR << "Find zero-length track, so skip.";
+        AERROR << "Find zero-length track, so skip.";
         continue;
       }
       if (object != tracked_objects.rbegin()->second) {
-        LOG_ERROR << "There must exist some timestamp in disorder, so skip.";
+        AERROR << "There must exist some timestamp in disorder, so skip.";
         continue;
       }
       if (!sequence_fuser_->TypeFusion(option_, &tracked_objects)) {
-        LOG_ERROR << "Failed to fuse types, so break.";
+        AERROR << "Failed to fuse types, so break.";
         break;
       }
     }
   } else {
     // one shot fusion
-    LOG_INFO << "Combined classifier, one shot fusion";
+    AINFO << "Combined classifier, one shot fusion";
     for (auto& object : *objects) {
       if (object->lidar_supplement.is_background) {
         object->type_probs.assign(static_cast<int>(ObjectType::MAX_OBJECT_TYPE),
@@ -107,7 +107,7 @@ bool FusedClassifier::Classify(const ClassifierOptions& options,
         continue;
       }
       if (!one_shot_fuser_->TypeFusion(option_, object)) {
-        LOG_ERROR << "Failed to fuse types, so continue.";
+        AERROR << "Failed to fuse types, so continue.";
       }
     }
   }

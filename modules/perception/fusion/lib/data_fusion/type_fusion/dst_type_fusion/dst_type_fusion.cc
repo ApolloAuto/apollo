@@ -57,7 +57,7 @@ DstTypeFusion::DstTypeFusion(TrackPtr track)
   sensor_obj = sensor_obj != nullptr ? sensor_obj : camera_object;
   sensor_obj = sensor_obj != nullptr ? sensor_obj : radar_object;
   if (sensor_obj == nullptr) {
-    LOG_ERROR << "track has no sensor_obj";
+    AERROR << "track has no sensor_obj";
     return;
   }
   fused_dst_ =
@@ -68,7 +68,7 @@ DstTypeFusion::DstTypeFusion(TrackPtr track)
 bool DstTypeFusion::Init() {
   BaseInitOptions options;
   if (!GetFusionInitOptions("DstTypeFusion", &options)) {
-    LOG_ERROR << "GetFusionInitOptions failed ";
+    AERROR << "GetFusionInitOptions failed ";
     return false;
   }
 
@@ -83,7 +83,7 @@ bool DstTypeFusion::Init() {
   DstTypeFusionConfig params;
 
   if (!lib::ParseProtobufFromFile<DstTypeFusionConfig>(config, &params)) {
-    LOG_ERROR << "Read config failed: " << config;
+    AERROR << "Read config failed: " << config;
     return false;
   }
 
@@ -93,7 +93,7 @@ bool DstTypeFusion::Init() {
     options_.sensor_reliability_[camera_id] = camera_param.reliability();
     options_.sensor_reliability_for_unknown_[camera_id] =
         camera_param.reliability_for_unknown();
-    LOG_INFO << "dst type fusion params: " << camera_id << " max valid dist: "
+    AINFO << "dst type fusion params: " << camera_id << " max valid dist: "
              << options_.camera_max_valid_dist_[camera_id]
              << " reliability: " << options_.sensor_reliability_[camera_id]
              << " reliability for unknown: "
@@ -105,7 +105,7 @@ bool DstTypeFusion::Init() {
     options_.sensor_reliability_[lidar_id] = lidar_param.reliability();
     options_.sensor_reliability_for_unknown_[lidar_id] =
         lidar_param.reliability_for_unknown();
-    LOG_INFO << "dst type fusion params: " << lidar_id
+    AINFO << "dst type fusion params: " << lidar_id
              << " reliability: " << options_.sensor_reliability_[lidar_id]
              << " reliability for unknown: "
              << options_.sensor_reliability_for_unknown_[lidar_id];
@@ -123,11 +123,11 @@ void DstTypeFusion::UpdateWithMeasurement(const SensorObjectPtr measurement,
                                           double target_timestamp) {
   Dst measurement_dst(name_);
   measurement_dst = TypeProbsToDst(measurement->GetBaseObject()->type_probs);
-  LOG_DEBUG << "type_probs: "
+  ADEBUG << "type_probs: "
             << vector2string<float>(measurement->GetBaseObject()->type_probs);
   fused_dst_ =
       fused_dst_ + measurement_dst * GetReliability(measurement->GetSensorId());
-  LOG_DEBUG << "reliability: " << GetReliability(measurement->GetSensorId());
+  ADEBUG << "reliability: " << GetReliability(measurement->GetSensorId());
   // update subtype
   if (IsCamera(measurement)) {
     track_ref_->GetFusedObject()->GetBaseObject()->sub_type =
@@ -160,7 +160,7 @@ void DstTypeFusion::UpdateWithoutMeasurement(const std::string &sensor_id,
                                           &sensor2world_pose);
     auto max_dist_it = options_.camera_max_valid_dist_.find(sensor_id);
     if (max_dist_it == options_.camera_max_valid_dist_.end()) {
-      LOG_WARN << boost::format(
+      AWARN << boost::format(
                       "There is no pre-defined max valid camera"
                       " dist for sensor type: %s") %
                       sensor_id;
@@ -234,12 +234,12 @@ Dst DstTypeFusion::TypeProbsToDst(const std::vector<float> &type_probs) {
   double type_probs_sum =
       std::accumulate(type_probs.begin(), type_probs.end(), 0.0);
   if (type_probs_sum < DBL_MIN) {
-    // LOG_WARN << "the sum of types probability equal 0.0";
+    // AWARN << "the sum of types probability equal 0.0";
     return res_dst;
   }
   // if (type_probs.size() > base::ObjectType::UNKNOWN_UNMOVABLE &&
   // type_probs[(int)base::ObjectType::UNKNOWN_UNMOVABLE] > 0.0f) {
-  //    LOG_INFO << "unknonw_unmovable prob = " <<
+  //    AINFO << "unknonw_unmovable prob = " <<
   //    type_probs[(int)base::ObjectType::UNKNOWN_UNMOVABLE] << " > 0.0f";
   //}
   std::map<uint64_t, double> res_bba_map;
@@ -267,7 +267,7 @@ Dst DstTypeFusion::TypeProbsToDst(const std::vector<float> &type_probs) {
 double DstTypeFusion::GetReliability(const std::string &sensor_id) const {
   auto find_res = options_.sensor_reliability_.find(sensor_id);
   if (find_res == options_.sensor_reliability_.end()) {
-    LOG_DEBUG << "the sensor type: " << sensor_id
+    ADEBUG << "the sensor type: " << sensor_id
               << " is not supported by class fusion";
     return 0.0;
   }
@@ -278,7 +278,7 @@ double DstTypeFusion::GetReliabilityForUnKnown(
     const std::string &sensor_id, double measurement_timestamp) const {
   auto find_res = options_.sensor_reliability_for_unknown_.find(sensor_id);
   if (find_res == options_.sensor_reliability_for_unknown_.end()) {
-    LOG_DEBUG << "the sensor type: " << sensor_id
+    ADEBUG << "the sensor type: " << sensor_id
               << " is not supported by class fusion";
     return 0.0;
   }
@@ -298,7 +298,7 @@ void DstTypeFusion::UpdateTypeState() {
   size_t max_hyp_ind = max_iter - fused_dst_vec.begin();
   uint64_t max_hyp = DstManager::Instance()->IndToFodSubset(name_, max_hyp_ind);
   if (max_hyp == DstMaps::OTHERS_MOVABLE) {
-    LOG_DEBUG << "max hyp is UNKNOWN_MOVABLE" << fused_dst_.PrintBba();
+    ADEBUG << "max hyp is UNKNOWN_MOVABLE" << fused_dst_.PrintBba();
   }
 
   // update type

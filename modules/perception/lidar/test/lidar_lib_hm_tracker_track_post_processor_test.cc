@@ -69,7 +69,7 @@ void ConstructTrackedObjects(const std::vector<base::ObjectPtr> &objects,
   // Construct tracked objects via necessary transformation & feature computing
   int num_objects = objects.size();
   CHECK(objects.size() == tracked_objects->size());
-  // LOG_INFO<< "test1" <<objects.size();
+  // AINFO<< "test1" <<objects.size();
   for (size_t i = 0; i < num_objects; ++i) {
     ((*tracked_objects)[i])->AttachObject(objects[i], pose);
     // compute foreground objects' shape feature

@@ -28,7 +28,7 @@
 class RTLogger : public nvinfer1::ILogger {
   void log(Severity severity, const char *msg) override {
     if (severity != Severity::kINFO) {
-      LOG_INFO << msg;
+      AINFO << msg;
     }
   }
 } rt_gLogger;
@@ -107,7 +107,7 @@ void RTNet::addConvLayer(const LayerParameter &layer_param,
   for (int i = 0; i < 3; i++) {
     dim_string += " " + std::to_string(tmp_out_dims.d[i]);
   }
-  LOG_INFO << layer_param.name() << dim_string;
+  AINFO << layer_param.name() << dim_string;
 #endif
 }
 
@@ -146,7 +146,7 @@ void RTNet::addDeconvLayer(const LayerParameter &layer_param,
     dim_string += " " + std::to_string(inputs[0]->getDimensions().d[i]);
   }
   dim_string += " | output: ";
-  LOG_INFO << layer_param.name() << dim_string;
+  AINFO << layer_param.name() << dim_string;
 #endif
 }
 void RTNet::addActiveLayer(const LayerParameter &layer_param,
@@ -183,9 +183,8 @@ void RTNet::addConcatLayer(const LayerParameter &layer_param,
     for (int i = 0; i < 3; i++) {
       dim_string += " " + std::to_string(dim_tmp.d[i]);
     }
-    LOG_INFO << layer_param.name() << ": " << layer_param.bottom(i) << " "
-             << (*tensor_modify_map)[layer_param.bottom(i)] << " "
-             << dim_string;
+    AINFO << layer_param.name() << ": " << layer_param.bottom(i) << " "
+          << (*tensor_modify_map)[layer_param.bottom(i)] << " " << dim_string;
   }
 #endif
   ConstructMap(layer_param, concatLayer, tensor_map, tensor_modify_map);
@@ -442,18 +441,18 @@ void RTNet::addLayer(const LayerParameter &layer_param,
   } else if (layer_param.type() == "Padding") {
     addPaddingLayer(layer_param, inputs, net, tensor_map, tensor_modify_map);
   } else if (layer_param.type() == "Dropout") {
-    LOG_INFO << "skip dropout";
+    AINFO << "skip dropout";
   } else if (layer_param.type() == "Power") {
     addScaleLayer(layer_param, inputs, weight_map, net, tensor_map,
                   tensor_modify_map);
   } else {
-    LOG_WARN << "unknown layer type:" << layer_param.type();
+    AWARN << "unknown layer type:" << layer_param.type();
   }
 }
 bool RTNet::loadWeights(const std::string &model_file, WeightMap *weight_map) {
   NetParameter net;
   if (!ReadProtoFromBinaryFile(model_file.c_str(), &net)) {
-    LOG_FATAL << "open file " << model_file << " failed";
+    AFATAL << "open file " << model_file << " failed";
     return false;
   }
   for (int i = 0; i < net.layer_size(); i++) {
@@ -561,7 +560,7 @@ RTNet::RTNet(const std::string &net_file, const std::string &model_file,
 bool RTNet::shape(const std::string &name, std::vector<int> *res) {
   auto engine = &(context_->getEngine());
   if (tensor_modify_map_.find(name) == tensor_modify_map_.end()) {
-    LOG_INFO << "can't get the shape of " << name;
+    AINFO << "can't get the shape of " << name;
     return false;
   }
   int bindingIndex = engine->getBindingIndex(tensor_modify_map_[name].c_str());
@@ -600,7 +599,7 @@ void RTNet::init_blob(std::vector<std::string> *names) {
 
 bool RTNet::Init(const std::map<std::string, std::vector<int>> &shapes) {
   if (gpu_id_ < 0) {
-    LOG_INFO << "must use gpu mode";
+    AINFO << "must use gpu mode";
     return false;
   }
   BASE_CUDA_CHECK(cudaSetDevice(gpu_id_));
@@ -635,16 +634,16 @@ bool RTNet::Init(const std::map<std::string, std::vector<int>> &shapes) {
 bool RTNet::checkInt8(const std::string &gpu_name,
                       nvinfer1::IInt8Calibrator *calibrator) {
   if (calibrator == nullptr) {
-    LOG_INFO << "Device Works on FP32 Mode.";
+    AINFO << "Device Works on FP32 Mode.";
     return false;
   }
   for (auto ref : _gpu_checklist) {
     if (ref == gpu_name) {
-      LOG_INFO << "Device Works on Int8 Mode.";
+      AINFO << "Device Works on Int8 Mode.";
       return true;
     }
   }
-  LOG_WARN << "Device Not Supports Int8 Mode. Use FP32 Mode.";
+  AWARN << "Device Not Supports Int8 Mode. Use FP32 Mode.";
   calibrator_ = nullptr;
   return false;
 }
@@ -700,7 +699,7 @@ void RTNet::parse_with_api(
       network_->markOutput(*tensor_map[tensor_modify_map_[*iter]]);
       iter++;
     } else {
-      LOG_INFO << "Erase output: " << *iter;
+      AINFO << "Erase output: " << *iter;
       iter = output_names_.erase(iter);
     }
   }

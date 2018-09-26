@@ -23,7 +23,7 @@ namespace apollo {
 namespace perception {
 namespace fusion {
 
-int Sensor::kMaxCachedFrameNum = 10;
+size_t Sensor::kMaxCachedFrameNum = 10;
 
 void Sensor::QueryLatestFrames(double timestamp,
                                std::vector<SensorFramePtr>* frames) {
@@ -61,8 +61,7 @@ bool Sensor::GetPose(double timestamp, Eigen::Affine3d* pose) const {
     }
   }
 
-  AWARN << "Failed to find pose for timestamp: "
-        << timestamp;
+  AWARN << "Failed to find pose for timestamp: " << timestamp;
   return false;
 }
 

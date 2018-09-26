@@ -103,7 +103,7 @@ void ConstructTrackedObjects(const std::vector<base::ObjectPtr>& objects,
   // Construct tracked objects via necessary transformation & feature computing
   int num_objects = objects.size();
   CHECK(objects.size() == tracked_objects->size());
-  // LOG_INFO<< "test1" <<objects.size();
+  // AINFO<< "test1" <<objects.size();
   for (size_t i = 0; i < num_objects; ++i) {
     ((*tracked_objects)[i])->AttachObject(objects[i], pose);
     // compute foreground objects' shape feature
@@ -131,7 +131,7 @@ TEST_F(HmMultiTargetTrackerTest,
   assert(pcd_filenames.size() > 0);
   assert(pcd_filenames.size() = pose_filenames.size());
   for (size_t i = 0; i < pcd_filenames.size(); ++i) {
-    // LOG_INFO<< "file id " <<i;
+    // AINFO<< "file id " <<i;
     LidarFrame* frame(new LidarFrame);
     // read pose
     Eigen::Affine3d pose = Eigen::Affine3d::Identity();
@@ -154,14 +154,14 @@ TEST_F(HmMultiTargetTrackerTest,
     EXPECT_TRUE(hm_tracker_->Track(hm_tracker_options, frame));
     std::vector<base::ObjectPtr>& result_objects = frame->tracked_objects;
     // assert tracking completly
-    // LOG_INFO<< "input and result object size " <<
+    // AINFO<< "input and result object size " <<
     //    result_objects.size() << " " <<objects.size();
     EXPECT_TRUE(result_objects.size() >= objects.size());
     // assert tracking without duplication
     std::map<size_t, int> track_id_pool;
     for (size_t j = 0; j < result_objects.size(); ++j) {
       int track_id = result_objects[j]->track_id;
-      // LOG_INFO<< "track id " << track_id;
+      // AINFO<< "track id " << track_id;
       EXPECT_TRUE(track_id_pool.find(track_id) == track_id_pool.end());
       track_id_pool[track_id] = 1;
     }

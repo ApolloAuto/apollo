@@ -49,7 +49,7 @@ bool PbfGatekeeper::Init() {
   PbfGatekeeperConfig params;
 
   if (!lib::ParseProtobufFromFile<PbfGatekeeperConfig>(config, &params)) {
-    LOG_ERROR << "Read config failed: " << config;
+    AERROR << "Read config failed: " << config;
     return false;
   }
   params_.publish_if_has_lidar = params.publish_if_has_lidar();
@@ -163,7 +163,7 @@ bool PbfGatekeeper::RadarAbleToPublish(const TrackPtr &track, bool is_night) {
       //   }
       // }
     } else if (radar_object->GetSensorId() == "radar_rear") {
-      LOG_DEBUG << "radar_rear: min_dis: "
+      ADEBUG << "radar_rear: min_dis: "
                 << params_.min_radar_confident_distance << " obj dist: "
                 << radar_object->GetBaseObject()->radar_supplement.range
                 << " track_id: " << track->GetTrackId()
@@ -197,7 +197,7 @@ bool PbfGatekeeper::CameraAbleToPublish(const TrackPtr &track, bool is_night) {
       double exist_prob = track->GetExistanceProb();
       if (exist_prob > params_.existance_threshold) {
         static int cnt_cam = 1;
-        LOG_INFO << "publish camera only object : cnt =  " << cnt_cam;
+        AINFO << "publish camera only object : cnt =  " << cnt_cam;
         cnt_cam++;
         return true;
       }
