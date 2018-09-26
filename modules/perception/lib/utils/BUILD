@@ -3,6 +3,14 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
+    name = "utils",
+    deps = [
+        ":perception_timer",
+        ":perception_time_util",
+    ],
+)
+
+cc_library(
     name = "perception_perf",
     hdrs = ["perf.h"],
 )

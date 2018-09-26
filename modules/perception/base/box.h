@@ -161,6 +161,14 @@ struct BBox2D {
   T ymax = 0;  // bottom-right
 };
 
+typedef Rect<int> RectI;
+typedef Rect<float> RectF;
+typedef Rect<double> RectD;
+
+typedef BBox2D<int> BBox2DI;
+typedef BBox2D<float> BBox2DF;
+typedef BBox2D<double> BBox2DD;
+
 }  // namespace base
 }  // namespace perception
 }  // namespace apollo

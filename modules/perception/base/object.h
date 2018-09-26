@@ -112,6 +112,9 @@ struct alignas(16) Object {
   FusionObjectSupplement fusion_supplement;
 };
 
+using ObjectPtr = std::shared_ptr<Object>;
+using ObjectConstPtr = std::shared_ptr<const Object>;
+
 }  // namespace base
 }  // namespace perception
 }  // namespace apollo
