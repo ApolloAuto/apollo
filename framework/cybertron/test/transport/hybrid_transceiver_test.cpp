@@ -42,6 +42,7 @@ class HybridTransceiverTest : public ::testing::Test {
   virtual void SetUp() {
     RoleAttributes attr;
     attr.set_host_name(common::GlobalData::Instance()->HostName());
+    attr.set_host_ip(common::GlobalData::Instance()->HostIp());
     attr.set_process_id(common::GlobalData::Instance()->ProcessId());
     attr.set_channel_name(channel_name_);
     attr.set_channel_id(common::Hash(channel_name_));

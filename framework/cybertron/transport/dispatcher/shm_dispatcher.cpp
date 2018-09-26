@@ -111,7 +111,7 @@ void ShmDispatcher::ThreadFunc() {
 }
 
 bool ShmDispatcher::Init() {
-  host_id_ = common::Hash(common::GlobalData::Instance()->HostName());
+  host_id_ = common::Hash(common::GlobalData::Instance()->HostIp());
 
   if (!InitMulticast()) {
     CloseAndReset(&sfd_);
