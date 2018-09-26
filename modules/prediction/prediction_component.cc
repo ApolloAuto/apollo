@@ -229,7 +229,7 @@ bool PredictionComponent::Proc(
   obstacles_container->Insert(*perception_obstacles);
 
   // Scenario analysis
-  ScenarioManager::Instance()->Run();
+  // ScenarioManager::Instance()->Run();
 
   obstacles_container->BuildLaneGraph();
 
