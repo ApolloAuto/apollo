@@ -3,6 +3,20 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
+    name = "interface",
+    deps = [
+        ":base_bipartite_graph_matcher",
+        ":base_segmentation",
+        ":base_classifier",
+        ":base_ground_detector",
+        ":base_multi_target_tracker",
+        ":base_object_filter",
+        ":base_roi_filter",
+    ],
+)
+
+
+cc_library(
     name = "base_bipartite_graph_matcher",
     hdrs = [
         "base_bipartite_graph_matcher.h",
