@@ -13,14 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+
 #ifndef MODULES_PERCEPTION_LIDAR_LIB_ROI_SERVICE_FILTER_H_
 #define MODULES_PERCEPTION_LIDAR_LIB_ROI_SERVICE_FILTER_H_
+
+#include <string>
+
 #include "modules/perception/lidar/lib/interface/base_roi_filter.h"
 #include "modules/perception/lidar/lib/scene_manager/roi_service/roi_service.h"
 
 namespace apollo {
 namespace perception {
 namespace lidar {
+
 class ROIServiceFilter : public BaseROIFilter {
  public:
   ROIServiceFilter() : BaseROIFilter() {}

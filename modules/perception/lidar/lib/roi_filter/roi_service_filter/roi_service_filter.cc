@@ -13,13 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+
 #include "modules/perception/lidar/lib/roi_filter/roi_service_filter/roi_service_filter.h"
-#include "modules/perception/lidar/common/lidar_log.h"
+
 #include "modules/perception/lidar/common/lidar_point_label.h"
 #include "modules/perception/lidar/lib/scene_manager/scene_manager.h"
+
 namespace apollo {
 namespace perception {
 namespace lidar {
+
 bool ROIServiceFilter::Init(const ROIFilterInitOptions& options) {
   roi_service_ = std::dynamic_pointer_cast<ROIService>(
       SceneManager::Instance().Service("ROIService"));
@@ -49,7 +52,7 @@ bool ROIServiceFilter::Filter(const ROIFilterOptions& options,
     Eigen::Vector3d world_point(pt.x, pt.y, pt.z);
     if (roi_service_->QueryIsPointInROI(world_point, roi_service_content_)) {
       frame->roi_indices.indices.push_back(i);
-      frame->cloud->points_label(i) =
+      frame->cloud->mutable_points_label()->at(i) =
           static_cast<uint8_t>(LidarPointLabel::ROI);
     }
   }
