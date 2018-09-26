@@ -42,6 +42,9 @@ class DistanceApproachIPOPTInterface : public Ipopt::TNLP {
 
   virtual ~DistanceApproachIPOPTInterface() = default;
 
+  void set_objective_weights(const double w_u, const double w_time_1,
+                             const double w_time_2, const double w_reg);
+
   void get_optimization_results(Eigen::MatrixXd* state_result,
                                 Eigen::MatrixXd* control_result,
                                 Eigen::MatrixXd* time_result) const;
@@ -114,6 +117,17 @@ class DistanceApproachIPOPTInterface : public Ipopt::TNLP {
   Eigen::MatrixXd state_result_;
   Eigen::MatrixXd control_result_;
   Eigen::MatrixXd time_result_;
+
+ private:
+  // weight from u, timescale linear form, timescale qudartic form,
+  // regularization
+  double w_u_ = 0.0;
+
+  double w_time_1_ = 0.0;
+
+  double w_time_2_ = 0.0;
+
+  double w_reg_ = 0.0;
 };
 
 }  // namespace planning

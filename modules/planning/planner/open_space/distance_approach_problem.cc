@@ -60,7 +60,7 @@ bool DistanceApproachProblem::Solve(Eigen::MatrixXd* state_result,
   // TODO(QiL) : set up number of variables and number of constaints, and rego
   // so constants do not get set repeatedly
 
-  // n1 : states variables
+  // n1 : states variables, 4 * (N+1)
   int n1 = 4 * (horizon_ + 1);
 
   // n2 : control inputs variables
@@ -71,6 +71,9 @@ bool DistanceApproachProblem::Solve(Eigen::MatrixXd* state_result,
 
   // n4 : dual multiplier associated with obstacleShape
   int n4 = vOb_.sum() * (horizon_ + 1);
+
+  // n5 : dual multipier associated with car shape, nOb*4 * (N+1)
+  int n5 = nOb_ * 4 * (horizon_ + 1);
 
   // m1 : state equality constatins
   int m1 = 4 * horizon_;
@@ -87,8 +90,11 @@ bool DistanceApproachProblem::Solve(Eigen::MatrixXd* state_result,
   // m5 : sampling time inequality constraints
   int m5 = horizon_;
 
-  int num_of_variables = n1 + n2 + n3 + n4;
+  int num_of_variables = n1 + n2 + n3 + n4 + n5;
   int num_of_constraints = m1 + m2 + m3 + m4 + m5;
+
+  ADEBUG << "Number of variables are : " << num_of_variables;
+  ADEBUG << "Number of constraints are : " << num_of_constraints;
 
   // TODO(QiL) : evaluate whether need to new it everytime
   DistanceApproachIPOPTInterface* ptop = new DistanceApproachIPOPTInterface(

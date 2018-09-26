@@ -30,6 +30,7 @@
 #include "modules/planning/planner/open_space/distance_approach_problem.h"
 #include "modules/planning/planner/open_space/warm_start_problem.h"
 #include "modules/planning/planner/planner.h"
+#include "modules/planning/proto/planner_open_space_config.pb.h"
 #include "modules/planning/proto/planning_config.pb.h"
 
 /*
@@ -90,6 +91,7 @@ class OpenSpacePlanner : public Planner {
   common::VehicleState init_state_;
   const common::VehicleParam& vehicle_param_ =
       common::VehicleConfigHelper::GetConfig().vehicle_param();
+  apollo::planning::PlannerOpenSpaceConfig planner_open_space_config_;
   double init_x_ = 0.0;
   double init_y_ = 0.0;
   double init_phi_ = 0.0;
@@ -98,6 +100,9 @@ class OpenSpacePlanner : public Planner {
   double back_to_center_ = 0.0;
   double left_to_center_ = 0.0;
   double right_to_center_ = 0.0;
+  size_t horizon_ = 0;
+  double ts_ = 0;
+  Eigen::MatrixXd ego_;
 };
 
 }  // namespace planning
