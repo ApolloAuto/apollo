@@ -21,6 +21,22 @@ cc_library(
 )
 
 cc_library(
+    name = "track_pool_types",
+    srcs = [
+        "track_pool_types.cc",
+    ],
+    hdrs = [
+        "track_pool_types.h",
+    ],
+    deps = [
+        ":tracked_object",
+        ":track_data",
+        "//modules/perception/base:object_pool",
+        "//framework:cybertron",
+    ],
+)
+
+cc_library(
     name = "track_data",
     srcs = [
         "track_data.cc",
