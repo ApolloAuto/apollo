@@ -18,8 +18,10 @@
 #define MODULES_PERCEPTION_INFERENCE_CAFFE_CAFFE_NET_H_
 
 #include <map>
+#include <memory>
 #include <set>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "caffe/caffe.hpp"
