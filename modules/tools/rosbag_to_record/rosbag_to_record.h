@@ -17,15 +17,15 @@
 #ifndef MODULES_TOOLS_ROSBAG_TO_RECORD_ROSBAG_TO_RECORD_H_
 #define MODULES_TOOLS_ROSBAG_TO_RECORD_ROSBAG_TO_RECORD_H_
 
+#include <rosbag/bag.h>
+#include <rosbag/view.h>
+
 #include <cstdint>
 #include <cstdlib>
 #include <iostream>
 #include <memory>
 #include <string>
 #include <unordered_map>
-
-#include <rosbag/bag.h>
-#include <rosbag/view.h>
 
 #include "cybertron/record/record_writer.h"
 

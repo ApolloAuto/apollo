@@ -14,26 +14,27 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "cybertron/proto/record.pb.h"
+
+#include "modules/tools/rosbag_to_record/rosbag_to_record.h"
 
 #include <geometry_msgs/Point32.h>
 #include <geometry_msgs/Transform.h>
 #include <geometry_msgs/TransformStamped.h>
-#include <tf2_msgs/TFMessage.h>
 #include <sensor_msgs/PointCloud.h>
 #include <sensor_msgs/PointCloud2.h>
+#include <tf2_msgs/TFMessage.h>
+#include <vector>
 
-#include "modules/tools/rosbag_to_record/rosbag_to_record.h"
+#include "cybertron/proto/record.pb.h"
 #include "modules/tools/rosbag_to_record/channel_info.h"
-
-#include "modules/planning/proto/planning.pb.h"
-#include "modules/prediction/proto/prediction_obstacle.pb.h"
-#include "modules/perception/proto/perception_obstacle.pb.h"
-#include "modules/perception/proto/traffic_light_detection.pb.h"
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/control/proto/control_cmd.pb.h"
 #include "modules/guardian/proto/guardian.pb.h"
 #include "modules/localization/proto/localization.pb.h"
+#include "modules/perception/proto/perception_obstacle.pb.h"
+#include "modules/perception/proto/traffic_light_detection.pb.h"
+#include "modules/planning/proto/planning.pb.h"
+#include "modules/prediction/proto/prediction_obstacle.pb.h"
 
 using apollo::cybertron::proto::SingleMessage;
 using apollo::tools::ChannelInfo;
@@ -98,7 +99,7 @@ int convert_PointCloud(std::shared_ptr<apollo::drivers::PointCloud> proto,
 
   return 1;
 }
-int main(int argc, char** argv) {
+int main(int argc, char **argv) {
   if (argc != 2) {
     PrintUsage();
     return -1;
@@ -130,9 +131,10 @@ int main(int argc, char** argv) {
   ros::Time::init();
   ros::Time start_time = ros::Time::now();
 
-  rosbag::View view(bag, rosbag::TopicQuery(channel_info->GetSupportChannels()));
-  
-  std::vector<std::string> channel_write_flag; 
+  rosbag::View view(bag,
+                    rosbag::TopicQuery(channel_info->GetSupportChannels()));
+
+  std::vector<std::string> channel_write_flag;
   for (const rosbag::MessageInstance m : view) {
     const std::string channel_name = m.getTopic();
     auto desc = channel_info->GetProtoDesc(channel_name);
@@ -140,8 +142,9 @@ int main(int argc, char** argv) {
     if (desc == "" || record_message_type == "") {
       AWARN << "can not find desc or message type";
     }
-    if (std::find(channel_write_flag.begin(), channel_write_flag.end(), channel_name) == channel_write_flag.end() && 
-         !record_writer->WriteChannel(channel_name, record_message_type, desc)) {
+    if (std::find(channel_write_flag.begin(), channel_write_flag.end(),
+                  channel_name) == channel_write_flag.end() &&
+        !record_writer->WriteChannel(channel_name, record_message_type, desc)) {
       AERROR << "write channel info failed";
     } else {
       channel_write_flag.push_back(channel_name);
@@ -152,23 +155,23 @@ int main(int argc, char** argv) {
     const std::string msg_type = m.getDataType();
     const std::string channel_name = m.getTopic();
     uint64_t nsec = m.getTime().toNSec();
-    
-//    auto msg_size = m.size();
-//
-//    std::vector<uint8_t> buffer;
-//    buffer.resize(msg_size);
-//    ros::serialization::IStream stream(buffer.data(), buffer.size());
-//    m.write(stream);
-//
-//    std::string str_msg;
-//    str_msg.reserve(msg_size);
-//    for (size_t i = 0; i < msg_size; ++i) {
-//      str_msg.push_back(buffer[i]);
-//    }
-    //TODO: find a way get all serialized str;
+
+    //    auto msg_size = m.size();
+    //
+    //    std::vector<uint8_t> buffer;
+    //    buffer.resize(msg_size);
+    //    ros::serialization::IStream stream(buffer.data(), buffer.size());
+    //    m.write(stream);
+    //
+    //    std::string str_msg;
+    //    str_msg.reserve(msg_size);
+    //    for (size_t i = 0; i < msg_size; ++i) {
+    //      str_msg.push_back(buffer[i]);
+    //    }
+    // FIXME: find a way get all serialized str;
     std::string serialized_str;
-    if (channel_name == "/apollo/perception/obstacles") {      
-      auto pb_msg = m.instantiate<apollo::perception::PerceptionObstacles>(); 
+    if (channel_name == "/apollo/perception/obstacles") {
+      auto pb_msg = m.instantiate<apollo::perception::PerceptionObstacles>();
       pb_msg->SerializeToString(&serialized_str);
     } else if (channel_name == "/apollo/planning") {
       auto pb_msg = m.instantiate<apollo::planning::ADCTrajectory>();
@@ -197,7 +200,7 @@ int main(int argc, char** argv) {
     } else if (channel_name == "/apollo/sensor/gnss/corrected_imu") {
       auto pb_msg = m.instantiate<apollo::localization::CorrectedImu>();
       if (pb_msg) {
-      	pb_msg->SerializeToString(&serialized_str);
+        pb_msg->SerializeToString(&serialized_str);
       }
     } else if (channel_name == "/apollo/sensor/gnss/odometry") {
       auto pb_msg = m.instantiate<apollo::localization::Gps>();
@@ -282,7 +285,8 @@ int main(int argc, char** argv) {
     } else if (channel_name == "/apollo/sensor/gnss/rtk_obs") {
       auto pb_msg = m.instantiate<apollo::drivers::gnss::EpochObservation>();
       pb_msg->SerializeToString(&serialized_str);
-    } else if (channel_name == "/apollo/sensor/velodyne64/compensator/PointCloud2") {
+    } else if (channel_name ==
+               "/apollo/sensor/velodyne64/compensator/PointCloud2") {
       auto ros_msg = m.instantiate<sensor_msgs::PointCloud2>();
       auto pb_msg = std::make_shared<apollo::drivers::PointCloud>();
       convert_PointCloud(pb_msg, ros_msg);
@@ -291,22 +295,23 @@ int main(int argc, char** argv) {
       AWARN << "not support channel:" << channel_name;
       continue;
     }
- 
-//    auto desc = channel_info->GetProtoDesc(channel_name);
-//    auto record_message_type = channel_info->GetMessageType(channel_name);
-//    if (desc == "" || record_message_type == "") {
-//      AWARN << "can not find desc or message type";
-//    }
-//    if (!record_writer->WriteChannel(channel_name, record_message_type, desc)) {
-//      AERROR << "write channel info failed";
-//    }
-//    SingleMessage single_msg;
-//    single_msg.set_channel_name(channel_name);
-//    
-//    single_msg.set_content(serialized_str);
-//    single_msg.set_time(nsec);
-    auto raw_message = 
-        std::make_shared<apollo::cybertron::message::RawMessage>(serialized_str);
+
+    //    auto desc = channel_info->GetProtoDesc(channel_name);
+    //    auto record_message_type = channel_info->GetMessageType(channel_name);
+    //    if (desc == "" || record_message_type == "") {
+    //      AWARN << "can not find desc or message type";
+    //    }
+    //    if (!record_writer->WriteChannel(channel_name, record_message_type,
+    //    desc)) {
+    //      AERROR << "write channel info failed";
+    //    }
+    //    SingleMessage single_msg;
+    //    single_msg.set_channel_name(channel_name);
+    //
+    //    single_msg.set_content(serialized_str);
+    //    single_msg.set_time(nsec);
+    auto raw_message = std::make_shared<apollo::cybertron::message::RawMessage>(
+        serialized_str);
     if (!record_writer->WriteMessage(channel_name, raw_message, nsec)) {
       AERROR << "write single msg fail";
     }
