@@ -28,6 +28,7 @@
 #include "modules/common/math/vec2d.h"
 #include "modules/common/time/time.h"
 #include "modules/common/util/file.h"
+#include "modules/common/util/message_util.h"
 #include "modules/prediction/common/feature_output.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_map.h"
@@ -291,6 +292,9 @@ bool PredictionComponent::Proc(
       }
     }
   }
+
+  common::util::FillHeader(node_->Name(), &prediction_obstacles);
+
   prediction_writer_->Write(
       std::make_shared<PredictionObstacles>(prediction_obstacles));
   return true;
