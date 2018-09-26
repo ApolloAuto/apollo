@@ -23,6 +23,8 @@ message MonitorMessageItem {
     CONTI_RADAR = 15;
     RACOBIT_RADAR = 16;
     ULTRASONIC_RADAR = 17;
+    MOBILEYE = 18;
+    DELPHI_ESR = 19;
   }
 
   optional MessageSource source = 1 [default = UNKNOWN];
