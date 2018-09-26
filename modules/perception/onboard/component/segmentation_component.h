@@ -18,7 +18,6 @@
 
 #include "cybertron/cybertron.h"
 #include "modules/drivers/proto/pointcloud.pb.h"  // NOLINT
-#include "modules/perception/base/point_cloud_types.h"
 #include "modules/perception/lidar/app/lidar_obstacle_segmentation.h"
 #include "modules/perception/lidar/common/lidar_frame.h"
 #include "modules/perception/onboard/component/lidar_inner_component_messages.h"

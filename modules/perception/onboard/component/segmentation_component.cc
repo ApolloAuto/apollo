@@ -43,8 +43,8 @@ bool SegmentationComponent::Init() {
 bool SegmentationComponent::Proc(
     const std::shared_ptr<drivers::PointCloud>& message) {
   AINFO << "Enter segmentation component, message timestamp: "
-        << GLOG_TIMESTAMP(message->measurement_time()) << " current timestamp "
-        << GLOG_TIMESTAMP(lib::TimeUtil::GetCurrentTime());
+        << std::to_string(message->measurement_time()) << " current timestamp "
+        << std::to_string(lib::TimeUtil::GetCurrentTime());
 
   std::shared_ptr<LidarFrameMessage> out_message(new (std::nothrow)
                                                      LidarFrameMessage);
@@ -85,8 +85,8 @@ bool SegmentationComponent::InternalProc(
   const double timestamp = in_message->measurement_time();
   const double cur_time = lib::TimeUtil::GetCurrentTime();
   const double start_latency = (cur_time - timestamp) * 1e3;
-  AINFO << "FRAME_STATISTICS:Lidar:Start:msg_time[" << GLOG_TIMESTAMP(timestamp)
-        << "]:cur_time[" << GLOG_TIMESTAMP(cur_time) << "]:cur_latency["
+  AINFO << "FRAME_STATISTICS:Lidar:Start:msg_time[" << std::to_string(timestamp)
+        << "]:cur_time[" << std::to_string(cur_time) << "]:cur_latency["
         << start_latency << "]";
 
   out_message->timestamp_ = timestamp;
@@ -102,7 +102,7 @@ bool SegmentationComponent::InternalProc(
                                                  &velodyne_trans) != true) {
     out_message->error_code_ = apollo::common::ErrorCode::PERCEPTION_ERROR_TF;
     AERROR << "Fail to get pose at time: "
-           << GLOG_TIMESTAMP(velodyne64_query_tf_timestamp);
+           << std::to_string(velodyne64_query_tf_timestamp);
     return true;
   }
   PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(

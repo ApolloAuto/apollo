@@ -1,3 +1,15 @@
+load("//tools:cpplint.bzl", "cpplint")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "app",
+    deps = [
+        ":lidar_obstacle_segmentation",
+        ":lidar_obstacle_tracking",
+    ]
+)
+
 cc_library(
     name = "lidar_obstacle_segmentation",
     srcs = [
@@ -43,3 +55,5 @@ cc_library(
         "//modules/perception/lidar/lib/interface",
     ],
 )
+
+cpplint()
