@@ -16,6 +16,7 @@
 #ifndef MODULES_PERCEPTION_FUSION_COMMON_CAMERA_UTIL_H_
 #define MODULES_PERCEPTION_FUSION_COMMON_CAMERA_UTIL_H_
 
+#include <memory>
 #include <vector>
 
 #include "modules/perception/base/camera.h"
