@@ -13,8 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+
 #ifndef MODULES_PERCEPTION_LIDAR_LIB_ROI_FILTER_HDMAP_ROI_FILTER_BITMAP2D_H_
 #define MODULES_PERCEPTION_LIDAR_LIB_ROI_FILTER_HDMAP_ROI_FILTER_BITMAP2D_H_
+
 #include <stdint.h>
 #include <Eigen/Core>
 #include <boost/format.hpp>
@@ -23,6 +25,7 @@
 namespace apollo {
 namespace perception {
 namespace lidar {
+
 class Bitmap2D {
  public:
   enum class DirectionMajor { XMAJOR = 0, YMAJOR = 1 };

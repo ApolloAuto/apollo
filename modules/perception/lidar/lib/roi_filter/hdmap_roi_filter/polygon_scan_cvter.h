@@ -15,10 +15,10 @@
  *****************************************************************************/
 #ifndef MODULES_PERCEPTION_LIDAR_LIB_HDMAP_ROI_FILTER_POLYGON_SCAN_CVTER_H_
 #define MODULES_PERCEPTION_LIDAR_LIB_HDMAP_ROI_FILTER_POLYGON_SCAN_CVTER_H_
+
 #include <Eigen/Core>
 #include <Eigen/StdVector>
 #include <algorithm>
-#include <boost/format.hpp>
 #include <limits>
 #include <utility>
 #include <vector>
@@ -28,6 +28,7 @@
 namespace apollo {
 namespace perception {
 namespace lidar {
+
 template <typename T = double>
 class PolygonScanCvter {
  public:

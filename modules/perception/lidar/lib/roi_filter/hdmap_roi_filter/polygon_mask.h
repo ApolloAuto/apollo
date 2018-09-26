@@ -15,8 +15,8 @@
  *****************************************************************************/
 #ifndef MODULES_PERCEPTION_LIDAR_LIB_ROI_FILTER_HDMAP_ROI_FILTER_POLYGON_MASK_H_
 #define MODULES_PERCEPTION_LIDAR_LIB_ROI_FILTER_HDMAP_ROI_FILTER_POLYGON_MASK_H_
+
 #include <algorithm>
-#include <boost/format.hpp>
 #include <limits>
 #include <string>
 #include <vector>
@@ -28,6 +28,7 @@
 namespace apollo {
 namespace perception {
 namespace lidar {
+
 template <typename T>
 bool DrawPolygonMask(const typename PolygonScanCvter<T>::Polygon& polygon,
                      Bitmap2D* bitmap, const double extend_dist = 0.0,
@@ -153,4 +154,4 @@ bool DrawPolygonsMask(
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_LIDAR_LIB_ROI_FILTER_HDMAP_ROI_FILTER_POLYGON_MASK_H_
+#endif  // PERCEPTION_LIDAR_LIB_ROI_FILTER_HDMAP_ROI_FILTER_POLYGON_MASK_H_

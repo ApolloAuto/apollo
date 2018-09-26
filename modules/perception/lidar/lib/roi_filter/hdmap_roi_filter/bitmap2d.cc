@@ -13,8 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+
 #include "modules/perception/lidar/lib/roi_filter/hdmap_roi_filter/bitmap2d.h"
+
 #include "modules/perception/lidar/common/lidar_log.h"
+
 namespace apollo {
 namespace perception {
 namespace lidar {
@@ -146,8 +149,8 @@ void Bitmap2D::Set(const double x, const double min_y, const double max_y) {
     SetRangeBits(right_bit_p.z(), left_bit_p.z(), &bitmap_[idx]);
     return;
   }
-  const int left_idx = Index(left_bit_p);
-  const int right_idx = Index(right_bit_p);
+  const size_t left_idx = Index(left_bit_p);
+  const size_t right_idx = Index(right_bit_p);
   SetHeadBits(left_bit_p.z(), &bitmap_[left_idx]);
   SetTailBits(right_bit_p.z(), &bitmap_[right_idx]);
   for (size_t i = left_idx + 1; i < right_idx; ++i) {
@@ -168,8 +171,8 @@ void Bitmap2D::Reset(const double x, const double min_y, const double max_y) {
     return;
   }
   // set first block and last block
-  const int left_idx = Index(left_bit_p);
-  const int right_idx = Index(right_bit_p);
+  const size_t left_idx = Index(left_bit_p);
+  const size_t right_idx = Index(right_bit_p);
   ResetHeadBits(left_bit_p.z(), &bitmap_[left_idx]);
   ResetTailBits(right_bit_p.z(), &bitmap_[right_idx]);
   for (size_t i = left_idx + 1; i < right_idx; ++i) {
