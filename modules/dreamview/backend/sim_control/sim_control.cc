@@ -175,7 +175,7 @@ void SimControl::SetStartPoint(const TrajectoryPoint& start_point) {
 }
 
 void SimControl::Reset() {
-  std::unique_lock<std::mutex> lock(mutex_);
+  std::lock_guard<std::mutex> lock(mutex_);
   InternalReset();
 }
 
@@ -196,7 +196,7 @@ void SimControl::ClearPlanning() {
 
 void SimControl::OnReceiveNavigationInfo(
     const std::shared_ptr<NavigationInfo>& navigation_info) {
-  std::unique_lock<std::mutex> lock(mutex_);
+  std::lock_guard<std::mutex> lock(mutex_);
 
   if (navigation_info->navigation_path_size() > 0) {
     const auto& path = navigation_info->navigation_path(0).path();
@@ -208,8 +208,7 @@ void SimControl::OnReceiveNavigationInfo(
 
 void SimControl::OnRoutingResponse(
     const std::shared_ptr<RoutingResponse>& routing) {
-  std::unique_lock<std::mutex> lock(mutex_);
-
+  std::lock_guard<std::mutex> lock(mutex_);
   if (!enabled_) {
     return;
   }
@@ -243,7 +242,7 @@ void SimControl::OnRoutingResponse(
 
 void SimControl::OnPredictionObstacles(
     const std::shared_ptr<PredictionObstacles>& obstacles) {
-  std::unique_lock<std::mutex> lock(mutex_);
+  std::lock_guard<std::mutex> lock(mutex_);
 
   if (!enabled_) {
     return;
@@ -253,7 +252,7 @@ void SimControl::OnPredictionObstacles(
 }
 
 void SimControl::Start() {
-  std::unique_lock<std::mutex> lock(mutex_);
+  std::lock_guard<std::mutex> lock(mutex_);
 
   if (!enabled_) {
     // When there is no localization yet, Init(true) will use a
@@ -271,7 +270,7 @@ void SimControl::Start() {
 }
 
 void SimControl::Stop() {
-  std::unique_lock<std::mutex> lock(mutex_);
+  std::lock_guard<std::mutex> lock(mutex_);
 
   if (enabled_) {
     sim_control_timer_->Stop();
@@ -281,7 +280,7 @@ void SimControl::Stop() {
 }
 
 void SimControl::OnPlanning(const std::shared_ptr<ADCTrajectory>& trajectory) {
-  std::unique_lock<std::mutex> lock(mutex_);
+  std::lock_guard<std::mutex> lock(mutex_);
 
   if (!enabled_) {
     return;
@@ -313,7 +312,7 @@ void SimControl::Freeze() {
 }
 
 void SimControl::RunOnce() {
-  std::unique_lock<std::mutex> lock(mutex_);
+  std::lock_guard<std::mutex> lock(mutex_);
 
   TrajectoryPoint trajectory_point;
   if (!PerfectControlModel(&trajectory_point)) {
@@ -456,16 +455,15 @@ void SimControl::PublishLocalization(const TrajectoryPoint& point) {
 }
 
 void SimControl::PublishDummyPrediction() {
-  std::unique_lock<std::mutex> lock(mutex_);
-
-  if (!send_dummy_prediction_) {
-    return;
-  }
-
   std::shared_ptr<PredictionObstacles> prediction =
       std::make_shared<PredictionObstacles>();
-  FillHeader("SimPrediction", prediction.get());
-
+  {
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (!send_dummy_prediction_) {
+      return;
+    }
+    FillHeader("SimPrediction", prediction.get());
+  }
   prediction_writer_->Write(prediction);
 }
 
