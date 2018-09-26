@@ -1,73 +1,10 @@
-// DO NOT MODIFY
-// THIS FILE IS GENERATED AUTOMATICALLY TO HELP WRITE BUILD FILE.
-// DELETE THIS FILE WHEN YOU HAVE CREATED THE COMPLETE BUILD FILE
-cc_library(
-    name = "fusion_common_dst_evidence_test",
-    srcs = [
-        "fusion_common_dst_evidence_test.cc",
-    ],
-    deps = [
-    ],
-)
-
+# DO NOT MODIFY
+# THIS FILE IS GENERATED AUTOMATICALLY TO HELP WRITE BUILD FILE
+# DELETE THIS FILE WHEN YOU HAVE CREATED THE COMPLETE BUILD FILE
 cc_library(
     name = "fusion_base_sensor_data_manager_test",
     srcs = [
         "fusion_base_sensor_data_manager_test.cc",
-    ],
-    deps = [
-    ],
-)
-
-cc_library(
-    name = "fusion_base_track_test",
-    srcs = [
-        "fusion_base_track_test.cc",
-    ],
-    deps = [
-    ],
-)
-
-cc_library(
-    name = "fusion_base_sensor_test",
-    srcs = [
-        "fusion_base_sensor_test.cc",
-    ],
-    deps = [
-    ],
-)
-
-cc_library(
-    name = "fusion_base_sensor_object_test",
-    srcs = [
-        "fusion_base_sensor_object_test.cc",
-    ],
-    deps = [
-    ],
-)
-
-cc_library(
-    name = "fusion_lib_data_association_hm_data_association_test",
-    srcs = [
-        "fusion_lib_data_association_hm_data_association_test.cc",
-    ],
-    deps = [
-    ],
-)
-
-cc_library(
-    name = "fusion_pbf_gatekeeper_test",
-    srcs = [
-        "fusion_pbf_gatekeeper_test.cc",
-    ],
-    deps = [
-    ],
-)
-
-cc_library(
-    name = "fusion_dst_existance_fusion_test",
-    srcs = [
-        "fusion_dst_existance_fusion_test.cc",
     ],
     deps = [
     ],
@@ -83,6 +20,60 @@ cc_library(
 )
 
 cc_library(
+    name = "fusion_base_sensor_object_test",
+    srcs = [
+        "fusion_base_sensor_object_test.cc",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
+    name = "fusion_base_sensor_test",
+    srcs = [
+        "fusion_base_sensor_test.cc",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
+    name = "fusion_base_track_test",
+    srcs = [
+        "fusion_base_track_test.cc",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
+    name = "fusion_common_camera_util_test",
+    srcs = [
+        "fusion_common_camera_util_test.cc",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
+    name = "fusion_common_dst_evidence_test",
+    srcs = [
+        "fusion_common_dst_evidence_test.cc",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
+    name = "fusion_common_information_filter_test",
+    srcs = [
+        "fusion_common_information_filter_test.cc",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
     name = "fusion_common_kalman_filter_test",
     srcs = [
         "fusion_common_kalman_filter_test.cc",
@@ -92,9 +83,36 @@ cc_library(
 )
 
 cc_library(
-    name = "fusion_pbf_shape_fusion_test",
+    name = "fusion_dst_existance_fusion_test",
     srcs = [
-        "fusion_pbf_shape_fusion_test.cc",
+        "fusion_dst_existance_fusion_test.cc",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
+    name = "fusion_dst_type_fusion_test",
+    srcs = [
+        "fusion_dst_type_fusion_test.cc",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
+    name = "fusion_kalman_motion_fusion_test",
+    srcs = [
+        "fusion_kalman_motion_fusion_test.cc",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
+    name = "fusion_lib_data_association_hm_data_association_test",
+    srcs = [
+        "fusion_lib_data_association_hm_data_association_test.cc",
     ],
     deps = [
     ],
@@ -119,9 +137,27 @@ cc_library(
 )
 
 cc_library(
-    name = "fusion_dst_type_fusion_test",
+    name = "fusion_lib_dummy_algorithms_test",
     srcs = [
-        "fusion_dst_type_fusion_test.cc",
+        "fusion_lib_dummy_algorithms_test.cc",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
+    name = "fusion_pbf_gatekeeper_test",
+    srcs = [
+        "fusion_pbf_gatekeeper_test.cc",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
+    name = "fusion_pbf_shape_fusion_test",
+    srcs = [
+        "fusion_pbf_shape_fusion_test.cc",
     ],
     deps = [
     ],
@@ -140,42 +176,6 @@ cc_library(
     name = "fusion_probabilistic_fusion_test",
     srcs = [
         "fusion_probabilistic_fusion_test.cc",
-    ],
-    deps = [
-    ],
-)
-
-cc_library(
-    name = "fusion_common_camera_util_test",
-    srcs = [
-        "fusion_common_camera_util_test.cc",
-    ],
-    deps = [
-    ],
-)
-
-cc_library(
-    name = "fusion_kalman_motion_fusion_test",
-    srcs = [
-        "fusion_kalman_motion_fusion_test.cc",
-    ],
-    deps = [
-    ],
-)
-
-cc_library(
-    name = "fusion_lib_dummy_algorithms_test",
-    srcs = [
-        "fusion_lib_dummy_algorithms_test.cc",
-    ],
-    deps = [
-    ],
-)
-
-cc_library(
-    name = "fusion_common_information_filter_test",
-    srcs = [
-        "fusion_common_information_filter_test.cc",
     ],
     deps = [
     ],

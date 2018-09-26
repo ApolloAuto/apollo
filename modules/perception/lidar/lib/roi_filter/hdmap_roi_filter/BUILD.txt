@@ -1,15 +1,6 @@
-// DO NOT MODIFY
-// THIS FILE IS GENERATED AUTOMATICALLY TO HELP WRITE BUILD FILE.
-// DELETE THIS FILE WHEN YOU HAVE CREATED THE COMPLETE BUILD FILE
-cc_library(
-    name = "polygon_scan_cvter",
-    hdrs = [
-        "polygon_scan_cvter.h",
-    ],
-    deps = [
-    ],
-)
-
+# DO NOT MODIFY
+# THIS FILE IS GENERATED AUTOMATICALLY TO HELP WRITE BUILD FILE
+# DELETE THIS FILE WHEN YOU HAVE CREATED THE COMPLETE BUILD FILE
 cc_library(
     name = "bitmap2d",
     srcs = [
@@ -44,24 +35,9 @@ cc_library(
 )
 
 cc_library(
-    name = "bitmap2d",
-    srcs = [
-        "bitmap2d.cc",
-    ],
+    name = "polygon_scan_cvter",
     hdrs = [
-        "bitmap2d.h",
-    ],
-    deps = [
-    ],
-)
-
-cc_library(
-    name = "hdmap_roi_filter",
-    srcs = [
-        "hdmap_roi_filter.cc",
-    ],
-    hdrs = [
-        "hdmap_roi_filter.h",
+        "polygon_scan_cvter.h",
     ],
     deps = [
     ],

@@ -1,6 +1,6 @@
-// DO NOT MODIFY
-// THIS FILE IS GENERATED AUTOMATICALLY TO HELP WRITE BUILD FILE.
-// DELETE THIS FILE WHEN YOU HAVE CREATED THE COMPLETE BUILD FILE
+# DO NOT MODIFY
+# THIS FILE IS GENERATED AUTOMATICALLY TO HELP WRITE BUILD FILE
+# DELETE THIS FILE WHEN YOU HAVE CREATED THE COMPLETE BUILD FILE
 cc_library(
     name = "spp_cluster",
     hdrs = [
@@ -11,72 +11,24 @@ cc_library(
 )
 
 cc_library(
+    name = "spp_cluster_list",
+    srcs = [
+        "spp_cluster_list.cc",
+    ],
+    hdrs = [
+        "spp_cluster_list.h",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
     name = "spp_engine",
     srcs = [
         "spp_engine.cc",
     ],
     hdrs = [
         "spp_engine.h",
-    ],
-    deps = [
-    ],
-)
-
-cc_library(
-    name = "spp_struct",
-    srcs = [
-        "spp_struct.cc",
-    ],
-    hdrs = [
-        "spp_struct.h",
-    ],
-    deps = [
-    ],
-)
-
-cc_library(
-    name = "spp_pool_types",
-    srcs = [
-        "spp_pool_types.cc",
-    ],
-    hdrs = [
-        "spp_pool_types.h",
-    ],
-    deps = [
-    ],
-)
-
-cc_library(
-    name = "spp_seg_cc_2d",
-    srcs = [
-        "spp_seg_cc_2d.cc",
-    ],
-    hdrs = [
-        "spp_seg_cc_2d.h",
-    ],
-    deps = [
-    ],
-)
-
-cc_library(
-    name = "spp_cluster_list",
-    srcs = [
-        "spp_cluster_list.cc",
-    ],
-    hdrs = [
-        "spp_cluster_list.h",
-    ],
-    deps = [
-    ],
-)
-
-cc_library(
-    name = "spp_cluster_list",
-    srcs = [
-        "spp_cluster_list.cc",
-    ],
-    hdrs = [
-        "spp_cluster_list.h",
     ],
     deps = [
     ],
@@ -107,18 +59,6 @@ cc_library(
 )
 
 cc_library(
-    name = "spp_label_image",
-    srcs = [
-        "spp_label_image.cc",
-    ],
-    hdrs = [
-        "spp_label_image.h",
-    ],
-    deps = [
-    ],
-)
-
-cc_library(
     name = "spp_seg_cc_2d",
     srcs = [
         "spp_seg_cc_2d.cc",
@@ -137,18 +77,6 @@ cc_library(
     ],
     hdrs = [
         "spp_struct.h",
-    ],
-    deps = [
-    ],
-)
-
-cc_library(
-    name = "spp_engine",
-    srcs = [
-        "spp_engine.cc",
-    ],
-    hdrs = [
-        "spp_engine.h",
     ],
     deps = [
     ],

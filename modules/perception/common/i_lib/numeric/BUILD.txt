@@ -1,28 +1,10 @@
-// DO NOT MODIFY
-// THIS FILE IS GENERATED AUTOMATICALLY TO HELP WRITE BUILD FILE.
-// DELETE THIS FILE WHEN YOU HAVE CREATED THE COMPLETE BUILD FILE
+# DO NOT MODIFY
+# THIS FILE IS GENERATED AUTOMATICALLY TO HELP WRITE BUILD FILE
+# DELETE THIS FILE WHEN YOU HAVE CREATED THE COMPLETE BUILD FILE
 cc_library(
-    name = "i_poly",
+    name = "i_eig",
     hdrs = [
-        "i_poly.h",
-    ],
-    deps = [
-    ],
-)
-
-cc_library(
-    name = "i_lu",
-    hdrs = [
-        "i_lu.h",
-    ],
-    deps = [
-    ],
-)
-
-cc_library(
-    name = "i_qr",
-    hdrs = [
-        "i_qr.h",
+        "i_eig.h",
     ],
     deps = [
     ],
@@ -38,9 +20,27 @@ cc_library(
 )
 
 cc_library(
-    name = "i_eig",
+    name = "i_lu",
     hdrs = [
-        "i_eig.h",
+        "i_lu.h",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
+    name = "i_poly",
+    hdrs = [
+        "i_poly.h",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
+    name = "i_qr",
+    hdrs = [
+        "i_qr.h",
     ],
     deps = [
     ],

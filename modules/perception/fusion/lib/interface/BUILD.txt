@@ -1,10 +1,10 @@
-// DO NOT MODIFY
-// THIS FILE IS GENERATED AUTOMATICALLY TO HELP WRITE BUILD FILE.
-// DELETE THIS FILE WHEN YOU HAVE CREATED THE COMPLETE BUILD FILE
+# DO NOT MODIFY
+# THIS FILE IS GENERATED AUTOMATICALLY TO HELP WRITE BUILD FILE
+# DELETE THIS FILE WHEN YOU HAVE CREATED THE COMPLETE BUILD FILE
 cc_library(
-    name = "base_tracker",
+    name = "base_data_association",
     hdrs = [
-        "base_tracker.h",
+        "base_data_association.h",
     ],
     deps = [
     ],
@@ -20,18 +20,18 @@ cc_library(
 )
 
 cc_library(
-    name = "base_gatekeeper",
+    name = "base_fusion_system",
     hdrs = [
-        "base_gatekeeper.h",
+        "base_fusion_system.h",
     ],
     deps = [
     ],
 )
 
 cc_library(
-    name = "base_data_association",
+    name = "base_gatekeeper",
     hdrs = [
-        "base_data_association.h",
+        "base_gatekeeper.h",
     ],
     deps = [
     ],
@@ -47,27 +47,27 @@ cc_library(
 )
 
 cc_library(
-    name = "base_type_fusion",
-    hdrs = [
-        "base_type_fusion.h",
-    ],
-    deps = [
-    ],
-)
-
-cc_library(
-    name = "base_fusion_system",
-    hdrs = [
-        "base_fusion_system.h",
-    ],
-    deps = [
-    ],
-)
-
-cc_library(
     name = "base_shape_fusion",
     hdrs = [
         "base_shape_fusion.h",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
+    name = "base_tracker",
+    hdrs = [
+        "base_tracker.h",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
+    name = "base_type_fusion",
+    hdrs = [
+        "base_type_fusion.h",
     ],
     deps = [
     ],

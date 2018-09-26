@@ -1,198 +1,6 @@
-// DO NOT MODIFY
-// THIS FILE IS GENERATED AUTOMATICALLY TO HELP WRITE BUILD FILE.
-// DELETE THIS FILE WHEN YOU HAVE CREATED THE COMPLETE BUILD FILE
-cc_library(
-    name = "measurement_computer",
-    srcs = [
-        "measurement_computer.cc",
-    ],
-    hdrs = [
-        "measurement_computer.h",
-    ],
-    deps = [
-    ],
-)
-
-cc_library(
-    name = "object_track_matcher",
-    srcs = [
-        "object_track_matcher.cc",
-    ],
-    hdrs = [
-        "object_track_matcher.h",
-    ],
-    deps = [
-    ],
-)
-
-cc_library(
-    name = "track_post_processor",
-    srcs = [
-        "track_post_processor.cc",
-    ],
-    hdrs = [
-        "track_post_processor.h",
-    ],
-    deps = [
-    ],
-)
-
-cc_library(
-    name = "hm_multi_target_tracker",
-    srcs = [
-        "hm_multi_target_tracker.cc",
-    ],
-    hdrs = [
-        "hm_multi_target_tracker.h",
-    ],
-    deps = [
-    ],
-)
-
-cc_library(
-    name = "tracker",
-    srcs = [
-        "tracker.cc",
-    ],
-    hdrs = [
-        "tracker.h",
-    ],
-    deps = [
-    ],
-)
-
-cc_library(
-    name = "gnn_bipartite_graph_matcher",
-    srcs = [
-        "gnn_bipartite_graph_matcher.cc",
-    ],
-    hdrs = [
-        "gnn_bipartite_graph_matcher.h",
-    ],
-    deps = [
-    ],
-)
-
-cc_library(
-    name = "measurement_computer",
-    srcs = [
-        "measurement_computer.cc",
-    ],
-    hdrs = [
-        "measurement_computer.h",
-    ],
-    deps = [
-    ],
-)
-
-cc_library(
-    name = "track_object_distance",
-    srcs = [
-        "track_object_distance.cc",
-    ],
-    hdrs = [
-        "track_object_distance.h",
-    ],
-    deps = [
-    ],
-)
-
-cc_library(
-    name = "gnn_bipartite_graph_matcher",
-    srcs = [
-        "gnn_bipartite_graph_matcher.cc",
-    ],
-    hdrs = [
-        "gnn_bipartite_graph_matcher.h",
-    ],
-    deps = [
-    ],
-)
-
-cc_library(
-    name = "object_track_matcher",
-    srcs = [
-        "object_track_matcher.cc",
-    ],
-    hdrs = [
-        "object_track_matcher.h",
-    ],
-    deps = [
-    ],
-)
-
-cc_library(
-    name = "multi_hm_bipartite_graph_matcher",
-    srcs = [
-        "multi_hm_bipartite_graph_matcher.cc",
-    ],
-    hdrs = [
-        "multi_hm_bipartite_graph_matcher.h",
-    ],
-    deps = [
-    ],
-)
-
-cc_library(
-    name = "kalman_filter",
-    srcs = [
-        "kalman_filter.cc",
-    ],
-    hdrs = [
-        "kalman_filter.h",
-    ],
-    deps = [
-    ],
-)
-
-cc_library(
-    name = "kalman_filter",
-    srcs = [
-        "kalman_filter.cc",
-    ],
-    hdrs = [
-        "kalman_filter.h",
-    ],
-    deps = [
-    ],
-)
-
-cc_library(
-    name = "track_post_processor",
-    srcs = [
-        "track_post_processor.cc",
-    ],
-    hdrs = [
-        "track_post_processor.h",
-    ],
-    deps = [
-    ],
-)
-
-cc_library(
-    name = "multi_hm_bipartite_graph_matcher",
-    srcs = [
-        "multi_hm_bipartite_graph_matcher.cc",
-    ],
-    hdrs = [
-        "multi_hm_bipartite_graph_matcher.h",
-    ],
-    deps = [
-    ],
-)
-
-cc_library(
-    name = "tracker",
-    srcs = [
-        "tracker.cc",
-    ],
-    hdrs = [
-        "tracker.h",
-    ],
-    deps = [
-    ],
-)
-
+# DO NOT MODIFY
+# THIS FILE IS GENERATED AUTOMATICALLY TO HELP WRITE BUILD FILE
+# DELETE THIS FILE WHEN YOU HAVE CREATED THE COMPLETE BUILD FILE
 cc_library(
     name = "base_filter",
     hdrs = [
@@ -203,6 +11,18 @@ cc_library(
 )
 
 cc_library(
+    name = "gnn_bipartite_graph_matcher",
+    srcs = [
+        "gnn_bipartite_graph_matcher.cc",
+    ],
+    hdrs = [
+        "gnn_bipartite_graph_matcher.h",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
     name = "hm_multi_target_tracker",
     srcs = [
         "hm_multi_target_tracker.cc",
@@ -215,12 +35,84 @@ cc_library(
 )
 
 cc_library(
+    name = "kalman_filter",
+    srcs = [
+        "kalman_filter.cc",
+    ],
+    hdrs = [
+        "kalman_filter.h",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
+    name = "measurement_computer",
+    srcs = [
+        "measurement_computer.cc",
+    ],
+    hdrs = [
+        "measurement_computer.h",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
+    name = "multi_hm_bipartite_graph_matcher",
+    srcs = [
+        "multi_hm_bipartite_graph_matcher.cc",
+    ],
+    hdrs = [
+        "multi_hm_bipartite_graph_matcher.h",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
+    name = "object_track_matcher",
+    srcs = [
+        "object_track_matcher.cc",
+    ],
+    hdrs = [
+        "object_track_matcher.h",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
+    name = "tracker",
+    srcs = [
+        "tracker.cc",
+    ],
+    hdrs = [
+        "tracker.h",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
     name = "track_object_distance",
     srcs = [
         "track_object_distance.cc",
     ],
     hdrs = [
         "track_object_distance.h",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
+    name = "track_post_processor",
+    srcs = [
+        "track_post_processor.cc",
+    ],
+    hdrs = [
+        "track_post_processor.h",
     ],
     deps = [
     ],

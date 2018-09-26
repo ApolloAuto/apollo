@@ -1,18 +1,6 @@
-// DO NOT MODIFY
-// THIS FILE IS GENERATED AUTOMATICALLY TO HELP WRITE BUILD FILE.
-// DELETE THIS FILE WHEN YOU HAVE CREATED THE COMPLETE BUILD FILE
-cc_library(
-    name = "object_filter_bank",
-    srcs = [
-        "object_filter_bank.cc",
-    ],
-    hdrs = [
-        "object_filter_bank.h",
-    ],
-    deps = [
-    ],
-)
-
+# DO NOT MODIFY
+# THIS FILE IS GENERATED AUTOMATICALLY TO HELP WRITE BUILD FILE
+# DELETE THIS FILE WHEN YOU HAVE CREATED THE COMPLETE BUILD FILE
 cc_library(
     name = "object_filter_bank",
     srcs = [

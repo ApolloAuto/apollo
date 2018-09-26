@@ -1,30 +1,6 @@
-// DO NOT MODIFY
-// THIS FILE IS GENERATED AUTOMATICALLY TO HELP WRITE BUILD FILE.
-// DELETE THIS FILE WHEN YOU HAVE CREATED THE COMPLETE BUILD FILE
-cc_library(
-    name = "tracked_object",
-    srcs = [
-        "tracked_object.cc",
-    ],
-    hdrs = [
-        "tracked_object.h",
-    ],
-    deps = [
-    ],
-)
-
-cc_library(
-    name = "tracked_object",
-    srcs = [
-        "tracked_object.cc",
-    ],
-    hdrs = [
-        "tracked_object.h",
-    ],
-    deps = [
-    ],
-)
-
+# DO NOT MODIFY
+# THIS FILE IS GENERATED AUTOMATICALLY TO HELP WRITE BUILD FILE
+# DELETE THIS FILE WHEN YOU HAVE CREATED THE COMPLETE BUILD FILE
 cc_library(
     name = "track_data",
     srcs = [
@@ -38,24 +14,12 @@ cc_library(
 )
 
 cc_library(
-    name = "track_data",
+    name = "tracked_object",
     srcs = [
-        "track_data.cc",
+        "tracked_object.cc",
     ],
     hdrs = [
-        "track_data.h",
-    ],
-    deps = [
-    ],
-)
-
-cc_library(
-    name = "track_pool_types",
-    srcs = [
-        "track_pool_types.cc",
-    ],
-    hdrs = [
-        "track_pool_types.h",
+        "tracked_object.h",
     ],
     deps = [
     ],

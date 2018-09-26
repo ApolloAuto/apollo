@@ -1,6 +1,15 @@
-// DO NOT MODIFY
-// THIS FILE IS GENERATED AUTOMATICALLY TO HELP WRITE BUILD FILE.
-// DELETE THIS FILE WHEN YOU HAVE CREATED THE COMPLETE BUILD FILE
+# DO NOT MODIFY
+# THIS FILE IS GENERATED AUTOMATICALLY TO HELP WRITE BUILD FILE
+# DELETE THIS FILE WHEN YOU HAVE CREATED THE COMPLETE BUILD FILE
+cc_library(
+    name = "common_image_processing_hough_test",
+    srcs = [
+        "common_image_processing_hough_test.cc",
+    ],
+    deps = [
+    ],
+)
+
 cc_library(
     name = "common_io_io_util_test",
     srcs = [
@@ -11,27 +20,9 @@ cc_library(
 )
 
 cc_library(
-    name = "common_sensor_manager_test",
-    srcs = [
-        "common_sensor_manager_test.cc",
-    ],
-    deps = [
-    ],
-)
-
-cc_library(
     name = "common_machine_learning_rdf_test",
     srcs = [
         "common_machine_learning_rdf_test.cc",
-    ],
-    deps = [
-    ],
-)
-
-cc_library(
-    name = "common_image_processing_hough_test",
-    srcs = [
-        "common_image_processing_hough_test.cc",
     ],
     deps = [
     ],

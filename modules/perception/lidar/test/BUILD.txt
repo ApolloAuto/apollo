@@ -1,73 +1,10 @@
-// DO NOT MODIFY
-// THIS FILE IS GENERATED AUTOMATICALLY TO HELP WRITE BUILD FILE.
-// DELETE THIS FILE WHEN YOU HAVE CREATED THE COMPLETE BUILD FILE
-cc_library(
-    name = "lidar_lib_pointcloud_preprocessor_test",
-    srcs = [
-        "lidar_lib_pointcloud_preprocessor_test.cc",
-    ],
-    deps = [
-    ],
-)
-
+# DO NOT MODIFY
+# THIS FILE IS GENERATED AUTOMATICALLY TO HELP WRITE BUILD FILE
+# DELETE THIS FILE WHEN YOU HAVE CREATED THE COMPLETE BUILD FILE
 cc_library(
     name = "lidar_app_lidar_pipeline_test",
     srcs = [
         "lidar_app_lidar_pipeline_test.cc",
-    ],
-    deps = [
-    ],
-)
-
-cc_library(
-    name = "lidar_lib_hm_tracker_hm_mutil_target_tracker_test",
-    srcs = [
-        "lidar_lib_hm_tracker_hm_mutil_target_tracker_test.cc",
-    ],
-    deps = [
-    ],
-)
-
-cc_library(
-    name = "lidar_lib_scene_manager_test",
-    srcs = [
-        "lidar_lib_scene_manager_test.cc",
-    ],
-    deps = [
-    ],
-)
-
-cc_library(
-    name = "pcd_pose",
-    hdrs = [
-        "pcd_pose.h",
-    ],
-    deps = [
-    ],
-)
-
-cc_library(
-    name = "lidar_lib_hm_tracker_bipartite_graph_matcher_test",
-    srcs = [
-        "lidar_lib_hm_tracker_bipartite_graph_matcher_test.cc",
-    ],
-    deps = [
-    ],
-)
-
-cc_library(
-    name = "lidar_lib_segmentation_cnnseg_test",
-    srcs = [
-        "lidar_lib_segmentation_cnnseg_test.cc",
-    ],
-    deps = [
-    ],
-)
-
-cc_library(
-    name = "lidar_lib_segmentation_cnnseg_feature_generator_test",
-    srcs = [
-        "lidar_lib_segmentation_cnnseg_feature_generator_test.cc",
     ],
     deps = [
     ],
@@ -83,54 +20,9 @@ cc_library(
 )
 
 cc_library(
-    name = "lidar_lib_hm_tracker_kalman_filter_test",
-    srcs = [
-        "lidar_lib_hm_tracker_kalman_filter_test.cc",
-    ],
-    deps = [
-    ],
-)
-
-cc_library(
-    name = "lidar_lib_roi_service_filter_test",
-    srcs = [
-        "lidar_lib_roi_service_filter_test.cc",
-    ],
-    deps = [
-    ],
-)
-
-cc_library(
     name = "lidar_lib_dummy_dummy_test",
     srcs = [
         "lidar_lib_dummy_dummy_test.cc",
-    ],
-    deps = [
-    ],
-)
-
-cc_library(
-    name = "lidar_lib_segmentation_cnnseg_spp_engine_spp_cluster_test",
-    srcs = [
-        "lidar_lib_segmentation_cnnseg_spp_engine_spp_cluster_test.cc",
-    ],
-    deps = [
-    ],
-)
-
-cc_library(
-    name = "lidar_lib_object_filter_bank_roi_boundary_filter_test",
-    srcs = [
-        "lidar_lib_object_filter_bank_roi_boundary_filter_test.cc",
-    ],
-    deps = [
-    ],
-)
-
-cc_library(
-    name = "lidar_lib_map_manager_test",
-    srcs = [
-        "lidar_lib_map_manager_test.cc",
     ],
     deps = [
     ],
@@ -146,18 +38,36 @@ cc_library(
 )
 
 cc_library(
-    name = "lidar_lib_object_filter_bank_filter_bank_test",
+    name = "lidar_lib_hm_tracker_bipartite_graph_matcher_test",
     srcs = [
-        "lidar_lib_object_filter_bank_filter_bank_test.cc",
+        "lidar_lib_hm_tracker_bipartite_graph_matcher_test.cc",
     ],
     deps = [
     ],
 )
 
 cc_library(
-    name = "lidar_lib_spatio_temporal_ground_detector_test",
+    name = "lidar_lib_hm_tracker_hm_mutil_target_tracker_test",
     srcs = [
-        "lidar_lib_spatio_temporal_ground_detector_test.cc",
+        "lidar_lib_hm_tracker_hm_mutil_target_tracker_test.cc",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
+    name = "lidar_lib_hm_tracker_kalman_filter_test",
+    srcs = [
+        "lidar_lib_hm_tracker_kalman_filter_test.cc",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
+    name = "lidar_lib_hm_tracker_object_track_matcher_test",
+    srcs = [
+        "lidar_lib_hm_tracker_object_track_matcher_test.cc",
     ],
     deps = [
     ],
@@ -173,6 +83,42 @@ cc_library(
 )
 
 cc_library(
+    name = "lidar_lib_map_manager_test",
+    srcs = [
+        "lidar_lib_map_manager_test.cc",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
+    name = "lidar_lib_object_filter_bank_filter_bank_test",
+    srcs = [
+        "lidar_lib_object_filter_bank_filter_bank_test.cc",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
+    name = "lidar_lib_object_filter_bank_roi_boundary_filter_test",
+    srcs = [
+        "lidar_lib_object_filter_bank_roi_boundary_filter_test.cc",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
+    name = "lidar_lib_pointcloud_preprocessor_test",
+    srcs = [
+        "lidar_lib_pointcloud_preprocessor_test.cc",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
     name = "lidar_lib_roi_filter_hdmap_roi_filter_test",
     srcs = [
         "lidar_lib_roi_filter_hdmap_roi_filter_test.cc",
@@ -182,9 +128,63 @@ cc_library(
 )
 
 cc_library(
-    name = "lidar_lib_hm_tracker_object_track_matcher_test",
+    name = "lidar_lib_roi_service_filter_test",
     srcs = [
-        "lidar_lib_hm_tracker_object_track_matcher_test.cc",
+        "lidar_lib_roi_service_filter_test.cc",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
+    name = "lidar_lib_scene_manager_test",
+    srcs = [
+        "lidar_lib_scene_manager_test.cc",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
+    name = "lidar_lib_segmentation_cnnseg_feature_generator_test",
+    srcs = [
+        "lidar_lib_segmentation_cnnseg_feature_generator_test.cc",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
+    name = "lidar_lib_segmentation_cnnseg_spp_engine_spp_cluster_test",
+    srcs = [
+        "lidar_lib_segmentation_cnnseg_spp_engine_spp_cluster_test.cc",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
+    name = "lidar_lib_segmentation_cnnseg_test",
+    srcs = [
+        "lidar_lib_segmentation_cnnseg_test.cc",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
+    name = "lidar_lib_spatio_temporal_ground_detector_test",
+    srcs = [
+        "lidar_lib_spatio_temporal_ground_detector_test.cc",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
+    name = "pcd_pose",
+    hdrs = [
+        "pcd_pose.h",
     ],
     deps = [
     ],
