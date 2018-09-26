@@ -13,9 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_LIDAR_LIB_CLASSIFIER_FUSED_CLASSIFIER_TYPE_FUSION_INTERFACE_H_
-#define MODULES_PERCEPTION_LIDAR_LIB_CLASSIFIER_FUSED_CLASSIFIER_TYPE_FUSION_INTERFACE_H_
+#ifndef MODULES_PERCEPTION_LIDAR_LIB_CLASSIFIER_FUSED_CLASSIFIER_TYPE_FUSION_INTERFACE_H_  // NOLINT
+#define MODULES_PERCEPTION_LIDAR_LIB_CLASSIFIER_FUSED_CLASSIFIER_TYPE_FUSION_INTERFACE_H_  // NOLINT
+
 #include <string>
+
 #include "modules/perception/base/object.h"
 #include "modules/perception/lib/registerer/registerer.h"
 #include "modules/perception/lidar/common/object_sequence.h"
@@ -54,8 +56,9 @@ class BaseSequenceTypeFusion {
 PERCEPTION_REGISTER_REGISTERER(BaseSequenceTypeFusion);
 #define PERCEPTION_REGISTER_SEQUENCETYPEFUSION(name) \
   PERCEPTION_REGISTER_CLASS(BaseSequenceTypeFusion, name)
+
 }  // namespace lidar
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_LIDAR_LIB_CLASSIFIER_FUSED_CLASSIFIER_TYPE_FUSION_INTERFACE_H_
+#endif

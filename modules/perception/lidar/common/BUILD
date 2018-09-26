@@ -115,4 +115,19 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "object_sequence",
+    srcs = [
+        "object_sequence.cc",
+    ],
+    hdrs = [
+        "object_sequence.h",
+    ],
+    deps = [
+        "//modules/perception/base:object",
+        "//modules/perception/lidar/common:common",
+        "//framework:cybertron",
+    ],
+)
+
 cpplint()

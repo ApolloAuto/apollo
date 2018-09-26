@@ -15,9 +15,12 @@
  *****************************************************************************/
 #ifndef MODULES_PERCEPTION_LIDAR_COMMON_OBJECT_SEQUENCE_H_
 #define MODULES_PERCEPTION_LIDAR_COMMON_OBJECT_SEQUENCE_H_
+
 #include <map>
 #include <mutex>
 #include <vector>
+#include <memory>
+
 #include "modules/perception/base/object.h"
 #include "modules/perception/lidar/common/lidar_log.h"
 
@@ -29,14 +32,16 @@ class ObjectSequence {
  public:
   typedef int TrackIdKey;
   typedef double TimeStampKey;
-  typedef std::map<TimeStampKey, base::ObjectPtr> TrackedObjects;
+  typedef std::map<TimeStampKey,
+      std::shared_ptr<apollo::perception::base::Object>> TrackedObjects;
 
  public:
   ObjectSequence() = default;
   ~ObjectSequence() = default;
 
-  bool AddTrackedFrameObjects(const std::vector<base::ObjectPtr>& objects,
-                              TimeStampKey timestamp);
+  bool AddTrackedFrameObjects(
+      const std::vector<std::shared_ptr<perception::base::Object>>& objects,
+      TimeStampKey timestamp);
 
   bool GetTrackInTemporalWindow(TrackIdKey track_id, TrackedObjects* track,
                                 TimeStampKey window_time);
