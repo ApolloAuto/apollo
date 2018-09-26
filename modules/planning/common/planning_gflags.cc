@@ -381,3 +381,8 @@ DEFINE_bool(enable_stitch_last_trajectory, true,
 
 DEFINE_bool(enable_planning_pad_msg, false,
             "To control whether to enable planning pad message.");
+
+// TODO(all): open space planner, merge with planning conf
+DEFINE_string(planner_open_space_config_filename,
+              "modules/planning/conf/planner_open_space_config.pb.txt",
+              "The open space planner configuration file");

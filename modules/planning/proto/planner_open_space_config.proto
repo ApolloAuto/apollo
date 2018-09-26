@@ -3,5 +3,11 @@ syntax = "proto2";
 package apollo.planning;
 
 message PlannerOpenSpaceConfig {
-  optional uint32 planning_horizon = 1 [default = 10];
+  optional uint32 planning_horizon = 1 [default = 80];
+  optional double ts = 2 [default = 0.1];
+  // For distance approach weight configs
+  optional double w_u = 3 [default = 0.1];
+  optional double w_time_1 = 4 [default = 0.5];
+  optional double w_time_2 = 5 [default = 1.0];
+  optional double w_reg = 6 [default = 1e-4];
 }

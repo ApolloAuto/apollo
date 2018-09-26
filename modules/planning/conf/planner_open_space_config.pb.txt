@@ -1,0 +1,5 @@
+planning_horizon : 80
+w_u : 0.1
+w_time_1 : 0.5
+w_time_2 : 1.0
+w_reg : 1e-4
