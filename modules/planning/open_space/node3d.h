@@ -60,6 +60,10 @@ class Node3d {
   std::size_t GetIndex() { return index_; };
   bool GetDirec() { return direction_; };
   double GetSteer() { return steering_; };
+  std::shared_ptr<Node3d> GetPreNode() {return pre_node_;};
+  std::vector<double> GetXs() {return traversed_x_;};
+  std::vector<double> GetYs() {return traversed_y_;};
+  std::vector<double> GetPhis() {return traversed_phi_;};
   void SetPre(std::shared_ptr<Node3d> pre_node) { pre_node_ = pre_node; };
   void SetDirec(bool direction) { direction_ = direction; };
   void SetTrajCost(double cost) { traj_cost_ = cost; };

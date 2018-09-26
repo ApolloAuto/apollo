@@ -55,7 +55,7 @@ class HybridAStar {
   explicit HybridAStar();
   virtual ~HybridAStar() = default;
   bool Plan(double sx, double sy, double sphi, double ex, double ey,
-            double ephi, std::vector<const Obstacle*> obstacles);
+            double ephi, std::vector<const Obstacle*> obstacles, Result* result);
 
  private:
   // not complete
@@ -68,7 +68,7 @@ class HybridAStar {
   // check Reeds Shepp path collision and validity
   bool RSPCheck(const ReedSheppPath* reeds_shepp_to_end);
   // load the whole RSP as nodes and add to the close set
-  void LoadRSPinCS(const ReedSheppPath* reeds_shepp_to_end,
+  std::shared_ptr<Node3d> LoadRSPinCS(const ReedSheppPath* reeds_shepp_to_end,
                    std::shared_ptr<Node3d> current_node);
   std::shared_ptr<Node3d> Next_node_generator(
       std::shared_ptr<Node3d> current_node, std::size_t next_node_index);
@@ -80,7 +80,7 @@ class HybridAStar {
   double NonHoloNoObstacleHeuristic(const ReedSheppPath* reeds_shepp_to_end);
   double EuclidDist();
   double CalculateRSPCost(const ReedSheppPath* reeds_shepp_to_end);
-  Result GetResult();
+  Result GetResult(std::shared_ptr<Node3d> final_node);
 
  private:
   PlannerOpenSpaceConfig open_space_conf_;
@@ -108,7 +108,6 @@ class HybridAStar {
       open_pq_;
   std::map<std::size_t, std::shared_ptr<Node3d>> open_set_;
   std::map<std::size_t, std::shared_ptr<Node3d>> close_set_;
-  Result result_;
   std::unique_ptr<ReedShepp> reed_shepp_generator_;
 };
 

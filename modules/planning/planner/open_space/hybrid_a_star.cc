@@ -73,8 +73,9 @@ bool HybridAStar::ValidityCheck(Node3d& node) {
   return true;
 }
 
-void HybridAStar::LoadRSPinCS(const ReedSheppPath* reeds_shepp_to_end,
-                              std::shared_ptr<Node3d> current_node) {
+std::shared_ptr<Node3d> HybridAStar::LoadRSPinCS(
+    const ReedSheppPath* reeds_shepp_to_end,
+    std::shared_ptr<Node3d> current_node) {
   std::shared_ptr<Node3d> end_node = std::shared_ptr<Node3d>(new Node3d(
       reeds_shepp_to_end->x.back(), reeds_shepp_to_end->y.back(),
       reeds_shepp_to_end->phi.back(), reeds_shepp_to_end->x,
@@ -82,6 +83,7 @@ void HybridAStar::LoadRSPinCS(const ReedSheppPath* reeds_shepp_to_end,
   end_node->SetPre(current_node);
   end_node->SetTrajCost(CalculateRSPCost(reeds_shepp_to_end));
   close_set_.insert(std::make_pair(end_node->GetIndex(), end_node));
+  return end_node;
 }
 
 std::shared_ptr<Node3d> HybridAStar::Next_node_generator(
@@ -196,9 +198,43 @@ double HybridAStar::CalculateRSPCost(const ReedSheppPath* reeds_shepp_to_end) {
   }
   return RSP_cost;
 }
-
+bool HybridAStar::GetResult(std::shared_ptr<Node3d> final_node, Result* result) {
+  std::shared_ptr<Node3d> current_node = final_node;
+  std::vector<double> hybrid_a_x;
+  std::vector<double> hybrid_a_y;
+  std::vector<double> hybrid_a_phi;
+  while (current_node->GetPreNode() != nullptr) {
+    std::vector<double> x = current_node->GetXs();
+    std::vector<double> y = current_node->GetYs();
+    std::vector<double> phi = current_node->GetPhis();
+    if (x.size() = 0 || y.size() == 0 || phi.size() == 0) {
+      AINFO<<"result size check failed";
+      return false;
+    }
+    std::reverse(x.begin(), x.end());
+    std::reverse(y.begin(), y.end());
+    std::reverse(phi.begin(), phi.end());
+    x.pop_back();
+    y.pop_back();
+    phi.pop_back();
+    hybrid_a_x.insert(hybrid_a_x.end(), x.begin(), x.end());
+    hybrid_a_y.insert(hybrid_a_y.end(), y.begin(), y.end());
+    hybrid_a_phi.insert(hybrid_a_phi.end(), phi.begin(), phi.end());
+    current_node = current_node->GetPreNode();
+  }
+  hybrid_a_x.insert(hybrid_a_x.end(), current_node->GetXs().begin(),
+                    current_node->GetXs().end());
+  shybrid_a_y.insert(hybrid_a_y.end(), current_node->GetYs().begin(),
+                     current_node->GetYs().end());
+  hybrid_a_phi.insert(hybrid_a_phi.end(), current_node->GetPhis().begin(),
+                      current_node->GetPhis().end());
+  *result.x = hybrid_a_x;
+  *result.y = hybrid_a_y;
+  *result.phi = hybrid_a_phi;
+  return true;
+}
 bool HybridAStar::Plan(double sx, double sy, double sphi, double ex, double ey,
-                       double ephi, std::vector<const Obstacle*> obstacles) {
+                       double ephi, std::vector<const Obstacle*> obstacles, Result* result) {
   // load nodes and obstacles
   std::vector<double> sx_vec{sx};
   std::vector<double> sy_vec{sy};
@@ -215,6 +251,7 @@ bool HybridAStar::Plan(double sx, double sy, double sphi, double ex, double ey,
   open_set_.insert(std::make_pair(start_node_->GetIndex(), start_node_));
   open_pq_.push(
       std::make_pair(start_node_->GetIndex(), start_node_->GetCost()));
+  std::shared_ptr<Node3d> final_node;
   // Hybrid A* begins
   while (!open_pq_.empty()) {
     // take out the lowest cost neighoring node
@@ -227,7 +264,7 @@ bool HybridAStar::Plan(double sx, double sy, double sphi, double ex, double ey,
     if (AnalyticExpansion(current_node, &reeds_shepp_to_end)) {
       AINFO << "Reach the end configuration with Reed Sharp";
       // load the whole RSP as nodes and add to the close set
-      LoadRSPinCS(&reeds_shepp_to_end, current_node);
+      final_node = LoadRSPinCS(&reeds_shepp_to_end, current_node);
       break;
     }
     for (std::size_t i = 0; i < next_node_num_; i++) {
@@ -254,7 +291,10 @@ bool HybridAStar::Plan(double sx, double sy, double sphi, double ex, double ey,
       }
     }
   }
-  result_ = GetResult();
+  if(!GetResult(final_node, result)) {
+    AINFO<<"GetResult failed";
+    return false;
+  }
   return true;
 }
 }  // namespace planning
