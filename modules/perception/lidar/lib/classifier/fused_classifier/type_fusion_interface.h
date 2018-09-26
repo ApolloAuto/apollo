@@ -17,6 +17,7 @@
 #define MODULES_PERCEPTION_LIDAR_LIB_CLASSIFIER_FUSED_CLASSIFIER_TYPE_FUSION_INTERFACE_H_  // NOLINT
 
 #include <string>
+#include <memory>
 
 #include "modules/perception/base/object.h"
 #include "modules/perception/lib/registerer/registerer.h"
@@ -34,7 +35,7 @@ class BaseOneShotTypeFusion {
  public:
   virtual bool Init(const TypeFusionInitOption& option) = 0;
   virtual bool TypeFusion(const TypeFusionOption& option,
-                          base::ObjectPtr object) = 0;
+      std::shared_ptr<perception::base::Object> object) = 0;
   virtual std::string Name() const = 0;
 };
 

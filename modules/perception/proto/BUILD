@@ -73,4 +73,36 @@ proto_library(
     ],
 )
 
+cc_proto_library(
+    name = "ccrf_type_fusion_config_proto",
+    deps = [
+        ":ccrf_type_fusion_config_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "ccrf_type_fusion_config_proto_lib",
+    srcs = [
+        "ccrf_type_fusion_config.proto",
+    ],
+    deps = [
+    ],
+)
+
+cc_proto_library(
+    name = "fused_classifier_config_proto",
+    deps = [
+        ":fused_classifier_config_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "fused_classifier_config_proto_lib",
+    srcs = [
+        "fused_classifier_config.proto",
+    ],
+    deps = [
+    ],
+)
+
 cpplint()

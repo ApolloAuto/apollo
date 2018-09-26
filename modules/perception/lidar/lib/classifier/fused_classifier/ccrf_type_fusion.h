@@ -19,6 +19,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <memory>
 #include "modules/perception/lidar/lib/classifier/fused_classifier/type_fusion_interface.h"
 #include "modules/perception/lidar/lib/classifier/fused_classifier/util.h"
 
@@ -30,9 +31,11 @@ class CCRFOneShotTypeFusion : public BaseOneShotTypeFusion {
  public:
   bool Init(const TypeFusionInitOption& option) override;
   bool TypeFusion(const TypeFusionOption& option,
-                  base::ObjectPtr object) override;
+      std::shared_ptr<perception::base::Object> object) override;
   std::string Name() const override { return "CCRFOneShotTypeFusion"; }
-  bool FuseOneShotTypeProbs(const base::ObjectPtr& object, Vectord* log_prob);
+  bool FuseOneShotTypeProbs(
+      const std::shared_ptr<perception::base::Object>& object,
+      Vectord* log_prob);
 
  protected:
   std::map<std::string, Matrixd> smooth_matrices_;
@@ -62,7 +65,7 @@ class CCRFSequenceTypeFusion : public BaseSequenceTypeFusion {
   bool FuseWithConditionalProbabilityInference(TrackedObjects* tracked_objects);
   // util
   bool RecoverFromLogProbability(Vectord* prob, std::vector<float>* dst,
-                                 base::ObjectType* type);
+                                 perception::base::ObjectType* type);
 
  protected:
   CCRFOneShotTypeFusion one_shot_fuser_;
