@@ -15,7 +15,13 @@
  *****************************************************************************/
 #ifndef MODULES_PERCEPTION_LIDAR_LIB_SCENE_MANAGER_ROI_SERVICE_ROI_SERVICE_H_
 #define MODULES_PERCEPTION_LIDAR_LIB_SCENE_MANAGER_ROI_SERVICE_ROI_SERVICE_H_
-#include <Eigen/Dense>
+
+#include <memory>
+#include <string>
+#include <vector>
+
+#include "Eigen/Dense"
+
 #include "modules/perception/lidar/lib/scene_manager/scene_service.h"
 
 namespace apollo {
@@ -24,22 +30,28 @@ namespace lidar {
 
 class ROIServiceContent : public SceneServiceContent {
  public:
-  typedef Eigen::Matrix<size_t, 2, 1> Vec2ui;
+  using Vec2ui = Eigen::Matrix<size_t, 2, 1>;
   enum class DirectionMajor { XMAJOR = 0, YMAJOR = 1 };
+
   ROIServiceContent() = default;
   ~ROIServiceContent() = default;
+
   // @brief: get a copy of this service content
   // @param [out]: copy of the service content
   void GetCopy(SceneServiceContent* content) const override;
+
   // @brief: set service content from outside
   // @param [in]: input service content
   void SetContent(const SceneServiceContent& content) override;
+
   // @brief: get service content name
   // @return: name
   std::string Name() const override { return "ROIServiceContent"; }
+
   // @brief: check bitmap bit
   // @brief return true if bit has been set
   inline bool CheckBit(const size_t loc, const uint64_t block) const;
+
   // @brief: check if point in bitmp;
   // @return: return true if point is in roi
   bool Check(const Eigen::Vector3d& world_point) const;
@@ -57,6 +69,7 @@ class ROIService : public SceneService {
  public:
   ROIService() = default;
   ~ROIService() { roi_content_ref_ = nullptr; }
+
   // @brief: initialize scene service
   // @param [in]: init options
   bool Init(const SceneServiceInitOptions& options =

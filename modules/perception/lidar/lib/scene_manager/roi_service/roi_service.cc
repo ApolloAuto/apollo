@@ -14,11 +14,14 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/perception/lidar/lib/scene_manager/roi_service/roi_service.h"
+
+#include "modules/perception/lidar/lib/scene_manager/roi_service/proto/roi_service.pb.h"
+
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lib/io/file_util.h"
 #include "modules/perception/lib/io/protobuf_util.h"
 #include "modules/perception/lib/utils/string_util.h"
-#include "modules/perception/lidar/lib/scene_manager/roi_service/proto/roi_service.pb.h"
+
 namespace apollo {
 namespace perception {
 namespace lidar {
