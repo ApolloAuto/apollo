@@ -6,7 +6,7 @@ cc_library(
     name = "io_util",
     srcs = [
         "io_util.cc",
-    ],    
+    ],
     hdrs = [
         "io_util.h",
     ],
@@ -20,16 +20,16 @@ cc_library(
     ],
 )
 
-# cc_library(
-#     name = "io_util_test",
-#     srcs = [
-#         "io_util_test.cc",
-#     ],
-#     deps = [
-#         ":io_util",
-#         "@gtest//:main",
-#     ],
-# )
-
+cc_test(
+    name = "io_util_test",
+    size = "small",
+    srcs = [
+        "io_util_test.cc",
+    ],
+    deps = [
+        ":io_util",
+        "@gtest//:main",
+    ],
+)
 
 cpplint()
