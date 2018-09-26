@@ -15,10 +15,12 @@
  *****************************************************************************/
 #ifndef MODULES_PERCEPTION_BASE_OMNIDIRECTIONAL_MODEL_H_
 #define MODULES_PERCEPTION_BASE_OMNIDIRECTIONAL_MODEL_H_
-#include <Eigen/Core>
 
 #include <memory>
 #include <string>
+
+#include "Eigen/Core"
+
 #include "modules/perception/base/camera.h"
 #include "modules/perception/base/distortion_model.h"
 #include "modules/perception/base/polynomial.h"

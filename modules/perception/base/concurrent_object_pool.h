@@ -43,7 +43,7 @@ template <class ObjectType, size_t N = kPoolDefaultSize,
           class Initializer = ObjectPoolDefaultInitializer<ObjectType>>
 class ConcurrentObjectPool : public BaseObjectPool<ObjectType> {
  public:
-  using ObjectTypePtr = typename BaseObjectPool<ObjectType>::ObjectTypePtr;
+  // using ObjectTypePtr = typename BaseObjectPool<ObjectType>::ObjectTypePtr;
   using BaseObjectPool<ObjectType>::capacity_;
   // @brief Only allow accessing from global instance
   static ConcurrentObjectPool& Instance() {
@@ -51,7 +51,7 @@ class ConcurrentObjectPool : public BaseObjectPool<ObjectType> {
     return pool;
   }
   // @brief overrided function to get object smart pointer
-  ObjectTypePtr Get() override {
+  std::shared_ptr<ObjectType> Get() override {
 // TODO(All): remove conditional build
 #ifndef PERCEPTION_BASE_DISABLE_POOL
     ObjectType* ptr = nullptr;
@@ -66,18 +66,19 @@ class ConcurrentObjectPool : public BaseObjectPool<ObjectType> {
     // For efficiency consideration, intialization should be invoked
     // after releasing the mutex
     kInitializer(ptr);
-    return ObjectTypePtr(ptr, [&](ObjectType* obj_ptr) {
+    return std::shared_ptr<ObjectType>(ptr, [&](ObjectType* obj_ptr) {
       std::lock_guard<std::mutex> lock(mutex_);
       queue_.push(obj_ptr);
     });
 #else
-    return ObjectTypePtr(new ObjectType);
+    return std::shared_ptr<ObjectType>(new ObjectType);
 #endif
   }
   // @brief overrided function to get batch of smart pointers
   // @params[IN] num: batch number
   // @params[OUT] data: vector container to store the pointers
-  void BatchGet(size_t num, std::vector<ObjectTypePtr>* data) override {
+  void BatchGet(size_t num,
+                std::vector<std::shared_ptr<ObjectType>>* data) override {
 #ifndef PERCEPTION_BASE_DISABLE_POOL
     std::vector<ObjectType*> buffer(num, nullptr);
     {
@@ -94,14 +95,15 @@ class ConcurrentObjectPool : public BaseObjectPool<ObjectType> {
     // after releasing the mutex
     for (size_t i = 0; i < num; ++i) {
       kInitializer(buffer[i]);
-      data->emplace_back(ObjectTypePtr(buffer[i], [&](ObjectType* obj_ptr) {
-        std::lock_guard<std::mutex> lock(mutex_);
-        queue_.push(obj_ptr);
-      }));
+      data->emplace_back(
+          std::shared_ptr<ObjectType>(buffer[i], [&](ObjectType* obj_ptr) {
+            std::lock_guard<std::mutex> lock(mutex_);
+            queue_.push(obj_ptr);
+          }));
     }
 #else
     for (size_t i = 0; i < num; ++i) {
-      data->emplace_back(ObjectTypePtr(new ObjectType));
+      data->emplace_back(std::shared_ptr<ObjectType>(new ObjectType));
     }
 #endif
   }
@@ -110,7 +112,7 @@ class ConcurrentObjectPool : public BaseObjectPool<ObjectType> {
   // @params[IN] is_front: indicating insert to front or back of the list
   // @params[OUT] data: list container to store the pointers
   void BatchGet(size_t num, bool is_front,
-                std::list<ObjectTypePtr>* data) override {
+                std::list<std::shared_ptr<ObjectType>>* data) override {
 #ifndef PERCEPTION_BASE_DISABLE_POOL
     std::vector<ObjectType*> buffer(num, nullptr);
     {
@@ -128,22 +130,23 @@ class ConcurrentObjectPool : public BaseObjectPool<ObjectType> {
     for (size_t i = 0; i < num; ++i) {
       kInitializer(buffer[i]);
       is_front
-          ? data->emplace_front(
-                ObjectTypePtr(buffer[i],
-                              [&](ObjectType* obj_ptr) {
-                                std::lock_guard<std::mutex> lock(mutex_);
-                                queue_.push(obj_ptr);
-                              }))
-          : data->emplace_back(
-                ObjectTypePtr(buffer[i], [&](ObjectType* obj_ptr) {
+          ? data->emplace_front(std::shared_ptr<ObjectType>(
+                buffer[i],
+                [&](ObjectType* obj_ptr) {
+                  std::lock_guard<std::mutex> lock(mutex_);
+                  queue_.push(obj_ptr);
+                }))
+          : data->emplace_back(std::shared_ptr<ObjectType>(
+                buffer[i], [&](ObjectType* obj_ptr) {
                   std::lock_guard<std::mutex> lock(mutex_);
                   queue_.push(obj_ptr);
                 }));
     }
 #else
     for (size_t i = 0; i < num; ++i) {
-      is_front ? data->emplace_front(ObjectTypePtr(new ObjectType))
-               : data->emplace_back(ObjectTypePtr(new ObjectType));
+      is_front
+          ? data->emplace_front(std::shared_ptr<ObjectType>(new ObjectType))
+          : data->emplace_back(std::shared_ptr<ObjectType>(new ObjectType));
     }
 #endif
   }
@@ -152,7 +155,7 @@ class ConcurrentObjectPool : public BaseObjectPool<ObjectType> {
   // @params[IN] is_front: indicating insert to front or back of the deque
   // @params[OUT] data: deque container to store the pointers
   void BatchGet(size_t num, bool is_front,
-                std::deque<ObjectTypePtr>* data) override {
+                std::deque<std::shared_ptr<ObjectType>>* data) override {
 #ifndef PERCEPTION_BASE_DISABLE_POOL
     std::vector<ObjectType*> buffer(num, nullptr);
     {
@@ -168,22 +171,23 @@ class ConcurrentObjectPool : public BaseObjectPool<ObjectType> {
     for (size_t i = 0; i < num; ++i) {
       kInitializer(buffer[i]);
       is_front
-          ? data->emplace_front(
-                ObjectTypePtr(buffer[i],
-                              [&](ObjectType* obj_ptr) {
-                                std::lock_guard<std::mutex> lock(mutex_);
-                                queue_.push(obj_ptr);
-                              }))
-          : data->emplace_back(
-                ObjectTypePtr(buffer[i], [&](ObjectType* obj_ptr) {
+          ? data->emplace_front(std::shared_ptr<ObjectType>(
+                buffer[i],
+                [&](ObjectType* obj_ptr) {
+                  std::lock_guard<std::mutex> lock(mutex_);
+                  queue_.push(obj_ptr);
+                }))
+          : data->emplace_back(std::shared_ptr<ObjectType>(
+                buffer[i], [&](ObjectType* obj_ptr) {
                   std::lock_guard<std::mutex> lock(mutex_);
                   queue_.push(obj_ptr);
                 }));
     }
 #else
     for (size_t i = 0; i < num; ++i) {
-      is_front ? data->emplace_front(ObjectTypePtr(new ObjectType))
-               : data->emplace_back(ObjectTypePtr(new ObjectType));
+      is_front
+          ? data->emplace_front(std::shared_ptr<ObjectType>(new ObjectType))
+          : data->emplace_back(std::shared_ptr<ObjectType>(new ObjectType));
     }
 #endif
   }
@@ -223,7 +227,7 @@ class ConcurrentObjectPool : public BaseObjectPool<ObjectType> {
   }
 #endif
   // @brief default constructor
-  explicit ConcurrentObjectPool(size_t default_size)
+  explicit ConcurrentObjectPool(const size_t default_size)
       : kDefaultCacheSize(default_size) {
 #ifndef PERCEPTION_BASE_DISABLE_POOL
     cache_ = new ObjectType[kDefaultCacheSize];

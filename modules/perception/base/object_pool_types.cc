@@ -21,7 +21,7 @@ namespace apollo {
 namespace perception {
 namespace base {
 
-// @brief call pool instance once to intialize memory
+// @brief call pool instance once to initialize memory
 __attribute__((constructor)) void PoolInitialize() {
   ObjectPool::Instance();
   PointFCloudPool::Instance();

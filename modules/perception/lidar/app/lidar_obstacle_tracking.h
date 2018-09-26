@@ -15,7 +15,9 @@
  *****************************************************************************/
 #ifndef MODULES_PERCEPTION_LIDAR_APP_LIDAR_OBSTACLE_TRACKING_H_
 #define MODULES_PERCEPTION_LIDAR_APP_LIDAR_OBSTACLE_TRACKING_H_
+
 #include <string>
+
 #include "modules/perception/lidar/common/lidar_error_code.h"
 #include "modules/perception/lidar/lib/interface/base_classifier.h"
 #include "modules/perception/lidar/lib/interface/base_multi_target_tracker.h"

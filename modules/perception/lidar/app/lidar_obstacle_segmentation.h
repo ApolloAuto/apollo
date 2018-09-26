@@ -15,8 +15,11 @@
  *****************************************************************************/
 #ifndef MODULES_PERCEPTION_LIDAR_APP_LIDAR_OBSTACLE_SEGMENTATION_H_
 #define MODULES_PERCEPTION_LIDAR_APP_LIDAR_OBSTACLE_SEGMENTATION_H_
-#include <Eigen/Dense>
+
 #include <string>
+
+#include "Eigen/Dense"
+
 #include "modules/perception/lidar/common/lidar_error_code.h"
 #include "modules/perception/lidar/lib/interface/base_classifier.h"
 #include "modules/perception/lidar/lib/interface/base_segmentation.h"

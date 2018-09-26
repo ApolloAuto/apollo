@@ -19,6 +19,7 @@
 #include <limits>
 
 #include "cybertron/common/log.h"
+
 #include "modules/perception/base/camera.h"
 #include "modules/perception/base/polynomial.h"
 
@@ -28,15 +29,14 @@ namespace base {
 
 Eigen::Vector2f OmnidirectionalCameraDistortionModel::Project(
     const Eigen::Vector3f& point3d) {
-  CHECK(std::isgreater(point3d[2], 0.f))
+  CHECK_GT(point3d[2], 0.f)
       << "the input point should be in front of the camera";
   // rotate:
   // [0 1 0;
   //  1 0 0;
   //  0 0 -1];
   double x[3] = {point3d(1), point3d(0), -point3d(2)};
-  double norm = sqrt(x[0] * x[0] + x[1] * x[1]);
-  const double& z = x[2];
+  const double norm = sqrt(x[0] * x[0] + x[1] * x[1]);
 
   Eigen::Vector2f projection;
   if (norm < std::numeric_limits<double>::epsilon()) {
@@ -45,19 +45,18 @@ Eigen::Vector2f OmnidirectionalCameraDistortionModel::Project(
     return projection;
   }
 
-  double theta = atan(z / norm);
-  double rho = world2cam_(theta);
+  const double theta = atan(x[2] / norm);
+  const double rho = world2cam_(theta);
 
-  double u = x[0] / norm * rho;
-  double v = x[1] / norm * rho;
+  const double u = x[0] / norm * rho;
+  const double v = x[1] / norm * rho;
   projection(1) = affine_[0] * u + affine_[1] * v + center_[0];
   projection(0) = affine_[2] * u + v + center_[1];
-
   return projection;
 }
 
 std::shared_ptr<BaseCameraModel>
-    OmnidirectionalCameraDistortionModel::get_camera_model() {
+OmnidirectionalCameraDistortionModel::get_camera_model() {
   std::shared_ptr<PinholeCameraModel> camera_model(new PinholeCameraModel());
   camera_model->set_width(width_);
   camera_model->set_height(height_);
@@ -74,8 +73,8 @@ bool OmnidirectionalCameraDistortionModel::set_params(
   }
 
   uint32_t cam2world_order = uint32_t(params(8));
-  AINFO << "cam2world order: " << cam2world_order
-      << ", size: " << params.size() << std::endl;
+  AINFO << "cam2world order: " << cam2world_order << ", size: " << params.size()
+        << std::endl;
 
   if (params.size() < 9 + cam2world_order + 1) {
     AINFO << "Incomplete cam2world model or missing world2cam model.";
@@ -83,8 +82,8 @@ bool OmnidirectionalCameraDistortionModel::set_params(
   }
 
   uint32_t world2cam_order = uint32_t(params(9 + cam2world_order));
-  AINFO << "world2cam order: " << world2cam_order
-      << ", size: " << params.size() << std::endl;
+  AINFO << "world2cam order: " << world2cam_order << ", size: " << params.size()
+        << std::endl;
 
   if (params.size() < 9 + cam2world_order + 1 + world2cam_order) {
     AINFO << "Incomplete world2cam model.";
