@@ -13,11 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef INFERENCE_TENSORRT_BATCHSTREAM_H_
-#define INFERENCE_TENSORRT_BATCHSTREAM_H_
+
+#ifndef MODULES_PERCEPTION_INFERENCE_TENSORRT_BATCHSTREAM_H_
+#define MODULES_PERCEPTION_INFERENCE_TENSORRT_BATCHSTREAM_H_
+
+#include <assert.h>
 #include <algorithm>
 #include <string>
 #include <vector>
+
 #include "NvInfer.h"
 
 namespace apollo {
@@ -66,4 +70,4 @@ class BatchStream {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // INFERENCE_TENSORRT_BATCHSTREAM_H_
+#endif  // MODULES_PERCEPTION_INFERENCE_TENSORRT_BATCHSTREAM_H_

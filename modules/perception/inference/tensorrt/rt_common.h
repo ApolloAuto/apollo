@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef INFERENCE_TENSORRT_RT_COMMON_H_
-#define INFERENCE_TENSORRT_RT_COMMON_H_
+
+#ifndef MODULES_PERCEPTION_INFERENCE_TENSORRT_RT_COMMON_H_
+#define MODULES_PERCEPTION_INFERENCE_TENSORRT_RT_COMMON_H_
 
 #include <cublas_v2.h>
 #include <cuda.h>
@@ -22,23 +23,26 @@
 #include <cudnn.h>
 #include <curand.h>
 #include <driver_types.h>
-#include <glog/logging.h>
 #include <string.h>
 #include <sys/stat.h>
 #include <time.h>
+#include <cmath>
 #include <fstream>
 #include <iostream>
 #include <memory>
 #include <sstream>
 
-#include <rt.pb.h>
-#include <cmath>
 #include "NvCaffeParser.h"
 #include "NvInfer.h"
+
+#include "cybertron/common/log.h"
 #include "modules/perception/base/common.h"
+#include "modules/perception/inference/rt.pb.h"
+
 namespace apollo {
 namespace perception {
 namespace inference {
+
 class NetParameter;
 
 typedef std::map<std::string, std::vector<nvinfer1::Weights>> WeightMap;
@@ -64,9 +68,11 @@ struct ConvParam {
   int group;
   int dilation;
 };
+
 bool ParserConvParam(const ConvolutionParameter &conv, ConvParam *param);
+
 }  // namespace inference
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // INFERENCE_TENSORRT_RT_COMMON_H_
+#endif  // MODULES_PERCEPTION_INFERENCE_TENSORRT_RT_COMMON_H_

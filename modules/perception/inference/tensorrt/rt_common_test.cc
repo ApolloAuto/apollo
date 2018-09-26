@@ -13,9 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include "gtest/gtest.h"
 
 #include "modules/perception/inference/tensorrt/rt_common.h"
+
+#include "gtest/gtest.h"
+
 TEST(RTReshapeDimsTest, test) {
   nvinfer1::DimsCHW dims;
   nvinfer1::DimsCHW input_dims;
@@ -32,6 +34,7 @@ TEST(RTReshapeDimsTest, test) {
   EXPECT_EQ(outdims.d[1], 3);
   EXPECT_EQ(outdims.d[2], 2);
 }
+
 TEST(RTModifyPoolingParamTest, test) {
   {
     apollo::perception::inference::PoolingParameter pool_param;
@@ -89,6 +92,7 @@ TEST(RTModifyPoolingParamTest, test) {
     EXPECT_EQ(pool_param.pad_w(), 0);
   }
 }
+
 TEST(RTParseConvParamTest, test) {
   {
     apollo::perception::inference::ConvolutionParameter conv_param;

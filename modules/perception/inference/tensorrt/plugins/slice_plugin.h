@@ -13,14 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef INFERENCE_TENSORRT_PLUGINS_SLICE_PLUGIN_H_
-#define INFERENCE_TENSORRT_PLUGINS_SLICE_PLUGIN_H_
 
+#ifndef MODULES_PERCEPTION_INFERENCE_TENSORRT_PLUGINS_SLICE_PLUGIN_H_
+#define MODULES_PERCEPTION_INFERENCE_TENSORRT_PLUGINS_SLICE_PLUGIN_H_
+
+#include <algorithm>
 #include <vector>
+
 #include "modules/perception/inference/tensorrt/rt_common.h"
+
 namespace apollo {
 namespace perception {
 namespace inference {
+
 class SLICEPlugin : public nvinfer1::IPlugin {
  public:
   SLICEPlugin(const SliceParameter &param, const nvinfer1::Dims &in_dims) {
@@ -37,9 +42,9 @@ class SLICEPlugin : public nvinfer1::IPlugin {
     }
 
     for (int i = 0; i < slice_point_.size(); i++) {
-      if (i == 0)
+      if (i == 0) {
         out_slice_dims_.push_back(slice_point_[i]);
-      else {
+      } else {
         out_slice_dims_.push_back(slice_point_[i] - slice_point_[i - 1]);
       }
     }
@@ -83,7 +88,8 @@ class SLICEPlugin : public nvinfer1::IPlugin {
   int axis_;
   nvinfer1::Dims input_dims_;
 };
+
 }  // namespace inference
 }  // namespace perception
 }  // namespace apollo
-#endif  //  INFERENCE_TENSORRT_PLUGINS_SLICE_PLUGIN_H_
+#endif  //  MODULES_PERCEPTION_INFERENCE_TENSORRT_PLUGINS_SLICE_PLUGIN_H_

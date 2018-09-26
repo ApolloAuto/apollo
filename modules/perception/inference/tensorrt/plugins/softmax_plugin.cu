@@ -13,11 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+
 #include <vector>
 #include "modules/perception/inference/tensorrt/plugins/softmax_plugin.h"
+
 namespace apollo {
 namespace perception {
 namespace inference {
+
 int SoftmaxPlugin::enqueue(int batch_size,
                            const void *const *inputs,
                            void **outputs,

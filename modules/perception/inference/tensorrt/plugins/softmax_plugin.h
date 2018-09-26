@@ -13,13 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef INFERENCE_TENSORRT_PLUGINS_SOFTMAX_PLUGIN_H_
-#define INFERENCE_TENSORRT_PLUGINS_SOFTMAX_PLUGIN_H_
+
+#ifndef MODULES_PERCEPTION_INFERENCE_TENSORRT_PLUGINS_SOFTMAX_PLUGIN_H_
+#define MODULES_PERCEPTION_INFERENCE_TENSORRT_PLUGINS_SOFTMAX_PLUGIN_H_
 
 #include "modules/perception/inference/tensorrt/rt_common.h"
+
 namespace apollo {
 namespace perception {
 namespace inference {
+
 class SoftmaxPlugin : public nvinfer1::IPlugin {
  public:
   SoftmaxPlugin(const SoftmaxParameter &param, nvinfer1::Dims in_dims) {
@@ -96,8 +99,9 @@ class SoftmaxPlugin : public nvinfer1::IPlugin {
   cudnnTensorDescriptor_t input_desc_;
   cudnnTensorDescriptor_t output_desc_;
 };
+
 }  // namespace inference
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // INFERENCE_TENSORRT_PLUGINS_SOFTMAX_PLUGIN_H_
+#endif  // MODULES_PERCEPTION_INFERENCE_TENSORRT_PLUGINS_SOFTMAX_PLUGIN_H_
