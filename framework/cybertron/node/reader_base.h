@@ -47,6 +47,7 @@ class ReaderBase {
   virtual bool Empty() const = 0;
   virtual bool HasReceived() const = 0;
   virtual double GetDelaySec() const = 0;
+  virtual uint32_t PendingQueueSize() const = 0;
 
   const std::string& GetChannelName() const {
     return role_attr_.channel_name();

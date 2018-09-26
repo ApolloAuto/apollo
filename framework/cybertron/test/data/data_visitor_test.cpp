@@ -31,11 +31,10 @@ std::vector<std::shared_ptr<ReaderBase>> InitReaders(int num) {
   auto node = CreateNode("data_visitor_test");
   std::vector<std::shared_ptr<ReaderBase>> readers;
   for (int i = 0; i < num; ++i) {
-    RoleAttributes attr;
-    attr.set_channel_name("/channel" + std::to_string(i));
-    auto qos_profile = attr.mutable_qos_profile();
-    qos_profile->set_depth(10);
-    auto reader = node->CreateReader<RawMessage>(attr);
+    ReaderConfig reader_cfg;
+    reader_cfg.channel_name = "/channel" + std::to_string(i);
+    reader_cfg.pending_queue_size = 10;
+    auto reader = node->CreateReader<RawMessage>(reader_cfg);
     readers.emplace_back(reader);
   }
   return readers;

@@ -6,7 +6,8 @@ import "qos_profile.proto";
 
 message ReaderOption {
     required string channel = 1;
-    optional QosProfile qos_profile = 2;
+    optional QosProfile qos_profile = 2;  // depth: used to define capacity of processed messages
+    optional uint32 pending_queue_size = 3 [default = 1];  // used to define capacity of unprocessed messages
 }
 
 message ComponentConfig {
