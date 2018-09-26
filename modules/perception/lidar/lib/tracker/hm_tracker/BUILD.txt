@@ -53,16 +53,4 @@ cc_library(
     ],
 )
 
-cc_library(
-    name = "track_post_processor",
-    srcs = [
-        "track_post_processor.cc",
-    ],
-    hdrs = [
-        "track_post_processor.h",
-    ],
-    deps = [
-    ],
-)
-
 cpplint()
