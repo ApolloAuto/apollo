@@ -40,8 +40,8 @@ bool RecognitionComponent::Init() {
 bool RecognitionComponent::Proc(
     const std::shared_ptr<LidarFrameMessage>& message) {
   AINFO << "Enter Tracking component, message timestamp: "
-        << GLOG_TIMESTAMP(message->timestamp_) << " current timestamp "
-        << GLOG_TIMESTAMP(lib::TimeUtil::GetCurrentTime());
+        << std::to_string(message->timestamp_) << " current timestamp "
+        << std::to_string(lib::TimeUtil::GetCurrentTime());
 
   std::shared_ptr<SensorFrameMessage> out_message =
       std::make_shared<SensorFrameMessage>();
@@ -127,8 +127,8 @@ bool RecognitionComponent::InternalProc(
   const double end_timestamp = lib::TimeUtil::GetCurrentTime();
   const double end_latency = (end_timestamp - in_message->timestamp_) * 1e3;
   AINFO << "FRAME_STATISTICS:Lidar:End:msg_time["
-        << GLOG_TIMESTAMP(in_message->timestamp_) << "]:cur_time["
-        << GLOG_TIMESTAMP(end_timestamp) << "]:cur_latency[" << end_latency
+        << std::to_string(in_message->timestamp_) << "]:cur_time["
+        << std::to_string(end_timestamp) << "]:cur_latency[" << end_latency
         << "]";
   return true;
 }
