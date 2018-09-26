@@ -18,7 +18,9 @@
 #define MODULES_PERCEPTION_INFERENCE_TENSORRT_PLUGINS_ARGMAX_PLUGIN_H_
 
 #include <thrust/device_vector.h>
+
 #include "modules/perception/inference/tensorrt/rt_common.h"
+#include "modules/perception/proto/rt.pb.h"
 
 namespace apollo {
 namespace perception {

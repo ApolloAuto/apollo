@@ -13,13 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+
+#include "modules/perception/inference/tensorrt/plugins/slice_plugin.h"
+#include "modules/perception/proto/rt.pb.h"
+
 #include "gtest/gtest.h"
 
-#include "modules/perception/inference/tensorrt/plugins/argmax_plugin.h"
-#include "modules/perception/inference/tensorrt/plugins/slice_plugin.h"
-
 TEST(SlicePluginsTest, test) {
-  apollo::perception::inference::SliceParameter slice_param;
+  apollo::perception::SliceParameter slice_param;
   slice_param.add_slice_point(3);
   nvinfer1::Dims in_dims;
   in_dims.nbDims = 5;
@@ -69,32 +70,4 @@ TEST(SlicePluginsTest, test) {
   EXPECT_EQ(out_dims.d[2], 20);
   EXPECT_EQ(out_dims.d[3], 30);
   EXPECT_EQ(out_dims.d[4], 40);
-}
-TEST(ArgmaxPluginsTest, test) {
-  {
-    apollo::perception::inference::ArgMaxParameter argmax_param;
-    argmax_param.set_out_max_val(true);
-    nvinfer1::Dims in_dims;
-    in_dims.nbDims = 3;
-    in_dims.d[0] = 8;
-    in_dims.d[1] = 10;
-    in_dims.d[2] = 20;
-    apollo::perception::inference::ArgMax1Plugin arg_plugin(argmax_param,
-                                                            in_dims);
-    auto out_dims = arg_plugin.getOutputDimensions(0, &in_dims, 3);
-    EXPECT_EQ(out_dims.d[0], 2);
-  }
-  {
-    apollo::perception::inference::ArgMaxParameter argmax_param;
-    argmax_param.set_out_max_val(false);
-    nvinfer1::Dims in_dims;
-    in_dims.nbDims = 3;
-    in_dims.d[0] = 8;
-    in_dims.d[1] = 10;
-    in_dims.d[2] = 20;
-    apollo::perception::inference::ArgMax1Plugin arg_plugin(argmax_param,
-                                                            in_dims);
-    auto out_dims = arg_plugin.getOutputDimensions(0, &in_dims, 3);
-    EXPECT_EQ(out_dims.d[0], 1);
-  }
 }

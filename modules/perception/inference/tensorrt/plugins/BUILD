@@ -67,5 +67,31 @@ cuda_library(
     ],
 )
 
+cc_test(
+    name = "slice_plugin_test",
+    srcs = [
+        "slice_plugin_test.cc",
+    ],
+    size = "small",
+    deps = [
+        ":perception_inference_tensorrt_plugins",
+        "//modules/perception/inference/tensorrt:rt_common",
+        "@gtest//:main",
+    ]
+)
+
+cc_test(
+    name = "argmax_plugin_test",
+    srcs = [
+        "argmax_plugin_test.cc",
+    ],
+    size = "small",
+    deps = [
+        ":perception_inference_tensorrt_plugins",
+        "//modules/perception/inference/tensorrt:rt_common",
+        "@gtest//:main",
+    ]
+)
+
 cpplint()
 
