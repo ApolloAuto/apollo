@@ -86,7 +86,7 @@ bool MsgSerializer::ConvertObjectToPb(const base::ObjectPtr &object_ptr,
   }
 
   if (FLAGS_obs_benchmark_mode) {
-    for (auto &point : object_ptr->lidar_supplement.cloud) {
+    for (auto &point : object_ptr->lidar_supplement.cloud.points()) {
       pb_msg->add_point_cloud(point.x);
       pb_msg->add_point_cloud(point.y);
       pb_msg->add_point_cloud(point.z);
@@ -115,8 +115,9 @@ bool MsgSerializer::ConvertObjectToPb(const base::ObjectPtr &object_ptr,
   }
 
   pb_msg->set_tracking_time(object_ptr->tracking_time);
-  pb_msg->set_type(static_cast<apollo::perception::Type>(object_ptr->type));
-  pb_msg->set_sub_type(static_cast<SubType>(object_ptr->sub_type));
+  pb_msg->set_type(static_cast<PerceptionObstacle::Type>(object_ptr->type));
+  pb_msg->set_sub_type(
+      static_cast<PerceptionObstacle::SubType>(object_ptr->sub_type));
   pb_msg->set_timestamp(object_ptr->latest_tracked_time);  // in seconds.
 
   if (object_ptr->lidar_supplement.height_above_ground != FLT_MAX) {
@@ -162,7 +163,7 @@ bool MsgSerializer::ConvertObjectToPb(const base::ObjectPtr &object_ptr,
       pb_velocity->set_z(measurement.velocity(2));
 
       pb_measurement->set_type(
-          static_cast<apollo::perception::Type>(measurement.type));
+          static_cast<PerceptionObstacle::Type>(measurement.type));
       // pb_measurement->set_sub_type();
       pb_measurement->set_timestamp(measurement.timestamp);
 
