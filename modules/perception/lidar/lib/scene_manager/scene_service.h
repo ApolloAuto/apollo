@@ -15,9 +15,11 @@
  *****************************************************************************/
 #ifndef MODULES_PERCEPTION_LIDAR_LIB_SCENE_MANAGER_SCENE_SERVICE_H_
 #define MODULES_PERCEPTION_LIDAR_LIB_SCENE_MANAGER_SCENE_SERVICE_H_
+
 #include <memory>
 #include <mutex>
 #include <string>
+
 #include "modules/perception/lib/registerer/registerer.h"
 
 namespace apollo {

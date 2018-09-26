@@ -1,6 +1,5 @@
-# DO NOT MODIFY
-# THIS FILE IS GENERATED AUTOMATICALLY TO HELP WRITE BUILD FILE
-# DELETE THIS FILE WHEN YOU HAVE CREATED THE COMPLETE BUILD FILE
+load("//tools:cpplint.bzl", "cpplint")
+
 cc_library(
     name = "scene_manager",
     srcs = [
@@ -10,6 +9,9 @@ cc_library(
         "scene_manager.h",
     ],
     deps = [
+        ":scene_service",
+        "//modules/perception/lib/io:protobuf_util",
+        "//modules/perception/lidar/lib/scene_manager/proto:scene_manager_config_proto",
     ],
 )
 
@@ -19,5 +21,8 @@ cc_library(
         "scene_service.h",
     ],
     deps = [
+        "//modules/perception/lib/registerer",
     ],
 )
+
+cpplint()

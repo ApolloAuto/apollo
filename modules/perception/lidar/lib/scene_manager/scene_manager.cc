@@ -13,12 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+#include "modules/perception/lidar/lib/scene_manager/scene_manager.h"
+
+#include "modules/perception/lidar/lib/scene_manager/proto/perception_config_schema.pb.h"
+
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lib/io/file_util.h"
 #include "modules/perception/lib/io/protobuf_util.h"
-
-#include "modules/perception/lidar/lib/scene_manager/proto/scene_manager_config.pb.h"
-#include "modules/perception/lidar/lib/scene_manager/scene_manager.h"
 #include "modules/perception/lidar/lib/scene_manager/scene_service.h"
 
 namespace apollo {

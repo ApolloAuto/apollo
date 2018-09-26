@@ -16,6 +16,7 @@
 #ifndef MODULES_PERCEPTION_BASE_OBJECT_H_
 #define MODULES_PERCEPTION_BASE_OBJECT_H_
 
+#include <memory>
 #include <string>
 #include <vector>
 
