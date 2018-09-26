@@ -31,7 +31,7 @@ std::pair<double, TrackedObjectPtr> TrackData::GetHistoryObject(int idx) {
     AWARN << "no object in track";
     return std::pair<double, TrackedObjectPtr>(0.0, TrackedObjectPtr(nullptr));
   }
-  int max_idx = abs(idx) >= history_objects_.size()
+  int max_idx = std::abs(idx) >= static_cast<int>(history_objects_.size())
                     ? history_objects_.size() - 1
                     : abs(idx);
   // from oldest
@@ -42,9 +42,7 @@ std::pair<double, TrackedObjectPtr> TrackData::GetHistoryObject(int idx) {
       ++cur_obj;
     }
     return *cur_obj;
-  }
-  // from latest
-  if (idx <= 0) {
+  } else {
     std::map<double, TrackedObjectPtr>::reverse_iterator cur_obj =
         history_objects_.rbegin();
     for (int i = 0; i < max_idx; ++i) {
@@ -88,12 +86,12 @@ void TrackData::PushTrackedObjectToTrack(TrackedObjectPtr obj, double time) {
       consecutive_invisible_count_ = 0;
       ++total_visible_count_;
     }
-    if (history_objects_.size() > max_history_size_) {
+    if (history_objects_.size() > static_cast<size_t>(max_history_size_)) {
       history_objects_.erase(history_objects_.begin());
     }
   } else {
     AWARN << "push object time " << time
-             << " already exist in track, ignore insert.";
+          << " already exist in track, ignore insert.";
   }
 }
 
