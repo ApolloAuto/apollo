@@ -13,11 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef I_LIB_CORE_I_ALLOC_H
-#define I_LIB_CORE_I_ALLOC_H
+#ifndef MODULES_PERCEPTION_COMMON_I_LIB_CORE_I_ALLOC_H_
+#define MODULES_PERCEPTION_COMMON_I_LIB_CORE_I_ALLOC_H_
 
 #include <new>
-#include "i_basic.h"
+
+#include "modules/perception/common/i_lib/core/i_basic.h"
 /*
 Alignment power->alignment offset in bytes:
 0->1
@@ -29,7 +30,7 @@ Alignment power->alignment offset in bytes:
 */
 
 //#define I_DEFAULT_ALIGNMENT_POWER  4 /*by default use 16-byte memory alignment
-//option*/
+// option*/
 
 namespace idl {
 template <typename T>
@@ -172,6 +173,6 @@ inline T *i_align_pointer(T *mem, unsigned long byte_count) {
   return (out);
 }
 
-} /* namespace idl */
+}  // namespace idl
 
-#endif
+#endif  // MODULES_PERCEPTION_COMMON_I_LIB_CORE_I_ALLOC_H_

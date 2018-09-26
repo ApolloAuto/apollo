@@ -13,9 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#pragma once
 
-#include "../core/i_blas.h"
+#ifndef MODULES_PERCEPTION_COMMON_I_LIB_NUMERIC_I_HOUSEHOLDER_H_
+#define MODULES_PERCEPTION_COMMON_I_LIB_NUMERIC_I_HOUSEHOLDER_H_
+
+#include "modules/perception/common/i_lib/core/i_blas.h"
 
 namespace idl {
 /*Compute a Householder vector h from an n-dimensional vector x (vector x should
@@ -240,4 +242,6 @@ inline void i_apply_givens(T c, T s, T *ai, T *aj, int n) {
   }
 }
 
-} /* namespace idl */
+}  // namespace idl
+
+#endif  // MODULES_PERCEPTION_COMMON_I_LIB_NUMERIC_I_HOUSEHOLDER_H_

@@ -13,9 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#pragma once
 
-#include "i_basic.h"
+#ifndef MODULES_PERCEPTION_COMMON_I_LIB_CORE_I_BLAS_H_
+#define MODULES_PERCEPTION_COMMON_I_LIB_CORE_I_BLAS_H_
+
+#include "modules/perception/common/i_lib/core/i_basic.h"
 
 namespace idl {
 
@@ -5091,4 +5093,6 @@ inline void i_shift_homogeneous4(T *A, int n) {
     src += 4;
   }
 }
-} /* namespace idl */
+}  // namespace idl
+
+#endif  // MODULES_PERCEPTION_COMMON_I_LIB_CORE_I_BLAS_H_

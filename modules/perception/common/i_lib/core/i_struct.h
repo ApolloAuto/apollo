@@ -13,9 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#pragma once
 
-#include "i_alloc.h"
+#ifndef MODULES_PERCEPTION_COMMON_I_LIB_CORE_I_STRUCT_H_
+#define MODULES_PERCEPTION_COMMON_I_LIB_CORE_I_STRUCT_H_
+
+#include "modules/perception/common/i_lib/core/i_alloc.h"
 
 namespace idl {
 template <typename T1, typename T2>
@@ -64,4 +66,6 @@ inline bool i_larger_pair_second_element(const Pair<T1, T2>& a,
   return a.second > b.second;
 }
 
-} /*namespace idl*/
+}  // namespace idl
+
+#endif  // MODULES_PERCEPTION_COMMON_I_LIB_CORE_I_STRUCT_H_

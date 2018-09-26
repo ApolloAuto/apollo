@@ -13,10 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef I_LIB_CORE_I_RAND_H
-#define I_LIB_CORE_I_RAND_H
 
-#include "i_basic.h"
+#ifndef MODULES_PERCEPTION_COMMON_I_LIB_CORE_I_RAND_H_
+#define MODULES_PERCEPTION_COMMON_I_LIB_CORE_I_RAND_H_
+
+#include "modules/perception/common/i_lib/core/i_basic.h"
 
 namespace idl {
 const int I_DEFAULT_SEED = 432;
@@ -203,6 +204,6 @@ inline double i_rand_gaussian_core_d(int &s, double mu, double sigma) {
   z1 = sqrtneg2logu1 * i_sin(two_pi_u2);
   return z0 * sigma + mu;
 }
-} /*namespace idl*/
+}  // namespace idl
 
-#endif
+#endif  // MODULES_PERCEPTION_COMMON_I_LIB_CORE_I_RAND_H_

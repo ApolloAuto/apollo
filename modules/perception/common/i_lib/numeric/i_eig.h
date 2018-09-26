@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef I_LIB_NUMERIC_I_EIG_H
-#define I_LIB_NUMERIC_I_EIG_H
+#ifndef MODULES_PERCEPTION_COMMON_I_LIB_NUMERIC_I_EIG_H_
+#define MODULES_PERCEPTION_COMMON_I_LIB_NUMERIC_I_EIG_H_
 
-#include "i_poly.h"
-#include "i_qr.h"
+#include "modules/perception/common/i_lib/numeric/i_poly.h"
+#include "modules/perception/common/i_lib/numeric/i_qr.h"
 
 namespace idl {
 /*Construct the characteristic polynomial equation for a 2x2 eigen system*/
@@ -176,6 +176,6 @@ inline void i_eig_symmetric_3x3_closed(const T A[9], T ev[3], T Q[9]) {
   Q[8] = qtmp[8];
 }
 
-} /* namespace idl */
+}  // namespace idl
 
-#endif
+#endif  // MODULES_PERCEPTION_COMMON_I_LIB_NUMERIC_I_EIG_H_
