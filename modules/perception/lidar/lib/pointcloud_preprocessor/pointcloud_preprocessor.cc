@@ -13,14 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+#include "modules/perception/lidar/lib/pointcloud_preprocessor/pointcloud_preprocessor.h"
+
+#include <memory>
+
+#include "modules/perception/lidar/lib/pointcloud_preprocessor/proto/pointcloud_preprocessor_config.pb.h"
+
 #include "modules/perception/base/object_pool_types.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lib/io/file_util.h"
 #include "modules/perception/lib/io/protobuf_util.h"
 #include "modules/perception/lidar/common/lidar_log.h"
-
-#include "modules/perception/lidar/lib/pointcloud_preprocessor/pointcloud_preprocessor.h"
-#include "modules/perception/lidar/lib/pointcloud_preprocessor/proto/pointcloud_preprocessor_config.pb.h"
 
 namespace apollo {
 namespace perception {

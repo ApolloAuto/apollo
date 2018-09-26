@@ -15,6 +15,8 @@
  *****************************************************************************/
 #include "modules/perception/fusion/base/base_init_options.h"
 
+#include "cybertron/common/log.h"
+
 #include "modules/perception/lib/config_manager/config_manager.h"
 
 namespace apollo {
@@ -23,10 +25,10 @@ namespace fusion {
 
 bool GetFusionInitOptions(const std::string& module_name,
                           BaseInitOptions* options) {
-  assert(options != nullptr);
+  CHECK_NOTNULL(options);
   lib::ConfigManager* config_manager =
       lib::Singleton<lib::ConfigManager>::get_instance();
-  assert(config_manager != nullptr);
+  CHECK_NOTNULL(config_manager);
   const lib::ModelConfig* model_config = nullptr;
   if (!config_manager->GetModelConfig(module_name, &model_config)) {
     return false;

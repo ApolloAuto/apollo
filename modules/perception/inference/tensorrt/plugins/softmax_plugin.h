@@ -29,8 +29,8 @@ class SoftmaxPlugin : public nvinfer1::IPlugin {
       input_dims_.type[i] = in_dims.type[i];
     }
     axis_ = param.axis() - 1;
-    CHECK(axis_ > 0);
-    CHECK(axis_ + 1 <= input_dims_.nbDims);
+    CHECK_GT(axis_, 0);
+    CHECK_LE(axis_ + 1, input_dims_.nbDims);
 
     inner_num_ = 1;
     for (int i = axis_ + 1; i < input_dims_.nbDims; i++) {
@@ -83,7 +83,7 @@ class SoftmaxPlugin : public nvinfer1::IPlugin {
   void serialize(void *buffer) override {
     char *d = reinterpret_cast<char *>(buffer), *a = d;
     size_t size = getSerializationSize();
-    CHECK(d == a + size);
+    CHECK_EQ(d, a + size);
   }
 
  private:

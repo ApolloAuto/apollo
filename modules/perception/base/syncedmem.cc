@@ -184,7 +184,7 @@ void* SyncedMemory::mutable_gpu_data() {
 #ifndef PERCEPTION_CPU_ONLY
 void SyncedMemory::async_gpu_push(const cudaStream_t& stream) {
   check_device();
-  CHECK(head_ == HEAD_AT_CPU);
+  CHECK_EQ(head_, HEAD_AT_CPU);
   if (gpu_ptr_ == NULL) {
     BASE_CUDA_CHECK(cudaMalloc(&gpu_ptr_, size_));
     own_gpu_data_ = true;
@@ -201,11 +201,11 @@ void SyncedMemory::check_device() {
 #ifdef PERCEPTION_DEBUG
   int device;
   cudaGetDevice(&device);
-  CHECK(device == device_);
+  CHECK_EQ(device, device_);
   if (gpu_ptr_ && own_gpu_data_) {
     cudaPointerAttributes attributes;
     BASE_CUDA_CHECK(cudaPointerGetAttributes(&attributes, gpu_ptr_));
-    CHECK(attributes.device == device_);
+    CHECK_EQ(attributes.device, device_);
   }
 #endif
 #endif

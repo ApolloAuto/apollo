@@ -16,7 +16,6 @@
 #ifndef INFERENCE_TENSORRT_RT_COMMON_H_
 #define INFERENCE_TENSORRT_RT_COMMON_H_
 
-#include <assert.h>
 #include <cublas_v2.h>
 #include <cuda.h>
 #include <cuda_runtime.h>

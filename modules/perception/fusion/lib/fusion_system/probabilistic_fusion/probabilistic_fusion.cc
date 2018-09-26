@@ -50,7 +50,7 @@ bool ProbabilisticFusion::Init(const FusionInitOptions& init_options) {
 
   lib::ConfigManager* config_manager =
       lib::Singleton<lib::ConfigManager>::get_instance();
-  assert(config_manager != nullptr);
+  CHECK_NOTNULL(config_manager);
   std::string woork_root_config = lib::FileUtil::GetAbsolutePath(
       config_manager->work_root(), options.root_dir);
 

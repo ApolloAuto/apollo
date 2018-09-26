@@ -128,8 +128,8 @@ TEST_F(HmMultiTargetTrackerTest,
   lib::FileUtil::GetFileList(data_path, ".pose", &pose_filenames);
   int frame_id = -1;
   double time_stamp = 0.0;
-  assert(pcd_filenames.size() > 0);
-  assert(pcd_filenames.size() = pose_filenames.size());
+  CHECK_GT(pcd_filenames.size(), 0);
+  ASSERT_EQ(pcd_filenames.size(), pose_filenames.size());
   for (size_t i = 0; i < pcd_filenames.size(); ++i) {
     // AINFO<< "file id " <<i;
     LidarFrame* frame(new LidarFrame);
@@ -138,7 +138,7 @@ TEST_F(HmMultiTargetTrackerTest,
     CHECK(
         common::ReadPoseFile(pose_filenames[i], &pose, &frame_id, &time_stamp));
     // read segments
-    CHECK(frame != nullptr);
+    CHECK_NOTNULL(frame);
     std::vector<base::ObjectPtr>& objects = frame->segmented_objects;
     CHECK(ConstructObjects(pcd_filenames[i], &objects));
     // build objects

@@ -16,7 +16,6 @@
 #ifndef INFERENCE_TENSORRT_ENTROPYCALIBRATOR_H_
 #define INFERENCE_TENSORRT_ENTROPYCALIBRATOR_H_
 
-#include <assert.h>
 #include <cuda_runtime_api.h>
 #include <float.h>
 #include <sys/stat.h>

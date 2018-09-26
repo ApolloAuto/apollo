@@ -84,7 +84,7 @@ void ConstructObjectsWithConstantSpeedModel(
     const std::vector<Eigen::Vector3d> &centers,
     const std::vector<Eigen::Vector3d> &sizes,
     std::vector<base::ObjectPtr> *objects) {
-  assert(centers.size() == sizes.size());
+  CHECK_EQ(centers.size(), sizes.size());
   uint8_t intensity = 127;
   for (size_t j = 0; j < centers.size(); ++j) {
     Eigen::Vector3d size = sizes[j];

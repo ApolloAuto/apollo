@@ -15,7 +15,6 @@
  *****************************************************************************/
 #include "modules/perception/lib/thread/thread.h"
 
-#include <assert.h>
 #include <signal.h>
 
 #include "cybertron/common/log.h"

@@ -197,19 +197,23 @@ struct PlaneFitPointCandIndices {
   int prune(unsigned int min_nr_samples, unsigned int max_nr_samples);
   unsigned int size() const { return indices.size(); }
   int& operator[](unsigned int i) {
-    assert(i >= 0 && i < indices.size());
+    CHECK_GE(i, 0);
+CHECK_LT(i, indices.size());
     return indices.at(i);
   }
   int& operator[](int i) {
-    assert(i >= 0 && i < (int)indices.size());
+    CHECK_GE(i, 0);
+CHECK_LT(i, (int)indices.size());
     return indices.at(i);
   }
   const int& operator[](unsigned int i) const {
-    assert(i >= 0 && i < indices.size());
+    CHECK_GE(i, 0);
+CHECK_LT(i, indices.size());
     return indices.at(i);
   }
   const int& operator[](int i) const {
-    assert(i >= 0 && i < (int)indices.size());
+    CHECK_GE(i, 0);
+CHECK_LT(i, (int)indices.size());
     return indices.at(i);
   }
   std::vector<int> indices;

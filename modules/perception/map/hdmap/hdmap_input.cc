@@ -75,7 +75,7 @@ bool HDMapInput::InitHDMap() {
   // hdmap_.reset(new adu::hdmap::HDMap());
   // ConfigManager* config_manager =
   // lib::Singleton<ConfigManager>::get_instance();
-  // CHECK(config_manager != nullptr);
+  // CHECK_NOTNULL(config_manager);
   // std::string model_name = "HDMapInput";
   // const lib::ModelConfig* model_config = NULL;
   // if (!config_manager->GetModelConfig(model_name, &model_config)) {

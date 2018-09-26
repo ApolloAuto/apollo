@@ -24,13 +24,13 @@ namespace inference {
 class SLICEPlugin : public nvinfer1::IPlugin {
  public:
   SLICEPlugin(const SliceParameter &param, const nvinfer1::Dims &in_dims) {
-    CHECK(param.slice_point_size() > 0);
+    CHECK_GT(param.slice_point_size(), 0);
     for (int i = 0; i < param.slice_point_size(); i++) {
       slice_point_.push_back(param.slice_point(i));
     }
     axis_ = std::max(param.axis() - 1, 0);
     input_dims_.nbDims = in_dims.nbDims;
-    CHECK(input_dims_.nbDims > 0);
+    CHECK_GT(input_dims_.nbDims, 0);
     for (int i = 0; i < in_dims.nbDims; i++) {
       input_dims_.d[i] = in_dims.d[i];
       input_dims_.type[i] = in_dims.type[i];
@@ -74,7 +74,7 @@ class SLICEPlugin : public nvinfer1::IPlugin {
   void serialize(void *buffer) override {
     char *d = reinterpret_cast<char *>(buffer), *a = d;
     size_t size = getSerializationSize();
-    CHECK(d == a + size);
+    CHECK_EQ(d, a + size);
   }
 
  private:

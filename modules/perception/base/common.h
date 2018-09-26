@@ -16,7 +16,6 @@
 #ifndef MODULES_PERCEPTION_BASE_COMMON_H_
 #define MODULES_PERCEPTION_BASE_COMMON_H_
 
-#include <assert.h>
 
 #ifndef PERCEPTION_CPU_ONLY
 

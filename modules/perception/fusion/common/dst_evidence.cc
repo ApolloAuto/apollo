@@ -201,7 +201,7 @@ void Dst::SelfCheck() const {
   CHECK(DstManager::Instance()->IsAppAdded(app_name_));
   if (dst_data_ptr_ == nullptr) {
     dst_data_ptr_ = DstManager::Instance()->GetAppDataPtr(app_name_);
-    CHECK(dst_data_ptr_ != nullptr);
+    CHECK_NOTNULL(dst_data_ptr_);
     bba_vec_.resize(dst_data_ptr_->fod_subsets_.size(), 0.0);
     bba_vec_[dst_data_ptr_->fod_loc_] = 1.0;
   }

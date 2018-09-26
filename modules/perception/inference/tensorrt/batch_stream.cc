@@ -28,7 +28,7 @@ BatchStream::BatchStream(int batchSize, int maxBatches, std::string dataPath)
   if (file != NULL) {
     int d[4];
     int fs = fread(d, sizeof(int), 4, file);
-    CHECK(fs == 4);
+    CHECK_EQ(fs, 4);
     mDims = nvinfer1::DimsNCHW{d[0], d[1], d[2], d[3]};
     fclose(file);
     mImageSize = mDims.c() * mDims.h() * mDims.w();
@@ -56,7 +56,8 @@ bool BatchStream::next() {
 
   for (int csize = 1, batchPos = 0; batchPos < mBatchSize;
        batchPos += csize, mFileBatchPos += csize) {
-    CHECK(mFileBatchPos > 0 && mFileBatchPos <= mDims.n());
+    CHECK_GT(mFileBatchPos, 0);
+CHECK_LE(mFileBatchPos, mDims.n());
     // mMaxBatches > number of batches in the files
     if (mFileBatchPos == mDims.n() && !update()) {
       return false;

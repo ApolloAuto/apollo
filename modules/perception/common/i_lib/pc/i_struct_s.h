@@ -17,7 +17,6 @@
 #define MODULES_PERCEPTION_COMMON_I_LIB_PC_I_STRUCT_S_H_
 
 #include <smmintrin.h>
-#include <cassert>
 #include <vector>
 #include "../core/i_alloc.h"
 #include "../core/i_blas.h"
@@ -57,7 +56,8 @@ class PtCluster {
     if (c.nr_points()) {
       _nr_points = c.nr_points();
       _data = i_alloc_aligned<T>(_nr_points * d, 4);
-      assert(_data != NULL && i_verify_alignment(_data, 4));
+      CHECK_NE(_data, NULL);
+      CHECK(i_verify_alignment(_data, 4));
       i_copy(c.const_data(), _data, _nr_points * d);
     }
   }
@@ -67,7 +67,8 @@ class PtCluster {
       if (this->_nr_points != c.nr_points()) {
         i_free_aligned(_data);
         _data = i_alloc_aligned<T>(this->_nr_points * d, 4);
-        assert(_data != NULL && i_verify_alignment(_data, 4));
+        CHECK_NE(_data, NULL);
+        CHECK(i_verify_alignment(_data, 4));
         this->_nr_points = c.nr_points();
       }
       i_copy(c.const_data(), _data, this->_nr_points * d);
@@ -78,24 +79,26 @@ class PtCluster {
   virtual ~PtCluster() { cleanup(); }
 
   T* operator[](unsigned int i) {
-    assert(i < _nr_points);
-    assert(_data != NULL);
+    CHECK_LT(i, _nr_points);
+    CHECK_NOTNULL(_data);
     return (_data + i * d);
   }
 
   const T* operator[](unsigned int i) const {
-    assert(i < _nr_points);
-    assert(_data != NULL);
+    CHECK_LT(i, _nr_points);
+    CHECK_NOTNULL(_data);
     return (_data + i * d);
   }
 
   reference operator()(unsigned int i, unsigned int j) {
-    assert(i < _nr_points && j < d);
+    CHECK_LT(i, _nr_points);
+    CHECK_LT(j, d);
     return _data[i * d + j];
   }
 
   const_reference operator()(unsigned int i, unsigned int j) const {
-    assert(i < _nr_points && j < d);
+    CHECK_LT(i, _nr_points);
+    CHECK_LT(j, d);
     return _data[i * d + j];
   }
 
@@ -407,35 +410,41 @@ class VoxelGridXY {
   bool get_voxel_coordinate_xy(T x, T y, int* row, int* col) const;
 
   Voxel<T>& operator[](unsigned int i) {
-    assert(i >= 0 && i < _voxels.size());
+    CHECK_GE(i, 0);
+    CHECK_LT(i, _voxels.size());
     return (_voxels[i]);
   }
 
   const Voxel<T>& operator[](unsigned int i) const {
-    assert(i >= 0 && i < _voxels.size());
+    CHECK_GE(i, 0);
+    CHECK_LT(i, _voxels.size());
     return (_voxels[i]);
   }
 
   Voxel<T>& operator[](int i) {
-    assert(i >= 0 && i < (int)_voxels.size());
+    CHECK_GE(i, 0);
+    CHECK_LT(i, (int)_voxels.size());
     return (_voxels[i]);
   }
   const Voxel<T>& operator[](int i) const {
-    assert(i >= 0 && i < (int)_voxels.size());
+    CHECK_GE(i, 0);
+    CHECK_LT(i, (int)_voxels.size());
     return (_voxels[i]);
   }
 
   Voxel<T>& operator()(unsigned int iy, unsigned int ix) {
-    assert(iy < _nr_voxel_y && ix < _nr_voxel_x);
+    CHECK_LT(iy, _nr_voxel_y);
+    CHECK_LT(ix, _nr_voxel_x);
     unsigned int i = _nr_voxel_x * iy + ix;
-    assert(i < _voxels.size());
+    CHECK_LT(i, _voxels.size());
     return (_voxels[i]);
   }
 
   const Voxel<T>& operator()(unsigned int iy, unsigned int ix) const {
-    assert(iy < _nr_voxel_y && ix < _nr_voxel_x);
+    CHECK_LT(iy, _nr_voxel_y);
+    CHECK_LT(ix, _nr_voxel_x);
     unsigned int i = _nr_voxel_x * iy + ix;
-    assert(i < _voxels.size());
+    CHECK_LT(i, _voxels.size());
     return (_voxels[i]);
   }
 
@@ -630,7 +639,9 @@ bool VoxelGridXY<T>::alloc(unsigned int nr_voxel_x, unsigned int nr_voxel_y,
   T span_y = (_dim_y[1] - _dim_y[0]);
   T span_z = (_dim_z[1] - _dim_z[0]);
 
-  assert(span_x > 0 && span_y > 0 && span_z > 0);
+  CHECK_GT(span_x, 0);
+  CHECK_GT(span_y, 0);
+  CHECK_GT(span_z, 0);
 
   _voxel_dim[0] = voxel_width_x = i_div(span_x, (int)_nr_voxel_x);
   _voxel_dim[1] = voxel_width_y = i_div(span_y, (int)_nr_voxel_y);
@@ -910,7 +921,9 @@ bool VoxelGridXY<T>::set(const T* data, unsigned int nr_points,
   T span_y = (dim_y_max - dim_y_min);
   T span_z = (dim_z_max - dim_z_min);
 
-  assert(span_x > 0 && span_y > 0 && span_z > 0);
+  CHECK_GT(span_x, 0);
+  CHECK_GT(span_y, 0);
+  CHECK_GT(span_z, 0);
 
   _voxel_dim[0] = voxel_width_x = i_div(span_x, (int)_nr_voxel_x);
   _voxel_dim[1] = voxel_width_y = i_div(span_y, (int)_nr_voxel_y);
@@ -958,7 +971,7 @@ bool VoxelGridXY<T>::set(const T* data, unsigned int nr_points,
                     (unsigned int)((y - dim_y_min) * voxel_width_y_rec)));
     i = nr_voxel_x * j + k;
 
-    assert(i < nr_voxel);
+    CHECK_LT(i, nr_voxel);
     _voxels[i]._indices.push_back(n);
   }
   _initialized = true;
@@ -1033,7 +1046,7 @@ bool i_downsample_voxelgridxy(const VoxelGridXY<T>& src, VoxelGridXY<T>& dst,
   unsigned int nr_voxel_y_src = src.nr_voxel_y();
   unsigned int nr_voxel_z_src = src.nr_voxel_z();
 
-  assert(nr_voxel_z_src == 1);
+  CHECK_EQ(nr_voxel_z_src, 1);
 
   /*scale factors*/
   unsigned int sf_x = (unsigned int)i_pow((unsigned int)2, dsf_dim_x);
@@ -1218,22 +1231,26 @@ class VoxelGridXYPyramid {
   unsigned int get_dsf_z() const { return (0); }
 
   VoxelGridXY<DATA_TYPE>& operator[](unsigned int i) {
-    assert(i >= 0 && i < _vgrids.size());
+    CHECK_GE(i, 0);
+    CHECK_LT(i, _vgrids.size());
     return _vgrids[i];
   }
 
   const VoxelGridXY<DATA_TYPE>& operator[](unsigned int i) const {
-    assert(i >= 0 && i < _vgrids.size());
+    CHECK_GE(i, 0);
+    CHECK_LT(i, _vgrids.size());
     return _vgrids[i];
   }
 
   VoxelGridXY<DATA_TYPE>& operator[](int i) {
-    assert(i >= 0 && i < (int)_vgrids.size());
+    CHECK_GE(i, 0);
+    CHECK_LT(i, (int)_vgrids.size());
     return _vgrids[i];
   }
 
   const VoxelGridXY<DATA_TYPE>& operator[](int i) const {
-    assert(i >= 0 && i < (int)_vgrids.size());
+    CHECK_GE(i, 0);
+    CHECK_LT(i, (int)_vgrids.size());
     return _vgrids[i];
   }
 
@@ -1432,6 +1449,6 @@ bool VoxelGridXYPyramid<DATA_TYPE>::initialized() const {
   return (i == _vgrids.size());
 }
 
-} // namespace idl
+}  // namespace idl
 
 #endif  // MODULES_PERCEPTION_COMMON_I_LIB_PC_I_STRUCT_S_H_

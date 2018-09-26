@@ -15,7 +15,6 @@
  *****************************************************************************/
 #ifndef INFERENCE_TENSORRT_BATCHSTREAM_H_
 #define INFERENCE_TENSORRT_BATCHSTREAM_H_
-#include <assert.h>
 #include <algorithm>
 #include <string>
 #include <vector>
