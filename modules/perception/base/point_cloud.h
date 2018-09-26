@@ -419,6 +419,9 @@ class AttributePointCloud : public PointCloud<PointT> {
   void SetPointHeight(size_t i, size_t j, float height) {
     points_height_[i * width_ + j] = height;
   }
+  void SetPointHeight(size_t i, float height) {
+    points_height_[i] = height;
+  }
   std::vector<float>* mutable_points_height() { return &points_height_; }
 
   const std::vector<int32_t>& points_beam_id() const { return points_beam_id_; }

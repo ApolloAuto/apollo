@@ -18,14 +18,17 @@
 #include <sstream>
 #include <string>
 
+#include "cybertron/common/log.h"
 #include "modules/perception/base/point_cloud.h"
-#include "modules/perception/base/point_cloud.h"
+#include "modules/perception/base/point.h"
 #include "modules/perception/common/point_cloud_processing/common.h"
 #include "modules/perception/lidar/common/feature_descriptor.h"
 
 namespace apollo {
 namespace perception {
 namespace lidar {
+
+using PointFCloud = apollo::perception::base::AttributePointCloud<base::PointF>;
 
 TrackedObject::TrackedObject(base::ObjectPtr obj_ptr,
                              const Eigen::Affine3d& pose) {
@@ -42,9 +45,9 @@ void TrackedObject::AttachObject(base::ObjectPtr obj_ptr,
 
     // object info to tracked object
     center = pose * object_ptr->center;
-    const base::PointFCloud& cloud = (object_ptr->lidar_supplement).cloud;
-    barycenter = (common::CalculateCentroid<const base::PointFCloud>(cloud))
-                     .cast<double>();
+    const PointFCloud& cloud = (object_ptr->lidar_supplement).cloud;
+    barycenter = (common::CalculateCentroid(cloud))
+        .cast<double>();
     barycenter = pose * barycenter;
     anchor_point = barycenter;
 
@@ -66,9 +69,11 @@ void TrackedObject::AttachObject(base::ObjectPtr obj_ptr,
       cloud_world[i].z = pt_world(2);
       cloud_world[i].intensity = cloud[i].intensity;
     }
-    memcpy(&cloud_world.points_height(0), &cloud.points_height(0),
-           sizeof(float) * cloud.size());
-
+    // memcpy(&(cloud_world.points_height(0)), &(cloud.points_height(0)),
+    //        sizeof(float) * cloud.size());
+    for (size_t i = 0; i <  cloud.size(); ++i) {
+      cloud_world.SetPointHeight(i, cloud.points_height(i));
+    }
     // other belief infomation keep as Reset()
     selected_measured_velocity = Eigen::Vector3d::Zero();
     selected_measured_acceleration = Eigen::Vector3d::Zero();

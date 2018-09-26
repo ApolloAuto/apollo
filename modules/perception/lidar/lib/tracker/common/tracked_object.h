@@ -16,14 +16,15 @@
 #ifndef MODULES_PERCEPTION_LIDAR_LIB_TRACKER_COMMON_TRACKED_OBJECT_H_
 #define MODULES_PERCEPTION_LIDAR_LIB_TRACKER_COMMON_TRACKED_OBJECT_H_
 
-#include <Eigen/Core>
 #include <string>
 #include <vector>
+#include <memory>
+
+#include "Eigen/Core"
 
 #include "modules/perception/base/object.h"
 #include "modules/perception/base/object_pool_types.h"
 #include "modules/perception/base/object_types.h"
-#include "modules/perception/lidar/common/lidar_log.h"
 
 namespace apollo {
 namespace perception {
