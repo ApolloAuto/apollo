@@ -117,4 +117,29 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "object_track_matcher",
+    srcs = [
+        "object_track_matcher.cc",
+    ],
+    hdrs = [
+        "object_track_matcher.h",
+    ],
+    deps = [
+        ":track_object_distance",
+        ":gnn_bipartite_graph_matcher",
+        ":multi_hm_bipartite_graph_matcher",
+        "//modules/perception/proto:hm_tracker_config_proto",
+        "//modules/perception/lib/config_manager:config_manager",
+        "//modules/perception/lib/io:file_util",
+        "//modules/common/util:file_util",
+        "//modules/perception/common/graph:secure_matrix",
+        "//modules/perception/lidar/lib/interface:base_bipartite_graph_matcher",
+        "//modules/perception/lidar/lib/tracker/common:track_data",
+        "//modules/perception/lidar/lib/tracker/common:tracked_object",
+        "@eigen",
+        "//framework:cybertron",
+    ],
+)
+
 cpplint()

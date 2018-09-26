@@ -6,30 +6,6 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "hm_multi_target_tracker",
-    srcs = [
-        "hm_multi_target_tracker.cc",
-    ],
-    hdrs = [
-        "hm_multi_target_tracker.h",
-    ],
-    deps = [
-    ],
-)
-
-cc_library(
-    name = "object_track_matcher",
-    srcs = [
-        "object_track_matcher.cc",
-    ],
-    hdrs = [
-        "object_track_matcher.h",
-    ],
-    deps = [
-    ],
-)
-
-cc_library(
     name = "tracker",
     srcs = [
         "tracker.cc",
@@ -38,6 +14,24 @@ cc_library(
         "tracker.h",
     ],
     deps = [
+    ],
+)
+
+cc_library(
+    name = "hm_multi_target_tracker",
+    srcs = [
+        "hm_multi_target_tracker.cc",
+    ],
+    hdrs = [
+        "hm_multi_target_tracker.h",
+    ],
+    deps = [
+        ":object_track_matcher",
+        ":tracker",
+        "//modules/perception/base:object",
+        "//modules/perception/common/geometry:convex_hull_2d",
+        "//modules/perception/lidar/lib/interface:base_multi_target_tracker",
+        "//modules/perception/lidar/lib/tracker/common:track_data",
     ],
 )
 
