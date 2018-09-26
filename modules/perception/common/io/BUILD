@@ -20,16 +20,20 @@ cc_library(
     ],
 )
 
-# cc_test(
-#     name = "io_util_test",
-#     size = "small",
-#     srcs = [
-#         "io_util_test.cc",
-#     ],
-#     deps = [
-#         ":io_util",
-#         "@gtest//:main",
-#     ],
-# )
+cc_test(
+    name = "io_util_test",
+    size = "small",
+    srcs = [
+        "io_util_test.cc",
+    ],
+    data = [
+        "//modules/perception:perception_testdata",
+    ],
+    deps = [
+        ":io_util",
+        "@yaml_cpp//:yaml",
+        "@gtest//:main",
+    ],
+)
 
 cpplint()
