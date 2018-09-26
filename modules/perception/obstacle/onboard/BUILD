@@ -50,6 +50,7 @@ cc_library(
     hdrs = [
         "lidar_process_subnode.h",
         "object_shared_data.h",
+        "scene_shared_data.h",
     ],
     deps = [
         ":hdmapinput",
@@ -213,6 +214,7 @@ cc_library(
         "camera_shared_data.h",
         "fusion_shared_data.h",
         "lane_shared_data.h",
+        "scene_shared_data.h",
     ],
     deps = [
         "//modules/perception/obstacle/base",

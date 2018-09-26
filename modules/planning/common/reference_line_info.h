@@ -67,7 +67,6 @@ class ReferenceLineInfo {
   PathDecision* path_decision();
   const PathDecision& path_decision() const;
   const ReferenceLine& reference_line() const;
-  const common::TrajectoryPoint& AdcPlanningPoint() const;
 
   bool ReachedDestination() const;
 
@@ -202,16 +201,18 @@ class ReferenceLineInfo {
 
   DiscretizedTrajectory discretized_trajectory_;
 
-  /**
-   * @brief SL boundary of stitching point (starting point of plan trajectory)
-   * relative to the reference line
-   */
-  SLBoundary adc_sl_boundary_;
-
-  /**
-   * @brief SL boundary of vehicle realtime state relative to the reference line
-   */
-  SLBoundary vehicle_sl_boundary_;
+  struct {
+    /**
+     * @brief SL boundary of stitching point (starting point of plan trajectory)
+     * relative to the reference line
+     */
+    SLBoundary adc_sl_boundary_;
+    /**
+     * @brief SL boundary of vehicle realtime state relative to the reference
+     * line
+     */
+    SLBoundary vehicle_sl_boundary_;
+  } sl_boundary_info_;
 
   planning_internal::Debug debug_;
   LatencyStats latency_stats_;

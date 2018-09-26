@@ -30,6 +30,7 @@
 #include "modules/common/time/time.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/hdmap/hdmap_util.h"
+#include "modules/planning/common/ego_info.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/trajectory/trajectory_stitcher.h"
@@ -58,7 +59,11 @@ Status NaviPlanning::Init() {
   CHECK(apollo::common::util::GetProtoFromFile(FLAGS_planning_config_file,
                                                &config_))
       << "failed to load planning config file " << FLAGS_planning_config_file;
-  CheckPlanningConfig();
+
+  if (!CheckPlanningConfig()) {
+    return Status(ErrorCode::PLANNING_ERROR,
+                  "planning config error: " + config_.DebugString());
+  }
 
   planner_dispatcher_->Init();
 
@@ -127,7 +132,7 @@ void NaviPlanning::OnPad(const PadMessage& pad) {
 }
 
 void NaviPlanning::ProcessPadMsg(DrivingAction drvie_action) {
-  if (config_.planner_type() == PlanningConfig::NAVI) {
+  if (config_.planner_type() == NAVI) {
     std::map<std::string, uint32_t> lane_id_to_priority;
     auto& ref_line_info_group = frame_->reference_line_info();
     if (is_received_pad_msg_) {
@@ -387,6 +392,10 @@ void NaviPlanning::RunOnce() {
     PublishPlanningPb(&not_ready_pb, start_timestamp);
     return;
   }
+
+  EgoInfo::instance()->Update(stitching_trajectory.back(), vehicle_state,
+                              frame_->obstacles());
+
   auto* trajectory_pb = frame_->mutable_trajectory();
   if (FLAGS_enable_record_debug) {
     frame_->RecordInputDebug(trajectory_pb->mutable_debug());
@@ -634,6 +643,15 @@ NaviPlanning::VehicleConfig NaviPlanning::ComputeVehicleConfigFromLocalization(
 
   vehicle_config.is_valid_ = true;
   return vehicle_config;
+}
+
+bool NaviPlanning::CheckPlanningConfig() {
+  if (!config_.has_planner_navi_config()) {
+    return false;
+  }
+  // TODO(All): check other config params
+
+  return true;
 }
 
 }  // namespace planning

@@ -18,6 +18,10 @@
 #define MODULES_PLANNING_TUNING_AUTOTUNING_BASE_MODEL_H_
 
 #include <memory>
+#include "modules/common/status/status.h"
+#include "modules/planning/proto/auto_tuning_model_input.pb.h"
+#include "modules/planning/tuning/autotuning_feature_builder.h"
+#include "modules/planning/tuning/autotuning_mlp_net_model.h"
 
 namespace apollo {
 namespace planning {
@@ -35,11 +39,16 @@ class AutotuningBaseModel {
   ~AutotuningBaseModel() = default;
 
   /**
+   * @brief set mlp model as well as feature builder
+   */
+  virtual common::Status SetParams() = 0;
+
+  /**
    * @brief : evaluate by trajectory
    * @param : input trajectory feature proto
    * @return : the total value of reward / cost
    */
-  double Evaluate(
+  virtual double Evaluate(
       const autotuning::TrajectoryFeature& trajectory_feature) const = 0;
 
   /**
@@ -47,14 +56,15 @@ class AutotuningBaseModel {
    * @param : trajectory pointwise input feature
    * @return : total value of reward / cost
    */
-  double Evaluate(
+  virtual double Evaluate(
       const autotuning::TrajectoryPointwiseFeature& point_feature) const = 0;
 
- private:
+ protected:
   /**
    * @brief : stored autotuning mlp model
    */
-  std::unique_ptr<AutotuningMLPNetModel> mpl_model_ = nullptr;
+  std::unique_ptr<AutotuningMLPModel> mlp_model_ = nullptr;
+  std::unique_ptr<AutotuningFeatureBuilder> feature_builder_ = nullptr;
 };
 
 }  // namespace planning

@@ -179,6 +179,7 @@ cc_library(
         "reference_line_info.h",
     ],
     deps = [
+        ":ego_info",
         ":path_decision",
         ":planning_gflags",
         "//modules/common:log",
@@ -322,6 +323,8 @@ cc_library(
         "//modules/planning/common/trajectory:publishable_trajectory",
         "//modules/planning/proto:planning_config_proto",
         "//modules/planning/proto:planning_proto",
+        "//modules/common/math:geometry",
+        "@eigen",
     ],
 )
 
@@ -338,6 +341,7 @@ cc_test(
         ":frame",
         "//modules/common/util",
         "//modules/planning/proto:planning_config_proto",
+        "//modules/map/hdmap:hdmap_util",
         "@gtest//:main",
     ],
 )
@@ -357,6 +361,7 @@ cc_test(
         "//modules/common/util",
         "//modules/common/vehicle_state/proto:vehicle_state_proto",
         "//modules/planning/proto:planning_config_proto",
+        "@eigen",
         "@gtest//:main",
     ],
 )
@@ -388,8 +393,42 @@ cc_test(
 )
 
 cc_library(
+    name = "ego_info",
+    srcs = [
+        "ego_info.cc",
+    ],
+    hdrs = [
+        "ego_info.h",
+    ],
+    deps = [
+        ":obstacle",
+        "//modules/common:log",
+        "//modules/common/configs:vehicle_config_helper",
+        "//modules/common/configs/proto:vehicle_config_proto",
+        "//modules/common/math:geometry",
+        "//modules/common/vehicle_state/proto:vehicle_state_proto",
+        "//modules/planning/reference_line",
+        "@eigen",
+    ],
+)
+
+cc_test(
+    name = "ego_info_test",
+    size = "small",
+    srcs = [
+        "ego_info_test.cc",
+    ],
+    deps = [
+        ":ego_info",
+        ":frame",
+        "@gtest//:main",
+    ],
+)
+
+cc_library(
     name = "planning_common",
     deps = [
+        ":ego_info",
         ":frame",
         ":frame_open_space",
         ":planning_gflags",

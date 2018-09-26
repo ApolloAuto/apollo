@@ -65,6 +65,13 @@
 namespace apollo {
 namespace perception {
 
+class FusionOptions {
+ public:
+  std::vector<double> fused_frame_ts;
+  std::vector<std::string> fused_frame_device_id;
+  bool fused = false;
+};
+
 class BaseFusion {
  public:
   BaseFusion() = default;
@@ -76,7 +83,8 @@ class BaseFusion {
   // @param [out]: fused objects.
   // @return true if fuse successfully, otherwise return false
   virtual bool Fuse(const std::vector<SensorObjects> &multi_sensor_objects,
-                    std::vector<std::shared_ptr<Object>> *fused_objects) = 0;
+                    std::vector<std::shared_ptr<Object>> *fused_objects,
+                    FusionOptions *options) = 0;
   virtual std::string name() const = 0;
 
  private:

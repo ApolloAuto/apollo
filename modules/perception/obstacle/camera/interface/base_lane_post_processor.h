@@ -55,8 +55,8 @@
 
 #include "modules/common/macro.h"
 #include "modules/perception/lib/base/registerer.h"
-#include "modules/perception/obstacle/camera/lane_post_process/common/type.h"
 #include "modules/perception/obstacle/base/object_supplement.h"
+#include "modules/perception/obstacle/camera/lane_post_process/common/type.h"
 
 namespace apollo {
 namespace perception {
@@ -66,9 +66,7 @@ struct CameraLanePostProcessOptions {
   bool use_lane_history = false;
   int lane_history_size = 0;
   VehicleStatus vehicle_status;
-  void SetMotion(const VehicleStatus &vs) {
-    vehicle_status = vs;
-  }
+  void SetMotion(const VehicleStatus& vs) { vehicle_status = vs; }
 };
 
 class BaseCameraLanePostProcessor {

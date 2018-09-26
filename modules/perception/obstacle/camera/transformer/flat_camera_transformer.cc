@@ -56,8 +56,8 @@ bool FlatCameraTransformer::Transform(
     obj_ptr->theta = atan2(dir[1], dir[0]);
 
     if (HaveHighConfidence(obj_ptr)) {
-      Eigen::Vector3f center_ego = pos_ground
-       + Eigen::Vector3f(0.0f, 0.0f, obj_ptr->height / 2.0f);
+      Eigen::Vector3f center_ego =
+          pos_ground + Eigen::Vector3f(0.0f, 0.0f, obj_ptr->height / 2.0f);
       centers.emplace_back(std::make_pair(center, center_ego));
     }
   }
@@ -76,7 +76,7 @@ bool FlatCameraTransformer::SetExtrinsics(
 }
 
 bool FlatCameraTransformer::GetAdjustedExtrinsics(
-  Eigen::Matrix<double, 4, 4>* extrinsics) {
+    Eigen::Matrix<double, 4, 4> *extrinsics) {
   // Return static results if no object to use in the scene
   if (adjust_pitch_) {
     *extrinsics = camera2car_adj_.cast<double>();
@@ -101,68 +101,69 @@ Eigen::Matrix<float, 3, 1> FlatCameraTransformer::MakeUnit(
 }
 
 bool FlatCameraTransformer::HaveHighConfidence(
-  std::shared_ptr<VisualObject> obj_ptr) {
-    if (obj_ptr->trunc_width > 0.25f) return false;
-    if (obj_ptr->trunc_height > 0.25f) return false;
-    if (obj_ptr->distance > 50.0) return false;
-    if (obj_ptr->distance < 5.0) return false;
+    std::shared_ptr<VisualObject> obj_ptr) {
+  if (obj_ptr->trunc_width > 0.25f) return false;
+  if (obj_ptr->trunc_height > 0.25f) return false;
+  if (obj_ptr->distance > 50.0) return false;
+  if (obj_ptr->distance < 5.0) return false;
 
-    double azimuth = std::atan2(obj_ptr->center[1], obj_ptr->center[0])
-     * 180.0 / M_PI;
-    if (!(-30.0 < azimuth && azimuth < 30.0)) return false;
+  double azimuth =
+      std::atan2(obj_ptr->center[1], obj_ptr->center[0]) * 180.0 / M_PI;
+  if (!(-30.0 < azimuth && azimuth < 30.0)) return false;
 
-    return true;
+  return true;
 }
 
 void FlatCameraTransformer::GetDynamicExtrinsics(
-  const std::vector<std::pair<Eigen::Vector3f, Eigen::Vector3f>> &centers) {
-    if (centers.empty()) {
-      adjust_pitch_ = false;
-      camera2car_adj_ = camera2car_;
-      pitch_diff_ = 0.0f;
-      return;
+    const std::vector<std::pair<Eigen::Vector3f, Eigen::Vector3f>> &centers) {
+  if (centers.empty()) {
+    adjust_pitch_ = false;
+    camera2car_adj_ = camera2car_;
+    pitch_diff_ = 0.0f;
+    return;
+  }
+
+  float min_diff = std::numeric_limits<float>::max();
+  float best_pitch_adjustment = 0.0f;
+  Eigen::Matrix<float, 4, 4> best_camera2car = camera2car_;
+
+  Eigen::Matrix<float, 4, 4> rot;
+  rot.setIdentity();
+  for (float p = -3.0; p < 3.0; p += 0.2f) {
+    // Create adjusted extrinsics
+    Eigen::Matrix3f rotate(
+        Eigen::AngleAxisf(0.0f, Eigen::Vector3f::UnitZ()) *
+        Eigen::AngleAxisf(p / 180.0f * M_PI, Eigen::Vector3f::UnitY()) *
+        Eigen::AngleAxisf(0.0f, Eigen::Vector3f::UnitX()));
+    rot.block<3, 3>(0, 0) = rotate;
+    Eigen::Matrix4f camera2car_r = rot * camera2car_;
+
+    float diff = 0.0;
+    for (auto center_p : centers) {
+      auto c_cam = center_p.first;
+      auto c_car_t = center_p.second;
+
+      Eigen::Vector4f c(c_cam.x(), c_cam.y(), c_cam.z(), 1.0f);
+      Eigen::Vector4f c_car_d = camera2car_r * c;
+
+      auto diff_3dim = c_car_d.head(3) - c_car_t;
+      diff += std::sqrt(diff_3dim.x() * diff_3dim.x() +
+                        diff_3dim.y() * diff_3dim.y() +
+                        diff_3dim.z() * diff_3dim.z());
     }
 
-    float min_diff = std::numeric_limits<float>::max();
-    float best_pitch_adjustment = 0.0f;
-    Eigen::Matrix<float, 4, 4> best_camera2car = camera2car_;
-
-    Eigen::Matrix<float, 4, 4> rot;
-    rot.setIdentity();
-    for (float p = -3.0; p < 3.0; p += 0.2f) {
-      // Create adjusted extrinsics
-      Eigen::Matrix3f rotate(Eigen::AngleAxisf(0.0f, Eigen::Vector3f::UnitZ())
-      * Eigen::AngleAxisf(p / 180.0f * M_PI, Eigen::Vector3f::UnitY())
-      * Eigen::AngleAxisf(0.0f, Eigen::Vector3f::UnitX()));
-      rot.block<3, 3>(0, 0) = rotate;
-      Eigen::Matrix4f camera2car_r = rot * camera2car_;
-
-      float diff = 0.0;
-      for (auto center_p : centers) {
-        auto c_cam = center_p.first;
-        auto c_car_t = center_p.second;
-
-        Eigen::Vector4f c(c_cam.x(), c_cam.y(), c_cam.z(), 1.0f);
-        Eigen::Vector4f c_car_d = camera2car_r * c;
-
-        auto diff_3dim = c_car_d.head(3) - c_car_t;
-        diff += std::sqrt(diff_3dim.x() * diff_3dim.x()
-                          + diff_3dim.y() * diff_3dim.y()
-                          + diff_3dim.z() * diff_3dim.z());
-      }
-
-      // Get best pitch angle adjustment
-      if (diff < min_diff) {
-        min_diff = diff;
-        best_pitch_adjustment = p;
-        best_camera2car = camera2car_r;
-      }
+    // Get best pitch angle adjustment
+    if (diff < min_diff) {
+      min_diff = diff;
+      best_pitch_adjustment = p;
+      best_camera2car = camera2car_r;
     }
+  }
 
-    // Output extrinsics as result
-    adjust_pitch_ = true;
-    camera2car_adj_ = best_camera2car;
-    pitch_diff_ = best_pitch_adjustment;
+  // Output extrinsics as result
+  adjust_pitch_ = true;
+  camera2car_adj_ = best_camera2car;
+  pitch_diff_ = best_pitch_adjustment;
 }
 
 }  // namespace perception

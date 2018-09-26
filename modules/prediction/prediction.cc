@@ -44,18 +44,18 @@
 namespace apollo {
 namespace prediction {
 
-using ::apollo::common::ErrorCode;
-using ::apollo::common::Status;
-using ::apollo::common::TrajectoryPoint;
-using ::apollo::common::adapter::AdapterConfig;
-using ::apollo::common::adapter::AdapterManager;
-using ::apollo::common::math::Vec2d;
-using ::apollo::common::time::Clock;
-using ::apollo::common::util::DirectoryExists;
-using ::apollo::common::util::Glob;
-using ::apollo::localization::LocalizationEstimate;
-using ::apollo::perception::PerceptionObstacle;
-using ::apollo::perception::PerceptionObstacles;
+using apollo::common::ErrorCode;
+using apollo::common::Status;
+using apollo::common::TrajectoryPoint;
+using apollo::common::adapter::AdapterConfig;
+using apollo::common::adapter::AdapterManager;
+using apollo::common::math::Vec2d;
+using apollo::common::time::Clock;
+using apollo::common::util::DirectoryExists;
+using apollo::common::util::Glob;
+using apollo::localization::LocalizationEstimate;
+using apollo::perception::PerceptionObstacle;
+using apollo::perception::PerceptionObstacles;
 
 std::string Prediction::Name() const { return FLAGS_prediction_module_name; }
 
@@ -80,6 +80,7 @@ void GetBagFiles(const boost::filesystem::path& p,
     }
   }
 }
+
 void Prediction::ProcessRosbag(const std::string& filename) {
   const std::vector<std::string> topics{FLAGS_perception_obstacle_topic,
                                         FLAGS_localization_topic};
@@ -210,7 +211,7 @@ void Prediction::OnPlanning(const planning::ADCTrajectory& adc_trajectory) {
 }
 
 void Prediction::RunOnce(const PerceptionObstacles& perception_obstacles) {
-  if (FLAGS_prediction_test_mode && FLAGS_prediction_test_duration > 0 &&
+  if (FLAGS_prediction_test_mode && FLAGS_prediction_test_duration > 0.0 &&
       (Clock::NowInSeconds() - start_time_ > FLAGS_prediction_test_duration)) {
     AINFO << "Prediction finished running in test mode";
     ros::shutdown();

@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-// The base class of measurement estimation filtering, e.g., Kalman Filtering
+// The base class of measurement estimation filtering, ex Kalman Filtering
 
 #ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_INTERFACE_BASE_CAMERA_FILTER_H_
 #define MODULES_PERCEPTION_OBSTACLE_CAMERA_INTERFACE_BASE_CAMERA_FILTER_H_
@@ -33,6 +33,12 @@
 namespace apollo {
 namespace perception {
 
+struct FilterOptions {
+  FilterOptions() = default;
+  explicit FilterOptions(Eigen::Matrix4d* pose) : camera_trans(pose) {}
+  std::shared_ptr<Eigen::Matrix4d> camera_trans;
+};
+
 class BaseCameraFilter {
  public:
   BaseCameraFilter() {}
@@ -44,7 +50,8 @@ class BaseCameraFilter {
   // @param [in/out] objects : tracked object lists, with updated 3D position,
   // 3D size, 3D velocity and orientation
   virtual bool Filter(const double timestamp,
-                      std::vector<std::shared_ptr<VisualObject>>* objects) = 0;
+                      std::vector<std::shared_ptr<VisualObject>>* objects,
+                      const FilterOptions& options) = 0;
 
   virtual std::string Name() const = 0;
 

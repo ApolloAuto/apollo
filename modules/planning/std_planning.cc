@@ -22,6 +22,8 @@
 #include <utility>
 #include <vector>
 
+#include "gtest/gtest_prod.h"
+
 #include "modules/routing/proto/routing.pb.h"
 
 #include "modules/common/adapters/adapter_manager.h"
@@ -29,6 +31,7 @@
 #include "modules/common/time/time.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/hdmap/hdmap_util.h"
+#include "modules/planning/common/ego_info.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/trajectory/trajectory_stitcher.h"
@@ -74,7 +77,10 @@ Status StdPlanning::Init() {
   CHECK(apollo::common::util::GetProtoFromFile(FLAGS_planning_config_file,
                                                &config_))
       << "failed to load planning config file " << FLAGS_planning_config_file;
-  CheckPlanningConfig();
+  if (!CheckPlanningConfig()) {
+    return Status(ErrorCode::PLANNING_ERROR,
+                  "planning config error: " + config_.DebugString());
+  }
 
   planner_dispatcher_->Init();
 
@@ -242,6 +248,10 @@ void StdPlanning::RunOnce() {
     PublishPlanningPb(&not_ready_pb, start_timestamp);
     return;
   }
+
+  EgoInfo::instance()->Update(stitching_trajectory.back(), vehicle_state,
+                              frame_->obstacles());
+
   auto* trajectory_pb = frame_->mutable_trajectory();
   if (FLAGS_enable_record_debug) {
     frame_->RecordInputDebug(trajectory_pb->mutable_debug());
@@ -354,6 +364,8 @@ Status StdPlanning::Plan(
 
   auto status = planner_->Plan(stitching_trajectory.back(), frame_.get());
 
+  ptr_debug->mutable_planning_data()->set_front_clear_distance(
+      EgoInfo::instance()->front_clear_distance());
   ExportReferenceLineDebug(ptr_debug);
 
   const auto* best_ref_info = frame_->FindDriveReferenceLineInfo();
@@ -448,6 +460,20 @@ void StdPlanning::Stop() {
   FrameHistory::instance()->Clear();
   GetPlanningStatus()->Clear();
   last_routing_.Clear();
+  EgoInfo::instance()->Clear();
+}
+
+bool StdPlanning::CheckPlanningConfig() {
+  if (!config_.has_standard_planning_config()) {
+    return false;
+  }
+  if (config_.standard_planning_config()
+          .planner_onroad_config()
+          .scenario_type_size() == 0) {
+    return false;
+  }
+  // TODO(All): check other config params
+  return true;
 }
 
 }  // namespace planning

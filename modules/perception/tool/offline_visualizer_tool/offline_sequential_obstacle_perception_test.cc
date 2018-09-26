@@ -235,7 +235,7 @@ class SequentialPerceptionTest {
 
   void GetSequentialSensorsDataFiles(std::vector<SensorFile>* sensors_files) {
     PERF_BLOCK_START();
-    std::map<std::string, std::vector<SensorFile> > sensors_files_lists;
+    std::map<std::string, std::vector<SensorFile>> sensors_files_lists;
     size_t total_sensor_files_num = 0;
     for (const auto& sensor_files_source : sensors_files_sources_) {
       std::string sensor_key = sensor_files_source.first;

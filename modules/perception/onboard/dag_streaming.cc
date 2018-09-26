@@ -31,8 +31,6 @@ using std::string;
 using std::map;
 using std::vector;
 
-using google::protobuf::TextFormat;
-
 DEFINE_int32(max_allowed_congestion_value, 0,
              "When DAGStreaming event_queues max length greater than "
              "max_allowed_congestion_value, reset DAGStreaming."
@@ -121,8 +119,7 @@ bool DAGStreaming::InitSubnodes(const DAGConfig& dag_config) {
 
   for (auto& subnode_proto : subnode_config.subnodes()) {
     std::pair<map<SubnodeID, DAGConfig::Subnode>::iterator, bool> result =
-        subnode_config_map.insert(
-            std::make_pair(subnode_proto.id(), subnode_proto));
+        subnode_config_map.emplace(subnode_proto.id(), subnode_proto);
     if (!result.second) {
       AERROR << "duplicate SubnodeID: " << subnode_proto.id();
       return false;
@@ -154,7 +151,7 @@ bool DAGStreaming::InitSubnodes(const DAGConfig& dag_config) {
 
     //    AINFO << "subnode_name: " << subnode_config.name();
     //    AINFO << "subnode_id: " << subnode_id;
-    if (inst == NULL) {
+    if (inst == nullptr) {
       AERROR << "failed to get subnode instance. name: "
              << subnode_config.name();
       return false;

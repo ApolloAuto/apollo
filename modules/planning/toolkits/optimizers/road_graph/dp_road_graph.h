@@ -18,11 +18,12 @@
  * @file dp_road_graph.h
  **/
 
-#ifndef MODULES_PLANNING_TASKS_DP_POLY_PATH_DP_ROAD_GRAPH_H_
-#define MODULES_PLANNING_TASKS_DP_POLY_PATH_DP_ROAD_GRAPH_H_
+#ifndef MODULES_PLANNING_TOOLKITS_OPTIMIZERS_ROAD_GRAPH_DP_ROAD_GRAPH_H_
+#define MODULES_PLANNING_TOOLKITS_OPTIMIZERS_ROAD_GRAPH_DP_ROAD_GRAPH_H_
 
 #include <limits>
 #include <list>
+#include <memory>
 #include <vector>
 
 #include "modules/common/proto/pnc_point.pb.h"
@@ -37,18 +38,19 @@
 #include "modules/planning/common/trajectory/discretized_trajectory.h"
 #include "modules/planning/math/curve1d/quintic_polynomial_curve1d.h"
 #include "modules/planning/reference_line/reference_point.h"
-#include "modules/planning/toolkits/optimizers/dp_poly_path/trajectory_cost.h"
+#include "modules/planning/toolkits/optimizers/road_graph/trajectory_cost.h"
+#include "modules/planning/toolkits/optimizers/road_graph/waypoint_sampler.h"
 
 namespace apollo {
 namespace planning {
 
-class DPRoadGraph {
+class DpRoadGraph {
  public:
-  explicit DPRoadGraph(const DpPolyPathConfig &config,
+  explicit DpRoadGraph(const DpPolyPathConfig &config,
                        const ReferenceLineInfo &reference_line_info,
                        const SpeedData &speed_data);
 
-  ~DPRoadGraph() = default;
+  ~DpRoadGraph() = default;
 
   bool FindPathTunnel(const common::TrajectoryPoint &init_point,
                       const std::vector<const PathObstacle *> &obstacles,
@@ -58,24 +60,28 @@ class DPRoadGraph {
     planning_debug_ = debug;
   }
 
+  void SetWaypointSampler(WaypointSampler *waypoint_sampler) {
+    waypoint_sampler_.reset(waypoint_sampler);
+  }
+
  private:
   /**
    * an private inner struct for the dp algorithm
    */
-  struct DPRoadGraphNode {
+  struct DpRoadGraphNode {
    public:
-    DPRoadGraphNode() = default;
+    DpRoadGraphNode() = default;
 
-    DPRoadGraphNode(const common::SLPoint point_sl,
-                    const DPRoadGraphNode *node_prev)
+    DpRoadGraphNode(const common::SLPoint point_sl,
+                    const DpRoadGraphNode *node_prev)
         : sl_point(point_sl), min_cost_prev_node(node_prev) {}
 
-    DPRoadGraphNode(const common::SLPoint point_sl,
-                    const DPRoadGraphNode *node_prev,
+    DpRoadGraphNode(const common::SLPoint point_sl,
+                    const DpRoadGraphNode *node_prev,
                     const ComparableCost &cost)
         : sl_point(point_sl), min_cost_prev_node(node_prev), min_cost(cost) {}
 
-    void UpdateCost(const DPRoadGraphNode *node_prev,
+    void UpdateCost(const DpRoadGraphNode *node_prev,
                     const QuinticPolynomialCurve1d &curve,
                     const ComparableCost &cost) {
       if (cost <= min_cost) {
@@ -86,7 +92,7 @@ class DPRoadGraph {
     }
 
     common::SLPoint sl_point;
-    const DPRoadGraphNode *min_cost_prev_node = nullptr;
+    const DpRoadGraphNode *min_cost_prev_node = nullptr;
     ComparableCost min_cost = {true, true, true,
                                std::numeric_limits<float>::infinity(),
                                std::numeric_limits<float>::infinity()};
@@ -94,11 +100,7 @@ class DPRoadGraph {
   };
 
   bool GenerateMinCostPath(const std::vector<const PathObstacle *> &obstacles,
-                           std::vector<DPRoadGraphNode> *min_cost_path);
-
-  bool SamplePathWaypoints(
-      const common::TrajectoryPoint &init_point,
-      std::vector<std::vector<common::SLPoint>> *const points);
+                           std::vector<DpRoadGraphNode> *min_cost_path);
 
   bool CalculateFrenetPoint(const common::TrajectoryPoint &traj_point,
                             common::FrenetFramePoint *const frenet_frame_point);
@@ -110,11 +112,10 @@ class DPRoadGraph {
                     const float end_s, const uint32_t curr_level,
                     const uint32_t total_level, ComparableCost *cost);
 
-  void UpdateNode(const std::list<DPRoadGraphNode> &prev_nodes,
+  void UpdateNode(const std::list<DpRoadGraphNode> &prev_nodes,
                   const uint32_t level, const uint32_t total_level,
-                  TrajectoryCost *trajectory_cost, DPRoadGraphNode *front,
-                  DPRoadGraphNode *cur_node);
-  bool HasSidepass();
+                  TrajectoryCost *trajectory_cost, DpRoadGraphNode *front,
+                  DpRoadGraphNode *cur_node);
 
  private:
   DpPolyPathConfig config_;
@@ -127,9 +128,11 @@ class DPRoadGraph {
   apollo::planning_internal::Debug *planning_debug_ = nullptr;
 
   ObjectSidePass sidepass_;
+
+  std::unique_ptr<WaypointSampler> waypoint_sampler_;
 };
 
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_TASKS_DP_POLY_PATH_DP_ROAD_GRAPH_H_
+#endif  // MODULES_PLANNING_TOOLKITS_OPTIMIZERS_ROAD_GRAPH_DP_ROAD_GRAPH_H_

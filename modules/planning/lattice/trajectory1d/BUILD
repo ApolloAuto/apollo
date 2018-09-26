@@ -70,6 +70,7 @@ cc_library(
         "lattice_trajectory1d.h",
     ],
     deps = [
+        "//modules/common:log",
         "//modules/planning/math/curve1d",
     ],
 )
@@ -84,8 +85,8 @@ cc_library(
     ],
     deps = [
         "//modules/common",
-        "//modules/planning/math/curve1d",
         "//modules/planning/common:planning_gflags",
+        "//modules/planning/math/curve1d",
     ],
 )
 

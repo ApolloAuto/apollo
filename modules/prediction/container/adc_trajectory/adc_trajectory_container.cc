@@ -18,10 +18,10 @@
 
 #include <memory>
 #include <vector>
+#include <utility>
 
 #include "modules/common/log.h"
 #include "modules/prediction/common/prediction_gflags.h"
-#include "modules/prediction/common/prediction_map.h"
 
 namespace apollo {
 namespace prediction {
@@ -34,11 +34,16 @@ using ::apollo::common::math::Vec2d;
 using ::apollo::hdmap::JunctionInfo;
 using ::apollo::planning::ADCTrajectory;
 
+ADCTrajectoryContainer::ADCTrajectoryContainer()
+    :adc_junction_info_ptr_(nullptr),
+     s_dist_to_junction_(0.0) {
+}
+
 void ADCTrajectoryContainer::Insert(
     const ::google::protobuf::Message& message) {
   adc_lane_ids_.clear();
   adc_lane_seq_.clear();
-  adc_junction_polygon_ = Polygon2d{};
+  adc_junction_polygon_ = std::move(Polygon2d());
 
   std::lock_guard<std::mutex> lock(adc_trajectory_mutex_);
   adc_trajectory_.CopyFrom(dynamic_cast<const ADCTrajectory&>(message));
@@ -83,6 +88,11 @@ bool ADCTrajectoryContainer::IsProtected() const {
 void ADCTrajectoryContainer::SetJunctionPolygon() {
   std::shared_ptr<const JunctionInfo> junction_info(nullptr);
 
+  double s_start = 0.0;
+  double s_at_junction = 0.0;
+  if (adc_trajectory_.trajectory_point_size() > 0) {
+    s_start = adc_trajectory_.trajectory_point(0).path_point().s();
+  }
   for (int i = 0; i < adc_trajectory_.trajectory_point_size(); ++i) {
     double s = adc_trajectory_.trajectory_point(i).path_point().s();
 
@@ -91,6 +101,7 @@ void ADCTrajectoryContainer::SetJunctionPolygon() {
     }
 
     if (junction_info != nullptr) {
+      s_at_junction = s;
       break;
     }
 
@@ -110,8 +121,23 @@ void ADCTrajectoryContainer::SetJunctionPolygon() {
     }
     if (vertices.size() >= 3) {
       adc_junction_polygon_ = Polygon2d{vertices};
+      adc_junction_info_ptr_ = junction_info;
+      s_dist_to_junction_ = s_at_junction - s_start;
     }
   }
+}
+
+std::shared_ptr<const apollo::hdmap::JunctionInfo>
+ADCTrajectoryContainer::ADCJunction() const {
+  return adc_junction_info_ptr_;
+}
+
+double ADCTrajectoryContainer::ADCDistanceToJunction() const {
+  return s_dist_to_junction_;
+}
+
+const ADCTrajectory& ADCTrajectoryContainer::adc_trajectory() const {
+  return adc_trajectory_;
 }
 
 void ADCTrajectoryContainer::SetLaneSequence() {

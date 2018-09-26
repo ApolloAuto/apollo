@@ -60,12 +60,12 @@ class MlpDataSet(object):
         features = tf.parse_single_example(
             serialized_example,
             features={
-                'image': tf.FixedLenFeature([62], tf.float32),
+                'data': tf.FixedLenFeature([62], tf.float32),
                 'label': tf.FixedLenFeature([1], tf.float32),
             })
 
-        image = features['image']
-        label = tf.cast(features['label'], tf.int32)
+        image = features['data']
+        label = tf.cast(features['label'], tf.int32)+1
         return image, label
 
     def make_batch(self, batch_size):
@@ -80,7 +80,7 @@ class MlpDataSet(object):
         # Potentially shuffle records.
         if self.subset == 'train':
             min_queue_examples = int(
-                MlpDataSet.num_examples_per_epoch(self.subset) * 0.4)
+                MlpDataSet.num_examples_per_epoch(self.subset) * 0.1)
             # Ensure that the capacity is sufficiently large to provide good random
             # shuffling.
             dataset = dataset.shuffle(buffer_size=min_queue_examples +
@@ -96,10 +96,10 @@ class MlpDataSet(object):
     @staticmethod
     def num_examples_per_epoch(subset='train'):
         if subset == 'train':
-            return 45000
+            return 13000000
         elif subset == 'validation':
-            return 5000
+            return 1600000
         elif subset == 'eval':
-            return 10000
+            return 1600000
         else:
             raise ValueError('Invalid data subset "%s"' % subset)

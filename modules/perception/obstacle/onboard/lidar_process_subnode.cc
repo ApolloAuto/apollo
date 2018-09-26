@@ -108,8 +108,6 @@ void LidarProcessSubnode::OnPointCloud(
   if (!GetVelodyneTrans(kTimeStamp, velodyne_trans.get())) {
     AERROR << "failed to get trans at timestamp: "
            << GLOG_TIMESTAMP(kTimeStamp);
-    out_sensor_objects->error_code = common::PERCEPTION_ERROR_TF;
-    PublishDataAndEvent(timestamp_, out_sensor_objects);
     return;
   }
   out_sensor_objects->sensor2world_pose = *velodyne_trans;
@@ -151,8 +149,6 @@ void LidarProcessSubnode::OnPointCloud(
       roi_indices_ = roi_indices;
     } else {
       AERROR << "failed to call roi filter.";
-      out_sensor_objects->error_code = common::PERCEPTION_ERROR_PROCESS;
-      PublishDataAndEvent(timestamp_, out_sensor_objects);
       return;
     }
   }
@@ -174,8 +170,6 @@ void LidarProcessSubnode::OnPointCloud(
     if (!segmentor_->Segment(roi_cloud, non_ground_indices,
                              segmentation_options, &objects)) {
       AERROR << "failed to call segmention.";
-      out_sensor_objects->error_code = common::PERCEPTION_ERROR_PROCESS;
-      PublishDataAndEvent(timestamp_, out_sensor_objects);
       return;
     }
   }
@@ -191,8 +185,6 @@ void LidarProcessSubnode::OnPointCloud(
 
     if (!object_filter_->Filter(object_filter_options, &objects)) {
       AERROR << "failed to call object filter.";
-      out_sensor_objects->error_code = common::PERCEPTION_ERROR_PROCESS;
-      PublishDataAndEvent(timestamp_, out_sensor_objects);
       return;
     }
   }
@@ -205,8 +197,6 @@ void LidarProcessSubnode::OnPointCloud(
     ObjectBuilderOptions object_builder_options;
     if (!object_builder_->Build(object_builder_options, &objects)) {
       AERROR << "failed to call object builder.";
-      out_sensor_objects->error_code = common::PERCEPTION_ERROR_PROCESS;
-      PublishDataAndEvent(timestamp_, out_sensor_objects);
       return;
     }
   }
@@ -222,8 +212,6 @@ void LidarProcessSubnode::OnPointCloud(
     if (!tracker_->Track(objects, timestamp_, tracker_options,
                          &(out_sensor_objects->objects))) {
       AERROR << "failed to call tracker.";
-      out_sensor_objects->error_code = common::PERCEPTION_ERROR_PROCESS;
-      PublishDataAndEvent(timestamp_, out_sensor_objects);
       return;
     }
   }
@@ -237,15 +225,14 @@ void LidarProcessSubnode::OnPointCloud(
     type_fuser_options.timestamp = timestamp_;
     if (!type_fuser_->FuseType(type_fuser_options,
                                &(out_sensor_objects->objects))) {
-      out_sensor_objects->error_code = common::PERCEPTION_ERROR_PROCESS;
-      PublishDataAndEvent(timestamp_, out_sensor_objects);
       return;
     }
   }
   ADEBUG << "lidar process succ.";
   PERF_BLOCK_END("lidar_type_fuser");
 
-  PublishDataAndEvent(timestamp_, out_sensor_objects);
+  // if visualization mode, add the point cloud outside
+  PublishDataAndEvent(timestamp_, out_sensor_objects, &point_cloud);
   return;
 }
 
@@ -276,6 +263,16 @@ bool LidarProcessSubnode::InitFrameDependence() {
            << lidar_processing_data_name;
     return false;
   }
+
+  const std::string scene_processing_data_name("SceneSharedData");
+  scene_data_ = dynamic_cast<SceneSharedData*>(
+      shared_data_manager_->GetSharedData(scene_processing_data_name));
+  if (scene_data_ == nullptr) {
+    AERROR << "Failed to get shared data instance "
+           << scene_processing_data_name;
+    return false;
+  }
+
   AINFO << "Init shared data successfully, data: " << processing_data_->name();
 
   /// init hdmap
@@ -408,7 +405,8 @@ void LidarProcessSubnode::TransPointCloudToPCL(
 }
 
 void LidarProcessSubnode::PublishDataAndEvent(
-    double timestamp, const SharedDataPtr<SensorObjects>& data) {
+    double timestamp, const SharedDataPtr<SensorObjects>& data,
+    PointCloudPtr* cloud) {
   // set shared data
   std::string key;
   if (!SubnodeHelper::ProduceSharedDataKey(timestamp, device_id_, &key)) {
@@ -417,7 +415,19 @@ void LidarProcessSubnode::PublishDataAndEvent(
     return;
   }
 
+  AINFO << "lidar object size is " << data->objects.size();
+
   processing_data_->Add(key, data);
+
+  // adding point cloud to scene
+  if (cloud != nullptr) {
+    SharedDataPtr<SceneItem> sdata(new SceneItem());
+    sdata->timestamp = timestamp;
+    sdata->cloud = *cloud;
+    sdata->pose = data->sensor2world_pose;
+    scene_data_->Add(key, sdata);
+  }
+
   // pub events
   for (size_t idx = 0; idx < pub_meta_events_.size(); ++idx) {
     const EventMeta& event_meta = pub_meta_events_[idx];

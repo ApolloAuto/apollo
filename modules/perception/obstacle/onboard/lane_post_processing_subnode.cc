@@ -279,9 +279,9 @@ Status LanePostProcessingSubnode::ProcEvents() {
   tot_processing_time_ += t;
   AINFO << "Lane Post Processing Runtime: " << t << " ms.";
   AINFO << "Lane Post Processing Runtime: "
-         << "MIN (" << min_processing_time_ << " ms), "
-         << "MAX (" << max_processing_time_ << " ms), "
-         << "AVE (" << tot_processing_time_ / seq_num_ << " ms).";
+        << "MIN (" << min_processing_time_ << " ms), "
+        << "MAX (" << max_processing_time_ << " ms), "
+        << "AVE (" << tot_processing_time_ / seq_num_ << " ms).";
 
   PublishDataAndEvent(event.timestamp, lane_objects);
 

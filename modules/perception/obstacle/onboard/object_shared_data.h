@@ -30,9 +30,7 @@ namespace perception {
    public:                                                   \
     data_name() : CommonSharedData<SensorObjects>() {}       \
     virtual ~data_name() {}                                  \
-    std::string name() const override {                      \
-      return #data_name;                                     \
-    }                                                        \
+    std::string name() const override { return #data_name; } \
                                                              \
    private:                                                  \
     DISALLOW_COPY_AND_ASSIGN(data_name);                     \

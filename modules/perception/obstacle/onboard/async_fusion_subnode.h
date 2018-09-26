@@ -70,8 +70,7 @@ class AsyncFusionSubnode : public Subnode {
 
   void OnChassis(const apollo::canbus::Chassis &message);
 
-  void PublishDataAndEvent(const double timestamp,
-                           const std::string &device_id,
+  void PublishDataAndEvent(const double timestamp, const std::string &device_id,
                            const SharedDataPtr<FusionItem> &data);
 
   void PublishPerceptionPb(const SensorObjects &sensor_objects);

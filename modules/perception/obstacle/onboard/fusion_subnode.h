@@ -71,8 +71,7 @@ class FusionSubnode : public Subnode {
 
   void OnChassis(const apollo::canbus::Chassis &message);
 
-  void PublishDataAndEvent(const double timestamp,
-                           const std::string &device_id,
+  void PublishDataAndEvent(const double timestamp, const std::string &device_id,
                            const SharedDataPtr<FusionItem> &data);
   double lidar_timestamp_;
   double radar_timestamp_;
@@ -88,9 +87,9 @@ class FusionSubnode : public Subnode {
   LaneSharedData *lane_shared_data_ = nullptr;
   std::shared_ptr<LaneObjects> lane_objects_;
   // CIPV related variables
-  CIPVObjectData* cipv_object_data_ = nullptr;
+  CIPVObjectData *cipv_object_data_ = nullptr;
   Cipv cipv_;
-  MotionService* motion_service_ = nullptr;
+  MotionService *motion_service_ = nullptr;
   MotionBuffer motion_buffer_;
 
   // lidar perception subnode event controls the publishing behavior

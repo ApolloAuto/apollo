@@ -18,8 +18,8 @@
  * @file dp_st_graph.h
  **/
 
-#ifndef MODULES_PLANNING_TASKS_DP_ST_SPEED_DP_ST_GRAPH_H_
-#define MODULES_PLANNING_TASKS_DP_ST_SPEED_DP_ST_GRAPH_H_
+#ifndef MODULES_PLANNING_TOOLKITS_OPTIMIZERS_DP_ST_SPEED_DP_ST_GRAPH_H_
+#define MODULES_PLANNING_TOOLKITS_OPTIMIZERS_DP_ST_SPEED_DP_ST_GRAPH_H_
 
 #include <vector>
 
@@ -59,13 +59,13 @@ class DpStGraph {
   void CalculateCostAt(const uint32_t r, const uint32_t c);
 
   float CalculateEdgeCost(const STPoint& first, const STPoint& second,
-                           const STPoint& third, const STPoint& forth,
-                           const float speed_limit);
+                          const STPoint& third, const STPoint& forth,
+                          const float speed_limit);
   float CalculateEdgeCostForSecondCol(const uint32_t row,
-                                       const float speed_limit);
-  float CalculateEdgeCostForThirdCol(const uint32_t curr_r,
-                                      const uint32_t pre_r,
                                       const float speed_limit);
+  float CalculateEdgeCostForThirdCol(const uint32_t curr_r,
+                                     const uint32_t pre_r,
+                                     const float speed_limit);
 
   void GetRowRange(const StGraphPoint& point, int* highest_row,
                    int* lowest_row);
@@ -102,4 +102,4 @@ class DpStGraph {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_TASKS_DP_ST_SPEED_DP_ST_GRAPH_H_
+#endif  // MODULES_PLANNING_TOOLKITS_OPTIMIZERS_DP_ST_SPEED_DP_ST_GRAPH_H_

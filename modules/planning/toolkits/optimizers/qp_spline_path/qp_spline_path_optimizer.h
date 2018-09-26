@@ -18,8 +18,8 @@
  * @file qp_path_optimizer.h
  **/
 
-#ifndef MODULES_PLANNING_TASKS_QP_SPLINE_PATH_QP_SPLINE_PATH_OPTIMIZER_H_
-#define MODULES_PLANNING_TASKS_QP_SPLINE_PATH_QP_SPLINE_PATH_OPTIMIZER_H_
+#ifndef MODULES_PLANNING_TOOLKITS_OPTIMIZERS_QP_SPLINE_PATH_OPTIMIZER_H_
+#define MODULES_PLANNING_TOOLKITS_OPTIMIZERS_QP_SPLINE_PATH_OPTIMIZER_H_
 
 #include <memory>
 #include <string>
@@ -38,7 +38,7 @@ namespace planning {
 class QpSplinePathOptimizer : public PathOptimizer {
  public:
   QpSplinePathOptimizer();
-  bool Init(const PlanningConfig& config) override;
+  bool Init(const ScenarioConfig::ScenarioTaskConfig& config) override;
 
  private:
   apollo::common::Status Process(const SpeedData& speed_data,
@@ -54,4 +54,4 @@ class QpSplinePathOptimizer : public PathOptimizer {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_TASKS_QP_SPLINE_PATH_QP_PATH_OPTIMIZER_H_
+#endif  // MODULES_PLANNING_TOOLKITS_OPTIMIZERS_QP_SPLINE_PATH_OPTIMIZER_H_

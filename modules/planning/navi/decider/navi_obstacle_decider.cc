@@ -30,8 +30,7 @@
 #include <utility>
 #include <vector>
 
-#include "glog/logging.h"
-
+#include "modules/common/log.h"
 #include "modules/common/math/line_segment2d.h"
 #include "modules/common/math/linear_interpolation.h"
 #include "modules/common/math/path_matcher.h"
@@ -51,10 +50,10 @@ namespace {
 constexpr double kEpislon = 1e-6;
 }  // namespace
 
-NaviObstacleDecider::NaviObstacleDecider() : Task("NaviObstacleDecider") {}
+NaviObstacleDecider::NaviObstacleDecider() : NaviTask("NaviObstacleDecider") {}
 
 bool NaviObstacleDecider::Init(const PlanningConfig& config) {
-  config_ = config.navi_planner_config().navi_obstacle_decider_config();
+  config_ = config.planner_navi_config().navi_obstacle_decider_config();
   return true;
 }
 

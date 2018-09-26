@@ -18,8 +18,8 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_TASKS_DP_POLY_PATH_TRAJECTORY_COST_H_
-#define MODULES_PLANNING_TASKS_DP_POLY_PATH_TRAJECTORY_COST_H_
+#ifndef MODULES_PLANNING_TOOLKITS_OPTIMIZERS_DP_POLY_PATH_TRAJECTORY_COST_H_
+#define MODULES_PLANNING_TOOLKITS_OPTIMIZERS_DP_POLY_PATH_TRAJECTORY_COST_H_
 
 #include <vector>
 
@@ -32,7 +32,7 @@
 #include "modules/planning/common/speed/speed_data.h"
 #include "modules/planning/math/curve1d/quintic_polynomial_curve1d.h"
 #include "modules/planning/reference_line/reference_line.h"
-#include "modules/planning/toolkits/optimizers/dp_poly_path/comparable_cost.h"
+#include "modules/planning/toolkits/optimizers/road_graph/comparable_cost.h"
 
 namespace apollo {
 namespace planning {
@@ -90,4 +90,4 @@ class TrajectoryCost {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_TASKS_DP_POLY_PATH_TRAJECTORY_COST_H_
+#endif  // MODULES_PLANNING_TOOLKITS_OPTIMIZERS_DP_POLY_PATH_TRAJECTORY_COST_H_

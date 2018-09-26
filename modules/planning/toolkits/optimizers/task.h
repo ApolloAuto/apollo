@@ -18,8 +18,8 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_TASKS_TASK_H_
-#define MODULES_PLANNING_TASKS_TASK_H_
+#ifndef MODULES_PLANNING_TOOLKITS_OPTIMIZERS_TASK_H_
+#define MODULES_PLANNING_TOOLKITS_OPTIMIZERS_TASK_H_
 
 #include <string>
 
@@ -41,7 +41,7 @@ class Task {
   virtual apollo::common::Status Execute(
       Frame* frame, ReferenceLineInfo* reference_line_info);
 
-  virtual bool Init(const PlanningConfig& config);
+  virtual bool Init(const ScenarioConfig::ScenarioTaskConfig& config);
 
  protected:
   bool is_init_ = false;
@@ -55,4 +55,4 @@ class Task {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_TASKS_TASK_H_
+#endif  // MODULES_PLANNING_TOOLKITS_OPTIMIZERS_TASK_H_

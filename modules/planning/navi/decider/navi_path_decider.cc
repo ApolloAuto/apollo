@@ -25,8 +25,8 @@
 #include <limits>
 #include <utility>
 
-#include "glog/logging.h"
 #include "modules/common/configs/vehicle_config_helper.h"
+#include "modules/common/log.h"
 #include "modules/common/math/vec2d.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/proto/sl_boundary.pb.h"
@@ -38,14 +38,14 @@ using apollo::common::Status;
 using apollo::common::math::Box2d;
 using apollo::common::math::Vec2d;
 
-NaviPathDecider::NaviPathDecider() : Task("NaviPathDecider") {
+NaviPathDecider::NaviPathDecider() : NaviTask("NaviPathDecider") {
   // TODO(all): Add your other initialization.
 }
 
 bool NaviPathDecider::Init(const PlanningConfig& config) {
   move_dest_lane_config_talbe_.clear();
   max_speed_levels_.clear();
-  config_ = config.navi_planner_config().navi_path_decider_config();
+  config_ = config.planner_navi_config().navi_path_decider_config();
   auto move_dest_lane_config_talbe = config_.move_dest_lane_config_talbe();
   for (const auto& item : move_dest_lane_config_talbe.lateral_shift()) {
     double max_speed_level = item.max_speed();
@@ -78,7 +78,7 @@ bool NaviPathDecider::Init(const PlanningConfig& config) {
 
 Status NaviPathDecider::Execute(Frame* frame,
                                 ReferenceLineInfo* const reference_line_info) {
-  Task::Execute(frame, reference_line_info);
+  NaviTask::Execute(frame, reference_line_info);
   vehicle_state_ = frame->vehicle_state();
   cur_reference_line_lane_id_ = reference_line_info->Lanes().Id();
   auto ret = Process(reference_line_info->reference_line(),

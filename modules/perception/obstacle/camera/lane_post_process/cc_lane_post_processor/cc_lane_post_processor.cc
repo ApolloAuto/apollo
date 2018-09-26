@@ -50,10 +50,10 @@ bool CCLanePostProcessor::Init() {
   // 2. get parameters
   string space_type = config_.space_type();
   if (space_type == "vehicle") {
-    options_.space_type = SpaceType::VEHICLE;
+    options_.space_type = SpaceType::VEHICLECOR;
   } else if (space_type == "image") {
     AINFO << "using image space to generate lane instances ...";
-    options_.space_type = SpaceType::IMAGE;
+    options_.space_type = SpaceType::IMAGECOR;
   } else {
     AERROR << "invalid space type" << space_type;
     return false;
@@ -112,7 +112,7 @@ bool CCLanePostProcessor::Init() {
   options_.frame.min_cc_pixel_num = config_.min_cc_pixel_num();
   options_.frame.min_cc_size = config_.min_cc_size();
   options_.frame.min_y_search_offset =
-      (options_.frame.space_type == SpaceType::IMAGE
+      (options_.frame.space_type == SpaceType::IMAGECOR
            ? config_.min_y_search_offset_image()
            : config_.min_y_search_offset());
 
@@ -126,13 +126,13 @@ bool CCLanePostProcessor::Init() {
   }
 
   options_.frame.assoc_param.min_distance =
-      (options_.frame.space_type == SpaceType::IMAGE
+      (options_.frame.space_type == SpaceType::IMAGECOR
            ? config_.assoc_min_distance_image()
            : config_.assoc_min_distance());
   ADEBUG << "assoc_min_distance = " << options_.frame.assoc_param.min_distance;
 
   options_.frame.assoc_param.max_distance =
-      (options_.frame.space_type == SpaceType::IMAGE
+      (options_.frame.space_type == SpaceType::IMAGECOR
            ? config_.assoc_max_distance_image()
            : config_.assoc_max_distance());
   ADEBUG << "assoc_max_distance = " << options_.frame.assoc_param.max_distance;
@@ -142,7 +142,7 @@ bool CCLanePostProcessor::Init() {
          << options_.frame.assoc_param.distance_weight;
 
   options_.frame.assoc_param.max_deviation_angle =
-      (options_.frame.space_type == SpaceType::IMAGE
+      (options_.frame.space_type == SpaceType::IMAGECOR
            ? config_.assoc_max_deviation_angle_image()
            : config_.assoc_max_deviation_angle());
   ADEBUG << "assoc_max_deviation_angle = "
@@ -155,7 +155,7 @@ bool CCLanePostProcessor::Init() {
          << options_.frame.assoc_param.deviation_angle_weight;
 
   options_.frame.assoc_param.max_relative_orie =
-      (options_.frame.space_type == SpaceType::IMAGE
+      (options_.frame.space_type == SpaceType::IMAGECOR
            ? config_.assoc_max_relative_orie_image()
            : config_.assoc_max_relative_orie());
   ADEBUG << "assoc_max_relative_orie = "
@@ -168,7 +168,7 @@ bool CCLanePostProcessor::Init() {
          << options_.frame.assoc_param.relative_orie_weight;
 
   options_.frame.assoc_param.max_departure_distance =
-      (options_.frame.space_type == SpaceType::IMAGE
+      (options_.frame.space_type == SpaceType::IMAGECOR
            ? config_.assoc_max_departure_distance_image()
            : config_.assoc_max_departure_distance());
   ADEBUG << "assoc_max_departure_distance = "
@@ -180,7 +180,7 @@ bool CCLanePostProcessor::Init() {
          << options_.frame.assoc_param.departure_distance_weight;
 
   options_.frame.assoc_param.min_orientation_estimation_size =
-      (options_.frame.space_type == SpaceType::IMAGE
+      (options_.frame.space_type == SpaceType::IMAGECOR
            ? config_.assoc_min_orientation_estimation_size_image()
            : config_.assoc_min_orientation_estimation_size());
   ADEBUG << "assoc_min_orientation_estimation_size = "
@@ -200,11 +200,11 @@ bool CCLanePostProcessor::Init() {
   // parameters on finding lane objects
   options_.frame.lane_interval_distance = config_.lane_interval_distance();
   options_.frame.min_instance_size_prefiltered =
-      (options_.frame.space_type == SpaceType::IMAGE
+      (options_.frame.space_type == SpaceType::IMAGECOR
            ? config_.min_instance_size_prefiltered_image()
            : config_.min_instance_size_prefiltered());
   options_.frame.max_size_to_fit_straight_line =
-      (options_.frame.space_type == SpaceType::IMAGE
+      (options_.frame.space_type == SpaceType::IMAGECOR
            ? config_.max_size_to_fit_straight_line_image()
            : config_.max_size_to_fit_straight_line());
 
@@ -213,11 +213,11 @@ bool CCLanePostProcessor::Init() {
   ADEBUG << "initial max_distance_to_see: " << max_distance_to_see_
          << " (meters)";
 
-  if (options_.space_type == SpaceType::VEHICLE) {
+  if (options_.space_type == SpaceType::VEHICLECOR) {
     projector_.reset(new Projector<ScalarType>());
     projector_->Init(roi_, max_distance_to_see_, vis_);
     is_x_longitude_ = true;
-  } else if (options_.space_type == SpaceType::IMAGE) {
+  } else if (options_.space_type == SpaceType::IMAGECOR) {
     is_x_longitude_ = false;
   } else {
     AERROR << "invalid space type" << space_type;
@@ -508,9 +508,9 @@ bool CCLanePostProcessor::GenerateLaneInstances(const cv::Mat &lane_map) {
   /// 4. do lane marker association and determine lane instance labels
   cur_frame_.reset(new LaneFrame);
 
-  if (options_.frame.space_type == SpaceType::IMAGE) {
+  if (options_.frame.space_type == SpaceType::IMAGECOR) {
     cur_frame_->Init(cc_list, non_mask_, options_.frame, scale_, start_y_pos_);
-  } else if (options_.frame.space_type == SpaceType::VEHICLE) {
+  } else if (options_.frame.space_type == SpaceType::VEHICLECOR) {
     cur_frame_->Init(cc_list, non_mask_, projector_, options_.frame, scale_,
                      start_y_pos_);
   } else {
@@ -821,7 +821,7 @@ bool CCLanePostProcessor::Process(const cv::Mat &lane_map,
             LaneInstance::CompareSiz);
 
   /// generate lane objects
-  if (options_.space_type == SpaceType::IMAGE) {
+  if (options_.space_type == SpaceType::IMAGECOR) {
     /// for image space coordinate
     ScalarType x_center = static_cast<ScalarType>(roi_.x + roi_.width / 2);
 
@@ -1108,7 +1108,7 @@ bool CCLanePostProcessor::Process(const cv::Mat &lane_map,
   }
 
   ADEBUG << "number of lane objects = " << (*lane_objects)->size();
-  // if (options_.space_type != SpaceType::IMAGE) {
+  // if (options_.space_type != SpaceType::IMAGECOR) {
   //   if (!CompensateLaneObjects((*lane_objects))) {
   //     AERROR << "fail to compensate lane objects.";
   //     return false;

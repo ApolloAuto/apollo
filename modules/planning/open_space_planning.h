@@ -81,6 +81,9 @@ class OpenSpacePlanning : public PlanningBase {
                            const common::TrajectoryPoint& planning_start_point,
                            const double start_time,
                            const common::VehicleState& vehicle_state);
+  bool CheckPlanningConfig();
+
+ private:
   std::unique_ptr<FrameOpenSpace> frame_;
 };
 

@@ -29,6 +29,7 @@ namespace perception {
 
 struct TrackObjectDistanceOptions {
   Eigen::Vector3d *ref_point = nullptr;
+  const Eigen::Matrix4d *sensor_world_pose = nullptr;
 };
 
 class PbfTrackObjectDistance {
@@ -65,9 +66,13 @@ class PbfTrackObjectDistance {
                             Eigen::Vector3d *center);
   float ComputeDistanceAngleMatchProb(
       const std::shared_ptr<PbfSensorObject> &fused_object,
-      const std::shared_ptr<PbfSensorObject> &sensor_object);
+      const std::shared_ptr<PbfSensorObject> &sensor_object,
+      const TrackObjectDistanceOptions &options);
 
-  float GetAngle(const std::shared_ptr<Object> &obj);
+  float GetAngle(const Eigen::Vector3d &sensor_center, SensorType type);
+  Eigen::Vector3d GetCenter(const std::shared_ptr<PbfSensorObject> &obj,
+                            const Eigen::Matrix4d &world_sensor_pose,
+                            SensorType sensor_type);
 
  private:
   DISALLOW_COPY_AND_ASSIGN(PbfTrackObjectDistance);

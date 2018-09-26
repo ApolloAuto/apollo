@@ -36,29 +36,29 @@ if len(sys.argv) < 2:
 fn = sys.argv[1]
 
 speed_table = {}
-f = open(fn, 'r')
-for line in f:
-    items = line.split(',')
-    cmd = round(float(items[0]))
-    speed = float(items[1])
-    acc = round(float(items[2]), 2)
-    if speed in speed_table:
-        cmd_table = speed_table[speed]
-        if cmd in cmd_table:
-            cmd_table[cmd].append(acc)
+with open(fn, 'r') as f:
+    for line in f:
+        items = line.split(',')
+        cmd = round(float(items[0]))
+        speed = float(items[1])
+        acc = round(float(items[2]), 2)
+        if speed in speed_table:
+            cmd_table = speed_table[speed]
+            if cmd in cmd_table:
+                cmd_table[cmd].append(acc)
+            else:
+                cmd_table[cmd] = [acc]
         else:
+            cmd_table = {}
             cmd_table[cmd] = [acc]
-    else:
-        cmd_table = {}
-        cmd_table[cmd] = [acc]
-        speed_table[speed] = cmd_table
-f.close()
+            speed_table[speed] = cmd_table
 
-for speed, cmd_dict in speed_table.items():
+for speed in speed_table:
+    cmd_dict = speed_table[speed]
     speed_list = []
     acc_list = []
-    for cmd, accs in cmd_dict.items():
-        for acc in accs:
+    for cmd in cmd_dict:
+        for acc in cmd_dict[cmd]:
             speed_list.append(speed)
             acc_list.append(acc)
     plt.plot(speed_list, acc_list, 'b.')

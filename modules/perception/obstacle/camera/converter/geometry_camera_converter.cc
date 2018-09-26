@@ -52,15 +52,23 @@ bool GeometryCameraConverter::Convert(
     CheckSizeSanity(obj);
 
     float deg_alpha = obj->alpha * 180.0f / M_PI;
+
     Eigen::Vector2f upper_left(obj->upper_left.x(), obj->upper_left.y());
     Eigen::Vector2f lower_right(obj->lower_right.x(), obj->lower_right.y());
 
     float distance = 0.0;
     Eigen::Vector2f mass_center_pixel = Eigen::Vector2f::Zero();
+
     if (obj->trunc_height < 0.25f) {
       // No truncation on 2D height
       ConvertSingle(obj->height, obj->width, obj->length, deg_alpha, upper_left,
                     lower_right, false, &distance, &mass_center_pixel);
+      AINFO << "no trucation on 2d height"
+            << "height:" << obj->height << " width:" << obj->width
+            << " alpha:" << deg_alpha << "2d box area is "
+            << std::abs(obj->upper_left.x() - obj->lower_right.x()) *
+                   std::abs(obj->upper_left.y() - obj->lower_right.y());
+
     } else if (obj->trunc_width < 0.25f && obj->trunc_height > 0.25f) {
       // 2D height truncation and no width truncation
       ConvertSingle(obj->height, obj->width, obj->length, deg_alpha, upper_left,
@@ -85,6 +93,9 @@ bool GeometryCameraConverter::Convert(
 
     // Set 8 corner pixels
     SetBoxProjection(obj);
+
+    ADEBUG << "object id " << obj->id << " distance " << obj->distance
+           << " theta degree" << (obj->theta * 180.0f / M_PI);
   }
 
   return true;
@@ -187,6 +198,8 @@ bool GeometryCameraConverter::ConvertSingle(
   // Distance search
   *distance =
       SearchDistance(pixel_length, use_width, mass_center_v, 0.1f, 150.0f);
+
+  AINFO << "search distacne 1 is " << *distance;
   for (size_t i = 0; i < 1; ++i) {
     // Mass center search
     SearchCenterDirection(box_center_pixel, *distance, &mass_center_v,
@@ -194,6 +207,7 @@ bool GeometryCameraConverter::ConvertSingle(
     // Distance search
     *distance = SearchDistance(pixel_length, use_width, mass_center_v,
                                0.9f * (*distance), 1.1f * (*distance));
+    AINFO << "search distance 2 is " << *distance;
   }
 
   return true;
@@ -246,6 +260,7 @@ float GeometryCameraConverter::SearchDistance(
 
     int curr_pixel_length = static_cast<int>(max_p - min_p);
     if (curr_pixel_length == pixel_length) {
+      AINFO << "obtain curr_pixel_length equal to pixel_length" << pixel_length;
       break;
     } else if (pixel_length < curr_pixel_length) {
       close_d = curr_d + 0.1f;
@@ -256,6 +271,7 @@ float GeometryCameraConverter::SearchDistance(
     // Early break for 0.1m accuracy
     float next_d = (far_d + close_d) / 2.0f;
     if (std::abs(next_d - curr_d) < 0.1f) {
+      AINFO << "early break for 0.1m accuracy";
       break;
     }
 
@@ -381,9 +397,9 @@ void GeometryCameraConverter::DecideAngle(
     const Eigen::Vector3f &camera_ray,
     std::shared_ptr<VisualObject> obj) const {
   float beta = std::atan2(camera_ray.x(), camera_ray.z());
-
   // Orientation is not reliable in these cases (DL model specific issue)
-  if (obj->distance > 50.0f || obj->trunc_width > 0.25f) {
+  if (obj->distance > 60.0f || obj->trunc_width > 0.25f) {
+    ADEBUG << "handle in special case";
     obj->theta = -1.0f * M_PI_2;
     obj->alpha = obj->theta - beta;
     if (obj->alpha > M_PI) {
@@ -392,6 +408,7 @@ void GeometryCameraConverter::DecideAngle(
       obj->alpha += 2 * M_PI;
     }
   } else {  // Normal cases
+    ADEBUG << "handle in normal case with beta" << (beta * 180.0f) / M_PI;
     float theta = obj->alpha + beta;
     if (theta > M_PI) {
       theta -= 2 * M_PI;
@@ -400,6 +417,8 @@ void GeometryCameraConverter::DecideAngle(
     }
     obj->theta = theta;
   }
+  // in camera space
+  obj->direction = Eigen::Vector3f(cos(obj->theta), 0.0f, -sin(obj->theta));
 }
 
 void GeometryCameraConverter::SetBoxProjection(
