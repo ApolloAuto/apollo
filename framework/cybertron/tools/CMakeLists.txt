@@ -4,7 +4,7 @@ project(tools)
 add_subdirectory(cyber_launch)
 add_subdirectory(cyber_recorder)
 add_subdirectory(cvt)
-add_subdirectory(geometry2)
+# add_subdirectory(geometry2)
 add_subdirectory(extrinsics_broadcaster)
 add_subdirectory(perf_script)
 
