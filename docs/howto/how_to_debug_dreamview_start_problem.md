@@ -162,6 +162,9 @@ cd build
 cmake  ..
 (We don't know the parameters that Apollo used, so we keep it by default)
 
+#Please change the job number accordingly, eg. use $(nproc)
+make -j4
+
 #backup pcl lib
 mkdir -p /usr/local/lib/pcl.origin
 mv /usr/local/lib/libpcl* /usr/local/lib/pcl.origin
