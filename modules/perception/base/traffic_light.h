@@ -16,6 +16,10 @@
 #ifndef MODULES_PERCEPTION_BASE_TRAFFIC_LIGHT_H_
 #define MODULES_PERCEPTION_BASE_TRAFFIC_LIGHT_H_
 
+#include <memory>
+#include <string>
+#include <vector>
+
 #include "modules/perception/base/box.h"
 
 namespace apollo {
@@ -38,7 +42,7 @@ enum class TLDetectionClass {
   TL_HORIZONTAL_CLASS = 2
 };
 
-//@brief Light Region in the Image
+// @brief Light Region in the Image
 struct LightRegion {
   // roi is marked by map & projection, it may be too large or not accuracy.
   Rect<int> projection_roi;
@@ -60,7 +64,7 @@ struct LightRegion {
   float detect_score = 0.0f;
 };
 
-//@brief Light Status
+// @brief Light Status
 struct LightStatus {
   // Traffic light color status.
   TLColor color = TLColor::TL_UNKNOWN_COLOR;
@@ -72,7 +76,7 @@ struct LightStatus {
   bool blink = false;
 };
 
-//@brief A Traffic Light.
+// @brief A Traffic Light.
 struct TrafficLight {
   TrafficLight() = default;
 

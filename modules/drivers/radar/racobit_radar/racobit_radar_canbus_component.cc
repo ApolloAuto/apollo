@@ -34,8 +34,7 @@ namespace racobit_radar {
 
 RacobitRadarCanbusComponent::RacobitRadarCanbusComponent()
     : monitor_logger_buffer_(
-          common::monitor::MonitorMessageItem::RACOBIT_RADAR) {
-}
+          common::monitor::MonitorMessageItem::RACOBIT_RADAR) {}
 
 bool RacobitRadarCanbusComponent::Init() {
   if (!GetProtoConfig(&racobit_radar_conf_)) {
@@ -44,11 +43,11 @@ bool RacobitRadarCanbusComponent::Init() {
 
   AINFO << "The canbus conf file is loaded: " << ConfigFilePath();
   ADEBUG << "Canbus_conf:" << racobit_radar_conf_.ShortDebugString();
-  racobit_radar_writer_ = node_->CreateWriter<RacobitRadar>(FLAGS_racobit_radar_topic);
+  racobit_radar_writer_ =
+      node_->CreateWriter<RacobitRadar>(FLAGS_racobit_radar_topic);
   if (!::apollo::common::util::GetProtoFromFile(ConfigFilePath(),
                                                 &racobit_radar_conf_)) {
-    return OnError("Unable to load canbus conf file: " +
-                   ConfigFilePath()).ok();
+    return OnError("Unable to load canbus conf file: " + ConfigFilePath()).ok();
   }
 
   AINFO << "The canbus conf file is loaded: " << ConfigFilePath();
@@ -122,4 +121,3 @@ Status RacobitRadarCanbusComponent::OnError(const std::string &error_msg) {
 }  // namespace racobit_radar
 }  // namespace drivers
 }  // namespace apollo
-
