@@ -433,6 +433,31 @@ class AttributePointCloud : public PointCloud<PointT> {
   std::vector<uint8_t> points_label_;
 };
 
+// typedef of point cloud indices
+typedef std::shared_ptr<PointIndices> PointIndicesPtr;
+typedef std::shared_ptr<const PointIndices> PointIndicesConstPtr;
+
+// typedef of point cloud
+typedef AttributePointCloud<PointF> PointFCloud;
+typedef AttributePointCloud<PointD> PointDCloud;
+
+typedef std::shared_ptr<PointFCloud> PointFCloudPtr;
+typedef std::shared_ptr<const PointFCloud> PointFCloudConstPtr;
+
+typedef std::shared_ptr<PointDCloud> PointDCloudPtr;
+typedef std::shared_ptr<const PointDCloud> PointDCloudConstPtr;
+
+// typedef of polygon
+typedef PointCloud<PointF> PolygonFType;
+typedef PointCloud<PointD> PolygonDType;
+
+typedef std::shared_ptr<PolygonFType> PolygonFTypePtr;
+typedef std::shared_ptr<const PolygonFType> PolygonFTypeConstPtr;
+
+typedef std::shared_ptr<PolygonDType> PolygonDTypePtr;
+typedef std::shared_ptr<const PolygonDType> PolygonDTypeConstPtr;
+
+
 }  // namespace base
 }  // namespace perception
 }  // namespace apollo
