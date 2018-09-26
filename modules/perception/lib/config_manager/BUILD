@@ -14,21 +14,21 @@ cc_library(
         "//framework:cybertron",
         "//modules/perception/common:perception_gflags",
         "//modules/perception/lib/io:file_util",
-        "//modules/perception/lib/singleton:singleton",
-        "//modules/perception/lib/thread:thread",
+        "//modules/perception/lib/singleton",
+        "//modules/perception/lib/thread",
         "//modules/perception/proto:perception_config_schema_proto",
     ],
 )
 
-cc_test(
-    name = "config_manager_test",
-    size = "small",
-    srcs = [
-        "config_manager_test.cc",
-    ],
-    deps = [
-        ":config_manager",
-        "@gtest//:main",
-    ],
-)
+# cc_test(
+#     name = "config_manager_test",
+#     size = "small",
+#     srcs = [
+#         "config_manager_test.cc",
+#     ],
+#     deps = [
+#         ":config_manager",
+#         "@gtest//:main",
+#     ],
+# )
 cpplint()
