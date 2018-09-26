@@ -6,6 +6,7 @@ cc_library(
     name = "common",
     deps = [
         ":cloud_mask",
+        ":lidar_error_code",
         ":lidar_frame",
         ":lidar_log",
         ":lidar_object_util",
@@ -101,6 +102,13 @@ cc_library(
     name = "lidar_timer",
     hdrs = [
         "lidar_timer.h",
+    ],
+)
+
+cc_library(
+    name = "lidar_error_code",
+    hdrs = [
+        "lidar_error_code.h",
     ],
 )
 
