@@ -16,7 +16,9 @@
 
 #include "screen.h"
 #include "renderable_message.h"
+#include "cybertron_topology_message.h"
 
+#include <thread>
 #include <ncurses.h>
 #include <unistd.h>
 #include <cstdio>
@@ -203,6 +205,7 @@ void Screen::Run() {
 
     (this->*showFuncs[static_cast<int>(current_state_)])(y,
                                                          ch);
+    std::this_thread::sleep_for(std::chrono::milliseconds(static_cast<int>(1000.0/CybertronTopologyMessage::max_frame_ratio())));                                                     
   } while (true);
 }
 
