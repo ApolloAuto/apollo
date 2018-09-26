@@ -17,6 +17,9 @@
 #define MODULES_PERCEPTION_LIDAR_LIB_TRACKER_COMMON_TRACK_DATA_H_
 
 #include <map>
+#include <utility>
+#include <memory>
+#include <deque>
 
 #include "modules/perception/lidar/lib/tracker/common/tracked_object.h"
 
