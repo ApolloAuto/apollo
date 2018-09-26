@@ -18,6 +18,7 @@
 
 #include <math.h>
 #include <memory.h>
+
 #include <set>
 #include <string>
 #include <vector>
@@ -37,7 +38,7 @@ struct HoughLine {
 class HoughTransfer {
  public:
   HoughTransfer();
-  ~HoughTransfer();
+  ~HoughTransfer() = default;
 
   // step1
   // @brief: initiate

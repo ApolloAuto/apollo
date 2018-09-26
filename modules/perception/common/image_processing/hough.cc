@@ -32,8 +32,6 @@ HoughTransfer::HoughTransfer()
       query_map_(),
       distribute_map_() {}
 
-HoughTransfer::~HoughTransfer() {}
-
 // step1
 // @brief: initiate
 // @params[IN] img_w, img_h: width and height of binary image
@@ -52,8 +50,8 @@ bool HoughTransfer::Init(int img_w, int img_h, float d_r, float d_theta) {
   vote_map_.resize(r_size_ * theta_size_, 0);
   // init query map
   query_map_.resize(img_w_ * img_h_);
-  for (size_t i = 0; i < query_map_.size(); ++i) {
-    query_map_[i].resize(theta_size_, 0);
+  for (auto& query : query_map_) {
+    query.resize(theta_size_, 0);
   }
 
   for (int theta_idx = 0; theta_idx < theta_size_; ++theta_idx) {
@@ -69,8 +67,8 @@ bool HoughTransfer::Init(int img_w, int img_h, float d_r, float d_theta) {
   }
   // init distribute map
   distribute_map_.resize(r_size_ * theta_size_);
-  for (size_t i = 0; i < distribute_map_.size(); ++i) {
-    distribute_map_[i].reserve(vote_reserve_size_);
+  for (auto& distribute : distribute_map_) {
+    distribute.reserve(vote_reserve_size_);
   }
 
   if (CheckPrepared()) {
@@ -108,7 +106,7 @@ bool HoughTransfer::ImageVote(const std::vector<int>& image,
 //             with_distribute: flag to control whether to calculate element
 //                              lenght,vote_num,pts in HoughLine
 void HoughTransfer::PointVote(int x, int y, bool with_distribute) {
-  int pos = y * img_w_ + x;
+  const int pos = y * img_w_ + x;
   PointVote(pos, with_distribute);
 }
 
@@ -161,8 +159,8 @@ unsigned int HoughTransfer::MemoryConsume() const {
     size += query_map_.capacity() * sizeof(query_map_[0]);
     size += theta_size_ * query_map_.size() * sizeof(query_map_[0][0]);
     size += distribute_map_.capacity() * sizeof(distribute_map_[0]);
-    for (size_t i = 0; i < distribute_map_.size(); ++i) {
-      size += distribute_map_[i].capacity() * sizeof(distribute_map_[i][0]);
+    for (const auto& distribute : distribute_map_) {
+      size += distribute.capacity() * sizeof(distribute[0]);
     }
   }
   return size;
@@ -172,16 +170,16 @@ unsigned int HoughTransfer::MemoryConsume() const {
 // when we use hough with with_distribute mode in large image long time,
 // memory consume maybe too large, so use this func to free no used cache.
 void HoughTransfer::FreeCache() {
-  for (size_t i = 0; i < distribute_map_.size(); ++i) {
-    distribute_map_[i].shrink_to_fit();
+  for (auto& distribute : distribute_map_) {
+    distribute.shrink_to_fit();
   }
 }
 
 void HoughTransfer::ResetMaps(bool with_distribute) {
   memset(vote_map_.data(), 0, vote_map_.size() * sizeof(vote_map_[0]));
   if (with_distribute) {
-    for (size_t i = 0; i < distribute_map_.size(); ++i) {
-      distribute_map_[i].clear();
+    for (auto& distribute : distribute_map_) {
+      distribute.clear();
     }
   }
 }
@@ -197,13 +195,13 @@ void HoughTransfer::ClearWithShrink() {
 }
 
 bool HoughTransfer::CheckPrepared() const {
-  if (vote_map_.size() != r_size_ * theta_size_) {
+  if (static_cast<int>(vote_map_.size()) != r_size_ * theta_size_) {
     return false;
   }
-  if (query_map_.size() != img_w_ * img_h_) {
+  if (static_cast<int>(query_map_.size()) != img_w_ * img_h_) {
     return false;
   }
-  if (distribute_map_.size() != r_size_ * theta_size_) {
+  if (static_cast<int>(distribute_map_.size()) != r_size_ * theta_size_) {
     return false;
   }
   if (vote_map_.empty() || query_map_.empty() || distribute_map_.empty()) {
@@ -241,22 +239,21 @@ bool HoughTransfer::VotePosToHoughLine(int vote_pos, bool with_distribute,
   if (!out_line) {
     return false;
   }
-  float r = (vote_pos / theta_size_ - r_size_ / 2) * d_r_;
-  float theta = (vote_pos % theta_size_) * d_theta_;
-  out_line->r = r;
-  out_line->theta = theta;
+  out_line->r = (vote_pos / theta_size_ - r_size_ / 2) * d_r_;
+  out_line->theta = (vote_pos % theta_size_) * d_theta_;
   out_line->vote_num = vote_map_[vote_pos];
   if (with_distribute) {
-    if (out_line->vote_num != distribute_map_[vote_pos].size()) {
+    if (out_line->vote_num !=
+        static_cast<int>(distribute_map_[vote_pos].size())) {
       return false;
     }
     out_line->pts = distribute_map_[vote_pos];
-    int start_pos = distribute_map_[vote_pos][0];
-    int end_pos = distribute_map_[vote_pos][out_line->vote_num - 1];
-    int start_x = start_pos % img_w_;
-    int start_y = start_pos / img_w_;
-    int end_x = end_pos % img_w_;
-    int end_y = end_pos / img_w_;
+    const int start_pos = distribute_map_[vote_pos][0];
+    const int end_pos = distribute_map_[vote_pos][out_line->vote_num - 1];
+    const int start_x = start_pos % img_w_;
+    const int start_y = start_pos / img_w_;
+    const int end_x = end_pos % img_w_;
+    const int end_y = end_pos / img_w_;
     out_line->length = sqrtf((start_x - end_x) * (start_x - end_x) +
                              (start_y - end_y) * (start_y - end_y));
   }
