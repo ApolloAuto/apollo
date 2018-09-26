@@ -372,7 +372,7 @@ bool SimControl::PerfectControlModel(TrajectoryPoint* point) {
 }
 
 void SimControl::PublishChassis(double cur_speed) {
-  std::shared_ptr<Chassis> chassis = std::make_shared<Chassis>();
+  auto chassis = std::make_shared<Chassis>();
   FillHeader("SimControl", chassis.get());
 
   chassis->set_engine_started(true);
@@ -387,8 +387,7 @@ void SimControl::PublishChassis(double cur_speed) {
 }
 
 void SimControl::PublishLocalization(const TrajectoryPoint& point) {
-  std::shared_ptr<LocalizationEstimate> localization =
-      std::make_shared<LocalizationEstimate>();
+  auto localization = std::make_shared<LocalizationEstimate>();
   FillHeader("SimControl", localization.get());
 
   auto* pose = localization->mutable_pose();
@@ -455,8 +454,7 @@ void SimControl::PublishLocalization(const TrajectoryPoint& point) {
 }
 
 void SimControl::PublishDummyPrediction() {
-  std::shared_ptr<PredictionObstacles> prediction =
-      std::make_shared<PredictionObstacles>();
+  auto prediction = std::make_shared<PredictionObstacles>();
   {
     std::lock_guard<std::mutex> lock(mutex_);
     if (!send_dummy_prediction_) {

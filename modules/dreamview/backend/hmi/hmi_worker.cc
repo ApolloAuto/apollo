@@ -242,8 +242,7 @@ bool HMIWorker::ChangeToDrivingMode(const Chassis::DrivingMode mode) {
     }
   }
 
-  std::shared_ptr<control::PadMessage> pad =
-      std::make_shared<control::PadMessage>();
+  auto pad = std::make_shared<control::PadMessage>();
   switch (mode) {
     case Chassis::COMPLETE_MANUAL:
       pad->set_action(DrivingAction::RESET);
