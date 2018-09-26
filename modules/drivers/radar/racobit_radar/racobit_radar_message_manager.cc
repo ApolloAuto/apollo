@@ -21,6 +21,8 @@
 
 #include "modules/drivers/radar/racobit_radar/racobit_radar_message_manager.h"
 
+#include <utility>
+
 #include "modules/common/util/message_util.h"
 #include "modules/drivers/radar/racobit_radar/protocol/cluster_general_info_701.h"
 #include "modules/drivers/radar/racobit_radar/protocol/cluster_list_status_600.h"
