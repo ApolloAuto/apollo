@@ -13,20 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef INFERENCE_CAFFE_CAFFE_NET_H_
-#define INFERENCE_CAFFE_CAFFE_NET_H_
-#include <glog/logging.h>
+
+#ifndef MODULES_PERCEPTION_INFERENCE_CAFFE_CAFFE_NET_H_
+#define MODULES_PERCEPTION_INFERENCE_CAFFE_CAFFE_NET_H_
 
 #include <map>
 #include <set>
 #include <string>
 #include <vector>
+
 #include "caffe/caffe.hpp"
+
 #include "modules/perception/inference/inference.h"
+
 namespace apollo {
 namespace perception {
 namespace inference {
+
 typedef std::shared_ptr<apollo::perception::base::Blob<float>> BlobPtr;
+
 class CaffeNet : public Inference {
  public:
   CaffeNet(const std::string &net_file, const std::string &model_file,
@@ -49,10 +54,10 @@ class CaffeNet : public Inference {
   std::shared_ptr<caffe::Net<float>> net_ = nullptr;
 
  private:
-  std::string model_file_;
   std::string net_file_;
-  std::vector<std::string> input_names_;
+  std::string model_file_;
   std::vector<std::string> output_names_;
+  std::vector<std::string> input_names_;
   BlobMap blobs_;
 };
 
@@ -60,4 +65,4 @@ class CaffeNet : public Inference {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  //  INFERENCE_CAFFE_CAFFE_NET_H_
+#endif  // MODULES_PERCEPTION_INFERENCE_CAFFE_CAFFE_NET_H_

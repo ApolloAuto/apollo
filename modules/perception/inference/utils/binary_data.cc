@@ -13,11 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include <thrust/copy.h>
 
+#include "modules/perception/inference/utils/binary_data.h"
+
+#include <thrust/copy.h>
 #include <string>
 #include <vector>
-#include "modules/perception/inference/utils/binary_data.h"
 
 namespace apollo {
 namespace perception {

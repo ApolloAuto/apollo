@@ -13,28 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+
 #include "modules/perception/inference/inference.h"
-#include "modules/perception/inference/caffe/caffe_net.h"
-#include "modules/perception/inference/tensorrt/rt_net.h"
 
 namespace apollo {
 namespace perception {
 namespace inference {
-Inference *CreateInferenceByName(const std::string &name,
-                                 const std::string &proto_file,
-                                 const std::string &weight_file,
-                                 const std::vector<std::string> &outputs,
-                                 const std::vector<std::string> &inputs,
-                                 const std::string &model_root) {
-  if (name == "CaffeNet") {
-    return new CaffeNet(proto_file, weight_file, outputs, inputs);
-  } else if (name == "RTNet") {
-    return new RTNet(proto_file, weight_file, outputs, inputs);
-  } else if (name == "RTNetInt8") {
-    return new RTNet(proto_file, weight_file, outputs, inputs, model_root);
-  }
-  return nullptr;
+
+void Inference::set_max_batch_size(const int &batch_size) {
+  max_batch_size_ = batch_size;
 }
+
+void Inference::set_gpu_id(const int &gpu_id) { gpu_id_ = gpu_id; }
 
 }  // namespace inference
 }  // namespace perception

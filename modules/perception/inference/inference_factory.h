@@ -13,15 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+#ifndef MODULES_PERCEPTION_INFERENCE_INFERENCE_FACTORY_H_
+#define MODULES_PERCEPTION_INFERENCE_INFERENCE_FACTORY_H_
 
-#include "modules/perception/inference/layer.h"
+#include <string>
+#include <vector>
+
+#include "modules/perception/inference/inference.h"
 
 namespace apollo {
 namespace perception {
 namespace inference {
 
-template class Layer<float>;
+Inference *CreateInferenceByName(const std::string &name,
+                                 const std::string &proto_file,
+                                 const std::string &weight_file,
+                                 const std::vector<std::string> &outputs,
+                                 const std::vector<std::string> &inputs,
+                                 const std::string &model_root = "");
 
 }  // namespace inference
 }  // namespace perception
 }  // namespace apollo
+
+#endif  // MODULES_PERCEPTION_INFERENCE_INFERENCE_FACTORY_H_

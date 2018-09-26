@@ -13,17 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef INFERENCE_LAYER_H_
-#define INFERENCE_LAYER_H_
-#include <cuda_runtime_api.h>
 
+#ifndef MODULES_PERCEPTION_INFERENCE_LAYER_H_
+#define MODULES_PERCEPTION_INFERENCE_LAYER_H_
+
+#include <cuda_runtime_api.h>
 #include <map>
 #include <string>
 #include <vector>
+
 #include "modules/perception/base/blob.h"
+
 namespace apollo {
 namespace perception {
 namespace inference {
+
 template <typename Dtype>
 class Layer {
  public:
@@ -45,4 +49,4 @@ class Layer {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // INFERENCE_LAYER_H_
+#endif  // MODULES_PERCEPTION_INFERENCE_LAYER_H_

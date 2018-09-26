@@ -14,13 +14,15 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/perception/inference/layer.h"
+#include "modules/perception/inference/inference.h"
+
+#include "gtest/gtest.h"
 
 namespace apollo {
 namespace perception {
 namespace inference {
 
-template class Layer<float>;
+TEST(Inference, default) {}
 
 }  // namespace inference
 }  // namespace perception

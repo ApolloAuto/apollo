@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef INFERENCE_UTILS_BINARY_DATA_H_
-#define INFERENCE_UTILS_BINARY_DATA_H_
+
+#ifndef MODULES_PERCEPTION_INFERENCE_UTILS_BINARY_DATA_H_
+#define MODULES_PERCEPTION_INFERENCE_UTILS_BINARY_DATA_H_
 
 #include <stdio.h>
 #include <boost/shared_ptr.hpp>
@@ -51,4 +52,4 @@ bool BinaryWriteFile(const char *file_path,
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // INFERENCE_UTILS_BINARY_DATA_H_
+#endif  // MODULES_PERCEPTION_INFERENCE_UTILS_BINARY_DATA_H_

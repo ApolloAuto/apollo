@@ -13,8 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+
 #include "modules/perception/inference/utils/util.h"
+
 #include <cmath>
+
+#include "cybertron/common/log.h"
 
 namespace apollo {
 namespace perception {
@@ -40,7 +44,7 @@ bool write_result(const std::string &out_path,
                   const std::vector<float> &results) {
   std::ofstream outf(out_path, std::ios::binary | std::ios::out);
   if (!outf.is_open()) {
-    LOG(INFO) << "Cannot open output file: " << out_path;
+    AERROR << "Cannot open output file: " << out_path;
     return false;
   }
   outf.write(reinterpret_cast<const char *>(results.data()),

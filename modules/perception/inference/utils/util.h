@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef INFERENCE_UTILS_UTIL_H_
-#define INFERENCE_UTILS_UTIL_H_
+
+#ifndef MODULES_PERCEPTION_INFERENCE_UTILS_UTIL_H_
+#define MODULES_PERCEPTION_INFERENCE_UTILS_UTIL_H_
 
 #include <cuda_runtime_api.h>
 
@@ -22,10 +23,10 @@
 #include <fstream>
 #include <iostream>
 #include <map>
+#include <memory>
 #include <string>
 #include <vector>
 
-#include "glog/logging.h"
 #include "modules/perception/base/blob.h"
 
 namespace apollo {
@@ -50,6 +51,7 @@ std::shared_ptr<float> load_binary_data(const std::string &filename);
 
 bool write_result(const std::string &out_path,
                   const std::vector<float> &results);
+
 bool write_result(const std::string &out_path,
                   const std::map<std::string, std::vector<float>> &results);
 
@@ -58,8 +60,9 @@ bool resize(int origin_channel, int origin_height, int origin_width,
             std::shared_ptr<apollo::perception::base::Blob<float>> dst,
             std::shared_ptr<apollo::perception::base::SyncedMemory> src_gpu,
             int start_axis);
+
 }  // namespace inference
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // INFERENCE_UTILS_UTIL_H_
+#endif  // INFERENCE_UTIMODULES_PERCEPTION_INFERENCE_UTILS_UTIL_H_LS_UTIL_H_
