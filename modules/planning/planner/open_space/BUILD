@@ -96,4 +96,65 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "distance_approach_ipopt_interface_test",
+    size = "small",
+    srcs = [
+        "distance_approach_ipopt_interface_test.cc",
+    ],
+    deps = [
+        "@gtest//:main",
+        ":distance_approach_ipopt_interface",
+    ],
+)
+
+cc_test(
+    name = "distance_approach_problem_test",
+    size = "small",
+    srcs = [
+        "distance_approach_problem_test.cc",
+    ],
+    deps = [
+        "@gtest//:main",
+        ":distance_approach_problem",
+    ],
+)
+
+cc_test(
+    name = "open_space_planner_test",
+    size = "small",
+    srcs = [
+        "open_space_planner_test.cc",
+    ],
+    deps = [
+        "@gtest//:main",
+        ":open_space_planner",
+    ],
+)
+
+
+cc_test(
+    name = "warm_start_ipopt_interface_test",
+    size = "small",
+    srcs = [
+        "warm_start_ipopt_interface_test.cc",
+    ],
+    deps = [
+        "@gtest//:main",
+        ":warm_start_ipopt_interface",
+    ],
+)
+
+cc_test(
+    name = "warm_start_problem_test",
+    size = "small",
+    srcs = [
+        "warm_start_problem_test.cc",
+    ],
+    deps = [
+        "@gtest//:main",
+        ":warm_start_problem",
+    ],
+)
+
 cpplint()
