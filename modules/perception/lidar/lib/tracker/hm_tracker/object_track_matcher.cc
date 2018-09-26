@@ -13,19 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include "modules/perception/lib/config_manager/config_manager.h"
-#include "modules/perception/lib/io/file_util.h"
-#include "modules/perception/lib/io/protobuf_util.h"
-
-#include "modules/perception/common/graph/secure_matrix.h"
-#include "modules/perception/lidar/common/lidar_log.h"
-#include "modules/perception/lidar/lib/tracker/hm_tracker/gnn_bipartite_graph_matcher.h"
-#include "modules/perception/lidar/lib/tracker/hm_tracker/multi_hm_bipartite_graph_matcher.h"
 #include "modules/perception/lidar/lib/tracker/hm_tracker/object_track_matcher.h"
-#include "modules/perception/lidar/lib/tracker/hm_tracker/proto/hm_tracker_config.pb.h"
-#include "object_track_matcher.h"
 
 #include <sstream>
+
+#include "cybertron/common/log.h"
+#include "modules/perception/lib/config_manager/config_manager.h"
+#include "modules/perception/lib/io/file_util.h"
+#include "modules/common/util/file.h"
+#include "modules/perception/lidar/lib/tracker/hm_tracker/gnn_bipartite_graph_matcher.h"
+#include "modules/perception/lidar/lib/tracker/hm_tracker/multi_hm_bipartite_graph_matcher.h"
+#include "modules/perception/proto/hm_tracker_config.pb.h"
 
 namespace apollo {
 namespace perception {
@@ -45,7 +43,7 @@ bool ObjectTrackMatcher::Init(const ObjectTrackMatcherInitOptions &options) {
   config_file =
       lib::FileUtil::GetAbsolutePath(config_file, "object_track_matcher.conf");
   ObjectTrackMatcherConfig config;
-  CHECK(lib::ParseProtobufFromFile(config_file, &config));
+  CHECK(apollo::common::util::GetProtoFromFile(config_file, &config));
 
   track_object_distance_.reset((new TrackObjectDistance()));
 
@@ -118,7 +116,7 @@ bool ObjectTrackMatcher::set_bound_value(float bound_value) {
 }
 void ObjectTrackMatcher::Match(
     const ObjectTrackMatcherOptions &options,
-    std::vector<TrackedObjectPtr> &objects,
+    const std::vector<TrackedObjectPtr> &objects,
     const std::vector<TrackDataPtr> &tracks,
     const std::vector<Eigen::VectorXf> &tracks_predict, const double time_diff,
     std::vector<TrackObjectPair> *assignments,
@@ -143,9 +141,9 @@ void ObjectTrackMatcher::Match(
   matcher_options.cost_thresh = max_match_distance_;
   matcher_options.bound_value = bound_value_;
   common::SecureMat<float> *association_mat = matcher_->cost_matrix();
-  association_mat->reserve(1000, 1000);
+  association_mat->Reserve(1000, 1000);
   // 1. computing association matrix
-  association_mat->resize(tracks.size(), objects.size());
+  association_mat->Resize(tracks.size(), objects.size());
   ComputeAssociateMatrix(tracks, tracks_predict, objects, time_diff,
                          association_mat);
   matcher_->Match(matcher_options, assignments, unassigned_tracks,

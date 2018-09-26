@@ -16,10 +16,12 @@
 #ifndef MODULES_PERCEPTION_LIDAR_LIB_TRACKER_HM_TRACKER_OBJECT_TRACK_MATCHER_H_
 #define MODULES_PERCEPTION_LIDAR_LIB_TRACKER_HM_TRACKER_OBJECT_TRACK_MATCHER_H_
 
-#include <Eigen/Core>
 #include <string>
 #include <utility>
 #include <vector>
+#include <memory>
+
+#include "Eigen/Core"
 
 #include "modules/perception/common/graph/secure_matrix.h"
 #include "modules/perception/lidar/lib/interface/base_bipartite_graph_matcher.h"
@@ -68,7 +70,7 @@ class ObjectTrackMatcher {
   // @params[OUT] unassigned_objects: objects without matched track
   // @return nothing
   void Match(const ObjectTrackMatcherOptions &options,
-             std::vector<TrackedObjectPtr> &objects,
+             const std::vector<TrackedObjectPtr> &objects,
              const std::vector<TrackDataPtr> &tracks,
              const std::vector<Eigen::VectorXf> &tracks_predict,
              const double time_diff, std::vector<TrackObjectPair> *assignments,
@@ -120,4 +122,5 @@ class ObjectTrackMatcher {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_LIDAR_LIB_TRACKER_HM_TRACKER_OBJECT_TRACK_MATCHER_H_
+#endif
+// MODULES_PERCEPTION_LIDAR_LIB_TRACKER_HM_TRACKER_OBJECT_TRACK_MATCHER_H_
