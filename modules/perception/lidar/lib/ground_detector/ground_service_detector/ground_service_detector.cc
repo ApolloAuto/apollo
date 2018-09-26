@@ -13,12 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+
 #include "modules/perception/lidar/lib/ground_detector/ground_service_detector/ground_service_detector.h"
+
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lib/io/file_util.h"
 #include "modules/perception/lib/io/protobuf_util.h"
 #include "modules/perception/lidar/common/lidar_point_label.h"
 #include "modules/perception/lidar/lib/ground_detector/ground_service_detector/proto/ground_service_detector_config.pb.h"
+
 namespace apollo {
 namespace perception {
 namespace lidar {
@@ -27,15 +30,19 @@ bool GroundServiceDetector::Init(const GroundDetectorInitOptions& options) {
   lib::ConfigManager* config_manager =
       lib::Singleton<lib::ConfigManager>::get_instance();
   CHECK_NOTNULL(config_manager);
+
   const lib::ModelConfig* model_config = nullptr;
   CHECK(config_manager->GetModelConfig(Name(), &model_config));
+
   const std::string work_root = config_manager->work_root();
   std::string config_file;
   std::string root_path;
   CHECK(model_config->get_value("root_path", &root_path));
+
   config_file = lib::FileUtil::GetAbsolutePath(work_root, root_path);
   config_file = lib::FileUtil::GetAbsolutePath(config_file,
                                                "ground_service_detector.conf");
+
   GroundServiceDetectorConfig config;
   CHECK(lib::ParseProtobufFromFile(config_file, &config));
   ground_threshold_ = config.ground_threshold();
@@ -69,12 +76,12 @@ bool GroundServiceDetector::Detect(const GroundDetectorOptions& options,
     Eigen::Vector3d world_point(pt.x, pt.y, pt.z);
     double dist = ground_service_->QueryPointToGroundDistance(
         world_point, ground_service_content_);
-    frame->cloud->points_height(i) = dist;
-    frame->world_cloud->points_height(i) = dist;
+    frame->cloud->mutable_points_height()->at(i) = dist;
+    frame->world_cloud->mutable_points_height()->at(i) = dist;
     if (dist > ground_threshold_) {
       non_ground_indices.indices.push_back(i);
     } else {
-      frame->cloud->points_label(i) =
+      frame->cloud->mutable_points_label()->at(i) =
           static_cast<uint8_t>(LidarPointLabel::GROUND);
     }
   }
@@ -86,3 +93,4 @@ PERCEPTION_REGISTER_GROUNDDETECTOR(GroundServiceDetector);
 }  // namespace lidar
 }  // namespace perception
 }  // namespace apollo
+
