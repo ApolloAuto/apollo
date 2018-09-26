@@ -104,12 +104,12 @@ bool KalmanFilter::Correct(const Eigen::VectorXd &cur_observation,
   }
   if (cur_observation_uncertainty.rows() != states_num_) {
     AERROR << "the rows of current observation uncertainty "
-                 "should be equal to state_num";
+              "should be equal to state_num";
     return false;
   }
   if (cur_observation_uncertainty.cols() != states_num_) {
     AERROR << "the cols of current observation uncertainty "
-                 "should be equal to state_num";
+              "should be equal to state_num";
     return false;
   }
 
@@ -119,9 +119,8 @@ bool KalmanFilter::Correct(const Eigen::VectorXd &cur_observation,
                  (c_matrix_ * global_uncertainty_ * c_matrix_.transpose() +
                   cur_observation_uncertainty_)
                      .inverse();
-  global_states_ =
-      global_states_ +
-      kalman_gain_ * (cur_observation_ - c_matrix_ * global_states_);
+  global_states_ = global_states_ + kalman_gain_ * (cur_observation_ -
+                                                    c_matrix_ * global_states_);
   Eigen::MatrixXd tmp_identity;
   tmp_identity.setIdentity(states_num_, states_num_);
   global_uncertainty_ =
@@ -153,10 +152,10 @@ Eigen::MatrixXd KalmanFilter::GetUncertainty() const {
 
 bool KalmanFilter::SetGainBreakdownThresh(const std::vector<bool> &break_down,
                                           const float threshold) {
-  if (break_down.size() != states_num_) {
+  if (static_cast<int>(break_down.size()) != states_num_) {
     return false;
   }
-  for (size_t i = 0; i < states_num_; i++) {
+  for (int i = 0; i < states_num_; i++) {
     if (break_down[i]) {
       gain_break_down_(i) = 1;
     }
@@ -167,10 +166,10 @@ bool KalmanFilter::SetGainBreakdownThresh(const std::vector<bool> &break_down,
 
 bool KalmanFilter::SetValueBreakdownThresh(const std::vector<bool> &break_down,
                                            const float threshold) {
-  if (break_down.size() != states_num_) {
+  if (static_cast<int>(break_down.size()) != states_num_) {
     return false;
   }
-  for (size_t i = 0; i < states_num_; i++) {
+  for (int i = 0; i < states_num_; i++) {
     if (break_down[i]) {
       value_break_down_(i) = 1;
     }
@@ -197,14 +196,13 @@ void KalmanFilter::CorrectionBreakdown() {
   prior_global_states_ = global_states_;
 }
 
-bool KalmanFilter::DeCorrelation(size_t x, size_t y, size_t x_len,
-                                 size_t y_len) {
+bool KalmanFilter::DeCorrelation(int x, int y, int x_len, int y_len) {
   if (x >= states_num_ || y >= states_num_ || x + x_len >= states_num_ ||
       y + y_len >= states_num_) {
     return false;
   }
-  for (size_t i = 0; i < x_len; i++) {
-    for (size_t j = 0; j < y_len; j++) {
+  for (int i = 0; i < x_len; i++) {
+    for (int j = 0; j < y_len; j++) {
       global_uncertainty_(x + i, y + j) = 0;
     }
   }

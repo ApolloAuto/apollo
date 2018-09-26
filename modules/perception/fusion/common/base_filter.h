@@ -65,14 +65,14 @@ class BaseFilter {
   std::string Name() { return name_; }
 
  protected:
-  // @brief the number of the system states
-  int states_num_;
-
   // @brief whether the filter has been init
   bool init_;
 
   // @brief the name of the filter
   std::string name_;
+
+  // @brief the number of the system states
+  int states_num_;
 
   Eigen::MatrixXd transform_matrix_;
   Eigen::VectorXd global_states_;

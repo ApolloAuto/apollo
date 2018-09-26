@@ -16,8 +16,9 @@
 #ifndef MODULES_PERCEPTION_COMMON_I_LIB_ALGORITHM_I_SORT_H_
 #define MODULES_PERCEPTION_COMMON_I_LIB_ALGORITHM_I_SORT_H_
 
-#include <assert.h>
-#include "../core/i_basic.h"
+#include "cybertron/common/log.h"
+
+#include "modules/perception/common/i_lib/core/i_basic.h"
 
 namespace idl {
 /*Strictly less*/
@@ -192,7 +193,9 @@ For efficiency, do NOT move the elements equal to pivot*/
 template <typename T>
 inline void i_quick_split(const T *src, T *dst, int n, T pivot, int first,
                           int last, long &first_equal, long &last_equal) {
-  assert(first >= 0 && last < n && first <= last);
+  CHECK_GE(first, 0);
+  CHECK_LT(last, n);
+  CHECK_LE(first, last);
   T v, *p1, *p2;
   const T *p3, *p4;
   /*start with pointers at the first and last of d and first of s*/
@@ -258,6 +261,6 @@ T i_quick_select(T *a, int n, int k, T *wa) {
   return (pivot); /*unreachable! put here to avoid warning*/
 }
 
-} // namespace idl
+}  // namespace idl
 
 #endif  // MODULES_PERCEPTION_COMMON_I_LIB_ALGORITHM_I_SORT_H_

@@ -34,21 +34,21 @@ bool DstManager::AddApp(const std::string &app_name,
   }
   DstCommonData dst_data;
   dst_data.fod_subsets_ = fod_subsets;
-  BuildSubsetsIndMap(dst_data);
+  BuildSubsetsIndMap(&dst_data);
   if (dst_data.subsets_ind_map_.size() != dst_data.fod_subsets_.size()) {
     AERROR << boost::format(
-                     "Dst %s: The input fod subsets"
-                     " have repetitive elements.") %
-                     app_name;
+                  "Dst %s: The input fod subsets"
+                  " have repetitive elements.") %
+                  app_name;
     return false;
   }
-  FodCheck(dst_data);
-  ComputeCardinalities(dst_data);
-  if (!ComputeRelations(dst_data)) {
+  FodCheck(&dst_data);
+  ComputeCardinalities(&dst_data);
+  if (!ComputeRelations(&dst_data)) {
     return false;
   }
   dst_data.init_ = true;
-  BuildNamesMap(fod_subset_names, dst_data);
+  BuildNamesMap(fod_subset_names, &dst_data);
   map_mutex_.lock();
   dst_common_data_[app_name] = dst_data;
   map_mutex_.unlock();
@@ -88,29 +88,29 @@ uint64_t DstManager::IndToFodSubset(const std::string &app_name,
   return iter->second.fod_subsets_[ind];
 }
 
-void DstManager::BuildSubsetsIndMap(DstCommonData &dst_data) {
-  dst_data.subsets_ind_map_.clear();
-  for (size_t i = 0; i < dst_data.fod_subsets_.size(); ++i) {
-    dst_data.subsets_ind_map_[dst_data.fod_subsets_[i]] = i;
+void DstManager::BuildSubsetsIndMap(DstCommonData *dst_data) {
+  dst_data->subsets_ind_map_.clear();
+  for (size_t i = 0; i < dst_data->fod_subsets_.size(); ++i) {
+    dst_data->subsets_ind_map_[dst_data->fod_subsets_[i]] = i;
   }
 }
 
-void DstManager::FodCheck(DstCommonData &dst_data) {
+void DstManager::FodCheck(DstCommonData *dst_data) {
   uint64_t fod = 0;
-  for (auto fod_subset : dst_data.fod_subsets_) {
+  for (auto fod_subset : dst_data->fod_subsets_) {
     fod |= fod_subset;
   }
-  dst_data.fod_loc_ = dst_data.fod_subsets_.size();
-  auto find_res = dst_data.subsets_ind_map_.insert(
-      std::make_pair(fod, dst_data.fod_subsets_.size()));
+  dst_data->fod_loc_ = dst_data->fod_subsets_.size();
+  auto find_res = dst_data->subsets_ind_map_.insert(
+      std::make_pair(fod, dst_data->fod_subsets_.size()));
   if (find_res.second) {
-    dst_data.fod_subsets_.push_back(fod);
+    dst_data->fod_subsets_.push_back(fod);
   } else {
-    dst_data.fod_loc_ = find_res.first->second;
+    dst_data->fod_loc_ = find_res.first->second;
   }
 }
 
-void DstManager::ComputeCardinalities(DstCommonData &dst_data) {
+void DstManager::ComputeCardinalities(DstCommonData *dst_data) {
   auto count_set_bits = [](uint64_t fod_subset) {
     size_t count = 0;
     while (fod_subset) {
@@ -119,13 +119,13 @@ void DstManager::ComputeCardinalities(DstCommonData &dst_data) {
     }
     return count;
   };
-  dst_data.fod_subset_cardinalities_.reserve(dst_data.fod_subsets_.size());
-  for (auto fod_subset : dst_data.fod_subsets_) {
-    dst_data.fod_subset_cardinalities_.push_back(count_set_bits(fod_subset));
+  dst_data->fod_subset_cardinalities_.reserve(dst_data->fod_subsets_.size());
+  for (auto fod_subset : dst_data->fod_subsets_) {
+    dst_data->fod_subset_cardinalities_.push_back(count_set_bits(fod_subset));
   }
 }
 
-bool DstManager::ComputeRelations(DstCommonData &dst_data) {
+bool DstManager::ComputeRelations(DstCommonData *dst_data) {
   auto reserve_space = [](std::vector<std::vector<size_t>> &relations,
                           size_t size) {
     relations.clear();
@@ -134,35 +134,35 @@ bool DstManager::ComputeRelations(DstCommonData &dst_data) {
       relation.reserve(size);
     }
   };
-  reserve_space(dst_data.subset_relations_, dst_data.fod_subsets_.size());
-  reserve_space(dst_data.inter_relations_, dst_data.fod_subsets_.size());
+  reserve_space(dst_data->subset_relations_, dst_data->fod_subsets_.size());
+  reserve_space(dst_data->inter_relations_, dst_data->fod_subsets_.size());
   // reserve space for combination_relations
-  dst_data.combination_relations_.clear();
-  dst_data.combination_relations_.resize(dst_data.fod_subsets_.size());
-  for (auto &combination_relation : dst_data.combination_relations_) {
-    combination_relation.reserve(2 * dst_data.fod_subsets_.size());
+  dst_data->combination_relations_.clear();
+  dst_data->combination_relations_.resize(dst_data->fod_subsets_.size());
+  for (auto &combination_relation : dst_data->combination_relations_) {
+    combination_relation.reserve(2 * dst_data->fod_subsets_.size());
   }
-  for (size_t i = 0; i < dst_data.fod_subsets_.size(); ++i) {
-    uint64_t fod_subset = dst_data.fod_subsets_[i];
-    auto &subset_inds = dst_data.subset_relations_[i];
-    auto &inter_inds = dst_data.inter_relations_[i];
+  for (size_t i = 0; i < dst_data->fod_subsets_.size(); ++i) {
+    uint64_t fod_subset = dst_data->fod_subsets_[i];
+    auto &subset_inds = dst_data->subset_relations_[i];
+    auto &inter_inds = dst_data->inter_relations_[i];
 
-    for (size_t j = 0; j < dst_data.fod_subsets_.size(); ++j) {
-      if ((fod_subset | dst_data.fod_subsets_[j]) == fod_subset) {
+    for (size_t j = 0; j < dst_data->fod_subsets_.size(); ++j) {
+      if ((fod_subset | dst_data->fod_subsets_[j]) == fod_subset) {
         subset_inds.push_back(j);
       }
-      uint64_t inter_res = fod_subset & dst_data.fod_subsets_[j];
+      uint64_t inter_res = fod_subset & dst_data->fod_subsets_[j];
       if (inter_res) {
         inter_inds.push_back(j);
-        auto find_res = dst_data.subsets_ind_map_.find(inter_res);
-        if (find_res == dst_data.subsets_ind_map_.end()) {
+        auto find_res = dst_data->subsets_ind_map_.find(inter_res);
+        if (find_res == dst_data->subsets_ind_map_.end()) {
           AERROR << boost::format(
               "Dst: The input set "
               "of fod subsets has no closure under the operation "
               "intersection");
           return false;
         }
-        dst_data.combination_relations_[find_res->second].push_back(
+        dst_data->combination_relations_[find_res->second].push_back(
             std::make_pair(i, j));
       }
     }
@@ -171,20 +171,20 @@ bool DstManager::ComputeRelations(DstCommonData &dst_data) {
 }
 
 void DstManager::BuildNamesMap(const std::vector<std::string> &fod_subset_names,
-                               DstCommonData &dst_data) {
+                               DstCommonData *dst_data) {
   // reset and reserve space
-  dst_data.fod_subset_names_.clear();
-  dst_data.fod_subset_names_.resize(dst_data.fod_subsets_.size());
-  for (size_t i = 0; i < dst_data.fod_subsets_.size(); ++i) {
-    dst_data.fod_subset_names_[i] =
-        std::bitset<64>(dst_data.fod_subsets_[i]).to_string();
+  dst_data->fod_subset_names_.clear();
+  dst_data->fod_subset_names_.resize(dst_data->fod_subsets_.size());
+  for (size_t i = 0; i < dst_data->fod_subsets_.size(); ++i) {
+    dst_data->fod_subset_names_[i] =
+        std::bitset<64>(dst_data->fod_subsets_[i]).to_string();
   }
   // set fod to unkown
-  dst_data.fod_subset_names_[dst_data.fod_loc_] = "unkown";
+  dst_data->fod_subset_names_[dst_data->fod_loc_] = "unkown";
   for (size_t i = 0;
-       i < std::min(fod_subset_names.size(), dst_data.fod_subsets_.size());
+       i < std::min(fod_subset_names.size(), dst_data->fod_subsets_.size());
        ++i) {
-    dst_data.fod_subset_names_[i] = fod_subset_names[i];
+    dst_data->fod_subset_names_[i] = fod_subset_names[i];
   }
 }
 
@@ -221,9 +221,8 @@ double Dst::GetIndBfmass(size_t ind) const {
 bool Dst::SetBbaVec(const std::vector<double> &bba_vec) {
   SelfCheck();
   if (bba_vec.size() != dst_data_ptr_->fod_subsets_.size()) {
-    AERROR << boost::format(
-                     "input bba_vec size: %d !=  Dst subsets size: %d") %
-                     bba_vec.size() % dst_data_ptr_->fod_subsets_.size();
+    AERROR << boost::format("input bba_vec size: %d !=  Dst subsets size: %d") %
+                  bba_vec.size() % dst_data_ptr_->fod_subsets_.size();
     return false;
   }
   // check belief mass valid
@@ -254,7 +253,7 @@ bool Dst::SetBba(const std::map<uint64_t, double> &bba_map) {
     }
     if (belief_mass < 0.0) {
       AWARN << boost::format("belief mass: %lf is not valid. Dst name: %s") %
-                      belief_mass % app_name_;
+                   belief_mass % app_name_;
       return false;
     }
     bba_vec[find_res->second] = belief_mass;
@@ -394,8 +393,8 @@ Dst operator*(const Dst &dst, double w) {
   // check w
   if (w < 0.0 || w > 1.0) {
     AERROR << boost::format(
-                     "the weight of bba %lf is not valid, return default bba") %
-                     w;
+                  "the weight of bba %lf is not valid, return default bba") %
+                  w;
     return res;
   }
   size_t fod_loc = dst.dst_data_ptr_->fod_loc_;

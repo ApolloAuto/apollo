@@ -8,6 +8,7 @@ cc_library(
         "i_sort.h",
     ],
     deps = [
+        "//framework:cybertron",
     ],
 )
 
