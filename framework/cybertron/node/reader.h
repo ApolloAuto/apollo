@@ -67,6 +67,7 @@ class Reader : public ReaderBase {
   bool HasReceived() const override;
   bool Empty() const override;
   double GetDelaySec() const override;
+  uint32_t PendingQueueSize() const override;
 
   virtual void Enqueue(const std::shared_ptr<MessageT>& msg);
   virtual void SetHistoryDepth(const uint32_t& depth);
@@ -79,6 +80,7 @@ class Reader : public ReaderBase {
  protected:
   double latest_recv_time_sec_;
   double second_to_lastest_recv_time_sec_;
+  uint32_t pending_queue_size_;
 
  private:
   void JoinTheTopology();
@@ -88,7 +90,6 @@ class Reader : public ReaderBase {
   CallbackFunc<MessageT> reader_func_;
   ReceiverPtr receiver_;
   std::string croutine_name_;
-  uint32_t pending_queue_size_;
 
   ChangeConnection change_conn_;
   service_discovery::ChannelManagerPtr channel_manager_;
@@ -252,6 +253,11 @@ double Reader<MessageT>::GetDelaySec() const {
   }
   return std::max((Time::Now().ToSecond() - latest_recv_time_sec_),
                   (latest_recv_time_sec_ - second_to_lastest_recv_time_sec_));
+}
+
+template <typename MessageT>
+uint32_t Reader<MessageT>::PendingQueueSize() const {
+  return pending_queue_size_;
 }
 
 template <typename MessageT>

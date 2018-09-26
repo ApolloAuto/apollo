@@ -139,11 +139,10 @@ bool Component<M0, NullType, NullType, NullType>::Initialize(
 
   bool is_reality_mode = GlobalData::Instance()->IsRealityMode();
 
-  RoleAttributes attr;
-  attr.set_node_name(config.name());
-  attr.set_channel_name(config.readers(0).channel());
-  auto qos_profile = attr.mutable_qos_profile();
-  *qos_profile = config.readers(0).qos_profile();
+  ReaderConfig reader_cfg;
+  reader_cfg.channel_name = config.readers(0).channel();
+  reader_cfg.qos_profile.CopyFrom(config.readers(0).qos_profile());
+  reader_cfg.pending_queue_size = config.readers(0).pending_queue_size();
 
   std::weak_ptr<Component<M0>> self =
       std::dynamic_pointer_cast<Component<M0>>(shared_from_this());
@@ -159,9 +158,9 @@ bool Component<M0, NullType, NullType, NullType>::Initialize(
   std::shared_ptr<Reader<M0>> reader = nullptr;
 
   if (is_reality_mode) {
-    reader = node_->CreateReader<M0>(attr);
+    reader = node_->CreateReader<M0>(reader_cfg);
   } else {
-    reader = node_->CreateReader<M0>(attr, func);
+    reader = node_->CreateReader<M0>(reader_cfg, func);
   }
 
   if (reader == nullptr) {
@@ -205,15 +204,20 @@ bool Component<M0, M1, NullType, NullType>::Initialize(
 
   bool is_reality_mode = GlobalData::Instance()->IsRealityMode();
 
-  RoleAttributes attr;
-  attr.set_node_name(config.name());
-  attr.set_channel_name(config.readers(1).channel());
-  auto reader1 = node_->template CreateReader<M1>(attr);
+  ReaderConfig reader_cfg;
+  reader_cfg.channel_name = config.readers(1).channel();
+  reader_cfg.qos_profile.CopyFrom(config.readers(1).qos_profile());
+  reader_cfg.pending_queue_size = config.readers(1).pending_queue_size();
 
-  attr.set_channel_name(config.readers(0).channel());
+  auto reader1 = node_->template CreateReader<M1>(reader_cfg);
+
+  reader_cfg.channel_name = config.readers(0).channel();
+  reader_cfg.qos_profile.CopyFrom(config.readers(0).qos_profile());
+  reader_cfg.pending_queue_size = config.readers(0).pending_queue_size();
+
   std::shared_ptr<Reader<M0>> reader0 = nullptr;
   if (is_reality_mode) {
-    reader0 = node_->template CreateReader<M0>(attr);
+    reader0 = node_->template CreateReader<M0>(reader_cfg);
   } else {
     std::weak_ptr<Component<M0, M1>> self =
         std::dynamic_pointer_cast<Component<M0, M1>>(shared_from_this());
@@ -233,7 +237,7 @@ bool Component<M0, M1, NullType, NullType>::Initialize(
       }
     };
 
-    reader0 = node_->template CreateReader<M0>(attr, func);
+    reader0 = node_->template CreateReader<M0>(reader_cfg, func);
   }
 
   if (reader0 == nullptr || reader1 == nullptr) {
@@ -291,17 +295,25 @@ bool Component<M0, M1, M2, NullType>::Initialize(
 
   bool is_reality_mode = GlobalData::Instance()->IsRealityMode();
 
-  RoleAttributes attr;
-  attr.set_node_name(config.name());
-  attr.set_channel_name(config.readers(1).channel());
-  auto reader1 = node_->template CreateReader<M1>(attr);
-  attr.set_channel_name(config.readers(2).channel());
-  auto reader2 = node_->template CreateReader<M2>(attr);
+  ReaderConfig reader_cfg;
+  reader_cfg.channel_name = config.readers(1).channel();
+  reader_cfg.qos_profile.CopyFrom(config.readers(1).qos_profile());
+  reader_cfg.pending_queue_size = config.readers(1).pending_queue_size();
 
-  attr.set_channel_name(config.readers(0).channel());
+  auto reader1 = node_->template CreateReader<M1>(reader_cfg);
+
+  reader_cfg.channel_name = config.readers(2).channel();
+  reader_cfg.qos_profile.CopyFrom(config.readers(2).qos_profile());
+  reader_cfg.pending_queue_size = config.readers(2).pending_queue_size();
+
+  auto reader2 = node_->template CreateReader<M2>(reader_cfg);
+
+  reader_cfg.channel_name = config.readers(0).channel();
+  reader_cfg.qos_profile.CopyFrom(config.readers(0).qos_profile());
+  reader_cfg.pending_queue_size = config.readers(0).pending_queue_size();
   std::shared_ptr<Reader<M0>> reader0 = nullptr;
   if (is_reality_mode) {
-    reader0 = node_->template CreateReader<M0>(attr);
+    reader0 = node_->template CreateReader<M0>(reader_cfg);
   } else {
     std::weak_ptr<Component<M0, M1, M2, NullType>> self =
         std::dynamic_pointer_cast<Component<M0, M1, M2, NullType>>(
@@ -325,7 +337,7 @@ bool Component<M0, M1, M2, NullType>::Initialize(
       }
     };
 
-    reader0 = node_->template CreateReader<M0>(attr, func);
+    reader0 = node_->template CreateReader<M0>(reader_cfg, func);
   }
 
   if (reader0 == nullptr || reader1 == nullptr || reader2 == nullptr) {
@@ -386,19 +398,32 @@ bool Component<M0, M1, M2, M3>::Initialize(const ComponentConfig& config) {
 
   bool is_reality_mode = GlobalData::Instance()->IsRealityMode();
 
-  RoleAttributes attr;
-  attr.set_node_name(config.name());
-  attr.set_channel_name(config.readers(1).channel());
-  auto reader1 = node_->template CreateReader<M1>(attr);
-  attr.set_channel_name(config.readers(2).channel());
-  auto reader2 = node_->template CreateReader<M2>(attr);
-  attr.set_channel_name(config.readers(3).channel());
-  auto reader3 = node_->template CreateReader<M3>(attr);
+  ReaderConfig reader_cfg;
+  reader_cfg.channel_name = config.readers(1).channel();
+  reader_cfg.qos_profile.CopyFrom(config.readers(1).qos_profile());
+  reader_cfg.pending_queue_size = config.readers(1).pending_queue_size();
 
-  attr.set_channel_name(config.readers(0).channel());
+  auto reader1 = node_->template CreateReader<M1>(reader_cfg);
+
+  reader_cfg.channel_name = config.readers(2).channel();
+  reader_cfg.qos_profile.CopyFrom(config.readers(2).qos_profile());
+  reader_cfg.pending_queue_size = config.readers(2).pending_queue_size();
+
+  auto reader2 = node_->template CreateReader<M2>(reader_cfg);
+
+  reader_cfg.channel_name = config.readers(3).channel();
+  reader_cfg.qos_profile.CopyFrom(config.readers(3).qos_profile());
+  reader_cfg.pending_queue_size = config.readers(3).pending_queue_size();
+
+  auto reader3 = node_->template CreateReader<M3>(reader_cfg);
+
+  reader_cfg.channel_name = config.readers(0).channel();
+  reader_cfg.qos_profile.CopyFrom(config.readers(0).qos_profile());
+  reader_cfg.pending_queue_size = config.readers(0).pending_queue_size();
+
   std::shared_ptr<Reader<M0>> reader0 = nullptr;
   if (is_reality_mode) {
-    reader0 = node_->template CreateReader<M0>(attr);
+    reader0 = node_->template CreateReader<M0>(reader_cfg);
   } else {
     std::weak_ptr<Component<M0, M1, M2, M3>> self =
         std::dynamic_pointer_cast<Component<M0, M1, M2, M3>>(
@@ -427,7 +452,7 @@ bool Component<M0, M1, M2, M3>::Initialize(const ComponentConfig& config) {
       }
     };
 
-    reader0 = node_->template CreateReader<M0>(attr, func);
+    reader0 = node_->template CreateReader<M0>(reader_cfg, func);
   }
 
   if (reader0 == nullptr || reader1 == nullptr || reader2 == nullptr ||

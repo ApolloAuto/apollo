@@ -43,13 +43,13 @@ class DataVisitor : public DataVisitorBase {
  public:
   explicit DataVisitor(const std::vector<std::shared_ptr<ReaderBase>>& readers)
       : buffer_m0_(readers[0]->ChannelId(),
-                   new BufferType<M0>(readers[0]->QosProfile().depth())),
+                   new BufferType<M0>(readers[0]->PendingQueueSize())),
         buffer_m1_(readers[1]->ChannelId(),
-                   new BufferType<M1>(readers[1]->QosProfile().depth())),
+                   new BufferType<M1>(readers[1]->PendingQueueSize())),
         buffer_m2_(readers[2]->ChannelId(),
-                   new BufferType<M2>(readers[2]->QosProfile().depth())),
+                   new BufferType<M2>(readers[2]->PendingQueueSize())),
         buffer_m3_(readers[3]->ChannelId(),
-                   new BufferType<M3>(readers[3]->QosProfile().depth())) {
+                   new BufferType<M3>(readers[3]->PendingQueueSize())) {
     DataDispatcher<M0>::Instance()->AddBuffer(buffer_m0_);
     DataDispatcher<M1>::Instance()->AddBuffer(buffer_m1_);
     DataDispatcher<M2>::Instance()->AddBuffer(buffer_m2_);
@@ -81,11 +81,11 @@ class DataVisitor<M0, M1, M2, NullType> : public DataVisitorBase {
  public:
   explicit DataVisitor(const std::vector<std::shared_ptr<ReaderBase>>& readers)
       : buffer_m0_(readers[0]->ChannelId(),
-                   new BufferType<M0>(readers[0]->QosProfile().depth())),
+                   new BufferType<M0>(readers[0]->PendingQueueSize())),
         buffer_m1_(readers[1]->ChannelId(),
-                   new BufferType<M1>(readers[1]->QosProfile().depth())),
+                   new BufferType<M1>(readers[1]->PendingQueueSize())),
         buffer_m2_(readers[2]->ChannelId(),
-                   new BufferType<M2>(readers[2]->QosProfile().depth())) {
+                   new BufferType<M2>(readers[2]->PendingQueueSize())) {
     DataDispatcher<M0>::Instance()->AddBuffer(buffer_m0_);
     DataDispatcher<M1>::Instance()->AddBuffer(buffer_m1_);
     DataDispatcher<M2>::Instance()->AddBuffer(buffer_m2_);
@@ -121,9 +121,9 @@ class DataVisitor<M0, M1, NullType, NullType> : public DataVisitorBase {
  public:
   explicit DataVisitor(const std::vector<std::shared_ptr<ReaderBase>>& readers)
       : buffer_m0_(readers[0]->ChannelId(),
-                   new BufferType<M0>(readers[0]->QosProfile().depth())),
+                   new BufferType<M0>(readers[0]->PendingQueueSize())),
         buffer_m1_(readers[1]->ChannelId(),
-                   new BufferType<M1>(readers[1]->QosProfile().depth())) {
+                   new BufferType<M1>(readers[1]->PendingQueueSize())) {
     DataDispatcher<M0>::Instance()->AddBuffer(buffer_m0_);
     DataDispatcher<M1>::Instance()->AddBuffer(buffer_m1_);
     data_notifier_->AddNotifier(buffer_m0_.ChannelId(), notifier_);
@@ -155,7 +155,7 @@ class DataVisitor<M0, NullType, NullType, NullType> : public DataVisitorBase {
  public:
   explicit DataVisitor(const std::shared_ptr<ReaderBase>& readers)
       : buffer_(readers->ChannelId(),
-                new BufferType<M0>(readers->QosProfile().depth())) {
+                new BufferType<M0>(readers->PendingQueueSize())) {
     DataDispatcher<M0>::Instance()->AddBuffer(buffer_);
     data_notifier_->AddNotifier(buffer_.ChannelId(), notifier_);
   }
