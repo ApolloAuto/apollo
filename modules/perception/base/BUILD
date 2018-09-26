@@ -21,6 +21,7 @@ cc_library(
         ":point_cloud",
         ":polynomial",
         ":syncedmem",
+        ":traffic_light",
     ],
 )
 
@@ -400,6 +401,16 @@ cc_test(
         "//modules/perception/base/test:test_helper",
         "@cuda",
         "@gtest//:main",
+    ],
+)
+
+cc_library(
+    name = "traffic_light",
+    hdrs = [
+        "traffic_light.h",
+    ],
+    deps = [
+        "//modules/perception/base:box",
     ],
 )
 
