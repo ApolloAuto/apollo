@@ -16,7 +16,10 @@
 #ifndef MODULES_PERCEPTION_ONBOARD_COMPONENT_SEGMENTATION_COMPONENT_H_
 #define MODULES_PERCEPTION_ONBOARD_COMPONENT_SEGMENTATION_COMPONENT_H_
 
+#include <memory>
+
 #include "cybertron/cybertron.h"
+
 #include "modules/drivers/proto/pointcloud.pb.h"  // NOLINT
 #include "modules/perception/lidar/app/lidar_obstacle_segmentation.h"
 #include "modules/perception/lidar/common/lidar_frame.h"

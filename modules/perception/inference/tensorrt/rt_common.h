@@ -29,8 +29,11 @@
 #include <cmath>
 #include <fstream>
 #include <iostream>
+#include <map>
 #include <memory>
 #include <sstream>
+#include <string>
+#include <vector>
 
 #include "NvCaffeParser.h"
 #include "NvInfer.h"

@@ -445,13 +445,13 @@ bool PolygonScanCvter<T>::ConvertSegment(const size_t seg_id,
   double k = ks[seg_id];
   const Point& low_vertex = segment.first;
   const Point& high_vertex = segment.second;
-  size_t vertex_id = 0;
-  if (low_vertex[dir_major_] < high_vertex[dir_major_]) {
-    vertex_id = seg_id;
-  } else {
-    std::swap(segment.first, segment.second);
-    vertex_id = (seg_id + 1) % segments.size();
-  }
+  // size_t vertex_id = 0;
+  // if (low_vertex[dir_major_] < high_vertex[dir_major_]) {
+  //   vertex_id = seg_id;
+  // } else {
+  //   std::swap(segment.first, segment.second);
+  //   vertex_id = (seg_id + 1) % segments.size();
+  // }
   // return pair of int id and edge
   Edge& edge = out_edge->second;
   int& x_id = out_edge->first;

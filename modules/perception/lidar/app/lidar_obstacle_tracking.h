@@ -16,6 +16,7 @@
 #ifndef MODULES_PERCEPTION_LIDAR_APP_LIDAR_OBSTACLE_TRACKING_H_
 #define MODULES_PERCEPTION_LIDAR_APP_LIDAR_OBSTACLE_TRACKING_H_
 
+#include <memory>
 #include <string>
 
 #include "modules/perception/lidar/common/lidar_error_code.h"

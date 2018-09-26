@@ -16,6 +16,8 @@
 
 #include "modules/perception/inference/tensorrt/rt_common.h"
 
+#include <utility>
+
 namespace apollo {
 namespace perception {
 namespace inference {

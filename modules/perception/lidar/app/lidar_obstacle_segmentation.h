@@ -16,6 +16,7 @@
 #ifndef MODULES_PERCEPTION_LIDAR_APP_LIDAR_OBSTACLE_SEGMENTATION_H_
 #define MODULES_PERCEPTION_LIDAR_APP_LIDAR_OBSTACLE_SEGMENTATION_H_
 
+#include <memory>
 #include <string>
 
 #include "Eigen/Dense"
