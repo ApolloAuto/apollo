@@ -36,7 +36,6 @@
 #include "modules/common/math/math_utils.h"
 #include "modules/planning/common/obstacle.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/constraint_checker/collision_checker.h"
 #include "modules/planning/proto/planner_open_space_config.pb.h"
 
 namespace apollo {
@@ -80,7 +79,7 @@ class HybridAStar {
   double NonHoloNoObstacleHeuristic(const ReedSheppPath* reeds_shepp_to_end);
   double EuclidDist();
   double CalculateRSPCost(const ReedSheppPath* reeds_shepp_to_end);
-  Result GetResult(std::shared_ptr<Node3d> final_node);
+  bool GetResult(std::shared_ptr<Node3d> final_node, Result* result);
 
  private:
   PlannerOpenSpaceConfig open_space_conf_;
