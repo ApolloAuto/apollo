@@ -18,14 +18,14 @@ cc_library(
     ],
 )
 
-#cc_test(
-#    name = "rt_common_test",
-#    size = "small",
-#    srcs = ["rt_common_test.cc"],
-#    deps = [
-#        ":rt_common",
-#        "@gtest//:main",
-#    ],
-#)
+cc_test(
+    name = "rt_common_test",
+    size = "small",
+    srcs = ["rt_common_test.cc"],
+    deps = [
+        ":rt_common",
+        "@gtest//:main",
+    ],
+)
 
 cpplint()
