@@ -83,4 +83,21 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "track_post_processor",
+    srcs = [
+        "track_post_processor.cc",
+    ],
+    hdrs = [
+        "track_post_processor.h",
+    ],
+    deps = [
+        "//modules/perception/base:object",
+        "//modules/perception/common/geometry:basic",
+        "//modules/perception/common/geometry:common",
+        "//modules/perception/lidar/lib/tracker/common:track_data",
+        "//framework:cybertron",
+    ],
+)
+
 cpplint()

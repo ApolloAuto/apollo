@@ -13,13 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+#include "modules/perception/lidar/lib/tracker/hm_tracker/track_post_processor.h"
+
 #include <algorithm>
 #include <utility>
+#include <map>
 
+#include "cybertron/common/log.h"
 #include "modules/perception/base/object_types.h"
 #include "modules/perception/common/geometry/basic.h"
 #include "modules/perception/common/geometry/common.h"
-#include "modules/perception/lidar/lib/tracker/hm_tracker/track_post_processor.h"
 
 namespace apollo {
 namespace perception {
