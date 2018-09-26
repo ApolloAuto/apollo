@@ -26,6 +26,9 @@ cc_test(
     srcs = [
         "file_util_test.cc",
     ],
+    data = [
+       "//modules/perception:perception_testdata",
+    ],
     deps = [
         ":file_util",
         "@gtest//:main",

@@ -26,6 +26,9 @@ cc_test(
      srcs = [
          "config_manager_test.cc",
      ],
+     data = [
+        "//modules/perception:perception_testdata",
+     ],
      deps = [
          ":config_manager",
          "@gtest//:main",
