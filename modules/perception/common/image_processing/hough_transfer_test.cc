@@ -14,9 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 #include <gtest/gtest.h>
-#include <iostream>
-#include <limits>
-#include "modules/perception/common/image_processing/hough.h"
+
+#include "modules/perception/common/image_processing/hough_transfer.h"
 
 namespace apollo {
 namespace perception {
