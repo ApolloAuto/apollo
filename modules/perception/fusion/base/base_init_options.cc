@@ -15,6 +15,8 @@
  *****************************************************************************/
 #include "modules/perception/fusion/base/base_init_options.h"
 
+#include "modules/perception/lib/config_manager/config_manager.h"
+
 namespace apollo {
 namespace perception {
 namespace fusion {

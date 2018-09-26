@@ -13,19 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+
+/**
+ * @file camera_util.cc
+ **/
+
 #include "modules/perception/fusion/common/camera_util.h"
 
 #include <limits>
-#include <vector>
-
-#include "modules/perception/base/camera.h"
-#include "modules/perception/fusion/base/sensor_object.h"
 
 namespace apollo {
 namespace perception {
 namespace fusion {
 
-void GetObjectEightVertices(base::ObjectConstPtr obj,
+void GetObjectEightVertices(std::shared_ptr<const base::Object> obj,
                             std::vector<Eigen::Vector3d>* vertices) {
   vertices->clear();
   vertices->resize(8);
@@ -65,7 +66,8 @@ bool Pt3dToCamera2d(const Eigen::Vector3d& pt3d,
 }
 
 bool IsObjectEightVerticesAllBehindCamera(
-    base::ObjectConstPtr obj, const Eigen::Matrix4d& world2camera_pose,
+    std::shared_ptr<const base::Object> obj,
+    const Eigen::Matrix4d& world2camera_pose,
     base::BaseCameraModelPtr camera_model) {
   std::vector<Eigen::Vector3d> vertices(8);
   GetObjectEightVertices(obj, &vertices);

@@ -26,7 +26,7 @@ namespace perception {
 namespace fusion {
 
 // SensorObject implementations
-SensorObject::SensorObject(const base::ObjectConstPtr& object_ptr,
+SensorObject::SensorObject(const std::shared_ptr<const base::Object>& object_ptr,
                            const SensorFramePtr& frame_ptr) {
   object_ = object_ptr;
   frame_ptr_ = frame_ptr;

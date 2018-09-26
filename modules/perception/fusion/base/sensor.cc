@@ -61,15 +61,14 @@ bool Sensor::GetPose(double timestamp, Eigen::Affine3d* pose) const {
     }
   }
 
-  LOG_ERROR << "Failed to find pose for timestamp: "
-            << GLOG_TIMESTAMP(timestamp);
+  AWARN << "Failed to find pose for timestamp: "
+        << timestamp;
   return false;
 }
 
 void Sensor::AddFrame(const base::FrameConstPtr& frame_ptr) {
-  SensorPtr sensor_ptr = this->GetPtr();
   SensorFramePtr frame(new SensorFrame());
-  frame->Initialize(frame_ptr, sensor_ptr);
+  frame->Initialize(frame_ptr, sensor_info_.name, sensor_info_.type);
   if (frames_.size() == kMaxCachedFrameNum) {
     frames_.pop_front();
   }
