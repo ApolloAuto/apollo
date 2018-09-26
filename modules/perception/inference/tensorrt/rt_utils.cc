@@ -13,13 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+
+#include "modules/perception/inference/tensorrt/rt_utils.h"
+
 #include <fcntl.h>
-#include <glog/logging.h>
 #include <unistd.h>
 #include <cmath>
 #include <iostream>
 
-#include "modules/perception/inference/tensorrt/rt_utils.h"
+#include "cybertron/common/log.h"
+
 namespace apollo {
 namespace perception {
 namespace inference {

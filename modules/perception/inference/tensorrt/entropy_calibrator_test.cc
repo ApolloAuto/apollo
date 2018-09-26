@@ -13,12 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+
 #include <opencv2/highgui/highgui_c.h>
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
-#include "gtest/gtest.h"
 #include "cybertron/common/log.h"
+#include "gtest/gtest.h"
 
 #define private public
 
@@ -56,9 +57,12 @@ TEST(Int8EntropyCalibratorTest, test_init) {
   }
   // test valid batch_stream
   {
-    BatchStream batch_stream(1, 5, "./inference_test_data/tensorrt/bs_1x1x1x1");
+    BatchStream batch_stream(
+        1, 5,
+        "modules/perception/inference/inference_test_data/tensorrt/bs_1x1x1x1");
     nvinfer1::Int8EntropyCalibrator calibrator(
-        batch_stream, 0, false, "./inference_test_data/tensorrt");
+        batch_stream, 0, false,
+        "modules/perception/inference/inference_test_data/tensorrt");
     EXPECT_EQ(calibrator.getBatchSize(), 1);
   }
 }
@@ -66,9 +70,12 @@ TEST(Int8EntropyCalibratorTest, test_init) {
 TEST(Int8EntropyCalibratorTest, test_cache) {
   // DONOT read cache
   {
-    BatchStream batch_stream(1, 5, "./inference_test_data/tensorrt/bs_1x1x1x1");
+    BatchStream batch_stream(
+        1, 5,
+        "modules/perception/inference/inference_test_data/tensorrt/bs_1x1x1x1");
     nvinfer1::Int8EntropyCalibrator calibrator(
-        batch_stream, 0, false, "./inference_test_data/tensorrt");
+        batch_stream, 0, false,
+        "modules/perception/inference/inference_test_data/tensorrt");
     size_t length;
     auto cache = calibrator.readCalibrationCache(length);
     EXPECT_EQ(length, 0);
@@ -77,9 +84,12 @@ TEST(Int8EntropyCalibratorTest, test_cache) {
 
   // DO read cache from BAD path
   {
-    BatchStream batch_stream(1, 5, "./inference_test_data/tensorrt/bs_1x1x1x1");
+    BatchStream batch_stream(
+        1, 5,
+        "modules/perception/inference/inference_test_data/tensorrt/bs_1x1x1x1");
     nvinfer1::Int8EntropyCalibrator calibrator(
-        batch_stream, 0, true, "./inference_test_data/tensorrt-nonexists");
+        batch_stream, 0, true,
+        "modules/perception/inference/inference_test_data/tensorrt-nonexists");
     size_t length;
     auto cache = calibrator.readCalibrationCache(length);
     EXPECT_EQ(length, 0);
@@ -88,9 +98,12 @@ TEST(Int8EntropyCalibratorTest, test_cache) {
 
   // DO read cache
   {
-    BatchStream batch_stream(1, 5, "./inference_test_data/tensorrt/bs_1x1x1x1");
+    BatchStream batch_stream(
+        1, 5,
+        "modules/perception/inference/inference_test_data/tensorrt/bs_1x1x1x1");
     nvinfer1::Int8EntropyCalibrator calibrator(
-        batch_stream, 0, true, "./inference_test_data/tensorrt");
+        batch_stream, 0, true,
+        "modules/perception/inference/inference_test_data/tensorrt");
     size_t length;
     auto cache = calibrator.readCalibrationCache(length);
     EXPECT_EQ(length, 1128);
@@ -101,9 +114,12 @@ TEST(Int8EntropyCalibratorTest, test_cache) {
 TEST(Int8EntropyCalibratorTest, test_get_batch) {
   // DO read cache
   {
-    BatchStream batch_stream(1, 5, "./inference_test_data/tensorrt/bs_1x1x1x1");
+    BatchStream batch_stream(
+        1, 5,
+        "modules/perception/inference/inference_test_data/tensorrt/bs_1x1x1x1");
     nvinfer1::Int8EntropyCalibrator calibrator(
-        batch_stream, 0, true, "./inference_test_data/tensorrt");
+        batch_stream, 0, true,
+        "modules/perception/inference/inference_test_data/tensorrt");
     size_t length;
     auto cache = calibrator.readCalibrationCache(length);
     EXPECT_EQ(length, 1128);

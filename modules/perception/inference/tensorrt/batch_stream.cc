@@ -13,15 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+
 #include "modules/perception/inference/tensorrt/batch_stream.h"
+
 #include <algorithm>
 #include <cstdio>
 #include <string>
+
 #include "cybertron/common/log.h"
 
 namespace apollo {
 namespace perception {
 namespace inference {
+
 BatchStream::BatchStream(int batchSize, int maxBatches, std::string dataPath)
     : mBatchSize(batchSize), mMaxBatches(maxBatches), mPath(dataPath) {
   FILE *file = fopen((mPath + "Batch0").c_str(), "rb");
@@ -57,7 +61,7 @@ bool BatchStream::next() {
   for (int csize = 1, batchPos = 0; batchPos < mBatchSize;
        batchPos += csize, mFileBatchPos += csize) {
     CHECK_GT(mFileBatchPos, 0);
-CHECK_LE(mFileBatchPos, mDims.n());
+    CHECK_LE(mFileBatchPos, mDims.n());
     // mMaxBatches > number of batches in the files
     if (mFileBatchPos == mDims.n() && !update()) {
       return false;

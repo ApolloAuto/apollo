@@ -13,6 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+
+#include "modules/perception/inference/tensorrt/rt_net.h"
+
 #include <NvInferPlugin.h>
 #include <iostream>
 #include <map>
@@ -23,7 +26,6 @@
 #include "modules/perception/inference/tensorrt/plugins/argmax_plugin.h"
 #include "modules/perception/inference/tensorrt/plugins/slice_plugin.h"
 #include "modules/perception/inference/tensorrt/plugins/softmax_plugin.h"
-#include "modules/perception/inference/tensorrt/rt_net.h"
 
 class RTLogger : public nvinfer1::ILogger {
   void log(Severity severity, const char *msg) override {
@@ -33,6 +35,7 @@ class RTLogger : public nvinfer1::ILogger {
   }
 } rt_gLogger;
 #define LOAD_DEBUG 0
+
 namespace apollo {
 namespace perception {
 namespace inference {
@@ -260,7 +263,8 @@ void RTNet::addScaleLayer(const LayerParameter &layer_param,
     lw[2] = loadLayerWeights(power_param.power(), size);
   } else {
     CHECK(weight_map->find(layer_param.name().c_str()) != weight_map->end());
-    for (int i = 0; i < (*weight_map)[layer_param.name().c_str()].size(); i++) {
+    for (size_t i = 0; i < (*weight_map)[layer_param.name().c_str()].size();
+         i++) {
       lw[i] = (*weight_map)[layer_param.name().c_str()][i];
     }
   }
@@ -564,7 +568,7 @@ bool RTNet::shape(const std::string &name, std::vector<int> *res) {
     return false;
   }
   int bindingIndex = engine->getBindingIndex(tensor_modify_map_[name].c_str());
-  if (bindingIndex > buffers_.size()) {
+  if (bindingIndex > (int)buffers_.size()) {
     return false;
   }
   nvinfer1::DimsCHW dims = static_cast<nvinfer1::DimsCHW &&>(
@@ -655,7 +659,7 @@ bool RTNet::addInput(const TensorDimsMap &tensor_dims_map,
   for (auto dims_pair : tensor_dims_map) {
     if (shapes.find(dims_pair.first) != shapes.end()) {
       auto shape = shapes.at(dims_pair.first);
-      if (shape.size() == dims_pair.second.nbDims + 1) {
+      if ((int)shape.size() == dims_pair.second.nbDims + 1) {
         max_batch_size_ = std::max(max_batch_size_, shape[0]);
         for (int i = 0; i < dims_pair.second.nbDims; i++) {
           dims_pair.second.d[i] = shape[i + 1];

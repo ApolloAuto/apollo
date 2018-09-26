@@ -25,6 +25,7 @@ cc_library(
         ":inference_util_cuda_lib",
     ],
     hdrs = ["util.h"],
+    linkopts = ["-lopencv_core -lopencv_imgproc -lopencv_highgui -lnvinfer_plugin -lcaffe"],
     deps = [
         "//modules/perception/base:blob",
     ],
@@ -37,7 +38,6 @@ cc_test(
     data = [
         "//modules/perception/inference:inference_test_data",
     ],
-    linkopts = ["-lopencv_core -lopencv_imgproc -lopencv_highgui -lnvinfer_plugin -lcaffe"],
     deps = [
         ":inference_util_lib",
         "@gtest//:main",
@@ -50,6 +50,7 @@ cc_library(
         "binary_data.cc",
     ],
     hdrs = ["binary_data.h"],
+    linkopts = ["-lopencv_core -lopencv_imgproc -lopencv_highgui -lnvinfer_plugin -lcaffe"],
     deps = [
         "//modules/perception/base:blob",
     ],
@@ -62,7 +63,6 @@ cc_test(
     data = [
         "//modules/perception/inference:inference_test_data",
     ],
-    linkopts = ["-lopencv_core -lopencv_imgproc -lopencv_highgui -lnvinfer_plugin -lcaffe"],
     deps = [
         ":inference_binary_data_lib",
         "@gtest//:main",

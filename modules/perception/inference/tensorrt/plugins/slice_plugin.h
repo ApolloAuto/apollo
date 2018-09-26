@@ -41,7 +41,7 @@ class SLICEPlugin : public nvinfer1::IPlugin {
       input_dims_.type[i] = in_dims.type[i];
     }
 
-    for (int i = 0; i < slice_point_.size(); i++) {
+    for (size_t i = 0; i < slice_point_.size(); i++) {
       if (i == 0) {
         out_slice_dims_.push_back(slice_point_[i]);
       } else {

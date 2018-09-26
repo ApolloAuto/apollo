@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef INFERENCE_TENSORRT_ENTROPYCALIBRATOR_H_
-#define INFERENCE_TENSORRT_ENTROPYCALIBRATOR_H_
+
+#ifndef MODULES_PERCEPTION_INFERENCE_TENSORRT_ENTROPYCALIBRATOR_H_
+#define MODULES_PERCEPTION_INFERENCE_TENSORRT_ENTROPYCALIBRATOR_H_
 
 #include <cuda_runtime_api.h>
 #include <float.h>
@@ -122,13 +123,12 @@ class Int8EntropyCalibrator : public IInt8EntropyCalibrator {
 
  private:
   apollo::perception::inference::BatchStream stream_;
-  std::string network_ = "yolo";
   bool read_cache_ = true;
-
+  std::string network_ = "yolo";
   size_t input_count_;
   void *device_input_ = nullptr;
   std::vector<char> calibration_cache_;
 };
 
 }  //  namespace nvinfer1
-#endif  // INFERENCE_TENSORRT_ENTROPYCALIBRATOR_H_
+#endif  // MODULES_PERCEPTION_INFERENCE_TENSORRT_ENTROPYCALIBRATOR_H_
