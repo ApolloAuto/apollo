@@ -58,6 +58,22 @@ proto_library(
 )
 
 cc_proto_library(
+    name = "rt_proto",
+    deps = [
+        ":rt_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "rt_proto_lib",
+    srcs = [
+        "rt.proto",
+    ],
+    deps = [
+    ],
+)
+
+cc_proto_library(
     name = "sensor_meta_schema_proto",
     deps = [
         ":sensor_meta_schema_proto_lib",

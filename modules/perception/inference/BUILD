@@ -2,20 +2,6 @@ load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
-cc_proto_library(
-    name = "rt_lib_proto",
-    deps = [
-        ":rt_lib",
-    ],
-)
-
-proto_library(
-    name = "rt_lib",
-    srcs = [
-        "rt.proto",
-    ],
-)
-
 cc_library(
     name = "layer_lib",
     srcs = ["layer.cc"],
