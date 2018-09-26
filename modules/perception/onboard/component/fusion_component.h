@@ -44,8 +44,6 @@ class FusionComponent : public cybertron::Component<SensorFrameMessage> {
   bool InternalProc(const std::shared_ptr<SensorFrameMessage const>& in_message,
                     std::shared_ptr<PerceptionObstacles> out_message,
                     std::shared_ptr<SensorFrameMessage> viz_message);
-  bool BuildSensorObjs(const std::shared_ptr<SensorFrameMessage const>& message,
-                       base::FramePtr& multi_sensor_objs) const;
 
  private:
   static std::mutex s_mutex_;

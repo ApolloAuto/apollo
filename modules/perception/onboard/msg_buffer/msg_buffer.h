@@ -16,16 +16,16 @@
 #ifndef MODULES_PERCEPTION_ONBOARD_MSG_BUFFER_H_
 #define MODULES_PERCEPTION_ONBOARD_MSG_BUFFER_H_
 
-#include <boost/circular_buffer.hpp>
+#include <cfloat>
+#include <memory>
 #include <string>
 #include <utility>
 #include <vector>
 
-#include "gflags/gflags.h"
-
-#include "cybertron/component/component.h"
-#include "float.h"
+#include "boost/circular_buffer.hpp"
 #include "cybertron/common/log.h"
+#include "cybertron/component/component.h"
+#include "gflags/gflags.h"
 
 namespace apollo {
 namespace perception {
@@ -109,18 +109,14 @@ int MsgBuffer<T>::LookupNearest(double timestamp, ConstPtr* msg) {
   }
   if (buffer_queue_.front().first - FLAGS_obs_buffer_match_precision >
       timestamp) {
-    AERROR << "Your timestamp (" << GLOG_TIMESTAMP(timestamp)
-           << ") is earlier than the oldest "
-           << "timestamp (" << GLOG_TIMESTAMP(buffer_queue_.front().first)
-           << ").";
+    AERROR << "Your timestamp (" << timestamp << ") is earlier than the oldest "
+           << "timestamp (" << buffer_queue_.front().first << ").";
     return cybertron::FAIL;
   }
   if (buffer_queue_.back().first + FLAGS_obs_buffer_match_precision <
       timestamp) {
-    AERROR << "Your timestamp (" << GLOG_TIMESTAMP(timestamp)
-           << ") is newer than the latest "
-           << "timestamp (" << GLOG_TIMESTAMP(buffer_queue_.back().first)
-           << ").";
+    AERROR << "Your timestamp (" << timestamp << ") is newer than the latest "
+           << "timestamp (" << buffer_queue_.back().first << ").";
     return cybertron::FAIL;
   }
 
@@ -168,18 +164,14 @@ int MsgBuffer<T>::LookupPeriod(const double timestamp, const double period,
   }
   if (buffer_queue_.front().first - FLAGS_obs_buffer_match_precision >
       timestamp) {
-    AERROR << "Your timestamp (" << GLOG_TIMESTAMP(timestamp)
-           << ") is earlier than the oldest "
-           << "timestamp (" << GLOG_TIMESTAMP(buffer_queue_.front().first)
-           << ").";
+    AERROR << "Your timestamp (" << timestamp << ") is earlier than the oldest "
+           << "timestamp (" << buffer_queue_.front().first << ").";
     return cybertron::FAIL;
   }
   if (buffer_queue_.back().first + FLAGS_obs_buffer_match_precision <
       timestamp) {
-    AERROR << "Your timestamp (" << GLOG_TIMESTAMP(timestamp)
-           << ") is newer than the latest "
-           << "timestamp (" << GLOG_TIMESTAMP(buffer_queue_.back().first)
-           << ").";
+    AERROR << "Your timestamp (" << timestamp << ") is newer than the latest "
+           << "timestamp (" << buffer_queue_.back().first << ").";
     return cybertron::FAIL;
   }
 
