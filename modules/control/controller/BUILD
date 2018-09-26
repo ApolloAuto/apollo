@@ -129,64 +129,64 @@ cc_library(
     ],
 )
 
-#cc_test(
-#    name = "lon_controller_test",
-#    size = "small",
-#    srcs = [
-#        "lon_controller_test.cc",
-#    ],
-#    data = ["//modules/control/testdata:control_testdata"],
-#    deps = [
-#        ":lon_controller",
-#        "//framework:cybertron",
-#        "//modules/common/time",
-#        "//modules/common/util",
-#        "//modules/common/vehicle_state:vehicle_state_provider",
-#        "//modules/control/common:control_gflags",
-#        "//modules/control/proto:control_proto",
-#        "//modules/planning/proto:planning_proto",
-#        "@gtest//:main",
-#    ],
-#)
+cc_test(
+    name = "lon_controller_test",
+    size = "small",
+    srcs = [
+        "lon_controller_test.cc",
+    ],
+    data = ["//modules/control/testdata:control_testdata"],
+    deps = [
+        ":lon_controller",
+        "//framework:cybertron",
+        "//modules/common/time",
+        "//modules/common/util",
+        "//modules/common/vehicle_state:vehicle_state_provider",
+        "//modules/control/common:control_gflags",
+        "//modules/control/proto:control_proto",
+        "//modules/planning/proto:planning_proto",
+        "@gtest//:main",
+    ],
+)
 
-#cc_test(
-#    name = "lat_controller_test",
-#    size = "small",
-#    srcs = [
-#        "lat_controller_test.cc",
-#    ],
-#    data = ["//modules/control/testdata:control_testdata"],
-#    deps = [
-#        ":lat_controller",
-#        "//framework:cybertron",
-#        "//modules/common/time",
-#        "//modules/common/util",
-#        "//modules/common/vehicle_state:vehicle_state_provider",
-#        "//modules/control/common:control_gflags",
-#        "//modules/control/proto:control_proto",
-#        "//modules/planning/proto:planning_proto",
-#        "@gtest//:main",
-#    ],
-#)
-#
-#cc_test(
-#    name = "mpc_controller_test",
-#    size = "small",
-#    srcs = [
-#        "mpc_controller_test.cc",
-#    ],
-#    data = ["//modules/control/testdata:control_testdata"],
-#    deps = [
-#        ":mpc_controller",
-#        "//framework:cybertron",
-#        "//modules/common/time",
-#        "//modules/common/util",
-#        "//modules/common/vehicle_state:vehicle_state_provider",
-#        "//modules/control/common:control_gflags",
-#        "//modules/control/proto:control_proto",
-#        "//modules/planning/proto:planning_proto",
-#        "@gtest//:main",
-#    ],
-#)
+cc_test(
+    name = "lat_controller_test",
+    size = "small",
+    srcs = [
+        "lat_controller_test.cc",
+    ],
+    data = ["//modules/control/testdata:control_testdata"],
+    deps = [
+        ":lat_controller",
+        "//framework:cybertron",
+        "//modules/common/time",
+        "//modules/common/util",
+        "//modules/common/vehicle_state:vehicle_state_provider",
+        "//modules/control/common:control_gflags",
+        "//modules/control/proto:control_proto",
+        "//modules/planning/proto:planning_proto",
+        "@gtest//:main",
+    ],
+)
+
+cc_test(
+    name = "mpc_controller_test",
+    size = "small",
+    srcs = [
+        "mpc_controller_test.cc",
+    ],
+    data = ["//modules/control/testdata:control_testdata"],
+    deps = [
+        ":mpc_controller",
+        "//framework:cybertron",
+        "//modules/common/time",
+        "//modules/common/util",
+        "//modules/common/vehicle_state:vehicle_state_provider",
+        "//modules/control/common:control_gflags",
+        "//modules/control/proto:control_proto",
+        "//modules/planning/proto:planning_proto",
+        "@gtest//:main",
+    ],
+)
 
 cpplint()

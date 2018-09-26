@@ -44,7 +44,7 @@ using TrajectoryPb = planning::ADCTrajectory;
 using apollo::common::VehicleStateProvider;
 
 const char data_path[] =
-    "modules/control/testdata/longitudinal_controller_test/";
+    "/apollo/modules//control/testdata/longitudinal_controller_test/";
 
 class LonControllerTest : public ::testing::Test, LonController {
  public:
@@ -117,7 +117,7 @@ TEST_F(LonControllerTest, ComputeLongitudinalErrors) {
   double time_now = Clock::NowInSeconds();
   trajectory_pb.mutable_header()->set_timestamp_sec(time_now);
 
-  auto *vehicle_state = VehicleStateProvider::Instance();
+  auto vehicle_state = VehicleStateProvider::Instance();
   vehicle_state->Update(localization_pb, chassis_pb);
   TrajectoryAnalyzer trajectory_analyzer(&trajectory_pb);
 
