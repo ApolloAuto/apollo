@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include "modules/perception/lidar/lib/segmentation/cnnseg/spp_engine/spp_engine.h"
 #include <set>
 #include "modules/perception/base/object_pool_types.h"
 #include "modules/perception/lidar/common/lidar_log.h"
 #include "modules/perception/lidar/common/lidar_timer.h"
+#include "modules/perception/lidar/lib/segmentation/cnnseg/spp_engine/spp_engine.h"
 
 namespace apollo {
 namespace perception {
@@ -58,7 +58,7 @@ size_t SppEngine::ProcessConnectedComponentCluster(
   data_.instance_pt_blob->cpu_data();
   double sync_time1 = timer.toc(true);
   worker_.WakeUp();
-  size_t num = detector_2d_cc_.Detect(&labels_2d_);
+  // size_t num = detector_2d_cc_.Detect(&labels_2d_);
   double detect_time = timer.toc(true);
   worker_.Join();
   double sync_time2 = timer.toc(true);
@@ -146,10 +146,10 @@ size_t SppEngine::ProcessConnectedComponentCluster(
   clusters_.RemoveEmptyClusters();
   double remove_time = timer.toc(true);
 
-  AINFO << "SegForeground: sync1 " << sync_time1
-           << "\tdetect: " << detect_time << "\tsync2: " << sync_time2
-           << "\tfilter: " << filter_time << "\tchz: " << chz_time
-           << "\tmapping: " << mapping_time << "\tremove: " << remove_time;
+  AINFO << "SegForeground: sync1 " << sync_time1 << "\tdetect: " << detect_time
+        << "\tsync2: " << sync_time2 << "\tfilter: " << filter_time
+        << "\tchz: " << chz_time << "\tmapping: " << mapping_time
+        << "\tremove: " << remove_time;
 
   return clusters_.size();
 }

@@ -11,9 +11,9 @@ cc_library(
         "rt_common.h",
     ],
     deps = [
+        "//framework:cybertron",
         "//modules/perception/base:common",
         "//modules/perception/proto:rt_proto",
-        "//framework:cybertron",
         "@tensorrt",
     ],
 )

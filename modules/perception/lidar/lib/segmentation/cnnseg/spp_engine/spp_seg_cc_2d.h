@@ -38,14 +38,14 @@ class SppCCDetector {
   // @brief: initialize detector
   // @param [in]: rows of feature map
   // @param [in]: cols of feature map
-  void Init(size_t rows, size_t cols) {
+  void Init(int rows, int cols) {
     if (rows_ * cols_ != rows * cols) {
       if (nodes_ != nullptr) {
         idl::i_free2(nodes_);
       }
       nodes_ = idl::i_alloc2<Node>(rows, cols);
-      rows_ = static_cast<int>(rows);
-      cols_ = static_cast<int>(cols);
+      rows_ = rows;
+      cols_ = cols;
     }
     CleanNodes();
   }
