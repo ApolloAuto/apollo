@@ -166,7 +166,7 @@ bool PointCloudPreprocessor::TransformCloud(
     world_point.z = trans_point(2);
     world_point.intensity = pt.intensity;
     world_cloud->push_back(world_point, local_cloud->points_timestamp(i),
-                           FLT_MAX, local_cloud->points_beam_id(i), 0);
+                           FLT_MAX, local_cloud->points_beam_id()[i], 0);
   }
   return true;
 }
