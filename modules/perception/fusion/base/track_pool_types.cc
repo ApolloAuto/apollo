@@ -14,7 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/perception/fusion/base/track_pool_types.h"
-#include "fusion_log.h"
+
+#include "cybertron/common/log.h"
 
 namespace apollo {
 namespace perception {
@@ -23,7 +24,7 @@ namespace fusion {
 // @brief call pool instance once to intialize memory
 __attribute__((constructor)) void FusionPoolInitialize() {
   TrackPool::Instance();
-  LOG_INFO << "Initialize FusionPool";
+  AINFO << "Initialize FusionPool";
 }
 
 }  // namespace fusion

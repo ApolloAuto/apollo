@@ -17,20 +17,20 @@
 
 #include <assert.h>
 
-#include "modules/perception/fusion/base/sensor.h"
-
 namespace apollo {
 namespace perception {
 namespace fusion {
 
 void SensorFrame::Initialize(const base::FrameConstPtr& frame_ptr,
-                             const SensorPtr& sensor_ptr) {
+                             const std::string& sensor_id,
+                             const base::SensorType& sensor_type) {
   timestamp_ = frame_ptr->timestamp;
   sensor2world_pose_ = frame_ptr->sensor2world_pose;
   lidar_frame_supplement_ = frame_ptr->lidar_frame_supplement;
   radar_frame_supplement_ = frame_ptr->radar_frame_supplement;
   camera_frame_supplement_ = frame_ptr->camera_frame_supplement;
-  sensor_ptr_ = sensor_ptr;
+  sensor_id_ = sensor_id;
+  sensor_type_ = sensor_type;
 
   const auto& base_objects = frame_ptr->objects;
   foreground_objects_.reserve(base_objects.size());
@@ -47,21 +47,11 @@ void SensorFrame::Initialize(const base::FrameConstPtr& frame_ptr,
 }
 
 std::string SensorFrame::GetSensorId() const {
-  if (!this->CheckSensorExist()) {
-    return std::string("");
-  }
-
-  SensorConstPtr sp = sensor_ptr_.lock();
-  return sp->GetSensorId();
+  return sensor_id_;
 }
 
 base::SensorType SensorFrame::GetSensorType() const {
-  if (!this->CheckSensorExist()) {
-    return base::SensorType::UNKNOWN_SENSOR_TYPE;
-  }
-
-  SensorConstPtr sp = sensor_ptr_.lock();
-  return sp->GetSensorType();
+  return sensor_type_;
 }
 
 }  // namespace fusion

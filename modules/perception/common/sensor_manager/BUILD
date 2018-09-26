@@ -20,7 +20,6 @@ cc_library(
         "//modules/perception/lib/config_manager:config_manager",
         "//modules/perception/lib/io:file_util",
         "//modules/perception/lib/thread:thread",
-        "//modules/perception/common:perception_gflags",
         "//modules/perception/proto:sensor_meta_schema_proto",
         "@yaml_cpp//:yaml",
     ],

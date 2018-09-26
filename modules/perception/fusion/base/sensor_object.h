@@ -17,7 +17,7 @@
 #define MODULES_PERCEPTION_FUSION_BASE_SENSOR_OBJECT_H_
 #include <memory>
 #include <string>
-#include "Eigen/Core"
+#include <Eigen/Core>
 
 #include "modules/perception/base/object.h"
 #include "modules/perception/base/sensor_meta.h"
@@ -31,7 +31,7 @@ class SensorObject {
  public:
   SensorObject() = delete;
 
-  SensorObject(const base::ObjectConstPtr& object_ptr,
+  SensorObject(const std::shared_ptr<const base::Object>& object_ptr,
                const SensorFramePtr& frame_ptr);
 
   // Getter
@@ -42,7 +42,8 @@ class SensorObject {
   std::string GetSensorId() const;
   base::SensorType GetSensorType() const;
 
-  inline base::ObjectConstPtr GetBaseObject() const { return object_; }
+  inline std::shared_ptr<const base::Object> GetBaseObject() const 
+      { return object_; }
 
   inline double GetInvisiblePeriod() const { return invisible_period_; }
 
@@ -55,7 +56,7 @@ class SensorObject {
   }
 
  private:
-  base::ObjectConstPtr object_;
+  std::shared_ptr<const base::Object> object_;
   double invisible_period_ = 0.0;
   std::weak_ptr<const SensorFrame> frame_ptr_;
 };
@@ -70,10 +71,10 @@ class FusedObject {
 
   inline double GetTimestamp() const { return object_->latest_tracked_time; }
 
-  inline base::ObjectPtr GetBaseObject() { return object_; }
+  inline std::shared_ptr<base::Object> GetBaseObject() { return object_; }
 
  private:
-  base::ObjectPtr object_;
+  std::shared_ptr<base::Object> object_;
 };
 
 typedef std::shared_ptr<FusedObject> FusedObjectPtr;

@@ -19,8 +19,6 @@
 #include <assert.h>
 #include <string>
 
-#include "modules/perception/lib/config_manager/config_manager.h"
-
 namespace apollo {
 namespace perception {
 namespace fusion {

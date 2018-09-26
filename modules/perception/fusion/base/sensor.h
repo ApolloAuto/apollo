@@ -13,8 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+
 #ifndef MODULES_PERCEPTION_FUSION_BASE_SENSOR_H_
 #define MODULES_PERCEPTION_FUSION_BASE_SENSOR_H_
+
 #include <deque>
 #include <memory>
 #include <string>

@@ -19,6 +19,7 @@
 #include <vector>
 
 #include "modules/perception/base/camera.h"
+#include "modules/perception/base/object.h"
 #include "modules/perception/common/geometry/common.h"
 #include "modules/perception/fusion/base/sensor_object.h"
 
@@ -29,7 +30,7 @@ namespace fusion {
 // @brief: get object eight vertices
 // @param [in]: object
 // @param [in/out]: vertices
-void GetObjectEightVertices(base::ObjectConstPtr obj,
+void GetObjectEightVertices(std::shared_ptr<const base::Object> obj,
                             std::vector<Eigen::Vector3d>* vertices);
 
 template <typename VectorType>
@@ -74,7 +75,8 @@ bool Pt3dToCamera2d(const Eigen::Vector3d& pt3d,
 // @param [in]: world2camera_pose
 // @param [in]: camera_model
 bool IsObjectEightVerticesAllBehindCamera(
-    base::ObjectConstPtr obj, const Eigen::Matrix4d& world2camera_pose,
+    std::shared_ptr<const base::Object> obj,
+    const Eigen::Matrix4d& world2camera_pose,
     base::BaseCameraModelPtr camera_model);
 
 // @brief: compute the ratio of object in camera view

@@ -13,12 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+
 #ifndef MODULES_PERCEPTION_FUSION_BASE_SENSOR_FRAME_H_
 #define MODULES_PERCEPTION_FUSION_BASE_SENSOR_FRAME_H_
+
 #include <memory>
 #include <string>
 #include <vector>
-#include "Eigen/Core"
+#include <Eigen/Core>
 
 #include "modules/perception/base/frame.h"
 #include "modules/perception/fusion/base/base_forward_declaration.h"
@@ -34,7 +36,8 @@ class SensorFrame : public std::enable_shared_from_this<SensorFrame> {
 
   // Unable to be called in constructor due to weak_ptr initialization
   void Initialize(const base::FrameConstPtr& base_frame_ptr,
-                  const SensorPtr& sensor_ptr);
+                  const std::string& sensor_id,
+                  const base::SensorType& sensor_type);
 
   // Getter
   inline double GetTimestamp() const { return timestamp_; }
@@ -68,11 +71,6 @@ class SensorFrame : public std::enable_shared_from_this<SensorFrame> {
  private:
   inline SensorFramePtr GetPtr() { return shared_from_this(); }
 
-  inline bool CheckSensorExist() const {
-    bool expired = sensor_ptr_.expired();
-    return !expired;
-  }
-
  private:
   double timestamp_ = 0.0;
   Eigen::Affine3d sensor2world_pose_;
@@ -85,7 +83,8 @@ class SensorFrame : public std::enable_shared_from_this<SensorFrame> {
   base::RadarFrameSupplement radar_frame_supplement_;
   base::CameraFrameSupplement camera_frame_supplement_;
 
-  std::weak_ptr<const Sensor> sensor_ptr_;
+  std::string sensor_id_;
+  base::SensorType sensor_type_;
 };
 
 }  // namespace fusion

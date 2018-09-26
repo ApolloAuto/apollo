@@ -14,6 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/perception/fusion/base/track.h"
+
 #include <cstdint>
 #include <iostream>
 #include <sstream>
@@ -33,8 +34,10 @@ bool Track::Initialize(SensorObjectPtr obj, bool is_background) {
   Reset();
   track_id_ = GenerateNewTrackId();
   is_background_ = is_background;
-  base::ObjectPtr fused_base_obj = fused_object_->GetBaseObject();
-  base::ObjectConstPtr sensor_base_obj = obj->GetBaseObject();
+  std::shared_ptr<base::Object> fused_base_obj
+      = fused_object_->GetBaseObject();
+  std::shared_ptr<const base::Object> sensor_base_obj
+      = obj->GetBaseObject();
   *fused_base_obj = *sensor_base_obj;
   UpdateWithSensorObject(obj);
   return true;
@@ -210,9 +213,9 @@ void Track::UpdateSensorObjectWithMeasurement(SensorId2ObjectMap* objects,
 }
 
 void Track::UpdateSupplementState(const SensorObjectPtr& src_object) {
-  base::ObjectPtr dst_obj = fused_object_->GetBaseObject();
+  std::shared_ptr<base::Object> dst_obj = fused_object_->GetBaseObject();
   if (src_object != nullptr) {
-    base::ObjectConstPtr src_obj = src_object->GetBaseObject();
+    std::shared_ptr<const base::Object> src_obj = src_object->GetBaseObject();
     if (IsLidar(src_object)) {
       dst_obj->lidar_supplement = src_obj->lidar_supplement;
     } else if (IsRadar(src_object)) {
@@ -234,8 +237,8 @@ void Track::UpdateSupplementState(const SensorObjectPtr& src_object) {
 }
 
 void Track::UpdateUnfusedState(const SensorObjectPtr& src_object) {
-  base::ObjectPtr dst_obj = fused_object_->GetBaseObject();
-  base::ObjectConstPtr src_obj = src_object->GetBaseObject();
+  std::shared_ptr<base::Object> dst_obj = fused_object_->GetBaseObject();
+  std::shared_ptr<const base::Object> src_obj = src_object->GetBaseObject();
   if (IsLidar(src_object)) {
     dst_obj->confidence = src_obj->confidence;
     dst_obj->velocity_converged = src_obj->velocity_converged;
@@ -279,8 +282,10 @@ bool Track::IsCameraVisible() const {
 }
 
 void Track::UpdateWithSensorObjectForBackground(const SensorObjectPtr& obj) {
-  base::ObjectPtr fused_base_object = fused_object_->GetBaseObject();
-  base::ObjectConstPtr measurement_base_object = obj->GetBaseObject();
+  std::shared_ptr<base::Object> fused_base_object
+      = fused_object_->GetBaseObject();
+  std::shared_ptr<const base::Object> measurement_base_object
+      = obj->GetBaseObject();
   *fused_base_object = *measurement_base_object;
 }
 
