@@ -182,8 +182,8 @@ bool FusionComponent::InternalProc(
   const double cur_time = lib::TimeUtil::GetCurrentTime();
   const double latency = (cur_time - timestamp) * 1e3;
   AINFO << "FRAME_STATISTICS:Obstacle:End:msg_time["
-        << GLOG_TIMESTAMP(timestamp) << "]:cur_time["
-        << GLOG_TIMESTAMP(cur_time) << "]:cur_latency[" << latency
+        << std::to_string(timestamp) << "]:cur_time["
+        << std::to_string(cur_time) << "]:cur_latency[" << latency
         << "]:obj_cnt[" << valid_objects.size() << "]";
   AINFO << "publish_number: " << valid_objects.size() << " obj";
   return true;
