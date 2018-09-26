@@ -23,18 +23,16 @@
 namespace apollo {
 namespace planning {
 
-HybridAStar::HybridAStar(double sx, double sy, double sphi, double ex,
-                         double ey, double ephi,
-                         std::vector<const Obstacle*> obstacles) {
+HybridAStar::HybridAStar() {
   CHECK(common::util::GetProtoFromFile(FLAGS_open_space_config_filename,
                                        &open_space_conf_))
       << "Failed to load open space planner config file "
       << FLAGS_open_space_config_filename;
-  start_node_.reset(new Node3d(sx, sy, sphi, open_space_conf_));
-  end_node_.reset(new Node3d(ex, ey, ephi, open_space_conf_));
-  obstacles_ = obstacles;
   reed_shepp_generator_.reset(new ReedShepp(vehicle_param_, open_space_conf_));
   next_node_num_ = open_space_conf_.next_node_num();
+  max_steer_ = open_space_conf_.max_steering();
+  step_size_ = open_space_conf_.step_size();
+  xy_grid_resolution_ = open_space_conf_.xy_grid_resolution();
 }
 
 bool HybridAStar::AnalyticExpansion(std::shared_ptr<Node3d> current_node,
@@ -73,21 +71,92 @@ bool HybridAStar::ValidityCheck(Node3d& node) {
 
 void HybridAStar::LoadRSPinCS(const ReedSheppPath* reeds_shepp_to_end,
                               std::shared_ptr<Node3d> current_node) {
-  std::shared_ptr<Node3d> last_node = current_node;
-  for (std::size_t i = 1; i < reeds_shepp_to_end->x.size(); i++) {
-    std::shared_ptr<Node3d> node = std::shared_ptr<Node3d>(
-        new Node3d(reeds_shepp_to_end->x[i], reeds_shepp_to_end->y[i],
-                   reeds_shepp_to_end->phi[i], open_space_conf_));
-    node->SetPre(last_node);
-    last_node = node;
-    close_set_.insert(std::make_pair(node->GetIndex(), node));
-  }
+  std::shared_ptr<Node3d> end_node = std::shared_ptr<Node3d>(new Node3d(
+      reeds_shepp_to_end->x.back(), reeds_shepp_to_end->y.back(),
+      reeds_shepp_to_end->phi.back(), reeds_shepp_to_end->x,
+      reeds_shepp_to_end->y, reeds_shepp_to_end->phi, open_space_conf_));
+  end_node->SetPre(current_node);
+  close_set_.insert(std::make_pair(end_node->GetIndex(), end_node));
 }
 
-bool HybridAStar::Plan() {
+std::shared_ptr<Node3d> HybridAStar::Next_node_generator(
+    std::shared_ptr<Node3d> current_node, std::size_t next_node_index) {
+  double steering = 0.0;
+  double index = 0.0;
+  double traveled_distance = 0.0;
+  if (next_node_index > next_node_num_ / 2 - 1) {
+    steering = -max_steer_ +
+               (2 * max_steer_ / (next_node_num_ / 2 - 1)) * next_node_index;
+    traveled_distance = 1 * step_size_;
+  } else {
+    index = next_node_index - next_node_num_ / 2;
+    steering =
+        -max_steer_ + (2 * max_steer_ / (next_node_num_ / 2 - 1)) * index;
+    traveled_distance = -1 * step_size_;
+  }
+  // take above motion primitive to generate a curve driving the car to a
+  // different grid
+  double arc = std::sqrt(2) * xy_grid_resolution_;
+  std::vector<double> intermediate_x;
+  std::vector<double> intermediate_y;
+  std::vector<double> intermediate_phi;
+  double last_x = current_node->GetX();
+  double last_y = current_node->GetY();
+  double last_phi = current_node->GetPhi();
+  intermediate_x.emplace_back(last_x);
+  intermediate_y.emplace_back(last_y);
+  intermediate_phi.emplace_back(last_phi);
+  for (std::size_t i = 0; i < arc / step_size_; i++) {
+    double next_x = last_x + traveled_distance * std::cos(last_phi);
+    double next_y = last_y + traveled_distance * std::sin(last_phi);
+    double next_phi = common::math::NormalizeAngle(
+        last_phi +
+        traveled_distance / vehicle_param_.wheel_base() * std::tan(steering));
+    intermediate_x.emplace_back(next_x);
+    intermediate_y.emplace_back(next_y);
+    intermediate_phi.emplace_back(next_phi);
+    last_x = next_x;
+    last_y = next_y;
+    last_phi = next_phi;
+  }
+  std::shared_ptr<Node3d> next_node = std::shared_ptr<Node3d>(
+      new Node3d(last_x, last_y, last_phi, intermediate_x, intermediate_y,
+                 intermediate_phi, open_space_conf_));
+  next_node->SetPre(current_node);
+  next_node->SetDirec(traveled_distance>0);
+  return next_node;
+}
+
+bool CalculateCost(std::shared_ptr<Node3d> current_node, std::shared_ptr<Node3d> next_node) {
+  //evaluate cost on the trajectory and add current cost
+  //evaluate heuristic cost
+  return true;
+}
+
+double NonHoloNoObstacleHeuristic() {
+  return 0.0;
+}
+
+
+bool HybridAStar::Plan(double sx, double sy, double sphi, double ex, double ey,
+                       double ephi, std::vector<const Obstacle*> obstacles) {
+  // load nodes and obstacles
+  std::vector<double> sx_vec{sx};
+  std::vector<double> sy_vec{sy};
+  std::vector<double> sphi_vec{sphi};
+  std::vector<double> ex_vec{ex};
+  std::vector<double> ey_vec{ey};
+  std::vector<double> ephi_vec{ephi};
+  start_node_.reset(
+      new Node3d(sx, sy, sphi, sx_vec, sy_vec, sphi_vec, open_space_conf_));
+  end_node_.reset(
+      new Node3d(ex, ey, ephi, ex_vec, ey_vec, ephi_vec, open_space_conf_));
+  obstacles_ = obstacles;
+  // load open set and priority queue
   open_set_.insert(std::make_pair(start_node_->GetIndex(), start_node_));
   open_pq_.push(
       std::make_pair(start_node_->GetIndex(), start_node_->GetCost()));
+  // Hybrid A* begins
   while (!open_pq_.empty()) {
     // take out the lowest cost neighoring node
     std::size_t current_id = open_pq_.top().first;
@@ -103,7 +172,7 @@ bool HybridAStar::Plan() {
       break;
     }
     for (std::size_t i = 0; i < next_node_num_; i++) {
-      std::shared_ptr<Node3d> next_node = Next_node_generator(i);
+      std::shared_ptr<Node3d> next_node = Next_node_generator(current_node, i);
       // boundary and validity check
       if (!ValidityCheck(*next_node)) {
         continue;
@@ -114,12 +183,13 @@ bool HybridAStar::Plan() {
       }
 
       if (open_set_.find(next_node->GetIndex()) == open_set_.end()) {
-        open_set_.insert(std::make_pair(next_node->GetIndex(), next_node));
         // TODO: only calculate cost here
+
+        open_set_.insert(std::make_pair(next_node->GetIndex(), next_node));
         open_pq_.push(
             std::make_pair(next_node->GetIndex(), next_node->GetCost()));
       } else {
-        // reintial the cost for rewiring
+        // reinitial the cost for rewiring
       }
     }
   }

@@ -21,15 +21,14 @@
 #ifndef MODULES_PLANNING_OPEN_SPACE_NODE3D_H_
 #define MODULES_PLANNING_OPEN_SPACE_NODE3D_H_
 
+#include <math.h>
 #include <memory>
 #include <vector>
-#include <math.h>
 
 #include "modules/common/math/box2d.h"
 #include "modules/planning/common/obstacle.h"
 #include "modules/planning/constraint_checker/collision_checker.h"
 #include "modules/planning/proto/planner_open_space_config.pb.h"
-
 
 namespace apollo {
 namespace planning {
@@ -42,9 +41,14 @@ class Node3d {
   explicit Node3d(double x, double y, double phi,
                   const PlannerOpenSpaceConfig& open_space_conf);
   explicit Node3d(double x, double y, double phi);
+  explicit Node3d(double x, double y, double phi,
+                  std::vector<double> traversed_x_,
+                  std::vector<double> traversed_y_,
+                  std::vector<double> traversed_phi_,
+                  const PlannerOpenSpaceConfig& open_space_conf);
   virtual ~Node3d() = default;
   Box2d GetBoundingBox(const common::VehicleParam& vehicle_param_);
-  double GetCost() { return current_cost_ + heuristic_cost_; };
+  double GetCost() { return traj_cost_ + heuristic_cost_; };
   std::size_t GetGridX() { return x_grid_; };
   std::size_t GetGridY() { return y_grid_; };
   std::size_t GetGridPhi() { return phi_grid_; };
@@ -52,18 +56,22 @@ class Node3d {
   double GetY() { return y_; };
   double GetPhi() { return phi_; };
   bool operator==(const std::shared_ptr<Node3d> right) const;
-  std::size_t GetIndex() {return index_;};
-  void SetPre(std::shared_ptr<Node3d> pre_node){pre_node_ = pre_node;};
+  std::size_t GetIndex() { return index_; };
+  void SetPre(std::shared_ptr<Node3d> pre_node) { pre_node_ = pre_node; };
+  void SetDirec(bool direction) {direction_ = direction;};
 
  private:
   double x_ = 0.0;
   double y_ = 0.0;
   double phi_ = 0.0;
+  std::vector<double> traversed_x_;
+  std::vector<double> traversed_y_;
+  std::vector<double> traversed_phi_;
   std::size_t x_grid_ = 0;
   std::size_t y_grid_ = 0;
   std::size_t phi_grid_ = 0;
   std::size_t index_ = 0;
-  double current_cost_ = 0.0;
+  double traj_cost_ = 0.0;
   double heuristic_cost_ = 0.0;
   double cost_ = 0.0;
   std::shared_ptr<Node3d> pre_node_ = nullptr;

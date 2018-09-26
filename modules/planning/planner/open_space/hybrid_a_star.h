@@ -31,11 +31,12 @@
 
 #include "cybertron/common/log.h"
 #include "cybertron/common/macros.h"
+#include "modules/common/math/math_utils.h"
 #include "modules/common/configs/proto/vehicle_config.pb.h"
 #include "modules/common/configs/vehicle_config_helper.h"
-#include "modules/planning/constraint_checker/collision_checker.h"
 #include "modules/planning/common/obstacle.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/constraint_checker/collision_checker.h"
 #include "modules/planning/proto/planner_open_space_config.pb.h"
 
 namespace apollo {
@@ -51,10 +52,10 @@ struct Result {
 
 class HybridAStar {
  public:
-  explicit HybridAStar(double sx, double sy, double sphi, double ex, double ey,
-                       double ephi, std::vector<const Obstacle*> obstacles);
+  explicit HybridAStar();
   virtual ~HybridAStar() = default;
-  bool Plan();
+  bool Plan(double sx, double sy, double sphi, double ex, double ey,
+                       double ephi, std::vector<const Obstacle*> obstacles);
 
  private:
   // not complete
@@ -69,8 +70,9 @@ class HybridAStar {
   // load the whole RSP as nodes and add to the close set
   void LoadRSPinCS(const ReedSheppPath* reeds_shepp_to_end,
                    std::shared_ptr<Node3d> current_node);
-  std::shared_ptr<Node3d> Next_node_generator(std::size_t next_node_index);
-  double Cost();
+  std::shared_ptr<Node3d> Next_node_generator(
+      std::shared_ptr<Node3d> current_node, std::size_t next_node_index);
+  bool CalculateCost(std::shared_ptr<Node3d> current_node, std::shared_ptr<Node3d> next_node);
   double HeuristicCost();
   double HoloObstacleHeuristic();
   double NonHoloNoObstacleHeuristic();
@@ -82,6 +84,9 @@ class HybridAStar {
   common::VehicleParam vehicle_param_ =
       common::VehicleConfigHelper::GetConfig().vehicle_param();
   std::size_t next_node_num_ = 0;
+  double max_steer_ = 0.0;
+  double step_size_ = 0.0;
+  double xy_grid_resolution_ = 0.0;
   std::vector<const Obstacle*> obstacles_;
   std::shared_ptr<Node3d> start_node_;
   std::shared_ptr<Node3d> end_node_;
