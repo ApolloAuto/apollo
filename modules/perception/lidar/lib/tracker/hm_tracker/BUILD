@@ -68,4 +68,19 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "gnn_bipartite_graph_matcher",
+    srcs = [
+        "gnn_bipartite_graph_matcher.cc",
+    ],
+    hdrs = [
+        "gnn_bipartite_graph_matcher.h",
+    ],
+    deps = [
+        "//modules/perception/common/graph:secure_matrix",
+        "//modules/perception/lidar/lib/interface:base_bipartite_graph_matcher",
+        "//framework:cybertron",
+    ],
+)
+
 cpplint()

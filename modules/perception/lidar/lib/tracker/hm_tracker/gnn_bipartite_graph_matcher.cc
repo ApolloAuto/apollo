@@ -14,9 +14,12 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/perception/lidar/lib/tracker/hm_tracker/gnn_bipartite_graph_matcher.h"
+
 #include <algorithm>
 #include <iostream>
 #include <vector>
+#include <utility>
+
 #include "cybertron/common/log.h"
 
 namespace apollo {
