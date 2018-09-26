@@ -15,12 +15,14 @@
  *****************************************************************************/
 #ifndef MODULES_PERCEPTION_LIDAR_LIB_CLASSIFIER_FUSED_CLASSIFIER_UTIL_H_
 #define MODULES_PERCEPTION_LIDAR_LIB_CLASSIFIER_FUSED_CLASSIFIER_UTIL_H_
-#include <Eigen/Dense>
+
 #include <fstream>
-#include <iostream>
 #include <map>
 #include <string>
 #include <vector>
+
+#include "Eigen/Dense"
+
 #include "modules/perception/base/object_types.h"
 
 namespace apollo {
