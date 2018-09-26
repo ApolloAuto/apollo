@@ -15,9 +15,11 @@
  *****************************************************************************/
 #ifndef MODULES_PERCEPTION_FUSION_BASE_SENSOR_OBJECT_H_
 #define MODULES_PERCEPTION_FUSION_BASE_SENSOR_OBJECT_H_
+
 #include <memory>
 #include <string>
-#include <Eigen/Core>
+
+#include "Eigen/Core"
 
 #include "modules/perception/base/object.h"
 #include "modules/perception/base/sensor_meta.h"
@@ -42,8 +44,9 @@ class SensorObject {
   std::string GetSensorId() const;
   base::SensorType GetSensorType() const;
 
-  inline std::shared_ptr<const base::Object> GetBaseObject() const 
-      { return object_; }
+  inline std::shared_ptr<const base::Object> GetBaseObject() const {
+    return object_;
+  }
 
   inline double GetInvisiblePeriod() const { return invisible_period_; }
 
