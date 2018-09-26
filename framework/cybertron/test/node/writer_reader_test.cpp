@@ -162,6 +162,7 @@ TEST(WriterReaderTest, observe) {
   attr.set_channel_name("channel");
   auto channel_id = common::GlobalData::RegisterChannel(attr.channel_name());
   attr.set_channel_id(channel_id);
+  attr.mutable_qos_profile()->set_depth(10);
 
   Reader<proto::UnitTest> reader(attr);
   reader.Init();

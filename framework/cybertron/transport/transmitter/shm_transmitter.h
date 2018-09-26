@@ -75,7 +75,7 @@ ShmTransmitter<M>::ShmTransmitter(const RoleAttributes& attr)
       channel_id_(attr.channel_id()),
       sfd_(-1),
       locator_(nullptr) {
-  host_id_ = common::Hash(attr.host_name());
+  host_id_ = common::Hash(attr.host_ip());
   memset(&mcast_addr_, 0, sizeof(mcast_addr_));
   locator_ = std::make_shared<proto::ShmMulticastLocator>();
 }

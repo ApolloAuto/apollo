@@ -63,6 +63,7 @@ class NodeChannelImpl {
   explicit NodeChannelImpl(const std::string& node_name)
       : is_reality_mode_(true), node_name_(node_name) {
     node_attr_.set_host_name(common::GlobalData::Instance()->HostName());
+    node_attr_.set_host_ip(common::GlobalData::Instance()->HostIp());
     node_attr_.set_process_id(common::GlobalData::Instance()->ProcessId());
     node_attr_.set_node_name(node_name);
     uint64_t node_id = common::GlobalData::RegisterNode(node_name);
@@ -202,6 +203,7 @@ auto NodeChannelImpl::CreateReader(const proto::RoleAttributes& role_attr)
 template <typename MessageT>
 void NodeChannelImpl::FillInAttr(proto::RoleAttributes* attr) {
   attr->set_host_name(node_attr_.host_name());
+  attr->set_host_ip(node_attr_.host_ip());
   attr->set_process_id(node_attr_.process_id());
   attr->set_node_name(node_attr_.node_name());
   attr->set_node_id(node_attr_.node_id());

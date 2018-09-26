@@ -293,7 +293,7 @@ Relation HybridTransmitter<M>::GetRelation(
   if (opposite_attr.channel_name() != this->attr_.channel_name()) {
     return NO_RELATION;
   }
-  if (opposite_attr.host_name() != this->attr_.host_name()) {
+  if (opposite_attr.host_ip() != this->attr_.host_ip()) {
     return DIFF_HOST;
   }
   if (opposite_attr.process_id() != this->attr_.process_id()) {

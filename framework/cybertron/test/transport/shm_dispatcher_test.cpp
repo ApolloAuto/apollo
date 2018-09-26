@@ -60,6 +60,7 @@ TEST(ShmDispatcherTest, on_message) {
 
   RoleAttributes oppo_attr;
   oppo_attr.set_host_name(common::GlobalData::Instance()->HostName());
+  oppo_attr.set_host_ip(common::GlobalData::Instance()->HostIp());
   oppo_attr.set_channel_name("on_message");
   oppo_attr.set_channel_id(common::Hash("on_message"));
   Identity oppo_id;
