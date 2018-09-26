@@ -71,4 +71,32 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "recognition_component",
+    srcs = [
+        "recognition_component.cc",
+    ],
+    hdrs = [
+        "recognition_component.h",
+    ],
+    deps = [
+        ":lidar_common_flags",
+        ":lidar_inner_component_messages",
+        "@eigen",
+        "//framework:cybertron",
+        "//modules/common/proto:error_code_proto",
+        "//modules/common/proto:geometry_proto",
+        "//modules/common/proto:header_proto",
+        "//modules/map/proto:map_proto",
+        "//modules/perception/base",
+        "//modules/perception/common/sensor_manager",
+        "//modules/perception/lib/utils",
+        "//modules/perception/lidar/app",
+        "//modules/perception/lidar/common",
+        "//modules/perception/lidar/lib/interface",
+        "//modules/perception/onboard/inner_component_messages",
+        "//modules/perception/proto:perception_proto",
+    ],
+)
+
 cpplint()
