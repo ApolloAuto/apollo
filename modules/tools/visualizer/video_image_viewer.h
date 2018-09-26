@@ -14,18 +14,17 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef TOOLS_CVT_VISUALIZER_VIDEOIMGVIEWER_H_
-#define TOOLS_CVT_VISUALIZER_VIDEOIMGVIEWER_H_
+#ifndef MODULES_TOOLS_VISUALIZER_VIDEOIMGVIEWER_H_
+#define MODULES_TOOLS_VISUALIZER_VIDEOIMGVIEWER_H_
+
+#include "modules/tools/visualizer/free_camera.h"
+#include "modules/tools/visualizer/plane.h"
+#include "modules/tools/visualizer/renderable_object.h"
+#include "modules/tools/visualizer/target_camera.h"
 
 #include <memory>
-
 #include <QOpenGLFunctions>
 #include <QOpenGLWidget>
-
-#include "free_camera.h"
-#include "plane.h"
-#include "renderable_object.h"
-#include "target_camera.h"
 
 class Texture;
 class FixedAspectRatioWidget;

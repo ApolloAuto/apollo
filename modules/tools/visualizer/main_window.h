@@ -14,20 +14,19 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef TOOLS_CVT_VISUALIZER_MAINWINDOW_H_
-#define TOOLS_CVT_VISUALIZER_MAINWINDOW_H_
+#ifndef MODULES_TOOLS_VISUALIZER_MAINWINDOW_H_
+#define MODULES_TOOLS_VISUALIZER_MAINWINDOW_H_
 
-#include "channel_reader.h"
-#include "msg_dialog.h"
+#include "modules/tools/visualizer/channel_reader.h"
+#include "modules/tools/visualizer/msg_dialog.h"
+#include "modules/drivers/proto/sensor_image.pb.h"
+#include "modules/drivers/proto/pointcloud.pb.h"
+#include "modules/drivers/proto/radar.pb.h"
 
 #include <QMainWindow>
 #include <QMenu>
 #include <QMutex>
 #include <QPixmap>
-
-#include "modules/drivers/proto/sensor_image.pb.h"
-#include "modules/drivers/proto/pointcloud.pb.h"
-#include "modules/drivers/proto/radar.pb.h"
 #include <memory>
 
 class FixedAspectRatioWidget;
@@ -132,4 +131,4 @@ class MainWindow : public QMainWindow {
   QList<VideoImgProxy*> closed_video_image_viewer_list_;
 };
 
-#endif  // TOOLS_CVT_VISUALIZER_MAINWINDOW_H_
+#endif  // MODULES_TOOLS_VISUALIZER_MAINWINDOW_H_

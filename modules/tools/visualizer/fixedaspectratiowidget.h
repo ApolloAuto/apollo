@@ -14,12 +14,12 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef TOOLS_CVT_VISUALIZER_FIXEDASPECTRATIOWIDGET_H_
-#define TOOLS_CVT_VISUALIZER_FIXEDASPECTRATIOWIDGET_H_
+#ifndef MODULES_TOOLS_VISUALIZER_FIXEDASPECTRATIOWIDGET_H_
+#define MODULES_TOOLS_VISUALIZER_FIXEDASPECTRATIOWIDGET_H_
 
+#include "modules/tools/visualizer/video_image_viewer.h"
 #include <QTimer>
 #include <QWidget>
-#include "video_image_viewer.h"
 
 class FixedAspectRatioWidget : public QWidget {
   Q_OBJECT
@@ -51,4 +51,4 @@ class FixedAspectRatioWidget : public QWidget {
   VideoImgViewer viewer_;
 };
 
-#endif  // TOOLS_CVT_VISUALIZER_FIXEDASPECTRATIOWIDGET_H_
+#endif  // MODULES_TOOLS_VISUALIZER_FIXEDASPECTRATIOWIDGET_H_

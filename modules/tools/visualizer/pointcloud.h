@@ -14,11 +14,11 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef TOOLS_CVT_VISUALIZER_POINTCLOUD_H_
-#define TOOLS_CVT_VISUALIZER_POINTCLOUD_H_
+#ifndef MODULES_TOOLS_VISUALIZER_POINTCLOUD_H_
+#define MODULES_TOOLS_VISUALIZER_POINTCLOUD_H_
 
 #include "modules/drivers/proto/pointcloud.pb.h"
-#include "renderable_object.h"
+#include "modules/tools/visualizer/renderable_object.h"
 
 class QOpenGLShaderProgram;
 
@@ -40,4 +40,4 @@ class PointCloud : public RenderableObject {
   GLfloat* buffer_;
 };
 
-#endif  // TOOLS_CVT_VISUALIZER_POINTCLOUD_H_
+#endif  // MODULES_TOOLS_VISUALIZER_POINTCLOUD_H_

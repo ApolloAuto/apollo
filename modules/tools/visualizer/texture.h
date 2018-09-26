@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef TOOLS_CVT_VISUALIZER_TEXTURE_H_
-#define TOOLS_CVT_VISUALIZER_TEXTURE_H_
+#ifndef MODULES_TOOLS_VISUALIZER_TEXTURE_H_
+#define MODULES_TOOLS_VISUALIZER_TEXTURE_H_
 
 #include "modules/drivers/proto/sensor_image.pb.h"
 #include <QImage>
@@ -59,4 +59,4 @@ class Texture {
   GLubyte* data_;
 };
 
-#endif  // TOOLS_CVT_VISUALIZER_TEXTURE_H_
+#endif  // MODULES_TOOLS_VISUALIZER_TEXTURE_H_

@@ -14,14 +14,14 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "video_image_viewer.h"
+#include "modules/tools/visualizer/video_image_viewer.h"
+#include "modules/tools/visualizer/video_image_viewer.h"
+#include "modules/tools/visualizer/texture.h"
 #include <QContextMenuEvent>
 #include <QMenu>
 #include <QMouseEvent>
 #include <QTimer>
 #include <iostream>
-#include "texture.h"
-#include "video_image_viewer.h"
 
 VideoImgViewer::VideoImgViewer(QWidget* parent)
     : QOpenGLWidget(parent),
@@ -55,7 +55,7 @@ void VideoImgViewer::initializeGL() {
   glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
   QImage noImage;
-  if (!noImage.load(tr(":/no_image.png"))) {
+  if (!noImage.load(tr(":/images/no_image.png"))) {
     std::cout << "--------can not load the default texture------------"
               << std::endl;
     return;
@@ -69,7 +69,7 @@ void VideoImgViewer::initializeGL() {
   }
 
   video_image_shader_prog_ = RenderableObject::CreateShaderProgram(
-      tr(":/video_image_plane.vert"), tr(":/video_image_plane.frag"));
+      tr(":/shaders/video_image_plane.vert"), tr(":/shaders/video_image_plane.frag"));
   if (video_image_shader_prog_ == nullptr) {
     return;
   }

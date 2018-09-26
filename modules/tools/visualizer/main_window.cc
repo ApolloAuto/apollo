@@ -30,19 +30,18 @@
 
 #include <iostream>
 
-#include "fixedaspectratiowidget.h"
-#include "grid.h"
-#include "main_window.h"
-#include "pointcloud.h"
-#include "texture.h"
-//#include "radarpoints.h"
-#include "ui_main_window.h"
-#include "video_images_dialog.h"
+#include "modules/tools/visualizer/fixedaspectratiowidget.h"
+#include "modules/tools/visualizer/grid.h"
+#include "modules/tools/visualizer/main_window.h"
+#include "modules/tools/visualizer/pointcloud.h"
+#include "modules/tools/visualizer/texture.h"
+#include "modules/tools/visualizer/video_images_dialog.h"
+#include "modules/tools/visualizer/ui_main_window.h"
 
 namespace {
 const char* globalTreeItemStyle = "margin-right:10px";
 
-constexpr char* aboutMessage =
+const char* aboutMessage =
     "Cyber_Visualizer\n"
     "\n"
     "One Visualization Tool for Presenting Cybertron Channel Data\n"
@@ -66,9 +65,15 @@ const char* licenseMessage =
     "WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n"
     "See the License for the specific language governing permissions and\n"
     "limitations under the License.\n";
+
+const char* pcTempObjGroupName = "pointcloud";
+const char* pcVertexPath = ":/shaders/pointcloud.vert";
+const char* pcFragPath = ":/shaders/pointcloud.frag";
+const char* gridVertexPath = ":/shaders/grid.vert";
+const char* gridFragPath = ":/shaders/grid.frag";
 }
 
-#define MEMBER_OFFSET(StructType, Member) (size_t) & (((StructType*)0)->Member)
+#define MEMBER_OFFSET(StructType, Member) (size_t)((char*)(& (((StructType*)1)->Member) - 1))
 #define StructPtrByMemberPtr(MemberPtr, StructType, Member) \
   (StructType*)((char*)MemberPtr - MEMBER_OFFSET(StructType, Member))
 
@@ -276,8 +281,8 @@ void MainWindow::EnableGrid(bool b) { grid_->set_is_renderable(b); }
 
 void MainWindow::ActionAddGrid(void) {
   if (grid_shader_ == nullptr) {
-    grid_shader_ = RenderableObject::CreateShaderProgram(tr(":/grid.vert"),
-                                                         tr(":/grid.frag"));
+    grid_shader_ = RenderableObject::CreateShaderProgram(tr(gridVertexPath),
+                                                         tr(gridFragPath));
     if (grid_shader_ != nullptr) {
       ui_->sceneWidget->AddNewShaderProg("grid", grid_shader_);
     }
@@ -415,7 +420,7 @@ void MainWindow::openRadarChannel(bool b){
 void MainWindow::ActionOpenPointCloud(void) {
   if (pointcloud_shader_ == nullptr) {
     pointcloud_shader_ = RenderableObject::CreateShaderProgram(
-        tr(":/pointcloud.vert"), tr(":/pointcloud.frag"));
+        tr(pcVertexPath), tr(pcFragPath));
     if (pointcloud_shader_ != nullptr) {
       ui_->sceneWidget->AddNewShaderProg("pointcloud", pointcloud_shader_);
     } else {
@@ -609,7 +614,7 @@ void MainWindow::PointCloudReaderCallback(
   pointcloud_reader_mutex_.unlock();
   PointCloud* pc = new PointCloud(pdata->point_size(), 4, pointcloud_shader_);
   if (pc) {
-    if (!pc->FillData(pdata) || !ui_->sceneWidget->AddTempRenderableObj("pointcloud", pc)) {
+    if (!pc->FillData(pdata) || !ui_->sceneWidget->AddTempRenderableObj(pcTempObjGroupName, pc)) {
       delete pc;
     }
   } else {

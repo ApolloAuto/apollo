@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "plane.h"
+#include "modules/tools/visualizer/plane.h"
 
 std::shared_ptr<Texture> Plane::NullTextureObj;
 
