@@ -43,7 +43,7 @@ message Config {
   required uint32 trigger_fps = 22 [default = 30];
   optional string channel_name = 23 [default = ""];
   // wait time when camera select timeout
-  optional float device_wait = 24 [default = 2.0];
+  optional uint32 device_wait_ms = 24 [default = 2000];
   // camera select spin time
   optional float spin_rate = 25 [default = 0.005];
   required OutputType output_type = 26;

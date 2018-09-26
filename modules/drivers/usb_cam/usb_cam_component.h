@@ -48,7 +48,7 @@ class UsbCamComponent : public Component<> {
   CameraImagePtr raw_image_ = nullptr;
   std::shared_ptr<Image> pb_image_ = nullptr;
   float spin_rate_ = 0.005;
-  float device_wait_ = 2.0;
+  uint32_t device_wait_ = 2000;
 };
 
 CYBERTRON_REGISTER_COMPONENT(UsbCamComponent)
