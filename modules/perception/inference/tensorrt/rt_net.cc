@@ -17,9 +17,11 @@
 #include "modules/perception/inference/tensorrt/rt_net.h"
 
 #include <NvInferPlugin.h>
+#include <algorithm>
 #include <iostream>
 #include <map>
 #include <set>
+#include <utility>
 #include <vector>
 
 #include "cybertron/common/log.h"
@@ -464,10 +466,10 @@ bool RTNet::loadWeights(const std::string &model_file, WeightMap *weight_map) {
     for (int j = 0; j < net.layer(i).blobs_size(); j++) {
       // val memory will be released when deconstructor is called
       auto blob = &(net.layer(i).blobs(j));
-      CHECK(blob->double_data_size() == 0);
-      CHECK(blob->double_diff_size() == 0);
-      CHECK(blob->diff_size() == 0);
-      CHECK(blob->data_size() != 0);
+      CHECK_EQ(blob->double_data_size(), 0);
+      CHECK_EQ(blob->double_diff_size(), 0);
+      CHECK_EQ(blob->diff_size(), 0);
+      CHECK_NE(blob->data_size(), 0);
       if (net.layer(i).type() == "BatchNorm") {
         mergeBN(j, net.mutable_layer(i));
       }
@@ -480,10 +482,10 @@ bool RTNet::loadWeights(const std::string &model_file, WeightMap *weight_map) {
 }
 void RTNet::mergeBN(int index, LayerParameter *layer_param) {
   auto blob = (layer_param->mutable_blobs(index));
-  CHECK(blob->double_data_size() == 0);
-  CHECK(blob->double_diff_size() == 0);
-  CHECK(blob->diff_size() == 0);
-  CHECK(blob->data_size() != 0);
+  CHECK_EQ(blob->double_data_size(), 0);
+  CHECK_EQ(blob->double_diff_size(), 0);
+  CHECK_EQ(blob->diff_size(), 0);
+  CHECK_NE(blob->data_size(), 0);
   int size = blob->data_size();
 
   auto scale = (layer_param->blobs(2));
@@ -568,7 +570,7 @@ bool RTNet::shape(const std::string &name, std::vector<int> *res) {
     return false;
   }
   int bindingIndex = engine->getBindingIndex(tensor_modify_map_[name].c_str());
-  if (bindingIndex > (int)buffers_.size()) {
+  if (bindingIndex > static_cast<int>(buffers_.size())) {
     return false;
   }
   nvinfer1::DimsCHW dims = static_cast<nvinfer1::DimsCHW &&>(
@@ -654,12 +656,12 @@ bool RTNet::checkInt8(const std::string &gpu_name,
 bool RTNet::addInput(const TensorDimsMap &tensor_dims_map,
                      const std::map<std::string, std::vector<int>> &shapes,
                      TensorMap *tensor_map) {
-  CHECK(net_param_->layer_size() > 0);
+  CHECK_GT(net_param_->layer_size(), 0);
   input_names_.clear();
   for (auto dims_pair : tensor_dims_map) {
     if (shapes.find(dims_pair.first) != shapes.end()) {
       auto shape = shapes.at(dims_pair.first);
-      if ((int)shape.size() == dims_pair.second.nbDims + 1) {
+      if (static_cast<int>(shape.size()) == dims_pair.second.nbDims + 1) {
         max_batch_size_ = std::max(max_batch_size_, shape[0]);
         for (int i = 0; i < dims_pair.second.nbDims; i++) {
           dims_pair.second.d[i] = shape[i + 1];
@@ -678,7 +680,7 @@ bool RTNet::addInput(const TensorDimsMap &tensor_dims_map,
 
 void RTNet::parse_with_api(
     const std::map<std::string, std::vector<int>> &shapes) {
-  CHECK(net_param_->layer_size() > 0);
+  CHECK_GT(net_param_->layer_size(), 0);
   std::vector<LayerParameter> order;
   TensorMap tensor_map;
   TensorDimsMap tensor_dims_map;

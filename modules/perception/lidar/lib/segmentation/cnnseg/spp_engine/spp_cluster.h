@@ -13,9 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_LIDAR_LIB_SEGMENTATION_CNNSEG_SPP_ENGINE_SPP_CLUSTER_H_
-#define MODULES_PERCEPTION_LIDAR_LIB_SEGMENTATION_CNNSEG_SPP_ENGINE_SPP_CLUSTER_H_
+#ifndef MODULES_PERCEPTION_LIDAR_LIB_SEGMENTATION_CNNSEG_SPP_ENGINE_SPP_CLUSTER_H_  // NOLINT
+#define MODULES_PERCEPTION_LIDAR_LIB_SEGMENTATION_CNNSEG_SPP_ENGINE_SPP_CLUSTER_H_  // NOLINT
+
 #include <algorithm>
+#include <memory>
 #include <vector>
 
 #include "modules/perception/base/point_cloud.h"
@@ -133,4 +135,4 @@ typedef std::shared_ptr<const SppCluster> SppClusterConstPtr;
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_LIDAR_LIB_SEGMENTATION_CNNSEG_SPP_ENGINE_SPP_CLUSTER_H_
+#endif  // PERCEPTION_LIDAR_LIB_SEGMENTATION_CNNSEG_SPP_ENGINE_SPP_CLUSTER_H_

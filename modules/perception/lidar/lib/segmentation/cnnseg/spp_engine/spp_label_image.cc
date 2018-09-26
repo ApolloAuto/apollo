@@ -14,7 +14,10 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/perception/lidar/lib/segmentation/cnnseg/spp_engine/spp_label_image.h"
+
+#include <algorithm>
 #include <utility>
+
 #include "modules/perception/lidar/common/lidar_log.h"
 #include "modules/perception/lidar/common/lidar_timer.h"
 #include "modules/perception/lidar/lib/segmentation/cnnseg/spp_engine/spp_pool_types.h"

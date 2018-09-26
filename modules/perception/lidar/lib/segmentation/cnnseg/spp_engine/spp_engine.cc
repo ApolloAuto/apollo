@@ -84,42 +84,6 @@ size_t SppEngine::ProcessConnectedComponentCluster(
   // first sync between cluster list and label image,
   // and they shared the same cluster pointer
   clusters_ = labels_2d_;
-#if 0
-  float half_width = static_cast<float>(width_) / 2;
-  float half_height = static_cast<float>(height_) / 2;
-  int x = 0;
-  int y = 0;
-  float ratio_x = half_width / range_;
-  float ratio_y = half_height / range_;
-  int width = static_cast<int>(width_);
-  int height = static_cast<int>(height_);
-
-  for (size_t i = 0; i < point_cloud->size(); ++i) {
-    if (mask.size() && mask[i] == 0) {
-      continue;
-    }
-    const auto& point = point_cloud->at(i);
-    //y = static_cast<int>((range_ - point.x) * ratio_x + 1.f) - 1;
-    //x = static_cast<int>((range_ - point.y) * ratio_y + 1.f) - 1;
-    float fx = (range_ - (0.707107 * (point.x + point.y))) * ratio_x;
-    float fy = (range_ - (0.707107 * (point.x - point.y))) * ratio_y;
-    x = fx < 0 ? -1.f : static_cast<int>(fx);
-    y = fy < 0 ? -1.f : static_cast<int>(fy);
-
-    if (x < 0 || x >= width || y < 0 || y >= height) {
-      continue;
-    }
-    const uint16_t& label = labels_2d_[y][x];
-    if (!label) {
-      continue;
-    }
-    if (point.z <= labels_2d_.GetCluster(label-1)->top_z
-        + data.top_z_threshold) {
-      clusters_.AddPointSample(label - 1, point,
-          point_cloud->points_height(i), i);
-    }
-  }
-#else
   for (size_t i = 0; i < point_cloud->size(); ++i) {
     if (mask.size() && mask[i] == 0) {
       continue;
@@ -140,7 +104,6 @@ size_t SppEngine::ProcessConnectedComponentCluster(
                                i);
     }
   }
-#endif
   double mapping_time = timer.toc(true);
   // 5. remove empty clusters
   clusters_.RemoveEmptyClusters();
