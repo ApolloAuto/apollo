@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,14 +39,21 @@ class DistanceApproachProblemTest : public ::testing::Test {
   Eigen::MatrixXd xf_ = Eigen::MatrixXd::Ones(4, 1);
   Eigen::MatrixXd XYbounds_ = Eigen::MatrixXd::Ones(4, 1);
   Eigen::MatrixXd vOb_ = Eigen::MatrixXd::Ones(12, 4);
-  std::size_t nOb_ = 10;
+  Eigen::MatrixXd xWS_ = Eigen::MatrixXd::Zero(4, horizon_ + 1);
+  Eigen::MatrixXd uWS_ = Eigen::MatrixXd::Zero(2, horizon_);
+  Eigen::MatrixXd timeWS_ = Eigen::MatrixXd::Zero(1, horizon_ + 1);
+  std::size_t obstacles_num = 10;
+  Eigen::MatrixXd obstacles_vertices_num =
+      Eigen::MatrixXd::Zero(1, horizon_ + 1);
+  Eigen::MatrixXd obstacles_A = Eigen::MatrixXd::Ones(4, 1);
+  Eigen::MatrixXd obstacles_b = Eigen::MatrixXd::Ones(4, 1);
 };
 
-TEST_F(DistanceApproachIPOPTInterfaceTest, initilization) {
+TEST_F(DistanceApproachProblemTest, initilization) {
   distance_approach_.reset(new DistanceApproachProblem(
-      x0_, xf_, horizon_, ts_, ego_, xWS, uWS, timeWS, XYbounds, obstacles_num,
-      obstacles_vertices_num, obstacles_A, obstacles_b));
-  EXPECT_NE(ptop_, nullptr);
+      x0_, xf_, horizon_, ts_, ego_, xWS_, uWS_, timeWS_, XYbounds_,
+      obstacles_num, obstacles_vertices_num, obstacles_A, obstacles_b));
+  EXPECT_NE(distance_approach_, nullptr);
 }
 
 }  // namespace planning

@@ -48,20 +48,32 @@ DistanceApproachIPOPTInterface::DistanceApproachIPOPTInterface(
       XYbounds_(XYbounds),
       vOb_(vOb),
       nOb_(nOb) {
-  w_ev_ = ego_(0, 1) + ego_(0, 3);
-  l_ev_ = ego_(0, 0) + ego_(0, 2);
+  w_ev_ = ego_(1, 0) + ego_(3, 0);
+  l_ev_ = ego_(0, 0) + ego_(2, 0);
+
   g_ = {l_ev_ / 2, w_ev_ / 2, l_ev_ / 2, w_ev_ / 2};
-  offset_ = (ego_(0, 0) + ego_(0, 2)) / 2 - ego_(0, 2);
-  CHECK(vOb_.sum() >= 0) << "vOb sum negative!";
+  offset_ = (ego_(0, 0) + ego_(2, 0)) / 2 - ego_(2, 0);
   vObsum_ = std::size_t(vOb_.sum());
-  state_result_(horizon_ + 1, 4);
-  control_result_(horizon_ + 1, 2);
-  time_result_(horizon_ + 1, 1);
+  state_result_ = Eigen::MatrixXd::Zero(horizon_ + 1, 4);
+  control_result_ = Eigen::MatrixXd::Zero(horizon_ + 1, 2);
+  time_result_ = Eigen::MatrixXd::Zero(horizon_ + 1, 1);
 }
 
 /*
   num_of_variables, num_of_constraints, horizon_, x0_, xF_, XYbounds_
   */
+
+void DistanceApproachIPOPTInterface::set_objective_weights(
+    const double w_u, const double w_time_1, const double w_time_2,
+    const double w_reg) {
+  w_u_ = w_u;
+
+  w_time_1_ = w_time_1;
+
+  w_time_2_ = w_time_2;
+
+  w_reg_ = w_reg;
+}
 
 bool DistanceApproachIPOPTInterface::get_nlp_info(int& n, int& m,
                                                   int& nnz_jac_g,
@@ -283,7 +295,6 @@ bool DistanceApproachIPOPTInterface::get_bounds_info(int n, double* x_l,
 
   ADEBUG << "constraint_index after adding lagrangian constraints n : "
          << constraint_index;
-
   return true;
 }
 
@@ -330,7 +341,6 @@ bool DistanceApproachIPOPTInterface::eval_g(int n, const double* x, bool new_x,
 
   // Next evaluate and iterate over time steps & obstacles
   // TODO(QiL) : two iterative loops
-
   return true;
 }
 
@@ -341,6 +351,14 @@ bool DistanceApproachIPOPTInterface::get_starting_point(
   CHECK(init_x == true) << "Warm start init_x setting failed";
   CHECK(init_z == false) << "Warm start init_z setting failed";
   CHECK(init_lambda == false) << "Warm start init_lambda setting failed";
+
+  auto offset_time = horizon_ * 4;
+
+  auto offset_input = horizon_ * 2 + offset_time;
+
+  // auto offset_l = offset_input + (horizon_ + 1) * 4;  // sum of nOb.
+
+  // auto offset_m = offset_l + (horizon_ + 1) * nOb_;
 
   // 1. state variables linspace initialization
 
@@ -399,22 +417,13 @@ bool DistanceApproachIPOPTInterface::eval_f(int n, const double* x, bool new_x,
   std::size_t lagrangian_n_start_index =
       lagrangian_l_start_index + (horizon_ + 1) * vObsum_;
 
-  /*
-      Min,sum(0.1*u[1,i]^2 + 1*u[2,i]^2 for i = 1:N) +
-                             sum(0.5*timeScale[i] + 1*timeScale[i]^2 for i =
-     1:N+1)+ sum(sum(reg*n[j,i]^2 for i = 1:N+1)  for j = 1:4) +
-                                                 sum(sum(reg*l[j,i]^2 for i
-     = 1:N+1)  for j = 1:sum(vOb))
-  */
-
+  // 1. objective to minimize u square
   for (std::size_t i = 0; i < horizon_; ++i) {
     obj_value += 0.1 * x[start_index + i] * x[start_index + i] +
                  x[start_index + i] * x[start_index + i + 1] +
                  0.5 * x[time_start_index + i] +
                  x[time_start_index + i] * x[time_start_index + i];
   }
-  obj_value += 0.5 * x[time_start_index + horizon_] +
-               x[time_start_index + horizon_] * x[time_start_index + horizon_];
 
   // Add l , sum(vOb) * (N+1)
   constexpr double reg = 1e-4;
@@ -449,6 +458,7 @@ void DistanceApproachIPOPTInterface::finalize_solution(
   // std::size_t state_start_index = 0;
   // std::size_t input_start_index = (horizon_ + 1) * 4;
   // std::size_t time_start_index = input_start_index + horizon_ * 2;
+
   for (std::size_t i = 0; i < horizon_; ++i) {
     std::size_t state_index = i * 4;
 

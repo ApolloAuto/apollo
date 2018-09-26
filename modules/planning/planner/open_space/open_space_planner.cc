@@ -34,29 +34,30 @@ using apollo::common::math::Vec2d;
 
 Status OpenSpacePlanner::Init(const PlanningConfig&) {
   AINFO << "In OpenSpacePlanner::Init()";
-  return Status::OK();
-}
+  // TODO(QiL): integrate open_space planner into task config when refactor done
+  CHECK(apollo::common::util::GetProtoFromFile(
+      FLAGS_planner_open_space_config_filename, &planner_open_space_config_))
+      << "Failed to load open space config file "
+      << FLAGS_planner_open_space_config_filename;
 
-apollo::common::Status OpenSpacePlanner::Plan(
-    const common::TrajectoryPoint& planning_init_point, FrameOpenSpace* frame) {
-  // Problem setup
-
-  // TODO(JinYun) : cleaning up : load control configs from VehicleParam at
-  // initialization
-
-  // horizon
-  std::size_t horizon = 80;
+  horizon_ = planner_open_space_config_.planning_horizon();
 
   // nominal sampling time
-  float ts = 0.1;
+  ts_ = planner_open_space_config_.ts();
 
   // load vehicle configuration
   front_to_center_ = vehicle_param_.front_edge_to_center();
   back_to_center_ = vehicle_param_.back_edge_to_center();
   left_to_center_ = vehicle_param_.left_edge_to_center();
   right_to_center_ = vehicle_param_.right_edge_to_center();
-  Eigen::MatrixXd ego(4, 1);
-  ego << front_to_center_, back_to_center_, left_to_center_, right_to_center_;
+  ego_ << front_to_center_, back_to_center_, left_to_center_, right_to_center_;
+
+  return Status::OK();
+}
+
+apollo::common::Status OpenSpacePlanner::Plan(
+    const common::TrajectoryPoint& planning_init_point, FrameOpenSpace* frame) {
+  // Problem setup
 
   // initial state
   init_state_ = frame->vehicle_state();
@@ -102,11 +103,11 @@ apollo::common::Status OpenSpacePlanner::Plan(
   // TODO(QiL): Step 6 ： Fromulate warmstart matrix
 
   // warm start variables
-  Eigen::MatrixXd xWS = Eigen::MatrixXd::Zero(4, horizon + 1);
-  Eigen::MatrixXd uWS = Eigen::MatrixXd::Zero(2, horizon);
-  Eigen::MatrixXd timeWS = Eigen::MatrixXd::Zero(1, horizon + 1);
+  Eigen::MatrixXd xWS = Eigen::MatrixXd::Zero(4, horizon_ + 1);
+  Eigen::MatrixXd uWS = Eigen::MatrixXd::Zero(2, horizon_);
+  Eigen::MatrixXd timeWS = Eigen::MatrixXd::Zero(1, horizon_ + 1);
 
-  warm_start_.reset(new WarmStartProblem(horizon, ts, x0, xF, XYbounds));
+  warm_start_.reset(new WarmStartProblem(horizon_, ts_, x0, xF, XYbounds));
 
   Eigen::MatrixXd state_result;
   Eigen::MatrixXd control_result;
@@ -124,14 +125,14 @@ apollo::common::Status OpenSpacePlanner::Plan(
 
   // TODO(QiL): Step 8 : Formulate distance approach problem
   // solution from distance approach
-  Eigen::MatrixXd xp1 = Eigen::MatrixXd::Zero(4, horizon + 1);
-  Eigen::MatrixXd up1 = Eigen::MatrixXd::Zero(2, horizon);
-  Eigen::MatrixXd scaleTime1 = Eigen::MatrixXd::Zero(1, horizon + 1);
+  Eigen::MatrixXd xp1 = Eigen::MatrixXd::Zero(4, horizon_ + 1);
+  Eigen::MatrixXd up1 = Eigen::MatrixXd::Zero(2, horizon_);
+  Eigen::MatrixXd scaleTime1 = Eigen::MatrixXd::Zero(1, horizon_ + 1);
 
   // TODO(QiL) : update the I/O to make the warm start problem and distance
   // approach problem connect
   distance_approach_.reset(new DistanceApproachProblem(
-      x0, xF, horizon, ts, ego, xWS, uWS, timeWS, XYbounds, obstacles_num,
+      x0, xF, horizon_, ts_, ego_, xWS, uWS, timeWS, XYbounds, obstacles_num,
       obstacles_vertices_num, obstacles_A, obstacles_b));
 
   // result for distance approach problem
