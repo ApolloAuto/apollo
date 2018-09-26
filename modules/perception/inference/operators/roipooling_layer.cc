@@ -13,9 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+
 #include "modules/perception/inference/operators/roipooling_layer.h"
+
 #include <algorithm>
+
 #include "modules/perception/base/blob.h"
+
 namespace apollo {
 namespace perception {
 namespace inference {
@@ -117,6 +121,7 @@ void ROIPoolingLayer<Dtype>::ForwardCPU(
 }
 template class ROIPoolingLayer<float>;
 template class ROIPoolingLayer<double>;
+
 }  // namespace inference
 }  // namespace perception
 }  // namespace apollo

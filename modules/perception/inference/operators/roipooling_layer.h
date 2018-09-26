@@ -13,14 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef INFERENCE_OPERATORS_ROIPOOLING_LAYER_H_
-#define INFERENCE_OPERATORS_ROIPOOLING_LAYER_H_
+
+#ifndef MODULES_PERCEPTION_INFERENCE_OPERATORS_ROIPOOLING_LAYER_H_
+#define MODULES_PERCEPTION_INFERENCE_OPERATORS_ROIPOOLING_LAYER_H_
+
 #include <float.h>
 #include <vector>
 #include "modules/perception/inference/layer.h"
+
 namespace apollo {
 namespace perception {
 namespace inference {
+
 template <typename Dtype>
 class ROIPoolingLayer : public Layer<Dtype> {
  public:
@@ -54,4 +58,5 @@ class ROIPoolingLayer : public Layer<Dtype> {
 }  // namespace inference
 }  // namespace perception
 }  // namespace apollo
-#endif  // INFERENCE_OPERATORS_ROIPOOLING_LAYER_H_
+
+#endif  // MODULES_PERCEPTION_INFERENCE_OPERATORS_ROIPOOLING_LAYER_H_

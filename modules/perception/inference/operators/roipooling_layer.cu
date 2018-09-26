@@ -13,10 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+#include "modules/perception/inference/operators/roipooling_layer.h"
+
 #include <algorithm>
 #include <vector>
 #include "modules/perception/base/blob.h"
-#include "modules/perception/inference/operators/roipooling_layer.h"
+
 namespace apollo {
 namespace perception {
 namespace inference {
