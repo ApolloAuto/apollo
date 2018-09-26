@@ -14,6 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/perception/lidar/lib/segmentation/cnnseg/feature_generator.h"
+
 #include "modules/perception/base/common.h"
 #include "modules/perception/lidar/lib/segmentation/cnnseg/util.h"
 
@@ -116,8 +117,8 @@ void FeatureGenerator::GenerateCPU(const base::PointFCloudPtr& pc_ptr,
   out_blob_->mutable_cpu_data();
 
   // fill initial value for feature blob
-  int map_size = height_ * width_;
-  for (size_t i = 0; i < map_size; ++i) {
+  const int map_size = height_ * width_;
+  for (int i = 0; i < map_size; ++i) {
     max_height_data_[i] = -5.f;
   }
   memset(mean_height_data_, 0, map_size * sizeof(float));

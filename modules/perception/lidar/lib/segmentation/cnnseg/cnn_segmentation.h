@@ -16,9 +16,13 @@
 #ifndef MODULES_PERCEPTION_LIDAR_LIB_SEGMENTATION_CNNSEG_H_
 #define MODULES_PERCEPTION_LIDAR_LIB_SEGMENTATION_CNNSEG_H_
 
-#include <boost/shared_ptr.hpp>
 #include <string>
 #include <vector>
+
+#include "boost/shared_ptr.hpp"
+
+#include "modules/perception/lidar/lib/segmentation/cnnseg/proto/cnnseg_param.pb.h"
+#include "modules/perception/lidar/lib/segmentation/cnnseg/proto/spp_engine_config.pb.h"
 
 #include "modules/perception/base/blob.h"
 #include "modules/perception/inference/inference.h"
@@ -27,8 +31,6 @@
 #include "modules/perception/lidar/lib/interface/base_roi_filter.h"
 #include "modules/perception/lidar/lib/interface/base_segmentation.h"
 #include "modules/perception/lidar/lib/segmentation/cnnseg/feature_generator.h"
-#include "modules/perception/lidar/lib/segmentation/cnnseg/proto/cnnseg_param.pb.h"
-#include "modules/perception/lidar/lib/segmentation/cnnseg/proto/spp_engine_config.pb.h"
 #include "modules/perception/lidar/lib/segmentation/cnnseg/spp_engine/spp_engine.h"
 
 namespace apollo {

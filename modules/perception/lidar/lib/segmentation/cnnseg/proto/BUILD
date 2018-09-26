@@ -14,8 +14,6 @@ proto_library(
     srcs = [
         "cnnseg_config.proto",
     ],
-    deps = [
-    ],
 )
 
 cc_proto_library(
@@ -30,8 +28,6 @@ proto_library(
     srcs = [
         "cnnseg_param.proto",
     ],
-    deps = [
-    ],
 )
 
 cc_proto_library(
@@ -45,8 +41,6 @@ proto_library(
     name = "spp_engine_config_proto_lib",
     srcs = [
         "spp_engine_config.proto",
-    ],
-    deps = [
     ],
 )
 
