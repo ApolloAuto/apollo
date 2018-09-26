@@ -12,18 +12,20 @@ cc_library(
     ],
     deps = [
         "//modules/perception/base:common",
-        "//modules/perception/inference:rt_lib_proto",
+        "//modules/perception/proto:rt_proto",
         "//framework:cybertron",
         "@tensorrt",
     ],
 )
 
-cc_test(
-    name = "rt_common_test",
-    size = "small",
-    srcs = ["rt_common_test.cc"],
-    deps = [
-        ":rt_common",
-        "@gtest//:main",
-    ],
-)
+#cc_test(
+#    name = "rt_common_test",
+#    size = "small",
+#    srcs = ["rt_common_test.cc"],
+#    deps = [
+#        ":rt_common",
+#        "@gtest//:main",
+#    ],
+#)
+
+cpplint()

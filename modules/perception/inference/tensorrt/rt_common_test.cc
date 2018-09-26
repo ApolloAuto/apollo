@@ -18,6 +18,9 @@
 
 #include "gtest/gtest.h"
 
+using apollo::perception::PoolingParameter;
+using apollo::perception::ConvolutionParameter;
+
 TEST(RTReshapeDimsTest, test) {
   nvinfer1::DimsCHW dims;
   nvinfer1::DimsCHW input_dims;
@@ -37,7 +40,7 @@ TEST(RTReshapeDimsTest, test) {
 
 TEST(RTModifyPoolingParamTest, test) {
   {
-    apollo::perception::inference::PoolingParameter pool_param;
+    PoolingParameter pool_param;
     pool_param.set_kernel_size(1);
     pool_param.set_stride(1);
     CHECK(modify_pool_param(&pool_param));
@@ -45,17 +48,17 @@ TEST(RTModifyPoolingParamTest, test) {
     EXPECT_EQ(pool_param.kernel_h(), 1);
   }
   {
-    apollo::perception::inference::PoolingParameter pool_param;
+    PoolingParameter pool_param;
     pool_param.set_kernel_h(0);
     CHECK(!modify_pool_param(&pool_param));
   }
   {
-    apollo::perception::inference::PoolingParameter pool_param;
+    PoolingParameter pool_param;
     pool_param.set_kernel_w(0);
     CHECK(!modify_pool_param(&pool_param));
   }
   {
-    apollo::perception::inference::PoolingParameter pool_param;
+    PoolingParameter pool_param;
     pool_param.set_stride(1);
     pool_param.set_kernel_size(1);
     CHECK(modify_pool_param(&pool_param));
@@ -63,19 +66,19 @@ TEST(RTModifyPoolingParamTest, test) {
     EXPECT_EQ(pool_param.stride_h(), 1);
   }
   {
-    apollo::perception::inference::PoolingParameter pool_param;
+    PoolingParameter pool_param;
     pool_param.set_kernel_size(1);
     pool_param.set_stride_h(0);
     CHECK(!modify_pool_param(&pool_param));
   }
   {
-    apollo::perception::inference::PoolingParameter pool_param;
+    PoolingParameter pool_param;
     pool_param.set_stride_w(0);
     pool_param.set_kernel_size(1);
     CHECK(!modify_pool_param(&pool_param));
   }
   {
-    apollo::perception::inference::PoolingParameter pool_param;
+    PoolingParameter pool_param;
     pool_param.set_pad(1);
     pool_param.set_kernel_size(1);
     pool_param.set_stride(1);
@@ -84,7 +87,7 @@ TEST(RTModifyPoolingParamTest, test) {
     EXPECT_EQ(pool_param.pad_w(), 1);
   }
   {
-    apollo::perception::inference::PoolingParameter pool_param;
+    PoolingParameter pool_param;
     pool_param.set_kernel_size(1);
     pool_param.set_stride(1);
     CHECK(modify_pool_param(&pool_param));
@@ -95,7 +98,7 @@ TEST(RTModifyPoolingParamTest, test) {
 
 TEST(RTParseConvParamTest, test) {
   {
-    apollo::perception::inference::ConvolutionParameter conv_param;
+    ConvolutionParameter conv_param;
     conv_param.add_kernel_size(3);
     conv_param.add_pad(1);
     conv_param.add_stride(1);
@@ -109,27 +112,27 @@ TEST(RTParseConvParamTest, test) {
     EXPECT_EQ(tensorrt_param.stride_w, 1);
   }
   {
-    apollo::perception::inference::ConvolutionParameter conv_param;
+    ConvolutionParameter conv_param;
     conv_param.clear_kernel_size();
     apollo::perception::inference::ConvParam tensorrt_param;
     CHECK(!ParserConvParam(conv_param, &tensorrt_param));
   }
   {
-    apollo::perception::inference::ConvolutionParameter conv_param;
+    ConvolutionParameter conv_param;
     conv_param.clear_kernel_size();
     conv_param.set_kernel_h(3);
     apollo::perception::inference::ConvParam tensorrt_param;
     CHECK(!ParserConvParam(conv_param, &tensorrt_param));
   }
   {
-    apollo::perception::inference::ConvolutionParameter conv_param;
+    ConvolutionParameter conv_param;
     conv_param.clear_kernel_size();
     conv_param.set_kernel_w(3);
     apollo::perception::inference::ConvParam tensorrt_param;
     CHECK(!ParserConvParam(conv_param, &tensorrt_param));
   }
   {
-    apollo::perception::inference::ConvolutionParameter conv_param;
+    ConvolutionParameter conv_param;
     conv_param.add_kernel_size(3);
     conv_param.set_pad_h(1);
     conv_param.add_stride(1);
@@ -144,7 +147,7 @@ TEST(RTParseConvParamTest, test) {
     EXPECT_EQ(tensorrt_param.stride_w, 1);
   }
   {
-    apollo::perception::inference::ConvolutionParameter conv_param;
+    ConvolutionParameter conv_param;
     conv_param.add_kernel_size(3);
     conv_param.set_pad_w(1);
     conv_param.add_stride(1);
@@ -159,7 +162,7 @@ TEST(RTParseConvParamTest, test) {
     EXPECT_EQ(tensorrt_param.stride_w, 1);
   }
   {
-    apollo::perception::inference::ConvolutionParameter conv_param;
+    ConvolutionParameter conv_param;
     conv_param.add_kernel_size(3);
     conv_param.add_pad(1);
     conv_param.set_pad_w(1);
@@ -168,7 +171,7 @@ TEST(RTParseConvParamTest, test) {
     CHECK(!ParserConvParam(conv_param, &tensorrt_param));
   }
   {
-    apollo::perception::inference::ConvolutionParameter conv_param;
+    ConvolutionParameter conv_param;
     conv_param.add_kernel_size(3);
     conv_param.add_pad(1);
     conv_param.set_pad_h(1);
@@ -177,7 +180,7 @@ TEST(RTParseConvParamTest, test) {
     CHECK(!ParserConvParam(conv_param, &tensorrt_param));
   }
   {
-    apollo::perception::inference::ConvolutionParameter conv_param;
+    ConvolutionParameter conv_param;
     conv_param.add_kernel_size(3);
     conv_param.add_pad(1);
     conv_param.add_stride(1);
@@ -187,7 +190,7 @@ TEST(RTParseConvParamTest, test) {
     CHECK(!ParserConvParam(conv_param, &tensorrt_param));
   }
   {
-    apollo::perception::inference::ConvolutionParameter conv_param;
+    ConvolutionParameter conv_param;
     conv_param.add_kernel_size(3);
     conv_param.add_pad(1);
     conv_param.add_stride(1);
@@ -197,7 +200,7 @@ TEST(RTParseConvParamTest, test) {
     CHECK(!ParserConvParam(conv_param, &tensorrt_param));
   }
   {
-    apollo::perception::inference::ConvolutionParameter conv_param;
+    ConvolutionParameter conv_param;
     conv_param.add_kernel_size(3);
     conv_param.add_pad(1);
     conv_param.set_stride_h(1);
@@ -206,7 +209,7 @@ TEST(RTParseConvParamTest, test) {
     CHECK(!ParserConvParam(conv_param, &tensorrt_param));
   }
   {
-    apollo::perception::inference::ConvolutionParameter conv_param;
+    ConvolutionParameter conv_param;
     conv_param.add_kernel_size(3);
     conv_param.add_pad(1);
     conv_param.set_stride_w(1);

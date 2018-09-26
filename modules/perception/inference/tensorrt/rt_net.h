@@ -24,6 +24,7 @@
 
 #include "modules/perception/inference/inference.h"
 #include "modules/perception/inference/tensorrt/entropy_calibrator.h"
+#include "modules/perception/proto/rt.pb.h"
 
 namespace apollo {
 namespace perception {
@@ -31,7 +32,7 @@ namespace inference {
 class ArgMax1Plugin;
 class SLICEPlugin;
 class SoftmaxPlugin;
-class NetParameter;
+
 class LayerParameter;
 typedef std::map<std::string, std::vector<nvinfer1::Weights>> WeightMap;
 typedef std::map<std::string, nvinfer1::ITensor *> TensorMap;

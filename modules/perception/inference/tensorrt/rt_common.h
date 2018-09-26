@@ -37,13 +37,11 @@
 
 #include "cybertron/common/log.h"
 #include "modules/perception/base/common.h"
-#include "modules/perception/inference/rt.pb.h"
+#include "modules/perception/proto/rt.pb.h"
 
 namespace apollo {
 namespace perception {
 namespace inference {
-
-class NetParameter;
 
 typedef std::map<std::string, std::vector<nvinfer1::Weights>> WeightMap;
 typedef std::map<std::string, nvinfer1::ITensor *> TensorMap;
