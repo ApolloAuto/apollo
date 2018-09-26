@@ -17,8 +17,10 @@
 #ifndef MODULES_PERCEPTION_INFERENCE_OPERATORS_ROIPOOLING_LAYER_H_
 #define MODULES_PERCEPTION_INFERENCE_OPERATORS_ROIPOOLING_LAYER_H_
 
-#include <float.h>
+#include <cfloat>
+#include <memory>
 #include <vector>
+
 #include "modules/perception/inference/layer.h"
 
 namespace apollo {

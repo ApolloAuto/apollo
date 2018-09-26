@@ -13,10 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_LIB_LIDAR_SEGMENTATION_CNNSEG_SPP_ENGINE_SPP_ENGINE_H_
-#define MODULES_PERCEPTION_LIB_LIDAR_SEGMENTATION_CNNSEG_SPP_ENGINE_SPP_ENGINE_H_
-#include <Eigen/Dense>
+#ifndef MODULES_PERCEPTION_LIB_LIDAR_SEGMENTATION_CNNSEG_SPP_ENGINE_SPP_ENGINE_H_  // NOLINT
+#define MODULES_PERCEPTION_LIB_LIDAR_SEGMENTATION_CNNSEG_SPP_ENGINE_SPP_ENGINE_H_  // NOLINT
+
 #include <utility>
+
+#include "Eigen/Dense"
+
 #include "modules/perception/lib/thread/thread_worker.h"
 #include "modules/perception/lidar/common/cloud_mask.h"
 #include "modules/perception/lidar/lib/segmentation/cnnseg/spp_engine/spp_cluster.h"
@@ -95,4 +98,4 @@ class SppEngine {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_LIB_LIDAR_SEGMENTATION_CNNSEG_SPP_ENGINE_SPP_ENGINE_H_
+#endif  // PERCEPTION_LIB_LIDAR_SEGMENTATION_CNNSEG_SPP_ENGINE_SPP_ENGINE_H_

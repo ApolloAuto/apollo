@@ -13,9 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_LIDAR_SEGMENTATION_CNNSEG_SPP_ENGINE_SPP_CLUSTER_LIST_H_
-#define MODULES_PERCEPTION_LIDAR_SEGMENTATION_CNNSEG_SPP_ENGINE_SPP_CLUSTER_LIST_H_
+#ifndef MODULES_PERCEPTION_LIDAR_SEGMENTATION_CNNSEG_SPP_ENGINE_SPP_CLUSTER_LIST_H_  // NOLINT
+#define MODULES_PERCEPTION_LIDAR_SEGMENTATION_CNNSEG_SPP_ENGINE_SPP_CLUSTER_LIST_H_  // NOLINT
+
 #include <vector>
+
 #include "modules/perception/lidar/lib/segmentation/cnnseg/spp_engine/spp_cluster.h"
 #include "modules/perception/lidar/lib/segmentation/cnnseg/spp_engine/spp_label_image.h"
 
@@ -95,4 +97,4 @@ class SppClusterList {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_LIDAR_SEGMENTATION_CNNSEG_SPP_ENGINE_SPP_CLUSTER_LIST_H_
+#endif  // PERCEPTION_LIDAR_SEGMENTATION_CNNSEG_SPP_ENGINE_SPP_CLUSTER_LIST_H_
