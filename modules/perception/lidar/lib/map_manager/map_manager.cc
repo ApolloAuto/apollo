@@ -14,11 +14,12 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/perception/lidar/lib/map_manager/map_manager.h"
+#include "cybertron/common/log.h"
+#include "modules/common/util/file.h"
+#include "modules/perception/proto/map_manager_config.pb.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lib/io/file_util.h"
-#include "modules/perception/lib/io/protobuf_util.h"
-#include "modules/perception/lidar/common/lidar_log.h"
-#include "modules/perception/lidar/lib/map_manager/proto/map_manager_config.pb.h"
+
 namespace apollo {
 namespace perception {
 namespace lidar {
@@ -36,7 +37,7 @@ bool MapManager::Init(const MapManagerInitOptions& options) {
   config_file = lib::FileUtil::GetAbsolutePath(work_root, root_path);
   config_file = lib::FileUtil::GetAbsolutePath(config_file, "map_manager.conf");
   MapManagerConfig config;
-  CHECK(lib::ParseProtobufFromFile(config_file, &config));
+  CHECK(common::util::GetProtoFromFile(config_file, &config));
   update_pose_ = config.update_pose();
   roi_search_distance_ = config.roi_search_distance();
   hdmap_input_ = lib::Singleton<map::HDMapInput>::get_instance();

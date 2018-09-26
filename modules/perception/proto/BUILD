@@ -105,4 +105,20 @@ proto_library(
     ],
 )
 
+cc_proto_library(
+    name = "map_manager_config_proto",
+    deps = [
+        ":map_manager_config_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "map_manager_config_proto_lib",
+    srcs = [
+        "map_manager_config.proto",
+    ],
+    deps = [
+    ],
+)
+
 cpplint()
