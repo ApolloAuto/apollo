@@ -31,6 +31,9 @@ cc_test(
     srcs = [
         "sensor_manager_test.cc",
     ],
+    data = [
+        "//modules/perception:perception_testdata",
+    ],
     deps = [
         ":sensor_manager",
         "@gtest//:main",

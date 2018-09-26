@@ -21,18 +21,18 @@ cc_library(
 )
 
 cc_test(
-     name = "config_manager_test",
-     size = "small",
-     srcs = [
-         "config_manager_test.cc",
-     ],
-     data = [
+    name = "config_manager_test",
+    size = "small",
+    srcs = [
+        "config_manager_test.cc",
+    ],
+    data = [
         "//modules/perception:perception_testdata",
-     ],
-     deps = [
-         ":config_manager",
-         "@gtest//:main",
-     ],
+    ],
+    deps = [
+        ":config_manager",
+        "@gtest//:main",
+    ],
 )
 
 cpplint()
