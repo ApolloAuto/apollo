@@ -18,8 +18,8 @@ cc_test(
         "registerer_test.cc",
     ],
     deps = [
-        "@gtest//:main",
         ":registerer",
+        "@gtest//:main",
     ],
 )
 
