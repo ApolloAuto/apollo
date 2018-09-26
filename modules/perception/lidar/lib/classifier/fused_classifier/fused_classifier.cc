@@ -16,14 +16,17 @@
 #include "modules/perception/lidar/lib/classifier/fused_classifier/fused_classifier.h"
 #include <string>
 #include <vector>
+#include "modules/common/util/file.h"
 #include "modules/perception/lib/io/file_util.h"
-#include "modules/perception/lib/io/protobuf_util.h"
-#include "modules/perception/lidar/lib/classifier/fused_classifier/proto/fused_classifier_config.pb.h"
+#include "modules/perception/proto/fused_classifier_config.pb.h"
 
 namespace apollo {
 namespace perception {
 namespace lidar {
-using base::ObjectType;
+
+using ObjectPtr = std::shared_ptr<apollo::perception::base::Object>;
+using apollo::perception::base::ObjectType;
+
 bool FusedClassifier::Init(const ClassifierInitOptions& options) {
   lib::ConfigManager* config_manager =
       lib::Singleton<lib::ConfigManager>::get_instance();
@@ -38,7 +41,7 @@ bool FusedClassifier::Init(const ClassifierInitOptions& options) {
   config_file =
       lib::FileUtil::GetAbsolutePath(config_file, "fused_classifier.conf");
   FusedClassifierConfig config;
-  CHECK(lib::ParseProtobufFromFile(config_file, &config));
+  CHECK(common::util::GetProtoFromFile(config_file, &config));
   temporal_window_ = config.temporal_window();
   enable_temporal_fusion_ = config.enable_temporal_fusion();
   use_tracked_objects_ = config.use_tracked_objects();
@@ -61,7 +64,7 @@ bool FusedClassifier::Classify(const ClassifierOptions& options,
   if (frame == nullptr) {
     return false;
   }
-  std::vector<base::ObjectPtr>* objects = use_tracked_objects_
+  std::vector<ObjectPtr>* objects = use_tracked_objects_
                                               ? &(frame->tracked_objects)
                                               : &(frame->segmented_objects);
   if (enable_temporal_fusion_ && frame->timestamp > 0.0) {

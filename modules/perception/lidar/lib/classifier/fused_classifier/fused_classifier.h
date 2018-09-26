@@ -16,8 +16,9 @@
 #ifndef MODULES_PERCEPTION_LIDAR_LIB_CLASSIFIER_FUSED_CLASSIFIER_H_
 #define MODULES_PERCEPTION_LIDAR_LIB_CLASSIFIER_FUSED_CLASSIFIER_H_
 
-#include <boost/shared_ptr.hpp>
 #include <string>
+#include <memory>
+
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lidar/common/lidar_frame.h"
 #include "modules/perception/lidar/common/object_sequence.h"

@@ -51,4 +51,25 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "fused_classifier",
+    srcs = [
+        "fused_classifier.cc",
+    ],
+    hdrs = [
+        "fused_classifier.h",
+    ],
+    deps = [
+        ":type_fusion_interface",
+        "//modules/common/util:file_util",
+        "//modules/perception/proto:fused_classifier_config_proto",
+        "//modules/perception/lib/config_manager:config_manager",
+        "//modules/perception/lib/io:file_util",
+        "//modules/perception/lidar/common:lidar_frame",
+        "//modules/perception/lidar/common:object_sequence",
+        "//modules/perception/lidar/lib/interface:base_classifier",
+        "//framework:cybertron",
+    ],
+)
+
 cpplint()
