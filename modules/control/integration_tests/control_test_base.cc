@@ -41,7 +41,6 @@ using apollo::canbus::Chassis;
 using apollo::common::monitor::MonitorMessage;
 using apollo::common::time::Clock;
 using apollo::control::PadMessage;
-using apollo::control::PadMessage;
 using apollo::localization::LocalizationEstimate;
 using apollo::perception::TrafficLightDetection;
 using apollo::planning::ADCTrajectory;
@@ -112,6 +111,7 @@ bool ControlTestBase::test_control() {
             FLAGS_test_data_dir + FLAGS_test_chassis_file, &chassis)) {
       AERROR << "Failed to load chassis file " << FLAGS_test_data_dir
              << FLAGS_test_chassis_file;
+      return false;
     }
     control_.OnChassis(std::make_shared<apollo::canbus::Chassis>(chassis));
   }
@@ -119,8 +119,12 @@ bool ControlTestBase::test_control() {
   // Monitor
   if (!FLAGS_test_monitor_file.empty()) {
     MonitorMessage monitor_message;
-    apollo::common::util::GetProtoFromFile(
-        FLAGS_test_data_dir + FLAGS_test_monitor_file, &monitor_message);
+    if (!apollo::common::util::GetProtoFromFile(
+            FLAGS_test_data_dir + FLAGS_test_monitor_file, &monitor_message)) {
+      AERROR << "Failed to load monitor file " << FLAGS_test_data_dir
+             << FLAGS_test_monitor_file;
+      return false;
+    }
     control_.OnMonitor(monitor_message);
   }
 
@@ -171,9 +175,10 @@ bool ControlTestBase::test_control(const std::string &test_case_name,
     bool same_result =
         common::util::IsProtoEqual(golden_result, control_command_);
     if (!same_result) {
-      std::string tmp_planning_file = tmp_golden_path + ".tmp";
-      common::util::SetProtoToASCIIFile(control_command_, tmp_planning_file);
-      AERROR << "found diff " << tmp_planning_file << " " << full_golden_path;
+      std::string tmp_test_result_file = tmp_golden_path + ".tmp";
+      common::util::SetProtoToASCIIFile(control_command_, tmp_test_result_file);
+      AERROR << "found diff " << tmp_test_result_file << " "
+             << full_golden_path;
     }
   }
   return true;
