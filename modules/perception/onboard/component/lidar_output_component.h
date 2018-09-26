@@ -16,6 +16,8 @@
 #ifndef MODULES_PERCEPTION_ONBOARD_COMPONENT_LIDAR_OUTPUT_COMPONENT_H_
 #define MODULES_PERCEPTION_ONBOARD_COMPONENT_LIDAR_OUTPUT_COMPONENT_H_
 
+#include <memory>
+
 #include "cybertron/component/component.h"
 #include "modules/perception/onboard/inner_component_messages/inner_component_messages.h"
 
@@ -33,7 +35,6 @@ class LidarOutputComponent : public cybertron::Component<SensorFrameMessage> {
 
  private:
   std::shared_ptr<apollo::cybertron::Writer<PerceptionObstacles>> writer_;
-
 };  // class LidarOutputComponent
 
 CYBERTRON_REGISTER_COMPONENT(LidarOutputComponent);

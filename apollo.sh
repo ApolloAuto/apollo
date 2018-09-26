@@ -504,6 +504,7 @@ function citest() {
 }
 
 function run_cpp_lint() {
+  set -e
   # check /apollo/module
   generate_build_targets
   echo "$BUILD_TARGETS" | xargs bazel test --config=cpplint -c dbg

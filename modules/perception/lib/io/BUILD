@@ -27,11 +27,21 @@ cc_test(
         "file_util_test.cc",
     ],
     data = [
-       "//modules/perception:perception_testdata",
+        "//modules/perception:perception_testdata",
     ],
     deps = [
         ":file_util",
         "@gtest//:main",
+    ],
+)
+
+cc_library(
+    name = "protobuf_util",
+    hdrs = [
+        "protobuf_util.h",
+    ],
+    deps = [
+        "//framework:cybertron",
     ],
 )
 
