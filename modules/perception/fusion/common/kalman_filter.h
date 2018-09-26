@@ -54,7 +54,7 @@ class KalmanFilter : public BaseFilter {
 
   // @brief get the belief uncertainty
   Eigen::MatrixXd GetUncertainty() const;
-  bool DeCorrelation(size_t x, size_t y, size_t x_len, size_t y_len);
+  bool DeCorrelation(int x, int y, int x_len, int y_len);
   void CorrectionBreakdown();
   bool SetGainBreakdownThresh(const std::vector<bool> &break_down,
                               const float threshold = 2.0);

@@ -25,7 +25,7 @@ cc_library(
         "base_init_options.h",
     ],
     deps = [
-        "//modules/perception/lib/config_manager:config_manager",
+        "//modules/perception/lib/config_manager",
     ],
 )
 
@@ -38,8 +38,8 @@ cc_library(
         "scene.h",
     ],
     deps = [
-        ":track",
         ":sensor",
+        ":track",
     ],
 )
 
@@ -56,16 +56,16 @@ cc_library(
         "sensor_object.h",
     ],
     deps = [
-        "//framework:cybertron",
         ":base_forward_declaration",
-        "@eigen",
-        "//modules/perception/base:base",
+        "//framework:cybertron",
+        "//modules/perception/base",
+        "//modules/perception/base:base_type",
         "//modules/perception/base:frame",
         "//modules/perception/base:object",
         "//modules/perception/base:object_pool_types",
-        "//modules/perception/base:base_type",
-        "//modules/perception/common/sensor_manager:sensor_manager",
-        "//modules/perception/lib/singleton:singleton",
+        "//modules/perception/common/sensor_manager",
+        "//modules/perception/lib/singleton",
+        "@eigen",
     ],
 )
 
@@ -78,11 +78,11 @@ cc_library(
         "sensor_data_manager.h",
     ],
     deps = [
-        "//modules/perception/base:frame",
-        "//modules/perception/common/sensor_manager:sensor_manager",
-        "//modules/perception/lib/singleton:singleton",
-        "//modules/perception/lib/thread:thread",
         ":sensor",
+        "//modules/perception/base:frame",
+        "//modules/perception/common/sensor_manager",
+        "//modules/perception/lib/singleton",
+        "//modules/perception/lib/thread",
     ],
 )
 
@@ -108,8 +108,8 @@ cc_library(
         "track_pool_types.h",
     ],
     deps = [
-        "//modules/perception/base:object_pool",
         ":track",
+        "//modules/perception/base:object_pool",
     ],
 )
 

@@ -74,16 +74,16 @@ class DstManager {
 
  private:
   DstManager() {}
-  void BuildSubsetsIndMap(DstCommonData& dst_data);
+  void BuildSubsetsIndMap(DstCommonData* dst_data);
   // fod check, put fod in fod_subsets to ensure BBA's validity after
   // default construction.
-  void FodCheck(DstCommonData& dst_data);
+  void FodCheck(DstCommonData* dst_data);
   // compute the cardinality of fod_subset which means counting set bits in
   // an integer
-  void ComputeCardinalities(DstCommonData& dst_data);
-  bool ComputeRelations(DstCommonData& dst_data);
+  void ComputeCardinalities(DstCommonData* st_data);
+  bool ComputeRelations(DstCommonData* dst_data);
   void BuildNamesMap(const std::vector<std::string>& fod_subset_names,
-                     DstCommonData& dst_data);
+                     DstCommonData* dst_data);
 
  private:
   // Dst data map
