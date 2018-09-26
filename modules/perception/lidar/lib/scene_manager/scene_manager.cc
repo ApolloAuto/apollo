@@ -15,7 +15,8 @@
  *****************************************************************************/
 #include "modules/perception/lidar/lib/scene_manager/scene_manager.h"
 
-#include "modules/perception/lidar/lib/scene_manager/proto/perception_config_schema.pb.h"
+#include "modules/perception/lidar/lib/scene_manager/proto/scene_manager_config.pb.h"
+#include "modules/perception/proto/perception_config_schema.pb.h"
 
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lib/io/file_util.h"
