@@ -14,6 +14,8 @@ proto_library(
     srcs = [
         "ground_service_config.proto",
     ],
+    deps = [
+    ],
 )
 
 cpplint()
