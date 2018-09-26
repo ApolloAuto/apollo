@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+
 #include "modules/perception/lidar/lib/roi_filter/hdmap_roi_filter/hdmap_roi_filter.h"
+
 #include <algorithm>
-#include <boost/format.hpp>
-#include <fstream>
 
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lib/io/file_util.h"
@@ -117,8 +117,9 @@ bool HdmapROIFilter::Filter(const ROIFilterOptions& options,
   // set roi points label
   if (ret) {
     for (auto index : frame->roi_indices.indices) {
-      auto& pt_label = frame->cloud->points_label(index);
-      pt_label = static_cast<uint8_t>(LidarPointLabel::ROI);
+       auto& pt_label = frame->cloud->points_label().at(index);
+      // TODO(all) fix this block
+      // pt_label = static_cast<uint8_t>(LidarPointLabel::ROI);
     }
   }
 
