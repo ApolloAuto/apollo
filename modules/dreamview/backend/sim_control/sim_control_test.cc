@@ -174,8 +174,7 @@ TEST_F(SimControlTest, TestDummyPrediction) {
   sim_control_->Init(false);
   sim_control_->enabled_ = true;
 
-  std::shared_ptr<PredictionObstacles> obstacles =
-      std::make_shared<PredictionObstacles>();
+  auto obstacles = std::make_shared<PredictionObstacles>();
 
   {
     const double timestamp = 100.01;

@@ -94,8 +94,7 @@ void SimulationWorldUpdater::RegisterMessageHandlers() {
       "Binary",
       [this](const std::string &data, WebSocketHandler::Connection *conn) {
         // Navigation info in binary format
-        std::shared_ptr<NavigationInfo> navigation_info =
-            std::make_shared<NavigationInfo>();
+        auto navigation_info = std::make_shared<NavigationInfo>();
         if (navigation_info->ParseFromString(data)) {
           sim_world_service_.PublishNavigationInfo(navigation_info);
         } else {
@@ -135,8 +134,7 @@ void SimulationWorldUpdater::RegisterMessageHandlers() {
   websocket_->RegisterMessageHandler(
       "SendRoutingRequest",
       [this](const Json &json, WebSocketHandler::Connection *conn) {
-        std::shared_ptr<RoutingRequest> routing_request =
-            std::make_shared<RoutingRequest>();
+        auto routing_request = std::make_shared<RoutingRequest>();
 
         bool succeed = ConstructRoutingRequest(json, routing_request.get());
         if (succeed) {

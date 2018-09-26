@@ -502,7 +502,8 @@ void SimulationWorldService::SetObstacleInfo(const PerceptionObstacle &obstacle,
   world_object->set_speed_heading(
       std::atan2(obstacle.velocity().y(), obstacle.velocity().x()));
   world_object->set_timestamp_sec(obstacle.timestamp());
-  world_object->set_confidence(obstacle.confidence());
+  world_object->set_confidence(obstacle.has_confidence() ? obstacle.confidence()
+                                                         : 1);
 }
 
 void SimulationWorldService::SetObstaclePolygon(
@@ -963,8 +964,7 @@ Json SimulationWorldService::GetRoutePathAsJson() const {
 
 void SimulationWorldService::ReadRoutingFromFile(
     const std::string &routing_response_file) {
-  std::shared_ptr<RoutingResponse> routing_response =
-      std::make_shared<RoutingResponse>();
+  auto routing_response = std::make_shared<RoutingResponse>();
   if (!GetProtoFromFile(routing_response_file, routing_response.get())) {
     AWARN << "Unable to read routing response from file: "
           << routing_response_file;
