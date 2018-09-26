@@ -11,14 +11,17 @@ message PlannerOpenSpaceConfig {
   optional double w_time_2 = 5 [default = 1.0];
   optional double w_reg = 6 [default = 1e-4];
   // Hybrid A Star Warm Start
-  optional double x_grid_resolution = 7 [default = 0.2];
-  optional double y_grid_resolution = 8 [default = 0.2];
-  optional double phi_grid_resolution = 9 [default = 0.05];
-  optional double max_x = 10 [default = 25.0];
-  optional double max_y = 11 [default = 25.0];
-  optional double min_x = 12 [default = -25.0];
-  optional double min_y = 13 [default =-25.0];
-  optional double max_steering = 14 [default = 0.6];
-  optional double next_node_num = 15 [default = 10];
-  optional double step_size = 16 [default = 1.0];
+  optional double xy_grid_resolution = 7 [default = 0.2];
+  optional double phi_grid_resolution = 8 [default = 0.05];
+  optional double max_x = 9 [default = 25.0];
+  optional double max_y = 10 [default = 25.0];
+  optional double min_x = 11 [default = -25.0];
+  optional double min_y = 12 [default =-25.0];
+  optional double max_steering = 13 [default = 0.6];
+  optional double next_node_num = 14 [default = 10];
+  optional double step_size = 15 [default = 1.0];
+  optional double back_penalty = 16 [default = 10.0];
+  optional double gear_switch_penalty = 17 [default = 10.0];
+  optional double steer_penalty = 18 [default = 10.0];
+  optional double steer_change_penalty = 19 [default = 10.0]; 
 }

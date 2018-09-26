@@ -8,3 +8,7 @@ max_steering : 0.6
 next_node_num : 10
 step_size : 0.5
 planning_horizon : 10
+back_penalty : 10.0
+gear_switch_penalty : 10.0
+steer_penalty : 10.0
+steer_change_penalty : 10.0
