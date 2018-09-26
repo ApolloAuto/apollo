@@ -13,10 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_LIDAR_LIB_SCENE_MANAGER_GROUND_SERVICE_GROUND_STRUCT_H_
-#define MODULES_PERCEPTION_LIDAR_LIB_SCENE_MANAGER_GROUND_SERVICE_GROUND_STRUCT_H_
-#include <Eigen/Dense>
+#ifndef MODULES_PERCEPTION_LIDAR_LIB_SCENE_MANAGER_GROUND_SERVICE_GROUND_STRUCT_H_  // NOLINT
+#define MODULES_PERCEPTION_LIDAR_LIB_SCENE_MANAGER_GROUND_SERVICE_GROUND_STRUCT_H_  // NOLINT
+
 #include <vector>
+
+#include "Eigen/Dense"
 
 namespace apollo {
 namespace perception {
@@ -31,19 +33,7 @@ class GroundGrid {
  public:
   GroundGrid() = default;
   ~GroundGrid() = default;
-  GroundGrid(const GroundGrid& rhs) {
-    rows_ = rhs.rows_;
-    cols_ = rhs.cols_;
-    size_ = rhs.size_;
-    if (data_.size() != rhs.data_.size()) {
-      data_.resize(rhs.data_.size());
-    }
-    memcpy(data_.data(), rhs.data_.data(), sizeof(GroundNode) * size_);
-    nodes_.resize(rows_);
-    for (uint32_t i = 0; i < rows_; ++i) {
-      nodes_[i] = data_.data() + i * cols_;
-    }
-  }
+  GroundGrid(const GroundGrid& rhs) { *this = rhs; }
   GroundGrid& operator=(const GroundGrid& rhs) {
     rows_ = rhs.rows_;
     cols_ = rhs.cols_;
@@ -53,9 +43,10 @@ class GroundGrid {
     }
     memcpy(data_.data(), rhs.data_.data(), sizeof(GroundNode) * size_);
     nodes_.resize(rows_);
-    for (uint32_t i = 0; i < rows_; ++i) {
+    for (int32_t i = 0; i < rows_; ++i) {
       nodes_[i] = data_.data() + i * cols_;
     }
+    return *this;
   }
   // @brief: initialize ground grid
   // @param [in]: rows and cols of grid
@@ -116,4 +107,4 @@ class GroundGrid {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_LIDAR_LIB_SCENE_MANAGER_GROUND_SERVICE_GROUND_STRUCT_H_
+#endif  // LIDAR_LIB_SCENE_MANAGER_GROUND_SERVICE_GROUND_STRUCT_H_

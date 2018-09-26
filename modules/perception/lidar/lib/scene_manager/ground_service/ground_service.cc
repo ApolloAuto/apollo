@@ -14,7 +14,9 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/perception/lidar/lib/scene_manager/ground_service/ground_service.h"
-#include <float.h>
+
+#include <cfloat>
+#include <limits>
 
 #include "modules/perception/common/i_lib/geometry/i_plane.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
@@ -90,14 +92,12 @@ float GroundServiceContent::PointToPlaneDistance(
     const Eigen::Vector3d& world_point) const {
   uint32_t grid_index = 0;
   if (!PointToGrid(world_point, &grid_index)) {
-    return FLT_MAX;
+    return std::numeric_limits<float>::max();
   }
 
   float offset_pt[3];
   float params[4];
-  float min_abs_dist = FLT_MAX;
-  float out = FLT_MAX;
-  float dist = 0.0;
+  float out = std::numeric_limits<float>::max();
 
   offset_pt[0] = static_cast<float>(world_point(0) - grid_center_(0));
   offset_pt[1] = static_cast<float>(world_point(1) - grid_center_(1));
