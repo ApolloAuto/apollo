@@ -1,3 +1,5 @@
+load("//tools:cpplint.bzl", "cpplint")
+
 package(default_visibility = ["//visibility:public"])
 
 # https://docs.bazel.build/versions/master/be/c-cpp.html#cc_library
@@ -10,17 +12,17 @@ cc_library(
     ]),
     hdrs = glob([
         "install/include/**/*.h",
-        "third_party/**/*.h"
+        "third_party/**/*.h",
     ]),
     includes = [
         "install/include",
-        "third_party/fast-rtps/include"
+        "third_party/fast-rtps/include",
     ],
     deps = [
         ":cybertron_common",
-        "@glog//:glog",
         "//external:gflags",
-    ]
+        "@glog",
+    ],
 )
 
 cc_library(
@@ -36,8 +38,8 @@ cc_library(
     ],
     deps = [
         ":cybertron_base",
-        "@glog//:glog"
-    ]
+        "@glog",
+    ],
 )
 
 cc_library(
@@ -47,5 +49,7 @@ cc_library(
     ]),
     includes = [
         "install/include",
-    ]
+    ],
 )
+
+cpplint()

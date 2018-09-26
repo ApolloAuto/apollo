@@ -54,16 +54,16 @@ class GlobalData {
   bool IsRealityMode() const;
 
   static uint64_t RegisterNode(const std::string& node_name);
-  static const std::string& GetNodeById(uint64_t id);
+  static std::string GetNodeById(uint64_t id);
 
   static uint64_t RegisterChannel(const std::string& channel);
-  static const std::string& GetChannelById(uint64_t id);
+  static std::string GetChannelById(uint64_t id);
 
   static uint64_t RegisterService(const std::string& service);
-  static const std::string& GetServiceById(uint64_t id);
+  static std::string GetServiceById(uint64_t id);
 
   static uint64_t RegisterTaskName(const std::string& task_name);
-  static const std::string& GetTaskNameById(uint64_t id);
+  static std::string GetTaskNameById(uint64_t id);
 
  private:
   void InitHostInfo();
@@ -87,8 +87,6 @@ class GlobalData {
   static AtomicHashMap<uint64_t, std::string, 256> channel_id_map_;
   static AtomicHashMap<uint64_t, std::string, 256> service_id_map_;
   static AtomicHashMap<uint64_t, std::string, 256> task_id_map_;
-
-  static const std::string dummy_str_;
 
   DECLARE_SINGLETON(GlobalData)
 };

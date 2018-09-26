@@ -34,7 +34,10 @@ AtomicHashMap<uint64_t, std::string, 512> GlobalData::node_id_map_;
 AtomicHashMap<uint64_t, std::string, 256> GlobalData::channel_id_map_;
 AtomicHashMap<uint64_t, std::string, 256> GlobalData::service_id_map_;
 AtomicHashMap<uint64_t, std::string, 256> GlobalData::task_id_map_;
-const std::string GlobalData::dummy_str_;
+
+namespace {
+const char* empty_str_ = "";
+}  // namespace
 
 GlobalData::GlobalData() {
   InitHostInfo();
@@ -106,12 +109,12 @@ uint64_t GlobalData::RegisterNode(const std::string& node_name) {
   return id;
 }
 
-const std::string& GlobalData::GetNodeById(uint64_t id) {
+std::string GlobalData::GetNodeById(uint64_t id) {
   std::string* node_name = nullptr;
   if (node_id_map_.Get(id, &node_name)) {
     return *node_name;
   }
-  return dummy_str_;
+  return empty_str_;
 }
 
 // TODO(fengkaiwen01) need a better error handling mechanism when collision
@@ -129,12 +132,12 @@ uint64_t GlobalData::RegisterChannel(const std::string& channel) {
   return id;
 }
 
-const std::string& GlobalData::GetChannelById(uint64_t id) {
+std::string GlobalData::GetChannelById(uint64_t id) {
   std::string* channel = nullptr;
   if (channel_id_map_.Get(id, &channel)) {
     return *channel;
   }
-  return dummy_str_;
+  return empty_str_;
 }
 
 // TODO(fengkaiwen01) need a better error handling mechanism when collision
@@ -152,12 +155,12 @@ uint64_t GlobalData::RegisterService(const std::string& service) {
   return id;
 }
 
-const std::string& GlobalData::GetServiceById(uint64_t id) {
+std::string GlobalData::GetServiceById(uint64_t id) {
   std::string* service = nullptr;
   if (service_id_map_.Get(id, &service)) {
     return *service;
   }
-  return dummy_str_;
+  return empty_str_;
 }
 
 // TODO(fengkaiwen01) need a better error handling mechanism when collision
@@ -175,12 +178,12 @@ uint64_t GlobalData::RegisterTaskName(const std::string& task_name) {
   return id;
 }
 
-const std::string& GlobalData::GetTaskNameById(uint64_t id) {
+std::string GlobalData::GetTaskNameById(uint64_t id) {
   std::string* task_name = nullptr;
   if (task_id_map_.Get(id, &task_name)) {
     return *task_name;
   }
-  return dummy_str_;
+  return empty_str_;
 }
 
 }  // namespace common
