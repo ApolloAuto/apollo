@@ -18,8 +18,9 @@
 
 #include "gtest/gtest.h"
 
-using apollo::perception::PoolingParameter;
-using apollo::perception::ConvolutionParameter;
+namespace apollo {
+namespace perception {
+namespace inference {
 
 TEST(RTReshapeDimsTest, test) {
   nvinfer1::DimsCHW dims;
@@ -218,3 +219,7 @@ TEST(RTParseConvParamTest, test) {
     CHECK(!ParserConvParam(conv_param, &tensorrt_param));
   }
 }
+
+}  // namespace inference
+}  // namespace perception
+}  // namespace apollo
