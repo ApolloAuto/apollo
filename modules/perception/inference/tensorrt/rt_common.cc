@@ -13,11 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+
 #include "modules/perception/inference/tensorrt/rt_common.h"
 
 namespace apollo {
 namespace perception {
 namespace inference {
+
 nvinfer1::DimsCHW ReshapeDims(const nvinfer1::DimsCHW &dims,
                               const nvinfer1::DimsCHW &inputDims) {
   nvinfer1::DimsCHW outDims = inputDims;

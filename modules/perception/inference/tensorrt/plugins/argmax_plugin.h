@@ -13,14 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef INFERENCE_TENSORRT_PLUGINS_ARGMAX_PLUGIN_H_
-#define INFERENCE_TENSORRT_PLUGINS_ARGMAX_PLUGIN_H_
+
+#ifndef MODULES_PERCEPTION_INFERENCE_TENSORRT_PLUGINS_ARGMAX_PLUGIN_H_
+#define MODULES_PERCEPTION_INFERENCE_TENSORRT_PLUGINS_ARGMAX_PLUGIN_H_
+
 #include <thrust/device_vector.h>
 #include "modules/perception/inference/tensorrt/rt_common.h"
 
 namespace apollo {
 namespace perception {
 namespace inference {
+
 class ArgMax1Plugin : public nvinfer1::IPlugin {
  public:
   ArgMax1Plugin(const ArgMaxParameter &argmax_param, nvinfer1::Dims in_dims) {
@@ -43,13 +46,13 @@ class ArgMax1Plugin : public nvinfer1::IPlugin {
   }
 
   /**
-  * \brief get the number of outputs from the layer
-  *
-  * \return the number of outputs
-  *
-  * this function is called by the implementations of INetworkDefinition and
-  * IBuilder. In particular, it is called prior to any call to initialize().
-  */
+   * \brief get the number of outputs from the layer
+   *
+   * \return the number of outputs
+   *
+   * this function is called by the implementations of INetworkDefinition and
+   * IBuilder. In particular, it is called prior to any call to initialize().
+   */
   virtual int initialize() { return 0; }
   virtual void terminate() {}
   int getNbOutputs() const override { return 1; }
@@ -94,7 +97,8 @@ class ArgMax1Plugin : public nvinfer1::IPlugin {
   nvinfer1::Dims input_dims_;
   nvinfer1::Dims output_dims_;
 };
+
 }  // namespace inference
 }  // namespace perception
 }  // namespace apollo
-#endif  //  INFERENCE_TENSORRT_PLUGINS_ARGMAX_PLUGIN_H_
+#endif  //  MODULES_PERCEPTION_INFERENCE_TENSORRT_PLUGINS_ARGMAX_PLUGIN_H_

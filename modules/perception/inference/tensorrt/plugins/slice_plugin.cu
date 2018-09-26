@@ -13,12 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+
 #include <vector>
 #include "modules/perception/inference/tensorrt/plugins/slice_plugin.h"
+
 namespace apollo {
 namespace perception {
 namespace inference {
+
 typedef int8_t int8;
+
 template<typename Dtype>
 __global__ void Slice(const int nthreads, const Dtype *in_data,
                       const int num_slices, const int slice_size,

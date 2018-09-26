@@ -18,8 +18,6 @@
 
 #include <iostream>
 
-#include "caffe/caffe.hpp"
-
 #include "cybertron/common/log.h"
 
 namespace apollo {
