@@ -15,11 +15,16 @@
  *****************************************************************************/
 #include "modules/perception/lidar/common/object_sequence.h"
 
+#include <utility>
+
+#include "cybertron/common/log.h"
+
 namespace apollo {
 namespace perception {
 namespace lidar {
 
-using base::ObjectPtr;
+using ObjectPtr = std::shared_ptr<apollo::perception::base::Object>;
+
 bool ObjectSequence::AddTrackedFrameObjects(
     const std::vector<ObjectPtr>& objects, TimeStampKey timestamp) {
   std::lock_guard<std::mutex> lock(mutex_);
@@ -32,7 +37,7 @@ bool ObjectSequence::AddTrackedFrameObjects(
     }
     auto res = iter->second.insert(std::make_pair(timestamp, obj));
     if (!res.second) {
-      LOG_ERROR << "Fail to insert object." << std::endl;
+      AERROR << "Fail to insert object." << std::endl;
       return false;
     }
   }

@@ -17,4 +17,16 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "type_fusion_interface",
+    hdrs = [
+        "type_fusion_interface.h",
+    ],
+    deps = [
+        "//modules/perception/base:object",
+        "//modules/perception/lib/registerer:registerer",
+        "//modules/perception/lidar/common:common",
+    ],
+)
+
 cpplint()
