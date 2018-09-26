@@ -41,10 +41,11 @@ static inline void Yield() {
 
 template <typename Rep, typename Period>
 static void SleepFor(const std::chrono::duration<Rep, Period>& sleep_duration) {
-  if (croutine::CRoutine::GetCurrentRoutine()) {
-    croutine::CRoutine::Sleep(sleep_duration);
-  } else {
+  auto routine = croutine::CRoutine::GetCurrentRoutine();
+  if (routine == nullptr) {
     std::this_thread::sleep_for(sleep_duration);
+  } else {
+    routine->Sleep(sleep_duration);
   }
 }
 
