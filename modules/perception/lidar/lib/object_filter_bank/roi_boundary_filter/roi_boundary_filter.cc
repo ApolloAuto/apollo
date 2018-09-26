@@ -13,18 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+#include "modules/perception/lidar/lib/object_filter_bank/roi_boundary_filter/roi_boundary_filter.h"
+#include "cybertron/common/log.h"
 #include "modules/perception/common/geometry/common.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lib/io/file_util.h"
-#include "modules/perception/lib/io/protobuf_util.h"
-#include "modules/perception/lidar/common/lidar_log.h"
+#include "modules/common/util/file.h"
 
-#include "modules/perception/lidar/lib/object_filter_bank/roi_boundary_filter/proto/roi_boundary_filter_config.pb.h"
-#include "modules/perception/lidar/lib/object_filter_bank/roi_boundary_filter/roi_boundary_filter.h"
+#include "modules/perception/proto/roi_boundary_filter_config.pb.h"
 
 namespace apollo {
 namespace perception {
 namespace lidar {
+
+using apollo::perception::base::PointD;
 
 bool ROIBoundaryFilter::Init(const ObjectFilterInitOptions& options) {
   lib::ConfigManager* config_manager =
@@ -40,7 +42,7 @@ bool ROIBoundaryFilter::Init(const ObjectFilterInitOptions& options) {
   config_file =
       lib::FileUtil::GetAbsolutePath(config_file, "roi_boundary_filter.conf");
   ROIBoundaryFilterConfig config;
-  CHECK(lib::ParseProtobufFromFile(config_file, &config));
+  CHECK(apollo::common::util::GetProtoFromFile(config_file, &config));
   distance_to_boundary_threshold_ = config.distance_to_boundary_threshold();
   confidence_threshold_ = config.confidence_threshold();
   cross_roi_threshold_ = config.cross_roi_threshold();
@@ -159,12 +161,12 @@ void ROIBoundaryFilter::FilterObjectsOutsideBoundary(
     // only compute distance for those outside roi
     if (!obj->lidar_supplement.is_in_roi) {
       (*objects_valid_flag)[i] = false;
-      for (auto& point : polygons_in_world_[i]) {
+      for (auto& point : polygons_in_world_[i].points()) {
         dist_to_boundary = 0.0;
         min_dist_to_boundary = DBL_MAX;
         world_point << point.x, point.y, point.z;
-        for (auto& boundary : road_boundary) {
-          common::CalculateDistAndDirToBoundary(
+        for (const auto& boundary : road_boundary) {
+          perception::common::CalculateDistAndDirToBoundary(
               world_point, boundary.left_boundary, boundary.right_boundary,
               &dist_to_boundary, &direction);
           if (min_dist_to_boundary > dist_to_boundary) {
@@ -202,12 +204,12 @@ void ROIBoundaryFilter::FilterObjectsInsideBoundary(
     if (obj->lidar_supplement.is_in_roi && !objects_cross_roi_[i] &&
         obj->confidence <= .11f) {
       (*objects_valid_flag)[i] = false;
-      for (auto& point : polygons_in_world_[i]) {
+      for (auto& point : polygons_in_world_[i].points()) {
         dist_to_boundary = 0.0;
         min_dist_to_boundary = DBL_MAX;
         world_point << point.x, point.y, point.z;
         for (auto& boundary : road_boundary) {
-          common::CalculateDistAndDirToBoundary(
+          perception::common::CalculateDistAndDirToBoundary(
               world_point, boundary.left_boundary, boundary.right_boundary,
               &dist_to_boundary, &direction);
           if (min_dist_to_boundary > dist_to_boundary) {

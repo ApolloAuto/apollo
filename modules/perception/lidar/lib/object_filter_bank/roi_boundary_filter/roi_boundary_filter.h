@@ -16,11 +16,13 @@
 #ifndef MODULES_PERCEPTION_LIDAR_LIB_OBJECT_FILTER_BANK_ROI_BOUNDARY_FILTER_H_
 #define MODULES_PERCEPTION_LIDAR_LIB_OBJECT_FILTER_BANK_ROI_BOUNDARY_FILTER_H_
 
-#include <Eigen/Dense>
 #include <string>
 #include <vector>
 
+#include "Eigen/Dense"
+
 #include "modules/perception/base/point_cloud.h"
+#include "modules/perception/base/point.h"
 #include "modules/perception/lidar/lib/interface/base_object_filter.h"
 
 namespace apollo {
@@ -64,7 +66,8 @@ class ROIBoundaryFilter : public BaseObjectFilter {
                                  std::vector<bool>* objects_valid_flag);
 
  private:
-  std::vector<base::PolygonDType> polygons_in_world_;
+  std::vector<perception::base::AttributePointCloud<perception::base::PointD>>
+      polygons_in_world_;
   std::vector<bool> objects_cross_roi_;
   std::vector<bool> objects_valid_flag_;
   // params
@@ -78,4 +81,4 @@ class ROIBoundaryFilter : public BaseObjectFilter {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_LIDAR_LIB_OBJECT_FILTER_BANK_ROI_BOUNDARY_FILTER_H_
+#endif

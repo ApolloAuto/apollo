@@ -121,4 +121,20 @@ proto_library(
     ],
 )
 
+cc_proto_library(
+    name = "roi_boundary_filter_config_proto",
+    deps = [
+        ":roi_boundary_filter_config_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "roi_boundary_filter_config_proto_lib",
+    srcs = [
+        "roi_boundary_filter_config.proto",
+    ],
+    deps = [
+    ],
+)
+
 cpplint()
