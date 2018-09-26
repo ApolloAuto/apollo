@@ -116,8 +116,8 @@ bool FusionComponent::InternalProc(
     AERROR << "Fusion receive message with error code, skip it.";
     return true;
   }
-  base::FramePtr frame;
-  BuildSensorObjs(in_message, frame);
+  base::FramePtr frame = in_message->frame_;
+  frame->timestamp = in_message->timestamp_;
 
   std::vector<base::ObjectPtr> fused_objects;
   if (!fusion_->Process(frame, &fused_objects)) {
@@ -186,14 +186,6 @@ bool FusionComponent::InternalProc(
         << std::to_string(cur_time) << "]:cur_latency[" << latency
         << "]:obj_cnt[" << valid_objects.size() << "]";
   AINFO << "publish_number: " << valid_objects.size() << " obj";
-  return true;
-}
-
-bool FusionComponent::BuildSensorObjs(
-    const std::shared_ptr<SensorFrameMessage const>& message,
-    base::FramePtr& frame) const {
-  frame = message->frame_;
-  frame->timestamp = message->timestamp_;
   return true;
 }
 
