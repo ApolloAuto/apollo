@@ -14,7 +14,11 @@
  * limitations under the License.
  *****************************************************************************/
 #include <algorithm>
+
+#include "cybertron/common/log.h"
+
 #include "modules/perception/inference/utils/util.h"
+
 namespace apollo {
 namespace perception {
 namespace inference {
@@ -90,11 +94,11 @@ bool resize(int origin_channel,
   int channel = dst->shape(3);
 
   if (origin_channel != dst->shape(3)) {
-    LOG(ERROR) << "channel should be the same after resize.";
+    AERROR << "channel should be the same after resize.";
     return false;
   }
   if (src_gpu == nullptr) {
-    LOG(ERROR) << "src_gpu should be allocated the same as the origin image.";
+    AERROR << "src_gpu should be allocated the same as the origin image.";
     return false;
   }
   float fx = static_cast<float>(origin_width) / static_cast<float>(width);

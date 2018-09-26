@@ -272,10 +272,10 @@ void KalmanMotionFusion::MotionFusionWithMeasurement(
                                    ->velocity_uncertainty.topLeftCorner(2, 2)
                                    .cast<double>();
 
-  LOG_DEBUG << "fusion_original_measurement@(" << std::setprecision(10)
+  ADEBUG << "fusion_original_measurement@(" << std::setprecision(10)
             << observation(0) << "," << observation(1) << "," << observation(2)
             << "," << observation(3) << ")";
-  LOG_DEBUG << "fusion_original_measurement_covariance@(" << r_matrix(0, 0)
+  ADEBUG << "fusion_original_measurement_covariance@(" << r_matrix(0, 0)
             << "," << r_matrix(0, 1) << "," << r_matrix(1, 0) << ","
             << r_matrix(1, 1) << "," << r_matrix(2, 2) << "," << r_matrix(2, 3)
             << "," << r_matrix(3, 2) << "," << r_matrix(3, 3) << ")";
@@ -296,10 +296,10 @@ void KalmanMotionFusion::MotionFusionWithMeasurement(
   RewardRMatrix(measurement->GetSensorType(),
                 measurement->GetBaseObject()->velocity_converged, &r_matrix);
 
-  LOG_DEBUG << "fusion_pseudo_measurement@(" << std::setprecision(10)
+  ADEBUG << "fusion_pseudo_measurement@(" << std::setprecision(10)
             << observation(0) << "," << observation(1) << "," << observation(2)
             << "," << observation(3) << ")";
-  LOG_DEBUG << "fusion_pseudo_measurement_covariance@(" << r_matrix(0, 0) << ","
+  ADEBUG << "fusion_pseudo_measurement_covariance@(" << r_matrix(0, 0) << ","
             << r_matrix(0, 1) << "," << r_matrix(1, 0) << "," << r_matrix(1, 1)
             << "," << r_matrix(2, 2) << "," << r_matrix(2, 3) << ","
             << r_matrix(3, 2) << "," << r_matrix(3, 3) << ")";
@@ -308,12 +308,12 @@ void KalmanMotionFusion::MotionFusionWithMeasurement(
   kalman_filter_.Correct(observation, r_matrix);
   kalman_filter_.CorrectionBreakdown();
 
-  LOG_DEBUG << "fusion_filter_belief@(" << std::setprecision(10)
+  ADEBUG << "fusion_filter_belief@(" << std::setprecision(10)
             << kalman_filter_.GetStates()(0) << ","
             << kalman_filter_.GetStates()(1) << ","
             << kalman_filter_.GetStates()(2) << ","
             << kalman_filter_.GetStates()(3) << ")";
-  LOG_DEBUG << "fusion_filter_belief_covariance@("
+  ADEBUG << "fusion_filter_belief_covariance@("
             << kalman_filter_.GetUncertainty()(0, 0) << ","
             << kalman_filter_.GetUncertainty()(0, 1) << ","
             << kalman_filter_.GetUncertainty()(1, 0) << ","
@@ -355,7 +355,7 @@ Eigen::VectorXd KalmanMotionFusion::ComputeAccelerationMeasurement(
   if (GetSensorHistoryLength(sensor_type) >= s_eval_window_) {
     int history_index = GetSensorHistoryIndex(sensor_type, s_eval_window_);
     if (history_index < 0 || history_index >= history_velocity_.size()) {
-      LOG_ERROR << "illegal history index";
+      AERROR << "illegal history index";
       return Eigen::Vector3d::Zero();
     }
     acceleration_measurement = velocity - history_velocity_[history_index];
@@ -413,7 +413,7 @@ Eigen::Vector4d KalmanMotionFusion::ComputePseudoMeasurement(
   if (sensor_manager->IsCamera(sensor_type)) {
     return ComputePseudoCameraMeasurement(measurement);
   }
-  LOG_INFO << "unsupport sensor type for pseudo measurement computation!";
+  AINFO << "unsupport sensor type for pseudo measurement computation!";
   Eigen::Vector4d pseudo_measurement = measurement;
   return pseudo_measurement;
 }

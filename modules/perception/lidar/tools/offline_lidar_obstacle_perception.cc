@@ -65,30 +65,30 @@ class OfflineLidarObstaclePerception {
     lib::FLAGS_config_manager_path = "./conf";
     config_manager_ = lib::Singleton<lib::ConfigManager>::get_instance();
     if (config_manager_ == NULL) {
-      LOG_ERROR << "Failed to get ConfigManager instance.";
+      AERROR << "Failed to get ConfigManager instance.";
       return false;
     }
     if (!config_manager_->Init()) {
-      LOG_ERROR << "Failed to int ConfigManage.";
+      AERROR << "Failed to int ConfigManage.";
       return false;
     }
     lidar_segmentation_.reset(new LidarObstacleSegmentation);
     if (lidar_segmentation_ == nullptr) {
-      LOG_ERROR << "Failed to get LidarObstacleSegmentation instance.";
+      AERROR << "Failed to get LidarObstacleSegmentation instance.";
       return false;
     }
     segment_init_options_.enable_hdmap_input = FLAGS_use_hdmap;
     if (!lidar_segmentation_->Init(segment_init_options_)) {
-      LOG_INFO << "Failed to init LidarObstacleSegmentation.";
+      AINFO << "Failed to init LidarObstacleSegmentation.";
       return false;
     }
     lidar_tracking_.reset(new LidarObstacleTracking);
     if (lidar_tracking_ == nullptr) {
-      LOG_ERROR << "Failed to get LidarObstacleTracking instance.";
+      AERROR << "Failed to get LidarObstacleTracking instance.";
       return false;
     }
     if (!lidar_tracking_->Init(tracking_init_options_)) {
-      LOG_INFO << "Failed to init LidarObstacleSegmentation.";
+      AINFO << "Failed to init LidarObstacleSegmentation.";
       return false;
     }
 
@@ -114,8 +114,8 @@ class OfflineLidarObstaclePerception {
                 }
               });
     for (size_t i = 0; i < pcd_file_names.size(); i++) {
-      LOG_INFO << "***************** Frame " << i << " ******************";
-      LOG_INFO << pcd_file_names[i];
+      AINFO << "***************** Frame " << i << " ******************";
+      AINFO << pcd_file_names[i];
       lib::FileUtil::GetFileName(pcd_file_names[i], &file_name);
       frame_ = LidarFramePool::Instance().Get();
       frame_->reserve = file_name;
@@ -123,22 +123,22 @@ class OfflineLidarObstaclePerception {
         frame_->cloud = base::PointFCloudPool::Instance().Get();
       }
       LoadPCLPCD(pcd_folder + "/" + file_name + ".pcd", frame_->cloud.get());
-      LOG_INFO << "Read point cloud from " << pcd_file_names[i]
+      AINFO << "Read point cloud from " << pcd_file_names[i]
                << " with cloud size: " << frame_->cloud->size();
       if (pose_folder != "") {
         lib::FileUtil::GetFileName(pcd_file_names[i], &file_name);
         std::string pose_file_name = pose_folder + "/" + file_name + ".pose";
-        LOG_INFO << "Pose file: " << pose_file_name;
+        AINFO << "Pose file: " << pose_file_name;
         if (!lib::FileUtil::Exists(pose_file_name)) {
           pose_file_name = pose_folder + "/" + file_name + ".pcd.pose";
         }
         int idt = 0;
         if (common::ReadPoseFile(pose_file_name, &frame_->lidar2world_pose,
                                  &idt, &timestamp)) {
-          LOG_INFO << "[timestamp]: " << std::setprecision(16) << timestamp;
+          AINFO << "[timestamp]: " << std::setprecision(16) << timestamp;
           frame_->timestamp = timestamp;
         } else {
-          LOG_INFO << "Failed to load pose, disable tracking pipeline.";
+          AINFO << "Failed to load pose, disable tracking pipeline.";
           FLAGS_enable_tracking = false;
         }
       }
@@ -146,15 +146,15 @@ class OfflineLidarObstaclePerception {
       LidarProcessResult segment_result =
           lidar_segmentation_->Process(segment_options_, frame_.get());
       if (segment_result.error_code != LidarErrorCode::Succeed) {
-        LOG_INFO << segment_result.log;
+        AINFO << segment_result.log;
         return;
       }
       if (FLAGS_enable_tracking) {
-        LOG_INFO << "Enable tracking.";
+        AINFO << "Enable tracking.";
         LidarProcessResult tracking_result =
             lidar_tracking_->Process(tracking_options_, frame_.get());
         if (tracking_result.error_code != LidarErrorCode::Succeed) {
-          LOG_INFO << tracking_result.log;
+          AINFO << tracking_result.log;
           return;
         }
         if (FLAGS_use_tracking_info) {
@@ -211,7 +211,7 @@ class OfflineLidarObstaclePerception {
                                    const std::string& path) {
     std::ofstream fout(path);
     if (!fout.is_open()) {
-      LOG_ERROR << "Fail to open " << path << std::endl;
+      AERROR << "Fail to open " << path << std::endl;
       return false;
     }
     fout << frame_id << " " << objects.size() << std::endl;
@@ -327,7 +327,7 @@ int main(int argc, char* argv[]) {
 
   apollo::perception::lidar::OfflineLidarObstaclePerception test;
   if (!test.setup()) {
-    LOG_INFO << "Failed to setup OfflineLidarObstaclePerception";
+    AINFO << "Failed to setup OfflineLidarObstaclePerception";
     return 0;
   }
   test.run();

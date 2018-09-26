@@ -15,8 +15,6 @@
  *****************************************************************************/
 #include "modules/perception/fusion/base/sensor_frame.h"
 
-#include <assert.h>
-
 namespace apollo {
 namespace perception {
 namespace fusion {
@@ -46,13 +44,9 @@ void SensorFrame::Initialize(const base::FrameConstPtr& frame_ptr,
   }
 }
 
-std::string SensorFrame::GetSensorId() const {
-  return sensor_id_;
-}
+std::string SensorFrame::GetSensorId() const { return sensor_id_; }
 
-base::SensorType SensorFrame::GetSensorType() const {
-  return sensor_type_;
-}
+base::SensorType SensorFrame::GetSensorType() const { return sensor_type_; }
 
 }  // namespace fusion
 }  // namespace perception

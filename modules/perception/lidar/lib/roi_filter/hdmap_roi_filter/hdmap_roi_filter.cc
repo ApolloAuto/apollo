@@ -72,7 +72,7 @@ bool HdmapROIFilter::Init(const ROIFilterInitOptions& options) {
   bitmap_.Init(min_range, max_range, cell_size);
 
   // output input parameters
-  LOG_INFO << " HDMap Roi Filter Parameters: "
+  AINFO << " HDMap Roi Filter Parameters: "
            << " range: " << range_ << " cell_size: " << cell_size_
            << " extend_dist: " << extend_dist_
            << " no_edge_table: " << no_edge_table_
@@ -83,7 +83,7 @@ bool HdmapROIFilter::Init(const ROIFilterInitOptions& options) {
 bool HdmapROIFilter::Filter(const ROIFilterOptions& options,
                             LidarFrame* frame) {
   if (frame->hdmap_struct == nullptr || frame->cloud == nullptr) {
-    LOG_ERROR << " Input frame data error !";
+    AERROR << " Input frame data error !";
     return false;
   }
 
@@ -92,7 +92,7 @@ bool HdmapROIFilter::Filter(const ROIFilterOptions& options,
   auto& junction_polygons = frame->hdmap_struct->junction_polygons;
   size_t polygons_world_size = road_polygons.size() + junction_polygons.size();
   if (0 == polygons_world_size) {
-    LOG_INFO << " Polygon Empty.";
+    AINFO << " Polygon Empty.";
     return false;
   }
 
@@ -135,7 +135,7 @@ bool HdmapROIFilter::Filter(const ROIFilterOptions& options,
       roi_service_content_.transform_ = frame->lidar2world_pose.translation();
       roi_service->UpdateServiceContent(roi_service_content_);
     } else {
-      LOG_INFO << "Failed to find roi service and cannot update.";
+      AINFO << "Failed to find roi service and cannot update.";
     }
   }
   return ret;
@@ -221,7 +221,7 @@ bool HdmapROIFilter::Bitmap2dFilter(const base::PointFCloudPtr& in_cloud,
                                     const Bitmap2D& bitmap,
                                     base::PointIndices* roi_indices) {
   if (!bitmap.Check(Eigen::Vector2d(0.0, 0.0))) {
-    LOG_WARN << " Car is not in roi!!.";
+    AWARN << " Car is not in roi!!.";
     return false;
   }
   roi_indices->indices.clear();

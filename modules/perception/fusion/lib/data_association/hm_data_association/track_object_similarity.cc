@@ -122,7 +122,7 @@ double ComputePtsBoxShapeSimilarity(const ProjectionCachePtr& cache,
   double square_norm_box_size_diff =
       box_size_diff.x() * box_size_diff.x() / x_std_dev / x_std_dev +
       box_size_diff.y() * box_size_diff.y() / y_std_dev / y_std_dev;
-  LOG_DEBUG << "camera_box_size@(" << camera_box_size(0) << ","
+  ADEBUG << "camera_box_size@(" << camera_box_size(0) << ","
             << camera_box_size(1) << "); "
             << "velo_box_size@(" << velo_box_size.x() << ","
             << velo_box_size.y() << "); "
@@ -149,7 +149,7 @@ double ComputePtsBoxSimilarity(const ProjectionCachePtr& cache,
       ComputePtsBoxLocationSimilarity(cache, object, camera_bbox);
   double shape_similarity =
       ComputePtsBoxShapeSimilarity(cache, object, camera_bbox);
-  LOG_DEBUG << "location_similarity@" << location_similarity
+  ADEBUG << "location_similarity@" << location_similarity
             << ", shape_similarity@" << shape_similarity;
   double fused_similarity =
       FuseTwoProbabilities(location_similarity, shape_similarity);

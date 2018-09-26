@@ -79,26 +79,26 @@ bool HDMapInput::InitHDMap() {
   // std::string model_name = "HDMapInput";
   // const lib::ModelConfig* model_config = NULL;
   // if (!config_manager->GetModelConfig(model_name, &model_config)) {
-  //   LOG_ERROR << "not found model: " << model_name;
+  //   AERROR << "not found model: " << model_name;
   //   return false;
   // }
   // if (!model_config->get_value("hdmap_sample_step", &hdmap_sample_step_)) {
-  //   LOG_ERROR << "hdmap_sample_step not found.";
+  //   AERROR << "hdmap_sample_step not found.";
   //   hdmap_sample_step_ = 5;
   // }
   // if (!model_config->get_value("hdmap_file", &hdmap_file_)) {
-  //   LOG_ERROR << "hdmap_file not found.";
+  //   AERROR << "hdmap_file not found.";
   //   return false;
   // }
   // if (!lib::FileUtil::Exists(hdmap_file_)) {
-  //   LOG_ERROR << "Failed to find hadmap file: " << hdmap_file_;
+  //   AERROR << "Failed to find hadmap file: " << hdmap_file_;
   //   return false;
   // }
   // if (hdmap_->load_map_from_file(hdmap_file_) != 0) {
-  //   LOG_ERROR << "Failed to load hadmap file: " << hdmap_file_;
+  //   AERROR << "Failed to load hadmap file: " << hdmap_file_;
   //   return false;
   // }
-  // LOG_INFO << "load hdmap file: " << hdmap_file_;
+  // AINFO << "load hdmap file: " << hdmap_file_;
   return true;
 }
 
@@ -118,7 +118,7 @@ bool HDMapInput::GetRoiHDMapStruct(
   //     &road_boundary_vec,
   //     &junctions_vec);
   // if (status != 0) {
-  //   LOG_ERROR << "Failed to get road boundary, point: "
+  //   AERROR << "Failed to get road boundary, point: "
   //     << point.DebugString();
   //   return false;
   // }
@@ -170,7 +170,7 @@ bool HDMapInput::GetRoiHDMapStruct(
 //     const BoundaryLine& left_boundary = boundary[i]->left_boundary;
 //     const std::vector<adu::common::hdmap::Point>& left_line_points =
 //       left_boundary.line_points;
-//     LOG_DEBUG << "input left road_boundary size = " <<
+//     ADEBUG << "input left road_boundary size = " <<
 //     left_line_points.size();
 //     step = (left_line_points.size() > 2) ? hdmap_sample_step_ : 1;
 //     for (int idx = 0; idx < left_line_points.size(); idx += step) {
@@ -188,13 +188,13 @@ bool HDMapInput::GetRoiHDMapStruct(
 //       road_polygons_ptr->at(polygons_index).push_back(
 //           road_boundaries_ptr->at(polygons_index).left_boundary[index]);
 //     }
-//     LOG_DEBUG << "left road_boundary downsample size = "
+//     ADEBUG << "left road_boundary downsample size = "
 //       << road_polygons_ptr->at(polygons_index).size();
 //     temp_cloud->clear();
 //     const BoundaryLine& right_boundary = boundary[i]->right_boundary;
 //     const std::vector<adu::common::hdmap::Point>& right_line_points
 //       = right_boundary.line_points;
-//     LOG_DEBUG << "input right road_boundary size = "
+//     ADEBUG << "input right road_boundary size = "
 //       << right_line_points.size();
 //     step = (right_line_points.size() > 2) ? hdmap_sample_step_ : 1;
 //     for (int idx = 0; idx < right_line_points.size(); idx += step) {
@@ -215,7 +215,7 @@ bool HDMapInput::GetRoiHDMapStruct(
 //           road_boundaries_ptr->at(
 //             polygons_index).right_boundary.size() - 1 - index]);
 //     }
-//     LOG_DEBUG << "right road_boundary downsample size = "
+//     ADEBUG << "right road_boundary downsample size = "
 //       << road_polygons_ptr->at(polygons_index).size();
 //     polygons_index++;
 //   }
@@ -308,7 +308,7 @@ void HDMapInput::DownsamplePoints(
   // }
   // // the last point
   // polygon_ptr->push_back(raw_cloud[raw_cloud_size - 1]);
-  // LOG_INFO << "Downsample road boundary points from "
+  // AINFO << "Downsample road boundary points from "
   //   << raw_cloud_size << " to " << polygon_ptr->size();
 }
 
@@ -375,7 +375,7 @@ bool HDMapInput::GetNearestLaneDirection(const base::PointD& pointd,
   // int status = hdmap_->get_nearest_lane(point, &nearest_lane,
   //     &nearest_s, &nearest_l);
   // if (status != 0) {
-  //   LOG_INFO << "Failed to get nearest lane for point " <<
+  //   AINFO << "Failed to get nearest lane for point " <<
   //   point.DebugString();
   //   return false;
   // }
@@ -409,16 +409,16 @@ bool HDMapInput::GetNearestLaneDirection(const base::PointD& pointd,
 //         forward_distance,
 //         &forward_signals);
 //     if (result != 0) {
-//       LOG_ERROR << "Failed to call HDMap::get_signal. point: "
+//       AERROR << "Failed to call HDMap::get_signal. point: "
 //         << point.ShortDebugString();
 //       return false;
 //     }
 //     signals->reserve(forward_signals.size());
 //     for (auto& signal_info : forward_signals) {
 //       signals->push_back(signal_info->signal());
-//       LOG_DEBUG << "Signal: " << signals->back().DebugString();
+//       ADEBUG << "Signal: " << signals->back().DebugString();
 //     }
-//     LOG_DEBUG << "get_signal success. num_signals: " << signals->size()
+//     ADEBUG << "get_signal success. num_signals: " << signals->size()
 //       << " point: " << point.ShortDebugString();
 //     return true;
 // }

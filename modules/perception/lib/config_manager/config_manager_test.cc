@@ -18,8 +18,8 @@
 
 #define private public
 #define protected public
-#include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/common/perception_gflags.h"
+#include "modules/perception/lib/config_manager/config_manager.h"
 
 namespace apollo {
 namespace perception {
@@ -30,9 +30,9 @@ class ConfigManagerTest : public testing::Test {
   ConfigManagerTest() : config_manager_(NULL) {}
   virtual ~ConfigManagerTest() {}
   virtual void SetUp() {
-    char* cybertron_path = "CYBERTRON_PATH=";
+    char cybertron_path[80] = "CYBERTRON_PATH=";
     putenv(cybertron_path);
-    char* module_path = "MODULE_PATH=";
+    char module_path[80] = "MODULE_PATH=";
     putenv(module_path);
     FLAGS_config_manager_path = "/apollo/modules/perception/testdata/lib/conf";
     config_manager_ = lib::Singleton<ConfigManager>::get_instance();

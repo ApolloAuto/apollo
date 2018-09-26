@@ -24,7 +24,7 @@ namespace lidar {
 __attribute__((constructor)) void TrackPoolInitialize() {
   TrackedObjectPool::Instance();
   TrackDataPool::Instance();
-  LOG_INFO << "Initialize track pool.";
+  AINFO << "Initialize track pool.";
 }
 
 }  // namespace lidar

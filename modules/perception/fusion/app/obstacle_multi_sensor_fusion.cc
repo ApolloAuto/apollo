@@ -22,7 +22,7 @@ namespace fusion {
 bool ObstacleMultiSensorFusion::Init(
     const ObstacleMultiSensorFusionParam& param) {
   if (fusion_ != nullptr) {
-    LOG_INFO << "Already inited";
+    AINFO << "Already inited";
     return true;
   }
   fusion_ = BaseFusionSystemRegisterer::GetInstanceByName(param.fusion_method);
@@ -30,7 +30,7 @@ bool ObstacleMultiSensorFusion::Init(
   FusionInitOptions init_options;
   init_options.main_sensor = param.main_sensor;
   if (fusion_ == nullptr || !fusion_->Init(init_options)) {
-    LOG_INFO << "Failed to Get Instance or Initialize " << param.fusion_method;
+    AINFO << "Failed to Get Instance or Initialize " << param.fusion_method;
     return false;
   }
   return true;

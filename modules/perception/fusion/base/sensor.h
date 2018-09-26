@@ -55,7 +55,7 @@ class Sensor : public std::enable_shared_from_this<Sensor> {
 
   void AddFrame(const base::FrameConstPtr& frame_ptr);
 
-  static void SetMaxCachedFrameNumber(int number) {
+  static void SetMaxCachedFrameNumber(size_t number) {
     kMaxCachedFrameNum = number;
   }
 
@@ -69,7 +69,7 @@ class Sensor : public std::enable_shared_from_this<Sensor> {
 
   std::deque<SensorFramePtr> frames_;
 
-  static int kMaxCachedFrameNum;
+  static size_t kMaxCachedFrameNum;
 };
 
 }  // namespace fusion

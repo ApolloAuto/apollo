@@ -12,6 +12,7 @@ cuda_library(
         "util.h",
     ],
     deps = [
+        "//framework:cybertron",
         "@cuda",
         "@eigen",
     ],
@@ -32,10 +33,10 @@ cc_library(
 cc_test(
     name = "inference_util_test",
     size = "small",
+    srcs = ["util_test.cc"],
     data = [
         "//modules/perception/inference:inference_test_data",
     ],
-    srcs = ["util_test.cc"],
     linkopts = ["-lopencv_core -lopencv_imgproc -lopencv_highgui -lnvinfer_plugin -lcaffe"],
     deps = [
         ":inference_util_lib",
@@ -57,10 +58,10 @@ cc_library(
 cc_test(
     name = "inference_binary_data_test",
     size = "small",
+    srcs = ["binary_data_test.cc"],
     data = [
         "//modules/perception/inference:inference_test_data",
     ],
-    srcs = ["binary_data_test.cc"],
     linkopts = ["-lopencv_core -lopencv_imgproc -lopencv_highgui -lnvinfer_plugin -lcaffe"],
     deps = [
         ":inference_binary_data_lib",

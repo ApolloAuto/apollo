@@ -27,18 +27,18 @@ KalmanFilter::~KalmanFilter() {}
 bool KalmanFilter::Init(const Eigen::VectorXd &initial_belief_states,
                         const Eigen::MatrixXd &initial_uncertainty) {
   if (initial_uncertainty.rows() != initial_uncertainty.cols()) {
-    LOG_ERROR << "the cols and rows of uncertainty martix should be equal";
+    AERROR << "the cols and rows of uncertainty martix should be equal";
     return false;
   }
   states_num_ = initial_uncertainty.rows();
 
   if (states_num_ <= 0) {
-    LOG_ERROR << "state_num should be greater than zero";
+    AERROR << "state_num should be greater than zero";
     return false;
   }
 
   if (states_num_ != initial_belief_states.rows()) {
-    LOG_ERROR << "the rows of state should be equal to state_num";
+    AERROR << "the rows of state should be equal to state_num";
     return false;
   }
 
@@ -64,23 +64,23 @@ bool KalmanFilter::Init(const Eigen::VectorXd &initial_belief_states,
 bool KalmanFilter::Predict(const Eigen::MatrixXd &transform_matrix,
                            const Eigen::MatrixXd &env_uncertainty_matrix) {
   if (init_ == false) {
-    LOG_ERROR << "Predict: Kalman Filter initalize not sucessfully";
+    AERROR << "Predict: Kalman Filter initalize not sucessfully";
     return false;
   }
   if (transform_matrix.rows() != states_num_) {
-    LOG_ERROR << "the rows of transform matrix should be equal to state_num";
+    AERROR << "the rows of transform matrix should be equal to state_num";
     return false;
   }
   if (transform_matrix.cols() != states_num_) {
-    LOG_ERROR << "the cols of transform matrix should be equal to state_num";
+    AERROR << "the cols of transform matrix should be equal to state_num";
     return false;
   }
   if (env_uncertainty_matrix.rows() != states_num_) {
-    LOG_ERROR << "the rows of env uncertainty should be equal to state_num";
+    AERROR << "the rows of env uncertainty should be equal to state_num";
     return false;
   }
   if (env_uncertainty_matrix.cols() != states_num_) {
-    LOG_ERROR << "the cols of env uncertainty should be equal to state_num";
+    AERROR << "the cols of env uncertainty should be equal to state_num";
     return false;
   }
   transform_matrix_ = transform_matrix;
@@ -95,20 +95,20 @@ bool KalmanFilter::Predict(const Eigen::MatrixXd &transform_matrix,
 bool KalmanFilter::Correct(const Eigen::VectorXd &cur_observation,
                            const Eigen::MatrixXd &cur_observation_uncertainty) {
   if (init_ == false) {
-    LOG_ERROR << "Correct: Kalman Filter initalize not sucessfully";
+    AERROR << "Correct: Kalman Filter initalize not sucessfully";
     return false;
   }
   if (cur_observation.rows() != states_num_) {
-    LOG_ERROR << "the rows of current observation should be equal to state_num";
+    AERROR << "the rows of current observation should be equal to state_num";
     return false;
   }
   if (cur_observation_uncertainty.rows() != states_num_) {
-    LOG_ERROR << "the rows of current observation uncertainty "
+    AERROR << "the rows of current observation uncertainty "
                  "should be equal to state_num";
     return false;
   }
   if (cur_observation_uncertainty.cols() != states_num_) {
-    LOG_ERROR << "the cols of current observation uncertainty "
+    AERROR << "the cols of current observation uncertainty "
                  "should be equal to state_num";
     return false;
   }
@@ -133,12 +133,12 @@ bool KalmanFilter::Correct(const Eigen::VectorXd &cur_observation,
 
 bool KalmanFilter::SetControlMatrix(const Eigen::MatrixXd &control_matrix) {
   if (init_ == false) {
-    LOG_ERROR << "SetControlMatrix: Kalman Filter initalize not sucessfully";
+    AERROR << "SetControlMatrix: Kalman Filter initalize not sucessfully";
     return false;
   }
   if (control_matrix.rows() != states_num_ ||
       control_matrix.cols() != states_num_) {
-    LOG_ERROR << "the rows/cols of control matrix should be equal to state_num";
+    AERROR << "the rows/cols of control matrix should be equal to state_num";
     return false;
   }
   c_matrix_ = control_matrix;

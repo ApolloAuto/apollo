@@ -246,7 +246,7 @@ float TrackObjectDistance::ComputeBboxSizeDistance(
                  std::max(old_bbox_size(1), new_bbox_size(0));
     size_dist = std::min(temp_val_0, temp_val_1);
   }
-  // LOG_INFO << "size distance value "  << old_bbox_size(0) << " " <<
+  // AINFO << "size distance value "  << old_bbox_size(0) << " " <<
   // new_bbox_size(0)
   //                                   << " " << dot_val_00 << " " << dot_val_01
   //                                   << " " << temp_val_0 << " " << temp_val_1
@@ -289,7 +289,7 @@ float TrackObjectDistance::ComputeHistogramDistance(
   std::vector<float> &new_object_shape_features = new_object->shape_features;
 
   if (old_object_shape_features.size() != new_object_shape_features.size()) {
-    LOG_ERROR << "sizes of compared features not matched. TrackObjectDistance";
+    AERROR << "sizes of compared features not matched. TrackObjectDistance";
     return 100;
   }
 

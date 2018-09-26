@@ -111,13 +111,13 @@ bool HmMultiTargetTracker::Track(const MultiTargetTrackerOptions& options,
 
   // 2. update tracks
   if (is_first_time_) {
-    LOG_INFO << "..................start track.......................";
+    AINFO << "..................start track.......................";
     if (!InitializeTracks(options)) {
-      LOG_INFO << "Failed to initialize tracks.";
+      AINFO << "Failed to initialize tracks.";
     }
     is_first_time_ = false;
   } else if (!UpdateTracks(options)) {
-    LOG_INFO << "Failed to update tracks.";
+    AINFO << "Failed to update tracks.";
   }
 
   // 3. collect result from tracks
@@ -143,7 +143,7 @@ bool HmMultiTargetTracker::InitializeTracks(
 
 bool HmMultiTargetTracker::UpdateTracks(
     const MultiTargetTrackerOptions& options) {
-  LOG_INFO << "..................new frame.......................";
+  AINFO << "..................new frame.......................";
   // 1. compute prediction from tracks
   std::vector<Eigen::VectorXf> foreground_track_predicts;
   std::vector<Eigen::VectorXf> background_track_predicts(
@@ -151,7 +151,7 @@ bool HmMultiTargetTracker::UpdateTracks(
 
   double time_diff = current_timestamp_ - last_timestamp_;
 
-  LOG_INFO << "...........fore ground track start................";
+  AINFO << "...........fore ground track start................";
 
   ComputeTracksPredict(foreground_track_data_, &foreground_track_predicts,
                        current_timestamp_);
@@ -164,7 +164,7 @@ bool HmMultiTargetTracker::UpdateTracks(
   MatchWrapper(matcher_options, foreground_objects_, foreground_track_data_,
                foreground_track_predicts, time_diff, foreground_matcher_.get(),
                &assignments, &unassigned_tracks, &unassigned_objects);
-  LOG_INFO << "Foreground association, #track: "
+  AINFO << "Foreground association, #track: "
            << foreground_track_data_.size()
            << " #object: " << foreground_objects_.size()
            << " #assoc: " << assignments.size();
@@ -176,12 +176,12 @@ bool HmMultiTargetTracker::UpdateTracks(
   CreateNewTracks(foreground_objects_, unassigned_objects,
                   &foreground_track_data_);
 
-  LOG_INFO << "...........back ground track start................";
+  AINFO << "...........back ground track start................";
   // 3. background object track association and update
   MatchWrapper(matcher_options, background_objects_, background_track_data_,
                background_track_predicts, time_diff, background_matcher_.get(),
                &assignments, &unassigned_tracks, &unassigned_objects);
-  LOG_INFO << "Background association, #track: "
+  AINFO << "Background association, #track: "
            << background_track_data_.size()
            << " #object: " << background_objects_.size()
            << " #assoc: " << assignments.size();
@@ -341,13 +341,13 @@ void HmMultiTargetTracker::CreateNewTracks(
     const std::vector<TrackedObjectPtr>& objects,
     const std::vector<size_t>& unassigned_indices,
     std::vector<TrackDataPtr>* track_datas) {
-  LOG_INFO << "new track size " << unassigned_indices.size();
+  AINFO << "new track size " << unassigned_indices.size();
   for (size_t i = 0; i < unassigned_indices.size(); ++i) {
     TrackDataPtr track_data = TrackDataPool::Instance().Get();
     tracker_->UpdateTrackDataWithObject(
         track_data, objects[unassigned_indices[i]], current_timestamp_);
     track_datas->push_back(track_data);
-    // LOG_INFO  << "new track " <<
+    // AINFO  << "new track " <<
     // objects[unassigned_indices[i]]->belief_anchor_point[0] << " "
     //           << objects[unassigned_indices[i]]->belief_anchor_point[1] << "
     //           "

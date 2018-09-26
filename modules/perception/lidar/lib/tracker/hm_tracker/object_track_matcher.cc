@@ -177,7 +177,7 @@ void ObjectTrackMatcher::ComputeAssociateMatrix(
     for (size_t j = 0; j < new_objects.size(); ++j) {
       ss << (*association_mat)(i, j) << " ";
     }
-    LOG_INFO << "association matrix : "<< ss.str();
+    AINFO << "association matrix : "<< ss.str();
   }*/
 }
 

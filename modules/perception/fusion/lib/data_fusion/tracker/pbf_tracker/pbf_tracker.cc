@@ -49,14 +49,14 @@ bool PbfTracker::InitParams() {
 
   std::string config =
       lib::FileUtil::GetAbsolutePath(woork_root_config, options.conf_file);
-  LOG_INFO << "Config file : " << config;
+  AINFO << "Config file : " << config;
   PbfTrackerConfig params;
   if (!lib::ParseProtobufFromFile<PbfTrackerConfig>(config, &params)) {
-    LOG_ERROR << "Read config failed: " << config;
+    AERROR << "Read config failed: " << config;
     return false;
   }
 
-  LOG_INFO << "Load PbfTrackerConfig: " << params.type_fusion_method() << ","
+  AINFO << "Load PbfTrackerConfig: " << params.type_fusion_method() << ","
            << params.motion_fusion_method() << ","
            << params.shape_fusion_method() << ","
            << params.existance_fusion_method();
@@ -72,28 +72,28 @@ bool PbfTracker::InitMethods() {
   if (s_type_fusion_method_ == "DstTypeFusion") {
     type_fusion_.reset(new DstTypeFusion(track_));
   } else {
-    LOG_ERROR << "Unknown type fusion : " << s_type_fusion_method_;
+    AERROR << "Unknown type fusion : " << s_type_fusion_method_;
     return false;
   }
 
   if (s_motion_fusion_method_ == "KalmanMotionFusion") {
     motion_fusion_.reset(new KalmanMotionFusion(track_));
   } else {
-    LOG_ERROR << "Unknown motion fusion : " << s_motion_fusion_method_;
+    AERROR << "Unknown motion fusion : " << s_motion_fusion_method_;
     return false;
   }
 
   if (s_existance_fusion_method_ == "DstExistanceFusion") {
     existance_fusion_.reset(new DstExistanceFusion(track_));
   } else {
-    LOG_ERROR << "Unknown existance fusion : " << s_existance_fusion_method_;
+    AERROR << "Unknown existance fusion : " << s_existance_fusion_method_;
     return false;
   }
 
   if (s_shape_fusion_method_ == "PbfShapeFusion") {
     shape_fusion_.reset(new PbfShapeFusion(track_));
   } else {
-    LOG_ERROR << "Unknown shape fusion : " << s_shape_fusion_method_;
+    AERROR << "Unknown shape fusion : " << s_shape_fusion_method_;
     return false;
   }
 
@@ -113,7 +113,7 @@ void PbfTracker::UpdateWithMeasurement(const TrackerOptions& options,
                                        const SensorObjectPtr measurement,
                                        double target_timestamp) {
   std::string sensor_id = measurement->GetSensorId();
-  LOG_DEBUG << "fusion_updating..." << track_->GetTrackId() << " with "
+  ADEBUG << "fusion_updating..." << track_->GetTrackId() << " with "
             << sensor_id << "..." << measurement->GetBaseObject()->track_id
             << "@" << GLOG_TIMESTAMP(measurement->GetTimestamp());
   existance_fusion_->UpdateWithMeasurement(measurement, target_timestamp,

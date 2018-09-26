@@ -203,7 +203,7 @@ bool FileUtil::GetFileContent(const string &path, string *content) {
 bool FileUtil::ReadLines(const string &path, vector<string> *lines) {
   std::ifstream fin(path);
   if (!fin.good()) {
-    LOG(ERROR) << "Failed to open path: " << path;
+    AERROR << "Failed to open path: " << path;
     return false;
   }
   if (lines == nullptr) {

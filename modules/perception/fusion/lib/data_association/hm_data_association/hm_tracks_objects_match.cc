@@ -71,7 +71,7 @@ bool HMTrackersObjectsAssociation::Associate(
   sensor_measurements->GetPose(&pose);
   Eigen::Vector3d ref_point = pose.translation();
 
-  LOG_DEBUG << "association_measurement_timestamp@" << measurement_timestamp;
+  ADEBUG << "association_measurement_timestamp@" << measurement_timestamp;
   ComputeAssociationDistanceMat(fusion_tracks, sensor_objects, ref_point,
                                 association_result->unassigned_tracks,
                                 association_result->unassigned_measurements,
@@ -112,7 +112,7 @@ bool HMTrackersObjectsAssociation::Associate(
   //    fusion_tracks[assignments[i].first]->GetTrackId();
   //  int obs_id =
   //    sensor_objects[assignments[i].second]->GetBaseObject()->track_id;
-  //  LOG_DEBUG << "local_track_id_assign: " << track_id << ", " << obs_id;
+  //  ADEBUG << "local_track_id_assign: " << track_id << ", " << obs_id;
   //}
 
   // start do post assign
@@ -134,7 +134,7 @@ bool HMTrackersObjectsAssociation::Associate(
                   measurement_ind_g2l, measurement_ind_l2g, association_mat,
                   association_result);
 
-  LOG_INFO << "association: measurement_num = " << sensor_objects.size()
+  AINFO << "association: measurement_num = " << sensor_objects.size()
            << ", track_num = " << fusion_tracks.size()
            << ", assignments = " << association_result->assignments.size()
            << ", unassigned_tracks = "
@@ -148,7 +148,7 @@ bool HMTrackersObjectsAssociation::Associate(
   //    fusion_tracks[final_assignments[i].first]->GetTrackId();
   //  int obs_id =
   //    sensor_objects[final_assignments[i].second]->GetBaseObject()->track_id;
-  //  LOG_DEBUG << "final_track_id_assign: " << track_id << ", " << obs_id;
+  //  ADEBUG << "final_track_id_assign: " << track_id << ", " << obs_id;
   //}
 
   return state;
@@ -333,14 +333,14 @@ void HMTrackersObjectsAssociation::ComputeAssociationDistanceMat(
         distance =
             track_object_distance_.Compute(fusion_track, sensor_object, opt);
       } else {
-        LOG_DEBUG << "center_distance " << center_dist
+        ADEBUG << "center_distance " << center_dist
                   << " exceeds slack threshold "
                   << s_association_center_dist_threshold_
                   << ", track_id: " << fusion_track->GetTrackId()
                   << ", obs_id: " << sensor_object->GetBaseObject()->track_id;
       }
       (*association_mat)[i][j] = distance;
-      LOG_DEBUG << "track_id: " << fusion_track->GetTrackId()
+      ADEBUG << "track_id: " << fusion_track->GetTrackId()
                 << ", obs_id: " << sensor_object->GetBaseObject()->track_id
                 << ", distance: " << distance;
     }

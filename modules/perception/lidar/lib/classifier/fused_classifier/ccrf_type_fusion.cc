@@ -52,8 +52,8 @@ bool CCRFOneShotTypeFusion::Init(const TypeFusionInitOption& option) {
   for (auto& pair : smooth_matrices_) {
     util::NormalizeRow(&pair.second);
     pair.second.transposeInPlace();
-    LOG_INFO << "Source: " << pair.first;
-    LOG_INFO << std::endl << pair.second;
+    AINFO << "Source: " << pair.first;
+    AINFO << std::endl << pair.second;
   }
 
   confidence_smooth_matrix_ = Matrixd::Identity();
@@ -62,8 +62,8 @@ bool CCRFOneShotTypeFusion::Init(const TypeFusionInitOption& option) {
     confidence_smooth_matrix_ = iter->second;
     smooth_matrices_.erase(iter);
   }
-  LOG_INFO << "Confidence: ";
-  LOG_INFO << std::endl << confidence_smooth_matrix_;
+  AINFO << "Confidence: ";
+  AINFO << std::endl << confidence_smooth_matrix_;
 
   return true;
 }
@@ -150,14 +150,14 @@ bool CCRFSequenceTypeFusion::Init(const TypeFusionInitOption& option) {
   for (std::size_t i = 0; i < VALID_OBJECT_TYPE; ++i) {
     util::NormalizeRow(&transition_matrix_);
   }
-  LOG_INFO << "transition matrix";
-  LOG_INFO << std::endl << transition_matrix_;
+  AINFO << "transition matrix";
+  AINFO << std::endl << transition_matrix_;
   for (std::size_t i = 0; i < VALID_OBJECT_TYPE; ++i) {
     for (std::size_t j = 0; j < VALID_OBJECT_TYPE; ++j) {
       transition_matrix_(i, j) = log(transition_matrix_(i, j));
     }
   }
-  LOG_INFO << std::endl << transition_matrix_;
+  AINFO << std::endl << transition_matrix_;
   return true;
 }
 
@@ -174,7 +174,7 @@ bool CCRFSequenceTypeFusion::TypeFusion(const TypeFusionOption& option,
 
 bool CCRFSequenceTypeFusion::FuseWithConditionalProbabilityInference(
     TrackedObjects* tracked_objects) {
-  // LOG_INFO << "Enter fuse with conditional probability inference";
+  // AINFO << "Enter fuse with conditional probability inference";
   fused_oneshot_probs_.resize(tracked_objects->size());
 
   std::size_t i = 0;
@@ -182,7 +182,7 @@ bool CCRFSequenceTypeFusion::FuseWithConditionalProbabilityInference(
     ObjectPtr& object = pair.second;
     if (!one_shot_fuser_.FuseOneShotTypeProbs(object,
                                               &fused_oneshot_probs_[i++])) {
-      LOG_ERROR << "Failed to fuse one short probs in sequence.";
+      AERROR << "Failed to fuse one short probs in sequence.";
       return false;
     }
   }

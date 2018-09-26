@@ -57,11 +57,11 @@ class HDMapInputTest : public testing::Test {
 // std::string test_file_name =
 //   "./map_test_data/hdmap/data/adu_common_ShaHeDaXueCheng-test01_1_5_0_15.bin";
 // if (hdmap_input_.hdmap_->load_map_from_file(test_file_name) != 0) {
-//   LOG_ERROR << "Failed to load get_nearest_lane_test hadmap file: "
+//   AERROR << "Failed to load get_nearest_lane_test hadmap file: "
 //             << test_file_name;
 //   EXPECT_TRUE(false);
 // }
-// LOG_INFO << "In test_GetSignals,load hdmap file: " << test_file_name;
+// AINFO << "In test_GetSignals,load hdmap file: " << test_file_name;
 // base::PointD pointd;
 // pointd.x = 438067.22;
 // pointd.y = 4444193.53;
@@ -91,11 +91,11 @@ class HDMapInputTest : public testing::Test {
 // EXPECT_TRUE(hdmap_input_.Init());
 // std::string test_file_name = "./map_test_data/hdmap/data/sunnyvale_map.bin";
 // if (hdmap_input_.hdmap_->load_map_from_file(test_file_name) != 0) {
-//   LOG_ERROR << "Failed to load get_nearest_lane_test hadmap file:"
+//   AERROR << "Failed to load get_nearest_lane_test hadmap file:"
 //             << test_file_name;
 //   EXPECT_TRUE(false);
 // }
-// LOG_INFO << "In test_GetNearestLaneDirection,load hdmap file: "
+// AINFO << "In test_GetNearestLaneDirection,load hdmap file: "
 //          << test_file_name;
 // // data reference to hdmap-library/src/test/get_nearest_lane_test.cpp in
 // master // NOLINT
@@ -142,15 +142,15 @@ class HDMapInputTest : public testing::Test {
 //   get_road_boundaries(point, distance, &road_boundaries, &junctions));
 // ASSERT_EQ(5, road_boundaries.size());
 // for (size_t i = 0; i < road_boundaries.size(); ++i) {
-//   LOG_INFO << "road boundary "<< i << " belonged to road(id) "
+//   AINFO << "road boundary "<< i << " belonged to road(id) "
 //            << road_boundaries[i]->id.id().c_str();
-//   LOG_INFO << "road_boundary left boundary point size: "
+//   AINFO << "road_boundary left boundary point size: "
 //            << road_boundaries[i]->left_boundary.line_points.size()
 //            << " x:"<< road_boundaries[i]->left_boundary.line_points[0].x()
 //            <<" y:" << road_boundaries[i]->left_boundary.line_points[0].y()
 //            << " x:"<< road_boundaries[i]->left_boundary.line_points[1].x()
 //            <<" y:" << road_boundaries[i]->left_boundary.line_points[1].y();
-//   LOG_INFO << "road_boundary right boundary point size: "
+//   AINFO << "road_boundary right boundary point size: "
 //            << road_boundaries[i]->right_boundary.line_points.size()
 //            << " x:"<< road_boundaries[i]->right_boundary.line_points[0].x()
 //            <<" y:" << road_boundaries[i]->right_boundary.line_points[0].y()

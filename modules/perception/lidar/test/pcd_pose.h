@@ -96,7 +96,7 @@ bool ReadPoseFile(const std::string& filename, Eigen::Matrix4d& pose,
 void LoadBPH(std::string pcd_file_name, base::PointFCloudPtr& pcd_ptr) {
   std::ifstream in_bph(pcd_file_name.c_str(), std::ios::binary);
   if (!in_bph.good()) {
-    LOG(ERROR) << "input bph file is invalid";
+    AERROR << "input bph file is invalid";
     return;
   }
 
@@ -139,14 +139,14 @@ void GetPcdPose(const std::string& pcd_dir, const std::string& pose_dir,
   sort(pcd_file_names.begin(), pcd_file_names.end(), FileCmp);
   sort(pose_file_names.begin(), pose_file_names.end(), FileCmp);
   if (pose_file_names.size() != pcd_file_names.size()) {
-    LOG_ERROR << "pcd file number does not match pose file number";
-    LOG_ERROR << "pose_file_names : " << pose_file_names.size();
-    LOG_ERROR << "pcd_file_names : " << pcd_file_names.size();
+    AERROR << "pcd file number does not match pose file number";
+    AERROR << "pose_file_names : " << pose_file_names.size();
+    AERROR << "pcd_file_names : " << pcd_file_names.size();
     return;
   }
   for (size_t i = 0; i < pcd_file_names.size(); ++i) {
-    LOG_INFO << "pcd_file_names[" << i << "]: " << pcd_file_names[i];
-    LOG_INFO << "pose_file_names[" << i << "]: " << pose_file_names[i];
+    AINFO << "pcd_file_names[" << i << "]: " << pcd_file_names[i];
+    AINFO << "pose_file_names[" << i << "]: " << pose_file_names[i];
     // read pcd
     base::PointFCloudPtr cloud_ptr(new base::PointFCloud);
     LoadBPH(pcd_file_names[i], cloud_ptr);

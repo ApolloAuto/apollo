@@ -83,7 +83,7 @@ bool DrawPolygonMask(const typename PolygonScanCvter<T>::Polygon& polygon,
       bitmap_min_range[major_dir];
 
   if (valid_range.second < valid_range.first + cell_size[major_dir]) {
-    LOG_WARN << "Invalid range: " << valid_range.first << " "
+    AWARN << "Invalid range: " << valid_range.first << " "
              << valid_range.second
              << ". polygon major directory range: " << poly_min_p[major_dir]
              << " " << poly_max_p[major_dir]
@@ -114,7 +114,7 @@ bool DrawPolygonMask(const typename PolygonScanCvter<T>::Polygon& polygon,
        x += cell_size[major_dir], ++i) {
     for (auto scan_interval : scans_intervals[i]) {
       if (scan_interval.first > scan_interval.second) {
-        LOG_ERROR << "The input polygon is illegal(complex polygon)";
+        AERROR << "The input polygon is illegal(complex polygon)";
         return false;
       }
 

@@ -45,7 +45,7 @@ static bool LoadPCLPCD(const std::string& file_path,
                        base::PointFCloud* cloud_out) {
   pcl::PointCloud<PCLPointXYZIT> org_cloud;
   if (pcl::io::loadPCDFile(file_path, org_cloud) < 0) {
-    LOG_ERROR << "Failed to load pcd file " << file_path;
+    AERROR << "Failed to load pcd file " << file_path;
     return false;
   }
   cloud_out->resize(org_cloud.size());
@@ -76,7 +76,7 @@ static bool WritePcd(const std::string& file_path,
     pcl::PCDWriter writer;
     writer.writeBinaryCompressed(file_path, pcl_cloud);
   } catch (const pcl::IOException& ex) {
-    LOG_ERROR << ex.detailedMessage();
+    AERROR << ex.detailedMessage();
     return false;
   }
   return true;

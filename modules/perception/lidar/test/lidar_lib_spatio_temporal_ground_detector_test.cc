@@ -30,7 +30,7 @@ bool LoadPCDFile(const std::string& file_path, base::PointFCloudPtr cloud_out) {
   int ret = 0;
   pcl::PointCloud<pcl::PointXYZI> org_cloud;
   if ((ret = pcl::io::loadPCDFile(file_path, org_cloud)) < 0) {
-    LOG_ERROR << "Failed to load pcd file: " << file_path << " " << ret;
+    AERROR << "Failed to load pcd file: " << file_path << " " << ret;
     return false;
   }
 

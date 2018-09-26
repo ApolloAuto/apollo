@@ -39,10 +39,10 @@ bool CNNSegmentation::Init(const SegmentationInitOptions& options) {
   std::string weight_file;
   std::string engine_file;
   CHECK(GetConfigs(&param_file, &proto_file, &weight_file, &engine_file));
-  LOG_INFO << "--     param_file: " << param_file;
-  LOG_INFO << "--     proto_file: " << proto_file;
-  LOG_INFO << "--    weight_file: " << weight_file;
-  LOG_INFO << "--      engine_file: " << engine_file;
+  AINFO << "--     param_file: " << param_file;
+  AINFO << "--     proto_file: " << proto_file;
+  AINFO << "--    weight_file: " << weight_file;
+  AINFO << "--      engine_file: " << engine_file;
 
   // get cnnseg params
   CHECK(lib::ParseProtobufFromFile<CNNSegParam>(param_file, &cnnseg_param_))
@@ -177,7 +177,7 @@ bool CNNSegmentation::InitClusterAndBackgroundSegmentation() {
   worker_.Bind([&]() {
     Timer timer;
     ROIFilterOptions roi_filter_options;
-    LOG_INFO << "before roi filter";
+    AINFO << "before roi filter";
     if (lidar_frame_ref_->hdmap_struct != nullptr &&
         roi_filter_->Filter(roi_filter_options, lidar_frame_ref_)) {
       roi_cloud_->CopyPointCloud(*lidar_frame_ref_->cloud,
@@ -187,7 +187,7 @@ bool CNNSegmentation::InitClusterAndBackgroundSegmentation() {
       lidar_frame_ref_->cloud = roi_cloud_;
       lidar_frame_ref_->world_cloud = roi_world_cloud_;
     } else {
-      LOG_INFO << "Fail to call roi filter, use origin cloud.";
+      AINFO << "Fail to call roi filter, use origin cloud.";
       lidar_frame_ref_->roi_indices.indices.resize(original_cloud_->size());
       // we manually fill roi indices with all cloud point indices
       std::iota(lidar_frame_ref_->roi_indices.indices.begin(),
@@ -197,7 +197,7 @@ bool CNNSegmentation::InitClusterAndBackgroundSegmentation() {
       *roi_world_cloud_ = *original_world_cloud_;
     }
     roi_filter_time_ = timer.toc(true);
-    LOG_INFO << "after roi filter";
+    AINFO << "after roi filter";
     GroundDetectorOptions ground_detector_options;
     ground_detector_->Detect(ground_detector_options, lidar_frame_ref_);
     if (lidar_frame_ref_->cloud != original_cloud_) {
@@ -207,7 +207,7 @@ bool CNNSegmentation::InitClusterAndBackgroundSegmentation() {
       lidar_frame_ref_->world_cloud = original_world_cloud_;
     }
     ground_detector_time_ = timer.toc(true);
-    LOG_INFO << "Roi-filter time: " << roi_filter_time_
+    AINFO << "Roi-filter time: " << roi_filter_time_
              << "\tGround-detector time: " << ground_detector_time_;
     return true;
   });
@@ -243,23 +243,23 @@ bool CNNSegmentation::Segment(const SegmentationOptions& options,
                               LidarFrame* frame) {
   // check input
   if (frame == nullptr) {
-    LOG_ERROR << "Input null frame ptr.";
+    AERROR << "Input null frame ptr.";
     return false;
   }
   if (frame->cloud == nullptr) {
-    LOG_ERROR << "Input null frame cloud.";
+    AERROR << "Input null frame cloud.";
     return false;
   }
   if (frame->world_cloud == nullptr) {
-    LOG_ERROR << "Input null frame world cloud.";
+    AERROR << "Input null frame world cloud.";
     return false;
   }
   if (frame->cloud->size() == 0) {
-    LOG_ERROR << "Input none points.";
+    AERROR << "Input none points.";
     return false;
   }
   if (frame->cloud->size() != frame->world_cloud->size()) {
-    LOG_ERROR << "Cloud size and world cloud size not consistent.";
+    AERROR << "Cloud size and world cloud size not consistent.";
     return false;
   }
   // record input cloud and lidar frame
@@ -278,7 +278,7 @@ bool CNNSegmentation::Segment(const SegmentationOptions& options,
   mapping_time_ = timer.toc(true);
 
   if (cudaSetDevice(gpu_id_) != cudaSuccess) {
-    LOG_ERROR << "Failed to set device to " << gpu_id_;
+    AERROR << "Failed to set device to " << gpu_id_;
     return false;
   }
 
@@ -293,7 +293,7 @@ bool CNNSegmentation::Segment(const SegmentationOptions& options,
   // processing clustering
   GetObjectsFromSppEngine(&frame->segmented_objects);
 
-  LOG_INFO << "CNNSEG: mapping: " << mapping_time_ << "\t"
+  AINFO << "CNNSEG: mapping: " << mapping_time_ << "\t"
            << " feature: " << feature_time_ << "\t"
            << " infer: " << infer_time_ << "\t"
            << " fg-seg: " << fg_seg_time_ << "\t"
@@ -315,7 +315,7 @@ void CNNSegmentation::GetObjectsFromSppEngine(
   // copy height from roi cloud to origin cloud,
   // note ground points include other noise points
   // filtered by ground detection post process
-  LOG_INFO << "Use origin cloud and copy height";
+  AINFO << "Use origin cloud and copy height";
   for (std::size_t i = 0; i < lidar_frame_ref_->roi_indices.indices.size();
        ++i) {
     const int& roi_id = lidar_frame_ref_->roi_indices.indices[i];

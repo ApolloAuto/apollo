@@ -43,7 +43,7 @@ bool GroundServiceDetector::Init(const GroundDetectorInitOptions& options) {
   ground_service_ = std::dynamic_pointer_cast<GroundService>(
       SceneManager::Instance().Service("GroundService"));
   if (ground_service_ == nullptr) {
-    LOG_ERROR << "Ground service is nullptr, Init scene manager first !";
+    AERROR << "Ground service is nullptr, Init scene manager first !";
     return false;
   }
   return true;
@@ -52,12 +52,12 @@ bool GroundServiceDetector::Init(const GroundDetectorInitOptions& options) {
 bool GroundServiceDetector::Detect(const GroundDetectorOptions& options,
                                    LidarFrame* frame) {
   if (frame == NULL || frame->world_cloud == nullptr) {
-    LOG_ERROR << "Frame is nullptr.";
+    AERROR << "Frame is nullptr.";
     return false;
   }
   ground_service_->GetServiceContentCopy(&ground_service_content_);
   if (!ground_service_content_.IsServiceReady()) {
-    LOG_ERROR << "service is not ready.";
+    AERROR << "service is not ready.";
     return false;
   }
   auto& cloud = frame->world_cloud;

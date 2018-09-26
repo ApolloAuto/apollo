@@ -59,7 +59,7 @@ bool ProbabilisticFusion::Init(const FusionInitOptions& init_options) {
   ProbabilisticFusionConfig params;
 
   if (!lib::ParseProtobufFromFile<ProbabilisticFusionConfig>(config, &params)) {
-    LOG_ERROR << "Read config failed: " << config;
+    AERROR << "Read config failed: " << config;
     return false;
   }
   params_.use_lidar = params.use_lidar();
@@ -78,23 +78,23 @@ bool ProbabilisticFusion::Init(const FusionInitOptions& init_options) {
   if (params_.data_association_method == "HMAssociation") {
     matcher_.reset(new HMTrackersObjectsAssociation());
   } else {
-    LOG_ERROR << "Unknown association method: "
+    AERROR << "Unknown association method: "
               << params_.data_association_method;
     return false;
   }
   if (!matcher_->Init()) {
-    LOG_ERROR << "Failed to init matcher.";
+    AERROR << "Failed to init matcher.";
     return false;
   }
 
   if (params_.gate_keeper_method == "PbfGatekeeper") {
     gate_keeper_.reset(new PbfGatekeeper());
   } else {
-    LOG_ERROR << "Unknown gate keeper method: " << params_.gate_keeper_method;
+    AERROR << "Unknown gate keeper method: " << params_.gate_keeper_method;
     return false;
   }
   if (!gate_keeper_->Init()) {
-    LOG_ERROR << "Failed to init gatekeeper.";
+    AERROR << "Failed to init gatekeeper.";
     return false;
   }
 
@@ -130,7 +130,7 @@ bool ProbabilisticFusion::Fuse(const FusionOptions& options,
   }
 
   if (started_) {
-    LOG_INFO << "add sensor measurement: " << sensor_frame->sensor_info.name
+    AINFO << "add sensor measurement: " << sensor_frame->sensor_info.name
              << ", obj_cnt : " << sensor_frame->objects.size() << ", "
              << GLOG_TIMESTAMP(sensor_frame->timestamp);
     sensor_data_manager_->AddSensorMeasurements(sensor_frame);
@@ -146,7 +146,7 @@ bool ProbabilisticFusion::Fuse(const FusionOptions& options,
   double fusion_time = sensor_frame->timestamp;
   std::vector<SensorFramePtr> frames;
   sensor_data_manager_->GetLatestFrames(fusion_time, &frames);
-  LOG_INFO << "Get " << frames.size() << " related frames for fusion";
+  AINFO << "Get " << frames.size() << " related frames for fusion";
 
   // 3. peform fusion on related frames
   for (size_t i = 0; i < frames.size(); ++i) {
@@ -178,7 +178,7 @@ bool ProbabilisticFusion::IsPublishSensor(
 }
 
 void ProbabilisticFusion::FuseFrame(const SensorFramePtr& frame) {
-  LOG_INFO << "Fusing frame: " << frame->GetSensorId()
+  AINFO << "Fusing frame: " << frame->GetSensorId()
            << ", foreground_object_number: "
            << frame->GetForegroundObjects().size()
            << ", background_object_number: "
@@ -269,7 +269,7 @@ void ProbabilisticFusion::CreateNewTracks(
     track->Initialize(frame->GetForegroundObjects()[obj_ind]);
     scenes_->AddForegroundTrack(track);
 
-    LOG_DEBUG
+    ADEBUG
         << "object id: "
         << frame->GetForegroundObjects()[obj_ind]->GetBaseObject()->track_id
         << ", create new track: " << track->GetTrackId();
@@ -351,7 +351,7 @@ void ProbabilisticFusion::RemoveLostTrack() {
       foreground_track_count++;
     }
   }
-  LOG_INFO << "Remove " << foreground_tracks.size() - foreground_track_count
+  AINFO << "Remove " << foreground_tracks.size() - foreground_track_count
            << " foreground tracks";
   foreground_tracks.resize(foreground_track_count);
   trackers_.resize(foreground_track_count);
@@ -367,7 +367,7 @@ void ProbabilisticFusion::RemoveLostTrack() {
       background_track_count++;
     }
   }
-  LOG_INFO << "Remove " << background_tracks.size() - background_track_count
+  AINFO << "Remove " << background_tracks.size() - background_track_count
            << " background tracks";
   background_tracks.resize(background_track_count);
 }
@@ -398,7 +398,7 @@ void ProbabilisticFusion::CollectFusedObjects(
     }
   }
 
-  LOG_INFO << "collect objects : fg_obj_cnt = " << fg_obj_num
+  AINFO << "collect objects : fg_obj_cnt = " << fg_obj_num
            << ", bg_obj_cnt = " << bg_obj_num
            << ", timestamp = " << GLOG_TIMESTAMP(timestamp);
 }
@@ -439,7 +439,7 @@ void ProbabilisticFusion::CollectObjectsByTrack(
   obj->latest_tracked_time = timestamp;
   obj->tracking_time = track->GetTrackingPeriod();
   fused_objects->emplace_back(obj);
-  LOG_DEBUG << "fusion_reporting..." << obj->track_id << "@"
+  ADEBUG << "fusion_reporting..." << obj->track_id << "@"
             << GLOG_TIMESTAMP(timestamp) << "@(" << std::setprecision(10)
             << obj->center(0) << "," << obj->center(1) << ","
             << obj->center_uncertainty(0, 0) << ","

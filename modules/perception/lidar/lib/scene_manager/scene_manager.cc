@@ -48,15 +48,15 @@ bool SceneManager::InitInternal(const SceneManagerInitOptions& options) {
     const auto& name = config.service_name(i);
     SceneServicePtr service(SceneServiceRegisterer::GetInstanceByName(name));
     if (service == nullptr) {
-      LOG_INFO << "Failed to find scene service: " << name << ", skipped";
+      AINFO << "Failed to find scene service: " << name << ", skipped";
       continue;
     }
     if (!service->Init()) {
-      LOG_INFO << "Failed to init scene service: " << name << ", skipped";
+      AINFO << "Failed to init scene service: " << name << ", skipped";
       continue;
     }
     services_.emplace(name, service);
-    LOG_INFO << "Scene manager add service: " << name;
+    AINFO << "Scene manager add service: " << name;
   }
   initialized_ = true;
   return true;

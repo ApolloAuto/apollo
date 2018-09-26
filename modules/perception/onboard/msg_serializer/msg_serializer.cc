@@ -42,7 +42,7 @@ bool MsgSerializer::SerializeMsg(double timestamp, int seq_num,
   for (const auto &obj : objects) {
     PerceptionObstacle *obstacle = obstacles->add_perception_obstacle();
     if (!ConvertObjectToPb(obj, obstacle)) {
-      LOG_ERROR << "ConvertObjectToPb failed, Object:" << obj->ToString();
+      AERROR << "ConvertObjectToPb failed, Object:" << obj->ToString();
       return false;
     }
   }

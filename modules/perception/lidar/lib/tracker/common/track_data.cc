@@ -26,7 +26,7 @@ TrackData::~TrackData() {}
 
 std::pair<double, TrackedObjectPtr> TrackData::GetHistoryObject(int idx) {
   if (history_objects_.size() == 0) {
-    LOG_WARN << "no object in track";
+    AWARN << "no object in track";
     return std::pair<double, TrackedObjectPtr>(0.0, TrackedObjectPtr(nullptr));
   }
   int max_idx = abs(idx) >= history_objects_.size()
@@ -90,7 +90,7 @@ void TrackData::PushTrackedObjectToTrack(TrackedObjectPtr obj, double time) {
       history_objects_.erase(history_objects_.begin());
     }
   } else {
-    LOG_WARN << "push object time " << time
+    AWARN << "push object time " << time
              << " already exist in track, ignore insert.";
   }
 }

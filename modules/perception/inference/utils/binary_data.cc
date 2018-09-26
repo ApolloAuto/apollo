@@ -20,6 +20,8 @@
 #include <string>
 #include <vector>
 
+#include "cybertron/common/log.h"
+
 namespace apollo {
 namespace perception {
 namespace inference {
@@ -119,7 +121,7 @@ std::map<std::string, boost::shared_ptr<base::Blob<Dtype>>> BinaryReadFile(
 
   FILE *fp = fopen(file_path, "rb");
   if (NULL == fp) {
-    LOG(ERROR) << "Failed opening Binaryary file: " << file_path;
+    AERROR << "Failed opening Binaryary file: " << file_path;
     return data_dict;
   }
 
@@ -138,7 +140,7 @@ bool BinaryWriteFile(const char *file_path,
                      const std::map<std::string, Btype> &data_dict) {
   FILE *fp = fopen(file_path, "wb");
   if (NULL == fp) {
-    LOG(ERROR) << "Failed opening Binaryary file: " << file_path;
+    AERROR << "Failed opening Binaryary file: " << file_path;
     return false;
   }
 
