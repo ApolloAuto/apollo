@@ -75,12 +75,13 @@ TEST(FileUtilTest, TestCompareFileByDigital) {
 }
 
 TEST(FileUtilTest, TestCompareFileByLexicographical) {
+  std::string data_folder = "/apollo/modules/perception/testdata/lib/data";
   EXPECT_TRUE(FileUtil::CompareFileByLexicographical(
-      "/apollo/modules/perception/testdata/lib/data/QB1234_2222_3333_0001.pcd",
-      "/apollo/modules/perception/testdata/lib/data/QB1234_2222_3333_1000.pcd"));
+      data_folder + "/QB1234_2222_3333_0001.pcd",
+      data_folder + "/QB1234_2222_3333_1000.pcd"));
   EXPECT_TRUE(FileUtil::CompareFileByLexicographical(
-      "/apollo/modules/perception/testdata/lib/data/QB1234_2222_3333_0001.pcd",
-      "/apollo/modules/perception/testdata/lib/data/QB1234_3333_3333_1000.pcd"));
+      data_folder + "/QB1234_2222_3333_0001.pcd",
+      data_folder + "/QB1234_3333_3333_1000.pcd"));
 }
 
 TEST(FileUtilTest, TestCompareFile) {

@@ -17,14 +17,13 @@
 
 #include <string>
 #include <utility>
-
-#include "cybertron/common/log.h"
 #include "google/protobuf/text_format.h"
 
-#include "modules/perception/proto/sensor_meta_schema.pb.h"
-
+#include "cybertron/common/log.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lib/io/file_util.h"
+#include "modules/perception/common/io/io_util.h"
+#include "modules/perception/proto/sensor_meta_schema.pb.h"
 
 namespace apollo {
 namespace perception {
@@ -85,13 +84,11 @@ bool SensorManager::Init() {
     if (this->IsCamera(sensor_info.type)) {
       std::shared_ptr<BrownCameraDistortionModel> distort_model(
           new BrownCameraDistortionModel());
-      /* TODO(jmtao): to add back ASAP once CTE is done
       if (!LoadBrownCameraIntrinsic(IntrinsicPath(sensor_info.frame_id),
                                     distort_model.get())) {
         AERROR << "Failed to load camera intrinsic";
         return false;
       }
-      */
       distort_model_map_.insert(make_pair(
           sensor_meta_proto.name(),
           std::dynamic_pointer_cast<BaseCameraDistortionModel>(distort_model)));
