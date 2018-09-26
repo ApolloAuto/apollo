@@ -217,7 +217,7 @@ Type CalculateIOUBBox(const base::BBox2D<Type> &box1,
 template <typename PointT>
 bool CalculateDistAndDirToSegs(
     const Eigen::Matrix<typename PointT::Type, 3, 1> &pt,
-    const base::AttributePointCloud<PointT> &segs, typename PointT::Type *dist,
+    const base::PointCloud<PointT> &segs, typename PointT::Type *dist,
     Eigen::Matrix<typename PointT::Type, 3, 1> *dir) {
   if (segs.size() < 2) {
     return false;
@@ -283,8 +283,8 @@ bool CalculateDistAndDirToSegs(
 template <typename PointT>
 void CalculateDistAndDirToBoundary(
     const Eigen::Matrix<typename PointT::Type, 3, 1> &pt,
-    const base::AttributePointCloud<PointT> &left_boundary,
-    const base::AttributePointCloud<PointT> &right_boundary,
+    const base::PointCloud<PointT> &left_boundary,
+    const base::PointCloud<PointT> &right_boundary,
     typename PointT::Type *dist,
     Eigen::Matrix<typename PointT::Type, 3, 1> *dir) {
   using Type = typename PointT::Type;
@@ -313,8 +313,8 @@ void CalculateDistAndDirToBoundary(
 template <typename PointT>
 void CalculateDistAndDirToBoundary(
     const Eigen::Matrix<typename PointT::Type, 3, 1> &pt,
-    const std::vector<base::AttributePointCloud<PointT>> &left_boundary,
-    const std::vector<base::AttributePointCloud<PointT>> &right_boundary,
+    const std::vector<base::PointCloud<PointT>> &left_boundary,
+    const std::vector<base::PointCloud<PointT>> &right_boundary,
     typename PointT::Type *dist,
     Eigen::Matrix<typename PointT::Type, 3, 1> *dir) {
   using Type = typename PointT::Type;
