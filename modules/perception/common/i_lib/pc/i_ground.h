@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef I_LIB_PC_I_GROUND_H
-#define I_LIB_PC_I_GROUND_H
+#ifndef MODULES_PERCEPTION_COMMON_I_LIB_PC_I_GROUND_H_
+#define MODULES_PERCEPTION_COMMON_I_LIB_PC_I_GROUND_H_
 
 #include <vector>
 #include "../core/i_blas.h"
@@ -323,6 +323,6 @@ class PlaneFitGroundDetector : public BaseGroundDetector {
   std::pair<int, int>* _order_table;
 };
 
-} /*namespace idl*/
+} // namespace idl
 
-#endif
+#endif  // MODULES_PERCEPTION_COMMON_I_LIB_PC_I_GROUND_H_

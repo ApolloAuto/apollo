@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef I_LIB_PC_I_UTIL_H
-#define I_LIB_PC_I_UTIL_H
+#ifndef MODULES_PERCEPTION_COMMON_I_LIB_PC_I_UTIL_H
+#define MODULES_PERCEPTION_COMMON_I_LIB_PC_I_UTIL_H
 
 #include "../core/i_blas.h"
 
@@ -262,6 +262,6 @@ inline void i_normalize_3d_points(T **threeds, T H[4],
   H[2] = span_z;
   H[3] = sf;
 }
-} /*namespace idl*/
+} // namespace idl
 
-#endif
+#endif  // MODULES_PERCEPTION_COMMON_I_LIB_PC_I_UTIL_H

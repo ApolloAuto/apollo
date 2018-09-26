@@ -173,6 +173,6 @@ inline T *i_align_pointer(T *mem, unsigned long byte_count) {
   return (out);
 }
 
-}  // namespace idl
+} // namespace idl
 
 #endif  // MODULES_PERCEPTION_COMMON_I_LIB_CORE_I_ALLOC_H_

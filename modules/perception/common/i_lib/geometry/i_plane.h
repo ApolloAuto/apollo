@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef I_LIB_GEOMETRY_I_PLANE_H
-#define I_LIB_GEOMETRY_I_PLANE_H
+#ifndef MODULES_PERCEPTION_COMMON_I_LIB_GEOMETRY_I_PLANE_H_
+#define MODULES_PERCEPTION_COMMON_I_LIB_GEOMETRY_I_PLANE_H_
 
 #include "../algorithm/i_sort.h"
 #include "../core/i_alloc.h"
@@ -559,6 +559,6 @@ inline void i_plane_fit_ransac_costfunc(const T pi[4], const T* data, int n,
   }
 }
 
-} /* namespace idl */
+} // namespace idl
 
-#endif
+#endif  // MODULES_PERCEPTION_COMMON_I_LIB_GEOMETRY_I_PLANE_H_

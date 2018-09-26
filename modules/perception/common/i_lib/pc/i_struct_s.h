@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef I_LIB_PC_I_STRUCT_S_H
-#define I_LIB_PC_I_STRUCT_S_H
+#ifndef MODULES_PERCEPTION_COMMON_I_LIB_PC_I_STRUCT_S_H_
+#define MODULES_PERCEPTION_COMMON_I_LIB_PC_I_STRUCT_S_H_
 
 #include <smmintrin.h>
 #include <cassert>
@@ -1432,6 +1432,6 @@ bool VoxelGridXYPyramid<DATA_TYPE>::initialized() const {
   return (i == _vgrids.size());
 }
 
-} /*namespace idl*/
+} // namespace idl
 
-#endif
+#endif  // MODULES_PERCEPTION_COMMON_I_LIB_PC_I_STRUCT_S_H_
