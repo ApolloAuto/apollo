@@ -11,8 +11,9 @@ module_config {
           {
             channel: "/apollo/sensor/gnss/imu"
             qos_profile: {
-              depth : 50
+              depth : 10
             }
+            pending_queue_size: 50
           }
         ]
       }
