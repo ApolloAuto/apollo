@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#pragma once
+#ifndef MODULES_PERCEPTION_COMMON_I_LIB_NUMERIC_I_LU_H_
+#define MODULES_PERCEPTION_COMMON_I_LIB_NUMERIC_I_LU_H_
 
-#include "../core/i_blas.h"
+#include "modules/perception/common/i_lib/core/i_blas.h"
 
 namespace idl {
 /*Pivot by finding element in row with largest magnitude element starting at
@@ -488,4 +489,5 @@ inline void i_lu_invert(const T *A, T *Ai) {
   }
 }
 
-} /* namespace idl */
+}  // namespace idl
+#endif  // MODULES_PERCEPTION_COMMON_I_LIB_NUMERIC_I_LU_H_

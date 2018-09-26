@@ -13,9 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#pragma once
 
-#include "../core/i_blas.h"
+#ifndef MODULES_PERCEPTION_COMMON_I_LIB_NUMERIC_I_POLY_H_
+#define MODULES_PERCEPTION_COMMON_I_LIB_NUMERIC_I_POLY_H_
+
+#include "modules/perception/common/i_lib/core/i_blas.h"
 
 #define I_DEFAULT_MAX_POLY_STURMCHAIN_ITERATIONS 50
 #define I_DEFAULT_MAX_POLY_BISECTION_ITERATIONS 50
@@ -767,4 +769,6 @@ inline int i_quartic_solve_closed(const T p[5], T roots[4],
   }
   return (nr_roots_p1 + nr_roots_p2);
 }
-} /* namespace idl */
+}  // namespace idl
+
+#endif  // MODULES_PERCEPTION_COMMON_I_LIB_NUMERIC_I_POLY_H_

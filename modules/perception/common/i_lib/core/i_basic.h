@@ -13,12 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#pragma once
 
-#include "i_constant.h"
+#ifndef MODULES_PERCEPTION_COMMON_I_LIB_CORE_I_BASIC_H_
+#define MODULES_PERCEPTION_COMMON_I_LIB_CORE_I_BASIC_H_
 
-#include <math.h>
-#include <string.h>
+#include <cmath>
+#include <cstring>
+
+#include "modules/perception/common/i_lib/core/i_constant.h"
 
 namespace idl {
 /*Compute abs(a)*/
@@ -543,4 +545,6 @@ inline bool i_within_2d(const T x, const T y, const T x_upper_left,
           y < height + y_upper_left);
 }
 
-} /*namespace idl*/
+}  // namespace idl
+
+#endif  // MODULES_PERCEPTION_COMMON_I_LIB_CORE_I_BASIC_H_

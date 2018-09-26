@@ -13,11 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef I_LIB_NUMERIC_I_QR_H
-#define I_LIB_NUMERIC_I_QR_H
 
-#include "../core/i_rand.h"
-#include "i_householder.h"
+#ifndef MODULES_PERCEPTION_COMMON_I_LIB_NUMERIC_I_QR_H_
+#define MODULES_PERCEPTION_COMMON_I_LIB_NUMERIC_I_QR_H_
+
+#include "modules/perception/common/i_lib/core/i_rand.h"
+#include "modules/perception/common/i_lib/numeric/i_householder.h"
 
 namespace idl {
 /*Perform explicit LQ-decomposition (meaning L is lower triangular and Q is
@@ -137,6 +138,6 @@ inline void i_rand_orthogonal(T **Q, T **A, T **R, T *h, T *htA, T *ss, int m,
   i_copy(Q, R, m, n);
 }
 
-} /* namespace idl */
+}  // namespace idl
 
-#endif
+#endif  // MODULES_PERCEPTION_COMMON_I_LIB_NUMERIC_I_QR_H_
