@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef TOOLS_CVT_VISUALIZER_TREEWIDGET_H_
-#define TOOLS_CVT_VISUALIZER_TREEWIDGET_H_
+#ifndef MODULES_TOOLS_VISUALIZER_TREEWIDGET_H_
+#define MODULES_TOOLS_VISUALIZER_TREEWIDGET_H_
 
 #include <QTreeWidget>
 
@@ -33,4 +33,4 @@ class TreeWidget : public QTreeWidget {
   bool event(QEvent *e);
 };
 
-#endif  // TOOLS_CVT_VISUALIZER_TREEWIDGET_H_
+#endif  // MODULES_TOOLS_VISUALIZER_TREEWIDGET_H_

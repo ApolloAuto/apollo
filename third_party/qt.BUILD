@@ -55,9 +55,9 @@ cc_library(
     deps = [":qt_core", ":qt_widgets", ":qt_gui"],
     copts=[
         "-Iinclude",
-    #    "-Iinclude/QtCore",
-     #   "-Iinclude/QtWidgets",
-      #  "-Iinclude/QtGui",
+        "-Iinclude/QtCore",
+        "-Iinclude/QtWidgets",
+        "-Iinclude/QtGui",
         "-Iinclude/QtOpenGL",
     ],
     linkopts = [

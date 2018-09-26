@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "scene_viewer.h"
-#include "scene_camera_dialog.h"
+#include "modules/tools/visualizer/scene_viewer.h"
+#include "modules/tools/visualizer/scene_camera_dialog.h"
 #include <QMessageBox>
 #include <QTimer>
 #include <QWheelEvent>

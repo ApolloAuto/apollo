@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef TOOLS_CVT_VISUALIZER_CYBERCHANNREADER_H_
-#define TOOLS_CVT_VISUALIZER_CYBERCHANNREADER_H_
+#ifndef MODULES_TOOLS_VISUALIZER_CYBERCHANNREADER_H_
+#define MODULES_TOOLS_VISUALIZER_CYBERCHANNREADER_H_
 
 #include <QThread>
 #include <functional>
@@ -109,4 +109,4 @@ class CyberChannReader : public QThread {
   std::shared_ptr<apollo::cybertron::Node> channel_node_;
 };
 
-#endif  // TOOLS_CVT_VISUALIZER_CYBERCHANNREADER_H_
+#endif  // MODULES_TOOLS_VISUALIZER_CYBERCHANNREADER_H_

@@ -14,13 +14,13 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef TOOLS_CVT_VISUALIZER_SCENEVIEWER_H_
-#define TOOLS_CVT_VISUALIZER_SCENEVIEWER_H_
+#ifndef MODULES_TOOLS_VISUALIZER_SCENEVIEWER_H_
+#define MODULES_TOOLS_VISUALIZER_SCENEVIEWER_H_
 
-#include "free_camera.h"
-#include "plane.h"
-#include "renderable_object.h"
-#include "target_camera.h"
+#include "modules/tools/visualizer/free_camera.h"
+#include "modules/tools/visualizer/plane.h"
+#include "modules/tools/visualizer/renderable_object.h"
+#include "modules/tools/visualizer/target_camera.h"
 
 #include <QList>
 #include <QOpenGLFunctions>
@@ -151,4 +151,4 @@ class SceneViewer : public QOpenGLWidget, protected QOpenGLFunctions {
   QList<RenderableObject*> permanent_renderable_obj_list_;
 };
 
-#endif  // TOOLS_CVT_VISUALIZER_SCENEVIEWER_H_
+#endif  // MODULES_TOOLS_VISUALIZER_SCENEVIEWER_H_

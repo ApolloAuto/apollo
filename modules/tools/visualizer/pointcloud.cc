@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "pointcloud.h"
+#include "modules/tools/visualizer/pointcloud.h"
 #include <cassert>
 #include <fstream>
 #include <iostream>

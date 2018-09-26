@@ -14,16 +14,14 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "msg_dialog.h"
-#include "ui_msg_dialog.h"
+#include "modules/tools/visualizer/video_images_dialog.h"
+#include "modules/tools/visualizer/ui_video_images_dialog.h"
 
-MessageDialog::MessageDialog(QWidget *parent)
-    : QDialog(parent), ui_(new Ui::MessageDialog) {
-  ui_->setupUi(this);
+VideoImagesDialog::VideoImagesDialog(QWidget *parent)
+    : QDialog(parent), ui(new Ui::VideoImagesDialog) {
+  ui->setupUi(this);
 }
 
-MessageDialog::~MessageDialog() { delete ui_; }
+VideoImagesDialog::~VideoImagesDialog() { delete ui; }
 
-void MessageDialog::setMessage(const QString &msg) {
-  ui_->msgLabel->setText(msg);
-}
+int VideoImagesDialog::count(void) const { return ui->spinBox->value(); }

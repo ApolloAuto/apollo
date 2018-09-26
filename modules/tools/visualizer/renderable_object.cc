@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "renderable_object.h"
+#include "modules/tools/visualizer/renderable_object.h"
 #include <iostream>
 
 std::shared_ptr<QOpenGLShaderProgram> RenderableObject::NullRenderableObj;

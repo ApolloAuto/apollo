@@ -14,10 +14,10 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef TOOLS_CVT_VISUALIZER_TARGETCAMERA_H_
-#define TOOLS_CVT_VISUALIZER_TARGETCAMERA_H_
+#ifndef MODULES_TOOLS_VISUALIZER_TARGETCAMERA_H_
+#define MODULES_TOOLS_VISUALIZER_TARGETCAMERA_H_
 
-#include "abstract_camera.h"
+#include "modules/tools/visualizer/abstract_camera.h"
 
 class TargetCamera : public AbstractCamera {
  public:
@@ -56,4 +56,4 @@ class TargetCamera : public AbstractCamera {
   float distance_;
 };
 
-#endif  // TOOLS_CVT_VISUALIZER_TARGETCAMERA_H_
+#endif  // MODULES_TOOLS_VISUALIZER_TARGETCAMERA_H_

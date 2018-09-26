@@ -20,8 +20,8 @@
    <string>CybertronVisualizer</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="res.qrc">
-    <normaloff>:/app.ico</normaloff>:/app.ico</iconset>
+   <iconset resource="../res.qrc">
+    <normaloff>:/images/app.ico</normaloff>:/images/app.ico</iconset>
   </property>
   <widget class="QWidget" name="centralWidget">
    <property name="sizePolicy">
@@ -169,8 +169,6 @@
     <addaction name="actionOpenImage"/>
     <addaction name="actionOpenImages"/>
     <addaction name="actionDelImage"/>
-    <addaction name="separator"/>
-    <addaction name="actionRadar"/>
    </widget>
    <widget class="QMenu" name="menuActions">
     <property name="title">
@@ -216,8 +214,8 @@
   </action>
   <action name="actionPointCloud">
    <property name="icon">
-    <iconset resource="res.qrc">
-     <normaloff>:/pointcloud.png</normaloff>:/pointcloud.png</iconset>
+    <iconset resource="../res.qrc">
+     <normaloff>:/images/pointcloud.png</normaloff>:/images/pointcloud.png</iconset>
    </property>
    <property name="text">
     <string>Show PointCloud</string>
@@ -245,8 +243,8 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset resource="res.qrc">
-     <normaloff>:/closeimage.png</normaloff>:/closeimage.png</iconset>
+    <iconset resource="../res.qrc">
+     <normaloff>:/images/closeimage.png</normaloff>:/images/closeimage.png</iconset>
    </property>
    <property name="text">
     <string>Del Image</string>
@@ -257,8 +255,8 @@
   </action>
   <action name="actionAddGrid">
    <property name="icon">
-    <iconset resource="res.qrc">
-     <normaloff>:/grid.png</normaloff>:/grid.png</iconset>
+    <iconset resource="../res.qrc">
+     <normaloff>:/images/grid.png</normaloff>:/images/grid.png</iconset>
    </property>
    <property name="text">
     <string>Show Grid</string>
@@ -269,8 +267,8 @@
   </action>
   <action name="actionOpenImages">
    <property name="icon">
-    <iconset resource="res.qrc">
-     <normaloff>:/images.png</normaloff>:/images.png</iconset>
+    <iconset resource="../res.qrc">
+     <normaloff>:/images/images.png</normaloff>:/images/images.png</iconset>
    </property>
    <property name="text">
     <string>Add Images</string>
@@ -281,8 +279,8 @@
   </action>
   <action name="actionOpenImage">
    <property name="icon">
-    <iconset resource="res.qrc">
-     <normaloff>:/image.png</normaloff>:/image.png</iconset>
+    <iconset resource="../res.qrc">
+     <normaloff>:/images/image.png</normaloff>:/images/image.png</iconset>
    </property>
    <property name="text">
     <string>Add Image</string>
@@ -298,8 +296,8 @@
   </action>
   <action name="actionPlay">
    <property name="icon">
-    <iconset resource="res.qrc">
-     <normaloff>:/play.png</normaloff>:/play.png</iconset>
+    <iconset resource="../res.qrc">
+     <normaloff>:/images/play.png</normaloff>:/images/play.png</iconset>
    </property>
    <property name="text">
     <string>Play</string>
@@ -313,19 +311,14 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="res.qrc">
-     <normaloff>:/pause.png</normaloff>:/pause.png</iconset>
+    <iconset resource="../res.qrc">
+     <normaloff>:/images/pause.png</normaloff>:/images/pause.png</iconset>
    </property>
    <property name="text">
     <string>Pause</string>
    </property>
    <property name="shortcut">
     <string>F9</string>
-   </property>
-  </action>
-  <action name="actionRadar">
-   <property name="text">
-    <string>Radar</string>
    </property>
   </action>
  </widget>
@@ -348,7 +341,7 @@
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="res.qrc"/>
+  <include location="../res.qrc"/>
  </resources>
  <connections>
   <connection>
@@ -479,22 +472,6 @@
     </hint>
    </hints>
   </connection>
-  <connection>
-   <sender>actionRadar</sender>
-   <signal>triggered()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>ActionOpenRadarChannel()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>569</x>
-     <y>376</y>
-    </hint>
-   </hints>
-  </connection>
  </connections>
  <slots>
   <slot>ActionOpenImage()</slot>
@@ -503,6 +480,5 @@
   <slot>ActionAddGrid()</slot>
   <slot>ActionOpenImages()</slot>
   <slot>CloseVideoImgViewer(bool)</slot>
-  <slot>ActionOpenRadarChannel()</slot>
  </slots>
 </ui>

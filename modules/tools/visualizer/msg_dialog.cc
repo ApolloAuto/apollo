@@ -14,26 +14,16 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "free_camera.h"
+#include "modules/tools/visualizer/msg_dialog.h"
+#include "modules/tools/visualizer/ui_msg_dialog.h"
 
-FreeCamera::FreeCamera(void)
-    : AbstractCamera(),
-      //    _speed(1.0f),
-      translation_(0.0, 0.0f, 0.0f) {}
+MessageDialog::MessageDialog(QWidget *parent)
+    : QDialog(parent), ui_(new Ui::MessageDialog) {
+  ui_->setupUi(this);
+}
 
-void FreeCamera::UpdateWorld(void) {
-  QMatrix4x4 R = YawPitchRoll(attitude_[0], attitude_[1], attitude_[2]);
+MessageDialog::~MessageDialog() { delete ui_; }
 
-  position_ += translation_;
-  translation_.setX(0.0f);
-  translation_.setY(0.0f);
-  translation_.setZ(0.0f);
-
-  look_ = QVector3D(R * QVector4D(0.0f, 0.0f, 1.0f, 0.0f));
-  up_ = QVector3D(R * QVector4D(0.0f, 1.0f, 0.0f, 0.0f));
-  right_ = QVector3D::crossProduct(look_, up_);
-
-  QVector3D tgt = position_ + look_;
-  model_view_mat_.setToIdentity();
-  model_view_mat_.lookAt(position_, tgt, up_);
+void MessageDialog::setMessage(const QString &msg) {
+  ui_->msgLabel->setText(msg);
 }

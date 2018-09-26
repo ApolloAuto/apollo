@@ -14,32 +14,39 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "grid.h"
+#include "modules/tools/visualizer/texture.h"
 #include <iostream>
 
-Grid::Grid(int cellCountBySide)
-    : RenderableObject((cellCountBySide << 2) + 4, 2),
-      grid_color_(128, 128, 128) {}
+Texture::Texture()
+    : is_size_changed_(false),
+      is_dirty_(false),
+      texture_format_(0),
+      image_width_(0),
+      image_height_(0),
+      data_size_(0),
+      data_(nullptr) {}
 
-bool Grid::FillVertexBuffer(GLfloat* pBuffer) {
-  float x = CellCount() / 2.0f;
-  float z;
+bool Texture::UpdateData(const QImage &img) {
+  if (data_size_ < img.byteCount()) {
+    if (!data_) {
+      delete [] data_;
+    }
 
-  for (z = -x; z <= x; ++z) {
-    *pBuffer++ = -x;
-    *pBuffer++ = z;
-    *pBuffer++ = x;
-    *pBuffer++ = z;
+    data_ = new GLubyte[img.byteCount()];
+    if (data_ == nullptr) {
+      data_size_ = 0;
+      return false;
+    }
+    data_size_ = img.byteCount();
+    is_size_changed_ = true;
   }
 
-  z = x;
+  memcpy(data_, img.bits(), img.byteCount());
+  is_dirty_ = true;
 
-  for (x = -z; x <= z; ++x) {
-    *pBuffer++ = x;
-    *pBuffer++ = -z;
-    *pBuffer++ = x;
-    *pBuffer++ = z;
-  }
+  image_height_ = img.height();
+  image_width_ = img.width();
 
+  texture_format_ = GL_RGBA;
   return true;
 }

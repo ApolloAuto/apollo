@@ -14,9 +14,9 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "scene_camera_dialog.h"
+#include "modules/tools/visualizer/scene_camera_dialog.h"
+#include "modules/tools/visualizer/ui_scene_camera_dialog.h"
 #include <QVector3D>
-#include "ui_scene_camera_dialog.h"
 
 SceneCameraDialog::SceneCameraDialog(QWidget* parent)
     : QDialog(parent), ui(new Ui::SceneCameraDialog) {

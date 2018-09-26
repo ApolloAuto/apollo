@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef TOOLS_CVT_VISUALIZER_SCENE_CAMERA_DIALOG_H_
-#define TOOLS_CVT_VISUALIZER_SCENE_CAMERA_DIALOG_H_
+#ifndef MODULES_TOOLS_VISUALIZER_SCENE_CAMERA_DIALOG_H_
+#define MODULES_TOOLS_VISUALIZER_SCENE_CAMERA_DIALOG_H_
 
 #include <QDialog>
 
@@ -57,4 +57,4 @@ class SceneCameraDialog : public QDialog {
   Ui::SceneCameraDialog *ui;
 };
 
-#endif  // TOOLS_CVT_VISUALIZER_SCENE_CAMERA_DIALOG_H_
+#endif  // MODULES_TOOLS_VISUALIZER_SCENE_CAMERA_DIALOG_H_

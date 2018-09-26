@@ -33,8 +33,7 @@ qt_cc_library(
     name = "visualizer_lib",
 
     src = glob(
-        [ "*.cpp"] 
-        # exclude = ["main.cpp"]    
+        [ "*.cc"],
     ),
 
     hdr = glob([
@@ -42,7 +41,7 @@ qt_cc_library(
     ]),
 
     uis = glob([
-        "*.ui", 
+        "uis/*.ui", 
     ]),
 
     res = glob([

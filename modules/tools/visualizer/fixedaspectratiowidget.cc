@@ -14,7 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "fixedaspectratiowidget.h"
+#include "modules/tools/visualizer/fixedaspectratiowidget.h"
+#include "modules/tools/visualizer/texture.h"
 #include <QContextMenuEvent>
 #include <QMenu>
 #include <QMouseEvent>
@@ -24,7 +25,6 @@
 #include <QStyle>
 #include <QStyleOption>
 #include <iostream>
-#include "texture.h"
 
 FixedAspectRatioWidget::FixedAspectRatioWidget(QWidget* parent, int index)
     : QWidget(parent), index_(index), refresh_timer_(this), viewer_() {

@@ -14,14 +14,22 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "video_images_dialog.h"
-#include "ui_video_images_dialog.h"
+#include "modules/tools/visualizer/target_camera.h"
 
-VideoImagesDialog::VideoImagesDialog(QWidget *parent)
-    : QDialog(parent), ui(new Ui::VideoImagesDialog) {
-  ui->setupUi(this);
+TargetCamera::TargetCamera()
+    : AbstractCamera(), target_pos_(0.0, 0.0, 0.0), distance_(10.0) {}
+
+void TargetCamera::UpdateWorld() {
+  QMatrix4x4 R = YawPitchRoll(yaw(), pitch(), roll());
+  QVector3D T{0, 0, distance_};
+  T = QVector3D(R * QVector4D(T, 0.0f));
+  position_ = target_pos_ + T;
+  look_ = target_pos_ - position_;
+  look_.normalize();
+
+  up_ = QVector3D(R * QVector4D(UP, 0.0f));
+  right_ = QVector3D::crossProduct(look_, up_);
+
+  model_view_mat_.setToIdentity();
+  model_view_mat_.lookAt(position_, target_pos_, up_);
 }
-
-VideoImagesDialog::~VideoImagesDialog() { delete ui; }
-
-int VideoImagesDialog::count(void) const { return ui->spinBox->value(); }
