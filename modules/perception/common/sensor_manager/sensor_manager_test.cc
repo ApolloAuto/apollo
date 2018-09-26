@@ -26,10 +26,10 @@ namespace common {
 /* TODO(all): to be added back
 TEST(SensorManagerTest, test) {
   FLAGS_work_root =
-      "/apollo/modules/perception/testdata/common/sensor_manager/";
+      "modules/perception/testdata/common/sensor_manager/";
   FLAGS_obs_sensor_meta_path = "data/sensor_meta.pt";
   FLAGS_obs_sensor_intrinsic_path =
-      "/apollo/modules/perception/testdata/common/sensor_manager/params";
+      "modules/perception/testdata/common/sensor_manager/params";
   SensorManager* sensor_manager = lib::Singleton<SensorManager>::get_instance();
   EXPECT_TRUE(sensor_manager != nullptr);
 
@@ -113,7 +113,7 @@ TEST(SensorManagerTest, test_init_error) {
 
   sensor_manager->inited_ = false;
   FLAGS_work_root =
-      "/apollo/modules/perception/testdata/common/sensor_manager/";
+      "modules/perception/testdata/common/sensor_manager/";
 
   FLAGS_obs_sensor_meta_path = "./data/sensor_meta_error.pt";
   EXPECT_FALSE(sensor_manager->Init());

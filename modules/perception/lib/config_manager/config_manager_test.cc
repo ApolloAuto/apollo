@@ -34,7 +34,7 @@ class ConfigManagerTest : public testing::Test {
     putenv(cybertron_path);
     char module_path[80] = "MODULE_PATH=";
     putenv(module_path);
-    FLAGS_config_manager_path = "/apollo/modules/perception/testdata/lib/conf";
+    FLAGS_config_manager_path = "modules/perception/testdata/lib/conf";
     config_manager_ = lib::Singleton<ConfigManager>::get_instance();
     ASSERT_TRUE(config_manager_ != NULL);
   }
