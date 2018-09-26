@@ -18,18 +18,6 @@ cc_library(
 )
 
 cc_library(
-    name = "multi_hm_bipartite_graph_matcher",
-    srcs = [
-        "multi_hm_bipartite_graph_matcher.cc",
-    ],
-    hdrs = [
-        "multi_hm_bipartite_graph_matcher.h",
-    ],
-    deps = [
-    ],
-)
-
-cc_library(
     name = "object_track_matcher",
     srcs = [
         "object_track_matcher.cc",
