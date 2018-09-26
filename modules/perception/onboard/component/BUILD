@@ -99,4 +99,33 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "fusion_component",
+    srcs = [
+        "fusion_component.cc",
+    ],
+    hdrs = [
+        "fusion_component.h",
+    ],
+    deps = [
+        "@eigen",
+        "//framework:cybertron",
+        "//modules/common/proto:error_code_proto",
+        "//modules/common/proto:geometry_proto",
+        "//modules/common/proto:header_proto",
+        "//modules/map/proto:map_proto",
+        "//modules/perception/base",
+        "//modules/perception/fusion/app:obstacle_multi_sensor_fusion",
+        "//modules/perception/fusion/base",
+        "//modules/perception/fusion/lib/interface",
+        "//modules/perception/lib/registerer",
+        "//modules/perception/lib/utils",
+        "//modules/perception/map/hdmap:hdmap_input",
+        "//modules/perception/onboard/common_flags",
+        "//modules/perception/onboard/inner_component_messages",
+        "//modules/perception/onboard/msg_serializer",
+        "//modules/perception/proto:perception_proto",
+    ],
+)
+
 cpplint()
