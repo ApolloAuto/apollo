@@ -14,13 +14,15 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/perception/lidar/lib/classifier/fused_classifier/util.h"
-#include "modules/perception/lidar/common/lidar_log.h"
+#include "cybertron/common/log.h"
 
 namespace apollo {
 namespace perception {
 namespace lidar {
 namespace util {
-using base::ObjectType;
+
+using apollo::perception::base::ObjectType;
+
 void FromStdToVector(const std::vector<float>& src_prob, Vectord* dst_prob) {
   (*dst_prob)(0) = src_prob[0];
   for (size_t i = 3; i < static_cast<size_t>(ObjectType::MAX_OBJECT_TYPE);
@@ -92,7 +94,7 @@ bool LoadSingleMatrixFile(const std::string& filename, Matrixd* matrix) {
   }
   std::ifstream fin(filename);
   if (!fin.is_open()) {
-    LOG_ERROR << "Fail to open file: " << filename;
+    AERROR << "Fail to open file: " << filename;
     return false;
   }
   LoadSingleMatrix(fin, matrix);
@@ -107,7 +109,7 @@ bool LoadMultipleMatricesFile(const std::string& filename,
   }
   std::ifstream fin(filename);
   if (!fin.is_open()) {
-    LOG_ERROR << "Fail to open file: " << filename;
+    AERROR << "Fail to open file: " << filename;
     return false;
   }
   matrices->clear();
