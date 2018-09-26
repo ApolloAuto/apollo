@@ -20,10 +20,10 @@
 #include <string>
 #include <vector>
 
-#include "modules/perception/base/blob.h"
-#include "modules/perception/base/options_define.h"
-#include "modules/perception/base/point_cloud.h"
 #include "modules/perception/lidar/lib/segmentation/cnnseg/proto/cnnseg_param.pb.h"
+
+#include "modules/perception/base/blob.h"
+#include "modules/perception/base/point_cloud.h"
 
 namespace apollo {
 namespace perception {
