@@ -13,17 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_LIDAR_LIB_TRACKER_HM_TRACKER_BASE_BIPARTITE_GRAPH_MATCHER_H_
-#define MODULES_PERCEPTION_LIDAR_LIB_TRACKER_HM_TRACKER_BASE_BIPARTITE_GRAPH_MATCHER_H_
+#ifndef MODULES_PERCEPTION_LIDAR_LIB_TRACKER_HM_TRACKER_BASE_BIPARTITE_GRAPH_MATCHER_H_  // NOLINT
+#define MODULES_PERCEPTION_LIDAR_LIB_TRACKER_HM_TRACKER_BASE_BIPARTITE_GRAPH_MATCHER_H_  // NOLINT
 
-#include <Eigen/Core>
 #include <string>
 #include <utility>
 #include <vector>
 
+#include "Eigen/Core"
+
 #include "modules/perception/common/graph/secure_matrix.h"
 #include "modules/perception/lib/registerer/registerer.h"
-#include "modules/perception/lidar/common/lidar_log.h"
 
 namespace apollo {
 namespace perception {
@@ -71,4 +71,4 @@ PERCEPTION_REGISTER_REGISTERER(BaseBipartiteGraphMatcher);
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_LIDAR_LIB_TRACKER_HM_TRACKER_BASE_BIPARTITE_GRAPH_MATCHER_H_
+#endif
