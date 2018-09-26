@@ -42,7 +42,8 @@ class HmMultiTargetTrackerTest : public testing::Test {
     putenv(cybertron_path);
     char* module_path = "MODULE_PATH=";
     putenv(module_path);
-    lib::FLAGS_work_root = "./lidar_test_data/lib/tracker/hm_tracker/";
+    lib::FLAGS_work_root =
+        "modules/perception/testdata/lidar/lib/tracker/hm_tracker/";
     object_builder_ = new ObjectBuilder();
     hm_tracker_ = new HmMultiTargetTracker();
 
@@ -121,7 +122,7 @@ TEST_F(HmMultiTargetTrackerTest,
   EXPECT_STREQ("HmMultiTargetTracker", hm_tracker_->Name().c_str());
   // test Track()
   std::string data_path =
-      "./lidar_test_data/lib/tracker/hm_tracker/data/files/";
+      "modules/perception/testdata/lidar/lib/tracker/hm_tracker/data/files/";
   std::vector<std::string> pcd_filenames;
   lib::FileUtil::GetFileList(data_path, ".pcd", &pcd_filenames);
   std::vector<std::string> pose_filenames;

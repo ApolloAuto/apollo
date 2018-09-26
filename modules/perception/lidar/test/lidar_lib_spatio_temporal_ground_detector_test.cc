@@ -57,15 +57,15 @@ TEST(SpatioTemporalGroundDetectorTest, test_spatio_temporal_ground_detector) {
   putenv(cybertron_path);
   char module_path[100] = "MODULE_PATH=";
   putenv(module_path);
-  lib::FLAGS_work_root =
-      "./lidar_test_data/lib/ground_detector/spatio_temporal_ground_detector/";
+  lib::FLAGS_work_root = "modules/perception/testdata/lidar/lib/"
+      "ground_detector/spatio_temporal_ground_detector/";
 
   EXPECT_TRUE(SceneManager::Instance().Init());
   // load pcd data
   base::PointFCloudPtr pc_ptr;
   pc_ptr.reset(new base::PointFCloud);
-  std::string filename =
-      "./lidar_test_data/lib/ground_detector/spatio_temporal_ground_detector/"
+  std::string filename = "modules/perception/testdata/lidar/lib/"
+      "ground_detector/spatio_temporal_ground_detector/"
       "pcd_data/QB9178_3_1461752790_1461753090_36701.pcd";
   bool ret = LoadPCDFile(filename, pc_ptr);
   CHECK(ret) << "Failed to load " << filename;

@@ -67,7 +67,8 @@ TEST(LidarLibObjectFilterBankTest, lidar_lib_object_filter_bank_test) {
   putenv(cybertron_path);
   char module_path[100] = "MODULE_PATH=";
   putenv(module_path);
-  lib::FLAGS_work_root = "./lidar_test_data/lib/object_filter_bank/filter_bank";
+  lib::FLAGS_work_root =
+      "modules/perception/testdata/lidar/lib/object_filter_bank/filter_bank";
 
   ObjectFilterBank filter_bank;
   EXPECT_EQ(filter_bank.Name(), "ObjectFilterBank");

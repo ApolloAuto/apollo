@@ -34,7 +34,7 @@ class ROIBoundaryFilterTest : public testing::Test {
     char module_path[100] = "MODULE_PATH=";
     putenv(module_path);
     lib::FLAGS_work_root =
-        "./lidar_test_data/lib/object_filter_bank/roi_boundary";
+        "modules/perception/testdata/lidar/lib/object_filter_bank/roi_boundary";
   }
   void TearDown() {}
 

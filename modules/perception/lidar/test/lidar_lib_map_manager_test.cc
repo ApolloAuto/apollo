@@ -33,7 +33,7 @@ TEST(LidarLibMapManagerTest, lidar_map_manager_empty_test) {
   char module_path[100] = "MODULE_PATH=";
   putenv(module_path);
 
-  lib::FLAGS_work_root = "./lidar_test_data/lib/map_manager";
+  lib::FLAGS_work_root = "modules/perception/testdata/lidar/lib/map_manager";
   lib::FLAGS_config_manager_path = "./empty_conf";
   lib::ConfigManager* config_manager =
       lib::Singleton<lib::ConfigManager>::get_instance();
@@ -53,7 +53,7 @@ TEST(LidarLibMapManagerTest, lidar_map_manager_test) {
   char module_path[100] = "MODULE_PATH=";
   putenv(module_path);
 
-  lib::FLAGS_work_root = "./lidar_test_data/lib/map_manager";
+  lib::FLAGS_work_root = "modules/perception/testdata/lidar/lib/map_manager";
   lib::FLAGS_config_manager_path = "./conf";
   lib::ConfigManager* config_manager =
       lib::Singleton<lib::ConfigManager>::get_instance();

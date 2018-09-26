@@ -36,7 +36,7 @@ class LidarAppPipelineTest : public testing::Test {
     putenv(cybertron_path);
     char module_path[100] = "MODULE_PATH=";
     putenv(module_path);
-    lib::FLAGS_work_root = "./lidar_test_data/app";
+    lib::FLAGS_work_root = "modules/perception/testdata/lidar/app";
   }
 
   void TearDown() {}
@@ -63,8 +63,10 @@ void ToMessage(const base::PointFCloud& cloud,
 #endif
 
 TEST_F(LidarAppPipelineTest, lidar_app_pipeline_test) {
-  std::string pcd_path = "./lidar_test_data/app/data/perception/lidar/files/";
-  std::string pose_path = "./lidar_test_data/app/data/perception/lidar/poses/";
+  std::string pcd_path =
+      "modules/perception/testdata/lidar/app/data/perception/lidar/files/";
+  std::string pose_path =
+      "modules/perception/testdata/lidar/app/data/perception/lidar/poses/";
   std::vector<std::string> pcd_file_names;
   lib::FileUtil::GetFileList(pcd_path, ".pcd", &pcd_file_names);
   std::string file_name;

@@ -129,7 +129,7 @@ TEST(hdmap_roi_filter_bitmap2d_test, test_polygon_scan_cvter) {
 bool LoadFrameData(LidarFrame* frame) {
   std::ifstream fin;
   fin.open(
-      "./lidar_test_data/lib/roi_filter/hdmap_roi_filter/data/"
+      "modules/perception/testdata/lidar/lib/roi_filter/hdmap_roi_filter/data/"
       "poly_mask_ut.poly");
   CHECK_EQ(fin.fail(), false);
   size_t polygons_num = 0;
@@ -147,7 +147,7 @@ bool LoadFrameData(LidarFrame* frame) {
   fin.close();
 
   fin.open(
-      "./lidar_test_data/lib/roi_filter/hdmap_roi_filter/data/"
+      "modules/perception/testdata/lidar/lib/roi_filter/hdmap_roi_filter/data/"
       "poly_mask_ut.pcd");
   CHECK_EQ(fin.fail(), false);
   size_t cloud_size = 0;
@@ -168,7 +168,8 @@ class HdmapROIFilterTest : public ::testing::Test {
     putenv(cybertron_path);
     char* module_path = "MODULE_PATH=";
     putenv(module_path);
-    lib::FLAGS_work_root = "./lidar_test_data/lib/roi_filter/hdmap_roi_filter";
+    lib::FLAGS_work_root =
+        "modules/perception/testdata/lidar/lib/roi_filter/hdmap_roi_filter";
   }
 
  protected:

@@ -44,7 +44,7 @@ class LidarLibSceneManagerTest : public testing::Test {
     putenv(cybertron_path);
     char* module_path = "MODULE_PATH=";
     putenv(module_path);
-    lib::FLAGS_work_root = "./lidar_test_data/lib/scene_manager";
+    lib::FLAGS_work_root = "modules/perception/testdata/lidar/lib/scene_manager";
     lib::FLAGS_config_manager_path = "./conf";
     lib::ConfigManager* config_manager =
         lib::Singleton<lib::ConfigManager>::get_instance();
@@ -167,11 +167,11 @@ TEST_F(LidarLibSceneManagerTest, lidar_lib_scene_manager_ground_service_test) {
   ground_service_cast->ground_content_ref_->grid_center_ << 461957.33791688998,
       4404672.5859791003, 19.143968966679999;
   LoadPlanes(
-      "./lidar_test_data/lib/"
+      "modules/perception/testdata/lidar/lib/"
       "scene_manager/resources/planes.txt",
       node_ptr);
   LoadPoints(
-      "./lidar_test_data/lib/"
+      "modules/perception/testdata/lidar/lib/"
       "scene_manager/resources/points.txt",
       &world_pts, &height_gts);
   Eigen::Vector3d world_point(0.0, 0.0, 0.0);
@@ -196,10 +196,10 @@ TEST_F(LidarLibSceneManagerTest, lidar_lib_scene_manager_ground_service_test) {
 
 void MockData(LidarFrame* frame) {
   std::string pcd =
-      "./lidar_test_data/lib/scene_manager/data/"
+      "modules/perception/testdata/lidar/lib/scene_manager/data/"
       "pcd/1532063882.176900.pcd";
   std::string pose =
-      "./lidar_test_data/lib/scene_manager/data/"
+      "modules/perception/testdata/lidar/lib/scene_manager/data/"
       "pose/1532063882.176900.pose";
   // a. load pcd
   frame->cloud = base::PointFCloudPool::Instance().Get();

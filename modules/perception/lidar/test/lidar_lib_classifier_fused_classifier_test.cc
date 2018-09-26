@@ -39,7 +39,8 @@ class FusedClassifierTest : public testing::Test {
     putenv(cybertron_path);
     char* module_path = "MODULE_PATH=";
     putenv(module_path);
-    lib::FLAGS_work_root = "./lidar_test_data/lib/classifier/fused_classifier";
+    lib::FLAGS_work_root =
+        "modules/perception/testdata/lidar/lib/classifier/fused_classifier";
     fused_classifier_ = new FusedClassifier();
     BuildObjects();
     for (auto& frame : frames_) {
