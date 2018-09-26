@@ -43,13 +43,16 @@ cc_library(
         ":racobit_radar_message_manager",
         "//framework:cybertron",
         "//modules/common",
+        "//modules/common/adapters:adapter_gflags",
         "//modules/common/monitor_log",
         "//modules/drivers/canbus:sensor_gflags",
+	"//modules/drivers/proto:sensor_proto",
         "//modules/drivers/canbus/can_client:can_client_factory",
         "//modules/drivers/canbus/can_comm:can_receiver",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/radar/racobit_radar/protocol:drivers_racobit_radar_protocol",
     ],
+    copts = ['-DMODULE_NAME=\\"racobit_radar_canbus\\"'],
 )
 
 cc_binary(
