@@ -37,7 +37,7 @@ bool UsbCamComponent::Init() {
   raw_image_->height = camera_config_->height();
   raw_image_->bytes_per_pixel = camera_config_->bytes_per_pixel();
 
-  device_wait_ = camera_config_->device_wait();
+  device_wait_ = camera_config_->device_wait_ms();
   spin_rate_ = camera_config_->spin_rate();
 
   if (camera_config_->output_type() == YUYV) {
@@ -67,8 +67,8 @@ bool UsbCamComponent::Init() {
 void UsbCamComponent::run() {
   while (!cybertron::IsShutdown()) {
     if (!camera_device_->wait_for_device()) {
-      // sleep 2s for next check
-      sleep(device_wait_);
+      // sleep for next check
+      cybertron::SleepFor(std::chrono::milliseconds(device_wait_));
       continue;
     }
 
