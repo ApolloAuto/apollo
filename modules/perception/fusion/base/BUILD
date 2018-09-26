@@ -3,6 +3,20 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
+    name = "base",
+    deps = [
+        ":base_forward_declaration",
+        ":fusion_log",
+        ":base_init_options",
+        ":scene",
+        ":sensor",
+        ":sensor_data_manager",
+        ":track",
+        ":track_pool_types",
+    ]
+)
+
+cc_library(
     name = "base_forward_declaration",
     hdrs = [
         "base_forward_declaration.h",
