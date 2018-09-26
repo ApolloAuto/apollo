@@ -31,7 +31,7 @@
 #include "modules/common/monitor_log/monitor_log_buffer.h"
 #include "modules/common/time/time.h"
 #include "modules/common/util/util.h"
-#include "modules/control/proto/control_cmd.pb.h"
+#include "modules/common/status/status.h"
 #include "modules/drivers/canbus/can_client/can_client.h"
 #include "modules/drivers/canbus/can_client/can_client_factory.h"
 #include "modules/drivers/canbus/can_comm/can_receiver.h"
@@ -69,13 +69,12 @@ using apollo::drivers::canbus::CanReceiver;
 using apollo::drivers::canbus::SenderMessage;
 using apollo::drivers::canbus::SensorCanbusConf;
 
-class RacobitRadarCanbus : public apollo::cybertron::Component<> {
+class RacobitRadarCanbusComponent : public apollo::cybertron::Component<> {
  public:
   // TODO(lizh): check whether we need a new msg item, say
   // MonitorMessageItem::SENSORCANBUS
-  RacobitRadarCanbus()
-      : monitor_logger_(apollo::common::monitor::MonitorMessageItem::CANBUS) {}
-  ~RacobitRadarCanbus();
+  RacobitRadarCanbusComponent();
+  ~RacobitRadarCanbusComponent();
 
   /**
    * @brief module initialization function
@@ -84,35 +83,22 @@ class RacobitRadarCanbus : public apollo::cybertron::Component<> {
   bool Init() override;
 
  private:
-  /**
-   * @brief module start function
-   * @return start status
-   */
-  apollo::common::Status Start() override;
-
-  /**
-   * @brief module stop function
-   */
-  void Stop() override;
-
-  Status OnError(const std::string &error_msg);
   void RegisterCanClients();
   apollo::common::ErrorCode ConfigureRadar();
-
+  Status OnError(const std::string &error_msg);
   std::shared_ptr<CanClient> can_client_;
   CanReceiver<RacobitRadar> can_receiver_;
   std::unique_ptr<RacobitRadarMessageManager> sensor_message_manager_;
 
   int64_t last_timestamp_ = 0;
-  apollo::common::monitor::MonitorLogger monitor_logger_;
-
+  apollo::common::monitor::MonitorLogBuffer monitor_logger_buffer_;
   bool start_success_ = false;
   // cybertron
   RacobitRadarConf racobit_radar_conf_;
   std::shared_ptr<cybertron::Writer<RacobitRadar>> racobit_radar_writer_;
 };
 
-CYBERTRON_REGISTER_COMPONENT(RacobitRadarCanbus)
+CYBERTRON_REGISTER_COMPONENT(RacobitRadarCanbusComponent)
 
 }  // namespace racobit_radar
 }  // namespace drivers
