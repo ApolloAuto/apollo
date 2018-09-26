@@ -13,20 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+
 #include "modules/perception/inference/caffe/caffe_net.h"
+
 #include <iostream>
-#include <map>
-#include <set>
-#include <string>
-#include <vector>
-#include "glog/logging.h"
+
+#include "caffe/caffe.hpp"
+
+#include "cybertron/common/log.h"
 
 namespace apollo {
 namespace perception {
 namespace inference {
+
 CaffeNet::CaffeNet(const std::string &net_file, const std::string &model_file,
                    const std::vector<std::string> &outputs)
     : net_file_(net_file), model_file_(model_file), output_names_(outputs) {}
+
 bool CaffeNet::Init(const std::map<std::string, std::vector<int>> &shapes) {
   if (gpu_id_ >= 0) {
     caffe::Caffe::SetDevice(gpu_id_);
@@ -69,6 +72,7 @@ bool CaffeNet::Init(const std::map<std::string, std::vector<int>> &shapes) {
   }
   return true;
 }
+
 CaffeNet::CaffeNet(const std::string &net_file, const std::string &model_file,
                    const std::vector<std::string> &outputs,
                    const std::vector<std::string> &inputs)
