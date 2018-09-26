@@ -177,7 +177,9 @@ void AsyncLogger::RunThread() {
     }
 
     if (flushing_buf_->flush) {
-      wrapped_->Flush();
+      for (auto &module_logger : moduleLoggerMap) {
+        module_logger.second->Flush();
+      }
     }
     flushing_buf_->clear();
 
