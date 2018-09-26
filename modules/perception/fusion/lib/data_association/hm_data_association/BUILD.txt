@@ -1,6 +1,10 @@
 # DO NOT MODIFY
 # THIS FILE IS GENERATED AUTOMATICALLY TO HELP WRITE BUILD FILE
 # DELETE THIS FILE WHEN YOU HAVE CREATED THE COMPLETE BUILD FILE
+load("//tools:cpplint.bzl", "cpplint")
+
+package(default_visibility = ["//visibility:public"])
+
 cc_library(
     name = "chi_squared_cdf_1_0",
     deps = [
@@ -69,3 +73,5 @@ cc_library(
     deps = [
     ],
 )
+
+cpplint()
