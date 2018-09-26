@@ -11,7 +11,6 @@ cc_library(
         "pointcloud_preprocessor.h",
     ],
     deps = [
-        "@eigen",
         "//framework:cybertron",
         "//modules/common/proto:error_code_proto",
         "//modules/common/proto:header_proto",
@@ -22,6 +21,7 @@ cc_library(
         "//modules/perception/lidar/common",
         "//modules/perception/lidar/lib/pointcloud_preprocessor/proto:pointcloud_preprocessor_config_proto",
         "//modules/perception/proto:perception_config_schema_proto",
+        "@eigen",
     ],
 )
 
