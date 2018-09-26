@@ -32,7 +32,10 @@ class ChannelMessage;
 // class GeneralMessage;
 
 class CybertronTopologyMessage : public RenderableMessage {
+  static double max_frmae_ratio_;;
  public:
+  static double max_frame_ratio(void){ return max_frmae_ratio_; }
+
   explicit CybertronTopologyMessage();
   ~CybertronTopologyMessage();
 
@@ -51,6 +54,8 @@ class CybertronTopologyMessage : public RenderableMessage {
   int page_item_count_;
   int page_index_;
   int col1_width_;
+
+  
 
   std::map<std::string, ChannelMessage*> all_channels_map_;
 };

@@ -27,6 +27,8 @@
 
 constexpr int SecondColumnOffset = 4;
 
+double CybertronTopologyMessage::max_frmae_ratio_ = 0.1;
+
 CybertronTopologyMessage::CybertronTopologyMessage()
     : RenderableMessage(nullptr, 1),
       second_column_(SecondColumnType::MessageFrameRatio),
@@ -217,6 +219,10 @@ void CybertronTopologyMessage::Render(const Screen* s, int key) {
     s->AddStr(0, y, iter->first.c_str());
 
     if (!ChannelMessage::isErrorCode(iter->second)) {
+
+      if(iter->second->frame_ratio() > max_frmae_ratio_)
+        max_frmae_ratio_ = iter->second->frame_ratio();
+
       switch (second_column_) {
         case SecondColumnType::MessageType:
           s->AddStr(col1_width_ + SecondColumnOffset, y,
