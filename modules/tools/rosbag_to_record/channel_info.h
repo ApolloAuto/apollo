@@ -19,46 +19,46 @@
 
 #include <memory>
 #include <string>
-#include <vector>
 #include <unordered_map>
+#include <vector>
 
+#include "cybertron/common/log.h"
 #include "cybertron/message/message_traits.h"
 #include "cybertron/message/protobuf_factory.h"
-#include "cybertron/common/log.h"
 
-#include "modules/planning/proto/planning.pb.h"
-#include "modules/prediction/proto/prediction_obstacle.pb.h"
-#include "modules/perception/proto/perception_obstacle.pb.h"
-#include "modules/perception/proto/traffic_light_detection.pb.h"
-#include "modules/canbus/proto/chassis.pb.h"
-#include "modules/control/proto/control_cmd.pb.h"
-#include "modules/guardian/proto/guardian.pb.h"
-#include "modules/localization/proto/localization.pb.h"
-#include "modules/localization/proto/gps.pb.h"
-#include "modules/localization/proto/imu.pb.h"
-#include "modules/common/proto/drive_event.pb.h"
-#include "modules/common/monitor_log/proto/monitor_log.pb.h"
-#include "modules/monitor/proto/system_status.pb.h"
-#include "modules/data/proto/static_info.pb.h"
-#include "modules/canbus/proto/chassis_detail.pb.h"
-#include "modules/control/proto/pad_msg.pb.h"
-#include "modules/map/relative_map/proto/navigation.pb.h"
-#include "modules/routing/proto/routing.pb.h"
 #include "cybertron/tf2_cybertron/transform_broadcaster.h"
-#include "modules/drivers/proto/conti_radar.pb.h"
-#include "modules/drivers/proto/delphi_esr.pb.h"
-#include "modules/drivers/gnss/proto/gnss_best_pose.pb.h"
+#include "modules/canbus/proto/chassis.pb.h"
+#include "modules/canbus/proto/chassis_detail.pb.h"
+#include "modules/common/monitor_log/proto/monitor_log.pb.h"
+#include "modules/common/proto/drive_event.pb.h"
+#include "modules/control/proto/control_cmd.pb.h"
+#include "modules/control/proto/pad_msg.pb.h"
+#include "modules/data/proto/static_info.pb.h"
 #include "modules/drivers/gnss/proto/gnss.pb.h"
+#include "modules/drivers/gnss/proto/gnss_best_pose.pb.h"
 #include "modules/drivers/gnss/proto/gnss_raw_observation.pb.h"
 #include "modules/drivers/gnss/proto/gnss_status.pb.h"
 #include "modules/drivers/gnss/proto/imu.pb.h"
 #include "modules/drivers/gnss/proto/ins.pb.h"
+#include "modules/drivers/proto/conti_radar.pb.h"
+#include "modules/drivers/proto/delphi_esr.pb.h"
 #include "modules/drivers/proto/pointcloud.pb.h"
+#include "modules/guardian/proto/guardian.pb.h"
+#include "modules/localization/proto/gps.pb.h"
+#include "modules/localization/proto/imu.pb.h"
+#include "modules/localization/proto/localization.pb.h"
+#include "modules/map/relative_map/proto/navigation.pb.h"
+#include "modules/monitor/proto/system_status.pb.h"
+#include "modules/perception/proto/perception_obstacle.pb.h"
+#include "modules/perception/proto/traffic_light_detection.pb.h"
+#include "modules/planning/proto/planning.pb.h"
+#include "modules/prediction/proto/prediction_obstacle.pb.h"
+#include "modules/routing/proto/routing.pb.h"
 
 namespace apollo {
 namespace tools {
 
-using namespace apollo::cybertron::message;
+// using namespace apollo::cybertron::message;
 using apollo::cybertron::message::ProtobufFactory;
 
 class ChannelInfo {
@@ -80,15 +80,15 @@ class ChannelInfo {
   ChannelInfo();
   ChannelInfo(const ChannelInfo&) = delete;
   ChannelInfo& operator=(const ChannelInfo&) = delete;
-  
-  template<typename M>
-  void InitChannelInfo(const std::string& channel_name, const std::string& msg_type) {
+
+  template <typename M>
+  void InitChannelInfo(const std::string& channel_name,
+                       const std::string& msg_type) {
     channel_msg_type_[channel_name] = msg_type;
     support_channels_.push_back(channel_name);
     std::string proto_desc("");
     M m;
-    ProtobufFactory::Instance()->GetDescriptorString(
-        msg_type, &proto_desc);
+    ProtobufFactory::Instance()->GetDescriptorString(msg_type, &proto_desc);
     channel_proto_desc_[channel_name] = proto_desc;
   }
 
