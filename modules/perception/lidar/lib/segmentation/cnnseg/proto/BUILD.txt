@@ -1,0 +1,53 @@
+load("//tools:cpplint.bzl", "cpplint")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_proto_library(
+    name = "cnnseg_config_poto",
+    deps = [
+        ":cnnseg_config_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "cnnseg_config_poto_lib",
+    srcs = [
+        "cnnseg_config.proto",
+    ],
+    deps = [
+    ],
+)
+
+cc_proto_library(
+    name = "cnnseg_param_poto",
+    deps = [
+        ":cnnseg_param_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "cnnseg_param_poto_lib",
+    srcs = [
+        "cnnseg_param.proto",
+    ],
+    deps = [
+    ],
+)
+
+cc_proto_library(
+    name = "spp_engine_config_poto",
+    deps = [
+        ":spp_engine_config_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "spp_engine_config_poto_lib",
+    srcs = [
+        "spp_engine_config.proto",
+    ],
+    deps = [
+    ],
+)
+
+cpplint()

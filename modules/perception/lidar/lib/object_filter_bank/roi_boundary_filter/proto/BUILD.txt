@@ -1,0 +1,21 @@
+load("//tools:cpplint.bzl", "cpplint")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_proto_library(
+    name = "roi_boundary_filter_config_poto",
+    deps = [
+        ":roi_boundary_filter_config_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "roi_boundary_filter_config_poto_lib",
+    srcs = [
+        "roi_boundary_filter_config.proto",
+    ],
+    deps = [
+    ],
+)
+
+cpplint()

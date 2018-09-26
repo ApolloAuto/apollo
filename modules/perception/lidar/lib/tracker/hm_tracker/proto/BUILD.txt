@@ -1,0 +1,21 @@
+load("//tools:cpplint.bzl", "cpplint")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_proto_library(
+    name = "hm_tracker_config_poto",
+    deps = [
+        ":hm_tracker_config_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "hm_tracker_config_poto_lib",
+    srcs = [
+        "hm_tracker_config.proto",
+    ],
+    deps = [
+    ],
+)
+
+cpplint()
