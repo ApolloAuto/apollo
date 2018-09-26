@@ -66,42 +66,41 @@ TEST(RecordTest, TestOneMessageFile) {
   ASSERT_EQ(MESSAGE_TYPE_1, rw->GetMessageType(CHANNEL_NAME_1));
   ASSERT_EQ(PROTO_DESC, rw->GetProtoDesc(CHANNEL_NAME_1));
 
-  std::shared_ptr<RawMessage> rm(new RawMessage(STR_10B));
-  ASSERT_TRUE(rw->WriteMessage(CHANNEL_NAME_1, rm, TIME_1));
-  ASSERT_EQ(1, rw->GetMessageNumber(CHANNEL_NAME_1));
+  int MESSAGE_NUM = 1024;
+  for (int i = 0; i < MESSAGE_NUM; ++i) {
+    std::shared_ptr<RawMessage> rm(new RawMessage(STR_10B));
+    ASSERT_TRUE(rw->WriteMessage(CHANNEL_NAME_1, rm, TIME_1));
+    ASSERT_EQ(i + 1, rw->GetMessageNumber(CHANNEL_NAME_1));
+  }
 
   delete rw;
 
   // reader
-  RecordReader* rr = new RecordReader();
-  ASSERT_FALSE(rr->is_opened_);
-  ASSERT_EQ("", rr->file_);
-  ASSERT_EQ("", rr->path_);
-  ASSERT_EQ(nullptr, rr->file_reader_);
+  auto file = std::make_shared<RecordFileReader>();
+  file->Open(TEST_FILE);
+  RecordReader reader(file, 0, UINT_MAX, std::set<std::string>());
 
-  ASSERT_TRUE(rr->Open(TEST_FILE));
-  ASSERT_TRUE(rr->is_opened_);
-  ASSERT_EQ(TEST_FILE, rr->file_);
-  ASSERT_EQ(TEST_FILE, rr->path_);
-  ASSERT_TRUE(rr->file_reader_->ifstream_.is_open());
+  ASSERT_NE(nullptr, reader.file_reader_);
+  ASSERT_TRUE(reader.file_reader_->ifstream_.is_open());
 
-  sleep(1);
+  RecordMessage msg;
+  for (int i = 0; i < MESSAGE_NUM; ++i) {
+    ASSERT_TRUE(reader.ReadMessage(&msg));
+    EXPECT_EQ(STR_10B, msg.content);
+    EXPECT_EQ(CHANNEL_NAME_1, msg.channel_name);
+    EXPECT_EQ(TIME_1, msg.time);
+  }
 
-  ASSERT_EQ("", rr->CurrentMessageChannelName());
-  ASSERT_EQ("", rr->CurrentRawMessage()->message);
-  ASSERT_EQ(0, rr->CurrentMessageTime());
+  RecordReader reader_2(file, 0, UINT_MAX, std::set<std::string>());
+  for (int i = 0; i < MESSAGE_NUM; ++i) {
+    ASSERT_TRUE(reader_2.ReadMessage(&msg));
+    EXPECT_EQ(STR_10B, msg.content);
+    EXPECT_EQ(CHANNEL_NAME_1, msg.channel_name);
+    EXPECT_EQ(TIME_1, msg.time);
+  }
 
-  ASSERT_FALSE(rr->EndOfFile());
-  ASSERT_TRUE(rr->ReadMessage());
-
-  ASSERT_EQ(CHANNEL_NAME_1, rr->CurrentMessageChannelName());
-  ASSERT_EQ(STR_10B, rr->CurrentRawMessage()->message);
-  ASSERT_EQ(TIME_1, rr->CurrentMessageTime());
-
-  ASSERT_TRUE(rr->EndOfFile());
-  ASSERT_FALSE(rr->ReadMessage());
-
-  delete rr;
+  EXPECT_FALSE(reader_2.ReadMessage(&msg));
+  EXPECT_FALSE(reader_2.ReadMessage(&msg));
 }
 
 TEST(RecordTest, TestMutiMessageFile) {
@@ -150,6 +149,7 @@ TEST(RecordTest, TestMutiMessageFile) {
   delete rw;
 
   // reader
+  /*
   RecordReader* rr = new RecordReader();
   ASSERT_FALSE(rr->is_opened_);
   ASSERT_EQ("", rr->file_);
@@ -181,6 +181,7 @@ TEST(RecordTest, TestMutiMessageFile) {
   ASSERT_FALSE(rr->ReadMessage());
 
   delete rr;
+  */
 }
 
 }  // namespace record

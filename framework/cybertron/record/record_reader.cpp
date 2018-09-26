@@ -20,205 +20,116 @@ namespace apollo {
 namespace cybertron {
 namespace record {
 
-RecordReader::RecordReader() {}
-
 RecordReader::~RecordReader() {
-  if (load_thread_ && load_thread_->joinable()) {
-    load_thread_->join();
-  }
-  Close();
 }
 
-bool RecordReader::Open(const std::string& file, uint64_t begin_time,
-                        uint64_t end_time,
-                        const std::vector<std::string>& channel_vec) {
-  file_ = file;
-  path_ = file_;
+RecordReader::RecordReader(const std::shared_ptr<RecordFileReader>& file, 
+                           uint64_t begin_time,
+                           uint64_t end_time,
+                           const std::set<std::string>& channels) {
   begin_time_ = begin_time;
   end_time_ = end_time;
-  channel_vec_ = channel_vec;
-  all_channels_ = channel_vec_.empty() ? true : false;
-  file_reader_.reset(new RecordFileReader());
-  current_message_.reset(new RecordMessage());
+  channels_ = channels;
+  file_reader_ = file;
 
-  if (!file_reader_->Open(path_)) {
-    AERROR << "open record file failed. file: " << path_;
-    return false;
-  }
   header_ = file_reader_->GetHeader();
+  file_reader_->Reset();
   if (begin_time_ < header_.begin_time()) {
     begin_time_ = header_.begin_time();
   }
+
   if (end_time_ > header_.end_time()) {
     end_time_ = header_.end_time();
   }
+
   if (begin_time_ > end_time_) {
-    AERROR << "begin time is larger than end time"
+    AERROR << "Begin time must be earlier than end time"
            << ", begin_time_=" << begin_time_ << ", end_time_=" << end_time_;
-    return false;
-  }
-  if (!InitLoadThread()) {
-    AERROR << "init loader error.";
-    return false;
-  }
-  is_opened_ = true;
-  return is_opened_;
+  } 
 }
 
-void RecordReader::Close() {
-  if (is_opened_) {
-    file_reader_->Close();
-    is_opened_ = false;
-  }
-}
+bool RecordReader::ReadMessage(RecordMessage* message) {
+  while (index_ < chunk_.messages_size()) {
+    const auto& next_message = chunk_.messages(index_++);
+    uint64_t time = next_message.time();
+    if (time > end_time_) {
+      return false;
+    }
+    if (time < begin_time_) {
+      continue;
+    }
 
-bool RecordReader::InitLoadThread() {
-  auto f = std::bind(&RecordReader::LoadChunk, this, std::placeholders::_1,
-                     std::placeholders::_2);
-  load_thread_ = std::make_shared<std::thread>(f, begin_time_, end_time_);
-  if (load_thread_ == nullptr) {
-    AERROR << "init loader thread error.";
-    return false;
-  }
-  return true;
-}
-
-bool RecordReader::ReadMessage() {
-  std::lock_guard<std::mutex> lck(mutex_);
-  if (!message_queue_.empty()) {
-    current_message_ = message_queue_.front();
-    message_queue_.pop();
+    const std::string& channel_name = next_message.channel_name();
+    if (!channels_.empty() && channels_.count(channel_name) == 0) {
+      continue;
+    }
+    OnNewMessage(channel_name);
+    message->channel_name = channel_name;
+    message->content = next_message.content();
+    message->time = time;
     return true;
   }
-  if (!looped_readback_ && loaded_all_message_) {
-    AINFO << "reach the last message";
-  } else {
-    AERROR << "read too fast, wait for load thread";
+
+  if (ReadNextChunk()) {
+    index_ = 0;
+    return ReadMessage(message);
   }
   return false;
 }
 
-bool RecordReader::EndOfFile() {
-  std::lock_guard<std::mutex> lck(mutex_);
-  if (message_queue_.empty() && !looped_readback_ && loaded_all_message_) {
-    return true;
-  }
-  return false;
-}
-
-void RecordReader::LoadChunk(uint64_t from_time, uint64_t to_time) {
-  uint64_t loop_time = end_time_ - begin_time_;
-  uint64_t total_message_number = header_.message_number();
-  if (total_message_number == 0) {
-    AERROR << "total message number is zero.";
-    return;
-  }
-  uint64_t average_period = loop_time / total_message_number;
-  if (average_period < 1e7) {
-    average_period = 1e7;  // 10ms
-  }
-  double average_hz = total_message_number / (loop_time * 1e-9);
-  uint32_t preload_queue_size = (uint32_t)average_hz * preload_seconds_;
-  if (preload_queue_size < min_queue_size_) {
-    preload_queue_size = min_queue_size_;
-  }
-  uint32_t loop_num = 0;
-  do {
-    AINFO << "new loop started";
-    bool skip_next_chunk_body(false);
-    file_reader_->ReadHeader();
-    while (!file_reader_->EndOfFile()) {
-      while (message_queue_.size() >= preload_queue_size) {
-        std::this_thread::sleep_for(std::chrono::nanoseconds(average_period));
-      }
-      Section section;
-      if (!file_reader_->ReadSection(&section)) {
-        AERROR << "read section fail";
-        return;
-      }
-      if (section.type == SectionType::SECTION_INDEX) {
+bool RecordReader::ReadNextChunk() {
+  bool skip_next_chunk_body = false;
+  Section section;
+  while (file_reader_->ReadSection(&section)) {
+    switch (section.type) {
+      case SectionType::SECTION_INDEX: {
+        file_reader_->SkipSection(section.size);
         break;
       }
-      switch (section.type) {
-        case SectionType::SECTION_CHANNEL: {
-          Channel chan;
-          if (!file_reader_->ReadSection<Channel>(section.size, &chan)) {
-            AERROR << "read channel section fail.";
-            return;
-          }
-          OnNewChannel(chan.name(), chan.message_type(), chan.proto_desc());
+      case SectionType::SECTION_CHANNEL: {
+        ADEBUG << "Read channel section of size: " << section.size;
+        Channel channel;
+        if (!file_reader_->ReadSection<Channel>(section.size, &channel)) {
+          AERROR << "Failed to read channel section.";
+          return false;
+        }
+        OnNewChannel(channel.name(), channel.message_type(), channel.proto_desc());
+        break;
+      }
+      case SectionType::SECTION_CHUNK_HEADER: {
+        ADEBUG << "Read chunk header section of size: " << section.size;
+        ChunkHeader header;
+        if (!file_reader_->ReadSection<ChunkHeader>(section.size, &header)) {
+          AERROR << "Failed to read chunk header section.";
+          return false;
+        }
+        if (begin_time_ > header.end_time()) {
+          return false;
+        }
+        if (end_time_ < header.begin_time()) {
+          skip_next_chunk_body = true;
+        }
+        break;
+      }
+      case SectionType::SECTION_CHUNK_BODY: {
+        if (skip_next_chunk_body) {
+          file_reader_->SkipSection(section.size);
+          skip_next_chunk_body = false;
           break;
         }
-        case SectionType::SECTION_CHUNK_HEADER: {
-          ChunkHeader chdr;
-          if (!file_reader_->ReadSection<ChunkHeader>(section.size, &chdr)) {
-            AERROR << "read chunk header section fail.";
-            return;
-          }
-          if (from_time > chdr.end_time() || to_time < chdr.begin_time()) {
-            skip_next_chunk_body = true;
-          }
-          break;
+        if (!file_reader_->ReadSection<ChunkBody>(section.size, &chunk_)) {
+          AERROR << "Failed to read chunk body section.";
+          return false;
         }
-        case SectionType::SECTION_CHUNK_BODY: {
-          if (skip_next_chunk_body) {
-            file_reader_->SkipSection(section.size);
-            skip_next_chunk_body = false;
-            break;
-          }
-          ChunkBody cbd;
-          if (!file_reader_->ReadSection<ChunkBody>(section.size, &cbd)) {
-            AERROR << "read chunk body section fail.";
-            return;
-          }
-          for (int idx = 0; idx < cbd.messages_size(); ++idx) {
-            uint64_t time(cbd.messages(idx).time());
-            if (time < from_time || time > to_time) {
-              continue;
-            }
-            std::string channel_name(cbd.messages(idx).channel_name());
-            if (!all_channels_ &&
-                std::find(channel_vec_.begin(), channel_vec_.end(),
-                          channel_name) == channel_vec_.end()) {
-              continue;
-            }
-            std::shared_ptr<RawMessage> raw_message(
-                new RawMessage(cbd.messages(idx).content()));
-            std::shared_ptr<RecordMessage> message_queue_item(new RecordMessage(
-                channel_name, raw_message, cbd.messages(idx).time()));
-            OnNewMessage(channel_name);
-            {
-              std::lock_guard<std::mutex> lck(mutex_);
-              message_queue_.push(message_queue_item);
-            }
-          }
-          break;
-        }
-        default: {
-          AERROR << "section should not be here, section type: "
-                 << section.type;
-          break;
-        }
-      }  // end switch for section type
-    }    // end while, condition is not EOF
-    loop_num++;
-  } while (looped_readback_);
-  loaded_all_message_ = true;
-}
-
-const std::string& RecordReader::CurrentMessageChannelName() {
-  std::lock_guard<std::mutex> lck(mutex_);
-  return current_message_->channel_name;
-}
-
-uint64_t RecordReader::CurrentMessageTime() {
-  std::lock_guard<std::mutex> lck(mutex_);
-  return current_message_->time;
-}
-
-std::shared_ptr<RawMessage> RecordReader::CurrentRawMessage() {
-  std::lock_guard<std::mutex> lck(mutex_);
-  return current_message_->raw_message;
+        return true;
+      }
+      default: {
+        AERROR << "Invalid section type: " << section.type;
+        return false;
+      }
+    }
+  }
+  return false;
 }
 
 }  // namespace record

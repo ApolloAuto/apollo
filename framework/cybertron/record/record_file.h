@@ -95,6 +95,7 @@ class RecordFile {
   virtual ~RecordFile();
   virtual bool Open(const std::string& path) = 0;
   virtual void Close() = 0;
+
   Header GetHeader();
   Index GetIndex();
 
@@ -121,6 +122,7 @@ class RecordFileReader : public RecordFile {
   bool ReadHeader();
   bool ReadIndex();
   bool EndOfFile();
+  void Reset();
 
  private:
   std::ifstream ifstream_;

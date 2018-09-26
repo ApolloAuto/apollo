@@ -51,10 +51,16 @@ bool RecordFileReader::Open(const std::string& path) {
   return ReadHeader();
 }
 
+void RecordFileReader::Reset() {
+  ifstream_.clear();
+  ifstream_.seekg(0, std::ios::beg);
+  ReadHeader();
+}
+
 bool RecordFileReader::ReadHeader() {
-  Section section;
   uint64_t backup_position = ifstream_.tellg();
   ifstream_.seekg(0, std::ios::beg);
+  Section section;
   if (!ReadSection(&section)) {
     AERROR << "read header section fail, file is broken of it is not a record "
               "file.";
@@ -163,7 +169,7 @@ bool RecordFileWriter::Open(const std::string& path) {
     AERROR << "init flush thread error.";
     return false;
   }
-  AINFO << "record file opened, file: " << path_;
+  ADEBUG << "record file opened, file: " << path_;
   return true;
 }
 
@@ -207,7 +213,7 @@ void RecordFileWriter::Close() {
   }
 
   ofstream_.close();
-  AINFO << "record file closed, file: " << path_;
+  ADEBUG << "record file closed, file: " << path_;
 }
 
 void RecordFileWriter::RefreshIndex() {

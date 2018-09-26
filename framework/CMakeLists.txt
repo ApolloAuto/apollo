@@ -26,7 +26,7 @@ add_subdirectory(cybertron/mainboard)
 # add_subdirectory(sensor)
 add_subdirectory(third_party)
 
-add_subdirectory(python)
+#add_subdirectory(python)
 add_subdirectory(cybertron/blocker)
 
 file(GLOB CYBERTRON_SRCS
@@ -93,4 +93,4 @@ install(DIRECTORY "cybertron"
   )
 
 enable_testing()
-#add_subdirectory(cybertron/test)
+add_subdirectory(cybertron/test)
