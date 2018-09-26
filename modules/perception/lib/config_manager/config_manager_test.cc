@@ -19,6 +19,7 @@
 #define private public
 #define protected public
 #include "modules/perception/lib/config_manager/config_manager.h"
+#include "modules/perception/common/perception_gflags.h"
 
 namespace apollo {
 namespace perception {
