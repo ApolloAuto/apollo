@@ -17,6 +17,7 @@
 #define MODULES_PERCEPTION_LIDAR_LIB_SCENE_MANAGER_SCENE_MANAGER_H_
 
 #include <map>
+#include <string>
 
 #include "modules/perception/lidar/lib/scene_manager/scene_service.h"
 
