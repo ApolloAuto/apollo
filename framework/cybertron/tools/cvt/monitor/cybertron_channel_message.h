@@ -209,8 +209,11 @@ class CybertronChannelMessage : public ChannelMessage {
             [subClass](const std::shared_ptr<MessageType>& rawMsg) {        \
               subClass->updateRawMessage(rawMsg);                           \
             };                                                              \
+        apollo::cybertron::ReaderConfig reader_cfg;                         \
+        reader_cfg.channel_name = channelName;                              \
+        reader_cfg.pending_queue_size = 20;                                 \
         subClass->channel_reader_ =                                         \
-            subClass->channel_node_->CreateReader<MessageType>(channelName, \
+            subClass->channel_node_->CreateReader<MessageType>(reader_cfg,  \
                                                                callBack);   \
         if (subClass->channel_reader_ == nullptr) {                         \
           subClass->channel_node_.reset();                                  \
