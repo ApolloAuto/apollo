@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef INFERENCE_TENSORRT_RT_NET_H_
-#define INFERENCE_TENSORRT_RT_NET_H_
-#include <glog/logging.h>
+
+#ifndef MODULES_PERCEPTION_INFERENCE_TENSORRT_RT_NET_H_
+#define MODULES_PERCEPTION_INFERENCE_TENSORRT_RT_NET_H_
 
 #include <map>
 #include <set>
@@ -33,7 +33,6 @@ class ArgMax1Plugin;
 class SLICEPlugin;
 class SoftmaxPlugin;
 
-class LayerParameter;
 typedef std::map<std::string, std::vector<nvinfer1::Weights>> WeightMap;
 typedef std::map<std::string, nvinfer1::ITensor *> TensorMap;
 typedef std::map<std::string, nvinfer1::DimsCHW> TensorDimsMap;
@@ -114,7 +113,6 @@ class RTNet : public Inference {
                        nvinfer1::ITensor *const *inputs,
                        nvinfer1::INetworkDefinition *net, TensorMap *tensor_map,
                        TensorModifyMap *tensor_modify_map);
-
   void addSliceLayer(const LayerParameter &layer_param,
                      nvinfer1::ITensor *const *inputs, int nbInputs,
                      nvinfer1::INetworkDefinition *net, TensorMap *tensor_map,
@@ -183,8 +181,8 @@ class RTNet : public Inference {
   std::vector<std::shared_ptr<ArgMax1Plugin>> argmax_plugins_;
   std::vector<std::shared_ptr<SoftmaxPlugin>> softmax_plugins_;
   std::vector<std::shared_ptr<SLICEPlugin>> slice_plugins_;
-  std::vector<std::string> input_names_;
   std::vector<std::string> output_names_;
+  std::vector<std::string> input_names_;
   std::map<std::string, std::string> tensor_modify_map_;
 
   std::shared_ptr<NetParameter> net_param_;
@@ -204,4 +202,4 @@ class RTNet : public Inference {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  //  INFERENCE_TENSORRT_RT_NET_H_
+#endif  //  MODULES_PERCEPTION_INFERENCE_TENSORRT_RT_NET_H_

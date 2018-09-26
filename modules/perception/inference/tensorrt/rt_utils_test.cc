@@ -13,30 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_INFERENCE_TENSORRT_RT_UTILS_H_
-#define MODULES_PERCEPTION_INFERENCE_TENSORRT_RT_UTILS_H_
 
-#include <google/protobuf/io/coded_stream.h>
-#include <google/protobuf/io/zero_copy_stream_impl.h>
-#include <google/protobuf/message.h>
-#include <google/protobuf/text_format.h>
-#include <map>
-#include <string>
-#include <vector>
+#include "modules/perception/inference/tensorrt/rt_utils.h"
 
-#include "modules/perception/proto/rt.pb.h"
+#include "gtest/gtest.h"
 
 namespace apollo {
 namespace perception {
 namespace inference {
-bool ReadProtoFromTextFile(const std::string &filename,
-                           google::protobuf::Message *proto);
-bool ReadProtoFromBinaryFile(const std::string &filename,
-                             google::protobuf::Message *proto);
-bool loadNetParams(const std::string &param_file, NetParameter *param);
-std::string locateFile(const std::string &path, const std::string &input);
+
+TEST(RT_UTILS, default) {}
 
 }  // namespace inference
 }  // namespace perception
 }  // namespace apollo
-#endif  //  MODULES_PERCEPTION_INFERENCE_TENSORRT_RT_UTILS_H_

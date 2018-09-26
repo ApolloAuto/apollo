@@ -40,6 +40,18 @@ cc_test(
     ],
 )
 
+cc_library(
+    name = "inference_factory_lib",
+    srcs = ["inference_factory.cc"],
+    hdrs = ["inference_factory.h"],
+    deps = [
+        ":inference_lib",
+        "//modules/perception/inference/utils:inference_util_lib",
+        "//modules/perception/inference/caffe:caffe_net_lib",
+        "//modules/perception/inference/tensorrt:rt_net",
+    ],
+)
+
 filegroup(
     name = "inference_test_data",
     srcs = glob(["inference_test_data/**"]),
