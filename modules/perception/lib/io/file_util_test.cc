@@ -15,22 +15,27 @@
  *****************************************************************************/
 #include <gtest/gtest.h>
 
+#define private public
+#define protected public
 #include "modules/perception/lib/io/file_util.h"
 
 namespace apollo {
 namespace perception {
 namespace lib {
 
-// TODO(all): to add back
-// TEST(FileUtilTest, TestGetType) {
-//   FileType type;
-//   EXPECT_FALSE(FileUtil::GetType("../testdata/data/2.txt", &type));
-//   EXPECT_FALSE(FileUtil::GetType("../testdata/data/-/*/", &type));
-//   EXPECT_TRUE(FileUtil::GetType("../testdata/data", &type));
-// }
+TEST(FileUtilTest, TestGetType) {
+  FileType type;
+  EXPECT_FALSE(FileUtil::GetType(
+      "/apollo/modules/perception/testdata/lib/data/2.txt", &type));
+  EXPECT_FALSE(FileUtil::GetType(
+      "/apollo/modules/perception/testdata/lib/data/-/*/", &type));
+  EXPECT_TRUE(FileUtil::GetType(
+      "/apollo/modules/perception/testdata/lib/data", &type));
+}
 
 TEST(FileUtilTest, TestCreateDir) {
-  EXPECT_TRUE(FileUtil::CreateDir("../testdata/data3/data4/data5"));
+  EXPECT_TRUE(FileUtil::CreateDir(
+      "/apollo/modules/perception/testdata/lib/data3/data4/data5"));
 }
 
 TEST(FileUtilTest, TestGetAbsolutPath) {
@@ -49,7 +54,8 @@ TEST(FileUtilTest, TestGetFileName) {
   std::string name;
   FileUtil::GetFileName("/home/work/data/1.txt", &name);
   EXPECT_EQ("1", name);
-  FileUtil::GetFileName("../testdata/data/data/11.txt", &name);
+  FileUtil::GetFileName(
+      "/apollo/modules/perception/testdata/lib/data/data/11.txt", &name);
   EXPECT_EQ("11", name);
   FileUtil::GetFileName("111.txt", &name);
   EXPECT_EQ("111", name);
@@ -58,8 +64,9 @@ TEST(FileUtilTest, TestGetFileName) {
 }
 
 TEST(FileUtilTest, TestCompareFileByDigital) {
-  EXPECT_TRUE(FileUtil::CompareFileByDigital("../testdata/data/1.txt",
-                                             "/home/data/2.txt"));
+  EXPECT_TRUE(FileUtil::CompareFileByDigital(
+      "/apollo/modules/perception/testdata/lib/data/1.txt",
+      "/home/data/2.txt"));
   EXPECT_TRUE(FileUtil::CompareFileByDigital("1.txt", "/home/data/2.txt"));
   EXPECT_TRUE(FileUtil::CompareFileByDigital("01.txt", "/home/data/2.txt"));
   EXPECT_FALSE(FileUtil::CompareFileByDigital("10", "/home/data/2.txt"));
@@ -69,19 +76,18 @@ TEST(FileUtilTest, TestCompareFileByDigital) {
 
 TEST(FileUtilTest, TestCompareFileByLexicographical) {
   EXPECT_TRUE(FileUtil::CompareFileByLexicographical(
-      "../testdata/data/QB1234_2222_3333_0001.pcd",
-      "../testdata/data/QB1234_2222_3333_1000.pcd"));
+      "/apollo/modules/perception/testdata/lib/data/QB1234_2222_3333_0001.pcd",
+      "/apollo/modules/perception/testdata/lib/data/QB1234_2222_3333_1000.pcd"));
   EXPECT_TRUE(FileUtil::CompareFileByLexicographical(
-      "../testdata/data/QB1234_2222_3333_0001.pcd",
-      "../testdata/data/QB1234_3333_3333_1000.pcd"));
+      "/apollo/modules/perception/testdata/lib/data/QB1234_2222_3333_0001.pcd",
+      "/apollo/modules/perception/testdata/lib/data/QB1234_3333_3333_1000.pcd"));
 }
 
-// TODO(all): to add back
-// TEST(FileUtilTest, TestCompareFile) {
-//   EXPECT_TRUE(FileUtil::CompareFile("1.txt", "1.txt", FCT_UNKNOWN));
-// }
+TEST(FileUtilTest, TestCompareFile) {
+  EXPECT_TRUE(FileUtil::CompareFile("1.txt", "1.txt", FCT_UNKNOWN));
+}
 
-/* TODO(all): to add back
+/* TODO(all): to be added back
 TEST(FileUtilTest, TestExists) {
   ASSERT_TRUE(FileUtil::CreateDir("./tmp"));
   EXPECT_TRUE(FileUtil::CreateDir(""));
@@ -93,16 +99,25 @@ TEST(FileUtilTest, TestExists) {
   EXPECT_FALSE(FileUtil::Exists("./tmp1"));
   ASSERT_TRUE(FileUtil::DeleteFile("./tmp/a.txt"));
   ASSERT_TRUE(FileUtil::DeleteFile("./tmp"));
-  ASSERT_TRUE(FileUtil::DeleteFile("./tmp1"));
-  ASSERT_EQ(system("chmod -R -x ../testdata/data3"), 256);
-  ASSERT_FALSE(FileUtil::DeleteFile("../testdata/data3"));
-  ASSERT_EQ(system("chmod -R +x ../testdata/data3"), 0);
-  ASSERT_EQ(system("chmod -R -r ../testdata/data3"), 256);
-  ASSERT_FALSE(FileUtil::DeleteFile("../testdata/data3"));
-  ASSERT_EQ(system("chmod -R +r ../testdata/data3"), 0);
-  ASSERT_EQ(system("chmod -R -w ../testdata/data3"), 0);
-  ASSERT_FALSE(FileUtil::DeleteFile("../testdata/data3"));
-  ASSERT_EQ(system("chmod -R +w ../testdata/data3"), 0);
+  // ASSERT_TRUE(FileUtil::DeleteFile("./tmp1"));
+  ASSERT_EQ(system(
+      "chmod -R -x /apollo/modules/perception/testdata/lib/data3"), 256);
+  ASSERT_FALSE(
+      FileUtil::DeleteFile("/apollo/modules/perception/testdata/lib/data3"));
+  ASSERT_EQ(system(
+      "chmod -R +x /apollo/modules/perception/testdata/lib/data3"), 0);
+  ASSERT_EQ(system(
+      "chmod -R -r /apollo/modules/perception/testdata/lib/data3"), 256);
+  ASSERT_FALSE(
+      FileUtil::DeleteFile("/apollo/modules/perception/testdata/lib/data3"));
+  ASSERT_EQ(system(
+      "chmod -R +r /apollo/modules/perception/testdata/lib/data3"), 0);
+  ASSERT_EQ(system(
+      "chmod -R -w /apollo/modules/perception/testdata/lib/data3"), 0);
+  ASSERT_FALSE(
+      FileUtil::DeleteFile("/apollo/modules/perception/testdata/lib/data3"));
+  ASSERT_EQ(system(
+      "chmod -R +w /apollo/modules/perception/testdata/lib/data3"), 0);
   ASSERT_EQ(system("mkdir -p tmpa/tmpb"), 0);
   ASSERT_EQ(system("mkdir -p tmpa/tmpc"), 0);
   ASSERT_EQ(system("touch tmpa/tmpb/b.txt"), 0);
@@ -114,64 +129,65 @@ TEST(FileUtilTest, TestExists) {
 }
 */
 
-/* TODO(all): to add back
 TEST(FileUtilTest, TestReadLines) {
-  std::string path = "../testdata/data/1.txt";
+  std::string path = "/apollo/modules/perception/testdata/lib/data/1.txt";
   std::vector<std::string> lines;
   EXPECT_FALSE(FileUtil::ReadLines("/not_exist_path", &lines));
-  EXPECT_FALSE(FileUtil::ReadLines("../testdata/data/1.txt", nullptr));
+  EXPECT_FALSE(FileUtil::ReadLines(
+      "/apollo/modules/perception/testdata/lib/data/1.txt", nullptr));
   EXPECT_TRUE(FileUtil::ReadLines(path, &lines));
   EXPECT_EQ(lines.size(), 2u);
 }
-*/
 
 TEST(FileUtilTest, TestRemoveFileSuffix) {
-  EXPECT_EQ(FileUtil::RemoveFileSuffix("../testdata/data/1.txt"), "1");
+  EXPECT_EQ(FileUtil::RemoveFileSuffix(
+      "/apollo/modules/perception/testdata/lib/data/1.txt"), "1");
   EXPECT_EQ(FileUtil::RemoveFileSuffix("/home/111"), "111");
 }
 
-/* TODO(all): to add back
 TEST(FileUtilTest, TestGetFileList) {
-  std::string path = "../testdata/data";
+  std::string path = "/apollo/modules/perception/testdata/lib/data";
   std::vector<std::string> files;
   EXPECT_TRUE(FileUtil::GetFileList(path, &files));
   EXPECT_FALSE(FileUtil::GetFileList("/not_exist_path", &files));
-  EXPECT_TRUE(FileUtil::GetFileList("../testdata/data", "txt", &files));
+  EXPECT_TRUE(FileUtil::GetFileList(
+      "/apollo/modules/perception/testdata/lib/data", "txt", &files));
 }
-*/
 
-/* TODO(all): to add back
 TEST(FileUtilTest, TestNumLines) {
-  EXPECT_EQ(FileUtil::NumLines("../testdata/data/1.txt"), 3);
-  EXPECT_EQ(FileUtil::NumLines("../testdata/data/11.txt"), -1);
+  EXPECT_EQ(FileUtil::NumLines(
+      "/apollo/modules/perception/testdata/lib/data/1.txt"), 3);
+  EXPECT_EQ(FileUtil::NumLines(
+      "/apollo/modules/perception/testdata/lib/data/11.txt"), -1);
 }
-*/
 
-/* TODO(all): to add back
 TEST(FileUtilTest, TestRenameFile) {
-  EXPECT_TRUE(FileUtil::RenameFile("../testdata/data2/123.txt",
-                                   "../testdata/data2/321.txt"));
-  EXPECT_TRUE(FileUtil::RenameFile("../testdata/data2/321.txt",
-                                   "../testdata/data2/123.txt"));
-  EXPECT_FALSE(FileUtil::RenameFile("../testdata/data2/111.txt",
-                                    "../testdata/data2/222.txt"));
+  EXPECT_TRUE(FileUtil::RenameFile(
+      "/apollo/modules/perception/testdata/lib/data2/123.txt",
+      "/apollo/modules/perception/testdata/lib/data2/321.txt"));
+  EXPECT_TRUE(FileUtil::RenameFile(
+      "/apollo/modules/perception/testdata/lib/data2/321.txt",
+      "/apollo/modules/perception/testdata/lib/data2/123.txt"));
+  EXPECT_FALSE(FileUtil::RenameFile(
+      "/apollo/modules/perception/testdata/lib/data2/111.txt",
+      "/apollo/modules/perception/testdata/lib/data2/222.txt"));
 }
-*/
 
-/* TODO(all): to add back
+
 TEST(FileUtilTest, TestGetFileContent) {
-  std::string path = "../testdata/data/1.txt";
+  std::string path = "/apollo/modules/perception/testdata/lib/data/1.txt";
   std::string content;
   EXPECT_FALSE(FileUtil::GetFileContent(path, NULL));
-  EXPECT_FALSE(
-      FileUtil::GetFileContent("../testdata/data/2.txt", &content));
+  EXPECT_FALSE(FileUtil::GetFileContent(
+      "/apollo/modules/perception/testdata/lib/data/2.txt", &content));
   EXPECT_TRUE(FileUtil::GetFileContent(path, &content));
-  ASSERT_EQ(system("chmod a-r ../testdata/data3/1.txt"), 0);
-  ASSERT_FALSE(
-      FileUtil::GetFileContent("../testdata/data3/1.txt", &content));
-  ASSERT_EQ(system("chmod a+r ../testdata/data3/1.txt"), 0);
+  ASSERT_EQ(system(
+      "chmod a-r /apollo/modules/perception/testdata/lib/data3/1.txt"), 0);
+  ASSERT_FALSE(FileUtil::GetFileContent(
+      "/apollo/modules/perception/testdata/lib/data3/1.txt", &content));
+  ASSERT_EQ(system(
+      "chmod a+r /apollo/modules/perception/testdata/lib/data3/1.txt"), 0);
 }
-*/
 
 TEST(FileUtilTest, TestFileUtil) { FileUtil file_util; }
 
