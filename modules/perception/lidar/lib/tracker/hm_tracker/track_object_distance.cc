@@ -14,12 +14,14 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/perception/lidar/lib/tracker/hm_tracker/track_object_distance.h"
+
 #include <algorithm>
 #include <vector>
+#include <utility>
+
 #include "modules/perception/common/geometry/basic.h"
 #include "modules/perception/common/geometry/common.h"
-#include "modules/perception/lidar/common/lidar_log.h"
-#include "track_object_distance.h"
+#include "cybertron/common/log.h"
 
 namespace apollo {
 namespace perception {

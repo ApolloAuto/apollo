@@ -17,8 +17,9 @@
 #define MODULES_PERCEPTION_LIDAR_LIB_TRACKER_HM_TRACKER_KALMAN_FILTER_H_
 
 #include <string>
+#include <memory>
 
-#include <Eigen/Core>
+#include "Eigen/Core"
 
 #include "modules/perception/lib/registerer/registerer.h"
 #include "modules/perception/lidar/lib/tracker/common/track_data.h"

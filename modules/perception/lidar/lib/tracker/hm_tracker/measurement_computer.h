@@ -16,6 +16,8 @@
 #ifndef MODULES_PERCEPTION_LIDAR_LIB_TRACKER_HM_TRACKER_MEASUREMENT_COMPUTER_H_
 #define MODULES_PERCEPTION_LIDAR_LIB_TRACKER_HM_TRACKER_MEASUREMENT_COMPUTER_H_
 
+#include <memory>
+
 #include "modules/perception/lidar/lib/tracker/common/track_data.h"
 #include "modules/perception/lidar/lib/tracker/common/tracked_object.h"
 
@@ -68,4 +70,5 @@ typedef std::shared_ptr<const MeasurementComputer> MeasurementComputerConstPtr;
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_LIDAR_LIB_TRACKER_HM_TRACKER_MEASUREMENT_COMPUTER_H_
+#endif
+// MODULES_PERCEPTION_LIDAR_LIB_TRACKER_HM_TRACKER_MEASUREMENT_COMPUTER_H_

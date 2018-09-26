@@ -6,15 +6,6 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "base_filter",
-    hdrs = [
-        "base_filter.h",
-    ],
-    deps = [
-    ],
-)
-
-cc_library(
     name = "gnn_bipartite_graph_matcher",
     srcs = [
         "gnn_bipartite_graph_matcher.cc",
@@ -33,30 +24,6 @@ cc_library(
     ],
     hdrs = [
         "hm_multi_target_tracker.h",
-    ],
-    deps = [
-    ],
-)
-
-cc_library(
-    name = "kalman_filter",
-    srcs = [
-        "kalman_filter.cc",
-    ],
-    hdrs = [
-        "kalman_filter.h",
-    ],
-    deps = [
-    ],
-)
-
-cc_library(
-    name = "measurement_computer",
-    srcs = [
-        "measurement_computer.cc",
-    ],
-    hdrs = [
-        "measurement_computer.h",
     ],
     deps = [
     ],
@@ -93,18 +60,6 @@ cc_library(
     ],
     hdrs = [
         "tracker.h",
-    ],
-    deps = [
-    ],
-)
-
-cc_library(
-    name = "track_object_distance",
-    srcs = [
-        "track_object_distance.cc",
-    ],
-    hdrs = [
-        "track_object_distance.h",
     ],
     deps = [
     ],

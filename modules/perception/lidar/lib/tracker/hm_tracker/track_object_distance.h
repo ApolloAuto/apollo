@@ -16,8 +16,9 @@
 #ifndef MODULES_PERCEPTION_LIDAR_LIB_TRACKER_HM_TRACKER_TRACK_OBJECT_DISTANCE_H_
 #define MODULES_PERCEPTION_LIDAR_LIB_TRACKER_HM_TRACKER_TRACK_OBJECT_DISTANCE_H_
 
-#include <Eigen/Core>
 #include <string>
+#include "Eigen/Core"
+
 #include "modules/perception/lidar/lib/tracker/common/track_data.h"
 #include "modules/perception/lidar/lib/tracker/common/tracked_object.h"
 
@@ -182,4 +183,5 @@ class TrackObjectDistance {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_LIDAR_LIB_TRACKER_HM_TRACKER_TRACK_OBJECT_DISTANCE_H_
+#endif
+// MODULES_PERCEPTION_LIDAR_LIB_TRACKER_HM_TRACKER_TRACK_OBJECT_DISTANCE_H_
