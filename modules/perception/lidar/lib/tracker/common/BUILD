@@ -20,4 +20,17 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "track_data",
+    srcs = [
+        "track_data.cc",
+    ],
+    hdrs = [
+        "track_data.h",
+    ],
+    deps = [
+        ":tracked_object",
+    ],
+)
+
 cpplint()
