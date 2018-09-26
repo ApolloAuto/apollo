@@ -168,7 +168,6 @@ cc_library(
     deps = [
         "//framework:cybertron",
         "//modules/planning/common:obstacle",
-        "//modules/planning/constraint_checker:collision_checker",
         "//modules/common/configs:vehicle_config_helper",
         "//modules/planning/proto:planner_open_space_config_proto",
         "//modules/planning/open_space:open_space_utils",

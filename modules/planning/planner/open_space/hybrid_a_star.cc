@@ -207,7 +207,7 @@ bool HybridAStar::GetResult(std::shared_ptr<Node3d> final_node, Result* result) 
     std::vector<double> x = current_node->GetXs();
     std::vector<double> y = current_node->GetYs();
     std::vector<double> phi = current_node->GetPhis();
-    if (x.size() = 0 || y.size() == 0 || phi.size() == 0) {
+    if (x.size() == 0 || y.size() == 0 || phi.size() == 0) {
       AINFO<<"result size check failed";
       return false;
     }
@@ -224,13 +224,13 @@ bool HybridAStar::GetResult(std::shared_ptr<Node3d> final_node, Result* result) 
   }
   hybrid_a_x.insert(hybrid_a_x.end(), current_node->GetXs().begin(),
                     current_node->GetXs().end());
-  shybrid_a_y.insert(hybrid_a_y.end(), current_node->GetYs().begin(),
+  hybrid_a_y.insert(hybrid_a_y.end(), current_node->GetYs().begin(),
                      current_node->GetYs().end());
   hybrid_a_phi.insert(hybrid_a_phi.end(), current_node->GetPhis().begin(),
                       current_node->GetPhis().end());
-  *result.x = hybrid_a_x;
-  *result.y = hybrid_a_y;
-  *result.phi = hybrid_a_phi;
+  (*result).x = hybrid_a_x;
+  (*result).y = hybrid_a_y;
+  (*result).phi = hybrid_a_phi;
   return true;
 }
 bool HybridAStar::Plan(double sx, double sy, double sphi, double ex, double ey,
