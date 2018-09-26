@@ -21,7 +21,7 @@
 #include "modules/perception/common/geometry/convex_hull_2d.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lib/io/file_util.h"
-#include "modules/perception/lib/io/protobuf_util.h"
+// #include "modules/perception/lib/io/protobuf_util.h"
 
 namespace apollo {
 namespace perception {
@@ -30,7 +30,12 @@ namespace lidar {
 static const float kEpsilon = 1e-6;
 static const float kEpsilonForSize = 1e-2;
 static const float kEpsilonForLine = 1e-3;
-using base::ObjectPtr;
+using apollo::perception::base::PointF;
+using apollo::perception::base::PointD;
+using ObjectPtr = std::shared_ptr<apollo::perception::base::Object>;
+using PointFCloud = apollo::perception::base::PointCloud<PointF>;
+using PolygonDType = apollo::perception::base::PointCloud<PointD>;
+using PointFCloudPtr = std::shared_ptr<PointFCloud>;
 
 bool ObjectBuilder::Init(const ObjectBuilderInitOptions& options) {
   return true;
@@ -58,14 +63,14 @@ bool ObjectBuilder::Build(const ObjectBuilderOptions& options,
 void ObjectBuilder::ComputePolygon2D(ObjectPtr object) {
   Eigen::Vector3f min_pt;
   Eigen::Vector3f max_pt;
-  base::PointFCloud& cloud = object->lidar_supplement.cloud;
+  PointFCloud& cloud = object->lidar_supplement.cloud;
   GetMinMax3D(cloud, &min_pt, &max_pt);
   if (cloud.size() < 4u) {
     SetDefaultValue(min_pt, max_pt, object);
     return;
   }
   LinePerturbation(&cloud);
-  common::ConvexHull2D<base::PointFCloud, base::PolygonDType> hull;
+  common::ConvexHull2D<PointFCloud, PolygonDType> hull;
   hull.GetConvexHull(cloud, &(object->polygon));
 }
 
@@ -110,7 +115,7 @@ void ObjectBuilder::ComputePolygonSizeCenter(ObjectPtr object) {
 
 void ObjectBuilder::SetDefaultValue(const Eigen::Vector3f& min_pt_in,
                                     const Eigen::Vector3f& max_pt_in,
-                                    base::ObjectPtr object) {
+                                    ObjectPtr object) {
   Eigen::Vector3f min_pt = min_pt_in;
   Eigen::Vector3f max_pt = max_pt_in;
   // handle degeneration case
@@ -157,7 +162,7 @@ void ObjectBuilder::SetDefaultValue(const Eigen::Vector3f& min_pt_in,
   }
 }
 
-bool ObjectBuilder::LinePerturbation(base::PointFCloud* cloud) {
+bool ObjectBuilder::LinePerturbation(PointFCloud* cloud) {
   if (cloud->size() >= 3) {
     int start_point = 0;
     int end_point = 1;
@@ -178,7 +183,7 @@ bool ObjectBuilder::LinePerturbation(base::PointFCloud* cloud) {
   return true;
 }
 
-void ObjectBuilder::GetMinMax3D(const base::PointFCloud& cloud,
+void ObjectBuilder::GetMinMax3D(const PointFCloud& cloud,
                                 Eigen::Vector3f* min_pt,
                                 Eigen::Vector3f* max_pt) {
   (*min_pt)[0] = (*min_pt)[1] = (*min_pt)[2] = FLT_MAX;
