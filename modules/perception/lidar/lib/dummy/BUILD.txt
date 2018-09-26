@@ -1,18 +1,6 @@
-// DO NOT MODIFY
-// THIS FILE IS GENERATED AUTOMATICALLY TO HELP WRITE BUILD FILE.
-// DELETE THIS FILE WHEN YOU HAVE CREATED THE COMPLETE BUILD FILE
-cc_library(
-    name = "dummy_segmentation",
-    srcs = [
-        "dummy_segmentation.cc",
-    ],
-    hdrs = [
-        "dummy_segmentation.h",
-    ],
-    deps = [
-    ],
-)
-
+# DO NOT MODIFY
+# THIS FILE IS GENERATED AUTOMATICALLY TO HELP WRITE BUILD FILE
+# DELETE THIS FILE WHEN YOU HAVE CREATED THE COMPLETE BUILD FILE
 cc_library(
     name = "dummy_classifier",
     srcs = [
@@ -20,18 +8,6 @@ cc_library(
     ],
     hdrs = [
         "dummy_classifier.h",
-    ],
-    deps = [
-    ],
-)
-
-cc_library(
-    name = "dummy_object_filter",
-    srcs = [
-        "dummy_object_filter.cc",
-    ],
-    hdrs = [
-        "dummy_object_filter.h",
     ],
     deps = [
     ],
@@ -50,84 +26,12 @@ cc_library(
 )
 
 cc_library(
-    name = "dummy_roi_filter",
-    srcs = [
-        "dummy_roi_filter.cc",
-    ],
-    hdrs = [
-        "dummy_roi_filter.h",
-    ],
-    deps = [
-    ],
-)
-
-cc_library(
-    name = "dummy_classifier",
-    srcs = [
-        "dummy_classifier.cc",
-    ],
-    hdrs = [
-        "dummy_classifier.h",
-    ],
-    deps = [
-    ],
-)
-
-cc_library(
     name = "dummy_multi_target_tracker",
     srcs = [
         "dummy_multi_target_tracker.cc",
     ],
     hdrs = [
         "dummy_multi_target_tracker.h",
-    ],
-    deps = [
-    ],
-)
-
-cc_library(
-    name = "dummy_ground_detector",
-    srcs = [
-        "dummy_ground_detector.cc",
-    ],
-    hdrs = [
-        "dummy_ground_detector.h",
-    ],
-    deps = [
-    ],
-)
-
-cc_library(
-    name = "dummy_roi_filter",
-    srcs = [
-        "dummy_roi_filter.cc",
-    ],
-    hdrs = [
-        "dummy_roi_filter.h",
-    ],
-    deps = [
-    ],
-)
-
-cc_library(
-    name = "dummy_multi_target_tracker",
-    srcs = [
-        "dummy_multi_target_tracker.cc",
-    ],
-    hdrs = [
-        "dummy_multi_target_tracker.h",
-    ],
-    deps = [
-    ],
-)
-
-cc_library(
-    name = "dummy_segmentation",
-    srcs = [
-        "dummy_segmentation.cc",
-    ],
-    hdrs = [
-        "dummy_segmentation.h",
     ],
     deps = [
     ],
@@ -140,6 +44,30 @@ cc_library(
     ],
     hdrs = [
         "dummy_object_filter.h",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
+    name = "dummy_roi_filter",
+    srcs = [
+        "dummy_roi_filter.cc",
+    ],
+    hdrs = [
+        "dummy_roi_filter.h",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
+    name = "dummy_segmentation",
+    srcs = [
+        "dummy_segmentation.cc",
+    ],
+    hdrs = [
+        "dummy_segmentation.h",
     ],
     deps = [
     ],

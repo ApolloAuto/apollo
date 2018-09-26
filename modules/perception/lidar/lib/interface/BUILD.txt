@@ -1,19 +1,10 @@
-// DO NOT MODIFY
-// THIS FILE IS GENERATED AUTOMATICALLY TO HELP WRITE BUILD FILE.
-// DELETE THIS FILE WHEN YOU HAVE CREATED THE COMPLETE BUILD FILE
+# DO NOT MODIFY
+# THIS FILE IS GENERATED AUTOMATICALLY TO HELP WRITE BUILD FILE
+# DELETE THIS FILE WHEN YOU HAVE CREATED THE COMPLETE BUILD FILE
 cc_library(
-    name = "base_multi_target_tracker",
+    name = "base_bipartite_graph_matcher",
     hdrs = [
-        "base_multi_target_tracker.h",
-    ],
-    deps = [
-    ],
-)
-
-cc_library(
-    name = "base_object_filter",
-    hdrs = [
-        "base_object_filter.h",
+        "base_bipartite_graph_matcher.h",
     ],
     deps = [
     ],
@@ -38,18 +29,27 @@ cc_library(
 )
 
 cc_library(
-    name = "base_roi_filter",
+    name = "base_multi_target_tracker",
     hdrs = [
-        "base_roi_filter.h",
+        "base_multi_target_tracker.h",
     ],
     deps = [
     ],
 )
 
 cc_library(
-    name = "base_bipartite_graph_matcher",
+    name = "base_object_filter",
     hdrs = [
-        "base_bipartite_graph_matcher.h",
+        "base_object_filter.h",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
+    name = "base_roi_filter",
+    hdrs = [
+        "base_roi_filter.h",
     ],
     deps = [
     ],

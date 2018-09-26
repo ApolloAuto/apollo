@@ -1,6 +1,6 @@
-// DO NOT MODIFY
-// THIS FILE IS GENERATED AUTOMATICALLY TO HELP WRITE BUILD FILE.
-// DELETE THIS FILE WHEN YOU HAVE CREATED THE COMPLETE BUILD FILE
+# DO NOT MODIFY
+# THIS FILE IS GENERATED AUTOMATICALLY TO HELP WRITE BUILD FILE
+# DELETE THIS FILE WHEN YOU HAVE CREATED THE COMPLETE BUILD FILE
 cc_library(
     name = "binary_data",
     srcs = [
@@ -8,30 +8,6 @@ cc_library(
     ],
     hdrs = [
         "binary_data.h",
-    ],
-    deps = [
-    ],
-)
-
-cc_library(
-    name = "binary_data",
-    srcs = [
-        "binary_data.cc",
-    ],
-    hdrs = [
-        "binary_data.h",
-    ],
-    deps = [
-    ],
-)
-
-cc_library(
-    name = "util",
-    srcs = [
-        "util.cc",
-    ],
-    hdrs = [
-        "util.h",
     ],
     deps = [
     ],
