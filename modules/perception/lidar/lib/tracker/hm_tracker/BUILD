@@ -100,4 +100,21 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "multi_hm_bipartite_graph_matcher",
+    srcs = [
+        "multi_hm_bipartite_graph_matcher.cc",
+    ],
+    hdrs = [
+        "multi_hm_bipartite_graph_matcher.h",
+    ],
+    deps = [
+        "//modules/perception/common/graph:gated_hungarian_bigraph_matcher",
+        "//modules/perception/common/graph:secure_matrix",
+        "//modules/perception/lidar/lib/interface:base_bipartite_graph_matcher",
+        "@eigen",
+        "//framework:cybertron",
+    ],
+)
+
 cpplint()

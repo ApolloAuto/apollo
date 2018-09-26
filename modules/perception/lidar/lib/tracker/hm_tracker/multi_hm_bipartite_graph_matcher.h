@@ -13,13 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_LIDAR_LIB_TRACKER_HM_TRACKER_MULTI_HM_BIPARTITE_GRAPH_MATCHER_H_
-#define MODULES_PERCEPTION_LIDAR_LIB_TRACKER_HM_TRACKER_MULTI_HM_BIPARTITE_GRAPH_MATCHER_H_
+#ifndef MODULES_PERCEPTION_LIDAR_LIB_TRACKER_HM_TRACKER_MULTI_HM_BIPARTITE_GRAPH_MATCHER_H_  // NOLINT
+#define MODULES_PERCEPTION_LIDAR_LIB_TRACKER_HM_TRACKER_MULTI_HM_BIPARTITE_GRAPH_MATCHER_H_  // NOLINT
 
-#include <Eigen/Core>
 #include <memory>
 #include <string>
 #include <vector>
+
+#include "Eigen/Core"
+
 #include "modules/perception/common/graph/gated_hungarian_bigraph_matcher.h"
 #include "modules/perception/common/graph/secure_matrix.h"
 #include "modules/perception/lidar/lib/interface/base_bipartite_graph_matcher.h"
@@ -52,4 +54,4 @@ class MultiHmBipartiteGraphMatcher : public BaseBipartiteGraphMatcher {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_LIDAR_LIB_TRACKER_HM_TRACKER_MULTI_HM_BIPARTITE_GRAPH_MATCHER_H_
+#endif

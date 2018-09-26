@@ -14,16 +14,15 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/perception/lidar/lib/tracker/hm_tracker/multi_hm_bipartite_graph_matcher.h"
-#include <Eigen/Core>
 #include "cybertron/common/log.h"
-#include "modules/perception/common/graph/gated_hungarian_bigraph_matcher.h"
 
 namespace apollo {
 namespace perception {
 namespace lidar {
 
 MultiHmBipartiteGraphMatcher::MultiHmBipartiteGraphMatcher() {
-  cost_matrix_ = &optimizer_.global_costs();
+  // cost_matrix_ = &optimizer_.global_costs();
+  *cost_matrix_ = optimizer_.global_costs();
 }
 
 MultiHmBipartiteGraphMatcher::~MultiHmBipartiteGraphMatcher() {
