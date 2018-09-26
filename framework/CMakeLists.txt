@@ -23,7 +23,7 @@ add_subdirectory(examples)
 #add_subdirectory(benchmark)
 add_subdirectory(cybertron/mainboard)
 
-add_subdirectory(sensor)
+# add_subdirectory(sensor)
 add_subdirectory(third_party)
 
 add_subdirectory(python)
@@ -42,7 +42,7 @@ file(GLOB CYBERTRON_SRCS
   "cybertron/task/*.cpp"
   "cybertron/time/*.cpp"
   "cybertron/timer/*.cpp"
-  "cybertron/tf2_cybertron/*.cpp"
+  # "cybertron/tf2_cybertron/*.cpp"
   "cybertron/transport/*.cpp"
   "cybertron/transport/*/*.cpp"
   "cybertron/service_discovery/*.cpp"
@@ -75,7 +75,7 @@ target_link_libraries(cybertron
   PocoFoundation
   -Wl,--no-undefined
   atomic
-  tf2_core
+  # tf2_core
   -luuid
  )
 

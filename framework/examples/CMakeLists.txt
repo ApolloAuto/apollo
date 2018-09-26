@@ -15,11 +15,11 @@ add_subdirectory(component_driver)
 add_subdirectory(component_watchdog)
 add_subdirectory(component_log)
 
-add_executable(sensor_test
-  sensor_test.cpp
-)
-target_link_libraries(sensor_test -pthread dl cybertron apollo_sensor)
-install(TARGETS sensor_test DESTINATION bin)
+# add_executable(sensor_test
+#   sensor_test.cpp
+# )
+# target_link_libraries(sensor_test -pthread dl cybertron apollo_sensor)
+# install(TARGETS sensor_test DESTINATION bin)
 
 add_executable(server_example
   service.cpp
@@ -61,11 +61,11 @@ add_executable(history
 target_link_libraries(history -pthread dl cybertron)
 install(TARGETS history DESTINATION bin)
 
-add_executable(tf_test
-  tf_test.cpp
-)
-target_link_libraries(tf_test -pthread dl cybertron)
-install(TARGETS tf_test DESTINATION bin)
+# add_executable(tf_test
+#   tf_test.cpp
+# )
+# target_link_libraries(tf_test -pthread dl cybertron)
+# install(TARGETS tf_test DESTINATION bin)
 
 add_executable(rwlock
   rw_lock.cpp
