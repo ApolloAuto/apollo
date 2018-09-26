@@ -14,10 +14,9 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef CYBERTRON_RECORD_RECORD_READER_H_
-#define CYBERTRON_RECORD_RECORD_READER_H_
+#ifndef CYBERTRON_RECORD_RECORD_MESSAGE_H_
+#define CYBERTRON_RECORD_RECORD_MESSAGE_H_
 
-#include <algorithm>
 #include <condition_variable>
 #include <memory>
 #include <queue>
@@ -28,7 +27,6 @@
 #include <vector>
 #include "cybertron/message/raw_message.h"
 #include "cybertron/record/record_base.h"
-#include "cybertron/record/record_message.h"
 
 namespace apollo {
 namespace cybertron {
@@ -37,26 +35,17 @@ namespace record {
 using ::apollo::cybertron::message::RawMessage;
 using ::apollo::cybertron::record::RecordFileReader;
 
-class RecordReader : public RecordBase {
- public:
-  RecordReader(const std::shared_ptr<RecordFileReader>& file, 
-               uint64_t begin_time,
-               uint64_t end_time,
-               const std::set<std::string>& channel_filter);
-  virtual ~RecordReader();
-  bool ReadMessage(RecordMessage* message);
-
- private:
-  bool ReadNextChunk();
-
-  uint64_t begin_time_ = 0;
-  uint64_t end_time_ = UINT64_MAX;
-  std::set<std::string> channels_;
-  std::shared_ptr<RecordFileReader> file_reader_ = nullptr;
-
-  ChunkBody chunk_;
-  uint64_t pos = 0;
-  uint32_t index_ = 0;
+struct RecordMessage {
+  RecordMessage() {}
+  RecordMessage(const std::string& name, 
+                const std::string& message,
+                uint64_t msg_time)
+      : channel_name(name),
+        content(message), 
+        time(msg_time) {}
+  std::string channel_name;
+  std::string content;
+  uint64_t time;
 };
 
 }  // namespace record

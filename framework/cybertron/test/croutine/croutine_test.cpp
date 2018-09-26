@@ -43,7 +43,7 @@ TEST(CRoutineTest, croutine_switch) {
 
 TEST(CRoutineTest, croutine_sleep) {
   auto cr = std::make_shared<CRoutine>(
-      []() { croutine::CRoutine::GetCurrentRoutine()->Sleep(1000); });
+      []() { croutine::CRoutine::GetCurrentRoutine()->Sleep(croutine::Duration(1000)); });
   auto state = cr->Resume();
   EXPECT_EQ(state, RoutineState::SLEEP);
   Sleep(5);
