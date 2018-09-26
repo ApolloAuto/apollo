@@ -9,9 +9,8 @@
         <file>images/pause.png</file>
         <file>images/play.png</file>
         <file>images/pointcloud.png</file>
-        <file>shaders/grid.frag</file>
         <file>shaders/grid.vert</file>
-        <file>shaders/pointcloud.frag</file>
+        <file>shaders/grid_pointcloud.frag</file>
         <file>shaders/pointcloud.vert</file>
         <file>shaders/video_image_plane.frag</file>
         <file>shaders/video_image_plane.vert</file>

@@ -68,9 +68,9 @@ const char* licenseMessage =
 
 const char* pcTempObjGroupName = "pointcloud";
 const char* pcVertexPath = ":/shaders/pointcloud.vert";
-const char* pcFragPath = ":/shaders/pointcloud.frag";
+const char* pcFragPath = ":/shaders/grid_pointcloud.frag";
 const char* gridVertexPath = ":/shaders/grid.vert";
-const char* gridFragPath = ":/shaders/grid.frag";
+const char* gridFragPath = ":/shaders/grid_pointcloud.frag";
 }
 
 #define MEMBER_OFFSET(StructType, Member) (size_t)((char*)(& (((StructType*)1)->Member) - 1))
