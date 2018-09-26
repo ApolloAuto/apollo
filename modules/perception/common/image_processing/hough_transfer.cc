@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include "modules/perception/common/image_processing/hough.h"
+#include "modules/perception/common/image_processing/hough_transfer.h"
 
 namespace apollo {
 namespace perception {
