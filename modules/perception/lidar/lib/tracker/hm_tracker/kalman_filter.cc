@@ -15,12 +15,18 @@
  *****************************************************************************/
 #include "modules/perception/lidar/lib/tracker/hm_tracker/kalman_filter.h"
 
+#include <deque>
+#include <map>
+#include <utility>
+#include <vector>
+#include <algorithm>
+
 #include "cybertron/common/log.h"
 #include "modules/perception/common/geometry/basic.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lib/io/file_util.h"
-#include "modules/perception/lib/io/protobuf_util.h"
-#include "modules/perception/lidar/lib/tracker/hm_tracker/proto/hm_tracker_config.pb.h"
+#include "modules/common/util/file.h"
+#include "modules/perception/proto/hm_tracker_config.pb.h"
 
 namespace apollo {
 namespace perception {
@@ -119,8 +125,7 @@ bool KalmanFilter::Init(const FilterOption& option) {
       lib::FileUtil::GetAbsolutePath(config_file, "kalman_filter.conf");
   // get config params
   KalmanFilterConfig config_params;
-  CHECK(lib::ParseProtobufFromFile<KalmanFilterConfig>(config_file,
-                                                       &config_params))
+  CHECK(apollo::common::util::GetProtoFromFile(config_file, &config_params))
       << "Failed to parse KalmanFilterConfig config file.";
 
   s_noise_maximum_ = config_params.noise_maximum();

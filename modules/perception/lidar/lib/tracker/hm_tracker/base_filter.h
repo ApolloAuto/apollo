@@ -17,8 +17,9 @@
 #define PERCEPTION_LIDAR_LIB_TRACKER_HM_TRACKER_BASE_FILTER_H
 
 #include <string>
+#include <memory>
 
-#include <Eigen/Core>
+#include "Eigen/Core"
 
 #include "modules/perception/lib/registerer/registerer.h"
 #include "modules/perception/lidar/lib/tracker/common/track_data.h"
