@@ -503,7 +503,12 @@ function citest() {
 }
 
 function run_cpp_lint() {
+  # check /apollo/module
   generate_build_targets
+  echo "$BUILD_TARGETS" | xargs bazel test --config=cpplint -c dbg
+
+  # check /apollo/framework
+  BUILD_TARGETS="//framework/cybertron/..."
   echo "$BUILD_TARGETS" | xargs bazel test --config=cpplint -c dbg
 }
 
@@ -514,7 +519,7 @@ function run_bash_lint() {
 
 function run_lint() {
   # Add cpplint rule to BUILD files that do not contain it.
-  for file in $(find modules -name BUILD |  grep -v gnss/third_party | \
+  for file in $(find framework modules -name BUILD |  grep -v gnss/third_party | \
     xargs grep -l -E 'cc_library|cc_test|cc_binary' | xargs grep -L 'cpplint()')
   do
     sed -i '1i\load("//tools:cpplint.bzl", "cpplint")\n' $file

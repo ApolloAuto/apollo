@@ -119,17 +119,17 @@ ClassFactoryVector GetAllClassFactoryObjectsOfLibrary(
 }
 
 void DestroyClassFactoryObjectsOfLibrary(
-    const std::string& library_path, ClassClassFactoryMap& class_factory_map,
-    const ClassLoader* class_loader) {
-  for (ClassClassFactoryMap::iterator itr = class_factory_map.begin();
-       itr != class_factory_map.end();) {
+    const std::string& library_path, const ClassLoader* class_loader,
+    ClassClassFactoryMap* class_factory_map) {
+  for (ClassClassFactoryMap::iterator itr = class_factory_map->begin();
+       itr != class_factory_map->end();) {
     AbstractClassFactoryBase* class_factory_object = itr->second;
     if (class_factory_object->GetRelativeLibraryPath() == library_path &&
         class_factory_object->IsOwnedBy(class_loader)) {
       class_factory_object->RemoveOwnedClassLoader(class_loader);
       // when no anybody owner,delete && erase
       if (!class_factory_object->IsOwnedByAnybody()) {
-        class_factory_map.erase(itr++);
+        class_factory_map->erase(itr++);
         delete class_factory_object;
       } else {
         ++itr;
@@ -146,8 +146,8 @@ void DestroyClassFactoryObjectsOfLibrary(const std::string& library_path,
 
   BaseToClassFactoryMapMap& factory_map_map = GetClassFactoryMapMap();
   for (auto& baseclass_map : factory_map_map) {
-    DestroyClassFactoryObjectsOfLibrary(library_path, baseclass_map.second,
-                                        loader);
+    DestroyClassFactoryObjectsOfLibrary(library_path, loader,
+                                        &baseclass_map.second);
   }
 }
 
@@ -261,7 +261,7 @@ void UnloadLibrary(const std::string& library_path, ClassLoader* loader) {
     LibpathPocolibVector::iterator itr = FindLoadedLibrary(library_path);
     if (itr == opened_libraries.end()) {
       AERROR << "attempt to UnloadLibrary lib,but can't find lib "
-            << library_path;
+             << library_path;
       return;
     }
 
