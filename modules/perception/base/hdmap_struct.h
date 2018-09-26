@@ -42,9 +42,8 @@ struct alignas(16) HdmapStruct {
   std::vector<PointCloud<PointD>> junction_polygons;
 };
 
-// TODO(all): tp remove
-// typedef std::shared_ptr<HdmapStruct> HdmapStructPtr;
-// typedef std::shared_ptr<const HdmapStruct> HdmapStructConstPtr;
+using HdmapStructPtr = std::shared_ptr<HdmapStruct>;
+using HdmapStructConstPtr = std::shared_ptr<const HdmapStruct>;
 
 }  // namespace base
 }  // namespace perception
