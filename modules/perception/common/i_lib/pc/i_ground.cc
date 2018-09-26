@@ -15,7 +15,6 @@
  *****************************************************************************/
 #include "i_ground.h"
 #include <algorithm>
-#include <cassert>
 #include <cfloat>
 #include <cmath>
 #include <iostream>
@@ -62,7 +61,7 @@ bool PlaneFitGroundDetectorParam::validate() const {
 
 int PlaneFitPointCandIndices::prune(unsigned int min_nr_samples,
                                     unsigned int max_nr_samples) {
-  assert(min_nr_samples < max_nr_samples);
+  CHECK_LT(min_nr_samples, max_nr_samples);
   unsigned int size = indices.size();
   unsigned int half = 0;
   if (size > max_nr_samples) {
@@ -92,7 +91,7 @@ PlaneFitGroundDetector::PlaneFitGroundDetector(
     const PlaneFitGroundDetectorParam &param)
     : BaseGroundDetector(param) {
   bool is_initialized = init();
-  assert(is_initialized);
+  CHECK(is_initialized);
 }
 
 PlaneFitGroundDetector::~PlaneFitGroundDetector() { cleanup(); }
@@ -296,7 +295,7 @@ int PlaneFitGroundDetector::compare_z(const float *point_cloud,
   while (iter < indices.cend()) {
     nr_contradi = 0;
     pos = *iter++;
-    assert(pos < (int)nr_points);
+    CHECK_LT(pos, (int)nr_points);
     nr_contradi = 0;
     // requires the Z element to be in the third position, i.e., after X, Y
     ptr = point_cloud + (pos * nr_point_element);
@@ -340,7 +339,7 @@ void PlaneFitGroundDetector::compute_adaptive_threshold() {
   float max_dist = 0;
   float thre = 0;
   float grid_rad = (float)(_param.nr_grids_coarse - 1) / 2;
-  assert(_pf_thresholds != NULL);
+  CHECK_NOTNULL(_pf_thresholds);
   for (r = 0; r < _param.nr_grids_coarse; ++r) {
     dr = (float)r - grid_rad;
     dr *= dr;
@@ -417,7 +416,7 @@ void PlaneFitGroundDetector::compute_signed_ground_height_line(
   const float *plane[] = {NULL, NULL, NULL, NULL, NULL};
   float min_abs_dist = 0;
   unsigned int nm1 = _param.nr_grids_coarse - 1;
-  assert(_param.nr_grids_coarse >= 2);
+  CHECK_GE(_param.nr_grids_coarse, 2);
   plane[0] = cn[0].is_valid() ? cn[0].params : NULL;
   plane[1] = cn[1].is_valid() ? cn[1].params : NULL;
   plane[2] = up[0].is_valid() ? up[0].params : NULL;
@@ -425,7 +424,7 @@ void PlaneFitGroundDetector::compute_signed_ground_height_line(
   std::vector<int>::const_iterator iter = (*_vg_coarse)(r, 0)._indices.cbegin();
   while (iter < (*_vg_coarse)(r, 0)._indices.cend()) {
     pos = *iter;
-    assert(pos < (int)nr_points);
+    CHECK_LT(pos, (int)nr_points);
     label = _labels[pos];
     cptr = point_cloud + (nr_point_elements * pos);
     dist[0] = plane[0] != NULL
@@ -464,7 +463,7 @@ void PlaneFitGroundDetector::compute_signed_ground_height_line(
     iter = (*_vg_coarse)(r, c)._indices.cbegin();
     while (iter < (*_vg_coarse)(r, c)._indices.cend()) {
       pos = *iter;
-      assert(pos < (int)nr_points);
+      CHECK_LT(pos, (int)nr_points);
       label = _labels[pos];
       cptr = point_cloud + (nr_point_elements * pos);
       dist[0] = plane[0] != NULL ? i_plane_to_point_signed_distance_w_unit_norm(
@@ -507,7 +506,7 @@ void PlaneFitGroundDetector::compute_signed_ground_height_line(
   iter = (*_vg_coarse)(r, nm1)._indices.cbegin();
   while (iter < (*_vg_coarse)(r, nm1)._indices.cend()) {
     pos = *iter;
-    assert(pos < (int)nr_points);
+    CHECK_LT(pos, (int)nr_points);
     label = _labels[pos];
     cptr = point_cloud + (nr_point_elements * pos);
     dist[0] = plane[0] != NULL
@@ -641,7 +640,7 @@ int PlaneFitGroundDetector::fit_grid(const float *point_cloud,
   float *psrc = NULL;
   float *pdst = _pf_threeds;
   for (i = 0; i < nr_samples; ++i) {
-    assert(candi[i] < (int)nr_points);
+    CHECK_LT(candi[i], (int)nr_points);
     i_copy3(point_cloud + (nr_point_element * candi[i]), pdst);
     pdst += _dim_point;
   }
@@ -844,7 +843,7 @@ int PlaneFitGroundDetector::fit_grid_with_neighbors(
   int c_n = 0;
   float angle = -1.f;
   for (int i = 0; i < nr_samples; ++i) {
-    assert(candi[i] < (int)nr_points);
+    CHECK_LT(candi[i], (int)nr_points);
     i_copy3(point_cloud + (nr_point_element * candi[i]), pdst);
     pdst += _dim_point;
   }
@@ -1057,10 +1056,10 @@ int PlaneFitGroundDetector::smooth_line(unsigned int up, unsigned int r,
   unsigned int c = 0;
   unsigned int nm1 = _param.nr_grids_coarse - 1;
   GroundPlaneSpherical plane;
-  assert(_param.nr_grids_coarse >= 2);
-  assert(up < _param.nr_grids_coarse);
-  assert(r < _param.nr_grids_coarse);
-  assert(dn < _param.nr_grids_coarse);
+  CHECK_GE(_param.nr_grids_coarse, 2);
+  CHECK_LT(up, _param.nr_grids_coarse);
+  CHECK_LT(r, _param.nr_grids_coarse);
+  CHECK_LT(dn, _param.nr_grids_coarse);
   if (/*!(*_vg_coarse)(r, 0).empty()*/ true) {
     if (_ground_planes_sphe[r][0].is_valid() == false) {
       nr_grids += complete_grid(
@@ -1198,7 +1197,7 @@ int PlaneFitGroundDetector::smooth() {
   unsigned int r = 0;
   unsigned int c = 0;
   unsigned int nm1 = _param.nr_grids_coarse - 1;
-  assert(_param.nr_grids_coarse >= 2);
+  CHECK_GE(_param.nr_grids_coarse, 2);
   nr_grids += smooth_line(0, 0, 1);
   for (r = 1; r < nm1; ++r) {
     nr_grids += smooth_line(r - 1, r, r + 1);
@@ -1216,10 +1215,10 @@ bool PlaneFitGroundDetector::detect(const float *point_cloud,
                                     float *height_above_ground,
                                     unsigned int nr_points,
                                     unsigned int nr_point_elements) {
-  assert(point_cloud != NULL);
-  assert(height_above_ground != NULL);
-  assert(nr_points <= _param.nr_points_max);
-  assert(nr_point_elements >= 3);
+  CHECK_NOTNULL(point_cloud);
+  CHECK_NOTNULL(height_above_ground);
+  CHECK_LE(nr_points, _param.nr_points_max);
+  CHECK_GE(nr_point_elements, 3);
   // setup the fine voxel grid
   if (!_vg_fine->set_s(point_cloud, nr_points, nr_point_elements)) {
     return false;
@@ -1228,22 +1227,20 @@ bool PlaneFitGroundDetector::detect(const float *point_cloud,
   if (!_vg_coarse->set_s(point_cloud, nr_points, nr_point_elements)) {
     return false;
   }
-  int nr_candis = 0;
-  int nr_valid_grid = 0;
   unsigned int r = 0;
   unsigned int c = 0;
   // unsigned int iter = 0;
   // filter to generate plane fitting candidates
-  nr_candis = filter();
+  filter();
   // std::cout << "# of plane candidates: " << nr_candis << std::endl;
   // fit local plane using ransac
   // nr_valid_grid = fit();
-  nr_valid_grid = fit_in_order();
+  fit_in_order();
   // std::cout << "# of valid plane geometry (fitting): " << nr_valid_grid <<
   // std::endl;
   // smooth plane using neighborhood information:
   for (int iter = 0; iter < _param.nr_smooth_iter; ++iter) {
-    nr_valid_grid = smooth();
+    smooth();
   }
 
   for (r = 0; r < _param.nr_grids_coarse; ++r) {
@@ -1270,8 +1267,10 @@ const VoxelGridXY<float> *PlaneFitGroundDetector::get_grid() const {
 
 const GroundPlaneLiDAR *PlaneFitGroundDetector::get_ground_plane(int r,
                                                                  int c) const {
-  assert(r >= 0 && r < (int)_param.nr_grids_coarse);
-  assert(c >= 0 && c < (int)_param.nr_grids_coarse);
+  CHECK_GE(r, 0);
+  CHECK_LT(r, (int)_param.nr_grids_coarse);
+  CHECK_GE(c, 0);
+  CHECK_LT(c, (int)_param.nr_grids_coarse);
   return _ground_planes != NULL ? _ground_planes[r] + c : NULL;
 }
 
@@ -1295,7 +1294,7 @@ void i_plane_eucli_to_spher(const GroundPlaneLiDAR &src,
     dst.force_invalid();
   } else {
     GroundPlaneLiDAR p = src;
-    assert(p.params[2] != 0 || p.params[1] != 0);
+    CHECK(p.params[2] != 0 || p.params[1] != 0);
     p.force_unit_norm();  // to be safe
     p.force_positive_normal_z();
     dst.theta = i_acos(p.params[0]);
@@ -1331,7 +1330,7 @@ void i_plane_spher_to_eucli(const GroundPlaneSpherical &src,
   }
 }
 
-} // namespace idl
+}  // namespace idl
 
 /*
 int PlaneFitGroundDetector::compare_z_16(const float* point_cloud,
@@ -1345,7 +1344,7 @@ unsigned int i, nr_contradi = 0;
 float z, delta_z;
 for (i = 0; i < indices.size(); ++i) {
 pos = indices[i];
-assert(pos < (int)nr_points);
+CHECK_LT(pos, (int)nr_points);
 // requires the Z element to be in the third position, i.e., after X, Y
 z = (point_cloud + (pos * nr_point_element))[2];
 if (z < _param.sample_region_z_lower || z >= _param.sample_region_z_upper) {
@@ -1460,7 +1459,7 @@ unsigned int i, nr_contradi = 0;
 float z, delta_z;
 for (i = 0; i < indices.size(); ++i) {
 pos = indices[i];
-assert(pos < (int)nr_points);
+CHECK_LT(pos, (int)nr_points);
 // requires the Z element to be in the third position, i.e., after X, Y
 z = (point_cloud + (pos * nr_point_element))[2];
 if (z < _param.sample_region_z_lower || z >= _param.sample_region_z_upper) {

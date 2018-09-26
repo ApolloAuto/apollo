@@ -84,7 +84,7 @@ void ConstructTrackedObjects(const std::vector<base::ObjectPtr> &objects,
 void ConstructObjects(const std::vector<Eigen::Vector3d> &centers,
                       const std::vector<Eigen::Vector3d> &sizes,
                       std::vector<base::ObjectPtr> *objects) {
-  assert(centers.size() == sizes.size());
+  CHECK_EQ(centers.size(), sizes.size());
   uint8_t intensity = 127;
   for (size_t j = 0; j < centers.size(); ++j) {
     Eigen::Vector3d size = sizes[j];
@@ -114,7 +114,7 @@ void ConstructObjects(const std::vector<Eigen::Vector3d> &centers,
 
 TEST_F(TrackPostProcessorTest, psot_processor_test) {
   LidarFrame *frame(new LidarFrame);
-  CHECK(frame != nullptr);
+  CHECK_NOTNULL(frame);
   // construct track data
   std::vector<Eigen::Vector3d> centers;
   centers.resize(3);

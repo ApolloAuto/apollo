@@ -15,7 +15,6 @@
  *****************************************************************************/
 #include "modules/perception/fusion/base/sensor.h"
 
-#include <assert.h>
 
 #include "cybertron/common/log.h"
 
@@ -27,7 +26,7 @@ size_t Sensor::kMaxCachedFrameNum = 10;
 
 void Sensor::QueryLatestFrames(double timestamp,
                                std::vector<SensorFramePtr>* frames) {
-  assert(frames != nullptr);
+  CHECK_NOTNULL(frames);
 
   frames->clear();
   for (size_t i = 0; i < frames_.size(); i++) {
@@ -52,7 +51,7 @@ SensorFramePtr Sensor::QueryLatestFrame(double timestamp) {
 }
 
 bool Sensor::GetPose(double timestamp, Eigen::Affine3d* pose) const {
-  assert(pose != nullptr);
+  CHECK_NOTNULL(pose);
 
   for (int i = static_cast<int>(frames_.size()) - 1; i >= 0; --i) {
     double time_diff = timestamp - frames_[i]->GetTimestamp();

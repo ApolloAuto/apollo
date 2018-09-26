@@ -82,7 +82,7 @@ class ArgMax1Plugin : public nvinfer1::IPlugin {
   void serialize(void *buffer) override {
     char *d = reinterpret_cast<char *>(buffer), *a = d;
     size_t size = getSerializationSize();
-    CHECK(d == a + size);
+    CHECK_EQ(d, a + size);
   }
 
   virtual ~ArgMax1Plugin() {}

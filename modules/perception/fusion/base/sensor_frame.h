@@ -43,7 +43,7 @@ class SensorFrame : public std::enable_shared_from_this<SensorFrame> {
   inline double GetTimestamp() const { return timestamp_; }
 
   inline bool GetPose(Eigen::Affine3d* pose) const {
-    assert(pose != nullptr);
+    CHECK_NOTNULL(pose);
     *pose = sensor2world_pose_;
     return true;
   }

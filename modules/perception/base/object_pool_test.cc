@@ -206,14 +206,14 @@ TEST(ObjectPoolTest, concurrent_object_pool_batch_get_deque_test) {
 #endif
 }
 
+#ifndef PERCEPTION_BASE_DISABLE_POOL
 TEST(ObjectPoolTest, concurrent_object_pool_constructor_test) {
   typedef ConcurrentObjectPool<Object, 10> TestObjectPool;
   auto& pool = TestObjectPool::Instance();
-#ifndef PERCEPTION_BASE_DISABLE_POOL
   EXPECT_EQ(pool.RemainedNum(), 10);
   EXPECT_EQ(pool.get_capacity(), 10);
-#endif
 }
+#endif
 
 struct TestObjectPoolInitializer {
   void operator()(Object* t) const { t->id = 1; }

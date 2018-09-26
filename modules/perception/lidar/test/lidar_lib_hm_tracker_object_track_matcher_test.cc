@@ -107,7 +107,7 @@ void ConstructTrackedObjects(const std::vector<base::ObjectPtr>& objects,
 
 TEST_F(ObjectTrackMatcherTest, foreground_matcher) {
   LidarFrame* frame(new LidarFrame);
-  CHECK(frame != nullptr);
+  CHECK_NOTNULL(frame);
   std::vector<base::ObjectPtr>& objects = frame->segmented_objects;
 
   ConstructPointCloud(&objects);
@@ -192,7 +192,7 @@ TEST_F(ObjectTrackMatcherTest, foreground_matcher) {
 
 TEST_F(ObjectTrackMatcherTest, background_matcher) {
   LidarFrame* frame(new LidarFrame);
-  CHECK(frame != nullptr);
+  CHECK_NOTNULL(frame);
   std::vector<base::ObjectPtr>& objects = frame->segmented_objects;
   ConstructPointCloud(&objects);
 
@@ -210,7 +210,7 @@ TEST_F(ObjectTrackMatcherTest, background_matcher) {
   std::vector<TrackDataPtr> tracks_data;
   std::vector<TrackedObjectPtr> background_tracked_objects;
   std::vector<Eigen::VectorXf> background_predicts;
-  assert(tracked_objects.size() != 6);
+  CHECK_NE(tracked_objects.size(), 6);
   TrackDataPtr track1(new TrackData());
   TrackDataPtr track2(new TrackData());
   track1->PushTrackedObjectToTrack(tracked_objects[0], 0.0);

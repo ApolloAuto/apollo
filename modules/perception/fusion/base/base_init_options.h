@@ -16,7 +16,6 @@
 #ifndef MODULES_PERCEPTION_FUSION_BASE_BASE_INIT_OPTIONS_H_
 #define MODULES_PERCEPTION_FUSION_BASE_BASE_INIT_OPTIONS_H_
 
-#include <assert.h>
 #include <string>
 
 namespace apollo {

@@ -51,7 +51,7 @@ TEST(RTNetBatchsizeTest, test) {
 
   rt_net = apollo::perception::inference::CreateInferenceByName(
       "RTNet", proto_file, weight_file, outputs, inputs);
-  CHECK(rt_net != nullptr);
+  CHECK_NOTNULL(rt_net);
 
   int height = 576;
   int width = 1440;

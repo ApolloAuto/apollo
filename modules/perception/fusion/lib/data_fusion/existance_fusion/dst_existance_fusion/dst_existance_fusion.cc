@@ -49,7 +49,7 @@ bool DstExistanceFusion::Init() {
 
   lib::ConfigManager *config_manager =
       lib::Singleton<lib::ConfigManager>::get_instance();
-  assert(config_manager != nullptr);
+  CHECK_NOTNULL(config_manager);
   std::string woork_root_config = lib::FileUtil::GetAbsolutePath(
       config_manager->work_root(), options.root_dir);
 
@@ -129,7 +129,7 @@ void DstExistanceFusion::UpdateWithoutMeasurement(const std::string &sensor_id,
                                                   double min_match_dist) {
   common::SensorManager *sensor_manager =
       lib::Singleton<common::SensorManager>::get_instance();
-  CHECK(sensor_manager != nullptr);
+  CHECK_NOTNULL(sensor_manager);
   SensorObjectConstPtr camera_object = nullptr;
   if (sensor_manager->IsCamera(sensor_id)) {
     camera_object = track_ref_->GetSensorObject(sensor_id);
@@ -181,7 +181,7 @@ double DstExistanceFusion::ComputeDistDecay(base::ObjectConstPtr obj,
   double dist_decay = 1.0;
   SensorDataManager *sensor_manager =
       lib::Singleton<SensorDataManager>::get_instance();
-  CHECK(sensor_manager != nullptr);
+  CHECK_NOTNULL(sensor_manager);
   Eigen::Affine3d sensor2world_pose;
   bool status =
       sensor_manager->GetPose(sensor_id, timestamp, &sensor2world_pose);
@@ -230,7 +230,7 @@ double DstExistanceFusion::GetExistReliability(
   double unknown_ratio = unknown ? 0.6 : 1.0;
   common::SensorManager *sensor_manager =
       lib::Singleton<common::SensorManager>::get_instance();
-  CHECK(sensor_manager != nullptr);
+  CHECK_NOTNULL(sensor_manager);
   if (sensor_manager->IsCamera(measurement->GetSensorId())) {
     return 0.8 * unknown_ratio;
   }
@@ -243,7 +243,7 @@ double DstExistanceFusion::GetExistReliability(
 double DstExistanceFusion::GetUnexistReliability(const std::string &sensor_id) {
   common::SensorManager *sensor_manager =
       lib::Singleton<common::SensorManager>::get_instance();
-  CHECK(sensor_manager != nullptr);
+  CHECK_NOTNULL(sensor_manager);
   if (sensor_manager->IsCamera(sensor_id)) {
     return 0.8;
   }

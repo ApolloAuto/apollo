@@ -174,7 +174,7 @@ void RTNet::addConcatLayer(const LayerParameter &layer_param,
   nvinfer1::IConcatenationLayer *concatLayer =
       net->addConcatenation(inputs, nbInputs);
   concatLayer->setName(layer_param.name().c_str());
-  CHECK(nbInputs == layer_param.bottom_size());
+  CHECK_EQ(nbInputs, layer_param.bottom_size());
 
 #if LOAD_DEBUG
   std::string dim_string = "";
@@ -214,7 +214,7 @@ void RTNet::addSliceLayer(const LayerParameter &layer_param,
                           nvinfer1::INetworkDefinition *net,
                           TensorMap *tensor_map,
                           TensorModifyMap *tensor_modify_map) {
-  CHECK(layer_param.slice_param().axis() > 0);
+  CHECK_GT(layer_param.slice_param().axis(), 0);
   std::shared_ptr<SLICEPlugin> slice_plugin;
   slice_plugin.reset(
       new SLICEPlugin(layer_param.slice_param(), inputs[0]->getDimensions()));
@@ -582,8 +582,8 @@ void RTNet::init_blob(std::vector<std::string> *names) {
   for (auto name : *names) {
     int bindingIndex =
         engine->getBindingIndex(tensor_modify_map_[name].c_str());
-    CHECK(bindingIndex < buffers_.size());
-    CHECK(bindingIndex >= 0);
+    CHECK_LT(bindingIndex, buffers_.size());
+    CHECK_GE(bindingIndex, 0);
     nvinfer1::DimsCHW dims = static_cast<nvinfer1::DimsCHW &&>(
         engine->getBindingDimensions(bindingIndex));
     int count = dims.c() * dims.h() * dims.w() * max_batch_size_;
@@ -664,7 +664,7 @@ bool RTNet::addInput(const TensorDimsMap &tensor_dims_map,
     }
     auto data = network_->addInput(
         dims_pair.first.c_str(), nvinfer1::DataType::kFLOAT, dims_pair.second);
-    CHECK(data != nullptr);
+    CHECK_NOTNULL(data);
     data->setName(dims_pair.first.c_str());
     tensor_map->insert(std::make_pair(dims_pair.first, data));
     input_names_.push_back(dims_pair.first);
@@ -683,14 +683,14 @@ void RTNet::parse_with_api(
   for (auto layer_param : order) {
     std::vector<nvinfer1::ITensor *> inputs;
     for (int j = 0; j < layer_param.bottom_size(); j++) {
-      CHECK(tensor_map[tensor_modify_map_[layer_param.bottom(j)]] != nullptr);
+      CHECK_NOTNULL(tensor_map[tensor_modify_map_[layer_param.bottom(j)]]);
       inputs.push_back(tensor_map[tensor_modify_map_[layer_param.bottom(j)]]);
     }
     addLayer(layer_param, inputs.data(), layer_param.bottom_size(),
              &weight_map_, network_, &tensor_map, &tensor_modify_map_);
   }
 
-  CHECK(output_names_.size() != 0);
+  CHECK_NE(output_names_.size(), 0);
   std::sort(output_names_.begin(), output_names_.end());
   auto last = std::unique(output_names_.begin(), output_names_.end());
   output_names_.erase(last, output_names_.end());

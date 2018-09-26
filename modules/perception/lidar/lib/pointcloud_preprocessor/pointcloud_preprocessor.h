@@ -13,8 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_LIDAR_LIB_POINTCLOUD_PREPROCESSOR_POINTCLOUD_PREPROCESSOR_H_
-#define MODULES_PERCEPTION_LIDAR_LIB_POINTCLOUD_PREPROCESSOR_POINTCLOUD_PREPROCESSOR_H_
+#ifndef MODULES_PERCEPTION_LIDAR_LIB_POINTCLOUD_PREPROCESSOR_POINTCLOUD_PREPROCESSOR_H_  // NOLINT
+#define MODULES_PERCEPTION_LIDAR_LIB_POINTCLOUD_PREPROCESSOR_POINTCLOUD_PREPROCESSOR_H_  // NOLINT
+
+#include <memory>
 #include <string>
 
 #include "modules/drivers/proto/pointcloud.pb.h"
@@ -75,4 +77,4 @@ class PointCloudPreprocessor {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_LIDAR_LIB_POINTCLOUD_PREPROCESSOR_POINTCLOUD_PREPROCESSOR_H_
+#endif
