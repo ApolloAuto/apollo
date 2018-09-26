@@ -109,12 +109,11 @@ void FeatureExtractor::ExtractNeighborLaneFeatures(
   auto ptr_left_neighbor_lane = PredictionMap::GetLeftNeighborLane(
       ptr_ego_lane, {ego_position.x(), ego_position.y()}, threshold);
 
-  double left_neighbor_lane_s = 0.0;
-  double left_neighbor_lane_l = 0.0;
-  ptr_left_neighbor_lane->GetProjection(ego_position,
-      &left_neighbor_lane_s, &left_neighbor_lane_l);
-
   if (ptr_left_neighbor_lane != nullptr) {
+    double left_neighbor_lane_s = 0.0;
+    double left_neighbor_lane_l = 0.0;
+    ptr_left_neighbor_lane->GetProjection(ego_position,
+        &left_neighbor_lane_s, &left_neighbor_lane_l);
     environment_features_.SetLeftNeighborLane(
         ptr_left_neighbor_lane->id().id(), left_neighbor_lane_s);
   }
@@ -122,12 +121,11 @@ void FeatureExtractor::ExtractNeighborLaneFeatures(
   auto ptr_right_neighbor_lane = PredictionMap::GetRightNeighborLane(
       ptr_ego_lane, {ego_position.x(), ego_position.y()}, threshold);
 
-  double right_neighbor_lane_s = 0.0;
-  double right_neighbor_lane_l = 0.0;
-  ptr_left_neighbor_lane->GetProjection(ego_position,
-      &right_neighbor_lane_s, &right_neighbor_lane_l);
-
   if (ptr_right_neighbor_lane != nullptr) {
+    double right_neighbor_lane_s = 0.0;
+    double right_neighbor_lane_l = 0.0;
+    ptr_left_neighbor_lane->GetProjection(ego_position,
+        &right_neighbor_lane_s, &right_neighbor_lane_l);
     environment_features_.SetRightNeighborLane(
         ptr_right_neighbor_lane->id().id(), right_neighbor_lane_s);
   }
