@@ -60,6 +60,7 @@ void FeatureExtractor::ExtractFeatures() {
   Vec2d ego_position(ego_trajectory_point.x(), ego_trajectory_point.y());
 
   auto ptr_ego_lane = GetEgoLane(ego_position);
+
   ExtractEgoLaneFeatures(ptr_ego_lane, ego_position);
 
   ExtractNeighborLaneFeatures(ptr_ego_lane, ego_position);
@@ -108,7 +109,6 @@ void FeatureExtractor::ExtractNeighborLaneFeatures(
 
   auto ptr_left_neighbor_lane = PredictionMap::GetLeftNeighborLane(
       ptr_ego_lane, {ego_position.x(), ego_position.y()}, threshold);
-
   if (ptr_left_neighbor_lane != nullptr) {
     double left_neighbor_lane_s = 0.0;
     double left_neighbor_lane_l = 0.0;
@@ -120,11 +120,10 @@ void FeatureExtractor::ExtractNeighborLaneFeatures(
 
   auto ptr_right_neighbor_lane = PredictionMap::GetRightNeighborLane(
       ptr_ego_lane, {ego_position.x(), ego_position.y()}, threshold);
-
   if (ptr_right_neighbor_lane != nullptr) {
     double right_neighbor_lane_s = 0.0;
     double right_neighbor_lane_l = 0.0;
-    ptr_left_neighbor_lane->GetProjection(ego_position,
+    ptr_right_neighbor_lane->GetProjection(ego_position,
         &right_neighbor_lane_s, &right_neighbor_lane_l);
     environment_features_.SetRightNeighborLane(
         ptr_right_neighbor_lane->id().id(), right_neighbor_lane_s);
