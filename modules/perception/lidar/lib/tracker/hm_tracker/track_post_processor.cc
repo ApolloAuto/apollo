@@ -496,7 +496,7 @@ void TrackPostProcessor::UpdateTrackConvergenceState(TrackDataPtr track_data) {
   std::vector<double> convergence_score_list;
   convergence_score_list.resize(boostup_need_history_size, 0.0);
 
-  size_t useable_measure_velocity_size = 1 + track_data->total_visible_count_ - 1;
+  size_t useable_measure_velocity_size = track_data->total_visible_count_;
   double base_convergence_noise = 2 * s_centroid_measurement_noise_;
 
   size_t visible_obj_idx = 0;
