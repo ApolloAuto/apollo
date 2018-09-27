@@ -66,7 +66,7 @@ class TrackData {
   int track_id_ = -1;
   int age_ = 0;
   int consecutive_invisible_count_ = 0;
-  int total_visible_count_ = 0;
+  size_t total_visible_count_ = 0;
   int max_history_size_ = 40;
   std::map<double, TrackedObjectPtr> history_objects_;
 
