@@ -64,7 +64,7 @@ bool HybridAStar::RSPCheck(const ReedSheppPath* reeds_shepp_to_end) {
 }
 
 bool HybridAStar::ValidityCheck(Node3d& node) {
-  for (const auto& obstacle_box : obstacles_) {
+  for (const auto& obstacle_box : (*obstacles_).Items()) {
     if (node.GetBoundingBox(vehicle_param_)
             .HasOverlap((*obstacle_box).PerceptionBoundingBox())) {
       return false;
@@ -198,7 +198,8 @@ double HybridAStar::CalculateRSPCost(const ReedSheppPath* reeds_shepp_to_end) {
   }
   return RSP_cost;
 }
-bool HybridAStar::GetResult(std::shared_ptr<Node3d> final_node, Result* result) {
+bool HybridAStar::GetResult(std::shared_ptr<Node3d> final_node,
+                            Result* result) {
   std::shared_ptr<Node3d> current_node = final_node;
   std::vector<double> hybrid_a_x;
   std::vector<double> hybrid_a_y;
@@ -208,33 +209,33 @@ bool HybridAStar::GetResult(std::shared_ptr<Node3d> final_node, Result* result) 
     std::vector<double> y = current_node->GetYs();
     std::vector<double> phi = current_node->GetPhis();
     if (x.size() == 0 || y.size() == 0 || phi.size() == 0) {
-      AINFO<<"result size check failed";
+      AINFO << "result size check failed";
       return false;
     }
     std::reverse(x.begin(), x.end());
     std::reverse(y.begin(), y.end());
     std::reverse(phi.begin(), phi.end());
+    AINFO << "good at reverse";
     x.pop_back();
     y.pop_back();
     phi.pop_back();
     hybrid_a_x.insert(hybrid_a_x.end(), x.begin(), x.end());
     hybrid_a_y.insert(hybrid_a_y.end(), y.begin(), y.end());
     hybrid_a_phi.insert(hybrid_a_phi.end(), phi.begin(), phi.end());
+    AINFO << "good at insert";
     current_node = current_node->GetPreNode();
   }
-  hybrid_a_x.insert(hybrid_a_x.end(), current_node->GetXs().begin(),
-                    current_node->GetXs().end());
-  hybrid_a_y.insert(hybrid_a_y.end(), current_node->GetYs().begin(),
-                     current_node->GetYs().end());
-  hybrid_a_phi.insert(hybrid_a_phi.end(), current_node->GetPhis().begin(),
-                      current_node->GetPhis().end());
+  hybrid_a_x.push_back(current_node->GetX());
+  hybrid_a_y.push_back(current_node->GetY());
+  hybrid_a_phi.push_back(current_node->GetPhi());
   (*result).x = hybrid_a_x;
   (*result).y = hybrid_a_y;
   (*result).phi = hybrid_a_phi;
   return true;
 }
 bool HybridAStar::Plan(double sx, double sy, double sphi, double ex, double ey,
-                       double ephi, std::vector<const Obstacle*> obstacles, Result* result) {
+                       double ephi, ThreadSafeIndexedObstacles* obstacles,
+                       Result* result) {
   // load nodes and obstacles
   std::vector<double> sx_vec{sx};
   std::vector<double> sy_vec{sy};
@@ -291,8 +292,8 @@ bool HybridAStar::Plan(double sx, double sy, double sphi, double ex, double ey,
       }
     }
   }
-  if(!GetResult(final_node, result)) {
-    AINFO<<"GetResult failed";
+  if (!GetResult(final_node, result)) {
+    AINFO << "GetResult failed";
     return false;
   }
   return true;

@@ -38,7 +38,8 @@ class reeds_shepp : public ::testing::Test {
     ASSERT_TRUE(common::util::GetProtoFromFile(FLAGS_open_space_config_filename,
                                                &open_space_conf_));
     vehicle_param_ = common::VehicleConfigHelper::GetConfig().vehicle_param();
-    reedshepp_test = new ReedShepp(vehicle_param_, open_space_conf_);
+    reedshepp_test = std::unique_ptr<ReedShepp>(
+        new ReedShepp(vehicle_param_, open_space_conf_));
   }
   void check(std::shared_ptr<Node3d> start_node,
              std::shared_ptr<Node3d> end_node, ReedSheppPath& optimal_path) {
@@ -55,11 +56,9 @@ class reeds_shepp : public ::testing::Test {
           open_space_conf_.step_size() * open_space_conf_.step_size());
       double interval =
           std::sqrt((optimal_path.x.at(i) - optimal_path.x.at(i - 1)) *
-                        (optimal_path.x.at(i) -
-                    optimal_path.x.at(i - 1)) +
+                        (optimal_path.x.at(i) - optimal_path.x.at(i - 1)) +
                     (optimal_path.y.at(i) - optimal_path.y.at(i - 1)) *
-                        (optimal_path.y.at(i) -
-                    optimal_path.y.at(i - 1)));
+                        (optimal_path.y.at(i) - optimal_path.y.at(i - 1)));
       ASSERT_LT(interval, gold_interval);
     }
   }
@@ -67,7 +66,7 @@ class reeds_shepp : public ::testing::Test {
  protected:
   common::VehicleParam vehicle_param_;
   PlannerOpenSpaceConfig open_space_conf_;
-  ReedShepp* reedshepp_test;
+  std::unique_ptr<ReedShepp> reedshepp_test;
 };
 
 TEST_F(reeds_shepp, test_set_1) {
