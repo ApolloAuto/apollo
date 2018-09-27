@@ -38,7 +38,6 @@ TEST(CommonIoTest, read_pose_file) {
   EXPECT_TRUE(ReadPoseFile(filename, &pose, &frame_id, &time_stamp));
 }
 
-/* TODO(all): to be fixed
 TEST(CommonIoTest, load_camera_intrinsic) {
   const std::string testdata_folder =
       "modules/perception/testdata/common/io/params/";
@@ -56,8 +55,7 @@ TEST(CommonIoTest, load_camera_intrinsic) {
   EXPECT_EQ(model.width_, 1192);
   EXPECT_EQ(model.height_, 712);
 }
-*/
-/* TODO(all): to be fixed
+
 TEST(CommonIoTest, load_ocamera_intrinsic) {
   const std::string testdata_folder =
       "modules/perception/testdata/common/io/params/";
@@ -92,7 +90,6 @@ TEST(CommonIoTest, load_ocamera_intrinsic) {
   yaml_file = testdata_folder + "test_ocam8.yaml";
   EXPECT_FALSE(LoadOmnidirectionalCameraIntrinsics(yaml_file, &model));
 }
-*/
 
 }  // namespace common
 }  // namespace perception
