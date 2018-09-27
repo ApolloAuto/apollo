@@ -32,7 +32,7 @@ def cuda_library_impl(ctx):
       deps_flags += ["-I" + d for d in f.cc.system_include_directories]
 
     ctx.actions.run_shell(
-            inputs=ctx.files.srcs + ctx.files.hdrs,
+            inputs=ctx.files.srcs + ctx.files.hdrs + ctx.files.deps,
             outputs=[ctx.outputs.out],
             arguments=args,
             env={'PATH':'/usr/local/cuda/bin:/usr/local/bin:/usr/bin:/bin',},
@@ -50,7 +50,7 @@ def cuda_binary_impl(ctx):
       deps_flags += ["-I" + d for d in f.cc.system_include_directories]
     output = ctx.outputs.out
     ctx.actions.run_shell(
-            inputs=ctx.files.srcs + ctx.files.hdrs,
+            inputs=ctx.files.srcs + ctx.files.hdrs + ctx.files.deps,
             outputs=[ctx.outputs.out],
             arguments=args,
             env={ 'PATH':'/usr/local/cuda/bin:/usr/local/bin:/usr/bin:/bin', },
