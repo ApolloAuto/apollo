@@ -55,10 +55,9 @@ bool DummyMultiTargetTracker::Track(const MultiTargetTrackerOptions& options,
       obj->lidar_supplement.cloud_world[j].z = obj->lidar_supplement.cloud[j].z;
     }
     const Eigen::Affine3d pose = frame->lidar2world_pose;
-    common::TransformPointCloud(pose,
-                                &obj->lidar_supplement.cloud_world);
+    common::TransformPointCloud(pose, &obj->lidar_supplement.cloud_world);
     common::TransformPointCloud(
-        pose, (base::AttributePointCloud<base::PointD> *) &obj->polygon);
+        pose, (base::AttributePointCloud<base::PointD>*)&obj->polygon);
     obj->theta = atan2(obj->direction[1], obj->direction[0]);
   }
   return true;
