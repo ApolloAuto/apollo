@@ -108,6 +108,7 @@ void MeasurementComputer::ComputeMeasuredBboxCenterVelocity(
   common::CalculateBBoxSizeCenter2DXY(cloud, old_dir_tmp, &new_size_tmp,
                                       &new_center, minimum_edge_length);
   // Eigen::Vector3d old_dir = old_dir_tmp.cast<double>();
+  // Eigen::Vector3d new_size = new_size_tmp.cast<double>();
   Eigen::Vector3d measured_bbox_center_velocity_with_old_dir =
       (new_center - old_center);
   measured_bbox_center_velocity_with_old_dir /= time_diff;

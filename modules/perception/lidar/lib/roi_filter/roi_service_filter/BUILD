@@ -11,7 +11,6 @@ cc_library(
         "roi_service_filter.h",
     ],
     deps = [
-        "@eigen",
         "//framework:cybertron",
         "//modules/perception/base:base_type",
         "//modules/perception/base:blob",
@@ -30,6 +29,24 @@ cc_library(
         "//modules/perception/lidar/lib/interface:base_roi_filter",
         "//modules/perception/lidar/lib/scene_manager",
         "//modules/perception/lidar/lib/scene_manager/roi_service",
+        "@eigen",
+    ],
+)
+
+cc_test(
+    name = "roi_service_filter_test",
+    size = "small",
+    srcs = [
+        "roi_service_filter_test.cc",
+    ],
+    deps = [
+        ":roi_service_filter",
+        "//modules/perception/common:perception_gflags",
+        "//modules/perception/common/io:io_util",
+        "//modules/perception/lidar/common:pcl_util",
+        "//modules/perception/lidar/lib/roi_filter/hdmap_roi_filter",
+        "//modules/perception/map/hdmap:hdmap_input",
+        "@gtest//:main",
     ],
 )
 
