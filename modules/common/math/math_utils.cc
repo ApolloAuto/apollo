@@ -96,9 +96,9 @@ void RotateAxis(const double theta, const double x0, const double y0,
 }
 
 std::pair<double, double> Cartesian2Polar(double x, double y) {
-   double r = std::sqrt(x * x + y * y);
-   double theta = std::atan2(y, x);
-   return std::make_pair(r, theta);
+  double r = std::sqrt(x * x + y * y);
+  double theta = std::atan2(y, x);
+  return std::make_pair(r, theta);
 }
 
 }  // namespace math

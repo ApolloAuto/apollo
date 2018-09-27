@@ -57,7 +57,7 @@ TEST_F(Node3dTest, GetBoundingBox) {
   ASSERT_EQ(test_box.center_y(), gold_box.center_y());
   ASSERT_EQ(test_box.length(), gold_box.length());
   ASSERT_EQ(test_box.width(), gold_box.width());
-};
+}
 
 }  // namespace planning
 }  // namespace apollo

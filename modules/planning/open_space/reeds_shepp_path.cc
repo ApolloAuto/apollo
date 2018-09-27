@@ -28,7 +28,7 @@ ReedShepp::ReedShepp(const common::VehicleParam& vehicle_param,
     : vehicle_param_(vehicle_param), open_space_conf_(open_space_conf) {
   max_kappa_ = std::tan(open_space_conf.max_steering()) /
                vehicle_param_.front_edge_to_center();
-};
+}
 
 std::pair<double, double> ReedShepp::calc_tau_omega(double u, double v,
                                                     double xi, double eta,
@@ -908,12 +908,12 @@ bool ReedShepp::GenerateLocalConfigurations(
       }
       while (std::abs(pd) <= std::abs(l)) {
         index++;
-        Interpolation(index, pd, m, ox, oy, ophi, px, py, pphi, pgear);
+        Interpolation(index, pd, m, ox, oy, ophi, &px, &py, &pphi, &pgear);
         pd += d;
       }
       ll = l - pd - d;
       index++;
-      Interpolation(index, l, m, ox, oy, ophi, px, py, pphi, pgear);
+      Interpolation(index, l, m, ox, oy, ophi, &px, &py, &pphi, &pgear);
     }
 
     while (px.back() == 0.0) {
@@ -943,19 +943,19 @@ bool ReedShepp::GenerateLocalConfigurations(
 }
 
 void ReedShepp::Interpolation(double index, double pd, char m, double ox,
-                              double oy, double ophi, std::vector<double>& px,
-                              std ::vector<double>& py,
-                              std::vector<double>& pphi,
-                              std::vector<bool>& pgear) {
+                              double oy, double ophi, std::vector<double>* px,
+                              std ::vector<double>* py,
+                              std::vector<double>* pphi,
+                              std::vector<bool>* pgear) {
   double ldx = 0.0;
   double ldy = 0.0;
   double gdx = 0.0;
   double gdy = 0.0;
 
   if (m == 'S') {
-    px.at(index) = ox + pd / max_kappa_ * std::cos(ophi);
-    py.at(index) = oy + pd / max_kappa_ * std::sin(ophi);
-    pphi.at(index) = ophi;
+    px->at(index) = ox + pd / max_kappa_ * std::cos(ophi);
+    py->at(index) = oy + pd / max_kappa_ * std::sin(ophi);
+    pphi->at(index) = ophi;
   } else {
     ldx = std::sin(pd) / max_kappa_;
     if (m == 'L') {
@@ -965,20 +965,20 @@ void ReedShepp::Interpolation(double index, double pd, char m, double ox,
     }
     gdx = std::cos(-ophi) * ldx + std::sin(-ophi) * ldy;
     gdy = -std::sin(-ophi) * ldx + std::cos(-ophi) * ldy;
-    px.at(index) = ox + gdx;
-    py.at(index) = oy + gdy;
+    px->at(index) = ox + gdx;
+    py->at(index) = oy + gdy;
   }
 
   if (pd > 0.0) {
-    pgear.at(index) = true;
+    pgear->at(index) = true;
   } else {
-    pgear.at(index) = false;
+    pgear->at(index) = false;
   }
 
   if (m == 'L') {
-    pphi.at(index) = ophi + pd;
+    pphi->at(index) = ophi + pd;
   } else if (m == 'R') {
-    pphi.at(index) = ophi - pd;
+    pphi->at(index) = ophi - pd;
   }
 }
 
