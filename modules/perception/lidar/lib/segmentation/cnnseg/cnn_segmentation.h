@@ -16,6 +16,7 @@
 #ifndef MODULES_PERCEPTION_LIDAR_LIB_SEGMENTATION_CNNSEG_H_
 #define MODULES_PERCEPTION_LIDAR_LIB_SEGMENTATION_CNNSEG_H_
 
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -26,6 +27,7 @@
 
 #include "modules/perception/base/blob.h"
 #include "modules/perception/inference/inference.h"
+#include "modules/perception/inference/inference_factory.h"
 #include "modules/perception/lib/thread/thread_worker.h"
 #include "modules/perception/lidar/lib/interface/base_ground_detector.h"
 #include "modules/perception/lidar/lib/interface/base_roi_filter.h"
@@ -55,9 +57,11 @@ class CNNSegmentation : public BaseSegmentation {
 
   bool InitClusterAndBackgroundSegmentation();
 
-  void GetObjectsFromSppEngine(std::vector<base::ObjectPtr>* objects);
+  void GetObjectsFromSppEngine(
+      std::vector<std::shared_ptr<base::Object>>* objects);
 
-  void MapPointToGrid(const base::PointFCloudPtr& pc_ptr);
+  void MapPointToGrid(
+      const std::shared_ptr<base::AttributePointCloud<base::PointF>>& pc_ptr);
 
   CNNSegParam cnnseg_param_;
   std::shared_ptr<inference::Inference> inference_;
@@ -97,10 +101,11 @@ class CNNSegmentation : public BaseSegmentation {
 
   // reference pointer of lidar frame
   LidarFrame* lidar_frame_ref_ = nullptr;
-  base::PointFCloudPtr original_cloud_;
-  base::PointDCloudPtr original_world_cloud_;
-  base::PointFCloudPtr roi_cloud_;
-  base::PointDCloudPtr roi_world_cloud_;
+  std::shared_ptr<base::AttributePointCloud<base::PointF>> original_cloud_;
+  std::shared_ptr<base::AttributePointCloud<base::PointD>>
+      original_world_cloud_;
+  std::shared_ptr<base::AttributePointCloud<base::PointF>> roi_cloud_;
+  std::shared_ptr<base::AttributePointCloud<base::PointD>> roi_world_cloud_;
   int gpu_id_ = -1;
 
   // time statistics

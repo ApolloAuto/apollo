@@ -98,7 +98,7 @@ void MeasurementComputer::ComputeMeasuredBboxCenterVelocity(
     const double &time_diff) {
   // Compute 2D bbox center velocity measurement
   Eigen::Vector3f old_dir_tmp = old_object->output_direction.cast<float>();
-  Eigen::Vector3d old_size = old_object->output_size;
+  // Eigen::Vector3d old_size = old_object->output_size;
   Eigen::Vector3d old_center = old_object->output_center;
   Eigen::Vector3f new_size_tmp;
   Eigen::Vector3d new_center;
@@ -107,7 +107,7 @@ void MeasurementComputer::ComputeMeasuredBboxCenterVelocity(
       (new_object->object_ptr->lidar_supplement).cloud_world;
   common::CalculateBBoxSizeCenter2DXY(cloud, old_dir_tmp, &new_size_tmp,
                                       &new_center, minimum_edge_length);
-  Eigen::Vector3d old_dir = old_dir_tmp.cast<double>();
+  // Eigen::Vector3d old_dir = old_dir_tmp.cast<double>();
   Eigen::Vector3d new_size = new_size_tmp.cast<double>();
   Eigen::Vector3d measured_bbox_center_velocity_with_old_dir =
       (new_center - old_center);

@@ -59,6 +59,8 @@ Spline2dKernel* OsqpSpline2dSolver::mutable_kernel() { return &kernel_; }
 Spline2d* OsqpSpline2dSolver::mutable_spline() { return &spline_; }
 
 bool OsqpSpline2dSolver::Solve() {
+  // TODO(All): implement here.
+  /*
   const MatrixXd& kernel_matrix = kernel_.kernel_matrix();
   const MatrixXd& offset = kernel_.offset();
   const MatrixXd& inequality_constraint_matrix =
@@ -69,7 +71,7 @@ bool OsqpSpline2dSolver::Solve() {
       constraint_.equality_constraint().constraint_matrix();
   const MatrixXd& equality_constraint_boundary =
       constraint_.equality_constraint().constraint_boundary();
-  // TODO(All): implement here.
+  */
   return true;
 }
 
