@@ -138,6 +138,22 @@ proto_library(
 )
 
 cc_proto_library(
+    name = "pbf_tracker_config_proto",
+    deps = [
+        ":pbf_tracker_config_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "pbf_tracker_config_proto_lib",
+    srcs = [
+        "pbf_tracker_config.proto",
+    ],
+    deps = [
+    ],
+)
+
+cc_proto_library(
     name = "probabilistic_fusion_config_proto",
     deps = [
         ":probabilistic_fusion_config_proto_lib",
