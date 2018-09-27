@@ -13,12 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_FUSION_LIB_DATA_FUSION_TYPE_FUSION_DST_EXISTANCE_FUSION_H_
-#define MODULES_PERCEPTION_FUSION_LIB_DATA_FUSION_TYPE_FUSION_DST_EXISTANCE_FUSION_H_
+#ifndef MODULES_PERCEPTION_FUSION_LIB_DATA_FUSION_EXISTANCE_FUSION_DST_EXISTANCE_FUSION_H_  // NOLINT
+#define MODULES_PERCEPTION_FUSION_LIB_DATA_FUSION_EXISTANCE_FUSION_DST_EXISTANCE_FUSION_H_  // NOLINT
 
 #include <map>
 #include <string>
-#include <unordered_map>
 #include <vector>
 
 #include "modules/perception/fusion/common/dst_evidence.h"
@@ -99,9 +98,9 @@ class DstExistanceFusion : public BaseExistanceFusion {
   double toic_score_ = 0.0;
 
  private:
-  static std::string name_;
+  static const char* name_;
+  static const char* toic_name_;
   static ExistanceDstMaps existance_dst_maps_;
-  static std::string toic_name_;
   static ToicDstMaps toic_dst_maps_;
   static DstExistanceFusionOptions options_;
 };
@@ -110,4 +109,4 @@ class DstExistanceFusion : public BaseExistanceFusion {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_FUSION_LIB_DATA_FUSION_TYPE_FUSION_DST_EXISTANCE_FUSION_H_
+#endif  MODULES_PERCEPTION_FUSION_LIB_DATA_FUSION_EXISTANCE_FUSION_DST_EXISTANCE_FUSION_H_  // NOLINT

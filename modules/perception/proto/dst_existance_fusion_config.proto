@@ -1,6 +1,6 @@
 syntax = "proto2";
 
-package apollo.perception.fusion;
+package apollo.perception;
 
 message CameraValidDist {
   required string camera_name = 1 [default = ""];

@@ -24,6 +24,22 @@ proto_library(
 )
 
 cc_proto_library(
+    name = "dst_existance_fusion_config_proto",
+    deps = [
+        ":dst_existance_fusion_config_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "dst_existance_fusion_config_proto_lib",
+    srcs = [
+        "dst_existance_fusion_config.proto",
+    ],
+    deps = [
+    ],
+)
+
+cc_proto_library(
     name = "perception_config_schema_proto",
     deps = [
         ":perception_config_schema_proto_lib",
