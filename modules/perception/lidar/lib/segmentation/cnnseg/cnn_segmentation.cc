@@ -44,17 +44,17 @@ bool CNNSegmentation::Init(const SegmentationInitOptions& options) {
   std::string weight_file;
   std::string engine_file;
   CHECK(GetConfigs(&param_file, &proto_file, &weight_file, &engine_file));
-  AINFO << "--     param_file: " << param_file;
-  AINFO << "--     proto_file: " << proto_file;
+  AINFO << "--    param_file: " << param_file;
+  AINFO << "--    proto_file: " << proto_file;
   AINFO << "--    weight_file: " << weight_file;
-  AINFO << "--      engine_file: " << engine_file;
+  AINFO << "--    engine_file: " << engine_file;
 
   // get cnnseg params
   CHECK(lib::ParseProtobufFromFile<CNNSegParam>(param_file, &cnnseg_param_))
-      << "Failed to parse CNNSegParam config file.";
+      << "Failed to parse CNNSegParam config file." << param_file;
   CHECK(lib::ParseProtobufFromFile<SppEngineConfig>(engine_file,
                                                     &spp_engine_config_))
-      << "Failed to parse SppEngine config file.";
+      << "Failed to parse SppEngine config file." << engine_file;
 
   // init feature parameters
   const FeatureParam& feature_param = cnnseg_param_.feature_param();

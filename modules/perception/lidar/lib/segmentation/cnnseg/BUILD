@@ -28,6 +28,18 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "cnn_segmentation_test",
+    srcs = [
+        "cnn_segmentation_test.cc",
+    ],
+    deps = [
+        ":cnn_segmentation",
+        "//modules/perception/common:perception_gflags",
+        "@gtest//:main",
+    ],
+)
+
 cc_library(
     name = "disjoint_set",
     hdrs = [

@@ -20,7 +20,7 @@
 #include <string>
 #include <vector>
 
-#include "boost/shared_ptr.hpp"
+#include "gtest/gtest_prod.h"
 
 #include "modules/perception/lidar/lib/segmentation/cnnseg/proto/cnnseg_param.pb.h"
 #include "modules/perception/lidar/lib/segmentation/cnnseg/proto/spp_engine_config.pb.h"
@@ -120,6 +120,9 @@ class CNNSegmentation : public BaseSegmentation {
 
  private:
   const int kDefaultPointCloudSize = 120000;
+
+  FRIEND_TEST(CNNSegmentationTest, cnn_segmentation_sequence_test);
+  FRIEND_TEST(CNNSegmentationTest, cnn_segmentation_test);
 };  // class CNNSegmentation
 
 }  // namespace lidar
