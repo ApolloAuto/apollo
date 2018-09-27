@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+
 #ifndef MODULES_PERCEPTION_LIDAR_LIB_SPATIO_TEMPORAL_GROUND_DETECTOR_H_
 #define MODULES_PERCEPTION_LIDAR_LIB_SPATIO_TEMPORAL_GROUND_DETECTOR_H_
 

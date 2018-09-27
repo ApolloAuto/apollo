@@ -164,14 +164,16 @@ bool SpatioTemporalGroundDetector::Detect(const GroundDetectorOptions& options,
 
   for (i = 0; i < valid_point_num_cur; ++i) {
     z_distance = ground_height_signed_.data()[i];
-    frame->cloud->points_height(point_indices_temp_[i]) = z_distance;
-    frame->world_cloud->points_height(point_indices_temp_[i]) = z_distance;
+    frame->cloud->mutable_points_height()->at(point_indices_temp_[i]) =
+        z_distance;
+    frame->world_cloud->mutable_points_height()->at(point_indices_temp_[i]) =
+        z_distance;
     if (idl::i_abs(z_distance) > ground_thres_) {
       non_ground_indices.indices.push_back(point_indices_temp_[i]);
     } else {
-      frame->cloud->points_label(point_indices_temp_[i]) =
+      frame->cloud->mutable_points_label()->at(point_indices_temp_[i]) =
           static_cast<uint8_t>(LidarPointLabel::GROUND);
-      frame->world_cloud->points_label(point_indices_temp_[i]) =
+      frame->world_cloud->mutable_points_label()->at(point_indices_temp_[i]) =
           static_cast<uint8_t>(LidarPointLabel::GROUND);
     }
   }
