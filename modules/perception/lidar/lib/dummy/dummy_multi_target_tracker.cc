@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+
 #include "modules/perception/lidar/lib/dummy/dummy_multi_target_tracker.h"
 #include "modules/perception/base/object_pool_types.h"
 #include "modules/perception/common/point_cloud_processing/common.h"
@@ -53,9 +54,11 @@ bool DummyMultiTargetTracker::Track(const MultiTargetTrackerOptions& options,
       obj->lidar_supplement.cloud_world[j].y = obj->lidar_supplement.cloud[j].y;
       obj->lidar_supplement.cloud_world[j].z = obj->lidar_supplement.cloud[j].z;
     }
-    common::TransformPointCloud(frame->lidar2world_pose,
+    const Eigen::Affine3d pose = frame->lidar2world_pose;
+    common::TransformPointCloud(pose,
                                 &obj->lidar_supplement.cloud_world);
-    common::TransformPointCloud(frame->lidar2world_pose, &obj->polygon);
+    common::TransformPointCloud(
+        pose, (base::AttributePointCloud<base::PointD> *) &obj->polygon);
     obj->theta = atan2(obj->direction[1], obj->direction[0]);
   }
   return true;
