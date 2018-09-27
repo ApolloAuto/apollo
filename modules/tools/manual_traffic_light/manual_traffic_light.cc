@@ -27,6 +27,7 @@
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/perception/proto/traffic_light_detection.pb.h"
 
+#include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/configs/config_gflags.h"
 #include "cybertron/common/log.h"
 #include "modules/common/util/color.h"
@@ -58,8 +59,11 @@ DEFINE_double(traffic_light_distance, 1000.0,
 class ManualTrafficLight final : public ::apollo::cybertron::TimerComponent {
  public:
   bool Init() {
+    AINFO << "Loading gflag from file: " << ConfigFilePath();
+    google::SetCommandLineOption("flagfile", ConfigFilePath().c_str());
+
     localization_reader_ = node_->CreateReader<LocalizationEstimate>(
-        "/apollo/localization/pose",
+        FLAGS_localization_topic,
         [this](const std::shared_ptr<LocalizationEstimate> &localization) {
           ADEBUG << "Received chassis data: run chassis callback.";
           OnLocalization(localization);
@@ -67,7 +71,8 @@ class ManualTrafficLight final : public ::apollo::cybertron::TimerComponent {
 
     traffic_light_detection_writer_ =
         node_->CreateWriter<TrafficLightDetection>(
-            "/apollo/perception/traffic_light");
+            FLAGS_traffic_light_detection_topic);
+
     return true;
   }
 

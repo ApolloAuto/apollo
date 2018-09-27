@@ -5,6 +5,7 @@ module_config {
     class_name : "ManualTrafficLight"
     config {
       name: "manual_traffic_light_componenet"
+      config_file_path:  "/apollo/modules/tools/manual_traffic_light/manual_traffic_light.conf"
       interval: 200 # milliseconds
     }
   }
