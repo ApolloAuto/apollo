@@ -141,8 +141,9 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
     return ComputeReinitStitchingTrajectory(vehicle_state);
   }
 
-  std::size_t position_matched_index = prev_trajectory->QueryNearestPoint(
-      {vehicle_state.x(), vehicle_state.y()});
+  std::size_t position_matched_index =
+      prev_trajectory->QueryNearestPointWithBuffer(
+      {vehicle_state.x(), vehicle_state.y()}, 1.0e-6);
 
   auto frenet_sd = ComputePositionProjection(
       vehicle_state.x(), vehicle_state.y(),
