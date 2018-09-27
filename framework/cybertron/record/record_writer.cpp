@@ -20,7 +20,7 @@ namespace apollo {
 namespace cybertron {
 namespace record {
 
-RecordWriter::RecordWriter() {}
+RecordWriter::RecordWriter() { header_ = HeaderBuilder::GetHeader(); }
 
 RecordWriter::~RecordWriter() { Close(); }
 
@@ -28,7 +28,6 @@ bool RecordWriter::Open(const std::string& file) {
   file_ = file;
   path_ = file_;
   file_writer_.reset(new RecordFileWriter());
-  header_ = HeaderBuilder::GetHeader();
   if (!file_writer_->Open(path_)) {
     AERROR << "open outfile failed. file: " << path_;
     return false;
@@ -116,6 +115,24 @@ void RecordWriter::ShowProgress() {
             << "    total channel num : " << channel_message_number_map_.size()
             << "  total msg num : " << ++total;
   std::cout.flush();
+}
+
+bool RecordWriter::SetSizeOfFileSegmentation(uint64_t size_kilobytes) {
+  if (is_opened_) {
+    AWARN << "please call this interface before opening file.";
+    return false;
+  }
+  header_.set_segment_raw_size(size_kilobytes * 1024UL);
+  return true;
+}
+
+bool RecordWriter::SetIntervalOfFileSegmentation(uint64_t time_sec) {
+  if (is_opened_) {
+    AWARN << "please call this interface before opening file.";
+    return false;
+  }
+  header_.set_segment_interval(time_sec * 1e9L);
+  return true;
 }
 
 }  // namespace record

@@ -174,6 +174,11 @@ void RecordFileWriter::Close() {
 
   if (is_writing_) {
     std::lock_guard<std::recursive_mutex> lock(chunk_mutex_);
+    // wait for the flush operation that may exist now
+    while (!chunk_flush_->empty()) {
+      std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    }
+
     {
       std::unique_lock<std::mutex> flush_lock(flush_mutex_);
       chunk_flush_.swap(chunk_active_);
@@ -336,13 +341,20 @@ bool RecordFileWriter::WriteMessage(const SingleMessage& message) {
     channel_message_number_map_.insert(std::make_pair(channel_name, 1));
   }
 
-  if (0 == header_.chunk_interval() && 0 == header_.chunk_raw_size()) {
-    return true;
+  bool need_flush = false;
+
+  if (header_.chunk_interval() > 0 &&
+      message.time() - chunk_active_->header_.begin_time() >
+          header_.chunk_interval()) {
+    need_flush = true;
   }
 
-  if (message.time() - chunk_active_->header_.begin_time() <
-          header_.chunk_interval() &&
-      chunk_active_->header_.raw_size() < header_.chunk_raw_size()) {
+  if (header_.chunk_raw_size() > 0 &&
+      chunk_active_->header_.raw_size() > header_.chunk_raw_size()) {
+    need_flush = true;
+  }
+
+  if (!need_flush) {
     return true;
   }
 

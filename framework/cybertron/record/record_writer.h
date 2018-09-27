@@ -54,8 +54,13 @@ class RecordWriter : public RecordBase {
 
   template <typename MessageT>
   bool WriteMessage(const std::string& channel_name, const MessageT& message,
-                    const uint64_t time, const std::string& proto_desc = "");
+                    const uint64_t time_nanosec,
+                    const std::string& proto_desc = "");
   void ShowProgress();
+
+  bool SetSizeOfFileSegmentation(uint64_t size_kilobytes);
+
+  bool SetIntervalOfFileSegmentation(uint64_t time_sec);
 
  private:
   bool WriteMessage(const SingleMessage& single_msg);
@@ -71,30 +76,31 @@ class RecordWriter : public RecordBase {
 template <>
 inline bool RecordWriter::WriteMessage(const std::string& channel_name,
                                        const std::string& content,
-                                       const uint64_t time,
+                                       const uint64_t time_nanosec,
                                        const std::string& proto_desc) {
   OnNewMessage(channel_name);
   SingleMessage single_msg;
   single_msg.set_channel_name(channel_name);
   single_msg.set_content(content);
-  single_msg.set_time(time);
+  single_msg.set_time(time_nanosec);
   return WriteMessage(single_msg);
 }
 
 template <>
 inline bool RecordWriter::WriteMessage(
     const std::string& channel_name, const std::shared_ptr<RawMessage>& message,
-    const uint64_t time, const std::string& proto_desc) {
+    const uint64_t time_nanosec, const std::string& proto_desc) {
   if (message == nullptr) {
     AERROR << "nullptr error, channel: " << channel_name;
     return false;
   }
-  return WriteMessage(channel_name, message->message, time);
+  return WriteMessage(channel_name, message->message, time_nanosec);
 }
 
 template <typename MessageT>
 bool RecordWriter::WriteMessage(const std::string& channel_name,
-                                const MessageT& message, const uint64_t time,
+                                const MessageT& message,
+                                const uint64_t time_nanosec,
                                 const std::string& proto_desc) {
   const std::string& message_type = GetMessageType(channel_name);
   if (message_type.empty()) {
@@ -116,7 +122,7 @@ bool RecordWriter::WriteMessage(const std::string& channel_name,
     AERROR << "Failed to serialize message, channel: " << channel_name;
     return false;
   }
-  return WriteMessage(channel_name, content, time);
+  return WriteMessage(channel_name, content, time_nanosec);
 }
 
 }  // namespace record
