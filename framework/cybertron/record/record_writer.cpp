@@ -95,6 +95,10 @@ bool RecordWriter::WriteMessage(const SingleMessage& message) {
   if (segment_begin_time_ == 0) {
     segment_begin_time_ = message.time();
   }
+  if (segment_begin_time_ > message.time()) {
+    segment_begin_time_ = message.time();
+  }
+
   if ((header_.segment_interval() > 0 &&
        message.time() - segment_begin_time_ > header_.segment_interval()) ||
       (header_.segment_raw_size() > 0 &&

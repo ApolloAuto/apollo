@@ -72,7 +72,12 @@ struct Chunk {
     if (0 == header_.begin_time()) {
       header_.set_begin_time(message.time());
     }
-    header_.set_end_time(message.time());
+    if (header_.begin_time() > message.time()) {
+      header_.set_begin_time(message.time());
+    }
+    if (header_.end_time() < message.time()) {
+      header_.set_end_time(message.time());
+    }
     header_.set_message_number(header_.message_number() + 1);
     header_.set_raw_size(header_.raw_size() + message.content().size());
   }
