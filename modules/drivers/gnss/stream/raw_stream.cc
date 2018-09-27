@@ -21,10 +21,9 @@
 #include <vector>
 
 #include "cybertron/cybertron.h"
+#include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/util/message_util.h"
-
 #include "modules/drivers/gnss/proto/config.pb.h"
-
 #include "modules/drivers/gnss/stream/raw_stream.h"
 #include "modules/drivers/gnss/stream/stream.h"
 
@@ -157,8 +156,7 @@ bool RawStream::Init() {
   stream_status_.set_ins_stream_type(StreamStatus::DISCONNECTED);
   stream_status_.set_rtk_stream_in_type(StreamStatus::DISCONNECTED);
   stream_status_.set_rtk_stream_out_type(StreamStatus::DISCONNECTED);
-  stream_writer_ =
-      node_->CreateWriter<StreamStatus>(config_.stream_channel_name());
+  stream_writer_ = node_->CreateWriter<StreamStatus>(FLAGS_stream_status_topic);
 
   common::util::FillHeader("gnss", &stream_status_);
   stream_writer_->Write(std::make_shared<StreamStatus>(stream_status_));
@@ -271,17 +269,18 @@ bool RawStream::Init() {
   gpsbin_stream_.reset(new std::ofstream(
       gpsbin_file, std::ios::app | std::ios::out | std::ios::binary));
   stream_writer_ =
-      node_->CreateWriter<StreamStatus>(config_.stream_channel_name());
-  raw_writer_ = node_->CreateWriter<RawData>(config_.raw_channel_name());
-  rtcm_writer_ = node_->CreateWriter<RawData>(config_.rtcm_channel_name());
-  gpsbin_reader_ = node_->CreateReader<RawData>(
-      config_.raw_channel_name(),
+      node_->CreateWriter<StreamStatus>(FLAGS_stream_status_topic);
+  raw_writer_ = node_->CreateWriter<RawData>(FLAGS_gnss_raw_data_topic);
+  rtcm_writer_ = node_->CreateWriter<RawData>(FLAGS_rtcm_data_topic);
+  cybertron::ReaderConfig reader_config;
+  reader_config.channel_name = FLAGS_gnss_raw_data_topic;
+  reader_config.pending_queue_size = 100;
+  gpsbin_reader_ = node_->CreateReader<RawData>(reader_config, 
       [&](const std::shared_ptr<RawData> &raw_data) {
         GpsbinCallback(raw_data);
       });
-
   chassis_reader_ = node_->CreateReader<Chassis>(
-      config_.chassis_channel_name(),
+      FLAGS_chassis_topic,
       [&](const std::shared_ptr<Chassis> &chassis) { chassis_ptr_ = chassis; });
 
   return true;

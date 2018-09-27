@@ -23,8 +23,8 @@
 #include "Eigen/Geometry"
 #include "boost/array.hpp"
 #include "cybertron/cybertron.h"
+#include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/util/message_util.h"
-
 #include "modules/drivers/gnss/proto/gnss_best_pose.pb.h"
 #include "modules/drivers/gnss/proto/gnss_raw_observation.pb.h"
 #include "modules/drivers/gnss/proto/heading.pb.h"
@@ -84,24 +84,19 @@ bool DataParser::Init() {
   gnss_status_.mutable_header()->set_timestamp_sec(
       cybertron::Time::Now().ToSecond());
 
-  gnssstatus_writer_ =
-      node_->CreateWriter<GnssStatus>(config_.gnssstatus_channel_name());
-  insstatus_writer_ =
-      node_->CreateWriter<InsStatus>(config_.insstatus_channel_name());
+  gnssstatus_writer_ = node_->CreateWriter<GnssStatus>(FLAGS_chassis_topic);
+  insstatus_writer_ = node_->CreateWriter<InsStatus>(FLAGS_ins_status_topic);
   gnssbestpose_writer_ =
-      node_->CreateWriter<GnssBestPose>(config_.bestpos_channel_name());
-  corrimu_writer_ =
-      node_->CreateWriter<CorrectedImu>(config_.corrimu_channel_name());
-  insstat_writer_ =
-      node_->CreateWriter<InsStat>(config_.insstat_channel_name());
+      node_->CreateWriter<GnssBestPose>(FLAGS_gnss_best_pose_topic);
+  corrimu_writer_ = node_->CreateWriter<CorrectedImu>(FLAGS_imu_topic);
+  insstat_writer_ = node_->CreateWriter<InsStat>(FLAGS_ins_stat_topic);
   gnssephemeris_writer_ =
-      node_->CreateWriter<GnssEphemeris>(config_.gnssephemeris_channel_name());
-  epochobservation_writer_ = node_->CreateWriter<EpochObservation>(
-      config_.epochobservation_channel_name());
-  heading_writer_ =
-      node_->CreateWriter<Heading>(config_.heading_channel_name());
-  rawimu_writer_ = node_->CreateWriter<Imu>(config_.rawimu_channel_name());
-  gps_writer_ = node_->CreateWriter<Gps>(config_.gps_channel_name());
+      node_->CreateWriter<GnssEphemeris>(FLAGS_gnss_rtk_eph_topic);
+  epochobservation_writer_ =
+      node_->CreateWriter<EpochObservation>(FLAGS_gnss_rtk_obs_topic);
+  heading_writer_ = node_->CreateWriter<Heading>(FLAGS_heading_topic);
+  rawimu_writer_ = node_->CreateWriter<Imu>(FLAGS_raw_imu_topic);
+  gps_writer_ = node_->CreateWriter<Gps>(FLAGS_gps_topic);
 
   common::util::FillHeader("gnss", &ins_status_);
   insstatus_writer_->Write(std::make_shared<InsStatus>(ins_status_));
