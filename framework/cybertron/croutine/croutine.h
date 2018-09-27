@@ -91,10 +91,9 @@ class CRoutine {
     CRoutine::Yield();
   }
 
-  inline void Sleep(const Duration& sleep_duration) {
+  inline void Sleep(const Duration &sleep_duration) {
     state_ = RoutineState::SLEEP;
-    wake_time_ =
-        std::chrono::steady_clock::now() + sleep_duration;
+    wake_time_ = std::chrono::steady_clock::now() + sleep_duration;
     statistic_info_.sleep_time += sleep_duration.count() / 1000;
     CRoutine::Yield();
   }

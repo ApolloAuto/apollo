@@ -93,4 +93,4 @@ install(DIRECTORY "cybertron"
   )
 
 enable_testing()
-add_subdirectory(cybertron/test)
+#add_subdirectory(cybertron/test)
