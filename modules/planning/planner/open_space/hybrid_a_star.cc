@@ -24,10 +24,10 @@ namespace apollo {
 namespace planning {
 
 HybridAStar::HybridAStar() {
-  CHECK(common::util::GetProtoFromFile(FLAGS_open_space_config_filename,
+  CHECK(common::util::GetProtoFromFile(FLAGS_planner_open_space_config_filename,
                                        &open_space_conf_))
       << "Failed to load open space planner config file "
-      << FLAGS_open_space_config_filename;
+      << FLAGS_planner_open_space_config_filename;
   reed_shepp_generator_.reset(new ReedShepp(vehicle_param_, open_space_conf_));
   next_node_num_ = open_space_conf_.next_node_num();
   max_steer_ = open_space_conf_.max_steering();
@@ -54,8 +54,9 @@ bool HybridAStar::AnalyticExpansion(std::shared_ptr<Node3d> current_node,
 
 bool HybridAStar::RSPCheck(const ReedSheppPath* reeds_shepp_to_end) {
   for (std::size_t i = 0; i < reeds_shepp_to_end->x.size(); i++) {
-    Node3d node(reeds_shepp_to_end->x[i], reeds_shepp_to_end->y[i],
-                reeds_shepp_to_end->phi[i], open_space_conf_);
+    std::shared_ptr<Node3d> node = std::shared_ptr<Node3d>(
+        new Node3d(reeds_shepp_to_end->x[i], reeds_shepp_to_end->y[i],
+                   reeds_shepp_to_end->phi[i], open_space_conf_));
     if (!ValidityCheck(node)) {
       return false;
     }
@@ -63,9 +64,9 @@ bool HybridAStar::RSPCheck(const ReedSheppPath* reeds_shepp_to_end) {
   return true;
 }
 
-bool HybridAStar::ValidityCheck(Node3d& node) {
+bool HybridAStar::ValidityCheck(std::shared_ptr<Node3d> node) {
   for (const auto& obstacle_box : (*obstacles_).Items()) {
-    if (node.GetBoundingBox(vehicle_param_)
+    if (node->GetBoundingBox(vehicle_param_)
             .HasOverlap((*obstacle_box).PerceptionBoundingBox())) {
       return false;
     }
@@ -271,7 +272,7 @@ bool HybridAStar::Plan(double sx, double sy, double sphi, double ex, double ey,
     for (std::size_t i = 0; i < next_node_num_; i++) {
       std::shared_ptr<Node3d> next_node = Next_node_generator(current_node, i);
       // boundary and validity check
-      if (!ValidityCheck(*next_node)) {
+      if (!ValidityCheck(next_node)) {
         continue;
       }
       // check if the node is already in the close set
@@ -280,7 +281,6 @@ bool HybridAStar::Plan(double sx, double sy, double sphi, double ex, double ey,
       }
 
       if (open_set_.find(next_node->GetIndex()) == open_set_.end()) {
-        // TODO: only calculate cost here
         ReedSheppPath reeds_shepp_heuristic;
         AnalyticExpansion(next_node, &reeds_shepp_heuristic);
         CalculateNodeCost(current_node, next_node, &reeds_shepp_heuristic);

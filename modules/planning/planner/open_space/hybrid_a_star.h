@@ -24,6 +24,7 @@
 #include <map>
 #include <memory>
 #include <queue>
+#include <utility>
 #include <vector>
 
 #include "modules/planning/open_space/node3d.h"
@@ -51,7 +52,7 @@ struct Result {
 
 class HybridAStar {
  public:
-  explicit HybridAStar();
+  HybridAStar();
   virtual ~HybridAStar() = default;
   bool Plan(double sx, double sy, double sphi, double ex, double ey,
             double ephi, ThreadSafeIndexedObstacles* obstacles, Result* result);
@@ -63,7 +64,7 @@ class HybridAStar {
   // not complete
   std::vector<std::shared_ptr<Node3d>> KinemeticModelExpansion();
   // check collision and validity
-  bool ValidityCheck(Node3d& node);
+  bool ValidityCheck(std::shared_ptr<Node3d> node);
   // check Reeds Shepp path collision and validity
   bool RSPCheck(const ReedSheppPath* reeds_shepp_to_end);
   // load the whole RSP as nodes and add to the close set

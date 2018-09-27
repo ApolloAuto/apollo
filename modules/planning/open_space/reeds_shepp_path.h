@@ -25,6 +25,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <utility>
 
 #include "cybertron/common/log.h"
 #include "cybertron/common/macros.h"
@@ -82,9 +83,9 @@ class ReedShepp {
       std::vector<ReedSheppPath>* all_possible_paths);
   // Interpolation usde in GenetateLocalConfiguration
   void Interpolation(double index, double pd, char m, double ox, double oy,
-                     double ophi, std::vector<double>& px,
-                     std ::vector<double>& py, std::vector<double>& pphi,
-                     std::vector<bool>& pgear);
+                     double ophi, std::vector<double>* px,
+                     std::vector<double>* py, std::vector<double>* pphi,
+                     std::vector<bool>* pgear);
   // motion primitives combination setup function
   bool SetRSP(int size, double lengths[], char types[],
               std::vector<ReedSheppPath>* all_possible_paths);
