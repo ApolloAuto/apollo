@@ -166,4 +166,34 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "hm_multi_target_tracker",
+    srcs = [
+        "hm_multi_target_tracker.cc",
+    ],
+    hdrs = [
+        "hm_multi_target_tracker.h",
+    ],
+    deps = [
+        ":object_track_matcher",
+        ":tracker",
+        ":track_object_distance",
+        "//modules/common/util:file_util",
+        "//modules/perception/base:object",
+        "//modules/perception/lib/io:file_util",
+        "//modules/perception/proto:hm_tracker_config_proto",
+        "//modules/perception/lib/config_manager:config_manager",
+        "//modules/perception/common/graph:secure_matrix",
+        "//modules/perception/common/geometry:convex_hull_2d",
+        "//modules/perception/lidar/lib/interface:base_multi_target_tracker",
+        "//modules/perception/lidar/lib/interface:base_bipartite_graph_matcher",
+        "//modules/perception/lidar/lib/tracker/common:track_data",
+        "//modules/perception/lidar/lib/tracker/common:tracked_object",
+        "//modules/perception/lidar/lib/tracker/common:track_pool_types",
+        "//modules/perception/lidar/common:feature_descriptor",
+        "//modules/perception/lidar/common:lidar_object_util",
+        "//framework:cybertron",
+    ],
+)
+
 cpplint()
