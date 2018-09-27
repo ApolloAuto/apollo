@@ -365,9 +365,9 @@ float TrackObjectDistance::ComputeLidarLidar(
                                .norm();
   if (center_distance > s_lidar2lidar_association_center_dist_threshold_) {
     ADEBUG << "center distance exceed lidar2lidar tight threshold: "
-              << "center_dist@" << center_distance << ", "
-              << "tight_threh@"
-              << s_lidar2lidar_association_center_dist_threshold_;
+           << "center_dist@" << center_distance << ", "
+           << "tight_threh@"
+           << s_lidar2lidar_association_center_dist_threshold_;
     return (std::numeric_limits<float>::max)();
   }
   float distance =
@@ -389,9 +389,9 @@ float TrackObjectDistance::ComputeLidarRadar(
                                .norm();
   if (center_distance > s_lidar2radar_association_center_dist_threshold_) {
     ADEBUG << "center distance exceed lidar2radar tight threshold: "
-              << "center_dist@" << center_distance << ", "
-              << "tight_threh@"
-              << s_lidar2radar_association_center_dist_threshold_;
+           << "center_dist@" << center_distance << ", "
+           << "tight_threh@"
+           << s_lidar2radar_association_center_dist_threshold_;
     return (std::numeric_limits<float>::max)();
   }
   float distance =
@@ -412,9 +412,9 @@ float TrackObjectDistance::ComputeRadarRadar(
                                .norm();
   if (center_distance > s_radar2radar_association_center_dist_threshold_) {
     ADEBUG << "center distance exceed radar2radar tight threshold: "
-              << "center_dist@" << center_distance << ", "
-              << "tight_threh@"
-              << s_radar2radar_association_center_dist_threshold_;
+           << "center_dist@" << center_distance << ", "
+           << "tight_threh@"
+           << s_radar2radar_association_center_dist_threshold_;
     return (std::numeric_limits<float>::max)();
   }
   float distance =
@@ -616,7 +616,7 @@ double TrackObjectDistance::ComputeLidarCameraSimilarity(
   if (!QueryLidar2WorldPose(lidar, &lidar2world_pose)) {
     return similarity;
   }
-  Eigen::Matrix4d lidar2camera_pose = world2camera_pose * lidar2world_pose;
+  // Eigen::Matrix4d lidar2camera_pose = world2camera_pose * lidar2world_pose;
   // 2. compute similarity of camera vs. velodyne64 observation
   const base::PointFCloud& cloud =
       lidar->GetBaseObject()->lidar_supplement.cloud;
@@ -761,7 +761,7 @@ bool TrackObjectDistance::ComputePolygonCenter(
     int range, Eigen::Vector3d* center) {
   base::PolygonDType polygon_part;
   std::map<double, int> distance2idx;
-  for (int idx = 0; idx < polygon.size(); ++idx) {
+  for (size_t idx = 0; idx < polygon.size(); ++idx) {
     const auto& point = polygon.at(idx);
     double distance =
         sqrt(pow(point.x - ref_pos(0), 2) + pow(point.y - ref_pos(1), 2));

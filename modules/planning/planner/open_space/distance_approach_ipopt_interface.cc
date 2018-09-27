@@ -352,9 +352,9 @@ bool DistanceApproachIPOPTInterface::get_starting_point(
   CHECK(init_z == false) << "Warm start init_z setting failed";
   CHECK(init_lambda == false) << "Warm start init_lambda setting failed";
 
-  auto offset_time = horizon_ * 4;
+  // auto offset_time = horizon_ * 4;
 
-  auto offset_input = horizon_ * 2 + offset_time;
+  // auto offset_input = horizon_ * 2 + offset_time;
 
   // auto offset_l = offset_input + (horizon_ + 1) * 4;  // sum of nOb.
 
