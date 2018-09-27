@@ -459,13 +459,19 @@ class VoxelGridXY {
   bool alloc_aligned_memory();
 
  private:
-  unsigned int _nr_points, _nr_point_element;
-  unsigned int _nr_voxel_x, _nr_voxel_y, _nr_voxel_z;
   const T* _data; /*point clouds memory*/
-  bool _initialized;
-  T _dim_x[2], _dim_y[2], _dim_z[2], _voxel_dim[3];
   float* _mem_aligned16_f32;
   int* _mem_aligned16_i32;
+  unsigned int _nr_points;
+  unsigned int _nr_point_element;
+  unsigned int _nr_voxel_x;
+  unsigned int _nr_voxel_y;
+  unsigned int _nr_voxel_z;
+  bool _initialized;
+  T _dim_x[2];
+  T _dim_y[2];
+  T _dim_z[2];
+  T _voxel_dim[3];
   std::vector<Voxel<T>> _voxels;
 };
 

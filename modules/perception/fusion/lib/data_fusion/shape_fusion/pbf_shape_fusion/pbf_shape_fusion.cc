@@ -26,7 +26,7 @@ bool PbfShapeFusion::Init() { return true; }
 
 void PbfShapeFusion::UpdateWithMeasurement(const SensorObjectPtr measurement,
                                            double target_timestamp) {
-  base::SensorType sensor_type = measurement->GetSensorType();
+  // base::SensorType sensor_type = measurement->GetSensorType();
   SensorObjectConstPtr latest_lidar = track_ref_->GetLatestLidarObject();
   SensorObjectConstPtr latest_radar = track_ref_->GetLatestRadarObject();
   SensorObjectConstPtr latest_camera = track_ref_->GetLatestCameraObject();

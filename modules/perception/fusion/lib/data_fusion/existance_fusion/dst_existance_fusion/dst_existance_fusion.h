@@ -92,14 +92,14 @@ class DstExistanceFusion : public BaseExistanceFusion {
   void UpdateExistanceState();
 
  private:
-  Dst fused_existance_;
   double existance_score_ = 0.0;
   Dst fused_toic_;
+  Dst fused_existance_;
   double toic_score_ = 0.0;
 
  private:
-  static const char* name_;
-  static const char* toic_name_;
+  static const char *name_;
+  static const char *toic_name_;
   static ExistanceDstMaps existance_dst_maps_;
   static ToicDstMaps toic_dst_maps_;
   static DstExistanceFusionOptions options_;
@@ -109,4 +109,4 @@ class DstExistanceFusion : public BaseExistanceFusion {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  MODULES_PERCEPTION_FUSION_LIB_DATA_FUSION_EXISTANCE_FUSION_DST_EXISTANCE_FUSION_H_  // NOLINT
+#endif
