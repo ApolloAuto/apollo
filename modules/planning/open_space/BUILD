@@ -44,4 +44,14 @@ cc_test(
         "@gtest//:main",],
 )
 
+cc_test(
+    name = "node3d_test",
+    size = "small",
+    srcs = ["node3d_test.cc"],
+    deps = [
+        "//framework:cybertron",
+        "//modules/planning/open_space:open_space_utils",
+        "@gtest//:main",
+    ],
+)
 cpplint()

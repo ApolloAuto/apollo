@@ -54,7 +54,7 @@ class HybridAStar {
   explicit HybridAStar();
   virtual ~HybridAStar() = default;
   bool Plan(double sx, double sy, double sphi, double ex, double ey,
-            double ephi, std::vector<const Obstacle*> obstacles, Result* result);
+            double ephi, ThreadSafeIndexedObstacles* obstacles, Result* result);
 
  private:
   // not complete
@@ -68,7 +68,7 @@ class HybridAStar {
   bool RSPCheck(const ReedSheppPath* reeds_shepp_to_end);
   // load the whole RSP as nodes and add to the close set
   std::shared_ptr<Node3d> LoadRSPinCS(const ReedSheppPath* reeds_shepp_to_end,
-                   std::shared_ptr<Node3d> current_node);
+                                      std::shared_ptr<Node3d> current_node);
   std::shared_ptr<Node3d> Next_node_generator(
       std::shared_ptr<Node3d> current_node, std::size_t next_node_index);
   void CalculateNodeCost(std::shared_ptr<Node3d> current_node,
@@ -93,7 +93,7 @@ class HybridAStar {
   double gear_switch_penalty_ = 0.0;
   double steer_penalty_ = 0.0;
   double steer_change_penalty_ = 0.0;
-  std::vector<const Obstacle*> obstacles_;
+  ThreadSafeIndexedObstacles* obstacles_;
   std::shared_ptr<Node3d> start_node_;
   std::shared_ptr<Node3d> end_node_;
   struct cmp {

@@ -174,4 +174,16 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "hybrid_a_star_test",
+    size = "medium",
+    srcs = [
+        "hybrid_a_star_test.cc",
+    ],
+    deps = [
+    "//modules/planning/planner/open_space:hybrid_a_star",
+    "@gtest//:main",
+    ],
+)
+
 cpplint()

@@ -134,7 +134,8 @@ bool ReedShepp::SCS(double x, double y, double phi,
   SLS(x, y, phi, &SLS_param);
   double SLS_lengths[3] = {SLS_param.t, SLS_param.u, SLS_param.v};
   char SLS_types[] = "SLS";
-  if (SLS_param.flag && !SetRSP(3, SLS_lengths, SLS_types, all_possible_paths)) {
+  if (SLS_param.flag &&
+      !SetRSP(3, SLS_lengths, SLS_types, all_possible_paths)) {
     AINFO << "Fail at SetRSP with SLS_param";
     return false;
   }
@@ -142,7 +143,8 @@ bool ReedShepp::SCS(double x, double y, double phi,
   SLS(x, -y, -phi, &SRS_param);
   double SRS_lengths[3] = {SRS_param.t, SRS_param.u, SRS_param.v};
   char SRS_types[] = "SRS";
-  if (SRS_param.flag && !SetRSP(3, SRS_lengths, SRS_types, all_possible_paths)) {
+  if (SRS_param.flag &&
+      !SetRSP(3, SRS_lengths, SRS_types, all_possible_paths)) {
     AINFO << "Fail at SetRSP with SRS_param";
     return false;
   }
@@ -866,10 +868,10 @@ bool ReedShepp::GenerateLocalConfigurations(
     const std::shared_ptr<Node3d> start_node,
     const std::shared_ptr<Node3d> end_node,
     std::vector<ReedSheppPath>* all_possible_paths) {
-    double step_scaled = open_space_conf_.step_size() * max_kappa_;
+  double step_scaled = open_space_conf_.step_size() * max_kappa_;
   for (auto& path : *all_possible_paths) {
-    std::size_t point_num = path.total_length / step_scaled +
-                            path.segs_lengths.size() + 3;
+    std::size_t point_num =
+        path.total_length / step_scaled + path.segs_lengths.size() + 3;
     std::vector<double> px(point_num, 0.0);
     std::vector<double> py(point_num, 0.0);
     std::vector<double> pphi(point_num, 0.0);
