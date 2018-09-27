@@ -201,4 +201,18 @@ proto_library(
     ],
 )
 
+cc_proto_library(
+    name = "dst_type_fusion_config_proto",
+    deps = [
+        ":dst_type_fusion_config_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "dst_type_fusion_config_proto_lib",
+    srcs = [
+        "dst_type_fusion_config.proto",
+    ],
+)
+
 cpplint()
