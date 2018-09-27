@@ -16,8 +16,10 @@
 #ifndef MODULES_PERCEPTION_LIDAR_LIB_CLASSIFIER_FUSED_CLASSIFIER_H_
 #define MODULES_PERCEPTION_LIDAR_LIB_CLASSIFIER_FUSED_CLASSIFIER_H_
 
-#include <string>
 #include <memory>
+#include <string>
+
+#include "gtest/gtest_prod.h"
 
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lidar/common/lidar_frame.h"
@@ -41,6 +43,9 @@ class FusedClassifier : public BaseClassifier {
   std::string Name() const override { return "FusedClassifier"; }
 
  private:
+  FRIEND_TEST(FusedClassifierTest, test_one_shot_fusion);
+  FRIEND_TEST(FusedClassifierTest, test_one_sequence_fusion);
+  FRIEND_TEST(FusedClassifierTest, test_one_sequence_fusion_bad_timestamp);
   ObjectSequence sequence_;
   double temporal_window_ = 20.0;
   bool enable_temporal_fusion_ = true;

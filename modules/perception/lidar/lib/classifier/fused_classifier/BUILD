@@ -11,8 +11,8 @@ cc_library(
         "util.h",
     ],
     deps = [
-        "//modules/perception/base:object",
         "//framework:cybertron",
+        "//modules/perception/base:object",
         "@eigen",
     ],
 )
@@ -24,8 +24,8 @@ cc_library(
     ],
     deps = [
         "//modules/perception/base:object",
-        "//modules/perception/lib/registerer:registerer",
-        "//modules/perception/lidar/common:common",
+        "//modules/perception/lib/registerer",
+        "//modules/perception/lidar/common",
     ],
 )
 
@@ -38,16 +38,16 @@ cc_library(
         "ccrf_type_fusion.h",
     ],
     deps = [
-        ":util",
         ":type_fusion_interface",
+        ":util",
+        "//framework:cybertron",
         "//modules/common/util:file_util",
         "//modules/perception/base:object",
         "//modules/perception/base:point_cloud",
-        "//modules/perception/lib/config_manager:config_manager",
+        "//modules/perception/lib/config_manager",
         "//modules/perception/lib/io:file_util",
         "//modules/perception/lidar/common:object_sequence",
         "//modules/perception/proto:ccrf_type_fusion_config_proto",
-        "//framework:cybertron",
     ],
 )
 
@@ -61,14 +61,26 @@ cc_library(
     ],
     deps = [
         ":type_fusion_interface",
+        "//framework:cybertron",
         "//modules/common/util:file_util",
-        "//modules/perception/proto:fused_classifier_config_proto",
-        "//modules/perception/lib/config_manager:config_manager",
+        "//modules/perception/lib/config_manager",
         "//modules/perception/lib/io:file_util",
         "//modules/perception/lidar/common:lidar_frame",
         "//modules/perception/lidar/common:object_sequence",
         "//modules/perception/lidar/lib/interface:base_classifier",
-        "//framework:cybertron",
+        "//modules/perception/proto:fused_classifier_config_proto",
+    ],
+)
+
+cc_library(
+    name = "fused_classifier_test",
+    srcs = [
+        "fused_classifier_test.cc",
+    ],
+    deps = [
+        ":fused_classifier",
+        ":util",
+        "@gtest//:main",
     ],
 )
 

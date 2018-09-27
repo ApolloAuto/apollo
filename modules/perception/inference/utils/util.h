@@ -18,14 +18,14 @@
 #define MODULES_PERCEPTION_INFERENCE_UTILS_UTIL_H_
 
 #include <cuda_runtime_api.h>
-
-#include <boost/shared_ptr.hpp>
 #include <fstream>
 #include <iostream>
 #include <map>
 #include <memory>
 #include <string>
 #include <vector>
+
+#include "boost/shared_ptr.hpp"
 
 #include "modules/perception/base/blob.h"
 
