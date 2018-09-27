@@ -19,12 +19,12 @@
 
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lib/io/file_util.h"
-#include "modules/perception/lib/io/protobuf_util.h"
+#include "modules/common/util/file.h"
 
 #include "modules/perception/fusion/base/base_init_options.h"
 #include "modules/perception/fusion/base/sensor_data_manager.h"
 #include "modules/perception/fusion/common/camera_util.h"
-#include "modules/perception/fusion/lib/data_fusion/type_fusion/dst_type_fusion/proto/dst_type_fusion_config.pb.h"
+#include "modules/perception/proto/dst_type_fusion_config.pb.h"
 
 namespace apollo {
 namespace perception {
@@ -41,7 +41,7 @@ std::string vector2string(const std::vector<Type> &values) {
   return oss.str();
 }
 
-std::string DstTypeFusion::name_ = "DstTypeFusion";
+std::string DstTypeFusion::name_ = "DstTypeFusion";  // NOLINT
 DstMaps DstTypeFusion::dst_maps_;
 DstTypeFusionOptions DstTypeFusion::options_;
 
@@ -82,7 +82,7 @@ bool DstTypeFusion::Init() {
       lib::FileUtil::GetAbsolutePath(woork_root_config, options.conf_file);
   DstTypeFusionConfig params;
 
-  if (!lib::ParseProtobufFromFile<DstTypeFusionConfig>(config, &params)) {
+  if (!apollo::common::util::GetProtoFromFile(config, &params)) {
     AERROR << "Read config failed: " << config;
     return false;
   }
@@ -210,7 +210,7 @@ void DstTypeFusion::UpdateWithoutMeasurement(const std::string &sensor_id,
 std::string DstTypeFusion::Name() const { return name_; }
 
 bool DstTypeFusion::TypToHyp(size_t object_type,
-                             uint64_t &hypothesis_type) const {
+                             uint64_t hypothesis_type) const {
   auto find_res = dst_maps_.typ_to_hyp_map_.find(object_type);
   if (find_res == dst_maps_.typ_to_hyp_map_.end()) {
     return false;
@@ -220,7 +220,7 @@ bool DstTypeFusion::TypToHyp(size_t object_type,
 }
 
 bool DstTypeFusion::HypToTyp(uint64_t hypothesis_type,
-                             size_t &object_type) const {
+                             size_t object_type) const {
   auto find_res = dst_maps_.hyp_to_typ_map_.find(hypothesis_type);
   if (find_res == dst_maps_.hyp_to_typ_map_.end()) {
     return false;
