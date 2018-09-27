@@ -6,6 +6,7 @@ add_library(${PROJECT_NAME}
   record_base.cpp
   record_writer.cpp
   record_reader.cpp
+  record_viewer.cpp
 )
 
 target_link_libraries(${PROJECT_NAME}

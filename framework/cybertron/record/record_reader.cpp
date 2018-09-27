@@ -20,49 +20,31 @@ namespace apollo {
 namespace cybertron {
 namespace record {
 
-RecordReader::~RecordReader() {
-}
+RecordReader::~RecordReader() {}
 
-RecordReader::RecordReader(const std::shared_ptr<RecordFileReader>& file, 
-                           uint64_t begin_time,
-                           uint64_t end_time,
-                           const std::set<std::string>& channels) {
-  begin_time_ = begin_time;
-  end_time_ = end_time;
-  channels_ = channels;
-  file_reader_ = file;
-
+RecordReader::RecordReader(const std::string& file) {
+  file_reader_.reset(new RecordFileReader());
+  file_reader_->Open(file);
   header_ = file_reader_->GetHeader();
-  file_reader_->Reset();
-  if (begin_time_ < header_.begin_time()) {
-    begin_time_ = header_.begin_time();
-  }
-
-  if (end_time_ > header_.end_time()) {
-    end_time_ = header_.end_time();
-  }
-
-  if (begin_time_ > end_time_) {
-    AERROR << "Begin time must be earlier than end time"
-           << ", begin_time_=" << begin_time_ << ", end_time_=" << end_time_;
-  } 
 }
 
-bool RecordReader::ReadMessage(RecordMessage* message) {
+void RecordReader::Reset() { file_reader_->Reset(); }
+
+const Header& RecordReader::header() const { return header_; }
+
+bool RecordReader::ReadMessage(RecordMessage* message, uint64_t begin_time,
+                               uint64_t end_time) {
   while (index_ < chunk_.messages_size()) {
     const auto& next_message = chunk_.messages(index_++);
     uint64_t time = next_message.time();
-    if (time > end_time_) {
+    if (time > end_time) {
       return false;
     }
-    if (time < begin_time_) {
+    if (time < begin_time) {
       continue;
     }
 
     const std::string& channel_name = next_message.channel_name();
-    if (!channels_.empty() && channels_.count(channel_name) == 0) {
-      continue;
-    }
     OnNewMessage(channel_name);
     message->channel_name = channel_name;
     message->content = next_message.content();
@@ -70,14 +52,15 @@ bool RecordReader::ReadMessage(RecordMessage* message) {
     return true;
   }
 
-  if (ReadNextChunk()) {
+  if (ReadNextChunk(&chunk_, begin_time, end_time)) {
     index_ = 0;
-    return ReadMessage(message);
+    return ReadMessage(message, begin_time, end_time);
   }
   return false;
 }
 
-bool RecordReader::ReadNextChunk() {
+bool RecordReader::ReadNextChunk(ChunkBody* chunk, uint64_t begin_time,
+                                 uint64_t end_time) {
   bool skip_next_chunk_body = false;
   Section section;
   while (file_reader_->ReadSection(&section)) {
@@ -93,7 +76,8 @@ bool RecordReader::ReadNextChunk() {
           AERROR << "Failed to read channel section.";
           return false;
         }
-        OnNewChannel(channel.name(), channel.message_type(), channel.proto_desc());
+        OnNewChannel(channel.name(), channel.message_type(),
+                     channel.proto_desc());
         break;
       }
       case SectionType::SECTION_CHUNK_HEADER: {
@@ -103,10 +87,10 @@ bool RecordReader::ReadNextChunk() {
           AERROR << "Failed to read chunk header section.";
           return false;
         }
-        if (begin_time_ > header.end_time()) {
+        if (begin_time > header.end_time()) {
           return false;
         }
-        if (end_time_ < header.begin_time()) {
+        if (end_time < header.begin_time()) {
           skip_next_chunk_body = true;
         }
         break;
@@ -117,7 +101,7 @@ bool RecordReader::ReadNextChunk() {
           skip_next_chunk_body = false;
           break;
         }
-        if (!file_reader_->ReadSection<ChunkBody>(section.size, &chunk_)) {
+        if (!file_reader_->ReadSection<ChunkBody>(section.size, chunk)) {
           AERROR << "Failed to read chunk body section.";
           return false;
         }
