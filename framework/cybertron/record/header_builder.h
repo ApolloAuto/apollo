@@ -27,8 +27,8 @@ class HeaderBuilder {
  public:
   static proto::Header GetHeaderWithSegmentParams(
       const uint64_t segment_interval, const uint64_t segment_raw_size);
-  static proto::Header GetHeaderWithChunkParams(
-      const uint64_t chunk_interval, const uint64_t chunk_raw_size);
+  static proto::Header GetHeaderWithChunkParams(const uint64_t chunk_interval,
+                                                const uint64_t chunk_raw_size);
   static proto::Header GetHeader();
 
  private:

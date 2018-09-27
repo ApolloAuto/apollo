@@ -37,12 +37,9 @@ using ::apollo::cybertron::record::RecordFileReader;
 
 struct RecordMessage {
   RecordMessage() {}
-  RecordMessage(const std::string& name, 
-                const std::string& message,
+  RecordMessage(const std::string& name, const std::string& message,
                 uint64_t msg_time)
-      : channel_name(name),
-        content(message), 
-        time(msg_time) {}
+      : channel_name(name), content(message), time(msg_time) {}
   std::string channel_name;
   std::string content;
   uint64_t time;

@@ -39,24 +39,19 @@ using ::apollo::cybertron::record::RecordFileReader;
 
 class RecordReader : public RecordBase {
  public:
-  RecordReader(const std::shared_ptr<RecordFileReader>& file, 
-               uint64_t begin_time,
-               uint64_t end_time,
-               const std::set<std::string>& channel_filter);
+  explicit RecordReader(const std::string& file);
   virtual ~RecordReader();
-  bool ReadMessage(RecordMessage* message);
+  bool ReadMessage(RecordMessage* message, uint64_t begin_time = 0,
+                   uint64_t end_time = UINT64_MAX);
+  const Header& header() const;
+  void Reset();
 
  private:
-  bool ReadNextChunk();
-
-  uint64_t begin_time_ = 0;
-  uint64_t end_time_ = UINT64_MAX;
-  std::set<std::string> channels_;
-  std::shared_ptr<RecordFileReader> file_reader_ = nullptr;
-
+  bool ReadNextChunk(ChunkBody* chunk, uint64_t begin_time, uint64_t end_time);
   ChunkBody chunk_;
   uint64_t pos = 0;
   uint32_t index_ = 0;
+  std::unique_ptr<RecordFileReader> file_reader_;
 };
 
 }  // namespace record

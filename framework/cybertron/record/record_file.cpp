@@ -117,12 +117,12 @@ void RecordFileReader::Close() {
 
 bool RecordFileReader::ReadSection(Section* section) {
   if (!ifstream_.is_open()) {
-    AERROR << "input file stream is not open, file: " << path_;
+    AERROR << "Input file stream is not open, file: " << path_;
     return false;
   }
   ifstream_.read(reinterpret_cast<char*>(section), sizeof(*section));
   if (ifstream_.eof()) {
-    AINFO << "input file stream is eof, file: " << path_;
+    ADEBUG << "Failed to read section due to EOF, file: " << path_;
     return false;
   }
   if (ifstream_.gcount() != sizeof(*section)) {
