@@ -20,10 +20,6 @@
 
 namespace apollo {
 namespace perception {
-namespace lib {
-DECLARE_string(work_root);
-}
-
 namespace lidar {
 
 class ROIBoundaryFilterTest : public testing::Test {
@@ -33,8 +29,7 @@ class ROIBoundaryFilterTest : public testing::Test {
     putenv(cybertron_path);
     char module_path[100] = "MODULE_PATH=";
     putenv(module_path);
-    lib::FLAGS_work_root =
-        "modules/perception/testdata/lidar/lib/object_filter_bank/roi_boundary";
+    FLAGS_work_root = "/apollo/modules/perception/testdata/lidar/lib/object_filter_bank/roi_boundary";
   }
   void TearDown() {}
 

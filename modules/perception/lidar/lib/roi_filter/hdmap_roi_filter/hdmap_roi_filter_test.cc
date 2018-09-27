@@ -26,11 +26,8 @@
 
 namespace apollo {
 namespace perception {
-namespace lib {
-DECLARE_string(work_root);
-}
-
 namespace lidar {
+
 typedef Bitmap2D::DirectionMajor DirectionMajor;
 typedef Bitmap2D::Vec2ui Vec2ui;
 
@@ -176,9 +173,8 @@ class HdmapROIFilterTest : public ::testing::Test {
     putenv(cybertron_path);
     char module_path[50] = "MODULE_PATH=";
     putenv(module_path);
-    FLAGS_work_root =
-        "/apollo/modules/perception/testdata/lidar/lib/roi_filter/"
-        "hdmap_roi_filter";
+    FLAGS_work_root = "/apollo/modules/perception/testdata/"
+        "lidar/lib/roi_filter/hdmap_roi_filter";
   }
 
  protected:

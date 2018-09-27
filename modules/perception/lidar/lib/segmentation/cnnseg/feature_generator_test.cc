@@ -118,8 +118,8 @@ TEST_F(FeatureGeneratorTest, basic_test) {
   putenv(cybertron_path);
   char module_path[100] = "MODULE_PATH=";
   putenv(module_path);
-  FLAGS_work_root =
-      "modules/perception/testdata/lidar/lib/segmentation/cnnseg/";
+  FLAGS_work_root = "/apollo/modules/perception/testdata/"
+      "lidar/lib/segmentation/cnnseg/";
 
   // load pcd data
   base::PointFCloudPtr pc_ptr;

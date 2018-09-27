@@ -25,8 +25,8 @@ namespace perception {
 namespace fusion {
 
 TEST(ProbabliticFusionTest, test_init) {
-  FLAGS_work_root =
-      "/apollo/modules/perception/testdata/fusion/probabilistic_fusion";
+  FLAGS_work_root = "/apollo/modules/perception/testdata/"
+      "fusion/probabilistic_fusion";
   FLAGS_obs_sensor_meta_path = "./data/sensor_meta.pt";
   FLAGS_obs_sensor_intrinsic_path =
       "/apollo/modules/perception/testdata/fusion/probabilistic_fusion/params";
@@ -93,8 +93,8 @@ TEST(ProbabliticFusionTest, test_init) {
 }
 
 TEST(ProbabliticFusionTest, test_update) {
-  FLAGS_work_root =
-      "/apollo/modules/perception/testdata/fusion/probabilistic_fusion";
+  FLAGS_work_root = "/apollo/modules/perception/testdata/"
+      "fusion/probabilistic_fusion";
   FLAGS_obs_sensor_meta_path = "./data/sensor_meta.pt";
   FLAGS_obs_sensor_intrinsic_path =
       "/apollo/modules/perception/testdata/fusion/probabilistic_fusion/params";
@@ -244,8 +244,8 @@ TEST(ProbabliticFusionTest, test_update) {
 }
 
 TEST(ProbabilisticFusionTest, test_collect_sensor_measurement) {
-  FLAGS_work_root =
-      "/apollo/modules/perception/testdata/fusion/probabilistic_fusion";
+  FLAGS_work_root = "/apollo/modules/perception/testdata/"
+      "fusion/probabilistic_fusion";
   FLAGS_obs_sensor_meta_path = "./data/sensor_meta.pt";
   FLAGS_obs_sensor_intrinsic_path =
       "/apollo/modules/perception/testdata/fusion/probabilistic_fusion/params";

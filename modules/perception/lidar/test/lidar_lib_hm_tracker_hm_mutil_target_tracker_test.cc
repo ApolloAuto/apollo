@@ -29,11 +29,8 @@
 
 namespace apollo {
 namespace perception {
-namespace lib {
-DECLARE_string(work_root);
-}
-
 namespace lidar {
+
 class HmMultiTargetTrackerTest : public testing::Test {
  protected:
   typedef std::pair<size_t, size_t> TrackObjectPair;
@@ -42,8 +39,8 @@ class HmMultiTargetTrackerTest : public testing::Test {
     putenv(cybertron_path);
     char* module_path = "MODULE_PATH=";
     putenv(module_path);
-    lib::FLAGS_work_root =
-        "modules/perception/testdata/lidar/lib/tracker/hm_tracker/";
+    FLAGS_work_root = "/apollo/modules/perception/testdata/"
+        "lidar/lib/tracker/hm_tracker/";
     object_builder_ = new ObjectBuilder();
     hm_tracker_ = new HmMultiTargetTracker();
 

@@ -27,22 +27,14 @@
 
 namespace apollo {
 namespace perception {
-namespace common {
-DECLARE_string(obs_sensor_meta_path);
-DECLARE_string(obs_sensor_intrinsic_path);
-}
-
-namespace lib {
-DECLARE_string(work_root);
-}
-
 namespace fusion {
 
 TEST(DstTypeFusionTest, test_update_with_measurement) {
-  lib::FLAGS_work_root = "/apollo/modules/perception/testdata/fusion/dst_type_fusion";
-  common::FLAGS_obs_sensor_intrinsic_path =
-      "/apollo/modules/perception/testdata/fusion/dst_type_fusion/params";
-  common::FLAGS_obs_sensor_meta_path = "./data/sensor_meta.pt";
+  FLAGS_work_root = "/apollo/modules/perception/testdata/"
+      "fusion/dst_type_fusion";
+  FLAGS_obs_sensor_intrinsic_path = "/apollo/modules/perception/testdata/"
+      "fusion/dst_type_fusion/params";
+  FLAGS_obs_sensor_meta_path = "./data/sensor_meta.pt";
   common::SensorManager *sensor_manager =
       lib::Singleton<common::SensorManager>::get_instance();
   EXPECT_TRUE(sensor_manager != nullptr);
@@ -129,11 +121,11 @@ TEST(DstTypeFusionTest, test_update_with_measurement) {
 }
 
 TEST(DstTypeFusionTest, test_update_without_measurement) {
-  lib::FLAGS_work_root =
-      "/apollo/modules/perception/testdata/fusion/dst_type_fusion";
-  common::FLAGS_obs_sensor_intrinsic_path =
-      "/apollo/modules/perception/testdata/fusion/dst_type_fusion/params";
-  common::FLAGS_obs_sensor_meta_path = "./conf/sensor_meta.config";
+  FLAGS_work_root = "/apollo/modules/perception/testdata/"
+      "fusion/dst_type_fusion";
+  FLAGS_obs_sensor_intrinsic_path = "/apollo/modules/perception/testdata/"
+      "fusion/dst_type_fusion/params";
+  FLAGS_obs_sensor_meta_path = "./conf/sensor_meta.config";
   common::SensorManager *sensor_manager =
       lib::Singleton<common::SensorManager>::get_instance();
   EXPECT_TRUE(sensor_manager != nullptr);

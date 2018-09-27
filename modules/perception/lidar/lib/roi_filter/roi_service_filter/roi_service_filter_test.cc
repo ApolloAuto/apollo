@@ -46,9 +46,8 @@ class LidarLibROIServiceFilterTest : public testing::Test {
     putenv(cybertron_path);
     char module_path[100] = "MODULE_PATH=";
     putenv(module_path);
-    FLAGS_work_root =
-        "/apollo/modules/perception/testdata/lidar/lib/roi_filter/"
-        "roi_service_filter";
+    FLAGS_work_root = "/apollo/modules/perception/testdata/"
+        "lidar/lib/roi_filter/roi_service_filter";
     FLAGS_config_manager_path = "./conf";
     lib::ConfigManager* config_manager =
         lib::Singleton<lib::ConfigManager>::get_instance();

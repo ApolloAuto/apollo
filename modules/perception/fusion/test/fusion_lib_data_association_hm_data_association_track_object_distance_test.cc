@@ -29,25 +29,16 @@
 
 namespace apollo {
 namespace perception {
-namespace common {
-DECLARE_string(obs_sensor_meta_path);
-DECLARE_string(obs_sensor_intrinsic_path);
-}
-
-namespace lib {
-DECLARE_string(work_root);
-}
-
 namespace fusion {
 
 class TrackObjectDistanceTest : public testing::Test {
  protected:
   void SetUp() {
-    lib::FLAGS_work_root =
-        "/apollo/modules/perception/testdata/fusion/hm_data_association";
-    common::FLAGS_obs_sensor_meta_path = "./data/sensor_meta.pt";
-    common::FLAGS_obs_sensor_intrinsic_path =
-        "/apollo/modules/perception/testdata/fusion/hm_data_association/params";
+    FLAGS_work_root = "/apollo/modules/perception/testdata/"
+        "fusion/hm_data_association";
+    FLAGS_obs_sensor_meta_path = "./data/sensor_meta.pt";
+    FLAGS_obs_sensor_intrinsic_path = "/apollo/modules/perception/testdata/"
+        "fusion/hm_data_association/params";
   }
 };
 
@@ -663,8 +654,8 @@ TEST_F(TrackObjectDistanceTest, test_query_projection_cache_object_4) {
 
 TEST_F(TrackObjectDistanceTest, test_compute_radar_camera_similiarity_0) {
   TrackObjectDistance track_object_distance;
-  common::FLAGS_obs_sensor_meta_path = "./conf/sensor_meta.config";
-  common::FLAGS_obs_sensor_intrinsic_path = "./params";
+  FLAGS_obs_sensor_meta_path = "./conf/sensor_meta.config";
+  FLAGS_obs_sensor_intrinsic_path = "./params";
 
   base::ObjectPtr radar_object_ptr(new base::Object());
   base::ObjectConstPtr radar_object_const_ptr(radar_object_ptr);
@@ -709,8 +700,8 @@ TEST_F(TrackObjectDistanceTest, test_compute_radar_camera_similiarity_0) {
 
 TEST_F(TrackObjectDistanceTest, test_compute_radar_camera_similiarity_1) {
   TrackObjectDistance track_object_distance;
-  common::FLAGS_obs_sensor_meta_path = "./conf/sensor_meta.config";
-  common::FLAGS_obs_sensor_intrinsic_path = "./params";
+  FLAGS_obs_sensor_meta_path = "./conf/sensor_meta.config";
+  FLAGS_obs_sensor_intrinsic_path = "./params";
 
   base::ObjectPtr radar_object_ptr(new base::Object());
   base::ObjectConstPtr radar_object_const_ptr(radar_object_ptr);
@@ -756,8 +747,8 @@ TEST_F(TrackObjectDistanceTest, test_compute_radar_camera_similiarity_1) {
 
 TEST_F(TrackObjectDistanceTest, test_compute_radar_camera_similiarity_2) {
   TrackObjectDistance track_object_distance;
-  common::FLAGS_obs_sensor_meta_path = "./conf/sensor_meta.config";
-  common::FLAGS_obs_sensor_intrinsic_path = "./params";
+  FLAGS_obs_sensor_meta_path = "./conf/sensor_meta.config";
+  FLAGS_obs_sensor_intrinsic_path = "./params";
 
   base::ObjectPtr radar_object_ptr(new base::Object());
   radar_object_ptr->center = Eigen::Vector3d(1, 1, 1);
@@ -808,8 +799,8 @@ TEST_F(TrackObjectDistanceTest, test_compute_radar_camera_similiarity_2) {
 
 TEST_F(TrackObjectDistanceTest, test_compute_radar_camera_similiarity_3) {
   TrackObjectDistance track_object_distance;
-  common::FLAGS_obs_sensor_meta_path = "./conf/sensor_meta.config";
-  common::FLAGS_obs_sensor_intrinsic_path = "./params";
+  FLAGS_obs_sensor_meta_path = "./conf/sensor_meta.config";
+  FLAGS_obs_sensor_intrinsic_path = "./params";
 
   base::ObjectPtr radar_object_ptr(new base::Object());
   radar_object_ptr->center = Eigen::Vector3d(-1, -1, -1);
@@ -861,8 +852,8 @@ TEST_F(TrackObjectDistanceTest, test_compute_radar_camera_similiarity_3) {
 
 TEST_F(TrackObjectDistanceTest, test_compute_radar_camera_similiarity_4) {
   TrackObjectDistance track_object_distance;
-  common::FLAGS_obs_sensor_meta_path = "./conf/sensor_meta.config";
-  common::FLAGS_obs_sensor_intrinsic_path = "./params";
+  FLAGS_obs_sensor_meta_path = "./conf/sensor_meta.config";
+  FLAGS_obs_sensor_intrinsic_path = "./params";
 
   base::ObjectPtr radar_object_ptr(new base::Object());
   radar_object_ptr->center = Eigen::Vector3d(1.001, 1, 1);
@@ -913,8 +904,8 @@ TEST_F(TrackObjectDistanceTest, test_compute_radar_camera_similiarity_4) {
 
 TEST_F(TrackObjectDistanceTest, test_compute_radar_camera_similiarity_5) {
   TrackObjectDistance track_object_distance;
-  common::FLAGS_obs_sensor_meta_path = "./conf/sensor_meta.config";
-  common::FLAGS_obs_sensor_intrinsic_path = "./params";
+  FLAGS_obs_sensor_meta_path = "./conf/sensor_meta.config";
+  FLAGS_obs_sensor_intrinsic_path = "./params";
 
   base::ObjectPtr radar_object_ptr(new base::Object());
   radar_object_ptr->center = Eigen::Vector3d(1, 1, 1);
@@ -966,8 +957,8 @@ TEST_F(TrackObjectDistanceTest, test_compute_radar_camera_similiarity_5) {
 
 TEST_F(TrackObjectDistanceTest, test_compute_lidar_camera_similiarity_0) {
   TrackObjectDistance track_object_distance;
-  common::FLAGS_obs_sensor_meta_path = "./conf/sensor_meta.config";
-  common::FLAGS_obs_sensor_intrinsic_path = "./params";
+  FLAGS_obs_sensor_meta_path = "./conf/sensor_meta.config";
+  FLAGS_obs_sensor_intrinsic_path = "./params";
 
   base::ObjectPtr lidar_object_ptr(new base::Object());
   lidar_object_ptr->center = Eigen::Vector3d(1, 1, 1);
@@ -1016,8 +1007,8 @@ TEST_F(TrackObjectDistanceTest, test_compute_lidar_camera_similiarity_0) {
 
 TEST_F(TrackObjectDistanceTest, test_compute_lidar_camera_similiarity_1) {
   TrackObjectDistance track_object_distance;
-  common::FLAGS_obs_sensor_meta_path = "./conf/sensor_meta.config";
-  common::FLAGS_obs_sensor_intrinsic_path = "./params";
+  FLAGS_obs_sensor_meta_path = "./conf/sensor_meta.config";
+  FLAGS_obs_sensor_intrinsic_path = "./params";
 
   base::ObjectPtr lidar_object_ptr(new base::Object());
   lidar_object_ptr->center = Eigen::Vector3d(1, 1, 1);
@@ -1066,8 +1057,8 @@ TEST_F(TrackObjectDistanceTest, test_compute_lidar_camera_similiarity_1) {
 
 TEST_F(TrackObjectDistanceTest, test_compute_lidar_camera_similiarity_2) {
   TrackObjectDistance track_object_distance;
-  common::FLAGS_obs_sensor_meta_path = "./conf/sensor_meta.config";
-  common::FLAGS_obs_sensor_intrinsic_path = "./params";
+  FLAGS_obs_sensor_meta_path = "./conf/sensor_meta.config";
+  FLAGS_obs_sensor_intrinsic_path = "./params";
 
   base::ObjectPtr lidar_object_ptr(new base::Object());
   lidar_object_ptr->center = Eigen::Vector3d(1, 1, 1);
@@ -1116,8 +1107,8 @@ TEST_F(TrackObjectDistanceTest, test_compute_lidar_camera_similiarity_2) {
 
 TEST_F(TrackObjectDistanceTest, test_compute_lidar_camera_similiarity_3) {
   TrackObjectDistance track_object_distance;
-  common::FLAGS_obs_sensor_meta_path = "./conf/sensor_meta.config";
-  common::FLAGS_obs_sensor_intrinsic_path = "./params";
+  FLAGS_obs_sensor_meta_path = "./conf/sensor_meta.config";
+  FLAGS_obs_sensor_intrinsic_path = "./params";
 
   base::ObjectPtr lidar_object_ptr(new base::Object());
   lidar_object_ptr->center = Eigen::Vector3d(1, 1, 1);
@@ -1166,8 +1157,8 @@ TEST_F(TrackObjectDistanceTest, test_compute_lidar_camera_similiarity_3) {
 
 TEST_F(TrackObjectDistanceTest, test_compute_lidar_camera_similiarity_4) {
   TrackObjectDistance track_object_distance;
-  common::FLAGS_obs_sensor_meta_path = "./conf/sensor_meta.config";
-  common::FLAGS_obs_sensor_intrinsic_path = "./params";
+  FLAGS_obs_sensor_meta_path = "./conf/sensor_meta.config";
+  FLAGS_obs_sensor_intrinsic_path = "./params";
 
   base::ObjectPtr lidar_object_ptr(new base::Object());
   lidar_object_ptr->center = Eigen::Vector3d(1, 1, 1);
@@ -1238,8 +1229,8 @@ TEST_F(TrackObjectDistanceTest, test_compute_lidar_camera_similiarity_4) {
 
 TEST_F(TrackObjectDistanceTest, test_compute_lidar_camera_similiarity_5) {
   TrackObjectDistance track_object_distance;
-  common::FLAGS_obs_sensor_meta_path = "./conf/sensor_meta.config";
-  common::FLAGS_obs_sensor_intrinsic_path = "./params";
+  FLAGS_obs_sensor_meta_path = "./conf/sensor_meta.config";
+  FLAGS_obs_sensor_intrinsic_path = "./params";
 
   base::ObjectPtr lidar_object_ptr(new base::Object());
   lidar_object_ptr->center = Eigen::Vector3d(1, 1, 1);
@@ -1298,8 +1289,8 @@ TEST_F(TrackObjectDistanceTest, test_compute_lidar_camera_similiarity_5) {
 
 TEST_F(TrackObjectDistanceTest, test_compute_radar_camera_0) {
   TrackObjectDistance track_object_distance;
-  common::FLAGS_obs_sensor_meta_path = "./conf/sensor_meta.config";
-  common::FLAGS_obs_sensor_intrinsic_path = "./params";
+  FLAGS_obs_sensor_meta_path = "./conf/sensor_meta.config";
+  FLAGS_obs_sensor_intrinsic_path = "./params";
 
   base::ObjectPtr radar_object_ptr(new base::Object());
   radar_object_ptr->center = Eigen::Vector3d(1, 1, 1);
@@ -1351,8 +1342,8 @@ TEST_F(TrackObjectDistanceTest, test_compute_radar_camera_0) {
 
 TEST_F(TrackObjectDistanceTest, test_compute_radar_camera_1) {
   TrackObjectDistance track_object_distance;
-  common::FLAGS_obs_sensor_meta_path = "./conf/sensor_meta.config";
-  common::FLAGS_obs_sensor_intrinsic_path = "./params";
+  FLAGS_obs_sensor_meta_path = "./conf/sensor_meta.config";
+  FLAGS_obs_sensor_intrinsic_path = "./params";
 
   base::ObjectPtr radar_object_ptr(new base::Object());
   radar_object_ptr->center = Eigen::Vector3d(1, 1, 1);
@@ -1404,8 +1395,8 @@ TEST_F(TrackObjectDistanceTest, test_compute_radar_camera_1) {
 
 TEST_F(TrackObjectDistanceTest, test_compute_radar_camera_2) {
   TrackObjectDistance track_object_distance;
-  common::FLAGS_obs_sensor_meta_path = "./conf/sensor_meta.config";
-  common::FLAGS_obs_sensor_intrinsic_path = "./params";
+  FLAGS_obs_sensor_meta_path = "./conf/sensor_meta.config";
+  FLAGS_obs_sensor_intrinsic_path = "./params";
 
   base::ObjectPtr radar_object_ptr(new base::Object());
   radar_object_ptr->center = Eigen::Vector3d(1, 1, -1);
@@ -1458,8 +1449,8 @@ TEST_F(TrackObjectDistanceTest, test_compute_radar_camera_2) {
 
 TEST_F(TrackObjectDistanceTest, test_compute_radar_camera_3) {
   TrackObjectDistance track_object_distance;
-  common::FLAGS_obs_sensor_meta_path = "./conf/sensor_meta.config";
-  common::FLAGS_obs_sensor_intrinsic_path = "./params";
+  FLAGS_obs_sensor_meta_path = "./conf/sensor_meta.config";
+  FLAGS_obs_sensor_intrinsic_path = "./params";
 
   base::ObjectPtr radar_object_ptr(new base::Object());
   radar_object_ptr->center = Eigen::Vector3d(1.1, 1.1, 1);
@@ -1512,8 +1503,8 @@ TEST_F(TrackObjectDistanceTest, test_compute_radar_camera_3) {
 
 TEST_F(TrackObjectDistanceTest, test_compute_radar_camera_4) {
   TrackObjectDistance track_object_distance;
-  common::FLAGS_obs_sensor_meta_path = "./conf/sensor_meta.config";
-  common::FLAGS_obs_sensor_intrinsic_path = "./params";
+  FLAGS_obs_sensor_meta_path = "./conf/sensor_meta.config";
+  FLAGS_obs_sensor_intrinsic_path = "./params";
 
   base::ObjectPtr radar_object_ptr(new base::Object());
   radar_object_ptr->center = Eigen::Vector3d(1, 1, 1);

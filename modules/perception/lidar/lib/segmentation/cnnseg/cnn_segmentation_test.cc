@@ -23,10 +23,6 @@
 
 namespace apollo {
 namespace perception {
-namespace lib {
-DECLARE_string(work_root);
-}
-
 namespace lidar {
 
 bool LoadPCDFile(const std::string& file_path, base::PointFCloudPtr cloud_out) {
@@ -76,8 +72,8 @@ TEST(CNNSegmentationTest, cnn_segmentation_sequence_test) {
   putenv(cybertron_path);
   char module_path[100] = "MODULE_PATH=";
   putenv(module_path);
-  FLAGS_work_root =
-      "/apollo/modules/perception/testdata/lidar/lib/segmentation/cnnseg/";
+  FLAGS_work_root = "/apollo/modules/perception/testdata/"
+      "lidar/lib/segmentation/cnnseg/";
 
   std::shared_ptr<CNNSegmentation> segmentation(new CNNSegmentation);
   SegmentationOptions options;
@@ -124,8 +120,8 @@ TEST(CNNSegmentationTest, cnn_segmentation_test) {
   putenv(cybertron_path);
   char module_path[100] = "MODULE_PATH=";
   putenv(module_path);
-  FLAGS_work_root =
-      "/apollo/modules/perception/testdata/lidar/lib/segmentation/cnnseg/";
+  FLAGS_work_root = "/apollo/modules/perception/testdata/"
+      "lidar/lib/segmentation/cnnseg/";
 
   // load pcd data
   base::PointFCloudPtr pc_ptr;

@@ -30,10 +30,6 @@
 
 namespace apollo {
 namespace perception {
-namespace lib {
-DECLARE_string(work_root);
-}
-
 namespace lidar {
 
 class ObjectTrackMatcherTest : public testing::Test {
@@ -44,8 +40,8 @@ class ObjectTrackMatcherTest : public testing::Test {
     putenv(cybertron_path);
     char* module_path = "MODULE_PATH=";
     putenv(module_path);
-    lib::FLAGS_work_root =
-        "modules/perception/testdata/lidar/lib/tracker/hm_tracker";
+    FLAGS_work_root = "/apollo/modules/perception/testdata/"
+        "lidar/lib/tracker/hm_tracker";
     object_builder_ = new ObjectBuilder();
     config_manager_ = lib::Singleton<lib::ConfigManager>::get_instance();
     CHECK_NOTNULL(config_manager_);

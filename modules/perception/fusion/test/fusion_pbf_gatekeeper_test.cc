@@ -23,23 +23,14 @@
 
 namespace apollo {
 namespace perception {
-namespace common {
-DECLARE_string(obs_sensor_meta_path);
-DECLARE_string(obs_sensor_intrinsic_path);
-}
-
-namespace lib {
-DECLARE_string(work_root);
-}
-
 namespace fusion {
 
 TEST(PbfGatekeeperTest, test) {
-  lib::FLAGS_work_root =
-      "/apollo/modules/perception/testdata/fusion/pbf_gatekeeper";
-  common::FLAGS_obs_sensor_meta_path = "./data/sensor_meta.pt";
-  common::FLAGS_obs_sensor_intrinsic_path =
-      "/apollo/modules/perception/testdata/fusion/pbf_gatekeeper/params";
+  FLAGS_work_root = "/apollo/modules/perception/testdata/"
+      "fusion/pbf_gatekeeper";
+  FLAGS_obs_sensor_meta_path = "./data/sensor_meta.pt";
+  FLAGS_obs_sensor_intrinsic_path = "/apollo/modules/perception/testdata/"
+      "fusion/pbf_gatekeeper/params";
 
   PbfGatekeeper gate_keeper;
   EXPECT_EQ(gate_keeper.Name(), "PbfGatekeeper");

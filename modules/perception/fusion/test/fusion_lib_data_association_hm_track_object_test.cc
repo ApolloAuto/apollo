@@ -25,16 +25,8 @@
 
 namespace apollo {
 namespace perception {
-namespace common {
-DECLARE_string(obs_sensor_meta_path);
-DECLARE_string(obs_sensor_intrinsic_path);
-}
-
-namespace lib {
-DECLARE_string(work_root);
-}
-
 namespace fusion {
+
 TEST(MatcherTest, test_generate_unassign) {
   HMTrackersObjectsAssociation matcher;
   std::vector<TrackMeasurmentPair> assignments;
@@ -50,10 +42,11 @@ TEST(MatcherTest, test_generate_unassign) {
 }
 
 TEST(MatcherTest, test_all) {
-  lib::FLAGS_work_root = "/apollo/modules/perception/testdata/fusion/hm_data_association";
-  common::FLAGS_obs_sensor_meta_path = "./data/sensor_meta.pt";
-  common::FLAGS_obs_sensor_intrinsic_path =
-      "/apollo/modules/perception/testdata/fusion/hm_data_association/params";
+  FLAGS_work_root = "/apollo/modules/perception/testdata/"
+      "fusion/hm_data_association";
+  FLAGS_obs_sensor_meta_path = "./data/sensor_meta.pt";
+  FLAGS_obs_sensor_intrinsic_path = "/apollo/modules/perception/testdata/"
+      "fusion/hm_data_association/params";
   Eigen::Matrix4d pose;
   pose << 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1;
   HMTrackersObjectsAssociation::s_match_distance_thresh_ = 4.0;

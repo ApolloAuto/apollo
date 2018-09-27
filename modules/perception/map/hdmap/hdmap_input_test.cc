@@ -25,10 +25,8 @@
 
 namespace apollo {
 namespace perception {
-namespace lib {
-DECLARE_string(config_manager_path);
-}
 namespace map {
+
 // using apollo::perception::lib::ConfigManager;
 // using adu::hdmap::JunctionInfo;
 // using adu::hdmap::JunctionInfoConstPtr;
@@ -40,8 +38,8 @@ class HDMapInputTest : public testing::Test {
     //    putenv(cybertron_path);
     //    char* module_path = "MODULE_PATH=";
     //    putenv(module_path);
-    //    lib::FLAGS_config_manager_path =
-    //        "modules/perception/testdata/map/hdmap/conf";
+    //    FLAGS_config_manager_path = "/apollo/modules/perception/testdata/"
+    //        "map/hdmap/conf";
     //    config_manager_ = lib::Singleton<ConfigManager>::get_instance();
     //    ASSERT_TRUE(config_manager_ != NULL);
   }

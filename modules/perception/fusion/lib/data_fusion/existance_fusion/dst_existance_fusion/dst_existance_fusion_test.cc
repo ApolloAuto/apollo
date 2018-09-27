@@ -33,8 +33,8 @@ namespace fusion {
 
 /* TODO(all): Initialize() not compiling. to be fixed
 TEST(DstExistFusionTest, test_update_with_measurement) {
-  FLAGS_work_root =
-      "/apollo/modules/perception/testdata/fusion/dst_existance_fusion";
+  FLAGS_work_root = "/apollo/modules/perception/testdata/"
+      "fusion/dst_existance_fusion";
   FLAGS_obs_sensor_intrinsic_path =
       "/apollo/modules/perception/testdata/fusion/dst_existance_fusion/params";
   FLAGS_obs_sensor_meta_path = "./data/sensor_meta.pt";

@@ -22,12 +22,6 @@
 
 namespace apollo {
 namespace perception {
-
-namespace lib {
-DECLARE_string(config_manager_path);
-DECLARE_string(work_root);
-}  // namespace lib
-
 namespace lidar {
 
 class LidarLibGroundServiceDetectorTest : public testing::Test {
@@ -37,10 +31,9 @@ class LidarLibGroundServiceDetectorTest : public testing::Test {
     putenv(cybertron_path);
     char* module_path = "MODULE_PATH=";
     putenv(module_path);
-    lib::FLAGS_work_root =
-        "modules/perception/testdata/lidar/lib/"
-        "ground_detector/ground_service_detector";
-    lib::FLAGS_config_manager_path = "./conf";
+    FLAGS_work_root = "/apollo/modules/perception/testdata/"
+        "lidar/lib/ground_detector/ground_service_detector";
+    FLAGS_config_manager_path = "./conf";
     lib::ConfigManager* config_manager =
         lib::Singleton<lib::ConfigManager>::get_instance();
     config_manager->Reset();
