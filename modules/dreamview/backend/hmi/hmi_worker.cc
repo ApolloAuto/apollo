@@ -46,6 +46,7 @@ namespace {
 
 using apollo::canbus::Chassis;
 using apollo::common::DriveEvent;
+using apollo::common::time::Clock;
 using apollo::common::util::ContainsKey;
 using apollo::common::util::FindOrNull;
 using apollo::common::util::StringTokenizer;
@@ -175,7 +176,19 @@ HMIWorker::HMIWorker(const std::shared_ptr<apollo::cybertron::Node> &node) {
 
 void HMIWorker::InitReadersAndWriters(
     const std::shared_ptr<apollo::cybertron::Node> &node) {
-  chassis_reader_ = node->GetReader<Chassis>(FLAGS_chassis_topic);
+  // Received Chassis, trigger action if there is high beam signal.
+  chassis_reader_ = node->CreateReader<Chassis>(
+      FLAGS_chassis_topic, [this](const std::shared_ptr<Chassis> &chassis) {
+        if (Clock::NowInSeconds() - chassis->header().timestamp_sec() <
+            FLAGS_system_status_lifetime_seconds) {
+          if (chassis->signal().high_beam()) {
+            const bool ret =
+                this->Trigger(this->GetConfig().chassis_high_beam_action());
+            AERROR_IF(!ret) << "Failed to execute high_beam action.";
+          }
+        }
+      });
+
   pad_writer_ = node->CreateWriter<control::PadMessage>(FLAGS_pad_topic);
   drive_event_writer_ =
       node->CreateWriter<apollo::common::DriveEvent>(FLAGS_drive_event_topic);

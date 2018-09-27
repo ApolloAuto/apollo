@@ -240,19 +240,6 @@ void HMI::RegisterMessageHandlers() {
           DeferredBroadcastHMIStatus();
         }
       });
-
-  // Received Chassis, trigger action if there is high beam signal.
-  node_->CreateReader<Chassis>(
-      FLAGS_chassis_topic, [this](const std::shared_ptr<Chassis> &chassis) {
-        if (Clock::NowInSeconds() - chassis->header().timestamp_sec() <
-            FLAGS_system_status_lifetime_seconds) {
-          if (chassis->signal().high_beam()) {
-            const bool ret = hmi_worker_->Trigger(
-                hmi_worker_->GetConfig().chassis_high_beam_action());
-            AERROR_IF(!ret) << "Failed to execute high_beam action.";
-          }
-        }
-      });
 }
 
 void HMI::StartBroadcastHMIStatusThread() {
