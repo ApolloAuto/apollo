@@ -16,7 +16,6 @@
 # -*- coding: utf-8 -*-
 """Module for test record."""
 
-import time
 import sys
 import unittest
 
@@ -51,29 +50,28 @@ class TestRecord(unittest.TestCase):
         fwriter.close()
 
         # reader
-        fread = record.RecordReader()
-        self.assertTrue(fread.open(TEST_RECORD_FILE))
-        time.sleep(1)
+        fread = record.RecordReader(TEST_RECORD_FILE)
 
-        self.assertFalse(fread.endoffile())
-        self.assertTrue(fread.read_message())
-        channelname = fread.currentmessage_channelname()
-        self.assertEqual(CHAN_1, fread.currentmessage_channelname())
-        self.assertEqual(STR_10B, fread.current_rawmessage())
-        self.assertEqual(TIME, fread.currentmessage_time())
-        self.assertEqual(1, fread.get_messagenumber(channelname))
-        self.assertEqual(MSG_TYPE, fread.get_messagetype(channelname))
-        msg = record_pb2.Header()
-        header_msg = fread.get_headerstring()
-        msg.ParseFromString(header_msg)
-        self.assertEqual(1, msg.major_version)
-        self.assertEqual(0, msg.minor_version)
-        self.assertEqual(1, msg.chunk_number)
-        self.assertEqual(1, msg.channel_number)
-        self.assertTrue(msg.is_complete)
+        for channelname, msg, datatype, timestamp in fread.read_messages():
+            print "+++"
+            print channelname
+            print msg, datatype, timestamp
+            self.assertEqual(CHAN_1, channelname)
+            self.assertEqual(STR_10B, msg)
+            self.assertEqual(TIME, timestamp)
+            self.assertEqual(1, fread.get_messagenumber(channelname))
+            self.assertEqual(MSG_TYPE, datatype)
+            self.assertEqual(MSG_TYPE, fread.get_messagetype(channelname))
+            print "pbdesc -> %s" % fread.get_protodesc(channelname)
+            msg = record_pb2.Header()
+            header_msg = fread.get_headerstring()
+            msg.ParseFromString(header_msg)
+            self.assertEqual(1, msg.major_version)
+            self.assertEqual(0, msg.minor_version)
+            self.assertEqual(1, msg.chunk_number)
+            self.assertEqual(1, msg.channel_number)
+            self.assertTrue(msg.is_complete)
 
-        self.assertTrue(fread.endoffile())
-        fread.close()
 
         cybertron.shutdown()
 

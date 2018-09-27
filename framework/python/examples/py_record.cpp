@@ -37,32 +37,26 @@ void test_write(const std::string &writefile) {
 }
 
 void test_read(const std::string &readfile) {
-  apollo::cybertron::record::PyRecordReader rec_reader;
+  apollo::cybertron::record::PyRecordReader rec_reader(readfile);
   AINFO << "++++ begin reading";
-  if (!rec_reader.Open(readfile)) {
-    AERROR << "reader open failed!";
-    return;
-  }
   sleep(1);
   int count = 0;
-  bool bReadMsg = true;
-  while (!rec_reader.EndOfFile()) {
-    bReadMsg = rec_reader.ReadMessage();
-    if (bReadMsg) {
-      AINFO << "========================";
-      std::string channel_name = rec_reader.CurrentMessageChannelName();
-      AINFO << "read msg[" << count << "]";
-      AINFO << "cur channel:[" << channel_name
-            << "] msg total:" << rec_reader.GetMessageNumber(channel_name)
-            << "] "
-            << "cur msg:[ " << rec_reader.CurrentRawMessage() << " ]";
-      AINFO << "curMsgTime: " << rec_reader.CurrentMessageTime();
-      AINFO << "msg type:" << rec_reader.GetMessageType(channel_name);
-      AINFO << "msg protoDesc:" << rec_reader.GetProtoDesc(channel_name);
-      count++;
-    }
+
+  apollo::cybertron::record::BagMessage bag_msg = rec_reader.ReadMessage();
+  while (!bag_msg.end) {
+    AINFO << "========================";
+    std::string channel_name = bag_msg.channel_name;
+    AINFO << "read msg[" << count << "]";
+    AINFO << "cur channel:[" << channel_name
+          << "] msg total:" << rec_reader.GetMessageNumber(channel_name) << "] "
+          << "cur msg:[ " << bag_msg.data << " ]";
+    AINFO << "curMsgTime: " << bag_msg.timestamp;
+    AINFO << "msg type:" << bag_msg.data_type;
+    AINFO << "msg protoDesc:" << rec_reader.GetProtoDesc(channel_name);
+    count++;
+    bag_msg = rec_reader.ReadMessage();
   }
-  rec_reader.Close();
+
   AINFO << "reader msg count = " << count;
 }
 int main(int argc, char *argv[]) {
