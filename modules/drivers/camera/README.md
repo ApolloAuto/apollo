@@ -6,7 +6,7 @@ This package is based off of V4L devices specifically instead of just UVC.
 
 For full documentation, see [the ROS wiki](http://ros.org/wiki/usb_cam).
 
-[Doxygen](http://docs.ros.org/indigo/api/camera/html/) files can be found on .he ROS wiki.
+[Doxygen](http://docs.ros.org/indigo/api/usb_cam/html/) files can be found on the ROS wiki.
 
 ### License
 usb_cam is released with a BSD license. For full terms and conditions, see the [LICENSE](LICENSE) file.
