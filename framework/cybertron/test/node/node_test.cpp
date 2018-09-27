@@ -36,6 +36,9 @@ TEST(NodeTest, create_writer_with_channel_name) {
   EXPECT_EQ(writer->GetChannelName(), "channel");
   EXPECT_TRUE(writer->inited());
   writer->Shutdown();
+
+  writer = node.CreateWriter<proto::UnitTest>("");
+  EXPECT_TRUE(writer == nullptr);
 }
 
 TEST(NodeTest, create_writer_with_attr) {
@@ -62,6 +65,10 @@ TEST(NodeTest, create_writer_with_attr) {
   EXPECT_EQ(writer_c->GetChannelName(), "channel");
   EXPECT_TRUE(writer_c->inited());
   writer_c->Shutdown();
+
+  attr.clear_channel_name();
+  auto writer_d = node.CreateWriter<proto::UnitTest>(attr);
+  EXPECT_TRUE(writer_d == nullptr);
 }
 
 TEST(NodeTest, create_reader_with_channel_name) {
@@ -72,6 +79,9 @@ TEST(NodeTest, create_reader_with_channel_name) {
   EXPECT_EQ(reader->GetChannelName(), "channel");
   EXPECT_TRUE(reader->inited());
   reader->Shutdown();
+
+  reader = node.CreateReader<proto::UnitTest>("", nullptr);
+  EXPECT_TRUE(reader == nullptr);
 }
 
 TEST(NodeTest, create_reader_with_attr) {
@@ -94,6 +104,10 @@ TEST(NodeTest, create_reader_with_attr) {
 
   auto reader_c = node.CreateReader<proto::UnitTest>(attr);
   ASSERT_EQ(reader_c, nullptr);
+
+  attr.clear_channel_name();
+  auto reader_d = node.CreateReader<proto::UnitTest>(attr);
+  EXPECT_TRUE(reader_d == nullptr);
 }
 
 TEST(NodeTest, create_service) {
