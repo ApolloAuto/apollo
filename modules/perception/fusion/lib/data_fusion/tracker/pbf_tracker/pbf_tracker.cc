@@ -28,10 +28,11 @@ namespace apollo {
 namespace perception {
 namespace fusion {
 
-std::string PbfTracker::s_type_fusion_method_ = "DstTypeFusion";
-std::string PbfTracker::s_existance_fusion_method_ = "DstExistanceFusion";
-std::string PbfTracker::s_motion_fusion_method_ = "KalmanMotionFusion";
-std::string PbfTracker::s_shape_fusion_method_ = "PbfShapeFusion";
+// TODO(all) fix the static string lint issue
+std::string PbfTracker::s_type_fusion_method_ = "DstTypeFusion";  // NOLINT
+std::string PbfTracker::s_existance_fusion_method_ = "DstExistanceFusion";  // NOLINT
+std::string PbfTracker::s_motion_fusion_method_ = "KalmanMotionFusion";  // NOLINT
+std::string PbfTracker::s_shape_fusion_method_ = "PbfShapeFusion";  // NOLINT
 
 PbfTracker::PbfTracker() {}
 
