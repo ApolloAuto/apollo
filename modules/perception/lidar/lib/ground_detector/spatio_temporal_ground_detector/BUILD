@@ -26,4 +26,17 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "spatio_temporal_ground_detector_test",
+    srcs = [
+        "spatio_temporal_ground_detector_test.cc",
+    ],
+    size = "small",
+    deps = [
+        ":spatio_temporal_ground_detector",
+        "@pcl",
+        "@gtest//:main",
+    ]
+)
+
 cpplint()
