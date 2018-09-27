@@ -126,7 +126,7 @@ class KalmanMotionFusion : public BaseMotionFusion {
   Eigen::Matrix3f acc_uncertainty_ = Eigen::Matrix3f::Zero();
 
   static int s_eval_window_;
-  static int s_history_size_maximum_;
+  static size_t s_history_size_maximum_;
 };
 
 }  // namespace fusion

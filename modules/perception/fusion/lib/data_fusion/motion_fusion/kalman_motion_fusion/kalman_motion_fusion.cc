@@ -14,7 +14,10 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/perception/fusion/lib/data_fusion/motion_fusion/kalman_motion_fusion/kalman_motion_fusion.h"
+
+#include <algorithm>
 #include <iomanip>
+
 #include "modules/perception/base/sensor_meta.h"
 #include "modules/perception/common/geometry/basic.h"
 #include "modules/perception/common/sensor_manager/sensor_manager.h"
@@ -24,7 +27,7 @@ namespace perception {
 namespace fusion {
 
 int KalmanMotionFusion::s_eval_window_ = 3;
-int KalmanMotionFusion::s_history_size_maximum_ = 20;
+size_t KalmanMotionFusion::s_history_size_maximum_ = 20;
 
 bool KalmanMotionFusion::Init() {
   if (track_ref_ == NULL) {
@@ -353,7 +356,7 @@ Eigen::VectorXd KalmanMotionFusion::ComputeAccelerationMeasurement(
     return acceleration_measurement;
   }
   if (GetSensorHistoryLength(sensor_type) >= s_eval_window_) {
-    int history_index = GetSensorHistoryIndex(sensor_type, s_eval_window_);
+    size_t history_index = GetSensorHistoryIndex(sensor_type, s_eval_window_);
     if (history_index < 0 || history_index >= history_velocity_.size()) {
       AERROR << "illegal history index";
       return Eigen::Vector3d::Zero();
