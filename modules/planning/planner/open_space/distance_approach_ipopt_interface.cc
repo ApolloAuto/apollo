@@ -172,7 +172,7 @@ bool DistanceApproachIPOPTInterface::get_bounds_info(int n, double* x_l,
 
   ADEBUG << "variable_index after adding sample time : " << variable_index;
 
-  // 4. lagrange constraint l, sum(oVb) * (N+1)
+  // 4. lagrange constraint l, obstacles_vertices_sum_ * (N+1)
   for (std::size_t i = 1; i <= horizon_ + 1; ++i) {
     for (std::size_t j = 1; j <= obstacles_vertices_sum_; ++j) {
       x_l[i * obstacles_vertices_sum_ + j] = 0.0;
@@ -201,7 +201,7 @@ bool DistanceApproachIPOPTInterface::get_bounds_info(int n, double* x_l,
   // Constraints: includes state, u, sample time and lagrange multipliers
   // constraints
 
-  // 1. state constraints
+  // 1. state constraints 4 * (N+1)
   // start point pose
   std::size_t constraint_index = 0;
   for (std::size_t i = 0; i < 4; ++i) {
@@ -210,7 +210,7 @@ bool DistanceApproachIPOPTInterface::get_bounds_info(int n, double* x_l,
   }
   constraint_index += 4;
 
-  // During horizons
+  // During horizons 2 ~ (N-1)
   for (std::size_t i = 1; i < horizon_ - 1; ++i) {
     // x
     g_l[constraint_index] = XYbounds_(0, 0);
@@ -242,7 +242,7 @@ bool DistanceApproachIPOPTInterface::get_bounds_info(int n, double* x_l,
   ADEBUG << "constraint_index after adding state constraints : "
          << constraint_index;
 
-  // 2. input constraints
+  // 2. input constraints 2 * (1~N)
   for (std::size_t i = 1; i < horizon_; ++i) {
     // u1
     g_l[constraint_index] = -0.6;
@@ -257,8 +257,8 @@ bool DistanceApproachIPOPTInterface::get_bounds_info(int n, double* x_l,
   ADEBUG << "constraint_index after adding input constraints : "
          << constraint_index;
 
-  // 3. sampling time constraints
-  for (std::size_t i = 1; i < horizon_; ++i) {
+  // 3. sampling time constraints  (1~N+1)
+  for (std::size_t i = 1; i < horizon_ + 1; ++i) {
     g_l[constraint_index] = -0.6;
     g_u[constraint_index] = 0.6;
 
@@ -267,7 +267,7 @@ bool DistanceApproachIPOPTInterface::get_bounds_info(int n, double* x_l,
   ADEBUG << "constraint_index after adding sampling time constraints : "
          << constraint_index;
 
-  // 3. lagrangian constraints l
+  // 3. lagrangian constraints l, obstacles_vertices_sum_ * (N+1)
   for (std::size_t i = 1; i < horizon_ + 1; ++i) {
     for (std::size_t j = 1; j <= obstacles_vertices_sum_; ++j) {
       g_l[i * obstacles_vertices_sum_ + j] = 0.0;
@@ -281,7 +281,7 @@ bool DistanceApproachIPOPTInterface::get_bounds_info(int n, double* x_l,
   ADEBUG << "constraint_index after adding lagrangian constraint l: "
          << constraint_index;
 
-  // 4. lagrangian constraints n
+  // 4. lagrangian constraints n, 4 * obstacles_num_ * (N+1)
   for (std::size_t i = 1; i < horizon_ + 1; ++i) {
     for (std::size_t j = 1; j <= 4 * obstacles_num_; ++j) {
       g_l[i * 4 * obstacles_num_ + j] = 0.0;
@@ -363,28 +363,62 @@ bool DistanceApproachIPOPTInterface::get_starting_point(
 
   // 1. state variables linspace initialization
 
-  std::vector<std::vector<double>> x_guess(4, std::vector<double>(horizon_));
+  // TODO(QiL) : replace the hot start guess with the initial caculation from
+  // warm up.
+
+  std::size_t variable_index = 0;
+  // 1. state variables 4 * (N+1)
+  std::vector<std::vector<double>> x_guess(4,
+                                           std::vector<double>(horizon_ + 1));
 
   for (std::size_t i = 0; i < 4; ++i) {
-    ::apollo::common::util::uniform_slice(x0_(i, 0), xf_(i, 0), horizon_,
+    ::apollo::common::util::uniform_slice(x0_(i, 0), xf_(i, 0), horizon_ + 1,
                                           &x_guess[i]);
   }
 
-  for (std::size_t i = 0; i <= horizon_; ++i) {
+  for (std::size_t i = 0; i <= horizon_ + 1; ++i) {
     for (std::size_t j = 0; j < 4; ++j) {
       x[i * 4 + j] = x_guess[j][i];
     }
+    variable_index += 4;
   }
 
-  // 2. input initialization
-  for (std::size_t i = 0; i <= 2 * horizon_; ++i) {
-    x[i] = 0.6;
+  // 2. control variable initialization, 2 * N
+  for (std::size_t i = 1; i <= 2 * horizon_; ++i) {
+    x[variable_index + i] = 0.6;
+    x[variable_index + i + 1] = 0.6;
+    variable_index += 2;
   }
 
-  // 3. sampling time constraints
+  // 3. sampling time constraints, N+1
   for (std::size_t i = 0; i <= horizon_; ++i) {
     x[i] = 0.5;
+    variable_index += 1;
   }
+
+  // 4. sampling time constraints, N+1
+  for (std::size_t i = 0; i <= horizon_; ++i) {
+    x[i] = 0.5;
+    ++variable_index;
+  }
+
+  // 4. lagrange constraint l, obstacles_vertices_sum_ * (N+1)
+  for (std::size_t i = 1; i <= horizon_ + 1; ++i) {
+    for (std::size_t j = 1; j <= obstacles_vertices_sum_; ++j) {
+      x[i * obstacles_vertices_sum_ + j] = 0.2;
+      ++variable_index;
+    }
+  }
+
+  // 4. lagrange constraint m, 4*obstacles_num * (horizon_+1)
+  for (std::size_t i = 1; i <= horizon_ + 1; ++i) {
+    for (std::size_t j = 1; j <= 4 * obstacles_num_; ++j) {
+      x[i * 4 * obstacles_num_ + j] = 0.2;
+      ++variable_index;
+    }
+  }
+
+  ADEBUG << "variable index after initialization done : " << variable_index;
 
   return true;
 }
