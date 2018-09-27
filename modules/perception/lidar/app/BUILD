@@ -56,4 +56,18 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "lidar_app_lidar_pipeline_test",
+    size = "small",
+    srcs = [
+        "lidar_app_lidar_pipeline_test.cc",
+    ],
+    deps = [
+        ":app",
+        "//external:gflags",
+        "//modules/perception/common/io:io_util",
+        "@gtest//:main",
+    ],
+)
+
 cpplint()

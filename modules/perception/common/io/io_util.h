@@ -16,9 +16,10 @@
 #ifndef MODULES_PERCEPTION_COMMON_IO_POSE_UTIL_H_
 #define MODULES_PERCEPTION_COMMON_IO_POSE_UTIL_H_
 
-#include <google/protobuf/message.h>
-#include <Eigen/Dense>
 #include <string>
+
+#include "Eigen/Dense"
+#include "google/protobuf/message.h"
 
 #include "modules/perception/base/distortion_model.h"
 #include "modules/perception/base/omnidirectional_model.h"

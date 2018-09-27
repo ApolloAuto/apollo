@@ -56,7 +56,7 @@ static bool LoadPCLPCD(const std::string& file_path,
     new_pt.y = pt.y;
     new_pt.z = pt.z;
     new_pt.intensity = pt.intensity;
-    cloud_out->points_timestamp(i) = pt.timestamp;
+    cloud_out->mutable_points_timestamp()->at(i) = pt.timestamp;
   }
   return true;
 }
@@ -69,7 +69,7 @@ static bool WritePcd(const std::string& file_path,
     point.x = cloud[i].x;
     point.y = cloud[i].y;
     point.z = cloud[i].z;
-    point.label = cloud.points_label(i);
+    point.label = cloud.points_label().at(i);
     pcl_cloud.push_back(point);
   }
   try {
