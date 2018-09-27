@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+
 #ifndef MODULES_PERCEPTION_LIDAR_LIB_DUMMY_DUMMY_ROI_FILTER_H_
 #define MODULES_PERCEPTION_LIDAR_LIB_DUMMY_DUMMY_ROI_FILTER_H_
 
