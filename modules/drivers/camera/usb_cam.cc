@@ -38,8 +38,8 @@
 #include <string>
 
 #include "adv_plat/include/adv_trigger.h"
-#include "modules/drivers/usb_cam/util.h"
-#include "modules/drivers/usb_cam/usb_cam.h"
+#include "modules/drivers/camera/util.h"
+#include "modules/drivers/camera/usb_cam.h"
 
 #define __STDC_CONSTANT_MACROS
 

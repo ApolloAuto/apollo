@@ -3,7 +3,7 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_binary(
-    name = "libusb_cam_component.so",
+    name = "libcamera_component.so",
     deps = [":usb_cam_component_lib"],
     linkopts = [
        "-shared",
@@ -11,7 +11,7 @@ cc_binary(
        "-lavformat",
        "-lavcodec",
     ],
-    linkstatic = False,
+    linkshared = True,
 )
 
 cc_library(
@@ -19,15 +19,15 @@ cc_library(
     srcs = ["usb_cam_component.cc"],
     hdrs = ["usb_cam_component.h"],
     deps = [
-        ":usb_cam",
+        ":camera",
         "//modules/drivers/proto:sensor_proto",
         "//framework:cybertron",
     ],
-    copts = ['-DMODULE_NAME=\\"usb_cam\\"']
+    copts = ['-DMODULE_NAME=\\"camera\\"']
 )
 
 cc_library(
-    name = "usb_cam",
+    name = "camera",
     srcs = [
         "usb_cam.cc",
         "util.cc",
@@ -38,7 +38,7 @@ cc_library(
     ],
     
     deps = [
-        "//modules/drivers/usb_cam/proto:usb_cam_proto",
+        "//modules/drivers/camera/proto:camera_proto",
         "//framework:cybertron",
         "@adv_plat//:adv_plat",
     ],

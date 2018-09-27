@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/drivers/usb_cam/util.h"
+#include "modules/drivers/camera/util.h"
 
 #include <stdarg.h>
 #include <stdint.h>

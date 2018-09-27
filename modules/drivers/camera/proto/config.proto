@@ -45,6 +45,6 @@ message Config {
   // wait time when camera select timeout
   optional uint32 device_wait_ms = 24 [default = 2000];
   // camera select spin time
-  optional float spin_rate = 25 [default = 0.005];
+  optional uint32 spin_rate = 25 [default = 200];
   required OutputType output_type = 26;
 }

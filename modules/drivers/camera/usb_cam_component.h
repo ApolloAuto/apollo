@@ -21,9 +21,9 @@
 
 #include "cybertron/cybertron.h"
 #include "modules/drivers/proto/sensor_image.pb.h"
-#include "modules/drivers/usb_cam/proto/config.pb.h"
+#include "modules/drivers/camera/proto/config.pb.h"
 
-#include "modules/drivers/usb_cam/usb_cam.h"
+#include "modules/drivers/camera/usb_cam.h"
 
 namespace apollo {
 namespace drivers {
@@ -47,7 +47,7 @@ class UsbCamComponent : public Component<> {
   std::shared_ptr<Config> camera_config_;
   CameraImagePtr raw_image_ = nullptr;
   std::shared_ptr<Image> pb_image_ = nullptr;
-  float spin_rate_ = 0.005;
+  uint32_t spin_rate_ = 200;
   uint32_t device_wait_ = 2000;
 };
 
