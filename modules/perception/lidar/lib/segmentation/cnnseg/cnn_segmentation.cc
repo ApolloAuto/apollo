@@ -14,10 +14,11 @@
  * limitations under the License.
  *****************************************************************************/
 #include <map>
-#include <string>
-#include <vector>
 
 #include "cybertron/common/log.h"
+
+#include "modules/perception/lidar/lib/segmentation/cnnseg/proto/cnnseg_config.pb.h"
+
 #include "modules/perception/base/object_pool_types.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lib/io/file_util.h"
@@ -25,12 +26,16 @@
 #include "modules/perception/lidar/common/lidar_point_label.h"
 #include "modules/perception/lidar/common/lidar_timer.h"
 #include "modules/perception/lidar/lib/segmentation/cnnseg/cnn_segmentation.h"
-#include "modules/perception/lidar/lib/segmentation/cnnseg/proto/cnnseg_config.pb.h"
 #include "modules/perception/lidar/lib/segmentation/cnnseg/util.h"
 
 namespace apollo {
 namespace perception {
 namespace lidar {
+
+using base::AttributePointCloud;
+using base::PointF;
+using base::PointD;
+using base::Object;
 
 bool CNNSegmentation::Init(const SegmentationInitOptions& options) {
   // get configs
@@ -208,16 +213,17 @@ bool CNNSegmentation::InitClusterAndBackgroundSegmentation() {
     }
     ground_detector_time_ = timer.toc(true);
     AINFO << "Roi-filter time: " << roi_filter_time_
-             << "\tGround-detector time: " << ground_detector_time_;
+          << "\tGround-detector time: " << ground_detector_time_;
     return true;
   });
   worker_.Start();
   return true;
 }
 
-void CNNSegmentation::MapPointToGrid(const base::PointFCloudPtr& pc_ptr) {
+void CNNSegmentation::MapPointToGrid(
+    const std::shared_ptr<AttributePointCloud<PointF>>& pc_ptr) {
   float inv_res_x = 0.5 * static_cast<float>(width_) / range_;
-  float inv_res_y = 0.5 * static_cast<float>(height_) / range_;
+  // float inv_res_y = 0.5 * static_cast<float>(height_) / range_;
   point2grid_.assign(pc_ptr->size(), -1);
   int pos_x = -1;
   int pos_y = -1;
@@ -294,20 +300,20 @@ bool CNNSegmentation::Segment(const SegmentationOptions& options,
   GetObjectsFromSppEngine(&frame->segmented_objects);
 
   AINFO << "CNNSEG: mapping: " << mapping_time_ << "\t"
-           << " feature: " << feature_time_ << "\t"
-           << " infer: " << infer_time_ << "\t"
-           << " fg-seg: " << fg_seg_time_ << "\t"
-           << " join: " << join_time_ << "\t"
-           << " collect: " << collect_time_;
+        << " feature: " << feature_time_ << "\t"
+        << " infer: " << infer_time_ << "\t"
+        << " fg-seg: " << fg_seg_time_ << "\t"
+        << " join: " << join_time_ << "\t"
+        << " collect: " << collect_time_;
   return true;
 }
 
 void CNNSegmentation::GetObjectsFromSppEngine(
-    std::vector<base::ObjectPtr>* objects) {
+    std::vector<std::shared_ptr<Object>>* objects) {
   Timer timer;
   spp_engine_.GetSppData().grid_indices = point2grid_.data();
-  size_t num_foreground =
-      spp_engine_.ProcessForegroundSegmentation(original_cloud_);
+  // size_t num_foreground =
+  //     spp_engine_.ProcessForegroundSegmentation(original_cloud_);
   fg_seg_time_ = timer.toc(true);
   // should sync with worker before do background segmentation
   worker_.Join();
@@ -319,19 +325,21 @@ void CNNSegmentation::GetObjectsFromSppEngine(
   for (std::size_t i = 0; i < lidar_frame_ref_->roi_indices.indices.size();
        ++i) {
     const int& roi_id = lidar_frame_ref_->roi_indices.indices[i];
-    original_cloud_->points_height(roi_id) = roi_cloud_->points_height(i);
-    if (roi_cloud_->points_label(i) ==
+    original_cloud_->mutable_points_height()->at(roi_id) =
+        roi_cloud_->points_height(i);
+    if (roi_cloud_->mutable_points_label()->at(i) ==
         static_cast<uint8_t>(LidarPointLabel::GROUND)) {
-      original_cloud_->points_label(roi_id) = roi_cloud_->points_label(i);
+      original_cloud_->mutable_points_label()->at(roi_id) =
+          roi_cloud_->points_label().at(i);
     }
   }
-  memcpy(&original_world_cloud_->points_height(0),
-         &original_cloud_->points_height(0),
+  memcpy(&original_world_cloud_->mutable_points_height()->at(0),
+         &original_cloud_->points_height().at(0),
          sizeof(float) * original_cloud_->size());
   if (cnnseg_param_.remove_ground_points()) {
-    num_foreground = spp_engine_.RemoveGroundPointsInForegroundCluster(
-        original_cloud_, lidar_frame_ref_->roi_indices,
-        lidar_frame_ref_->non_ground_indices);
+    //  num_foreground = spp_engine_.RemoveGroundPointsInForegroundCluster(
+    //      original_cloud_, lidar_frame_ref_->roi_indices,
+    //      lidar_frame_ref_->non_ground_indices);
   }
 
   const auto& clusters = spp_engine_.clusters();
