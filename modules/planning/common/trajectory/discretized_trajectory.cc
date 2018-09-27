@@ -100,6 +100,24 @@ std::uint32_t DiscretizedTrajectory::QueryNearestPoint(
   return index_min;
 }
 
+uint32_t DiscretizedTrajectory::QueryNearestPointWithBuffer(
+    const common::math::Vec2d& position, const double buffer) const {
+  double dist_sqr_min = std::numeric_limits<double>::max();
+  std::uint32_t index_min = 0;
+  for (std::uint32_t i = 0; i < trajectory_points_.size(); ++i) {
+    const common::math::Vec2d curr_point(
+        trajectory_points_[i].path_point().x(),
+        trajectory_points_[i].path_point().y());
+
+    const double dist_sqr = curr_point.DistanceSquareTo(position);
+    if (dist_sqr < dist_sqr_min + buffer) {
+      dist_sqr_min = dist_sqr;
+      index_min = i;
+    }
+  }
+  return index_min;
+}
+
 void DiscretizedTrajectory::AppendTrajectoryPoint(
     const TrajectoryPoint& trajectory_point) {
   if (!trajectory_points_.empty()) {

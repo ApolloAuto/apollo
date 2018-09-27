@@ -60,6 +60,9 @@ class DiscretizedTrajectory : public Trajectory {
 
   virtual uint32_t QueryNearestPoint(const common::math::Vec2d& position) const;
 
+  uint32_t QueryNearestPointWithBuffer(
+      const common::math::Vec2d& position, const double buffer) const;
+
   virtual void AppendTrajectoryPoint(
       const common::TrajectoryPoint& trajectory_point);
 
