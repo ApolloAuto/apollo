@@ -20,7 +20,7 @@
 
 TEST(ArgmaxPluginsTest, test) {
   {
-    apollo::perception::ArgMaxParameter argmax_param;
+    apollo::perception::inference::ArgMaxParameter argmax_param;
     argmax_param.set_out_max_val(true);
     nvinfer1::Dims in_dims;
     in_dims.nbDims = 3;
@@ -33,7 +33,7 @@ TEST(ArgmaxPluginsTest, test) {
     EXPECT_EQ(out_dims.d[0], 2);
   }
   {
-    apollo::perception::ArgMaxParameter argmax_param;
+    apollo::perception::inference::ArgMaxParameter argmax_param;
     argmax_param.set_out_max_val(false);
     nvinfer1::Dims in_dims;
     in_dims.nbDims = 3;

@@ -20,7 +20,7 @@
 #include "gtest/gtest.h"
 
 TEST(SlicePluginsTest, test) {
-  apollo::perception::SliceParameter slice_param;
+  apollo::perception::inference::SliceParameter slice_param;
   slice_param.add_slice_point(3);
   nvinfer1::Dims in_dims;
   in_dims.nbDims = 5;
