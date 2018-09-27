@@ -15,27 +15,19 @@
  *****************************************************************************/
 #include <gtest/gtest.h>
 #include "modules/perception/fusion/lib/data_fusion/tracker/pbf_tracker/pbf_tracker.h"
+#include "modules/perception/base/sensor_meta.h"
 #define private public
 #define protected public
 #include "modules/perception/fusion/lib/fusion_system/probabilistic_fusion/probabilistic_fusion.h"
 
 namespace apollo {
 namespace perception {
-namespace common {
-DECLARE_string(obs_sensor_meta_path);
-DECLARE_string(obs_sensor_intrinsic_path);
-}
-
-namespace lib {
-DECLARE_string(work_root);
-}
-
 namespace fusion {
 
 TEST(ProbabliticFusionTest, test_init) {
-  lib::FLAGS_work_root = "./fusion_test_data/probabilistic_fusion";
-  common::FLAGS_obs_sensor_meta_path = "./data/sensor_meta.pt";
-  common::FLAGS_obs_sensor_intrinsic_path =
+  FLAGS_work_root = "./fusion_test_data/probabilistic_fusion";
+  FLAGS_obs_sensor_meta_path = "./data/sensor_meta.pt";
+  FLAGS_obs_sensor_intrinsic_path =
       "./fusion_test_data/probabilistic_fusion/params";
   SensorDataManager* sensor_manager =
       lib::Singleton<SensorDataManager>::get_instance();
@@ -100,9 +92,9 @@ TEST(ProbabliticFusionTest, test_init) {
 }
 
 TEST(ProbabliticFusionTest, test_update) {
-  lib::FLAGS_work_root = "./fusion_test_data/probabilistic_fusion";
-  common::FLAGS_obs_sensor_meta_path = "./data/sensor_meta.pt";
-  common::FLAGS_obs_sensor_intrinsic_path =
+  FLAGS_work_root = "./fusion_test_data/probabilistic_fusion";
+  FLAGS_obs_sensor_meta_path = "./data/sensor_meta.pt";
+  FLAGS_obs_sensor_intrinsic_path =
       "./fusion_test_data/probabilistic_fusion/params";
   SensorDataManager* sensor_manager =
       lib::Singleton<SensorDataManager>::get_instance();
@@ -250,9 +242,9 @@ TEST(ProbabliticFusionTest, test_update) {
 }
 
 TEST(ProbabilisticFusionTest, test_collect_sensor_measurement) {
-  lib::FLAGS_work_root = "./fusion_test_data/probabilistic_fusion";
-  common::FLAGS_obs_sensor_meta_path = "./data/sensor_meta.pt";
-  common::FLAGS_obs_sensor_intrinsic_path =
+  FLAGS_work_root = "./fusion_test_data/probabilistic_fusion";
+  FLAGS_obs_sensor_meta_path = "./data/sensor_meta.pt";
+  FLAGS_obs_sensor_intrinsic_path =
       "./fusion_test_data/probabilistic_fusion/params";
   SensorDataManager* sensor_manager =
       lib::Singleton<SensorDataManager>::get_instance();

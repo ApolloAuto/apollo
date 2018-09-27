@@ -18,6 +18,7 @@
 
 #include <gflags/gflags.h>
 
+#include "modules/common/time/time_util.h"
 #include "modules/perception/base/object_pool_types.h"
 #include "modules/perception/fusion/base/base_init_options.h"
 #include "modules/perception/fusion/base/track_pool_types.h"
@@ -25,12 +26,12 @@
 #include "modules/perception/fusion/lib/data_fusion/existance_fusion/dst_existance_fusion/dst_existance_fusion.h"
 #include "modules/perception/fusion/lib/data_fusion/tracker/pbf_tracker/pbf_tracker.h"
 #include "modules/perception/fusion/lib/data_fusion/type_fusion/dst_type_fusion/dst_type_fusion.h"
-#include "modules/perception/fusion/lib/fusion_system/probabilistic_fusion/proto/probabilistic_fusion_config.pb.h"
 #include "modules/perception/fusion/lib/gatekeeper/pbf_gatekeeper/pbf_gatekeeper.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lib/io/file_util.h"
 #include "modules/perception/lib/io/protobuf_util.h"
 #include "modules/perception/lib/utils/perf.h"
+#include "modules/perception/proto/probabilistic_fusion_config.pb.h"
 
 namespace apollo {
 namespace perception {
