@@ -11,9 +11,9 @@ cc_library(
         "bitmap2d.h",
     ],
     deps = [
-        "@eigen",
         "//framework:cybertron",
         "//modules/perception/lidar/common:lidar_log",
+        "@eigen",
     ],
 )
 
@@ -26,7 +26,6 @@ cc_library(
         "hdmap_roi_filter.h",
     ],
     deps = [
-        "@eigen",
         ":bitmap2d",
         ":polygon_mask",
         ":polygon_scan_cvter",
@@ -38,6 +37,19 @@ cc_library(
         "//modules/perception/lidar/lib/roi_filter/hdmap_roi_filter/proto:hdmap_roi_filter_proto",
         "//modules/perception/lidar/lib/scene_manager",
         "//modules/perception/lidar/lib/scene_manager/roi_service",
+        "@eigen",
+    ],
+)
+
+cc_test(
+    name = "hdmap_roi_filter_test",
+    size = "small",
+    srcs = [
+        "hdmap_roi_filter_test.cc",
+    ],
+    deps = [
+        ":hdmap_roi_filter",
+        "@gtest//:main",
     ],
 )
 
@@ -47,10 +59,10 @@ cc_library(
         "polygon_mask.h",
     ],
     deps = [
-        "@eigen",
         ":bitmap2d",
         ":polygon_scan_cvter",
         "//modules/perception/lidar/common:lidar_log",
+        "@eigen",
     ],
 )
 
@@ -60,8 +72,8 @@ cc_library(
         "polygon_scan_cvter.h",
     ],
     deps = [
-        "@eigen",
         "//modules/perception/lidar/common:lidar_log",
+        "@eigen",
     ],
 )
 

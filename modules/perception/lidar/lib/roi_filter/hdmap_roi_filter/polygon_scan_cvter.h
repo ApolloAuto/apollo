@@ -16,12 +16,13 @@
 #ifndef MODULES_PERCEPTION_LIDAR_LIB_HDMAP_ROI_FILTER_POLYGON_SCAN_CVTER_H_
 #define MODULES_PERCEPTION_LIDAR_LIB_HDMAP_ROI_FILTER_POLYGON_SCAN_CVTER_H_
 
-#include <Eigen/Core>
-#include <Eigen/StdVector>
 #include <algorithm>
 #include <limits>
 #include <utility>
 #include <vector>
+
+#include "Eigen/Core"
+#include "Eigen/StdVector"
 
 #include "modules/perception/lidar/common/lidar_log.h"
 
@@ -241,6 +242,7 @@ void PolygonScanCvter<T>::ScansCvt(
   // sort
   std::sort(aet_.second.begin(), aet_.second.end());
   CHECK_EQ(aet_.second.size() & 1, 0);
+
   // add aet to result
   for (size_t i = 0; i < aet_.second.size(); i += 2) {
     double min_y = aet_.second[i].y;
