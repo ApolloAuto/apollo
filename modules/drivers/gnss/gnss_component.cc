@@ -47,10 +47,6 @@ bool GnssDriverComponent::Init() {
   return true;
 }
 
-bool GnssDriverComponent::Proc(const std::shared_ptr<RawData>& rawdata) {
-  return true;
-}
-
 }  // namespace gnss
 }  // namespace drivers
 }  // namespace apollo

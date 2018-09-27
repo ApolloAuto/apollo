@@ -84,7 +84,7 @@ bool DataParser::Init() {
   gnss_status_.mutable_header()->set_timestamp_sec(
       cybertron::Time::Now().ToSecond());
 
-  gnssstatus_writer_ = node_->CreateWriter<GnssStatus>(FLAGS_chassis_topic);
+  gnssstatus_writer_ = node_->CreateWriter<GnssStatus>(FLAGS_gnss_status_topic);
   insstatus_writer_ = node_->CreateWriter<InsStatus>(FLAGS_ins_status_topic);
   gnssbestpose_writer_ =
       node_->CreateWriter<GnssBestPose>(FLAGS_gnss_best_pose_topic);

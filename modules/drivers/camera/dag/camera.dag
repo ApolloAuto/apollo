@@ -7,7 +7,6 @@ module_config {
       config {
         name : "camera_driver_short"
         config_file_path : "/apollo/modules/drivers/camera/conf/camera_short_conf.pb.txt"
-        readers {channel: ""}
       }
     }
 
@@ -16,7 +15,6 @@ module_config {
       config {
         name : "camera_driver_long"
         config_file_path : "/apollo/modules/drivers/camera/conf/camera_long_conf.pb.txt"
-        readers {channel: ""}
       }
     }
 
@@ -25,7 +23,6 @@ module_config {
       config {
         name : "camera_driver_front"
         config_file_path : "/apollo/modules/drivers/camera/conf/camera_front_conf.pb.txt"
-        readers {channel: ""}
       }
     }
 
