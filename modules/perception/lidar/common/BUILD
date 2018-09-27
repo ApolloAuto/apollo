@@ -120,6 +120,7 @@ cc_library(
     deps = [
         ":lidar_log",
         "//modules/perception/base",
+        "@pcl",
     ],
 )
 
@@ -132,9 +133,9 @@ cc_library(
         "object_sequence.h",
     ],
     deps = [
-        "//modules/perception/base:object",
-        "//modules/perception/lidar/common:common",
         "//framework:cybertron",
+        "//modules/perception/base:object",
+        "//modules/perception/lidar/common",
     ],
 )
 

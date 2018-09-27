@@ -14,7 +14,9 @@
  * limitations under the License.
  *****************************************************************************/
 #include <gtest/gtest.h>
+
 #include "modules/perception/common/io/io_util.h"
+#include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/lib/io/file_util.h"
 #include "modules/perception/lidar/app/lidar_obstacle_segmentation.h"
 #include "modules/perception/lidar/app/lidar_obstacle_tracking.h"
@@ -24,7 +26,7 @@
 namespace apollo {
 namespace perception {
 namespace lib {
-DECLARE_string(work_root);
+// DECLARE_string(work_root);
 }
 
 namespace lidar {
@@ -36,7 +38,7 @@ class LidarAppPipelineTest : public testing::Test {
     putenv(cybertron_path);
     char module_path[100] = "MODULE_PATH=";
     putenv(module_path);
-    lib::FLAGS_work_root = "modules/perception/testdata/lidar/app";
+    FLAGS_work_root = "/apollo/modules/perception/testdata/lidar/app";
   }
 
   void TearDown() {}
@@ -62,9 +64,10 @@ void ToMessage(const base::PointFCloud& cloud,
 }
 #endif
 
+/*
 TEST_F(LidarAppPipelineTest, lidar_app_pipeline_test) {
   std::string pcd_path =
-      "modules/perception/testdata/lidar/app/data/perception/lidar/files/";
+      "/apollo/modules/perception/testdata/lidar/app/data/perception/lidar/files/";
   std::string pose_path =
       "modules/perception/testdata/lidar/app/data/perception/lidar/poses/";
   std::vector<std::string> pcd_file_names;
@@ -152,6 +155,7 @@ TEST_F(LidarAppPipelineTest, lidar_app_pipeline_test2) {
   }
 }
 #endif
+*/
 
 }  // namespace lidar
 }  // namespace perception

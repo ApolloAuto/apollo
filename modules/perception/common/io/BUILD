@@ -17,6 +17,7 @@ cc_library(
         "//modules/perception/base:omnidirectional_model",
         "//modules/perception/common/geometry:basic",
         "//modules/perception/lib/io:file_util",
+        "@yaml_cpp//:yaml",
     ],
 )
 
@@ -31,7 +32,6 @@ cc_test(
     ],
     deps = [
         ":io_util",
-        "@yaml_cpp//:yaml",
         "@gtest//:main",
     ],
 )
