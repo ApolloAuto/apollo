@@ -3,10 +3,10 @@
 
 #include <vector>
 
-#include <geometry_msgs/transform_stamped.h>
 #include <tf2/buffer_core.h>
 #include <tf2/convert.h>
 #include <tf2/time.h>
+#include <tf2/transform_stamped.h>
 
 #include "cybertron/node/node.h"
 #include "cybertron/proto/common_geometry.pb.h"
