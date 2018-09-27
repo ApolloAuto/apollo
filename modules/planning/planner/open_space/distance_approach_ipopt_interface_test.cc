@@ -64,6 +64,13 @@ void DistanceApproachIPOPTInterfaceTest::ProblemSetup() {
   ptop_.reset(new DistanceApproachIPOPTInterface(
       num_of_variables_, num_of_constraints_, horizon_, ts_, ego_, x0_, xf_,
       XYbounds_, obstacles_vertices_num_, obstacles_num_));
+
+  double weight_u = 0.1;
+  double weight_time_1 = 0.2;
+  double weight_time_2 = 0.3;
+  double weight_reg = 0.4;
+  ptop_->set_objective_weights(weight_u, weight_time_1, weight_time_2,
+                               weight_reg);
 }
 
 TEST_F(DistanceApproachIPOPTInterfaceTest, initilization) {
@@ -107,6 +114,16 @@ TEST_F(DistanceApproachIPOPTInterfaceTest, get_starting_point) {
       ptop_->get_starting_point(kNumOfVariables, init_x, x, init_z, z_L, z_U,
                                 kNumOfConstraints, init_lambda, lambda);
   EXPECT_TRUE(res);
+}
+
+TEST_F(DistanceApproachIPOPTInterfaceTest, eval_f) {
+  int kNumOfVariables = 520;
+  double obj_value;
+  double x[kNumOfVariables];
+  std::fill_n(x, kNumOfVariables, 1.2);
+  bool res = ptop_->eval_f(kNumOfVariables, x, true, obj_value);
+  EXPECT_TRUE(res);
+  EXPECT_DOUBLE_EQ(obj_value, 241.10399999999802);
 }
 
 }  // namespace planning
