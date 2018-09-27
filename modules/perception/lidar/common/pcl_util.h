@@ -41,25 +41,25 @@ struct PCLPointXYZL {
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 } EIGEN_ALIGN16;
 
-// static bool LoadPCLPCD(const std::string& file_path,
-//                        base::PointFCloud* cloud_out) {
-//   pcl::PointCloud<PCLPointXYZIT> org_cloud;
-//   if (pcl::io::loadPCDFile(file_path, org_cloud) < 0) {
-//     AERROR << "Failed to load pcd file " << file_path;
-//     return false;
-//   }
-//   cloud_out->resize(org_cloud.size());
-//   for (size_t i = 0; i < org_cloud.size(); ++i) {
-//     auto& pt = org_cloud.points[i];
-//     auto& new_pt = cloud_out->at(i);
-//     new_pt.x = pt.x;
-//     new_pt.y = pt.y;
-//     new_pt.z = pt.z;
-//     new_pt.intensity = pt.intensity;
-//     cloud_out->mutable_points_timestamp()->at(i) = pt.timestamp;
-//   }
-//   return true;
-// }
+static bool LoadPCLPCD(const std::string& file_path,
+                       base::PointFCloud* cloud_out) {
+  pcl::PointCloud<PCLPointXYZIT> org_cloud;
+  if (pcl::io::loadPCDFile(file_path, org_cloud) < 0) {
+    AERROR << "Failed to load pcd file " << file_path;
+    return false;
+  }
+  cloud_out->resize(org_cloud.size());
+  for (size_t i = 0; i < org_cloud.size(); ++i) {
+    auto& pt = org_cloud.points[i];
+    auto& new_pt = cloud_out->at(i);
+    new_pt.x = pt.x;
+    new_pt.y = pt.y;
+    new_pt.z = pt.z;
+    new_pt.intensity = pt.intensity;
+    cloud_out->mutable_points_timestamp()->at(i) = pt.timestamp;
+  }
+  return true;
+}
 
 // static bool WritePcd(const std::string& file_path,
 //                      const base::PointFCloud& cloud) {

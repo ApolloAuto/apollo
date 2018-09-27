@@ -14,6 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/perception/lidar/lib/segmentation/cnnseg/feature_generator.h"
+
 #include "modules/perception/base/common.h"
 
 namespace apollo {
@@ -196,8 +197,8 @@ void FeatureGenerator::GenerateGPU(const base::PointFCloudPtr& pc_ptr,
                  sizeof(int) * cloud_size, cudaMemcpyHostToDevice));
 
   // compute features
-  float inv_res_x = 0.5 * width_ / range_;
-  float inv_res_y = 0.5 * height_ / range_;
+  // float inv_res_x = 0.5 * width_ / range_;
+  // float inv_res_y = 0.5 * height_ / range_;
   {
     int block_size = (cloud_size + kGPUThreadSize - 1) / kGPUThreadSize;
     MapKernel<float><<<block_size, kGPUThreadSize>>>(cloud_size, pc_gpu_,
