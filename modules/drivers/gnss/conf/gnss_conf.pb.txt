@@ -42,6 +42,7 @@ proj4_text: "+proj=utm +zone=10 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no
 tf {
     frame_id: "world"
     child_frame_id: "novatel"
+    enable: true
 }
 
 # If given, the driver will send velocity info into novatel one time per second

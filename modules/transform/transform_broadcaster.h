@@ -40,12 +40,12 @@ class TransformBroadcaster {
   /** \brief Send a TransformStamped message
    * The stamped data structure includes frame_id, and time, and parent_id
    * already.  */
-  void sendTransform(const apollo::transform::TransformStamped& transform);
+  void SendTransform(const apollo::transform::TransformStamped& transform);
 
   /** \brief Send a vector of TransformStamped messages
    * The stamped data structure includes frame_id, and time, and parent_id
    * already.  */
-  void sendTransform(
+  void SendTransform(
       const std::vector<apollo::transform::TransformStamped>& transforms);
 
  private:

@@ -27,14 +27,14 @@ TransformBroadcaster::TransformBroadcaster(
   writer_ = node_->CreateWriter<::apollo::transform::TransformStampeds>(attr);
 }
 
-void TransformBroadcaster::sendTransform(
+void TransformBroadcaster::SendTransform(
     const ::apollo::transform::TransformStamped& transform) {
   std::vector<::apollo::transform::TransformStamped> transforms;
   transforms.emplace_back(transform);
-  sendTransform(transforms);
+  SendTransform(transforms);
 }
 
-void TransformBroadcaster::sendTransform(
+void TransformBroadcaster::SendTransform(
     const std::vector<::apollo::transform::TransformStamped>& transforms) {
   auto message = std::make_shared<::apollo::transform::TransformStampeds>();
   for (const auto& transform : transforms) {

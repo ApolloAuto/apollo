@@ -278,10 +278,11 @@ void DataParser::PublishOdometry(const MessagePtr message) {
   gps_msg->mutable_linear_velocity()->set_z(ins->linear_velocity().z());
 
   gps_writer_->Write(gps);
-
-  TransformStamped transform;
-  GpsToTransformStamped(gps, &transform);
-  tf_broadcaster_.sendTransform(transform);
+  if (config_.tf().enable()) {
+    TransformStamped transform;
+    GpsToTransformStamped(gps, &transform);
+    tf_broadcaster_.SendTransform(transform);
+  }
 }
 
 void DataParser::PublishCorrimu(const MessagePtr message) {
