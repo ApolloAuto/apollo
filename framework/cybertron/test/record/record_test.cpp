@@ -48,12 +48,18 @@ TEST(RecordTest, TestOneMessageFile) {
   ASSERT_EQ("", rw->file_);
   ASSERT_EQ("", rw->path_);
   ASSERT_EQ(nullptr, rw->file_writer_);
+  ASSERT_TRUE(rw->SetSizeOfFileSegmentation(1024));
+  ASSERT_TRUE(rw->SetIntervalOfFileSegmentation(100));
+  ASSERT_EQ(rw->header_.segment_interval(), 100 * 1e9L);
+  ASSERT_EQ(rw->header_.segment_raw_size(), 1024 * 1024UL);
 
   ASSERT_TRUE(rw->Open(TEST_FILE));
   ASSERT_TRUE(rw->is_opened_);
   ASSERT_EQ(TEST_FILE, rw->file_);
   ASSERT_EQ(TEST_FILE, rw->path_);
   ASSERT_TRUE(rw->file_writer_->ofstream_.is_open());
+  ASSERT_FALSE(rw->SetSizeOfFileSegmentation(1024));
+  ASSERT_FALSE(rw->SetIntervalOfFileSegmentation(100));
 
   ASSERT_TRUE(rw->WriteChannel(CHANNEL_NAME_1, MESSAGE_TYPE_1, PROTO_DESC));
   ASSERT_EQ(0, rw->GetMessageNumber(CHANNEL_NAME_1));
@@ -134,7 +140,8 @@ TEST(RecordTest, TestMutiMessageFile) {
   std::string pbmsg_content("");
   pbmsg.SerializeToString(&pbmsg_content);
 
-  ASSERT_TRUE(rw->WriteMessage<Channel>(CHANNEL_NAME_2, pbmsg, TIME_2, PROTO_DESC));
+  ASSERT_TRUE(
+      rw->WriteMessage<Channel>(CHANNEL_NAME_2, pbmsg, TIME_2, PROTO_DESC));
   ASSERT_EQ(1, rw->GetMessageNumber(CHANNEL_NAME_2));
 
   ASSERT_TRUE(rw->WriteMessage(CHANNEL_NAME_1, rm, TIME_3));

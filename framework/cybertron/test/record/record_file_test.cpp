@@ -87,7 +87,7 @@ TEST(RecordFileTest, TestOneMessageFile) {
   ASSERT_NE(nullptr, rfw->flush_thread_);
 
   // write header section
-  Header hdr1 = GetHeaderWithSegmentParams(0, 0);
+  Header hdr1 = HeaderBuilder::GetHeaderWithSegmentParams(0, 0);
   hdr1.set_chunk_interval(0);
   hdr1.set_chunk_raw_size(0);
   ASSERT_TRUE(rfw->WriteHeader(hdr1));
