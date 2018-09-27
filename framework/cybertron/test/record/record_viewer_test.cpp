@@ -107,12 +107,16 @@ TEST(RecordTest, filter_test) {
 
   RecordViewer viewer_0(reader);
   EXPECT_EQ(CheckCount(viewer_0), 1000);
+  EXPECT_EQ(START_TIME, viewer_0.get_begin_time());
+  EXPECT_EQ(END_TIME - 1, viewer_0.get_end_time());
 
-  RecordViewer viewer_1(reader, END_TIME, END_TIME + 1);
+  RecordViewer viewer_1(reader, END_TIME, END_TIME);
   EXPECT_EQ(CheckCount(viewer_1), 0);
+  EXPECT_EQ(END_TIME, viewer_1.get_begin_time());
 
   RecordViewer viewer_2(reader, END_TIME, START_TIME);
   EXPECT_EQ(CheckCount(viewer_2), 0);
+  EXPECT_EQ(START_TIME, viewer_2.get_end_time());
 
   RecordViewer viewer_3(reader, 0, END_TIME);
   EXPECT_EQ(CheckCount(viewer_3), 1000);
