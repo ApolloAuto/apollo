@@ -17,9 +17,11 @@
 #define MODULES_PERCEPTION_LIDAR_COMMON_OBJECT_SEQUENCE_H_
 
 #include <map>
+#include <memory>
 #include <mutex>
 #include <vector>
-#include <memory>
+
+#include "gtest/gtest_prod.h"
 
 #include "modules/perception/base/object.h"
 #include "modules/perception/lidar/common/lidar_log.h"
@@ -33,7 +35,8 @@ class ObjectSequence {
   typedef int TrackIdKey;
   typedef double TimeStampKey;
   typedef std::map<TimeStampKey,
-      std::shared_ptr<apollo::perception::base::Object>> TrackedObjects;
+                   std::shared_ptr<apollo::perception::base::Object>>
+      TrackedObjects;
 
  public:
   ObjectSequence() = default;
@@ -47,9 +50,10 @@ class ObjectSequence {
                                 TimeStampKey window_time);
 
  protected:
+  FRIEND_TEST(FusedClassifierTest, test_one_sequence_fusion);
+  FRIEND_TEST(FusedClassifierTest, test_one_sequence_fusion_bad_timestamp);
   void RemoveStaleTracks(TimeStampKey current_stamp);
 
- protected:
   TimeStampKey current_;
   std::map<TrackIdKey, TrackedObjects> sequence_;
   std::mutex mutex_;

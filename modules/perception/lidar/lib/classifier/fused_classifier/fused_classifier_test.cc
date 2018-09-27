@@ -13,14 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include <gtest/gtest.h>
+#include "modules/perception/lidar/lib/classifier/fused_classifier/fused_classifier.h"
+
 #include <map>
 #include <mutex>
+
+#include "gtest/gtest.h"
+
 #include "modules/perception/base/object.h"
 #include "modules/perception/lidar/common/lidar_frame.h"
 #include "modules/perception/lidar/common/lidar_log.h"
 #include "modules/perception/lidar/common/object_sequence.h"
-#include "modules/perception/lidar/lib/classifier/fused_classifier/fused_classifier.h"
 #include "modules/perception/lidar/lib/classifier/fused_classifier/util.h"
 
 namespace apollo {
