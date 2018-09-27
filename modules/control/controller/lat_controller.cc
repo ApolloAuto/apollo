@@ -138,8 +138,7 @@ void LatController::ProcessLogs(const SimpleLateralDebug *debug,
   // StrCat supports 9 arguments at most.
   const std::string log_str = StrCat(
       StrCat(debug->lateral_error(), ",", debug->ref_heading(), ",",
-             VehicleStateProvider::Instance()->heading(), ",",
-             debug->heading_error(), ","),
+             debug->heading(), ",", debug->heading_error(), ","),
       StrCat(debug->heading_error_rate(), ",", debug->lateral_error_rate(), ",",
              debug->curvature(), ",", debug->steer_angle(), ","),
       StrCat(debug->steer_angle_feedforward(), ",",
@@ -344,6 +343,8 @@ Status LatController::ComputeControlCommand(
   trajectory_analyzer_ =
       std::move(TrajectoryAnalyzer(&target_tracking_trajectory));
 
+  UpdateDrivingOrientation();
+
   SimpleLateralDebug *debug = cmd->mutable_debug()->mutable_simple_lat_debug();
   debug->Clear();
 
@@ -407,7 +408,10 @@ Status LatController::ComputeControlCommand(
 
   if (VehicleStateProvider::Instance()->linear_velocity() <
           FLAGS_lock_steer_speed &&
-      VehicleStateProvider::Instance()->gear() == canbus::Chassis::GEAR_DRIVE &&
+      (VehicleStateProvider::Instance()->gear() ==
+       canbus::Chassis::GEAR_DRIVE ||
+       VehicleStateProvider::Instance()->gear() ==
+       canbus::Chassis::GEAR_REVERSE) &&
       chassis->driving_mode() == canbus::Chassis::COMPLETE_AUTO_DRIVE) {
     steer_angle = pre_steer_angle_;
   }
@@ -432,7 +436,7 @@ Status LatController::ComputeControlCommand(
       -matrix_k_(0, 3) * matrix_state_(3, 0) * 180 / M_PI * steer_ratio_ /
       steer_single_direction_max_degree_ * 100;
 
-  debug->set_heading(VehicleStateProvider::Instance()->heading());
+  debug->set_heading(driving_orientation_);
   debug->set_steer_angle(steer_angle);
   debug->set_steer_angle_feedforward(steer_angle_feedforward);
   debug->set_steer_angle_lateral_contribution(steer_angle_lateral_contribution);
@@ -453,23 +457,16 @@ Status LatController::Reset() { return Status::OK(); }
 
 void LatController::UpdateState(SimpleLateralDebug *debug) {
   if (FLAGS_use_navigation_mode) {
-    ComputeLateralErrors(0.0, 0.0, VehicleStateProvider::Instance()->heading(),
+    ComputeLateralErrors(0.0, 0.0, driving_orientation_,
                          VehicleStateProvider::Instance()->linear_velocity(),
                          VehicleStateProvider::Instance()->angular_velocity(),
                          trajectory_analyzer_, debug);
   } else {
     const auto &com = VehicleStateProvider::Instance()->ComputeCOMPosition(lr_);
-    ComputeLateralErrors(com.x(), com.y(),
-                         VehicleStateProvider::Instance()->heading(),
+    ComputeLateralErrors(com.x(), com.y(), driving_orientation_,
                          VehicleStateProvider::Instance()->linear_velocity(),
                          VehicleStateProvider::Instance()->angular_velocity(),
                          trajectory_analyzer_, debug);
-  }
-
-  // Reverse heading error if vehicle is going in reverse
-  if (VehicleStateProvider::Instance()->gear() ==
-      canbus::Chassis::GEAR_REVERSE) {
-    debug->set_heading_error(-debug->heading_error());
   }
 
   // State matrix update;
@@ -591,5 +588,18 @@ void LatController::ComputeLateralErrors(
   debug->set_curvature(target_point.path_point().kappa());
 }
 
+void LatController::UpdateDrivingOrientation() {
+  driving_orientation_ = VehicleStateProvider::Instance()->heading();
+  matrix_bd_ = matrix_b_ * ts_;
+  // Reverse the driving direction if the vehicle is in reverse mode
+  if (VehicleStateProvider::Instance()->gear() ==
+      canbus::Chassis::GEAR_REVERSE) {
+    driving_orientation_ = common::math::NormalizeAngle(
+      driving_orientation_ + M_PI);
+  // Update Matrix_b for reverse mode
+  matrix_bd_ = - matrix_b_ * ts_;
+  ADEBUG << "Matrix_b changed due to gear direction";
+  }
+}
 }  // namespace control
 }  // namespace apollo
