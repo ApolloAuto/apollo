@@ -6,18 +6,6 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "tracker",
-    srcs = [
-        "tracker.cc",
-    ],
-    hdrs = [
-        "tracker.h",
-    ],
-    deps = [
-    ],
-)
-
-cc_library(
     name = "hm_multi_target_tracker",
     srcs = [
         "hm_multi_target_tracker.cc",
