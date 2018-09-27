@@ -19,6 +19,7 @@ cc_library(
     hdrs = ["tcp_stream.h"],
     deps = [
         ":stream",
+        "//modules/common/adapters:adapter_gflags",
         "//modules/common/util:string_util",
         "//modules/common/proto:pnc_point_proto",
         "//modules/common/util:util",
@@ -35,6 +36,7 @@ cc_library(
         ":ntrip_stream",
         ":serial_stream",
         ":stream",
+        "//modules/common/adapters:adapter_gflags",
         "//modules/drivers/gnss/parser:gnss_parser",
         "//modules/drivers/gnss/proto:gnss_proto",
         "//modules/canbus/proto:canbus_proto",

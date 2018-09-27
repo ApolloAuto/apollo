@@ -19,11 +19,10 @@
 #include <memory>
 
 #include "cybertron/cybertron.h"
-
-#include "modules/drivers/gnss/proto/gnss_raw_observation.pb.h"
-
+#include "modules/common/adapters/adapter_gflags.h"
 #include "modules/drivers/gnss/parser/parser.h"
 #include "modules/drivers/gnss/parser/rtcm3_parser.h"
+#include "modules/drivers/gnss/proto/gnss_raw_observation.pb.h"
 
 namespace apollo {
 namespace drivers {
@@ -32,10 +31,9 @@ namespace gnss {
 using ::apollo::drivers::gnss::EpochObservation;
 using ::apollo::drivers::gnss::GnssEphemeris;
 
-RtcmParser::RtcmParser(const config::Config &config,
-           const std::shared_ptr<apollo::cybertron::Node> &node)
-    : config_(config), node_(node) {
-}
+RtcmParser::RtcmParser(const config::Config& config,
+                       const std::shared_ptr<apollo::cybertron::Node>& node)
+    : config_(config), node_(node) {}
 
 bool RtcmParser::Init() {
   rtcm_parser_.reset(new Rtcm3Parser(true));
@@ -46,10 +44,9 @@ bool RtcmParser::Init() {
   }
 
   gnssephemeris_writer_ =
-      node_->CreateWriter<GnssEphemeris>(config_.gnssephemeris_channel_name());
-  epochobservation_writer_ = node_->CreateWriter<EpochObservation>(
-      config_.epochobservation_channel_name());
-
+      node_->CreateWriter<GnssEphemeris>(FLAGS_gnss_rtk_eph_topic);
+  epochobservation_writer_ =
+      node_->CreateWriter<EpochObservation>(FLAGS_gnss_rtk_obs_topic);
   init_flag_ = true;
   return true;
 }

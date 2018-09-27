@@ -28,7 +28,7 @@ namespace velodyne {
 
 bool VelodyneConvertComponent::Init() {
   Config velodyne_config;
-  if (!!GetProtoConfig(&velodyne_config)) {
+  if (!GetProtoConfig(&velodyne_config)) {
     AWARN << "Load config failed, config file" << config_file_path_;
     return false;
   }
