@@ -1,7 +1,7 @@
 modules {
   name: "GPS"
   process_conf {
-    process_cmd_keywords: "modules/drivers/gnss/gnss"
+    process_cmd_keywords: "modules/drivers/gnss/launch/gnss.launch"
   }
 }
 modules {
@@ -13,13 +13,13 @@ modules {
 modules {
   name: "canbus"
   process_conf {
-    process_cmd_keywords: "modules/canbus/canbus"
+    process_cmd_keywords: "modules/canbus/launch/canbus.launch"
   }
 }
 modules {
   name: "control"
   process_conf {
-    process_cmd_keywords: "modules/control/control"
+    process_cmd_keywords: "modules/control/launch/control.launch"
   }
   topic_conf {
     channel: "/apollo/control"
@@ -28,7 +28,7 @@ modules {
 modules {
   name: "guardian"
   process_conf {
-    process_cmd_keywords: "modules/guardian/guardian"
+    process_cmd_keywords: "modules/guardian/launch/guardian.launch"
   }
 }
 modules {
@@ -40,7 +40,7 @@ modules {
 modules {
   name: "navigation_control"
   process_conf {
-    process_cmd_keywords: "modules/control/control"
+    process_cmd_keywords: "modules/control/launch/control.launch"
   }
   topic_conf {
     channel: "/apollo/control"
@@ -49,7 +49,7 @@ modules {
 modules {
   name: "localization"
   process_conf {
-    process_cmd_keywords: "modules/localization/localization"
+    process_cmd_keywords: "modules/localization/launch"
   }
   topic_conf {
     channel: "/apollo/localization/pose"
@@ -58,7 +58,7 @@ modules {
 modules {
   name: "navigation_localization"
   process_conf {
-    process_cmd_keywords: "modules/localization/localization"
+    process_cmd_keywords: "modules/localization/launch"
   }
   topic_conf {
     channel: "/apollo/localization/pose"
@@ -73,7 +73,7 @@ modules {
 modules {
   name: "perception"
   process_conf {
-    process_cmd_keywords: "modules/perception/perception"
+    process_cmd_keywords: "modules/perception/launch/perception.launch"
   }
   topic_conf {
     channel: "/apollo/perception/obstacles"
@@ -82,7 +82,7 @@ modules {
 modules {
   name: "navigation_perception"
   process_conf {
-    process_cmd_keywords: "modules/perception/perception"
+    process_cmd_keywords: "modules/perception/launch/perception.launch"
   }
   topic_conf {
     channel: "/apollo/perception/obstacles"
@@ -91,7 +91,7 @@ modules {
 modules {
   name: "planning"
   process_conf {
-    process_cmd_keywords: "modules/planning/planning"
+    process_cmd_keywords: "modules/planning/launch/planning.launch"
   }
   topic_conf {
     channel: "/apollo/planning"
@@ -100,7 +100,7 @@ modules {
 modules {
   name: "navigation_planning"
   process_conf {
-    process_cmd_keywords: "modules/planning/planning"
+    process_cmd_keywords: "modules/planning/launch/planning.launch"
   }
   topic_conf {
     channel: "/apollo/planning"
@@ -109,7 +109,7 @@ modules {
 modules {
   name: "prediction"
   process_conf {
-    process_cmd_keywords: "modules/prediction/prediction"
+    process_cmd_keywords: "modules/prediction/launch/prediction.launch"
   }
   topic_conf {
     channel: "/apollo/prediction"
@@ -124,7 +124,7 @@ modules {
 modules {
   name: "navigation_prediction"
   process_conf {
-    process_cmd_keywords: "modules/prediction/prediction"
+    process_cmd_keywords: "modules/prediction/launch/prediction.launch"
   }
   topic_conf {
     channel: "/apollo/prediction"
@@ -133,7 +133,7 @@ modules {
 modules {
   name: "radar"
   process_conf {
-    process_cmd_keywords: "modules/drivers/radar/conti_radar/conti_radar"
+    process_cmd_keywords: "modules/drivers/radar/conti_radar/launch/conti_radar.launch"
   }
   topic_conf {
     channel: "/apollo/sensor/conti_radar"
@@ -160,7 +160,7 @@ modules {
 modules {
   name: "relative_map"
   process_conf {
-    process_cmd_keywords: "modules/map/relative_map/relative_map"
+    process_cmd_keywords: "modules/map/relative_map/launch/relative_map.launch"
   }
   topic_conf {
     channel: "/apollo/relative_map"
@@ -169,13 +169,13 @@ modules {
 modules {
   name: "routing"
   process_conf {
-    process_cmd_keywords: "modules/routing/routing"
+    process_cmd_keywords: "modules/routing/launch/routing.launch"
   }
 }
 modules {
   name: "third_party_perception"
   process_conf {
-    process_cmd_keywords: "modules/third_party_perception/third_party_perception"
+    process_cmd_keywords: "modules/third_party_perception/launch/third_party_perception.launch"
   }
   topic_conf {
     channel: "/apollo/perception/obstacles"
