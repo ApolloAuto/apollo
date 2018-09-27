@@ -1,6 +1,6 @@
 syntax = "proto2";
 
-package apollo.perception;
+package apollo.perception.inference;
 
 // Specifies the shape (dimensions) of a Blob.
 message BlobShape {
