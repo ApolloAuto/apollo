@@ -11,6 +11,7 @@ cc_library(
         "//external:gflags",
         "//framework:cybertron",
         "//modules/common",
+        "//modules/common/adapters:adapter_gflags",
         "//modules/common/configs:config_gflags",
         "//modules/common/util",
         "//modules/common/util:color",
