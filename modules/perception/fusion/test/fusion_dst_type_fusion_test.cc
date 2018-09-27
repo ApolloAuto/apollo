@@ -39,9 +39,9 @@ DECLARE_string(work_root);
 namespace fusion {
 
 TEST(DstTypeFusionTest, test_update_with_measurement) {
-  lib::FLAGS_work_root = "./fusion_test_data/dst_type_fusion";
+  lib::FLAGS_work_root = "/apollo/modules/perception/testdata/fusion/dst_type_fusion";
   common::FLAGS_obs_sensor_intrinsic_path =
-      "./fusion_test_data/dst_type_fusion/params";
+      "/apollo/modules/perception/testdata/fusion/dst_type_fusion/params";
   common::FLAGS_obs_sensor_meta_path = "./data/sensor_meta.pt";
   common::SensorManager *sensor_manager =
       lib::Singleton<common::SensorManager>::get_instance();
@@ -129,9 +129,10 @@ TEST(DstTypeFusionTest, test_update_with_measurement) {
 }
 
 TEST(DstTypeFusionTest, test_update_without_measurement) {
-  lib::FLAGS_work_root = "./fusion_test_data/dst_type_fusion";
+  lib::FLAGS_work_root =
+      "/apollo/modules/perception/testdata/fusion/dst_type_fusion";
   common::FLAGS_obs_sensor_intrinsic_path =
-      "./fusion_test_data/dst_type_fusion/params";
+      "/apollo/modules/perception/testdata/fusion/dst_type_fusion/params";
   common::FLAGS_obs_sensor_meta_path = "./conf/sensor_meta.config";
   common::SensorManager *sensor_manager =
       lib::Singleton<common::SensorManager>::get_instance();

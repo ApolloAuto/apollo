@@ -32,9 +32,10 @@ DECLARE_string(work_root);
 namespace fusion {
 
 TEST(SensorDataManagerTest, test) {
-  lib::FLAGS_work_root = "./fusion_test_data/base";
+  lib::FLAGS_work_root = "/apollo/modules/perception/testdata/fusion/base";
   common::FLAGS_obs_sensor_meta_path = "./data/sensor_meta.pt";
-  common::FLAGS_obs_sensor_intrinsic_path = "./fusion_test_data/base/params";
+  common::FLAGS_obs_sensor_intrinsic_path =
+      "/apollo/modules/perception/testdata/fusion/base/params";
   SensorDataManager* sensor_data_manager =
       lib::Singleton<SensorDataManager>::get_instance();
   EXPECT_TRUE(sensor_data_manager != nullptr);

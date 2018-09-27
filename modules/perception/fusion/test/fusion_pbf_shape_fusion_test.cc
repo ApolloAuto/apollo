@@ -31,10 +31,11 @@ namespace fusion {
 const double SHAPE_FUSION_PI = 3.1415926;
 
 TEST(PbfShapeFusion, lidar_track) {
-  lib::FLAGS_work_root = "./fusion_test_data/pbf_shape_fusion";
+  lib::FLAGS_work_root =
+      "/apollo/modules/perception/testdata/fusion/pbf_shape_fusion";
   common::FLAGS_obs_sensor_meta_path = "./data/sensor_meta.pt";
   common::FLAGS_obs_sensor_intrinsic_path =
-      "./fusion_test_data/pbf_shape_fusion/params";
+      "/apollo/modules/perception/testdata/fusion/pbf_shape_fusion/params";
   Eigen::Matrix4d pose;
   pose << 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1;
 
@@ -164,10 +165,10 @@ TEST(PbfShapeFusion, lidar_track) {
 }
 
 TEST(PbfShapeFusion, radar_track) {
-  lib::FLAGS_work_root = "./fusion_test_data/pbf_shape_fusion";
+  lib::FLAGS_work_root = "/apollo/modules/perception/testdata/fusion/pbf_shape_fusion";
   common::FLAGS_obs_sensor_meta_path = "./conf/sensor_meta.config";
   common::FLAGS_obs_sensor_intrinsic_path =
-      "./fusion_test_data/pbf_shape_fusion/params";
+      "/apollo/modules/perception/testdata/fusion/pbf_shape_fusion/params";
   Eigen::Matrix4d pose;
   pose << 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1;
 
@@ -339,10 +340,10 @@ TEST(PbfShapeFusion, radar_track) {
 }
 
 TEST(PbfShapeFusion, camera_track) {
-  lib::FLAGS_work_root = "./fusion_test_data/pbf_shape_fusion";
+  lib::FLAGS_work_root = "/apollo/modules/perception/testdata/fusion/pbf_shape_fusion";
   common::FLAGS_obs_sensor_meta_path = "./conf/sensor_meta.config";
   common::FLAGS_obs_sensor_intrinsic_path =
-      "./fusion_test_data/pbf_shape_fusion/params";
+      "/apollo/modules/perception/testdata/fusion/pbf_shape_fusion/params";
   Eigen::Matrix4d pose;
   pose << 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1;
 

@@ -35,9 +35,10 @@ DECLARE_string(work_root);
 namespace fusion {
 
 TEST(TrackTest, test) {
-  lib::FLAGS_work_root = "./fusion_test_data/base/";
+  lib::FLAGS_work_root = "/apollo/modules/perception/testdata/fusion/base/";
   common::FLAGS_obs_sensor_meta_path = "./data/sensor_meta.pt";
-  common::FLAGS_obs_sensor_intrinsic_path = "./fusion_test_data/base/params";
+  common::FLAGS_obs_sensor_intrinsic_path =
+      "/apollo/modules/perception/testdata/fusion/base/params";
   base::SensorInfo vlp64_info;
   vlp64_info.name = "velodyne64";
   vlp64_info.type = base::SensorType::VELODYNE_64;
