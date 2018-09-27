@@ -58,38 +58,6 @@ proto_library(
 )
 
 cc_proto_library(
-    name = "rt_proto",
-    deps = [
-        ":rt_proto_lib",
-    ],
-)
-
-proto_library(
-    name = "rt_proto_lib",
-    srcs = [
-        "rt.proto",
-    ],
-    deps = [
-    ],
-)
-
-cc_proto_library(
-    name = "sensor_meta_schema_proto",
-    deps = [
-        ":sensor_meta_schema_proto_lib",
-    ],
-)
-
-proto_library(
-    name = "sensor_meta_schema_proto_lib",
-    srcs = [
-        "sensor_meta_schema.proto",
-    ],
-    deps = [
-    ],
-)
-
-cc_proto_library(
     name = "ccrf_type_fusion_config_proto",
     deps = [
         ":ccrf_type_fusion_config_proto_lib",
@@ -122,6 +90,22 @@ proto_library(
 )
 
 cc_proto_library(
+    name = "hm_tracker_config_proto",
+    deps = [
+        ":hm_tracker_config_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "hm_tracker_config_proto_lib",
+    srcs = [
+        "hm_tracker_config.proto",
+    ],
+    deps = [
+    ],
+)
+
+cc_proto_library(
     name = "map_manager_config_proto",
     deps = [
         ":map_manager_config_proto_lib",
@@ -132,6 +116,22 @@ proto_library(
     name = "map_manager_config_proto_lib",
     srcs = [
         "map_manager_config.proto",
+    ],
+    deps = [
+    ],
+)
+
+cc_proto_library(
+    name = "probabilistic_fusion_config_proto",
+    deps = [
+        ":probabilistic_fusion_config_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "probabilistic_fusion_config_proto_lib",
+    srcs = [
+        "probabilistic_fusion_config.proto",
     ],
     deps = [
     ],
@@ -154,16 +154,32 @@ proto_library(
 )
 
 cc_proto_library(
-    name = "hm_tracker_config_proto",
+    name = "rt_proto",
     deps = [
-        ":hm_tracker_config_proto_lib",
+        ":rt_proto_lib",
     ],
 )
 
 proto_library(
-    name = "hm_tracker_config_proto_lib",
+    name = "rt_proto_lib",
     srcs = [
-        "hm_tracker_config.proto",
+        "rt.proto",
+    ],
+    deps = [
+    ],
+)
+
+cc_proto_library(
+    name = "sensor_meta_schema_proto",
+    deps = [
+        ":sensor_meta_schema_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "sensor_meta_schema_proto_lib",
+    srcs = [
+        "sensor_meta_schema.proto",
     ],
     deps = [
     ],
