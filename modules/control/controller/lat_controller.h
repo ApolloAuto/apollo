@@ -104,6 +104,9 @@ class LatController : public Controller {
  protected:
   void UpdateState(SimpleLateralDebug *debug);
 
+  // logic for reverse driving mode
+  void UpdateDrivingOrientation();
+
   void UpdateMatrix();
 
   void UpdateMatrixCompound();
@@ -219,6 +222,8 @@ class LatController : public Controller {
   double init_vehicle_heading_ = 0.0;
 
   double min_turn_radius_ = 0.0;
+
+  double driving_orientation_ = 0.0;
 };
 
 }  // namespace control
