@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_FUSION_LIB_DATA_ASSOCIATION_CHI_SQUARED_CDF_1_0_0500_0_999900_H_
-#define MODULES_PERCEPTION_FUSION_LIB_DATA_ASSOCIATION_CHI_SQUARED_CDF_1_0_0500_0_999900_H_
+#ifndef MODULES_PERCEPTION_FUSION_LIB_DATA_ASSOCIATION_CHI_SQUARED_CDF_1_0_0500_0_999900_H_  // NOLINT
+#define MODULES_PERCEPTION_FUSION_LIB_DATA_ASSOCIATION_CHI_SQUARED_CDF_1_0_0500_0_999900_H_  // NOLINT
 
 #include <cstdlib>
 
@@ -87,4 +87,4 @@ inline double ChiSquaredCdf1TableFun(double dist) {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_FUSION_LIB_DATA_ASSOCIATION_CHI_SQUARED_CDF_1_0_0500_0_999900_H_
+#endif  // FUSION_LIB_DATA_ASSOCIATION_CHI_SQUARED_CDF_1_0_0500_0_999900_H_
