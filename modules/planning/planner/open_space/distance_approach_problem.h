@@ -33,13 +33,12 @@ namespace planning {
 
 class DistanceApproachProblem {
  public:
-  explicit DistanceApproachProblem(Eigen::MatrixXd x0, Eigen::MatrixXd xF,
-                                   std::size_t horizon, float ts,
-                                   Eigen::MatrixXd ego, Eigen::MatrixXd xWS,
-                                   Eigen::MatrixXd uWS, Eigen::MatrixXd timeWS,
-                                   Eigen::MatrixXd XYbounds, std::size_t nOb,
-                                   Eigen::MatrixXd vOb, Eigen::MatrixXd AOb,
-                                   Eigen::MatrixXd bOb);
+  explicit DistanceApproachProblem(
+      Eigen::MatrixXd x0, Eigen::MatrixXd xF, std::size_t horizon, float ts,
+      Eigen::MatrixXd ego, Eigen::MatrixXd xWS, Eigen::MatrixXd uWS,
+      Eigen::MatrixXd timeWS, Eigen::MatrixXd XYbounds,
+      std::size_t obstacles_num, Eigen::MatrixXd obstacles_vertices_num,
+      Eigen::MatrixXd obstacles_A, Eigen::MatrixXd obstacles_b);
 
   virtual ~DistanceApproachProblem() = default;
 
@@ -75,16 +74,16 @@ class DistanceApproachProblem {
   Eigen::MatrixXd XYbounds_;
 
   // number of obstacles
-  std::size_t nOb_;
+  std::size_t obstacles_num_;
 
-  // vOb
-  Eigen::MatrixXd vOb_;
+  // obstacles_vertices_num
+  Eigen::MatrixXd obstacles_vertices_num_;
 
-  // AOb
-  Eigen::MatrixXd AOb_;
+  // obstacles_A
+  Eigen::MatrixXd obstacles_A_;
 
-  // bOb
-  Eigen::MatrixXd bOb_;
+  // obstacles_b
+  Eigen::MatrixXd obstacles_b_;
 };
 
 }  // namespace planning

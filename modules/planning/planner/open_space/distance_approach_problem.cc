@@ -38,8 +38,9 @@ using apollo::common::time::Clock;
 DistanceApproachProblem::DistanceApproachProblem(
     Eigen::MatrixXd x0, Eigen::MatrixXd xF, std::size_t horizon, float ts,
     Eigen::MatrixXd ego, Eigen::MatrixXd xWS, Eigen::MatrixXd uWS,
-    Eigen::MatrixXd timeWS, Eigen::MatrixXd XYbounds, std::size_t nOb,
-    Eigen::MatrixXd vOb, Eigen::MatrixXd AOb, Eigen::MatrixXd bOb)
+    Eigen::MatrixXd timeWS, Eigen::MatrixXd XYbounds, std::size_t obstacles_num,
+    Eigen::MatrixXd obstacles_vertices_num, Eigen::MatrixXd obstacles_A,
+    Eigen::MatrixXd obstacles_b)
     : x0_(x0),
       xF_(xF),
       horizon_(horizon),
@@ -49,10 +50,10 @@ DistanceApproachProblem::DistanceApproachProblem(
       uWS_(uWS),
       timeWS_(timeWS),
       XYbounds_(XYbounds),
-      nOb_(nOb),
-      vOb_(vOb),
-      AOb_(AOb),
-      bOb_(bOb) {}
+      obstacles_num_(obstacles_num),
+      obstacles_vertices_num_(obstacles_vertices_num),
+      obstacles_A_(obstacles_A),
+      obstacles_b_(obstacles_b) {}
 
 bool DistanceApproachProblem::Solve(Eigen::MatrixXd* state_result,
                                     Eigen::MatrixXd* control_result,
@@ -70,10 +71,10 @@ bool DistanceApproachProblem::Solve(Eigen::MatrixXd* state_result,
   int n3 = horizon_ + 1;
 
   // n4 : dual multiplier associated with obstacleShape
-  int n4 = vOb_.sum() * (horizon_ + 1);
+  int n4 = obstacles_vertices_num_.sum() * (horizon_ + 1);
 
-  // n5 : dual multipier associated with car shape, nOb*4 * (N+1)
-  int n5 = nOb_ * 4 * (horizon_ + 1);
+  // n5 : dual multipier associated with car shape, obstacles_num*4 * (N+1)
+  int n5 = obstacles_num_ * 4 * (horizon_ + 1);
 
   // m1 : state equality constatins
   int m1 = 4 * horizon_;
@@ -99,7 +100,7 @@ bool DistanceApproachProblem::Solve(Eigen::MatrixXd* state_result,
   // TODO(QiL) : evaluate whether need to new it everytime
   DistanceApproachIPOPTInterface* ptop = new DistanceApproachIPOPTInterface(
       num_of_variables, num_of_constraints, horizon_, ts_, ego_, x0_, xF_,
-      XYbounds_, vOb_, nOb_);
+      XYbounds_, obstacles_vertices_num_, obstacles_num_);
 
   Ipopt::SmartPtr<Ipopt::TNLP> problem = ptop;
 
