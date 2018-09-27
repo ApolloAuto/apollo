@@ -10,6 +10,7 @@ cc_library(
     hdrs = [
         "i_ground.h",
     ],
+    copts = ["-msse4.1"],
     deps = [
         ":i_struct_s",
         ":i_util",

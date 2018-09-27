@@ -13,7 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include "modules/perception/lidar/lib/ground_detector/spatio_temporal_ground_detector/spatio_temporal_ground_detector.h"
+
+#include "modules/perception/lidar/lib/ground_detector/spatio_temporal_ground_detector/spatio_temporal_ground_detector.h"  // NOLINT
 
 #include "modules/perception/common/point_cloud_processing/common.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
@@ -21,7 +22,7 @@
 #include "modules/perception/lib/io/protobuf_util.h"
 #include "modules/perception/lidar/common/lidar_log.h"
 #include "modules/perception/lidar/common/lidar_point_label.h"
-#include "modules/perception/lidar/lib/ground_detector/spatio_temporal_ground_detector/proto/spatio_temporal_ground_detector_config.pb.h"
+#include "modules/perception/lidar/lib/ground_detector/spatio_temporal_ground_detector/proto/spatio_temporal_ground_detector_config.pb.h"  // NOLINT
 
 namespace apollo {
 namespace perception {
@@ -100,7 +101,7 @@ bool SpatioTemporalGroundDetector::Detect(const GroundDetectorOptions& options,
   int index = 0;
   unsigned int nr_points_element = 3;
   float z_distance = 0.0;
-  float dist = 0.0;
+
   cloud_center_(0) = frame->lidar2world_pose(0, 3);
   cloud_center_(1) = frame->lidar2world_pose(1, 3);
   cloud_center_(2) = frame->lidar2world_pose(2, 3);

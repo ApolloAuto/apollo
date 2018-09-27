@@ -9,6 +9,7 @@ cc_library(
         "//modules/perception/common/i_lib/core",
         "//modules/perception/common/i_lib/geometry:i_plane",
         "//modules/perception/common/i_lib/numeric",
+        "//modules/perception/common/i_lib/pc:i_ground",
     ],
 )
 
