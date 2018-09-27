@@ -13,14 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+
 #ifndef MODULES_PERCEPTION_COMMON_I_LIB_PC_I_STRUCT_S_H_
 #define MODULES_PERCEPTION_COMMON_I_LIB_PC_I_STRUCT_S_H_
 
 #include <smmintrin.h>
 #include <vector>
-#include "../core/i_alloc.h"
-#include "../core/i_blas.h"
-#include "i_util.h"
+
+#include "modules/perception/common/i_lib/core/i_alloc.h"
+#include "modules/perception/common/i_lib/core/i_blas.h"
+#include "modules/perception/common/i_lib/pc/i_util.h"
 
 namespace idl {
 template <typename T, unsigned int d>
