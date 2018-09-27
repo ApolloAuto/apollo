@@ -13,8 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include <gtest/gtest.h>
 #include "modules/perception/lidar/lib/segmentation/cnnseg/spp_engine/spp_cluster_list.h"
+
+#include "gtest/gtest.h"
+
 #include "modules/perception/lidar/lib/segmentation/cnnseg/spp_engine/spp_label_image.h"
 
 namespace apollo {

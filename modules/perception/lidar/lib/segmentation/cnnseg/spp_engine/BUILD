@@ -45,6 +45,18 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "spp_cluster_list_test",
+    size = "small",
+    srcs = [
+        "spp_cluster_list_test.cc",
+    ],
+    deps = [
+        ":spp_cluster_list",
+        "@gtest//:main",
+    ],
+)
+
 cc_library(
     name = "spp_label_image",
     srcs = [

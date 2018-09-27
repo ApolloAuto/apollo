@@ -19,6 +19,8 @@
 #include <memory>
 #include <vector>
 
+#include "gtest/gtest_prod.h"
+
 #include "modules/perception/common/i_lib/core/i_alloc.h"
 #include "modules/perception/lidar/lib/segmentation/cnnseg/spp_engine/spp_cluster.h"
 
@@ -137,6 +139,8 @@ class SppLabelImage {
 
  private:
   static const size_t kDefaultReserveSize = 500;
+
+  FRIEND_TEST(SppClusterTest, spp_cluster_test);
 };
 
 typedef std::shared_ptr<SppLabelImage> SppLabelImagePtr;
