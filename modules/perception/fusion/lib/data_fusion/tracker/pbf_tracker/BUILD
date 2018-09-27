@@ -12,11 +12,6 @@ cc_library(
     ],
     deps = [
         "//modules/common/time:time",
-        "//modules/perception/fusion/base:sensor",
-        "//modules/perception/common:perception_gflags",
-        "//modules/perception/fusion/common:base_filter",
-        "//modules/perception/fusion/common:dst_evidence",
-        "//modules/perception/fusion/common:kalman_filter",
         "//modules/perception/fusion/lib/data_fusion/existance_fusion/dst_existance_fusion:dst_existance_fusion",
         "//modules/perception/fusion/lib/data_fusion/motion_fusion/kalman_motion_fusion:kalman_motion_fusion",
         "//modules/perception/fusion/lib/data_fusion/shape_fusion/pbf_shape_fusion:pbf_shape_fusion",
@@ -26,16 +21,17 @@ cc_library(
     ],
 )
 
-#cc_test(
-#    name = "pbf_tracker_test",
-#    size = "small",
-#    srcs = [
-#        "pbf_tracker_test.cc",
-#    ],
-#    deps = [
-#        ":pbf_tracker",
-#        "@gtest//:main",
-#    ],
-#)
+cc_test(
+    name = "pbf_tracker_test",
+    size = "small",
+    srcs = [
+        "pbf_tracker_test.cc",
+    ],
+    deps = [
+        ":pbf_tracker",
+        "//modules/perception/common:perception_gflags",
+        "@gtest//:main",
+    ],
+)
 
 cpplint()
