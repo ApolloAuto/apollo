@@ -252,7 +252,7 @@ class SimulationWorldService {
   void ReadRoutingFromFile(const std::string &routing_response_file);
 
   template <typename MessageT>
-  void UpdateLatency(const std::string module_name,
+  void UpdateLatency(const std::string &module_name,
                      cybertron::Reader<MessageT> *reader) {
     if (reader->Empty()) {
       return;
@@ -272,7 +272,20 @@ class SimulationWorldService {
     (*world_.mutable_latency())[module_name] = latency;
   }
 
+  /**
+   * @brief update delayes of modules.
+   * @detail Delay is calculated based on the received time from a module
+   * reader. If the reader has not received any message, delay is -1. Otherwise,
+   * it is the max of (current_time - last_received_time) and
+   * (last_received_time - second_to_last_received_time)
+   */
   void UpdateDelays();
+
+  /**
+   * @brief update latencies of modules, where latency is how long it takes for
+   * sensor data (lidar, radar and/or camera) to be processed by
+   * a module.
+   */
   void UpdateLatencies();
 
   template <typename Points>

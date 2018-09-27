@@ -27,7 +27,7 @@ properties:
             fill: false
             showLine: true
         perception:
-            color: 'rgba(113, 226, 208, 0.5)' # aqua
+            color: 'rgba(113, 226, 208, 0.5)' # turquoise
             borderWidth: 2
             pointRadius: 0
             fill: false
