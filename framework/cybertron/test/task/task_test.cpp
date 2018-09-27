@@ -14,9 +14,7 @@ class Foo {
     EXPECT_EQ(res.get(), 10);
   }
 
-  uint32_t Task(const uint32_t& input) {
-    return input;
-  }
+  uint32_t Task(const uint32_t& input) { return input; }
 };
 
 struct Message {
@@ -55,7 +53,7 @@ TEST(AsyncTest, batch_run) {
     void_results.push_back(Async(&Task1));
   }
 
-  for (auto& result: void_results) {
+  for (auto& result : void_results) {
     result.get();
   }
 

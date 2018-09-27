@@ -16,10 +16,10 @@
 
 #include "cybertron/task/task_manager.h"
 
-#include "cybertron/task/task.h"
 #include "cybertron/croutine/croutine.h"
 #include "cybertron/croutine/routine_factory.h"
 #include "cybertron/scheduler/scheduler.h"
+#include "cybertron/task/task.h"
 
 namespace apollo {
 namespace cybertron {

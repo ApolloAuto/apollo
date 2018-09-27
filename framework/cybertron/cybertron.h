@@ -35,7 +35,6 @@ namespace cybertron {
 std::unique_ptr<Node> CreateNode(const std::string& node_name,
                                  const std::string& name_space = "");
 
-
 }  // namespace cybertron
 }  // namespace apollo
 

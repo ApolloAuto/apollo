@@ -6,9 +6,7 @@ namespace apollo {
 namespace cybertron {
 namespace common {
 
-TEST(LogTest, TestAll) {
-  AINFO << "11111";
-}
+TEST(LogTest, TestAll) { AINFO << "11111"; }
 
 }  // namespace logger
 }  // namespace cybertron

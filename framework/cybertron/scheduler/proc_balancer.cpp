@@ -91,7 +91,7 @@ bool ProcBalancer::Push(const std::weak_ptr<CRoutine>& croutine) {
   processor->Context()->Push(cr);
   croutine_pos_map_.Set(cr->Id(), processor->Id());
   ADEBUG << "push routine[" << GlobalData::GetTaskNameById(cr->Id())
-        << "] into processor[" << processor->Id() << "]";
+         << "] into processor[" << processor->Id() << "]";
   return true;
 }
 

@@ -82,7 +82,7 @@ std::shared_ptr<CRoutine> CFSContext::NextRoutine() {
     if (cr->IsSleep() || cr->IsWaitingInput()) {
       wait_queue_.emplace_back(cr);
       ADEBUG << "pop from rq routine[" << cr_id << "] size["
-            << wait_queue_.size() << "]";
+             << wait_queue_.size() << "]";
       it = rb_map_.erase(it);
       continue;
     }
