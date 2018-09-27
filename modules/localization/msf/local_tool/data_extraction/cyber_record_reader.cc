@@ -40,20 +40,12 @@ void CyberRecordReader::Subscribe(
 }
 
 void CyberRecordReader::Read(const std::string &file_name) {
-  std::unique_ptr<RecordReader> reader(new RecordReader());
-  reader->Open(file_name);
-
-  while (!reader->EndOfFile()) {
-    if (!reader->ReadMessage()) {
-      usleep(1000);
-      continue;
-    }
-    std::string channel_name = reader->CurrentMessageChannelName();
-    std::string message_content = reader->CurrentRawMessage()->message;
-
-    auto itr = call_back_map_.find(channel_name);
+  RecordReader reader(file_name);
+  cybertron::record::RecordMessage message;
+  while (!reader.ReadMessage(&message)) {
+    auto itr = call_back_map_.find(message.channel_name);
     if (itr != call_back_map_.end()) {
-      itr->second(message_content);
+      itr->second(message.content);
     }
   }
 
