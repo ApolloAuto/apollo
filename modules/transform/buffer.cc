@@ -121,7 +121,7 @@ void Buffer::SubscriptionCallbackImpl(
       AERROR << "Failure to set recieved transform:" << temp.c_str();
     }
   }
-};
+}
 
 void Buffer::TF2MsgToCyber(
     const geometry_msgs::TransformStamped& tf2_trans_stamped,
@@ -189,10 +189,7 @@ bool Buffer::canTransform(const std::string& target_frame,
   while (
       cybertron::Time::Now().ToNanosecond() < start_time + timeout_ns &&
       !canTransform(target_frame, source_frame, time.ToNanosecond(), errstr) &&
-      !cybertron::IsShutdown())  // Make sure we haven't been stopped (won't
-                                 // work for
-                                 // pytf)
-  {
+      !cybertron::IsShutdown()) {
     usleep(3000);
   }
   bool retval =
@@ -226,3 +223,4 @@ bool Buffer::canTransform(const std::string& target_frame,
 
 }  // namespace transform
 }  // namespace apollo
+

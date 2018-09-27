@@ -275,7 +275,7 @@ bool RawStream::Init() {
   cybertron::ReaderConfig reader_config;
   reader_config.channel_name = FLAGS_gnss_raw_data_topic;
   reader_config.pending_queue_size = 100;
-  gpsbin_reader_ = node_->CreateReader<RawData>(reader_config, 
+  gpsbin_reader_ = node_->CreateReader<RawData>(reader_config,
       [&](const std::shared_ptr<RawData> &raw_data) {
         GpsbinCallback(raw_data);
       });
