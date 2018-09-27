@@ -13,11 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_LIDAR_LIB_TRACKER_HM_TRACKER_HM_MULTI_TARGET_TRACKER_H_
-#define MODULES_PERCEPTION_LIDAR_LIB_TRACKER_HM_TRACKER_HM_MULTI_TARGET_TRACKER_H_
+#ifndef MODULES_PERCEPTION_LIDAR_LIB_TRACKER_HM_TRACKER_HM_MULTI_TARGET_TRACKER_H_  // NOLINT
+#define MODULES_PERCEPTION_LIDAR_LIB_TRACKER_HM_TRACKER_HM_MULTI_TARGET_TRACKER_H_  // NOLINT
 
 #include <string>
 #include <vector>
+#include <memory>
 
 #include "modules/perception/base/object.h"
 #include "modules/perception/common/geometry/convex_hull_2d.h"
@@ -68,7 +69,7 @@ class HmMultiTargetTracker : public BaseMultiTargetTracker {
   bool IsNeedToRemove(const TrackDataPtr& track);
 
   void MatchWrapper(const ObjectTrackMatcherOptions& options,
-                    std::vector<TrackedObjectPtr>& objects,
+                    const std::vector<TrackedObjectPtr>& objects,
                     const std::vector<TrackDataPtr>& tracks,
                     const std::vector<Eigen::VectorXf>& tracks_predict,
                     const double time_diff, ObjectTrackMatcher* matcher,

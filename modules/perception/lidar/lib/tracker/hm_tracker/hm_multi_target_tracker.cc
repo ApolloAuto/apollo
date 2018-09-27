@@ -13,19 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+#include "modules/perception/lidar/lib/tracker/hm_tracker/hm_multi_target_tracker.h"
+
 #include <iomanip>
 #include <map>
 #include <utility>
 
+#include "cybertron/common/log.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lib/io/file_util.h"
-#include "modules/perception/lib/io/protobuf_util.h"
+#include "modules/common/util/file.h"
 #include "modules/perception/lidar/common/feature_descriptor.h"
-#include "modules/perception/lidar/common/lidar_log.h"
 #include "modules/perception/lidar/common/lidar_object_util.h"
 #include "modules/perception/lidar/lib/tracker/common/track_pool_types.h"
-#include "modules/perception/lidar/lib/tracker/hm_tracker/hm_multi_target_tracker.h"
-#include "modules/perception/lidar/lib/tracker/hm_tracker/proto/hm_tracker_config.pb.h"
+#include "modules/perception/proto/hm_tracker_config.pb.h"
 
 namespace apollo {
 namespace perception {
@@ -48,7 +49,7 @@ bool HmMultiTargetTracker::Init(const MultiTargetTrackerInitOptions& options) {
   config_file = lib::FileUtil::GetAbsolutePath(config_file,
                                                "hm_multi_target_tracker.conf");
   HmMultiTargetTrackerConfig config;
-  CHECK(lib::ParseProtobufFromFile(config_file, &config));
+  CHECK(apollo::common::util::GetProtoFromFile(config_file, &config));
 
   foreground_matcher_method_ = config.foreground_mathcer_method();
   background_matcher_method_ = config.background_matcher_method();
@@ -324,7 +325,7 @@ void HmMultiTargetTracker::DecomposeForegroundBackgroundObjects(
 
 void HmMultiTargetTracker::MatchWrapper(
     const ObjectTrackMatcherOptions& options,
-    std::vector<TrackedObjectPtr>& objects,
+    const std::vector<TrackedObjectPtr>& objects,
     const std::vector<TrackDataPtr>& tracks,
     const std::vector<Eigen::VectorXf>& tracks_predict, const double time_diff,
     ObjectTrackMatcher* matcher, std::vector<TrackObjectPair>* assignments,
