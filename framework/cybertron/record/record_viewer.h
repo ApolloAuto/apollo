@@ -32,10 +32,10 @@ class RecordViewer {
   RecordViewer(const std::shared_ptr<RecordReader>& reader,
                uint64_t begin_time = 0, uint64_t end_time = UINT_MAX,
                const std::set<std::string>& channels = std::set<std::string>());
-
   bool IsValid() const;
-
   bool Update(RecordMessage* message);
+  uint64_t get_begin_time() const;
+  uint64_t get_end_time() const;
 
   class Iterator {
    public:

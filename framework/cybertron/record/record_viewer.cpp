@@ -54,6 +54,10 @@ bool RecordViewer::Update(RecordMessage* message) {
   return false;
 }
 
+uint64_t RecordViewer::get_begin_time() const { return begin_time_; }
+
+uint64_t RecordViewer::get_end_time() const { return end_time_; }
+
 RecordViewer::Iterator RecordViewer::begin() { return Iterator(this); }
 
 RecordViewer::Iterator RecordViewer::end() { return Iterator(this, true); }
