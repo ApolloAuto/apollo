@@ -38,7 +38,7 @@ class DistanceApproachProblemTest : public ::testing::Test {
   Eigen::MatrixXd x0_ = Eigen::MatrixXd::Ones(4, 1);
   Eigen::MatrixXd xf_ = Eigen::MatrixXd::Ones(4, 1);
   Eigen::MatrixXd XYbounds_ = Eigen::MatrixXd::Ones(4, 1);
-  Eigen::MatrixXd vOb_ = Eigen::MatrixXd::Ones(12, 4);
+  Eigen::MatrixXd obstacles_vertices_num_ = Eigen::MatrixXd::Ones(12, 4);
   Eigen::MatrixXd xWS_ = Eigen::MatrixXd::Zero(4, horizon_ + 1);
   Eigen::MatrixXd uWS_ = Eigen::MatrixXd::Zero(2, horizon_);
   Eigen::MatrixXd timeWS_ = Eigen::MatrixXd::Zero(1, horizon_ + 1);

@@ -36,8 +36,8 @@ constexpr double dmin = 0.05;
 DistanceApproachIPOPTInterface::DistanceApproachIPOPTInterface(
     const int num_of_variables, const int num_of_constraints,
     std::size_t horizon, float ts, Eigen::MatrixXd ego, Eigen::MatrixXd x0,
-    Eigen::MatrixXd xf, Eigen::MatrixXd XYbounds, Eigen::MatrixXd vOb,
-    std::size_t nOb)
+    Eigen::MatrixXd xf, Eigen::MatrixXd XYbounds,
+    Eigen::MatrixXd obstacles_vertices_num, std::size_t obstacles_num)
     : num_of_variables_(num_of_variables),
       num_of_constraints_(num_of_constraints),
       horizon_(horizon),
@@ -46,14 +46,14 @@ DistanceApproachIPOPTInterface::DistanceApproachIPOPTInterface(
       x0_(x0),
       xf_(xf),
       XYbounds_(XYbounds),
-      vOb_(vOb),
-      nOb_(nOb) {
+      obstacles_vertices_num_(obstacles_vertices_num),
+      obstacles_num_(obstacles_num) {
   w_ev_ = ego_(1, 0) + ego_(3, 0);
   l_ev_ = ego_(0, 0) + ego_(2, 0);
 
   g_ = {l_ev_ / 2, w_ev_ / 2, l_ev_ / 2, w_ev_ / 2};
   offset_ = (ego_(0, 0) + ego_(2, 0)) / 2 - ego_(2, 0);
-  vObsum_ = std::size_t(vOb_.sum());
+  obstacles_vertices_sum_ = std::size_t(obstacles_vertices_num_.sum());
   state_result_ = Eigen::MatrixXd::Zero(horizon_ + 1, 4);
   control_result_ = Eigen::MatrixXd::Zero(horizon_ + 1, 2);
   time_result_ = Eigen::MatrixXd::Zero(horizon_ + 1, 1);
@@ -174,10 +174,10 @@ bool DistanceApproachIPOPTInterface::get_bounds_info(int n, double* x_l,
 
   // 4. lagrange constraint l, sum(oVb) * (N+1)
   for (std::size_t i = 1; i <= horizon_ + 1; ++i) {
-    for (std::size_t j = 1; j <= vObsum_; ++j) {
-      x_l[i * vObsum_ + j] = 0.0;
+    for (std::size_t j = 1; j <= obstacles_vertices_sum_; ++j) {
+      x_l[i * obstacles_vertices_sum_ + j] = 0.0;
       // TODO(QiL): refine this variables limits
-      x_u[i * vObsum_ + j] = 100.0;
+      x_u[i * obstacles_vertices_sum_ + j] = 100.0;
 
       ++variable_index;
     }
@@ -185,12 +185,12 @@ bool DistanceApproachIPOPTInterface::get_bounds_info(int n, double* x_l,
 
   ADEBUG << "variable_index after adding lagrange l : " << variable_index;
 
-  // 4. lagrange constraint m, 4*nOb * (horizon_+1)
+  // 4. lagrange constraint m, 4*obstacles_num * (horizon_+1)
   for (std::size_t i = 1; i <= horizon_ + 1; ++i) {
-    for (std::size_t j = 1; j <= 4 * nOb_; ++j) {
-      x_l[i * 4 * nOb_ + j] = 0.0;
+    for (std::size_t j = 1; j <= 4 * obstacles_num_; ++j) {
+      x_l[i * 4 * obstacles_num_ + j] = 0.0;
       // TODO(QiL): refine this variables limits
-      x_u[i * 4 * nOb_ + j] = 100.0;
+      x_u[i * 4 * obstacles_num_ + j] = 100.0;
 
       ++variable_index;
     }
@@ -269,10 +269,10 @@ bool DistanceApproachIPOPTInterface::get_bounds_info(int n, double* x_l,
 
   // 3. lagrangian constraints l
   for (std::size_t i = 1; i < horizon_ + 1; ++i) {
-    for (std::size_t j = 1; j <= vObsum_; ++j) {
-      g_l[i * vObsum_ + j] = 0.0;
+    for (std::size_t j = 1; j <= obstacles_vertices_sum_; ++j) {
+      g_l[i * obstacles_vertices_sum_ + j] = 0.0;
       // TODO(QiL) : Check constraint index 100 after running senarios.
-      g_u[i * vObsum_ + j] = 100.0;
+      g_u[i * obstacles_vertices_sum_ + j] = 100.0;
 
       ++constraint_index;
     }
@@ -283,11 +283,11 @@ bool DistanceApproachIPOPTInterface::get_bounds_info(int n, double* x_l,
 
   // 4. lagrangian constraints n
   for (std::size_t i = 1; i < horizon_ + 1; ++i) {
-    for (std::size_t j = 1; j <= 4 * nOb_; ++j) {
-      g_l[i * 4 * nOb_ + j] = 0.0;
+    for (std::size_t j = 1; j <= 4 * obstacles_num_; ++j) {
+      g_l[i * 4 * obstacles_num_ + j] = 0.0;
       // TODO(QiL) : Check constraint index 100 back after running the
       // senarios.
-      g_u[i * 4 * nOb_ + j] = 100.0;
+      g_u[i * 4 * obstacles_num_ + j] = 100.0;
 
       ++constraint_index;
     }
@@ -356,9 +356,10 @@ bool DistanceApproachIPOPTInterface::get_starting_point(
 
   // auto offset_input = horizon_ * 2 + offset_time;
 
-  // auto offset_l = offset_input + (horizon_ + 1) * 4;  // sum of nOb.
+  // auto offset_l = offset_input + (horizon_ + 1) * 4;  // sum of
+  // obstacles_num.
 
-  // auto offset_m = offset_l + (horizon_ + 1) * nOb_;
+  // auto offset_m = offset_l + (horizon_ + 1) * obstacles_num_;
 
   // 1. state variables linspace initialization
 
@@ -415,7 +416,7 @@ bool DistanceApproachIPOPTInterface::eval_f(int n, const double* x, bool new_x,
   std::size_t time_start_index = start_index + horizon_ * 2;
   std::size_t lagrangian_l_start_index = time_start_index + horizon_ + 1;
   std::size_t lagrangian_n_start_index =
-      lagrangian_l_start_index + (horizon_ + 1) * vObsum_;
+      lagrangian_l_start_index + (horizon_ + 1) * obstacles_vertices_sum_;
 
   // 1. objective to minimize u square
   for (std::size_t i = 0; i < horizon_; ++i) {
@@ -425,21 +426,22 @@ bool DistanceApproachIPOPTInterface::eval_f(int n, const double* x, bool new_x,
                  x[time_start_index + i] * x[time_start_index + i];
   }
 
-  // Add l , sum(vOb) * (N+1)
+  // Add l , sum(obstacles_vertices_num) * (N+1)
   constexpr double reg = 1e-4;
   for (std::size_t i = 1; i < horizon_ + 1; ++i) {
-    for (std::size_t j = 1; j <= vObsum_; ++j) {
+    for (std::size_t j = 1; j <= obstacles_vertices_sum_; ++j) {
       obj_value += reg * x[lagrangian_l_start_index + i * (horizon_ + 1) + j] *
                    x[lagrangian_l_start_index + i * (horizon_ + 1) + j];
     }
   }
 
-  // Add n, 4 * nOb * (N+1)
+  // Add n, 4 * obstacles_num * (N+1)
   for (std::size_t i = 1; i < horizon_ + 1; ++i) {
     // TODO(QiL) : Double check the dimensions here !!!!!!!!!
-    for (std::size_t j = 1; j <= 4 * nOb_; ++j) {
-      obj_value += reg * x[lagrangian_n_start_index + i * 4 * nOb_ + j] *
-                   x[lagrangian_n_start_index + i * 4 * nOb_ + j];
+    for (std::size_t j = 1; j <= 4 * obstacles_num_; ++j) {
+      obj_value += reg *
+                   x[lagrangian_n_start_index + i * 4 * obstacles_num_ + j] *
+                   x[lagrangian_n_start_index + i * 4 * obstacles_num_ + j];
     }
   }
   return true;
