@@ -117,7 +117,7 @@ void RTKLocalizationComponent::PublishPoseBroadcastTF(
   mutable_rotation->set_qz(localization.pose().orientation().qz());
   mutable_rotation->set_qw(localization.pose().orientation().qw());
 
-  tf2_broadcaster_->sendTransform(tf2_msg);
+  tf2_broadcaster_->SendTransform(tf2_msg);
   return;
 }
 
