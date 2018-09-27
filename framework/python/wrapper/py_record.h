@@ -31,6 +31,7 @@
 #include "cybertron/message/py_message.h"
 #include "cybertron/message/raw_message.h"
 #include "cybertron/proto/record.pb.h"
+#include "cybertron/record/record_message.h"
 #include "cybertron/record/record_reader.h"
 #include "cybertron/record/record_writer.h"
 
@@ -42,47 +43,59 @@ namespace apollo {
 namespace cybertron {
 namespace record {
 
+struct BagMessage {
+  uint64_t timestamp = 0;
+  std::string channel_name = "";
+  std::string data = "";
+  std::string data_type = "";
+  bool end = true;
+};
+
 class PyRecordReader {
  public:
-  PyRecordReader() {}
+  explicit PyRecordReader(const std::string& file) {
+    record_reader_.reset(new RecordReader(file));
+  }
   ~PyRecordReader() {}
 
-  bool Open(const std::string& path) { return record_reader_.Open(path); }
-  void Close() { record_reader_.Close(); }
-
-  bool ReadMessage() { return record_reader_.ReadMessage(); }
-  bool EndOfFile() { return record_reader_.EndOfFile(); }
-  std::string CurrentMessageChannelName() {
-    return record_reader_.CurrentMessageChannelName();
-  }
-  std::string CurrentRawMessage() {
-    if (record_reader_.CurrentRawMessage()) {
-      return record_reader_.CurrentRawMessage()->message;
+  BagMessage ReadMessage(uint64_t begin_time = 0,
+                         uint64_t end_time = UINT64_MAX) {
+    BagMessage ret_msg;
+    RecordMessage record_message;
+    if (!record_reader_->ReadMessage(&record_message, begin_time, end_time)) {
+      ret_msg.end = true;
+      return ret_msg;
     }
-    return "";
+
+    ret_msg.end = false;
+    ret_msg.channel_name = record_message.channel_name;
+    ret_msg.data = record_message.content;
+    ret_msg.timestamp = record_message.time;
+    ret_msg.data_type =
+        record_reader_->GetMessageType(record_message.channel_name);
+    return ret_msg;
   }
-  uint64_t CurrentMessageTime() { return record_reader_.CurrentMessageTime(); }
 
   uint64_t GetMessageNumber(const std::string& channel_name) {
-    return record_reader_.GetMessageNumber(channel_name);
+    return record_reader_->GetMessageNumber(channel_name);
   }
 
   std::string GetMessageType(const std::string& channel_name) {
-    return record_reader_.GetMessageType(channel_name);
+    return record_reader_->GetMessageType(channel_name);
   }
 
   std::string GetProtoDesc(const std::string& channel_name) {
-    return record_reader_.GetProtoDesc(channel_name);
+    return record_reader_->GetProtoDesc(channel_name);
   }
 
   std::string GetHeaderString() {
     std::string org_data;
-    record_reader_.GetHeader().SerializeToString(&org_data);
+    record_reader_->GetHeader().SerializeToString(&org_data);
     return org_data;
   }
 
  private:
-  RecordReader record_reader_;
+  std::unique_ptr<RecordReader> record_reader_;
 };
 
 class PyRecordWriter {

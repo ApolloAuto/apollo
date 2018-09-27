@@ -19,7 +19,7 @@
 import sys
 import os
 import importlib
-
+import collections
 
 # init vars
 CYBERTRON_PATH = os.environ['CYBERTRON_PATH']
@@ -32,62 +32,37 @@ sys.path.append(CYERTRON_DIR + "/python/")
 sys.path.append(CYERTRON_DIR + "/cybertron/")
 
 _CYBER_RECORD = importlib.import_module('_cyber_record')
-
+PyBagMessage = collections.namedtuple('PyBagMessage',
+                    'topic message data_type timestamp')
 #//////////////////////////////record file class//////////////////////////////
 class RecordReader(object):
     """
     Class for cybertron RecordReader wrapper.
     """
-    def __init__(self):
-        self.record_reader = _CYBER_RECORD.new_PyRecordReader()
+    def __init__(self, file_name):
+        self.record_reader = _CYBER_RECORD.new_PyRecordReader(file_name)
 
     def __del__(self):
         _CYBER_RECORD.delete_PyRecordReader(self.record_reader)
 
-    def open(self, path):
+    def read_messages(self, start_time=0, end_time=18446744073709551615):
         """
-        open record file for read.
+        read message from bag file.
+        @param self
+        @param start_time:
+        @param end_time:
+        @return: generator of (message, data_type, timestamp)
         """
-        return _CYBER_RECORD.PyRecordReader_Open(self.record_reader, path)
+        while True:
+            message = _CYBER_RECORD.PyRecordReader_ReadMessage(
+                  self.record_reader, start_time, end_time)
 
-    def close(self):
-        """
-        close record file.
-        """
-        _CYBER_RECORD.PyRecordReader_Close(self.record_reader)
-
-    def read_message(self):
-        """
-        read messge.
-        """
-        return _CYBER_RECORD.PyRecordReader_ReadMessage(self.record_reader)
-
-    def endoffile(self):
-        """
-        is read to the end of file.
-        """
-        return _CYBER_RECORD.PyRecordReader_EndOfFile(self.record_reader)
-
-    def currentmessage_channelname(self):
-        """
-        return current message channel name.
-        """
-        return _CYBER_RECORD.PyRecordReader_CurrentMessageChannelName(
-                    self.record_reader)
-
-    def current_rawmessage(self):
-        """
-        return current raw message.
-        """
-        return _CYBER_RECORD.PyRecordReader_CurrentRawMessage(
-                    self.record_reader)
-
-    def currentmessage_time(self):
-        """
-        return current message time.
-        """
-        return _CYBER_RECORD.PyRecordReader_CurrentMessageTime(
-                    self.record_reader)
+            if not message["end"]:
+                yield PyBagMessage(message["channel_name"], message["data"],
+                        message["data_type"], message["timestamp"])
+            else:
+                #print "No message more."
+                break
 
     def get_messagenumber(self, channel_name):
         """

@@ -47,31 +47,21 @@ def test_record_reader(reader_path):
     """
     record reader.
     """
-    freader = record.RecordReader()
-    if not freader.open(reader_path):
-        print "reader open failed!"
-        return
+    freader = record.RecordReader(reader_path)
     time.sleep(1)
     print "+"*80
     print "+++begin to read..."
     count = 1
-    read_msg_succ = True
-    while not freader.endoffile():
+    for channelname, msg, datatype, timestamp in freader.read_messages():
         print "="*80
         print "read [%d] msg" % count
-        read_msg_succ = freader.read_message()
-        if read_msg_succ:
-            channelname = freader.currentmessage_channelname()
-            print "chnanel_name -> %s" % freader.currentmessage_channelname()
-            print "msg -> %s" % freader.current_rawmessage()
-            print "msgtime -> %d" % freader.currentmessage_time()
-            print "msgnum -> %d" % freader.get_messagenumber(channelname)
-            print "msgtype -> %s" % freader.get_messagetype(channelname)
-            print "pbdesc -> %s" % freader.get_protodesc(channelname)
-            count = count + 1
-    freader.close()
-
-    cybertron.shutdown()
+        print "chnanel_name -> %s" % channelname
+        print "msg -> %s" % msg
+        print "msgtime -> %d" % timestamp
+        print "msgnum -> %d" % freader.get_messagenumber(channelname)
+        print "msgtype -> %s" % datatype
+        print "pbdesc -> %s" % freader.get_protodesc(channelname)
+        count = count + 1
 
 if __name__ == '__main__':
     cybertron.init()

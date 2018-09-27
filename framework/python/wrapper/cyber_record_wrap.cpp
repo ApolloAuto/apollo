@@ -31,8 +31,15 @@ T PyObjectToPtr(PyObject *pyobj, const std::string &type_ptr) {
 }
 
 PyObject *cyber_new_PyRecordReader(PyObject *self, PyObject *args) {
+  char *filepath = nullptr;
+  Py_ssize_t len = 0;
+  if (!PyArg_ParseTuple(args, const_cast<char *>("s#:new_PyRecordReader"),
+                        &filepath, &len)) {
+    return Py_None;
+  }
+
   apollo::cybertron::record::PyRecordReader *reader =
-      new apollo::cybertron::record::PyRecordReader();
+      new apollo::cybertron::record::PyRecordReader(std::string(filepath, len));
   PyObject *pyobj_rec_reader =
       PyCapsule_New(reader, "apollo_cybertron_record_pyrecordfilereader", NULL);
   return pyobj_rec_reader;
@@ -56,156 +63,39 @@ PyObject *cyber_delete_PyRecordReader(PyObject *self, PyObject *args) {
   return Py_None;
 }
 
-PyObject *cyber_PyRecordReader_Open(PyObject *self, PyObject *args) {
-  PyObject *pyobj_reader = nullptr;
-  char *path = nullptr;
-  Py_ssize_t len = 0;
-  if (!PyArg_ParseTuple(args,
-                        const_cast<char *>("Os#:cyber_PyRecordReader_Open"),
-                        &pyobj_reader, &path, &len)) {
-    AINFO << "cyber_PyRecordReader_Open:PyRecordReader failed!";
-    Py_RETURN_FALSE;
-  }
-
-  apollo::cybertron::record::PyRecordReader *reader =
-      PyObjectToPtr<apollo::cybertron::record::PyRecordReader *>(
-          pyobj_reader, "apollo_cybertron_record_pyrecordfilereader");
-
-  if (nullptr == reader) {
-    AINFO << "PyRecordReader_Open:reader ptr is null!";
-    Py_RETURN_FALSE;
-  }
-
-  std::string path_str(path, len);
-  if (!reader->Open(path_str)) {
-    Py_RETURN_FALSE;
-  }
-  Py_RETURN_TRUE;
-}
-
-PyObject *cyber_PyRecordReader_Close(PyObject *self, PyObject *args) {
-  PyObject *pyobj_reader = nullptr;
-  if (!PyArg_ParseTuple(args, const_cast<char *>("O:PyRecordReader_Close"),
-                        &pyobj_reader)) {
-    return Py_None;
-  }
-
-  auto reader =
-      (apollo::cybertron::record::PyRecordReader *)PyCapsule_GetPointer(
-          pyobj_reader, "apollo_cybertron_record_pyrecordfilereader");
-  if (nullptr == reader) {
-    AINFO << "cyber_PyRecordReader_Close:PyRecordReader ptr is null!";
-    return Py_None;
-  }
-  reader->Close();
-  return Py_None;
-}
-
 PyObject *cyber_PyRecordReader_ReadMessage(PyObject *self, PyObject *args) {
   PyObject *pyobj_reader = nullptr;
+  uint64_t begin_time = 0;
+  uint64_t end_time = UINT64_MAX;
   if (!PyArg_ParseTuple(args,
-                        const_cast<char *>("O:PyRecordReader_ReadMessage"),
-                        &pyobj_reader)) {
-    Py_RETURN_FALSE;
+                        const_cast<char *>("OKK:PyRecordReader_ReadMessage"),
+                        &pyobj_reader, &begin_time, &end_time)) {
+    return nullptr;
   }
 
   auto reader =
       (apollo::cybertron::record::PyRecordReader *)PyCapsule_GetPointer(
           pyobj_reader, "apollo_cybertron_record_pyrecordfilereader");
   if (nullptr == reader) {
-    AINFO << "PyRecordReader_ReadMessage ptr is null!";
-    Py_RETURN_FALSE;
+    AERROR << "PyRecordReader_ReadMessage ptr is null!";
+    return nullptr;
   }
 
-  if (!reader->ReadMessage()) {
-    Py_RETURN_FALSE;
-  }
-  Py_RETURN_TRUE;
-}
+  apollo::cybertron::record::BagMessage result;
+  result = reader->ReadMessage(begin_time, end_time);
+  PyObject *pyobj_bag_message = pyobj_bag_message = PyDict_New();
+  PyDict_SetItemString(pyobj_bag_message, "channel_name",
+                       Py_BuildValue("s", result.channel_name.c_str()));
+  PyDict_SetItemString(pyobj_bag_message, "data",
+                       Py_BuildValue("s", result.data.c_str()));
+  PyDict_SetItemString(pyobj_bag_message, "data_type",
+                       Py_BuildValue("s", result.data_type.c_str()));
+  PyDict_SetItem(pyobj_bag_message, Py_BuildValue("s", "timestamp"),
+                 Py_BuildValue("K", result.timestamp));
+  PyDict_SetItem(pyobj_bag_message, Py_BuildValue("s", "end"),
+                 result.end ? Py_True : Py_False);
 
-PyObject *cyber_PyRecordReader_EndOfFile(PyObject *self, PyObject *args) {
-  PyObject *pyobj_reader = nullptr;
-  if (!PyArg_ParseTuple(args, const_cast<char *>("O:PyRecordReader_EndOfFile"),
-                        &pyobj_reader)) {
-    Py_RETURN_FALSE;
-  }
-
-  auto reader =
-      (apollo::cybertron::record::PyRecordReader *)PyCapsule_GetPointer(
-          pyobj_reader, "apollo_cybertron_record_pyrecordfilereader");
-  if (nullptr == reader) {
-    AINFO << "PyRecordReader_EndOfFile ptr is null!";
-    Py_RETURN_FALSE;
-  }
-
-  if (!reader->EndOfFile()) {
-    Py_RETURN_FALSE;
-  }
-  Py_RETURN_TRUE;
-}
-
-PyObject *cyber_PyRecordReader_CurrentMessageChannelName(PyObject *self,
-                                                         PyObject *args) {
-  PyObject *pyobj_reader = nullptr;
-  if (!PyArg_ParseTuple(args,
-                        const_cast<char *>(
-                            "O:cyber_PyRecordReader_CurrentMessageChannelName"),
-                        &pyobj_reader)) {
-    return PYOBJECT_NULL_STRING;
-  }
-
-  auto reader =
-      (apollo::cybertron::record::PyRecordReader *)PyCapsule_GetPointer(
-          pyobj_reader, "apollo_cybertron_record_pyrecordfilereader");
-  if (nullptr == reader) {
-    AINFO << "PyRecordReader_CurrentMessageChannelName ptr is null!";
-    return PYOBJECT_NULL_STRING;
-  }
-
-  std::string channel_name = reader->CurrentMessageChannelName();
-  return PyString_FromStringAndSize(channel_name.c_str(), channel_name.size());
-}
-
-PyObject *cyber_PyRecordReader_CurrentRawMessage(PyObject *self,
-                                                 PyObject *args) {
-  PyObject *pyobj_reader = nullptr;
-  if (!PyArg_ParseTuple(
-          args, const_cast<char *>("O:cyber_PyRecordReader_CurrentRawMessage"),
-          &pyobj_reader)) {
-    return PYOBJECT_NULL_STRING;
-  }
-
-  auto reader =
-      (apollo::cybertron::record::PyRecordReader *)PyCapsule_GetPointer(
-          pyobj_reader, "apollo_cybertron_record_pyrecordfilereader");
-  if (nullptr == reader) {
-    AINFO << "PyRecordReader_CurrentRawMessage ptr is null!";
-    return PYOBJECT_NULL_STRING;
-  }
-
-  std::string msg = reader->CurrentRawMessage();
-  return PyString_FromStringAndSize(msg.c_str(), msg.size());
-}
-
-PyObject *cyber_PyRecordReader_CurrentMessageTime(PyObject *self,
-                                                  PyObject *args) {
-  PyObject *pyobj_reader = nullptr;
-  if (!PyArg_ParseTuple(
-          args, const_cast<char *>("O:cyber_PyRecordReader_CurrentMessageTime"),
-          &pyobj_reader)) {
-    return PyLong_FromLong(0);
-  }
-
-  auto reader =
-      (apollo::cybertron::record::PyRecordReader *)PyCapsule_GetPointer(
-          pyobj_reader, "apollo_cybertron_record_pyrecordfilereader");
-  if (nullptr == reader) {
-    AINFO << "PyRecordReader_CurrentMessageTime ptr is null!";
-    return PyLong_FromLong(0);
-  }
-
-  uint64_t cur_time = reader->CurrentMessageTime();
-  return PyLong_FromLong(cur_time);
+  return pyobj_bag_message;
 }
 
 PyObject *cyber_PyRecordReader_GetMessageNumber(PyObject *self,
@@ -213,10 +103,10 @@ PyObject *cyber_PyRecordReader_GetMessageNumber(PyObject *self,
   PyObject *pyobj_reader = nullptr;
   char *channel_name = nullptr;
   Py_ssize_t len = 0;
-  if (!PyArg_ParseTuple(args,
-                        const_cast<char *>("Os:cyber_PyRecordReader_Open"),
-                        &pyobj_reader, &channel_name)) {
-    AINFO << "PyRecordReader_GetMessageNumber:PyRecordReader failed!";
+  if (!PyArg_ParseTuple(
+          args, const_cast<char *>("Os:PyRecordReader_GetMessageNumber"),
+          &pyobj_reader, &channel_name)) {
+    AERROR << "PyRecordReader_GetMessageNumber:PyRecordReader failed!";
     return PyLong_FromLong(0);
   }
 
@@ -260,9 +150,9 @@ PyObject *cyber_PyRecordReader_GetProtoDesc(PyObject *self, PyObject *args) {
   char *channel_name = nullptr;
   Py_ssize_t len = 0;
   if (!PyArg_ParseTuple(args,
-                        const_cast<char *>("Os:cyber_PyRecordReader_Open"),
+                        const_cast<char *>("Os:PyRecordReader_GetProtoDesc"),
                         &pyobj_reader, &channel_name)) {
-    AINFO << "PyRecordReader_GetProtoDesc:PyRecordReader failed!";
+    AERROR << "PyRecordReader_GetProtoDesc failed!";
     return PYOBJECT_NULL_STRING;
   }
 
@@ -430,18 +320,8 @@ static PyMethodDef _cyber_record_methods[] = {
     // PyRecordReader fun
     {"new_PyRecordReader", cyber_new_PyRecordReader, METH_VARARGS, ""},
     {"delete_PyRecordReader", cyber_delete_PyRecordReader, METH_VARARGS, ""},
-    {"PyRecordReader_Open", cyber_PyRecordReader_Open, METH_VARARGS, ""},
-    {"PyRecordReader_Close", cyber_PyRecordReader_Close, METH_VARARGS, ""},
     {"PyRecordReader_ReadMessage", cyber_PyRecordReader_ReadMessage,
      METH_VARARGS, ""},
-    {"PyRecordReader_EndOfFile", cyber_PyRecordReader_EndOfFile, METH_VARARGS,
-     ""},
-    {"PyRecordReader_CurrentMessageChannelName",
-     cyber_PyRecordReader_CurrentMessageChannelName, METH_VARARGS, ""},
-    {"PyRecordReader_CurrentRawMessage", cyber_PyRecordReader_CurrentRawMessage,
-     METH_VARARGS, ""},
-    {"PyRecordReader_CurrentMessageTime",
-     cyber_PyRecordReader_CurrentMessageTime, METH_VARARGS, ""},
     {"PyRecordReader_GetMessageNumber", cyber_PyRecordReader_GetMessageNumber,
      METH_VARARGS, ""},
     {"PyRecordReader_GetMessageType", cyber_PyRecordReader_GetMessageType,

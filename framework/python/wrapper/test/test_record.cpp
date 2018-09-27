@@ -37,21 +37,19 @@ TEST(CyberRecordTest, record_readerwriter) {
   rec_writer.Close();
 
   // read
-  apollo::cybertron::record::PyRecordReader rec_reader;
+  apollo::cybertron::record::PyRecordReader rec_reader(TEST_RECORD_FILE);
   AINFO << "++++ begin reading";
-  EXPECT_TRUE(rec_reader.Open(TEST_RECORD_FILE));
 
   sleep(1);
   int count = 0;
-  bool bReadMsg = true;
-  EXPECT_FALSE(rec_reader.EndOfFile());
-  EXPECT_TRUE(rec_reader.ReadMessage());
+  apollo::cybertron::record::BagMessage bag_msg = rec_reader.ReadMessage();
 
-  std::string channel_name = rec_reader.CurrentMessageChannelName();
+  std::string channel_name = bag_msg.channel_name;
   EXPECT_EQ(CHAN_1, channel_name);
-  EXPECT_EQ(STR_10B, rec_reader.CurrentRawMessage());
+  EXPECT_EQ(STR_10B, bag_msg.data);
   EXPECT_EQ(1, rec_reader.GetMessageNumber(channel_name));
-  EXPECT_EQ(888, rec_reader.CurrentMessageTime());
+  EXPECT_EQ(888, bag_msg.timestamp);
+  EXPECT_EQ(MSG_TYPE, bag_msg.data_type);
   EXPECT_EQ(MSG_TYPE, rec_reader.GetMessageType(channel_name));
   std::string header_str = rec_reader.GetHeaderString();
   apollo::cybertron::proto::Header header;
@@ -61,9 +59,6 @@ TEST(CyberRecordTest, record_readerwriter) {
   EXPECT_EQ(1, header.chunk_number());
   EXPECT_EQ(1, header.channel_number());
   EXPECT_TRUE(header.is_complete());
-
-  EXPECT_TRUE(rec_reader.EndOfFile());
-  rec_reader.Close();
 }
 
 int main(int argc, char** argv) {
