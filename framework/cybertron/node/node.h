@@ -120,7 +120,9 @@ auto Node::CreateReader(const proto::RoleAttributes& role_attr,
   }
   auto reader = node_channel_impl_->template CreateReader<MessageT>(
       role_attr, reader_func);
-  readers_.emplace(std::make_pair(role_attr.channel_name(), reader));
+  if (reader != nullptr) {
+    readers_.emplace(std::make_pair(role_attr.channel_name(), reader));
+  }
   return reader;
 }
 
@@ -136,7 +138,9 @@ auto Node::CreateReader(const ReaderConfig& config,
   }
   auto reader =
       node_channel_impl_->template CreateReader<MessageT>(config, reader_func);
-  readers_.emplace(std::make_pair(config.channel_name, reader));
+  if (reader != nullptr) {
+    readers_.emplace(std::make_pair(config.channel_name, reader));
+  }
   return reader;
 }
 
@@ -152,7 +156,9 @@ auto Node::CreateReader(const std::string& channel_name,
   }
   auto reader = node_channel_impl_->template CreateReader<MessageT>(
       channel_name, reader_func);
-  readers_.emplace(std::make_pair(channel_name, reader));
+  if (reader != nullptr) {
+    readers_.emplace(std::make_pair(channel_name, reader));
+  }
   return reader;
 }
 
