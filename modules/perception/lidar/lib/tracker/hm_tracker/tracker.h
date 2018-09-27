@@ -16,6 +16,9 @@
 #ifndef MODULES_PERCEPTION_LIDAR_LIB_TRACKER_HM_TRACKER_TRACKER_H_
 #define MODULES_PERCEPTION_LIDAR_LIB_TRACKER_HM_TRACKER_TRACKER_H_
 
+#include <memory>
+#include <string>
+
 #include "modules/perception/base/object_pool_types.h"
 #include "modules/perception/lidar/lib/tracker/common/track_data.h"
 #include "modules/perception/lidar/lib/tracker/common/track_pool_types.h"
@@ -47,7 +50,7 @@ class Tracker {
   virtual void UpdateTrackDataWithoutObject(TrackDataPtr track_data,
                                             double timestamp);
 
-  virtual std::string Name() const { return "Tracker"; };
+  virtual std::string Name() const { return "Tracker"; }
 
  private:
   TrackedObjectPtr FakeTrackedObject(TrackDataPtr track_data, double timestamp);

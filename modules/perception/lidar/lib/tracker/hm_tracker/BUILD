@@ -142,4 +142,28 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "tracker",
+    srcs = [
+        "tracker.cc",
+    ],
+    hdrs = [
+        "tracker.h",
+    ],
+    deps = [
+        ":base_filter",
+        ":measurement_computer",
+        ":track_post_processor",
+        "//modules/common/util:file_util",
+        "//modules/perception/proto:hm_tracker_config_proto",
+        "//modules/perception/lib/config_manager:config_manager",
+        "//modules/perception/lib/io:file_util",
+        "//modules/perception/base:object_pool_types",
+        "//modules/perception/lidar/lib/tracker/common:track_data",
+        "//modules/perception/lidar/lib/tracker/common:track_pool_types",
+        "//modules/perception/lidar/lib/tracker/common:tracked_object",
+        "//framework:cybertron",
+    ],
+)
+
 cpplint()
