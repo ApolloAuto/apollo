@@ -15,6 +15,8 @@
  *****************************************************************************/
 #include "modules/perception/fusion/lib/data_fusion/existance_fusion/dst_existance_fusion/dst_existance_fusion.h"
 
+#include <limits>
+
 #include "boost/format.hpp"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lib/io/file_util.h"
@@ -23,14 +25,14 @@
 #include "modules/perception/fusion/base/base_init_options.h"
 #include "modules/perception/fusion/base/sensor_data_manager.h"
 #include "modules/perception/fusion/common/camera_util.h"
-#include "modules/perception/fusion/lib/data_fusion/existance_fusion/dst_existance_fusion/proto/dst_existance_fusion_config.pb.h"
+#include "modules/perception/proto/dst_existance_fusion_config.pb.h"
 
 namespace apollo {
 namespace perception {
 namespace fusion {
 
-std::string DstExistanceFusion::name_ = "DstExistanceFusion";
-std::string DstExistanceFusion::toic_name_ = "DstToicFusion";
+const char* DstExistanceFusion::name_ = "DstExistanceFusion";
+const char* DstExistanceFusion::toic_name_ = "DstToicFusion";
 ExistanceDstMaps DstExistanceFusion::existance_dst_maps_;
 ToicDstMaps DstExistanceFusion::toic_dst_maps_;
 DstExistanceFusionOptions DstExistanceFusion::options_;
@@ -106,7 +108,7 @@ void DstExistanceFusion::UpdateWithMeasurement(
   existance_evidence.SetBba(
       {{ExistanceDstMaps::EXIST, obj_exist_prob},
        {ExistanceDstMaps::EXISTUNKOWN, 1 - obj_exist_prob}});
-  // TODO hard code for fused exist bba
+  // TODO(all) hard code for fused exist bba
   const double exist_fused_w = 1.0;
   ADEBUG << " before update exist prob: " << GetExistanceProbability();
   fused_existance_ =
@@ -153,7 +155,7 @@ void DstExistanceFusion::UpdateWithoutMeasurement(const std::string &sensor_id,
     existance_evidence.SetBba(
         {{ExistanceDstMaps::NEXIST, obj_unexist_prob},
          {ExistanceDstMaps::EXISTUNKOWN, 1 - obj_unexist_prob}});
-    // TODO hard code for fused exist bba
+    // TODO(all) hard code for fused exist bba
     const double unexist_fused_w = 1.0;
     double min_match_dist_score = min_match_dist;
     // if (!sensor_manager->IsCamera(sensor_id)) {
