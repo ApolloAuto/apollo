@@ -125,12 +125,12 @@ double ComputePtsBoxShapeSimilarity(const ProjectionCachePtr& cache,
       box_size_diff.x() * box_size_diff.x() / x_std_dev / x_std_dev +
       box_size_diff.y() * box_size_diff.y() / y_std_dev / y_std_dev;
   ADEBUG << "camera_box_size@(" << camera_box_size(0) << ","
-            << camera_box_size(1) << "); "
-            << "velo_box_size@(" << velo_box_size.x() << ","
-            << velo_box_size.y() << "); "
-            << "box_size_diff@(" << box_size_diff.x() << ","
-            << box_size_diff.y() << "); "
-            << "square_norm_box_size_diff@" << square_norm_box_size_diff;
+         << camera_box_size(1) << "); "
+         << "velo_box_size@(" << velo_box_size.x() << "," << velo_box_size.y()
+         << "); "
+         << "box_size_diff@(" << box_size_diff.x() << "," << box_size_diff.y()
+         << "); "
+         << "square_norm_box_size_diff@" << square_norm_box_size_diff;
   // use chi-square distribution. Cauchy may be more reasonable.
   double shape_similarity =
       1 - ChiSquaredCdf2TableFun(square_norm_box_size_diff);
@@ -152,7 +152,7 @@ double ComputePtsBoxSimilarity(const ProjectionCachePtr& cache,
   double shape_similarity =
       ComputePtsBoxShapeSimilarity(cache, object, camera_bbox);
   ADEBUG << "location_similarity@" << location_similarity
-            << ", shape_similarity@" << shape_similarity;
+         << ", shape_similarity@" << shape_similarity;
   double fused_similarity =
       FuseTwoProbabilities(location_similarity, shape_similarity);
   return fused_similarity;

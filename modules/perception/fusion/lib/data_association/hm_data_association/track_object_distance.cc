@@ -139,7 +139,8 @@ bool TrackObjectDistance::BuildProjectionCacheObject(
   // if not, build projection object of its cloud and cache it
   // else, build empty projection object and cache it
   bool is_all_lidar_3d_vertices_outside_frustum = false;
-  if (cloud.size() > s_lidar2camera_projection_vertices_check_pts_num_) {
+  if (static_cast<int>(cloud.size()) >
+      s_lidar2camera_projection_vertices_check_pts_num_) {
     is_all_lidar_3d_vertices_outside_frustum = true;
     std::vector<Eigen::Vector3d> lidar_box_vertices;
     GetObjectEightVertices(lidar->GetBaseObject(), &lidar_box_vertices);
@@ -162,7 +163,8 @@ bool TrackObjectDistance::BuildProjectionCacheObject(
   if (!is_all_lidar_3d_vertices_outside_frustum) {
     // 5.1 check whehter downsampling needed
     size_t every_n = 1;
-    if (cloud.size() > s_lidar2camera_projection_downsample_target_pts_num_) {
+    if (static_cast<int>(cloud.size()) >
+        s_lidar2camera_projection_downsample_target_pts_num_) {
       every_n = static_cast<double>(cloud.size()) /
                 s_lidar2camera_projection_downsample_target_pts_num_;
     }
@@ -553,13 +555,13 @@ float TrackObjectDistance::ComputeRadarCamera(
           pt3d.y(), box2d_ct.y(), box2d_size.y(), rc_y_similarity_params_);
       // compute similarity on height
       // use camera car height to modify the radar location
-      double h_similarity = ComputeRadarCameraHSimilarity(
-          radar, camera, box2d_size.y(), radar_box2d_vertices,
-          rc_h_similarity_params_);
+      // double h_similarity = ComputeRadarCameraHSimilarity(
+      //     radar, camera, box2d_size.y(), radar_box2d_vertices,
+      //     rc_h_similarity_params_);
       // compute similarity on width
-      double w_similarity = ComputeRadarCameraWSimilarity(
-          radar, width, box2d_size.x(), radar_box2d_vertices,
-          rc_w_similarity_params_);
+      // double w_similarity = ComputeRadarCameraWSimilarity(
+      //     radar, width, box2d_size.x(), radar_box2d_vertices,
+      //     rc_w_similarity_params_);
       // compute similarity on offset 3d
       double loc_similarity = ComputeRadarCameraLocSimilarity(
           radar_ct, camera, world2camera_pose, rc_loc_similarity_params_);

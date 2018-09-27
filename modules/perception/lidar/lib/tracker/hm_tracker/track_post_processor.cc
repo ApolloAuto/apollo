@@ -16,8 +16,8 @@
 #include "modules/perception/lidar/lib/tracker/hm_tracker/track_post_processor.h"
 
 #include <algorithm>
-#include <utility>
 #include <map>
+#include <utility>
 
 #include "cybertron/common/log.h"
 #include "modules/perception/base/object_types.h"
@@ -79,7 +79,7 @@ void TrackPostProcessor::SmoothTrackVelocity(TrackDataPtr track_data) {
     UpdateTrackConvergenceState(track_data);
     UpdateTrackVelocityOnlineCovariance(track_data);
     AINFO << "TrackPostProcessor::keep motion because of extraodinary "
-                "acceleration.";
+             "acceleration.";
     // keep static hypothesis
     return;
   }
@@ -236,8 +236,7 @@ bool TrackPostProcessor::CheckStaticHypothesisByVelocityAngleChange(
       reasonable_angle_change_maximum;
   if (reasonable_angle_change_maximum < 0 ||
       reasonable_angle_change_maximum > M_PI) {
-    AWARN
-        << "illegal angle change maximum! use default one (PI / 4) instead";
+    AWARN << "illegal angle change maximum! use default one (PI / 4) instead";
     local_reasonable_angle_change_maximum = M_PI / 4.0;
   }
   // believe angle change is obvious if one of estimation pair is

@@ -17,9 +17,9 @@
 #include <sstream>
 #include "boost/format.hpp"
 
+#include "modules/common/util/file.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lib/io/file_util.h"
-#include "modules/common/util/file.h"
 
 #include "modules/perception/fusion/base/base_init_options.h"
 #include "modules/perception/fusion/base/sensor_data_manager.h"
@@ -93,11 +93,11 @@ bool DstTypeFusion::Init() {
     options_.sensor_reliability_[camera_id] = camera_param.reliability();
     options_.sensor_reliability_for_unknown_[camera_id] =
         camera_param.reliability_for_unknown();
-    AINFO << "dst type fusion params: " << camera_id << " max valid dist: "
-             << options_.camera_max_valid_dist_[camera_id]
-             << " reliability: " << options_.sensor_reliability_[camera_id]
-             << " reliability for unknown: "
-             << options_.sensor_reliability_for_unknown_[camera_id];
+    AINFO << "dst type fusion params: " << camera_id
+          << " max valid dist: " << options_.camera_max_valid_dist_[camera_id]
+          << " reliability: " << options_.sensor_reliability_[camera_id]
+          << " reliability for unknown: "
+          << options_.sensor_reliability_for_unknown_[camera_id];
   }
 
   for (auto lidar_param : params.lidar_params()) {
@@ -106,9 +106,9 @@ bool DstTypeFusion::Init() {
     options_.sensor_reliability_for_unknown_[lidar_id] =
         lidar_param.reliability_for_unknown();
     AINFO << "dst type fusion params: " << lidar_id
-             << " reliability: " << options_.sensor_reliability_[lidar_id]
-             << " reliability for unknown: "
-             << options_.sensor_reliability_for_unknown_[lidar_id];
+          << " reliability: " << options_.sensor_reliability_[lidar_id]
+          << " reliability for unknown: "
+          << options_.sensor_reliability_for_unknown_[lidar_id];
   }
 
   if (DstManager::Instance()->IsAppAdded(name_)) {
@@ -124,7 +124,7 @@ void DstTypeFusion::UpdateWithMeasurement(const SensorObjectPtr measurement,
   Dst measurement_dst(name_);
   measurement_dst = TypeProbsToDst(measurement->GetBaseObject()->type_probs);
   ADEBUG << "type_probs: "
-            << vector2string<float>(measurement->GetBaseObject()->type_probs);
+         << vector2string<float>(measurement->GetBaseObject()->type_probs);
   fused_dst_ =
       fused_dst_ + measurement_dst * GetReliability(measurement->GetSensorId());
   ADEBUG << "reliability: " << GetReliability(measurement->GetSensorId());
@@ -152,8 +152,8 @@ void DstTypeFusion::UpdateWithoutMeasurement(const std::string &sensor_id,
 
     base::BaseCameraModelPtr camera_model =
         sensor_manager->GetCameraIntrinsic(sensor_id);
-    CHECK(camera_model != nullptr) << "Failed to get camera intrinsic for "
-                                   << sensor_id;
+    CHECK(camera_model != nullptr)
+        << "Failed to get camera intrinsic for " << sensor_id;
 
     Eigen::Affine3d sensor2world_pose;
     bool status = sensor_manager->GetPose(sensor_id, measurement_timestamp,
@@ -161,9 +161,9 @@ void DstTypeFusion::UpdateWithoutMeasurement(const std::string &sensor_id,
     auto max_dist_it = options_.camera_max_valid_dist_.find(sensor_id);
     if (max_dist_it == options_.camera_max_valid_dist_.end()) {
       AWARN << boost::format(
-                      "There is no pre-defined max valid camera"
-                      " dist for sensor type: %s") %
-                      sensor_id;
+                   "There is no pre-defined max valid camera"
+                   " dist for sensor type: %s") %
+                   sensor_id;
     }
     if (status && max_dist_it != options_.camera_max_valid_dist_.end()) {
       SensorObjectConstPtr lidar_object = track_ref_->GetLatestLidarObject();
@@ -210,22 +210,22 @@ void DstTypeFusion::UpdateWithoutMeasurement(const std::string &sensor_id,
 std::string DstTypeFusion::Name() const { return name_; }
 
 bool DstTypeFusion::TypToHyp(size_t object_type,
-                             uint64_t hypothesis_type) const {
+                             uint64_t *hypothesis_type) const {
   auto find_res = dst_maps_.typ_to_hyp_map_.find(object_type);
   if (find_res == dst_maps_.typ_to_hyp_map_.end()) {
     return false;
   }
-  hypothesis_type = find_res->second;
+  *hypothesis_type = find_res->second;
   return true;
 }
 
 bool DstTypeFusion::HypToTyp(uint64_t hypothesis_type,
-                             size_t object_type) const {
+                             size_t *object_type) const {
   auto find_res = dst_maps_.hyp_to_typ_map_.find(hypothesis_type);
   if (find_res == dst_maps_.hyp_to_typ_map_.end()) {
     return false;
   }
-  object_type = find_res->second;
+  *object_type = find_res->second;
   return true;
 }
 
@@ -246,7 +246,7 @@ Dst DstTypeFusion::TypeProbsToDst(const std::vector<float> &type_probs) {
   for (size_t i = 0; i < type_probs.size(); ++i) {
     size_t typ = i;
     uint64_t hyp = 0;
-    if (!TypToHyp(typ, hyp)) {
+    if (!TypToHyp(typ, &hyp)) {
       continue;
     }
     res_bba_map[hyp] = type_probs[typ];
@@ -268,7 +268,7 @@ double DstTypeFusion::GetReliability(const std::string &sensor_id) const {
   auto find_res = options_.sensor_reliability_.find(sensor_id);
   if (find_res == options_.sensor_reliability_.end()) {
     ADEBUG << "the sensor type: " << sensor_id
-              << " is not supported by class fusion";
+           << " is not supported by class fusion";
     return 0.0;
   }
   return find_res->second;
@@ -279,7 +279,7 @@ double DstTypeFusion::GetReliabilityForUnKnown(
   auto find_res = options_.sensor_reliability_for_unknown_.find(sensor_id);
   if (find_res == options_.sensor_reliability_for_unknown_.end()) {
     ADEBUG << "the sensor type: " << sensor_id
-              << " is not supported by class fusion";
+           << " is not supported by class fusion";
     return 0.0;
   }
   time_t rawtime = measurement_timestamp;
@@ -302,8 +302,8 @@ void DstTypeFusion::UpdateTypeState() {
   }
 
   // update type
-  size_t object_type;
-  HypToTyp(max_hyp, object_type);
+  size_t object_type = 0;
+  HypToTyp(max_hyp, &object_type);
   track_ref_->GetFusedObject()->GetBaseObject()->type =
       static_cast<base::ObjectType>(object_type);
   // modify subtype
@@ -321,7 +321,7 @@ void DstTypeFusion::UpdateTypeState() {
   for (size_t i = 0; i < fused_dst_vec.size(); ++i) {
     size_t type = 0;
     uint64_t hyp = DstManager::Instance()->IndToFodSubset(name_, i);
-    HypToTyp(hyp, type);
+    HypToTyp(hyp, &type);
     type_probs[type] += static_cast<float>(fused_dst_vec[i]);
   }
   track_ref_->GetFusedObject()->GetBaseObject()->type_probs = type_probs;

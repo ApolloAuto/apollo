@@ -16,12 +16,12 @@
 #include "modules/perception/lidar/lib/tracker/hm_tracker/track_object_distance.h"
 
 #include <algorithm>
-#include <vector>
 #include <utility>
+#include <vector>
 
+#include "cybertron/common/log.h"
 #include "modules/perception/common/geometry/basic.h"
 #include "modules/perception/common/geometry/common.h"
-#include "cybertron/common/log.h"
 
 namespace apollo {
 namespace perception {
@@ -296,7 +296,7 @@ float TrackObjectDistance::ComputeHistogramDistance(
   }
 
   float histogram_dist = 0.0;
-  for (int i = 0; i < old_object_shape_features.size(); ++i) {
+  for (size_t i = 0; i < old_object_shape_features.size(); ++i) {
     histogram_dist +=
         std::fabs(old_object_shape_features[i] - new_object_shape_features[i]);
   }

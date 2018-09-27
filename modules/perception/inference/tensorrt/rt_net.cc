@@ -207,9 +207,12 @@ void RTNet::addPoolingLayer(const LayerParameter &layer_param,
           : nvinfer1::PoolingType::kAVERAGE;
   CHECK(modify_pool_param(&pool));
   nvinfer1::IPoolingLayer *poolLayer = net->addPooling(
-      *inputs[0], pool_type, {pool.kernel_h(), pool.kernel_w()});
-  poolLayer->setStride(nvinfer1::DimsHW{pool.stride_h(), pool.stride_w()});
-  poolLayer->setPadding(nvinfer1::DimsHW{pool.pad_h(), pool.pad_w()});
+      *inputs[0], pool_type,
+      {static_cast<int>(pool.kernel_h()), static_cast<int>(pool.kernel_w())});
+  poolLayer->setStride(nvinfer1::DimsHW{static_cast<int>(pool.stride_h()),
+                                        static_cast<int>(pool.stride_w())});
+  poolLayer->setPadding(nvinfer1::DimsHW{static_cast<int>(pool.pad_h()),
+                                         static_cast<int>(pool.pad_w())});
   poolLayer->setName(layer_param.name().c_str());
   ConstructMap(layer_param, poolLayer, tensor_map, tensor_modify_map);
 }
