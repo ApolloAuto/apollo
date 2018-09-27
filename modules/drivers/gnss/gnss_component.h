@@ -34,11 +34,10 @@ using apollo::cybertron::Reader;
 using apollo::cybertron::Writer;
 using apollo::drivers::gnss::RawData;
 
-class GnssDriverComponent : public Component<RawData> {
+class GnssDriverComponent : public Component<> {
  public:
   GnssDriverComponent();
   bool Init() override;
-  bool Proc(const std::shared_ptr<RawData>& rawdata) override;
 
  private:
   std::unique_ptr<RawStream> raw_stream_ = nullptr;

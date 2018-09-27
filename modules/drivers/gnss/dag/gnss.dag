@@ -7,7 +7,6 @@ module_config {
       config {
         name : "gnss"
         config_file_path : "/apollo/modules/drivers/gnss/conf/gnss_conf.pb.txt"
-        readers {channel: ""}
       }
     }
 }
