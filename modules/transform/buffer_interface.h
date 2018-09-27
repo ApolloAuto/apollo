@@ -17,7 +17,9 @@
 #ifndef MODULES_TRANSFORM_BUFFER_INTERFACE_H_
 #define MODULES_TRANSFORM_BUFFER_INTERFACE_H_
 
+#include <algorithm>
 #include <sstream>
+#include <string>
 #include "tf2/buffer_core.h"
 #include "tf2/convert.h"
 #include "tf2/exceptions.h"
@@ -106,7 +108,7 @@ class BufferInterface {
 
   // Transform, simple api, with pre-allocation
   template <typename T>
-  T& transform(const T& in, T& out, const std::string& target_frame,
+  T& transform(const T& in, T& out, const std::string& target_frame,  // NOLINT
                float timeout = 0.0) const {
     // do the transform
     tf2::doTransform(in, out,
@@ -125,7 +127,7 @@ class BufferInterface {
 
   // transform, simple api, different types, pre-allocation
   template <typename A, typename B>
-  B& transform(const A& in, B& out, const std::string& target_frame,
+  B& transform(const A& in, B& out, const std::string& target_frame,  // NOLINT
                float timeout = 0.0) const {
     A copy = transform(in, target_frame, timeout);
     tf2::convert(copy, out);
@@ -134,7 +136,7 @@ class BufferInterface {
 
   // Transform, advanced api, with pre-allocation
   template <typename T>
-  T& transform(const T& in, T& out, const std::string& target_frame,
+  T& transform(const T& in, T& out, const std::string& target_frame,  // NOLINT
                const cybertron::Time& target_time,
                const std::string& fixed_frame, float timeout = 0.0) const {
     // do the transform
@@ -156,7 +158,7 @@ class BufferInterface {
 
   // Transform, advanced api, different types, with pre-allocation
   template <typename A, typename B>
-  B& transform(const A& in, B& out, const std::string& target_frame,
+  B& transform(const A& in, B& out, const std::string& target_frame,  // NOLINT
                const cybertron::Time& target_time,
                const std::string& fixed_frame, float timeout = 0.0) const {
     // do the transform
@@ -164,7 +166,6 @@ class BufferInterface {
     tf2::convert(copy, out);
     return out;
   }
-
 };  // class
 
 }  // namespace transform
