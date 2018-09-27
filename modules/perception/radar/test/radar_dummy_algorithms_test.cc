@@ -1,0 +1,96 @@
+// Copyright 2018 Baidu Inc. All Rights Reserved.
+// @author: Chongchong Li (lichongchong@baidu.com)
+// @file: radar_dummy_algorithms_test.cc
+// @brief: unit test for dummy algorithms
+
+#include <gtest/gtest.h>
+#include "modules/perception/radar/lib/dummy/dummy_algorithms.h"
+
+namespace apollo {
+namespace perception {
+namespace radar {
+
+class DummyAlgorithmsTest : public testing::Test {
+ protected:
+  DummyPreprocessor preprocessor;
+  DummyDetector detector;
+  DummyRoiFilter roi_filter;
+};
+
+ContiRadar MockContiObs() {
+  ContiRadar raw_obs;
+
+  ContiRadarObs conti_obs;
+  conti_obs.set_clusterortrack(0);
+  conti_obs.set_obstacle_id(80);
+  conti_obs.set_longitude_dist(20);
+  conti_obs.set_lateral_dist(10);
+  conti_obs.set_longitude_vel(10);
+  conti_obs.set_lateral_vel(5);
+  conti_obs.set_rcs(15);
+  conti_obs.set_dynprop(0);
+  conti_obs.set_probexist(0.8);
+  conti_obs.set_longitude_dist_rms(0.2);
+  conti_obs.set_lateral_dist_rms(0.1);
+  conti_obs.set_longitude_vel_rms(0.2);
+  conti_obs.set_lateral_vel_rms(0.1);
+  conti_obs.set_oritation_angle(10);
+  conti_obs.set_oritation_angle_rms(2.0);
+  conti_obs.set_length(2.0);
+  conti_obs.set_width(1.0);
+  conti_obs.set_obstacle_class(CONTI_CAR);
+  conti_obs.set_meas_state(2);
+
+  raw_obs.add_contiobs()->CopyFrom(conti_obs);
+  conti_obs.set_obstacle_class(CONTI_TRUCK);
+  raw_obs.add_contiobs()->CopyFrom(conti_obs);
+  conti_obs.set_obstacle_class(CONTI_PEDESTRIAN);
+  raw_obs.add_contiobs()->CopyFrom(conti_obs);
+  conti_obs.set_obstacle_class(CONTI_MOTOCYCLE);
+  raw_obs.add_contiobs()->CopyFrom(conti_obs);
+  conti_obs.set_obstacle_class(CONTI_BICYCLE);
+  raw_obs.add_contiobs()->CopyFrom(conti_obs);
+  conti_obs.set_obstacle_class(CONTI_TYPE_UNKNOWN);
+  raw_obs.add_contiobs()->CopyFrom(conti_obs);
+
+  return raw_obs;
+}
+
+TEST_F(DummyAlgorithmsTest, dummy_test) {
+  ContiRadar raw_obs = MockContiObs();
+  ContiRadar corrected_obs;
+  PreprocessorOptions preprocessor_options;
+  bool init_result = preprocessor.Init();
+  EXPECT_TRUE(init_result);
+  EXPECT_EQ(preprocessor.Name(), "DummyPreprocessor");
+  preprocessor.Preprocess(raw_obs, preprocessor_options, &corrected_obs);
+  EXPECT_EQ(corrected_obs.contiobs_size(), 6);
+  EXPECT_EQ(corrected_obs.contiobs(0).obstacle_id(), 80);
+  EXPECT_EQ(corrected_obs.contiobs(0).meas_state(), 2);
+
+  DetectorOptions detector_options;
+  init_result = detector.Init();
+  EXPECT_TRUE(init_result);
+  EXPECT_EQ(detector.Name(), "DummyDetector");
+
+  base::FramePtr detected_frame(new base::Frame);
+  detector.Detect(corrected_obs, detector_options, detected_frame);
+  Eigen::Vector3d center(20, 10, 0);
+  Eigen::Vector3f velocity(10, 5, 0);
+  EXPECT_LT((center - detected_frame->objects[0]->center).norm(), 1.0e-6);
+  EXPECT_LT((velocity - detected_frame->objects[0]->velocity).norm(), 1.0e-6);
+
+  RoiFilterOptions roi_filter_options;
+  init_result = roi_filter.Init();
+  EXPECT_TRUE(init_result);
+  EXPECT_EQ(roi_filter.Name(), "DummyRoiFilter");
+  bool roi_filter_result = roi_filter.RoiFilter(roi_filter_options,
+                                                detected_frame);
+  EXPECT_TRUE(roi_filter_result);
+  EXPECT_EQ(detected_frame->objects.size(), 6);
+
+}
+
+}  // namespace radar
+}  // namespace perception
+}  // namespace apollo

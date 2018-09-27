@@ -1,0 +1,76 @@
+// Copyright 2018 Baidu Inc. All Rights Reserved.
+// @author: hui yujiang (huiyujiang@baidu.com)
+// @file: radar_tracker_radar_track_test.cc
+// @brief: radar track test
+
+#include "modules/perception/radar/lib/tracker/common/radar_track.h"
+#include <gtest/gtest.h>
+#include "cybertron/common/log.h"
+#include "modules/perception/radar/lib/tracker/filter/adaptive_kalman_filter.h"
+
+namespace apollo {
+namespace perception {
+
+namespace radar {
+TEST(RadarTrackTest, radar_track_test) {
+  int tracked_times_threshold = 1;
+  RadarTrack::SetTrackedTimesThreshold(tracked_times_threshold);
+  std::string chosen_filter = "AdaptiveKalmanFilter";
+  RadarTrack::SetChosenFilter(chosen_filter);
+  bool use_filter = false;
+  RadarTrack::SetUseFilter(use_filter);
+
+  base::ObjectPtr object(new base::Object);
+  object->track_id = 100;
+  object->center << 10.0, 20.0, 0.0;
+  object->velocity << 3.0, 4.0, 0.0;
+  double timestamp = 123456789.0;
+  RadarTrackPtr radar_track(new RadarTrack(object, timestamp));
+  EXPECT_EQ(radar_track->GetObsId(), 0);
+  EXPECT_EQ(radar_track->ConfirmTrack(), false);
+  EXPECT_EQ(radar_track->IsDead(), false);
+  radar_track->SetDead();
+  EXPECT_EQ(radar_track->IsDead(), true);
+
+  base::ObjectPtr object2(new base::Object);
+  object2->track_id = 100;
+  object2->center << 10.3, 20.4, 0.0;
+  object2->velocity << 3.0, 4.0, 0.0;
+  double timestamp2 = 123456789.1;
+  radar_track->UpdataObsRadar(object2, timestamp2);
+  EXPECT_EQ(radar_track->ConfirmTrack(), true);
+
+  RadarTrackPtr radar_track2(new RadarTrack(object, timestamp));
+  use_filter = true;
+  RadarTrack::SetUseFilter(use_filter);
+  base::ObjectPtr object3(new base::Object);
+  object3->track_id = 100;
+  object3->center << 10.3, 20.4, 0.0;
+  object3->velocity << 3.0, 4.0, 0.0;
+  double timestamp3 = 123456789.1;
+  radar_track2->UpdataObsRadar(object3, timestamp3);
+  EXPECT_TRUE(radar_track->GetTrackingTime() - 0.1 < 1e-5);
+  EXPECT_EQ(radar_track2->ConfirmTrack(), true);
+
+  chosen_filter = "Default";
+  RadarTrack::SetChosenFilter(chosen_filter);
+  RadarTrackPtr radar_track3(new RadarTrack(object, timestamp));
+}
+
+TEST(RadarTrackTest, radar_track_function_test) {
+  base::ObjectPtr object(new base::Object);
+  object->track_id = 100;
+  object->center << 10.0, 20.0, 0.0;
+  object->velocity << 3.0, 4.0, 0.0;
+  double timestamp = 123456789.0;
+  RadarTrackPtr radar_track(new RadarTrack(object, timestamp));
+  EXPECT_TRUE(std::fabs(radar_track->GetTrackingTime() - 0.0) < 1e-5);
+  EXPECT_TRUE(std::fabs(radar_track->GetTimestamp() - timestamp) < 1e-5);
+  radar_track->SetObsRadarNullptr();
+  EXPECT_EQ(radar_track->GetObsRadar(), nullptr);
+  EXPECT_EQ(radar_track->GetObs(), nullptr);
+}
+
+}  // namespace radar
+}  // namespace perception
+}  // namespace apollo

@@ -231,4 +231,18 @@ proto_library(
     ],
 )
 
+cc_proto_library(
+    name = "tracker_config_proto",
+    deps = [
+        ":tracker_config_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "tracker_config_proto_lib",
+    srcs = [
+        "tracker_config.proto",
+    ],
+)
+
 cpplint()
