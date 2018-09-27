@@ -49,8 +49,9 @@ TEST(CameraUtilTest, test_is_pt_in_frustum) {
 }
 
 TEST(CameraUtilTest, test_object_in_camera_view_and_is_behind_camera) {
-  lib::FLAGS_work_root = "./fusion_test_data/base";
-  common::FLAGS_obs_sensor_intrinsic_path = "./fusion_test_data/base/params";
+  lib::FLAGS_work_root = "/apollo/modules/perception/testdata/fusion/base";
+  common::FLAGS_obs_sensor_intrinsic_path =
+      "/apollo/modules/perception/testdata/fusion/base/params";
   common::FLAGS_obs_sensor_meta_path = "./data/sensor_meta.pt";
 
   // create a lidar sensor object

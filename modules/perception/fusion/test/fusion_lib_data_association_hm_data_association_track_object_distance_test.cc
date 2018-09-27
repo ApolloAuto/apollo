@@ -43,10 +43,11 @@ namespace fusion {
 class TrackObjectDistanceTest : public testing::Test {
  protected:
   void SetUp() {
-    lib::FLAGS_work_root = "./fusion_test_data/hm_data_association";
+    lib::FLAGS_work_root =
+        "/apollo/modules/perception/testdata/fusion/hm_data_association";
     common::FLAGS_obs_sensor_meta_path = "./data/sensor_meta.pt";
     common::FLAGS_obs_sensor_intrinsic_path =
-        "./fusion_test_data/hm_data_association/params";
+        "/apollo/modules/perception/testdata/fusion/hm_data_association/params";
   }
 };
 
