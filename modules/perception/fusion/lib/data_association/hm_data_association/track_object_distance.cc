@@ -14,17 +14,19 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/perception/fusion/lib/data_association/hm_data_association/track_object_distance.h"
+
 #include <algorithm>
 #include <limits>
 #include <map>
 #include <string>
 #include <utility>
+
 #include "boost/format.hpp"
+
 #include "modules/perception/base/camera.h"
+#include "modules/perception/base/point.h"
 #include "modules/perception/base/sensor_meta.h"
 #include "modules/perception/common/geometry/camera_homography.h"
-#include "modules/perception/fusion/base/sensor_data_manager.h"
-#include "modules/perception/fusion/common/camera_util.h"
 #include "modules/perception/fusion/lib/data_association/hm_data_association/chi_squared_cdf_1_0.0500_0.999900.h"
 #include "modules/perception/fusion/lib/data_association/hm_data_association/chi_squared_cdf_2_0.0500_0.999900.h"
 

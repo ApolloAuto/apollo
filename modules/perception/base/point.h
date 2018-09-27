@@ -76,6 +76,8 @@ struct Point2D {
   T y = 0;
 };
 
+using Point2DF = Point2D<float>;
+
 template <typename T>
 struct Point3D {
   T x = 0;
