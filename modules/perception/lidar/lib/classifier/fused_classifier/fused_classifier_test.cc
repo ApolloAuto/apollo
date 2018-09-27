@@ -21,6 +21,7 @@
 #include "gtest/gtest.h"
 
 #include "modules/perception/base/object.h"
+#include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/lidar/common/lidar_frame.h"
 #include "modules/perception/lidar/common/lidar_log.h"
 #include "modules/perception/lidar/common/object_sequence.h"
@@ -28,11 +29,8 @@
 
 namespace apollo {
 namespace perception {
-namespace lib {
-DECLARE_string(config_manager_path);
-DECLARE_string(work_root);
-}  // namespace lib
 namespace lidar {
+
 using base::Object;
 using base::ObjectPtr;
 class FusedClassifierTest : public testing::Test {
@@ -42,8 +40,8 @@ class FusedClassifierTest : public testing::Test {
     putenv(cybertron_path);
     char module_path[80] = "MODULE_PATH=";
     putenv(module_path);
-    lib::FLAGS_work_root =
-        "modules/perception/testdata/lidar/lib/classifier/fused_classifier";
+    FLAGS_work_root = "/apollo/modules/perception/testdata/"
+        "lidar/lib/classifier/fused_classifier";
     fused_classifier_ = new FusedClassifier();
     BuildObjects();
     for (auto& frame : frames_) {

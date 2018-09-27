@@ -28,11 +28,6 @@
 
 namespace apollo {
 namespace perception {
-namespace common {
-DECLARE_string(obs_sensor_meta_path);
-DECLARE_string(obs_sensor_intrinsic_path);
-}
-
 namespace fusion {
 
 TEST(ProjectionCacheTest, test) {
@@ -284,8 +279,8 @@ TEST(ComputeRadarCameraVelocitySimilarity, test) {
 }
 
 TEST(TrackObjectDistance, test) {
-  common::FLAGS_obs_sensor_meta_path = "./data/sensor_meta.pt";
-  common::FLAGS_obs_sensor_intrinsic_path = "./params";
+  FLAGS_obs_sensor_meta_path = "./data/sensor_meta.pt";
+  FLAGS_obs_sensor_intrinsic_path = "./params";
   TrackObjectDistance track_object_distance;
 }
 

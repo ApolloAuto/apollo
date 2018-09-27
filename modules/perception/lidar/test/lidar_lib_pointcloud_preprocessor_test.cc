@@ -18,10 +18,6 @@
 
 namespace apollo {
 namespace perception {
-namespace lib {
-DECLARE_string(work_root);
-}
-
 namespace lidar {
 
 class PointCloudPreprocessorTest : public testing::Test {
@@ -31,8 +27,8 @@ class PointCloudPreprocessorTest : public testing::Test {
     putenv(cybertron_path);
     char module_path[100] = "MODULE_PATH=";
     putenv(module_path);
-    lib::FLAGS_work_root =
-        "modules/perception/testdata/lidar/lib/pointcloud_preprocessor";
+    FLAGS_work_root = "/apollo/modules/perception/testdata/"
+        "lidar/lib/pointcloud_preprocessor";
   }
   void TearDown() {}
 

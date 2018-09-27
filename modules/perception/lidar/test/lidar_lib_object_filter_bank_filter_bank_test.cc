@@ -18,10 +18,6 @@
 
 namespace apollo {
 namespace perception {
-namespace lib {
-DECLARE_string(work_root);
-}
-
 namespace lidar {
 
 class MockObjectFilter1 : public BaseObjectFilter {
@@ -67,8 +63,8 @@ TEST(LidarLibObjectFilterBankTest, lidar_lib_object_filter_bank_test) {
   putenv(cybertron_path);
   char module_path[100] = "MODULE_PATH=";
   putenv(module_path);
-  lib::FLAGS_work_root =
-      "modules/perception/testdata/lidar/lib/object_filter_bank/filter_bank";
+  FLAGS_work_root = "/apollo/modules/perception/testdata/"
+      "lidar/lib/object_filter_bank/filter_bank";
 
   ObjectFilterBank filter_bank;
   EXPECT_EQ(filter_bank.Name(), "ObjectFilterBank");

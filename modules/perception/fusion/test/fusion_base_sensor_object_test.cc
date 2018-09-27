@@ -22,22 +22,13 @@
 
 namespace apollo {
 namespace perception {
-namespace common {
-DECLARE_string(obs_sensor_meta_path);
-DECLARE_string(obs_sensor_intrinsic_path);
-}
-
-namespace lib {
-DECLARE_string(work_root);
-}
-
 namespace fusion {
 
 TEST(SensorObjectTest, test) {
-  lib::FLAGS_work_root = "/apollo/modules/perception/testdata/fusion/base";
-  common::FLAGS_obs_sensor_meta_path = "./data/sensor_meta.pt";
-  common::FLAGS_obs_sensor_intrinsic_path =
-      "/apollo/modules/perception/testdata/fusion/base/params";
+  FLAGS_work_root = "/apollo/modules/perception/testdata/fusion/base";
+  FLAGS_obs_sensor_meta_path = "./data/sensor_meta.pt";
+  FLAGS_obs_sensor_intrinsic_path = "/apollo/modules/perception/testdata/"
+      "fusion/base/params";
   base::SensorInfo sensor_info;
   sensor_info.name = "test";
   sensor_info.type = base::SensorType::VELODYNE_64;

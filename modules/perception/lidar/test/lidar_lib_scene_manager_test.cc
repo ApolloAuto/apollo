@@ -27,14 +27,9 @@
 #include "modules/perception/lidar/lib/scene_manager/ground_service/ground_service.h"
 #include "modules/perception/lidar/lib/scene_manager/roi_service/roi_service.h"
 #include "modules/perception/lidar/lib/scene_manager/scene_manager.h"
+
 namespace apollo {
 namespace perception {
-
-namespace lib {
-DECLARE_string(config_manager_path);
-DECLARE_string(work_root);
-}  // namespace lib
-
 namespace lidar {
 
 class LidarLibSceneManagerTest : public testing::Test {
@@ -44,8 +39,8 @@ class LidarLibSceneManagerTest : public testing::Test {
     putenv(cybertron_path);
     char* module_path = "MODULE_PATH=";
     putenv(module_path);
-    lib::FLAGS_work_root = "modules/perception/testdata/lidar/lib/scene_manager";
-    lib::FLAGS_config_manager_path = "./conf";
+    FLAGS_work_root = "/apollo/modules/perception/testdata/lidar/lib/scene_manager";
+    FLAGS_config_manager_path = "./conf";
     lib::ConfigManager* config_manager =
         lib::Singleton<lib::ConfigManager>::get_instance();
     config_manager->Reset();
