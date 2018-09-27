@@ -47,6 +47,11 @@ class SimulationWorldServiceTest : public ::testing::Test {
  public:
   static void SetUpTestCase() {
     cybertron::GlobalData::Instance()->EnableSimulationMode();
+
+    std::unique_ptr<cybertron::Node> node =
+        cybertron::CreateNode("sim_world_service_test");
+    control_writer_ = node->CreateWriter<apollo::control::ControlCommand>(
+        FLAGS_control_command_topic);
   }
 
   virtual void SetUp() {
@@ -54,8 +59,6 @@ class SimulationWorldServiceTest : public ::testing::Test {
         "modules/dreamview/backend/testdata/routing.pb.txt";
     apollo::common::VehicleConfigHelper::Init();
     sim_world_service_.reset(new SimulationWorldService(map_service_.get()));
-
-    SetupCybertron();
   }
 
  protected:
@@ -65,28 +68,16 @@ class SimulationWorldServiceTest : public ::testing::Test {
     FLAGS_sim_world_with_routing_path = true;
     map_service_.reset(new MapService(false));
   }
-  void SetupCybertron();
 
   std::unique_ptr<SimulationWorldService> sim_world_service_;
   std::unique_ptr<MapService> map_service_;
 
-  bool is_cybertron_initialized_ = false;
-  std::shared_ptr<cybertron::Writer<apollo::control::ControlCommand>>
+  static std::shared_ptr<cybertron::Writer<apollo::control::ControlCommand>>
       control_writer_;
 };
 
-void SimulationWorldServiceTest::SetupCybertron() {
-  if (is_cybertron_initialized_) {
-    return;
-  }
-
-  std::unique_ptr<cybertron::Node> node =
-      cybertron::CreateNode("sim_world_service_test");
-  control_writer_ = node->CreateWriter<apollo::control::ControlCommand>(
-      FLAGS_control_command_topic);
-
-  is_cybertron_initialized_ = true;
-}
+std::shared_ptr<cybertron::Writer<apollo::control::ControlCommand>>
+    SimulationWorldServiceTest::control_writer_;
 
 TEST_F(SimulationWorldServiceTest, UpdateMonitorSuccess) {
   MonitorMessage monitor;
