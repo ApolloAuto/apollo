@@ -494,6 +494,7 @@ function citest() {
   cd /apollo/framework
   bash cybertron.sh build_fast
   cd /apollo
+  source framework/install/setup.bash
 
   citest_basic
   if [ $? -eq 0 ]; then
