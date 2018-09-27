@@ -14,9 +14,12 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/perception/fusion/lib/data_association/hm_data_association/hm_tracks_objects_match.h"
+
 #include <algorithm>
 #include <map>
 #include <utility>
+
+#include "modules/perception/common/graph/secure_matrix.h"
 
 namespace apollo {
 namespace perception {
@@ -195,11 +198,11 @@ bool HMTrackersObjectsAssociation::MinimizeAssignment(
     std::vector<size_t>* unassigned_measurements) {
   common::GatedHungarianMatcher<float>::OptimizeFlag opt_flag =
       common::GatedHungarianMatcher<float>::OptimizeFlag::OPTMIN;
-  common::SecureMat<float>& global_costs = optimizer_.global_costs();
+  common::SecureMat<float> global_costs = optimizer_.global_costs();
   int rows = unassigned_tracks->size();
   int cols = unassigned_measurements->size();
 
-  global_costs.resize(rows, cols);
+  global_costs.Resize(rows, cols);
   for (size_t r_i = 0; r_i < rows; r_i++) {
     for (size_t c_i = 0; c_i < cols; c_i++) {
       global_costs(r_i, c_i) = static_cast<float>(association_mat[r_i][c_i]);

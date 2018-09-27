@@ -19,7 +19,9 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
+
 #include "Eigen/StdVector"
+
 #include "modules/perception/common/sensor_manager/sensor_manager.h"
 #include "modules/perception/fusion/base/fusion_log.h"
 #include "modules/perception/fusion/base/sensor_data_manager.h"

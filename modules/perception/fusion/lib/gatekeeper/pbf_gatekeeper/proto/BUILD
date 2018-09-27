@@ -14,8 +14,6 @@ proto_library(
     srcs = [
         "pbf_gatekeeper_config.proto",
     ],
-    deps = [
-    ],
 )
 
 cpplint()

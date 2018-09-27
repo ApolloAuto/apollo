@@ -15,6 +15,7 @@
  *****************************************************************************/
 #ifndef MODULES_PERCEPTION_FUSION_LIB_GATEKEEPER_PBF_GATEKEEPER_PBF_GATEKEEPER_H_
 #define MODULES_PERCEPTION_FUSION_LIB_GATEKEEPER_PBF_GATEKEEPER_PBF_GATEKEEPER_H_
+
 #include <string>
 #include <vector>
 
