@@ -138,8 +138,8 @@ void TrackPostProcessor::SmoothTrackOrientation(TrackDataPtr track_data) {
   }
 
   Eigen::Vector3d bk_size = current_object->output_size;
-  Eigen::Vector3d bk_dir = current_object->output_direction;
-  Eigen::Vector3d bk_center = current_object->output_center;
+  // Eigen::Vector3d bk_dir = current_object->output_direction;
+  // Eigen::Vector3d bk_center = current_object->output_center;
   Eigen::Vector3f new_size_tmp;
   Eigen::Vector3d new_center;
   double minimum_edge_length = 0.01;
@@ -499,7 +499,7 @@ void TrackPostProcessor::UpdateTrackConvergenceState(TrackDataPtr track_data) {
   int useable_measure_velocity_size = 1 + track_data->total_visible_count_ - 1;
   double base_convergence_noise = 2 * s_centroid_measurement_noise_;
 
-  int visible_obj_idx = 0;
+  size_t visible_obj_idx = 0;
   std::map<double, TrackedObjectPtr>::reverse_iterator cur_object_pair;
   for (cur_object_pair = history_object.rbegin();
        cur_object_pair != history_object.rend(); ++cur_object_pair) {

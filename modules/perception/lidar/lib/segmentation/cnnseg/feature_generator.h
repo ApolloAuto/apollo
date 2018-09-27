@@ -21,6 +21,8 @@
 #include <string>
 #include <vector>
 
+#include "gtest/gtest_prod.h"
+
 #include "modules/perception/lidar/lib/segmentation/cnnseg/proto/cnnseg_param.pb.h"
 
 #include "modules/perception/base/blob.h"
@@ -114,6 +116,10 @@ class FeatureGenerator {
   int pc_gpu_size_ = 0;
   const int kMaxPointCloudGPUSize = 120000;
   const int kGPUThreadSize = 512;
+
+  // for TEST only
+  FRIEND_TEST(FeatureGeneratorTest, basic_test);
+  friend class FeatureGeneratorTest;
 };
 
 }  // namespace lidar

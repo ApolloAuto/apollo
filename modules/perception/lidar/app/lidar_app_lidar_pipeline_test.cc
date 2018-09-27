@@ -21,7 +21,7 @@
 #include "modules/perception/lidar/app/lidar_obstacle_segmentation.h"
 #include "modules/perception/lidar/app/lidar_obstacle_tracking.h"
 #include "modules/perception/lidar/common/lidar_error_code.h"
-#include "modules/perception/lidar/common/pcl_util.h"
+// #include "modules/perception/lidar/common/pcl_util.h"
 
 namespace apollo {
 namespace perception {
