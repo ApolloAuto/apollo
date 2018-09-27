@@ -495,7 +495,7 @@ function citest() {
   bash cybertron.sh build_fast
   cd /apollo
 
-  run_test
+  citest_basic
   if [ $? -eq 0 ]; then
     success 'Test passed!'
     return 0
