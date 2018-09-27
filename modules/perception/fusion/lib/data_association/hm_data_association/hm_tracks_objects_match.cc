@@ -138,12 +138,12 @@ bool HMTrackersObjectsAssociation::Associate(
                   association_result);
 
   AINFO << "association: measurement_num = " << sensor_objects.size()
-           << ", track_num = " << fusion_tracks.size()
-           << ", assignments = " << association_result->assignments.size()
-           << ", unassigned_tracks = "
-           << association_result->unassigned_tracks.size()
-           << ", unassigned_measuremnets = "
-           << association_result->unassigned_measurements.size();
+        << ", track_num = " << fusion_tracks.size()
+        << ", assignments = " << association_result->assignments.size()
+        << ", unassigned_tracks = "
+        << association_result->unassigned_tracks.size()
+        << ", unassigned_measuremnets = "
+        << association_result->unassigned_measurements.size();
 
   // const auto& final_assignments = association_result->assignments;
   // for (size_t i = 0; i < final_assignments.size(); ++i) {
@@ -203,8 +203,8 @@ bool HMTrackersObjectsAssociation::MinimizeAssignment(
   int cols = unassigned_measurements->size();
 
   global_costs.Resize(rows, cols);
-  for (size_t r_i = 0; r_i < rows; r_i++) {
-    for (size_t c_i = 0; c_i < cols; c_i++) {
+  for (int r_i = 0; r_i < rows; r_i++) {
+    for (int c_i = 0; c_i < cols; c_i++) {
       global_costs(r_i, c_i) = static_cast<float>(association_mat[r_i][c_i]);
     }
   }
@@ -267,7 +267,6 @@ void HMTrackersObjectsAssociation::ComputeDistance(
     int min_m_ind = measurement_ind_l2g[min_m_loc];
     const SensorObjectPtr& min_sensor_object = sensor_objects[min_m_ind];
     const TrackPtr& fusion_track = fusion_tracks[track_ind];
-    const FusedObjectPtr& fused_object = fusion_track->GetFusedObject();
     SensorObjectConstPtr lidar_object = fusion_track->GetLatestLidarObject();
     SensorObjectConstPtr radar_object = fusion_track->GetLatestRadarObject();
     if (IsCamera(min_sensor_object)) {
@@ -337,15 +336,15 @@ void HMTrackersObjectsAssociation::ComputeAssociationDistanceMat(
             track_object_distance_.Compute(fusion_track, sensor_object, opt);
       } else {
         ADEBUG << "center_distance " << center_dist
-                  << " exceeds slack threshold "
-                  << s_association_center_dist_threshold_
-                  << ", track_id: " << fusion_track->GetTrackId()
-                  << ", obs_id: " << sensor_object->GetBaseObject()->track_id;
+               << " exceeds slack threshold "
+               << s_association_center_dist_threshold_
+               << ", track_id: " << fusion_track->GetTrackId()
+               << ", obs_id: " << sensor_object->GetBaseObject()->track_id;
       }
       (*association_mat)[i][j] = distance;
       ADEBUG << "track_id: " << fusion_track->GetTrackId()
-                << ", obs_id: " << sensor_object->GetBaseObject()->track_id
-                << ", distance: " << distance;
+             << ", obs_id: " << sensor_object->GetBaseObject()->track_id
+             << ", distance: " << distance;
     }
   }
 }
@@ -368,7 +367,6 @@ void HMTrackersObjectsAssociation::IdAssign(
               unassigned_sensor_objects->end(), 0);
     return;
   }
-  base::SensorType sensor_type = sensor_objects[0]->GetSensorType();
   const std::string sensor_id = sensor_objects[0]->GetSensorId();
 
   std::map<int, int> sensor_id_2_track_ind;

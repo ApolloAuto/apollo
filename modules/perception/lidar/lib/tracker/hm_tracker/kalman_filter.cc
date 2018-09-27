@@ -15,17 +15,17 @@
  *****************************************************************************/
 #include "modules/perception/lidar/lib/tracker/hm_tracker/kalman_filter.h"
 
+#include <algorithm>
 #include <deque>
 #include <map>
 #include <utility>
 #include <vector>
-#include <algorithm>
 
 #include "cybertron/common/log.h"
+#include "modules/common/util/file.h"
 #include "modules/perception/common/geometry/basic.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lib/io/file_util.h"
-#include "modules/common/util/file.h"
 #include "modules/perception/proto/hm_tracker_config.pb.h"
 
 namespace apollo {
@@ -531,7 +531,7 @@ void KalmanFilter::UpdateConverged(int useable_measure_velocity_size) {
       return;
     }
     if (new_object_->boostup_need_history_size <
-        s_boostup_history_size_maximum_) {
+        static_cast<int>(s_boostup_history_size_maximum_)) {
       new_object_->boostup_need_history_size += 1;
     }
   } else {
@@ -558,7 +558,7 @@ void KalmanFilter::ComputeConvergenceConfidence(
       std::max(base_convergence_noise, velocity_residual.norm());
 
   // history objects score
-  int visible_obj_idx = 1;
+  size_t visible_obj_idx = 1;
   std::map<double, TrackedObjectPtr>::reverse_iterator cur_object_pair;
   for (cur_object_pair = history_object.rbegin();
        cur_object_pair != history_object.rend(); ++cur_object_pair) {
@@ -567,7 +567,7 @@ void KalmanFilter::ComputeConvergenceConfidence(
       continue;
     }
     if (visible_obj_idx >= convergence_score_list.size() ||
-        visible_obj_idx >= useable_measure_velocity_size) {
+        static_cast<int>(visible_obj_idx) >= useable_measure_velocity_size) {
       break;
     }
     velocity_residual =
@@ -722,7 +722,7 @@ void KalmanFilter::CalculateAverageCornerVelocity(
     int window_size, Eigen::Vector3d* average_velocity) {
   average_velocity->setZero();
 
-  size_t use_num = 0;
+  int use_num = 0;
   Eigen::Vector3d sum_corner_velocity = Eigen::Vector3d::Zero();
   for (auto history_object_pair = track_data_->history_objects_.rbegin();
        history_object_pair != track_data_->history_objects_.rend();
@@ -746,7 +746,8 @@ void KalmanFilter::ComputeMotionScore() {
   };
 
   // the first s_motion_score_window_size frames measurement is unstable
-  if (track_data_->history_objects_.size() < s_motion_score_window_size_ - 1) {
+  if (static_cast<int>(track_data_->history_objects_.size()) <
+      s_motion_score_window_size_ - 1) {
     new_object_->motion_score = Eigen::Vector3d(1, 1, 1);
     return;
   }
@@ -784,7 +785,7 @@ void KalmanFilter::ComputeMotionScore() {
     double theta_diff = compute_theta_diff(new_theta, average_theta);
     variance_theta += theta_diff;
 
-    if (++use_num == s_motion_score_window_size_) {
+    if (++use_num == static_cast<size_t>(s_motion_score_window_size_)) {
       break;
     }
   }
@@ -798,7 +799,8 @@ void KalmanFilter::ComputeMotionScore() {
       track_data_->history_norm_variance_;
   std::deque<double>& history_theta_variance =
       track_data_->history_theta_variance_;
-  if (history_norm_variance.size() >= s_motion_score_window_size_) {
+  if (history_norm_variance.size() >=
+      static_cast<size_t>(s_motion_score_window_size_)) {
     history_norm_variance.pop_front();
     history_theta_variance.pop_front();
   }

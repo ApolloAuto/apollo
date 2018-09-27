@@ -31,16 +31,16 @@ namespace perception {
 namespace lib {
 DECLARE_string(config_manager_path);
 DECLARE_string(work_root);
-}
+}  // namespace lib
 namespace lidar {
-using base::ObjectPtr;
 using base::Object;
+using base::ObjectPtr;
 class FusedClassifierTest : public testing::Test {
  protected:
   void SetUp() override {
-    char* cybertron_path = "CYBERTRON_PATH=";
+    char cybertron_path[80] = "CYBERTRON_PATH=";
     putenv(cybertron_path);
-    char* module_path = "MODULE_PATH=";
+    char module_path[80] = "MODULE_PATH=";
     putenv(module_path);
     lib::FLAGS_work_root =
         "modules/perception/testdata/lidar/lib/classifier/fused_classifier";

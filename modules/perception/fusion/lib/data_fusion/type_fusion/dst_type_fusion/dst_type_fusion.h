@@ -115,8 +115,8 @@ class DstTypeFusion : public BaseTypeFusion {
   std::string Name() const;
 
  private:
-  bool TypToHyp(size_t object_type, uint64_t hypothesis_type) const;
-  bool HypToTyp(uint64_t hypothesis_type, size_t object_type) const;
+  bool TypToHyp(size_t object_type, uint64_t *hypothesis_type) const;
+  bool HypToTyp(uint64_t hypothesis_type, size_t *object_type) const;
   Dst TypeProbsToDst(const std::vector<float> &type_probs);
   double GetReliability(const std::string &sensor_id) const;
   double GetReliabilityForUnKnown(const std::string &sensor_id,
