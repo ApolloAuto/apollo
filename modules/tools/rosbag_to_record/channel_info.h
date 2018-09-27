@@ -72,8 +72,8 @@ class ChannelInfo {
     return instance;
   }
 
-  const std::string& GetMessageType(const std::string& channel_name);
-  const std::string& GetProtoDesc(const std::string& channel_name);
+  const std::string GetMessageType(const std::string& channel_name);
+  const std::string GetProtoDesc(const std::string& channel_name);
   const std::vector<std::string>& GetSupportChannels();
 
  private:

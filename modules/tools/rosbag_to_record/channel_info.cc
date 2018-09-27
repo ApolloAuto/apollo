@@ -30,8 +30,7 @@ ChannelInfo::~ChannelInfo() {
   channel_proto_desc_.clear();
 }
 
-const std::string& ChannelInfo::GetMessageType(
-    const std::string& channel_name) {
+const std::string ChannelInfo::GetMessageType(const std::string& channel_name) {
   auto search = channel_msg_type_.find(channel_name);
   if (search != channel_msg_type_.end()) {
     return search->second;
@@ -39,7 +38,7 @@ const std::string& ChannelInfo::GetMessageType(
   return empty_str_;
 }
 
-const std::string& ChannelInfo::GetProtoDesc(const std::string& channel_name) {
+const std::string ChannelInfo::GetProtoDesc(const std::string& channel_name) {
   auto search = channel_proto_desc_.find(channel_name);
   if (search != channel_proto_desc_.end()) {
     return search->second;
