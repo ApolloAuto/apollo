@@ -64,15 +64,15 @@ DistanceApproachIPOPTInterface::DistanceApproachIPOPTInterface(
   */
 
 void DistanceApproachIPOPTInterface::set_objective_weights(
-    const double w_u, const double w_time_1, const double w_time_2,
-    const double w_reg) {
-  w_u_ = w_u;
+    const double weight_u, const double weight_time_1,
+    const double weight_time_2, const double weight_reg) {
+  weight_u_ = weight_u;
 
-  w_time_1_ = w_time_1;
+  weight_time_1_ = weight_time_1;
 
-  w_time_2_ = w_time_2;
+  weight_time_2_ = weight_time_2;
 
-  w_reg_ = w_reg;
+  weight_reg_ = weight_reg;
 }
 
 bool DistanceApproachIPOPTInterface::get_nlp_info(int& n, int& m,
@@ -445,7 +445,6 @@ bool DistanceApproachIPOPTInterface::eval_f(int n, const double* x, bool new_x,
   // input, next horizon_ + 1 is sampling time, next horizon_ + 1 is
   // lagrangian l, next horizon_ +1 is lagrangian n
 
-  // TODO(QiL) : Change the weight to configs
   std::size_t start_index = (horizon_ + 1) * 4;
   std::size_t time_start_index = start_index + horizon_ * 2;
   std::size_t lagrangian_l_start_index = time_start_index + horizon_ + 1;
@@ -454,17 +453,19 @@ bool DistanceApproachIPOPTInterface::eval_f(int n, const double* x, bool new_x,
 
   // 1. objective to minimize u square
   for (std::size_t i = 0; i < horizon_; ++i) {
-    obj_value += 0.1 * x[start_index + i] * x[start_index + i] +
-                 x[start_index + i] * x[start_index + i + 1] +
-                 0.5 * x[time_start_index + i] +
-                 x[time_start_index + i] * x[time_start_index + i];
+    obj_value +=
+        weight_u_ * x[start_index + i] * x[start_index + i] +
+        x[start_index + i] * x[start_index + i + 1] +
+        weight_time_1_ * x[time_start_index + i] +
+        weight_time_2_ * x[time_start_index + i] * x[time_start_index + i];
   }
 
   // Add l , sum(obstacles_vertices_num) * (N+1)
   constexpr double reg = 1e-4;
   for (std::size_t i = 1; i < horizon_ + 1; ++i) {
     for (std::size_t j = 1; j <= obstacles_vertices_sum_; ++j) {
-      obj_value += reg * x[lagrangian_l_start_index + i * (horizon_ + 1) + j] *
+      obj_value += weight_reg_ *
+                   x[lagrangian_l_start_index + i * (horizon_ + 1) + j] *
                    x[lagrangian_l_start_index + i * (horizon_ + 1) + j];
     }
   }
@@ -473,7 +474,7 @@ bool DistanceApproachIPOPTInterface::eval_f(int n, const double* x, bool new_x,
   for (std::size_t i = 1; i < horizon_ + 1; ++i) {
     // TODO(QiL) : Double check the dimensions here !!!!!!!!!
     for (std::size_t j = 1; j <= 4 * obstacles_num_; ++j) {
-      obj_value += reg *
+      obj_value += weight_reg_ *
                    x[lagrangian_n_start_index + i * 4 * obstacles_num_ + j] *
                    x[lagrangian_n_start_index + i * 4 * obstacles_num_ + j];
     }
