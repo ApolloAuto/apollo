@@ -63,7 +63,7 @@ extern "C" {
 
 #include "cybertron/cybertron.h"
 
-#include "modules/drivers/usb_cam/proto/config.pb.h"
+#include "modules/drivers/camera/proto/config.pb.h"
 
 namespace apollo {
 namespace drivers {

@@ -3,22 +3,22 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "usb_cam_proto",
+    name = "camera_proto",
     deps = [
-        ":sensor_usb_cam_proto",
+        ":sensor_camera_proto",
     ],
 )
 
 
 cc_proto_library(
-    name = "sensor_usb_cam_proto",
+    name = "sensor_camera_proto",
     deps = [
-        ":usb_cam_proto_lib",
+        ":camera_proto_lib",
     ],
 )
 
 proto_library(
-    name = "usb_cam_proto_lib",
+    name = "camera_proto_lib",
     srcs = [
         "config.proto",
     ],

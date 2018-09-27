@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/drivers/usb_cam/usb_cam_component.h"
+#include "modules/drivers/camera/usb_cam_component.h"
 
 namespace apollo {
 namespace drivers {
@@ -38,7 +38,7 @@ bool UsbCamComponent::Init() {
   raw_image_->bytes_per_pixel = camera_config_->bytes_per_pixel();
 
   device_wait_ = camera_config_->device_wait_ms();
-  spin_rate_ = camera_config_->spin_rate();
+  spin_rate_ = (1.0 / camera_config_->spin_rate()) * 1e6;
 
   if (camera_config_->output_type() == YUYV) {
     raw_image_->image_size = raw_image_->width * raw_image_->height * 2;
@@ -84,7 +84,7 @@ void UsbCamComponent::run() {
     pb_image_->set_data(raw_image_->image, raw_image_->image_size);
     writer_->Write(pb_image_);
 
-    sleep(spin_rate_);
+    cybertron::SleepFor(std::chrono::microseconds(spin_rate_));
   }
 }
 
