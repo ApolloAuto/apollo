@@ -101,12 +101,31 @@ bool CanbusComponent::Init() {
   }
   AINFO << "The vehicle controller is successfully initialized.";
 
-  guardian_cmd_reader_ = node_->CreateReader<GuardianCommand>(
-      FLAGS_guardian_topic,
-      [this](const std::shared_ptr<GuardianCommand> &cmd) {
-        ADEBUG << "Received guardian data: run canbus callback.";
-        OnGuardianCommand(*cmd);
-      });
+  cybertron::ReaderConfig guardian_cmd_reader_config;
+  guardian_cmd_reader_config.channel_name = FLAGS_guardian_topic;
+  guardian_cmd_reader_config.pending_queue_size =
+      FLAGS_guardian_cmd_pending_queue_size;
+
+  cybertron::ReaderConfig control_cmd_reader_config;
+  control_cmd_reader_config.channel_name = FLAGS_control_command_topic;
+  control_cmd_reader_config.pending_queue_size =
+      FLAGS_control_cmd_pending_queue_size;
+
+  if (FLAGS_receive_guardian) {
+    guardian_cmd_reader_ = node_->CreateReader<GuardianCommand>(
+        guardian_cmd_reader_config,
+        [this](const std::shared_ptr<GuardianCommand> &cmd) {
+          ADEBUG << "Received guardian data: run canbus callback.";
+          OnGuardianCommand(*cmd);
+        });
+  } else {
+    control_command_reader_ = node_->CreateReader<ControlCommand>(
+        control_cmd_reader_config,
+        [this](const std::shared_ptr<ControlCommand> &cmd) {
+          ADEBUG << "Received control data: run canbus callback.";
+          OnControlCommand(*cmd);
+        });
+  }
 
   chassis_writer_ = node_->CreateWriter<Chassis>(FLAGS_chassis_topic);
 

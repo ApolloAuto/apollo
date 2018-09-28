@@ -92,6 +92,8 @@ class CanbusComponent final : public apollo::cybertron::TimerComponent {
   CanbusConf canbus_conf_;
   std::shared_ptr<Reader<apollo::guardian::GuardianCommand>>
       guardian_cmd_reader_;
+  std::shared_ptr<Reader<apollo::control::ControlCommand>>
+      control_command_reader_;
   std::unique_ptr<apollo::drivers::canbus::CanClient> can_client_;
   CanSender<ChassisDetail> can_sender_;
   apollo::drivers::canbus::CanReceiver<ChassisDetail> can_receiver_;

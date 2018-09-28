@@ -44,3 +44,8 @@ DEFINE_string(canbus_test_file,
 // TODO(QiL) : depreciate this after test
 DEFINE_bool(receive_guardian, false,
             "Enable receiving guardian message on canbus side");
+
+DEFINE_int32(guardian_cmd_pending_queue_size, 10,
+             "Max guardian cmd pending queue size");
+DEFINE_int32(control_cmd_pending_queue_size, 10,
+             "Max control cmd pending queue size");
