@@ -53,6 +53,20 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "dst_evidence_test",
+    size = "small",
+    srcs = [
+        "dst_evidence_test.cc",
+    ],
+    deps = [
+        ":dst_evidence",
+        "//modules/perception/fusion/base",
+        "@gtest//:main",
+    ],
+)
+
+
 cc_library(
     name = "information_filter",
     srcs = [
