@@ -107,22 +107,29 @@ TEST(RecordTest, filter_test) {
 
   RecordViewer viewer_0(reader);
   EXPECT_EQ(CheckCount(viewer_0), 1000);
-  EXPECT_EQ(START_TIME, viewer_0.get_begin_time());
-  EXPECT_EQ(END_TIME - 1, viewer_0.get_end_time());
+  EXPECT_EQ(START_TIME, viewer_0.begin_time());
+  EXPECT_EQ(END_TIME - 1, viewer_0.end_time());
 
   RecordViewer viewer_1(reader, END_TIME, END_TIME);
   EXPECT_EQ(CheckCount(viewer_1), 0);
-  EXPECT_EQ(END_TIME, viewer_1.get_begin_time());
+  EXPECT_EQ(END_TIME, viewer_1.begin_time());
 
   RecordViewer viewer_2(reader, END_TIME, START_TIME);
   EXPECT_EQ(CheckCount(viewer_2), 0);
-  EXPECT_EQ(START_TIME, viewer_2.get_end_time());
+  EXPECT_EQ(START_TIME, viewer_2.end_time());
+
+  viewer_0.begin();
+  viewer_0.begin();
 
   RecordViewer viewer_3(reader, 0, END_TIME);
   EXPECT_EQ(CheckCount(viewer_3), 1000);
 
   RecordViewer viewer_4(reader, START_TIME);
   EXPECT_EQ(CheckCount(viewer_4), 1000);
+
+  auto it_1 = viewer_3.begin();
+  auto it_2 = viewer_4.begin();
+  EXPECT_FALSE(it_1 == it_2);
 
   RecordViewer viewer_5(reader, 1500, 1600);
   EXPECT_EQ(CheckCount(viewer_5), 101);
@@ -132,6 +139,7 @@ TEST(RecordTest, filter_test) {
 
   RecordViewer viewer_7(reader, 0, END_TIME, {CHANNEL_NAME_1});
   EXPECT_EQ(CheckCount(viewer_7), 1000);
+
 }
 
 }  // namespace record

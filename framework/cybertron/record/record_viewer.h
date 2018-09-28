@@ -50,21 +50,19 @@ class RecordViewer {
     Iterator() {}
     virtual ~Iterator() {}
 
-   private:
-    friend class RecordViewer;
     bool operator==(Iterator const& other) const;
     bool operator!=(const Iterator& rhs) const;
     void operator++();
     pointer operator->();
     reference operator*();
 
+   private:
     bool end_ = false;
     uint64_t index_ = 0;
     RecordViewer* viewer_ = nullptr;
     value_type message_instance_;
   };
 
- public:
   Iterator begin();
   Iterator end();
 
