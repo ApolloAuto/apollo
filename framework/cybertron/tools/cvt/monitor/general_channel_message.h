@@ -41,8 +41,8 @@ class GeneralChannelMessage
   explicit GeneralChannelMessage(RenderableMessage* parent = nullptr)
       : CybertronChannelMessage<apollo::cybertron::message::RawMessage>(parent),
         current_state_(State::ShowDebugString),
-        pages_(0),
-        page_index_(0),
+        // pages_(0),
+        // page_index_(0),
         raw_msg_class_(nullptr) {}
 
  private:
@@ -51,12 +51,11 @@ class GeneralChannelMessage
 
   void RenderDebugString(const Screen* s, int key, unsigned lineNo);
   void RenderInfo(const Screen* s, int key, unsigned lineNo);
-  void SplitPages(int key);
-
+  
   enum class State { ShowDebugString, ShowInfo } current_state_;
 
-  int pages_;
-  int page_index_;
+  // int pages_;
+  // int page_index_;
   google::protobuf::Message* raw_msg_class_;
 
   friend class RepeatedItemsMessage;

@@ -27,14 +27,10 @@
 
 constexpr int SecondColumnOffset = 4;
 
-double CybertronTopologyMessage::max_frmae_ratio_ = 0.1;
-
 CybertronTopologyMessage::CybertronTopologyMessage()
     : RenderableMessage(nullptr, 1),
       second_column_(SecondColumnType::MessageFrameRatio),
-      pages_(1),
       page_item_count_(24),
-      page_index_(0),
       col1_width_(8),
       all_channels_map_() {}
 
@@ -148,21 +144,21 @@ void CybertronTopologyMessage::ChangeState(const Screen* s, int key) {
       second_column_ = SecondColumnType::MessageType;
       break;
 
-    case CTRL('d'):
-    case KEY_NPAGE:
-      ++page_index_;
-      if (page_index_ >= pages_) page_index_ = pages_ - 1;
-      break;
+    // case CTRL('d'):
+    // case KEY_NPAGE:
+    //   ++page_index_;
+    //   if (page_index_ >= pages_) page_index_ = pages_ - 1;
+    //   break;
 
-    case CTRL('u'):
-    case KEY_PPAGE:
-      --page_index_;
-      if (page_index_ < 1) page_index_ = 0;
-      break;
+    // case CTRL('u'):
+    // case KEY_PPAGE:
+    //   --page_index_;
+    //   if (page_index_ < 1) page_index_ = 0;
+    //   break;
 
     case ' ': {
       ChannelMessage* child =
-          static_cast<ChannelMessage*>(Child(line_no()));
+          static_cast<ChannelMessage*>(Child(*line_no()));
       if (child) {
         child->set_enabled(!child->is_enabled());
       }
@@ -176,6 +172,7 @@ void CybertronTopologyMessage::Render(const Screen* s, int key) {
   page_item_count_ = s->Height() - 1;
   pages_ = all_channels_map_.size() / page_item_count_ + 1;
   ChangeState(s, key);
+  SplitPages(key);
 
   unsigned y = 0;
 
@@ -211,17 +208,19 @@ void CybertronTopologyMessage::Render(const Screen* s, int key) {
     color = Screen::RED_BLACK;
 
     if (!ChannelMessage::isErrorCode(iter->second)) {
-      if (iter->second->is_enabled() && iter->second->has_message_come())
-        color = Screen::GREEN_BLACK;
+      if (iter->second->has_message_come()){
+        if(iter->second->is_enabled()){
+          color = Screen::GREEN_BLACK;
+        } else {
+          color = Screen::YELLOW_BLACK;
+        }
+      }
     }
 
     s->SetCurrentColor(color);
     s->AddStr(0, y, iter->first.c_str());
 
     if (!ChannelMessage::isErrorCode(iter->second)) {
-
-      if(iter->second->frame_ratio() > max_frmae_ratio_)
-        max_frmae_ratio_ = iter->second->frame_ratio();
 
       switch (second_column_) {
         case SecondColumnType::MessageType:

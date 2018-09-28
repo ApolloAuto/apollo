@@ -32,6 +32,7 @@ class Screen final {
   static const char InteractiveCmdStr[];
 
   enum ColorPair {  // foreground color - background color
+    INVALID = 0,
     GREEN_BLACK = 1,
     YELLOW_BLACK,
     RED_BLACK,
@@ -51,7 +52,8 @@ class Screen final {
 
   void AddStr(int x, int y, ColorPair color, const char* cStr) const;
 
-  void SetCurrentColor(ColorPair color) const;
+  ColorPair Color(void)const{ return current_color_pair_; }
+  void SetCurrentColor(ColorPair color)const;
   void AddStr(int x, int y, const char* str) const;
   void AddStr(const char* str) const;
   void MoveOffsetXY(int offsetX, int offsetY) const;
@@ -63,24 +65,22 @@ class Screen final {
     }
   }
 
-  // int highlight_line_no(void) const { return highlight_line_no_; }
-
  private:
   explicit Screen();
   Screen(const Screen&) = delete;
   Screen& operator=(const Screen&) = delete;
 
-  void SwitchState(int ch);
+  int SwitchState(int ch);
   void HighlightLine(int lineNo);
 
-  void ShowInteractiveCmd(int& y, int ch);
-  void ShowRenderMessage(int& y, int ch);
+  void ShowInteractiveCmd(int ch);
+  void ShowRenderMessage(int ch);
 
   bool IsInit(void) const;
 
+  mutable ColorPair current_color_pair_;
   enum class State { RenderMessage, RenderInterCmdInfo };
   State current_state_;
-  // int highlight_line_no_;
   int highlight_direction_;
   RenderableMessage* current_render_obj_;
 };

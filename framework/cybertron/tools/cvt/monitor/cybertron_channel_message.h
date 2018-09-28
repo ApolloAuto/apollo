@@ -28,8 +28,11 @@
 
 class Screen;
 
-class ChannelMessage /* : public RenderableMessage */ : public GeneralMessageBase {
+class ChannelMessage : public GeneralMessageBase {
+  static double max_frmae_ratio_;
  public:
+  static double max_frame_ratio(void){ return max_frmae_ratio_; }
+
   enum class ErrorCode {
     NewSubClassFailed = -1,
     CreateNodeFailed = -2,
@@ -95,7 +98,7 @@ class ChannelMessage /* : public RenderableMessage */ : public GeneralMessageBas
   bool is_enabled(void) const { return is_enabled_; }
   void set_enabled(bool b) {
     is_enabled_ = b;
-    if (!b) set_has_message_come(false);
+    // if (!b) set_has_message_come(false);
   }
 
   bool has_message_come(void) const { return has_message_come_; }
@@ -110,6 +113,9 @@ class ChannelMessage /* : public RenderableMessage */ : public GeneralMessageBas
       frame_ratio_ = frame_counter_ / deltaTime.ToSecond();
       frame_counter_ = 0;
     }
+
+    if(frame_ratio_ > max_frmae_ratio_)
+      max_frmae_ratio_ = frame_ratio_;
 
     return (frame_ratio_);
   }
@@ -167,13 +173,12 @@ class CybertronChannelMessage : public ChannelMessage {
 
  protected:
   void updateRawMessage(const std::shared_ptr<MessageType>& rawMsg) {
+    set_has_message_come(true);
     if (!is_enabled_) {
       return;
     }
-
     ++frame_counter_;
     std::lock_guard<std::mutex> _g(inner_lock_);
-    set_has_message_come(true);
     channel_message_.reset();
     channel_message_ = rawMsg;
   }
