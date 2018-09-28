@@ -25,7 +25,7 @@ namespace fusion {
 class InformationFilter : public BaseFilter {
  public:
   InformationFilter();
-  ~InformationFilter();
+  ~InformationFilter() = default;
 
   bool Init(const Eigen::VectorXd &global_states,
             const Eigen::MatrixXd &global_uncertainty);
