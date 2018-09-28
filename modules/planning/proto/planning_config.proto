@@ -40,10 +40,8 @@ message ScenarioConfig {
     INTERSECTION_TRAFFIC_LIGHT_RIGHT_TURN = 7;
     INTERSECTION_TRAFFIC_LIGHT_GO_THROUGH = 8;
   }
-  optional ScenarioType scenario_type = 1;
-
   message ScenarioTaskConfig {
-    optional TaskType task = 1;
+    optional TaskType task_type = 1;
     oneof task_config {
       DpPolyPathConfig dp_poly_path_config = 2;
       DpStSpeedConfig dp_st_speed_config = 3;
@@ -53,7 +51,10 @@ message ScenarioConfig {
       PathDeciderConfig path_decider_config = 7;
     }
   }
-  repeated ScenarioTaskConfig scenario_task_config = 2;
+
+  optional ScenarioType scenario_type = 1;
+  repeated TaskType task = 2;
+  repeated ScenarioTaskConfig scenario_task_config = 3;
 }
 
 message PlannerOnRoadConfig {

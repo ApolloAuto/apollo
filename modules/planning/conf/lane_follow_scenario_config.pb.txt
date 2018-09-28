@@ -1,6 +1,11 @@
 scenario_type : LANE_FOLLOW
+task : DP_POLY_PATH_OPTIMIZER
+task : PATH_DECIDER
+task : DP_ST_SPEED_OPTIMIZER
+task : SPEED_DECIDER
+task : QP_SPLINE_ST_SPEED_OPTIMIZER
 scenario_task_config : {
-  task : DP_POLY_PATH_OPTIMIZER
+  task_type : DP_POLY_PATH_OPTIMIZER
   dp_poly_path_config {
     waypoint_sampler_config {
       sample_points_num_each_level: 7
@@ -28,10 +33,10 @@ scenario_task_config : {
   }
 }
 scenario_task_config : {
-  task : PATH_DECIDER
+  task_type : PATH_DECIDER
 }
 scenario_task_config : {
-  task : DP_ST_SPEED_OPTIMIZER
+  task_type : DP_ST_SPEED_OPTIMIZER
   dp_st_speed_config {
     total_path_length: 149
     total_time: 7.0
@@ -78,7 +83,7 @@ scenario_task_config : {
   }
 }
 scenario_task_config : {
-  task : SPEED_DECIDER
+  task_type : SPEED_DECIDER
   dp_st_speed_config {
     total_path_length: 149
     total_time: 7.0
@@ -119,7 +124,7 @@ scenario_task_config : {
   }
 }
 scenario_task_config : {
-  task : QP_SPLINE_ST_SPEED_OPTIMIZER
+  task_type : QP_SPLINE_ST_SPEED_OPTIMIZER
   qp_st_speed_config {
     total_path_length: 250.0
     total_time: 7.0

@@ -87,17 +87,26 @@ bool LaneFollowScenario::Init() {
   CHECK(apollo::common::util::GetProtoFromFile(
       FLAGS_lane_follow_scenario_config_file, &config_));
 
-  for (const auto task_cfg : config_.scenario_task_config()) {
-    tasks_.emplace_back(task_factory_.CreateObject(task_cfg.task()));
-    AINFO << "Created task:" << tasks_.back()->Name();
+  // get all active tasks
+  std::vector<TaskType> tasks;
+  for (int i = 0; i < config_.task_size(); ++i) {
+    tasks.push_back(config_.task(i));
   }
 
-  for (size_t i = 0; i < tasks_.size(); ++i) {
-    if (!tasks_[i]->Init(config_.scenario_task_config(i))) {
-      AERROR << "Init task[" << tasks_[i]->Name() << "] failed.";
-      return false;
+  // init task with conf
+  for (int i = 0; i < config_.scenario_task_config_size(); ++i) {
+    auto task_cfg = config_.scenario_task_config(i);
+    TaskType task_type = task_cfg.task_type();
+    if (std::find(tasks.begin(), tasks.end(), task_type) != tasks.end()) {
+      tasks_.emplace_back(task_factory_.CreateObject(task_type));
+      AINFO << "Created task:" << TaskType_Name(task_type);
+      if (!tasks_.back()->Init(task_cfg)) {
+        AERROR << "Init task[" << TaskType_Name(task_type) << "] failed.";
+        return false;
+      }
     }
   }
+
   is_init_ = true;
   return true;
 }
