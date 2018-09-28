@@ -78,10 +78,6 @@ class FeatureExtractor {
   std::shared_ptr<const hdmap::LaneInfo> GetEgoLane(
       const common::math::Vec2d& ego_position) const;
 
-  ADCTrajectoryContainer* ego_trajectory_containter_;
-
-  PoseContainer* pose_container_;
-
   EnvironmentFeatures environment_features_;
 };
 

@@ -35,23 +35,19 @@ namespace apollo {
 namespace prediction {
 
 FeatureExtractor::FeatureExtractor() {
-  ego_trajectory_containter_ = dynamic_cast<ADCTrajectoryContainer*>(
-      ContainerManager::Instance()->GetContainer(
-          AdapterConfig::PLANNING_TRAJECTORY));
-
-  pose_container_ = dynamic_cast<PoseContainer*>(
-      ContainerManager::Instance()->GetContainer(
-          AdapterConfig::LOCALIZATION));
 }
 
 void FeatureExtractor::ExtractFeatures() {
-  if (pose_container_ == nullptr) {
+  PoseContainer* pose_container = dynamic_cast<PoseContainer*>(
+      ContainerManager::Instance()->GetContainer(
+          AdapterConfig::LOCALIZATION));
+  if (pose_container == nullptr) {
     AERROR << "Null pose container found.";
     return;
   }
   ExtractEgoVehicleFeatures();
 
-  auto ego_trajectory_point = pose_container_->GetPosition();
+  auto ego_trajectory_point = pose_container->GetPosition();
   if (!ego_trajectory_point.has_x() ||
       !ego_trajectory_point.has_y()) {
     AERROR << "Fail to get ego vehicle position";
@@ -77,9 +73,12 @@ const EnvironmentFeatures& FeatureExtractor::GetEnvironmentFeatures() const {
 }
 
 void FeatureExtractor::ExtractEgoVehicleFeatures() {
+  PoseContainer* pose_container = dynamic_cast<PoseContainer*>(
+      ContainerManager::Instance()->GetContainer(
+          AdapterConfig::LOCALIZATION));
   // TODO(all): change this to ego_speed and ego_heading
-  environment_features_.set_ego_speed(pose_container_->GetSpeed());
-  environment_features_.set_ego_heading(pose_container_->GetTheta());
+  environment_features_.set_ego_speed(pose_container->GetSpeed());
+  environment_features_.set_ego_heading(pose_container->GetTheta());
   // TODO(all): add acceleration if needed
 }
 
@@ -131,14 +130,18 @@ void FeatureExtractor::ExtractNeighborLaneFeatures(
 }
 
 void FeatureExtractor::ExtractFrontJunctionFeatures() {
-  if (ego_trajectory_containter_ == nullptr) {
+  ADCTrajectoryContainer* ego_trajectory_container =
+      dynamic_cast<ADCTrajectoryContainer*>(
+          ContainerManager::Instance()->GetContainer(
+              AdapterConfig::PLANNING_TRAJECTORY));
+  if (ego_trajectory_container == nullptr) {
     AERROR << "Null ego trajectory container";
     return;
   }
-  JunctionInfoPtr junction = ego_trajectory_containter_->ADCJunction();
+  JunctionInfoPtr junction = ego_trajectory_container->ADCJunction();
   if (junction != nullptr) {
     environment_features_.SetFrontJunction(junction->id().id(),
-        ego_trajectory_containter_->ADCDistanceToJunction());
+        ego_trajectory_container->ADCDistanceToJunction());
   }
 }
 
@@ -146,8 +149,12 @@ void FeatureExtractor::ExtractObstacleFeatures() {
 }
 
 LaneInfoPtr FeatureExtractor::GetEgoLane(const Vec2d& ego_position) const {
+  ADCTrajectoryContainer* ego_trajectory_container =
+      dynamic_cast<ADCTrajectoryContainer*>(
+          ContainerManager::Instance()->GetContainer(
+              AdapterConfig::PLANNING_TRAJECTORY));
   const auto& trajectory =
-      ego_trajectory_containter_->adc_trajectory();
+      ego_trajectory_container->adc_trajectory();
   for (const auto& lane_id : trajectory.lane_id()) {
     LaneInfoPtr lane_info =
         HDMapUtil::BaseMap().GetLaneById(hdmap::MakeMapId(lane_id.id()));
