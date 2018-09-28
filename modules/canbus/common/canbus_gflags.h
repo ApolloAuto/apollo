@@ -40,4 +40,7 @@ DECLARE_string(canbus_test_file);
 
 // canbus test files
 DECLARE_bool(receive_guardian);
+
+DECLARE_int32(guardian_cmd_pending_queue_size);
+DECLARE_int32(control_cmd_pending_queue_size);
 #endif
