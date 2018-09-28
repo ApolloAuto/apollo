@@ -22,6 +22,8 @@
 #include <unordered_map>
 #include <vector>
 
+#include "gtest/gtest_prod.h"
+
 #include "modules/perception/base/frame.h"
 #include "modules/perception/common/sensor_manager/sensor_manager.h"
 #include "modules/perception/fusion/base/sensor.h"
@@ -61,6 +63,8 @@ class SensorDataManager {
       const std::string& sensor_id) const;
 
  private:
+  FRIEND_TEST(SensorDataManagerTest, test);
+
   SensorDataManager();
   ~SensorDataManager() = default;
 

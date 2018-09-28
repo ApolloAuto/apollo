@@ -59,6 +59,10 @@ class Sensor : public std::enable_shared_from_this<Sensor> {
     kMaxCachedFrameNum = number;
   }
 
+  void SetLatestQueryTimestamp(const double latest_query_timestamp) {
+    latest_query_timestamp_ = latest_query_timestamp;
+  }
+
  private:
   inline SensorPtr GetPtr() { return shared_from_this(); }
 

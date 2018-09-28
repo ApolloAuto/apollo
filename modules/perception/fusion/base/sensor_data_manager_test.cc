@@ -96,7 +96,7 @@ TEST(SensorDataManagerTest, test) {
 
   frame_vec.clear();
   query_timestamp = 8000;
-  sensor_data_manager->sensors_["velodyne64"]->latest_query_timestamp_ = 0;
+  sensor_data_manager->sensors_["velodyne64"]->SetLatestQueryTimestamp(0.0);
   sensor_data_manager->GetLatestFrames(query_timestamp, nullptr);
   EXPECT_EQ(frame_vec.size(), 0);
   sensor_data_manager->GetLatestFrames(query_timestamp, &frame_vec);
