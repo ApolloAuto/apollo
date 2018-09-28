@@ -40,7 +40,8 @@ TEST(SensorFrameTest, test) {
   base_frame->objects.emplace_back(base_object_2);
 
   SensorFramePtr frame_ptr(new SensorFrame());
-  frame_ptr->Initialize(base_frame, sensor_ptr);
+  frame_ptr->Initialize(base_frame, sensor_ptr->GetSensorId(),
+                        sensor_ptr->GetSensorType());
   EXPECT_EQ(frame_ptr->GetForegroundObjects().size(), 1);
   EXPECT_EQ(frame_ptr->GetBackgroundObjects().size(), 1);
 
@@ -50,10 +51,6 @@ TEST(SensorFrameTest, test) {
   EXPECT_EQ((pose.matrix() - sensor2world_pose.matrix()).trace(), 0.0);
   EXPECT_EQ(frame_ptr->GetSensorId(), "test");
   EXPECT_EQ(frame_ptr->GetSensorType(), base::SensorType::VELODYNE_64);
-
-  sensor_ptr.reset();
-  EXPECT_EQ(frame_ptr->GetSensorId(), "");
-  EXPECT_EQ(frame_ptr->GetSensorType(), base::SensorType::UNKNOWN_SENSOR_TYPE);
 }
 
 }  // namespace fusion

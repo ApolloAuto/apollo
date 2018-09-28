@@ -83,6 +83,22 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "sensor_frame_test",
+    size = "small",
+    srcs = [
+        "sensor_frame_test.cc",
+    ],
+    data = [
+        "//modules/perception:perception_testdata",
+    ],
+    deps = [
+        ":sensor",
+        "@gtest//:main",
+    ],
+)
+
+
 cc_library(
     name = "sensor_data_manager",
     srcs = [
@@ -114,7 +130,6 @@ cc_test(
         "@gtest//:main",
     ],
 )
-
 
 cc_library(
     name = "track",
