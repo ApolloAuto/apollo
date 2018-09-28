@@ -164,6 +164,18 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "track_test",
+    size = "small",
+    srcs = [
+        "track_test.cc",
+    ],
+    deps = [
+        ":track",
+        "@gtest//:main",
+    ],
+)
+
 cc_library(
     name = "track_pool_types",
     srcs = [
