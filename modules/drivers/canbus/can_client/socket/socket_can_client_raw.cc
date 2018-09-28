@@ -51,8 +51,6 @@ ErrorCode SocketCanClientRaw::Start() {
   if (is_started_) {
     return ErrorCode::OK;
   }
-  struct sockaddr_can addr;
-  struct ifreq ifr;
 
   // open device
   // guss net is the device minor number, if one card is 0,1
@@ -74,7 +72,7 @@ ErrorCode SocketCanClientRaw::Start() {
   // init config and state
   // 1. set receive message_id filter, ie white list
   struct can_filter filter[2048];
-  for (int i = 0; i < 2048; ++i) {
+  for (int i = 0; i < sizeof(filter)/sizeof(filter[0]); ++i) {
     filter[i].can_id = 0x000 + i;
     filter[i].can_mask = CAN_SFF_MASK;
   }
@@ -95,6 +93,7 @@ ErrorCode SocketCanClientRaw::Start() {
     return ErrorCode::CAN_CLIENT_ERROR_BASE;
   }
 
+  struct ifreq ifr;
   std::string can_name("can" + std::to_string(port_));
   std::strncpy(ifr.ifr_name, can_name.c_str(), IFNAMSIZ);
   if (ioctl(dev_handler_, SIOCGIFINDEX, &ifr) < 0) {
@@ -103,12 +102,12 @@ ErrorCode SocketCanClientRaw::Start() {
   }
 
   // bind socket to network interface
-
+  struct sockaddr_can addr;
+  memset(&addr, 0, sizeof(addr));
   addr.can_family = AF_CAN;
   addr.can_ifindex = ifr.ifr_ifindex;
   ret = ::bind(dev_handler_, reinterpret_cast<struct sockaddr *>(&addr),
                sizeof(addr));
-
   if (ret < 0) {
     AERROR << "bind socket to network interface error code: " << ret;
     return ErrorCode::CAN_CLIENT_ERROR_BASE;
@@ -179,7 +178,6 @@ ErrorCode SocketCanClientRaw::Receive(std::vector<CanFrame> *const frames,
   }
 
   for (int32_t i = 0; i < *frame_num && i < MAX_CAN_RECV_FRAME_LEN; ++i) {
-    CanFrame cf;
     int ret = read(dev_handler_, &recv_frames_[i], sizeof(recv_frames_[i]));
 
     if (ret < 0) {
@@ -193,6 +191,8 @@ ErrorCode SocketCanClientRaw::Receive(std::vector<CanFrame> *const frames,
              << CANBUS_MESSAGE_LENGTH << ").";
       return ErrorCode::CAN_CLIENT_ERROR_RECV_FAILED;
     }
+
+    CanFrame cf;
     cf.id = recv_frames_[i].can_id;
     cf.len = recv_frames_[i].can_dlc;
     std::memcpy(cf.data, recv_frames_[i].data, recv_frames_[i].can_dlc);
