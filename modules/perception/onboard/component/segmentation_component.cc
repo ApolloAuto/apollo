@@ -31,6 +31,8 @@ uint32_t SegmentationComponent::s_seq_num_ = 0;
 std::mutex SegmentationComponent::s_mutex_;
 
 bool SegmentationComponent::Init() {
+  AINFO << "Loading gflag from file: " << ConfigFilePath();
+  google::SetCommandLineOption("flagfile", ConfigFilePath().c_str());
   if (InitAlgorithmPlugin() != true) {
     AERROR << "Failed to init segmentation component algorithm plugin.";
     return false;
@@ -115,7 +117,6 @@ bool SegmentationComponent::InternalProc(
   frame->cloud = base::PointFCloudPool::Instance().Get();
   frame->timestamp = timestamp;
 
-#ifdef PERCEPTION_LIDAR_USE_COMMON_MESSAGE
   lidar::LidarObstacleSegmentationOptions segment_opts;
   segment_opts.sensor_name = FLAGS_obs_lidar_onboard_sensor_name;
   lidar::LidarProcessResult ret =
@@ -127,7 +128,6 @@ bool SegmentationComponent::InternalProc(
   }
   PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(FLAGS_obs_lidar_onboard_sensor_name,
                                            "segmentation_2::segment_obstacle");
-#endif
 
   return true;
 }

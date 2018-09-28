@@ -13,30 +13,26 @@ cc_library(
     ],
     deps = [
         ":feature_generator",
+        ":disjoint_set",
+        ":util",
         "//framework:cybertron",
-        "//modules/common/util",        
+        "//modules/common/util:file_util",
+        "//modules/common/util:string_util",
         "//modules/perception/base",
         "//modules/perception/inference:inference_factory_lib",
         "//modules/perception/inference:inference_lib",
+        "//modules/perception/inference/utils:inference_util_lib",
+        "//modules/perception/inference/caffe:caffe_net_lib",
+        "//modules/perception/inference/tensorrt:rt_net",
         "//modules/perception/lib/config_manager",
-        "//modules/perception/lidar/common",
+        "//modules/perception/lib/singleton",
+        "//modules/perception/lib/io:file_util",
         "//modules/perception/lidar/lib/interface",
-        "//modules/perception/lidar/lib/segmentation/cnnseg/proto:cnnseg_config_proto",
-        "//modules/perception/lidar/lib/segmentation/cnnseg/proto:spp_engine_config_proto",
         "//modules/perception/lidar/lib/segmentation/cnnseg/spp_engine",
-        "//modules/perception/proto:perception_config_schema_proto",
-    ],
-)
-
-cc_test(
-    name = "cnn_segmentation_test",
-    srcs = [
-        "cnn_segmentation_test.cc",
-    ],
-    deps = [
-        ":cnn_segmentation",
-        "//modules/perception/common:perception_gflags",
-        "@gtest//:main",
+        "//modules/perception/lidar/lib/segmentation/cnnseg/proto:cnnseg_config_proto",
+        "//modules/perception/lidar/lib/segmentation/cnnseg/proto:cnnseg_param_proto",
+        "//modules/perception/lidar/lib/segmentation/cnnseg/proto:spp_engine_config_proto",
+        "//modules/perception/proto:perception_config_schema_proto"
     ],
 )
 
@@ -50,8 +46,8 @@ cc_library(
 cc_library(
     name = "feature_generator",
     srcs = [
-        "feature_generator.cc",
         ":feature_generator_cuda",
+        "feature_generator.cc",
     ],
     hdrs = [
         "feature_generator.h",
@@ -76,8 +72,27 @@ cuda_library(
         ":util",
         "//modules/perception/base",
         "//modules/perception/lidar/lib/segmentation/cnnseg/proto:cnnseg_param_proto",
-        "@cuda",
         "@eigen",
+        "@cuda",
+    ],
+)
+
+cc_library(
+    name = "util",
+    hdrs = [
+        "util.h",
+    ],
+)
+
+cc_test(
+    name = "cnn_segmentation_test",
+    srcs = [
+        "cnn_segmentation_test.cc",
+    ],
+    deps = [
+        ":cnn_segmentation",
+        "//modules/perception/common:perception_gflags",
+        "@gtest//:main",
     ],
 )
 
@@ -94,13 +109,6 @@ cc_test(
         "@gtest//:main",
         "@opencv2//:core",
         "@opencv2//:highgui",
-    ],
-)
-
-cc_library(
-    name = "util",
-    hdrs = [
-        "util.h",
     ],
 )
 

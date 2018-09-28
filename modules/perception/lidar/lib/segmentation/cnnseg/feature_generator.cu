@@ -97,7 +97,7 @@ __global__ void MapKernel(const int n, const base::PointF* pc,
     }
     Dtype pz = pc[i].z;
     Dtype pi = pc[i].intensity / 255.0;
-    atomicMax(max_height_data, pz);
+    atomicMax(&max_height_data[idx], pz);
     atomicAdd(&mean_height_data[idx], pz);
     if (mean_intensity_data != nullptr) {
       atomicAdd(&mean_intensity_data[idx], pi);

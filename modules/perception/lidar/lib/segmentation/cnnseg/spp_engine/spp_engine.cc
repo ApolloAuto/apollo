@@ -58,7 +58,7 @@ size_t SppEngine::ProcessConnectedComponentCluster(
   data_.instance_pt_blob->cpu_data();
   double sync_time1 = timer.toc(true);
   worker_.WakeUp();
-  // size_t num = detector_2d_cc_.Detect(&labels_2d_);
+  size_t num = detector_2d_cc_.Detect(&labels_2d_);
   double detect_time = timer.toc(true);
   worker_.Join();
   double sync_time2 = timer.toc(true);

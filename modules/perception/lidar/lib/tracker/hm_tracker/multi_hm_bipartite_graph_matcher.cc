@@ -21,8 +21,7 @@ namespace perception {
 namespace lidar {
 
 MultiHmBipartiteGraphMatcher::MultiHmBipartiteGraphMatcher() {
-  // cost_matrix_ = &optimizer_.global_costs();
-  *cost_matrix_ = optimizer_.global_costs();
+  cost_matrix_ = optimizer_.mutable_global_costs();
 }
 
 MultiHmBipartiteGraphMatcher::~MultiHmBipartiteGraphMatcher() {

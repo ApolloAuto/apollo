@@ -1,0 +1,33 @@
+module_config {
+  module_library : "/apollo/bazel-bin/modules/perception/onboard/component/libperception_component.so"
+  components {
+    class_name : "SegmentationComponent"
+    config {
+      name: "segmentation"
+      config_file_path: "/apollo/modules/perception/production/conf/perception/perception.flag"
+      readers {
+          channel: "/apollo/sensor/velodyne64/compensator/PointCloud2"
+        }
+    }
+  }
+
+  components {
+    class_name : "RecognitionComponent"
+    config {
+      name: "recognition"
+      readers {
+          channel: "/perception/inner/SegmentationObjects"
+        }
+    }
+  }
+
+  components {
+    class_name: "FusionComponent"
+    config {
+      name: "SensorFusion"
+      readers {
+          channel: "/perception/inner/PrefusedObjects"
+        }
+    }
+  }
+}

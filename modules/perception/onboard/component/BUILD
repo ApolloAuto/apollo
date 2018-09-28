@@ -2,88 +2,35 @@ load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
+cc_binary(
+    name = "libperception_component.so",
+    deps = [":perception_component_inner"],
+    linkopts = ["-shared"],
+    linkstatic = False,
+)
+
 cc_library(
-    name = "lidar_output_component",
+    name = "perception_component_inner",
     srcs = [
+        "fusion_component.cc",
         "lidar_output_component.cc",
-    ],
-    hdrs = [
-        "lidar_output_component.h",
-    ],
-    deps = [
-        "@eigen",
-        "//framework:cybertron",
-        "//modules/drivers/proto:sensor_proto",
-        "//modules/perception/proto:perception_proto",
-        "//modules/perception/base",
-        "//modules/perception/onboard/inner_component_messages",
-        "//modules/perception/onboard/msg_serializer",
-    ],
-)
-
-cc_library(
-    name = "lidar_common_flags",
-    srcs = [
         "lidar_common_flags.cc",
-    ],
-    hdrs = [
-        "lidar_common_flags.h",
-    ],
-    deps = [
-        "//external:gflags",
-    ],
-)
-
-cc_library(
-    name = "lidar_inner_component_messages",
-    hdrs = [
-        "lidar_inner_component_messages.h",
-    ],
-    deps = [
-    ],
-)
-
-cc_library(
-    name = "segmentation_component",
-    srcs = [
         "segmentation_component.cc",
-    ],
-    hdrs = [
-        "segmentation_component.h",
-    ],
-    deps = [
-        ":lidar_common_flags",
-        ":lidar_inner_component_messages",
-        "@eigen",
-        "//framework:cybertron",
-        "//modules/drivers/proto:sensor_proto",
-        "//modules/map/proto:map_proto",
-        "//modules/perception/base",
-        "//modules/perception/lib/utils",
-        "//modules/perception/lidar/app",
-        "//modules/perception/lidar/lib/interface",
-        "//modules/perception/lidar/lib/object_builder",
-        "//modules/perception/proto:perception_proto",
-        "//modules/perception/onboard/common_flags",
-        "//modules/perception/onboard/inner_component_messages",
-        "//modules/perception/onboard/transform_wrapper",
-        "//modules/transform:tf2_buffer_lib",
-    ],
-)
-
-cc_library(
-    name = "recognition_component",
-    srcs = [
         "recognition_component.cc",
     ],
     hdrs = [
+        "fusion_component.h",
+        "lidar_output_component.h",
+        "lidar_common_flags.h",
+        "segmentation_component.h",
         "recognition_component.h",
+        "lidar_inner_component_messages.h",
     ],
     deps = [
-        ":lidar_common_flags",
-        ":lidar_inner_component_messages",
         "@eigen",
         "//framework:cybertron",
+        "//modules/drivers/proto:sensor_proto",
+        "//modules/perception/proto:perception_proto",
         "//modules/common/proto:error_code_proto",
         "//modules/common/proto:geometry_proto",
         "//modules/common/proto:header_proto",
@@ -91,41 +38,34 @@ cc_library(
         "//modules/perception/base",
         "//modules/perception/common/sensor_manager",
         "//modules/perception/lib/utils",
+        "//modules/perception/lib/registerer",
+        "//modules/perception/map/hdmap:hdmap_input",
         "//modules/perception/lidar/app",
         "//modules/perception/lidar/common",
         "//modules/perception/lidar/lib/interface",
-        "//modules/perception/onboard/inner_component_messages",
-        "//modules/perception/proto:perception_proto",
-    ],
-)
-
-cc_library(
-    name = "fusion_component",
-    srcs = [
-        "fusion_component.cc",
-    ],
-    hdrs = [
-        "fusion_component.h",
-    ],
-    deps = [
-        "@eigen",
-        "//framework:cybertron",
-        "//modules/common/proto:error_code_proto",
-        "//modules/common/proto:geometry_proto",
-        "//modules/common/proto:header_proto",
-        "//modules/map/proto:map_proto",
-        "//modules/perception/base",
+        "//modules/perception/lidar/lib/object_builder",
+        "//modules/perception/lidar/lib/scene_manager/ground_service:ground_service",
+        "//modules/perception/lidar/lib/scene_manager/roi_service:roi_service",
+        "//modules/perception/lidar/lib/segmentation/cnnseg:cnn_segmentation",
+        "//modules/perception/lidar/lib/ground_detector/spatio_temporal_ground_detector",
+        "//modules/perception/lidar/lib/roi_filter/hdmap_roi_filter",
+        "//modules/perception/lidar/lib/object_filter_bank/roi_boundary_filter",
+        "//modules/perception/lidar/lib/tracker/hm_tracker:hm_multi_target_tracker",
+        "//modules/perception/lidar/lib/tracker/hm_tracker:kalman_filter",
+        "//modules/perception/lidar/lib/tracker/hm_tracker:multi_hm_bipartite_graph_matcher",
+        "//modules/perception/lidar/lib/classifier/fused_classifier",
+        "//modules/perception/lidar/lib/classifier/fused_classifier:ccrf_type_fusion",
         "//modules/perception/fusion/app:obstacle_multi_sensor_fusion",
         "//modules/perception/fusion/base",
         "//modules/perception/fusion/lib/interface",
-        "//modules/perception/lib/registerer",
-        "//modules/perception/lib/utils",
-        "//modules/perception/map/hdmap:hdmap_input",
+        "//modules/perception/fusion/lib/dummy:dummy_algorithms",
         "//modules/perception/onboard/common_flags",
-        "//modules/perception/onboard/inner_component_messages",
         "//modules/perception/onboard/msg_serializer",
-        "//modules/perception/proto:perception_proto",
+        "//modules/perception/onboard/transform_wrapper",
+        "//modules/perception/onboard/inner_component_messages",
+        "//modules/transform:tf2_buffer_lib",
     ],
+    copts = ['-DMODULE_NAME=\\"perception\\"']
 )
 
 cpplint()

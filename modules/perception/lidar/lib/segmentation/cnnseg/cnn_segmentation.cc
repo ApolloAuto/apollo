@@ -27,6 +27,7 @@
 #include "modules/perception/lidar/common/lidar_timer.h"
 #include "modules/perception/lidar/lib/segmentation/cnnseg/cnn_segmentation.h"
 #include "modules/perception/lidar/lib/segmentation/cnnseg/util.h"
+#include "modules/perception/inference/inference_factory.h"
 
 namespace apollo {
 namespace perception {
@@ -313,8 +314,8 @@ void CNNSegmentation::GetObjectsFromSppEngine(
     std::vector<std::shared_ptr<Object>>* objects) {
   Timer timer;
   spp_engine_.GetSppData().grid_indices = point2grid_.data();
-  // size_t num_foreground =
-  //     spp_engine_.ProcessForegroundSegmentation(original_cloud_);
+  size_t num_foreground =
+       spp_engine_.ProcessForegroundSegmentation(original_cloud_);
   fg_seg_time_ = timer.toc(true);
   // should sync with worker before do background segmentation
   worker_.Join();
@@ -338,9 +339,9 @@ void CNNSegmentation::GetObjectsFromSppEngine(
          &original_cloud_->points_height().at(0),
          sizeof(float) * original_cloud_->size());
   if (cnnseg_param_.remove_ground_points()) {
-    //  num_foreground = spp_engine_.RemoveGroundPointsInForegroundCluster(
-    //      original_cloud_, lidar_frame_ref_->roi_indices,
-    //      lidar_frame_ref_->non_ground_indices);
+    num_foreground = spp_engine_.RemoveGroundPointsInForegroundCluster(
+          original_cloud_, lidar_frame_ref_->roi_indices,
+          lidar_frame_ref_->non_ground_indices);
   }
 
   const auto& clusters = spp_engine_.clusters();
