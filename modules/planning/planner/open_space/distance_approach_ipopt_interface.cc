@@ -35,14 +35,19 @@ constexpr double dmin = 0.05;
 
 DistanceApproachIPOPTInterface::DistanceApproachIPOPTInterface(
     const int num_of_variables, const int num_of_constraints,
-    std::size_t horizon, float ts, Eigen::MatrixXd ego, Eigen::MatrixXd x0,
-    Eigen::MatrixXd xf, Eigen::MatrixXd XYbounds,
-    Eigen::MatrixXd obstacles_vertices_num, std::size_t obstacles_num)
+    std::size_t horizon, float ts, Eigen::MatrixXd ego,
+    const Eigen::MatrixXd& xWS, const Eigen::MatrixXd& uWS,
+    const Eigen::MatrixXd& timeWS, Eigen::MatrixXd x0, Eigen::MatrixXd xf,
+    Eigen::MatrixXd XYbounds, Eigen::MatrixXd obstacles_vertices_num,
+    std::size_t obstacles_num)
     : num_of_variables_(num_of_variables),
       num_of_constraints_(num_of_constraints),
       horizon_(horizon),
       ts_(ts),
       ego_(ego),
+      xWS_(xWS),
+      uWS_(uWS),
+      timeWS_(timeWS),
       x0_(x0),
       xf_(xf),
       XYbounds_(XYbounds),
@@ -83,7 +88,6 @@ bool DistanceApproachIPOPTInterface::get_nlp_info(int& n, int& m,
   n = num_of_variables_;
 
   // number of constraints
-
   m = num_of_constraints_;
 
   // number of nonzero hessian and lagrangian.
@@ -311,15 +315,15 @@ bool DistanceApproachIPOPTInterface::eval_g(int n, const double* x, bool new_x,
   for (std::size_t i = 0; i < horizon_; ++i) {
     // x1
     // TODO(QiL) : change to sin table
-    g[state_start_index + 4] = g[state_start_index] +
-                               g[time_start_index] * ts_ *
+    g[state_start_index + 4] =
+        g[state_start_index] + g[time_start_index] * ts_ *
                                    g[state_start_index + 3] *
                                    std::cos(g[state_start_index + 2]);
     // x2
-    g[state_start_index + 5] = g[state_start_index + 1] +
-                               g[time_start_index] * ts_ *
-                                   g[state_start_index + 3] *
-                                   std::sin(g[state_start_index + 2]);
+    g[state_start_index + 5] =
+        g[state_start_index + 1] + g[time_start_index] * ts_ *
+                                       g[state_start_index + 3] *
+                                       std::sin(g[state_start_index + 2]);
     // x3
     g[state_start_index + 6] =
         g[state_start_index + 2] +
@@ -461,7 +465,6 @@ bool DistanceApproachIPOPTInterface::eval_f(int n, const double* x, bool new_x,
   }
 
   // Add l , sum(obstacles_vertices_num) * (N+1)
-  // constexpr double reg = 1e-4;
   for (std::size_t i = 1; i < horizon_ + 1; ++i) {
     for (std::size_t j = 1; j <= obstacles_vertices_sum_; ++j) {
       obj_value += weight_reg_ *

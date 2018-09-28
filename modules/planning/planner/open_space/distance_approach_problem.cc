@@ -99,8 +99,8 @@ bool DistanceApproachProblem::Solve(Eigen::MatrixXd* state_result,
 
   // TODO(QiL) : evaluate whether need to new it everytime
   DistanceApproachIPOPTInterface* ptop = new DistanceApproachIPOPTInterface(
-      num_of_variables, num_of_constraints, horizon_, ts_, ego_, x0_, xF_,
-      XYbounds_, obstacles_vertices_num_, obstacles_num_);
+      num_of_variables, num_of_constraints, horizon_, ts_, ego_, xWS_, uWS_,
+      timeWS_, x0_, xF_, XYbounds_, obstacles_vertices_num_, obstacles_num_);
 
   Ipopt::SmartPtr<Ipopt::TNLP> problem = ptop;
 
