@@ -23,6 +23,8 @@
 namespace apollo {
 namespace planning {
 
+using apollo::common::time::Clock;
+
 HybridAStar::HybridAStar() {
   CHECK(common::util::GetProtoFromFile(FLAGS_planner_open_space_config_filename,
                                        &open_space_conf_))
@@ -219,14 +221,12 @@ bool HybridAStar::GetResult(std::shared_ptr<Node3d> final_node,
     std::reverse(x.begin(), x.end());
     std::reverse(y.begin(), y.end());
     std::reverse(phi.begin(), phi.end());
-    AINFO << "good at reverse";
     x.pop_back();
     y.pop_back();
     phi.pop_back();
     hybrid_a_x.insert(hybrid_a_x.end(), x.begin(), x.end());
     hybrid_a_y.insert(hybrid_a_y.end(), y.begin(), y.end());
     hybrid_a_phi.insert(hybrid_a_phi.end(), phi.begin(), phi.end());
-    AINFO << "good at insert";
     current_node = current_node->GetPreNode();
   }
   hybrid_a_x.push_back(current_node->GetX());
@@ -258,6 +258,10 @@ bool HybridAStar::Plan(double sx, double sy, double sphi, double ex, double ey,
       std::make_pair(start_node_->GetIndex(), start_node_->GetCost()));
   std::shared_ptr<Node3d> final_node;
   // Hybrid A* begins
+  std::size_t explored_node_num = 0;
+  double reeds_shepp_time = 0.0;
+  double start_timestamp = 0.0;
+  double end_timestamp = 0.0;
   while (!open_pq_.empty()) {
     // take out the lowest cost neighoring node
     std::size_t current_id = open_pq_.top().first;
@@ -266,12 +270,15 @@ bool HybridAStar::Plan(double sx, double sy, double sphi, double ex, double ey,
     // check if a analystic curve could be connected from current configuration
     // to the end configuration without collision. if so, search ends.
     ReedSheppPath reeds_shepp_to_end;
+    start_timestamp = Clock::NowInSeconds();
     if (AnalyticExpansion(current_node, &reeds_shepp_to_end)) {
       AINFO << "Reach the end configuration with Reed Sharp";
       // load the whole RSP as nodes and add to the close set
       final_node = LoadRSPinCS(&reeds_shepp_to_end, current_node);
       break;
     }
+    end_timestamp = Clock::NowInSeconds();
+    reeds_shepp_time += (end_timestamp - start_timestamp);
     for (std::size_t i = 0; i < next_node_num_; i++) {
       std::shared_ptr<Node3d> next_node = Next_node_generator(current_node, i);
       // boundary and validity check
@@ -284,9 +291,13 @@ bool HybridAStar::Plan(double sx, double sy, double sphi, double ex, double ey,
       }
 
       if (open_set_.find(next_node->GetIndex()) == open_set_.end()) {
+        explored_node_num++;
+        start_timestamp = Clock::NowInSeconds();
         ReedSheppPath reeds_shepp_heuristic;
         AnalyticExpansion(next_node, &reeds_shepp_heuristic);
         CalculateNodeCost(current_node, next_node, &reeds_shepp_heuristic);
+        end_timestamp = Clock::NowInSeconds();
+        reeds_shepp_time += (end_timestamp - start_timestamp);
         open_set_.insert(std::make_pair(next_node->GetIndex(), next_node));
         open_pq_.push(
             std::make_pair(next_node->GetIndex(), next_node->GetCost()));
@@ -299,6 +310,8 @@ bool HybridAStar::Plan(double sx, double sy, double sphi, double ex, double ey,
     AINFO << "GetResult failed";
     return false;
   }
+  AINFO << "explored node num is " << explored_node_num;
+  AINFO << "reeds_shepp_time is " << reeds_shepp_time;
   return true;
 }
 }  // namespace planning
