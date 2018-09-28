@@ -107,6 +107,17 @@ cc_test(
     ],
 )
 
+cc_test(
+    name = "sensor_object_test",
+    size = "small",
+    srcs = [
+        "sensor_object_test.cc",
+    ],
+    deps = [
+        ":sensor",
+        "@gtest//:main",
+    ],
+)
 
 cc_library(
     name = "sensor_data_manager",
