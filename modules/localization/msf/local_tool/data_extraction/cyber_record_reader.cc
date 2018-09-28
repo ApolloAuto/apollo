@@ -42,7 +42,7 @@ void CyberRecordReader::Subscribe(
 void CyberRecordReader::Read(const std::string &file_name) {
   RecordReader reader(file_name);
   cybertron::record::RecordMessage message;
-  while (!reader.ReadMessage(&message)) {
+  while (reader.ReadMessage(&message)) {
     auto itr = call_back_map_.find(message.channel_name);
     if (itr != call_back_map_.end()) {
       itr->second(message.content);

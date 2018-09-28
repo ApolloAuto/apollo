@@ -56,10 +56,6 @@ class MSFLocalizationComponent final
   bool InitIO();
 
  private:
-  //   std::shared_ptr<cybertron::Reader<drivers::gnss::Imu>>
-  //       imu_listener_ = nullptr;
-  //   std::string imu_topic_ = "";
-
   std::shared_ptr<cybertron::Reader<drivers::PointCloud>> lidar_listener_ =
       nullptr;
   std::string lidar_topic_ = "";

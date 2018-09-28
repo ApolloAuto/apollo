@@ -56,7 +56,6 @@ bool MSFLocalizationComponent::InitConfig() {
   }
   AINFO << "Msf localization config: " << msf_config.DebugString();
 
-  //   imu_topic_ = msf_config.imu_topic();
   lidar_topic_ = msf_config.lidar_topic();
   bestgnsspos_topic_ = msf_config.bestgnsspos_topic();
 
@@ -74,24 +73,15 @@ bool MSFLocalizationComponent::InitConfig() {
 }
 
 bool MSFLocalizationComponent::InitIO() {
-  // init reader
-  //   std::function<void(const std::shared_ptr <
-  //                      cybertron::Reader<drivers::gnss::Imu>&)>
-  //       imu_register_call = std::bind(&MSFLocalization::OnRawImu,
-  //       &localization_,
-  //                                     std::placeholders::_1);
-  //   imu_listener_ =
-  //       this->node_->CreateReader <
-  //       cybertron::Reader<drivers::gnss::Imu>(imu_topic_, imu_register_call);
+  cybertron::ReaderConfig reader_config;
+  reader_config.channel_name = lidar_topic_;
+  reader_config.pending_queue_size = 1;
 
-  RoleAttributes attr;
-  attr.set_channel_name(lidar_topic_);
-  attr.mutable_qos_profile()->set_depth(2);
   std::function<void(const std::shared_ptr<drivers::PointCloud>&)>
       lidar_register_call = std::bind(&MSFLocalization::OnPointCloud,
                                       &localization_, std::placeholders::_1);
   lidar_listener_ = this->node_->CreateReader<drivers::PointCloud>(
-      attr, lidar_register_call);
+      reader_config, lidar_register_call);
 
   std::function<void(const std::shared_ptr<drivers::gnss::GnssBestPose>&)>
       bestgnsspos_register_call =
