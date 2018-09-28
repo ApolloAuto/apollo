@@ -59,6 +59,10 @@ size_t SppEngine::ProcessConnectedComponentCluster(
   double sync_time1 = timer.toc(true);
   worker_.WakeUp();
   size_t num = detector_2d_cc_.Detect(&labels_2d_);
+  if (num == 0) {
+      ADEBUG << "No object detected";
+      // Later will decide if return this function here
+  }
   double detect_time = timer.toc(true);
   worker_.Join();
   double sync_time2 = timer.toc(true);
