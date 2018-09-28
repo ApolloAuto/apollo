@@ -177,8 +177,7 @@ inline int IAssignPointToVoxel(const T *data, T bound_x_min, T bound_x_max,
   return (i);
 }
 
-template <typename T>
-class Voxel {
+template <typename T> class Voxel {
  public:
   Voxel() {}
   ~Voxel() {}
