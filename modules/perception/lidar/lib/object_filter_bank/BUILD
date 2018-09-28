@@ -13,9 +13,9 @@ cc_library(
     deps = [
         "@eigen",
         "//framework:cybertron",
+        "//modules/common/util",        
         "//modules/perception/base",
         "//modules/perception/lib/config_manager",
-        "//modules/perception/lib/io:protobuf_util",
         "//modules/perception/lib/singleton",
         "//modules/perception/lidar/lib/interface",
         "//modules/perception/lidar/lib/object_filter_bank/proto:filter_bank_config_proto",

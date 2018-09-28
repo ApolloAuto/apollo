@@ -18,9 +18,9 @@
 
 #include <algorithm>
 
+#include "modules/common/util/file.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lib/io/file_util.h"
-#include "modules/perception/lib/io/protobuf_util.h"
 #include "modules/perception/lib/utils/string_util.h"
 #include "modules/perception/lidar/common/lidar_point_label.h"
 #include "modules/perception/lidar/lib/roi_filter/hdmap_roi_filter/polygon_mask.h"
@@ -53,7 +53,7 @@ bool HdmapROIFilter::Init(const ROIFilterInitOptions& options) {
   config_file =
       lib::FileUtil::GetAbsolutePath(config_file, "hdmap_roi_filter.conf");
   HDMapRoiFilterConfig config;
-  CHECK(lib::ParseProtobufFromFile(config_file, &config));
+  CHECK(apollo::common::util::GetProtoFromFile(config_file, &config));
   range_ = config.range();
   cell_size_ = config.cell_size();
   extend_dist_ = config.extend_dist();

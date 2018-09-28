@@ -17,12 +17,11 @@
 
 #include <memory>
 
-#include "modules/perception/lidar/lib/pointcloud_preprocessor/proto/pointcloud_preprocessor_config.pb.h"
-
+#include "modules/common/util/file.h"
 #include "modules/perception/base/object_pool_types.h"
+#include "modules/perception/lidar/lib/pointcloud_preprocessor/proto/pointcloud_preprocessor_config.pb.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lib/io/file_util.h"
-#include "modules/perception/lib/io/protobuf_util.h"
 #include "modules/perception/lidar/common/lidar_log.h"
 
 namespace apollo {
@@ -46,7 +45,7 @@ bool PointCloudPreprocessor::Init(
   config_file = lib::FileUtil::GetAbsolutePath(config_file,
                                                "pointcloud_preprocessor.conf");
   PointCloudPreprocessorConfig config;
-  CHECK(lib::ParseProtobufFromFile(config_file, &config));
+  CHECK(apollo::common::util::GetProtoFromFile(config_file, &config));
   filter_naninf_points_ = config.filter_naninf_points();
   filter_nearby_box_points_ = config.filter_nearby_box_points();
   box_forward_x_ = config.box_forward_x();

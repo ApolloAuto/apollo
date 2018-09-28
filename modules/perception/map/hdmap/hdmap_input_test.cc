@@ -53,8 +53,8 @@ class HDMapInputTest : public testing::Test {
 // // data reference to
 // hdmap-library/src/test/get_forward_nearest_signals_on_lane_test.cpp in master
 // // NOLINT
-// std::string test_file_name =
-//   "modules/perception/testdata/map/hdmap/data/adu_common_ShaHeDaXueCheng-test01_1_5_0_15.bin";
+// std::string test_file_name = "/apollo/modules/perception/testdata/"
+//     "map/hdmap/data/adu_common_ShaHeDaXueCheng-test01_1_5_0_15.bin";
 // if (hdmap_input_.hdmap_->load_map_from_file(test_file_name) != 0) {
 //   AERROR << "Failed to load get_nearest_lane_test hadmap file: "
 //             << test_file_name;
@@ -88,8 +88,8 @@ class HDMapInputTest : public testing::Test {
 //}
 // TEST_F(HDMapInputTest, test_GetNearestLaneDirection) {
 // EXPECT_TRUE(hdmap_input_.Init());
-// std::string test_file_name =
-//     "modules/perception/testdata/map/hdmap/data/sunnyvale_map.bin";
+// std::string test_file_name = "/apollo/modules/perception/testdata/"
+//     "map/hdmap/data/sunnyvale_map.bin";
 // if (hdmap_input_.hdmap_->load_map_from_file(test_file_name) != 0) {
 //   AERROR << "Failed to load get_nearest_lane_test hadmap file:"
 //             << test_file_name;

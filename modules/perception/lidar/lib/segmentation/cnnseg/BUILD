@@ -14,11 +14,11 @@ cc_library(
     deps = [
         ":feature_generator",
         "//framework:cybertron",
+        "//modules/common/util",        
         "//modules/perception/base",
         "//modules/perception/inference:inference_factory_lib",
         "//modules/perception/inference:inference_lib",
         "//modules/perception/lib/config_manager",
-        "//modules/perception/lib/io:protobuf_util",
         "//modules/perception/lidar/common",
         "//modules/perception/lidar/lib/interface",
         "//modules/perception/lidar/lib/segmentation/cnnseg/proto:cnnseg_config_proto",

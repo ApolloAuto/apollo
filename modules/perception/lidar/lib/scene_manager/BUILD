@@ -12,8 +12,8 @@ cc_library(
     ],
     deps = [
         ":scene_service",
+        "//modules/common/util",        
         "//modules/perception/lib/config_manager",
-        "//modules/perception/lib/io:protobuf_util",
         "//modules/perception/lib/singleton",
         "//modules/perception/lib/thread",
         "//modules/perception/lidar/lib/scene_manager/proto:scene_manager_config_proto",

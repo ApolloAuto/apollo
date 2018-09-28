@@ -15,11 +15,10 @@
  *****************************************************************************/
 #include "modules/perception/lidar/lib/scene_manager/roi_service/roi_service.h"
 
+#include "modules/common/util/file.h"
 #include "modules/perception/lidar/lib/scene_manager/roi_service/proto/roi_service.pb.h"
-
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lib/io/file_util.h"
-#include "modules/perception/lib/io/protobuf_util.h"
 #include "modules/perception/lib/utils/string_util.h"
 
 namespace apollo {
@@ -97,7 +96,7 @@ bool ROIService::Init(const SceneServiceInitOptions& options) {
   config_file = lib::FileUtil::GetAbsolutePath(work_root, root_path);
   config_file = lib::FileUtil::GetAbsolutePath(config_file, "roi_service.conf");
   ROIServiceConfig config;
-  CHECK(lib::ParseProtobufFromFile(config_file, &config));
+  CHECK(apollo::common::util::GetProtoFromFile(config_file, &config));
   roi_content_ref_->cell_size_ = config.cell_size();
   roi_content_ref_->range_ = config.range();
   return true;

@@ -18,11 +18,11 @@
 #include <algorithm>
 #include <limits>
 
+#include "modules/common/util/file.h"
 #include "modules/perception/fusion/base/base_init_options.h"
 #include "modules/perception/fusion/lib/gatekeeper/pbf_gatekeeper/proto/pbf_gatekeeper_config.pb.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lib/io/file_util.h"
-#include "modules/perception/lib/io/protobuf_util.h"
 
 namespace apollo {
 namespace perception {
@@ -48,7 +48,8 @@ bool PbfGatekeeper::Init() {
       lib::FileUtil::GetAbsolutePath(woork_root_config, options.conf_file);
   PbfGatekeeperConfig params;
 
-  if (!lib::ParseProtobufFromFile<PbfGatekeeperConfig>(config, &params)) {
+  if (!apollo::common::util::GetProtoFromFile<PbfGatekeeperConfig>(
+      config, &params)) {
     AERROR << "Read config failed: " << config;
     return false;
   }

@@ -15,6 +15,8 @@
  *****************************************************************************/
 #ifndef MODULES_PERCEPTION_FUSION_LIB_FUSION_SYSTEM_PROBABILISTIC_FUSION_H_
 #define MODULES_PERCEPTION_FUSION_LIB_FUSION_SYSTEM_PROBABILISTIC_FUSION_H_
+
+#include <memory>
 #include <mutex>
 #include <string>
 #include <vector>

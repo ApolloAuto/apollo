@@ -25,7 +25,7 @@ namespace common {
 
 TEST(CommonIoTest, read_pose_file) {
   const std::string testdata_folder =
-      "modules/perception/testdata/common/io/params/";
+      "/apollo/modules/perception/testdata/common/io/params/";
   std::string filename;
   Eigen::Affine3d pose;
   int frame_id = 0;
@@ -40,7 +40,7 @@ TEST(CommonIoTest, read_pose_file) {
 
 TEST(CommonIoTest, load_camera_intrinsic) {
   const std::string testdata_folder =
-      "modules/perception/testdata/common/io/params/";
+      "/apollo/modules/perception/testdata/common/io/params/";
   std::string yaml_file;
   base::BrownCameraDistortionModel model;
 
@@ -58,7 +58,7 @@ TEST(CommonIoTest, load_camera_intrinsic) {
 
 TEST(CommonIoTest, load_ocamera_intrinsic) {
   const std::string testdata_folder =
-      "modules/perception/testdata/common/io/params/";
+      "/apollo/modules/perception/testdata/common/io/params/";
   std::string yaml_file;
   base::OmnidirectionalCameraDistortionModel model;
 

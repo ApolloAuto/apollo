@@ -18,10 +18,10 @@
 #include <limits>
 
 #include "boost/format.hpp"
+
+#include "modules/common/util/file.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lib/io/file_util.h"
-#include "modules/perception/lib/io/protobuf_util.h"
-
 #include "modules/perception/fusion/base/base_init_options.h"
 #include "modules/perception/fusion/base/sensor_data_manager.h"
 #include "modules/perception/fusion/common/camera_util.h"
@@ -59,7 +59,8 @@ bool DstExistanceFusion::Init() {
       lib::FileUtil::GetAbsolutePath(woork_root_config, options.conf_file);
   DstExistanceFusionConfig params;
 
-  if (!lib::ParseProtobufFromFile<DstExistanceFusionConfig>(config, &params)) {
+  if (!apollo::common::util::GetProtoFromFile<DstExistanceFusionConfig>(
+      config, &params)) {
     AERROR << "Read config failed: " << config;
     return false;
   }

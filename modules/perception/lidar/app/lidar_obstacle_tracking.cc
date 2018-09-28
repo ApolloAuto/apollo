@@ -14,9 +14,10 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/perception/lidar/app/lidar_obstacle_tracking.h"
+
+#include "modules/common/util/file.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lib/io/file_util.h"
-#include "modules/perception/lib/io/protobuf_util.h"
 #include "modules/perception/lib/utils/perf.h"
 #include "modules/perception/lidar/app/proto/lidar_obstacle_tracking_config.pb.h"
 #include "modules/perception/lidar/common/lidar_log.h"
@@ -42,7 +43,7 @@ bool LidarObstacleTracking::Init(
                                                "lidar_obstacle_tracking.conf");
 
   LidarObstacleTrackingConfig config;
-  CHECK(lib::ParseProtobufFromFile(config_file, &config));
+  CHECK(apollo::common::util::GetProtoFromFile(config_file, &config));
   multi_target_tracker_name_ = config.multi_target_tracker();
   fusion_classifier_name_ = config.fusion_classifier();
 

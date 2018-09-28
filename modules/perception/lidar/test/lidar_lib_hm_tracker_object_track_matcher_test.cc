@@ -60,7 +60,7 @@ class ObjectTrackMatcherTest : public testing::Test {
 
 bool ConstructPointCloud(std::vector<base::ObjectPtr>* objects) {
   std::string pcd_data(
-      "modules/perception/testdata/lidar/lib/tracker/hm_tracker/data/objects.pcd");
+      "/apollo/modules/perception/testdata/lidar/lib/tracker/hm_tracker/data/objects.pcd");
   std::ifstream cluster_ifs(pcd_data.c_str(), std::ifstream::in);
   std::string point_buf;
   while (cluster_ifs.good()) {

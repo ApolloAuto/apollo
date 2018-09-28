@@ -162,11 +162,11 @@ TEST_F(LidarLibSceneManagerTest, lidar_lib_scene_manager_ground_service_test) {
   ground_service_cast->ground_content_ref_->grid_center_ << 461957.33791688998,
       4404672.5859791003, 19.143968966679999;
   LoadPlanes(
-      "modules/perception/testdata/lidar/lib/"
+      "/apollo/modules/perception/testdata/lidar/lib/"
       "scene_manager/resources/planes.txt",
       node_ptr);
   LoadPoints(
-      "modules/perception/testdata/lidar/lib/"
+      "/apollo/modules/perception/testdata/lidar/lib/"
       "scene_manager/resources/points.txt",
       &world_pts, &height_gts);
   Eigen::Vector3d world_point(0.0, 0.0, 0.0);
@@ -191,10 +191,10 @@ TEST_F(LidarLibSceneManagerTest, lidar_lib_scene_manager_ground_service_test) {
 
 void MockData(LidarFrame* frame) {
   std::string pcd =
-      "modules/perception/testdata/lidar/lib/scene_manager/data/"
+      "/apollo/modules/perception/testdata/lidar/lib/scene_manager/data/"
       "pcd/1532063882.176900.pcd";
   std::string pose =
-      "modules/perception/testdata/lidar/lib/scene_manager/data/"
+      "/apollo/modules/perception/testdata/lidar/lib/scene_manager/data/"
       "pose/1532063882.176900.pose";
   // a. load pcd
   frame->cloud = base::PointFCloudPool::Instance().Get();
