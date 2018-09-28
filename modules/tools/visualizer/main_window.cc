@@ -35,8 +35,8 @@
 #include "modules/tools/visualizer/main_window.h"
 #include "modules/tools/visualizer/pointcloud.h"
 #include "modules/tools/visualizer/texture.h"
-#include "modules/tools/visualizer/video_images_dialog.h"
 #include "modules/tools/visualizer/ui_main_window.h"
+#include "modules/tools/visualizer/video_images_dialog.h"
 
 namespace {
 const char* globalTreeItemStyle = "margin-right:10px";
@@ -71,11 +71,15 @@ const char* pcVertexPath = ":/shaders/pointcloud.vert";
 const char* pcFragPath = ":/shaders/grid_pointcloud.frag";
 const char* gridVertexPath = ":/shaders/grid.vert";
 const char* gridFragPath = ":/shaders/grid_pointcloud.frag";
-}
+}  // namespace
 
-#define MEMBER_OFFSET(StructType, Member) (size_t)((char*)(& (((StructType*)1)->Member) - 1))
-#define StructPtrByMemberPtr(MemberPtr, StructType, Member) \
-  (StructType*)((char*)MemberPtr - MEMBER_OFFSET(StructType, Member))
+#define MEMBER_OFFSET(StructType, Member)                                    \
+  (size_t)(                                                                  \
+      reinterpret_cast<char*>(&(reinterpret_cast<StructType*>(1)->Member)) - \
+      1)
+#define StructPtrByMemberPtr(MemberPtr, StructType, Member)          \
+  reinterpret_cast<StructType*>(reinterpret_cast<char*>(MemberPtr) - \
+                                MEMBER_OFFSET(StructType, Member))
 
 struct MainWindow::VideoImgProxy {
   FixedAspectRatioWidget video_image_viewer_;
@@ -88,8 +92,7 @@ struct MainWindow::VideoImgProxy {
 
   QMutex reader_mutex_;
   std::shared_ptr<Texture> dynamic_texture_;
-  CyberChannReader<apollo::drivers::CompressedImage>*
-      channel_reader_;
+  CyberChannReader<apollo::drivers::CompressedImage>* channel_reader_;
 };
 
 MainWindow::MainWindow(QWidget* parent)
@@ -136,7 +139,8 @@ MainWindow::MainWindow(QWidget* parent)
   }
 
   connect(ui_->actionAbout, SIGNAL(triggered(bool)), this, SLOT(showMessage()));
-  connect(ui_->actionLicense, SIGNAL(triggered(bool)), this, SLOT(showMessage()));
+  connect(ui_->actionLicense, SIGNAL(triggered(bool)), this,
+          SLOT(showMessage()));
 
   pointcloud_button_->setCheckable(true);
   pointcloud_button_->setStyleSheet(globalTreeItemStyle);
@@ -147,8 +151,10 @@ MainWindow::MainWindow(QWidget* parent)
   connect(pointcloud_comboBox_, SIGNAL(currentIndexChanged(int)), this,
           SLOT(ChangePointCloudChannel()));
 
-  connect(ui_->treeWidget, SIGNAL(itemSelectionChanged()), this, SLOT(UpdateActions()));
-  connect(ui_->treeWidget, SIGNAL(visibilityChanged(bool)), ui_->actionGlobal, SLOT(setChecked(bool)));
+  connect(ui_->treeWidget, SIGNAL(itemSelectionChanged()), this,
+          SLOT(UpdateActions()));
+  connect(ui_->treeWidget, SIGNAL(visibilityChanged(bool)), ui_->actionGlobal,
+          SLOT(setChecked(bool)));
   connect(ui_->actionPlay, SIGNAL(triggered(bool)), this, SLOT(PlayPause()));
   connect(ui_->actionPause, SIGNAL(triggered(bool)), this, SLOT(PlayPause()));
 }
@@ -157,8 +163,8 @@ MainWindow::~MainWindow() {
   for (VideoImgProxy* item : video_image_viewer_list_) {
     item->reader_mutex_.unlock();
   }
-  for(VideoImgProxy* item : closed_video_image_viewer_list_){
-      item->reader_mutex_.unlock();
+  for (VideoImgProxy* item : closed_video_image_viewer_list_) {
+    item->reader_mutex_.unlock();
   }
 
   pointcloud_reader_mutex_.unlock();
@@ -178,14 +184,13 @@ MainWindow::~MainWindow() {
     pointcloud_channel_Reader_ = nullptr;
   }
 
-  foreach (VideoImgProxy* item, video_image_viewer_list_) {
-    if (item->channel_reader_ &&
-        item->channel_reader_->isRunning()) {
+  for (VideoImgProxy* item : video_image_viewer_list_) {
+    if (item->channel_reader_ && item->channel_reader_->isRunning()) {
       item->channel_reader_->quit();
 
       if (!item->channel_reader_->isFinished()) {
         item->channel_reader_->wait();
-	  }
+      }
       delete item->channel_reader_;
     }
 
@@ -193,9 +198,8 @@ MainWindow::~MainWindow() {
     delete item;
   }
 
-  foreach (VideoImgProxy* item, closed_video_image_viewer_list_) {
-    if (item->channel_reader_ &&
-        item->channel_reader_->isRunning()) {
+  for (VideoImgProxy* item : closed_video_image_viewer_list_) {
+    if (item->channel_reader_ && item->channel_reader_->isRunning()) {
       item->channel_reader_->quit();
 
       if (!item->channel_reader_->isFinished()) {
@@ -222,7 +226,7 @@ void MainWindow::calculateWH(void) {
     wh.setWidth(wh.width() / count);
     int index = 0;
 
-    foreach (VideoImgProxy* p, video_image_viewer_list_) {
+    for (VideoImgProxy* p : video_image_viewer_list_) {
       p->video_image_viewer_.setMinimumSize(wh);
       ui_->videoImageGridLayout->removeWidget(&p->video_image_viewer_);
       ui_->videoImageGridLayout->addWidget(&p->video_image_viewer_, index / 3,
@@ -407,20 +411,16 @@ void MainWindow::EditGridColor(QTreeWidgetItem* item, int column) {
   }
 }
 
-void MainWindow::EnableRadarPoints(bool b){
-}
+void MainWindow::EnableRadarPoints(bool b) {}
 
-void MainWindow::ActionOpenRadarChannel(void){
+void MainWindow::ActionOpenRadarChannel(void) {}
 
-}
-
-void MainWindow::openRadarChannel(bool b){
-}
+void MainWindow::openRadarChannel(bool b) {}
 
 void MainWindow::ActionOpenPointCloud(void) {
   if (pointcloud_shader_ == nullptr) {
-    pointcloud_shader_ = RenderableObject::CreateShaderProgram(
-        tr(pcVertexPath), tr(pcFragPath));
+    pointcloud_shader_ =
+        RenderableObject::CreateShaderProgram(tr(pcVertexPath), tr(pcFragPath));
     if (pointcloud_shader_ != nullptr) {
       ui_->sceneWidget->AddNewShaderProg("pointcloud", pointcloud_shader_);
     } else {
@@ -534,8 +534,9 @@ void MainWindow::ActionOpenImage(void) {
   connect(&videoImgProxy->channel_name_combobox_,
           SIGNAL(currentIndexChanged(int)), this,
           SLOT(ChangeVideoImgChannel()));
-  connect(&videoImgProxy->video_image_viewer_, SIGNAL(focusOnThis(FixedAspectRatioWidget*)),
-          this, SLOT(SelectCurrentTreeItem(FixedAspectRatioWidget*)));
+  connect(&videoImgProxy->video_image_viewer_,
+          SIGNAL(focusOnThis(FixedAspectRatioWidget*)), this,
+          SLOT(SelectCurrentTreeItem(FixedAspectRatioWidget*)));
 
   video_image_viewer_list_.append(videoImgProxy);
   videoImgProxy->video_image_viewer_.setVisible(true);
@@ -575,8 +576,9 @@ void MainWindow::DoDeleteVideoImg(VideoImgProxy* proxy) {
              SLOT(PlayVideoImage(bool)));
   disconnect(&proxy->channel_name_combobox_, SIGNAL(currentIndexChanged(int)),
              this, SLOT(ChangeVideoImgChannel()));
-  disconnect(&proxy->video_image_viewer_, SIGNAL(focusOnThis(FixedAspectRatioWidget*)),
-             this, SLOT(SelectCurrentTreeItem(FixedAspectRatioWidget*)));
+  disconnect(&proxy->video_image_viewer_,
+             SIGNAL(focusOnThis(FixedAspectRatioWidget*)), this,
+             SLOT(SelectCurrentTreeItem(FixedAspectRatioWidget*)));
 
   if (proxy->action_item_button_.isChecked()) {
     proxy->reader_mutex_.lock();
@@ -590,9 +592,9 @@ void MainWindow::DoDeleteVideoImg(VideoImgProxy* proxy) {
   video_image_viewer_list_.removeOne(proxy);
   closed_video_image_viewer_list_.append(proxy);
 
-  if (video_image_viewer_list_.count())
+  if (video_image_viewer_list_.count()) {
     calculateWH();
-  else {
+  } else {
     ui_->videoImageWidget->setVisible(false);
   }
 }
@@ -614,7 +616,8 @@ void MainWindow::PointCloudReaderCallback(
   pointcloud_reader_mutex_.unlock();
   PointCloud* pc = new PointCloud(pdata->point_size(), 4, pointcloud_shader_);
   if (pc) {
-    if (!pc->FillData(pdata) || !ui_->sceneWidget->AddTempRenderableObj(pcTempObjGroupName, pc)) {
+    if (!pc->FillData(pdata) ||
+        !ui_->sceneWidget->AddTempRenderableObj(pcTempObjGroupName, pc)) {
       delete pc;
     }
   } else {
@@ -646,10 +649,10 @@ void MainWindow::PlayRenderableObject(bool b) {
         return;
       }
 
-      auto pointCallback = [this](
-          const std::shared_ptr<apollo::drivers::PointCloud>& pdata) {
-        this->PointCloudReaderCallback(pdata);
-      };
+      auto pointCallback =
+          [this](const std::shared_ptr<apollo::drivers::PointCloud>& pdata) {
+            this->PointCloudReaderCallback(pdata);
+          };
 
       if (!pointcloud_channel_Reader_->InstallCallbackAndOpen(
               pointCallback,
@@ -693,20 +696,21 @@ void MainWindow::ImageReaderCallback(
     VideoImgProxy* theVideoImgProxy) {
   theVideoImgProxy->reader_mutex_.lock();
   if (theVideoImgProxy->dynamic_texture_ != nullptr && imgData != nullptr) {
-      QImage img;
-      if (img.loadFromData((const unsigned char*)(imgData->data().c_str()),
-                           imgData->ByteSize())) {
-        if (theVideoImgProxy->dynamic_texture_->UpdateData(img)) {
-          theVideoImgProxy->video_image_viewer_.SetupDynamicTexture(
-              theVideoImgProxy->dynamic_texture_);
-        } else {
-          std::cerr << "--------Cannot update dynamic Texture Data--------"
-                    << std::endl;
-        }
+    QImage img;
+    if (img.loadFromData((const unsigned char*)(imgData->data().c_str()),
+                         imgData->ByteSize())) {
+      if (theVideoImgProxy->dynamic_texture_->UpdateData(img)) {
+        theVideoImgProxy->video_image_viewer_.SetupDynamicTexture(
+            theVideoImgProxy->dynamic_texture_);
       } else {
-        std::cerr << "-----------Cannot load compressed image from data with QImage"
+        std::cerr << "--------Cannot update dynamic Texture Data--------"
                   << std::endl;
       }
+    } else {
+      std::cerr
+          << "-----------Cannot load compressed image from data with QImage"
+          << std::endl;
+    }
   }
   theVideoImgProxy->reader_mutex_.unlock();
 }
@@ -761,8 +765,10 @@ void MainWindow::DoPlayVideoImage(bool b, VideoImgProxy* theVideoImg) {
       }
     }
 
-    theVideoImg->root_item_.setToolTip(0, theVideoImg->channel_name_combobox_.currentText());
-    theVideoImg->video_image_viewer_.setToolTip(theVideoImg->channel_name_combobox_.currentText());
+    theVideoImg->root_item_.setToolTip(
+        0, theVideoImg->channel_name_combobox_.currentText());
+    theVideoImg->video_image_viewer_.setToolTip(
+        theVideoImg->channel_name_combobox_.currentText());
 
     theVideoImg->action_item_button_.setText("Stop");
     theVideoImg->channel_name_combobox_.setEnabled(false);
@@ -797,24 +803,22 @@ void MainWindow::ChangeVideoImgChannel() {
 
   if (theVideoImg->channel_reader_ != nullptr) {
     theVideoImg->channel_reader_->CloseChannel();
-    theVideoImg->channel_reader_->OpenChannel(
-        obj->currentText().toStdString());
+    theVideoImg->channel_reader_->OpenChannel(obj->currentText().toStdString());
   }
 }
 
-void MainWindow::SelectCurrentTreeItem(FixedAspectRatioWidget * dock) {
-    if(dock) {
-        VideoImgProxy* theVideoImg =
-            StructPtrByMemberPtr(dock, VideoImgProxy, video_image_viewer_);
-        theVideoImg->root_item_.setExpanded(true);
-        if(ui_->treeWidget->currentItem() == &theVideoImg->root_item_)
-        {
-            ui_->actionDelImage->setEnabled(true);
-        } else {
-            ui_->treeWidget->setCurrentItem(&theVideoImg->root_item_);
-        }
-        ui_->treeWidget->setFocus();
+void MainWindow::SelectCurrentTreeItem(FixedAspectRatioWidget* dock) {
+  if (dock) {
+    VideoImgProxy* theVideoImg =
+        StructPtrByMemberPtr(dock, VideoImgProxy, video_image_viewer_);
+    theVideoImg->root_item_.setExpanded(true);
+    if (ui_->treeWidget->currentItem() == &theVideoImg->root_item_) {
+      ui_->actionDelImage->setEnabled(true);
+    } else {
+      ui_->treeWidget->setCurrentItem(&theVideoImg->root_item_);
     }
+    ui_->treeWidget->setFocus();
+  }
 }
 
 void MainWindow::TopologyChanged(
@@ -853,11 +857,11 @@ void MainWindow::TopologyChanged(
     ui_->treeWidget->setRootIsDecorated(true);
 
     if (str.contains("camera", Qt::CaseInsensitive)) {
-      foreach (VideoImgProxy* item, video_image_viewer_list_) {
+      for (VideoImgProxy* item : video_image_viewer_list_) {
         item->channel_name_combobox_.addItem(str);
       }
 
-      foreach (VideoImgProxy* item, closed_video_image_viewer_list_) {
+      for (VideoImgProxy* item : closed_video_image_viewer_list_) {
         item->channel_name_combobox_.addItem(str);
       }
     }
@@ -869,20 +873,18 @@ void MainWindow::TopologyChanged(
 }
 
 void MainWindow::PlayPause(void) {
+  QObject* obj = QObject::sender();
+  bool b = true;
+  if (obj == ui_->actionPause) b = false;
 
-    QObject* obj = QObject::sender();
-    bool b = true;
-    if(obj == ui_->actionPause)
-        b = false;
-
-    if(pointcloud_top_item_) {
-        pointcloud_button_->setChecked(b);
-        PlayRenderableObject(b);
-    }
-    foreach(VideoImgProxy* p, video_image_viewer_list_) {
-        p->action_item_button_.setChecked(b);
-        DoPlayVideoImage(b, p);
-    }
+  if (pointcloud_top_item_) {
+    pointcloud_button_->setChecked(b);
+    PlayRenderableObject(b);
+  }
+  for (VideoImgProxy* p : video_image_viewer_list_) {
+    p->action_item_button_.setChecked(b);
+    DoPlayVideoImage(b, p);
+  }
 }
 
 void MainWindow::resizeEvent(QResizeEvent* event) {

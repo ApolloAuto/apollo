@@ -39,7 +39,7 @@ std::shared_ptr<QOpenGLShaderProgram> RenderableObject::CreateShaderProgram(
 
 RenderableObject::RenderableObject(
     int vertexCount, int vertexElementCount,
-    std::shared_ptr<QOpenGLShaderProgram>& shaderProgram)
+    const std::shared_ptr<QOpenGLShaderProgram>& shaderProgram)
     : QOpenGLFunctions(),
       is_init_(false),
       is_renderable_(true),

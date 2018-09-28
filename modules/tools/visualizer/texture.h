@@ -17,17 +17,17 @@
 #ifndef MODULES_TOOLS_VISUALIZER_TEXTURE_H_
 #define MODULES_TOOLS_VISUALIZER_TEXTURE_H_
 
-#include "modules/drivers/proto/sensor_image.pb.h"
 #include <QImage>
 #include <QOpenGLBuffer>
 #include <memory>
+#include "modules/drivers/proto/sensor_image.pb.h"
 
 class Texture {
  public:
   Texture(void);
   ~Texture() {
     if (data_) {
-      delete [] data_;
+      delete[] data_;
       data_ = nullptr;
     }
   }

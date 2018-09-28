@@ -17,8 +17,8 @@
 #ifndef MODULES_TOOLS_VISUALIZER_GRID_H_
 #define MODULES_TOOLS_VISUALIZER_GRID_H_
 
-#include "modules/tools/visualizer/renderable_object.h"
 #include <QColor>
+#include "modules/tools/visualizer/renderable_object.h"
 
 class Grid : public RenderableObject {
  public:

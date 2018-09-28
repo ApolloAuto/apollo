@@ -17,17 +17,17 @@
 #ifndef MODULES_TOOLS_VISUALIZER_MAINWINDOW_H_
 #define MODULES_TOOLS_VISUALIZER_MAINWINDOW_H_
 
-#include "modules/tools/visualizer/channel_reader.h"
-#include "modules/tools/visualizer/msg_dialog.h"
-#include "modules/drivers/proto/sensor_image.pb.h"
-#include "modules/drivers/proto/pointcloud.pb.h"
-#include "modules/drivers/proto/radar.pb.h"
-
 #include <QMainWindow>
 #include <QMenu>
 #include <QMutex>
 #include <QPixmap>
 #include <memory>
+
+#include "modules/drivers/proto/pointcloud.pb.h"
+#include "modules/drivers/proto/radar.pb.h"
+#include "modules/drivers/proto/sensor_image.pb.h"
+#include "modules/tools/visualizer/channel_reader.h"
+#include "modules/tools/visualizer/msg_dialog.h"
 
 class FixedAspectRatioWidget;
 class Texture;
@@ -46,6 +46,7 @@ class MainWindow;
 
 class MainWindow : public QMainWindow {
   Q_OBJECT
+
  public:
   explicit MainWindow(QWidget* parent = nullptr);
   ~MainWindow();
@@ -95,8 +96,7 @@ class MainWindow : public QMainWindow {
   void PointCloudReaderCallback(
       const std::shared_ptr<const apollo::drivers::PointCloud>& pdata);
   void ImageReaderCallback(
-      const std::shared_ptr<const apollo::drivers::CompressedImage>&
-          imgData,
+      const std::shared_ptr<const apollo::drivers::CompressedImage>& imgData,
       VideoImgProxy* proxy);
 
   void InsertAllChannelNames(void);

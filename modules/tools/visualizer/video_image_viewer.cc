@@ -15,13 +15,12 @@
  *****************************************************************************/
 
 #include "modules/tools/visualizer/video_image_viewer.h"
-#include "modules/tools/visualizer/video_image_viewer.h"
-#include "modules/tools/visualizer/texture.h"
 #include <QContextMenuEvent>
 #include <QMenu>
 #include <QMouseEvent>
 #include <QTimer>
 #include <iostream>
+#include "modules/tools/visualizer/texture.h"
 
 VideoImgViewer::VideoImgViewer(QWidget* parent)
     : QOpenGLWidget(parent),
@@ -69,7 +68,8 @@ void VideoImgViewer::initializeGL() {
   }
 
   video_image_shader_prog_ = RenderableObject::CreateShaderProgram(
-      tr(":/shaders/video_image_plane.vert"), tr(":/shaders/video_image_plane.frag"));
+      tr(":/shaders/video_image_plane.vert"),
+      tr(":/shaders/video_image_plane.frag"));
   if (video_image_shader_prog_ == nullptr) {
     return;
   }

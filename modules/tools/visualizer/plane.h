@@ -17,9 +17,9 @@
 #ifndef MODULES_TOOLS_VISUALIZER_PLANE_H_
 #define MODULES_TOOLS_VISUALIZER_PLANE_H_
 
+#include <memory>
 #include "modules/tools/visualizer/renderable_object.h"
 #include "modules/tools/visualizer/texture.h"
-#include <memory>
 
 class Plane : public RenderableObject {
   /*
@@ -34,23 +34,23 @@ class Plane : public RenderableObject {
  public:
   static std::shared_ptr<Texture> NullTextureObj;
 
-  explicit Plane(std::shared_ptr<Texture>& t = NullTextureObj);
+  explicit Plane(const std::shared_ptr<Texture>& t = NullTextureObj);
   virtual ~Plane(void) { texture_.reset(); }
 
-  void set_texture(std::shared_ptr<Texture>& t) {
+  void set_texture(const std::shared_ptr<Texture>& t) {
     if (t != texture_) {
       texture_ = t;
     }
   }
 
-  virtual GLenum GetPrimitiveType(void) const { return GL_QUADS; }
+  GLenum GetPrimitiveType(void) const override { return GL_QUADS; }
   GLsizei texWidth(void) const { return texture_->width(); }
   GLsizei texHeight(void) const { return texture_->height(); }
 
  protected:
-  virtual bool FillVertexBuffer(GLfloat* pBuffer) override;
-  virtual void Draw(void) override;
-  virtual void SetupAllAttrPointer(void) override;
+  bool FillVertexBuffer(GLfloat* pBuffer) override;
+  void Draw(void) override;
+  void SetupAllAttrPointer(void) override;
 
  private:
   GLuint texture_id_;

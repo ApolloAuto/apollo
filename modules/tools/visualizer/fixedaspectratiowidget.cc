@@ -15,7 +15,6 @@
  *****************************************************************************/
 
 #include "modules/tools/visualizer/fixedaspectratiowidget.h"
-#include "modules/tools/visualizer/texture.h"
 #include <QContextMenuEvent>
 #include <QMenu>
 #include <QMouseEvent>
@@ -25,6 +24,7 @@
 #include <QStyle>
 #include <QStyleOption>
 #include <iostream>
+#include "modules/tools/visualizer/texture.h"
 
 FixedAspectRatioWidget::FixedAspectRatioWidget(QWidget* parent, int index)
     : QWidget(parent), index_(index), refresh_timer_(this), viewer_() {
@@ -48,7 +48,7 @@ void FixedAspectRatioWidget::StartOrStopUpdate(bool b) {
 }
 
 void FixedAspectRatioWidget::SetupDynamicTexture(
-    std::shared_ptr<Texture>& textureObj) {
+    const std::shared_ptr<Texture>& textureObj) {
   if (textureObj == nullptr) {
     viewer_.default_image_->setSizeChanged();
     viewer_.plane_.set_texture(viewer_.default_image_);
@@ -74,42 +74,43 @@ void FixedAspectRatioWidget::contextMenuEvent(QContextMenuEvent* event) {
   QWidget::contextMenuEvent(event);
 }
 
-namespace {
-inline void calculateWH(double aspect, int w, int h, QSize& size) {
-  int wc = 4;
-  int hc = 9;
-  if (aspect == 4.0 / 3.0) {
-    wc = 2;
-    hc = 3;
-  } else if (aspect == 16.0 / 10.0) {
-    wc = 4;
-    hc = 10;
-  }
-
-  int tmpH = w >> wc;
-  w = tmpH << wc;
-  size.setWidth(w);
-  tmpH *= hc;
-  if (tmpH <= h) {
-    size.setHeight(tmpH);
-  } else {
-    tmpH = h / hc;
-    h = tmpH * hc;
-    size.setHeight(h);
-    size.setWidth(tmpH << wc);
-  }
-}
-}
-
 void FixedAspectRatioWidget::resizeEvent(QResizeEvent* revent) {
-  QSize s;
-  calculateWH(static_cast<double>(viewer_.plane_.texWidth()) /
-                  static_cast<double>(viewer_.plane_.texHeight()),
-              revent->size().width(), revent->size().height(), s);
+  QSize size = revent->size();
 
-  viewer_.setGeometry((revent->size().width() - s.width()) / 2,
-                      (revent->size().height() - s.height()) / 2, s.width(),
-                      s.height());
+  {
+    double aspect = static_cast<double>(viewer_.plane_.texWidth()) /
+                    static_cast<double>(viewer_.plane_.texHeight());
+
+    int wc = 4;
+    int hc = 9;
+    if (aspect == 4.0 / 3.0) {
+      wc = 2;
+      hc = 3;
+    } else if (aspect == 16.0 / 10.0) {
+      wc = 4;
+      hc = 10;
+    }
+
+    int w = size.width();
+    int h = size.height();
+
+    int tmpH = w >> wc;
+    w = tmpH << wc;
+    size.setWidth(w);
+    tmpH *= hc;
+    if (tmpH <= h) {
+      size.setHeight(tmpH);
+    } else {
+      tmpH = h / hc;
+      h = tmpH * hc;
+      size.setHeight(h);
+      size.setWidth(tmpH << wc);
+    }
+  }
+
+  viewer_.setGeometry((revent->size().width() - size.width()) / 2,
+                      (revent->size().height() - size.height()) / 2,
+                      size.width(), size.height());
   QWidget::resizeEvent(revent);
 }
 

@@ -17,11 +17,12 @@
 #ifndef MODULES_TOOLS_VISUALIZER_CYBERCHANNREADER_H_
 #define MODULES_TOOLS_VISUALIZER_CYBERCHANNREADER_H_
 
+#include <cybertron/cybertron.h>
+
 #include <QThread>
 #include <functional>
 #include <memory>
-
-#include <cybertron/cybertron.h>
+#include <string>
 
 class MainWindow;
 
@@ -83,7 +84,7 @@ class CyberChannReader : public QThread {
   }
 
  protected:
-  virtual void run() override { apollo::cybertron::WaitForShutdown(); }
+  void run() override { apollo::cybertron::WaitForShutdown(); }
 
  private:
   bool CreateChannel(const std::string& channelName) {
