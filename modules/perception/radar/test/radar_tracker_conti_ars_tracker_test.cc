@@ -5,17 +5,19 @@
 
 #include <gtest/gtest.h>
 #include "cybertron/common/log.h"
+#include "modules/perception/common/perception_gflags.h"
+
+#define private public
+#define protected public
 #include "modules/perception/radar/lib/tracker/conti_ars_tracker/conti_ars_tracker.h"
 
 namespace apollo {
 namespace perception {
-namespace lib {
-DECLARE_string(work_root);
-}  // namespace lib
 namespace radar {
+
 TEST(ContiArsTrackerTest, conti_ars_tracker_init_test) {
   BaseTracker* tracker = new ContiArsTracker();
-  lib::FLAGS_work_root = "./radar_test_data/conti_ars_tracker";
+  FLAGS_work_root = "./radar_test_data/conti_ars_tracker";
   EXPECT_EQ(tracker->Init(), true);
   EXPECT_EQ(tracker->Name(), "ContiArsTracker");
   delete tracker;
@@ -23,7 +25,7 @@ TEST(ContiArsTrackerTest, conti_ars_tracker_init_test) {
 
 TEST(ContiArsTrackerTest, conti_ars_tracker_track_test) {
   BaseTracker* tracker = new ContiArsTracker();
-  lib::FLAGS_work_root = "./radar_test_data/conti_ars_tracker";
+  FLAGS_work_root = "./radar_test_data/conti_ars_tracker";
   tracker->Init();
   base::Frame radar_frame;
   radar_frame.timestamp = 123456789.1;
@@ -52,7 +54,7 @@ TEST(ContiArsTrackerTest, conti_ars_tracker_collect_test) {
   RadarTrackPtr radar_track(new RadarTrack(object, timestamp));
 
   ContiArsTracker* tracker = new ContiArsTracker();
-  lib::FLAGS_work_root = "./radar_test_data/conti_ars_tracker";
+  FLAGS_work_root = "./radar_test_data/conti_ars_tracker";
   tracker->Init();
   tracker->track_manager_->ClearTracks();
   tracker->track_manager_->AddTrack(radar_track);
@@ -81,7 +83,7 @@ TEST(ContiArsTrackerTest, conti_ars_tracker_unassigned_test) {
       timestamp + ContiArsTracker::s_tracking_time_win_ + 1e-5;
 
   ContiArsTracker* tracker = new ContiArsTracker();
-  lib::FLAGS_work_root = "./radar_test_data/conti_ars_tracker";
+  FLAGS_work_root = "./radar_test_data/conti_ars_tracker";
   tracker->Init();
   tracker->track_manager_->ClearTracks();
   tracker->track_manager_->AddTrack(radar_track);

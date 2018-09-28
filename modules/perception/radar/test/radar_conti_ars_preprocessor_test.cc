@@ -4,17 +4,8 @@
 // @brief: unit test for conti_ars_preprocessor
 
 #include <gtest/gtest.h>
+#include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/radar/lib/preprocessor/conti_ars_preprocessor/conti_ars_preprocessor.h"
-
-namespace apollo {
-namespace perception {
-namespace lib {
-
-DECLARE_string(work_root);
-
-}  // namespace lib
-}  // namespace perception
-}  // namespace apollo
 
 namespace apollo {
 namespace perception {
@@ -32,7 +23,7 @@ class ContiArsPreprocessorTest : public testing::Test {
 TEST_F(ContiArsPreprocessorTest, init) {
   float delay_time = preprocessor.GetDelayTime();
   EXPECT_FLOAT_EQ(delay_time, 0.0);
-  lib::FLAGS_work_root = "./radar_test_data/preprocessor";
+  FLAGS_work_root = "./radar_test_data/preprocessor";
   bool init_result = preprocessor.Init();
   EXPECT_TRUE(init_result);
   delay_time = preprocessor.GetDelayTime();

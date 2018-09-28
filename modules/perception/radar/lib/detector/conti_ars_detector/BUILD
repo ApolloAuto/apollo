@@ -18,7 +18,7 @@ cc_library(
         "//modules/perception/common/geometry:roi_filter",
         "//modules/perception/radar/common:types",
         "//modules/perception/radar/common:radar_util",
-        "//modules/perception/radar/lib/interface:radar_lib_interface",
+        "//modules/perception/radar/lib/interface:base_detector",
         "//modules/perception/proto:perception_config_schema_proto",
         "//modules/drivers/proto:sensor_proto",
         "@eigen",

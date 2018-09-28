@@ -12,6 +12,7 @@ namespace radar {
 
 TEST(ContiArsDetector, detect) {
   ContiRadar corrected_obstacles;
+  corrected_obstacles.mutable_header()->set_timestamp_sec(151237772.355345434);
   ContiRadarObs* conti_obs = corrected_obstacles.add_contiobs();
   conti_obs->set_clusterortrack(0);
   conti_obs->set_obstacle_id(80);
