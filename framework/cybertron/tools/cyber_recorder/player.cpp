@@ -247,6 +247,7 @@ bool Player::LoadChunk(uint64_t from_time, uint64_t to_time) {
   while (::apollo::cybertron::OK()) {
     ADEBUG << "new loop started";
     uint32_t chunk_idx = 0;
+    bool need_skip_chunk_body = false;
     infileopt_.ReadHeader();
     while (::apollo::cybertron::OK()) {
       if (chunk_idx == header_.chunk_number()) {
@@ -285,6 +286,7 @@ bool Player::LoadChunk(uint64_t from_time, uint64_t to_time) {
           if (from_time > chunk_header.end_time() ||
               to_time < chunk_header.begin_time()) {
             chunk_idx++;
+            need_skip_chunk_body = true;
             continue;
           }
           if (!infileopt_.ReadSection(&section)) {
@@ -317,6 +319,13 @@ bool Player::LoadChunk(uint64_t from_time, uint64_t to_time) {
             }
           }
           chunk_idx++;
+          break;
+        }
+        case SectionType::SECTION_CHUNK_BODY: {
+          if (need_skip_chunk_body) {
+            infileopt_.SkipSection(section.size);
+            need_skip_chunk_body = false;
+          }
           break;
         }
         default: {
