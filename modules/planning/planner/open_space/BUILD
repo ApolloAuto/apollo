@@ -13,6 +13,7 @@ cc_library(
     deps = [
         "warm_start_problem",
         "distance_approach_problem",
+        "hybrid_a_star",
         "//external:gflags",
         "//framework:cybertron",
         "//modules/common/proto:pnc_point_proto",
@@ -27,7 +28,6 @@ cc_library(
         "//modules/planning/common:frame_open_space",
         "//modules/planning/proto:planning_proto",
         "@eigen//:eigen",
-
     ],
 )
 
@@ -176,16 +176,27 @@ cc_library(
     ],
 )
 
-#cc_test(
-#    name = "hybrid_a_star_test",
-#    size = "medium",
-#    srcs = [
-#        "hybrid_a_star_test.cc",
-#    ],
-#    deps = [
-#    "//modules/planning/planner/open_space:hybrid_a_star",
-#    "@gtest//:main",
-#    ],
-#)
+cc_test(
+    name = "hybrid_a_star_test",
+    size = "medium",
+    srcs = [
+        "hybrid_a_star_test.cc",
+    ],
+    deps = [
+    "//modules/planning/planner/open_space:hybrid_a_star",
+    "@gtest//:main",
+    ],
+)
+
+cc_binary(
+    name = "hybrid_a_star_wrapper_lib.so",
+    linkshared = True,
+    srcs = [
+        "hybrid_a_star_wrapper.cc",
+    ],
+    deps = [
+        "//modules/planning/planner/open_space:hybrid_a_star",
+    ],
+)
 
 cpplint()
