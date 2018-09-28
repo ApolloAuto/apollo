@@ -310,8 +310,8 @@ TEST_F(HybridTransceiverTest,
   std::this_thread::sleep_for(std::chrono::milliseconds(200));
   transmitter_b_->Transmit(msg);
   std::this_thread::sleep_for(std::chrono::milliseconds(200));
-  // 2 from receiver_b(transient_local), 1 from receiver_a(volatile)
-  EXPECT_EQ(msgs.size(), 3);
+  // 2 from receiver_b(transient_local), 2 from receiver_a(volatile)
+  EXPECT_EQ(msgs.size(), 4);
   for (auto& item : msgs) {
     EXPECT_EQ(item.class_name(), class_name);
     EXPECT_EQ(item.case_name(), case_name);

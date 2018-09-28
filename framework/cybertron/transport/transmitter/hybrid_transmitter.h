@@ -249,9 +249,7 @@ void HybridTransmitter<M>::TransmitHistoryMsg(
     const RoleAttributes& opposite_attr) {
   // check qos
   if (this->attr_.qos_profile().durability() !=
-          QosDurabilityPolicy::DURABILITY_TRANSIENT_LOCAL ||
-      opposite_attr.qos_profile().durability() !=
-          QosDurabilityPolicy::DURABILITY_TRANSIENT_LOCAL) {
+      QosDurabilityPolicy::DURABILITY_TRANSIENT_LOCAL) {
     return;
   }
 

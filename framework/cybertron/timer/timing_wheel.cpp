@@ -70,7 +70,7 @@ uint64_t TimingWheel::StartTimer(uint64_t interval, CallHandler handler,
   if (!add_queue_.Enqueue(task)) {
     AERROR << "add queue is full, Enqueue failed!";
   }
-  AINFO << "start timer id: " << id_counter_;
+  ADEBUG << "start timer id: " << id_counter_;
   return id_counter_;
 }
 
@@ -102,7 +102,7 @@ void TimingWheel::StopTimer(uint64_t timer_id) {
     std::lock_guard<std::mutex> lg(cancelled_mutex_);
     cancelled_list_.push_back(timer_id);
   }
-  AINFO << "stop timer id: " << id_counter_;
+  ADEBUG << "stop timer id: " << id_counter_;
 }
 
 void TimingWheel::RemoveCancelledTasks(uint64_t slot_index) {
