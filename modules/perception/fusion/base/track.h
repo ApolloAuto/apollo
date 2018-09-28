@@ -23,6 +23,8 @@
 #include <string>
 #include <vector>
 
+#include "gtest/gtest_prod.h"
+
 #include "modules/perception/fusion/base/sensor_object.h"
 
 namespace apollo {
@@ -138,6 +140,8 @@ class Track {
   size_t tracked_times_ = 0;
 
  private:
+  FRIEND_TEST(TrackTest, test);
+
   static size_t s_track_idx_;
   static double s_max_lidar_invisible_period_;
   static double s_max_radar_invisible_period_;
