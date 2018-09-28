@@ -342,6 +342,9 @@ void CNNSegmentation::GetObjectsFromSppEngine(
     num_foreground = spp_engine_.RemoveGroundPointsInForegroundCluster(
           original_cloud_, lidar_frame_ref_->roi_indices,
           lidar_frame_ref_->non_ground_indices);
+    if (num_foreground == 0) {
+      ADEBUG << "No foreground segmentation output";
+    }
   }
 
   const auto& clusters = spp_engine_.clusters();
