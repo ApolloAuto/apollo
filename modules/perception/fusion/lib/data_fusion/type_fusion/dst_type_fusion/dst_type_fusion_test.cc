@@ -13,6 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+#include "modules/perception/fusion/lib/data_fusion/type_fusion/dst_type_fusion/dst_type_fusion.h"
+
 #include <algorithm>
 #include <functional>
 #include <map>
@@ -23,7 +25,6 @@
 #include "gtest/gtest.h"
 #include "modules/perception/fusion/base/sensor_data_manager.h"
 #include "modules/perception/fusion/common/camera_util.h"
-#include "modules/perception/fusion/lib/data_fusion/type_fusion/dst_type_fusion/dst_type_fusion.h"
 
 namespace apollo {
 namespace perception {
@@ -62,7 +63,8 @@ TEST(DstTypeFusionTest, test_update_with_measurement) {
   lidar_sensor_ptr->AddFrame(lidar_frame_ptr);
 
   SensorFramePtr lidar_sensor_frame_ptr(new SensorFrame());
-  lidar_sensor_frame_ptr->Initialize(lidar_frame_ptr, lidar_sensor_ptr);
+  lidar_sensor_frame_ptr->Initialize(lidar_frame_ptr,
+      lidar_sensor_ptr->GetSensorId(), lidar_sensor_ptr->GetSensorType());
   SensorObjectPtr lidar_sensor_object_ptr(
       new SensorObject(base_lidar_object_ptr, lidar_sensor_frame_ptr));
   TrackPtr track(new Track());
@@ -91,7 +93,8 @@ TEST(DstTypeFusionTest, test_update_with_measurement) {
   camera_sensor_ptr->AddFrame(camera_frame_ptr);
 
   SensorFramePtr camera_sensor_frame_ptr(new SensorFrame());
-  camera_sensor_frame_ptr->Initialize(camera_frame_ptr, camera_sensor_ptr);
+  camera_sensor_frame_ptr->Initialize(camera_frame_ptr,
+      camera_sensor_ptr->GetSensorId(), camera_sensor_ptr->GetSensorType());
   SensorObjectPtr camera_sensor_object_ptr(
       new SensorObject(base_camera_object_ptr, camera_sensor_frame_ptr));
 
@@ -105,7 +108,8 @@ TEST(DstTypeFusionTest, test_update_with_measurement) {
   SensorFramePtr camera_sensor_frame_normal(new SensorFrame());
   SensorPtr camera_sensor_ptr1(new Sensor(camera_frame_ptr->sensor_info));
   camera_sensor_ptr1->AddFrame(camera_frame_ptr);
-  camera_sensor_frame_normal->Initialize(camera_frame_ptr, camera_sensor_ptr1);
+  camera_sensor_frame_normal->Initialize(camera_frame_ptr,
+      camera_sensor_ptr->GetSensorId(), camera_sensor_ptr->GetSensorType());
   SensorObjectPtr camera_sensor_object_ptr1(
       new SensorObject(base_camera_object_ptr, camera_sensor_frame_normal));
   // update with measurment
@@ -150,7 +154,8 @@ TEST(DstTypeFusionTest, test_update_without_measurement) {
   base_frame->objects.emplace_back(base_obj);
   base_frame->sensor_info = radar_front_info;
   SensorFramePtr radar_frame(new SensorFrame());
-  radar_frame->Initialize(base_frame, radar_front_sensor);
+  radar_frame->Initialize(base_frame,
+      radar_front_sensor->GetSensorId(), radar_front_sensor->GetSensorType());
 
   // create a lidar track
   base::ObjectPtr base_lidar_object_ptr(new base::Object());
@@ -171,7 +176,8 @@ TEST(DstTypeFusionTest, test_update_without_measurement) {
   lidar_sensor_ptr->AddFrame(lidar_frame_ptr);
 
   SensorFramePtr lidar_sensor_frame_ptr(new SensorFrame());
-  lidar_sensor_frame_ptr->Initialize(lidar_frame_ptr, lidar_sensor_ptr);
+  lidar_sensor_frame_ptr->Initialize(lidar_frame_ptr,
+      lidar_sensor_ptr->GetSensorId(), lidar_sensor_ptr->GetSensorType());
   SensorObjectPtr lidar_sensor_object_ptr(
       new SensorObject(base_lidar_object_ptr, lidar_sensor_frame_ptr));
   TrackPtr track1(new Track());
@@ -231,7 +237,8 @@ TEST(DstTypeFusionTest, test_update_without_measurement) {
   base::ObjectPtr base_camera_object_ptr(new base::Object());
 
   SensorFramePtr camera_sensor_frame_ptr(new SensorFrame());
-  camera_sensor_frame_ptr->Initialize(camera_frame_ptr, camera_sensor_ptr);
+  camera_sensor_frame_ptr->Initialize(camera_frame_ptr,
+      camera_sensor_ptr->GetSensorId(), camera_sensor_ptr->GetSensorType());
   SensorObjectPtr camera_sensor_object_ptr(
       new SensorObject(base_camera_object_ptr, camera_sensor_frame_ptr));
   TrackPtr track3(new Track());
