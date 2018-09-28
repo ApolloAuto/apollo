@@ -54,8 +54,8 @@ class OsqpSpline2dSolver final : public Spline2dSolver {
  private:
   FRIEND_TEST(OSQPSolverTest, basic_test);
   void ToCSCMatrix(const Eigen::MatrixXd& dense_matrix,
-                   std::vector<double>* data, std::vector<double>* indices,
-                   std::vector<double>* indptr) const;
+                   std::vector<double>* data, std::vector<int>* indices,
+                   std::vector<int>* indptr) const;
 
  private:
   OSQPSettings* osqp_settings_ = nullptr;
