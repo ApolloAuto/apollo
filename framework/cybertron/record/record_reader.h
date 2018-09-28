@@ -51,7 +51,6 @@ class RecordReader : public RecordBase {
   bool ReadNextChunk(ChunkBody* chunk, uint64_t begin_time, uint64_t end_time);
   proto::ChunkBody chunk_;
   proto::Index index_;
-  uint64_t pos = 0;
   uint32_t message_index_ = 0;
   std::unique_ptr<RecordFileReader> file_reader_;
 };

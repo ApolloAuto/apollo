@@ -90,7 +90,7 @@ bool RecordViewer::Iterator::operator==(Iterator const& other) const {
   if (other.end_) {
     return end_;
   }
-  return index_ == other.index_;
+  return index_ == other.index_ && viewer_ == other.viewer_;
 }
 
 bool RecordViewer::Iterator::operator!=(const Iterator& rhs) const {
