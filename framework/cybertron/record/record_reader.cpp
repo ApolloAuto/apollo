@@ -26,16 +26,30 @@ RecordReader::RecordReader(const std::string& file) {
   file_reader_.reset(new RecordFileReader());
   file_reader_->Open(file);
   header_ = file_reader_->GetHeader();
+  if (file_reader_->ReadIndex()) {
+    index_ = file_reader_->GetIndex();
+  }
 }
 
 void RecordReader::Reset() { file_reader_->Reset(); }
 
 const Header& RecordReader::header() const { return header_; }
 
+std::set<std::string> RecordReader::GetChannelList() const {
+  std::set<std::string> channel_list;
+  for (int i = 0; i < index_.indexes_size(); i++) {
+    ChannelCache cache = index_.indexes(i).channel_cache();
+    if (index_.indexes(i).type() == SectionType::SECTION_CHANNEL) {
+      channel_list.insert(cache.name());
+    }
+  }
+  return channel_list;
+}
+
 bool RecordReader::ReadMessage(RecordMessage* message, uint64_t begin_time,
                                uint64_t end_time) {
-  while (index_ < chunk_.messages_size()) {
-    const auto& next_message = chunk_.messages(index_++);
+  while (message_index_ < chunk_.messages_size()) {
+    const auto& next_message = chunk_.messages(message_index_++);
     uint64_t time = next_message.time();
     if (time > end_time) {
       return false;
@@ -53,7 +67,7 @@ bool RecordReader::ReadMessage(RecordMessage* message, uint64_t begin_time,
   }
 
   if (ReadNextChunk(&chunk_, begin_time, end_time)) {
-    index_ = 0;
+    message_index_ = 0;
     return ReadMessage(message, begin_time, end_time);
   }
   return false;

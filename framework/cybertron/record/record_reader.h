@@ -43,14 +43,16 @@ class RecordReader : public RecordBase {
   virtual ~RecordReader();
   bool ReadMessage(RecordMessage* message, uint64_t begin_time = 0,
                    uint64_t end_time = UINT64_MAX);
+  std::set<std::string> GetChannelList() const;
   const Header& header() const;
   void Reset();
 
  private:
   bool ReadNextChunk(ChunkBody* chunk, uint64_t begin_time, uint64_t end_time);
-  ChunkBody chunk_;
+  proto::ChunkBody chunk_;
+  proto::Index index_;
   uint64_t pos = 0;
-  uint32_t index_ = 0;
+  uint32_t message_index_ = 0;
   std::unique_ptr<RecordFileReader> file_reader_;
 };
 

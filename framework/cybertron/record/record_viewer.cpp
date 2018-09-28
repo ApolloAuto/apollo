@@ -54,9 +54,18 @@ bool RecordViewer::Update(RecordMessage* message) {
   return false;
 }
 
-uint64_t RecordViewer::get_begin_time() const { return begin_time_; }
+uint64_t RecordViewer::begin_time() const { return begin_time_; }
 
-uint64_t RecordViewer::get_end_time() const { return end_time_; }
+uint64_t RecordViewer::end_time() const { return end_time_; }
+
+std::set<std::string> RecordViewer::GetChannelList() const {
+  std::set<std::string> channel_list;
+  auto all_channel = reader_->GetChannelList();
+  std::set_intersection(all_channel.begin(), all_channel.end(),
+                        channels_.begin(), channels_.end(),
+                        std::inserter(channel_list, channel_list.end()));
+  return channel_list;
+}
 
 RecordViewer::Iterator RecordViewer::begin() { return Iterator(this); }
 
@@ -67,10 +76,10 @@ RecordViewer::Iterator::Iterator(RecordViewer* viewer, bool end)
   if (end_) {
     return;
   }
+  viewer_->reader_->Reset();
   if (!viewer_->IsValid()) {
     end_ = true;
   } else {
-    viewer_->reader_->Reset();
     if (!viewer_->Update(&message_instance_)) {
       end_ = true;
     }
