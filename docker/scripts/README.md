@@ -28,15 +28,15 @@ the base image, but in case you want to do code development on a Mac, you can
 still try the latest
 [Docker-for-Mac](https://docs.docker.com/docker-for-mac/install)
 
-It runs on a virtual kernel which is similar to use Docker Toolkit + VirtualBox.
+It runs on a virtual kernel which is similar to using the Docker Toolkit + VirtualBox.
 Make sure you understand the [difference](https://docs.docker.com/docker-for-mac/docker-toolbox).
 
-With Mac, lots of Linux bindings are not available, which could cause problems.
-So it's basicly just an environment for code development, while not production.
+With Mac, a lot of the Linux bindings are not available, which could cause issues.
+So it's basically just an environment for code development, but not for production.
 
 ## Development container
 
-We provide development environment where you can build Apollo from code.
+We provide a development environment where you can build Apollo from code.
 
 ```bash
 cd /path/to/apollo
@@ -46,19 +46,9 @@ bash docker/scripts/dev_into.sh
 
 The scripts to build the dev-image are also available at docker/build.
 
-Note that, within the scripts in this directory, only standard tools that are
-expected to be available in most Linux distributions should be used (e.g., don't
-use realpath).
-
-## Release container
-
-We also distribute release images with runtime environment and pre-compiled
-binaries.
-
-Simply run
-```bash
-cd /path/to/apollo
-bash docker/scripts/release_start.sh
+```
+Note: 
+Within the scripts in this directory, only standard tools that are expected to be available in most Linux distributions should be used (e.g., don't use realpath).
 ```
 
 And then you should be able to see Dreamview at http://localhost:8888.
