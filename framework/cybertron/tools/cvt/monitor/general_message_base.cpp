@@ -15,40 +15,56 @@
  *****************************************************************************/
 
 #include "general_message_base.h"
-#include "screen.h"
 #include "general_channel_message.h"
 #include "general_message.h"
+#include "screen.h"
+
+#include <iomanip>
 
 int GeneralMessageBase::lineCount(const google::protobuf::Message& msg,
                                   int screenWidth) {
   const google::protobuf::Reflection* reflection = msg.GetReflection();
-
+  const google::protobuf::Descriptor* descriptor = msg.GetDescriptor();
   std::vector<const google::protobuf::FieldDescriptor*> fields;
-  reflection->ListFields(msg, &fields);
+  if (descriptor->options().map_entry()) {
+    fields.push_back(descriptor->field(0));
+    fields.push_back(descriptor->field(1));
+  } else {
+    reflection->ListFields(msg, &fields);
+  }
 
   int fsize = fields.size();
   int ret = 0;
-  for (int i = 0; i < fsize; ++i, ++ret) {
-    const google::protobuf::FieldDescriptor* field = fields[i];
-    if (!field->is_repeated()) {
-      switch (field->cpp_type()) {
-        case google::protobuf::FieldDescriptor::CPPTYPE_STRING: {
-          std::string scratch;
-          const std::string& value =
-              reflection->GetStringReference(msg, field, &scratch);
-          ret += value.size() / screenWidth;
-          break;
-        }
-
-        case google::protobuf::FieldDescriptor::CPPTYPE_MESSAGE:
-          const google::protobuf::Message& childMsg =
-              reflection->GetMessage(msg, field);
-          ret += lineCount(childMsg, screenWidth) + 1;
-          break;
-
-      }  // end switch
-    }
+  for (int i = 0; i < fsize; ++i) {
+    ret += lineCountOfField(msg, screenWidth, fields[i], reflection);
   }  // end for
+
+  return ret;
+}
+
+int GeneralMessageBase::lineCountOfField(
+    const google::protobuf::Message& msg, int screenWidth,
+    const google::protobuf::FieldDescriptor* field,
+    const google::protobuf::Reflection* reflection) {
+  int ret = 1;
+  if (!field->is_repeated()) {
+    switch (field->cpp_type()) {
+      case google::protobuf::FieldDescriptor::CPPTYPE_STRING: {
+        std::string scratch;
+        const std::string& value =
+            reflection->GetStringReference(msg, field, &scratch);
+        ret += value.size() / screenWidth;
+        break;
+      }
+
+      case google::protobuf::FieldDescriptor::CPPTYPE_MESSAGE:
+        const google::protobuf::Message& childMsg =
+            reflection->GetMessage(msg, field);
+        ret += lineCount(childMsg, screenWidth) + 1;
+        break;
+
+    }  // end switch
+  }
 
   return ret;
 }
@@ -58,11 +74,17 @@ void GeneralMessageBase::PrintMessage(GeneralMessageBase* baseMsg,
                                       const Screen* s, unsigned& lineNo,
                                       int indent, int jumpLines) {
   const google::protobuf::Reflection* reflection = msg.GetReflection();
-
+  const google::protobuf::Descriptor* descriptor = msg.GetDescriptor();
   std::vector<const google::protobuf::FieldDescriptor*> fields;
-  reflection->ListFields(msg, &fields);
+  if (descriptor->options().map_entry()) {
+    fields.push_back(descriptor->field(0));
+    fields.push_back(descriptor->field(1));
+  } else {
+    reflection->ListFields(msg, &fields);
+  }
 
   int i = 0;
+  // jump lines
   for (; i < fields.size() && jumpLines > 1; ++i) {
     const google::protobuf::FieldDescriptor* field = fields[i];
     --jumpLines;
@@ -93,17 +115,18 @@ void GeneralMessageBase::PrintMessage(GeneralMessageBase* baseMsg,
     if (field->is_repeated()) {
       outStr << "+[" << reflection->FieldSize(msg, field) << " items]";
 
-        GeneralMessage* item = new GeneralMessage(baseMsg, &msg, reflection, field);
+      GeneralMessage* item =
+          new GeneralMessage(baseMsg, &msg, reflection, field);
 
-        if(item) {
-          baseMsg->insertRepeatedMessage(lineNo, item);
-        }
+      if (item) {
+        baseMsg->insertRepeatedMessage(lineNo, item);
+      }
 
     } else {
       switch (field->cpp_type()) {
-#define OUTPUT_FIELD(CPPTYPE, METHOD)                        \
-  case google::protobuf::FieldDescriptor::CPPTYPE_##CPPTYPE: \
-    outStr << reflection->Get##METHOD(msg, field);           \
+#define OUTPUT_FIELD(CPPTYPE, METHOD)                                       \
+  case google::protobuf::FieldDescriptor::CPPTYPE_##CPPTYPE:                \
+    outStr << std::setprecision(64) << reflection->Get##METHOD(msg, field); \
     break
 
         OUTPUT_FIELD(INT32, Int32);
@@ -117,7 +140,14 @@ void GeneralMessageBase::PrintMessage(GeneralMessageBase* baseMsg,
 
         case google::protobuf::FieldDescriptor::CPPTYPE_ENUM: {
           int enum_value = reflection->GetEnumValue(msg, field);
-          outStr << enum_value;
+
+          const google::protobuf::EnumValueDescriptor* enum_desc =
+              field->enum_type()->FindValueByNumber(enum_value);
+          if (enum_desc != nullptr) {
+            outStr << enum_desc->name() << "  " << enum_value;
+          } else {
+            outStr << enum_value << "  " << enum_value;
+          }
           break;
         }
 
@@ -132,7 +162,7 @@ void GeneralMessageBase::PrintMessage(GeneralMessageBase* baseMsg,
         case google::protobuf::FieldDescriptor::CPPTYPE_MESSAGE:
           s->AddStr(indent, lineNo++, outStr.str().c_str());
           PrintMessage(baseMsg, reflection->GetMessage(msg, field), s, lineNo,
-                     indent + 2);
+                       indent + 2);
           outStr.str("");
           break;
       }  // end switch
@@ -141,9 +171,20 @@ void GeneralMessageBase::PrintMessage(GeneralMessageBase* baseMsg,
     s->AddStr(indent, lineNo++, outStr.str().c_str());
     outStr.str("");
   }  // end for
+
+  const google::protobuf::UnknownFieldSet& unknown_fields =
+      reflection->GetUnknownFields(msg);
+  if (!unknown_fields.empty()) {
+    Screen::ColorPair c = s->Color();
+    s->ClearCurrentColor(c);
+    s->SetCurrentColor(Screen::RED_BLACK);
+    s->AddStr(indent, lineNo++, "Have Unknown Fields");
+    s->ClearCurrentColor(Screen::RED_BLACK);
+    s->SetCurrentColor(c);
+  }
 }
 
-RenderableMessage* GeneralMessageBase::Child(int lineNo) const{
+RenderableMessage* GeneralMessageBase::Child(int lineNo) const {
   if (lineNo < 0) {
     return nullptr;
   }

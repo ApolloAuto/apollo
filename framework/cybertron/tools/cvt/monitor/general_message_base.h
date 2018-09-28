@@ -31,19 +31,22 @@ class GeneralMessageBase : public RenderableMessage {
                            int jumpLines = 0);
 
   static int lineCount(const google::protobuf::Message& msg, int screenWidth);
+  static int lineCountOfField(const google::protobuf::Message& msg,
+                              int screenWidth,
+                              const google::protobuf::FieldDescriptor* field,
+                              const google::protobuf::Reflection* reflection);
 
-  void insertRepeatedMessage(int lineNo, GeneralMessageBase* item){
-      children_map_.insert(std::make_pair(lineNo, item));
+  void insertRepeatedMessage(int lineNo, GeneralMessageBase* item) {
+    children_map_.insert(std::make_pair(lineNo, item));
   }
 
   RenderableMessage* Child(int lineNo) const;
 
-  explicit GeneralMessageBase(RenderableMessage* parent = nullptr) : RenderableMessage(parent), children_map_() {}
-  ~GeneralMessageBase(void) {
-    clear();
-  }
+  explicit GeneralMessageBase(RenderableMessage* parent = nullptr)
+      : RenderableMessage(parent), children_map_() {}
+  ~GeneralMessageBase(void) { clear(); }
 
-  void clear(void){
+  void clear(void) {
     for (auto& iter : children_map_) {
       delete iter.second;
     }

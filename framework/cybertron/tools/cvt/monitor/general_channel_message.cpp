@@ -18,13 +18,11 @@
 #include "general_message.h"
 #include "screen.h"
 
-#include <ncurses.h>
 #include <iomanip>
 #include <sstream>
 
 namespace {
 constexpr int ReaderWriterOffset = 4;
-constexpr int PageItemCountOffset = 3;
 }  // namespace
 
 RenderableMessage* GeneralChannelMessage::Child(int lineNo) const {
@@ -46,6 +44,8 @@ void GeneralChannelMessage::Render(const Screen* s, int key) {
     default:;
   }
 
+  clear();
+
   unsigned lineNo = 0;
 
   s->SetCurrentColor(Screen::WHITE_BLACK);
@@ -55,37 +55,24 @@ void GeneralChannelMessage::Render(const Screen* s, int key) {
   s->AddStr(0, lineNo++, "MessageType: ");
   s->AddStr(message_type().c_str());
 
-  switch (current_state_) {
-    case State::ShowDebugString:
-      RenderDebugString(s, key, lineNo);
-      break;
-    case State::ShowInfo:
-      RenderInfo(s, key, lineNo);
-      break;
+  if(is_enabled()) {
+    switch (current_state_) {
+      case State::ShowDebugString:
+        RenderDebugString(s, key, lineNo);
+        break;
+      case State::ShowInfo:
+        RenderInfo(s, key, lineNo);
+        break;
+    }
+  } else {
+    s->AddStr(0, lineNo++, "Channel has been closed");
   }
   s->ClearCurrentColor(Screen::WHITE_BLACK);
 }
 
-void GeneralChannelMessage::SplitPages(int key) {
-  switch (key) {
-    case CTRL('d'):
-    case KEY_NPAGE:
-      ++page_index_;
-      if (page_index_ >= pages_) page_index_ = pages_ - 1;
-      break;
-
-    case CTRL('u'):
-    case KEY_PPAGE:
-      --page_index_;
-      if (page_index_ < 1) page_index_ = 0;
-      break;
-    default:;
-  }
-}
-
 void GeneralChannelMessage::RenderInfo(const Screen* s, int key, unsigned lineNo) {
-  int pageItemCount = s->Height() - PageItemCountOffset;
-  pages_ = (readers_.size() + writers_.size() + PageItemCountOffset) /
+  int pageItemCount = s->Height() - lineNo;
+  pages_ = (readers_.size() + writers_.size() + lineNo) /
                pageItemCount +
            1;
   SplitPages(key);
@@ -137,16 +124,15 @@ void GeneralChannelMessage::RenderDebugString(const Screen* s, int key,
       raw_msg_class_ = rawFactory->GenerateMessageByType(message_type());
     }
 
-    clear();
-
     if (raw_msg_class_ == nullptr) {
       s->AddStr(0, lineNo++, "Cannot Generate Message by Message Type");
     } else {
+      s->AddStr(0, lineNo++, "FrameRatio: ");
+
       std::ostringstream outStr;
       outStr << std::fixed << std::setprecision(2) << frame_ratio();
-      s->AddStr(0, lineNo++, "FrameRatio: ");
       s->AddStr(outStr.str().c_str());
-
+      
       decltype(channel_message_) channelMsg = CopyMsgPtr();
 
       if (raw_msg_class_->ParseFromString(channelMsg->message)) {
@@ -155,10 +141,8 @@ void GeneralChannelMessage::RenderDebugString(const Screen* s, int key,
         int pageItemCount = s->Height() - lineNo;
         pages_ = lcount / pageItemCount + 1;
         SplitPages(key);
-
-        PrintMessage(this, *raw_msg_class_, s, lineNo, 0,
+        GeneralMessageBase::PrintMessage(this, *raw_msg_class_, s, lineNo, 0,
                      page_index_ * pageItemCount);
-
       } else {
         s->AddStr(0, lineNo++, "Cannot parse the raw message");
       }

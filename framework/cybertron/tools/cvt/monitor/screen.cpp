@@ -16,6 +16,7 @@
 
 #include "screen.h"
 #include "renderable_message.h"
+#include "cybertron_channel_message.h"
 #include "cybertron_topology_message.h"
 
 #include <thread>
@@ -33,17 +34,18 @@ Screen* Screen::Instance(void) {
 }
 
 const char Screen::InteractiveCmdStr[] =
-    "Common Commands:\n"
+    "Common Commands for all:\n"
     "   q | Q | Esc -- quit\n"
     "   Backspace -- go back\n"
     "   h | H -- go to show help info\n"
     "\n"
+    "Common Commands for Topology and Channel Message:\n"
     "   PgDn | ^d -- show next page\n"
     "   PgUp | ^u -- show previous page\n"
     "\n"
     "   Up Arrow -- move up one line\n"
     "   Down Arrow -- move down one line\n"
-    "   Right Arrow -- enter the selected Channel or Repeated Data Item\n"
+    "   Right Arrow -- enter the selected Channel or Repeated Datum\n"
     "   Left Arrow -- go back to the upper level\n"
     "\n"
     "   Enter -- the same with Right Arrow key\n"
@@ -52,7 +54,7 @@ const char Screen::InteractiveCmdStr[] =
     "   w | W -- the same with Up Arrow key\n"
     "   s | S -- the same with Down Arrow key\n"
     "\n"
-    "Commands for top-level topology message:\n"
+    "Commands for Topology message:\n"
     "   f | F -- show frame ratio for all channel messages\n"
     "   t | T -- show channel message type\n"
     "\n"
@@ -62,13 +64,13 @@ const char Screen::InteractiveCmdStr[] =
     "   i | I -- show Reader and Writers of Channel\n"
     "   b | B -- show Debug String of Channel Message\n"
     "\n"
-    "Commands for "
+    "Commands for Channel Repeated Datum:\n"
     "   n | N -- next repeated data item\n"
     "   m | M -- previous repeated data item\n";
 
 Screen::Screen()
-    : current_state_(State::RenderMessage),
-      /* highlight_line_no_(1), */
+    : current_color_pair_(INVALID),
+      current_state_(State::RenderMessage),
       highlight_direction_(0),
       current_render_obj_(nullptr) {}
 
@@ -110,6 +112,7 @@ int Screen::Height(void) const { return LINES; }
 
 void Screen::SetCurrentColor(ColorPair color) const {
   if (IsInit()) {
+    current_color_pair_ = color;
     attron(COLOR_PAIR(color));
   }
 }
@@ -128,6 +131,7 @@ void Screen::AddStr(const char* str) const {
 void Screen::ClearCurrentColor(ColorPair color) const {
   if (IsInit()) {
     attroff(COLOR_PAIR(color));
+    current_color_pair_ = INVALID;
   }
 }
 
@@ -166,12 +170,13 @@ void Screen::HighlightLine(int lineNo) {
   }
 }
 
-void Screen::SwitchState(int ch) {
+int Screen::SwitchState(int ch) {
   switch (current_state_) {
     case State::RenderInterCmdInfo:
       if (KEY_BACKSPACE == ch) {
         current_state_ = State::RenderMessage;
         clear();
+        ch = 27;
       }
       break;
     case State::RenderMessage:
@@ -182,6 +187,7 @@ void Screen::SwitchState(int ch) {
       break;
     default:;
   }
+  return ch;
 }
 
 void Screen::Run() {
@@ -189,11 +195,9 @@ void Screen::Run() {
     return;
   }
 
-  int y = current_render_obj_->line_no();
   highlight_direction_ = 0;
-  move(y, 0);
 
-  void (Screen::*showFuncs[])(int&, int) = {&Screen::ShowRenderMessage,
+  void (Screen::*showFuncs[])(int) = {&Screen::ShowRenderMessage,
                                             &Screen::ShowInteractiveCmd};
 
   do {
@@ -201,11 +205,10 @@ void Screen::Run() {
 
     if (ch == 'q' || ch == 'Q' || ch == 27) break;
 
-    SwitchState(ch);
+    ch = SwitchState(ch);
 
-    (this->*showFuncs[static_cast<int>(current_state_)])(y,
-                                                         ch);
-    std::this_thread::sleep_for(std::chrono::milliseconds(static_cast<int>(1000.0/CybertronTopologyMessage::max_frame_ratio())));                                                     
+    (this->*showFuncs[static_cast<int>(current_state_)])(ch);
+    std::this_thread::sleep_for(std::chrono::milliseconds(static_cast<int>(1000.0/(ChannelMessage::max_frame_ratio() + 10.0))));                                                     
   } while (true);
 }
 
@@ -216,32 +219,34 @@ void Screen::Resize(void) {
   }
 }
 
-void Screen::ShowRenderMessage(int& y, int ch) {
+void Screen::ShowRenderMessage(int ch) {
   if (current_render_obj_) {
     erase();
     current_render_obj_->Render(this, ch);
   }
 
-  HighlightLine(y);
-  move(y, 0);
+  int* y = current_render_obj_->line_no();;
+
+  HighlightLine(*y);
+  move(*y, 0);
   refresh();
 
   switch (ch) {
     case 's':
     case 'S':
     case KEY_DOWN:
-      ++y;
+      ++(*y);
       highlight_direction_ = -1;
-      if (y >= Height()) y = Height() - 1;
+      if (*y >= Height()) { *y = Height() - 1; }
       break;
 
     case 'w':
     case 'W':
     case KEY_UP:
-      --y;
-      if (y < 1) y = 1;
+      --(*y);
+      if (*y < 1) *y = 1;
       highlight_direction_ = 1;
-      if (y < 0) y = 0;
+      if (*y < 0) { *y = 0; }
       break;
 
     case 'a':
@@ -264,10 +269,10 @@ void Screen::ShowRenderMessage(int& y, int ch) {
     case 'D':
     case KEY_RIGHT:
       if (current_render_obj_) {
-        RenderableMessage* child = current_render_obj_->Child(y);
+        RenderableMessage* child = current_render_obj_->Child(*y);
 
         if (child) {
-          current_render_obj_->set_line_no(y);
+          child->reset_line_page();
           current_render_obj_ = child;
           y = child->line_no();
           clear();
@@ -277,7 +282,7 @@ void Screen::ShowRenderMessage(int& y, int ch) {
   }
 }
 
-void Screen::ShowInteractiveCmd(int&, int) {
+void Screen::ShowInteractiveCmd(int) {
   unsigned y = 0;
 
   SetCurrentColor(Screen::WHITE_BLACK);

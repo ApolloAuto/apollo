@@ -45,7 +45,7 @@ class GeneralMessage : public GeneralMessageBase {
   GeneralMessage& operator=(const GeneralMessage&) = delete;
 
   void PrintRepeatedField(const Screen* s, unsigned& lineNo, int indent,
-                          int index);
+                          int index, int jumpLines);
 
   int itemIndex_;
 

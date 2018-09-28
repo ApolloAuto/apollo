@@ -40,7 +40,7 @@ class Screen;
 class RenderableMessage {
  public:
   explicit RenderableMessage(RenderableMessage* parent = nullptr, int lineNo = 0)
-      : parent_(parent), line_no_(lineNo) {}
+      : line_no_(lineNo), pages_(1), page_index_(0), parent_(parent) {}
 
   virtual ~RenderableMessage() { parent_ = nullptr; }
 
@@ -57,10 +57,14 @@ class RenderableMessage {
   virtual RenderableMessage* Child(int /* lineNo */) const { return nullptr; }
   
  protected:
-  int line_no(void) const {return line_no_; }
+  int* line_no(void) {  return &line_no_; }
   void set_line_no(int lineNo){ line_no_ = lineNo; }
+  void reset_line_page(void){ line_no_ = 0; page_index_ = 0; }
+  void SplitPages(int key);
 
   int line_no_;
+  int pages_;
+  int page_index_;
   RenderableMessage* parent_;
 
   friend class Screen;
