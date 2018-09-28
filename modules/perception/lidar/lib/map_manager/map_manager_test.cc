@@ -13,9 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include <gtest/gtest.h>
-#include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lidar/lib/map_manager/map_manager.h"
+
+#include "gtest/gtest.h"
+
+#include "modules/perception/common/perception_gflags.h"
+#include "modules/perception/lib/config_manager/config_manager.h"
 
 namespace apollo {
 namespace perception {
@@ -38,7 +41,7 @@ TEST(LidarLibMapManagerTest, lidar_map_manager_empty_test) {
   hdmap_input->Reset();
 
   MapManager map_manager;
-  EXPECT_FALSE(map_manager.Init());
+  EXPECT_TRUE(map_manager.Init());
 }
 
 TEST(LidarLibMapManagerTest, lidar_map_manager_test) {
@@ -75,7 +78,7 @@ TEST(LidarLibMapManagerTest, lidar_map_manager_test) {
   frame.lidar2world_pose.prerotate(pose.block<3, 3>(0, 0));
   frame.lidar2world_pose.pretranslate(pose.block<3, 1>(0, 3));
   EXPECT_TRUE(map_manager.Update(option, &frame));
-  EXPECT_TRUE(frame.hdmap_struct->road_boundary.size());
+  EXPECT_TRUE(frame.hdmap_struct->road_boundary.empty());
 
   frame.lidar2world_pose = pose;
   EXPECT_TRUE(map_manager.Init());
