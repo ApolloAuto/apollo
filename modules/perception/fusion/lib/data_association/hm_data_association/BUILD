@@ -88,4 +88,59 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "hm_data_association_test",
+    size = "small",
+    srcs = [
+        "hm_data_association_test.cc",
+    ],
+    deps = [
+        "@gtest//:main",
+        "//modules/perception/base:frame",
+        "//modules/perception/common/sensor_manager:sensor_manager",
+        "//modules/perception/fusion/base:sensor",
+        "//modules/perception/fusion/base:track",
+        ":probabilities",
+        ":projection_cache",
+        ":track_object_distance",
+        ":track_object_similarity",
+    ],
+)
+
+cc_test(
+    name = "track_object_distance_test",
+    size = "small",
+    srcs = [
+        "track_object_distance_test.cc",
+    ],
+    deps = [
+        "@gtest//:main",
+        "//modules/perception/base:frame",
+        "//modules/perception/base:point_cloud",
+        "//modules/perception/common/sensor_manager:sensor_manager",
+        "//modules/perception/fusion/base:sensor",
+        "//modules/perception/fusion/base:track",
+        ":projection_cache",
+        ":track_object_distance",
+        ":track_object_similarity",
+    ],
+)
+
+cc_test(
+    name = "track_object_test",
+    size = "small",
+    srcs = [
+        "track_object_test.cc",
+    ],
+    deps = [
+        "@gtest//:main",
+        "//modules/perception/base:frame",
+        "//modules/perception/base:point_cloud",
+        "//modules/perception/common/sensor_manager:sensor_manager",
+        "//modules/perception/fusion/base:sensor",
+        "//modules/perception/fusion/base:track",
+        ":hm_tracks_objects_match",
+    ],
+)
+
 cpplint()
