@@ -294,9 +294,13 @@ PyObject *cyber_PyRecordWriter_WriteMessage(PyObject *self, PyObject *args) {
   char *rawmessage = nullptr;
   Py_ssize_t len = 0;
   uint64_t time = 0;
+  char *proto_desc = nullptr;
+  Py_ssize_t len_desc = 0;
+
   if (!PyArg_ParseTuple(
-          args, const_cast<char *>("Oss#K:cyber_PyRecordWriter_WriteMessage"),
-          &pyobj_rec_writer, &channel_name, &rawmessage, &len, &time)) {
+          args, const_cast<char *>("Oss#Ks#:cyber_PyRecordWriter_WriteMessage"),
+          &pyobj_rec_writer, &channel_name, &rawmessage, &len, &time,
+          &proto_desc, &len_desc)) {
     AERROR << "cyber_PyRecordWriter_WriteMessage parsetuple failed!";
     Py_RETURN_FALSE;
   }
@@ -305,12 +309,14 @@ PyObject *cyber_PyRecordWriter_WriteMessage(PyObject *self, PyObject *args) {
       pyobj_rec_writer, "apollo_cybertron_record_pyrecordfilewriter");
 
   if (nullptr == writer) {
-    AINFO << "cyber_PyRecordWriter_WriteMessage:writer ptr is null!";
+    AERROR << "cyber_PyRecordWriter_WriteMessage:writer ptr is null!";
     Py_RETURN_FALSE;
   }
 
   std::string rawmessage_str(rawmessage, len);
-  if (!writer->WriteMessage(channel_name, rawmessage_str, time)) {
+  std::string desc_str(proto_desc, len_desc);
+  if (!writer->WriteMessage(channel_name, rawmessage_str, time, desc_str)) {
+    AERROR << "cyber_PyRecordWriter_WriteMessage:WriteMessage failed!";
     Py_RETURN_FALSE;
   }
   Py_RETURN_TRUE;

@@ -37,8 +37,9 @@ def test_record_trans(reader_path):
     fread = record.RecordReader(reader_path)
     count = 0
     for channelname, msg, datatype, timestamp in fread.read_messages():
-        print channelname, timestamp, fread.get_messagenumber(channelname)
-        fwriter.write_channel(channelname, datatype, "")
+        # print channelname, timestamp, fread.get_messagenumber(channelname)
+        desc = fread.get_protodesc(channelname)
+        fwriter.write_channel(channelname, datatype, desc)
         fwriter.write_message(channelname, msg, timestamp)
         count = count + 1
     print "all count=", count

@@ -113,9 +113,11 @@ class PyRecordWriter {
   }
 
   bool WriteMessage(const std::string& channel_name,
-                    const std::string& rawmessage, uint64_t time) {
+                    const std::string& rawmessage, uint64_t time,
+                    const std::string& proto_desc = "") {
     return recored_writer_.WriteMessage(
-        channel_name, std::make_shared<RawMessage>(rawmessage), time);
+        channel_name, std::make_shared<RawMessage>(rawmessage), time,
+        proto_desc);
   }
 
  private:
