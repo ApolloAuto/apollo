@@ -89,8 +89,17 @@ cc_test(
     srcs = [
         "sensor_frame_test.cc",
     ],
-    data = [
-        "//modules/perception:perception_testdata",
+    deps = [
+        ":sensor",
+        "@gtest//:main",
+    ],
+)
+
+cc_test(
+    name = "sensor_test",
+    size = "small",
+    srcs = [
+        "sensor_test.cc",
     ],
     deps = [
         ":sensor",

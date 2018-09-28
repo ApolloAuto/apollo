@@ -22,6 +22,8 @@
 #include <string>
 #include <vector>
 
+#include "gtest/gtest_prod.h"
+
 #include "modules/perception/base/sensor_meta.h"
 #include "modules/perception/fusion/base/base_forward_declaration.h"
 #include "modules/perception/fusion/base/sensor_frame.h"
@@ -64,6 +66,8 @@ class Sensor : public std::enable_shared_from_this<Sensor> {
   }
 
  private:
+  FRIEND_TEST(SensorTest, test);
+
   inline SensorPtr GetPtr() { return shared_from_this(); }
 
  private:
