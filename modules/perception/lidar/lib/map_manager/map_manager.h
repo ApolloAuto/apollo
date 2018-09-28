@@ -17,6 +17,9 @@
 #define MODULES_PERCEPTION_LIDAR_LIB_MAP_MANAGER_MAP_MANAGER_H_
 
 #include <string>
+
+#include "gtest/gtest_prod.h"
+
 #include "modules/perception/base/hdmap_struct.h"
 #include "modules/perception/lidar/common/lidar_frame.h"
 #include "modules/perception/map/hdmap/hdmap_input.h"
@@ -54,6 +57,8 @@ class MapManager {
   // params
   bool update_pose_ = false;
   double roi_search_distance_ = 80.0;
+
+  FRIEND_TEST(LidarLibMapManagerTest, lidar_map_manager_test);
 };  // class MapManager
 
 }  // namespace lidar

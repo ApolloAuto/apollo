@@ -14,9 +14,12 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/perception/lidar/lib/map_manager/map_manager.h"
+
 #include "cybertron/common/log.h"
-#include "modules/common/util/file.h"
+
 #include "modules/perception/proto/map_manager_config.pb.h"
+
+#include "modules/common/util/file.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lib/io/file_util.h"
 
