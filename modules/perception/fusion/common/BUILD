@@ -80,4 +80,17 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "kalman_filter_test",
+    size = "small",
+    srcs = [
+        "kalman_filter_test.cc",
+    ],
+    deps = [
+        ":kalman_filter",
+        "//modules/perception/fusion/base",
+        "@gtest//:main",
+    ],
+)
+
 cpplint()
