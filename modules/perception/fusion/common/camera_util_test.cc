@@ -58,7 +58,9 @@ TEST(CameraUtilTest, test_object_in_camera_view_and_is_behind_camera) {
   lidar_sensor->AddFrame(lidar_frame);
 
   SensorFramePtr lidar_sensor_frame(new SensorFrame());
-  lidar_sensor_frame->Initialize(lidar_frame, lidar_sensor);
+  lidar_sensor_frame->Initialize(lidar_frame,
+                                 lidar_sensor->GetSensorId(),
+                                 lidar_sensor->GetSensorType());
   SensorObjectPtr lidar_sensor_object(
       new SensorObject(base_lidar_object, lidar_sensor_frame));
 

@@ -27,6 +27,19 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "camera_util_test",
+    size = "small",
+    srcs = [
+        "camera_util_test.cc",
+    ],
+    deps = [
+        ":camera_util",
+        "//modules/perception/fusion/base",
+        "@gtest//:main",
+    ],
+)
+
 cc_library(
     name = "dst_evidence",
     srcs = [
