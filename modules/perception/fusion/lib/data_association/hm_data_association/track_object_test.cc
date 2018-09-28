@@ -16,7 +16,7 @@
 
 #include "modules/perception/fusion/lib/data_association/hm_data_association/hm_tracks_objects_match.h"
 
-#include <gtest/gtest.h>
+#include "gtest/gtest.h"
 
 #include "modules/perception/base/frame.h"
 #include "modules/perception/common/sensor_manager/sensor_manager.h"
@@ -170,8 +170,8 @@ TEST(MatcherTest, test_all) {
   EXPECT_FLOAT_EQ(association_mat[2][1], 4.0);
   unassigned_tracks.clear();
   unassigned_measurements.clear();
-  std::vector<TrackMeasurmentPair> assignments; 
-  //test id assign with do_nothing equals to true 
+  std::vector<TrackMeasurmentPair> assignments;
+  //test id assign with do_nothing equals to true
   matcher.IdAssign(fusion_tracks, sensor_objects, &assignments,
                    &unassigned_tracks, &unassigned_measurements, true);
   EXPECT_EQ(0, assignments.size());
