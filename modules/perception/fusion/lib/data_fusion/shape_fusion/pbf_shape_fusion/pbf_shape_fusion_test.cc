@@ -13,35 +13,46 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include <gtest/gtest.h>
+
 #include "modules/perception/fusion/lib/data_fusion/shape_fusion/pbf_shape_fusion/pbf_shape_fusion.h"
+
+#include <memory>
+#include "gtest/gtest.h"
+
+#include "modules/perception/common/perception_gflags.h"
+#include "modules/perception/fusion/base/sensor_frame.h"
+#include "modules/perception/base/sensor_meta.h"
 
 namespace apollo {
 namespace perception {
 namespace fusion {
-
 const double SHAPE_FUSION_PI = 3.1415926;
 
+using SensorInfoPtr = std::shared_ptr<perception::base::SensorInfo>;
+using apollo::perception::fusion::SensorFrame;
+using SensorFramePtr = std::shared_ptr<SensorFrame>;
+using FramePtr = std::shared_ptr<perception::base::Frame>;
+
 TEST(PbfShapeFusion, lidar_track) {
-  FLAGS_work_root = "/apollo/modules/perception/testdata/"
-      "fusion/pbf_shape_fusion";
+  FLAGS_work_root =
+      "/apollo/modules/perception/testdata/fusion/pbf_shape_fusion";
   FLAGS_obs_sensor_meta_path = "./data/sensor_meta.pt";
-  FLAGS_obs_sensor_intrinsic_path = "/apollo/modules/perception/testdata/"
-      "fusion/pbf_shape_fusion/params";
+  FLAGS_obs_sensor_intrinsic_path =
+      "/apollo/modules/perception/testdata/fusion/pbf_shape_fusion/params";
   Eigen::Matrix4d pose;
   pose << 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1;
 
-  base::SensorInfoPtr lidar_sensor_info(new base::SensorInfo);
+  SensorInfoPtr lidar_sensor_info(new base::SensorInfo);
   lidar_sensor_info->type = base::SensorType::VELODYNE_64;
   lidar_sensor_info->name = "VELODYNE_64";
   SensorPtr lidar_sensor(new Sensor(*lidar_sensor_info));
 
-  base::SensorInfoPtr radar_sensor_info(new base::SensorInfo);
+  SensorInfoPtr radar_sensor_info(new base::SensorInfo);
   radar_sensor_info->type = base::SensorType::LONG_RANGE_RADAR;
   radar_sensor_info->name = "LONG_RANGE_RADAR";
   SensorPtr radar_sensor(new Sensor(*radar_sensor_info));
 
-  base::SensorInfoPtr camera_sensor_info(new base::SensorInfo);
+  SensorInfoPtr camera_sensor_info(new base::SensorInfo);
   camera_sensor_info->type = base::SensorType::MONOCULAR_CAMERA;
   camera_sensor_info->name = "MONOCULAR_CAMERA";
   SensorPtr camera_sensor(new Sensor(*camera_sensor_info));
@@ -56,14 +67,15 @@ TEST(PbfShapeFusion, lidar_track) {
   std::vector<base::ObjectPtr> lidar_track_objects;
   lidar_track_objects.push_back(base_track_lidar);
 
-  base::FramePtr lidar_track_frame(new base::Frame);
+  FramePtr lidar_track_frame(new base::Frame);
   lidar_track_frame->sensor_info = *lidar_sensor_info;
   lidar_track_frame->timestamp = 151192277.124567989;
   lidar_track_frame->sensor2world_pose = pose;
   lidar_track_frame->objects = lidar_track_objects;
 
   SensorFramePtr lidar_sensor_frame(new SensorFrame);
-  lidar_sensor_frame->Initialize(lidar_track_frame, lidar_sensor);
+  lidar_sensor_frame->Initialize(lidar_track_frame,
+      lidar_sensor->GetSensorId(), lidar_sensor->GetSensorType());
   SensorObjectPtr lidar_obj(
       new SensorObject(base_track_lidar, lidar_sensor_frame));
   TrackPtr lidar_track(new Track());
@@ -78,14 +90,15 @@ TEST(PbfShapeFusion, lidar_track) {
   std::vector<base::ObjectPtr> lidar_objects;
   lidar_objects.push_back(base_object_lidar);
 
-  base::FramePtr lidar_frame(new base::Frame);
+  FramePtr lidar_frame(new base::Frame);
   lidar_frame->sensor_info = *lidar_sensor_info;
   lidar_frame->timestamp = 151192277.124567989;
   lidar_frame->sensor2world_pose = pose;
   lidar_frame->objects = lidar_objects;
 
   SensorFramePtr lidar_sensor_frame_2(new SensorFrame);
-  lidar_sensor_frame_2->Initialize(lidar_frame, lidar_sensor);
+  lidar_sensor_frame_2->Initialize(lidar_frame,
+      lidar_sensor->GetSensorId(), lidar_sensor->GetSensorType());
   SensorObjectPtr lidar_measurement(
       new SensorObject(base_object_lidar, lidar_sensor_frame_2));
   // radar measurment
@@ -98,14 +111,15 @@ TEST(PbfShapeFusion, lidar_track) {
   std::vector<base::ObjectPtr> radar_objects;
   radar_objects.push_back(base_object_radar);
 
-  base::FramePtr radar_frame(new base::Frame);
+  FramePtr radar_frame(new base::Frame);
   radar_frame->sensor_info = *radar_sensor_info;
   radar_frame->timestamp = 151192277.124567989;
   radar_frame->sensor2world_pose = pose;
   radar_frame->objects = radar_objects;
 
   SensorFramePtr radar_sensor_frame(new SensorFrame);
-  radar_sensor_frame->Initialize(radar_frame, radar_sensor);
+  radar_sensor_frame->Initialize(radar_frame,
+      radar_sensor->GetSensorId(), radar_sensor->GetSensorType());
   SensorObjectPtr radar_measurement(
       new SensorObject(base_object_radar, radar_sensor_frame));
   // camera measurment
@@ -118,14 +132,15 @@ TEST(PbfShapeFusion, lidar_track) {
   std::vector<base::ObjectPtr> camera_objects;
   camera_objects.push_back(base_object_camera);
 
-  base::FramePtr camera_frame(new base::Frame);
+  FramePtr camera_frame(new base::Frame);
   camera_frame->sensor_info = *camera_sensor_info;
   camera_frame->timestamp = 151192277.124567989;
   camera_frame->sensor2world_pose = pose;
   camera_frame->objects = camera_objects;
 
   SensorFramePtr camera_sensor_frame(new SensorFrame);
-  camera_sensor_frame->Initialize(camera_frame, camera_sensor);
+  camera_sensor_frame->Initialize(camera_frame,
+      camera_sensor->GetSensorId(), camera_sensor->GetSensorType());
   SensorObjectPtr camera_measurement(
       new SensorObject(base_object_camera, camera_sensor_frame));
 
@@ -157,30 +172,30 @@ TEST(PbfShapeFusion, lidar_track) {
 }
 
 TEST(PbfShapeFusion, radar_track) {
-  FLAGS_work_root = "/apollo/modules/perception/testdata/"
-      "fusion/pbf_shape_fusion";
+  FLAGS_work_root =
+      "/apollo/modules/perception/testdata/fusion/pbf_shape_fusion";
   FLAGS_obs_sensor_meta_path = "./conf/sensor_meta.config";
-  FLAGS_obs_sensor_intrinsic_path = "/apollo/modules/perception/testdata/"
-      "fusion/pbf_shape_fusion/params";
+  FLAGS_obs_sensor_intrinsic_path =
+      "/apollo/modules/perception/testdata/fusion/pbf_shape_fusion/params";
   Eigen::Matrix4d pose;
   pose << 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1;
 
-  base::SensorInfoPtr lidar_sensor_info(new base::SensorInfo);
+  SensorInfoPtr lidar_sensor_info(new base::SensorInfo);
   lidar_sensor_info->type = base::SensorType::VELODYNE_64;
   lidar_sensor_info->name = "VELODYNE_64";
   SensorPtr lidar_sensor(new Sensor(*lidar_sensor_info));
 
-  base::SensorInfoPtr radar_sensor_info(new base::SensorInfo);
+  SensorInfoPtr radar_sensor_info(new base::SensorInfo);
   radar_sensor_info->type = base::SensorType::LONG_RANGE_RADAR;
   radar_sensor_info->name = "LONG_RANGE_RADAR";
   SensorPtr radar_sensor(new Sensor(*radar_sensor_info));
 
-  base::SensorInfoPtr camera_sensor_info(new base::SensorInfo);
+  SensorInfoPtr camera_sensor_info(new base::SensorInfo);
   camera_sensor_info->type = base::SensorType::MONOCULAR_CAMERA;
   camera_sensor_info->name = "MONOCULAR_CAMERA";
   SensorPtr camera_sensor(new Sensor(*camera_sensor_info));
 
-  base::SensorInfoPtr unknown_sensor_info(new base::SensorInfo);
+  SensorInfoPtr unknown_sensor_info(new base::SensorInfo);
   unknown_sensor_info->type = base::SensorType::MONOCULAR_CAMERA;
   unknown_sensor_info->name = "UNKNOWN_SENSOR_TYPE";
   SensorPtr unknown_sensor(new Sensor(*unknown_sensor_info));
@@ -195,14 +210,15 @@ TEST(PbfShapeFusion, radar_track) {
   std::vector<base::ObjectPtr> radar_track_objects;
   radar_track_objects.push_back(base_track_radar);
 
-  base::FramePtr radar_track_frame(new base::Frame);
+  FramePtr radar_track_frame(new base::Frame);
   radar_track_frame->sensor_info = *radar_sensor_info;
   radar_track_frame->timestamp = 151192277.124567989;
   radar_track_frame->sensor2world_pose = pose;
   radar_track_frame->objects = radar_track_objects;
 
   SensorFramePtr radar_sensor_frame(new SensorFrame);
-  radar_sensor_frame->Initialize(radar_track_frame, radar_sensor);
+  radar_sensor_frame->Initialize(radar_track_frame,
+      radar_sensor->GetSensorId(), radar_sensor->GetSensorType());
   SensorObjectPtr radar_obj(
       new SensorObject(base_track_radar, radar_sensor_frame));
   TrackPtr radar_track(new Track());
@@ -218,14 +234,15 @@ TEST(PbfShapeFusion, radar_track) {
   std::vector<base::ObjectPtr> lidar_objects;
   lidar_objects.push_back(base_object_lidar);
 
-  base::FramePtr lidar_frame(new base::Frame);
+  FramePtr lidar_frame(new base::Frame);
   lidar_frame->sensor_info = *lidar_sensor_info;
   lidar_frame->timestamp = 151192277.124567989;
   lidar_frame->sensor2world_pose = pose;
   lidar_frame->objects = lidar_objects;
 
   SensorFramePtr lidar_sensor_frame(new SensorFrame);
-  lidar_sensor_frame->Initialize(lidar_frame, lidar_sensor);
+  lidar_sensor_frame->Initialize(lidar_frame,
+      lidar_sensor->GetSensorId(), lidar_sensor->GetSensorType());
   SensorObjectPtr lidar_measurement(
       new SensorObject(base_object_lidar, lidar_sensor_frame));
   // radar measurment
@@ -238,14 +255,15 @@ TEST(PbfShapeFusion, radar_track) {
   std::vector<base::ObjectPtr> radar_objects;
   radar_objects.push_back(base_object_radar);
 
-  base::FramePtr radar_frame(new base::Frame);
+  FramePtr radar_frame(new base::Frame);
   radar_frame->sensor_info = *radar_sensor_info;
   radar_frame->timestamp = 151192277.124567989;
   radar_frame->sensor2world_pose = pose;
   radar_frame->objects = radar_objects;
 
   SensorFramePtr radar_sensor_frame_2(new SensorFrame);
-  radar_sensor_frame_2->Initialize(radar_frame, radar_sensor);
+  radar_sensor_frame_2->Initialize(radar_frame,
+      radar_sensor->GetSensorId(), radar_sensor->GetSensorType());
   SensorObjectPtr radar_measurement(
       new SensorObject(base_object_radar, radar_sensor_frame_2));
   // camera measurment
@@ -258,14 +276,15 @@ TEST(PbfShapeFusion, radar_track) {
   std::vector<base::ObjectPtr> camera_objects;
   camera_objects.push_back(base_object_camera);
 
-  base::FramePtr camera_frame(new base::Frame);
+  FramePtr camera_frame(new base::Frame);
   camera_frame->sensor_info = *camera_sensor_info;
   camera_frame->timestamp = 151192277.124567989;
   camera_frame->sensor2world_pose = pose;
   camera_frame->objects = camera_objects;
 
   SensorFramePtr camera_sensor_frame(new SensorFrame);
-  camera_sensor_frame->Initialize(camera_frame, camera_sensor);
+  camera_sensor_frame->Initialize(camera_frame,
+      camera_sensor->GetSensorId(), camera_sensor->GetSensorType());
   SensorObjectPtr camera_measurement(
       new SensorObject(base_object_camera, camera_sensor_frame));
   // unknown measurment
@@ -278,14 +297,15 @@ TEST(PbfShapeFusion, radar_track) {
   std::vector<base::ObjectPtr> unknown_objects;
   unknown_objects.push_back(base_object_unknown);
 
-  base::FramePtr unknown_frame(new base::Frame);
+  FramePtr unknown_frame(new base::Frame);
   unknown_frame->sensor_info = *unknown_sensor_info;
   unknown_frame->timestamp = 151192277.124567989;
   unknown_frame->sensor2world_pose = pose;
   unknown_frame->objects = unknown_objects;
 
   SensorFramePtr unknown_sensor_frame(new SensorFrame);
-  unknown_sensor_frame->Initialize(unknown_frame, unknown_sensor);
+  unknown_sensor_frame->Initialize(unknown_frame,
+      unknown_sensor->GetSensorId(), unknown_sensor->GetSensorType());
   SensorObjectPtr unknown_measurement(
       new SensorObject(base_object_unknown, unknown_sensor_frame));
 
@@ -333,25 +353,25 @@ TEST(PbfShapeFusion, radar_track) {
 }
 
 TEST(PbfShapeFusion, camera_track) {
-  FLAGS_work_root = "/apollo/modules/perception/testdata/"
-      "fusion/pbf_shape_fusion";
+  FLAGS_work_root =
+      "/apollo/modules/perception/testdata/fusion/pbf_shape_fusion";
   FLAGS_obs_sensor_meta_path = "./conf/sensor_meta.config";
-  FLAGS_obs_sensor_intrinsic_path = "/apollo/modules/perception/testdata/"
-      "fusion/pbf_shape_fusion/params";
+  FLAGS_obs_sensor_intrinsic_path =
+      "/apollo/modules/perception/testdata/fusion/pbf_shape_fusion/params";
   Eigen::Matrix4d pose;
   pose << 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1;
 
-  base::SensorInfoPtr lidar_sensor_info(new base::SensorInfo);
+  SensorInfoPtr lidar_sensor_info(new base::SensorInfo);
   lidar_sensor_info->type = base::SensorType::VELODYNE_64;
   lidar_sensor_info->name = "VELODYNE_64";
   SensorPtr lidar_sensor(new Sensor(*lidar_sensor_info));
 
-  base::SensorInfoPtr radar_sensor_info(new base::SensorInfo);
+  SensorInfoPtr radar_sensor_info(new base::SensorInfo);
   radar_sensor_info->type = base::SensorType::LONG_RANGE_RADAR;
   radar_sensor_info->name = "LONG_RANGE_RADAR";
   SensorPtr radar_sensor(new Sensor(*radar_sensor_info));
 
-  base::SensorInfoPtr camera_sensor_info(new base::SensorInfo);
+  SensorInfoPtr camera_sensor_info(new base::SensorInfo);
   camera_sensor_info->type = base::SensorType::MONOCULAR_CAMERA;
   camera_sensor_info->name = "MONOCULAR_CAMERA";
   SensorPtr camera_sensor(new Sensor(*camera_sensor_info));
@@ -366,14 +386,15 @@ TEST(PbfShapeFusion, camera_track) {
   std::vector<base::ObjectPtr> camera_track_objects;
   camera_track_objects.push_back(base_track_camera);
 
-  base::FramePtr camera_track_frame(new base::Frame);
+  FramePtr camera_track_frame(new base::Frame);
   camera_track_frame->sensor_info = *camera_sensor_info;
   camera_track_frame->timestamp = 151192277.124567989;
   camera_track_frame->sensor2world_pose = pose;
   camera_track_frame->objects = camera_track_objects;
 
   SensorFramePtr camera_sensor_frame(new SensorFrame);
-  camera_sensor_frame->Initialize(camera_track_frame, camera_sensor);
+  camera_sensor_frame->Initialize(camera_track_frame,
+      camera_sensor->GetSensorId(), camera_sensor->GetSensorType());
   SensorObjectPtr camera_obj(
       new SensorObject(base_track_camera, camera_sensor_frame));
   TrackPtr camera_track(new Track());
@@ -389,14 +410,15 @@ TEST(PbfShapeFusion, camera_track) {
   std::vector<base::ObjectPtr> lidar_objects;
   lidar_objects.push_back(base_object_lidar);
 
-  base::FramePtr lidar_frame(new base::Frame);
+  FramePtr lidar_frame(new base::Frame);
   lidar_frame->sensor_info = *lidar_sensor_info;
   lidar_frame->timestamp = 151192277.124567989;
   lidar_frame->sensor2world_pose = pose;
   lidar_frame->objects = lidar_objects;
 
   SensorFramePtr lidar_sensor_frame(new SensorFrame);
-  lidar_sensor_frame->Initialize(lidar_frame, lidar_sensor);
+  lidar_sensor_frame->Initialize(lidar_frame,
+      lidar_sensor->GetSensorId(), lidar_sensor->GetSensorType());
   SensorObjectPtr lidar_measurement(
       new SensorObject(base_object_lidar, lidar_sensor_frame));
   // radar measurment
@@ -409,24 +431,26 @@ TEST(PbfShapeFusion, camera_track) {
   std::vector<base::ObjectPtr> radar_objects;
   radar_objects.push_back(base_object_radar);
 
-  base::FramePtr radar_frame(new base::Frame);
+  FramePtr radar_frame(new base::Frame);
   radar_frame->sensor_info = *radar_sensor_info;
   radar_frame->timestamp = 151192277.124567989;
   radar_frame->sensor2world_pose = pose;
   radar_frame->objects = radar_objects;
 
   SensorFramePtr radar_sensor_frame(new SensorFrame);
-  radar_sensor_frame->Initialize(radar_frame, radar_sensor);
+  radar_sensor_frame->Initialize(radar_frame,
+      radar_sensor->GetSensorId(), radar_sensor->GetSensorType());
   SensorObjectPtr radar_measurement(
       new SensorObject(base_object_radar, radar_sensor_frame));
-  base::FramePtr radar_frame_2(new base::Frame);
+  FramePtr radar_frame_2(new base::Frame);
   radar_frame_2->sensor_info = *radar_sensor_info;
   radar_frame_2->timestamp = 151192278.124567989;
   radar_frame_2->sensor2world_pose = pose;
   radar_frame_2->objects = radar_objects;
 
   SensorFramePtr radar_sensor_frame_2(new SensorFrame);
-  radar_sensor_frame_2->Initialize(radar_frame_2, radar_sensor);
+  radar_sensor_frame_2->Initialize(radar_frame_2,
+      radar_sensor->GetSensorId(), radar_sensor->GetSensorType());
   SensorObjectPtr radar_measurement_2(
       new SensorObject(base_object_radar, radar_sensor_frame_2));
   // camera measurment
@@ -439,14 +463,15 @@ TEST(PbfShapeFusion, camera_track) {
   std::vector<base::ObjectPtr> camera_objects;
   camera_objects.push_back(base_object_camera);
 
-  base::FramePtr camera_frame(new base::Frame);
+  FramePtr camera_frame(new base::Frame);
   camera_frame->sensor_info = *camera_sensor_info;
   camera_frame->timestamp = 151192277.124567989;
   camera_frame->sensor2world_pose = pose;
   camera_frame->objects = camera_objects;
 
   SensorFramePtr camera_sensor_frame_2(new SensorFrame);
-  camera_sensor_frame_2->Initialize(camera_frame, camera_sensor);
+  camera_sensor_frame_2->Initialize(camera_frame,
+      camera_sensor->GetSensorId(), camera_sensor->GetSensorType());
   SensorObjectPtr camera_measurement(
       new SensorObject(base_object_camera, camera_sensor_frame_2));
 
