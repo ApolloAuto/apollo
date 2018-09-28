@@ -15,6 +15,7 @@
  *****************************************************************************/
 #include "modules/perception/fusion/lib/data_fusion/tracker/pbf_tracker/pbf_tracker.h"
 
+#include "modules/common/util/file.h"
 #include "modules/common/time/time_util.h"
 #include "modules/perception/fusion/lib/data_fusion/existance_fusion/dst_existance_fusion/dst_existance_fusion.h"
 #include "modules/perception/fusion/lib/data_fusion/motion_fusion/kalman_motion_fusion/kalman_motion_fusion.h"
@@ -22,7 +23,6 @@
 #include "modules/perception/fusion/lib/data_fusion/type_fusion/dst_type_fusion/dst_type_fusion.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lib/io/file_util.h"
-#include "modules/perception/lib/io/protobuf_util.h"
 
 namespace apollo {
 namespace perception {
@@ -54,7 +54,8 @@ bool PbfTracker::InitParams() {
       lib::FileUtil::GetAbsolutePath(woork_root_config, options.conf_file);
   AINFO << "Config file : " << config;
   PbfTrackerConfig params;
-  if (!lib::ParseProtobufFromFile<PbfTrackerConfig>(config, &params)) {
+  if (!apollo::common::util::GetProtoFromFile<PbfTrackerConfig>(
+      config, &params)) {
     AERROR << "Read config failed: " << config;
     return false;
   }

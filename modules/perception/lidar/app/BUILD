@@ -45,9 +45,9 @@ cc_library(
     ],
     deps = [
         "//framework:cybertron",
+        "//modules/common/util",
         "//modules/perception/base",
         "//modules/perception/lib/config_manager",
-        "//modules/perception/lib/io:protobuf_util",
         "//modules/perception/lib/utils",
         "//modules/perception/lidar/app/proto:app_proto",
         "//modules/perception/lidar/common",

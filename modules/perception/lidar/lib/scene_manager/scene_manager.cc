@@ -15,13 +15,12 @@
  *****************************************************************************/
 #include "modules/perception/lidar/lib/scene_manager/scene_manager.h"
 
-#include "modules/perception/lidar/lib/scene_manager/proto/scene_manager_config.pb.h"
-#include "modules/perception/proto/perception_config_schema.pb.h"
-
+#include "modules/common/util/file.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lib/io/file_util.h"
-#include "modules/perception/lib/io/protobuf_util.h"
+#include "modules/perception/lidar/lib/scene_manager/proto/scene_manager_config.pb.h"
 #include "modules/perception/lidar/lib/scene_manager/scene_service.h"
+#include "modules/perception/proto/perception_config_schema.pb.h"
 
 namespace apollo {
 namespace perception {
@@ -44,7 +43,7 @@ bool SceneManager::InitInternal(const SceneManagerInitOptions& options) {
   config_file =
       lib::FileUtil::GetAbsolutePath(config_file, "scene_manager.conf");
   SceneManagerConfig config;
-  CHECK(lib::ParseProtobufFromFile(config_file, &config));
+  CHECK(apollo::common::util::GetProtoFromFile(config_file, &config));
   services_.clear();
   for (int i = 0; i < config.service_name_size(); ++i) {
     const auto& name = config.service_name(i);

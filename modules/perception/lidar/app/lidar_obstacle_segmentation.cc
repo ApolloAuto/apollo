@@ -14,9 +14,10 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/perception/lidar/app/lidar_obstacle_segmentation.h"
+
+#include "modules/common/util/file.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lib/io/file_util.h"
-#include "modules/perception/lib/io/protobuf_util.h"
 #include "modules/perception/lib/utils/perf.h"
 #include "modules/perception/lidar/app/proto/lidar_obstacle_segmentation_config.pb.h"
 #include "modules/perception/lidar/common/lidar_log.h"
@@ -43,7 +44,7 @@ bool LidarObstacleSegmentation::Init(
       config_file, "lidar_obstacle_segmentation.conf");
 
   LidarObstacleSegmentationConfig config;
-  CHECK(lib::ParseProtobufFromFile(config_file, &config));
+  CHECK(apollo::common::util::GetProtoFromFile(config_file, &config));
   segmentor_name_ = config.segmentor();
   use_map_manager_ = config.use_map_manager();
   use_object_filter_bank_ = config.use_object_filter_bank();

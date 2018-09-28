@@ -18,10 +18,10 @@
 #include <cfloat>
 #include <limits>
 
+#include "modules/common/util/file.h"
 #include "modules/perception/common/i_lib/geometry/i_plane.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lib/io/file_util.h"
-#include "modules/perception/lib/io/protobuf_util.h"
 #include "modules/perception/lidar/lib/scene_manager/ground_service/proto/ground_service_config.pb.h"
 
 namespace apollo {
@@ -155,8 +155,8 @@ bool GroundService::Init(const SceneServiceInitOptions& options) {
       lib::FileUtil::GetAbsolutePath(config_file, "ground_service.conf");
 
   GroundServiceConfig config_params;
-  CHECK(lib::ParseProtobufFromFile<GroundServiceConfig>(config_file,
-                                                        &config_params))
+  CHECK(apollo::common::util::GetProtoFromFile<GroundServiceConfig>(
+      config_file, &config_params))
       << "Failed to parse GroundServiceConfig config file.";
 
   double roi_region_rad_x = config_params.roi_rad_x();

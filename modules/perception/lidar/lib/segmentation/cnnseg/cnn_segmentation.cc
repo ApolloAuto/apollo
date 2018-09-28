@@ -19,10 +19,10 @@
 
 #include "modules/perception/lidar/lib/segmentation/cnnseg/proto/cnnseg_config.pb.h"
 
+#include "modules/common/util/file.h"
 #include "modules/perception/base/object_pool_types.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lib/io/file_util.h"
-#include "modules/perception/lib/io/protobuf_util.h"
 #include "modules/perception/lidar/common/lidar_point_label.h"
 #include "modules/perception/lidar/common/lidar_timer.h"
 #include "modules/perception/lidar/lib/segmentation/cnnseg/cnn_segmentation.h"
@@ -50,9 +50,10 @@ bool CNNSegmentation::Init(const SegmentationInitOptions& options) {
   AINFO << "--    engine_file: " << engine_file;
 
   // get cnnseg params
-  CHECK(lib::ParseProtobufFromFile<CNNSegParam>(param_file, &cnnseg_param_))
+  CHECK(apollo::common::util::GetProtoFromFile<CNNSegParam>(
+      param_file, &cnnseg_param_))
       << "Failed to parse CNNSegParam config file." << param_file;
-  CHECK(lib::ParseProtobufFromFile<SppEngineConfig>(engine_file,
+  CHECK(apollo::common::util::GetProtoFromFile<SppEngineConfig>(engine_file,
                                                     &spp_engine_config_))
       << "Failed to parse SppEngine config file." << engine_file;
 
@@ -434,7 +435,7 @@ bool CNNSegmentation::GetConfigs(std::string* param_file,
   config_file = lib::FileUtil::GetAbsolutePath(config_file, "cnnseg.conf");
 
   CNNSegConfig config;
-  CHECK(lib::ParseProtobufFromFile(config_file, &config))
+  CHECK(apollo::common::util::GetProtoFromFile(config_file, &config))
       << "Failed to parse CNNSeg config file";
   *param_file = lib::FileUtil::GetAbsolutePath(work_root, config.param_file());
   *proto_file = lib::FileUtil::GetAbsolutePath(work_root, config.proto_file());

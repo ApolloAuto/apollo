@@ -14,10 +14,14 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/perception/fusion/lib/fusion_system/probabilistic_fusion/probabilistic_fusion.h"
-#include <iomanip>
 
 #include <gflags/gflags.h>
 
+#include <iomanip>
+#include <map>
+#include <utility>
+
+#include "modules/common/util/file.h"
 #include "modules/common/time/time_util.h"
 #include "modules/perception/base/object_pool_types.h"
 #include "modules/perception/fusion/base/base_init_options.h"
@@ -29,7 +33,6 @@
 #include "modules/perception/fusion/lib/gatekeeper/pbf_gatekeeper/pbf_gatekeeper.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lib/io/file_util.h"
-#include "modules/perception/lib/io/protobuf_util.h"
 #include "modules/perception/lib/utils/perf.h"
 #include "modules/perception/proto/probabilistic_fusion_config.pb.h"
 
@@ -59,7 +62,8 @@ bool ProbabilisticFusion::Init(const FusionInitOptions& init_options) {
       lib::FileUtil::GetAbsolutePath(woork_root_config, options.conf_file);
   ProbabilisticFusionConfig params;
 
-  if (!lib::ParseProtobufFromFile<ProbabilisticFusionConfig>(config, &params)) {
+  if (!apollo::common::util::GetProtoFromFile<ProbabilisticFusionConfig>(
+      config, &params)) {
     AERROR << "Read config failed: " << config;
     return false;
   }

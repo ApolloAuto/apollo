@@ -14,15 +14,18 @@
  * limitations under the License.
  *****************************************************************************/
 #include <gtest/gtest.h>
-#include "modules/perception/fusion/lib/data_fusion/tracker/pbf_tracker/pbf_tracker.h"
-#include "modules/perception/base/sensor_meta.h"
+
 #define private public
 #define protected public
+#include "modules/perception/fusion/lib/data_fusion/tracker/pbf_tracker/pbf_tracker.h"
+#include "modules/perception/base/sensor_meta.h"
 #include "modules/perception/fusion/lib/fusion_system/probabilistic_fusion/probabilistic_fusion.h"
 
 namespace apollo {
 namespace perception {
 namespace fusion {
+
+using apollo::perception::base::SensorInfo;
 
 TEST(ProbabliticFusionTest, test_init) {
   FLAGS_work_root = "/apollo/modules/perception/testdata/"
@@ -41,15 +44,15 @@ TEST(ProbabliticFusionTest, test_init) {
   EXPECT_EQ(pf.Name(), "ProbabilisticFusion");
 
   // sensor info
-  base::SensorInfoPtr sensor_info(new base::SensorInfo);
+  std::shared_ptr<SensorInfo> sensor_info(new base::SensorInfo);
   sensor_info->type = base::SensorType::VELODYNE_64;
   sensor_info->name = "velodyne64";
   // radar_sensor_info
-  base::SensorInfoPtr radar_sensor_info(new base::SensorInfo);
+  std::shared_ptr<SensorInfo> radar_sensor_info(new base::SensorInfo);
   radar_sensor_info->type = base::SensorType::LONG_RANGE_RADAR;
   radar_sensor_info->name = "LONG_RANGE_RADAR";
   // camera_sensor_info
-  base::SensorInfoPtr camera_sensor_info(new base::SensorInfo);
+  std::shared_ptr<SensorInfo> camera_sensor_info(new base::SensorInfo);
   camera_sensor_info->type = base::SensorType::MONOCULAR_CAMERA;
   camera_sensor_info->name = "MONOCULAR_CAMERA";
 
@@ -109,7 +112,7 @@ TEST(ProbabliticFusionTest, test_update) {
   EXPECT_EQ(pf.Name(), "ProbabilisticFusion");
 
   // sensor info
-  base::SensorInfoPtr sensor_info(new base::SensorInfo);
+  std::shared_ptr<SensorInfo> sensor_info(new base::SensorInfo);
   sensor_info->type = base::SensorType::VELODYNE_64;
   sensor_info->name = "velodyne64";
 
@@ -260,15 +263,15 @@ TEST(ProbabilisticFusionTest, test_collect_sensor_measurement) {
   EXPECT_EQ(pf.Name(), "ProbabilisticFusion");
 
   // sensor info
-  base::SensorInfoPtr sensor_info(new base::SensorInfo);
+  std::shared_ptr<SensorInfo> sensor_info(new base::SensorInfo);
   sensor_info->type = base::SensorType::VELODYNE_64;
   sensor_info->name = "velodyne64";
   // radar_sensor_info
-  base::SensorInfoPtr radar_sensor_info(new base::SensorInfo);
+  std::shared_ptr<SensorInfo> radar_sensor_info(new base::SensorInfo);
   radar_sensor_info->type = base::SensorType::LONG_RANGE_RADAR;
   radar_sensor_info->name = "LONG_RANGE_RADAR";
   // camera_sensor_info
-  base::SensorInfoPtr camera_sensor_info(new base::SensorInfo);
+  std::shared_ptr<SensorInfo> camera_sensor_info(new base::SensorInfo);
   camera_sensor_info->type = base::SensorType::MONOCULAR_CAMERA;
   camera_sensor_info->name = "MONOCULAR_CAMERA";
 

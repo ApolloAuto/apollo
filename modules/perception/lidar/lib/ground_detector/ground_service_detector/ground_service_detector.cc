@@ -16,9 +16,9 @@
 
 #include "modules/perception/lidar/lib/ground_detector/ground_service_detector/ground_service_detector.h"
 
+#include "modules/common/util/file.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lib/io/file_util.h"
-#include "modules/perception/lib/io/protobuf_util.h"
 #include "modules/perception/lidar/common/lidar_point_label.h"
 #include "modules/perception/lidar/lib/ground_detector/ground_service_detector/proto/ground_service_detector_config.pb.h"
 
@@ -44,7 +44,7 @@ bool GroundServiceDetector::Init(const GroundDetectorInitOptions& options) {
                                                "ground_service_detector.conf");
 
   GroundServiceDetectorConfig config;
-  CHECK(lib::ParseProtobufFromFile(config_file, &config));
+  CHECK(apollo::common::util::GetProtoFromFile(config_file, &config));
   ground_threshold_ = config.ground_threshold();
 
   ground_service_ = std::dynamic_pointer_cast<GroundService>(

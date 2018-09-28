@@ -13,10 +13,10 @@ cc_library(
     deps = [
         "@eigen",
         "//framework:cybertron",
+        "//modules/common/util",        
         "//modules/perception/base:base_type",
         "//modules/perception/lib/config_manager",
         "//modules/perception/lib/io:file_util",
-        "//modules/perception/lib/io:protobuf_util",
         "//modules/perception/lib/singleton",
         "//modules/perception/lib/thread",
         "//modules/perception/lidar/common:lidar_frame",
