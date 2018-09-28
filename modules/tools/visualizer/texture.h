@@ -44,6 +44,7 @@ class Texture {
   GLsizei data_size(void) const { return data_size_; }
 
   bool UpdateData(const QImage& img);
+  bool UpdateData(const std::shared_ptr<const apollo::drivers::Image>&);
   const GLubyte* data(void) const { return data_; }
 
  private:

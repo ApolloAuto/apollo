@@ -50,3 +50,28 @@ bool Texture::UpdateData(const QImage &img) {
   texture_format_ = GL_RGBA;
   return true;
 }
+bool Texture::UpdateData(const std::shared_ptr<const apollo::drivers::Image>& imgData){
+    std::size_t imgSize = imgData->data().size();
+    if (static_cast<std::size_t>(data_size_) < imgSize) {
+      if (!data_) {
+        delete[] data_;
+      }
+
+      data_ = new GLubyte[imgSize];
+      if (data_ == nullptr) {
+        data_size_ = 0;
+        return false;
+      }
+      data_size_ = imgSize;
+      is_size_changed_ = true;
+    }
+
+    memcpy(data_, imgData->data().c_str(), imgSize);
+    is_dirty_ = true;
+
+    image_width_ = imgData->width();
+    image_height_ = imgData->height();
+
+    texture_format_ = GL_RGB;
+    return true;
+}

@@ -96,7 +96,7 @@ class MainWindow : public QMainWindow {
   void PointCloudReaderCallback(
       const std::shared_ptr<const apollo::drivers::PointCloud>& pdata);
   void ImageReaderCallback(
-      const std::shared_ptr<const apollo::drivers::CompressedImage>& imgData,
+      const std::shared_ptr<const apollo::drivers::Image>& imgData,
       VideoImgProxy* proxy);
 
   void InsertAllChannelNames(void);

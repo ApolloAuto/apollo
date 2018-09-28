@@ -21,8 +21,7 @@ out vec4 FragColor;
 
 uniform sampler2D texture;
 
-void main(void)
-{
+void main(void) {
     vec4 v4 = texture2D(texture, TexCoord);
-    FragColor = vec4(v4.bgra);
+    FragColor = vec4(v4.rgb, 1.0);
 }
