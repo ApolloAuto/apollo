@@ -141,11 +141,8 @@ class Node(object):
         self.node = _CYBER_NODE.new_PyNode(name)
         self.list_writer = []
         self.list_reader = []
-        self.list_client = []
-        self.list_service = []
         self.subs = {}
         self.pubs = {}
-        self.services = {}
         self.mutex = threading.Lock()
         self.callbacks = {}
 
@@ -155,10 +152,6 @@ class Node(object):
             _CYBER_NODE.delete_PyWriter(writer)
         for reader in self.list_reader:
             _CYBER_NODE.delete_PyReader(reader)
-        for client in self.list_client:
-            _CYBER_NODE.delete_PyClient(client)
-        for service in self.list_service:
-            _CYBER_NODE.delete_PyService(service)
         _CYBER_NODE.delete_PyNode(self.node)
 
     def register_message(self, file_desc):
@@ -238,61 +231,6 @@ class Node(object):
         _CYBER_NODE.PyReader_register_func(reader, f_ptr)
 
         return Reader(name, reader, data_type)
-
-    def create_client(self, name, request_data_type, response_data_type):
-        """
-        create client by channelname,request datatype,response datatype
-        """
-        datatype = request_data_type.DESCRIPTOR.full_name
-        client = _CYBER_NODE.PyNode_create_client(
-            self.node, name, str(datatype))
-        self.list_client.append(client)
-        return Client(client, response_data_type)
-
-    def service_callback(self, name):
-        """
-        service callback
-        """
-        svr = self.services[name]
-        msg_str = _CYBER_NODE.PyService_read(svr[0])
-
-        if len(msg_str) > 0:
-            proto = svr[3]()
-            proto.ParseFromString(msg_str)
-            response = None
-            if svr[2] is None:
-                response = svr[1](proto)
-            else:
-                response = svr[1](proto, svr[2])
-
-            _CYBER_NODE.PyService_write(svr[0], response.SerializeToString())
-        return 0
-
-    def create_service(self, name, req_data_type, callback, args=None):
-        """
-        create service callback
-        """
-        self.mutex.acquire()
-        if name in self.services.keys():
-            self.mutex.release()
-            return None
-        self.mutex.release()
-
-        datatype = req_data_type.DESCRIPTOR.full_name
-        svr = _CYBER_NODE.PyNode_create_service(self.node, name, str(datatype))
-        self.list_service.append(svr)
-        srv_list = (svr, callback, args, req_data_type, False)
-
-        self.mutex.acquire()
-        self.services[name] = srv_list
-        self.mutex.release()
-
-        fun_svr_cb = PY_CALLBACK_TYPE(self.service_callback)
-        self.callbacks[name] = fun_svr_cb
-        f_ptr = ctypes.cast(self.callbacks[name], ctypes.c_void_p).value
-
-        _CYBER_NODE.PyService_register_func(svr, f_ptr)
-        return svr
 
     def spin(self):
         """
