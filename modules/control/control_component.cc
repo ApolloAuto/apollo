@@ -63,23 +63,40 @@ bool ControlComponent::Init() {
     return false;
   }
 
+  cybertron::ReaderConfig chassis_reader_config;
+  chassis_reader_config.channel_name = FLAGS_chassis_topic;
+  chassis_reader_config.pending_queue_size = FLAGS_chassis_pending_queue_size;
+
   chassis_reader_ = node_->CreateReader<Chassis>(
-      FLAGS_chassis_topic,
+      chassis_reader_config,
       std::bind(&ControlComponent::OnChassis, this, std::placeholders::_1));
   CHECK(chassis_reader_ != nullptr);
 
+  cybertron::ReaderConfig planning_reader_config;
+  planning_reader_config.channel_name = FLAGS_planning_trajectory_topic;
+  planning_reader_config.pending_queue_size = FLAGS_planning_pending_queue_size;
+
   trajectory_reader_ = node_->CreateReader<ADCTrajectory>(
-      FLAGS_planning_trajectory_topic,
+      planning_reader_config,
       std::bind(&ControlComponent::OnPlanning, this, std::placeholders::_1));
   CHECK(trajectory_reader_ != nullptr);
 
+  cybertron::ReaderConfig localization_reader_config;
+  localization_reader_config.channel_name = FLAGS_localization_topic;
+  localization_reader_config.pending_queue_size =
+      FLAGS_localization_pending_queue_size;
+
   localization_reader_ = node_->CreateReader<LocalizationEstimate>(
-      FLAGS_localization_topic, std::bind(&ControlComponent::OnLocalization,
-                                          this, std::placeholders::_1));
+      localization_reader_config, std::bind(&ControlComponent::OnLocalization,
+                                            this, std::placeholders::_1));
   CHECK(localization_reader_ != nullptr);
 
+  cybertron::ReaderConfig pad_msg_reader_config;
+  pad_msg_reader_config.channel_name = FLAGS_pad_topic;
+  pad_msg_reader_config.pending_queue_size = FLAGS_pad_msg_pending_queue_size;
+
   pad_msg_reader_ = node_->CreateReader<PadMessage>(
-      FLAGS_pad_topic,
+      pad_msg_reader_config,
       std::bind(&ControlComponent::OnPad, this, std::placeholders::_1));
   CHECK(pad_msg_reader_ != nullptr);
 
