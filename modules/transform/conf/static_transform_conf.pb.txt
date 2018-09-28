@@ -4,3 +4,10 @@ extrinsic_file {
     file_path: "/apollo/modules/drivers/velodyne/params/velodyne64_novatel_extrinsics_example.yaml"
     enable: true
 }
+
+extrinsic_file {
+    frame_id: "localization"
+    child_frame_id: "novatel"
+    file_path: "/apollo/modules/localization/msf/params/novatel_localization_extrinsics.yaml"
+    enable: true
+}
