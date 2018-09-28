@@ -36,11 +36,7 @@ class PointCloud {
   using PointType = PointT;
   // @brief default constructor
   PointCloud() = default;
-  // @brief copy constructor
-  explicit PointCloud(const PointCloud<PointT>& pc)
-      : width_(pc.width_), height_(pc.height_) {
-    points_ = pc.points_;
-  }
+
   // @brief construct from input point cloud and specified indices
   PointCloud(const PointCloud<PointT>& pc, const PointIndices& indices) {
     CopyPointCloud(pc, indices);
@@ -56,13 +52,6 @@ class PointCloud {
   // @brief destructor
   virtual ~PointCloud() = default;
 
-  // @brief add points of input cloud, return the self cloud
-  inline PointCloud& operator+=(const PointCloud<PointT>& rhs) {
-    points_.insert(points_.end(), rhs.points_.begin(), rhs.points_.end());
-    width_ = width_ * height_ + rhs.width_ * rhs.height_;
-    height_ = 1;
-    return *this;
-  }
   // @brief accessor of point via 2d indices for organized cloud,
   // @return nullptr for non-organized cloud
   inline const PointT* at(size_t col, size_t row) const {
@@ -233,16 +222,7 @@ class AttributePointCloud : public PointCloud<PointT> {
   using PointCloud<PointT>::timestamp_;
   // @brief default constructor
   AttributePointCloud() = default;
-  // @brief copy constructor
-  AttributePointCloud(const AttributePointCloud<PointT>& pc) {
-    width_ = pc.width_;
-    height_ = pc.height_;
-    points_ = pc.points_;
-    points_timestamp_ = pc.points_timestamp_;
-    points_height_ = pc.points_height_;
-    points_beam_id_ = pc.points_beam_id_;
-    points_label_ = pc.points_label_;
-  }
+
   // @brief construct from input point cloud and specified indices
   AttributePointCloud(const AttributePointCloud<PointT>& pc,
                       const PointIndices& indices) {
@@ -419,9 +399,7 @@ class AttributePointCloud : public PointCloud<PointT> {
   void SetPointHeight(size_t i, size_t j, float height) {
     points_height_[i * width_ + j] = height;
   }
-  void SetPointHeight(size_t i, float height) {
-    points_height_[i] = height;
-  }
+  void SetPointHeight(size_t i, float height) { points_height_[i] = height; }
   std::vector<float>* mutable_points_height() { return &points_height_; }
 
   const std::vector<int32_t>& points_beam_id() const { return points_beam_id_; }
@@ -459,7 +437,6 @@ typedef std::shared_ptr<const PolygonFType> PolygonFTypeConstPtr;
 
 typedef std::shared_ptr<PolygonDType> PolygonDTypePtr;
 typedef std::shared_ptr<const PolygonDType> PolygonDTypeConstPtr;
-
 
 }  // namespace base
 }  // namespace perception

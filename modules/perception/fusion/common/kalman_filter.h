@@ -26,7 +26,6 @@ namespace fusion {
 class KalmanFilter : public BaseFilter {
  public:
   KalmanFilter();
-  ~KalmanFilter();
 
   bool Init(const Eigen::VectorXd &initial_belief_states,
             const Eigen::MatrixXd &initial_uncertainty);

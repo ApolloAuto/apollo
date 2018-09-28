@@ -84,11 +84,9 @@ bool DrawPolygonMask(const typename PolygonScanCvter<T>::Polygon& polygon,
       bitmap_min_range[major_dir];
 
   if (valid_range.second < valid_range.first + cell_size[major_dir]) {
-    AWARN << "Invalid range: " << valid_range.first << " "
-             << valid_range.second
-             << ". polygon major directory range: " << poly_min_p[major_dir]
-             << " " << poly_max_p[major_dir]
-             << ". cell size: " << cell_size[major_dir];
+    AWARN << "Invalid range: " << valid_range.first << " " << valid_range.second
+          << ". polygon major directory range: " << poly_min_p[major_dir] << " "
+          << poly_max_p[major_dir] << ". cell size: " << cell_size[major_dir];
     return true;
   }
 

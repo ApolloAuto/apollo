@@ -56,7 +56,6 @@ class DstManager {
     static DstManager dst_manager;
     return &dst_manager;
   }
-  ~DstManager() {}
   // brief: app initialization
   // param [in]: app_name
   // param [in]: fod_subsets, hypotheses sets
@@ -95,7 +94,6 @@ class DstManager {
 class Dst {
  public:
   explicit Dst(const std::string& app_name);
-  ~Dst() {}
 
   // setter
   bool SetBbaVec(const std::vector<double>& bba_vec);

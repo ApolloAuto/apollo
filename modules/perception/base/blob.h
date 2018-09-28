@@ -151,9 +151,9 @@ class Blob {
     CHECK_GE(axis_index, -num_axes())
         << "axis " << axis_index << " out of range for " << num_axes()
         << "-D Blob with shape " << shape_string();
-    CHECK_LT(axis_index, num_axes()) << "axis " << axis_index
-                                     << " out of range for " << num_axes()
-                                     << "-D Blob with shape " << shape_string();
+    CHECK_LT(axis_index, num_axes())
+        << "axis " << axis_index << " out of range for " << num_axes()
+        << "-D Blob with shape " << shape_string();
     if (axis_index < 0) {
       return axis_index + num_axes();
     }

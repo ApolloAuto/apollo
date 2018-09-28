@@ -19,12 +19,8 @@ namespace apollo {
 namespace perception {
 namespace fusion {
 
-InformationFilter::InformationFilter() {
-  name_ = "InformationFilter";
-  last_observation_init_ = false;
-}
-
-InformationFilter::~InformationFilter() {}
+InformationFilter::InformationFilter()
+    : BaseFilter("InformationFilter"), last_observation_init_(false) {}
 
 bool InformationFilter::Init(const Eigen::VectorXd &global_states,
                              const Eigen::MatrixXd &global_uncertainty) {

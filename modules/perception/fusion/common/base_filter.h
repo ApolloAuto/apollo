@@ -27,7 +27,8 @@ namespace fusion {
 class BaseFilter {
  public:
   // @brief constructor
-  BaseFilter() : init_(false), name_("BaseFilter"), states_num_(0) {}
+  explicit BaseFilter(const std::string name)
+      : init_(false), name_(name), states_num_(0) {}
 
   // @brief destructor
   virtual ~BaseFilter() {}
