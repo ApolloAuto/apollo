@@ -48,8 +48,8 @@ bool PbfGatekeeper::Init() {
       lib::FileUtil::GetAbsolutePath(woork_root_config, options.conf_file);
   PbfGatekeeperConfig params;
 
-  if (!apollo::common::util::GetProtoFromFile<PbfGatekeeperConfig>(
-      config, &params)) {
+  if (!apollo::common::util::GetProtoFromFile<PbfGatekeeperConfig>(config,
+                                                                   &params)) {
     AERROR << "Read config failed: " << config;
     return false;
   }
@@ -100,7 +100,8 @@ bool PbfGatekeeper::AbleToPublish(const TrackPtr &track) {
 
   track->AddTrackedTimes();
   if (params_.use_track_time_pub_strategy &&
-      track->GetTrackedTimes() <= params_.pub_track_time_thresh) {
+      track->GetTrackedTimes() <=
+          static_cast<size_t>(params_.pub_track_time_thresh)) {
     return false;
   }
   return true;
@@ -164,11 +165,11 @@ bool PbfGatekeeper::RadarAbleToPublish(const TrackPtr &track, bool is_night) {
       //   }
       // }
     } else if (radar_object->GetSensorId() == "radar_rear") {
-      ADEBUG << "radar_rear: min_dis: "
-                << params_.min_radar_confident_distance << " obj dist: "
-                << radar_object->GetBaseObject()->radar_supplement.range
-                << " track_id: " << track->GetTrackId()
-                << " exist_prob: " << track->GetExistanceProb();
+      ADEBUG << "radar_rear: min_dis: " << params_.min_radar_confident_distance
+             << " obj dist: "
+             << radar_object->GetBaseObject()->radar_supplement.range
+             << " track_id: " << track->GetTrackId()
+             << " exist_prob: " << track->GetExistanceProb();
       if (radar_object->GetBaseObject()->radar_supplement.range >
               params_.min_radar_confident_distance &&
           (radar_object->GetBaseObject()->velocity.norm() > 4.0 ||

@@ -11,14 +11,14 @@ cc_library(
         "pbf_gatekeeper.h",
     ],
     deps = [
-        "//modules/perception/fusion/lib/interface:interface",
+        "//modules/common/util",
         "//modules/perception/fusion/base:base_init_options",
-        "//modules/perception/fusion/lib/gatekeeper/pbf_gatekeeper/proto:pbf_gatekeeper_config_proto",
-        "//modules/perception/lib/config_manager:config_manager",
-        "//modules/perception/lib/io:file_util",
-        "//modules/perception/lib/io:protobuf_util",
         "//modules/perception/fusion/base:scene",
         "//modules/perception/fusion/base:track",
+        "//modules/perception/fusion/lib/gatekeeper/pbf_gatekeeper/proto:pbf_gatekeeper_config_proto",
+        "//modules/perception/fusion/lib/interface",
+        "//modules/perception/lib/config_manager",
+        "//modules/perception/lib/io:file_util",
     ],
 )
 
@@ -29,11 +29,11 @@ cc_test(
         "pbf_gatekeeper_test.cc",
     ],
     deps = [
-        "@gtest//:main",
         ":pbf_gatekeeper",
-        "//modules/perception/common/sensor_manager:sensor_manager",
+        "//modules/perception/common/sensor_manager",
         "//modules/perception/fusion/base:sensor",
         "//modules/perception/fusion/base:track",
+        "@gtest//:main",
     ],
 )
 
