@@ -18,4 +18,19 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "pbf_shape_fusion_test",
+    size = "small",
+    srcs = [
+        "pbf_shape_fusion_test.cc",
+    ],
+    deps = [
+        ":pbf_shape_fusion",
+        "//modules/perception/base:base_type",
+        "//modules/perception/base:frame",
+        "//modules/perception/common:perception_gflags",
+        "@gtest//:main",
+    ],
+)
+
 cpplint()
