@@ -108,6 +108,7 @@ void GeneralMessageBase::PrintMessage(GeneralMessageBase* baseMsg,
   }
 
   std::ostringstream outStr;
+  std::ios_base::fmtflags old_flags;
   for (; i < fields.size(); ++i) {
     const google::protobuf::FieldDescriptor* field = fields[i];
     const std::string& fieldName = field->name();
@@ -124,18 +125,21 @@ void GeneralMessageBase::PrintMessage(GeneralMessageBase* baseMsg,
 
     } else {
       switch (field->cpp_type()) {
-#define OUTPUT_FIELD(CPPTYPE, METHOD)                                       \
-  case google::protobuf::FieldDescriptor::CPPTYPE_##CPPTYPE:                \
-    outStr << std::setprecision(64) << reflection->Get##METHOD(msg, field); \
+#define OUTPUT_FIELD(CPPTYPE, METHOD, PRECISION)             \
+  case google::protobuf::FieldDescriptor::CPPTYPE_##CPPTYPE: \
+    old_flags = outStr.flags();                              \
+    outStr << std::fixed << std::setprecision(PRECISION)     \
+           << reflection->Get##METHOD(msg, field);           \
+    outStr.flags(old_flags);                                 \
     break
 
-        OUTPUT_FIELD(INT32, Int32);
-        OUTPUT_FIELD(INT64, Int64);
-        OUTPUT_FIELD(UINT32, UInt32);
-        OUTPUT_FIELD(UINT64, UInt64);
-        OUTPUT_FIELD(FLOAT, Float);
-        OUTPUT_FIELD(DOUBLE, Double);
-        OUTPUT_FIELD(BOOL, Bool);
+        OUTPUT_FIELD(INT32, Int32, 6);
+        OUTPUT_FIELD(INT64, Int64, 6);
+        OUTPUT_FIELD(UINT32, UInt32, 6);
+        OUTPUT_FIELD(UINT64, UInt64, 6);
+        OUTPUT_FIELD(FLOAT, Float, 6);
+        OUTPUT_FIELD(DOUBLE, Double, 9);
+        OUTPUT_FIELD(BOOL, Bool, 6);
 #undef OUTPUT_FIELD
 
         case google::protobuf::FieldDescriptor::CPPTYPE_ENUM: {
@@ -144,9 +148,9 @@ void GeneralMessageBase::PrintMessage(GeneralMessageBase* baseMsg,
           const google::protobuf::EnumValueDescriptor* enum_desc =
               field->enum_type()->FindValueByNumber(enum_value);
           if (enum_desc != nullptr) {
-            outStr << enum_desc->name() << "  " << enum_value;
+            outStr << enum_desc->name();
           } else {
-            outStr << enum_value << "  " << enum_value;
+            outStr << enum_value;
           }
           break;
         }
