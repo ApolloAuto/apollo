@@ -92,7 +92,7 @@ struct MainWindow::VideoImgProxy {
 
   QMutex reader_mutex_;
   std::shared_ptr<Texture> dynamic_texture_;
-  CyberChannReader<apollo::drivers::CompressedImage>* channel_reader_;
+  CyberChannReader<apollo::drivers::Image>* channel_reader_;
 };
 
 MainWindow::MainWindow(QWidget* parent)
@@ -692,25 +692,20 @@ void MainWindow::PlayRenderableObject(bool b) {
 }
 
 void MainWindow::ImageReaderCallback(
-    const std::shared_ptr<const apollo::drivers::CompressedImage>& imgData,
+    const std::shared_ptr<const apollo::drivers::Image>& imgData,
     VideoImgProxy* theVideoImgProxy) {
   theVideoImgProxy->reader_mutex_.lock();
   if (theVideoImgProxy->dynamic_texture_ != nullptr && imgData != nullptr) {
-    QImage img;
-    if (img.loadFromData((const unsigned char*)(imgData->data().c_str()),
-                         imgData->ByteSize())) {
-      if (theVideoImgProxy->dynamic_texture_->UpdateData(img)) {
-        theVideoImgProxy->video_image_viewer_.SetupDynamicTexture(
-            theVideoImgProxy->dynamic_texture_);
-      } else {
-        std::cerr << "--------Cannot update dynamic Texture Data--------"
-                  << std::endl;
-      }
+    if (theVideoImgProxy->dynamic_texture_->UpdateData(imgData)) {
+      theVideoImgProxy->video_image_viewer_.SetupDynamicTexture(
+          theVideoImgProxy->dynamic_texture_);
     } else {
-      std::cerr
-          << "-----------Cannot load compressed image from data with QImage"
-          << std::endl;
+      std::cerr << "--------Cannot update dynamic Texture Data--------"
+                << std::endl;
     }
+  } else {
+    std::cerr << "----Dynamic Texture is nullptr or apollo.drivers.Image is nullptr"
+              << std::endl;
   }
   theVideoImgProxy->reader_mutex_.unlock();
 }
@@ -735,7 +730,7 @@ void MainWindow::DoPlayVideoImage(bool b, VideoImgProxy* theVideoImg) {
 
     if (!theVideoImg->channel_reader_) {
       theVideoImg->channel_reader_ =
-          new CyberChannReader<apollo::drivers::CompressedImage>();
+          new CyberChannReader<apollo::drivers::Image>();
 
       if (!theVideoImg->channel_reader_) {
         QMessageBox::warning(this, tr("Create Cybertron Channel Reader"),
@@ -745,10 +740,11 @@ void MainWindow::DoPlayVideoImage(bool b, VideoImgProxy* theVideoImg) {
         return;
       }
 
-      auto videoCallback = [this, theVideoImg](
-          const std::shared_ptr<apollo::drivers::CompressedImage>& pdata) {
-        this->ImageReaderCallback(pdata, theVideoImg);
-      };
+      auto videoCallback =
+          [this,
+           theVideoImg](const std::shared_ptr<apollo::drivers::Image>& pdata) {
+            this->ImageReaderCallback(pdata, theVideoImg);
+          };
 
       if (!theVideoImg->channel_reader_->InstallCallbackAndOpen(
               videoCallback, theVideoImg->channel_name_combobox_.currentText()
