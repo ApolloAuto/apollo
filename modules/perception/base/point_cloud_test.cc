@@ -127,9 +127,6 @@ TEST(PointCloudTest, point_cloud_constructor_test) {
     EXPECT_TRUE(cloud5.IsOrganized());
     EXPECT_EQ(cloud5.width(), 6);
     EXPECT_EQ(cloud5.height(), 7);
-    cloud5 += cloud4;
-    EXPECT_EQ(cloud5.width(), 45);
-    EXPECT_EQ(cloud5.height(), 1);
   }
   {
     using TestPointCloud = AttributePointCloud<PointF>;

@@ -33,8 +33,6 @@ namespace base {
 
 struct alignas(16) Object {
   Object();
-  Object(const Object &) = default;
-  Object &operator=(const Object &) = default;
   std::string ToString() const;
   void Reset();
 

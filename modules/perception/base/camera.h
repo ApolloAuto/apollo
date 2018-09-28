@@ -28,7 +28,6 @@ namespace base {
 
 class BaseCameraModel {
  public:
-  BaseCameraModel() = default;
   virtual ~BaseCameraModel() = default;
 
   virtual Eigen::Vector2f Project(const Eigen::Vector3f& point3d) = 0;
@@ -48,7 +47,6 @@ class BaseCameraModel {
 
 class PinholeCameraModel : public BaseCameraModel {
  public:
-  PinholeCameraModel() = default;
   ~PinholeCameraModel() = default;
 
   Eigen::Vector2f Project(const Eigen::Vector3f& point3d) override;

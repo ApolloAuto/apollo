@@ -20,9 +20,7 @@ namespace apollo {
 namespace perception {
 namespace fusion {
 
-KalmanFilter::KalmanFilter() { name_ = "KalmanFilter"; }
-
-KalmanFilter::~KalmanFilter() {}
+KalmanFilter::KalmanFilter() : BaseFilter("KalmanFilter") {}
 
 bool KalmanFilter::Init(const Eigen::VectorXd &initial_belief_states,
                         const Eigen::MatrixXd &initial_uncertainty) {
