@@ -1,35 +1,37 @@
 # Localization
 
 ## Introduction
-  This module provides localization service. There are two methods provided by default. One is an RTK (Real Time Kinematic) based method which incorporates GPS and IMU (Inertial Measurement Unit) information, the other is multi-sensor fusion method which incorporates GPS, IMU, and LiDAR information.
+  This module provides localization services. There are two ways in which localization is provided:
+  -  The RTK (Real Time Kinematic) based method which incorporates GPS and IMU (Inertial Measurement Unit) information
+  - The  multi-sensor fusion method which incorporates GPS, IMU, and LiDAR information.
 
 ## Input
   In the provided RTK localization method, there are two inputs:
-  * GPS - The Global Positioning System.
-  * IMU - Inertial Measurement Unit.
+  - GPS - The Global Positioning System
+  - IMU - Inertial Measurement Unit
   
-  In the provided multi-sensor fusion localization method, there are three inputs:
-  * GPS - The Global Positioning System.
-  * IMU - Inertial Measurement Unit.
-  * LiDAR - Light Detection And Ranging Sensor.
-  For more information, refer to [multi-sensor fusion localizaiton](https://github.com/ApolloAuto/apollo/tree/master/modules/localization/msf/README.md).
+  In the  multi-sensor fusion localization method, there are three inputs:
+  - GPS - The Global Positioning System
+  - IMU - Inertial Measurement Unit
+  - LiDAR - Light Detection And Ranging Sensor
+  For more information, refer to [multi-sensor fusion localization](https://github.com/ApolloAuto/apollo/tree/master/modules/localization/msf/README.md).
 
-## Output
-  * An object instance defined by Protobuf message `LocalizationEstimate`, which can be found in file `localization/proto/localization.proto`.
+## Output 
+An object instance defined by Protobuf message `LocalizationEstimate`, which can be found in file `localization/proto/localization.proto`.
 
-## Add localization implementation
-  Currently the RTK based localization is implemented in class `RTKLocalization`. If you are implementing a new localization method with the, for example, name `FooLocalization`, you would follow the following steps:
+## Implementing Localization
+  Currently the RTK based localization is implemented in class `RTKLocalization`. If you are implementing a new localization method, for example, `FooLocalization`, you would need to perform the following steps:
 
-  1. In `proto/localization_config.proto`, add a value `FOO` to the `LocalizationType` enum type.
+  1. In `proto/localization_config.proto`, add a value `FOO` to the `LocalizationType` enum type
 
-  1. Go to the `modules/localization` directory, and create a `foo` directory. In the `foo` directory, implement the class `FooLocalization` by following the code in the `RTKLocalization` class in the `rtk` directory. `FooLocalization` has to be a subclass of `LocalizationBase`. Also create a file `foo/BUILD` by following the file `rtk/BUILD`.
+  2. Go to the `modules/localization` directory, and create a `foo` directory. In the `foo` directory, implement the class `FooLocalization` by following the code in the `RTKLocalization` class in the `rtk` directory. `FooLocalization` has to be a subclass of `LocalizationBase`. Also create a file `foo/BUILD` by following the file `rtk/BUILD`
 
-  1. You need to register the `FooLocalization` class in the function `Localization::RegisterLocalizationMethods()`, which is located in the C++ file `localization.cc`. You can register it by inserting the following code at the end of the function:
+  3. You need to register the `FooLocalization` class in the function `Localization::RegisterLocalizationMethods()`, which is located in the `localization.cc` file. You can register it by inserting the following code at the end of the function:
 
   ```
-  localization_factory_.Register(LocalizationConfig::FOO, []()->LocalizationBase* { return new FooLocalization(); });
+   localization_factory_.Register(LocalizationConfig::FOO, []()->LocalizationBase* { return new FooLocalization(); });
   ```
   
-  Make sure your code compiles by including the header files that defines class `FooLocalization`.
+  4. Make sure your code compiles by including the header files that defines class `FooLocalization`
 
-  1. Now you can go back to the `apollo` root directory and build your code with command `bash apollo.sh build`.
+  1. Now you can go back to the `apollo` root directory and build your code with command `bash apollo.sh build`
