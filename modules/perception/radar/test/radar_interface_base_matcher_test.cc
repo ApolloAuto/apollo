@@ -12,6 +12,7 @@
 namespace apollo {
 namespace perception {
 namespace radar {
+
 TEST(BaseMatcherTest, base_matcher_test) {
   BaseMatcher* matcher = new BaseMatcher();
   EXPECT_TRUE(matcher != nullptr);
@@ -61,6 +62,7 @@ TEST(BaseMatcherTest, base_matcher_test) {
   EXPECT_EQ(match_state, true);
   delete matcher;
 }
+
 }  // namespace radar
 }  // namespace perception
 }  // namespace apollo

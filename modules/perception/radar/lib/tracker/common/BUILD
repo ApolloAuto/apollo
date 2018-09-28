@@ -27,7 +27,7 @@ cc_library(
     deps = [
         "//modules/perception/base:base",
         "//modules/perception/radar/common:types",
-        "//modules/perception/radar/lib/interface:radar_lib_interface",
+        "//modules/perception/radar/lib/interface:base_filter",
         "//modules/perception/radar/lib/tracker/filter:adaptive_kalman_filter",
         "@eigen",
     ],

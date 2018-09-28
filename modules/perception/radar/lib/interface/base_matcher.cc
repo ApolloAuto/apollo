@@ -3,19 +3,24 @@
 // @file: base_matcher.cc
 // @brief: base match interface
 #include "modules/perception/radar/lib/interface/base_matcher.h"
+
 namespace apollo {
 namespace perception {
 namespace radar {
+
 double BaseMatcher::s_max_match_distance_ = 2.5;
 double BaseMatcher::s_bound_match_distance_ = 10.0;
+
 void BaseMatcher::SetMaxMatchDistance(double dist) {
   s_max_match_distance_ = dist;
 }
+
 double BaseMatcher::GetMaxMatchDistance() { return s_max_match_distance_; }
 
 void BaseMatcher::SetBoundMatchDistance(double dist) {
   s_bound_match_distance_ = dist;
 }
+
 double BaseMatcher::GetBoundMatchDistance() { return s_bound_match_distance_; }
 
 void BaseMatcher::IDMatch(const std::vector<RadarTrackPtr> &radar_tracks,

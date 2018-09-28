@@ -6,9 +6,11 @@
 #include <gtest/gtest.h>
 #include "cybertron/common/log.h"
 #include "modules/perception/radar/lib/tracker/filter/adaptive_kalman_filter.h"
+
 namespace apollo {
 namespace perception {
 namespace radar {
+
 TEST(AdaptiveKalmanFilterTest, adaptive_kalman_filter_test) {
   BaseFilter* filter = new AdaptiveKalmanFilter();
   EXPECT_TRUE(filter != nullptr);
@@ -62,6 +64,7 @@ TEST(AdaptiveKalmanFilterTest, adaptive_kalman_filter_test) {
   EXPECT_TRUE(std::fabs(update_result(3) - result(3)) < 1e-3);
   delete filter;
 }
+
 }  // namespace radar
 }  // namespace perception
 }  // namespace apollo

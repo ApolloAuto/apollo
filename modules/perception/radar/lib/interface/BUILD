@@ -3,20 +3,64 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "radar_lib_interface",
+    name = "base_matcher",
     srcs = [
+        "base_matcher.cc",
     ],
     hdrs = [
-        "base_detector.h",
-        "base_filter.h",
         "base_matcher.h",
-        "base_preprocessor.h",
-        "base_radar_obstacle_perception.h",
-        "base_roi_filter.h",
-        "base_tracker.h",
     ],
     deps = [
-        "//modules/drivers/proto:sensor_proto",
+        "//modules/perception/base:base",
+        "//modules/perception/lib/singleton:singleton",
+        "//modules/perception/lib/config_manager:config_manager",
+        "//modules/perception/lib/registerer:registerer",
+        "//modules/perception/radar/common:types",
+        "//modules/perception/radar/lib/tracker/common:radar_track",
+        "//modules/perception/proto:perception_config_schema_proto",
+        "@eigen",
+    ],
+)
+
+cc_library(
+    name = "base_filter",
+    hdrs = [
+        "base_filter.h",
+    ],
+)
+
+cc_library(
+    name = "base_detector",
+    hdrs = [
+        "base_detector.h",
+    ],
+)
+
+cc_library(
+    name = "base_preprocessor",
+    hdrs = [
+        "base_preprocessor.h",
+    ],
+)
+
+cc_library(
+    name = "base_radar_obstacle_perception",
+    hdrs = [
+        "base_radar_obstacle_perception.h",
+    ],
+)
+
+cc_library(
+    name = "base_roi_filter",
+    hdrs = [
+        "base_roi_filter.h",
+    ],
+)
+
+cc_library(
+    name = "base_tracker",
+    hdrs = [
+        "base_tracker.h",
     ],
 )
 

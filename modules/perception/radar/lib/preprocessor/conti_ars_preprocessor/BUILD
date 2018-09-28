@@ -16,7 +16,7 @@ cc_library(
         "//modules/perception/lib/config_manager:config_manager",
         "//modules/perception/lib/registerer:registerer",
         "//modules/perception/radar/common:types",
-        "//modules/perception/radar/lib/interface:radar_lib_interface",
+        "//modules/perception/radar/lib/interface:base_preprocessor",
         "//modules/drivers/proto:sensor_proto",
         "@eigen",
     ],

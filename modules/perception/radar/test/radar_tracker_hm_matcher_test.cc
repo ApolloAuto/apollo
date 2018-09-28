@@ -3,22 +3,24 @@
 // @file: radar_tracker_hm_matcher_test.cc
 // @brief: radar matcher base on hungarian method
 
-#include "modules/perception/radar/lib/tracker/common/radar_track.h"
 #include <gtest/gtest.h>
 #include "cybertron/common/log.h"
+#include "modules/perception/common/perception_gflags.h"
+#include "modules/perception/radar/lib/tracker/common/radar_track.h"
 #include "modules/perception/radar/lib/tracker/common/radar_track_manager.h"
+
+#define private public
+#define protected public
 #include "modules/perception/radar/lib/tracker/matcher/hm_matcher.h"
 
 namespace apollo {
 namespace perception {
-namespace lib {
-DECLARE_string(work_root);
-}  // namespace lib
 namespace radar {
+
 TEST(HMMatcherTest, hm_matcher_init_test) {
   BaseMatcher* matcher = new HMMatcher();
   EXPECT_TRUE(matcher != nullptr);
-  lib::FLAGS_work_root = "./radar_test_data/matcher";
+  FLAGS_work_root = "./radar_test_data/matcher";
   EXPECT_EQ(matcher->Init(), true);
   delete matcher;
 }
@@ -47,7 +49,7 @@ TEST(HMMatcherTest, hm_matcher_propterty_match_test) {
 TEST(HMMatcherTest, hm_matcher_test) {
   BaseMatcher* matcher = new HMMatcher();
   EXPECT_TRUE(matcher != nullptr);
-  lib::FLAGS_work_root = "./radar_test_data/matcher";
+  FLAGS_work_root = "./radar_test_data/matcher";
   EXPECT_EQ(matcher->Init(), true);
   EXPECT_EQ(matcher->Name(), "HMMatcher");
   double match_distance = 2.5;

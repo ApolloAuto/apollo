@@ -12,7 +12,7 @@ cc_library(
     ],
     deps = [
         "//modules/perception/base:base",
-        "//modules/perception/radar/lib/interface:radar_lib_interface",
+        "//modules/perception/radar/lib/interface:base_filter",
         "@eigen",
     ],
 )
