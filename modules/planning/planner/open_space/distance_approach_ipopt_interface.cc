@@ -69,15 +69,8 @@ DistanceApproachIPOPTInterface::DistanceApproachIPOPTInterface(
   */
 
 void DistanceApproachIPOPTInterface::set_objective_weights(
-    const double weight_u, const double weight_time_1,
-    const double weight_time_2, const double weight_reg) {
-  weight_u_ = weight_u;
-
-  weight_time_1_ = weight_time_1;
-
-  weight_time_2_ = weight_time_2;
-
-  weight_reg_ = weight_reg;
+    const DistanceApproachConfig& distance_approach_config) {
+  distance_approach_config_.CopyFrom(distance_approach_config);
 }
 
 bool DistanceApproachIPOPTInterface::get_nlp_info(int& n, int& m,
@@ -344,7 +337,7 @@ bool DistanceApproachIPOPTInterface::eval_g(int n, const double* x, bool new_x,
   }
 
   // Next evaluate and iterate over time steps & obstacles
-  // TODO(QiL) : two iterative loops
+  // TODO(QiL): two iterative loops
   return true;
 }
 
@@ -367,7 +360,7 @@ bool DistanceApproachIPOPTInterface::get_starting_point(
 
   // 1. state variables linspace initialization
 
-  // TODO(QiL) : replace the hot start guess with the initial caculation from
+  // TODO(QiL): replace the hot start guess with the initial caculation from
   // warm up.
 
   std::size_t variable_index = 0;
@@ -449,39 +442,57 @@ bool DistanceApproachIPOPTInterface::eval_f(int n, const double* x, bool new_x,
   // input, next horizon_ + 1 is sampling time, next horizon_ + 1 is
   // lagrangian l, next horizon_ +1 is lagrangian n
 
-  std::size_t start_index = (horizon_ + 1) * 4;
-  std::size_t time_start_index = start_index + horizon_ * 2;
-  std::size_t lagrangian_l_start_index = time_start_index + horizon_ + 1;
-  std::size_t lagrangian_n_start_index =
-      lagrangian_l_start_index + (horizon_ + 1) * obstacles_vertices_sum_;
+  // Objective is :
+  // min control inputs
+  // min input rate
+  // min time
+  // regularization wrt warm start traectory
 
+  std::size_t control_start_index = (horizon_ + 1) * 4;
+  // std::size_t time_start_index = control_start_index + horizon_ * 2;
+
+  // TODO(QiL): Initial impelementation towards earier understanding and debug
+  // purpose, later code refine towards improving efficiency
+
+  DCHECK(ts_ != 0) << "ts in distance_approach_ is 0";
   // 1. objective to minimize u square
   for (std::size_t i = 0; i < horizon_; ++i) {
+    obj_value += distance_approach_config_.weight_u(0) *
+                     x[control_start_index + i] * x[control_start_index + i] +
+                 distance_approach_config_.weight_u(1) *
+                     x[control_start_index + i] *
+                     x[control_start_index + i + 1];
+  }
+
+  // 2. ojective to monimize input change rate, first horizon
+  obj_value += distance_approach_config_.weight_u_rate(0) *
+                   (x[control_start_index] / ts_) *
+                   (x[control_start_index] / ts_) +
+               distance_approach_config_.weight_u_rate(1) *
+                   (x[control_start_index + 1] / ts_) *
+                   (x[control_start_index + 1] / ts_);
+
+  // 3. objective to minimize input change rates, 1 ~ horizone -1
+  for (std::size_t i = 1; i < horizon_ - 1; ++i) {
+    double u1_rate =
+        (x[control_start_index + i + 2] - x[control_start_index + i]) / ts_;
+    double u2_rate =
+        (x[control_start_index + i + 3] - x[control_start_index + i + 1]) / ts_;
     obj_value +=
-        weight_u_ * x[start_index + i] * x[start_index + i] +
-        x[start_index + i] * x[start_index + i + 1] +
-        weight_time_1_ * x[time_start_index + i] +
-        weight_time_2_ * x[time_start_index + i] * x[time_start_index + i];
+        distance_approach_config_.weight_u_rate(0) * u1_rate * u1_rate +
+        distance_approach_config_.weight_u_rate(1) * u2_rate * u2_rate;
   }
 
-  // Add l , sum(obstacles_vertices_num) * (N+1)
-  for (std::size_t i = 1; i < horizon_ + 1; ++i) {
-    for (std::size_t j = 1; j <= obstacles_vertices_sum_; ++j) {
-      obj_value += weight_reg_ *
-                   x[lagrangian_l_start_index + i * (horizon_ + 1) + j] *
-                   x[lagrangian_l_start_index + i * (horizon_ + 1) + j];
-    }
+  // 4. objective to minimize state diff to warm up
+  for (std::size_t i = 0; i < horizon_; ++i) {
+    double x1_diff = x[4 * i] - xWS_(0, i);
+    double x2_diff = x[4 * i + 1] - xWS_(1, i);
+    double x3_diff = x[4 * i + 2] - xWS_(2, i);
+    obj_value += distance_approach_config_.weight_state(0) * x1_diff * x1_diff +
+                 distance_approach_config_.weight_state(1) * x2_diff * x2_diff +
+                 distance_approach_config_.weight_state(2) * x3_diff * x3_diff;
   }
 
-  // Add n, 4 * obstacles_num * (N+1)
-  for (std::size_t i = 1; i < horizon_ + 1; ++i) {
-    // TODO(QiL) : Double check the dimensions here !!!!!!!!!
-    for (std::size_t j = 1; j <= 4 * obstacles_num_; ++j) {
-      obj_value += weight_reg_ *
-                   x[lagrangian_n_start_index + i * 4 * obstacles_num_ + j] *
-                   x[lagrangian_n_start_index + i * 4 * obstacles_num_ + j];
-    }
-  }
   return true;
 }
 

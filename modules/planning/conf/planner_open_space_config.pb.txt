@@ -1,19 +1,27 @@
 planning_horizon : 80
-w_u : 0.1
-w_time_1 : 0.5
-w_time_2 : 1.0
-w_reg : 1e-4
 
-xy_grid_resolution : 0.2
-phi_grid_resolution : 0.05
-max_x : 25.0
-max_y : 25.0
-min_x : -25.0
-min_y : -25.0
-max_steering : 0.6
-next_node_num : 10
-step_size : 0.5
-back_penalty : 10.0
-gear_switch_penalty : 10.0
-steer_penalty : 10.0
-steer_change_penalty : 10.0
+warm_start_config : {
+  xy_grid_resolution : 0.2
+  phi_grid_resolution : 0.05
+  max_x : 25.0
+  max_y : 25.0
+  min_x : -25.0
+  min_y : -25.0
+  max_steering : 0.6
+  next_node_num : 10
+  step_size : 0.5
+  back_penalty : 10.0
+  gear_switch_penalty : 10.0
+  steer_penalty : 10.0
+  steer_change_penalty : 10.0
+}
+
+distance_approach_config : {
+  weight_u : 0.01
+  weight_u : 0.5
+  weight_u_rate : 0.1
+  weight_u_rate : 0.1
+  weight_state : 0.001
+  weight_state : 0.001
+  weight_state : 0.001
+}

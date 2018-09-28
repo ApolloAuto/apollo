@@ -29,14 +29,17 @@ HybridAStar::HybridAStar() {
       << "Failed to load open space planner config file "
       << FLAGS_planner_open_space_config_filename;
   reed_shepp_generator_.reset(new ReedShepp(vehicle_param_, open_space_conf_));
-  next_node_num_ = open_space_conf_.next_node_num();
-  max_steer_ = open_space_conf_.max_steering();
-  step_size_ = open_space_conf_.step_size();
-  xy_grid_resolution_ = open_space_conf_.xy_grid_resolution();
-  back_penalty_ = open_space_conf_.back_penalty();
-  gear_switch_penalty_ = open_space_conf_.gear_switch_penalty();
-  steer_penalty_ = open_space_conf_.steer_penalty();
-  steer_change_penalty_ = open_space_conf_.steer_change_penalty();
+  next_node_num_ = open_space_conf_.warm_start_config().next_node_num();
+  max_steer_ = open_space_conf_.warm_start_config().max_steering();
+  step_size_ = open_space_conf_.warm_start_config().step_size();
+  xy_grid_resolution_ =
+      open_space_conf_.warm_start_config().xy_grid_resolution();
+  back_penalty_ = open_space_conf_.warm_start_config().back_penalty();
+  gear_switch_penalty_ =
+      open_space_conf_.warm_start_config().gear_switch_penalty();
+  steer_penalty_ = open_space_conf_.warm_start_config().steer_penalty();
+  steer_change_penalty_ =
+      open_space_conf_.warm_start_config().steer_change_penalty();
 }
 
 bool HybridAStar::AnalyticExpansion(std::shared_ptr<Node3d> current_node,

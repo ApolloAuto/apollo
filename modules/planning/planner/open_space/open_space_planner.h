@@ -92,6 +92,7 @@ class OpenSpacePlanner : public Planner {
   const common::VehicleParam& vehicle_param_ =
       common::VehicleConfigHelper::GetConfig().vehicle_param();
   apollo::planning::PlannerOpenSpaceConfig planner_open_space_config_;
+  apollo::planning::DistanceApproachConfig distance_approach_config_;
   double init_x_ = 0.0;
   double init_y_ = 0.0;
   double init_phi_ = 0.0;

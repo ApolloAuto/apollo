@@ -28,6 +28,7 @@
 #include "IpTypes.hpp"
 
 #include "modules/common/configs/vehicle_config_helper.h"
+#include "modules/planning/proto/planner_open_space_config.pb.h"
 
 namespace apollo {
 namespace planning {
@@ -44,9 +45,8 @@ class DistanceApproachIPOPTInterface : public Ipopt::TNLP {
 
   virtual ~DistanceApproachIPOPTInterface() = default;
 
-  void set_objective_weights(const double weight_u, const double weight_time_1,
-                             const double weight_time_2,
-                             const double weight_reg);
+  void set_objective_weights(
+      const apollo::planning::DistanceApproachConfig& distance_approach_config);
 
   void get_optimization_results(Eigen::MatrixXd* state_result,
                                 Eigen::MatrixXd* control_result,
@@ -125,15 +125,7 @@ class DistanceApproachIPOPTInterface : public Ipopt::TNLP {
   Eigen::MatrixXd time_result_;
 
  private:
-  // weight from u, timescale linear form, timescale qudartic form,
-  // regularization
-  double weight_u_ = 0.0;
-
-  double weight_time_1_ = 0.0;
-
-  double weight_time_2_ = 0.0;
-
-  double weight_reg_ = 0.0;
+  apollo::planning::DistanceApproachConfig distance_approach_config_;
 };
 
 }  // namespace planning

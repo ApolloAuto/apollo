@@ -40,8 +40,10 @@ Status OpenSpacePlanner::Init(const PlanningConfig&) {
       << "Failed to load open space config file "
       << FLAGS_planner_open_space_config_filename;
 
-  horizon_ = planner_open_space_config_.planning_horizon();
+  distance_approach_config_ =
+      planner_open_space_config_.distance_approach_config();
 
+  horizon_ = planner_open_space_config_.planning_horizon();
   // nominal sampling time
   ts_ = planner_open_space_config_.ts();
 
@@ -135,6 +137,8 @@ apollo::common::Status OpenSpacePlanner::Plan(
       x0, xF, horizon_, ts_, ego_, xWS, uWS, timeWS, XYbounds, obstacles_num,
       obstacles_vertices_num, obstacles_A, obstacles_b));
 
+  ADEBUG << "Distance approach configs set"
+         << distance_approach_config_.ShortDebugString();
   // result for distance approach problem
   Eigen::MatrixXd state_result_ds;
   Eigen::MatrixXd control_result_ds;
