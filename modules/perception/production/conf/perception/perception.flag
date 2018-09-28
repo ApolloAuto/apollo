@@ -1,0 +1,151 @@
+###########################################################################
+# Flags from sensor_manager
+
+# SensorManager config file
+# type: string
+# default:
+--obs_sensor_meta_path=./data/perception/common/sensor_meta.pt
+
+# The intrinsics/extrinsics dir
+# type: string
+# default:
+--obs_sensor_intrinsic_path=/apollo/data/params
+
+
+###########################################################################
+# Flags from fusion_component
+
+# onboard fusion method
+# type: string
+# default:
+--obs_onboard_fusion=DummyFusionSystem
+
+# main sensor for fusion
+# type: string
+# default:
+--obs_fusion_main_sensor=velodyne64
+
+# use object in-roi check function
+# type: bool
+# default:
+--obs_object_in_roi_check=false
+
+# roi radius for object in-roi check
+# type: double
+# default:
+--obs_roi_radius_for_object_check=180
+
+###########################################################################
+# Flags from lidar_onboard/component/segmentation_component.cc
+
+# segmentation component send message name
+# type: string
+# default:
+--obs_segmentation_component_output_channel_name=/perception/inner/SegmentationObjects
+
+# lidar to novatel child frame id.
+# type: string
+# default:
+--obs_lidar2novatel_tf2_child_frame_id=velodyne64
+
+# velodyne64 query tf offset
+# type: double
+# default: 8
+--obs_velodyne64_query_tf_offset=20
+
+
+###########################################################################
+# Flags from lidar_onboard/component/recognition_component.cc
+
+# recognition component send message name
+# type: string
+# default:
+--obs_recognition_component_output_channel_name=/perception/inner/PrefusedObjects
+
+# sensor name
+# type: string
+# default:
+--obs_lidar_onboard_sensor_name=velodyne64
+
+###########################################################################
+# Flags from common_flags
+
+# enable hdmap input for roi filter.
+# type: bool
+# default: true
+--obs_enable_hdmap_input=true
+
+# whether to send message for visualization.
+# type: bool
+# default: false
+--obs_enable_visualization=false
+
+# where to save screenshots of visualization
+# type: string
+# default: ./
+--obs_screen_output_dir=./
+
+# whether switch to benchmark output mode
+# type: bool
+# default: false
+--obs_benchmark_mode=false
+
+# whether save fusion supplement data
+# type: bool
+# default: false
+--obs_save_fusion_supplement=true
+
+###########################################################################
+# Flags from transform_wrapper
+
+# sensor to novatel frame id.
+# type: string
+# default:
+--obs_sensor2novatel_tf2_frame_id=novatel
+
+# novatel to world frame id.
+# type: string
+# default:
+--obs_novatel2world_tf2_frame_id=world
+
+# novatel to world child frame id.
+# type: string
+# default:
+--obs_novatel2world_tf2_child_frame_id=novatel
+
+# query Cybertron TF buffer size in second.
+# type: double
+# default: 0.01
+--obs_tf2_buff_size=0.01
+
+# enabled state of local pose extrapolation when failed to query pose
+# type: bool
+# default: false
+--obs_enable_local_pose_extrapolation=true
+
+# local pose cache size
+# type: double
+# default: 1.0
+--obs_transform_cache_size=1.0
+
+# max local pose extrapolation latency
+# type: double
+# default: 0.15
+--obs_max_local_pose_extrapolation_latency=0.15
+
+
+###########################################################################
+# Flags from radar_detection_component
+
+# radar obstacle perception.
+# type: string
+# default: RadarObstaclePerception
+--obs_radar_obstacle_perception=RadarObstaclePerception
+
+# whether convert timestamp to gps timestamp
+# type: bool
+# default: false
+--obs_convert2gps_timestamp=false
+
+
+--work_root=/apollo/modules/perception/production

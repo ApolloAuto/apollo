@@ -1,0 +1,7 @@
+use_lidar: true
+use_radar: true
+use_camera: true
+tracker_method: "PbfTracker"
+data_association_method: "HMAssociation"
+gate_keeper_method: "PbfGatekeeper"
+prohibition_sensors: "radar_front"

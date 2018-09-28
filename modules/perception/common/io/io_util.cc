@@ -20,16 +20,16 @@
 #include <google/protobuf/io/gzip_stream.h>
 #include <google/protobuf/io/zero_copy_stream_impl.h>
 #include <google/protobuf/text_format.h>
-#include <yaml-cpp/yaml.h>
 #include <Eigen/Geometry>
 #include <algorithm>
 #include <fstream>
 #include <iomanip>
 #include <vector>
 
-#include "modules/perception/base/camera.h"
 #include "cybertron/common/log.h"
+#include "modules/perception/base/camera.h"
 #include "modules/perception/lib/io/file_util.h"
+#include "yaml-cpp/yaml.h"
 
 namespace apollo {
 namespace perception {
