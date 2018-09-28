@@ -20,6 +20,7 @@ import sys
 import os
 import importlib
 import collections
+from google.protobuf.descriptor_pb2 import FileDescriptorProto
 
 # init vars
 CYBERTRON_PATH = os.environ['CYBERTRON_PATH']
@@ -120,9 +121,18 @@ class RecordWriter(object):
         return _CYBER_RECORD.PyRecordWriter_WriteChannel(self.record_writer,
                     channel_name, type_name, proto_desc)
 
-    def write_message(self, channel_name, rawmessage, time):
+    def write_message(self, channel_name, data, time, raw = True):
         """
         writer msg:channelname,rawmsg,writer time
         """
-        return _CYBER_RECORD.PyRecordWriter_WriteMessage(self.record_writer,
-                    channel_name, rawmessage, time)
+        if raw:
+            return _CYBER_RECORD.PyRecordWriter_WriteMessage(self.record_writer,
+                    channel_name, data, time, "")
+        else:
+            file_desc = data.DESCRIPTOR.file
+            proto = FileDescriptorProto()
+            file_desc.CopyToProto(proto)
+            proto.name = file_desc.name
+            desc_str = proto.SerializeToString()
+            return _CYBER_RECORD.PyRecordWriter_WriteMessage(self.record_writer,
+                    channel_name, data.SerializeToString(), time, desc_str)

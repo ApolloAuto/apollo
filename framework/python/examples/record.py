@@ -22,6 +22,8 @@ import sys
 sys.path.append("../")
 from cybertron import cybertron
 from cybertron import record
+import chatter_pb2
+from google.protobuf.descriptor_pb2 import FileDescriptorProto
 
 TEST_RECORD_FILE = "test02.record"
 CHAN_1 = "channel/chatter"
@@ -41,6 +43,20 @@ def test_record_writer(writer_path):
     print "+++ begin to writer..."
     fwriter.write_channel(CHAN_1, MSG_TYPE, STR_10B)
     fwriter.write_message(CHAN_1, STR_10B, 1000)
+
+    msg = chatter_pb2.Chatter()
+    msg.content = "AAAAAA"
+
+    file_desc = msg.DESCRIPTOR.file
+    proto = FileDescriptorProto()
+    file_desc.CopyToProto(proto)
+    proto.name = file_desc.name
+    desc_str = proto.SerializeToString()
+
+    fwriter.write_channel('chatter_a', msg.DESCRIPTOR.full_name, desc_str)
+    fwriter.write_message('chatter_a', msg, 998, False)
+    fwriter.write_message("chatter_a", msg.SerializeToString(), 999)
+
     fwriter.close()
 
 def test_record_reader(reader_path):
@@ -60,7 +76,7 @@ def test_record_reader(reader_path):
         print "msgtime -> %d" % timestamp
         print "msgnum -> %d" % freader.get_messagenumber(channelname)
         print "msgtype -> %s" % datatype
-        print "pbdesc -> %s" % freader.get_protodesc(channelname)
+        # print "pbdesc -> %s" % freader.get_protodesc(channelname)
         count = count + 1
 
 if __name__ == '__main__':
