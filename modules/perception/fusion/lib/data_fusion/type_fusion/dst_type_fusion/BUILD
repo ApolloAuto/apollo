@@ -25,4 +25,19 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "dst_type_fusion_test",
+    size = "small",
+    srcs = [
+        "dst_type_fusion_test.cc",
+    ],
+    deps = [
+        ":dst_type_fusion",
+        "//modules/perception/base:base_type",
+        "//modules/perception/base:frame",
+        "//modules/perception/common:perception_gflags",
+        "@gtest//:main",
+    ],
+)
+
 cpplint()
