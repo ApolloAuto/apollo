@@ -21,6 +21,9 @@
 #include "IpTNLP.hpp"
 #include "IpTypes.hpp"
 
+#include "modules/common/util/file.h"
+#include "modules/planning/common/planning_gflags.h"
+
 #include "gtest/gtest.h"
 
 namespace apollo {
@@ -28,7 +31,17 @@ namespace planning {
 
 class DistanceApproachIPOPTInterfaceTest : public ::testing::Test {
  public:
-  virtual void SetUp() { ProblemSetup(); }
+  virtual void SetUp() {
+    CHECK(apollo::common::util::GetProtoFromFile(
+        FLAGS_planner_open_space_config_filename, &planner_open_space_config_))
+        << "Failed to load open space config file "
+        << FLAGS_planner_open_space_config_filename;
+
+    distance_approach_config_ =
+        planner_open_space_config_.distance_approach_config();
+
+    ProblemSetup();
+  }
 
  protected:
   void ProblemSetup();
@@ -51,6 +64,8 @@ class DistanceApproachIPOPTInterfaceTest : public ::testing::Test {
   int num_of_constraints_;
 
   std::unique_ptr<DistanceApproachIPOPTInterface> ptop_ = nullptr;
+  apollo::planning::PlannerOpenSpaceConfig planner_open_space_config_;
+  apollo::planning::DistanceApproachConfig distance_approach_config_;
 };
 
 void DistanceApproachIPOPTInterfaceTest::ProblemSetup() {
@@ -68,12 +83,7 @@ void DistanceApproachIPOPTInterfaceTest::ProblemSetup() {
       num_of_variables_, num_of_constraints_, horizon_, ts_, ego_, xWS_, uWS_,
       timeWS_, x0_, xf_, XYbounds_, obstacles_vertices_num_, obstacles_num_));
 
-  double weight_u = 0.1;
-  double weight_time_1 = 0.2;
-  double weight_time_2 = 0.3;
-  double weight_reg = 0.4;
-  ptop_->set_objective_weights(weight_u, weight_time_1, weight_time_2,
-                               weight_reg);
+  ptop_->set_objective_weights(distance_approach_config_);
 }
 
 TEST_F(DistanceApproachIPOPTInterfaceTest, initilization) {
@@ -126,7 +136,7 @@ TEST_F(DistanceApproachIPOPTInterfaceTest, eval_f) {
   std::fill_n(x, kNumOfVariables, 1.2);
   bool res = ptop_->eval_f(kNumOfVariables, x, true, obj_value);
   EXPECT_TRUE(res);
-  EXPECT_DOUBLE_EQ(obj_value, 241.10399999999802);
+  EXPECT_DOUBLE_EQ(obj_value, 2883.672728746038);
 }
 
 }  // namespace planning

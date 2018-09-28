@@ -86,10 +86,12 @@ cc_library(
         "distance_approach_ipopt_interface.h",
     ],
     deps = [
+        "//framework:cybertron",
         "//modules/common/math",
         "//modules/common/util",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/proto:planning_proto",
+        "//modules/planning/proto:planning_config_proto",
         "//modules/common/configs:vehicle_config_helper",
         "@eigen//:eigen",
         "@ipopt//:ipopt",

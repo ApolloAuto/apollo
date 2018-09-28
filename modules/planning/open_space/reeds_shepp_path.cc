@@ -26,7 +26,7 @@ namespace planning {
 ReedShepp::ReedShepp(const common::VehicleParam& vehicle_param,
                      const PlannerOpenSpaceConfig& open_space_conf)
     : vehicle_param_(vehicle_param), open_space_conf_(open_space_conf) {
-  max_kappa_ = std::tan(open_space_conf.max_steering()) /
+  max_kappa_ = std::tan(open_space_conf.warm_start_config().max_steering()) /
                vehicle_param_.front_edge_to_center();
 }
 
@@ -868,7 +868,8 @@ bool ReedShepp::GenerateLocalConfigurations(
     const std::shared_ptr<Node3d> start_node,
     const std::shared_ptr<Node3d> end_node,
     std::vector<ReedSheppPath>* all_possible_paths) {
-  double step_scaled = open_space_conf_.step_size() * max_kappa_;
+  double step_scaled =
+      open_space_conf_.warm_start_config().step_size() * max_kappa_;
   for (auto& path : *all_possible_paths) {
     std::size_t point_num =
         path.total_length / step_scaled + path.segs_lengths.size() + 3;

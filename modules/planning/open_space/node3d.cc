@@ -28,15 +28,22 @@ Node3d::Node3d(double x, double y, double phi,
   x_ = x;
   y_ = y;
   phi_ = phi;
-  x_grid_ = static_cast<std::size_t>((x_ - open_space_conf.min_x()) /
-                                     open_space_conf.xy_grid_resolution());
-  y_grid_ = static_cast<std::size_t>((y_ - open_space_conf.min_y()) /
-                                     open_space_conf.xy_grid_resolution());
-  phi_grid_ = static_cast<std::size_t>((phi_ - (-M_PI)) /
-                                       open_space_conf.phi_grid_resolution());
-  index_ = phi_grid_ * (open_space_conf.max_x() - open_space_conf.min_x()) *
-               (open_space_conf.max_y() - open_space_conf.min_y()) +
-           y_grid_ * (open_space_conf.max_x() - open_space_conf.min_x()) +
+  x_grid_ = static_cast<std::size_t>(
+      (x_ - open_space_conf.warm_start_config().min_x()) /
+      open_space_conf.warm_start_config().xy_grid_resolution());
+  y_grid_ = static_cast<std::size_t>(
+      (y_ - open_space_conf.warm_start_config().min_y()) /
+      open_space_conf.warm_start_config().xy_grid_resolution());
+  phi_grid_ = static_cast<std::size_t>(
+      (phi_ - (-M_PI)) /
+      open_space_conf.warm_start_config().phi_grid_resolution());
+  index_ = phi_grid_ *
+               (open_space_conf.warm_start_config().max_x() -
+                open_space_conf.warm_start_config().min_x()) *
+               (open_space_conf.warm_start_config().max_y() -
+                open_space_conf.warm_start_config().min_y()) +
+           y_grid_ * (open_space_conf.warm_start_config().max_x() -
+                      open_space_conf.warm_start_config().min_x()) +
            x_grid_;
 }
 
@@ -53,15 +60,22 @@ Node3d::Node3d(double x, double y, double phi, std::vector<double> traversed_x,
   x_ = x;
   y_ = y;
   phi_ = phi;
-  x_grid_ = static_cast<std::size_t>((x_ - open_space_conf.min_x()) /
-                                     open_space_conf.xy_grid_resolution());
-  y_grid_ = static_cast<std::size_t>((y_ - open_space_conf.min_y()) /
-                                     open_space_conf.xy_grid_resolution());
-  phi_grid_ = static_cast<std::size_t>((phi_ - (-M_PI)) /
-                                       open_space_conf.phi_grid_resolution());
-  index_ = phi_grid_ * (open_space_conf.max_x() - open_space_conf.min_x()) *
-               (open_space_conf.max_y() - open_space_conf.min_y()) +
-           y_grid_ * (open_space_conf.max_x() - open_space_conf.min_x()) +
+  x_grid_ = static_cast<std::size_t>(
+      (x_ - open_space_conf.warm_start_config().min_x()) /
+      open_space_conf.warm_start_config().xy_grid_resolution());
+  y_grid_ = static_cast<std::size_t>(
+      (y_ - open_space_conf.warm_start_config().min_y()) /
+      open_space_conf.warm_start_config().xy_grid_resolution());
+  phi_grid_ = static_cast<std::size_t>(
+      (phi_ - (-M_PI)) /
+      open_space_conf.warm_start_config().phi_grid_resolution());
+  index_ = phi_grid_ *
+               (open_space_conf.warm_start_config().max_x() -
+                open_space_conf.warm_start_config().min_x()) *
+               (open_space_conf.warm_start_config().max_y() -
+                open_space_conf.warm_start_config().min_y()) +
+           y_grid_ * (open_space_conf.warm_start_config().max_x() -
+                      open_space_conf.warm_start_config().min_x()) +
            x_grid_;
   traversed_x_ = traversed_x;
   traversed_y_ = traversed_y;
