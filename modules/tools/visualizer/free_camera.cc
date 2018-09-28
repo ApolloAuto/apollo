@@ -17,9 +17,7 @@
 #include "modules/tools/visualizer/free_camera.h"
 
 FreeCamera::FreeCamera(void)
-    : AbstractCamera(),
-      //    _speed(1.0f),
-      translation_(0.0, 0.0f, 0.0f) {}
+    : AbstractCamera(), translation_(0.0, 0.0f, 0.0f) {}
 
 void FreeCamera::UpdateWorld(void) {
   QMatrix4x4 R = YawPitchRoll(attitude_[0], attitude_[1], attitude_[2]);

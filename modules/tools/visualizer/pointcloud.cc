@@ -20,14 +20,15 @@
 #include <iostream>
 #include <sstream>
 
-PointCloud::PointCloud(int pointCount, int vertexElementCount,
-                       std::shared_ptr<QOpenGLShaderProgram>& shaderProgram)
+PointCloud::PointCloud(
+    int pointCount, int vertexElementCount,
+    const std::shared_ptr<QOpenGLShaderProgram>& shaderProgram)
     : RenderableObject(pointCount, vertexElementCount, shaderProgram),
       buffer_(nullptr) {}
 
 PointCloud::~PointCloud(void) {
   if (buffer_) {
-    delete [] buffer_;
+    delete[] buffer_;
     buffer_ = nullptr;
   }
 }
@@ -53,7 +54,7 @@ bool PointCloud::FillData(
     GLfloat* tmp = buffer_;
 
     for (int i = 0; i < vertex_count(); ++i, tmp += vertex_element_count()) {
-      const  apollo::drivers::PointXYZIT& point = pdata->point(i);
+      const apollo::drivers::PointXYZIT& point = pdata->point(i);
       tmp[0] = point.x();
       tmp[1] = point.z();
       tmp[2] = -point.y();

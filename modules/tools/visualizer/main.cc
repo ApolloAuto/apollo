@@ -14,11 +14,11 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "cybertron/init.h"
-#include "modules/tools/visualizer/main_window.h"
 #include <QApplication>
 #include <QFile>
 #include <QSurfaceFormat>
+#include "cybertron/init.h"
+#include "modules/tools/visualizer/main_window.h"
 
 int main(int argc, char* argv[]) {
   QSurfaceFormat format;

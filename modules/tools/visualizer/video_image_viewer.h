@@ -17,20 +17,19 @@
 #ifndef MODULES_TOOLS_VISUALIZER_VIDEOIMGVIEWER_H_
 #define MODULES_TOOLS_VISUALIZER_VIDEOIMGVIEWER_H_
 
+#include <QOpenGLFunctions>
+#include <QOpenGLWidget>
+#include <memory>
+
 #include "modules/tools/visualizer/free_camera.h"
 #include "modules/tools/visualizer/plane.h"
 #include "modules/tools/visualizer/renderable_object.h"
 #include "modules/tools/visualizer/target_camera.h"
 
-#include <memory>
-#include <QOpenGLFunctions>
-#include <QOpenGLWidget>
-
 class Texture;
 class FixedAspectRatioWidget;
 
 class VideoImgViewer : public QOpenGLWidget, protected QOpenGLFunctions {
-  Q_OBJECT
  public:
   explicit VideoImgViewer(QWidget* parent = nullptr);
   ~VideoImgViewer();

@@ -29,9 +29,9 @@ class RenderableObject : protected QOpenGLFunctions {
   static std::shared_ptr<QOpenGLShaderProgram> CreateShaderProgram(
       const QString& vertexShaderFileName, const QString& fragShaderFileName);
 
-  explicit RenderableObject(
-      int vertex_count = 1, int vertex_element_count = 3,
-      std::shared_ptr<QOpenGLShaderProgram>& shaderProgram = NullRenderableObj);
+  explicit RenderableObject(int vertex_count = 1, int vertex_element_count = 3,
+                            const std::shared_ptr<QOpenGLShaderProgram>&
+                                shaderProgram = NullRenderableObj);
   virtual ~RenderableObject(void);
 
   virtual GLenum GetPrimitiveType(void) const = 0;
@@ -53,7 +53,7 @@ class RenderableObject : protected QOpenGLFunctions {
   }
 
   void set_shader_program(
-      std::shared_ptr<QOpenGLShaderProgram>& shaderProgram) {
+      const std::shared_ptr<QOpenGLShaderProgram>& shaderProgram) {
     shader_program_ = shaderProgram;
   }
 

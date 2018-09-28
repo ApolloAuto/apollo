@@ -17,22 +17,24 @@
 #ifndef MODULES_TOOLS_VISUALIZER_SCENEVIEWER_H_
 #define MODULES_TOOLS_VISUALIZER_SCENEVIEWER_H_
 
-#include "modules/tools/visualizer/free_camera.h"
-#include "modules/tools/visualizer/plane.h"
-#include "modules/tools/visualizer/renderable_object.h"
-#include "modules/tools/visualizer/target_camera.h"
-
 #include <QList>
 #include <QOpenGLFunctions>
 #include <QOpenGLWidget>
 #include <map>
 #include <memory>
+#include <string>
+
+#include "modules/tools/visualizer/free_camera.h"
+#include "modules/tools/visualizer/plane.h"
+#include "modules/tools/visualizer/renderable_object.h"
+#include "modules/tools/visualizer/target_camera.h"
 
 class QTimer;
 class SceneCameraDialog;
 
 class SceneViewer : public QOpenGLWidget, protected QOpenGLFunctions {
   Q_OBJECT
+
  public:
   enum CameraType {
     TARGET,
@@ -45,7 +47,8 @@ class SceneViewer : public QOpenGLWidget, protected QOpenGLFunctions {
   bool is_init(void) const { return is_init_; }
   bool IsFreeCamera(void) const { return current_cameraPtr_ == &free_camera_; }
 
-  bool AddTempRenderableObj(const std::string& tmpObjGroupName, RenderableObject* renderObj);
+  bool AddTempRenderableObj(const std::string& tmpObjGroupName,
+                            RenderableObject* renderObj);
   bool AddPermanentRenderObj(RenderableObject* obj) {
     if (obj && obj->haveShaderProgram() && is_init_) {
       permanent_renderable_obj_list_.append(obj);
@@ -66,8 +69,9 @@ class SceneViewer : public QOpenGLWidget, protected QOpenGLFunctions {
 
   float sensitivity(void) const { return sensitivity_; }
 
-  void AddNewShaderProg(const std::string& shaderProgName,
-                        std::shared_ptr<QOpenGLShaderProgram>& newShaderProg) {
+  void AddNewShaderProg(
+      const std::string& shaderProgName,
+      const std::shared_ptr<QOpenGLShaderProgram>& newShaderProg) {
     if (newShaderProg == nullptr) {
       return;
     }
@@ -147,7 +151,7 @@ class SceneViewer : public QOpenGLWidget, protected QOpenGLFunctions {
 
   struct TempRenderableObjGroup;
 
-  std::map< const std::string, TempRenderableObjGroup* > tmp_renderable_obj_list_;
+  std::map<const std::string, TempRenderableObjGroup*> tmp_renderable_obj_list_;
   QList<RenderableObject*> permanent_renderable_obj_list_;
 };
 

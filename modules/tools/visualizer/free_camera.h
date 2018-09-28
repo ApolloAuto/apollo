@@ -21,7 +21,7 @@
 
 class FreeCamera : public AbstractCamera {
  public:
-  explicit FreeCamera(void);
+  FreeCamera(void);
   ~FreeCamera() {}
 
   // After calling the function updateWorld

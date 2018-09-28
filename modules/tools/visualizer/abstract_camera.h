@@ -26,17 +26,17 @@ class AbstractCamera {
 
   static const QVector3D UP;
   static float Radians(float degrees) {
-    return degrees * float(0.01745329251994329576923690768489);
+    return degrees * static_cast<float>(0.01745329251994329576923690768489);
   }
 
   static float Degrees(float radians) {
-    return radians * float(57.295779513082320876798154814105);
+    return radians * static_cast<float>(57.295779513082320876798154814105);
   }
 
   static QMatrix4x4 YawPitchRoll(float yawInDegrees, float picthInDegrees,
                                  float rollInDegrees);
 
-  explicit AbstractCamera();
+  AbstractCamera(void);
   virtual ~AbstractCamera() {}
 
   virtual void UpdateWorld(void) = 0;  // update modelview
@@ -113,10 +113,10 @@ class AbstractCamera {
 
   void UpdateProjection(void) {
     projection_mat_.setToIdentity();
-    if (camera_mode() == CameraMode::PerspectiveMode)
+    if (camera_mode() == CameraMode::PerspectiveMode) {
       projection_mat_.perspective(fov_, near_plane_width_ / near_plane_height_,
                                   near_plane_, far_plane_);
-    else {
+    } else {
       projection_mat_.ortho(-near_plane_width_ / 2.0f, near_plane_width_ / 2.0f,
                             -near_plane_height_ / 2.0f,
                             near_plane_height_ / 2.0f, 0.0f, 0.0f);

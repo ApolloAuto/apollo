@@ -17,18 +17,19 @@
 #ifndef MODULES_TOOLS_VISUALIZER_FIXEDASPECTRATIOWIDGET_H_
 #define MODULES_TOOLS_VISUALIZER_FIXEDASPECTRATIOWIDGET_H_
 
-#include "modules/tools/visualizer/video_image_viewer.h"
 #include <QTimer>
 #include <QWidget>
+#include <memory>
+#include "modules/tools/visualizer/video_image_viewer.h"
 
 class FixedAspectRatioWidget : public QWidget {
   Q_OBJECT
-  
+
  public:
   explicit FixedAspectRatioWidget(QWidget *parent = nullptr, int index = 0);
 
   bool is_init(void) const { return viewer_.is_init_; }
-  void SetupDynamicTexture(std::shared_ptr<Texture> &textureObj);
+  void SetupDynamicTexture(const std::shared_ptr<Texture> &textureObj);
 
   void set_index(int i) { index_ = i; }
   int index(void) const { return index_; }

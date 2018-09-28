@@ -18,7 +18,7 @@
 
 std::shared_ptr<Texture> Plane::NullTextureObj;
 
-Plane::Plane(std::shared_ptr<Texture>& t)
+Plane::Plane(const std::shared_ptr<Texture>& t)
     : RenderableObject(4, 4), texture_id_(0), texture_(t) {}
 
 bool Plane::FillVertexBuffer(GLfloat* pBuffer) {
@@ -68,7 +68,7 @@ void Plane::SetupAllAttrPointer(void) {
   glEnableVertexAttribArray(1);
   glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE,
                         sizeof(GLfloat) * vertex_element_count(),
-                        (void*)(sizeof(GLfloat) * 2));
+                        reinterpret_cast<void*>(sizeof(GLfloat) * 2));
 }
 
 void Plane::Draw(void) {
