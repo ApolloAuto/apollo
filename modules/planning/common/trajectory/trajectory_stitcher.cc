@@ -170,9 +170,14 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
   std::size_t forward_time_index =
       prev_trajectory->QueryLowerBoundPoint(forward_rel_time);
 
+  ADEBUG << "Position matched index:\t" << position_matched_index;
+  ADEBUG << "Time matched index:\t" << time_matched_index;
+
+  auto matched_index = std::min(time_matched_index, position_matched_index);
+
   std::vector<TrajectoryPoint> stitching_trajectory(
       prev_trajectory->trajectory_points().begin() +
-          std::max(0, static_cast<int>(time_matched_index - 1)),
+          std::max(0, static_cast<int>(matched_index - 1)),
       prev_trajectory->trajectory_points().begin() + forward_time_index + 1);
 
   const double zero_s = stitching_trajectory.back().path_point().s();
