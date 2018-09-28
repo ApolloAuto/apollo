@@ -42,7 +42,8 @@ TEST(SensorObjectTest, test) {
   base_frame->sensor2world_pose = sensor2world_pose;
   base_frame->objects.emplace_back(base_object);
   SensorFramePtr frame_ptr(new SensorFrame());
-  frame_ptr->Initialize(base_frame, sensor_ptr);
+  frame_ptr->Initialize(base_frame, sensor_ptr->GetSensorId(),
+                        sensor_ptr->GetSensorType());
 
   SensorObjectPtr object(new SensorObject(base_object, frame_ptr));
 
