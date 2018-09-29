@@ -344,62 +344,31 @@ bool DistanceApproachIPOPTInterface::eval_g(int n, const double* x, bool new_x,
 bool DistanceApproachIPOPTInterface::get_starting_point(
     int n, bool init_x, double* x, bool init_z, double* z_L, double* z_U, int m,
     bool init_lambda, double* lambda) {
-  CHECK(n == num_of_variables_) << "No. of variables wrong. n : " << n;
+  CHECK(n == num_of_variables_)
+      << "No. of variables wrong in get_starting_point. n : " << n;
   CHECK(init_x == true) << "Warm start init_x setting failed";
   CHECK(init_z == false) << "Warm start init_z setting failed";
   CHECK(init_lambda == false) << "Warm start init_lambda setting failed";
 
-  // auto offset_time = horizon_ * 4;
-
-  // auto offset_input = horizon_ * 2 + offset_time;
-
-  // auto offset_l = offset_input + (horizon_ + 1) * 4;  // sum of
-  // obstacles_num.
-
-  // auto offset_m = offset_l + (horizon_ + 1) * obstacles_num_;
-
-  // 1. state variables linspace initialization
-
-  // TODO(QiL): replace the hot start guess with the initial caculation from
-  // warm up.
-
   std::size_t variable_index = 0;
-  // 1. state variables 4 * (N+1)
-  std::vector<std::vector<double>> x_guess(4,
-                                           std::vector<double>(horizon_ + 1));
 
-  for (std::size_t i = 0; i < 4; ++i) {
-    ::apollo::common::util::uniform_slice(x0_(i, 0), xf_(i, 0), horizon_ + 1,
-                                          &x_guess[i]);
-  }
-
-  for (std::size_t i = 0; i <= horizon_ + 1; ++i) {
+  // 1. state variables 4 * (horizon_ + 1)
+  for (std::size_t i = 0; i < horizon_ + 1; ++i) {
     for (std::size_t j = 0; j < 4; ++j) {
-      x[i * 4 + j] = x_guess[j][i];
+      x[i * 4 + j] = xWS_(j, i);
     }
     variable_index += 4;
   }
 
   // 2. control variable initialization, 2 * N
-  for (std::size_t i = 1; i <= 2 * horizon_; ++i) {
-    x[variable_index + i] = 0.6;
-    x[variable_index + i + 1] = 0.6;
+  for (std::size_t i = 1; i <= horizon_; ++i) {
+    x[variable_index + i] = uWS_(0, i - 1);
+    x[variable_index + i + 1] = uWS_(1, i - 1);
     variable_index += 2;
   }
 
-  // 3. sampling time constraints, N+1
-  for (std::size_t i = 0; i <= horizon_; ++i) {
-    x[i] = 0.5;
-    variable_index += 1;
-  }
-
-  // 4. sampling time constraints, N+1
-  for (std::size_t i = 0; i <= horizon_; ++i) {
-    x[i] = 0.5;
-    ++variable_index;
-  }
-
-  // 4. lagrange constraint l, obstacles_vertices_sum_ * (N+1)
+  // TODO(QiL) : better hot start l
+  // 3. lagrange constraint l, obstacles_vertices_sum_ * (N+1)
   for (std::size_t i = 1; i <= horizon_ + 1; ++i) {
     for (std::size_t j = 1; j <= obstacles_vertices_sum_; ++j) {
       x[i * obstacles_vertices_sum_ + j] = 0.2;
@@ -407,6 +376,7 @@ bool DistanceApproachIPOPTInterface::get_starting_point(
     }
   }
 
+  // TODO(QiL) : better hot start m
   // 4. lagrange constraint m, 4*obstacles_num * (horizon_+1)
   for (std::size_t i = 1; i <= horizon_ + 1; ++i) {
     for (std::size_t j = 1; j <= 4 * obstacles_num_; ++j) {
@@ -438,10 +408,6 @@ bool DistanceApproachIPOPTInterface::eval_h(int n, const double* x, bool new_x,
 
 bool DistanceApproachIPOPTInterface::eval_f(int n, const double* x, bool new_x,
                                             double& obj_value) {
-  // first (horizon_ + 1) * 4 is state, then next horizon_ * 2 is control
-  // input, next horizon_ + 1 is sampling time, next horizon_ + 1 is
-  // lagrangian l, next horizon_ +1 is lagrangian n
-
   // Objective is :
   // min control inputs
   // min input rate
