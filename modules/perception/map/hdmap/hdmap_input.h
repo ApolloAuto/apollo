@@ -26,7 +26,7 @@
 #include "modules/map/hdmap/hdmap_common.h"
 // #include "modules/perception/base/point_cloud_types.h"
 #include "modules/perception/lib/singleton/singleton.h"
-// #include "modules/perception/lib/thread/mutex.h"
+#include "modules/perception/lib/thread/mutex.h"
 
 namespace apollo {
 namespace perception {
@@ -41,9 +41,9 @@ class HDMapInput {
                          std::shared_ptr<base::HdmapStruct> hdmap_struct_prt);
   bool GetNearestLaneDirection(const base::PointD& pointd,
                                Eigen::Vector3d* lane_direction);
-  //   bool GetSignals(const Eigen::Vector3d& pointd,
-  //       double forward_distance,
-  //       std::vector<adu::common::hdmap::Signal>* signals);
+  bool GetSignals(const Eigen::Vector3d& pointd,
+                  double forward_distance,
+                  std::vector<apollo::hdmap::Signal>* signals);
 
  private:
   HDMapInput() = default;
@@ -64,7 +64,7 @@ class HDMapInput {
       std::vector<base::RoadBoundary>* flt_road_boundaries_ptr);
 
   void DownsamplePoints(
-      const std::shared_ptr<base::PointCloud<base::PointD>>& raw_cloud_ptr,
+      const base::PointDCloudPtr& raw_cloud_ptr,
       base::PointCloud<base::PointD>* polygon_ptr,
       int min_points_num_for_sample = 15) const;
 
