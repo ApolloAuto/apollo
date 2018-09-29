@@ -1,8 +1,18 @@
-// Copyright 2018 Baidu Inc. All Rights Reserved.
-// @author: Chongchong Li (lichongchong@baidu.com)
-// @file: conti_ars_detector.h
-// @brief: detector for Continental Ars 408-21
-
+/******************************************************************************
+* Copyright 2018 The Apollo Authors. All Rights Reserved.
+*
+* Licensed under the Apache License, Version 2.0 (the License);
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an AS IS BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*****************************************************************************/
 #ifndef RADAR_LIB_DETECTOR_CONTI_ARS_DETECTOR_CONTI_ARS_DETECTOR_H_
 #define RADAR_LIB_DETECTOR_CONTI_ARS_DETECTOR_CONTI_ARS_DETECTOR_H_
 
