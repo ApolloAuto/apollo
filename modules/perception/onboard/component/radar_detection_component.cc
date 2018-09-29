@@ -28,24 +28,30 @@ DEFINE_string(obs_radar_obstacle_perception, "RadarObstaclePerception",
 DEFINE_bool(obs_convert2gps_timestamp, false,
             "whether convert timestamp to gps timestamp.");
 
-int RadarDetectionComponent::Init() {
-  std::string radar_name;
-  READ_CONF(this->_name, "radar_name", radar_name);
-  READ_CONF(this->_name, "tf_child_frame_id", tf_child_frame_id_);
-  READ_CONF(this->_name, "radar_forward_distance", radar_forward_distance_);
-  READ_CONF(this->_name, "radar_preprocessor", preprocessor_name_);
-  READ_CONF(this->_name, "radar_pipeline", pipeline_name_);
+bool RadarDetectionComponent::Init() {
+  RadarComponentConfig comp_config;
+  if (!GetProtoConfig(&comp_config)) {
+    return false;
+  }
+  AINFO <<"Radarr Component Configs: " << comp_config.DebugString();
+
+  // to load component configs
+  tf_child_frame_id_ = comp_config.tf_child_frame_id();
+  radar_forward_distance_ = comp_config.radar_forward_distance();
+  preprocessor_name_ = comp_config.radar_preprocessor();
+  pipeline_name_ = comp_config.radar_pipeline();
 
   common::SensorManager* sensor_manager =
       lib::Singleton<common::SensorManager>::get_instance();
   if (sensor_manager == nullptr) {
     AERROR << "Failed to get sensor manager instance";
-    return FAIL;
+    return false;
   }
-  bool ret = sensor_manager->GetSensorInfo(radar_name, &radar_info_);
+  
+  bool ret = sensor_manager->GetSensorInfo(comp_config.radar_name(), &radar_info_);
   if (!ret) {
-    AERROR << "Failed to get sensor info, sensor name: " << radar_name;
-    return FAIL;
+    AERROR << "Failed to get sensor info, sensor name: " << comp_config.radar_name();
+    return false;
   }
 
   // init algorithm plugin
@@ -54,25 +60,23 @@ int RadarDetectionComponent::Init() {
   radar2novatel_trans_.Init(tf_child_frame_id_);
   localization_subscriber_.Init(
       FLAGS_obs_localization_channel,
-      FLAGS_obs_localization_channel + '_' + radar_name);
-  return SUCC;
+      FLAGS_obs_localization_channel + '_' + comp_config.radar_name());
+  return true;
 }
 
-int RadarDetectionComponent::Proc(
-    const std::shared_ptr<RadarObsArray const>& message) {
+bool RadarDetectionComponent::Proc(
+    const std::shared_ptr<ContiRadar>& message) {
   AINFO << "Enter radar preprocess, message timestamp: "
-           << GLOG_TIMESTAMP(message->measurement_time())
+           << std::to_string(message->header().timestamp_sec())
            << " current timestamp " << lib::TimeUtil::GetCurrentTime();
   std::shared_ptr<SensorFrameMessage> out_message(new (std::nothrow)
                                                       SensorFrameMessage);
   int status = InternalProc(message, out_message);
-  if (status == SUCC) {
-    Send("/perception/inner/PrefusedObjects", out_message);
+  if (status) {
+    writer_->Write(out_message);
     AINFO << "Send radar processing output message.";
   }
   return status;
-
-  return 1;
 }
 
 int RadarDetectionComponent::InitAlgorithmPlugin() {
@@ -99,31 +103,31 @@ int RadarDetectionComponent::InitAlgorithmPlugin() {
   return SUCC;
 }
 
-int RadarDetectionComponent::InternalProc(
-    const std::shared_ptr<RadarObsArray const>& in_message,
+bool RadarDetectionComponent::InternalProc(
+    const std::shared_ptr<ContiRadar>& in_message,
     std::shared_ptr<SensorFrameMessage> out_message) {
   PERCEPTION_PERF_FUNCTION_WITH_INDICATOR(radar_info_.name);
-  RadarObsArray raw_obstacles = *in_message;
+  ContiRadar raw_obstacles = *in_message;
   {
     std::unique_lock<std::mutex> lock(_mutex);
     ++seq_num_;
   }
-  double timestamp = in_message->measurement_time();
+  double timestamp = in_message->header().timestamp_sec();
   const double cur_time = lib::TimeUtil::GetCurrentTime();
   const double start_latency = (cur_time - timestamp) * 1e3;
   AINFO << "FRAME_STATISTICS:Radar:Start:msg_time["
-           << GLOG_TIMESTAMP(timestamp) << "]:cur_time["
-           << GLOG_TIMESTAMP(cur_time) << "]:cur_latency[" << start_latency
+           << std::to_string(timestamp) << "]:cur_time["
+           << std::to_string(cur_time) << "]:cur_latency[" << start_latency
            << "]";
   PERCEPTION_PERF_BLOCK_START();
   // init preprocessor_options
   radar::PreprocessorOptions preprocessor_options;
-  RadarObsArray corrected_obstacles;
+  ContiRadar corrected_obstacles;
   radar_preprocessor_->Preprocess(raw_obstacles, preprocessor_options,
                                   &corrected_obstacles);
   PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(radar_info_.name,
                                            "radar_preprocessor");
-  timestamp = corrected_obstacles.measurement_time();
+  timestamp = corrected_obstacles.header().timestamp_sec();
   if (FLAGS_obs_convert2gps_timestamp) {
     timestamp = lib::TimeUtil::Unix2Gps(timestamp);
   }
@@ -140,16 +144,16 @@ int RadarDetectionComponent::InternalProc(
   Eigen::Affine3d radar_trans;
   if (radar2world_trans_.GetSensor2worldTrans(timestamp, &radar_trans) !=
       SUCC) {
-    out_message->error_code_ = ::adu::common::perception::ERROR_TF;
+    out_message->error_code_ = apollo::common::ErrorCode::PERCEPTION_ERROR_TF;
     AERROR << "Fail to get pose at time: " << timestamp;
-    return SUCC;
+    return true;
   }
   Eigen::Affine3d radar2novatel_trans;
   if (radar2novatel_trans_.GetTrans(timestamp, &radar2novatel_trans, "novatel",
                                     tf_child_frame_id_) != SUCC) {
-    out_message->error_code_ = ::adu::common::perception::ERROR_TF;
+    out_message->error_code_ = apollo::common::ErrorCode::PERCEPTION_ERROR_TF;
     AERROR << "Fail to get radar2novatel trans at time: " << timestamp;
-    return SUCC;
+    return true;
   }
   PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(radar_info_.name,
                                            "GetSensor2worldTrans");
@@ -161,8 +165,8 @@ int RadarDetectionComponent::InternalProc(
           timestamp, &(options.detector_options.car_linear_speed),
           &(options.detector_options.car_angular_speed)) != SUCC) {
     AERROR << "Failed to call get_car_speed. [timestamp: "
-              << GLOG_TIMESTAMP(timestamp);
-    return FAIL;
+              << std::to_string(timestamp);
+    return false;
   }
   PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(radar_info_.name, "GetCarSpeed");
   // init roi_filter_options
@@ -185,9 +189,9 @@ int RadarDetectionComponent::InternalProc(
       radar_perception_->Perceive(corrected_obstacles, options, &radar_objects);
 
   if (!result) {
-    out_message->error_code_ = ::adu::common::perception::ERROR_PROCESS;
+    out_message->error_code_ = apollo::common::ErrorCode::PERCEPTION_ERROR_PROCESS;
     AERROR << "RadarDetector Proc failed.";
-    return SUCC;
+    return true;
   }
   out_message->frame_.reset(new base::Frame());
   out_message->frame_->sensor_info = radar_info_;
@@ -197,15 +201,15 @@ int RadarDetectionComponent::InternalProc(
 
   const double end_timestamp = lib::TimeUtil::GetCurrentTime();
   const double end_latency =
-      (end_timestamp - in_message->measurement_time()) * 1e3;
+      (end_timestamp - in_message->header().timestamp_sec()) * 1e3;
   PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(radar_info_.name,
                                            "radar_perception");
   AINFO << "FRAME_STATISTICS:Radar:End:msg_time["
-           << GLOG_TIMESTAMP(in_message->measurement_time()) << "]:cur_time["
-           << GLOG_TIMESTAMP(end_timestamp) << "]:cur_latency[" << end_latency
+           << std::to_string(in_message->header().timestamp_sec()) << "]:cur_time["
+           << std::to_string(end_timestamp) << "]:cur_latency[" << end_latency
            << "]";
 
-  return SUCC;
+  return true;
 }
 
 int RadarDetectionComponent::GetCarLocalizationSpeed(

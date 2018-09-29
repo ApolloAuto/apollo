@@ -22,8 +22,7 @@
 #include <vector>
 
 #include "boost/circular_buffer.hpp"
-#include "cybertron/common/log.h"
-#include "cybertron/component/component.h"
+#include "cybertron/cybertron.h"
 #include "gflags/gflags.h"
 
 namespace apollo {
@@ -77,7 +76,7 @@ void MsgBuffer<T>::Init(const std::string& channel, const std::string& name) {
   } else {
     node_name_ = name + "_subscriber";
   }
-  node_.reset(new cybertron::Node(node_name_));
+  node_.reset(apollo::cybertron::CreateNode(node_name_).release());
 
   std::function<void(const ConstPtr&)> register_call =
       std::bind(&MsgBuffer<T>::MsgCallback, this, std::placeholders::_1);

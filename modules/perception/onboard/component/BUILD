@@ -36,6 +36,7 @@ cc_library(
         "//modules/common/proto:header_proto",
         "//modules/drivers/proto:sensor_proto",
         "//modules/map/proto:map_proto",
+        "//modules/localization/proto:localization_proto",
         "//modules/perception/base",
         "//modules/perception/common/sensor_manager",
         "//modules/perception/fusion/app:obstacle_multi_sensor_fusion",

@@ -1,0 +1,5 @@
+radar_name: "radar_front"
+tf_child_frame_id: "radar_front"
+radar_forward_distance: 200.0
+radar_preprocessor: "ContiArsPreprocessor"
+radar_pipeline: "FrontRadarPipeline"
