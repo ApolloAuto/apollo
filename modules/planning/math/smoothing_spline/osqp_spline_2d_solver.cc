@@ -65,10 +65,17 @@ bool OsqpSpline2dSolver::Solve() {
   // change P to csc format
   const MatrixXd& P = kernel_.kernel_matrix();
   ADEBUG << "P: " << P.rows() << ", " << P.cols();
+  if (P.rows() == 0) {
+    return false;
+  }
+
   std::vector<double> P_data;
   std::vector<int> P_indices;
   std::vector<int> P_indptr;
   ToCSCMatrix(P, &P_data, &P_indices, &P_indptr);
+  if (P.rows() == 0) {
+    return false;
+  }
 
   c_int P_nnz = P_data.size();
   c_float P_x[P_nnz];  // NOLINT
@@ -93,8 +100,10 @@ bool OsqpSpline2dSolver::Solve() {
       inequality_constraint_matrix.rows() + equality_constraint_matrix.rows(),
       inequality_constraint_matrix.cols());
   A << inequality_constraint_matrix, equality_constraint_matrix;
-
   ADEBUG << "A: " << A.rows() << ", " << A.cols();
+  if (A.rows() == 0) {
+    return false;
+  }
 
   std::vector<double> A_data;
   std::vector<int> A_indices;
@@ -180,6 +189,14 @@ bool OsqpSpline2dSolver::Solve() {
   // Solve Problem
   osqp_solve(work);
 
+  MatrixXd solved_params = MatrixXd::Zero(P.rows(), 1);
+  for (int i = 0; i < P.rows(); ++i) {
+    solved_params(i, 0) = work->solution->x[i];
+  }
+
+  last_num_param_ = P.rows();
+  last_num_constraint_ = constraint_num;
+
   // Cleanup
   osqp_cleanup(work);
   c_free(data->A);
@@ -187,7 +204,7 @@ bool OsqpSpline2dSolver::Solve() {
   c_free(data);
   c_free(settings);
 
-  return true;
+  return spline_.set_splines(solved_params, spline_.spline_order());
 }
 
 // extract
