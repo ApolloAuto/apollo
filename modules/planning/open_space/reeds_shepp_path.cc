@@ -863,7 +863,7 @@ bool ReedShepp::SetRSP(int size, double lengths[], char types[],
   all_possible_paths->emplace_back(path);
   return true;
 }
-
+//TODO(Jinyun) : reformulate GenerateLocalConfigurations.
 bool ReedShepp::GenerateLocalConfigurations(
     const std::shared_ptr<Node3d> start_node,
     const std::shared_ptr<Node3d> end_node,
@@ -872,7 +872,7 @@ bool ReedShepp::GenerateLocalConfigurations(
       open_space_conf_.warm_start_config().step_size() * max_kappa_;
   for (auto& path : *all_possible_paths) {
     std::size_t point_num =
-        path.total_length / step_scaled + path.segs_lengths.size() + 3;
+        path.total_length / step_scaled + path.segs_lengths.size() + 10;
     std::vector<double> px(point_num, 0.0);
     std::vector<double> py(point_num, 0.0);
     std::vector<double> pphi(point_num, 0.0);
@@ -916,14 +916,12 @@ bool ReedShepp::GenerateLocalConfigurations(
       index++;
       Interpolation(index, l, m, ox, oy, ophi, &px, &py, &pphi, &pgear);
     }
-
     while (px.back() == 0.0) {
       px.pop_back();
       py.pop_back();
       pphi.pop_back();
       pgear.pop_back();
     }
-
     for (std::size_t i = 0; i < px.size(); i++) {
       path.x.push_back(std::cos(-start_node->GetPhi()) * px.at(i) +
                        std::sin(-start_node->GetPhi()) * py.at(i) +
@@ -952,7 +950,6 @@ void ReedShepp::Interpolation(double index, double pd, char m, double ox,
   double ldy = 0.0;
   double gdx = 0.0;
   double gdy = 0.0;
-
   if (m == 'S') {
     px->at(index) = ox + pd / max_kappa_ * std::cos(ophi);
     py->at(index) = oy + pd / max_kappa_ * std::sin(ophi);

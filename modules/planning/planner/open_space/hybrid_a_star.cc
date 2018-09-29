@@ -57,6 +57,16 @@ bool HybridAStar::AnalyticExpansion(std::shared_ptr<Node3d> current_node,
   return true;
 }
 
+bool HybridAStar::ReedSheppHeuristic(std::shared_ptr<Node3d> current_node,
+                                     ReedSheppPath* reeds_shepp_to_end) {
+  if (!reed_shepp_generator_->ShortestRSP(current_node, end_node_,
+                                          reeds_shepp_to_end)) {
+    AINFO << "ShortestRSP failed";
+    return false;
+  }
+  return true;
+}
+
 bool HybridAStar::RSPCheck(const ReedSheppPath* reeds_shepp_to_end) {
   for (std::size_t i = 0; i < reeds_shepp_to_end->x.size(); i++) {
     std::shared_ptr<Node3d> node = std::shared_ptr<Node3d>(
@@ -72,7 +82,7 @@ bool HybridAStar::RSPCheck(const ReedSheppPath* reeds_shepp_to_end) {
 bool HybridAStar::ValidityCheck(std::shared_ptr<Node3d> node) {
   for (const auto& obstacle_box : (*obstacles_).Items()) {
     if (node->GetBoundingBox(vehicle_param_)
-            .HasOverlap((*obstacle_box).PerceptionBoundingBox())) {
+            .HasOverlap(obstacle_box->PerceptionBoundingBox())) {
       return false;
     }
   }
@@ -97,7 +107,7 @@ std::shared_ptr<Node3d> HybridAStar::Next_node_generator(
   double steering = 0.0;
   double index = 0.0;
   double traveled_distance = 0.0;
-  if (next_node_index > next_node_num_ / 2 - 1) {
+  if (next_node_index < next_node_num_ / 2) {
     steering = -max_steer_ +
                (2 * max_steer_ / (next_node_num_ / 2 - 1)) * next_node_index;
     traveled_distance = 1 * step_size_;
@@ -138,7 +148,6 @@ std::shared_ptr<Node3d> HybridAStar::Next_node_generator(
   next_node->SetPre(current_node);
   next_node->SetDirec(traveled_distance > 0);
   next_node->SetSteer(steering);
-
   return next_node;
 }
 
@@ -252,6 +261,14 @@ bool HybridAStar::Plan(double sx, double sy, double sphi, double ex, double ey,
   end_node_.reset(
       new Node3d(ex, ey, ephi, ex_vec, ey_vec, ephi_vec, open_space_conf_));
   obstacles_ = obstacles;
+  if (!ValidityCheck(start_node_)) {
+    AINFO << "start_node in collision with obstacles";
+    return false;
+  }
+  if (!ValidityCheck(end_node_)) {
+    AINFO << "end_node in collision with obstacles";
+    return false;
+  }
   // load open set and priority queue
   open_set_.insert(std::make_pair(start_node_->GetIndex(), start_node_));
   open_pq_.push(
@@ -277,6 +294,7 @@ bool HybridAStar::Plan(double sx, double sy, double sphi, double ex, double ey,
       final_node = LoadRSPinCS(&reeds_shepp_to_end, current_node);
       break;
     }
+    close_set_.insert(std::make_pair(current_node->GetIndex(), current_node));
     end_timestamp = Clock::NowInSeconds();
     reeds_shepp_time += (end_timestamp - start_timestamp);
     for (std::size_t i = 0; i < next_node_num_; i++) {
@@ -294,7 +312,7 @@ bool HybridAStar::Plan(double sx, double sy, double sphi, double ex, double ey,
         explored_node_num++;
         start_timestamp = Clock::NowInSeconds();
         ReedSheppPath reeds_shepp_heuristic;
-        AnalyticExpansion(next_node, &reeds_shepp_heuristic);
+        ReedSheppHeuristic(next_node, &reeds_shepp_heuristic);
         CalculateNodeCost(current_node, next_node, &reeds_shepp_heuristic);
         end_timestamp = Clock::NowInSeconds();
         reeds_shepp_time += (end_timestamp - start_timestamp);
