@@ -239,25 +239,4 @@ class CybertronChannelMessage : public ChannelMessage {
     return ret;                                                            \
   }
 
-/*
-#define BegDefineChannelMsgSubClass(SubClassName, MessageType)            \
-  class SubClassName : public CybertronChannelMessage<MessageType> {      \
-   public:                                                                \
-   RegisterChannelMsgClass(SubClassName, MessageType) virtual void Render( \
-       const Screen* s, int key) override
-
-#define SubClassDeconstructor(SubClassName) \
- public:                                    \
-  virtual ~SubClassName()
-
-#define SubClassConstructor(SubClassName, MessageType)       \
-private:                                                    \
-  SubClassName(const SubClassName&) = delete;                \
-  SubClassName& operator=(const SubClassName&) = delete;     \
-  explicit SubClassName(RenderableMessage* parent = nullptr) \
-      : CybertronChannelMessage<MessageType>(parent)
-*/
-
-// #define EndDefineChannelMsgSubClass(SubClassName) } /* SubClassName */
-
 #endif  // TOOLS_CVT_MONITOR_CYBERTRON_CHANNEL_MESSAGE_H_
