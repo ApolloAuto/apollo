@@ -4,22 +4,34 @@ services:
     - docker
 dist: trusty
 os: linux
-env:
-    - JOB=lint
-    - JOB=cibuild
-    - JOB=citest
 cache:
   directories:
   - $HOME/.cache/bazel
 install: skip
 before_script:
     - cp scripts/AGREEMENT.txt ${HOME}/.apollo_agreement.txt
-script:
-    - ./docker/scripts/dev_start.sh -t dev-x86_64-20180925_1415
-    - ./apollo_docker.sh ${JOB}
-    - rm -rf "${HOME}/.cache/bazel/_bazel_${USER}/install"
-    - rm -rf "/apollo/data/core"
+jobs:
+  include:
+    - stage: stage-01
+      env:
+        - JOB=lint
+      script:
+        - ./docker/scripts/dev_start.sh -t dev-x86_64-20180925_1415
+        - ./apollo_docker.sh ${JOB}
+    - stage: stage-02
+      env:
+        - JOB=cibuild
+      script:
+        - ./apollo_docker.sh ${JOB}
+    - stage: stage-03
+      env:
+        - JOB=citest
+      script:
+        - ./apollo_docker.sh ${JOB}
+        - rm -rf "${HOME}/.cache/bazel/_bazel_${USER}/install"
+        - rm -rf "/apollo/data/core"    
 notifications:
     email:
-        on_success: change
+        on_success: always
         on_failure: always
+        
