@@ -32,14 +32,13 @@
 
 #include "cybertron/common/log.h"
 #include "cybertron/common/macros.h"
-#include "modules/common/time/time.h"
 #include "modules/common/configs/proto/vehicle_config.pb.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/math_utils.h"
+#include "modules/common/time/time.h"
 #include "modules/planning/common/obstacle.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/proto/planner_open_space_config.pb.h"
-
 
 namespace apollo {
 namespace planning {
@@ -63,6 +62,8 @@ class HybridAStar {
   // not complete
   bool AnalyticExpansion(std::shared_ptr<Node3d> current_node,
                          ReedSheppPath* reeds_shepp_to_end);
+  bool ReedSheppHeuristic(std::shared_ptr<Node3d> current_node,
+                          ReedSheppPath* reeds_shepp_to_end);
   // not complete
   std::vector<std::shared_ptr<Node3d>> KinemeticModelExpansion();
   // check collision and validity
@@ -100,9 +101,9 @@ class HybridAStar {
   std::shared_ptr<Node3d> start_node_;
   std::shared_ptr<Node3d> end_node_;
   struct cmp {
-    bool operator()(const std::pair<std::size_t, double> left,
-                    const std::pair<std::size_t, double> right) const {
-      return left.second <= right.second;
+    bool operator()(const std::pair<std::size_t, double>& left,
+                    const std::pair<std::size_t, double>& right) const {
+      return left.second >= right.second;
     }
   };
   std::priority_queue<std::pair<std::size_t, double>,

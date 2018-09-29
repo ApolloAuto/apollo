@@ -28,13 +28,13 @@ class ObstacleContainer {
  public:
   ObstacleContainer() = default;
   void AddVirtualObstacle(const double x, const double y, const double heading,
-                          const double length, const double width) {
+                          const double length, const double width, const int id) {
     std::unique_ptr<Obstacle> obstacle_class =
         std::unique_ptr<Obstacle>(new Obstacle());
-    Vec2d obstacle_center(50.0, 50.0);
-    Box2d obstacle_box(obstacle_center, 0.0, 20.0, 20.0);
+    Vec2d obstacle_center(x, y);
+    Box2d obstacle_box(obstacle_center, heading, length, width);
     std::unique_ptr<Obstacle> obstacle =
-        obstacle_class->CreateStaticVirtualObstacles("I am a obstacle",
+        obstacle_class->CreateStaticVirtualObstacles(std::to_string(id),
                                                      obstacle_box);
     obstacles_list.Add(obstacle->Id(), *obstacle);
   }
@@ -70,8 +70,8 @@ ObstacleContainer* CreateObstaclesPtr() { return new ObstacleContainer(); }
 ResultContainer* CreateResultPtr() { return new ResultContainer(); }
 void AddVirtualObstacle(ObstacleContainer* obstacles_ptr, const double x,
                         const double y, const double heading,
-                        const double length, const double width) {
-  obstacles_ptr->AddVirtualObstacle(x, y, heading, length, width);
+                        const double length, const double width, const int id) {
+  obstacles_ptr->AddVirtualObstacle(x, y, heading, length, width, id);
 }
 bool Plan(HybridAStar* planner_ptr, ObstacleContainer* obstacles_ptr,
           ResultContainer* result_ptr, double sx, double sy, double sphi,
@@ -84,7 +84,7 @@ void GetResult(ResultContainer* result_ptr, double* x, double* y, double* phi,
                std::size_t* output_size) {
   result_ptr->LoadResult();
   std::size_t size = result_ptr->GetX()->size();
-  std::cout << "return size is " << size;
+  std::cout << "return size is " << size << std::endl;
   for (std::size_t i = 0; i < size; i++) {
     x[i] = result_ptr->GetX()->at(i);
     y[i] = result_ptr->GetY()->at(i);

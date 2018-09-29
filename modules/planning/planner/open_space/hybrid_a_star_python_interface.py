@@ -1,5 +1,23 @@
+#!/usr/bin/env python
+
+###############################################################################
+# Copyright 2018 The Apollo Authors. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+###############################################################################
+
 import ctypes
-from ctypes import cdll, c_ushort
+from ctypes import cdll, c_ushort, c_int
 from ctypes import c_double
 from ctypes import POINTER
 import math
@@ -11,9 +29,9 @@ class HybridAStarPlanner(object):
         self.planner = lib.CreatePlannerPtr()
         self.obstacles = lib.CreateObstaclesPtr()
         self.result = lib.CreateResultPtr()
-    def AddVirtualObstacle(self, x, y, heading, length, width):
+    def AddVirtualObstacle(self, x, y, heading, length, width, identity):
         lib.AddVirtualObstacle(self.obstacles, c_double(x), 
-            c_double(y), c_double(heading), c_double(length), c_double(width))
+            c_double(y), c_double(heading), c_double(length), c_double(width), c_int(identity))
     def Plan(self, sx, sy, sphi, ex, ey, ephi):
         return lib.Plan(self.planner, self.obstacles, self.result, c_double(sx), 
             c_double(sy), c_double(sphi), c_double(ex), c_double(ey),c_double(ephi))
