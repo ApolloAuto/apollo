@@ -8,8 +8,8 @@
 #include <utility>
 #include <iomanip>
 #include "cybertron/common/log.h"
+#include "modules/common/util/file.h"
 #include "modules/perception/lib/io/file_util.h"
-#include "modules/perception/lib/io/protobuf_util.h"
 #include "modules/perception/proto/tracker_config.pb.h"
 
 namespace apollo {
@@ -38,7 +38,7 @@ bool HMMatcher::Init() {
                                             "hm_matcher.conf");
   // get config params
   MatcherConfig config_params;
-  CHECK(lib::ParseProtobufFromFile<MatcherConfig>(
+  CHECK(apollo::common::util::GetProtoFromFile<MatcherConfig>(
                                   config_file, &config_params))
        << "Failed to parse MatcherConfig config file.";
   double max_match_distance = config_params.max_match_distance();

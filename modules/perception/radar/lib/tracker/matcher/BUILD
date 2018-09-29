@@ -11,11 +11,12 @@ cc_library(
         "hm_matcher.h",
     ],
     deps = [
+        "//modules/common/util:file_util",
+        "//modules/common/util:string_util",
         "//modules/perception/base:base",
         "//modules/perception/lib/singleton:singleton",
         "//modules/perception/lib/config_manager:config_manager",
         "//modules/perception/lib/registerer:registerer",
-        "//modules/perception/lib/io:protobuf_util",
         "//modules/perception/common/graph:graph",
         "//modules/perception/radar/common:types",
         "//modules/perception/radar/lib/tracker/common:radar_track",
