@@ -144,21 +144,20 @@ void CybertronTopologyMessage::ChangeState(const Screen* s, int key) {
       second_column_ = SecondColumnType::MessageType;
       break;
 
-    // case CTRL('d'):
-    // case KEY_NPAGE:
-    //   ++page_index_;
-    //   if (page_index_ >= pages_) page_index_ = pages_ - 1;
-    //   break;
+      // case CTRL('d'):
+      // case KEY_NPAGE:
+      //   ++page_index_;
+      //   if (page_index_ >= pages_) page_index_ = pages_ - 1;
+      //   break;
 
-    // case CTRL('u'):
-    // case KEY_PPAGE:
-    //   --page_index_;
-    //   if (page_index_ < 1) page_index_ = 0;
-    //   break;
+      // case CTRL('u'):
+      // case KEY_PPAGE:
+      //   --page_index_;
+      //   if (page_index_ < 1) page_index_ = 0;
+      //   break;
 
     case ' ': {
-      ChannelMessage* child =
-          static_cast<ChannelMessage*>(Child(*line_no()));
+      ChannelMessage* child = static_cast<ChannelMessage*>(Child(*line_no()));
       if (child) {
         child->set_enabled(!child->is_enabled());
       }
@@ -174,42 +173,37 @@ void CybertronTopologyMessage::Render(const Screen* s, int key) {
   ChangeState(s, key);
   SplitPages(key);
 
-  unsigned y = 0;
-
-  auto iter = all_channels_map_.cbegin();
-  while (y < page_index_ * page_item_count_) {
-    ++iter;
-    ++y;
-  }
-
-  y = 0;
-  page_item_count_++;
-
-  s->AddStr(0, y, Screen::WHITE_BLACK, "Channels");
-
+  // display table title
+  s->AddStr(0, 0, Screen::WHITE_BLACK, "Channels");
   switch (second_column_) {
     case SecondColumnType::MessageType:
-      s->AddStr(col1_width_ + SecondColumnOffset, y, Screen::WHITE_BLACK,
+      s->AddStr(col1_width_ + SecondColumnOffset, 0, Screen::WHITE_BLACK,
                 "TypeName");
       break;
     case SecondColumnType::MessageFrameRatio:
-      s->AddStr(col1_width_ + SecondColumnOffset, y, Screen::WHITE_BLACK,
+      s->AddStr(col1_width_ + SecondColumnOffset, 0, Screen::WHITE_BLACK,
                 "FrameRatio");
       break;
   }
 
-  ++y;
-
+  // display concrete channel info
   Screen::ColorPair color;
   std::ostringstream outStr;
 
-  for (; iter != all_channels_map_.cend() && y < page_item_count_;
-       ++iter, ++y) {
+  auto iter = all_channels_map_.cbegin();
+  const int skip_item_count = page_index_ * page_item_count_;
+  for (int i = 0; i < skip_item_count; ++i) {
+    ++iter;
+  }
+
+  int y = 1;  // start line index
+  const int end_y = s->Height();
+  for (; iter != all_channels_map_.cend() && y < end_y; ++iter, ++y) {
     color = Screen::RED_BLACK;
 
     if (!ChannelMessage::isErrorCode(iter->second)) {
-      if (iter->second->has_message_come()){
-        if(iter->second->is_enabled()){
+      if (iter->second->has_message_come()) {
+        if (iter->second->is_enabled()) {
           color = Screen::GREEN_BLACK;
         } else {
           color = Screen::YELLOW_BLACK;
@@ -221,7 +215,6 @@ void CybertronTopologyMessage::Render(const Screen* s, int key) {
     s->AddStr(0, y, iter->first.c_str());
 
     if (!ChannelMessage::isErrorCode(iter->second)) {
-
       switch (second_column_) {
         case SecondColumnType::MessageType:
           s->AddStr(col1_width_ + SecondColumnOffset, y,
