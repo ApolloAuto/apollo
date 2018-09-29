@@ -17,11 +17,13 @@
 /**
  * @file
  **/
-#include "modules/planning/math/smoothing_spline/active_set_spline_2d_solver.h"
+
+#include <chrono>
 
 #include "gtest/gtest.h"
 
 #include "modules/planning/math/curve_math.h"
+#include "modules/planning/math/smoothing_spline/active_set_spline_2d_solver.h"
 
 namespace apollo {
 namespace planning {
@@ -70,7 +72,11 @@ TEST(constraint_test, test_suit_one) {
 
   kernel->AddRegularization(0.1);
   // constraint->add_point_angle_constraint(0, -1.21);
+  auto start = std::chrono::system_clock::now();
   EXPECT_TRUE(spline_solver.Solve());
+  auto end = std::chrono::system_clock::now();
+  std::chrono::duration<double> diff = end - start;
+  std::cout << "Time to solver is " << diff.count() << " s\n";
 
   MatrixXd gold_res(51, 6);
   // clang-format off
