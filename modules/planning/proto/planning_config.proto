@@ -76,6 +76,7 @@ enum PlannerType {
   PUBLIC_ROAD = 1;  // public road planner
   OPEN_SPACE = 2;   // open space planner
   NAVI = 3;         // navigation planner
+  LATTICE = 4;      // lattice planner
 }
 
 message RtkPlanningConfig {
