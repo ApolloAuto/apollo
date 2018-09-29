@@ -19,10 +19,11 @@
 
 #include <gflags/gflags.h>
 #include <memory>
-// #include <hdmap.h>
 #include <string>
 #include <vector>
 #include "modules/perception/base/hdmap_struct.h"
+#include "modules/map/hdmap/hdmap.h"
+#include "modules/map/hdmap/hdmap_common.h"
 // #include "modules/perception/base/point_cloud_types.h"
 #include "modules/perception/lib/singleton/singleton.h"
 // #include "modules/perception/lib/thread/mutex.h"
@@ -50,12 +51,12 @@ class HDMapInput {
   HDMapInput& operator=(const HDMapInput&) = delete;
   bool InitHDMap();
   bool InitInternal();
-  //   void MergeBoundaryJunction(
-  //       const std::vector<adu::hdmap::RoiRoadBoundaryPtr>& boundary,
-  //       const std::vector<adu::hdmap::JunctionInfoConstPtr>& junctions,
-  //       std::vector<base::RoadBoundary>* road_boundaries_ptr,
-  //       std::vector<base::PolygonDType>* road_polygons_ptr,
-  //       std::vector<base::PolygonDType>* junction_polygons_ptr);
+  void MergeBoundaryJunction(
+      const std::vector<apollo::hdmap::RoadROIBoundaryPtr>& boundary,
+      const std::vector<apollo::hdmap::JunctionBoundaryPtr>& junctions,
+      std::vector<base::RoadBoundary>* road_boundaries_ptr,
+      std::vector<base::PolygonDType>* road_polygons_ptr,
+      std::vector<base::PolygonDType>* junction_polygons_ptr);
 
   bool GetRoadBoundaryFilteredByJunctions(
       const std::vector<base::RoadBoundary>& road_boundaries,
@@ -71,14 +72,14 @@ class HDMapInput {
       const base::PointCloud<base::PointD>& boundary_line,
       const std::vector<base::PointCloud<base::PointD>>& junctions,
       std::vector<base::PointCloud<base::PointD>>* boundary_line_vec_ptr);
-  //   bool GetSignalsFromHDMap(const Eigen::Vector3d& pointd,
-  //     double forward_distance,
-  //     std::vector<adu::common::hdmap::Signal>* signals);
+    bool GetSignalsFromHDMap(const Eigen::Vector3d& pointd,
+      double forward_distance,
+      std::vector<apollo::hdmap::Signal>* signals);
   bool inited_ = false;
-  // lib::Mutex mutex_;
-  //   std::unique_ptr<adu::hdmap::HDMap> hdmap_;
-  //   int hdmap_sample_step_ = 5;
-  //   std::string hdmap_file_;
+  lib::Mutex mutex_;
+  std::unique_ptr<apollo::hdmap::HDMap> hdmap_;
+  int hdmap_sample_step_ = 5;
+  std::string hdmap_file_;
   friend class lib::Singleton<HDMapInput>;
 };
 
