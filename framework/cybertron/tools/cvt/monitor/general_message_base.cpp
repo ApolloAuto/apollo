@@ -65,7 +65,7 @@ int GeneralMessageBase::lineCountOfField(
       case google::protobuf::FieldDescriptor::CPPTYPE_MESSAGE: {
         const google::protobuf::Message& childMsg =
             reflection->GetMessage(msg, field);
-        ret += lineCount(childMsg, screenWidth) + 1;
+        ret += lineCount(childMsg, screenWidth);
         break;
       }
 
