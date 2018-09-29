@@ -146,7 +146,7 @@ void CybertronTopologyMessage::ChangeState(const Screen* s, int key) {
     case 'T':
       second_column_ = SecondColumnType::MessageType;
       break;
-
+      
     case ' ': {
       ChannelMessage* child = static_cast<ChannelMessage*>(Child(*line_no()));
       if (child) {
@@ -175,7 +175,7 @@ void CybertronTopologyMessage::Render(const Screen* s, int key) {
                 "FrameRatio");
       break;
   }
-
+ 
   auto iter = all_channels_map_.cbegin();
   register int tmp = page_index_ * page_item_count_;
   register int line = 0;
@@ -215,8 +215,7 @@ void CybertronTopologyMessage::Render(const Screen* s, int key) {
           outStr.str("");
           outStr << std::fixed << std::setprecision(2)
                  << iter->second->frame_ratio();
-          s->AddStr(col1_width_ + SecondColumnOffset, line,
-                    outStr.str().c_str());
+          s->AddStr(col1_width_ + SecondColumnOffset, line, outStr.str().c_str());
         } break;
       }
     } else {
