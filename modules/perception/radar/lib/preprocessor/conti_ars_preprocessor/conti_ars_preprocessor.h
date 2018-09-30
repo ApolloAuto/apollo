@@ -62,4 +62,4 @@ class ContiArsPreprocessor : public BasePreprocessor {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // RADAR_LIB_PREPROCESSOR_CONTI_ARS_PREPROCESSOR_CONTI_ARS_PREPROCESSOR_H_
+#endif  // RADAR_LIB_PREPROCESSOR_CONTI_ARS_PREPROCESSOR_CONTI_ARS_PREPROCESSOR_H_ // NOLINT

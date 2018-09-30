@@ -18,6 +18,7 @@
 
 #include <string>
 #include <vector>
+#include <memory>
 #include "Eigen/Core"
 #include "modules/perception/base/frame.h"
 #include "cybertron/common/log.h"
