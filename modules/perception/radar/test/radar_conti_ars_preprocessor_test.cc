@@ -33,7 +33,8 @@ class ContiArsPreprocessorTest : public testing::Test {
 TEST_F(ContiArsPreprocessorTest, init) {
   float delay_time = preprocessor.GetDelayTime();
   EXPECT_FLOAT_EQ(delay_time, 0.0);
-  FLAGS_work_root = "./radar_test_data/preprocessor";
+  FLAGS_work_root = "/apollo/modules/perception/testdata/"
+      "radar/preprocessor";
   bool init_result = preprocessor.Init();
   EXPECT_TRUE(init_result);
   delay_time = preprocessor.GetDelayTime();
@@ -43,6 +44,13 @@ TEST_F(ContiArsPreprocessorTest, init) {
 
 TEST_F(ContiArsPreprocessorTest, preprocess) {
   ContiRadar raw_obs;
+  Header radar_header;
+  radar_header.set_timestamp_sec(151237772.355345434);
+  radar_header.set_radar_timestamp(151237772355345434);
+  radar_header.set_module_name("radar");
+  radar_header.set_sequence_num(0);
+  raw_obs.mutable_header()->CopyFrom(radar_header);
+
   PreprocessorOptions options;
   ContiRadar corrected_obs;
 
@@ -94,6 +102,12 @@ TEST_F(ContiArsPreprocessorTest, preprocess) {
   raw_obs.clear_contiobs();
   corrected_obs.clear_contiobs();
 
+  radar_header.set_timestamp_sec(151237772.425345434);
+  radar_header.set_radar_timestamp(151237772425345434);
+  radar_header.set_module_name("radar");
+  radar_header.set_sequence_num(0);
+  raw_obs.mutable_header()->CopyFrom(radar_header);
+
   conti_obs = raw_obs.add_contiobs();
   conti_obs->set_obstacle_id(1);
   conti_obs->set_meas_state(1);
@@ -124,6 +138,12 @@ TEST_F(ContiArsPreprocessorTest, preprocess) {
 
   raw_obs.clear_contiobs();
   corrected_obs.clear_contiobs();
+
+  radar_header.set_timestamp_sec(151237772.485345434);
+  radar_header.set_radar_timestamp(151237772485345434);
+  radar_header.set_module_name("radar");
+  radar_header.set_sequence_num(0);
+  raw_obs.mutable_header()->CopyFrom(radar_header);
 
   SetMaxRadarIdx();
   conti_obs = raw_obs.add_contiobs();

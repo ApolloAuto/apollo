@@ -24,7 +24,8 @@ namespace radar {
 
 TEST(ContiArsTrackerTest, conti_ars_tracker_empty_init_test) {
   BaseTracker* tracker = new ContiArsTracker();
-  FLAGS_work_root = "./radar_test_data/conti_ars_tracker/empty";
+  FLAGS_work_root = "/apollo/modules/perception/testdata/"
+        "radar/conti_ars_tracker/empty";
   EXPECT_EQ(tracker->Init(), false);
   delete tracker;
 }
