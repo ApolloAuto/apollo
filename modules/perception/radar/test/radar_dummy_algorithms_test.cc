@@ -98,7 +98,6 @@ TEST_F(DummyAlgorithmsTest, dummy_test) {
                                                 detected_frame);
   EXPECT_TRUE(roi_filter_result);
   EXPECT_EQ(detected_frame->objects.size(), 6);
-
 }
 
 }  // namespace radar

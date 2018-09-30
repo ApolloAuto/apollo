@@ -47,10 +47,12 @@ bool RadarDetectionComponent::Init() {
     AERROR << "Failed to get sensor manager instance";
     return false;
   }
-  
-  bool ret = sensor_manager->GetSensorInfo(comp_config.radar_name(), &radar_info_);
+
+  bool ret = sensor_manager->GetSensorInfo(
+               comp_config.radar_name(), &radar_info_);
   if (!ret) {
-    AERROR << "Failed to get sensor info, sensor name: " << comp_config.radar_name();
+    AERROR << "Failed to get sensor info, sensor name: "
+           << comp_config.radar_name();
     return false;
   }
 
@@ -189,7 +191,8 @@ bool RadarDetectionComponent::InternalProc(
       radar_perception_->Perceive(corrected_obstacles, options, &radar_objects);
 
   if (!result) {
-    out_message->error_code_ = apollo::common::ErrorCode::PERCEPTION_ERROR_PROCESS;
+    out_message->error_code_ =
+        apollo::common::ErrorCode::PERCEPTION_ERROR_PROCESS;
     AERROR << "RadarDetector Proc failed.";
     return true;
   }
@@ -205,8 +208,9 @@ bool RadarDetectionComponent::InternalProc(
   PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(radar_info_.name,
                                            "radar_perception");
   AINFO << "FRAME_STATISTICS:Radar:End:msg_time["
-           << std::to_string(in_message->header().timestamp_sec()) << "]:cur_time["
-           << std::to_string(end_timestamp) << "]:cur_latency[" << end_latency
+           << std::to_string(in_message->header().timestamp_sec())
+           << "]:cur_time[" << std::to_string(end_timestamp)
+           << "]:cur_latency[" << end_latency
            << "]";
 
   return true;

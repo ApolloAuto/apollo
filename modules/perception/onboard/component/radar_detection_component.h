@@ -16,6 +16,7 @@
 #ifndef RADAR_ONBOARD_COMPONENT_RADAR_DETECTION_COMPONENT_H_
 #define RADAR_ONBOARD_COMPONENT_RADAR_DETECTION_COMPONENT_H_
 #include <string>
+#include <memory>
 #include <vector>
 #include "cybertron/component/component.h"
 #include "modules/localization/proto/localization.pb.h"
