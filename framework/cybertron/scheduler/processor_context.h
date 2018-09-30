@@ -20,6 +20,7 @@
 #include <future>
 #include <limits>
 #include <list>
+#include <map>
 #include <memory>
 #include <mutex>
 #include <unordered_map>
@@ -51,35 +52,34 @@ struct CommonState {
 
 class ProcessorContext {
  public:
-  explicit ProcessorContext(const std::shared_ptr<Processor>& processor)
-      : processor_(processor), notified_(false) {}
+  ProcessorContext() : notified_(false) {}
 
   void ShutDown();
-  void PrintStatistics();
-  void PrintCRoutineStats();
-  void UpdateProcessStat(ProcessorStat* stat);
 
   inline void SetId(const int id) { proc_index_ = id; }
+  inline int Id() { return proc_index_; }
   inline bool GetState(const uint64_t& routine_id, RoutineState* state);
   inline bool SetState(const uint64_t& routine_id, const RoutineState& state);
 
-  void NotifyProcessor(uint64_t croutine_id);
-  void Push(const std::shared_ptr<CRoutine>& cr);
-  bool Pop(uint64_t croutine_id, std::future<std::shared_ptr<CRoutine>>& fut);
+  void BindProcessor(std::shared_ptr<Processor>& processor) {
+    if (!processor_) {
+      processor_ = processor;
+    }
+  }
+
+  virtual void Notify(uint64_t croutine_id);
+  virtual bool Enqueue(const std::shared_ptr<CRoutine>& cr) = 0;
+  virtual bool EnqueueAffinityRoutine(const std::shared_ptr<CRoutine>& cr){};
   void RemoveCRoutine(uint64_t croutine_id);
+  int RqSize();
 
   virtual bool RqEmpty() = 0;
   virtual std::shared_ptr<CRoutine> NextRoutine() = 0;
 
  protected:
-  virtual bool IsPriorInverse(uint64_t routine_id) = 0;
-  virtual bool Enqueue(const std::shared_ptr<CRoutine>& cr) = 0;
-
-  //  std::mutex mtx_cr_map_;
   AtomicRWLock rw_lock_;
   CRoutineMap cr_map_;
-  AtomicHashMap<uint64_t, std::promise<std::shared_ptr<CRoutine>>> pop_list_;
-  std::shared_ptr<Processor> processor_;
+  std::shared_ptr<Processor> processor_ = nullptr;
 
   bool stop_ = false;
   std::atomic<bool> notified_;

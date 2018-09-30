@@ -40,26 +40,20 @@ static void CRoutineEntry(void *arg) {
 CRoutine::CRoutine(const std::function<void()> &func) {
   func_ = func;
   MakeContext(CRoutineEntry, this, &context_);
-  state_ = RoutineState::READY;
+  SetState(RoutineState::READY);
 }
 
 CRoutine::CRoutine(std::function<void()> &&func) {
   func_ = std::move(func);
   MakeContext(CRoutineEntry, this, &context_);
-  state_ = RoutineState::READY;
+  SetState(RoutineState::READY);
 }
 
-void CRoutine::PrintStatistics() const {
-  AINFO << "routine_id[" << id_ << "] exec_time[" << statistic_info_.exec_time
-        << "] sleep_time[" << statistic_info_.sleep_time << "] switch_num["
-        << statistic_info_.switch_num << "]";
-}
-
-CRoutine::~CRoutine() { PrintStatistics(); }
+CRoutine::~CRoutine() {}
 
 RoutineState CRoutine::Resume() {
   if (force_stop_) {
-    state_ = RoutineState::FINISHED;
+    SetState(RoutineState::FINISHED);
     return state_;
   }
 
@@ -75,7 +69,6 @@ RoutineState CRoutine::Resume() {
   }
 
   current_routine_ = this;
-  // update statistics info
   auto t_start = std::chrono::high_resolution_clock::now();
   PerfEventCache::Instance()->AddSchedEvent(SchedPerf::SWAP_IN, id_,
                                             processor_id_, 0, 0, -1, -1);
@@ -86,27 +79,20 @@ RoutineState CRoutine::Resume() {
                          .count();
   PerfEventCache::Instance()->AddSchedEvent(
       SchedPerf::SWAP_OUT, id_, processor_id_, 0, start_nanos, -1, int(state_));
-  if (IsRunning()) {
-    state_ = RoutineState::READY;
-  }
-
   auto diff =
       std::chrono::duration<double, std::milli>(t_end - t_start).count();
-  statistic_info_.exec_time += diff;
-  statistic_info_.switch_num++;
+  exec_time_ += diff;
+  if (IsRunning()) {
+    SetState(RoutineState::READY);
+  }
   return state_;
 }
 
 void CRoutine::Routine() {
   while (true) {
-    ADEBUG << "inner routine" << std::endl;
+    AINFO << "inner routine" << std::endl;
     usleep(1000000);
   }
-}
-
-RoutineStatistics CRoutine::GetStatistics() const {
-  // TODO(hewei03): We need a mutex if try to clear statistics info later.
-  return statistic_info_;
 }
 
 }  // namespace croutine

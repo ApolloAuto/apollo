@@ -36,19 +36,16 @@
 
 namespace apollo {
 namespace cybertron {
-namespace data {
-class DataVisitorBase;
-}
 namespace scheduler {
-
-class ProcBalancer;
-class RoutineBalancer;
 
 using apollo::cybertron::proto::RoutineConf;
 using apollo::cybertron::proto::SchedulerConf;
-using croutine::CRoutine;
-using croutine::RoutineFactory;
-using data::DataVisitorBase;
+using apollo::cybertron::croutine::CRoutine;
+using apollo::cybertron::croutine::RoutineFactory;
+using apollo::cybertron::data::DataVisitorBase;
+using apollo::cybertron::proto::ProcessStrategy;
+
+class ProcessorContext;
 
 class Scheduler {
  public:
@@ -57,32 +54,41 @@ class Scheduler {
   bool CreateTask(std::function<void()>&& func, const std::string& name,
                   std::shared_ptr<DataVisitorBase> visitor = nullptr);
   bool RemoveTask(const std::string& name);
-  bool NotifyTask(uint64_t task_id) const;
   void PrintStatistics();
   void ShutDown();
-  static uint32_t ProcessorNum() { return processor_num_; }
+  uint32_t ProcessorNum() { return proc_num_; }
+
+  bool DispatchTask(const std::shared_ptr<CRoutine>& croutine);
+  bool RemoveCRoutine(uint64_t cr_id);
+  bool NotifyProcessor(uint64_t cr_id) const;
+  bool NotifyTask(uint64_t task_id) const;
+
+  inline std::vector<std::shared_ptr<ProcessorContext>> ProcCtxs() {
+    return proc_ctxs_;
+  }
+  inline std::unordered_map<uint64_t, uint32_t> RtCtx() { return rt_ctx_; }
+  inline bool IsClassic() { return classic_; }
 
  private:
   Scheduler(Scheduler&) = delete;
   Scheduler& operator=(Scheduler&) = delete;
+  void CreateProcessor();
+  std::shared_ptr<ProcessorContext> FindProc(const std::shared_ptr<CRoutine>&);
+  void StartSysmon();
 
-  void StartSourceBalance();
-
-  uint64_t duration_ = 500000;
   std::atomic<bool> stop_;
-
-  std::thread schedule_thread_;
-
-  SchedulerConf scheduler_conf_;
-  RoutineConf routine_conf_;
-
-  std::shared_ptr<ProcBalancer> proc_balancer_;
-  std::shared_ptr<RoutineBalancer> routine_balancer_;
-
+  std::thread sysmon_;
+  SchedulerConf sched_conf_;
+  RoutineConf rt_conf_;
   std::mutex task_id_map_mutex_;
   std::unordered_map<uint64_t, std::string> task_id_map_;
-
-  static uint32_t processor_num_;
+  uint32_t proc_num_;
+  ProcessStrategy sched_policy_ = ProcessStrategy::CFS;
+  std::vector<std::shared_ptr<ProcessorContext>> proc_ctxs_;
+  std::mutex mtx_ctx_qsize_;
+  std::multimap<int, std::shared_ptr<ProcessorContext>> ctx_qsize_;
+  std::unordered_map<uint64_t, uint32_t> rt_ctx_;
+  bool classic_ = false;
 
   DECLARE_SINGLETON(Scheduler)
 };

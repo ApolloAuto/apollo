@@ -20,13 +20,20 @@
 #include <chrono>
 #include <functional>
 #include <memory>
+#include <mutex>
+#include <set>
 #include <string>
 
+#include "cybertron/base/atomic_rw_lock.h"
 #include "cybertron/croutine/routine_context.h"
 
 namespace apollo {
 namespace cybertron {
 namespace croutine {
+
+using apollo::cybertron::base::AtomicRWLock;
+using apollo::cybertron::base::ReadLockGuard;
+using apollo::cybertron::base::WriteLockGuard;
 
 using routine_t = uint32_t;
 using CRoutineFunc = std::function<void()>;
@@ -39,13 +46,6 @@ enum class RoutineState {
   IO_WAIT,
   SLEEP,
   WAITING_INPUT
-};
-
-struct RoutineStatistics {
-  uint64_t switch_num = 0;
-  double io_wait_time = 0;
-  double sleep_time = 0;
-  double exec_time = 0;
 };
 
 class CRoutine {
@@ -77,42 +77,77 @@ class CRoutine {
 
   inline void Run() {
     func_();
-    state_ = RoutineState::FINISHED;
+    SetState(RoutineState::FINISHED);
   }
 
-  inline void SetState(const RoutineState &state) { state_ = state; }
+  inline bool TryLockForOp() {
+    std::lock_guard<std::mutex> lh(op_mtx_);
+    if (!being_op_) {
+      being_op_ = true;
+      return being_op_;
+    }
+    return false;
+  }
 
-  inline const RoutineState &State() { return state_; }
+  inline void TryUnlockForOp() {
+    std::lock_guard<std::mutex> lh(op_mtx_);
+    being_op_ = false;
+  }
 
-  inline void Wake() { state_ = RoutineState::READY; }
+  inline void SetState(const RoutineState &state, bool is_notify = false) {
+    WriteLockGuard<AtomicRWLock> lg(cr_rw_lock_);
+    // for race condition issue
+    if (is_notify && state_ == RoutineState::RUNNING) {
+      return;
+    }
+    state_ = state;
+  }
+
+  inline const RoutineState &State() {
+    ReadLockGuard<AtomicRWLock> lg(cr_rw_lock_);
+    return state_;
+  }
+
+  inline void Wake() { SetState(RoutineState::READY); }
 
   inline void HangUp() {
-    state_ = RoutineState::IO_WAIT;
+    SetState(RoutineState::IO_WAIT);
     CRoutine::Yield();
   }
 
   inline void Sleep(const Duration &sleep_duration) {
-    state_ = RoutineState::SLEEP;
+    SetState(RoutineState::SLEEP);
     wake_time_ = std::chrono::steady_clock::now() + sleep_duration;
-    statistic_info_.sleep_time += sleep_duration.count() / 1000;
     CRoutine::Yield();
   }
 
   inline void SetId(uint64_t id) { id_ = id; }
-
   inline uint64_t Id() { return id_; }
+
+  inline void SetName(std::string name) { name_ = name; }
+  inline std::string Name() { return name_; }
 
   inline void SetProcessorId(int processor_id) { processor_id_ = processor_id; }
 
   inline int ProcessorId() { return processor_id_; }
 
-  void PrintStatistics() const;
-  RoutineStatistics GetStatistics() const;
+  void AddAffinityProcessor(int processor_id) {
+    affinity_processor_id_set_.insert(processor_id);
+  }
+
+  std::set<int> &GetAffinityProcessorSet() {
+    return affinity_processor_id_set_;
+  }
+
+  bool IsAffinity(int processor_id) {
+    return affinity_processor_id_set_.find(processor_id) !=
+           affinity_processor_id_set_.end();
+  }
 
   RoutineState UpdateState() {
     if (IsSleep()) {
       if (std::chrono::steady_clock::now() > wake_time_) {
-        state_ = RoutineState::READY;
+        SetState(RoutineState::READY);
       }
     }
     return state_;
@@ -132,6 +167,9 @@ class CRoutine {
   double VRunningTime() { return vruntime_; }
   void SetVRunningTime(double time) { vruntime_ = time; }
 
+  double ExecTime() { return exec_time_; }
+  void SetExecTime(double time) { exec_time_ = time; }
+
   double NormalizedRunningTime() { return normalized_vruntime_; }
   void SetNormalizedRunningTime(double time) { normalized_vruntime_ = time; }
 
@@ -142,12 +180,30 @@ class CRoutine {
   void SetProcessedNum(double num) { proc_num_ = num; }
   void IncreaseProcessedNum() { ++proc_num_; }
 
-  bool IsRunning() { return state_ == RoutineState::RUNNING; }
-  bool IsFinished() { return state_ == RoutineState::FINISHED; }
-  bool IsWaitingInput() { return state_ == RoutineState::WAITING_INPUT; }
-  bool IsReady() { return state_ == RoutineState::READY; }
-  bool IsSleep() { return state_ == RoutineState::SLEEP; }
-  bool IsIOWait() { return state_ == RoutineState::IO_WAIT; }
+  bool IsRunning() {
+    ReadLockGuard<AtomicRWLock> lg(cr_rw_lock_);
+    return state_ == RoutineState::RUNNING;
+  }
+  bool IsFinished() {
+    ReadLockGuard<AtomicRWLock> lg(cr_rw_lock_);
+    return state_ == RoutineState::FINISHED;
+  }
+  bool IsWaitingInput() {
+    ReadLockGuard<AtomicRWLock> lg(cr_rw_lock_);
+    return state_ == RoutineState::WAITING_INPUT;
+  }
+  bool IsReady() {
+    ReadLockGuard<AtomicRWLock> lg(cr_rw_lock_);
+    return state_ == RoutineState::READY;
+  }
+  bool IsSleep() {
+    ReadLockGuard<AtomicRWLock> lg(cr_rw_lock_);
+    return state_ == RoutineState::SLEEP;
+  }
+  bool IsIOWait() {
+    ReadLockGuard<AtomicRWLock> lg(cr_rw_lock_);
+    return state_ == RoutineState::IO_WAIT;
+  }
 
   void Stop() { force_stop_ = true; }
 
@@ -158,21 +214,27 @@ class CRoutine {
 
  private:
   uint64_t id_ = 0;
-  uint32_t processor_id_ = 0;
+  std::string name_;
+  uint32_t processor_id_ = -1;
+  std::set<int> affinity_processor_id_set_;
+
   static thread_local CRoutine *current_routine_;
   static thread_local std::shared_ptr<RoutineContext> main_context_;
   RoutineContext context_;
   CRoutineFunc func_;
-  RoutineStatistics statistic_info_;
   RoutineState state_;
   uint32_t priority_ = 1;
   uint64_t frequency_ = 0;
+  double exec_time_ = 0;
   double proc_num_ = 0;
   double normalized_vfrequency_ = 0.0;
   double vfrequency_ = 0.0;
   double vruntime_ = 0.0;
   double normalized_vruntime_ = 0.0;
   bool force_stop_ = false;
+  bool being_op_ = false;
+  std::mutex op_mtx_;
+  AtomicRWLock cr_rw_lock_;
 };
 
 }  // namespace croutine

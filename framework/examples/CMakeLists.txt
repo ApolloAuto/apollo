@@ -72,11 +72,6 @@ add_executable(rwlock
 )
 target_link_libraries(rwlock -Wl,--no-as-needed -pthread dl cybertron_common)
 
-add_executable(rbtree_example
-  rbtree_example.cpp
-)
-target_link_libraries(rbtree_example -Wl,--no-as-needed -pthread dl cybertron)
-
 add_executable(user_defined_task
   user_defined_task.cpp
 )

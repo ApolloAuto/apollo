@@ -20,7 +20,8 @@
 #include "cybertron/common/types.h"
 #include "cybertron/croutine/croutine.h"
 #include "cybertron/event/perf_event_cache.h"
-#include "cybertron/scheduler/policy/processor_context.h"
+#include "cybertron/scheduler/processor_context.h"
+#include "cybertron/scheduler/scheduler.h"
 #include "cybertron/time/time.h"
 
 namespace apollo {
@@ -29,29 +30,6 @@ namespace scheduler {
 
 using apollo::cybertron::event::PerfEventCache;
 using apollo::cybertron::event::SchedPerf;
-
-bool ProcessorContext::Pop(uint64_t croutine_id,
-                           std::future<std::shared_ptr<CRoutine>>& fut) {
-  std::promise<std::shared_ptr<CRoutine>> prom;
-  fut = prom.get_future();
-  WriteLockGuard<AtomicRWLock> lg(rw_lock_);
-  if (cr_map_.erase(croutine_id) != 0) {
-    pop_list_.Set(croutine_id, std::move(prom));
-    return true;
-  }
-  return false;
-}
-
-void ProcessorContext::Push(const std::shared_ptr<CRoutine>& cr) {
-  {
-    WriteLockGuard<AtomicRWLock> lg(rw_lock_);
-    if (cr_map_.find(cr->Id()) != cr_map_.end() || pop_list_.Has(cr->Id())) {
-      return;
-    }
-    cr_map_[cr->Id()] = cr;
-  }
-  Enqueue(cr);
-}
 
 void ProcessorContext::RemoveCRoutine(uint64_t croutine_id) {
   WriteLockGuard<AtomicRWLock> lg(rw_lock_);
@@ -62,26 +40,21 @@ void ProcessorContext::RemoveCRoutine(uint64_t croutine_id) {
   }
 }
 
-void ProcessorContext::NotifyProcessor(uint64_t routine_id) {
+int ProcessorContext::RqSize() {
   ReadLockGuard<AtomicRWLock> lg(rw_lock_);
-  if (cr_map_.find(routine_id) == cr_map_.end()) {
-    return;
-  }
+  return cr_map_.size();
+}
 
+void ProcessorContext::Notify(uint64_t routine_id) {
   PerfEventCache::Instance()->AddSchedEvent(SchedPerf::NOTIFY_IN, routine_id,
                                             proc_index_, 0, 0, -1, -1);
+  ReadLockGuard<AtomicRWLock> lg(rw_lock_);
   if (!cr_map_[routine_id]->IsRunning()) {
-    cr_map_[routine_id]->SetState(RoutineState::READY);
+    cr_map_[routine_id]->SetState(RoutineState::READY, true);
   }
   if (!notified_.exchange(true)) {
     processor_->Notify();
     return;
-  }
-
-  if (processor_->EnableEmergencyThread()) {
-    if (!cr_map_[routine_id]->IsRunning() && IsPriorInverse(routine_id)) {
-      processor_->NotifyEmergencyThread();
-    }
   }
 }
 
@@ -90,24 +63,6 @@ void ProcessorContext::ShutDown() {
     stop_ = true;
   }
   processor_->Stop();
-}
-
-void ProcessorContext::PrintStatistics() {}
-
-void ProcessorContext::PrintCRoutineStats() {
-  ReadLockGuard<AtomicRWLock> lg(rw_lock_);
-  for (auto it = cr_map_.begin(); it != cr_map_.end(); ++it) {
-    it->second->PrintStatistics();
-  }
-}
-
-void ProcessorContext::UpdateProcessStat(ProcessorStat* stat) {
-  ReadLockGuard<AtomicRWLock> lg(rw_lock_);
-  for (auto it = cr_map_.begin(); it != cr_map_.end(); ++it) {
-    auto s = it->second->GetStatistics();
-    stat->exec_time += s.exec_time;
-    stat->sleep_time += s.sleep_time;
-  }
 }
 
 }  // namespace scheduler
