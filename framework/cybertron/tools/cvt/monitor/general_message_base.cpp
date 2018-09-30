@@ -58,7 +58,7 @@ int GeneralMessageBase::lineCountOfField(
         std::string scratch;
         const std::string& value =
             reflection->GetStringReference(msg, field, &scratch);
-        ret += value.size() / screenWidth;
+        ret += value.size() / screenWidth + 1;
         break;
       }
 
@@ -88,8 +88,8 @@ void GeneralMessageBase::PrintMessage(GeneralMessageBase* baseMsg,
     reflection->ListFields(msg, &fields);
   }
 
-  for (int i = 0; i < fields.size(); ++i) {
-    bool isWriten = false;
+  for (std::size_t i = 0; i < fields.size(); ++i) {
+    if(lineNo > s->Height()) { break; }
     const google::protobuf::FieldDescriptor* field = fields[i];
     if (field->is_repeated()) {
       if (jumpLines) {
@@ -99,9 +99,7 @@ void GeneralMessageBase::PrintMessage(GeneralMessageBase* baseMsg,
         const std::string& fieldName = field->name();
         outStr << fieldName << ": ";
         outStr << "+[" << reflection->FieldSize(msg, field) << " items ]";
-        GeneralMessage* item =
-            new GeneralMessage(baseMsg, &msg, reflection, field);
-
+        GeneralMessage* item = new GeneralMessage(baseMsg, &msg, reflection, field);
         if (item) {
           baseMsg->insertRepeatedMessage(lineNo, item);
         }
@@ -219,6 +217,8 @@ void GeneralMessageBase::PrintField(
           outStr << "[" << index << "] ";
         }
         s->AddStr(indent, lineNo++, outStr.str().c_str());
+      } else {
+        --jumpLines;
       }
       GeneralMessageBase::PrintMessage(
           baseMsg,

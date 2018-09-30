@@ -15,11 +15,10 @@
  *****************************************************************************/
 
 #include "screen.h"
-#include "renderable_message.h"
 #include "cybertron_channel_message.h"
 #include "cybertron_topology_message.h"
+#include "renderable_message.h"
 
-#include <thread>
 #include <ncurses.h>
 #include <unistd.h>
 #include <cstdio>
@@ -27,6 +26,7 @@
 #include <iostream>
 #include <mutex>
 #include <string>
+#include <thread>
 
 Screen* Screen::Instance(void) {
   static Screen s;
@@ -111,7 +111,7 @@ int Screen::Width(void) const { return COLS; }
 int Screen::Height(void) const { return LINES; }
 
 void Screen::SetCurrentColor(ColorPair color) const {
-  if(color == INVALID) return;
+  if (color == INVALID) return;
   if (IsInit()) {
     current_color_pair_ = color;
     attron(COLOR_PAIR(color));
@@ -192,14 +192,14 @@ int Screen::SwitchState(int ch) {
 }
 
 void Screen::Run() {
-  if (stdscr == nullptr) {
+  if (stdscr == nullptr || current_render_obj_ == nullptr) {
     return;
   }
 
   highlight_direction_ = 0;
 
   void (Screen::*showFuncs[])(int) = {&Screen::ShowRenderMessage,
-                                            &Screen::ShowInteractiveCmd};
+                                      &Screen::ShowInteractiveCmd};
 
   do {
     int ch = getch();
@@ -209,7 +209,8 @@ void Screen::Run() {
     ch = SwitchState(ch);
 
     (this->*showFuncs[static_cast<int>(current_state_)])(ch);
-    std::this_thread::sleep_for(std::chrono::milliseconds(static_cast<int>(1000.0/(ChannelMessage::max_frame_ratio() + 10.0))));                                                     
+    std::this_thread::sleep_for(std::chrono::milliseconds(
+        static_cast<int>(1000.0 / (ChannelMessage::max_frame_ratio() + 10.0))));
   } while (true);
 }
 
@@ -221,12 +222,10 @@ void Screen::Resize(void) {
 }
 
 void Screen::ShowRenderMessage(int ch) {
-  if (current_render_obj_) {
-    erase();
-    current_render_obj_->Render(this, ch);
-  }
+  erase();
+  current_render_obj_->Render(this, ch);
 
-  int* y = current_render_obj_->line_no();;
+  int* y = current_render_obj_->line_no();
 
   HighlightLine(*y);
   move(*y, 0);
@@ -238,7 +237,9 @@ void Screen::ShowRenderMessage(int ch) {
     case KEY_DOWN:
       ++(*y);
       highlight_direction_ = -1;
-      if (*y >= Height()) { *y = Height() - 1; }
+      if (*y >= Height()) {
+        *y = Height() - 1;
+      }
       break;
 
     case 'w':
@@ -247,39 +248,39 @@ void Screen::ShowRenderMessage(int ch) {
       --(*y);
       if (*y < 1) *y = 1;
       highlight_direction_ = 1;
-      if (*y < 0) { *y = 0; }
+      if (*y < 0) {
+        *y = 0;
+      }
       break;
 
     case 'a':
     case 'A':
     case KEY_BACKSPACE:
-    case KEY_LEFT:
-      if (current_render_obj_) {
-        RenderableMessage* p = current_render_obj_->parent();
-        if (p) {
-          current_render_obj_ = p;
-          y = p->line_no();
-          clear();
-        }
+    case KEY_LEFT:{
+      RenderableMessage* p = current_render_obj_->parent();
+      if (p) {
+        current_render_obj_ = p;
+        y = p->line_no();
+        clear();
       }
       break;
+    }
 
     case '\n':
     case '\r':
     case 'd':
     case 'D':
-    case KEY_RIGHT:
-      if (current_render_obj_) {
-        RenderableMessage* child = current_render_obj_->Child(*y);
+    case KEY_RIGHT:{
+      RenderableMessage* child = current_render_obj_->Child(*y);
 
-        if (child) {
-          child->reset_line_page();
-          current_render_obj_ = child;
-          y = child->line_no();
-          clear();
-        }
+      if (child) {
+        child->reset_line_page();
+        current_render_obj_ = child;
+        y = child->line_no();
+        clear();
       }
       break;
+    }
   }
 }
 

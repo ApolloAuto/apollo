@@ -100,7 +100,8 @@ void GeneralMessage::Render(const Screen* s, int key) {
       SplitPages(key);
 
       int jumpLines = page_index_ * page_item_count_;
-      // PrintRepeatedField(s, lineNo, 0, itemIndex_, jumpLines);
+      jumpLines <<= 2;
+      jumpLines /= 5;
       GeneralMessageBase::PrintField(this, *message_ptr_, jumpLines, s, lineNo, 0, reflection_ptr_, field_, itemIndex_);
     }
   }
