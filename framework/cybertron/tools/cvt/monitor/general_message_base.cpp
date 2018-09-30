@@ -21,6 +21,11 @@
 
 #include <iomanip>
 
+namespace {
+constexpr int INT_FLOAT_PRECISION = 6;
+constexpr int DOULBE_PRECISION = 9;
+}  // namespace
+
 int GeneralMessageBase::lineCount(const google::protobuf::Message& msg,
                                   int screenWidth) {
   const google::protobuf::Reflection* reflection = msg.GetReflection();
@@ -60,7 +65,7 @@ int GeneralMessageBase::lineCountOfField(
       case google::protobuf::FieldDescriptor::CPPTYPE_MESSAGE:
         const google::protobuf::Message& childMsg =
             reflection->GetMessage(msg, field);
-        ret += lineCount(childMsg, screenWidth) + 1;
+        ret += lineCount(childMsg, screenWidth);
         break;
 
     }  // end switch
@@ -71,8 +76,8 @@ int GeneralMessageBase::lineCountOfField(
 
 void GeneralMessageBase::PrintMessage(GeneralMessageBase* baseMsg,
                                       const google::protobuf::Message& msg,
-                                      const Screen* s, unsigned& lineNo,
-                                      int indent, int jumpLines) {
+                                      int& jumpLines, const Screen* s,
+                                      unsigned& lineNo, int indent) {
   const google::protobuf::Reflection* reflection = msg.GetReflection();
   const google::protobuf::Descriptor* descriptor = msg.GetDescriptor();
   std::vector<const google::protobuf::FieldDescriptor*> fields;
@@ -83,108 +88,144 @@ void GeneralMessageBase::PrintMessage(GeneralMessageBase* baseMsg,
     reflection->ListFields(msg, &fields);
   }
 
-  int i = 0;
-  // jump lines
-  for (; i < fields.size() && jumpLines > 1; ++i) {
+  for (int i = 0; i < fields.size(); ++i) {
+    bool isWriten = false;
     const google::protobuf::FieldDescriptor* field = fields[i];
-    --jumpLines;
-
-    if (!field->is_repeated()) {
-      switch (field->cpp_type()) {
-        case google::protobuf::FieldDescriptor::CPPTYPE_STRING: {
-          std::string scratch;
-          const std::string& value =
-              reflection->GetStringReference(msg, field, &scratch);
-          jumpLines -= value.size() / s->Width();
-          break;
-        }
-
-        case google::protobuf::FieldDescriptor::CPPTYPE_MESSAGE:
-          jumpLines -=
-              lineCount(reflection->GetMessage(msg, field), s->Width());
-          break;
-      }  // end switch
-    }
-  }
-
-  std::ostringstream outStr;
-  std::ios_base::fmtflags old_flags;
-  for (; i < fields.size(); ++i) {
-    const google::protobuf::FieldDescriptor* field = fields[i];
-    const std::string& fieldName = field->name();
-    outStr << fieldName << ": ";
     if (field->is_repeated()) {
-      outStr << "+[" << reflection->FieldSize(msg, field) << " items]";
+      if (jumpLines) {
+        --jumpLines;
+      } else {
+        std::ostringstream outStr;
+        const std::string& fieldName = field->name();
+        outStr << fieldName << ": ";
+        outStr << "+[" << reflection->FieldSize(msg, field) << " items ]";
+        GeneralMessage* item =
+            new GeneralMessage(baseMsg, &msg, reflection, field);
 
-      GeneralMessage* item =
-          new GeneralMessage(baseMsg, &msg, reflection, field);
-
-      if (item) {
-        baseMsg->insertRepeatedMessage(lineNo, item);
+        if (item) {
+          baseMsg->insertRepeatedMessage(lineNo, item);
+        }
+        s->AddStr(indent, lineNo++, outStr.str().c_str());
       }
-
     } else {
-      switch (field->cpp_type()) {
-#define OUTPUT_FIELD(CPPTYPE, METHOD, PRECISION)             \
-  case google::protobuf::FieldDescriptor::CPPTYPE_##CPPTYPE: \
-    old_flags = outStr.flags();                              \
-    outStr << std::fixed << std::setprecision(PRECISION)     \
-           << reflection->Get##METHOD(msg, field);           \
-    outStr.flags(old_flags);                                 \
-    break
-
-        OUTPUT_FIELD(INT32, Int32, 6);
-        OUTPUT_FIELD(INT64, Int64, 6);
-        OUTPUT_FIELD(UINT32, UInt32, 6);
-        OUTPUT_FIELD(UINT64, UInt64, 6);
-        OUTPUT_FIELD(FLOAT, Float, 6);
-        OUTPUT_FIELD(DOUBLE, Double, 9);
-        OUTPUT_FIELD(BOOL, Bool, 6);
-#undef OUTPUT_FIELD
-
-        case google::protobuf::FieldDescriptor::CPPTYPE_ENUM: {
-          int enum_value = reflection->GetEnumValue(msg, field);
-
-          const google::protobuf::EnumValueDescriptor* enum_desc =
-              field->enum_type()->FindValueByNumber(enum_value);
-          if (enum_desc != nullptr) {
-            outStr << enum_desc->name();
-          } else {
-            outStr << enum_value;
-          }
-          break;
-        }
-
-        case google::protobuf::FieldDescriptor::CPPTYPE_STRING: {
-          std::string scratch;
-          const std::string& value =
-              reflection->GetStringReference(msg, field, &scratch);
-          outStr << value;
-          break;
-        }
-
-        case google::protobuf::FieldDescriptor::CPPTYPE_MESSAGE:
-          s->AddStr(indent, lineNo++, outStr.str().c_str());
-          PrintMessage(baseMsg, reflection->GetMessage(msg, field), s, lineNo,
-                       indent + 2);
-          outStr.str("");
-          break;
-      }  // end switch
-    }    // end else
-
-    s->AddStr(indent, lineNo++, outStr.str().c_str());
-    outStr.str("");
-  }  // end for
+      PrintField(baseMsg, msg, jumpLines, s, lineNo, indent, reflection, field,
+                 -1);
+    }  // end else
+  }    // end for
 
   const google::protobuf::UnknownFieldSet& unknown_fields =
       reflection->GetUnknownFields(msg);
   if (!unknown_fields.empty()) {
     Screen::ColorPair c = s->Color();
-    s->ClearCurrentColor(c);
+    s->ClearCurrentColor();
     s->SetCurrentColor(Screen::RED_BLACK);
     s->AddStr(indent, lineNo++, "Have Unknown Fields");
-    s->ClearCurrentColor(Screen::RED_BLACK);
+    s->ClearCurrentColor();
     s->SetCurrentColor(c);
+  }
+}
+
+void GeneralMessageBase::PrintField(
+    GeneralMessageBase* baseMsg, const google::protobuf::Message& msg,
+    int& jumpLines, const Screen* s, unsigned& lineNo, int indent,
+    const google::protobuf::Reflection* ref,
+    const google::protobuf::FieldDescriptor* field, int index) {
+  std::ostringstream outStr;
+  std::ios_base::fmtflags old_flags;
+
+  switch (field->cpp_type()) {
+#define OUTPUT_FIELD(CPPTYPE, METHOD, PRECISION)                   \
+  case google::protobuf::FieldDescriptor::CPPTYPE_##CPPTYPE:       \
+    if (jumpLines) {                                               \
+      --jumpLines;                                                 \
+    } else {                                                       \
+      const std::string& fieldName = field->name();                \
+      outStr << fieldName << ": ";                                 \
+      if (field->is_repeated()) {                                  \
+        outStr << "[" << index << "] ";                            \
+      }                                                            \
+      old_flags = outStr.flags();                                  \
+      outStr << std::fixed << std::setprecision(PRECISION)         \
+             << (field->is_repeated()                              \
+                     ? ref->GetRepeated##METHOD(msg, field, index) \
+                     : ref->Get##METHOD(msg, field));              \
+      outStr.flags(old_flags);                                     \
+      s->AddStr(indent, lineNo++, outStr.str().c_str());           \
+    }                                                              \
+    break
+
+    OUTPUT_FIELD(INT32, Int32, INT_FLOAT_PRECISION);
+    OUTPUT_FIELD(INT64, Int64, INT_FLOAT_PRECISION);
+    OUTPUT_FIELD(UINT32, UInt32, INT_FLOAT_PRECISION);
+    OUTPUT_FIELD(UINT64, UInt64, INT_FLOAT_PRECISION);
+    OUTPUT_FIELD(FLOAT, Float, INT_FLOAT_PRECISION);
+    OUTPUT_FIELD(DOUBLE, Double, DOULBE_PRECISION);
+    OUTPUT_FIELD(BOOL, Bool, INT_FLOAT_PRECISION);
+#undef OUTPUT_FIELD
+
+    case google::protobuf::FieldDescriptor::CPPTYPE_STRING: {
+      std::string scratch;
+      const std::string& value =
+          field->is_repeated()
+              ? ref->GetRepeatedStringReference(msg, field, index, &scratch)
+              : ref->GetStringReference(msg, field, &scratch);
+      int lines = value.size() / s->Width() + 1;
+      if (lines > jumpLines) {
+        const std::string& fieldName = field->name();
+        outStr << fieldName << ": ";
+        if (field->is_repeated()) {
+          outStr << "[" << index << "] ";
+        }
+        outStr << value.substr(jumpLines * s->Width());
+        s->AddStr(indent, lineNo, outStr.str().c_str());
+        lineNo += (lines - jumpLines);
+        jumpLines = 0;
+
+      } else {
+        jumpLines -= lines;
+      }
+      break;
+    }
+
+    case google::protobuf::FieldDescriptor::CPPTYPE_ENUM: {
+      if (jumpLines) {
+        --jumpLines;
+      } else {
+        const std::string& fieldName = field->name();
+        outStr << fieldName << ": ";
+        if (field->is_repeated()) {
+          outStr << "[" << index << "] ";
+        }
+        int enum_value = field->is_repeated()
+                             ? ref->GetRepeatedEnumValue(msg, field, index)
+                             : ref->GetEnumValue(msg, field);
+        const google::protobuf::EnumValueDescriptor* enum_desc =
+            field->enum_type()->FindValueByNumber(enum_value);
+        if (enum_desc != nullptr) {
+          outStr << enum_desc->name();
+        } else {
+          outStr << enum_value;
+        }
+        s->AddStr(indent, lineNo++, outStr.str().c_str());
+      }
+      break;
+    }
+
+    case google::protobuf::FieldDescriptor::CPPTYPE_MESSAGE:
+      if (!jumpLines) {
+        const std::string& fieldName = field->name();
+        outStr << fieldName << ": ";
+        if (field->is_repeated()) {
+          outStr << "[" << index << "] ";
+        }
+        s->AddStr(indent, lineNo++, outStr.str().c_str());
+      }
+      GeneralMessageBase::PrintMessage(
+          baseMsg,
+          field->is_repeated() ? ref->GetRepeatedMessage(msg, field, index)
+                               : ref->GetMessage(msg, field),
+          jumpLines, s, lineNo, indent + 2);
+      break;
   }
 }
 

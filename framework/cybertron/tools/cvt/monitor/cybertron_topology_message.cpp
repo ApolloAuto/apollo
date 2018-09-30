@@ -27,11 +27,11 @@
 
 constexpr int SecondColumnOffset = 4;
 
-CybertronTopologyMessage::CybertronTopologyMessage()
+CybertronTopologyMessage::CybertronTopologyMessage(const std::string& channel)
     : RenderableMessage(nullptr, 1),
       second_column_(SecondColumnType::MessageFrameRatio),
-      page_item_count_(24),
       col1_width_(8),
+      specified_channel_(channel),
       all_channels_map_() {}
 
 CybertronTopologyMessage::~CybertronTopologyMessage(void) {
@@ -75,6 +75,10 @@ void CybertronTopologyMessage::TopologyChanged(
   const std::string& channelName = changeMsg.role_attr().channel_name();
   const std::string& msgTypeName = changeMsg.role_attr().message_type();
 
+  if (!specified_channel_.empty() && specified_channel_ != channelName) {
+    return;
+  }
+
   if ((int)channelName.length() > col1_width_) {
     col1_width_ = channelName.length();
   }
@@ -106,17 +110,16 @@ void CybertronTopologyMessage::TopologyChanged(
     if (!ChannelMessage::isErrorCode(channelMsg)) {
       if (::apollo::cybertron::proto::RoleType::ROLE_WRITER ==
           changeMsg.role_type()) {
+        if (msgTypeName != apollo::cybertron::message::MessageType<
+                               apollo::cybertron::message::RawMessage>()) {
+          channelMsg->set_message_type(msgTypeName);
+        }
+
         channelMsg->add_writer(nodeName);
       } else {
         channelMsg->add_reader(nodeName);
       }
-
-      if (msgTypeName != apollo::cybertron::message::MessageType<
-                             apollo::cybertron::message::RawMessage>()) {
-        channelMsg->set_message_type(msgTypeName);
-      }
     }
-
   } else {
     auto iter = all_channels_map_.find(channelName);
 
@@ -144,18 +147,6 @@ void CybertronTopologyMessage::ChangeState(const Screen* s, int key) {
       second_column_ = SecondColumnType::MessageType;
       break;
 
-      // case CTRL('d'):
-      // case KEY_NPAGE:
-      //   ++page_index_;
-      //   if (page_index_ >= pages_) page_index_ = pages_ - 1;
-      //   break;
-
-      // case CTRL('u'):
-      // case KEY_PPAGE:
-      //   --page_index_;
-      //   if (page_index_ < 1) page_index_ = 0;
-      //   break;
-
     case ' ': {
       ChannelMessage* child = static_cast<ChannelMessage*>(Child(*line_no()));
       if (child) {
@@ -173,7 +164,6 @@ void CybertronTopologyMessage::Render(const Screen* s, int key) {
   ChangeState(s, key);
   SplitPages(key);
 
-  // display table title
   s->AddStr(0, 0, Screen::WHITE_BLACK, "Channels");
   switch (second_column_) {
     case SecondColumnType::MessageType:
@@ -186,19 +176,20 @@ void CybertronTopologyMessage::Render(const Screen* s, int key) {
       break;
   }
 
-  // display concrete channel info
+  auto iter = all_channels_map_.cbegin();
+  register int tmp = page_index_ * page_item_count_;
+  register int line = 0;
+  while (line < tmp) {
+    ++iter;
+    ++line;
+  }
+
   Screen::ColorPair color;
   std::ostringstream outStr;
 
-  auto iter = all_channels_map_.cbegin();
-  const int skip_item_count = page_index_ * page_item_count_;
-  for (int i = 0; i < skip_item_count; ++i) {
-    ++iter;
-  }
-
-  int y = 1;  // start line index
-  const int end_y = s->Height();
-  for (; iter != all_channels_map_.cend() && y < end_y; ++iter, ++y) {
+  tmp = page_item_count_ + 1;
+  for (line = 1; iter != all_channels_map_.cend() && line < tmp;
+       ++iter, ++line) {
     color = Screen::RED_BLACK;
 
     if (!ChannelMessage::isErrorCode(iter->second)) {
@@ -212,27 +203,28 @@ void CybertronTopologyMessage::Render(const Screen* s, int key) {
     }
 
     s->SetCurrentColor(color);
-    s->AddStr(0, y, iter->first.c_str());
+    s->AddStr(0, line, iter->first.c_str());
 
     if (!ChannelMessage::isErrorCode(iter->second)) {
       switch (second_column_) {
         case SecondColumnType::MessageType:
-          s->AddStr(col1_width_ + SecondColumnOffset, y,
+          s->AddStr(col1_width_ + SecondColumnOffset, line,
                     iter->second->message_type().c_str());
           break;
         case SecondColumnType::MessageFrameRatio: {
           outStr.str("");
           outStr << std::fixed << std::setprecision(2)
                  << iter->second->frame_ratio();
-          s->AddStr(col1_width_ + SecondColumnOffset, y, outStr.str().c_str());
+          s->AddStr(col1_width_ + SecondColumnOffset, line,
+                    outStr.str().c_str());
         } break;
       }
     } else {
       ChannelMessage::ErrorCode errcode =
           ChannelMessage::castPtr2ErrorCode(iter->second);
-      s->AddStr(col1_width_ + SecondColumnOffset, y,
+      s->AddStr(col1_width_ + SecondColumnOffset, line,
                 ChannelMessage::errCode2Str(errcode));
     }
-    s->ClearCurrentColor(color);
+    s->ClearCurrentColor();
   }
 }

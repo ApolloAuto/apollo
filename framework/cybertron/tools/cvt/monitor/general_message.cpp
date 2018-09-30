@@ -18,84 +18,16 @@
 #include "general_channel_message.h"
 #include "screen.h"
 
+#include <iomanip>
 #include <sstream>
+
+namespace {
+constexpr int INT_FLOAT_PRECISION = 6;
+constexpr int DOULBE_PRECISION = 9;
+}  // namespace
 
 RenderableMessage* GeneralMessage::Child(int lineNo) const {
   return GeneralMessageBase::Child(lineNo);
-}
-
-void GeneralMessage::PrintRepeatedField(const Screen* s, unsigned& lineNo,
-                                        int indent, int index, int jumpLines) {
-  std::ostringstream outStr;
-  std::ios_base::fmtflags old_flags;
-  const std::string& fieldName = field_->name();
-  outStr << fieldName << ": ";
-
-  if (field_->is_repeated()) {
-    outStr << "[" << index << "] ";
-  }
-
-  switch (field_->cpp_type()) {
-#define OUTPUT_FIELD(CPPTYPE, METHOD, PRECISION)                             \
-  case google::protobuf::FieldDescriptor::CPPTYPE_##CPPTYPE:                 \
-    old_flags = outStr.flags();                                              \
-    outStr << std::fixed << std::setprecision(PRECISION)                     \
-           << field_->is_repeated()                                          \
-        ? reflection_ptr_->GetRepeated##METHOD(*message_ptr_, field_, index) \
-        : reflection_ptr_->Get##METHOD(*message_ptr_, field_);               \
-    outStr.flags(old_flags);                                                 \
-    break
-
-    OUTPUT_FIELD(INT32, Int32, 6);
-    OUTPUT_FIELD(INT64, Int64, 6);
-    OUTPUT_FIELD(UINT32, UInt32, 6);
-    OUTPUT_FIELD(UINT64, UInt64, 6);
-    OUTPUT_FIELD(FLOAT, Float, 6);
-    OUTPUT_FIELD(DOUBLE, Double, 9);
-    OUTPUT_FIELD(BOOL, Bool, 6);
-#undef OUTPUT_FIELD
-
-    case google::protobuf::FieldDescriptor::CPPTYPE_STRING: {
-      std::string scratch;
-      const std::string& value =
-          field_->is_repeated()
-              ? reflection_ptr_->GetRepeatedStringReference(
-                    *message_ptr_, field_, index, &scratch)
-              : reflection_ptr_->GetStringReference(*message_ptr_, field_,
-                                                    &scratch);
-      outStr << value.substr(jumpLines);
-      break;
-    }
-
-    case google::protobuf::FieldDescriptor::CPPTYPE_ENUM: {
-      int enum_value =
-          field_->is_repeated()
-              ? reflection_ptr_->GetRepeatedEnumValue(*message_ptr_, field_,
-                                                      index)
-              : reflection_ptr_->GetEnumValue(*message_ptr_, field_);
-      const google::protobuf::EnumValueDescriptor* enum_desc =
-          field_->enum_type()->FindValueByNumber(enum_value);
-      if (enum_desc != nullptr) {
-        outStr << enum_desc->name();
-      } else {
-        outStr << enum_value;
-      }
-      break;
-    }
-
-    case google::protobuf::FieldDescriptor::CPPTYPE_MESSAGE:
-      s->AddStr(indent, lineNo++, outStr.str().c_str());
-      GeneralMessageBase::PrintMessage(
-          this, field_->is_repeated()
-                    ? reflection_ptr_->GetRepeatedMessage(*message_ptr_, field_,
-                                                          index)
-                    : reflection_ptr_->GetMessage(*message_ptr_, field_),
-          s, lineNo, indent + 2, jumpLines + 1);
-      outStr.str("");
-      break;
-  }
-
-  s->AddStr(indent, lineNo++, outStr.str().c_str());
 }
 
 GeneralMessage::GeneralMessage(GeneralMessageBase* parent,
@@ -163,13 +95,15 @@ void GeneralMessage::Render(const Screen* s, int key) {
 
       int lcount =
           lineCountOfField(*message_ptr_, s->Width(), field_, reflection_ptr_);
-      int pageItemCount = s->Height() - lineNo;
-      pages_ = lcount / pageItemCount + 1;
+      page_item_count_ = s->Height() - lineNo;
+      pages_ = lcount / page_item_count_ + 1;
       SplitPages(key);
 
-      PrintRepeatedField(s, lineNo, 0, itemIndex_, page_index_ * pageItemCount);
+      int jumpLines = page_index_ * page_item_count_;
+      // PrintRepeatedField(s, lineNo, 0, itemIndex_, jumpLines);
+      GeneralMessageBase::PrintField(this, *message_ptr_, jumpLines, s, lineNo, 0, reflection_ptr_, field_, itemIndex_);
     }
   }
 
-  s->ClearCurrentColor(Screen::WHITE_BLACK);
+  s->ClearCurrentColor();
 }

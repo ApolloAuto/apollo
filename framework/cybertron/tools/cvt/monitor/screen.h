@@ -57,7 +57,7 @@ class Screen final {
   void AddStr(int x, int y, const char* str) const;
   void AddStr(const char* str) const;
   void MoveOffsetXY(int offsetX, int offsetY) const;
-  void ClearCurrentColor(ColorPair color) const;
+  void ClearCurrentColor(void) const;
 
   void SetCurrentRenderMessage(RenderableMessage* const renderObj) {
     if (renderObj) {
