@@ -182,6 +182,10 @@ bool OsqpSpline2dSolver::Solve() {
   // Define Solver settings as default
   osqp_set_default_settings(settings);
   settings->alpha = 1.0;  // Change alpha parameter
+  settings->eps_abs = 1.0e-06;
+  settings->eps_rel = 1.0e-06;
+  settings->max_iter = 5000;
+  settings->polish = true;
 
   // Setup workspace
   work = osqp_setup(data, settings);
@@ -218,7 +222,7 @@ void OsqpSpline2dSolver::ToCSCMatrix(const MatrixXd& dense_matrix,
   int data_count = 0;
   for (int c = 0; c < dense_matrix.cols(); ++c) {
     indptr->emplace_back(data_count);
-    for (int r = 0; r < dense_matrix.cols(); ++r) {
+    for (int r = 0; r < dense_matrix.rows(); ++r) {
       if (std::fabs(dense_matrix(r, c)) < epsilon) {
         continue;
       }

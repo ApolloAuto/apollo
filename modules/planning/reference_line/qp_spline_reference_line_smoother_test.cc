@@ -19,6 +19,8 @@
  **/
 #include "modules/planning/reference_line/qp_spline_reference_line_smoother.h"
 
+#include <chrono>
+
 #include "gtest/gtest.h"
 
 #include "modules/planning/proto/reference_line_smoother_config.pb.h"
@@ -95,8 +97,16 @@ TEST_F(QpSplineReferenceLineSmootherTest, smooth) {
   anchor_points.back().longitudinal_bound = 1e-6;
   anchor_points.back().lateral_bound = 1e-6;
   smoother_->SetAnchorPoints(anchor_points);
+
+  auto start = std::chrono::system_clock::now();
+
   EXPECT_TRUE(smoother_->Smooth(*reference_line_, &smoothed_reference_line));
-  EXPECT_NEAR(152.0, smoothed_reference_line.Length(), 1.0);
+
+  auto end = std::chrono::system_clock::now();
+  std::chrono::duration<double> diff = end - start;
+  std::cout << "Time to solver is " << diff.count() << " s\n";
+
+  EXPECT_NEAR(152.5409, smoothed_reference_line.Length(), 1.0e-2);
 }
 
 }  // namespace planning

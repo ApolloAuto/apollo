@@ -90,6 +90,35 @@ TEST(OSQPSolverTest, basic_test) {
       EXPECT_EQ(indptr[i], indptr_golden[i]);
     }
   }
+  {
+    std::vector<double> data;
+    std::vector<int> indices;
+    std::vector<int> indptr;
+    Eigen::MatrixXd dense_matrix(4, 6);
+    dense_matrix << 11, 0, 0, 14, 0, 16, 0, 22, 0, 0, 25, 26, 0, 0, 33, 34, 0,
+        36, 41, 0, 43, 44, 0, 46;
+
+    spline_solver.ToCSCMatrix(dense_matrix, &data, &indices, &indptr);
+
+    std::vector<double> data_golden = {11.0, 41.0, 22.0, 33.0, 43.0, 14.0, 34.0,
+                                       44.0, 25.0, 16.0, 26.0, 36.0, 46.0};
+    std::vector<int> indices_golden = {0, 3, 1, 2, 3, 0, 2, 3, 1, 0, 1, 2, 3};
+    std::vector<int> indptr_golden = {0, 2, 3, 5, 8, 9, 13};
+
+    EXPECT_EQ(data.size(), data_golden.size());
+    EXPECT_EQ(indices.size(), indices_golden.size());
+    EXPECT_EQ(indptr.size(), indptr_golden.size());
+
+    for (size_t i = 0; i < data.size(); ++i) {
+      EXPECT_DOUBLE_EQ(data[i], data_golden[i]);
+    }
+    for (size_t i = 0; i < indices.size(); ++i) {
+      EXPECT_EQ(indices[i], indices_golden[i]);
+    }
+    for (size_t i = 0; i < indptr.size(); ++i) {
+      EXPECT_EQ(indptr[i], indptr_golden[i]) << "i = " << i;
+    }
+  }
 }
 
 TEST(OSQPSolverTest, solver_test_01) {
@@ -199,13 +228,6 @@ TEST(OSQPSolverTest, solver_test_01) {
   double t = 0;
   for (int i = 0; i < 51; ++i) {
     auto xy = spline_solver.spline()(t);
-    const double heading = std::atan2(spline_solver.spline().DerivativeY(t),
-                                      spline_solver.spline().DerivativeX(t));
-    const double kappa = CurveMath::ComputeCurvature(
-        spline_solver.spline().DerivativeX(t),
-        spline_solver.spline().SecondDerivativeX(t),
-        spline_solver.spline().DerivativeY(t),
-        spline_solver.spline().SecondDerivativeY(t));
     EXPECT_NEAR(xy.first, gold_res(i, 1),
                 std::fmax(3e-3, gold_res(i, 1) * 1e-4));
     EXPECT_NEAR(xy.second, gold_res(i, 2),
