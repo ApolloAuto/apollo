@@ -653,10 +653,11 @@ void MainWindow::PlayRenderableObject(bool b) {
           [this](const std::shared_ptr<apollo::drivers::PointCloud>& pdata) {
             this->PointCloudReaderCallback(pdata);
           };
-
+      std::string nodeName("Visualizer-");
+      nodeName.append(pointcloud_top_item_->text(0).toStdString());
       if (!pointcloud_channel_Reader_->InstallCallbackAndOpen(
-              pointCallback,
-              pointcloud_comboBox_->currentText().toStdString())) {
+              pointCallback, pointcloud_comboBox_->currentText().toStdString(),
+              nodeName)) {
         QMessageBox::warning(
             this, tr("Settup Channel Callback"),
             tr("Channel Callback cannot be installed!!!\nPlease check it!"),
@@ -704,8 +705,9 @@ void MainWindow::ImageReaderCallback(
                 << std::endl;
     }
   } else {
-    std::cerr << "----Dynamic Texture is nullptr or apollo.drivers.Image is nullptr"
-              << std::endl;
+    std::cerr
+        << "----Dynamic Texture is nullptr or apollo.drivers.Image is nullptr"
+        << std::endl;
   }
   theVideoImgProxy->reader_mutex_.unlock();
 }
@@ -746,9 +748,12 @@ void MainWindow::DoPlayVideoImage(bool b, VideoImgProxy* theVideoImg) {
             this->ImageReaderCallback(pdata, theVideoImg);
           };
 
+      std::string nodeName("Visualizer-");
+      nodeName.append(theVideoImg->root_item_.text(0).toStdString());
       if (!theVideoImg->channel_reader_->InstallCallbackAndOpen(
-              videoCallback, theVideoImg->channel_name_combobox_.currentText()
-                                 .toStdString())) {
+              videoCallback,
+              theVideoImg->channel_name_combobox_.currentText().toStdString(),
+              nodeName)) {
         QMessageBox::warning(
             this, tr("Settup Channel Callback"),
             tr("Channel Callback cannot be installed!!!\nPlease check it!"),
@@ -787,8 +792,10 @@ void MainWindow::DoPlayVideoImage(bool b, VideoImgProxy* theVideoImg) {
 void MainWindow::ChangePointCloudChannel() {
   if (pointcloud_channel_Reader_ != nullptr) {
     pointcloud_channel_Reader_->CloseChannel();
+    std::string nodeName("Visualizer-");
+    nodeName.append(pointcloud_top_item_->text(0).toStdString());
     pointcloud_channel_Reader_->OpenChannel(
-        pointcloud_comboBox_->currentText().toStdString());
+        pointcloud_comboBox_->currentText().toStdString(), nodeName);
   }
 }
 
@@ -799,7 +806,10 @@ void MainWindow::ChangeVideoImgChannel() {
 
   if (theVideoImg->channel_reader_ != nullptr) {
     theVideoImg->channel_reader_->CloseChannel();
-    theVideoImg->channel_reader_->OpenChannel(obj->currentText().toStdString());
+    std::string nodeName("Visualizer-");
+    nodeName.append(theVideoImg->root_item_.text(0).toStdString());
+    theVideoImg->channel_reader_->OpenChannel(obj->currentText().toStdString(),
+                                              nodeName);
   }
 }
 

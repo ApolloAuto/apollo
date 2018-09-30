@@ -26,9 +26,13 @@ class GeneralMessageBase : public RenderableMessage {
  protected:
   enum { Type = 0 };
   static void PrintMessage(GeneralMessageBase* baseMsg,
-                           const google::protobuf::Message& msg,
-                           const Screen* s, unsigned& lineNo, int indent,
-                           int jumpLines = 0);
+                           const google::protobuf::Message& msg, int& jumpLines,
+                           const Screen* s, unsigned& lineNo, int indent);
+  static void PrintField(GeneralMessageBase* baseMsg,
+                         const google::protobuf::Message& msg, int& jumpLines,
+                         const Screen* s, unsigned& lineNo, int indent,
+                         const google::protobuf::Reflection* ref, const google::protobuf::FieldDescriptor* field,
+                         int index);
 
   static int lineCount(const google::protobuf::Message& msg, int screenWidth);
   static int lineCountOfField(const google::protobuf::Message& msg,

@@ -111,6 +111,7 @@ int Screen::Width(void) const { return COLS; }
 int Screen::Height(void) const { return LINES; }
 
 void Screen::SetCurrentColor(ColorPair color) const {
+  if(color == INVALID) return;
   if (IsInit()) {
     current_color_pair_ = color;
     attron(COLOR_PAIR(color));
@@ -128,9 +129,9 @@ void Screen::AddStr(const char* str) const {
   }
 }
 
-void Screen::ClearCurrentColor(ColorPair color) const {
+void Screen::ClearCurrentColor(void) const {
   if (IsInit()) {
-    attroff(COLOR_PAIR(color));
+    attroff(COLOR_PAIR(current_color_pair_));
     current_color_pair_ = INVALID;
   }
 }
@@ -159,14 +160,14 @@ void Screen::HighlightLine(int lineNo) {
       ch &= A_CHARTEXT;
       if (ch == ' ') mvaddch(lineNo + highlight_direction_, x, ch);
     }
-    ClearCurrentColor(WHITE_BLACK);
+    ClearCurrentColor();
 
     SetCurrentColor(BLACK_WHITE);
     for (int x = 0; x < Width(); ++x) {
       int ch = mvinch(lineNo, x);
       mvaddch(lineNo, x, ch & A_CHARTEXT);
     }
-    ClearCurrentColor(BLACK_WHITE);
+    ClearCurrentColor();
   }
 }
 
@@ -296,5 +297,5 @@ void Screen::ShowInteractiveCmd(int) {
     ptr = sub + 1;
   }
 
-  ClearCurrentColor(Screen::WHITE_BLACK);
+  ClearCurrentColor();
 }

@@ -47,34 +47,34 @@ class CyberChannReader : public QThread {
     }
   }
 
+  bool InstallCallbackAndOpen(CyberChannelCallback<T> channelCallback,
+                              const std::string& channelName, const std::string& nodeName) {
+
+    return InstallCallback(channelCallback) && OpenChannel(channelName, nodeName);
+  }
+
   bool InstallCallback(CyberChannelCallback<T> channelCallback) {
     if (channelCallback != nullptr) {
       channel_callback_ = channelCallback;
       return true;
     } else {
+      std::cerr << "Parameter readerCallback is null" << std::endl;
       return false;
     }
   }
 
-  bool InstallCallbackAndOpen(CyberChannelCallback<T> channelCallback,
-                              const std::string& channelName) {
-    if (channelCallback == nullptr || channelName.empty()) {
-      std::cout << "Parameter readerCallback is null" << std::endl;
+  bool OpenChannel(const std::string& channelName, const std::string& nodeName) {
+    if(channelName.empty() || nodeName.empty()){
+      std::cerr << "Channel Name or Node Name must be not empty" << std::endl;
       return false;
     }
 
-    channel_callback_ = channelCallback;
-
-    return OpenChannel(channelName);
-  }
-
-  bool OpenChannel(const std::string& channelName) {
     if (channel_node_ != nullptr || channel_reader_ != nullptr ||
         !channel_callback_) {
       return false;
     }
 
-    return CreateChannel(channelName);
+    return CreateChannel(channelName, nodeName);
   }
 
   const std::string& NodeName(void) const { return channel_node_->Name(); }
@@ -87,9 +87,9 @@ class CyberChannReader : public QThread {
   void run() override { apollo::cybertron::WaitForShutdown(); }
 
  private:
-  bool CreateChannel(const std::string& channelName) {
+  bool CreateChannel(const std::string& channelName, const std::string& nodeName) {
     if (channel_node_ == nullptr) {
-      channel_node_ = apollo::cybertron::CreateNode("CyberChannReader");
+      channel_node_ = apollo::cybertron::CreateNode(nodeName);
       if (channel_node_ == nullptr) {
         return false;
       }

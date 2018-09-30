@@ -31,23 +31,56 @@ void SigResizeHandle(int) { Screen::Instance()->Resize(); }
 
 void printHelp(const char* cmdName) {
   std::cout << "Usage:\n"
-            << cmdName << "  run this tool\n"
+            << cmdName << "  [option]\nOption:\n"
             << "   -h print help info\n"
-            << "\nInteractive Command:\n"
+            << "   -c specify one channel\n"
+            << "Interactive Command:\n"
             << Screen::InteractiveCmdStr << std::endl;
 }
+
+enum COMMAND {
+  TOO_MANY_PARAMETER,
+  HELP, // 2
+  NO_OPTION, // 1
+  CHANNEL // 3 -> 4
+};
+
+COMMAND parseOption(int argc,  char* const argv[], std::string& commandVal){
+  if(argc > 4) return TOO_MANY_PARAMETER;
+  int index = 1;
+  while(true) {
+    const char* opt = argv[index];
+    if(opt == nullptr) break;
+    if(strcmp(opt, "-h") == 0) return HELP;
+    if(strcmp(opt, "-c") == 0) {
+      if(argv[index + 1]){
+        commandVal = argv[index + 1];
+        return CHANNEL;
+      }
+    }
+
+    ++index;
+  }
+
+  return NO_OPTION;
+}
+
+
 }  // namespace
 
 int main(int argc, char* argv[]) {
-  if (argc > 2) {
-    std::cout << "Too many parameters\n";
-    printHelp(argv[0]);
-    return 0;
-  } else if (argc == 2) {
-    if (strcmp(argv[1], "-h") == 0) {
+  std::string val;
+
+  COMMAND com = parseOption(argc, argv, val);
+
+  switch(com){
+    case TOO_MANY_PARAMETER:
+      std::cout << "Too many paramtes\n";
+    case HELP:
       printHelp(argv[0]);
       return 0;
-    }
+    
+    default:;
   }
 
   apollo::cybertron::Init(argv[0]);
@@ -60,7 +93,7 @@ int main(int argc, char* argv[]) {
                           GeneralChannelMessage::Instance);
   f->SetDefaultChildFactory("apollo::cybertron::message::RawMessage");
 
-  CybertronTopologyMessage topologyMsg;
+  CybertronTopologyMessage topologyMsg(val);
 
   auto topologyCallback =
       [&topologyMsg](const apollo::cybertron::proto::ChangeMsg& change_msg) {

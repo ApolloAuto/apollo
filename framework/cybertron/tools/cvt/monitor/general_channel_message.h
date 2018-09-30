@@ -54,8 +54,6 @@ class GeneralChannelMessage
   
   enum class State { ShowDebugString, ShowInfo } current_state_;
 
-  // int pages_;
-  // int page_index_;
   google::protobuf::Message* raw_msg_class_;
 
   friend class RepeatedItemsMessage;

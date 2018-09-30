@@ -18,6 +18,7 @@
 #define TOOLS_CVT_MONITOR_CYBERTRON_TOPOLOGY_MESSAGE_H_
 
 #include <map>
+#include <string>
 #include "renderable_message.h"
 
 namespace apollo {
@@ -33,7 +34,7 @@ class ChannelMessage;
 
 class CybertronTopologyMessage : public RenderableMessage {
  public:
-  explicit CybertronTopologyMessage();
+  explicit CybertronTopologyMessage(const std::string& channel);
   ~CybertronTopologyMessage();
 
   void Render(const Screen* s, int key) override;
@@ -42,14 +43,16 @@ class CybertronTopologyMessage : public RenderableMessage {
   void TopologyChanged(const apollo::cybertron::proto::ChangeMsg& change_msg);
 
  private:
+  CybertronTopologyMessage(const CybertronTopologyMessage&) = delete;
+  CybertronTopologyMessage& operator = (const CybertronTopologyMessage&) = delete;
+
   void ChangeState(const Screen* s, int key);
 
   enum class SecondColumnType { MessageType, MessageFrameRatio };
   SecondColumnType second_column_;
 
-  int page_item_count_;
   int col1_width_; 
-
+  const std::string& specified_channel_;
   std::map<std::string, ChannelMessage*> all_channels_map_;
 };
 
