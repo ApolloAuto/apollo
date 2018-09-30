@@ -16,6 +16,7 @@ cc_test(
 
 cc_test(
     name = "radar_conti_ars_preprocessor_test",
+    size = "small",
     srcs = [
         "radar_conti_ars_preprocessor_test.cc",
     ],
@@ -27,6 +28,7 @@ cc_test(
 
 cc_test(
     name = "radar_dummy_algorithms_test",
+    size = "small",
     srcs = [
         "radar_dummy_algorithms_test.cc",
     ],
@@ -38,6 +40,7 @@ cc_test(
 
 cc_test(
     name = "radar_filter_adaptive_kalman_filter_test",
+    size = "small",
     srcs = [
         "radar_filter_adaptive_kalman_filter_test.cc",
     ],
@@ -49,6 +52,7 @@ cc_test(
 
 cc_test(
     name = "radar_hdmap_radar_roi_filter_test",
+    size = "small",
     srcs = [
         "radar_hdmap_radar_roi_filter_test.cc",
     ],
@@ -60,6 +64,7 @@ cc_test(
 
 cc_test(
     name = "radar_interface_base_matcher_test",
+    size = "small",
     srcs = [
         "radar_interface_base_matcher_test.cc",
     ],
@@ -72,6 +77,7 @@ cc_test(
 
 cc_test(
     name = "radar_tracker_conti_ars_tracker_empty_test",
+    size = "small",
     srcs = [
         "radar_tracker_conti_ars_tracker_empty_test.cc",
     ],
@@ -83,6 +89,7 @@ cc_test(
 
 cc_test(
     name = "radar_tracker_conti_ars_tracker_test",
+    size = "small",
     srcs = [
         "radar_tracker_conti_ars_tracker_test.cc",
     ],
@@ -94,6 +101,7 @@ cc_test(
 
 cc_test(
     name = "radar_tracker_hm_matcher_test",
+    size = "small",
     srcs = [
         "radar_tracker_hm_matcher_test.cc",
     ],
@@ -106,6 +114,7 @@ cc_test(
 
 cc_test(
     name = "radar_tracker_radar_track_manager_test",
+    size = "small",
     srcs = [
         "radar_tracker_radar_track_manager_test.cc",
     ],
@@ -117,6 +126,7 @@ cc_test(
 
 cc_test(
     name = "radar_tracker_radar_track_test",
+    size = "small",
     srcs = [
         "radar_tracker_radar_track_test.cc",
     ],

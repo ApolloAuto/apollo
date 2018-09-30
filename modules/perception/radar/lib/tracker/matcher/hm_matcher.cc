@@ -119,14 +119,14 @@ void HMMatcher::TrackObjectPropertyMatch(
                         *unassigned_objects, &association_mat);
 
   // from perception-common
-  common::SecureMat<double> global_costs = hungarian_matcher_.global_costs();
-  global_costs.Resize(unassigned_tracks->size(), unassigned_objects->size());
+  common::SecureMat<double>* global_costs =
+      hungarian_matcher_.mutable_global_costs();
+  global_costs->Resize(unassigned_tracks->size(), unassigned_objects->size());
   for (size_t i = 0; i < unassigned_tracks->size(); ++i) {
     for (size_t j = 0; j < unassigned_objects->size(); ++j) {
-      global_costs(i, j) = association_mat[i][j];
+      (*global_costs)(i, j) = association_mat[i][j];
     }
   }
-
   std::vector<TrackObjectPair> property_assignments;
   std::vector<size_t> property_unassigned_tracks;
   std::vector<size_t> property_unassigned_objects;
