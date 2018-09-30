@@ -41,17 +41,17 @@ cc_library(
     ],
 )
 
-cc_test(
-    name = "hdmap_roi_filter_test",
-    size = "small",
-    srcs = [
-        "hdmap_roi_filter_test.cc",
-    ],
-    deps = [
-        ":hdmap_roi_filter",
-        "@gtest//:main",
-    ],
-)
+#cc_test(
+#    name = "hdmap_roi_filter_test",
+#    size = "small",
+#    srcs = [
+#        "hdmap_roi_filter_test.cc",
+#    ],
+#    deps = [
+#        ":hdmap_roi_filter",
+#        "@gtest//:main",
+#    ],
+#)
 
 cc_library(
     name = "polygon_mask",
