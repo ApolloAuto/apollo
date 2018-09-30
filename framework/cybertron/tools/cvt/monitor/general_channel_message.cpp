@@ -141,10 +141,10 @@ void GeneralChannelMessage::RenderDebugString(const Screen* s, int key,
         pages_ = lcount / page_item_count_ + 1;
         SplitPages(key);
         int jumpLines = page_index_ * page_item_count_;
-        if(jumpLines){
-          jumpLines -= (jumpLines/4);
-        } 
-        GeneralMessageBase::PrintMessage(this, *raw_msg_class_, jumpLines, s, lineNo, 0);
+        jumpLines <<= 2;
+        jumpLines /= 5;
+        GeneralMessageBase::PrintMessage(this, *raw_msg_class_, jumpLines, s,
+                                         lineNo, 0);
       } else {
         s->AddStr(0, lineNo++, "Cannot parse the raw message");
       }
