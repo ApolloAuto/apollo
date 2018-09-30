@@ -18,7 +18,7 @@
 # onboard fusion method
 # type: string
 # default:
---obs_onboard_fusion=DummyFusionSystem
+--obs_onboard_fusion=ProbabilisticFusion
 
 # main sensor for fusion
 # type: string

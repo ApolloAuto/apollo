@@ -59,6 +59,7 @@ cc_library(
         "//modules/perception/fusion/base",
         "//modules/perception/fusion/lib/interface",
         "//modules/perception/fusion/lib/dummy:dummy_algorithms",
+        "//modules/perception/fusion/lib/fusion_system/probabilistic_fusion",
         "//modules/perception/onboard/common_flags",
         "//modules/perception/onboard/msg_serializer",
         "//modules/perception/onboard/transform_wrapper",
