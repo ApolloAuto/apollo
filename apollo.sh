@@ -461,6 +461,8 @@ function citest_map() {
 }
 
 function citest_basic() {
+  set -e
+
   BUILD_TARGETS="
     //modules/common/...
     //modules/control/...
@@ -473,14 +475,16 @@ function citest_basic() {
     //modules/prediction/...
     //modules/routing/..."
 
+  JOB_ARG="--jobs=$(nproc) --ram_utilization_factor 80"
+
   # control related test
-  echo "$BUILD_TARGETS" | grep "control\/" | xargs bazel test $DEFINES --config=unit_test -c dbg --test_verbose_timeout_warnings $@
+  echo "$BUILD_TARGETS" | grep "control\/" | xargs bazel test $DEFINES $JOB_ARG --config=unit_test -c dbg --test_verbose_timeout_warnings $@
 
   # prediction related test
-  echo "$BUILD_TARGETS" | grep "prediction\/" | xargs bazel test $DEFINES --config=unit_test -c dbg --test_verbose_timeout_warnings $@
+  echo "$BUILD_TARGETS" | grep "prediction\/" | xargs bazel test $DEFINES $JOB_ARG --config=unit_test -c dbg --test_verbose_timeout_warnings $@
 
   # planning related test
-  echo "$BUILD_TARGETS" | grep "planning\/" | xargs bazel test $DEFINES --config=unit_test -c dbg --test_verbose_timeout_warnings $@
+  echo "$BUILD_TARGETS" | grep "planning\/" | xargs bazel test $DEFINES $JOB_ARG --config=unit_test -c dbg --test_verbose_timeout_warnings $@
 
   if [ $? -eq 0 ]; then
     success 'Test passed!'

@@ -43,7 +43,7 @@ QpSplineReferenceLineSmoother::QpSplineReferenceLineSmoother(
     : ReferenceLineSmoother(config) {
   if (FLAGS_use_osqp_optimizer) {
     spline_solver_.reset(
-        new OsqpSpline2dSolver(t_knots_, config.qp_spline().spline_order()))
+        new OsqpSpline2dSolver(t_knots_, config.qp_spline().spline_order()));
   } else {
     spline_solver_.reset(new ActiveSetSpline2dSolver(
         t_knots_, config.qp_spline().spline_order()));
