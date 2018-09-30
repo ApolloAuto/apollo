@@ -386,3 +386,5 @@ DEFINE_bool(enable_planning_pad_msg, false,
 DEFINE_string(planner_open_space_config_filename,
               "/apollo/modules/planning/conf/planner_open_space_config.pb.txt",
               "The open space planner configuration file");
+
+DEFINE_bool(use_osqp_optimizer, false, "Use OSQP optimizer.");
