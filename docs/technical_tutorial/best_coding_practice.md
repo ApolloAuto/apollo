@@ -32,15 +32,17 @@
      ]
    )
    ```
-
+1. In general, we follow Google C++ coding style.
+   ```https://google.github.io/styleguide/cppguide.html```
+   
 1. Simple and unified function signature.
    ```C++
-   void foobar(const InputType& input1, const int input2, ...,
+   void FooBar(const InputType& input1, const int input2, ...,
                OutputType* output1, ...);
 
    // RVO machanism will help you avoid unnecessary object copy.
    // See https://en.wikipedia.org/wiki/Copy_elision#Return_value_optimization
-   OutputType foobar(const InputType& input);
+   OutputType FooBar(const InputType& input);
    ```
 
 1. Use const whenever possible.
