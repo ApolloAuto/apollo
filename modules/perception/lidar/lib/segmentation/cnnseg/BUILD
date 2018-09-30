@@ -96,20 +96,20 @@ cc_test(
     ],
 )
 
-cc_test(
-    name = "feature_generator_test",
-    size = "small",
-    srcs = [
-        "feature_generator_test.cc",
-    ],
-    deps = [
-        ":feature_generator",
-        "//modules/perception/common:perception_gflags",
-        "//modules/perception/lidar/common:pcl_util",
-        "@gtest//:main",
-        "@opencv2//:core",
-        "@opencv2//:highgui",
-    ],
-)
+#cc_test(
+#    name = "feature_generator_test",
+#    size = "small",
+#    srcs = [
+#        "feature_generator_test.cc",
+#    ],
+#    deps = [
+#        ":feature_generator",
+#        "//modules/perception/common:perception_gflags",
+#        "//modules/perception/lidar/common:pcl_util",
+#        "@gtest//:main",
+#        "@opencv2//:core",
+#        "@opencv2//:highgui",
+#    ],
+#)
 
 cpplint()
