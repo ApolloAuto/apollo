@@ -46,7 +46,8 @@ enum class SchedPerf {
   SWAP_OUT = 2,
   TRY_FETCH_OUT = 3,
   NOTIFY_IN = 4,
-  NEXT_ROUTINE = 5
+  NEXT_ROUTINE = 5,
+  NEXT_AFFINITY_R = 6
 };
 
 enum class TransPerf { TRANS_FROM = 1, TRANS_TO = 2, WRITE_NOTIFY = 3 };

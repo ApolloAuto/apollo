@@ -21,92 +21,58 @@
 #include "cybertron/common/log.h"
 #include "cybertron/croutine/croutine.h"
 #include "cybertron/croutine/routine_context.h"
-#include "cybertron/scheduler/policy/processor_context.h"
 #include "cybertron/scheduler/processor.h"
+#include "cybertron/scheduler/processor_context.h"
+#include "cybertron/scheduler/scheduler.h"
 #include "cybertron/time/time.h"
 
 namespace apollo {
 namespace cybertron {
 namespace scheduler {
 
-using apollo::cybertron::common::GlobalData;
+Processor::Processor() { routine_context_.reset(new RoutineContext()); }
 
-void Processor::Start() {
-  main_thread_.Start();
-  if (buffer_) {
-    emergency_thread_.Start();
-    emergency_thread_.SetHigherPriority();
+Processor::~Processor() {
+  if (thread_.joinable()) {
+    thread_.join();
   }
 }
 
-void Processor::Stop() { running_ = false; }
-
-void Processor::BindContext(const std::shared_ptr<ProcessorContext>& context) {
-  context_ = context;
-}
-
-void Processor::ProcessorThread::Start() {
-  thread_ = std::thread(&ProcessorThread::Run, this);
+void Processor::Start() {
+  thread_ = std::thread(&Processor::Run, this);
   uint32_t core_num = std::thread::hardware_concurrency();
   if (core_num != 0) {
     cpu_set_t set;
     CPU_ZERO(&set);
-    CPU_SET(processor_->id_ % core_num, &set);
-    if (pthread_setaffinity_np(thread_.native_handle(), sizeof(set), &set) !=
-        0) {
-      AWARN << "Set cpu affinity failed!";
-    }
+    CPU_SET(id_, &set);
+    pthread_setaffinity_np(thread_.native_handle(), sizeof(set), &set);
   }
 }
 
-void Processor::ProcessorThread::Run() {
-  CRoutine::SetMainContext(processor_->routine_context_);
-  processor_->running_ = true;
-  while (processor_->running_) {
-    // there is a lock in NextRoutine
-    // std::unique_lock<std::mutex> context_lock(processor_->context_mutex_);
-    if (processor_->context_) {
-      cur_routine_ = processor_->context_->NextRoutine();
-      if (cur_routine_) {
-        if (cur_routine_->Resume() == croutine::RoutineState::FINISHED) {
-          processor_->context_->RemoveCRoutine(cur_routine_->Id());
-        }
+void Processor::Run() {
+  CRoutine::SetMainContext(routine_context_);
 
-        cur_routine_ = nullptr;
-        if (processor_->buffer_) {
-          std::unique_lock<std::mutex> lk_rq(cv_mutex_);
-          cv_.wait(lk_rq);
-        }
+  std::shared_ptr<CRoutine> cr = nullptr;
+
+  while (running_) {
+    if (context_) {
+      cr = context_->NextRoutine();
+      if (cr) {
+        cr->Resume();
       } else {
-        std::unique_lock<std::mutex> lk_rq(cv_mutex_);
-        if (processor_->buffer_) {
-          cv_.wait(lk_rq);
+        std::unique_lock<std::mutex> lk_rq(mtx_rq_);
+        if (Scheduler::Instance()->IsClassic()) {
+          cv_.wait_for(lk_rq, std::chrono::milliseconds(1),
+                       [this] { return !this->context_->RqEmpty(); });
         } else {
           cv_.wait_for(lk_rq, std::chrono::milliseconds(1));
-          // cv_.wait(lk_rq, [this] {
-          //   return !this->processor_->context_->RqEmpty();
-          // });
         }
       }
     } else {
-      // context_lock.unlock();
-      ADEBUG << "no pcontext bound, wait...";
-      std::unique_lock<std::mutex> lk_rq(cv_mutex_);
-      cv_.wait(lk_rq, [this] {
-        return this->processor_->context_ &&
-               !this->processor_->context_->RqEmpty();
-      });
+      std::unique_lock<std::mutex> lk_rq(mtx_rq_);
+      cv_.wait(lk_rq,
+               [this] { return this->context_ && !this->context_->RqEmpty(); });
     }
-  }
-}
-
-void Processor::ProcessorThread::SetHigherPriority() {
-  sched_param sch;
-  int policy = 0;
-  pthread_getschedparam(thread_.native_handle(), &policy, &sch);
-  sch.sched_priority = sch.sched_priority + 20;
-  if (pthread_setschedparam(thread_.native_handle(), SCHED_RR, &sch)) {
-    AWARN << "Failed to setschedparam: " << std::strerror(errno);
   }
 }
 

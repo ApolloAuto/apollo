@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef CYBERTRON_SCHEDULER_POLICY_ROUND_ROBIN_CONTEXT_H_
-#define CYBERTRON_SCHEDULER_POLICY_ROUND_ROBIN_CONTEXT_H_
+#ifndef CYBERTRON_SCHEDULER_POLICY_CFS_CONTEXT_H_
+#define CYBERTRON_SCHEDULER_POLICY_CFS_CONTEXT_H_
 
 #include <cstdint>
 #include <future>
@@ -26,37 +26,41 @@
 #include <string>
 #include <vector>
 
-#include "cybertron/scheduler/policy/processor_context.h"
+#include "cybertron/scheduler/processor_context.h"
 
 namespace apollo {
 namespace cybertron {
 namespace croutine {
 class CRoutine;
 }
+
 namespace scheduler {
 
 class Processor;
 
 using croutine::CRoutine;
 
-class RQContext : public ProcessorContext {
+class CFSContext : public ProcessorContext {
  public:
-  explicit RQContext(const std::shared_ptr<Processor>& processor)
-      : ProcessorContext(processor) {}
-  std::shared_ptr<CRoutine> NextRoutine();
-  bool Enqueue(const std::shared_ptr<CRoutine>& cr);
-  bool IsPriorInverse(uint64_t routine_id);
-  bool RqEmpty();
+  std::shared_ptr<CRoutine> NextRoutine() override;
+  bool EnqueueAffinityRoutine(const std::shared_ptr<CRoutine>& cr) override;
+  bool Enqueue(const std::shared_ptr<CRoutine>& cr) override;
+  bool RqEmpty() override;
 
  private:
-  // more friendly for new enqueue routines
+  std::shared_ptr<CRoutine> NextLocalRoutine();
+  std::shared_ptr<CRoutine> NextAffinityRoutine();
+
   std::mutex mtx_run_queue_;
-  CRoutineList run_queue_;
-  CRoutineList::iterator run_queue_it_ = run_queue_.begin();
+  std::mutex rw_affinity_lock_;
+  std::multimap<double, std::shared_ptr<CRoutine>> local_rb_map_;
+  std::multimap<double, std::shared_ptr<CRoutine>> affinity_rb_map_;
+  std::shared_ptr<CRoutine> cur_croutine_ = nullptr;
+  double min_vruntime_ = 0;
 };
 
 }  // namespace scheduler
 }  // namespace cybertron
 }  // namespace apollo
 
-#endif  // CYBERTRON_SCHEDULER_POLICY_ROUND_ROBIN_CONTEXT_H_
+#endif  // CYBERTRON_SCHEDULER_POLICY_CFS_CONTEXT_H_

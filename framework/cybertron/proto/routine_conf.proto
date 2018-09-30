@@ -11,6 +11,7 @@ message RoutineConfInfo {
     optional double deadline = 6;
     optional uint32 priority = 7 [default = 1];
     optional int32 frequency = 8 [default = 1];
+    repeated uint32 affinity_processor = 9;
 }
 
 message RoutineConf {

@@ -14,12 +14,15 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "cybertron/scheduler/policy/cfs_context.h"
+#include "cybertron/scheduler/policy/classic.h"
 
 #include "cybertron/common/global_data.h"
 #include "cybertron/common/log.h"
 #include "cybertron/common/types.h"
 #include "cybertron/croutine/croutine.h"
+#include "cybertron/event/perf_event_cache.h"
+#include "cybertron/proto/routine_conf.pb.h"
+#include "cybertron/proto/scheduler_conf.pb.h"
 #include "cybertron/scheduler/processor.h"
 #include "cybertron/time/time.h"
 
@@ -29,90 +32,73 @@ namespace scheduler {
 
 using croutine::RoutineState;
 using apollo::cybertron::common::GlobalData;
+using apollo::cybertron::event::PerfEventCache;
+using apollo::cybertron::event::SchedPerf;
+using apollo::cybertron::proto::SchedulerConf;
+using apollo::cybertron::proto::RoutineConf;
+using apollo::cybertron::proto::RoutineConfInfo;
 
-std::shared_ptr<CRoutine> CFSContext::NextRoutine() {
+std::shared_ptr<CRoutine> ClassicContext::NextRoutine() {
   if (stop_) {
     return nullptr;
   }
-
   std::lock_guard<std::mutex> lock(mtx_run_queue_);
-
-  for (auto it = run_queue_.begin(); it != run_queue_.end();) {
-    auto cr = (*it);
-    cr->SetVRunningTime(cr->GetStatistics().exec_time / cr->Priority());
-    rb_map_.insert(
-        std::pair<double, std::shared_ptr<CRoutine>>(cr->VRunningTime(), cr));
-    it = run_queue_.erase(it);
-  }
-
-  for (auto it = wait_queue_.begin(); it != wait_queue_.end();) {
-    auto cr = (*it);
-    cr->UpdateState();
-    if (cr->IsReady()) {
-      cr->SetVRunningTime(min_vruntime_ - cr->NormalizedRunningTime());
-      rb_map_.insert(
-          std::pair<double, std::shared_ptr<CRoutine>>(cr->VRunningTime(), cr));
-      it = wait_queue_.erase(it);
-      continue;
-    }
-    ++it;
-  }
+  auto start_perf_time = apollo::cybertron::Time::Now().ToNanosecond();
 
   std::shared_ptr<CRoutine> croutine = nullptr;
   for (auto it = rb_map_.begin(); it != rb_map_.end();) {
     auto cr = it->second;
+    if (!cr->TryLockForOp()) {
+      ++it;
+      continue;
+    }
     // AINFO << GlobalData::GetTaskNameById(cr->Id()) << " " <<
     // cr->GetStatistics().exec_time / cr->Priority();
     auto cr_id = cr->Id();
-    std::promise<std::shared_ptr<CRoutine>>* promise = nullptr;
-    if (pop_list_.Get(cr_id, &promise)) {
-      cr->SetNormalizedRunningTime(cr->VRunningTime() - min_vruntime_);
-      promise->set_value(cr);
-      pop_list_.Remove(cr_id);
-      it = rb_map_.erase(it);
-      continue;
-    }
 
     if (cr->IsFinished()) {
       it = rb_map_.erase(it);
-      continue;
-    }
-
-    // TODO: We should use asynchronous notification mechanism later.
-    if (cr->IsSleep() || cr->IsWaitingInput()) {
-      wait_queue_.emplace_back(cr);
-      ADEBUG << "pop from rq routine[" << cr_id << "] size["
-             << wait_queue_.size() << "]";
-      it = rb_map_.erase(it);
+      cr->TryUnlockForOp();
       continue;
     }
 
     if (cr->IsReady()) {
-      min_vruntime_ = cr->VRunningTime();
       croutine = cr;
-      run_queue_.emplace_back(cr);
-      rb_map_.erase(it);
+      cr->SetState(RoutineState::RUNNING);
+      cr->TryUnlockForOp();
       break;
     }
+    cr->TryUnlockForOp();
     ++it;
   }
   if (croutine == nullptr) {
     notified_.store(false);
+  } else {
+    PerfEventCache::Instance()->AddSchedEvent(
+        SchedPerf::NEXT_ROUTINE, croutine->Id(), croutine->ProcessorId(), 0,
+        start_perf_time, -1, -1);
   }
   return croutine;
 }
 
-bool CFSContext::Enqueue(const std::shared_ptr<CRoutine>& cr) {
-  std::lock_guard<std::mutex> lg(mtx_run_queue_);
-  cr->SetVRunningTime(min_vruntime_ + cr->NormalizedRunningTime());
-  rb_map_.insert(
-      std::pair<double, std::shared_ptr<CRoutine>>(cr->VRunningTime(), cr));
+bool ClassicContext::Enqueue(const std::shared_ptr<CRoutine>& cr) {
+  WriteLockGuard<AtomicRWLock> lg(rw_lock_);
+  if (cr_map_.find(cr->Id()) != cr_map_.end()) {
+    return false;
+  }
+  cr_map_[cr->Id()] = cr;
   return true;
 }
 
-bool CFSContext::IsPriorInverse(uint64_t routine_id) { return false; }
+bool ClassicContext::EnqueueAffinityRoutine(
+    const std::shared_ptr<CRoutine>& cr) {
+  std::lock_guard<std::mutex> lg(mtx_run_queue_);
+  rb_map_.insert(
+      std::pair<double, std::shared_ptr<CRoutine>>(cr->Priority(), cr));
+  return true;
+}
 
-bool CFSContext::RqEmpty() {
+bool ClassicContext::RqEmpty() {
   std::lock_guard<std::mutex> lg(mtx_run_queue_);
   return !notified_.load();
 }

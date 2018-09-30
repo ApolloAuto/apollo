@@ -14,48 +14,46 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef CYBERTRON_SCHEDULER_POLICY_RBTREE_H_
-#define CYBERTRON_SCHEDULER_POLICY_RBTREE_H_
+#ifndef CYBERTRON_SCHEDULER_POLICY_CLASSIC_CONTEXT_H_
+#define CYBERTRON_SCHEDULER_POLICY_CLASSIC_CONTEXT_H_
 
-#include <stdint.h>
+#include <cstdint>
+#include <future>
+#include <list>
+#include <map>
+#include <memory>
+#include <mutex>
+#include <string>
+#include <vector>
+
+#include "cybertron/scheduler/processor_context.h"
 
 namespace apollo {
 namespace cybertron {
+namespace croutine {
+class CRoutine;
+}
+
 namespace scheduler {
 
-class RBNode {
- public:
-  uint64_t parent_color_;
-  RBNode *right_;
-  RBNode *left_;
+class Processor;
 
-  virtual bool Compare(RBNode *) = 0;
-  virtual int Compare(void *) = 0;
-  virtual void Print() = 0;
-};
+using croutine::CRoutine;
 
-class RBTree {
+class ClassicContext : public ProcessorContext {
  public:
-  void Insert(RBNode *);
-  void Delete(RBNode *);
-  RBNode *Find(void *);
-  RBNode *First();
-  void Preorder();
-  void Preorder(RBNode *);
+  std::shared_ptr<CRoutine> NextRoutine() override;
+  bool Enqueue(const std::shared_ptr<CRoutine>& cr) override;
+  bool EnqueueAffinityRoutine(const std::shared_ptr<CRoutine>& cr) override;
+  bool RqEmpty() override;
 
  private:
-  void InsertRebalance(RBNode *);
-  void DeleteRebalance(RBNode *, RBNode *);
-  void LinkNode(RBNode **, RBNode *, RBNode *);
-  void RotateLeft(RBNode *);
-  void RotateRight(RBNode *);
-
-  RBNode *root_ = nullptr;
-  // cache leftmost
+  std::mutex mtx_run_queue_;
+  std::multimap<double, std::shared_ptr<CRoutine>> rb_map_;
 };
 
 }  // namespace scheduler
 }  // namespace cybertron
 }  // namespace apollo
 
-#endif  // CYBERTRON_SCHEDULER_POLICY_RBTREE_H_
+#endif  // CYBERTRON_SCHEDULER_POLICY_CFS_CONTEXT_H_

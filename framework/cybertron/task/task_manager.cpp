@@ -44,7 +44,7 @@ TaskManager::TaskManager()
   };
 
   auto factory = croutine::CreateRoutineFactory(std::move(func));
-  num_threads_ = scheduler::Scheduler::ProcessorNum();
+  num_threads_ = scheduler::Scheduler::Instance()->ProcessorNum();
   tasks_.reserve(num_threads_);
   for (int i = 0; i < num_threads_; i++) {
     auto task_name = task_prefix + std::to_string(i);
