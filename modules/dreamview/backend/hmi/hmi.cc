@@ -37,6 +37,8 @@ using apollo::common::util::JsonUtil;
 using Json = WebSocketHandler::Json;
 using RLock = boost::shared_lock<boost::shared_mutex>;
 
+constexpr int HMI::kMinBroadcastIntervalMs;
+
 HMI::HMI(WebSocketHandler *websocket, MapService *map_service)
     : node_(cybertron::CreateNode("hmi")),
       websocket_(websocket),
@@ -47,7 +49,7 @@ HMI::HMI(WebSocketHandler *websocket, MapService *map_service)
   // Register websocket message handlers.
   if (websocket_) {
     RegisterMessageHandlers();
-    StartBroadcastHMIStatusThread();
+    cybertron::Async(&HMI::BroadcastStatusThreadLoop, this);
   }
 
   audio_capture_writer_ =
@@ -242,36 +244,33 @@ void HMI::RegisterMessageHandlers() {
       });
 }
 
-void HMI::StartBroadcastHMIStatusThread() {
-  constexpr int kMinBroadcastIntervalMs = 200;
-  broadcast_hmi_status_thread_.reset(new std::thread([this]() {
-    while (true) {
-      std::this_thread::sleep_for(
-          std::chrono::milliseconds(kMinBroadcastIntervalMs));
+void HMI::BroadcastStatusThreadLoop() {
+  while (true) {
+    std::this_thread::sleep_for(
+        std::chrono::milliseconds(kMinBroadcastIntervalMs));
 
-      {
-        std::lock_guard<std::mutex> lock(need_broadcast_mutex_);
-        if (!need_broadcast_) {
-          continue;
-        }
-        // Reset to false.
-        need_broadcast_ = false;
+    {
+      std::lock_guard<std::mutex> lock(need_broadcast_mutex_);
+      if (!need_broadcast_) {
+        continue;
       }
-
-      // Get a copy of status.
-      const auto status = hmi_worker_->GetStatus();
-      websocket_->BroadcastData(
-          JsonUtil::ProtoToTypedJson("HMIStatus", status).dump());
-
-      // Broadcast messages.
-      if (status.current_map().empty()) {
-        monitor_log_buffer_.WARN("You haven't selected a map yet!");
-      }
-      if (status.current_vehicle().empty()) {
-        monitor_log_buffer_.WARN("You haven't selected a vehicle yet!");
-      }
+      // Reset to false.
+      need_broadcast_ = false;
     }
-  }));
+
+    // Get a copy of status.
+    const auto status = hmi_worker_->GetStatus();
+    websocket_->BroadcastData(
+        JsonUtil::ProtoToTypedJson("HMIStatus", status).dump());
+
+    // Broadcast messages.
+    if (status.current_map().empty()) {
+      monitor_log_buffer_.WARN("You haven't selected a map yet!");
+    }
+    if (status.current_vehicle().empty()) {
+      monitor_log_buffer_.WARN("You haven't selected a vehicle yet!");
+    }
+  }
 }
 
 void HMI::DeferredBroadcastHMIStatus() {
