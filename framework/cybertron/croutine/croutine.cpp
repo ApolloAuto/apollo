@@ -16,10 +16,10 @@
 
 #include "cybertron/croutine/croutine.h"
 
-#include "cybertron/common/global_data.h"
 #include "cybertron/common/log.h"
 #include "cybertron/croutine/routine_context.h"
 #include "cybertron/event/perf_event_cache.h"
+#include "cybertron/time/time.h"
 
 namespace apollo {
 namespace cybertron {
@@ -54,7 +54,7 @@ CRoutine::~CRoutine() {}
 RoutineState CRoutine::Resume() {
   if (force_stop_) {
     SetState(RoutineState::FINISHED);
-    return state_;
+    return RoutineState::FINISHED;
   }
 
   UpdateState();
@@ -65,27 +65,23 @@ RoutineState CRoutine::Resume() {
       AERROR << "Wait input";
     }
     AERROR << "Invalid Routine State!";
-    return state_;
+    return state_.load();
   }
 
   current_routine_ = this;
-  auto t_start = std::chrono::high_resolution_clock::now();
+  auto t_start = cybertron::Time::MonoTime().ToNanosecond();
   PerfEventCache::Instance()->AddSchedEvent(SchedPerf::SWAP_IN, id_,
                                             processor_id_, 0, 0, -1, -1);
   SwapContext(GetMainContext(), this->GetContext());
-  auto t_end = std::chrono::high_resolution_clock::now();
-  auto start_nanos = std::chrono::duration_cast<std::chrono::nanoseconds>(
-                         t_start.time_since_epoch())
-                         .count();
-  PerfEventCache::Instance()->AddSchedEvent(
-      SchedPerf::SWAP_OUT, id_, processor_id_, 0, start_nanos, -1, int(state_));
-  auto diff =
-      std::chrono::duration<double, std::milli>(t_end - t_start).count();
-  exec_time_ += diff;
+  auto t_end = cybertron::Time::MonoTime().ToNanosecond();
+  PerfEventCache::Instance()->AddSchedEvent(SchedPerf::SWAP_OUT, id_,
+                                            processor_id_, 0, t_start, -1,
+                                            static_cast<int>(state_.load()));
+  exec_time_ += t_end - t_start;
   if (IsRunning()) {
     SetState(RoutineState::READY);
   }
-  return state_;
+  return state_.load();
 }
 
 void CRoutine::Routine() {

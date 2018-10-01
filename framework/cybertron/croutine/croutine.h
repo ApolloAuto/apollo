@@ -17,6 +17,7 @@
 #ifndef CYBERTRON_CROUTINE_CROUTINE_H_
 #define CYBERTRON_CROUTINE_CROUTINE_H_
 
+#include <atomic>
 #include <chrono>
 #include <functional>
 #include <memory>
@@ -24,18 +25,12 @@
 #include <set>
 #include <string>
 
-#include "cybertron/base/atomic_rw_lock.h"
 #include "cybertron/croutine/routine_context.h"
 
 namespace apollo {
 namespace cybertron {
 namespace croutine {
 
-using apollo::cybertron::base::AtomicRWLock;
-using apollo::cybertron::base::ReadLockGuard;
-using apollo::cybertron::base::WriteLockGuard;
-
-using routine_t = uint32_t;
 using CRoutineFunc = std::function<void()>;
 using Duration = std::chrono::microseconds;
 
@@ -95,18 +90,14 @@ class CRoutine {
   }
 
   inline void SetState(const RoutineState &state, bool is_notify = false) {
-    WriteLockGuard<AtomicRWLock> lg(cr_rw_lock_);
     // for race condition issue
-    if (is_notify && state_ == RoutineState::RUNNING) {
+    if (is_notify && state_.load() == RoutineState::RUNNING) {
       return;
     }
-    state_ = state;
+    state_.store(state);
   }
 
-  inline const RoutineState &State() {
-    ReadLockGuard<AtomicRWLock> lg(cr_rw_lock_);
-    return state_;
-  }
+  inline const RoutineState State() { return state_.load(); }
 
   inline void Wake() { SetState(RoutineState::READY); }
 
@@ -150,7 +141,7 @@ class CRoutine {
         SetState(RoutineState::READY);
       }
     }
-    return state_;
+    return state_.load();
   }
 
   double VFrequency() { return vfrequency_; }
@@ -167,8 +158,8 @@ class CRoutine {
   double VRunningTime() { return vruntime_; }
   void SetVRunningTime(double time) { vruntime_ = time; }
 
-  double ExecTime() { return exec_time_; }
-  void SetExecTime(double time) { exec_time_ = time; }
+  uint64_t ExecTime() { return exec_time_; }
+  void SetExecTime(uint64_t time) { exec_time_ = time; }
 
   double NormalizedRunningTime() { return normalized_vruntime_; }
   void SetNormalizedRunningTime(double time) { normalized_vruntime_ = time; }
@@ -180,35 +171,17 @@ class CRoutine {
   void SetProcessedNum(double num) { proc_num_ = num; }
   void IncreaseProcessedNum() { ++proc_num_; }
 
-  bool IsRunning() {
-    ReadLockGuard<AtomicRWLock> lg(cr_rw_lock_);
-    return state_ == RoutineState::RUNNING;
-  }
-  bool IsFinished() {
-    ReadLockGuard<AtomicRWLock> lg(cr_rw_lock_);
-    return state_ == RoutineState::FINISHED;
-  }
-  bool IsWaitingInput() {
-    ReadLockGuard<AtomicRWLock> lg(cr_rw_lock_);
-    return state_ == RoutineState::WAITING_INPUT;
-  }
-  bool IsReady() {
-    ReadLockGuard<AtomicRWLock> lg(cr_rw_lock_);
-    return state_ == RoutineState::READY;
-  }
-  bool IsSleep() {
-    ReadLockGuard<AtomicRWLock> lg(cr_rw_lock_);
-    return state_ == RoutineState::SLEEP;
-  }
-  bool IsIOWait() {
-    ReadLockGuard<AtomicRWLock> lg(cr_rw_lock_);
-    return state_ == RoutineState::IO_WAIT;
-  }
+  bool IsRunning() { return state_.load() == RoutineState::RUNNING; }
+  bool IsFinished() { return state_.load() == RoutineState::FINISHED; }
+  bool IsWaitingInput() { return state_.load() == RoutineState::WAITING_INPUT; }
+  bool IsReady() { return state_.load() == RoutineState::READY; }
+  bool IsSleep() { return state_.load() == RoutineState::SLEEP; }
+  bool IsIOWait() { return state_.load() == RoutineState::IO_WAIT; }
 
   void Stop() { force_stop_ = true; }
 
   std::chrono::steady_clock::time_point wake_time_;
-  // for processor scheudle
+  // for processor schedule
 
   double notify_num_ = 0;
 
@@ -222,10 +195,10 @@ class CRoutine {
   static thread_local std::shared_ptr<RoutineContext> main_context_;
   RoutineContext context_;
   CRoutineFunc func_;
-  RoutineState state_;
+  std::atomic<RoutineState> state_;
   uint32_t priority_ = 1;
   uint64_t frequency_ = 0;
-  double exec_time_ = 0;
+  uint64_t exec_time_ = 0;
   double proc_num_ = 0;
   double normalized_vfrequency_ = 0.0;
   double vfrequency_ = 0.0;
@@ -234,7 +207,6 @@ class CRoutine {
   bool force_stop_ = false;
   bool being_op_ = false;
   std::mutex op_mtx_;
-  AtomicRWLock cr_rw_lock_;
 };
 
 }  // namespace croutine

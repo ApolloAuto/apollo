@@ -30,13 +30,13 @@ namespace apollo {
 namespace cybertron {
 namespace scheduler {
 
-using croutine::RoutineState;
 using apollo::cybertron::common::GlobalData;
 using apollo::cybertron::event::PerfEventCache;
 using apollo::cybertron::event::SchedPerf;
-using apollo::cybertron::proto::SchedulerConf;
 using apollo::cybertron::proto::RoutineConf;
 using apollo::cybertron::proto::RoutineConfInfo;
+using apollo::cybertron::proto::SchedulerConf;
+using croutine::RoutineState;
 
 std::shared_ptr<CRoutine> CFSContext::NextRoutine() {
   if (stop_) {
@@ -54,8 +54,9 @@ std::shared_ptr<CRoutine> CFSContext::NextLocalRoutine() {
 
   // re-enqueue top croutine
   if (cur_croutine_) {
-    cur_croutine_->SetVRunningTime(cur_croutine_->ExecTime() /
-                                   cur_croutine_->Priority());
+    cur_croutine_->SetVRunningTime(
+        static_cast<double>(cur_croutine_->ExecTime()) /
+        cur_croutine_->Priority());
     cur_croutine_->SetExecTime(cur_croutine_->VRunningTime() *
                                cur_croutine_->Priority());
     local_rb_map_.insert(std::pair<double, std::shared_ptr<CRoutine>>(
