@@ -15,7 +15,7 @@
  *****************************************************************************/
 
 /*
- * spiral_reference_line_smoother.h
+ * @file warm_start_problem.h
  */
 
 #ifndef MODULES_PLANNING_OPEN_SPACE_WARM_START_PROBLEM_H_

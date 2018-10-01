@@ -15,7 +15,7 @@
  *****************************************************************************/
 
 /*
- * warm_start_ipopt_interface.cc
+ * @file warm_start_ipopt_interface.cc
  */
 
 #include "modules/planning/open_space/warm_start_ipopt_interface.h"

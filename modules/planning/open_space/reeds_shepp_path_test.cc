@@ -15,7 +15,7 @@
  *****************************************************************************/
 
 /*
- * reeds_shepp_path_test.cc
+ * @file reeds_shepp_path_test.cc
  */
 
 #include <memory>

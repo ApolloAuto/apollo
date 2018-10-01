@@ -14,6 +14,10 @@
  * limitations under the License.
  *****************************************************************************/
 
+/**
+ * @file open_space_planner.cc
+ **/
+
 #include "modules/planning/planner/open_space/open_space_planner.h"
 
 #include <fstream>
