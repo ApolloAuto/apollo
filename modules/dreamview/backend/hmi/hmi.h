@@ -41,7 +41,7 @@ class HMI {
 
  private:
   // Broadcast HMIStatus to all clients.
-  void StartBroadcastHMIStatusThread();
+  void BroadcastStatusThreadLoop();
   void DeferredBroadcastHMIStatus();
 
   // Send VehicleParam to the given conn, or broadcast if conn is null.
@@ -59,7 +59,7 @@ class HMI {
   MapService *map_service_;
 
   // For HMIStatus broadcasting.
-  std::unique_ptr<std::thread> broadcast_hmi_status_thread_;
+  static constexpr int kMinBroadcastIntervalMs = 200;
   bool need_broadcast_ = false;
   std::mutex need_broadcast_mutex_;
 
