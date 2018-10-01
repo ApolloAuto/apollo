@@ -3,7 +3,7 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "dummy_classifier",
+    name = "dummy_algorithms",
     srcs = [
         "dummy_classifier.cc",
         "dummy_ground_detector.cc",
@@ -28,6 +28,18 @@ cc_library(
         "//modules/perception/lidar/common",
         "//modules/perception/lidar/lib/interface",
         "@eigen",
+    ],
+)
+
+cc_test(
+    name = "dummy_algorithms_test",
+    size = "small",
+    srcs = [
+        "dummy_algorithms_test.cc",
+    ],
+    deps = [
+        ":dummy_algorithms",
+        "@gtest//:main",
     ],
 )
 
