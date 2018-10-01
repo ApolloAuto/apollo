@@ -14,7 +14,6 @@
  * limitations under the License.
  *****************************************************************************/
 
-
 #include "modules/tools/rosbag_to_record/rosbag_to_record.h"
 
 #include <geometry_msgs/Point32.h>
@@ -26,7 +25,6 @@
 #include <vector>
 
 #include "cybertron/proto/record.pb.h"
-#include "modules/tools/rosbag_to_record/channel_info.h"
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/control/proto/control_cmd.pb.h"
 #include "modules/guardian/proto/guardian.pb.h"
@@ -35,13 +33,14 @@
 #include "modules/perception/proto/traffic_light_detection.pb.h"
 #include "modules/planning/proto/planning.pb.h"
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
+#include "modules/tools/rosbag_to_record/channel_info.h"
 
 using apollo::cybertron::proto::SingleMessage;
 using apollo::tools::ChannelInfo;
 
 void PrintUsage() {
   std::cout << "Usage:\n"
-            << "  rosbag_to_record myfile.bag" << std::endl;
+            << "  rosbag_to_record input.bag output.record" << std::endl;
 }
 
 int convert_PointCloud(std::shared_ptr<apollo::drivers::PointCloud> proto,
@@ -100,12 +99,13 @@ int convert_PointCloud(std::shared_ptr<apollo::drivers::PointCloud> proto,
   return 1;
 }
 int main(int argc, char **argv) {
-  if (argc != 2) {
+  if (argc != 3) {
     PrintUsage();
     return -1;
   }
 
   const std::string rosbag_file_name = argv[1];
+  const std::string record_file_name = argv[2];
   rosbag::Bag bag;
   try {
     bag.open(rosbag_file_name);
@@ -113,14 +113,10 @@ int main(int argc, char **argv) {
     std::cerr << "Error: the input file is not a ros bag file." << std::endl;
     return -1;
   }
-
   auto channel_info = ChannelInfo::Instance();
   std::cout << "Info of ros bag file" << std::endl;
   std::string command_line = "rosbag info " + rosbag_file_name;
   system(command_line.c_str());
-
-  const std::string record_file_name =
-      rosbag_file_name.substr(0, rosbag_file_name.size() - 3) + "record";
 
   auto record_writer =
       std::make_shared<apollo::cybertron::record::RecordWriter>();
