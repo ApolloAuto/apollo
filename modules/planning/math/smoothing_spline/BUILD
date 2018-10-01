@@ -123,6 +123,47 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "active_set_spline_1d_solver_test",
+    size = "small",
+    srcs = [
+        "active_set_spline_1d_solver_test.cc",
+    ],
+    deps = [
+        ":active_set_spline_1d_solver",
+        "@gtest//:main",
+    ],
+)
+
+cc_library(
+    name = "osqp_spline_1d_solver",
+    srcs = [
+        "osqp_spline_1d_solver.cc",
+    ],
+    hdrs = [
+        "osqp_spline_1d_solver.h",
+    ],
+    deps = [
+        ":spline_1d_solver",
+        "//modules/common/math:matrix_operations",
+        "//modules/common/time",
+        "@eigen",
+        "@osqp",
+    ],
+)
+
+cc_test(
+    name = "osqp_spline_1d_solver_test",
+    size = "small",
+    srcs = [
+        "osqp_spline_1d_solver_test.cc",
+    ],
+    deps = [
+        ":osqp_spline_1d_solver",
+        "@gtest//:main",
+    ],
+)
+
 cc_library(
     name = "spline_2d_seg",
     srcs = [
@@ -187,10 +228,6 @@ cc_library(
 
 cc_library(
     name = "spline_2d_solver",
-    srcs = [
-        "active_set_spline_2d_solver.cc",
-        "osqp_spline_2d_solver.cc",
-    ],
     hdrs = [
         "active_set_spline_2d_solver.h",
         "osqp_spline_2d_solver.h",
@@ -207,6 +244,61 @@ cc_library(
         "//modules/common/time",
         "//modules/planning/common:planning_gflags",
         "@eigen",
+        "@osqp",
+    ],
+)
+
+cc_library(
+    name = "active_set_spline_2d_solver",
+    srcs = [
+        "active_set_spline_2d_solver.cc",
+    ],
+    hdrs = [
+        "active_set_spline_2d_solver.h",
+    ],
+    deps = [
+        ":spline_2d_solver",
+    ],
+)
+
+cc_test(
+    name = "active_set_spline_2d_solver_test",
+    size = "small",
+    srcs = [
+        "spline_2d_solver_test.cc",
+    ],
+    deps = [
+        ":active_set_spline_2d_solver",
+        "//modules/planning/math:curve_math",
+        "@gtest//:main",
+    ],
+)
+
+cc_library(
+    name = "osqp_spline_2d_solver",
+    srcs = [
+        "osqp_spline_2d_solver.cc",
+    ],
+    hdrs = [
+        "osqp_spline_2d_solver.h",
+    ],
+    deps = [
+        ":spline_2d_solver",
+        "//modules/common/math:matrix_operations",
+        "@osqp",
+    ],
+)
+
+cc_test(
+    name = "osqp_spline_2d_solver_test",
+    size = "small",
+    srcs = [
+        "osqp_spline_2d_solver_test.cc",
+    ],
+    deps = [
+        ":osqp_spline_2d_solver",
+        "//modules/planning/math:curve_math",
+        "@gtest//:main",
     ],
 )
 
@@ -256,18 +348,6 @@ cc_library(
 )
 
 cc_test(
-    name = "active_set_spline_1d_solver_test",
-    size = "small",
-    srcs = [
-        "active_set_spline_1d_solver_test.cc",
-    ],
-    deps = [
-        ":active_set_spline_1d_solver",
-        "@gtest//:main",
-    ],
-)
-
-cc_test(
     name = "spline_1d_kernel_test",
     size = "small",
     srcs = [
@@ -311,32 +391,6 @@ cc_test(
     ],
     deps = [
         ":piecewise_linear_constraint",
-        "@gtest//:main",
-    ],
-)
-
-cc_test(
-    name = "active_set_spline_2d_solver_test",
-    size = "small",
-    srcs = [
-        "spline_2d_solver_test.cc",
-    ],
-    deps = [
-        ":spline_2d_solver",
-        "//modules/planning/math:curve_math",
-        "@gtest//:main",
-    ],
-)
-
-cc_test(
-    name = "osqp_spline_2d_solver_test",
-    size = "small",
-    srcs = [
-        "osqp_spline_2d_solver_test.cc",
-    ],
-    deps = [
-        ":spline_2d_solver",
-        "//modules/planning/math:curve_math",
         "@gtest//:main",
     ],
 )
