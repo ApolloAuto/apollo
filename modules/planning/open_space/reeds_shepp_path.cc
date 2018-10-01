@@ -15,7 +15,7 @@
  *****************************************************************************/
 
 /*
- * reeds_shepp_path.cc
+ * @file reeds_shepp_path.cc
  */
 
 #include "modules/planning/open_space/reeds_shepp_path.h"
@@ -877,7 +877,7 @@ bool ReedShepp::GenerateLocalConfigurations(
     std::vector<double> py(point_num, 0.0);
     std::vector<double> pphi(point_num, 0.0);
     std::vector<bool> pgear(point_num, true);
-    double index = 1;
+    int index = 1;
     double d = 0.0;
     double pd = 0.0;
     double ll = 0.0;

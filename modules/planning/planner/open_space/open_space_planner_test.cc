@@ -15,8 +15,9 @@
  *****************************************************************************/
 
 /**
- * @file
+ * @file open_space_planner_test.cc
  **/
+
 #include "modules/planning/planner/open_space/open_space_planner.h"
 
 #include "gtest/gtest.h"

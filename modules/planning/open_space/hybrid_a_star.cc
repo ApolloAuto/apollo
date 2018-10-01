@@ -15,7 +15,7 @@
  *****************************************************************************/
 
 /*
- * hybrid_a_star.cc
+ * @file hybrid_a_star.cc
  */
 
 #include "modules/planning/open_space/hybrid_a_star.h"
@@ -105,17 +105,17 @@ std::shared_ptr<Node3d> HybridAStar::LoadRSPinCS(
 std::shared_ptr<Node3d> HybridAStar::Next_node_generator(
     std::shared_ptr<Node3d> current_node, std::size_t next_node_index) {
   double steering = 0.0;
-  double index = 0.0;
+  std::size_t index = 0.0;
   double traveled_distance = 0.0;
   if (next_node_index < next_node_num_ / 2) {
     steering = -max_steer_ +
                (2 * max_steer_ / (next_node_num_ / 2 - 1)) * next_node_index;
-    traveled_distance = 1 * step_size_;
+    traveled_distance = step_size_;
   } else {
     index = next_node_index - next_node_num_ / 2;
     steering =
         -max_steer_ + (2 * max_steer_ / (next_node_num_ / 2 - 1)) * index;
-    traveled_distance = -1 * step_size_;
+    traveled_distance = -step_size_;
   }
   // take above motion primitive to generate a curve driving the car to a
   // different grid

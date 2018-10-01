@@ -15,7 +15,7 @@
  *****************************************************************************/
 
 /*
- * node3d.cc
+ * @file node3d.cc
  */
 
 #include "modules/planning/open_space/node3d.h"

@@ -15,7 +15,7 @@
  *****************************************************************************/
 
 /*
- * reeds_shepp_path.h
+ * @file reeds_shepp_path.h
  */
 
 #ifndef MODULES_PLANNING_OPEN_SPACE_REEDS_SHEPP_PATH_H_

@@ -14,6 +14,10 @@
  * limitations under the License.
  *****************************************************************************/
 
+/**
+ * @file open_space_planner.h
+ **/
+
 #ifndef MODULES_PLANNING_PLANNER_OPENSPACE_OPENSPACE_PLANNER_H_
 #define MODULES_PLANNING_PLANNER_OPENSPACE_OPENSPACE_PLANNER_H_
 

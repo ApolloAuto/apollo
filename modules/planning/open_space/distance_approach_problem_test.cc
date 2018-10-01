@@ -15,7 +15,7 @@
  *****************************************************************************/
 
 /**
- * @file
+ * @file distance_approach_problem_test.cc
  **/
 #include "modules/planning/open_space/distance_approach_problem.h"
 

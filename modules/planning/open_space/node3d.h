@@ -15,7 +15,7 @@
  *****************************************************************************/
 
 /*
- * node3d.h
+ * @file node3d.h
  */
 
 #ifndef MODULES_PLANNING_OPEN_SPACE_NODE3D_H_

@@ -15,7 +15,7 @@
  *****************************************************************************/
 
 /*
- * hybrid_a_star_test.cc
+ * @file hybrid_a_star_test.cc
  */
 
 #include <memory>

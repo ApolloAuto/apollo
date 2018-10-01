@@ -15,7 +15,7 @@
  *****************************************************************************/
 
 /*
- * warm_start_problem.cc
+ * @file warm_start_problem.cc
  */
 
 #include "modules/planning/open_space/warm_start_problem.h"

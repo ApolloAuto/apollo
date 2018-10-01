@@ -15,7 +15,7 @@
  *****************************************************************************/
 
 /*
- * distance_approach_problem.h
+ * @file distance_approach_problem.h
  */
 
 #ifndef MODULES_PLANNING_OPEN_SPACE_DISTANCE_APPROACH_PROBLEM_H_

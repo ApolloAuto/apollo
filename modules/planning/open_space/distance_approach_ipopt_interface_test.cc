@@ -15,7 +15,7 @@
  *****************************************************************************/
 
 /**
- * @file
+ * @file distance_approach_ipopt_interface_test.h
  **/
 #include "modules/planning/open_space/distance_approach_ipopt_interface.h"
 #include "IpTNLP.hpp"
