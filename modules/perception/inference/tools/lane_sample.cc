@@ -14,9 +14,13 @@
  * limitations under the License.
  *****************************************************************************/
 #include <iostream>
-#include "/usr/include/opencv2/opencv.hpp"
-#include "/usr/local/include/gflags/gflags.h"
+
+#include "gflags/gflags.h"
+#include "opencv2/opencv.hpp"
+
+#include "cybertron/common/log.h"
 #include "modules/perception/inference/inference.h"
+#include "modules/perception/inference/inference_factory.h"
 #include "modules/perception/inference/tensorrt/batch_stream.h"
 #include "modules/perception/inference/tensorrt/entropy_calibrator.h"
 #include "modules/perception/inference/tensorrt/rt_net.h"
@@ -29,6 +33,7 @@ DEFINE_string(test_list, "image_list.txt", "path of image list");
 DEFINE_string(image_root, "./images/", "path of image dir");
 DEFINE_string(image_ext, ".jpg", "path of image ext");
 DEFINE_string(res_dir, "./result.dat", "path of result");
+
 int main(int argc, char **argv) {
   google::ParseCommandLineFlags(&argc, &argv, true);
   std::vector<float> output_data_vec1;
@@ -39,16 +44,16 @@ int main(int argc, char **argv) {
   color_table.push_back(cv::Scalar(255, 0, 0));     // for mask value = 3
   color_table.push_back(cv::Scalar(240, 32, 160));  // for mask value = 4
 
-  std::string proto_file = "./lane_parser/caffe.pt";
-  std::string weight_file = "./lane_parser/caffe.caffemodel";
-  std::string model_root = "./lane_parser/";
+  const std::string proto_file = "./lane_parser/caffe.pt";
+  const std::string weight_file = "./lane_parser/caffe.caffemodel";
+  const std::string model_root = "./lane_parser/";
 
   cudaDeviceProp prop;
   cudaGetDeviceProperties(&prop, 0);
-  LOG(INFO) << prop.name;
+  AINFO << prop.name;
 
   apollo::perception::inference::Inference *rt_net;
-  std::string input_blob_name = "data";
+  const std::string input_blob_name = "data";
   std::vector<std::string> inputs{"data"};
 
   std::vector<std::string> outputs{"loc_pred", "obj_pred", "cls_pred",
@@ -72,9 +77,9 @@ int main(int argc, char **argv) {
     rt_net = apollo::perception::inference::CreateInferenceByName(
         "RTNet", proto_file, weight_file, outputs, inputs);
   }
-  int height = 608;
-  int width = 1024;
-  int offset_y = 0;
+  const int height = 608;
+  const int width = 1024;
+  const int offset_y = 0;
   std::vector<int> shape = {1, 3, height, width};
   std::map<std::string, std::vector<int>> shape_map{{input_blob_name, shape}};
 
@@ -95,11 +100,10 @@ int main(int argc, char **argv) {
     img_roi.copyTo(img);
     cv::resize(img, img, cv::Size(width, height));
 
-    int count = 1 * width * height;
+    const int count = 1 * width * height;
     float *input = new float[count];
     for (int i = 0; i < count; i++) {
       input[i] = (img.data[i] - 128) * 0.0078125;
-      ;
     }
     cudaMemcpy(input_blob->mutable_gpu_data(), input, count * sizeof(float),
                cudaMemcpyHostToDevice);
@@ -111,29 +115,7 @@ int main(int argc, char **argv) {
       auto blob = rt_net->get_blob(output_name);
       std::vector<float> tmp_vec(blob->cpu_data(),
                                  blob->cpu_data() + blob->count());
-#if 0
       if (output_name == "output") {
-        int cnt = 0;
-        std::cout << output_name << " " << blob->channels() << " "
-                  << blob->height() << " " << blob->width() << std::endl;
-        for (int c = 0; c < blob->channels(); c++) {
-          for (int j = 0; j < blob->height(); j++) {
-            for (int w = 0; w < blob->width(); w++) {
-              int offset = blob->offset(0, c, j, w);
-              cnt++;
-              std::cout << blob->cpu_data()[offset] << std::endl;
-            }
-          }
-        }
-        std::cout << std::endl;
-      }
-
-#endif
-      if (output_name == "output") {
-        int output_height = blob->height();
-        int output_width = blob->width();
-        int output_channels = blob->channels();
-        int spatial_dim = output_height * output_width;
         const float *output_data = blob->cpu_data();
         for (int h = 0; h < img.rows; h++) {
           for (int w = 0; w < img.cols; w++) {
@@ -152,9 +134,6 @@ int main(int argc, char **argv) {
   }
 
   apollo::perception::inference::write_result(FLAGS_res_dir, output_data_vec);
-
-  std::cout << std::endl;
-  std::cout << "Hello, World!" << std::endl;
   delete rt_net;
 
   return 0;

@@ -13,10 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include <gflags/gflags.h>
 #include <iostream>
+
+#include "gflags/gflags.h"
 #include "opencv2/opencv.hpp"
 
+#include "cybertron/common/log.h"
 #include "modules/perception/inference/inference.h"
 #include "modules/perception/inference/tensorrt/batch_stream.h"
 #include "modules/perception/inference/tensorrt/entropy_calibrator.h"
@@ -46,9 +48,9 @@ DEFINE_bool(hwc_input, true, "input blob is hwc order.");
 
 int evaluate_image_list() {
   CHECK_EQ(FLAGS_image_channel_num, 3);
-  int height = FLAGS_height;
-  int width = FLAGS_width;
-  int count = FLAGS_image_channel_num * width * height;
+  const int height = FLAGS_height;
+  const int width = FLAGS_width;
+  const int count = FLAGS_image_channel_num * width * height;
 
   std::ifstream fin;
   fin.open(FLAGS_test_list, std::ifstream::in);
@@ -69,8 +71,7 @@ int evaluate_image_list() {
   }
   fin.close();
 
-  std::string out_file;
-  out_file = FLAGS_batch_root + "/Batch0";
+  std::string out_file = FLAGS_batch_root + "/Batch0";
   std::ofstream out_car(out_file, std::ofstream::out | std::ofstream::binary);
   // std::ofstream out_car(out_file, std::ofstream::out);
   if (!out_car.is_open()) {
@@ -79,7 +80,7 @@ int evaluate_image_list() {
   }
   std::vector<float> cpu_data(count);
   // main loop
-  for (int i = 0; i < img_list.size(); i++) {
+  for (size_t i = 0; i < img_list.size(); i++) {
     std::string image_path = img_list[i] + FLAGS_image_ext;
     cv::Mat img = cv::imread(image_path, CV_LOAD_IMAGE_COLOR);
     cv::Mat img_org;
@@ -157,8 +158,6 @@ int evaluate_image_list() {
 int main(int argc, char **argv) {
   google::ParseCommandLineFlags(&argc, &argv, true);
 
-  std::string proto_file = FLAGS_proto_file;
-  std::string weight_file = FLAGS_weight_file;
   if (FLAGS_gen_batch) {
     evaluate_image_list();
   }
@@ -173,7 +172,8 @@ int main(int argc, char **argv) {
       (new nvinfer1::Int8EntropyCalibrator(stream, 0, true,
                                            FLAGS_cal_table_root));
   apollo::perception::inference::RTNet *rt_net =
-      new apollo::perception::inference::RTNet(proto_file, weight_file, outputs,
+      new apollo::perception::inference::RTNet(FLAGS_proto_file,
+                                               FLAGS_weight_file, outputs,
                                                inputs, calibrator);
   rt_net->Init(std::map<std::string, std::vector<int>>());
   rt_net->Infer();
