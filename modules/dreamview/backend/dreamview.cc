@@ -32,7 +32,7 @@ using apollo::common::VehicleConfigHelper;
 using apollo::common::time::Clock;
 using apollo::common::util::PathExists;
 
-std::string Dreamview::Name() const { return FLAGS_dreamview_module_name; }
+Dreamview::~Dreamview() { Stop(); }
 
 void Dreamview::TerminateProfilingMode() {
   Stop();

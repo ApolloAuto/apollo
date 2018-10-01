@@ -40,11 +40,11 @@ namespace dreamview {
 
 class Dreamview {
  public:
-  std::string Name() const;
+  ~Dreamview();
+
   apollo::common::Status Init();
   apollo::common::Status Start();
   void Stop();
-  virtual ~Dreamview() = default;
 
  private:
   void TerminateProfilingMode();
