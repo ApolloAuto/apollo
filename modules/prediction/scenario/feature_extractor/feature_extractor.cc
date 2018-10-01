@@ -34,56 +34,59 @@ using LaneInfoPtr = std::shared_ptr<const LaneInfo>;
 namespace apollo {
 namespace prediction {
 
-FeatureExtractor::FeatureExtractor() {
-}
+EnvironmentFeatures FeatureExtractor::ExtractEnvironmentFeatures() const {
+  EnvironmentFeatures environment_features;
 
-void FeatureExtractor::ExtractFeatures() {
   PoseContainer* pose_container = dynamic_cast<PoseContainer*>(
       ContainerManager::Instance()->GetContainer(
           AdapterConfig::LOCALIZATION));
+
   if (pose_container == nullptr) {
     AERROR << "Null pose container found.";
-    return;
+    return environment_features;
   }
-  ExtractEgoVehicleFeatures();
+  ExtractEgoVehicleFeatures(&environment_features);
 
   auto ego_trajectory_point = pose_container->GetPosition();
   if (!ego_trajectory_point.has_x() ||
       !ego_trajectory_point.has_y()) {
     AERROR << "Fail to get ego vehicle position";
-    return;
+    return environment_features;
   }
   Vec2d ego_position(ego_trajectory_point.x(), ego_trajectory_point.y());
 
   auto ptr_ego_lane = GetEgoLane(ego_position);
 
-  ExtractEgoLaneFeatures(ptr_ego_lane, ego_position);
+  ExtractEgoLaneFeatures(&environment_features,
+      ptr_ego_lane, ego_position);
 
-  ExtractNeighborLaneFeatures(ptr_ego_lane, ego_position);
+  ExtractNeighborLaneFeatures(
+      &environment_features, ptr_ego_lane, ego_position);
 
-  ExtractFrontJunctionFeatures();
+  ExtractFrontJunctionFeatures(&environment_features);
 
-  ExtractObstacleFeatures();
+  ExtractObstacleFeatures(&environment_features);
 
   // TODO(all): add other features
+
+  return environment_features;
 }
 
-const EnvironmentFeatures& FeatureExtractor::GetEnvironmentFeatures() const {
-  return environment_features_;
-}
-
-void FeatureExtractor::ExtractEgoVehicleFeatures() {
+void FeatureExtractor::ExtractEgoVehicleFeatures(
+    EnvironmentFeatures* ptr_environment_features) const {
   PoseContainer* pose_container = dynamic_cast<PoseContainer*>(
       ContainerManager::Instance()->GetContainer(
           AdapterConfig::LOCALIZATION));
   // TODO(all): change this to ego_speed and ego_heading
-  environment_features_.set_ego_speed(pose_container->GetSpeed());
-  environment_features_.set_ego_heading(pose_container->GetTheta());
+  ptr_environment_features->set_ego_speed(pose_container->GetSpeed());
+  ptr_environment_features->set_ego_heading(pose_container->GetTheta());
   // TODO(all): add acceleration if needed
 }
 
-void FeatureExtractor::ExtractEgoLaneFeatures(const LaneInfoPtr& ptr_ego_lane,
-    const common::math::Vec2d& ego_position) {
+void FeatureExtractor::ExtractEgoLaneFeatures(
+    EnvironmentFeatures* ptr_environment_features,
+    const LaneInfoPtr& ptr_ego_lane,
+    const common::math::Vec2d& ego_position) const {
 
   if (ptr_ego_lane == nullptr) {
     ADEBUG << "Ego vehicle is not on any lane.";
@@ -92,11 +95,12 @@ void FeatureExtractor::ExtractEgoLaneFeatures(const LaneInfoPtr& ptr_ego_lane,
   double curr_lane_s = 0.0;
   double curr_lane_l = 0.0;
   ptr_ego_lane->GetProjection(ego_position, &curr_lane_s, &curr_lane_l);
-  environment_features_.SetEgoLane(ptr_ego_lane->id().id(), curr_lane_s);
+  ptr_environment_features->SetEgoLane(ptr_ego_lane->id().id(), curr_lane_s);
 }
 
 void FeatureExtractor::ExtractNeighborLaneFeatures(
-    const LaneInfoPtr& ptr_ego_lane, const Vec2d& ego_position) {
+    EnvironmentFeatures* ptr_environment_features,
+    const LaneInfoPtr& ptr_ego_lane, const Vec2d& ego_position) const {
 
   if (ptr_ego_lane == nullptr) {
     AERROR << "Ego vehicle is not on any lane.";
@@ -113,7 +117,7 @@ void FeatureExtractor::ExtractNeighborLaneFeatures(
     double left_neighbor_lane_l = 0.0;
     ptr_left_neighbor_lane->GetProjection(ego_position,
         &left_neighbor_lane_s, &left_neighbor_lane_l);
-    environment_features_.SetLeftNeighborLane(
+    ptr_environment_features->SetLeftNeighborLane(
         ptr_left_neighbor_lane->id().id(), left_neighbor_lane_s);
   }
 
@@ -124,12 +128,13 @@ void FeatureExtractor::ExtractNeighborLaneFeatures(
     double right_neighbor_lane_l = 0.0;
     ptr_right_neighbor_lane->GetProjection(ego_position,
         &right_neighbor_lane_s, &right_neighbor_lane_l);
-    environment_features_.SetRightNeighborLane(
+    ptr_environment_features->SetRightNeighborLane(
         ptr_right_neighbor_lane->id().id(), right_neighbor_lane_s);
   }
 }
 
-void FeatureExtractor::ExtractFrontJunctionFeatures() {
+void FeatureExtractor::ExtractFrontJunctionFeatures(
+    EnvironmentFeatures* ptr_environment_features) const {
   ADCTrajectoryContainer* ego_trajectory_container =
       dynamic_cast<ADCTrajectoryContainer*>(
           ContainerManager::Instance()->GetContainer(
@@ -140,12 +145,13 @@ void FeatureExtractor::ExtractFrontJunctionFeatures() {
   }
   JunctionInfoPtr junction = ego_trajectory_container->ADCJunction();
   if (junction != nullptr) {
-    environment_features_.SetFrontJunction(junction->id().id(),
+    ptr_environment_features->SetFrontJunction(junction->id().id(),
         ego_trajectory_container->ADCDistanceToJunction());
   }
 }
 
-void FeatureExtractor::ExtractObstacleFeatures() {
+void FeatureExtractor::ExtractObstacleFeatures(
+    EnvironmentFeatures* ptr_environment_features) const {
 }
 
 LaneInfoPtr FeatureExtractor::GetEgoLane(const Vec2d& ego_position) const {

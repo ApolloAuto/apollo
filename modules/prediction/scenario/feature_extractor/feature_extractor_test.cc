@@ -42,10 +42,12 @@ TEST_F(FeatureExtractorTest, junction) {
   std::unique_ptr<Container> adc_traj_container =
       ContainerManager::Instance()->CreateContainer(
           AdapterConfig::PLANNING_TRAJECTORY);
+
+  EnvironmentFeatures environment_features;
   FeatureExtractor feature_extractor;
-  feature_extractor.ExtractFrontJunctionFeatures();
-  EnvironmentFeatures environment_features =
-      feature_extractor.GetEnvironmentFeatures();
+  feature_extractor.ExtractFrontJunctionFeatures(&environment_features);
+
+  environment_features = feature_extractor.ExtractEnvironmentFeatures();
   EXPECT_TRUE(!environment_features.has_front_junction());
 }
 

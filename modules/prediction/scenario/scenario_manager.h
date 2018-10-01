@@ -62,8 +62,9 @@ class ScenarioManager {
       Obstacle* obstacle_ptr);
 
  private:
-  FeatureExtractor feature_extractor_;
   ScenarioAnalyzer scenario_analyzer_;
+
+  EnvironmentFeatures environment_features_;
 
   DECLARE_SINGLETON(ScenarioManager)
 };

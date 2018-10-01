@@ -34,8 +34,10 @@ using apollo::common::math::Vec2d;
 ScenarioManager::ScenarioManager() {}
 
 void ScenarioManager::Run() {
-  feature_extractor_.ExtractFeatures();
-  scenario_analyzer_.Analyze(feature_extractor_.GetEnvironmentFeatures());
+  FeatureExtractor feature_extractor;
+  environment_features_ = feature_extractor.ExtractEnvironmentFeatures();
+
+  scenario_analyzer_.Analyze(environment_features_);
   if (FLAGS_enable_prioritize_obstacles) {
     PrioritizeObstacles();
   }
@@ -59,7 +61,7 @@ void ScenarioManager::PrioritizeObstacles() {
   for (const int obstacle_id : obstacle_ids) {
     Obstacle* obstacle_ptr = obstacles_container->GetObstacle(obstacle_id);
     PrioritizeObstacle(
-        feature_extractor_.GetEnvironmentFeatures(),
+        environment_features_,
         scenario_analyzer_.GetScenarioFeatures(),
         obstacle_ptr);
   }
