@@ -66,7 +66,7 @@ class HDMapInput {
   void DownsamplePoints(
       const base::PointDCloudPtr& raw_cloud_ptr,
       base::PointCloud<base::PointD>* polygon_ptr,
-      int min_points_num_for_sample = 15) const;
+      size_t min_points_num_for_sample = 15) const;
 
   void SplitBoundary(
       const base::PointCloud<base::PointD>& boundary_line,

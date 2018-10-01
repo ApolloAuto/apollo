@@ -248,9 +248,9 @@ bool HDMapInput::GetRoadBoundaryFilteredByJunctions(
     // filter right boundary points
     this->SplitBoundary(temp_road_boundary.right_boundary,
         junctions, &temp_right_boundary_vec);
-    int n_temp_road_boundary = std::max(temp_left_boundary_vec.size(),
+    auto n_temp_road_boundary = std::max(temp_left_boundary_vec.size(),
         temp_right_boundary_vec.size());
-    for (int i = 0; i < n_temp_road_boundary; ++i) {
+    for (size_t i = 0; i < n_temp_road_boundary; ++i) {
       base::RoadBoundary temp_road_boundary;
       if (i < temp_left_boundary_vec.size()) {
         temp_road_boundary.left_boundary = temp_left_boundary_vec[i];
@@ -267,7 +267,7 @@ bool HDMapInput::GetRoadBoundaryFilteredByJunctions(
 void HDMapInput::DownsamplePoints(
     const base::PointDCloudPtr& raw_cloud_ptr,
     base::PointCloud<base::PointD>* polygon_ptr,
-    int min_points_num_for_sample) const {
+    size_t min_points_num_for_sample) const {
   const PointDCloud& raw_cloud = *raw_cloud_ptr;
   unsigned int spt = 0;
   double acos_theta = 0.0;
@@ -386,7 +386,7 @@ bool HDMapInput::GetNearestLaneDirection(const base::PointD& pointd,
   // double lane_heading
   //   = nearest_lane_trajectory.get_smooth_point(nearest_s).heading();
   // *lane_direction = Eigen::Vector3d(cos(lane_heading), sin(lane_heading), 0);
-  // return true;
+  return true;
 }
 
 bool HDMapInput::GetSignalsFromHDMap(const Eigen::Vector3d& pointd,
