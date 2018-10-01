@@ -15,7 +15,7 @@
  *****************************************************************************/
 
 /**
- * @file qp_spline_path_generator.h
+ * @file
  **/
 
 #ifndef MODULES_PLANNING_TOOLKITS_OPTIMIZERS_QP_SPLINE_PATH_GENERATOR_H_
@@ -34,7 +34,7 @@
 #include "modules/planning/common/path_decision.h"
 #include "modules/planning/common/path_obstacle.h"
 #include "modules/planning/common/speed/speed_data.h"
-#include "modules/planning/math/smoothing_spline/spline_1d_generator.h"
+#include "modules/planning/math/smoothing_spline/active_set_spline_1d_solver.h"
 #include "modules/planning/toolkits/optimizers/qp_spline_path/qp_frenet_frame.h"
 
 namespace apollo {
@@ -42,7 +42,7 @@ namespace planning {
 
 class QpSplinePathGenerator {
  public:
-  QpSplinePathGenerator(Spline1dGenerator* spline_generator,
+  QpSplinePathGenerator(Spline1dSolver* spline_solver,
                         const ReferenceLine& reference_line,
                         const QpSplinePathConfig& qp_spline_path_config,
                         const SLBoundary& adc_sl_boundary);
@@ -73,7 +73,7 @@ class QpSplinePathGenerator {
   bool Solve();
 
  private:
-  Spline1dGenerator* spline_generator_ = nullptr;
+  Spline1dSolver* spline_solver_ = nullptr;
   apollo::planning_internal::Debug* planning_debug_ = nullptr;
   const ReferenceLine& reference_line_;
   const QpSplinePathConfig& qp_spline_path_config_;

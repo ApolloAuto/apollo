@@ -38,11 +38,11 @@ using apollo::common::Status;
 using apollo::common::VehicleParam;
 using apollo::planning_internal::STGraphDebug;
 
-QpSplineStGraph::QpSplineStGraph(Spline1dGenerator* spline_generator,
+QpSplineStGraph::QpSplineStGraph(Spline1dSolver* spline_solver,
                                  const QpStSpeedConfig& qp_st_speed_config,
                                  const VehicleParam& veh_param,
                                  const bool is_change_lane)
-    : spline_generator_(spline_generator),
+    : spline_solver_(spline_solver),
       qp_st_speed_config_(qp_st_speed_config),
       is_change_lane_(is_change_lane),
       t_knots_resolution_(
@@ -108,8 +108,8 @@ Status QpSplineStGraph::Search(const StGraphData& st_graph_data,
   ADEBUG << "init point:" << init_point_.DebugString();
 
   // reset spline generator
-  spline_generator_->Reset(
-      t_knots_, qp_st_speed_config_.qp_spline_config().spline_order());
+  spline_solver_->Reset(t_knots_,
+                        qp_st_speed_config_.qp_spline_config().spline_order());
 
   if (!AddConstraint(st_graph_data.init_point(), st_graph_data.speed_limit(),
                      st_graph_data.st_boundaries(), accel_bound)
@@ -134,7 +134,7 @@ Status QpSplineStGraph::Search(const StGraphData& st_graph_data,
 
   // extract output
   speed_data->Clear();
-  const Spline1d& spline = spline_generator_->spline();
+  const Spline1d& spline = spline_solver_->spline();
 
   const double t_output_resolution = FLAGS_trajectory_time_min_interval;
   double time = 0.0;
@@ -154,8 +154,7 @@ Status QpSplineStGraph::AddConstraint(
     const common::TrajectoryPoint& init_point, const SpeedLimit& speed_limit,
     const std::vector<const StBoundary*>& boundaries,
     const std::pair<double, double>& accel_bound) {
-  Spline1dConstraint* constraint =
-      spline_generator_->mutable_spline_constraint();
+  Spline1dConstraint* constraint = spline_solver_->mutable_spline_constraint();
 
   if (!constraint->AddPointConstraint(0.0, 0.0)) {
     const std::string msg = "add st start point constraint failed";
@@ -279,7 +278,7 @@ Status QpSplineStGraph::AddConstraint(
 Status QpSplineStGraph::AddKernel(
     const std::vector<const StBoundary*>& boundaries,
     const SpeedLimit& speed_limit) {
-  Spline1dKernel* spline_kernel = spline_generator_->mutable_spline_kernel();
+  Spline1dKernel* spline_kernel = spline_solver_->mutable_spline_kernel();
 
   if (qp_st_speed_config_.qp_spline_config().accel_kernel_weight() > 0) {
     spline_kernel->AddSecondOrderDerivativeMatrix(
@@ -329,13 +328,13 @@ Status QpSplineStGraph::AddKernel(
 }
 
 Status QpSplineStGraph::Solve() {
-  return spline_generator_->Solve()
+  return spline_solver_->Solve()
              ? Status::OK()
              : Status(ErrorCode::PLANNING_ERROR, "QpSplineStGraph::solve");
 }
 
 Status QpSplineStGraph::AddCruiseReferenceLineKernel(const double weight) {
-  auto* spline_kernel = spline_generator_->mutable_spline_kernel();
+  auto* spline_kernel = spline_solver_->mutable_spline_kernel();
   double dist_ref = qp_st_speed_config_.total_path_length();
   for (uint32_t i = 0; i < t_evaluated_.size(); ++i) {
     cruise_.push_back(dist_ref);
@@ -367,7 +366,7 @@ Status QpSplineStGraph::AddCruiseReferenceLineKernel(const double weight) {
 
 Status QpSplineStGraph::AddFollowReferenceLineKernel(
     const std::vector<const StBoundary*>& boundaries, const double weight) {
-  auto* spline_kernel = spline_generator_->mutable_spline_kernel();
+  auto* spline_kernel = spline_solver_->mutable_spline_kernel();
   std::vector<double> ref_s;
   std::vector<double> filtered_evaluate_t;
   for (size_t i = 0; i < t_evaluated_.size(); ++i) {
@@ -418,7 +417,7 @@ Status QpSplineStGraph::AddFollowReferenceLineKernel(
 
 Status QpSplineStGraph::AddYieldReferenceLineKernel(
     const std::vector<const StBoundary*>& boundaries, const double weight) {
-  auto* spline_kernel = spline_generator_->mutable_spline_kernel();
+  auto* spline_kernel = spline_solver_->mutable_spline_kernel();
   std::vector<double> ref_s;
   std::vector<double> filtered_evaluate_t;
   for (size_t i = 0; i < t_evaluated_.size(); ++i) {
@@ -469,7 +468,7 @@ bool QpSplineStGraph::AddDpStReferenceKernel(const double weight) const {
     t_pos.push_back(point.t());
     s_pos.push_back(point.s());
   }
-  auto* spline_kernel = spline_generator_->mutable_spline_kernel();
+  auto* spline_kernel = spline_solver_->mutable_spline_kernel();
   if (!t_pos.empty()) {
     spline_kernel->AddReferenceLineKernelMatrix(
         t_pos, s_pos, weight * qp_st_speed_config_.total_time() / t_pos.size());

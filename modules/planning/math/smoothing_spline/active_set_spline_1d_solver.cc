@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,10 @@
  *****************************************************************************/
 
 /**
- * @file : spline_1d_generator.cc
- * @brief: piecewise_smoothing_spline (pss) generator class
- *           solve pss by qp algorithm, include adding constraint, adding
- *kernel, and solver solve
+ * @file
  **/
 
-#include "modules/planning/math/smoothing_spline/spline_1d_generator.h"
+#include "modules/planning/math/smoothing_spline/active_set_spline_1d_solver.h"
 
 #include <algorithm>
 
@@ -44,38 +41,17 @@ constexpr double kMaxBound = 1e3;
 using apollo::common::time::Clock;
 using Eigen::MatrixXd;
 
-Spline1dGenerator::Spline1dGenerator(const std::vector<double>& x_knots,
-                                     const uint32_t spline_order)
-    : spline_(x_knots, spline_order),
-      spline_constraint_(x_knots, spline_order),
-      spline_kernel_(x_knots, spline_order) {}
-
-void Spline1dGenerator::Reset(const std::vector<double>& x_knots,
-                              const uint32_t spline_order) {
-  spline_ = Spline1d(x_knots, spline_order);
-  spline_constraint_ = Spline1dConstraint(x_knots, spline_order);
-  spline_kernel_ = Spline1dKernel(x_knots, spline_order);
-}
-
-Spline1dConstraint* Spline1dGenerator::mutable_spline_constraint() {
-  return &spline_constraint_;
-}
-
-Spline1dKernel* Spline1dGenerator::mutable_spline_kernel() {
-  return &spline_kernel_;
-}
-
-bool Spline1dGenerator::Solve() {
-  const MatrixXd& kernel_matrix = spline_kernel_.kernel_matrix();
-  const MatrixXd& offset = spline_kernel_.offset();
+bool ActiveSetSpline1dSolver::Solve() {
+  const MatrixXd& kernel_matrix = kernel_.kernel_matrix();
+  const MatrixXd& offset = kernel_.offset();
   const MatrixXd& inequality_constraint_matrix =
-      spline_constraint_.inequality_constraint().constraint_matrix();
+      constraint_.inequality_constraint().constraint_matrix();
   const MatrixXd& inequality_constraint_boundary =
-      spline_constraint_.inequality_constraint().constraint_boundary();
+      constraint_.inequality_constraint().constraint_boundary();
   const MatrixXd& equality_constraint_matrix =
-      spline_constraint_.equality_constraint().constraint_matrix();
+      constraint_.equality_constraint().constraint_matrix();
   const MatrixXd& equality_constraint_boundary =
-      spline_constraint_.equality_constraint().constraint_boundary();
+      constraint_.equality_constraint().constraint_boundary();
 
   if (kernel_matrix.rows() != kernel_matrix.cols()) {
     AERROR << "kernel_matrix.rows() [" << kernel_matrix.rows()
@@ -189,7 +165,7 @@ bool Spline1dGenerator::Solve() {
                             constraint_upper_bound, max_iter);
   }
   const double end_timestamp = Clock::NowInSeconds();
-  ADEBUG << "Spline1dGenerator QP solve time: "
+  ADEBUG << "ActiveSetSpline1dSolver QP solve time: "
          << (end_timestamp - start_timestamp) * 1000 << " ms.";
 
   if (ret != qpOASES::SUCCESSFUL_RETURN) {
@@ -221,8 +197,6 @@ bool Spline1dGenerator::Solve() {
 
   return spline_.SetSplineSegs(solved_params, spline_.spline_order());
 }
-
-const Spline1d& Spline1dGenerator::spline() const { return spline_; }
 
 }  // namespace planning
 }  // namespace apollo

@@ -93,12 +93,9 @@ cc_library(
 )
 
 cc_library(
-    name = "spline_1d_generator",
-    srcs = [
-        "spline_1d_generator.cc",
-    ],
+    name = "spline_1d_solver",
     hdrs = [
-        "spline_1d_generator.h",
+        "spline_1d_solver.h",
     ],
     deps = [
         ":spline_1d",
@@ -106,8 +103,22 @@ cc_library(
         ":spline_1d_kernel",
         "//modules/common/math/qp_solver",
         "//modules/common/math/qp_solver:active_set_qp_solver",
-        "//modules/common/time",
         "//modules/planning/common:planning_gflags",
+        "@eigen",
+    ],
+)
+
+cc_library(
+    name = "active_set_spline_1d_solver",
+    srcs = [
+        "active_set_spline_1d_solver.cc",
+    ],
+    hdrs = [
+        "active_set_spline_1d_solver.h",
+    ],
+    deps = [
+        ":spline_1d_solver",
+        "//modules/common/time",
         "@eigen",
     ],
 )
@@ -245,13 +256,13 @@ cc_library(
 )
 
 cc_test(
-    name = "spline_1d_generator_test",
+    name = "active_set_spline_1d_solver_test",
     size = "small",
     srcs = [
-        "spline_1d_generator_test.cc",
+        "active_set_spline_1d_solver_test.cc",
     ],
     deps = [
-        ":spline_1d_generator",
+        ":active_set_spline_1d_solver",
         "@gtest//:main",
     ],
 )

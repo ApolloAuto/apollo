@@ -32,14 +32,11 @@ cc_library(
         "//modules/planning/math:polynomial_xd",
         "//modules/planning/math/curve1d:polynomial_curve1d",
         "//modules/planning/math/curve1d:quintic_polynomial_curve1d",
-        "//modules/planning/math/smoothing_spline:spline_1d_constraint",
-        "//modules/planning/math/smoothing_spline:spline_1d_generator",
-        "//modules/planning/math/smoothing_spline:spline_1d_kernel",
-        "//modules/planning/math/smoothing_spline:spline_1d_seg",
+        "//modules/planning/math/smoothing_spline:active_set_spline_1d_solver",
         "//modules/planning/proto:planning_proto",
         "//modules/planning/reference_line",
         "//modules/planning/toolkits/optimizers:path_optimizer",
-        "@eigen//:eigen",
+        "@eigen",
     ],
 )
 

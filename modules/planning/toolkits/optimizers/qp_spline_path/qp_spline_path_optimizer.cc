@@ -15,7 +15,7 @@
  *****************************************************************************/
 
 /**
- * @file qp_spline_path_optimizer.cc
+ * @file
  **/
 #include "modules/planning/toolkits/optimizers/qp_spline_path/qp_spline_path_optimizer.h"
 
@@ -39,8 +39,8 @@ bool QpSplinePathOptimizer::Init(
   qp_spline_path_config_ = config.qp_spline_path_config();
 
   std::vector<double> init_knots;
-  spline_generator_.reset(
-      new Spline1dGenerator(init_knots, qp_spline_path_config_.spline_order()));
+  spline_solver_.reset(new ActiveSetSpline1dSolver(
+      init_knots, qp_spline_path_config_.spline_order()));
   is_init_ = true;
   return true;
 }
@@ -53,7 +53,7 @@ Status QpSplinePathOptimizer::Process(const SpeedData& speed_data,
     AERROR << "Please call Init() before Process.";
     return Status(ErrorCode::PLANNING_ERROR, "Not init.");
   }
-  QpSplinePathGenerator path_generator(spline_generator_.get(), reference_line,
+  QpSplinePathGenerator path_generator(spline_solver_.get(), reference_line,
                                        qp_spline_path_config_,
                                        reference_line_info_->AdcSlBoundary());
   path_generator.SetDebugLogger(reference_line_info_->mutable_debug());

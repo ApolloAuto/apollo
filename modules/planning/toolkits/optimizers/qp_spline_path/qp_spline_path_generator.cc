@@ -54,10 +54,10 @@ using apollo::common::math::CartesianFrenetConverter;
 using apollo::common::math::Vec2d;
 
 QpSplinePathGenerator::QpSplinePathGenerator(
-    Spline1dGenerator* spline_generator, const ReferenceLine& reference_line,
+    Spline1dSolver* spline_solver, const ReferenceLine& reference_line,
     const QpSplinePathConfig& qp_spline_path_config,
     const SLBoundary& adc_sl_boundary)
-    : spline_generator_(spline_generator),
+    : spline_solver_(spline_solver),
       reference_line_(reference_line),
       qp_spline_path_config_(qp_spline_path_config),
       adc_sl_boundary_(adc_sl_boundary) {
@@ -154,7 +154,7 @@ bool QpSplinePathGenerator::Generate(
                                  ", ddl:", init_frenet_point_.ddl());
 
   // extract data
-  const Spline1d& spline = spline_generator_->spline();
+  const Spline1d& spline = spline_solver_->spline();
   std::vector<common::PathPoint> path_points;
 
   ReferencePoint ref_point = reference_line_.GetReferencePoint(start_s);
@@ -259,7 +259,7 @@ bool QpSplinePathGenerator::InitSpline(const double start_s,
   common::util::uniform_slice(start_s, end_s, number_of_spline, &knots_);
 
   // spawn a new spline generator
-  spline_generator_->Reset(knots_, qp_spline_path_config_.spline_order());
+  spline_solver_->Reset(knots_, qp_spline_path_config_.spline_order());
 
   // set evaluated_s_
   uint32_t constraint_num =
@@ -272,7 +272,7 @@ bool QpSplinePathGenerator::InitSpline(const double start_s,
 bool QpSplinePathGenerator::AddConstraint(const QpFrenetFrame& qp_frenet_frame,
                                           const double boundary_extension) {
   Spline1dConstraint* spline_constraint =
-      spline_generator_->mutable_spline_constraint();
+      spline_solver_->mutable_spline_constraint();
 
   const int dim =
       (knots_.size() - 1) * (qp_spline_path_config_.spline_order() + 1);
@@ -445,13 +445,13 @@ void QpSplinePathGenerator::AddHistoryPathKernel() {
     histroy_l.push_back(p.l() - ref_l_);
   }
 
-  Spline1dKernel* spline_kernel = spline_generator_->mutable_spline_kernel();
+  Spline1dKernel* spline_kernel = spline_solver_->mutable_spline_kernel();
   spline_kernel->AddReferenceLineKernelMatrix(
       history_s, histroy_l, qp_spline_path_config_.history_path_weight());
 }
 
 void QpSplinePathGenerator::AddKernel() {
-  Spline1dKernel* spline_kernel = spline_generator_->mutable_spline_kernel();
+  Spline1dKernel* spline_kernel = spline_solver_->mutable_spline_kernel();
 
   if (init_trajectory_point_.v() < qp_spline_path_config_.uturn_speed_limit() &&
       !is_change_lane_path_ &&
@@ -505,7 +505,7 @@ void QpSplinePathGenerator::AddKernel() {
 }
 
 bool QpSplinePathGenerator::Solve() {
-  if (!spline_generator_->Solve()) {
+  if (!spline_solver_->Solve()) {
     for (size_t i = 0; i < knots_.size(); ++i) {
       ADEBUG << "knots_[" << i << "]: " << knots_[i];
     }
