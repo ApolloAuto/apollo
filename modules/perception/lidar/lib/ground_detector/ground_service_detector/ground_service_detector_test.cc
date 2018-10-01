@@ -20,6 +20,9 @@
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lidar/lib/ground_detector/ground_service_detector/ground_service_detector.h"
 
+DECLARE_string(work_root);
+DECLARE_string(config_manager_path);
+
 namespace apollo {
 namespace perception {
 namespace lidar {
@@ -27,9 +30,9 @@ namespace lidar {
 class LidarLibGroundServiceDetectorTest : public testing::Test {
  protected:
   void SetUp() {
-    char* cybertron_path = "CYBERTRON_PATH=";
+    char cybertron_path[] = "CYBERTRON_PATH=";
     putenv(cybertron_path);
-    char* module_path = "MODULE_PATH=";
+    char module_path[] = "MODULE_PATH=";
     putenv(module_path);
     FLAGS_work_root = "/apollo/modules/perception/testdata/"
         "lidar/lib/ground_detector/ground_service_detector";
@@ -115,9 +118,9 @@ TEST_F(LidarLibGroundServiceDetectorTest,
   float out_gt = 0.f;
   float out = 0.f;
   GroundNode* node_ptr =
-      ground_service_cast->ground_content_ref_->grid_.DataPtr();
-  ground_service_cast->ground_content_ref_->grid_center_ << 461957.33791688998,
-      4404672.5859791003, 19.143968966679999;
+      ground_service_cast->GetGroundServiceContent()->grid_.DataPtr();
+  ground_service_cast->GetGroundServiceContent()->grid_center_
+      << 461957.33791688998, 4404672.5859791003, 19.143968966679999;
   LoadPlanes(
       "/apollo/modules/perception/testdata/lidar/lib/ground_detector/"
       "ground_service_detector/data/resources/planes.txt",
@@ -137,7 +140,7 @@ TEST_F(LidarLibGroundServiceDetectorTest,
     frame.cloud->push_back(local_pt);
   }
   EXPECT_TRUE(ground_service_detector.Detect(GroundDetectorOptions(), &frame));
-  for (int i = 0; i < frame.world_cloud->size(); ++i) {
+  for (size_t i = 0; i < frame.world_cloud->size(); ++i) {
     out_gt = height_gts[i];
     out = frame.cloud->points_height(i);
     EXPECT_NEAR(out_gt, out, 1e-6);

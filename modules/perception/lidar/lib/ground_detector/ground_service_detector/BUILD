@@ -13,7 +13,7 @@ cc_library(
     deps = [
         "@eigen",
         "//framework:cybertron",
-        "//modules/common/util",        
+        "//modules/common/util",
         "//modules/perception/base:base_type",
         "//modules/perception/lib/config_manager",
         "//modules/perception/lib/io:file_util",
@@ -30,5 +30,19 @@ cc_library(
         "//modules/perception/proto:perception_config_schema_proto",
     ],
 )
+
+cc_test(
+    name = "ground_service_detector_test",
+    size = "small",
+    srcs = [
+        "ground_service_detector_test.cc",
+    ],
+    deps = [
+        ":ground_service_detector",
+        "@gtest//:main",
+        "//modules/perception/common/io:io_util",
+    ],
+)
+
 
 cpplint()

@@ -79,6 +79,10 @@ class GroundService : public SceneService {
   // @return: name
   std::string Name() const override { return "GroundService"; }
 
+  GroundServiceContent* GetGroundServiceContent() const {
+    return ground_content_ref_;
+  }
+
  public:
   // @brief: Query point to ground distance
   // @param [in]: point in world frame
