@@ -15,19 +15,19 @@
  *****************************************************************************/
 
 /**
- * @file spline_smoother_solver.cc
+ * @file
  **/
-#include "modules/planning/math/smoothing_spline/spline_1d_generator.h"
+#include "modules/planning/math/smoothing_spline/active_set_spline_1d_solver.h"
 
 #include "gtest/gtest.h"
 
 namespace apollo {
 namespace planning {
 
-TEST(Spline1dGenerator, one) {
+TEST(ActiveSetSpline1dSolver, one) {
   // starting point
   std::vector<double> x_knots{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-  Spline1dGenerator pg(x_knots, 6);
+  ActiveSetSpline1dSolver pg(x_knots, 6);
 
   auto* spline_constraint = pg.mutable_spline_constraint();
   auto* spline_kernel = pg.mutable_spline_kernel();
@@ -69,10 +69,10 @@ TEST(Spline1dGenerator, one) {
   auto params = pg.spline();
 }
 
-TEST(Spline1dGenerator, two) {
+TEST(ActiveSetSpline1dSolver, two) {
   // starting point
   std::vector<double> x_knots{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-  Spline1dGenerator pg(x_knots, 6);
+  ActiveSetSpline1dSolver pg(x_knots, 6);
 
   auto* spline_constraint = pg.mutable_spline_constraint();
   auto* spline_kernel = pg.mutable_spline_kernel();

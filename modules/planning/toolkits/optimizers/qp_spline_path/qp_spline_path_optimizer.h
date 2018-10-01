@@ -15,7 +15,7 @@
  *****************************************************************************/
 
 /**
- * @file qp_path_optimizer.h
+ * @file
  **/
 
 #ifndef MODULES_PLANNING_TOOLKITS_OPTIMIZERS_QP_SPLINE_PATH_OPTIMIZER_H_
@@ -29,7 +29,7 @@
 #include "modules/planning/proto/planning_config.pb.h"
 #include "modules/planning/proto/qp_spline_path_config.pb.h"
 
-#include "modules/planning/math/smoothing_spline/spline_1d_generator.h"
+#include "modules/planning/math/smoothing_spline/active_set_spline_1d_solver.h"
 #include "modules/planning/toolkits/optimizers/path_optimizer.h"
 
 namespace apollo {
@@ -48,7 +48,7 @@ class QpSplinePathOptimizer : public PathOptimizer {
 
  private:
   QpSplinePathConfig qp_spline_path_config_;
-  std::unique_ptr<Spline1dGenerator> spline_generator_;
+  std::unique_ptr<Spline1dSolver> spline_solver_;
 };
 
 }  // namespace planning

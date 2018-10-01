@@ -15,7 +15,7 @@
  *****************************************************************************/
 
 /**
- * @file qp_spline_st_graph.h
+ * @file
  **/
 
 #ifndef MODULES_PLANNING_TOOLKITS_OPTIMIZERS_QP_SPLINE_ST_GRAPH_H_
@@ -35,7 +35,7 @@
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/speed/speed_data.h"
 #include "modules/planning/common/speed/st_boundary.h"
-#include "modules/planning/math/smoothing_spline/spline_1d_generator.h"
+#include "modules/planning/math/smoothing_spline/active_set_spline_1d_solver.h"
 #include "modules/planning/toolkits/optimizers/st_graph/st_graph_data.h"
 
 namespace apollo {
@@ -43,7 +43,7 @@ namespace planning {
 
 class QpSplineStGraph {
  public:
-  QpSplineStGraph(Spline1dGenerator* spline_generator,
+  QpSplineStGraph(Spline1dSolver* spline_solver,
                   const QpStSpeedConfig& qp_st_speed_config,
                   const apollo::common::VehicleParam& veh_param,
                   const bool is_change_lane);
@@ -97,7 +97,7 @@ class QpSplineStGraph {
 
  private:
   // solver
-  Spline1dGenerator* spline_generator_ = nullptr;
+  Spline1dSolver* spline_solver_ = nullptr;
 
   // qp st configuration
   const QpStSpeedConfig qp_st_speed_config_;
