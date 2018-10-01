@@ -24,6 +24,7 @@
 
 #include "cybertron/common/log.h"
 
+#include "modules/common/math/matrix_operations.h"
 #include "modules/common/math/qp_solver/qp_solver_gflags.h"
 #include "modules/common/time/time.h"
 #include "modules/planning/common/planning_gflags.h"
@@ -31,11 +32,11 @@
 namespace apollo {
 namespace planning {
 namespace {
-
 constexpr double kRoadBound = 1e10;
 }
 
 using apollo::common::time::Clock;
+using apollo::common::math::DenseToCSCMatrix;
 using Eigen::MatrixXd;
 
 OsqpSpline2dSolver::OsqpSpline2dSolver(const std::vector<double>& t_knots,
@@ -69,27 +70,20 @@ bool OsqpSpline2dSolver::Solve() {
     return false;
   }
 
-  std::vector<double> P_data;
-  std::vector<int> P_indices;
-  std::vector<int> P_indptr;
-  ToCSCMatrix(P, &P_data, &P_indices, &P_indptr);
-  if (P.rows() == 0) {
-    return false;
-  }
+  std::vector<c_float> P_data;
+  std::vector<c_int> P_indices;
+  std::vector<c_int> P_indptr;
+  DenseToCSCMatrix(P, &P_data, &P_indices, &P_indptr);
 
   c_int P_nnz = P_data.size();
   c_float P_x[P_nnz];  // NOLINT
-  for (int i = 0; i < P_nnz; ++i) {
-    P_x[i] = P_data[i];
-  }
+  std::copy(P_data.begin(), P_data.end(), P_x);
+
   c_int P_i[P_indices.size()];  // NOLINT
-  for (size_t i = 0; i < P_indices.size(); ++i) {
-    P_i[i] = P_indices[i];
-  }
+  std::copy(P_indices.begin(), P_indices.end(), P_i);
+
   c_int P_p[P_indptr.size()];  // NOLINT
-  for (size_t i = 0; i < P_indptr.size(); ++i) {
-    P_p[i] = P_indptr[i];
-  }
+  std::copy(P_indptr.begin(), P_indptr.end(), P_p);
 
   // change A to csc format
   const MatrixXd& inequality_constraint_matrix =
@@ -105,24 +99,20 @@ bool OsqpSpline2dSolver::Solve() {
     return false;
   }
 
-  std::vector<double> A_data;
-  std::vector<int> A_indices;
-  std::vector<int> A_indptr;
-  ToCSCMatrix(A, &A_data, &A_indices, &A_indptr);
+  std::vector<c_float> A_data;
+  std::vector<c_int> A_indices;
+  std::vector<c_int> A_indptr;
+  DenseToCSCMatrix(A, &A_data, &A_indices, &A_indptr);
 
   c_int A_nnz = A_data.size();
   c_float A_x[A_nnz];  // NOLINT
-  for (int i = 0; i < A_nnz; ++i) {
-    A_x[i] = A_data[i];
-  }
+  std::copy(A_data.begin(), A_data.end(), A_x);
+
   c_int A_i[A_indices.size()];  // NOLINT
-  for (size_t i = 0; i < A_indices.size(); ++i) {
-    A_i[i] = A_indices[i];
-  }
+  std::copy(A_indices.begin(), A_indices.end(), A_i);
+
   c_int A_p[A_indptr.size()];  // NOLINT
-  for (size_t i = 0; i < A_indptr.size(); ++i) {
-    A_p[i] = A_indptr[i];
-  }
+  std::copy(A_indptr.begin(), A_indptr.end(), A_p);
 
   // set q, l, u: l < A < u
   const MatrixXd& q_eigen = kernel_.offset();
@@ -139,28 +129,21 @@ bool OsqpSpline2dSolver::Solve() {
   int constraint_num = inequality_constraint_boundary.rows() +
                        equality_constraint_boundary.rows();
 
+  constexpr float kEpsilon = 1e-9;
+  constexpr float kUpperLimit = 1e9;
   c_float l[constraint_num];  // NOLINT
+  c_float u[constraint_num];  // NOLINT
   for (int i = 0; i < constraint_num; ++i) {
     if (i < inequality_constraint_boundary.rows()) {
       l[i] = inequality_constraint_boundary(i, 0);
+      u[i] = kUpperLimit;
     } else {
-      l[i] = equality_constraint_boundary(
-          i - inequality_constraint_boundary.rows(), 0);
+      const int idx = i - inequality_constraint_boundary.rows();
+      l[i] = equality_constraint_boundary(idx, 0) - kEpsilon;
+      u[i] = equality_constraint_boundary(idx, 0) + kEpsilon;
     }
   }
 
-  c_float u[constraint_num];  // NOLINT
-  constexpr float kEpsilon = 1e-9;
-  constexpr float kUpperLimit = 1e9;
-  for (int i = 0; i < constraint_num; ++i) {
-    if (i < inequality_constraint_boundary.rows()) {
-      u[i] = kUpperLimit;
-    } else {
-      u[i] = equality_constraint_boundary(
-                 i - inequality_constraint_boundary.rows(), 0) +
-             kEpsilon;
-    }
-  }
   // Problem settings
   OSQPSettings* settings =
       reinterpret_cast<OSQPSettings*>(c_malloc(sizeof(OSQPSettings)));
@@ -213,26 +196,6 @@ bool OsqpSpline2dSolver::Solve() {
 
 // extract
 const Spline2d& OsqpSpline2dSolver::spline() const { return spline_; }
-
-void OsqpSpline2dSolver::ToCSCMatrix(const MatrixXd& dense_matrix,
-                                     std::vector<double>* data,
-                                     std::vector<int>* indices,
-                                     std::vector<int>* indptr) const {
-  constexpr double epsilon = 1e-9;
-  int data_count = 0;
-  for (int c = 0; c < dense_matrix.cols(); ++c) {
-    indptr->emplace_back(data_count);
-    for (int r = 0; r < dense_matrix.rows(); ++r) {
-      if (std::fabs(dense_matrix(r, c)) < epsilon) {
-        continue;
-      }
-      data->emplace_back(dense_matrix(r, c));
-      ++data_count;
-      indices->emplace_back(r);
-    }
-  }
-  indptr->emplace_back(data_count);
-}
 
 }  // namespace planning
 }  // namespace apollo

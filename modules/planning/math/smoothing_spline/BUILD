@@ -190,6 +190,7 @@ cc_library(
         ":spline_2d_constraint",
         ":spline_2d_kernel",
         "//modules/common/math:geometry",
+        "//modules/common/math:matrix_operations",
         "//modules/common/math/qp_solver",
         "//modules/common/math/qp_solver:active_set_qp_solver",
         "//modules/common/time",
@@ -304,11 +305,23 @@ cc_test(
 )
 
 cc_test(
-    name = "spline_2d_solver_test",
+    name = "active_set_spline_2d_solver_test",
+    size = "small",
+    srcs = [
+        "spline_2d_solver_test.cc",
+    ],
+    deps = [
+        ":spline_2d_solver",
+        "//modules/planning/math:curve_math",
+        "@gtest//:main",
+    ],
+)
+
+cc_test(
+    name = "osqp_spline_2d_solver_test",
     size = "small",
     srcs = [
         "osqp_spline_2d_solver_test.cc",
-        "spline_2d_solver_test.cc",
     ],
     deps = [
         ":spline_2d_solver",
