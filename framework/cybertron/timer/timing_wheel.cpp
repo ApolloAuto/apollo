@@ -82,9 +82,9 @@ void TimingWheel::Step() {
   uint64_t idx = tick_ & mask_;
   RemoveCancelledTasks(idx);
   FillAddSlot();
-  FillRepeatSlot();
   time_slots_[idx].EnumTaskList(deadline, true, &handler_queue_,
                                 &repeat_queue_);
+  FillRepeatSlot();
 
   // timing wheel tick one time
   tick_++;
@@ -102,7 +102,7 @@ void TimingWheel::StopTimer(uint64_t timer_id) {
     std::lock_guard<std::mutex> lg(cancelled_mutex_);
     cancelled_list_.push_back(timer_id);
   }
-  ADEBUG << "stop timer id: " << id_counter_;
+  ADEBUG << "stop timer id: " << timer_id;
 }
 
 void TimingWheel::RemoveCancelledTasks(uint64_t slot_index) {
@@ -113,6 +113,7 @@ void TimingWheel::RemoveCancelledTasks(uint64_t slot_index) {
     std::lock_guard<std::mutex> lg(cancelled_mutex_);
     for (auto id : cancelled_list_) {
       time_slots_[slot_index].RemoveTask(id);
+      ADEBUG << "remove task " << id << "from slots " << slot_index;
     }
   }
 }
@@ -149,10 +150,7 @@ void TimingWheel::FillSlot(const std::shared_ptr<TimerTask>& task) {
   uint64_t idx = ticks & mask_;
   time_slots_[idx].AddTask(task);
 
-  // AINFO << "task id " << task->Id()
-  //           << " insert to index " << idx
-  //           << " reset rounds " << task->rest_rounds
-  //           << " deadline at " << task->deadline << std::endl;
+  ADEBUG << "task id " << task->Id() << " insert to index " << idx;
 }
 }  // namespace cybertron
 }  // namespace apollo
