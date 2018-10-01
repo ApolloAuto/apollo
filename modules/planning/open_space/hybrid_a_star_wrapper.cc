@@ -17,7 +17,7 @@
 /*
  * hybrid_a_star_wrapper.cc
  */
-#include "modules/planning/planner/open_space/hybrid_a_star.h"
+#include "modules/planning/open_space/hybrid_a_star.h"
 
 #include <iostream>
 

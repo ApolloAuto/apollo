@@ -18,7 +18,7 @@
  * warm_start_ipopt_interface.cc
  */
 
-#include "modules/planning/planner/open_space/warm_start_ipopt_interface.h"
+#include "modules/planning/open_space/warm_start_ipopt_interface.h"
 
 #include <math.h>
 #include <utility>

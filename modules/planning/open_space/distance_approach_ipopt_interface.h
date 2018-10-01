@@ -15,11 +15,11 @@
  *****************************************************************************/
 
 /*
- * warm_start_ipopt_interface.h
+ * distance_approach_ipopt_interface.h
  */
 
-#ifndef MODULES_PLANNING_PLANNER_OPEN_SPACE_DISTANCE_APPROACH_IPOPT_INTERFACE_H_
-#define MODULES_PLANNING_PLANNER_OPEN_SPACE_DISTANCE_APPROACH_IPOPT_INTERFACE_H_
+#ifndef MODULES_PLANNING_OPEN_SPACE_DISTANCE_APPROACH_IPOPT_INTERFACE_H_
+#define MODULES_PLANNING_OPEN_SPACE_DISTANCE_APPROACH_IPOPT_INTERFACE_H_
 
 #include <vector>
 
@@ -132,4 +132,4 @@ class DistanceApproachIPOPTInterface : public Ipopt::TNLP {
 }  // namespace apollo
 
 #endif
-// MODULES_PLANNING_PLANNER_OPEN_SPACE_DISTANCE_APPROACH_IPOPT_INTERFACE_H_
+// MODULES_PLANNING_OPEN_SPACE_DISTANCE_APPROACH_IPOPT_INTERFACE_H_

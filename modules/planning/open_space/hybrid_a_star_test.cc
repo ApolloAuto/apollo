@@ -24,7 +24,7 @@
 #include "modules/common/math/box2d.h"
 #include "modules/common/math/vec2d.h"
 #include "modules/planning/common/obstacle.h"
-#include "modules/planning/planner/open_space/hybrid_a_star.h"
+#include "modules/planning/open_space/hybrid_a_star.h"
 
 namespace apollo {
 namespace planning {
