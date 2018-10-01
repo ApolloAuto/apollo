@@ -143,7 +143,7 @@ void TimingWheel::FillSlot(const std::shared_ptr<TimerTask>& task) {
                     (task->fire_count_ + 1) * (task->interval_) * 1000 * 1000 -
                     start_time_;
 
-  // calc从时间轮开始运转时经过t个tick
+  // Calculate how many tickes have been run since the time wheel start
   uint64_t t = task->deadline_ / tick_duration_;  // perTick = 1ms
   task->rest_rounds_ = (t - tick_) / TIMING_WHEEL_SIZE;
   uint64_t ticks = std::max(t, tick_);  // right now
