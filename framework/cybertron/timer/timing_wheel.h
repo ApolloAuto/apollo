@@ -36,7 +36,6 @@
 namespace apollo {
 namespace cybertron {
 
-using apollo::cybertron::base::ThreadPool;
 using apollo::cybertron::base::BoundedQueue;
 using CallHandler = std::function<void()>;
 
@@ -58,8 +57,6 @@ class TimingWheel {
   void StopTimer(uint64_t timer_id);
 
   void Step();
-
-  static ThreadPool& Workers();
 
  private:
   void FillAddSlot();

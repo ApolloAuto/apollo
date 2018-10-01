@@ -18,6 +18,7 @@
 
 #include <algorithm>
 #include "cybertron/common/log.h"
+#include "cybertron/task/task.h"
 #include "cybertron/time/time.h"
 #include "cybertron/timer/timer_task.h"
 #include "cybertron/timer/timing_slot.h"
@@ -37,11 +38,6 @@ TimingWheel::TimingWheel(const Duration& tick_duration) {
   add_queue_.Init(BOUNDED_QUEUE_SIZE);
   repeat_queue_.Init(BOUNDED_QUEUE_SIZE);
   handler_queue_.Init(BOUNDED_QUEUE_SIZE);
-}
-
-ThreadPool& TimingWheel::Workers() {
-  static ThreadPool pool(THREAD_POOL_SIZE);
-  return pool;
 }
 
 uint64_t TimingWheel::StartTimer(uint64_t interval, CallHandler handler,
@@ -92,7 +88,7 @@ void TimingWheel::Step() {
   while (!handler_queue_.Empty()) {
     HandlePackage hp;
     if (handler_queue_.Dequeue(&hp)) {
-      Workers().Enqueue(hp.handle);
+      cybertron::Async(hp.handle);
     }
   }
 }

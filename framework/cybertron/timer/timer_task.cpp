@@ -17,6 +17,7 @@
 #include "cybertron/timer/timer_task.h"
 
 #include "cybertron/common/log.h"
+#include "cybertron/task/task.h"
 #include "cybertron/time/time.h"
 #include "cybertron/timer/timing_wheel.h"
 
@@ -30,7 +31,7 @@ void TimerTask::Fire(bool async) {
   if (oneshot_)  // not repeat. so always on ready
     status_ = EXPIRED;
   if (async) {
-    TimingWheel::Workers().Enqueue(handler_);
+    cybertron::Async(handler_);
   } else {
     handler_();
   }
