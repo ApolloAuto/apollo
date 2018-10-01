@@ -27,7 +27,7 @@ ReedShepp::ReedShepp(const common::VehicleParam& vehicle_param,
                      const PlannerOpenSpaceConfig& open_space_conf)
     : vehicle_param_(vehicle_param), open_space_conf_(open_space_conf) {
   max_kappa_ = std::tan(open_space_conf.warm_start_config().max_steering()) /
-               vehicle_param_.front_edge_to_center();
+               vehicle_param_.wheel_base();
 }
 
 std::pair<double, double> ReedShepp::calc_tau_omega(double u, double v,
