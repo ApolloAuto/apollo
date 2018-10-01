@@ -17,14 +17,14 @@
 /**
  * @file
  **/
-#include "modules/planning/planner/open_space/warm_start_ipopt_interface.h"
+#include "modules/planning/open_space/warm_start_problem.h"
 
 #include "gtest/gtest.h"
 
 namespace apollo {
 namespace planning {
 
-TEST(WarmStartIPOPTInterface, add_boundary) {}
+TEST(WarmStartProblem, add_boundary) {}
 
 }  // namespace planning
 }  // namespace apollo

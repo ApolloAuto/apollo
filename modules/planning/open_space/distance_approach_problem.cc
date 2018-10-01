@@ -18,7 +18,7 @@
  * distance_approach_problem.cc
  */
 
-#include "modules/planning/planner/open_space/distance_approach_problem.h"
+#include "modules/planning/open_space/distance_approach_problem.h"
 
 #include <algorithm>
 #include <iomanip>

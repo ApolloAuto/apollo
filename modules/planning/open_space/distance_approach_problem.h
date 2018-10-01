@@ -15,17 +15,17 @@
  *****************************************************************************/
 
 /*
- * spiral_reference_line_smoother.h
+ * distance_approach_problem.h
  */
 
-#ifndef MODULES_PLANNING_PLANNER_OPEN_SPACE_DISTANCE_APPROACH_PROBLEM_H_
-#define MODULES_PLANNING_PLANNER_OPEN_SPACE_DISTANCE_APPROACH_PROBLEM_H_
+#ifndef MODULES_PLANNING_OPEN_SPACE_DISTANCE_APPROACH_PROBLEM_H_
+#define MODULES_PLANNING_OPEN_SPACE_DISTANCE_APPROACH_PROBLEM_H_
 
 #include <vector>
 
 #include "Eigen/Dense"
 
-#include "modules/planning/planner/open_space/distance_approach_ipopt_interface.h"
+#include "modules/planning/open_space/distance_approach_ipopt_interface.h"
 #include "modules/planning/proto/planning.pb.h"
 
 namespace apollo {
@@ -89,4 +89,4 @@ class DistanceApproachProblem {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_PLANNER_OPEN_SPACE_DISTANCE_APPROACH_PROBLEM_H_
+#endif  // MODULES_PLANNING_OPEN_SPACE_DISTANCE_APPROACH_PROBLEM_H_

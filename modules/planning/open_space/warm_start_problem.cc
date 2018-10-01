@@ -18,7 +18,7 @@
  * warm_start_problem.cc
  */
 
-#include "modules/planning/planner/open_space/warm_start_problem.h"
+#include "modules/planning/open_space/warm_start_problem.h"
 
 #include <algorithm>
 #include <iomanip>

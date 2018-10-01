@@ -18,8 +18,19 @@
  * hybrid_a_star.h
  */
 
-#ifndef MODULES_PLANNING_PLANNER_OPEN_SPACE_HYBRID_A_STAR_H_
-#define MODULES_PLANNING_PLANNER_OPEN_SPACE_HYBRID_A_STAR_H_
+/*
+ * Inspired by
+ *
+ * Dolgov, Dmitri, et al. “Path Planning for Autonomous Vehicles in Unknown
+ * Semi-Structured Environments.” The International Journal of Robotics
+ * Research, vol. 29, no. 5, 2010, pp. 485–501., doi:10.1177/0278364909359210.
+ *
+ * Xiaojing, et al. "Optimization-Based Collision Avoidance" and its
+ * implementation.
+ */
+
+#ifndef MODULES_PLANNING_OPEN_SPACE_HYBRID_A_STAR_H_
+#define MODULES_PLANNING_OPEN_SPACE_HYBRID_A_STAR_H_
 
 #include <map>
 #include <memory>
@@ -117,4 +128,4 @@ class HybridAStar {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_PLANNER_OPEN_SPACE_HYBRID_A_STAR_H_
+#endif  // MODULES_PLANNING_OPEN_SPACE_HYBRID_A_STAR_H_

@@ -18,7 +18,7 @@
  * distance_approach_problem_interface.cc
  */
 
-#include "modules/planning/planner/open_space/distance_approach_ipopt_interface.h"
+#include "modules/planning/open_space/distance_approach_ipopt_interface.h"
 
 #include <math.h>
 #include <utility>

@@ -18,14 +18,14 @@
  * spiral_reference_line_smoother.h
  */
 
-#ifndef MODULES_PLANNING_PLANNER_OPEN_SPACE_WARM_START_PROBLEM_H_
-#define MODULES_PLANNING_PLANNER_OPEN_SPACE_WARM_START_PROBLEM_H_
+#ifndef MODULES_PLANNING_OPEN_SPACE_WARM_START_PROBLEM_H_
+#define MODULES_PLANNING_OPEN_SPACE_WARM_START_PROBLEM_H_
 
 #include <vector>
 
 #include "Eigen/Dense"
 
-#include "modules/planning/planner/open_space/warm_start_ipopt_interface.h"
+#include "modules/planning/open_space/warm_start_ipopt_interface.h"
 #include "modules/planning/proto/planning.pb.h"
 
 namespace apollo {
@@ -61,4 +61,4 @@ class WarmStartProblem {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_PLANNER_OPEN_SPACE_WARM_START_PROBLEM_H_
+#endif  // MODULES_PLANNING_OPEN_SPACE_WARM_START_PROBLEM_H_
