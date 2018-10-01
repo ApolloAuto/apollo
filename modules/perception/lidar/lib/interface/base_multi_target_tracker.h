@@ -34,7 +34,7 @@ class BaseMultiTargetTracker {
  public:
   BaseMultiTargetTracker() = default;
 
-  ~BaseMultiTargetTracker() = default;
+  virtual ~BaseMultiTargetTracker() = default;
 
   virtual bool Init(const MultiTargetTrackerInitOptions& options =
                         MultiTargetTrackerInitOptions()) = 0;

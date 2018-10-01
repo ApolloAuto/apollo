@@ -30,7 +30,7 @@ class DummyMultiTargetTracker : public BaseMultiTargetTracker {
  public:
   DummyMultiTargetTracker() = default;
 
-  ~DummyMultiTargetTracker() = default;
+  virtual ~DummyMultiTargetTracker() = default;
 
   bool Init(const MultiTargetTrackerInitOptions& options =
                 MultiTargetTrackerInitOptions()) override;
