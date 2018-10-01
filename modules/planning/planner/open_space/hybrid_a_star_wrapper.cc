@@ -28,7 +28,8 @@ class ObstacleContainer {
  public:
   ObstacleContainer() = default;
   void AddVirtualObstacle(const double x, const double y, const double heading,
-                          const double length, const double width, const int id) {
+                          const double length, const double width,
+                          const int id) {
     std::unique_ptr<Obstacle> obstacle_class =
         std::unique_ptr<Obstacle>(new Obstacle());
     Vec2d obstacle_center(x, y);
