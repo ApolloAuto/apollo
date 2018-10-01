@@ -13,20 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include <gflags/gflags.h>
-#include <pcl/io/pcd_io.h>
-#include <pcl/kdtree/kdtree.h>
-#include <pcl/kdtree/kdtree_flann.h>
-#include <Eigen/Dense>
-
 #include <fstream>
 #include <iomanip>
-#include <pcl/kdtree/impl/kdtree_flann.hpp>
+
+#include "Eigen/Dense"
+#include "gflags/gflags.h"
+#include "pcl/io/pcd_io.h"
+#include "pcl/kdtree/impl/kdtree_flann.hpp"
+#include "pcl/kdtree/kdtree.h"
+#include "pcl/kdtree/kdtree_flann.h"
 
 #include "modules/perception/base/object.h"
 #include "modules/perception/base/object_types.h"
 #include "modules/perception/base/point_cloud.h"
 #include "modules/perception/common/io/io_util.h"
+#include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/common/point_cloud_processing/common.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lib/io/file_util.h"
@@ -48,11 +49,6 @@ DEFINE_bool(use_tracking_info, false, "option to use tracking info");
 
 namespace apollo {
 namespace perception {
-
-namespace lib {
-DECLARE_string(config_manager_path);
-}  // namespace lib
-
 namespace lidar {
 
 class OfflineLidarObstaclePerception {
@@ -62,7 +58,7 @@ class OfflineLidarObstaclePerception {
   ~OfflineLidarObstaclePerception() = default;
 
   bool setup() {
-    lib::FLAGS_config_manager_path = "./conf";
+    FLAGS_config_manager_path = "./conf";
     config_manager_ = lib::Singleton<lib::ConfigManager>::get_instance();
     if (config_manager_ == NULL) {
       AERROR << "Failed to get ConfigManager instance.";
@@ -254,7 +250,8 @@ class OfflineLidarObstaclePerception {
       // we save polygon here for debug
       int polygon_size = -static_cast<int>(object->polygon.size());
       fout << polygon_size /*negative polygon size*/ << " ";
-      for (auto& pt : object->polygon) {
+      for (size_t i = 0; i < object->polygon.size(); ++i) {
+        const auto& pt = object->polygon[i];
         fout << std::setprecision(8) << pt.x << " " << pt.y << " " << pt.z
              << " ";
       }
@@ -269,7 +266,8 @@ class OfflineLidarObstaclePerception {
       auto write_transformed_polygon = [&](const base::PolygonDType& poly) {
         Eigen::Vector3d point;
         fout << poly.size() << " ";
-        for (auto& pt : poly) {
+        for (size_t i = 0; i < poly.size(); ++i) {
+          const auto& pt = poly[i];
           point << pt.x, pt.y, z;
           point = world2lidar_pose * point;
           fout << std::setprecision(8) << point(0) << " " << point(1) << " "
