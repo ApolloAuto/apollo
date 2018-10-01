@@ -50,6 +50,7 @@ void Timer::Stop() {
   if (timer_id_ == 0) {
     return;
   }
+  ADEBUG << "stop timer " << timer_id_;
   tm_->Remove(timer_id_);
 }
 

@@ -8,14 +8,25 @@ int main(int argc, char *argv[]) {
 
   std::shared_ptr<Node> node(apollo::cybertron::CreateNode("parameter"));
   uint64_t count = 0;
-  auto timer = apollo::cybertron::Timer(1000,
+  auto timer1 = apollo::cybertron::Timer(10,
                                         [&count]() {
-                                          AINFO << "timer shot count: "
+                                          AINFO << "timer1 shot count: "
                                                 << count;
                                           count++;
                                         },
-                                        true);
-  timer.Start();
+                                        false);
+  auto timer2 = apollo::cybertron::Timer(10,
+                                        [&count]() {
+                                          AINFO << "timer2 shot count: "
+                                                << count;
+                                          count++;
+                                        },
+                                        false);
+  timer1.Start();
+  timer2.Start();
+  sleep(10);
+  timer1.Stop();
+  timer2.Stop();
   apollo::cybertron::WaitForShutdown();
   return 0;
 }
