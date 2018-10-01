@@ -45,9 +45,9 @@ void TransformPoint(const PointT &point_in, const Eigen::Affine3d &pose,
 // @brief transform a point cloud
 // old name: transform_point_cloud
 template <typename PointT>
-void TransformPointCloud(const base::AttributePointCloud<PointT> &cloud_in,
+void TransformPointCloud(const base::PointCloud<PointT> &cloud_in,
                          const Eigen::Affine3d &pose,
-                         base::AttributePointCloud<PointT> *cloud_out) {
+                         base::PointCloud<PointT> *cloud_out) {
   if (cloud_out->size() < cloud_in.size()) {
     cloud_out->resize(cloud_in.size());
   }
@@ -60,7 +60,7 @@ void TransformPointCloud(const base::AttributePointCloud<PointT> &cloud_in,
 // old name:transform_point_cloud
 template <typename PointT>
 void TransformPointCloud(const Eigen::Affine3d &pose,
-                         base::AttributePointCloud<PointT> *cloud_in_out) {
+                         base::PointCloud<PointT> *cloud_in_out) {
   TransformPointCloud<PointT>(*cloud_in_out, pose, cloud_in_out);
 }
 
