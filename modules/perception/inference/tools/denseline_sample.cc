@@ -14,9 +14,13 @@
  * limitations under the License.
  *****************************************************************************/
 #include <iostream>
-#include "/usr/include/opencv2/opencv.hpp"
-#include "/usr/local/include/gflags/gflags.h"
+
+#include "gflags/gflags.h"
+#include "opencv2/opencv.hpp"
+
+#include "cybertron/common/log.h"
 #include "modules/perception/inference/inference.h"
+#include "modules/perception/inference/inference_factory.h"
 #include "modules/perception/inference/tensorrt/batch_stream.h"
 #include "modules/perception/inference/tensorrt/entropy_calibrator.h"
 #include "modules/perception/inference/tensorrt/rt_net.h"
@@ -43,27 +47,27 @@ int main(int argc, char **argv) {
   google::ParseCommandLineFlags(&argc, &argv, true);
   std::vector<float> output_data_vec1;
 
-  int height = FLAGS_height;
-  int width = FLAGS_width;
-  int count = FLAGS_image_channel * width * height;
+  const int height = FLAGS_height;
+  const int width = FLAGS_width;
+  const int count = FLAGS_image_channel * width * height;
 
-  std::string proto_file = "./denseline_parser/deploy.prototxt";
-  std::string weight_file = "./denseline_parser/deploy.caffemodel";
-  std::string model_root = "./denseline_parser/";
+  const std::string proto_file = "./denseline_parser/deploy.prototxt";
+  const std::string weight_file = "./denseline_parser/deploy.caffemodel";
+  const std::string model_root = "./denseline_parser/";
 
   cudaDeviceProp prop;
   cudaGetDeviceProperties(&prop, 0);
-  LOG(INFO) << prop.name;
+  AINFO << prop.name;
 
   apollo::perception::inference::Inference *rt_net;
-  std::string input_blob_name = "data";
+  const std::string input_blob_name = "data";
   std::vector<std::string> inputs{input_blob_name};
 
   std::vector<std::string> outputs;
   apollo::perception::inference::load_data<std::string>(FLAGS_names_file,
                                                         &outputs);
   for (auto name : outputs) {
-    LOG(INFO) << "outputs name: " << name;
+    AINFO << "outputs name: " << name;
   }
 
   // std::shared_ptr<nvinfer1::Int8EntropyCalibrator> calibrator = nullptr;
@@ -74,11 +78,11 @@ int main(int argc, char **argv) {
     // apollo::perception::inference::BatchStream stream(2, 50, "./batches/");
     // calibrator
     //    .reset(new nvinfer1::Int8EntropyCalibrator(stream, 0, true, "./"));
-    LOG(INFO) << "int8";
+    AINFO << "int8";
     rt_net = new apollo::perception::inference::RTNet(
         proto_file, weight_file, outputs, inputs, calibrator);
   } else {
-    LOG(INFO) << "fp32";
+    AINFO << "fp32";
     rt_net = apollo::perception::inference::CreateInferenceByName(
         "RTNet", proto_file, weight_file, outputs, inputs);
   }
@@ -95,7 +99,7 @@ int main(int argc, char **argv) {
 
   for (auto image_file : image_lists) {
     cv::Mat img = cv::imread(FLAGS_image_root + image_file + FLAGS_image_ext);
-    LOG(INFO) << img.channels();
+    AINFO << img.channels();
     cv::Rect roi(0, FLAGS_offset_y, img.cols, img.rows - FLAGS_offset_y);
     cv::Mat img_roi = img(roi);
     img_roi.copyTo(img);
@@ -124,26 +128,23 @@ int main(int argc, char **argv) {
       std::vector<float> tmp_vec(blob->cpu_data(),
                                  blob->cpu_data() + blob->count());
       // if(output_name=="conv2" || output_name == "conv1") {
-      if (1) {
-        int cnt = 0;
-        LOG(INFO) << output_name << " " << blob->channels() << " "
-                  << blob->height() << " " << blob->width();
-        double sum = 0;
-        for (int i = 0; i < blob->count(); ++i) {
-          sum += blob->cpu_data()[i];
-          if (i < 100) {
-            LOG(INFO) << blob->cpu_data()[i];
-          }
+      AINFO << output_name << " " << blob->channels() << " "
+            << blob->height() << " " << blob->width();
+      double sum = 0;
+      for (int i = 0; i < blob->count(); ++i) {
+        sum += blob->cpu_data()[i];
+        if (i < 100) {
+          AINFO << blob->cpu_data()[i];
         }
-        LOG(INFO) << output_name << ", sum : " << std::endl;
       }
+      AINFO << output_name << ", sum : " << std::endl;
+      // end of if
+
       output_data_vec.insert(output_data_vec.end(), tmp_vec.begin(),
                              tmp_vec.end());
     }
   }
   apollo::perception::inference::write_result(FLAGS_res_dir, output_data_vec);
-
-  LOG(INFO) << "Hello, World!";
   delete rt_net;
   // rt_net has deletle calibrator?
   // delete calibrator;

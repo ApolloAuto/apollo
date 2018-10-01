@@ -14,9 +14,12 @@
  * limitations under the License.
  *****************************************************************************/
 #include <iostream>
-#include "/usr/include/opencv2/opencv.hpp"
-#include "/usr/local/include/gflags/gflags.h"
+
+#include "gflags/gflags.h"
+#include "opencv2/opencv.hpp"
+
 #include "modules/perception/inference/inference.h"
+#include "modules/perception/inference/inference_factory.h"
 #include "modules/perception/inference/tensorrt/batch_stream.h"
 #include "modules/perception/inference/tensorrt/entropy_calibrator.h"
 #include "modules/perception/inference/tensorrt/rt_net.h"
@@ -29,12 +32,13 @@ DEFINE_string(test_list, "image_list.txt", "path of image list");
 DEFINE_string(image_root, "./images/", "path of image dir");
 DEFINE_string(image_ext, ".jpg", "path of image ext");
 DEFINE_string(res_dir, "./result.dat", "path of result");
+
 int main(int argc, char **argv) {
   google::ParseCommandLineFlags(&argc, &argv, true);
 
-  std::string proto_file = "./yolo/caffe.pt";
-  std::string weight_file = "./yolo/caffe.caffemodel";
-  std::string model_root = "./yolo";
+  const std::string proto_file = "./yolo/caffe.pt";
+  const std::string weight_file = "./yolo/caffe.caffemodel";
+  const std::string model_root = "./yolo";
 
   apollo::perception::inference::Inference *rt_net;
   std::vector<std::string> outputs{"loc_pred", "obj_pred", "cls_pred",
@@ -55,9 +59,9 @@ int main(int argc, char **argv) {
     rt_net = apollo::perception::inference::CreateInferenceByName(
         "RTNet", proto_file, weight_file, outputs, inputs);
   }
-  int height = 576;
-  int width = 1440;
-  int offset_y = 312;
+  const int height = 576;
+  const int width = 1440;
+  const int offset_y = 312;
   std::vector<int> shape = {1, height, width, 3};
   std::map<std::string, std::vector<int>> shape_map{{"data", shape}};
   rt_net->Init(shape_map);
@@ -74,7 +78,7 @@ int main(int argc, char **argv) {
     img_roi.copyTo(img);
     cv::resize(img, img, cv::Size(width, height));
     auto input = rt_net->get_blob("data")->mutable_cpu_data();
-    int count = 3 * width * height;
+    const int count = 3 * width * height;
     for (int i = 0; i < count; i++) {
       input[i] = img.data[i];
     }
@@ -84,23 +88,13 @@ int main(int argc, char **argv) {
     for (auto output_name : outputs) {
       std::vector<int> shape;
       auto blob = rt_net->get_blob(output_name);
-      int size = blob->count();
+      const int size = blob->count();
       std::vector<float> tmp_vec(blob->cpu_data(), blob->cpu_data() + size);
-#if 0
-      std::cout << output_name << " " << std::endl;
-      for (int i = 0; i < 500; i++) {
-        std::cout << tmp_vec[i] << " ";
-      }
-      std::cout << std::endl;
-#endif
       output_data_vec.insert(output_data_vec.end(), tmp_vec.begin(),
                              tmp_vec.end());
     }
   }
   apollo::perception::inference::write_result(FLAGS_res_dir, output_data_vec);
-
-  std::cout << std::endl;
-  std::cout << "Hello, World!" << std::endl;
   delete rt_net;
   return 0;
 }
