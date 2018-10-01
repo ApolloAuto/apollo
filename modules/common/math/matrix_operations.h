@@ -24,6 +24,8 @@
 
 #include <cmath>
 #include <utility>
+#include <vector>
+
 #include "Eigen/Dense"
 #include "Eigen/SVD"
 
@@ -134,6 +136,26 @@ bool ContinuousToDiscrete(const Eigen::MatrixXd &m_a,
                           const Eigen::MatrixXd &m_d, const double ts,
                           Eigen::MatrixXd *ptr_a_d, Eigen::MatrixXd *ptr_b_d,
                           Eigen::MatrixXd *ptr_c_d, Eigen::MatrixXd *ptr_d_d);
+
+template <typename T, int M, int N, typename D>
+void DenseToCSCMatrix(const Eigen::Matrix<T, M, N> &dense_matrix,
+                      std::vector<T> *data, std::vector<D> *indices,
+                      std::vector<D> *indptr) {
+  constexpr double epsilon = 1e-9;
+  int data_count = 0;
+  for (int c = 0; c < dense_matrix.cols(); ++c) {
+    indptr->emplace_back(data_count);
+    for (int r = 0; r < dense_matrix.rows(); ++r) {
+      if (std::fabs(dense_matrix(r, c)) < epsilon) {
+        continue;
+      }
+      data->emplace_back(dense_matrix(r, c));
+      ++data_count;
+      indices->emplace_back(r);
+    }
+  }
+  indptr->emplace_back(data_count);
+}
 
 }  // namespace math
 }  // namespace common

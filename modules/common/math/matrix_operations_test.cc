@@ -242,6 +242,91 @@ TEST(ContinuousToDiscreteTest, c2d_dynamic_size) {
   EXPECT_FLOAT_EQ(prt_d_d(0, 0), 2.0050251);
 }
 
+TEST(DENSE_TO_CSC_MATRIX, dense_to_csc_matrix_test) {
+  {
+    std::vector<double> data;
+    std::vector<int> indices;
+    std::vector<int> indptr;
+    Eigen::MatrixXd dense_matrix(3, 3);
+    dense_matrix << 1.2, 0, 2.2, 0, 0, 3.1, 4.8, 5.4, 6.01;
+    DenseToCSCMatrix(dense_matrix, &data, &indices, &indptr);
+
+    std::vector<double> data_golden = {1.2, 4.8, 5.4, 2.2, 3.1, 6.01};
+    std::vector<int> indices_golden = {0, 2, 2, 0, 1, 2};
+    std::vector<int> indptr_golden = {0, 2, 3, 6};
+
+    EXPECT_EQ(data.size(), data_golden.size());
+    EXPECT_EQ(indices.size(), indices_golden.size());
+    EXPECT_EQ(indptr.size(), indptr_golden.size());
+
+    for (size_t i = 0; i < data.size(); ++i) {
+      EXPECT_DOUBLE_EQ(data[i], data_golden[i]);
+    }
+    for (size_t i = 0; i < indices.size(); ++i) {
+      EXPECT_EQ(indices[i], indices_golden[i]);
+    }
+    for (size_t i = 0; i < indptr.size(); ++i) {
+      EXPECT_EQ(indptr[i], indptr_golden[i]);
+    }
+  }
+
+  {
+    std::vector<double> data;
+    std::vector<int> indices;
+    std::vector<int> indptr;
+    Eigen::MatrixXd dense_matrix(2, 2);
+    dense_matrix << 4.0, 1.0, 1.0, 2.0;
+    DenseToCSCMatrix(dense_matrix, &data, &indices, &indptr);
+
+    std::vector<double> data_golden = {4.0, 1.0, 1.0, 2.0};
+    std::vector<int> indices_golden = {0, 1, 0, 1};
+    std::vector<int> indptr_golden = {0, 2, 4};
+
+    EXPECT_EQ(data.size(), data_golden.size());
+    EXPECT_EQ(indices.size(), indices_golden.size());
+    EXPECT_EQ(indptr.size(), indptr_golden.size());
+
+    for (size_t i = 0; i < data.size(); ++i) {
+      EXPECT_DOUBLE_EQ(data[i], data_golden[i]);
+    }
+    for (size_t i = 0; i < indices.size(); ++i) {
+      EXPECT_EQ(indices[i], indices_golden[i]);
+    }
+    for (size_t i = 0; i < indptr.size(); ++i) {
+      EXPECT_EQ(indptr[i], indptr_golden[i]);
+    }
+  }
+  {
+    std::vector<double> data;
+    std::vector<int> indices;
+    std::vector<int> indptr;
+    Eigen::MatrixXd dense_matrix(4, 6);
+    dense_matrix << 11, 0, 0, 14, 0, 16, 0, 22, 0, 0, 25, 26, 0, 0, 33, 34, 0,
+        36, 41, 0, 43, 44, 0, 46;
+
+    DenseToCSCMatrix(dense_matrix, &data, &indices, &indptr);
+
+    std::vector<double> data_golden = {11.0, 41.0, 22.0, 33.0, 43.0, 14.0, 34.0,
+                                       44.0, 25.0, 16.0, 26.0, 36.0, 46.0};
+    std::vector<int> indices_golden = {0, 3, 1, 2, 3, 0, 2, 3, 1, 0, 1, 2, 3};
+    std::vector<int> indptr_golden = {0, 2, 3, 5, 8, 9, 13};
+
+    EXPECT_EQ(data.size(), data_golden.size());
+    EXPECT_EQ(indices.size(), indices_golden.size());
+    EXPECT_EQ(indptr.size(), indptr_golden.size());
+
+    for (size_t i = 0; i < data.size(); ++i) {
+      EXPECT_DOUBLE_EQ(data[i], data_golden[i]);
+    }
+    for (size_t i = 0; i < indices.size(); ++i) {
+      EXPECT_EQ(indices[i], indices_golden[i]);
+    }
+    for (size_t i = 0; i < indptr.size(); ++i) {
+      EXPECT_EQ(indptr[i], indptr_golden[i]) << "i = " << i;
+    }
+  }
+}
+
 }  // namespace math
 }  // namespace common
 }  // namespace apollo
