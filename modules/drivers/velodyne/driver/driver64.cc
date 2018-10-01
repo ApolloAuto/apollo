@@ -59,9 +59,10 @@ bool Velodyne64Driver::Poll(std::shared_ptr<VelodyneScan> scan) {
   ADEBUG << "Publishing a full Velodyne scan.";
   scan->mutable_header()->set_timestamp_sec(cybertron::Time().Now().ToSecond());
   scan->mutable_header()->set_frame_id(config_.frame_id());
+  scan->set_model(config_.model());
+  scan->set_mode(config_.mode());
   scan->set_basetime(basetime_);
 
-  // output_.publish(scan);
   return true;
 }
 

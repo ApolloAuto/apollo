@@ -112,6 +112,8 @@ bool VelodyneDriver::Poll(std::shared_ptr<VelodyneScan> scan) {
   ADEBUG << "Publishing a full Velodyne scan.";
   scan->mutable_header()->set_timestamp_sec(cybertron::Time().Now().ToSecond());
   scan->mutable_header()->set_frame_id(config_.frame_id());
+  scan->set_model(config_.model());
+  scan->set_mode(config_.mode());
   // we use first packet gps time update gps base hour
   // in cloud nodelet, will update base time packet by packet
   uint32_t current_secs = *(reinterpret_cast<uint32_t*>(
