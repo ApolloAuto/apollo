@@ -51,6 +51,10 @@ class SceneManager {
   bool Reset(
       const SceneManagerInitOptions& options = SceneManagerInitOptions());
 
+  int GetServiceNum() const {
+    return services_.size();
+  }
+
  protected:
   SceneManager() = default;
   // @brief: initialize scene manager
