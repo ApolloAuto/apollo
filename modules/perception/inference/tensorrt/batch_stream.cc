@@ -29,7 +29,7 @@ namespace inference {
 BatchStream::BatchStream(int batchSize, int maxBatches, std::string dataPath)
     : mBatchSize(batchSize), mMaxBatches(maxBatches), mPath(dataPath) {
   FILE *file = fopen((mPath + "Batch0").c_str(), "rb");
-  if (file != NULL) {
+  if (file != nullptr) {
     int d[4];
     int fs = fread(d, sizeof(int), 4, file);
     CHECK_EQ(fs, 4);
@@ -94,7 +94,7 @@ void BatchStream::skip(int skipCount) {
 bool BatchStream::update() {
   std::string inputFileName = mPath + "Batch" + std::to_string(mFileCount++);
   FILE *file = fopen(inputFileName.c_str(), "rb");
-  if (file == NULL) {
+  if (file == nullptr) {
     return false;
   }
 

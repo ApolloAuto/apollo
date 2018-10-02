@@ -24,7 +24,7 @@ namespace lib {
 
 class Mutex {
  public:
-  Mutex() { pthread_mutex_init(&mu_, NULL); }
+  Mutex() { pthread_mutex_init(&mu_, nullptr); }
 
   ~Mutex() { pthread_mutex_destroy(&mu_); }
 
@@ -57,7 +57,7 @@ class MutexLock {
 // Wrapper for pthread_cond_t
 class CondVar {
  public:
-  CondVar() { pthread_cond_init(&cv_, NULL); }
+  CondVar() { pthread_cond_init(&cv_, nullptr); }
   ~CondVar() { pthread_cond_destroy(&cv_); }
 
   void Wait(Mutex *mu) { pthread_cond_wait(&cv_, &mu->mu_); }
@@ -112,7 +112,7 @@ class BlockingCounter {
 
 class RwMutex {
  public:
-  RwMutex() { pthread_rwlock_init(&mu_, NULL); }
+  RwMutex() { pthread_rwlock_init(&mu_, nullptr); }
   ~RwMutex() { pthread_rwlock_destroy(&mu_); }
 
   inline void ReaderLock() { pthread_rwlock_rdlock(&mu_); }

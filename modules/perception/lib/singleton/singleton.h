@@ -56,7 +56,7 @@ template <typename T>
 pthread_once_t Singleton<T>::p_once_ = PTHREAD_ONCE_INIT;
 
 template <typename T>
-T *Singleton<T>::instance_ = NULL;
+T *Singleton<T>::instance_ = nullptr;
 
 }  // namespace lib
 }  // namespace perception

@@ -70,9 +70,9 @@ void ThreadPool::Add(const vector<Closure *> &closures) {
 
 void ThreadPoolWorker::Run() {
   while (true) {
-    Closure *closure = NULL;
+    Closure *closure = nullptr;
     thread_pool_->task_queue_.Pop(&closure);
-    if (closure == NULL) {
+    if (closure == nullptr) {
       break;
     }
 

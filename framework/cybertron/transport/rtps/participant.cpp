@@ -48,7 +48,7 @@ void Participant::CreateFastRtpsParticipant(
     eprosima::fastrtps::ParticipantListener* listener) {
   uint32_t domain_id = 80;
   const char* val = ::getenv("CYBER_DOMAIN_ID");
-  if (val != NULL) {
+  if (val != nullptr) {
     try {
       domain_id = std::stoi(val);
     } catch (const std::exception& e) {

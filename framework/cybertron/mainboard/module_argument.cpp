@@ -63,10 +63,10 @@ void ModuleArgument::GetOptions(const int argc, char* const argv[]) {
   int long_index = 0;
   const std::string short_opts = "h::d:p:";
   static const struct option long_opts[] = {
-      {"help", no_argument, NULL, 'h'},
-      {"dag_conf", required_argument, NULL, 'd'},
-      {"process_name", required_argument, NULL, 'p'},
-      {NULL, no_argument, NULL, 0}};
+      {"help", no_argument, nullptr, 'h'},
+      {"dag_conf", required_argument, nullptr, 'd'},
+      {"process_name", required_argument, nullptr, 'p'},
+      {NULL, no_argument, nullptr, 0}};
 
   // log command for info
   std::string cmd("");

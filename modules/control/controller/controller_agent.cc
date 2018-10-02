@@ -81,8 +81,8 @@ Status ControllerAgent::Init(const ControlConf *control_conf) {
   RegisterControllers(control_conf);
   CHECK(InitializeConf(control_conf).ok()) << "Fail to initialize config.";
   for (auto &controller : controller_list_) {
-    if (controller == NULL || !controller->Init(control_conf_).ok()) {
-      if (controller != NULL) {
+    if (controller == nullptr || !controller->Init(control_conf_).ok()) {
+      if (controller != nullptr) {
         AERROR << "Controller <" << controller->Name() << "> init failed!";
         return Status(ErrorCode::CONTROL_INIT_ERROR,
                       "Failed to init Controller:" + controller->Name());

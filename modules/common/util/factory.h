@@ -84,7 +84,7 @@ class Factory {
 
   /**
    * @brief Creates and transfers membership of an object of type matching id.
-   * Need to register id before CreateObject is called. May return NULL
+   * Need to register id before CreateObject is called. May return nullptr
    * silently.
    * @param id The identifier of the class we which to instantiate
    * @param args the object construction arguments

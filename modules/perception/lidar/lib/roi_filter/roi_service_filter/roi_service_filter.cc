@@ -35,7 +35,7 @@ bool ROIServiceFilter::Init(const ROIFilterInitOptions& options) {
 
 bool ROIServiceFilter::Filter(const ROIFilterOptions& options,
                               LidarFrame* frame) {
-  if (frame == NULL || frame->world_cloud == nullptr) {
+  if (frame == nullptr || frame->world_cloud == nullptr) {
     AERROR << "Frame is nullptr.";
     return false;
   }

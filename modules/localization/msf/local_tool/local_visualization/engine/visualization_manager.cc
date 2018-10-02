@@ -32,7 +32,7 @@ namespace msf {
 // ===================MessageBuffer=======================
 template <class MessageType>
 MessageBuffer<MessageType>::MessageBuffer(int capacity) : capacity_(capacity) {
-  pthread_mutex_init(&buffer_mutex_, NULL);
+  pthread_mutex_init(&buffer_mutex_, nullptr);
 }
 
 template <class MessageType>

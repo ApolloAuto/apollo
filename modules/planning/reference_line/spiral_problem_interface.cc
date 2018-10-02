@@ -435,7 +435,7 @@ bool SpiralProblemInterface::eval_jac_g(int n, const double* x, bool new_x,
   CHECK_EQ(std::size_t(n), num_of_variables_);
   CHECK_EQ(std::size_t(m), num_of_constraints_);
 
-  if (values == NULL) {
+  if (values == nullptr) {
     std::size_t nz_index = 0;
 
     std::size_t variable_offset = num_of_points_ * 5;
@@ -676,7 +676,7 @@ bool SpiralProblemInterface::eval_h(int n, const double* x, bool new_x,
                                     const double* lambda, bool new_lambda,
                                     int nele_hess, int* iRow, int* jCol,
                                     double* values) {
-  if (values == NULL) {
+  if (values == nullptr) {
     std::size_t index = 0;
     for (std::size_t i = 0; i + 1 < num_of_points_; ++i) {
       std::size_t variable_index = i * 5;

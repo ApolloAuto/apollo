@@ -29,13 +29,13 @@ PCDExporter::PCDExporter(const std::string &pcd_folder) {
   pcd_folder_ = pcd_folder;
   std::string stamp_file = pcd_folder_ + "/pcd_timestamp.txt";
 
-  if ((stamp_file_handle_ = fopen(stamp_file.c_str(), "a")) == NULL) {
+  if ((stamp_file_handle_ = fopen(stamp_file.c_str(), "a")) == nullptr) {
     AERROR << "Cannot open stamp file!";
   }
 }
 
 PCDExporter::~PCDExporter() {
-  if (stamp_file_handle_ != NULL) {
+  if (stamp_file_handle_ != nullptr) {
     fclose(stamp_file_handle_);
   }
 }

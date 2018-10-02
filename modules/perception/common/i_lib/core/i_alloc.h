@@ -35,12 +35,12 @@ Alignment power->alignment offset in bytes:
 namespace idl {
 template <typename T>
 inline T *i_alloc(int memory_size) {
-  T *mem = NULL;
+  T *mem = nullptr;
   if (!memory_size) {
     return mem;
   }
   mem = new (std::nothrow) T[memory_size];
-  if (mem == NULL) {
+  if (mem == nullptr) {
     return (NULL);
   }
   return (mem);
@@ -48,9 +48,9 @@ inline T *i_alloc(int memory_size) {
 
 template <typename T>
 inline void i_free(T *&mem) {
-  if (mem != NULL) {
+  if (mem != nullptr) {
     delete[] mem;
-    mem = NULL;
+    mem = nullptr;
   }
 }
 
@@ -59,11 +59,11 @@ template <typename T>
 inline T **i_alloc2(int m, int n) {
   T *mem, **head;
   mem = new (std::nothrow) T[m * n];
-  if (mem == NULL) {
+  if (mem == nullptr) {
     return (NULL);
   }
   head = new (std::nothrow) T *[m];
-  if (head == NULL) {
+  if (head == nullptr) {
     delete[] mem;
     return (NULL);
   }
@@ -74,10 +74,10 @@ inline T **i_alloc2(int m, int n) {
 /*Free memory allocated with function i_alloc2*/
 template <typename T>
 inline void i_free2(T **&A) {
-  if (A != NULL) {
+  if (A != nullptr) {
     delete[] A[0];
     delete[] A;
-    A = NULL;
+    A = nullptr;
   }
 }
 
@@ -87,17 +87,17 @@ inline T ***i_alloc3(int l, int m, int n) {
   T *mem, ***head;
   int i, j;
   mem = new (std::nothrow) T[l * m * n];
-  if (mem == NULL) {
+  if (mem == nullptr) {
     return (NULL);
   }
   head = new (std::nothrow) T **[l];
-  if (head == NULL) {
+  if (head == nullptr) {
     delete[] mem;
     return (NULL);
   }
   for (i = 0; i < l; i++) {
     head[i] = new (std::nothrow) T *[m];
-    if (head[i] == NULL) {
+    if (head[i] == nullptr) {
       for (j = 0; j < i; j++) delete[] head[j];
       delete[] head;
       delete[] mem;
@@ -110,11 +110,11 @@ inline T ***i_alloc3(int l, int m, int n) {
 
 template <class T>
 inline void i_free3(T ***&A, int l) {
-  if (A != NULL) {
+  if (A != nullptr) {
     delete[](A[0][0]);
     for (int i = 0; i < l; i++) delete[] A[i];
     delete[] A;
-    A = NULL;
+    A = nullptr;
   }
 }
 
@@ -145,7 +145,7 @@ template <typename T>
 inline void i_free_aligned(T *&mem) {
   if (mem) {
     delete[]((char **)mem)[-1];
-    mem = NULL;
+    mem = nullptr;
   }
 }
 

@@ -100,17 +100,17 @@ bool LRUCache<Key, Element>::Get(const Key &key, Element **value) {
 
 template <class Key, class Element>
 Element *LRUCache<Key, Element>::Put(const Key &key, Element *value) {
-  if (value == NULL) {
-    std::cout << "LRUCache Warning: put a NULL" << std::endl;
-    return NULL;
+  if (value == nullptr) {
+    std::cout << "LRUCache Warning: put a nullptr" << std::endl;
+    return nullptr;
   }
-  Element *node_remove = NULL;
+  Element *node_remove = nullptr;
   MapIterator found_iter = map_.find(key);
   if (found_iter != map_.end()) {
     // move the corresponding key to list front
     list_.splice(list_.begin(), list_, found_iter->second);
     node_remove = found_iter->second->second;
-    if (node_remove == value) return NULL;
+    if (node_remove == value) return nullptr;
     if (Destroy(&node_remove)) {
       found_iter->second->second = value;
     } else {
@@ -152,7 +152,7 @@ bool LRUCache<Key, Element>::IsExist(const Key &key) {
 
 template <class Key, class Element>
 Element *LRUCache<Key, Element>::Remove(const Key &key) {
-  Element *node_remove = NULL;
+  Element *node_remove = nullptr;
   MapIterator found_iter = map_.find(key);
 
   if (found_iter == map_.end()) {
@@ -171,7 +171,7 @@ Element *LRUCache<Key, Element>::Remove(const Key &key) {
 template <class Key, class Element>
 Element *LRUCache<Key, Element>::ClearOne() {
   // std::cout << "clear_one start" << std::endl;
-  Element *node_remove = NULL;
+  Element *node_remove = nullptr;
   ListReverseIterator ritr = list_.rbegin();
   while (ritr != list_.rend()) {
     if (Destroy(&(ritr->second))) {

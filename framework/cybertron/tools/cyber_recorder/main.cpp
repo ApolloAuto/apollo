@@ -148,18 +148,18 @@ int main(int argc, char** argv) {
   int long_index = 0;
   const std::string short_opts = "f:c:k:o:alr:b:e:s:d:h";
   static const struct option long_opts[] = {
-      {"files", required_argument, NULL, 'f'},
-      {"white-channel", required_argument, NULL, 'c'},
-      {"black-channel", required_argument, NULL, 'k'},
-      {"output", required_argument, NULL, 'o'},
-      {"all", no_argument, NULL, 'a'},
-      {"loop", no_argument, NULL, 'l'},
-      {"rate", required_argument, NULL, 'r'},
-      {"begin", required_argument, NULL, 'b'},
-      {"end", required_argument, NULL, 'e'},
-      {"start", required_argument, NULL, 's'},
-      {"delay", required_argument, NULL, 'd'},
-      {"help", no_argument, NULL, 'h'}};
+      {"files", required_argument, nullptr, 'f'},
+      {"white-channel", required_argument, nullptr, 'c'},
+      {"black-channel", required_argument, nullptr, 'k'},
+      {"output", required_argument, nullptr, 'o'},
+      {"all", no_argument, nullptr, 'a'},
+      {"loop", no_argument, nullptr, 'l'},
+      {"rate", required_argument, nullptr, 'r'},
+      {"begin", required_argument, nullptr, 'b'},
+      {"end", required_argument, nullptr, 'e'},
+      {"start", required_argument, nullptr, 's'},
+      {"delay", required_argument, nullptr, 'd'},
+      {"help", no_argument, nullptr, 'h'}};
 
   std::vector<std::string> opt_file_vec;
   std::vector<std::string> opt_output_vec;

@@ -26,12 +26,12 @@ CoordinateConvertTool::CoordinateConvertTool()
 CoordinateConvertTool::~CoordinateConvertTool() {
   if (pj_from_) {
     pj_free(pj_from_);
-    pj_from_ = NULL;
+    pj_from_ = nullptr;
   }
 
   if (pj_to_) {
     pj_free(pj_to_);
-    pj_to_ = NULL;
+    pj_to_ = nullptr;
   }
 }
 
@@ -46,12 +46,12 @@ Status CoordinateConvertTool::SetConvertParam(const std::string &source_param,
   dst_convert_param_ = dst_param;
   if (pj_from_) {
       pj_free(pj_from_);
-      pj_from_ = NULL;
+      pj_from_ = nullptr;
   }
 
   if (pj_to_) {
     pj_free(pj_to_);
-    pj_to_ = NULL;
+    pj_to_ = nullptr;
   }
 
   if (!(pj_from_ = pj_init_plus(source_convert_param_.c_str()))) {
@@ -62,7 +62,7 @@ Status CoordinateConvertTool::SetConvertParam(const std::string &source_param,
   if (!(pj_to_ = pj_init_plus(dst_convert_param_.c_str()))) {
     std::string err_msg = "Fail to pj_init_plus " + dst_convert_param_;
     pj_free(pj_from_);
-    pj_from_ = NULL;
+    pj_from_ = nullptr;
     return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
   }
 

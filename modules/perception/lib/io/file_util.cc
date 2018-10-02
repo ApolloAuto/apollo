@@ -75,12 +75,12 @@ bool FileUtil::DeleteFile(const string &filename) {
 
   // directory，remove iteratively
   DIR *dir = opendir(filename.c_str());
-  if (dir == NULL) {
+  if (dir == nullptr) {
     AWARN << "failed to opendir: " << filename;
     return false;
   }
-  dirent *dir_info = NULL;
-  while ((dir_info = readdir(dir)) != NULL) {
+  dirent *dir_info = nullptr;
+  while ((dir_info = readdir(dir)) != nullptr) {
     if (strcmp(dir_info->d_name, ".") == 0 ||
         strcmp(dir_info->d_name, "..") == 0) {
       continue;
@@ -166,7 +166,7 @@ bool FileUtil::CreateDir(const string &dir) {
 }
 
 bool FileUtil::GetFileContent(const string &path, string *content) {
-  if (content == NULL) {
+  if (content == nullptr) {
     return false;
   }
 

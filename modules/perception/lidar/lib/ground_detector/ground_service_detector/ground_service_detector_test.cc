@@ -96,7 +96,7 @@ TEST_F(LidarLibGroundServiceDetectorTest,
 
   EXPECT_TRUE(SceneManager::Instance().Init());
   EXPECT_TRUE(ground_service_detector.Init(GroundDetectorInitOptions()));
-  EXPECT_FALSE(ground_service_detector.Detect(GroundDetectorOptions(), NULL));
+  EXPECT_FALSE(ground_service_detector.Detect(GroundDetectorOptions(), nullptr));
   LidarFrame frame;
   EXPECT_FALSE(ground_service_detector.Detect(GroundDetectorOptions(), &frame));
   frame.world_cloud = base::PointDCloudPool::Instance().Get();

@@ -37,14 +37,14 @@ class Any {
       : content_(new Holder<ValueType>(value)) {}
 
   Any(const Any &other)
-      : content_(other.content_ ? other.content_->Clone() : NULL) {}
+      : content_(other.content_ ? other.content_->Clone() : nullptr) {}
 
   ~Any() { delete content_; }
 
   template <typename ValueType>
   ValueType *AnyCast() {
     return content_ ? &(static_cast<Holder<ValueType> *>(content_)->held_)
-                    : NULL;  // NOLINT
+                    : nullptr;  // NOLINT
   }
 
  private:
@@ -105,7 +105,7 @@ bool GetRegisteredClasses(
           AERROR << "Instance:" << c.first;                           \
         }                                                             \
         AERROR << "Get instance " << name << " failed.";              \
-        return NULL;                                                  \
+        return nullptr;                                                  \
       }                                                               \
       Any object = iter->second->NewInstance();                       \
       return *(object.AnyCast<base_class *>());                       \

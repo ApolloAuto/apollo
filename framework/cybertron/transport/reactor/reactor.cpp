@@ -154,7 +154,7 @@ void Reactor::ThreadFunc() {
   /* block all signals in this thread */
   sigset_t signal_set;
   sigfillset(&signal_set);
-  pthread_sigmask(SIG_BLOCK, &signal_set, NULL);
+  pthread_sigmask(SIG_BLOCK, &signal_set, nullptr);
 
   while (!shutdown_) {
     Poll(100);

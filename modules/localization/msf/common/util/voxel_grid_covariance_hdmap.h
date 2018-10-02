@@ -189,7 +189,7 @@ class VoxelGridCovariance : public pcl::VoxelGrid<PointT> {
       LeafConstPtr ret(&(leaf_iter->second));
       return ret;
     } else {
-      return NULL;
+      return nullptr;
     }
   }
 
@@ -210,7 +210,7 @@ class VoxelGridCovariance : public pcl::VoxelGrid<PointT> {
       LeafConstPtr ret(&(leaf_iter->second));
       return ret;
     } else {
-      return NULL;
+      return nullptr;
     }
   }
 
@@ -234,7 +234,7 @@ class VoxelGridCovariance : public pcl::VoxelGrid<PointT> {
       LeafConstPtr ret(&(leaf_iter->second));
       return ret;
     } else {
-      return NULL;
+      return nullptr;
     }
   }
 

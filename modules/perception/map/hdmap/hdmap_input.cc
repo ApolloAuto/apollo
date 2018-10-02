@@ -78,7 +78,7 @@ bool HDMapInput::InitHDMap() {
   lib::Singleton<ConfigManager>::get_instance();
   CHECK_NOTNULL(config_manager);
   std::string model_name = "HDMapInput";
-  const lib::ModelConfig* model_config = NULL;
+  const lib::ModelConfig* model_config = nullptr;
   if (!config_manager->GetModelConfig(model_name, &model_config)) {
     AERROR << "not found model: " << model_name;
     return false;

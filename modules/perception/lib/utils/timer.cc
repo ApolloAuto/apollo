@@ -27,14 +27,14 @@ using std::string;
 
 void Timer::Start() {
   struct timeval tv;
-  gettimeofday(&tv, NULL);
+  gettimeofday(&tv, nullptr);
 
   start_time_ = tv.tv_sec * 1000 + tv.tv_usec / 1000;
 }
 
 uint64_t Timer::End(const string &msg) {
   struct timeval tv;
-  gettimeofday(&tv, NULL);
+  gettimeofday(&tv, nullptr);
   end_time_ = tv.tv_sec * 1000 + tv.tv_usec / 1000;
   uint64_t elapsed_time = end_time_ - start_time_;
 

@@ -240,7 +240,7 @@ bool LateralTrajectoryOptimizerInterface::eval_jac_g(int n, const double* x,
   auto offset_prime = num_of_points_;
   auto offset_pprime = 2 * num_of_points_;
 
-  if (values == NULL) {
+  if (values == nullptr) {
     std::size_t nz_index = 0;
     std::size_t constraint_index = 0;
 

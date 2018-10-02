@@ -76,7 +76,7 @@ inline void SyncedMemory::to_cpu() {
       break;
     case HEAD_AT_GPU:
 #ifndef PERCEPTION_CPU_ONLY
-      if (cpu_ptr_ == NULL) {
+      if (cpu_ptr_ == nullptr) {
         PerceptionMallocHost(&cpu_ptr_, size_, cpu_malloc_use_cuda_);
         own_cpu_data_ = true;
       }
@@ -103,7 +103,7 @@ inline void SyncedMemory::to_gpu() {
       own_gpu_data_ = true;
       break;
     case HEAD_AT_CPU:
-      if (gpu_ptr_ == NULL) {
+      if (gpu_ptr_ == nullptr) {
         BASE_CUDA_CHECK(cudaMalloc(&gpu_ptr_, size_));
         own_gpu_data_ = true;
       }
@@ -143,7 +143,7 @@ const void* SyncedMemory::gpu_data() {
   return (const void*)gpu_ptr_;
 #else
   NO_GPU;
-  return NULL;
+  return nullptr;
 #endif
 }
 
@@ -177,7 +177,7 @@ void* SyncedMemory::mutable_gpu_data() {
   return gpu_ptr_;
 #else
   NO_GPU;
-  return NULL;
+  return nullptr;
 #endif
 }
 
@@ -185,7 +185,7 @@ void* SyncedMemory::mutable_gpu_data() {
 void SyncedMemory::async_gpu_push(const cudaStream_t& stream) {
   check_device();
   CHECK_EQ(head_, HEAD_AT_CPU);
-  if (gpu_ptr_ == NULL) {
+  if (gpu_ptr_ == nullptr) {
     BASE_CUDA_CHECK(cudaMalloc(&gpu_ptr_, size_));
     own_gpu_data_ = true;
   }

@@ -72,7 +72,7 @@ void RTNet::addConvLayer(const LayerParameter &layer_param,
   ConvolutionParameter conv = layer_param.convolution_param();
   ConvParam param;
   CHECK(ParserConvParam(conv, &param));
-  nvinfer1::IConvolutionLayer *convLayer = NULL;
+  nvinfer1::IConvolutionLayer *convLayer = nullptr;
   int size = conv.num_output() * param.kernel_w * param.kernel_h *
              inputs[0]->getDimensions().d[0];
 
@@ -125,7 +125,7 @@ void RTNet::addDeconvLayer(const LayerParameter &layer_param,
   ConvolutionParameter conv = layer_param.convolution_param();
   ConvParam param;
   ParserConvParam(conv, &param);
-  nvinfer1::IDeconvolutionLayer *deconvLayer = NULL;
+  nvinfer1::IDeconvolutionLayer *deconvLayer = nullptr;
   if ((*weight_map)[layer_param.name().c_str()].size() == 2) {
     deconvLayer =
         net->addDeconvolution(*inputs[0], conv.num_output(),
