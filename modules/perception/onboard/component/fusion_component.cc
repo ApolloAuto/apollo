@@ -37,7 +37,8 @@ std::mutex FusionComponent::s_mutex_;
 bool FusionComponent::Init() {
   // init algorithm plugin
   CHECK(InitAlgorithmPlugin() == true) << "Failed to init algorithm plugin.";
-  writer_ = node_->CreateWriter<PerceptionObstacles>("/perception/obstacles");
+  writer_ =
+    node_->CreateWriter<PerceptionObstacles>("/apollo/perception/obstacles");
   inner_writer_ = node_->CreateWriter<SensorFrameMessage>(
       "/perception/inner/PrefusedObjects");
   return true;
@@ -60,12 +61,12 @@ bool FusionComponent::Proc(const std::shared_ptr<SensorFrameMessage>& message) {
       AINFO << "Fusion receive non " << FLAGS_obs_fusion_main_sensor
             << " message, skip send.";
     } else {
-      // Send("/perception/obstacles", out_message);
+      // Send("/apollo/perception/obstacles", out_message);
       writer_->Write(out_message);
       AINFO << "Send fusion processing output message.";
       // send msg for visualization
       if (FLAGS_obs_enable_visualization) {
-        // Send("/perception/inner/PrefusedObjects", viz_message);
+        // Send("/apollo/perception/inner/PrefusedObjects", viz_message);
         writer_->Write(out_message);
       }
     }
