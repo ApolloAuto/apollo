@@ -151,9 +151,6 @@ function build() {
   info "Building framework ..."
   cd /apollo/framework
   bash cybertron.sh build_fast
-  if [ $? -ne 0 ]; then
-    fail 'Build framework failed!'
-  fi
   cd /apollo
   info "Building modules ..."
   source framework/install/setup.bash
