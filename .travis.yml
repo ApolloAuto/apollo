@@ -16,7 +16,7 @@ jobs:
       env:
         - JOB=lint
       script:
-        - ./docker/scripts/dev_start.sh -t dev-x86_64-20180925_1415
+        - ./docker/scripts/dev_start.sh -t dev-x86_64-20181001_1754-ci
         - ./apollo_docker.sh ${JOB}
         - rm -rf "${HOME}/.cache/bazel/_bazel_${USER}/install"
         - rm -rf "/apollo/data/core"    
@@ -24,7 +24,7 @@ jobs:
       env:
         - JOB=cibuild
       script:
-        - ./docker/scripts/dev_start.sh -t dev-x86_64-20180925_1415
+        - ./docker/scripts/dev_start.sh -t dev-x86_64-20181001_1754-ci
         - ./apollo_docker.sh ${JOB}
         - rm -rf "${HOME}/.cache/bazel/_bazel_${USER}/install"
         - rm -rf "/apollo/data/core"
@@ -32,7 +32,7 @@ jobs:
       env:
         - JOB=citest
       script:
-        - ./docker/scripts/dev_start.sh -t dev-x86_64-20180925_1415
+        - ./docker/scripts/dev_start.sh -t dev-x86_64-20181001_1754-ci
         - ./apollo_docker.sh ${JOB}
         - rm -rf "${HOME}/.cache/bazel/_bazel_${USER}/install"
         - rm -rf "/apollo/data/core"    
