@@ -44,5 +44,4 @@ cc_test(
     ],
 )
 
-
 cpplint()
