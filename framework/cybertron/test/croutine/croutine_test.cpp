@@ -19,7 +19,6 @@ TEST(CRoutineTest, croutine_basic) {
   auto state = cr->Resume();
   EXPECT_TRUE(finish);
   EXPECT_EQ(state, RoutineState::FINISHED);
-  cr->PrintStatistics();
 }
 
 TEST(CRoutineTest, croutine_switch) {
@@ -60,6 +59,15 @@ TEST(CRoutineTest, croutine_hangup) {
   cr->Wake();
   state = cr->Resume();
   EXPECT_EQ(state, RoutineState::FINISHED);
+}
+
+TEST(CRoutineTest, croutine_lock) {
+  auto cr = std::make_shared<CRoutine>(
+      []() { CRoutine::GetCurrentRoutine()->HangUp(); });
+  auto lock = cr->GetLock();
+  EXPECT_TRUE(lock.try_lock());
+  auto lock2 = cr->GetLock();
+  EXPECT_FALSE(lock2.try_lock());
 }
 
 }  // namespace croutine
