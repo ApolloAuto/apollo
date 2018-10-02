@@ -57,8 +57,8 @@ RoutineState CRoutine::Resume() {
     return RoutineState::FINISHED;
   }
 
+  std::unique_lock<std::mutex> ul(op_mtx_);
   UpdateState();
-
   // Keep compatibility with different policies.
   if (!IsRunning() && !IsReady()) {
     if (IsWaitingInput()) {

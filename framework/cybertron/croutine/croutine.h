@@ -75,18 +75,9 @@ class CRoutine {
     SetState(RoutineState::FINISHED);
   }
 
-  inline bool TryLockForOp() {
-    std::lock_guard<std::mutex> lh(op_mtx_);
-    if (!being_op_) {
-      being_op_ = true;
-      return being_op_;
-    }
-    return false;
-  }
-
-  inline void TryUnlockForOp() {
-    std::lock_guard<std::mutex> lh(op_mtx_);
-    being_op_ = false;
+  inline std::unique_lock<std::mutex> GetLock() const {
+    std::unique_lock<std::mutex> ul(op_mtx_, std::defer_lock);
+    return ul;
   }
 
   inline void SetState(const RoutineState &state, bool is_notify = false) {
@@ -205,8 +196,7 @@ class CRoutine {
   double vruntime_ = 0.0;
   double normalized_vruntime_ = 0.0;
   bool force_stop_ = false;
-  bool being_op_ = false;
-  std::mutex op_mtx_;
+  mutable std::mutex op_mtx_;
 };
 
 }  // namespace croutine
