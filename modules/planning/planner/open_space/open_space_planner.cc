@@ -15,7 +15,7 @@
  *****************************************************************************/
 
 /**
- * @file open_space_planner.cc
+ * @file
  **/
 
 #include "modules/planning/planner/open_space/open_space_planner.h"

@@ -15,7 +15,7 @@
  *****************************************************************************/
 
 /*
- * @file warm_start_problem.h
+ * @file
  */
 
 #ifndef MODULES_PLANNING_OPEN_SPACE_WARM_START_PROBLEM_H_

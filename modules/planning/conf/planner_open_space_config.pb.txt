@@ -11,9 +11,9 @@ warm_start_config : {
   next_node_num : 10
   step_size : 0.5
   back_penalty : 0.0
-  gear_switch_penalty : 100.0
+  gear_switch_penalty : 10.0
   steer_penalty : 100.0
-  steer_change_penalty : 100.0
+  steer_change_penalty : 10.0
 }
 
 distance_approach_config : {

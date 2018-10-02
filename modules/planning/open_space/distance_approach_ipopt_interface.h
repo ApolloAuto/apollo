@@ -15,7 +15,7 @@
  *****************************************************************************/
 
 /*
- * @file distance_approach_ipopt_interface.h
+ * @file
  */
 
 #ifndef MODULES_PLANNING_OPEN_SPACE_DISTANCE_APPROACH_IPOPT_INTERFACE_H_

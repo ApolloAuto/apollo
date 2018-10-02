@@ -15,7 +15,7 @@
  *****************************************************************************/
 
 /*
- * @file node3d_test.cc
+ * @file
  */
 #include "modules/planning/open_space/node3d.h"
 #include "gtest/gtest.h"

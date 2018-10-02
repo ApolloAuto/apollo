@@ -15,7 +15,7 @@
  *****************************************************************************/
 
 /*
- * @file hybrid_a_star_test.cc
+ * @file
  */
 
 #include <memory>
@@ -43,18 +43,18 @@ class HybridATest : public ::testing::Test {
 };
 
 TEST_F(HybridATest, test1) {
-  double sx = 0.0;
+  double sx = -15.0;
   double sy = 0.0;
   double sphi = 0.0;
-  double ex = 100.0;
-  double ey = 100.0;
-  double ephi = M_PI;
+  double ex = 15.0;
+  double ey = 0.0;
+  double ephi = 0.0;
   ThreadSafeIndexedObstacles obstacles_list;
   Result result;
   std::unique_ptr<Obstacle> obstacle_class =
       std::unique_ptr<Obstacle>(new Obstacle());
-  Vec2d obstacle_center(50.0, 50.0);
-  Box2d obstacle_box(obstacle_center, 0.0, 20.0, 20.0);
+  Vec2d obstacle_center(0.0, 0.0);
+  Box2d obstacle_box(obstacle_center, 0.0, 5.0, 5.0);
   std::unique_ptr<Obstacle> obstacle =
       obstacle_class->CreateStaticVirtualObstacles("a box in center",
                                                    obstacle_box);

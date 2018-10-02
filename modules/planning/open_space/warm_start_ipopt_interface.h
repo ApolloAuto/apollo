@@ -15,7 +15,7 @@
  *****************************************************************************/
 
 /*
- * @file warm_start_ipopt_interface.h
+ * @file
  */
 
 #ifndef MODULES_PLANNING_OPEN_SPACE_WARM_START_IPOPT_INTERFACE_H_

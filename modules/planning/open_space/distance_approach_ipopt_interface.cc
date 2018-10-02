@@ -15,7 +15,7 @@
  *****************************************************************************/
 
 /*
- * @file distance_approach_problem_interface.cc
+ * @file
  */
 
 #include "modules/planning/open_space/distance_approach_ipopt_interface.h"
