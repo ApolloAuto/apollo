@@ -21,7 +21,8 @@ namespace perception {
 namespace onboard {
 
 bool LidarOutputComponent::Init() {
-  writer_ = node_->CreateWriter<PerceptionObstacles>("/perception/obstacles");
+  writer_ =
+    node_->CreateWriter<PerceptionObstacles>("/apollo/perception/obstacles");
   return true;
 }
 
@@ -42,7 +43,7 @@ bool LidarOutputComponent::Proc(
   }
 
   writer_->Write(out_message);
-  // Send("/perception/obstacles", out_message);
+  // Send("/apollo/perception/obstacles", out_message);
 
   return true;
 }
