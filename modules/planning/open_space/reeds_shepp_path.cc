@@ -66,6 +66,20 @@ bool ReedShepp::ShortestRSP(const std::shared_ptr<Node3d> start_node,
       optimal_path_length = all_possible_paths.at(i).total_length;
     }
   }
+  if (std::abs(all_possible_paths[optimal_path_index].x.back() -
+               end_node->GetX()) > 1e-3 ||
+      std::abs(all_possible_paths[optimal_path_index].y.back() -
+               end_node->GetY()) > 1e-3 ||
+      std::abs(all_possible_paths[optimal_path_index].phi.back() -
+               end_node->GetPhi()) > 1e-3) {
+    AINFO << "RSP end position not right";
+    for (std::size_t i = 0;
+         i < all_possible_paths[optimal_path_index].segs_types.size(); i++) {
+      AINFO << "types are "
+            << all_possible_paths[optimal_path_index].segs_types[i];
+    }
+    return false;
+  }
   (*optimal_path).x = all_possible_paths[optimal_path_index].x;
   (*optimal_path).y = all_possible_paths[optimal_path_index].y;
   (*optimal_path).phi = all_possible_paths[optimal_path_index].phi;
@@ -104,9 +118,9 @@ bool ReedShepp::GenerateRSP(const std::shared_ptr<Node3d> start_node,
   // normalize the initial point to (0,0,0)
   double x = (c * dx + s * dy) * max_kappa_;
   double y = (-s * dx + c * dy) * max_kappa_;
-  if (!SCS(x, y, dphi, all_possible_paths)) {
-    AINFO << "Fail at SCS";
-  }
+  // if (!SCS(x, y, dphi, all_possible_paths)) {
+  //   AINFO << "Fail at SCS";
+  // }
   if (!CSC(x, y, dphi, all_possible_paths)) {
     AINFO << "Fail at CSC";
   }
@@ -651,7 +665,7 @@ void ReedShepp::LSL(double x, double y, double phi, RSPParam* param) {
       common::math::Cartesian2Polar(x - std::sin(phi), y - 1.0 + std::cos(phi));
   double u = polar.first;
   double t = polar.second;
-  double v;
+  double v = 0.0;
   if (t >= 0.0) {
     v = common::math::NormalizeAngle(phi - t);
     if (v >= 0.0) {
@@ -713,7 +727,8 @@ void ReedShepp::SLS(double x, double y, double phi, RSPParam* param) {
   double u = 0.0;
   double t = 0.0;
   double v = 0.0;
-  if (y > 0.0 && phi_mod > 0.0 && phi_mod < M_PI * 0.99) {
+  double epsilon = 1e-1;
+  if (y > 0.0 && phi_mod > epsilon && phi_mod < M_PI) {
     xd = -y / std::tan(phi_mod) + x;
     t = xd - std::tan(phi_mod / 2.0);
     u = phi_mod;
@@ -722,7 +737,7 @@ void ReedShepp::SLS(double x, double y, double phi, RSPParam* param) {
     param->u = u;
     param->t = t;
     param->v = v;
-  } else if (y < 0.0 && phi_mod > 0.0 && phi_mod < M_PI * 0.99) {
+  } else if (y < 0.0 && phi_mod > epsilon && phi_mod < M_PI) {
     xd = -y / std::tan(phi_mod) + x;
     t = xd - std::tan(phi_mod / 2.0);
     u = phi_mod;
@@ -739,15 +754,16 @@ void ReedShepp::LRLRn(double x, double y, double phi, RSPParam* param) {
   double eta = y - 1.0 - std::cos(phi);
   double rho = 0.25 * (2.0 + std::sqrt(xi * xi + eta * eta));
   double u = 0.0;
-  double v = 0.0;
-  if (rho <= 1.0) {
+  if (rho <= 1.0 && rho >= 0.0) {
     u = std::acos(rho);
-    std::pair<double, double> tau_omega = calc_tau_omega(u, v, xi, eta, phi);
-    if (tau_omega.first >= 0.0 && tau_omega.second <= 0.0) {
-      param->flag = true;
-      param->u = u;
-      param->t = tau_omega.first;
-      param->v = tau_omega.second;
+    if (u >= 0 && u <= 0.5 * M_PI) {
+      std::pair<double, double> tau_omega = calc_tau_omega(u, -u, xi, eta, phi);
+      if (tau_omega.first >= 0.0 && tau_omega.second <= 0.0) {
+        param->flag = true;
+        param->u = u;
+        param->t = tau_omega.first;
+        param->v = tau_omega.second;
+      }
     }
   }
 }
@@ -759,7 +775,7 @@ void ReedShepp::LRLRp(double x, double y, double phi, RSPParam* param) {
   double u = 0.0;
   if (rho <= 1.0 && rho >= 0.0) {
     u = -std::acos(rho);
-    if (u >= -0.5 * M_PI) {
+    if (u >= 0 && u <= 0.5 * M_PI) {
       std::pair<double, double> tau_omega = calc_tau_omega(u, u, xi, eta, phi);
       if (tau_omega.first >= 0.0 && tau_omega.second >= 0.0) {
         param->flag = true;
@@ -853,8 +869,18 @@ bool ReedShepp::SetRSP(int size, double lengths[], char types[],
   double sum = 0.0;
   for (int i = 0; i < size; i++) {
     sum += std::abs(lengths[i]);
+    if (std::abs(lengths[i]) >= 100) {
+      AINFO << "std::abs(lengths[i])" << std::abs(lengths[i]);
+      AINFO << "length too large";
+      return false;
+    }
   }
   path.total_length = sum;
+
+  if (path.total_length >= 100) {
+    AINFO << "total length too large";
+    return false;
+  }
 
   if (path.total_length <= 0.0) {
     AINFO << "total length smaller than 0";
@@ -872,7 +898,7 @@ bool ReedShepp::GenerateLocalConfigurations(
       open_space_conf_.warm_start_config().step_size() * max_kappa_;
   for (auto& path : *all_possible_paths) {
     std::size_t point_num =
-        path.total_length / step_scaled + path.segs_lengths.size() + 10;
+        path.total_length / step_scaled + path.segs_lengths.size() + 4;
     std::vector<double> px(point_num, 0.0);
     std::vector<double> py(point_num, 0.0);
     std::vector<double> pphi(point_num, 0.0);
@@ -916,7 +942,8 @@ bool ReedShepp::GenerateLocalConfigurations(
       index++;
       Interpolation(index, l, m, ox, oy, ophi, &px, &py, &pphi, &pgear);
     }
-    while (px.back() == 0.0) {
+    while (px.back() == 0.0 && py.back() == 0.0 && pphi.back() == 0.0 &&
+           pgear.back() == true) {
       px.pop_back();
       py.pop_back();
       pphi.pop_back();

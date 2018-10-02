@@ -12,16 +12,29 @@ HybridAStar = HybridAStarPlanner()
 # parameter(except max, min and car size is defined in proto)
 num_output_buffer = 100000
 sx = -15.0
-sy = 8
+sy = 7
 sphi = 0.0
-ex = 0.0
-ey = 0.0
-ephi = math.pi / 2
 
-#obstacles(x, y, heading, length, width, id)
-HybridAStar.AddVirtualObstacle(0.0, 13.0, 0.0, 40.0, 4.0, 1)
-HybridAStar.AddVirtualObstacle(-11, 0.0, 0.0, 18.0, 10.0, 2)
-HybridAStar.AddVirtualObstacle(11, 0.0, 0.0, 18.0, 10.0, 3)
+# scenario = "backward"
+scenario = "parallel"
+
+if scenario == "backward":
+    #obstacles(x, y, heading, length, width, id)
+    HybridAStar.AddVirtualObstacle(0.0, 13.0, 0.0, 40.0, 4.0, 1)
+    HybridAStar.AddVirtualObstacle(-11, 0.0, 0.0, 18.0, 10.0, 2)
+    HybridAStar.AddVirtualObstacle(11, 0.0, 0.0, 18.0, 10.0, 3)
+    ex = 0.0
+    ey = 0.0
+    ephi = math.pi / 2
+elif scenario == "parallel":
+    #obstacles(x, y, heading, length, width, id)
+    HybridAStar.AddVirtualObstacle(0.0, 13.0, 0.0, 40.0, 4.0, 1)
+    HybridAStar.AddVirtualObstacle(-12, 0.0, 0.0, 16.0, 10.0, 2)
+    HybridAStar.AddVirtualObstacle(12, 0.0, 0.0, 16.0, 10.0, 3)
+    HybridAStar.AddVirtualObstacle(0.0, -1.25, 0.0, 40.0, 7.5, 4)
+    ex = -1.75
+    ey = 4.0
+    ephi = 0
 
 
 x = (c_double * num_output_buffer)()
@@ -65,12 +78,21 @@ for i in range(0, size[0]):
     ax.add_patch(arrow)
 plt.plot(sx, sy, "s")
 plt.plot(ex, ey, "s")
-rect1 = patches.Rectangle((-20.0, 11.0), 40.0, 4.0, 0.0)
-rect2 = patches.Rectangle((-20.0, -5.0), 18.0, 10.0, 0.0)
-rect3 = patches.Rectangle((2.0, -5.0), 18.0, 10.0, 0.0)
-ax.add_patch(rect1)
-ax.add_patch(rect2)
-ax.add_patch(rect3)
+if scenario == "backward":
+    rect1 = patches.Rectangle((-20.0, 11.0), 40.0, 4.0, 0.0)
+    rect2 = patches.Rectangle((-20.0, -5.0), 18.0, 10.0, 0.0)
+    rect3 = patches.Rectangle((2.0, -5.0), 18.0, 10.0, 0.0)
+    ax.add_patch(rect1)
+    ax.add_patch(rect2)
+    ax.add_patch(rect3)
+elif scenario == "parallel":
+    rect1 = patches.Rectangle((-20.0, 11.0), 40.0, 4.0, 0.0)
+    rect2 = patches.Rectangle((-20.0, -5.0), 16.0, 10.0, 0.0)
+    rect3 = patches.Rectangle((4.0, -5.0), 16.0, 10.0, 0.0)
+    rect4 = patches.Rectangle((-20.0, -5.0), 40.0, 7.5, 0.0)
+    ax.add_patch(rect1)
+    ax.add_patch(rect2)
+    ax.add_patch(rect3)
+    ax.add_patch(rect4)
 plt.axis('equal')
 plt.show()
-
