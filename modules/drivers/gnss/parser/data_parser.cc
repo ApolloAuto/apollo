@@ -37,7 +37,6 @@ namespace apollo {
 namespace drivers {
 namespace gnss {
 
-using apollo::common::util::MessageUtil;
 using ::apollo::localization::CorrectedImu;
 using ::apollo::localization::Gps;
 
@@ -99,9 +98,9 @@ bool DataParser::Init() {
   rawimu_writer_ = node_->CreateWriter<Imu>(FLAGS_raw_imu_topic);
   gps_writer_ = node_->CreateWriter<Gps>(FLAGS_gps_topic);
 
-  MessageUtil<InsStatus>::FillHeader("gnss", &ins_status_);
+  common::util::FillHeader("gnss", &ins_status_);
   insstatus_writer_->Write(std::make_shared<InsStatus>(ins_status_));
-  MessageUtil<GnssStatus>::FillHeader("gnss", &gnss_status_);
+  common::util::FillHeader("gnss", &gnss_status_);
   gnssstatus_writer_->Write(std::make_shared<GnssStatus>(gnss_status_));
 
   AINFO << "Creating data parser of format: " << config_.data().format();
@@ -150,7 +149,7 @@ void DataParser::CheckInsStatus(::apollo::drivers::gnss::Ins *ins) {
         break;
     }
 
-    MessageUtil<InsStatus>::FillHeader("gnss", &ins_status_);
+    common::util::FillHeader("gnss", &ins_status_);
     insstatus_writer_->Write(std::make_shared<InsStatus>(ins_status_));
   }
 }
@@ -166,7 +165,7 @@ void DataParser::CheckGnssStatus(::apollo::drivers::gnss::Gnss *gnss) {
   } else {
     gnss_status_.set_solution_completed(false);
   }
-  MessageUtil<GnssStatus>::FillHeader("gnss", &gnss_status_);
+  common::util::FillHeader("gnss", &gnss_status_);
   gnssstatus_writer_->Write(std::make_shared<GnssStatus>(gnss_status_));
 }
 
@@ -215,13 +214,13 @@ void DataParser::DispatchMessage(Parser::MessageType type, MessagePtr message) {
 
 void DataParser::PublishInsStat(const MessagePtr message) {
   auto ins_stat = std::make_shared<InsStat>(*As<InsStat>(message));
-  MessageUtil<InsStat>::FillHeader("gnss", ins_stat.get());
+  common::util::FillHeader("gnss", ins_stat.get());
   insstat_writer_->Write(ins_stat);
 }
 
 void DataParser::PublishBestpos(const MessagePtr message) {
   auto bestpos = std::make_shared<GnssBestPose>(*As<GnssBestPose>(message));
-  MessageUtil<GnssBestPose>::FillHeader("gnss", bestpos.get());
+  common::util::FillHeader("gnss", bestpos.get());
   gnssbestpose_writer_->Write(bestpos);
 }
 
@@ -238,7 +237,7 @@ void DataParser::PublishImu(const MessagePtr message) {
   raw_imu->mutable_angular_velocity()->set_y(imu->angular_velocity().x());
   raw_imu->mutable_angular_velocity()->set_z(imu->angular_velocity().z());
 
-  MessageUtil<Imu>::FillHeader("gnss", raw_imu.get());
+  common::util::FillHeader("gnss", raw_imu.get());
   rawimu_writer_->Write(raw_imu);
 }
 

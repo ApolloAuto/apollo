@@ -41,8 +41,8 @@ using apollo::common::math::InverseQuaternionRotate;
 using apollo::common::math::NormalizeAngle;
 using apollo::common::math::QuaternionToHeading;
 using apollo::common::time::Clock;
+using apollo::common::util::FillHeader;
 using apollo::common::util::GetProtoFromFile;
-using apollo::common::util::MessageUtil;
 using apollo::localization::LocalizationEstimate;
 using apollo::planning::ADCTrajectory;
 using apollo::prediction::PredictionObstacles;
@@ -373,7 +373,7 @@ bool SimControl::PerfectControlModel(TrajectoryPoint* point) {
 
 void SimControl::PublishChassis(double cur_speed) {
   auto chassis = std::make_shared<Chassis>();
-  MessageUtil<Chassis>::FillHeader("SimControl", chassis.get());
+  FillHeader("SimControl", chassis.get());
 
   chassis->set_engine_started(true);
   chassis->set_driving_mode(Chassis::COMPLETE_AUTO_DRIVE);
@@ -388,8 +388,7 @@ void SimControl::PublishChassis(double cur_speed) {
 
 void SimControl::PublishLocalization(const TrajectoryPoint& point) {
   auto localization = std::make_shared<LocalizationEstimate>();
-  MessageUtil<LocalizationEstimate>::FillHeader("SimControl",
-                                                localization.get());
+  FillHeader("SimControl", localization.get());
 
   auto* pose = localization->mutable_pose();
   auto prev = prev_point_.path_point();
@@ -461,8 +460,7 @@ void SimControl::PublishDummyPrediction() {
     if (!send_dummy_prediction_) {
       return;
     }
-    MessageUtil<PredictionObstacles>::FillHeader("SimPrediction",
-                                                 prediction.get());
+    FillHeader("SimPrediction", prediction.get());
   }
   prediction_writer_->Write(prediction);
 }

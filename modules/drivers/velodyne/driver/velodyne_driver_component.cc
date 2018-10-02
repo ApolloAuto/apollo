@@ -27,8 +27,6 @@ namespace apollo {
 namespace drivers {
 namespace velodyne {
 
-using apollo::common::util::MessageUtil;
-
 bool VelodyneDriverComponent::Init() {
   AINFO << "Velodyne driver component init";
   Config velodyne_config;
@@ -60,7 +58,7 @@ void VelodyneDriverComponent::device_poll() {
     std::shared_ptr<VelodyneScan> scan = std::make_shared<VelodyneScan>();
     bool ret = dvr_->Poll(scan);
     if (ret) {
-      MessageUtil<VelodyneScan>::FillHeader("velodyne", scan.get());
+      common::util::FillHeader("velodyne", scan.get());
       writer_->Write(scan);
     } else {
       AWARN << "device poll failed";

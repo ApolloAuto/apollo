@@ -24,8 +24,6 @@ DECLARE_string(flagfile);
 namespace apollo {
 namespace routing {
 
-using apollo::common::util::MessageUtil;
-
 bool RoutingComponent::Init() {
   AINFO << "Loading gflag from file: " << ConfigFilePath();
   google::SetCommandLineOption("flagfile", ConfigFilePath().c_str());
@@ -41,7 +39,7 @@ bool RoutingComponent::Proc(const std::shared_ptr<RoutingRequest>& request) {
   if (!routing_.Process(request, response.get())) {
     return false;
   }
-  MessageUtil<RoutingResponse>::FillHeader(node_->Name(), response.get());
+  common::util::FillHeader(node_->Name(), response.get());
 
   response_writer_->Write(response);
   return true;
@@ -49,3 +47,4 @@ bool RoutingComponent::Proc(const std::shared_ptr<RoutingRequest>& request) {
 
 }  // namespace routing
 }  // namespace apollo
+

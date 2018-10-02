@@ -53,7 +53,6 @@ using apollo::common::math::Vec2d;
 using apollo::common::time::Clock;
 using apollo::common::util::DirectoryExists;
 using apollo::common::util::Glob;
-using apollo::common::util::MessageUtil;
 using apollo::localization::LocalizationEstimate;
 using apollo::perception::PerceptionObstacle;
 using apollo::perception::PerceptionObstacles;
@@ -294,8 +293,7 @@ bool PredictionComponent::Proc(
     }
   }
 
-  MessageUtil<prediction::PredictionObstacles>::FillHeader(
-      node_->Name(), &prediction_obstacles);
+  common::util::FillHeader(node_->Name(), &prediction_obstacles);
 
   prediction_writer_->Write(
       std::make_shared<PredictionObstacles>(prediction_obstacles));

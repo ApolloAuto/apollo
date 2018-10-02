@@ -32,7 +32,6 @@ namespace third_party_perception {
 using apollo::canbus::Chassis;
 using apollo::common::ErrorCode;
 using apollo::common::Status;
-using apollo::common::util::MessageUtil;
 using apollo::drivers::ContiRadar;
 using apollo::drivers::DelphiESR;
 using apollo::drivers::Esr_track01_500;
@@ -110,8 +109,7 @@ bool ThirdPartyPerception::Process(PerceptionObstacles* const response) {
   *response =
       fusion::MobileyeRadarFusion(mobileye_obstacles_, radar_obstacles_);
 
-  MessageUtil<PerceptionObstacles>::FillHeader(
-      FLAGS_third_party_perception_node_name, response);
+  common::util::FillHeader(FLAGS_third_party_perception_node_name, response);
 
   mobileye_obstacles_.Clear();
   radar_obstacles_.Clear();

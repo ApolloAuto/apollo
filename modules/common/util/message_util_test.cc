@@ -18,8 +18,8 @@
 
 #include <vector>
 
-#include "gtest/gtest.h"
 #include "modules/common/util/testdata/simple.pb.h"
+#include "gtest/gtest.h"
 
 namespace apollo {
 namespace common {
@@ -29,7 +29,7 @@ TEST(StringUtilTest, dump_message) {
   auto a = 1;
   EXPECT_TRUE(DumpMessage(a));
   auto simple_msg = std::make_shared<test::SimpleMessage>();
-  MessageUtil<test::SimpleMessage>::FillHeader("test", simple_msg.get());
+  FillHeader("test", simple_msg.get());
   EXPECT_TRUE(DumpMessage(simple_msg));
   EXPECT_TRUE(
       PathExists("/tmp/apollo.common.util.test.SimpleMessage/0.pb.txt"));
