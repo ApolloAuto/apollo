@@ -48,7 +48,8 @@ std::shared_ptr<CRoutine> ClassicContext::NextRoutine() {
   std::shared_ptr<CRoutine> croutine = nullptr;
   for (auto it = rb_map_.begin(); it != rb_map_.end();) {
     auto cr = it->second;
-    if (!cr->TryLockForOp()) {
+    auto lock = cr->GetLock();
+    if (!lock.try_lock()) {
       ++it;
       continue;
     }
@@ -58,17 +59,14 @@ std::shared_ptr<CRoutine> ClassicContext::NextRoutine() {
 
     if (cr->IsFinished()) {
       it = rb_map_.erase(it);
-      cr->TryUnlockForOp();
       continue;
     }
 
     if (cr->IsReady()) {
       croutine = cr;
       cr->SetState(RoutineState::RUNNING);
-      cr->TryUnlockForOp();
       break;
     }
-    cr->TryUnlockForOp();
     ++it;
   }
   if (croutine == nullptr) {

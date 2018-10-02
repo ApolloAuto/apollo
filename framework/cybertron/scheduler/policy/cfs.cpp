@@ -48,6 +48,7 @@ std::shared_ptr<CRoutine> CFSContext::NextRoutine() {
   }
   return cr;
 }
+
 std::shared_ptr<CRoutine> CFSContext::NextLocalRoutine() {
   std::lock_guard<std::mutex> lock(mtx_run_queue_);
   auto start_perf_time = apollo::cybertron::Time::Now().ToNanosecond();
@@ -67,16 +68,20 @@ std::shared_ptr<CRoutine> CFSContext::NextLocalRoutine() {
   std::shared_ptr<CRoutine> croutine = nullptr;
   for (auto it = local_rb_map_.begin(); it != local_rb_map_.end();) {
     auto cr = it->second;
-    if (!cr->TryLockForOp()) {
+    auto lock = cr->GetLock();
+    if (!lock.try_lock()) {
       ++it;
       continue;
     }
 
-    auto cr_id = cr->Id();
     cr->UpdateState();
+    if (cr->IsRunning()) {
+      ++it;
+      continue;
+    }
+
     if (cr->IsFinished()) {
       it = local_rb_map_.erase(it);
-      cr->TryUnlockForOp();
       continue;
     }
 
@@ -86,10 +91,8 @@ std::shared_ptr<CRoutine> CFSContext::NextLocalRoutine() {
       croutine->SetState(RoutineState::RUNNING);
       cur_croutine_ = croutine;
       local_rb_map_.erase(it);
-      cr->TryUnlockForOp();
       break;
     }
-    cr->TryUnlockForOp();
     ++it;
   }
   if (croutine == nullptr) {
@@ -112,7 +115,8 @@ std::shared_ptr<CRoutine> CFSContext::NextAffinityRoutine() {
 
   for (auto it = affinity_rb_map_.begin(); it != affinity_rb_map_.end();) {
     auto cr = it->second;
-    if (!cr->TryLockForOp()) {
+    auto lock = cr->GetLock();
+    if (!lock.try_lock()) {
       ++it;
       continue;
     }
@@ -120,17 +124,19 @@ std::shared_ptr<CRoutine> CFSContext::NextAffinityRoutine() {
     cr->UpdateState();
     if (cr->IsFinished()) {
       it = affinity_rb_map_.erase(it);
-      cr->TryUnlockForOp();
+      continue;
+    }
+
+    if (cr->IsRunning()) {
+      ++it;
       continue;
     }
 
     if (cr->IsReady()) {
       croutine = cr;
       cr->SetState(RoutineState::RUNNING);
-      cr->TryUnlockForOp();
       break;
     }
-    cr->TryUnlockForOp();
     ++it;
   }
   if (croutine) {
