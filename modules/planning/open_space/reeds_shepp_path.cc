@@ -15,7 +15,7 @@
  *****************************************************************************/
 
 /*
- * @file reeds_shepp_path.cc
+ * @file
  */
 
 #include "modules/planning/open_space/reeds_shepp_path.h"
@@ -869,19 +869,8 @@ bool ReedShepp::SetRSP(int size, double lengths[], char types[],
   double sum = 0.0;
   for (int i = 0; i < size; i++) {
     sum += std::abs(lengths[i]);
-    if (std::abs(lengths[i]) >= 100) {
-      AINFO << "std::abs(lengths[i])" << std::abs(lengths[i]);
-      AINFO << "length too large";
-      return false;
-    }
   }
   path.total_length = sum;
-
-  if (path.total_length >= 100) {
-    AINFO << "total length too large";
-    return false;
-  }
-
   if (path.total_length <= 0.0) {
     AINFO << "total length smaller than 0";
     return false;
@@ -942,8 +931,9 @@ bool ReedShepp::GenerateLocalConfigurations(
       index++;
       Interpolation(index, l, m, ox, oy, ophi, &px, &py, &pphi, &pgear);
     }
-    while (px.back() == 0.0 && py.back() == 0.0 && pphi.back() == 0.0 &&
-           pgear.back() == true) {
+    double epsilon = 1e-15;
+    while (std::fabs(px.back()) < epsilon && std::fabs(py.back()) < epsilon &&
+           std::fabs(pphi.back()) < epsilon && pgear.back()) {
       px.pop_back();
       py.pop_back();
       pphi.pop_back();
