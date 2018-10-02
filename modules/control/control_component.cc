@@ -33,6 +33,7 @@ using apollo::common::ErrorCode;
 using apollo::common::Status;
 using apollo::common::VehicleStateProvider;
 using apollo::common::time::Clock;
+using apollo::common::util::MessageUtil;
 using apollo::control::ControlCommand;
 using apollo::control::PadMessage;
 using apollo::localization::LocalizationEstimate;
@@ -305,7 +306,7 @@ bool ControlComponent::Proc() {
   control_command.mutable_header()->set_radar_timestamp(
       local_view_.trajectory.header().radar_timestamp());
 
-  common::util::FillHeader(node_->Name(), &control_command);
+  MessageUtil<ControlCommand>::FillHeader(node_->Name(), &control_command);
 
   ADEBUG << control_command.ShortDebugString();
   if (control_conf_.is_control_test_mode()) {

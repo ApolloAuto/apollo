@@ -32,6 +32,7 @@ namespace drivers {
 namespace gnss {
 
 using apollo::canbus::Chassis;
+using apollo::common::util::MessageUtil;
 
 void switch_stream_status(const apollo::drivers::gnss::Stream::Status &status,
                           StreamStatus_Type *report_status_type) {
@@ -158,7 +159,7 @@ bool RawStream::Init() {
   stream_status_.set_rtk_stream_out_type(StreamStatus::DISCONNECTED);
   stream_writer_ = node_->CreateWriter<StreamStatus>(FLAGS_stream_status_topic);
 
-  common::util::FillHeader("gnss", &stream_status_);
+  MessageUtil<StreamStatus>::FillHeader("gnss", &stream_status_);
   stream_writer_->Write(std::make_shared<StreamStatus>(stream_status_));
 
   // Creates streams.
@@ -456,13 +457,13 @@ void RawStream::StreamStatusCheck() {
   }
 
   if (status_report) {
-    common::util::FillHeader("gnss", &stream_status_);
+    MessageUtil<StreamStatus>::FillHeader("gnss", &stream_status_);
     stream_writer_->Write(std::make_shared<StreamStatus>(stream_status_));
   }
 }
 
 void RawStream::DataSpin() {
-  common::util::FillHeader("gnss", &stream_status_);
+  MessageUtil<StreamStatus>::FillHeader("gnss", &stream_status_);
   stream_writer_->Write(std::make_shared<StreamStatus>(stream_status_));
   while (cybertron::OK()) {
     size_t length = data_stream_->read(buffer_, BUFFER_SIZE);

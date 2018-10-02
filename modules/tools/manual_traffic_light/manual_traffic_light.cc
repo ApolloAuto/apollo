@@ -27,9 +27,9 @@
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/perception/proto/traffic_light_detection.pb.h"
 
+#include "cybertron/common/log.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/configs/config_gflags.h"
-#include "cybertron/common/log.h"
 #include "modules/common/util/color.h"
 #include "modules/common/util/file.h"
 #include "modules/common/util/message_util.h"
@@ -43,6 +43,7 @@ using apollo::common::PointENU;
 using apollo::common::color::ANSI_GREEN;
 using apollo::common::color::ANSI_RED;
 using apollo::common::color::ANSI_RESET;
+using apollo::common::util::MessageUtil;
 using apollo::common::util::PrintIter;
 using apollo::hdmap::HDMap;
 using apollo::hdmap::HDMapUtil;
@@ -196,7 +197,8 @@ class ManualTrafficLight final : public ::apollo::cybertron::TimerComponent {
       light->set_tracking_time(1.0);
       light->set_id(iter->id().id());
     }
-    ::apollo::common::util::FillHeader("manual_traffic_light", detection);
+    MessageUtil<TrafficLightDetection>::FillHeader("manual_traffic_light",
+                                                   detection);
     return true;
   }
 

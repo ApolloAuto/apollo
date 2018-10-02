@@ -21,6 +21,8 @@ namespace apollo {
 namespace common {
 namespace monitor {
 
+using apollo::common::util::MessageUtil;
+
 MonitorLogger::MonitorLogger() {
   auto node_name =
       "monitor_logger" + std::to_string(cybertron::Time::Now().ToNanosecond());
@@ -52,7 +54,7 @@ void MonitorLogger::Publish(const MonitorMessageItem::MessageSource &source,
 
 void MonitorLogger::DoPublish(MonitorMessage *message) const {
   RETURN_IF_NULL(monitor_msg_writer_);
-  common::util::FillHeader("monitor", message);
+  MessageUtil<MonitorMessage>::FillHeader("monitor", message);
   monitor_msg_writer_->Write(std::make_shared<MonitorMessage>(*message));
 }
 
