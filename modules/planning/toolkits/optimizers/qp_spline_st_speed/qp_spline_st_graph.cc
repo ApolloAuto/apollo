@@ -26,12 +26,14 @@
 #include <utility>
 
 #include "cybertron/common/log.h"
+#include "modules/common/time/time.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
 namespace planning {
 
+using apollo::common::time::Clock;
 using apollo::common::ErrorCode;
 using apollo::common::SpeedPoint;
 using apollo::common::Status;
@@ -126,11 +128,15 @@ Status QpSplineStGraph::Search(const StGraphData& st_graph_data,
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
+  auto start = Clock::NowInSeconds();
   if (!Solve().ok()) {
     const std::string msg = "Solve qp problem failed!";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
+  auto end = Clock::NowInSeconds();
+  ADEBUG << "QpSplineStGraph time to solve is " << (end - start) * 1000
+         << " ms.";
 
   // extract output
   speed_data->Clear();
