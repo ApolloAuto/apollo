@@ -15,7 +15,7 @@
  *****************************************************************************/
 
 #include <map>
- #include <memory>
+#include <memory>
 #include <string>
 
 #include "gtest/gtest.h"
@@ -52,10 +52,12 @@ namespace planning {
 
 #define TMAIN                                            \
   int main(int argc, char** argv) {                      \
+    ::apollo::cybertron::Init("planning_test");          \
     ::testing::InitGoogleTest(&argc, argv);              \
     ::google::ParseCommandLineFlags(&argc, &argv, true); \
-    apollo::cybertron::Init("planning_test");            \
-    return RUN_ALL_TESTS();                              \
+    int ret = RUN_ALL_TESTS();                           \
+    ::apollo::cybertron::Shutdown();                     \
+    return ret;                                          \
   }
 
 #define ENABLE_RULE(RULE_ID, ENABLED) this->rule_enabled_[RULE_ID] = ENABLED
