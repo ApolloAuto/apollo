@@ -2,12 +2,10 @@ load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
-# https://docs.bazel.build/versions/master/be/c-cpp.html#cc_library
 cc_library(
     name = "cybertron",
     srcs = glob([
         "install/lib/libcybertron*.so",
-#        "install/lib/libtf2.so",
         "install/third_party/**/libfast*.so",
     ]),
     hdrs = glob([
@@ -49,6 +47,48 @@ cc_library(
     ]),
     includes = [
         "install/include",
+    ],
+)
+
+cc_binary(
+    name = "listener",
+    srcs = glob([
+        "examples/listener.cpp",
+    ]),
+    deps = [
+        "//framework/cybertron:cybertron_core",
+    ],
+    copts = [
+        "-Iframework",
+    ],
+    #TODO: Using deps instead.
+    linkopts = [
+        "-pthread",
+        "-lprotobuf",
+        "-lglog",
+        "-lgflags",
+        "-luuid",
+    ],
+)
+
+cc_binary(
+    name = "talker",
+    srcs = glob([
+        "examples/talker.cpp",
+    ]),
+    deps = [
+        "//framework/cybertron:cybertron_core",
+    ],
+    copts = [
+        "-Iframework",
+    ],
+    #TODO: Using deps instead.
+    linkopts = [
+        "-pthread",
+        "-lprotobuf",
+        "-lglog",
+        "-lgflags",
+        "-luuid",
     ],
 )
 

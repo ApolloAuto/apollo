@@ -3,7 +3,7 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "blocker_lib",
+    name = "service_lib",
     srcs = glob([
         "*.cpp",
     ]),
