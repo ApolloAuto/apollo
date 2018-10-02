@@ -34,6 +34,15 @@ message LaneFeature {
   optional double lane_heading = 8;
 }
 
+message ObstaclePriority {
+  enum Priority {
+    CAUTION = 1;
+    NORMAL = 2;
+    IGNORE = 3;
+  }
+  optional Priority priority = 25 [default = NORMAL];
+}
+
 message Feature {
   // Obstacle ID
   optional int32 id = 1;
@@ -67,10 +76,5 @@ message Feature {
   optional apollo.perception.PerceptionObstacle.Type type = 23;
   optional double label_update_time_delta = 24;
 
-  enum Priority {
-    CAUTION = 1;
-    NORMAL = 2;
-    IGNORE = 3;
-  }
-  optional Priority priority = 25 [default = NORMAL];
+  optional ObstaclePriority priority = 25;
 }

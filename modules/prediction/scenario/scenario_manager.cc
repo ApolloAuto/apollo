@@ -115,7 +115,8 @@ void ScenarioManager::PrioritizeObstacleInCruise(
       }
     }
     if (!has_lane_of_interest) {
-      latest_feature_ptr->set_priority(Feature::IGNORE);
+      latest_feature_ptr->mutable_priority()->set_priority(
+          ObstaclePriority::IGNORE);
     }
   } else {
     // Obstacle has neither lane nor neighbor lanes
@@ -133,7 +134,8 @@ void ScenarioManager::PrioritizeObstacleInCruise(
     if (std::abs(l) > 10.0 ||
         s > std::max(20.0, ego_speed * 5.0) ||
         s < 0.0) {
-      latest_feature_ptr->set_priority(Feature::IGNORE);
+      latest_feature_ptr->mutable_priority()->set_priority(
+          ObstaclePriority::IGNORE);
     }
   }
 }
