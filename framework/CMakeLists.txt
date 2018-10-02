@@ -52,8 +52,6 @@ file(GLOB CYBERTRON_SRCS
   "cybertron/parameter/*.cpp"
   "cybertron/croutine/context/*.cpp"
   "cybertron/event/*.cpp"
-  "cybertron/mainboard/module_argument.cpp"
-  "cybertron/mainboard/module_controller.cpp"
   "cybertron/message/*.cpp"
 )
 
