@@ -34,13 +34,17 @@ namespace planning {
 
 class OsqpSpline1dSolver : public Spline1dSolver {
  public:
-  OsqpSpline1dSolver(const std::vector<double>& x_knots, const uint32_t order)
-      : Spline1dSolver(x_knots, order) {}
+  OsqpSpline1dSolver(const std::vector<double>& x_knots, const uint32_t order);
+  virtual ~OsqpSpline1dSolver();
 
   bool Solve() override;
 
+  void CleanUp();
+
+  void ResetOsqp();
+
  private:
-  OSQPSettings* osqp_settings_ = nullptr;
+  OSQPSettings* settings_ = nullptr;
   OSQPWorkspace* work_ = nullptr;  // Workspace
   OSQPData* data_ = nullptr;       // OSQPData
 };

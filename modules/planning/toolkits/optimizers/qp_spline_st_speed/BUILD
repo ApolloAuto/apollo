@@ -19,6 +19,7 @@ cc_library(
         "//modules/common/util",
         "//modules/planning/common:planning_context",
         "//modules/planning/math/smoothing_spline:active_set_spline_1d_solver",
+        "//modules/planning/math/smoothing_spline:osqp_spline_1d_solver",
         "//modules/planning/proto:qp_st_speed_config_proto",
         "//modules/planning/toolkits/optimizers/st_graph:st_boundary_mapper",
         "//modules/planning/toolkits/optimizers/st_graph:st_graph_data",

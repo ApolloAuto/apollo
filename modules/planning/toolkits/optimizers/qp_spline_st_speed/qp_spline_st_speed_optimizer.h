@@ -31,6 +31,7 @@
 #include "modules/planning/proto/st_boundary_config.pb.h"
 
 #include "modules/planning/math/smoothing_spline/active_set_spline_1d_solver.h"
+#include "modules/planning/math/smoothing_spline/osqp_spline_1d_solver.h"
 #include "modules/planning/toolkits/optimizers/speed_optimizer.h"
 #include "modules/planning/toolkits/optimizers/st_graph/speed_limit_decider.h"
 #include "modules/planning/toolkits/optimizers/st_graph/st_boundary_mapper.h"

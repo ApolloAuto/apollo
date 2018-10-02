@@ -32,13 +32,50 @@
 
 namespace apollo {
 namespace planning {
-namespace {
-
-constexpr double kMaxBound = 1e3;
-}
 
 using Eigen::MatrixXd;
 using apollo::common::math::DenseToCSCMatrix;
+
+OsqpSpline1dSolver::OsqpSpline1dSolver(const std::vector<double>& x_knots,
+                                       const uint32_t order)
+    : Spline1dSolver(x_knots, order) {
+  // Problem settings
+  settings_ = reinterpret_cast<OSQPSettings*>(c_malloc(sizeof(OSQPSettings)));
+
+  // Define Solver settings as default
+  osqp_set_default_settings(settings_);
+  settings_->alpha = 1.0;  // Change alpha parameter
+  settings_->eps_abs = 1.0e-03;
+  settings_->eps_rel = 1.0e-03;
+  settings_->max_iter = 5000;
+  // settings_->polish = true;
+  settings_->verbose = false;
+  settings_->warm_start = true;
+
+  // Populate data
+  data_ = reinterpret_cast<OSQPData*>(c_malloc(sizeof(OSQPData)));
+}
+
+OsqpSpline1dSolver::~OsqpSpline1dSolver() { CleanUp(); }
+
+void OsqpSpline1dSolver::CleanUp() {
+  osqp_cleanup(work_);
+  if (data_ != nullptr) {
+    c_free(data_->A);
+    c_free(data_->P);
+    c_free(data_);
+  }
+  if (settings_ != nullptr) {
+    c_free(settings_);
+  }
+}
+
+void OsqpSpline1dSolver::ResetOsqp() {
+  // Problem settings
+  settings_ = reinterpret_cast<OSQPSettings*>(c_malloc(sizeof(OSQPSettings)));
+  // Populate data
+  data_ = reinterpret_cast<OSQPData*>(c_malloc(sizeof(OSQPData)));
+}
 
 bool OsqpSpline1dSolver::Solve() {
   // Namings here are following osqp convention.
@@ -125,52 +162,26 @@ bool OsqpSpline1dSolver::Solve() {
     }
   }
 
-  // Problem settings
-  OSQPSettings* settings =
-      reinterpret_cast<OSQPSettings*>(c_malloc(sizeof(OSQPSettings)));
+  data_->n = P.rows();
+  data_->m = constraint_num;
+  data_->P = csc_matrix(data_->n, data_->n, P_nnz, P_x, P_i, P_p);
+  data_->q = q;
+  data_->A = csc_matrix(data_->m, data_->n, A_nnz, A_x, A_i, A_p);
+  data_->l = l;
+  data_->u = u;
 
-  // Structures
-  OSQPWorkspace* work;  // Workspace
-  OSQPData* data;       // OSQPData
-
-  // Populate data
-  data = reinterpret_cast<OSQPData*>(c_malloc(sizeof(OSQPData)));
-  data->n = P.rows();
-  data->m = constraint_num;
-  data->P = csc_matrix(data->n, data->n, P_nnz, P_x, P_i, P_p);
-  data->q = q;
-  data->A = csc_matrix(data->m, data->n, A_nnz, A_x, A_i, A_p);
-  data->l = l;
-  data->u = u;
-
-  // Define Solver settings as default
-  osqp_set_default_settings(settings);
-  settings->alpha = 1.0;  // Change alpha parameter
-  settings->eps_abs = 1.0e-06;
-  settings->eps_rel = 1.0e-06;
-  settings->max_iter = 5000;
-  settings->polish = true;
-
-  // Setup workspace
-  work = osqp_setup(data, settings);
+  work_ = osqp_setup(data_, settings_);
 
   // Solve Problem
-  osqp_solve(work);
+  osqp_solve(work_);
 
   MatrixXd solved_params = MatrixXd::Zero(P.rows(), 1);
   for (int i = 0; i < P.rows(); ++i) {
-    solved_params(i, 0) = work->solution->x[i];
+    solved_params(i, 0) = work_->solution->x[i];
   }
 
   last_num_param_ = P.rows();
   last_num_constraint_ = constraint_num;
-
-  // Cleanup
-  osqp_cleanup(work);
-  c_free(data->A);
-  c_free(data->P);
-  c_free(data);
-  c_free(settings);
 
   return spline_.SetSplineSegs(solved_params, spline_.spline_order());
 }
