@@ -221,3 +221,9 @@ new_local_repository(
     build_file = "third_party/qt.BUILD",
     path = "/apollo/framework/third_party/Qt5.5.1/5.5/gcc_64",
 )
+
+new_local_repository(
+    name = "fastrtps",
+    build_file = "third_party/fastrtps.BUILD",
+    path = "/apollo/framework/third_party/fast-rtps",
+)

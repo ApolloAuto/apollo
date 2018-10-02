@@ -3,16 +3,19 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "base_lib",
+    name = "transport_common_lib",
     srcs = glob([
-          "*.cpp",
+        "*.cpp",
     ]),
     hdrs = glob([
-          "*.h",
+        "*.h",
     ]),
-    deps = [
+    copts = [
+        "-Iframework",
     ],
-    copts = ["-Iframework"]
+    deps = [
+        "//framework/cybertron/common:common_lib",
+    ],
 )
 
 #cpplint()
