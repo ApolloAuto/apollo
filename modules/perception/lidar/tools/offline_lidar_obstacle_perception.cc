@@ -60,7 +60,7 @@ class OfflineLidarObstaclePerception {
   bool setup() {
     FLAGS_config_manager_path = "./conf";
     config_manager_ = lib::Singleton<lib::ConfigManager>::get_instance();
-    if (config_manager_ == NULL) {
+    if (config_manager_ == nullptr) {
       AERROR << "Failed to get ConfigManager instance.";
       return false;
     }

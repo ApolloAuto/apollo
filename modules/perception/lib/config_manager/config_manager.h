@@ -19,7 +19,7 @@
 //         get_instance();
 //
 //         string model_name = "FrameClassifier";
-//         const ModelConfig* model_config = NULL;
+//         const ModelConfig* model_config = nullptr;
 //         if (!config_manager->GetModelConfig(model_name, &model_config)) {
 //            AERROR << "not found model: " << model_name;
 //            return false;

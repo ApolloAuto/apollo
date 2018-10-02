@@ -221,10 +221,10 @@ inline void i_plane_fit_total_least_square(
     const T* X, T pi[4], int n, T* Xp, T centroid[3],
     T err_stat[2] /*mean err and err std*/) {
   i_zero4(pi);
-  if (centroid != NULL) {
+  if (centroid != nullptr) {
     i_zero3(centroid);
   }
-  if (err_stat != NULL) {
+  if (err_stat != nullptr) {
     i_zero2(err_stat);
   }
   if (n < 3) {
@@ -259,12 +259,12 @@ inline void i_plane_fit_total_least_square(
   /*the optimal plane should pass [xm, ym, zm]:*/
   pi[3] = -i_dot3(pi, t);
 
-  if (centroid != NULL) {
+  if (centroid != nullptr) {
     i_copy3(t, centroid);
   }
 
   /*data stat:*/
-  if (err_stat != NULL) {
+  if (err_stat != nullptr) {
     const T* cptr_data = X;
     for (i = 0; i < n; ++i) {
       Xp[i] = i_plane_to_point_distance(pi, cptr_data);
@@ -423,7 +423,7 @@ inline void i_plane_fit_total_least_square(T* X, int* indices, T pi[4],
   /*the optimal plane should pass [xm, ym, zm]:*/
   pi[3] = -(pi[0] * xm + pi[1] * ym + pi[2] * zm);
 
-  if (centroid != NULL) {
+  if (centroid != nullptr) {
     centroid[0] = xm;
     centroid[1] = ym;
     centroid[2] = zm;

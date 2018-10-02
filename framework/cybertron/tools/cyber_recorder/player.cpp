@@ -465,7 +465,7 @@ void Player::ReadCharFromStdin() {
   timeval tv;
   tv.tv_sec = 0;
   tv.tv_usec = 0;
-  if (select(maxfd_, &testfd, NULL, NULL, &tv) <= 0) {
+  if (select(maxfd_, &testfd, nullptr, nullptr, &tv) <= 0) {
     return;
   }
   auto ch = getc(stdin);

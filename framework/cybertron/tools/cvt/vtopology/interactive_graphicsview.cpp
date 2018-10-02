@@ -90,7 +90,7 @@ void InteractiveGraphicsView::mouseMoveEvent(QMouseEvent *event) {
 void InteractiveGraphicsView::mousePressEvent(QMouseEvent *event) {
   if (event->button() == Qt::LeftButton) {
     QPointF point = mapToScene(event->pos());
-    if (scene()->itemAt(point, transform()) == NULL) {
+    if (scene()->itemAt(point, transform()) == nullptr) {
       last_mouse_pos_ = event->pos();
 
       mouse_left_button_pressed_ = true;

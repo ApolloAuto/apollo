@@ -135,7 +135,7 @@ bool Segment::OpenOrCreate() {
   }
 
   // attach managed_shm_
-  managed_shm_ = shmat(shmid, NULL, 0);
+  managed_shm_ = shmat(shmid, nullptr, 0);
   if (managed_shm_ == reinterpret_cast<void*>(-1)) {
     AERROR << "attach shm failed.";
     shmctl(shmid, IPC_RMID, 0);
@@ -213,7 +213,7 @@ bool Segment::OpenOnly() {
   }
 
   // attach managed_shm_
-  managed_shm_ = shmat(shmid, NULL, 0);
+  managed_shm_ = shmat(shmid, nullptr, 0);
   if (managed_shm_ == reinterpret_cast<void*>(-1)) {
     AERROR << "attach shm failed.";
     return false;

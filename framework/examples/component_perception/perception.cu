@@ -46,11 +46,11 @@ int TestCUDA() {
       h_B[i] = rand()/(float)RAND_MAX;
   }
 
-  float *d_A = NULL;
+  float *d_A = nullptr;
   cudaMalloc((void **)&d_A, size);
-  float *d_B = NULL;
+  float *d_B = nullptr;
   cudaMalloc((void **)&d_B, size);
-  float *d_C = NULL;
+  float *d_C = nullptr;
   cudaMalloc((void **)&d_C, size);
 
   cudaMemcpy(d_A, h_A, size, cudaMemcpyHostToDevice);

@@ -101,7 +101,7 @@ int SocketInput::get_firing_data_packet(VelodynePacket *pkt) {
     // socket using a blocking read.
     uint8_t bytes[FIRING_DATA_PACKET_SIZE];
     ssize_t nbytes =
-        recvfrom(sockfd_, bytes, FIRING_DATA_PACKET_SIZE, 0, NULL, NULL);
+        recvfrom(sockfd_, bytes, FIRING_DATA_PACKET_SIZE, 0, nullptr, nullptr);
 
     if (nbytes < 0) {
       if (errno != EWOULDBLOCK) {
@@ -135,7 +135,8 @@ int SocketInput::get_positioning_data_packet(NMEATimePtr nmea_time) {
     // Last 234 bytes not use
     uint8_t bytes[POSITIONING_DATA_PACKET_SIZE];
     ssize_t nbytes =
-        recvfrom(sockfd_, bytes, POSITIONING_DATA_PACKET_SIZE, 0, NULL, NULL);
+        recvfrom(sockfd_, bytes, POSITIONING_DATA_PACKET_SIZE, 0,
+            nullptr, nullptr);
 
     if (nbytes < 0) {
       if (errno != EWOULDBLOCK) {

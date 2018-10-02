@@ -268,7 +268,7 @@ bool CosThetaProbleminterface::eval_jac_g(int n, const double* x, bool new_x,
                                           int* jCol, double* values) {
   CHECK_EQ(static_cast<std::size_t>(n), num_of_variables_);
   CHECK_EQ(static_cast<std::size_t>(m), num_of_constraints_);
-  if (values == NULL) {
+  if (values == nullptr) {
     // positional deviation constraints
     for (std::size_t i = 0; i < num_of_variables_; ++i) {
       iRow[i] = i;
@@ -289,7 +289,7 @@ bool CosThetaProbleminterface::eval_h(int n, const double* x, bool new_x,
                                       const double* lambda, bool new_lambda,
                                       int nele_hess, int* iRow, int* jCol,
                                       double* values) {
-  if (values == NULL) {
+  if (values == nullptr) {
     std::size_t index = 0;
     for (std::size_t i = 0; i < 6; ++i) {
       for (std::size_t j = 0; j <= i; ++j) {

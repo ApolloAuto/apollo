@@ -184,8 +184,8 @@ int main(int argc, char** argv) {
 
     LosslessMapNode* lossless_node =
         static_cast<LosslessMapNode*>(lossless_map.GetMapNodeSafe(*itr));
-    if (lossless_node == NULL) {
-      std::cerr << "index: " << index << " is a NULL pointer!" << std::endl;
+    if (lossless_node == nullptr) {
+      std::cerr << "index: " << index << " is a nullptr pointer!" << std::endl;
       continue;
     }
     LosslessMapMatrix& lossless_matrix =

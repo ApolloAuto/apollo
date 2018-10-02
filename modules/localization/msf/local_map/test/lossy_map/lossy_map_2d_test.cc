@@ -141,8 +141,8 @@ TEST_F(LossyMap2DTestSuite, LossyMapToMapMatrixTest) {
   for (; itr != buf.end(); ++itr, ++index) {
     LossyMapNode* node =
         static_cast<LossyMapNode*>(input_map.GetMapNodeSafe(*itr));
-    if (node == NULL) {
-      std::cerr << "index: " << index << " is a NULL pointer!" << std::endl;
+    if (node == nullptr) {
+      std::cerr << "index: " << index << " is a nullptr pointer!" << std::endl;
       continue;
     }
     LossyMapMatrix& input_matrix =

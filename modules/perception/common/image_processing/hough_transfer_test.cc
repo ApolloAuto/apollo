@@ -44,7 +44,7 @@ TEST(HoughTransferTest, image_no_line_test) {
   EXPECT_EQ(0, lines.size());
   // nullptr
   transfer.ImageVote(image, true);
-  transfer.GetLines(4, 1, 1, true, NULL);
+  transfer.GetLines(4, 1, 1, true, nullptr);
   EXPECT_EQ(0, lines.size());
   // wrong input
   flag = transfer.Init(0, 1, 1.0, 1.0);

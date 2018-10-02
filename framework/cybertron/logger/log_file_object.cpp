@@ -36,8 +36,8 @@ static const char* const LC_LOG_SEVERITY_NAMES[NUM_SEVERITIES] = {
 
 LogFileObject::LogFileObject(google::LogSeverity severity,
                              const char* base_filename)
-    : base_filename_selected_(base_filename != NULL),
-      base_filename_((base_filename != NULL) ? base_filename : ""),
+    : base_filename_selected_(base_filename != nullptr),
+      base_filename_((base_filename != nullptr) ? base_filename : ""),
       base_filepath_(base_filename_),
       symlink_basename_("UNKNOWN"),
       filename_extension_(),
@@ -51,9 +51,9 @@ LogFileObject::LogFileObject(google::LogSeverity severity,
 
 LogFileObject::~LogFileObject() {
   std::lock_guard<std::mutex> lock(lock_);
-  if (file_ != NULL) {
+  if (file_ != nullptr) {
     fclose(file_);
-    file_ = NULL;
+    file_ = nullptr;
   }
 }
 
@@ -62,9 +62,9 @@ void LogFileObject::SetBasename(const char* basename) {
   base_filename_selected_ = true;
   if (base_filename_ != basename) {
     // Get rid of old log file since we are changing names
-    if (file_ != NULL) {
+    if (file_ != nullptr) {
       fclose(file_);
-      file_ = NULL;
+      file_ = nullptr;
       rollover_attempt_ = kRolloverAttemptFrequency - 1;
     }
     base_filename_ = basename;
@@ -75,9 +75,9 @@ void LogFileObject::SetExtension(const char* ext) {
   std::lock_guard<std::mutex> lock(lock_);
   if (filename_extension_ != ext) {
     // Get rid of old log file since we are changing names
-    if (file_ != NULL) {
+    if (file_ != nullptr) {
       fclose(file_);
-      file_ = NULL;
+      file_ = nullptr;
       rollover_attempt_ = kRolloverAttemptFrequency - 1;
     }
     filename_extension_ = ext;
@@ -95,7 +95,7 @@ void LogFileObject::Flush() {
 }
 
 void LogFileObject::FlushUnlocked() {
-  if (file_ != NULL) {
+  if (file_ != nullptr) {
     fflush(file_);
     bytes_since_flush_ = 0;
   }
@@ -121,7 +121,7 @@ bool LogFileObject::CreateLogfile(const std::string& time_pid_string) {
 #endif
 
   file_ = fdopen(fd, "a");  // Make a FILE*.
-  if (file_ == NULL) {      // Man, we're screwed!
+  if (file_ == nullptr) {      // Man, we're screwed!
     close(fd);
     unlink(filename);  // Erase the half-baked evidence: an unusable log file
     return false;
@@ -159,14 +159,14 @@ void LogFileObject::Write(bool force_flush, time_t timestamp,
   if (static_cast<int>(file_length_ >> 20) >=
           ::apollo::cybertron::logger::MaxLogSize() ||
       apollo::cybertron::logger::PidHasChanged()) {
-    if (file_ != NULL) fclose(file_);
-    file_ = NULL;
+    if (file_ != nullptr) fclose(file_);
+    file_ = nullptr;
     file_length_ = bytes_since_flush_ = dropped_mem_length_ = 0;
     rollover_attempt_ = kRolloverAttemptFrequency - 1;
   }
 
   // If there's no destination file, make one before outputting
-  if (file_ == NULL) {
+  if (file_ == nullptr) {
     // Try to rollover the log file every 32 log messages.  The only time
     // this could matter would be when we have trouble creating the log
     // file.  If that happens, we'll lose lots of log messages, of course!
@@ -231,7 +231,7 @@ void LogFileObject::Write(bool force_flush, time_t timestamp,
     const std::string& file_header_string = file_header_stream.str();
 
     const int header_len = file_header_string.size();
-    if (file_ == NULL) {
+    if (file_ == nullptr) {
       return;
     }
     fwrite(file_header_string.data(), 1, header_len, file_);

@@ -50,7 +50,7 @@ LossyMapCell2D& LossyMapCell2D::operator=(const LossyMapCell2D& ref) {
 LossyMapMatrix2D::LossyMapMatrix2D() {
   rows_ = 0;
   cols_ = 0;
-  map_cells_ = NULL;
+  map_cells_ = nullptr;
 }
 
 LossyMapMatrix2D::~LossyMapMatrix2D() {
@@ -94,7 +94,7 @@ void LossyMapMatrix2D::Init(const BaseMapConfig* config) {
 void LossyMapMatrix2D::Init(unsigned int rows, unsigned int cols) {
   if (map_cells_) {
     delete[] map_cells_;
-    map_cells_ = NULL;
+    map_cells_ = nullptr;
   }
   map_cells_ = new LossyMapCell2D[rows * cols];
   rows_ = rows;

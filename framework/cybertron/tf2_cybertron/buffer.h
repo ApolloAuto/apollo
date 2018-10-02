@@ -73,14 +73,14 @@ class Buffer : public BufferInterface, public tf2::BufferCore {
    * \param target_time The time at which to transform
    * \param timeout How long to block before failing
    * \param errstr A pointer to a string which will be filled with why the
-   * transform failed, if not NULL
+   * transform failed, if not nullptr
    * \return True if the transform is possible, false otherwise
    */
   virtual bool canTransform(const std::string& target_frame,
                             const std::string& source_frame,
                             const cybertron::Time& target_time,
                             const float timeout_second = 0.01,
-                            std::string* errstr = NULL) const;
+                            std::string* errstr = nullptr) const;
 
   /** \brief Test if a transform is possible
    * \param target_frame The frame into which to transform
@@ -91,7 +91,7 @@ class Buffer : public BufferInterface, public tf2::BufferCore {
    * time
    * \param timeout How long to block before failing
    * \param errstr A pointer to a string which will be filled with why the
-   * transform failed, if not NULL
+   * transform failed, if not nullptr
    * \return True if the transform is possible, false otherwise
    */
   virtual bool canTransform(const std::string& target_frame,
@@ -100,7 +100,7 @@ class Buffer : public BufferInterface, public tf2::BufferCore {
                             const cybertron::Time& source_time,
                             const std::string& fixed_frame,
                             const float timeout_second = 0.01,
-                            std::string* errstr = NULL) const;
+                            std::string* errstr = nullptr) const;
 
  private:
   void SubscriptionCallback(

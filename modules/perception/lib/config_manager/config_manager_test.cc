@@ -36,7 +36,7 @@ class ConfigManagerTest : public testing::Test {
     putenv(module_path);
     FLAGS_config_manager_path = "/apollo/modules/perception/testdata/lib/conf";
     config_manager_ = lib::Singleton<ConfigManager>::get_instance();
-    ASSERT_TRUE(config_manager_ != NULL);
+    ASSERT_TRUE(config_manager_ != nullptr);
   }
 
  protected:
@@ -62,21 +62,21 @@ TEST_F(ConfigManagerTest, TestInit) {
 
 TEST_F(ConfigManagerTest, TestGetModelConfig) {
   std::string model_name = "FrameClassifier";
-  const ModelConfig* model_config = NULL;
+  const ModelConfig* model_config = nullptr;
 
   EXPECT_TRUE(config_manager_->GetModelConfig(model_name, &model_config));
-  ASSERT_TRUE(model_config != NULL);
+  ASSERT_TRUE(model_config != nullptr);
   EXPECT_EQ(model_config->name(), model_name);
 
   // not exist model.
-  model_config = NULL;
+  model_config = nullptr;
   EXPECT_FALSE(config_manager_->GetModelConfig("noexist", &model_config));
-  EXPECT_TRUE(model_config == NULL);
+  EXPECT_TRUE(model_config == nullptr);
 }
 
 TEST_F(ConfigManagerTest, TestModelConfig) {
   std::string model_name = "FrameClassifier";
-  const ModelConfig* model_config = NULL;
+  const ModelConfig* model_config = nullptr;
   ASSERT_TRUE(config_manager_->Init());
   ASSERT_EQ(config_manager_->NumModels(), 2u);
   ASSERT_FALSE(

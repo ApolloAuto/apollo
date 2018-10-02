@@ -4372,7 +4372,7 @@ inline void i_mult_Ax(const T *A, const T *x, T *Ax, int m, int n) {
 template <typename T>
 inline void i_mult_Atx(const T *A, const T *x, T *Atx, int m, int n) {
   T acc;
-  const T *Ai = NULL;
+  const T *Ai = nullptr;
   for (int i = 0; i < n; i++) {
     Ai = A + i;
     acc = T(0.0);

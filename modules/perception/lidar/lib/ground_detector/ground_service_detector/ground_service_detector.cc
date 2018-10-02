@@ -58,7 +58,7 @@ bool GroundServiceDetector::Init(const GroundDetectorInitOptions& options) {
 
 bool GroundServiceDetector::Detect(const GroundDetectorOptions& options,
                                    LidarFrame* frame) {
-  if (frame == NULL || frame->world_cloud == nullptr) {
+  if (frame == nullptr || frame->world_cloud == nullptr) {
     AERROR << "Frame is nullptr.";
     return false;
   }

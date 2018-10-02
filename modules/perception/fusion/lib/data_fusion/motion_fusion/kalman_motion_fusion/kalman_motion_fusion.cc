@@ -30,7 +30,7 @@ int KalmanMotionFusion::s_eval_window_ = 3;
 size_t KalmanMotionFusion::s_history_size_maximum_ = 20;
 
 bool KalmanMotionFusion::Init() {
-  if (track_ref_ == NULL) {
+  if (track_ref_ == nullptr) {
     return false;
   }
   if (track_ref_->GetLatestLidarObject() != nullptr) {

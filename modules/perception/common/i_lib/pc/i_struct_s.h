@@ -58,7 +58,7 @@ class PtCluster {
     if (c.nr_points()) {
       _nr_points = c.nr_points();
       _data = i_alloc_aligned<T>(_nr_points * d, 4);
-      CHECK_NE(_data, NULL);
+      CHECK_NE(_data, nullptr);
       CHECK(i_verify_alignment(_data, 4));
       i_copy(c.const_data(), _data, _nr_points * d);
     }
@@ -69,7 +69,7 @@ class PtCluster {
       if (this->_nr_points != c.nr_points()) {
         i_free_aligned(_data);
         _data = i_alloc_aligned<T>(this->_nr_points * d, 4);
-        CHECK_NE(_data, NULL);
+        CHECK_NE(_data, nullptr);
         CHECK(i_verify_alignment(_data, 4));
         this->_nr_points = c.nr_points();
       }
@@ -496,7 +496,7 @@ VoxelGridXY<T>::VoxelGridXY()
 template <typename T>
 void VoxelGridXY<T>::cleanup() {
   _initialized = false;
-  _data = NULL;
+  _data = nullptr;
   _nr_points = _nr_point_element = _nr_voxel_x = _nr_voxel_y = 0;
   _nr_voxel_z = 1;
   i_zero2(_dim_x);
@@ -573,7 +573,7 @@ bool VoxelGridXY<T>::alloc_aligned_memory() {
   if (!_mem_aligned16_i32) {
     _mem_aligned16_i32 = i_alloc_aligned<int>(4, 4);
   }
-  return (_mem_aligned16_f32 != NULL && _mem_aligned16_i32 != NULL &&
+  return (_mem_aligned16_f32 != nullptr && _mem_aligned16_i32 != nullptr &&
           i_verify_alignment(_mem_aligned16_f32, 4) &&
           i_verify_alignment(_mem_aligned16_i32, 4));
 }
@@ -1438,7 +1438,7 @@ bool VoxelGridXYPyramid<DATA_TYPE>::set(
 
 template <typename DATA_TYPE>
 void VoxelGridXYPyramid<DATA_TYPE>::cleanup() {
-  _pc = NULL;
+  _pc = nullptr;
   _vgrids.clear();
   _nr_points = _nr_point_element = _dsf_x = _dsf_y = _dsf_z = 0;
 }

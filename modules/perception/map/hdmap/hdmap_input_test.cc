@@ -41,7 +41,7 @@ class HDMapInputTest : public testing::Test {
     //    FLAGS_config_manager_path = "/apollo/modules/perception/testdata/"
     //        "map/hdmap/conf";
     //    config_manager_ = lib::Singleton<ConfigManager>::get_instance();
-    //    ASSERT_TRUE(config_manager_ != NULL);
+    //    ASSERT_TRUE(config_manager_ != nullptr);
   }
 
  protected:

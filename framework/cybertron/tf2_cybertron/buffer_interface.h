@@ -61,14 +61,14 @@ class BufferInterface {
    * \param time The time at which to transform
    * \param timeout How long to block before failing
    * \param errstr A pointer to a string which will be filled with why the
-   * transform failed, if not NULL
+   * transform failed, if not nullptr
    * \return True if the transform is possible, false otherwise
    */
   virtual bool canTransform(const std::string& target_frame,
                             const std::string& source_frame,
                             const cybertron::Time& time,
                             const float timeout_second = 0.01,
-                            std::string* errstr = NULL) const = 0;
+                            std::string* errstr = nullptr) const = 0;
 
   /** \brief Test if a transform is possible
    * \param target_frame The frame into which to transform
@@ -79,7 +79,7 @@ class BufferInterface {
    * time
    * \param timeout How long to block before failing
    * \param errstr A pointer to a string which will be filled with why the
-   * transform failed, if not NULL
+   * transform failed, if not nullptr
    * \return True if the transform is possible, false otherwise
    */
   virtual bool canTransform(const std::string& target_frame,
@@ -88,7 +88,7 @@ class BufferInterface {
                             const cybertron::Time& source_time,
                             const std::string& fixed_frame,
                             const float timeout_second = 0.01,
-                            std::string* errstr = NULL) const = 0;
+                            std::string* errstr = nullptr) const = 0;
 
   // Transform, simple api, with pre-allocation
   template <typename T>

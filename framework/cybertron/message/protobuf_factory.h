@@ -85,10 +85,10 @@ class ProtobufFactory {
   google::protobuf::Message* GenerateMessageByType(
       const std::string& type) const;
 
-  // Find a top-level message type by name. Returns NULL if not found.
+  // Find a top-level message type by name. Returns nullptr if not found.
   const Descriptor* FindMessageTypeByName(const std::string& type) const;
 
-  // Find a service definition by name. Returns NULL if not found.
+  // Find a service definition by name. Returns nullptr if not found.
   const google::protobuf::ServiceDescriptor* FindServiceByName(
       const std::string& name) const;
 

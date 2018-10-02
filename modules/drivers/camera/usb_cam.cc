@@ -177,7 +177,7 @@ void UsbCam::mjpeg2rgb(char* mjpeg_buffer, int len, char* rgb_buffer,
 
   video_sws_ =
       sws_getContext(xsize, ysize, avcodec_context_->pix_fmt, xsize, ysize,
-                     PIX_FMT_RGB24, SWS_BILINEAR, NULL, NULL, NULL);
+                     PIX_FMT_RGB24, SWS_BILINEAR, nullptr, nullptr, nullptr);
   sws_scale(video_sws_, avframe_camera_->data, avframe_camera_->linesize, 0,
             ysize, avframe_rgb_->data, avframe_rgb_->linesize);
   sws_freeContext(video_sws_);
@@ -207,7 +207,7 @@ bool UsbCam::poll(const CameraImagePtr& raw_image) {
   tv.tv_sec = 2;
   tv.tv_usec = 0;
 
-  r = select(fd_ + 1, &fds, NULL, NULL, &tv);
+  r = select(fd_ + 1, &fds, nullptr, nullptr, &tv);
 
   if (-1 == r) {
     if (EINTR == errno) {
@@ -891,7 +891,7 @@ bool UsbCam::read_frame(CameraImagePtr raw_image) {
 }
 
 bool UsbCam::process_image(const void* src, int len, CameraImagePtr dest) {
-  if (src == NULL || dest == NULL) {
+  if (src == nullptr || dest == nullptr) {
     AERROR << "process image error. src or dest is null";
     return false;
   }
@@ -977,7 +977,7 @@ void UsbCam::set_v4l_parameter(const std::string& param,
   FILE* stream = popen(cmd.c_str(), "r");
   if (stream) {
     while (!feof(stream)) {
-      if (fgets(buffer, 256, stream) != NULL) {
+      if (fgets(buffer, 256, stream) != nullptr) {
         output.append(buffer);
       }
     }

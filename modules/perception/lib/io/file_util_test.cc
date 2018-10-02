@@ -184,7 +184,7 @@ TEST(FileUtilTest, TestRenameFile) {
 TEST(FileUtilTest, TestGetFileContent) {
   std::string path = "/apollo/modules/perception/testdata/lib/data/1.txt";
   std::string content;
-  EXPECT_FALSE(FileUtil::GetFileContent(path, NULL));
+  EXPECT_FALSE(FileUtil::GetFileContent(path, nullptr));
   EXPECT_FALSE(FileUtil::GetFileContent(
       "/apollo/modules/perception/testdata/lib/data/2.txt", &content));
   EXPECT_TRUE(FileUtil::GetFileContent(path, &content));

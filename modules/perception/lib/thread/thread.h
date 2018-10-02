@@ -54,7 +54,7 @@ class Thread {
   static void *ThreadRunner(void *arg) {
     Thread *t = reinterpret_cast<Thread *>(arg);
     t->Run();
-    return NULL;
+    return nullptr;
   }
 
   pthread_t tid_;

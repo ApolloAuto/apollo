@@ -139,7 +139,7 @@ bool PlaneFitGroundDetector::init() {
   }
   // fine grid:
   _vg_fine = new VoxelGridXY<float>();
-  if (_vg_fine == NULL) {
+  if (_vg_fine == nullptr) {
     return false;
   }
   if (!_vg_fine->alloc(_param.nr_grids_fine, _param.nr_grids_fine,
@@ -150,7 +150,7 @@ bool PlaneFitGroundDetector::init() {
   }
   // coarse grid:
   _vg_coarse = new VoxelGridXY<float>();
-  if (_vg_coarse == NULL) {
+  if (_vg_coarse == nullptr) {
     return false;
   }
   if (!_vg_coarse->alloc(_param.nr_grids_coarse, _param.nr_grids_coarse,
@@ -288,7 +288,7 @@ int PlaneFitGroundDetector::compare_z(const float *point_cloud,
   unsigned int nr_contradi = 0;
   unsigned int nr_z_comp_fail_threshold =
       i_min(_param.nr_z_comp_fail_threshold, (unsigned int)(nr_compares >> 1));
-  const float *ptr = NULL;
+  const float *ptr = nullptr;
   float z = 0;
   float delta_z = 0;
   std::vector<int>::const_iterator iter = indices.cbegin();
@@ -411,36 +411,36 @@ void PlaneFitGroundDetector::compute_signed_ground_height_line(
   unsigned int id = 0;
   int pos = 0;
   char label = 0;
-  const float *cptr = NULL;
+  const float *cptr = nullptr;
   float dist[] = {0, 0, 0, 0, 0};
-  const float *plane[] = {NULL, NULL, NULL, NULL, NULL};
+  const float *plane[] = {NULL, nullptr, nullptr, nullptr, nullptr};
   float min_abs_dist = 0;
   unsigned int nm1 = _param.nr_grids_coarse - 1;
   CHECK_GE(_param.nr_grids_coarse, 2);
-  plane[0] = cn[0].is_valid() ? cn[0].params : NULL;
-  plane[1] = cn[1].is_valid() ? cn[1].params : NULL;
-  plane[2] = up[0].is_valid() ? up[0].params : NULL;
-  plane[3] = dn[0].is_valid() ? dn[0].params : NULL;
+  plane[0] = cn[0].is_valid() ? cn[0].params : nullptr;
+  plane[1] = cn[1].is_valid() ? cn[1].params : nullptr;
+  plane[2] = up[0].is_valid() ? up[0].params : nullptr;
+  plane[3] = dn[0].is_valid() ? dn[0].params : nullptr;
   std::vector<int>::const_iterator iter = (*_vg_coarse)(r, 0)._indices.cbegin();
   while (iter < (*_vg_coarse)(r, 0)._indices.cend()) {
     pos = *iter;
     CHECK_LT(pos, (int)nr_points);
     label = _labels[pos];
     cptr = point_cloud + (nr_point_elements * pos);
-    dist[0] = plane[0] != NULL
+    dist[0] = plane[0] != nullptr
                   ? i_plane_to_point_signed_distance_w_unit_norm(plane[0], cptr)
                   : FLT_MAX;
     min_abs_dist = i_abs(dist[0]);
     id = 0;
     // for candidates we take min dist:
     if (label) {
-      dist[1] = plane[1] != NULL ? i_plane_to_point_signed_distance_w_unit_norm(
+      dist[1] = plane[1] != nullptr ? i_plane_to_point_signed_distance_w_unit_norm(
                                        plane[1], cptr)
                                  : FLT_MAX;
-      dist[2] = plane[2] != NULL ? i_plane_to_point_signed_distance_w_unit_norm(
+      dist[2] = plane[2] != nullptr ? i_plane_to_point_signed_distance_w_unit_norm(
                                        plane[2], cptr)
                                  : FLT_MAX;
-      dist[3] = plane[3] != NULL ? i_plane_to_point_signed_distance_w_unit_norm(
+      dist[3] = plane[3] != nullptr ? i_plane_to_point_signed_distance_w_unit_norm(
                                        plane[3], cptr)
                                  : FLT_MAX;
       for (i = 1; i < 4; ++i) {
@@ -455,37 +455,37 @@ void PlaneFitGroundDetector::compute_signed_ground_height_line(
   }
 
   for (c = 1; c < nm1; ++c) {
-    plane[0] = cn[c].is_valid() ? cn[c].params : NULL;
-    plane[1] = cn[c - 1].is_valid() ? cn[c - 1].params : NULL;
-    plane[2] = cn[c + 1].is_valid() ? cn[c + 1].params : NULL;
-    plane[3] = up[c].is_valid() ? up[c].params : NULL;
-    plane[4] = dn[c].is_valid() ? dn[c].params : NULL;
+    plane[0] = cn[c].is_valid() ? cn[c].params : nullptr;
+    plane[1] = cn[c - 1].is_valid() ? cn[c - 1].params : nullptr;
+    plane[2] = cn[c + 1].is_valid() ? cn[c + 1].params : nullptr;
+    plane[3] = up[c].is_valid() ? up[c].params : nullptr;
+    plane[4] = dn[c].is_valid() ? dn[c].params : nullptr;
     iter = (*_vg_coarse)(r, c)._indices.cbegin();
     while (iter < (*_vg_coarse)(r, c)._indices.cend()) {
       pos = *iter;
       CHECK_LT(pos, (int)nr_points);
       label = _labels[pos];
       cptr = point_cloud + (nr_point_elements * pos);
-      dist[0] = plane[0] != NULL ? i_plane_to_point_signed_distance_w_unit_norm(
+      dist[0] = plane[0] != nullptr ? i_plane_to_point_signed_distance_w_unit_norm(
                                        plane[0], cptr)
                                  : FLT_MAX;
       min_abs_dist = i_abs(dist[0]);
       id = 0;
       if (label) {
         dist[1] =
-            plane[1] != NULL
+            plane[1] != nullptr
                 ? i_plane_to_point_signed_distance_w_unit_norm(plane[1], cptr)
                 : FLT_MAX;
         dist[2] =
-            plane[2] != NULL
+            plane[2] != nullptr
                 ? i_plane_to_point_signed_distance_w_unit_norm(plane[2], cptr)
                 : FLT_MAX;
         dist[3] =
-            plane[3] != NULL
+            plane[3] != nullptr
                 ? i_plane_to_point_signed_distance_w_unit_norm(plane[3], cptr)
                 : FLT_MAX;
         dist[4] =
-            plane[4] != NULL
+            plane[4] != nullptr
                 ? i_plane_to_point_signed_distance_w_unit_norm(plane[4], cptr)
                 : FLT_MAX;
         for (i = 1; i < 5; ++i) {
@@ -499,30 +499,30 @@ void PlaneFitGroundDetector::compute_signed_ground_height_line(
       ++iter;
     }
   }
-  plane[0] = cn[nm1].is_valid() ? cn[nm1].params : NULL;
-  plane[1] = cn[nm1 - 1].is_valid() ? cn[nm1 - 1].params : NULL;
-  plane[2] = up[nm1].is_valid() ? up[nm1].params : NULL;
-  plane[3] = dn[nm1].is_valid() ? dn[nm1].params : NULL;
+  plane[0] = cn[nm1].is_valid() ? cn[nm1].params : nullptr;
+  plane[1] = cn[nm1 - 1].is_valid() ? cn[nm1 - 1].params : nullptr;
+  plane[2] = up[nm1].is_valid() ? up[nm1].params : nullptr;
+  plane[3] = dn[nm1].is_valid() ? dn[nm1].params : nullptr;
   iter = (*_vg_coarse)(r, nm1)._indices.cbegin();
   while (iter < (*_vg_coarse)(r, nm1)._indices.cend()) {
     pos = *iter;
     CHECK_LT(pos, (int)nr_points);
     label = _labels[pos];
     cptr = point_cloud + (nr_point_elements * pos);
-    dist[0] = plane[0] != NULL
+    dist[0] = plane[0] != nullptr
                   ? i_plane_to_point_signed_distance_w_unit_norm(plane[0], cptr)
                   : FLT_MAX;
     min_abs_dist = i_abs(dist[0]);
     id = 0;
     // for candidates we take min dist:
     if (label) {
-      dist[1] = plane[1] != NULL ? i_plane_to_point_signed_distance_w_unit_norm(
+      dist[1] = plane[1] != nullptr ? i_plane_to_point_signed_distance_w_unit_norm(
                                        plane[1], cptr)
                                  : FLT_MAX;
-      dist[2] = plane[2] != NULL ? i_plane_to_point_signed_distance_w_unit_norm(
+      dist[2] = plane[2] != nullptr ? i_plane_to_point_signed_distance_w_unit_norm(
                                        plane[2], cptr)
                                  : FLT_MAX;
-      dist[3] = plane[3] != NULL ? i_plane_to_point_signed_distance_w_unit_norm(
+      dist[3] = plane[3] != nullptr ? i_plane_to_point_signed_distance_w_unit_norm(
                                        plane[3], cptr)
                                  : FLT_MAX;
       for (i = 1; i < 4; ++i) {
@@ -637,7 +637,7 @@ int PlaneFitGroundDetector::fit_grid(const float *point_cloud,
   // 3x3 matrix stores: x, y, z; x, y, z; x, y, z;
   float samples[9];
   // copy 3D points
-  float *psrc = NULL;
+  float *psrc = nullptr;
   float *pdst = _pf_threeds;
   for (i = 0; i < nr_samples; ++i) {
     CHECK_LT(candi[i], (int)nr_points);
@@ -837,7 +837,7 @@ int PlaneFitGroundDetector::fit_grid_with_neighbors(
   // 3x3 matrix stores: x, y, z; x, y, z; x, y, z;
   float samples[9];
   // copy 3D points
-  float *psrc = NULL;
+  float *psrc = nullptr;
   float *pdst = _pf_threeds;
   int r_n = 0;
   int c_n = 0;
@@ -1271,7 +1271,7 @@ const GroundPlaneLiDAR *PlaneFitGroundDetector::get_ground_plane(int r,
   CHECK_LT(r, (int)_param.nr_grids_coarse);
   CHECK_GE(c, 0);
   CHECK_LT(c, (int)_param.nr_grids_coarse);
-  return _ground_planes != NULL ? _ground_planes[r] + c : NULL;
+  return _ground_planes != nullptr ? _ground_planes[r] + c : nullptr;
 }
 
 const unsigned int PlaneFitGroundDetector::get_grid_dim_x() const {

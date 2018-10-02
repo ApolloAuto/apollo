@@ -39,7 +39,7 @@ namespace logger {
 
 int64_t CycleClock_Now() {
   struct timeval tv;
-  gettimeofday(&tv, NULL);
+  gettimeofday(&tv, nullptr);
   return static_cast<int64_t>(tv.tv_sec) * 1000000 + tv.tv_usec;
 }
 
@@ -53,7 +53,7 @@ static void GetHostName(std::string* hostname) {
 
 static std::vector<std::string>* logging_directories_list;
 const std::vector<std::string>& GetLoggingDirectories() {
-  if (logging_directories_list == NULL) {
+  if (logging_directories_list == nullptr) {
     logging_directories_list = new std::vector<std::string>;
 
     if (!FLAGS_log_dir.empty()) {

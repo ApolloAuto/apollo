@@ -69,7 +69,7 @@ template <typename T, typename std::enable_if<
 bool DumpMessage(const std::shared_ptr<T>& msg,
                  const std::string& dump_dir = "/tmp") {
   if (!msg) {
-    AWARN << "Message to be dumped is NULL!";
+    AWARN << "Message to be dumped is nullptr!";
   }
 
   auto type_name = T::descriptor()->full_name();

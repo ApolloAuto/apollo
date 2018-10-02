@@ -111,7 +111,7 @@ TEST_F(LidarLibROIServiceFilterTest, lidar_lib_roi_service_filter_test) {
 
   EXPECT_TRUE(SceneManager::Instance().Init());
   EXPECT_TRUE(roi_service_filter.Init(ROIFilterInitOptions()));
-  EXPECT_FALSE(roi_service_filter.Filter(ROIFilterOptions(), NULL));
+  EXPECT_FALSE(roi_service_filter.Filter(ROIFilterOptions(), nullptr));
   LidarFrame frame;
   EXPECT_FALSE(roi_service_filter.Filter(ROIFilterOptions(), &frame));
   MockData(&frame);
