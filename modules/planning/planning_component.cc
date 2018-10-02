@@ -24,6 +24,7 @@
 namespace apollo {
 namespace planning {
 
+using apollo::common::util::MessageUtil;
 using apollo::hdmap::HDMapUtil;
 using apollo::perception::TrafficLightDetection;
 using apollo::relative_map::MapMsg;
@@ -39,7 +40,7 @@ bool PlanningComponent::Init() {
       FLAGS_routing_response_topic,
       [this](const std::shared_ptr<RoutingResponse>& routing) {
         AINFO << "Received routing data: run routing callback 2:"
-               << routing->header().DebugString();
+              << routing->header().DebugString();
         std::lock_guard<std::mutex> lock(mutex_);
         routing_.CopyFrom(*routing);
       });
@@ -110,7 +111,7 @@ bool PlanningComponent::Proc(
   ADCTrajectory adc_trajectory_pb;
   planning_base_->RunOnce(local_view_, &adc_trajectory_pb);
 
-  common::util::FillHeader(node_->Name(), &adc_trajectory_pb);
+  MessageUtil<ADCTrajectory>::FillHeader(node_->Name(), &adc_trajectory_pb);
   planning_writer_->Write(std::make_shared<ADCTrajectory>(adc_trajectory_pb));
   return true;
 }
@@ -122,7 +123,8 @@ void PlanningComponent::CheckRerouting() {
   if (!rerouting->need_rerouting()) {
     return;
   }
-  common::util::FillHeader(node_->Name(), rerouting->mutable_routing_request());
+  MessageUtil<RoutingRequest>::FillHeader(node_->Name(),
+                                          rerouting->mutable_routing_request());
   rerouting->set_need_rerouting(false);
   rerouting_writer_->Write(
       std::make_shared<RoutingRequest>(rerouting->routing_request()));
@@ -146,7 +148,7 @@ bool PlanningComponent::CheckInput() {
 
   if (not_ready->has_reason()) {
     AERROR << not_ready->reason() << "; skip the planning cycle.";
-    common::util::FillHeader(node_->Name(), &trajectory_pb);
+    MessageUtil<ADCTrajectory>::FillHeader(node_->Name(), &trajectory_pb);
     planning_writer_->Write(std::make_shared<ADCTrajectory>(trajectory_pb));
     return false;
   }

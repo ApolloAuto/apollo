@@ -43,6 +43,7 @@ namespace {
 using apollo::canbus::Chassis;
 using apollo::common::VehicleSignal;
 using apollo::common::time::Clock;
+using apollo::common::util::MessageUtil;
 using apollo::control::ControlCommand;
 using apollo::control::PadMessage;
 using apollo::cybertron::CreateNode;
@@ -344,7 +345,7 @@ class Teleop {
   }
 
   void Send() {
-    apollo::common::util::FillHeader("control", &control_command_);
+    MessageUtil<ControlCommand>::FillHeader("control", &control_command_);
     control_command_writer_->Write(
         std::make_shared<ControlCommand>(control_command_));
     ADEBUG << "Control Command send OK:" << control_command_.ShortDebugString();

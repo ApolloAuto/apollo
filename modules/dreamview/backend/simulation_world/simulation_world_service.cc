@@ -50,11 +50,11 @@ using apollo::common::VehicleConfigHelper;
 using apollo::common::monitor::MonitorMessage;
 using apollo::common::monitor::MonitorMessageItem;
 using apollo::common::time::Clock;
-using apollo::common::time::ToSecond;
 using apollo::common::time::millis;
+using apollo::common::time::ToSecond;
 using apollo::common::util::DownsampleByAngle;
-using apollo::common::util::FillHeader;
 using apollo::common::util::GetProtoFromFile;
+using apollo::common::util::MessageUtil;
 using apollo::control::ControlCommand;
 using apollo::hdmap::Curve;
 using apollo::hdmap::Map;
@@ -1106,13 +1106,15 @@ void SimulationWorldService::DumpMessages() {
 
 void SimulationWorldService::PublishNavigationInfo(
     const std::shared_ptr<NavigationInfo> &navigation_info) {
-  FillHeader(FLAGS_dreamview_module_name, navigation_info.get());
+  MessageUtil<NavigationInfo>::FillHeader(FLAGS_dreamview_module_name,
+                                          navigation_info.get());
   navigation_writer_->Write(navigation_info);
 }
 
 void SimulationWorldService::PublishRoutingRequest(
     const std::shared_ptr<RoutingRequest> &routing_request) {
-  FillHeader(FLAGS_dreamview_module_name, routing_request.get());
+  MessageUtil<RoutingRequest>::FillHeader(FLAGS_dreamview_module_name,
+                                          routing_request.get());
   routing_request_writer_->Write(routing_request);
 }
 

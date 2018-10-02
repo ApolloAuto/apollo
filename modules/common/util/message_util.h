@@ -40,20 +40,31 @@ namespace util {
 // Expose some useful utils from protobuf.
 using ::google::protobuf::Message;
 
-template <typename T, typename std::enable_if<
-                          std::is_base_of<Message, T>::value, int>::type = 0>
-static void FillHeader(const std::string& module_name, T* msg,
-                       bool reset_sequence_num = false) {
-  static std::atomic<uint64_t> sequence_num = {0};
-  if (reset_sequence_num) {
-    sequence_num.store(0);
+template <typename T, typename Enable = void>
+class MessageUtil {};
+
+template <typename T>
+class MessageUtil<T, typename std::enable_if<std::is_base_of<Message, T>::value,
+                                             void>::type> {
+ public:
+  static void FillHeader(const std::string& module_name, T* msg) {
+    auto* header = msg->mutable_header();
+    double timestamp = apollo::common::time::Clock::NowInSeconds();
+    header->set_module_name(module_name);
+    header->set_timestamp_sec(timestamp);
+    header->set_sequence_num(sequence_num_.fetch_add(1));
   }
-  auto* header = msg->mutable_header();
-  double timestamp = apollo::common::time::Clock::NowInSeconds();
-  header->set_module_name(module_name);
-  header->set_timestamp_sec(timestamp);
-  header->set_sequence_num(sequence_num.fetch_add(1));
-}
+
+  static void ResetSequenceNumber() { sequence_num_.store(0); }
+
+ private:
+  static std::atomic<uint64_t> sequence_num_;
+};
+
+template <typename T>
+std::atomic<uint64_t>
+    MessageUtil<T, typename std::enable_if<std::is_base_of<Message, T>::value,
+                                           void>::type>::sequence_num_ = {0};
 
 template <typename T, typename std::enable_if<
                           !std::is_base_of<Message, T>::value, int>::type = 0>

@@ -35,6 +35,8 @@ namespace apollo {
 namespace drivers {
 namespace conti_radar {
 
+using apollo::common::util::MessageUtil;
+
 ContiRadarMessageManager::ContiRadarMessageManager(
     const std::shared_ptr<Writer<ContiRadar>> &writer)
     : conti_radar_writer_(writer) {
@@ -95,7 +97,7 @@ void ContiRadarMessageManager::Parse(const uint32_t message_id,
     }
     sensor_data_.Clear();
     // fill header when recieve the general info message
-    common::util::FillHeader("conti_radar", &sensor_data_);
+    MessageUtil<ContiRadar>::FillHeader("conti_radar", &sensor_data_);
   }
 
   sensor_protocol_data->Parse(data, length, &sensor_data_);

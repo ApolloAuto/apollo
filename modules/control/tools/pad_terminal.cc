@@ -35,6 +35,7 @@ namespace {
 using apollo::canbus::Chassis;
 using apollo::common::time::AsInt64;
 using apollo::common::time::Clock;
+using apollo::common::util::MessageUtil;
 using apollo::control::DrivingAction;
 using apollo::control::PadMessage;
 using apollo::cybertron::CreateNode;
@@ -70,7 +71,7 @@ class PadTerminal {
       pad.set_action(DrivingAction::START);
       AINFO << "sending start action command.";
     }
-    apollo::common::util::FillHeader("terminal", &pad);
+    MessageUtil<PadMessage>::FillHeader("terminal", &pad);
     pad_writer_->Write(std::make_shared<PadMessage>(pad));
     AINFO << "send pad_message OK";
   }

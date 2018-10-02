@@ -37,6 +37,8 @@ namespace apollo {
 namespace drivers {
 namespace racobit_radar {
 
+using apollo::common::util::MessageUtil;
+
 RacobitRadarMessageManager::RacobitRadarMessageManager(
     std::shared_ptr<cybertron::Writer<RacobitRadar>> writer)
     : writer_(std::move(writer)) {
@@ -86,7 +88,7 @@ void RacobitRadarMessageManager::Parse(const uint32_t message_id,
     return;
   }
 
-  common::util::FillHeader(FLAGS_sensor_node_name, &sensor_data_);
+  MessageUtil<RacobitRadar>::FillHeader(FLAGS_sensor_node_name, &sensor_data_);
 
   // trigger publishment
   if (message_id == ClusterListStatus600::ID ||
@@ -96,7 +98,7 @@ void RacobitRadarMessageManager::Parse(const uint32_t message_id,
     if (sensor_data_.contiobs_size() <=
         sensor_data_.object_list_status().nof_objects()) {
       // maybe lost a object_list_status msg
-      common::util::FillHeader("racobit_radar", &sensor_data_);
+      MessageUtil<RacobitRadar>::FillHeader("racobit_radar", &sensor_data_);
       writer_->Write(sensor_data_);
     }
     sensor_data_.Clear();

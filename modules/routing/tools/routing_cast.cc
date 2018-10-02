@@ -23,10 +23,10 @@
 #include "modules/common/util/message_util.h"
 #include "modules/routing/proto/routing.pb.h"
 
-DEFINE_string(routing_dump_file,
-              "/tmp/routing.pb.txt",
+DEFINE_string(routing_dump_file, "/tmp/routing.pb.txt",
               "file name to dump routing response.");
 
+using apollo::common::util::MessageUtil;
 using apollo::cybertron::Rate;
 using apollo::cybertron::Time;
 
@@ -44,12 +44,12 @@ int main(int argc, char *argv[]) {
     return -1;
   }
 
-  auto cast_writer =
-      cast_node->CreateWriter<apollo::routing::RoutingResponse>(
-          FLAGS_routing_response_topic);
+  auto cast_writer = cast_node->CreateWriter<apollo::routing::RoutingResponse>(
+      FLAGS_routing_response_topic);
   Rate rate(1.0);
   while (apollo::cybertron::OK()) {
-    apollo::common::util::FillHeader("routing", &routing_response);
+    MessageUtil<apollo::routing::RoutingResponse>::FillHeader(
+        "routing", &routing_response);
     cast_writer->Write(routing_response);
     rate.Sleep();
   }
