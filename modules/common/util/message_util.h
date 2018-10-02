@@ -42,12 +42,8 @@ using ::google::protobuf::Message;
 
 template <typename T, typename std::enable_if<
                           std::is_base_of<Message, T>::value, int>::type = 0>
-static void FillHeader(const std::string& module_name, T* msg,
-                       bool reset_sequence_num = false) {
+static void FillHeader(const std::string& module_name, T* msg) {
   static std::atomic<uint64_t> sequence_num = {0};
-  if (reset_sequence_num) {
-    sequence_num.store(0);
-  }
   auto* header = msg->mutable_header();
   double timestamp = apollo::common::time::Clock::NowInSeconds();
   header->set_module_name(module_name);
