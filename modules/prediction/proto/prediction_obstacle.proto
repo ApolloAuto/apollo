@@ -7,6 +7,7 @@ import "modules/common/proto/header.proto";
 import "modules/common/proto/pnc_point.proto";
 import "modules/prediction/proto/scenario.proto";
 import "modules/perception/proto/perception_obstacle.proto";
+import "modules/prediction/proto/feature.proto";
 
 message Trajectory {
   optional double probability = 1;  // probability of this trajectory
@@ -50,6 +51,8 @@ message PredictionObstacle {
 
   // estimated obstacle intent
   optional ObstacleIntent intent = 5;
+
+  optional ObstaclePriority priority = 6;
 }
 
 message PredictionObstacles {

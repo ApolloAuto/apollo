@@ -127,7 +127,7 @@ bool Obstacle::ToIgnore() {
   if (history_size() == 0) {
     return true;
   }
-  return latest_feature().priority() == Feature::IGNORE;
+  return latest_feature().priority().priority() == ObstaclePriority::IGNORE;
 }
 
 bool Obstacle::IsNearJunction() {
