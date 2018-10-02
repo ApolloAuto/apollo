@@ -52,7 +52,7 @@ bool QpSplineStSpeedOptimizer::Init(
   st_boundary_config_ = qp_st_speed_config_.st_boundary_config();
   std::vector<double> init_knots;
 
-  if (FLAGS_use_osqp_optimizer) {
+  if (FLAGS_use_osqp_optimizer_for_qp_st) {
     spline_solver_.reset(new OsqpSpline1dSolver(init_knots, 5));
   } else {
     spline_solver_.reset(new ActiveSetSpline1dSolver(init_knots, 5));

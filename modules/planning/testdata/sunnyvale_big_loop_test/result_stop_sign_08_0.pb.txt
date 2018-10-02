@@ -8,10 +8,10 @@ decision {
       reason_code: STOP_REASON_STOP_SIGN
       reason: "stop by SS_2203"
       stop_point {
-        x: 586979.95439842215
-        y: 4141241.73174152
+        x: 586979.95010428689
+        y: 4141241.7073030639
       }
-      stop_heading: 2.7491778522192512
+      stop_heading: 2.7461661425859814
       change_lane_type: FORWARD
     }
   }
@@ -24,11 +24,11 @@ decision {
           reason_code: STOP_REASON_STOP_SIGN
           distance_s: -1
           stop_point {
-            x: 586979.95439842215
-            y: 4141241.73174152
+            x: 586979.95010428689
+            y: 4141241.7073030639
             z: 0
           }
-          stop_heading: 2.7491778522192512
+          stop_heading: 2.7461661425859814
         }
       }
     }

@@ -44,7 +44,7 @@ using apollo::common::time::Clock;
 QpSplineReferenceLineSmoother::QpSplineReferenceLineSmoother(
     const ReferenceLineSmootherConfig& config)
     : ReferenceLineSmoother(config) {
-  if (FLAGS_use_osqp_optimizer) {
+  if (FLAGS_use_osqp_optimizer_for_reference_line) {
     spline_solver_.reset(
         new OsqpSpline2dSolver(t_knots_, config.qp_spline().spline_order()));
   } else {
@@ -82,7 +82,7 @@ bool QpSplineReferenceLineSmoother::Smooth(
     AERROR << "Solve spline smoother problem failed";
   }
   auto end = Clock::NowInSeconds();
-  ADEBUG << "QpSplineReferenceLineSmoother solve time is "
+  AERROR << "QpSplineReferenceLineSmoother solve time is "
          << (end - start) * 1000 << " ms.";
 
   // mapping spline to reference line point
