@@ -24,8 +24,8 @@
 #include <limits>
 #include <memory>
 #include <string>
-#include <vector>
 #include <utility>
+#include <vector>
 
 #include "cybertron/common/log.h"
 #include "cybertron/common/macros.h"

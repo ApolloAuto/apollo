@@ -99,6 +99,7 @@ std::shared_ptr<Node3d> HybridAStar::LoadRSPinCS(
   end_node->SetPre(current_node);
   end_node->SetTrajCost(CalculateRSPCost(reeds_shepp_to_end));
   close_set_.insert(std::make_pair(end_node->GetIndex(), end_node));
+  AINFO << "end_node.GetX()" << end_node->GetX();
   return end_node;
 }
 
@@ -312,7 +313,10 @@ bool HybridAStar::Plan(double sx, double sy, double sphi, double ex, double ey,
         explored_node_num++;
         start_timestamp = Clock::NowInSeconds();
         ReedSheppPath reeds_shepp_heuristic;
-        ReedSheppHeuristic(next_node, &reeds_shepp_heuristic);
+        if (!ReedSheppHeuristic(next_node, &reeds_shepp_heuristic)) {
+          AINFO << "Heuristic fail";
+          continue;
+        }
         CalculateNodeCost(current_node, next_node, &reeds_shepp_heuristic);
         end_timestamp = Clock::NowInSeconds();
         reeds_shepp_time += (end_timestamp - start_timestamp);
@@ -320,9 +324,13 @@ bool HybridAStar::Plan(double sx, double sy, double sphi, double ex, double ey,
         open_pq_.push(
             std::make_pair(next_node->GetIndex(), next_node->GetCost()));
       } else {
-        // reinitial the cost for rewiring
+        // TODO(Jinyun) :reinitial the cost for rewiring
       }
     }
+  }
+  if (final_node == nullptr) {
+    AINFO << "Hybrid A searching return null ptr(open_set ran out)";
+    return false;
   }
   if (!GetResult(final_node, result)) {
     AINFO << "GetResult failed";
