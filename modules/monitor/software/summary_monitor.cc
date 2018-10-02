@@ -37,7 +37,6 @@ namespace {
 
 using apollo::common::util::StrCat;
 using apollo::common::util::StringPrintf;
-using apollo::common::util::MessageUtil;
 
 // Status has a *summary* field which is apollo::monitor::Summary.
 template <class Status>
@@ -99,7 +98,7 @@ void SummaryMonitor::RunOnce(const double current_time) {
     static auto writer = MonitorManager::CreateWriter<SystemStatus>(
         FLAGS_system_status_topic);
 
-    MessageUtil<SystemStatus>::FillHeader("SystemMonitor", system_status);
+    apollo::common::util::FillHeader("SystemMonitor", system_status);
     writer->Write(*system_status);
     ADEBUG << "Published system status: " << system_status->DebugString();
     system_status_fp_ = new_fp;

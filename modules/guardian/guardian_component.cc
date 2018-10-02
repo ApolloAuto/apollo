@@ -26,7 +26,6 @@ namespace guardian {
 
 using apollo::canbus::Chassis;
 using apollo::common::ErrorCode;
-using apollo::common::util::MessageUtil;
 using apollo::control::ControlCommand;
 using apollo::cybertron::Reader;
 using apollo::cybertron::Writer;
@@ -82,7 +81,7 @@ bool GuardianComponent::Proc() {
     PassThroughControlCommand();
   }
 
-  MessageUtil<GuardianCommand>::FillHeader(node_->Name(), &guardian_cmd_);
+  common::util::FillHeader(node_->Name(), &guardian_cmd_);
   guardian_writer_->Write(std::make_shared<GuardianCommand>(guardian_cmd_));
   return true;
 }

@@ -28,7 +28,6 @@ namespace canbus {
 
 using apollo::common::ErrorCode;
 using apollo::common::time::Clock;
-using apollo::common::util::MessageUtil;
 using apollo::control::ControlCommand;
 using apollo::drivers::canbus::CanClientFactory;
 using apollo::guardian::GuardianCommand;
@@ -166,7 +165,7 @@ bool CanbusComponent::Init() {
 
 void CanbusComponent::PublishChassis() {
   Chassis chassis = vehicle_controller_->chassis();
-  MessageUtil<Chassis>::FillHeader(node_->Name(), &chassis);
+  common::util::FillHeader(node_->Name(), &chassis);
   chassis_writer_->Write(std::make_shared<Chassis>(chassis));
   ADEBUG << chassis.ShortDebugString();
 }

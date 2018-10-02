@@ -27,8 +27,6 @@
 namespace apollo {
 namespace prediction {
 
-using apollo::common::util::MessageUtil;
-
 /**
  * class FakePredictionComponent
  * This class generates fake prediction messages. The prediction message only
@@ -46,8 +44,7 @@ class FakePredictionComponent : public apollo::cybertron::TimerComponent {
   }
   bool Proc() override {
     auto prediction = std::make_shared<PredictionObstacles>();
-    MessageUtil<PredictionObstacles>::FillHeader("fake_prediction",
-                                                 prediction.get());
+    common::util::FillHeader("fake_prediction", prediction.get());
     prediction_writer_->Write(prediction);
     return true;
   }

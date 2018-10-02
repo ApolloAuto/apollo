@@ -21,10 +21,9 @@
 namespace apollo {
 namespace relative_map {
 
-using apollo::canbus::Chassis;
-using apollo::common::util::MessageUtil;
-using apollo::localization::LocalizationEstimate;
 using apollo::perception::PerceptionObstacles;
+using apollo::canbus::Chassis;
+using apollo::localization::LocalizationEstimate;
 
 bool RelativeMapComponent::Init() {
   AINFO << "Loading gflag from file: " << ConfigFilePath();
@@ -39,7 +38,7 @@ bool RelativeMapComponent::Proc() {
   if (!relative_map_.Process(map_msg.get())) {
     return false;
   }
-  MessageUtil<MapMsg>::FillHeader(node_->Name(), map_msg.get());
+  common::util::FillHeader(node_->Name(), map_msg.get());
   relative_map_writer_->Write(map_msg);
   return true;
 }
@@ -53,7 +52,8 @@ bool RelativeMapComponent::InitReaders() {
       });
 
   chassis_reader_ = node_->CreateReader<Chassis>(
-      FLAGS_chassis_topic, [this](const std::shared_ptr<Chassis>& chassis) {
+      FLAGS_chassis_topic,
+      [this](const std::shared_ptr<Chassis>& chassis) {
         ADEBUG << "Received chassis data: run chassis callback.";
         relative_map_.OnChassis(*chassis.get());
       });
@@ -72,9 +72,11 @@ bool RelativeMapComponent::InitReaders() {
         relative_map_.OnNavigationInfo(*navigation_info.get());
       });
 
-  relative_map_writer_ = node_->CreateWriter<MapMsg>(FLAGS_relative_map_topic);
+  relative_map_writer_ =
+      node_->CreateWriter<MapMsg>(FLAGS_relative_map_topic);
   return true;
 }
 
 }  // namespace relative_map
 }  // namespace apollo
+

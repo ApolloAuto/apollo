@@ -50,7 +50,6 @@ using apollo::common::time::Clock;
 using apollo::common::util::ContainsKey;
 using apollo::common::util::FindOrNull;
 using apollo::common::util::StringTokenizer;
-using apollo::common::util::MessageUtil;
 using apollo::control::DrivingAction;
 using google::protobuf::Map;
 using RLock = boost::shared_lock<boost::shared_mutex>;
@@ -233,7 +232,7 @@ void HMIWorker::SubmitDriveEvent(const uint64_t event_time_ms,
                                  const std::string &event_msg,
                                  const std::vector<std::string> &event_types) {
   std::shared_ptr<DriveEvent> drive_event = std::make_shared<DriveEvent>();
-  MessageUtil<DriveEvent>::FillHeader("HMI", drive_event.get());
+  common::util::FillHeader("HMI", drive_event.get());
   drive_event->set_event(event_msg);
   for (const auto &type_name : event_types) {
     DriveEvent::Type type;
@@ -273,7 +272,7 @@ bool HMIWorker::ChangeToDrivingMode(const Chassis::DrivingMode mode) {
   constexpr auto kTryInterval = std::chrono::milliseconds(500);
   for (int i = 0; i < kMaxTries; ++i) {
     // Send driving action periodically until entering target driving mode.
-    MessageUtil<control::PadMessage>::FillHeader("HMI", pad.get());
+    common::util::FillHeader("HMI", pad.get());
     HMIWorker::pad_writer_->Write(pad);
 
     std::this_thread::sleep_for(kTryInterval);
