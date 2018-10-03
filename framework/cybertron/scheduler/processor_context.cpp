@@ -49,8 +49,13 @@ void ProcessorContext::Notify(uint64_t routine_id) {
   PerfEventCache::Instance()->AddSchedEvent(SchedPerf::NOTIFY_IN, routine_id,
                                             proc_index_, 0, 0, -1, -1);
   ReadLockGuard<AtomicRWLock> lg(rw_lock_);
-  if (cr_map_[routine_id]->state() != RoutineState::RUNNING) {
-    cr_map_[routine_id]->set_state(RoutineState::READY);
+  auto routine = cr_map_[routine_id];
+  {
+    auto lock = routine->GetLock();
+    lock.lock();
+    if (routine->state() == RoutineState::DATA_WAIT) {
+      routine->set_state(RoutineState::READY);
+    }
   }
 
   if (!notified_.exchange(true)) {
