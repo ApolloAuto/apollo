@@ -14,11 +14,10 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/perception/inference/utils/util.h"
-
 #include <cmath>
-
+#include <memory>
 #include "cybertron/common/log.h"
+#include "modules/perception/inference/utils/util.h"
 
 namespace apollo {
 namespace perception {
@@ -32,7 +31,7 @@ std::shared_ptr<float> load_binary_data(const std::string &filename) {
     ifs.seekg(0, ifs.beg);
     std::shared_ptr<float> outputs;
     outputs.reset(new float[length]);
-    ifs.read(reinterpret_cast<char *>(outputs.get()), sizeof(float) * length);
+    ifs.read( reinterpret_cast<char *>(outputs.get()), sizeof(float) * length);
     ifs.close();
     return outputs;
   } else {
@@ -44,7 +43,7 @@ bool write_result(const std::string &out_path,
                   const std::vector<float> &results) {
   std::ofstream outf(out_path, std::ios::binary | std::ios::out);
   if (!outf.is_open()) {
-    AERROR << "Cannot open output file: " << out_path;
+    AINFO << "Cannot open output file: " << out_path;
     return false;
   }
   outf.write(reinterpret_cast<const char *>(results.data()),

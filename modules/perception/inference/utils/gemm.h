@@ -13,14 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_INFERENCE_UTILS_UTIL_H_
-#define MODULES_PERCEPTION_INFERENCE_UTILS_UTIL_H_
+
+#ifndef MODULES_PERCEPTION_INFERENCE_UTILS_GEMM_H
+#define MODULES_PERCEPTION_INFERENCE_UTILS_GEMM_H
 
 #include <cuda_runtime_api.h>
+#include <cblas.h>
+
+#include <boost/shared_ptr.hpp>
 #include <fstream>
 #include <iostream>
 #include <map>
-#include <memory>
 #include <vector>
 #include <string>
 #include "modules/perception/base/image.h"
@@ -29,29 +32,31 @@
 namespace apollo {
 namespace perception {
 namespace inference {
+class GPUL2Norm {
+ public:
+  void L2Norm(base::Blob<float> *input_data);
 
-template<typename T>
-void load_data(const std::string &filename, std::vector<T> *outputs) {
-  std::ifstream ifs(filename, std::ifstream::in);
+ private:
+  base::Blob<float> scale_;
+  base::Blob<float> ones_;
+  base::Blob<float> square_;
+};
 
-  if (ifs.good()) {
-    outputs->clear();
-    T output;
-    while (ifs >> output) {
-      outputs->push_back(output);
-    }
-    ifs.close();
-  }
-}
+void GPUGemmFloat(const CBLAS_TRANSPOSE TransA,
+                  const CBLAS_TRANSPOSE TransB,
+                  const int M,
+                  const int N,
+                  const int K,
+                  const float alpha,
+                  const float *A,
+                  const float *B,
+                  const float beta,
+                  float *C);
+void GPUMultiFloat(const int n, const float *a, const float *b, float *result);
+void GPUMSetFloat(const int n, const float alpha, float *result);
 
-std::shared_ptr<float> load_binary_data(const std::string &filename);
-
-bool write_result(const std::string &out_path,
-                  const std::vector<float> &results);
-bool write_result(const std::string &out_path,
-                  const std::map<std::string, std::vector<float> > &results);
 }  // namespace inference
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_INFERENCE_UTILS_UTIL_H_
+#endif  // MODULES_PERCEPTION_INFERENCE_UTILS_GEMM_H

@@ -13,12 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+#ifndef MODULES_PERCEPTION_INFERFENCE_UTILS_BINARYDATA_H_
+#define MODULES_PERCEPTION_INFERFENCE_UTILS_BINARYDATA_H_
 
-#ifndef MODULES_PERCEPTION_INFERENCE_UTILS_BINARY_DATA_H_
-#define MODULES_PERCEPTION_INFERENCE_UTILS_BINARY_DATA_H_
-
-#include <stdio.h>
 #include <boost/shared_ptr.hpp>
+#include <stdio.h>
 #include <map>
 #include <string>
 #include <vector>
@@ -36,15 +35,15 @@ static const int kMaxDim = INT_MAX;
 int BinaryReadString(FILE *fp, char *name);
 int BinaryWriteString(FILE *fp, const std::string &str);
 
-template <typename Dtype>
+template<typename Dtype>
 boost::shared_ptr<base::Blob<Dtype>> BinaryReadBlob(FILE *fp);
-template <typename Dtype>
+template<typename Dtype>
 void BinaryWriteBlob(FILE *fp, const base::Blob<Dtype> &blob);
 
-template <typename Dtype>
-std::map<std::string, boost::shared_ptr<base::Blob<Dtype>>> BinaryReadFile(
-    const char *file_path);
-template <typename Btype>
+template<typename Dtype>
+std::map<std::string, boost::shared_ptr<base::Blob<Dtype>>>
+BinaryReadFile(const char *file_path);
+template<typename Btype>
 bool BinaryWriteFile(const char *file_path,
                      const std::map<std::string, Btype> &data_dict);
 
@@ -52,4 +51,4 @@ bool BinaryWriteFile(const char *file_path,
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_INFERENCE_UTILS_BINARY_DATA_H_
+#endif   // MODULES_PERCEPTION_INFERFENCE_UTILS_BINARYDATA_H_
