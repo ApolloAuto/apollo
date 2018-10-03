@@ -141,6 +141,14 @@ function generate_build_targets() {
 #              Build functions
 #=================================================
 
+function build_cybertron() {
+  cd /apollo/framework
+  bash cybertron.sh build_fast
+  cd /apollo
+  info "Building cybertron ..."
+  source framework/install/setup.bash
+}
+
 function build() {
   if [ "${USE_GPU}" = "1" ] ; then
     echo -e "${YELLOW}Running build under GPU mode. GPU is required to run the build.${NO_COLOR}"
@@ -148,12 +156,8 @@ function build() {
     echo -e "${YELLOW}Running build under CPU mode. No GPU is required to run the build.${NO_COLOR}"
   fi
   info "Start building, please wait ..."
-  info "Building framework ..."
-  cd /apollo/framework
-  bash cybertron.sh build_fast
-  cd /apollo
-  info "Building modules ..."
-  source framework/install/setup.bash
+  build_cybertron
+
   generate_build_targets
   info "Building on $MACHINE_ARCH..."
 
@@ -745,6 +749,7 @@ function print_usage() {
   ${BLUE}build${NONE}: run build only
   ${BLUE}build_opt${NONE}: build optimized binary for the code
   ${BLUE}build_gpu${NONE}: run build only with Caffe GPU mode support
+  ${BLUE}build_cybertron${NONE}: run build cybertron framework only
   ${BLUE}build_velodyne${NONE}: build velodyne driver
   ${BLUE}build_velodyne_vls128${NONE}: build velodyne vls-128 driver
   ${BLUE}build_lslidar${NONE}: build lslidar driver
@@ -836,6 +841,9 @@ function main() {
       ;;
     buildify)
       buildify
+      ;;
+    build_cybertron)
+     build_cybertron
       ;;
     build_py)
       build_py_proto
