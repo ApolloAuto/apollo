@@ -16,6 +16,8 @@
 #include <gtest/gtest.h>
 #include "modules/perception/lidar/lib/pointcloud_preprocessor/pointcloud_preprocessor.h"
 
+DECLARE_string(work_root);
+
 namespace apollo {
 namespace perception {
 namespace lidar {
@@ -98,15 +100,15 @@ TEST_F(PointCloudPreprocessorTest, basic_test) {
     EXPECT_TRUE(preprocessor.Preprocess(option, &frame));
     EXPECT_EQ(frame.cloud->size(), 2);
     EXPECT_EQ(frame.world_cloud->size(), 2);
-    for (int i = 0; i < frame.cloud->size(); ++i) {
+    for (size_t i = 0; i < frame.cloud->size(); ++i) {
       auto& pt = frame.cloud->at(i);
       auto& world_pt = frame.world_cloud->at(i);
       EXPECT_EQ(pt.x, world_pt.x);
       EXPECT_EQ(pt.y, world_pt.y);
       EXPECT_EQ(pt.z, world_pt.z);
       EXPECT_EQ(pt.intensity, world_pt.intensity);
-      EXPECT_EQ(frame.cloud->points_beam_id(i),
-                frame.world_cloud->points_beam_id(i));
+      EXPECT_EQ(frame.cloud->points_beam_id()[i],
+                frame.world_cloud->points_beam_id()[i]);
     }
   }
 #ifdef PERCEPTION_LIDAR_USE_COMMON_MESSAGE
