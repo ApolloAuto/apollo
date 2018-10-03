@@ -107,7 +107,12 @@ void FeatureExtractor::ExtractEgoLaneFeatures(
       ptr_ego_lane->lane().left_boundary().boundary_type(0).types_size() != 0 &&
       ptr_ego_lane->lane().left_boundary().boundary_type(0).types(0) !=
       hdmap::LaneBoundaryType::Type::LaneBoundaryType_Type_CURB) {
-    ptr_environment_features->set_ego_lane_reverse_accessible(true);
+    const auto& reverse_lanes =
+        ptr_ego_lane->lane().left_neighbor_reverse_lane_id();
+    std::for_each(reverse_lanes.begin(), reverse_lanes.end(),
+        [&ptr_environment_features](decltype(*reverse_lanes.begin())& t) {
+      ptr_environment_features->AddNonneglectableReverseLanes(t.id());
+    });
   }
 }
 

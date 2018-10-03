@@ -85,9 +85,11 @@ class EnvironmentFeatures {
 
   const std::vector<int>& get_obstacle_ids() const;
 
-  bool ego_lane_reverse_accessible() const;
+  const std::unordered_set<std::string>& nonneglectable_reverse_lanes() const;
 
-  void set_ego_lane_reverse_accessible(const bool is_reverse_accessible);
+  void AddNonneglectableReverseLanes(const std::string& lane_id);
+
+  bool RemoveNonneglectableReverseLanes(const std::string& lane_id);
 
  private:
   common::Point3D ego_position_;
@@ -124,7 +126,7 @@ class EnvironmentFeatures {
 
   std::vector<int> obstacle_ids_;
 
-  bool ego_lane_reverse_accessible_ = false;
+  std::unordered_set<std::string> nonneglectable_reverse_lanes_;
 };
 
 }  // namespace prediction

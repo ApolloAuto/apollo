@@ -146,13 +146,24 @@ const std::vector<int>& EnvironmentFeatures::get_obstacle_ids() const {
   return obstacle_ids_;
 }
 
-bool EnvironmentFeatures::ego_lane_reverse_accessible() const {
-  return ego_lane_reverse_accessible_;
+const std::unordered_set<std::string>&
+EnvironmentFeatures::nonneglectable_reverse_lanes() const {
+  return nonneglectable_reverse_lanes_;
 }
 
-void EnvironmentFeatures::set_ego_lane_reverse_accessible(
-    const bool is_reverse_accessible) {
-  ego_lane_reverse_accessible_ = is_reverse_accessible;
+void EnvironmentFeatures::AddNonneglectableReverseLanes(
+    const std::string& lane_id) {
+  nonneglectable_reverse_lanes_.insert(lane_id);
+}
+
+bool EnvironmentFeatures::RemoveNonneglectableReverseLanes(
+    const std::string& lane_id) {
+  if (nonneglectable_reverse_lanes_.find(lane_id) ==
+      nonneglectable_reverse_lanes_.end()) {
+    return false;
+  }
+  nonneglectable_reverse_lanes_.erase(lane_id);
+  return true;
 }
 
 }  // namespace prediction
