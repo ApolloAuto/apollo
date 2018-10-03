@@ -60,6 +60,9 @@ struct Result {
   std::vector<double> x;
   std::vector<double> y;
   std::vector<double> phi;
+  std::vector<double> v;
+  std::vector<double> a;
+  std::vector<double> steer;
 };
 
 class HybridAStar {
@@ -95,6 +98,7 @@ class HybridAStar {
   double EuclidDist();
   double CalculateRSPCost(const ReedSheppPath* reeds_shepp_to_end);
   bool GetResult(std::shared_ptr<Node3d> final_node, Result* result);
+  bool GenerateSpeedAcceleration(Result* result);
 
  private:
   PlannerOpenSpaceConfig open_space_conf_;
@@ -108,6 +112,7 @@ class HybridAStar {
   double gear_switch_penalty_ = 0.0;
   double steer_penalty_ = 0.0;
   double steer_change_penalty_ = 0.0;
+  double delta_t_ = 0.0;
   ThreadSafeIndexedObstacles* obstacles_;
   std::shared_ptr<Node3d> start_node_;
   std::shared_ptr<Node3d> end_node_;

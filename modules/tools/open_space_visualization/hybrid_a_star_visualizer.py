@@ -2,6 +2,7 @@ from hybrid_a_star_python_interface import *
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 from matplotlib import animation
+import numpy as np
 import time
 import math
 
@@ -40,6 +41,9 @@ elif scenario == "parallel":
 x = (c_double * num_output_buffer)()
 y = (c_double * num_output_buffer)()
 phi = (c_double * num_output_buffer)()
+v = (c_double * num_output_buffer)()
+a = (c_double * num_output_buffer)()
+steer = (c_double * num_output_buffer)()
 size = (c_ushort * 1)()
 
 start = time.time()
@@ -51,18 +55,24 @@ end = time.time()
 print("planning time is " + str(end - start))
 
 # load result
-HybridAStar.GetResult(x, y, phi, size)
+HybridAStar.GetResult(x, y, phi, v, a, steer, size)
 x_out = []
 y_out = []
 phi_out = []
+v_out = []
+a_out = []
+steer_out = []
 for i in range(0, size[0]):
     x_out.append(float(x[i]))
     y_out.append(float(y[i]))
     phi_out.append(float(phi[i]))
+    v_out.append(float(v[i]))
+    a_out.append(float(a[i]))
+    steer_out.append(float(steer[i]))
 
 # plot
-fig = plt.figure(1)
-ax = plt.gca()
+fig1 = plt.figure(1)
+ax = fig1.add_subplot(111)
 for i in range(0, size[0]):
     downx = 1.055 * math.cos(phi_out[i] - math.pi / 2)
     downy = 1.055 * math.sin(phi_out[i] - math.pi / 2)
@@ -76,8 +86,8 @@ for i in range(0, size[0]):
         x_out[i], y_out[i], 0.25*math.cos(phi_out[i]), 0.25*math.sin(phi_out[i]), 0.2)
     ax.add_patch(car)
     ax.add_patch(arrow)
-plt.plot(sx, sy, "s")
-plt.plot(ex, ey, "s")
+ax.plot(sx, sy, "s")
+ax.plot(ex, ey, "s")
 if scenario == "backward":
     rect1 = patches.Rectangle((-20.0, 11.0), 40.0, 4.0, 0.0)
     rect2 = patches.Rectangle((-20.0, -5.0), 18.0, 10.0, 0.0)
@@ -95,4 +105,12 @@ elif scenario == "parallel":
     ax.add_patch(rect3)
     ax.add_patch(rect4)
 plt.axis('equal')
+
+fig2 = plt.figure(2)
+v_graph = fig2.add_subplot(311);
+v_graph.plot(np.linspace(0, size[0], size[0]), v_out)
+a_graph = fig2.add_subplot(312);
+a_graph.plot(np.linspace(0, size[0], size[0]), a_out)
+steer_graph = fig2.add_subplot(313);
+steer_graph.plot(np.linspace(0, size[0], size[0]), steer_out)
 plt.show()

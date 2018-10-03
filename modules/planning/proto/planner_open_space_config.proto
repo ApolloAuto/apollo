@@ -27,6 +27,7 @@ message WarmStartConfig {
   optional double gear_switch_penalty = 11 [default = 10.0];
   optional double steer_penalty = 12 [default = 10.0];
   optional double steer_change_penalty = 13 [default = 10.0];
+  optional double delta_t = 14 [default = 1.0];
 }
 
 message DistanceApproachConfig {

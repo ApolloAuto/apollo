@@ -40,6 +40,6 @@ class HybridAStarPlanner(object):
         return lib.Plan(self.planner, self.obstacles, self.result, c_double(sx),
                         c_double(sy), c_double(sphi), c_double(ex), c_double(ey), c_double(ephi))
 
-    def GetResult(self, x, y, phi, output_size):
+    def GetResult(self, x, y, phi, v, a, steer, output_size):
         lib.GetResult(self.result, POINTER(c_double)(x), POINTER(c_double)(y),
-                      POINTER(c_double)(phi), POINTER(c_ushort)(output_size))
+                      POINTER(c_double)(phi), POINTER(c_double)(v), POINTER(c_double)(a), POINTER(c_double)(steer), POINTER(c_ushort)(output_size))

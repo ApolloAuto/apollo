@@ -52,10 +52,16 @@ class ResultContainer {
     x_ = std::move(result_.x);
     y_ = std::move(result_.y);
     phi_ = std::move(result_.phi);
+    v_ = std::move(result_.v);
+    a_ = std::move(result_.a);
+    steer_ = std::move(result_.steer);
   }
   std::vector<double>* GetX() { return &x_; }
   std::vector<double>* GetY() { return &y_; }
   std::vector<double>* GetPhi() { return &phi_; }
+  std::vector<double>* GetV() { return &v_; }
+  std::vector<double>* GetA() { return &a_; }
+  std::vector<double>* GetSteer() { return &steer_; }
   Result* PrepareResult() { return &result_; }
 
  private:
@@ -63,6 +69,9 @@ class ResultContainer {
   std::vector<double> x_;
   std::vector<double> y_;
   std::vector<double> phi_;
+  std::vector<double> v_;
+  std::vector<double> a_;
+  std::vector<double> steer_;
 };
 
 extern "C" {
@@ -82,7 +91,7 @@ bool Plan(HybridAStar* planner_ptr, ObstacleContainer* obstacles_ptr,
                            result_ptr->PrepareResult());
 }
 void GetResult(ResultContainer* result_ptr, double* x, double* y, double* phi,
-               std::size_t* output_size) {
+               double* v, double* a, double* steer, std::size_t* output_size) {
   result_ptr->LoadResult();
   std::size_t size = result_ptr->GetX()->size();
   std::cout << "return size is " << size << std::endl;
@@ -90,6 +99,9 @@ void GetResult(ResultContainer* result_ptr, double* x, double* y, double* phi,
     x[i] = result_ptr->GetX()->at(i);
     y[i] = result_ptr->GetY()->at(i);
     phi[i] = result_ptr->GetPhi()->at(i);
+    v[i] = result_ptr->GetV()->at(i);
+    a[i] = result_ptr->GetA()->at(i);
+    steer[i] = result_ptr->GetSteer()->at(i);
   }
   *output_size = size;
 }

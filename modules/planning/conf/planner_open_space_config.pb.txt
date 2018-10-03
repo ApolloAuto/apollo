@@ -14,6 +14,7 @@ warm_start_config : {
   gear_switch_penalty : 10.0
   steer_penalty : 100.0
   steer_change_penalty : 10.0
+  delta_t : 1.0
 }
 
 distance_approach_config : {
