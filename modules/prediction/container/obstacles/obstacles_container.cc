@@ -101,10 +101,12 @@ void ObstaclesContainer::InsertPerceptionObstacle(
   Obstacle* obstacle_ptr = obstacles_.GetSilently(id);
   if (obstacle_ptr != nullptr) {
     obstacle_ptr->Insert(perception_obstacle, timestamp);
+    ADEBUG << "Insert obstacle [" << id << "]";
   } else {
     Obstacle obstacle;
     obstacle.Insert(perception_obstacle, timestamp);
     obstacles_.Put(id, std::move(obstacle));
+    ADEBUG << "Insert obstacle [" << id << "]";
   }
 }
 
