@@ -12,7 +12,7 @@ before_script:
     - cp scripts/AGREEMENT.txt ${HOME}/.apollo_agreement.txt
 jobs:
   include:
-    - stage: lint
+    - stage: stage-01
       env:
         - JOB=lint
       script:
@@ -20,7 +20,7 @@ jobs:
         - ./apollo_docker.sh ${JOB}
         - rm -rf "${HOME}/.cache/bazel/_bazel_${USER}/install"
         - rm -rf "/apollo/data/core"    
-    - stage: build_and_test
+    - stage: stage-02
       env:
         - JOB=cibuild
         - JOB=citest
