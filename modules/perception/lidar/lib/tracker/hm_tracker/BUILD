@@ -196,4 +196,18 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "hm_multi_target_tracker_test",
+    size = "small",
+    srcs = [
+        "hm_multi_target_tracker_test.cc",
+    ],
+    deps = [
+        ":hm_multi_target_tracker",
+        "@gtest//:main",
+        "//modules/perception/common/io:io_util",
+        "//modules/perception/lidar/lib/object_builder",
+    ],
+)
+
 cpplint()
