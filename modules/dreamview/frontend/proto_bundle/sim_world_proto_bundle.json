@@ -405,6 +405,16 @@
                   "rule": "repeated",
                   "type": "string",
                   "id": 9
+                },
+                "parkingSpace": {
+                  "rule": "repeated",
+                  "type": "string",
+                  "id": 10
+                },
+                "speedBump": {
+                  "rule": "repeated",
+                  "type": "string",
+                  "id": 11
                 }
               }
             },

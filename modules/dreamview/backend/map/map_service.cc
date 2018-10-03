@@ -35,12 +35,14 @@ using apollo::hdmap::Id;
 using apollo::hdmap::JunctionInfoConstPtr;
 using apollo::hdmap::LaneInfoConstPtr;
 using apollo::hdmap::Map;
+using apollo::hdmap::ParkingSpaceInfoConstPtr;
 using apollo::hdmap::Path;
 using apollo::hdmap::PncMap;
 using apollo::hdmap::RoadInfoConstPtr;
 using apollo::hdmap::RouteSegments;
 using apollo::hdmap::SignalInfoConstPtr;
 using apollo::hdmap::SimMapFile;
+using apollo::hdmap::SpeedBumpInfoConstPtr;
 using apollo::hdmap::StopSignInfoConstPtr;
 using apollo::hdmap::YieldSignInfoConstPtr;
 using apollo::routing::RoutingRequest;
@@ -210,6 +212,18 @@ void MapService::CollectMapElementIds(const PointENU &point, double radius,
   }
   ExtractIds(junctions, ids->mutable_junction());
 
+  std::vector<ParkingSpaceInfoConstPtr> parking_spaces;
+  if (SimMap()->GetParkingSpaces(point, radius, &parking_spaces) != 0) {
+    AERROR << "Fail to get parking space from sim_map.";
+  }
+  ExtractIds(parking_spaces, ids->mutable_parking_space());
+
+  std::vector<SpeedBumpInfoConstPtr> speed_bumps;
+  if (SimMap()->GetSpeedBumps(point, radius, &speed_bumps) != 0) {
+    AERROR << "Fail to get speed bump from sim_map.";
+  }
+  ExtractIds(speed_bumps, ids->mutable_speed_bump());
+
   std::vector<SignalInfoConstPtr> signals;
   if (SimMap()->GetSignals(point, radius, &signals) != 0) {
     AERROR << "Failed to get signals from sim_map.";
@@ -315,6 +329,22 @@ Map MapService::RetrieveMapElements(const MapElementIds &ids) const {
     auto element = SimMap()->GetOverlapById(map_id);
     if (element) {
       *result.add_overlap() = element->overlap();
+    }
+  }
+
+  for (const auto &id : ids.parking_space()) {
+    map_id.set_id(id);
+    auto element = SimMap()->GetParkingSpaceById(map_id);
+    if (element) {
+      *result.add_parking_space() = element->parking_space();
+    }
+  }
+
+  for (const auto &id : ids.speed_bump()) {
+    map_id.set_id(id);
+    auto element = SimMap()->GetSpeedBumpById(map_id);
+    if (element) {
+      *result.add_speed_bump() = element->speed_bump();
     }
   }
 
