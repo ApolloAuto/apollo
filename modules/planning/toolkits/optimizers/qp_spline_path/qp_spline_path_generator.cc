@@ -148,7 +148,6 @@ bool QpSplinePathGenerator::Generate(
   if (!is_solved) {
     AERROR << "Fail to solve qp_spline_path. Use reference line as qp_path "
               "output.";
-    DumpPlanningContext();
   }
   ADEBUG << common::util::StrCat("Spline dl:", init_frenet_point_.dl(),
                                  ", ddl:", init_frenet_point_.ddl());

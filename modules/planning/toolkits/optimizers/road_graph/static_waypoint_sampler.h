@@ -18,8 +18,8 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_TOOLKITS_OPTIMIZERS_ROAD_GRAPH_WAYPOINT_SAMPLER_H_
-#define MODULES_PLANNING_TOOLKITS_OPTIMIZERS_ROAD_GRAPH_WAYPOINT_SAMPLER_H_
+#ifndef MODULES_PLANNING_TOOLKITS_OPTIMIZERS_ROAD_GRAPH_STATIC_WAYPOINT_SAMPLER_H_  // NOLINT
+#define MODULES_PLANNING_TOOLKITS_OPTIMIZERS_ROAD_GRAPH_STATIC_WAYPOINT_SAMPLER_H_  // NOLINT
 
 #include <limits>
 #include <list>
@@ -37,42 +37,27 @@
 #include "modules/planning/math/curve1d/quintic_polynomial_curve1d.h"
 #include "modules/planning/reference_line/reference_point.h"
 #include "modules/planning/toolkits/optimizers/road_graph/trajectory_cost.h"
+#include "modules/planning/toolkits/optimizers/road_graph/waypoint_sampler.h"
 
 namespace apollo {
 namespace planning {
 
-class WaypointSampler {
+/**
+ * This class only samples waypoints at fixed positions on the route. This
+ * method can increase the path stability.
+ */
+class StaticWaypointSampler : public WaypointSampler {
  public:
-  explicit WaypointSampler(const WaypointSamplerConfig &config)
-      : config_(config) {}
-  ~WaypointSampler() = default;
-
-  virtual void Init(const ReferenceLineInfo *reference_line_info,
-                    const common::SLPoint &init_sl_point_,
-                    const common::FrenetFramePoint &init_frenet_frame_point);
-
-  virtual void SetDebugLogger(apollo::planning_internal::Debug *debug) {
-    planning_debug_ = debug;
-  }
+  explicit StaticWaypointSampler(const WaypointSamplerConfig &config)
+      : WaypointSampler(config) {}
 
   virtual bool SamplePathWaypoints(
       const common::TrajectoryPoint &init_point,
       std::vector<std::vector<common::SLPoint>> *const points);
-
- protected:
-  virtual bool HasSidepass();
-
- protected:
-  const WaypointSamplerConfig &config_;
-  const ReferenceLineInfo *reference_line_info_ = nullptr;
-  common::SLPoint init_sl_point_;
-  common::FrenetFramePoint init_frenet_frame_point_;
-  apollo::planning_internal::Debug *planning_debug_ = nullptr;
-
-  ObjectSidePass sidepass_;
 };
 
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_TOOLKITS_OPTIMIZERS_ROAD_GRAPH_WAYPOINT_SAMPLER_H_
+#endif
+// MODULES_PLANNING_TOOLKITS_OPTIMIZERS_ROAD_GRAPH_STATIC_WAYPOINT_SAMPLER_H_

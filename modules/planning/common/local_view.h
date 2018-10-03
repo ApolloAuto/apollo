@@ -21,10 +21,10 @@
 
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/localization/proto/localization.pb.h"
+#include "modules/map/relative_map/proto/navigation.pb.h"
 #include "modules/perception/proto/traffic_light_detection.pb.h"
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
 #include "modules/routing/proto/routing.pb.h"
-#include "modules/map/relative_map/proto/navigation.pb.h"
 
 namespace apollo {
 namespace planning {
@@ -40,6 +40,7 @@ struct LocalView {
   std::shared_ptr<localization::LocalizationEstimate> localization_estimate;
   std::shared_ptr<perception::TrafficLightDetection> traffic_light;
   std::shared_ptr<routing::RoutingResponse> routing;
+  bool is_new_routing = false;
   std::shared_ptr<relative_map::MapMsg> relative_map;
 };
 

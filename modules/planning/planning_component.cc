@@ -19,6 +19,7 @@
 
 #include "modules/common/util/message_util.h"
 #include "modules/map/hdmap/hdmap_util.h"
+#include "modules/map/pnc_map/pnc_map.h"
 #include "modules/planning/common/planning_context.h"
 
 namespace apollo {
@@ -39,7 +40,7 @@ bool PlanningComponent::Init() {
       FLAGS_routing_response_topic,
       [this](const std::shared_ptr<RoutingResponse>& routing) {
         AINFO << "Received routing data: run routing callback 2:"
-               << routing->header().DebugString();
+              << routing->header().DebugString();
         std::lock_guard<std::mutex> lock(mutex_);
         routing_.CopyFrom(*routing);
       });
@@ -95,7 +96,14 @@ bool PlanningComponent::Proc(
   local_view_.localization_estimate = localization_estimate;
   {
     std::lock_guard<std::mutex> lock(mutex_);
-    local_view_.routing = std::make_shared<routing::RoutingResponse>(routing_);
+    if (!local_view_.routing ||
+        hdmap::PncMap::IsNewRouting(*local_view_.routing, routing_)) {
+      local_view_.routing =
+          std::make_shared<routing::RoutingResponse>(routing_);
+      local_view_.is_new_routing = true;
+    } else {
+      local_view_.is_new_routing = false;
+    }
   }
   {
     std::lock_guard<std::mutex> lock(mutex_);
@@ -108,6 +116,11 @@ bool PlanningComponent::Proc(
   }
 
   ADCTrajectory adc_trajectory_pb;
+
+  if (local_view_.is_new_routing) {
+    PlanningContext::Instance()->UpdateRouting(*local_view_.routing);
+  }
+
   planning_base_->RunOnce(local_view_, &adc_trajectory_pb);
 
   common::util::FillHeader(node_->Name(), &adc_trajectory_pb);
