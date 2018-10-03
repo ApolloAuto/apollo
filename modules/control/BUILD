@@ -43,6 +43,7 @@ cc_binary(
     name = "libcontrol_component.so",
     deps = [":control_component_lib"],
     linkshared = True,
+    linkstatic = False,
 )
 
 cc_test(

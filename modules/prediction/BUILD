@@ -56,6 +56,7 @@ cc_binary(
         "//external:gflags",
     ],
     linkshared = True,
+    linkstatic = False,
 )
 
 filegroup(

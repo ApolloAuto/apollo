@@ -12,6 +12,7 @@ cc_binary(
        "-lavcodec",
     ],
     linkshared = True,
+    linkstatic = False,
 )
 
 cc_library(

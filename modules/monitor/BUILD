@@ -23,6 +23,7 @@ cc_binary(
     ],
     copts = ['-DMODULE_NAME=\\"monitor\\"'],
     linkshared = True,
+    linkstatic = False,
 )
 
 cpplint()

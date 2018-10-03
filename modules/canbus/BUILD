@@ -40,6 +40,7 @@ cc_binary(
         ":canbus_lib",
     ],
     linkshared = True,
+    linkstatic = False,
 )
 
 filegroup(

@@ -59,6 +59,7 @@ cc_binary(
     name = "libracobit_radar_canbus_component.so",
     deps = [":racobit_radar_canbus_lib"],
     linkshared = True,
+    linkstatic = False,
 )
 
 cpplint()

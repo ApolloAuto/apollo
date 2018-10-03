@@ -15,6 +15,7 @@ cc_binary(
         "//modules/prediction/proto:prediction_proto",
     ],
     linkshared = True,
+    linkstatic = False,
 )
 
 cpplint()

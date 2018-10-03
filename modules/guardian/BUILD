@@ -20,6 +20,7 @@ cc_binary(
     ],
     copts = ['-DMODULE_NAME=\\"guardian\\"'],
     linkshared = True,
+    linkstatic = False,
 )
 
 cpplint()
