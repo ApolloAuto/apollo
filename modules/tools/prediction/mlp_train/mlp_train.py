@@ -76,6 +76,8 @@ def load_data(filename):
     for key in h5_file.keys():
         samples[key] = h5_file[key][:]
 
+    print("load file success")
+
     return samples['data']
 
 
