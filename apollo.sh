@@ -468,18 +468,16 @@ function citest_basic() {
   set -e
 
   BUILD_TARGETS="
-    //modules/common/...
-    //modules/control/...
-    //modules/localization/proto/...
-    //modules/localization/rtk/...
-    `bazel query //modules/localization/msf/... except //modules/localization/msf/local_tool/...`
-    `bazel query //modules/localization/msf/local_tool/local_visualization/...`
-    //modules/perception/proto/...
-    //modules/planning/...
-    //modules/prediction/...
-    //modules/routing/..."
+    `bazel query //modules/perception/...`
+    `bazel query //modules/control/...`
+    `bazel query //modules/prediction/...`
+    `bazel query //modules/planning/...`
+  "
 
   JOB_ARG="--jobs=$(nproc) --ram_utilization_factor 80"
+
+  # perception related test
+  echo "$BUILD_TARGETS" | grep "perception\/" | grep -v "syncedmem_test" | grep -v "blob_test" | grep -v "perception_inference_operators_test" | xargs bazel test $DEFINES $JOB_ARG --config=unit_test -c dbg --test_verbose_timeout_warnings $@
 
   # control related test
   echo "$BUILD_TARGETS" | grep "control\/" | xargs bazel test $DEFINES $JOB_ARG --config=unit_test -c dbg --test_verbose_timeout_warnings $@
