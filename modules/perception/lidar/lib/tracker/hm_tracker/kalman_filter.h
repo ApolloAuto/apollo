@@ -20,6 +20,7 @@
 #include <memory>
 
 #include "Eigen/Core"
+#include "gtest/gtest_prod.h"
 
 #include "modules/perception/lib/registerer/registerer.h"
 #include "modules/perception/lidar/lib/tracker/common/track_data.h"
@@ -100,6 +101,9 @@ class KalmanFilter : public BaseFilter {
   static int s_motion_score_window_size_;
 
  private:
+  FRIEND_TEST(KalmanFilterTest, set_params_test);
+  FRIEND_TEST(KalmanFilterTest, use_constant_speed_model);
+
   bool FillTemporaryInfo(TrackDataPtr track_data, TrackedObjectPtr new_object,
                          double time);
 
