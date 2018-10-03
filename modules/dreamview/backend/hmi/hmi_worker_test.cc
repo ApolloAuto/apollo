@@ -15,9 +15,13 @@
  *****************************************************************************/
 #include "modules/dreamview/backend/hmi/hmi_worker.h"
 
+#include "google/protobuf/util/message_differencer.h"
 #include "gtest/gtest.h"
 
 #include "cybertron/cybertron.h"
+#include "modules/common/util/file.h"
+
+DECLARE_string(modes_config_path);
 
 namespace apollo {
 namespace dreamview {
@@ -29,6 +33,24 @@ TEST(HMIWorkerTest, Init) {
   HMIWorker worker(node);
   const auto& hmi_config = worker.GetConfig();
   EXPECT_GT(hmi_config.available_vehicles().size(), 0);
+}
+
+TEST(HMIWorkerTest, LoadModesConfig) {
+  const std::string modes_config_path =
+      "/apollo/modules/dreamview/backend/hmi/testdata/modes";
+  const std::string expected_config_pb_file =
+      "/apollo/modules/dreamview/backend/hmi/testdata/modes/"
+      "expected_modes.pb.txt";
+
+  HMIConfig expected_config;
+  ASSERT_TRUE(apollo::common::util::GetProtoFromASCIIFile(
+      expected_config_pb_file, &expected_config));
+
+  HMIConfig loaded_config;
+  EXPECT_TRUE(HMIWorker::LoadModesConfig(modes_config_path, &loaded_config));
+
+  EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equivalent(
+      expected_config, loaded_config));
 }
 
 }  // namespace dreamview
