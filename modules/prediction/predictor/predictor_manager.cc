@@ -155,7 +155,13 @@ void PredictorManager::Run(const PerceptionObstacles& perception_obstacles) {
     PredictionObstacle prediction_obstacle;
     prediction_obstacle.set_timestamp(perception_obstacle.timestamp());
     Obstacle* obstacle = obstacles_container->GetObstacle(id);
+    // if obstacle == nullptr, that means obstacle is not predictable
+    // Checkout the logic of non-predictable in obstacle.cc
     if (obstacle != nullptr) {
+      if (obstacle->ToIgnore()) {
+        ADEBUG << "Ignore obstacle[" << id << "]";
+        continue;
+      }
       if (obstacle->IsStill()) {
         predictor = GetPredictor(ObstacleConf::EMPTY_PREDICTOR);
       } else {
