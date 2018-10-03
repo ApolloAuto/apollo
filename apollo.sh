@@ -183,12 +183,12 @@ function build() {
   python modules/tools/common/kv_db.py put \
       "apollo:data:commit_id" "$REVISION"
 
-  # if [ -d /apollo-simulator ] && [ -e /apollo-simulator/build.sh ]; then
-  #   cd /apollo-simulator && bash build.sh build
-  #   if [ $? -ne 0 ]; then
-  #     fail 'Build failed!'
-  #   fi
-  # fi
+  if [ -d /apollo-simulator ] && [ -e /apollo-simulator/build.sh ]; then
+    cd /apollo-simulator && bash build.sh build
+    if [ $? -ne 0 ]; then
+      fail 'Build failed!'
+    fi
+  fi
   if [ $? -eq 0 ]; then
     success 'Build passed!'
   else
