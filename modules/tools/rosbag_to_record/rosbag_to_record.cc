@@ -27,6 +27,7 @@
 #include "cybertron/proto/record.pb.h"
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/control/proto/control_cmd.pb.h"
+#include "modules/drivers/gnss/proto/gnss_status_deprecated.pb.h"
 #include "modules/guardian/proto/guardian.pb.h"
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
@@ -136,7 +137,8 @@ int main(int argc, char **argv) {
     auto desc = channel_info->GetProtoDesc(channel_name);
     auto record_message_type = channel_info->GetMessageType(channel_name);
     if (desc == "" || record_message_type == "") {
-      AWARN << "can not find desc or message type";
+      AWARN << "can not find desc or message type for channel: "
+            << channel_name;
     }
     if (std::find(channel_write_flag.begin(), channel_write_flag.end(),
                   channel_name) == channel_write_flag.end() &&
@@ -267,7 +269,7 @@ int main(int argc, char **argv) {
       auto pb_msg = m.instantiate<apollo::drivers::gnss::GnssBestPose>();
       pb_msg->SerializeToString(&serialized_str);
     } else if (channel_name == "/apollo/sensor/gnss/gnss_status") {
-      auto pb_msg = m.instantiate<apollo::drivers::gnss::GnssStatus>();
+      auto pb_msg = m.instantiate<apollo::drivers::gnss_status::GnssStatus>();
       pb_msg->SerializeToString(&serialized_str);
     } else if (channel_name == "/apollo/sensor/gnss/imu") {
       auto pb_msg = m.instantiate<apollo::drivers::gnss::Imu>();
