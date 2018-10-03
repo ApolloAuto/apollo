@@ -55,7 +55,7 @@ TEST(CRoutineTest, croutine_hangup) {
   auto cr = std::make_shared<CRoutine>(
       []() { CRoutine::GetCurrentRoutine()->HangUp(); });
   auto state = cr->Resume();
-  EXPECT_EQ(state, RoutineState::IO_WAIT);
+  EXPECT_EQ(state, RoutineState::DATA_WAIT);
   cr->Wake();
   state = cr->Resume();
   EXPECT_EQ(state, RoutineState::FINISHED);

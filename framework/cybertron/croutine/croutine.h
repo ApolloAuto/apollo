@@ -162,7 +162,7 @@ inline RoutineState CRoutine::state() const { return state_; }
 inline void CRoutine::Wake() { state_ = RoutineState::READY; }
 
 inline void CRoutine::HangUp() {
-  state_ = RoutineState::IO_WAIT;
+  state_ = RoutineState::DATA_WAIT;
   CRoutine::Yield();
 }
 
