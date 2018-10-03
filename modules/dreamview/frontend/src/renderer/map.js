@@ -202,6 +202,19 @@ export default class Map {
         return drewObjects;
     }
 
+    addCurve(lines, color, coordinates, scene) {
+        const drewObjects = [];
+        lines.forEach(line => {
+            line.segment.forEach(segment => {
+                const points = coordinates.applyOffsetToArray(segment.lineSegment.point);
+                const mesh = drawSegmentsFromPoints(points, color, 5, 3, false);
+                scene.add(mesh);
+                drewObjects.push(mesh);
+            });
+        });
+        return drewObjects;
+    }
+
     extractOverlaps(overlaps) {
         overlaps.forEach(overlap => {
             const overlapId = overlap.id.id;
@@ -289,19 +302,9 @@ export default class Map {
         }
     }
 
-    drawStopLine(stopLines, drewObjects, coordinates, scene) {
-        stopLines.forEach(stopLine => {
-            stopLine.segment.forEach(segment => {
-                const points = coordinates.applyOffsetToArray(segment.lineSegment.point);
-                const mesh = drawSegmentsFromPoints(points, colorMapping.PURE_WHITE, 5, 3, false);
-                scene.add(mesh);
-                drewObjects.push(mesh);
-            });
-        });
-    }
-
     addTrafficLight(signal, coordinates, scene) {
-        const drewObjects = [];
+        const drewObjects = this.addCurve(
+            signal.stopLine, colorMapping.PURE_WHITE, coordinates, scene);
         const posAndHeading = this.getSignalPositionAndHeading(signal, coordinates);
         if (posAndHeading) {
             loadObject(trafficLightMaterial, trafficLightObject,
@@ -317,7 +320,6 @@ export default class Map {
                     drewObjects.push(mesh);
                 });
         }
-        this.drawStopLine(signal.stopLine, drewObjects, coordinates, scene);
         return drewObjects;
     }
 
@@ -347,7 +349,8 @@ export default class Map {
     }
 
     addStopSign(stopSign, coordinates, scene) {
-        const drewObjects = [];
+        const drewObjects = this.addCurve(
+            stopSign.stopLine, colorMapping.PURE_WHITE, coordinates, scene);
         const posAndHeading = this.getStopSignPositionAndHeading(stopSign, coordinates);
         if (posAndHeading) {
             loadObject(stopSignMaterial, stopSignObject, stopSignScales,
@@ -362,7 +365,6 @@ export default class Map {
                     drewObjects.push(mesh);
                 });
         }
-        this.drawStopLine(stopSign.stopLine, drewObjects, coordinates, scene);
         return drewObjects;
     }
 
@@ -418,7 +420,8 @@ export default class Map {
     appendMapData(newData, coordinates, scene) {
         // Note: drawing order matter since "stopSign" and "signal" are dependent on "overlap"
         const kinds = ["overlap", "lane", "junction", "road",
-                       "clearArea", "signal", "stopSign", "crosswalk"];
+                       "clearArea", "signal", "stopSign", "crosswalk",
+                       "parkingSpace", "speedBump"];
         for (const kind of kinds) {
             if (!newData[kind]) {
                 continue;
@@ -475,6 +478,18 @@ export default class Map {
                         const road = newData[kind][i];
                         this.data[kind].push(Object.assign(newData[kind][i], {
                             drewObjects: this.addRoad(road, coordinates, scene)
+                        }));
+                        break;
+                    case "parkingSpace":
+                        this.data[kind].push(Object.assign(newData[kind][i], {
+                            drewObjects: this.addBorder(
+                                newData[kind][i], colorMapping.YELLOW, coordinates, scene)
+                        }));
+                        break;
+                    case "speedBump":
+                        this.data[kind].push(Object.assign(newData[kind][i], {
+                            drewObjects: this.addCurve(
+                                newData[kind][i].position, colorMapping.RED, coordinates, scene)
                         }));
                         break;
                     default:
