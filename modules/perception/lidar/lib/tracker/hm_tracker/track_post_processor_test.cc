@@ -23,10 +23,13 @@
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lib/io/file_util.h"
 #include "modules/perception/lidar/common/lidar_log.h"
-#include "modules/perception/lidar/lib/common/track_pool_types.h"
 #include "modules/perception/lidar/lib/interface/base_bipartite_graph_matcher.h"
 #include "modules/perception/lidar/lib/object_builder/object_builder.h"
 #include "modules/perception/lidar/lib/tracker/hm_tracker/track_post_processor.h"
+#include "modules/perception/lidar/lib/tracker/common/track_pool_types.h"
+
+DECLARE_string(work_root);
+DECLARE_string(config_manager_path);
 
 namespace apollo {
 namespace perception {
@@ -37,9 +40,9 @@ class TrackPostProcessorTest : public testing::Test {
   typedef std::pair<size_t, size_t> TrackObjectPair;
 
   void SetUp() {
-    char *cybertron_path = "CYBERTRON_PATH=";
+    char cybertron_path[] = "CYBERTRON_PATH=";
     putenv(cybertron_path);
-    char *module_path = "MODULE_PATH=";
+    char module_path[] = "MODULE_PATH=";
     putenv(module_path);
     FLAGS_work_root = "/apollo/modules/perception/testdata/"
         "lidar/lib/tracker/hm_tracker";
@@ -65,7 +68,7 @@ void ConstructTrackedObjects(const std::vector<base::ObjectPtr> &objects,
                              std::vector<TrackedObjectPtr> *tracked_objects,
                              const Eigen::Affine3d &pose) {
   // Construct tracked objects via necessary transformation & feature computing
-  int num_objects = objects.size();
+  auto num_objects = objects.size();
   CHECK(objects.size() == tracked_objects->size());
   // AINFO<< "test1" <<objects.size();
   for (size_t i = 0; i < num_objects; ++i) {
@@ -143,7 +146,6 @@ TEST_F(TrackPostProcessorTest, psot_processor_test) {
   std::pair<double, TrackedObjectPtr> timestamp_object_pair =
       track_data->GetLatestObject();
   TrackedObjectPtr latest_object = timestamp_object_pair.second;
-  ;
   TrackPostProcessorPtr post_processor(new TrackPostProcessor);
 
   TrackDataPtr track_data2(new TrackData);

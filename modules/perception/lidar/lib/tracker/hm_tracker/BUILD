@@ -156,6 +156,27 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "track_post_processor_test",
+    size = "small",
+    srcs = [
+        "track_post_processor_test.cc",
+    ],
+    deps = [
+        ":track_post_processor",
+        ":hm_tracker",
+        "@gtest//:main",
+        "//modules/perception/base",
+        "//modules/perception/common/io:io_util",
+        "//modules/perception/lidar/common",
+        "//modules/perception/lidar/lib/interface",
+        "//modules/perception/common/graph",
+        "//modules/perception/lidar/lib/object_builder",
+        "//modules/perception/lidar/lib/tracker/common:track_pool_types",
+    ],
+)
+
+
 cc_library(
     name = "multi_hm_bipartite_graph_matcher",
     srcs = [
