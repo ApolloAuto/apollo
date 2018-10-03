@@ -146,5 +146,15 @@ const std::vector<int>& EnvironmentFeatures::get_obstacle_ids() const {
   return obstacle_ids_;
 }
 
+bool EnvironmentFeatures::ego_lane_reverse_accessible() const {
+  return ego_lane_reverse_accessible_;
+}
+
+void EnvironmentFeatures::set_ego_lane_reverse_accessible(
+    const bool is_reverse_accessible) {
+  ego_lane_reverse_accessible_ = is_reverse_accessible;
+}
+
 }  // namespace prediction
 }  // namespace apollo
+
