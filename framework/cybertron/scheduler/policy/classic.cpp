@@ -53,18 +53,15 @@ std::shared_ptr<CRoutine> ClassicContext::NextRoutine() {
       ++it;
       continue;
     }
-    // AINFO << GlobalData::GetTaskNameById(cr->Id()) << " " <<
-    // cr->GetStatistics().exec_time / cr->Priority();
-    auto cr_id = cr->Id();
 
-    if (cr->IsFinished()) {
+    if (cr->state() == RoutineState::FINISHED) {
       it = rb_map_.erase(it);
       continue;
     }
 
-    if (cr->IsReady()) {
+    if (cr->state() == RoutineState::READY) {
       croutine = cr;
-      cr->SetState(RoutineState::RUNNING);
+      cr->set_state(RoutineState::RUNNING);
       break;
     }
     ++it;
@@ -73,7 +70,7 @@ std::shared_ptr<CRoutine> ClassicContext::NextRoutine() {
     notified_.store(false);
   } else {
     PerfEventCache::Instance()->AddSchedEvent(
-        SchedPerf::NEXT_ROUTINE, croutine->Id(), croutine->ProcessorId(), 0,
+        SchedPerf::NEXT_ROUTINE, croutine->id(), croutine->processor_id(), 0,
         start_perf_time, -1, -1);
   }
   return croutine;
@@ -81,10 +78,10 @@ std::shared_ptr<CRoutine> ClassicContext::NextRoutine() {
 
 bool ClassicContext::Enqueue(const std::shared_ptr<CRoutine>& cr) {
   WriteLockGuard<AtomicRWLock> lg(rw_lock_);
-  if (cr_map_.find(cr->Id()) != cr_map_.end()) {
+  if (cr_map_.find(cr->id()) != cr_map_.end()) {
     return false;
   }
-  cr_map_[cr->Id()] = cr;
+  cr_map_[cr->id()] = cr;
   return true;
 }
 
@@ -92,7 +89,7 @@ bool ClassicContext::EnqueueAffinityRoutine(
     const std::shared_ptr<CRoutine>& cr) {
   std::lock_guard<std::mutex> lg(mtx_run_queue_);
   rb_map_.insert(
-      std::pair<double, std::shared_ptr<CRoutine>>(cr->Priority(), cr));
+      std::pair<double, std::shared_ptr<CRoutine>>(cr->priority(), cr));
   return true;
 }
 

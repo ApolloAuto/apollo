@@ -63,14 +63,14 @@ RoutineFactory CreateRoutineFactory(
       for (;;) {
         if (dv->TryFetch(msg)) {
           PerfEventCache::Instance()->AddSchedEvent(
-              SchedPerf::TRY_FETCH_OUT, CRoutine::GetCurrentRoutine()->Id(),
-              CRoutine::GetCurrentRoutine()->ProcessorId(), 0, 0, 1, -1);
+              SchedPerf::TRY_FETCH_OUT, CRoutine::GetCurrentRoutine()->id(),
+              CRoutine::GetCurrentRoutine()->processor_id(), 0, 0, 1, -1);
           f(msg);
         } else {
           PerfEventCache::Instance()->AddSchedEvent(
-              SchedPerf::TRY_FETCH_OUT, CRoutine::GetCurrentRoutine()->Id(),
-              CRoutine::GetCurrentRoutine()->ProcessorId(), 0, 0, 0, -1);
-          CRoutine::GetCurrentRoutine()->SetState(RoutineState::WAITING_INPUT);
+              SchedPerf::TRY_FETCH_OUT, CRoutine::GetCurrentRoutine()->id(),
+              CRoutine::GetCurrentRoutine()->processor_id(), 0, 0, 0, -1);
+          CRoutine::GetCurrentRoutine()->set_state(RoutineState::DATA_WAIT);
         }
         CRoutine::Yield();
       }
@@ -92,14 +92,14 @@ RoutineFactory CreateRoutineFactory(
       for (;;) {
         if (dv->TryFetch(msg0, msg1)) {
           PerfEventCache::Instance()->AddSchedEvent(
-              SchedPerf::TRY_FETCH_OUT, CRoutine::GetCurrentRoutine()->Id(),
-              CRoutine::GetCurrentRoutine()->ProcessorId(), 0, 0, 1, -1);
+              SchedPerf::TRY_FETCH_OUT, CRoutine::GetCurrentRoutine()->id(),
+              CRoutine::GetCurrentRoutine()->processor_id(), 0, 0, 1, -1);
           f(msg0, msg1);
         } else {
           PerfEventCache::Instance()->AddSchedEvent(
-              SchedPerf::TRY_FETCH_OUT, CRoutine::GetCurrentRoutine()->Id(),
-              CRoutine::GetCurrentRoutine()->ProcessorId(), 0, 0, 0, -1);
-          CRoutine::GetCurrentRoutine()->SetState(RoutineState::WAITING_INPUT);
+              SchedPerf::TRY_FETCH_OUT, CRoutine::GetCurrentRoutine()->id(),
+              CRoutine::GetCurrentRoutine()->processor_id(), 0, 0, 0, -1);
+          CRoutine::GetCurrentRoutine()->set_state(RoutineState::DATA_WAIT);
         }
         CRoutine::Yield();
       }
@@ -121,14 +121,14 @@ RoutineFactory CreateRoutineFactory(
       for (;;) {
         if (dv->TryFetch(msg0, msg1, msg2)) {
           PerfEventCache::Instance()->AddSchedEvent(
-              SchedPerf::TRY_FETCH_OUT, CRoutine::GetCurrentRoutine()->Id(),
-              CRoutine::GetCurrentRoutine()->ProcessorId(), 0, 0, 1, -1);
+              SchedPerf::TRY_FETCH_OUT, CRoutine::GetCurrentRoutine()->id(),
+              CRoutine::GetCurrentRoutine()->processor_id(), 0, 0, 1, -1);
           f(msg0, msg1, msg2);
         } else {
           PerfEventCache::Instance()->AddSchedEvent(
-              SchedPerf::TRY_FETCH_OUT, CRoutine::GetCurrentRoutine()->Id(),
-              CRoutine::GetCurrentRoutine()->ProcessorId(), 0, 0, 0, -1);
-          CRoutine::GetCurrentRoutine()->SetState(RoutineState::WAITING_INPUT);
+              SchedPerf::TRY_FETCH_OUT, CRoutine::GetCurrentRoutine()->id(),
+              CRoutine::GetCurrentRoutine()->processor_id(), 0, 0, 0, -1);
+          CRoutine::GetCurrentRoutine()->set_state(RoutineState::DATA_WAIT);
         }
         CRoutine::Yield();
       }
@@ -151,14 +151,14 @@ RoutineFactory CreateRoutineFactory(
       for (;;) {
         if (dv->TryFetch(msg0, msg1, msg2, msg3)) {
           PerfEventCache::Instance()->AddSchedEvent(
-              SchedPerf::TRY_FETCH_OUT, CRoutine::GetCurrentRoutine()->Id(),
-              CRoutine::GetCurrentRoutine()->ProcessorId(), 0, 0, 1, -1);
+              SchedPerf::TRY_FETCH_OUT, CRoutine::GetCurrentRoutine()->id(),
+              CRoutine::GetCurrentRoutine()->processor_id(), 0, 0, 1, -1);
           f(msg0, msg1, msg2, msg3);
         } else {
           PerfEventCache::Instance()->AddSchedEvent(
-              SchedPerf::TRY_FETCH_OUT, CRoutine::GetCurrentRoutine()->Id(),
-              CRoutine::GetCurrentRoutine()->ProcessorId(), 0, 0, 0, -1);
-          CRoutine::GetCurrentRoutine()->SetState(RoutineState::WAITING_INPUT);
+              SchedPerf::TRY_FETCH_OUT, CRoutine::GetCurrentRoutine()->id(),
+              CRoutine::GetCurrentRoutine()->processor_id(), 0, 0, 0, -1);
+          CRoutine::GetCurrentRoutine()->set_state(RoutineState::DATA_WAIT);
         }
         CRoutine::Yield();
       }

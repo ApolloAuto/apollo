@@ -52,8 +52,8 @@ class Processor {
   void BindContext(const std::shared_ptr<ProcessorContext>& context) {
     context_ = context;
   }
-  void SetId(uint32_t id) { id_ = id; }
-  uint32_t Id() { return id_; }
+  void set_id(uint32_t id) { id_ = id; }
+  uint32_t id() const { return id_; }
   void Stop() { running_ = false; }
   void Notify() { cv_.notify_one(); }
 

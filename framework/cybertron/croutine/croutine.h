@@ -17,7 +17,6 @@
 #ifndef CYBERTRON_CROUTINE_CROUTINE_H_
 #define CYBERTRON_CROUTINE_CROUTINE_H_
 
-#include <atomic>
 #include <chrono>
 #include <functional>
 #include <memory>
@@ -31,173 +30,226 @@ namespace apollo {
 namespace cybertron {
 namespace croutine {
 
-using CRoutineFunc = std::function<void()>;
+using RoutineFunc = std::function<void()>;
 using Duration = std::chrono::microseconds;
 
-enum class RoutineState {
-  READY,
-  RUNNING,
-  FINISHED,
-  IO_WAIT,
-  SLEEP,
-  WAITING_INPUT
-};
+enum class RoutineState { READY, RUNNING, FINISHED, SLEEP, IO_WAIT, DATA_WAIT };
 
 class CRoutine {
  public:
-  explicit CRoutine(const CRoutineFunc &func);
-  explicit CRoutine(CRoutineFunc &&func);
+  explicit CRoutine(const RoutineFunc &func);
+  explicit CRoutine(RoutineFunc &&func);
   virtual ~CRoutine();
   virtual void Routine();
 
-  // static interface
-  inline static void Yield() {
-    SwapContext(GetCurrentRoutine()->GetContext(), GetMainContext());
-  }
+  // static interfaces
+  static void Yield();
+  static void SetMainContext(const std::shared_ptr<RoutineContext> &context);
+  static CRoutine *GetCurrentRoutine();
+  static RoutineContext *GetMainContext();
 
-  // TODO(hewei03): weak pointer here?
-  inline static void SetMainContext(
-      const std::shared_ptr<RoutineContext> &context) {
-    main_context_ = context;
-  }
-
-  inline static CRoutine *GetCurrentRoutine() { return current_routine_; }
-
-  inline static RoutineContext *GetMainContext() { return main_context_.get(); }
-
-  // public interface
+  // public interfaces
   RoutineState Resume();
+  RoutineState UpdateState();
+  RoutineContext *GetContext();
+  std::unique_lock<std::mutex> GetLock() const;
 
-  inline RoutineContext *GetContext() { return &context_; }
+  void Run();
+  void Stop();
+  void Wake();
+  void HangUp();
+  void Sleep(const Duration &sleep_duration);
 
-  inline void Run() {
-    func_();
-    SetState(RoutineState::FINISHED);
-  }
+  void AddAffinityProcessor(int processor_id);
+  const std::set<int> &GetAffinityProcessorSet() const;
+  bool IsAffinity(int processor_id);
 
-  inline std::unique_lock<std::mutex> GetLock() const {
-    std::unique_lock<std::mutex> ul(op_mtx_, std::defer_lock);
-    return ul;
-  }
+  // getter and setter
+  RoutineState state() const;
+  void set_state(const RoutineState &state);
 
-  inline void SetState(const RoutineState &state, bool is_notify = false) {
-    // for race condition issue
-    if (is_notify && state_.load() == RoutineState::RUNNING) {
-      return;
-    }
-    state_.store(state);
-  }
+  uint64_t id() const;
+  void set_id(uint64_t id);
 
-  inline const RoutineState State() { return state_.load(); }
+  const std::string &name() const;
+  void set_name(std::string name);
 
-  inline void Wake() { SetState(RoutineState::READY); }
+  int processor_id() const;
+  void set_processor_id(int processor_id);
 
-  inline void HangUp() {
-    SetState(RoutineState::IO_WAIT);
-    CRoutine::Yield();
-  }
+  double vfrequency() const;
+  void set_vfrequency(double frequency);
 
-  inline void Sleep(const Duration &sleep_duration) {
-    SetState(RoutineState::SLEEP);
-    wake_time_ = std::chrono::steady_clock::now() + sleep_duration;
-    CRoutine::Yield();
-  }
+  double frequency() const;
+  void set_frequency(double frequency);
 
-  inline void SetId(uint64_t id) { id_ = id; }
-  inline uint64_t Id() { return id_; }
+  double normalized_vfrequency() const;
+  void set_normalized_vfrequency(double frequency);
 
-  inline void SetName(std::string name) { name_ = name; }
-  inline std::string Name() { return name_; }
+  double vruntime() const;
+  void set_vruntime(double time);
 
-  inline void SetProcessorId(int processor_id) { processor_id_ = processor_id; }
+  uint64_t exec_time() const;
+  void set_exec_time(uint64_t time);
 
-  inline int ProcessorId() { return processor_id_; }
+  double normalized_vruntime() const;
+  void set_normalized_vruntime(double time);
 
-  void AddAffinityProcessor(int processor_id) {
-    affinity_processor_id_set_.insert(processor_id);
-  }
+  uint32_t priority() const;
+  void set_priority(uint32_t priority);
 
-  std::set<int> &GetAffinityProcessorSet() {
-    return affinity_processor_id_set_;
-  }
-
-  bool IsAffinity(int processor_id) {
-    return affinity_processor_id_set_.find(processor_id) !=
-           affinity_processor_id_set_.end();
-  }
-
-  RoutineState UpdateState() {
-    if (IsSleep()) {
-      if (std::chrono::steady_clock::now() > wake_time_) {
-        SetState(RoutineState::READY);
-      }
-    }
-    return state_.load();
-  }
-
-  double VFrequency() { return vfrequency_; }
-  void SetVFrequency(double frequency) { vfrequency_ = frequency; }
-
-  double Frequency() { return frequency_; }
-  void SetFrequency(double frequency) { frequency_ = frequency; }
-
-  double NormalizedFrequency() { return normalized_vfrequency_; }
-  void SetNormalizedFrequency(double frequency) {
-    normalized_vfrequency_ = frequency;
-  }
-
-  double VRunningTime() { return vruntime_; }
-  void SetVRunningTime(double time) { vruntime_ = time; }
-
-  uint64_t ExecTime() { return exec_time_; }
-  void SetExecTime(uint64_t time) { exec_time_ = time; }
-
-  double NormalizedRunningTime() { return normalized_vruntime_; }
-  void SetNormalizedRunningTime(double time) { normalized_vruntime_ = time; }
-
-  uint32_t Priority() { return priority_; }
-  void SetPriority(uint32_t priority) { priority_ = priority; }
-
-  double ProcessedNum() { return proc_num_; }
-  void SetProcessedNum(double num) { proc_num_ = num; }
-  void IncreaseProcessedNum() { ++proc_num_; }
-
-  bool IsRunning() { return state_.load() == RoutineState::RUNNING; }
-  bool IsFinished() { return state_.load() == RoutineState::FINISHED; }
-  bool IsWaitingInput() { return state_.load() == RoutineState::WAITING_INPUT; }
-  bool IsReady() { return state_.load() == RoutineState::READY; }
-  bool IsSleep() { return state_.load() == RoutineState::SLEEP; }
-  bool IsIOWait() { return state_.load() == RoutineState::IO_WAIT; }
-
-  void Stop() { force_stop_ = true; }
-
-  std::chrono::steady_clock::time_point wake_time_;
-  // for processor schedule
-
-  double notify_num_ = 0;
+  double proc_num() const;
+  void set_proc_num(double num);
 
  private:
-  uint64_t id_ = 0;
   std::string name_;
-  uint32_t processor_id_ = -1;
   std::set<int> affinity_processor_id_set_;
+  std::chrono::steady_clock::time_point wake_time_;
 
-  static thread_local CRoutine *current_routine_;
-  static thread_local std::shared_ptr<RoutineContext> main_context_;
+  RoutineFunc func_;
+  RoutineState state_;
   RoutineContext context_;
-  CRoutineFunc func_;
-  std::atomic<RoutineState> state_;
-  uint32_t priority_ = 1;
-  uint64_t frequency_ = 0;
-  uint64_t exec_time_ = 0;
+  mutable std::mutex mutex_;
+
+  bool force_stop_ = false;
   double proc_num_ = 0;
   double normalized_vfrequency_ = 0.0;
   double vfrequency_ = 0.0;
   double vruntime_ = 0.0;
   double normalized_vruntime_ = 0.0;
-  bool force_stop_ = false;
-  mutable std::mutex op_mtx_;
+  uint32_t priority_ = 1;
+  uint32_t processor_id_ = -1;
+  uint64_t id_ = 0;
+  uint64_t frequency_ = 0;
+  uint64_t exec_time_ = 0;
+
+  static thread_local CRoutine *current_routine_;
+  static thread_local std::shared_ptr<RoutineContext> main_context_;
 };
+
+inline void CRoutine::Yield() {
+  SwapContext(GetCurrentRoutine()->GetContext(), GetMainContext());
+}
+
+inline CRoutine *CRoutine::GetCurrentRoutine() { return current_routine_; }
+
+inline RoutineContext *CRoutine::GetMainContext() {
+  return main_context_.get();
+}
+
+inline void CRoutine::SetMainContext(
+    const std::shared_ptr<RoutineContext> &context) {
+  main_context_ = context;
+}
+
+inline RoutineContext *CRoutine::GetContext() { return &context_; }
+RoutineState Resume();
+
+inline void CRoutine::Run() {
+  func_();
+  state_ = RoutineState::FINISHED;
+}
+
+inline std::unique_lock<std::mutex> CRoutine::GetLock() const {
+  std::unique_lock<std::mutex> ul(mutex_, std::defer_lock);
+  return ul;
+}
+
+inline void CRoutine::set_state(const RoutineState &state) { state_ = state; }
+
+inline RoutineState CRoutine::state() const { return state_; }
+
+inline void CRoutine::Wake() { state_ = RoutineState::READY; }
+
+inline void CRoutine::HangUp() {
+  state_ = RoutineState::IO_WAIT;
+  CRoutine::Yield();
+}
+
+inline void CRoutine::Sleep(const Duration &sleep_duration) {
+  state_ = RoutineState::SLEEP;
+  wake_time_ = std::chrono::steady_clock::now() + sleep_duration;
+  CRoutine::Yield();
+}
+
+inline uint64_t CRoutine::id() const { return id_; }
+
+inline void CRoutine::set_id(uint64_t id) { id_ = id; }
+
+inline const std::string &CRoutine::name() const { return name_; }
+
+inline void CRoutine::set_name(std::string name) { name_ = name; }
+
+inline int CRoutine::processor_id() const { return processor_id_; }
+
+inline void CRoutine::set_processor_id(int processor_id) {
+  processor_id_ = processor_id;
+}
+
+inline void CRoutine::AddAffinityProcessor(int processor_id) {
+  affinity_processor_id_set_.insert(processor_id);
+}
+
+inline const std::set<int> &CRoutine::GetAffinityProcessorSet() const {
+  return affinity_processor_id_set_;
+}
+
+inline bool CRoutine::IsAffinity(int processor_id) {
+  return affinity_processor_id_set_.find(processor_id) !=
+         affinity_processor_id_set_.end();
+}
+
+inline RoutineState CRoutine::UpdateState() {
+  if (state_ == RoutineState::SLEEP &&
+      std::chrono::steady_clock::now() > wake_time_) {
+    state_ = RoutineState::READY;
+  }
+  return state_;
+}
+
+inline double CRoutine::vfrequency() const { return vfrequency_; }
+
+inline void CRoutine::set_vfrequency(double frequency) {
+  vfrequency_ = frequency;
+}
+
+inline double CRoutine::frequency() const { return frequency_; }
+
+inline void CRoutine::set_frequency(double frequency) {
+  frequency_ = frequency;
+}
+
+inline double CRoutine::normalized_vfrequency() const {
+  return normalized_vfrequency_;
+}
+
+inline void CRoutine::set_normalized_vfrequency(double frequency) {
+  normalized_vfrequency_ = frequency;
+}
+
+inline double CRoutine::vruntime() const { return vruntime_; }
+
+inline void CRoutine::set_vruntime(double time) { vruntime_ = time; }
+
+inline uint64_t CRoutine::exec_time() const { return exec_time_; }
+
+inline void CRoutine::set_exec_time(uint64_t time) { exec_time_ = time; }
+
+inline double CRoutine::normalized_vruntime() const {
+  return normalized_vruntime_;
+}
+
+inline void CRoutine::set_normalized_vruntime(double time) {
+  normalized_vruntime_ = time;
+}
+
+inline uint32_t CRoutine::priority() const { return priority_; }
+
+inline void CRoutine::set_priority(uint32_t priority) { priority_ = priority; }
+
+inline double CRoutine::proc_num() const { return proc_num_; }
+
+inline void CRoutine::set_proc_num(double num) { proc_num_ = num; }
 
 }  // namespace croutine
 }  // namespace cybertron
