@@ -56,7 +56,7 @@ bool ContiRadarCanbusComponent::Init() {
   }
   AINFO << "Can client is successfully created.";
   conti_radar_writer_ =
-      node_->CreateWriter<ContiRadar>(FLAGS_conti_radar_topic);
+      node_->CreateWriter<ContiRadar>(conti_radar_conf_.radar_channel());
   pose_reader_ = node_->CreateReader<LocalizationEstimate>(
       FLAGS_localization_topic,
       [&](const std::shared_ptr<LocalizationEstimate>& pose) {

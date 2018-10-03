@@ -4,10 +4,10 @@
 #                   drivers                      #
 ##################################################
 
-# 128
 module_config {
     module_library : "/apollo/bazel-bin/modules/drivers/velodyne/driver/libvelodyne_driver_component.so"
 
+    # 128
     components {
       class_name : "VelodyneDriverComponent"
       config {
@@ -15,12 +15,7 @@ module_config {
         config_file_path : "/apollo/modules/drivers/velodyne/conf/velodyne128_conf.pb.txt"
       }
     }
-}
-
-# 16_front
-module_config {
-    module_library : "/apollo/bazel-bin/modules/drivers/velodyne/driver/libvelodyne_driver_component.so"
-
+    # 16_front
     components {
       class_name : "VelodyneDriverComponent"
       config {
@@ -28,12 +23,7 @@ module_config {
         config_file_path : "/apollo/modules/drivers/velodyne/conf/velodyne16_front_center_conf.pb.txt"
       }
     }
-}
-
-# 16_rear_left
-module_config {
-    module_library : "/apollo/bazel-bin/modules/drivers/velodyne/driver/libvelodyne_driver_component.so"
-
+    # 16_rear_left
     components {
       class_name : "VelodyneDriverComponent"
       config {
@@ -41,12 +31,7 @@ module_config {
         config_file_path : "/apollo/modules/drivers/velodyne/conf/velodyne16_rear_left_conf.pb.txt"
       }
     }
-}
-
-# 16_rear_right
-module_config {
-    module_library : "/apollo/bazel-bin/modules/drivers/velodyne/driver/libvelodyne_driver_component.so"
-
+    # 16_rear_right
     components {
       class_name : "VelodyneDriverComponent"
       config {
@@ -74,10 +59,10 @@ module_config {
     }
 }
 
-# 16_front_center
 module_config {
     module_library : "/apollo/bazel-bin/modules/drivers/velodyne/parser/libvelodyne_convert_component.so"
 
+    # 16_front_center
     components {
       class_name : "VelodyneConvertComponent"
       config {
@@ -86,12 +71,7 @@ module_config {
         readers {channel: "/apollo/sensor/velodyne128/VelodyneScan"}
       }
     }
-}
-
-# 16_rear_left
-module_config {
-    module_library : "/apollo/bazel-bin/modules/drivers/velodyne/parser/libvelodyne_convert_component.so"
-
+    # 16_rear_left
     components {
       class_name : "VelodyneConvertComponent"
       config {
@@ -100,12 +80,7 @@ module_config {
         readers {channel: "/apollo/sensor/velodyne128/VelodyneScan"}
       }
     }
-}
-
-# 16_rear_right
-module_config {
-    module_library : "/apollo/bazel-bin/modules/drivers/velodyne/parser/libvelodyne_convert_component.so"
-
+    # 16_rear_right
     components {
       class_name : "VelodyneConvertComponent"
       config {

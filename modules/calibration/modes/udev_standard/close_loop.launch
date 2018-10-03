@@ -20,14 +20,14 @@
 
 	<module>
 		<name>camera</name>
-		<dag_conf>/apollo/modules/drivers/usb_cam/dag/camera.dag</dag_conf>
+		<dag_conf>/apollo/modules/drivers/usb_cam/dag/camera_udev.dag</dag_conf>
 		<process_name>apollo</process_name>
 		<version>1.0.0</version>
 	</module>
 
 	<module>
 		<name>conti_radar</name>
-		<dag_conf>/apollo/modules/drivers/radar/conti_radar/dag/conti_radar.dag</dag_conf>
+		<dag_conf>/apollo/modules/drivers/radar/conti_radar/dag/conti_radar_udev.dag</dag_conf>
 		<process_name>apollo</process_name>
 		<version>1.0.0</version>
 	</module>
