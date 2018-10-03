@@ -22,12 +22,14 @@
 #define MODULES_PLANNING_COMMON_PLANNING_CONTEXT_H_
 
 #include <string>
+#include <unordered_map>
 
 #include "cybertron/common/macros.h"
 
 #include "modules/common/proto/drive_state.pb.h"
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/planning/proto/planning_status.pb.h"
+#include "modules/routing/proto/routing.pb.h"
 
 /**
  * @brief PlanningContext is the runtime context in planning. It is
@@ -41,16 +43,26 @@ class PlanningContext {
   void Clear();
 
   PlanningStatus* mutable_planning_status() { return &planning_status_; }
-  const PlanningStatus& planning_status() const { return planning_status_; }
+
+  void UpdateRouting(const apollo::routing::RoutingResponse& routing);
+
+  // assign a static anchor_s to all lanes in current routing. One purpose is to
+  // let path sampler always sample a static point given a lane id;
+  struct RouteLaneInfo {
+    float anchor_s = 0.0f;
+    float start_s = 0.0f;
+  };
+
+  RouteLaneInfo FindLaneStaticS(const std::string& lane_id) const;
 
  private:
   PlanningStatus planning_status_;
 
+  std::unordered_map<std::string, RouteLaneInfo> lane_anchor_s_;
+
   // this is a singleton class
   DECLARE_SINGLETON(PlanningContext);
 };
-
-void DumpPlanningContext();
 
 inline PlanningStatus* mutable_planning_status() {
   return PlanningContext::Instance()->mutable_planning_status();

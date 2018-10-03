@@ -23,14 +23,43 @@ namespace planning {
 
 PlanningContext::PlanningContext() {}
 
-void DumpPlanningContext() {
-  //  AdapterManager::GetLocalization()->DumpLatestMessage();
-  //  AdapterManager::GetChassis()->DumpLatestMessage();
-  //  AdapterManager::GetRoutingResponse()->DumpLatestMessage();
-  //  AdapterManager::GetPrediction()->DumpLatestMessage();
+PlanningContext::RouteLaneInfo PlanningContext::FindLaneStaticS(
+    const std::string& lane_id) const {
+  auto iter = lane_anchor_s_.find(lane_id);
+  if (iter == lane_anchor_s_.end()) {
+    RouteLaneInfo info;
+    return info;
+  } else {
+    return iter->second;
+  }
 }
 
-void PlanningContext::Clear() { planning_status_.Clear(); }
+void PlanningContext::UpdateRouting(
+    const apollo::routing::RoutingResponse& routing) {
+  // Note: when there are repeating lane ids in routing, the value of
+  // lane_anchor_s_ may be overwrite by when there are repeating lane IDs in
+  // routing. But for the purpose of assiging a static start point for all the
+  // lanes on the route, it is OK.
+  lane_anchor_s_.clear();
+  float accumulated_s = 0.0;
+  for (const auto& road : routing.road()) {
+    float road_s = 0.0;
+    for (const auto& passage : road.passage()) {
+      for (const auto& lane : passage.segment()) {
+        auto& info = lane_anchor_s_[lane.id()];
+        info.anchor_s = accumulated_s + road_s;
+        info.start_s = lane.start_s();
+        road_s += lane.end_s() - lane.start_s();
+      }
+    }
+    accumulated_s += road_s;
+  }
+}
+
+void PlanningContext::Clear() {
+  planning_status_.Clear();
+  lane_anchor_s_.clear();
+}
 
 }  // namespace planning
 }  // namespace apollo
