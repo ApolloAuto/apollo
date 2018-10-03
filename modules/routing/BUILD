@@ -42,6 +42,7 @@ cc_binary(
     name = "librouting_component.so",
     deps = [":routing_component_lib"],
     linkshared = True,
+    linkstatic = False,
 )
 
 filegroup(

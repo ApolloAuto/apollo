@@ -83,6 +83,7 @@ cc_binary(
     name = "libultrasonic_radar_canbus_component.so",
     deps = [":ultrasonic_radar_canbus_component_lib"],
     linkshared = True,
+    linkstatic = False,
 )
 
 cpplint()

@@ -55,6 +55,7 @@ cc_binary(
     name = "libstatic_transform_component.so",
     deps = [":static_transform_component_lib"],
     linkshared = True,
+    linkstatic = False,
 )
 
 

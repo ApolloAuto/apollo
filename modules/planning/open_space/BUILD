@@ -202,6 +202,7 @@ cc_test(
 cc_binary(
     name = "hybrid_a_star_wrapper_lib.so",
     linkshared = True,
+    linkstatic = False,
     srcs = [
         "hybrid_a_star_wrapper.cc",
     ],

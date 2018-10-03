@@ -91,6 +91,7 @@ cc_binary(
     name = "libthird_party_perception_component.so",
     deps = [":third_party_perception_component_lib"],
     linkshared = True,
+    linkstatic = False,
 )
 
 cpplint()
