@@ -21,18 +21,14 @@ jobs:
         - rm -rf "${HOME}/.cache/bazel/_bazel_${USER}/install"
         - rm -rf "/apollo/data/core"    
     - stage: stage-02
-      env:
-        - JOB=cibuild
       script:
         - ./docker/scripts/dev_start.sh -t dev-x86_64-20181001_1754-ci
-        - ./apollo_docker.sh ${JOB}
+        - ./apollo_docker.sh cibuild
         - rm -rf "${HOME}/.cache/bazel/_bazel_${USER}/install"
         - rm -rf "/apollo/data/core"
-      env:
-        - JOB=citest
       script:
         - ./docker/scripts/dev_start.sh -t dev-x86_64-20181001_1754-ci
-        - ./apollo_docker.sh ${JOB}
+        - ./apollo_docker.sh citest
         - rm -rf "${HOME}/.cache/bazel/_bazel_${USER}/install"
         - rm -rf "/apollo/data/core"  
 notifications:
