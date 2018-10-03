@@ -1,0 +1,137 @@
+# Define all coms in DAG streaming.
+
+##################################################
+#                   drivers                      #
+##################################################
+
+# 128
+module_config {
+    module_library : "/apollo/bazel-bin/modules/drivers/velodyne/driver/libvelodyne_driver_component.so"
+
+    components {
+      class_name : "VelodyneDriverComponent"
+      config {
+        name : "velodyne_128_driver"
+        config_file_path : "/apollo/modules/drivers/velodyne/conf/velodyne128_conf.pb.txt"
+      }
+    }
+}
+
+# 16_front
+module_config {
+    module_library : "/apollo/bazel-bin/modules/drivers/velodyne/driver/libvelodyne_driver_component.so"
+
+    components {
+      class_name : "VelodyneDriverComponent"
+      config {
+        name : "velodyne_16_front_center_driver"
+        config_file_path : "/apollo/modules/drivers/velodyne/conf/velodyne16_front_center_conf.pb.txt"
+      }
+    }
+}
+
+# 16_rear_left
+module_config {
+    module_library : "/apollo/bazel-bin/modules/drivers/velodyne/driver/libvelodyne_driver_component.so"
+
+    components {
+      class_name : "VelodyneDriverComponent"
+      config {
+        name : "velodyne_16_rear_left_driver"
+        config_file_path : "/apollo/modules/drivers/velodyne/conf/velodyne16_rear_left_conf.pb.txt"
+      }
+    }
+}
+
+# 16_rear_right
+module_config {
+    module_library : "/apollo/bazel-bin/modules/drivers/velodyne/driver/libvelodyne_driver_component.so"
+
+    components {
+      class_name : "VelodyneDriverComponent"
+      config {
+        name : "velodyne_16_rear_right_driver"
+        config_file_path : "/apollo/modules/drivers/velodyne/conf/velodyne16_rear_right_conf.pb.txt"
+      }
+    }
+}
+
+##################################################
+#                   convert                      #
+##################################################
+
+# 128
+module_config {
+    module_library : "/apollo/bazel-bin/modules/drivers/velodyne/parser/libvelodyne_convert_component.so"
+
+    components {
+      class_name : "VelodyneConvertComponent"
+      config {
+        name : "velodyne_128_convert"
+        config_file_path : "/apollo/modules/drivers/velodyne/conf/velodyne128_conf.pb.txt"
+        readers {channel: "/apollo/sensor/velodyne128/VelodyneScan"}
+      }
+    }
+}
+
+# 16_front_center
+module_config {
+    module_library : "/apollo/bazel-bin/modules/drivers/velodyne/parser/libvelodyne_convert_component.so"
+
+    components {
+      class_name : "VelodyneConvertComponent"
+      config {
+        name : "velodyne_16_front_center_convert"
+        config_file_path : "/apollo/modules/drivers/velodyne/conf/velodyne16_front_center_conf.pb.txt"
+        readers {channel: "/apollo/sensor/velodyne128/VelodyneScan"}
+      }
+    }
+}
+
+# 16_rear_left
+module_config {
+    module_library : "/apollo/bazel-bin/modules/drivers/velodyne/parser/libvelodyne_convert_component.so"
+
+    components {
+      class_name : "VelodyneConvertComponent"
+      config {
+        name : "velodyne_16_rear_left_convert"
+        config_file_path : "/apollo/modules/drivers/velodyne/conf/velodyne16_rear_left_conf.pb.txt"
+        readers {channel: "/apollo/sensor/velodyne128/VelodyneScan"}
+      }
+    }
+}
+
+# 16_rear_right
+module_config {
+    module_library : "/apollo/bazel-bin/modules/drivers/velodyne/parser/libvelodyne_convert_component.so"
+
+    components {
+      class_name : "VelodyneConvertComponent"
+      config {
+        name : "velodyne_16_rear_right_convert"
+        config_file_path : "/apollo/modules/drivers/velodyne/conf/velodyne16_rear_right_conf.pb.txt"
+        readers {channel: "/apollo/sensor/velodyne128/VelodyneScan"}
+      }
+    }
+}
+
+
+##################################################
+#                compensation                    #
+##################################################
+
+module_config {
+    module_library : "/apollo/bazel-bin/modules/drivers/velodyne/parser/libvelodyne_compensator_component.so"
+
+    components {
+      class_name : "VelodyneCompensatorComponent"
+      config {
+        name : "velodyne_compensator"
+        config_file_path : "/apollo/modules/drivers/velodyne/conf/velodyne128_conf.pb.txt"
+        readers {channel: "/apollo/sensor/velodyne128/PointCloud2"}
+      }
+    }
+}
+
+
