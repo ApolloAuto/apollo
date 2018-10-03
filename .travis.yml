@@ -12,7 +12,7 @@ before_script:
     - cp scripts/AGREEMENT.txt ${HOME}/.apollo_agreement.txt
 jobs:
   include:
-    - stage: stage-01
+    - stage: lint
       env:
         - JOB=lint
       script:
@@ -20,22 +20,15 @@ jobs:
         - ./apollo_docker.sh ${JOB}
         - rm -rf "${HOME}/.cache/bazel/_bazel_${USER}/install"
         - rm -rf "/apollo/data/core"    
-    - stage: stage-02
+    - stage: build_and_test
       env:
         - JOB=cibuild
-      script:
-        - ./docker/scripts/dev_start.sh -t dev-x86_64-20181001_1754-ci
-        - ./apollo_docker.sh ${JOB}
-        - rm -rf "${HOME}/.cache/bazel/_bazel_${USER}/install"
-        - rm -rf "/apollo/data/core"
-    - stage: stage-03
-      env:
         - JOB=citest
       script:
         - ./docker/scripts/dev_start.sh -t dev-x86_64-20181001_1754-ci
         - ./apollo_docker.sh ${JOB}
         - rm -rf "${HOME}/.cache/bazel/_bazel_${USER}/install"
-        - rm -rf "/apollo/data/core"    
+        - rm -rf "/apollo/data/core"  
 notifications:
     email:
         on_success: always
