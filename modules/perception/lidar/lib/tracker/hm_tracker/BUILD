@@ -198,6 +198,26 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "object_track_matcher_test",
+    size = "small",
+    srcs = [
+        "object_track_matcher_test.cc",
+    ],
+    deps = [
+        ":object_track_matcher",
+        ":hm_tracker",
+        "@gtest//:main",
+        "//modules/perception/base",
+        "//modules/perception/common/io:io_util",
+        "//modules/perception/lidar/common",
+        "//modules/perception/lidar/lib/interface",
+        "//modules/perception/common/graph",
+        "//modules/perception/lidar/lib/object_builder",
+        "//modules/perception/lidar/lib/tracker/common:track_pool_types",
+    ],
+)
+
 cc_library(
     name = "tracker",
     srcs = [
