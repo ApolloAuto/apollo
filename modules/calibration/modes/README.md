@@ -8,17 +8,18 @@ contains its runtime launch files to bring up all components.
 We'll convert the folder names to readable names automatically and display on
 Dreamview. Please make it simple, clean and meaningful.
 
-An example:
+An example mode files structure:
 
 ```text
-# Folders with structure:
 modes/
       mkz_standard/
-                   drivers.launch
-                   perception.launch
-                   planning_control.launch
+                   close_loop.launch
+                   map_collection.launch
+                   ...
+```
 
-# will be displayed on Dreamview as:
-Selectable mode:    "Mkz Standard"
-Launchable modules: "Drivers", "Perception", "Planning Control"
+On Dreamview it can be selected in drop down menu:
+```text
+Mode:    "Mkz Standard"
+Config:  "Close Loop" or "Map Collection"
 ```

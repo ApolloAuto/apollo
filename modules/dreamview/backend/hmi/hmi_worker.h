@@ -95,9 +95,38 @@ class HMIWorker {
   // accessing it.
   inline boost::shared_mutex& GetStatusMutex() { return status_mutex_; }
 
+  // Load modes configuration from FLAGS_modes_config_path to HMIConfig.modes().
+  //
+  // E.g. Modes directory:
+  // /path/to/modes/
+  //     mkz_standard/
+  //         close_loop.launch
+  //         map_collection.launch
+  //
+  // In HMIConfig it will be loaded as:
+  // modes {
+  //   key: "Mkz Standard"
+  //   value: {
+  //     path: "/path/to/modes/mkz_standard"
+  //     launches: {
+  //       key: "Close Loop"
+  //       value: "/path/to/modes/mkz_standard/close_loop.launch"
+  //     }
+  //     launches: {
+  //       key: "Map Collection"
+  //       value: "/path/to/modes/mkz_standard/map_collection.launch"
+  //     }
+  //   }
+  // }
+  static bool LoadModesConfig(
+      const std::string& modes_config_path, HMIConfig* config);
+
  private:
   void InitReadersAndWriters(
       const std::shared_ptr<apollo::cybertron::Node>& node);
+
+  // Run command: scripts/cyber_launch.sh <command> <current_launch>
+  bool CyberLaunch(const std::string& command) const;
 
   HMIConfig config_;
   HMIStatus status_;
