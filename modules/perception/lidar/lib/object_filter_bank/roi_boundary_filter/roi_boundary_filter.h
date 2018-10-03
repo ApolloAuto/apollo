@@ -20,6 +20,7 @@
 #include <vector>
 
 #include "Eigen/Dense"
+#include "gtest/gtest_prod.h"
 
 #include "modules/perception/base/point_cloud.h"
 #include "modules/perception/base/point.h"
@@ -66,6 +67,8 @@ class ROIBoundaryFilter : public BaseObjectFilter {
                                  std::vector<bool>* objects_valid_flag);
 
  private:
+  FRIEND_TEST(ROIBoundaryFilterTest, roi_boundary_filter_test);
+
   std::vector<perception::base::AttributePointCloud<perception::base::PointD>>
       polygons_in_world_;
   std::vector<bool> objects_cross_roi_;

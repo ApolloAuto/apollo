@@ -18,6 +18,8 @@
 
 #include "modules/perception/lidar/lib/object_filter_bank/roi_boundary_filter/roi_boundary_filter.h"
 
+DECLARE_string(work_root);
+
 namespace apollo {
 namespace perception {
 namespace lidar {
@@ -29,7 +31,9 @@ class ROIBoundaryFilterTest : public testing::Test {
     putenv(cybertron_path);
     char module_path[100] = "MODULE_PATH=";
     putenv(module_path);
-    FLAGS_work_root = "/apollo/modules/perception/testdata/lidar/lib/object_filter_bank/roi_boundary";
+    FLAGS_work_root =
+        "/apollo/modules/perception/testdata/lidar/lib/object_filter_bank/"
+        "roi_boundary";
   }
   void TearDown() {}
 

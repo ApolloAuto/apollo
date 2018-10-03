@@ -23,4 +23,16 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "roi_boundary_filter_test",
+    size = "small",
+    srcs = [
+        "roi_boundary_filter_test.cc",
+    ],
+    deps = [
+        ":roi_boundary_filter",
+        "@gtest//:main",
+    ],
+)
+
 cpplint()
