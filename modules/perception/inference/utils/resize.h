@@ -13,10 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_INFERENCE_UTILS_UTIL_H_
-#define MODULES_PERCEPTION_INFERENCE_UTILS_UTIL_H_
+
+#ifndef MODULES_PERCEPTION_INFERENCE_UTILS_RESIZE_H
+#define MODULES_PERCEPTION_INFERENCE_UTILS_RESIZE_H
 
 #include <cuda_runtime_api.h>
+#include <cblas.h>
+
+#include <boost/shared_ptr.hpp>
 #include <fstream>
 #include <iostream>
 #include <map>
@@ -30,28 +34,33 @@ namespace apollo {
 namespace perception {
 namespace inference {
 
-template<typename T>
-void load_data(const std::string &filename, std::vector<T> *outputs) {
-  std::ifstream ifs(filename, std::ifstream::in);
+bool ResizeGPU(const base::Image8U &src,
+               std::shared_ptr<apollo::perception::base::Blob<float> > dst,
+               int stepwidth,
+               int start_axis);
 
-  if (ifs.good()) {
-    outputs->clear();
-    T output;
-    while (ifs >> output) {
-      outputs->push_back(output);
-    }
-    ifs.close();
-  }
-}
+bool ResizeGPU(const apollo::perception::base::Blob<uint8_t> &src_gpu,
+               std::shared_ptr<apollo::perception::base::Blob<float> > dst,
+               int stepwidth,
+               int start_axis,
+               int mean_b,
+               int mean_g,
+               int mean_r,
+               bool channel_axis,
+               float scale);
 
-std::shared_ptr<float> load_binary_data(const std::string &filename);
+bool ResizeGPU(const base::Image8U &src,
+               std::shared_ptr<apollo::perception::base::Blob<float> > dst,
+               int stepwidth,
+               int start_axis,
+               float mean_b,
+               float mean_g,
+               float mean_r,
+               bool channel_axis,
+               float scale);
 
-bool write_result(const std::string &out_path,
-                  const std::vector<float> &results);
-bool write_result(const std::string &out_path,
-                  const std::map<std::string, std::vector<float> > &results);
 }  // namespace inference
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_INFERENCE_UTILS_UTIL_H_
+#endif  // MODULES_PERCEPTION_INFERENCE_UTILS_RESIZE_H

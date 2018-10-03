@@ -28,6 +28,9 @@ cc_library(
     linkopts = ["-lopencv_core -lopencv_imgproc -lopencv_highgui -lnvinfer_plugin -lcaffe"],
     deps = [
         "//modules/perception/base:blob",
+        "//modules/perception/base:image",
+        "//modules/perception/base:box",
+        "//modules/perception/base:point_cloud",
     ],
 )
 
