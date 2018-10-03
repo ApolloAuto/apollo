@@ -35,7 +35,7 @@ class EnvironmentFeatures {
 
   void set_ego_position(const double x, const double y);
 
-  const apollo::common::Point3D& get_ego_position() const;
+  const common::Point3D& get_ego_position() const;
 
   void set_ego_speed(const double ego_speed);
 
@@ -85,8 +85,12 @@ class EnvironmentFeatures {
 
   const std::vector<int>& get_obstacle_ids() const;
 
+  bool ego_lane_reverse_accessible() const;
+
+  void set_ego_lane_reverse_accessible(const bool is_reverse_accessible);
+
  private:
-  apollo::common::Point3D ego_position_;
+  common::Point3D ego_position_;
 
   double ego_speed_ = 0.0;
 
@@ -119,6 +123,8 @@ class EnvironmentFeatures {
   double dist_to_front_junction_ = 0.0;
 
   std::vector<int> obstacle_ids_;
+
+  bool ego_lane_reverse_accessible_ = false;
 };
 
 }  // namespace prediction

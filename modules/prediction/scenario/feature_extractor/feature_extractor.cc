@@ -96,6 +96,19 @@ void FeatureExtractor::ExtractEgoLaneFeatures(
   double curr_lane_l = 0.0;
   ptr_ego_lane->GetProjection(ego_position, &curr_lane_s, &curr_lane_l);
   ptr_environment_features->SetEgoLane(ptr_ego_lane->id().id(), curr_lane_s);
+
+  double threshold = 1.0;
+  auto ptr_left_neighbor_lane = PredictionMap::GetLeftNeighborLane(
+      ptr_ego_lane, {ego_position.x(), ego_position.y()}, threshold);
+
+  if (ptr_left_neighbor_lane == nullptr &&
+      ptr_ego_lane->lane().has_left_boundary() &&
+      ptr_ego_lane->lane().left_boundary().boundary_type_size() != 0 &&
+      ptr_ego_lane->lane().left_boundary().boundary_type(0).types_size() != 0 &&
+      ptr_ego_lane->lane().left_boundary().boundary_type(0).types(0) !=
+      hdmap::LaneBoundaryType::Type::LaneBoundaryType_Type_CURB) {
+    ptr_environment_features->set_ego_lane_reverse_accessible(true);
+  }
 }
 
 void FeatureExtractor::ExtractNeighborLaneFeatures(
@@ -112,6 +125,7 @@ void FeatureExtractor::ExtractNeighborLaneFeatures(
 
   auto ptr_left_neighbor_lane = PredictionMap::GetLeftNeighborLane(
       ptr_ego_lane, {ego_position.x(), ego_position.y()}, threshold);
+
   if (ptr_left_neighbor_lane != nullptr) {
     double left_neighbor_lane_s = 0.0;
     double left_neighbor_lane_l = 0.0;
