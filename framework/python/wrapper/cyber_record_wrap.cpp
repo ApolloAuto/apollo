@@ -87,7 +87,7 @@ PyObject *cyber_PyRecordReader_ReadMessage(PyObject *self, PyObject *args) {
   PyDict_SetItemString(pyobj_bag_message, "channel_name",
                        Py_BuildValue("s", result.channel_name.c_str()));
   PyDict_SetItemString(pyobj_bag_message, "data",
-                       Py_BuildValue("s", result.data.c_str()));
+                       Py_BuildValue("s#", result.data.c_str(), result.data.length()));
   PyDict_SetItemString(pyobj_bag_message, "data_type",
                        Py_BuildValue("s", result.data_type.c_str()));
   PyDict_SetItem(pyobj_bag_message, Py_BuildValue("s", "timestamp"),
