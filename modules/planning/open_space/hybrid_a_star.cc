@@ -42,6 +42,7 @@ HybridAStar::HybridAStar() {
   steer_penalty_ = open_space_conf_.warm_start_config().steer_penalty();
   steer_change_penalty_ =
       open_space_conf_.warm_start_config().steer_change_penalty();
+  delta_t_ = open_space_conf_.warm_start_config().delta_t();
 }
 
 bool HybridAStar::AnalyticExpansion(std::shared_ptr<Node3d> current_node,
@@ -245,8 +246,49 @@ bool HybridAStar::GetResult(std::shared_ptr<Node3d> final_node,
   (*result).x = hybrid_a_x;
   (*result).y = hybrid_a_y;
   (*result).phi = hybrid_a_phi;
+  if (!GenerateSpeedAcceleration(result)) {
+    AINFO << "GenerateSpeedAcceleration fail";
+    return false;
+  }
   return true;
 }
+
+bool HybridAStar::GenerateSpeedAcceleration(Result* result) {
+  if (result->x.size() < 2 || result->y.size() < 2 || result->phi.size() < 2) {
+    AINFO << "result size check when generating speed and acceleration fail";
+    return false;
+  }
+  std::size_t x_size = result->x.size();
+  // load velocity from position
+  for (std::size_t i = 0; i < x_size - 1; i++) {
+    double discrete_v = ((result->x[i + 1] - result->x[i]) / delta_t_) *
+                            std::cos(result->phi[i]) +
+                        ((result->y[i + 1] - result->y[i]) / delta_t_) *
+                            std::sin(result->phi[i]);
+    result->v.emplace_back(discrete_v);
+  }
+  result->v.emplace_back(0.0);
+  // load acceleration from velocity
+  for (std::size_t i = 0; i < x_size - 1; i++) {
+    double discrete_a = (result->v[i + 1] - result->v[i]) / delta_t_;
+    result->a.emplace_back(discrete_a);
+  }
+  result->a.emplace_back(0.0);
+  // load steering from phi
+  for (std::size_t i = 0; i < x_size - 1; i++) {
+    double discrete_steer = (result->phi[i + 1] - result->phi[i]) *
+                            vehicle_param_.wheel_base() / step_size_;
+    if (result->v[i] > 0) {
+      discrete_steer = std::atan(discrete_steer);
+    } else {
+      discrete_steer = std::atan(-discrete_steer);
+    }
+    result->steer.emplace_back(discrete_steer);
+  }
+  result->steer.emplace_back(0.0);
+  return true;
+}
+
 bool HybridAStar::Plan(double sx, double sy, double sphi, double ex, double ey,
                        double ephi, ThreadSafeIndexedObstacles* obstacles,
                        Result* result) {
