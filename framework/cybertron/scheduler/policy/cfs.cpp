@@ -55,13 +55,13 @@ std::shared_ptr<CRoutine> CFSContext::NextLocalRoutine() {
 
   // re-enqueue top croutine
   if (cur_croutine_) {
-    cur_croutine_->SetVRunningTime(
-        static_cast<double>(cur_croutine_->ExecTime()) /
-        cur_croutine_->Priority());
-    cur_croutine_->SetExecTime(cur_croutine_->VRunningTime() *
-                               cur_croutine_->Priority());
+    cur_croutine_->set_vruntime(
+        static_cast<double>(cur_croutine_->exec_time()) /
+        cur_croutine_->priority());
+    cur_croutine_->set_exec_time(cur_croutine_->vruntime() *
+                               cur_croutine_->priority());
     local_rb_map_.insert(std::pair<double, std::shared_ptr<CRoutine>>(
-        cur_croutine_->VRunningTime(), cur_croutine_));
+        cur_croutine_->vruntime(), cur_croutine_));
     cur_croutine_ = nullptr;
   }
 
@@ -75,20 +75,20 @@ std::shared_ptr<CRoutine> CFSContext::NextLocalRoutine() {
     }
 
     cr->UpdateState();
-    if (cr->IsRunning()) {
+    if (cr->state() == RoutineState::RUNNING) {
       ++it;
       continue;
     }
 
-    if (cr->IsFinished()) {
+    if (cr->state() == RoutineState::FINISHED) {
       it = local_rb_map_.erase(it);
       continue;
     }
 
-    if (cr->IsReady()) {
-      min_vruntime_ = cr->VRunningTime();
+    if (cr->state() == RoutineState::READY) {
+      min_vruntime_ = cr->vruntime();
       croutine = cr;
-      croutine->SetState(RoutineState::RUNNING);
+      croutine->set_state(RoutineState::RUNNING);
       cur_croutine_ = croutine;
       local_rb_map_.erase(it);
       break;
@@ -99,7 +99,7 @@ std::shared_ptr<CRoutine> CFSContext::NextLocalRoutine() {
     notified_.store(false);
   } else {
     PerfEventCache::Instance()->AddSchedEvent(
-        SchedPerf::NEXT_ROUTINE, croutine->Id(), croutine->ProcessorId(), 0,
+        SchedPerf::NEXT_ROUTINE, croutine->id(), croutine->processor_id(), 0,
         start_perf_time, -1, -1);
   }
   return croutine;
@@ -122,57 +122,57 @@ std::shared_ptr<CRoutine> CFSContext::NextAffinityRoutine() {
     }
 
     cr->UpdateState();
-    if (cr->IsFinished()) {
+    if (cr->state() == RoutineState::FINISHED) {
       it = affinity_rb_map_.erase(it);
       continue;
     }
 
-    if (cr->IsRunning()) {
+    if (cr->state() == RoutineState::RUNNING) {
       ++it;
       continue;
     }
 
-    if (cr->IsReady()) {
+    if (cr->state() == RoutineState::READY) {
       croutine = cr;
-      cr->SetState(RoutineState::RUNNING);
+      cr->set_state(RoutineState::RUNNING);
       break;
     }
     ++it;
   }
   if (croutine) {
     PerfEventCache::Instance()->AddSchedEvent(SchedPerf::NEXT_AFFINITY_R,
-                                              croutine->Id(), proc_index_, 0,
+                                              croutine->id(), proc_index_, 0,
                                               start_perf_time, -1, -1);
   }
   return croutine;
 }
 
 bool CFSContext::Enqueue(const std::shared_ptr<CRoutine>& cr) {
-  if (cr->ProcessorId() != Id()) {
+  if (cr->processor_id() != id()) {
     return false;
   }
 
   {
     WriteLockGuard<AtomicRWLock> lg(rw_lock_);
-    if (cr_map_.find(cr->Id()) != cr_map_.end()) {
+    if (cr_map_.find(cr->id()) != cr_map_.end()) {
       return false;
     }
-    cr_map_[cr->Id()] = cr;
+    cr_map_[cr->id()] = cr;
   }
 
   std::lock_guard<std::mutex> lg(mtx_run_queue_);
-  cr->SetVRunningTime(min_vruntime_ + cr->NormalizedRunningTime());
-  cr->SetExecTime(cr->VRunningTime() * cr->Priority());
+  cr->set_vruntime(min_vruntime_ + cr->normalized_vruntime());
+  cr->set_exec_time(cr->vruntime() * cr->priority());
   local_rb_map_.insert(
-      std::pair<double, std::shared_ptr<CRoutine>>(cr->VRunningTime(), cr));
+      std::pair<double, std::shared_ptr<CRoutine>>(cr->vruntime(), cr));
   return true;
 }
 
 bool CFSContext::EnqueueAffinityRoutine(const std::shared_ptr<CRoutine>& cr) {
   std::lock_guard<std::mutex> lg(rw_affinity_lock_);
-  if (cr->IsAffinity(Id())) {
+  if (cr->IsAffinity(id())) {
     affinity_rb_map_.insert(
-        std::pair<uint32_t, std::shared_ptr<CRoutine>>(cr->Priority(), cr));
+        std::pair<uint32_t, std::shared_ptr<CRoutine>>(cr->priority(), cr));
     return true;
   }
   return false;

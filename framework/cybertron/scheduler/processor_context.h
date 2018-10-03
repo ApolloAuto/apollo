@@ -56,10 +56,10 @@ class ProcessorContext {
 
   void ShutDown();
 
-  inline void SetId(const int id) { proc_index_ = id; }
-  inline int Id() { return proc_index_; }
-  inline bool GetState(const uint64_t& routine_id, RoutineState* state);
-  inline bool SetState(const uint64_t& routine_id, const RoutineState& state);
+  inline void set_id(int id) { proc_index_ = id; }
+  inline int id() const { return proc_index_; }
+  inline bool Getstate(const uint64_t& routine_id, RoutineState* state);
+  inline bool set_state(const uint64_t& routine_id, const RoutineState& state);
 
   void BindProcessor(std::shared_ptr<Processor>& processor) {
     if (!processor_) {
@@ -88,23 +88,23 @@ class ProcessorContext {
   int proc_index_ = -1;
 };
 
-bool ProcessorContext::GetState(const uint64_t& routine_id,
+bool ProcessorContext::Getstate(const uint64_t& routine_id,
                                 RoutineState* state) {
   ReadLockGuard<AtomicRWLock> lg(rw_lock_);
   auto it = cr_map_.find(routine_id);
   if (it != cr_map_.end()) {
-    *state = it->second->State();
+    *state = it->second->state();
     return true;
   }
   return false;
 }
 
-bool ProcessorContext::SetState(const uint64_t& routine_id,
+bool ProcessorContext::set_state(const uint64_t& routine_id,
                                 const RoutineState& state) {
   ReadLockGuard<AtomicRWLock> lg(rw_lock_);
   auto it = cr_map_.find(routine_id);
   if (it != cr_map_.end()) {
-    it->second->SetState(state);
+    it->second->set_state(state);
     return true;
   }
   return false;

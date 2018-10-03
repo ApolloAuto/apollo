@@ -90,7 +90,7 @@ void Scheduler::StartSysmon() {
 void Scheduler::CreateProcessor() {
   for (int i = 0; i < proc_num_; i++) {
     auto proc = std::make_shared<Processor>();
-    proc->SetId(i);
+    proc->set_id(i);
 
     std::shared_ptr<ProcessorContext> ctx;
     switch (sched_policy_) {
@@ -106,7 +106,7 @@ void Scheduler::CreateProcessor() {
         break;
     }
 
-    ctx->SetId(i);
+    ctx->set_id(i);
     proc->BindContext(ctx);
     ctx->BindProcessor(proc);
     proc_ctxs_.emplace_back(ctx);
@@ -138,13 +138,13 @@ std::shared_ptr<ProcessorContext> Scheduler::FindProc(
   auto cur_cr = CRoutine::GetCurrentRoutine();
 
   if (cur_cr) {
-    cur_proc_ = cur_cr->ProcessorId();
+    cur_proc_ = cur_cr->processor_id();
   }
 
-  if (cr->ProcessorId() != -1 && cr->ProcessorId() != cur_proc_ &&
-      cr->ProcessorId() < proc_ctxs_.size()) {
-    cr->SetProcessorId(proc_ctxs_[cr->ProcessorId()]->Id());
-    return proc_ctxs_[cr->ProcessorId()];
+  if (cr->processor_id() != -1 && cr->processor_id() != cur_proc_ &&
+      cr->processor_id() < proc_ctxs_.size()) {
+    cr->set_processor_id(proc_ctxs_[cr->processor_id()]->id());
+    return proc_ctxs_[cr->processor_id()];
   }
 
   {
@@ -152,11 +152,11 @@ std::shared_ptr<ProcessorContext> Scheduler::FindProc(
     for (auto p : ctx_qsize_) {
       auto ctx = p.second;
 
-      int proc_id = ctx->Id();
+      int proc_id = ctx->id();
       if (proc_id == cur_proc_ || !cr->IsAffinity(proc_id)) {
         continue;
       }
-      cr->SetProcessorId(ctx->Id());
+      cr->set_processor_id(ctx->id());
       return ctx;
     }
   }
@@ -165,49 +165,49 @@ std::shared_ptr<ProcessorContext> Scheduler::FindProc(
     count += proc_ctxs_[i]->RqSize();
   }
   auto id = count % proc_ctxs_.size();
-  cr->SetProcessorId(proc_ctxs_[id]->Id());
-  return proc_ctxs_[cr->ProcessorId()];
+  cr->set_processor_id(proc_ctxs_[id]->id());
+  return proc_ctxs_[cr->processor_id()];
 }
 
 bool Scheduler::DispatchTask(const std::shared_ptr<CRoutine>& croutine) {
   auto ctx = FindProc(croutine);
 
-  if (croutine->ProcessorId() >= proc_num_ ||
-      croutine->ProcessorId() < 0 && ctx) {
-    AERROR << GlobalData::GetTaskNameById(croutine->Id())
+  if (croutine->processor_id() >= proc_num_ ||
+      croutine->processor_id() < 0 && ctx) {
+    AERROR << GlobalData::GetTaskNameById(croutine->id())
            << "push failed, get processor failed, "
-           << "target processor index: " << croutine->ProcessorId();
+           << "target processor index: " << croutine->processor_id();
     return false;
   }
 
   if (ctx->Enqueue(croutine)) {
-    ADEBUG << "push routine[" << GlobalData::GetTaskNameById(croutine->Id())
-           << "] into processor[" << croutine->ProcessorId() << "]";
+    ADEBUG << "push routine[" << GlobalData::GetTaskNameById(croutine->id())
+           << "] into processor[" << croutine->processor_id() << "]";
   } else {
-    AWARN << "push routine[" << GlobalData::GetTaskNameById(croutine->Id())
-          << "] into processor[" << croutine->ProcessorId() << "] failed";
+    AWARN << "push routine[" << GlobalData::GetTaskNameById(croutine->id())
+          << "] into processor[" << croutine->processor_id() << "] failed";
     return false;
   }
 
   for (int i = 0; i < proc_ctxs_.size(); ++i) {
     if (croutine->IsAffinity(i)) {
       if (proc_ctxs_.at(i)->EnqueueAffinityRoutine(croutine)) {
-        ADEBUG << "push routine[" << GlobalData::GetTaskNameById(croutine->Id())
+        ADEBUG << "push routine[" << GlobalData::GetTaskNameById(croutine->id())
                << "] into affinity_processor[" << i << "]";
       } else {
-        AWARN << "push routine[" << GlobalData::GetTaskNameById(croutine->Id())
+        AWARN << "push routine[" << GlobalData::GetTaskNameById(croutine->id())
               << "] into affinity_processor[" << i << "] failed";
       }
     }
   }
 
-  rt_ctx_.insert({croutine->Id(), croutine->ProcessorId()});
+  rt_ctx_.insert({croutine->id(), croutine->processor_id()});
 
   {
     std::lock_guard<std::mutex> lk(mtx_ctx_qsize_);
     std::shared_ptr<ProcessorContext> pctx = nullptr;
     for (auto it = ctx_qsize_.begin(); it != ctx_qsize_.end(); ++it) {
-      if (it->second->Id() == croutine->ProcessorId()) {
+      if (it->second->id() == croutine->processor_id()) {
         pctx = it->second;
         ctx_qsize_.erase(it);
         break;
@@ -262,14 +262,14 @@ bool Scheduler::CreateTask(std::function<void()>&& func,
   }
 
   auto croutine = std::make_shared<CRoutine>(func);
-  croutine->SetId(task_id);
-  croutine->SetName(name);
-  croutine->SetPriority(cr_info.priority());
-  croutine->SetFrequency(cr_info.frequency());
+  croutine->set_id(task_id);
+  croutine->set_name(name);
+  croutine->set_priority(cr_info.priority());
+  croutine->set_frequency(cr_info.frequency());
 
   if (cr_info.has_processor_index()) {
     auto processor_id = cr_info.processor_index();
-    croutine->SetProcessorId(processor_id);
+    croutine->set_processor_id(processor_id);
   }
 
   if (!cr_info.affinity_processor().empty()) {

@@ -40,48 +40,46 @@ static void CRoutineEntry(void *arg) {
 CRoutine::CRoutine(const std::function<void()> &func) {
   func_ = func;
   MakeContext(CRoutineEntry, this, &context_);
-  SetState(RoutineState::READY);
+  state_ = RoutineState::READY;
 }
 
 CRoutine::CRoutine(std::function<void()> &&func) {
   func_ = std::move(func);
   MakeContext(CRoutineEntry, this, &context_);
-  SetState(RoutineState::READY);
+  state_ = RoutineState::READY;
 }
 
 CRoutine::~CRoutine() {}
 
 RoutineState CRoutine::Resume() {
+  std::unique_lock<std::mutex> ul(mutex_);
   if (force_stop_) {
-    SetState(RoutineState::FINISHED);
+    state_ = RoutineState::FINISHED;
     return RoutineState::FINISHED;
   }
 
-  std::unique_lock<std::mutex> ul(op_mtx_);
   UpdateState();
+
   // Keep compatibility with different policies.
-  if (!IsRunning() && !IsReady()) {
-    if (IsWaitingInput()) {
-      AERROR << "Wait input";
-    }
+  if (state_ != RoutineState::RUNNING && state_ != RoutineState::READY) {
     AERROR << "Invalid Routine State!";
-    return state_.load();
+    return state_;
   }
 
   current_routine_ = this;
-  auto t_start = cybertron::Time::MonoTime().ToNanosecond();
+  auto t_start = cybertron::Time::Now().ToNanosecond();
   PerfEventCache::Instance()->AddSchedEvent(SchedPerf::SWAP_IN, id_,
                                             processor_id_, 0, 0, -1, -1);
   SwapContext(GetMainContext(), this->GetContext());
-  auto t_end = cybertron::Time::MonoTime().ToNanosecond();
+  auto t_end = cybertron::Time::Now().ToNanosecond();
   PerfEventCache::Instance()->AddSchedEvent(SchedPerf::SWAP_OUT, id_,
                                             processor_id_, 0, t_start, -1,
-                                            static_cast<int>(state_.load()));
+                                            static_cast<int>(state_));
   exec_time_ += t_end - t_start;
-  if (IsRunning()) {
-    SetState(RoutineState::READY);
+  if (state_ == RoutineState::RUNNING) {
+    state_ = RoutineState::READY;
   }
-  return state_.load();
+  return state_;
 }
 
 void CRoutine::Routine() {
@@ -90,6 +88,8 @@ void CRoutine::Routine() {
     usleep(1000000);
   }
 }
+
+void CRoutine::Stop() { force_stop_ = true; }
 
 }  // namespace croutine
 }  // namespace cybertron
