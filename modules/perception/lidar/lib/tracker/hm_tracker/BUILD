@@ -3,6 +3,22 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
+    name = "hm_tracker",
+    deps = [
+        ":base_filter",
+        ":gnn_bipartite_graph_matcher",
+        ":hm_multi_target_tracker",
+        ":kalman_filter",
+        ":measurement_computer",
+        ":multi_hm_bipartite_graph_matcher",
+        ":object_track_matcher",
+        ":track_object_distance",
+        ":track_post_processor",
+        ":tracker",
+    ],
+)
+
+cc_library(
     name = "base_filter",
     hdrs = [
         "base_filter.h",
@@ -33,6 +49,26 @@ cc_library(
         "//modules/perception/lidar/lib/tracker/common:track_data",
         "//framework:cybertron",
         "@eigen",
+    ],
+)
+
+cc_test(
+    name = "kalman_filter_test",
+    size = "small",
+    srcs = [
+        "kalman_filter_test.cc",
+    ],
+    deps = [
+        ":kalman_filter",
+        ":hm_tracker",
+        "@gtest//:main",
+        "//modules/perception/base",
+        "//modules/perception/common/io:io_util",
+        "//modules/perception/lidar/common",
+        "//modules/perception/lidar/lib/interface",
+        "//modules/perception/common/graph",
+        "//modules/perception/lidar/lib/object_builder",
+        "//modules/perception/lidar/lib/tracker/common:track_pool_types",
     ],
 )
 
