@@ -26,8 +26,8 @@ namespace lidar {
 TEST(BipartiteGraphMatcherTest, multi_hm_bipartite_graph_matcher_test) {
   MultiHmBipartiteGraphMatcher *matcher = new MultiHmBipartiteGraphMatcher();
   common::SecureMat<float> *cost_mat = matcher->cost_matrix();
-  cost_mat->reserve(10, 10);
-  cost_mat->resize(3, 4);
+  cost_mat->Reserve(10, 10);
+  cost_mat->Resize(3, 4);
   (*cost_mat)(0, 0) = 0.2;
   (*cost_mat)(0, 1) = 1.2;
   (*cost_mat)(0, 2) = 4;
@@ -51,8 +51,8 @@ TEST(BipartiteGraphMatcherTest, multi_hm_bipartite_graph_matcher_test) {
   std::vector<size_t> unassigned_rows;
   std::vector<size_t> unassigned_cols;
   matcher->Match(options, &assignments, &unassigned_rows, &unassigned_cols);
-  for (int i = 0; i < assignments.size() - 1; i++) {
-    for (int j = i + 1; j < assignments.size(); j++) {
+  for (size_t i = 0; i < assignments.size() - 1; i++) {
+    for (size_t j = i + 1; j < assignments.size(); j++) {
       if (assignments[i].first > assignments[j].first) {
         std::swap(assignments[i], assignments[j]);
       }
@@ -76,8 +76,8 @@ TEST(BipartiteGraphMatcherTest, multi_hm_bipartite_graph_matcher_test) {
 TEST(BipartiteGraphMatcherTest, gnn_bipartite_graph_matcher_test) {
   GnnBipartiteGraphMatcher *matcher = new GnnBipartiteGraphMatcher();
   common::SecureMat<float> *cost_mat = matcher->cost_matrix();
-  cost_mat->reserve(10, 10);
-  cost_mat->resize(3, 4);
+  cost_mat->Reserve(10, 10);
+  cost_mat->Resize(3, 4);
   (*cost_mat)(0, 0) = 0.2;
   (*cost_mat)(0, 1) = 1.2;
   (*cost_mat)(0, 2) = 4;
@@ -100,8 +100,8 @@ TEST(BipartiteGraphMatcherTest, gnn_bipartite_graph_matcher_test) {
   std::vector<size_t> unassigned_rows;
   std::vector<size_t> unassigned_cols;
   matcher->Match(options, &assignments, &unassigned_rows, &unassigned_cols);
-  for (int i = 0; i < assignments.size() - 1; i++) {
-    for (int j = i + 1; j < assignments.size(); j++) {
+  for (size_t i = 0; i < assignments.size() - 1; i++) {
+    for (size_t j = i + 1; j < assignments.size(); j++) {
       if (assignments[i].first > assignments[j].first) {
         std::swap(assignments[i], assignments[j]);
       }

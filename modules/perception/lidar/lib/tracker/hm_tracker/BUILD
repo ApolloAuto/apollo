@@ -119,6 +119,26 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "gnn_bipartite_graph_matcher_test",
+    size = "small",
+    srcs = [
+        "gnn_bipartite_graph_matcher_test.cc",
+    ],
+    deps = [
+        ":gnn_bipartite_graph_matcher",
+        ":hm_tracker",
+        "@gtest//:main",
+        "//modules/perception/base",
+        "//modules/perception/common/io:io_util",
+        "//modules/perception/lidar/common",
+        "//modules/perception/lidar/lib/interface",
+        "//modules/perception/common/graph",
+        "//modules/perception/lidar/lib/object_builder",
+        "//modules/perception/lidar/lib/tracker/common:track_pool_types",
+    ],
+)
+
 cc_library(
     name = "track_post_processor",
     srcs = [
