@@ -53,4 +53,5 @@ message RadarConf {
 message ContiRadarConf {
   optional CanConf can_conf = 1;
   optional RadarConf radar_conf = 2;
+  optional string radar_channel = 3;
 }
