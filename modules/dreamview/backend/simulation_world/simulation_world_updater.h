@@ -103,7 +103,7 @@ class SimulationWorldUpdater {
 
   /**
    * @brief Dumps the latest received message to file.
-   * @param adapter the adapter to perfom dumping
+   * @param adapter the adapter to perform dumping
    * @param adapter_name the name of the adapter
    */
   template <typename AdapterType>

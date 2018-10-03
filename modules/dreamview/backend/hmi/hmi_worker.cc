@@ -376,7 +376,7 @@ void HMIWorker::ChangeToMap(const std::string &map_name) {
   apollo::common::KVDB::Put("apollo:dreamview:map", map_name);
 
   SetGlobalFlag("map_dir", *map_dir, &FLAGS_map_dir);
-  RunModeCommand("stop");
+  cybertron::Async(&HMIWorker::RunModeCommand, this, "stop");
 
   // Trigger registered change map handlers.
   for (const auto handler : change_map_handlers_) {
