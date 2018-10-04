@@ -14,13 +14,13 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/drivers/camera/usb_cam_component.h"
+#include "modules/drivers/camera/camera_component.h"
 
 namespace apollo {
 namespace drivers {
-namespace usb_cam {
+namespace camera {
 
-bool UsbCamComponent::Init() {
+bool CameraComponent::Init() {
   camera_config_ = std::make_shared<Config>();
   if (!apollo::cybertron::common::GetProtoFromFile(config_file_path_,
                                                    camera_config_.get())) {
@@ -60,11 +60,11 @@ bool UsbCamComponent::Init() {
   pb_image_->mutable_data()->reserve(raw_image_->image_size);
 
   writer_ = node_->CreateWriter<Image>(camera_config_->channel_name());
-  cybertron::Async(&UsbCamComponent::run, this);
+  cybertron::Async(&CameraComponent::run, this);
   return true;
 }
 
-void UsbCamComponent::run() {
+void CameraComponent::run() {
   while (!cybertron::IsShutdown()) {
     if (!camera_device_->wait_for_device()) {
       // sleep for next check
@@ -88,6 +88,6 @@ void UsbCamComponent::run() {
   }
 }
 
-}  // namespace usb_cam
+}  // namespace camera
 }  // namespace drivers
 }  // namespace apollo

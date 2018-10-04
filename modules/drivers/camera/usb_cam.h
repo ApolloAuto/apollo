@@ -34,8 +34,8 @@
  *
  *********************************************************************/
 
-#ifndef MODULES_DRIVERS_USB_CAM_USB_CAM_H_
-#define MODULES_DRIVERS_USB_CAM_USB_CAM_H_
+#ifndef MODULES_DRIVERS_CAMERA_USB_CAM_H_
+#define MODULES_DRIVERS_CAMERA_USB_CAM_H_
 
 #include <asm/types.h> /* for videodev2.h */
 #include <malloc.h>
@@ -67,15 +67,15 @@ extern "C" {
 
 namespace apollo {
 namespace drivers {
-namespace usb_cam {
+namespace camera {
 
-using apollo::drivers::usb_cam::config::Config;
-using apollo::drivers::usb_cam::config::IO_METHOD_MMAP;
-using apollo::drivers::usb_cam::config::IO_METHOD_READ;
-using apollo::drivers::usb_cam::config::IO_METHOD_UNKNOWN;
-using apollo::drivers::usb_cam::config::IO_METHOD_USERPTR;
-using apollo::drivers::usb_cam::config::YUYV;
-using apollo::drivers::usb_cam::config::RGB;
+using apollo::drivers::camera::config::Config;
+using apollo::drivers::camera::config::IO_METHOD_MMAP;
+using apollo::drivers::camera::config::IO_METHOD_READ;
+using apollo::drivers::camera::config::IO_METHOD_UNKNOWN;
+using apollo::drivers::camera::config::IO_METHOD_USERPTR;
+using apollo::drivers::camera::config::YUYV;
+using apollo::drivers::camera::config::RGB;
 
 // camera raw image struct
 struct CameraImage {
@@ -165,8 +165,8 @@ class UsbCam {
   uint64_t last_nsec_;
   float frame_drop_interval_;
 };
-}  // namespace usb_cam
+}  // namespace camera
 }  // namespace drivers
 }  // namespace apollo
 
-#endif  // ONBOARD_DRIVERS_USB_CAMERA_INCLUDE_USB_CAMERA_CAMERA_DEVICE_H
+#endif  // ONBOARD_DRIVERS_CAMERAERA_INCLUDE_USB_CAMERA_CAMERA_DEVICE_H

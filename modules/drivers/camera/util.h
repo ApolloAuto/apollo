@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_DRIVERS_USB_CAM_UTIL_H
-#define MODULES_DRIVERS_USB_CAM_UTIL_H
+#ifndef MODULES_DRIVERS_CAMERA_UTIL_H
+#define MODULES_DRIVERS_CAMERA_UTIL_H
 
 #include <assert.h>
 #include <errno.h>
@@ -37,7 +37,7 @@
 
 namespace apollo {
 namespace drivers {
-namespace usb_cam {
+namespace camera {
 
 void yuyv2rgb_avx(unsigned char *YUV, unsigned char *RGB, int NumPixels);
 
@@ -523,8 +523,8 @@ SIMD_INLINE __m256i LoadPermuted(const __m256i *p) {
   return _mm256_permute4x64_epi64(Load<align>(p), 0xD8);
 }
 
-}  // namespace usb_cam
+}  // namespace camera
 }  // namespace drivers
 }  // namespace apollo
 
-#endif  // MODULES_DRIVERS_USB_CAM_UTIL_H
+#endif  // MODULES_DRIVERS_CAMERA_UTIL_H

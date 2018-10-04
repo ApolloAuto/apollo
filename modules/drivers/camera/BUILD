@@ -4,25 +4,42 @@ package(default_visibility = ["//visibility:public"])
 
 cc_binary(
     name = "libcamera_component.so",
-    deps = [":usb_cam_component_lib"],
+    deps = [
+        ":camera_component_lib",
+        ":compress_component_lib",
+    ],
     linkopts = [
-       "-shared",
        "-lswscale",
        "-lavformat",
        "-lavcodec",
+       "-latomic",
     ],
     linkshared = True,
     linkstatic = False,
 )
 
 cc_library(
-    name = "usb_cam_component_lib",
-    srcs = ["usb_cam_component.cc"],
-    hdrs = ["usb_cam_component.h"],
+    name = "camera_component_lib",
+    srcs = ["camera_component.cc"],
+    hdrs = ["camera_component.h"],
     deps = [
         ":camera",
         "//modules/drivers/proto:sensor_proto",
         "//framework:cybertron",
+    ],
+    copts = ['-DMODULE_NAME=\\"camera\\"']
+)
+
+cc_library(
+    name = "compress_component_lib",
+    srcs = ["compress_component.cc"],
+    hdrs = ["compress_component.h"],
+    deps = [
+        "//modules/drivers/proto:sensor_proto",
+        "//modules/drivers/camera/proto:camera_proto",
+        "//framework:cybertron",
+        "@opencv2//:core",
+        "@opencv2//:highgui"
     ],
     copts = ['-DMODULE_NAME=\\"camera\\"']
 )
