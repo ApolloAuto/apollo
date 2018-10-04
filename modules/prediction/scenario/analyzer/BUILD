@@ -13,6 +13,7 @@ cc_library(
         "//modules/prediction/common:prediction_gflags",
         "//modules/prediction/scenario/scenario_features:scenario_features",
         "//modules/prediction/scenario/scenario_features:cruise_scenario_features",
+        "//modules/prediction/scenario/scenario_features:junction_scenario_features",
     ],
 )
 
@@ -30,6 +31,7 @@ cc_test(
         "//modules/prediction/common:prediction_gflags",
         "//modules/prediction/scenario/scenario_features:scenario_features",
         "//modules/prediction/scenario/scenario_features:cruise_scenario_features",
+        "//modules/prediction/scenario/scenario_features:junction_scenario_features",
         "@gtest//:main",
     ],
 )
