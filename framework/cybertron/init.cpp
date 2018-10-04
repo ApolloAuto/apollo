@@ -35,6 +35,7 @@
 #include "cybertron/scheduler/scheduler.h"
 #include "cybertron/service_discovery/topology_manager.h"
 #include "cybertron/task/task.h"
+#include "cybertron/transport/transport.h"
 
 namespace apollo {
 namespace cybertron {
@@ -160,6 +161,7 @@ void Shutdown() {
   }
   scheduler::Scheduler::Instance()->ShutDown();
   service_discovery::TopologyManager::Instance()->Shutdown();
+  transport::Transport::Shutdown();
   g_is_shutdown = true;
   g_ok = false;
 }

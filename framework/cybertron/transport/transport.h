@@ -45,6 +45,8 @@ class Transport {
   Transport();
   virtual ~Transport();
 
+  static void Shutdown();
+
   template <typename M>
   static auto CreateTransmitter(const RoleAttributes& attr,
                                 const OptionalMode& mode = OptionalMode::HYBRID)

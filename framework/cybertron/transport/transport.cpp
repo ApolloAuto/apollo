@@ -16,6 +16,7 @@
 
 #include "cybertron/transport/transport.h"
 
+#include <atomic>
 #include <mutex>
 
 #include "cybertron/common/global_data.h"
@@ -24,6 +25,7 @@ namespace apollo {
 namespace cybertron {
 namespace transport {
 
+static std::atomic<bool> shutdown_ = {false};
 static std::mutex participant_mutex_;
 
 ParticipantPtr Transport::participant_ = nullptr;
@@ -31,6 +33,16 @@ ParticipantPtr Transport::participant_ = nullptr;
 Transport::Transport() {}
 
 Transport::~Transport() {}
+
+void Transport::Shutdown() {
+  if (shutdown_.exchange(true)) {
+    return;
+  }
+  if (participant_ != nullptr) {
+    participant_->Shutdown();
+    participant_ = nullptr;
+  }
+}
 
 ParticipantPtr Transport::CreateParticipant() {
   std::string participant_name =

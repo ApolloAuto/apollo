@@ -120,6 +120,9 @@ bool RtpsTransmitter<M>::Transmit(const M& msg, const MessageInfo& msg_info) {
   wparams.related_sample_identity().sequence_number().low =
       (int32_t)(msg_info.seq_num() & 0xFFFFFFFF);
 
+  if (participant_->is_shutdown()) {
+    return false;
+  }
   return publisher_->write(reinterpret_cast<void*>(&m), wparams);
 }
 
