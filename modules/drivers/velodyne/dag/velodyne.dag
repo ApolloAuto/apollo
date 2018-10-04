@@ -25,13 +25,13 @@ module_config {
 }
 
 module_config {
-    module_library : "/apollo/bazel-bin/modules/drivers/velodyne/parser/libvelodyne_compensator_component.so"
+    module_library : "/apollo/bazel-bin/modules/drivers/velodyne/compensator/libvelodyne_compensator_component.so"
 
     components {
       class_name : "VelodyneCompensatorComponent"
       config {
         name : "velodyne_compensator"
-        config_file_path : "/apollo/modules/drivers/velodyne/conf/velodyne64_conf.pb.txt"
+        config_file_path : "/apollo/modules/drivers/velodyne/conf/velodyne64_compensator.pb.txt"
         readers {channel: "/apollo/sensor/velodyne64/PointCloud2"}
       }
     }

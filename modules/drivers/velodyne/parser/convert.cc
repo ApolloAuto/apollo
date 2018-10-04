@@ -22,7 +22,6 @@ namespace velodyne {
 
 using apollo::drivers::PointCloud;
 using apollo::drivers::velodyne::VelodyneScan;
-using apollo::drivers::velodyne::config::Config;
 
 void Convert::init(const Config& velodyne_config) {
   config_ = velodyne_config;

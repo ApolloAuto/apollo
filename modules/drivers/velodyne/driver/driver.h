@@ -40,7 +40,7 @@ constexpr double PACKET_RATE_VLS128 = 6250.0;
 
 class VelodyneDriver {
  public:
-  explicit VelodyneDriver(const config::Config &config) : config_(config) {}
+  explicit VelodyneDriver(const Config &config) : config_(config) {}
   virtual ~VelodyneDriver() {}
 
   virtual bool Poll(std::shared_ptr<VelodyneScan> scan);
@@ -49,7 +49,7 @@ class VelodyneDriver {
   void SetPacketRate(const double packet_rate) { packet_rate_ = packet_rate; }
 
  protected:
-  config::Config config_;
+  Config config_;
   std::unique_ptr<Input> input_ = nullptr;
   std::unique_ptr<Input> positioning_input_ = nullptr;
   std::string topic_;
@@ -66,7 +66,7 @@ class VelodyneDriver {
 
 class Velodyne64Driver : public VelodyneDriver {
  public:
-  explicit Velodyne64Driver(const config::Config &config)
+  explicit Velodyne64Driver(const Config &config)
       : VelodyneDriver(config) {}
   virtual ~Velodyne64Driver() {}
 
@@ -80,7 +80,7 @@ class Velodyne64Driver : public VelodyneDriver {
 
 class VelodyneDriverFactory {
  public:
-  static VelodyneDriver *CreateDriver(const config::Config &config);
+  static VelodyneDriver *CreateDriver(const Config &config);
 };
 
 }  // namespace velodyne

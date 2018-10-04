@@ -14,17 +14,19 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_DRIVERS_VELODYNE_PARSER_VELODYNE_COMPENSATOR_COMPONENT_H_
-#define MODULES_DRIVERS_VELODYNE_PARSER_VELODYNE_COMPENSATOR_COMPONENT_H_
+#ifndef MODULES_DRIVERS_VELODYNE_FUSION_FUSION_COMPONENT_H_
+#define MODULES_DRIVERS_VELODYNE_FUSION_FUSION_COMPONENT_H_
 
+#include <Eigen/Eigen>
 #include <memory>
+#include <string>
 #include <vector>
 
 #include "cybertron/cybertron.h"
 
 #include "modules/drivers/proto/pointcloud.pb.h"
-#include "modules/drivers/velodyne/parser/compensator.h"
-#include "modules/drivers/velodyne/proto/velodyne.pb.h"
+#include "modules/drivers/velodyne/proto/config.pb.h"
+#include "modules/transform/buffer.h"
 
 namespace apollo {
 namespace drivers {
@@ -34,25 +36,33 @@ using apollo::cybertron::Component;
 using apollo::cybertron::Reader;
 using apollo::cybertron::Writer;
 using apollo::drivers::PointCloud;
-using apollo::drivers::velodyne::config::Config;
 
-class VelodyneCompensatorComponent : public Component<PointCloud> {
+class FusionComponent : public Component<PointCloud> {
  public:
   bool Init() override;
   bool Proc(const std::shared_ptr<PointCloud>& point_cloud) override;
 
  private:
-  std::unique_ptr<Compensator> _compensator = nullptr;
-  std::vector<std::shared_ptr<PointCloud>> compensator_deque_;
-  int queue_size_ = 8;
-  int index_ = 0;
-  int seq_ = 0;
-  std::shared_ptr<Writer<PointCloud>> writer_ = nullptr;
+  bool Fusion(std::shared_ptr<PointCloud> target,
+              std::shared_ptr<PointCloud> source);
+  bool IsExpired(const std::shared_ptr<PointCloud>& target,
+                 const std::shared_ptr<PointCloud>& source);
+  bool QueryPoseAffine(const std::string& target_frame_id,
+                       const std::string& source_frame_id,
+                       Eigen::Affine3d* pose);
+  void AppendPointCloud(std::shared_ptr<PointCloud> point_cloud,
+                        std::shared_ptr<PointCloud> point_cloud_add,
+                        const Eigen::Affine3d& pose);
+
+  FusionConfig conf_;
+  std::shared_ptr<apollo::transform::Buffer> buffer_ptr_;
+  std::shared_ptr<Writer<PointCloud>> fusion_writer_;
+  std::vector<std::shared_ptr<Reader<PointCloud>>> readers_;
 };
 
-CYBERTRON_REGISTER_COMPONENT(VelodyneCompensatorComponent)
+CYBERTRON_REGISTER_COMPONENT(FusionComponent)
 }  // namespace velodyne
 }  // namespace drivers
 }  // namespace apollo
 
-#endif  // MODULES_DRIVERS_VELODYNE_PARSER_VELODYNE_COMPENSATOR_COMPONENT_H_
+#endif  // MODULES_DRIVERS_VELODYNE_FUSION_FUSION_COMPONENT_H_

@@ -50,41 +50,4 @@ cc_library(
     ],
 )
 
-cc_binary(
-    name = "libvelodyne_compensator_component.so",
-    deps = [":velodyne_compensator_component_lib"],
-    linkopts = ["-shared"],
-    linkstatic = False,
-)
-
-cc_library(
-    name = "velodyne_compensator_component_lib",
-    srcs = ["velodyne_compensator_component.cc"],
-    hdrs = ["velodyne_compensator_component.h"],
-    deps = [
-        "//modules/drivers/velodyne/parser:compensator",
-        "//framework:cybertron",
-    ],
-    copts = ['-DMODULE_NAME=\\"velodyne\\"']
-)
-
-cc_library(
-    name = "compensator",
-    srcs = [
-        "compensator.cc",
-    ],
-    hdrs = [
-        "compensator.h",
-        "const_variables.h",
-        "util.h",
-    ],
-    deps = [
-        "//modules/drivers/velodyne/proto:velodyne_proto",
-        "//modules/drivers/proto:sensor_proto",
-        "//modules/transform:tf2_buffer_lib",
-        "//framework:cybertron",
-        "@eigen",
-    ],
-)
-
 cpplint()

@@ -201,8 +201,7 @@ void VelodyneDriver::UpdateGpsTopHour(uint32_t current_time) {
   last_gps_time_ = current_time;
 }
 
-VelodyneDriver* VelodyneDriverFactory::CreateDriver(
-    const config::Config& config) {
+VelodyneDriver* VelodyneDriverFactory::CreateDriver(const Config& config) {
   auto new_config = config;
   if (new_config.prefix_angle() > 35900 || new_config.prefix_angle() < 100) {
     AWARN << "invalid prefix angle, prefix_angle must be between 100 and 35900";

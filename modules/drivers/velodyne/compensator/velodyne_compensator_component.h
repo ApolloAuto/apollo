@@ -13,18 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_DRIVERS_VELODYNE_DRIVER_VELODYNE_DRIVER_COMPONENT_H_
-#define MODULES_DRIVERS_VELODYNE_DRIVER_VELODYNE_DRIVER_COMPONENT_H_
+
+#ifndef MODULES_DRIVERS_VELODYNE_COMPENSATOR_VELODYNE_COMPENSATOR_COMPONENT_H_
+#define MODULES_DRIVERS_VELODYNE_COMPENSATOR_VELODYNE_COMPENSATOR_COMPONENT_H_
 
 #include <memory>
-#include <string>
-#include <thread>
+#include <vector>
 
 #include "cybertron/cybertron.h"
 
-#include "modules/drivers/velodyne/driver/driver.h"
-#include "modules/drivers/velodyne/proto/config.pb.h"
-#include "modules/drivers/velodyne/proto/velodyne.pb.h"
+#include "modules/drivers/proto/pointcloud.pb.h"
+#include "modules/drivers/velodyne/compensator/compensator.h"
 
 namespace apollo {
 namespace drivers {
@@ -33,25 +32,25 @@ namespace velodyne {
 using apollo::cybertron::Component;
 using apollo::cybertron::Reader;
 using apollo::cybertron::Writer;
-using apollo::drivers::velodyne::VelodyneScan;
+using apollo::drivers::PointCloud;
 
-class VelodyneDriverComponent : public Component<> {
+class VelodyneCompensatorComponent : public Component<PointCloud> {
  public:
   bool Init() override;
+  bool Proc(const std::shared_ptr<PointCloud>& point_cloud) override;
 
  private:
-  void device_poll();
-  volatile bool runing_;  ///< device thread is running
-  uint32_t seq_ = 0;
-  std::shared_ptr<std::thread> device_thread_;
-  std::shared_ptr<VelodyneDriver> dvr_;  ///< driver implementation class
-  std::shared_ptr<apollo::cybertron::Writer<VelodyneScan>> writer_;
+  std::unique_ptr<Compensator> _compensator = nullptr;
+  std::vector<std::shared_ptr<PointCloud>> compensator_deque_;
+  int queue_size_ = 8;
+  int index_ = 0;
+  int seq_ = 0;
+  std::shared_ptr<Writer<PointCloud>> writer_ = nullptr;
 };
 
-CYBERTRON_REGISTER_COMPONENT(VelodyneDriverComponent)
-
+CYBERTRON_REGISTER_COMPONENT(VelodyneCompensatorComponent)
 }  // namespace velodyne
 }  // namespace drivers
 }  // namespace apollo
 
-#endif  // MODULES_DRIVERS_VELODYNE_DRIVER_VELODYNE_DRIVER_COMPONENT_H_
+#endif  // MODULES_DRIVERS_VELODYNE_COMPENSATOR_VELODYNE_COMPENSATOR_COMPONENT_H_
