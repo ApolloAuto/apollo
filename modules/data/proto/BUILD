@@ -19,15 +19,57 @@ proto_library(
 proto_library(
     name = "task_proto_lib",
     srcs = ["task.proto"],
-    deps = [
-        ":static_info_proto_lib",
-    ],
+    deps = [":static_info_proto_lib"],
 )
 
 proto_library(
     name = "warehouse_query_proto_lib",
     srcs = ["warehouse_query.proto"],
+    deps = [":task_proto_lib"],
+)
+
+cc_proto_library(
+    name = "record_request_proto",
+    deps = [":record_request_proto_lib"],
+)
+
+proto_library(
+    name = "record_request_proto_lib",
+    srcs = ["record_request.proto"],
+    deps = ["//modules/common/proto:header_proto_lib"],
+)
+
+cc_proto_library(
+    name = "record_response_proto",
+    deps = [":record_response_proto_lib"],
+)
+
+proto_library(
+    name = "record_response_proto_lib",
+    srcs = ["record_response.proto"],
+    deps = ["//modules/common/proto:header_proto_lib"],
+)
+
+cc_proto_library(
+    name = "data_conf_proto",
+    deps = [":data_conf_proto_lib"],
+)
+
+proto_library(
+    name = "data_conf_proto_lib",
+    srcs = ["data_conf.proto"],
+)
+
+cc_proto_library(
+    name = "data_proto",
+    deps = [":data_proto_lib"],
+)
+
+proto_library(
+    name = "data_proto_lib",
+    srcs = ["data.proto"],
     deps = [
-        ":task_proto_lib",
+        ":record_request_proto_lib",
+        "//modules/common/proto:header_proto_lib",
     ],
 )
