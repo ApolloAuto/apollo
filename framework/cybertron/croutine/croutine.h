@@ -44,6 +44,7 @@ class CRoutine {
 
   // static interfaces
   static void Yield();
+  static void Yield(const RoutineState& state);
   static void SetMainContext(const std::shared_ptr<RoutineContext> &context);
   static CRoutine *GetCurrentRoutine();
   static RoutineContext *GetMainContext();
@@ -53,6 +54,8 @@ class CRoutine {
   RoutineState UpdateState();
   RoutineContext *GetContext();
   std::unique_lock<std::mutex> GetLock() const;
+  std::unique_lock<std::mutex> TryLock() const;
+  std::unique_lock<std::mutex> DeferLock() const;
 
   void Run();
   void Stop();
@@ -102,6 +105,9 @@ class CRoutine {
   void set_proc_num(double num);
 
  private:
+  void Lock();
+  void Unlock();
+
   std::string name_;
   std::set<int> affinity_processor_id_set_;
   std::chrono::steady_clock::time_point wake_time_;
@@ -109,7 +115,9 @@ class CRoutine {
   RoutineFunc func_;
   RoutineState state_;
   RoutineContext context_;
+
   mutable std::mutex mutex_;
+  std::unique_lock<std::mutex> lock_;
 
   bool force_stop_ = false;
   double proc_num_ = 0;
@@ -126,6 +134,13 @@ class CRoutine {
   static thread_local CRoutine *current_routine_;
   static thread_local std::shared_ptr<RoutineContext> main_context_;
 };
+
+inline void CRoutine::Yield(const RoutineState& state) {
+  auto routine = GetCurrentRoutine();
+  routine->Lock();
+  routine->set_state(state);
+  SwapContext(GetCurrentRoutine()->GetContext(), GetMainContext());
+}
 
 inline void CRoutine::Yield() {
   SwapContext(GetCurrentRoutine()->GetContext(), GetMainContext());
@@ -147,11 +162,20 @@ RoutineState Resume();
 
 inline void CRoutine::Run() {
   func_();
-  state_ = RoutineState::FINISHED;
 }
 
 inline std::unique_lock<std::mutex> CRoutine::GetLock() const {
+  std::unique_lock<std::mutex> ul(mutex_);
+  return ul;
+}
+
+inline std::unique_lock<std::mutex> CRoutine::DeferLock() const {
   std::unique_lock<std::mutex> ul(mutex_, std::defer_lock);
+  return ul;
+}
+
+inline std::unique_lock<std::mutex> CRoutine::TryLock() const {
+  std::unique_lock<std::mutex> ul(mutex_, std::try_to_lock);
   return ul;
 }
 
@@ -162,14 +186,12 @@ inline RoutineState CRoutine::state() const { return state_; }
 inline void CRoutine::Wake() { state_ = RoutineState::READY; }
 
 inline void CRoutine::HangUp() {
-  state_ = RoutineState::DATA_WAIT;
-  CRoutine::Yield();
+  CRoutine::Yield(RoutineState::DATA_WAIT);
 }
 
 inline void CRoutine::Sleep(const Duration &sleep_duration) {
-  state_ = RoutineState::SLEEP;
   wake_time_ = std::chrono::steady_clock::now() + sleep_duration;
-  CRoutine::Yield();
+  CRoutine::Yield(RoutineState::SLEEP);
 }
 
 inline uint64_t CRoutine::id() const { return id_; }
@@ -250,6 +272,16 @@ inline void CRoutine::set_priority(uint32_t priority) { priority_ = priority; }
 inline double CRoutine::proc_num() const { return proc_num_; }
 
 inline void CRoutine::set_proc_num(double num) { proc_num_ = num; }
+
+inline void CRoutine::Lock() {
+  lock_ = std::unique_lock<std::mutex>(mutex_);
+}
+
+inline void CRoutine::Unlock() {
+  if (lock_) {
+    lock_.unlock();
+  }
+}
 
 }  // namespace croutine
 }  // namespace cybertron

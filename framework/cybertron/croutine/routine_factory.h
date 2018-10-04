@@ -66,13 +66,13 @@ RoutineFactory CreateRoutineFactory(
               SchedPerf::TRY_FETCH_OUT, CRoutine::GetCurrentRoutine()->id(),
               CRoutine::GetCurrentRoutine()->processor_id(), 0, 0, 1, -1);
           f(msg);
+          CRoutine::Yield();
         } else {
           PerfEventCache::Instance()->AddSchedEvent(
               SchedPerf::TRY_FETCH_OUT, CRoutine::GetCurrentRoutine()->id(),
               CRoutine::GetCurrentRoutine()->processor_id(), 0, 0, 0, -1);
-          CRoutine::GetCurrentRoutine()->set_state(RoutineState::DATA_WAIT);
+          CRoutine::Yield(RoutineState::DATA_WAIT);
         }
-        CRoutine::Yield();
       }
     };
   };
@@ -95,13 +95,13 @@ RoutineFactory CreateRoutineFactory(
               SchedPerf::TRY_FETCH_OUT, CRoutine::GetCurrentRoutine()->id(),
               CRoutine::GetCurrentRoutine()->processor_id(), 0, 0, 1, -1);
           f(msg0, msg1);
+          CRoutine::Yield();
         } else {
           PerfEventCache::Instance()->AddSchedEvent(
               SchedPerf::TRY_FETCH_OUT, CRoutine::GetCurrentRoutine()->id(),
               CRoutine::GetCurrentRoutine()->processor_id(), 0, 0, 0, -1);
-          CRoutine::GetCurrentRoutine()->set_state(RoutineState::DATA_WAIT);
+          CRoutine::Yield(RoutineState::DATA_WAIT);
         }
-        CRoutine::Yield();
       }
     };
   };
@@ -124,13 +124,13 @@ RoutineFactory CreateRoutineFactory(
               SchedPerf::TRY_FETCH_OUT, CRoutine::GetCurrentRoutine()->id(),
               CRoutine::GetCurrentRoutine()->processor_id(), 0, 0, 1, -1);
           f(msg0, msg1, msg2);
+          CRoutine::Yield();
         } else {
           PerfEventCache::Instance()->AddSchedEvent(
               SchedPerf::TRY_FETCH_OUT, CRoutine::GetCurrentRoutine()->id(),
               CRoutine::GetCurrentRoutine()->processor_id(), 0, 0, 0, -1);
-          CRoutine::GetCurrentRoutine()->set_state(RoutineState::DATA_WAIT);
+          CRoutine::Yield(RoutineState::DATA_WAIT);
         }
-        CRoutine::Yield();
       }
     };
   };
@@ -154,13 +154,13 @@ RoutineFactory CreateRoutineFactory(
               SchedPerf::TRY_FETCH_OUT, CRoutine::GetCurrentRoutine()->id(),
               CRoutine::GetCurrentRoutine()->processor_id(), 0, 0, 1, -1);
           f(msg0, msg1, msg2, msg3);
+          CRoutine::Yield();
         } else {
           PerfEventCache::Instance()->AddSchedEvent(
               SchedPerf::TRY_FETCH_OUT, CRoutine::GetCurrentRoutine()->id(),
               CRoutine::GetCurrentRoutine()->processor_id(), 0, 0, 0, -1);
-          CRoutine::GetCurrentRoutine()->set_state(RoutineState::DATA_WAIT);
+          CRoutine::Yield(RoutineState::DATA_WAIT);
         }
-        CRoutine::Yield();
       }
     };
   };

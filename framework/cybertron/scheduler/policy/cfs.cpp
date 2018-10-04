@@ -68,8 +68,8 @@ std::shared_ptr<CRoutine> CFSContext::NextLocalRoutine() {
   std::shared_ptr<CRoutine> croutine = nullptr;
   for (auto it = local_rb_map_.begin(); it != local_rb_map_.end();) {
     auto cr = it->second;
-    auto lock = cr->GetLock();
-    if (!lock.try_lock()) {
+    auto lock = cr->TryLock();
+    if (!lock) {
       ++it;
       continue;
     }
@@ -115,8 +115,8 @@ std::shared_ptr<CRoutine> CFSContext::NextAffinityRoutine() {
 
   for (auto it = affinity_rb_map_.begin(); it != affinity_rb_map_.end();) {
     auto cr = it->second;
-    auto lock = cr->GetLock();
-    if (!lock.try_lock()) {
+    auto lock = cr->TryLock();
+    if (!lock) {
       ++it;
       continue;
     }
