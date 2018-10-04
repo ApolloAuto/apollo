@@ -474,6 +474,12 @@ function run_lint() {
 function clean() {
   # Remove bazel cache.
   bazel clean --async
+
+  # Remove bazel cache in associated directories
+  if [ -d /apollo-simulator ]; then
+    cd /apollo-simulator && bazel clean --async
+  fi
+
   # Remove cmake cache.
   rm -fr framework/build
 }

@@ -52,6 +52,16 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "inference_factory_test",
+    srcs = ["inference_factory_test.cc"],
+    size = "small",
+    deps = [
+        ":inference_factory_lib",
+        "@gtest//:main",
+    ],
+)
+
 filegroup(
     name = "inference_test_data",
     srcs = glob(["inference_test_data/**"]),
