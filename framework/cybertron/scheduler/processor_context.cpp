@@ -50,9 +50,9 @@ void ProcessorContext::Notify(uint64_t routine_id) {
                                             proc_index_, 0, 0, -1, -1);
   ReadLockGuard<AtomicRWLock> lg(rw_lock_);
   auto routine = cr_map_[routine_id];
-  {
+
+  if (routine->state() == RoutineState::DATA_WAIT) {
     auto lock = routine->GetLock();
-    lock.try_lock();
     if (routine->state() == RoutineState::DATA_WAIT) {
       routine->set_state(RoutineState::READY);
     }

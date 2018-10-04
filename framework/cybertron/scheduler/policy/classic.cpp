@@ -48,8 +48,8 @@ std::shared_ptr<CRoutine> ClassicContext::NextRoutine() {
   std::shared_ptr<CRoutine> croutine = nullptr;
   for (auto it = rb_map_.begin(); it != rb_map_.end();) {
     auto cr = it->second;
-    auto lock = cr->GetLock();
-    if (!lock.try_lock()) {
+    auto lock = cr->TryLock();
+    if (!lock) {
       ++it;
       continue;
     }

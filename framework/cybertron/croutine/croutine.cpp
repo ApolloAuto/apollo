@@ -34,7 +34,7 @@ thread_local std::shared_ptr<RoutineContext> CRoutine::main_context_;
 static void CRoutineEntry(void *arg) {
   CRoutine *r = static_cast<CRoutine *>(arg);
   r->Run();
-  SwapContext(r->GetContext(), CRoutine::GetMainContext());
+  CRoutine::Yield(RoutineState::FINISHED);
 }
 
 CRoutine::CRoutine(const std::function<void()> &func) {
@@ -52,21 +52,22 @@ CRoutine::CRoutine(std::function<void()> &&func) {
 CRoutine::~CRoutine() {}
 
 RoutineState CRoutine::Resume() {
-  std::unique_lock<std::mutex> ul(mutex_);
-  if (force_stop_) {
-    state_ = RoutineState::FINISHED;
-    return RoutineState::FINISHED;
+  {
+    auto lock = GetLock();
+    if (force_stop_) {
+      state_ = RoutineState::FINISHED;
+      return state_;
+    }
+
+    UpdateState();
+
+    if (state_ != RoutineState::RUNNING && state_ != RoutineState::READY) {
+      AERROR << "Invalid Routine State!";
+      return state_;
+    }
+    current_routine_ = this;
   }
 
-  UpdateState();
-
-  // Keep compatibility with different policies.
-  if (state_ != RoutineState::RUNNING && state_ != RoutineState::READY) {
-    AERROR << "Invalid Routine State!";
-    return state_;
-  }
-
-  current_routine_ = this;
   auto t_start = cybertron::Time::Now().ToNanosecond();
   PerfEventCache::Instance()->AddSchedEvent(SchedPerf::SWAP_IN, id_,
                                             processor_id_, 0, 0, -1, -1);
@@ -79,6 +80,7 @@ RoutineState CRoutine::Resume() {
   if (state_ == RoutineState::RUNNING) {
     state_ = RoutineState::READY;
   }
+  Unlock();
   return state_;
 }
 
