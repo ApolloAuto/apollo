@@ -61,9 +61,12 @@ namespace planning {
 
 #define TMAIN                                            \
   int main(int argc, char** argv) {                      \
+    ::apollo::cybertron::Init("planning_test");          \
     ::testing::InitGoogleTest(&argc, argv);              \
     ::google::ParseCommandLineFlags(&argc, &argv, true); \
-    return RUN_ALL_TESTS();                              \
+    int ret = RUN_ALL_TESTS();                           \
+    ::apollo::cybertron::Shutdown();                     \
+    return ret;                                          \
   }
 
 DECLARE_string(test_routing_response_file);
