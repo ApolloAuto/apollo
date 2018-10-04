@@ -55,7 +55,8 @@ DistanceApproachIPOPTInterface::DistanceApproachIPOPTInterface(
       obstacles_vertices_num_(obstacles_vertices_num),
       obstacles_num_(obstacles_num),
       obstacles_A_(obstacles_A),
-      obstacles_b_(obstacles_b) {
+      obstacles_b_(obstacles_b),
+      use_fix_time_(use_fix_time) {
   w_ev_ = ego_(1, 0) + ego_(3, 0);
   l_ev_ = ego_(0, 0) + ego_(2, 0);
 
@@ -164,12 +165,18 @@ bool DistanceApproachIPOPTInterface::get_bounds_info(int n, double* x_l,
 
   // 3. sampling time variables, 1 ~ (0 ~ horizon_ -1)
   for (std::size_t i = 0; i < horizon_; ++i) {
-    x_l[variable_index] = -0.6;
-    x_u[variable_index] = 0.6;
+    if (!use_fix_time_) {
+      x_l[variable_index] = 0.0;
+      x_u[variable_index] = 10.0;
+    } else {
+      x_l[variable_index] = 1.0;
+      x_u[variable_index] = 1.0;
+    }
 
     ++variable_index;
   }
   ADEBUG << "variable_index after adding sample time : " << variable_index;
+  ADEBUG << "sample time fix time status is : " << use_fix_time_;
 
   // 3. lagrange constraint l, (0 ~ obstacles_vertices_sum_ - 1) * (0 ~
   // horizon_)
@@ -262,23 +269,24 @@ bool DistanceApproachIPOPTInterface::eval_g(int n, const double* x, bool new_x,
   std::size_t constraint_index = 0;
   for (std::size_t i = 1; i < horizon_; ++i) {
     // x1
-    // TODO(QiL) : change to sin table
+    // TODO(QiL) : optimize and remove redudant caculation in next iteration.
     g[constraint_index] =
         x[state_start_index + 4] -
         (x[state_start_index] +
-         ts_ *
+         ts_ * x[time_start_index] *
              (x[state_start_index + 3] +
-              ts_ * 0.5 * x[control_start_index + 1]) *
+              ts_ * x[time_start_index] * 0.5 * x[control_start_index + 1]) *
              (std::cos(x[state_start_index + 2] +
-                       ts_ * 0.5 * x[state_start_index + 3] *
+                       ts_ * x[time_start_index] * 0.5 *
+                           x[state_start_index + 3] *
                            std::tan(x[control_start_index] / wheelbase_))));
     // x2
     g[constraint_index + 1] =
         x[state_start_index + 5] -
         (x[state_start_index + 1] +
-         ts_ *
+         ts_ * x[time_start_index] *
              (x[state_start_index + 3] +
-              ts_ * 0.5 * x[control_start_index + 1]) *
+              ts_ * x[time_start_index] * 0.5 * x[control_start_index + 1]) *
              std::sin(x[state_start_index + 3]) *
              std::tan(x[control_start_index] / wheelbase_));
 
@@ -286,19 +294,21 @@ bool DistanceApproachIPOPTInterface::eval_g(int n, const double* x, bool new_x,
     g[constraint_index + 1] =
         x[state_start_index + 6] -
         (x[state_start_index + 2] +
-         ts_ *
+         ts_ * x[time_start_index] *
              (x[state_start_index + 3] +
-              ts_ * 0.5 * x[control_start_index + 1]) *
+              ts_ * x[time_start_index] * 0.5 * x[control_start_index + 1]) *
              std::tan(x[control_start_index] / wheelbase_));
 
     // x4
     g[constraint_index + 4] =
         x[state_start_index + 7] -
-        (x[state_start_index + 3] + ts_ * x[control_start_index + 1]);
+        (x[state_start_index + 3] +
+         ts_ * x[time_start_index] * x[control_start_index + 1]);
 
     state_start_index += 4;
     control_start_index += 2;
     constraint_index += 4;
+    time_start_index += 1;
   }
 
   ADEBUG << "constraint_index after adding eular forward dynamics constraints "
@@ -393,9 +403,15 @@ bool DistanceApproachIPOPTInterface::get_starting_point(
     variable_index += 2;
   }
 
+  // 2. time scale variable initialization, 0 ~ horizon_ -1
+  for (std::size_t i = 0; i < horizon_; ++i) {
+    x[variable_index] = 1.0;
+    ++variable_index;
+  }
+
   // TODO(QiL) : better hot start l
   // 3. lagrange constraint l, obstacles_vertices_sum_ * (N+1)
-  for (std::size_t i = 1; i <= horizon_ + 1; ++i) {
+  for (std::size_t i = 1; i <= (horizon_ + 1); ++i) {
     for (std::size_t j = 1; j <= obstacles_vertices_sum_; ++j) {
       x[i * obstacles_vertices_sum_ + j] = 0.2;
       ++variable_index;
@@ -531,5 +547,6 @@ void DistanceApproachIPOPTInterface::get_optimization_results(
   *control_result = control_result_;
   *time_result = time_result_;
 }
+
 }  // namespace planning
 }  // namespace apollo
