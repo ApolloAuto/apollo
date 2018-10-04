@@ -28,7 +28,7 @@ namespace prediction {
 std::shared_ptr<ScenarioFeatures> ScenarioAnalyzer::Analyze(
     const EnvironmentFeatures& environment_features) {
 
-  Scenario_Type scenario_type;
+  Scenario_Type scenario_type = Scenario::UNKNOWN;
 
   if (environment_features.has_front_junction() &&
       environment_features.GetFrontJunction().second <
@@ -45,13 +45,15 @@ std::shared_ptr<ScenarioFeatures> ScenarioAnalyzer::Analyze(
     cruise_scenario_features->BuildCruiseScenarioFeatures(environment_features);
 
     return cruise_scenario_features;
-  } else if (scenario_type == Scenario::JUNCTION) {
+  }
+
+  if (scenario_type == Scenario::JUNCTION) {
     std::shared_ptr<JunctionScenarioFeatures> junction_scenario_features(
         new JunctionScenarioFeatures());
     return junction_scenario_features;
-  } else {
-    return nullptr;
   }
+
+  return std::make_shared<ScenarioFeatures>();
 }
 
 }  // namespace prediction

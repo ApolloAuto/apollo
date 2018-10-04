@@ -23,6 +23,10 @@
 namespace apollo {
 namespace prediction {
 
+ScenarioFeatures::ScenarioFeatures() {
+  scenario_.set_type(Scenario::Type::Scenario_Type_UNKNOWN);
+}
+
 const Scenario& ScenarioFeatures::scenario() const {
   return scenario_;
 }

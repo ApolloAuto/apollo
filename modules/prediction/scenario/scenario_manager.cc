@@ -37,12 +37,9 @@ void ScenarioManager::Run() {
   FeatureExtractor feature_extractor;
   environment_features_ = feature_extractor.ExtractEnvironmentFeatures();
 
-  ptr_scenario_features_ =
-      std::move(ScenarioAnalyzer::Analyze(environment_features_));
+  ptr_scenario_features_ = ScenarioAnalyzer::Analyze(environment_features_);
 
-  if (ptr_scenario_features_ == nullptr) {
-    // TODO(all): add warning for unhandled scenarios
-  }
+  CHECK(ptr_scenario_features_ != nullptr);
 
   if (FLAGS_enable_prioritize_obstacles) {
     PrioritizeObstacles();
