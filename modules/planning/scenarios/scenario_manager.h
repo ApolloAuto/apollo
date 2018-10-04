@@ -18,6 +18,7 @@
 #define MODULES_PLANNING_SCENARIOS_SCENARIO_MANAGER_H_
 
 #include <memory>
+#include <set>
 
 #include "modules/planning/proto/planning_config.pb.h"
 
@@ -47,6 +48,7 @@ class ScenarioManager final {
       scenario_factory_;
 
   std::unique_ptr<Scenario> scenario_;
+  std::set<ScenarioConfig::ScenarioType> supported_scenarios_;
 };
 
 }  // namespace planning

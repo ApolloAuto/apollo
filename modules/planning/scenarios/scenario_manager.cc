@@ -43,7 +43,15 @@ void ScenarioManager::Update(const common::TrajectoryPoint& ego_point,
 
 ScenarioConfig::ScenarioType ScenarioManager::DecideCurrentScenario(
     const common::TrajectoryPoint& ego_point, const Frame& frame) {
-  return scenario_->Transfer(scenario_->scenario_type(), ego_point, frame);
+  for (const auto& scenario_type : supported_scenarios_) {
+    // TODO(All): use a better way rather than create object each time.
+    auto tmp_scenario = scenario_factory_.CreateObject(scenario_type);
+    if (tmp_scenario->IsTransferable(*scenario_, ego_point, frame)) {
+      return tmp_scenario->scenario_type();
+    }
+  }
+  // default scenario type here
+  return ScenarioConfig::LANE_FOLLOW;
 }
 
 }  // namespace planning
