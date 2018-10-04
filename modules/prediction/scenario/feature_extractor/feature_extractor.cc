@@ -106,7 +106,7 @@ void FeatureExtractor::ExtractEgoLaneFeatures(
       ptr_ego_lane->lane().left_boundary().boundary_type_size() != 0 &&
       ptr_ego_lane->lane().left_boundary().boundary_type(0).types_size() != 0 &&
       ptr_ego_lane->lane().left_boundary().boundary_type(0).types(0) !=
-      hdmap::LaneBoundaryType::Type::LaneBoundaryType_Type_CURB) {
+      hdmap::LaneBoundaryType::CURB) {
     const auto& reverse_lanes =
         ptr_ego_lane->lane().left_neighbor_reverse_lane_id();
     std::for_each(reverse_lanes.begin(), reverse_lanes.end(),
