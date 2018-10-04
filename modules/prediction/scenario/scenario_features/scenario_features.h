@@ -20,6 +20,8 @@
 
 #pragma once
 
+#include "modules/prediction/proto/scenario.pb.h"
+
 namespace apollo {
 namespace prediction {
 
@@ -28,6 +30,10 @@ class ScenarioFeatures {
   ScenarioFeatures() = default;
 
   virtual ~ScenarioFeatures() = default;
+
+  const Scenario& scenario() const;
+ protected:
+  Scenario scenario_;
 };
 
 }  // namespace prediction

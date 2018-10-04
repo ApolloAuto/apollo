@@ -61,9 +61,9 @@ class ScenarioManager {
       Obstacle* obstacle_ptr);
 
  private:
-  ScenarioAnalyzer scenario_analyzer_;
-
   EnvironmentFeatures environment_features_;
+
+  std::shared_ptr<ScenarioFeatures> ptr_scenario_features_ = nullptr;
 
   DECLARE_SINGLETON(ScenarioManager)
 };
