@@ -58,8 +58,10 @@ class DistanceApproachIPOPTInterfaceTest : public ::testing::Test {
   Eigen::MatrixXd uWS_ = Eigen::MatrixXd::Ones(2, 5);
   Eigen::MatrixXd timeWS_ = Eigen::MatrixXd::Ones(1, 5);
   Eigen::MatrixXd obstacles_vertices_num_;
-
+  Eigen::MatrixXd obstacles_A_ = Eigen::MatrixXd::Ones(10, 2);
+  Eigen::MatrixXd obstacles_b_ = Eigen::MatrixXd::Ones(10, 1);
   int num_of_variables_;
+  bool use_fix_time_ = false;
 
   int num_of_constraints_;
 
@@ -81,7 +83,8 @@ void DistanceApproachIPOPTInterfaceTest::ProblemSetup() {
 
   ptop_.reset(new DistanceApproachIPOPTInterface(
       num_of_variables_, num_of_constraints_, horizon_, ts_, ego_, xWS_, uWS_,
-      timeWS_, x0_, xf_, XYbounds_, obstacles_vertices_num_, obstacles_num_));
+      timeWS_, x0_, xf_, XYbounds_, obstacles_vertices_num_, obstacles_num_,
+      obstacles_A_, obstacles_b_, use_fix_time_));
 
   ptop_->set_objective_weights(distance_approach_config_);
 }

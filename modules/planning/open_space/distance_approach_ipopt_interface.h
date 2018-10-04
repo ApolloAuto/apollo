@@ -41,7 +41,8 @@ class DistanceApproachIPOPTInterface : public Ipopt::TNLP {
       const Eigen::MatrixXd& xWS, const Eigen::MatrixXd& uWS,
       const Eigen::MatrixXd& timeWS, Eigen::MatrixXd x0, Eigen::MatrixXd xf,
       Eigen::MatrixXd XYbounds, Eigen::MatrixXd obstacles_vertices_num,
-      std::size_t obstacles_num);
+      std::size_t obstacles_num, const Eigen::MatrixXd& obstacles_A,
+      const Eigen::MatrixXd& obstacles_b, bool use_fix_time);
 
   virtual ~DistanceApproachIPOPTInterface() = default;
 
@@ -82,8 +83,9 @@ class DistanceApproachIPOPTInterface : public Ipopt::TNLP {
                   int* iRow, int* jCol, double* values) override;
 
   /** Method to return:
-   *   1) The structure of the hessian of the lagrangian (if "values" is nullptr)
-   *   2) The values of the hessian of the lagrangian (if "values" is not nullptr)
+   *   1) The structure of the hessian of the lagrangian (if "values" is
+   * nullptr) 2) The values of the hessian of the lagrangian (if "values" is not
+   * nullptr)
    */
   bool eval_h(int n, const double* x, bool new_x, double obj_factor, int m,
               const double* lambda, bool new_lambda, int nele_hess, int* iRow,
@@ -123,6 +125,12 @@ class DistanceApproachIPOPTInterface : public Ipopt::TNLP {
   Eigen::MatrixXd state_result_;
   Eigen::MatrixXd control_result_;
   Eigen::MatrixXd time_result_;
+
+  // obstacles_A
+  Eigen::MatrixXd obstacles_A_;
+
+  // obstacles_b
+  Eigen::MatrixXd obstacles_b_;
 
  private:
   apollo::planning::DistanceApproachConfig distance_approach_config_;

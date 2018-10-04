@@ -97,9 +97,11 @@ bool DistanceApproachProblem::Solve(Eigen::MatrixXd* state_result,
   ADEBUG << "Number of constraints are : " << num_of_constraints;
 
   // TODO(QiL) : evaluate whether need to new it everytime
+  bool use_fix_time_ = false;
   DistanceApproachIPOPTInterface* ptop = new DistanceApproachIPOPTInterface(
       num_of_variables, num_of_constraints, horizon_, ts_, ego_, xWS_, uWS_,
-      timeWS_, x0_, xF_, XYbounds_, obstacles_vertices_num_, obstacles_num_);
+      timeWS_, x0_, xF_, XYbounds_, obstacles_vertices_num_, obstacles_num_,
+      obstacles_A_, obstacles_b_, use_fix_time_);
 
   Ipopt::SmartPtr<Ipopt::TNLP> problem = ptop;
 
