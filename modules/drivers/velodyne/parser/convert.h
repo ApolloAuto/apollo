@@ -31,7 +31,6 @@ namespace velodyne {
 
 using apollo::drivers::PointCloud;
 using apollo::drivers::velodyne::VelodyneScan;
-using apollo::drivers::velodyne::config::Config;
 
 // convert velodyne data to pointcloud and republish
 class Convert {

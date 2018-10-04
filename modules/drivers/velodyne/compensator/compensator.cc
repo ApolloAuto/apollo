@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/drivers/velodyne/parser/compensator.h"
+#include "modules/drivers/velodyne/compensator/compensator.h"
 
 #include <limits>
 #include <memory>
@@ -24,17 +24,12 @@ namespace apollo {
 namespace drivers {
 namespace velodyne {
 
-Compensator::Compensator(const Config& velodyne_config) {
-  tf2_buffer_ptr_ = Buffer::Instance();
-  config_ = velodyne_config;
-}
-
 bool Compensator::QueryPoseAffineFromTF2(
     const uint64_t& timestamp, void* pose, const std::string& child_frame_id) {
   cybertron::Time query_time(timestamp);
   std::string err_string;
-  if (!tf2_buffer_ptr_->canTransform("world", child_frame_id, query_time, 0.02,
-                                     &err_string)) {
+  if (!tf2_buffer_ptr_->canTransform(config_.world_frame_id(), child_frame_id, query_time, 
+				     config_.transform_query_timeout(), &err_string)) {
     AERROR << "Can not find transform. " << timestamp
            << " frame_id:" << child_frame_id << " Error info: " << err_string;
     return false;
@@ -44,7 +39,7 @@ bool Compensator::QueryPoseAffineFromTF2(
 
   try {
     stamped_transform =
-        tf2_buffer_ptr_->lookupTransform("world", child_frame_id, query_time);
+        tf2_buffer_ptr_->lookupTransform(config_.world_frame_id(), child_frame_id, query_time);
   } catch (tf2::TransformException& ex) {
     AERROR << ex.what();
     return false;
@@ -86,7 +81,7 @@ bool Compensator::MotionCompensation(
   uint64_t new_time = cybertron::Time().Now().ToNanosecond();
   AINFO << "compenstator new msg diff:" << new_time - start
         << ";meta:" << msg->header().lidar_timestamp();
-  msg_compensated->mutable_point()->Reserve(140000);
+  msg_compensated->mutable_point()->Reserve(240000);
 
   // compensate point cloud, remove nan point
   if (QueryPoseAffineFromTF2(timestamp_min, &pose_min_time, frame_id) &&
@@ -122,17 +117,6 @@ inline void Compensator::GetTimestampInterval(
       *timestamp_max = timestamp;
     }
   }
-}
-
-inline bool Compensator::IsValid(const Eigen::Vector3d& point) {
-  float x = point.x();
-  float y = point.y();
-  float z = point.z();
-  if (abs(x) > config_.max_range() || abs(y) > config_.max_range() ||
-      abs(z) > config_.max_range()) {
-    return false;
-  }
-  return true;
 }
 
 void Compensator::MotionCompensation(
@@ -172,12 +156,12 @@ void Compensator::MotionCompensation(
     for (const auto& point : msg->point()) {
       float x_scalar = point.x();
       if (std::isnan(x_scalar)) {
-        if (config_.organized()) {
+        // if (config_.organized()) {
           auto* point_new = msg_compensated->add_point();
           point_new->CopyFrom(point);
-        } else {
-          AERROR << "nan point do not need motion compensation";
-        }
+        // } else {
+        //   AERROR << "nan point do not need motion compensation";
+        // }
         continue;
       }
       float y_scalar = point.y();
@@ -195,14 +179,6 @@ void Compensator::MotionCompensation(
 
       Eigen::Affine3d trans = ti * qi;
       p = trans * p;
-
-      if (!IsValid(p)) {
-        if (config_.organized()) {
-          auto* point_new = msg_compensated->add_point();
-          point_new->CopyFrom(point);
-        }
-        continue;
-      }
 
       auto* point_new = msg_compensated->add_point();
       point_new->set_intensity(point.intensity());
@@ -230,10 +206,6 @@ void Compensator::MotionCompensation(
 
     p = ti * p;
 
-    if (!IsValid(p)) {
-      AINFO << "invaid point,x:" << p.x() << ";y:" << p.y() << ";z:" << p.z();
-      continue;
-    }
     auto* point_new = msg_compensated->add_point();
     point_new->set_intensity(point.intensity());
     point_new->set_timestamp(point.timestamp());

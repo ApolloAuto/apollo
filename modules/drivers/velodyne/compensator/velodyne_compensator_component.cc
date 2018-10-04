@@ -16,23 +16,24 @@
 
 #include <memory>
 
-#include "modules/drivers/velodyne/parser/velodyne_compensator_component.h"
+#include "modules/drivers/velodyne/compensator/velodyne_compensator_component.h"
+#include "modules/drivers/velodyne/proto/velodyne.pb.h"
 
 namespace apollo {
 namespace drivers {
 namespace velodyne {
 
 bool VelodyneCompensatorComponent::Init() {
-  Config velodyne_config;
-  if (!GetProtoConfig(&velodyne_config)) {
-    AWARN << "Load config failed, config file" << config_file_path_;
+  CompensatorConfig config;
+  if (!GetProtoConfig(&config)) {
+    AWARN << "Load config failed, config file" << ConfigFilePath();
     return false;
   }
 
   writer_ = node_->CreateWriter<PointCloud>(
-      velodyne_config.compensator_channel_name());
+      config.output_channel());
 
-  _compensator.reset(new Compensator(velodyne_config));
+  _compensator.reset(new Compensator(config));
 
   for (int i = 0; i < queue_size_; ++i) {
     compensator_deque_.push_back(std::make_shared<PointCloud>());
@@ -40,7 +41,7 @@ bool VelodyneCompensatorComponent::Init() {
       AERROR << "fail to make shared:" << i;
       return false;
     }
-    compensator_deque_[i]->mutable_point()->Reserve(140000);
+    compensator_deque_[i]->mutable_point()->Reserve(240000);
   }
   return true;
 }

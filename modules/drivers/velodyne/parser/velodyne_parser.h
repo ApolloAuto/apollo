@@ -85,7 +85,6 @@ using apollo::drivers::velodyne::VelodyneScan;
 using apollo::drivers::velodyne::VLP16;
 using apollo::drivers::velodyne::VLP32C;
 using apollo::drivers::velodyne::VLS128;
-using apollo::drivers::velodyne::config::Config;
 
 /**
  * Raw Velodyne packet constants and structures.

@@ -37,7 +37,6 @@ using apollo::cybertron::Reader;
 using apollo::cybertron::Writer;
 using apollo::drivers::PointCloud;
 using apollo::drivers::velodyne::VelodyneScan;
-using apollo::drivers::velodyne::config::Config;
 
 class VelodyneConvertComponent : public Component<VelodyneScan> {
  public:

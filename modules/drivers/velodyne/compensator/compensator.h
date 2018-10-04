@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_DRIVERS_VELODYNE_PARSER_COMPENSATOR_H_
-#define MODULES_DRIVERS_VELODYNE_PARSER_COMPENSATOR_H_
+#ifndef MODULES_DRIVERS_VELODYNE_COMPENSATOR_COMPENSATOR_H_
+#define MODULES_DRIVERS_VELODYNE_COMPENSATOR_COMPENSATOR_H_
 
 #include <Eigen/Eigen>
 #include <memory>
@@ -24,7 +24,6 @@
 #include "modules/transform/buffer.h"
 
 #include "modules/drivers/proto/pointcloud.pb.h"
-#include "modules/drivers/velodyne/parser/const_variables.h"
 #include "modules/drivers/velodyne/proto/config.pb.h"
 
 namespace apollo {
@@ -33,11 +32,10 @@ namespace velodyne {
 
 using apollo::transform::Buffer;
 using apollo::drivers::PointCloud;
-using apollo::drivers::velodyne::config::Config;
 
 class Compensator {
  public:
-  explicit Compensator(const Config& velodyne_config);
+  explicit Compensator(const CompensatorConfig& config) : config_(config) {}
   virtual ~Compensator() {}
 
   bool MotionCompensation(const std::shared_ptr<const PointCloud>& msg,
@@ -69,12 +67,12 @@ class Compensator {
 
   bool IsValid(const Eigen::Vector3d& point);
 
-  std::shared_ptr<Buffer> tf2_buffer_ptr_;
-  Config config_;
+  std::shared_ptr<Buffer> tf2_buffer_ptr_ = transform::Buffer::Instance();
+  CompensatorConfig config_;
 };
 
 }  // namespace velodyne
 }  // namespace drivers
 }  // namespace apollo
 
-#endif  // MODULES_DRIVERS_VELODYNE_PARSER_COMPENSATOR_H_
+#endif  // MODULES_DRIVERS_VELODYNE_COMPENSATOR_COMPENSATOR_H_

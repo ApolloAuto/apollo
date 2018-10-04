@@ -1,6 +1,6 @@
 syntax = "proto2";
 
-package apollo.drivers.velodyne.config;
+package apollo.drivers.velodyne;
 
 import "modules/drivers/velodyne/proto/velodyne.proto";
 
@@ -8,8 +8,8 @@ message Config {
   required string frame_id = 1;
   required string scan_channel = 2;
   optional double rpm = 3 [default = 600.0];
-  required apollo.drivers.velodyne.Model model = 4;
-  required apollo.drivers.velodyne.Mode mode = 21;
+  required Model model = 4;
+  required Mode mode = 21;
   optional string pcap = 5;
   optional int32 prefix_angle = 6;
   optional int32 firing_data_port = 7;
@@ -26,6 +26,19 @@ message Config {
   optional bool organized = 18;
   optional string convert_channel_name = 19;
   optional int32 npackets = 20;
-  optional string compensator_channel_name = 22;
   optional bool use_gps_time = 23;
 }
+
+message FusionConfig {
+  optional uint32 max_interval_ms = 1;
+  optional bool drop_expired_data = 2;
+  optional string fusion_channel = 3;
+  repeated string input_channel = 4;
+}
+
+message CompensatorConfig {
+  optional string output_channel = 1;
+  optional double transform_query_timeout = 2 [default = 0.02];
+  optional string world_frame_id = 3 [default = "world"];
+}
+

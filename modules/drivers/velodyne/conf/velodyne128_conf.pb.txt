@@ -14,4 +14,3 @@ calibration_online: false
 calibration_file: "/apollo/modules/drivers/velodyne/params/velodyne128_VLS_calibration.yaml"
 organized: false
 convert_channel_name: "/apollo/sensor/velodyne128/PointCloud2"
-compensator_channel_name: "/apollo/sensor/velodyne128/compensator/PointCloud2" 
