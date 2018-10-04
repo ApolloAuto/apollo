@@ -132,6 +132,9 @@ class DistanceApproachIPOPTInterface : public Ipopt::TNLP {
   // obstacles_b
   Eigen::MatrixXd obstacles_b_;
 
+  // whether to use fix time
+  bool use_fix_time_ = false;
+
  private:
   apollo::planning::DistanceApproachConfig distance_approach_config_;
 };
