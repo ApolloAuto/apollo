@@ -121,7 +121,7 @@ bool LogFileObject::CreateLogfile(const std::string& time_pid_string) {
 #endif
 
   file_ = fdopen(fd, "a");  // Make a FILE*.
-  if (file_ == nullptr) {      // Man, we're screwed!
+  if (file_ == nullptr) {   // Man, we're screwed!
     close(fd);
     unlink(filename);  // Erase the half-baked evidence: an unusable log file
     return false;

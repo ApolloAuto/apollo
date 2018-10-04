@@ -59,7 +59,7 @@ std::shared_ptr<CRoutine> CFSContext::NextLocalRoutine() {
         static_cast<double>(cur_croutine_->exec_time()) /
         cur_croutine_->priority());
     cur_croutine_->set_exec_time(cur_croutine_->vruntime() *
-                               cur_croutine_->priority());
+                                 cur_croutine_->priority());
     local_rb_map_.insert(std::pair<double, std::shared_ptr<CRoutine>>(
         cur_croutine_->vruntime(), cur_croutine_));
     cur_croutine_ = nullptr;

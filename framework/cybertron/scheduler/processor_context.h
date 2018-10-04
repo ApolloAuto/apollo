@@ -100,7 +100,7 @@ bool ProcessorContext::Getstate(const uint64_t& routine_id,
 }
 
 bool ProcessorContext::set_state(const uint64_t& routine_id,
-                                const RoutineState& state) {
+                                 const RoutineState& state) {
   ReadLockGuard<AtomicRWLock> lg(rw_lock_);
   auto it = cr_map_.find(routine_id);
   if (it != cr_map_.end()) {

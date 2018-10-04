@@ -1,6 +1,6 @@
 #include "cybertron/base/atomic_rw_lock.h"
-#include "cybertron/base/reentrant_rw_lock.h"
 #include <thread>
+#include "cybertron/base/reentrant_rw_lock.h"
 #include "gtest/gtest.h"
 
 namespace apollo {

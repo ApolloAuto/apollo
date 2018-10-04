@@ -44,7 +44,7 @@ class CRoutine {
 
   // static interfaces
   static void Yield();
-  static void Yield(const RoutineState& state);
+  static void Yield(const RoutineState &state);
   static void SetMainContext(const std::shared_ptr<RoutineContext> &context);
   static CRoutine *GetCurrentRoutine();
   static RoutineContext *GetMainContext();
@@ -135,7 +135,7 @@ class CRoutine {
   static thread_local std::shared_ptr<RoutineContext> main_context_;
 };
 
-inline void CRoutine::Yield(const RoutineState& state) {
+inline void CRoutine::Yield(const RoutineState &state) {
   auto routine = GetCurrentRoutine();
   routine->Lock();
   routine->set_state(state);
@@ -160,9 +160,7 @@ inline void CRoutine::SetMainContext(
 inline RoutineContext *CRoutine::GetContext() { return &context_; }
 RoutineState Resume();
 
-inline void CRoutine::Run() {
-  func_();
-}
+inline void CRoutine::Run() { func_(); }
 
 inline std::unique_lock<std::mutex> CRoutine::GetLock() const {
   std::unique_lock<std::mutex> ul(mutex_);
@@ -185,9 +183,7 @@ inline RoutineState CRoutine::state() const { return state_; }
 
 inline void CRoutine::Wake() { state_ = RoutineState::READY; }
 
-inline void CRoutine::HangUp() {
-  CRoutine::Yield(RoutineState::DATA_WAIT);
-}
+inline void CRoutine::HangUp() { CRoutine::Yield(RoutineState::DATA_WAIT); }
 
 inline void CRoutine::Sleep(const Duration &sleep_duration) {
   wake_time_ = std::chrono::steady_clock::now() + sleep_duration;
@@ -273,9 +269,7 @@ inline double CRoutine::proc_num() const { return proc_num_; }
 
 inline void CRoutine::set_proc_num(double num) { proc_num_ = num; }
 
-inline void CRoutine::Lock() {
-  lock_ = std::unique_lock<std::mutex>(mutex_);
-}
+inline void CRoutine::Lock() { lock_ = std::unique_lock<std::mutex>(mutex_); }
 
 inline void CRoutine::Unlock() {
   if (lock_) {
