@@ -34,25 +34,25 @@ using common::math::Vec2d;
 ScenarioManager::ScenarioManager() {}
 
 void ScenarioManager::Run() {
-  FeatureExtractor feature_extractor;
-  environment_features_ = feature_extractor.ExtractEnvironmentFeatures();
+  auto environment_features = FeatureExtractor::ExtractEnvironmentFeatures();
 
-  ptr_scenario_features_ = ScenarioAnalyzer::Analyze(environment_features_);
+  auto ptr_scenario_features = ScenarioAnalyzer::Analyze(environment_features);
 
-  CHECK(ptr_scenario_features_ != nullptr);
+  current_scenario_ = ptr_scenario_features->scenario();
 
   if (FLAGS_enable_prioritize_obstacles) {
-    PrioritizeObstacles();
+    PrioritizeObstacles(environment_features, ptr_scenario_features);
   }
   // TODO(all) other functionalities including lane, junction filters
 }
 
 const Scenario& ScenarioManager::scenario() const {
-  CHECK(ptr_scenario_features_ != nullptr);
-  return ptr_scenario_features_->scenario();
+  return current_scenario_;
 }
 
-void ScenarioManager::PrioritizeObstacles() {
+void ScenarioManager::PrioritizeObstacles(
+    const EnvironmentFeatures& environment_features,
+    const std::shared_ptr<ScenarioFeatures> ptr_scenario_features) {
   ObstaclesContainer* obstacles_container = dynamic_cast<ObstaclesContainer*>(
       ContainerManager::Instance()->GetContainer(
           AdapterConfig::PERCEPTION_OBSTACLES));
@@ -67,7 +67,7 @@ void ScenarioManager::PrioritizeObstacles() {
     Obstacle* obstacle_ptr = obstacles_container->GetObstacle(obstacle_id);
     PrioritizeObstacle(
         environment_features_,
-        ptr_scenario_features_,
+        ptr_scenario_features,
         obstacle_ptr);
   }
 }
@@ -76,7 +76,7 @@ void ScenarioManager::PrioritizeObstacle(
     const EnvironmentFeatures& environment_features,
     std::shared_ptr<ScenarioFeatures> scenario_features,
     Obstacle* obstacle_ptr) {
-  const auto& scenario_type = ptr_scenario_features_->scenario().type();
+  const auto& scenario_type = scenario_features->scenario().type();
   if (scenario_type == Scenario::CRUISE ||
       scenario_type == Scenario::CRUISE_URBAN ||
       scenario_type == Scenario::CRUISE_HIGHWAY) {

@@ -110,7 +110,7 @@ bool Obstacle::IsStill() {
   return true;
 }
 
-bool Obstacle::IsOnLane() {
+bool Obstacle::IsOnLane() const {
   if (feature_history_.size() > 0) {
     if (feature_history_.front().has_lane() &&
         (feature_history_.front().lane().current_lane_feature_size() > 0 ||

@@ -34,7 +34,7 @@ using LaneInfoPtr = std::shared_ptr<const LaneInfo>;
 namespace apollo {
 namespace prediction {
 
-EnvironmentFeatures FeatureExtractor::ExtractEnvironmentFeatures() const {
+EnvironmentFeatures FeatureExtractor::ExtractEnvironmentFeatures() {
   EnvironmentFeatures environment_features;
 
   PoseContainer* pose_container = dynamic_cast<PoseContainer*>(
@@ -73,7 +73,7 @@ EnvironmentFeatures FeatureExtractor::ExtractEnvironmentFeatures() const {
 }
 
 void FeatureExtractor::ExtractEgoVehicleFeatures(
-    EnvironmentFeatures* ptr_environment_features) const {
+    EnvironmentFeatures* ptr_environment_features) {
   PoseContainer* pose_container = dynamic_cast<PoseContainer*>(
       ContainerManager::Instance()->GetContainer(
           AdapterConfig::LOCALIZATION));
@@ -86,7 +86,7 @@ void FeatureExtractor::ExtractEgoVehicleFeatures(
 void FeatureExtractor::ExtractEgoLaneFeatures(
     EnvironmentFeatures* ptr_environment_features,
     const LaneInfoPtr& ptr_ego_lane,
-    const common::math::Vec2d& ego_position) const {
+    const common::math::Vec2d& ego_position) {
 
   if (ptr_ego_lane == nullptr) {
     ADEBUG << "Ego vehicle is not on any lane.";
@@ -118,7 +118,7 @@ void FeatureExtractor::ExtractEgoLaneFeatures(
 
 void FeatureExtractor::ExtractNeighborLaneFeatures(
     EnvironmentFeatures* ptr_environment_features,
-    const LaneInfoPtr& ptr_ego_lane, const Vec2d& ego_position) const {
+    const LaneInfoPtr& ptr_ego_lane, const Vec2d& ego_position) {
 
   if (ptr_ego_lane == nullptr) {
     AERROR << "Ego vehicle is not on any lane.";
@@ -153,7 +153,7 @@ void FeatureExtractor::ExtractNeighborLaneFeatures(
 }
 
 void FeatureExtractor::ExtractFrontJunctionFeatures(
-    EnvironmentFeatures* ptr_environment_features) const {
+    EnvironmentFeatures* ptr_environment_features) {
   ADCTrajectoryContainer* ego_trajectory_container =
       dynamic_cast<ADCTrajectoryContainer*>(
           ContainerManager::Instance()->GetContainer(
@@ -170,10 +170,10 @@ void FeatureExtractor::ExtractFrontJunctionFeatures(
 }
 
 void FeatureExtractor::ExtractObstacleFeatures(
-    EnvironmentFeatures* ptr_environment_features) const {
+    EnvironmentFeatures* ptr_environment_features) {
 }
 
-LaneInfoPtr FeatureExtractor::GetEgoLane(const Vec2d& ego_position) const {
+LaneInfoPtr FeatureExtractor::GetEgoLane(const Vec2d& ego_position) {
   ADCTrajectoryContainer* ego_trajectory_container =
       dynamic_cast<ADCTrajectoryContainer*>(
           ContainerManager::Instance()->GetContainer(

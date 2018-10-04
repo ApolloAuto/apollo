@@ -37,6 +37,12 @@ class ScenarioManagerTest : public ::testing::Test {
   std::shared_ptr<ScenarioManager> manager_ = nullptr;
 };
 
+TEST_F(ScenarioManagerTest, init) {
+  auto scenario_manager = ScenarioManager::Instance();
+  const auto& scenario = scenario_manager->scenario();
+  EXPECT_EQ(scenario.type(), Scenario::UNKNOWN);
+}
+
 TEST_F(ScenarioManagerTest, run) {
   // TODO(kechxu) add unit tests with concrete contents
   ContainerManager::Instance()->RegisterContainers();

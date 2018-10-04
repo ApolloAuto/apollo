@@ -141,7 +141,7 @@ class Obstacle {
    * @brief Check if the obstacle is on any lane.
    * @return If the obstacle is on any lane.
    */
-  bool IsOnLane();
+  bool IsOnLane() const;
 
   /**
    * @brief Check if the obstacle can be ignored.
