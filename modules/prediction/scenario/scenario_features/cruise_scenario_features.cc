@@ -48,27 +48,38 @@ void CruiseScenarioFeatures::InsertLaneOfInterest(
 
 void CruiseScenarioFeatures::BuildCruiseScenarioFeatures(
     const EnvironmentFeatures& environment_features) {
+  // Forward lanes
   if (environment_features.has_ego_lane()) {
     auto ego_lane = environment_features.GetEgoLane();
     const std::string& ego_lane_id = ego_lane.first;
     double ego_lane_s = ego_lane.second;
-    SearchAndInsertLanes(ego_lane_id, ego_lane_s, 50.0);
+    SearchForwardAndInsert(ego_lane_id, ego_lane_s, 50.0);
   }
   if (environment_features.has_left_neighbor_lane()) {
     auto left_lane = environment_features.GetLeftNeighborLane();
     const std::string& left_lane_id = left_lane.first;
     double left_lane_s = left_lane.second;
-    SearchAndInsertLanes(left_lane_id, left_lane_s, 50.0);
+    SearchForwardAndInsert(left_lane_id, left_lane_s, 50.0);
   }
   if (environment_features.has_right_neighbor_lane()) {
     auto right_lane = environment_features.GetRightNeighborLane();
     const std::string& right_lane_id = right_lane.first;
     double right_lane_s = right_lane.second;
-    SearchAndInsertLanes(right_lane_id, right_lane_s, 50.0);
+    SearchForwardAndInsert(right_lane_id, right_lane_s, 50.0);
+  }
+
+  // Reverse lanes
+  const std::unordered_set<std::string>& reverse_lane_ids =
+      environment_features.nonneglectable_reverse_lanes();
+  if (reverse_lane_ids.empty()) {
+    ADEBUG << "No reverse lane considered";
+  }
+  for (const std::string& reverse_lane_id : reverse_lane_ids) {
+    lane_ids_of_interest_.insert(reverse_lane_id);
   }
 }
 
-void CruiseScenarioFeatures::SearchAndInsertLanes(
+void CruiseScenarioFeatures::SearchForwardAndInsert(
     const std::string& start_lane_id, const double start_lane_s,
     const double range) {
   ConstLaneInfoPtr start_lane_info = PredictionMap::LaneById(start_lane_id);
