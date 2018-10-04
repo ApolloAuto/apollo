@@ -28,13 +28,11 @@
 #include "cybertron/message/raw_message.h"
 #include "cybertron/record/header_builder.h"
 #include "cybertron/record/record_base.h"
-#include "cybertron/time/time.h"
 
 namespace apollo {
 namespace cybertron {
 namespace record {
 
-using ::apollo::cybertron::Time;
 using ::apollo::cybertron::message::RawMessage;
 using ::apollo::cybertron::record::RecordFileWriter;
 
