@@ -1,4 +1,5 @@
 #include "cybertron/base/atomic_rw_lock.h"
+#include "cybertron/base/reentrant_rw_lock.h"
 #include <thread>
 #include "gtest/gtest.h"
 
@@ -6,14 +7,14 @@ namespace apollo {
 namespace cybertron {
 namespace base {
 
-TEST(AtomicRWLockTest, read_lock) {
+TEST(ReentrantRWLockTest, read_lock) {
   int count = 0;
   int thread_init = 0;
   bool flag = true;
-  AtomicRWLock lock;
+  ReentrantRWLock lock;
   EXPECT_EQ(0, lock.lock_num_.load());
   auto f = [&]() {
-    ReadLockGuard<AtomicRWLock> lg(lock);
+    ReadLockGuard<ReentrantRWLock> lg(lock);
     count++;
     thread_init++;
     while (flag) {
@@ -31,16 +32,16 @@ TEST(AtomicRWLockTest, read_lock) {
   t1.join();
   t2.join();
   {
-    ReadLockGuard<AtomicRWLock> lg1(lock);
+    ReadLockGuard<ReentrantRWLock> lg1(lock);
     EXPECT_EQ(1, lock.lock_num_.load());
     {
-      ReadLockGuard<AtomicRWLock> lg2(lock);
+      ReadLockGuard<ReentrantRWLock> lg2(lock);
       EXPECT_EQ(2, lock.lock_num_.load());
       {
-        ReadLockGuard<AtomicRWLock> lg3(lock);
+        ReadLockGuard<ReentrantRWLock> lg3(lock);
         EXPECT_EQ(3, lock.lock_num_.load());
         {
-          ReadLockGuard<AtomicRWLock> lg4(lock);
+          ReadLockGuard<ReentrantRWLock> lg4(lock);
           EXPECT_EQ(4, lock.lock_num_.load());
         }
         EXPECT_EQ(3, lock.lock_num_.load());
@@ -52,14 +53,14 @@ TEST(AtomicRWLockTest, read_lock) {
   EXPECT_EQ(0, lock.lock_num_.load());
 }
 
-TEST(AtomicRWLockTest, write_lock) {
+TEST(ReentrantRWLockTest, write_lock) {
   int count = 0;
   int thread_run = 0;
   bool flag = true;
-  AtomicRWLock lock(false);
+  ReentrantRWLock lock(false);
   auto f = [&]() {
     thread_run++;
-    WriteLockGuard<AtomicRWLock> lg(lock);
+    WriteLockGuard<ReentrantRWLock> lg(lock);
     count++;
     while (flag) {
       std::this_thread::yield();
@@ -77,13 +78,13 @@ TEST(AtomicRWLockTest, write_lock) {
   t2.join();
 
   {
-    WriteLockGuard<AtomicRWLock> lg1(lock);
+    WriteLockGuard<ReentrantRWLock> lg1(lock);
     EXPECT_EQ(-1, lock.lock_num_.load());
     {
-      WriteLockGuard<AtomicRWLock> lg2(lock);
+      WriteLockGuard<ReentrantRWLock> lg2(lock);
       EXPECT_EQ(-2, lock.lock_num_.load());
       {
-        ReadLockGuard<AtomicRWLock> lg3(lock);
+        ReadLockGuard<ReentrantRWLock> lg3(lock);
         EXPECT_EQ(-2, lock.lock_num_.load());
       }
     }
