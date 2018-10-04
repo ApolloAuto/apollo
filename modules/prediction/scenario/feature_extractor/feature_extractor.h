@@ -39,43 +39,43 @@ class FeatureExtractor {
   /**
    * @brief Constructor
    */
-  FeatureExtractor() = default;
+  FeatureExtractor() = delete;
 
   /**
    * @brief Destructor
    */
-  virtual ~FeatureExtractor() = default;
+  virtual ~FeatureExtractor() = delete;
 
   /**
    * @brief Extract features for scenario analysis
    * @return Scenario features
    */
-  EnvironmentFeatures ExtractEnvironmentFeatures() const;
+  static EnvironmentFeatures ExtractEnvironmentFeatures();
 
   FRIEND_TEST(FeatureExtractorTest, junction);
 
  private:
-  void ExtractEgoVehicleFeatures(
-      EnvironmentFeatures* ptr_environment_features) const;
+  static void ExtractEgoVehicleFeatures(
+      EnvironmentFeatures* ptr_environment_features);
 
-  void ExtractEgoLaneFeatures(
+  static void ExtractEgoLaneFeatures(
       EnvironmentFeatures* ptr_environment_features,
       const std::shared_ptr<const hdmap::LaneInfo>& ptr_ego_lane,
-      const common::math::Vec2d& ego_position) const;
+      const common::math::Vec2d& ego_position);
 
-  void ExtractNeighborLaneFeatures(
+  static void ExtractNeighborLaneFeatures(
       EnvironmentFeatures* ptr_environment_features,
       const std::shared_ptr<const hdmap::LaneInfo>& ptr_ego_lane,
-      const common::math::Vec2d& ego_position) const;
+      const common::math::Vec2d& ego_position);
 
-  void ExtractFrontJunctionFeatures(
-      EnvironmentFeatures* ptr_environment_features) const;
+  static void ExtractFrontJunctionFeatures(
+      EnvironmentFeatures* ptr_environment_features);
 
-  void ExtractObstacleFeatures(
-      EnvironmentFeatures* ptr_environment_features) const;
+  static void ExtractObstacleFeatures(
+      EnvironmentFeatures* ptr_environment_features);
 
-  std::shared_ptr<const hdmap::LaneInfo> GetEgoLane(
-      const common::math::Vec2d& ego_position) const;
+  static std::shared_ptr<const hdmap::LaneInfo> GetEgoLane(
+      const common::math::Vec2d& ego_position);
 };
 
 }  // namespace prediction

@@ -44,10 +44,9 @@ TEST_F(FeatureExtractorTest, junction) {
           AdapterConfig::PLANNING_TRAJECTORY);
 
   EnvironmentFeatures environment_features;
-  FeatureExtractor feature_extractor;
-  feature_extractor.ExtractFrontJunctionFeatures(&environment_features);
+  FeatureExtractor::ExtractFrontJunctionFeatures(&environment_features);
 
-  environment_features = feature_extractor.ExtractEnvironmentFeatures();
+  environment_features = FeatureExtractor::ExtractEnvironmentFeatures();
   EXPECT_TRUE(!environment_features.has_front_junction());
 }
 
