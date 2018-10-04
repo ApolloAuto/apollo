@@ -39,17 +39,14 @@ std::shared_ptr<ScenarioFeatures> ScenarioAnalyzer::Analyze(
   }
 
   if (scenario_type == Scenario::CRUISE) {
-    std::shared_ptr<CruiseScenarioFeatures> cruise_scenario_features(
-        new CruiseScenarioFeatures());
-
+    auto cruise_scenario_features = std::make_shared<CruiseScenarioFeatures>();
     cruise_scenario_features->BuildCruiseScenarioFeatures(environment_features);
-
     return cruise_scenario_features;
   }
 
   if (scenario_type == Scenario::JUNCTION) {
-    std::shared_ptr<JunctionScenarioFeatures> junction_scenario_features(
-        new JunctionScenarioFeatures());
+    auto junction_scenario_features =
+        std::make_shared<JunctionScenarioFeatures>();
     return junction_scenario_features;
   }
 
