@@ -32,6 +32,7 @@
 #include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
 #include "modules/planning/common/frame_open_space.h"
 #include "modules/planning/open_space/distance_approach_problem.h"
+#include "modules/planning/open_space/hybrid_a_star.h"
 #include "modules/planning/open_space/warm_start_problem.h"
 #include "modules/planning/planner/planner.h"
 #include "modules/planning/proto/planner_open_space_config.pb.h"
@@ -89,7 +90,7 @@ class OpenSpacePlanner : public Planner {
       FrameOpenSpace* frame);
 
  private:
-  std::unique_ptr<::apollo::planning::WarmStartProblem> warm_start_;
+  std::unique_ptr<::apollo::planning::HybridAStar> warm_start_;
   std::unique_ptr<::apollo::planning::DistanceApproachProblem>
       distance_approach_;
   common::VehicleState init_state_;
@@ -101,13 +102,10 @@ class OpenSpacePlanner : public Planner {
   double init_y_ = 0.0;
   double init_phi_ = 0.0;
   double init_v_ = 0.0;
-  double front_to_center_ = 0.0;
-  double back_to_center_ = 0.0;
-  double left_to_center_ = 0.0;
-  double right_to_center_ = 0.0;
   size_t horizon_ = 0;
   double ts_ = 0;
   Eigen::MatrixXd ego_;
+  Eigen::MatrixXd XYbounds_;
 };
 
 }  // namespace planning

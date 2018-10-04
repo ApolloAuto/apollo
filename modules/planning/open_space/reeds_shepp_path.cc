@@ -26,7 +26,8 @@ namespace planning {
 ReedShepp::ReedShepp(const common::VehicleParam& vehicle_param,
                      const PlannerOpenSpaceConfig& open_space_conf)
     : vehicle_param_(vehicle_param), open_space_conf_(open_space_conf) {
-  max_kappa_ = std::tan(open_space_conf.warm_start_config().max_steering()) /
+  max_kappa_ = std::tan(vehicle_param_.max_steer_angle() /
+                        vehicle_param_.steer_ratio()) /
                vehicle_param_.wheel_base();
 }
 

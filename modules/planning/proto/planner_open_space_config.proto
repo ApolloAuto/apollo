@@ -3,12 +3,11 @@ syntax = "proto2";
 package apollo.planning;
 
 message PlannerOpenSpaceConfig {
-  optional uint32 planning_horizon = 1 [default = 80];
-  optional double ts = 2 [default = 0.1];
   // Hybrid A Star Warm Start
-  optional WarmStartConfig warm_start_config = 3;
+  optional WarmStartConfig warm_start_config = 1;
   // Distance Approach COnfigs
-  optional DistanceApproachConfig distance_approach_config = 4;
+  optional DistanceApproachConfig distance_approach_config = 2;
+  optional double delta_t = 3 [default = 1.0];
 
 }
 
@@ -27,7 +26,6 @@ message WarmStartConfig {
   optional double gear_switch_penalty = 11 [default = 10.0];
   optional double steer_penalty = 12 [default = 10.0];
   optional double steer_change_penalty = 13 [default = 10.0];
-  optional double delta_t = 14 [default = 1.0];
 }
 
 message DistanceApproachConfig {
