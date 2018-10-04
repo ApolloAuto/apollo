@@ -28,7 +28,7 @@ module_config {
     module_library : "/apollo/bazel-bin/modules/drivers/velodyne/compensator/libvelodyne_compensator_component.so"
 
     components {
-      class_name : "VelodyneCompensatorComponent"
+      class_name : "CompensatorComponent"
       config {
         name : "velodyne_compensator"
         config_file_path : "/apollo/modules/drivers/velodyne/conf/velodyne128_compensator_conf.pb.txt"
