@@ -3,8 +3,8 @@ project(base_test)
 add_executable(any_test any_test.cpp)
 target_link_libraries(any_test cybertron gtest)
 
-add_executable(atomic_rw_lock_test atomic_rw_lock_test.cpp)
-target_link_libraries(atomic_rw_lock_test gtest)
+#add_executable(atomic_rw_lock_test atomic_rw_lock_test.cpp)
+#target_link_libraries(atomic_rw_lock_test gtest)
 
 add_executable(bounded_queue_test bounded_queue_test.cpp)
 target_link_libraries(bounded_queue_test gtest)
@@ -20,7 +20,7 @@ target_link_libraries(atomic_hash_map_test  gtest)
 
 install(TARGETS
   any_test
-  atomic_rw_lock_test
+  #atomic_rw_lock_test
   bounded_queue_test
   signal_test
   object_pool_test
