@@ -14,25 +14,16 @@
  * limitations under the License.
  *****************************************************************************/
 
-#pragma once
-
-#include <memory>
-
-#include "modules/prediction/common/environment_features.h"
-#include "modules/prediction/scenario/scenario_features/scenario_features.h"
+#include "modules/prediction/scenario/scenario_features/junction_scenario_features.h"
 
 namespace apollo {
 namespace prediction {
 
-class ScenarioAnalyzer {
- public:
-  ScenarioAnalyzer() = delete;
+JunctionScenarioFeatures::JunctionScenarioFeatures() {
+  scenario_.set_type(Scenario::JUNCTION);
+}
 
-  virtual ~ScenarioAnalyzer() = default;
-
-  static std::shared_ptr<ScenarioFeatures>
-  Analyze(const EnvironmentFeatures& environment_features);
-};
+JunctionScenarioFeatures::~JunctionScenarioFeatures() {}
 
 }  // namespace prediction
 }  // namespace apollo

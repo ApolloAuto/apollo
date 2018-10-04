@@ -19,6 +19,8 @@
 #include <string>
 
 #include "modules/prediction/common/prediction_gflags.h"
+#include "modules/prediction/scenario/scenario_features/cruise_scenario_features.h"
+#include "modules/prediction/scenario/scenario_features/junction_scenario_features.h"
 
 namespace apollo {
 namespace prediction {
@@ -43,6 +45,10 @@ std::shared_ptr<ScenarioFeatures> ScenarioAnalyzer::Analyze(
     cruise_scenario_features->BuildCruiseScenarioFeatures(environment_features);
 
     return cruise_scenario_features;
+  } else if (scenario_type == Scenario::JUNCTION) {
+    std::shared_ptr<JunctionScenarioFeatures> junction_scenario_features(
+        new JunctionScenarioFeatures());
+    return junction_scenario_features;
   } else {
     return nullptr;
   }

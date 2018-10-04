@@ -26,6 +26,17 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "junction_scenario_features",
+    srcs = ["junction_scenario_features.cc"],
+    hdrs = ["junction_scenario_features.h"],
+    deps = [
+        ":scenario_features",
+        "//modules/prediction/common:environment_features",
+        "//modules/prediction/common:prediction_map",
+    ],
+)
+
 cc_test(
     name = "cruise_scenario_features_test",
     size = "small",
