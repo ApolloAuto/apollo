@@ -26,21 +26,34 @@ namespace transport {
 
 Participant::Participant(const std::string& name, int send_port,
                          eprosima::fastrtps::ParticipantListener* listener)
-    : shutdown_(false), fastrtps_participant_(nullptr) {
-  CreateFastRtpsParticipant(name, send_port, listener);
-}
+    : shutdown_(false),
+      name_(name),
+      send_port_(send_port),
+      listener_(listener),
+      fastrtps_participant_(nullptr) {}
 
 Participant::~Participant() {}
 
 void Participant::Shutdown() {
-  if (shutdown_) {
+  if (shutdown_.exchange(true)) {
     return;
   }
-  shutdown_ = true;
 
-  RETURN_IF_NULL(fastrtps_participant_);
-  eprosima::fastrtps::Domain::removeParticipant(fastrtps_participant_);
-  fastrtps_participant_ = nullptr;
+  std::lock_guard<std::mutex> lck(mutex_);
+  if (fastrtps_participant_ != nullptr) {
+    eprosima::fastrtps::Domain::removeParticipant(fastrtps_participant_);
+    fastrtps_participant_ = nullptr;
+    listener_ = nullptr;
+  }
+}
+
+eprosima::fastrtps::Participant* Participant::fastrtps_participant() {
+  std::lock_guard<std::mutex> lck(mutex_);
+  if (fastrtps_participant_ != nullptr) {
+    return fastrtps_participant_;
+  }
+  CreateFastRtpsParticipant(name_, send_port_, listener_);
+  return fastrtps_participant_;
 }
 
 void Participant::CreateFastRtpsParticipant(

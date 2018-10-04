@@ -17,7 +17,9 @@
 #ifndef CYBERTRON_TRANSPORT_RTPS_PARTICIPANT_H_
 #define CYBERTRON_TRANSPORT_RTPS_PARTICIPANT_H_
 
+#include <atomic>
 #include <memory>
+#include <mutex>
 #include <string>
 
 #include <fastrtps/Domain.h>
@@ -43,18 +45,21 @@ class Participant {
 
   void Shutdown();
 
-  eprosima::fastrtps::Participant* fastrtps_participant() const {
-    return fastrtps_participant_;
-  }
+  eprosima::fastrtps::Participant* fastrtps_participant();
+  bool is_shutdown() const { return shutdown_.load(); }
 
  private:
   void CreateFastRtpsParticipant(
       const std::string& name, int send_port,
       eprosima::fastrtps::ParticipantListener* listener);
 
-  bool shutdown_;
+  std::atomic<bool> shutdown_;
+  std::string name_;
+  int send_port_;
+  eprosima::fastrtps::ParticipantListener* listener_;
   UnderlayMessageType type_;
   eprosima::fastrtps::Participant* fastrtps_participant_;
+  std::mutex mutex_;
 };
 
 }  // namespace transport
