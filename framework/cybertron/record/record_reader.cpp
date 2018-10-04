@@ -31,8 +31,8 @@ RecordReader::RecordReader(const std::string& file) {
   }
 }
 
-void RecordReader::Reset() { 
-  file_reader_->Reset(); 
+void RecordReader::Reset() {
+  file_reader_->Reset();
   message_index_ = 0;
   chunk_ = ChunkBody();
 }

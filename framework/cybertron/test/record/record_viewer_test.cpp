@@ -139,7 +139,6 @@ TEST(RecordTest, filter_test) {
 
   RecordViewer viewer_7(reader, 0, END_TIME, {CHANNEL_NAME_1});
   EXPECT_EQ(CheckCount(viewer_7), 1000);
-
 }
 
 }  // namespace record
