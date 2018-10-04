@@ -61,6 +61,8 @@ const MenuIdOptionMapping = {
         mapRoad: 'showMapRoad',
         mapSignal: 'showMapSignal',
         mapStopSign: 'showMapStopSign',
+        mapSpeedBump: 'showMapSpeedBump',
+        mapParkingSpace: 'showMapParkingSpace',
 };
 
 @observer

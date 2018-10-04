@@ -119,6 +119,7 @@ export default class Map {
             const points = coordinates.applyOffsetToArray(segment.lineSegment.point);
             const centerLine =
                 drawSegmentsFromPoints(points, colorMapping.GREEN, 1, 1, false);
+            centerLine.name = "CentralLine-" + lane.id.id;
             scene.add(centerLine);
             drewObjects.push(centerLine);
         });
@@ -129,6 +130,7 @@ export default class Map {
             lane.rightBoundary.curve.segment.forEach((segment, index) => {
                 const points = coordinates.applyOffsetToArray(segment.lineSegment.point);
                 const boundary = this.addLaneMesh(rightLaneType, points);
+                boundary.name = "RightBoundary-" + lane.id.id;
                 scene.add(boundary);
                 drewObjects.push(boundary);
             });
@@ -139,6 +141,7 @@ export default class Map {
             lane.leftBoundary.curve.segment.forEach((segment, index) => {
                 const points = coordinates.applyOffsetToArray(segment.lineSegment.point);
                 const boundary = this.addLaneMesh(leftLaneType, points);
+                boundary.name = "LeftBoundary-" + lane.id.id;
                 scene.add(boundary);
                 drewObjects.push(boundary);
             });
@@ -155,6 +158,7 @@ export default class Map {
                 edge.curve.segment.forEach((segment, index) => {
                     const points = coordinates.applyOffsetToArray(segment.lineSegment.point);
                     const boundary = this.addLaneMesh("CURB", points);
+                    boundary.name = "Road-" + road.id.id;
                     scene.add(boundary);
                     drewObjects.push(boundary);
                 });
@@ -324,20 +328,14 @@ export default class Map {
     }
 
     getStopSignPositionAndHeading(stopSign, coordinates) {
-        let heading = undefined;
-        const overlapLen = stopSign.overlapId.length;
-        if (overlapLen > 0) {
+        let heading = this.getHeadingFromStopLine(stopSign);
+        if (isNaN(heading) && !_.isEmpty(stopSign.overlapId)) {
             const overlapId = stopSign.overlapId[0].id;
-            heading = this.laneHeading[this.overlapMap[overlapId]];
-        }
-        if (!heading) {
-            console.warn("Unable to get stop sign heading, " +
-                "use orthogonal direction of StopLine.");
-            heading = this.getHeadingFromStopLine(stopSign);
+            heading = this.laneHeading[this.overlapMap[overlapId]] || NaN;
         }
 
         if (!isNaN(heading)) {
-            const stopLinePoint = stopSign.stopLine[0].segment[0].lineSegment.point[0];
+            const stopLinePoint = _.last(stopSign.stopLine[0].segment[0].lineSegment.point);
             let position = new THREE.Vector3(stopLinePoint.x, stopLinePoint.y, 0);
             position = coordinates.applyOffset(position);
 
@@ -360,7 +358,6 @@ export default class Map {
                     mesh.position.set(posAndHeading.pos.x, posAndHeading.pos.y, 0);
                     mesh.matrixAutoUpdate = false;
                     mesh.updateMatrix();
-
                     scene.add(mesh);
                     drewObjects.push(mesh);
                 });

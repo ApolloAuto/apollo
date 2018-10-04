@@ -90,6 +90,8 @@ export default [
             mapRoad: 'Road',
             mapSignal: 'Signal',
             mapStopSign: 'Stop Sign',
+            mapSpeedBump: 'Speed Bump',
+            mapParkingSpace: 'Parking Space',
         },
         supportInOfflineView: false,
     },
