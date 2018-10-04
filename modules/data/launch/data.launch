@@ -1,0 +1,7 @@
+<cybertron>
+    <module>
+        <name>data</name>
+        <dag_conf>/apollo/modules/data/dag/data.dag</dag_conf>
+        <process_name>data</process_name>
+    </module>
+</cybertron>

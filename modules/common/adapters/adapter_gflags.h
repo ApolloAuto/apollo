@@ -85,4 +85,7 @@ DECLARE_string(rtcm_data_topic);
 // Guardian topic
 DECLARE_string(guardian_topic);
 
+// Data topic
+DECLARE_string(data_topic);
+
 #endif  // MODULES_COMMON_ADAPTERS_ADAPTER_GFLAGS_H_

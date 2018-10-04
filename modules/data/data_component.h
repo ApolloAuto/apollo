@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,22 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_DATA_UTIL_INFO_COLLECTOR_H_
-#define MODULES_DATA_UTIL_INFO_COLLECTOR_H_
+/**
+ * @file
+ */
+
+#ifndef MODEULES_DATA_DATA_COMPONENT_H_
+#define MODEULES_DATA_DATA_COMPONENT_H_
 
 #include <memory>
 #include <string>
 
 #include "cybertron/common/macros.h"
+#include "cybertron/component/timer_component.h"
 #include "cybertron/cybertron.h"
-#include "modules/data/proto/static_info.pb.h"
+
+#include "modules/data/proto/data.pb.h"
+#include "modules/data/proto/data_conf.pb.h"
 
 /**
  * @namespace apollo::data
@@ -31,33 +38,30 @@
 namespace apollo {
 namespace data {
 
-class InfoCollector {
+class DataComponent final
+    : public apollo::cybertron::Component<DataInputCommand> {
  public:
-  static void Init(const std::shared_ptr<apollo::cybertron::Node>& node);
-  // Get task information.
-  static const StaticInfo &GetStaticInfo();
-
-  // Get specific information.
-  // Listening topics: ChassisDetail.
-  static const VehicleInfo &GetVehicleInfo();
-  static const EnvironmentInfo &GetEnvironmentInfo();
-  static const HardwareInfo &GetHardwareInfo();
-  static const SoftwareInfo &GetSoftwareInfo();
-  static const UserInfo &GetUserInfo();
-
-  // Utils.
-  static std::string GetDockerImage();
+  DataComponent() = default;
+  ~DataComponent() = default;
+ public:
+  bool Init() override;
+  bool Proc(const std::shared_ptr<DataInputCommand> &request) override;
+  // probably do not need this with Proc function,
+  // but leave it for testing for now
+  void CreateReader();
 
  private:
-  StaticInfo static_info_;
-  StaticInfoConf config_;
-  std::shared_ptr<cybertron::Reader<apollo::routing::RoutingRequest>>
-      routing_request_reader_;
-
-  DECLARE_SINGLETON(InfoCollector);
+  void OnDataInputCommand(
+    const std::shared_ptr<DataInputCommand> &data_input_cmd);
+ private:
+  DataConf data_conf_;
+  std::shared_ptr<apollo::cybertron::Reader<DataInputCommand>>
+    data_input_cmd_reader_;
 };
+
+CYBERTRON_REGISTER_COMPONENT(DataComponent)
 
 }  // namespace data
 }  // namespace apollo
 
-#endif  // MODULES_DATA_UTIL_INFO_COLLECTOR_H_
+#endif  // MODEULES_DATA_DATA_COMPONENT_H_
