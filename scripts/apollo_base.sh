@@ -330,6 +330,12 @@ function stop_customized_path() {
   MODULE_PATH=$1
   MODULE=$2
 
+  is_stopped_customized_path "${MODULE_PATH}" "${MODULE}"
+  if [ $? -eq 1 ]; then
+    echo "${MODULE} process is not running!"
+    return
+  fi
+
   cyber_launch stop "/apollo/modules/${MODULE_PATH}/launch/${MODULE}.launch"
   if [ $? -eq 0 ]; then
     echo "Successfully stopped module ${MODULE}."
