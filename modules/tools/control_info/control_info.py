@@ -27,13 +27,10 @@ import time
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy
-import rosbag
-import rospy
-import tf
 import tkFileDialog
 from matplotlib import patches
 from matplotlib import lines
-from std_msgs.msg import String
+from cybertron import cybertron
 
 from modules.localization.proto import localization_pb2
 from modules.canbus.proto import chassis_pb2
@@ -95,7 +92,7 @@ class ControlInfo(object):
         New Planning Trajectory
         """
         basetime = entity.header.timestamp_sec
-        numpoints = len(entity.adc_trajectory_point)
+        numpoints = len(entity.trajectory_point)
         with self.lock:
             self.pointx = numpy.zeros(numpoints)
             self.pointy = numpy.zeros(numpoints)
@@ -106,16 +103,17 @@ class ControlInfo(object):
             self.pointacceleration = numpy.zeros(numpoints)
 
             for idx in range(numpoints):
-                self.pointx[idx] = entity.adc_trajectory_point[idx].x
-                self.pointy[idx] = entity.adc_trajectory_point[idx].y
-                self.pointspeed[idx] = entity.adc_trajectory_point[idx].speed
-                self.pointtheta[idx] = entity.adc_trajectory_point[idx].theta
-                self.pointcurvature[idx] = entity.adc_trajectory_point[
-                    idx].curvature
-                self.pointacceleration[idx] = entity.adc_trajectory_point[
-                    idx].acceleration_s
+                self.pointx[idx] = entity.trajectory_point[idx].path_point.x
+                self.pointy[idx] = entity.trajectory_point[idx].path_point.y
+                self.pointspeed[idx] = entity.trajectory_point[idx].v
+                self.pointtheta[idx] = entity.trajectory_point[
+                    idx].path_point.theta
+                self.pointcurvature[idx] = entity.trajectory_point[
+                    idx].path_point.kappa
+                self.pointacceleration[idx] = entity.trajectory_point[
+                    idx].a
                 self.pointtime[
-                    idx] = entity.adc_trajectory_point[idx].relative_time + basetime
+                    idx] = entity.trajectory_point[idx].relative_time + basetime
 
         if numpoints == 0:
             self.planningavailable = False
@@ -327,12 +325,12 @@ class ControlInfo(object):
 
 
 if __name__ == "__main__":
+    from cybertron.record import RecordReader
+
     parser = argparse.ArgumentParser(
         description='Process and analyze control and planning data')
     parser.add_argument('--bag', type=str, help='use Rosbag')
     args = parser.parse_args()
-
-    rospy.init_node('control_info', anonymous=True)
 
     fig, axarr = plt.subplots(2, 2)
     plt.tight_layout()
@@ -343,44 +341,45 @@ if __name__ == "__main__":
 
     if args.bag:
         file_path = args.bag
-        bag = rosbag.Bag(file_path)
-        for topic, msg, t in bag.read_messages(topics=[
-                '/apollo/control', '/apollo/planning',
-                '/apollo/localization/pose', '/apollo/canbus/chassis'
-        ]):
-            print t.to_sec(), topic
-            if topic == "/apollo/localization/pose":
-                controlinfo.callback_localization(msg)
-            elif topic == "/apollo/planning":
-                controlinfo.callback_planning(msg)
-            elif topic == "/apollo/control":
-                controlinfo.callback_control(msg)
-            elif topic == "/apollo/canbus/chassis":
-                controlinfo.callback_canbus(msg)
+        # bag = rosbag.Bag(file_path)
+        reader = RecordReader(file_path)
+        for msg in reader.read_messages():
+            print msg.timestamp, msg.topic
+            if msg.topic == "/apollo/localization/pose":
+                localization = localization_pb2.LocalizationEstimate()
+                localization.ParseFromString(msg.message)
+                controlinfo.callback_localization(localization)
+            elif msg.topic == "/apollo/planning":
+                adc_trajectory = planning_pb2.ADCTrajectory()
+                adc_trajectory.ParseFromString(msg.message)
+                controlinfo.callback_planning(adc_trajectory)
+            elif msg.topic == "/apollo/control":
+                control_cmd = control_cmd_pb2.ControlCommand()
+                control_cmd.ParseFromString(msg.message)
+                controlinfo.callback_control(control_cmd)
+            elif msg.topic == "/apollo/canbus/chassis":
+                chassis = chassis_pb2.Chassis()
+                chassis.ParseFromString(msg.message)
+                controlinfo.callback_canbus(chassis)
         print "Done reading the file"
-        bag.close()
 
     else:
-        planningsub = rospy.Subscriber('/apollo/planning',
-                                       planning_pb2.ADCTrajectory,
-                                       controlinfo.callback_planning)
-        localizationsub = rospy.Subscriber(
+        cybertron.init()
+        # rospy.init_node('control_info', anonymous=True)
+        node = cybertron.Node("rtk_recorder")
+        planningsub = node.create_reader('/apollo/planning',
+                                         planning_pb2.ADCTrajectory,
+                                         controlinfo.callback_planning)
+        localizationsub = node.create_reader(
             '/apollo/localization/pose', localization_pb2.LocalizationEstimate,
             controlinfo.callback_localization)
-        controlsub = rospy.Subscriber('/apollo/control',
-                                      control_cmd_pb2.ControlCommand,
-                                      controlinfo.callback_control)
-        canbussub = rospy.Subscriber('/apollo/canbus/chassis',
-                                     chassis_pb2.Chassis,
-                                     controlinfo.callback_canbus)
+        controlsub = node.create_reader('/apollo/control',
+                                        control_cmd_pb2.ControlCommand,
+                                        controlinfo.callback_control)
+        canbussub = node.create_reader('/apollo/canbus/chassis',
+                                       chassis_pb2.Chassis,
+                                       controlinfo.callback_canbus)
         raw_input("Press Enter To Stop")
-
-        planningsub.unregister()
-        localizationsub.unregister()
-        controlsub.unregister()
-        canbussub.unregister()
-
-        rospy.sleep(0.5)
 
     mng = plt.get_current_fig_manager()
     controlinfo.longitudinal()
