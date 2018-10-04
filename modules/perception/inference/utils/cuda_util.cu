@@ -13,11 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+
 #include "modules/perception/inference/utils/cuda_util.h"
+
 #include <boost/thread.hpp>
 #include <cuda_runtime_api.h>
-#include "glog/logging.h"
-//#include "modules/perception/base/log.h"
+
+#include "cybertron/common/log.h"
 
 namespace apollo {
 namespace perception {

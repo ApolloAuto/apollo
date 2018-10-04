@@ -13,11 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+
+#include "modules/perception/inference/utils/util.h"
+
 #include <algorithm>
 
 #include "cybertron/common/log.h"
-
-#include "modules/perception/inference/utils/util.h"
 
 namespace apollo {
 namespace perception {

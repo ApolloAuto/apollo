@@ -13,10 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+
+#include "modules/perception/inference/utils/gemm.h"
+
 #include <algorithm>
+
 #include "modules/perception/inference/utils/util.h"
 #include "modules/perception/inference/utils/cuda_util.h"
-#include "modules/perception/inference/utils/gemm.h"
 
 namespace apollo {
 namespace perception {

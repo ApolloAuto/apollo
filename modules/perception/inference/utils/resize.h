@@ -17,47 +17,37 @@
 #ifndef MODULES_PERCEPTION_INFERENCE_UTILS_RESIZE_H
 #define MODULES_PERCEPTION_INFERENCE_UTILS_RESIZE_H
 
-#include <cuda_runtime_api.h>
 #include <cblas.h>
+#include <cuda_runtime_api.h>
 
 #include <boost/shared_ptr.hpp>
 #include <fstream>
 #include <iostream>
 #include <map>
 #include <memory>
-#include <vector>
 #include <string>
-#include "modules/perception/base/image.h"
+#include <vector>
+
 #include "modules/perception/base/blob.h"
+#include "modules/perception/base/image.h"
 
 namespace apollo {
 namespace perception {
 namespace inference {
 
 bool ResizeGPU(const base::Image8U &src,
-               std::shared_ptr<apollo::perception::base::Blob<float> > dst,
-               int stepwidth,
-               int start_axis);
+               std::shared_ptr<apollo::perception::base::Blob<float>> dst,
+               int stepwidth, int start_axis);
 
 bool ResizeGPU(const apollo::perception::base::Blob<uint8_t> &src_gpu,
-               std::shared_ptr<apollo::perception::base::Blob<float> > dst,
-               int stepwidth,
-               int start_axis,
-               int mean_b,
-               int mean_g,
-               int mean_r,
-               bool channel_axis,
-               float scale);
+               std::shared_ptr<apollo::perception::base::Blob<float>> dst,
+               int stepwidth, int start_axis, int mean_b, int mean_g,
+               int mean_r, bool channel_axis, float scale);
 
 bool ResizeGPU(const base::Image8U &src,
-               std::shared_ptr<apollo::perception::base::Blob<float> > dst,
-               int stepwidth,
-               int start_axis,
-               float mean_b,
-               float mean_g,
-               float mean_r,
-               bool channel_axis,
-               float scale);
+               std::shared_ptr<apollo::perception::base::Blob<float>> dst,
+               int stepwidth, int start_axis, float mean_b, float mean_g,
+               float mean_r, bool channel_axis, float scale);
 
 }  // namespace inference
 }  // namespace perception

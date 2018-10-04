@@ -17,17 +17,18 @@
 #ifndef MODULES_PERCEPTION_INFERENCE_UTILS_GEMM_H
 #define MODULES_PERCEPTION_INFERENCE_UTILS_GEMM_H
 
-#include <cuda_runtime_api.h>
 #include <cblas.h>
+#include <cuda_runtime_api.h>
 
 #include <boost/shared_ptr.hpp>
 #include <fstream>
 #include <iostream>
 #include <map>
-#include <vector>
 #include <string>
-#include "modules/perception/base/image.h"
+#include <vector>
+
 #include "modules/perception/base/blob.h"
+#include "modules/perception/base/image.h"
 
 namespace apollo {
 namespace perception {
@@ -42,16 +43,9 @@ class GPUL2Norm {
   base::Blob<float> square_;
 };
 
-void GPUGemmFloat(const CBLAS_TRANSPOSE TransA,
-                  const CBLAS_TRANSPOSE TransB,
-                  const int M,
-                  const int N,
-                  const int K,
-                  const float alpha,
-                  const float *A,
-                  const float *B,
-                  const float beta,
-                  float *C);
+void GPUGemmFloat(const CBLAS_TRANSPOSE TransA, const CBLAS_TRANSPOSE TransB,
+                  const int M, const int N, const int K, const float alpha,
+                  const float *A, const float *B, const float beta, float *C);
 void GPUMultiFloat(const int n, const float *a, const float *b, float *result);
 void GPUMSetFloat(const int n, const float alpha, float *result);
 

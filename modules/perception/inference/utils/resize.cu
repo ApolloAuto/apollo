@@ -14,8 +14,10 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <algorithm>
 #include "modules/perception/inference/utils/resize.h"
+
+#include <algorithm>
+
 #include "modules/perception/inference/utils/util.h"
 #include "modules/perception/inference/utils/cuda_util.h"
 
