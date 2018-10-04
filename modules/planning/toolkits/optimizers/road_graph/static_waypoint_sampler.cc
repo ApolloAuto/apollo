@@ -35,6 +35,9 @@
 
 namespace apollo {
 namespace planning {
+namespace {
+constexpr float kMathEpsilon = 1e-6;
+}
 
 using apollo::common::SLPoint;
 using apollo::common::Status;
@@ -81,7 +84,6 @@ bool StaticWaypointSampler::SamplePathWaypoints(
   const float level_distance =
       (init_point.v() > FLAGS_max_stop_speed) ? step_length : step_length / 2.0;
   float accumulated_s = init_s;
-  float prev_s = accumulated_s;
 
   auto *status = mutable_planning_status();
   if (!status->has_pull_over() && status->pull_over().in_pull_over()) {
@@ -108,18 +110,9 @@ bool StaticWaypointSampler::SamplePathWaypoints(
     }
   }
 
-  for (std::size_t i = 0; accumulated_s < total_length; ++i) {
-    accumulated_s += level_distance;
-    if (accumulated_s + level_distance / 2.0 > total_length) {
-      accumulated_s = total_length;
-    }
-    const float s = std::fmin(accumulated_s, total_length);
-    constexpr float kMinAllowedSampleStep = 1.0;
-    if (std::fabs(s - prev_s) < kMinAllowedSampleStep) {
-      continue;
-    }
-    prev_s = s;
-
+  for (std::size_t i = 0; accumulated_s + kMathEpsilon < total_length;
+       ++i, accumulated_s += level_distance) {
+    const float s = accumulated_s;
     double left_width = 0.0;
     double right_width = 0.0;
     reference_line_info_->reference_line().GetLaneWidth(s, &left_width,
