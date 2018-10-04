@@ -25,11 +25,12 @@
 #include <memory>
 
 #include "cybertron/common/macros.h"
+#include "modules/prediction/container/obstacles/obstacle.h"
+#include "modules/prediction/container/obstacles/obstacles_container.h"
 #include "modules/prediction/proto/scenario.pb.h"
 #include "modules/prediction/proto/prediction_conf.pb.h"
 #include "modules/prediction/scenario/feature_extractor/feature_extractor.h"
 #include "modules/prediction/scenario/analyzer/scenario_analyzer.h"
-#include "modules/prediction/container/obstacles/obstacle.h"
 #include "modules/prediction/scenario/scenario_features/cruise_scenario_features.h"
 
 namespace apollo {
@@ -52,15 +53,10 @@ class ScenarioManager {
       const EnvironmentFeatures& environment_features,
       const std::shared_ptr<ScenarioFeatures> scenario_features);
 
-  void PrioritizeObstacle(
-      const EnvironmentFeatures& environment_features,
-      const std::shared_ptr<ScenarioFeatures> scenario_features,
-      Obstacle* obstacle_ptr);
-
-  void PrioritizeObstacleInCruise(
+  void PrioritizeObstaclesForCruiseScenario(
       const EnvironmentFeatures& environment_features,
       const std::shared_ptr<CruiseScenarioFeatures> scenario_features,
-      Obstacle* obstacle_ptr);
+      ObstaclesContainer* ptr_obstacle_contrainer);
 
  private:
   Scenario current_scenario_;
