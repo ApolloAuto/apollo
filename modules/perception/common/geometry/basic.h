@@ -166,7 +166,7 @@ void ConvertCartesiantoPolarCoordinate(const PointT &xyz,
                                        typename PointT::Type *v_angle_in_degree,
                                        typename PointT::Type *dist) {
   using T = typename PointT::Type;
-  const T radius_to_degree = 180.0 / M_PI;
+  const T radian_to_degree = 180.0 / M_PI;
   const T x = xyz.x;
   const T y = xyz.y;
   const T z = xyz.z;
@@ -174,12 +174,12 @@ void ConvertCartesiantoPolarCoordinate(const PointT &xyz,
   (*dist) = sqrt(x * x + y * y + z * z);
   T dist_xy = sqrt(x * x + y * y);
 
-  (*h_angle_in_degree) = std::acos(x / dist_xy) * radius_to_degree;
+  (*h_angle_in_degree) = std::acos(x / dist_xy) * radian_to_degree;
   if (y < 0.0) {
     (*h_angle_in_degree) = 360.0 - (*h_angle_in_degree);
   }
 
-  (*v_angle_in_degree) = std::acos(dist_xy / (*dist)) * radius_to_degree;
+  (*v_angle_in_degree) = std::acos(dist_xy / (*dist)) * radian_to_degree;
   if (z < 0.0) {
     (*v_angle_in_degree) = -(*v_angle_in_degree);
   }
