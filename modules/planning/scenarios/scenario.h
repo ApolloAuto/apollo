@@ -48,9 +48,9 @@ class Scenario {
   virtual common::Status Process(
       const common::TrajectoryPoint& planning_init_point, Frame* frame) = 0;
 
-  virtual ScenarioConfig::ScenarioType Transfer(
-      const ScenarioConfig::ScenarioType& current_scenario,
-      const common::TrajectoryPoint& ego_point, const Frame& frame) const = 0;
+  virtual bool IsTransferable(const Scenario& current_scenario,
+                              const common::TrajectoryPoint& ego_point,
+                              const Frame& frame) const = 0;
 
  protected:
   bool is_init_ = false;

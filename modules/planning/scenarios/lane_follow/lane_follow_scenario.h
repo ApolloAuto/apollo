@@ -51,10 +51,9 @@ class LaneFollowScenario : public Scenario {
   common::Status Process(const common::TrajectoryPoint& planning_init_point,
                          Frame* frame) override;
 
-  ScenarioConfig::ScenarioType Transfer(
-      const ScenarioConfig::ScenarioType& current_scenario,
-      const common::TrajectoryPoint& ego_point,
-      const Frame& frame) const override;
+  bool IsTransferable(const Scenario& current_scenario,
+                      const common::TrajectoryPoint& ego_point,
+                      const Frame& frame) const override;
 
  private:
   void RegisterTasks();
