@@ -35,9 +35,9 @@ class CruiseScenarioFeatures : public ScenarioFeatures {
 
   virtual ~CruiseScenarioFeatures();
 
-  bool IsLaneOfInterest(const std::string lane_id) const;
+  bool IsLaneOfInterest(const std::string& lane_id) const;
 
-  void InsertLaneOfInterest(const std::string lane_id);
+  void InsertLaneOfInterest(const std::string& lane_id);
 
   void BuildCruiseScenarioFeatures(
       const EnvironmentFeatures& environment_features);
@@ -47,7 +47,6 @@ class CruiseScenarioFeatures : public ScenarioFeatures {
       const std::string& lane_id, const double start_lane_s,
       const double range);
 
- private:
   std::unordered_set<std::string> lane_ids_of_interest_;
 };
 

@@ -28,8 +28,8 @@
 namespace apollo {
 namespace prediction {
 
-using apollo::common::adapter::AdapterConfig;
-using apollo::common::math::Vec2d;
+using common::adapter::AdapterConfig;
+using common::math::Vec2d;
 
 ScenarioManager::ScenarioManager() {}
 
@@ -37,7 +37,13 @@ void ScenarioManager::Run() {
   FeatureExtractor feature_extractor;
   environment_features_ = feature_extractor.ExtractEnvironmentFeatures();
 
-  scenario_analyzer_.Analyze(environment_features_);
+  ptr_scenario_features_ =
+      std::move(ScenarioAnalyzer::Analyze(environment_features_));
+
+  if (ptr_scenario_features_ == nullptr) {
+    // TODO(all): add warning for unhandled scenarios
+  }
+
   if (FLAGS_enable_prioritize_obstacles) {
     PrioritizeObstacles();
   }
@@ -45,7 +51,8 @@ void ScenarioManager::Run() {
 }
 
 const Scenario& ScenarioManager::scenario() const {
-  return scenario_analyzer_.scenario();
+  CHECK(ptr_scenario_features_ != nullptr);
+  return ptr_scenario_features_->scenario();
 }
 
 void ScenarioManager::PrioritizeObstacles() {
@@ -56,13 +63,14 @@ void ScenarioManager::PrioritizeObstacles() {
     AERROR << "Null obstacles container found.";
     return;
   }
-  const std::vector<int>& obstacle_ids =
+
+  const auto& obstacle_ids =
       obstacles_container->GetCurrentFramePredictableObstacleIds();
-  for (const int obstacle_id : obstacle_ids) {
+  for (const int& obstacle_id : obstacle_ids) {
     Obstacle* obstacle_ptr = obstacles_container->GetObstacle(obstacle_id);
     PrioritizeObstacle(
         environment_features_,
-        scenario_analyzer_.GetScenarioFeatures(),
+        ptr_scenario_features_,
         obstacle_ptr);
   }
 }
@@ -71,7 +79,7 @@ void ScenarioManager::PrioritizeObstacle(
     const EnvironmentFeatures& environment_features,
     std::shared_ptr<ScenarioFeatures> scenario_features,
     Obstacle* obstacle_ptr) {
-  const auto& scenario_type = scenario_analyzer_.scenario().type();
+  const auto& scenario_type = ptr_scenario_features_->scenario().type();
   if (scenario_type == Scenario::CRUISE ||
       scenario_type == Scenario::CRUISE_URBAN ||
       scenario_type == Scenario::CRUISE_HIGHWAY) {

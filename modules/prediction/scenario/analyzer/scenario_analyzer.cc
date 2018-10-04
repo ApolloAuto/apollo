@@ -23,33 +23,29 @@
 namespace apollo {
 namespace prediction {
 
-ScenarioAnalyzer::ScenarioAnalyzer() : scenario_features_(nullptr) {}
-
-void ScenarioAnalyzer::Analyze(
+std::shared_ptr<ScenarioFeatures> ScenarioAnalyzer::Analyze(
     const EnvironmentFeatures& environment_features) {
+
+  Scenario_Type scenario_type;
+
   if (environment_features.has_front_junction() &&
       environment_features.GetFrontJunction().second <
           FLAGS_junction_distance_threshold) {
-    scenario_.set_type(Scenario::JUNCTION);
+    scenario_type = Scenario::JUNCTION;
   } else if (environment_features.has_ego_lane()) {
-    scenario_.set_type(Scenario::CRUISE);
+    scenario_type = Scenario::CRUISE;
   }
 
-  if (scenario_.type() == Scenario::CRUISE) {
-    std::shared_ptr<CruiseScenarioFeatures> cruise_scenario_features =
-        std::make_shared<CruiseScenarioFeatures>();
+  if (scenario_type == Scenario::CRUISE) {
+    std::shared_ptr<CruiseScenarioFeatures> cruise_scenario_features(
+        new CruiseScenarioFeatures());
+
     cruise_scenario_features->BuildCruiseScenarioFeatures(environment_features);
-    scenario_features_ = cruise_scenario_features;
+
+    return cruise_scenario_features;
+  } else {
+    return nullptr;
   }
-}
-
-const Scenario& ScenarioAnalyzer::scenario() const {
-  return scenario_;
-}
-
-std::shared_ptr<ScenarioFeatures>
-ScenarioAnalyzer::GetScenarioFeatures() {
-  return scenario_features_;
 }
 
 }  // namespace prediction

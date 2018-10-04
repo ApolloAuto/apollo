@@ -29,19 +29,17 @@ class ScenarioAnalyzerTest : public KMLMapBasedTest {};
 
 TEST_F(ScenarioAnalyzerTest, unknown) {
   EnvironmentFeatures environment_features;
-  ScenarioAnalyzer scenario_analyzer;
-  scenario_analyzer.Analyze(environment_features);
-  Scenario scenario = scenario_analyzer.scenario();
-  EXPECT_EQ(scenario.type(), Scenario::UNKNOWN);
+  auto ptr_scenario_features =
+      ScenarioAnalyzer::Analyze(environment_features);
+  EXPECT_EQ(ptr_scenario_features->scenario().type(), Scenario::UNKNOWN);
 }
 
 TEST_F(ScenarioAnalyzerTest, junction) {
   EnvironmentFeatures environment_features;
   environment_features.SetFrontJunction("1", 3.0);
-  ScenarioAnalyzer scenario_analyzer;
-  scenario_analyzer.Analyze(environment_features);
-  Scenario scenario = scenario_analyzer.scenario();
-  EXPECT_EQ(scenario.type(), Scenario::JUNCTION);
+  auto ptr_scenario_features =
+      ScenarioAnalyzer::Analyze(environment_features);
+  EXPECT_EQ(ptr_scenario_features->scenario().type(), Scenario::JUNCTION);
 }
 
 }  // namespace prediction

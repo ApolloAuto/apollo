@@ -30,15 +30,19 @@ using apollo::hdmap::LaneInfo;
 using ConstLaneInfoPtr = std::shared_ptr<const LaneInfo>;
 using apollo::hdmap::Lane;
 
-CruiseScenarioFeatures::CruiseScenarioFeatures() {}
+CruiseScenarioFeatures::CruiseScenarioFeatures() {
+  scenario_.set_type(Scenario::CRUISE);
+}
 
 CruiseScenarioFeatures::~CruiseScenarioFeatures() {}
 
-bool CruiseScenarioFeatures::IsLaneOfInterest(const std::string lane_id) const {
+bool CruiseScenarioFeatures::IsLaneOfInterest(
+    const std::string& lane_id) const {
   return lane_ids_of_interest_.find(lane_id) != lane_ids_of_interest_.end();
 }
 
-void CruiseScenarioFeatures::InsertLaneOfInterest(const std::string lane_id) {
+void CruiseScenarioFeatures::InsertLaneOfInterest(
+    const std::string& lane_id) {
   lane_ids_of_interest_.insert(lane_id);
 }
 
