@@ -43,7 +43,7 @@ class CruiseScenarioFeatures : public ScenarioFeatures {
       const EnvironmentFeatures& environment_features);
 
  private:
-  void SearchAndInsertLanes(
+  void SearchForwardAndInsert(
       const std::string& lane_id, const double start_lane_s,
       const double range);
 
