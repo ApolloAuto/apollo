@@ -23,8 +23,8 @@
 #include <algorithm>
 #include <utility>
 
-#include "modules/common/configs/vehicle_config_helper.h"
 #include "cybertron/common/log.h"
+#include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/cartesian_frenet_conversion.h"
 #include "modules/common/util/util.h"
 #include "modules/map/hdmap/hdmap_util.h"
@@ -44,6 +44,8 @@ bool SidePassWaypointSampler::SamplePathWaypoints(
     const common::TrajectoryPoint &init_point,
     std::vector<std::vector<common::SLPoint>> *const points) {
   CHECK_NOTNULL(points);
+  points->clear();
+  points->insert(points->begin(), std::vector<common::SLPoint>{init_sl_point_});
 
   const float kMinSampleDistance = 40.0;
   const float total_length = std::fmin(

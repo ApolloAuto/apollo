@@ -87,7 +87,7 @@ bool DpRoadGraph::FindPathTunnel(
     return false;
   }
   std::vector<common::FrenetFramePoint> frenet_path;
-  float accumulated_s = init_sl_point_.s();
+  float accumulated_s = min_cost_path.front().sl_point.s();
   const float path_resolution = config_.path_resolution();
 
   for (std::size_t i = 1; i < min_cost_path.size(); ++i) {
@@ -133,8 +133,6 @@ bool DpRoadGraph::GenerateMinCostPath(
            << reference_line_.Length();
     return false;
   }
-  path_waypoints.insert(path_waypoints.begin(),
-                        std::vector<common::SLPoint>{init_sl_point_});
   const auto &vehicle_config =
       common::VehicleConfigHelper::Instance()->GetConfig();
 
@@ -143,8 +141,19 @@ bool DpRoadGraph::GenerateMinCostPath(
       obstacles, vehicle_config.vehicle_param(), speed_data_, init_sl_point_);
 
   std::list<std::list<DpRoadGraphNode>> graph_nodes;
+
+  // find one point from first row
+  const auto &first_row = path_waypoints.front();
+  int nearest_i = 0;
+  for (std::size_t i = 1; i < first_row.size(); ++i) {
+    if (std::fabs(first_row[i].l() - init_sl_point_.l()) <
+        std::fabs(first_row[nearest_i].l() - init_sl_point_.l())) {
+      nearest_i = i;
+    }
+  }
   graph_nodes.emplace_back();
-  graph_nodes.back().emplace_back(init_sl_point_, nullptr, ComparableCost());
+  graph_nodes.back().emplace_back(first_row[nearest_i], nullptr,
+                                  ComparableCost());
   auto &front = graph_nodes.front().front();
   size_t total_level = path_waypoints.size();
 
