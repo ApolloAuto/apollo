@@ -19,9 +19,9 @@ proto_library(
         ":decision_proto_lib",
         ":planning_internal_proto_lib",
         "//modules/canbus/proto:canbus_proto_lib",
-        "//modules/common/proto:geometry_proto_lib",
         "//modules/common/proto:drive_state_proto_lib",
         "//modules/common/proto:error_code_proto_lib",
+        "//modules/common/proto:geometry_proto_lib",
         "//modules/common/proto:header_proto_lib",
         "//modules/common/proto:pnc_point_proto_lib",
         "//modules/common/proto:vehicle_signal_proto_lib",
@@ -102,6 +102,20 @@ proto_library(
 )
 
 cc_proto_library(
+    name = "proceed_with_caution_speed_config_proto",
+    deps = [
+        ":proceed_with_caution_speed_config_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "proceed_with_caution_speed_config_proto_lib",
+    srcs = [
+        "proceed_with_caution_speed_config.proto",
+    ],
+)
+
+cc_proto_library(
     name = "navi_path_decider_config_proto",
     deps = [
         ":navi_path_decider_config_proto_lib",
@@ -163,6 +177,7 @@ proto_library(
         ":navi_speed_decider_config_proto_lib",
         ":planner_open_space_config_proto_lib",
         ":poly_st_speed_config_proto_lib",
+        ":proceed_with_caution_speed_config_proto_lib",
         ":qp_spline_path_config_proto_lib",
         ":qp_st_speed_config_proto_lib",
         ":reference_line_smoother_config_proto_lib",
@@ -321,9 +336,9 @@ proto_library(
     deps = [
         ":decision_proto_lib",
         ":planning_proto_lib",
-        "//modules/routing/proto:routing_proto_lib",
-        "//modules/common/proto:geometry_proto_lib",
         "//modules/common/proto:drive_state_proto_lib",
+        "//modules/common/proto:geometry_proto_lib",
+        "//modules/routing/proto:routing_proto_lib",
     ],
 )
 
