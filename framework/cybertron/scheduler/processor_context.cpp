@@ -52,7 +52,7 @@ void ProcessorContext::Notify(uint64_t routine_id) {
   auto routine = cr_map_[routine_id];
   {
     auto lock = routine->GetLock();
-    lock.lock();
+    lock.try_lock();
     if (routine->state() == RoutineState::DATA_WAIT) {
       routine->set_state(RoutineState::READY);
     }
