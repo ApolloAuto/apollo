@@ -115,9 +115,6 @@ int main(int argc, char **argv) {
     return -1;
   }
   auto channel_info = ChannelInfo::Instance();
-  std::cout << "Info of ros bag file" << std::endl;
-  std::string command_line = "rosbag info " + rosbag_file_name;
-  system(command_line.c_str());
 
   auto record_writer =
       std::make_shared<apollo::cybertron::record::RecordWriter>();
@@ -318,7 +315,7 @@ int main(int argc, char **argv) {
   record_writer->Close();
   record_writer = nullptr;
   std::cout << "Info of record file" << std::endl;
-  command_line = "cyber_recorder info -f " + record_file_name;
+  std::string command_line = "cyber_recorder info -f " + record_file_name;
   system(command_line.c_str());
 
   std::cout << "Convertion finished! Took " << ros::Time::now() - start_time
