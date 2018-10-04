@@ -412,6 +412,23 @@ class Renderer {
 
         return geo;
     }
+
+    getMouseOverLanes(event) {
+        const canvasPosition = event.currentTarget.getBoundingClientRect();
+        const mouse = new THREE.Vector3(
+            ((event.clientX - canvasPosition.left) / this.dimension.width) * 2 - 1,
+            -((event.clientY - canvasPosition.top) / this.dimension.height) * 2 + 1,
+            0);
+
+        const raycaster = new THREE.Raycaster();
+        raycaster.setFromCamera( mouse, this.camera );
+        const objects = this.map.data['lane'].reduce((result,current) => {
+            return result.concat(current.drewObjects);
+        }, []);
+        const intersects = raycaster.intersectObjects(objects);
+        const names = intersects.map(intersect => intersect.object.name);
+        return names;
+    }
 }
 
 const RENDERER = new Renderer();

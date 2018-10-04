@@ -60,6 +60,8 @@ export default class Options {
     @observable showMapRoad = PARAMETERS.options.defaults.showMapRoad;
     @observable showMapSignal = PARAMETERS.options.defaults.showMapSignal;
     @observable showMapStopSign = PARAMETERS.options.defaults.showMapStopSign;
+    @observable showMapSpeedBump = PARAMETERS.options.defaults.showMapSpeedBump;
+    @observable showMapParkingSpace = PARAMETERS.options.defaults.showMapParkingSpace;
 
     // Others
     @observable showPNCMonitor = PARAMETERS.options.defaults.showPNCMonitor;

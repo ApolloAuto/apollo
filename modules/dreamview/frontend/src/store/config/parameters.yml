@@ -85,6 +85,8 @@ options:
     showMapRoad: false
     showMapSignal: true
     showMapStopSign: true
+    showMapSpeedBump: true
+    showMapParkingSpace: true
     cameraAngle: Default
 
 navigation:
