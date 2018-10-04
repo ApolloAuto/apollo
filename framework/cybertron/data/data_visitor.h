@@ -28,11 +28,17 @@
 #include "cybertron/data/data_visitor_base.h"
 #include "cybertron/data/fusion/all_latest.h"
 #include "cybertron/data/fusion/data_fusion.h"
-#include "cybertron/node/reader_base.h"
 
 namespace apollo {
 namespace cybertron {
 namespace data {
+
+struct VisitorConfig {
+  VisitorConfig(uint64_t id, uint32_t size)
+      : channel_id(id), queue_size(size) {}
+  uint64_t channel_id;
+  uint32_t queue_size;
+};
 
 template <typename T>
 using BufferType = CacheBuffer<std::shared_ptr<T>>;
@@ -41,20 +47,20 @@ template <typename M0, typename M1 = NullType, typename M2 = NullType,
           typename M3 = NullType>
 class DataVisitor : public DataVisitorBase {
  public:
-  explicit DataVisitor(const std::vector<std::shared_ptr<ReaderBase>>& readers)
-      : buffer_m0_(readers[0]->ChannelId(),
-                   new BufferType<M0>(readers[0]->PendingQueueSize())),
-        buffer_m1_(readers[1]->ChannelId(),
-                   new BufferType<M1>(readers[1]->PendingQueueSize())),
-        buffer_m2_(readers[2]->ChannelId(),
-                   new BufferType<M2>(readers[2]->PendingQueueSize())),
-        buffer_m3_(readers[3]->ChannelId(),
-                   new BufferType<M3>(readers[3]->PendingQueueSize())) {
+  explicit DataVisitor(const std::vector<VisitorConfig>& configs)
+      : buffer_m0_(configs[0].channel_id,
+                   new BufferType<M0>(configs[0].queue_size)),
+        buffer_m1_(configs[1].channel_id,
+                   new BufferType<M1>(configs[1].queue_size)),
+        buffer_m2_(configs[2].channel_id,
+                   new BufferType<M2>(configs[2].queue_size)),
+        buffer_m3_(configs[3].channel_id,
+                   new BufferType<M3>(configs[3].queue_size)) {
     DataDispatcher<M0>::Instance()->AddBuffer(buffer_m0_);
     DataDispatcher<M1>::Instance()->AddBuffer(buffer_m1_);
     DataDispatcher<M2>::Instance()->AddBuffer(buffer_m2_);
     DataDispatcher<M3>::Instance()->AddBuffer(buffer_m3_);
-    data_notifier_->AddNotifier(buffer_m0_.ChannelId(), notifier_);
+    data_notifier_->AddNotifier(buffer_m0_.channel_id(), notifier_);
     data_fusion_ = new fusion::AllLatest<M0, M1, M2, M3>(
         buffer_m0_, buffer_m1_, buffer_m2_, buffer_m3_);
   }
@@ -79,17 +85,17 @@ class DataVisitor : public DataVisitorBase {
 template <typename M0, typename M1, typename M2>
 class DataVisitor<M0, M1, M2, NullType> : public DataVisitorBase {
  public:
-  explicit DataVisitor(const std::vector<std::shared_ptr<ReaderBase>>& readers)
-      : buffer_m0_(readers[0]->ChannelId(),
-                   new BufferType<M0>(readers[0]->PendingQueueSize())),
-        buffer_m1_(readers[1]->ChannelId(),
-                   new BufferType<M1>(readers[1]->PendingQueueSize())),
-        buffer_m2_(readers[2]->ChannelId(),
-                   new BufferType<M2>(readers[2]->PendingQueueSize())) {
+  explicit DataVisitor(const std::vector<VisitorConfig>& configs)
+      : buffer_m0_(configs[0].channel_id,
+                   new BufferType<M0>(configs[0].queue_size)),
+        buffer_m1_(configs[1].channel_id,
+                   new BufferType<M1>(configs[1].queue_size)),
+        buffer_m2_(configs[2].channel_id,
+                   new BufferType<M2>(configs[2].queue_size)) {
     DataDispatcher<M0>::Instance()->AddBuffer(buffer_m0_);
     DataDispatcher<M1>::Instance()->AddBuffer(buffer_m1_);
     DataDispatcher<M2>::Instance()->AddBuffer(buffer_m2_);
-    data_notifier_->AddNotifier(buffer_m0_.ChannelId(), notifier_);
+    data_notifier_->AddNotifier(buffer_m0_.channel_id(), notifier_);
     data_fusion_ =
         new fusion::AllLatest<M0, M1, M2>(buffer_m0_, buffer_m1_, buffer_m2_);
   }
@@ -119,14 +125,14 @@ class DataVisitor<M0, M1, M2, NullType> : public DataVisitorBase {
 template <typename M0, typename M1>
 class DataVisitor<M0, M1, NullType, NullType> : public DataVisitorBase {
  public:
-  explicit DataVisitor(const std::vector<std::shared_ptr<ReaderBase>>& readers)
-      : buffer_m0_(readers[0]->ChannelId(),
-                   new BufferType<M0>(readers[0]->PendingQueueSize())),
-        buffer_m1_(readers[1]->ChannelId(),
-                   new BufferType<M1>(readers[1]->PendingQueueSize())) {
+  explicit DataVisitor(const std::vector<VisitorConfig>& configs)
+      : buffer_m0_(configs[0].channel_id,
+                   new BufferType<M0>(configs[0].queue_size)),
+        buffer_m1_(configs[1].channel_id,
+                   new BufferType<M1>(configs[1].queue_size)) {
     DataDispatcher<M0>::Instance()->AddBuffer(buffer_m0_);
     DataDispatcher<M1>::Instance()->AddBuffer(buffer_m1_);
-    data_notifier_->AddNotifier(buffer_m0_.ChannelId(), notifier_);
+    data_notifier_->AddNotifier(buffer_m0_.channel_id(), notifier_);
     data_fusion_ = new fusion::AllLatest<M0, M1>(buffer_m0_, buffer_m1_);
   }
 
@@ -153,17 +159,16 @@ class DataVisitor<M0, M1, NullType, NullType> : public DataVisitorBase {
 template <typename M0>
 class DataVisitor<M0, NullType, NullType, NullType> : public DataVisitorBase {
  public:
-  explicit DataVisitor(const std::shared_ptr<ReaderBase>& readers)
-      : buffer_(readers->ChannelId(),
-                new BufferType<M0>(readers->PendingQueueSize())) {
+  explicit DataVisitor(const VisitorConfig& configs)
+      : buffer_(configs.channel_id, new BufferType<M0>(configs.queue_size)) {
     DataDispatcher<M0>::Instance()->AddBuffer(buffer_);
-    data_notifier_->AddNotifier(buffer_.ChannelId(), notifier_);
+    data_notifier_->AddNotifier(buffer_.channel_id(), notifier_);
   }
 
   DataVisitor(uint64_t channel_id, uint32_t queue_size)
       : buffer_(channel_id, new BufferType<M0>(queue_size)) {
     DataDispatcher<M0>::Instance()->AddBuffer(buffer_);
-    data_notifier_->AddNotifier(buffer_.ChannelId(), notifier_);
+    data_notifier_->AddNotifier(buffer_.channel_id(), notifier_);
   }
 
   bool TryFetch(std::shared_ptr<M0>& m0) {  // NOLINT

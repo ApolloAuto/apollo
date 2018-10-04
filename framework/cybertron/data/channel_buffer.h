@@ -46,7 +46,7 @@ class ChannelBuffer {
 
   bool FetchMulti(uint64_t fetch_size, std::vector<std::shared_ptr<T>>* vec);
 
-  uint64_t ChannelId() const { return channel_id_; }
+  uint64_t channel_id() const { return channel_id_; }
   std::shared_ptr<BufferType> Buffer() const { return buffer_; }
 
  private:

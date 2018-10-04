@@ -17,8 +17,10 @@
 #ifndef CYBERTRON_TASK_TASK_MANAGER_H_
 #define CYBERTRON_TASK_TASK_MANAGER_H_
 
+#include <future>
 #include <memory>
 #include <string>
+#include <type_traits>
 
 #include "cybertron/base/bounded_queue.h"
 #include "cybertron/scheduler/scheduler.h"

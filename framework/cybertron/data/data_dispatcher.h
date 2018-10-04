@@ -63,11 +63,11 @@ void DataDispatcher<T>::AddBuffer(const ChannelBuffer<T>& channel_buffer) {
   std::lock_guard<std::mutex> lock(buffers_map_mutex_);
   auto buffer = channel_buffer.Buffer();
   BufferVector* buffers = nullptr;
-  if (buffers_map_.Get(channel_buffer.ChannelId(), &buffers)) {
+  if (buffers_map_.Get(channel_buffer.channel_id(), &buffers)) {
     buffers->emplace_back(buffer);
   } else {
     BufferVector new_buffers = {buffer};
-    buffers_map_.Set(channel_buffer.ChannelId(), new_buffers);
+    buffers_map_.Set(channel_buffer.channel_id(), new_buffers);
   }
 }
 

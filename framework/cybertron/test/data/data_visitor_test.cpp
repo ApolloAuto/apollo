@@ -26,18 +26,14 @@ void DispatchMessage(uint64_t channel_id, int num) {
   }
 }
 
-std::vector<std::shared_ptr<ReaderBase>> InitReaders(int num) {
-  cybertron::Init();
-  auto node = CreateNode("data_visitor_test");
-  std::vector<std::shared_ptr<ReaderBase>> readers;
+std::vector<VisitorConfig> InitConfigs(int num) {
+  std::vector<VisitorConfig> configs;
   for (int i = 0; i < num; ++i) {
-    ReaderConfig reader_cfg;
-    reader_cfg.channel_name = "/channel" + std::to_string(i);
-    reader_cfg.pending_queue_size = 10;
-    auto reader = node->CreateReader<RawMessage>(reader_cfg);
-    readers.emplace_back(reader);
+    uint64_t channel_id = str_hash("/channel" + std::to_string(i));
+    uint32_t queue_size = 10;
+    configs.emplace_back(channel_id, queue_size);
   }
-  return readers;
+  return configs;
 }
 
 TEST(DataVisitorTest, one_channel) {
@@ -57,7 +53,7 @@ TEST(DataVisitorTest, one_channel) {
 
 TEST(DataVisitorTest, two_channel) {
   auto dv =
-      std::make_shared<DataVisitor<RawMessage, RawMessage>>(InitReaders(2));
+      std::make_shared<DataVisitor<RawMessage, RawMessage>>(InitConfigs(2));
 
   DispatchMessage(channel0, 1);
   std::shared_ptr<RawMessage> msg0;
@@ -74,7 +70,7 @@ TEST(DataVisitorTest, two_channel) {
 
 TEST(DataVisitorTest, three_channel) {
   auto dv = std::make_shared<DataVisitor<RawMessage, RawMessage, RawMessage>>(
-      InitReaders(3));
+      InitConfigs(3));
 
   DispatchMessage(channel0, 1);
   std::shared_ptr<RawMessage> msg0;
@@ -95,7 +91,7 @@ TEST(DataVisitorTest, three_channel) {
 TEST(DataVisitorTest, four_channel) {
   auto dv = std::make_shared<
       DataVisitor<RawMessage, RawMessage, RawMessage, RawMessage>>(
-      InitReaders(4));
+      InitConfigs(4));
 
   DispatchMessage(channel0, 1);
   std::shared_ptr<RawMessage> msg0;

@@ -16,6 +16,7 @@
 
 #include "cybertron/task/task_manager.h"
 
+#include "cybertron/common/global_data.h"
 #include "cybertron/croutine/croutine.h"
 #include "cybertron/croutine/routine_factory.h"
 #include "cybertron/scheduler/scheduler.h"
@@ -48,7 +49,7 @@ TaskManager::TaskManager()
   tasks_.reserve(num_threads_);
   for (int i = 0; i < num_threads_; i++) {
     auto task_name = task_prefix + std::to_string(i);
-    tasks_.push_back(GlobalData::RegisterTaskName(task_name));
+    tasks_.push_back(data::GlobalData::RegisterTaskName(task_name));
     scheduler::Scheduler::Instance()->CreateTask(factory, task_name);
   }
 }
