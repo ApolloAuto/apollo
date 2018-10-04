@@ -24,12 +24,13 @@ namespace apollo {
 namespace drivers {
 namespace velodyne {
 
-bool Compensator::QueryPoseAffineFromTF2(
-    const uint64_t& timestamp, void* pose, const std::string& child_frame_id) {
+bool Compensator::QueryPoseAffineFromTF2(const uint64_t& timestamp, void* pose,
+                                         const std::string& child_frame_id) {
   cybertron::Time query_time(timestamp);
   std::string err_string;
-  if (!tf2_buffer_ptr_->canTransform(config_.world_frame_id(), child_frame_id, query_time, 
-				     config_.transform_query_timeout(), &err_string)) {
+  if (!tf2_buffer_ptr_->canTransform(
+          config_.world_frame_id(), child_frame_id, query_time,
+          config_.transform_query_timeout(), &err_string)) {
     AERROR << "Can not find transform. " << timestamp
            << " frame_id:" << child_frame_id << " Error info: " << err_string;
     return false;
@@ -38,8 +39,8 @@ bool Compensator::QueryPoseAffineFromTF2(
   apollo::transform::TransformStamped stamped_transform;
 
   try {
-    stamped_transform =
-        tf2_buffer_ptr_->lookupTransform(config_.world_frame_id(), child_frame_id, query_time);
+    stamped_transform = tf2_buffer_ptr_->lookupTransform(
+        config_.world_frame_id(), child_frame_id, query_time);
   } catch (tf2::TransformException& ex) {
     AERROR << ex.what();
     return false;
@@ -90,7 +91,7 @@ bool Compensator::MotionCompensation(
     AINFO << "compenstator tf msg diff:" << tf_time - new_time
           << ";meta:" << msg->header().lidar_timestamp();
     MotionCompensation(msg, msg_compensated, timestamp_min, timestamp_max,
-                        pose_min_time, pose_max_time);
+                       pose_min_time, pose_max_time);
     uint64_t com_time = cybertron::Time().Now().ToNanosecond();
 
     msg_compensated->set_width(msg_compensated->point_size() / msg->height());
@@ -157,8 +158,8 @@ void Compensator::MotionCompensation(
       float x_scalar = point.x();
       if (std::isnan(x_scalar)) {
         // if (config_.organized()) {
-          auto* point_new = msg_compensated->add_point();
-          point_new->CopyFrom(point);
+        auto* point_new = msg_compensated->add_point();
+        point_new->CopyFrom(point);
         // } else {
         //   AERROR << "nan point do not need motion compensation";
         // }

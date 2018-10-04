@@ -16,22 +16,21 @@
 
 #include <memory>
 
-#include "modules/drivers/velodyne/compensator/velodyne_compensator_component.h"
+#include "modules/drivers/velodyne/compensator/compensator_component.h"
 #include "modules/drivers/velodyne/proto/velodyne.pb.h"
 
 namespace apollo {
 namespace drivers {
 namespace velodyne {
 
-bool VelodyneCompensatorComponent::Init() {
+bool CompensatorComponent::Init() {
   CompensatorConfig config;
   if (!GetProtoConfig(&config)) {
     AWARN << "Load config failed, config file" << ConfigFilePath();
     return false;
   }
 
-  writer_ = node_->CreateWriter<PointCloud>(
-      config.output_channel());
+  writer_ = node_->CreateWriter<PointCloud>(config.output_channel());
 
   _compensator.reset(new Compensator(config));
 
@@ -46,7 +45,7 @@ bool VelodyneCompensatorComponent::Init() {
   return true;
 }
 
-bool VelodyneCompensatorComponent::Proc(
+bool CompensatorComponent::Proc(
     const std::shared_ptr<PointCloud>& point_cloud) {
   uint64_t start = cybertron::Time().Now().ToNanosecond();
   if (index_ >= queue_size_) {

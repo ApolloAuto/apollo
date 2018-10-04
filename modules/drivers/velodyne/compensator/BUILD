@@ -4,15 +4,15 @@ package(default_visibility = ["//visibility:public"])
 
 cc_binary(
     name = "libvelodyne_compensator_component.so",
-    deps = [":velodyne_compensator_component_lib"],
+    deps = [":compensator_component_lib"],
     linkopts = ["-shared"],
     linkstatic = False,
 )
 
 cc_library(
-    name = "velodyne_compensator_component_lib",
-    srcs = ["velodyne_compensator_component.cc"],
-    hdrs = ["velodyne_compensator_component.h"],
+    name = "compensator_component_lib",
+    srcs = ["compensator_component.cc"],
+    hdrs = ["compensator_component.h"],
     deps = [
         "//modules/drivers/velodyne/compensator:compensator_lib",
         "//framework:cybertron",

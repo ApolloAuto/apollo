@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_DRIVERS_VELODYNE_COMPENSATOR_VELODYNE_COMPENSATOR_COMPONENT_H_
-#define MODULES_DRIVERS_VELODYNE_COMPENSATOR_VELODYNE_COMPENSATOR_COMPONENT_H_
+#ifndef MODULES_DRIVERS_VELODYNE_COMPENSATOR_COMPENSATOR_COMPONENT_H_
+#define MODULES_DRIVERS_VELODYNE_COMPENSATOR_COMPENSATOR_COMPONENT_H_
 
 #include <memory>
 #include <vector>
@@ -34,7 +34,7 @@ using apollo::cybertron::Reader;
 using apollo::cybertron::Writer;
 using apollo::drivers::PointCloud;
 
-class VelodyneCompensatorComponent : public Component<PointCloud> {
+class CompensatorComponent : public Component<PointCloud> {
  public:
   bool Init() override;
   bool Proc(const std::shared_ptr<PointCloud>& point_cloud) override;
@@ -48,9 +48,9 @@ class VelodyneCompensatorComponent : public Component<PointCloud> {
   std::shared_ptr<Writer<PointCloud>> writer_ = nullptr;
 };
 
-CYBERTRON_REGISTER_COMPONENT(VelodyneCompensatorComponent)
+CYBERTRON_REGISTER_COMPONENT(CompensatorComponent)
 }  // namespace velodyne
 }  // namespace drivers
 }  // namespace apollo
 
-#endif  // MODULES_DRIVERS_VELODYNE_COMPENSATOR_VELODYNE_COMPENSATOR_COMPONENT_H_
+#endif  // MODULES_DRIVERS_VELODYNE_COMPENSATOR_COMPENSATOR_COMPONENT_H_
