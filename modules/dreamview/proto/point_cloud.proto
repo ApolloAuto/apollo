@@ -3,5 +3,5 @@ syntax = "proto2";
 package apollo.dreamview;
 
 message PointCloud {
-  repeated float num = 1;
+  repeated float num = 1 [packed = true];
 }

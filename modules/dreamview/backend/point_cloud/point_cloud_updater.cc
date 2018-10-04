@@ -18,27 +18,28 @@
 
 #include <utility>
 
-#include "modules/common/adapters/adapter_manager.h"
 #include "cybertron/common/log.h"
+#include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/time/time.h"
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
 #include "modules/dreamview/proto/point_cloud.pb.h"
 #include "pcl/filters/voxel_grid.h"
-#include "pcl_conversions/pcl_conversions.h"
 #include "third_party/json/json.hpp"
 
 namespace apollo {
 namespace dreamview {
 
-using apollo::common::adapter::AdapterManager;
 using apollo::common::time::Clock;
 using apollo::localization::LocalizationEstimate;
-using sensor_msgs::PointCloud2;
 using Json = nlohmann::json;
 
 PointCloudUpdater::PointCloudUpdater(WebSocketHandler *websocket)
-    : websocket_(websocket), point_cloud_str_(""), future_ready_(true) {
+    : node_(cybertron::CreateNode("point_cloud")),
+      websocket_(websocket),
+      point_cloud_str_(""),
+      future_ready_(true) {
   RegisterMessageHandlers();
+  InitReaders();
 }
 
 PointCloudUpdater::~PointCloudUpdater() { Stop(); }
@@ -89,11 +90,17 @@ void PointCloudUpdater::RegisterMessageHandlers() {
       });
 }
 
-void PointCloudUpdater::Start() {
-  AdapterManager::AddPointCloudCallback(&PointCloudUpdater::UpdatePointCloud,
-                                        this);
-  AdapterManager::AddLocalizationCallback(
-      &PointCloudUpdater::UpdateLocalizationTime, this);
+void PointCloudUpdater::InitReaders() {
+  localization_reader_ = node_->CreateReader<LocalizationEstimate>(
+      FLAGS_localization_topic,
+      [this](const std::shared_ptr<LocalizationEstimate> &msg) {
+        UpdateLocalizationTime(msg);
+      });
+  point_cloud_reader_ = node_->CreateReader<drivers::PointCloud>(
+      FLAGS_pointcloud_topic,
+      [this](const std::shared_ptr<drivers::PointCloud> &msg) {
+        UpdatePointCloud(msg);
+      });
 }
 
 void PointCloudUpdater::Stop() {
@@ -102,22 +109,38 @@ void PointCloudUpdater::Stop() {
   }
 }
 
-void PointCloudUpdater::UpdatePointCloud(const PointCloud2 &point_cloud) {
+void PointCloudUpdater::UpdatePointCloud(
+    const std::shared_ptr<drivers::PointCloud> &point_cloud) {
   if (!enabled_) {
     return;
   }
 
-  last_point_cloud_time_ = point_cloud.header.stamp.toSec();
+  last_point_cloud_time_ = point_cloud->header().timestamp_sec();
   // Check if last filter process has finished before processing new data.
   if (future_ready_) {
     future_ready_ = false;
-    // transform from ros to pcl
+    // transform from drivers::PointCloud to pcl::PointCloud
     pcl::PointCloud<pcl::PointXYZ>::Ptr pcl_ptr(
         new pcl::PointCloud<pcl::PointXYZ>);
-    pcl::fromROSMsg(point_cloud, *pcl_ptr);
+    pcl_ptr->width = point_cloud->width();
+    pcl_ptr->height = point_cloud->height();
+    pcl_ptr->is_dense = false;
+    pcl_ptr->points.resize(pcl_ptr->width * pcl_ptr->height);
+
+    if (pcl_ptr->width == 0 || pcl_ptr->height == 0) {
+      pcl_ptr->width = 1;
+      pcl_ptr->height = point_cloud->point_size();
+      pcl_ptr->points.resize(point_cloud->point_size());
+    }
+
+    for (size_t i = 0; i < pcl_ptr->points.size(); ++i) {
+      pcl_ptr->points[i].x = point_cloud->point(i).x();
+      pcl_ptr->points[i].y = point_cloud->point(i).y();
+      pcl_ptr->points[i].z = point_cloud->point(i).z();
+    }
     std::future<void> f =
-        std::async(std::launch::async, &PointCloudUpdater::FilterPointCloud,
-                   this, pcl_ptr);
+        cybertron::Async(&PointCloudUpdater::FilterPointCloud,
+                         this, pcl_ptr);
     async_future_ = std::move(f);
   }
 }
@@ -133,7 +156,7 @@ void PointCloudUpdater::FilterPointCloud(
   voxel_grid.filter(*pcl_filtered_ptr);
   AINFO << "filtered point cloud data size: " << pcl_filtered_ptr->size();
 
-  PointCloud point_cloud_pb;
+  apollo::dreamview::PointCloud point_cloud_pb;
   for (size_t idx = 0; idx < pcl_filtered_ptr->size(); ++idx) {
     pcl::PointXYZ &pt = pcl_filtered_ptr->points[idx];
     if (!std::isnan(pt.x) && !std::isnan(pt.y) && !std::isnan(pt.z)) {
@@ -152,8 +175,8 @@ void PointCloudUpdater::FilterPointCloud(
 }
 
 void PointCloudUpdater::UpdateLocalizationTime(
-    const LocalizationEstimate &localization) {
-  last_localization_time_ = localization.header().timestamp_sec();
+    const std::shared_ptr<LocalizationEstimate> &localization) {
+  last_localization_time_ = localization->header().timestamp_sec();
 }
 
 }  // namespace dreamview

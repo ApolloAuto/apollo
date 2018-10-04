@@ -29,12 +29,13 @@
 #include "boost/thread/shared_mutex.hpp"
 
 #include "cybertron/common/log.h"
+#include "cybertron/cybertron.h"
 #include "modules/common/util/string_util.h"
 #include "modules/dreamview/backend/handlers/websocket_handler.h"
+#include "modules/drivers/proto/pointcloud.pb.h"
 #include "modules/localization/proto/localization.pb.h"
 #include "pcl/point_cloud.h"
 #include "pcl/point_types.h"
-#include "sensor_msgs/PointCloud2.h"
 
 /**
  * @namespace apollo::dreamview
@@ -61,18 +62,23 @@ class PointCloudUpdater {
   /**
    * @brief Starts to push PointCloud to frontend.
    */
-  void Start();
   void Stop();
 
  private:
   void RegisterMessageHandlers();
 
-  void UpdatePointCloud(const sensor_msgs::PointCloud2 &point_cloud);
+  void InitReaders();
+
+  void UpdatePointCloud(
+      const std::shared_ptr<drivers::PointCloud> &point_cloud);
 
   void FilterPointCloud(pcl::PointCloud<pcl::PointXYZ>::Ptr pcl_ptr);
 
   void UpdateLocalizationTime(
-      const apollo::localization::LocalizationEstimate &localization);
+      const std::shared_ptr<apollo::localization::LocalizationEstimate>
+          &localization);
+
+  std::unique_ptr<cybertron::Node> node_;
 
   WebSocketHandler *websocket_;
 
@@ -86,6 +92,12 @@ class PointCloudUpdater {
   boost::shared_mutex mutex_;
   std::future<void> async_future_;
   std::atomic<bool> future_ready_;
+
+  // Cybertron messsage readers.
+  std::shared_ptr<cybertron::Reader<apollo::localization::LocalizationEstimate>>
+      localization_reader_;
+  std::shared_ptr<cybertron::Reader<drivers::PointCloud>>
+      point_cloud_reader_;
 
   double last_point_cloud_time_ = 0.0;
   double last_localization_time_ = 0.0;
