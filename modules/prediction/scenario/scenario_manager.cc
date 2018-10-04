@@ -66,7 +66,7 @@ void ScenarioManager::PrioritizeObstacles(
   for (const int& obstacle_id : obstacle_ids) {
     Obstacle* obstacle_ptr = obstacles_container->GetObstacle(obstacle_id);
     PrioritizeObstacle(
-        environment_features_,
+        environment_features,
         ptr_scenario_features,
         obstacle_ptr);
   }
@@ -74,7 +74,7 @@ void ScenarioManager::PrioritizeObstacles(
 
 void ScenarioManager::PrioritizeObstacle(
     const EnvironmentFeatures& environment_features,
-    std::shared_ptr<ScenarioFeatures> scenario_features,
+    const std::shared_ptr<ScenarioFeatures> scenario_features,
     Obstacle* obstacle_ptr) {
   const auto& scenario_type = scenario_features->scenario().type();
   if (scenario_type == Scenario::CRUISE ||
@@ -92,7 +92,7 @@ void ScenarioManager::PrioritizeObstacle(
 
 void ScenarioManager::PrioritizeObstacleInCruise(
     const EnvironmentFeatures& environment_features,
-    std::shared_ptr<CruiseScenarioFeatures> cruise_scenario_features,
+    const std::shared_ptr<CruiseScenarioFeatures> cruise_scenario_features,
     Obstacle* obstacle_ptr) {
   if (obstacle_ptr->history_size() == 0) {
     AERROR << "Obstacle [" << obstacle_ptr->id() << "] has no feature.";
