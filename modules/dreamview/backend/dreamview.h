@@ -27,8 +27,8 @@
 #include "modules/dreamview/backend/handlers/websocket_handler.h"
 #include "modules/dreamview/backend/hmi/hmi.h"
 #include "modules/dreamview/backend/map/map_service.h"
-// #include "modules/dreamview/backend/point_cloud/point_cloud_updater.h"
-// #include "modules/dreamview/backend/sim_control/sim_control.h"
+#include "modules/dreamview/backend/point_cloud/point_cloud_updater.h"
+#include "modules/dreamview/backend/sim_control/sim_control.h"
 #include "modules/dreamview/backend/simulation_world/simulation_world_updater.h"
 
 /**
@@ -52,7 +52,7 @@ class Dreamview {
   std::unique_ptr<cybertron::Timer> exit_timer_;
 
   std::unique_ptr<SimulationWorldUpdater> sim_world_updater_;
-  // std::unique_ptr<PointCloudUpdater> point_cloud_updater_;
+  std::unique_ptr<PointCloudUpdater> point_cloud_updater_;
   std::unique_ptr<SimControl> sim_control_;
   std::unique_ptr<CivetServer> server_;
   std::unique_ptr<WebSocketHandler> websocket_;
