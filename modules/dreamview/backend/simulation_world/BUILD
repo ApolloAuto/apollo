@@ -12,14 +12,14 @@ cc_library(
     ],
     copts = ['-DMODULE_NAME=\\"dreamview\\"'],
     deps = [
-        "//modules/canbus/proto:canbus_proto",
         "//framework:cybertron",
+        "//modules/canbus/proto:canbus_proto",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/math:quaternion",
         "//modules/common/monitor_log",
-        "//modules/common/proto:geometry_proto",
         "//modules/common/proto:drive_event_proto",
+        "//modules/common/proto:geometry_proto",
         "//modules/common/util",
         "//modules/common/util:map_util",
         "//modules/common/util:points_downsampler",
@@ -31,11 +31,10 @@ cc_library(
         "//modules/localization/proto:gps_proto",
         "//modules/localization/proto:localization_proto",
         "//modules/map/hdmap:hdmap_util",
-        "//modules/planning/proto:planning_proto",
         "//modules/perception/proto:perception_proto",
+        "//modules/planning/proto:planning_proto",
         "//modules/prediction/proto:prediction_proto",
         "//third_party/json",
-        "@com_google_protobuf//:protobuf",
     ],
 )
 
@@ -75,7 +74,6 @@ cc_library(
         "//modules/dreamview/backend/handlers:websocket_handler",
         "//modules/dreamview/backend/map:map_service",
         "//modules/dreamview/backend/sim_control",
-        "@com_google_protobuf//:protobuf",
     ],
 )
 

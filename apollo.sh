@@ -93,37 +93,11 @@ function check_esd_files() {
 
 function generate_build_targets() {
   if [ -z $NOT_BUILD_PERCEPTION ] ; then
-    BUILD_TARGETS=""
+    BUILD_TARGETS=`bazel query //modules/...`
   else
     info 'Skip building perception module!'
-    # BUILD_TARGETS=`bazel query //... except //modules/perception/... except //modules/calibration/lidar_ex_checker/...`
-    BUILD_TARGETS=""
+    BUILD_TARGETS=`bazel query //modules/... except //modules/perception/... except //modules/calibration/lidar_ex_checker/...`
   fi
-
-    BUILD_TARGETS="
-    //modules/canbus/...
-    //modules/common/...
-    //modules/control/...
-    //modules/data/...
-    //modules/dreamview/...
-    //modules/drivers/...
-    //modules/guardian/...
-    //modules/integration_test/...
-    //modules/localization/...
-    //modules/map/...
-    //modules/monitor/...
-    //modules/perception/...
-    //modules/planning/...
-    //modules/prediction/...
-    //modules/routing/...
-    //modules/transform/...
-    //modules/third_party_perception/...
-    //modules/tools/manual_traffic_light/...
-    //modules/tools/prediction/fake_prediction/...
-    //modules/tools/rosbag_to_record/...
-    //modules/tools/visualizer/...
-    //modules/transform/..."
-    # //modules/calibration/...
 
   if [ $? -ne 0 ]; then
     fail 'Build failed!'
@@ -419,51 +393,6 @@ function run_test() {
   fi
 }
 
-function citest_perception() {
-  generate_build_targets
-
-  # common related test
-  echo "$BUILD_TARGETS" | grep "perception\/" | grep -v "sunnyvale_big_loop\|cnn_segmentation_test\|yolo_camera_detector_test\|unity_recognize_test\|perception_traffic_light_rectify_test\|cuda_util_test" | xargs bazel test $DEFINES --config=unit_test -c dbg --test_verbose_timeout_warnings $@
-
-  if [ $? -eq 0 ]; then
-    success 'Test passed!'
-    return 0
-  else
-    fail 'Test failed!'
-    return 1
-  fi
-}
-
-function citest_dreamview() {
-  generate_build_targets
-
-  # common related test
-  echo "$BUILD_TARGETS" | grep "dreamview\/" | xargs bazel test $DEFINES --config=unit_test -c dbg --test_verbose_timeout_warnings $@
-
-  if [ $? -eq 0 ]; then
-    success 'Test passed!'
-    return 0
-  else
-    fail 'Test failed!'
-    return 1
-  fi
-}
-
-function citest_map() {
-  generate_build_targets
-
-  # common related test
-  echo "$BUILD_TARGETS" | grep "map\/" | grep -v "cuda_util_test" | xargs bazel test $DEFINES --config=unit_test -c dbg --test_verbose_timeout_warnings $@
-
-  if [ $? -eq 0 ]; then
-    success 'Test passed!'
-    return 0
-  else
-    fail 'Test failed!'
-    return 1
-  fi
-}
-
 function citest_basic() {
   set -e
 
@@ -473,26 +402,14 @@ function citest_basic() {
 
   JOB_ARG="--jobs=$(nproc) --ram_utilization_factor 80"
 
-  # common related test
-  echo "$BUILD_TARGETS" | grep "modules\/common\/" | xargs bazel test $DEFINES $JOB_ARG --config=unit_test -c dbg --test_verbose_timeout_warnings $@
-
-  # perception related test
-  echo "$BUILD_TARGETS" | grep "modules\/perception\/" | grep -v "syncedmem_test" | grep -v "blob_test" | grep -v "perception_inference_operators_test" | xargs bazel test $DEFINES $JOB_ARG --config=unit_test -c dbg --test_verbose_timeout_warnings $@
-
-  # control related test
-  echo "$BUILD_TARGETS" | grep "modules\/control\/" | xargs bazel test $DEFINES $JOB_ARG --config=unit_test -c dbg --test_verbose_timeout_warnings $@
-
-  # prediction related test
-  echo "$BUILD_TARGETS" | grep "modules\/prediction\/" | xargs bazel test $DEFINES $JOB_ARG --config=unit_test -c dbg --test_verbose_timeout_warnings $@
-
-  # planning related test
-  echo "$BUILD_TARGETS" | grep "modules\/planning\/" | xargs bazel test $DEFINES $JOB_ARG --config=unit_test -c dbg --test_verbose_timeout_warnings $@
-
-  # routing related test
-  echo "$BUILD_TARGETS" | grep "modules\/routing\/" | xargs bazel test $DEFINES $JOB_ARG --config=unit_test -c dbg --test_verbose_timeout_warnings $@
-
-  # map related test
-  echo "$BUILD_TARGETS" | grep "modules\/map\/" | grep -v "cuda_util_test" | xargs bazel test $DEFINES --config=unit_test -c dbg --test_verbose_timeout_warnings $@
+  echo "$BUILD_TARGETS" | grep "modules\/" | grep "test" \
+          | grep -v "dreamview\/" \
+          | grep -v "drivers\/" \
+          | grep -v "blob_test" \
+          | grep -v "syncedmem_test" | grep -v "blob_test" \
+          | grep -v "perception_inference_operators_test" \
+          | grep -v "cuda_util_test" \
+          | xargs bazel test $DEFINES $JOB_ARG --config=unit_test -c dbg --test_verbose_timeout_warnings $@
 
   if [ $? -eq 0 ]; then
     success 'Test passed!'
@@ -888,22 +805,6 @@ function main() {
     citest)
       DEFINES="${DEFINES} --cxxopt=-DCPU_ONLY"
       citest $@
-      ;;
-    citest_map)
-      DEFINES="${DEFINES} --cxxopt=-DCPU_ONLY"
-      citest_map $@
-      ;;
-    citest_dreamview)
-      DEFINES="${DEFINES} --cxxopt=-DCPU_ONLY"
-      citest_dreamview $@
-      ;;
-    citest_perception)
-      DEFINES="${DEFINES} --cxxopt=-DCPU_ONLY"
-      citest_perception $@
-      ;;
-    citest_basic)
-      DEFINES="${DEFINES} --cxxopt=-DCPU_ONLY"
-      citest_basic $@
       ;;
     test_gpu)
       DEFINES="${DEFINES} --cxxopt=-DUSE_GPU"
