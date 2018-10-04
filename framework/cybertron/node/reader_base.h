@@ -53,7 +53,7 @@ class ReaderBase {
     return role_attr_.channel_name();
   }
 
-  const uint64_t ChannelId() const { return role_attr_.channel_id(); }
+  uint64_t ChannelId() const { return role_attr_.channel_id(); }
 
   const proto::QosProfile& QosProfile() const {
     return role_attr_.qos_profile();

@@ -173,7 +173,9 @@ bool Component<M0, NullType, NullType, NullType>::Initialize(
     return true;
   }
 
-  auto dv = std::make_shared<data::DataVisitor<M0>>(readers_[0]);
+  data::VisitorConfig conf = {readers_[0]->ChannelId(),
+                              readers_[0]->PendingQueueSize()};
+  auto dv = std::make_shared<data::DataVisitor<M0>>(conf);
   croutine::RoutineFactory factory =
       croutine::CreateRoutineFactory<M0>(func, dv);
   auto sched = scheduler::Scheduler::Instance();
@@ -264,7 +266,11 @@ bool Component<M0, M1, NullType, NullType>::Initialize(
     }
   };
 
-  auto dv = std::make_shared<data::DataVisitor<M0, M1>>(readers_);
+  std::vector<data::VisitorConfig> config_list;
+  for (auto& reader : readers_) {
+    config_list.emplace_back(reader->ChannelId(), reader->PendingQueueSize());
+  }
+  auto dv = std::make_shared<data::DataVisitor<M0, M1>>(config_list);
   croutine::RoutineFactory factory =
       croutine::CreateRoutineFactory<M0, M1>(func, dv);
   return sched->CreateTask(factory, node_->Name());
@@ -367,7 +373,11 @@ bool Component<M0, M1, M2, NullType>::Initialize(
     }
   };
 
-  auto dv = std::make_shared<data::DataVisitor<M0, M1, M2>>(readers_);
+  std::vector<data::VisitorConfig> config_list;
+  for (auto& reader : readers_) {
+    config_list.emplace_back(reader->ChannelId(), reader->PendingQueueSize());
+  }
+  auto dv = std::make_shared<data::DataVisitor<M0, M1, M2>>(config_list);
   croutine::RoutineFactory factory =
       croutine::CreateRoutineFactory<M0, M1, M2>(func, dv);
   return sched->CreateTask(factory, node_->Name());
@@ -483,7 +493,11 @@ bool Component<M0, M1, M2, M3>::Initialize(const ComponentConfig& config) {
     }
   };
 
-  auto dv = std::make_shared<data::DataVisitor<M0, M1, M2, M3>>(readers_);
+  std::vector<data::VisitorConfig> config_list;
+  for (auto& reader : readers_) {
+    config_list.emplace_back(reader->ChannelId(), reader->PendingQueueSize());
+  }
+  auto dv = std::make_shared<data::DataVisitor<M0, M1, M2, M3>>(config_list);
   croutine::RoutineFactory factory =
       croutine::CreateRoutineFactory<M0, M1, M2, M3>(func, dv);
   return sched->CreateTask(factory, node_->Name());
