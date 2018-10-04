@@ -47,7 +47,7 @@
 
 namespace apollo {
 namespace drivers {
-namespace usb_cam {
+namespace camera {
 
 UsbCam::UsbCam()
     : fd_(-1),
@@ -1020,6 +1020,6 @@ void UsbCam::reconnect() {
   close_device();
 }
 
-}  // namespace usb_cam
+}  // namespace camera
 }  // namespace drivers
 }  // namespace apollo

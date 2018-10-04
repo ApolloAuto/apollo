@@ -25,3 +25,8 @@ channel_name: "/apollo/sensor/camera/left_rear/image"
 device_wait_ms: 2000
 spin_rate: 200
 output_type: RGB
+
+compress_conf {
+    output_channel: "/apollo/sensor/camera/left_rear/image/compressed"
+    image_pool_size: 100
+}

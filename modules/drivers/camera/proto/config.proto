@@ -1,6 +1,6 @@
 syntax = "proto2";
 
-package apollo.drivers.usb_cam.config;
+package apollo.drivers.camera.config;
 
 enum IOMethod {
   IO_METHOD_UNKNOWN = 0;
@@ -41,10 +41,16 @@ message Config {
   required uint32 bytes_per_pixel = 20 [default = 3];
   required uint32 trigger_internal = 21 [default = 0];
   required uint32 trigger_fps = 22 [default = 30];
-  optional string channel_name = 23 [default = ""];
+  optional string channel_name = 23;
   // wait time when camera select timeout
   optional uint32 device_wait_ms = 24 [default = 2000];
   // camera select spin time
   optional uint32 spin_rate = 25 [default = 200];
   required OutputType output_type = 26;
+
+  message CompressConfig {
+    optional string output_channel = 1;
+    optional uint32 image_pool_size = 2 [default = 20];
+  }
+  optional CompressConfig compress_conf = 27;
 }

@@ -14,46 +14,40 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_DRIVERS_USB_CAM_USB_CAM_COMPONENT_H
-#define MODULES_DRIVERS_USB_CAM_USB_CAM_COMPONENT_H
+#ifndef MODULES_DRIVERS_CAMERA_COMPRESS_COMPONENT_H_
+#define MODULES_DRIVERS_CAMERA_COMPRESS_COMPONENT_H_
 
 #include <memory>
 
+#include "cybertron/base/concurrent_object_pool.h"
 #include "cybertron/cybertron.h"
-#include "modules/drivers/proto/sensor_image.pb.h"
 #include "modules/drivers/camera/proto/config.pb.h"
-
-#include "modules/drivers/camera/usb_cam.h"
+#include "modules/drivers/proto/sensor_image.pb.h"
 
 namespace apollo {
 namespace drivers {
-namespace usb_cam {
+namespace camera {
 
 using apollo::cybertron::Component;
-using apollo::cybertron::Reader;
 using apollo::cybertron::Writer;
+using apollo::cybertron::base::CCObjectPool;
 using apollo::drivers::Image;
-using apollo::drivers::usb_cam::config::Config;
+using apollo::drivers::camera::config::Config;
 
-class UsbCamComponent : public Component<> {
+class CompressComponent : public Component<Image> {
  public:
   bool Init() override;
+  bool Proc(const std::shared_ptr<Image>& image) override;
 
  private:
-  void run();
-
-  std::shared_ptr<Writer<Image>> writer_ = nullptr;
-  std::unique_ptr<UsbCam> camera_device_;
-  std::shared_ptr<Config> camera_config_;
-  CameraImagePtr raw_image_ = nullptr;
-  std::shared_ptr<Image> pb_image_ = nullptr;
-  uint32_t spin_rate_ = 200;
-  uint32_t device_wait_ = 2000;
+  std::shared_ptr<CCObjectPool<CompressedImage>> image_pool_;
+  std::shared_ptr<Writer<CompressedImage>> writer_ = nullptr;
+  Config config_;
 };
 
-CYBERTRON_REGISTER_COMPONENT(UsbCamComponent)
-}  // namespace usb_cam
+CYBERTRON_REGISTER_COMPONENT(CompressComponent)
+}  // namespace camera
 }  // namespace drivers
 }  // namespace apollo
 
-#endif  // ONBOARD_DRIVERS_USB_CAMERA_INCLUDE_USB_CAMERA_COMPONENT_H
+#endif  // ONBOARD_DRIVERS_CAMERAERA_INCLUDE_COMPRESS_COMPONENT_H_

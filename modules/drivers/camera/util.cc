@@ -21,7 +21,7 @@
 
 namespace apollo {
 namespace drivers {
-namespace usb_cam {
+namespace camera {
 
 void print_m256(__m256i a) {
   unsigned char snoop[32];
@@ -150,6 +150,6 @@ void yuyv2rgb_avx(unsigned char* YUV, unsigned char* RGB, int NumPixels) {
   }
 }
 
-}  // namespace usb_cam
+}  // namespace camera
 }  // namespace drivers
 }  // namespace apollo
