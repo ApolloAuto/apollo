@@ -111,7 +111,6 @@ proto_library(
     name = "gnss_status_proto_lib",
     srcs = [
         "gnss_status.proto",
-        "gnss_status_deprecated.proto",
     ],
     deps = [
         "//modules/common/proto:error_code_proto_lib",
