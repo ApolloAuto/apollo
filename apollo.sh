@@ -468,25 +468,31 @@ function citest_basic() {
   set -e
 
   BUILD_TARGETS="
-    `bazel query //modules/perception/...`
-    `bazel query //modules/control/...`
-    `bazel query //modules/prediction/...`
-    `bazel query //modules/planning/...`
+    `bazel query //modules/...`
   "
 
   JOB_ARG="--jobs=$(nproc) --ram_utilization_factor 80"
 
+  # common related test
+  echo "$BUILD_TARGETS" | grep "modules\/common\/" | xargs bazel test $DEFINES $JOB_ARG --config=unit_test -c dbg --test_verbose_timeout_warnings $@
+
   # perception related test
-  echo "$BUILD_TARGETS" | grep "perception\/" | grep -v "syncedmem_test" | grep -v "blob_test" | grep -v "perception_inference_operators_test" | xargs bazel test $DEFINES $JOB_ARG --config=unit_test -c dbg --test_verbose_timeout_warnings $@
+  echo "$BUILD_TARGETS" | grep "modules\/perception\/" | grep -v "syncedmem_test" | grep -v "blob_test" | grep -v "perception_inference_operators_test" | xargs bazel test $DEFINES $JOB_ARG --config=unit_test -c dbg --test_verbose_timeout_warnings $@
 
   # control related test
-  echo "$BUILD_TARGETS" | grep "control\/" | xargs bazel test $DEFINES $JOB_ARG --config=unit_test -c dbg --test_verbose_timeout_warnings $@
+  echo "$BUILD_TARGETS" | grep "modules\/control\/" | xargs bazel test $DEFINES $JOB_ARG --config=unit_test -c dbg --test_verbose_timeout_warnings $@
 
   # prediction related test
-  echo "$BUILD_TARGETS" | grep "prediction\/" | xargs bazel test $DEFINES $JOB_ARG --config=unit_test -c dbg --test_verbose_timeout_warnings $@
+  echo "$BUILD_TARGETS" | grep "modules\/prediction\/" | xargs bazel test $DEFINES $JOB_ARG --config=unit_test -c dbg --test_verbose_timeout_warnings $@
 
   # planning related test
-  echo "$BUILD_TARGETS" | grep "planning\/" | xargs bazel test $DEFINES $JOB_ARG --config=unit_test -c dbg --test_verbose_timeout_warnings $@
+  echo "$BUILD_TARGETS" | grep "modules\/planning\/" | xargs bazel test $DEFINES $JOB_ARG --config=unit_test -c dbg --test_verbose_timeout_warnings $@
+
+  # routing related test
+  echo "$BUILD_TARGETS" | grep "modules\/routing\/" | xargs bazel test $DEFINES $JOB_ARG --config=unit_test -c dbg --test_verbose_timeout_warnings $@
+
+  # map related test
+  echo "$BUILD_TARGETS" | grep "modules\/map\/" | grep -v "cuda_util_test" | xargs bazel test $DEFINES --config=unit_test -c dbg --test_verbose_timeout_warnings $@
 
   if [ $? -eq 0 ]; then
     success 'Test passed!'
