@@ -93,6 +93,8 @@ class FrameOpenSpace {
 
   const bool is_near_destination() const { return is_near_destination_; }
 
+  ThreadSafeIndexedObstacles *GetObstacleList() { return &obstacles_; }
+
   const std::size_t obstacles_num() { return obstacles_num_; }
 
   const Eigen::MatrixXd &obstacles_vertices_num() {

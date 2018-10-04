@@ -47,16 +47,26 @@ Status OpenSpacePlanner::Init(const PlanningConfig&) {
   distance_approach_config_ =
       planner_open_space_config_.distance_approach_config();
 
-  horizon_ = planner_open_space_config_.planning_horizon();
   // nominal sampling time
-  ts_ = planner_open_space_config_.ts();
+  ts_ = planner_open_space_config_.delta_t();
 
   // load vehicle configuration
-  front_to_center_ = vehicle_param_.front_edge_to_center();
-  back_to_center_ = vehicle_param_.back_edge_to_center();
-  left_to_center_ = vehicle_param_.left_edge_to_center();
-  right_to_center_ = vehicle_param_.right_edge_to_center();
-  ego_ << front_to_center_, back_to_center_, left_to_center_, right_to_center_;
+  double front_to_center = vehicle_param_.front_edge_to_center();
+  double back_to_center = vehicle_param_.back_edge_to_center();
+  double left_to_center = vehicle_param_.left_edge_to_center();
+  double right_to_center = vehicle_param_.right_edge_to_center();
+  ego_.resize(4, 1);
+  ego_ << front_to_center, back_to_center, left_to_center, right_to_center;
+  // load xy boundary into the Plan() from configuration(before ROI is done)
+  double x_max = planner_open_space_config_.warm_start_config().max_x();
+  double y_max = planner_open_space_config_.warm_start_config().max_y();
+  double x_min = planner_open_space_config_.warm_start_config().min_x();
+  double y_min = planner_open_space_config_.warm_start_config().min_y();
+  XYbounds_.resize(4, 1);
+  XYbounds_ << x_max, y_max, x_min, y_min;
+
+  // initialize warm start class pointer
+  warm_start_.reset(new HybridAStar());
 
   return Status::OK();
 }
@@ -100,34 +110,40 @@ apollo::common::Status OpenSpacePlanner::Plan(
   // ob2 << 20, 5, -1.3, 5;
   // ob3 << 20, 15, 20, -11;
 
-  // TODO(QiL): Step 5 : Add absolute constraints (States and Controls) from
-  // perception/map
-  // [x_lower, x_upper, - y_lower, y_upper]
-  Eigen::MatrixXd XYbounds(4, 1);
-  XYbounds << -15, 15, 1, 10;
+  // Warm Start (initial velocity is assumed to be 0 for now)
 
-  // TODO(QiL): Step 6 ： Fromulate warmstart matrix
+  Result result;
+  ThreadSafeIndexedObstacles* obstalce_list = frame->GetObstacleList();
 
-  // warm start variables
-  Eigen::MatrixXd xWS = Eigen::MatrixXd::Zero(4, horizon_ + 1);
-  Eigen::MatrixXd uWS = Eigen::MatrixXd::Zero(2, horizon_);
-  Eigen::MatrixXd timeWS = Eigen::MatrixXd::Zero(1, horizon_ + 1);
-
-  warm_start_.reset(new WarmStartProblem(horizon_, ts_, x0, xF, XYbounds));
-
-  Eigen::MatrixXd state_result;
-  Eigen::MatrixXd control_result;
-  Eigen::MatrixXd time_result;
-
-  bool ret_status =
-      warm_start_->Solve(&state_result, &control_result, &time_result);
-
-  if (ret_status) {
+  if (warm_start_->Plan(x0(0, 0), x0(1, 0), x0(2, 0), xF(0, 0), xF(1, 0),
+                        xF(2, 0), obstalce_list, &result)) {
     ADEBUG << "Warm start problem solved successfully!";
   } else {
     return Status(ErrorCode::PLANNING_ERROR,
                   "Warm start problem failed to solve");
   }
+  // load Warm Start result(horizon is the "N", not the size of step points)
+  horizon_ = result.x.size() - 1;
+  Eigen::MatrixXd xWS = Eigen::MatrixXd::Zero(4, horizon_ + 1);
+  Eigen::MatrixXd uWS = Eigen::MatrixXd::Zero(2, horizon_);
+  Eigen::VectorXd x = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(
+      result.x.data(), horizon_ + 1);
+  Eigen::VectorXd y = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(
+      result.y.data(), horizon_ + 1);
+  Eigen::VectorXd phi = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(
+      result.phi.data(), horizon_ + 1);
+  Eigen::VectorXd v = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(
+      result.v.data(), horizon_ + 1);
+  Eigen::VectorXd steer = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(
+      result.steer.data(), horizon_);
+  Eigen::VectorXd a =
+      Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(result.a.data(), horizon_);
+  xWS.row(0) = x;
+  xWS.row(1) = y;
+  xWS.row(2) = phi;
+  xWS.row(3) = v;
+  uWS.row(0) = steer;
+  uWS.row(1) = a;
 
   // TODO(QiL): Step 8 : Formulate distance approach problem
   // solution from distance approach
@@ -138,7 +154,7 @@ apollo::common::Status OpenSpacePlanner::Plan(
   // TODO(QiL) : update the I/O to make the warm start problem and distance
   // approach problem connect
   distance_approach_.reset(new DistanceApproachProblem(
-      x0, xF, horizon_, ts_, ego_, xWS, uWS, timeWS, XYbounds, obstacles_num,
+      x0, xF, horizon_, ts_, ego_, xWS, uWS, XYbounds_, obstacles_num,
       obstacles_vertices_num, obstacles_A, obstacles_b));
 
   ADEBUG << "Distance approach configs set"

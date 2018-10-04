@@ -41,7 +41,6 @@ class DistanceApproachProblemTest : public ::testing::Test {
   Eigen::MatrixXd obstacles_vertices_num_ = Eigen::MatrixXd::Ones(12, 4);
   Eigen::MatrixXd xWS_ = Eigen::MatrixXd::Zero(4, horizon_ + 1);
   Eigen::MatrixXd uWS_ = Eigen::MatrixXd::Zero(2, horizon_);
-  Eigen::MatrixXd timeWS_ = Eigen::MatrixXd::Zero(1, horizon_ + 1);
   std::size_t obstacles_num = 10;
   Eigen::MatrixXd obstacles_vertices_num =
       Eigen::MatrixXd::Zero(1, horizon_ + 1);
@@ -51,8 +50,8 @@ class DistanceApproachProblemTest : public ::testing::Test {
 
 TEST_F(DistanceApproachProblemTest, initilization) {
   distance_approach_.reset(new DistanceApproachProblem(
-      x0_, xf_, horizon_, ts_, ego_, xWS_, uWS_, timeWS_, XYbounds_,
-      obstacles_num, obstacles_vertices_num, obstacles_A, obstacles_b));
+      x0_, xf_, horizon_, ts_, ego_, xWS_, uWS_, XYbounds_, obstacles_num,
+      obstacles_vertices_num, obstacles_A, obstacles_b));
   EXPECT_NE(distance_approach_, nullptr);
 }
 

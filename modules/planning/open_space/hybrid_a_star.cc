@@ -32,7 +32,7 @@ HybridAStar::HybridAStar() {
       << FLAGS_planner_open_space_config_filename;
   reed_shepp_generator_.reset(new ReedShepp(vehicle_param_, open_space_conf_));
   next_node_num_ = open_space_conf_.warm_start_config().next_node_num();
-  max_steer_ = open_space_conf_.warm_start_config().max_steering();
+  max_steer_ = vehicle_param_.max_steer_angle() / vehicle_param_.steer_ratio();
   step_size_ = open_space_conf_.warm_start_config().step_size();
   xy_grid_resolution_ =
       open_space_conf_.warm_start_config().xy_grid_resolution();
@@ -42,7 +42,7 @@ HybridAStar::HybridAStar() {
   steer_penalty_ = open_space_conf_.warm_start_config().steer_penalty();
   steer_change_penalty_ =
       open_space_conf_.warm_start_config().steer_change_penalty();
-  delta_t_ = open_space_conf_.warm_start_config().delta_t();
+  delta_t_ = open_space_conf_.delta_t();
 }
 
 bool HybridAStar::AnalyticExpansion(std::shared_ptr<Node3d> current_node,
@@ -250,6 +250,20 @@ bool HybridAStar::GetResult(std::shared_ptr<Node3d> final_node,
     AINFO << "GenerateSpeedAcceleration fail";
     return false;
   }
+  if (result->x.size() != result->y.size() ||
+      result->x.size() != result->v.size() ||
+      result->x.size() != result->phi.size()) {
+    AINFO << "state sizes not equal";
+    return false;
+  }
+  if (result->a.size() != result->steer.size() ||
+      result->x.size() - result->a.size() != 1) {
+    AINFO << "control sizes not equal or not right";
+    AINFO << result->a.size();
+    AINFO << result->steer.size();
+    AINFO << result->x.size();
+    return false;
+  }
   return true;
 }
 
@@ -273,7 +287,6 @@ bool HybridAStar::GenerateSpeedAcceleration(Result* result) {
     double discrete_a = (result->v[i + 1] - result->v[i]) / delta_t_;
     result->a.emplace_back(discrete_a);
   }
-  result->a.emplace_back(0.0);
   // load steering from phi
   for (std::size_t i = 0; i < x_size - 1; i++) {
     double discrete_steer = (result->phi[i + 1] - result->phi[i]) *
@@ -285,7 +298,6 @@ bool HybridAStar::GenerateSpeedAcceleration(Result* result) {
     }
     result->steer.emplace_back(discrete_steer);
   }
-  result->steer.emplace_back(0.0);
   return true;
 }
 
