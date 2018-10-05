@@ -1,9 +1,11 @@
 scenario_type : SIDE_PASS
-task : DP_POLY_PATH_OPTIMIZER
-task : PATH_DECIDER
-task : DP_ST_SPEED_OPTIMIZER
-task : SPEED_DECIDER
-task : QP_SPLINE_ST_SPEED_OPTIMIZER
+stage : {
+  task : DP_POLY_PATH_OPTIMIZER
+  task : PATH_DECIDER
+  task : DP_ST_SPEED_OPTIMIZER
+  task : SPEED_DECIDER
+  task : QP_SPLINE_ST_SPEED_OPTIMIZER
+}
 scenario_task_config : {
   task_type : DP_POLY_PATH_OPTIMIZER
   dp_poly_path_config {
