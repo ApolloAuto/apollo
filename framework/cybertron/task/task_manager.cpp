@@ -49,7 +49,7 @@ TaskManager::TaskManager()
   tasks_.reserve(num_threads_);
   for (int i = 0; i < num_threads_; i++) {
     auto task_name = task_prefix + std::to_string(i);
-    tasks_.push_back(data::GlobalData::RegisterTaskName(task_name));
+    tasks_.push_back(common::GlobalData::RegisterTaskName(task_name));
     scheduler::Scheduler::Instance()->CreateTask(factory, task_name);
   }
 }
