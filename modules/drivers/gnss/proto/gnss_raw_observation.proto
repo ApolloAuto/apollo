@@ -179,6 +179,7 @@ message GlonassOrbit {
   optional double accelerate_y = 25;
   optional double accelerate_z = 26;
   optional double infor_age = 27;
+  optional uint32 sat_prn = 28;
 }
 
 // This message encapsulates keppler orbit message and glonass message
