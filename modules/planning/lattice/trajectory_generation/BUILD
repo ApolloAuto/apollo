@@ -165,8 +165,7 @@ cc_library(
     ],
     deps = [
         "//framework:cybertron",
-        "//modules/planning/common:planning_gflags",
-        "//modules/planning/lattice/behavior:path_time_graph",
+        #"//modules/planning/lattice/behavior:path_time_graph",
         "//modules/planning/lattice/trajectory1d:piecewise_jerk_trajectory1d",
     ],
 )
@@ -181,10 +180,22 @@ cc_library(
     ],
     deps = [
         ":lateral_qp_optimizer",
-        "//modules/planning/common:planning_gflags",
-        "//modules/planning/lattice/behavior:path_time_graph",
-        "//modules/planning/lattice/trajectory1d:piecewise_jerk_trajectory1d",
         "@qpOASES",
+    ],
+)
+
+cc_library(
+    name = "osqp_lateral_qp_optimizer",
+    srcs = [
+        "osqp_lateral_qp_optimizer.cc",
+    ],
+    hdrs = [
+        "osqp_lateral_qp_optimizer.h",
+    ],
+    deps = [
+        ":lateral_qp_optimizer",
+        "@eigen",
+        "@osqp",
     ],
 )
 
