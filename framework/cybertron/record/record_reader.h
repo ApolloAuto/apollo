@@ -17,43 +17,54 @@
 #ifndef CYBERTRON_RECORD_RECORD_READER_H_
 #define CYBERTRON_RECORD_RECORD_READER_H_
 
-#include <algorithm>
-#include <condition_variable>
 #include <memory>
-#include <queue>
 #include <set>
 #include <string>
-#include <thread>
 #include <unordered_map>
-#include <utility>
-#include <vector>
-#include "cybertron/message/raw_message.h"
+
+#include "cybertron/proto/record.pb.h"
 #include "cybertron/record/record_base.h"
+#include "cybertron/record/record_file.h"
 #include "cybertron/record/record_message.h"
 
 namespace apollo {
 namespace cybertron {
 namespace record {
 
-using ::apollo::cybertron::message::RawMessage;
-using ::apollo::cybertron::record::RecordFileReader;
-
 class RecordReader : public RecordBase {
  public:
+  using FileReaderPtr = std::unique_ptr<RecordFileReader>;
+  using ChannelInfoMap = std::unordered_map<std::string, proto::ChannelCache>;
+
   explicit RecordReader(const std::string& file);
   virtual ~RecordReader();
+
   bool ReadMessage(RecordMessage* message, uint64_t begin_time = 0,
                    uint64_t end_time = UINT64_MAX);
-  std::set<std::string> GetChannelList() const;
-  const Header& header() const;
   void Reset();
 
+  uint64_t GetMessageNumber(const std::string& channel_name) const override;
+
+  const std::string& GetMessageType(
+      const std::string& channel_name) const override;
+
+  const std::string& GetProtoDesc(
+      const std::string& channel_name) const override;
+
+  std::set<std::string> GetChannelList() const;
+
+  const proto::Header& header() const { return header_; }
+  const ChannelInfoMap& channel_info() const { return channel_info_; }
+
  private:
-  bool ReadNextChunk(ChunkBody* chunk, uint64_t begin_time, uint64_t end_time);
+  bool ReadNextChunk(proto::ChunkBody* chunk, uint64_t begin_time,
+                     uint64_t end_time);
+
   proto::ChunkBody chunk_;
   proto::Index index_;
   uint32_t message_index_ = 0;
-  std::unique_ptr<RecordFileReader> file_reader_;
+  ChannelInfoMap channel_info_;
+  FileReaderPtr file_reader_;
 };
 
 }  // namespace record

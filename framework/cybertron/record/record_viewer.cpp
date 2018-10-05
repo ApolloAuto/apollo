@@ -14,7 +14,12 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <cybertron/record/record_viewer.h>
+#include "cybertron/record/record_viewer.h"
+
+#include <algorithm>
+
+#include "cybertron/common/log.h"
+
 
 namespace apollo {
 namespace cybertron {

@@ -92,5 +92,7 @@ int main(int argc, char** argv) {
   apollo::cybertron::Init(argv[0]);
   testing::InitGoogleTest(&argc, argv);
   // google::InitGoogleLogging(argv[0]);
-  return RUN_ALL_TESTS();
+  auto res = RUN_ALL_TESTS();
+  apollo::cybertron::Shutdown();
+  return res;
 }

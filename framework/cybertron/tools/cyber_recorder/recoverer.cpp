@@ -16,6 +16,8 @@
 
 #include "cybertron/tools/cyber_recorder/recoverer.h"
 
+#include "cybertron/record/header_builder.h"
+
 namespace apollo {
 namespace cybertron {
 namespace record {

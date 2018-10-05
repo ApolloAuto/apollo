@@ -21,11 +21,14 @@
 #include <set>
 #include <string>
 
+#include "cybertron/record/record_message.h"
 #include "cybertron/record/record_reader.h"
 
 namespace apollo {
 namespace cybertron {
 namespace record {
+
+class RecordMessage;
 
 class RecordViewer {
  public:
