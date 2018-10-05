@@ -22,7 +22,6 @@ cc_library(
         "//framework/cybertron/base:base_lib",
         "//framework/cybertron/message:message_lib",
         "//framework/cybertron/time:time_lib",
-        "//framework/cybertron/timer:timer_lib",
         "//framework/cybertron/event:event_lib",
         "//framework/cybertron/transport/rtps:rtps_lib",
         "//framework/cybertron/transport/qos:qos_lib",
