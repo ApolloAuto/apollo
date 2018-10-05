@@ -87,8 +87,10 @@ bool SidePassScenario::Init() {
 
   // get all active tasks
   std::vector<TaskType> tasks;
-  for (int i = 0; i < config_.task_size(); ++i) {
-    tasks.push_back(config_.task(i));
+  CHECK_GT(config_.stage_size(), 0);
+  // TODO(All): deal with multiple stages.
+  for (int i = 0; i < config_.stage(0).task_size(); ++i) {
+    tasks.push_back(config_.stage(0).task(i));
   }
 
   // init task with conf
