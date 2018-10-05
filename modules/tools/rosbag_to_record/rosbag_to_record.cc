@@ -34,6 +34,7 @@
 #include "modules/planning/proto/planning.pb.h"
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
 #include "modules/tools/rosbag_to_record/channel_info.h"
+#include "modules/transform/proto/transform.pb.h"
 
 using apollo::cybertron::proto::SingleMessage;
 using apollo::tools::ChannelInfo;
@@ -228,8 +229,8 @@ int main(int argc, char **argv) {
       pb_msg->SerializeToString(&serialized_str);
     } else if (channel_name == "/tf" || channel_name == "/tf_static") {
       auto rawdata = m.instantiate<tf2_msgs::TFMessage>();
-      auto proto = std::make_shared<adu::common::TransformStampeds>();
-      adu::common::TransformStamped *cyber_tf;
+      auto proto = std::make_shared<apollo::transform::TransformStampeds>();
+      apollo::transform::TransformStamped *cyber_tf;
       for (size_t i = 0; i < rawdata->transforms.size(); ++i) {
         cyber_tf = proto->add_transforms();
 

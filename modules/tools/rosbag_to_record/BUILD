@@ -42,6 +42,7 @@ cc_library(
         "//modules/routing/proto:routing_proto",
         "//modules/drivers/proto:sensor_proto",
         "//modules/drivers/gnss/proto:gnss_proto",
+        "//modules/transform/proto:transform_proto",
     ],
 )
 

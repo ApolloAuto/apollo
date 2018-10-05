@@ -26,7 +26,6 @@
 #include "cybertron/component/component.h"
 #include "cybertron/cybertron.h"
 #include "cybertron/message/raw_message.h"
-#include "cybertron/tf2_cybertron/buffer.h"
 
 #include "modules/localization/msf/msf_localization.h"
 

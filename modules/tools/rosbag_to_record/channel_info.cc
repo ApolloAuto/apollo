@@ -16,6 +16,8 @@
 
 #include "modules/tools/rosbag_to_record/channel_info.h"
 
+#include "modules/transform/proto/transform.pb.h"
+
 namespace apollo {
 namespace tools {
 
@@ -91,9 +93,9 @@ void ChannelInfo::InitChannels() {
       "/apollo/routing_request", "apollo.routing.RoutingRequest");
   InitChannelInfo<apollo::routing::RoutingResponse>(
       "/apollo/routing_response", "apollo.routing.RoutingResponse");
-  InitChannelInfo<adu::common::TransformStampeds>(
+  InitChannelInfo<apollo::transform::TransformStampeds>(
       "/tf", "adu.common.TransformStampeds");
-  InitChannelInfo<adu::common::TransformStampeds>(
+  InitChannelInfo<apollo::transform::TransformStampeds>(
       "/tf_static", "adu.common.TransformStampeds");
   InitChannelInfo<apollo::drivers::ContiRadar>("/apollo/sensor/conti_radar",
                                                "apollo.drivers.ContiRadar");

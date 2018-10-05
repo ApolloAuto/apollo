@@ -26,7 +26,6 @@
 #include "cybertron/message/message_traits.h"
 #include "cybertron/message/protobuf_factory.h"
 
-#include "cybertron/tf2_cybertron/transform_broadcaster.h"
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/canbus/proto/chassis_detail.pb.h"
 #include "modules/common/monitor_log/proto/monitor_log.pb.h"
