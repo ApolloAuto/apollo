@@ -19,9 +19,9 @@
 
 #include "cybertron/cybertron.h"
 #include "cybertron/proto/chatter.pb.h"
+#include "cybertron/py_wrapper/py_node.h"
 #include "cybertron/time/rate.h"
 #include "cybertron/time/time.h"
-#include "python/wrapper/py_node.h"
 
 using apollo::cybertron::Rate;
 using apollo::cybertron::Time;

@@ -20,8 +20,8 @@
 #include "cybertron/cybertron.h"
 #include "cybertron/message/py_message.h"
 #include "cybertron/proto/chatter.pb.h"
+#include "cybertron/py_wrapper/py_node.h"
 #include "gtest/gtest.h"
-#include "python/wrapper/py_node.h"
 
 using apollo::cybertron::message::PyMessageWrap;
 using apollo::cybertron::Time;

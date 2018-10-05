@@ -18,8 +18,7 @@
 
 #include "cybertron/cybertron.h"
 #include "cybertron/proto/chatter.pb.h"
-#include "gtest/gtest.h"
-#include "python/wrapper/py_record.h"
+#include "cybertron/py_wrapper/py_record.h"
 
 const char TEST_RECORD_FILE[] = "test02.record";
 const char CHAN_1[] = "channel/chatter";
@@ -28,41 +27,43 @@ const char MSG_TYPE[] = "apollo.cybertron.proto.Test";
 const char STR_10B[] = "1234567890";
 const char TEST_FILE[] = "test.record";
 
-TEST(CyberRecordTest, record_readerwriter) {
+void test_write(const std::string &writefile) {
   apollo::cybertron::record::PyRecordWriter rec_writer;
-
-  EXPECT_TRUE(rec_writer.Open(TEST_RECORD_FILE));
+  AINFO << "++++ begin writer";
+  rec_writer.Open(writefile);
   rec_writer.WriteChannel(CHAN_1, MSG_TYPE, STR_10B);
-  rec_writer.WriteMessage(CHAN_1, STR_10B, 888);
+  rec_writer.WriteMessage(CHAN_1, STR_10B, 1000);
   rec_writer.Close();
-
-  // read
-  apollo::cybertron::record::PyRecordReader rec_reader(TEST_RECORD_FILE);
-  AINFO << "++++ begin reading";
-
-  sleep(1);
-  int count = 0;
-  apollo::cybertron::record::BagMessage bag_msg = rec_reader.ReadMessage();
-
-  std::string channel_name = bag_msg.channel_name;
-  EXPECT_EQ(CHAN_1, channel_name);
-  EXPECT_EQ(STR_10B, bag_msg.data);
-  EXPECT_EQ(1, rec_reader.GetMessageNumber(channel_name));
-  EXPECT_EQ(888, bag_msg.timestamp);
-  EXPECT_EQ(MSG_TYPE, bag_msg.data_type);
-  EXPECT_EQ(MSG_TYPE, rec_reader.GetMessageType(channel_name));
-  std::string header_str = rec_reader.GetHeaderString();
-  apollo::cybertron::proto::Header header;
-  header.ParseFromString(header_str);
-  EXPECT_EQ(1, header.major_version());
-  EXPECT_EQ(0, header.minor_version());
-  EXPECT_EQ(1, header.chunk_number());
-  EXPECT_EQ(1, header.channel_number());
-  EXPECT_TRUE(header.is_complete());
 }
 
-int main(int argc, char** argv) {
-  apollo::cybertron::Init(argv[0]);
-  testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
+void test_read(const std::string &readfile) {
+  apollo::cybertron::record::PyRecordReader rec_reader(readfile);
+  AINFO << "++++ begin reading";
+  sleep(1);
+  int count = 0;
+
+  apollo::cybertron::record::BagMessage bag_msg = rec_reader.ReadMessage();
+  while (!bag_msg.end) {
+    AINFO << "========================";
+    std::string channel_name = bag_msg.channel_name;
+    AINFO << "read msg[" << count << "]";
+    AINFO << "cur channel:[" << channel_name
+          << "] msg total:" << rec_reader.GetMessageNumber(channel_name) << "] "
+          << "cur msg:[ " << bag_msg.data << " ]";
+    AINFO << "curMsgTime: " << bag_msg.timestamp;
+    AINFO << "msg type:" << bag_msg.data_type;
+    AINFO << "msg protoDesc:" << rec_reader.GetProtoDesc(channel_name);
+    count++;
+    bag_msg = rec_reader.ReadMessage();
+  }
+
+  AINFO << "reader msg count = " << count;
+}
+int main(int argc, char *argv[]) {
+  apollo::cybertron::Init("cyber_python");
+  test_write(TEST_RECORD_FILE);
+  sleep(1);
+  test_read(TEST_RECORD_FILE);
+
+  return 0;
 }

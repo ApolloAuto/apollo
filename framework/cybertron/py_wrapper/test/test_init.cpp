@@ -14,26 +14,20 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include <thread>
+
 #include "cybertron/cybertron.h"
-#include "cybertron/proto/chatter.pb.h"
-#include "python/wrapper/py_node.h"
+#include "cybertron/py_wrapper/py_node.h"
+#include "gtest/gtest.h"
 
-apollo::cybertron::PyReader *pr = NULL;
-
-int cbfun(const char *channel_name) {
-  AINFO << "recv->[ " << channel_name << " ]";
-  if (pr) AINFO << "read->[ " << pr->read() << " ]";
+TEST(CyberInitTest, test_init) {
+  EXPECT_TRUE(apollo::cybertron::OK());
+  apollo::cybertron::Shutdown();
+  EXPECT_TRUE(apollo::cybertron::IsShutdown());
 }
 
-int main(int argc, char *argv[]) {
-  apollo::cybertron::Init("cyber_python");
-  apollo::cybertron::proto::Chatter chat;
-  apollo::cybertron::PyNode node("listener");
-  pr = node.create_reader("channel/chatter", chat.GetTypeName());
-  pr->register_func(cbfun);
-
-  apollo::cybertron::WaitForShutdown();
-  delete pr;
-
-  return 0;
+int main(int argc, char** argv) {
+  apollo::cybertron::Init(argv[0]);
+  testing::InitGoogleTest(&argc, argv);
+  return RUN_ALL_TESTS();
 }
