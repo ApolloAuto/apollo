@@ -90,7 +90,7 @@ class PyWriter {
   int write(const std::string &data) {
     auto message =
         std::make_shared<cybertron::message::PyMessageWrap>(data, data_type_);
-    message->SetTypeName(data_type_);
+    message->set_type_name(data_type_);
     return writer_->Write(message);
   }
 

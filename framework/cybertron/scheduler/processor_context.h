@@ -69,7 +69,7 @@ class ProcessorContext {
 
   virtual void Notify(uint64_t croutine_id);
   virtual bool Enqueue(const std::shared_ptr<CRoutine>& cr) = 0;
-  virtual bool EnqueueAffinityRoutine(const std::shared_ptr<CRoutine>& cr){};
+  virtual bool EnqueueAffinityRoutine(const std::shared_ptr<CRoutine>& cr) = 0;
   void RemoveCRoutine(uint64_t croutine_id);
   int RqSize();
 

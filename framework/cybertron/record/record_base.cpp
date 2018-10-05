@@ -24,7 +24,7 @@ RecordBase::RecordBase() {}
 
 RecordBase::~RecordBase() {}
 
-const Header RecordBase::GetHeader() const { return header_; }
+const Header& RecordBase::GetHeader() const { return header_; }
 
 bool RecordBase::IsNewChannel(const std::string& channel_name) {
   auto search = channel_message_number_map_.find(channel_name);
@@ -65,7 +65,7 @@ const std::string& RecordBase::GetMessageType(
   if (search != channel_message_type_map_.end()) {
     return search->second;
   }
-  return g_empty_string;
+  return null_type_;
 }
 
 const std::string& RecordBase::GetProtoDesc(
@@ -74,7 +74,7 @@ const std::string& RecordBase::GetProtoDesc(
   if (search != channel_proto_desc_map_.end()) {
     return search->second;
   }
-  return g_empty_string;
+  return null_type_;
 }
 
 }  // namespace record

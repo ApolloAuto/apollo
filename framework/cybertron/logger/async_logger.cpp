@@ -153,8 +153,8 @@ void AsyncLogger::RunThread() {
 
     for (const auto& msg : flushing_buf_->messages) {
       std::string module_name;
-      int lpos = msg.message.find("[");
-      int rpos = msg.message.find("]", lpos);
+      auto lpos = msg.message.find("[");
+      auto rpos = msg.message.find("]", lpos);
       if (lpos != std::string::npos && rpos != std::string::npos) {
         module_name = msg.message.substr(lpos + 1, rpos - lpos - 1);
       }

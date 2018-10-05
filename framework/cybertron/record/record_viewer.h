@@ -21,7 +21,7 @@
 #include <set>
 #include <string>
 
-#include <cybertron/record/record_reader.h>
+#include "cybertron/record/record_reader.h"
 
 namespace apollo {
 namespace cybertron {

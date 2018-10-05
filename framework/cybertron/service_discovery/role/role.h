@@ -62,8 +62,8 @@ class RoleBase {
   void set_attributes(const RoleAttributes& attr) { attributes_ = attr; }
 
  protected:
-  uint64_t timestamp_;
   RoleAttributes attributes_;
+  uint64_t timestamp_;
 };
 
 class RoleWriter : public RoleBase {

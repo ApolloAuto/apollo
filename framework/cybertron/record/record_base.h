@@ -33,8 +33,6 @@ namespace apollo {
 namespace cybertron {
 namespace record {
 
-const char g_empty_string[] = "";
-
 class RecordBase {
  public:
   RecordBase();
@@ -42,7 +40,7 @@ class RecordBase {
   uint64_t GetMessageNumber(const std::string& channel_name) const;
   const std::string& GetMessageType(const std::string& channel_name) const;
   const std::string& GetProtoDesc(const std::string& channel_name) const;
-  const Header GetHeader() const;
+  const Header& GetHeader() const;
 
  protected:
   bool IsNewChannel(const std::string& channel_name);
@@ -57,6 +55,7 @@ class RecordBase {
   std::mutex mutex_;
   std::string file_;
   std::string path_;
+  std::string null_type_;
   std::unordered_map<std::string, uint64_t> channel_message_number_map_;
   std::unordered_map<std::string, std::string> channel_message_type_map_;
   std::unordered_map<std::string, std::string> channel_proto_desc_map_;

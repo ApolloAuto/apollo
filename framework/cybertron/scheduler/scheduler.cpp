@@ -32,9 +32,6 @@ using apollo::cybertron::common::GlobalData;
 
 Scheduler::Scheduler() : stop_(false) {
   auto gconf = GlobalData::Instance()->Config();
-  int interval = 1000;
-  struct sched_param param;
-  int policy;
   proc_num_ = std::thread::hardware_concurrency();
 
   if (gconf.has_scheduler_conf()) {
@@ -88,7 +85,7 @@ void Scheduler::StartSysmon() {
 }
 
 void Scheduler::CreateProcessor() {
-  for (int i = 0; i < proc_num_; i++) {
+  for (uint32_t i = 0; i < proc_num_; i++) {
     auto proc = std::make_shared<Processor>();
     proc->set_id(i);
 
@@ -161,7 +158,7 @@ std::shared_ptr<ProcessorContext> Scheduler::FindProc(
     }
   }
 
-  for (int i = 0; i < proc_ctxs_.size(); i++) {
+  for (uint32_t i = 0; i < proc_ctxs_.size(); i++) {
     count += proc_ctxs_[i]->RqSize();
   }
   auto id = count % proc_ctxs_.size();
@@ -173,7 +170,7 @@ bool Scheduler::DispatchTask(const std::shared_ptr<CRoutine>& croutine) {
   auto ctx = FindProc(croutine);
 
   if (croutine->processor_id() >= proc_num_ ||
-      croutine->processor_id() < 0 && ctx) {
+      (croutine->processor_id() < 0 && ctx)) {
     AERROR << GlobalData::GetTaskNameById(croutine->id())
            << "push failed, get processor failed, "
            << "target processor index: " << croutine->processor_id();
@@ -189,7 +186,7 @@ bool Scheduler::DispatchTask(const std::shared_ptr<CRoutine>& croutine) {
     return false;
   }
 
-  for (int i = 0; i < proc_ctxs_.size(); ++i) {
+  for (uint32_t i = 0; i < proc_ctxs_.size(); ++i) {
     if (croutine->IsAffinity(i)) {
       if (proc_ctxs_.at(i)->EnqueueAffinityRoutine(croutine)) {
         ADEBUG << "push routine[" << GlobalData::GetTaskNameById(croutine->id())
@@ -277,7 +274,7 @@ bool Scheduler::CreateTask(std::function<void()>&& func,
       croutine->AddAffinityProcessor(p);
     }
   } else {
-    for (int i = 0; i < proc_num_; i++) {
+    for (uint32_t i = 0; i < proc_num_; i++) {
       croutine->AddAffinityProcessor(i);
     }
   }

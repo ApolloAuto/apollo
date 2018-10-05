@@ -47,7 +47,7 @@ TaskManager::TaskManager()
   auto factory = croutine::CreateRoutineFactory(std::move(func));
   num_threads_ = scheduler::Scheduler::Instance()->ProcessorNum();
   tasks_.reserve(num_threads_);
-  for (int i = 0; i < num_threads_; i++) {
+  for (uint32_t i = 0; i < num_threads_; i++) {
     auto task_name = task_prefix + std::to_string(i);
     tasks_.push_back(common::GlobalData::RegisterTaskName(task_name));
     scheduler::Scheduler::Instance()->CreateTask(factory, task_name);
@@ -55,7 +55,7 @@ TaskManager::TaskManager()
 }
 
 TaskManager::~TaskManager() {
-  for (int i = 0; i < num_threads_; i++) {
+  for (uint32_t i = 0; i < num_threads_; i++) {
     scheduler::Scheduler::Instance()->RemoveTask(task_prefix +
                                                  std::to_string(i));
   }
