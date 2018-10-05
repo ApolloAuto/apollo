@@ -17,34 +17,49 @@
 #ifndef MODULES_CANBUS_VEHICLE_LEXUS_PROTOCOL_WHEEL_SPEED_RPT_407_H_
 #define MODULES_CANBUS_VEHICLE_LEXUS_PROTOCOL_WHEEL_SPEED_RPT_407_H_
 
-#include "modules/drivers/canbus/can_comm/protocol_data.h"
 #include "modules/canbus/proto/chassis_detail.pb.h"
+#include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
 namespace canbus {
 namespace lexus {
 
 class Wheelspeedrpt407 : public ::apollo::drivers::canbus::ProtocolData<
-                    ::apollo::canbus::ChassisDetail> {
+                             ::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
   Wheelspeedrpt407();
   void Parse(const std::uint8_t* bytes, int32_t length,
-                     ChassisDetail* chassis) const override;
+             ChassisDetail* chassis) const override;
 
  private:
+  // config detail: {'name': 'WHEEL_SPD_REAR_RIGHT', 'offset': 0.0, 'precision':
+  // 0.01, 'len': 16, 'is_signed_var': True, 'physical_range':
+  // '[-327.68|327.67]', 'bit': 55, 'type': 'double', 'order': 'motorola',
+  // 'physical_unit': 'rad/s'}
+  double wheel_spd_rear_right(const std::uint8_t* bytes,
+                              const int32_t length) const;
 
-  // config detail: {'name': 'WHEEL_SPD_REAR_RIGHT', 'offset': 0.0, 'precision': 0.01, 'len': 16, 'is_signed_var': True, 'physical_range': '[-327.68|327.67]', 'bit': 55, 'type': 'double', 'order': 'motorola', 'physical_unit': 'rad/s'}
-  double wheel_spd_rear_right(const std::uint8_t* bytes, const int32_t length) const;
+  // config detail: {'name': 'WHEEL_SPD_REAR_LEFT', 'offset': 0.0, 'precision':
+  // 0.01, 'len': 16, 'is_signed_var': True, 'physical_range':
+  // '[-327.68|327.67]', 'bit': 39, 'type': 'double', 'order': 'motorola',
+  // 'physical_unit': 'rad/s'}
+  double wheel_spd_rear_left(const std::uint8_t* bytes,
+                             const int32_t length) const;
 
-  // config detail: {'name': 'WHEEL_SPD_REAR_LEFT', 'offset': 0.0, 'precision': 0.01, 'len': 16, 'is_signed_var': True, 'physical_range': '[-327.68|327.67]', 'bit': 39, 'type': 'double', 'order': 'motorola', 'physical_unit': 'rad/s'}
-  double wheel_spd_rear_left(const std::uint8_t* bytes, const int32_t length) const;
+  // config detail: {'name': 'WHEEL_SPD_FRONT_RIGHT', 'offset': 0.0,
+  // 'precision': 0.01, 'len': 16, 'is_signed_var': True, 'physical_range':
+  // '[-327.68|327.67]', 'bit': 23, 'type': 'double', 'order': 'motorola',
+  // 'physical_unit': 'rad/s'}
+  double wheel_spd_front_right(const std::uint8_t* bytes,
+                               const int32_t length) const;
 
-  // config detail: {'name': 'WHEEL_SPD_FRONT_RIGHT', 'offset': 0.0, 'precision': 0.01, 'len': 16, 'is_signed_var': True, 'physical_range': '[-327.68|327.67]', 'bit': 23, 'type': 'double', 'order': 'motorola', 'physical_unit': 'rad/s'}
-  double wheel_spd_front_right(const std::uint8_t* bytes, const int32_t length) const;
-
-  // config detail: {'name': 'WHEEL_SPD_FRONT_LEFT', 'offset': 0.0, 'precision': 0.01, 'len': 16, 'is_signed_var': False, 'physical_range': '[-327.68|327.67]', 'bit': 7, 'type': 'double', 'order': 'motorola', 'physical_unit': 'rad/s'}
-  double wheel_spd_front_left(const std::uint8_t* bytes, const int32_t length) const;
+  // config detail: {'name': 'WHEEL_SPD_FRONT_LEFT', 'offset': 0.0, 'precision':
+  // 0.01, 'len': 16, 'is_signed_var': False, 'physical_range':
+  // '[-327.68|327.67]', 'bit': 7, 'type': 'double', 'order': 'motorola',
+  // 'physical_unit': 'rad/s'}
+  double wheel_spd_front_left(const std::uint8_t* bytes,
+                              const int32_t length) const;
 };
 
 }  // namespace lexus

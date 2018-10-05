@@ -17,33 +17,45 @@
 #ifndef MODULES_CANBUS_VEHICLE_LEXUS_PROTOCOL_REAR_LIGHTS_RPT_418_H_
 #define MODULES_CANBUS_VEHICLE_LEXUS_PROTOCOL_REAR_LIGHTS_RPT_418_H_
 
-#include "modules/drivers/canbus/can_comm/protocol_data.h"
 #include "modules/canbus/proto/chassis_detail.pb.h"
+#include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
 namespace canbus {
 namespace lexus {
 
 class Rearlightsrpt418 : public ::apollo::drivers::canbus::ProtocolData<
-                    ::apollo::canbus::ChassisDetail> {
+                             ::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
   Rearlightsrpt418();
   void Parse(const std::uint8_t* bytes, int32_t length,
-                     ChassisDetail* chassis) const override;
+             ChassisDetail* chassis) const override;
 
  private:
+  // config detail: {'name': 'REVERSE_LIGHTS_ON_IS_VALID', 'offset': 0.0,
+  // 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range':
+  // '[0|1]', 'bit': 9, 'type': 'bool', 'order': 'motorola', 'physical_unit':
+  // ''}
+  bool reverse_lights_on_is_valid(const std::uint8_t* bytes,
+                                  const int32_t length) const;
 
-  // config detail: {'name': 'REVERSE_LIGHTS_ON_IS_VALID', 'offset': 0.0, 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 9, 'type': 'bool', 'order': 'motorola', 'physical_unit': ''}
-  bool reverse_lights_on_is_valid(const std::uint8_t* bytes, const int32_t length) const;
+  // config detail: {'name': 'BRAKE_LIGHTS_ON_IS_VALID', 'offset': 0.0,
+  // 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range':
+  // '[0|1]', 'bit': 8, 'type': 'bool', 'order': 'motorola', 'physical_unit':
+  // ''}
+  bool brake_lights_on_is_valid(const std::uint8_t* bytes,
+                                const int32_t length) const;
 
-  // config detail: {'name': 'BRAKE_LIGHTS_ON_IS_VALID', 'offset': 0.0, 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 8, 'type': 'bool', 'order': 'motorola', 'physical_unit': ''}
-  bool brake_lights_on_is_valid(const std::uint8_t* bytes, const int32_t length) const;
-
-  // config detail: {'name': 'REVERSE_LIGHTS_ON', 'offset': 0.0, 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 1, 'type': 'bool', 'order': 'motorola', 'physical_unit': ''}
+  // config detail: {'name': 'REVERSE_LIGHTS_ON', 'offset': 0.0,
+  // 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range':
+  // '[0|1]', 'bit': 1, 'type': 'bool', 'order': 'motorola', 'physical_unit':
+  // ''}
   bool reverse_lights_on(const std::uint8_t* bytes, const int32_t length) const;
 
-  // config detail: {'name': 'BRAKE_LIGHTS_ON', 'offset': 0.0, 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 0, 'type': 'bool', 'order': 'motorola', 'physical_unit': ''}
+  // config detail: {'name': 'BRAKE_LIGHTS_ON', 'offset': 0.0, 'precision': 1.0,
+  // 'len': 1, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 0,
+  // 'type': 'bool', 'order': 'motorola', 'physical_unit': ''}
   bool brake_lights_on(const std::uint8_t* bytes, const int32_t length) const;
 };
 

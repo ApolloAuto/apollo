@@ -31,14 +31,24 @@ Steeringmotorrpt2405::Steeringmotorrpt2405() {}
 const int32_t Steeringmotorrpt2405::ID = 0x405;
 
 void Steeringmotorrpt2405::Parse(const std::uint8_t* bytes, int32_t length,
-                         ChassisDetail* chassis) const {
-  chassis->mutable_lexus()->mutable_steering_motor_rpt_2_405()->set_encoder_temperature(encoder_temperature(bytes, length));
-  chassis->mutable_lexus()->mutable_steering_motor_rpt_2_405()->set_motor_temperature(motor_temperature(bytes, length));
-  chassis->mutable_lexus()->mutable_steering_motor_rpt_2_405()->set_angular_speed(angular_speed(bytes, length));
+                                 ChassisDetail* chassis) const {
+  chassis->mutable_lexus()
+      ->mutable_steering_motor_rpt_2_405()
+      ->set_encoder_temperature(encoder_temperature(bytes, length));
+  chassis->mutable_lexus()
+      ->mutable_steering_motor_rpt_2_405()
+      ->set_motor_temperature(motor_temperature(bytes, length));
+  chassis->mutable_lexus()
+      ->mutable_steering_motor_rpt_2_405()
+      ->set_angular_speed(angular_speed(bytes, length));
 }
 
-// config detail: {'name': 'encoder_temperature', 'offset': -40.0, 'precision': 1.0, 'len': 16, 'is_signed_var': True, 'physical_range': '[-32808|32727]', 'bit': 7, 'type': 'int', 'order': 'motorola', 'physical_unit': 'deg C'}
-int Steeringmotorrpt2405::encoder_temperature(const std::uint8_t* bytes, int32_t length) const {
+// config detail: {'name': 'encoder_temperature', 'offset': -40.0,
+// 'precision': 1.0, 'len': 16, 'is_signed_var': True, 'physical_range':
+// '[-32808|32727]', 'bit': 7, 'type': 'int', 'order': 'motorola',
+// 'physical_unit': 'deg C'}
+int Steeringmotorrpt2405::encoder_temperature(const std::uint8_t* bytes,
+                                              int32_t length) const {
   Byte t0(bytes + 0);
   int32_t x = t0.get_byte(0, 8);
 
@@ -54,8 +64,12 @@ int Steeringmotorrpt2405::encoder_temperature(const std::uint8_t* bytes, int32_t
   return ret;
 }
 
-// config detail: {'name': 'motor_temperature', 'offset': -40.0, 'precision': 1.0, 'len': 16, 'is_signed_var': True, 'physical_range': '[-32808|32727]', 'bit': 23, 'type': 'int', 'order': 'motorola', 'physical_unit': 'deg C'}
-int Steeringmotorrpt2405::motor_temperature(const std::uint8_t* bytes, int32_t length) const {
+// config detail: {'name': 'motor_temperature', 'offset': -40.0,
+// 'precision': 1.0, 'len': 16, 'is_signed_var': True, 'physical_range':
+// '[-32808|32727]', 'bit': 23, 'type': 'int', 'order': 'motorola',
+// 'physical_unit': 'deg C'}
+int Steeringmotorrpt2405::motor_temperature(const std::uint8_t* bytes,
+                                            int32_t length) const {
   Byte t0(bytes + 2);
   int32_t x = t0.get_byte(0, 8);
 
@@ -71,8 +85,12 @@ int Steeringmotorrpt2405::motor_temperature(const std::uint8_t* bytes, int32_t l
   return ret;
 }
 
-// config detail: {'name': 'angular_speed', 'offset': 0.0, 'precision': 0.001, 'len': 32, 'is_signed_var': True, 'physical_range': '[-2147483.648|2147483.647]', 'bit': 39, 'type': 'double', 'order': 'motorola', 'physical_unit': 'rev/s'}
-double Steeringmotorrpt2405::angular_speed(const std::uint8_t* bytes, int32_t length) const {
+// config detail: {'name': 'angular_speed', 'offset': 0.0, 'precision': 0.001,
+// 'len': 32, 'is_signed_var': True, 'physical_range':
+// '[-2147483.648|2147483.647]', 'bit': 39, 'type': 'double', 'order':
+// 'motorola', 'physical_unit': 'rev/s'}
+double Steeringmotorrpt2405::angular_speed(const std::uint8_t* bytes,
+                                           int32_t length) const {
   Byte t0(bytes + 4);
   int32_t x = t0.get_byte(0, 8);
 
