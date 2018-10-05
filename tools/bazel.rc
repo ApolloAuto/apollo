@@ -3,6 +3,8 @@
 # +------------------------------------------------------------+
 startup --batch_cpu_scheduling
 
+startup --host_jvm_args=-XX:-UseParallelGC
+
 # +------------------------------------------------------------+
 # | Test Configurations                                        |
 # +------------------------------------------------------------+
@@ -48,6 +50,8 @@ test:coverage --linkopt=-lc
 # +------------------------------------------------------------+
 # Do not show warnings from external dependencies.
 build --output_filter="^//"
+
+build --show_timestamps
 
 # Work around the sandbox issue.
 build --spawn_strategy=standalone
