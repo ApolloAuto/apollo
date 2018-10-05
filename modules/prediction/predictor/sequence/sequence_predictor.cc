@@ -73,6 +73,11 @@ void SequencePredictor::FilterLaneSequences(
   std::pair<int, double> change(-1, -1.0);
   std::pair<int, double> all(-1, -1.0);
 
+  /** 
+    * Filter out those obstacles that are close to the ADC 
+    * so that we will ignore them and drive normally unless
+    * they really kick into our lane.
+    */
   for (int i = 0; i < num_lane_sequence; ++i) {
     const LaneSequence& sequence = lane_graph.lane_sequence(i);
     lane_change_type[i] = GetLaneChangeType(lane_id, sequence);
@@ -95,6 +100,10 @@ void SequencePredictor::FilterLaneSequences(
     }
   }
 
+
+  /**
+    * Pick the most probable lane-sequence and lane-change
+    */
   for (int i = 0; i < num_lane_sequence; ++i) {
     const LaneSequence& sequence = lane_graph.lane_sequence(i);
 
@@ -115,6 +124,7 @@ void SequencePredictor::FilterLaneSequences(
     }
   }
 
+  
   for (int i = 0; i < num_lane_sequence; ++i) {
     const LaneSequence& sequence = lane_graph.lane_sequence(i);
 
