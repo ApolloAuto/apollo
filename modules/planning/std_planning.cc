@@ -412,7 +412,7 @@ bool StdPlanning::CheckPlanningConfig() {
     return false;
   }
   if (config_.standard_planning_config()
-          .planner_onroad_config()
+          .planner_public_road_config()
           .scenario_type_size() == 0) {
     return false;
   }

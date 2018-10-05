@@ -32,7 +32,7 @@ class ScenarioManager final {
  public:
   ScenarioManager() = default;
 
-  bool Init();
+  bool Init(const std::set<ScenarioConfig::ScenarioType>& supported_scenarios);
 
   Scenario* mutable_scenario() { return scenario_.get(); }
 

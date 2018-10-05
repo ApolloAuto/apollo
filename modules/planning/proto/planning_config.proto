@@ -59,7 +59,7 @@ message ScenarioConfig {
   repeated ScenarioTaskConfig scenario_task_config = 3;
 }
 
-message PlannerOnRoadConfig {
+message PlannerPublicRoadConfig {
   // supported scenario types
   repeated ScenarioConfig.ScenarioType scenario_type = 1;
 }
@@ -84,7 +84,7 @@ message RtkPlanningConfig {
 
 message StandardPlanningConfig {
   repeated PlannerType planner_type = 1;  // supported planners
-  optional PlannerOnRoadConfig planner_onroad_config = 2;
+  optional PlannerPublicRoadConfig planner_public_road_config = 2;
 }
 
 message NavigationPlanningConfig {
