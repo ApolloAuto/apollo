@@ -43,7 +43,7 @@ TEST_F(SidePassScenarioTest, Simple) {
   EXPECT_EQ(scenario_->scenario_type(), ScenarioConfig::SIDE_PASS);
 
   FLAGS_side_pass_scenario_config_file =
-      "modules/planning/conf/side_pass_scenario_config.pb.txt";
+      "modules/planning/conf/scenario_side_pass_config.pb.txt";
   ScenarioConfig config;
   EXPECT_TRUE(apollo::common::util::GetProtoFromFile(
       FLAGS_side_pass_scenario_config_file, &config));
