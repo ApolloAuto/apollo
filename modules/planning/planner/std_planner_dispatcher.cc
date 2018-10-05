@@ -15,14 +15,19 @@
  *****************************************************************************/
 
 #include "modules/planning/planner/std_planner_dispatcher.h"
-
+#include "modules/common/util/file.h"
 #include "modules/planning/proto/planning_config.pb.h"
+#include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
 namespace planning {
 
 std::unique_ptr<Planner> StdPlannerDispatcher::DispatchPlanner() {
-  return planner_factory_.CreateObject(PUBLIC_ROAD);
+  PlanningConfig planning_config;
+  apollo::common::util::GetProtoFromFile(FLAGS_planning_config_file,
+      &planning_config);
+  return planner_factory_.CreateObject(
+      planning_config.standard_planning_config().planner_type(0));
 }
 
 }  // namespace planning
