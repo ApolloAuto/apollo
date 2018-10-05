@@ -189,7 +189,7 @@ void PointCloudUpdater::FilterPointCloud(
 
   float z_offset;
   {
-    boost::unique_lock<boost::shared_mutex> reader_lock(mutex_);
+    boost::shared_lock<boost::shared_mutex> reader_lock(mutex_);
     z_offset = lidar_height_;
   }
   apollo::dreamview::PointCloud point_cloud_pb;
