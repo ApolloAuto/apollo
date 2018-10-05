@@ -28,14 +28,20 @@ DEFINE_int32(planning_loop_rate, 10, "Loop rate for planning node");
 DEFINE_bool(enable_collision_detection, false,
             "enable collision detection in planning");
 
+// scenario conf
 DEFINE_string(
     lane_follow_scenario_config_file,
-    "/apollo/modules/planning/conf/lane_follow_scenario_config.pb.txt",
+    "/apollo/modules/planning/conf/scenario_lane_follow_config.pb.txt",
     "The lane follow scenario configuration file");
-
-DEFINE_string(side_pass_scenario_config_file,
-              "/apollo/modules/planning/conf/side_pass_scenario_config.pb.txt",
-              "The side pass scenario configuration file");
+DEFINE_string(
+    side_pass_scenario_config_file,
+    "/apollo/modules/planning/conf/scenario_side_pass_config.pb.txt",
+    "The side pass scenario configuration file");
+DEFINE_string(
+    stop_sign_unprotected_scenario_config_file,
+    "/apollo/modules/planning/conf/"
+    "scenario_stop_sign_unprotected_config.pb.txt",
+    "The stop_sign_unprotected scenario configuration file");
 
 DEFINE_string(planning_adapter_config_filename,
               "/apollo/modules/planning/conf/adapter.conf",

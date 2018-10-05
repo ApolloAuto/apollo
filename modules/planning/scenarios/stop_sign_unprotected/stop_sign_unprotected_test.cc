@@ -18,7 +18,7 @@
  * @file
  **/
 
-#include "modules/planning/scenarios/lane_follow/lane_follow_scenario.h"
+#include "modules/planning/scenarios/stop_sign_unprotected/stop_sign_unprotected.h"  // NOINT
 
 #include <memory>
 
@@ -31,22 +31,23 @@
 namespace apollo {
 namespace planning {
 
-class LaneFollowScenarioTest : public ::testing::Test {
+class StopSignUnprotectedScenarioTest : public ::testing::Test {
  public:
   virtual void SetUp() {}
 
  protected:
-  std::unique_ptr<LaneFollowScenario> scenario_;
+  std::unique_ptr<StopSignUnprotectedScenario> scenario_;
 };
-TEST_F(LaneFollowScenarioTest, Simple) {
-  scenario_.reset(new LaneFollowScenario());
-  EXPECT_EQ(scenario_->scenario_type(), ScenarioConfig::LANE_FOLLOW);
 
-  FLAGS_lane_follow_scenario_config_file =
-      "modules/planning/conf/scenario_lane_follow_config.pb.txt";
+TEST_F(StopSignUnprotectedScenarioTest, Simple) {
+  scenario_.reset(new StopSignUnprotectedScenario());
+  EXPECT_EQ(scenario_->scenario_type(),
+            ScenarioConfig::STOP_SIGN_UNPROTECTED);
+
   ScenarioConfig config;
   EXPECT_TRUE(apollo::common::util::GetProtoFromFile(
-      FLAGS_lane_follow_scenario_config_file, &config));
+      FLAGS_stop_sign_unprotected_scenario_config_file, &config));
+
   EXPECT_TRUE(scenario_->Init());
 }
 
