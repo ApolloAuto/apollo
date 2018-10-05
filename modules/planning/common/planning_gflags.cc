@@ -33,6 +33,10 @@ DEFINE_string(
     "/apollo/modules/planning/conf/lane_follow_scenario_config.pb.txt",
     "The lane follow scenario configuration file");
 
+DEFINE_string(side_pass_scenario_config_file,
+              "/apollo/modules/planning/conf/side_pass_scenario_config.pb.txt",
+              "The side pass scenario configuration file");
+
 DEFINE_string(planning_adapter_config_filename,
               "/apollo/modules/planning/conf/adapter.conf",
               "The adapter configuration file");
