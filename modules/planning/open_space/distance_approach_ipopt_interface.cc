@@ -108,7 +108,7 @@ bool DistanceApproachIPOPTInterface::get_bounds_info(int n, double* x_l,
       << ", num_of_constraints_: " << num_of_constraints_;
 
   // Variables: includes state, u, sample time and lagrange multipliers
-  // 1. state variables, 4 * (0~ horizon)
+  // 1. state variables, 4 * [0, horizon]
   // start point pose
   std::size_t variable_index = 0;
   for (std::size_t i = 0; i < 4; ++i) {
@@ -118,7 +118,7 @@ bool DistanceApproachIPOPTInterface::get_bounds_info(int n, double* x_l,
   variable_index += 4;
 
   // During horizons, 2 ~ N-1
-  for (std::size_t i = 2; i <= horizon_ - 1; ++i) {
+  for (std::size_t i = 2; i <= horizon_; ++i) {
     // x
     x_l[variable_index] = XYbounds_(0, 0);
     x_u[variable_index] = XYbounds_(1, 0);
@@ -148,7 +148,7 @@ bool DistanceApproachIPOPTInterface::get_bounds_info(int n, double* x_l,
   variable_index += 4;
   ADEBUG << "variable_index after adding state variables : " << variable_index;
 
-  // 2. control varialbles, 2 * (0 ~ horizon_-1)
+  // 2. control variables, 2 * (0 ~ horizon_-1)
   for (std::size_t i = 0; i < horizon_; ++i) {
     // u1
     x_l[variable_index] = -0.6;
@@ -204,8 +204,8 @@ bool DistanceApproachIPOPTInterface::get_bounds_info(int n, double* x_l,
 
   ADEBUG << "variable_index after adding lagrange n : " << variable_index;
 
-  // Constraints: includes four state euler forward constraints, three
-  // obstatalces related constraints
+  // Constraints: includes four state Euler forward constraints, three
+  // Obstacle related constraints
 
   // 1. state constraints 4 * (0 ~ horizons)
   // start point pose
@@ -216,7 +216,7 @@ bool DistanceApproachIPOPTInterface::get_bounds_info(int n, double* x_l,
   }
   constraint_index += 4 * (horizon_ + 1);
 
-  ADEBUG << "constraint_index after adding eular forward dynamics constraints: "
+  ADEBUG << "constraint_index after adding Euler forward dynamics constraints: "
          << constraint_index;
 
   // 2. Three obstacles related equal constraints, one equality constraints,
@@ -248,9 +248,6 @@ bool DistanceApproachIPOPTInterface::get_bounds_info(int n, double* x_l,
 
 bool DistanceApproachIPOPTInterface::eval_g(int n, const double* x, bool new_x,
                                             int m, double* g) {
-  // state start index.
-  std::size_t state_start_index = 0;
-
   // control start index.
   std::size_t control_start_index = 4 * (horizon_ + 1);
 
@@ -268,8 +265,9 @@ bool DistanceApproachIPOPTInterface::eval_g(int n, const double* x, bool new_x,
 
   std::size_t constraint_index = 0;
   for (std::size_t i = 1; i < horizon_; ++i) {
+    std::size_t state_start_index = 4 * (i - 1);
     // x1
-    // TODO(QiL) : optimize and remove redudant caculation in next iteration.
+    // TODO(QiL) : optimize and remove redundant calculation in next iteration.
     g[constraint_index] =
         x[state_start_index + 4] -
         (x[state_start_index] +
@@ -291,7 +289,7 @@ bool DistanceApproachIPOPTInterface::eval_g(int n, const double* x, bool new_x,
              std::tan(x[control_start_index] / wheelbase_));
 
     // x3
-    g[constraint_index + 1] =
+    g[constraint_index + 2] =
         x[state_start_index + 6] -
         (x[state_start_index + 2] +
          ts_ * x[time_start_index] *
@@ -300,26 +298,24 @@ bool DistanceApproachIPOPTInterface::eval_g(int n, const double* x, bool new_x,
              std::tan(x[control_start_index] / wheelbase_));
 
     // x4
-    g[constraint_index + 4] =
+    g[constraint_index + 3] =
         x[state_start_index + 7] -
         (x[state_start_index + 3] +
          ts_ * x[time_start_index] * x[control_start_index + 1]);
 
-    state_start_index += 4;
     control_start_index += 2;
     constraint_index += 4;
     time_start_index += 1;
   }
 
-  ADEBUG << "constraint_index after adding eular forward dynamics constraints "
+  ADEBUG << "constraint_index after adding Euler forward dynamics constraints "
             "updated: "
          << constraint_index;
 
   // 2. Obstacle avoidance constraints
   int counter = 0;
-  // Reset state_start_index
-  state_start_index = 0;
   for (std::size_t i = 1; i <= horizon_ + 1; ++i) {
+    std::size_t state_start_index = 4 * (i - 1);
     for (std::size_t j = 1; j <= obstacles_num_; ++j) {
       std::size_t current_vertice_num = obstacles_vertices_num_(i, 0);
       Eigen::MatrixXd Aj =
@@ -340,7 +336,7 @@ bool DistanceApproachIPOPTInterface::eval_g(int n, const double* x, bool new_x,
       }
       g[constraint_index] = tmp1 * tmp1 + tmp2 * tmp2 - 1.0;
 
-      // G' * mu + R' * lamda == 0
+      // G' * mu + R' * lambda == 0
       g[constraint_index + 1] = nj[0] - nj[2] +
                                 std::cos(x[state_start_index + 2]) * tmp1 +
                                 std::sin(x[state_start_index + 2]) * tmp2;
@@ -365,7 +361,6 @@ bool DistanceApproachIPOPTInterface::eval_g(int n, const double* x, bool new_x,
       counter += 4;
       l_start_index += current_vertice_num;
       n_start_index += 4;
-      state_start_index += 4;
       constraint_index += 4;
     }
   }
@@ -454,12 +449,12 @@ bool DistanceApproachIPOPTInterface::eval_f(int n, const double* x, bool new_x,
   // min control inputs
   // min input rate
   // min time
-  // regularization wrt warm start traectory
+  // regularization wrt warm start trajectory
 
   std::size_t control_start_index = (horizon_ + 1) * 4;
   // std::size_t time_start_index = control_start_index + horizon_ * 2;
 
-  // TODO(QiL): Initial impelementation towards earier understanding and debug
+  // TODO(QiL): Initial implementation towards earlier understanding and debug
   // purpose, later code refine towards improving efficiency
 
   DCHECK(ts_ != 0) << "ts in distance_approach_ is 0";
@@ -472,7 +467,7 @@ bool DistanceApproachIPOPTInterface::eval_f(int n, const double* x, bool new_x,
                      x[control_start_index + i + 1];
   }
 
-  // 2. ojective to monimize input change rate, first horizon
+  // 2. objective to minimize input change rate, first horizon
   obj_value += distance_approach_config_.weight_u_rate(0) *
                    (x[control_start_index] / ts_) *
                    (x[control_start_index] / ts_) +
@@ -480,7 +475,7 @@ bool DistanceApproachIPOPTInterface::eval_f(int n, const double* x, bool new_x,
                    (x[control_start_index + 1] / ts_) *
                    (x[control_start_index + 1] / ts_);
 
-  // 3. objective to minimize input change rates, 1 ~ horizone -1
+  // 3. objective to minimize input change rates, 1 ~ horizon -1
   for (std::size_t i = 1; i < horizon_ - 1; ++i) {
     double u1_rate =
         (x[control_start_index + i + 2] - x[control_start_index + i]) / ts_;
