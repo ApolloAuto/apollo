@@ -413,6 +413,8 @@ class Renderer {
         return geo;
     }
 
+    // Debugging purpose function:
+    //  For detecting names of the lanes that your mouse cursor points to.
     getMouseOverLanes(event) {
         const canvasPosition = event.currentTarget.getBoundingClientRect();
         const mouse = new THREE.Vector3(
