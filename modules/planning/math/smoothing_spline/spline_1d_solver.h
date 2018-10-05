@@ -24,10 +24,13 @@
 #include <memory>
 #include <vector>
 
+#include "Eigen/Core"
+
 #include "modules/common/math/qp_solver/qp_solver.h"
 #include "modules/planning/math/smoothing_spline/spline_1d.h"
 #include "modules/planning/math/smoothing_spline/spline_1d_constraint.h"
 #include "modules/planning/math/smoothing_spline/spline_1d_kernel.h"
+#include "modules/planning/proto/qp_problem.pb.h"
 
 namespace apollo {
 namespace planning {
@@ -55,6 +58,13 @@ class Spline1dSolver {
 
   // output
   virtual const Spline1d& spline() const { return spline_; }
+
+  // convert qp problem to proto
+  void GenerateProblemProto(QuadraticProgrammingProblem* const qp_proto) const;
+
+ protected:
+  void ConvertMatrixXdToProto(const Eigen::MatrixXd& matrix,
+                              QPMatrix* const proto) const;
 
  protected:
   Spline1d spline_;

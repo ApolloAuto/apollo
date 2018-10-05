@@ -57,6 +57,8 @@ class Spline1d {
   const std::vector<double>& x_knots() const;
   uint32_t spline_order() const;
 
+  const std::vector<Spline1dSeg>& splines() const;
+
  private:
   uint32_t FindIndex(const double x) const;
 

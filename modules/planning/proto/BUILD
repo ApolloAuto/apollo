@@ -422,4 +422,18 @@ proto_library(
     ],
 )
 
+cc_proto_library(
+    name = "qp_problem_proto",
+    deps = [
+        ":qp_problem_lib",
+    ]
+)
+
+proto_library(
+    name = "qp_problem_lib",
+    srcs = [
+        "qp_problem.proto",
+    ]
+)
+
 cpplint()
