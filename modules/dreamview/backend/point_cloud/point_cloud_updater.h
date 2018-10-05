@@ -23,6 +23,7 @@
 
 #include <atomic>
 #include <future>
+#include <memory>
 #include <string>
 
 #include "boost/thread/locks.hpp"
