@@ -16,9 +16,9 @@
 
 #include "modules/canbus/vehicle/lexus/lexus_vehicle_factory.h"
 
+#include "cybertron/common/log.h"
 #include "modules/canbus/vehicle/lexus/lexus_controller.h"
 #include "modules/canbus/vehicle/lexus/lexus_message_manager.h"
-#include "modules/common/log.h"
 #include "modules/common/util/util.h"
 
 namespace apollo {
