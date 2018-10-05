@@ -1,1 +1,0 @@
-INPUT(libncurses.so.5 -ltinfo)
