@@ -307,8 +307,11 @@ export default class Map {
     }
 
     addTrafficLight(signal, coordinates, scene) {
+        // Draw stop line
         const drewObjects = this.addCurve(
             signal.stopLine, colorMapping.PURE_WHITE, coordinates, scene);
+
+        // Add traffic light object
         const posAndHeading = this.getSignalPositionAndHeading(signal, coordinates);
         if (posAndHeading) {
             loadObject(trafficLightMaterial, trafficLightObject,
@@ -347,8 +350,11 @@ export default class Map {
     }
 
     addStopSign(stopSign, coordinates, scene) {
+        // Draw stop line
         const drewObjects = this.addCurve(
             stopSign.stopLine, colorMapping.PURE_WHITE, coordinates, scene);
+
+        // Add stop sign object
         const posAndHeading = this.getStopSignPositionAndHeading(stopSign, coordinates);
         if (posAndHeading) {
             loadObject(stopSignMaterial, stopSignObject, stopSignScales,
