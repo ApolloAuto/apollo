@@ -74,6 +74,7 @@ enum PlannerType {
   ONROAD = 1;  // expectation maximization
   OPENSPACE = 2; // open space planner
   NAVI = 3; // navigation planner
+  LATTICE = 4;  // lattice planner
 }
 
 message RtkPlanningConfig {

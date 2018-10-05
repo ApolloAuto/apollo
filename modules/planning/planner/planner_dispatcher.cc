@@ -34,6 +34,8 @@ void PlannerDispatcher::RegisterPlanners() {
                             []() -> Planner* { return new EMPlanner(); });
   planner_factory_.Register(
       OPENSPACE, []() -> Planner* { return new OpenSpacePlanner(); });
+  planner_factory_.Register(
+       LATTICE, []() -> Planner* { return new LatticePlanner(); });
   planner_factory_.Register(NAVI,
                             []() -> Planner* { return new NaviPlanner(); });
 }
