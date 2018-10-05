@@ -44,8 +44,8 @@ namespace canbus {
 class LexusVehicleFactory : public AbstractVehicleFactory {
  public:
   /**
-  * @brief destructor
-  */
+   * @brief destructor
+   */
   virtual ~LexusVehicleFactory() = default;
 
   /**
@@ -58,7 +58,7 @@ class LexusVehicleFactory : public AbstractVehicleFactory {
    * @brief create lexus message manager
    * @returns a unique_ptr that points to the created message manager
    */
-  std::unique_ptr<MessageManager<::apollo::canbus::ChassisDetail>> 
+  std::unique_ptr<MessageManager<::apollo::canbus::ChassisDetail>>
   CreateMessageManager() override;
 };
 

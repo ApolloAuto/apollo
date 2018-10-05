@@ -26,7 +26,7 @@ namespace lexus {
 using ::apollo::drivers::canbus::MessageManager;
 
 class LexusMessageManager
-	: public MessageManager<::apollo::canbus::ChassisDetail> {
+    : public MessageManager<::apollo::canbus::ChassisDetail> {
  public:
   LexusMessageManager();
   virtual ~LexusMessageManager();

@@ -17,39 +17,58 @@
 #ifndef MODULES_CANBUS_VEHICLE_LEXUS_PROTOCOL_ACCEL_AUX_RPT_300_H_
 #define MODULES_CANBUS_VEHICLE_LEXUS_PROTOCOL_ACCEL_AUX_RPT_300_H_
 
-#include "modules/drivers/canbus/can_comm/protocol_data.h"
 #include "modules/canbus/proto/chassis_detail.pb.h"
+#include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
 namespace canbus {
 namespace lexus {
 
 class Accelauxrpt300 : public ::apollo::drivers::canbus::ProtocolData<
-                    ::apollo::canbus::ChassisDetail> {
+                           ::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
   Accelauxrpt300();
   void Parse(const std::uint8_t* bytes, int32_t length,
-                     ChassisDetail* chassis) const override;
+             ChassisDetail* chassis) const override;
 
  private:
+  // config detail: {'name': 'USER_INTERACTION_IS_VALID', 'offset': 0.0,
+  // 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range':
+  // '[0|1]', 'bit': 42, 'type': 'bool', 'order': 'motorola', 'physical_unit':
+  // ''}
+  bool user_interaction_is_valid(const std::uint8_t* bytes,
+                                 const int32_t length) const;
 
-  // config detail: {'name': 'USER_INTERACTION_IS_VALID', 'offset': 0.0, 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 42, 'type': 'bool', 'order': 'motorola', 'physical_unit': ''}
-  bool user_interaction_is_valid(const std::uint8_t* bytes, const int32_t length) const;
-
-  // config detail: {'name': 'USER_INTERACTION', 'offset': 0.0, 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 32, 'type': 'bool', 'order': 'motorola', 'physical_unit': ''}
+  // config detail: {'name': 'USER_INTERACTION', 'offset': 0.0,
+  // 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range':
+  // '[0|1]', 'bit': 32, 'type': 'bool', 'order': 'motorola', 'physical_unit':
+  // ''}
   bool user_interaction(const std::uint8_t* bytes, const int32_t length) const;
 
-  // config detail: {'name': 'RAW_PEDAL_FORCE_IS_VALID', 'offset': 0.0, 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 41, 'type': 'bool', 'order': 'motorola', 'physical_unit': ''}
-  bool raw_pedal_force_is_valid(const std::uint8_t* bytes, const int32_t length) const;
+  // config detail: {'name': 'RAW_PEDAL_FORCE_IS_VALID', 'offset': 0.0,
+  // 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range':
+  // '[0|1]', 'bit': 41, 'type': 'bool', 'order': 'motorola', 'physical_unit':
+  // ''}
+  bool raw_pedal_force_is_valid(const std::uint8_t* bytes,
+                                const int32_t length) const;
 
-  // config detail: {'name': 'RAW_PEDAL_FORCE', 'offset': 0.0, 'precision': 0.001, 'len': 16, 'is_signed_var': True, 'physical_range': '[-32.768|32.767]', 'bit': 23, 'type': 'double', 'order': 'motorola', 'physical_unit': ''}
+  // config detail: {'name': 'RAW_PEDAL_FORCE', 'offset': 0.0, 'precision':
+  // 0.001, 'len': 16, 'is_signed_var': True, 'physical_range':
+  // '[-32.768|32.767]', 'bit': 23, 'type': 'double', 'order': 'motorola',
+  // 'physical_unit': ''}
   double raw_pedal_force(const std::uint8_t* bytes, const int32_t length) const;
 
-  // config detail: {'name': 'RAW_PEDAL_POS_IS_VALID', 'offset': 0.0, 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 40, 'type': 'bool', 'order': 'motorola', 'physical_unit': ''}
-  bool raw_pedal_pos_is_valid(const std::uint8_t* bytes, const int32_t length) const;
+  // config detail: {'name': 'RAW_PEDAL_POS_IS_VALID', 'offset': 0.0,
+  // 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range':
+  // '[0|1]', 'bit': 40, 'type': 'bool', 'order': 'motorola', 'physical_unit':
+  // ''}
+  bool raw_pedal_pos_is_valid(const std::uint8_t* bytes,
+                              const int32_t length) const;
 
-  // config detail: {'name': 'RAW_PEDAL_POS', 'offset': 0.0, 'precision': 0.001, 'len': 16, 'is_signed_var': True, 'physical_range': '[-32.768|32.767]', 'bit': 7, 'type': 'double', 'order': 'motorola', 'physical_unit': ''}
+  // config detail: {'name': 'RAW_PEDAL_POS', 'offset': 0.0, 'precision': 0.001,
+  // 'len': 16, 'is_signed_var': True, 'physical_range': '[-32.768|32.767]',
+  // 'bit': 7, 'type': 'double', 'order': 'motorola', 'physical_unit': ''}
   double raw_pedal_pos(const std::uint8_t* bytes, const int32_t length) const;
 };
 

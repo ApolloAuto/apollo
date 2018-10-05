@@ -31,17 +31,29 @@ Accelauxrpt300::Accelauxrpt300() {}
 const int32_t Accelauxrpt300::ID = 0x300;
 
 void Accelauxrpt300::Parse(const std::uint8_t* bytes, int32_t length,
-                         ChassisDetail* chassis) const {
-  chassis->mutable_lexus()->mutable_accel_aux_rpt_300()->set_user_interaction_is_valid(user_interaction_is_valid(bytes, length));
-  chassis->mutable_lexus()->mutable_accel_aux_rpt_300()->set_user_interaction(user_interaction(bytes, length));
-  chassis->mutable_lexus()->mutable_accel_aux_rpt_300()->set_raw_pedal_force_is_valid(raw_pedal_force_is_valid(bytes, length));
-  chassis->mutable_lexus()->mutable_accel_aux_rpt_300()->set_raw_pedal_force(raw_pedal_force(bytes, length));
-  chassis->mutable_lexus()->mutable_accel_aux_rpt_300()->set_raw_pedal_pos_is_valid(raw_pedal_pos_is_valid(bytes, length));
-  chassis->mutable_lexus()->mutable_accel_aux_rpt_300()->set_raw_pedal_pos(raw_pedal_pos(bytes, length));
+                           ChassisDetail* chassis) const {
+  chassis->mutable_lexus()
+      ->mutable_accel_aux_rpt_300()
+      ->set_user_interaction_is_valid(user_interaction_is_valid(bytes, length));
+  chassis->mutable_lexus()->mutable_accel_aux_rpt_300()->set_user_interaction(
+      user_interaction(bytes, length));
+  chassis->mutable_lexus()
+      ->mutable_accel_aux_rpt_300()
+      ->set_raw_pedal_force_is_valid(raw_pedal_force_is_valid(bytes, length));
+  chassis->mutable_lexus()->mutable_accel_aux_rpt_300()->set_raw_pedal_force(
+      raw_pedal_force(bytes, length));
+  chassis->mutable_lexus()
+      ->mutable_accel_aux_rpt_300()
+      ->set_raw_pedal_pos_is_valid(raw_pedal_pos_is_valid(bytes, length));
+  chassis->mutable_lexus()->mutable_accel_aux_rpt_300()->set_raw_pedal_pos(
+      raw_pedal_pos(bytes, length));
 }
 
-// config detail: {'name': 'user_interaction_is_valid', 'offset': 0.0, 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 42, 'type': 'bool', 'order': 'motorola', 'physical_unit': ''}
-bool Accelauxrpt300::user_interaction_is_valid(const std::uint8_t* bytes, int32_t length) const {
+// config detail: {'name': 'user_interaction_is_valid', 'offset': 0.0,
+// 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range':
+// '[0|1]', 'bit': 42, 'type': 'bool', 'order': 'motorola', 'physical_unit': ''}
+bool Accelauxrpt300::user_interaction_is_valid(const std::uint8_t* bytes,
+                                               int32_t length) const {
   Byte t0(bytes + 5);
   int32_t x = t0.get_byte(2, 1);
 
@@ -49,8 +61,11 @@ bool Accelauxrpt300::user_interaction_is_valid(const std::uint8_t* bytes, int32_
   return ret;
 }
 
-// config detail: {'name': 'user_interaction', 'offset': 0.0, 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 32, 'type': 'bool', 'order': 'motorola', 'physical_unit': ''}
-bool Accelauxrpt300::user_interaction(const std::uint8_t* bytes, int32_t length) const {
+// config detail: {'name': 'user_interaction', 'offset': 0.0, 'precision': 1.0,
+// 'len': 1, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 32,
+// 'type': 'bool', 'order': 'motorola', 'physical_unit': ''}
+bool Accelauxrpt300::user_interaction(const std::uint8_t* bytes,
+                                      int32_t length) const {
   Byte t0(bytes + 4);
   int32_t x = t0.get_byte(0, 1);
 
@@ -58,8 +73,11 @@ bool Accelauxrpt300::user_interaction(const std::uint8_t* bytes, int32_t length)
   return ret;
 }
 
-// config detail: {'name': 'raw_pedal_force_is_valid', 'offset': 0.0, 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 41, 'type': 'bool', 'order': 'motorola', 'physical_unit': ''}
-bool Accelauxrpt300::raw_pedal_force_is_valid(const std::uint8_t* bytes, int32_t length) const {
+// config detail: {'name': 'raw_pedal_force_is_valid', 'offset': 0.0,
+// 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range':
+// '[0|1]', 'bit': 41, 'type': 'bool', 'order': 'motorola', 'physical_unit': ''}
+bool Accelauxrpt300::raw_pedal_force_is_valid(const std::uint8_t* bytes,
+                                              int32_t length) const {
   Byte t0(bytes + 5);
   int32_t x = t0.get_byte(1, 1);
 
@@ -67,8 +85,11 @@ bool Accelauxrpt300::raw_pedal_force_is_valid(const std::uint8_t* bytes, int32_t
   return ret;
 }
 
-// config detail: {'name': 'raw_pedal_force', 'offset': 0.0, 'precision': 0.001, 'len': 16, 'is_signed_var': True, 'physical_range': '[-32.768|32.767]', 'bit': 23, 'type': 'double', 'order': 'motorola', 'physical_unit': ''}
-double Accelauxrpt300::raw_pedal_force(const std::uint8_t* bytes, int32_t length) const {
+// config detail: {'name': 'raw_pedal_force', 'offset': 0.0, 'precision': 0.001,
+// 'len': 16, 'is_signed_var': True, 'physical_range': '[-32.768|32.767]',
+// 'bit': 23, 'type': 'double', 'order': 'motorola', 'physical_unit': ''}
+double Accelauxrpt300::raw_pedal_force(const std::uint8_t* bytes,
+                                       int32_t length) const {
   Byte t0(bytes + 2);
   int32_t x = t0.get_byte(0, 8);
 
@@ -84,8 +105,11 @@ double Accelauxrpt300::raw_pedal_force(const std::uint8_t* bytes, int32_t length
   return ret;
 }
 
-// config detail: {'name': 'raw_pedal_pos_is_valid', 'offset': 0.0, 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 40, 'type': 'bool', 'order': 'motorola', 'physical_unit': ''}
-bool Accelauxrpt300::raw_pedal_pos_is_valid(const std::uint8_t* bytes, int32_t length) const {
+// config detail: {'name': 'raw_pedal_pos_is_valid', 'offset': 0.0,
+// 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range':
+// '[0|1]', 'bit': 40, 'type': 'bool', 'order': 'motorola', 'physical_unit': ''}
+bool Accelauxrpt300::raw_pedal_pos_is_valid(const std::uint8_t* bytes,
+                                            int32_t length) const {
   Byte t0(bytes + 5);
   int32_t x = t0.get_byte(0, 1);
 
@@ -93,8 +117,11 @@ bool Accelauxrpt300::raw_pedal_pos_is_valid(const std::uint8_t* bytes, int32_t l
   return ret;
 }
 
-// config detail: {'name': 'raw_pedal_pos', 'offset': 0.0, 'precision': 0.001, 'len': 16, 'is_signed_var': True, 'physical_range': '[-32.768|32.767]', 'bit': 7, 'type': 'double', 'order': 'motorola', 'physical_unit': ''}
-double Accelauxrpt300::raw_pedal_pos(const std::uint8_t* bytes, int32_t length) const {
+// config detail: {'name': 'raw_pedal_pos', 'offset': 0.0, 'precision': 0.001,
+// 'len': 16, 'is_signed_var': True, 'physical_range': '[-32.768|32.767]',
+// 'bit': 7, 'type': 'double', 'order': 'motorola', 'physical_unit': ''}
+double Accelauxrpt300::raw_pedal_pos(const std::uint8_t* bytes,
+                                     int32_t length) const {
   Byte t0(bytes + 0);
   int32_t x = t0.get_byte(0, 8);
 

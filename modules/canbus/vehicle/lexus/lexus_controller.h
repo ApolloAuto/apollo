@@ -45,15 +45,15 @@ namespace lexus {
 
 class LexusController final : public VehicleController {
  public:
-
-  explicit LexusController() {};
+  explicit LexusController(){};
 
   virtual ~LexusController();
 
   ::apollo::common::ErrorCode Init(
       const VehicleParameter& params,
-      CanSender<::apollo::canbus::ChassisDetail> *const can_sender,
-      MessageManager<::apollo::canbus::ChassisDetail> *const message_manager) override;
+      CanSender<::apollo::canbus::ChassisDetail>* const can_sender,
+      MessageManager<::apollo::canbus::ChassisDetail>* const message_manager)
+      override;
 
   bool Start() override;
 
