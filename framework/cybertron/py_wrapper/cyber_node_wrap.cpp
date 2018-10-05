@@ -18,7 +18,7 @@
 #include <string>
 #include <vector>
 
-#include "python/wrapper/py_node.h"
+#include "cybertron/py_wrapper/py_node.h"
 
 static PyObject *cyber_py_is_shutdown(PyObject *self, PyObject *args) {
   bool is_shutdown = apollo::cybertron::py_is_shutdown();

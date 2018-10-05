@@ -17,7 +17,7 @@
 #include <Python.h>
 #include <string.h>
 
-#include "python/wrapper/py_init.h"
+#include "cybertron/py_wrapper/py_init.h"
 
 static PyObject *cyber_py_init(PyObject *self, PyObject *args) {
   bool is_init = apollo::cybertron::py_init();

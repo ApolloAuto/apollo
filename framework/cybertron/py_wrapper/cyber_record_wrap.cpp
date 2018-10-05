@@ -17,7 +17,7 @@
 #include <Python.h>
 #include <string>
 
-#include "python/wrapper/py_record.h"
+#include "cybertron/py_wrapper/py_record.h"
 
 #define PYOBJECT_NULL_STRING PyString_FromStringAndSize("", 0)
 

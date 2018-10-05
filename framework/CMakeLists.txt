@@ -17,6 +17,7 @@ include(${CMAKE_SOURCE_DIR}/cmake/Packages.cmake)
 add_subdirectory(cybertron/proto)
 add_subdirectory(cybertron/common)
 add_subdirectory(cybertron/record)
+add_subdirectory(cybertron/py_wrapper)
 
 add_subdirectory(cybertron/tools)
 add_subdirectory(examples)
@@ -26,8 +27,8 @@ add_subdirectory(cybertron/mainboard)
 # add_subdirectory(sensor)
 add_subdirectory(third_party)
 
-add_subdirectory(python)
 add_subdirectory(cybertron/blocker)
+add_subdirectory(cybertron/python)
 
 file(GLOB CYBERTRON_SRCS
   "cybertron/*.cpp"
