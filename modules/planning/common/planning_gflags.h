@@ -25,6 +25,7 @@ DECLARE_double(test_duration);
 DECLARE_string(planning_config_file);
 
 DECLARE_string(lane_follow_scenario_config_file);
+DECLARE_string(side_pass_scenario_config_file);
 
 DECLARE_string(planning_adapter_config_filename);
 DECLARE_string(traffic_rule_config_filename);

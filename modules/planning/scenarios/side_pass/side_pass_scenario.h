@@ -18,8 +18,8 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_SCENARIOS_LANE_FOLLOW_SCENARIO_H_
-#define MODULES_PLANNING_SCENARIOS_LANE_FOLLOW_SCENARIO_H_
+#ifndef MODULES_PLANNING_SCENARIOS_SIDE_PASS_SCENARIO_H_
+#define MODULES_PLANNING_SCENARIOS_SIDE_PASS_SCENARIO_H_
 
 #include <memory>
 #include <string>
@@ -41,10 +41,10 @@
 namespace apollo {
 namespace planning {
 
-class LaneFollowScenario : public Scenario {
+class SidePassScenario : public Scenario {
  public:
-  LaneFollowScenario() : Scenario(ScenarioConfig::LANE_FOLLOW) {}
-  virtual ~LaneFollowScenario() = default;
+  SidePassScenario() : Scenario(ScenarioConfig::SIDE_PASS) {}
+  virtual ~SidePassScenario() = default;
 
   bool Init() override;
 
@@ -58,24 +58,6 @@ class LaneFollowScenario : public Scenario {
  private:
   void RegisterTasks();
 
-  common::Status PlanOnReferenceLine(
-      const common::TrajectoryPoint& planning_start_point, Frame* frame,
-      ReferenceLineInfo* reference_line_info);
-
-  std::vector<common::SpeedPoint> DummyHotStart(
-      const common::TrajectoryPoint& planning_init_point);
-
-  void GenerateFallbackPathProfile(const ReferenceLineInfo* reference_line_info,
-                                   PathData* path_data);
-
-  common::SLPoint GetStopSL(const ObjectStop& stop_decision,
-                            const ReferenceLine& reference_line) const;
-
-  void RecordObstacleDebugInfo(ReferenceLineInfo* reference_line_info);
-
-  void RecordDebugInfo(ReferenceLineInfo* reference_line_info,
-                       const std::string& name, const double time_diff_ms);
-
   apollo::common::util::Factory<TaskType, Task> task_factory_;
 
   std::vector<std::unique_ptr<Task>> tasks_;
@@ -88,4 +70,4 @@ class LaneFollowScenario : public Scenario {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_SCENARIOS_LANE_FOLLOW_SCENARIO_H_
+#endif  // MODULES_PLANNING_SCENARIOS_SIDE_PASS_SCENARIO_H_
