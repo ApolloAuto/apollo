@@ -113,5 +113,51 @@ TEST(OsqpSpline1dSolver, two) {
   auto params = pg.spline();
 }
 
+TEST(OsqpSpline1dSolver, three) {
+  std::vector<double> x_knots{0, 1, 2};
+  OsqpSpline1dSolver pg(x_knots, 5);
+  QuadraticProgrammingProblem qp_proto;
+  auto* spline_constraint = pg.mutable_spline_constraint();
+  auto* spline_kernel = pg.mutable_spline_kernel();
+
+  spline_constraint->AddThirdDerivativeSmoothConstraint();
+  spline_constraint->AddMonotoneInequalityConstraintAtKnots();
+
+  spline_constraint->AddPointConstraint(0.0, 0.0);
+  spline_constraint->AddPointDerivativeConstraint(0.0, 0.0);
+  spline_constraint->AddPointSecondDerivativeConstraint(0.0, 0.0);
+
+  std::vector<double> x_coord = {0, 0.5};
+  std::vector<double> l_bound = {1.8, 2};
+  std::vector<double> u_bound = {3, 7};
+
+  spline_constraint->AddBoundary(x_coord, l_bound, u_bound);
+
+  double intercept = 5;
+  double slope = 4;
+
+  spline_kernel->AddRegularization(1.0);
+  spline_kernel->AddThirdOrderDerivativeMatrix(10);
+
+  std::vector<double> t_knots(21, 0.0);
+  std::vector<double> ft_knots(21, 0.0);
+
+  for (std::size_t i = 0; i < t_knots.size(); ++i) {
+    t_knots[i] = i * 0.1;
+    ft_knots[i] = t_knots[i] * slope + intercept;
+  }
+
+  spline_kernel->AddReferenceLineKernelMatrix(t_knots, ft_knots, 1);
+  EXPECT_TRUE(pg.Solve());
+
+  pg.GenerateProblemProto(&qp_proto);
+
+  EXPECT_EQ(qp_proto.param_size(), 12);
+  EXPECT_EQ(qp_proto.quadratic_matrix().row_size(), 12);
+  EXPECT_EQ(qp_proto.quadratic_matrix().col_size(), 12);
+  EXPECT_EQ(qp_proto.equality_matrix().row_size(), 7);
+  EXPECT_EQ(qp_proto.inequality_matrix().row_size(), 6);
+}
+
 }  // namespace planning
 }  // namespace apollo

@@ -91,6 +91,8 @@ const std::vector<double>& Spline1d::x_knots() const { return x_knots_; }
 
 uint32_t Spline1d::spline_order() const { return spline_order_; }
 
+const std::vector<Spline1dSeg>& Spline1d::splines() const { return splines_; }
+
 uint32_t Spline1d::FindIndex(const double x) const {
   auto upper_bound = std::upper_bound(x_knots_.begin() + 1, x_knots_.end(), x);
   const uint32_t dis = std::distance(x_knots_.begin(), upper_bound);
