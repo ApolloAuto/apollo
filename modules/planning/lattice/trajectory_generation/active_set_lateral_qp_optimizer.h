@@ -18,44 +18,32 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_LATTICE_LATERAL_QP_OPTIMIZER_H_
-#define MODULES_PLANNING_LATTICE_LATERAL_QP_OPTIMIZER_H_
+#ifndef MODULES_PLANNING_LATTICE_ACTIVE_SET_LATERAL_QP_OPTIMIZER_H_
+#define MODULES_PLANNING_LATTICE_ACTIVE_SET_LATERAL_QP_OPTIMIZER_H_
 
 #include <array>
 #include <memory>
 #include <utility>
 #include <vector>
 
-#include "qpOASES.hpp"
-
 #include "modules/planning/lattice/trajectory1d/piecewise_jerk_trajectory1d.h"
+#include "modules/planning/lattice/trajectory_generation/lateral_qp_optimizer.h"
 
 namespace apollo {
 namespace planning {
 
-class LateralQPOptimizer {
+class ActiverSetLateralQPOptimizer : public LateralQPOptimizer {
  public:
-  LateralQPOptimizer() = default;
+  ActiverSetLateralQPOptimizer() = default;
 
-  virtual ~LateralQPOptimizer() = default;
+  virtual ~ActiverSetLateralQPOptimizer() = default;
 
-  virtual bool optimize(
+  bool optimize(
       const std::array<double, 3>& d_state, const double delta_s,
-      const std::vector<std::pair<double, double>>& d_bounds) = 0;
-
-  virtual PiecewiseJerkTrajectory1d GetOptimalTrajectory() const;
-
- protected:
-  double delta_s_ = 0.0;
-
-  std::vector<double> opt_d_;
-
-  std::vector<double> opt_d_prime_;
-
-  std::vector<double> opt_d_pprime_;
+      const std::vector<std::pair<double, double>>& d_bounds) override;
 };
 
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_LATTICE_LATERAL_QP_OPTIMIZER_H_
+#endif  // MODULES_PLANNING_LATTICE_ACTIVE_SET_LATERAL_QP_OPTIMIZER_H_

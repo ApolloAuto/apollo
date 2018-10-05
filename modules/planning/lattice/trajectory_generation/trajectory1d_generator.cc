@@ -30,8 +30,9 @@
 #include "modules/planning/lattice/trajectory1d/constant_deceleration_trajectory1d.h"
 #include "modules/planning/lattice/trajectory1d/piecewise_jerk_trajectory1d.h"
 #include "modules/planning/lattice/trajectory1d/standing_still_trajectory1d.h"
+#include "modules/planning/lattice/trajectory_generation/active_set_lateral_qp_optimizer.h"
 #include "modules/planning/lattice/trajectory_generation/lateral_trajectory_optimizer.h"
-#include "modules/planning/lattice/trajectory_generation/lateral_qp_optimizer.h"
+
 namespace apollo {
 namespace planning {
 
@@ -140,11 +141,12 @@ void Trajectory1dGenerator::GenerateLateralTrajectoryBundle(
         ptr_path_time_graph_->GetLateralBounds(s_min, s_max, delta_s);
 
     // LateralTrajectoryOptimizer lateral_optimizer;
-    LateralQPOptimizer lateral_optimizer;
+    std::unique_ptr<LateralQPOptimizer> lateral_optimizer(
+        new ActiverSetLateralQPOptimizer);
 
-    lateral_optimizer.optimize(init_lat_state_, delta_s, lateral_bounds);
+    lateral_optimizer->optimize(init_lat_state_, delta_s, lateral_bounds);
 
-    auto lateral_trajectory = lateral_optimizer.GetOptimalTrajectory();
+    auto lateral_trajectory = lateral_optimizer->GetOptimalTrajectory();
 
     ptr_lat_trajectory_bundle->push_back(
         std::make_shared<PiecewiseJerkTrajectory1d>(lateral_trajectory));
