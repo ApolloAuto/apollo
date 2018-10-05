@@ -31,21 +31,40 @@ Brakeauxrpt304::Brakeauxrpt304() {}
 const int32_t Brakeauxrpt304::ID = 0x304;
 
 void Brakeauxrpt304::Parse(const std::uint8_t* bytes, int32_t length,
-                         ChassisDetail* chassis) const {
-  chassis->mutable_lexus()->mutable_brake_aux_rpt_304()->set_brake_on_off_is_valid(brake_on_off_is_valid(bytes, length));
-  chassis->mutable_lexus()->mutable_brake_aux_rpt_304()->set_brake_on_off(brake_on_off(bytes, length));
-  chassis->mutable_lexus()->mutable_brake_aux_rpt_304()->set_user_interaction_is_valid(user_interaction_is_valid(bytes, length));
-  chassis->mutable_lexus()->mutable_brake_aux_rpt_304()->set_user_interaction(user_interaction(bytes, length));
-  chassis->mutable_lexus()->mutable_brake_aux_rpt_304()->set_raw_brake_pressure_is_valid(raw_brake_pressure_is_valid(bytes, length));
-  chassis->mutable_lexus()->mutable_brake_aux_rpt_304()->set_raw_brake_pressure(raw_brake_pressure(bytes, length));
-  chassis->mutable_lexus()->mutable_brake_aux_rpt_304()->set_raw_pedal_force_is_valid(raw_pedal_force_is_valid(bytes, length));
-  chassis->mutable_lexus()->mutable_brake_aux_rpt_304()->set_raw_pedal_force(raw_pedal_force(bytes, length));
-  chassis->mutable_lexus()->mutable_brake_aux_rpt_304()->set_raw_pedal_pos_is_valid(raw_pedal_pos_is_valid(bytes, length));
-  chassis->mutable_lexus()->mutable_brake_aux_rpt_304()->set_raw_pedal_pos(raw_pedal_pos(bytes, length));
+                           ChassisDetail* chassis) const {
+  chassis->mutable_lexus()
+      ->mutable_brake_aux_rpt_304()
+      ->set_brake_on_off_is_valid(brake_on_off_is_valid(bytes, length));
+  chassis->mutable_lexus()->mutable_brake_aux_rpt_304()->set_brake_on_off(
+      brake_on_off(bytes, length));
+  chassis->mutable_lexus()
+      ->mutable_brake_aux_rpt_304()
+      ->set_user_interaction_is_valid(user_interaction_is_valid(bytes, length));
+  chassis->mutable_lexus()->mutable_brake_aux_rpt_304()->set_user_interaction(
+      user_interaction(bytes, length));
+  chassis->mutable_lexus()
+      ->mutable_brake_aux_rpt_304()
+      ->set_raw_brake_pressure_is_valid(
+          raw_brake_pressure_is_valid(bytes, length));
+  chassis->mutable_lexus()->mutable_brake_aux_rpt_304()->set_raw_brake_pressure(
+      raw_brake_pressure(bytes, length));
+  chassis->mutable_lexus()
+      ->mutable_brake_aux_rpt_304()
+      ->set_raw_pedal_force_is_valid(raw_pedal_force_is_valid(bytes, length));
+  chassis->mutable_lexus()->mutable_brake_aux_rpt_304()->set_raw_pedal_force(
+      raw_pedal_force(bytes, length));
+  chassis->mutable_lexus()
+      ->mutable_brake_aux_rpt_304()
+      ->set_raw_pedal_pos_is_valid(raw_pedal_pos_is_valid(bytes, length));
+  chassis->mutable_lexus()->mutable_brake_aux_rpt_304()->set_raw_pedal_pos(
+      raw_pedal_pos(bytes, length));
 }
 
-// config detail: {'name': 'brake_on_off_is_valid', 'offset': 0.0, 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 60, 'type': 'bool', 'order': 'motorola', 'physical_unit': ''}
-bool Brakeauxrpt304::brake_on_off_is_valid(const std::uint8_t* bytes, int32_t length) const {
+// config detail: {'name': 'brake_on_off_is_valid', 'offset': 0.0,
+// 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range':
+// '[0|1]', 'bit': 60, 'type': 'bool', 'order': 'motorola', 'physical_unit': ''}
+bool Brakeauxrpt304::brake_on_off_is_valid(const std::uint8_t* bytes,
+                                           int32_t length) const {
   Byte t0(bytes + 7);
   int32_t x = t0.get_byte(4, 1);
 
@@ -53,8 +72,11 @@ bool Brakeauxrpt304::brake_on_off_is_valid(const std::uint8_t* bytes, int32_t le
   return ret;
 }
 
-// config detail: {'name': 'brake_on_off', 'offset': 0.0, 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 49, 'type': 'bool', 'order': 'motorola', 'physical_unit': ''}
-bool Brakeauxrpt304::brake_on_off(const std::uint8_t* bytes, int32_t length) const {
+// config detail: {'name': 'brake_on_off', 'offset': 0.0, 'precision': 1.0,
+// 'len': 1, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 49,
+// 'type': 'bool', 'order': 'motorola', 'physical_unit': ''}
+bool Brakeauxrpt304::brake_on_off(const std::uint8_t* bytes,
+                                  int32_t length) const {
   Byte t0(bytes + 6);
   int32_t x = t0.get_byte(1, 1);
 
@@ -62,8 +84,11 @@ bool Brakeauxrpt304::brake_on_off(const std::uint8_t* bytes, int32_t length) con
   return ret;
 }
 
-// config detail: {'name': 'user_interaction_is_valid', 'offset': 0.0, 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 59, 'type': 'bool', 'order': 'motorola', 'physical_unit': ''}
-bool Brakeauxrpt304::user_interaction_is_valid(const std::uint8_t* bytes, int32_t length) const {
+// config detail: {'name': 'user_interaction_is_valid', 'offset': 0.0,
+// 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range':
+// '[0|1]', 'bit': 59, 'type': 'bool', 'order': 'motorola', 'physical_unit': ''}
+bool Brakeauxrpt304::user_interaction_is_valid(const std::uint8_t* bytes,
+                                               int32_t length) const {
   Byte t0(bytes + 7);
   int32_t x = t0.get_byte(3, 1);
 
@@ -71,8 +96,11 @@ bool Brakeauxrpt304::user_interaction_is_valid(const std::uint8_t* bytes, int32_
   return ret;
 }
 
-// config detail: {'name': 'user_interaction', 'offset': 0.0, 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 48, 'type': 'bool', 'order': 'motorola', 'physical_unit': ''}
-bool Brakeauxrpt304::user_interaction(const std::uint8_t* bytes, int32_t length) const {
+// config detail: {'name': 'user_interaction', 'offset': 0.0, 'precision': 1.0,
+// 'len': 1, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 48,
+// 'type': 'bool', 'order': 'motorola', 'physical_unit': ''}
+bool Brakeauxrpt304::user_interaction(const std::uint8_t* bytes,
+                                      int32_t length) const {
   Byte t0(bytes + 6);
   int32_t x = t0.get_byte(0, 1);
 
@@ -80,8 +108,11 @@ bool Brakeauxrpt304::user_interaction(const std::uint8_t* bytes, int32_t length)
   return ret;
 }
 
-// config detail: {'name': 'raw_brake_pressure_is_valid', 'offset': 0.0, 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 58, 'type': 'bool', 'order': 'motorola', 'physical_unit': ''}
-bool Brakeauxrpt304::raw_brake_pressure_is_valid(const std::uint8_t* bytes, int32_t length) const {
+// config detail: {'name': 'raw_brake_pressure_is_valid', 'offset': 0.0,
+// 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range':
+// '[0|1]', 'bit': 58, 'type': 'bool', 'order': 'motorola', 'physical_unit': ''}
+bool Brakeauxrpt304::raw_brake_pressure_is_valid(const std::uint8_t* bytes,
+                                                 int32_t length) const {
   Byte t0(bytes + 7);
   int32_t x = t0.get_byte(2, 1);
 
@@ -89,8 +120,12 @@ bool Brakeauxrpt304::raw_brake_pressure_is_valid(const std::uint8_t* bytes, int3
   return ret;
 }
 
-// config detail: {'name': 'raw_brake_pressure', 'offset': 0.0, 'precision': 1.0, 'len': 16, 'is_signed_var': True, 'physical_range': '[-32.768|32.767]', 'bit': 39, 'type': 'double', 'order': 'motorola', 'physical_unit': ''}
-double Brakeauxrpt304::raw_brake_pressure(const std::uint8_t* bytes, int32_t length) const {
+// config detail: {'name': 'raw_brake_pressure', 'offset': 0.0,
+// 'precision': 1.0, 'len': 16, 'is_signed_var': True, 'physical_range':
+// '[-32.768|32.767]', 'bit': 39, 'type': 'double', 'order': 'motorola',
+// 'physical_unit': ''}
+double Brakeauxrpt304::raw_brake_pressure(const std::uint8_t* bytes,
+                                          int32_t length) const {
   Byte t0(bytes + 4);
   int32_t x = t0.get_byte(0, 8);
 
@@ -106,8 +141,11 @@ double Brakeauxrpt304::raw_brake_pressure(const std::uint8_t* bytes, int32_t len
   return ret;
 }
 
-// config detail: {'name': 'raw_pedal_force_is_valid', 'offset': 0.0, 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 57, 'type': 'bool', 'order': 'motorola', 'physical_unit': ''}
-bool Brakeauxrpt304::raw_pedal_force_is_valid(const std::uint8_t* bytes, int32_t length) const {
+// config detail: {'name': 'raw_pedal_force_is_valid', 'offset': 0.0,
+// 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range':
+// '[0|1]', 'bit': 57, 'type': 'bool', 'order': 'motorola', 'physical_unit': ''}
+bool Brakeauxrpt304::raw_pedal_force_is_valid(const std::uint8_t* bytes,
+                                              int32_t length) const {
   Byte t0(bytes + 7);
   int32_t x = t0.get_byte(1, 1);
 
@@ -115,8 +153,11 @@ bool Brakeauxrpt304::raw_pedal_force_is_valid(const std::uint8_t* bytes, int32_t
   return ret;
 }
 
-// config detail: {'name': 'raw_pedal_force', 'offset': 0.0, 'precision': 1.0, 'len': 16, 'is_signed_var': True, 'physical_range': '[-32.768|32.767]', 'bit': 23, 'type': 'double', 'order': 'motorola', 'physical_unit': ''}
-double Brakeauxrpt304::raw_pedal_force(const std::uint8_t* bytes, int32_t length) const {
+// config detail: {'name': 'raw_pedal_force', 'offset': 0.0, 'precision': 1.0,
+// 'len': 16, 'is_signed_var': True, 'physical_range': '[-32.768|32.767]',
+// 'bit': 23, 'type': 'double', 'order': 'motorola', 'physical_unit': ''}
+double Brakeauxrpt304::raw_pedal_force(const std::uint8_t* bytes,
+                                       int32_t length) const {
   Byte t0(bytes + 2);
   int32_t x = t0.get_byte(0, 8);
 
@@ -132,8 +173,11 @@ double Brakeauxrpt304::raw_pedal_force(const std::uint8_t* bytes, int32_t length
   return ret;
 }
 
-// config detail: {'name': 'raw_pedal_pos_is_valid', 'offset': 0.0, 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 56, 'type': 'bool', 'order': 'motorola', 'physical_unit': ''}
-bool Brakeauxrpt304::raw_pedal_pos_is_valid(const std::uint8_t* bytes, int32_t length) const {
+// config detail: {'name': 'raw_pedal_pos_is_valid', 'offset': 0.0,
+// 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'physical_range':
+// '[0|1]', 'bit': 56, 'type': 'bool', 'order': 'motorola', 'physical_unit': ''}
+bool Brakeauxrpt304::raw_pedal_pos_is_valid(const std::uint8_t* bytes,
+                                            int32_t length) const {
   Byte t0(bytes + 7);
   int32_t x = t0.get_byte(0, 1);
 
@@ -141,8 +185,11 @@ bool Brakeauxrpt304::raw_pedal_pos_is_valid(const std::uint8_t* bytes, int32_t l
   return ret;
 }
 
-// config detail: {'name': 'raw_pedal_pos', 'offset': 0.0, 'precision': 1.0, 'len': 16, 'is_signed_var': True, 'physical_range': '[-32.768|32.767]', 'bit': 7, 'type': 'double', 'order': 'motorola', 'physical_unit': ''}
-double Brakeauxrpt304::raw_pedal_pos(const std::uint8_t* bytes, int32_t length) const {
+// config detail: {'name': 'raw_pedal_pos', 'offset': 0.0, 'precision': 1.0,
+// 'len': 16, 'is_signed_var': True, 'physical_range': '[-32.768|32.767]',
+// 'bit': 7, 'type': 'double', 'order': 'motorola', 'physical_unit': ''}
+double Brakeauxrpt304::raw_pedal_pos(const std::uint8_t* bytes,
+                                     int32_t length) const {
   Byte t0(bytes + 0);
   int32_t x = t0.get_byte(0, 8);
 

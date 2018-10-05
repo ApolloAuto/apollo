@@ -31,13 +31,23 @@ Detectedobjectrpt411::Detectedobjectrpt411() {}
 const int32_t Detectedobjectrpt411::ID = 0x411;
 
 void Detectedobjectrpt411::Parse(const std::uint8_t* bytes, int32_t length,
-                         ChassisDetail* chassis) const {
-  chassis->mutable_lexus()->mutable_detected_object_rpt_411()->set_front_object_distance_high_res(front_object_distance_high_res(bytes, length));
-  chassis->mutable_lexus()->mutable_detected_object_rpt_411()->set_front_object_distance_low_res(front_object_distance_low_res(bytes, length));
+                                 ChassisDetail* chassis) const {
+  chassis->mutable_lexus()
+      ->mutable_detected_object_rpt_411()
+      ->set_front_object_distance_high_res(
+          front_object_distance_high_res(bytes, length));
+  chassis->mutable_lexus()
+      ->mutable_detected_object_rpt_411()
+      ->set_front_object_distance_low_res(
+          front_object_distance_low_res(bytes, length));
 }
 
-// config detail: {'name': 'front_object_distance_high_res', 'offset': 0.0, 'precision': 0.001, 'len': 24, 'is_signed_var': False, 'physical_range': '[0|16777.215]', 'bit': 31, 'type': 'double', 'order': 'motorola', 'physical_unit': 'm'}
-double Detectedobjectrpt411::front_object_distance_high_res(const std::uint8_t* bytes, int32_t length) const {
+// config detail: {'name': 'front_object_distance_high_res', 'offset': 0.0,
+// 'precision': 0.001, 'len': 24, 'is_signed_var': False, 'physical_range':
+// '[0|16777.215]', 'bit': 31, 'type': 'double', 'order': 'motorola',
+// 'physical_unit': 'm'}
+double Detectedobjectrpt411::front_object_distance_high_res(
+    const std::uint8_t* bytes, int32_t length) const {
   Byte t0(bytes + 3);
   int32_t x = t0.get_byte(0, 8);
 
@@ -55,8 +65,12 @@ double Detectedobjectrpt411::front_object_distance_high_res(const std::uint8_t* 
   return ret;
 }
 
-// config detail: {'name': 'front_object_distance_low_res', 'offset': 0.0, 'precision': 0.001, 'len': 24, 'is_signed_var': False, 'physical_range': '[0|16777.215]', 'bit': 7, 'type': 'double', 'order': 'motorola', 'physical_unit': 'm'}
-double Detectedobjectrpt411::front_object_distance_low_res(const std::uint8_t* bytes, int32_t length) const {
+// config detail: {'name': 'front_object_distance_low_res', 'offset': 0.0,
+// 'precision': 0.001, 'len': 24, 'is_signed_var': False, 'physical_range':
+// '[0|16777.215]', 'bit': 7, 'type': 'double', 'order': 'motorola',
+// 'physical_unit': 'm'}
+double Detectedobjectrpt411::front_object_distance_low_res(
+    const std::uint8_t* bytes, int32_t length) const {
   Byte t0(bytes + 0);
   int32_t x = t0.get_byte(0, 8);
 
