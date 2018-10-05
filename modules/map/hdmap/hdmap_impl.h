@@ -34,11 +34,11 @@ limitations under the License.
 #include "modules/map/proto/map_junction.pb.h"
 #include "modules/map/proto/map_lane.pb.h"
 #include "modules/map/proto/map_overlap.pb.h"
+#include "modules/map/proto/map_parking_space.pb.h"
 #include "modules/map/proto/map_signal.pb.h"
 #include "modules/map/proto/map_speed_bump.pb.h"
 #include "modules/map/proto/map_stop_sign.pb.h"
 #include "modules/map/proto/map_yield_sign.pb.h"
-#include "modules/map/proto/map_parking_space.pb.h"
 
 /**
  * @namespace apollo::hdmap
@@ -71,8 +71,7 @@ class HDMapImpl {
       std::unordered_map<std::string, std::shared_ptr<SpeedBumpInfo>>;
   using OverlapTable =
       std::unordered_map<std::string, std::shared_ptr<OverlapInfo>>;
-  using RoadTable =
-      std::unordered_map<std::string, std::shared_ptr<RoadInfo>>;
+  using RoadTable = std::unordered_map<std::string, std::shared_ptr<RoadInfo>>;
   using ParkingSpaceTable =
       std::unordered_map<std::string, std::shared_ptr<ParkingSpaceInfo>>;
 
@@ -192,9 +191,9 @@ class HDMapImpl {
    * @param parking_spaces store all parking spaces in target range
    * @return 0:success, otherwise failed
    */
-  int GetParkingSpaces(const apollo::common::PointENU& point, double distance,
-                      std::vector<ParkingSpaceInfoConstPtr>*
-                      parking_spaces) const;
+  int GetParkingSpaces(
+      const apollo::common::PointENU& point, double distance,
+      std::vector<ParkingSpaceInfoConstPtr>* parking_spaces) const;
 
   /**
    * @brief get nearest lane from target point,
@@ -297,10 +296,9 @@ class HDMapImpl {
                     std::vector<ClearAreaInfoConstPtr>* clear_areas) const;
   int GetSpeedBumps(const apollo::common::math::Vec2d& point, double distance,
                     std::vector<SpeedBumpInfoConstPtr>* speed_bumps) const;
-  int GetParkingSpaces(const apollo::common::math::Vec2d& point,
-                       double distance,
-                       std::vector<ParkingSpaceInfoConstPtr>*
-                       parking_spaces) const;
+  int GetParkingSpaces(
+      const apollo::common::math::Vec2d& point, double distance,
+      std::vector<ParkingSpaceInfoConstPtr>* parking_spaces) const;
   int GetNearestLane(const apollo::common::math::Vec2d& point,
                      LaneInfoConstPtr* nearest_lane, double* nearest_s,
                      double* nearest_l) const;

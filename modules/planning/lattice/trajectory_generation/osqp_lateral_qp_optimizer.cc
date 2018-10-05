@@ -16,47 +16,46 @@
 
 #include "modules/planning/lattice/trajectory_generation/osqp_lateral_qp_optimizer.h"
 
-#include "Eigen/Core"
-#include "osqp/include/osqp.h"
+#include <algorithm>
 
 #include "cybertron/common/log.h"
+#include "modules/common/math/matrix_operations.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
 namespace planning {
 
 using Eigen::MatrixXd;
+using apollo::common::math::DenseToCSCMatrix;
 
 bool OsqpLateralQPOptimizer::optimize(
     const std::array<double, 3>& d_state, const double delta_s,
     const std::vector<std::pair<double, double>>& d_bounds) {
+  CalcualteKernel(d_bounds, &P_data_, &P_indices_, &P_indptr_);
+
+  c_int P_nnz = P_data_.size();
+  c_float P_x[P_nnz];  // NOLINT
+  std::copy(P_data_.begin(), P_data_.end(), P_x);
+
+  c_int P_i[P_indices_.size()];  // NOLINT
+  std::copy(P_indices_.begin(), P_indices_.end(), P_i);
+
+  c_int P_p[P_indptr_.size()];  // NOLINT
+  std::copy(P_indptr_.begin(), P_indptr_.end(), P_p);
+
   delta_s_ = delta_s;
-  const int num_var = static_cast<int>(d_bounds.size());
-  const int kNumParam = 3 * num_var;
+  const int num_var = d_bounds.size();
+  const int kNumParam = 3 * d_bounds.size();
   const int kNumConstraint = 3 * (num_var - 1) + 5;
-
-  // const int kNumOfMatrixElement = kNumParam * kNumParam;
-  MatrixXd kernel = MatrixXd::Zero(kNumParam, kNumParam);  // dense matrix
-
-  for (int i = 0; i < kNumParam; ++i) {
-    if (i < num_var) {
-      kernel(i, i) = 2.0 * FLAGS_weight_lateral_offset +
-                     2.0 * FLAGS_weight_lateral_obstacle_distance;
-    } else if (i < 2 * num_var) {
-      kernel(i, i) = 2.0 * FLAGS_weight_lateral_derivative;
-    } else {
-      kernel(i, i) = 2.0 * FLAGS_weight_lateral_second_order_derivative;
-    }
-  }
-
   MatrixXd affine_constraint = MatrixXd::Zero(kNumParam, kNumConstraint);
   // const int kNumOfConstraint = kNumParam * kNumConstraint;
-  double lower_bounds[kNumConstraint];
-  double upper_bounds[kNumConstraint];
+  c_float lower_bounds[kNumConstraint];
+  c_float upper_bounds[kNumConstraint];
 
   const int prime_offset = num_var;
   const int pprime_offset = 2 * num_var;
   int constraint_index = 0;
+
   // d_i+1'' - d_i''
   for (int i = 0; i + 1 < num_var; ++i) {
     const int row = constraint_index;
@@ -126,7 +125,96 @@ bool OsqpLateralQPOptimizer::optimize(
   upper_bounds[constraint_index] = 0.0;
   ++constraint_index;
 
+  // change affine_constraint to CSC format
+  std::vector<c_float> A_data;
+  std::vector<c_int> A_indices;
+  std::vector<c_int> A_indptr;
+  DenseToCSCMatrix(affine_constraint, &A_data, &A_indices, &A_indptr);
+
+  c_int A_nnz = A_data.size();
+  c_float A_x[A_nnz];  // NOLINT
+  std::copy(A_data.begin(), A_data.end(), A_x);
+
+  c_int A_i[A_indices.size()];  // NOLINT
+  std::copy(A_indices.begin(), A_indices.end(), A_i);
+
+  c_int A_p[A_indptr.size()];  // NOLINT
+  std::copy(A_indptr.begin(), A_indptr.end(), A_p);
+
+  // offset
+  double q[kNumParam];
+  for (int i = 0; i < kNumParam; ++i) {
+    if (i < num_var) {
+      q[i] = -2.0 * FLAGS_weight_lateral_obstacle_distance *
+             (d_bounds[i].first + d_bounds[i].second);
+    } else {
+      q[i] = 0.0;
+    }
+  }
+
+  // Problem settings
+  OSQPSettings* settings =
+      reinterpret_cast<OSQPSettings*>(c_malloc(sizeof(OSQPSettings)));
+
+  // Define Solver settings as default
+  osqp_set_default_settings(settings);
+  settings->alpha = 1.0;  // Change alpha parameter
+  settings->eps_abs = 1.0e-05;
+  settings->eps_rel = 1.0e-05;
+  settings->max_iter = 5000;
+  settings->polish = true;
+  settings->verbose = FLAGS_enable_osqp_debug;
+
+  // Populate data
+  OSQPData* data = reinterpret_cast<OSQPData*>(c_malloc(sizeof(OSQPData)));
+  data->n = kNumParam;
+  data->m = affine_constraint.rows();
+  data->P = csc_matrix(data->n, data->n, P_nnz, P_x, P_i, P_p);
+  data->q = q;
+  data->A = csc_matrix(data->m, data->n, A_nnz, A_x, A_i, A_p);
+  data->l = lower_bounds;
+  data->u = upper_bounds;
+
+  // Workspace
+  OSQPWorkspace* work = osqp_setup(data, settings);
+
+  // Solve Problem
+  osqp_solve(work);
+
+  // TODO(All):
+  // (1) extract primal results
+  // (2) separate into several functions rather then put all in one.
+
+  // Cleanup
+  osqp_cleanup(work);
+  c_free(data->A);
+  c_free(data->P);
+  c_free(data);
+  c_free(settings);
+
   return true;
+}
+void OsqpLateralQPOptimizer::CalcualteKernel(
+    const std::vector<std::pair<double, double>>& d_bounds,
+    std::vector<c_float>* P_data, std::vector<c_float>* P_indices,
+    std::vector<c_float>* P_indptr) {
+  const int kNumParam = 3 * d_bounds.size();
+
+  // const int kNumOfMatrixElement = kNumParam * kNumParam;
+  MatrixXd kernel = MatrixXd::Zero(kNumParam, kNumParam);  // dense matrix
+
+  for (int i = 0; i < kNumParam; ++i) {
+    if (i < d_bounds.size()) {
+      kernel(i, i) = 2.0 * FLAGS_weight_lateral_offset +
+                     2.0 * FLAGS_weight_lateral_obstacle_distance;
+    } else if (i < 2 * d_bounds.size()) {
+      kernel(i, i) = 2.0 * FLAGS_weight_lateral_derivative;
+    } else {
+      kernel(i, i) = 2.0 * FLAGS_weight_lateral_second_order_derivative;
+    }
+  }
+
+  DenseToCSCMatrix(kernel, P_data, P_indices, P_indptr);
 }
 
 }  // namespace planning
