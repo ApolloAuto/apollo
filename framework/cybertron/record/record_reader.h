@@ -21,6 +21,7 @@
 #include <condition_variable>
 #include <memory>
 #include <queue>
+#include <set>
 #include <string>
 #include <thread>
 #include <unordered_map>

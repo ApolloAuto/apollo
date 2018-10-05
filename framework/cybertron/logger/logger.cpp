@@ -43,8 +43,8 @@ void Logger::Write(bool force_flush, time_t timestamp, const char* message,
   std::string log_message = std::string(message);
   std::string module_name("unknown");
   // set the same bracket as the bracket in log.h
-  int lpos = log_message.find('[');
-  int rpos = log_message.find(']', lpos);
+  auto lpos = log_message.find('[');
+  auto rpos = log_message.find(']', lpos);
   if (lpos != std::string::npos && rpos != std::string::npos) {
     module_name = log_message.substr(lpos + 1, rpos - lpos - 1);
     auto cut_length = rpos - lpos + 1;

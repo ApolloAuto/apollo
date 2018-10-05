@@ -72,7 +72,7 @@ RecordViewer::Iterator RecordViewer::begin() { return Iterator(this); }
 RecordViewer::Iterator RecordViewer::end() { return Iterator(this, true); }
 
 RecordViewer::Iterator::Iterator(RecordViewer* viewer, bool end)
-    : viewer_(viewer), end_(end) {
+    : end_(end), viewer_(viewer) {
   if (end_) {
     return;
   }
