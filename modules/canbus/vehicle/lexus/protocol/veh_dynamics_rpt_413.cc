@@ -31,12 +31,16 @@ Vehdynamicsrpt413::Vehdynamicsrpt413() {}
 const int32_t Vehdynamicsrpt413::ID = 0x413;
 
 void Vehdynamicsrpt413::Parse(const std::uint8_t* bytes, int32_t length,
-                         ChassisDetail* chassis) const {
-  chassis->mutable_lexus()->mutable_veh_dynamics_rpt_413()->set_veh_g_forces(veh_g_forces(bytes, length));
+                              ChassisDetail* chassis) const {
+  chassis->mutable_lexus()->mutable_veh_dynamics_rpt_413()->set_veh_g_forces(
+      veh_g_forces(bytes, length));
 }
 
-// config detail: {'name': 'veh_g_forces', 'offset': 0.0, 'precision': 0.001, 'len': 8, 'is_signed_var': False, 'physical_range': '[-32.768|32.767]', 'bit': 7, 'type': 'double', 'order': 'motorola', 'physical_unit': ''}
-double Vehdynamicsrpt413::veh_g_forces(const std::uint8_t* bytes, int32_t length) const {
+// config detail: {'name': 'veh_g_forces', 'offset': 0.0, 'precision': 0.001,
+// 'len': 8, 'is_signed_var': False, 'physical_range': '[-32.768|32.767]',
+// 'bit': 7, 'type': 'double', 'order': 'motorola', 'physical_unit': ''}
+double Vehdynamicsrpt413::veh_g_forces(const std::uint8_t* bytes,
+                                       int32_t length) const {
   Byte t0(bytes + 0);
   int32_t x = t0.get_byte(0, 8);
 

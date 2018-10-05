@@ -17,30 +17,35 @@
 #ifndef MODULES_CANBUS_VEHICLE_LEXUS_PROTOCOL_VIN_RPT_414_H_
 #define MODULES_CANBUS_VEHICLE_LEXUS_PROTOCOL_VIN_RPT_414_H_
 
-#include "modules/drivers/canbus/can_comm/protocol_data.h"
 #include "modules/canbus/proto/chassis_detail.pb.h"
+#include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
 namespace canbus {
 namespace lexus {
 
 class Vinrpt414 : public ::apollo::drivers::canbus::ProtocolData<
-                    ::apollo::canbus::ChassisDetail> {
+                      ::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
   Vinrpt414();
   void Parse(const std::uint8_t* bytes, int32_t length,
-                     ChassisDetail* chassis) const override;
+             ChassisDetail* chassis) const override;
 
  private:
-
-  // config detail: {'name': 'VEH_SERIAL', 'offset': 0.0, 'precision': 1.0, 'len': 24, 'is_signed_var': False, 'physical_range': '[0|0]', 'bit': 39, 'type': 'int', 'order': 'motorola', 'physical_unit': ''}
+  // config detail: {'name': 'VEH_SERIAL', 'offset': 0.0, 'precision': 1.0,
+  // 'len': 24, 'is_signed_var': False, 'physical_range': '[0|0]', 'bit': 39,
+  // 'type': 'int', 'order': 'motorola', 'physical_unit': ''}
   int veh_serial(const std::uint8_t* bytes, const int32_t length) const;
 
-  // config detail: {'name': 'VEH_MY_CODE', 'offset': 0.0, 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'physical_range': '[0|0]', 'bit': 31, 'type': 'int', 'order': 'motorola', 'physical_unit': ''}
+  // config detail: {'name': 'VEH_MY_CODE', 'offset': 0.0, 'precision': 1.0,
+  // 'len': 8, 'is_signed_var': False, 'physical_range': '[0|0]', 'bit': 31,
+  // 'type': 'int', 'order': 'motorola', 'physical_unit': ''}
   int veh_my_code(const std::uint8_t* bytes, const int32_t length) const;
 
-  // config detail: {'name': 'VEH_MFG_CODE', 'offset': 0.0, 'precision': 1.0, 'len': 24, 'is_signed_var': False, 'physical_range': '[0|0]', 'bit': 7, 'type': 'int', 'order': 'motorola', 'physical_unit': ''}
+  // config detail: {'name': 'VEH_MFG_CODE', 'offset': 0.0, 'precision': 1.0,
+  // 'len': 24, 'is_signed_var': False, 'physical_range': '[0|0]', 'bit': 7,
+  // 'type': 'int', 'order': 'motorola', 'physical_unit': ''}
   int veh_mfg_code(const std::uint8_t* bytes, const int32_t length) const;
 };
 

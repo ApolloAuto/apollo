@@ -17,24 +17,25 @@
 #ifndef MODULES_CANBUS_VEHICLE_LEXUS_PROTOCOL_VEH_DYNAMICS_RPT_413_H_
 #define MODULES_CANBUS_VEHICLE_LEXUS_PROTOCOL_VEH_DYNAMICS_RPT_413_H_
 
-#include "modules/drivers/canbus/can_comm/protocol_data.h"
 #include "modules/canbus/proto/chassis_detail.pb.h"
+#include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
 namespace canbus {
 namespace lexus {
 
 class Vehdynamicsrpt413 : public ::apollo::drivers::canbus::ProtocolData<
-                    ::apollo::canbus::ChassisDetail> {
+                              ::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
   Vehdynamicsrpt413();
   void Parse(const std::uint8_t* bytes, int32_t length,
-                     ChassisDetail* chassis) const override;
+             ChassisDetail* chassis) const override;
 
  private:
-
-  // config detail: {'name': 'VEH_G_FORCES', 'offset': 0.0, 'precision': 0.001, 'len': 8, 'is_signed_var': False, 'physical_range': '[-32.768|32.767]', 'bit': 7, 'type': 'double', 'order': 'motorola', 'physical_unit': ''}
+  // config detail: {'name': 'VEH_G_FORCES', 'offset': 0.0, 'precision': 0.001,
+  // 'len': 8, 'is_signed_var': False, 'physical_range': '[-32.768|32.767]',
+  // 'bit': 7, 'type': 'double', 'order': 'motorola', 'physical_unit': ''}
   double veh_g_forces(const std::uint8_t* bytes, const int32_t length) const;
 };
 
