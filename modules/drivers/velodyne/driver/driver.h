@@ -41,7 +41,7 @@ constexpr double PACKET_RATE_VLS128 = 6250.0;
 class VelodyneDriver {
  public:
   explicit VelodyneDriver(const Config &config) : config_(config) {}
-  virtual ~VelodyneDriver() {}
+  virtual ~VelodyneDriver();
 
   virtual bool Poll(std::shared_ptr<VelodyneScan> scan);
   virtual void Init();
@@ -58,6 +58,8 @@ class VelodyneDriver {
   uint64_t basetime_ = 0;
   uint32_t last_gps_time_ = 0;
 
+  std::thread positioning_thread_;
+
   virtual int PollStandard(std::shared_ptr<VelodyneScan> scan);
   bool SetBaseTime();
   void SetBaseTimeFromNmeaTime(NMEATimePtr nmea_time, uint64_t *basetime);
@@ -68,7 +70,7 @@ class Velodyne64Driver : public VelodyneDriver {
  public:
   explicit Velodyne64Driver(const Config &config)
       : VelodyneDriver(config) {}
-  virtual ~Velodyne64Driver() {}
+  ~Velodyne64Driver() {}
 
   void Init() override;
   bool Poll(std::shared_ptr<VelodyneScan> scan) override;

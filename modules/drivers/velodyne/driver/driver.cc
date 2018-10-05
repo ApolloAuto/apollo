@@ -28,6 +28,12 @@ namespace apollo {
 namespace drivers {
 namespace velodyne {
 
+VelodyneDriver::~VelodyneDriver() {
+  if (positioning_thread_.joinable()) {
+    positioning_thread_.join();
+  }
+}
+
 void VelodyneDriver::Init() {
   double frequency = (config_.rpm() / 60.0);  // expected Hz rate
 
@@ -44,8 +50,8 @@ void VelodyneDriver::Init() {
   positioning_input_->init(config_.positioning_data_port());
 
   // raw data output topic
-  std::thread thread(&VelodyneDriver::PollPositioningPacket, this);
-  thread.detach();
+  positioning_thread_ =
+      std::thread(&VelodyneDriver::PollPositioningPacket, this);
 }
 
 void VelodyneDriver::SetBaseTimeFromNmeaTime(NMEATimePtr nmea_time,

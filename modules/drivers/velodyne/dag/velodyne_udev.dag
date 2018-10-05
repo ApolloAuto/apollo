@@ -45,30 +45,29 @@ module_config {
 #                   convert                      #
 ##################################################
 
-# 128
 module_config {
     module_library : "/apollo/bazel-bin/modules/drivers/velodyne/parser/libvelodyne_convert_component.so"
 
+    # 128
     components {
       class_name : "VelodyneConvertComponent"
       config {
         name : "velodyne_128_convert"
         config_file_path : "/apollo/modules/drivers/velodyne/conf/velodyne128_conf.pb.txt"
-        readers {channel: "/apollo/sensor/velodyne128/VelodyneScan"}
+        readers {
+          channel: "/apollo/sensor/velodyne128/VelodyneScan"
+        }
       }
     }
-}
-
-module_config {
-    module_library : "/apollo/bazel-bin/modules/drivers/velodyne/parser/libvelodyne_convert_component.so"
-
     # 16_front_center
     components {
       class_name : "VelodyneConvertComponent"
       config {
         name : "velodyne_16_front_center_convert"
         config_file_path : "/apollo/modules/drivers/velodyne/conf/velodyne16_front_center_conf.pb.txt"
-        readers {channel: "/apollo/sensor/velodyne128/VelodyneScan"}
+        readers {
+          channel: "/apollo/sensor/velodyne16/front/center/VelodyneScan"
+        }
       }
     }
     # 16_rear_left
@@ -77,7 +76,9 @@ module_config {
       config {
         name : "velodyne_16_rear_left_convert"
         config_file_path : "/apollo/modules/drivers/velodyne/conf/velodyne16_rear_left_conf.pb.txt"
-        readers {channel: "/apollo/sensor/velodyne128/VelodyneScan"}
+        readers {
+          channel: "/apollo/sensor/velodyne16/rear/left/VelodyneScan"
+        }
       }
     }
     # 16_rear_right
@@ -86,11 +87,12 @@ module_config {
       config {
         name : "velodyne_16_rear_right_convert"
         config_file_path : "/apollo/modules/drivers/velodyne/conf/velodyne16_rear_right_conf.pb.txt"
-        readers {channel: "/apollo/sensor/velodyne128/VelodyneScan"}
+        readers {
+          channel: "/apollo/sensor/velodyne16/rear/right/VelodyneScan"
+        }
       }
     }
 }
-
 
 ##################################################
 #                    fusion                      #

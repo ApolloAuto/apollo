@@ -37,6 +37,11 @@ using apollo::drivers::velodyne::VelodyneScan;
 
 class VelodyneDriverComponent : public Component<> {
  public:
+  ~VelodyneDriverComponent() {
+    if (device_thread_->joinable()) {
+      device_thread_->join();
+    }
+  }
   bool Init() override;
 
  private:
