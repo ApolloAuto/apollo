@@ -41,6 +41,7 @@
 #include "modules/planning/toolkits/optimizers/dp_st_speed/dp_st_speed_optimizer.h"
 #include "modules/planning/toolkits/optimizers/path_decider/path_decider.h"
 #include "modules/planning/toolkits/optimizers/poly_st_speed/poly_st_speed_optimizer.h"
+#include "modules/planning/toolkits/optimizers/qp_piecewise_jerk_path/qp_piecewise_jerk_path_optimizer.h"
 #include "modules/planning/toolkits/optimizers/qp_spline_path/qp_spline_path_optimizer.h"
 #include "modules/planning/toolkits/optimizers/qp_spline_st_speed/qp_spline_st_speed_optimizer.h"
 #include "modules/planning/toolkits/optimizers/speed_decider/speed_decider.h"
@@ -73,6 +74,9 @@ void LaneFollowScenario::RegisterTasks() {
                          []() -> Task* { return new SpeedDecider(); });
   task_factory_.Register(QP_SPLINE_ST_SPEED_OPTIMIZER, []() -> Task* {
     return new QpSplineStSpeedOptimizer();
+  });
+  task_factory_.Register(QP_PIECEWISE_JERK_PATH_OPTIMIZER, []() -> Task* {
+    return new QpPiecewiseJerkPathOptimizer();
   });
   task_factory_.Register(POLY_ST_SPEED_OPTIMIZER,
                          []() -> Task* { return new PolyStSpeedOptimizer(); });

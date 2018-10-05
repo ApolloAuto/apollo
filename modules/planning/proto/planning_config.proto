@@ -4,6 +4,7 @@ package apollo.planning;
 
 import "modules/planning/proto/dp_poly_path_config.proto";
 import "modules/planning/proto/dp_st_speed_config.proto";
+import "modules/planning/proto/qp_piecewise_jerk_path_config.proto";
 import "modules/planning/proto/qp_spline_path_config.proto";
 import "modules/planning/proto/qp_st_speed_config.proto";
 import "modules/planning/proto/proceed_with_caution_speed_config.proto";
@@ -23,6 +24,7 @@ enum TaskType {
   NAVI_PATH_DECIDER = 7;
   NAVI_SPEED_DECIDER = 8;
   NAVI_OBSTACLE_DECIDER = 9;
+  QP_PIECEWISE_JERK_PATH_OPTIMIZER = 10;
 };
 
 message PathDeciderConfig {
@@ -53,6 +55,7 @@ message ScenarioConfig {
       PolyStSpeedConfig poly_st_speed_config = 6;
       PathDeciderConfig path_decider_config = 7;
       ProceedWithCautionSpeedConfig proceed_with_caution_speed_config = 8;
+      QpPiecewiseJerkPathConfig qp_piecewise_jerk_path_config = 9;
     }
   }
   message Stage {

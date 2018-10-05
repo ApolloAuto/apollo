@@ -1,0 +1,11 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+message QpPiecewiseJerkPathConfig {
+  optional double path_resolution = 1 [default = 1.0]; // meters
+  optional double qp_delta_s = 2 [default = 1.0]; // meteres
+  optional double min_look_ahead_time = 3 [default = 6.0]; // seconds
+  optional double min_look_ahead_distance = 4 [default = 60.0]; // meters
+  optional double lateral_buffer = 5 [default = 0.2]; // meters
+}
