@@ -17,17 +17,10 @@
 #ifndef CYBERTRON_RECORD_RECORD_BASE_H_
 #define CYBERTRON_RECORD_RECORD_BASE_H_
 
-#include <condition_variable>
-#include <iostream>
-#include <memory>
-#include <mutex>
+#include <stdint.h>
 #include <string>
-#include <thread>
-#include <unordered_map>
 
-#include "cybertron/common/file.h"
-#include "cybertron/common/log.h"
-#include "cybertron/record/record_file.h"
+#include "cybertron/proto/record.pb.h"
 
 namespace apollo {
 namespace cybertron {
@@ -35,30 +28,23 @@ namespace record {
 
 class RecordBase {
  public:
-  RecordBase();
-  virtual ~RecordBase();
-  uint64_t GetMessageNumber(const std::string& channel_name) const;
-  const std::string& GetMessageType(const std::string& channel_name) const;
-  const std::string& GetProtoDesc(const std::string& channel_name) const;
-  const Header& GetHeader() const;
+  virtual ~RecordBase() = default;
+
+  virtual uint64_t GetMessageNumber(const std::string& channel_name) const = 0;
+
+  virtual const std::string& GetMessageType(
+      const std::string& channel_name) const = 0;
+
+  virtual const std::string& GetProtoDesc(
+      const std::string& channel_name) const = 0;
+
+  const proto::Header& GetHeader() const { return header_; }
 
  protected:
-  bool IsNewChannel(const std::string& channel_name);
-
-  void OnNewChannel(const std::string& channel_name,
-                    const std::string& message_type,
-                    const std::string& proto_desc);
-
-  void OnNewMessage(const std::string& channel_name);
-
-  Header header_;
-  std::mutex mutex_;
   std::string file_;
   std::string path_;
   std::string null_type_;
-  std::unordered_map<std::string, uint64_t> channel_message_number_map_;
-  std::unordered_map<std::string, std::string> channel_message_type_map_;
-  std::unordered_map<std::string, std::string> channel_proto_desc_map_;
+  proto::Header header_;
   bool is_opened_ = false;
 };
 

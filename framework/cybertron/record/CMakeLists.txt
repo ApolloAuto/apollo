@@ -3,7 +3,6 @@ project(cybertron_record)
 add_library(${PROJECT_NAME}
   header_builder.cpp
   record_file.cpp
-  record_base.cpp
   record_writer.cpp
   record_reader.cpp
   record_viewer.cpp

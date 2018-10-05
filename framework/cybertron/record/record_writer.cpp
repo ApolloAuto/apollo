@@ -16,9 +16,16 @@
 
 #include "cybertron/record/record_writer.h"
 
+#include <iostream>
+
+#include "cybertron/common/log.h"
+
 namespace apollo {
 namespace cybertron {
 namespace record {
+
+using proto::Channel;
+using proto::SingleMessage;
 
 RecordWriter::RecordWriter() { header_ = HeaderBuilder::GetHeader(); }
 
@@ -133,6 +140,57 @@ bool RecordWriter::SetIntervalOfFileSegmentation(uint64_t time_sec) {
   }
   header_.set_segment_interval(time_sec * 1e9L);
   return true;
+}
+
+bool RecordWriter::IsNewChannel(const std::string& channel_name) {
+  auto search = channel_message_number_map_.find(channel_name);
+  if (search == channel_message_number_map_.end()) {
+    return true;
+  }
+  return false;
+}
+
+void RecordWriter::OnNewChannel(const std::string& channel_name,
+                                const std::string& message_type,
+                                const std::string& proto_desc) {
+  if (IsNewChannel(channel_name)) {
+    channel_message_number_map_[channel_name] = 0;
+    channel_message_type_map_[channel_name] = message_type;
+    channel_proto_desc_map_[channel_name] = proto_desc;
+  }
+}
+
+void RecordWriter::OnNewMessage(const std::string& channel_name) {
+  auto search = channel_message_number_map_.find(channel_name);
+  if (search != channel_message_number_map_.end()) {
+    channel_message_number_map_[channel_name]++;
+  }
+}
+
+uint64_t RecordWriter::GetMessageNumber(const std::string& channel_name) const {
+  auto search = channel_message_number_map_.find(channel_name);
+  if (search != channel_message_number_map_.end()) {
+    return search->second;
+  }
+  return 0;
+}
+
+const std::string& RecordWriter::GetMessageType(
+    const std::string& channel_name) const {
+  auto search = channel_message_type_map_.find(channel_name);
+  if (search != channel_message_type_map_.end()) {
+    return search->second;
+  }
+  return null_type_;
+}
+
+const std::string& RecordWriter::GetProtoDesc(
+    const std::string& channel_name) const {
+  auto search = channel_proto_desc_map_.find(channel_name);
+  if (search != channel_proto_desc_map_.end()) {
+    return search->second;
+  }
+  return null_type_;
 }
 
 }  // namespace record

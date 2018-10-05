@@ -23,7 +23,7 @@ TEST(SchedulerTest, print_statistics) {
 
 TEST(SchedulerTest, remove_task) {
   Scheduler scheduler;
-  EXPECT_FALSE(scheduler.RemoveTask("remove_task"));
+  EXPECT_TRUE(scheduler.RemoveTask("remove_task"));
   scheduler.ShutDown();
   EXPECT_TRUE(scheduler.RemoveTask("remove_task"));
 }

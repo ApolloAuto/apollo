@@ -17,27 +17,30 @@
 #ifndef CYBERTRON_RECORD_RECORD_WRITER_H_
 #define CYBERTRON_RECORD_RECORD_WRITER_H_
 
-#include <algorithm>
-#include <condition_variable>
+#include <stdint.h>
 #include <memory>
+#include <mutex>
 #include <string>
-#include <thread>
 #include <unordered_map>
-#include <utility>
-#include <vector>
+
+#include "cybertron/common/log.h"
 #include "cybertron/message/raw_message.h"
+#include "cybertron/proto/record.pb.h"
 #include "cybertron/record/header_builder.h"
 #include "cybertron/record/record_base.h"
+#include "cybertron/record/record_file.h"
 
 namespace apollo {
 namespace cybertron {
 namespace record {
 
-using ::apollo::cybertron::message::RawMessage;
-using ::apollo::cybertron::record::RecordFileWriter;
-
 class RecordWriter : public RecordBase {
  public:
+  using MessageNumberMap = std::unordered_map<std::string, uint64_t>;
+  using MessageTypeMap = std::unordered_map<std::string, std::string>;
+  using MessageProtoDescMap = std::unordered_map<std::string, std::string>;
+  using FileWriterPtr = std::unique_ptr<RecordFileWriter>;
+
   RecordWriter();
 
   virtual ~RecordWriter();
@@ -54,21 +57,39 @@ class RecordWriter : public RecordBase {
   bool WriteMessage(const std::string& channel_name, const MessageT& message,
                     const uint64_t time_nanosec,
                     const std::string& proto_desc = "");
+
   void ShowProgress();
 
   bool SetSizeOfFileSegmentation(uint64_t size_kilobytes);
 
   bool SetIntervalOfFileSegmentation(uint64_t time_sec);
 
+  uint64_t GetMessageNumber(const std::string& channel_name) const override;
+
+  const std::string& GetMessageType(
+      const std::string& channel_name) const override;
+
+  const std::string& GetProtoDesc(
+      const std::string& channel_name) const override;
+
  private:
-  bool WriteMessage(const SingleMessage& single_msg);
+  bool WriteMessage(const proto::SingleMessage& single_msg);
   void SplitOutfile();
+  bool IsNewChannel(const std::string& channel_name);
+  void OnNewChannel(const std::string& channel_name,
+                    const std::string& message_type,
+                    const std::string& proto_desc);
+  void OnNewMessage(const std::string& channel_name);
 
   uint64_t segment_raw_size_ = 0;
   uint64_t segment_begin_time_ = 0;
   uint64_t file_index_ = 0;
-  std::unique_ptr<RecordFileWriter> file_writer_ = nullptr;
-  std::unique_ptr<RecordFileWriter> file_writer_backup_ = nullptr;
+  MessageNumberMap channel_message_number_map_;
+  MessageTypeMap channel_message_type_map_;
+  MessageProtoDescMap channel_proto_desc_map_;
+  FileWriterPtr file_writer_ = nullptr;
+  FileWriterPtr file_writer_backup_ = nullptr;
+  std::mutex mutex_;
 };
 
 template <>
@@ -77,7 +98,7 @@ inline bool RecordWriter::WriteMessage(const std::string& channel_name,
                                        const uint64_t time_nanosec,
                                        const std::string& proto_desc) {
   OnNewMessage(channel_name);
-  SingleMessage single_msg;
+  proto::SingleMessage single_msg;
   single_msg.set_channel_name(channel_name);
   single_msg.set_content(content);
   single_msg.set_time(time_nanosec);
@@ -86,7 +107,8 @@ inline bool RecordWriter::WriteMessage(const std::string& channel_name,
 
 template <>
 inline bool RecordWriter::WriteMessage(
-    const std::string& channel_name, const std::shared_ptr<RawMessage>& message,
+    const std::string& channel_name,
+    const std::shared_ptr<message::RawMessage>& message,
     const uint64_t time_nanosec, const std::string& proto_desc) {
   if (message == nullptr) {
     AERROR << "nullptr error, channel: " << channel_name;

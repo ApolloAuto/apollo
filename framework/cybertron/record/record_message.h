@@ -17,23 +17,12 @@
 #ifndef CYBERTRON_RECORD_RECORD_MESSAGE_H_
 #define CYBERTRON_RECORD_RECORD_MESSAGE_H_
 
-#include <condition_variable>
-#include <memory>
-#include <queue>
+#include <stdint.h>
 #include <string>
-#include <thread>
-#include <unordered_map>
-#include <utility>
-#include <vector>
-#include "cybertron/message/raw_message.h"
-#include "cybertron/record/record_base.h"
 
 namespace apollo {
 namespace cybertron {
 namespace record {
-
-using ::apollo::cybertron::message::RawMessage;
-using ::apollo::cybertron::record::RecordFileReader;
 
 struct RecordMessage {
   RecordMessage() {}

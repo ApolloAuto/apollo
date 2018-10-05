@@ -16,6 +16,7 @@
 
 #include <gtest/gtest.h>
 #include <unistd.h>
+#include <algorithm>
 #include <atomic>
 #include <memory>
 #include <string>
@@ -28,6 +29,8 @@
 namespace apollo {
 namespace cybertron {
 namespace record {
+
+using apollo::cybertron::message::RawMessage;
 
 const char CHANNEL_NAME_1[] = "/test/channel1";
 const char CHANNEL_NAME_2[] = "/test/channel2";
@@ -64,6 +67,11 @@ uint64_t CheckCount(RecordViewer viewer) {
 TEST(RecordTest, iterator_test) {
   ConstructRecord();
   auto reader = std::make_shared<RecordReader>(TEST_FILE);
+  auto msg_num = reader->GetMessageNumber(CHANNEL_NAME_1);
+  EXPECT_EQ(msg_num, MESSAGE_NUM);
+  auto& msg_type = reader->GetMessageType(CHANNEL_NAME_1);
+  EXPECT_EQ(msg_type, MESSAGE_TYPE_1);
+
   RecordViewer viewer(reader);
   int count = 0;
   for (auto& msg : viewer) {

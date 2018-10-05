@@ -16,9 +16,13 @@
 
 #include "cybertron/record/record_reader.h"
 
+#include <utility>
+
 namespace apollo {
 namespace cybertron {
 namespace record {
+
+using proto::SectionType;
 
 RecordReader::~RecordReader() {}
 
@@ -28,6 +32,20 @@ RecordReader::RecordReader(const std::string& file) {
   header_ = file_reader_->GetHeader();
   if (file_reader_->ReadIndex()) {
     index_ = file_reader_->GetIndex();
+    const int kIndexSize = index_.indexes_size();
+    for (int i = 0; i < kIndexSize; ++i) {
+      auto single_idx = index_.mutable_indexes(i);
+      if (single_idx->type() != SectionType::SECTION_CHANNEL) {
+        continue;
+      }
+      if (!single_idx->has_channel_cache()) {
+        AERROR << "single channel index does not have channel_cache.";
+        continue;
+      }
+      auto channel_cache = single_idx->mutable_channel_cache();
+      channel_info_.insert(
+          std::make_pair(channel_cache->name(), *channel_cache));
+    }
   }
 }
 
@@ -37,15 +55,10 @@ void RecordReader::Reset() {
   chunk_ = ChunkBody();
 }
 
-const Header& RecordReader::header() const { return header_; }
-
 std::set<std::string> RecordReader::GetChannelList() const {
   std::set<std::string> channel_list;
-  for (int i = 0; i < index_.indexes_size(); i++) {
-    ChannelCache cache = index_.indexes(i).channel_cache();
-    if (index_.indexes(i).type() == SectionType::SECTION_CHANNEL) {
-      channel_list.insert(cache.name());
-    }
+  for (auto& item : channel_info_) {
+    channel_list.insert(item.first);
   }
   return channel_list;
 }
@@ -62,9 +75,7 @@ bool RecordReader::ReadMessage(RecordMessage* message, uint64_t begin_time,
       continue;
     }
 
-    const std::string& channel_name = next_message.channel_name();
-    OnNewMessage(channel_name);
-    message->channel_name = channel_name;
+    message->channel_name = next_message.channel_name();
     message->content = next_message.content();
     message->time = time;
     return true;
@@ -94,8 +105,6 @@ bool RecordReader::ReadNextChunk(ChunkBody* chunk, uint64_t begin_time,
           AERROR << "Failed to read channel section.";
           return false;
         }
-        OnNewChannel(channel.name(), channel.message_type(),
-                     channel.proto_desc());
         break;
       }
       case SectionType::SECTION_CHUNK_HEADER: {
@@ -132,6 +141,32 @@ bool RecordReader::ReadNextChunk(ChunkBody* chunk, uint64_t begin_time,
     }
   }
   return false;
+}
+
+uint64_t RecordReader::GetMessageNumber(const std::string& channel_name) const {
+  auto search = channel_info_.find(channel_name);
+  if (search == channel_info_.end()) {
+    return 0;
+  }
+  return search->second.message_number();
+}
+
+const std::string& RecordReader::GetMessageType(
+    const std::string& channel_name) const {
+  auto search = channel_info_.find(channel_name);
+  if (search == channel_info_.end()) {
+    return null_type_;
+  }
+  return search->second.message_type();
+}
+
+const std::string& RecordReader::GetProtoDesc(
+    const std::string& channel_name) const {
+  auto search = channel_info_.find(channel_name);
+  if (search == channel_info_.end()) {
+    return null_type_;
+  }
+  return search->second.proto_desc();
 }
 
 }  // namespace record

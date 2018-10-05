@@ -31,6 +31,8 @@ namespace apollo {
 namespace cybertron {
 namespace record {
 
+using apollo::cybertron::message::RawMessage;
+
 const char CHANNEL_NAME_1[] = "/test/channel1";
 const char CHANNEL_NAME_2[] = "/test/channel2";
 const char MESSAGE_TYPE_1[] = "apollo.cybertron.proto.Test";
