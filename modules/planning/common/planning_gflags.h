@@ -214,6 +214,7 @@ DECLARE_string(planner_open_space_config_filename);
 
 DECLARE_bool(use_osqp_optimizer_for_qp_st);
 DECLARE_bool(use_osqp_optimizer_for_reference_line);
+DECLARE_bool(enable_osqp_debug);
 
 DECLARE_bool(use_static_waypoint_sampler);
 

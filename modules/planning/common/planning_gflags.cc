@@ -395,5 +395,7 @@ DEFINE_bool(use_osqp_optimizer_for_qp_st, false,
             "Use OSQP optimizer for QpSt speed optimization.");
 DEFINE_bool(use_osqp_optimizer_for_reference_line, true,
             "Use OSQP optimizer for reference line optimization.");
+DEFINE_bool(enable_osqp_debug, false,
+            "True to turn on OSQP verbose debug output in log.");
 
 DEFINE_bool(use_static_waypoint_sampler, false, "Use static waypoint sampler");

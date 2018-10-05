@@ -29,6 +29,7 @@
 
 #include "modules/common/math/matrix_operations.h"
 #include "modules/common/time/time.h"
+#include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
 namespace planning {
@@ -49,7 +50,7 @@ OsqpSpline1dSolver::OsqpSpline1dSolver(const std::vector<double>& x_knots,
   settings_->eps_rel = 1.0e-03;
   settings_->max_iter = 5000;
   // settings_->polish = true;
-  settings_->verbose = false;
+  settings_->verbose = FLAGS_enable_osqp_debug;
   settings_->warm_start = true;
 
   // Populate data
