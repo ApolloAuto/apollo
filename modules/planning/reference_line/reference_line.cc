@@ -15,7 +15,7 @@
  *****************************************************************************/
 
 /**
- * @file reference_line.cc
+ * @file
  **/
 
 #include "modules/planning/reference_line/reference_line.h"
@@ -31,6 +31,7 @@
 
 #include "cybertron/common/log.h"
 #include "modules/common/math/angle.h"
+#include "modules/common/math/cartesian_frenet_conversion.h"
 #include "modules/common/math/linear_interpolation.h"
 #include "modules/common/math/vec2d.h"
 #include "modules/common/util/string_util.h"
@@ -42,6 +43,7 @@ namespace planning {
 
 using MapPath = hdmap::Path;
 using apollo::common::SLPoint;
+using apollo::common::math::CartesianFrenetConverter;
 using apollo::common::util::DistanceXY;
 using apollo::hdmap::InterpolatedIndex;
 
@@ -170,6 +172,35 @@ bool ReferenceLine::Shrink(const common::math::Vec2d& point,
   map_path_ = MapPath(std::move(std::vector<hdmap::MapPathPoint>(
       reference_points_.begin(), reference_points_.end())));
   return true;
+}
+
+common::FrenetFramePoint ReferenceLine::GetFrenetPoint(
+    const common::TrajectoryPoint& traj_point) const {
+  common::SLPoint sl_point;
+  XYToSL({traj_point.path_point().x(), traj_point.path_point().y()}, &sl_point);
+  common::FrenetFramePoint frenet_frame_point;
+  frenet_frame_point.set_s(sl_point.s());
+  frenet_frame_point.set_l(sl_point.l());
+
+  const double theta = traj_point.path_point().theta();
+  const double kappa = traj_point.path_point().kappa();
+  const double l = frenet_frame_point.l();
+
+  ReferencePoint ref_point;
+  ref_point = GetReferencePoint(frenet_frame_point.s());
+
+  const double theta_ref = ref_point.heading();
+  const double kappa_ref = ref_point.kappa();
+  const double dkappa_ref = ref_point.dkappa();
+
+  const double dl = CartesianFrenetConverter::CalculateLateralDerivative(
+      theta_ref, theta, l, kappa_ref);
+  const double ddl =
+      CartesianFrenetConverter::CalculateSecondOrderLateralDerivative(
+          theta_ref, theta, kappa_ref, kappa, dkappa_ref, l);
+  frenet_frame_point.set_dl(dl);
+  frenet_frame_point.set_ddl(ddl);
+  return frenet_frame_point;
 }
 
 ReferencePoint ReferenceLine::GetNearestReferencePoint(const double s) const {
