@@ -1,11 +1,24 @@
 scenario_type : LANE_FOLLOW
 stage : {
   task : DP_POLY_PATH_OPTIMIZER
+  # task : QP_PIECEWISE_JERK_PATH_OPTIMIZER
   task : PATH_DECIDER
   task : DP_ST_SPEED_OPTIMIZER
   task : SPEED_DECIDER
   task : QP_SPLINE_ST_SPEED_OPTIMIZER
 }
+
+scenario_task_config : {
+  task_type : QP_PIECEWISE_JERK_PATH_OPTIMIZER
+  qp_piecewise_jerk_path_config {
+    path_resolution: 1.0
+    qp_delta_s: 1.0
+    min_look_ahead_time: 6.0
+    min_look_ahead_distance: 60.0
+    lateral_buffer: 0.2
+  }
+}
+
 scenario_task_config : {
   task_type : DP_POLY_PATH_OPTIMIZER
   dp_poly_path_config {

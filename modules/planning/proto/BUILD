@@ -178,6 +178,7 @@ proto_library(
         ":planner_open_space_config_proto_lib",
         ":poly_st_speed_config_proto_lib",
         ":proceed_with_caution_speed_config_proto_lib",
+        ":qp_piecewise_jerk_path_config_proto_lib",
         ":qp_spline_path_config_proto_lib",
         ":qp_st_speed_config_proto_lib",
         ":reference_line_smoother_config_proto_lib",
@@ -290,6 +291,20 @@ proto_library(
     name = "traffic_rule_config_proto_lib",
     srcs = [
         "traffic_rule_config.proto",
+    ],
+)
+
+cc_proto_library(
+    name = "qp_piecewise_jerk_path_config_proto",
+    deps = [
+        ":qp_piecewise_jerk_path_config_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "qp_piecewise_jerk_path_config_proto_lib",
+    srcs = [
+        "qp_piecewise_jerk_path_config.proto",
     ],
 )
 
