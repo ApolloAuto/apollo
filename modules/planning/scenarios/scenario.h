@@ -21,6 +21,7 @@
 #ifndef MODULES_PLANNING_SCENARIOS_SCENARIO_H_
 #define MODULES_PLANNING_SCENARIOS_SCENARIO_H_
 
+#include <set>
 #include <string>
 
 #include "modules/planning/proto/planning_config.pb.h"

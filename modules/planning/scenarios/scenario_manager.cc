@@ -21,8 +21,10 @@
 namespace apollo {
 namespace planning {
 
-bool ScenarioManager::Init() {
+bool ScenarioManager::Init(
+    const std::set<ScenarioConfig::ScenarioType>& supported_scenarios) {
   RegisterScenarios();
+  supported_scenarios_ = supported_scenarios;
   scenario_ = scenario_factory_.CreateObject(ScenarioConfig::LANE_FOLLOW);
   return true;
 }

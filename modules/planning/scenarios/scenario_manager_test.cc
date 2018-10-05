@@ -21,6 +21,7 @@
 #include "modules/planning/scenarios/scenario_manager.h"
 
 #include <memory>
+#include <set>
 
 #include "gtest/gtest.h"
 
@@ -38,7 +39,8 @@ class ScenarioManagerTest : public ::testing::Test {
 };
 
 TEST_F(ScenarioManagerTest, Simple) {
-  EXPECT_TRUE(scenario_manager_.Init());
+  std::set<ScenarioConfig::ScenarioType> supported_scenarios;
+  EXPECT_TRUE(scenario_manager_.Init(supported_scenarios));
   common::TrajectoryPoint tp;
 
   uint32_t sequence_num = 10;
