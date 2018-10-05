@@ -169,6 +169,7 @@ bool OsqpSpline2dSolver::Solve() {
   settings->eps_rel = 1.0e-05;
   settings->max_iter = 5000;
   settings->polish = true;
+  settings->verbose = FLAGS_enable_osqp_debug;
 
   // Setup workspace
   work = osqp_setup(data, settings);

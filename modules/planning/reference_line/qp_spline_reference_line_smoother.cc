@@ -82,7 +82,7 @@ bool QpSplineReferenceLineSmoother::Smooth(
     AERROR << "Solve spline smoother problem failed";
   }
   auto end = Clock::NowInSeconds();
-  AERROR << "QpSplineReferenceLineSmoother solve time is "
+  ADEBUG << "QpSplineReferenceLineSmoother solve time is "
          << (end - start) * 1000 << " ms.";
 
   // mapping spline to reference line point
