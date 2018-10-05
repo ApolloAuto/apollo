@@ -93,10 +93,10 @@ function check_esd_files() {
 
 function generate_build_targets() {
   if [ -z $NOT_BUILD_PERCEPTION ] ; then
-    BUILD_TARGETS=`bazel query //modules/...`
+    BUILD_TARGETS=`bazel query //modules/... union //framework/...`
   else
     info 'Skip building perception module!'
-    BUILD_TARGETS=`bazel query //modules/... except //modules/perception/... except //modules/calibration/lidar_ex_checker/...`
+    BUILD_TARGETS=`bazel query //modules/... except //modules/perception/... except //modules/calibration/lidar_ex_checker/... union //framework/...`
   fi
 
   if [ $? -ne 0 ]; then
@@ -123,6 +123,14 @@ function build_cybertron() {
   source framework/install/setup.bash
 }
 
+function build_proto() {
+  cd /apollo/framework/cybertron/proto
+  protoc *.proto --cpp_out=.
+  cd /apollo
+  info "Building proto ..."
+  source framework/cybertron/setup.bash
+}
+
 function build() {
   if [ "${USE_GPU}" = "1" ] ; then
     echo -e "${YELLOW}Running build under GPU mode. GPU is required to run the build.${NO_COLOR}"
@@ -130,7 +138,7 @@ function build() {
     echo -e "${YELLOW}Running build under CPU mode. No GPU is required to run the build.${NO_COLOR}"
   fi
   info "Start building, please wait ..."
-  build_cybertron
+  build_proto
 
   generate_build_targets
   info "Building on $MACHINE_ARCH..."
@@ -172,8 +180,9 @@ function build() {
 
 function cibuild() {
   info "Building framework ..."
-  cd /apollo/framework
-  bash cybertron.sh build_fast
+  build_proto
+  #cd /apollo/framework
+  #bash cybertron.sh build_fast
 
   cd /apollo
   info "Building modules ..."
@@ -185,6 +194,7 @@ function cibuild() {
 
   info "Building with $JOB_ARG for $MACHINE_ARCH"
   BUILD_TARGETS="
+    //framework/...
     //modules/canbus/...
     //modules/common/...
     //modules/control/...
@@ -397,13 +407,12 @@ function citest_basic() {
   set -e
 
   info "Building framework ..."
-  cd /apollo/framework
-  bash cybertron.sh build_fast
+  build_proto
   cd /apollo
-  source framework/install/setup.bash
+  source framework/cybertron/setup.bash
 
   BUILD_TARGETS="
-    `bazel query //modules/...`
+    `bazel query //modules/... union //framework/...`
   "
 
   JOB_ARG="--jobs=$(nproc) --ram_utilization_factor 80"
@@ -431,13 +440,12 @@ function citest_extended() {
   set -e
 
   info "Building framework ..."
-  cd /apollo/framework
-  bash cybertron.sh build_fast
+  build_proto
   cd /apollo
-  source framework/install/setup.bash
+  source framework/cybertron/setup.bash
 
   BUILD_TARGETS="
-    `bazel query //modules/planning/...`
+    `bazel query //modules/planning/... union //framework/...`
   "
 
   JOB_ARG="--jobs=$(nproc) --ram_utilization_factor 80"
@@ -456,10 +464,9 @@ function citest_extended() {
 
 function citest() {
   info "Building framework ..."
-  cd /apollo/framework
-  bash cybertron.sh build_fast
+  build_proto
   cd /apollo
-  source framework/install/setup.bash
+  source framework/cybertron/setup.bash
 
   citest_basic
   citest_extended

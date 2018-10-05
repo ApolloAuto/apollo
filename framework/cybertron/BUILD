@@ -13,6 +13,7 @@ cc_binary(
     ],
     copts = [
         "-Iframework",
+        "-pthread",
     ],
     linkstatic = False,
 )
