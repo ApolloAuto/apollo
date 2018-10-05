@@ -39,7 +39,7 @@ bool PlanningComponent::Init() {
   routing_reader_ = node_->CreateReader<RoutingResponse>(
       FLAGS_routing_response_topic,
       [this](const std::shared_ptr<RoutingResponse>& routing) {
-        AINFO << "Received routing data: run routing callback 2:"
+        AINFO << "Received routing data: run routing callback."
               << routing->header().DebugString();
         std::lock_guard<std::mutex> lock(mutex_);
         routing_.CopyFrom(*routing);
@@ -48,7 +48,7 @@ bool PlanningComponent::Init() {
   traffic_light_reader_ = node_->CreateReader<TrafficLightDetection>(
       FLAGS_traffic_light_detection_topic,
       [this](const std::shared_ptr<TrafficLightDetection>& traffic_light) {
-        ADEBUG << "Received chassis data: run chassis callback.";
+        ADEBUG << "Received traffic light data: run traffic light callback.";
         std::lock_guard<std::mutex> lock(mutex_);
         traffic_light_.CopyFrom(*traffic_light);
       });
