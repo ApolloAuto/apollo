@@ -34,10 +34,10 @@
 #define MODULE_NAME DEFAULT_NAME
 #endif
 
-#define ADEBUG_MODULE(module)                                                \
-  VLOG(4) << LEFT_BRACKET                                                    \
-          << (module != DEFAULT_NAME ? module                                \
-                                     : apollo::cybertron::Binary::GetName()) \
+#define ADEBUG_MODULE(module)                                             \
+  VLOG(4) << LEFT_BRACKET << (strcmp(module, DEFAULT_NAME) != 0           \
+                                  ? module                                \
+                                  : apollo::cybertron::Binary::GetName()) \
           << RIGHT_BRACKET << "[DEBUG] "
 #define ADEBUG ADEBUG_MODULE(MODULE_NAME)
 #define AINFO ALOG_MODULE(MODULE_NAME, INFO)
@@ -55,7 +55,7 @@
 #endif
 
 #define ALOG_MODULE_STREAM_INFO(module)                                \
-  (module != DEFAULT_NAME                                              \
+  (strcmp(module, DEFAULT_NAME) != 0                                   \
        ? google::LogMessage(__FILE__, __LINE__, google::INFO).stream() \
              << LEFT_BRACKET << module << RIGHT_BRACKET                \
        : google::LogMessage(__FILE__, __LINE__, google::INFO).stream() \
@@ -63,7 +63,7 @@
              << RIGHT_BRACKET)
 
 #define ALOG_MODULE_STREAM_WARN(module)                                   \
-  (module != DEFAULT_NAME                                                 \
+  (strcmp(module, DEFAULT_NAME) != 0                                      \
        ? google::LogMessage(__FILE__, __LINE__, google::WARNING).stream() \
              << LEFT_BRACKET << module << RIGHT_BRACKET                   \
        : google::LogMessage(__FILE__, __LINE__, google::WARNING).stream() \
@@ -71,7 +71,7 @@
              << RIGHT_BRACKET)
 
 #define ALOG_MODULE_STREAM_ERROR(module)                                \
-  (module != DEFAULT_NAME                                               \
+  (strcmp(module, DEFAULT_NAME) != 0                                    \
        ? google::LogMessage(__FILE__, __LINE__, google::ERROR).stream() \
              << LEFT_BRACKET << module << RIGHT_BRACKET                 \
        : google::LogMessage(__FILE__, __LINE__, google::ERROR).stream() \
@@ -79,7 +79,7 @@
              << RIGHT_BRACKET)
 
 #define ALOG_MODULE_STREAM_FATAL(module)                                \
-  (module != DEFAULT_NAME                                               \
+  (strcmp(module, DEFAULT_NAME) != 0                                    \
        ? google::LogMessage(__FILE__, __LINE__, google::FATAL).stream() \
              << LEFT_BRACKET << module << RIGHT_BRACKET                 \
        : google::LogMessage(__FILE__, __LINE__, google::FATAL).stream() \
