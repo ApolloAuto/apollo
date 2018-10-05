@@ -17,58 +17,63 @@
 ###############################################################################
 
 function print_help() {
-   echo "Example: filter_planning.sh -[pc|np|wp] [-d|--dir] bag1 bag2 bag3 ..."
+   echo "Example: filter_planning.sh -[pc|np|wp] [-d|--dir] record1 record2 record3 ..."
    echo "-d|--dir the target storage directory"
    echo "This script works in three modes:"
-   echo "  -pc filter for perfect control, produces *.pc.bag"
-   echo "  -po filter only for perception topic, produces *.po.bag"
-   echo "  -np filter for planning dependencies, produces *.np.bag"
-   echo "  -wp filter for planning and its dependencies, produces *.wp.bag"
-   echo "  -pn filter out planning and prediction, produces *.npp.bag"
-   echo "  -co filter out perception, prediction and planning, produces *.co.bag"
-   echo "  -ni filter out pointcloud and images, produces *.ni.bag"
+   echo "  -pc filter for perfect control, produces *.pc.record"
+   echo "  -po filter only for perception topic, produces *.po.record"
+   echo "  -np filter for planning dependencies, produces *.np.record"
+   echo "  -wp filter for planning and its dependencies, produces *.wp.record"
+   echo "  -pn filter out planning and prediction, produces *.npp.record"
+   echo "  -co filter out perception, prediction and planning, produces *.co.record"
+   echo "  -ni filter out pointcloud and images, produces *.ni.record"
 }
 
-routing_topic="topic == '/apollo/routing_response'"
+routing_topic="/apollo/routing_response"
+planning_topic="/apollo/planning"
+prediction_topic="/apollo/prediction"
+drive_event_topic="/apollo/drive_event"
+pointcloud_topic="/apollo/sensor/velodyne64/compensator/PointCloud2"
 
-perception_topic="topic == '/apollo/perception/obstacles' \
-   or topic == '/apollo/perception/traffic_light'"
+perception_topic=(
+'/apollo/perception/obstacles'
+'/apollo/perception/traffic_light'
+)
 
-perfect_control_topic="$perception_topic  \
-   or $routing_topic \
-   or topic == '/apollo/perception/obstacles' \
-   or topic == '/apollo/prediction' \
-   or topic == '/apollo/control' \
-   or topic == '/apollo/perception/traffic_light'"
+perfect_control_topic=()
+perfect_control_topic+=${perception_topic[@]}
+perfect_control_topic+=($routing_topic)
+perfect_control_topic+=("$prediction_topic")
+perfect_control_topic+=("/apollo/perception/traffic_light")
 
-planning_deps="$perfect_control_topic \
-    or topic == '/apollo/canbus/chassis' \
-    or topic == '/apollo/localization/pose' \
-    or topic == '/apollo/navigation' \
-    or topic == '/apollo/guardian' \
-    or topic == '/apollo/monitor/system_status' \
-    or topic == '/apollo/relative_map'"
 
-planning_topic="topic == '/apollo/planning'"
-prediction_topic="topic == '/apollo/prediction'"
-pointcloud_topic="topic == '/apollo/sensor/velodyne64/compensator/PointCloud2'"
-image_topic="topic == '/apollo/sensor/camera/traffic/image_long' \
-    or topic == '/apollo/sensor/camera/traffic/image_short'"
+planning_deps=()
+planning_deps+=${perfect_control_topic[@]}
+planning_deps+=('/apollo/canbus/chassis')
+planning_deps+=('/apollo/localization/pose')
+planning_deps+=('/apollo/navigation')
+planning_deps+=('/apollo/guardian')
+planning_deps+=('/apollo/monitor/system_status')
+planning_deps+=('/apollo/relative_map')
 
-planning_all="topic == '/apollo/planning' \
-    or topic == '/apollo/drive_event' \
-    or $planning_deps"
 
-camera_only="topic != '/apollo/perception/obstacles' \
-    and topic != '/apollo/prediction' \
-    and topic != '/apollo/planning'"
+image_topic=(
+'/apollo/sensor/camera/traffic/image_long'
+'/apollo/sensor/camera/traffic/image_short'
+)
+
+planning_all=()
+planning_all+=${planning_deps[@]}
+planning_all+=($planning_topic)
+planning_all+=($drive_event_topic)
+
 
 #Three different filter mode
-#create perfect control mode bag
+#create perfect control mode record
 is_perfect_control=false
-#create a rosbag with planning and its dependencies
+#create a rosrecord with planning and its dependencies
 is_with_planning=false
-#create a rosbag only with planning's dependencies
+#create a rosrecord only with planning's dependencies
 is_no_planning=false
 
 #only perception topic
@@ -155,50 +160,49 @@ function filter() {
     target=""
     name=$(basename $1)
     if $is_perfect_control; then
-        target="$2/${name%.*}.pc.bag"
-        rosbag filter $1 "$target" "$perfect_control_topic"
-
+        target="$2/${name%.*}.pc.record"
+        cyber_recorder split -f $1 $(echo ${perfect_control_topic[@]} | sed 's/^\| / -c /g') -o $target
     fi
 
     if $is_no_prediction_planning; then
-        target="$2/${name%.*}.npp.bag"
-        rosbag filter $1 "$target" "not ($prediction_topic) and not ($planning_topic)"
+        target="$2/${name%.*}.npp.record"
+        cyber_recorder split -f $1 -k $prediction_topic -k $planning_topic -o $target
     fi
 
     if $is_perception; then
-        target="$2/${name%.*}.po.bag"
-        rosbag filter $1 "$target" "$perception_topic"
+        target="$2/${name%.*}.po.record"
+        cyber_recorder split -f $1 $(echo ${perception_topic[@]} | sed 's/^\| / -k /g') -o $target
     fi
 
     if $is_no_planning; then
-        target="$2/${name%.*}.np.bag"
-        rosbag filter $1 "$target" "$planning_deps"
+        target="$2/${name%.*}.np.record"
+        cyber_recorder split -f $1 -k $planning_topic -o $target
     fi
 
     if $is_with_planning; then
-        target="$2/${name%.*}.wp.bag"
-        rosbag filter $1 "$target" "$planning_all"
+        target="$2/${name%.*}.wp.record"
+        cyber_recorder split -f $1 $(echo ${planning_all[@]} | sed 's/^\| / -c /g') -o $target
     fi
 
     if $is_camera_only; then
-	target="$2/${name%.*}.co.bag"
-	rosbag filter $1 "$target" "$camera_only"
+        target="$2/${name%.*}.co.record"
+        cyber_recorder split -f $1 $(echo ${image_topic[@]} | sed 's/^\| / -c /g') -o $target
     fi
 
     if $is_no_pointcloud_image; then
-        target="$2/${name%.*}.ni.bag"
-        rosbag filter $1 "$target" "not ($pointcloud_topic) and not ($image_topic)"
+        target="$2/${name%.*}.ni.record"
+        cyber_recorder split -f $1 $(echo ${pointcloud_topic} ${image_topic[@]} | sed 's/^\| / -k /g') -o $target
     fi
 
-    echo "filtered ${bag} to $target"
+    echo "filtered ${record} to $target"
 }
 
-for bag in $@; do
+for record in $@; do
    folder=""
    if [ -z $target_dir ] ; then
-     folder="$(dirname $bag)"
+     folder="$(dirname $record)"
    else
       folder=$target_dir
    fi
-   filter $bag $folder
+   filter $record $folder
 done
