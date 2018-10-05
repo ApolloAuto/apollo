@@ -426,7 +426,7 @@ function run() {
   run_customized_path $module $module "$@"
 }
 
-CYBERTRON_SETUP="/apollo/framework/install/setup.bash"
+CYBERTRON_SETUP="/apollo/framework/cybertron/setup.bash"
 if [ -e "${CYBERTRON_SETUP}" ]; then
     source "${CYBERTRON_SETUP}"
 fi
