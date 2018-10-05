@@ -46,7 +46,6 @@ enum FlowDirection {
   DOWNSTREAM,
 };
 
-// TODO@nizhongjun
 // opt impl of Vertice/Edge/Graph, replace stl with base
 class Vertice {
  public:

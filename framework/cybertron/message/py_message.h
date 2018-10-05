@@ -27,7 +27,8 @@ namespace apollo {
 namespace cybertron {
 namespace message {
 
-static const char* const PY_MESSAGE_FULLNAME = "apollo.cybertron.message.PyMessage";
+static const char* const PY_MESSAGE_FULLNAME =
+    "apollo.cybertron.message.PyMessage";
 // static const std::string data_split_pattern = "#@";
 
 class PyMessageWrap {
@@ -61,13 +62,9 @@ class PyMessageWrap {
   std::string type_name_;
 };
 
-inline void PyMessageWrap::set_data(const std::string& msg) {
-  data_ = msg;
-}
+inline void PyMessageWrap::set_data(const std::string& msg) { data_ = msg; }
 
-inline const std::string& PyMessageWrap::data() const { 
-  return data_; 
-}
+inline const std::string& PyMessageWrap::data() const { return data_; }
 
 inline bool PyMessageWrap::ParseFromString(const std::string& msgstr) {
   // todo : will use submsg type ywf
@@ -92,9 +89,7 @@ inline bool PyMessageWrap::SerializeToString(std::string* output) const {
   return true;
 }
 
-inline const std::string& PyMessageWrap::type_name() { 
-  return type_name_;
-}
+inline const std::string& PyMessageWrap::type_name() { return type_name_; }
 
 inline void PyMessageWrap::set_type_name(const std::string& type_name) {
   type_name_ = type_name;
@@ -105,9 +100,7 @@ inline const PyMessageWrap::Descriptor* PyMessageWrap::descriptor() {
   return &desc;
 }
 
-inline std::string PyMessageWrap::TypeName() {
-  return PY_MESSAGE_FULLNAME;
-}
+inline std::string PyMessageWrap::TypeName() { return PY_MESSAGE_FULLNAME; }
 
 }  // namespace message
 }  // namespace cybertron

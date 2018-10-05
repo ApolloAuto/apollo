@@ -85,7 +85,7 @@ class PerfEventBase {
 // 5 next_routine
 class SchedPerfEvent : public PerfEventBase {
  public:
-  SchedPerfEvent() { event_type = int(EventType::SCHED_EVENT); }
+  SchedPerfEvent() { event_type = static_cast<int>(EventType::SCHED_EVENT); }
   void SetParams(const int count, ...) override;
   std::string SerializeToString() override {
     std::stringstream ss;
@@ -114,7 +114,9 @@ class SchedPerfEvent : public PerfEventBase {
 // 2 write_data_cache & notify listener
 class TransportPerfEvent : public PerfEventBase {
  public:
-  TransportPerfEvent() { event_type = int(EventType::TRANS_EVENT); }
+  TransportPerfEvent() {
+    event_type = static_cast<int>(EventType::TRANS_EVENT);
+  }
   void SetParams(const int count, ...) override;
   std::string SerializeToString() override {
     std::stringstream ss;

@@ -44,7 +44,7 @@ struct ProcessorStat {
 
 class Processor {
  public:
-  explicit Processor();
+  Processor();
   virtual ~Processor();
 
   void Run();

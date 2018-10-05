@@ -21,6 +21,8 @@
 #include <memory>
 #include <string>
 #include <type_traits>
+#include <utility>
+#include <vector>
 
 #include "cybertron/base/bounded_queue.h"
 #include "cybertron/scheduler/scheduler.h"

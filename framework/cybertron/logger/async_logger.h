@@ -28,8 +28,8 @@
 #include <utility>
 #include <vector>
 
-#include <glog/logging.h>
 #include "cybertron/common/macros.h"
+#include "glog/logging.h"
 
 namespace apollo {
 namespace cybertron {

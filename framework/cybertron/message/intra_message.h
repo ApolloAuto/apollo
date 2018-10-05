@@ -33,10 +33,10 @@ class IntraMessage {
 
   static std::string GetDescriptorString() { return ""; }
 
-  static const std::string &TypeName() { return type_name_; }
+  static std::string TypeName() { return std::string(type_name_); }
 
  protected:
-  static std::string type_name_;
+  static const char *type_name_;
 };
 
 }  // namespace message

@@ -16,6 +16,8 @@
 
 #include "cybertron/scheduler/policy/classic.h"
 
+#include <utility>
+
 #include "cybertron/common/global_data.h"
 #include "cybertron/common/log.h"
 #include "cybertron/common/types.h"

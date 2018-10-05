@@ -21,10 +21,10 @@
 #include <mutex>
 #include <string>
 
-#include <fastrtps/Domain.h>
-#include <fastrtps/subscriber/SampleInfo.h>
-#include <fastrtps/subscriber/Subscriber.h>
-#include <fastrtps/subscriber/SubscriberListener.h>
+#include "fastrtps/Domain.h"
+#include "fastrtps/subscriber/SampleInfo.h"
+#include "fastrtps/subscriber/Subscriber.h"
+#include "fastrtps/subscriber/SubscriberListener.h"
 
 namespace apollo {
 namespace cybertron {
@@ -39,7 +39,7 @@ class SubscriberListener : public eprosima::fastrtps::SubscriberListener {
 
   void onNewDataMessage(eprosima::fastrtps::Subscriber* sub);
   void onSubscriptionMatched(eprosima::fastrtps::Subscriber* sub,
-                             eprosima::fastrtps::MatchingInfo& info);
+                             eprosima::fastrtps::MatchingInfo& info);  // NOLINT
 
  private:
   NewMsgCallback callback_;
