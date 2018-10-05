@@ -59,15 +59,23 @@ class PointCloudUpdater {
   explicit PointCloudUpdater(WebSocketHandler *websocket);
   ~PointCloudUpdater();
 
+  static void LoadLidarHeight(const std::string& file_path);
+
   /**
    * @brief Starts to push PointCloud to frontend.
    */
+  void Start();
   void Stop();
+
+  // The height of lidar w.r.t the ground.
+  static float lidar_height_;
+
+  // Mutex to protect concurrent access to point_cloud_str_ and lidar_height_.
+  // NOTE: Use boost until we have std version of rwlock support.
+  static boost::shared_mutex mutex_;
 
  private:
   void RegisterMessageHandlers();
-
-  void InitReaders();
 
   void UpdatePointCloud(
       const std::shared_ptr<drivers::PointCloud> &point_cloud);
@@ -78,6 +86,8 @@ class PointCloudUpdater {
       const std::shared_ptr<apollo::localization::LocalizationEstimate>
           &localization);
 
+  constexpr static float kDefaultLidarHeight = 1.91;
+
   std::unique_ptr<cybertron::Node> node_;
 
   WebSocketHandler *websocket_;
@@ -87,9 +97,6 @@ class PointCloudUpdater {
   // The PointCloud to be pushed to frontend.
   std::string point_cloud_str_;
 
-  // Mutex to protect concurrent access to point_cloud_str_.
-  // NOTE: Use boost until we have std version of rwlock support.
-  boost::shared_mutex mutex_;
   std::future<void> async_future_;
   std::atomic<bool> future_ready_;
 

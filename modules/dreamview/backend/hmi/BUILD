@@ -47,6 +47,7 @@ cc_library(
         "//modules/common/util:map_util",
         "//modules/dreamview/backend/handlers:websocket_handler",
         "//modules/dreamview/backend/map:map_service",
+        "//modules/dreamview/backend/point_cloud:point_cloud_updater",
         "//modules/dreamview/proto:audio_capture_proto",
     ],
 )

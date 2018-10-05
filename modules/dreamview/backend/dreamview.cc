@@ -95,14 +95,14 @@ Status Dreamview::Init() {
 
 Status Dreamview::Start() {
   sim_world_updater_->Start();
-  //   point_cloud_updater_->Start();
+  point_cloud_updater_->Start();
   return Status::OK();
 }
 
 void Dreamview::Stop() {
   server_->close();
   sim_control_->Stop();
-  //   point_cloud_updater_->Stop();
+  point_cloud_updater_->Stop();
 }
 
 }  // namespace dreamview

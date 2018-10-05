@@ -21,17 +21,23 @@
 #include "cybertron/common/log.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/time/time.h"
+#include "modules/common/util/file.h"
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
 #include "modules/dreamview/proto/point_cloud.pb.h"
 #include "pcl/filters/voxel_grid.h"
 #include "third_party/json/json.hpp"
+#include "yaml-cpp/yaml.h"
 
 namespace apollo {
 namespace dreamview {
 
 using apollo::common::time::Clock;
+using apollo::common::util::PathExists;
 using apollo::localization::LocalizationEstimate;
 using Json = nlohmann::json;
+
+float PointCloudUpdater::lidar_height_ = kDefaultLidarHeight;
+boost::shared_mutex PointCloudUpdater::mutex_;
 
 PointCloudUpdater::PointCloudUpdater(WebSocketHandler *websocket)
     : node_(cybertron::CreateNode("point_cloud")),
@@ -39,10 +45,33 @@ PointCloudUpdater::PointCloudUpdater(WebSocketHandler *websocket)
       point_cloud_str_(""),
       future_ready_(true) {
   RegisterMessageHandlers();
-  InitReaders();
 }
 
 PointCloudUpdater::~PointCloudUpdater() { Stop(); }
+
+void PointCloudUpdater::LoadLidarHeight(const std::string& file_path) {
+  if (!common::util::PathExists(file_path)) {
+    AWARN << "No such file: " << FLAGS_lidar_height_yaml
+          << ". Using default lidar height:" << kDefaultLidarHeight;
+    boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
+    lidar_height_ = kDefaultLidarHeight;
+    return;
+  }
+
+  YAML::Node config = YAML::LoadFile(file_path);
+  if (config["vehicle"] && config["vehicle"]["parameters"]) {
+    boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
+    lidar_height_ = config["vehicle"]["parameters"]["height"].as<float>();
+    AINFO << "Lidar height is updated to " << lidar_height_;
+    return;
+  }
+
+  AWARN << "Fail to load the lidar height yaml file: "
+        << FLAGS_lidar_height_yaml << ". Using default lidar height:"
+        << kDefaultLidarHeight;
+  boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
+  lidar_height_ = kDefaultLidarHeight;
+}
 
 void PointCloudUpdater::RegisterMessageHandlers() {
   // Send current point_cloud status to the new client.
@@ -90,7 +119,7 @@ void PointCloudUpdater::RegisterMessageHandlers() {
       });
 }
 
-void PointCloudUpdater::InitReaders() {
+void PointCloudUpdater::Start() {
   localization_reader_ = node_->CreateReader<LocalizationEstimate>(
       FLAGS_localization_topic,
       [this](const std::shared_ptr<LocalizationEstimate> &msg) {
@@ -101,6 +130,8 @@ void PointCloudUpdater::InitReaders() {
       [this](const std::shared_ptr<drivers::PointCloud> &msg) {
         UpdatePointCloud(msg);
       });
+
+  LoadLidarHeight(FLAGS_lidar_height_yaml);
 }
 
 void PointCloudUpdater::Stop() {
@@ -156,15 +187,18 @@ void PointCloudUpdater::FilterPointCloud(
   voxel_grid.filter(*pcl_filtered_ptr);
   AINFO << "filtered point cloud data size: " << pcl_filtered_ptr->size();
 
+  float z_offset;
+  {
+    boost::unique_lock<boost::shared_mutex> reader_lock(mutex_);
+    z_offset = lidar_height_;
+  }
   apollo::dreamview::PointCloud point_cloud_pb;
   for (size_t idx = 0; idx < pcl_filtered_ptr->size(); ++idx) {
     pcl::PointXYZ &pt = pcl_filtered_ptr->points[idx];
     if (!std::isnan(pt.x) && !std::isnan(pt.y) && !std::isnan(pt.z)) {
       point_cloud_pb.add_num(pt.x);
       point_cloud_pb.add_num(pt.y);
-      // TODO(unacao): velodyne height should be updated by hmi store
-      // upon vehicle change.
-      point_cloud_pb.add_num(pt.z + 1.91f);
+      point_cloud_pb.add_num(pt.z + z_offset);
     }
   }
   {

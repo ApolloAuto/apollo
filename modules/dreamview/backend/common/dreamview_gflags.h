@@ -57,4 +57,6 @@ DECLARE_double(voxel_filter_height);
 
 DECLARE_double(system_status_lifetime_seconds);
 
+DECLARE_string(lidar_height_yaml);
+
 #endif  // MODULES_DREAMVIEW_BACKEND_COMMON_DREAMVIEW_GFLAGS_H_

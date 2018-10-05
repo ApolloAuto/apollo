@@ -24,6 +24,7 @@ cc_library(
         "//third_party/json",
         "@com_google_protobuf//:protobuf",
         "@pcl//:pcl",
+        "@yaml_cpp//:yaml",
     ],
 )
 
