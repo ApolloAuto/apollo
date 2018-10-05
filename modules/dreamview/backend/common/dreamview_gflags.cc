@@ -83,3 +83,8 @@ DEFINE_double(system_status_lifetime_seconds, 30,
               "Lifetime of a valid SystemStatus message. It's more like a "
               "replay message if the timestamp is old, where we should ignore "
               "the status change.");
+
+DEFINE_string(lidar_height_yaml,
+              "/apollo/modules/localization/msf/params/velodyne_params/"
+              "velodyne64_height.yaml",
+              "The yaml file for reading height of lidar w.r.t. ground.");

@@ -26,6 +26,7 @@
 #include "modules/common/util/json_util.h"
 #include "modules/common/util/map_util.h"
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
+#include "modules/dreamview/backend/point_cloud/point_cloud_updater.h"
 
 namespace apollo {
 namespace dreamview {
@@ -175,6 +176,8 @@ void HMI::RegisterMessageHandlers() {
   // HMI client asks for changing vehicle.
   hmi_worker_->RegisterChangeVehicleHandler(
       [this](const std::string &new_vehicle) {
+        // Reload lidar params for point cloud service.
+        PointCloudUpdater::LoadLidarHeight(FLAGS_lidar_height_yaml);
         // Broadcast new HMIStatus and VehicleParam.
         DeferredBroadcastHMIStatus();
         SendVehicleParam();
