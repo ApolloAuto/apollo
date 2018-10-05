@@ -21,17 +21,17 @@
 #ifndef CYBERTRON_LOGGER_LOGGER_UTIL_H_
 #define CYBERTRON_LOGGER_LOGGER_UTIL_H_
 
-#include <stdlib.h>
 #include <sys/stat.h>
 #include <sys/time.h>
 #include <sys/utsname.h>
 #include <time.h>
 #include <unistd.h>
+#include <cstdlib>
 #include <cstdint>
 #include <string>
 #include <vector>
 
-#include <glog/logging.h>
+#include "glog/logging.h"
 
 namespace apollo {
 namespace cybertron {

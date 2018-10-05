@@ -23,4 +23,4 @@ cc_library(
     ],
 )
 
-#cpplint()
+cpplint()

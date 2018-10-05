@@ -61,7 +61,7 @@ class ProcessorContext {
   inline bool Getstate(const uint64_t& routine_id, RoutineState* state);
   inline bool set_state(const uint64_t& routine_id, const RoutineState& state);
 
-  void BindProcessor(std::shared_ptr<Processor>& processor) {
+  void BindProcessor(const std::shared_ptr<Processor>& processor) {
     if (!processor_) {
       processor_ = processor;
     }

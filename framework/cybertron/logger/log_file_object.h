@@ -21,7 +21,7 @@
 #include <mutex>
 #include <string>
 
-#include <glog/logging.h>
+#include "glog/logging.h"
 
 namespace apollo {
 namespace cybertron {

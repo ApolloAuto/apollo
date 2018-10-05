@@ -14,12 +14,15 @@
  * limitations under the License.
  *****************************************************************************/
 #include "cybertron/logger/log_file_object.h"
-#include <assert.h>
+
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <cassert>
 #include <iomanip>
 #include <iostream>
+#include <vector>
+
 #include "cybertron/logger/logger_util.h"
 
 namespace apollo {

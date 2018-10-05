@@ -17,15 +17,15 @@
 #ifndef CYBERTRON_TRANSPORT_SHM_SEGMENT_H_
 #define CYBERTRON_TRANSPORT_SHM_SEGMENT_H_
 
+#include <sys/ipc.h>
+#include <sys/shm.h>
+#include <sys/types.h>
 #include <cstdint>
 #include <memory>
 #include <mutex>
 #include <string>
 #include <unordered_map>
 
-#include <sys/ipc.h>
-#include <sys/shm.h>
-#include <sys/types.h>
 
 #include "cybertron/transport/shm/block.h"
 #include "cybertron/transport/shm/shm_conf.h"

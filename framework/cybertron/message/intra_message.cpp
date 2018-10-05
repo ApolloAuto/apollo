@@ -20,7 +20,7 @@ namespace apollo {
 namespace cybertron {
 namespace message {
 
-std::string IntraMessage::type_name_ = "IntraMessage";
+const char* IntraMessage::type_name_ = "IntraMessage";
 
 }  // namespace message
 }  // namespace cybertron

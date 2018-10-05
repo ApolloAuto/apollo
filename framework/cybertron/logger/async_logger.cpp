@@ -15,12 +15,13 @@
  *****************************************************************************/
 
 #include "cybertron/logger/async_logger.h"
-#include "cybertron/logger/log_file_object.h"
 
 #include <stdlib.h>
 #include <string>
 #include <thread>
 #include <unordered_map>
+
+#include "cybertron/logger/log_file_object.h"
 
 namespace apollo {
 namespace cybertron {

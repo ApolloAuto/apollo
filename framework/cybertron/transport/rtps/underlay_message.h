@@ -17,8 +17,6 @@
 #ifndef CYBERTRON_TRANSPORT_RTPS_UNDERLAY_MESSAGE_H_
 #define CYBERTRON_TRANSPORT_RTPS_UNDERLAY_MESSAGE_H_
 
-// TODO Poner en el contexto.
-
 #include <array>
 #include <cstdint>
 #include <string>
@@ -227,13 +225,13 @@ class UnderlayMessage {
    * @param cdr CDR serialization object.
    */
   ePcybertronima_user_DllExport void serialize(
-      eprosima::fastcdr::Cdr &cdr) const;
+      eprosima::fastcdr::Cdr &cdr) const;  // NOLINT
 
   /*!
    * @brief This function deserializes an object using CDR serialization.
    * @param cdr CDR serialization object.
    */
-  ePcybertronima_user_DllExport void deserialize(eprosima::fastcdr::Cdr &cdr);
+  ePcybertronima_user_DllExport void deserialize(eprosima::fastcdr::Cdr &cdr);  // NOLINT
 
   /*!
    * @brief This function returns the maximum serialized size of the Key of an
@@ -256,7 +254,7 @@ class UnderlayMessage {
    * @param cdr CDR serialization object.
    */
   ePcybertronima_user_DllExport void serializeKey(
-      eprosima::fastcdr::Cdr &cdr) const;
+      eprosima::fastcdr::Cdr &cdr) const;  // NOLINT
 
  private:
   int32_t m_timestamp;

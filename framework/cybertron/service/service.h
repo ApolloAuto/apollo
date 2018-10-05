@@ -60,7 +60,7 @@ class Service : public ServiceBase {
                      const transport::MessageInfo& message_info);
 
   void SendResponse(const transport::MessageInfo& message_info,
-                    std::shared_ptr<Response>& response);
+                    const std::shared_ptr<Response>& response);
   std::string node_name_;
   bool init_;
   ServiceCallback service_callback_;
@@ -77,7 +77,6 @@ class Service : public ServiceBase {
 
 template <typename Request, typename Response>
 void Service<Request, Response>::destroy() {
-  // TODO: writer and reader destory
 }
 
 template <typename Request, typename Response>
@@ -145,7 +144,7 @@ void Service<Request, Response>::HandleRequest(
 template <typename Request, typename Response>
 void Service<Request, Response>::SendResponse(
     const transport::MessageInfo& message_info,
-    std::shared_ptr<Response>& response) {
+    const std::shared_ptr<Response>& response) {
   if (!init_) {
     // LOG_DEBUG << "not inited error.";
     return;

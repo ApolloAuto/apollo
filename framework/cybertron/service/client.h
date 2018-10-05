@@ -105,7 +105,6 @@ class Client : public ClientBase {
 
 template <typename Request, typename Response>
 void Client<Request, Response>::Destroy() {
-  // TODO: writer and reader destory
 }
 
 template <typename Request, typename Response>
@@ -161,8 +160,7 @@ Client<Request, Response>::SendRequest(SharedRequest request,
   auto status = future.wait_for(timeout_s);
   if (status == std::future_status::ready) {
     return future.get();
-  } else {  // TODO: more check
-    // LOG_DEBUG << "send request timeout:" << _request_channel;
+  } else {
     return nullptr;
   }
 }
@@ -206,7 +204,6 @@ Client<Request, Response>::AsyncSendRequest(SharedRequest request,
 template <typename Request, typename Response>
 bool Client<Request, Response>::ServiceIsReady() const {
   return true;
-  // TODO: call middleware interface get service CHANNEL info
 }
 
 template <typename Request, typename Response>

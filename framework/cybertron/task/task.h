@@ -18,6 +18,7 @@
 #define CYBERTRON_TASK_TASK_H_
 
 #include <future>
+#include <utility>
 
 #include "cybertron/task/task_manager.h"
 

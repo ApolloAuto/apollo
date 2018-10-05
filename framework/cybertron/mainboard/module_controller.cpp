@@ -29,7 +29,6 @@ namespace mainboard {
 ModuleController::ModuleController(const ModuleArgument& args) { args_ = args; }
 
 ModuleController::~ModuleController() {
-  // TODO(hewei03): TBD
 }
 
 bool ModuleController::Init() {
@@ -38,7 +37,6 @@ bool ModuleController::Init() {
   // return true;
 }
 
-// TODO:unInit
 void ModuleController::Clear() {
   component_list_.clear();  // keep alive
   class_loader_manager_.UnloadAllLibrary();

@@ -71,16 +71,12 @@ bool Writer<MessageT>::Init() {
   if (init_.exchange(true)) {
     return true;
   }
-  // TODO: singleton by channel name
   transmitter_ = transport::Transport::CreateTransmitter<MessageT>(role_attr_);
   RETURN_VAL_IF_NULL(transmitter_, false);
   this->role_attr_.set_id(transmitter_->id().HashValue());
-
   channel_manager_ =
       service_discovery::TopologyManager::Instance()->channel_manager();
   JoinTheTopology();
-
-  // TODO more check
   return true;
 }
 

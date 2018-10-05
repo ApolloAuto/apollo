@@ -24,8 +24,6 @@
 #include <mutex>
 #include <string>
 
-#include <fastrtps/participant/Participant.h>
-
 #include "cybertron/base/signal.h"
 #include "cybertron/common/macros.h"
 #include "cybertron/service_discovery/communication/participant_listener.h"
@@ -33,6 +31,7 @@
 #include "cybertron/service_discovery/specific_manager/node_manager.h"
 #include "cybertron/service_discovery/specific_manager/service_manager.h"
 #include "cybertron/transport/rtps/participant.h"
+#include "fastrtps/participant/Participant.h"
 
 namespace apollo {
 namespace cybertron {

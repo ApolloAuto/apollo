@@ -19,10 +19,9 @@
 
 #include <string>
 
-#include <fastrtps/attributes/PublisherAttributes.h>
-#include <fastrtps/attributes/SubscriberAttributes.h>
-
 #include "cybertron/proto/qos_profile.pb.h"
+#include "fastrtps/attributes/PublisherAttributes.h"
+#include "fastrtps/attributes/SubscriberAttributes.h"
 
 namespace apollo {
 namespace cybertron {

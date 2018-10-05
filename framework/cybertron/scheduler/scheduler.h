@@ -19,12 +19,14 @@
 
 #include <unistd.h>
 #include <atomic>
+#include <map>
 #include <memory>
 #include <mutex>
 #include <set>
 #include <string>
 #include <thread>
 #include <unordered_map>
+#include <vector>
 
 #include "cybertron/common/log.h"
 #include "cybertron/common/macros.h"

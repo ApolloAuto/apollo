@@ -171,13 +171,11 @@ bool Reader<MessageT>::Init() {
       service_discovery::TopologyManager::Instance()->channel_manager();
   JoinTheTopology();
 
-  // TODO more check
   return true;
 }
 
 template <typename MessageT>
 void Reader<MessageT>::Shutdown() {
-  // TODO: delete task and reset transport reader
   if (!init_.exchange(false)) {
     return;
   }

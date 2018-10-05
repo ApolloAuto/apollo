@@ -20,16 +20,15 @@
 #include <memory>
 #include <string>
 
-#include <fastrtps/Domain.h>
-#include <fastrtps/attributes/PublisherAttributes.h>
-#include <fastrtps/participant/Participant.h>
-#include <fastrtps/publisher/Publisher.h>
-
 #include "cybertron/common/log.h"
 #include "cybertron/message/message_traits.h"
 #include "cybertron/transport/rtps/attributes_filler.h"
 #include "cybertron/transport/rtps/participant.h"
 #include "cybertron/transport/transmitter/transmitter.h"
+#include "fastrtps/Domain.h"
+#include "fastrtps/attributes/PublisherAttributes.h"
+#include "fastrtps/participant/Participant.h"
+#include "fastrtps/publisher/Publisher.h"
 
 namespace apollo {
 namespace cybertron {

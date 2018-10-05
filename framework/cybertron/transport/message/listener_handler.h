@@ -45,7 +45,6 @@ class ListenerHandlerBase {
 
   virtual void Disconnect(uint64_t self_id) = 0;
   virtual void Disconnect(uint64_t self_id, uint64_t oppo_id) = 0;
-  // TODO: maybe israwmessage no need
   inline bool IsRawMessage() const { return is_raw_message_; }
 
  protected:

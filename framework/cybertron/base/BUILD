@@ -15,4 +15,4 @@ cc_library(
     copts = ["-Iframework"]
 )
 
-#cpplint()
+cpplint()
