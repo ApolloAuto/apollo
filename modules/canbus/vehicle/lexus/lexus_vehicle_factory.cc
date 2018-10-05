@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@
 
 #include "modules/canbus/vehicle/lexus/lexus_vehicle_factory.h"
 
-#include "cybertron/common/log.h"
 #include "modules/canbus/vehicle/lexus/lexus_controller.h"
 #include "modules/canbus/vehicle/lexus/lexus_message_manager.h"
+#include "modules/common/log.h"
 #include "modules/common/util/util.h"
 
 namespace apollo {
