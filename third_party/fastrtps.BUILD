@@ -1,8 +1,8 @@
 cc_library(
     name = "fastrtps",
     srcs = glob([
-        "lib/libfastrtps.so",
-        "lib/libfastcdr.so",
+        "lib/*.so.*",
+        "lib/*.so",
     ]),
 
     includes = [

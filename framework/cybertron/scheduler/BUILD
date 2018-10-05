@@ -14,9 +14,7 @@ cc_library(
     ]),
     deps = [
           "//framework/cybertron/croutine:croutine_lib",
-          "//framework/cybertron/transport:transport_lib",
           "//framework/cybertron/data:data_lib",
-          "//framework/cybertron/node:reader_base_lib",
     ],
     copts = [
         "-Iframework",

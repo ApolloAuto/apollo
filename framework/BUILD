@@ -50,46 +50,4 @@ cc_library(
     ],
 )
 
-cc_binary(
-    name = "listener",
-    srcs = glob([
-        "examples/listener.cpp",
-    ]),
-    deps = [
-        "//framework/cybertron:cybertron_core",
-    ],
-    copts = [
-        "-Iframework",
-    ],
-    #TODO: Using deps instead.
-    linkopts = [
-        "-pthread",
-        "-lprotobuf",
-        "-lglog",
-        "-lgflags",
-        "-luuid",
-    ],
-)
-
-cc_binary(
-    name = "talker",
-    srcs = glob([
-        "examples/talker.cpp",
-    ]),
-    deps = [
-        "//framework/cybertron:cybertron_core",
-    ],
-    copts = [
-        "-Iframework",
-    ],
-    #TODO: Using deps instead.
-    linkopts = [
-        "-pthread",
-        "-lprotobuf",
-        "-lglog",
-        "-lgflags",
-        "-luuid",
-    ],
-)
-
 cpplint()
