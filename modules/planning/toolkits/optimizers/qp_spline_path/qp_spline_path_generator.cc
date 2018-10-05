@@ -93,10 +93,7 @@ bool QpSplinePathGenerator::Generate(
     last_discretized_path_ = &path_data_history.back().first;
   }
 
-  if (!CalculateFrenetPoint(init_point, &init_frenet_point_)) {
-    AERROR << "Fail to map init point: " << init_point.ShortDebugString();
-    return false;
-  }
+  init_frenet_point_ = reference_line_.GetFrenetPoint(init_point);
 
   if (is_change_lane_path_) {
     ref_l_ = init_frenet_point_.l();
@@ -214,39 +211,6 @@ bool QpSplinePathGenerator::Generate(
   }
   path_data->SetReferenceLine(&reference_line_);
   path_data->SetDiscretizedPath(DiscretizedPath(path_points));
-  return true;
-}
-
-bool QpSplinePathGenerator::CalculateFrenetPoint(
-    const common::TrajectoryPoint& traj_point,
-    common::FrenetFramePoint* const frenet_frame_point) {
-  common::SLPoint sl_point;
-  if (!reference_line_.XYToSL(
-          {traj_point.path_point().x(), traj_point.path_point().y()},
-          &sl_point)) {
-    return false;
-  }
-  frenet_frame_point->set_s(sl_point.s());
-  frenet_frame_point->set_l(sl_point.l());
-
-  const double theta = traj_point.path_point().theta();
-  const double kappa = traj_point.path_point().kappa();
-  const double l = frenet_frame_point->l();
-
-  ReferencePoint ref_point;
-  ref_point = reference_line_.GetReferencePoint(frenet_frame_point->s());
-
-  const double theta_ref = ref_point.heading();
-  const double kappa_ref = ref_point.kappa();
-  const double dkappa_ref = ref_point.dkappa();
-
-  const double dl = CartesianFrenetConverter::CalculateLateralDerivative(
-      theta_ref, theta, l, kappa_ref);
-  const double ddl =
-      CartesianFrenetConverter::CalculateSecondOrderLateralDerivative(
-          theta_ref, theta, kappa_ref, kappa, dkappa_ref, l);
-  frenet_frame_point->set_dl(dl);
-  frenet_frame_point->set_ddl(ddl);
   return true;
 }
 
