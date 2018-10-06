@@ -46,7 +46,8 @@ ErrorCode LexusController::Init(
     AINFO << "LexusController has already been initiated.";
     return ErrorCode::CANBUS_ERROR;
   }
-
+  vehicle_params_.CopyFrom(
+      common::VehicleConfigHelper::Instance()->GetConfig().vehicle_param());
   params_.CopyFrom(params);
   if (!params_.has_driving_mode()) {
     AERROR << "Vehicle conf pb not set driving_mode.";
@@ -403,15 +404,12 @@ void LexusController::Gear(Chassis::GearPosition gear_position) {
 // -> pedal
 void LexusController::Brake(double pedal) {
   // double real_value = params_.max_acc() * acceleration / 100;
-  // TODO(QiL) : Update brake value based on mode
   if (!(driving_mode() == Chassis::COMPLETE_AUTO_DRIVE ||
         driving_mode() == Chassis::AUTO_SPEED_ONLY)) {
     AINFO << "The current drive mode does not need to set acceleration.";
     return;
   }
-  /* ADD YOUR OWN CAR CHASSIS OPERATION
-  brake_60_->set_pedal(pedal);
-  */
+  brake_cmd_104_->set_brake_cmd(pedal);
 }
 
 // drive with old acceleration
@@ -422,9 +420,7 @@ void LexusController::Throttle(double pedal) {
     AINFO << "The current drive mode does not need to set acceleration.";
     return;
   }
-  /* ADD YOUR OWN CAR CHASSIS OPERATION
-  throttle_62_->set_pedal(pedal);
-  */
+  accel_cmd_100_->set_accel_cmd(pedal);
 }
 
 // lexus default, -470 ~ 470, left:+, right:-
@@ -437,11 +433,12 @@ void LexusController::Steer(double angle) {
     AINFO << "The current driving mode does not need to set steer.";
     return;
   }
-  // const double real_angle = params_.max_steer_angle() * angle / 100.0;
+  const double real_angle = vehicle_params_.max_steer_angle() * angle / 100.0;
   // reverse sign
-  /* ADD YOUR OWN CAR CHASSIS OPERATION
-  steering_64_->set_steering_angle(real_angle)->set_steering_angle_speed(200);
-  */
+
+  steering_cmd_12c_->set_position(real_angle);
+  // TODO(QiL) : double check this rate
+  steering_cmd_12c_->set_rotation_rate(40);
 }
 
 // steering with new angle speed
@@ -453,14 +450,18 @@ void LexusController::Steer(double angle, double angle_spd) {
     AINFO << "The current driving mode does not need to set steer.";
     return;
   }
-  /* ADD YOUR OWN CAR CHASSIS OPERATION
-  const double real_angle = params_.max_steer_angle() * angle / 100.0;
-  const double real_angle_spd = ProtocolData::BoundedValue(
-      params_.min_steer_angle_spd(), params_.max_steer_angle_spd(),
-      params_.max_steer_angle_spd() * angle_spd / 100.0);
-  steering_64_->set_steering_angle(real_angle)
-      ->set_steering_angle_speed(real_angle_spd);
-  */
+
+  const double real_angle =
+      vehicle_params_.max_steer_angle() / M_PI * 180 * angle / 100.0;
+  const double real_angle_spd =
+      ProtocolData<::apollo::canbus::ChassisDetail>::BoundedValue(
+          vehicle_params_.min_steer_angle_rate() / M_PI * 180,
+          vehicle_params_.max_steer_angle_rate() / M_PI * 180,
+          vehicle_params_.max_steer_angle_rate() / M_PI * 180 * angle_spd /
+              100.0);
+  steering_cmd_12c_->set_position(real_angle);
+  // TODO(QiL) : double check this rate
+  steering_cmd_12c_->set_rotation_rate(real_angle_spd);
 }
 
 void LexusController::SetEpbBreak(const ControlCommand& command) {
