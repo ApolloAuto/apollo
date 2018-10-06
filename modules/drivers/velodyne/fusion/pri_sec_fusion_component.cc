@@ -16,13 +16,13 @@
 
 #include <memory>
 
-#include "modules/drivers/velodyne/fusion/fusion_component.h"
+#include "modules/drivers/velodyne/fusion/pri_sec_fusion_component.h"
 
 namespace apollo {
 namespace drivers {
 namespace velodyne {
 
-bool FusionComponent::Init() {
+bool PriSecFusionComponent::Init() {
   if (!GetProtoConfig(&conf_)) {
     AWARN << "Load config failed, config file" << ConfigFilePath();
     return false;
@@ -38,7 +38,8 @@ bool FusionComponent::Init() {
   return true;
 }
 
-bool FusionComponent::Proc(const std::shared_ptr<PointCloud>& point_cloud) {
+bool PriSecFusionComponent::Proc(
+    const std::shared_ptr<PointCloud>& point_cloud) {
   auto target = point_cloud;
   for (const auto& reader : readers_) {
     reader->Observe();
@@ -57,16 +58,24 @@ bool FusionComponent::Proc(const std::shared_ptr<PointCloud>& point_cloud) {
   return true;
 }
 
-bool FusionComponent::IsExpired(const std::shared_ptr<PointCloud>& target,
-                                const std::shared_ptr<PointCloud>& source) {
+bool PriSecFusionComponent::IsExpired(
+    const std::shared_ptr<PointCloud>& target,
+    const std::shared_ptr<PointCloud>& source) {
   auto diff = target->measurement_time() - source->measurement_time();
   return diff * 1000 > conf_.max_interval_ms();
 }
 
-bool FusionComponent::QueryPoseAffine(const std::string& target_frame_id,
-                                      const std::string& source_frame_id,
-                                      Eigen::Affine3d* pose) {
+bool PriSecFusionComponent::QueryPoseAffine(const std::string& target_frame_id,
+                                            const std::string& source_frame_id,
+                                            Eigen::Affine3d* pose) {
   std::string err_string;
+  if (!buffer_ptr_->canTransform(target_frame_id, source_frame_id,
+                                 cybertron::Time(0), 0.02, &err_string)) {
+    AERROR << "Can not find transform. "
+           << "target_id:" << target_frame_id << " frame_id:" << source_frame_id
+           << " Error info: " << err_string;
+    return false;
+  }
   apollo::transform::TransformStamped stamped_transform;
   try {
     stamped_transform = buffer_ptr_->lookupTransform(
@@ -86,7 +95,7 @@ bool FusionComponent::QueryPoseAffine(const std::string& target_frame_id,
   return true;
 }
 
-void FusionComponent::AppendPointCloud(
+void PriSecFusionComponent::AppendPointCloud(
     std::shared_ptr<PointCloud> point_cloud,
     std::shared_ptr<PointCloud> point_cloud_add, const Eigen::Affine3d& pose) {
   if (std::isnan(pose(0, 0))) {
@@ -129,8 +138,8 @@ void FusionComponent::AppendPointCloud(
   point_cloud->set_width(new_width);
 }
 
-bool FusionComponent::Fusion(std::shared_ptr<PointCloud> target,
-                             std::shared_ptr<PointCloud> source) {
+bool PriSecFusionComponent::Fusion(std::shared_ptr<PointCloud> target,
+                                   std::shared_ptr<PointCloud> source) {
   Eigen::Affine3d pose;
   if (QueryPoseAffine(target->frame_id(), source->frame_id(), &pose)) {
     AppendPointCloud(target, source, pose);

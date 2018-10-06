@@ -40,5 +40,7 @@ message CompensatorConfig {
   optional string output_channel = 1;
   optional double transform_query_timeout = 2 [default = 0.02];
   optional string world_frame_id = 3 [default = "world"];
+  optional string target_frame_id = 4;
+  optional uint32 point_cloud_size = 5;
 }
 

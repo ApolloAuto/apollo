@@ -48,6 +48,7 @@ cc_library(
         "@eigen",
         "@yaml_cpp//:yaml",
     ],
+    copts = ['-DMODULE_NAME=\\"velodyne\\"']
 )
 
 cpplint()

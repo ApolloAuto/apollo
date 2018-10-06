@@ -40,7 +40,7 @@ class CompensatorComponent : public Component<PointCloud> {
   bool Proc(const std::shared_ptr<PointCloud>& point_cloud) override;
 
  private:
-  std::unique_ptr<Compensator> _compensator = nullptr;
+  std::unique_ptr<Compensator> compensator_ = nullptr;
   std::vector<std::shared_ptr<PointCloud>> compensator_deque_;
   int queue_size_ = 8;
   int index_ = 0;
