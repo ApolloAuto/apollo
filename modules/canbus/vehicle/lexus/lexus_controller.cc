@@ -158,6 +158,38 @@ Chassis LexusController::chassis() {
     chassis_.set_speed_mps(0);
   }
 
+  if (chassis_detail.lexus().has_wheel_speed_rpt_407()) {
+    // TODO(QiL) : No wheel speed valid bit in lexus, so default valid
+    chassis_.mutable_wheel_speed()->set_is_wheel_spd_rr_valid(true);
+    // chassis_.mutable_wheel_speed()->set_wheel_direction_rr(true);
+    chassis_.mutable_wheel_speed()->set_wheel_spd_rr(
+        chassis_detail.lexus().wheel_speed_rpt_407().wheel_spd_rear_right());
+
+    chassis_.mutable_wheel_speed()->set_is_wheel_spd_rl_valid(true);
+    /*
+    chassis_.mutable_wheel_speed()->set_wheel_direction_rl(
+        chassis_detail.vehicle_spd().wheel_direction_rl());
+        */
+    chassis_.mutable_wheel_speed()->set_wheel_spd_rl(
+        chassis_detail.lexus().wheel_speed_rpt_407().wheel_spd_rear_left());
+
+    chassis_.mutable_wheel_speed()->set_is_wheel_spd_fr_valid(true);
+    /*
+    chassis_.mutable_wheel_speed()->set_wheel_direction_fr(
+        chassis_detail.vehicle_spd().wheel_direction_fr());
+        */
+    chassis_.mutable_wheel_speed()->set_wheel_spd_fr(
+        chassis_detail.lexus().wheel_speed_rpt_407().wheel_spd_front_right());
+
+    chassis_.mutable_wheel_speed()->set_is_wheel_spd_fl_valid(true);
+    /*
+    chassis_.mutable_wheel_speed()->set_wheel_direction_fl(
+        chassis_detail.vehicle_spd().wheel_direction_fl());
+        */
+    chassis_.mutable_wheel_speed()->set_wheel_spd_fl(
+        chassis_detail.lexus().wheel_speed_rpt_407().wheel_spd_front_left());
+  }
+
   // 7
   chassis_.set_fuel_range_m(0);
   // 8
