@@ -396,6 +396,12 @@ function run_test() {
 function citest_basic() {
   set -e
 
+  info "Building framework ..."
+  cd /apollo/framework
+  bash cybertron.sh build_fast
+  cd /apollo
+  source framework/install/setup.bash
+
   BUILD_TARGETS="
     `bazel query //modules/...`
   "
@@ -420,6 +426,33 @@ function citest_basic() {
   fi
 }
 
+function citest_extended() {
+  set -e
+
+  info "Building framework ..."
+  cd /apollo/framework
+  bash cybertron.sh build_fast
+  cd /apollo
+  source framework/install/setup.bash
+
+  BUILD_TARGETS="
+    `bazel query //modules/planning/...`
+  "
+
+  JOB_ARG="--jobs=$(nproc) --ram_utilization_factor 80"
+
+  echo "$BUILD_TARGETS" | grep "test" \
+          | xargs bazel test $DEFINES $JOB_ARG --config=unit_test -c dbg --test_verbose_timeout_warnings $@
+
+  if [ $? -eq 0 ]; then
+    success 'Test passed!'
+    return 0
+  else
+    fail 'Test failed!'
+    return 1
+  fi
+}
+
 function citest() {
   info "Building framework ..."
   cd /apollo/framework
@@ -428,6 +461,7 @@ function citest() {
   source framework/install/setup.bash
 
   citest_basic
+  citest_extended
   if [ $? -eq 0 ]; then
     success 'Test passed!'
     return 0
@@ -811,6 +845,14 @@ function main() {
     citest)
       DEFINES="${DEFINES} --cxxopt=-DCPU_ONLY"
       citest $@
+      ;;
+    citest_basic)
+      DEFINES="${DEFINES} --cxxopt=-DCPU_ONLY"
+      citest_basic $@
+      ;;
+    citest_extended)
+      DEFINES="${DEFINES} --cxxopt=-DCPU_ONLY"
+      citest_extended $@
       ;;
     test_gpu)
       DEFINES="${DEFINES} --cxxopt=-DUSE_GPU"
