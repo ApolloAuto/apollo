@@ -181,9 +181,14 @@ bool OsqpLateralQPOptimizer::optimize(
   // Solve Problem
   osqp_solve(work);
 
-  // TODO(All):
-  // (1) extract primal results
-  // (2) separate into several functions rather then put all in one.
+  // extract primal results
+  for (int i = 0; i < num_var; ++i) {
+    opt_d_.push_back(work->solution->x[i]);
+    opt_d_prime_.push_back(work->solution->x[i + num_var]);
+    opt_d_pprime_.push_back(work->solution->x[i + 2 * num_var]);
+  }
+  opt_d_prime_[num_var - 1] = 0.0;
+  opt_d_pprime_[num_var - 1] = 0.0;
 
   // Cleanup
   osqp_cleanup(work);
@@ -204,10 +209,10 @@ void OsqpLateralQPOptimizer::CalcualteKernel(
   MatrixXd kernel = MatrixXd::Zero(kNumParam, kNumParam);  // dense matrix
 
   for (int i = 0; i < kNumParam; ++i) {
-    if (i < d_bounds.size()) {
+    if (i < static_cast<int>(d_bounds.size())) {
       kernel(i, i) = 2.0 * FLAGS_weight_lateral_offset +
                      2.0 * FLAGS_weight_lateral_obstacle_distance;
-    } else if (i < 2 * d_bounds.size()) {
+    } else if (i < 2 * static_cast<int>(d_bounds.size())) {
       kernel(i, i) = 2.0 * FLAGS_weight_lateral_derivative;
     } else {
       kernel(i, i) = 2.0 * FLAGS_weight_lateral_second_order_derivative;
