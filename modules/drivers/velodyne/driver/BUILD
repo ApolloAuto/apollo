@@ -43,6 +43,7 @@ cc_library(
         "//framework:cybertron",
         "@pcl",
     ],
+    copts = ['-DMODULE_NAME=\\"velodyne\\"']
 )
 
 cpplint()

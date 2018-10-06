@@ -11,8 +11,8 @@ cc_binary(
 
 cc_library(
     name = "fusion_component_lib",
-    srcs = ["fusion_component.cc"],
-    hdrs = ["fusion_component.h"],
+    srcs = ["pri_sec_fusion_component.cc"],
+    hdrs = ["pri_sec_fusion_component.h"],
     deps = [
         "//framework:cybertron",
         "//modules/drivers/velodyne/proto:velodyne_proto",

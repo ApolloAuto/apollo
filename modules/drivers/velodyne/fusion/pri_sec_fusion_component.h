@@ -37,7 +37,7 @@ using apollo::cybertron::Reader;
 using apollo::cybertron::Writer;
 using apollo::drivers::PointCloud;
 
-class FusionComponent : public Component<PointCloud> {
+class PriSecFusionComponent : public Component<PointCloud> {
  public:
   bool Init() override;
   bool Proc(const std::shared_ptr<PointCloud>& point_cloud) override;
@@ -60,7 +60,7 @@ class FusionComponent : public Component<PointCloud> {
   std::vector<std::shared_ptr<Reader<PointCloud>>> readers_;
 };
 
-CYBERTRON_REGISTER_COMPONENT(FusionComponent)
+CYBERTRON_REGISTER_COMPONENT(PriSecFusionComponent)
 }  // namespace velodyne
 }  // namespace drivers
 }  // namespace apollo

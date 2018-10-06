@@ -32,7 +32,7 @@ bool CompensatorComponent::Init() {
 
   writer_ = node_->CreateWriter<PointCloud>(config.output_channel());
 
-  _compensator.reset(new Compensator(config));
+  compensator_.reset(new Compensator(config));
 
   for (int i = 0; i < queue_size_; ++i) {
     compensator_deque_.push_back(std::make_shared<PointCloud>());
@@ -54,7 +54,7 @@ bool CompensatorComponent::Proc(
   std::shared_ptr<PointCloud> point_cloud_compensated =
       compensator_deque_[index_++];
   point_cloud_compensated->Clear();
-  if (_compensator->MotionCompensation(point_cloud, point_cloud_compensated)) {
+  if (compensator_->MotionCompensation(point_cloud, point_cloud_compensated)) {
     uint64_t diff = cybertron::Time().Now().ToNanosecond() - start;
     AINFO << "compenstator diff:" << diff
           << ";meta:" << point_cloud_compensated->header().lidar_timestamp();

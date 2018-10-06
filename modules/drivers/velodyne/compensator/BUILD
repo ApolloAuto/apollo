@@ -35,6 +35,7 @@ cc_library(
         "//framework:cybertron",
         "@eigen",
     ],
+    copts = ['-DMODULE_NAME=\\"velodyne\\"']
 )
 
 cpplint()
