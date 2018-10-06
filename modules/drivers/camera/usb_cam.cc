@@ -994,7 +994,7 @@ void UsbCam::set_v4l_parameter(const std::string& param,
 
 bool UsbCam::wait_for_device() {
   if (is_capturing_) {
-    AINFO << "is capturing";
+    ADEBUG << "is capturing";
     return true;
   }
   if (!open_device()) {
