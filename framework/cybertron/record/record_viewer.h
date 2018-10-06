@@ -33,7 +33,7 @@ class RecordMessage;
 class RecordViewer {
  public:
   RecordViewer(const std::shared_ptr<RecordReader>& reader,
-               uint64_t begin_time = 0, uint64_t end_time = UINT_MAX,
+               uint64_t begin_time = 0, uint64_t end_time = UINT64_MAX,
                const std::set<std::string>& channels = std::set<std::string>());
   bool IsValid() const;
   bool Update(RecordMessage* message);
