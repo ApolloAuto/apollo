@@ -30,7 +30,7 @@ const int32_t Dashcontrolsrightrpt210::ID = 0x210;
 Dashcontrolsrightrpt210::Dashcontrolsrightrpt210() { Reset(); }
 
 uint32_t Dashcontrolsrightrpt210::GetPeriod() const {
-  // TODO modify every protocol's period manually
+  // TODO(QiL) modify every protocol's period manually
   static const uint32_t PERIOD = 20 * 1000;
   return PERIOD;
 }
@@ -49,7 +49,7 @@ void Dashcontrolsrightrpt210::UpdateData(uint8_t* data) {
 }
 
 void Dashcontrolsrightrpt210::Reset() {
-  // TODO you should check this manually
+  // TODO(QiL) you should check this manually
   output_value_ = Dash_controls_right_rpt_210::OUTPUT_VALUE_DASH_CONTROL_NONE;
   commanded_value_ =
       Dash_controls_right_rpt_210::COMMANDED_VALUE_DASH_CONTROL_NONE;

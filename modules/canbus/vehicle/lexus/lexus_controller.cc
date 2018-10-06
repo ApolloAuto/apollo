@@ -15,11 +15,10 @@ limitations under the License.
 
 #include "modules/canbus/vehicle/lexus/lexus_controller.h"
 
-#include "modules/common/proto/vehicle_signal.pb.h"
-
 #include "cybertron/common/log.h"
 #include "modules/canbus/vehicle/lexus/lexus_message_manager.h"
 #include "modules/canbus/vehicle/vehicle_controller.h"
+#include "modules/common/proto/vehicle_signal.pb.h"
 #include "modules/common/time/time.h"
 #include "modules/drivers/canbus/can_comm/can_sender.h"
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
@@ -358,7 +357,7 @@ void LexusController::Gear(Chassis::GearPosition gear_position) {
 // -> pedal
 void LexusController::Brake(double pedal) {
   // double real_value = params_.max_acc() * acceleration / 100;
-  // TODO Update brake value based on mode
+  // TODO(QiL) : Update brake value based on mode
   if (!(driving_mode() == Chassis::COMPLETE_AUTO_DRIVE ||
         driving_mode() == Chassis::AUTO_SPEED_ONLY)) {
     AINFO << "The current drive mode does not need to set acceleration.";

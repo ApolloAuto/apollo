@@ -30,7 +30,7 @@ const int32_t Parkingbrakecmd124::ID = 0x124;
 Parkingbrakecmd124::Parkingbrakecmd124() { Reset(); }
 
 uint32_t Parkingbrakecmd124::GetPeriod() const {
-  // TODO modify every protocol's period manually
+  // TODO(QiL) modify every protocol's period manually
   static const uint32_t PERIOD = 20 * 1000;
   return PERIOD;
 }
@@ -44,7 +44,7 @@ void Parkingbrakecmd124::UpdateData(uint8_t* data) {
 }
 
 void Parkingbrakecmd124::Reset() {
-  // TODO you should check this manually
+  // TODO(QiL) you should check this manually
   ignore_overrides_ = false;
   enable_ = false;
   clear_override_ = false;

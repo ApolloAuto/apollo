@@ -30,7 +30,7 @@ const int32_t Cruisecontrolbuttonscmd108::ID = 0x108;
 Cruisecontrolbuttonscmd108::Cruisecontrolbuttonscmd108() { Reset(); }
 
 uint32_t Cruisecontrolbuttonscmd108::GetPeriod() const {
-  // TODO modify every protocol's period manually
+  // TODO(QiL) modify every protocol's period manually
   static const uint32_t PERIOD = 20 * 1000;
   return PERIOD;
 }
@@ -44,7 +44,7 @@ void Cruisecontrolbuttonscmd108::UpdateData(uint8_t* data) {
 }
 
 void Cruisecontrolbuttonscmd108::Reset() {
-  // TODO you should check this manually
+  // TODO(QiL) you should check this manually
   cruise_control_button_ =
       Cruise_control_buttons_cmd_108::CRUISE_CONTROL_BUTTON_CRUISE_CONTROL_NONE;
   ignore_overrides_ = false;

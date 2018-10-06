@@ -45,8 +45,6 @@ namespace lexus {
 
 class LexusController final : public VehicleController {
  public:
-  explicit LexusController(){};
-
   virtual ~LexusController();
 
   ::apollo::common::ErrorCode Init(

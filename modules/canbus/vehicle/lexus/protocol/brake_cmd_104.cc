@@ -30,7 +30,7 @@ const int32_t Brakecmd104::ID = 0x104;
 Brakecmd104::Brakecmd104() { Reset(); }
 
 uint32_t Brakecmd104::GetPeriod() const {
-  // TODO modify every protocol's period manually
+  // TODO(QiL) modify every protocol's period manually
   static const uint32_t PERIOD = 20 * 1000;
   return PERIOD;
 }
@@ -44,7 +44,7 @@ void Brakecmd104::UpdateData(uint8_t* data) {
 }
 
 void Brakecmd104::Reset() {
-  // TODO you should check this manually
+  // TODO(QiL) you should check this manually
   ignore_overrides_ = false;
   enable_ = false;
   clear_override_ = false;

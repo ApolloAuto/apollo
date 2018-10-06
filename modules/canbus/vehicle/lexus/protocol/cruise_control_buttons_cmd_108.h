@@ -122,4 +122,4 @@ class Cruisecontrolbuttonscmd108
 }  // namespace canbus
 }  // namespace apollo
 
-#endif  // MODULES_CANBUS_VEHICL_LEXUS_PROTOCOL_CRUISE_CONTROL_BUTTONS_CMD_108_H_
+#endif  // MODULES_CANBUS_VEHICL_LEXUS_PROTOCOL_CRUISE_CONTROL_BUTTONS_CMD_108_H
