@@ -68,91 +68,35 @@ ErrorCode LexusController::Init(
   accel_cmd_100_ = dynamic_cast<Accelcmd100*>(
       message_manager_->GetMutableProtocolDataById(Accelcmd100::ID));
   if (accel_cmd_100_ == nullptr) {
-    AERROR << "Accelcmd100 does not exist in the LexusMessageManager!";
+    AERROR << "Accelcmd100 does not exist in the LexusMessalexusanager!";
     return ErrorCode::CANBUS_ERROR;
   }
 
   brake_cmd_104_ = dynamic_cast<Brakecmd104*>(
       message_manager_->GetMutableProtocolDataById(Brakecmd104::ID));
   if (brake_cmd_104_ == nullptr) {
-    AERROR << "Brakecmd104 does not exist in the LexusMessageManager!";
-    return ErrorCode::CANBUS_ERROR;
-  }
-
-  cruise_control_buttons_cmd_108_ = dynamic_cast<Cruisecontrolbuttonscmd108*>(
-      message_manager_->GetMutableProtocolDataById(
-          Cruisecontrolbuttonscmd108::ID));
-  if (cruise_control_buttons_cmd_108_ == nullptr) {
-    AERROR << "Cruisecontrolbuttonscmd108 does not exist in the "
-              "LexusMessageManager!";
-    return ErrorCode::CANBUS_ERROR;
-  }
-
-  dash_controls_right_rpt_210_ = dynamic_cast<Dashcontrolsrightrpt210*>(
-      message_manager_->GetMutableProtocolDataById(
-          Dashcontrolsrightrpt210::ID));
-  if (dash_controls_right_rpt_210_ == nullptr) {
-    AERROR
-        << "Dashcontrolsrightrpt210 does not exist in the LexusMessageManager!";
-    return ErrorCode::CANBUS_ERROR;
-  }
-
-  hazard_lights_cmd_114_ = dynamic_cast<Hazardlightscmd114*>(
-      message_manager_->GetMutableProtocolDataById(Hazardlightscmd114::ID));
-  if (hazard_lights_cmd_114_ == nullptr) {
-    AERROR << "Hazardlightscmd114 does not exist in the LexusMessageManager!";
-    return ErrorCode::CANBUS_ERROR;
-  }
-
-  headlight_cmd_118_ = dynamic_cast<Headlightcmd118*>(
-      message_manager_->GetMutableProtocolDataById(Headlightcmd118::ID));
-  if (headlight_cmd_118_ == nullptr) {
-    AERROR << "Headlightcmd118 does not exist in the LexusMessageManager!";
-    return ErrorCode::CANBUS_ERROR;
-  }
-
-  parking_brake_cmd_124_ = dynamic_cast<Parkingbrakecmd124*>(
-      message_manager_->GetMutableProtocolDataById(Parkingbrakecmd124::ID));
-  if (parking_brake_cmd_124_ == nullptr) {
-    AERROR << "Parkingbrakecmd124 does not exist in the LexusMessageManager!";
+    AERROR << "Brakecmd104 does not exist in the LexusMessalexusanager!";
     return ErrorCode::CANBUS_ERROR;
   }
 
   shift_cmd_128_ = dynamic_cast<Shiftcmd128*>(
       message_manager_->GetMutableProtocolDataById(Shiftcmd128::ID));
   if (shift_cmd_128_ == nullptr) {
-    AERROR << "Shiftcmd128 does not exist in the LexusMessageManager!";
+    AERROR << "Shiftcmd128 does not exist in the LexusMessalexusanager!";
     return ErrorCode::CANBUS_ERROR;
   }
 
-  turn_cmd_130_ = dynamic_cast<Turncmd130*>(
-      message_manager_->GetMutableProtocolDataById(Turncmd130::ID));
-  if (turn_cmd_130_ == nullptr) {
-    AERROR << "Turncmd130 does not exist in the LexusMessageManager!";
-    return ErrorCode::CANBUS_ERROR;
-  }
-
-  wiper_cmd_134_ = dynamic_cast<Wipercmd134*>(
-      message_manager_->GetMutableProtocolDataById(Wipercmd134::ID));
-  if (wiper_cmd_134_ == nullptr) {
-    AERROR << "Wipercmd134 does not exist in the LexusMessageManager!";
+  steering_cmd_12c_ = dynamic_cast<Steeringcmd12c*>(
+      message_manager_->GetMutableProtocolDataById(Steeringcmd12c::ID));
+  if (steering_cmd_12c_ == nullptr) {
+    AERROR << "Steeringcmd12c does not exist in the LexusMessageManager!";
     return ErrorCode::CANBUS_ERROR;
   }
 
   can_sender_->AddMessage(Accelcmd100::ID, accel_cmd_100_, false);
   can_sender_->AddMessage(Brakecmd104::ID, brake_cmd_104_, false);
-  can_sender_->AddMessage(Cruisecontrolbuttonscmd108::ID,
-                          cruise_control_buttons_cmd_108_, false);
-  can_sender_->AddMessage(Dashcontrolsrightrpt210::ID,
-                          dash_controls_right_rpt_210_, false);
-  can_sender_->AddMessage(Hazardlightscmd114::ID, hazard_lights_cmd_114_,
-                          false);
-  can_sender_->AddMessage(Headlightcmd118::ID, headlight_cmd_118_, false);
-  can_sender_->AddMessage(Parkingbrakecmd124::ID, parking_brake_cmd_124_,
-                          false);
   can_sender_->AddMessage(Shiftcmd128::ID, shift_cmd_128_, false);
-  can_sender_->AddMessage(Turncmd130::ID, turn_cmd_130_, false);
-  can_sender_->AddMessage(Wipercmd134::ID, wiper_cmd_134_, false);
+  can_sender_->AddMessage(Steeringcmd12c::ID, steering_cmd_12c_, false);
 
   // need sleep to ensure all messages received
   AINFO << "LexusController is initialized.";
@@ -203,8 +147,111 @@ Chassis LexusController::chassis() {
 
   // 3
   chassis_.set_engine_started(true);
-  /* ADD YOUR OWN CAR CHASSIS OPERATION
-   */
+
+  // 5
+  if (chassis_detail.lexus().has_vehicle_speed_rpt_400() &&
+      chassis_detail.lexus().vehicle_speed_rpt_400().has_vehicle_speed()) {
+    chassis_.set_speed_mps(
+        chassis_detail.lexus().vehicle_speed_rpt_400().has_vehicle_speed());
+  } else {
+    chassis_.set_speed_mps(0);
+  }
+
+  // 7
+  chassis_.set_fuel_range_m(0);
+  // 8
+  if (chassis_detail.lexus().has_accel_rpt_200() &&
+      chassis_detail.lexus().accel_rpt_200().has_output_value()) {
+    chassis_.set_throttle_percentage(
+        chassis_detail.lexus().accel_rpt_200().output_value());
+  } else {
+    chassis_.set_throttle_percentage(0);
+  }
+  // 9
+  if (chassis_detail.lexus().has_brake_rpt_204() &&
+      chassis_detail.lexus().brake_rpt_204().has_output_value()) {
+    chassis_.set_brake_percentage(
+        chassis_detail.lexus().brake_rpt_204().output_value());
+  } else {
+    chassis_.set_brake_percentage(0);
+  }
+
+  // 23, previously 10
+  if (chassis_detail.lexus().has_shift_rpt_228() &&
+      chassis_detail.lexus().shift_rpt_228().has_output_value()) {
+    Chassis::GearPosition gear_pos = Chassis::GEAR_INVALID;
+
+    if (chassis_detail.lexus().shift_rpt_228().output_value() ==
+        Shift_rpt_228::OUTPUT_VALUE_NEUTRAL) {
+      gear_pos = Chassis::GEAR_NEUTRAL;
+    }
+    if (chassis_detail.lexus().shift_rpt_228().output_value() ==
+        Shift_rpt_228::OUTPUT_VALUE_REVERSE) {
+      gear_pos = Chassis::GEAR_REVERSE;
+    }
+    if (chassis_detail.lexus().shift_rpt_228().output_value() ==
+        Shift_rpt_228::OUTPUT_VALUE_FORWARD_HIGH) {
+      gear_pos = Chassis::GEAR_DRIVE;
+    }
+
+    chassis_.set_gear_location(gear_pos);
+  } else {
+    chassis_.set_gear_location(Chassis::GEAR_NONE);
+  }
+
+  // 11
+  // TODO(QiL) : verify the unit here.
+  if (chassis_detail.lexus().has_steering_rpt_22c() &&
+      chassis_detail.lexus().steering_rpt_22c().has_output_value()) {
+    chassis_.set_steering_percentage(
+        chassis_detail.lexus().steering_rpt_22c().output_value() * 100.0 /
+        vehicle_params_.max_steer_angle());
+  } else {
+    chassis_.set_steering_percentage(0);
+  }
+
+  // 16, 17
+  /*
+  if (chassis_detail.has_light() &&
+      chassis_detail.light().has_turn_light_type() &&
+      chassis_detail.light().turn_light_type() != Light::TURN_LIGHT_OFF) {
+    if (chassis_detail.light().turn_light_type() == Light::TURN_LEFT_ON) {
+      chassis_.mutable_signal()->set_turn_signal(
+          common::VehicleSignal::TURN_LEFT);
+    } else if (chassis_detail.light().turn_light_type() ==
+               Light::TURN_RIGHT_ON) {
+      chassis_.mutable_signal()->set_turn_signal(
+          common::VehicleSignal::TURN_RIGHT);
+    } else {
+      chassis_.mutable_signal()->set_turn_signal(
+          common::VehicleSignal::TURN_NONE);
+    }
+  } else {
+    chassis_.mutable_signal()->set_turn_signal(
+        common::VehicleSignal::TURN_NONE);
+  }
+
+  */
+
+  // TODO(all): implement the rest here/
+  // 26
+  if (chassis_error_mask_) {
+    chassis_.set_chassis_error_mask(chassis_error_mask_);
+  }
+
+  // give engage_advice based on error_code and canbus feedback
+  if (!chassis_error_mask_ && !chassis_.parking_brake() &&
+      (chassis_.throttle_percentage() == 0.0) &&
+      (chassis_.brake_percentage() != 0.0)) {
+    chassis_.mutable_engage_advice()->set_advice(
+        apollo::common::EngageAdvice::READY_TO_ENGAGE);
+  } else {
+    chassis_.mutable_engage_advice()->set_advice(
+        apollo::common::EngageAdvice::DISALLOW_ENGAGE);
+    chassis_.mutable_engage_advice()->set_reason(
+        "CANBUS not ready, firmware error or emergency button pressed!");
+  }
+
   return chassis_;
 }
 
@@ -219,10 +266,11 @@ ErrorCode LexusController::EnableAutoMode() {
     return ErrorCode::OK;
   }
   return ErrorCode::OK;
-  /* ADD YOUR OWN CAR CHASSIS OPERATION
-  brake_60_->set_enable();
-  throttle_62_->set_enable();
-  steering_64_->set_enable();
+
+  accel_cmd_100_->set_enable(true);
+  brake_cmd_104_->set_enable(true);
+  steering_cmd_12c_->set_enable(true);
+  shift_cmd_128_->set_enable(true);
 
   can_sender_->Update();
   const int32_t flag =
@@ -237,7 +285,6 @@ ErrorCode LexusController::EnableAutoMode() {
     AINFO << "Switch to COMPLETE_AUTO_DRIVE mode ok.";
     return ErrorCode::OK;
   }
-  */
 }
 
 ErrorCode LexusController::DisableAutoMode() {

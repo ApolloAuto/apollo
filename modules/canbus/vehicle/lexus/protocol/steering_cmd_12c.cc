@@ -16,10 +16,7 @@
 
 #include "modules/canbus/vehicle/lexus/protocol/steering_cmd_12c.h"
 
-#include "glog/logging.h"
-
 #include "modules/drivers/canbus/common/byte.h"
-#include "modules/drivers/canbus/common/canbus_consts.h"
 
 namespace apollo {
 namespace canbus {
@@ -27,108 +24,143 @@ namespace lexus {
 
 using ::apollo::drivers::canbus::Byte;
 
-Steeringcmd12c::Steeringcmd12c() {}
 const int32_t Steeringcmd12c::ID = 0x12C;
 
-void Steeringcmd12c::Parse(const std::uint8_t* bytes, int32_t length,
-                           ChassisDetail* chassis) const {
-  chassis->mutable_lexus()->mutable_steering_cmd_12c()->set_ignore_overrides(
-      ignore_overrides(bytes, length));
-  chassis->mutable_lexus()->mutable_steering_cmd_12c()->set_enable(
-      enable(bytes, length));
-  chassis->mutable_lexus()->mutable_steering_cmd_12c()->set_clear_override(
-      clear_override(bytes, length));
-  chassis->mutable_lexus()->mutable_steering_cmd_12c()->set_clear_faults(
-      clear_faults(bytes, length));
-  chassis->mutable_lexus()->mutable_steering_cmd_12c()->set_position(
-      position(bytes, length));
-  chassis->mutable_lexus()->mutable_steering_cmd_12c()->set_rotation_rate(
-      rotation_rate(bytes, length));
+// public
+Steeringcmd12c::Steeringcmd12c() { Reset(); }
+
+uint32_t Steeringcmd12c::GetPeriod() const {
+  // TODO(QiL) : modify every protocol's period manually
+  static const uint32_t PERIOD = 20 * 1000;
+  return PERIOD;
 }
 
-// config detail: {'name': 'ignore_overrides', 'offset': 0.0, 'precision': 1.0,
+void Steeringcmd12c::UpdateData(uint8_t* data) {
+  set_p_ignore_overrides(data, ignore_overrides_);
+  set_p_enable(data, enable_);
+  set_p_clear_override(data, clear_override_);
+  set_p_clear_faults(data, clear_faults_);
+  set_p_position(data, position_);
+  set_p_rotation_rate(data, rotation_rate_);
+}
+
+void Steeringcmd12c::Reset() {
+  // TODO(QiL) : you should check this manually
+  ignore_overrides_ = false;
+  enable_ = false;
+  clear_override_ = false;
+  clear_faults_ = false;
+  position_ = 0.0;
+  rotation_rate_ = 0.0;
+}
+
+Steeringcmd12c* Steeringcmd12c::set_ignore_overrides(bool ignore_overrides) {
+  ignore_overrides_ = ignore_overrides;
+  return this;
+}
+
+// config detail: {'name': 'IGNORE_OVERRIDES', 'offset': 0.0, 'precision': 1.0,
 // 'len': 1, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 1,
 // 'type': 'bool', 'order': 'motorola', 'physical_unit': ''}
-bool Steeringcmd12c::ignore_overrides(const std::uint8_t* bytes,
-                                      int32_t length) const {
-  Byte t0(bytes + 0);
-  int32_t x = t0.get_byte(1, 1);
+void Steeringcmd12c::set_p_ignore_overrides(uint8_t* data,
+                                            bool ignore_overrides) {
+  int x = ignore_overrides;
 
-  bool ret = x;
-  return ret;
+  Byte to_set(data + 0);
+  to_set.set_value(x, 1, 1);
 }
 
-// config detail: {'name': 'enable', 'offset': 0.0, 'precision': 1.0, 'len': 1,
+Steeringcmd12c* Steeringcmd12c::set_enable(bool enable) {
+  enable_ = enable;
+  return this;
+}
+
+// config detail: {'name': 'ENABLE', 'offset': 0.0, 'precision': 1.0, 'len': 1,
 // 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 0, 'type': 'bool',
 // 'order': 'motorola', 'physical_unit': ''}
-bool Steeringcmd12c::enable(const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 0);
-  int32_t x = t0.get_byte(0, 1);
+void Steeringcmd12c::set_p_enable(uint8_t* data, bool enable) {
+  int x = enable;
 
-  bool ret = x;
-  return ret;
+  Byte to_set(data + 0);
+  to_set.set_value(x, 0, 1);
 }
 
-// config detail: {'name': 'clear_override', 'offset': 0.0, 'precision': 1.0,
+Steeringcmd12c* Steeringcmd12c::set_clear_override(bool clear_override) {
+  clear_override_ = clear_override;
+  return this;
+}
+
+// config detail: {'name': 'CLEAR_OVERRIDE', 'offset': 0.0, 'precision': 1.0,
 // 'len': 1, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 2,
 // 'type': 'bool', 'order': 'motorola', 'physical_unit': ''}
-bool Steeringcmd12c::clear_override(const std::uint8_t* bytes,
-                                    int32_t length) const {
-  Byte t0(bytes + 0);
-  int32_t x = t0.get_byte(2, 1);
+void Steeringcmd12c::set_p_clear_override(uint8_t* data, bool clear_override) {
+  int x = clear_override;
 
-  bool ret = x;
-  return ret;
+  Byte to_set(data + 0);
+  to_set.set_value(x, 2, 1);
 }
 
-// config detail: {'name': 'clear_faults', 'offset': 0.0, 'precision': 1.0,
+Steeringcmd12c* Steeringcmd12c::set_clear_faults(bool clear_faults) {
+  clear_faults_ = clear_faults;
+  return this;
+}
+
+// config detail: {'name': 'CLEAR_FAULTS', 'offset': 0.0, 'precision': 1.0,
 // 'len': 1, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 3,
 // 'type': 'bool', 'order': 'motorola', 'physical_unit': ''}
-bool Steeringcmd12c::clear_faults(const std::uint8_t* bytes,
-                                  int32_t length) const {
-  Byte t0(bytes + 0);
-  int32_t x = t0.get_byte(3, 1);
+void Steeringcmd12c::set_p_clear_faults(uint8_t* data, bool clear_faults) {
+  int x = clear_faults;
 
-  bool ret = x;
-  return ret;
+  Byte to_set(data + 0);
+  to_set.set_value(x, 3, 1);
 }
 
-// config detail: {'name': 'position', 'offset': 0.0, 'precision': 0.001, 'len':
+Steeringcmd12c* Steeringcmd12c::set_position(double position) {
+  position_ = position;
+  return this;
+}
+
+// config detail: {'name': 'POSITION', 'offset': 0.0, 'precision': 0.001, 'len':
 // 16, 'is_signed_var': True, 'physical_range': '[-32.768|32.767]', 'bit': 15,
 // 'type': 'double', 'order': 'motorola', 'physical_unit': 'rad'}
-double Steeringcmd12c::position(const std::uint8_t* bytes,
-                                int32_t length) const {
-  Byte t0(bytes + 1);
-  int32_t x = t0.get_byte(0, 8);
+void Steeringcmd12c::set_p_position(uint8_t* data, double position) {
+  position = ProtocolData::BoundedValue(-32.768, 32.767, position);
+  int x = position / 0.001000;
+  uint8_t t = 0;
 
-  Byte t1(bytes + 2);
-  int32_t t = t1.get_byte(0, 8);
-  x <<= 8;
-  x |= t;
+  t = x & 0xFF;
+  Byte to_set0(data + 2);
+  to_set0.set_value(t, 0, 8);
+  x >>= 8;
 
-  x <<= 16;
-  x >>= 16;
-
-  double ret = x * 0.001000;
-  return ret;
+  t = x & 0xFF;
+  Byte to_set1(data + 1);
+  to_set1.set_value(t, 0, 8);
 }
 
-// config detail: {'name': 'rotation_rate', 'offset': 0.0, 'precision': 0.001,
+Steeringcmd12c* Steeringcmd12c::set_rotation_rate(double rotation_rate) {
+  rotation_rate_ = rotation_rate;
+  return this;
+}
+
+// config detail: {'name': 'ROTATION_RATE', 'offset': 0.0, 'precision': 0.001,
 // 'len': 16, 'is_signed_var': False, 'physical_range': '[0|65.535]', 'bit': 31,
 // 'type': 'double', 'order': 'motorola', 'physical_unit': 'rad/s'}
-double Steeringcmd12c::rotation_rate(const std::uint8_t* bytes,
-                                     int32_t length) const {
-  Byte t0(bytes + 3);
-  int32_t x = t0.get_byte(0, 8);
+void Steeringcmd12c::set_p_rotation_rate(uint8_t* data, double rotation_rate) {
+  rotation_rate = ProtocolData::BoundedValue(0.0, 65.535, rotation_rate);
+  int x = rotation_rate / 0.001000;
+  uint8_t t = 0;
 
-  Byte t1(bytes + 4);
-  int32_t t = t1.get_byte(0, 8);
-  x <<= 8;
-  x |= t;
+  t = x & 0xFF;
+  Byte to_set0(data + 4);
+  to_set0.set_value(t, 0, 8);
+  x >>= 8;
 
-  double ret = x * 0.001000;
-  return ret;
+  t = x & 0xFF;
+  Byte to_set1(data + 3);
+  to_set1.set_value(t, 0, 8);
 }
+
 }  // namespace lexus
 }  // namespace canbus
 }  // namespace apollo

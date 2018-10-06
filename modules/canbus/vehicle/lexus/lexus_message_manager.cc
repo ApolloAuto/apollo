@@ -21,8 +21,10 @@ limitations under the License.
 #include "modules/canbus/vehicle/lexus/protocol/dash_controls_right_rpt_210.h"
 #include "modules/canbus/vehicle/lexus/protocol/hazard_lights_cmd_114.h"
 #include "modules/canbus/vehicle/lexus/protocol/headlight_cmd_118.h"
+#include "modules/canbus/vehicle/lexus/protocol/horn_cmd_11c.h"
 #include "modules/canbus/vehicle/lexus/protocol/parking_brake_cmd_124.h"
 #include "modules/canbus/vehicle/lexus/protocol/shift_cmd_128.h"
+#include "modules/canbus/vehicle/lexus/protocol/steering_cmd_12c.h"
 #include "modules/canbus/vehicle/lexus/protocol/turn_cmd_130.h"
 #include "modules/canbus/vehicle/lexus/protocol/wiper_cmd_134.h"
 
@@ -45,7 +47,6 @@ limitations under the License.
 #include "modules/canbus/vehicle/lexus/protocol/hazard_lights_rpt_214.h"
 #include "modules/canbus/vehicle/lexus/protocol/headlight_aux_rpt_318.h"
 #include "modules/canbus/vehicle/lexus/protocol/headlight_rpt_218.h"
-#include "modules/canbus/vehicle/lexus/protocol/horn_cmd_11c.h"
 #include "modules/canbus/vehicle/lexus/protocol/horn_rpt_21c.h"
 #include "modules/canbus/vehicle/lexus/protocol/interior_lights_rpt_416.h"
 #include "modules/canbus/vehicle/lexus/protocol/lat_lon_heading_rpt_40e.h"
@@ -57,7 +58,6 @@ limitations under the License.
 #include "modules/canbus/vehicle/lexus/protocol/shift_aux_rpt_328.h"
 #include "modules/canbus/vehicle/lexus/protocol/shift_rpt_228.h"
 #include "modules/canbus/vehicle/lexus/protocol/steering_aux_rpt_32c.h"
-#include "modules/canbus/vehicle/lexus/protocol/steering_cmd_12c.h"
 #include "modules/canbus/vehicle/lexus/protocol/steering_motor_rpt_1_404.h"
 #include "modules/canbus/vehicle/lexus/protocol/steering_motor_rpt_2_405.h"
 #include "modules/canbus/vehicle/lexus/protocol/steering_motor_rpt_3_406.h"
@@ -85,8 +85,10 @@ LexusMessageManager::LexusMessageManager() {
   AddSendProtocolData<Dashcontrolsrightrpt210, true>();
   AddSendProtocolData<Hazardlightscmd114, true>();
   AddSendProtocolData<Headlightcmd118, true>();
+  AddSendProtocolData<Horncmd11c, true>();
   AddSendProtocolData<Parkingbrakecmd124, true>();
   AddSendProtocolData<Shiftcmd128, true>();
+  AddSendProtocolData<Steeringcmd12c, true>();
   AddSendProtocolData<Turncmd130, true>();
   AddSendProtocolData<Wipercmd134, true>();
 
@@ -110,7 +112,6 @@ LexusMessageManager::LexusMessageManager() {
   AddRecvProtocolData<Hazardlightsrpt214, true>();
   AddRecvProtocolData<Headlightauxrpt318, true>();
   AddRecvProtocolData<Headlightrpt218, true>();
-  AddRecvProtocolData<Horncmd11c, true>();
   AddRecvProtocolData<Hornrpt21c, true>();
   AddRecvProtocolData<Interiorlightsrpt416, true>();
   AddRecvProtocolData<Latlonheadingrpt40e, true>();
@@ -122,7 +123,6 @@ LexusMessageManager::LexusMessageManager() {
   AddRecvProtocolData<Shiftauxrpt328, true>();
   AddRecvProtocolData<Shiftrpt228, true>();
   AddRecvProtocolData<Steeringauxrpt32c, true>();
-  AddRecvProtocolData<Steeringcmd12c, true>();
   AddRecvProtocolData<Steeringmotorrpt1404, true>();
   AddRecvProtocolData<Steeringmotorrpt2405, true>();
   AddRecvProtocolData<Steeringmotorrpt3406, true>();

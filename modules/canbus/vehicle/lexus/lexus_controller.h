@@ -34,8 +34,10 @@
 #include "modules/canbus/vehicle/lexus/protocol/dash_controls_right_rpt_210.h"
 #include "modules/canbus/vehicle/lexus/protocol/hazard_lights_cmd_114.h"
 #include "modules/canbus/vehicle/lexus/protocol/headlight_cmd_118.h"
+#include "modules/canbus/vehicle/lexus/protocol/horn_cmd_11c.h"
 #include "modules/canbus/vehicle/lexus/protocol/parking_brake_cmd_124.h"
 #include "modules/canbus/vehicle/lexus/protocol/shift_cmd_128.h"
+#include "modules/canbus/vehicle/lexus/protocol/steering_cmd_12c.h"
 #include "modules/canbus/vehicle/lexus/protocol/turn_cmd_130.h"
 #include "modules/canbus/vehicle/lexus/protocol/wiper_cmd_134.h"
 
@@ -121,8 +123,10 @@ class LexusController final : public VehicleController {
   Dashcontrolsrightrpt210* dash_controls_right_rpt_210_ = nullptr;
   Hazardlightscmd114* hazard_lights_cmd_114_ = nullptr;
   Headlightcmd118* headlight_cmd_118_ = nullptr;
+  Horncmd11c* horn_cmd_11c_ = nullptr;
   Parkingbrakecmd124* parking_brake_cmd_124_ = nullptr;
   Shiftcmd128* shift_cmd_128_ = nullptr;
+  Steeringcmd12c* steering_cmd_12c_ = nullptr;
   Turncmd130* turn_cmd_130_ = nullptr;
   Wipercmd134* wiper_cmd_134_ = nullptr;
 
