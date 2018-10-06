@@ -304,10 +304,11 @@ ErrorCode LexusController::EnableSteeringOnlyMode() {
     return ErrorCode::OK;
   }
   return ErrorCode::OK;
-  /* ADD YOUR OWN CAR CHASSIS OPERATION
-  brake_60_->set_disable();
-  throttle_62_->set_disable();
-  steering_64_->set_enable();
+
+  accel_cmd_100_->set_enable(false);
+  brake_cmd_104_->set_enable(false);
+  steering_cmd_12c_->set_enable(false);
+  shift_cmd_128_->set_enable(false);
 
   can_sender_->Update();
   if (CheckResponse(CHECK_RESPONSE_STEER_UNIT_FLAG, true) == false) {
@@ -320,7 +321,6 @@ ErrorCode LexusController::EnableSteeringOnlyMode() {
     AINFO << "Switch to AUTO_STEER_ONLY mode ok.";
     return ErrorCode::OK;
   }
-  */
 }
 
 ErrorCode LexusController::EnableSpeedOnlyMode() {
@@ -331,10 +331,10 @@ ErrorCode LexusController::EnableSpeedOnlyMode() {
     return ErrorCode::OK;
   }
   return ErrorCode::OK;
-  /* ADD YOUR OWN CAR CHASSIS OPERATION
-  brake_60_->set_enable();
-  throttle_62_->set_enable();
-  steering_64_->set_disable();
+  accel_cmd_100_->set_enable(false);
+  brake_cmd_104_->set_enable(false);
+  steering_cmd_12c_->set_enable(false);
+  shift_cmd_128_->set_enable(false);
 
   can_sender_->Update();
   if (CheckResponse(CHECK_RESPONSE_SPEED_UNIT_FLAG, true) == false) {
@@ -347,7 +347,6 @@ ErrorCode LexusController::EnableSpeedOnlyMode() {
     AINFO << "Switch to AUTO_SPEED_ONLY mode ok.";
     return ErrorCode::OK;
   }
-  */
 }
 
 // NEUTRAL, REVERSE, DRIVE
