@@ -76,8 +76,7 @@ class Service : public ServiceBase {
 };
 
 template <typename Request, typename Response>
-void Service<Request, Response>::destroy() {
-}
+void Service<Request, Response>::destroy() {}
 
 template <typename Request, typename Response>
 bool Service<Request, Response>::Init() {

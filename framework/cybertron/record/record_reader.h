@@ -62,7 +62,7 @@ class RecordReader : public RecordBase {
 
   proto::ChunkBody chunk_;
   proto::Index index_;
-  uint32_t message_index_ = 0;
+  int message_index_ = 0;
   ChannelInfoMap channel_info_;
   FileReaderPtr file_reader_;
 };

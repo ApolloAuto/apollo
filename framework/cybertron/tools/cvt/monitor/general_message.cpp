@@ -102,7 +102,8 @@ void GeneralMessage::Render(const Screen* s, int key) {
       int jumpLines = page_index_ * page_item_count_;
       jumpLines <<= 2;
       jumpLines /= 5;
-      GeneralMessageBase::PrintField(this, *message_ptr_, jumpLines, s, lineNo, 0, reflection_ptr_, field_, itemIndex_);
+      GeneralMessageBase::PrintField(this, *message_ptr_, jumpLines, s, lineNo,
+                                     0, reflection_ptr_, field_, itemIndex_);
     }
   }
 

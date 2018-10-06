@@ -231,7 +231,8 @@ class UnderlayMessage {
    * @brief This function deserializes an object using CDR serialization.
    * @param cdr CDR serialization object.
    */
-  ePcybertronima_user_DllExport void deserialize(eprosima::fastcdr::Cdr &cdr);  // NOLINT
+  ePcybertronima_user_DllExport void deserialize(
+      eprosima::fastcdr::Cdr &cdr);  // NOLINT
 
   /*!
    * @brief This function returns the maximum serialized size of the Key of an

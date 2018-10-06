@@ -20,13 +20,13 @@
 #include "about_dialog.h"
 #include "composite_item.h"
 
+#include <QColor>
 #include <QList>
 #include <QMainWindow>
 #include <QMutex>
 #include <QPixmap>
 #include <QTimer>
 #include <QVector2D>
-#include <QColor>
 #include <memory>
 
 class QTreeWidgetItem;

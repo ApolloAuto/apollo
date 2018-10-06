@@ -256,7 +256,7 @@ void Screen::ShowRenderMessage(int ch) {
     case 'a':
     case 'A':
     case KEY_BACKSPACE:
-    case KEY_LEFT:{
+    case KEY_LEFT: {
       RenderableMessage* p = current_render_obj_->parent();
       if (p) {
         current_render_obj_ = p;
@@ -270,7 +270,7 @@ void Screen::ShowRenderMessage(int ch) {
     case '\r':
     case 'd':
     case 'D':
-    case KEY_RIGHT:{
+    case KEY_RIGHT: {
       RenderableMessage* child = current_render_obj_->Child(*y);
 
       if (child) {

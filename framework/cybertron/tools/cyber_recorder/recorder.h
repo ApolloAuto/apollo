@@ -52,14 +52,14 @@ class Recorder : public std::enable_shared_from_this<Recorder> {
   bool Stop();
 
  private:
-  bool is_started_;
-  bool is_stopping_;
-  std::shared_ptr<Node> node_;
-  std::shared_ptr<RecordWriter> writer_;
+  bool is_started_ = false;
+  bool is_stopping_ = false;
+  std::shared_ptr<Node> node_ = nullptr;
+  std::shared_ptr<RecordWriter> writer_ = nullptr;
   Connection<const ChangeMsg&> change_conn_;
-  std::vector<std::string> channel_vec_;
   std::string output_;
-  bool all_channels_;
+  bool all_channels_ = true;
+  std::vector<std::string> channel_vec_;
   std::unordered_map<std::string, std::shared_ptr<ReaderBase>>
       channel_reader_map_;
 

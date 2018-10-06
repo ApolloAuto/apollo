@@ -104,8 +104,7 @@ class Client : public ClientBase {
 };
 
 template <typename Request, typename Response>
-void Client<Request, Response>::Destroy() {
-}
+void Client<Request, Response>::Destroy() {}
 
 template <typename Request, typename Response>
 bool Client<Request, Response>::Init() {

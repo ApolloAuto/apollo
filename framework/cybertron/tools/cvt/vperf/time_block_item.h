@@ -17,10 +17,10 @@
 #ifndef TOOLS_CVT_VPERF_TIMEBLOCKITEM_H_
 #define TOOLS_CVT_VPERF_TIMEBLOCKITEM_H_
 
-#include "perf_data_base.h"
 #include <QBrush>
 #include <QGraphicsRectItem>
 #include <QPen>
+#include "perf_data_base.h"
 
 class TimeBlockItem : public QGraphicsRectItem {
  public:

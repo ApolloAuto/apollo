@@ -20,7 +20,6 @@
 
 #include "cybertron/common/log.h"
 
-
 namespace apollo {
 namespace cybertron {
 namespace record {

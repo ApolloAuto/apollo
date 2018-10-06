@@ -44,14 +44,14 @@ class CybertronTopologyMessage : public RenderableMessage {
 
  private:
   CybertronTopologyMessage(const CybertronTopologyMessage&) = delete;
-  CybertronTopologyMessage& operator = (const CybertronTopologyMessage&) = delete;
+  CybertronTopologyMessage& operator=(const CybertronTopologyMessage&) = delete;
 
   void ChangeState(const Screen* s, int key);
 
   enum class SecondColumnType { MessageType, MessageFrameRatio };
   SecondColumnType second_column_;
 
-  int col1_width_; 
+  int col1_width_;
   const std::string& specified_channel_;
   std::map<std::string, ChannelMessage*> all_channels_map_;
 };

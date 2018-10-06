@@ -32,7 +32,8 @@ int main(int argc, char* argv[]) {
       };
 
   auto channelManager =
-      apollo::cybertron::service_discovery::TopologyManager::Instance()->channel_manager();
+      apollo::cybertron::service_discovery::TopologyManager::Instance()
+          ->channel_manager();
 
   channelManager->AddChangeListener(topologyCallback);
 

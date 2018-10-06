@@ -40,20 +40,20 @@ void printHelp(const char* cmdName) {
 
 enum COMMAND {
   TOO_MANY_PARAMETER,
-  HELP, // 2
-  NO_OPTION, // 1
-  CHANNEL // 3 -> 4
+  HELP,       // 2
+  NO_OPTION,  // 1
+  CHANNEL     // 3 -> 4
 };
 
-COMMAND parseOption(int argc,  char* const argv[], std::string& commandVal){
-  if(argc > 4) return TOO_MANY_PARAMETER;
+COMMAND parseOption(int argc, char* const argv[], std::string& commandVal) {
+  if (argc > 4) return TOO_MANY_PARAMETER;
   int index = 1;
-  while(true) {
+  while (true) {
     const char* opt = argv[index];
-    if(opt == nullptr) break;
-    if(strcmp(opt, "-h") == 0) return HELP;
-    if(strcmp(opt, "-c") == 0) {
-      if(argv[index + 1]){
+    if (opt == nullptr) break;
+    if (strcmp(opt, "-h") == 0) return HELP;
+    if (strcmp(opt, "-c") == 0) {
+      if (argv[index + 1]) {
         commandVal = argv[index + 1];
         return CHANNEL;
       }
@@ -65,7 +65,6 @@ COMMAND parseOption(int argc,  char* const argv[], std::string& commandVal){
   return NO_OPTION;
 }
 
-
 }  // namespace
 
 int main(int argc, char* argv[]) {
@@ -73,13 +72,13 @@ int main(int argc, char* argv[]) {
 
   COMMAND com = parseOption(argc, argv, val);
 
-  switch(com){
+  switch (com) {
     case TOO_MANY_PARAMETER:
       std::cout << "Too many paramtes\n";
     case HELP:
       printHelp(argv[0]);
       return 0;
-    
+
     default:;
   }
 

@@ -28,8 +28,7 @@ namespace mainboard {
 
 ModuleController::ModuleController(const ModuleArgument& args) { args_ = args; }
 
-ModuleController::~ModuleController() {
-}
+ModuleController::~ModuleController() {}
 
 bool ModuleController::Init() {
   // std::string process_name = args_.GetProcessName();
