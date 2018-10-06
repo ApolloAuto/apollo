@@ -117,4 +117,4 @@ class Cruisecontrolbuttonsrpt208
 }  // namespace canbus
 }  // namespace apollo
 
-#endif  // MODULES_CANBUS_VEHICL_LEXUS_PROTOCOL_CRUISE_CONTROL_BUTTONS_RPT_208_H_
+#endif  // MODULES_CANBUS_VEHICL_LEXUS_PROTOCOL_CRUISE_CONTROL_BUTTONS_RPT_208_H

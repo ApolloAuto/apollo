@@ -30,7 +30,7 @@ const int32_t Hazardlightscmd114::ID = 0x114;
 Hazardlightscmd114::Hazardlightscmd114() { Reset(); }
 
 uint32_t Hazardlightscmd114::GetPeriod() const {
-  // TODO modify every protocol's period manually
+  // TODO(QiL) modify every protocol's period manually
   static const uint32_t PERIOD = 20 * 1000;
   return PERIOD;
 }
@@ -44,7 +44,7 @@ void Hazardlightscmd114::UpdateData(uint8_t* data) {
 }
 
 void Hazardlightscmd114::Reset() {
-  // TODO you should check this manually
+  // TODO(QiL) you should check this manually
   hazard_lights_cmd_ = false;
   ignore_overrides_ = false;
   clear_override_ = false;
