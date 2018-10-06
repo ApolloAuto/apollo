@@ -26,7 +26,6 @@
 #include <string>
 #include <unordered_map>
 
-
 #include "cybertron/transport/shm/block.h"
 #include "cybertron/transport/shm/shm_conf.h"
 #include "cybertron/transport/shm/state.h"

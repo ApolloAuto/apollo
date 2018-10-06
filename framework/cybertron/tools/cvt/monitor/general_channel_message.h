@@ -51,7 +51,7 @@ class GeneralChannelMessage
 
   void RenderDebugString(const Screen* s, int key, unsigned lineNo);
   void RenderInfo(const Screen* s, int key, unsigned lineNo);
-  
+
   enum class State { ShowDebugString, ShowInfo } current_state_;
 
   google::protobuf::Message* raw_msg_class_;

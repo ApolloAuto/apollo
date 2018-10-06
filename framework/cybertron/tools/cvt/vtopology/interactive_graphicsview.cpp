@@ -70,7 +70,7 @@ void InteractiveGraphicsView::keyPressEvent(QKeyEvent *event) {
     case Qt::Key_Minus:
       zoom_out();
 
- acceptLabel:
+    acceptLabel:
       event->setAccepted(true);
     default:
       QGraphicsView::keyPressEvent(event);
@@ -116,9 +116,9 @@ void InteractiveGraphicsView::zoom_out() { zoom(1 - zoom_delta_); }
 
 void InteractiveGraphicsView::zoom(float scalValue) {
   double factor = transform()
-                     .scale(scalValue, scalValue)
-                     .mapRect(QRectF(0, 0, 1, 1))
-                     .width();
+                      .scale(scalValue, scalValue)
+                      .mapRect(QRectF(0, 0, 1, 1))
+                      .width();
   if (factor < 0.07 || factor > 100) return;
 
   scale(scalValue, scalValue);

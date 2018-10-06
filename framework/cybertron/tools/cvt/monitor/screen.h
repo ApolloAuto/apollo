@@ -52,8 +52,8 @@ class Screen final {
 
   void AddStr(int x, int y, ColorPair color, const char* cStr) const;
 
-  ColorPair Color(void)const{ return current_color_pair_; }
-  void SetCurrentColor(ColorPair color)const;
+  ColorPair Color(void) const { return current_color_pair_; }
+  void SetCurrentColor(ColorPair color) const;
   void AddStr(int x, int y, const char* str) const;
   void AddStr(const char* str) const;
   void MoveOffsetXY(int offsetX, int offsetY) const;

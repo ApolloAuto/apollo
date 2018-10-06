@@ -89,7 +89,9 @@ void GeneralMessageBase::PrintMessage(GeneralMessageBase* baseMsg,
   }
 
   for (std::size_t i = 0; i < fields.size(); ++i) {
-    if(lineNo > s->Height()) { break; }
+    if (lineNo > s->Height()) {
+      break;
+    }
     const google::protobuf::FieldDescriptor* field = fields[i];
     if (field->is_repeated()) {
       if (jumpLines) {
@@ -99,7 +101,8 @@ void GeneralMessageBase::PrintMessage(GeneralMessageBase* baseMsg,
         const std::string& fieldName = field->name();
         outStr << fieldName << ": ";
         outStr << "+[" << reflection->FieldSize(msg, field) << " items ]";
-        GeneralMessage* item = new GeneralMessage(baseMsg, &msg, reflection, field);
+        GeneralMessage* item =
+            new GeneralMessage(baseMsg, &msg, reflection, field);
         if (item) {
           baseMsg->insertRepeatedMessage(lineNo, item);
         }

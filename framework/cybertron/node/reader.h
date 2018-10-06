@@ -78,9 +78,9 @@ class Reader : public ReaderBase {
   virtual Iterator End() const { return observed_queue_.end(); }
 
  protected:
-  double latest_recv_time_sec_;
-  double second_to_lastest_recv_time_sec_;
-  uint32_t pending_queue_size_;
+  double latest_recv_time_sec_ = -1.0;
+  double second_to_lastest_recv_time_sec_ = -1.0;
+  uint32_t pending_queue_size_ = DEFAULT_PENDING_QUEUE_SIZE;
 
  private:
   void JoinTheTopology();
@@ -88,11 +88,11 @@ class Reader : public ReaderBase {
   void OnChannelChange(const proto::ChangeMsg& change_msg);
 
   CallbackFunc<MessageT> reader_func_;
-  ReceiverPtr receiver_;
+  ReceiverPtr receiver_ = nullptr;
   std::string croutine_name_;
 
   ChangeConnection change_conn_;
-  service_discovery::ChannelManagerPtr channel_manager_;
+  service_discovery::ChannelManagerPtr channel_manager_ = nullptr;
 
   mutable std::mutex mutex_;
   uint32_t history_depth_;
@@ -105,13 +105,7 @@ Reader<MessageT>::Reader(const proto::RoleAttributes& role_attr,
                          const CallbackFunc<MessageT>& reader_func,
                          uint32_t pending_queue_size)
     : ReaderBase(role_attr),
-      latest_recv_time_sec_(-1.0),
-      second_to_lastest_recv_time_sec_(-1.0),
       reader_func_(reader_func),
-      receiver_(nullptr),
-      croutine_name_(""),
-      pending_queue_size_(pending_queue_size),
-      channel_manager_(nullptr),
       history_depth_(role_attr.qos_profile().depth()) {}
 
 template <typename MessageT>

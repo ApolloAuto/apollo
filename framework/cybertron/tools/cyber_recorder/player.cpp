@@ -23,10 +23,10 @@ namespace record {
 TimedPlayer::TimedPlayer(std::shared_ptr<Writer<RawMessage>>& writer,
                          const std::shared_ptr<RawMessage>& raw_message,
                          uint64_t real_time, uint64_t play_time)
-    : writer_(writer),
-      raw_message_(raw_message),
-      real_time_(real_time),
-      play_time_(play_time) {}
+    : real_time_(real_time),
+      play_time_(play_time),
+      writer_(writer),
+      raw_message_(raw_message) {}
 
 TimedPlayer::~TimedPlayer() {}
 
@@ -51,11 +51,11 @@ Player::Player(const std::string& file, bool all_channels,
                bool looped_playback, float rate, uint64_t begin_time,
                uint64_t end_time, uint64_t start_seconds,
                uint64_t delay_seconds)
-    : file_(file),
-      all_channels_(all_channels),
-      channel_vec_(channel_vec),
+    : all_channels_(all_channels),
       looped_playback_(looped_playback),
+      file_(file),
       rate_(rate),
+      channel_vec_(channel_vec),
       begin_time_(begin_time),
       end_time_(end_time),
       start_seconds_(start_seconds),
@@ -175,8 +175,9 @@ bool Player::InitWriters() {
     std::string channel_name = pair.first;
     std::string message_type = pair.second;
 
-    if (all_channels_ || std::find(channel_vec_.begin(), channel_vec_.end(),
-                                   channel_name) != channel_vec_.end()) {
+    if (all_channels_ ||
+        std::find(channel_vec_.begin(), channel_vec_.end(), channel_name) !=
+            channel_vec_.end()) {
       RoleAttributes role_attributes;
       role_attributes.set_channel_name(channel_name);
       role_attributes.set_message_type(message_type);
@@ -391,7 +392,6 @@ bool Player::Start() {
 
   uint64_t base_tw_time = 0;                          // in nanosecond
   uint64_t pause_time = 0;                            // in nanosecond
-  uint64_t period_time = Time::Now().ToNanosecond();  // in nanosecond
 
   std::thread progress_thread([this] {
     while (::apollo::cybertron::OK()) {
