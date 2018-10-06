@@ -409,6 +409,7 @@ function citest_basic() {
   JOB_ARG="--jobs=$(nproc) --ram_utilization_factor 80"
 
   echo "$BUILD_TARGETS" | grep "modules\/" | grep "test" \
+          | grep -v "planning\/" \
           | grep -v "dreamview\/" \
           | grep -v "drivers\/" \
           | grep -v "blob_test" \
