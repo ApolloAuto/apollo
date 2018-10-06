@@ -99,8 +99,8 @@ bool ModuleController::LoadModule(const DagConfig& dag_config) {
 
     class_loader_manager_.LoadLibrary(load_path);
 
-    for (auto component : module_config.components()) {
-      const std::string class_name = component.class_name();
+    for (auto& component : module_config.components()) {
+      const std::string& class_name = component.class_name();
       std::shared_ptr<ComponentBase> base =
           class_loader_manager_.CreateClassObj<ComponentBase>(class_name);
       if (base == nullptr) {
@@ -113,8 +113,8 @@ bool ModuleController::LoadModule(const DagConfig& dag_config) {
       component_list_.emplace_back(std::move(base));
     }
 
-    for (auto component : module_config.timer_components()) {
-      const std::string class_name = component.class_name();
+    for (auto& component : module_config.timer_components()) {
+      const std::string& class_name = component.class_name();
       std::shared_ptr<ComponentBase> base =
           class_loader_manager_.CreateClassObj<ComponentBase>(class_name);
       if (base == nullptr) {
