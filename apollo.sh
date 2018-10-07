@@ -418,10 +418,11 @@ function citest_basic() {
   JOB_ARG="--jobs=$(nproc) --ram_utilization_factor 80"
 
   echo "$BUILD_TARGETS" | grep "modules\/" | grep "test" \
-          | grep -v "planning\/" \
-          | grep -v "prediction\/" \
-          | grep -v "control\/" \
-          | grep -v "common\/" \
+          | grep -v "modules\/integration_test" \
+          | grep -v "modules\/planning" \
+          | grep -v "modules\/prediction" \
+          | grep -v "modules\/control" \
+          | grep -v "modules\/common" \
           | grep -v "can_client" \
           | grep -v "blob_test" \
           | grep -v "syncedmem_test" | grep -v "blob_test" \
@@ -447,7 +448,8 @@ function citest_extended() {
   source framework/cybertron/setup.bash
 
   BUILD_TARGETS="
-    `bazel query //modules/planning/... union //framework/... union //modules/prediction/... union //modules/control/... union //modules/common/...`
+    `bazel query //modules/planning/... union //modules/common/... union //modules/integration_test/...`
+    `bazel query //modules/prediction/... union //modules/control/...`
   "
 
   JOB_ARG="--jobs=$(nproc) --ram_utilization_factor 80"
