@@ -23,11 +23,7 @@ namespace apollo {
 namespace planning {
 
 std::unique_ptr<Planner> StdPlannerDispatcher::DispatchPlanner() {
-  PlanningConfig planning_config;
-  apollo::common::util::GetProtoFromFile(FLAGS_planning_config_file,
-      &planning_config);
-  return planner_factory_.CreateObject(
-      planning_config.standard_planning_config().planner_type(0));
+  return planner_factory_.CreateObject(LATTICE);
 }
 
 }  // namespace planning
