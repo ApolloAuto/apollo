@@ -28,6 +28,7 @@
 
 #include "qpOASES.hpp"
 
+#include "modules/common/proto/pnc_point.pb.h"
 #include "modules/planning/lattice/trajectory1d/piecewise_jerk_trajectory1d.h"
 
 namespace apollo {
@@ -44,6 +45,7 @@ class LateralQPOptimizer {
       const std::vector<std::pair<double, double>>& d_bounds) = 0;
 
   virtual PiecewiseJerkTrajectory1d GetOptimalTrajectory() const;
+  virtual std::vector<common::FrenetFramePoint> GetFrenetFramePath() const;
 
  protected:
   double delta_s_ = 0.0;
