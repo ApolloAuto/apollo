@@ -37,7 +37,6 @@ namespace planning {
 
 using apollo::common::SLPoint;
 using apollo::common::Status;
-using apollo::common::math::CartesianFrenetConverter;
 using apollo::common::util::MakeSLPoint;
 
 void WaypointSampler::Init(

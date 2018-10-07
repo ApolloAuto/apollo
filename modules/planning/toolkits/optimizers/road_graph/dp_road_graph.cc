@@ -70,12 +70,7 @@ bool DpRoadGraph::FindPathTunnel(
            << init_point.DebugString();
     return false;
   }
-
-  if (!CalculateFrenetPoint(init_point_, &init_frenet_frame_point_)) {
-    AERROR << "Fail to create init_frenet_frame_point_ from : "
-           << init_point_.DebugString();
-    return false;
-  }
+  init_frenet_frame_point_ = reference_line_.GetFrenetPoint(init_point_);
 
   waypoint_sampler_->Init(&reference_line_info_, init_sl_point_,
                           init_frenet_frame_point_);
@@ -259,39 +254,6 @@ void DpRoadGraph::UpdateNode(const std::shared_ptr<RoadGraphMessage> &msg) {
         msg->total_level);
     msg->cur_node->UpdateCost(msg->front, curve, cost);
   }
-}
-
-bool DpRoadGraph::CalculateFrenetPoint(
-    const common::TrajectoryPoint &traj_point,
-    common::FrenetFramePoint *const frenet_frame_point) {
-  common::SLPoint sl_point;
-  if (!reference_line_.XYToSL(
-          {traj_point.path_point().x(), traj_point.path_point().y()},
-          &sl_point)) {
-    return false;
-  }
-  frenet_frame_point->set_s(sl_point.s());
-  frenet_frame_point->set_l(sl_point.l());
-
-  const float theta = traj_point.path_point().theta();
-  const float kappa = traj_point.path_point().kappa();
-  const float l = frenet_frame_point->l();
-
-  ReferencePoint ref_point;
-  ref_point = reference_line_.GetReferencePoint(frenet_frame_point->s());
-
-  const float theta_ref = ref_point.heading();
-  const float kappa_ref = ref_point.kappa();
-  const float dkappa_ref = ref_point.dkappa();
-
-  const float dl = CartesianFrenetConverter::CalculateLateralDerivative(
-      theta_ref, theta, l, kappa_ref);
-  const float ddl =
-      CartesianFrenetConverter::CalculateSecondOrderLateralDerivative(
-          theta_ref, theta, kappa_ref, kappa, dkappa_ref, l);
-  frenet_frame_point->set_dl(dl);
-  frenet_frame_point->set_ddl(ddl);
-  return true;
 }
 
 bool DpRoadGraph::IsValidCurve(const QuinticPolynomialCurve1d &curve) const {

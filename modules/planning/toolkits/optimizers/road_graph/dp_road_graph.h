@@ -101,9 +101,6 @@ class DpRoadGraph {
   bool GenerateMinCostPath(const std::vector<const PathObstacle *> &obstacles,
                            std::vector<DpRoadGraphNode> *min_cost_path);
 
-  bool CalculateFrenetPoint(const common::TrajectoryPoint &traj_point,
-                            common::FrenetFramePoint *const frenet_frame_point);
-
   bool IsValidCurve(const QuinticPolynomialCurve1d &curve) const;
 
   void GetCurveCost(TrajectoryCost trajectory_cost,
