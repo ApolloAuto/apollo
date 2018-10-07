@@ -13,14 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include "i_ground.h"
-#include <algorithm>
+#include <iostream>
+#include <cassert>
 #include <cfloat>
 #include <cmath>
-#include <iostream>
+#include <algorithm>
+#include <utility>
+#include "modules/perception/common/i_lib/pc/i_ground.h"
 
-namespace idl {
-void PlaneFitGroundDetectorParam::set_default() {
+namespace apollo {
+namespace perception {
+namespace common {
+void PlaneFitGroundDetectorParam::SetDefault() {
   nr_points_max = 320000;  // assume max 320000 points
   nr_grids_fine = 256;     // must be 2 and above
   nr_grids_coarse = 16;    // must be 2 and above
@@ -29,8 +33,8 @@ void PlaneFitGroundDetectorParam::set_default() {
   nr_inliers_min_threshold = 8;
   nr_samples_min_threshold = 128;
   nr_samples_max_threshold = 1024;
-  sample_region_z_lower = -3.0f;  //-3.0m
-  sample_region_z_upper = -1.0f;  //-1.0m
+  sample_region_z_lower = -3.0f;  // -3.0m
+  sample_region_z_upper = -1.0f;  // -1.0m
   roi_region_rad_x = 72.0f;       // 72.0f
   roi_region_rad_y = 72.0f;       // 72.0f
   roi_region_rad_z = 10.0f;
@@ -45,7 +49,7 @@ void PlaneFitGroundDetectorParam::set_default() {
   nr_smooth_iter = 1;
 }
 
-bool PlaneFitGroundDetectorParam::validate() const {
+bool PlaneFitGroundDetectorParam::Validate() const {
   if (nr_grids_coarse < 2 || nr_grids_fine < 2 ||
       nr_grids_coarse > nr_grids_fine || nr_points_max == 0 ||
       nr_samples_min_threshold == 0 || nr_samples_max_threshold == 0 ||
@@ -59,19 +63,21 @@ bool PlaneFitGroundDetectorParam::validate() const {
   return true;
 }
 
-int PlaneFitPointCandIndices::prune(unsigned int min_nr_samples,
+int PlaneFitPointCandIndices::Prune(unsigned int min_nr_samples,
                                     unsigned int max_nr_samples) {
-  CHECK_LT(min_nr_samples, max_nr_samples);
+  assert(min_nr_samples < max_nr_samples);
   unsigned int size = indices.size();
   unsigned int half = 0;
   if (size > max_nr_samples) {
-    i_randomized_shuffle1(indices.data(), (int)indices.size(), random_seed);
-    // i_random_sample(indices.data(), max_nr_samples, (int)size, random_seed);
+    IRandomizedShuffle1(indices.data(), static_cast<int>(indices.size()),
+                        &random_seed);
+    // IRandomSample(indices.Data(), max_nr_samples, static_cast<int>Size,
+    // random_seed);
     // for (int i = 0; i < max_nr_samples; ++i) {
-    //    int j = indices[i];
-    //    //i <= j forever;
-    //    indices[i] = indices[j];
-    //}
+    //     int j = indices[i];
+    //     // i <= j forever;
+    //     indices[i] = indices[j];
+    // }
     indices.resize(max_nr_samples);
   } else {
     if (size > min_nr_samples) {
@@ -80,214 +86,218 @@ int PlaneFitPointCandIndices::prune(unsigned int min_nr_samples,
         half = half >> 1;
       }
       size = half << 1;
-      i_randomized_shuffle1(indices.data(), (int)indices.size(), random_seed);
+      IRandomizedShuffle1(indices.data(), static_cast<int>(indices.size()),
+                          &random_seed);
       indices.resize(size);
     }
   }
-  return (int)indices.size();
+  return static_cast<int>(indices.size());
 }
 
 PlaneFitGroundDetector::PlaneFitGroundDetector(
     const PlaneFitGroundDetectorParam &param)
     : BaseGroundDetector(param) {
-  bool is_initialized = init();
-  CHECK(is_initialized);
+  bool is_initialized = Init();
+  assert(is_initialized);
 }
 
-PlaneFitGroundDetector::~PlaneFitGroundDetector() { cleanup(); }
+PlaneFitGroundDetector::~PlaneFitGroundDetector() { CleanUp(); }
 
-// init the order lookup table
-void PlaneFitGroundDetector::init_order_table(const VoxelGridXY<float> *vg,
-                                              std::pair<int, int> *order) {
-  std::vector<std::pair<float, int>> map_dist;
+// Init the order lookup table
+void PlaneFitGroundDetector::InitOrderTable(const VoxelGridXY<float> *vg,
+                                            std::pair<int, int> *order) {
+  std::vector<std::pair<float, int> > map_dist;
   float cx = 0.f;
   float cy = 0.f;
   float dist2 = 0.f;
   float radius = 0.f;
   unsigned int i = 0;
   int id = 0;
-  for (i = 0; i < vg->nr_voxel(); ++i) {
-    const auto &voxel = vg->get_const_voxels()[i];
-    radius = voxel._dim_x * 0.5;
-    cx = voxel._v[0] + radius;
-    cy = voxel._v[1] + radius;
+  for (i = 0; i < vg->NrVoxel(); ++i) {
+    const auto &voxel = vg->GetConstVoxels()[i];
+    radius = voxel.dim_x_ * 0.5;
+    cx = voxel.v_[0] + radius;
+    cy = voxel.v_[1] + radius;
     dist2 = cx * cx + cy * cy;
     map_dist.push_back(std::pair<float, int>(dist2, i));
   }
   sort(map_dist.begin(), map_dist.end(),
-       [](const std::pair<float, int> &a, const std::pair<float, int> &b) {
-         return a.first < b.first;
-       });
+       [](const std::pair<float, int> & a, const std::pair<float, int> & b) {
+    return a.first < b.first;
+  });
   for (i = 0; i < map_dist.size(); ++i) {
     id = map_dist[i].second;
-    const auto &voxel = vg->get_const_voxels()[id];
-    order[i].first = voxel._iy;
-    order[i].second = voxel._ix;
+    const auto &voxel = vg->GetConstVoxels()[id];
+    order[i].first = voxel.iy_;
+    order[i].second = voxel.ix_;
   }
 }
 
-bool PlaneFitGroundDetector::init() {
+bool PlaneFitGroundDetector::Init() {
   unsigned int r = 0;
   unsigned int c = 0;
   unsigned int pr = 0;
   unsigned int pc = 0;
   unsigned int index = 0;
   unsigned int capacity = 0;
-  unsigned int sf = _param.nr_grids_fine / _param.nr_grids_coarse;
-  if (!_param.validate()) {
+  unsigned int sf = param_.nr_grids_fine / param_.nr_grids_coarse;
+  if (!param_.Validate()) {
     return false;
   }
   // fine grid:
-  _vg_fine = new VoxelGridXY<float>();
-  if (_vg_fine == nullptr) {
+  vg_fine_ = new VoxelGridXY<float>();
+  if (vg_fine_ == nullptr) {
     return false;
   }
-  if (!_vg_fine->alloc(_param.nr_grids_fine, _param.nr_grids_fine,
-                       -_param.roi_region_rad_x, _param.roi_region_rad_x,
-                       -_param.roi_region_rad_y, _param.roi_region_rad_y,
-                       -_param.roi_region_rad_z, _param.roi_region_rad_z)) {
+  if (!vg_fine_->Alloc(param_.nr_grids_fine, param_.nr_grids_fine,
+                       -param_.roi_region_rad_x, param_.roi_region_rad_x,
+                       -param_.roi_region_rad_y, param_.roi_region_rad_y,
+                       -param_.roi_region_rad_z, param_.roi_region_rad_z)) {
     return false;
   }
   // coarse grid:
-  _vg_coarse = new VoxelGridXY<float>();
-  if (_vg_coarse == nullptr) {
+  vg_coarse_ = new VoxelGridXY<float>();
+  if (vg_coarse_ == nullptr) {
     return false;
   }
-  if (!_vg_coarse->alloc(_param.nr_grids_coarse, _param.nr_grids_coarse,
-                         -_param.roi_region_rad_x, _param.roi_region_rad_x,
-                         -_param.roi_region_rad_y, _param.roi_region_rad_y,
-                         -_param.roi_region_rad_z, _param.roi_region_rad_z)) {
+  if (!vg_coarse_->Alloc(param_.nr_grids_coarse, param_.nr_grids_coarse,
+                         -param_.roi_region_rad_x, param_.roi_region_rad_x,
+                         -param_.roi_region_rad_y, param_.roi_region_rad_y,
+                         -param_.roi_region_rad_z, param_.roi_region_rad_z)) {
     return false;
   }
 
-  // init order lookup table
-  _order_table = i_alloc<std::pair<int, int>>(_vg_fine->nr_voxel());
-  init_order_table(_vg_coarse, _order_table);
+  // Init order lookup table
+  order_table_ = IAlloc<std::pair<int, int> >(vg_fine_->NrVoxel());
+  InitOrderTable(vg_coarse_, order_table_);
 
   // ground plane:
-  _ground_planes = i_alloc2<GroundPlaneLiDAR>(_param.nr_grids_coarse,
-                                              _param.nr_grids_coarse);
-  if (!_ground_planes) {
+  ground_planes_ =
+      IAlloc2<GroundPlaneLiDAR>(param_.nr_grids_coarse, param_.nr_grids_coarse);
+  if (!ground_planes_) {
     return false;
   }
-  _ground_planes_sphe = i_alloc2<GroundPlaneSpherical>(_param.nr_grids_coarse,
-                                                       _param.nr_grids_coarse);
-  if (!_ground_planes_sphe) {
+  ground_planes_sphe_ = IAlloc2<GroundPlaneSpherical>(param_.nr_grids_coarse,
+                                                      param_.nr_grids_coarse);
+  if (!ground_planes_sphe_) {
     return false;
   }
-  _ground_z = i_alloc2<std::pair<float, bool>>(_param.nr_grids_coarse,
-                                               _param.nr_grids_coarse);
-  if (!_ground_z) {
+  ground_z_ = IAlloc2<std::pair<float, bool> >(param_.nr_grids_coarse,
+                                               param_.nr_grids_coarse);
+  if (!ground_z_) {
     return false;
   }
   // sample candis:
-  _local_candis = i_alloc2<PlaneFitPointCandIndices>(_param.nr_grids_coarse,
-                                                     _param.nr_grids_coarse);
-  if (!_local_candis) {
+  local_candis_ = IAlloc2<PlaneFitPointCandIndices>(param_.nr_grids_coarse,
+                                                    param_.nr_grids_coarse);
+  if (!local_candis_) {
     return false;
   }
-  // reserve space to avoid runtime memory re-allocation
-  for (r = 0; r < _param.nr_grids_coarse; ++r) {
-    for (c = 0; c < _param.nr_grids_coarse; ++c) {
-      if (r < (_param.nr_grids_coarse << 3) &&
-          c < (_param.nr_grids_coarse << 3)) {
+  // Reserve space to avoid runtime memory re-allocation
+  for (r = 0; r < param_.nr_grids_coarse; ++r) {
+    for (c = 0; c < param_.nr_grids_coarse; ++c) {
+      if (r < (param_.nr_grids_coarse << 3) &&
+          c < (param_.nr_grids_coarse << 3)) {
         capacity = 16384;
-      } else if (r < (_param.nr_grids_coarse << 2) &&
-                 c < (_param.nr_grids_coarse << 2)) {
+      } else if (r < (param_.nr_grids_coarse << 2) &&
+                 c < (param_.nr_grids_coarse << 2)) {
         capacity = 8192;
-      } else if (r < (_param.nr_grids_coarse << 1) &&
-                 c < (_param.nr_grids_coarse << 1)) {
+      } else if (r < (param_.nr_grids_coarse << 1) &&
+                 c < (param_.nr_grids_coarse << 1)) {
         capacity = 4096;
       } else {
         capacity = 512;
       }
-      _local_candis[r][c].reserve(capacity);
+      local_candis_[r][c].Reserve(capacity);
     }
   }
   // threeds in ransac, in inhomogeneous coordinates:
-  _pf_threeds =
-      i_alloc_aligned<float>(_param.nr_samples_max_threshold * _dim_point, 4);
-  if (!_pf_threeds) {
+  pf_threeds_ =
+      IAllocAligned<float>(param_.nr_samples_max_threshold * dim_point_, 4);
+  if (!pf_threeds_) {
     return false;
   }
-  memset((void *)_pf_threeds, 0,
-         _param.nr_samples_max_threshold * _dim_point * sizeof(float));
+  memset(reinterpret_cast<void *>(pf_threeds_), 0,
+         param_.nr_samples_max_threshold * dim_point_ * sizeof(float));
   // labels:
-  _labels = i_alloc_aligned<char>(_param.nr_points_max, 4);
-  if (!_labels) {
+  labels_ = IAllocAligned<char>(param_.nr_points_max, 4);
+  if (!labels_) {
     return false;
   }
-  memset((void *)_labels, 0, _param.nr_points_max * sizeof(char));
+  memset(reinterpret_cast<void *>(labels_), 0,
+         param_.nr_points_max * sizeof(char));
   // map of fine grid id to coarse id:
-  _map_fine_to_coarse = i_alloc_aligned<unsigned int>(
-      _param.nr_grids_fine * _param.nr_grids_fine, 4);
-  if (!_map_fine_to_coarse) {
+  map_fine_to_coarse_ = IAllocAligned<unsigned int>(
+      param_.nr_grids_fine * param_.nr_grids_fine, 4);
+  if (!map_fine_to_coarse_) {
     return false;
   }
-  for (r = 0; r < _param.nr_grids_fine; ++r) {
+  for (r = 0; r < param_.nr_grids_fine; ++r) {
     pr = r / sf;
-    index = r * _param.nr_grids_fine;
-    for (c = 0; c < _param.nr_grids_fine; ++c) {
+    index = r * param_.nr_grids_fine;
+    for (c = 0; c < param_.nr_grids_fine; ++c) {
       pc = c / sf;
-      _map_fine_to_coarse[index + c] = pr * _param.nr_grids_coarse + pc;
+      map_fine_to_coarse_[index + c] = pr * param_.nr_grids_coarse + pc;
     }
   }
   // ransac memory:
-  _sampled_z_values = i_alloc_aligned<float>(_param.nr_z_comp_candis, 4);
-  if (!_sampled_z_values) {
+  sampled_z_values_ = IAllocAligned<float>(param_.nr_z_comp_candis, 4);
+  if (!sampled_z_values_) {
     return false;
   }
-  memset((void *)_sampled_z_values, 0, _param.nr_z_comp_candis * sizeof(float));
+  memset(reinterpret_cast<void *>(sampled_z_values_), 0,
+         param_.nr_z_comp_candis * sizeof(float));
   // ransac memory:
-  _sampled_indices = i_alloc_aligned<int>(_param.nr_z_comp_candis, 4);
-  if (!_sampled_indices) {
+  sampled_indices_ = IAllocAligned<int>(param_.nr_z_comp_candis, 4);
+  if (!sampled_indices_) {
     return false;
   }
-  memset((void *)_sampled_indices, 0, _param.nr_z_comp_candis * sizeof(int));
+  memset(reinterpret_cast<void *>(sampled_indices_), 0,
+         param_.nr_z_comp_candis * sizeof(int));
   // ransac thresholds:
-  _pf_thresholds =
-      i_alloc2<float>(_param.nr_grids_coarse, _param.nr_grids_coarse);
-  if (!_pf_thresholds) {
+  pf_thresholds_ =
+      IAlloc2<float>(param_.nr_grids_coarse, param_.nr_grids_coarse);
+  if (!pf_thresholds_) {
     return false;
   }
   // compute thresholds
-  compute_adaptive_threshold();
+  ComputeAdaptiveThreshold();
   return true;
 }
 
-void PlaneFitGroundDetector::cleanup() {
-  if (_vg_fine) {
-    delete _vg_fine;
+void PlaneFitGroundDetector::CleanUp() {
+  if (vg_fine_) {
+    delete vg_fine_;
   }
-  if (_vg_coarse) {
-    delete _vg_coarse;
+  if (vg_coarse_) {
+    delete vg_coarse_;
   }
-  i_free2<GroundPlaneLiDAR>(_ground_planes);
-  i_free2<GroundPlaneSpherical>(_ground_planes_sphe);
-  i_free2<std::pair<float, bool>>(_ground_z);
-  i_free2<PlaneFitPointCandIndices>(_local_candis);
-  i_free_aligned<float>(_pf_threeds);
-  i_free_aligned<char>(_labels);
-  i_free_aligned<unsigned int>(_map_fine_to_coarse);
-  i_free_aligned<float>(_sampled_z_values);
-  i_free_aligned<int>(_sampled_indices);
-  i_free2<float>(_pf_thresholds);
-  i_free<std::pair<int, int>>(_order_table);
+  IFree2<GroundPlaneLiDAR>(&ground_planes_);
+  IFree2<GroundPlaneSpherical>(&ground_planes_sphe_);
+  IFree2<std::pair<float, bool> >(&ground_z_);
+  IFree2<PlaneFitPointCandIndices>(&local_candis_);
+  IFreeAligned<float>(&pf_threeds_);
+  IFreeAligned<char>(&labels_);
+  IFreeAligned<unsigned int>(&map_fine_to_coarse_);
+  IFreeAligned<float>(&sampled_z_values_);
+  IFreeAligned<int>(&sampled_indices_);
+  IFree2<float>(&pf_thresholds_);
+  IFree<std::pair<int, int> >(&order_table_);
 }
 
-int PlaneFitGroundDetector::compare_z(const float *point_cloud,
-                                      const std::vector<int> &indices,
-                                      const float *z_values,
-                                      PlaneFitPointCandIndices &candi,
-                                      unsigned int nr_points,
-                                      unsigned int nr_point_element,
-                                      unsigned int nr_compares) {
+int PlaneFitGroundDetector::CompareZ(const float *point_cloud,
+                                     const std::vector<int> &indices,
+                                     const float *z_values,
+                                     PlaneFitPointCandIndices *candi,
+                                     unsigned int nr_points,
+                                     unsigned int nr_point_element,
+                                     unsigned int nr_compares) {
   int pos = 0;
   int nr_candis = 0;
   unsigned int i = 0;
   unsigned int nr_contradi = 0;
   unsigned int nr_z_comp_fail_threshold =
-      i_min(_param.nr_z_comp_fail_threshold, (unsigned int)(nr_compares >> 1));
+      IMin(param_.nr_z_comp_fail_threshold, (unsigned int)(nr_compares >> 1));
   const float *ptr = nullptr;
   float z = 0;
   float delta_z = 0;
@@ -295,23 +305,23 @@ int PlaneFitGroundDetector::compare_z(const float *point_cloud,
   while (iter < indices.cend()) {
     nr_contradi = 0;
     pos = *iter++;
-    CHECK_LT(pos, (int)nr_points);
+    assert(pos < static_cast<int>(nr_points));
     nr_contradi = 0;
-    // requires the Z element to be in the third position, i.e., after X, Y
+    //  requires the Z element to be in the third position, i.e., after X, Y
     ptr = point_cloud + (pos * nr_point_element);
     z = ptr[2];
     // for near range check valid height
-    if (i_abs(ptr[0]) < _param.roi_near_rad &&
-        i_abs(ptr[1]) < _param.roi_near_rad) {
-      if (z < _param.sample_region_z_lower ||
-          z > _param.sample_region_z_upper) {
+    if (IAbs(ptr[0]) < param_.roi_near_rad &&
+        IAbs(ptr[1]) < param_.roi_near_rad) {
+      if (z < param_.sample_region_z_lower ||
+          z > param_.sample_region_z_upper) {
         continue;
       }
     }
     if (nr_compares > nr_z_comp_fail_threshold) {
       for (i = 0; i < nr_compares; ++i) {
-        delta_z = i_abs(z_values[i] - z);
-        if (delta_z > _param.planefit_filter_threshold) {
+        delta_z = IAbs(z_values[i] - z);
+        if (delta_z > param_.planefit_filter_threshold) {
           nr_contradi++;
           if (nr_contradi > nr_z_comp_fail_threshold) {
             break;
@@ -320,15 +330,15 @@ int PlaneFitGroundDetector::compare_z(const float *point_cloud,
       }
     }
     if (nr_contradi <= nr_z_comp_fail_threshold) {
-      _labels[pos] = 1;
-      candi.push_index(pos);
+      labels_[pos] = 1;
+      candi->PushIndex(pos);
       nr_candis++;
     }
   }
   return nr_candis;
 }
 
-void PlaneFitGroundDetector::compute_adaptive_threshold() {
+void PlaneFitGroundDetector::ComputeAdaptiveThreshold() {
   unsigned int r = 0;
   unsigned int c = 0;
   float dr = 0;
@@ -338,70 +348,69 @@ void PlaneFitGroundDetector::compute_adaptive_threshold() {
   float min_dist = 0;
   float max_dist = 0;
   float thre = 0;
-  float grid_rad = (float)(_param.nr_grids_coarse - 1) / 2;
-  CHECK_NOTNULL(_pf_thresholds);
-  for (r = 0; r < _param.nr_grids_coarse; ++r) {
-    dr = (float)r - grid_rad;
+  float grid_rad = static_cast<float>(param_.nr_grids_coarse - 1) / 2;
+  assert(pf_thresholds_ != nullptr);
+  for (r = 0; r < param_.nr_grids_coarse; ++r) {
+    dr = static_cast<float>(r) - grid_rad;
     dr *= dr;
-    for (c = 0; c < _param.nr_grids_coarse; ++c) {
-      dc = (float)c - grid_rad;
+    for (c = 0; c < param_.nr_grids_coarse; ++c) {
+      dc = static_cast<float>(c) - grid_rad;
       dc *= dc;
       // store to center distance:
-      _pf_thresholds[r][c] = i_sqrt(dr + dc);
+      pf_thresholds_[r][c] = ISqrt(dr + dc);
     }
   }
-  i_min_max_elements(_pf_thresholds[0],
-                     _param.nr_grids_coarse * _param.nr_grids_coarse, min_dist,
-                     max_dist);
+  IMinMaxElements(pf_thresholds_[0],
+                  param_.nr_grids_coarse * param_.nr_grids_coarse, &min_dist,
+                  &max_dist);
   if (max_dist - min_dist < Constant<float>::EPSILON()) {
-    thre = (_param.planefit_dist_threshold_near +
-            _param.planefit_dist_threshold_far) /
-           2;
-    for (r = 0; r < _param.nr_grids_coarse; ++r) {
-      for (c = 0; c < _param.nr_grids_coarse; ++c) {
-        _pf_thresholds[r][c] = thre;
+    thre = (param_.planefit_dist_threshold_near +
+            param_.planefit_dist_threshold_far) / 2;
+    for (r = 0; r < param_.nr_grids_coarse; ++r) {
+      for (c = 0; c < param_.nr_grids_coarse; ++c) {
+        pf_thresholds_[r][c] = thre;
       }
     }
   } else {
-    k = _param.planefit_dist_threshold_far -
-        _param.planefit_dist_threshold_near;
+    k = param_.planefit_dist_threshold_far -
+        param_.planefit_dist_threshold_near;
     k = k / (max_dist - min_dist);
-    b = _param.planefit_dist_threshold_far +
-        _param.planefit_dist_threshold_near;
+    b = param_.planefit_dist_threshold_far +
+        param_.planefit_dist_threshold_near;
     b = (b - k * (min_dist + max_dist)) / 2;
-    for (r = 0; r < _param.nr_grids_coarse; ++r) {
-      for (c = 0; c < _param.nr_grids_coarse; ++c) {
-        thre = k * _pf_thresholds[r][c] + b;
-        _pf_thresholds[r][c] = thre;
+    for (r = 0; r < param_.nr_grids_coarse; ++r) {
+      for (c = 0; c < param_.nr_grids_coarse; ++c) {
+        thre = k * pf_thresholds_[r][c] + b;
+        pf_thresholds_[r][c] = thre;
       }
     }
   }
 }
 
-void PlaneFitGroundDetector::compute_signed_ground_height(
+void PlaneFitGroundDetector::ComputeSignedGroundHeight(
     const float *point_cloud, float *height_above_ground,
     unsigned int nr_points, unsigned int nr_point_elements) {
   unsigned int r = 0;
-  unsigned int nm1 = _param.nr_grids_coarse - 1;
+  unsigned int nm1 = param_.nr_grids_coarse - 1;
   for (r = 0; r < nr_points; ++r) {
     height_above_ground[r] = FLT_MAX;
   }
-  compute_signed_ground_height_line(
-      point_cloud, _ground_planes[0], _ground_planes[0], _ground_planes[1],
+  ComputeSignedGroundHeightLine(
+      point_cloud, ground_planes_[0], ground_planes_[0], ground_planes_[1],
       height_above_ground, 0, nr_points, nr_point_elements);
   for (r = 1; r < nm1; ++r) {
-    compute_signed_ground_height_line(point_cloud, _ground_planes[r - 1],
-                                      _ground_planes[r], _ground_planes[r + 1],
-                                      height_above_ground, r, nr_points,
-                                      nr_point_elements);
+    ComputeSignedGroundHeightLine(point_cloud, ground_planes_[r - 1],
+                                  ground_planes_[r], ground_planes_[r + 1],
+                                  height_above_ground, r, nr_points,
+                                  nr_point_elements);
   }
-  compute_signed_ground_height_line(point_cloud, _ground_planes[nm1 - 1],
-                                    _ground_planes[nm1], _ground_planes[nm1],
-                                    height_above_ground, nm1, nr_points,
-                                    nr_point_elements);
+  ComputeSignedGroundHeightLine(point_cloud, ground_planes_[nm1 - 1],
+                                ground_planes_[nm1], ground_planes_[nm1],
+                                height_above_ground, nm1, nr_points,
+                                nr_point_elements);
 }
 
-void PlaneFitGroundDetector::compute_signed_ground_height_line(
+void PlaneFitGroundDetector::ComputeSignedGroundHeightLine(
     const float *point_cloud, const GroundPlaneLiDAR *up,
     const GroundPlaneLiDAR *cn, const GroundPlaneLiDAR *dn,
     float *height_above_ground, unsigned int r, unsigned int nr_points,
@@ -412,40 +421,40 @@ void PlaneFitGroundDetector::compute_signed_ground_height_line(
   int pos = 0;
   char label = 0;
   const float *cptr = nullptr;
-  float dist[] = {0, 0, 0, 0, 0};
-  const float *plane[] = {NULL, nullptr, nullptr, nullptr, nullptr};
+  float dist[] = { 0, 0, 0, 0, 0 };
+  const float *plane[] = { nullptr, nullptr, nullptr, nullptr, nullptr };
   float min_abs_dist = 0;
-  unsigned int nm1 = _param.nr_grids_coarse - 1;
-  CHECK_GE(_param.nr_grids_coarse, 2);
-  plane[0] = cn[0].is_valid() ? cn[0].params : nullptr;
-  plane[1] = cn[1].is_valid() ? cn[1].params : nullptr;
-  plane[2] = up[0].is_valid() ? up[0].params : nullptr;
-  plane[3] = dn[0].is_valid() ? dn[0].params : nullptr;
-  std::vector<int>::const_iterator iter = (*_vg_coarse)(r, 0)._indices.cbegin();
-  while (iter < (*_vg_coarse)(r, 0)._indices.cend()) {
+  unsigned int nm1 = param_.nr_grids_coarse - 1;
+  assert(param_.nr_grids_coarse >= 2);
+  plane[0] = cn[0].IsValid() ? cn[0].params : nullptr;
+  plane[1] = cn[1].IsValid() ? cn[1].params : nullptr;
+  plane[2] = up[0].IsValid() ? up[0].params : nullptr;
+  plane[3] = dn[0].IsValid() ? dn[0].params : nullptr;
+  std::vector<int>::const_iterator iter = (*vg_coarse_)(r, 0).indices_.cbegin();
+  while (iter < (*vg_coarse_)(r, 0).indices_.cend()) {
     pos = *iter;
-    CHECK_LT(pos, (int)nr_points);
-    label = _labels[pos];
+    assert(pos < static_cast<int>(nr_points));
+    label = labels_[pos];
     cptr = point_cloud + (nr_point_elements * pos);
     dist[0] = plane[0] != nullptr
-                  ? i_plane_to_point_signed_distance_w_unit_norm(plane[0], cptr)
+                  ? IPlaneToPointSignedDistanceWUnitNorm(plane[0], cptr)
                   : FLT_MAX;
-    min_abs_dist = i_abs(dist[0]);
+    min_abs_dist = IAbs(dist[0]);
     id = 0;
     // for candidates we take min dist:
     if (label) {
-      dist[1] = plane[1] != nullptr ? i_plane_to_point_signed_distance_w_unit_norm(
-                                       plane[1], cptr)
-                                 : FLT_MAX;
-      dist[2] = plane[2] != nullptr ? i_plane_to_point_signed_distance_w_unit_norm(
-                                       plane[2], cptr)
-                                 : FLT_MAX;
-      dist[3] = plane[3] != nullptr ? i_plane_to_point_signed_distance_w_unit_norm(
-                                       plane[3], cptr)
-                                 : FLT_MAX;
+      dist[1] = plane[1] != nullptr
+                    ? IPlaneToPointSignedDistanceWUnitNorm(plane[1], cptr)
+                    : FLT_MAX;
+      dist[2] = plane[2] != nullptr
+                    ? IPlaneToPointSignedDistanceWUnitNorm(plane[2], cptr)
+                    : FLT_MAX;
+      dist[3] = plane[3] != nullptr
+                    ? IPlaneToPointSignedDistanceWUnitNorm(plane[3], cptr)
+                    : FLT_MAX;
       for (i = 1; i < 4; ++i) {
-        if (min_abs_dist > i_abs(dist[i])) {
-          min_abs_dist = i_abs(dist[i]);
+        if (min_abs_dist > IAbs(dist[i])) {
+          min_abs_dist = IAbs(dist[i]);
           id = i;
         }
       }
@@ -455,42 +464,38 @@ void PlaneFitGroundDetector::compute_signed_ground_height_line(
   }
 
   for (c = 1; c < nm1; ++c) {
-    plane[0] = cn[c].is_valid() ? cn[c].params : nullptr;
-    plane[1] = cn[c - 1].is_valid() ? cn[c - 1].params : nullptr;
-    plane[2] = cn[c + 1].is_valid() ? cn[c + 1].params : nullptr;
-    plane[3] = up[c].is_valid() ? up[c].params : nullptr;
-    plane[4] = dn[c].is_valid() ? dn[c].params : nullptr;
-    iter = (*_vg_coarse)(r, c)._indices.cbegin();
-    while (iter < (*_vg_coarse)(r, c)._indices.cend()) {
+    plane[0] = cn[c].IsValid() ? cn[c].params : nullptr;
+    plane[1] = cn[c - 1].IsValid() ? cn[c - 1].params : nullptr;
+    plane[2] = cn[c + 1].IsValid() ? cn[c + 1].params : nullptr;
+    plane[3] = up[c].IsValid() ? up[c].params : nullptr;
+    plane[4] = dn[c].IsValid() ? dn[c].params : nullptr;
+    iter = (*vg_coarse_)(r, c).indices_.cbegin();
+    while (iter < (*vg_coarse_)(r, c).indices_.cend()) {
       pos = *iter;
-      CHECK_LT(pos, (int)nr_points);
-      label = _labels[pos];
+      assert(pos < static_cast<int>(nr_points));
+      label = labels_[pos];
       cptr = point_cloud + (nr_point_elements * pos);
-      dist[0] = plane[0] != nullptr ? i_plane_to_point_signed_distance_w_unit_norm(
-                                       plane[0], cptr)
-                                 : FLT_MAX;
-      min_abs_dist = i_abs(dist[0]);
+      dist[0] = plane[0] != nullptr
+                    ? IPlaneToPointSignedDistanceWUnitNorm(plane[0], cptr)
+                    : FLT_MAX;
+      min_abs_dist = IAbs(dist[0]);
       id = 0;
       if (label) {
-        dist[1] =
-            plane[1] != nullptr
-                ? i_plane_to_point_signed_distance_w_unit_norm(plane[1], cptr)
-                : FLT_MAX;
-        dist[2] =
-            plane[2] != nullptr
-                ? i_plane_to_point_signed_distance_w_unit_norm(plane[2], cptr)
-                : FLT_MAX;
-        dist[3] =
-            plane[3] != nullptr
-                ? i_plane_to_point_signed_distance_w_unit_norm(plane[3], cptr)
-                : FLT_MAX;
-        dist[4] =
-            plane[4] != nullptr
-                ? i_plane_to_point_signed_distance_w_unit_norm(plane[4], cptr)
-                : FLT_MAX;
+        dist[1] = plane[1] != nullptr
+                      ? IPlaneToPointSignedDistanceWUnitNorm(plane[1], cptr)
+                      : FLT_MAX;
+        dist[2] = plane[2] != nullptr
+                      ? IPlaneToPointSignedDistanceWUnitNorm(plane[2], cptr)
+                      : FLT_MAX;
+        dist[3] = plane[3] != nullptr
+                      ? IPlaneToPointSignedDistanceWUnitNorm(plane[3], cptr)
+                      : FLT_MAX;
+        dist[4] = plane[4] != nullptr
+                      ? IPlaneToPointSignedDistanceWUnitNorm(plane[4], cptr)
+                      : FLT_MAX;
         for (i = 1; i < 5; ++i) {
-          if (min_abs_dist > i_abs(dist[i])) {
-            min_abs_dist = i_abs(dist[i]);
+          if (min_abs_dist > IAbs(dist[i])) {
+            min_abs_dist = IAbs(dist[i]);
             id = i;
           }
         }
@@ -499,35 +504,35 @@ void PlaneFitGroundDetector::compute_signed_ground_height_line(
       ++iter;
     }
   }
-  plane[0] = cn[nm1].is_valid() ? cn[nm1].params : nullptr;
-  plane[1] = cn[nm1 - 1].is_valid() ? cn[nm1 - 1].params : nullptr;
-  plane[2] = up[nm1].is_valid() ? up[nm1].params : nullptr;
-  plane[3] = dn[nm1].is_valid() ? dn[nm1].params : nullptr;
-  iter = (*_vg_coarse)(r, nm1)._indices.cbegin();
-  while (iter < (*_vg_coarse)(r, nm1)._indices.cend()) {
+  plane[0] = cn[nm1].IsValid() ? cn[nm1].params : nullptr;
+  plane[1] = cn[nm1 - 1].IsValid() ? cn[nm1 - 1].params : nullptr;
+  plane[2] = up[nm1].IsValid() ? up[nm1].params : nullptr;
+  plane[3] = dn[nm1].IsValid() ? dn[nm1].params : nullptr;
+  iter = (*vg_coarse_)(r, nm1).indices_.cbegin();
+  while (iter < (*vg_coarse_)(r, nm1).indices_.cend()) {
     pos = *iter;
-    CHECK_LT(pos, (int)nr_points);
-    label = _labels[pos];
+    assert(pos < static_cast<int>(nr_points));
+    label = labels_[pos];
     cptr = point_cloud + (nr_point_elements * pos);
     dist[0] = plane[0] != nullptr
-                  ? i_plane_to_point_signed_distance_w_unit_norm(plane[0], cptr)
+                  ? IPlaneToPointSignedDistanceWUnitNorm(plane[0], cptr)
                   : FLT_MAX;
-    min_abs_dist = i_abs(dist[0]);
+    min_abs_dist = IAbs(dist[0]);
     id = 0;
     // for candidates we take min dist:
     if (label) {
-      dist[1] = plane[1] != nullptr ? i_plane_to_point_signed_distance_w_unit_norm(
-                                       plane[1], cptr)
-                                 : FLT_MAX;
-      dist[2] = plane[2] != nullptr ? i_plane_to_point_signed_distance_w_unit_norm(
-                                       plane[2], cptr)
-                                 : FLT_MAX;
-      dist[3] = plane[3] != nullptr ? i_plane_to_point_signed_distance_w_unit_norm(
-                                       plane[3], cptr)
-                                 : FLT_MAX;
+      dist[1] = plane[1] != nullptr
+                    ? IPlaneToPointSignedDistanceWUnitNorm(plane[1], cptr)
+                    : FLT_MAX;
+      dist[2] = plane[2] != nullptr
+                    ? IPlaneToPointSignedDistanceWUnitNorm(plane[2], cptr)
+                    : FLT_MAX;
+      dist[3] = plane[3] != nullptr
+                    ? IPlaneToPointSignedDistanceWUnitNorm(plane[3], cptr)
+                    : FLT_MAX;
       for (i = 1; i < 4; ++i) {
-        if (min_abs_dist > i_abs(dist[i])) {
-          min_abs_dist = i_abs(dist[i]);
+        if (min_abs_dist > IAbs(dist[i])) {
+          min_abs_dist = IAbs(dist[i]);
           id = i;
         }
       }
@@ -537,87 +542,88 @@ void PlaneFitGroundDetector::compute_signed_ground_height_line(
   }
 }
 
-int PlaneFitGroundDetector::filter_grid(const Voxel<float> &vx,
-                                        const float *point_cloud,
-                                        PlaneFitPointCandIndices &candi,
-                                        unsigned int nr_points,
-                                        unsigned int nr_point_element) {
+int PlaneFitGroundDetector::FilterGrid(const Voxel<float> &vx,
+                                       const float *point_cloud,
+                                       PlaneFitPointCandIndices *candi,
+                                       unsigned int nr_points,
+                                       unsigned int nr_point_element) {
   int pos = 0;
   int rseed = I_DEFAULT_SEED;
   int nr_candis = 0;
   unsigned int i = 0;
-  unsigned int nr_samples = i_min(_param.nr_z_comp_candis, vx.nr_points());
-  if (vx.empty()) {
+  unsigned int nr_samples = IMin(param_.nr_z_comp_candis, vx.NrPoints());
+  if (vx.Empty()) {
     return 0;
   }
-  // generate sampled indices
-  if (vx.nr_points() <= _param.nr_z_comp_candis) {
-    // i_ramp(_sampled_indices, vx.nr_points());
-    // sampled z values
-    for (i = 0; i < vx.nr_points(); ++i) {
-      pos = vx._indices[i] * nr_point_element;
-      // requires the Z element to be in the third position, i.e., after X, Y
-      _sampled_z_values[i] = (point_cloud + pos)[2];
+  //  generate sampled indices
+  if (vx.NrPoints() <= param_.nr_z_comp_candis) {
+    // IRamp(sampled_indices_, vx.NrPoints());
+    //  sampled z values
+    for (i = 0; i < vx.NrPoints(); ++i) {
+      pos = vx.indices_[i] * nr_point_element;
+      //  requires the Z element to be in the third position, i.e., after X, Y
+      sampled_z_values_[i] = (point_cloud + pos)[2];
     }
   } else {
-    i_random_sample(_sampled_indices, (int)_param.nr_z_comp_candis,
-                    (int)vx.nr_points(), rseed);
-    // sampled z values
+    IRandomSample(sampled_indices_, static_cast<int>(param_.nr_z_comp_candis),
+                  static_cast<int>(vx.NrPoints()), &rseed);
+    //  sampled z values
     for (i = 0; i < nr_samples; ++i) {
-      pos = vx._indices[_sampled_indices[i]] * nr_point_element;
+      pos = vx.indices_[sampled_indices_[i]] * nr_point_element;
       // requires the Z element to be in the third position, i.e., after X, Y
-      _sampled_z_values[i] = (point_cloud + pos)[2];
+      sampled_z_values_[i] = (point_cloud + pos)[2];
     }
   }
-  // filter points and get plane fitting candidates
-  nr_candis = compare_z(point_cloud, vx._indices, _sampled_z_values, candi,
-                        nr_points, nr_point_element, nr_samples);
+  // Filter points and get plane fitting candidates
+  nr_candis = CompareZ(point_cloud, vx.indices_, sampled_z_values_, candi,
+                       nr_points, nr_point_element, nr_samples);
   return nr_candis;
 }
 
-int PlaneFitGroundDetector::filter_line(unsigned int r) {
+int PlaneFitGroundDetector::FilterLine(unsigned int r) {
   int nr_candis = 0;
   unsigned int c = 0;
-  const float *point_cloud = _vg_fine->const_data();
-  unsigned int nr_points = _vg_fine->nr_points();
-  unsigned int nr_point_element = _vg_fine->nr_point_element();
-  unsigned int begin = (r * _param.nr_grids_fine);
+  const float *point_cloud = vg_fine_->const_data();
+  unsigned int nr_points = vg_fine_->NrPoints();
+  unsigned int nr_point_element = vg_fine_->NrPointElement();
+  unsigned int begin = (r * param_.nr_grids_fine);
   int parent = 0;
-  for (c = 0; c < _param.nr_grids_fine; c++) {
-    parent = _map_fine_to_coarse[begin + c];
+  for (c = 0; c < param_.nr_grids_fine; c++) {
+    parent = map_fine_to_coarse_[begin + c];
     nr_candis +=
-        filter_grid((*_vg_fine)(r, c), point_cloud, _local_candis[0][parent],
-                    nr_points, nr_point_element);
+        FilterGrid((*vg_fine_)(r, c), point_cloud, &local_candis_[0][parent],
+                   nr_points, nr_point_element);
   }
   return nr_candis;
 }
 
-int PlaneFitGroundDetector::filter() {
+int PlaneFitGroundDetector::Filter() {
   int nr_candis = 0;
   unsigned int i = 0;
   unsigned int r = 0;
-  memset((void *)_labels, 0, _vg_fine->nr_points() * sizeof(char));
-  // clear candidate list
-  for (i = 0; i < _vg_coarse->nr_voxel(); ++i) {
-    _local_candis[0][i].clear();
+  memset(reinterpret_cast<void *>(labels_), 0,
+         vg_fine_->NrPoints() * sizeof(char));
+  //  Clear candidate list
+  for (i = 0; i < vg_coarse_->NrVoxel(); ++i) {
+    local_candis_[0][i].Clear();
   }
-  // filter plane fitting candidates
-  for (r = 0; r < _param.nr_grids_fine; ++r) {
-    nr_candis += filter_line(r);
+  //  Filter plane fitting candidates
+  for (r = 0; r < param_.nr_grids_fine; ++r) {
+    nr_candis += FilterLine(r);
   }
   return nr_candis;
 }
 
-int PlaneFitGroundDetector::fit_grid(const float *point_cloud,
-                                     PlaneFitPointCandIndices &candi,
-                                     GroundPlaneLiDAR &groundplane,
-                                     unsigned int nr_points,
-                                     unsigned int nr_point_element,
-                                     float dist_thre) {
+int PlaneFitGroundDetector::FitGrid(const float *point_cloud,
+                                    PlaneFitPointCandIndices *candi,
+                                    GroundPlaneLiDAR *groundplane,
+                                    unsigned int nr_points,
+                                    unsigned int nr_point_element,
+                                    float dist_thre) {
   // initialize the best plane
-  groundplane.force_invalid();
+  groundplane->ForceInvalid();
   // not enough samples, failed and return
-  if (candi.size() < _param.nr_inliers_min_threshold) {
+  if (candi->Size() < param_.nr_inliers_min_threshold) {
     return (0);
   }
   GroundPlaneLiDAR plane;
@@ -629,48 +635,48 @@ int PlaneFitGroundDetector::fit_grid(const float *point_cloud,
   int i = 0;
   int j = 0;
   int rseed = I_DEFAULT_SEED;
-  int indices_trial[] = {0, 0, 0};
-  int nr_samples = candi.prune(_param.nr_samples_min_threshold,
-                               _param.nr_samples_max_threshold);
+  int indices_trial[] = { 0, 0, 0 };
+  int nr_samples = candi->Prune(param_.nr_samples_min_threshold,
+                                param_.nr_samples_max_threshold);
   int nr_inliers_termi =
-      i_round(nr_samples * _param.termi_inlier_percen_threshold);
+      IRound(nr_samples * param_.termi_inlier_percen_threshold);
   // 3x3 matrix stores: x, y, z; x, y, z; x, y, z;
   float samples[9];
   // copy 3D points
   float *psrc = nullptr;
-  float *pdst = _pf_threeds;
+  float *pdst = pf_threeds_;
   for (i = 0; i < nr_samples; ++i) {
-    CHECK_LT(candi[i], (int)nr_points);
-    i_copy3(point_cloud + (nr_point_element * candi[i]), pdst);
-    pdst += _dim_point;
+    assert((*candi)[i] < static_cast<int>(nr_points));
+    ICopy3(point_cloud + (nr_point_element * (*candi)[i]), pdst);
+    pdst += dim_point_;
   }
   // generate plane hypothesis and vote
-  for (i = 0; i < _param.nr_ransac_iter_threshold; ++i) {
-    i_random_sample(indices_trial, 3, nr_samples, rseed);
-    i_scale3(indices_trial, _dim_point);
-    i_copy3(_pf_threeds + indices_trial[0], samples);
-    i_copy3(_pf_threeds + indices_trial[1], samples + 3);
-    i_copy3(_pf_threeds + indices_trial[2], samples + 6);
-    i_plane_fit_destroyed(samples, plane.params);
+  for (i = 0; i < param_.nr_ransac_iter_threshold; ++i) {
+    IRandomSample(indices_trial, 3, nr_samples, &rseed);
+    IScale3(indices_trial, dim_point_);
+    ICopy3(pf_threeds_ + indices_trial[0], samples);
+    ICopy3(pf_threeds_ + indices_trial[1], samples + 3);
+    ICopy3(pf_threeds_ + indices_trial[2], samples + 6);
+    IPlaneFitDestroyed(samples, plane.params);
     // check if the plane hypothesis has valid geometry
-    if (plane.get_degree_normal_to_z() > _param.planefit_orien_threshold) {
+    if (plane.GetDegreeNormalToZ() > param_.planefit_orien_threshold) {
       continue;
     }
     // iterate samples and check if the point to plane distance is below
     // threshold
-    psrc = _pf_threeds;
+    psrc = pf_threeds_;
     nr_inliers = 0;
     fit_cost = 0;
     for (j = 0; j < nr_samples; ++j) {
-      ptp_dist = i_plane_to_point_distance_w_unit_norm(plane.params, psrc);
+      ptp_dist = IPlaneToPointDistanceWUnitNorm(plane.params, psrc);
       if (ptp_dist < dist_thre) {
         nr_inliers++;
         fit_cost += ptp_dist;
       }
-      psrc += _dim_point;
+      psrc += dim_point_;
     }
-    // assign number of supports
-    plane.set_nr_support(nr_inliers);
+    // Assign number of supports
+    plane.SetNrSupport(nr_inliers);
 
     fit_cost = nr_inliers > 0 ? (fit_cost / nr_inliers) : dist_thre;
     // record the best plane
@@ -679,12 +685,12 @@ int PlaneFitGroundDetector::fit_grid(const float *point_cloud,
         if (fit_cost < fit_cost_best) {
           nr_inliers_best = nr_inliers;
           fit_cost_best = fit_cost;
-          groundplane = plane;
+          *groundplane = plane;
         }
       } else {
         nr_inliers_best = nr_inliers;
         fit_cost_best = fit_cost;
-        groundplane = plane;
+        *groundplane = plane;
       }
       // found enough inliers - terminate the ransac
       if (nr_inliers_best > nr_inliers_termi) {
@@ -693,72 +699,73 @@ int PlaneFitGroundDetector::fit_grid(const float *point_cloud,
     }
   }
   // check if meet the inlier number requirement
-  if (!groundplane.is_valid()) {
+  if (!groundplane->IsValid()) {
     return (0);
   }
-  if (groundplane.get_nr_support() < (int)_param.nr_inliers_min_threshold) {
-    groundplane.force_invalid();
+  if (groundplane->GetNrSupport() <
+      static_cast<int>(param_.nr_inliers_min_threshold)) {
+    groundplane->ForceInvalid();
     return (0);
   }
   // iterate samples and check if the point to plane distance is within
   // threshold
   nr_inliers = 0;
-  psrc = _pf_threeds;
-  pdst = _pf_threeds;
+  psrc = pf_threeds_;
+  pdst = pf_threeds_;
   for (i = 0; i < nr_samples; ++i) {
-    ptp_dist = i_plane_to_point_distance_w_unit_norm(groundplane.params, psrc);
+    ptp_dist = IPlaneToPointDistanceWUnitNorm(groundplane->params, psrc);
     if (ptp_dist < dist_thre) {
-      i_copy3(psrc, pdst);
+      ICopy3(psrc, pdst);
       pdst += 3;
       nr_inliers++;
     }
-    psrc += _dim_point;
+    psrc += dim_point_;
   }
-  groundplane.set_nr_support(nr_inliers);
-  // note that _pf_threeds will be destroyed after calling this routine
-  i_plane_fit_total_least_square(_pf_threeds, groundplane.params, nr_inliers);
+  groundplane->SetNrSupport(nr_inliers);
+  // note that pf_threeds_ will be destroyed after calling this routine
+  IPlaneFitTotalLeastSquare(pf_threeds_, groundplane->params, nr_inliers);
   // filtering: the best plane orientation is not valid*/
-  // std::cout << groundplane.get_degree_normal_to_z() << std::endl;
-  if (groundplane.get_degree_normal_to_z() > _param.planefit_orien_threshold) {
-    groundplane.force_invalid();
+  // std::cout << groundplane->GetDegreeNormalToZ() << std::endl;
+  if (groundplane->GetDegreeNormalToZ() > param_.planefit_orien_threshold) {
+    groundplane->ForceInvalid();
     return (0);
   }
   return nr_inliers;
 }
 
-int PlaneFitGroundDetector::fit_line(unsigned int r) {
+int PlaneFitGroundDetector::FitLine(unsigned int r) {
   int nr_grids = 0;
   unsigned int c = 0;
   GroundPlaneLiDAR gp;
-  for (c = 0; c < _param.nr_grids_coarse; c++) {
-    if (fit_grid(_vg_coarse->const_data(), _local_candis[r][c], gp,
-                 _vg_coarse->nr_points(), _vg_coarse->nr_point_element(),
-                 _pf_thresholds[r][c]) >=
-        (int)_param.nr_inliers_min_threshold) {
+  for (c = 0; c < param_.nr_grids_coarse; c++) {
+    if (FitGrid(vg_coarse_->const_data(), &local_candis_[r][c], &gp,
+                vg_coarse_->NrPoints(), vg_coarse_->NrPointElement(),
+                pf_thresholds_[r][c]) >=
+        static_cast<int>(param_.nr_inliers_min_threshold)) {
       // transform to polar coordinates and store:
-      i_plane_eucli_to_spher(gp, _ground_planes_sphe[r][c]);
-      _ground_planes[r][c] = gp;
+      IPlaneEucliToSpher(gp, &ground_planes_sphe_[r][c]);
+      ground_planes_[r][c] = gp;
       nr_grids++;
     } else {
-      _ground_planes_sphe[r][c].force_invalid();
-      _ground_planes[r][c].force_invalid();
+      ground_planes_sphe_[r][c].ForceInvalid();
+      ground_planes_[r][c].ForceInvalid();
     }
   }
   return nr_grids;
 }
 
-int PlaneFitGroundDetector::fit() {
+int PlaneFitGroundDetector::Fit() {
   int nr_grids = 0;
-  for (unsigned int r = 0; r < _param.nr_grids_coarse; ++r) {
-    nr_grids += fit_line(r);
+  for (unsigned int r = 0; r < param_.nr_grids_coarse; ++r) {
+    nr_grids += FitLine(r);
   }
   return nr_grids;
 }
 
-// filter candidates by neighbors
-int PlaneFitGroundDetector::filter_candidates(
-    int r, int c, const float *point_cloud, PlaneFitPointCandIndices &candi,
-    std::vector<std::pair<int, int>> &neighbors,
+//  Filter candidates by neighbors
+int PlaneFitGroundDetector::FilterCandidates(
+    int r, int c, const float *point_cloud, PlaneFitPointCandIndices *candi,
+    std::vector<std::pair<int, int> > *neighbors,
     unsigned int nr_point_element) {
   float avg_z = 0.f;
   int count = 0;
@@ -767,30 +774,30 @@ int PlaneFitGroundDetector::filter_candidates(
   int c_n = 0;
   float z = 0.f;
   std::vector<int> filtered_indices;
-  filtered_indices.reserve(candi.size());
-  for (i = 0; i < neighbors.size(); ++i) {
-    r_n = neighbors[i].first;
-    c_n = neighbors[i].second;
-    if (_ground_z[r_n][c_n].second) {
-      avg_z += _ground_z[r_n][c_n].first;
+  filtered_indices.reserve(candi->Size());
+  for (i = 0; i < neighbors->size(); ++i) {
+    r_n = (*neighbors)[i].first;
+    c_n = (*neighbors)[i].second;
+    if (ground_z_[r_n][c_n].second) {
+      avg_z += ground_z_[r_n][c_n].first;
       count++;
     }
   }
   if (count > 0) {
     avg_z /= count;
-    _ground_z[r][c].first = avg_z;
-    _ground_z[r][c].second = true;
-    for (i = 0; i < candi.size(); ++i) {
-      z = (point_cloud + (nr_point_element * candi[i]))[2];
-      if (z > avg_z - _param.candidate_filter_threshold &&
-          z < avg_z + _param.candidate_filter_threshold) {
-        filtered_indices.push_back(candi[i]);
+    ground_z_[r][c].first = avg_z;
+    ground_z_[r][c].second = true;
+    for (i = 0; i < candi->Size(); ++i) {
+      z = (point_cloud + (nr_point_element * (*candi)[i]))[2];
+      if (z > avg_z - param_.candidate_filter_threshold &&
+          z < avg_z + param_.candidate_filter_threshold) {
+        filtered_indices.push_back((*candi)[i]);
       } else {
-        _labels[candi[i]] = 0;
+        labels_[(*candi)[i]] = 0;
       }
     }
-    if (filtered_indices.size() != candi.size()) {
-      candi.indices.assign(filtered_indices.begin(), filtered_indices.end());
+    if (filtered_indices.size() != candi->Size()) {
+      candi->indices.assign(filtered_indices.begin(), filtered_indices.end());
     }
   }
   return count;
@@ -798,188 +805,187 @@ int PlaneFitGroundDetector::filter_candidates(
 
 inline float calculate_two_angles(const GroundPlaneLiDAR &p1,
                                   const GroundPlaneLiDAR &p2) {
-  float numerator = i_dot3(p1.params, p2.params);
-  float denominator = i_l2_norm(p1.params, 3) * i_l2_norm(p2.params, 3);
-  return i_acos(numerator * i_rec(denominator));
+  float numerator = IDot3(p1.params, p2.params);
+  float denominator = IL2Norm(p1.params, 3) * IL2Norm(p2.params, 3);
+  return IAcos(numerator * IRec(denominator));
 }
 
-int PlaneFitGroundDetector::fit_grid_with_neighbors(
-    int r, int c, const float *point_cloud, GroundPlaneLiDAR &groundplane,
+int PlaneFitGroundDetector::FitGridWithNeighbors(
+    int r, int c, const float *point_cloud, GroundPlaneLiDAR *groundplane,
     unsigned int nr_points, unsigned int nr_point_element, float dist_thre) {
   // initialize the best plane
-  groundplane.force_invalid();
+  groundplane->ForceInvalid();
   // not enough samples, failed and return
 
-  PlaneFitPointCandIndices &candi = _local_candis[r][c];
-  std::vector<std::pair<int, int>> neighbors;
-  get_neighbors(r, c, _param.nr_grids_coarse, _param.nr_grids_coarse,
-                neighbors);
-  filter_candidates(r, c, point_cloud, candi, neighbors, nr_point_element);
+  PlaneFitPointCandIndices &candi = local_candis_[r][c];
+  std::vector<std::pair<int, int> > neighbors;
+  GetNeighbors(r, c, param_.nr_grids_coarse, param_.nr_grids_coarse,
+               &neighbors);
+  FilterCandidates(r, c, point_cloud, &candi, &neighbors, nr_point_element);
 
-  if (candi.size() < _param.nr_inliers_min_threshold) {
+  if (candi.Size() < param_.nr_inliers_min_threshold) {
     return (0);
   }
 
   GroundPlaneLiDAR plane;
-  int nr_iter = _param.nr_ransac_iter_threshold + neighbors.size();
-  GroundPlaneLiDAR hypothesis[nr_iter];
+  int kNr_iter = param_.nr_ransac_iter_threshold + neighbors.size();
+  GroundPlaneLiDAR hypothesis[kNr_iter];
   float ptp_dist = 0;
   int best = -1;
   int nr_inliers = 0;
   int nr_inliers_best = -1;
   float angle_best = FLT_MAX;
+  int i = 0;
+  int j = 0;
   int rseed = I_DEFAULT_SEED;
-  int indices_trial[] = {0, 0, 0};
-  int nr_samples = candi.prune(_param.nr_samples_min_threshold,
-                               _param.nr_samples_max_threshold);
+  int indices_trial[] = { 0, 0, 0 };
+  int nr_samples = candi.Prune(param_.nr_samples_min_threshold,
+                               param_.nr_samples_max_threshold);
   int nr_inliers_termi =
-      i_round(nr_samples * _param.termi_inlier_percen_threshold);
+      IRound(nr_samples * param_.termi_inlier_percen_threshold);
   // 3x3 matrix stores: x, y, z; x, y, z; x, y, z;
   float samples[9];
   // copy 3D points
   float *psrc = nullptr;
-  float *pdst = _pf_threeds;
+  float *pdst = pf_threeds_;
   int r_n = 0;
   int c_n = 0;
   float angle = -1.f;
-  for (int i = 0; i < nr_samples; ++i) {
-    CHECK_LT(candi[i], (int)nr_points);
-    i_copy3(point_cloud + (nr_point_element * candi[i]), pdst);
-    pdst += _dim_point;
+  for (i = 0; i < nr_samples; ++i) {
+    assert(candi[i] < static_cast<int>(nr_points));
+    ICopy3(point_cloud + (nr_point_element * candi[i]), pdst);
+    pdst += dim_point_;
   }
   // generate plane hypothesis and vote
-  for (int i = 0; i < _param.nr_ransac_iter_threshold; ++i) {
-    i_random_sample(indices_trial, 3, nr_samples, rseed);
-    i_scale3(indices_trial, _dim_point);
-    i_copy3(_pf_threeds + indices_trial[0], samples);
-    i_copy3(_pf_threeds + indices_trial[1], samples + 3);
-    i_copy3(_pf_threeds + indices_trial[2], samples + 6);
-    i_plane_fit_destroyed(samples, hypothesis[i].params);
+  for (i = 0; i < param_.nr_ransac_iter_threshold; ++i) {
+    IRandomSample(indices_trial, 3, nr_samples, &rseed);
+    IScale3(indices_trial, dim_point_);
+    ICopy3(pf_threeds_ + indices_trial[0], samples);
+    ICopy3(pf_threeds_ + indices_trial[1], samples + 3);
+    ICopy3(pf_threeds_ + indices_trial[2], samples + 6);
+    IPlaneFitDestroyed(samples, hypothesis[i].params);
     // check if the plane hypothesis has valid geometry
-    if (hypothesis[i].get_degree_normal_to_z() >
-        _param.planefit_orien_threshold) {
+    if (hypothesis[i].GetDegreeNormalToZ() > param_.planefit_orien_threshold) {
       continue;
     }
     // iterate samples and check if the point to plane distance is below
     // threshold
-    psrc = _pf_threeds;
+    psrc = pf_threeds_;
     nr_inliers = 0;
-    for (int j = 0; j < nr_samples; ++j) {
-      ptp_dist =
-          i_plane_to_point_distance_w_unit_norm(hypothesis[i].params, psrc);
+    for (j = 0; j < nr_samples; ++j) {
+      ptp_dist = IPlaneToPointDistanceWUnitNorm(hypothesis[i].params, psrc);
       if (ptp_dist < dist_thre) {
         nr_inliers++;
       }
-      psrc += _dim_point;
+      psrc += dim_point_;
     }
-    // assign number of supports
-    hypothesis[i].set_nr_support(nr_inliers);
+    // Assign number of supports
+    hypothesis[i].SetNrSupport(nr_inliers);
 
     if (nr_inliers > nr_inliers_termi) {
       break;
     }
   }
 
-  for (size_t i = 0; i < neighbors.size(); ++i) {
+  for (i = 0; i < neighbors.size(); ++i) {
     r_n = neighbors[i].first;
     c_n = neighbors[i].second;
-    if (_ground_planes[r_n][c_n].is_valid()) {
-      hypothesis[i + _param.nr_ransac_iter_threshold] =
-          _ground_planes[r_n][c_n];
-      psrc = _pf_threeds;
+    if (ground_planes_[r_n][c_n].IsValid()) {
+      hypothesis[i + param_.nr_ransac_iter_threshold] =
+          ground_planes_[r_n][c_n];
+      psrc = pf_threeds_;
       nr_inliers = 0;
-      for (int j = 0; j < nr_samples; ++j) {
-        ptp_dist = i_plane_to_point_distance_w_unit_norm(
-            hypothesis[i + _param.nr_ransac_iter_threshold].params, psrc);
+      for (j = 0; j < nr_samples; ++j) {
+        ptp_dist = IPlaneToPointDistanceWUnitNorm(
+            hypothesis[i + param_.nr_ransac_iter_threshold].params, psrc);
         if (ptp_dist < dist_thre) {
           nr_inliers++;
         }
-        psrc += _dim_point;
+        psrc += dim_point_;
       }
-      if (nr_inliers < (int)_param.nr_inliers_min_threshold) {
-        hypothesis[i + _param.nr_ransac_iter_threshold].force_invalid();
+      if (nr_inliers < static_cast<int>(param_.nr_inliers_min_threshold)) {
+        hypothesis[i + param_.nr_ransac_iter_threshold].ForceInvalid();
         continue;
       }
-      hypothesis[i + _param.nr_ransac_iter_threshold].set_nr_support(
-          nr_inliers);
+      hypothesis[i + param_.nr_ransac_iter_threshold].SetNrSupport(nr_inliers);
     }
   }
 
   nr_inliers_best = -1;
-  for (int i = 0; i < nr_iter; ++i) {
-    if (!(hypothesis[i].is_valid())) {
+  for (i = 0; i < kNr_iter; ++i) {
+    if (!(hypothesis[i].IsValid())) {
       continue;
     }
-    nr_inliers = hypothesis[i].get_nr_support();
+    nr_inliers = hypothesis[i].GetNrSupport();
     if (nr_inliers >= nr_inliers_best) {
       if (nr_inliers == nr_inliers_best) {
-        angle = calculate_angle_dist(hypothesis[i], neighbors);
+        angle = CalculateAngleDist(hypothesis[i], neighbors);
         if (angle < angle_best && angle > 0) {
           angle_best = angle;
           best = i;
         }
       } else {
         nr_inliers_best = nr_inliers;
-        angle_best = calculate_angle_dist(hypothesis[i], neighbors);
+        angle_best = CalculateAngleDist(hypothesis[i], neighbors);
         best = i;
       }
     }
   }
 
-  groundplane = hypothesis[best];
+  *groundplane = hypothesis[best];
 
   // check if meet the inlier number requirement
-  if (!groundplane.is_valid()) {
+  if (!groundplane->IsValid()) {
     return (0);
   }
-  if (groundplane.get_nr_support() < (int)_param.nr_inliers_min_threshold) {
-    groundplane.force_invalid();
+  if (groundplane->GetNrSupport() <
+      static_cast<int>(param_.nr_inliers_min_threshold)) {
+    groundplane->ForceInvalid();
     return (0);
   }
   // iterate samples and check if the point to plane distance is within
   // threshold
   nr_inliers = 0;
-  psrc = _pf_threeds;
-  pdst = _pf_threeds;
-  for (int i = 0; i < nr_samples; ++i) {
-    ptp_dist = i_plane_to_point_distance_w_unit_norm(groundplane.params, psrc);
+  psrc = pf_threeds_;
+  pdst = pf_threeds_;
+  for (i = 0; i < nr_samples; ++i) {
+    ptp_dist = IPlaneToPointDistanceWUnitNorm(groundplane->params, psrc);
     if (ptp_dist < dist_thre) {
-      i_copy3(psrc, pdst);
+      ICopy3(psrc, pdst);
       pdst += 3;
       nr_inliers++;
     }
-    psrc += _dim_point;
+    psrc += dim_point_;
   }
-  groundplane.set_nr_support(nr_inliers);
+  groundplane->SetNrSupport(nr_inliers);
 
-  // note that _pf_threeds will be destroyed after calling this routine
-  i_plane_fit_total_least_square(_pf_threeds, groundplane.params, nr_inliers);
-  if (angle_best <= calculate_angle_dist(groundplane, neighbors)) {
-    groundplane = hypothesis[best];
-    groundplane.set_status(true);
+  // note that pf_threeds_ will be destroyed after calling this routine
+  IPlaneFitTotalLeastSquare(pf_threeds_, groundplane->params, nr_inliers);
+  if (angle_best <= CalculateAngleDist(*groundplane, neighbors)) {
+    *groundplane = hypothesis[best];
+    groundplane->SetStatus(true);
   }
 
-  if (groundplane.get_degree_normal_to_z() > _param.planefit_orien_threshold) {
-    groundplane.force_invalid();
+  if (groundplane->GetDegreeNormalToZ() > param_.planefit_orien_threshold) {
+    groundplane->ForceInvalid();
     return (0);
   }
 
-  const auto &voxel_cur = (*_vg_coarse)(r, c);
-  float radius = voxel_cur._dim_x * 0.5;
-  float cx = voxel_cur._v[0] + radius;
-  float cy = voxel_cur._v[1] + radius;
-  float cz = -(groundplane.params[0] * cx + groundplane.params[1] * cy +
-               groundplane.params[3]) /
-             groundplane.params[2];
-  _ground_z[r][c].first = cz;
-  _ground_z[r][c].second = true;
+  const auto &voxel_cur = (*vg_coarse_)(r, c);
+  float radius = voxel_cur.dim_x_ * 0.5;
+  float cx = voxel_cur.v_[0] + radius;
+  float cy = voxel_cur.v_[1] + radius;
+  float cz = -(groundplane->params[0] * cx + groundplane->params[1] * cy +
+               groundplane->params[3]) / groundplane->params[2];
+  ground_z_[r][c].first = cz;
+  ground_z_[r][c].second = true;
 
   return nr_inliers;
 }
 
-float PlaneFitGroundDetector::calculate_angle_dist(
+float PlaneFitGroundDetector::CalculateAngleDist(
     const GroundPlaneLiDAR &plane,
-    const std::vector<std::pair<int, int>> &neighbors) {
+    const std::vector<std::pair<int, int> > &neighbors) {
   float angle_dist = 0;
   int count = 0;
   unsigned int j = 0;
@@ -988,8 +994,8 @@ float PlaneFitGroundDetector::calculate_angle_dist(
   for (j = 0; j < neighbors.size(); ++j) {
     r_n = neighbors[j].first;
     c_n = neighbors[j].second;
-    if (_ground_planes[r_n][c_n].is_valid()) {
-      angle_dist += calculate_two_angles(_ground_planes[r_n][c_n], plane);
+    if (ground_planes_[r_n][c_n].IsValid()) {
+      angle_dist += calculate_two_angles(ground_planes_[r_n][c_n], plane);
       count++;
     }
   }
@@ -999,316 +1005,316 @@ float PlaneFitGroundDetector::calculate_angle_dist(
   return angle_dist / count;
 }
 
-int PlaneFitGroundDetector::fit_in_order() {
+int PlaneFitGroundDetector::FitInOrder() {
   int nr_grids = 0;
   unsigned int i = 0;
   unsigned int j = 0;
   int r = 0;
   int c = 0;
   GroundPlaneLiDAR gp;
-  for (i = 0; i < _param.nr_grids_coarse; ++i) {
-    for (j = 0; j < _param.nr_grids_coarse; ++j) {
-      _ground_z[i][j].first = 0.f;
-      _ground_z[i][j].second = false;
+  for (i = 0; i < param_.nr_grids_coarse; ++i) {
+    for (j = 0; j < param_.nr_grids_coarse; ++j) {
+      ground_z_[i][j].first = 0.f;
+      ground_z_[i][j].second = false;
     }
   }
-  for (i = 0; i < _vg_coarse->nr_voxel(); ++i) {
-    r = _order_table[i].first;
-    c = _order_table[i].second;
-    if (fit_grid_with_neighbors(
-            r, c, _vg_coarse->const_data(), gp, _vg_coarse->nr_points(),
-            _vg_coarse->nr_point_element(),
-            _pf_thresholds[r][c]) >= (int)_param.nr_inliers_min_threshold) {
-      i_plane_eucli_to_spher(gp, _ground_planes_sphe[r][c]);
-      _ground_planes[r][c] = gp;
+  for (i = 0; i < vg_coarse_->NrVoxel(); ++i) {
+    r = order_table_[i].first;
+    c = order_table_[i].second;
+    if (FitGridWithNeighbors(
+            r, c, vg_coarse_->const_data(), &gp, vg_coarse_->NrPoints(),
+            vg_coarse_->NrPointElement(), pf_thresholds_[r][c]) >=
+        static_cast<int>(param_.nr_inliers_min_threshold)) {
+      IPlaneEucliToSpher(gp, &ground_planes_sphe_[r][c]);
+      ground_planes_[r][c] = gp;
       nr_grids++;
     } else {
-      _ground_planes_sphe[r][c].force_invalid();
-      _ground_planes[r][c].force_invalid();
+      ground_planes_sphe_[r][c].ForceInvalid();
+      ground_planes_[r][c].ForceInvalid();
     }
   }
   return nr_grids;
 }
 
-void PlaneFitGroundDetector::get_neighbors(
+void PlaneFitGroundDetector::GetNeighbors(
     int r, int c, int rows, int cols,
-    std::vector<std::pair<int, int>> &neighbors) {
-  int left = i_max(0, c - 1);
-  int right = i_min(cols - 1, c + 1);
-  int up = i_max(0, r - 1);
-  int down = i_min(rows - 1, r + 1);
+    std::vector<std::pair<int, int> > *neighbors) {
+  int left = IMax(0, c - 1);
+  int right = IMin(cols - 1, c + 1);
+  int up = IMax(0, r - 1);
+  int down = IMin(rows - 1, r + 1);
   int x = 0;
   int y = 0;
-  neighbors.reserve(8);
+  neighbors->reserve(8);
   for (x = left; x <= right; ++x) {
     for (y = up; y <= down; ++y) {
       if (x == c && y == r) {
         continue;
       }
-      neighbors.push_back(std::pair<int, int>(y, x));
+      neighbors->push_back(std::pair<int, int>(y, x));
     }
   }
 }
 
-int PlaneFitGroundDetector::smooth_line(unsigned int up, unsigned int r,
-                                        unsigned int dn) {
+int PlaneFitGroundDetector::SmoothLine(unsigned int up, unsigned int r,
+                                       unsigned int dn) {
   int nr_grids = 0;
   unsigned int c = 0;
-  unsigned int nm1 = _param.nr_grids_coarse - 1;
+  unsigned int nm1 = param_.nr_grids_coarse - 1;
   GroundPlaneSpherical plane;
-  CHECK_GE(_param.nr_grids_coarse, 2);
-  CHECK_LT(up, _param.nr_grids_coarse);
-  CHECK_LT(r, _param.nr_grids_coarse);
-  CHECK_LT(dn, _param.nr_grids_coarse);
+  assert(param_.nr_grids_coarse >= 2);
+  assert(up < param_.nr_grids_coarse);
+  assert(r < param_.nr_grids_coarse);
+  assert(dn < param_.nr_grids_coarse);
   if (/*!(*_vg_coarse)(r, 0).empty()*/ true) {
-    if (_ground_planes_sphe[r][0].is_valid() == false) {
-      nr_grids += complete_grid(
-          _ground_planes_sphe[r][0], _ground_planes_sphe[r][1],
-          _ground_planes_sphe[up][0], _ground_planes_sphe[dn][0], plane);
+    if (ground_planes_sphe_[r][0].IsValid() == false) {
+      nr_grids += CompleteGrid(
+          ground_planes_sphe_[r][0], ground_planes_sphe_[r][1],
+          ground_planes_sphe_[up][0], ground_planes_sphe_[dn][0], &plane);
     } else {
       nr_grids +=
-          smooth_grid(_ground_planes_sphe[r][0], _ground_planes_sphe[r][0],
-                      _ground_planes_sphe[r][1], _ground_planes_sphe[up][0],
-                      _ground_planes_sphe[dn][0], plane);
+          SmoothGrid(ground_planes_sphe_[r][0], ground_planes_sphe_[r][0],
+                     ground_planes_sphe_[r][1], ground_planes_sphe_[up][0],
+                     ground_planes_sphe_[dn][0], &plane);
     }
-    i_plane_spher_to_eucli(plane, _ground_planes[r][0]);
+    IPlaneSpherToEucli(plane, &ground_planes_[r][0]);
   }
   for (c = 1; c < nm1; ++c) {
     if (/*!(*_vg_coarse)(r, c).empty()*/ true) {
-      if (_ground_planes_sphe[r][c].is_valid() == false) {
-        nr_grids += complete_grid(
-            _ground_planes_sphe[r][c - 1], _ground_planes_sphe[r][c + 1],
-            _ground_planes_sphe[up][c], _ground_planes_sphe[dn][c], plane);
+      if (ground_planes_sphe_[r][c].IsValid() == false) {
+        nr_grids += CompleteGrid(
+            ground_planes_sphe_[r][c - 1], ground_planes_sphe_[r][c + 1],
+            ground_planes_sphe_[up][c], ground_planes_sphe_[dn][c], &plane);
       } else {
-        nr_grids += smooth_grid(
-            _ground_planes_sphe[r][c], _ground_planes_sphe[r][c - 1],
-            _ground_planes_sphe[r][c + 1], _ground_planes_sphe[up][c],
-            _ground_planes_sphe[dn][c], plane);
+        nr_grids += SmoothGrid(
+            ground_planes_sphe_[r][c], ground_planes_sphe_[r][c - 1],
+            ground_planes_sphe_[r][c + 1], ground_planes_sphe_[up][c],
+            ground_planes_sphe_[dn][c], &plane);
       }
-      i_plane_spher_to_eucli(plane, _ground_planes[r][c]);
+      IPlaneSpherToEucli(plane, &ground_planes_[r][c]);
     }
   }
   if (/*!(*_vg_coarse)(r, nm1).empty()*/ true) {
-    if (_ground_planes_sphe[r][nm1].is_valid() == false) {
-      nr_grids += complete_grid(
-          _ground_planes_sphe[r][nm1 - 1], _ground_planes_sphe[r][nm1],
-          _ground_planes_sphe[up][nm1], _ground_planes_sphe[dn][nm1], plane);
+    if (ground_planes_sphe_[r][nm1].IsValid() == false) {
+      nr_grids += CompleteGrid(
+          ground_planes_sphe_[r][nm1 - 1], ground_planes_sphe_[r][nm1],
+          ground_planes_sphe_[up][nm1], ground_planes_sphe_[dn][nm1], &plane);
     } else {
-      nr_grids += smooth_grid(
-          _ground_planes_sphe[r][nm1], _ground_planes_sphe[r][nm1 - 1],
-          _ground_planes_sphe[r][nm1], _ground_planes_sphe[up][nm1],
-          _ground_planes_sphe[dn][nm1], plane);
+      nr_grids += SmoothGrid(
+          ground_planes_sphe_[r][nm1], ground_planes_sphe_[r][nm1 - 1],
+          ground_planes_sphe_[r][nm1], ground_planes_sphe_[up][nm1],
+          ground_planes_sphe_[dn][nm1], &plane);
     }
-    i_plane_spher_to_eucli(plane, _ground_planes[r][nm1]);
+    IPlaneSpherToEucli(plane, &ground_planes_[r][nm1]);
   }
 
   return nr_grids;
 }
 
-int PlaneFitGroundDetector::complete_grid(const GroundPlaneSpherical &lt,
-                                          const GroundPlaneSpherical &rt,
-                                          const GroundPlaneSpherical &up,
-                                          const GroundPlaneSpherical &dn,
-                                          GroundPlaneSpherical &gp) {
-  int supports[] = {0, 0, 0, 0};
-  float weights[] = {0.f, 0.f, 0.f, 0.f};
-  gp.force_invalid();
-  supports[0] = lt.get_nr_support();
-  supports[1] = rt.get_nr_support();
-  supports[2] = up.get_nr_support();
-  supports[3] = dn.get_nr_support();
-  int support_sum = i_sum4(supports);
+int PlaneFitGroundDetector::CompleteGrid(const GroundPlaneSpherical &lt,
+                                         const GroundPlaneSpherical &rt,
+                                         const GroundPlaneSpherical &up,
+                                         const GroundPlaneSpherical &dn,
+                                         GroundPlaneSpherical *gp) {
+  int supports[] = { 0, 0, 0, 0 };
+  float weights[] = { 0.f, 0.f, 0.f, 0.f };
+  gp->ForceInvalid();
+  supports[0] = lt.GetNrSupport();
+  supports[1] = rt.GetNrSupport();
+  supports[2] = up.GetNrSupport();
+  supports[3] = dn.GetNrSupport();
+  int support_sum = ISum4(supports);
   if (!support_sum) {
     return 0;
   }
-  weights[0] = (float)(supports[0]) / support_sum;
-  weights[1] = (float)(supports[1]) / support_sum;
-  weights[2] = (float)(supports[2]) / support_sum;
-  weights[3] = (float)(supports[3]) / support_sum;
+  weights[0] = static_cast<float>(supports[0]) / support_sum;
+  weights[1] = static_cast<float>(supports[1]) / support_sum;
+  weights[2] = static_cast<float>(supports[2]) / support_sum;
+  weights[3] = static_cast<float>(supports[3]) / support_sum;
   // weighted average:
-  gp.theta = weights[0] * lt.theta + weights[1] * rt.theta +
-             weights[2] * up.theta + weights[3] * dn.theta;
-  gp.phi = weights[0] * lt.phi + weights[1] * rt.phi + weights[2] * up.phi +
-           weights[3] * dn.phi;
-  gp.d = weights[0] * lt.d + weights[1] * rt.d + weights[2] * up.d +
-         weights[3] * dn.d;
+  gp->theta = weights[0] * lt.theta + weights[1] * rt.theta +
+              weights[2] * up.theta + weights[3] * dn.theta;
+  gp->phi = weights[0] * lt.phi + weights[1] * rt.phi + weights[2] * up.phi +
+            weights[3] * dn.phi;
+  gp->d = weights[0] * lt.d + weights[1] * rt.d + weights[2] * up.d +
+          weights[3] * dn.d;
   // compute average - diveided by 4, round to nearest int
-  support_sum = i_max(((support_sum + 2) >> 2), 1);
-  gp.set_nr_support(support_sum);
+  support_sum = IMax(((support_sum + 2) >> 2), 1);
+  gp->SetNrSupport(support_sum);
   return 1;
 }
 
-int PlaneFitGroundDetector::smooth_grid(const GroundPlaneSpherical &g,
-                                        const GroundPlaneSpherical &lt,
-                                        const GroundPlaneSpherical &rt,
-                                        const GroundPlaneSpherical &up,
-                                        const GroundPlaneSpherical &dn,
-                                        GroundPlaneSpherical &gp) {
-  int supports[] = {0, 0, 0, 0, 0};
-  float weights[] = {0.f, 0.f, 0.f, 0.f, 0.f};
-  gp.force_invalid();
-  if (!g.is_valid()) {
+int PlaneFitGroundDetector::SmoothGrid(const GroundPlaneSpherical &g,
+                                       const GroundPlaneSpherical &lt,
+                                       const GroundPlaneSpherical &rt,
+                                       const GroundPlaneSpherical &up,
+                                       const GroundPlaneSpherical &dn,
+                                       GroundPlaneSpherical *gp) {
+  int supports[] = { 0, 0, 0, 0, 0 };
+  float weights[] = { 0.f, 0.f, 0.f, 0.f, 0.f };
+  gp->ForceInvalid();
+  if (!g.IsValid()) {
     return 0;
   }
-  // geometry weight:
-  //  1
+  //  geometry weight:
+  //   1
   // 1 4 1
-  //  1
-  if (lt.get_status()) {
-    supports[0] = lt.get_nr_support();
+  //   1
+  if (lt.GetStatus()) {
+    supports[0] = lt.GetNrSupport();
   }
-  if (rt.get_status()) {
-    supports[1] = rt.get_nr_support();
+  if (rt.GetStatus()) {
+    supports[1] = rt.GetNrSupport();
   }
-  if (up.get_status()) {
-    supports[2] = up.get_nr_support();
+  if (up.GetStatus()) {
+    supports[2] = up.GetNrSupport();
   }
-  if (dn.get_status()) {
-    supports[3] = dn.get_nr_support();
+  if (dn.GetStatus()) {
+    supports[3] = dn.GetNrSupport();
   }
-  supports[4] = (g.get_nr_support() << 2);
-  int support_sum = i_sum4(supports);
+  supports[4] = (g.GetNrSupport() << 2);
+  int support_sum = ISum4(supports);
   if (support_sum == 0) {
-    gp = g;
+    *gp = g;
     return 0;
   }
   support_sum += supports[4];
-  weights[0] = (float)(supports[0]) / support_sum;
-  weights[1] = (float)(supports[1]) / support_sum;
-  weights[2] = (float)(supports[2]) / support_sum;
-  weights[3] = (float)(supports[3]) / support_sum;
-  weights[4] = (float)(supports[4]) / support_sum;
+  weights[0] = static_cast<float>(supports[0]) / support_sum;
+  weights[1] = static_cast<float>(supports[1]) / support_sum;
+  weights[2] = static_cast<float>(supports[2]) / support_sum;
+  weights[3] = static_cast<float>(supports[3]) / support_sum;
+  weights[4] = static_cast<float>(supports[4]) / support_sum;
   // weighted average:
-  gp.theta = weights[0] * lt.theta + weights[1] * rt.theta +
-             weights[2] * up.theta + weights[3] * dn.theta +
-             weights[4] * g.theta;
-  gp.phi = weights[0] * lt.phi + weights[1] * rt.phi + weights[2] * up.phi +
-           weights[3] * dn.phi + weights[4] * g.phi;
-  gp.d = weights[0] * lt.d + weights[1] * rt.d + weights[2] * up.d +
-         weights[3] * dn.d + weights[4] * g.d;
+  gp->theta =
+      weights[0] * lt.theta + weights[1] * rt.theta + weights[2] * up.theta +
+      weights[3] * dn.theta + weights[4] * g.theta;
+  gp->phi = weights[0] * lt.phi + weights[1] * rt.phi + weights[2] * up.phi +
+            weights[3] * dn.phi + weights[4] * g.phi;
+  gp->d = weights[0] * lt.d + weights[1] * rt.d + weights[2] * up.d +
+          weights[3] * dn.d + weights[4] * g.d;
   // compute weighted average - diveided by 8, round to nearest int
-  support_sum = i_max(((support_sum + 2) >> 3), 1);
-  gp.set_nr_support(support_sum);
+  support_sum = IMax(((support_sum + 2) >> 3), 1);
+  gp->SetNrSupport(support_sum);
   return 1;
 }
 
-int PlaneFitGroundDetector::smooth() {
+int PlaneFitGroundDetector::Smooth() {
   int nr_grids = 0;
   unsigned int r = 0;
   unsigned int c = 0;
-  unsigned int nm1 = _param.nr_grids_coarse - 1;
-  CHECK_GE(_param.nr_grids_coarse, 2);
-  nr_grids += smooth_line(0, 0, 1);
+  unsigned int nm1 = param_.nr_grids_coarse - 1;
+  assert(param_.nr_grids_coarse >= 2);
+  nr_grids += SmoothLine(0, 0, 1);
   for (r = 1; r < nm1; ++r) {
-    nr_grids += smooth_line(r - 1, r, r + 1);
+    nr_grids += SmoothLine(r - 1, r, r + 1);
   }
-  nr_grids += smooth_line(nm1 - 1, nm1, nm1);
-  for (r = 0; r < _param.nr_grids_coarse; ++r) {
-    for (c = 0; c < _param.nr_grids_coarse; ++c) {
-      i_plane_eucli_to_spher(_ground_planes[r][c], _ground_planes_sphe[r][c]);
+  nr_grids += SmoothLine(nm1 - 1, nm1, nm1);
+  for (r = 0; r < param_.nr_grids_coarse; ++r) {
+    for (c = 0; c < param_.nr_grids_coarse; ++c) {
+      IPlaneEucliToSpher(ground_planes_[r][c], &ground_planes_sphe_[r][c]);
     }
   }
   return nr_grids;
 }
 
-bool PlaneFitGroundDetector::detect(const float *point_cloud,
+bool PlaneFitGroundDetector::Detect(const float *point_cloud,
                                     float *height_above_ground,
                                     unsigned int nr_points,
                                     unsigned int nr_point_elements) {
-  CHECK_NOTNULL(point_cloud);
-  CHECK_NOTNULL(height_above_ground);
-  CHECK_LE(nr_points, _param.nr_points_max);
-  CHECK_GE(nr_point_elements, 3);
+  assert(point_cloud != nullptr);
+  assert(height_above_ground != nullptr);
+  assert(nr_points <= param_.nr_points_max);
+  assert(nr_point_elements >= 3);
   // setup the fine voxel grid
-  if (!_vg_fine->set_s(point_cloud, nr_points, nr_point_elements)) {
+  if (!vg_fine_->SetS(point_cloud, nr_points, nr_point_elements)) {
     return false;
   }
   // setup the coarse voxel grid
-  if (!_vg_coarse->set_s(point_cloud, nr_points, nr_point_elements)) {
+  if (!vg_coarse_->SetS(point_cloud, nr_points, nr_point_elements)) {
     return false;
   }
+  int nr_candis = 0;
+  int nr_valid_grid = 0;
   unsigned int r = 0;
   unsigned int c = 0;
-  // unsigned int iter = 0;
-  // filter to generate plane fitting candidates
-  filter();
+  unsigned int iter = 0;
+  // Filter to generate plane fitting candidates
+  nr_candis = Filter();
   // std::cout << "# of plane candidates: " << nr_candis << std::endl;
-  // fit local plane using ransac
-  // nr_valid_grid = fit();
-  fit_in_order();
+  //  Fit local plane using ransac
+  // nr_valid_grid = Fit();
+  nr_valid_grid = FitInOrder();
   // std::cout << "# of valid plane geometry (fitting): " << nr_valid_grid <<
   // std::endl;
-  // smooth plane using neighborhood information:
-  for (int iter = 0; iter < _param.nr_smooth_iter; ++iter) {
-    smooth();
+  // Smooth plane using neighborhood information:
+  for (iter = 0; iter < param_.nr_smooth_iter; ++iter) {
+    nr_valid_grid = Smooth();
   }
 
-  for (r = 0; r < _param.nr_grids_coarse; ++r) {
-    for (c = 0; c < _param.nr_grids_coarse; ++c) {
-      if ((*_vg_coarse)(r, c).empty()) {
-        _ground_planes[r][c].force_invalid();
+  for (r = 0; r < param_.nr_grids_coarse; ++r) {
+    for (c = 0; c < param_.nr_grids_coarse; ++c) {
+      if ((*vg_coarse_)(r, c).Empty()) {
+        ground_planes_[r][c].ForceInvalid();
       }
     }
   }
 
-  // std::cout << "# of valid plane geometry (smooth): " << nr_valid_grid <<
+  // std::cout << "# of valid plane geometry (Smooth): " << nr_valid_grid <<
   // std::endl;
   // compute point to ground distance
-  compute_signed_ground_height(point_cloud, height_above_ground, nr_points,
-                               nr_point_elements);
+  ComputeSignedGroundHeight(point_cloud, height_above_ground, nr_points,
+                            nr_point_elements);
   return true;
 }
 
-const char *PlaneFitGroundDetector::get_label() const { return _labels; }
+const char *PlaneFitGroundDetector::GetLabel() const { return labels_; }
 
-const VoxelGridXY<float> *PlaneFitGroundDetector::get_grid() const {
-  return _vg_coarse;
+const VoxelGridXY<float> *PlaneFitGroundDetector::GetGrid() const {
+  return vg_coarse_;
 }
 
-const GroundPlaneLiDAR *PlaneFitGroundDetector::get_ground_plane(int r,
-                                                                 int c) const {
-  CHECK_GE(r, 0);
-  CHECK_LT(r, (int)_param.nr_grids_coarse);
-  CHECK_GE(c, 0);
-  CHECK_LT(c, (int)_param.nr_grids_coarse);
-  return _ground_planes != nullptr ? _ground_planes[r] + c : nullptr;
+const GroundPlaneLiDAR *PlaneFitGroundDetector::GetGroundPlane(int r,
+                                                               int c) const {
+  assert(r >= 0 && r < static_cast<int>(param_.nr_grids_coarse));
+  assert(c >= 0 && c < static_cast<int>(param_.nr_grids_coarse));
+  return ground_planes_ != nullptr ? ground_planes_[r] + c : nullptr;
 }
 
-const unsigned int PlaneFitGroundDetector::get_grid_dim_x() const {
-  return _vg_coarse->nr_voxel_x();
+const unsigned int PlaneFitGroundDetector::GetGridDimX() const {
+  return vg_coarse_->NrVoxelX();
 }
 
-const unsigned int PlaneFitGroundDetector::get_grid_dim_y() const {
-  return _vg_coarse->nr_voxel_y();
+const unsigned int PlaneFitGroundDetector::GetGridDimY() const {
+  return vg_coarse_->NrVoxelY();
 }
 
-float PlaneFitGroundDetector::get_unknown_height() { return (FLT_MAX); }
+float PlaneFitGroundDetector::GetUnknownHeight() { return (FLT_MAX); }
 
-PlaneFitPointCandIndices **PlaneFitGroundDetector::get_candis() const {
-  return _local_candis;
+PlaneFitPointCandIndices **PlaneFitGroundDetector::GetCandis() const {
+  return local_candis_;
 }
 
-void i_plane_eucli_to_spher(const GroundPlaneLiDAR &src,
-                            GroundPlaneSpherical &dst) {
-  if (src.is_valid() == false) {
-    dst.force_invalid();
+void IPlaneEucliToSpher(const GroundPlaneLiDAR &src,
+                        GroundPlaneSpherical *dst) {
+  if (src.IsValid() == false) {
+    dst->ForceInvalid();
   } else {
     GroundPlaneLiDAR p = src;
-    CHECK(p.params[2] != 0 || p.params[1] != 0);
-    p.force_unit_norm();  // to be safe
-    p.force_positive_normal_z();
-    dst.theta = i_acos(p.params[0]);
-    dst.phi = i_atan2(p.params[1], p.params[2]);
-    dst.d = p.params[3];
-    dst.set_nr_support(src.get_nr_support());
-    dst.set_status(src.get_status());
+    assert(p.params[2] != 0 || p.params[1] != 0);
+    p.ForceUnitNorm();  // to be safe
+    p.ForcePositiveNormalZ();
+    dst->theta = IAcos(p.params[0]);
+    dst->phi = IAtan2(p.params[1], p.params[2]);
+    dst->d = p.params[3];
+    dst->SetNrSupport(src.GetNrSupport());
+    dst->SetStatus(src.GetStatus());
   }
 }
 
-void i_plane_spher_to_eucli(const GroundPlaneSpherical &src,
-                            GroundPlaneLiDAR &dst) {
-  if (src.is_valid() == false) {
-    dst.force_invalid();
+void IPlaneSpherToEucli(const GroundPlaneSpherical &src,
+                        GroundPlaneLiDAR *dst) {
+  if (src.IsValid() == false) {
+    dst->ForceInvalid();
   } else {
     // assume positive nz;
     // ny = nz * ny_over_nz;
@@ -1317,341 +1323,18 @@ void i_plane_spher_to_eucli(const GroundPlaneSpherical &src,
     // nz^2(1 + ny_over_nz^2) = 1 - nx^2;
     // nz = sqrt((1-nx^2)/(1 + ny_over_nz^2))
     // nz is positive, guaranteed
-    float nx = i_cos(src.theta);
-    float ny_over_nz = i_tan(src.phi);
-    float nz = i_sqrt((1 - nx * nx) / (1 + ny_over_nz * ny_over_nz));
+    float nx = ICos(src.theta);
+    float ny_over_nz = ITan(src.phi);
+    float nz = ISqrt((1 - nx * nx) / (1 + ny_over_nz * ny_over_nz));
     float ny = nz * ny_over_nz;
-    dst.params[0] = nx;
-    dst.params[1] = ny;
-    dst.params[2] = nz;
-    dst.params[3] = src.d;
-    dst.set_nr_support(src.get_nr_support());
-    dst.set_status(src.get_status());
+    dst->params[0] = nx;
+    dst->params[1] = ny;
+    dst->params[2] = nz;
+    dst->params[3] = src.d;
+    dst->SetNrSupport(src.GetNrSupport());
+    dst->SetStatus(src.GetStatus());
   }
 }
-
-}  // namespace idl
-
-/*
-int PlaneFitGroundDetector::compare_z_16(const float* point_cloud,
-const std::vector<int>& indices,
-const float z_values[16],
-unsigned int nr_points,
-unsigned int nr_point_element,
-PlaneFitPointCandIndices& candi) {
-int pos, nr_candis = 0;
-unsigned int i, nr_contradi = 0;
-float z, delta_z;
-for (i = 0; i < indices.size(); ++i) {
-pos = indices[i];
-CHECK_LT(pos, (int)nr_points);
-// requires the Z element to be in the third position, i.e., after X, Y
-z = (point_cloud + (pos * nr_point_element))[2];
-if (z < _param.sample_region_z_lower || z >= _param.sample_region_z_upper) {
-continue;
-}
-// 0
-delta_z = i_abs(z_values[0] - z);
-if (delta_z > _param.planefit_filter_threshold) {
-nr_contradi++;
-}
-// 1
-delta_z = i_abs(z_values[1] - z);
-if (delta_z > _param.planefit_filter_threshold) {
-nr_contradi++;
-}
-// 2
-delta_z = i_abs(z_values[2] - z);
-if (delta_z > _param.planefit_filter_threshold) {
-nr_contradi++;
-}
-// 3
-delta_z = i_abs(z_values[3] - z);
-if (delta_z > _param.planefit_filter_threshold) {
-nr_contradi++;
-}
-if (nr_contradi > _param.nr_z_comp_fail_threshold) {
-continue;
-}
-// 4
-delta_z = i_abs(z_values[4] - z);
-if (delta_z > _param.planefit_filter_threshold) {
-nr_contradi++;
-}
-// 5
-delta_z = i_abs(z_values[5] - z);
-if (delta_z > _param.planefit_filter_threshold) {
-nr_contradi++;
-}
-// 6
-delta_z = i_abs(z_values[6] - z);
-if (delta_z > _param.planefit_filter_threshold) {
-nr_contradi++;
-}
-// 7
-delta_z = i_abs(z_values[7] - z);
-if (delta_z > _param.planefit_filter_threshold) {
-nr_contradi++;
-}
-if (nr_contradi > _param.nr_z_comp_fail_threshold) {
-continue;
-}
-// 8
-delta_z = i_abs(z_values[8] - z);
-if (delta_z > _param.planefit_filter_threshold) {
-nr_contradi++;
-}
-// 9
-delta_z = i_abs(z_values[9] - z);
-if (delta_z > _param.planefit_filter_threshold) {
-nr_contradi++;
-}
-// 10
-delta_z = i_abs(z_values[10] - z);
-if (delta_z > _param.planefit_filter_threshold) {
-nr_contradi++;
-}
-// 11
-delta_z = i_abs(z_values[11] - z);
-if (delta_z > _param.planefit_filter_threshold) {
-nr_contradi++;
-}
-if (nr_contradi > _param.nr_z_comp_fail_threshold) {
-continue;
-}
-// 12
-delta_z = i_abs(z_values[12] - z);
-if (delta_z > _param.planefit_filter_threshold) {
-nr_contradi++;
-}
-// 13
-delta_z = i_abs(z_values[13] - z);
-if (delta_z > _param.planefit_filter_threshold) {
-nr_contradi++;
-}
-// 14
-delta_z = i_abs(z_values[14] - z);
-if (delta_z > _param.planefit_filter_threshold) {
-nr_contradi++;
-}
-// 15
-delta_z = i_abs(z_values[15] - z);
-if (delta_z > _param.planefit_filter_threshold) {
-nr_contradi++;
-}
-if (nr_contradi <= _param.nr_z_comp_fail_threshold) {
-_labels[pos] = 1;
-candi.push_index(pos);
-nr_candis++;
-}
-}
-return nr_candis;
-}
-
-int PlaneFitGroundDetector::compare_z_32(const float* point_cloud,
-const std::vector<int>& indices,
-const float z_values[32],
-unsigned int nr_points,
-unsigned int nr_point_element,
-PlaneFitPointCandIndices& candi) {
-int pos, nr_candis = 0;
-unsigned int i, nr_contradi = 0;
-float z, delta_z;
-for (i = 0; i < indices.size(); ++i) {
-pos = indices[i];
-CHECK_LT(pos, (int)nr_points);
-// requires the Z element to be in the third position, i.e., after X, Y
-z = (point_cloud + (pos * nr_point_element))[2];
-if (z < _param.sample_region_z_lower || z >= _param.sample_region_z_upper) {
-continue;
-}
-// 0
-delta_z = i_abs(z_values[0] - z);
-if (delta_z > _param.planefit_filter_threshold) {
-nr_contradi++;
-}
-// 1
-delta_z = i_abs(z_values[1] - z);
-if (delta_z > _param.planefit_filter_threshold) {
-nr_contradi++;
-}
-// 2
-delta_z = i_abs(z_values[2] - z);
-if (delta_z > _param.planefit_filter_threshold) {
-nr_contradi++;
-}
-// 3
-delta_z = i_abs(z_values[3] - z);
-if (delta_z > _param.planefit_filter_threshold) {
-nr_contradi++;
-}
-if (nr_contradi > _param.nr_z_comp_fail_threshold) {
-continue;
-}
-// 4
-delta_z = i_abs(z_values[4] - z);
-if (delta_z > _param.planefit_filter_threshold) {
-nr_contradi++;
-}
-// 5
-delta_z = i_abs(z_values[5] - z);
-if (delta_z > _param.planefit_filter_threshold) {
-nr_contradi++;
-}
-// 6
-delta_z = i_abs(z_values[6] - z);
-if (delta_z > _param.planefit_filter_threshold) {
-nr_contradi++;
-}
-// 7
-delta_z = i_abs(z_values[7] - z);
-if (delta_z > _param.planefit_filter_threshold) {
-nr_contradi++;
-}
-if (nr_contradi > _param.nr_z_comp_fail_threshold) {
-continue;
-}
-// 8
-delta_z = i_abs(z_values[8] - z);
-if (delta_z > _param.planefit_filter_threshold) {
-nr_contradi++;
-}
-// 9
-delta_z = i_abs(z_values[9] - z);
-if (delta_z > _param.planefit_filter_threshold) {
-nr_contradi++;
-}
-// 10
-delta_z = i_abs(z_values[10] - z);
-if (delta_z > _param.planefit_filter_threshold) {
-nr_contradi++;
-}
-// 11
-delta_z = i_abs(z_values[11] - z);
-if (delta_z > _param.planefit_filter_threshold) {
-nr_contradi++;
-}
-if (nr_contradi > _param.nr_z_comp_fail_threshold) {
-continue;
-}
-// 12
-delta_z = i_abs(z_values[12] - z);
-if (delta_z > _param.planefit_filter_threshold) {
-nr_contradi++;
-}
-// 13
-delta_z = i_abs(z_values[13] - z);
-if (delta_z > _param.planefit_filter_threshold) {
-nr_contradi++;
-}
-// 14
-delta_z = i_abs(z_values[14] - z);
-if (delta_z > _param.planefit_filter_threshold) {
-nr_contradi++;
-}
-// 15
-delta_z = i_abs(z_values[15] - z);
-if (delta_z > _param.planefit_filter_threshold) {
-nr_contradi++;
-}
-if (nr_contradi > _param.nr_z_comp_fail_threshold) {
-continue;
-}
-// 16
-delta_z = i_abs(z_values[16] - z);
-if (delta_z > _param.planefit_filter_threshold) {
-nr_contradi++;
-}
-// 17
-delta_z = i_abs(z_values[17] - z);
-if (delta_z > _param.planefit_filter_threshold) {
-nr_contradi++;
-}
-// 18
-delta_z = i_abs(z_values[18] - z);
-if (delta_z > _param.planefit_filter_threshold) {
-nr_contradi++;
-}
-// 19
-delta_z = i_abs(z_values[19] - z);
-if (delta_z > _param.planefit_filter_threshold) {
-nr_contradi++;
-}
-if (nr_contradi > _param.nr_z_comp_fail_threshold) {
-continue;
-}
-// 20
-delta_z = i_abs(z_values[20] - z);
-if (delta_z > _param.planefit_filter_threshold) {
-nr_contradi++;
-}
-// 21
-delta_z = i_abs(z_values[21] - z);
-if (delta_z > _param.planefit_filter_threshold) {
-nr_contradi++;
-}
-// 22
-delta_z = i_abs(z_values[22] - z);
-if (delta_z > _param.planefit_filter_threshold) {
-nr_contradi++;
-}
-// 23
-delta_z = i_abs(z_values[23] - z);
-if (delta_z > _param.planefit_filter_threshold) {
-nr_contradi++;
-}
-if (nr_contradi > _param.nr_z_comp_fail_threshold) {
-continue;
-}
-// 24
-delta_z = i_abs(z_values[24] - z);
-if (delta_z > _param.planefit_filter_threshold) {
-nr_contradi++;
-}
-// 25
-delta_z = i_abs(z_values[25] - z);
-if (delta_z > _param.planefit_filter_threshold) {
-nr_contradi++;
-}
-// 26
-delta_z = i_abs(z_values[26] - z);
-if (delta_z > _param.planefit_filter_threshold) {
-nr_contradi++;
-}
-// 27
-delta_z = i_abs(z_values[27] - z);
-if (delta_z > _param.planefit_filter_threshold) {
-nr_contradi++;
-}
-if (nr_contradi > _param.nr_z_comp_fail_threshold) {
-continue;
-}
-// 28
-delta_z = i_abs(z_values[28] - z);
-if (delta_z > _param.planefit_filter_threshold) {
-nr_contradi++;
-}
-// 29
-delta_z = i_abs(z_values[29] - z);
-if (delta_z > _param.planefit_filter_threshold) {
-nr_contradi++;
-}
-// 30
-delta_z = i_abs(z_values[30] - z);
-if (delta_z > _param.planefit_filter_threshold) {
-nr_contradi++;
-}
-// 31
-delta_z = i_abs(z_values[31] - z);
-if (delta_z > _param.planefit_filter_threshold) {
-nr_contradi++;
-}
-if (nr_contradi <= _param.nr_z_comp_fail_threshold) {
-_labels[pos] = 1;
-candi.push_index(pos);
-nr_candis++;
-}
-}
-return nr_candis;
-}
-*/
+} /*namespace common*/
+} /*namespace perception*/
+} /*namespace apollo*/

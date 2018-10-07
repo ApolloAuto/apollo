@@ -18,250 +18,251 @@
 #define MODULES_PERCEPTION_COMMON_I_LIB_PC_I_STRUCT_S_H_
 
 #include <smmintrin.h>
+#include <cassert>
 #include <vector>
+#include <limits>
 
 #include "modules/perception/common/i_lib/core/i_alloc.h"
 #include "modules/perception/common/i_lib/core/i_blas.h"
 #include "modules/perception/common/i_lib/pc/i_util.h"
 
-namespace idl {
-template <typename T, unsigned int d>
-class PtCluster {
+
+namespace apollo {
+namespace perception {
+namespace common {
+template <typename T, unsigned int d> class PtCluster {
  public:
-  typedef T* iterator;
-  typedef const T* const_iterator;
-  typedef T& reference;
-  typedef const T& const_reference;
+  typedef T *iterator;
+  typedef const T *const_iterator;
+  typedef T &reference;
+  typedef const T &const_reference;
 
-  static unsigned int nr_point_element() { return (d); }
+  static unsigned int NrPointElement() { return (d); }
 
-  static unsigned int pointsize_in_byte() { return (d * sizeof(T)); }
+  static unsigned int PointsizeInByte() { return (d * sizeof(T)); }
 
-  unsigned int clustersize_in_byte() const {
-    return (d * sizeof(T) * _nr_points);
+  unsigned int ClustersizeInByte() const {
+    return (d * sizeof(T) * nr_points_);
   }
 
-  unsigned int nr_points() const { return (_nr_points); }
+  unsigned int NrPoints() const { return (nr_points_); }
 
-  bool initialized() const { return (_nr_points > 0); }
+  bool Initialized() const { return (nr_points_ > 0); }
 
-  const T* const_data() const { return (_data); }
+  const T *ConstData() const { return (data_); }
 
-  T* data() { return (_data); }
+  T *Data() { return (data_); }
 
-  void cleanup();
+  void CleanUp();
 
   PtCluster();
   explicit PtCluster(unsigned int n);
-  PtCluster(const T* data, unsigned int n);
-  PtCluster(const PtCluster<T, d>& c) : _data(NULL), _nr_points(0) {
-    if (c.nr_points()) {
-      _nr_points = c.nr_points();
-      _data = i_alloc_aligned<T>(_nr_points * d, 4);
-      CHECK_NE(_data, nullptr);
-      CHECK(i_verify_alignment(_data, 4));
-      i_copy(c.const_data(), _data, _nr_points * d);
+  PtCluster(const T *data, unsigned int n);
+  PtCluster(const PtCluster<T, d> &c) : data_(nullptr), nr_points_(0) {
+    if (c.NrPoints()) {
+      nr_points_ = c.NrPoints();
+      data_ = IAllocAligned<T>(nr_points_ * d, 4);
+      assert(data_ != nullptr && IVerifyAlignment(data_, 4));
+      ICopy(c.ConstData(), data_, nr_points_ * d);
     }
   }
 
-  PtCluster& operator=(const PtCluster<T, d>& c) {
+  PtCluster &operator=(const PtCluster<T, d> &c) {
     if (this != &c) {
-      if (this->_nr_points != c.nr_points()) {
-        i_free_aligned(_data);
-        _data = i_alloc_aligned<T>(this->_nr_points * d, 4);
-        CHECK_NE(_data, nullptr);
-        CHECK(i_verify_alignment(_data, 4));
-        this->_nr_points = c.nr_points();
+      if (this->nr_points_ != c.NrPoints()) {
+        IFreeAligned(&data_);
+        data_ = IAllocAligned<T>(this->nr_points_ * d, 4);
+        assert(data_ != nullptr && IVerifyAlignment(data_, 4));
+        this->nr_points_ = c.NrPoints();
       }
-      i_copy(c.const_data(), _data, this->_nr_points * d);
+      ICopy(c.ConstData(), data_, this->nr_points_ * d);
     }
     return (*this);
   }
 
-  virtual ~PtCluster() { cleanup(); }
+  virtual ~PtCluster() { CleanUp(); }
 
-  T* operator[](unsigned int i) {
-    CHECK_LT(i, _nr_points);
-    CHECK_NOTNULL(_data);
-    return (_data + i * d);
+  T *operator[](unsigned int i) {
+    assert(i < nr_points_);
+    assert(data_ != nullptr);
+    return (data_ + i * d);
   }
 
-  const T* operator[](unsigned int i) const {
-    CHECK_LT(i, _nr_points);
-    CHECK_NOTNULL(_data);
-    return (_data + i * d);
+  const T *operator[](unsigned int i) const {
+    assert(i < nr_points_);
+    assert(data_ != nullptr);
+    return (data_ + i * d);
   }
 
   reference operator()(unsigned int i, unsigned int j) {
-    CHECK_LT(i, _nr_points);
-    CHECK_LT(j, d);
-    return _data[i * d + j];
+    assert(i < nr_points_ && j < d);
+    return data_[i * d + j];
   }
 
   const_reference operator()(unsigned int i, unsigned int j) const {
-    CHECK_LT(i, _nr_points);
-    CHECK_LT(j, d);
-    return _data[i * d + j];
+    assert(i < nr_points_ && j < d);
+    return data_[i * d + j];
   }
 
-  iterator begin() { return _data; }
+  iterator Begin() { return data_; }
 
-  iterator end() { return _data + (_nr_points * d); }
+  iterator End() { return data_ + (nr_points_ * d); }
 
-  const_iterator begin() const { return _data; }
+  const_iterator Begin() const { return data_; }
 
-  const_iterator end() const { return data + (_nr_points * d); }
+  const_iterator End() const { return data_ + (nr_points_ * d); }
 
  protected:
-  /*continuous 16-byte aligned memory*/
-  T* _data;
-  unsigned int _nr_points;
+  // continuous 16-byte aligned memory
+  T *data_;
+  unsigned int nr_points_;
 };
 
 template <typename T, unsigned int d>
-PtCluster<T, d>::PtCluster() : _data(NULL), _nr_points(0) {}
+PtCluster<T, d>::PtCluster()
+    : data_(nullptr), nr_points_(0) {}
 
 template <typename T, unsigned int d>
-PtCluster<T, d>::PtCluster(unsigned int n) : _data(NULL), _nr_points(n) {
+PtCluster<T, d>::PtCluster(unsigned int n)
+    : data_(nullptr), nr_points_(n) {
   if (n != 0) {
-    _data = i_alloc_aligned<T>(n * d, 4);
-    if (!_data || !i_verify_alignment(_data, 4)) {
-      _nr_points = 0;
-      i_free_aligned(_data);
+    data_ = IAllocAligned<T>(n * d, 4);
+    if (!data_ || !IVerifyAlignment(data_, 4)) {
+      nr_points_ = 0;
+      IFreeAligned(&data_);
     }
   }
 }
 
 template <typename T, unsigned int d>
-PtCluster<T, d>::PtCluster(const T* data, unsigned int n)
-    : _data(NULL), _nr_points(n) {
+PtCluster<T, d>::PtCluster(const T *data, unsigned int n)
+    : data_(nullptr), nr_points_(n) {
   if (data && n) {
-    _data = i_alloc_aligned<T>(n * d, 4);
-    if (_data && i_verify_alignment(_data, 4)) {
-      i_copy(data, _data, n * d);
+    data_ = IAllocAligned<T>(n * d, 4);
+    if (data_ && IVerifyAlignment(data_, 4)) {
+      ICopy(data, data_, n * d);
     } else {
-      _nr_points = 0;
-      i_free_aligned(_data);
+      nr_points_ = 0;
+      IFreeAligned(&data_);
     }
   }
 }
 
-template <typename T, unsigned int d>
-void PtCluster<T, d>::cleanup() {
-  i_free_aligned(_data);
-  _nr_points = 0;
+template <typename T, unsigned int d> void PtCluster<T, d>::CleanUp() {
+  IFreeAligned(&data_);
+  nr_points_ = 0;
 }
 
 template <typename T>
-inline int i_assign_point_to_voxel(const T* data, T bound_x_min, T bound_x_max,
-                                   T bound_y_min, T bound_y_max, T bound_z_min,
-                                   T bound_z_max, T voxel_width_x_rec,
-                                   T voxel_width_y_rec, int nr_voxel_x,
-                                   int nr_voxel_y) {
+inline int IAssignPointToVoxel(const T *data, T bound_x_min, T bound_x_max,
+                               T bound_y_min, T bound_y_max, T bound_z_min,
+                               T bound_z_max, T voxel_width_x_rec,
+                               T voxel_width_y_rec, int nr_voxel_x,
+                               int nr_voxel_y) {
   int i, j, k;
   T x = data[0];
   T y = data[1];
   T z = data[2];
 
-  /*points that are outside the defined BBOX are ignored*/
+  // points that are outside the defined BBOX are ignored
   if (x < bound_x_min || x > bound_x_max || y < bound_y_min ||
       y > bound_y_max || z < bound_z_min || z > bound_z_max) {
     return (-1);
   }
 
-  /*compute the x, y voxel indices*/
-  k = i_min(nr_voxel_x - 1, (int)((x - bound_x_min) * voxel_width_x_rec));
-  j = i_min(nr_voxel_y - 1, (int)((y - bound_y_min) * voxel_width_y_rec));
+  // compute the x, y voxel indices
+  k = IMin(nr_voxel_x - 1,
+           static_cast<int>((x - bound_x_min) * voxel_width_x_rec));
+  j = IMin(nr_voxel_y - 1,
+           static_cast<int>((y - bound_y_min) * voxel_width_y_rec));
   i = (nr_voxel_x * j) + k;
   return (i);
 }
 
-template <typename T>
-class Voxel {
+template <typename T> class Voxel {
  public:
-  Voxel(){};
-  ~Voxel(){};
-  Voxel(const Voxel<T>& voxel) {
-    _dim_x = voxel._dim_x;
-    _dim_y = voxel._dim_y;
-    _dim_z = voxel._dim_z;
-    _ix = voxel._ix;
-    _iy = voxel._iy;
-    _iz = voxel._iz;
-    i_copy3(voxel._v, _v);
-    _indices.assign(voxel._indices.begin(), voxel._indices.end());
-  };
+  Voxel() {}
+  ~Voxel() {}
+  Voxel(const Voxel<T> &voxel) {
+    dim_x_ = voxel.dim_x_;
+    dim_y_ = voxel.dim_y_;
+    dim_z_ = voxel.dim_z_;
+    ix_ = voxel.ix_;
+    iy_ = voxel.iy_;
+    iz_ = voxel.iz_;
+    ICopy3(voxel.v_, v_);
+    indices_.assign(voxel.indices_.begin(), voxel.indices_.end());
+  }
 
-  Voxel& operator=(const Voxel<T>& voxel) {
+  Voxel &operator=(const Voxel<T> &voxel) {
     if (this != &voxel) {
-      this->_dim_x = voxel._dim_x;
-      this->_dim_y = voxel._dim_y;
-      this->_dim_z = voxel._dim_z;
-      this->_ix = voxel._ix;
-      this->_iy = voxel._iy;
-      this->_iz = voxel._iz;
-      i_copy3(voxel._v, this->_v);
-      this->_indices.assign(voxel._indices.begin(), voxel._indices.end());
+      this->dim_x_ = voxel.dim_x_;
+      this->dim_y_ = voxel.dim_y_;
+      this->dim_z_ = voxel.dim_z_;
+      this->ix_ = voxel.ix_;
+      this->iy_ = voxel.iy_;
+      this->iz_ = voxel.iz_;
+      ICopy3(voxel.v_, this->v_);
+      this->indices_.assign(voxel.indices_.begin(), voxel.indices_.end());
     }
     return (*this);
-  };
-
-  void init(const T v[3], T dim_x, T dim_y, T dim_z, int ix, int iy, int iz) {
-    i_copy3(v, _v);
-    _dim_x = dim_x;
-    _dim_y = dim_y;
-    _dim_z = dim_z;
-    _ix = ix;
-    _iy = iy;
-    _iz = iz;
-    _indices.clear();
   }
 
-  void init(T v_x, T v_y, T v_z, T dim_x, T dim_y, T dim_z, int ix, int iy,
+  void Init(const T *v, T dim_x, T dim_y, T dim_z, int ix, int iy, int iz) {
+    ICopy3(v, v_);
+    dim_x_ = dim_x;
+    dim_y_ = dim_y;
+    dim_z_ = dim_z;
+    ix_ = ix;
+    iy_ = iy;
+    iz_ = iz;
+    indices_.clear();
+  }
+
+  void Init(T v_x, T v_y, T v_z, T dim_x, T dim_y, T dim_z, int ix, int iy,
             int iz) {
-    _v[0] = v_x;
-    _v[1] = v_y;
-    _v[2] = v_z;
-    _dim_x = dim_x;
-    _dim_y = dim_y;
-    _dim_z = dim_z;
-    _ix = ix;
-    _iy = iy;
-    _iz = iz;
-    _indices.clear();
+    v_[0] = v_x;
+    v_[1] = v_y;
+    v_[2] = v_z;
+    dim_x_ = dim_x;
+    dim_y_ = dim_y;
+    dim_z_ = dim_z;
+    ix_ = ix;
+    iy_ = iy;
+    iz_ = iz;
+    indices_.clear();
   }
 
-  void reset() {
-    i_zero3(_v);
-    _dim_x = _dim_y = _dim_z = 0;
-    _ix = _iy = _iz = 0;
-    _indices.clear();
+  void Reset() {
+    IZero3(v_);
+    dim_x_ = dim_y_ = dim_z_ = 0;
+    ix_ = iy_ = iz_ = 0;
+    indices_.clear();
   }
 
-  void reserve(unsigned int size) { _indices.reserve(size); }
+  void Reserve(unsigned int size) { indices_.reserve(size); }
 
-  void push_back(int id) { _indices.push_back(id); }
+  void PushBack(int id) { indices_.push_back(id); }
 
-  unsigned int capacity() const { return (unsigned int)_indices.capacity(); }
+  unsigned int Capacity() const { return (unsigned int) indices_.capacity(); }
 
-  unsigned int nr_points() const { return (unsigned int)_indices.size(); }
+  unsigned int NrPoints() const { return (unsigned int) indices_.size(); }
 
-  bool empty() const { return _indices.empty(); }
+  bool Empty() const { return indices_.empty(); }
 
-  T _v[3], _dim_x, _dim_y, _dim_z;
+  T v_[3], dim_x_, dim_y_, dim_z_;
 
-  /*voxel indices in the X, Y, Z dimensions - meaningful for voxel grid*/
-  int _ix, _iy, _iz;
+  // voxel indices in the X, Y, Z dimensions - meaningful for voxel grid
+  int ix_, iy_, iz_;
 
-  /*point indices*/
-  std::vector<int> _indices;
+  // point indices
+  std::vector<int> indices_;
 };
 
-/*-----Voxel Grid XY-----*/
-template <typename T>
-class VoxelGridXY {
-  /*assuming at most 320000 points*/
-  static const unsigned int _nr_max_reserved_points = 320000;
+// -----Voxel Grid XY-----
+template <typename T> class VoxelGridXY {
+  // assuming at most 320000 points
+  static const unsigned int s_nr_max_reserved_points_ = 320000;
 
  public:
   VoxelGridXY();
@@ -270,240 +271,225 @@ class VoxelGridXY {
               T spatial_bound_y_min, T spatial_bound_y_max,
               T spatial_bound_z_min, T spatial_bound_z_max);
 
-  VoxelGridXY& operator=(const VoxelGridXY<T>& vg) {
+  VoxelGridXY &operator=(const VoxelGridXY<T> &vg) {
     if (this != &vg) {
-      this->_initialized = vg.initialized();
-      this->_nr_points = vg.nr_points();
-      this->_nr_point_element = vg.nr_point_element();
-      this->_nr_voxel_x = vg.nr_voxel_x();
-      this->_nr_voxel_y = vg.nr_voxel_y();
-      this->_nr_voxel_z = vg.nr_voxel_z();
-      this->_data = vg.const_data();
-      vg.get_grid_dimension(this->_dim_x[0], this->_dim_x[1], this->_dim_y[0],
-                            this->_dim_y[1], this->_dim_z[0], this->_dim_z[1]);
-      this->_voxels.resize(vg.nr_voxel());
-      for (unsigned int i = 0; i < vg.nr_voxel(); ++i) {
-        this->_voxels[i] = vg[i];
+      this->initialized_ = vg.Initialized();
+      this->nr_points_ = vg.NrPoints();
+      this->nr_point_element_ = vg.NrPointElement();
+      this->nr_voxel_x_ = vg.NrVoxelX();
+      this->nr_voxel_y_ = vg.NrVoxelY();
+      this->nr_voxel_z_ = vg.NrVoxelZ();
+      this->data_ = vg.const_data();
+      vg.GetGridDimension(&this->dim_x_[0], &this->dim_x_[1], &this->dim_y_[0],
+                          &this->dim_y_[1], &this->dim_z_[0], &this->dim_z_[1]);
+      this->voxels_.resize(vg.NrVoxel());
+      for (unsigned int i = 0; i < vg.NrVoxel(); ++i) {
+        this->voxels_[i] = vg[i];
       }
 
-      this->alloc_aligned_memory();
+      this->AllocAlignedMemory();
     }
     return (*this);
   }
 
-  void cleanup();
+  void CleanUp();
 
   ~VoxelGridXY() {
-    i_free_aligned<float>(_mem_aligned16_f32);
-    i_free_aligned<int>(_mem_aligned16_i32);
-    cleanup();
+    IFreeAligned<float>(&mem_aligned16_f32_);
+    IFreeAligned<int>(&mem_aligned16_i32_);
+    CleanUp();
   }
 
-  bool alloc(unsigned int nr_voxel_x, unsigned int nr_voxel_y,
+  bool Alloc(unsigned int nr_voxel_x, unsigned int nr_voxel_y,
              T spatial_bound_x_min, T spatial_bound_x_max,
              T spatial_bound_y_min, T spatial_bound_y_max,
              T spatial_bound_z_min, T spatial_bound_z_max);
 
-  // non-sse2 version
-  bool set(const T* data /*pointer to the point cloud memory*/,
-           unsigned int nr_points, unsigned int nr_point_element);
+  bool Set(const T *data, unsigned int nr_points,
+           unsigned int nr_point_element);
 
-  /*sse2 version: only for float type input data*/
-  bool set_s(const float* data /*pointer to the point cloud memory*/,
-             unsigned int nr_points, unsigned int nr_point_element);
+  // sse2 version: only for float type input Data
+  bool SetS(const float *data, unsigned int nr_points,
+            unsigned int nr_point_element);
 
-  bool set(const T* data /*pointer to the point cloud memory*/,
-           unsigned int nr_points, unsigned int nr_point_element,
+  bool Set(const T *data, unsigned int nr_points, unsigned int nr_point_element,
            unsigned int nr_voxel_x, unsigned int nr_voxel_y,
            T spatial_bound_x_min, T spatial_bound_x_max, T spatial_bound_y_min,
            T spatial_bound_y_max, T spatial_bound_z_min, T spatial_bound_z_max,
            bool force_bound = true);
 
-  bool initialized() const { return _initialized; }
+  bool Initialized() const { return initialized_; }
 
-  unsigned int nr_voxel() const { return (unsigned int)_voxels.size(); }
+  unsigned int NrVoxel() const { return (unsigned int) voxels_.size(); }
 
-  unsigned int nr_voxel_x() const { return _nr_voxel_x; }
+  unsigned int NrVoxelX() const { return nr_voxel_x_; }
 
-  unsigned int nr_voxel_y() const { return _nr_voxel_y; }
+  unsigned int NrVoxelY() const { return nr_voxel_y_; }
 
-  unsigned int nr_voxel_z() const { return (1); }
+  unsigned int NrVoxelZ() const { return (1); }
 
-  unsigned int nr_points() const { return _nr_points; }
+  unsigned int NrPoints() const { return nr_points_; }
 
-  unsigned int nr_point_element() const { return _nr_point_element; }
+  unsigned int NrPointElement() const { return nr_point_element_; }
 
-  unsigned int nr_indexed_points() const;
+  unsigned int NrIndexedPoints() const;
 
-  std::vector<Voxel<T>>& get_voxels() { return _voxels; }
+  std::vector<Voxel<T> > &GetVoxels() { return voxels_; }
 
-  const std::vector<Voxel<T>>& get_const_voxels() const { return _voxels; }
+  const std::vector<Voxel<T> > &GetConstVoxels() const { return voxels_; }
 
-  void set_voxels(const std::vector<Voxel<T>>& voxels) {
-    _voxels.assign(voxels.begin(), voxels.end());
+  void SetVoxels(const std::vector<Voxel<T> > &voxels) {
+    voxels_.assign(voxels.begin(), voxels.end());
   }
 
-  bool get_grid_dimension(T& dim_min_x, T& dim_max_x, T& dim_min_y,
-                          T& dim_max_y, T& dim_min_z, T& dim_max_z) const {
-    if (!_initialized) {
+  bool GetGridDimension(T *dim_min_x, T *dim_max_x, T *dim_min_y, T *dim_max_y,
+                        T *dim_min_z, T *dim_max_z) const {
+    if (!initialized_) {
       dim_min_x = dim_max_x = dim_min_y = dim_max_y = dim_min_z = dim_max_z =
-          (T)0;
+          static_cast<T>(0);
       return (false);
     }
-    dim_min_x = _dim_x[0];
-    dim_max_x = _dim_x[1];
-    dim_min_y = _dim_y[0];
-    dim_max_y = _dim_y[1];
-    dim_min_z = _dim_z[0];
-    dim_max_z = _dim_z[1];
+    *dim_min_x = dim_x_[0];
+    *dim_max_x = dim_x_[1];
+    *dim_min_y = dim_y_[0];
+    *dim_max_y = dim_y_[1];
+    *dim_min_z = dim_z_[0];
+    *dim_max_z = dim_z_[1];
     return (true);
   }
 
-  void set_grid_dimension(T dim_min_x, T dim_max_x, T dim_min_y, T dim_max_y,
-                          T dim_min_z, T dim_max_z) {
-    _dim_x[0] = dim_min_x;
-    _dim_x[1] = dim_max_x;
-    _dim_y[0] = dim_min_y;
-    _dim_y[1] = dim_max_y;
-    _dim_z[0] = dim_min_z;
-    _dim_z[1] = dim_max_z;
+  void SetGridDimension(T dim_min_x, T dim_max_x, T dim_min_y, T dim_max_y,
+                        T dim_min_z, T dim_max_z) {
+    dim_x_[0] = dim_min_x;
+    dim_x_[1] = dim_max_x;
+    dim_y_[0] = dim_min_y;
+    dim_y_[1] = dim_max_y;
+    dim_z_[0] = dim_min_z;
+    dim_z_[1] = dim_max_z;
   }
 
-  bool get_voxel_dimension(T& voxel_width_x, T& voxel_width_y,
-                           T& voxel_width_z) const {
-    if (!_initialized) {
-      voxel_width_x = voxel_width_y = voxel_width_z = (T)0;
+  bool GetVoxelDimension(T *voxel_width_x, T *voxel_width_y,
+                         T *voxel_width_z) const {
+    if (!initialized_) {
+      *voxel_width_x = *voxel_width_y = *voxel_width_z = static_cast<T>(0);
       return (false);
     }
-    voxel_width_x = _voxel_dim[0];
-    voxel_width_y = _voxel_dim[1];
-    voxel_width_z = _voxel_dim[2];
+    *voxel_width_x = voxel_dim_[0];
+    *voxel_width_y = voxel_dim_[1];
+    *voxel_width_z = voxel_dim_[2];
     return (true);
   }
 
-  void set_voxel_dimension(T voxel_width_x, T voxel_width_y, T voxel_width_z) {
-    _voxel_dim[0] = voxel_width_x;
-    _voxel_dim[1] = voxel_width_y;
-    _voxel_dim[2] = voxel_width_z;
+  void SetVoxelDimension(T voxel_width_x, T voxel_width_y, T voxel_width_z) {
+    voxel_dim_[0] = voxel_width_x;
+    voxel_dim_[1] = voxel_width_y;
+    voxel_dim_[2] = voxel_width_z;
   }
 
-  void set_nr_points(unsigned int nr_points) { _nr_points = nr_points; }
+  void SetNrPoints(unsigned int nr_points) { nr_points_ = nr_points; }
 
-  void set_nr_point_element(unsigned int nr_point_element) {
-    _nr_point_element = nr_point_element;
+  void SetNrPointElement(unsigned int nr_point_element) {
+    nr_point_element_ = nr_point_element;
   }
 
-  void set_nr_voxel(unsigned int nr_voxel_x, unsigned int nr_voxel_y,
-                    unsigned int nr_voxel_z) {
-    _nr_voxel_x = nr_voxel_x;
-    _nr_voxel_y = nr_voxel_y;
-    _nr_voxel_z = nr_voxel_z;
+  void SetNrVoxel(unsigned int nr_voxel_x, unsigned int nr_voxel_y,
+                  unsigned int nr_voxel_z) {
+    nr_voxel_x_ = nr_voxel_x;
+    nr_voxel_y_ = nr_voxel_y;
+    nr_voxel_z_ = nr_voxel_z;
   }
 
-  void set_point_clouds_data(const T* data) { _data = data; }
+  void SetPointCloudsData(const T *data) { data_ = data; }
 
-  void set_initialized(bool initialized) { _initialized = initialized; }
+  void SetInitialized(bool initialized) { initialized_ = initialized; }
 
-  int get_all_indices(std::vector<int>& indices) const;
+  // int GetAllIndices(std::vector<int> &indices) const;
 
-  int which_voxel(T x, T y, T z) const;
+  int WhichVoxel(T x, T y, T z) const;
 
-  /* add by Fangzhen Li on 03/27/17 */
-  bool get_voxel_coordinate_xy(T x, T y, int* row, int* col) const;
+  //  add by Fangzhen Li on 03/27/17
+  bool GetVoxelCoordinateXY(T x, T y, int *row, int *col) const;
 
-  Voxel<T>& operator[](unsigned int i) {
-    CHECK_GE(i, 0);
-    CHECK_LT(i, _voxels.size());
-    return (_voxels[i]);
+  Voxel<T> &operator[](unsigned int i) {
+    assert(i >= 0 && i < voxels_.size());
+    return (voxels_[i]);
   }
 
-  const Voxel<T>& operator[](unsigned int i) const {
-    CHECK_GE(i, 0);
-    CHECK_LT(i, _voxels.size());
-    return (_voxels[i]);
+  const Voxel<T> &operator[](unsigned int i) const {
+    assert(i >= 0 && i < voxels_.size());
+    return (voxels_[i]);
   }
 
-  Voxel<T>& operator[](int i) {
-    CHECK_GE(i, 0);
-    CHECK_LT(i, (int)_voxels.size());
-    return (_voxels[i]);
+  Voxel<T> &operator[](int i) {
+    assert(i >= 0 && i < static_cast<int>(voxels_.size()));
+    return (voxels_[i]);
   }
-  const Voxel<T>& operator[](int i) const {
-    CHECK_GE(i, 0);
-    CHECK_LT(i, (int)_voxels.size());
-    return (_voxels[i]);
+  const Voxel<T> &operator[](int i) const {
+    assert(i >= 0 && i < static_cast<int>(voxels_.size()));
+    return (voxels_[i]);
   }
 
-  Voxel<T>& operator()(unsigned int iy, unsigned int ix) {
-    CHECK_LT(iy, _nr_voxel_y);
-    CHECK_LT(ix, _nr_voxel_x);
-    unsigned int i = _nr_voxel_x * iy + ix;
-    CHECK_LT(i, _voxels.size());
-    return (_voxels[i]);
+  Voxel<T> &operator()(unsigned int iy, unsigned int ix) {
+    assert(iy < nr_voxel_y_ && ix < nr_voxel_x_);
+    unsigned int i = nr_voxel_x_ * iy + ix;
+    assert(i < voxels_.size());
+    return (voxels_[i]);
   }
 
-  const Voxel<T>& operator()(unsigned int iy, unsigned int ix) const {
-    CHECK_LT(iy, _nr_voxel_y);
-    CHECK_LT(ix, _nr_voxel_x);
-    unsigned int i = _nr_voxel_x * iy + ix;
-    CHECK_LT(i, _voxels.size());
-    return (_voxels[i]);
+  const Voxel<T> &operator()(unsigned int iy, unsigned int ix) const {
+    assert(iy < nr_voxel_y_ && ix < nr_voxel_x_);
+    unsigned int i = nr_voxel_x_ * iy + ix;
+    assert(i < voxels_.size());
+    return (voxels_[i]);
   }
 
-  T* data() { return (_data); }
+  T *Data() { return (data_); }
 
-  const T* const_data() const { return (_data); }
+  const T *const_data() const { return (data_); }
 
  private:
-  void reserve();
-  bool alloc_aligned_memory();
+  void Reserve();
+  bool AllocAlignedMemory();
 
  private:
-  const T* _data; /*point clouds memory*/
-  float* _mem_aligned16_f32;
-  int* _mem_aligned16_i32;
-  unsigned int _nr_points;
-  unsigned int _nr_point_element;
-  unsigned int _nr_voxel_x;
-  unsigned int _nr_voxel_y;
-  unsigned int _nr_voxel_z;
-  bool _initialized;
-  T _dim_x[2];
-  T _dim_y[2];
-  T _dim_z[2];
-  T _voxel_dim[3];
-  std::vector<Voxel<T>> _voxels;
+  unsigned int nr_points_, nr_point_element_;
+  unsigned int nr_voxel_x_, nr_voxel_y_, nr_voxel_z_;
+  const T *data_;  // point clouds memory
+  bool initialized_;
+  T dim_x_[2], dim_y_[2], dim_z_[2], voxel_dim_[3];
+  float *mem_aligned16_f32_;
+  int *mem_aligned16_i32_;
+  std::vector<Voxel<T> > voxels_;
 };
 
 template <typename T>
 VoxelGridXY<T>::VoxelGridXY()
-    : _data(NULL),
-      _mem_aligned16_f32(NULL),
-      _mem_aligned16_i32(NULL),
-      _nr_points(0),
-      _nr_point_element(0),
-      _nr_voxel_x(0),
-      _nr_voxel_y(0),
-      _nr_voxel_z(1),
-      _initialized(false) {
-  i_zero2(_dim_x);
-  i_zero2(_dim_y);
-  i_zero2(_dim_z);
-  i_zero3(_voxel_dim);
-  alloc_aligned_memory();
-};
+    : data_(nullptr),
+      mem_aligned16_f32_(nullptr),
+      mem_aligned16_i32_(nullptr),
+      nr_points_(0),
+      nr_point_element_(0),
+      nr_voxel_x_(0),
+      nr_voxel_y_(0),
+      nr_voxel_z_(1),
+      initialized_(false) {
+  IZero2(dim_x_);
+  IZero2(dim_y_);
+  IZero2(dim_z_);
+  IZero3(voxel_dim_);
+  AllocAlignedMemory();
+}
 
-template <typename T>
-void VoxelGridXY<T>::cleanup() {
-  _initialized = false;
-  _data = nullptr;
-  _nr_points = _nr_point_element = _nr_voxel_x = _nr_voxel_y = 0;
-  _nr_voxel_z = 1;
-  i_zero2(_dim_x);
-  i_zero2(_dim_y);
-  i_zero2(_dim_z);
-  i_zero3(_voxel_dim);
-  _voxels.clear();
+template <typename T> void VoxelGridXY<T>::CleanUp() {
+  initialized_ = false;
+  data_ = nullptr;
+  nr_points_ = nr_point_element_ = nr_voxel_x_ = nr_voxel_y_ = 0;
+  nr_voxel_z_ = 1;
+  IZero2(dim_x_);
+  IZero2(dim_y_);
+  IZero2(dim_z_);
+  IZero3(voxel_dim_);
+  voxels_.clear();
 }
 
 template <typename T>
@@ -511,257 +497,250 @@ VoxelGridXY<T>::VoxelGridXY(unsigned int nr_voxel_x, unsigned int nr_voxel_y,
                             T spatial_bound_x_min, T spatial_bound_x_max,
                             T spatial_bound_y_min, T spatial_bound_y_max,
                             T spatial_bound_z_min, T spatial_bound_z_max) {
-  alloc(nr_voxel_x, nr_voxel_y, spatial_bound_x_min, spatial_bound_x_max,
+  Alloc(nr_voxel_x, nr_voxel_y, spatial_bound_x_min, spatial_bound_x_max,
         spatial_bound_y_min, spatial_bound_y_max, spatial_bound_z_min,
         spatial_bound_z_max);
-  alloc_aligned_memory();
-  _initialized = false;
+  AllocAlignedMemory();
+  initialized_ = false;
 }
 
-template <typename T>
-void VoxelGridXY<T>::reserve() {
+template <typename T> void VoxelGridXY<T>::Reserve() {
   int r, c, i = 0, m = 0;
-  unsigned int n = (_nr_voxel_x * _nr_voxel_y);
+  unsigned int n = (nr_voxel_x_ * nr_voxel_y_);
 
-  if (n == 0 || _voxels.size() != n) {
+  if (n == 0 || voxels_.size() != n) {
     return;
   }
 
-  double cen_x = ((double)(_nr_voxel_x - 1)) * 0.5;
-  double cen_y = ((double)(_nr_voxel_y - 1)) * 0.5;
+  double cen_x = (static_cast<double>(nr_voxel_x_ - 1)) * 0.5;
+  double cen_y = (static_cast<double>(nr_voxel_y_ - 1)) * 0.5;
 
-  /*normalization factor = 1/(2sigma*sigma)*/
-  /*hardcode sigma 10.0*/
-  double sigma = (double)i_average(_nr_voxel_x, _nr_voxel_y) / 10.0;
-  double nf = i_div(0.5, (sigma * sigma));
+  // normalization factor = 1/(2sigma*sigma)
+  // hardcode sigma 10.0
+  double sigma = static_cast<double>(IAverage(nr_voxel_x_, nr_voxel_y_) / 10.0);
+  double nf = IDiv(0.5, (sigma * sigma));
   double dr, drsqr, dc, dcsqr, v, ksum = 0.0;
   std::vector<double> kernel(n, 0.0);
 
-  /*pre-compute kernel*/
-  for (r = 0; r < (int)_nr_voxel_y; ++r) {
-    dr = (double)r - cen_y;
-    drsqr = i_sqr(dr);
-    for (c = 0; c < (int)_nr_voxel_x; ++c) {
-      dc = (double)c - cen_x;
-      dcsqr = i_sqr(dc);
-      v = i_exp(-(drsqr + dcsqr) * nf);
+  // pre-compute kernel
+  for (r = 0; r < static_cast<int>(nr_voxel_y_); ++r) {
+    dr = static_cast<double>(r) - cen_y;
+    drsqr = ISqr(dr);
+    for (c = 0; c < static_cast<int>(nr_voxel_x_); ++c) {
+      dc = static_cast<double>(c) - cen_x;
+      dcsqr = ISqr(dc);
+      v = IExp(-(drsqr + dcsqr) * nf);
       ksum += v;
       kernel[i++] = v;
     }
   }
 
-  /*normalize the kernel, sum to 1.0*/
-  v = i_rec(ksum);
-  for (i = 0; i < (int)n; ++i) {
+  // normalize the kernel, sum to 1.0
+  v = IRec(ksum);
+  for (i = 0; i < static_cast<int>(n); ++i) {
     kernel[i] *= v;
   }
 
-  /*alloc at least 8 positions*/
-  for (i = 0; i < (int)n; ++i) {
-    m = i_max(8, (int)(_nr_max_reserved_points * kernel[i]));
-    _voxels[i].reserve(m);
+  // Alloc at least 8 positions
+  for (i = 0; i < static_cast<int>(n); ++i) {
+    m = IMax(8, static_cast<int>(s_nr_max_reserved_points_ * kernel[i]));
+    voxels_[i].Reserve(m);
   }
 
   return;
 }
 
-template <typename T>
-bool VoxelGridXY<T>::alloc_aligned_memory() {
-  if (!_mem_aligned16_f32) {
-    _mem_aligned16_f32 = i_alloc_aligned<float>(4, 4);
+template <typename T> bool VoxelGridXY<T>::AllocAlignedMemory() {
+  if (!mem_aligned16_f32_) {
+    mem_aligned16_f32_ = IAllocAligned<float>(4, 4);
   }
-  if (!_mem_aligned16_i32) {
-    _mem_aligned16_i32 = i_alloc_aligned<int>(4, 4);
+  if (!mem_aligned16_i32_) {
+    mem_aligned16_i32_ = IAllocAligned<int>(4, 4);
   }
-  return (_mem_aligned16_f32 != nullptr && _mem_aligned16_i32 != nullptr &&
-          i_verify_alignment(_mem_aligned16_f32, 4) &&
-          i_verify_alignment(_mem_aligned16_i32, 4));
+  return (mem_aligned16_f32_ != nullptr && mem_aligned16_i32_ != nullptr &&
+          IVerifyAlignment(mem_aligned16_f32_, 4) &&
+          IVerifyAlignment(mem_aligned16_i32_, 4));
 }
 
-template <typename T>
-int VoxelGridXY<T>::which_voxel(T x, T y, T z) const {
+template <typename T> int VoxelGridXY<T>::WhichVoxel(T x, T y, T z) const {
   int j, k;
-  if (!_initialized) {
+  if (!initialized_) {
     return (-1);
   }
 
-  if (x < _dim_x[0] || x > _dim_x[1] || y < _dim_y[0] || y > _dim_y[1] ||
-      z < _dim_z[0] || z > _dim_z[1]) {
-    return (-1); /*points that are outside the defined BBOX are ignored*/
+  if (x < dim_x_[0] || x > dim_x_[1] || y < dim_y_[0] || y > dim_y_[1] ||
+      z < dim_z_[0] || z > dim_z_[1]) {
+    return (-1);  // points that are outside the defined BBOX are ignored
   }
 
-  k = (int)i_max(
-      (unsigned int)0,
-      i_min(_nr_voxel_x - 1, (unsigned int)((x - _dim_x[0]) / _voxel_dim[0])));
-  j = (int)i_max(
-      (unsigned int)0,
-      i_min(_nr_voxel_y - 1, (unsigned int)((y - _dim_y[0]) / _voxel_dim[1])));
-  return (_nr_voxel_x * j + k);
+  k = static_cast<int>(IMax(
+      (unsigned int) 0,
+      IMin(nr_voxel_x_ - 1, (unsigned int)((x - dim_x_[0]) / voxel_dim_[0]))));
+  j = static_cast<int>(IMax(
+      (unsigned int) 0,
+      IMin(nr_voxel_y_ - 1, (unsigned int)((y - dim_y_[0]) / voxel_dim_[1]))));
+  return (nr_voxel_x_ * j + k);
 }
 
-/* add by Fangzhen Li on 03/27/17 */
+//  add by Fangzhen Li on 03/27/17
 template <typename T>
-bool VoxelGridXY<T>::get_voxel_coordinate_xy(T x, T y, int* row,
-                                             int* col) const {
-  if (x < _dim_x[0] || x > _dim_x[1] || y < _dim_y[0] || y > _dim_y[1]) {
-    return false; /*points that are outside the defined BBOX are ignored*/
+bool VoxelGridXY<T>::GetVoxelCoordinateXY(T x, T y, int *row, int *col) const {
+  if (x < dim_x_[0] || x > dim_x_[1] || y < dim_y_[0] || y > dim_y_[1]) {
+    return false;  // points that are outside the defined BBOX are ignored
   }
 
-  *col = (int)((x - _dim_x[0]) / _voxel_dim[0]);
-  *row = (int)((y - _dim_y[0]) / _voxel_dim[1]);
+  *col = static_cast<int>((x - dim_x_[0]) / voxel_dim_[0]);
+  *row = static_cast<int>((y - dim_y_[0]) / voxel_dim_[1]);
   return true;
 }
 
 template <typename T>
-bool VoxelGridXY<T>::alloc(unsigned int nr_voxel_x, unsigned int nr_voxel_y,
+bool VoxelGridXY<T>::Alloc(unsigned int nr_voxel_x, unsigned int nr_voxel_y,
                            T spatial_bound_x_min, T spatial_bound_x_max,
                            T spatial_bound_y_min, T spatial_bound_y_max,
                            T spatial_bound_z_min, T spatial_bound_z_max) {
   if (!nr_voxel_x || !nr_voxel_y) {
-    _initialized = false;
-    return _initialized;
+    initialized_ = false;
+    return initialized_;
   }
-  _nr_voxel_x = nr_voxel_x;
-  _nr_voxel_y = nr_voxel_y;
+  nr_voxel_x_ = nr_voxel_x;
+  nr_voxel_y_ = nr_voxel_y;
 
   unsigned int i, j, k, n = 0;
-  unsigned int nr_voxel_xy = (_nr_voxel_x * _nr_voxel_y);
+  unsigned int nr_voxel_xy = (nr_voxel_x_ * nr_voxel_y_);
   unsigned int nr_voxel = nr_voxel_xy;
 
   T vx, vy, vz, voxel_width_x, voxel_width_y, voxel_width_z;
 
-  _voxels.clear();
-  _voxels.resize(nr_voxel);
+  voxels_.clear();
+  voxels_.resize(nr_voxel);
 
-  /*voxel grid dimesion is forced to be the manual input*/
-  _dim_x[0] = spatial_bound_x_min;
-  _dim_x[1] = spatial_bound_x_max;
+  // voxel grid dimesion is forced to be the manual input
+  dim_x_[0] = spatial_bound_x_min;
+  dim_x_[1] = spatial_bound_x_max;
 
-  _dim_y[0] = spatial_bound_y_min;
-  _dim_y[1] = spatial_bound_y_max;
+  dim_y_[0] = spatial_bound_y_min;
+  dim_y_[1] = spatial_bound_y_max;
 
-  _dim_z[0] = spatial_bound_z_min;
-  _dim_z[1] = spatial_bound_z_max;
+  dim_z_[0] = spatial_bound_z_min;
+  dim_z_[1] = spatial_bound_z_max;
 
-  T span_x = (_dim_x[1] - _dim_x[0]);
-  T span_y = (_dim_y[1] - _dim_y[0]);
-  T span_z = (_dim_z[1] - _dim_z[0]);
+  T span_x = (dim_x_[1] - dim_x_[0]);
+  T span_y = (dim_y_[1] - dim_y_[0]);
+  T span_z = (dim_z_[1] - dim_z_[0]);
 
-  CHECK_GT(span_x, 0);
-  CHECK_GT(span_y, 0);
-  CHECK_GT(span_z, 0);
+  assert(span_x > 0 && span_y > 0 && span_z > 0);
 
-  _voxel_dim[0] = voxel_width_x = i_div(span_x, (int)_nr_voxel_x);
-  _voxel_dim[1] = voxel_width_y = i_div(span_y, (int)_nr_voxel_y);
-  _voxel_dim[2] = voxel_width_z = span_z;
+  voxel_dim_[0] = voxel_width_x = IDiv(span_x, static_cast<int>(nr_voxel_x_));
+  voxel_dim_[1] = voxel_width_y = IDiv(span_y, static_cast<int>(nr_voxel_y_));
+  voxel_dim_[2] = voxel_width_z = span_z;
 
-  std::vector<T> vxs(_nr_voxel_x);
+  std::vector<T> vxs(nr_voxel_x_);
 
-  vxs[0] = _dim_x[0];
-  for (i = 1; i < _nr_voxel_x; i++) {
+  vxs[0] = dim_x_[0];
+  for (i = 1; i < nr_voxel_x_; i++) {
     vxs[i] = vxs[i - 1] + voxel_width_x;
   }
 
-  vy = _dim_y[0];
-  vz = _dim_z[0];
+  vy = dim_y_[0];
+  vz = dim_z_[0];
 
-  for (j = 0; j < _nr_voxel_y; j++) {
-    for (k = 0; k < _nr_voxel_x; k++) {
+  for (j = 0; j < nr_voxel_y_; j++) {
+    for (k = 0; k < nr_voxel_x_; k++) {
       vx = vxs[k];
-      _voxels[n++].init(vx, vy, vz, voxel_width_x, voxel_width_y, voxel_width_z,
-                        (int)k, (int)j, 0);
+      voxels_[n++].Init(vx, vy, vz, voxel_width_x, voxel_width_y, voxel_width_z,
+                        static_cast<int>(k), static_cast<int>(j), 0);
     }
     vy += voxel_width_y;
   }
 
-  /*pre-alloc capacaity for _indices vector - speed-up the code slightly*/
-  reserve();
+  // pre-Alloc capacaity for indices_ vector - speed-up the code slightly
+  Reserve();
   return (true);
 }
 
 template <typename T>
-bool VoxelGridXY<T>::set(const T* data, unsigned int nr_points,
+bool VoxelGridXY<T>::Set(const T *data, unsigned int nr_points,
                          unsigned int nr_point_element) {
-  if (!data || !nr_points || !nr_point_element || !_nr_voxel_x ||
-      !_nr_voxel_y || _nr_voxel_z != 1) {
-    _initialized = false;
-    return _initialized;
+  if (!data || !nr_points || !nr_point_element || !nr_voxel_x_ ||
+      !nr_voxel_y_ || nr_voxel_z_ != 1) {
+    initialized_ = false;
+    return initialized_;
   }
 
-  _data = data;
-  _nr_points = nr_points;
-  _nr_point_element = nr_point_element;
+  data_ = data;
+  nr_points_ = nr_points;
+  nr_point_element_ = nr_point_element;
 
-  unsigned int nr_voxel = (_nr_voxel_x * _nr_voxel_y);
+  unsigned int nr_voxel = (nr_voxel_x_ * nr_voxel_y_);
   unsigned int i, nd = 0;
   int id, n = 0;
 
-  T voxel_width_x_rec = i_rec(_voxel_dim[0]);
-  T voxel_width_y_rec = i_rec(_voxel_dim[1]);
+  T voxel_width_x_rec = IRec(voxel_dim_[0]);
+  T voxel_width_y_rec = IRec(voxel_dim_[1]);
 
-  T bound_x_min = _dim_x[0];
-  T bound_x_max = _dim_x[1];
-  T bound_y_min = _dim_y[0];
-  T bound_y_max = _dim_y[1];
-  T bound_z_min = _dim_z[0];
-  T bound_z_max = _dim_z[1];
+  T bound_x_min = dim_x_[0];
+  T bound_x_max = dim_x_[1];
+  T bound_y_min = dim_y_[0];
+  T bound_y_max = dim_y_[1];
+  T bound_z_min = dim_z_[0];
+  T bound_z_max = dim_z_[1];
 
-  /*clear the old index buffer*/
+  // clear the old index buffer
   for (i = 0; i < nr_voxel; ++i) {
-    _voxels[i]._indices.clear();
+    voxels_[i].indices_.clear();
   }
 
-  /*assign point indices*/
-  for (; n < (int)_nr_points; n++, nd += _nr_point_element) {
-    id = i_assign_point_to_voxel(
-        _data + nd, bound_x_min, bound_x_max, bound_y_min, bound_y_max,
+  // Assign point indices
+  for (; n < static_cast<int>(nr_points_); n++, nd += nr_point_element_) {
+    id = IAssignPointToVoxel(
+        data_ + nd, bound_x_min, bound_x_max, bound_y_min, bound_y_max,
         bound_z_min, bound_z_max, voxel_width_x_rec, voxel_width_y_rec,
-        (int)_nr_voxel_x, (int)_nr_voxel_y);
+        static_cast<int>(nr_voxel_x_), static_cast<int>(nr_voxel_y_));
 
     if (id >= 0) {
-      _voxels[id].push_back(n);
+      voxels_[id].push_back(n);
     }
   }
 
-  _initialized = true;
-  return (_initialized);
+  initialized_ = true;
+  return (initialized_);
 }
 
 template <typename T>
-bool VoxelGridXY<T>::set_s(
-    const float* data /*pointer to the point cloud memory*/,
-    unsigned int nr_points, unsigned int nr_point_element) {
-  if (!data || !nr_points || !nr_point_element || !_nr_voxel_x ||
-      !_nr_voxel_y || _nr_voxel_z != 1) {
-    _initialized = false;
-    return _initialized;
+bool VoxelGridXY<T>::SetS(const float *data, unsigned int nr_points,
+                          unsigned int nr_point_element) {
+  if (!data || !nr_points || !nr_point_element || !nr_voxel_x_ ||
+      !nr_voxel_y_ || nr_voxel_z_ != 1) {
+    initialized_ = false;
+    return initialized_;
   }
 
-  _data = data;
-  _nr_points = nr_points;
-  _nr_point_element = nr_point_element;
+  data_ = data;
+  nr_points_ = nr_points;
+  nr_point_element_ = nr_point_element;
 
-  unsigned int nr_voxel = (_nr_voxel_x * _nr_voxel_y);
+  unsigned int nr_voxel = (nr_voxel_x_ * nr_voxel_y_);
   unsigned int i, n = 0;
   int id;
 
-  float voxel_width_x_rec = i_rec((float)_voxel_dim[0]);
-  float voxel_width_y_rec = i_rec((float)_voxel_dim[1]);
+  float voxel_width_x_rec = IRec(static_cast<float>(voxel_dim_[0]));
+  float voxel_width_y_rec = IRec(static_cast<float>(voxel_dim_[1]));
 
-  __m128i iv_nr_voxel_x =
-      _mm_setr_epi32((int)_nr_voxel_x, 0, (int)_nr_voxel_x, 0);
-  __m128i iv_nr_voxel_x_m1 = _mm_set1_epi32((int)(_nr_voxel_x - 1));
-  __m128i iv_nr_voxel_y_m1 = _mm_set1_epi32((int)(_nr_voxel_y - 1));
+  __m128i iv_nr_voxel_x = _mm_setr_epi32(static_cast<int>(nr_voxel_x_), 0,
+                                         static_cast<int>(nr_voxel_x_), 0);
+  __m128i iv_nr_voxel_x_m1 = _mm_set1_epi32(static_cast<int>(nr_voxel_x_ - 1));
+  __m128i iv_nr_voxel_y_m1 = _mm_set1_epi32(static_cast<int>(nr_voxel_y_ - 1));
 
   __m128 v_width_x_rec = _mm_set_ps1(voxel_width_x_rec);
   __m128 v_width_y_rec = _mm_set_ps1(voxel_width_y_rec);
 
-  __m128 v_x_min = _mm_set_ps1(_dim_x[0]);
-  __m128 v_x_max = _mm_set_ps1(_dim_x[1]);
-  __m128 v_y_min = _mm_set_ps1(_dim_y[0]);
-  __m128 v_y_max = _mm_set_ps1(_dim_y[1]);
-  __m128 v_z_min = _mm_set_ps1(_dim_z[0]);
-  __m128 v_z_max = _mm_set_ps1(_dim_z[1]);
+  __m128 v_x_min = _mm_set_ps1(dim_x_[0]);
+  __m128 v_x_max = _mm_set_ps1(dim_x_[1]);
+  __m128 v_y_min = _mm_set_ps1(dim_y_[0]);
+  __m128 v_y_max = _mm_set_ps1(dim_y_[1]);
+  __m128 v_z_min = _mm_set_ps1(dim_z_[0]);
+  __m128 v_z_max = _mm_set_ps1(dim_z_[1]);
 
   __m128 v_cmp_x, v_cmp_y, v_cmp_z, v_in_roi;
   v_in_roi = _mm_setr_ps(1.0, 1.0, 1.0, 1.0);
@@ -771,7 +750,7 @@ bool VoxelGridXY<T>::set_s(
       iv_v_indices_13;
 
   for (i = 0; i < nr_voxel; ++i) {
-    _voxels[i]._indices.clear();
+    voxels_[i].indices_.clear();
   }
 
   unsigned int nr_loops = (nr_points >> 2);
@@ -783,19 +762,19 @@ bool VoxelGridXY<T>::set_s(
   unsigned int d3 = d1 + d2;
   unsigned int d4 = (nr_point_element << 2);
 
-  /*xyz are required to be stored in continuous memory*/
-  const float* cptr_x = data;
-  const float* cptr_y = data + 1;
-  const float* cptr_z = data + 2;
-  const float* cptr_remainder = data + (nr_fast_processed * nr_point_element);
+  // xyz are required to be stored in continuous memory
+  const float *cptr_x = data;
+  const float *cptr_y = data + 1;
+  const float *cptr_z = data + 2;
+  const float *cptr_remainder = data + (nr_fast_processed * nr_point_element);
 
   for (i = 0; i < nr_loops; ++i, n += 4) {
-    /*set memory*/
+    // Set memory
     v_xs = _mm_setr_ps(cptr_x[0], cptr_x[d1], cptr_x[d2], cptr_x[d3]);
     v_ys = _mm_setr_ps(cptr_y[0], cptr_y[d1], cptr_y[d2], cptr_y[d3]);
     v_zs = _mm_setr_ps(cptr_z[0], cptr_z[d1], cptr_z[d2], cptr_z[d3]);
 
-    /*compare range:*/
+    // compare range:
     v_cmp_x =
         _mm_and_ps(_mm_cmpge_ps(v_xs, v_x_min), _mm_cmple_ps(v_xs, v_x_max));
     v_cmp_y =
@@ -804,16 +783,16 @@ bool VoxelGridXY<T>::set_s(
         _mm_and_ps(_mm_cmpge_ps(v_zs, v_z_min), _mm_cmple_ps(v_zs, v_z_max));
     v_in_roi = _mm_and_ps(_mm_and_ps(v_cmp_x, v_cmp_y), v_cmp_z);
 
-    /*vector operations, cast into signed integers*/
+    // vector operations, cast into signed integers
     v_xs = _mm_sub_ps(v_xs, v_x_min);
     v_xs = _mm_mul_ps(v_xs, v_width_x_rec);
-    iv_x_indices = _mm_cvttps_epi32(v_xs); /*truncate towards zero*/
+    iv_x_indices = _mm_cvttps_epi32(v_xs);  // truncate towards zero
     iv_x_indices = _mm_min_epi32(iv_nr_voxel_x_m1, iv_x_indices);
 
-    /*vector operations, cast into signed integers*/
+    // vector operations, cast into signed integers
     v_ys = _mm_sub_ps(v_ys, v_y_min);
     v_ys = _mm_mul_ps(v_ys, v_width_y_rec);
-    iv_y_indices = _mm_cvttps_epi32(v_ys); /*truncate towards zero*/
+    iv_y_indices = _mm_cvttps_epi32(v_ys);  // truncate towards zero
     iv_y_indices = _mm_min_epi32(iv_nr_voxel_y_m1, iv_y_indices);
 
     iv_v_indices_02 = _mm_mullo_epi32(iv_y_indices, iv_nr_voxel_x);
@@ -826,247 +805,244 @@ bool VoxelGridXY<T>::set_s(
     iv_indices = _mm_add_epi32(iv_v_indices_02, iv_v_indices_13);
     iv_indices = _mm_add_epi32(iv_indices, iv_x_indices);
 
-    /*store values from registers to memory*/
-    /*address 16byte-aligned*/
-    _mm_store_ps(_mem_aligned16_f32, v_in_roi);
-    /*address 16byte-aligned*/
-    _mm_store_si128((__m128i*)_mem_aligned16_i32, iv_indices);
+    // store values from registers to memory
+    // address 16byte-aligned
+    _mm_store_ps(mem_aligned16_f32_, v_in_roi);
+    // address 16byte-aligned
+    _mm_store_si128(reinterpret_cast<__m128i *>(mem_aligned16_i32_),
+                    iv_indices);
 
-    if (_mem_aligned16_f32[0] != 0) {
-      _voxels[_mem_aligned16_i32[0]]._indices.push_back(n);
+    if (mem_aligned16_f32_[0] != 0) {
+      voxels_[mem_aligned16_i32_[0]].indices_.push_back(n);
     }
-    if (_mem_aligned16_f32[1] != 0) {
-      _voxels[_mem_aligned16_i32[1]]._indices.push_back(n + 1);
+    if (mem_aligned16_f32_[1] != 0) {
+      voxels_[mem_aligned16_i32_[1]].indices_.push_back(n + 1);
     }
-    if (_mem_aligned16_f32[2] != 0) {
-      _voxels[_mem_aligned16_i32[2]]._indices.push_back(n + 2);
+    if (mem_aligned16_f32_[2] != 0) {
+      voxels_[mem_aligned16_i32_[2]].indices_.push_back(n + 2);
     }
-    if (_mem_aligned16_f32[3] != 0) {
-      _voxels[_mem_aligned16_i32[3]]._indices.push_back(n + 3);
+    if (mem_aligned16_f32_[3] != 0) {
+      voxels_[mem_aligned16_i32_[3]].indices_.push_back(n + 3);
     }
     cptr_x += d4;
     cptr_y += d4;
     cptr_z += d4;
   }
 
-  /*handling remaining points*/
+  // handling remaining points
   for (i = 0; i < remainder; i++, n++) {
-    id = i_assign_point_to_voxel(cptr_remainder, _dim_x[0], _dim_x[1],
-                                 _dim_y[0], _dim_y[1], _dim_z[0], _dim_z[1],
-                                 voxel_width_x_rec, voxel_width_y_rec,
-                                 (int)_nr_voxel_x, (int)_nr_voxel_y);
+    id = IAssignPointToVoxel(cptr_remainder, dim_x_[0], dim_x_[1], dim_y_[0],
+                             dim_y_[1], dim_z_[0], dim_z_[1], voxel_width_x_rec,
+                             voxel_width_y_rec, static_cast<int>(nr_voxel_x_),
+                             static_cast<int>(nr_voxel_y_));
 
     if (id >= 0) {
-      _voxels[id]._indices.push_back(n);
+      voxels_[id].indices_.push_back(n);
     }
 
     cptr_remainder += nr_point_element;
   }
 
-  _initialized = true;
-  return (_initialized);
+  initialized_ = true;
+  return (initialized_);
 }
 
 template <typename T>
-bool VoxelGridXY<T>::set(const T* data, unsigned int nr_points,
+bool VoxelGridXY<T>::Set(const T *data, unsigned int nr_points,
                          unsigned int nr_point_element, unsigned int nr_voxel_x,
                          unsigned int nr_voxel_y, T spatial_bound_x_min,
                          T spatial_bound_x_max, T spatial_bound_y_min,
                          T spatial_bound_y_max, T spatial_bound_z_min,
                          T spatial_bound_z_max, bool force_bound) {
   if (!data || !nr_points || !nr_point_element || !nr_voxel_x || !nr_voxel_y) {
-    _initialized = false;
-    return _initialized;
+    initialized_ = false;
+    return initialized_;
   }
 
-  _data = data;
-  _nr_points = nr_points;
-  _nr_point_element = nr_point_element;
-  _nr_voxel_x = nr_voxel_x;
-  _nr_voxel_y = nr_voxel_y;
-  _nr_voxel_z = 1;
+  data_ = data;
+  nr_points_ = nr_points;
+  nr_point_element_ = nr_point_element;
+  nr_voxel_x_ = nr_voxel_x;
+  nr_voxel_y_ = nr_voxel_y;
+  nr_voxel_z_ = 1;
 
   unsigned int i, j, k, n = 0, nd = 0;
-  unsigned int nr_voxel_xy = (_nr_voxel_x * _nr_voxel_y);
+  unsigned int nr_voxel_xy = (nr_voxel_x_ * nr_voxel_y_);
   unsigned int nr_voxel = nr_voxel_xy;
   unsigned int nr_voxel_xm1 = nr_voxel_x - 1;
   unsigned int nr_voxel_ym1 = nr_voxel_y - 1;
   T vx, vy, vz, x, y, z;
   T voxel_width_x, voxel_width_y, voxel_width_z;
 
-  _voxels.clear();
-  _voxels.resize(nr_voxel);
+  voxels_.clear();
+  voxels_.resize(nr_voxel);
 
-  /*if force_bound then the voxel grid dimesion is forced to be the manual
-   * input*/
+  // if force_bound then the voxel grid dimesion is forced to be the manual
+  //  * input
   if (force_bound) {
-    _dim_x[0] = spatial_bound_x_min;
-    _dim_x[1] = spatial_bound_x_max;
+    dim_x_[0] = spatial_bound_x_min;
+    dim_x_[1] = spatial_bound_x_max;
 
-    _dim_y[0] = spatial_bound_y_min;
-    _dim_y[1] = spatial_bound_y_max;
+    dim_y_[0] = spatial_bound_y_min;
+    dim_y_[1] = spatial_bound_y_max;
 
-    _dim_z[0] = spatial_bound_z_min;
-    _dim_z[1] = spatial_bound_z_max;
+    dim_z_[0] = spatial_bound_z_min;
+    dim_z_[1] = spatial_bound_z_max;
   } else {
-    i_get_pointclouds_dim_w_bound(
-        _data, _nr_points, 0, _nr_point_element, _dim_x[0], _dim_x[1],
-        _dim_y[0], _dim_y[1], _dim_z[0], _dim_z[1], spatial_bound_x_min,
+    IGetPointcloudsDimWBound(
+        data_, nr_points_, 0, nr_point_element_, &dim_x_[0], &dim_x_[1],
+        &dim_y_[0], &dim_y_[1], &dim_z_[0], &dim_z_[1], spatial_bound_x_min,
         spatial_bound_x_max, spatial_bound_y_min, spatial_bound_y_max,
         spatial_bound_z_min, spatial_bound_z_max);
   }
 
-  T dim_x_min = _dim_x[0];
-  T dim_x_max = _dim_x[1];
+  T dim_x_min = dim_x_[0];
+  T dim_x_max = dim_x_[1];
 
-  T dim_y_min = _dim_y[0];
-  T dim_y_max = _dim_y[1];
+  T dim_y_min = dim_y_[0];
+  T dim_y_max = dim_y_[1];
 
-  T dim_z_min = _dim_z[0];
-  T dim_z_max = _dim_z[1];
+  T dim_z_min = dim_z_[0];
+  T dim_z_max = dim_z_[1];
 
   T span_x = (dim_x_max - dim_x_min);
   T span_y = (dim_y_max - dim_y_min);
   T span_z = (dim_z_max - dim_z_min);
 
-  CHECK_GT(span_x, 0);
-  CHECK_GT(span_y, 0);
-  CHECK_GT(span_z, 0);
+  assert(span_x > 0 && span_y > 0 && span_z > 0);
 
-  _voxel_dim[0] = voxel_width_x = i_div(span_x, (int)_nr_voxel_x);
-  _voxel_dim[1] = voxel_width_y = i_div(span_y, (int)_nr_voxel_y);
-  _voxel_dim[2] = voxel_width_z = span_z;
+  voxel_dim_[0] = voxel_width_x = IDiv(span_x, static_cast<int>(nr_voxel_x_));
+  voxel_dim_[1] = voxel_width_y = IDiv(span_y, static_cast<int>(nr_voxel_y_));
+  voxel_dim_[2] = voxel_width_z = span_z;
 
-  T voxel_width_x_rec = i_rec(_voxel_dim[0]);
-  T voxel_width_y_rec = i_rec(_voxel_dim[1]);
+  T voxel_width_x_rec = IRec(voxel_dim_[0]);
+  T voxel_width_y_rec = IRec(voxel_dim_[1]);
 
-  std::vector<T> vxs(_nr_voxel_x);
-  vxs[0] = _dim_x[0];
+  std::vector<T> vxs(nr_voxel_x_);
+  vxs[0] = dim_x_[0];
 
-  for (i = 1; i < _nr_voxel_x; i++) {
+  for (i = 1; i < nr_voxel_x_; i++) {
     vxs[i] = vxs[i - 1] + voxel_width_x;
   }
 
-  vy = _dim_y[0];
-  vz = _dim_z[0];
+  vy = dim_y_[0];
+  vz = dim_z_[0];
 
-  for (j = 0; j < _nr_voxel_y; j++) {
-    for (k = 0; k < _nr_voxel_x; k++) {
+  for (j = 0; j < nr_voxel_y_; j++) {
+    for (k = 0; k < nr_voxel_x_; k++) {
       vx = vxs[k];
-      _voxels[n++].init(vx, vy, vz, voxel_width_x, voxel_width_y, voxel_width_z,
-                        (int)k, (int)j, 0);
+      voxels_[n++].init(vx, vy, vz, voxel_width_x, voxel_width_y, voxel_width_z,
+                        static_cast<int>(k), static_cast<int>(j), 0);
     }
     vy += voxel_width_y;
   }
 
-  /*assign point indices*/
-  for (; n < _nr_points; n++, nd += _nr_point_element) {
-    x = _data[nd];
-    y = _data[nd + 1];
-    z = _data[nd + 2];
+  // Assign point indices
+  for (; n < nr_points_; n++, nd += nr_point_element_) {
+    x = data_[nd];
+    y = data_[nd + 1];
+    z = data_[nd + 2];
 
     if (x < dim_x_min || x > dim_x_max || y < dim_y_min || y > dim_y_max ||
         z < dim_z_min || z > dim_z_max) {
-      /*points that are outside the defined BBOX are ignored*/
+      // points that are outside the defined BBOX are ignored
       continue;
     }
 
-    k = i_max((unsigned int)0,
-              i_min(nr_voxel_xm1,
-                    (unsigned int)((x - dim_x_min) * voxel_width_x_rec)));
-    j = i_max((unsigned int)0,
-              i_min(nr_voxel_ym1,
-                    (unsigned int)((y - dim_y_min) * voxel_width_y_rec)));
+    k = IMax((unsigned int) 0,
+             IMin(nr_voxel_xm1,
+                  (unsigned int)((x - dim_x_min) * voxel_width_x_rec)));
+    j = IMax((unsigned int) 0,
+             IMin(nr_voxel_ym1,
+                  (unsigned int)((y - dim_y_min) * voxel_width_y_rec)));
     i = nr_voxel_x * j + k;
 
-    CHECK_LT(i, nr_voxel);
-    _voxels[i]._indices.push_back(n);
+    assert(i < nr_voxel);
+    voxels_[i].indices_.push_back(n);
   }
-  _initialized = true;
-  return _initialized;
+  initialized_ = true;
+  return initialized_;
 }
 
-template <typename T>
-int VoxelGridXY<T>::get_all_indices(std::vector<int>& indices) const {
-  unsigned int i, j;
-  indices.clear();
+// template <typename T>
+// int VoxelGridXY<T>::GetAllIndices(std::vector<int> &indices) const {
+//   unsigned int i, j;
+//   indices.clear();
 
-  if (!_initialized) {
-    return -1;
-  }
-  for (i = 0; i < _voxels.size(); ++i) {
-    for (j = 0; j < _voxels[i]._indices.size(); ++j) {
-      indices.push_back(_voxels[i]._indices.at(j));
-    }
-  }
+//   if (!initialized_) {
+//     return -1;
+//   }
+//   for (i = 0; i < voxels_.size(); ++i) {
+//     for (j = 0; j < voxels_[i].indices_.size(); ++j) {
+//       indices.push_back(voxels_[i].indices_.at(j));
+//     }
+//   }
 
-  return (int)indices.size();
-}
+//   return static_cast<int> (indices.size());
+// }
 
-template <typename T>
-unsigned int VoxelGridXY<T>::nr_indexed_points() const {
-  if (!_initialized) {
+template <typename T> unsigned int VoxelGridXY<T>::NrIndexedPoints() const {
+  if (!initialized_) {
     return 0;
   }
   unsigned int i, n = 0;
-  for (i = 0; i < _voxels.size(); ++i) {
-    n += _voxels[i]._indices.size();
+  for (i = 0; i < voxels_.size(); ++i) {
+    n += voxels_[i].indices_.size();
   }
   return n;
 }
 
 template <typename T>
-static void i_push_back_vectors(const std::vector<T>& src,
-                                std::vector<T>& dst) {
+static void IPushBackVectors(const std::vector<T> &src, std::vector<T> *dst) {
   unsigned int i = src.size();
-  unsigned int j = dst.size();
+  unsigned int j = dst->size();
 
   if (i == 0) {
     return;
   } else if (j == 0) {
-    dst.assign(src.begin(), src.end());
+    dst->assign(src.begin(), src.end());
   } else {
-    dst.resize(i + j);
-    i_copy(src.data(), dst.data() + j, (int)i);
+    dst->resize(i + j);
+    ICopy(src.data(), dst->data() + j, static_cast<int>(i));
   }
   return;
 }
 
-/*VoxelgridXY downsample functions*/
+// VoxelgridXY downsample functions
 template <typename T>
-bool i_downsample_voxelgridxy(const VoxelGridXY<T>& src, VoxelGridXY<T>& dst,
-                              unsigned int dsf_dim_x, unsigned int dsf_dim_y) {
-  if (!src.initialized()) {
+bool IDownsampleVoxelGridXY(const VoxelGridXY<T> &src, VoxelGridXY<T> *dst,
+                            unsigned int dsf_dim_x, unsigned int dsf_dim_y) {
+  if (!src.Initialized()) {
     return (false);
   } else if (dsf_dim_x == 0 && dsf_dim_y == 0) {
-    dst = src;
+    *dst = src;
     return (true);
   } else {
-    if (&src == &dst) {
-      return (false); /*not allowed to downsample a voxel grid from itself*/
+    if (&src == dst) {
+      return (false);  // not allowed to downsample a voxel grid from itself
     }
   }
 
-  dst.cleanup(); /*perform cleanup first*/
+  dst->CleanUp();  // perform CleanUp first
 
-  /*# of voxels of the src voxel grid*/
-  unsigned int nr_voxel_x_src = src.nr_voxel_x();
-  unsigned int nr_voxel_y_src = src.nr_voxel_y();
-  unsigned int nr_voxel_z_src = src.nr_voxel_z();
+  // # of voxels of the src voxel grid
+  unsigned int nr_voxel_x_src = src.NrVoxelX();
+  unsigned int nr_voxel_y_src = src.NrVoxelY();
+  unsigned int nr_voxel_z_src = src.NrVoxelZ();
 
-  CHECK_EQ(nr_voxel_z_src, 1);
+  assert(nr_voxel_z_src == 1);
 
-  /*scale factors*/
-  unsigned int sf_x = (unsigned int)i_pow((unsigned int)2, dsf_dim_x);
-  unsigned int sf_y = (unsigned int)i_pow((unsigned int)2, dsf_dim_y);
+  // scale factors
+  unsigned int sf_x = (unsigned int) IPow((unsigned int) 2, dsf_dim_x);
+  unsigned int sf_y = (unsigned int) IPow((unsigned int) 2, dsf_dim_y);
 
-  /*compute the # of voxels for the new scale*/
+  // compute the # of voxels for the new scale
   unsigned int nr_voxel_x_dst = nr_voxel_x_src / sf_x;
   unsigned int nr_voxel_y_dst = nr_voxel_y_src / sf_y;
   unsigned int nr_voxel_z_dst = nr_voxel_z_src;
 
   if (!nr_voxel_x_dst || !nr_voxel_y_dst || !nr_voxel_z_dst) {
-    return (false); /*do not continue*/
+    return (false);  // do not continue
   }
 
   unsigned int nr_res_voxel_x_dst = (nr_voxel_x_src % sf_x);
@@ -1082,19 +1058,19 @@ bool i_downsample_voxelgridxy(const VoxelGridXY<T>& src, VoxelGridXY<T>& dst,
   T dim_min_z_src = 0;
   T dim_max_z_src = 0;
 
-  /*the dimension of the voxels in the src voxel grid*/
-  src.get_voxel_dimension(voxel_width_x_src, voxel_width_y_src,
-                          voxel_width_z_src);
+  // the dimension of the voxels in the src voxel grid
+  src.GetVoxelDimension(&voxel_width_x_src, &voxel_width_y_src,
+                        &voxel_width_z_src);
 
-  src.get_grid_dimension(dim_min_x_src, dim_max_x_src, dim_min_y_src,
-                         dim_max_y_src, dim_min_z_src, dim_max_z_src);
+  src.GetGridDimension(&dim_min_x_src, &dim_max_x_src, &dim_min_y_src,
+                       &dim_max_y_src, &dim_min_z_src, &dim_max_z_src);
 
-  /*new voxel dimensions after downsampling the 3D grid*/
+  // new voxel dimensions after downsampling the 3D grid
   T voxel_width_x_dst = (sf_x * voxel_width_x_src);
   T voxel_width_y_dst = (sf_y * voxel_width_y_src);
   T voxel_width_z_dst = voxel_width_z_src;
 
-  /*new grid dimensions after downsampling the 3D grid*/
+  // new grid dimensions after downsampling the 3D grid
   T dim_x_dst[2], dim_y_dst[2], dim_z_dst[2];
 
   dim_x_dst[0] = dim_min_x_src;
@@ -1109,15 +1085,15 @@ bool i_downsample_voxelgridxy(const VoxelGridXY<T>& src, VoxelGridXY<T>& dst,
                      : (voxel_width_y_dst * nr_voxel_y_dst + dim_y_dst[0]);
   dim_z_dst[1] = dim_max_z_src;
 
-  /*set dst*/
-  dst.set_nr_points(src.nr_points());
-  dst.set_nr_point_element(src.nr_point_element());
-  dst.set_voxel_dimension(voxel_width_x_dst, voxel_width_y_dst,
-                          voxel_width_z_dst);
-  dst.set_grid_dimension(dim_x_dst[0], dim_x_dst[1], dim_y_dst[0], dim_y_dst[1],
-                         dim_z_dst[0], dim_z_dst[1]);
-  dst.set_nr_voxel(nr_voxel_x_dst, nr_voxel_y_dst, nr_voxel_z_dst);
-  dst.set_point_clouds_data(src.const_data());
+  // Set dst
+  dst->SetNrPoints(src.NrPoints());
+  dst->SetNrPointElement(src.NrPointElement());
+  dst->SetVoxelDimension(voxel_width_x_dst, voxel_width_y_dst,
+                         voxel_width_z_dst);
+  dst->SetGridDimension(dim_x_dst[0], dim_x_dst[1], dim_y_dst[0], dim_y_dst[1],
+                        dim_z_dst[0], dim_z_dst[1]);
+  dst->SetNrVoxel(nr_voxel_x_dst, nr_voxel_y_dst, nr_voxel_z_dst);
+  dst->SetPointCloudsData(src.const_data());
 
   unsigned int i, j, r, c, rs, cs, rspi, n = 0;
 
@@ -1130,7 +1106,7 @@ bool i_downsample_voxelgridxy(const VoxelGridXY<T>& src, VoxelGridXY<T>& dst,
     vxs[i] = vxs[i - 1] + voxel_width_x_dst;
   }
 
-  std::vector<Voxel<T>> voxels(nr_voxel_y_dst * nr_voxel_x_dst);
+  std::vector<Voxel<T> > voxels(nr_voxel_y_dst * nr_voxel_x_dst);
 
   for (r = 0; r < nr_voxel_y_dst; r++) {
     rs = (r * sf_y);
@@ -1139,26 +1115,26 @@ bool i_downsample_voxelgridxy(const VoxelGridXY<T>& src, VoxelGridXY<T>& dst,
     for (c = 0; c < nr_voxel_x_dst; c++) {
       cs = (c * sf_x);
       voxels[n].init(vxs[c], vy, vz, voxel_width_x_dst, voxel_width_y_dst,
-                     voxel_width_z_dst, (int)c, (int)r, (int)0);
-      /*collect samples from its lower scale:*/
+                     voxel_width_z_dst, static_cast<int>(c),
+                     static_cast<int>(r), static_cast<int>(0));
+      // collect samples from its lower scale:
       for (i = 0; i < sf_y; ++i) {
         rspi = rs + i;
         for (j = 0; j < sf_x; ++j) {
-          i_push_back_vectors(src(rspi, cs + j)._indices, voxels[n]._indices);
+          IPushBackVectors(src(rspi, cs + j).indices_, &voxels[n].indices_);
         }
       }
-      /*increase voxel index by 1*/
+      // increase voxel index by 1
       n++;
     }
   }
-  dst.set_voxels(voxels);
-  dst.set_initialized(true);
+  dst->SetVoxels(voxels);
+  dst->SetInitialized(true);
   return (true);
 }
 
-/*-----Multiscale Voxel Grid Pyramid-----*/
-template <typename DATA_TYPE>
-class VoxelGridXYPyramid {
+// -----Multiscale Voxel Grid Pyramid-----
+template <typename DATA_TYPE> class VoxelGridXYPyramid {
  public:
   VoxelGridXYPyramid();
   VoxelGridXYPyramid(unsigned int nr_scale, unsigned int nr_voxel_x_base,
@@ -1169,121 +1145,112 @@ class VoxelGridXYPyramid {
                      DATA_TYPE spatial_bound_y_max,
                      DATA_TYPE spatial_bound_z_min,
                      DATA_TYPE spatial_bound_z_max) {
-    alloc(nr_scale, nr_voxel_x_base, nr_voxel_y_base, dsf_x, dsf_y,
+    Alloc(nr_scale, nr_voxel_x_base, nr_voxel_y_base, dsf_x, dsf_y,
           spatial_bound_x_min, spatial_bound_x_max, spatial_bound_y_min,
           spatial_bound_y_max, spatial_bound_z_min, spatial_bound_z_max);
-  };
+  }
 
-  void cleanup();
+  void CleanUp();
 
-  ~VoxelGridXYPyramid() { cleanup(); }
+  ~VoxelGridXYPyramid() { CleanUp(); }
 
-  bool alloc(unsigned int nr_scale, unsigned int nr_voxel_x_base,
+  bool Alloc(unsigned int nr_scale, unsigned int nr_voxel_x_base,
              unsigned int nr_voxel_y_base, unsigned int dsf_x,
              unsigned int dsf_y, DATA_TYPE spatial_bound_x_min,
              DATA_TYPE spatial_bound_x_max, DATA_TYPE spatial_bound_y_min,
              DATA_TYPE spatial_bound_y_max, DATA_TYPE spatial_bound_z_min,
              DATA_TYPE spatial_bound_z_max);
 
-  /*non-sse2 version*/
-  bool set(const DATA_TYPE* pc /*pointer to the point cloud*/,
-           /*total number of points of the point cloud - base level*/
-           unsigned int nr_points, unsigned int nr_point_element);
+  // non-sse2 version
+  bool Set(const DATA_TYPE *pc, unsigned int nr_points,
+           unsigned int nr_point_element);
 
-  /*the sse2 version - speed up the voxel grid construction, for float type
-   * points only*/
-  bool set_s(const float* pc /*pointer to the point cloud*/,
-             /*total number of points of the point cloud - base level*/
-             unsigned int nr_points, unsigned int nr_point_element);
+  // the sse2 version - speed up the voxel grid construction, for float type
+  // * points only
+  bool SetS(const float *pc, unsigned int nr_points,
+            unsigned int nr_point_element);
 
-  bool set(const DATA_TYPE* pc /*pointer to the point cloud*/,
-           unsigned int nr_scale,
-           /*total number of points of the point cloud - base level*/
-           unsigned int nr_points, unsigned int nr_point_element,
-           unsigned int nr_voxel_x_base, unsigned int nr_voxel_y_base,
-           unsigned int dsf_x, unsigned int dsf_y,
+  bool Set(const DATA_TYPE *pc, unsigned int nr_scale, unsigned int nr_points,
+           unsigned int nr_point_element, unsigned int nr_voxel_x_base,
+           unsigned int nr_voxel_y_base, unsigned int dsf_x, unsigned int dsf_y,
            DATA_TYPE spatial_bound_x_min, DATA_TYPE spatial_bound_x_max,
            DATA_TYPE spatial_bound_y_min, DATA_TYPE spatial_bound_y_max,
            DATA_TYPE spatial_bound_z_min, DATA_TYPE spatial_bound_z_max);
 
-  unsigned int nr_scale() const { return (unsigned int)_vgrids.size(); }
+  unsigned int NrScale() const { return (unsigned int) vgrids_.size(); }
 
-  unsigned int nr_voxel(unsigned int i = 0) const {
-    return (i < _vgrids.size()) ? _vgrids[i].nr_voxel() : 0;
+  unsigned int NrVoxel(unsigned int i = 0) const {
+    return (i < vgrids_.size()) ? vgrids_[i].nr_voxel() : 0;
   }
 
-  unsigned int nr_voxel_x(unsigned int i = 0) const {
-    return (i < _vgrids.size()) ? _vgrids[i].nr_voxel_x() : 0;
+  unsigned int NrVoxelX(unsigned int i = 0) const {
+    return (i < vgrids_.size()) ? vgrids_[i].nr_voxel_x() : 0;
   }
 
-  unsigned int nr_voxel_y(unsigned int i = 0) const {
-    return (i < _vgrids.size()) ? _vgrids[i].nr_voxel_y() : 0;
+  unsigned int NrVoxelY(unsigned int i = 0) const {
+    return (i < vgrids_.size()) ? vgrids_[i].nr_voxel_y() : 0;
   }
 
-  unsigned int nr_voxel_z(unsigned int i = 0) const {
-    return (i < _vgrids.size()) ? _vgrids[i].nr_voxel_z() : 0;
+  unsigned int NrVoxelZ(unsigned int i = 0) const {
+    return (i < vgrids_.size()) ? vgrids_[i].nr_voxel_z() : 0;
   }
 
-  unsigned int nr_points(unsigned int scale) const {
-    return (scale < _vgrids.size()) ? _vgrids[scale].nr_points() : 0;
+  unsigned int NrPoints(unsigned int scale) const {
+    return (scale < vgrids_.size()) ? vgrids_[scale].nr_points() : 0;
   }
 
-  unsigned int nr_points() const { return _nr_points; }
+  unsigned int NrPoints() const { return nr_points_; }
 
-  unsigned int nr_point_element() const { return _nr_point_element; }
+  unsigned int NrPointElement() const { return nr_point_element_; }
 
-  bool initialized() const;
+  bool Initialized() const;
 
-  unsigned int get_dsf_x() const { return _dsf_x; }
-  unsigned int get_dsf_y() const { return _dsf_y; }
-  unsigned int get_dsf_z() const { return (0); }
+  unsigned int GetDsfX() const { return dsf_x_; }
+  unsigned int GetDsfY() const { return dsf_y_; }
+  unsigned int GetDsfZ() const { return (0); }
 
-  VoxelGridXY<DATA_TYPE>& operator[](unsigned int i) {
-    CHECK_GE(i, 0);
-    CHECK_LT(i, _vgrids.size());
-    return _vgrids[i];
+  VoxelGridXY<DATA_TYPE> &operator[](unsigned int i) {
+    assert(i >= 0 && i < vgrids_.size());
+    return vgrids_[i];
   }
 
-  const VoxelGridXY<DATA_TYPE>& operator[](unsigned int i) const {
-    CHECK_GE(i, 0);
-    CHECK_LT(i, _vgrids.size());
-    return _vgrids[i];
+  const VoxelGridXY<DATA_TYPE> &operator[](unsigned int i) const {
+    assert(i >= 0 && i < vgrids_.size());
+    return vgrids_[i];
   }
 
-  VoxelGridXY<DATA_TYPE>& operator[](int i) {
-    CHECK_GE(i, 0);
-    CHECK_LT(i, (int)_vgrids.size());
-    return _vgrids[i];
+  VoxelGridXY<DATA_TYPE> &operator[](int i) {
+    assert(i >= 0 && i < static_cast<int>(vgrids_.size()));
+    return vgrids_[i];
   }
 
-  const VoxelGridXY<DATA_TYPE>& operator[](int i) const {
-    CHECK_GE(i, 0);
-    CHECK_LT(i, (int)_vgrids.size());
-    return _vgrids[i];
+  const VoxelGridXY<DATA_TYPE> &operator[](int i) const {
+    assert(i >= 0 && i < static_cast<int>(vgrids_.size()));
+    return vgrids_[i];
   }
 
-  const DATA_TYPE* const_data() const { return _pc; }
+  const DATA_TYPE *ConstData() const { return pc_; }
 
-  DATA_TYPE* data() { return _pc; }
+  DATA_TYPE *Data() { return pc_; }
 
  private:
-  unsigned int _nr_points, _nr_point_element;
-  unsigned int _dsf_x, _dsf_y, _dsf_z;
-  const DATA_TYPE* _pc;
-  std::vector<VoxelGridXY<DATA_TYPE>> _vgrids;
+  unsigned int nr_points_, nr_point_element_;
+  unsigned int dsf_x_, dsf_y_, dsf_z_;
+  const DATA_TYPE *pc_;
+  std::vector<VoxelGridXY<DATA_TYPE> > vgrids_;
 };
 
 template <typename DATA_TYPE>
 VoxelGridXYPyramid<DATA_TYPE>::VoxelGridXYPyramid()
-    : _pc(NULL),
-      _nr_points(0),
-      _nr_point_element(0),
-      _dsf_x(0),
-      _dsf_y(0),
-      _dsf_z(0){};
+    : pc_(nullptr),
+      nr_points_(0),
+      nr_point_element_(0),
+      dsf_x_(0),
+      dsf_y_(0),
+      dsf_z_(0) {}
 
 template <typename DATA_TYPE>
-bool VoxelGridXYPyramid<DATA_TYPE>::alloc(
+bool VoxelGridXYPyramid<DATA_TYPE>::Alloc(
     unsigned int nr_scale, unsigned int nr_voxel_x_base,
     unsigned int nr_voxel_y_base, unsigned int dsf_x, unsigned int dsf_y,
     DATA_TYPE spatial_bound_x_min, DATA_TYPE spatial_bound_x_max,
@@ -1296,18 +1263,18 @@ bool VoxelGridXYPyramid<DATA_TYPE>::alloc(
   unsigned int scale;
   unsigned int nr_voxel_x = nr_voxel_x_base;
   unsigned int nr_voxel_y = nr_voxel_y_base;
-  unsigned int sf_x = (unsigned int)i_pow((unsigned int)2, dsf_x);
-  unsigned int sf_y = (unsigned int)i_pow((unsigned int)2, dsf_y);
+  unsigned int sf_x = (unsigned int) IPow((unsigned int) 2, dsf_x);
+  unsigned int sf_y = (unsigned int) IPow((unsigned int) 2, dsf_y);
 
-  _dsf_x = dsf_x;
-  _dsf_y = dsf_y;
-  _dsf_z = 0;
+  dsf_x_ = dsf_x;
+  dsf_y_ = dsf_y;
+  dsf_z_ = 0;
 
-  _vgrids.clear();
-  _vgrids.resize(nr_scale);
+  vgrids_.clear();
+  vgrids_.resize(nr_scale);
 
   for (scale = 0; scale < nr_scale; ++scale) {
-    if (!_vgrids[scale].alloc(nr_voxel_x, nr_voxel_y, spatial_bound_x_min,
+    if (!vgrids_[scale].alloc(nr_voxel_x, nr_voxel_y, spatial_bound_x_min,
                               spatial_bound_x_max, spatial_bound_y_min,
                               spatial_bound_y_max, spatial_bound_z_min,
                               spatial_bound_z_max)) {
@@ -1318,11 +1285,11 @@ bool VoxelGridXYPyramid<DATA_TYPE>::alloc(
   }
 
   if (scale == 0) {
-    _vgrids.clear();
+    vgrids_.clear();
     return false;
   } else {
     if (scale != nr_scale) {
-      _vgrids.resize(scale);
+      vgrids_.resize(scale);
     }
   }
 
@@ -1330,64 +1297,64 @@ bool VoxelGridXYPyramid<DATA_TYPE>::alloc(
 }
 
 template <typename DATA_TYPE>
-bool VoxelGridXYPyramid<DATA_TYPE>::set(const DATA_TYPE* pc,
+bool VoxelGridXYPyramid<DATA_TYPE>::Set(const DATA_TYPE *pc,
                                         unsigned int nr_points,
                                         unsigned int nr_point_element) {
-  if (!pc || !nr_points || !nr_point_element || _vgrids.empty()) {
+  if (!pc || !nr_points || !nr_point_element || vgrids_.empty()) {
     return false;
   }
 
-  unsigned int scale, nr_scale = (unsigned int)_vgrids.size();
+  unsigned int scale, nr_scale = (unsigned int) vgrids_.size();
 
-  _pc = pc;
-  _nr_points = nr_points;
-  _nr_point_element = nr_point_element;
+  pc_ = pc;
+  nr_points_ = nr_points;
+  nr_point_element_ = nr_point_element;
 
   for (scale = 0; scale < nr_scale; ++scale) {
-    if (!_vgrids[scale].set(pc, nr_points, nr_point_element)) {
+    if (!vgrids_[scale].set(pc, nr_points, nr_point_element)) {
       break;
     }
   }
 
-  /*break in the middle - last (nr_scale - s) grids are invalid*/
+  // break in the middle - last (NrScale - s) grids are invalid
   if (scale < nr_scale) {
-    _vgrids.resize(scale);
+    vgrids_.resize(scale);
   }
 
-  return (_vgrids.size() == nr_scale);
+  return (vgrids_.size() == nr_scale);
 }
 
 template <typename DATA_TYPE>
-bool VoxelGridXYPyramid<DATA_TYPE>::set_s(const float* pc,
-                                          unsigned int nr_points,
-                                          unsigned int nr_point_element) {
-  if (!pc || !nr_points || !nr_point_element || _vgrids.empty()) {
+bool VoxelGridXYPyramid<DATA_TYPE>::SetS(const float *pc,
+                                         unsigned int nr_points,
+                                         unsigned int nr_point_element) {
+  if (!pc || !nr_points || !nr_point_element || vgrids_.empty()) {
     return false;
   }
 
-  unsigned int scale, nr_scale = (unsigned int)_vgrids.size();
+  unsigned int scale, nr_scale = (unsigned int) vgrids_.size();
 
-  _pc = pc;
-  _nr_points = nr_points;
-  _nr_point_element = nr_point_element;
+  pc_ = pc;
+  nr_points_ = nr_points;
+  nr_point_element_ = nr_point_element;
 
   for (scale = 0; scale < nr_scale; ++scale) {
-    if (!_vgrids[scale].set_s(pc, nr_points, nr_point_element)) {
+    if (!vgrids_[scale].set_s(pc, nr_points, nr_point_element)) {
       break;
     }
   }
 
-  /*break in the middle - last (nr_scale - s) grids are invalid*/
+  // break in the middle - last (NrScale - s) grids are invalid
   if (scale < nr_scale) {
-    _vgrids.resize(scale);
+    vgrids_.resize(scale);
   }
 
-  return (_vgrids.size() == nr_scale);
+  return (vgrids_.size() == nr_scale);
 }
 
 template <typename DATA_TYPE>
-bool VoxelGridXYPyramid<DATA_TYPE>::set(
-    const DATA_TYPE* pc, unsigned int nr_scale, unsigned int nr_points,
+bool VoxelGridXYPyramid<DATA_TYPE>::Set(
+    const DATA_TYPE *pc, unsigned int nr_scale, unsigned int nr_points,
     unsigned int nr_point_element, unsigned int nr_voxel_x_base,
     unsigned int nr_voxel_y_base, unsigned int dsf_x, unsigned int dsf_y,
     DATA_TYPE spatial_bound_x_min, DATA_TYPE spatial_bound_x_max,
@@ -1399,64 +1366,63 @@ bool VoxelGridXYPyramid<DATA_TYPE>::set(
   }
 
   unsigned int i, s;
-  _pc = pc;
-  _nr_points = nr_points;
-  _nr_point_element = nr_point_element;
+  pc_ = pc;
+  nr_points_ = nr_points;
+  nr_point_element_ = nr_point_element;
 
-  _dsf_x = dsf_x;
-  _dsf_y = dsf_y;
-  _dsf_z = 0;
+  dsf_x_ = dsf_x;
+  dsf_y_ = dsf_y;
+  dsf_z_ = 0;
 
-  _vgrids.clear();
-  _vgrids.resize(nr_scale);
+  vgrids_.clear();
+  vgrids_.resize(nr_scale);
 
-  /*set the base level pyramid*/
-  if (!_vgrids[0].set(_pc, nr_points, nr_point_element, nr_voxel_x_base,
+  // Set the base level pyramid
+  if (!vgrids_[0].set(pc_, nr_points, nr_point_element, nr_voxel_x_base,
                       nr_voxel_y_base, spatial_bound_x_min, spatial_bound_x_max,
                       spatial_bound_y_min, spatial_bound_y_max,
                       spatial_bound_z_min, spatial_bound_z_max)) {
-    _vgrids.clear();
+    vgrids_.clear();
     return false;
   }
 
   for (s = 1; s < nr_scale; ++s) {
-    if (!i_downsample_voxelgridxy(_vgrids[s - 1], _vgrids[s], _dsf_x, _dsf_y)) {
+    if (!IDownsampleVoxelGridXY(vgrids_[s - 1], &vgrids_[s], dsf_x_, dsf_y_)) {
       break;
     }
   }
 
-  if (s <
-      nr_scale) /*break in the middle - last (nr_scale - s) grids are invalid*/
-  {
+  if (s < nr_scale) {
     for (i = 0; i < (nr_scale - s); ++i) {
-      _vgrids.pop_back();
+      vgrids_.pop_back();
     }
   }
 
-  return (_vgrids.size() == nr_scale); /*check if all scales are valid*/
+  return (vgrids_.size() == nr_scale);  // check if all scales are valid
+}
+
+template <typename DATA_TYPE> void VoxelGridXYPyramid<DATA_TYPE>::CleanUp() {
+  pc_ = nullptr;
+  vgrids_.clear();
+  nr_points_ = nr_point_element_ = dsf_x_ = dsf_y_ = dsf_z_ = 0;
 }
 
 template <typename DATA_TYPE>
-void VoxelGridXYPyramid<DATA_TYPE>::cleanup() {
-  _pc = nullptr;
-  _vgrids.clear();
-  _nr_points = _nr_point_element = _dsf_x = _dsf_y = _dsf_z = 0;
-}
-
-template <typename DATA_TYPE>
-bool VoxelGridXYPyramid<DATA_TYPE>::initialized() const {
+bool VoxelGridXYPyramid<DATA_TYPE>::Initialized() const {
   unsigned int i;
-  if (_vgrids.empty()) {
+  if (vgrids_.empty()) {
     return false;
   }
-  for (i = 0; i < _vgrids.size(); ++i) {
-    if (!_vgrids[i].initialized()) {
+  for (i = 0; i < vgrids_.size(); ++i) {
+    if (!vgrids_[i].initialized()) {
       break;
     }
   }
-  return (i == _vgrids.size());
+  return (i == vgrids_.size());
 }
 
-}  // namespace idl
+}  // namespace common
+}  // namespace perception
+}  // namespace apollo
 
 #endif  // MODULES_PERCEPTION_COMMON_I_LIB_PC_I_STRUCT_S_H_

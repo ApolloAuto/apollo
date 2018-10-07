@@ -33,10 +33,10 @@ class SppLabelImage {
   SppLabelImage() { clusters_.reserve(kDefaultReserveSize); }
   ~SppLabelImage() {
     if (labels_) {
-      idl::i_free2(labels_);
+      common::IFree2(&labels_);
     }
     if (range_mask_) {
-      idl::i_free2(range_mask_);
+      common::IFree2(&range_mask_);
     }
   }
   // @brief: initialize label image
@@ -150,4 +150,4 @@ typedef std::shared_ptr<const SppLabelImage> SppLabelImageConstPtr;
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // LIDAR_LIB_SEGMENTATION_CNNSEG_SPP_ENGINE_SPP_LABEL_IMAGE_H_
+#endif  // MODULES_PERCEPTION_LIDAR_LIB_SEGMENTATION_CNNSEG_SPP_ENGINE_SPP_LABEL_IMAGE_H_  // NOLINT

@@ -109,7 +109,7 @@ float GroundServiceContent::PointToPlaneDistance(
     params[1] = node->params(1);
     params[2] = node->params(2);
     params[3] = node->params(3);
-    out = idl::i_plane_to_point_signed_distance_w_unit_norm(params, offset_pt);
+    out = common::IPlaneToPointSignedDistanceWUnitNorm(params, offset_pt);
   }
   return out;
 }

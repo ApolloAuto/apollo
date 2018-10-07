@@ -58,15 +58,15 @@ bool SpatioTemporalGroundDetector::Init(
   use_roi_ = config_params.use_roi();
   use_ground_service_ = config_params.use_ground_service();
 
-  param_ = new idl::PlaneFitGroundDetectorParam;
+  param_ = new common::PlaneFitGroundDetectorParam;
   param_->roi_region_rad_x = config_params.roi_rad_x();
   param_->roi_region_rad_y = config_params.roi_rad_y();
   param_->roi_region_rad_z = config_params.roi_rad_z();
   param_->nr_grids_coarse = config_params.grid_size();
   param_->nr_smooth_iter = config_params.nr_smooth_iter();
 
-  pfdetector_ = new idl::PlaneFitGroundDetector(*param_);
-  pfdetector_->init();
+  pfdetector_ = new common::PlaneFitGroundDetector(*param_);
+  pfdetector_->Init();
 
   point_indices_temp_.resize(default_point_size_);
   data_.resize(default_point_size_ * 3);
@@ -156,12 +156,14 @@ bool SpatioTemporalGroundDetector::Detect(const GroundDetectorOptions& options,
   base::PointIndices& non_ground_indices = frame->non_ground_indices;
   AINFO << "input of ground detector:" << valid_point_num;
 
-  if (!pfdetector_->detect(data_.data(), ground_height_signed_.data(),
-                           valid_point_num, nr_points_element)) {
-    AERROR << "failed to call ground detector!";
-    non_ground_indices.indices.insert(
-        non_ground_indices.indices.end(), point_indices_temp_.begin(),
-        point_indices_temp_.begin() + valid_point_num);
+  if (!pfdetector_->Detect(data_.data(),
+              ground_height_signed_.data(),
+              valid_point_num,
+              nr_points_element)) {
+     AINFO << "failed to call ground detector!";
+    non_ground_indices.indices.insert(non_ground_indices.indices.end(),
+                               point_indices_temp_.begin(),
+                               point_indices_temp_.begin() + valid_point_num);
     return false;
   }
 
@@ -171,7 +173,7 @@ bool SpatioTemporalGroundDetector::Detect(const GroundDetectorOptions& options,
         z_distance;
     frame->world_cloud->mutable_points_height()->at(point_indices_temp_[i]) =
         z_distance;
-    if (idl::i_abs(z_distance) > ground_thres_) {
+    if (common::IAbs(z_distance) > ground_thres_) {
       non_ground_indices.indices.push_back(point_indices_temp_[i]);
     } else {
       frame->cloud->mutable_points_label()->at(point_indices_temp_[i]) =
@@ -188,14 +190,14 @@ bool SpatioTemporalGroundDetector::Detect(const GroundDetectorOptions& options,
       ground_service_content_.grid_center_ = cloud_center_;
       ground_service_content_.grid_.Reset();
       GroundNode* node_ptr = ground_service_content_.grid_.DataPtr();
-      unsigned int rows = pfdetector_->get_grid_dim_y();
-      unsigned int cols = pfdetector_->get_grid_dim_x();
+      unsigned int rows = pfdetector_->GetGridDimY();
+      unsigned int cols = pfdetector_->GetGridDimX();
       unsigned int index = 0;
       for (unsigned int r = 0; r < rows; ++r) {
         for (unsigned int c = 0; c < cols; ++c) {
-          const idl::GroundPlaneLiDAR* plane =
-              pfdetector_->get_ground_plane(r, c);
-          if (plane->is_valid()) {
+          const common::GroundPlaneLiDAR* plane
+            = pfdetector_->GetGroundPlane(r, c);
+          if (plane->IsValid()) {
             index = r * cols + c;
             GroundNode* node = node_ptr + index;
             node->params(0) = plane->params[0];

@@ -17,7 +17,7 @@ cc_library(
         "//modules/perception/common/i_lib/algorithm:i_sort",
         "//modules/perception/common/i_lib/core:core",
         "//modules/perception/common/i_lib/geometry:i_plane",
-        "//modules/perception/common/i_lib/numeric:numeric",
+        "//modules/perception/common/i_lib/da:i_ransac",
     ],
 )
 
@@ -39,4 +39,4 @@ cc_library(
     ],
 )
 
-# cpplint()
+cpplint()

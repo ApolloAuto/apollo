@@ -17,39 +17,43 @@
 #ifndef MODULES_PERCEPTION_COMMON_I_LIB_CORE_I_BASIC_H_
 #define MODULES_PERCEPTION_COMMON_I_LIB_CORE_I_BASIC_H_
 
-#include <cmath>
-#include <cstring>
-
+#include <math.h>
+#include <string.h>
 #include "modules/perception/common/i_lib/core/i_constant.h"
 
-namespace idl {
-/*Compute abs(a)*/
-inline float i_abs(float a) { return a < 0.f ? -a : a; }
-inline int i_abs(int a) { return a < 0 ? -a : a; }
-inline double i_abs(double a) { return a < 0.0 ? -a : a; }
+namespace apollo {
+namespace perception {
+namespace common {
 
-/*Compute a/b, should not template this function, i_rec(int, int) should return
- * double*/
-inline float i_div(float a, float b) { return ((b != 0.f) ? (a / b) : 1.0f); }
-inline float i_div(float a, int b) { return ((b != 0) ? (a / b) : 1.0f); }
-inline float i_div(float a, unsigned int b) {
+// Compute abs(a)
+inline float IAbs(float a) { return a < 0.f ? -a : a; }
+inline int IAbs(int a) { return a < 0 ? -a : a; }
+inline double IAbs(double a) { return a < 0.0 ? -a : a; }
+
+// Compute a/b, should not template this function, IRec(int, int) should return
+//  * double
+inline float IDiv(float a, float b) { return ((b != 0.f) ? (a / b) : 1.0f); }
+inline float IDiv(float a, int b) { return ((b != 0) ? (a / b) : 1.0f); }
+inline float IDiv(float a, unsigned int b) {
   float result = 1.0f;
   if (b != 0) {
     result = a / b;
   }
   return result;
 }
-inline double i_div(int a, int b) { return ((b != 0) ? ((double)a / b) : 1.0); }
-inline double i_div(unsigned int a, unsigned int b) {
+inline double IDiv(int a, int b) {
+  return ((b != 0) ? (static_cast<double>(a) / b) : 1.0);
+}
+inline double IDiv(unsigned int a, unsigned int b) {
   double result = 1.0;
   if (b != 0) {
-    result = (double)a / b;
+    result = static_cast<double>(a) / b;
   }
   return result;
 }
-inline double i_div(double a, double b) { return ((b != 0.0) ? (a / b) : 1.0); }
-inline double i_div(double a, int b) { return ((b != 0) ? (a / b) : 1.0); }
-inline double i_div(double a, unsigned int b) {
+inline double IDiv(double a, double b) { return ((b != 0.0) ? (a / b) : 1.0); }
+inline double IDiv(double a, int b) { return ((b != 0) ? (a / b) : 1.0); }
+inline double IDiv(double a, unsigned int b) {
   double result = 1.0;
   if (b != 0) {
     result = a / b;
@@ -57,99 +61,107 @@ inline double i_div(double a, unsigned int b) {
   return result;
 }
 
-/*Compute 1/a, should not template this function, i_rec(int) should return
- * double*/
-inline float i_rec(float a) { return ((a != 0.0f) ? ((1.0f) / a) : 1.0f); }
-inline double i_rec(int a) { return ((a != 0) ? ((1.0) / a) : 1.0); }
-inline double i_rec(unsigned int a) { return ((a != 0) ? ((1.0) / a) : 1.0); }
-inline double i_rec(double a) { return ((a != 0.0) ? ((1.0) / a) : 1.0); }
+// Compute 1/a, should not template this function,
+// IRecstatic_cast<int> should return
+//  * double
+inline float IRec(float a) { return ((a != 0.0f) ? ((1.0f) / a) : 1.0f); }
+inline double IRec(int a) { return ((a != 0) ? ((1.0) / a) : 1.0); }
+inline double IRec(unsigned int a) { return ((a != 0) ? ((1.0) / a) : 1.0); }
+inline double IRec(double a) { return ((a != 0.0) ? ((1.0) / a) : 1.0); }
 
-/*Compute sqrt(a), should not template this function, i_sqrt(int) should return
- * double*/
-inline float i_sqrt(float a) { return (a >= 0.0f) ? (sqrtf(a)) : 0.0f; }
-inline double i_sqrt(int a) { return (a > 0) ? (sqrt((double)a)) : 0.0; }
-inline double i_sqrt(unsigned int a) {
-  return (a > 0) ? (sqrt((double)a)) : 0.0;
+// Compute sqrt(a), should not template this function, ISqrt(int) should return
+//  * double
+inline float ISqrt(float a) { return (a >= 0.0f) ? (sqrtf(a)) : 0.0f; }
+inline double ISqrt(int a) {
+  return (a > 0) ? (sqrt(static_cast<double>(a))) : 0.0;
 }
-inline double i_sqrt(double a) { return (a >= 0.0) ? (sqrt(a)) : 0.0; }
+inline double ISqrt(unsigned int a) {
+  return (a > 0) ? (sqrt(static_cast<double>(a))) : 0.0;
+}
+inline double ISqrt(double a) { return (a >= 0.0) ? (sqrt(a)) : 0.0; }
 
-/*Compute cubic root of a, should not template this function, i_cbrt(int) should
- * return double*/
-inline float i_cbrt(float a) {
+// Compute cubic root of a, should not template this function, ICbrt(int) should
+//  * return double
+inline float ICbrt(float a) {
   return (a >= 0.f) ? powf(a, 1.f / 3) : -powf(-a, 1.f / 3);
 }
-inline double i_cbrt(int a) {
-  return (a >= 0) ? pow((double)a, 1.0 / 3) : -pow(-(double)a, 1.0 / 3);
+inline double ICbrt(int a) {
+  return (a >= 0) ? pow(static_cast<double>(a), 1.0 / 3)
+                  : -pow(-static_cast<double>(a), 1.0 / 3);
 }
-inline double i_cbrt(unsigned int a) { return pow((double)a, 1.0 / 3); }
-inline double i_cbrt(double a) {
+inline double ICbrt(unsigned int a) {
+  return pow(static_cast<double>(a), 1.0 / 3);
+}
+inline double ICbrt(double a) {
   return (a >= 0.0) ? pow(a, 1.0 / 3) : -pow(-a, 1.0 / 3);
 }
 
-/*Compute a^2, should not template this function, i_sqr(char) and i_sqr(unsigned
- * char) should return int*/
-inline float i_sqr(float a) { return (a * a); }
-inline int i_sqr(int a) { return (a * a); }
-inline unsigned int i_sqr(unsigned int a) { return (a * a); }
-inline double i_sqr(double a) { return (a * a); }
-inline int i_sqr(char a) { return ((int)a * (int)a); }
-inline int i_sqr(unsigned char a) { return ((int)a * (int)a); }
-
-/*Compute a^3, should not template this function, i_cub(char) and i_cub(unsigned
- * char) should return int*/
-inline float i_cub(float a) { return (a * a * a); }
-inline int i_cub(int a) { return (a * a * a); }
-inline unsigned int i_cub(unsigned int a) { return (a * a * a); }
-inline double i_cub(double a) { return (a * a * a); }
-inline int i_cub(char a) { return ((int)a * (int)a * (int)a); }
-inline int i_cub(unsigned char a) { return ((int)a * (int)a * (int)a); }
-
-/*Compute log(x)*/
-inline float i_log(float x) { return ((x > 0.f) ? logf(x) : 0.f); }
-inline double i_log(int x) { return ((x > 0) ? log((double)x) : 0.0); }
-inline double i_log(unsigned int x) { return ((x > 0) ? log((double)x) : 0.0); }
-inline double i_log(double x) { return ((x > 0.0) ? log(x) : 0.0); }
-
-/*Compute exp(x)*/
-inline float i_exp(float x) { return (expf(x)); }
-inline double i_exp(int x) { return exp((double)x); }
-inline double i_exp(unsigned int x) { return exp((double)x); }
-inline double i_exp(double x) { return exp(x); }
-
-/*Compute pow(a, b) => a^b*/
-inline float i_pow(float a, float b) { return powf(a, b); }
-inline float i_pow(float a, int b) { return powf(a, (float)b); }
-inline double i_pow(int a, int b) { return pow((double)a, (double)b); }
-inline double i_pow(unsigned int a, unsigned int b) {
-  return pow((double)a, (double)b);
-}
-inline double i_pow(double a, double b) { return pow(a, b); }
-inline double i_pow(double a, int b) { return pow(a, (double)b); }
-
-/*Compute min(a,b)*/
-template <typename T>
-inline T i_min(T a, T b) {
-  return ((a <= b) ? a : b);
+// Compute a^2, should not template this function, ISqr(char) and ISqr(unsigned
+//  * char) should return int
+inline float ISqr(float a) { return (a * a); }
+inline int ISqr(int a) { return (a * a); }
+inline unsigned int ISqr(unsigned int a) { return (a * a); }
+inline double ISqr(double a) { return (a * a); }
+inline int ISqr(char a) { return (static_cast<int>(a) * static_cast<int>(a)); }
+inline int ISqr(unsigned char a) {
+  return (static_cast<int>(a) * static_cast<int>(a));
 }
 
-/*Compute max(a,b)*/
-template <typename T>
-inline T i_max(T a, T b) {
-  return ((a >= b) ? a : b);
+// Compute a^3, should not template this function, ICub(char) and ICub(unsigned
+//  * char) should return int
+inline float ICub(float a) { return (a * a * a); }
+inline int ICub(int a) { return (a * a * a); }
+inline unsigned int ICub(unsigned int a) { return (a * a * a); }
+inline double ICub(double a) { return (a * a * a); }
+inline int ICub(char a) {
+  return (static_cast<int>(a) * static_cast<int>(a) * static_cast<int>(a));
+}
+inline int ICub(unsigned char a) {
+  return (static_cast<int>(a) * static_cast<int>(a) * static_cast<int>(a));
 }
 
-/*Compute the average of a and b*/
-template <typename T>
-inline T i_average(T a, T b) {
-  return (a + b) / 2;
+// Compute log(x)
+inline float ILog(float x) { return ((x > 0.f) ? logf(x) : 0.f); }
+inline double ILog(int x) {
+  return ((x > 0) ? log(static_cast<double>(x)) : 0.0);
 }
+inline double ILog(unsigned int x) {
+  return ((x > 0) ? log(static_cast<double>(x)) : 0.0);
+}
+inline double ILog(double x) { return ((x > 0.0) ? log(x) : 0.0); }
 
-/*Compute the sign of a, return:
- 1 if a>0
- -1 if a<0
- 0 if a==0*/
-template <typename T>
-inline T i_sign(T a) {
+// Compute exp(x)
+inline float IExp(float x) { return (expf(x)); }
+inline double IExp(int x) { return exp(static_cast<double>(x)); }
+inline double IExp(unsigned int x) { return exp(static_cast<double>(x)); }
+inline double IExp(double x) { return exp(x); }
+
+// Compute pow(a, b) => a^b
+inline float IPow(float a, float b) { return powf(a, b); }
+inline float IPow(float a, int b) { return powf(a, static_cast<float>(b)); }
+inline double IPow(int a, int b) {
+  return pow(static_cast<double>(a), static_cast<double>(b));
+}
+inline double IPow(unsigned int a, unsigned int b) {
+  return pow(static_cast<double>(a), static_cast<double>(b));
+}
+inline double IPow(double a, double b) { return pow(a, b); }
+inline double IPow(double a, int b) { return pow(a, static_cast<double>(b)); }
+
+// Compute min(a,b)
+template <typename T> inline T IMin(T a, T b) { return ((a <= b) ? a : b); }
+
+// Compute max(a,b)
+template <typename T> inline T IMax(T a, T b) { return ((a >= b) ? a : b); }
+
+// Compute the average of a and b
+template <typename T> inline T IAverage(T a, T b) { return (a + b) / 2; }
+
+// Compute the sign of a, return:
+// 1 if a>0
+// -1 if a<0
+// 0 if a==0
+template <typename T> inline T ISign(T a) {
   if (a > T(0.0))
     return (T(1.0));
   else if (a < T(0.0))
@@ -158,82 +170,83 @@ inline T i_sign(T a) {
     return (T(0.0));
 }
 
-/*Compute the sign of a, return:
-1 if a>=0
--1 if a<0*/
-template <typename T>
-inline T i_sign_never_zero(T a) {
+// Compute the sign of a, return:
+// 1 if a>=0
+// -1 if a<0
+template <typename T> inline T ISignNeverZero(T a) {
   if (a >= T(0.0))
     return (T(1.0));
   else
     return (T(-1.0));
 }
 
-/*Round a to the nearest integer*/
-inline int i_round(int a) { return (a); }
-inline int i_round(float a) {
-  return ((a >= 0.f) ? ((int)(a + 0.5f)) : ((int)(a - 0.5f)));
+// Round a to the nearest integer
+inline int IRound(int a) { return (a); }
+inline int IRound(float a) {
+  return ((a >= 0.f) ? (static_cast<int>(a + 0.5f))
+                     : (static_cast<int>(a - 0.5f)));
 }
-inline int i_round(double a) {
-  return ((a >= 0.0) ? ((int)(a + 0.5)) : ((int)(a - 0.5)));
+inline int IRound(double a) {
+  return ((a >= 0.0) ? (static_cast<int>(a + 0.5))
+                     : (static_cast<int>(a - 0.5)));
 }
 
-/*Rounds a upward, returning the smallest integral value that is not less than
- * a*/
-inline int i_ceil(int a) { return (a); }
-inline int i_ceil(float a) { return (int)(ceilf(a)); }
-inline int i_ceil(double a) { return (int)(ceil(a)); }
+// Rounds a upward, returning the smallest integral value that is not less than
+//  * a
+inline int ICeil(int a) { return (a); }
+inline int ICeil(float a) { return static_cast<int>(ceilf(a)); }
+inline int ICeil(double a) { return static_cast<int>(ceil(a)); }
 
-/*Trigonometric functions*/
-inline float i_sin(float alpha) { return sinf(alpha); }
-inline double i_sin(double alpha) { return sin(alpha); }
-inline float i_cos(float alpha) { return cosf(alpha); }
-inline double i_cos(double alpha) { return cos(alpha); }
-inline float i_tan(float alpha) { return tanf(alpha); }
-inline double i_tan(double alpha) { return tan(alpha); }
+// Trigonometric functions
+inline float ISin(float alpha) { return sinf(alpha); }
+inline double ISin(double alpha) { return sin(alpha); }
+inline float ICos(float alpha) { return cosf(alpha); }
+inline double ICos(double alpha) { return cos(alpha); }
+inline float ITan(float alpha) { return tanf(alpha); }
+inline double ITan(double alpha) { return tan(alpha); }
 
-inline float i_asin(float alpha) {
+inline float IAsin(float alpha) {
   if (alpha >= 1.f) return Constant<float>::HALF_PI();
   if (alpha < -1.f) return -Constant<float>::HALF_PI();
   return asinf(alpha);
 }
-inline double i_asin(double alpha) {
+inline double IAsin(double alpha) {
   if (alpha >= 1.0) return Constant<double>::HALF_PI();
   if (alpha < -1.0) return -Constant<double>::HALF_PI();
   return asin(alpha);
 }
-inline float i_acos(float alpha) {
+inline float IAcos(float alpha) {
   if (alpha >= 1.f) return 0.f;
   if (alpha < -1.f) return Constant<float>::PI();
   return acosf(alpha);
 }
-inline double i_acos(double alpha) {
+inline double IAcos(double alpha) {
   if (alpha >= 1.0) return 0.0;
   if (alpha < -1.0) return Constant<double>::PI();
   return acos(alpha);
 }
-inline float i_atan2(float y, float x) { return atan2f(y, x); }
-inline double i_atan2(double y, double x) { return atan2(y, x); }
+inline float IAtan2(float y, float x) { return atan2f(y, x); }
+inline double IAtan2(double y, double x) { return atan2(y, x); }
 
-inline float i_radians_to_degree(float r) {
+inline float IRadiansToDegree(float r) {
   return (r * Constant<float>::RADIAN_TO_DEGREE());
 }
-inline double i_radians_to_degree(double r) {
+inline double IRadiansToDegree(double r) {
   return (r * Constant<double>::RADIAN_TO_DEGREE());
 }
-inline float i_degree_to_radians(float d) {
+inline float IDegreeToRadians(float d) {
   return (d * Constant<float>::DEGREE_TO_RADIAN());
 }
-inline double i_degree_to_radians(double d) {
+inline double IDegreeToRadians(double d) {
   return (d * Constant<double>::DEGREE_TO_RADIAN());
 }
 
-/*Compute the Hamming distance between two (unsigned) integers (considered as
- * binary values, that is, as sequences of bits)*/
-inline unsigned int i_hamming(unsigned int a, unsigned int b) {
+// Compute the Hamming distance between two (unsigned) integers (considered as
+//  * binary values, that is, as sequences of bits)
+inline unsigned int IHamming(unsigned int a, unsigned int b) {
   unsigned int distance = 0;
   unsigned int val = a ^ b;  // XOR
-  // Count the number of bits set
+                             // Count the number of bits set
   while (val != 0) {
     // A bit is set, so increment the count and clear the bit
     distance++;
@@ -242,111 +255,93 @@ inline unsigned int i_hamming(unsigned int a, unsigned int b) {
   return distance;  // Return the number of different bits
 }
 
-inline unsigned int i_hamming_lut(unsigned int a, unsigned int b) {
+inline unsigned int IHammingLut(unsigned int a, unsigned int b) {
   unsigned int distance = 0;
   unsigned int val = a ^ b;  // XOR
   unsigned char *p = (unsigned char *)&val;
-  /*count the total # of "1s" in a xor b*/
-  distance = i_UByteBitCountLut[p[0]] + i_UByteBitCountLut[p[1]] +
-             i_UByteBitCountLut[p[2]] + i_UByteBitCountLut[p[3]];
-  return distance; /*Return the number of different bits*/
+  // count the total # of "1s" in a xor b
+  distance = kIUByteBitCountLut[p[0]] + kIUByteBitCountLut[p[1]] +
+             kIUByteBitCountLut[p[2]] + kIUByteBitCountLut[p[3]];
+  return distance;  // Return the number of different bits
 }
 
-/*Swap of numbers*/
-template <typename T>
-inline void i_swap(T &a, T &b) {
+// Swap of numbers
+template <typename T> inline void ISwap(T &a, T &b) {
   T temp;
   temp = a;
   a = b;
   b = temp;
 }
-template <typename T>
-inline void i_swap(T *a, T *b, int n) {
-  for (int i = 0; i < n; i++) i_swap(a[i], b[i]);
+template <typename T> inline void ISwap(T *a, T *b, int n) {
+  for (int i = 0; i < n; i++)
+    ISwap(a[i], b[i]);
 }
-template <typename T>
-inline void i_swap2(T *a, T *b) {
-  i_swap(a[0], b[0]);
-  i_swap(a[1], b[1]);
+template <typename T> inline void ISwap2(T *a, T *b) {
+  ISwap(a[0], b[0]);
+  ISwap(a[1], b[1]);
 }
-template <typename T>
-inline void i_swap3(T *a, T *b) {
-  i_swap(a[0], b[0]);
-  i_swap(a[1], b[1]);
-  i_swap(a[2], b[2]);
+template <typename T> inline void ISwap3(T *a, T *b) {
+  ISwap(a[0], b[0]);
+  ISwap(a[1], b[1]);
+  ISwap(a[2], b[2]);
 }
-template <typename T>
-inline void i_swap4(T *a, T *b) {
-  i_swap(a[0], b[0]);
-  i_swap(a[1], b[1]);
-  i_swap(a[2], b[2]);
-  i_swap(a[3], b[3]);
+template <typename T> inline void ISwap4(T *a, T *b) {
+  ISwap(a[0], b[0]);
+  ISwap(a[1], b[1]);
+  ISwap(a[2], b[2]);
+  ISwap(a[3], b[3]);
 }
 
-/*Return:
-      min_val if a <= min_val
-      max_val if a >= max_val
-      a       else*/
-template <typename T>
-inline T i_interval(T a, T min_val, T max_val) {
+// Return:
+// min_val if a <= min_val
+// max_val if a >= max_val
+template <typename T> inline T IInterval(T a, T min_val, T max_val) {
   if (a <= min_val) return (min_val);
   if (a >= max_val) return (max_val);
   return (a);
 }
 
-/*Return:
-min_val   if a <= min_val
-max_val-1 if a >= max_val
-a         else*/
-template <typename T>
-inline T i_interval_halfopen(T a, T min_val, T max_val) {
+template <typename T> inline T IIntervalHalfopen(T a, T min_val, T max_val) {
   if (a <= min_val) return (min_val);
   if (a >= max_val) return (max_val - 1);
   return (a);
 }
 
-/*Make p[i] to be the reference of a's ith row, where a is a mxn matrix*/
-template <typename T>
-inline void i_make_reference(T *a, T **p, int m, int n) {
+// Make p[i] to be the reference of a's ith row, where a is a mxn matrix
+template <typename T> inline void IMakeReference(T *a, T **p, int m, int n) {
   for (int i = 0; i < m; i++) {
     p[i] = &a[i * n];
   }
 }
-template <typename T>
-inline void i_make_reference_2x2(T a[4], T *p[2]) {
+template <typename T> inline void IMakeReference2x2(T a[4], T *p[2]) {
   p[0] = &a[0];
   p[1] = &a[2];
 }
-template <typename T>
-inline void i_make_reference_3x3(T a[9], T *p[3]) {
+template <typename T> inline void IMakeReference3x3(T a[9], T *p[3]) {
   p[0] = &a[0];
   p[1] = &a[3];
   p[2] = &a[6];
 }
-template <typename T>
-inline void i_make_reference_4x4(T a[16], T *p[4]) {
+template <typename T> inline void IMakeReference4x4(T a[16], T *p[4]) {
   p[0] = &a[0];
   p[1] = &a[4];
   p[2] = &a[8];
   p[3] = &a[12];
 }
-template <typename T>
-inline void i_make_reference_4x9(T a[36], T *p[4]) {
+template <typename T> inline void IMakeReference4x9(T a[36], T *p[4]) {
   p[0] = &a[0];
   p[1] = &a[9];
   p[2] = &a[18];
   p[3] = &a[27];
 }
-template <typename T>
-inline void i_make_reference_5x9(T a[45], T *p[5]) {
+template <typename T> inline void IMakeReference5x9(T a[45], T *p[5]) {
   p[0] = &a[0];
   p[1] = &a[9];
   p[2] = &a[18];
   p[3] = &a[27];
   p[4] = &a[36];
 }
-template <typename T>
-inline void i_make_reference_9x9(T a[81], T *p[9]) {
+template <typename T> inline void IMakeReference9x9(T a[81], T *p[9]) {
   p[0] = &a[0];
   p[1] = &a[9];
   p[2] = &a[18];
@@ -357,8 +352,7 @@ inline void i_make_reference_9x9(T a[81], T *p[9]) {
   p[7] = &a[63];
   p[8] = &a[72];
 }
-template <typename T>
-inline void i_make_reference_12x12(T a[144], T *p[12]) {
+template <typename T> inline void IMakeReference12x12(T a[144], T *p[12]) {
   p[0] = &a[0];
   p[1] = &a[12];
   p[2] = &a[24];
@@ -374,38 +368,38 @@ inline void i_make_reference_12x12(T a[144], T *p[12]) {
 }
 
 template <typename T>
-inline void i_make_const_reference(const T *a, const T **p, int m, int n) {
+inline void IMakeConstReference(const T *a, const T **p, int m, int n) {
   for (int i = 0; i < m; i++) {
     p[i] = &a[i * n];
   }
 }
 template <typename T>
-inline void i_make_const_reference_2x2(const T a[4], const T *p[2]) {
+inline void IMakeConstReference2x2(const T a[4], const T *p[2]) {
   p[0] = &a[0];
   p[1] = &a[2];
 }
 template <typename T>
-inline void i_make_const_reference_3x3(const T a[9], const T *p[3]) {
+inline void IMakeConstReference3x3(const T a[9], const T *p[3]) {
   p[0] = &a[0];
   p[1] = &a[3];
   p[2] = &a[6];
 }
 template <typename T>
-inline void i_make_const_reference_4x4(const T a[16], const T *p[4]) {
+inline void IMakeConstReference4x4(const T a[16], const T *p[4]) {
   p[0] = &a[0];
   p[1] = &a[4];
   p[2] = &a[8];
   p[3] = &a[12];
 }
 template <typename T>
-inline void i_make_const_reference_4x9(const T a[36], const T *p[4]) {
+inline void IMakeConstReference4x9(const T a[36], const T *p[4]) {
   p[0] = &a[0];
   p[1] = &a[9];
   p[2] = &a[18];
   p[3] = &a[27];
 }
 template <typename T>
-inline void i_make_const_reference_5x9(const T a[45], const T *p[5]) {
+inline void IMakeConstReference5x9(const T a[45], const T *p[5]) {
   p[0] = &a[0];
   p[1] = &a[9];
   p[2] = &a[18];
@@ -413,7 +407,7 @@ inline void i_make_const_reference_5x9(const T a[45], const T *p[5]) {
   p[4] = &a[36];
 }
 template <typename T>
-inline void i_make_const_reference_9x9(const T a[81], const T *p[9]) {
+inline void IMakeConstReference9x9(const T a[81], const T *p[9]) {
   p[0] = &a[0];
   p[1] = &a[9];
   p[2] = &a[18];
@@ -425,7 +419,7 @@ inline void i_make_const_reference_9x9(const T a[81], const T *p[9]) {
   p[8] = &a[72];
 }
 template <typename T>
-inline void i_make_const_reference_12x12(const T a[144], const T *p[12]) {
+inline void IMakeConstReference12x12(const T a[144], const T *p[12]) {
   p[0] = &a[0];
   p[1] = &a[12];
   p[2] = &a[24];
@@ -440,9 +434,9 @@ inline void i_make_const_reference_12x12(const T a[144], const T *p[12]) {
   p[11] = &a[132];
 }
 
-/*Create an array of pointers (in p) to the l*m*n memory area a*/
+// Create an array of pointers (in p) to the l*m*n memory area a
 template <typename T>
-inline void i_make_reference(T *a, T ***p, int l, int m, int n) {
+inline void IMakeReference(T *a, T ***p, int l, int m, int n) {
   T *temp = a;
   for (int i = 0; i < l; i++) {
     for (int j = 0; j < m; j++) {
@@ -452,99 +446,100 @@ inline void i_make_reference(T *a, T ***p, int l, int m, int n) {
   }
 }
 
-/*Assign a[i] = i to a n-dimensional vector a*/
-template <typename T>
-inline void i_ramp(T *a, int n) {
+// Assign a[i] = i to a n-dimensional vector a
+template <typename T> inline void IRamp(T *a, int n) {
   for (int i = 0; i < n; i++) {
-    a[i] = (T)i;
+    a[i] = static_cast<T>(i);
   }
 }
 
-/*Construct the square 2D Gaussian Kernel (nxn) given Kernel width "n" and sigma
- * value "sigma"*/
-inline void i_gaussian_2d(float *kernel, int n, const float sigma) {
+// Construct the square 2D Gaussian Kernel (nxn) given Kernel width "n" and
+// sigma
+//  * value "sigma"
+inline void IGaussian2D(float *kernel, int n, const float sigma) {
   int r, c, i = 0;
-  const float cen = ((float)(n - 1)) / 2;
+  const float cen = (static_cast<float>(n - 1)) / 2;
   const float nf =
-      i_div(0.5f, (sigma * sigma));  // normalization factor = 1/(2sigma*sigma)
+      IDiv(0.5f, (sigma * sigma));  // normalization factor = 1/(2sigma*sigma)
   float dr, drsqr, dc, dcsqr, v, ksum = 0.f;
   // pre-compute filter
   for (r = 0; r < n; ++r) {
-    dr = (float)r - cen;
-    drsqr = i_sqr(dr);
+    dr = static_cast<float>(r) - cen;
+    drsqr = ISqr(dr);
     for (c = 0; c < n; ++c) {
-      dc = (float)c - cen;
-      dcsqr = i_sqr(dc);
-      v = i_exp(-(drsqr + dcsqr) * nf);
+      dc = static_cast<float>(c) - cen;
+      dcsqr = ISqr(dc);
+      v = IExp(-(drsqr + dcsqr) * nf);
       ksum += v;
       kernel[i++] = v;
     }
   }
   // normalize the kernel
-  v = i_div(1.0f, ksum);
+  v = IDiv(1.0f, ksum);
   for (i = 0; i < n * n; ++i) {
     kernel[i] *= v;
   }
 }
 
-inline void i_gaussian_2d(double *kernel, int n, const double sigma) {
+inline void IGaussian2D(double *kernel, int n, const double sigma) {
   int r, c, i = 0;
-  const double cen = ((double)(n - 1)) / 2;
+  const double cen = (static_cast<double>(n - 1)) / 2;
   const double nf =
-      i_div(0.5, (sigma * sigma));  // normalization factor = 1/(2sigma*sigma)
+      IDiv(0.5, (sigma * sigma));  // normalization factor = 1/(2sigma*sigma)
   double dr, drsqr, dc, dcsqr, v, ksum = 0.0;
   // pre-compute filter
   for (r = 0; r < n; ++r) {
-    dr = (double)r - cen;
-    drsqr = i_sqr(dr);
+    dr = static_cast<double>(r) - cen;
+    drsqr = ISqr(dr);
     for (c = 0; c < n; ++c) {
-      dc = (double)c - cen;
-      dcsqr = i_sqr(dc);
-      v = i_exp(-(drsqr + dcsqr) * nf);
+      dc = static_cast<double>(c) - cen;
+      dcsqr = ISqr(dc);
+      v = IExp(-(drsqr + dcsqr) * nf);
       ksum += v;
       kernel[i++] = v;
     }
   }
   // normalize the kernel
-  v = i_div(1.0, ksum);
+  v = IDiv(1.0, ksum);
   for (i = 0; i < n * n; ++i) {
     kernel[i] *= v;
   }
 }
 
-/*Move a into b, without necessarily preserving the value of a. This function is
- * specialized for types that are expensive to copy*/
-template <typename T>
-inline void i_move(T &a, T &b) {
-  b = a;
-}
+// Move a into b, without necessarily preserving the value of a. This function
+// is * specialized for types that are expensive to copy
+template <typename T> inline void IMove(const T &a, T *b) { *b = a; }
 
-/*Check if a point x is within the 1D rectangle bounding box defined by range
- * [start, start + length)*/
+// Check if a point x is within the 1D rectangle bounding box defined by range
+//  * [start, start + length)
 template <typename T>
-inline bool i_within_1d(const T x, const T start, const T length) {
+inline bool IWithin1D(const T x, const T start, const T length) {
   return (x >= start && x < (length + start));
 }
 
-/*Check if a point p(x,y) is within the 2D rectangle bounding box defined by
- * [x_upper_left, y_upper_left, width, height], where width and height are width
- * and height of the bounding box*/
+// Check if a point p(x,y) is within the 2D rectangle bounding box defined by
+//  * [x_upper_left, y_upper_left, width, height], where width and height are
+// width
+//  * and height of the bounding box
 template <typename T>
-inline bool i_within_2d(const T p[2], const T x_upper_left,
-                        const T y_upper_left, const T width, const T height) {
+inline bool IWithin2D(const T p[2], const T x_upper_left, const T y_upper_left,
+                      const T width, const T height) {
   return (p[0] >= x_upper_left && p[1] >= y_upper_left &&
           p[0] < width + x_upper_left && p[1] < height + y_upper_left);
 }
-/*Check if a point (x,y) is within the 2D rectangle bounding box defined by
- * [x_upper_left, y_upper_left, width, height], where width and height are width
- * and height of the bounding box*/
+// Check if a point (x,y) is within the 2D rectangle bounding box defined by
+//  * [x_upper_left, y_upper_left, width, height], where width and height are
+// width
+//  * and height of the bounding box
 template <typename T>
-inline bool i_within_2d(const T x, const T y, const T x_upper_left,
-                        const T y_upper_left, const T width, const T height) {
+inline bool IWithin2D(const T x, const T y, const T x_upper_left,
+                      const T y_upper_left, const T width, const T height) {
   return (x >= x_upper_left && y >= y_upper_left && x < width + x_upper_left &&
           y < height + y_upper_left);
 }
 
-}  // namespace idl
+}  // namespace common
+}  // namespace perception
+}  // namespace apollo
 
 #endif  // MODULES_PERCEPTION_COMMON_I_LIB_CORE_I_BASIC_H_
