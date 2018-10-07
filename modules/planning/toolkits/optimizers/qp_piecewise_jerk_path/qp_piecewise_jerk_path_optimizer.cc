@@ -79,8 +79,9 @@ bool QpPiecewiseJerkPathOptimizer::Init(
   if (config.has_qp_piecewise_jerk_path_config()) {
     config_ = config.qp_piecewise_jerk_path_config();
   }
-  // lateral_qp_optimizer_.reset(new ActiverSetLateralQPOptimizer());
-  lateral_qp_optimizer_.reset(new ActiverSetAugmentedLateralQPOptimizer());
+  lateral_qp_optimizer_.reset(new ActiverSetLateralQPOptimizer());
+  // TODO(all): use gflags or config to turn on/off new algorithms
+  // lateral_qp_optimizer_.reset(new ActiverSetAugmentedLateralQPOptimizer());
   is_init_ = true;
   return true;
 }
