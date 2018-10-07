@@ -23,6 +23,8 @@
 
 #include <algorithm>
 
+#include "modules/common/time/time.h"
+#include "modules/planning/lattice/trajectory_generation/active_set_augmented_lateral_qp_optimizer.h"
 #include "modules/planning/lattice/trajectory_generation/active_set_lateral_qp_optimizer.h"
 
 namespace apollo {
@@ -30,26 +32,25 @@ namespace planning {
 
 using apollo::common::ErrorCode;
 using apollo::common::Status;
+using apollo::common::time::Clock;
 
 namespace {
 std::vector<std::pair<double, double>>::iterator min_pair_first(
     std::vector<std::pair<double, double>>::iterator begin,
     std::vector<std::pair<double, double>>::iterator end) {
-  return std::min_element(begin, end,
-                          [](const std::pair<double, double>& lhs,
-                             const std::pair<double, double>& rhs) {
-                            return lhs.first < rhs.first;
-                          });
+  return std::min_element(begin, end, [](const std::pair<double, double>& lhs,
+                                         const std::pair<double, double>& rhs) {
+    return lhs.first < rhs.first;
+  });
 }
 
 std::vector<std::pair<double, double>>::iterator max_pair_second(
     std::vector<std::pair<double, double>>::iterator begin,
     std::vector<std::pair<double, double>>::iterator end) {
-  return std::max_element(begin, end,
-                          [](const std::pair<double, double>& lhs,
-                             const std::pair<double, double>& rhs) {
-                            return lhs.second < rhs.second;
-                          });
+  return std::max_element(begin, end, [](const std::pair<double, double>& lhs,
+                                         const std::pair<double, double>& rhs) {
+    return lhs.second < rhs.second;
+  });
 }
 
 void assign_pair_first(std::vector<std::pair<double, double>>::iterator begin,
@@ -78,7 +79,8 @@ bool QpPiecewiseJerkPathOptimizer::Init(
   if (config.has_qp_piecewise_jerk_path_config()) {
     config_ = config.qp_piecewise_jerk_path_config();
   }
-  lateral_qp_optimizer_.reset(new ActiverSetLateralQPOptimizer());
+  // lateral_qp_optimizer_.reset(new ActiverSetLateralQPOptimizer());
+  lateral_qp_optimizer_.reset(new ActiverSetAugmentedLateralQPOptimizer());
   is_init_ = true;
   return true;
 }
@@ -219,12 +221,19 @@ Status QpPiecewiseJerkPathOptimizer::Process(
 
   std::array<double, 3> lateral_state{frenet_point.l(), frenet_point.dl(),
                                       frenet_point.ddl()};
+  auto start_time = Clock::NowInSeconds();
   bool success = lateral_qp_optimizer_->optimize(lateral_state, qp_delta_s,
                                                  lateral_bounds);
+  auto end_time = Clock::NowInSeconds();
+  AERROR << "lateral_qp_optimizer used time: " << (end_time - start_time) * 1000
+         << " ms.";
+
   if (!success) {
     AERROR << "lateral qp optimizer failed";
+    CHECK(false);
     return Status(ErrorCode::PLANNING_ERROR, "lateral qp optimizer failed");
   }
+  // CHECK(false);
 
   auto poly1d = lateral_qp_optimizer_->GetOptimalTrajectory();
 
