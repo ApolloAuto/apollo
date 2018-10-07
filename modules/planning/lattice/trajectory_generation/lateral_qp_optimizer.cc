@@ -34,5 +34,21 @@ PiecewiseJerkTrajectory1d LateralQPOptimizer::GetOptimalTrajectory() const {
   return optimal_trajectory;
 }
 
+std::vector<common::FrenetFramePoint> LateralQPOptimizer::GetFrenetFramePath()
+    const {
+  std::vector<common::FrenetFramePoint> frenet_frame_path;
+  double accumulated_s = 0.0;
+  for (size_t i = 0; i < opt_d_.size(); ++i) {
+    common::FrenetFramePoint frenet_frame_point;
+    frenet_frame_point.set_s(accumulated_s);
+    frenet_frame_point.set_l(opt_d_[i]);
+    frenet_frame_point.set_dl(opt_d_prime_[i]);
+    frenet_frame_point.set_ddl(opt_d_pprime_[i]);
+    frenet_frame_path.push_back(std::move(frenet_frame_point));
+    accumulated_s += delta_s_;
+  }
+  return frenet_frame_path;
+}
+
 }  // namespace planning
 }  // namespace apollo

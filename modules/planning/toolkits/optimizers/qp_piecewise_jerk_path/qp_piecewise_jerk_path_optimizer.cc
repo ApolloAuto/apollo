@@ -222,12 +222,12 @@ Status QpPiecewiseJerkPathOptimizer::Process(
 
   std::array<double, 3> lateral_state{frenet_point.l(), frenet_point.dl(),
                                       frenet_point.ddl()};
-  auto start_time = Clock::NowInSeconds();
+  auto start_time = std::chrono::system_clock::now();
   bool success = lateral_qp_optimizer_->optimize(lateral_state, qp_delta_s,
                                                  lateral_bounds);
-  auto end_time = Clock::NowInSeconds();
-  ADEBUG << "lateral_qp_optimizer used time: " << (end_time - start_time) * 1000
-         << " ms.";
+  auto end_time = std::chrono::system_clock::now();
+  std::chrono::duration<double> diff = end_time - start_time;
+  ADEBUG << "lateral_qp_optimizer used time: " << diff.count() * 1000 << " ms.";
 
   if (!success) {
     AERROR << "lateral qp optimizer failed";
@@ -235,21 +235,16 @@ Status QpPiecewiseJerkPathOptimizer::Process(
     return Status(ErrorCode::PLANNING_ERROR, "lateral qp optimizer failed");
   }
 
-  auto poly1d = lateral_qp_optimizer_->GetOptimalTrajectory();
+  std::vector<common::FrenetFramePoint> frenet_path =
+      lateral_qp_optimizer_->GetFrenetFramePath();
+  ADEBUG << "frenet_path size: " << frenet_path.size();
 
-  std::vector<common::FrenetFramePoint> frenet_path;
-  const float total_length = poly1d.ParamLength();
-  const float resolution = config_.path_resolution();
-  for (double s = 0.0; s < total_length && s < path_length; s += resolution) {
-    common::FrenetFramePoint frenet_frame_point;
-    frenet_frame_point.set_s(frenet_point.s() + s);
-    frenet_frame_point.set_l(poly1d.Evaluate(0, s));
-    frenet_frame_point.set_dl(poly1d.Evaluate(1, s));
-    frenet_frame_point.set_ddl(poly1d.Evaluate(2, s));
-    frenet_path.push_back(std::move(frenet_frame_point));
+  for (auto& point : frenet_path) {
+    point.set_s(frenet_point.s() + point.s());
   }
   path_data->SetReferenceLine(&reference_line);
   path_data->SetFrenetPath(FrenetFramePath(frenet_path));
+
   return Status::OK();
 }
 

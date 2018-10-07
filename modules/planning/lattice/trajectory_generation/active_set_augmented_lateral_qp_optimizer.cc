@@ -27,6 +27,10 @@ namespace planning {
 bool ActiverSetAugmentedLateralQPOptimizer::optimize(
     const std::array<double, 3>& d_state, const double delta_s,
     const std::vector<std::pair<double, double>>& d_bounds) {
+  opt_d_.clear();
+  opt_d_prime_.clear();
+  opt_d_pprime_.clear();
+
   delta_s_ = delta_s;
   const int kNumVariable = d_bounds.size();
 
@@ -133,9 +137,37 @@ bool ActiverSetAugmentedLateralQPOptimizer::optimize(
     ++constraint_index;
   }
 
+  const double kDeltaL = 1.0e-7;
+  int var_index = constraint_index * kNumVariable;
+  bool set_init_status_constraints = false;
+
   // TODO(lianglia-apollo):
-  // (1) Add initial status constraints
-  // (2) Verify whether it is necessary to keep final dl and ddl to 0.0
+  // Add initial status constraints here
+  if (set_init_status_constraints) {
+    affine_constraint_matrix[var_index] = 1.0;
+    constraint_lower_bounds[constraint_index] = d_state[0] - kDeltaL;
+    constraint_upper_bounds[constraint_index] = d_state[0] + kDeltaL;
+    ++constraint_index;
+
+    var_index = constraint_index * kNumVariable;
+    affine_constraint_matrix[var_index] = -1.0 / delta_s;
+    affine_constraint_matrix[var_index + 1] = 1.0 / delta_s;
+    constraint_lower_bounds[constraint_index] = d_state[1] - kDeltaL;
+    constraint_upper_bounds[constraint_index] = d_state[1] + kDeltaL;
+    ++constraint_index;
+
+    var_index = constraint_index * kNumVariable;
+    affine_constraint_matrix[var_index] = 1.0 / delta_s_sq;
+    affine_constraint_matrix[var_index + 1] = -2.0 / delta_s_sq;
+    affine_constraint_matrix[var_index + 2] = 1.0 / delta_s_sq;
+    constraint_lower_bounds[constraint_index] = d_state[2] - kDeltaL;
+    constraint_upper_bounds[constraint_index] = d_state[2] + kDeltaL;
+    ++constraint_index;
+  }
+
+  // TODO(lianglia-apollo):
+  // Verify whether it is necessary to keep final dl and ddl to 0.0
+
   CHECK_EQ(constraint_index, kNumConstraint);
 
   auto ret = qp_problem.init(h_matrix, g_matrix, affine_constraint_matrix,
