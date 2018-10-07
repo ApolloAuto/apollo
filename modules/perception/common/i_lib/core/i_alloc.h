@@ -17,162 +17,141 @@
 #define MODULES_PERCEPTION_COMMON_I_LIB_CORE_I_ALLOC_H_
 
 #include <new>
-
+#include <iostream>
 #include "modules/perception/common/i_lib/core/i_basic.h"
-/*
-Alignment power->alignment offset in bytes:
-0->1
-1->2
-2->4
-3->8
-4->16
-5->32
-*/
 
-//#define I_DEFAULT_ALIGNMENT_POWER  4 /*by default use 16-byte memory alignment
-// option*/
+//
+// Alignment power->alignment offset in bytes:
+// 0->1
+// 1->2
+// 2->4
+// 3->8
+// 4->16
+// 5->32
+//
 
-namespace idl {
-template <typename T>
-inline T *i_alloc(int memory_size) {
+// #define I_DEFAULT_ALIGNMENT_POWER  4 by default use 16-byte memory
+// alignment option
+namespace apollo {
+namespace perception {
+namespace common {
+
+template <typename T> inline T *IAlloc(int memory_size) {
   T *mem = nullptr;
   if (!memory_size) {
     return mem;
   }
   mem = new (std::nothrow) T[memory_size];
   if (mem == nullptr) {
-    return (NULL);
+    return nullptr;
   }
-  return (mem);
+  return mem;
 }
 
-template <typename T>
-inline void i_free(T *&mem) {
-  if (mem != nullptr) {
-    delete[] mem;
-    mem = nullptr;
+template <typename T> inline void IFree(T **mem) {
+  if (mem != nullptr && *mem != nullptr) {
+    delete[] * mem;
+    *mem = nullptr;
   }
 }
 
-/*Memory allocated with this function must be released with i_free2*/
-template <typename T>
-inline T **i_alloc2(int m, int n) {
-  T *mem, **head;
+// Memory allocated with this function must be released with IFree2
+template <typename T> inline T **IAlloc2(int m, int n) {
+  T *mem = nullptr;
+  T **head = nullptr;
   mem = new (std::nothrow) T[m * n];
   if (mem == nullptr) {
-    return (NULL);
+    return nullptr;
   }
   head = new (std::nothrow) T *[m];
   if (head == nullptr) {
     delete[] mem;
-    return (NULL);
+    return nullptr;
   }
-  i_make_reference<T>(mem, head, m, n);
-  return (head);
+  IMakeReference<T>(mem, head, m, n);
+  return head;
 }
 
-/*Free memory allocated with function i_alloc2*/
-template <typename T>
-inline void i_free2(T **&A) {
-  if (A != nullptr) {
-    delete[] A[0];
-    delete[] A;
-    A = nullptr;
+// Free memory allocated with function IAlloc2
+template <typename T> inline void IFree2(T ***A) {
+  if (A != nullptr && *A != nullptr) {
+    delete[](*A)[0];
+    delete[] * A;
+    *A = nullptr;
   }
 }
 
-/*Allocate an (l x m x n) T tensor*/
-template <class T>
-inline T ***i_alloc3(int l, int m, int n) {
-  T *mem, ***head;
+// Allocate an (l x m x n) T tensor
+template <class T> inline T ***IAlloc3(int l, int m, int n) {
+  T *mem = nullptr;
+  T ***head = nullptr;
   int i, j;
   mem = new (std::nothrow) T[l * m * n];
   if (mem == nullptr) {
-    return (NULL);
+    return nullptr;
   }
-  head = new (std::nothrow) T **[l];
+  head = new (std::nothrow) T * *[l];
   if (head == nullptr) {
     delete[] mem;
-    return (NULL);
+    return nullptr;
   }
   for (i = 0; i < l; i++) {
     head[i] = new (std::nothrow) T *[m];
     if (head[i] == nullptr) {
-      for (j = 0; j < i; j++) delete[] head[j];
+      for (j = 0; j < i; j++)
+        delete[] head[j];
       delete[] head;
       delete[] mem;
-      return (NULL);
+      return nullptr;
     }
   }
-  i_make_reference(mem, head, l, m, n);
-  return (head);
+  IMakeReference(mem, head, l, m, n);
+  return head;
 }
 
-template <class T>
-inline void i_free3(T ***&A, int l) {
-  if (A != nullptr) {
-    delete[](A[0][0]);
-    for (int i = 0; i < l; i++) delete[] A[i];
-    delete[] A;
-    A = nullptr;
-  }
-}
-
-/*Memory allocated with this function must be released with i_free_aligned*/
+// Memory allocated with this function must be released with IFreeAligned
 template <typename T>
-inline T *i_alloc_aligned(int memory_size, int alignment_power = 4) {
+inline T *IAllocAligned(int memory_size, int alignment_power = 4) {
   if (memory_size <= 0) {
-    return ((T *)NULL);
+    return (reinterpret_cast<T *>(NULL));
   }
   int actual_alignment_power = (alignment_power >= 0) ? alignment_power : 0;
-  std::size_t memory_size_in_byte = (std::size_t)memory_size * sizeof(T);
-  std::size_t mask = (std::size_t)((1 << actual_alignment_power) - 1);
+  std::size_t memory_size_in_byte =
+      static_cast<size_t>(memory_size) * sizeof(T);
+  std::size_t mask = static_cast<size_t>((1 << actual_alignment_power) - 1);
   std::size_t pointer_size_in_byte = sizeof(char *);
   char *mem_begin = new (
       std::nothrow) char[memory_size_in_byte + mask + pointer_size_in_byte];
   if (!mem_begin) {
-    return ((T *)NULL);
+    return (reinterpret_cast<T *>(NULL));
   }
   char *mem_actual =
-      (char *)(((std::size_t)mem_begin + mask + pointer_size_in_byte) &
-               (~mask));
-  ((char **)mem_actual)[-1] = mem_begin;
-  return ((T *)mem_actual);
+      reinterpret_cast<char *>((reinterpret_cast<size_t>(mem_begin) + mask +
+                                pointer_size_in_byte) & (~mask));
+  (reinterpret_cast<char **>(mem_actual))[-1] = mem_begin;
+  return (reinterpret_cast<T *>(mem_actual));
 }
 
-/*Free memory allocated with function i_alloc_aligned*/
-template <typename T>
-inline void i_free_aligned(T *&mem) {
-  if (mem) {
-    delete[]((char **)mem)[-1];
-    mem = nullptr;
+// Free memory allocated with function IAllocAligned
+template <typename T> inline void IFreeAligned(T **mem) {
+  if (mem != nullptr && *mem != nullptr) {
+    delete[](reinterpret_cast<char **>(*mem))[-1];
+    *mem = nullptr;
   }
 }
 
 template <typename T>
-inline int i_verify_alignment(const T *mem, int alignment_power = 4) {
-  std::size_t mask = (std::size_t)((1 << alignment_power) - 1);
-  if (((size_t)mem) & mask) {
-    return (0);
+inline int IVerifyAlignment(const T *mem, int alignment_power = 4) {
+  std::size_t mask = static_cast<size_t>((1 << alignment_power) - 1);
+  if (((size_t) mem) & mask) {
+    return 0;
   } else {
-    return (1);
+    return 1;
   }
 }
 
-template <typename T>
-inline T *i_align_pointer(T *mem, unsigned long byte_count) {
-  unsigned long long inu, d;
-  T *out;
-  inu = ((unsigned long)mem);
-  d = (inu % byte_count);
-  if (d) {
-    out = (T *)(inu - d + byte_count);
-  } else {
-    out = mem;
-  }
-  return (out);
-}
-
-} // namespace idl
+}  //  namespace common
+}  //  namespace perception
+}  //  namespace apollo
 
 #endif  // MODULES_PERCEPTION_COMMON_I_LIB_CORE_I_ALLOC_H_

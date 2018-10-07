@@ -33,7 +33,7 @@ class SppCCDetector {
 
   ~SppCCDetector() {
     if (nodes_ != nullptr) {
-      idl::i_free2(nodes_);
+      common::IFree2(&nodes_);
     }
   }
   // @brief: initialize detector
@@ -42,11 +42,11 @@ class SppCCDetector {
   void Init(int rows, int cols) {
     if (rows_ * cols_ != rows * cols) {
       if (nodes_ != nullptr) {
-        idl::i_free2(nodes_);
+        common::IFree2(&nodes_);
       }
-      nodes_ = idl::i_alloc2<Node>(rows, cols);
-      rows_ = rows;
-      cols_ = cols;
+      nodes_ = common::IAlloc2<Node>(rows, cols);
+      rows_ = static_cast<int>(rows);
+      cols_ = static_cast<int>(cols);
     }
     CleanNodes();
   }

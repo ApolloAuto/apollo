@@ -29,20 +29,20 @@ namespace lidar {
 void SppLabelImage::Init(size_t width, size_t height) {
   // simply release the last memory and allocate new one
   if (labels_) {
-    idl::i_free2(labels_);
+    common::IFree2(&labels_);
   }
   width_ = width;
   height_ = height;
-  labels_ = idl::i_alloc2<uint16_t>(height_, width_);
+  labels_ = common::IAlloc2<uint16_t>(height_, width_);
   memset(labels_[0], 0, sizeof(uint16_t) * width_ * height_);
   clusters_.clear();
 }
 
 void SppLabelImage::InitRangeMask(float range, float boundary_distance) {
   if (range_mask_) {
-    idl::i_free2(range_mask_);
+    common::IFree2(&range_mask_);
   }
-  range_mask_ = idl::i_alloc2<char>(height_, width_);
+  range_mask_ = common::IAlloc2<char>(height_, width_);
   memset(range_mask_[0], 0, sizeof(char) * width_ * height_);
   float meter_per_pixel = range * 2.0 / width_;
   size_t half_width = width_ / 2;

@@ -27,11 +27,6 @@
 #include "modules/perception/lidar/lib/scene_manager/ground_service/ground_service.h"
 #include "modules/perception/lidar/lib/scene_manager/scene_manager.h"
 
-namespace idl {
-class PlaneFitGroundDetector;
-struct PlaneFitGroundDetectorParam;
-}  // namespace idl
-
 namespace apollo {
 namespace perception {
 namespace lidar {
@@ -56,8 +51,8 @@ class SpatioTemporalGroundDetector : public BaseGroundDetector {
   std::string Name() const override { return "SpatioTemporalGroundDetector"; }
 
  private:
-  idl::PlaneFitGroundDetectorParam* param_ = nullptr;
-  idl::PlaneFitGroundDetector* pfdetector_ = nullptr;
+  common::PlaneFitGroundDetectorParam* param_ = nullptr;
+  common::PlaneFitGroundDetector* pfdetector_ = nullptr;
   std::vector<float> data_;
   std::vector<float> ground_height_signed_;
   std::vector<int> point_indices_temp_;

@@ -3,14 +3,11 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "i_plane",
+    name = "i_ransac",
     hdrs = [
-        "i_plane.h",
-        "i_line.h",
-        "i_util.h",
+        "i_ransac.h",
     ],
     deps = [
-        "@eigen",
     ],
 )
 

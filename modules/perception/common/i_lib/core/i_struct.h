@@ -19,53 +19,56 @@
 
 #include "modules/perception/common/i_lib/core/i_alloc.h"
 
-namespace idl {
-template <typename T1, typename T2>
-struct Pair {
+namespace apollo {
+namespace perception {
+namespace common {
+template <typename T1, typename T2> struct Pair {
   T1 first;
   T2 second;
-  Pair(){};
-  Pair(const Pair<T1, T2>& p) {
+  Pair() {}
+  Pair(const Pair<T1, T2> &p) {
     first = p.first;
     second = p.second;
   }
-  Pair& operator=(const Pair<T1, T2>& p) {
+  Pair &operator=(const Pair<T1, T2> &p) {
     this->first = p.first;
     this->second = p.second;
     return (*this);
   }
-  Pair(const T1& a, const T2& b) : first(a), second(b){};
+  Pair(const T1 &a, const T2 &b) : first(a), second(b) {}
 };
 
 template <typename T1, typename T2>
-inline Pair<T1, T2> i_make_pair(const T1& a, const T2& b) {
+inline Pair<T1, T2> IMakePair(const T1 &a, const T2 &b) {
   return Pair<T1, T2>(a, b);
 }
 
 template <typename T1, typename T2>
-inline bool i_less_pair_first_element(const Pair<T1, T2>& a,
-                                      const Pair<T1, T2>& b) {
+inline bool ILessPairFirstElement(const Pair<T1, T2> &a,
+                                  const Pair<T1, T2> &b) {
   return a.first < b.first;
 }
 
 template <typename T1, typename T2>
-inline bool i_less_pair_second_element(const Pair<T1, T2>& a,
-                                       const Pair<T1, T2>& b) {
+inline bool ILessPairSecondElement(const Pair<T1, T2> &a,
+                                   const Pair<T1, T2> &b) {
   return a.second < b.second;
 }
 
 template <typename T1, typename T2>
-inline bool i_larger_pair_first_element(const Pair<T1, T2>& a,
-                                        const Pair<T1, T2>& b) {
+inline bool ILargerPairFirstElement(const Pair<T1, T2> &a,
+                                    const Pair<T1, T2> &b) {
   return a.first > b.first;
 }
 
 template <typename T1, typename T2>
-inline bool i_larger_pair_second_element(const Pair<T1, T2>& a,
-                                         const Pair<T1, T2>& b) {
+inline bool ILargerPairSecondElement(const Pair<T1, T2> &a,
+                                     const Pair<T1, T2> &b) {
   return a.second > b.second;
 }
 
-}  // namespace idl
+}  // namespace common
+}  // namespace perception
+}  // namespace apollo
 
 #endif  // MODULES_PERCEPTION_COMMON_I_LIB_CORE_I_STRUCT_H_
