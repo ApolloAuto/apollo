@@ -30,6 +30,7 @@ cc_library(
         "trajectory1d_generator.h",
     ],
     deps = [
+        ":active_set_augmented_lateral_qp_optimizer",
         ":active_set_lateral_qp_optimizer",
         ":end_condition_sampler",
         ":lateral_trajectory_optimizer",
@@ -196,6 +197,20 @@ cc_library(
         ":lateral_qp_optimizer",
         "@eigen",
         "@osqp",
+    ],
+)
+
+cc_library(
+    name = "active_set_augmented_lateral_qp_optimizer",
+    srcs = [
+        "active_set_augmented_lateral_qp_optimizer.cc",
+    ],
+    hdrs = [
+        "active_set_augmented_lateral_qp_optimizer.h",
+    ],
+    deps = [
+        ":lateral_qp_optimizer",
+        "@qpOASES",
     ],
 )
 
