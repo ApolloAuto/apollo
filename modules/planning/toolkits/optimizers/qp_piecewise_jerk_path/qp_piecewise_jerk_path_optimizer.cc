@@ -225,15 +225,14 @@ Status QpPiecewiseJerkPathOptimizer::Process(
   bool success = lateral_qp_optimizer_->optimize(lateral_state, qp_delta_s,
                                                  lateral_bounds);
   auto end_time = Clock::NowInSeconds();
-  AERROR << "lateral_qp_optimizer used time: " << (end_time - start_time) * 1000
+  ADEBUG << "lateral_qp_optimizer used time: " << (end_time - start_time) * 1000
          << " ms.";
 
   if (!success) {
     AERROR << "lateral qp optimizer failed";
-    CHECK(false);
+    DCHECK(false);
     return Status(ErrorCode::PLANNING_ERROR, "lateral qp optimizer failed");
   }
-  // CHECK(false);
 
   auto poly1d = lateral_qp_optimizer_->GetOptimalTrajectory();
 
