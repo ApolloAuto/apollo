@@ -186,8 +186,7 @@ common::FrenetFramePoint ReferenceLine::GetFrenetPoint(
   const double kappa = traj_point.path_point().kappa();
   const double l = frenet_frame_point.l();
 
-  ReferencePoint ref_point;
-  ref_point = GetReferencePoint(frenet_frame_point.s());
+  ReferencePoint ref_point = GetReferencePoint(frenet_frame_point.s());
 
   const double theta_ref = ref_point.heading();
   const double kappa_ref = ref_point.kappa();
