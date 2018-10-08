@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_COMMON_I_LIB_GEOMETRY_I_LINE_H_
-#define MODULES_PERCEPTION_COMMON_I_LIB_GEOMETRY_I_LINE_H_
+#pragma once
+
 
 #include <cassert>
 #include "modules/perception/common/i_lib/algorithm/i_sort.h"
@@ -72,4 +72,4 @@ template <typename T> inline void ILineFit2d(const T *x, const T *xp, T *l) {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_COMMON_I_LIB_GEOMETRY_I_LINE_H_
+

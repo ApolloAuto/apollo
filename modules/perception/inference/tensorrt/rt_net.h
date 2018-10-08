@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_INFERENCE_TENSORRT_RT_NET_H_
-#define MODULES_PERCEPTION_INFERENCE_TENSORRT_RT_NET_H_
+#pragma once
+
 
 #include <map>
 #include <memory>
@@ -202,5 +202,3 @@ class RTNet : public Inference {
 }  // namespace inference
 }  // namespace perception
 }  // namespace apollo
-
-#endif  //  MODULES_PERCEPTION_INFERENCE_TENSORRT_RT_NET_H_

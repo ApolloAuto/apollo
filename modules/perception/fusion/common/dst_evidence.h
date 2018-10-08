@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_FUSION_COMMON_DST_EVIDENCE_H_
-#define MODULES_PERCEPTION_FUSION_COMMON_DST_EVIDENCE_H_
+#pragma once
+
 
 #include <cstdlib>
 #include <map>
@@ -142,4 +142,4 @@ class Dst {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_FUSION_COMMON_DST_EVIDENCE_H_
+

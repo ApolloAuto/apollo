@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_LIDAR_LIB_DUMMY_DUMMY_ROI_FILTER_H_
-#define MODULES_PERCEPTION_LIDAR_LIB_DUMMY_DUMMY_ROI_FILTER_H_
+#pragma once
+
 
 #include <string>
 #include <vector>
@@ -50,4 +50,4 @@ class DummyROIFilter : public BaseROIFilter {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_LIDAR_LIB_DUMMY_DUMMY_ROI_FILTER_H_
+

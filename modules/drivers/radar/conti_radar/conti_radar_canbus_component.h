@@ -18,8 +18,8 @@
  * @file
  */
 
-#ifndef MODULES_DRIVERS_RADAR_CONTI_RADAR_CONTI_RADAR_CANBUS_COMPONENT_H_
-#define MODULES_DRIVERS_RADAR_CONTI_RADAR_CONTI_RADAR_CANBUS_COMPONENT_H_
+#pragma once
+
 
 #include <memory>
 #include <string>
@@ -102,4 +102,4 @@ CYBERTRON_REGISTER_COMPONENT(ContiRadarCanbusComponent)
 }  // namespace conti_radar
 }  // namespace drivers
 }  // namespace apollo
-#endif  // MODULES_DRIVERS_RADAR_CONTI_RADAR_CONTI_RADAR_CANBUS_COMPONENT_H_
+

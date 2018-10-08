@@ -18,8 +18,7 @@
  * @file
  */
 
-#ifndef MODEULES_THIRD_PARTY_PERCEPTION_FILTER_H_
-#define MODEULES_THIRD_PARTY_PERCEPTION_FILTER_H_
+#pragma once
 
 #include "modules/third_party_perception/proto/radar_obstacle.pb.h"
 
@@ -38,4 +37,4 @@ bool IsPreserved(const RadarObstacle& radar_obstacle);
 }  // namespace third_party_perception
 }  // namespace apollo
 
-#endif  // MODULES_THIRD_PARTY_PERCEPTION_FILTER_H_
+

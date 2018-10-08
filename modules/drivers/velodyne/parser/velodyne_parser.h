@@ -48,8 +48,8 @@
  *  \author Jack O'Quin
  */
 
-#ifndef MODULES_DRIVERS_VELODYNE_PARSER_VELODYNE_PARSER_H_
-#define MODULES_DRIVERS_VELODYNE_PARSER_VELODYNE_PARSER_H_
+#pragma once
+
 
 #include <errno.h>
 #include <math.h>
@@ -381,4 +381,4 @@ class VelodyneParserFactory {
 }  // namespace drivers
 }  // namespace apollo
 
-#endif  // MODULES_DRIVERS_VELODYNE_PARSER_VELODYNE_PARSER_H_
+

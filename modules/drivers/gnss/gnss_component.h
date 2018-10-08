@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_DRIVERS_GNSS_GNSS_COMPONENT_H_
-#define MODULES_DRIVERS_GNSS_GNSS_COMPONENT_H_
+#pragma once
+
 
 #include <memory>
 #include <string>
@@ -49,4 +49,4 @@ CYBERTRON_REGISTER_COMPONENT(GnssDriverComponent)
 }  // namespace gnss
 }  // namespace drivers
 }  // namespace apollo
-#endif  // MODULES_DRIVERS_GNSS_UTIL_TIME_CONVERSION_H_
+

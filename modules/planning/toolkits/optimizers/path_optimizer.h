@@ -18,8 +18,8 @@
  * @file path_optimizer.h
  **/
 
-#ifndef MODULES_PLANNING_TOOLKITS_OPTIMIZERS_PATH_OPTIMIZER_H_
-#define MODULES_PLANNING_TOOLKITS_OPTIMIZERS_PATH_OPTIMIZER_H_
+#pragma once
+
 
 #include <string>
 
@@ -50,4 +50,4 @@ class PathOptimizer : public Task {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_TOOLKITS_OPTIMIZERS_PATH_OPTIMIZER_H_
+

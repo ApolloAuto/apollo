@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_LIDAR_LIB_DUMMY_DUMMY_CLASSIFIER_H_
-#define MODULES_PERCEPTION_LIDAR_LIB_DUMMY_DUMMY_CLASSIFIER_H_
+#pragma once
+
 
 #include <string>
 #include <vector>
@@ -47,4 +47,4 @@ class DummyClassifier : public BaseClassifier {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_LIDAR_LIB_DUMMY_DUMMY_CLASSIFIER_H_
+

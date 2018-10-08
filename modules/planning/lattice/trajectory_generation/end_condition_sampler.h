@@ -18,8 +18,8 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_LATTICE_TRAJECTORY_GENERATION_END_CONDITION_SAMPLER_H_
-#define MODULES_PLANNING_LATTICE_TRAJECTORY_GENERATION_END_CONDITION_SAMPLER_H_
+#pragma once
+
 
 #include <array>
 #include <utility>
@@ -83,6 +83,3 @@ class EndConditionSampler {
 
 }  // namespace planning
 }  // namespace apollo
-
-#endif
-// MODULES_PLANNING_LATTICE_TRAJECTORY_GENERATION_END_CONDITION_SAMPLER_H_

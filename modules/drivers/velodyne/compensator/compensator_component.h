@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_DRIVERS_VELODYNE_COMPENSATOR_COMPENSATOR_COMPONENT_H_
-#define MODULES_DRIVERS_VELODYNE_COMPENSATOR_COMPENSATOR_COMPONENT_H_
+#pragma once
+
 
 #include <memory>
 #include <vector>
@@ -53,4 +53,4 @@ CYBERTRON_REGISTER_COMPONENT(CompensatorComponent)
 }  // namespace drivers
 }  // namespace apollo
 
-#endif  // MODULES_DRIVERS_VELODYNE_COMPENSATOR_COMPENSATOR_COMPONENT_H_
+

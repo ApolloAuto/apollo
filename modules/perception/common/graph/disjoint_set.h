@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_COMMON_GRAPH_DISJOINT_SET_H_
-#define MODULES_PERCEPTION_COMMON_GRAPH_DISJOINT_SET_H_
+#pragma once
+
 
 #include <vector>
 
@@ -63,4 +63,4 @@ class Universe {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_COMMON_GRAPH_DISJOINT_SET_H_
+

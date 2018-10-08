@@ -19,8 +19,8 @@
  * @brief The class of MonitorLogger
  */
 
-#ifndef MODULES_COMMON_MONITOR_LOG_MONITOR_LOGGER_H_
-#define MODULES_COMMON_MONITOR_LOG_MONITOR_LOGGER_H_
+#pragma once
+
 
 #include <memory>
 #include <string>
@@ -76,4 +76,4 @@ class MonitorLogger {
 }  // namespace common
 }  // namespace apollo
 
-#endif  // MODULES_COMMON_MONITOR_LOG_MONITOR_LOGGER_H_
+

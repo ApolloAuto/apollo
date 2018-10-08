@@ -25,8 +25,8 @@
  * $ Id: 02/14/2012 11:25:34 AM piyushk $
  */
 
-#ifndef MODULES_DRIVERS_VELODYNE_PARSER_CALIBRATION_H_
-#define MODULES_DRIVERS_VELODYNE_PARSER_CALIBRATION_H_
+#pragma once
+
 
 #include <map>
 #include <string>
@@ -86,4 +86,4 @@ class Calibration {
 }  // namespace drivers
 }  // namespace apollo
 
-#endif  // MODULES_DRIVERS_VELODYNE_PARSER_CALIBRATION_H_
+

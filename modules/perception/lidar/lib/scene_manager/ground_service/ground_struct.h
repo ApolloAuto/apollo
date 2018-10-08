@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_LIDAR_LIB_SCENE_MANAGER_GROUND_SERVICE_GROUND_STRUCT_H_  // NOLINT
-#define MODULES_PERCEPTION_LIDAR_LIB_SCENE_MANAGER_GROUND_SERVICE_GROUND_STRUCT_H_  // NOLINT
+#pragma once
+
 
 #include <vector>
 
@@ -107,4 +107,3 @@ class GroundGrid {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // LIDAR_LIB_SCENE_MANAGER_GROUND_SERVICE_GROUND_STRUCT_H_

@@ -18,8 +18,8 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_TOOLKITS_OPTIMIZERS_QP_SPLINE_ST_GRAPH_H_
-#define MODULES_PLANNING_TOOLKITS_OPTIMIZERS_QP_SPLINE_ST_GRAPH_H_
+#pragma once
+
 
 #include <memory>
 #include <utility>
@@ -132,4 +132,4 @@ class QpSplineStGraph {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_TOOLKITS_OPTIMIZERS_QP_SPLINE_ST_GRAPH_H_
+

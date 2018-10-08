@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_LIDAR_LIB_TRACKER_HM_TRACKER_KALMAN_FILTER_H_
-#define MODULES_PERCEPTION_LIDAR_LIB_TRACKER_HM_TRACKER_KALMAN_FILTER_H_
+#pragma once
+
 
 #include <string>
 #include <memory>
@@ -162,4 +162,4 @@ typedef std::shared_ptr<const KalmanFilter> KalmanFilterConstPtr;
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_LIDAR_LIB_TRACKER_HM_TRACKER_KALMAN_FILTER_H_
+

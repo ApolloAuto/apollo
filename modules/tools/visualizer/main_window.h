@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_TOOLS_VISUALIZER_MAINWINDOW_H_
-#define MODULES_TOOLS_VISUALIZER_MAINWINDOW_H_
+#pragma once
+
 
 #include <QMainWindow>
 #include <QMenu>
@@ -131,4 +131,4 @@ class MainWindow : public QMainWindow {
   QList<VideoImgProxy*> closed_video_image_viewer_list_;
 };
 
-#endif  // MODULES_TOOLS_VISUALIZER_MAINWINDOW_H_
+

@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_COMMON_POINT_CLOUD_PROCESSING_COMMON_H_
-#define MODULES_PERCEPTION_COMMON_POINT_CLOUD_PROCESSING_COMMON_H_
+#pragma once
+
 
 #include <algorithm>
 #include <limits>
@@ -152,4 +152,4 @@ Eigen::Matrix<T, 3, 1> CalculateCentroid(
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_COMMON_POINT_CLOUD_PROCESSING_COMMON_H_
+

@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_FUSION_LIB_INTERFACE_BASE_DATA_ASSOCIATION_H_
-#define MODULES_PERCEPTION_FUSION_LIB_INTERFACE_BASE_DATA_ASSOCIATION_H_
+#pragma once
+
 
 #include <string>
 #include <utility>
@@ -66,4 +66,4 @@ class BaseDataAssociation {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_FUSION_LIB_INTERFACE_BASE_DATA_ASSOCIATION_H_
+

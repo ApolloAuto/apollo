@@ -18,8 +18,8 @@
  * @file ultrasonic_radar_message_manager.h
  * @brief The class of UltrasonicRadarMessageManager
  */
-#ifndef MODULES_DRIVERS_RADAR_ULTRASONIC_RADAR_MESSAGE_MANAGER_H_
-#define MODULES_DRIVERS_RADAR_ULTRASONIC_RADAR_MESSAGE_MANAGER_H_
+#pragma once
+
 
 #include <memory>
 
@@ -62,4 +62,4 @@ class UltrasonicRadarMessageManager : public MessageManager<Ultrasonic> {
 }  // namespace drivers
 }  // namespace apollo
 
-#endif  // MODULES_DRIVERS_RADAR_ULTRASONIC_RADAR_MESSAGE_MANAGER_H_
+

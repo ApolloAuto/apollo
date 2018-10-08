@@ -19,8 +19,8 @@
  * @brief Obstacle
  */
 
-#ifndef MODULES_PREDICTION_CONTAINER_OBSTACLES_OBSTACLE_H_
-#define MODULES_PREDICTION_CONTAINER_OBSTACLES_OBSTACLE_H_
+#pragma once
+
 
 #include <deque>
 #include <memory>
@@ -264,4 +264,4 @@ class Obstacle {
 }  // namespace prediction
 }  // namespace apollo
 
-#endif  // MODULES_PREDICTION_CONTAINER_OBSTACLES_OBSTACLE_H_
+

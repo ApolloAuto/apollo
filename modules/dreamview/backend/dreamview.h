@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_DREAMVIEW_BACKEND_DREAMVIEW_H_
-#define MODULES_DREAMVIEW_BACKEND_DREAMVIEW_H_
+#pragma once
+
 
 #include <memory>
 #include <string>
@@ -66,4 +66,4 @@ class Dreamview {
 }  // namespace dreamview
 }  // namespace apollo
 
-#endif  // MODULES_DREAMVIEW_BACKEND_DREAMVIEW_H_
+

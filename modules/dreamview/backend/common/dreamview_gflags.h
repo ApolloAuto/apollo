@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_DREAMVIEW_BACKEND_COMMON_DREAMVIEW_GFLAGS_H_
-#define MODULES_DREAMVIEW_BACKEND_COMMON_DREAMVIEW_GFLAGS_H_
+#pragma once
+
 
 #include "gflags/gflags.h"
 
@@ -59,4 +59,4 @@ DECLARE_double(system_status_lifetime_seconds);
 
 DECLARE_string(lidar_height_yaml);
 
-#endif  // MODULES_DREAMVIEW_BACKEND_COMMON_DREAMVIEW_GFLAGS_H_
+

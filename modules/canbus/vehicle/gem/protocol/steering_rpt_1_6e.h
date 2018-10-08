@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_CANBUS_VEHICLE_GEM_PROTOCOL_STEERING_RPT_1_6E_H_
-#define MODULES_CANBUS_VEHICLE_GEM_PROTOCOL_STEERING_RPT_1_6E_H_
+#pragma once
+
 
 #include "modules/canbus/proto/chassis_detail.pb.h"
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
@@ -54,4 +54,4 @@ class Steeringrpt16e : public ::apollo::drivers::canbus::ProtocolData<
 }  // namespace canbus
 }  // namespace apollo
 
-#endif  // MODULES_CANBUS_VEHICL_GEM_PROTOCOL_STEERING_RPT_1_6E_H_
+

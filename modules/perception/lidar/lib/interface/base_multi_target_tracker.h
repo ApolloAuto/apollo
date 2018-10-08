@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_LIDAR_LIB_INTERFACE_BASE_MULTI_TARGET_TRACKER_H_
-#define MODULES_PERCEPTION_LIDAR_LIB_INTERFACE_BASE_MULTI_TARGET_TRACKER_H_
+#pragma once
+
 
 #include <string>
 #include <vector>
@@ -63,4 +63,4 @@ PERCEPTION_REGISTER_REGISTERER(BaseMultiTargetTracker);
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_LIDAR_LIB_INTERFACE_BASE_MULTI_TARGET_TRACKER_H_
+

@@ -18,8 +18,8 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_COMMON_FRAME_OPEN_SPACE_H_
-#define MODULES_PLANNING_COMMON_FRAME_OPEN_SPACE_H_
+#pragma once
+
 
 #include <cstdint>
 #include <list>
@@ -169,4 +169,4 @@ class FrameOpenSpaceHistory : public IndexedQueue<uint32_t, FrameOpenSpace> {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_COMMON_FRAME_OPEN_SPACE_H_
+

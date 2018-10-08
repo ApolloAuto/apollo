@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_TOOLS_ROSBAG_TO_RECORD_ROSBAG_TO_RECORD_H_
-#define MODULES_TOOLS_ROSBAG_TO_RECORD_ROSBAG_TO_RECORD_H_
+#pragma once
+
 
 #include <rosbag/bag.h>
 #include <rosbag/view.h>
@@ -29,4 +29,4 @@
 
 #include "cybertron/record/record_writer.h"
 
-#endif  // MODULES_TOOLS_ROSBAG_TO_RECORD_ROSBAG_TO_RECORD_H_
+

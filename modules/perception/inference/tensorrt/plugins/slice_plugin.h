@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_INFERENCE_TENSORRT_PLUGINS_SLICE_PLUGIN_H_
-#define MODULES_PERCEPTION_INFERENCE_TENSORRT_PLUGINS_SLICE_PLUGIN_H_
+#pragma once
+
 
 #include <algorithm>
 #include <vector>
@@ -92,4 +92,3 @@ class SLICEPlugin : public nvinfer1::IPlugin {
 }  // namespace inference
 }  // namespace perception
 }  // namespace apollo
-#endif  //  MODULES_PERCEPTION_INFERENCE_TENSORRT_PLUGINS_SLICE_PLUGIN_H_

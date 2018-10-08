@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_LIDAR_LIB_ROI_FILTER_HDMAP_ROI_FILTER_BITMAP2D_H_
-#define MODULES_PERCEPTION_LIDAR_LIB_ROI_FILTER_HDMAP_ROI_FILTER_BITMAP2D_H_
+#pragma once
+
 
 #include <stdint.h>
 #include <Eigen/Core>
@@ -113,4 +113,4 @@ class Bitmap2D {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_LIDAR_LIB_ROI_FILTER_HDMAP_ROI_FILTER_BITMAP2D_H_
+

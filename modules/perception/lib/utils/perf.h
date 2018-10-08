@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_LIB_UTILS_PERF_H_
-#define MODULES_PERCEPTION_LIB_UTILS_PERF_H_
+#pragma once
+
 
 #include <string>
 
@@ -120,4 +120,4 @@ inline std::string get_full_name(const std::string& full_name,
 
 #endif  // PERCEPTION_DISABLE_PERF
 
-#endif  // MODULES_PERCEPTION_LIB_UTILS_PERF_H_
+

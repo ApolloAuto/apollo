@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_COMMON_I_LIB_CORE_I_BASIC_H_
-#define MODULES_PERCEPTION_COMMON_I_LIB_CORE_I_BASIC_H_
+#pragma once
+
 
 #include <math.h>
 #include <string.h>
@@ -542,4 +542,4 @@ inline bool IWithin2D(const T x, const T y, const T x_upper_left,
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_COMMON_I_LIB_CORE_I_BASIC_H_
+

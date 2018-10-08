@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_BASE_HDMAP_STRUCT_H_
-#define MODULES_PERCEPTION_BASE_HDMAP_STRUCT_H_
+#pragma once
+
 
 #include <memory>
 #include <vector>
@@ -49,4 +49,4 @@ using HdmapStructConstPtr = std::shared_ptr<const HdmapStruct>;
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_BASE_HDMAP_STRUCT_H_
+

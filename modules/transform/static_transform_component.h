@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_TRANSFORM_STATIC_TRANSFROM_COMPONENT_H_
-#define MODULES_TRANSFORM_STATIC_TRANSFROM_COMPONENT_H_
+#pragma once
+
 
 #include <memory>
 #include <string>
@@ -54,4 +54,4 @@ CYBERTRON_REGISTER_COMPONENT(StaticTransformComponent)
 }  // namespace transform
 }  // namespace apollo
 
-#endif  // MODULES_TRANSFORM_STATIC_TRANSFROM_COMPONENT_H_
+

@@ -14,8 +14,8 @@
   * limitations under the License.
   *****************************************************************************/
 
-#ifndef MODULES_ROUTING_GRAPH_SUB_TOPO_GRAPH_H
-#define MODULES_ROUTING_GRAPH_SUB_TOPO_GRAPH_H
+#pragma once
+
 
 #include <memory>
 #include <queue>
@@ -107,4 +107,4 @@ class SubTopoGraph {
 }  // namespace routing
 }  // namespace apollo
 
-#endif  // MODULES_ROUTING_GRAPH_SUB_TOPO_GRAPH_H
+

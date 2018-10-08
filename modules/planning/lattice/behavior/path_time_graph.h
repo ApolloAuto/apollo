@@ -18,8 +18,8 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_LATTICE_BEHAVIOR_PATH_TIME_GRAPH_H_
-#define MODULES_PLANNING_LATTICE_BEHAVIOR_PATH_TIME_GRAPH_H_
+#pragma once
+
 
 #include <array>
 #include <string>
@@ -112,4 +112,4 @@ class PathTimeGraph {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_LATTICE_BEHAVIOR_PATH_TIME_GRAPH_H_
+

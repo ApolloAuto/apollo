@@ -19,8 +19,8 @@
  * @brief Use predictor manager to manage all predictors
  */
 
-#ifndef MODULES_PREDICTION_PREDICTOR_PREDICTOR_MANAGER_H_
-#define MODULES_PREDICTION_PREDICTOR_PREDICTOR_MANAGER_H_
+#pragma once
+
 
 #include <map>
 #include <memory>
@@ -122,4 +122,4 @@ class PredictorManager {
 }  // namespace prediction
 }  // namespace apollo
 
-#endif  // MODULES_PREDICTION_PREDICTOR_PREDICTOR_MANAGER_H_
+

@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_LIDAR_COMMON_LIDAR_TIMER_H_
-#define MODULES_PERCEPTION_LIDAR_COMMON_LIDAR_TIMER_H_
+#pragma once
+
 
 #include <chrono>
 
@@ -43,4 +43,4 @@ class Timer {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_LIDAR_COMMON_LIDAR_TIMER_H_
+

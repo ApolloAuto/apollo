@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_DRIVERS_RADAR_CONTI_RADAR_PROTOCOL_MOTION_INPUT_SPEED_300_H_
-#define MODULES_DRIVERS_RADAR_CONTI_RADAR_PROTOCOL_MOTION_INPUT_SPEED_300_H_
+#pragma once
+
 
 #include <cmath>
 
@@ -64,4 +64,4 @@ class MotionInputSpeed300
 }  // namespace drivers
 }  // namespace apollo
 
-#endif  // MODULES_DRIVERS_RADAR_CONTI_RADAR_PROTOCOL_MOTION_INPUT_SPEED_300_H_
+

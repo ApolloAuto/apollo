@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_BASE_TRAFFIC_LIGHT_H_
-#define MODULES_PERCEPTION_BASE_TRAFFIC_LIGHT_H_
+#pragma once
+
 
 #include <memory>
 #include <string>
@@ -93,4 +93,4 @@ typedef std::vector<TrafficLightPtr> TrafficLightPtrs;
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_BASE_TRAFFIC_LIGHT_H_
+

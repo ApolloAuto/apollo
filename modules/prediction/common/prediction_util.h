@@ -14,8 +14,8 @@
  *permissions and limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PREDICTION_COMMON_PREDICTION_UTIL_H_
-#define MODULES_PREDICTION_COMMON_PREDICTION_UTIL_H_
+#pragma once
+
 
 #include <utility>
 #include <vector>
@@ -123,4 +123,4 @@ double AdjustSpeedByCurvature(const double speed, const double curvature);
 }  // namespace prediction
 }  // namespace apollo
 
-#endif  // MODULES_PREDICTION_COMMON_PREDICTION_UTIL_H_
+

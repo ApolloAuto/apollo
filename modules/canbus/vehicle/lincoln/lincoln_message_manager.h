@@ -19,8 +19,8 @@
  * @brief the class of LincolnMessageManager
  */
 
-#ifndef MODULES_CANBUS_VEHICLE_LINCOLN_LINCOLN_MESSAGE_MANAGER_H_
-#define MODULES_CANBUS_VEHICLE_LINCOLN_LINCOLN_MESSAGE_MANAGER_H_
+#pragma once
+
 
 #include "modules/canbus/proto/chassis_detail.pb.h"
 #include "modules/drivers/canbus/can_comm/message_manager.h"
@@ -55,4 +55,4 @@ class LincolnMessageManager
 }  // namespace canbus
 }  // namespace apollo
 
-#endif  // MODULES_CANBUS_VEHICLE_LINCOLN_LINCOLN_MESSAGE_MANAGER_H_
+

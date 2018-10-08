@@ -19,8 +19,8 @@
  * @brief Defines the CanFrame struct and CanClient interface.
  */
 
-#ifndef MODULES_DRIVERS_CANBUS_CAN_CLIENT_CAN_CLIENT_H_
-#define MODULES_DRIVERS_CANBUS_CAN_CLIENT_CAN_CLIENT_H_
+#pragma once
+
 
 #include <cstdint>
 #include <cstring>
@@ -169,4 +169,4 @@ class CanClient {
 }  // namespace drivers
 }  // namespace apollo
 
-#endif  // MODULES_DRIVERS_CANBUS_CAN_CLIENT_CAN_CLIENT_H_
+

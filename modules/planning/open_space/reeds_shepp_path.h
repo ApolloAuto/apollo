@@ -18,8 +18,8 @@
  * @file
  */
 
-#ifndef MODULES_PLANNING_OPEN_SPACE_REEDS_SHEPP_PATH_H_
-#define MODULES_PLANNING_OPEN_SPACE_REEDS_SHEPP_PATH_H_
+#pragma once
+
 
 #include <limits>
 #include <memory>
@@ -124,4 +124,4 @@ class ReedShepp {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_OPEN_SPACE_REEDS_SHEPP_PATH_H_
+

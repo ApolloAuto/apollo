@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PREDICTION_COMMON_ENVIRONMENT_FEATURES_H_
-#define MODULES_PREDICTION_COMMON_ENVIRONMENT_FEATURES_H_
+#pragma once
+
 
 #include <string>
 #include <unordered_set>
@@ -132,4 +132,4 @@ class EnvironmentFeatures {
 }  // namespace prediction
 }  // namespace apollo
 
-#endif /* MODULES_PREDICTION_COMMON_ENVIRONMENT_FEATURES_H_ */
+

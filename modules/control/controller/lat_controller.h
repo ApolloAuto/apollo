@@ -19,8 +19,8 @@
  * @brief Defines the LatController class.
  */
 
-#ifndef MODULES_CONTROL_CONTROLLER_LAT_CONTROLLER_H_
-#define MODULES_CONTROL_CONTROLLER_LAT_CONTROLLER_H_
+#pragma once
+
 
 #include <fstream>
 #include <memory>
@@ -229,4 +229,4 @@ class LatController : public Controller {
 }  // namespace control
 }  // namespace apollo
 
-#endif  // MODULES_CONTROL_CONTROLLER_LATERAL_CONTROLLER_H_
+

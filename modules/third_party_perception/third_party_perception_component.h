@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_THIRD_PARTY_PERCEPTION_THIRD_PARTY_PERCEPTION_COMPONENT_H_
-#define MODULES_THIRD_PARTY_PERCEPTION_THIRD_PARTY_PERCEPTION_COMPONENT_H_
+#pragma once
+
 
 #include <memory>
 
@@ -60,4 +60,4 @@ CYBERTRON_REGISTER_COMPONENT(ThirdPartyPerceptionComponent)
 }  // namespace third_party_perception
 }  // namespace apollo
 
-#endif  // MODULES_THIRD_PARTY_PERCEPTION_THIRD_PARTY_PERCEPTION_COMPONENT_H_
+

@@ -19,8 +19,8 @@
  * @brief: natural coordinate system
  **/
 
-#ifndef MODULES_PLANNING_TOOLKITS_OPTIMIZERS_QP_FRENET_FRAME_H_
-#define MODULES_PLANNING_TOOLKITS_OPTIMIZERS_QP_FRENET_FRAME_H_
+#pragma once
+
 
 #include <memory>
 #include <utility>
@@ -108,4 +108,4 @@ class QpFrenetFrame {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_TOOLKITS_OPTIMIZERS_QP_FRENET_FRAME_H_
+

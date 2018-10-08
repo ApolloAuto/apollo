@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PLANNING_COMMON_LOCAL_VIEW_H_
-#define MODULES_PLANNING_COMMON_LOCAL_VIEW_H_
+#pragma once
+
 
 #include <memory>
 
@@ -47,4 +47,4 @@ struct LocalView {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_COMMON_LOCAL_VIEW_H_
+

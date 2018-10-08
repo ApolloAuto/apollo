@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_DATA_UTIL_INFO_COLLECTOR_H_
-#define MODULES_DATA_UTIL_INFO_COLLECTOR_H_
+#pragma once
+
 
 #include <memory>
 #include <string>
@@ -60,4 +60,4 @@ class InfoCollector {
 }  // namespace data
 }  // namespace apollo
 
-#endif  // MODULES_DATA_UTIL_INFO_COLLECTOR_H_
+

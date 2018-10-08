@@ -19,8 +19,8 @@
  * @brief
  */
 
-#ifndef MODULES_LOCALIZATION_MSF_LOCAL_TOOL_ONLINE_LOCAL_VISUALIZER_H
-#define MODULES_LOCALIZATION_MSF_LOCAL_TOOL_ONLINE_LOCAL_VISUALIZER_H
+#pragma once
+
 
 #include <Eigen/Geometry>
 #include <memory>
@@ -100,4 +100,4 @@ CYBERTRON_REGISTER_COMPONENT(OnlineVisualizerComponent);
 }  // namespace localization
 }  // namespace apollo
 
-#endif  // MODULES_LOCALIZATION_MSF_LOCAL_TOOL_ONLINE_LOCAL_VISUALIZER_H
+

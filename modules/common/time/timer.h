@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_COMMON_TIME_TIMER_H_
-#define MODULES_COMMON_TIME_TIMER_H_
+#pragma once
+
 
 #include <stdint.h>
 #include <chrono>
@@ -76,4 +76,4 @@ class TimerWrapper {
 
 #define PERF_BLOCK_END(msg) _timer_.End(msg)
 
-#endif  // MODULES_COMMON_TIME_TIMER_H_
+

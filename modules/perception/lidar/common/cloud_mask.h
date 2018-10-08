@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_LIDAR_COMMON_CLOUD_MASK_H_
-#define MODULES_PERCEPTION_LIDAR_COMMON_CLOUD_MASK_H_
+#pragma once
+
 
 #include <vector>
 #include "modules/perception/base/point_cloud.h"
@@ -162,4 +162,4 @@ size_t CloudMask::ValidIndicesCount(
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_LIDAR_COMMON_CLOUD_MASK_H_
+

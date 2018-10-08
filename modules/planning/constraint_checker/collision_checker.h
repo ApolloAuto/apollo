@@ -18,8 +18,8 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_CONSTRAINT_CHECKER_COLLISION_CHECKER_H_
-#define MODULES_PLANNING_CONSTRAINT_CHECKER_COLLISION_CHECKER_H_
+#pragma once
+
 
 #include <array>
 #include <memory>
@@ -69,4 +69,4 @@ class CollisionChecker {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_CONSTRAINT_CHECKER_COLLISION_CHECKER_H_
+

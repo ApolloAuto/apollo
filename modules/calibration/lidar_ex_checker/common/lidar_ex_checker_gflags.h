@@ -14,8 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_CALIBRATION_LIDAR_EX_CHECKER_COMMON_LIDAR_EX_CHECKER_GFLAGS_H_
-#define MODULES_CALIBRATION_LIDAR_EX_CHECKER_COMMON_LIDAR_EX_CHECKER_GFLAGS_H_
+#pragma once
 
 #include "gflags/gflags.h"
 
@@ -27,6 +26,3 @@ DECLARE_int32(capture_cloud_count);
 DECLARE_double(capture_distance);
 
 DECLARE_string(adapter_config_filename);
-
-#endif
-/* MODULES_CALIBRATION_LIDAR_EX_CHECKER_COMMON_LIDAR_EX_CHECKER_GFLAGS_H_ */

@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_BASE_OBJECT_SUPPLEMENT_H_
-#define MODULES_PERCEPTION_BASE_OBJECT_SUPPLEMENT_H_
+#pragma once
+
 
 #include <memory>
 #include <string>
@@ -221,4 +221,4 @@ struct alignas(16) FusionObjectSupplement {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_BASE_OBJECT_SUPPLEMENT_H_
+

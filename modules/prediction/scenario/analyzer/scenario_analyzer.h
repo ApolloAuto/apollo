@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PREDICTION_SCENARIO_ANALYZER_SCENARIO_ANALYZER_H_
-#define MODULES_PREDICTION_SCENARIO_ANALYZER_SCENARIO_ANALYZER_H_
+#pragma once
+
 
 #include <memory>
 
@@ -48,4 +48,4 @@ class ScenarioAnalyzer {
 }  // namespace prediction
 }  // namespace apollo
 
-#endif  // MODULES_PREDICTION_SCENARIO_ANALYZER_SCENARIO_ANALYZER_H_
+

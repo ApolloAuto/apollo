@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_TOOLS_VISUALIZER_SCENEVIEWER_H_
-#define MODULES_TOOLS_VISUALIZER_SCENEVIEWER_H_
+#pragma once
+
 
 #include <QList>
 #include <QOpenGLFunctions>
@@ -155,4 +155,4 @@ class SceneViewer : public QOpenGLWidget, protected QOpenGLFunctions {
   QList<RenderableObject*> permanent_renderable_obj_list_;
 };
 
-#endif  // MODULES_TOOLS_VISUALIZER_SCENEVIEWER_H_
+

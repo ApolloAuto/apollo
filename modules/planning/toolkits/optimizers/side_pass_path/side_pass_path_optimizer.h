@@ -18,8 +18,8 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_TOOLKITS_OPTIMIZERS_SIDE_PASS_PATH_OPTIMIZER_H_
-#define MODULES_PLANNING_TOOLKITS_OPTIMIZERS_SIDE_PASS_PATH_OPTIMIZER_H_
+#pragma once
+
 
 #include "modules/planning/proto/dp_poly_path_config.pb.h"
 #include "modules/planning/proto/planning_config.pb.h"
@@ -53,4 +53,4 @@ class SidePassPathOptimizer final : public PathOptimizer {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_TOOLKITS_OPTIMIZERS_SIDE_PASS_PATH_OPTIMIZER_H_
+

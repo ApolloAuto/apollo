@@ -14,8 +14,8 @@
   * limitations under the License.
   *****************************************************************************/
 
-#ifndef MODULES_ROUTING_CORE_NAVIGATOR_H_
-#define MODULES_ROUTING_CORE_NAVIGATOR_H_
+#pragma once
+
 
 #include <memory>
 #include <string>
@@ -70,4 +70,4 @@ class Navigator {
 }  // namespace routing
 }  // namespace apollo
 
-#endif  // MODULES_ROUTING_CORE_NAVIGATOR_H_
+

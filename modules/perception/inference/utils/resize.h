@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_INFERENCE_UTILS_RESIZE_H
-#define MODULES_PERCEPTION_INFERENCE_UTILS_RESIZE_H
+#pragma once
+
 
 #include <cblas.h>
 #include <cuda_runtime_api.h>
@@ -53,4 +53,4 @@ bool ResizeGPU(const base::Image8U &src,
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_INFERENCE_UTILS_RESIZE_H
+

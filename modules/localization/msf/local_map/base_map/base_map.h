@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_LOCALIZATION_MSF_LOCAL_MAP_BASE_MAP_BASE_MAP_H_
-#define MODULES_LOCALIZATION_MSF_LOCAL_MAP_BASE_MAP_BASE_MAP_H_
+#pragma once
+
 
 #include <list>
 #include <map>
@@ -130,4 +130,4 @@ class BaseMap {
 }  // namespace localization
 }  // namespace apollo
 
-#endif  // MODULES_LOCALIZATION_MSF_LOCAL_MAP_BASE_MAP_BASE_MAP_H_
+

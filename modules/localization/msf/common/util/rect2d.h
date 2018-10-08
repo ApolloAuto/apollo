@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_LOCALIZATION_MSF_COMMON_RECT2D_H_
-#define MODULES_LOCALIZATION_MSF_COMMON_RECT2D_H_
+#pragma once
+
 
 #include "Eigen/Core"
 
@@ -110,4 +110,4 @@ Eigen::Matrix<T, 2, 1> Rect2D<T>::GetRightBottomCorner() const {
 }  // namespace localization
 }  // namespace apollo
 
-#endif  // MODULES_LOCALIZATION_MSF_COMMON_RECT2D_H_
+

@@ -19,8 +19,8 @@
  * @brief Defines the Factory class.
  */
 
-#ifndef MODULES_COMMON_UTIL_FACTORY_H_
-#define MODULES_COMMON_UTIL_FACTORY_H_
+#pragma once
+
 
 #include <map>
 #include <memory>
@@ -122,4 +122,4 @@ class Factory {
 }  // namespace common
 }  // namespace apollo
 
-#endif  // MODULES_COMMON_UTIL_FACTORY_H_
+

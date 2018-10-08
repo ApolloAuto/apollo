@@ -19,8 +19,8 @@
  * @brief Functions to generate coefficients for digital filter.
  */
 
-#ifndef MODULES_COMMON_FILTERS_DIGITAL_FILTER_COEFFICIENTS_H_
-#define MODULES_COMMON_FILTERS_DIGITAL_FILTER_COEFFICIENTS_H_
+#pragma once
+
 
 #include <vector>
 
@@ -45,4 +45,4 @@ void LpfCoefficients(const double ts, const double cutoff_freq,
 }  // namespace common
 }  // namespace apollo
 
-#endif  // MODULES_COMMON_FILTERS_DIGITAL_FILTER_COEFFICIENTS_H_
+

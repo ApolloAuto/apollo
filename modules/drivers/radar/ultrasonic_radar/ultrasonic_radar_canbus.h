@@ -18,8 +18,8 @@
  * @file
  */
 
-#ifndef MODULES_DRIVERS_RADAR_ULTRASONIC_RADAR_ULTRASONIC_RADAR_CANBUS_H_
-#define MODULES_DRIVERS_RADAR_ULTRASONIC_RADAR_ULTRASONIC_RADAR_CANBUS_H_
+#pragma once
+
 
 #include <memory>
 #include <string>
@@ -109,4 +109,4 @@ class UltrasonicRadarCanbus {
 }  // namespace drivers
 }  // namespace apollo
 
-#endif  // MODULES_DRIVERS_RADAR_ULTRASONIC_RADAR_ULTRASONIC_RADAR_CANBUS_H_
+

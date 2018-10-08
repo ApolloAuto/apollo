@@ -18,8 +18,8 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_TOOLKITS_DECIDERS_BACKSIDE_VEHICE_H_
-#define MODULES_PLANNING_TOOLKITS_DECIDERS_BACKSIDE_VEHICE_H_
+#pragma once
+
 
 #include <string>
 
@@ -48,4 +48,4 @@ class BacksideVehicle : public TrafficRule {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_TOOLKITS_DECIDERS_BACK_SIDEVEHICE_H_
+

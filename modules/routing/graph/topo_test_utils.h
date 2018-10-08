@@ -14,8 +14,8 @@
   * limitations under the License.
   *****************************************************************************/
 
-#ifndef MODULES_ROUTING_GRAPH_TOPO_TEST_UTILS_H
-#define MODULES_ROUTING_GRAPH_TOPO_TEST_UTILS_H
+#pragma once
+
 
 #include <string>
 
@@ -66,4 +66,4 @@ void GetGraph3ForTest(Graph* graph);
 }  // namespace routing
 }  // namespace apollo
 
-#endif  // MODULES_ROUTING_GRAPH_TOPO_TEST_UTILS_H
+

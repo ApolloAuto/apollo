@@ -18,8 +18,8 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_TOOLKITS_DECIDERS_SIGNAL_LIGHT_H_
-#define MODULES_PLANNING_TOOLKITS_DECIDERS_SIGNAL_LIGHT_H_
+#pragma once
+
 
 #include <memory>
 #include <string>
@@ -65,4 +65,4 @@ class SignalLight : public TrafficRule {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_TOOLKITS_DECIDERS_SIGNAL_LIGHT_H_
+

@@ -18,8 +18,8 @@
  * @file qp_spline_reference_line_smoother.h
  **/
 
-#ifndef MODULES_PLANNING_REFERENCE_LINE_QP_SPLINE_REFERENCE_LINE_SMOOTHER_H_
-#define MODULES_PLANNING_REFERENCE_LINE_QP_SPLINE_REFERENCE_LINE_SMOOTHER_H_
+#pragma once
+
 
 #include <memory>
 #include <string>
@@ -79,4 +79,4 @@ class QpSplineReferenceLineSmoother : public ReferenceLineSmoother {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_REFERENCE_LINE_QP_SPLINE_REFERENCE_LINE_SMOOTHER_H_
+

@@ -18,8 +18,8 @@
  *   @file
  **/
 
-#ifndef MODULES_PLANNING_COMMON_SPEED_ST_BOUNDARY_H_
-#define MODULES_PLANNING_COMMON_SPEED_ST_BOUNDARY_H_
+#pragma once
+
 
 #include <limits>
 #include <memory>
@@ -138,4 +138,4 @@ class StBoundary : public common::math::Polygon2d {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_COMMON_SPEED_ST_BOUNDARY_H_
+

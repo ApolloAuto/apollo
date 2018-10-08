@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_LIDAR_LIB_SPATIO_TEMPORAL_GROUND_DETECTOR_H_
-#define MODULES_PERCEPTION_LIDAR_LIB_SPATIO_TEMPORAL_GROUND_DETECTOR_H_
+#pragma once
+
 
 #include <Eigen/Core>
 #include <algorithm>
@@ -69,4 +69,4 @@ class SpatioTemporalGroundDetector : public BaseGroundDetector {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_LIDAR_LIB_SPATIO_TEMPORAL_GROUND_Detector_H_
+

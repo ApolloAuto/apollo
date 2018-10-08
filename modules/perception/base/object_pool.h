@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_BASE_OBJECT_POOL_H_
-#define MODULES_PERCEPTION_BASE_OBJECT_POOL_H_
+#pragma once
+
 #include <deque>
 #include <list>
 #include <memory>
@@ -122,4 +122,4 @@ class DummyObjectPool : public BaseObjectPool<ObjectType> {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_BASE_OBJECT_POOL_H_
+

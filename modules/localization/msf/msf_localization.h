@@ -19,8 +19,8 @@
  * @brief The class of MSFLocalization
  */
 
-#ifndef MODULES_LOCALIZATION_MSF_MSF_LOCALIZATION_H_
-#define MODULES_LOCALIZATION_MSF_MSF_LOCALIZATION_H_
+#pragma once
+
 
 #include <memory>
 #include <string>
@@ -106,4 +106,4 @@ class MSFLocalization {
 }  // namespace localization
 }  // namespace apollo
 
-#endif  // MODULES_LOCALIZATION_MSF_MSF_LOCALIZATION_H_
+

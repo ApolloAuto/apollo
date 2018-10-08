@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_BASE_LANE_STRUCT_H_
-#define MODULES_PERCEPTION_BASE_LANE_STRUCT_H_
+#pragma once
+
 
 #include <vector>
 
@@ -90,4 +90,4 @@ struct LaneLine {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_BASE_LANE_STRUCT_H_
+

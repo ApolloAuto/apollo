@@ -17,8 +17,8 @@
 /**
  * @file speed_data.h
  **/
-#ifndef MODULES_PLANNING_COMMON_SPEED_SPEED_DATA_H_
-#define MODULES_PLANNING_COMMON_SPEED_SPEED_DATA_H_
+#pragma once
+
 
 #include <string>
 #include <vector>
@@ -61,4 +61,4 @@ class SpeedData {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_COMMON_SPEED_SPEED_DATA_H_
+

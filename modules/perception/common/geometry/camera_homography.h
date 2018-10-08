@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_COMMON_GEOMETRY_CAMERA_HOMOGRAPHY_H_
-#define MODULES_PERCEPTION_COMMON_GEOMETRY_CAMERA_HOMOGRAPHY_H_
+#pragma once
+
 
 #include "Eigen/Core"
 #include "Eigen/Geometry"
@@ -44,4 +44,4 @@ bool IsCamerasFieldOverlap(const base::PinholeCameraModel& from_camera,
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_COMMON_GEOMETRY_CAMERA_HOMOGRAPHY_H_
+

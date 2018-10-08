@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_MONITOR_COMMON_MONITOR_MANAGER_H_
-#define MODULES_MONITOR_COMMON_MONITOR_MANAGER_H_
+#pragma once
+
 
 #include <memory>
 #include <string>
@@ -83,4 +83,4 @@ class MonitorManager {
 }  // namespace monitor
 }  // namespace apollo
 
-#endif  // MODULES_MONITOR_COMMON_MONITOR_MANAGER_H_
+

@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_COMMON_GRAPH_GATED_HUNGARIAN_BIGRAPH_MATCHER_H_
-#define MODULES_PERCEPTION_COMMON_GRAPH_GATED_HUNGARIAN_BIGRAPH_MATCHER_H_
+#pragma once
+
 
 #include <algorithm>
 #include <functional>
@@ -325,4 +325,4 @@ void GatedHungarianMatcher<T>::OptimizeAdapter(
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_COMMON_GRAPH_GATED_HUNGARIAN_BIGRAPH_MATCHER_H_
+

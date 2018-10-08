@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_TOOLS_VISUALIZER_VIDEOIMGVIEWER_H_
-#define MODULES_TOOLS_VISUALIZER_VIDEOIMGVIEWER_H_
+#pragma once
+
 
 #include <QOpenGLFunctions>
 #include <QOpenGLWidget>
@@ -51,4 +51,3 @@ class VideoImgViewer : public QOpenGLWidget, protected QOpenGLFunctions {
   friend class FixedAspectRatioWidget;
 };
 
-#endif  // VIDEOIMGVIEWER_H

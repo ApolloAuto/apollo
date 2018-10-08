@@ -18,8 +18,8 @@
  * @file
  */
 
-#ifndef MODULES_COMMON_STATUS_STATUS_H_
-#define MODULES_COMMON_STATUS_STATUS_H_
+#pragma once
+
 
 #include <string>
 
@@ -138,4 +138,4 @@ inline std::ostream &operator<<(std::ostream &os, const Status &s) {
 }  // namespace common
 }  // namespace apollo
 
-#endif  // MODULES_COMMON_STATUS_STATUS_H_
+

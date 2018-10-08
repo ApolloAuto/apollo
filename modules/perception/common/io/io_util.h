@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_COMMON_IO_POSE_UTIL_H_
-#define MODULES_PERCEPTION_COMMON_IO_POSE_UTIL_H_
+#pragma once
+
 
 #include <string>
 
@@ -44,4 +44,4 @@ bool LoadOmnidirectionalCameraIntrinsics(
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_COMMON_IO_POSE_UTIL_H_
+

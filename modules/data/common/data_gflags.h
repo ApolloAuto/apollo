@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_DATA_COMMON_DATA_GFLAGS_H_
-#define MODULES_DATA_COMMON_DATA_GFLAGS_H_
+#pragma once
+
 
 #include "gflags/gflags.h"
 
@@ -23,5 +23,5 @@
 DECLARE_string(data_conf_file);
 DECLARE_string(data_record_service_name);
 
-#endif  // MODULES_DATA_COMMON_DATA_GFLAGS_H_
+
 

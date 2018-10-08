@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_DRIVERS_VELODYNE_DRIVER_DRIVER_H_
-#define MODULES_DRIVERS_VELODYNE_DRIVER_DRIVER_H_
+#pragma once
+
 
 #include <memory>
 #include <string>
@@ -89,4 +89,4 @@ class VelodyneDriverFactory {
 }  // namespace drivers
 }  // namespace apollo
 
-#endif  // MODULES_DRIVERS_VELODYNE_DRIVER_DRIVER_H_
+

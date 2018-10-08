@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_DRIVERS_VELODYNE_PARSER_ONLINE_CALIBRATION_H_
-#define MODULES_DRIVERS_VELODYNE_PARSER_ONLINE_CALIBRATION_H_
+#pragma once
+
 
 #include <memory>
 #include <string>
@@ -59,4 +59,4 @@ class OnlineCalibration {
 }  // namespace drivers
 }  // namespace apollo
 
-#endif  // MODULES_DRIVERS_VELODYNE_PARSER_ONLINE_CALIBRATION_H_
+

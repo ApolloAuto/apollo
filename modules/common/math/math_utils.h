@@ -19,8 +19,8 @@
  * @brief Math-related util functions.
  */
 
-#ifndef MODULES_COMMON_MATH_MATH_UTILS_H_
-#define MODULES_COMMON_MATH_MATH_UTILS_H_
+#pragma once
+
 
 #include <limits>
 #include <utility>
@@ -211,4 +211,4 @@ std::pair<double, double> Cartesian2Polar(double x, double y);
 }  // namespace common
 }  // namespace apollo
 
-#endif  // MODULES_COMMON_MATH_UTILS_H_
+

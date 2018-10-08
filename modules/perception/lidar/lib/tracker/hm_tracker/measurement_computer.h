@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_LIDAR_LIB_TRACKER_HM_TRACKER_MEASUREMENT_COMPUTER_H_
-#define MODULES_PERCEPTION_LIDAR_LIB_TRACKER_HM_TRACKER_MEASUREMENT_COMPUTER_H_
+#pragma once
+
 
 #include <memory>
 
@@ -69,6 +69,3 @@ typedef std::shared_ptr<const MeasurementComputer> MeasurementComputerConstPtr;
 }  // namespace lidar
 }  // namespace perception
 }  // namespace apollo
-
-#endif
-// MODULES_PERCEPTION_LIDAR_LIB_TRACKER_HM_TRACKER_MEASUREMENT_COMPUTER_H_

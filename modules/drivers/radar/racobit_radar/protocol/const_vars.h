@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_DRIVERS_RADAR_RACOBIT_RADAR_CONST_VARS_H_
-#define MODULES_DRIVERS_RADAR_RACOBIT_RADAR_CONST_VARS_H_
+#pragma once
+
 
 namespace apollo {
 namespace drivers {
@@ -84,4 +84,4 @@ const double OBJECT_LENGTH_RES = 0.2;
 }  // namespace drivers
 }  // namespace apollo
 
-#endif  // MODULES_DRIVERS_RADAR_RACOBIT_RADAR_CONST_VARS_H_
+

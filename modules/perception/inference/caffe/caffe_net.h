@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_INFERENCE_CAFFE_CAFFE_NET_H_
-#define MODULES_PERCEPTION_INFERENCE_CAFFE_CAFFE_NET_H_
+#pragma once
+
 
 #include <map>
 #include <memory>
@@ -67,4 +67,4 @@ class CaffeNet : public Inference {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_INFERENCE_CAFFE_CAFFE_NET_H_
+

@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_TOOLS_VISUALIZER_MESSAGEDIALOG_H_
-#define MODULES_TOOLS_VISUALIZER_MESSAGEDIALOG_H_
+#pragma once
+
 
 #include <QDialog>
 
@@ -37,4 +37,4 @@ class MessageDialog : public QDialog {
   Ui::MessageDialog* ui_;
 };
 
-#endif  // MODULES_TOOLS_VISUALIZER_MESSAGEDIALOG_H_
+

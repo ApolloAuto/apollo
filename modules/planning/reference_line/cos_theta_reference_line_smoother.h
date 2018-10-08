@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PLANNING_REFERENCE_LINE_COSTHETA_REFERENCE_LINE_SMOOTHER_H_
-#define MODULES_PLANNING_REFERENCE_LINE_COSTHETA_REFERENCE_LINE_SMOOTHER_H_
+#pragma once
+
 
 #include <utility>
 #include <vector>
@@ -89,4 +89,4 @@ class CosThetaReferenceLineSmoother : public ReferenceLineSmoother {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_REFERENCE_LINE_COSTHETA_REFERENCE_LINE_SMOOTHER_H_
+

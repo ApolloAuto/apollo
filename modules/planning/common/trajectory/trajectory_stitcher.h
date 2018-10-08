@@ -18,8 +18,8 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_COMMON_TRAJECTORY_TRAJECTORY_STITCHER_H_
-#define MODULES_PLANNING_COMMON_TRAJECTORY_TRAJECTORY_STITCHER_H_
+#pragma once
+
 
 #include <utility>
 #include <vector>
@@ -57,4 +57,4 @@ class TrajectoryStitcher {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_COMMON_TRAJECTORY_TRAJECTORY_STITCHER_H_
+

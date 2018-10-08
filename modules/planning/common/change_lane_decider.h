@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PLANNING_COMMON_CHANGE_LANE_DECIDER_H_
-#define MODULES_PLANNING_COMMON_CHANGE_LANE_DECIDER_H_
+#pragma once
+
 
 #include <list>
 #include <memory>
@@ -55,4 +55,4 @@ class ChangeLaneDecider {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_COMMON_CHANGE_LANE_DECIDER_H_
+

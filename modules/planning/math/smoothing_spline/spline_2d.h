@@ -19,8 +19,8 @@
  * @brief: piecewise smoothing spline 2d class
  **/
 
-#ifndef MODULES_PLANNING_SMOOTHING_SPLINE_SPLINE_2D_H_
-#define MODULES_PLANNING_SMOOTHING_SPLINE_SPLINE_2D_H_
+#pragma once
+
 
 #include <utility>
 #include <vector>
@@ -62,4 +62,4 @@ class Spline2d {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_SMOOTHING_SPLINE_SPLINE_2D_H_
+

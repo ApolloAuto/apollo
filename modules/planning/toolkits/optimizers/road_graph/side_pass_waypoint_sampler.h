@@ -18,8 +18,8 @@
  * @file side_pass_waypoint_sampler.h
  **/
 
-#ifndef MODULES_PLANNING_TOOLKITS_OPTIMIZERS_ROAD_GRAPH_SIDE_PASS_SAMPLER_H_
-#define MODULES_PLANNING_TOOLKITS_OPTIMIZERS_ROAD_GRAPH_SIDE_PASS_SAMPLER_H_
+#pragma once
+
 
 #include <vector>
 
@@ -44,4 +44,4 @@ class SidePassWaypointSampler final : public WaypointSampler {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_TOOLKITS_OPTIMIZERS_ROAD_GRAPH_SIDE_PASS_SAMPLER_H_
+

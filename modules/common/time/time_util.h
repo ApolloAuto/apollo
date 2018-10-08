@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_COMMON_TIME_TIME_UTIL_H_
-#define MODULES_COMMON_TIME_TIME_UTIL_H_
+#pragma once
+
 
 #include <sys/time.h>
 #include <iomanip>
@@ -69,4 +69,4 @@ class TimeUtil {
 }  // namespace common
 }  // namespace apollo
 
-#endif  // MODULES_COMMON_TIME_TIME_UTIL_H__
+

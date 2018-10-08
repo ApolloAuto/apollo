@@ -18,8 +18,8 @@
  * @file
  */
 
-#ifndef MODULES_DREAMVIEW_BACKEND_SIMULATION_WORLD_SIM_WORLD_UPDATER_H_
-#define MODULES_DREAMVIEW_BACKEND_SIMULATION_WORLD_SIM_WORLD_UPDATER_H_
+#pragma once
+
 
 #include <memory>
 #include <string>
@@ -150,4 +150,4 @@ class SimulationWorldUpdater {
 }  // namespace dreamview
 }  // namespace apollo
 
-#endif  // MODULES_DREAMVIEW_BACKEND_SIMULATION_WORLD_SIM_WORLD_UPDATER_H_
+

@@ -18,8 +18,8 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_COMMON_PATH_OBSTACLE_H_
-#define MODULES_PLANNING_COMMON_PATH_OBSTACLE_H_
+#pragma once
+
 
 #include <list>
 #include <string>
@@ -196,4 +196,4 @@ class PathObstacle {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_COMMON_PATH_OBSTACLE_H_
+

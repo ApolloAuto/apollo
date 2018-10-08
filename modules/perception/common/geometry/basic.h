@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_COMMON_GEOMETRY_BASIC_H_
-#define MODULES_PERCEPTION_COMMON_GEOMETRY_BASIC_H_
+#pragma once
+
 
 #include <algorithm>
 #include <limits>
@@ -189,4 +189,4 @@ void ConvertCartesiantoPolarCoordinate(const PointT &xyz,
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_COMMON_GEOMETRY_BASIC_H_
+

@@ -18,8 +18,8 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_COMMON_LAG_PREDICTION_H_
-#define MODULES_PLANNING_COMMON_LAG_PREDICTION_H_
+#pragma once
+
 
 #include <unordered_map>
 #include <unordered_set>

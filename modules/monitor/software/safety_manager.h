@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_MONITOR_SOFTWARE_SAFETY_MANAGER_H_
-#define MODULES_MONITOR_SOFTWARE_SAFETY_MANAGER_H_
+#pragma once
+
 
 #include <string>
 
@@ -40,4 +40,4 @@ class SafetyManager {
 }  // namespace monitor
 }  // namespace apollo
 
-#endif  // MODULES_MONITOR_SOFTWARE_SAFETY_MANAGER_H_
+

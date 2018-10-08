@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_MONITOR_MONITOR_H_
-#define MODULES_MONITOR_MONITOR_H_
+#pragma once
+
 
 #include <memory>
 #include <string>
@@ -46,4 +46,4 @@ CYBERTRON_REGISTER_COMPONENT(Monitor)
 }  // namespace monitor
 }  // namespace apollo
 
-#endif  // MODULES_MONITOR_MONITOR_H_
+

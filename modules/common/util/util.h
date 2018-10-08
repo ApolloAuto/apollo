@@ -19,8 +19,8 @@
  * @brief Some util functions.
  */
 
-#ifndef MODULES_COMMON_UTIL_UTIL_H_
-#define MODULES_COMMON_UTIL_UTIL_H_
+#pragma once
+
 
 #include <algorithm>
 #include <iostream>
@@ -261,4 +261,4 @@ std::ostream& operator<<(std::ostream& os, std::pair<A, B>& p) {
   return os << "first: " << p.first << ", second: " << p.second;
 }
 
-#endif  // MODULES_COMMON_UTIL_UTIL_H_
+

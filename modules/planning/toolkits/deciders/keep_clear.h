@@ -18,8 +18,8 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_TOOLKITS_DECIDERS_KEEP_CLEAR_H_
-#define MODULES_PLANNING_TOOLKITS_DECIDERS_KEEP_CLEAR_H_
+#pragma once
+
 
 #include <string>
 
@@ -53,4 +53,4 @@ class KeepClear : public TrafficRule {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_TOOLKITS_DECIDERS_KEEP_CLEAR_H_
+

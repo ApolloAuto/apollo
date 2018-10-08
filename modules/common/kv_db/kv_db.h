@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_COMMON_KV_DB_KV_DB_H_
-#define MODULES_COMMON_KV_DB_KV_DB_H_
+#pragma once
+
 
 #include <leveldb/db.h>
 #include <memory>
@@ -64,4 +64,4 @@ class KVDB {
 }  // namespace common
 }  // namespace apollo
 
-#endif  // MODULES_COMMON_KV_DB_KV_DB_H_
+

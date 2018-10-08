@@ -18,8 +18,8 @@
  * @file st_point.h
  **/
 
-#ifndef MODULES_PLANNING_COMMON_SPEED_ST_POINT_H_
-#define MODULES_PLANNING_COMMON_SPEED_ST_POINT_H_
+#pragma once
+
 
 #include <string>
 
@@ -44,4 +44,4 @@ class STPoint : public common::math::Vec2d {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_COMMON_SPEED_ST_POINT_H_
+

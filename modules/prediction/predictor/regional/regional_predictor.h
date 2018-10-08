@@ -19,8 +19,8 @@
  * @brief Define pedestrian predictor
  */
 
-#ifndef MODULES_PREDICTION_PREDICTOR_REGIONAL_REGIONAL_PREDICTOR_H_
-#define MODULES_PREDICTION_PREDICTOR_REGIONAL_REGIONAL_PREDICTOR_H_
+#pragma once
+
 
 #include <vector>
 
@@ -116,4 +116,4 @@ class RegionalPredictor : public Predictor {
 }  // namespace prediction
 }  // namespace apollo
 
-#endif  // MODULES_PREDICTION_PREDICTOR_PEDESTRIAN_REGIONAL_PREDICTOR_H_
+

@@ -18,8 +18,8 @@
  * @file
  */
 
-#ifndef MODULES_DREAMVIEW_BACKEND_SIMULATION_WORLD_SIM_WORLD_H_
-#define MODULES_DREAMVIEW_BACKEND_SIMULATION_WORLD_SIM_WORLD_H_
+#pragma once
+
 
 #include <algorithm>
 #include <functional>
@@ -398,4 +398,4 @@ class SimulationWorldService {
 }  // namespace dreamview
 }  // namespace apollo
 
-#endif  // MODULES_DREAMVIEW_BACKEND_SIMULATION_WORLD_SIM_WORLD_H_
+

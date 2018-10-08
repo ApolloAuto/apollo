@@ -19,8 +19,8 @@
  * @brief Some string util functions.
  */
 
-#ifndef MODULES_COMMON_UTIL_STRING_UTIL_H_
-#define MODULES_COMMON_UTIL_STRING_UTIL_H_
+#pragma once
+
 
 #include <functional>
 #include <sstream>
@@ -208,4 +208,4 @@ std::string EncodeBase64(const std::string& in);
 }  // namespace common
 }  // namespace apollo
 
-#endif  // MODULES_COMMON_UTIL_STRING_UTIL_H_
+

@@ -19,8 +19,8 @@
  * @brief the class of Gear66 (for lincoln vehicle)
  */
 
-#ifndef MODULES_CANBUS_VEHICLE_LINCOLN_PROTOCOL_GEAR_66_H_
-#define MODULES_CANBUS_VEHICLE_LINCOLN_PROTOCOL_GEAR_66_H_
+#pragma once
+
 
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 #include "modules/canbus/proto/chassis_detail.pb.h"
@@ -122,4 +122,4 @@ class Gear66 : public ::apollo::drivers::canbus::ProtocolData<
 }  // namespace canbus
 }  // namespace apollo
 
-#endif  // MODULES_CANBUS_VEHICLE_LINCOLN_PROTOCOL_GEAR_66_H_
+

@@ -19,8 +19,8 @@
  * @brief Functions to compute integral.
  */
 
-#ifndef MODULES_COMMON_MATH_INTEGRAL_H_
-#define MODULES_COMMON_MATH_INTEGRAL_H_
+#pragma once
+
 
 #include <array>
 #include <functional>
@@ -291,4 +291,4 @@ double IntegrateByGaussLegendre(const std::function<double(double)>& func,
 }  // namespace common
 }  // namespace apollo
 
-#endif  // MODULES_COMMON_MATH_INTEGRAL_H_
+

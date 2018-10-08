@@ -18,8 +18,8 @@
  * @file dp_road_graph.h
  **/
 
-#ifndef MODULES_PLANNING_TOOLKITS_OPTIMIZERS_ROAD_GRAPH_DP_ROAD_GRAPH_H_
-#define MODULES_PLANNING_TOOLKITS_OPTIMIZERS_ROAD_GRAPH_DP_ROAD_GRAPH_H_
+#pragma once
+
 
 #include <limits>
 #include <list>
@@ -146,4 +146,4 @@ class DpRoadGraph {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_TOOLKITS_OPTIMIZERS_ROAD_GRAPH_DP_ROAD_GRAPH_H_
+

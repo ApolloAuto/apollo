@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_LIDAR_LIB_INTERFACE_DUMMY_SEGMENTATION_H_
-#define MODULES_PERCEPTION_LIDAR_LIB_INTERFACE_DUMMY_SEGMENTATION_H_
+#pragma once
+
 
 #include <string>
 #include <vector>
@@ -49,4 +49,4 @@ class DummySegmentation : public BaseSegmentation {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_LIDAR_LIB_DUMMY_DUMMY_SEGMENTATION_H_
+

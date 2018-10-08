@@ -19,8 +19,8 @@
  * @brief The class of LocalizationLidarProcess
  */
 
-#ifndef MODULES_LOCALIZATION_MSF_LOCALIZATION_LIDAR_PROCESS_H_
-#define MODULES_LOCALIZATION_MSF_LOCALIZATION_LIDAR_PROCESS_H_
+#pragma once
+
 
 #include <cstdint>
 #include <list>
@@ -161,4 +161,4 @@ class LocalizationLidarProcess {
 }  // namespace localization
 }  // namespace apollo
 
-#endif  // MODULES_LOCALIZATION_MSF_LOCALIZATION_LIDAR_PROCESS_H_
+

@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_LIDAR_LIB_SEGMENTATION_CNNSEG_SPP_ENGINE_SPP_POOL_TYPES_H_  // NOLINT
-#define MODULES_PERCEPTION_LIDAR_LIB_SEGMENTATION_CNNSEG_SPP_ENGINE_SPP_POOL_TYPES_H_  // NOLINT
+#pragma once
+
 
 #include <string>
 
@@ -40,5 +40,3 @@ typedef base::LightObjectPool<SppCluster, kSppClusterPoolSize,
 }  // namespace lidar
 }  // namespace perception
 }  // namespace apollo
-
-#endif  // PERCEPTION_LIDAR_LIB_SEGMENTATION_CNNSEG_SPP_ENGINE_SPP_POOL_TYPES_H_

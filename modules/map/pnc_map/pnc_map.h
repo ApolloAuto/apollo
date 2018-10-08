@@ -18,8 +18,8 @@
  * @file:
  **/
 
-#ifndef MODULES_MAP_PNC_MAP_PNC_MAP_H_
-#define MODULES_MAP_PNC_MAP_PNC_MAP_H_
+#pragma once
+
 
 #include <array>
 #include <limits>
@@ -235,4 +235,4 @@ class PncMap {
 }  // namespace hdmap
 }  // namespace apollo
 
-#endif  // MODULES_MAP_PNC_MAP_PNC_MAP_H_
+

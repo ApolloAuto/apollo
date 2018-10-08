@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_MAP_RELATIVE_MAP_RELATIVE_MAP_GFLAGS_H_
-#define MODULES_MAP_RELATIVE_MAP_RELATIVE_MAP_GFLAGS_H_
+#pragma once
+
 
 #include "gflags/gflags.h"
 
@@ -34,4 +34,4 @@ DECLARE_bool(enable_cyclic_rerouting);
 DECLARE_bool(relative_map_generate_left_boundray);
 DECLARE_bool(navigator_down_sample);
 
-#endif  // MODULES_MAP_RELATIVE_MAP_RELATIVE_MAP_GFLAGS_H_
+

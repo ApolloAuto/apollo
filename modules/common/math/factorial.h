@@ -19,8 +19,8 @@
  * @brief Meta programming for computing factorial
  */
 
-#ifndef MODULES_COMMON_MATH_FACTORIAL_H_
-#define MODULES_COMMON_MATH_FACTORIAL_H_
+#pragma once
+
 
 namespace apollo {
 namespace common {
@@ -40,4 +40,4 @@ struct Factorial<0> {
 }  // namespace common
 }  // namespace apollo
 
-#endif  // MODULES_COMMON_MATH_FACTORIAL_H_
+

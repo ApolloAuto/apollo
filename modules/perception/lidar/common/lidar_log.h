@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_LIDAR_COMMON_LIDAR_LOG_H_
-#define MODULES_PERCEPTION_LIDAR_COMMON_LIDAR_LOG_H_
+#pragma once
+
 
 #include "cybertron/common/log.h"
 
@@ -41,4 +41,4 @@
 #define LDLIDAR_TIME_SYNCHRONIZE_ERROR 214
 #define LDLIDAR_GET_CONFIG_ERROR 220
 
-#endif  // MODULES_PERCEPTION_LIDAR_COMMON_LIDAR_LOG_H_
+

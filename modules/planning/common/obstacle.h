@@ -18,8 +18,8 @@
  * @file obstacle.h
  **/
 
-#ifndef MODULES_PLANNING_COMMON_OBSTACLE_H_
-#define MODULES_PLANNING_COMMON_OBSTACLE_H_
+#pragma once
+
 
 #include <list>
 #include <memory>
@@ -123,4 +123,4 @@ typedef ThreadSafeIndexedList<std::string, Obstacle> ThreadSafeIndexedObstacles;
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_COMMON_OBSTACLE_H_
+

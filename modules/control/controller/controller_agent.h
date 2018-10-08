@@ -19,8 +19,8 @@
  * @brief Defines the ControllerAgent class.
  */
 
-#ifndef MODULES_CONTROL_CONTROLLER_CONTROLLER_AGENT_H_
-#define MODULES_CONTROL_CONTROLLER_CONTROLLER_AGENT_H_
+#pragma once
+
 
 #include <cstdio>
 #include <memory>
@@ -93,4 +93,4 @@ class ControllerAgent {
 }  // namespace control
 }  // namespace apollo
 
-#endif  // MODULES_CONTROL_CONTROLLER_CONTROLLER_AGENT_H_
+

@@ -19,8 +19,8 @@
  * @brief Defines SenderMessage class and CanSender class.
  */
 
-#ifndef MODULES_DRIVERS_CANBUS_CAN_COMM_CAN_SENDER_H_
-#define MODULES_DRIVERS_CANBUS_CAN_COMM_CAN_SENDER_H_
+#pragma once
+
 
 #include <algorithm>
 #include <array>
@@ -411,4 +411,4 @@ bool CanSender<SensorType>::NeedSend(const SenderMessage<SensorType> &msg,
 }  // namespace drivers
 }  // namespace apollo
 
-#endif  // MODULES_DRIVERS_CANBUS_CAN_COMM_CAN_SENDER_H_
+

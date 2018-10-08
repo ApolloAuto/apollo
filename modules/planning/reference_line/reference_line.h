@@ -18,8 +18,8 @@
  * @file reference_line.h
  **/
 
-#ifndef MODULES_PLANNING_REFERENCE_LINE_REFERENCE_LINE_H_
-#define MODULES_PLANNING_REFERENCE_LINE_REFERENCE_LINE_H_
+#pragma once
+
 
 #include <string>
 #include <utility>
@@ -220,4 +220,4 @@ class ReferenceLine {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_REFERENCE_LINE_REFERENCE_LINE_H_
+

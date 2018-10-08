@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_CANBUS_VEHICLE_GEM_PROTOCOL_WHEEL_SPEED_RPT_7A_H_
-#define MODULES_CANBUS_VEHICLE_GEM_PROTOCOL_WHEEL_SPEED_RPT_7A_H_
+#pragma once
+
 
 #include "modules/canbus/proto/chassis_detail.pb.h"
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
@@ -66,4 +66,4 @@ class Wheelspeedrpt7a : public ::apollo::drivers::canbus::ProtocolData<
 }  // namespace canbus
 }  // namespace apollo
 
-#endif  // MODULES_CANBUS_VEHICL_GEM_PROTOCOL_WHEEL_SPEED_RPT_7A_H_
+

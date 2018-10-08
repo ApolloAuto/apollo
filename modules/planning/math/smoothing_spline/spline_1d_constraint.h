@@ -20,8 +20,8 @@
  *methods
  **/
 
-#ifndef MODULES_PLANNING_MATH_SMOOTHING_SPLINE_SPLINE_1D_CONSTRAINT_H_
-#define MODULES_PLANNING_MATH_SMOOTHING_SPLINE_SPLINE_1D_CONSTRAINT_H_
+#pragma once
+
 
 #include <algorithm>
 #include <functional>
@@ -144,4 +144,4 @@ class Spline1dConstraint {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_MATH_SMOOTHING_SPLINE_SPLINE_1D_CONSTRAINT_H_
+

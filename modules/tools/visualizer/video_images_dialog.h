@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_TOOLS_VISUALIZER_VIDEO_IMAGES_DIALOG_H_
-#define MODULES_TOOLS_VISUALIZER_VIDEO_IMAGES_DIALOG_H_
+#pragma once
+
 
 #include <QDialog>
 
@@ -36,4 +36,4 @@ class VideoImagesDialog : public QDialog {
   Ui::VideoImagesDialog *ui;
 };
 
-#endif  // MODULES_TOOLS_VISUALIZER_VIDEO_IMAGES_DIALOG_H_
+

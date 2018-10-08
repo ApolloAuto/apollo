@@ -18,8 +18,8 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_TOOLKITS_OPTIMIZERS_TASK_H_
-#define MODULES_PLANNING_TOOLKITS_OPTIMIZERS_TASK_H_
+#pragma once
+
 
 #include <string>
 
@@ -55,4 +55,4 @@ class Task {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_TOOLKITS_OPTIMIZERS_TASK_H_
+

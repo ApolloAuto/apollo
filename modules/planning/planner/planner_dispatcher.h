@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PLANNING_PLANNER_PLANNER_DISPATCHER_H_
-#define MODULES_PLANNING_PLANNER_PLANNER_DISPATCHER_H_
+#pragma once
+
 
 #include <memory>
 #include <string>
@@ -57,4 +57,4 @@ class PlannerDispatcher {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_PLANNER_PLANNER_DISPATCHER_H_
+

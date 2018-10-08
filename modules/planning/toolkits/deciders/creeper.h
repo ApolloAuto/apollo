@@ -18,8 +18,8 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_TOOLKITS_DECIDERS_CREEPER_H_
-#define MODULES_PLANNING_TOOLKITS_DECIDERS_CREEPER_H_
+#pragma once
+
 
 #include "cybertron/common/macros.h"
 
@@ -50,4 +50,4 @@ class Creeper {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_TOOLKITS_DECIDERS_CREEPER_H_
+

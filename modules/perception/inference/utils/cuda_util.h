@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_INFERENCE_UTILS_CUDA_UTIL_H
-#define MODULES_PERCEPTION_INFERENCE_UTILS_CUDA_UTIL_H
+#pragma once
+
 #include <cublas_v2.h>
 namespace apollo {
 namespace perception {
@@ -36,4 +36,4 @@ class CudaUtil {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_INFERENCE_UTILS_CUDA_UTIL_H
+

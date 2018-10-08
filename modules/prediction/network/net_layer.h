@@ -23,8 +23,8 @@
 
 #include "modules/prediction/network/net_util.h"
 
-#ifndef MODULES_PREDICTION_NETWORK_NET_LAYER_H_
-#define MODULES_PREDICTION_NETWORK_NET_LAYER_H_
+#pragma once
+
 
 /**
  * @namespace apollo::prediction::network
@@ -350,4 +350,4 @@ class Concatenate : public Layer {
 }  // namespace prediction
 }  // namespace apollo
 
-#endif  // MODULES_PREDICTION_NETWORK_NET_LAYER_H_
+

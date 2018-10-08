@@ -19,8 +19,8 @@
  * @brief The class of LocalizationGnssProcess
  */
 
-#ifndef MODULES_LOCALIZATION_MSF_LOCALIZATION_GNSS_PROCESS_H_
-#define MODULES_LOCALIZATION_MSF_LOCALIZATION_GNSS_PROCESS_H_
+#pragma once
+
 
 #include <map>
 #include <string>
@@ -151,4 +151,4 @@ class LocalizationGnssProcess {
 }  // namespace localization
 }  // namespace apollo
 
-#endif  // MODULES_LOCALIZATION_MSF_LOCALIZATION_GNSS_PROCESS_H_
+

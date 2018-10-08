@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_ROUTING_CORE_RESULT_GENERATOR_H_
-#define MODULES_ROUTING_CORE_RESULT_GENERATOR_H_
+#pragma once
+
 
 #include <string>
 #include <utility>
@@ -83,4 +83,4 @@ class ResultGenerator {
 }  // namespace routing
 }  // namespace apollo
 
-#endif  // MODULES_ROUTING_CORE_RESULT_GENERATOR_H_
+

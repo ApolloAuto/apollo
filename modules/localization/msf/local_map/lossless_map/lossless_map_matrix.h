@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_LOCALIZATION_MSF_LOCAL_MAP_LOSSLESS_MAP_LOSSLESS_MAP_MATRIX_H_
-#define MODULES_LOCALIZATION_MSF_LOCAL_MAP_LOSSLESS_MAP_LOSSLESS_MAP_MATRIX_H_
+#pragma once
+
 
 #include <vector>
 
@@ -202,5 +202,3 @@ class LosslessMapMatrix : public BaseMapMatrix {
 }  // namespace msf
 }  // namespace localization
 }  // namespace apollo
-
-#endif  // LOCALIZATION_MSF_LOCAL_MAP_LOSSLESS_MAP_LOSSLESS_MAP_MATRIX_H_

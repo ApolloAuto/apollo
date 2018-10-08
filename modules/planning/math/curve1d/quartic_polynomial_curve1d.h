@@ -18,8 +18,8 @@
  * @file quartic_polynomial_curve1d.h
  **/
 
-#ifndef MODULES_PLANNING_MATH_CURVE1D_QUARTIC_POLYNOMIAL_CURVE1D_H_
-#define MODULES_PLANNING_MATH_CURVE1D_QUARTIC_POLYNOMIAL_CURVE1D_H_
+#pragma once
+
 
 #include <array>
 #include <string>
@@ -64,4 +64,4 @@ class QuarticPolynomialCurve1d : public PolynomialCurve1d {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_MATH_CURVE1D_QUARTIC_POLYNOMIAL_CURVE1D_H_
+

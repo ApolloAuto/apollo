@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_MAP_RELATIVE_MAP_NAVIGATION_LANE_H_
-#define MODULES_MAP_RELATIVE_MAP_NAVIGATION_LANE_H_
+#pragma once
+
 
 #include <list>
 #include <memory>
@@ -161,4 +161,4 @@ class NavigationLane {
 }  // namespace relative_map
 }  // namespace apollo
 
-#endif  // MODULES_MAP_RELATIVE_MAP_NAVIGATION_LANE_H_
+

@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_DATA_RECORDER_RECORD_SERVICE_H_
-#define MODULES_DATA_RECORDER_RECORD_SERVICE_H_
+#pragma once
+
 
 #include <memory>
 
@@ -48,4 +48,4 @@ class RecordService {
 }  // namespace data
 }  // namespace apollo
 
-#endif  // MODULES_DATA_RECORDER_RECORD_SERVICE_H_
+

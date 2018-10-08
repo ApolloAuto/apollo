@@ -18,8 +18,8 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_TOOLKITS_OPTIMIZERS_QP_SPLINE_PATH_OPTIMIZER_H_
-#define MODULES_PLANNING_TOOLKITS_OPTIMIZERS_QP_SPLINE_PATH_OPTIMIZER_H_
+#pragma once
+
 
 #include <memory>
 #include <string>
@@ -54,4 +54,4 @@ class QpSplinePathOptimizer : public PathOptimizer {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_TOOLKITS_OPTIMIZERS_QP_SPLINE_PATH_OPTIMIZER_H_
+

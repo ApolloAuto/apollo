@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_LIDAR_LIB_CLASSIFIER_FUSED_CLASSIFIER_TYPE_FUSION_INTERFACE_H_  // NOLINT
-#define MODULES_PERCEPTION_LIDAR_LIB_CLASSIFIER_FUSED_CLASSIFIER_TYPE_FUSION_INTERFACE_H_  // NOLINT
+#pragma once
+
 
 #include <string>
 #include <memory>
@@ -62,4 +62,3 @@ PERCEPTION_REGISTER_REGISTERER(BaseSequenceTypeFusion);
 }  // namespace perception
 }  // namespace apollo
 
-#endif

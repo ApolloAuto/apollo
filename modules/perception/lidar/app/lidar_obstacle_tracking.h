@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_LIDAR_APP_LIDAR_OBSTACLE_TRACKING_H_
-#define MODULES_PERCEPTION_LIDAR_APP_LIDAR_OBSTACLE_TRACKING_H_
+#pragma once
+
 
 #include <memory>
 #include <string>
@@ -57,4 +57,4 @@ class LidarObstacleTracking {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_LIDAR_APP_LIDAR_OBSTACLE_TRACKING_H_
+

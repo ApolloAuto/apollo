@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_LIDAR_LIB_COMMON_LIDAR_FRAME_POOL_H_
-#define MODULES_PERCEPTION_LIDAR_LIB_COMMON_LIDAR_FRAME_POOL_H_
+#pragma once
+
 
 #include "modules/perception/base/concurrent_object_pool.h"
 #include "modules/perception/lidar/common/lidar_frame.h"
@@ -37,4 +37,4 @@ typedef base::ConcurrentObjectPool<LidarFrame, kLidarFramePoolSize,
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_LIDAR_LIB_COMMON_LIDAR_FRAME_POOL_H_
+

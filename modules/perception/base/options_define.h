@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_BASE_OPITON_DEFINE_H_
-#define MODULES_PERCEPTION_BASE_OPITON_DEFINE_H_
+#pragma once
+
 
 // build perception with cpu or gpu
 /* #undef PERCEPTION_CPU_ONLY */
@@ -22,4 +22,4 @@
 // build perception with using cybertron log lib or glog lib
 /* #undef PERCEPTION_USE_CYBERTRON */
 
-#endif  // MODULES_PERCEPTION_BASE_OPITON_DEFINE_H_
+

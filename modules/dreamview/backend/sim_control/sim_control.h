@@ -18,8 +18,8 @@
  * @file
  */
 
-#ifndef MODULES_DREAMVIEW_BACKEND_SIM_CONTROL_SIM_CONTROL_H_
-#define MODULES_DREAMVIEW_BACKEND_SIM_CONTROL_SIM_CONTROL_H_
+#pragma once
+
 
 #include <memory>
 #include <string>
@@ -198,4 +198,4 @@ class SimControl : SimControlInterface {
 }  // namespace dreamview
 }  // namespace apollo
 
-#endif  // MODULES_DREAMVIEW_BACKEND_SIM_CONTROL_SIM_CONTROL_H_
+

@@ -19,8 +19,8 @@
  * @brief Defines the SocketCanClientRaw class which inherits CanClient.
  */
 
-#ifndef MODULES_DRIVERS_CANBUS_CAN_CLIENT_CLIENT_SOCKET_CAN_CLIENT_RAW_H_
-#define MODULES_DRIVERS_CANBUS_CAN_CLIENT_CLIENT_SOCKET_CAN_CLIENT_RAW_H_
+#pragma once
+
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -122,4 +122,4 @@ class SocketCanClientRaw : public CanClient {
 }  // namespace drivers
 }  // namespace apollo
 
-#endif  // MODULES_DRIVERS_CANBUS_CANCARD_CLIENT_SOCKET_CAN_CLIENT_RAW_H_
+

@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_THIRD_PARTY_PERCEPTION_INTEGRATION_TESTS_H_
-#define MODULES_THIRD_PARTY_PERCEPTION_INTEGRATION_TESTS_H_
+#pragma once
+
 
 #include <string>
 #include <vector>
@@ -64,4 +64,4 @@ class ThirdPartyPerceptionTestBase : public ::testing::Test {
 }  // namespace third_party_perception
 }  // namespace apollo
 
-#endif  // MODULES_THIRD_PARTY_PERCEPTION_INTEGRATION_TESTS_H_
+

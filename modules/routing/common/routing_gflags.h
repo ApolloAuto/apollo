@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_ROUTING_COMMON_ROUTING_GFLAGS_H_
-#define MODULES_ROUTING_COMMON_ROUTING_GFLAGS_H_
+#pragma once
+
 
 #include "gflags/gflags.h"
 
@@ -25,4 +25,4 @@ DECLARE_string(routing_node_name);
 DECLARE_double(min_length_for_lane_change);
 DECLARE_bool(enable_change_lane_in_result);
 
-#endif  // MODULES_ROUTING_COMMON_ROUTING_GFLAGS_H_
+

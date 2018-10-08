@@ -18,8 +18,8 @@
  * @file qp_spline_st_graph.h
  **/
 
-#ifndef MODULES_PLANNING_TOOLKITS_OPTIMIZERS_QP_PIECEWISE_ST_GRAPH_H_
-#define MODULES_PLANNING_TOOLKITS_OPTIMIZERS_QP_PIECEWISE_ST_GRAPH_H_
+#pragma once
+
 
 #include <memory>
 #include <utility>
@@ -110,4 +110,4 @@ class QpPiecewiseStGraph {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_TOOLKITS_OPTIMIZERS_QP_PIECEWISE_ST_GRAPH_H_
+

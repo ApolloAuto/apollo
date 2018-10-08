@@ -18,8 +18,8 @@
  * @file
  */
 
-#ifndef MODULES_CANBUS_VEHICLE_VEHICLE_FACTORY_H_
-#define MODULES_CANBUS_VEHICLE_VEHICLE_FACTORY_H_
+#pragma once
+
 
 #include <memory>
 
@@ -59,4 +59,4 @@ class VehicleFactory
 }  // namespace canbus
 }  // namespace apollo
 
-#endif  // MODULES_CANBUS_VEHICLE_VEHICLE_FACTORY_H_
+

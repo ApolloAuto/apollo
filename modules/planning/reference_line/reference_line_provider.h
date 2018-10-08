@@ -20,8 +20,8 @@
  * @brief Declaration of the class ReferenceLineProvider.
  */
 
-#ifndef MODULES_PLANNING_REFERENCE_LINE_REFERENCE_LINE_PROVIDER_H_
-#define MODULES_PLANNING_REFERENCE_LINE_REFERENCE_LINE_PROVIDER_H_
+#pragma once
+
 
 #include <atomic>
 #include <condition_variable>
@@ -186,4 +186,4 @@ class ReferenceLineProvider {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_REFERENCE_LINE_REFERENCE_LINE_PROVIDER_H_
+

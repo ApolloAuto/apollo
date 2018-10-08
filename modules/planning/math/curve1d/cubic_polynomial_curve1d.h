@@ -18,8 +18,8 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_MATH_CURVE1D_CUBIC_POLYNOMIAL_CURVE1D_H_
-#define MODULES_PLANNING_MATH_CURVE1D_CUBIC_POLYNOMIAL_CURVE1D_H_
+#pragma once
+
 
 #include <array>
 #include <string>
@@ -62,4 +62,4 @@ class CubicPolynomialCurve1d : public PolynomialCurve1d {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_MATH_CURVE1D_CUBIC_POLYNOMIAL_CURVE1D_H_
+

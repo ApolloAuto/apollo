@@ -31,8 +31,8 @@
  *           Solve boundary shooting problem with newton raphson method
  **/
 
-#ifndef MODULES_PLANNING_MATH_SPIRAL_CURVE_QUINTIC_SPIRAL_CURVE_H_
-#define MODULES_PLANNING_MATH_SPIRAL_CURVE_QUINTIC_SPIRAL_CURVE_H_
+#pragma once
+
 
 #include <vector>
 
@@ -58,4 +58,4 @@ class QuinticSpiralCurve : public SpiralCurve {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_MATH_SPIRAL_CURVE_QUINTIC_SPIRAL_CURVE_H_
+

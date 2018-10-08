@@ -18,8 +18,8 @@
  * @file : affine_constraint.h
  **/
 
-#ifndef MODULES_PLANNING_MATH_SMOOTHING_SPLINE_AFFINE_CONSTRAINT_H_
-#define MODULES_PLANNING_MATH_SMOOTHING_SPLINE_AFFINE_CONSTRAINT_H_
+#pragma once
+
 
 #include "Eigen/Core"
 #include "modules/planning/math/polynomial_xd.h"
@@ -51,4 +51,4 @@ class AffineConstraint {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_MATH_SMOOTHING_SPLINE_AFFINE_CONSTRAINT_H_
+

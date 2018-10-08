@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_COMMON_I_LIB_PC_I_STRUCT_S_H_
-#define MODULES_PERCEPTION_COMMON_I_LIB_PC_I_STRUCT_S_H_
+#pragma once
+
 
 #include <smmintrin.h>
 #include <cassert>
@@ -1436,4 +1436,4 @@ bool VoxelGridXYPyramid<DATA_TYPE>::Initialized() const {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_COMMON_I_LIB_PC_I_STRUCT_S_H_
+

@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_LOCALIZATION_MSF_VOXEL_GRID_COVARIANCE_HDMAP_H_
-#define MODULES_LOCALIZATION_MSF_VOXEL_GRID_COVARIANCE_HDMAP_H_
+#pragma once
+
 
 #include <pcl/common/common.h>
 #include <pcl/filters/boost.h>
@@ -609,4 +609,4 @@ class VoxelGridCovariance : public pcl::VoxelGrid<PointT> {
 }  // namespace msf
 }  // namespace localization
 }  // namespace apollo
-#endif  // MODULES_LOCALIZATION_MSF_VOXEL_GRID_COVARIANCE_HDMAP_H_
+

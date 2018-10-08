@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_COMMON_I_LIB_PC_I_UTIL_H_
-#define MODULES_PERCEPTION_COMMON_I_LIB_PC_I_UTIL_H_
+#pragma once
+
 
 #include <limits>
 #include "modules/perception/common/i_lib/core/i_blas.h"
@@ -61,4 +61,4 @@ inline void IGetPointcloudsDimWBound(const T *threeds, int n, int start_offset,
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_COMMON_I_LIB_PC_I_UTIL_H_
+

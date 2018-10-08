@@ -18,8 +18,8 @@
  * @file
  */
 
-#ifndef MODULES_PREDICTION_SCENARIO_SCENARIO_MANAGER_H_
-#define MODULES_PREDICTION_SCENARIO_SCENARIO_MANAGER_H_
+#pragma once
+
 
 #include <vector>
 #include <string>
@@ -72,4 +72,4 @@ class ScenarioManager {
 }  // namespace prediction
 }  // namespace apollo
 
-#endif  // MODULES_PREDICTION_SCENARIO_SCENARIO_MANAGER_H_
+

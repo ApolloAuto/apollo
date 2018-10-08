@@ -19,8 +19,8 @@
  * @brief Defines the templated KalmanFilter class.
  */
 
-#ifndef MODULES_COMMON_MATH_KALMAN_FILTER_H_
-#define MODULES_COMMON_MATH_KALMAN_FILTER_H_
+#pragma once
+
 
 #include <sstream>
 #include <string>
@@ -295,4 +295,4 @@ inline std::string KalmanFilter<T, XN, ZN, UN>::DebugString() const {
 }  // namespace common
 }  // namespace apollo
 
-#endif  // MODULES_COMMON_MATH_KALMAN_FILTER_H_
+

@@ -18,8 +18,8 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_TOOLKITS_OPTIMIZERS_QP_SPLINE_PATH_GENERATOR_H_
-#define MODULES_PLANNING_TOOLKITS_OPTIMIZERS_QP_SPLINE_PATH_GENERATOR_H_
+#pragma once
+
 
 #include <memory>
 #include <string>
@@ -90,4 +90,4 @@ class QpSplinePathGenerator {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_TOOLKITS_OPTIMIZERS_QP_SPLINE_PATH_GENERATOR_H_
+

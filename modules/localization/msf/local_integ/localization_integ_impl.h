@@ -19,8 +19,8 @@
  * @brief The class of LocalizationIntegImpl
  */
 
-#ifndef MODULES_LOCALIZATION_MSF_LOCALIZATION_INTEG_IMPL_H_
-#define MODULES_LOCALIZATION_MSF_LOCALIZATION_INTEG_IMPL_H_
+#pragma once
+
 
 #include <atomic>
 #include <functional>
@@ -166,4 +166,4 @@ class LocalizationIntegImpl {
 }  // namespace localization
 }  // namespace apollo
 
-#endif  // MODULES_LOCALIZATION_MSF_LOCALIZATION_INTEG_IMPL_H_
+

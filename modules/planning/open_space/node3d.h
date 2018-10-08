@@ -18,8 +18,8 @@
  * @file
  */
 
-#ifndef MODULES_PLANNING_OPEN_SPACE_NODE3D_H_
-#define MODULES_PLANNING_OPEN_SPACE_NODE3D_H_
+#pragma once
+
 
 #include <math.h>
 #include <memory>
@@ -93,4 +93,4 @@ class Node3d {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_OPEN_SPACE_NODE3D_H_
+

@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_FUSION_APP_OBSTACLE_MULTI_SENSOR_FUSION_H_
-#define MODULES_PERCEPTION_FUSION_APP_OBSTACLE_MULTI_SENSOR_FUSION_H_
+#pragma once
+
 #include <mutex>
 #include <string>
 #include <vector>
@@ -51,4 +51,4 @@ class ObstacleMultiSensorFusion {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_FUSION_APP_OBSTACLE_MULTI_SENSOR_FUSION_H_
+

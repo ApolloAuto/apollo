@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_DREAMVIEW_BACKEND_HMI_HMI_H_
-#define MODULES_DREAMVIEW_BACKEND_HMI_HMI_H_
+#pragma once
+
 
 #include <memory>
 #include <mutex>
@@ -69,4 +69,4 @@ class HMI {
 }  // namespace dreamview
 }  // namespace apollo
 
-#endif  // MODULES_DREAMVIEW_BACKEND_HMI_HMI_H_
+

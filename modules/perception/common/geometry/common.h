@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_COMMON_GEOMETRY_COMMON_H_
-#define MODULES_PERCEPTION_COMMON_GEOMETRY_COMMON_H_
+#pragma once
+
 
 #include <algorithm>
 #include <limits>
@@ -359,4 +359,4 @@ void CalculateDistAndDirToBoundary(
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_COMMON_GEOMETRY_COMMON_H_
+

@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_LIDAR_LIB_DUMMY_DUMMY_GROUND_DETECTOR_H_
-#define MODULES_PERCEPTION_LIDAR_LIB_DUMMY_DUMMY_GROUND_DETECTOR_H_
+#pragma once
+
 
 #include <string>
 
@@ -48,4 +48,4 @@ class DummyGroundDetector : public BaseGroundDetector {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_LIDAR_LIB_DUMMY_DUMMY_GROUND_DETECTOR_H_
+

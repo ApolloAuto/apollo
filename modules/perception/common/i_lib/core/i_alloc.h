@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_COMMON_I_LIB_CORE_I_ALLOC_H_
-#define MODULES_PERCEPTION_COMMON_I_LIB_CORE_I_ALLOC_H_
+#pragma once
+
 
 #include <new>
 #include <iostream>
@@ -154,4 +154,4 @@ inline int IVerifyAlignment(const T *mem, int alignment_power = 4) {
 }  //  namespace perception
 }  //  namespace apollo
 
-#endif  // MODULES_PERCEPTION_COMMON_I_LIB_CORE_I_ALLOC_H_
+

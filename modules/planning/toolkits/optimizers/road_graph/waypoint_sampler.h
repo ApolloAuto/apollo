@@ -18,8 +18,8 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_TOOLKITS_OPTIMIZERS_ROAD_GRAPH_WAYPOINT_SAMPLER_H_
-#define MODULES_PLANNING_TOOLKITS_OPTIMIZERS_ROAD_GRAPH_WAYPOINT_SAMPLER_H_
+#pragma once
+
 
 #include <limits>
 #include <list>
@@ -75,4 +75,4 @@ class WaypointSampler {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_TOOLKITS_OPTIMIZERS_ROAD_GRAPH_WAYPOINT_SAMPLER_H_
+

@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_FUSION_LIB_DATA_FUSION_SHAPE_FUSION_PBF_SHAPE_FUSION_H_  // NOLINT
-#define MODULES_PERCEPTION_FUSION_LIB_DATA_FUSION_SHAPE_FUSION_PBF_SHAPE_FUSION_H_  // NOLINT
+#pragma once
+
 
 #include <string>
 #include "modules/perception/fusion/base/sensor_data_manager.h"
@@ -58,6 +58,3 @@ class PbfShapeFusion : public BaseShapeFusion {
 }  // namespace fusion
 }  // namespace perception
 }  // namespace apollo
-
-#endif
-// MODULES_PERCEPTION_FUSION_LIB_DATA_FUSION_SHAPE_FUSION_PBF_SHAPE_FUSION_H_

@@ -19,8 +19,7 @@
  * @brief Defines the AABox2d class.
  */
 
-#ifndef MODULES_COMMON_MATH_AABOX2D_H_
-#define MODULES_COMMON_MATH_AABOX2D_H_
+#pragma once
 
 #include <string>
 #include <vector>
@@ -226,5 +225,3 @@ class AABox2d {
 }  // namespace math
 }  // namespace common
 }  // namespace apollo
-
-#endif /* MODULES_COMMON_MATH_AABOX2D_H_ */

@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_FUSION_LIB_GATEKEEPER_PBF_GATEKEEPER_PBF_GATEKEEPER_H_  // NOLINT
-#define MODULES_PERCEPTION_FUSION_LIB_GATEKEEPER_PBF_GATEKEEPER_PBF_GATEKEEPER_H_  // NOLINT
+#pragma once
+
 
 #include <string>
 #include <vector>
@@ -70,4 +70,4 @@ class PbfGatekeeper : public BaseGatekeeper {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_FUSION_LIB_GATEKEEPER_PBF_GATEKEEPER_PBF_GATEKEEPER_H_   // NOLINT
+

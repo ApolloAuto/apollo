@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_MONITOR_HARDWARE_CAN_CAN_MONITOR_H_
-#define MODULES_MONITOR_HARDWARE_CAN_CAN_MONITOR_H_
+#pragma once
+
 
 #include <string>
 #include <vector>
@@ -33,4 +33,4 @@ class CanMonitor : public RecurrentRunner {
 }  // namespace monitor
 }  // namespace apollo
 
-#endif  // MODULES_MONITOR_HARDWARE_CAN_CAN_MONITOR_H_
+

@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_LIDAR_LIB_HDMAP_ROI_FILTER_POLYGON_SCAN_CVTER_H_
-#define MODULES_PERCEPTION_LIDAR_LIB_HDMAP_ROI_FILTER_POLYGON_SCAN_CVTER_H_
+#pragma once
+
 
 #include <algorithm>
 #include <limits>
@@ -497,4 +497,4 @@ bool PolygonScanCvter<T>::ConvertSegment(const size_t seg_id,
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_LIDAR_LIB_HDMAP_ROI_FILTER_POLYGON_SCAN_CVTER_H_
+

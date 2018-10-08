@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_MONITOR_HARDWARE_CAN_ESDCAN_ESDCAN_ERR_STR_H_
-#define MODULES_MONITOR_HARDWARE_CAN_ESDCAN_ESDCAN_ERR_STR_H_
+#pragma once
+
 
 #include "esd_can/include/ntcan.h"
 
@@ -34,4 +34,4 @@ const char *esdcan_err_to_str(NTCAN_RESULT ntstatus);
 }  // namespace monitor
 }  // namespace apollo
 
-#endif  // MODULES_MONITOR_HARDWARE_CAN_ESDCAN_ESDCAN_ERR_STR_H_
+

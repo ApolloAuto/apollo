@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_DRIVERS_RADAR_ULTRASONIC_RADAR_ULTRASONIC_RADAR_CANBUS_COMPONENT_H_  // NOLINT
-#define MODULES_DRIVERS_RADAR_ULTRASONIC_RADAR_ULTRASONIC_RADAR_CANBUS_COMPONENT_H_  // NOLINT
+#pragma once
+
 
 #include <memory>
 
@@ -44,6 +44,3 @@ CYBERTRON_REGISTER_COMPONENT(UltrasonicRadarCanbusComponent)
 }  // namespace ultrasonic_radar
 }  // namespace drivers
 }  // namespace apollo
-
-#endif // MODULES_DRIVERS_RADAR_ULTRASONIC_RADAR_ULTRASONIC_RADAR_CANBUS_COMPONENT_H_  // NOLINT
-

@@ -19,8 +19,8 @@
  * @brief Use container manager to manage all containers
  */
 
-#ifndef MODULES_PREDICTION_CONTAINER_CONTAINER_MANAGER_H_
-#define MODULES_PREDICTION_CONTAINER_CONTAINER_MANAGER_H_
+#pragma once
+
 
 #include <map>
 #include <memory>
@@ -93,4 +93,4 @@ class ContainerManager {
 }  // namespace prediction
 }  // namespace apollo
 
-#endif  // MODULES_PREDICTION_CONTAINER_CONTAINER_MANAGER_H_
+

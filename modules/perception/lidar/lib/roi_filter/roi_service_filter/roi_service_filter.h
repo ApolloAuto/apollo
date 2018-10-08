@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_LIDAR_LIB_ROI_SERVICE_FILTER_H_
-#define MODULES_PERCEPTION_LIDAR_LIB_ROI_SERVICE_FILTER_H_
+#pragma once
+
 
 #include <string>
 
@@ -46,4 +46,4 @@ class ROIServiceFilter : public BaseROIFilter {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_LIDAR_LIB_ROI_SERVICE_FILTER_H_
+

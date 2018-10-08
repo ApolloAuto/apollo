@@ -18,8 +18,8 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_LATTICE_BEHAVIOR_PREDICTION_QUERIER_H_
-#define MODULES_PLANNING_LATTICE_BEHAVIOR_PREDICTION_QUERIER_H_
+#pragma once
+
 
 #include <memory>
 #include <string>
@@ -58,4 +58,4 @@ class PredictionQuerier {
 }  // namespace planning
 }  // namespace apollo
 
-#endif /* MODULES_PLANNING_LATTICE_BEHAVIOR_PREDICTION_QUERIER_H_ */
+

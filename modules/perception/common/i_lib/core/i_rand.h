@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_COMMON_I_LIB_CORE_I_RAND_H_
-#define MODULES_PERCEPTION_COMMON_I_LIB_CORE_I_RAND_H_
+#pragma once
+
 
 #include "modules/perception/common/i_lib/core/i_basic.h"
 
@@ -105,4 +105,4 @@ template <typename T> inline void IRandomizedShuffle1(T *A, int n, int *s) {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_COMMON_I_LIB_CORE_I_RAND_H_
+

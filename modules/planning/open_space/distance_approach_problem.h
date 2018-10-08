@@ -18,8 +18,8 @@
  * @file
  */
 
-#ifndef MODULES_PLANNING_OPEN_SPACE_DISTANCE_APPROACH_PROBLEM_H_
-#define MODULES_PLANNING_OPEN_SPACE_DISTANCE_APPROACH_PROBLEM_H_
+#pragma once
+
 
 #include <vector>
 
@@ -89,4 +89,4 @@ class DistanceApproachProblem {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_OPEN_SPACE_DISTANCE_APPROACH_PROBLEM_H_
+

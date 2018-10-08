@@ -18,8 +18,8 @@
  * spiral_reference_line_smoother.h
  */
 
-#ifndef MODULES_PLANNING_REFERENCE_LINE_SPIRAL_REFERENCE_LINE_SMOOTHER_H_
-#define MODULES_PLANNING_REFERENCE_LINE_SPIRAL_REFERENCE_LINE_SMOOTHER_H_
+#pragma once
+
 
 #include <vector>
 
@@ -106,4 +106,4 @@ class SpiralReferenceLineSmoother : public ReferenceLineSmoother {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_REFERENCE_LINE_SPIRAL_REFERENCE_LINE_SMOOTHER_H_
+

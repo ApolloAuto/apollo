@@ -19,8 +19,8 @@
  * @brief Defines the PIDController class.
  */
 
-#ifndef MODULES_CONTROL_COMMON_PID_CONTROLLER_H_
-#define MODULES_CONTROL_COMMON_PID_CONTROLLER_H_
+#pragma once
+
 
 #include "modules/control/proto/pid_conf.pb.h"
 
@@ -106,4 +106,4 @@ class PIDController {
 }  // namespace control
 }  // namespace apollo
 
-#endif  // MODULES_CONTROL_COMMON_PID_CONTROLLER_H_
+

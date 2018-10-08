@@ -18,8 +18,8 @@
  * @points_downsampler
  */
 
-#ifndef MODULES_COMMON_UTIL_POINTS_DOWNSAMPLER_H_
-#define MODULES_COMMON_UTIL_POINTS_DOWNSAMPLER_H_
+#pragma once
+
 
 #include <cmath>
 #include <vector>
@@ -168,4 +168,4 @@ std::vector<int> DownsampleByDistance(const Points &points,
 }  // namespace common
 }  // namespace apollo
 
-#endif  // MODULES_COMMON_UTIL_POINTS_DOWNSAMPLER_H_
+

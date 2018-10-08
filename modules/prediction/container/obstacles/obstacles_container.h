@@ -19,8 +19,8 @@
  * @brief Obstacles container
  */
 
-#ifndef MODULES_PREDICTION_CONTAINER_OBSTACLES_OBSTACLES_CONTAINER_H_
-#define MODULES_PREDICTION_CONTAINER_OBSTACLES_OBSTACLES_CONTAINER_H_
+#pragma once
+
 
 #include <vector>
 
@@ -103,4 +103,4 @@ class ObstaclesContainer : public Container {
 }  // namespace prediction
 }  // namespace apollo
 
-#endif  // MODULES_PREDICTION_CONTAINER_OBSTACLES_OBSTACLES_CONTAINER_H_
+

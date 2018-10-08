@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_BASE_POINT_H_
-#define MODULES_PERCEPTION_BASE_POINT_H_
+#pragma once
+
 
 #include <cfloat>
 #include <cstdint>
@@ -89,4 +89,4 @@ struct Point3D {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_BASE_POINT_H_
+

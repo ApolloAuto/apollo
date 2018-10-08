@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_DRIVERS_CAMERA_CAMERA_COMPONENT_H_
-#define MODULES_DRIVERS_CAMERA_CAMERA_COMPONENT_H_
+#pragma once
+
 
 #include <memory>
 
@@ -56,4 +56,4 @@ CYBERTRON_REGISTER_COMPONENT(CameraComponent)
 }  // namespace drivers
 }  // namespace apollo
 
-#endif  // MODULES_DRIVERS_CAMERA_CAMERA_COMPONENT_H_
+

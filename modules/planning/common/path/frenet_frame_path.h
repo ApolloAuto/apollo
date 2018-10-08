@@ -18,8 +18,8 @@
  * @file frenet_frame_path.h
  **/
 
-#ifndef MODULES_PLANNING_COMMON_PATH_FRENET_FRAME_PATH_H_
-#define MODULES_PLANNING_COMMON_PATH_FRENET_FRAME_PATH_H_
+#pragma once
+
 
 #include <vector>
 
@@ -67,4 +67,4 @@ class FrenetFramePath {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_COMMON_PATH_FRENET_FRAME_PATH_H_
+

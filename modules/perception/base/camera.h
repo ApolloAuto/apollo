@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_BASE_CAMERA_H_
-#define MODULES_PERCEPTION_BASE_CAMERA_H_
+#pragma once
+
 
 #include <memory>
 #include <string>
@@ -79,4 +79,4 @@ typedef std::shared_ptr<const PinholeCameraModel> PinholeCameraModelConstPtr;
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_BASE_CAMERA_H_
+

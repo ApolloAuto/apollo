@@ -18,8 +18,8 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_LATTICE_TRAJECTORY1D_PIECEWISE_JERK_TRAJECTORY1D_H_
-#define MODULES_PLANNING_LATTICE_TRAJECTORY1D_PIECEWISE_JERK_TRAJECTORY1D_H_
+#pragma once
+
 
 #include <vector>
 #include <string>
@@ -60,4 +60,4 @@ class PiecewiseJerkTrajectory1d : public Curve1d {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_LATTICE_TRAJECTORY1D_PIECEWISE_JERK_TRAJECTORY1D_H_
+

@@ -19,8 +19,8 @@
  * @brief This file provides the declaration of the class "NaviPlanner".
  */
 
-#ifndef MODULES_PLANNING_PLANNER_NAVI_NAVI_PLANNER_H_
-#define MODULES_PLANNING_PLANNER_NAVI_NAVI_PLANNER_H_
+#pragma once
+
 
 #include <memory>
 #include <string>
@@ -123,4 +123,4 @@ class NaviPlanner : public PlannerWithReferenceLine {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_PLANNER_NAVI_NAVI_PLANNER_H_
+

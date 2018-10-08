@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_TOOLS_VISUALIZER_ABSTRACTCAMERA_H_
-#define MODULES_TOOLS_VISUALIZER_ABSTRACTCAMERA_H_
+#pragma once
+
 
 #include <QMatrix4x4>
 #include <QVector3D>
@@ -150,4 +150,4 @@ class AbstractCamera {
   QMatrix4x4 model_view_mat_;
 };
 
-#endif  // MODULES_TOOLS_VISUALIZER_ABSTRACTCAMERA_H_
+

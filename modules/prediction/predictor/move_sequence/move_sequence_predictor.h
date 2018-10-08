@@ -19,8 +19,8 @@
  * @brief Define move sequence predictor
  */
 
-#ifndef MODULES_PREDICTION_PREDICTOR_MOVE_SEQUENCE_MOVE_SEQUENCE_PREDICTOR_H_
-#define MODULES_PREDICTION_PREDICTOR_MOVE_SEQUENCE_MOVE_SEQUENCE_PREDICTOR_H_
+#pragma once
+
 
 #include <array>
 #include <string>
@@ -90,4 +90,4 @@ class MoveSequencePredictor : public SequencePredictor {
 }  // namespace prediction
 }  // namespace apollo
 
-#endif  // MODULES_PREDICTION_PREDICTOR_MOVE_SEQUENCE_MOVE_SEQUENCE_PREDICTOR_H_
+

@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_FUSION_BASE_SENSOR_H_
-#define MODULES_PERCEPTION_FUSION_BASE_SENSOR_H_
+#pragma once
+
 
 #include <deque>
 #include <memory>
@@ -84,4 +84,4 @@ class Sensor : public std::enable_shared_from_this<Sensor> {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_FUSION_BASE_SENSOR_H_
+

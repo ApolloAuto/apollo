@@ -18,8 +18,8 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_TOOLKITS_OPTIMIZERS_DP_POLY_PATH_COMPARABLE_COST_H_
-#define MODULES_PLANNING_TOOLKITS_OPTIMIZERS_DP_POLY_PATH_COMPARABLE_COST_H_
+#pragma once
+
 
 #include <cmath>
 #include <cstdlib>
@@ -119,4 +119,4 @@ class ComparableCost {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_TOOLKITS_OPTIMIZERS_DP_POLY_PATH_COMPARABLE_COST_H_
+

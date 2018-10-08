@@ -19,8 +19,8 @@
  * @brief Defines the CanClientFactory class.
  */
 
-#ifndef MODULES_DRIVERS_CANBUS_CAN_CLIENT_CAN_CLIENT_FACTORY_H_
-#define MODULES_DRIVERS_CANBUS_CAN_CLIENT_CAN_CLIENT_FACTORY_H_
+#pragma once
+
 
 #include <memory>
 #include <unordered_map>
@@ -69,4 +69,4 @@ class CanClientFactory
 }  // namespace drivers
 }  // namespace apollo
 
-#endif  // MODULES_DRIVERS_CANBUS_CAN_CLIENT_CAN_CLIENT_FACTORY_H_
+

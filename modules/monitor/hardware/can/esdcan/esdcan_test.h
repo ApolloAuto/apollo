@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_MONITOR_HARDWARE_CAN_ESDCAN_ESDCAN_TEST_H_
-#define MODULES_MONITOR_HARDWARE_CAN_ESDCAN_ESDCAN_TEST_H_
+#pragma once
+
 
 #include <ostream>
 #include <string>
@@ -76,4 +76,4 @@ class EsdCanDetails : public ::apollo::monitor::HwCheckResultDetails {
 }  // namespace monitor
 }  // namespace apollo
 
-#endif  // MODULES_MONITOR_HARDWARE_CAN_ESDCAN_ESDCAN_TEST_H_
+

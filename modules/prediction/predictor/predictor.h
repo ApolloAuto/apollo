@@ -19,8 +19,8 @@
  * @brief Define the predictor base class
  */
 
-#ifndef MODULES_PREDICTION_PREDICTOR_PREDICTOR_H_
-#define MODULES_PREDICTION_PREDICTOR_PREDICTOR_H_
+#pragma once
+
 
 #include <vector>
 
@@ -114,4 +114,4 @@ class Predictor {
 }  // namespace prediction
 }  // namespace apollo
 
-#endif  // MODULES_PREDICTION_PREDICTOR_PREDICTOR_H_
+

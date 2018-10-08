@@ -19,8 +19,8 @@
  * @brief The pcl types.
  */
 
-#ifndef MODULES_LOCALIZATION_MSF_COMMON_POINT_TYPES_H_
-#define MODULES_LOCALIZATION_MSF_COMMON_POINT_TYPES_H_
+#pragma once
+
 
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
@@ -95,4 +95,4 @@ POINT_CLOUD_REGISTER_POINT_STRUCT(
     (double, x, x)(double, y, y)(double, z, z)(uint8_t, intensity, intensity)(
         uint8_t, ring, ring)(double, timestamp, timestamp))
 
-#endif  // MODULES_LOCALIZATION_MSF_COMMON_POINT_TYPES_H_
+

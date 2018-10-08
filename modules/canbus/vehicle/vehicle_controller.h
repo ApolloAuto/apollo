@@ -19,8 +19,8 @@
  * @brief The class of VehicleController
  */
 
-#ifndef MODULES_CANBUS_VEHICLE_CONTROLLER_H_
-#define MODULES_CANBUS_VEHICLE_CONTROLLER_H_
+#pragma once
+
 
 #include <unordered_map>
 
@@ -165,4 +165,4 @@ class VehicleController {
 }  // namespace canbus
 }  // namespace apollo
 
-#endif  // MODULES_CANBUS_VEHICLE_CONTROLLER_H_
+

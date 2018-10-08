@@ -19,8 +19,8 @@
  * @brief The class of LocalizationIntegParam
  */
 
-#ifndef MODULES_LOCALIZATION_MSF_LOCALIZATION_PARAMS_H_
-#define MODULES_LOCALIZATION_MSF_LOCALIZATION_PARAMS_H_
+#pragma once
+
 
 #include <memory>
 #include <string>
@@ -107,4 +107,4 @@ class LocalizationResult {
 }  // namespace localization
 }  // namespace apollo
 
-#endif  // MODULES_LOCALIZATION_MSF_LOCALIZATION_PARAMS_H_
+

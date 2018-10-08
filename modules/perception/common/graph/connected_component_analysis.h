@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_COMMON_GRAPH_CONNECTED_COMPONENT_ANALYSIS_H_
-#define MODULES_PERCEPTION_COMMON_GRAPH_CONNECTED_COMPONENT_ANALYSIS_H_
+#pragma once
+
 
 #include <queue>
 #include <vector>
@@ -72,4 +72,4 @@ void ConnectedComponentAnalysis(const std::vector<std::vector<int>>& graph,
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_COMMON_GRAPH_CONNECTED_COMPONENT_ANALYSIS_H_
+

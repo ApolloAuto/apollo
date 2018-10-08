@@ -19,8 +19,8 @@
  * @brief The class of MeasureRepublishProcess
  */
 
-#ifndef MODULES_LOCALIZATION_MSF_MEASURE_REPUBLISH_PROCESS_H_
-#define MODULES_LOCALIZATION_MSF_MEASURE_REPUBLISH_PROCESS_H_
+#pragma once
+
 
 #include <cmath>
 #include <cstdint>
@@ -114,4 +114,4 @@ class MeasureRepublishProcess {
 }  // namespace localization
 }  // namespace apollo
 
-#endif  // MODULES_LOCALIZATION_MSF_MEASURE_REPUBLISH_PROCESS_H_
+

@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_LIDAR_LIB_DUMMY_MULTI_TARGET_TRACKER_H_
-#define MODULES_PERCEPTION_LIDAR_LIB_DUMMY_MULTI_TARGET_TRACKER_H_
+#pragma once
+
 
 #include <string>
 #include <vector>
@@ -52,4 +52,4 @@ class DummyMultiTargetTracker : public BaseMultiTargetTracker {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_LIDAR_LIB_DUMMY_MULTI_TARGET_TRACKER_H_
+

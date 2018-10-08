@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_ONBOARD_COMPONENT_LIDAR_COMMON_FLAGS_H_
-#define MODULES_PERCEPTION_ONBOARD_COMPONENT_LIDAR_COMMON_FLAGS_H_
+#pragma once
+
 
 #include <gflags/gflags.h>
 
@@ -36,4 +36,4 @@ DECLARE_string(obs_lidar_onboard_sensor_name);
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_ONBOARD_COMPONENT_LIDAR_COMMON_FLAGS_H_
+

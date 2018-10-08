@@ -19,8 +19,8 @@
  * @brief the class of Throttleinfo75 (for lincoln vehicle)
  */
 
-#ifndef MODULES_CANBUS_VEHICL_LINCOLN_PROTOCOL_THROTTLEINFO_75_H_
-#define MODULES_CANBUS_VEHICL_LINCOLN_PROTOCOL_THROTTLEINFO_75_H_
+#pragma once
+
 
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 #include "modules/canbus/proto/chassis_detail.pb.h"
@@ -81,4 +81,4 @@ class Throttleinfo75 : public ::apollo::drivers::canbus::ProtocolData<
 }  // namespace canbus
 }  // namespace apollo
 
-#endif  // MODULES_CANBUS_VEHICL_LINCOLN_PROTOCOL_THROTTLEINFO_75_H_
+

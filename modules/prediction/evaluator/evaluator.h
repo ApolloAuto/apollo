@@ -19,8 +19,8 @@
  * @brief Define the data container base class
  */
 
-#ifndef MODULES_PREDICTION_EVALUATOR_EVALUATOR_H_
-#define MODULES_PREDICTION_EVALUATOR_EVALUATOR_H_
+#pragma once
+
 
 #include <string>
 #include <vector>
@@ -56,4 +56,4 @@ class Evaluator {
 }  // namespace prediction
 }  // namespace apollo
 
-#endif  // MODULES_PREDICTION_EVALUATOR_EVALUATOR_H_
+

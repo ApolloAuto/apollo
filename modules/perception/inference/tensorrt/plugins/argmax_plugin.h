@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_INFERENCE_TENSORRT_PLUGINS_ARGMAX_PLUGIN_H_
-#define MODULES_PERCEPTION_INFERENCE_TENSORRT_PLUGINS_ARGMAX_PLUGIN_H_
+#pragma once
+
 
 #include <thrust/device_vector.h>
 
@@ -103,4 +103,3 @@ class ArgMax1Plugin : public nvinfer1::IPlugin {
 }  // namespace inference
 }  // namespace perception
 }  // namespace apollo
-#endif  //  MODULES_PERCEPTION_INFERENCE_TENSORRT_PLUGINS_ARGMAX_PLUGIN_H_

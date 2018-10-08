@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_LIDAR_LIB_TRACKER_HM_TRACKER_HM_MULTI_TARGET_TRACKER_H_  // NOLINT
-#define MODULES_PERCEPTION_LIDAR_LIB_TRACKER_HM_TRACKER_HM_MULTI_TARGET_TRACKER_H_  // NOLINT
+#pragma once
+
 
 #include <string>
 #include <vector>
@@ -131,4 +131,3 @@ class HmMultiTargetTracker : public BaseMultiTargetTracker {
 }  // namespace perception
 }  // namespace apollo
 
-#endif

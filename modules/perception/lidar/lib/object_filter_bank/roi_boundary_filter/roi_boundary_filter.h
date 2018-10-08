@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_LIDAR_LIB_OBJECT_FILTER_BANK_ROI_BOUNDARY_FILTER_H_
-#define MODULES_PERCEPTION_LIDAR_LIB_OBJECT_FILTER_BANK_ROI_BOUNDARY_FILTER_H_
+#pragma once
+
 
 #include <string>
 #include <vector>
@@ -83,5 +83,3 @@ class ROIBoundaryFilter : public BaseObjectFilter {
 }  // namespace lidar
 }  // namespace perception
 }  // namespace apollo
-
-#endif

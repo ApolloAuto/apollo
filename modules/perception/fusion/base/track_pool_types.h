@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_FUSION_BASE_TRACK_POOL_TYPES_H_
-#define MODULES_PERCEPTION_FUSION_BASE_TRACK_POOL_TYPES_H_
+#pragma once
+
 
 #include "modules/perception/base/concurrent_object_pool.h"
 #include "modules/perception/fusion/base/track.h"
@@ -38,4 +38,4 @@ typedef base::ConcurrentObjectPool<Track, kTrackPoolSize, TrackInitializer>
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_FUSION_BASE_TRACK_POOL_TYPES_H_
+

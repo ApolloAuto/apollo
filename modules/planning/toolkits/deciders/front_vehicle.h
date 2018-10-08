@@ -18,8 +18,8 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_TOOLKITS_DECIDERS_FRONT_VEHICLE_H_
-#define MODULES_PLANNING_TOOLKITS_DECIDERS_FRONT_VEHICLE_H_
+#pragma once
+
 
 #include <string>
 
@@ -52,4 +52,4 @@ class FrontVehicle : public TrafficRule {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_TOOLKITS_DECIDERS_FRONT_VEHICLE_H_
+

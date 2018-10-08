@@ -18,8 +18,8 @@
  * @file
  */
 
-#ifndef MODULES_PREDICTION_PREDICTOR_EMPTY_EMPTY_PREDICTOR_H_
-#define MODULES_PREDICTION_PREDICTOR_EMPTY_EMPTY_PREDICTOR_H_
+#pragma once
+
 
 #include "modules/prediction/predictor/predictor.h"
 
@@ -48,4 +48,4 @@ class EmptyPredictor : public Predictor {
 }  // namespace prediction
 }  // namespace apollo
 
-#endif  // MODULES_PREDICTION_PREDICTOR_EMPTY_EMPTY_PREDICTOR_H_
+

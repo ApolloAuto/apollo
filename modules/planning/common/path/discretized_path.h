@@ -18,8 +18,8 @@
  * @file discretized_path.h
  **/
 
-#ifndef MODULES_PLANNING_COMMON_PATH_DISCRETIZED_PATH_H_
-#define MODULES_PLANNING_COMMON_PATH_DISCRETIZED_PATH_H_
+#pragma once
+
 
 #include <vector>
 
@@ -62,4 +62,4 @@ class DiscretizedPath {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_COMMON_PATH_PATH_H_
+

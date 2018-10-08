@@ -18,8 +18,8 @@
  * @file spline_2d_constraint.h
  **/
 
-#ifndef MODULES_PLANNING_SMOOTHING_SPLINE_SPLINE_2D_CONSTRAINT_H_
-#define MODULES_PLANNING_SMOOTHING_SPLINE_SPLINE_2D_CONSTRAINT_H_
+#pragma once
+
 
 #include <vector>
 #include "Eigen/Core"
@@ -129,4 +129,4 @@ class Spline2dConstraint {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_SMOOTHING_SPLINE_SPLINE_2D_CONSTRAINT_H_
+

@@ -19,8 +19,8 @@
  * @brief: Definition of PiecewiseLinearKernel class
  **/
 
-#ifndef MODULES_PLANNING_MATH_SMOOTHING_SPLINE_PIECEWISE_LINEAR_KERNEL_H_
-#define MODULES_PLANNING_MATH_SMOOTHING_SPLINE_PIECEWISE_LINEAR_KERNEL_H_
+#pragma once
+
 
 #include <vector>
 
@@ -59,4 +59,4 @@ class PiecewiseLinearKernel {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_MATH_SMOOTHING_SPLINE_PIECEWISE_LINEAR_KERNEL_H_
+

@@ -19,8 +19,8 @@
  * @brief Some map util functions.
  */
 
-#ifndef MODULES_COMMON_UTIL_MAP_UTIL_H_
-#define MODULES_COMMON_UTIL_MAP_UTIL_H_
+#pragma once
+
 
 #include "google/protobuf/stubs/map_util.h"
 
@@ -75,4 +75,4 @@ using google::protobuf::AppendValuesFromMap;
 }  // namespace common
 }  // namespace apollo
 
-#endif  // MODULES_COMMON_UTIL_MAP_UTIL_H_
+

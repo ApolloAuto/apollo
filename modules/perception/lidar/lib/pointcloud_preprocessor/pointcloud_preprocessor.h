@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_LIDAR_LIB_POINTCLOUD_PREPROCESSOR_POINTCLOUD_PREPROCESSOR_H_  // NOLINT
-#define MODULES_PERCEPTION_LIDAR_LIB_POINTCLOUD_PREPROCESSOR_POINTCLOUD_PREPROCESSOR_H_  // NOLINT
+#pragma once
+
 
 #include <memory>
 #include <string>
@@ -77,4 +77,3 @@ class PointCloudPreprocessor {
 }  // namespace perception
 }  // namespace apollo
 
-#endif

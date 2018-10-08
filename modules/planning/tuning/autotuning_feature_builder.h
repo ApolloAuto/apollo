@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PLANNING_TUNING_AUTOTUNING_FEATURE_BUILDER_H_
-#define MODULES_PLANNING_TUNING_AUTOTUNING_FEATURE_BUILDER_H_
+#pragma once
+
 
 #include "modules/common/status/status.h"
 #include "modules/planning/proto/auto_tuning_model_input.pb.h"
@@ -55,4 +55,4 @@ class AutotuningFeatureBuilder {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_TUNING_AUTOTUNING_FEATURE_BUILDER_H_
+

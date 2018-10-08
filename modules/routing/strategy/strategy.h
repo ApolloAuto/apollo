@@ -14,8 +14,8 @@
   * limitations under the License.
   *****************************************************************************/
 
-#ifndef MODULES_ROUTING_STRATEGY_STRATEGY_H_
-#define MODULES_ROUTING_STRATEGY_STRATEGY_H_
+#pragma once
+
 
 #include <unordered_set>
 #include <vector>
@@ -39,4 +39,4 @@ class Strategy {
 }  // namespace routing
 }  // namespace apollo
 
-#endif  // MODULES_ROUTING_STRATEGY_STRATEGY_H_
+

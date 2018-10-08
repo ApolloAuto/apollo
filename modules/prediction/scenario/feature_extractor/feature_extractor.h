@@ -18,8 +18,8 @@
  * @file
  */
 
-#ifndef MODULES_PREDICTION_SCENARIO_FEATURE_EXTRACTOR_FEATURE_EXTRACTOR_H_
-#define MODULES_PREDICTION_SCENARIO_FEATURE_EXTRACTOR_FEATURE_EXTRACTOR_H_
+#pragma once
+
 
 #include <memory>
 #include <vector>
@@ -82,4 +82,4 @@ class FeatureExtractor {
 }  // namespace prediction
 }  // namespace apollo
 
-#endif /* MODULES_PREDICTION_SCENARIO_FEATURE_EXTRACTOR_FEATURE_EXTRACTOR_H_ */
+

@@ -18,8 +18,8 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_SCENARIOS_LANE_FOLLOW_SCENARIO_H_
-#define MODULES_PLANNING_SCENARIOS_LANE_FOLLOW_SCENARIO_H_
+#pragma once
+
 
 #include <memory>
 #include <string>
@@ -88,4 +88,4 @@ class LaneFollowScenario : public Scenario {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_SCENARIOS_LANE_FOLLOW_SCENARIO_H_
+

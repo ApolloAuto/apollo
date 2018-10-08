@@ -19,8 +19,8 @@
  * @brief Defines the EulerAnglesZXY class.
  */
 
-#ifndef MODULES_COMMON_MATH_EULER_ANGLES_ZXY_H_
-#define MODULES_COMMON_MATH_EULER_ANGLES_ZXY_H_
+#pragma once
+
 
 // TODO(all): should use Angle class internally.
 
@@ -184,4 +184,4 @@ using EulerAnglesZXYd = EulerAnglesZXY<double>;
 }  // namespace common
 }  // namespace apollo
 
-#endif /* MODULES_COMMON_MATH_EULER_ANGLES_ZXY_H_ */
+

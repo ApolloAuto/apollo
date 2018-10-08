@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_COMMON_GEOMETRY_ROI_FILTER_H_
-#define MODULES_PERCEPTION_COMMON_GEOMETRY_ROI_FILTER_H_
+#pragma once
+
 
 #include <memory>
 #include <vector>
@@ -60,4 +60,4 @@ bool ObjectInRoiSlackCheck(
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_COMMON_GEOMETRY_ROI_FILTER_H_
+

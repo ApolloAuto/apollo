@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_TOOLS_VISUALIZER_PLANE_H_
-#define MODULES_TOOLS_VISUALIZER_PLANE_H_
+#pragma once
+
 
 #include <memory>
 #include "modules/tools/visualizer/renderable_object.h"
@@ -57,4 +57,4 @@ class Plane : public RenderableObject {
   std::shared_ptr<Texture> texture_;
 };
 
-#endif  // MODULES_TOOLS_VISUALIZER_PLANE_H_
+

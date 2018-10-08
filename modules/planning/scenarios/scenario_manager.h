@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PLANNING_SCENARIOS_SCENARIO_MANAGER_H_
-#define MODULES_PLANNING_SCENARIOS_SCENARIO_MANAGER_H_
+#pragma once
+
 
 #include <memory>
 #include <set>
@@ -54,4 +54,4 @@ class ScenarioManager final {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_SCENARIOS_SCENARIO_MANAGER_H_
+

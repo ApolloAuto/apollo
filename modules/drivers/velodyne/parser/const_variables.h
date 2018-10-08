@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_DRIVERS_VELODYNE_PARSER_CONST_VARIABLES_H_
-#define MODULES_DRIVERS_VELODYNE_PARSER_CONST_VARIABLES_H_
+#pragma once
+
 
 #include <iostream>
 
@@ -268,4 +268,4 @@ const float INNER_TIME_128[12][32] = {
 }  // namespace drivers
 }  // namespace apollo
 
-#endif  // MODULES_DRIVERS_VELODYNE_PARSER_CONST_VARIABLES_H_
+

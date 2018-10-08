@@ -18,8 +18,7 @@
  * @file
  */
 
-#ifndef MODEULES_THIRD_PARTY_PERCEPTION_THIRD_PARTY_PERCEPTION_UTIL_H_
-#define MODEULES_THIRD_PARTY_PERCEPTION_THIRD_PARTY_PERCEPTION_UTIL_H_
+#pragma once
 
 #include <cmath>
 
@@ -79,5 +78,3 @@ double HeadingDifference(const double theta1, const double theta2);
 
 }  // namespace third_party_perception
 }  // namespace apollo
-
-#endif  // MODULES_THIRD_PARTY_PERCEPTION_THIRD_PARTY_PERCEPTION_UTIL_H_

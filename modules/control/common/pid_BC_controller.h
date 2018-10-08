@@ -19,8 +19,8 @@
  * @brief Defines the PIDBCController class.
  */
 
-#ifndef MODULES_CONTROL_COMMON_PID_BACKWARD_CACULATION_CONTROLLER_H_
-#define MODULES_CONTROL_COMMON_PID_BACKWARD_CACULATION_CONTROLLER_H_
+#pragma once
+
 
 #include "modules/control/common/pid_controller.h"
 #include "modules/control/proto/pid_conf.pb.h"
@@ -56,4 +56,4 @@ class PIDBCController : public PIDController {
 }  // namespace control
 }  // namespace apollo
 
-#endif  // MODULES_CONTROL_COMMON_PID_BACKWARD_CACULATION_CONTROLLER_H_
+

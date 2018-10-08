@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PREDICTION_COMMON_PREDICTION_GFLAGS_H_
-#define MODULES_PREDICTION_COMMON_PREDICTION_GFLAGS_H_
+#pragma once
+
 
 #include "gflags/gflags.h"
 
@@ -119,4 +119,4 @@ DECLARE_double(turning_curvature_upper_bound);
 DECLARE_double(speed_at_lower_curvature);
 DECLARE_double(speed_at_upper_curvature);
 
-#endif  // MODULES_PREDICTION_COMMON_PREDICTION_GFLAGS_H_
+

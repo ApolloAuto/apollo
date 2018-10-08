@@ -14,8 +14,8 @@
  *permissions and limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PREDICTION_COMMON_FEATURE_OUTPUT_H_
-#define MODULES_PREDICTION_COMMON_FEATURE_OUTPUT_H_
+#pragma once
+
 
 #include "modules/prediction/proto/feature.pb.h"
 #include "modules/prediction/proto/offline_features.pb.h"
@@ -72,4 +72,4 @@ class FeatureOutput {
 }  // namespace prediction
 }  // namespace apollo
 
-#endif  // MODULES_PREDICTION_COMMON_FEATURE_OUTPUT_H_
+

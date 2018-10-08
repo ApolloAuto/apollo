@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_TOOLS_VISUALIZER_FIXEDASPECTRATIOWIDGET_H_
-#define MODULES_TOOLS_VISUALIZER_FIXEDASPECTRATIOWIDGET_H_
+#pragma once
+
 
 #include <QTimer>
 #include <QWidget>
@@ -52,4 +52,4 @@ class FixedAspectRatioWidget : public QWidget {
   VideoImgViewer viewer_;
 };
 
-#endif  // MODULES_TOOLS_VISUALIZER_FIXEDASPECTRATIOWIDGET_H_
+

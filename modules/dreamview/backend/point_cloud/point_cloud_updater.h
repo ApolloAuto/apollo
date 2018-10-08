@@ -18,8 +18,8 @@
  * @file
  */
 
-#ifndef MODULES_DREAMVIEW_BACKEND_POINT_CLOUD_POINT_CLOUD_UPDATER_H_
-#define MODULES_DREAMVIEW_BACKEND_POINT_CLOUD_POINT_CLOUD_UPDATER_H_
+#pragma once
+
 
 #include <atomic>
 #include <future>
@@ -114,4 +114,4 @@ class PointCloudUpdater {
 }  // namespace dreamview
 }  // namespace apollo
 
-#endif  // MODULES_DREAMVIEW_BACKEND_POINT_CLOUD_POINT_CLOUD_UPDATER_H_
+

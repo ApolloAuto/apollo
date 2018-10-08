@@ -18,8 +18,8 @@
  * @file visualization_manager.h
  * @brief
  */
-#ifndef MODULES_LOCALIZATION_MSF_LOCAL_TOOL_VISUALIZATION_MANAGER_H
-#define MODULES_LOCALIZATION_MSF_LOCAL_TOOL_VISUALIZATION_MANAGER_H
+#pragma once
+
 
 #include <Eigen/Geometry>
 #include <list>
@@ -190,4 +190,4 @@ class VisualizationManager {
 }  // namespace msf
 }  // namespace localization
 }  // namespace apollo
-#endif  // MODULES_LOCALIZATION_MSF_LOCAL_TOOL_VISUALIZATION_MANAGER_H
+

@@ -34,8 +34,8 @@
  *
  *********************************************************************/
 
-#ifndef MODULES_DRIVERS_CAMERA_USB_CAM_H_
-#define MODULES_DRIVERS_CAMERA_USB_CAM_H_
+#pragma once
+
 
 #include <asm/types.h> /* for videodev2.h */
 #include <malloc.h>
@@ -168,5 +168,3 @@ class UsbCam {
 }  // namespace camera
 }  // namespace drivers
 }  // namespace apollo
-
-#endif  // ONBOARD_DRIVERS_CAMERAERA_INCLUDE_USB_CAMERA_CAMERA_DEVICE_H

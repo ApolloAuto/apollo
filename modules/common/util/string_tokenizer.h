@@ -19,8 +19,8 @@
  * @brief Defines the StringTokenizer class
  */
 
-#ifndef MODULES_COMMON_UTIL_STRING_TOKENIZER_H_
-#define MODULES_COMMON_UTIL_STRING_TOKENIZER_H_
+#pragma once
+
 
 #include <string>
 #include <vector>
@@ -85,4 +85,4 @@ class StringTokenizer {
 }  // namespace common
 }  // namespace apollo
 
-#endif /* MODULES_COMMON_UTIL_STRING_TOKENIZER_H_ */
+

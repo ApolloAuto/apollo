@@ -13,8 +13,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 =========================================================================*/
 
-#ifndef MODULES_MAP_HDMAP_ADAPTER_PROTO_ORGANIZER_H_
-#define MODULES_MAP_HDMAP_ADAPTER_PROTO_ORGANIZER_H_
+#pragma once
+
 
 #include <string>
 #include <unordered_map>
@@ -81,4 +81,4 @@ class ProtoOrganizer {
 }  // namespace hdmap
 }  // namespace apollo
 
-#endif  // MODULES_MAP_HDMAP_ADAPTER_PROTO_ORGANIZER_H_
+
