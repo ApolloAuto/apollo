@@ -100,10 +100,18 @@ void MoveSequencePredictor::Predict(Obstacle* obstacle) {
          << trajectories_.size() << " trajectories.";
 }
 
+/**
+  * For this function:
+  * Input: obstacle status, lane-sequence, the total time of prediction,
+  *        and the time interval between two adjacent points when plotting.
+  * Output: A vector of TrajectoryPoint
+*/
 void MoveSequencePredictor::DrawMoveSequenceTrajectoryPoints(
     const Obstacle& obstacle, const LaneSequence& lane_sequence,
     const double total_time, const double period,
     std::vector<TrajectoryPoint>* points) {
+
+  // Sanity check
   points->clear();
   const Feature& feature = obstacle.latest_feature();
   if (!feature.has_position() || !feature.has_velocity() ||
@@ -113,6 +121,7 @@ void MoveSequencePredictor::DrawMoveSequenceTrajectoryPoints(
     return;
   }
 
+  //
   Eigen::Vector2d position(feature.position().x(), feature.position().y());
   double time_to_lat_end_state =
       std::max(FLAGS_default_time_to_lat_end_state,
@@ -284,18 +293,27 @@ bool MoveSequencePredictor::GetLateralPolynomial(
 
 double MoveSequencePredictor::ComputeTimeToLatEndConditionByVelocity(
     const Obstacle& obstacle, const LaneSequence& lane_sequence) {
+  // Sanity check.
   CHECK_GT(obstacle.history_size(), 0);
   CHECK_GT(lane_sequence.lane_segment_size(), 0);
   CHECK_GT(lane_sequence.lane_segment(0).lane_point_size(), 0);
+
+  // Get the obstacle's Cartesian v_x, v_y.
+  // Get the lane point's Cartesian angle, relative distance.
+  // Then project the obstacle's velocity onto Frenet coordinate to get
+  // lateral velocity v_l.
   const Feature& feature = obstacle.latest_feature();
   const LanePoint& first_lane_point =
       lane_sequence.lane_segment(0).lane_point(0);
   double v_x = feature.velocity().x();
   double v_y = feature.velocity().y();
-
   double lane_heading = first_lane_point.heading();
   double lane_l = first_lane_point.relative_l();
   double v_l = v_y * std::cos(lane_heading) - v_x * std::sin(lane_heading);
+
+  // If laterally moving too slow or even away from lane center,
+  // then use the default speed
+  // Otherwise, directly calculate the time and return.
   if (std::fabs(v_l) < FLAGS_default_lateral_approach_speed ||
       lane_l * v_l < 0.0) {
     return std::fabs(lane_l / FLAGS_default_lateral_approach_speed);
