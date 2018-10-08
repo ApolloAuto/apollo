@@ -47,9 +47,6 @@ target_link_libraries(bounded_queue cybertron)
 add_executable(atomic_hash_map atomic_hash_map.cpp)
 target_link_libraries(atomic_hash_map cybertron)
 
-add_executable(tf2_cybertron tf2_cybertron.cpp)
-target_link_libraries(tf2_cybertron cybertron)
-
 add_subdirectory(service_discovery)
 add_subdirectory(transport)
 add_subdirectory(component)

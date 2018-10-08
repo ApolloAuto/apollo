@@ -44,20 +44,10 @@ class ObjectPool {
  public:
   using InitFunc = std::function<void(T *)>;
   template <typename... Args>
-  static ObjectPoolPtr Instance(int num_objects, Args &&... args) {
-    static ObjectPoolPtr inst = std::shared_ptr<ObjectPool<T>>(
-        new ObjectPool<T>(num_objects, std::forward<Args>(args)...));
-    return inst;
-  }
+  explicit ObjectPool(int num_objects, Args &&... args);
 
   template <typename... Args>
-  static ObjectPoolPtr Instance(int num_objects, InitFunc &&f,
-                                Args &&... args) {
-    static ObjectPoolPtr inst = std::shared_ptr<ObjectPool<T>>(
-        new ObjectPool<T>(num_objects, std::forward<InitFunc>(f),
-                          std::forward<Args>(args)...));
-    return inst;
-  }
+  explicit ObjectPool(int num_objects, InitFunc f, Args &&... args);
 
   ~ObjectPool();
   std::shared_ptr<T> GetObject();
@@ -65,12 +55,6 @@ class ObjectPool {
   void Dump();
 
  private:
-  template <typename... Args>
-  explicit ObjectPool(int num_objects, Args &&... args);
-
-  template <typename... Args>
-  explicit ObjectPool(int num_objects, InitFunc f, Args &&... args);
-
   ObjectPool(ObjectPool &) = delete;
   ObjectPool &operator=(ObjectPool &) = delete;
 

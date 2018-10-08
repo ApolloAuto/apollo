@@ -17,7 +17,7 @@ struct Test {
 
 void fpool()
 {
-  auto pool = CCObjectPool<Test>::Instance(100);
+  auto pool = new CCObjectPool<Test>(100);
 
   auto start = std::chrono::steady_clock::now();
 

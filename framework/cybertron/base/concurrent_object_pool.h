@@ -47,19 +47,9 @@ class CCObjectPool {
  public:
   using InitFunc = std::function<void(T *)>;
   template <typename... Args>
-  static CCObjectPoolPtr Instance(int size, Args &&... args) {
-    static CCObjectPoolPtr inst = std::shared_ptr<CCObjectPool<T>>(
-        new CCObjectPool<T>(size, std::forward<Args>(args)...));
-    return inst;
-  }
-
+  explicit CCObjectPool(int size, Args &&... args);
   template <typename... Args>
-  static CCObjectPoolPtr Instance(int size, InitFunc &&f, Args &&... args) {
-    static CCObjectPoolPtr inst =
-        std::shared_ptr<CCObjectPool<T>>(new CCObjectPool<T>(
-            size, std::forward<InitFunc>(f), std::forward<Args>(args)...));
-    return inst;
-  }
+  explicit CCObjectPool(int size, InitFunc f, Args &&... args);
 
   ~CCObjectPool();
   std::shared_ptr<T> GetObject();
@@ -71,11 +61,6 @@ class CCObjectPool {
   std::atomic<Head> pool_;
   Node *node_arena_;
   int num_object_;
-
-  template <typename... Args>
-  explicit CCObjectPool(int size, Args &&... args);
-  template <typename... Args>
-  explicit CCObjectPool(int size, InitFunc f, Args &&... args);
 
   CCObjectPool(CCObjectPool &) = delete;
   CCObjectPool &operator=(CCObjectPool &) = delete;
