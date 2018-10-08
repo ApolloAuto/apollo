@@ -179,10 +179,13 @@ bool ActiverSetLateralQPOptimizer::optimize(
   }
   double result[kNumParam];
   qp_problem.getPrimalSolution(result);
+  opt_d_.resize(num_var);
+  opt_d_prime_.resize(num_var);
+  opt_d_pprime_.resize(num_var);
   for (int i = 0; i < num_var; ++i) {
-    opt_d_.push_back(result[i]);
-    opt_d_prime_.push_back(result[num_var + i]);
-    opt_d_pprime_.push_back(result[2 * num_var + i]);
+    opt_d_[i] = result[i];
+    opt_d_prime_[i] = result[num_var + i];
+    opt_d_pprime_[i] = result[2 * num_var + i];
   }
   opt_d_prime_[num_var - 1] = 0.0;
   opt_d_pprime_[num_var - 1] = 0.0;
