@@ -72,14 +72,11 @@ TopicMonitor::TopicMonitor(const TopicConf &config, TopicStatus *status)
 }
 
 void TopicMonitor::RunOnce(const double current_time) {
-  if (!reader_->HasReceived()) {
-    status_->set_message_delay(-1);
-    return;
-  }
   const double delay = reader_->GetDelaySec();
-  if (delay > config_.acceptable_delay()) {
+  if (delay < 0 || delay > config_.acceptable_delay()) {
     status_->set_message_delay(delay);
   } else {
+    // Clear the field if delay is acceptable (3s by default).
     status_->clear_message_delay();
   }
 }
