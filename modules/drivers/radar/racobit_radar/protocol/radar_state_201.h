@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_DRIVERS_RADAR_RACOBIT_RADAR_PROTOCOL_RADAR_STATE_201_H_
-#define MODULES_DRIVERS_RADAR_RACOBIT_RADAR_PROTOCOL_RADAR_STATE_201_H_
+#pragma once
+
 
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 #include "modules/drivers/proto/racobit_radar.pb.h"
@@ -54,4 +54,4 @@ class RadarState201
 }  // namespace drivers
 }  // namespace apollo
 
-#endif  // MODULES_CANBUS_VEHICL_ESR_PROTOCOL_RADAR_STATE_201_H_
+

@@ -18,8 +18,8 @@
  * spiral_problem_interface.h
  */
 
-#ifndef MODULES_PLANNING_REFERENCE_LINE_SPIRAL_PROBLEM_INTERFACE_H_
-#define MODULES_PLANNING_REFERENCE_LINE_SPIRAL_PROBLEM_INTERFACE_H_
+#pragma once
+
 
 #include <vector>
 
@@ -183,4 +183,4 @@ class SpiralProblemInterface : public Ipopt::TNLP {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_REFERENCE_LINE_SPIRAL_PROBLEM_INTERFACE_H_
+

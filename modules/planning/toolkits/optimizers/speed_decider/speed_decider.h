@@ -18,8 +18,8 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_TOOLKITS_OPTIMIZERS_SPEED_DECIDER_SPEED_DECIDER_H_
-#define MODULES_PLANNING_TOOLKITS_OPTIMIZERS_SPEED_DECIDER_SPEED_DECIDER_H_
+#pragma once
+
 
 #include <string>
 
@@ -104,4 +104,4 @@ class SpeedDecider : public Task {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_TOOLKITS_OPTIMIZERS_SPEED_DECIDER_SPEED_DECIDER_H_
+

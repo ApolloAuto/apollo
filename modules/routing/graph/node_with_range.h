@@ -14,8 +14,8 @@
   * limitations under the License.
   *****************************************************************************/
 
-#ifndef MODULES_ROUTING_GRAPH_NODE_WITH_RANGE_H
-#define MODULES_ROUTING_GRAPH_NODE_WITH_RANGE_H
+#pragma once
+
 
 #include <string>
 
@@ -46,4 +46,4 @@ class NodeWithRange : public NodeSRange {
 }  // namespace routing
 }  // namespace apollo
 
-#endif  // MODULES_ROUTING_GRAPH_NODE_WITH_RANGE_H
+

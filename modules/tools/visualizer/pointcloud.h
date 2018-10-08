@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_TOOLS_VISUALIZER_POINTCLOUD_H_
-#define MODULES_TOOLS_VISUALIZER_POINTCLOUD_H_
+#pragma once
+
 
 #include <memory>
 #include "modules/drivers/proto/pointcloud.pb.h"
@@ -41,4 +41,4 @@ class PointCloud : public RenderableObject {
   GLfloat* buffer_;
 };
 
-#endif  // MODULES_TOOLS_VISUALIZER_POINTCLOUD_H_
+

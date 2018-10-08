@@ -13,8 +13,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
 
-#ifndef MODULES_CONTROL_COMMON_INTERPOLATION_1D_H_
-#define MODULES_CONTROL_COMMON_INTERPOLATION_1D_H_
+#pragma once
+
 
 #include <memory>
 #include <utility>
@@ -57,4 +57,4 @@ class Interpolation1D {
 }  // namespace control
 }  // namespace apollo
 
-#endif  // MODULES_CONTROL_COMMON_INTERPOLATION_1D_H_
+

@@ -19,8 +19,8 @@
  * @brief Defines the TrajectoryAnalyzer class.
  */
 
-#ifndef MODULES_CONTROL_COMMON_TRAJECTORY_ANALYZER_H_
-#define MODULES_CONTROL_COMMON_TRAJECTORY_ANALYZER_H_
+#pragma once
+
 
 #include <vector>
 
@@ -140,4 +140,4 @@ class TrajectoryAnalyzer {
 }  // namespace control
 }  // namespace apollo
 
-#endif  // MODULES_CONTROL_COMMON_TRAJECTORY_ANALYZER_H_
+

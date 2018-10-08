@@ -18,8 +18,8 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_LATTICE_TRAJECTORY_GENERATION_TRAJECTORY1D_GENERATOR_H_
-#define MODULES_PLANNING_LATTICE_TRAJECTORY_GENERATION_TRAJECTORY1D_GENERATOR_H_
+#pragma once
+
 
 #include <memory>
 #include <utility>
@@ -133,6 +133,3 @@ inline void Trajectory1dGenerator::GenerateTrajectory1DBundle<5>(
 
 }  // namespace planning
 }  // namespace apollo
-
-#endif
-// MODULES_PLANNING_LATTICE_TRAJECTORY_GENERATION_TRAJECTORY1D_GENERATOR_H_

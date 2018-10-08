@@ -19,8 +19,7 @@
  * @brief Search-related functions.
  */
 
-#ifndef MODULES_COMMON_MATH_SEARCH_H_
-#define MODULES_COMMON_MATH_SEARCH_H_
+#pragma once
 
 #include <functional>
 
@@ -50,4 +49,4 @@ double GoldenSectionSearch(const std::function<double(double)> &func,
 }  // namespace common
 }  // namespace apollo
 
-#endif /* MODULES_COMMON_MATH_SEARCH_H_ */
+

@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_CONTROL_CONTROL_COMPONENT_H_
-#define MODULES_CONTROL_CONTROL_COMPONENT_H_
+#pragma once
+
 
 #include <cstdio>
 #include <memory>
@@ -127,4 +127,4 @@ CYBERTRON_REGISTER_COMPONENT(ControlComponent)
 }  // namespace control
 }  // namespace apollo
 
-#endif  // MODULES_CONTROL_CONTROL_COMPONENT_H_
+

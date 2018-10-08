@@ -19,8 +19,8 @@
  * @brief Defines the EsdCanClient class which inherits CanClient.
  */
 
-#ifndef MODULES_DRIVERS_CANBUS_CAN_CLIENT_CLIENT_ESD_CAN_CLIENT_H_
-#define MODULES_DRIVERS_CANBUS_CAN_CLIENT_CLIENT_ESD_CAN_CLIENT_H_
+#pragma once
+
 
 #include <string>
 #include <vector>
@@ -108,4 +108,4 @@ class EsdCanClient : public CanClient {
 }  // namespace drivers
 }  // namespace apollo
 
-#endif  // MODULES_DRIVERS_CANBUS_CAN_CLIENT_CLIENT_ESD_CAN_CLIENT_H_
+

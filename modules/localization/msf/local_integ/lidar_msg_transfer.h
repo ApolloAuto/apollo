@@ -19,8 +19,8 @@
  * @brief The class of LidarMagTransfer
  */
 
-#ifndef MODULES_LOCALIZATION_MSF_LIDAR_MSG_TRANSFER_H_
-#define MODULES_LOCALIZATION_MSF_LIDAR_MSG_TRANSFER_H_
+#pragma once
+
 
 #include <cstdint>
 
@@ -50,4 +50,4 @@ class LidarMsgTransfer {
 }  // namespace localization
 }  // namespace apollo
 
-#endif  // MODULES_LOCALIZATION_MSF_GNSS_MSG_TRANSFER_H_
+

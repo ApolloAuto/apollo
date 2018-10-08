@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_CANBUS_VEHICLE_LEXUS_PROTOCOL_CRUISE_CONTROL_BUTTONS_CMD_108_H_
-#define MODULES_CANBUS_VEHICLE_LEXUS_PROTOCOL_CRUISE_CONTROL_BUTTONS_CMD_108_H_
+#pragma once
+
 
 #include "modules/canbus/proto/chassis_detail.pb.h"
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
@@ -122,4 +122,4 @@ class Cruisecontrolbuttonscmd108
 }  // namespace canbus
 }  // namespace apollo
 
-#endif  // MODULES_CANBUS_VEHICL_LEXUS_PROTOCOL_CRUISE_CONTROL_BUTTONS_CMD_108_H
+

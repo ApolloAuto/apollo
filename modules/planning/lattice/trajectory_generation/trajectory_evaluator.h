@@ -18,8 +18,8 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_LATTICE_TRAJECTORY_GENERATION_TRAJECTORY_EVALUATOR_H_
-#define MODULES_PLANNING_LATTICE_TRAJECTORY_GENERATION_TRAJECTORY_EVALUATOR_H_
+#pragma once
+
 
 #include <array>
 #include <functional>
@@ -163,6 +163,3 @@ class TrajectoryEvaluator {
 
 }  // namespace planning
 }  // namespace apollo
-
-#endif
-// MODULES_PLANNING_LATTICE_TRAJECTORY_GENERATION_TRAJECTORY_EVALUATOR_H_

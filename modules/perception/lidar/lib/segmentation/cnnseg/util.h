@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_LIDAR_LIB_SEGMENTATION_CNNSEG_UTIL_H_
-#define MODULES_PERCEPTION_LIDAR_LIB_SEGMENTATION_CNNSEG_UTIL_H_
+#pragma once
+
 
 #include <string>
 
@@ -61,4 +61,4 @@ inline float Pixel2Pc(int in_pixel, float in_size, float out_range) {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_LIDAR_LIB_SEGMENTATION_CNNSEG_UTIL_H_
+

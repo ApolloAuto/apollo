@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_TOOLS_VISUALIZER_TARGETCAMERA_H_
-#define MODULES_TOOLS_VISUALIZER_TARGETCAMERA_H_
+#pragma once
+
 
 #include "modules/tools/visualizer/abstract_camera.h"
 
@@ -56,4 +56,4 @@ class TargetCamera : public AbstractCamera {
   float distance_;
 };
 
-#endif  // MODULES_TOOLS_VISUALIZER_TARGETCAMERA_H_
+

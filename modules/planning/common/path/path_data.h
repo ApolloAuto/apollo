@@ -18,8 +18,8 @@
  * @file path_data.h
  **/
 
-#ifndef MODULES_PLANNING_COMMON_PATH_PATH_DATA_H_
-#define MODULES_PLANNING_COMMON_PATH_PATH_DATA_H_
+#pragma once
+
 
 #include <list>
 #include <string>
@@ -81,4 +81,4 @@ class PathData {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_COMMON_PATH_PATH_DATA_H_
+

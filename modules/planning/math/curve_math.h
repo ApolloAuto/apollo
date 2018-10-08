@@ -18,8 +18,8 @@
  * @file curve_math.h
  **/
 
-#ifndef MODULES_PLANNING_MATH_CURVE_MATH_H_
-#define MODULES_PLANNING_MATH_CURVE_MATH_H_
+#pragma once
+
 
 namespace apollo {
 namespace planning {
@@ -59,4 +59,4 @@ class CurveMath {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_MATH_CURVE_MATH_H_
+

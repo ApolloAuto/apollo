@@ -19,8 +19,8 @@
  * @brief Defines CanReceiver class.
  */
 
-#ifndef MODULES_DRIVERS_CANBUS_CAN_COMM_CAN_RECEIVER_H_
-#define MODULES_DRIVERS_CANBUS_CAN_COMM_CAN_RECEIVER_H_
+#pragma once
+
 
 #include <cmath>
 #include <iostream>
@@ -212,4 +212,4 @@ void CanReceiver<SensorType>::Stop() {
 }  // namespace drivers
 }  // namespace apollo
 
-#endif  // MODULES_DRIVERS_CANBUS_CAN_COMM_CAN_RECEIVER_H_
+

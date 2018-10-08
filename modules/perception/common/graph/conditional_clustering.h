@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_COMMON_GEOMETRY_CONDITIONAL_CLUSTERING_H_
-#define MODULES_PERCEPTION_COMMON_GEOMETRY_CONDITIONAL_CLUSTERING_H_
+#pragma once
+
 
 #include <limits>
 #include <memory>
@@ -152,4 +152,4 @@ void ConditionClustering<PointT>::Segment(IndicesClusters* xy_clusters) {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_COMMON_GEOMETRY_CONDITIONAL_CLUSTERING_H_
+

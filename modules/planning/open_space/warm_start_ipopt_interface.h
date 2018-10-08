@@ -18,8 +18,8 @@
  * @file
  */
 
-#ifndef MODULES_PLANNING_OPEN_SPACE_WARM_START_IPOPT_INTERFACE_H_
-#define MODULES_PLANNING_OPEN_SPACE_WARM_START_IPOPT_INTERFACE_H_
+#pragma once
+
 
 #include <vector>
 
@@ -130,4 +130,4 @@ class WarmStartIPOPTInterface : public Ipopt::TNLP {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_OPEN_SPACE_WARM_START_IPOPT_INTERFACE_H_
+

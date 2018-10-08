@@ -17,8 +17,8 @@
  * @file
  */
 
-#ifndef MODULES_PREDICTION_PREDICTOR_SINGLE_LANE_SINGLE_LANE_PREDICTOR_H_
-#define MODULES_PREDICTION_PREDICTOR_SINGLE_LANE_SINGLE_LANE_PREDICTOR_H_
+#pragma once
+
 
 #include <string>
 #include <vector>
@@ -66,4 +66,4 @@ class SingleLanePredictor : public SequencePredictor {
 }  // namespace prediction
 }  // namespace apollo
 
-#endif  // MODULES_PREDICTION_PREDICTOR_SINGLE_LANE_SINGLE_LANE_PREDICTOR_H_
+

@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_FUSION_LIB_SENSOR_HM_TRACKS_OBJECTS_MATCH_H_
-#define MODULES_PERCEPTION_FUSION_LIB_SENSOR_HM_TRACKS_OBJECTS_MATCH_H_
+#pragma once
+
 
 #include <string>
 #include <vector>
@@ -102,4 +102,4 @@ class HMTrackersObjectsAssociation : public BaseDataAssociation {
 }  // namespace fusion
 }  // namespace perception
 }  // namespace apollo
-#endif  // MODULES_PERCEPTION_FUSION_LIB_SENSOR_HM_TRACKS_OBJECTS_MATCH_H_
+

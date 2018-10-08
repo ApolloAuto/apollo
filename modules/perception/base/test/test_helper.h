@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_BASE_TEST_TEST_HELPER_H_
-#define MODULES_PERCEPTION_BASE_TEST_TEST_HELPER_H_
+#pragma once
+
 
 #include <gtest/gtest.h>
 
@@ -81,4 +81,4 @@ typedef ::testing::Types<CPUDevice<float>, CPUDevice<double>, GPUDevice<float>,
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_BASE_TEST_TEST_HELPER_H_
+

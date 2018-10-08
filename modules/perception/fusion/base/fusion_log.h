@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_FUSION_BASE_LOG_H_
-#define MODULES_PERCEPTION_FUSION_BASE_LOG_H_
+#pragma once
+
 #include "cybertron/common/log.h"
 // 500-599 reserve for fusion module error
 #define FUSION_GET_POSE_ERROR 500          // get pose error
@@ -33,4 +33,4 @@
 #define FUSION_HM_ASSIGN_ERROR 524         // hm assign error
 #define FUSION_BBAMANAGER_ERROR 525        // BBAManager throw error
 
-#endif  // MODULES_PERCEPTION_FUSION_BASE_LOG_H_
+

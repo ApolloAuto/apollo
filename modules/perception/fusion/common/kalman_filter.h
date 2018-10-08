@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_FUSION_COMMON_KALMAN_FILTER_H_
-#define MODULES_PERCEPTION_FUSION_COMMON_KALMAN_FILTER_H_
+#pragma once
+
 
 #include <vector>
 #include "modules/perception/fusion/common/base_filter.h"
@@ -75,4 +75,4 @@ class KalmanFilter : public BaseFilter {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_FUSION_COMMON_KALMAN_FILTER_H_
+

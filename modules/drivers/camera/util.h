@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_DRIVERS_CAMERA_UTIL_H
-#define MODULES_DRIVERS_CAMERA_UTIL_H
+#pragma once
+
 
 #include <assert.h>
 #include <errno.h>
@@ -527,4 +527,4 @@ SIMD_INLINE __m256i LoadPermuted(const __m256i *p) {
 }  // namespace drivers
 }  // namespace apollo
 
-#endif  // MODULES_DRIVERS_CAMERA_UTIL_H
+

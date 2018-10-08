@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_DRIVERS_VELODYNE_PARSER_VELODYNE_CONVERT_COMPONENT_H_
-#define MODULES_DRIVERS_VELODYNE_PARSER_VELODYNE_CONVERT_COMPONENT_H_
+#pragma once
+
 
 #include <deque>
 #include <memory>
@@ -57,4 +57,4 @@ CYBERTRON_REGISTER_COMPONENT(VelodyneConvertComponent)
 }  // namespace drivers
 }  // namespace apollo
 
-#endif  // MODULES_DRIVERS_VELODYNE_PARSER_VELODYNE_CONVERT_COMPONENT_H_
+

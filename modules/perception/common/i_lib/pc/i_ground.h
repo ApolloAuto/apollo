@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_COMMON_I_LIB_PC_I_GROUND_H_
-#define MODULES_PERCEPTION_COMMON_I_LIB_PC_I_GROUND_H_
+#pragma once
+
 
 #include <vector>
 #include <utility>
@@ -327,4 +327,4 @@ class PlaneFitGroundDetector : public BaseGroundDetector {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_COMMON_I_LIB_PC_I_GROUND_H_
+

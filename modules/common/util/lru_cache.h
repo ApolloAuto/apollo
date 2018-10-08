@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_COMMON_UTIL_LRU_CACHE_H_
-#define MODULES_COMMON_UTIL_LRU_CACHE_H_
+#pragma once
+
 
 #include <iostream>
 #include <mutex>
@@ -282,4 +282,4 @@ class LRUCache {
 }  // namespace common
 }  // namespace apollo
 
-#endif  // MODULES_COMMON_UTIL_LRU_CACHE_H_
+

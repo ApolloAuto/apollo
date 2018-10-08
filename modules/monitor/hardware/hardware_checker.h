@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_MONITOR_HARDWARE_HARDWARE_CHECKER_H_
-#define MODULES_MONITOR_HARDWARE_HARDWARE_CHECKER_H_
+#pragma once
+
 
 #include <memory>
 #include <ostream>
@@ -85,4 +85,4 @@ class HwCheckerInterface {
 }  // namespace monitor
 }  // namespace apollo
 
-#endif  // MODULES_MONITOR_HARDWARE_HARDWARE_CHECKER_H_
+

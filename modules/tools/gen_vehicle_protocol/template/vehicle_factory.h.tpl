@@ -18,8 +18,8 @@
  * @file %(car_type_lower)s_vehicle_factory.h
  */
 
-#ifndef MODULES_CANBUS_VEHICLE_%(car_type_upper)s_VEHICLE_FACTORY_H_
-#define MODULES_CANBUS_VEHICLE_%(car_type_upper)s_VEHICLE_FACTORY_H_
+#pragma once
+
 
 #include <memory>
 
@@ -65,4 +65,4 @@ class %(car_type_cap)sVehicleFactory : public AbstractVehicleFactory {
 }  // namespace canbus
 }  // namespace apollo
 
-#endif  // MODULES_CANBUS_VEHICLE_%(car_type_upper)s_VEHICLE_FACTORY_H_
+

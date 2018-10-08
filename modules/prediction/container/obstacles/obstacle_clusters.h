@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PREDICTION_CONTAINER_OBSTACLES_OBSTACLE_CLUSTERS_H_
-#define MODULES_PREDICTION_CONTAINER_OBSTACLES_OBSTACLE_CLUSTERS_H_
+#pragma once
+
 
 #include <memory>
 #include <string>
@@ -61,4 +61,4 @@ class ObstacleClusters {
 }  // namespace prediction
 }  // namespace apollo
 
-#endif  // MODULES_PREDICTION_CONTAINER_OBSTACLES_OBSTACLE_CLUSTERS_H_
+

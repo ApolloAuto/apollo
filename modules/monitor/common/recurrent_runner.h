@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_MONITOR_COMMON_RECURRENT_RUNNER_H_
-#define MODULES_MONITOR_COMMON_RECURRENT_RUNNER_H_
+#pragma once
+
 
 #include <memory>
 #include <mutex>
@@ -53,4 +53,4 @@ class RecurrentRunner {
 }  // namespace monitor
 }  // namespace apollo
 
-#endif  // MODULES_MONITOR_COMMON_RECURRENT_RUNNER_H_
+

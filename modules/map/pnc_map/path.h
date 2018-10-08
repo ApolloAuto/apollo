@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_MAP_PNC_MAP_PATH_H_
-#define MODULES_MAP_PNC_MAP_PATH_H_
+#pragma once
+
 
 #include <cmath>
 #include <functional>
@@ -373,4 +373,4 @@ class Path {
 }  // namespace hdmap
 }  // namespace apollo
 
-#endif  // MODULES_MAP_PNC_MAP_PATH_H_
+

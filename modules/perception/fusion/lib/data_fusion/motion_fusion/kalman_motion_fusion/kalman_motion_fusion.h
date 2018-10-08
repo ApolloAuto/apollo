@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_FUSION_LIB_DATA_FUSION_KALMAN_MOTION_FUSION_H_
-#define MODULES_PERCEPTION_FUSION_LIB_DATA_FUSION_KALMAN_MOTION_FUSION_H_
+#pragma once
+
 
 #include <deque>
 #include <string>
@@ -132,5 +132,3 @@ class KalmanMotionFusion : public BaseMotionFusion {
 }  // namespace fusion
 }  // namespace perception
 }  // namespace apollo
-
-#endif

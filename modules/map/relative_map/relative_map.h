@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_MAP_RELATIVE_MAP_RELATIVE_MAP_H_
-#define MODULES_MAP_RELATIVE_MAP_RELATIVE_MAP_H_
+#pragma once
+
 
 #include <memory>
 #include <mutex>
@@ -91,4 +91,4 @@ class RelativeMap{
 }  // namespace relative_map
 }  // namespace apollo
 
-#endif  // MODULES_MAP_RELATIVE_MAP_RELATIVE_MAP_H_
+

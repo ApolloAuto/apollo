@@ -20,8 +20,8 @@
  *methods
  **/
 
-#ifndef MODULES_PLANNING_MATH_SMOOTHING_SPLINE_SPLINE_1D_KERNEL_H_
-#define MODULES_PLANNING_MATH_SMOOTHING_SPLINE_SPLINE_1D_KERNEL_H_
+#pragma once
+
 
 #include <vector>
 #include "Eigen/Core"
@@ -88,4 +88,4 @@ class Spline1dKernel {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_MATH_SMOOTHING_SPLINE_SPLINE_1D_KERNEL_H_
+

@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_CONTROL_INTEGRATION_TESTS_H_
-#define MODULES_CONTROL_INTEGRATION_TESTS_H_
+#pragma once
+
 
 #include <string>
 #include <vector>
@@ -66,4 +66,4 @@ class ControlTestBase : public ::testing::Test {
 }  // namespace control
 }  // namespace apollo
 
-#endif  // MODULES_CONTROL_INTEGRATION_TESTS_H_
+

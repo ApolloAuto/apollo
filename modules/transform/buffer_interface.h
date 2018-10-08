@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_TRANSFORM_BUFFER_INTERFACE_H_
-#define MODULES_TRANSFORM_BUFFER_INTERFACE_H_
+#pragma once
+
 
 #include <algorithm>
 #include <sstream>
@@ -171,4 +171,4 @@ class BufferInterface {
 }  // namespace transform
 }  // namespace apollo
 
-#endif  // MODULES_TRANSFORM_BUFFER_INTERFACE_H_
+

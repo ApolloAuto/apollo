@@ -18,8 +18,8 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_TOOLKITS_OPTIMIZERS_PROCEED_WITH_CAUTION_SPEED_GENERATOR_H_  // NOLINT
-#define MODULES_PLANNING_TOOLKITS_OPTIMIZERS_PROCEED_WITH_CAUTION_SPEED_GENERATOR_H_  // NOLINT
+#pragma once
+
 
 #include "modules/common/configs/proto/vehicle_config.pb.h"
 #include "modules/planning/proto/planning_config.pb.h"
@@ -60,4 +60,3 @@ class ProceedWithCautionSpeedGenerator : public SpeedOptimizer {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // PLANNING_TOOLKITS_OPTIMIZERS_PROCEED_WITH_CAUTION_SPEED_GENERATOR_H_

@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_DRIVERS_RADAR_CONTI_RADAR_PROTOCOL_OBJECT_EXTENDED_INFO_60D_H_
-#define MODULES_DRIVERS_RADAR_CONTI_RADAR_PROTOCOL_OBJECT_EXTENDED_INFO_60D_H_
+#pragma once
+
 
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 #include "modules/drivers/proto/conti_radar.pb.h"
@@ -54,4 +54,4 @@ class ObjectExtendedInfo60D
 }  // namespace drivers
 }  // namespace apollo
 
-#endif  // MODULES_CANBUS_VEHICL_ESR_PROTOCOL_OBJECT_EXTENDED_INFO_60D_H_
+

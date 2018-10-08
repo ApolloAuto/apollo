@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_COMMON_UTIL_BLOCKING_QUEUE_H_
-#define MODULES_COMMON_UTIL_BLOCKING_QUEUE_H_
+#pragma once
+
 
 #include <deque>
 #include <string>
@@ -117,4 +117,4 @@ class BlockingQueue {
 }  // namespace common
 }  // namespace apollo
 
-#endif  // MODULES_COMMON_UTIL_BLOCKING_QUEUE_H_
+

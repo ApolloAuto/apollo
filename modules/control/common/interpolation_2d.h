@@ -18,8 +18,8 @@
  * @file
  */
 
-#ifndef MODULES_CONTROL_COMMON_INTERPOLATION_2D_H_
-#define MODULES_CONTROL_COMMON_INTERPOLATION_2D_H_
+#pragma once
+
 
 #include <map>
 #include <memory>
@@ -73,4 +73,4 @@ class Interpolation2D {
 }  // namespace control
 }  // namespace apollo
 
-#endif  // MODULES_CONTROL_COMMON_INTERPOLATION_1D_H_
+

@@ -18,8 +18,8 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_PLANNER_LATTICE_LATTICE_PLANNER_H_
-#define MODULES_PLANNING_PLANNER_LATTICE_LATTICE_PLANNER_H_
+#pragma once
+
 
 #include <string>
 #include <vector>
@@ -78,4 +78,4 @@ class LatticePlanner : public PlannerWithReferenceLine {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_PLANNER_LATTICE_LATTICE_PLANNER_H_
+

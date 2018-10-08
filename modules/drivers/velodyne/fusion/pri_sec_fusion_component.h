@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_DRIVERS_VELODYNE_FUSION_FUSION_COMPONENT_H_
-#define MODULES_DRIVERS_VELODYNE_FUSION_FUSION_COMPONENT_H_
+#pragma once
+
 
 #include <Eigen/Eigen>
 #include <memory>
@@ -65,4 +65,4 @@ CYBERTRON_REGISTER_COMPONENT(PriSecFusionComponent)
 }  // namespace drivers
 }  // namespace apollo
 
-#endif  // MODULES_DRIVERS_VELODYNE_FUSION_FUSION_COMPONENT_H_
+

@@ -14,8 +14,8 @@
   * limitations under the License.
   *****************************************************************************/
 
-#ifndef MODULES_ROUTING_GRAPH_TOPO_NODE_H
-#define MODULES_ROUTING_GRAPH_TOPO_NODE_H
+#pragma once
+
 
 #include <string>
 #include <unordered_map>
@@ -145,4 +145,4 @@ class TopoEdge {
 }  // namespace routing
 }  // namespace apollo
 
-#endif  // MODULES_ROUTING_GRAPH_TOPO_NODE_H
+

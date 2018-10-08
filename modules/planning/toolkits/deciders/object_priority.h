@@ -18,8 +18,8 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_TOOLKITS_DECIDERS_OBJECT_PRIORITY_H_
-#define MODULES_PLANNING_TOOLKITS_DECIDERS_OBJECT_PRIORITY_H_
+#pragma once
+
 
 #include <string>
 
@@ -40,4 +40,4 @@ class ObjectPriority : public TrafficRule {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_TOOLKITS_DECIDERS_OBJECT_PRIORITY_H_
+

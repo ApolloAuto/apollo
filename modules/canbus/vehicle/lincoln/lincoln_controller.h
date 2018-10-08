@@ -19,8 +19,8 @@
  * @brief The class of LincolnController
  */
 
-#ifndef MODULES_CANBUS_VEHICLE_LINCOLN_LINCOLN_CONTROLLER_H_
-#define MODULES_CANBUS_VEHICLE_LINCOLN_LINCOLN_CONTROLLER_H_
+#pragma once
+
 
 #include <memory>
 #include <thread>
@@ -161,4 +161,4 @@ class LincolnController final : public VehicleController {
 }  // namespace canbus
 }  // namespace apollo
 
-#endif  // MODULES_CANBUS_VEHICLE_LINCOLN_LINCOLN_CONTROLLER_H_
+

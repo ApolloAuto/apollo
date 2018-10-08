@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_CANBUS_VEHICLE_%(car_type_upper)s_%(car_type_upper)s_PROTOCOL_MANAGER_H_
-#define MODULES_CANBUS_VEHICLE_%(car_type_upper)s_%(car_type_upper)s_PROTOCOL_MANAGER_H_
+#pragma once
+
 
 #include <memory>
 #include <thread>
@@ -126,4 +126,4 @@ class %(car_type_cap)sController final : public VehicleController {
 }  // namespace canbus
 }  // namespace apollo
 
-#endif  // MODULES_CANBUS_VEHICLE_%(car_type_upper)s_%(car_type_upper)s_PROTOCOL_MANAGER_H_
+

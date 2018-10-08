@@ -29,8 +29,8 @@
  * implementation.
  */
 
-#ifndef MODULES_PLANNING_OPEN_SPACE_HYBRID_A_STAR_H_
-#define MODULES_PLANNING_OPEN_SPACE_HYBRID_A_STAR_H_
+#pragma once
+
 
 #include <map>
 #include <memory>
@@ -133,4 +133,4 @@ class HybridAStar {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_OPEN_SPACE_HYBRID_A_STAR_H_
+

@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PLANNING_TUNING_AUTOTUNING_RAW_FEATURE_GENERATOR_H_
-#define MODULES_PLANNING_TUNING_AUTOTUNING_RAW_FEATURE_GENERATOR_H_
+#pragma once
+
 
 #include <vector>
 #include "modules/common/proto/pnc_point.pb.h"
@@ -67,4 +67,4 @@ class AutotuningRawFeatureGenerator {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_TUNING_AUTOTUNING_RAW_FEATURE_GENERATOR_H_
+

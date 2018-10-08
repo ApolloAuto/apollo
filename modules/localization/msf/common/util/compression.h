@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_LOCALIZATION_MSF_COMMON_COMPRESSION_H_
-#define MODULES_LOCALIZATION_MSF_COMMON_COMPRESSION_H_
+#pragma once
+
 
 #include <vector>
 
@@ -48,4 +48,4 @@ class ZlibStrategy : public CompressionStrategy {
 }  // namespace localization
 }  // namespace apollo
 
-#endif  // MODULES_LOCALIZATION_MSF_COMMON_COMPRESSION_H_
+

@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_MONITOR_HARDWARE_CAN_SOCKETCAN_SOCKETCAN_CHECKER_H_
-#define MODULES_MONITOR_HARDWARE_CAN_SOCKETCAN_SOCKETCAN_CHECKER_H_
+#pragma once
+
 
 #include <string>
 #include <vector>
@@ -72,4 +72,4 @@ class SocketCanChecker : public HwCheckerInterface {
 }  // namespace monitor
 }  // namespace apollo
 
-#endif  // MODULES_MONITOR_HARDWARE_CAN_SOCKETCAN_SOCKETCAN_CHECKER_H_
+

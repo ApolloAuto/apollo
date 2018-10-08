@@ -18,8 +18,8 @@
  * @file racobit_radar_message_manager.h
  * @brief The class of RacobitRadarMessageManager
  */
-#ifndef MODULES_DRIVERS_RADAR_RACOBIT_RADAR_RACOBIT_RADAR_MESSAGE_MANAGER_H_
-#define MODULES_DRIVERS_RADAR_RACOBIT_RADAR_RACOBIT_RADAR_MESSAGE_MANAGER_H_
+#pragma once
+
 
 #include <memory>
 
@@ -68,4 +68,4 @@ class RacobitRadarMessageManager : public MessageManager<RacobitRadar> {
 }  // namespace drivers
 }  // namespace apollo
 
-#endif  // MODULES_DRIVERS_RADAR_RACOBIT_RADAR_RACOBIT_RADAR_MESSAGE_MANAGER_H_
+

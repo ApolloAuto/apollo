@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_FUSION_BASE_PBF_BASE_FORWARD_DECLARATION_H_
-#define MODULES_PERCEPTION_FUSION_BASE_PBF_BASE_FORWARD_DECLARATION_H_
+#pragma once
+
 #include <memory>
 
 namespace apollo {
@@ -33,4 +33,4 @@ typedef std::shared_ptr<const Sensor> SensorConstPtr;
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_FUSION_BASE_PBF_BASE_FORWARD_DECLARATION_H_
+

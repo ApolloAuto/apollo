@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_COMMON_UTIL_HTTP_CLIENT_H_
-#define MODULES_COMMON_UTIL_HTTP_CLIENT_H_
+#pragma once
+
 
 #include <string>
 
@@ -45,4 +45,4 @@ class HttpClient {
 }  // namespace common
 }  // namespace apollo
 
-#endif  // MODULES_COMMON_UTIL_HTTP_CLIENT_H_
+

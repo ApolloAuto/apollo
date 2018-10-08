@@ -19,8 +19,8 @@
  * @brief the class of steering_65.h (for lincoln vehicle)
  */
 
-#ifndef MODULES_CANBUS_VEHICL_LINCOLN_PROTOCOL_STEERING_65_H_
-#define MODULES_CANBUS_VEHICL_LINCOLN_PROTOCOL_STEERING_65_H_
+#pragma once
+
 
 #include <sys/time.h>
 
@@ -207,4 +207,4 @@ class Steering65 : public ::apollo::drivers::canbus::ProtocolData<
 }  // namespace canbus
 }  // namespace apollo
 
-#endif  // MODULES_CANBUS_VEHICL_LINCOLN_PROTOCOL_STEERING_65_H_
+

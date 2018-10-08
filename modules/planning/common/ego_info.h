@@ -18,8 +18,8 @@
  * @file ego_info.h
  **/
 
-#ifndef MODULES_PLANNING_COMMON_EGO_INFO_H_
-#define MODULES_PLANNING_COMMON_EGO_INFO_H_
+#pragma once
+
 
 #include <limits>
 #include <unordered_map>
@@ -85,4 +85,4 @@ class EgoInfo {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_COMMON_EGO_INFO_H_
+

@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_LIDAR_LIB_SEGMENTATION_CNNSEG_SPP_ENGINE_SPP_LABEL_IMAGE_H_  // NOLINT
-#define MODULES_PERCEPTION_LIDAR_LIB_SEGMENTATION_CNNSEG_SPP_ENGINE_SPP_LABEL_IMAGE_H_  // NOLINT
+#pragma once
+
 
 #include <memory>
 #include <vector>
@@ -150,4 +150,4 @@ typedef std::shared_ptr<const SppLabelImage> SppLabelImageConstPtr;
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_LIDAR_LIB_SEGMENTATION_CNNSEG_SPP_ENGINE_SPP_LABEL_IMAGE_H_  // NOLINT
+

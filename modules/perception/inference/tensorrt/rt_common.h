@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_INFERENCE_TENSORRT_RT_COMMON_H_
-#define MODULES_PERCEPTION_INFERENCE_TENSORRT_RT_COMMON_H_
+#pragma once
+
 
 #include <cublas_v2.h>
 #include <cuda.h>
@@ -76,4 +76,4 @@ bool ParserConvParam(const ConvolutionParameter &conv, ConvParam *param);
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_INFERENCE_TENSORRT_RT_COMMON_H_
+

@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_TOOLS_VISUALIZER_RENDERABLEOBJECT_H_
-#define MODULES_TOOLS_VISUALIZER_RENDERABLEOBJECT_H_
+#pragma once
+
 
 #include <QOpenGLBuffer>
 #include <QOpenGLFunctions>
@@ -89,4 +89,4 @@ class RenderableObject : protected QOpenGLFunctions {
   QOpenGLBuffer vbo_;
 };
 
-#endif  // MODULES_TOOLS_VISUALIZER_RENDERABLEOBJECT_H_
+

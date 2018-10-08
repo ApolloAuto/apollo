@@ -19,8 +19,8 @@
  * @brief This file provides the declaration of the class "NaviSpeedTsGraph".
  */
 
-#ifndef MODULES_PLANNING_NAVI_NAVI_SPEED_TS_GRAPH_H_
-#define MODULES_PLANNING_NAVI_NAVI_SPEED_TS_GRAPH_H_
+#pragma once
+
 
 #include <limits>
 #include <vector>
@@ -138,4 +138,4 @@ class NaviSpeedTsGraph {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_NAVI_NAVI_SPEED_TS_GRAPH_H_
+

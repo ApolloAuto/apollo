@@ -18,8 +18,8 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_LATTICE_TRAJECTORY_GENERATION_BACKUP_TRAJECTORY_H_
-#define MODULES_PLANNING_LATTICE_TRAJECTORY_GENERATION_BACKUP_TRAJECTORY_H_
+#pragma once
+
 
 #include <array>
 #include <functional>
@@ -87,4 +87,4 @@ class BackupTrajectoryGenerator {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_LATTICE_TRAJECTORY_GENERATION_BACKUP_TRAJECTORY_H_
+

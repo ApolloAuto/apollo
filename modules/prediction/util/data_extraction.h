@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PREDICTION_UTIL_DATA_EXTRACTION_H_
-#define MODULES_PREDICTION_UTIL_DATA_EXTRACTION_H_
+#pragma once
+
 
 #include <string>
 #include <vector>
@@ -32,4 +32,4 @@ void GetDataFileNames(const boost::filesystem::path& p,
 }  // namespace prediction
 }  // namespace apollo
 
-#endif /* MODULES_PREDICTION_UTIL_DATA_EXTRACTION_H_ */
+

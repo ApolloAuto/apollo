@@ -18,8 +18,8 @@
  * @file indexed_list.h
  **/
 
-#ifndef MODULES_PLANNING_COMMON_INDEXED_LIST_H_
-#define MODULES_PLANNING_COMMON_INDEXED_LIST_H_
+#pragma once
+
 
 #include <memory>
 #include <unordered_map>
@@ -116,4 +116,4 @@ class ThreadSafeIndexedList : public IndexedList<I, T> {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_COMMON_INDEXED_LIST_H
+

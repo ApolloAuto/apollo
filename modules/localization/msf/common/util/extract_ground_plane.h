@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_LOCALIZATION_MSF_EXTRACT_GROUND_PLANE_H_
-#define MODULES_LOCALIZATION_MSF_EXTRACT_GROUND_PLANE_H_
+#pragma once
+
 
 #include <cmath>
 #include <map>
@@ -200,4 +200,4 @@ class FeatureXYPlane {
 }  // namespace localization
 }  // namespace apollo
 
-#endif  // MODULES_LOCALIZATION_MSF_EXTRACT_GROUND_PLANE_H_
+

@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_CANBUS_VEHICLE_LEXUS_LEXUS_PROTOCOL_MANAGER_H_
-#define MODULES_CANBUS_VEHICLE_LEXUS_LEXUS_PROTOCOL_MANAGER_H_
+#pragma once
+
 
 #include <memory>
 #include <thread>
@@ -145,4 +145,4 @@ class LexusController final : public VehicleController {
 }  // namespace canbus
 }  // namespace apollo
 
-#endif  // MODULES_CANBUS_VEHICLE_LEXUS_LEXUS_PROTOCOL_MANAGER_H_
+

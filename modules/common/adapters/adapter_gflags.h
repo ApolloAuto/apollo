@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_COMMON_ADAPTERS_ADAPTER_GFLAGS_H_
-#define MODULES_COMMON_ADAPTERS_ADAPTER_GFLAGS_H_
+#pragma once
+
 
 #include "gflags/gflags.h"
 
@@ -88,4 +88,4 @@ DECLARE_string(guardian_topic);
 // Data topic
 DECLARE_string(data_topic);
 
-#endif  // MODULES_COMMON_ADAPTERS_ADAPTER_GFLAGS_H_
+

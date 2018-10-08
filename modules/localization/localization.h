@@ -19,8 +19,8 @@
  * @brief The class of Localization
  */
 
-#ifndef MODULES_LOCALIZATION_LOCALIZATION_H_
-#define MODULES_LOCALIZATION_LOCALIZATION_H_
+#pragma once
+
 
 #include <memory>
 #include <string>
@@ -84,4 +84,4 @@ class Localization : public apollo::common::ApolloApp {
 }  // namespace localization
 }  // namespace apollo
 
-#endif  // MODULES_LOCALIZATION_LOCALIZATION_H_
+

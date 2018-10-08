@@ -20,8 +20,7 @@
  *        as opposed to what happens in euler_angles_zxy.h (Right/Forward).
  */
 
-#ifndef MODULES_COMMON_MATH_BOX2D_H_
-#define MODULES_COMMON_MATH_BOX2D_H_
+#pragma once
 
 #include <limits>
 #include <string>
@@ -280,5 +279,3 @@ class Box2d {
 }  // namespace math
 }  // namespace common
 }  // namespace apollo
-
-#endif /* MODULES_COMMON_MATH_BOX2D_H_ */

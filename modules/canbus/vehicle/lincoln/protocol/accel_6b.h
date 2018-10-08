@@ -19,8 +19,8 @@
  * @brief the class of Accel6b (for lincoln vehicle)
  */
 
-#ifndef MODULES_CANBUS_VEHICLE_LINCOLN_PROTOCOL_ACCEL_6B_H_
-#define MODULES_CANBUS_VEHICLE_LINCOLN_PROTOCOL_ACCEL_6B_H_
+#pragma once
+
 
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 #include "modules/canbus/proto/chassis_detail.pb.h"
@@ -95,4 +95,4 @@ class Accel6b : public ::apollo::drivers::canbus::ProtocolData<
 }  // namespace canbus
 }  // namespace apollo
 
-#endif  // MODULES_CANBUS_VEHICLE_LINCOLN_PROTOCOL_ACCEL_6B_H_
+

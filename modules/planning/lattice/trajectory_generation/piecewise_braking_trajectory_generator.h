@@ -18,8 +18,8 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_LATTICE_PIECEWISE_BRAKING_TRAJECTORY_GENERATOR_H_
-#define MODULES_PLANNING_LATTICE_PIECEWISE_BRAKING_TRAJECTORY_GENERATOR_H_
+#pragma once
+
 
 #include <memory>
 
@@ -48,4 +48,4 @@ class PiecewiseBrakingTrajectoryGenerator {
 }  // namespace planning
 }  // namespace apollo
 
-#endif /* MODULES_PLANNING_LATTICE_PIECEWISE_BRAKING_TRAJECTORY_GENERATOR_H_ */
+

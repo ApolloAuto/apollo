@@ -19,8 +19,8 @@
  * @brief The gflags used by localization module
  */
 
-#ifndef MODULES_LOCALIZATION_COMMON_LOCALIZATION_GFLAGS_H_
-#define MODULES_LOCALIZATION_COMMON_LOCALIZATION_GFLAGS_H_
+#pragma once
+
 
 #include "gflags/gflags.h"
 
@@ -105,4 +105,4 @@ DECLARE_double(imu_vehicle_qw);
 // visualization
 DECLARE_string(map_visual_dir);
 
-#endif  // MODULES_LOCALIZATION_COMMON_LOCALIZATION_GFLAGS_H_
+

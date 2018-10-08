@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_COMMON_GRAPH_HUNGARIAN_OPTIMIZER_H_
-#define MODULES_PERCEPTION_COMMON_GRAPH_HUNGARIAN_OPTIMIZER_H_
+#pragma once
+
 
 #include <algorithm>
 #include <cstdio>
@@ -727,4 +727,4 @@ void HungarianOptimizer<T>::AugmentPath() {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_COMMON_GRAPH_HUNGARIAN_OPTIMIZER_H_
+

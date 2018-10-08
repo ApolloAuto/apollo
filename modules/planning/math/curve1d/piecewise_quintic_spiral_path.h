@@ -18,8 +18,8 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_MATH_CURVE1D_PIECEWISE_QUINTIC_SPIRAL_PATH_H_
-#define MODULES_PLANNING_MATH_CURVE1D_PIECEWISE_QUINTIC_SPIRAL_PATH_H_
+#pragma once
+
 
 #include <string>
 #include <vector>
@@ -68,4 +68,4 @@ class PiecewiseQuinticSpiralPath : public Curve1d {
 }  // namespace planning
 }  // namespace apollo
 
-#endif /* MODULES_PLANNING_MATH_CURVE1D_PIECEWISE_QUINTIC_SPIRAL_PATH_H_ */
+

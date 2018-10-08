@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PLANNING_TUNING_AUTOTUNING_BASE_MODEL_H_
-#define MODULES_PLANNING_TUNING_AUTOTUNING_BASE_MODEL_H_
+#pragma once
+
 
 #include <memory>
 #include "modules/common/status/status.h"
@@ -70,4 +70,4 @@ class AutotuningBaseModel {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_TUNING_AUTOTUNING_BASE_MODEL_H_
+

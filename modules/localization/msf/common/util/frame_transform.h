@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_LOCALIZATION_MSF_COMMON_FRAME_TRANSFORM_H_
-#define MODULES_LOCALIZATION_MSF_COMMON_FRAME_TRANSFORM_H_
+#pragma once
+
 
 #include <Eigen/Core>
 #include <Eigen/Geometry>
@@ -53,4 +53,4 @@ void BlhToXYZ(const Eigen::Vector3d &blh, Eigen::Vector3d *xyz);
 }   // namespace localization
 }   // namespace apollo
 
-#endif  // MODULES_LOCALIZATION_MSF_COMMON_FRAME_TRANSFORM_H_
+

@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PLANNING_TUNING_AUTOTUNING_MLP_NET_MODEL_H_
-#define MODULES_PLANNING_TUNING_AUTOTUNING_MLP_NET_MODEL_H_
+#pragma once
+
 
 #include <vector>
 
@@ -45,4 +45,4 @@ class AutotuningMLPModel : public prediction::network::NetModel {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_TUNING_AUTOTUNING_MLP_NET_MODEL_H_
+

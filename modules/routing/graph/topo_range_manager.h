@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_ROUTING_GRAPH_TOPO_RANGE_MANAGER_H
-#define MODULES_ROUTING_GRAPH_TOPO_RANGE_MANAGER_H
+#pragma once
+
 
 #include <unordered_map>
 #include <vector>
@@ -47,4 +47,4 @@ class TopoRangeManager {
 }  // namespace routing
 }  // namespace apollo
 
-#endif  // MODULES_ROUTING_GRAPH_TOPO_RANGE_MANAGER_H
+

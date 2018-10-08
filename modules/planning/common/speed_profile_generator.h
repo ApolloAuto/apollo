@@ -18,8 +18,8 @@
  * @file speed_profile_generator.h
  **/
 
-#ifndef MODULES_PLANNING_COMMON_SPEED_PROFILE_GENERATOR_H_
-#define MODULES_PLANNING_COMMON_SPEED_PROFILE_GENERATOR_H_
+#pragma once
+
 
 #include <utility>
 #include <vector>
@@ -60,4 +60,4 @@ class SpeedProfileGenerator {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_COMMON_SPEED_PROFILE_GENERATOR_H_
+

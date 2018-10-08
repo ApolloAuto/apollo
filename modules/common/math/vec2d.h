@@ -19,8 +19,7 @@
  * @brief Defines the Vec2d class.
  */
 
-#ifndef MODULES_COMMON_MATH_VEC2D_H_
-#define MODULES_COMMON_MATH_VEC2D_H_
+#pragma once
 
 #include <cmath>
 #include <string>
@@ -131,5 +130,3 @@ Vec2d operator*(const double ratio, const Vec2d &vec);
 }  // namespace math
 }  // namespace common
 }  // namespace apollo
-
-#endif /* MODULES_COMMON_MATH_VEC2D_H_ */

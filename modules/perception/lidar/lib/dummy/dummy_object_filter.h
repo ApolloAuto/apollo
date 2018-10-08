@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_LIDAR_LIB_DUMMY_DUMMY_OBJECT_FILTER_H_
-#define MODULES_PERCEPTION_LIDAR_LIB_DUMMY_DUMMY_OBJECT_FILTER_H_
+#pragma once
+
 
 #include <string>
 #include <vector>
@@ -48,4 +48,4 @@ class DummyObjectFilter : public BaseObjectFilter {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_LIDAR_LIB_INTERFACE_BASE_OBJECT_FILTER_H_
+

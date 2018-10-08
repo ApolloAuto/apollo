@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_CANBUS_VEHICLE_%(car_type_upper)s_PROTOCOL_%(protocol_name_upper)s_H_
-#define MODULES_CANBUS_VEHICLE_%(car_type_upper)s_PROTOCOL_%(protocol_name_upper)s_H_
+#pragma once
+
 
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 #include "modules/canbus/proto/chassis_detail.pb.h"
@@ -40,4 +40,4 @@ class %(classname)s : public ::apollo::drivers::canbus::ProtocolData<
 }  // namespace canbus
 }  // namespace apollo
 
-#endif  // MODULES_CANBUS_VEHICL_%(car_type_upper)s_PROTOCOL_%(protocol_name_upper)s_H_
+

@@ -18,8 +18,8 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_MATH_SMOOTHING_SPLINE_SPLINE_1D_SOLVER_H_
-#define MODULES_PLANNING_MATH_SMOOTHING_SPLINE_SPLINE_1D_SOLVER_H_
+#pragma once
+
 
 #include <memory>
 #include <vector>
@@ -79,4 +79,4 @@ class Spline1dSolver {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_MATH_SMOOTHING_SPLINE_SPLINE_1D_SOLVER_H_
+

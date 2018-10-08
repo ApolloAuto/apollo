@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_TOOLS_ROSBAG_TO_RECORD_CHANNEL_INFO_H_
-#define MODULES_TOOLS_ROSBAG_TO_RECORD_CHANNEL_INFO_H_
+#pragma once
+
 
 #include <memory>
 #include <string>
@@ -101,4 +101,4 @@ class ChannelInfo {
 }  // namespace tools
 }  // namespace apollo
 
-#endif  // MODULES_TOOLS_ROSBAG_TO_RECORD_CHANNEL_INFO_H_
+

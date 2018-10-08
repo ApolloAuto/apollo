@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_BASE_COMPARISON_TRAITS_H_
-#define MODULES_PERCEPTION_BASE_COMPARISON_TRAITS_H_
+#pragma once
+
 
 #include <cmath>
 #include <limits>
@@ -43,4 +43,4 @@ typename std::enable_if<std::is_floating_point<T>::value, bool>::type Equal(
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_BASE_COMPARISON_TRAITS_H_
+

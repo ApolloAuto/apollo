@@ -18,8 +18,8 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_TOOLKITS_DECIDERS_REROUTING_H_
-#define MODULES_PLANNING_TOOLKITS_DECIDERS_REROUTING_H_
+#pragma once
+
 
 #include <string>
 
@@ -50,4 +50,4 @@ class Rerouting : public TrafficRule {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_TOOLKITS_DECIDERS_REROUTING_H_
+

@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_FUSION_LIB_DATA_FUSION_EXISTANCE_FUSION_DST_EXISTANCE_FUSION_H_  // NOLINT
-#define MODULES_PERCEPTION_FUSION_LIB_DATA_FUSION_EXISTANCE_FUSION_DST_EXISTANCE_FUSION_H_  // NOLINT
+#pragma once
+
 
 #include <map>
 #include <string>
@@ -108,5 +108,3 @@ class DstExistanceFusion : public BaseExistanceFusion {
 }  // namespace fusion
 }  // namespace perception
 }  // namespace apollo
-
-#endif

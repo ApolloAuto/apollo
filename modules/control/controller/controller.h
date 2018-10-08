@@ -19,8 +19,8 @@
  * @brief Defines the Controller base class.
  */
 
-#ifndef MODULES_CONTROL_CONTROLLER_CONTROLLER_H_
-#define MODULES_CONTROL_CONTROLLER_CONTROLLER_H_
+#pragma once
+
 
 #include <cmath>
 #include <string>
@@ -98,4 +98,4 @@ class Controller {
 }  // namespace control
 }  // namespace apollo
 
-#endif  // MODULES_CONTROL_CONTROLLER_CONTROLLER_H_
+

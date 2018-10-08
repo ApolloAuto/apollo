@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_CANBUS_VEHICLE_GEM_PROTOCOL_DATE_TIME_RPT_83_H_
-#define MODULES_CANBUS_VEHICLE_GEM_PROTOCOL_DATE_TIME_RPT_83_H_
+#pragma once
+
 
 #include "modules/canbus/proto/chassis_detail.pb.h"
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
@@ -68,4 +68,4 @@ class Datetimerpt83 : public ::apollo::drivers::canbus::ProtocolData<
 }  // namespace canbus
 }  // namespace apollo
 
-#endif  // MODULES_CANBUS_VEHICL_GEM_PROTOCOL_DATE_TIME_RPT_83_H_
+

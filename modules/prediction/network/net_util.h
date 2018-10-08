@@ -19,8 +19,8 @@
  * @brief Define activation functions for neural network
  */
 
-#ifndef MODULES_PREDICTION_NETWORK_NET_UTIL_H_
-#define MODULES_PREDICTION_NETWORK_NET_UTIL_H_
+#pragma once
+
 
 #include <functional>
 #include <string>
@@ -98,4 +98,4 @@ bool LoadTensor(const TensorParameter& tensor_pb, Eigen::VectorXf* vector);
 }  // namespace prediction
 }  // namespace apollo
 
-#endif  // MODULES_PREDICTION_NETWORK_NET_UTIL_H_
+

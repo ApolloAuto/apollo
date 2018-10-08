@@ -19,8 +19,8 @@
  * @brief The class of MonitorLogBuffer
  */
 
-#ifndef MODULES_COMMON_MONITOR_LOG_MONITOR_LOG_BUFFER_H_
-#define MODULES_COMMON_MONITOR_LOG_MONITOR_LOG_BUFFER_H_
+#pragma once
+
 
 #include <memory>
 #include <sstream>
@@ -116,4 +116,4 @@ class MonitorLogBuffer {
 }  // namespace common
 }  // namespace apollo
 
-#endif  // MODULES_COMMON_MONITOR_LOG_MONITOR_LOG_BUFFER_H_
+

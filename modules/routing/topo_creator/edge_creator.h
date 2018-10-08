@@ -14,8 +14,8 @@
   * limitations under the License.
   *****************************************************************************/
 
-#ifndef MODULES_ROUTING_TOPO_CREATOR_EDGE_CREATOR_H
-#define MODULES_ROUTING_TOPO_CREATOR_EDGE_CREATOR_H
+#pragma once
+
 
 #include "modules/routing/proto/routing_config.pb.h"
 #include "modules/routing/proto/topo_graph.pb.h"
@@ -41,4 +41,4 @@ class EdgeCreator {
 }  // namespace routing
 }  // namespace apollo
 
-#endif  // MODULES_ROUTING_TOPO_CREATOR_EDGE_CREATOR_H
+

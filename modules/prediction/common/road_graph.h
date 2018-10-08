@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PREDICTION_COMMON_ROAD_GRAPH_H_
-#define MODULES_PREDICTION_COMMON_ROAD_GRAPH_H_
+#pragma once
+
 
 #include <memory>
 #include <vector>
@@ -71,4 +71,4 @@ class RoadGraph {
 }  // namespace prediction
 }  // namespace apollo
 
-#endif  // MODULES_PREDICTION_COMMON_ROAD_GRAPH_H_
+

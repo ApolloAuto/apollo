@@ -19,8 +19,8 @@
  * @brief Define the sequence predictor base class
  */
 
-#ifndef MODULES_PREDICTION_PREDICTOR_SEQUENCE_SEQUENCE_PREDICTOR_H_
-#define MODULES_PREDICTION_PREDICTOR_SEQUENCE_SEQUENCE_PREDICTOR_H_
+#pragma once
+
 
 #include <string>
 #include <unordered_set>
@@ -132,4 +132,3 @@ class SequencePredictor : public Predictor {
 }  // namespace prediction
 }  // namespace apollo
 
-#endif

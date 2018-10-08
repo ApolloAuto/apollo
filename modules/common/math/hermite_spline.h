@@ -18,8 +18,8 @@
  * @file
  **/
 
-#ifndef MODULES_COMMON_MATH_HERMITE_SPLINE_H_
-#define MODULES_COMMON_MATH_HERMITE_SPLINE_H_
+#pragma once
+
 
 #include <array>
 #include <utility>
@@ -205,4 +205,4 @@ inline T HermiteSpline<T, N>::Evaluate(const std::uint32_t order,
 }  // namespace common
 }  // namespace apollo
 
-#endif  // MODULES_COMMON_MATH_HERMITE_SPLINE_H_
+

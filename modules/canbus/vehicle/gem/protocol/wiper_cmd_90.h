@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_CANBUS_VEHICLE_GEM_PROTOCOL_WIPER_CMD_90_H_
-#define MODULES_CANBUS_VEHICLE_GEM_PROTOCOL_WIPER_CMD_90_H_
+#pragma once
+
 
 #include "modules/canbus/proto/chassis_detail.pb.h"
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
@@ -64,4 +64,4 @@ class Wipercmd90 : public ::apollo::drivers::canbus::ProtocolData<
 }  // namespace canbus
 }  // namespace apollo
 
-#endif  // MODULES_CANBUS_VEHICL_GEM_PROTOCOL_WIPER_CMD_90_H_
+

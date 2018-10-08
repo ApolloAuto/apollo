@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_FUSION_BASE_SENSOR_DATA_MANAGER_H_
-#define MODULES_PERCEPTION_FUSION_BASE_SENSOR_DATA_MANAGER_H_
+#pragma once
+
 
 #include <memory>
 #include <string>
@@ -81,4 +81,4 @@ class SensorDataManager {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_FUSION_BASE_SENSOR_DATA_MANAGER_H_
+

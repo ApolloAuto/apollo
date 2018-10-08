@@ -18,8 +18,8 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_COMMON_FRAME_H_
-#define MODULES_PLANNING_COMMON_FRAME_H_
+#pragma once
+
 
 #include <cstdint>
 #include <list>
@@ -175,4 +175,4 @@ class FrameHistory : public IndexedQueue<uint32_t, Frame> {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_COMMON_FRAME_H_
+

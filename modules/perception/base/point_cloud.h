@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_BASE_POINT_CLOUD_H_
-#define MODULES_PERCEPTION_BASE_POINT_CLOUD_H_
+#pragma once
+
 
 #include <limits>
 #include <memory>
@@ -446,4 +446,4 @@ typedef std::shared_ptr<const PolygonDType> PolygonDTypeConstPtr;
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_BASE_POINT_CLOUD_H_
+

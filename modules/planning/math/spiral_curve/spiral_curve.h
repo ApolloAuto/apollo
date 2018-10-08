@@ -19,8 +19,8 @@
  * @brief: spiral path base class
  **/
 
-#ifndef MODULES_PLANNING_MATH_SPIRAL_CURVE_SPIRAL_CURVE_H_
-#define MODULES_PLANNING_MATH_SPIRAL_CURVE_SPIRAL_CURVE_H_
+#pragma once
+
 
 #include <algorithm>
 #include <cmath>
@@ -99,4 +99,4 @@ class SpiralCurve {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_MATH_SPIRAL_CURVE_SPIRAL_CURVE_H_
+

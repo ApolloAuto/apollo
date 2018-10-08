@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_INFERENCE_TENSORRT_PLUGINS_SOFTMAX_PLUGIN_H_
-#define MODULES_PERCEPTION_INFERENCE_TENSORRT_PLUGINS_SOFTMAX_PLUGIN_H_
+#pragma once
+
 
 #include "modules/perception/inference/tensorrt/rt_common.h"
 
@@ -104,4 +104,4 @@ class SoftmaxPlugin : public nvinfer1::IPlugin {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_INFERENCE_TENSORRT_PLUGINS_SOFTMAX_PLUGIN_H_
+

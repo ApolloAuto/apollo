@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_COMMON_I_LIB_ALGORITHM_I_SORT_H_
-#define MODULES_PERCEPTION_COMMON_I_LIB_ALGORITHM_I_SORT_H_
+#pragma once
+
 
 #include <assert.h>
 #include "modules/perception/common/i_lib/core/i_basic.h"
@@ -131,4 +131,4 @@ inline void IIndexedShuffle(T *a, T *b, int *indices, int n, int element_size_a,
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_COMMON_I_LIB_ALGORITHM_I_SORT_H_
+

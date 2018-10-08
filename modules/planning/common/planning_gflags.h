@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PLANNING_COMMON_PLANNING_GFLAGS_H_
-#define MODULES_PLANNING_COMMON_PLANNING_GFLAGS_H_
+#pragma once
+
 
 #include "gflags/gflags.h"
 
@@ -223,4 +223,4 @@ DECLARE_bool(enable_osqp_debug);
 
 DECLARE_bool(use_static_waypoint_sampler);
 
-#endif  // MODULES_PLANNING_COMMON_PLANNING_GFLAGS_H_
+

@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_FUSION_LIB_FUSION_SYSTEM_PROBABILISTIC_FUSION_H_
-#define MODULES_PERCEPTION_FUSION_LIB_FUSION_SYSTEM_PROBABILISTIC_FUSION_H_
+#pragma once
+
 
 #include <memory>
 #include <mutex>
@@ -108,4 +108,4 @@ class ProbabilisticFusion : public BaseFusionSystem {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_FUSION_LIB_FUSION_SYSTEM_PROBABILISTIC_FUSION_H_
+

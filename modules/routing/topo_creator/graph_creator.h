@@ -14,8 +14,8 @@
   * limitations under the License.
   *****************************************************************************/
 
-#ifndef MODULES_ROUTING_TOPO_CREATOR_GRAPH_CREATOR_H
-#define MODULES_ROUTING_TOPO_CREATOR_GRAPH_CREATOR_H
+#pragma once
+
 
 #include <string>
 #include <unordered_map>
@@ -63,4 +63,4 @@ class GraphCreator {
 }  // namespace routing
 }  // namespace apollo
 
-#endif  // MODULES_ROUTING_TOPO_CREATOR_GRAPH_CREATOR_H
+

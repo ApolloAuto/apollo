@@ -13,8 +13,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
 
-#ifndef MODULES_CANBUS_VEHICLE_%(car_type_up)s_%(car_type_up)s_MESSAGE_MANAGER_H_
-#define MODULES_CANBUS_VEHICLE_%(car_type_up)s_%(car_type_up)s_MESSAGE_MANAGER_H_
+#pragma once
+
 
 #include "modules/canbus/proto/chassis_detail.pb.h"
 #include "modules/drivers/canbus/can_comm/message_manager.h"
@@ -36,4 +36,4 @@ class %(car_type_cap)sMessageManager
 }  // namespace canbus
 }  // namespace apollo
 
-#endif  // MODULES_CANBUS_VEHICLE_%(car_type_up)s_%(car_type_up)s_MESSAGE_MANAGER_H_
+

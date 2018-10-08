@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_LIDAR_LIB_SCENE_MANAGER_GROUND_SERVICE_GROUND_SERVICE_H_  // NOLINT
-#define MODULES_PERCEPTION_LIDAR_LIB_SCENE_MANAGER_GROUND_SERVICE_GROUND_SERVICE_H_  // NOLINT
+#pragma once
+
 
 #include <memory>
 #include <mutex>
@@ -109,5 +109,3 @@ typedef std::shared_ptr<const GroundService> GroundServiceConstPtr;
 }  // namespace lidar
 }  // namespace perception
 }  // namespace apollo
-
-#endif  // LIDAR_LIB_SCENE_MANAGER_GROUND_SERVICE_GROUND_SERVICE_H_

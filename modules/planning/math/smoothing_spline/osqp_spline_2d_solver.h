@@ -18,8 +18,8 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_SMOOTHING_SPLINE_OSQP_SPLINE_2D_SOLVER_H_
-#define MODULES_PLANNING_SMOOTHING_SPLINE_OSQP_SPLINE_2D_SOLVER_H_
+#pragma once
+
 
 #include <memory>
 #include <vector>
@@ -67,4 +67,4 @@ class OsqpSpline2dSolver final : public Spline2dSolver {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_SMOOTHING_SPLINE_OSQP_SPLINE_2D_SOLVER_H_
+

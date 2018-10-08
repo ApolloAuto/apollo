@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_FUSION_BASE_TRACK_H_
-#define MODULES_PERCEPTION_FUSION_BASE_TRACK_H_
+#pragma once
+
 
 #include <deque>
 #include <map>
@@ -155,4 +155,4 @@ typedef std::shared_ptr<const Track> TrackConstPtr;
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_FUSION_BASE_TRACK_H_
+

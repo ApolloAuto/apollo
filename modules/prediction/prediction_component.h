@@ -18,8 +18,8 @@
  * @file
  */
 
-#ifndef MODULES_PREDICTION_PREDICTION_COMPONENT_H_
-#define MODULES_PREDICTION_PREDICTION_COMPONENT_H_
+#pragma once
+
 
 #include <memory>
 #include <string>
@@ -104,4 +104,4 @@ CYBERTRON_REGISTER_COMPONENT(PredictionComponent)
 }  // namespace prediction
 }  // namespace apollo
 
-#endif  // MODULES_PREDICTION_PREDICTION_COMPONENT_H_
+

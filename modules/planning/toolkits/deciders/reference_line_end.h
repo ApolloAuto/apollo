@@ -18,8 +18,8 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_TOOLKITS_DECIDERS_REFERENCE_LINE_END_H_
-#define MODULES_PLANNING_TOOLKITS_DECIDERS_REFERENCE_LINE_END_H_
+#pragma once
+
 
 #include <string>
 
@@ -47,4 +47,4 @@ class ReferenceLineEnd : public TrafficRule {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_TOOLKITS_DECIDERS_REFERENCE_LINE_END_H_
+

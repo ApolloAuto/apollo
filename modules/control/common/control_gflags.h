@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_CONTROL_COMMON_CONTROL_GFLAGS_H_
-#define MODULES_CONTROL_COMMON_CONTROL_GFLAGS_H_
+#pragma once
+
 
 #include "gflags/gflags.h"
 
@@ -58,4 +58,4 @@ DECLARE_int32(planning_pending_queue_size);
 DECLARE_int32(localization_pending_queue_size);
 DECLARE_int32(pad_msg_pending_queue_size);
 
-#endif  // MODULES_CONTROL_COMMON_CONTROL_GFLAGS_H_
+

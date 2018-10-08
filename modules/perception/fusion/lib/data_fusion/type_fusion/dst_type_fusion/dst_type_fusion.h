@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_FUSION_LIB_DATA_FUSION_TYPE_FUSION_DST_TYPE_FUSION_H_
-#define MODULES_PERCEPTION_FUSION_LIB_DATA_FUSION_TYPE_FUSION_DST_TYPE_FUSION_H_
+#pragma once
+
 
 #include <map>
 #include <string>
@@ -138,6 +138,3 @@ class DstTypeFusion : public BaseTypeFusion {
 }  // namespace fusion
 }  // namespace perception
 }  // namespace apollo
-
-#endif
-// MODULES_PERCEPTION_FUSION_LIB_DATA_FUSION_TYPE_FUSION_DST_TYPE_FUSION_H_

@@ -27,8 +27,8 @@
  *          (default) initialized step for newton: 8, tol = 10^-2, max_iter = 10
  **/
 
-#ifndef MODULES_PLANNING_MATH_SPIRAL_CURVE_CUBIC_SPIRAL_CURVE_H_
-#define MODULES_PLANNING_MATH_SPIRAL_CURVE_CUBIC_SPIRAL_CURVE_H_
+#pragma once
+
 
 #include <vector>
 
@@ -54,4 +54,4 @@ class CubicSpiralCurve : public SpiralCurve {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_MATH_SPIRAL_CURVE_CUBIC_SPIRAL_CURVE_H_
+

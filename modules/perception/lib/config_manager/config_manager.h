@@ -108,8 +108,8 @@
 //         values: 1.4
 //     }
 // }
-#ifndef MODULES_PERCEPTION_LIB_CONFIG_MANAGER_CONFIG_MANAGER_H_
-#define MODULES_PERCEPTION_LIB_CONFIG_MANAGER_CONFIG_MANAGER_H_
+#pragma once
+
 
 #include <google/protobuf/message.h>
 
@@ -344,4 +344,4 @@ class ConfigRead<std::vector<T>> {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_LIB_CONFIG_MANAGER_CONFIG_MANAGER_H_
+

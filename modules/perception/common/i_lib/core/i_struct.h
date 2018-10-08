@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_COMMON_I_LIB_CORE_I_STRUCT_H_
-#define MODULES_PERCEPTION_COMMON_I_LIB_CORE_I_STRUCT_H_
+#pragma once
+
 
 #include "modules/perception/common/i_lib/core/i_alloc.h"
 
@@ -71,4 +71,4 @@ inline bool ILargerPairSecondElement(const Pair<T1, T2> &a,
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_COMMON_I_LIB_CORE_I_STRUCT_H_
+

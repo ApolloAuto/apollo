@@ -19,8 +19,8 @@
  * @brief Use evaluator manager to manage all evaluators
  */
 
-#ifndef MODULES_PREDICTION_EVALUATOR_EVALUATOR_MANAGER_H_
-#define MODULES_PREDICTION_EVALUATOR_EVALUATOR_MANAGER_H_
+#pragma once
+
 
 #include <map>
 #include <memory>
@@ -100,4 +100,4 @@ class EvaluatorManager {
 }  // namespace prediction
 }  // namespace apollo
 
-#endif  // MODULES_PREDICTION_EVALUATOR_EVALUATOR_MANAGER_H_
+

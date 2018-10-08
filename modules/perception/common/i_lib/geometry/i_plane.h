@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_COMMON_I_LIB_GEOMETRY_I_PLANE_H_
-#define MODULES_PERCEPTION_COMMON_I_LIB_GEOMETRY_I_PLANE_H_
+#pragma once
+
 
 #include "modules/perception/common/i_lib/core/i_struct.h"
 #include "modules/perception/common/i_lib/core/i_alloc.h"
@@ -460,4 +460,4 @@ template <typename T> inline void IPlaneFitAdv(const T *Xs, T *para) {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_COMMON_I_LIB_GEOMETRY_I_PLANE_H_
+

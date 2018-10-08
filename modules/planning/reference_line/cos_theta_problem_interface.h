@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PLANNING_REFERENCE_LINE_COSTHETA_PROBLEM_INTERFACE_H_
-#define MODULES_PLANNING_REFERENCE_LINE_COSTHETA_PROBLEM_INTERFACE_H_
+#pragma once
+
 
 #include <map>
 #include <utility>
@@ -144,4 +144,4 @@ class CosThetaProbleminterface : public Ipopt::TNLP {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_REFERENCE_LINE_COSTHETA_PROBLEM_INTERFACE_H_
+

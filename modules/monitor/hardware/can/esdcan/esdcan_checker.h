@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_MONITOR_HARDWARE_CAN_ESDCAN_ESDCAN_CHECKER_H_
-#define MODULES_MONITOR_HARDWARE_CAN_ESDCAN_ESDCAN_CHECKER_H_
+#pragma once
+
 
 #include <string>
 #include <vector>
@@ -68,4 +68,4 @@ class EsdCanChecker : public HwCheckerInterface {
 }  // namespace monitor
 }  // namespace apollo
 
-#endif  // MODULES_MONITOR_HARDWARE_CAN_ESDCAN_ESDCAN_CHECKER_H_
+

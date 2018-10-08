@@ -18,8 +18,8 @@
  * @file conti_radar_message_manager.h
  * @brief The class of ContiRadarMessageManager
  */
-#ifndef MODULES_DRIVERS_RADAR_CONTI_RADAR_CONTI_RADAR_MESSAGE_MANAGER_H_
-#define MODULES_DRIVERS_RADAR_CONTI_RADAR_CONTI_RADAR_MESSAGE_MANAGER_H_
+#pragma once
+
 
 #include <memory>
 #include "cybertron/cybertron.h"
@@ -67,4 +67,4 @@ class ContiRadarMessageManager : public MessageManager<ContiRadar> {
 }  // namespace drivers
 }  // namespace apollo
 
-#endif  // MODULES_DRIVERS_RADAR_CONTI_RADAR_CONTI_RADAR_MESSAGE_MANAGER_H_
+

@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_LIB_UTILS_TIMER_H_
-#define MODULES_PERCEPTION_LIB_UTILS_TIMER_H_
+#pragma once
+
 
 #include <stdint.h>
 #include <string>
@@ -64,4 +64,4 @@ class TimerWrapper {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_LIB_UTILS_TIMER_H_
+

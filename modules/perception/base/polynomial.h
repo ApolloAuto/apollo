@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_BASE_POLYNOMIAL_H
-#define MODULES_PERCEPTION_BASE_POLYNOMIAL_H
+#pragma once
+
 
 #include <iostream>
 #include <map>
@@ -47,4 +47,4 @@ std::ostream& operator<<(std::ostream& o, const Polynomial& p);
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_BASE_POLYNOMIAL_H
+

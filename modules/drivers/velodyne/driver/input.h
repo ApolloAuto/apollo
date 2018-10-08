@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_DRIVERS_VELODYNE_DRIVER_INPUT_H_
-#define MODULES_DRIVERS_VELODYNE_DRIVER_INPUT_H_
+#pragma once
+
 
 #include <stdio.h>
 #include <unistd.h>
@@ -73,4 +73,4 @@ class Input {
 }  // namespace drivers
 }  // namespace apollo
 
-#endif  // MODULES_DRIVERS_VELODYNE_DRIVER_INPUT_H_
+

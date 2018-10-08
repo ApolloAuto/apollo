@@ -19,8 +19,7 @@
  * @brief Define the LineSegment2d class.
  */
 
-#ifndef MODULES_COMMON_MATH_LINE_SEGEMENT2D_H_
-#define MODULES_COMMON_MATH_LINE_SEGEMENT2D_H_
+#pragma once
 
 #include <string>
 #include "modules/common/math/vec2d.h"
@@ -219,5 +218,3 @@ class LineSegment2d {
 }  // namespace math
 }  // namespace common
 }  // namespace apollo
-
-#endif /* MODULES_COMMON_MATH_LINE_SEGEMENT2D_H_ */

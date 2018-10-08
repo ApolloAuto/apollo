@@ -18,8 +18,8 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_SCENARIOS_SCENARIO_H_
-#define MODULES_PLANNING_SCENARIOS_SCENARIO_H_
+#pragma once
+
 
 #include <set>
 #include <string>
@@ -61,4 +61,4 @@ class Scenario {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_SCENARIOS_SCENARIO_H_
+

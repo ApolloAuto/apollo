@@ -18,8 +18,8 @@
  * @file dp_st_graph.h
  **/
 
-#ifndef MODULES_PLANNING_TOOLKITS_OPTIMIZERS_DP_ST_SPEED_DP_ST_GRAPH_H_
-#define MODULES_PLANNING_TOOLKITS_OPTIMIZERS_DP_ST_SPEED_DP_ST_GRAPH_H_
+#pragma once
+
 
 #include <memory>
 #include <vector>
@@ -110,4 +110,4 @@ class DpStGraph {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_TOOLKITS_OPTIMIZERS_DP_ST_SPEED_DP_ST_GRAPH_H_
+

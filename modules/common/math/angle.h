@@ -19,8 +19,7 @@
  * @brief Defines the templated Angle class.
  */
 
-#ifndef MODULES_COMMON_MATH_ANGLE_H_
-#define MODULES_COMMON_MATH_ANGLE_H_
+#pragma once
 
 #include <cmath>
 #include <cstdint>
@@ -275,5 +274,3 @@ float tan(Angle8 a);
 }  // namespace math
 }  // namespace common
 }  // namespace apollo
-
-#endif /* MODULES_COMMON_MATH_AABOX2D_H_ */

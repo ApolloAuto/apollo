@@ -19,8 +19,8 @@
  * @brief: Definition of PiecewiseLinearConstraint class.
  **/
 
-#ifndef MODULES_PLANNING_MATH_SMOOTHING_SPLINE_PIECEWISE_LINEAR_CONSTRAINT_H_
-#define MODULES_PLANNING_MATH_SMOOTHING_SPLINE_PIECEWISE_LINEAR_CONSTRAINT_H_
+#pragma once
+
 
 #include <vector>
 
@@ -78,4 +78,4 @@ class PiecewiseLinearConstraint {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_MATH_SMOOTHING_SPLINE_PIECEWISE_LINEAR_CONSTRAINT_H_
+

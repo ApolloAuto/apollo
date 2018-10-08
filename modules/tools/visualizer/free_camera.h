@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_TOOLS_VISUALIZER_FREECAMERA_H_
-#define MODULES_TOOLS_VISUALIZER_FREECAMERA_H_
+#pragma once
+
 
 #include "modules/tools/visualizer/abstract_camera.h"
 
@@ -39,4 +39,4 @@ class FreeCamera : public AbstractCamera {
   QVector3D translation_;
 };
 
-#endif  // MODULES_TOOLS_VISUALIZER_FREECAMERA_H_
+

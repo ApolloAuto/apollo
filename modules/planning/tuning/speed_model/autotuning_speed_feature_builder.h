@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PLANNING_TUNING_SPEED_MODEL_AUTOTUNING_SPEED_FEATURE_BUILDER_H_
-#define MODULES_PLANNING_TUNING_SPEED_MODEL_AUTOTUNING_SPEED_FEATURE_BUILDER_H_
+#pragma once
+
 
 #include "modules/planning/tuning/autotuning_feature_builder.h"
 
@@ -80,6 +80,3 @@ class AutotuningSpeedFeatureBuilder : public AutotuningFeatureBuilder {
 
 }  // namespace planning
 }  // namespace apollo
-
-#endif
-// MODULES_PLANNING_TUNING_SPEED_MODEL_AUTOTUNING_SPEED_FEATURE_BUILDER_H_

@@ -18,8 +18,8 @@
  * @file trajectory.h
  **/
 
-#ifndef MODULES_PLANNING_COMMON_TRAJECTORY_TRAJECTORY_H_
-#define MODULES_PLANNING_COMMON_TRAJECTORY_TRAJECTORY_H_
+#pragma once
+
 
 #include "modules/common/proto/pnc_point.pb.h"
 
@@ -45,4 +45,4 @@ class Trajectory {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_COMMON_TRAJECTORY_TRAJECTORY_H_
+

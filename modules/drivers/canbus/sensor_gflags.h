@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_DRIVERS_CANBUS_SENSOR_GFLAGS_H_
-#define MODULES_DRIVERS_CANBUS_SENSOR_GFLAGS_H_
+#pragma once
+
 
 #include "gflags/gflags.h"
 
@@ -33,5 +33,3 @@ DECLARE_double(sensor_freq);
 
 // System gflags
 DECLARE_string(sensor_node_name);
-
-#endif

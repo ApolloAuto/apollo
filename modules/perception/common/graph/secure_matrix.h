@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_COMMON_GRAPH_SECURE_MATRIX_H_
-#define MODULES_PERCEPTION_COMMON_GRAPH_SECURE_MATRIX_H_
+#pragma once
+
 
 #include <memory>
 
@@ -88,4 +88,4 @@ class SecureMat {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_COMMON_GRAPH_SECURE_MATRIX_H_
+

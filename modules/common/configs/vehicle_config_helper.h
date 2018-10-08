@@ -18,8 +18,8 @@
  * @file
  */
 
-#ifndef MODULES_CONFIGS_VEHICLE_CONFIG_H_
-#define MODULES_CONFIGS_VEHICLE_CONFIG_H_
+#pragma once
+
 
 #include <string>
 
@@ -117,4 +117,4 @@ class VehicleConfigHelper {
 }  // namespace common
 }  // namespace apollo
 
-#endif  // MODULES_CONFIGS_VEHICLE_CONFIG_H_
+

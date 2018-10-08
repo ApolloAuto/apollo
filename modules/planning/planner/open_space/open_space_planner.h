@@ -18,8 +18,8 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_PLANNER_OPENSPACE_OPENSPACE_PLANNER_H_
-#define MODULES_PLANNING_PLANNER_OPENSPACE_OPENSPACE_PLANNER_H_
+#pragma once
+
 
 #include <memory>
 #include <string>
@@ -111,4 +111,4 @@ class OpenSpacePlanner : public Planner {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_PLANNER_OPENSPACE_OPENSPACE_PLANNER_H_
+

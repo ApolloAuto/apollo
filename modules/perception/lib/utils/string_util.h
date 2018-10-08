@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_LIB_UTILS_STRING_UTIL_H_
-#define MODULES_PERCEPTION_LIB_UTILS_STRING_UTIL_H_
+#pragma once
+
 
 #include <string>
 #include <vector>
@@ -97,4 +97,4 @@ std::string StringUtil::Digit2String(T number) {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_LIB_UTILS_STRING_UTIL_H_
+

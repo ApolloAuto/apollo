@@ -22,8 +22,8 @@
  *           P is the kernel of k-th smooth kernel
  **/
 
-#ifndef MODULES_PLANNING_MATH_SMOOTHING_SPLINE_SPLINE_SEG_KERNEL_H_
-#define MODULES_PLANNING_MATH_SMOOTHING_SPLINE_SPLINE_SEG_KERNEL_H_
+#pragma once
+
 
 #include <cstddef>
 #include <string>
@@ -73,4 +73,4 @@ class SplineSegKernel {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_MATH_SMOOTHING_SPLINE_SPLINE_SEG_KERNEL_H_
+

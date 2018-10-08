@@ -18,8 +18,8 @@
  * @brief Define lane sequence predictor
  */
 
-#ifndef MODULES_PREDICTION_PREDICTOR_LANE_SEQUENCE_LANE_SEQUENCE_PREDICTOR_H_
-#define MODULES_PREDICTION_PREDICTOR_LANE_SEQUENCE_LANE_SEQUENCE_PREDICTOR_H_
+#pragma once
+
 
 #include <string>
 #include <vector>
@@ -68,4 +68,4 @@ class LaneSequencePredictor : public SequencePredictor {
 }  // namespace prediction
 }  // namespace apollo
 
-#endif  // MODULES_PREDICTION_PREDICTOR_VEHICLE_LANE_SEQUENCE_PREDICTOR_H_
+

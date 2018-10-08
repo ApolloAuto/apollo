@@ -18,8 +18,8 @@
  * @file
  */
 
-#ifndef MODULES_PLANNING_COMMON_PLANNING_CONTEXT_H_
-#define MODULES_PLANNING_COMMON_PLANNING_CONTEXT_H_
+#pragma once
+
 
 #include <string>
 #include <unordered_map>
@@ -71,4 +71,4 @@ inline PlanningStatus* mutable_planning_status() {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_COMMON_PLANNING_CONTEXT_H_
+

@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_MONITOR_HARDWARE_CAN_SOCKETCAN_SOCKETCAN_TEST_H_
-#define MODULES_MONITOR_HARDWARE_CAN_SOCKETCAN_SOCKETCAN_TEST_H_
+#pragma once
+
 
 #include <linux/can.h>
 #include <linux/can/raw.h>
@@ -42,4 +42,4 @@ int socketcan_do_test(int id);
 }  // namespace monitor
 }  // namespace apollo
 
-#endif  // MODULES_MONITOR_HARDWARE_CAN_SOCKETCAN_SOCKETCAN_TEST_H_
+

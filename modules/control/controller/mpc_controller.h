@@ -19,8 +19,8 @@
  * @brief Defines the MPCController class.
  */
 
-#ifndef MODULES_CONTROL_CONTROLLER_MPC_CONTROLLER_H_
-#define MODULES_CONTROL_CONTROLLER_MPC_CONTROLLER_H_
+#pragma once
+
 
 #include <fstream>
 #include <memory>
@@ -256,4 +256,4 @@ class MPCController : public Controller {
 }  // namespace control
 }  // namespace apollo
 
-#endif  // MODULES_CONTROL_CONTROLLER_MPC_CONTROLLER_H_
+

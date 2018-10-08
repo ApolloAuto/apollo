@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_ONBOARD_INNER_COMPONENT_MESSAGES_H_
-#define MODULES_PERCEPTION_ONBOARD_INNER_COMPONENT_MESSAGES_H_
+#pragma once
+
 
 #include <Eigen/Core>
 #include <memory>
@@ -78,4 +78,4 @@ class SensorFrameMessage : public apollo::cybertron::message::IntraMessage {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_ONBOARD_INNER_COMPONENT_MESSAGES_H_
+

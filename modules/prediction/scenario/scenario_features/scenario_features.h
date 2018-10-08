@@ -18,8 +18,8 @@
  * @file
  */
 
-#ifndef MODULES_PREDICTION_SCENARIO_SCENARIO_FEATURES_SCENARIO_FEATURES_H_
-#define MODULES_PREDICTION_SCENARIO_SCENARIO_FEATURES_SCENARIO_FEATURES_H_
+#pragma once
+
 
 namespace apollo {
 namespace prediction {
@@ -34,4 +34,4 @@ class ScenarioFeatures {
 }  // namespace prediction
 }  // namespace apollo
 
-#endif /* MODULES_PREDICTION_SCENARIO_SCENARIO_FEATURES_SCENARIO_FEATURES_H_ */
+

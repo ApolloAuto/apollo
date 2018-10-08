@@ -19,8 +19,8 @@
  * @brief hysteresis filter
  */
 
-#ifndef MODULES_CONTROL_COMMON_HYSTERESIS_FILTER_H_
-#define MODULES_CONTROL_COMMON_HYSTERESIS_FILTER_H_
+#pragma once
+
 
 /**
  * @namespace apollo::control
@@ -42,4 +42,4 @@ class HysteresisFilter {
 
 }  // namespace control
 }  // namespace apollo
-#endif  // MODULES_CONTROL_COMMON_HYSTERESIS_FILTER_H_
+

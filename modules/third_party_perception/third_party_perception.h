@@ -18,8 +18,7 @@
  * @file
  */
 
-#ifndef MODEULES_THIRD_PARTY_PERCEPTION_THIRD_PARTY_PERCEPTION_H_
-#define MODEULES_THIRD_PARTY_PERCEPTION_THIRD_PARTY_PERCEPTION_H_
+#pragma once
 
 #include <map>
 #include <mutex>
@@ -79,4 +78,4 @@ class ThirdPartyPerception {
 }  // namespace third_party_perception
 }  // namespace apollo
 
-#endif  // MODULES_THIRD_PARTY_PERCEPTION_THIRD_PARTY_PERCEPTION_H_
+

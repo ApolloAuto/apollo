@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_TRANSFORM_BUFFER_H_
-#define MODULES_TRANSFORM_BUFFER_H_
+#pragma once
+
 
 #include <memory>
 #include <string>
@@ -148,4 +148,4 @@ class Buffer : public BufferInterface, public tf2::BufferCore {
 }  // namespace transform
 }  // namespace apollo
 
-#endif  // MODULES_TRANSFORM_BUFFER_H_
+

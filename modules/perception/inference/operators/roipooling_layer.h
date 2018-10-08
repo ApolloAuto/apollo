@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_INFERENCE_OPERATORS_ROIPOOLING_LAYER_H_
-#define MODULES_PERCEPTION_INFERENCE_OPERATORS_ROIPOOLING_LAYER_H_
+#pragma once
+
 
 #include <cfloat>
 #include <memory>
@@ -61,4 +61,4 @@ class ROIPoolingLayer : public Layer<Dtype> {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_INFERENCE_OPERATORS_ROIPOOLING_LAYER_H_
+

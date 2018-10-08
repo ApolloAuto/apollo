@@ -19,8 +19,8 @@
  * @brief Some string util functions.
  */
 
-#ifndef MODULES_COMMON_UTIL_MESSAGE_UTIL_H_
-#define MODULES_COMMON_UTIL_MESSAGE_UTIL_H_
+#pragma once
+
 
 #include <memory>
 #include <string>
@@ -98,4 +98,4 @@ bool DumpMessage(const std::shared_ptr<T>& msg,
 }  // namespace common
 }  // namespace apollo
 
-#endif  // MODULES_COMMON_UTIL_MESSAGE_UTIL_H_
+

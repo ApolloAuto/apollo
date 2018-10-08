@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_TOOLS_VISUALIZER_GRID_H_
-#define MODULES_TOOLS_VISUALIZER_GRID_H_
+#pragma once
+
 
 #include <QColor>
 #include "modules/tools/visualizer/renderable_object.h"
@@ -56,4 +56,4 @@ class Grid : public RenderableObject {
   QColor grid_color_;
 };
 
-#endif  // MODULES_TOOLS_VISUALIZER_GRID_H_
+

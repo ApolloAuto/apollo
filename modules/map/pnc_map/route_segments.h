@@ -18,8 +18,8 @@
  * @file
  **/
 
-#ifndef MODULES_MAP_PNC_MAP_ROUTE_SEGMENTS_H_
-#define MODULES_MAP_PNC_MAP_ROUTE_SEGMENTS_H_
+#pragma once
+
 
 #include <limits>
 #include <memory>
@@ -236,4 +236,4 @@ class RouteSegments : public std::vector<LaneSegment> {
 }  // namespace hdmap
 }  // namespace apollo
 
-#endif  // MODULES_MAP_PNC_MAP_ROUTE_SEGMENTS_H_
+

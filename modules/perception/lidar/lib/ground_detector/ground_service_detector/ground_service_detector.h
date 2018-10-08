@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_LIDAR_LIB_GROUND_SERVICE_DETECTOR_H_
-#define MODULES_PERCEPTION_LIDAR_LIB_GROUND_SERVICE_DETECTOR_H_
+#pragma once
+
 
 #include <string>
 
@@ -49,4 +49,4 @@ class GroundServiceDetector : public BaseGroundDetector {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_LIDAR_LIB_GROUND_SERVICE_DETECTOR_H_
+

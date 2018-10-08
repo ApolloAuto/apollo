@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PLANNING_STD_PLANNING_H_
-#define MODULES_PLANNING_STD_PLANNING_H_
+#pragma once
+
 
 #include <memory>
 #include <string>
@@ -85,4 +85,4 @@ class StdPlanning : public PlanningBase {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_STD_PLANNING_H_
+

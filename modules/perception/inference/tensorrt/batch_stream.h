@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_INFERENCE_TENSORRT_BATCHSTREAM_H_
-#define MODULES_PERCEPTION_INFERENCE_TENSORRT_BATCHSTREAM_H_
+#pragma once
+
 
 #include <assert.h>
 #include <algorithm>
@@ -70,4 +70,4 @@ class BatchStream {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_INFERENCE_TENSORRT_BATCHSTREAM_H_
+

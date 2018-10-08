@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_COMMON_UTIL_JSON_UTIL_H_
-#define MODULES_COMMON_UTIL_JSON_UTIL_H_
+#pragma once
+
 
 #include <string>
 #include <vector>
@@ -78,4 +78,4 @@ class JsonUtil {
 }  // namespace common
 }  // namespace apollo
 
-#endif  // MODULES_COMMON_UTIL_JSON_UTIL_H_
+

@@ -19,8 +19,7 @@
  * @brief Defines some useful matrix operations.
  */
 
-#ifndef MODULES_COMMON_MATH_MATRIX_OPERATIONS_H_
-#define MODULES_COMMON_MATH_MATRIX_OPERATIONS_H_
+#pragma once
 
 #include <cmath>
 #include <utility>
@@ -160,5 +159,3 @@ void DenseToCSCMatrix(const Eigen::Matrix<T, M, N> &dense_matrix,
 }  // namespace math
 }  // namespace common
 }  // namespace apollo
-
-#endif /* MODULES_COMMON_MATH_MATRIX_OPERATIONS_H_ */

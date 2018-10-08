@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_COMMON_PERCEPTION_GFLAGS_H_
-#define MODULES_PERCEPTION_COMMON_PERCEPTION_GFLAGS_H_
+#pragma once
+
 
 #include "gflags/gflags.h"
 
@@ -30,4 +30,4 @@ DECLARE_string(config_manager_path);
 DECLARE_string(work_root);
 DECLARE_string(adu_data);
 
-#endif  // MODULES_PERCEPTION_COMMON_PERCEPTION_GFLAGS_H_
+

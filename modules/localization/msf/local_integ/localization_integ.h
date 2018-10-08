@@ -19,8 +19,8 @@
  * @brief The class of LocalizationInteg
  */
 
-#ifndef MODULES_LOCALIZATION_MSF_LOCALIZATION_INTEG_H_
-#define MODULES_LOCALIZATION_MSF_LOCALIZATION_INTEG_H_
+#pragma once
+
 
 #include <memory>
 #include <string>
@@ -105,4 +105,4 @@ class LocalizationInteg {
 }  // namespace localization
 }  // namespace apollo
 
-#endif  // MODULES_LOCALIZATION_MSF_LOCALIZATION_IMU_PROCESS_H_
+

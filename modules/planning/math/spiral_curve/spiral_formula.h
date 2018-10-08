@@ -22,8 +22,8 @@
  * @warning: all partial derivatives shall guarantee sg > 0
  */
 
-#ifndef MODULES_PLANNING_MATH_SPIRAL_CURVE_SPIRAL_FORMULA_H_
-#define MODULES_PLANNING_MATH_SPIRAL_CURVE_SPIRAL_FORMULA_H_
+#pragma once
+
 
 #include <array>
 
@@ -231,4 +231,4 @@ class SpiralFormula {
 
 }  // namespace planning
 }  // namespace apollo
-#endif  // MODULES_PLANNING_MATH_SPIRAL_CURVE_SPIRAL_FORMULA_H_
+

@@ -18,8 +18,7 @@
  * @file
  */
 
-#ifndef MODEULES_THIRD_PARTY_PERCEPTION_CONVERSION_H_
-#define MODEULES_THIRD_PARTY_PERCEPTION_CONVERSION_H_
+#pragma once
 
 #include <cstdint>
 #include <queue>
@@ -63,4 +62,4 @@ apollo::perception::PerceptionObstacles RadarObstaclesToPerceptionObstacles(
 }  // namespace third_party_perception
 }  // namespace apollo
 
-#endif  // MODULES_THIRD_PARTY_PERCEPTION_FUSION_H_
+

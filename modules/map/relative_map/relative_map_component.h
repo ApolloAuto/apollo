@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_MAP_RELATIVE_MAP_RELATIVE_MAP_COMPONENT_H_
-#define MODULES_MAP_RELATIVE_MAP_RELATIVE_MAP_COMPONENT_H_
+#pragma once
+
 
 #include <memory>
 
@@ -55,5 +55,5 @@ CYBERTRON_REGISTER_COMPONENT(RelativeMapComponent)
 }  // namespace relative_map
 }  // namespace apollo
 
-#endif  // MODULES_MAP_RELATIVE_MAP_RELATIVE_MAP_COMPONENT_H_
+
 

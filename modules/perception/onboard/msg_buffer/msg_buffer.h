@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_ONBOARD_MSG_BUFFER_H_
-#define MODULES_PERCEPTION_ONBOARD_MSG_BUFFER_H_
+#pragma once
+
 
 #include <cfloat>
 #include <memory>
@@ -197,4 +197,4 @@ int MsgBuffer<T>::LookupPeriod(const double timestamp, const double period,
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_ONBOARD_MSG_BUFFER_H_
+

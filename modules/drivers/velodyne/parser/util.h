@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_DRIVERS_VELODYNE_PARSER_UTIL_H_
-#define MODULES_DRIVERS_VELODYNE_PARSER_UTIL_H_
+#pragma once
+
 
 #include <cmath>
 #include <fstream>
@@ -61,4 +61,4 @@ void init_sin_cos_rot_table(float* sin_rot_table, float* cos_rot_table,
 }  // namespace drivers
 }  // namespace apollo
 
-#endif  // MODULES_DRIVERS_VELODYNE_VELODYNE_POINTCLOUD_UTIL_H_
+

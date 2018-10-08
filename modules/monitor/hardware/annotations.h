@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_MONITOR_HARDWARE_ANNOTATIONS_H_
-#define MODULES_MONITOR_HARDWARE_ANNOTATIONS_H_
+#pragma once
+
 
 /// Indicating a pointer class member is not owned by an object of the class; it
 /// is the responsibility of the programmer to make sure the given pointer is
@@ -53,4 +53,4 @@
 /// should not be used directly.
 #define PRIVATE
 
-#endif  // MODULES_MONITOR_HARDWARE_ANNOTATIONS_H_
+

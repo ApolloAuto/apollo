@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_MONITOR_HARDWARE_CAN_ESDCAN_ESDCAN_UTILS_H_
-#define MODULES_MONITOR_HARDWARE_CAN_ESDCAN_ESDCAN_UTILS_H_
+#pragma once
+
 
 #include "modules/monitor/hardware/can/esdcan/esdcan_test.h"
 
@@ -39,4 +39,4 @@ void esdcan_print_bitrate(const NTCAN_BITRATE &bitrate);
 }  // namespace monitor
 }  // namespace apollo
 
-#endif  // MODULES_MONITOR_HARDWARE_CAN_ESDCAN_ESDCAN_UTILS_H_
+

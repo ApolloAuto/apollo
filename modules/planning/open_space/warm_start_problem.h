@@ -18,8 +18,8 @@
  * @file
  */
 
-#ifndef MODULES_PLANNING_OPEN_SPACE_WARM_START_PROBLEM_H_
-#define MODULES_PLANNING_OPEN_SPACE_WARM_START_PROBLEM_H_
+#pragma once
+
 
 #include <vector>
 
@@ -61,4 +61,4 @@ class WarmStartProblem {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_OPEN_SPACE_WARM_START_PROBLEM_H_
+

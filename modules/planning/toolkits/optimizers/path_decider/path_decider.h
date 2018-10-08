@@ -18,8 +18,8 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_TOOLKITS_OPTIMIZERS_PATH_DECIDER_PATH_DECIDER_H_
-#define MODULES_PLANNING_TOOLKITS_OPTIMIZERS_PATH_DECIDER_PATH_DECIDER_H_
+#pragma once
+
 
 #include <limits>
 #include <string>
@@ -54,4 +54,4 @@ class PathDecider : public Task {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_TOOLKITS_OPTIMIZERS_PATH_DECIDER_PATH_DECIDER_H_
+

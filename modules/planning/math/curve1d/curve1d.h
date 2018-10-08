@@ -18,8 +18,8 @@
  * @file curve1d.h
  **/
 
-#ifndef MODULES_PLANNING_MATH_CURVE1D_CURVE1D_H_
-#define MODULES_PLANNING_MATH_CURVE1D_CURVE1D_H_
+#pragma once
+
 
 #include <string>
 
@@ -45,4 +45,4 @@ class Curve1d {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_MATH_CURVE1D_CURVE1D_H_
+

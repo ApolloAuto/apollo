@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_LIDAR_COMMON_OBJECT_SEQUENCE_H_
-#define MODULES_PERCEPTION_LIDAR_COMMON_OBJECT_SEQUENCE_H_
+#pragma once
+
 
 #include <map>
 #include <memory>
@@ -64,4 +64,4 @@ class ObjectSequence {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_LIDAR_COMMON_OBJECT_SEQUENCE_H_
+

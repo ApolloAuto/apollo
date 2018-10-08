@@ -18,8 +18,8 @@
  * @file
  */
 
-#ifndef MODULES_COMMON_UTIL_FILE_H_
-#define MODULES_COMMON_UTIL_FILE_H_
+#pragma once
+
 
 #include <dirent.h>
 #include <fcntl.h>
@@ -272,4 +272,4 @@ void GetFileNamesInFolderById(const std::string &folder, const std::string &ext,
 }  // namespace common
 }  // namespace apollo
 
-#endif  // MODULES_COMMON_UTIL_FILE_H_
+

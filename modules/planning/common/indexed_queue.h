@@ -18,8 +18,8 @@
  * @file:
  **/
 
-#ifndef MODULES_PLANNING_COMMON_INDEXED_QUEUE_H_
-#define MODULES_PLANNING_COMMON_INDEXED_QUEUE_H_
+#pragma once
+
 
 #include <memory>
 #include <queue>
@@ -79,4 +79,4 @@ class IndexedQueue {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_COMMON_INDEXED_QUEUE_H_
+

@@ -63,4 +63,4 @@ class RepublishMsg : public apollo::common::ApolloApp {
 }  // namespace calibration
 }  // namespace apollo
 
-#endif  // MODULES_CALIBRATION_REPUBLISH_MSG_H_
+

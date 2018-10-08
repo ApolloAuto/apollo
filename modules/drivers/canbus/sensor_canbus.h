@@ -18,8 +18,8 @@
  * @file
  */
 
-#ifndef MODULES_DRIVERS_CANBUS_SENSOR_CANBUS_H_
-#define MODULES_DRIVERS_CANBUS_SENSOR_CANBUS_H_
+#pragma once
+
 
 #include <condition_variable>
 #include <memory>
@@ -227,4 +227,4 @@ bool SensorCanbus<SensorType>::OnError(const std::string &error_msg) {
 }  // namespace drivers
 }  // namespace apollo
 
-#endif  // MODULES_DRIVERS_CANBUS_SENSOR_CANBUS_H_
+

@@ -18,8 +18,8 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_TOOLKITS_OPTIMIZERS_POLY_ST_SPEED_POLY_ST_GRAPH_H_
-#define MODULES_PLANNING_TOOLKITS_OPTIMIZERS_POLY_ST_SPEED_POLY_ST_GRAPH_H_
+#pragma once
+
 
 #include <limits>
 #include <string>
@@ -93,4 +93,4 @@ class PolyStGraph {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_TOOLKITS_OPTIMIZERS_POLY_ST_SPEED_POLY_ST_GRAPH_H_
+

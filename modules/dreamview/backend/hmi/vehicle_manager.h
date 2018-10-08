@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_DREAMVIEW_BACKEND_HMI_VEHICLE_MANAGER_H_
-#define MODULES_DREAMVIEW_BACKEND_HMI_VEHICLE_MANAGER_H_
+#pragma once
+
 
 #include <string>
 
@@ -43,4 +43,4 @@ class VehicleManager {
 }  // namespace dreamview
 }  // namespace apollo
 
-#endif  // MODULES_DREAMVIEW_BACKEND_HMI_VEHICLE_MANAGER_H_
+

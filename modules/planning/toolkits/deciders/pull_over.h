@@ -18,8 +18,8 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_TOOLKITS_DECIDERS_PULLOVER_H_
-#define MODULES_PLANNING_TOOLKITS_DECIDERS_PULLOVER_H_
+#pragma once
+
 
 #include <string>
 #include <unordered_map>
@@ -121,4 +121,4 @@ class PullOver : public TrafficRule {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_TOOLKITS_DECIDERS_PULLOVER_H_
+

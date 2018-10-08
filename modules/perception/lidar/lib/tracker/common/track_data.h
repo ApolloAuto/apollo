@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_LIDAR_LIB_TRACKER_COMMON_TRACK_DATA_H_
-#define MODULES_PERCEPTION_LIDAR_LIB_TRACKER_COMMON_TRACK_DATA_H_
+#pragma once
+
 
 #include <map>
 #include <utility>
@@ -95,4 +95,4 @@ typedef std::shared_ptr<const TrackData> TrackDataConstPtr;
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_LIDAR_LIB_TRACKER_COMMON_TRACK_DATA_H_
+

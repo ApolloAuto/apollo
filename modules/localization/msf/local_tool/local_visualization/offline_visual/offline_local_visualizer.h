@@ -18,8 +18,8 @@
  * @file offline_local_visualizer.h
  * @brief The offline tool for localization visualization.
  */
-#ifndef MODULES_LOCALIZATION_MSF_LOCAL_TOOL_OFFLINE_LOCAL_VISUALIZER_H
-#define MODULES_LOCALIZATION_MSF_LOCAL_TOOL_OFFLINE_LOCAL_VISUALIZER_H
+#pragma once
+
 
 #include <map>
 #include <string>
@@ -106,4 +106,4 @@ class OfflineLocalVisualizer {
 }  // namespace localization
 }  // namespace apollo
 
-#endif  // MODULES_LOCALIZATION_MSF_LOCAL_TOOL_OFFLINE_LOCAL_VISUALIZER_H
+

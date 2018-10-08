@@ -19,8 +19,7 @@
  * @brief Defines the DigitalFilter class.
  */
 
-#ifndef MODULES_COMMON_FILTERS_DIGITAL_FILTER_H_
-#define MODULES_COMMON_FILTERS_DIGITAL_FILTER_H_
+#pragma once
 
 #include <deque>
 #include <vector>
@@ -151,5 +150,3 @@ class DigitalFilter {
 
 }  // namespace common
 }  // namespace apollo
-
-#endif /* MODULES_COMMON_FILTERS_DIGITAL_FILTER_H_ */

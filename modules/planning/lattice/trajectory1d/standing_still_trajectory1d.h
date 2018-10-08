@@ -18,8 +18,8 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_LATTICE_STANDING_STILL_TRAJECTORY1D_H_
-#define MODULES_PLANNING_LATTICE_STANDING_STILL_TRAJECTORY1D_H_
+#pragma once
+
 
 #include <stdint.h>
 #include <string>
@@ -58,4 +58,4 @@ class StandingStillTrajectory1d : public Curve1d {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_LATTICE_STANDING_STILL_TRAJECTORY1D_H_
+

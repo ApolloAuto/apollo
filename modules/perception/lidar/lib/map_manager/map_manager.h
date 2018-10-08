@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_LIDAR_LIB_MAP_MANAGER_MAP_MANAGER_H_
-#define MODULES_PERCEPTION_LIDAR_LIB_MAP_MANAGER_MAP_MANAGER_H_
+#pragma once
+
 
 #include <string>
 
@@ -65,4 +65,4 @@ class MapManager {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_LIDAR_LIB_MAP_MANAGER_MAP_MANAGER_H_
+

@@ -23,8 +23,8 @@
  * 0 at East, pi/2 at North, -pi/2 at South.
  */
 
-#ifndef MODULES_COMMON_MATH_QUATERNION_H_
-#define MODULES_COMMON_MATH_QUATERNION_H_
+#pragma once
+
 
 #include <cmath>
 
@@ -119,4 +119,4 @@ inline Eigen::Vector3d InverseQuaternionRotate(const Quaternion &orientation,
 }  // namespace common
 }  // namespace apollo
 
-#endif /* MODULES_COMMON_MATH_QUATERNION_H_ */
+

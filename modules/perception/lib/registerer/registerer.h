@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_LIB_REGISTERER_REGISTERER_H_
-#define MODULES_PERCEPTION_LIB_REGISTERER_REGISTERER_H_
+#pragma once
+
 
 #include <map>
 #include <string>
@@ -157,4 +157,4 @@ bool GetRegisteredClasses(
   }                                                                           \
   }  // namespace
 
-#endif  // MODULES_PERCEPTION_LIB_REGISTERER_REGISTERER_H_
+

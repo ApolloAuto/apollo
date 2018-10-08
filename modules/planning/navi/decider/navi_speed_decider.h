@@ -19,8 +19,8 @@
  * @brief This file provides the declaration of the class "NaviSpeedDecider".
  */
 
-#ifndef MODULES_PLANNING_NAVI_NAVI_SPEED_DECIDER_H_
-#define MODULES_PLANNING_NAVI_NAVI_SPEED_DECIDER_H_
+#pragma once
+
 
 #include <functional>
 #include <string>
@@ -169,4 +169,4 @@ class NaviSpeedDecider : public NaviTask {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_NAVI_NAVI_SPEED_DECIDER_H_
+

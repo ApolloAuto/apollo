@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PREDICTION_EVALUATOR_VEHICLE_COST_EVALUATOR_H_
-#define MODULES_PREDICTION_EVALUATOR_VEHICLE_COST_EVALUATOR_H_
+#pragma once
+
 
 #include "modules/prediction/container/obstacles/obstacle.h"
 #include "modules/prediction/evaluator/evaluator.h"
@@ -56,4 +56,4 @@ class CostEvaluator : public Evaluator {
 }  // namespace prediction
 }  // namespace apollo
 
-#endif  // MODULES_PREDICTION_EVALUATOR_VEHICLE_COST_EVALUATOR_H_
+

@@ -21,8 +21,8 @@
 #include "cybertron/common/macros.h"
 #include "modules/prediction/network/net_model.h"
 
-#ifndef MODULES_PREDICTION_NETWORK_RNN_MODEL_RNN_MODEL_H_
-#define MODULES_PREDICTION_NETWORK_RNN_MODEL_RNN_MODEL_H_
+#pragma once
+
 
 /**
  * @namespace apollo::prediction::network
@@ -73,4 +73,4 @@ class RnnModel : public NetModel {
 }  // namespace prediction
 }  // namespace apollo
 
-#endif  // MODULES_PREDICTION_NETWORK_RNN_MODEL_RNN_MODEL_H_
+

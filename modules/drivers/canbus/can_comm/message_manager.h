@@ -18,8 +18,8 @@
  * @file message_manager.h
  * @brief The class of MessageManager
  */
-#ifndef MODULES_DRIVERS_CANBUS_CAN_COMM_MESSAGE_MANAGER_H_
-#define MODULES_DRIVERS_CANBUS_CAN_COMM_MESSAGE_MANAGER_H_
+#pragma once
+
 
 #include <memory>
 #include <mutex>
@@ -244,4 +244,4 @@ void MessageManager<SensorType>::ResetSendMessages() {
 }  // namespace drivers
 }  // namespace apollo
 
-#endif  // MODULES_DRIVERS_CANBUS_CAN_COMM_MESSAGE_MANAGER_H_
+

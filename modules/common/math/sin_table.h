@@ -19,8 +19,8 @@
  * @brief Exports the SIN_TABLE, used by the Angle class.
  */
 
-#ifndef MODULES_COMMON_MATH_SIN_TABLE_H_
-#define MODULES_COMMON_MATH_SIN_TABLE_H_
+#pragma once
+
 
 /**
  * @namespace apollo::common::math
@@ -37,5 +37,3 @@ extern const float SIN_TABLE[SIN_TABLE_SIZE];
 }  // namespace math
 }  // namespace common
 }  // namespace apollo
-
-#endif /* MODULES_COMMON_MATH_SIN_TABLE_H_ */

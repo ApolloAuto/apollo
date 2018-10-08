@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_FUSION_LIB_DATA_ASSOCIATION_TRACK_OBJECT_SIMILARITY_H_  // NOLINT
-#define MODULES_PERCEPTION_FUSION_LIB_DATA_ASSOCIATION_TRACK_OBJECT_SIMILARITY_H_  // NOLINT
+#pragma once
+
 
 #include <vector>
 
@@ -116,5 +116,3 @@ double ComputeRadarCameraVelocitySimilarity(const SensorObjectConstPtr& radar,
 }  // namespace fusion
 }  // namespace perception
 }  // namespace apollo
-
-#endif  // FUSION_LIB_DATA_ASSOCIATION_TRACK_OBJECT_SIMILARITY_H_

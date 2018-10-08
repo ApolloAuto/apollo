@@ -18,8 +18,8 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_TOOLKITS_OPTIMIZERS_QP_PIECEWISE_JERK_PATH_OPTIMIZER_H_
-#define MODULES_PLANNING_TOOLKITS_OPTIMIZERS_QP_PIECEWISE_JERK_PATH_OPTIMIZER_H_
+#pragma once
+
 
 #include <memory>
 #include <string>
@@ -59,6 +59,3 @@ class QpPiecewiseJerkPathOptimizer : public PathOptimizer {
 
 }  // namespace planning
 }  // namespace apollo
-
-#endif
-// MODULES_PLANNING_TOOLKITS_OPTIMIZERS_QP_PIECEWISE_JERK_PATH_OPTIMIZER_H_

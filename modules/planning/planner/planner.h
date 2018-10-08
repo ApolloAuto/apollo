@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PLANNING_PLANNER_PLANNER_H_
-#define MODULES_PLANNING_PLANNER_PLANNER_H_
+#pragma once
+
 
 #include <string>
 
@@ -100,4 +100,4 @@ class PlannerWithReferenceLine : public Planner {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_PLANNER_PLANNER_H_
+

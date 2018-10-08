@@ -18,8 +18,8 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_LATTICE_CONSTANT_DECELERATION_TRAJECTORY1D_H_
-#define MODULES_PLANNING_LATTICE_CONSTANT_DECELERATION_TRAJECTORY1D_H_
+#pragma once
+
 
 #include <string>
 #include "modules/planning/math/curve1d/curve1d.h"
@@ -64,4 +64,4 @@ class ConstantDecelerationTrajectory1d : public Curve1d {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_LATTICE_CONSTANT_DECELERATION_TRAJECTORY1D_H_
+

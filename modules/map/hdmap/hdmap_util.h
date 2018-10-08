@@ -13,8 +13,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 =========================================================================*/
 
-#ifndef MODULES_MAP_HDMAP_HDMAP_UTIL_H_
-#define MODULES_MAP_HDMAP_HDMAP_UTIL_H_
+#pragma once
+
 
 #include <memory>
 #include <mutex>
@@ -119,4 +119,4 @@ class HDMapUtil {
 }  // namespace hdmap
 }  // namespace apollo
 
-#endif  // MODULES_MAP_HDMAP_HDMAP_UTIL_H_
+

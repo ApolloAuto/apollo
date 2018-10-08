@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_INFERENCE_UTILS_UTIL_H_
-#define MODULES_PERCEPTION_INFERENCE_UTILS_UTIL_H_
+#pragma once
+
 
 #include <cuda_runtime_api.h>
 #include <fstream>
@@ -54,4 +54,4 @@ bool write_result(const std::string &out_path,
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_INFERENCE_UTILS_UTIL_H_
+

@@ -19,8 +19,8 @@
  * @brief Define lane sequence predictor
  */
 
-#ifndef MODULES_PREDICTION_PREDICTOR_FREE_MOVE_FREE_MOVE_PREDICTOR_H_
-#define MODULES_PREDICTION_PREDICTOR_FREE_MOVE_FREE_MOVE_PREDICTOR_H_
+#pragma once
+
 
 #include <vector>
 
@@ -69,4 +69,4 @@ class FreeMovePredictor : public Predictor {
 }  // namespace prediction
 }  // namespace apollo
 
-#endif  // MODULES_PREDICTION_PREDICTOR_VEHICLE_FREE_MOVE_PREDICTOR_H_
+

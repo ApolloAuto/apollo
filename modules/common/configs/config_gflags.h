@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_COMMON_CONFIGS_GFLAGS_H_
-#define MODULES_COMMON_CONFIGS_GFLAGS_H_
+#pragma once
+
 
 #include "gflags/gflags.h"
 
@@ -42,4 +42,4 @@ DECLARE_string(localization_tf2_child_frame_id);
 DECLARE_bool(use_navigation_mode);
 DECLARE_string(navigation_mode_end_way_point_file);
 
-#endif  // MODULES_COMMON_CONFIGS_GFLAGS_H_
+

@@ -18,8 +18,8 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_COMMON_REFERENCE_LINE_INFO_H_
-#define MODULES_PLANNING_COMMON_REFERENCE_LINE_INFO_H_
+#pragma once
+
 
 #include <algorithm>
 #include <limits>
@@ -239,4 +239,4 @@ class ReferenceLineInfo {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_COMMON_REFERENCE_LINE_INFO_H_
+

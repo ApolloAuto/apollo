@@ -19,8 +19,8 @@
  * @brief The class of ProtocolData
  */
 
-#ifndef MODULES_DRIVERS_CANBUS_CAN_COMM_PROTOCOL_DATA_H_
-#define MODULES_DRIVERS_CANBUS_CAN_COMM_PROTOCOL_DATA_H_
+#pragma once
+
 
 #include <cmath>
 #include <numeric>
@@ -150,4 +150,4 @@ void ProtocolData<SensorType>::Reset() {}
 }  // namespace drivers
 }  // namespace apollo
 
-#endif  // MODULES_DRIVERS_CANBUS_CAN_COMM_PROTOCOL_DATA_H_
+

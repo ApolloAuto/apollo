@@ -19,8 +19,8 @@
  * @brief Defines the FakeCanClient class which inherites CanClient.
  */
 
-#ifndef MODULES_DRIVERS_CANBUS_CAN_CLIENT_FAKE_FAKE_CAN_CLIENT_H_
-#define MODULES_DRIVERS_CANBUS_CAN_CLIENT_FAKE_FAKE_CAN_CLIENT_H_
+#pragma once
+
 
 #include <sstream>
 #include <string>
@@ -109,4 +109,4 @@ class FakeCanClient : public CanClient {
 }  // namespace drivers
 }  // namespace apollo
 
-#endif  // MODULES_DRIVERS_CANBUS_CAN_CLIENT_FAKE_FAKE_CAN_CLIENT_H_
+

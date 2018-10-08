@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_DRIVERS_RADAR_RACOBIT_RADAR_PROTOCOL_CLUSTER_GENERAL_INFO_701_H_
-#define MODULES_DRIVERS_RADAR_RACOBIT_RADAR_PROTOCOL_CLUSTER_GENERAL_INFO_701_H_
+#pragma once
+
 
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 #include "modules/drivers/proto/racobit_radar.pb.h"
@@ -53,5 +53,3 @@ class ClusterGeneralInfo701
 }  // namespace racobit_radar
 }  // namespace drivers
 }  // namespace apollo
-#endif
-// MODULES_DRIVERS_RADAR_RACOBIT_RADAR_PROTOCOL_CLUSTER_GENERAL_INFO_701_H

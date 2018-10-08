@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_THIRD_PARTY_PERCEPTION_THIRD_PARTY_PERCEPTION_GFLAGS_H_
-#define MODULES_THIRD_PARTY_PERCEPTION_THIRD_PARTY_PERCEPTION_GFLAGS_H_
+#pragma once
+
 
 #include "gflags/gflags.h"
 
@@ -60,5 +60,3 @@ DECLARE_bool(use_conti_radar);
 DECLARE_double(max_mobileye_obstacle_length);
 DECLARE_double(max_mobileye_obstacle_width);
 DECLARE_bool(overwrite_mobileye_theta);
-
-#endif

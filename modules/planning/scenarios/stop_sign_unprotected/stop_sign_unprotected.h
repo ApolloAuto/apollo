@@ -18,8 +18,8 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_SCENARIOS_STOP_SIGN_UNPROTECTED_SCENARIO_H_
-#define MODULES_PLANNING_SCENARIOS_STOP_SIGN_UNPROTECTED_SCENARIO_H_
+#pragma once
+
 
 #include <memory>
 #include <vector>
@@ -66,4 +66,4 @@ class StopSignUnprotectedScenario : public Scenario {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_SCENARIOS_STOP_SIGN_UNPROTECTED_SCENARIO_H_
+

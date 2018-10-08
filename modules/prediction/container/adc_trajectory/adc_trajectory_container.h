@@ -19,8 +19,8 @@
  * @brief ADC trajectory container
  */
 
-#ifndef MODULES_PREDICTION_CONTAINER_ADC_TRAJECTORY_OBSTACLES_H_
-#define MODULES_PREDICTION_CONTAINER_ADC_TRAJECTORY_OBSTACLES_H_
+#pragma once
+
 
 #include <memory>
 #include <string>
@@ -123,4 +123,4 @@ class ADCTrajectoryContainer : public Container {
 }  // namespace prediction
 }  // namespace apollo
 
-#endif  // MODULES_PREDICTION_CONTAINER_ADC_TRAJECTORY_OBSTACLES_H_
+

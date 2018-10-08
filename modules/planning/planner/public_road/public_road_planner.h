@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PLANNING_PLANNER_PUBLIC_ROAD_PUBLIC_ROAD_PLANNER_H_
-#define MODULES_PLANNING_PLANNER_PUBLIC_ROAD_PUBLIC_ROAD_PLANNER_H_
+#pragma once
+
 
 #include <memory>
 #include <string>
@@ -76,4 +76,4 @@ class PublicRoadPlanner : public PlannerWithReferenceLine {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_PLANNER_PUBLIC_ROAD_PUBLIC_ROAD_PLANNER_H_
+

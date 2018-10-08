@@ -18,8 +18,8 @@
  * @file
  */
 
-#ifndef MODULES_CANBUS_CANBUS_COMPONENT_H_
-#define MODULES_CANBUS_CANBUS_COMPONENT_H_
+#pragma once
+
 
 #include <memory>
 #include <string>
@@ -111,4 +111,4 @@ CYBERTRON_REGISTER_COMPONENT(CanbusComponent)
 }  // namespace canbus
 }  // namespace apollo
 
-#endif  // MODULES_CANBUS_CANBUS_COMPONENT_H_
+

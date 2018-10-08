@@ -18,8 +18,8 @@
  * @file spline_2d_seg.h
  **/
 
-#ifndef MODULES_PLANNING_SMOOTHER_SPLINE_SPLINE_2D_SEG_H_
-#define MODULES_PLANNING_SMOOTHER_SPLINE_SPLINE_2D_SEG_H_
+#pragma once
+
 
 #include <utility>
 #include <vector>
@@ -73,4 +73,4 @@ class Spline2dSeg {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_SMOOTHER_SPLINE_SMOOTHER_SPLINE2D_H_
+

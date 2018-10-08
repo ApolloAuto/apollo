@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_COMMON_UTIL_DISJOINT_SET_H_
-#define MODULES_COMMON_UTIL_DISJOINT_SET_H_
+#pragma once
+
 
 namespace apollo {
 namespace common {
@@ -74,4 +74,4 @@ void DisjointSetUnion(T *x, T *y) {
 }  // namespace common
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_COMMON_UTIL_DISJOINT_SET_H_
+

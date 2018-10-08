@@ -19,8 +19,8 @@
  * @brief Obstacles container
  */
 
-#ifndef MODULES_PREDICTION_CONTAINER_POSE_OBSTACLES_H_
-#define MODULES_PREDICTION_CONTAINER_POSE_OBSTACLES_H_
+#pragma once
+
 
 #include <memory>
 
@@ -98,4 +98,4 @@ class PoseContainer : public Container {
 }  // namespace prediction
 }  // namespace apollo
 
-#endif  // MODULES_PREDICTION_CONTAINER_POSE_OBSTACLES_H_
+

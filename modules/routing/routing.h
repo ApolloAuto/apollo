@@ -14,8 +14,8 @@
   * limitations under the License.
   *****************************************************************************/
 
-#ifndef MODULES_ROUTING_ROUTING_H_
-#define MODULES_ROUTING_ROUTING_H_
+#pragma once
+
 
 #include <memory>
 #include <string>
@@ -74,4 +74,4 @@ class Routing {
 }  // namespace routing
 }  // namespace apollo
 
-#endif  // MODULES_ROUTING_ROUTING_H_
+

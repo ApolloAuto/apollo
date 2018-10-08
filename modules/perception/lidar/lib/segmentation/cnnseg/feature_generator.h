@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_LIDAR_LIB_SEGMENTATION_CNNSEG_FEATURE_GENERATOR_H_
-#define MODULES_PERCEPTION_LIDAR_LIB_SEGMENTATION_CNNSEG_FEATURE_GENERATOR_H_
+#pragma once
+
 
 #include <cmath>
 #include <memory>
@@ -126,4 +126,4 @@ class FeatureGenerator {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_LIDAR_LIB_SEGMENTATION_CNNSEG_FEATURE_GENERATOR_H_
+

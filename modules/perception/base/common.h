@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_BASE_COMMON_H_
-#define MODULES_PERCEPTION_BASE_COMMON_H_
+#pragma once
+
 
 #ifndef PERCEPTION_CPU_ONLY
 
@@ -55,4 +55,4 @@ inline void GPUAssert(cudaError_t code, const char *file, int line,
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_BASE_COMMON_H_
+

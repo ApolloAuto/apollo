@@ -19,8 +19,8 @@
  * @brief Defines the LonController class.
  */
 
-#ifndef MODULES_CONTROL_CONTROLLER_LON_CONTROLLER_H_
-#define MODULES_CONTROL_CONTROLLER_LON_CONTROLLER_H_
+#pragma once
+
 
 #include <map>
 #include <memory>
@@ -140,4 +140,4 @@ class LonController : public Controller {
 };
 }  // namespace control
 }  // namespace apollo
-#endif  // MODULES_CONTROL_CONTROLLER_LONGITUDINAL_CONTROLLER_H_
+

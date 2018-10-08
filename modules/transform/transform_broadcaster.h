@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_TRANSFORM_TRANSFORM_BROADCASTER_H_
-#define MODULES_TRANSFORM_TRANSFORM_BROADCASTER_H_
+#pragma once
+
 
 #include <memory>
 #include <vector>
@@ -56,4 +56,4 @@ class TransformBroadcaster {
 }  // namespace transform
 }  // namespace apollo
 
-#endif  // MODULES_TRANSFORM_TRANSFORM_BROADCASTER_H_
+

@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_DRIVERS_GNSS_STREAM_RAW_STREAM_H_
-#define MODULES_DRIVERS_GNSS_STREAM_RAW_STREAM_H_
+#pragma once
+
 
 #include <fstream>
 #include <memory>
@@ -110,4 +110,4 @@ class RawStream {
 }  // namespace drivers
 }  // namespace apollo
 
-#endif  // MODULES_DRIVERS_GNSS_STREAM_RAW_STREAM_H_
+

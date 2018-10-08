@@ -19,8 +19,8 @@
  * @brief Solver for discrete-time linear quadratic problem.
  */
 
-#ifndef MODULES_COMMON_MATH_LINEAR_QUADRATIC_REGULATOR_H_
-#define MODULES_COMMON_MATH_LINEAR_QUADRATIC_REGULATOR_H_
+#pragma once
+
 
 #include "Eigen/Core"
 
@@ -52,4 +52,4 @@ void SolveLQRProblem(const Eigen::MatrixXd &A, const Eigen::MatrixXd &B,
 }  // namespace common
 }  // namespace apollo
 
-#endif  // MODULES_COMMON_MATH_LINEAR_QUADRATIC_REGULATOR_H_
+

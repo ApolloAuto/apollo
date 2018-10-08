@@ -18,8 +18,8 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_LATTICE_LATERAL_TRAJECTORY_OPTIMIZER_INTERFACE_H_
-#define MODULES_PLANNING_LATTICE_LATERAL_TRAJECTORY_OPTIMIZER_INTERFACE_H_
+#pragma once
+
 
 #include <utility>
 #include <vector>
@@ -130,4 +130,4 @@ class LateralTrajectoryOptimizerInterface : public Ipopt::TNLP {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_LATTICE_LATERAL_TRAJECTORY_OPTIMIZER_INTERFACE_H_
+

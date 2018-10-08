@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_MONITOR_HARDWARE_CAN_CAN_CHECKER_FACTORY_H_
-#define MODULES_MONITOR_HARDWARE_CAN_CAN_CHECKER_FACTORY_H_
+#pragma once
+
 
 #include <memory>
 
@@ -56,5 +56,5 @@ class CanCheckerFactory
 }  // namespace monitor
 }  // namespace apollo
 
-#endif  // MODULES_MONITOR_HARDWARE_CAN_CAN_CHECKER_FACTORY_H_
+
 

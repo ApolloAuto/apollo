@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_FUSION_LIB_DATA_ASSOCIATION_PROJECTION_CACHE_H_
-#define MODULES_PERCEPTION_FUSION_LIB_DATA_ASSOCIATION_PROJECTION_CACHE_H_
+#pragma once
+
 #include <iostream>
 #include <map>
 #include <string>
@@ -186,4 +186,4 @@ typedef ProjectionCache* ProjectionCachePtr;
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_FUSION_LIB_DATA_ASSOCAITION_PROJECTION_CACHE_H_
+

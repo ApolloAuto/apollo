@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_FUSION_COMMON_CAMERA_UTIL_H_
-#define MODULES_PERCEPTION_FUSION_COMMON_CAMERA_UTIL_H_
+#pragma once
+
 
 #include <memory>
 #include <vector>
@@ -98,4 +98,4 @@ float ObjectInCameraView(SensorObjectConstPtr sensor_object,
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_FUSION_COMMON_CAMERA_UTIL_H_
+

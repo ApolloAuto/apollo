@@ -18,8 +18,8 @@
  * @file
  **/
 
-#ifndef MODULES_PREDICTION_COMMON_VALIDATION_CHECKER_H_
-#define MODULES_PREDICTION_COMMON_VALIDATION_CHECKER_H_
+#pragma once
+
 
 #include <vector>
 
@@ -63,4 +63,4 @@ class ValidationChecker {
 }  // namespace prediction
 }  // namespace apollo
 
-#endif  // MODULES_PREDICTION_COMMON_VALIDATION_CHECKER_H_
+

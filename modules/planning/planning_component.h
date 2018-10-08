@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PLANNING_PLANNING_COMPONENT_H_
-#define MODULES_PLANNING_PLANNING_COMPONENT_H_
+#pragma once
+
 
 #include <memory>
 #include <mutex>
@@ -87,4 +87,4 @@ CYBERTRON_REGISTER_COMPONENT(PlanningComponent)
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_PLANNING_COMPONENT_H_
+

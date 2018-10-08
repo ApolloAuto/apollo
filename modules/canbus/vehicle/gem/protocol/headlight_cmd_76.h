@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_CANBUS_VEHICLE_GEM_PROTOCOL_HEADLIGHT_CMD_76_H_
-#define MODULES_CANBUS_VEHICLE_GEM_PROTOCOL_HEADLIGHT_CMD_76_H_
+#pragma once
+
 
 #include "modules/canbus/proto/chassis_detail.pb.h"
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
@@ -62,4 +62,4 @@ class Headlightcmd76 : public ::apollo::drivers::canbus::ProtocolData<
 }  // namespace canbus
 }  // namespace apollo
 
-#endif  // MODULES_CANBUS_VEHICL_GEM_PROTOCOL_HEADLIGHT_CMD_76_H_
+

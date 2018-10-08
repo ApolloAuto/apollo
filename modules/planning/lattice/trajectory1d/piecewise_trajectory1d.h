@@ -18,8 +18,8 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_LATTICE_PIECEWISE_TRAJECTORY1D_H_
-#define MODULES_PLANNING_LATTICE_PIECEWISE_TRAJECTORY1D_H_
+#pragma once
+
 
 #include <memory>
 #include <string>
@@ -57,4 +57,4 @@ class PiecewiseTrajectory1d : public Curve1d {
 }  // namespace planning
 }  // namespace apollo
 
-#endif /* MODULES_PLANNING_LATTICE_PIECEWISE_TRAJECTORY1D_H_ */
+

@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_TOOLS_VISUALIZER_TEXTURE_H_
-#define MODULES_TOOLS_VISUALIZER_TEXTURE_H_
+#pragma once
+
 
 #include <QImage>
 #include <QOpenGLBuffer>
@@ -60,4 +60,4 @@ class Texture {
   GLubyte* data_;
 };
 
-#endif  // MODULES_TOOLS_VISUALIZER_TEXTURE_H_
+

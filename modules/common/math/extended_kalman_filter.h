@@ -19,8 +19,8 @@
  * @brief Defines the templated extended Kalman filter class.
  */
 
-#ifndef MODULES_COMMON_MATH_EXTENDED_KALMAN_FILTER_H_
-#define MODULES_COMMON_MATH_EXTENDED_KALMAN_FILTER_H_
+#pragma once
+
 
 #include <functional>
 #include <utility>
@@ -254,4 +254,4 @@ inline void ExtendedKalmanFilter<T, XN, ZN, UN>::Correct(
 }  // namespace common
 }  // namespace apollo
 
-#endif  // MODULES_COMMON_MATH_EXTENDED_KALMAN_FILTER_H_
+

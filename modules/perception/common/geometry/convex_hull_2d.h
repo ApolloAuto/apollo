@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_COMMON_GEOMETRY_CONVEX_HULL_2D_H_
-#define MODULES_PERCEPTION_COMMON_GEOMETRY_CONVEX_HULL_2D_H_
+#pragma once
+
 
 #include <cfloat>
 #include <algorithm>
@@ -234,4 +234,4 @@ bool ConvexHull2D<CLOUD_IN_TYPE, CLOUD_OUT_TYPE>::GetConvexHullMonotoneChain(
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_COMMON_GEOMETRY_CONVEX_HULL_2D_H_
+

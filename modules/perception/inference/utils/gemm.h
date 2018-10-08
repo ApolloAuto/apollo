@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_INFERENCE_UTILS_GEMM_H
-#define MODULES_PERCEPTION_INFERENCE_UTILS_GEMM_H
+#pragma once
+
 
 #include <cblas.h>
 #include <cuda_runtime_api.h>
@@ -53,4 +53,4 @@ void GPUMSetFloat(const int n, const float alpha, float *result);
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_INFERENCE_UTILS_GEMM_H
+

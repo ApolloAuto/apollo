@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PREDICTION_NETWORK_NET_MODEL_H_
-#define MODULES_PREDICTION_NETWORK_NET_MODEL_H_
+#pragma once
+
 
 #include <memory>
 #include <string>
@@ -121,4 +121,4 @@ class NetModel {
 }  // namespace prediction
 }  // namespace apollo
 
-#endif  // MODULES_PREDICTION_NETWORK_NET_MODEL_H_
+

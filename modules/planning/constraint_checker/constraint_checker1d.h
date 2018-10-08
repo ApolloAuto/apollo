@@ -18,8 +18,8 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_CONSTRAINT_CHECKER_CONSTRAINT_CHECKER1D_H_
-#define MODULES_PLANNING_CONSTRAINT_CHECKER_CONSTRAINT_CHECKER1D_H_
+#pragma once
+
 
 #include <vector>
 
@@ -42,4 +42,4 @@ class ConstraintChecker1d {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_CONSTRAINT_CHECKER_CONSTRAINT_CHECKER1D_H_
+

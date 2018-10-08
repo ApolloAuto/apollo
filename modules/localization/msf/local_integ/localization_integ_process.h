@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_LOCALIZATION_MSF_LOCALIZATION_IMU_PROCESS_H_
-#define MODULES_LOCALIZATION_MSF_LOCALIZATION_IMU_PROCESS_H_
+#pragma once
+
 
 #include <atomic>
 #include <condition_variable>
@@ -107,4 +107,4 @@ class LocalizationIntegProcess {
 }  // namespace localization
 }  // namespace apollo
 
-#endif  // MODULES_LOCALIZATION_MSF_LOCALIZATION_IMU_PROCESS_H_
+

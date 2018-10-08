@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_COMMON_POINT_CLOUD_PROCESSING_DOWNSAMPLING_H_
-#define MODULES_PERCEPTION_COMMON_POINT_CLOUD_PROCESSING_DOWNSAMPLING_H_
+#pragma once
+
 
 #include <memory>
 #include <utility>
@@ -219,4 +219,4 @@ void DownsamplingRectangleNeighbour(
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_COMMON_POINT_CLOUD_PROCESSING_DOWNSAMPLING_H_
+

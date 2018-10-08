@@ -19,8 +19,8 @@
  * @brief Defines the templated AABoxKDTree2dNode class.
  */
 
-#ifndef MODULES_COMMON_MATH_AABOXKDTREE2D_H_
-#define MODULES_COMMON_MATH_AABOXKDTREE2D_H_
+#pragma once
+
 
 #include <algorithm>
 #include <limits>
@@ -471,4 +471,4 @@ class AABoxKDTree2d {
 }  // namespace common
 }  // namespace apollo
 
-#endif /* MODULES_COMMON_MATH_AABOXKDTREE2D_H_ */
+

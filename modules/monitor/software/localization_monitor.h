@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_MONITOR_SOFTWARE_LOCALIZATION_MONITOR_H_
-#define MODULES_MONITOR_SOFTWARE_LOCALIZATION_MONITOR_H_
+#pragma once
+
 
 #include "modules/monitor/common/recurrent_runner.h"
 
@@ -30,4 +30,4 @@ class LocalizationMonitor : public RecurrentRunner {
 }  // namespace monitor
 }  // namespace apollo
 
-#endif  // MODULES_MONITOR_SOFTWARE_LOCALIZATION_MONITOR_H_
+

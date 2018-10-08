@@ -14,8 +14,8 @@
   * limitations under the License.
   *****************************************************************************/
 
-#ifndef MODULES_ROUTING_GRAPH_RANGE_UTILS_H
-#define MODULES_ROUTING_GRAPH_RANGE_UTILS_H
+#pragma once
+
 
 #include <vector>
 
@@ -102,4 +102,4 @@ int BinarySearchForEndS(const std::vector<T>& sorted_vec, double value_s) {
 }  // namespace routing
 }  // namespace apollo
 
-#endif  // MODULES_ROUTING_GRAPH_RANGE_UTILS_H
+

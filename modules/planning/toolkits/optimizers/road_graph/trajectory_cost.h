@@ -18,8 +18,8 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_TOOLKITS_OPTIMIZERS_DP_POLY_PATH_TRAJECTORY_COST_H_
-#define MODULES_PLANNING_TOOLKITS_OPTIMIZERS_DP_POLY_PATH_TRAJECTORY_COST_H_
+#pragma once
+
 
 #include <vector>
 
@@ -90,4 +90,4 @@ class TrajectoryCost {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_TOOLKITS_OPTIMIZERS_DP_POLY_PATH_TRAJECTORY_COST_H_
+

@@ -18,8 +18,8 @@
  * @brief Convert mpc problem to qp based problem and solve.
  */
 
-#ifndef MODULES_CONTROL_COMMON_MPC_SOLVER_H_
-#define MODULES_CONTROL_COMMON_MPC_SOLVER_H_
+#pragma once
+
 
 #include <vector>
 
@@ -60,4 +60,4 @@ bool SolveLinearMPC(
 }  // namespace common
 }  // namespace apollo
 
-#endif  // MODULES_CONTROL_COMMON_MPC_SOLVER_H_
+

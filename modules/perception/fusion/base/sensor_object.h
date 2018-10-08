@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_FUSION_BASE_SENSOR_OBJECT_H_
-#define MODULES_PERCEPTION_FUSION_BASE_SENSOR_OBJECT_H_
+#pragma once
+
 
 #include <memory>
 #include <string>
@@ -90,4 +90,4 @@ bool IsCamera(const SensorObjectConstPtr& obj);
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_FUSION_BASE_SENSOR_OBJECT_H_
+

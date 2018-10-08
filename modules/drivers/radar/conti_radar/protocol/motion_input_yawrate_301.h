@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_DRIVERS_RADAR_CONTI_RADAR_PROTOCOL_MOTION_INPUT_YAWRATE_300_H_
-#define MODULES_DRIVERS_RADAR_CONTI_RADAR_PROTOCOL_MOTION_INPUT_YAWRATE_300_H_
+#pragma once
+
 
 #include <cmath>
 
@@ -63,6 +63,3 @@ class MotionInputYawRate301
 }  // namespace conti_radar
 }  // namespace drivers
 }  // namespace apollo
-
-// MODULES_DRIVERS_RADAR_CONTI_RADAR_PROTOCOL_MOTION_INPUT_YAWRATE_300_H_
-#endif

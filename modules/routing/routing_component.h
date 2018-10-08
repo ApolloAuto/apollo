@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_ROUTING_ROUTING_COMPONENT_H_
-#define MODULES_ROUTING_ROUTING_COMPONENT_H_
+#pragma once
+
 
 #include <memory>
 
@@ -46,5 +46,5 @@ CYBERTRON_REGISTER_COMPONENT(RoutingComponent)
 }  // namespace routing
 }  // namespace apollo
 
-#endif  // MODULES_ROUTING_ROUTING_COMPONENT_H_
+
 

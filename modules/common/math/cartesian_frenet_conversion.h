@@ -18,8 +18,8 @@
  * @file
  **/
 
-#ifndef MODULES_COMMON_MATH_CARTESIAN_FRENET_CONVERSION_H_
-#define MODULES_COMMON_MATH_CARTESIAN_FRENET_CONVERSION_H_
+#pragma once
+
 
 #include <array>
 
@@ -105,4 +105,4 @@ class CartesianFrenetConverter {
 }  // namespace common
 }  // namespace apollo
 
-#endif  // MODULES_COMMON_MATH_CARTESIAN_FRENET_CONVERSION_H_
+

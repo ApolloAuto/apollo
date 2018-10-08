@@ -14,8 +14,8 @@
   * limitations under the License.
   *****************************************************************************/
 
-#ifndef MODULES_ROUTING_CORE_BLACK_LIST_RANGE_GENERATOR_H
-#define MODULES_ROUTING_CORE_BLACK_LIST_RANGE_GENERATOR_H
+#pragma once
+
 
 #include <memory>
 #include <unordered_map>
@@ -46,4 +46,4 @@ class BlackListRangeGenerator {
 }  // namespace routing
 }  // namespace apollo
 
-#endif  // MODULES_ROUTING_CORE_BLACK_LIST_RANGE_GENERATOR_H
+

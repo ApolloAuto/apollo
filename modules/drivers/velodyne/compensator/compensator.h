@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_DRIVERS_VELODYNE_COMPENSATOR_COMPENSATOR_H_
-#define MODULES_DRIVERS_VELODYNE_COMPENSATOR_COMPENSATOR_H_
+#pragma once
+
 
 #include <Eigen/Eigen>
 #include <memory>
@@ -75,4 +75,4 @@ class Compensator {
 }  // namespace drivers
 }  // namespace apollo
 
-#endif  // MODULES_DRIVERS_VELODYNE_COMPENSATOR_COMPENSATOR_H_
+

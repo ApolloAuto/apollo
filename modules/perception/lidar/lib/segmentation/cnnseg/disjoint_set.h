@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_LIDAR_LIB_SEGMENTATION_CNNSEG_DISJOINT_SET_H_
-#define MODULES_PERCEPTION_LIDAR_LIB_SEGMENTATION_CNNSEG_DISJOINT_SET_H_
+#pragma once
+
 
 namespace apollo {
 namespace perception {
@@ -91,4 +91,4 @@ void DisjointSetUnion(T* x, T* y) {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_LIDAR_LIB_SEGMENTATION_CNNSEG_DISJOINT_SET_H_
+

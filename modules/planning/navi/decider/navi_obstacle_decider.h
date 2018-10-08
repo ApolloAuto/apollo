@@ -19,8 +19,8 @@
  * @brief This file provides the declaration of the class "NaviSpeedDecider".
  */
 
-#ifndef MODULES_PLANNING_NAVI_NAVI_OBSTACLE_DECIDER_H_
-#define MODULES_PLANNING_NAVI_NAVI_OBSTACLE_DECIDER_H_
+#pragma once
+
 
 #include <map>
 #include <string>
@@ -198,4 +198,4 @@ inline void NaviObstacleDecider::SetLastNudgeDistance(double dist) {
 }  // namespace planning
 }  // namespace apollo
 
-#endif /* MODULES_PLANNING_NAVI_NAVI_OBSTACLE_DECIDER_H_ */
+

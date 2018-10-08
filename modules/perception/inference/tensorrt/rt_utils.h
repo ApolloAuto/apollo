@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_INFERENCE_TENSORRT_RT_UTILS_H_
-#define MODULES_PERCEPTION_INFERENCE_TENSORRT_RT_UTILS_H_
+#pragma once
+
 
 #include <google/protobuf/io/coded_stream.h>
 #include <google/protobuf/io/zero_copy_stream_impl.h>
@@ -39,4 +39,3 @@ std::string locateFile(const std::string &path, const std::string &input);
 }  // namespace inference
 }  // namespace perception
 }  // namespace apollo
-#endif  //  MODULES_PERCEPTION_INFERENCE_TENSORRT_RT_UTILS_H_

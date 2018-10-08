@@ -18,8 +18,8 @@
  * @file quintic_spiral_path.h
  **/
 
-#ifndef MODULES_PLANNING_MATH_CURVE1D_QUINTIC_SPIRAL_PATH_H_
-#define MODULES_PLANNING_MATH_CURVE1D_QUINTIC_SPIRAL_PATH_H_
+#pragma once
+
 
 #include <cmath>
 #include <utility>
@@ -126,4 +126,4 @@ class QuinticSpiralPath : public QuinticPolynomialCurve1d {
 }  // namespace planning
 }  // namespace apollo
 
-#endif /* MODULES_PLANNING_MATH_CURVE1D_QUINTIC_SPIRAL_PATH_H_ */
+

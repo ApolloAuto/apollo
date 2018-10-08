@@ -18,8 +18,8 @@
  * @file spline_2d_kernel.h
  **/
 
-#ifndef MODULES_PLANNING_SMOOTHING_SPLINE_2D_KERNEL_H_
-#define MODULES_PLANNING_SMOOTHING_SPLINE_2D_KERNEL_H_
+#pragma once
+
 
 #include <vector>
 #include "Eigen/Core"
@@ -71,4 +71,4 @@ class Spline2dKernel {
 
 }  // namespace planning
 }  // namespace apollo
-#endif  // MODULES_PLANNING_SMOOTHING_SPLINE_2D_KERNEL_H_
+

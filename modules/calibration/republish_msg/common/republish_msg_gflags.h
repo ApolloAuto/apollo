@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_CALIBRATION_REPUBLISH_MSG_COMMON_REPUBLISH_MSG_GFLAGS_H_
-#define MODULES_CALIBRATION_REPUBLISH_MSG_COMMON_REPUBLISH_MSG_GFLAGS_H_
+#pragma once
+
 
 #include "gflags/gflags.h"
 
@@ -23,4 +23,4 @@ DECLARE_string(node_name);
 
 DECLARE_string(adapter_config_filename);
 
-#endif /* MODULES_CALIBRATION_REPUBLISH_MSG_COMMON_REPUBLISH_MSG_GFLAGS_H_ */
+

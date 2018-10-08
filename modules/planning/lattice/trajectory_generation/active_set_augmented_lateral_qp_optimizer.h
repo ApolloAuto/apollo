@@ -18,8 +18,8 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_LATTICE_ACTIVE_SET_AUGMENTEDLATERAL_QP_OPTIMIZER_H_
-#define MODULES_PLANNING_LATTICE_ACTIVE_SET_AUGMENTEDLATERAL_QP_OPTIMIZER_H_
+#pragma once
+
 
 #include <array>
 #include <memory>
@@ -46,4 +46,4 @@ class ActiverSetAugmentedLateralQPOptimizer : public LateralQPOptimizer {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_LATTICE_ACTIVE_SET_AUGMENTEDLATERAL_QP_OPTIMIZER_H_
+

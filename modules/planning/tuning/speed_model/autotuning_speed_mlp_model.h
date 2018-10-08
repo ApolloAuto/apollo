@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PLANNING_TUNING_SPEED_MODEL_SPEED_MLP_MODEL_H_
-#define MODULES_PLANNING_TUNING_SPEED_MODEL_SPEED_MLP_MODEL_H_
+#pragma once
+
 
 #include "modules/common/status/status.h"
 #include "modules/planning/tuning/autotuning_base_model.h"
@@ -66,4 +66,4 @@ class AutotuningSpeedMLPModel : public AutotuningBaseModel {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_TUNING_SPEED_MODEL_SPEED_MLP_MODEL_H_
+

@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_INFERENCE_TENSORRT_ENTROPYCALIBRATOR_H_
-#define MODULES_PERCEPTION_INFERENCE_TENSORRT_ENTROPYCALIBRATOR_H_
+#pragma once
+
 
 #include <cuda_runtime_api.h>
 #include <float.h>
@@ -131,4 +131,4 @@ class Int8EntropyCalibrator : public IInt8EntropyCalibrator {
 };
 
 }  //  namespace nvinfer1
-#endif  // MODULES_PERCEPTION_INFERENCE_TENSORRT_ENTROPYCALIBRATOR_H_
+

@@ -18,8 +18,8 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_LATTICE_BEHAVIOR_FEASIBLE_REGION_H_
-#define MODULES_PLANNING_LATTICE_BEHAVIOR_FEASIBLE_REGION_H_
+#pragma once
+
 
 #include <algorithm>
 #include <array>
@@ -54,4 +54,4 @@ class FeasibleRegion {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_LATTICE_BEHAVIOR_FEASIBLE_REGION_H_
+
