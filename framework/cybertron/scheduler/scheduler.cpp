@@ -141,7 +141,7 @@ std::shared_ptr<ProcessorContext> Scheduler::FindProc(
   }
 
   if (cr->processor_id() != -1 && cr->processor_id() != cur_proc_ &&
-      cr->processor_id() < proc_ctxs_.size()) {
+      cr->processor_id() < static_cast<int>(proc_ctxs_.size())) {
     cr->set_processor_id(proc_ctxs_[cr->processor_id()]->id());
     return proc_ctxs_[cr->processor_id()];
   }
@@ -171,7 +171,7 @@ std::shared_ptr<ProcessorContext> Scheduler::FindProc(
 bool Scheduler::DispatchTask(const std::shared_ptr<CRoutine>& croutine) {
   auto ctx = FindProc(croutine);
 
-  if (croutine->processor_id() >= proc_num_ ||
+  if (croutine->processor_id() >= static_cast<int>(proc_num_) ||
       (croutine->processor_id() < 0 && ctx)) {
     AERROR << GlobalData::GetTaskNameById(croutine->id())
            << "push failed, get processor failed, "

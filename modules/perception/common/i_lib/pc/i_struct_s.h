@@ -19,18 +19,18 @@
 
 #include <smmintrin.h>
 #include <cassert>
-#include <vector>
 #include <limits>
+#include <vector>
 
 #include "modules/perception/common/i_lib/core/i_alloc.h"
 #include "modules/perception/common/i_lib/core/i_blas.h"
 #include "modules/perception/common/i_lib/pc/i_util.h"
 
-
 namespace apollo {
 namespace perception {
 namespace common {
-template <typename T, unsigned int d> class PtCluster {
+template <typename T, unsigned int d>
+class PtCluster {
  public:
   typedef T *iterator;
   typedef const T *const_iterator;
@@ -119,12 +119,10 @@ template <typename T, unsigned int d> class PtCluster {
 };
 
 template <typename T, unsigned int d>
-PtCluster<T, d>::PtCluster()
-    : data_(nullptr), nr_points_(0) {}
+PtCluster<T, d>::PtCluster() : data_(nullptr), nr_points_(0) {}
 
 template <typename T, unsigned int d>
-PtCluster<T, d>::PtCluster(unsigned int n)
-    : data_(nullptr), nr_points_(n) {
+PtCluster<T, d>::PtCluster(unsigned int n) : data_(nullptr), nr_points_(n) {
   if (n != 0) {
     data_ = IAllocAligned<T>(n * d, 4);
     if (!data_ || !IVerifyAlignment(data_, 4)) {
@@ -148,7 +146,8 @@ PtCluster<T, d>::PtCluster(const T *data, unsigned int n)
   }
 }
 
-template <typename T, unsigned int d> void PtCluster<T, d>::CleanUp() {
+template <typename T, unsigned int d>
+void PtCluster<T, d>::CleanUp() {
   IFreeAligned(&data_);
   nr_points_ = 0;
 }
@@ -179,7 +178,8 @@ inline int IAssignPointToVoxel(const T *data, T bound_x_min, T bound_x_max,
   return (i);
 }
 
-template <typename T> class Voxel {
+template <typename T>
+class Voxel {
  public:
   Voxel() {}
   ~Voxel() {}
@@ -244,9 +244,9 @@ template <typename T> class Voxel {
 
   void PushBack(int id) { indices_.push_back(id); }
 
-  unsigned int Capacity() const { return (unsigned int) indices_.capacity(); }
+  unsigned int Capacity() const { return (unsigned int)indices_.capacity(); }
 
-  unsigned int NrPoints() const { return (unsigned int) indices_.size(); }
+  unsigned int NrPoints() const { return (unsigned int)indices_.size(); }
 
   bool Empty() const { return indices_.empty(); }
 
@@ -260,7 +260,8 @@ template <typename T> class Voxel {
 };
 
 // -----Voxel Grid XY-----
-template <typename T> class VoxelGridXY {
+template <typename T>
+class VoxelGridXY {
   // assuming at most 320000 points
   static const unsigned int s_nr_max_reserved_points_ = 320000;
 
@@ -320,7 +321,7 @@ template <typename T> class VoxelGridXY {
 
   bool Initialized() const { return initialized_; }
 
-  unsigned int NrVoxel() const { return (unsigned int) voxels_.size(); }
+  unsigned int NrVoxel() const { return (unsigned int)voxels_.size(); }
 
   unsigned int NrVoxelX() const { return nr_voxel_x_; }
 
@@ -452,27 +453,30 @@ template <typename T> class VoxelGridXY {
   bool AllocAlignedMemory();
 
  private:
-  unsigned int nr_points_, nr_point_element_;
-  unsigned int nr_voxel_x_, nr_voxel_y_, nr_voxel_z_;
-  const T *data_;  // point clouds memory
-  bool initialized_;
+  unsigned int nr_points_ = 0;
+  unsigned int nr_point_element_ = 0;
+  unsigned int nr_voxel_x_ = 0;
+  unsigned int nr_voxel_y_ = 0;
+  unsigned int nr_voxel_z_ = 0;
+  const T *data_ = nullptr;  // point clouds memory
+  bool initialized_ = false;
   T dim_x_[2], dim_y_[2], dim_z_[2], voxel_dim_[3];
-  float *mem_aligned16_f32_;
-  int *mem_aligned16_i32_;
+  float *mem_aligned16_f32_ = nullptr;
+  int *mem_aligned16_i32_ = nullptr;
   std::vector<Voxel<T> > voxels_;
 };
 
 template <typename T>
 VoxelGridXY<T>::VoxelGridXY()
-    : data_(nullptr),
-      mem_aligned16_f32_(nullptr),
-      mem_aligned16_i32_(nullptr),
-      nr_points_(0),
+    : nr_points_(0),
       nr_point_element_(0),
       nr_voxel_x_(0),
       nr_voxel_y_(0),
       nr_voxel_z_(1),
-      initialized_(false) {
+      data_(nullptr),
+      initialized_(false),
+      mem_aligned16_f32_(nullptr),
+      mem_aligned16_i32_(nullptr) {
   IZero2(dim_x_);
   IZero2(dim_y_);
   IZero2(dim_z_);
@@ -480,7 +484,8 @@ VoxelGridXY<T>::VoxelGridXY()
   AllocAlignedMemory();
 }
 
-template <typename T> void VoxelGridXY<T>::CleanUp() {
+template <typename T>
+void VoxelGridXY<T>::CleanUp() {
   initialized_ = false;
   data_ = nullptr;
   nr_points_ = nr_point_element_ = nr_voxel_x_ = nr_voxel_y_ = 0;
@@ -504,7 +509,8 @@ VoxelGridXY<T>::VoxelGridXY(unsigned int nr_voxel_x, unsigned int nr_voxel_y,
   initialized_ = false;
 }
 
-template <typename T> void VoxelGridXY<T>::Reserve() {
+template <typename T>
+void VoxelGridXY<T>::Reserve() {
   int r, c, i = 0, m = 0;
   unsigned int n = (nr_voxel_x_ * nr_voxel_y_);
 
@@ -550,7 +556,8 @@ template <typename T> void VoxelGridXY<T>::Reserve() {
   return;
 }
 
-template <typename T> bool VoxelGridXY<T>::AllocAlignedMemory() {
+template <typename T>
+bool VoxelGridXY<T>::AllocAlignedMemory() {
   if (!mem_aligned16_f32_) {
     mem_aligned16_f32_ = IAllocAligned<float>(4, 4);
   }
@@ -562,7 +569,8 @@ template <typename T> bool VoxelGridXY<T>::AllocAlignedMemory() {
           IVerifyAlignment(mem_aligned16_i32_, 4));
 }
 
-template <typename T> int VoxelGridXY<T>::WhichVoxel(T x, T y, T z) const {
+template <typename T>
+int VoxelGridXY<T>::WhichVoxel(T x, T y, T z) const {
   int j, k;
   if (!initialized_) {
     return (-1);
@@ -574,10 +582,10 @@ template <typename T> int VoxelGridXY<T>::WhichVoxel(T x, T y, T z) const {
   }
 
   k = static_cast<int>(IMax(
-      (unsigned int) 0,
+      (unsigned int)0,
       IMin(nr_voxel_x_ - 1, (unsigned int)((x - dim_x_[0]) / voxel_dim_[0]))));
   j = static_cast<int>(IMax(
-      (unsigned int) 0,
+      (unsigned int)0,
       IMin(nr_voxel_y_ - 1, (unsigned int)((y - dim_y_[0]) / voxel_dim_[1]))));
   return (nr_voxel_x_ * j + k);
 }
@@ -949,10 +957,10 @@ bool VoxelGridXY<T>::Set(const T *data, unsigned int nr_points,
       continue;
     }
 
-    k = IMax((unsigned int) 0,
+    k = IMax((unsigned int)0,
              IMin(nr_voxel_xm1,
                   (unsigned int)((x - dim_x_min) * voxel_width_x_rec)));
-    j = IMax((unsigned int) 0,
+    j = IMax((unsigned int)0,
              IMin(nr_voxel_ym1,
                   (unsigned int)((y - dim_y_min) * voxel_width_y_rec)));
     i = nr_voxel_x * j + k;
@@ -981,7 +989,8 @@ bool VoxelGridXY<T>::Set(const T *data, unsigned int nr_points,
 //   return static_cast<int> (indices.size());
 // }
 
-template <typename T> unsigned int VoxelGridXY<T>::NrIndexedPoints() const {
+template <typename T>
+unsigned int VoxelGridXY<T>::NrIndexedPoints() const {
   if (!initialized_) {
     return 0;
   }
@@ -1033,8 +1042,8 @@ bool IDownsampleVoxelGridXY(const VoxelGridXY<T> &src, VoxelGridXY<T> *dst,
   assert(nr_voxel_z_src == 1);
 
   // scale factors
-  unsigned int sf_x = (unsigned int) IPow((unsigned int) 2, dsf_dim_x);
-  unsigned int sf_y = (unsigned int) IPow((unsigned int) 2, dsf_dim_y);
+  unsigned int sf_x = (unsigned int)IPow((unsigned int)2, dsf_dim_x);
+  unsigned int sf_y = (unsigned int)IPow((unsigned int)2, dsf_dim_y);
 
   // compute the # of voxels for the new scale
   unsigned int nr_voxel_x_dst = nr_voxel_x_src / sf_x;
@@ -1134,7 +1143,8 @@ bool IDownsampleVoxelGridXY(const VoxelGridXY<T> &src, VoxelGridXY<T> *dst,
 }
 
 // -----Multiscale Voxel Grid Pyramid-----
-template <typename DATA_TYPE> class VoxelGridXYPyramid {
+template <typename DATA_TYPE>
+class VoxelGridXYPyramid {
  public:
   VoxelGridXYPyramid();
   VoxelGridXYPyramid(unsigned int nr_scale, unsigned int nr_voxel_x_base,
@@ -1177,7 +1187,7 @@ template <typename DATA_TYPE> class VoxelGridXYPyramid {
            DATA_TYPE spatial_bound_y_min, DATA_TYPE spatial_bound_y_max,
            DATA_TYPE spatial_bound_z_min, DATA_TYPE spatial_bound_z_max);
 
-  unsigned int NrScale() const { return (unsigned int) vgrids_.size(); }
+  unsigned int NrScale() const { return (unsigned int)vgrids_.size(); }
 
   unsigned int NrVoxel(unsigned int i = 0) const {
     return (i < vgrids_.size()) ? vgrids_[i].nr_voxel() : 0;
@@ -1263,8 +1273,8 @@ bool VoxelGridXYPyramid<DATA_TYPE>::Alloc(
   unsigned int scale;
   unsigned int nr_voxel_x = nr_voxel_x_base;
   unsigned int nr_voxel_y = nr_voxel_y_base;
-  unsigned int sf_x = (unsigned int) IPow((unsigned int) 2, dsf_x);
-  unsigned int sf_y = (unsigned int) IPow((unsigned int) 2, dsf_y);
+  unsigned int sf_x = (unsigned int)IPow((unsigned int)2, dsf_x);
+  unsigned int sf_y = (unsigned int)IPow((unsigned int)2, dsf_y);
 
   dsf_x_ = dsf_x;
   dsf_y_ = dsf_y;
@@ -1304,7 +1314,7 @@ bool VoxelGridXYPyramid<DATA_TYPE>::Set(const DATA_TYPE *pc,
     return false;
   }
 
-  unsigned int scale, nr_scale = (unsigned int) vgrids_.size();
+  unsigned int scale, nr_scale = (unsigned int)vgrids_.size();
 
   pc_ = pc;
   nr_points_ = nr_points;
@@ -1332,7 +1342,7 @@ bool VoxelGridXYPyramid<DATA_TYPE>::SetS(const float *pc,
     return false;
   }
 
-  unsigned int scale, nr_scale = (unsigned int) vgrids_.size();
+  unsigned int scale, nr_scale = (unsigned int)vgrids_.size();
 
   pc_ = pc;
   nr_points_ = nr_points;
@@ -1401,7 +1411,8 @@ bool VoxelGridXYPyramid<DATA_TYPE>::Set(
   return (vgrids_.size() == nr_scale);  // check if all scales are valid
 }
 
-template <typename DATA_TYPE> void VoxelGridXYPyramid<DATA_TYPE>::CleanUp() {
+template <typename DATA_TYPE>
+void VoxelGridXYPyramid<DATA_TYPE>::CleanUp() {
   pc_ = nullptr;
   vgrids_.clear();
   nr_points_ = nr_point_element_ = dsf_x_ = dsf_y_ = dsf_z_ = 0;

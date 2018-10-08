@@ -55,6 +55,7 @@ class ChannelMessage : public GeneralMessageBase {
       case ChannelMessage::ErrorCode::MessageTypeIsEmptr:
         return "Message Type is Empty";
     }
+    return "";
   }
 
   static bool isErrorCode(void* ptr) {

@@ -62,12 +62,15 @@ int GeneralMessageBase::lineCountOfField(
         break;
       }
 
-      case google::protobuf::FieldDescriptor::CPPTYPE_MESSAGE:
+      case google::protobuf::FieldDescriptor::CPPTYPE_MESSAGE: {
         const google::protobuf::Message& childMsg =
             reflection->GetMessage(msg, field);
         ret += lineCount(childMsg, screenWidth);
         break;
+      }
 
+      default:
+        break;
     }  // end switch
   }
 
@@ -88,8 +91,8 @@ void GeneralMessageBase::PrintMessage(GeneralMessageBase* baseMsg,
     reflection->ListFields(msg, &fields);
   }
 
-  for (std::size_t i = 0; i < fields.size(); ++i) {
-    if (lineNo > s->Height()) {
+  for (size_t i = 0; i < fields.size(); ++i) {
+    if (lineNo > static_cast<unsigned>(s->Height())) {
       break;
     }
     const google::protobuf::FieldDescriptor* field = fields[i];

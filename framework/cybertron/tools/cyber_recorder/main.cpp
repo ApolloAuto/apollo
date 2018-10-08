@@ -311,7 +311,7 @@ int main(int argc, char** argv) {
     ::apollo::cybertron::Init(argv[0]);
     // TODO @baownayu order input record file
     bool play_result = true;
-    for (auto& opt_file : opt_file_vec) {
+    for (size_t i = 0; i < opt_file_vec.size(); ++i) {
       Player player(opt_file_vec[0], opt_white_channels.empty(),
                     opt_white_channels, opt_loop, opt_rate, opt_begin, opt_end,
                     opt_start, opt_delay);

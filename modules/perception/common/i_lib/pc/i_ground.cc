@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include <iostream>
+#include "modules/perception/common/i_lib/pc/i_ground.h"
+#include <algorithm>
 #include <cassert>
 #include <cfloat>
 #include <cmath>
-#include <algorithm>
+#include <iostream>
 #include <utility>
-#include "modules/perception/common/i_lib/pc/i_ground.h"
 
 namespace apollo {
 namespace perception {
@@ -122,9 +122,9 @@ void PlaneFitGroundDetector::InitOrderTable(const VoxelGridXY<float> *vg,
     map_dist.push_back(std::pair<float, int>(dist2, i));
   }
   sort(map_dist.begin(), map_dist.end(),
-       [](const std::pair<float, int> & a, const std::pair<float, int> & b) {
-    return a.first < b.first;
-  });
+       [](const std::pair<float, int> &a, const std::pair<float, int> &b) {
+         return a.first < b.first;
+       });
   for (i = 0; i < map_dist.size(); ++i) {
     id = map_dist[i].second;
     const auto &voxel = vg->GetConstVoxels()[id];
@@ -365,7 +365,8 @@ void PlaneFitGroundDetector::ComputeAdaptiveThreshold() {
                   &max_dist);
   if (max_dist - min_dist < Constant<float>::EPSILON()) {
     thre = (param_.planefit_dist_threshold_near +
-            param_.planefit_dist_threshold_far) / 2;
+            param_.planefit_dist_threshold_far) /
+           2;
     for (r = 0; r < param_.nr_grids_coarse; ++r) {
       for (c = 0; c < param_.nr_grids_coarse; ++c) {
         pf_thresholds_[r][c] = thre;
@@ -421,8 +422,8 @@ void PlaneFitGroundDetector::ComputeSignedGroundHeightLine(
   int pos = 0;
   char label = 0;
   const float *cptr = nullptr;
-  float dist[] = { 0, 0, 0, 0, 0 };
-  const float *plane[] = { nullptr, nullptr, nullptr, nullptr, nullptr };
+  float dist[] = {0, 0, 0, 0, 0};
+  const float *plane[] = {nullptr, nullptr, nullptr, nullptr, nullptr};
   float min_abs_dist = 0;
   unsigned int nm1 = param_.nr_grids_coarse - 1;
   assert(param_.nr_grids_coarse >= 2);
@@ -635,7 +636,7 @@ int PlaneFitGroundDetector::FitGrid(const float *point_cloud,
   int i = 0;
   int j = 0;
   int rseed = I_DEFAULT_SEED;
-  int indices_trial[] = { 0, 0, 0 };
+  int indices_trial[] = {0, 0, 0};
   int nr_samples = candi->Prune(param_.nr_samples_min_threshold,
                                 param_.nr_samples_max_threshold);
   int nr_inliers_termi =
@@ -835,10 +836,9 @@ int PlaneFitGroundDetector::FitGridWithNeighbors(
   int nr_inliers = 0;
   int nr_inliers_best = -1;
   float angle_best = FLT_MAX;
-  int i = 0;
-  int j = 0;
+
   int rseed = I_DEFAULT_SEED;
-  int indices_trial[] = { 0, 0, 0 };
+  int indices_trial[] = {0, 0, 0};
   int nr_samples = candi.Prune(param_.nr_samples_min_threshold,
                                param_.nr_samples_max_threshold);
   int nr_inliers_termi =
@@ -851,13 +851,13 @@ int PlaneFitGroundDetector::FitGridWithNeighbors(
   int r_n = 0;
   int c_n = 0;
   float angle = -1.f;
-  for (i = 0; i < nr_samples; ++i) {
+  for (int i = 0; i < nr_samples; ++i) {
     assert(candi[i] < static_cast<int>(nr_points));
     ICopy3(point_cloud + (nr_point_element * candi[i]), pdst);
     pdst += dim_point_;
   }
   // generate plane hypothesis and vote
-  for (i = 0; i < param_.nr_ransac_iter_threshold; ++i) {
+  for (int i = 0; i < param_.nr_ransac_iter_threshold; ++i) {
     IRandomSample(indices_trial, 3, nr_samples, &rseed);
     IScale3(indices_trial, dim_point_);
     ICopy3(pf_threeds_ + indices_trial[0], samples);
@@ -872,7 +872,7 @@ int PlaneFitGroundDetector::FitGridWithNeighbors(
     // threshold
     psrc = pf_threeds_;
     nr_inliers = 0;
-    for (j = 0; j < nr_samples; ++j) {
+    for (int j = 0; j < nr_samples; ++j) {
       ptp_dist = IPlaneToPointDistanceWUnitNorm(hypothesis[i].params, psrc);
       if (ptp_dist < dist_thre) {
         nr_inliers++;
@@ -887,7 +887,7 @@ int PlaneFitGroundDetector::FitGridWithNeighbors(
     }
   }
 
-  for (i = 0; i < neighbors.size(); ++i) {
+  for (size_t i = 0; i < neighbors.size(); ++i) {
     r_n = neighbors[i].first;
     c_n = neighbors[i].second;
     if (ground_planes_[r_n][c_n].IsValid()) {
@@ -895,7 +895,7 @@ int PlaneFitGroundDetector::FitGridWithNeighbors(
           ground_planes_[r_n][c_n];
       psrc = pf_threeds_;
       nr_inliers = 0;
-      for (j = 0; j < nr_samples; ++j) {
+      for (int j = 0; j < nr_samples; ++j) {
         ptp_dist = IPlaneToPointDistanceWUnitNorm(
             hypothesis[i + param_.nr_ransac_iter_threshold].params, psrc);
         if (ptp_dist < dist_thre) {
@@ -912,7 +912,7 @@ int PlaneFitGroundDetector::FitGridWithNeighbors(
   }
 
   nr_inliers_best = -1;
-  for (i = 0; i < kNr_iter; ++i) {
+  for (int i = 0; i < kNr_iter; ++i) {
     if (!(hypothesis[i].IsValid())) {
       continue;
     }
@@ -948,7 +948,7 @@ int PlaneFitGroundDetector::FitGridWithNeighbors(
   nr_inliers = 0;
   psrc = pf_threeds_;
   pdst = pf_threeds_;
-  for (i = 0; i < nr_samples; ++i) {
+  for (int i = 0; i < nr_samples; ++i) {
     ptp_dist = IPlaneToPointDistanceWUnitNorm(groundplane->params, psrc);
     if (ptp_dist < dist_thre) {
       ICopy3(psrc, pdst);
@@ -976,7 +976,8 @@ int PlaneFitGroundDetector::FitGridWithNeighbors(
   float cx = voxel_cur.v_[0] + radius;
   float cy = voxel_cur.v_[1] + radius;
   float cz = -(groundplane->params[0] * cx + groundplane->params[1] * cy +
-               groundplane->params[3]) / groundplane->params[2];
+               groundplane->params[3]) /
+             groundplane->params[2];
   ground_z_[r][c].first = cz;
   ground_z_[r][c].second = true;
 
@@ -1116,8 +1117,8 @@ int PlaneFitGroundDetector::CompleteGrid(const GroundPlaneSpherical &lt,
                                          const GroundPlaneSpherical &up,
                                          const GroundPlaneSpherical &dn,
                                          GroundPlaneSpherical *gp) {
-  int supports[] = { 0, 0, 0, 0 };
-  float weights[] = { 0.f, 0.f, 0.f, 0.f };
+  int supports[] = {0, 0, 0, 0};
+  float weights[] = {0.f, 0.f, 0.f, 0.f};
   gp->ForceInvalid();
   supports[0] = lt.GetNrSupport();
   supports[1] = rt.GetNrSupport();
@@ -1150,8 +1151,8 @@ int PlaneFitGroundDetector::SmoothGrid(const GroundPlaneSpherical &g,
                                        const GroundPlaneSpherical &up,
                                        const GroundPlaneSpherical &dn,
                                        GroundPlaneSpherical *gp) {
-  int supports[] = { 0, 0, 0, 0, 0 };
-  float weights[] = { 0.f, 0.f, 0.f, 0.f, 0.f };
+  int supports[] = {0, 0, 0, 0, 0};
+  float weights[] = {0.f, 0.f, 0.f, 0.f, 0.f};
   gp->ForceInvalid();
   if (!g.IsValid()) {
     return 0;
@@ -1185,9 +1186,9 @@ int PlaneFitGroundDetector::SmoothGrid(const GroundPlaneSpherical &g,
   weights[3] = static_cast<float>(supports[3]) / support_sum;
   weights[4] = static_cast<float>(supports[4]) / support_sum;
   // weighted average:
-  gp->theta =
-      weights[0] * lt.theta + weights[1] * rt.theta + weights[2] * up.theta +
-      weights[3] * dn.theta + weights[4] * g.theta;
+  gp->theta = weights[0] * lt.theta + weights[1] * rt.theta +
+              weights[2] * up.theta + weights[3] * dn.theta +
+              weights[4] * g.theta;
   gp->phi = weights[0] * lt.phi + weights[1] * rt.phi + weights[2] * up.phi +
             weights[3] * dn.phi + weights[4] * g.phi;
   gp->d = weights[0] * lt.d + weights[1] * rt.d + weights[2] * up.d +
@@ -1233,22 +1234,19 @@ bool PlaneFitGroundDetector::Detect(const float *point_cloud,
   if (!vg_coarse_->SetS(point_cloud, nr_points, nr_point_elements)) {
     return false;
   }
-  int nr_candis = 0;
-  int nr_valid_grid = 0;
   unsigned int r = 0;
   unsigned int c = 0;
-  unsigned int iter = 0;
   // Filter to generate plane fitting candidates
-  nr_candis = Filter();
+  // int nr_candis = Filter();
   // std::cout << "# of plane candidates: " << nr_candis << std::endl;
   //  Fit local plane using ransac
   // nr_valid_grid = Fit();
-  nr_valid_grid = FitInOrder();
+  // int nr_valid_grid = FitInOrder();
   // std::cout << "# of valid plane geometry (fitting): " << nr_valid_grid <<
   // std::endl;
   // Smooth plane using neighborhood information:
-  for (iter = 0; iter < param_.nr_smooth_iter; ++iter) {
-    nr_valid_grid = Smooth();
+  for (int iter = 0; iter < param_.nr_smooth_iter; ++iter) {
+    Smooth();
   }
 
   for (r = 0; r < param_.nr_grids_coarse; ++r) {

@@ -81,7 +81,7 @@ void GeneralChannelMessage::RenderInfo(const Screen* s, int key,
 
   auto iter = vec->cbegin();
   int y = page_index_ * page_item_count_;
-  if (y < vec->size()) {
+  if (y < static_cast<int>(vec->size())) {
     y = 0;
     while (y < page_index_ * page_item_count_) {
       ++iter;
