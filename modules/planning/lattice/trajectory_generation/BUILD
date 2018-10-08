@@ -35,6 +35,7 @@ cc_library(
         ":end_condition_sampler",
         ":lateral_trajectory_optimizer",
         ":lateral_trajectory_optimizer_interface",
+        ":osqp_lateral_qp_optimizer",
         "//modules/common",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/lattice/behavior:path_time_graph",

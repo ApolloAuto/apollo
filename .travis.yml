@@ -1,3 +1,8 @@
+# safelist
+branches:
+  only:
+  - master
+
 language: cpp
 sudo: required
 services:
@@ -21,6 +26,7 @@ jobs:
         - rm -rf "${HOME}/.cache/bazel/_bazel_${USER}/install"
         - rm -rf "/apollo/data/core"
     - stage: stage-02
+      if: branch = master
       env:
         - JOB=cibuild
       script:
