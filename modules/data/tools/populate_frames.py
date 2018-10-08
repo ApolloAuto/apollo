@@ -58,7 +58,7 @@ gflags.DEFINE_string('pointcloud_channel',
 class FramePopulator:
     def __init__(self, args):
         self._args = args
-        self._current_frame_id = -1
+        self._current_frame_id = '#' 
         self._current_frame = None
         self._channel_function_map = {
             args.pointcloud_channel: self.parse_protobuf_pointcloud,
@@ -70,7 +70,10 @@ class FramePopulator:
 
     def check_frame(self, frame_id):
         if frame_id != self._current_frame_id:
+            glog.info('#current frame {}, changing to {}'.format(
+                self._current_frame_id, frame_id))
             if self._current_frame != None:
+                glog.info('#dumping frame {}'.format(self._current_frame_id))
                 self.load_yaml_settings()
                 self._current_frame.dump_to_file(self._args.output_file)
             self._current_frame = frame.Frame()
@@ -86,16 +89,13 @@ class FramePopulator:
 
         self.check_frame(point_cloud.frame_id)
 
-        #print ('width: %d' % point_cloud.width)
-        #print ('height: %d' % point_cloud.height)
-        
         for pointxyzi in point_cloud.point:
             vector4 = frame.Vector4(
                 pointxyzi.x,
                 pointxyzi.y,
                 pointxyzi.z,
-                pointxyzi.i,
-                pointxyzi.is_ground
+                pointxyzi.intensity,
+                False
             )
             self._current_frame.points.append(vector4)
 
@@ -107,8 +107,9 @@ class FramePopulator:
         glog.info('#processing record file {}'.format(self._args.input_file))
 
         for channel, message, _type, timestamp in freader.read_messages():
-            self.process(self._channel_function_map[channel], 
-                message, timestamp)
+            if channel in self._channel_function_map:
+                self.process(self._channel_function_map[channel], 
+                    message, timestamp)
 
 def main():
     gflags.FLAGS(sys.argv)
