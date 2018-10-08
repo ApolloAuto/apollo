@@ -181,7 +181,16 @@ int main(int argc, char** argv) {
     }
     switch (opt) {
       case 'f':
-        opt_file_vec.push_back(std::string(optarg));
+        optind--;
+        while (optind < argc) {
+          if (*argv[optind] != '-') {
+            opt_file_vec.emplace_back(argv[optind]);
+            optind++;
+          } else {
+            optind--;
+            break;
+          }
+        }
         break;
       case 'c':
         optind--;
@@ -309,10 +318,9 @@ int main(int argc, char** argv) {
       return -1;
     }
     ::apollo::cybertron::Init(argv[0]);
-    // TODO @baownayu order input record file
     bool play_result = true;
     for (size_t i = 0; i < opt_file_vec.size(); ++i) {
-      Player player(opt_file_vec[0], opt_white_channels.empty(),
+      Player player(opt_file_vec[i], opt_white_channels.empty(),
                     opt_white_channels, opt_loop, opt_rate, opt_begin, opt_end,
                     opt_start, opt_delay);
       play_result = play_result && player.Init() ? true : false;
