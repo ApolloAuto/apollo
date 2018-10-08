@@ -235,17 +235,6 @@ Status LatticePlanner::PlanOnReferenceLine(
   while (trajectory_evaluator.has_more_trajectory_pairs()) {
     double trajectory_pair_cost =
         trajectory_evaluator.top_trajectory_pair_cost();
-    // For auto tuning
-    std::vector<double> trajectory_pair_cost_components;
-    if (FLAGS_enable_auto_tuning) {
-      trajectory_pair_cost_components =
-          trajectory_evaluator.top_trajectory_pair_component_cost();
-      ADEBUG << "TrajectoryPairComponentCost";
-      ADEBUG << "travel_cost = " << trajectory_pair_cost_components[0];
-      ADEBUG << "jerk_cost = " << trajectory_pair_cost_components[1];
-      ADEBUG << "obstacle_cost = " << trajectory_pair_cost_components[2];
-      ADEBUG << "lateral_cost = " << trajectory_pair_cost_components[3];
-    }
     auto trajectory_pair = trajectory_evaluator.next_top_trajectory_pair();
 
     // combine two 1d trajectories to one 2d trajectory
@@ -300,49 +289,6 @@ Status LatticePlanner::PlanOnReferenceLine(
     reference_line_info->SetCost(reference_line_info->PriorityCost() +
                                  trajectory_pair_cost);
     reference_line_info->SetDrivable(true);
-
-    // Auto Tuning
-    // TODO(all) add localization check w/o adapter manager
-    // if (AdapterManager::GetLocalization() == nullptr) {
-    //  AERROR << "Auto tuning failed since no localization is available.";
-    // } else
-    if (FLAGS_enable_auto_tuning) {
-      // 1. Get future trajectory from localization
-      DiscretizedTrajectory future_trajectory = GetFutureTrajectory();
-      // 2. Map future trajectory to lon-lat trajectory pair
-      std::vector<common::SpeedPoint> lon_future_trajectory;
-      std::vector<common::FrenetFramePoint> lat_future_trajectory;
-      if (!MapFutureTrajectoryToSL(future_trajectory, *ptr_reference_line,
-                                   &lon_future_trajectory,
-                                   &lat_future_trajectory)) {
-        AERROR << "Auto tuning failed since no mapping "
-               << "from future trajectory to lon-lat";
-      }
-      // 3. evaluate cost
-      std::vector<double> future_traj_component_cost;
-      trajectory_evaluator.EvaluateDiscreteTrajectory(
-          planning_target, lon_future_trajectory, lat_future_trajectory,
-          &future_traj_component_cost);
-
-      // 4. emit
-      planning_internal::PlanningData* ptr_debug =
-          reference_line_info->mutable_debug()->mutable_planning_data();
-
-      apollo::planning_internal::AutoTuningTrainingData auto_tuning_data;
-
-      for (double student_cost_component : trajectory_pair_cost_components) {
-        auto_tuning_data.mutable_student_component()->add_cost_component(
-            student_cost_component);
-      }
-
-      for (double teacher_cost_component : future_traj_component_cost) {
-        auto_tuning_data.mutable_teacher_component()->add_cost_component(
-            teacher_cost_component);
-      }
-
-      ptr_debug->mutable_auto_tuning_training_data()->CopyFrom(
-          auto_tuning_data);
-    }
 
     // Print the chosen end condition and start condition
     ADEBUG << "Starting Lon. State: s = " << init_s[0] << " ds = " << init_s[1]
@@ -427,53 +373,6 @@ Status LatticePlanner::PlanOnReferenceLine(
     }
     return Status(ErrorCode::PLANNING_ERROR, "No feasible trajectories");
   }
-}
-
-DiscretizedTrajectory LatticePlanner::GetFutureTrajectory() const {
-  // localization
-  // TODO(all) added locaization data w/o adapermanager
-  // const auto& localization =
-  //    AdapterManager::GetLocalization()->GetLatestObserved();
-  // ADEBUG << "Get localization:" << localization.DebugString();
-  std::vector<TrajectoryPoint> traj_pts;
-  // for (const auto& traj_pt : localization.trajectory_point()) {
-  //  traj_pts.emplace_back(traj_pt);
-  // }
-  DiscretizedTrajectory ret(traj_pts);
-  return ret;
-}
-
-bool LatticePlanner::MapFutureTrajectoryToSL(
-    const DiscretizedTrajectory& future_trajectory,
-    const std::vector<PathPoint>& discretized_reference_line,
-    std::vector<apollo::common::SpeedPoint>* st_points,
-    std::vector<apollo::common::FrenetFramePoint>* sl_points) {
-  if (0 == discretized_reference_line.size()) {
-    AERROR << "MapFutureTrajectoryToSL error";
-    return false;
-  }
-  for (const common::TrajectoryPoint& trajectory_point :
-       future_trajectory.trajectory_points()) {
-    const PathPoint& path_point = trajectory_point.path_point();
-    PathPoint matched_point = PathMatcher::MatchToPath(
-        discretized_reference_line, path_point.x(), path_point.y());
-    std::array<double, 3> pose_s;
-    std::array<double, 3> pose_d;
-    ComputeInitFrenetState(matched_point, trajectory_point, &pose_s, &pose_d);
-    apollo::common::SpeedPoint st_point;
-    apollo::common::FrenetFramePoint sl_point;
-    st_point.set_s(pose_s[0]);
-    st_point.set_t(trajectory_point.relative_time());
-    st_point.set_v(pose_s[1]);
-    st_point.set_a(pose_s[2]);  // Not setting da
-    sl_point.set_s(pose_s[0]);
-    sl_point.set_l(pose_d[0]);
-    sl_point.set_dl(pose_d[0]);
-    sl_point.set_ddl(pose_d[0]);
-    st_points->emplace_back(std::move(st_point));
-    sl_points->emplace_back(std::move(sl_point));
-  }
-  return true;
 }
 
 }  // namespace planning

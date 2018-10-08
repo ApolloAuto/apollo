@@ -64,15 +64,6 @@ class LatticePlanner : public PlannerWithReferenceLine {
   common::Status PlanOnReferenceLine(
       const common::TrajectoryPoint& planning_init_point, Frame* frame,
       ReferenceLineInfo* reference_line_info) override;
-
- private:
-  DiscretizedTrajectory GetFutureTrajectory() const;
-
-  bool MapFutureTrajectoryToSL(
-      const DiscretizedTrajectory& future_trajectory,
-      const std::vector<common::PathPoint>& discretized_reference_line,
-      std::vector<common::SpeedPoint>* st_points,
-      std::vector<common::FrenetFramePoint>* sl_points);
 };
 
 }  // namespace planning
