@@ -38,19 +38,21 @@ namespace {
 std::vector<std::pair<double, double>>::iterator min_pair_first(
     std::vector<std::pair<double, double>>::iterator begin,
     std::vector<std::pair<double, double>>::iterator end) {
-  return std::min_element(begin, end, [](const std::pair<double, double>& lhs,
-                                         const std::pair<double, double>& rhs) {
-    return lhs.first < rhs.first;
-  });
+  return std::min_element(begin, end,
+                          [](const std::pair<double, double>& lhs,
+                             const std::pair<double, double>& rhs) {
+                            return lhs.first < rhs.first;
+                          });
 }
 
 std::vector<std::pair<double, double>>::iterator max_pair_second(
     std::vector<std::pair<double, double>>::iterator begin,
     std::vector<std::pair<double, double>>::iterator end) {
-  return std::max_element(begin, end, [](const std::pair<double, double>& lhs,
-                                         const std::pair<double, double>& rhs) {
-    return lhs.second < rhs.second;
-  });
+  return std::max_element(begin, end,
+                          [](const std::pair<double, double>& lhs,
+                             const std::pair<double, double>& rhs) {
+                            return lhs.second < rhs.second;
+                          });
 }
 
 void assign_pair_first(std::vector<std::pair<double, double>>::iterator begin,
@@ -237,7 +239,6 @@ Status QpPiecewiseJerkPathOptimizer::Process(
 
   std::vector<common::FrenetFramePoint> frenet_path =
       lateral_qp_optimizer_->GetFrenetFramePath();
-  ADEBUG << "frenet_path size: " << frenet_path.size();
 
   for (auto& point : frenet_path) {
     point.set_s(frenet_point.s() + point.s());
