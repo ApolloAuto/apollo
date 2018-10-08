@@ -92,7 +92,7 @@ class Frame:
     def dump_to_file(self, output_file):
         # TODO: TEST IT
         with open(output_file, 'w') as outfile:
-            json.dump(self.to_json(), outfile)
+           outfile.write(self.to_json())
 
 if __name__ == '__main__':
     # TODO: remove the following tests
@@ -104,3 +104,4 @@ if __name__ == '__main__':
     #s = json.dumps(p, indent=4)
     s = p.to_json()
     print (s)
+    p.dump_to_file("a.json")
