@@ -7,7 +7,7 @@ cc_library(
         "-Iinclude/QtCore",
     ],
     linkopts = [
-        "-Wl,-rpath,/apollo/framework/third_party/Qt5.5.1/5.5/gcc_64/lib",
+        "-L/apollo/framework/third_party/Qt5.5.1/5.5/gcc_64/lib",
         "-lQt5Core",
     ],
     visibility = ["//visibility:public"],
