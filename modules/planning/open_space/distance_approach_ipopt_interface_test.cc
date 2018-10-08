@@ -53,6 +53,7 @@ class DistanceApproachIPOPTInterfaceTest : public ::testing::Test {
   Eigen::MatrixXd ego_ = Eigen::MatrixXd::Ones(4, 1);
   Eigen::MatrixXd x0_ = Eigen::MatrixXd::Ones(4, 1);
   Eigen::MatrixXd xf_ = 10 * Eigen::MatrixXd::Ones(4, 1);
+  Eigen::MatrixXd last_time_u_ = Eigen::MatrixXd::Zero(2, 1);
   Eigen::MatrixXd XYbounds_ = Eigen::MatrixXd::Ones(4, 1);
   Eigen::MatrixXd xWS_ = Eigen::MatrixXd::Ones(4, 6);
   Eigen::MatrixXd uWS_ = Eigen::MatrixXd::Ones(2, 5);
@@ -83,8 +84,8 @@ void DistanceApproachIPOPTInterfaceTest::ProblemSetup() {
 
   ptop_.reset(new DistanceApproachIPOPTInterface(
       num_of_variables_, num_of_constraints_, horizon_, ts_, ego_, xWS_, uWS_,
-      timeWS_, x0_, xf_, XYbounds_, obstacles_vertices_num_, obstacles_num_,
-      obstacles_A_, obstacles_b_, use_fix_time_));
+      timeWS_, x0_, xf_, last_time_u_, XYbounds_, obstacles_vertices_num_,
+      obstacles_num_, obstacles_A_, obstacles_b_, use_fix_time_));
 
   ptop_->set_objective_weights(distance_approach_config_);
 }
@@ -139,7 +140,7 @@ TEST_F(DistanceApproachIPOPTInterfaceTest, eval_f) {
   std::fill_n(x, kNumOfVariables, 1.2);
   bool res = ptop_->eval_f(kNumOfVariables, x, true, obj_value);
   EXPECT_TRUE(res);
-  EXPECT_DOUBLE_EQ(obj_value, 2883.672728746038);
+  EXPECT_DOUBLE_EQ(obj_value, 3.6727199999999991);
 }
 
 }  // namespace planning

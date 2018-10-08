@@ -34,9 +34,9 @@ namespace planning {
 class DistanceApproachProblem {
  public:
   explicit DistanceApproachProblem(
-      Eigen::MatrixXd x0, Eigen::MatrixXd xF, std::size_t horizon, float ts,
-      Eigen::MatrixXd ego, Eigen::MatrixXd xWS, Eigen::MatrixXd uWS,
-      Eigen::MatrixXd XYbounds, std::size_t obstacles_num,
+      Eigen::MatrixXd x0, Eigen::MatrixXd xF, Eigen::MatrixXd last_time_u,
+      std::size_t horizon, float ts, Eigen::MatrixXd ego, Eigen::MatrixXd xWS,
+      Eigen::MatrixXd uWS, Eigen::MatrixXd XYbounds, std::size_t obstacles_num,
       Eigen::MatrixXd obstacles_vertices_num, Eigen::MatrixXd obstacles_A,
       Eigen::MatrixXd obstacles_b);
 
@@ -51,6 +51,9 @@ class DistanceApproachProblem {
 
   // end point
   Eigen::MatrixXd xF_;
+
+  // the last control command in last planning cycle
+  Eigen::MatrixXd last_time_u_;
 
   // time horizon
   std::size_t horizon_;

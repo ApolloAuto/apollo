@@ -40,9 +40,10 @@ class DistanceApproachIPOPTInterface : public Ipopt::TNLP {
       std::size_t horizon, float ts, Eigen::MatrixXd ego,
       const Eigen::MatrixXd& xWS, const Eigen::MatrixXd& uWS,
       const Eigen::MatrixXd& timeWS, Eigen::MatrixXd x0, Eigen::MatrixXd xf,
-      Eigen::MatrixXd XYbounds, Eigen::MatrixXd obstacles_vertices_num,
-      std::size_t obstacles_num, const Eigen::MatrixXd& obstacles_A,
-      const Eigen::MatrixXd& obstacles_b, bool use_fix_time);
+      Eigen::MatrixXd last_time_u, Eigen::MatrixXd XYbounds,
+      Eigen::MatrixXd obstacles_vertices_num, std::size_t obstacles_num,
+      const Eigen::MatrixXd& obstacles_A, const Eigen::MatrixXd& obstacles_b,
+      bool use_fix_time);
 
   virtual ~DistanceApproachIPOPTInterface() = default;
 
@@ -104,14 +105,26 @@ class DistanceApproachIPOPTInterface : public Ipopt::TNLP {
   int num_of_variables_;
   int num_of_constraints_;
   std::size_t horizon_;
-  float ts_;
+  double ts_;
   Eigen::MatrixXd ego_;
   Eigen::MatrixXd xWS_;
   Eigen::MatrixXd uWS_;
   Eigen::MatrixXd timeWS_;
   Eigen::MatrixXd x0_;
   Eigen::MatrixXd xf_;
+  Eigen::MatrixXd last_time_u_;
   Eigen::MatrixXd XYbounds_;
+
+  // penalty
+  double weight_state_x_;
+  double weight_state_y_;
+  double weight_state_phi_;
+  double weight_input_steer_;
+  double weight_input_a_;
+  double weight_rate_steer_;
+  double weight_rate_a_;
+  double weight_stitching_steer_;
+  double weight_stitching_a_;
 
   double w_ev_;
   double l_ev_;
