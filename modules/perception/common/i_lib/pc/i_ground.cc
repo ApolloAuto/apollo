@@ -97,8 +97,7 @@ int PlaneFitPointCandIndices::Prune(unsigned int min_nr_samples,
 PlaneFitGroundDetector::PlaneFitGroundDetector(
     const PlaneFitGroundDetectorParam &param)
     : BaseGroundDetector(param) {
-  bool is_initialized = Init();
-  assert(is_initialized);
+  assert(Init());
 }
 
 PlaneFitGroundDetector::~PlaneFitGroundDetector() { CleanUp(); }
