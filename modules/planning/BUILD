@@ -10,7 +10,9 @@ cc_library(
     hdrs = [
         "planning_component.h",
     ],
-    copts = ["-DMODULE_NAME=\\\"planning\\\""],
+    copts = [
+        "-DMODULE_NAME=\\\"planning\\\"",
+    ],
     deps = [
         ":planning_lib",
         "//framework:cybertron",
