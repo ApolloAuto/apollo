@@ -24,9 +24,13 @@ DECLARE_double(test_duration);
 
 DECLARE_string(planning_config_file);
 
-DECLARE_string(lane_follow_scenario_config_file);
-DECLARE_string(side_pass_scenario_config_file);
-DECLARE_string(stop_sign_unprotected_scenario_config_file);
+// scenarios related
+DECLARE_string(scenario_lane_follow_config_file);
+DECLARE_string(scenario_side_pass_config_file);
+DECLARE_string(scenario_stop_sign_unprotected_config_file);
+DECLARE_string(scenario_stop_sign_unprotected_stage_stop);
+DECLARE_string(scenario_stop_sign_unprotected_stage_creep);
+DECLARE_string(scenario_stop_sign_unprotected_stage_cruise);
 
 DECLARE_string(planning_adapter_config_filename);
 DECLARE_string(traffic_rule_config_filename);

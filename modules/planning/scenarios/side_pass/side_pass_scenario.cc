@@ -83,7 +83,7 @@ bool SidePassScenario::Init() {
   RegisterTasks();
 
   CHECK(apollo::common::util::GetProtoFromFile(
-      FLAGS_side_pass_scenario_config_file, &config_));
+      FLAGS_scenario_side_pass_config_file, &config_));
 
   // get all active tasks
   std::vector<TaskType> tasks;

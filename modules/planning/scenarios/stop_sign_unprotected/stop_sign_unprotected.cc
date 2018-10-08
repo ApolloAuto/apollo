@@ -59,7 +59,7 @@ bool StopSignUnprotectedScenario::Init() {
   RegisterTasks();
 
   CHECK(apollo::common::util::GetProtoFromFile(
-      FLAGS_stop_sign_unprotected_scenario_config_file, &config_));
+      FLAGS_scenario_stop_sign_unprotected_config_file, &config_));
 
   // get all active tasks
   std::vector<TaskType> tasks;

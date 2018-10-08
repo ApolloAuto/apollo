@@ -59,7 +59,7 @@ message ScenarioConfig {
     }
   }
   message Stage {
-      optional string name = 1 [ default = "" ];
+      optional string stage_name = 1 [ default = "" ];
       repeated TaskType task = 2;
   };
   optional ScenarioType scenario_type = 1;

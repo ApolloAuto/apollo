@@ -39,14 +39,15 @@ class LaneFollowScenarioTest : public ::testing::Test {
   std::unique_ptr<LaneFollowScenario> scenario_;
 };
 TEST_F(LaneFollowScenarioTest, Simple) {
+  FLAGS_scenario_lane_follow_config_file =
+      "modules/planning/conf/scenario_lane_follow_config.pb.txt";
+
   scenario_.reset(new LaneFollowScenario());
   EXPECT_EQ(scenario_->scenario_type(), ScenarioConfig::LANE_FOLLOW);
 
-  FLAGS_lane_follow_scenario_config_file =
-      "modules/planning/conf/scenario_lane_follow_config.pb.txt";
   ScenarioConfig config;
   EXPECT_TRUE(apollo::common::util::GetProtoFromFile(
-      FLAGS_lane_follow_scenario_config_file, &config));
+      FLAGS_scenario_lane_follow_config_file, &config));
   EXPECT_TRUE(scenario_->Init());
 }
 
