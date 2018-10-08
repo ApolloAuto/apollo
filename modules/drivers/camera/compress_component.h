@@ -39,7 +39,7 @@ class CompressComponent : public Component<Image> {
   bool Proc(const std::shared_ptr<Image>& image) override;
 
  private:
-  std::shared_ptr<CCObjectPool<CompressedImage>> image_pool_;
+  std::unique_ptr<CCObjectPool<CompressedImage>> image_pool_;
   std::shared_ptr<Writer<CompressedImage>> writer_ = nullptr;
   Config config_;
 };

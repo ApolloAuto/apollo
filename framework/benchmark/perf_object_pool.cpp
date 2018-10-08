@@ -13,7 +13,7 @@ struct Test {
 };
 
 void fpool() {
-  auto pool = ObjectPool<Test>::Instance(100);
+  auto pool = new ObjectPool<Test>(100);
 
   auto start = std::chrono::steady_clock::now();
 
@@ -25,6 +25,7 @@ void fpool() {
 
   std::chrono::duration<double> diff = end - start;
   std::cout << std::fixed << diff.count() << " s\n";
+  delete pool;
 }
 
 void fnpool() {
@@ -46,10 +47,7 @@ int main(int argc, char *argv[]) {
     return 0;
   }
 
-  std::shared_ptr<ObjectPool<Test>> pool;
   std::thread t;
-
-  if (!strcmp(argv[1], "pool")) pool = ObjectPool<Test>::Instance(POOL_SIZE);
 
   if (!strcmp(argv[1], "pool"))
     t = std::thread(fpool);
