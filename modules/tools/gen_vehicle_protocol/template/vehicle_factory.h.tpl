@@ -58,7 +58,7 @@ class %(car_type_cap)sVehicleFactory : public AbstractVehicleFactory {
    * @brief create %(car_type_lower)s message manager
    * @returns a unique_ptr that points to the created message manager
    */
-  std::unique_ptr<MessageManager<::apollo::canbus::ChassisDetail>> 
+  std::unique_ptr<MessageManager<::apollo::canbus::ChassisDetail>>
   CreateMessageManager() override;
 };
 
