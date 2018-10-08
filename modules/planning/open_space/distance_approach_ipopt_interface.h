@@ -125,6 +125,8 @@ class DistanceApproachIPOPTInterface : public Ipopt::TNLP {
   double weight_rate_a_;
   double weight_stitching_steer_;
   double weight_stitching_a_;
+  double weight_first_order_time_;
+  double weight_second_order_time_;
 
   double w_ev_;
   double l_ev_;

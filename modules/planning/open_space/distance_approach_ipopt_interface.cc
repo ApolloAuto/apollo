@@ -86,6 +86,8 @@ void DistanceApproachIPOPTInterface::set_objective_weights(
   weight_rate_a_ = distance_approach_config_.weight_u_rate(1);
   weight_stitching_steer_ = distance_approach_config_.weight_stitching(0);
   weight_stitching_a_ = distance_approach_config_.weight_stitching(1);
+  weight_first_order_time_ = distance_approach_config_.weight_time(0);
+  weight_second_order_time_ = distance_approach_config_.weight_time(1);
 }
 
 bool DistanceApproachIPOPTInterface::get_nlp_info(int& n, int& m,
@@ -461,8 +463,9 @@ bool DistanceApproachIPOPTInterface::eval_f(int n, const double* x, bool new_x,
   // min input rate
   // min time (if the time step is not fixed)
   // regularization wrt warm start trajectory
-
+  DCHECK(ts_ != 0) << "ts in distance_approach_ is 0";
   std::size_t control_start_index = (horizon_ + 1) * 4;
+  std::size_t timestep_start_index = (horizon_ + 1) * 4 + horizon_ * 2;
 
   // TODO(QiL): Initial implementation towards earlier understanding and debug
   // purpose, later code refine towards improving efficiency
@@ -476,7 +479,39 @@ bool DistanceApproachIPOPTInterface::eval_f(int n, const double* x, bool new_x,
                      x[control_start_index + index + 1];
   }
 
-  // 2. objective to minimize state diff to warm up
+  // 2. objective to minimize input change rates, 1 ~ horizone -1
+  for (std::size_t i = 0; i < horizon_ - 1; ++i) {
+    std::size_t index = 2 * i;
+    double steering_rate =
+        (x[control_start_index + index] - x[control_start_index + index + 2]) /
+        x[timestep_start_index + i] / ts_;
+    double a_rate = (x[control_start_index + index + 1] -
+                     x[control_start_index + index + 3]) /
+                    x[timestep_start_index + i] / ts_;
+    obj_value += weight_rate_steer_ * steering_rate * steering_rate +
+                 weight_rate_a_ * a_rate * a_rate;
+  }
+
+  // 3. objective to minimize input volume for first horizon
+  double last_time_steer_rate = (x[control_start_index] - last_time_u_(0, 0)) /
+                                x[timestep_start_index] / ts_;
+  double last_time_a_rate = (x[control_start_index + 1] - last_time_u_(1, 0)) /
+                            x[timestep_start_index + 1] / ts_;
+  obj_value +=
+      weight_stitching_steer_ * last_time_steer_rate * last_time_steer_rate +
+      weight_stitching_a_ * last_time_a_rate * last_time_a_rate;
+
+  // 4. objective to minimize total time
+  for (std::size_t i = 0; i < horizon_; ++i) {
+    double first_order_penalty =
+        weight_first_order_time_ * x[timestep_start_index + i];
+    double second_order_penalty = weight_second_order_time_ *
+                                  x[timestep_start_index + i] *
+                                  x[timestep_start_index + i];
+    obj_value += first_order_penalty + second_order_penalty;
+  }
+
+  // 5. objective to minimize state diff to warm up
   for (std::size_t i = 0; i < horizon_ + 1; ++i) {
     std::size_t index = 4 * i;
     double x1_diff = x[index] - xWS_(0, i);
@@ -485,27 +520,6 @@ bool DistanceApproachIPOPTInterface::eval_f(int n, const double* x, bool new_x,
     obj_value += weight_state_x_ * x1_diff * x1_diff +
                  weight_state_y_ * x2_diff * x2_diff +
                  weight_state_phi_ * x3_diff * x3_diff;
-  }
-
-  std::size_t timestep_start_index = (horizon_ + 1) * 4 + horizon_ * 2;
-  // 3. objective to minimize input volume for first horizon
-  obj_value +=
-      weight_stitching_steer_ * (x[control_start_index] - last_time_u_(0, 0)) *
-          (x[control_start_index] - last_time_u_(0, 0)) +
-      weight_stitching_a_ * (x[control_start_index + 1] - last_time_u_(1, 0)) *
-          (x[control_start_index + 1] - last_time_u_(1, 0));
-
-  // 4. objective to minimize input change rates, 1 ~ horizone -1
-  for (std::size_t i = 0; i < horizon_ - 1; ++i) {
-    std::size_t index = 2 * i;
-    double steering_rate =
-        (x[control_start_index + index] - x[control_start_index + index + 2]) /
-        x[timestep_start_index + i] * ts_;
-    double a_rate = (x[control_start_index + index + 1] -
-                     x[control_start_index + index + 3]) /
-                    x[timestep_start_index + i] * ts_;
-    obj_value += weight_rate_steer_ * steering_rate * steering_rate +
-                 weight_rate_a_ * a_rate * a_rate;
   }
 
   return true;
