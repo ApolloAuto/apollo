@@ -24,4 +24,6 @@ distance_approach_config : {
   weight_state : 0.001
   weight_state : 0.001
   weight_state : 0.001
+  weight_stitching : 0.0
+  weight_stitching : 0.0
 }

@@ -36,13 +36,14 @@ namespace planning {
 using apollo::common::time::Clock;
 
 DistanceApproachProblem::DistanceApproachProblem(
-    Eigen::MatrixXd x0, Eigen::MatrixXd xF, std::size_t horizon, float ts,
-    Eigen::MatrixXd ego, Eigen::MatrixXd xWS, Eigen::MatrixXd uWS,
-    Eigen::MatrixXd XYbounds, std::size_t obstacles_num,
+    Eigen::MatrixXd x0, Eigen::MatrixXd xF, Eigen::MatrixXd last_time_u,
+    std::size_t horizon, float ts, Eigen::MatrixXd ego, Eigen::MatrixXd xWS,
+    Eigen::MatrixXd uWS, Eigen::MatrixXd XYbounds, std::size_t obstacles_num,
     Eigen::MatrixXd obstacles_vertices_num, Eigen::MatrixXd obstacles_A,
     Eigen::MatrixXd obstacles_b)
     : x0_(x0),
       xF_(xF),
+      last_time_u_(last_time_u),
       horizon_(horizon),
       ts_(ts),
       ego_(ego),
@@ -100,8 +101,8 @@ bool DistanceApproachProblem::Solve(Eigen::MatrixXd* state_result,
   bool use_fix_time_ = false;
   DistanceApproachIPOPTInterface* ptop = new DistanceApproachIPOPTInterface(
       num_of_variables, num_of_constraints, horizon_, ts_, ego_, xWS_, uWS_,
-      timeWS_, x0_, xF_, XYbounds_, obstacles_vertices_num_, obstacles_num_,
-      obstacles_A_, obstacles_b_, use_fix_time_);
+      timeWS_, x0_, xF_, last_time_u_, XYbounds_, obstacles_vertices_num_,
+      obstacles_num_, obstacles_A_, obstacles_b_, use_fix_time_);
 
   Ipopt::SmartPtr<Ipopt::TNLP> problem = ptop;
 

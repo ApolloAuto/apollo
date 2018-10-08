@@ -38,9 +38,10 @@ DistanceApproachIPOPTInterface::DistanceApproachIPOPTInterface(
     std::size_t horizon, float ts, Eigen::MatrixXd ego,
     const Eigen::MatrixXd& xWS, const Eigen::MatrixXd& uWS,
     const Eigen::MatrixXd& timeWS, Eigen::MatrixXd x0, Eigen::MatrixXd xf,
-    Eigen::MatrixXd XYbounds, Eigen::MatrixXd obstacles_vertices_num,
-    std::size_t obstacles_num, const Eigen::MatrixXd& obstacles_A,
-    const Eigen::MatrixXd& obstacles_b, bool use_fix_time)
+    Eigen::MatrixXd last_time_u, Eigen::MatrixXd XYbounds,
+    Eigen::MatrixXd obstacles_vertices_num, std::size_t obstacles_num,
+    const Eigen::MatrixXd& obstacles_A, const Eigen::MatrixXd& obstacles_b,
+    bool use_fix_time)
     : num_of_variables_(num_of_variables),
       num_of_constraints_(num_of_constraints),
       horizon_(horizon),
@@ -51,6 +52,7 @@ DistanceApproachIPOPTInterface::DistanceApproachIPOPTInterface(
       timeWS_(timeWS),
       x0_(x0),
       xf_(xf),
+      last_time_u_(last_time_u),
       XYbounds_(XYbounds),
       obstacles_vertices_num_(obstacles_vertices_num),
       obstacles_num_(obstacles_num),
@@ -75,6 +77,15 @@ DistanceApproachIPOPTInterface::DistanceApproachIPOPTInterface(
 void DistanceApproachIPOPTInterface::set_objective_weights(
     const DistanceApproachConfig& distance_approach_config) {
   distance_approach_config_.CopyFrom(distance_approach_config);
+  weight_state_x_ = distance_approach_config_.weight_state(0);
+  weight_state_y_ = distance_approach_config_.weight_state(1);
+  weight_state_phi_ = distance_approach_config_.weight_state(2);
+  weight_input_steer_ = distance_approach_config_.weight_u(0);
+  weight_input_a_ = distance_approach_config_.weight_u(1);
+  weight_rate_steer_ = distance_approach_config_.weight_u_rate(0);
+  weight_rate_a_ = distance_approach_config_.weight_u_rate(1);
+  weight_stitching_steer_ = distance_approach_config_.weight_stitching(0);
+  weight_stitching_a_ = distance_approach_config_.weight_stitching(1);
 }
 
 bool DistanceApproachIPOPTInterface::get_nlp_info(int& n, int& m,
@@ -448,52 +459,53 @@ bool DistanceApproachIPOPTInterface::eval_f(int n, const double* x, bool new_x,
   // Objective is :
   // min control inputs
   // min input rate
-  // min time
+  // min time (if the time step is not fixed)
   // regularization wrt warm start trajectory
 
   std::size_t control_start_index = (horizon_ + 1) * 4;
-  // std::size_t time_start_index = control_start_index + horizon_ * 2;
 
   // TODO(QiL): Initial implementation towards earlier understanding and debug
   // purpose, later code refine towards improving efficiency
 
-  DCHECK(ts_ != 0) << "ts in distance_approach_ is 0";
   // 1. objective to minimize u square
   for (std::size_t i = 0; i < horizon_; ++i) {
-    obj_value += distance_approach_config_.weight_u(0) *
-                     x[control_start_index + i] * x[control_start_index + i] +
-                 distance_approach_config_.weight_u(1) *
-                     x[control_start_index + i] *
-                     x[control_start_index + i + 1];
+    std::size_t index = 2 * i;
+    obj_value += weight_input_steer_ * x[control_start_index + index] *
+                     x[control_start_index + index] +
+                 weight_input_a_ * x[control_start_index + index + 1] *
+                     x[control_start_index + index + 1];
   }
 
-  // 2. objective to minimize input change rate, first horizon
-  obj_value += distance_approach_config_.weight_u_rate(0) *
-                   (x[control_start_index] / ts_) *
-                   (x[control_start_index] / ts_) +
-               distance_approach_config_.weight_u_rate(1) *
-                   (x[control_start_index + 1] / ts_) *
-                   (x[control_start_index + 1] / ts_);
-
-  // 3. objective to minimize input change rates, 1 ~ horizon -1
-  for (std::size_t i = 1; i < horizon_ - 1; ++i) {
-    double u1_rate =
-        (x[control_start_index + i + 2] - x[control_start_index + i]) / ts_;
-    double u2_rate =
-        (x[control_start_index + i + 3] - x[control_start_index + i + 1]) / ts_;
-    obj_value +=
-        distance_approach_config_.weight_u_rate(0) * u1_rate * u1_rate +
-        distance_approach_config_.weight_u_rate(1) * u2_rate * u2_rate;
+  // 2. objective to minimize state diff to warm up
+  for (std::size_t i = 0; i < horizon_ + 1; ++i) {
+    std::size_t index = 4 * i;
+    double x1_diff = x[index] - xWS_(0, i);
+    double x2_diff = x[index + 1] - xWS_(1, i);
+    double x3_diff = x[index + 2] - xWS_(2, i);
+    obj_value += weight_state_x_ * x1_diff * x1_diff +
+                 weight_state_y_ * x2_diff * x2_diff +
+                 weight_state_phi_ * x3_diff * x3_diff;
   }
 
-  // 4. objective to minimize state diff to warm up
-  for (std::size_t i = 0; i < horizon_; ++i) {
-    double x1_diff = x[4 * i] - xWS_(0, i);
-    double x2_diff = x[4 * i + 1] - xWS_(1, i);
-    double x3_diff = x[4 * i + 2] - xWS_(2, i);
-    obj_value += distance_approach_config_.weight_state(0) * x1_diff * x1_diff +
-                 distance_approach_config_.weight_state(1) * x2_diff * x2_diff +
-                 distance_approach_config_.weight_state(2) * x3_diff * x3_diff;
+  std::size_t timestep_start_index = (horizon_ + 1) * 4 + horizon_ * 2;
+  // 3. objective to minimize input volume for first horizon
+  obj_value +=
+      weight_stitching_steer_ * (x[control_start_index] - last_time_u_(0, 0)) *
+          (x[control_start_index] - last_time_u_(0, 0)) +
+      weight_stitching_a_ * (x[control_start_index + 1] - last_time_u_(1, 0)) *
+          (x[control_start_index + 1] - last_time_u_(1, 0));
+
+  // 4. objective to minimize input change rates, 1 ~ horizone -1
+  for (std::size_t i = 0; i < horizon_ - 1; ++i) {
+    std::size_t index = 2 * i;
+    double steering_rate =
+        (x[control_start_index + index] - x[control_start_index + index + 2]) /
+        x[timestep_start_index + i] * ts_;
+    double a_rate = (x[control_start_index + index + 1] -
+                     x[control_start_index + index + 3]) /
+                    x[timestep_start_index + i] * ts_;
+    obj_value += weight_rate_steer_ * steering_rate * steering_rate +
+                 weight_rate_a_ * a_rate * a_rate;
   }
 
   return true;

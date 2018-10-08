@@ -102,6 +102,8 @@ class OpenSpacePlanner : public Planner {
   double init_y_ = 0.0;
   double init_phi_ = 0.0;
   double init_v_ = 0.0;
+  double init_steer_ = 0.0;
+  double init_a_ = 0.0;
   size_t horizon_ = 0;
   double ts_ = 0;
   Eigen::MatrixXd ego_;

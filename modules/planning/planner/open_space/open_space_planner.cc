@@ -81,8 +81,12 @@ apollo::common::Status OpenSpacePlanner::Plan(
   init_y_ = init_state_.y();
   init_phi_ = init_state_.heading();
   init_v_ = init_state_.linear_velocity();
+  init_steer_ = 0;
+  init_a_ = 0;
   Eigen::MatrixXd x0(4, 1);
   x0 << init_x_, init_y_, init_phi_, init_v_;
+  Eigen::MatrixXd last_time_u(2, 1);
+  last_time_u << init_steer_, init_a_;
   // std::vector<double> x0({-12, 11, 0, 0});
 
   // final state
@@ -154,8 +158,8 @@ apollo::common::Status OpenSpacePlanner::Plan(
   // TODO(QiL) : update the I/O to make the warm start problem and distance
   // approach problem connect
   distance_approach_.reset(new DistanceApproachProblem(
-      x0, xF, horizon_, ts_, ego_, xWS, uWS, XYbounds_, obstacles_num,
-      obstacles_vertices_num, obstacles_A, obstacles_b));
+      x0, xF, last_time_u, horizon_, ts_, ego_, xWS, uWS, XYbounds_,
+      obstacles_num, obstacles_vertices_num, obstacles_A, obstacles_b));
 
   ADEBUG << "Distance approach configs set"
          << distance_approach_config_.ShortDebugString();

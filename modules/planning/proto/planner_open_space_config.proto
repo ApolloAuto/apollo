@@ -33,5 +33,6 @@ message DistanceApproachConfig {
   repeated double weight_u = 1;
   repeated double weight_u_rate = 2;
   repeated double weight_state = 3;
-  repeated double weight_reg = 4;
+  repeated double weight_stitching = 4;
+  repeated double weight_reg = 5;
 }
