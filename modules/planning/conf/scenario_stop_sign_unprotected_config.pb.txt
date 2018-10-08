@@ -1,5 +1,12 @@
 scenario_type : STOP_SIGN_UNPROTECTED
 stage : {
+  stage_name : "SCENATIO_STOP_SIGN_UNPROTECTED_STAGE_STOP"
+}
+stage : {
+  stage_name : "SCENATIO_STOP_SIGN_UNPROTECTED_STAGE_CREEP"
+}
+stage : {
+  stage_name : "SCENATIO_STOP_SIGN_UNPROTECTED_STAGE_CRUISE"
   task : DP_POLY_PATH_OPTIMIZER
   task : PATH_DECIDER
   task : DP_ST_SPEED_OPTIMIZER

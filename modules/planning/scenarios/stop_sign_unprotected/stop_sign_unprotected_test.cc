@@ -40,13 +40,16 @@ class StopSignUnprotectedScenarioTest : public ::testing::Test {
 };
 
 TEST_F(StopSignUnprotectedScenarioTest, Simple) {
+  FLAGS_scenario_stop_sign_unprotected_config_file =
+      "modules/planning/conf/scenario_stop_sign_unprotected_config.pb.txt";
+
   scenario_.reset(new StopSignUnprotectedScenario());
   EXPECT_EQ(scenario_->scenario_type(),
             ScenarioConfig::STOP_SIGN_UNPROTECTED);
 
   ScenarioConfig config;
   EXPECT_TRUE(apollo::common::util::GetProtoFromFile(
-      FLAGS_stop_sign_unprotected_scenario_config_file, &config));
+      FLAGS_scenario_stop_sign_unprotected_config_file, &config));
 
   EXPECT_TRUE(scenario_->Init());
 }

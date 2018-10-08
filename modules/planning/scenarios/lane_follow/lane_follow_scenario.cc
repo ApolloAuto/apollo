@@ -89,7 +89,7 @@ bool LaneFollowScenario::Init() {
   RegisterTasks();
 
   CHECK(apollo::common::util::GetProtoFromFile(
-      FLAGS_lane_follow_scenario_config_file, &config_));
+      FLAGS_scenario_lane_follow_config_file, &config_));
 
   // get all active tasks
   std::vector<TaskType> tasks;

@@ -36,11 +36,11 @@ class DpStGraphTest : public ::testing::Test {
  public:
   virtual void SetUp() {
     FLAGS_enable_multi_thread_in_dp_st_graph = false;
-    FLAGS_lane_follow_scenario_config_file =
+    FLAGS_scenario_lane_follow_config_file =
         "modules/planning/conf/scenario_lane_follow_config.pb.txt";
     ScenarioConfig config;
     CHECK(apollo::common::util::GetProtoFromFile(
-        FLAGS_lane_follow_scenario_config_file, &config));
+        FLAGS_scenario_lane_follow_config_file, &config));
 
     for (const auto& cfg : config.scenario_task_config()) {
       if (cfg.task_type() == DP_ST_SPEED_OPTIMIZER) {
