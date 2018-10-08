@@ -114,10 +114,7 @@ bool RecordReader::ReadNextChunk(ChunkBody* chunk, uint64_t begin_time,
           AERROR << "Failed to read chunk header section.";
           return false;
         }
-        if (begin_time > header.end_time()) {
-          return false;
-        }
-        if (end_time < header.begin_time()) {
+        if (begin_time > header.end_time() || end_time < header.begin_time()) {
           skip_next_chunk_body = true;
         }
         break;
