@@ -10,6 +10,9 @@ cc_binary(
         ".",
     ],
     linkopts = [
+        "-lcybertron",
+        "-lcybertron_proto",
+        "-lcybertron_common",
         "-lfastrtps",
         "-lconsole_bridge",
         "-lprotobuf",

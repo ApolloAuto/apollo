@@ -308,7 +308,11 @@ def start(launch_file = ''):
     logger.info("=" * 120)
 
     # set PATH in setup.sh
-    binary_path = g_binary_name
+    binary_path = cybertron_path + '/bin/' + g_binary_name
+
+    if not os.path.isfile(binary_path):
+        logger.error('Binary file %s does not exist' % binary_path)
+        sys.exit(1)
 
     if not os.path.isfile(launch_file):
         logger.error('Launch xml file %s does not exist' % launch_file)
