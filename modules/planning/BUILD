@@ -38,7 +38,8 @@ cc_test(
     ],
     deps = [
         ":planning_component_lib",
-        "@gtest//:main",
+        "//framework:cybertron",
+        "@gtest",
     ],
 )
 

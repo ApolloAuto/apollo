@@ -59,8 +59,8 @@ class PlanningComponentTest : public ::testing::Test {
  public:
   virtual void SetUp() {
     FLAGS_use_multi_thread_to_add_obstacles = false;
-    FLAGS_enable_multi_thread_in_dp_poly_path = false;
-    FLAGS_enable_multi_thread_in_dp_st_graph = false;
+    FLAGS_enable_multi_thread_in_dp_poly_path = true;
+    FLAGS_enable_multi_thread_in_dp_st_graph = true;
     FLAGS_planning_config_file =
         "/apollo/modules/planning/conf/planning_config.pb.txt";
     FLAGS_align_prediction_time = false;
@@ -102,7 +102,7 @@ void PlanningComponentTest::SetupCybertron() {
   }
 
   // init cybertron framework
-  apollo::cybertron::Init("planning_test");
+  // apollo::cybertron::Init("planning_test");
 
   Clock::SetMode(Clock::CYBERTRON);
 
@@ -199,9 +199,6 @@ bool PlanningComponentTest::RunPlanning(const std::string& test_case_name) {
   LocalView local_view;
   CHECK(FeedTestData(&local_view)) << "Failed to feed test data";
 
-  planning_component_.reset(new PlanningComponent());
-  planning_component_->Initialize(component_config_);
-
   usleep(1000);  // sleep 1ms
 
   // feed topics
@@ -220,6 +217,9 @@ bool PlanningComponentTest::RunPlanning(const std::string& test_case_name) {
   // note: main channel must be written last
   prediction_writer_->Write(local_view.prediction_obstacles);
   usleep(200000);  // sleep 200ms
+
+  planning_component_.reset(new PlanningComponent());
+  planning_component_->Initialize(component_config_);
 
   TrimPlanning(&adc_trajectory_);
 
@@ -280,3 +280,12 @@ TEST_F(PlanningComponentTest, garage_stop_obstacle) {
 
 }  // namespace planning
 }  // namespace apollo
+
+int main(int argc, char** argv) {
+  ::apollo::cybertron::Init("planning_test");
+  ::testing::InitGoogleTest(&argc, argv);
+  ::google::ParseCommandLineFlags(&argc, &argv, true);
+  int ret = RUN_ALL_TESTS();
+  ::apollo::cybertron::Shutdown();
+  return ret;
+}
