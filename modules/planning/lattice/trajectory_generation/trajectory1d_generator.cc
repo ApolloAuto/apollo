@@ -30,8 +30,8 @@
 #include "modules/planning/lattice/trajectory1d/constant_deceleration_trajectory1d.h"
 #include "modules/planning/lattice/trajectory1d/piecewise_jerk_trajectory1d.h"
 #include "modules/planning/lattice/trajectory1d/standing_still_trajectory1d.h"
-#include "modules/planning/lattice/trajectory_generation/active_set_lateral_qp_optimizer.h"
 #include "modules/planning/lattice/trajectory_generation/lateral_trajectory_optimizer.h"
+#include "modules/planning/math/finite_element_qp/active_set_lateral_qp_optimizer.h"
 
 namespace apollo {
 namespace planning {

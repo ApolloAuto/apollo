@@ -30,12 +30,9 @@ cc_library(
         "trajectory1d_generator.h",
     ],
     deps = [
-        ":active_set_augmented_lateral_qp_optimizer",
-        ":active_set_lateral_qp_optimizer",
         ":end_condition_sampler",
         ":lateral_trajectory_optimizer",
         ":lateral_trajectory_optimizer_interface",
-        ":osqp_lateral_qp_optimizer",
         "//modules/common",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/lattice/behavior:path_time_graph",
@@ -47,6 +44,7 @@ cc_library(
         "//modules/planning/lattice/trajectory1d:standing_still_trajectory1d",
         "//modules/planning/math/curve1d:quartic_polynomial_curve1d",
         "//modules/planning/math/curve1d:quintic_polynomial_curve1d",
+        "//modules/planning/math/finite_element_qp",
         "//modules/planning/proto:lattice_sampling_config_proto",
         "//modules/planning/proto:lattice_structure_proto",
     ],
@@ -154,64 +152,6 @@ cc_library(
         "//modules/planning/lattice/trajectory1d:piecewise_jerk_trajectory1d",
         "//modules/planning/lattice/trajectory_generation:lateral_trajectory_optimizer_interface",
         "@ipopt",
-    ],
-)
-
-cc_library(
-    name = "lateral_qp_optimizer",
-    srcs = [
-        "lateral_qp_optimizer.cc",
-    ],
-    hdrs = [
-        "lateral_qp_optimizer.h",
-    ],
-    deps = [
-        "//framework:cybertron",
-        #"//modules/planning/lattice/behavior:path_time_graph",
-        "//modules/planning/lattice/trajectory1d:piecewise_jerk_trajectory1d",
-    ],
-)
-
-cc_library(
-    name = "active_set_lateral_qp_optimizer",
-    srcs = [
-        "active_set_lateral_qp_optimizer.cc",
-    ],
-    hdrs = [
-        "active_set_lateral_qp_optimizer.h",
-    ],
-    deps = [
-        ":lateral_qp_optimizer",
-        "@qpOASES",
-    ],
-)
-
-cc_library(
-    name = "osqp_lateral_qp_optimizer",
-    srcs = [
-        "osqp_lateral_qp_optimizer.cc",
-    ],
-    hdrs = [
-        "osqp_lateral_qp_optimizer.h",
-    ],
-    deps = [
-        ":lateral_qp_optimizer",
-        "@eigen",
-        "@osqp",
-    ],
-)
-
-cc_library(
-    name = "active_set_augmented_lateral_qp_optimizer",
-    srcs = [
-        "active_set_augmented_lateral_qp_optimizer.cc",
-    ],
-    hdrs = [
-        "active_set_augmented_lateral_qp_optimizer.h",
-    ],
-    deps = [
-        ":lateral_qp_optimizer",
-        "@qpOASES",
     ],
 )
 

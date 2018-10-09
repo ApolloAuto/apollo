@@ -20,14 +20,13 @@
 
 #pragma once
 
-
 #include <memory>
 #include <string>
 #include <utility>
 #include <vector>
 
 #include "modules/common/proto/pnc_point.pb.h"
-#include "modules/planning/lattice/trajectory_generation/lateral_qp_optimizer.h"
+#include "modules/planning/math/finite_element_qp/lateral_qp_optimizer.h"
 #include "modules/planning/proto/planning_config.pb.h"
 #include "modules/planning/proto/qp_piecewise_jerk_path_config.pb.h"
 #include "modules/planning/toolkits/optimizers/path_optimizer.h"

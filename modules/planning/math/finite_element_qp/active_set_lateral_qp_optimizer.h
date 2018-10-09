@@ -20,14 +20,13 @@
 
 #pragma once
 
-
 #include <array>
 #include <memory>
 #include <utility>
 #include <vector>
 
 #include "modules/planning/lattice/trajectory1d/piecewise_jerk_trajectory1d.h"
-#include "modules/planning/lattice/trajectory_generation/lateral_qp_optimizer.h"
+#include "modules/planning/math/finite_element_qp/lateral_qp_optimizer.h"
 
 namespace apollo {
 namespace planning {
@@ -45,5 +44,3 @@ class ActiverSetLateralQPOptimizer : public LateralQPOptimizer {
 
 }  // namespace planning
 }  // namespace apollo
-
-
