@@ -78,7 +78,6 @@ int main(int argc, char* argv[]) {
     case HELP:
       printHelp(argv[0]);
       return 0;
-
     default:;
   }
 

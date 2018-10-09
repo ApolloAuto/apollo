@@ -80,12 +80,10 @@ void GeneralChannelMessage::RenderInfo(const Screen* s, int key,
   std::vector<std::string>* vec = &readers_;
 
   auto iter = vec->cbegin();
-  int y = page_index_ * page_item_count_;
-  if (y < static_cast<int>(vec->size())) {
-    y = 0;
-    while (y < page_index_ * page_item_count_) {
+  unsigned y = page_index_ * page_item_count_;
+  if (y < vec->size()) {
+    for (unsigned i = 0; i < y; ++i) {
       ++iter;
-      ++y;
     }
   } else {
     y -= vec->size();

@@ -84,6 +84,7 @@ class MainWindow : public QMainWindow {
   void ActionOpenRadarChannel(void);
   void openRadarChannel(bool b);
   void EnableRadarPoints(bool b);
+  void ChangeRadarChannel(void);
 
   void showMessage(void);
 
@@ -103,7 +104,12 @@ class MainWindow : public QMainWindow {
   VideoImgProxy* AddVideoImgViewer(void);
   void DoDeleteVideoImg(VideoImgProxy*);
   void DoPlayVideoImage(bool, VideoImgProxy*);
-  void calculateWH(/*VideoImgProxy* videoImgProxy*/);
+  void calculateWH(void);
+
+  RadarData* createRadarData(void);
+  void DoOpenRadarChannel(bool b, RadarData * radarProxy);
+  void RadarRenderCallback(const std::shared_ptr<const apollo::drivers::RadarObstacles>& rawData,
+                                       RadarData* radar);
 
   Ui::MainWindow* ui_;
   MessageDialog* msg_dialog_;
@@ -126,9 +132,13 @@ class MainWindow : public QMainWindow {
 
   std::shared_ptr<QOpenGLShaderProgram> pointcloud_shader_;
   std::shared_ptr<QOpenGLShaderProgram> grid_shader_;
+  std::shared_ptr<QOpenGLShaderProgram> radar_points_shader_;
 
   QList<VideoImgProxy*> video_image_viewer_list_;
   QList<VideoImgProxy*> closed_video_image_viewer_list_;
+
+  QList<RadarData*> radarData_list_;
+  QList<RadarData*> closed_radarData_list_;
 };
 
 

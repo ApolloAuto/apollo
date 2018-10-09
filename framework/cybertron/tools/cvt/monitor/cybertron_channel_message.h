@@ -42,20 +42,25 @@ class ChannelMessage : public GeneralMessageBase {
   };
 
   static const char* errCode2Str(ErrorCode errCode) {
+    const char* ret = "Unknown Error Code";
     switch (errCode) {
       case ChannelMessage::ErrorCode::NewSubClassFailed:
-        return "Cannot create Parser Object";
+        ret = "Cannot create Parser Object";
+        break;
 
       case ChannelMessage::ErrorCode::CreateNodeFailed:
-        return "Cannot create Cybertron Node";
+        ret = "Cannot create Cybertron Node";
+        break;
 
       case ChannelMessage::ErrorCode::CreateReaderFailed:
-        return "Cannot create Cybertron Reader";
-
+        ret = "Cannot create Cybertron Reader";
+        break;
+        
       case ChannelMessage::ErrorCode::MessageTypeIsEmptr:
-        return "Message Type is Empty";
+        ret = "Message Type is Empty";
+        break;
     }
-    return "";
+    return ret;
   }
 
   static bool isErrorCode(void* ptr) {
