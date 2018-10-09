@@ -96,11 +96,12 @@ TEST_F(ProceedWithCautionSpeedGeneratorTest, FixedSpeed) {
   std::vector<common::SpeedPoint> speed_points = speed_data2.speed_vector();
   int num_speed_points = speed_points.size();
   EXPECT_GT(num_speed_points, 0);
+  AERROR << "Number of speed points: " << num_speed_points;
 
   // Check if the output speed are the same for all points
   for (int i = 0; i < num_speed_points; i++) {
     double actual_speed = speed_points[i].v();
-    EXPECT_EQ(actual_speed, 2.23);
+    EXPECT_DOUBLE_EQ(actual_speed, 2.23);
   }
 }
 
