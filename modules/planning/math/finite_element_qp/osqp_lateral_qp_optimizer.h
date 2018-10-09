@@ -20,44 +20,40 @@
 
 #pragma once
 
-
 #include <array>
-#include <memory>
 #include <utility>
 #include <vector>
 
-#include "qpOASES.hpp"
+#include "Eigen/Core"
+#include "osqp/include/osqp.h"
 
-#include "modules/common/proto/pnc_point.pb.h"
 #include "modules/planning/lattice/trajectory1d/piecewise_jerk_trajectory1d.h"
+#include "modules/planning/math/finite_element_qp/lateral_qp_optimizer.h"
 
 namespace apollo {
 namespace planning {
 
-class LateralQPOptimizer {
+class OsqpLateralQPOptimizer : public LateralQPOptimizer {
  public:
-  LateralQPOptimizer() = default;
+  OsqpLateralQPOptimizer() = default;
 
-  virtual ~LateralQPOptimizer() = default;
+  virtual ~OsqpLateralQPOptimizer() = default;
 
-  virtual bool optimize(
+  bool optimize(
       const std::array<double, 3>& d_state, const double delta_s,
-      const std::vector<std::pair<double, double>>& d_bounds) = 0;
+      const std::vector<std::pair<double, double>>& d_bounds) override;
 
-  virtual PiecewiseJerkTrajectory1d GetOptimalTrajectory() const;
-  virtual std::vector<common::FrenetFramePoint> GetFrenetFramePath() const;
+ private:
+  void CalcualteKernel(const std::vector<std::pair<double, double>>& d_bounds,
+                       const double delta_s, std::vector<c_float>* P_data,
+                       std::vector<c_float>* P_indices,
+                       std::vector<c_float>* P_indptr);
 
- protected:
-  double delta_s_ = 0.0;
-
-  std::vector<double> opt_d_;
-
-  std::vector<double> opt_d_prime_;
-
-  std::vector<double> opt_d_pprime_;
+  // kernel
+  std::vector<c_float> P_data_;
+  std::vector<c_float> P_indices_;
+  std::vector<c_float> P_indptr_;
 };
 
 }  // namespace planning
 }  // namespace apollo
-
-

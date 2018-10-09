@@ -29,6 +29,7 @@ cc_library(
         "//modules/planning/math:polynomial_xd",
         "//modules/planning/math/curve1d:polynomial_curve1d",
         "//modules/planning/math/curve1d:quintic_polynomial_curve1d",
+        "//modules/planning/math/finite_element_qp",
         "//modules/planning/math/smoothing_spline:active_set_spline_1d_solver",
         "//modules/planning/proto:planning_proto",
         "//modules/planning/reference_line",

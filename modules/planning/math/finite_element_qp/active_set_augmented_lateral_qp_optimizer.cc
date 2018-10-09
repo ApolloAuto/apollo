@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/planning/lattice/trajectory_generation/active_set_augmented_lateral_qp_optimizer.h"
+#include "modules/planning/math/finite_element_qp/active_set_augmented_lateral_qp_optimizer.h"
 
 #include "cybertron/common/log.h"
 #include "qpOASES.hpp"
