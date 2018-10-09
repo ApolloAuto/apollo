@@ -1,12 +1,16 @@
 scenario_type : STOP_SIGN_UNPROTECTED
 stage : {
   stage_name : "SCENATIO_STOP_SIGN_UNPROTECTED_STAGE_STOP"
+  enabled : true
 }
 stage : {
   stage_name : "SCENATIO_STOP_SIGN_UNPROTECTED_STAGE_CREEP"
+  enabled : false
+  task : DECIDER_CREEP
 }
 stage : {
   stage_name : "SCENATIO_STOP_SIGN_UNPROTECTED_STAGE_CRUISE"
+  enabled : true
   task : DP_POLY_PATH_OPTIMIZER
   task : PATH_DECIDER
   task : DP_ST_SPEED_OPTIMIZER
@@ -182,5 +186,16 @@ scenario_task_config : {
       dynamic_obs_nudge_speed_ratio: 0.8
       centri_jerk_speed_coeff: 1.0
     }
+  }
+}
+
+scenario_task_config : {
+  task_type : DECIDER_CREEP
+  decider_creep_config : {
+    creep_distance_to_stop_line: 1.5
+    stop_distance: 0.3
+    speed_limit: 1.0
+    max_valid_stop_distance: 0.4
+    min_boundary_t: 6.0
   }
 }
