@@ -184,6 +184,7 @@ bool OsqpLateralQPOptimizer::optimize(
 
   return true;
 }
+
 void OsqpLateralQPOptimizer::CalcualteKernel(
     const std::vector<std::pair<double, double>>& d_bounds,
     std::vector<c_float>* P_data, std::vector<c_int>* P_indices,

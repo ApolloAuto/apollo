@@ -83,8 +83,8 @@ bool QpPiecewiseJerkPathOptimizer::Init(
   }
   // TODO(all): use gflags or config to turn on/off new algorithms
   // lateral_qp_optimizer_.reset(new ActiveSetLateralQPOptimizer());
-  // lateral_qp_optimizer_.reset(new ActiveSetAugmentedLateralQPOptimizer());
   // lateral_qp_optimizer_.reset(new OsqpLateralJerkQPOptimizer());
+  // lateral_qp_optimizer_.reset(new ActiveSetAugmentedLateralQPOptimizer());
   lateral_qp_optimizer_.reset(new OsqpLateralLinearQPOptimizer());
 
   is_init_ = true;
@@ -239,7 +239,7 @@ Status QpPiecewiseJerkPathOptimizer::Process(
                                                  lateral_bounds);
   auto end_time = std::chrono::system_clock::now();
   std::chrono::duration<double> diff = end_time - start_time;
-  ADEBUG << "lateral_qp_optimizer used time: " << diff.count() * 1000 << " ms.";
+  AERROR << "lateral_qp_optimizer used time: " << diff.count() * 1000 << " ms.";
 
   if (!success) {
     AERROR << "lateral qp optimizer failed";
