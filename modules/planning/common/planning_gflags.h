@@ -16,7 +16,6 @@
 
 #pragma once
 
-
 #include "gflags/gflags.h"
 
 DECLARE_bool(planning_test_mode);
@@ -173,6 +172,7 @@ DECLARE_bool(lateral_optimization);
 DECLARE_double(weight_lateral_offset);
 DECLARE_double(weight_lateral_derivative);
 DECLARE_double(weight_lateral_second_order_derivative);
+DECLARE_double(weight_lateral_third_order_derivative);
 DECLARE_double(weight_lateral_obstacle_distance);
 DECLARE_double(lateral_third_order_derivative_max);
 
@@ -222,5 +222,3 @@ DECLARE_bool(use_osqp_optimizer_for_reference_line);
 DECLARE_bool(enable_osqp_debug);
 
 DECLARE_bool(use_static_waypoint_sampler);
-
-

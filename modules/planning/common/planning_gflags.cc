@@ -35,28 +35,20 @@ DEFINE_string(
     "/apollo/modules/planning/conf/scenario_lane_follow_config.pb.txt",
     "The lane follow scenario configuration file");
 /// side_pass
-DEFINE_string(
-    scenario_side_pass_config_file,
-    "/apollo/modules/planning/conf/scenario_side_pass_config.pb.txt",
-    "The side pass scenario configuration file");
+DEFINE_string(scenario_side_pass_config_file,
+              "/apollo/modules/planning/conf/scenario_side_pass_config.pb.txt",
+              "The side pass scenario configuration file");
 /// stop_sign_unprotected
-DEFINE_string(
-    scenario_stop_sign_unprotected_config_file,
-    "/apollo/modules/planning/conf/"
-    "scenario_stop_sign_unprotected_config.pb.txt",
-    "The stop_sign_unprotected scenario configuration file");
-DEFINE_string(
-    scenario_stop_sign_unprotected_stage_stop,
-    "SCENATIO_STOP_SIGN_UNPROTECTED_STAGE_STOP",
-    "stage 1: stop");
-DEFINE_string(
-    scenario_stop_sign_unprotected_stage_creep,
-    "SCENATIO_STOP_SIGN_UNPROTECTED_STAGE_CREEP",
-    "stage 2: creep");
-DEFINE_string(
-    scenario_stop_sign_unprotected_stage_cruise,
-    "SCENATIO_STOP_SIGN_UNPROTECTED_STAGE_CRUISE",
-    "stage 3: cruise");
+DEFINE_string(scenario_stop_sign_unprotected_config_file,
+              "/apollo/modules/planning/conf/"
+              "scenario_stop_sign_unprotected_config.pb.txt",
+              "The stop_sign_unprotected scenario configuration file");
+DEFINE_string(scenario_stop_sign_unprotected_stage_stop,
+              "SCENATIO_STOP_SIGN_UNPROTECTED_STAGE_STOP", "stage 1: stop");
+DEFINE_string(scenario_stop_sign_unprotected_stage_creep,
+              "SCENATIO_STOP_SIGN_UNPROTECTED_STAGE_CREEP", "stage 2: creep");
+DEFINE_string(scenario_stop_sign_unprotected_stage_cruise,
+              "SCENATIO_STOP_SIGN_UNPROTECTED_STAGE_CRUISE", "stage 3: cruise");
 
 DEFINE_string(planning_adapter_config_filename,
               "/apollo/modules/planning/conf/adapter.conf",
@@ -376,6 +368,9 @@ DEFINE_double(weight_lateral_derivative, 500.0,
               "in lateral trajectory optimization");
 DEFINE_double(weight_lateral_second_order_derivative, 1000.0,
               "weight for lateral second order derivative "
+              "in lateral trajectory optimization");
+DEFINE_double(weight_lateral_third_order_derivative, 1000.0,
+              "weight for lateral third order derivative "
               "in lateral trajectory optimization");
 DEFINE_double(
     weight_lateral_obstacle_distance, 0.0,
