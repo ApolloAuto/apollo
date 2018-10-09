@@ -20,7 +20,6 @@
 
 #pragma once
 
-
 #include <vector>
 
 #include "Eigen/Dense"
@@ -149,6 +148,21 @@ class DistanceApproachIPOPTInterface : public Ipopt::TNLP {
 
   // whether to use fix time
   bool use_fix_time_ = false;
+
+  // state start index
+  std::size_t state_start_index_ = 0;
+
+  // control start index.
+  std::size_t control_start_index_ = 0;
+
+  // time start index
+  std::size_t time_start_index_ = 0;
+
+  // lagrangian l start index
+  std::size_t l_start_index_ = 0;
+
+  // lagrangian n start index
+  std::size_t n_start_index_ = 0;
 
  private:
   apollo::planning::DistanceApproachConfig distance_approach_config_;
