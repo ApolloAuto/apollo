@@ -18,10 +18,7 @@ add_subdirectory(cybertron/proto)
 add_subdirectory(cybertron/common)
 add_subdirectory(cybertron/record)
 add_subdirectory(cybertron/py_wrapper)
-
-if(NOT MAKE_WITHOUT_TOOLS)
 add_subdirectory(cybertron/tools)
-endif()
 
 add_subdirectory(examples)
 #add_subdirectory(benchmark)
