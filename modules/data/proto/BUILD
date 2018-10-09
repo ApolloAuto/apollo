@@ -50,11 +50,6 @@ proto_library(
     deps = ["//modules/common/proto:header_proto_lib"],
 )
 
-cc_proto_library(
-    name = "tools_frame_proto",
-    deps = [":tools_frame_proto_lib"],
-)
-
 proto_library(
     name = "tools_frame_proto_lib",
     srcs = ["frame.proto"],

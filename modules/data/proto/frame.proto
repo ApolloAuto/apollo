@@ -1,35 +1,35 @@
 syntax = "proto2";
 
 message Vector3 {
-  required double x = 1;
-  required double y = 2;
-  required double z = 3;
+  optional double x = 1;
+  optional double y = 2;
+  optional double z = 3;
 }
 
 message Vector4 {
-  required double x = 1;
-  required double y = 2;
-  required double z = 3;
-  required double i = 4;
+  optional double x = 1;
+  optional double y = 2;
+  optional double z = 3;
+  optional double i = 4;
   optional bool is_ground = 5 [default = false];
 }
 
 message Quaternion {
-  required double x = 1;
-  required double y = 2;
-  required double z = 3;
-  required double w = 4;
+  optional double x = 1;
+  optional double y = 2;
+  optional double z = 3;
+  optional double w = 4;
 }
 
 message GPSPose {
-  required double lat = 1;
-  required double lon = 2;
-  required double bearing = 3;
+  optional double lat = 1;
+  optional double lon = 2;
+  optional double bearing = 3;
 }
 
 message CameraImage {
   optional double timestamp = 1;
-  required string image_url = 2;
+  optional string image_url = 2;
   optional Vector3 position = 3;
   optional Quaternion heading = 4;
   optional double fx = 5;
