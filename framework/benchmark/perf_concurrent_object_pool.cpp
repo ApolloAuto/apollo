@@ -30,6 +30,7 @@ void fpool()
 
   std::chrono::duration<double> diff = end-start;
   std::cout << std::fixed << diff.count() << " s\n";
+  delete pool;
 }
 
 void fnpool()
