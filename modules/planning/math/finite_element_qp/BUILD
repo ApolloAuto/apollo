@@ -57,6 +57,21 @@ cc_library(
 )
 
 cc_library(
+    name = "osqp_lateral_linear_qp_optimizer",
+    srcs = [
+        "osqp_lateral_linear_qp_optimizer.cc",
+    ],
+    hdrs = [
+        "osqp_lateral_linear_qp_optimizer.h",
+    ],
+    deps = [
+        ":lateral_qp_optimizer",
+        "@eigen",
+        "@osqp",
+    ],
+)
+
+cc_library(
     name = "active_set_augmented_lateral_qp_optimizer",
     srcs = [
         "active_set_augmented_lateral_qp_optimizer.cc",

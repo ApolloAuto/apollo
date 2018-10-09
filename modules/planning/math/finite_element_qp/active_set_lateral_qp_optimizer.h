@@ -31,11 +31,11 @@
 namespace apollo {
 namespace planning {
 
-class ActiverSetLateralQPOptimizer : public LateralQPOptimizer {
+class ActiveSetLateralQPOptimizer : public LateralQPOptimizer {
  public:
-  ActiverSetLateralQPOptimizer() = default;
+  ActiveSetLateralQPOptimizer() = default;
 
-  virtual ~ActiverSetLateralQPOptimizer() = default;
+  virtual ~ActiveSetLateralQPOptimizer() = default;
 
   bool optimize(
       const std::array<double, 3>& d_state, const double delta_s,

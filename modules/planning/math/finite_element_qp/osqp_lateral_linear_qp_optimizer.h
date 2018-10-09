@@ -21,9 +21,11 @@
 #pragma once
 
 #include <array>
-#include <memory>
 #include <utility>
 #include <vector>
+
+#include "Eigen/Core"
+#include "osqp/include/osqp.h"
 
 #include "modules/planning/lattice/trajectory1d/piecewise_jerk_trajectory1d.h"
 #include "modules/planning/math/finite_element_qp/lateral_qp_optimizer.h"
@@ -31,15 +33,21 @@
 namespace apollo {
 namespace planning {
 
-class ActiveSetAugmentedLateralQPOptimizer : public LateralQPOptimizer {
+class OsqpLateralLinearQPOptimizer : public LateralQPOptimizer {
  public:
-  ActiveSetAugmentedLateralQPOptimizer() = default;
+  OsqpLateralLinearQPOptimizer() = default;
 
-  virtual ~ActiveSetAugmentedLateralQPOptimizer() = default;
+  virtual ~OsqpLateralLinearQPOptimizer() = default;
 
   bool optimize(
       const std::array<double, 3>& d_state, const double delta_s,
       const std::vector<std::pair<double, double>>& d_bounds) override;
+
+ private:
+  void CalcualteKernel(const std::vector<std::pair<double, double>>& d_bounds,
+                       const double delta_s, std::vector<c_float>* P_data,
+                       std::vector<c_int>* P_indices,
+                       std::vector<c_int>* P_indptr);
 };
 
 }  // namespace planning
