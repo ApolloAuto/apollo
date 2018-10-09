@@ -32,6 +32,13 @@ using apollo::common::ErrorCode;
 using apollo::common::Status;
 using apollo::hdmap::PathOverlap;
 
+bool Creep::Init(const ScenarioConfig::ScenarioTaskConfig &config) {
+  CHECK(config.has_decider_creep_config());
+  config_ = config.decider_creep_config();
+  is_init_ = true;
+  return true;
+}
+
 Status Creep::Process(Frame* frame,
                       ReferenceLineInfo* reference_line_info) {
   if (!is_init_) {
@@ -58,7 +65,7 @@ bool Creep::BuildStopDecision(
   CHECK_NOTNULL(reference_line_info);
 
   double adc_front_edge_s = reference_line_info->AdcSlBoundary().end_s();
-  const double creep_distance = 1.0;  // TODO(all)
+  const double creep_distance = config_.creep_distance_pass_stop_line();
   double creep_stop_s = adc_front_edge_s + + creep_distance;
 
   // create virtual stop wall
@@ -78,8 +85,8 @@ bool Creep::BuildStopDecision(
   }
 
   // build stop decision
-  double stop_buffer = 0.3;  // TODO(all)
-  const double stop_s = creep_stop_s - stop_buffer;
+  const double stop_distance = config_.stop_distance();
+  const double stop_s = creep_stop_s - stop_distance;
   const auto& reference_line = reference_line_info->reference_line();
   auto stop_point = reference_line.GetReferencePoint(stop_s);
   double stop_heading = reference_line.GetReferencePoint(stop_s).heading();
@@ -87,7 +94,7 @@ bool Creep::BuildStopDecision(
   ObjectDecisionType stop;
   auto stop_decision = stop.mutable_stop();
   stop_decision->set_reason_code(StopReasonCode::STOP_REASON_CREEPER);
-  stop_decision->set_distance_s(-stop_buffer);
+  stop_decision->set_distance_s(-stop_distance);
   stop_decision->set_stop_heading(stop_heading);
   stop_decision->mutable_stop_point()->set_x(stop_point.x());
   stop_decision->mutable_stop_point()->set_y(stop_point.y());

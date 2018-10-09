@@ -22,6 +22,8 @@
 
 #include "cybertron/common/macros.h"
 
+#include "modules/planning/proto/decider_config.pb.h"
+
 #include "modules/map/pnc_map/path.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/reference_line_info.h"
@@ -47,6 +49,7 @@ class Creep : public Decider {
 
  private:
   static constexpr const char* CREEP_VO_ID_PREFIX = "CREEP_";
+  DeciderCreepConfig config_;
 };
 
 }  // namespace planning
