@@ -30,7 +30,7 @@
 #include "modules/common/util/factory.h"
 #include "modules/planning/common/speed_profile_generator.h"
 #include "modules/planning/scenarios/scenario.h"
-#include "modules/planning/toolkits/optimizers/task.h"
+#include "modules/planning/toolkits/task.h"
 
 namespace apollo {
 namespace planning {

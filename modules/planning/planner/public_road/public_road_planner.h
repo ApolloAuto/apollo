@@ -31,7 +31,7 @@
 #include "modules/planning/planner/planner.h"
 #include "modules/planning/reference_line/reference_line.h"
 #include "modules/planning/reference_line/reference_point.h"
-#include "modules/planning/toolkits/optimizers/task.h"
+#include "modules/planning/toolkits/task.h"
 
 /**
  * @namespace apollo::planning

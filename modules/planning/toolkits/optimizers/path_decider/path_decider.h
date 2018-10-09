@@ -23,7 +23,7 @@
 #include <limits>
 #include <string>
 
-#include "modules/planning/toolkits/optimizers/task.h"
+#include "modules/planning/toolkits/task.h"
 
 namespace apollo {
 namespace planning {

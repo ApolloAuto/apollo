@@ -28,20 +28,43 @@
 namespace apollo {
 namespace planning {
 
+using apollo::common::ErrorCode;
+using apollo::common::Status;
 using apollo::hdmap::PathOverlap;
 
-// TODO(all): revisit & rewrite
-bool Creep::BuildStopDecision(Frame* frame,
-                              ReferenceLineInfo* reference_line_info,
-                              const PathOverlap& overlap) {
+Status Creep::Process(Frame* frame,
+                      ReferenceLineInfo* reference_line_info) {
+  if (!is_init_) {
+    AERROR << "Please call Init() before Process().";
+    return Status(ErrorCode::PLANNING_ERROR, "Not inited.");
+  }
+
   CHECK_NOTNULL(frame);
+  CHECK_NOTNULL(reference_line_info);
+
+  BuildStopDecision(frame, reference_line_info);
+
+  return Status::OK();
+}
+
+// TODO(all): revisit & rewrite
+// bool Creep::BuildStopDecision(Frame* frame,
+//                              ReferenceLineInfo* reference_line_info,
+//                              const PathOverlap& overlap) {
+bool Creep::BuildStopDecision(
+    Frame* frame,
+    ReferenceLineInfo* reference_line_info) {
+  CHECK_NOTNULL(frame);
+  CHECK_NOTNULL(reference_line_info);
 
   double adc_front_edge_s = reference_line_info->AdcSlBoundary().end_s();
   const double creep_distance = 1.0;  // TODO(all)
-  double creep_stop_s = adc_front_edge_s + creep_distance;
+  double creep_stop_s = adc_front_edge_s + + creep_distance;
 
   // create virtual stop wall
-  std::string virtual_obstacle_id = CREEP_VO_ID_PREFIX + overlap.object_id;
+  // TODO(all)
+  // std::string virtual_obstacle_id = CREEP_VO_ID_PREFIX + overlap.object_id;
+  std::string virtual_obstacle_id = CREEP_VO_ID_PREFIX + std::string("test");
   auto* obstacle = frame->CreateStopObstacle(
       reference_line_info, virtual_obstacle_id, creep_stop_s);
   if (!obstacle) {

@@ -26,7 +26,7 @@
 
 #include "modules/common/status/status.h"
 #include "modules/planning/reference_line/reference_line.h"
-#include "modules/planning/toolkits/optimizers/task.h"
+#include "modules/planning/toolkits/task.h"
 
 namespace apollo {
 namespace planning {

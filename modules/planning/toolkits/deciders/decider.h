@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ * Copyright 2017 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,34 +20,31 @@
 
 #pragma once
 
-#include "cybertron/common/macros.h"
 
-#include "modules/map/pnc_map/path.h"
-#include "modules/planning/common/frame.h"
-#include "modules/planning/common/reference_line_info.h"
-#include "modules/planning/toolkits/deciders/decider.h"
+#include <string>
+#include <vector>
+
+#include "modules/common/status/status.h"
+#include "modules/planning/toolkits/task.h"
 
 namespace apollo {
 namespace planning {
 
-class Creep : public Decider {
+class Decider : public Task {
  public:
-  Creep();
-  ~Creep() = default;
-
-  bool Init(const ScenarioConfig::ScenarioTaskConfig &config) override;
-
- private:
-  apollo::common::Status Process(
+  explicit Decider(const std::string& name);
+  virtual ~Decider() = default;
+  apollo::common::Status Execute(
       Frame* frame,
       ReferenceLineInfo* reference_line_info) override;
 
-  bool BuildStopDecision(Frame* frame,
-                         ReferenceLineInfo* reference_line_info);
-
- private:
-  static constexpr const char* CREEP_VO_ID_PREFIX = "CREEP_";
+ protected:
+  virtual apollo::common::Status Process(
+      Frame* frame,
+      ReferenceLineInfo* reference_line_info) = 0;
 };
 
 }  // namespace planning
 }  // namespace apollo
+
+

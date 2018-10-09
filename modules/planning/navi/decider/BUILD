@@ -44,7 +44,7 @@ cc_library(
         "//modules/planning/navi/decider:navi_obstacle_decider",
         "//modules/planning/proto:planning_config_proto",
         "//modules/planning/proto:planning_proto",
-        "//modules/planning/toolkits/optimizers:task",
+        "//modules/planning/toolkits:task",
     ],
 )
 
@@ -71,7 +71,7 @@ cc_library(
         "//modules/planning/navi/decider:navi_obstacle_decider",
         "//modules/planning/proto:planning_config_proto",
         "//modules/planning/proto:planning_proto",
-        "//modules/planning/toolkits/optimizers:task",
+        "//modules/planning/toolkits:task",
     ],
 )
 
@@ -96,7 +96,7 @@ cc_library(
         "//modules/planning/common:reference_line_info",
         "//modules/planning/proto:planning_config_proto",
         "//modules/planning/proto:planning_proto",
-        "//modules/planning/toolkits/optimizers:task",
+        "//modules/planning/toolkits:task",
     ],
 )
 

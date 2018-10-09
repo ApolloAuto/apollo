@@ -21,7 +21,7 @@ cc_library(
         "//modules/planning/common:reference_line_info",
         "//modules/planning/proto:planning_config_proto",
         "//modules/planning/proto:planning_proto",
-        "//modules/planning/toolkits/optimizers:task",
+        "//modules/planning/toolkits:task",
     ],
 )
 
