@@ -2,6 +2,7 @@ syntax = "proto2";
 
 package apollo.planning;
 
+import "modules/planning/proto/decider_config.proto";
 import "modules/planning/proto/dp_poly_path_config.proto";
 import "modules/planning/proto/dp_st_speed_config.proto";
 import "modules/planning/proto/qp_piecewise_jerk_path_config.proto";
@@ -25,6 +26,7 @@ enum TaskType {
   NAVI_SPEED_DECIDER = 8;
   NAVI_OBSTACLE_DECIDER = 9;
   QP_PIECEWISE_JERK_PATH_OPTIMIZER = 10;
+  DECIDER_CREEP = 11;
 };
 
 message PathDeciderConfig {
@@ -56,11 +58,13 @@ message ScenarioConfig {
       PathDeciderConfig path_decider_config = 7;
       ProceedWithCautionSpeedConfig proceed_with_caution_speed_config = 8;
       QpPiecewiseJerkPathConfig qp_piecewise_jerk_path_config = 9;
+      DeciderCreepConfig decider_creep_config = 10;
     }
   }
   message Stage {
-      optional string stage_name = 1 [ default = "" ];
-      repeated TaskType task = 2;
+    optional string stage_name = 1 [ default = "" ];
+    optional bool enabled = 2 [ default = true ];
+    repeated TaskType task = 3;
   };
   optional ScenarioType scenario_type = 1;
   repeated Stage stage = 2;

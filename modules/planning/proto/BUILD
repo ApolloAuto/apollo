@@ -35,6 +35,23 @@ proto_library(
 )
 
 cc_proto_library(
+    name = "decider_config_proto",
+    deps = [
+        ":decider_config_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "decider_config_proto_lib",
+    srcs = [
+        "decider_config.proto",
+    ],
+    deps = [
+    ],
+)
+
+
+cc_proto_library(
     name = "decision_proto",
     deps = [
         ":decision_proto_lib",
@@ -170,6 +187,7 @@ proto_library(
         "planning_config.proto",
     ],
     deps = [
+        ":decider_config_proto_lib",
         ":dp_poly_path_config_proto_lib",
         ":dp_st_speed_config_proto_lib",
         ":navi_obstacle_decider_config_proto_lib",
