@@ -561,6 +561,82 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
   } else {
     std::fill(values, values + nele_jac, 0.0);
     std::size_t nz_index = 0;
+
+    std::size_t time_index = time_start_index_;
+    std::size_t state_index = state_start_index_;
+    std::size_t control_index = control_start_index_;
+
+    // TODO(QiL) : initially implemented to be debug friendly, later iterate
+    // towards better efficiency
+    // 1. state constraints 4 * [0, horizons-1]
+    for (std::size_t i = 0; i < horizon_ + 1; ++i) {
+      values[nz_index] = -1.0;
+      ++nz_index;
+
+      values[nz_index] =
+          x[time_index] * ts_ *
+          (x[state_index + 3] +
+           x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
+          std::sin(x[state_index + 2] +
+                   x[time_index] * ts_ * 0.5 * x[state_index + 3] *
+                       std::tan(x[control_index] / wheelbase_));  // a.
+      ++nz_index;
+
+      values[nz_index] =
+          -1.0 *
+          (x[time_index] * ts_ *
+               std::cos(x[state_index + 2] +
+                        x[time_index] * ts_ * 0.5 * x[state_index + 3] *
+                            std::tan(x[control_index] / wheelbase_)) +
+           x[time_index] * ts_ * x[time_index] * ts_ * 0.5 *
+               x[control_index + 1] * (-1) * x[time_index] * ts_ * 0.5 *
+               std::tan(x[control_index] / wheelbase_) *
+               std::sin(x[state_index + 2] +
+                        x[time_index] * ts_ * 0.5 * x[state_index + 3] *
+                            std::tan(x[control_index] / wheelbase_)));  // b
+      ++nz_index;
+
+      values[nz_index] = -1.0;
+      ++nz_index;
+
+      values[nz_index] =
+          -1.0 * (x[time_index] * ts_ *
+                  (x[state_index + 3] +
+                   x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
+                  std::cos(x[state_index + 2] +
+                           x[time_index] * ts_ * 0.5 * x[state_index + 3] *
+                               std::tan(x[control_index] / wheelbase_)));  // f.
+      ++nz_index;
+
+      values[nz_index] =
+          -1.0 *
+          (x[time_index] * ts_ *
+               std::sin(x[state_index + 2] +
+                        x[time_index] * ts_ * 0.5 * x[state_index + 3] *
+                            std::tan(x[control_index] / wheelbase_)) +
+           x[time_index] * ts_ * x[time_index] * ts_ * 0.5 *
+               x[control_index + 1] * (-1) * x[time_index] * ts_ * 0.5 *
+               std::tan(x[control_index] / wheelbase_) *
+               std::cos(x[state_index + 2] +
+                        x[time_index] * ts_ * 0.5 * x[state_index + 3] *
+                            std::tan(x[control_index] / wheelbase_)));  // g
+      ++nz_index;
+
+      values[nz_index] = -1.0;
+      ++nz_index;
+
+      values[nz_index] = -1.0 * x[time_index] * ts_;  // k.
+      ++nz_index;
+
+      values[nz_index] = -1.0;
+      ++nz_index;
+
+      state_index += 4;
+      control_index += 2;
+      time_index += 1;
+    }
+
+    //  CHECK_EQ(nz_index, static_cast<std::size_t>(nele_jac));
   }
   return true;
 }
