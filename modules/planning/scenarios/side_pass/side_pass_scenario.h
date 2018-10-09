@@ -26,8 +26,6 @@
 
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/planning/proto/planning.pb.h"
-#include "modules/planning/proto/planning_config.pb.h"
-
 #include "modules/common/status/status.h"
 #include "modules/common/util/factory.h"
 #include "modules/planning/common/reference_line_info.h"
@@ -65,12 +63,10 @@ class SidePassScenario : public Scenario {
 
   void RegisterTasks();
 
-  apollo::common::util::Factory<TaskType, Task> task_factory_;
-
+ private:
+  static int current_stage_index_;
   std::vector<std::unique_ptr<Task>> tasks_;
-
   ScenarioConfig config_;
-
   SpeedProfileGenerator speed_profile_generator_;
 
   SidePassStage stage_ = OBSTACLE_APPROACH;

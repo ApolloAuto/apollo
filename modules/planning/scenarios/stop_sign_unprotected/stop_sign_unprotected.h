@@ -24,13 +24,11 @@
 #include <vector>
 
 #include "modules/planning/proto/planning.pb.h"
-#include "modules/planning/proto/planning_config.pb.h"
 
 #include "modules/common/status/status.h"
 #include "modules/common/util/factory.h"
 #include "modules/planning/common/speed_profile_generator.h"
 #include "modules/planning/scenarios/scenario.h"
-#include "modules/planning/toolkits/task.h"
 
 namespace apollo {
 namespace planning {
@@ -53,12 +51,10 @@ class StopSignUnprotectedScenario : public Scenario {
  private:
   void RegisterTasks();
 
-  apollo::common::util::Factory<TaskType, Task> task_factory_;
-
+ private:
+  static int current_stage_index_;
   std::vector<std::unique_ptr<Task>> tasks_;
-
   ScenarioConfig config_;
-
   SpeedProfileGenerator speed_profile_generator_;
 };
 

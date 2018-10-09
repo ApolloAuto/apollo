@@ -74,7 +74,7 @@ bool Creep::BuildStopDecision(
 
   double adc_front_edge_s = reference_line_info->AdcSlBoundary().end_s();
   const double creep_distance = FindCreepDistance(frame, reference_line_info);
-  double creep_stop_s = adc_front_edge_s + + creep_distance;
+  double creep_stop_s = adc_front_edge_s + creep_distance;
 
   // create virtual stop wall
   // TODO(all)

@@ -13,6 +13,7 @@ cc_library(
     deps = [
         "//modules/common",
         "//modules/planning/common:planning_common",
+        "//modules/planning/toolkits:task",
     ],
 )
 
