@@ -1,6 +1,5 @@
 /******************************************************************************
- *
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +26,7 @@
 #include "modules/planning/math/finite_element_qp/active_set_augmented_lateral_qp_optimizer.h"
 #include "modules/planning/math/finite_element_qp/active_set_lateral_qp_optimizer.h"
 #include "modules/planning/math/finite_element_qp/osqp_lateral_jerk_qp_optimizer.h"
+#include "modules/planning/math/finite_element_qp/osqp_lateral_linear_qp_optimizer.h"
 #include "modules/planning/math/finite_element_qp/osqp_lateral_qp_optimizer.h"
 
 namespace apollo {
@@ -85,7 +85,7 @@ bool QpPiecewiseJerkPathOptimizer::Init(
   // lateral_qp_optimizer_.reset(new ActiveSetLateralQPOptimizer());
   // lateral_qp_optimizer_.reset(new ActiveSetAugmentedLateralQPOptimizer());
   // lateral_qp_optimizer_.reset(new OsqpLateralJerkQPOptimizer());
-  lateral_qp_optimizer_.reset(new OsqpLateralQPOptimizer());
+  lateral_qp_optimizer_.reset(new OsqpLateralLinearQPOptimizer());
 
   is_init_ = true;
   return true;
