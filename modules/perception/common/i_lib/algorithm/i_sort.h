@@ -130,5 +130,3 @@ inline void IIndexedShuffle(T *a, T *b, int *indices, int n, int element_size_a,
 }  // namespace common
 }  // namespace perception
 }  // namespace apollo
-
-

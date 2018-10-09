@@ -410,5 +410,3 @@ bool CanSender<SensorType>::NeedSend(const SenderMessage<SensorType> &msg,
 }  // namespace canbus
 }  // namespace drivers
 }  // namespace apollo
-
-

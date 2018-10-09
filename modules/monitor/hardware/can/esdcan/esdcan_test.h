@@ -75,5 +75,3 @@ class EsdCanDetails : public ::apollo::monitor::HwCheckResultDetails {
 }  // namespace hw
 }  // namespace monitor
 }  // namespace apollo
-
-

@@ -85,5 +85,3 @@ class Calibration {
 }  // namespace velodyne
 }  // namespace drivers
 }  // namespace apollo
-
-

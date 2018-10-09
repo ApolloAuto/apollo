@@ -44,5 +44,3 @@ class HttpClient {
 }  // namespace util
 }  // namespace common
 }  // namespace apollo
-
-

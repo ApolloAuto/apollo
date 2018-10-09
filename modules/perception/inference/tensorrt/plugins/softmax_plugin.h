@@ -103,5 +103,3 @@ class SoftmaxPlugin : public nvinfer1::IPlugin {
 }  // namespace inference
 }  // namespace perception
 }  // namespace apollo
-
-

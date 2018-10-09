@@ -104,5 +104,3 @@ DECLARE_double(imu_vehicle_qw);
 
 // visualization
 DECLARE_string(map_visual_dir);
-
-

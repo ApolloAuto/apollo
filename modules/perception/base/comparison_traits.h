@@ -42,5 +42,3 @@ typename std::enable_if<std::is_floating_point<T>::value, bool>::type Equal(
 }  // namespace base
 }  // namespace perception
 }  // namespace apollo
-
-

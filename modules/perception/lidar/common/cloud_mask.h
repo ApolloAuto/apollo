@@ -161,5 +161,3 @@ size_t CloudMask::ValidIndicesCount(
 }  // namespace lidar
 }  // namespace perception
 }  // namespace apollo
-
-

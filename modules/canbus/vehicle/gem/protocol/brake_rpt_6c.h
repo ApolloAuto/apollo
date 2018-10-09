@@ -59,5 +59,3 @@ class Brakerpt6c : public ::apollo::drivers::canbus::ProtocolData<
 }  // namespace gem
 }  // namespace canbus
 }  // namespace apollo
-
-

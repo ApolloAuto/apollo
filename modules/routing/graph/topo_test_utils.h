@@ -65,5 +65,3 @@ void GetGraph3ForTest(Graph* graph);
 
 }  // namespace routing
 }  // namespace apollo
-
-

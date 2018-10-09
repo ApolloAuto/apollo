@@ -397,5 +397,3 @@ class SimulationWorldService {
 
 }  // namespace dreamview
 }  // namespace apollo
-
-

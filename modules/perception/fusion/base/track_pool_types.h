@@ -37,5 +37,3 @@ typedef base::ConcurrentObjectPool<Track, kTrackPoolSize, TrackInitializer>
 }  // namespace fusion
 }  // namespace perception
 }  // namespace apollo
-
-

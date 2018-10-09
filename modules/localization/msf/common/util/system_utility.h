@@ -55,5 +55,3 @@ class system {
 }  // namespace msf
 }  // namespace localization
 }  // namespace apollo
-
-

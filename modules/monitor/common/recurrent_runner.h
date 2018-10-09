@@ -52,5 +52,3 @@ class RecurrentRunner {
 
 }  // namespace monitor
 }  // namespace apollo
-
-

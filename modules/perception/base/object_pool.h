@@ -121,5 +121,3 @@ class DummyObjectPool : public BaseObjectPool<ObjectType> {
 }  // namespace base
 }  // namespace perception
 }  // namespace apollo
-
-

@@ -122,5 +122,3 @@ class ADCTrajectoryContainer : public Container {
 
 }  // namespace prediction
 }  // namespace apollo
-
-

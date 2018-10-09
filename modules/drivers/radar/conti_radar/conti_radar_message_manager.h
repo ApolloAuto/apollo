@@ -66,5 +66,3 @@ class ContiRadarMessageManager : public MessageManager<ContiRadar> {
 }  // namespace conti_radar
 }  // namespace drivers
 }  // namespace apollo
-
-

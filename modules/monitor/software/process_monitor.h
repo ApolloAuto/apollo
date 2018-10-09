@@ -38,5 +38,3 @@ class ProcessMonitor : public RecurrentRunner {
 
 }  // namespace monitor
 }  // namespace apollo
-
-

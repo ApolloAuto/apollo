@@ -35,5 +35,3 @@ class VideoImagesDialog : public QDialog {
  private:
   Ui::VideoImagesDialog *ui;
 };
-
-

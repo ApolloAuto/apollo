@@ -44,5 +44,3 @@ class Curve1d {
 
 }  // namespace planning
 }  // namespace apollo
-
-

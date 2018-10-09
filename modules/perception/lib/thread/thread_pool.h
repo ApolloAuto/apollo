@@ -80,5 +80,3 @@ class ThreadPoolWorker : public Thread {
 }  // namespace lib
 }  // namespace perception
 }  // namespace apollo
-
-

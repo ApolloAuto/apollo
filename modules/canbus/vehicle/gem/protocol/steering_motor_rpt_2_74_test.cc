@@ -44,4 +44,3 @@ TEST_F(Steeringmotorrpt274Test, reset) {
 }  // namespace gem
 }  // namespace canbus
 }  // namespace apollo
-

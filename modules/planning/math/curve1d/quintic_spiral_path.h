@@ -125,5 +125,3 @@ class QuinticSpiralPath : public QuinticPolynomialCurve1d {
 
 }  // namespace planning
 }  // namespace apollo
-
-

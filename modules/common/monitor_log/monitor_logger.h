@@ -75,5 +75,3 @@ class MonitorLogger {
 }  // namespace monitor
 }  // namespace common
 }  // namespace apollo
-
-

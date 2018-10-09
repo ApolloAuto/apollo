@@ -89,5 +89,3 @@ class MoveSequencePredictor : public SequencePredictor {
 
 }  // namespace prediction
 }  // namespace apollo
-
-

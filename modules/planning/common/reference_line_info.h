@@ -238,5 +238,3 @@ class ReferenceLineInfo {
 
 }  // namespace planning
 }  // namespace apollo
-
-

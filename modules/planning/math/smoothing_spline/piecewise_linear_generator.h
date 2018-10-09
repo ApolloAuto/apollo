@@ -64,5 +64,3 @@ class PiecewiseLinearGenerator {
 
 }  // namespace planning
 }  // namespace apollo
-
-

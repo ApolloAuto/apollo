@@ -100,5 +100,3 @@ class DataParser {
 }  // namespace gnss
 }  // namespace drivers
 }  // namespace apollo
-
-

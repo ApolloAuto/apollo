@@ -56,5 +56,3 @@ CYBERTRON_REGISTER_COMPONENT(VelodyneConvertComponent)
 }  // namespace velodyne
 }  // namespace drivers
 }  // namespace apollo
-
-

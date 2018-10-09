@@ -45,5 +45,3 @@ class Creep {
 
 }  // namespace planning
 }  // namespace apollo
-
-

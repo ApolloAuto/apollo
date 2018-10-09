@@ -168,5 +168,3 @@ class NaviPathDecider : public NaviTask {
 
 }  // namespace planning
 }  // namespace apollo
-
-

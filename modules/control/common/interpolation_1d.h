@@ -56,5 +56,3 @@ class Interpolation1D {
 
 }  // namespace control
 }  // namespace apollo
-
-

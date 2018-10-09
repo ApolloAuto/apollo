@@ -91,5 +91,3 @@ class RTKReplayPlanner : public PlannerWithReferenceLine {
 
 }  // namespace planning
 }  // namespace apollo
-
-

@@ -74,5 +74,3 @@ class AbstractVehicleFactory {
 
 }  // namespace canbus
 }  // namespace apollo
-
-

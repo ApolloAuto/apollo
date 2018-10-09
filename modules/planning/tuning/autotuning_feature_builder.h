@@ -54,5 +54,3 @@ class AutotuningFeatureBuilder {
 
 }  // namespace planning
 }  // namespace apollo
-
-

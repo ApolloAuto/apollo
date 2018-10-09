@@ -61,5 +61,3 @@ class TopoGraph {
 
 }  // namespace routing
 }  // namespace apollo
-
-

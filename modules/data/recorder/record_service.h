@@ -47,5 +47,3 @@ class RecordService {
 
 }  // namespace data
 }  // namespace apollo
-
-

@@ -86,5 +86,3 @@ class BackupTrajectoryGenerator {
 
 }  // namespace planning
 }  // namespace apollo
-
-

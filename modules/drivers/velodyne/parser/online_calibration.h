@@ -58,5 +58,3 @@ class OnlineCalibration {
 }  // namespace velodyne
 }  // namespace drivers
 }  // namespace apollo
-
-

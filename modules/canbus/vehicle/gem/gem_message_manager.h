@@ -35,5 +35,3 @@ class GemMessageManager
 }  // namespace gem
 }  // namespace canbus
 }  // namespace apollo
-
-

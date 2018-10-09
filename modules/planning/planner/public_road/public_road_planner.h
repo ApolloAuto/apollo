@@ -75,5 +75,3 @@ class PublicRoadPlanner : public PlannerWithReferenceLine {
 
 }  // namespace planning
 }  // namespace apollo
-
-

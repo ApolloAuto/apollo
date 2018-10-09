@@ -70,5 +70,3 @@ class DpStSpeedOptimizer : public SpeedOptimizer {
 
 }  // namespace planning
 }  // namespace apollo
-
-

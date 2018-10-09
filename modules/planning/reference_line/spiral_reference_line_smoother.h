@@ -105,5 +105,3 @@ class SpiralReferenceLineSmoother : public ReferenceLineSmoother {
 
 }  // namespace planning
 }  // namespace apollo
-
-

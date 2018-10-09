@@ -52,5 +52,3 @@
 /// Indicating private global variable that is implementation specific and
 /// should not be used directly.
 #define PRIVATE
-
-

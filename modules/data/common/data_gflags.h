@@ -22,6 +22,3 @@
 // data file
 DECLARE_string(data_conf_file);
 DECLARE_string(data_record_service_name);
-
-
-

@@ -74,5 +74,3 @@ class KalmanFilter : public BaseFilter {
 }  // namespace fusion
 }  // namespace perception
 }  // namespace apollo
-
-

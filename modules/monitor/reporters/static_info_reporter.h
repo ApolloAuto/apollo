@@ -29,5 +29,3 @@ class StaticInfoReporter : public RecurrentRunner {
 
 }  // namespace monitor
 }  // namespace apollo
-
-

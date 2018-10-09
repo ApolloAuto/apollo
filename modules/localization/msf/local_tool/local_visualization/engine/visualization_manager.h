@@ -190,4 +190,3 @@ class VisualizationManager {
 }  // namespace msf
 }  // namespace localization
 }  // namespace apollo
-

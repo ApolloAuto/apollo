@@ -52,5 +52,3 @@ bool ResizeGPU(const base::Image8U &src,
 }  // namespace inference
 }  // namespace perception
 }  // namespace apollo
-
-

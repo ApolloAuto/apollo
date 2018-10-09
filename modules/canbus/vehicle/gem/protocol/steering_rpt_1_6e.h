@@ -53,5 +53,3 @@ class Steeringrpt16e : public ::apollo::drivers::canbus::ProtocolData<
 }  // namespace gem
 }  // namespace canbus
 }  // namespace apollo
-
-

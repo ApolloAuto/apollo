@@ -36,5 +36,3 @@ bool IsPreserved(const RadarObstacle& radar_obstacle);
 }  // namespace filter
 }  // namespace third_party_perception
 }  // namespace apollo
-
-

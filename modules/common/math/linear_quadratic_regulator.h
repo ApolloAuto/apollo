@@ -51,5 +51,3 @@ void SolveLQRProblem(const Eigen::MatrixXd &A, const Eigen::MatrixXd &B,
 }  // namespace math
 }  // namespace common
 }  // namespace apollo
-
-

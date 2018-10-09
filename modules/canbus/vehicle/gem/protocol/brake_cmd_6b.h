@@ -55,5 +55,3 @@ class Brakecmd6b : public ::apollo::drivers::canbus::ProtocolData<
 }  // namespace gem
 }  // namespace canbus
 }  // namespace apollo
-
-

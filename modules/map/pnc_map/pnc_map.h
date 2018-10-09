@@ -234,5 +234,3 @@ class PncMap {
 
 }  // namespace hdmap
 }  // namespace apollo
-
-

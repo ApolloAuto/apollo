@@ -64,5 +64,3 @@ class ThreadWorker {
 }  // namespace lib
 }  // namespace perception
 }  // namespace apollo
-
-

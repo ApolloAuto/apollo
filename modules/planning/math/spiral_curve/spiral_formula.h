@@ -231,4 +231,3 @@ class SpiralFormula {
 
 }  // namespace planning
 }  // namespace apollo
-

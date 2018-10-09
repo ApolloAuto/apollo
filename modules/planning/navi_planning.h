@@ -141,5 +141,3 @@ class NaviPlanning : public PlanningBase {
 
 }  // namespace planning
 }  // namespace apollo
-
-

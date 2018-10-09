@@ -38,5 +38,3 @@ class FreeCamera : public AbstractCamera {
  private:
   QVector3D translation_;
 };
-
-

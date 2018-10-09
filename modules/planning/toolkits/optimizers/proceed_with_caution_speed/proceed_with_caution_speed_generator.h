@@ -59,4 +59,3 @@ class ProceedWithCautionSpeedGenerator : public SpeedOptimizer {
 
 }  // namespace planning
 }  // namespace apollo
-

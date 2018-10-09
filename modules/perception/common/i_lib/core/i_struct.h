@@ -70,5 +70,3 @@ inline bool ILargerPairSecondElement(const Pair<T1, T2> &a,
 }  // namespace common
 }  // namespace perception
 }  // namespace apollo
-
-

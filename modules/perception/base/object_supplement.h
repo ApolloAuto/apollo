@@ -220,5 +220,3 @@ struct alignas(16) FusionObjectSupplement {
 }  // namespace base
 }  // namespace perception
 }  // namespace apollo
-
-

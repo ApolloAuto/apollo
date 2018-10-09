@@ -91,5 +91,3 @@ class DistanceApproachProblem {
 
 }  // namespace planning
 }  // namespace apollo
-
-

@@ -59,5 +59,3 @@ class ThirdPartyPerceptionComponent final
 CYBERTRON_REGISTER_COMPONENT(ThirdPartyPerceptionComponent)
 }  // namespace third_party_perception
 }  // namespace apollo
-
-

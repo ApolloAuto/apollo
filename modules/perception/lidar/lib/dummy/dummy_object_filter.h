@@ -47,5 +47,3 @@ class DummyObjectFilter : public BaseObjectFilter {
 }  // namespace lidar
 }  // namespace perception
 }  // namespace apollo
-
-

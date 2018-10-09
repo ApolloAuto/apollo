@@ -137,5 +137,3 @@ class StBoundary : public common::math::Polygon2d {
 
 }  // namespace planning
 }  // namespace apollo
-
-

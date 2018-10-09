@@ -53,5 +53,3 @@ class FeasibleRegion {
 
 }  // namespace planning
 }  // namespace apollo
-
-

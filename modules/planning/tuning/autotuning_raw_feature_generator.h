@@ -66,5 +66,3 @@ class AutotuningRawFeatureGenerator {
 
 }  // namespace planning
 }  // namespace apollo
-
-

@@ -54,5 +54,3 @@ class UtilXmlParser {
 }  // namespace adapter
 }  // namespace hdmap
 }  // namespace apollo
-
-

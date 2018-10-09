@@ -65,5 +65,3 @@ class BaseDataAssociation {
 }  // namespace fusion
 }  // namespace perception
 }  // namespace apollo
-
-

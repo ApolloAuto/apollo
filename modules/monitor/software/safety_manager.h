@@ -39,5 +39,3 @@ class SafetyManager {
 
 }  // namespace monitor
 }  // namespace apollo
-
-

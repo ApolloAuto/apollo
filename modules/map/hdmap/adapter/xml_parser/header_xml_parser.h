@@ -32,5 +32,3 @@ class HeaderXmlParser {
 }  // namespace adapter
 }  // namespace hdmap
 }  // namespace apollo
-
-

@@ -4603,5 +4603,3 @@ template <typename T> inline void IShiftHomogeneous4(T *A, int n) {
 }  // namespace common
 }  // namespace perception
 }  // namespace apollo
-
-

@@ -44,5 +44,3 @@ class SummaryMonitor : public RecurrentRunner {
 
 }  // namespace monitor
 }  // namespace apollo
-
-

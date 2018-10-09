@@ -267,5 +267,3 @@ const float INNER_TIME_128[12][32] = {
 }  // namespace velodyne
 }  // namespace drivers
 }  // namespace apollo
-
-

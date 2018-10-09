@@ -31,5 +31,3 @@ void GetDataFileNames(const boost::filesystem::path& p,
 
 }  // namespace prediction
 }  // namespace apollo
-
-

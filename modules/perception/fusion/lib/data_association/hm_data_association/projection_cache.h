@@ -185,5 +185,3 @@ typedef ProjectionCache* ProjectionCachePtr;
 }  // namespace fusion
 }  // namespace perception
 }  // namespace apollo
-
-

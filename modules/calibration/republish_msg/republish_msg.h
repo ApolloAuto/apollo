@@ -62,5 +62,3 @@ class RepublishMsg : public apollo::common::ApolloApp {
 
 }  // namespace calibration
 }  // namespace apollo
-
-

@@ -96,5 +96,3 @@ std::string StringUtil::Digit2String(T number) {
 }  // namespace lib
 }  // namespace perception
 }  // namespace apollo
-
-

@@ -103,5 +103,3 @@ CYBERTRON_REGISTER_COMPONENT(PredictionComponent)
 
 }  // namespace prediction
 }  // namespace apollo
-
-

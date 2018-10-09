@@ -69,5 +69,3 @@ class GraphSegmentor {
 }  // namespace common
 }  // namespace perception
 }  // namespace apollo
-
-

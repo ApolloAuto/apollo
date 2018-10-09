@@ -121,5 +121,3 @@ class SocketCanClientRaw : public CanClient {
 }  // namespace canbus
 }  // namespace drivers
 }  // namespace apollo
-
-

@@ -89,5 +89,3 @@ class TrajectoryCost {
 
 }  // namespace planning
 }  // namespace apollo
-
-

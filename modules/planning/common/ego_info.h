@@ -84,5 +84,3 @@ class EgoInfo {
 
 }  // namespace planning
 }  // namespace apollo
-
-

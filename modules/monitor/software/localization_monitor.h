@@ -29,5 +29,3 @@ class LocalizationMonitor : public RecurrentRunner {
 
 }  // namespace monitor
 }  // namespace apollo
-
-

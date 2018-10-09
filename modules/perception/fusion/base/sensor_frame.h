@@ -90,5 +90,3 @@ class SensorFrame : public std::enable_shared_from_this<SensorFrame> {
 }  // namespace fusion
 }  // namespace perception
 }  // namespace apollo
-
-

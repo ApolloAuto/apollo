@@ -149,5 +149,3 @@ void ProtocolData<SensorType>::Reset() {}
 }  // namespace canbus
 }  // namespace drivers
 }  // namespace apollo
-
-

@@ -92,5 +92,3 @@ class ControllerAgent {
 
 }  // namespace control
 }  // namespace apollo
-
-

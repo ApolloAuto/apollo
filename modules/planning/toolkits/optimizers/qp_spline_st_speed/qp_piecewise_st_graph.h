@@ -109,5 +109,3 @@ class QpPiecewiseStGraph {
 
 }  // namespace planning
 }  // namespace apollo
-
-

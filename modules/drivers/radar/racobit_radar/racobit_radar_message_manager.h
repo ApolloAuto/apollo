@@ -67,5 +67,3 @@ class RacobitRadarMessageManager : public MessageManager<RacobitRadar> {
 }  // namespace racobit_radar
 }  // namespace drivers
 }  // namespace apollo
-
-

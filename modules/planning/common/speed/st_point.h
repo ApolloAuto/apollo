@@ -43,5 +43,3 @@ class STPoint : public common::math::Vec2d {
 
 }  // namespace planning
 }  // namespace apollo
-
-

@@ -230,5 +230,3 @@ const std::map<std::string, ObjectSubType> kName2SubTypeMap = {
 }  // namespace base
 }  // namespace perception
 }  // namespace apollo
-
-

@@ -211,5 +211,3 @@ void CanReceiver<SensorType>::Stop() {
 }  // namespace canbus
 }  // namespace drivers
 }  // namespace apollo
-
-

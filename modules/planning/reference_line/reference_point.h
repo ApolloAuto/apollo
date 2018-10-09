@@ -54,5 +54,3 @@ class ReferencePoint : public hdmap::MapPathPoint {
 
 }  // namespace planning
 }  // namespace apollo
-
-

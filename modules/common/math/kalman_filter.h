@@ -294,5 +294,3 @@ inline std::string KalmanFilter<T, XN, ZN, UN>::DebugString() const {
 }  // namespace math
 }  // namespace common
 }  // namespace apollo
-
-

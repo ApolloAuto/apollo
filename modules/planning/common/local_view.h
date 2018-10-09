@@ -46,5 +46,3 @@ struct LocalView {
 
 }  // namespace planning
 }  // namespace apollo
-
-

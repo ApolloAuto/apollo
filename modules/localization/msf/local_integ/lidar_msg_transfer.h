@@ -49,5 +49,3 @@ class LidarMsgTransfer {
 }  // namespace msf
 }  // namespace localization
 }  // namespace apollo
-
-

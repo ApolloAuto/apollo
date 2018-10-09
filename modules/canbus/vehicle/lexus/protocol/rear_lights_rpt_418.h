@@ -62,5 +62,3 @@ class Rearlightsrpt418 : public ::apollo::drivers::canbus::ProtocolData<
 }  // namespace lexus
 }  // namespace canbus
 }  // namespace apollo
-
-

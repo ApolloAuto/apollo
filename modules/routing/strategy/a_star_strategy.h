@@ -52,5 +52,3 @@ class AStarStrategy : public Strategy {
 
 }  // namespace routing
 }  // namespace apollo
-
-

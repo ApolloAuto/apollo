@@ -129,5 +129,3 @@ class LateralTrajectoryOptimizerInterface : public Ipopt::TNLP {
 
 }  // namespace planning
 }  // namespace apollo
-
-

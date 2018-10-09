@@ -51,5 +51,3 @@ class FrontVehicle : public TrafficRule {
 };
 }  // namespace planning
 }  // namespace apollo
-
-

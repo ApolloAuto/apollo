@@ -69,5 +69,3 @@ class BatchStream {
 }  // namespace inference
 }  // namespace perception
 }  // namespace apollo
-
-

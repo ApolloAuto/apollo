@@ -33,5 +33,3 @@ bool GetFusionInitOptions(const std::string& module_name,
 }  // namespace fusion
 }  // namespace perception
 }  // namespace apollo
-
-

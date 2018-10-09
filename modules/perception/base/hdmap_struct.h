@@ -48,5 +48,3 @@ using HdmapStructConstPtr = std::shared_ptr<const HdmapStruct>;
 }  // namespace base
 }  // namespace perception
 }  // namespace apollo
-
-

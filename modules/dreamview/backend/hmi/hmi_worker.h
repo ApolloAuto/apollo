@@ -144,5 +144,3 @@ class HMIWorker {
 
 }  // namespace dreamview
 }  // namespace apollo
-
-

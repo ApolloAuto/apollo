@@ -74,5 +74,3 @@ class Compensator {
 }  // namespace velodyne
 }  // namespace drivers
 }  // namespace apollo
-
-

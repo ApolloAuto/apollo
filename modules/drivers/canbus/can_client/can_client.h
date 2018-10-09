@@ -168,5 +168,3 @@ class CanClient {
 }  // namespace canbus
 }  // namespace drivers
 }  // namespace apollo
-
-

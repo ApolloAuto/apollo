@@ -39,5 +39,3 @@ using apollo::common::Status;
 }  // namespace adapter
 }  // namespace hdmap
 }  // namespace apollo
-
-

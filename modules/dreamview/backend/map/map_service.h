@@ -111,5 +111,3 @@ class MapService {
 
 }  // namespace dreamview
 }  // namespace apollo
-
-

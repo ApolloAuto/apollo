@@ -44,5 +44,3 @@ void LpfCoefficients(const double ts, const double cutoff_freq,
 
 }  // namespace common
 }  // namespace apollo
-
-

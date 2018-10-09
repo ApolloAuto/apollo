@@ -60,5 +60,3 @@ void init_sin_cos_rot_table(float* sin_rot_table, float* cos_rot_table,
 }  // namespace velodyne
 }  // namespace drivers
 }  // namespace apollo
-
-

@@ -79,5 +79,3 @@ class TrajectoryPointCollector {
 }  // namespace util
 }  // namespace dreamview
 }  // namespace apollo
-
-

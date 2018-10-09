@@ -47,5 +47,3 @@ class DummyGroundDetector : public BaseGroundDetector {
 }  // namespace lidar
 }  // namespace perception
 }  // namespace apollo
-
-

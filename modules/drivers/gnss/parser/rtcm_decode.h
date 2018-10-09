@@ -184,4 +184,3 @@ static inline bool gnss_time_type(
 }  // namespace gnss
 }  // namespace drivers
 }  // namespace apollo
-

@@ -45,5 +45,3 @@ struct alignas(16) Landmark {
 }  // namespace base
 }  // namespace perception
 }  // namespace apollo
-
-

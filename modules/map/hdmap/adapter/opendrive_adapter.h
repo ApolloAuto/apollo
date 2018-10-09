@@ -42,5 +42,3 @@ class OpendriveAdapter {
 }  // namespace adapter
 }  // namespace hdmap
 }  // namespace apollo
-
-

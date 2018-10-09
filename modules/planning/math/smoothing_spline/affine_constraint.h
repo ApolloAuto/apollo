@@ -50,5 +50,3 @@ class AffineConstraint {
 
 }  // namespace planning
 }  // namespace apollo
-
-

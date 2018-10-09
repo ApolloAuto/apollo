@@ -40,5 +40,3 @@ class TrajectoryCombiner {
 
 }  // namespace planning
 }  // namespace apollo
-
-

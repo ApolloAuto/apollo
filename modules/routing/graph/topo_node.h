@@ -144,5 +144,3 @@ class TopoEdge {
 
 }  // namespace routing
 }  // namespace apollo
-
-

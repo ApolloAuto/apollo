@@ -117,5 +117,3 @@ using ObjectConstPtr = std::shared_ptr<const Object>;
 }  // namespace base
 }  // namespace perception
 }  // namespace apollo
-
-

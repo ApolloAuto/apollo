@@ -120,5 +120,3 @@ class PullOver : public TrafficRule {
 
 }  // namespace planning
 }  // namespace apollo
-
-

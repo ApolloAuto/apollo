@@ -83,5 +83,3 @@ class Localization : public apollo::common::ApolloApp {
 
 }  // namespace localization
 }  // namespace apollo
-
-

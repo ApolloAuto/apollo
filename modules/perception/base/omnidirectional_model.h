@@ -63,5 +63,3 @@ typedef std::shared_ptr<const OmnidirectionalCameraDistortionModel>
 }  // namespace base
 }  // namespace perception
 }  // namespace apollo
-
-

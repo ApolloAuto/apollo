@@ -70,5 +70,3 @@ class RoadGraph {
 
 }  // namespace prediction
 }  // namespace apollo
-
-

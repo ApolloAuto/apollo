@@ -71,5 +71,3 @@ template <typename T> inline void ILineFit2d(const T *x, const T *xp, T *l) {
 }  // namespace common
 }  // namespace perception
 }  // namespace apollo
-
-

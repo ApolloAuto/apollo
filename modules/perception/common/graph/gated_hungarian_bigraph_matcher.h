@@ -324,5 +324,3 @@ void GatedHungarianMatcher<T>::OptimizeAdapter(
 }  // namespace common
 }  // namespace perception
 }  // namespace apollo
-
-

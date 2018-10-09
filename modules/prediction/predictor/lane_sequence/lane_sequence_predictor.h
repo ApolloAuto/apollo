@@ -67,5 +67,3 @@ class LaneSequencePredictor : public SequencePredictor {
 
 }  // namespace prediction
 }  // namespace apollo
-
-

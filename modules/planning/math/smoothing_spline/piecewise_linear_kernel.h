@@ -58,5 +58,3 @@ class PiecewiseLinearKernel {
 
 }  // namespace planning
 }  // namespace apollo
-
-

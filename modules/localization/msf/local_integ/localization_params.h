@@ -106,5 +106,3 @@ class LocalizationResult {
 }  // namespace msf
 }  // namespace localization
 }  // namespace apollo
-
-

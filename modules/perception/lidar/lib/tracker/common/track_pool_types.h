@@ -45,5 +45,3 @@ typedef base::ConcurrentObjectPool<TrackData, kTrackDataPoolSize,
 }  // namespace lidar
 }  // namespace perception
 }  // namespace apollo
-
-

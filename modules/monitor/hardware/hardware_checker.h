@@ -84,5 +84,3 @@ class HwCheckerInterface {
 
 }  // namespace monitor
 }  // namespace apollo
-
-

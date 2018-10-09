@@ -21,5 +21,3 @@
 
 // build perception with using cybertron log lib or glog lib
 /* #undef PERCEPTION_USE_CYBERTRON */
-
-

@@ -160,5 +160,3 @@ class LocalizationLidarProcess {
 }  // namespace msf
 }  // namespace localization
 }  // namespace apollo
-
-

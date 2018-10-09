@@ -51,5 +51,3 @@ class OsqpSpline1dSolver : public Spline1dSolver {
 
 }  // namespace planning
 }  // namespace apollo
-
-

@@ -92,5 +92,3 @@ class PlanningBase {
 
 }  // namespace planning
 }  // namespace apollo
-
-

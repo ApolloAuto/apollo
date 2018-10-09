@@ -39,5 +39,3 @@ class ObjectPriority : public TrafficRule {
 
 }  // namespace planning
 }  // namespace apollo
-
-

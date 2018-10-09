@@ -47,5 +47,3 @@ class SignalsXmlParser {
 }  // namespace adapter
 }  // namespace hdmap
 }  // namespace apollo
-
-

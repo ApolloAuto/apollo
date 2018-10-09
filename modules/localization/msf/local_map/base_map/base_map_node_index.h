@@ -91,5 +91,3 @@ class MapNodeIndex {
 }  // namespace msf
 }  // namespace localization
 }  // namespace apollo
-
-

@@ -66,5 +66,3 @@ PERCEPTION_REGISTER_REGISTERER(BaseFusionSystem);
 }  // namespace fusion
 }  // namespace perception
 }  // namespace apollo
-
-

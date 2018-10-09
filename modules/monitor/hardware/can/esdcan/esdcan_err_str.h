@@ -33,5 +33,3 @@ const char *esdcan_err_to_str(NTCAN_RESULT ntstatus);
 }  // namespace hw
 }  // namespace monitor
 }  // namespace apollo
-
-

@@ -31,5 +31,3 @@ DECLARE_bool(obs_save_fusion_supplement);
 }  // namespace onboard
 }  // namespace perception
 }  // namespace apollo
-
-

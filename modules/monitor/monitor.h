@@ -45,5 +45,3 @@ CYBERTRON_REGISTER_COMPONENT(Monitor)
 
 }  // namespace monitor
 }  // namespace apollo
-
-

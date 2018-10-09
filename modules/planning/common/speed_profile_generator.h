@@ -59,5 +59,3 @@ class SpeedProfileGenerator {
 
 }  // namespace planning
 }  // namespace apollo
-
-

@@ -62,5 +62,3 @@ class GraphCreator {
 
 }  // namespace routing
 }  // namespace apollo
-
-

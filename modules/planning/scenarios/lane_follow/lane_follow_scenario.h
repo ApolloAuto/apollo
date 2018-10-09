@@ -87,5 +87,3 @@ class LaneFollowScenario : public Scenario {
 
 }  // namespace planning
 }  // namespace apollo
-
-

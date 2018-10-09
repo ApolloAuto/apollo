@@ -86,5 +86,3 @@ CYBERTRON_REGISTER_COMPONENT(PlanningComponent)
 
 }  // namespace planning
 }  // namespace apollo
-
-

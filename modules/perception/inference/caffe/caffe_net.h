@@ -66,5 +66,3 @@ class CaffeNet : public Inference {
 }  // namespace inference
 }  // namespace perception
 }  // namespace apollo
-
-

@@ -197,5 +197,3 @@ class SimControl : SimControlInterface {
 
 }  // namespace dreamview
 }  // namespace apollo
-
-

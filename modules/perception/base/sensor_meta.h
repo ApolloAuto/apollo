@@ -74,5 +74,3 @@ struct SensorInfo {
 }  // namespace base
 }  // namespace perception
 }  // namespace apollo
-
-

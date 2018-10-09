@@ -48,5 +48,3 @@ class SpeedLimit {
 
 }  // namespace planning
 }  // namespace apollo
-
-

@@ -151,5 +151,3 @@ void ConditionClustering<PointT>::Segment(IndicesClusters* xy_clusters) {
 }  // namespace common
 }  // namespace perception
 }  // namespace apollo
-
-

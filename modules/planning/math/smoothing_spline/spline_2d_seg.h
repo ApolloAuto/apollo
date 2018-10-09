@@ -72,5 +72,3 @@ class Spline2dSeg {
 
 }  // namespace planning
 }  // namespace apollo
-
-

@@ -35,5 +35,3 @@ class CudaUtil {
 }  // namespace inference
 }  // namespace perception
 }  // namespace apollo
-
-

@@ -71,5 +71,3 @@ class FeatureOutput {
 
 }  // namespace prediction
 }  // namespace apollo
-
-

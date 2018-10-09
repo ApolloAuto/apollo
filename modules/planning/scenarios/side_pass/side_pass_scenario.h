@@ -69,5 +69,3 @@ class SidePassScenario : public Scenario {
 
 }  // namespace planning
 }  // namespace apollo
-
-

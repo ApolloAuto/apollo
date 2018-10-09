@@ -94,5 +94,3 @@ class StBoundaryMapper {
 
 }  // namespace planning
 }  // namespace apollo
-
-

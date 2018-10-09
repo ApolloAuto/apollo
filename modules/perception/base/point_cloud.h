@@ -445,5 +445,3 @@ typedef std::shared_ptr<const PolygonDType> PolygonDTypeConstPtr;
 }  // namespace base
 }  // namespace perception
 }  // namespace apollo
-
-

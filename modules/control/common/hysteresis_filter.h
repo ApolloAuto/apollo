@@ -42,4 +42,3 @@ class HysteresisFilter {
 
 }  // namespace control
 }  // namespace apollo
-

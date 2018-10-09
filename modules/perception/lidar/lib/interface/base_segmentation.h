@@ -60,5 +60,3 @@ PERCEPTION_REGISTER_REGISTERER(BaseSegmentation);
 }  // namespace lidar
 }  // namespace perception
 }  // namespace apollo
-
-

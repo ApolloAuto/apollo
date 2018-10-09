@@ -119,5 +119,3 @@ inline std::string get_full_name(const std::string& full_name,
   _timer_.End(indicator + "_" + msg)
 
 #endif  // PERCEPTION_DISABLE_PERF
-
-

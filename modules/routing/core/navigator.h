@@ -69,5 +69,3 @@ class Navigator {
 
 }  // namespace routing
 }  // namespace apollo
-
-

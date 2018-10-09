@@ -56,5 +56,3 @@ class SpeedProfileCost {
 
 }  // namespace planning
 }  // namespace apollo
-
-

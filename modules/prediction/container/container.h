@@ -52,5 +52,3 @@ class Container {
 
 }  // namespace prediction
 }  // namespace apollo
-
-

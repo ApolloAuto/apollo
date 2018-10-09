@@ -63,5 +63,3 @@ class KVDB {
 
 }  // namespace common
 }  // namespace apollo
-
-

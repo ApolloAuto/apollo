@@ -50,5 +50,3 @@ class Vehiclespeedrpt6f : public ::apollo::drivers::canbus::ProtocolData<
 }  // namespace gem
 }  // namespace canbus
 }  // namespace apollo
-
-

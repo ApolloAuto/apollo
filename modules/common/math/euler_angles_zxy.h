@@ -183,5 +183,3 @@ using EulerAnglesZXYd = EulerAnglesZXY<double>;
 }  // namespace math
 }  // namespace common
 }  // namespace apollo
-
-

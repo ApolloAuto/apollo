@@ -55,5 +55,3 @@ class Grid : public RenderableObject {
  private:
   QColor grid_color_;
 };
-
-

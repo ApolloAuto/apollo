@@ -168,5 +168,3 @@ class FrameOpenSpaceHistory : public IndexedQueue<uint32_t, FrameOpenSpace> {
 
 }  // namespace planning
 }  // namespace apollo
-
-

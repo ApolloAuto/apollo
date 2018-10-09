@@ -77,5 +77,3 @@ class PathDecision {
 
 }  // namespace planning
 }  // namespace apollo
-
-

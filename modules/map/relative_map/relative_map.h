@@ -90,5 +90,3 @@ class RelativeMap{
 
 }  // namespace relative_map
 }  // namespace apollo
-
-

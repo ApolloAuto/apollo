@@ -99,5 +99,3 @@ class EvaluatorManager {
 
 }  // namespace prediction
 }  // namespace apollo
-
-

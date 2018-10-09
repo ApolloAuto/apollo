@@ -165,5 +165,3 @@ class LocalizationIntegImpl {
 }  // namespace msf
 }  // namespace localization
 }  // namespace apollo
-
-

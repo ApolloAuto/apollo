@@ -59,5 +59,3 @@ class Spline1dSeg {
 
 }  // namespace planning
 }  // namespace apollo
-
-

@@ -150,5 +150,3 @@ class LocalizationGnssProcess {
 }  // namespace msf
 }  // namespace localization
 }  // namespace apollo
-
-

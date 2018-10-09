@@ -243,5 +243,3 @@ void MessageManager<SensorType>::ResetSendMessages() {
 }  // namespace canbus
 }  // namespace drivers
 }  // namespace apollo
-
-

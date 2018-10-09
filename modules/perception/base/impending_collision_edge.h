@@ -61,5 +61,3 @@ struct ImpendingCollisionEdges {
 }  // namespace base
 }  // namespace perception
 }  // namespace apollo
-
-

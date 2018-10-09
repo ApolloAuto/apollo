@@ -100,5 +100,3 @@ class ChannelInfo {
 
 }  // namespace tools
 }  // namespace apollo
-
-

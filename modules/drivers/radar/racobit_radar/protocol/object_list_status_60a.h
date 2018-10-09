@@ -45,5 +45,3 @@ class ObjectListStatus60A
 }  // namespace racobit_radar
 }  // namespace drivers
 }  // namespace apollo
-
-

@@ -88,5 +88,3 @@ class VelodyneDriverFactory {
 }  // namespace velodyne
 }  // namespace drivers
 }  // namespace apollo
-
-

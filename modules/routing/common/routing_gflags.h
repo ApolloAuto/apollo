@@ -24,5 +24,3 @@ DECLARE_string(routing_node_name);
 
 DECLARE_double(min_length_for_lane_change);
 DECLARE_bool(enable_change_lane_in_result);
-
-

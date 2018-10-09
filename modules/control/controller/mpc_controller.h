@@ -255,5 +255,3 @@ class MPCController : public Controller {
 
 }  // namespace control
 }  // namespace apollo
-
-

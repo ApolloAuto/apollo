@@ -156,5 +156,3 @@ bool GetRegisteredClasses(
     if (map.find(#name) == map.end()) map[#name] = new ObjectFactory##name(); \
   }                                                                           \
   }  // namespace
-
-

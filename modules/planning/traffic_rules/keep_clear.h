@@ -52,5 +52,3 @@ class KeepClear : public TrafficRule {
 
 }  // namespace planning
 }  // namespace apollo
-
-

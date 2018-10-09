@@ -349,5 +349,3 @@ class Concatenate : public Layer {
 }  // namespace network
 }  // namespace prediction
 }  // namespace apollo
-
-

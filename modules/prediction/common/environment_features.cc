@@ -168,4 +168,3 @@ bool EnvironmentFeatures::RemoveNonneglectableReverseLanes(
 
 }  // namespace prediction
 }  // namespace apollo
-

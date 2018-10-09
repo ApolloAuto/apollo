@@ -84,5 +84,3 @@ class StopSign : public TrafficRule {
 
 }  // namespace planning
 }  // namespace apollo
-
-

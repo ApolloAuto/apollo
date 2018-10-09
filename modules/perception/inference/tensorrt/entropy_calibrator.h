@@ -131,4 +131,3 @@ class Int8EntropyCalibrator : public IInt8EntropyCalibrator {
 };
 
 }  //  namespace nvinfer1
-

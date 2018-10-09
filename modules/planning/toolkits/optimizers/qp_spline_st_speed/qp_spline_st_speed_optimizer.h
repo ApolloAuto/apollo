@@ -61,5 +61,3 @@ class QpSplineStSpeedOptimizer : public SpeedOptimizer {
 
 }  // namespace planning
 }  // namespace apollo
-
-

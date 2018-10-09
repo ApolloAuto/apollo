@@ -77,5 +77,3 @@ class ThirdPartyPerception {
 
 }  // namespace third_party_perception
 }  // namespace apollo
-
-

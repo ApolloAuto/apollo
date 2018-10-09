@@ -343,5 +343,3 @@ class ConfigRead<std::vector<T>> {
 }  // namespace lib
 }  // namespace perception
 }  // namespace apollo
-
-

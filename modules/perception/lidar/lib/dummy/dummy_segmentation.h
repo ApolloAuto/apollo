@@ -48,5 +48,3 @@ class DummySegmentation : public BaseSegmentation {
 }  // namespace lidar
 }  // namespace perception
 }  // namespace apollo
-
-

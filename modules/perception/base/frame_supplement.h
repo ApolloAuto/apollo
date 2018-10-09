@@ -92,5 +92,3 @@ typedef std::shared_ptr<const UltrasonicFrameSupplement>
 }  // namespace base
 }  // namespace perception
 }  // namespace apollo
-
-

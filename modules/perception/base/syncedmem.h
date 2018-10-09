@@ -104,5 +104,3 @@ class SyncedMemory {
 }  // namespace base
 }  // namespace perception
 }  // namespace apollo
-
-

@@ -104,5 +104,3 @@ template <typename T> inline void IRandomizedShuffle1(T *A, int n, int *s) {
 }  // namespace common
 }  // namespace perception
 }  // namespace apollo
-
-

@@ -99,5 +99,3 @@ class PlannerWithReferenceLine : public Planner {
 
 }  // namespace planning
 }  // namespace apollo
-
-

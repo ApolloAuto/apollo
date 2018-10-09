@@ -71,5 +71,3 @@ void ConnectedComponentAnalysis(const std::vector<std::vector<int>>& graph,
 }  // namespace common
 }  // namespace perception
 }  // namespace apollo
-
-

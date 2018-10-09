@@ -62,5 +62,3 @@ class ValidationChecker {
 
 }  // namespace prediction
 }  // namespace apollo
-
-

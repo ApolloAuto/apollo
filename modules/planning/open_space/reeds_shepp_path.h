@@ -123,5 +123,3 @@ class ReedShepp {
 };
 }  // namespace planning
 }  // namespace apollo
-
-

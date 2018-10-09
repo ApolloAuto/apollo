@@ -47,5 +47,3 @@ class ScenarioAnalyzer {
 
 }  // namespace prediction
 }  // namespace apollo
-
-

@@ -62,5 +62,3 @@ class Universe {
 }  // namespace common
 }  // namespace perception
 }  // namespace apollo
-
-

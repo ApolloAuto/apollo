@@ -80,5 +80,3 @@ class SensorDataManager {
 }  // namespace fusion
 }  // namespace perception
 }  // namespace apollo
-
-

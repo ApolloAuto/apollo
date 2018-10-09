@@ -65,5 +65,3 @@ class StopSignUnprotectedScenario : public Scenario {
 
 }  // namespace planning
 }  // namespace apollo
-
-

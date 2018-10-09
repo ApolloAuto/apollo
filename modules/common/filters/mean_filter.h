@@ -85,5 +85,3 @@ class MeanFilter {
 
 }  // namespace common
 }  // namespace apollo
-
-

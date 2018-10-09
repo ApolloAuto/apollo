@@ -81,5 +81,3 @@ class BaseMapConfig {
 }  // namespace msf
 }  // namespace localization
 }  // namespace apollo
-
-

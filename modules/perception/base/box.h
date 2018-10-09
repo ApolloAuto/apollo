@@ -172,5 +172,3 @@ typedef BBox2D<double> BBox2DD;
 }  // namespace base
 }  // namespace perception
 }  // namespace apollo
-
-

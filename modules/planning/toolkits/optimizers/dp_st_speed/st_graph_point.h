@@ -67,5 +67,3 @@ class StGraphPoint {
 
 }  // namespace planning
 }  // namespace apollo
-
-

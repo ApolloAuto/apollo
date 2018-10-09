@@ -44,5 +44,3 @@ class Trajectory {
 
 }  // namespace planning
 }  // namespace apollo
-
-

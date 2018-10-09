@@ -139,5 +139,3 @@ T gps2unix(const T gps_seconds) {
 }  // namespace util
 }  // namespace drivers
 }  // namespace apollo
-
-

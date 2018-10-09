@@ -54,5 +54,3 @@ class LossyMapConfig2D : public BaseMapConfig {
 }  // namespace msf
 }  // namespace localization
 }  // namespace apollo
-
-

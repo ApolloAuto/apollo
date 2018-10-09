@@ -96,5 +96,3 @@ typedef std::shared_ptr<const ROIService> ROIServiceConstPtr;
 }  // namespace lidar
 }  // namespace perception
 }  // namespace apollo
-
-

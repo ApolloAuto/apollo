@@ -103,5 +103,3 @@ class SpeedDecider : public Task {
 
 }  // namespace planning
 }  // namespace apollo
-
-

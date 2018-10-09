@@ -47,5 +47,3 @@ class BacksideVehicle : public TrafficRule {
 
 }  // namespace planning
 }  // namespace apollo
-
-

@@ -182,5 +182,3 @@ class SpiralProblemInterface : public Ipopt::TNLP {
 
 }  // namespace planning
 }  // namespace apollo
-
-

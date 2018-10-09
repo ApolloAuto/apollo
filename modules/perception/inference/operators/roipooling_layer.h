@@ -60,5 +60,3 @@ class ROIPoolingLayer : public Layer<Dtype> {
 }  // namespace inference
 }  // namespace perception
 }  // namespace apollo
-
-

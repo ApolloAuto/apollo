@@ -33,4 +33,3 @@ bool UltrasonicRadarCanbusComponent::Init() {
 }  // namespace ultrasonic_radar
 }  // namespace drivers
 }  // namespace apollo
-

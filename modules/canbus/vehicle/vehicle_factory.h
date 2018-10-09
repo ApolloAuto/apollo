@@ -58,5 +58,3 @@ class VehicleFactory
 
 }  // namespace canbus
 }  // namespace apollo
-
-

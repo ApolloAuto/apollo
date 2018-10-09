@@ -77,5 +77,3 @@ struct LidarFrame {
 }  // namespace lidar
 }  // namespace perception
 }  // namespace apollo
-
-

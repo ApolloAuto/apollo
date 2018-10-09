@@ -32,5 +32,3 @@ typedef std::shared_ptr<const Sensor> SensorConstPtr;
 }  // namespace fusion
 }  // namespace perception
 }  // namespace apollo
-
-

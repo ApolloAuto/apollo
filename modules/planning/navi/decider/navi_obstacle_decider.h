@@ -197,5 +197,3 @@ inline void NaviObstacleDecider::SetLastNudgeDistance(double dist) {
 }
 }  // namespace planning
 }  // namespace apollo
-
-

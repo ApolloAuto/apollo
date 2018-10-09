@@ -139,5 +139,3 @@ class GemController final : public VehicleController {
 }  // namespace gem
 }  // namespace canbus
 }  // namespace apollo
-
-

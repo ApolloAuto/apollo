@@ -178,5 +178,3 @@ class Byte {
 }  // namespace canbus
 }  // namespace drivers
 }  // namespace apollo
-
-

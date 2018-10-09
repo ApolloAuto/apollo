@@ -105,5 +105,3 @@ class RadarConfig200
 }  // namespace racobit_radar
 }  // namespace drivers
 }  // namespace apollo
-
-

@@ -31,5 +31,3 @@ enum class LidarPointLabel {
 }  // namespace lidar
 }  // namespace perception
 }  // namespace apollo
-
-

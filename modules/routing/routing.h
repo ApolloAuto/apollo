@@ -73,5 +73,3 @@ class Routing {
 
 }  // namespace routing
 }  // namespace apollo
-
-

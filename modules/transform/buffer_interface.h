@@ -170,5 +170,3 @@ class BufferInterface {
 
 }  // namespace transform
 }  // namespace apollo
-
-

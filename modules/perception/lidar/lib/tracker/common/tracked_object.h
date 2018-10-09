@@ -139,5 +139,3 @@ typedef std::shared_ptr<const TrackedObject> TrackedObjectConstPtr;
 }  // namespace lidar
 }  // namespace perception
 }  // namespace apollo
-
-

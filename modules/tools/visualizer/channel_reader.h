@@ -109,5 +109,3 @@ class CyberChannReader : public QThread {
   std::shared_ptr<apollo::cybertron::Reader<T>> channel_reader_;
   std::shared_ptr<apollo::cybertron::Node> channel_node_;
 };
-
-

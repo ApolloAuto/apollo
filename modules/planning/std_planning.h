@@ -84,5 +84,3 @@ class StdPlanning : public PlanningBase {
 
 }  // namespace planning
 }  // namespace apollo
-
-

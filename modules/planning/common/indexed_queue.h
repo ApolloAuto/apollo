@@ -78,5 +78,3 @@ class IndexedQueue {
 
 }  // namespace planning
 }  // namespace apollo
-
-

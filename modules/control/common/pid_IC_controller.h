@@ -56,5 +56,3 @@ class PIDICController : public PIDController {
 
 }  // namespace control
 }  // namespace apollo
-
-

@@ -60,5 +60,3 @@ class ObstacleClusters {
 
 }  // namespace prediction
 }  // namespace apollo
-
-

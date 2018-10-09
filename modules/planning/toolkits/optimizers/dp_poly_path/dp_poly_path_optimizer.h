@@ -54,5 +54,3 @@ class DpPolyPathOptimizer : public PathOptimizer {
 
 }  // namespace planning
 }  // namespace apollo
-
-

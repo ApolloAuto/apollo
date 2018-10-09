@@ -111,5 +111,3 @@ class ActiveSetQpSolver : public QpSolver {
 }  // namespace math
 }  // namespace common
 }  // namespace apollo
-
-

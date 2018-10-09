@@ -35,5 +35,3 @@ class LexusMessageManager
 }  // namespace lexus
 }  // namespace canbus
 }  // namespace apollo
-
-

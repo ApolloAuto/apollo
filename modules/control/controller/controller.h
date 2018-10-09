@@ -97,5 +97,3 @@ class Controller {
 
 }  // namespace control
 }  // namespace apollo
-
-

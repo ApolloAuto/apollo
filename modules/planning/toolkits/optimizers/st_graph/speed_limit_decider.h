@@ -67,5 +67,3 @@ class SpeedLimitDecider {
 
 }  // namespace planning
 }  // namespace apollo
-
-

@@ -55,5 +55,3 @@ class TargetCamera : public AbstractCamera {
 
   float distance_;
 };
-
-

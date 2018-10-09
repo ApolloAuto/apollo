@@ -53,5 +53,3 @@ class ScenarioManager final {
 
 }  // namespace planning
 }  // namespace apollo
-
-

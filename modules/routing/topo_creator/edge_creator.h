@@ -40,5 +40,3 @@ class EdgeCreator {
 
 }  // namespace routing
 }  // namespace apollo
-
-

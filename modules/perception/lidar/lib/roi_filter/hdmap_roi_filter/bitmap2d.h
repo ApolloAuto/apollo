@@ -112,5 +112,3 @@ class Bitmap2D {
 }  // namespace lidar
 }  // namespace perception
 }  // namespace apollo
-
-

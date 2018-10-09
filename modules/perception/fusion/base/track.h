@@ -154,5 +154,3 @@ typedef std::shared_ptr<const Track> TrackConstPtr;
 }  // namespace fusion
 }  // namespace perception
 }  // namespace apollo
-
-

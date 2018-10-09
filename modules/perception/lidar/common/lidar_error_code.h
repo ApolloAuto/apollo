@@ -51,5 +51,3 @@ struct LidarProcessResult {
 }  // namespace lidar
 }  // namespace perception
 }  // namespace apollo
-
-

@@ -110,5 +110,3 @@ CYBERTRON_REGISTER_COMPONENT(CanbusComponent)
 
 }  // namespace canbus
 }  // namespace apollo
-
-

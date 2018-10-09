@@ -74,5 +74,3 @@ class WaypointSampler {
 
 }  // namespace planning
 }  // namespace apollo
-
-

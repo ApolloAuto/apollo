@@ -103,5 +103,3 @@ class FeatureDescriptor {
 }  // namespace lidar
 }  // namespace perception
 }  // namespace apollo
-
-

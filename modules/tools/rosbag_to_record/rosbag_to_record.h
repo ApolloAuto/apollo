@@ -28,5 +28,3 @@
 #include <unordered_map>
 
 #include "cybertron/record/record_writer.h"
-
-

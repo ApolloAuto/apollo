@@ -78,5 +78,3 @@ class QpSplineReferenceLineSmoother : public ReferenceLineSmoother {
 
 }  // namespace planning
 }  // namespace apollo
-
-

@@ -112,5 +112,3 @@ inline void DiscretizedTrajectory::Clear() { trajectory_points_.clear(); }
 
 }  // namespace planning
 }  // namespace apollo
-
-

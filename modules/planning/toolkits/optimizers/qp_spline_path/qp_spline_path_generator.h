@@ -89,5 +89,3 @@ class QpSplinePathGenerator {
 
 }  // namespace planning
 }  // namespace apollo
-
-

@@ -168,5 +168,3 @@ class NaviSpeedDecider : public NaviTask {
 
 }  // namespace planning
 }  // namespace apollo
-
-

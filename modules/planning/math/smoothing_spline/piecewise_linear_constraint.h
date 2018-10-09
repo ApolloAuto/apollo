@@ -77,5 +77,3 @@ class PiecewiseLinearConstraint {
 
 }  // namespace planning
 }  // namespace apollo
-
-

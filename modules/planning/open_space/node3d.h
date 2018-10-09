@@ -92,5 +92,3 @@ class Node3d {
 
 }  // namespace planning
 }  // namespace apollo
-
-

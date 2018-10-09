@@ -70,5 +70,3 @@ class QpSolver {
 }  // namespace math
 }  // namespace common
 }  // namespace apollo
-
-

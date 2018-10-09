@@ -91,5 +91,3 @@ class RNNEvaluator : public Evaluator {
 
 }  // namespace prediction
 }  // namespace apollo
-
-

@@ -98,5 +98,3 @@ class SensorManager {
 }  // namespace common
 }  // namespace perception
 }  // namespace apollo
-
-

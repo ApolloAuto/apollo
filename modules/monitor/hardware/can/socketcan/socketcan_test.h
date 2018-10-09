@@ -41,5 +41,3 @@ int socketcan_do_test(int id);
 }  // namespace hw
 }  // namespace monitor
 }  // namespace apollo
-
-

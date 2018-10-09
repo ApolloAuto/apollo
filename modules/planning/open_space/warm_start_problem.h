@@ -60,5 +60,3 @@ class WarmStartProblem {
 
 }  // namespace planning
 }  // namespace apollo
-
-

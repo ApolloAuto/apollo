@@ -58,5 +58,3 @@ CYBERTRON_REGISTER_COMPONENT(SegmentationComponent);
 }  // namespace onboard
 }  // namespace perception
 }  // namespace apollo
-
-

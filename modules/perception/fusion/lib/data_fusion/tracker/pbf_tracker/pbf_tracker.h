@@ -74,5 +74,3 @@ class PbfTracker : public BaseTracker {
 }  // namespace fusion
 }  // namespace perception
 }  // namespace apollo
-
-

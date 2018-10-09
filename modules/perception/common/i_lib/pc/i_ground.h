@@ -326,5 +326,3 @@ class PlaneFitGroundDetector : public BaseGroundDetector {
 }  // namespace common
 }  // namespace perception
 }  // namespace apollo
-
-

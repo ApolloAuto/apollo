@@ -53,5 +53,3 @@ bool write_result(const std::string &out_path,
 }  // namespace inference
 }  // namespace perception
 }  // namespace apollo
-
-

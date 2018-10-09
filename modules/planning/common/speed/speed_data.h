@@ -60,5 +60,3 @@ class SpeedData {
 
 }  // namespace planning
 }  // namespace apollo
-
-

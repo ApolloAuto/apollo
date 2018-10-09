@@ -164,5 +164,3 @@ class VehicleController {
 
 }  // namespace canbus
 }  // namespace apollo
-
-

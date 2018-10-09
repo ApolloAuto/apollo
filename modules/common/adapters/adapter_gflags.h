@@ -87,5 +87,3 @@ DECLARE_string(guardian_topic);
 
 // Data topic
 DECLARE_string(data_topic);
-
-

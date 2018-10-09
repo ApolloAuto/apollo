@@ -55,5 +55,3 @@ class CostEvaluator : public Evaluator {
 
 }  // namespace prediction
 }  // namespace apollo
-
-

@@ -452,5 +452,3 @@ using JunctionBoundaryPtr = std::shared_ptr<JunctionBoundary>;
 
 }  // namespace hdmap
 }  // namespace apollo
-
-

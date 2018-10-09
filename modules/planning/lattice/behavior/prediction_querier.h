@@ -57,5 +57,3 @@ class PredictionQuerier {
 
 }  // namespace planning
 }  // namespace apollo
-
-

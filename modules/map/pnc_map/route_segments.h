@@ -235,5 +235,3 @@ class RouteSegments : public std::vector<LaneSegment> {
 
 }  // namespace hdmap
 }  // namespace apollo
-
-

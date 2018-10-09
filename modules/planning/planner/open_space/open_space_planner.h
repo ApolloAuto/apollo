@@ -112,5 +112,3 @@ class OpenSpacePlanner : public Planner {
 
 }  // namespace planning
 }  // namespace apollo
-
-

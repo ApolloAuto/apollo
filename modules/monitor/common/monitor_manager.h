@@ -82,5 +82,3 @@ class MonitorManager {
 
 }  // namespace monitor
 }  // namespace apollo
-
-

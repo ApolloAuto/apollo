@@ -55,5 +55,3 @@ class ClusterQualityInfo702
 }  // namespace racobit_radar
 }  // namespace drivers
 }  // namespace apollo
-
-

@@ -131,5 +131,3 @@ class QpSplineStGraph {
 
 }  // namespace planning
 }  // namespace apollo
-
-

@@ -45,6 +45,3 @@ CYBERTRON_REGISTER_COMPONENT(RoutingComponent)
 
 }  // namespace routing
 }  // namespace apollo
-
-
-

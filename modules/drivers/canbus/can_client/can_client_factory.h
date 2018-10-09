@@ -68,5 +68,3 @@ class CanClientFactory
 }  // namespace canbus
 }  // namespace drivers
 }  // namespace apollo
-
-

@@ -41,5 +41,3 @@ struct CarLight {
 }  // namespace base
 }  // namespace perception
 }  // namespace apollo
-
-

@@ -50,5 +50,3 @@ class SocketInput : public Input {
 }  // namespace velodyne
 }  // namespace drivers
 }  // namespace apollo
-
-

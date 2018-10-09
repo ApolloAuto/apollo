@@ -253,5 +253,3 @@ inline void ExtendedKalmanFilter<T, XN, ZN, UN>::Correct(
 }  // namespace math
 }  // namespace common
 }  // namespace apollo
-
-

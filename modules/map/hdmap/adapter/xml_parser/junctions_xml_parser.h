@@ -37,5 +37,3 @@ class JunctionsXmlParser {
 }  // namespace adapter
 }  // namespace hdmap
 }  // namespace apollo
-
-

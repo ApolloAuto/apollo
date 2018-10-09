@@ -59,5 +59,3 @@ class InfoCollector {
 
 }  // namespace data
 }  // namespace apollo
-
-

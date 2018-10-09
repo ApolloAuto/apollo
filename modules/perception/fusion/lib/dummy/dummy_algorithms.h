@@ -85,5 +85,3 @@ class DummyTracker : public BaseTracker {
 }  // namespace fusion
 }  // namespace perception
 }  // namespace apollo
-
-

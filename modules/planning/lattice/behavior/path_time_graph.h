@@ -111,5 +111,3 @@ class PathTimeGraph {
 
 }  // namespace planning
 }  // namespace apollo
-
-

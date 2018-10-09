@@ -260,5 +260,3 @@ class HDMap {
 
 }  // namespace hdmap
 }  // namespace apollo
-
-

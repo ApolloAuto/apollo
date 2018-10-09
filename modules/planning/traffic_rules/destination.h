@@ -54,5 +54,3 @@ class Destination : public TrafficRule {
 
 }  // namespace planning
 }  // namespace apollo
-
-

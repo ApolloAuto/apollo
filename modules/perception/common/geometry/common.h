@@ -358,5 +358,3 @@ void CalculateDistAndDirToBoundary(
 }  // namespace common
 }  // namespace perception
 }  // namespace apollo
-
-

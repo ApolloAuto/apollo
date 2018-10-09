@@ -131,5 +131,3 @@ class EnvironmentFeatures {
 
 }  // namespace prediction
 }  // namespace apollo
-
-

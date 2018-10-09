@@ -56,5 +56,3 @@ class PiecewiseTrajectory1d : public Curve1d {
 
 }  // namespace planning
 }  // namespace apollo
-
-

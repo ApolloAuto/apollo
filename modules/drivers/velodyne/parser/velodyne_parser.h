@@ -380,5 +380,3 @@ class VelodyneParserFactory {
 }  // namespace velodyne
 }  // namespace drivers
 }  // namespace apollo
-
-

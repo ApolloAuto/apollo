@@ -53,5 +53,3 @@ class PolyStSpeedOptimizer : public SpeedOptimizer {
 
 }  // namespace planning
 }  // namespace apollo
-
-

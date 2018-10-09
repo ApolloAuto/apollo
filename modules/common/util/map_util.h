@@ -74,5 +74,3 @@ using google::protobuf::AppendValuesFromMap;
 }  // namespace util
 }  // namespace common
 }  // namespace apollo
-
-

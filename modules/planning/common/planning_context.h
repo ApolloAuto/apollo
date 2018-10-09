@@ -70,5 +70,3 @@ inline PlanningStatus* mutable_planning_status() {
 
 }  // namespace planning
 }  // namespace apollo
-
-

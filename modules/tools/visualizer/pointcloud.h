@@ -40,5 +40,3 @@ class PointCloud : public RenderableObject {
 
   GLfloat* buffer_;
 };
-
-

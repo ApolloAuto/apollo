@@ -41,5 +41,3 @@ class ConstraintChecker1d {
 
 }  // namespace planning
 }  // namespace apollo
-
-

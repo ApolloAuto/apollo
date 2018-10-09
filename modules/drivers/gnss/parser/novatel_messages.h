@@ -561,5 +561,3 @@ inline ImuParameter GetImuParameter(ImuType type) {
 }  // namespace gnss
 }  // namespace drivers
 }  // namespace apollo
-
-

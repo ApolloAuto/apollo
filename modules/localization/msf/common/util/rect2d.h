@@ -109,5 +109,3 @@ Eigen::Matrix<T, 2, 1> Rect2D<T>::GetRightBottomCorner() const {
 }  // namespace msf
 }  // namespace localization
 }  // namespace apollo
-
-

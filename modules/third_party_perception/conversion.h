@@ -61,5 +61,3 @@ apollo::perception::PerceptionObstacles RadarObstaclesToPerceptionObstacles(
 }  // namespace conversion
 }  // namespace third_party_perception
 }  // namespace apollo
-
-

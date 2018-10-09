@@ -64,5 +64,3 @@ class SignalLight : public TrafficRule {
 
 }  // namespace planning
 }  // namespace apollo
-
-

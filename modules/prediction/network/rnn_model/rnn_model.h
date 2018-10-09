@@ -72,5 +72,3 @@ class RnnModel : public NetModel {
 }  // namespace network
 }  // namespace prediction
 }  // namespace apollo
-
-

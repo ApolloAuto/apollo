@@ -87,5 +87,3 @@ class Spline1dKernel {
 
 }  // namespace planning
 }  // namespace apollo
-
-

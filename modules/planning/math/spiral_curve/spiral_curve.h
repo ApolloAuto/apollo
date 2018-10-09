@@ -98,5 +98,3 @@ class SpiralCurve {
 
 }  // namespace planning
 }  // namespace apollo
-
-

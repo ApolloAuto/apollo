@@ -102,5 +102,3 @@ class ObstaclesContainer : public Container {
 
 }  // namespace prediction
 }  // namespace apollo
-
-

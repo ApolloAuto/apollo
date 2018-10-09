@@ -49,5 +49,3 @@ class Rerouting : public TrafficRule {
 
 }  // namespace planning
 }  // namespace apollo
-
-

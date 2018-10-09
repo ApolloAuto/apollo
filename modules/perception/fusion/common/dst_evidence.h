@@ -141,5 +141,3 @@ class Dst {
 }  // namespace fusion
 }  // namespace perception
 }  // namespace apollo
-
-

@@ -59,5 +59,3 @@ bool SolveLinearMPC(
 }  // namespace math
 }  // namespace common
 }  // namespace apollo
-
-

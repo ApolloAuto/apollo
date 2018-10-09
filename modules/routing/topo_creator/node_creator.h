@@ -45,5 +45,3 @@ class NodeCreator {
 
 }  // namespace routing
 }  // namespace apollo
-
-

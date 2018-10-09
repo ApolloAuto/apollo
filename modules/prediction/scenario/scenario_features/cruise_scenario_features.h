@@ -54,5 +54,3 @@ class CruiseScenarioFeatures : public ScenarioFeatures {
 
 }  // namespace prediction
 }  // namespace apollo
-
-

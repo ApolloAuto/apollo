@@ -55,5 +55,3 @@ class SpeedOptimizer : public Task {
 
 }  // namespace planning
 }  // namespace apollo
-
-

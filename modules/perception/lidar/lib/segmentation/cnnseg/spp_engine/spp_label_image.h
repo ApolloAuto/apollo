@@ -149,5 +149,3 @@ typedef std::shared_ptr<const SppLabelImage> SppLabelImageConstPtr;
 }  // namespace lidar
 }  // namespace perception
 }  // namespace apollo
-
-

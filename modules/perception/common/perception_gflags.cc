@@ -31,4 +31,3 @@ DEFINE_string(config_manager_path, "./conf", "The ModelConfig config paths.");
 DEFINE_string(work_root, "", "Project work root direcotry.");
 DEFINE_string(adu_data, "/home/caros/adu_data",
               "ADU shared data path, including maps, routings...");
-

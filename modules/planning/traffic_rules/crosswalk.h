@@ -53,5 +53,3 @@ class Crosswalk : public TrafficRule {
 
 }  // namespace planning
 }  // namespace apollo
-
-

@@ -57,5 +57,3 @@ class QuinticSpiralCurve : public SpiralCurve {
 
 }  // namespace planning
 }  // namespace apollo
-
-

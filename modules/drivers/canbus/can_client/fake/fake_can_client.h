@@ -108,5 +108,3 @@ class FakeCanClient : public CanClient {
 }  // namespace canbus
 }  // namespace drivers
 }  // namespace apollo
-
-

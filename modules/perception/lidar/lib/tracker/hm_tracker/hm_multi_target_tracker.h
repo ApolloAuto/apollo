@@ -130,4 +130,3 @@ class HmMultiTargetTracker : public BaseMultiTargetTracker {
 }  // namespace lidar
 }  // namespace perception
 }  // namespace apollo
-

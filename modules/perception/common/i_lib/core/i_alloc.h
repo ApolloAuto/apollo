@@ -153,5 +153,3 @@ inline int IVerifyAlignment(const T *mem, int alignment_power = 4) {
 }  //  namespace common
 }  //  namespace perception
 }  //  namespace apollo
-
-

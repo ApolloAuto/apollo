@@ -35,5 +35,3 @@ DECLARE_string(obs_lidar_onboard_sensor_name);
 }  // namespace onboard
 }  // namespace perception
 }  // namespace apollo
-
-

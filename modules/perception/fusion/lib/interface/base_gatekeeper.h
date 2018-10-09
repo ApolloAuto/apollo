@@ -46,5 +46,3 @@ class BaseGatekeeper {
 }  // namespace fusion
 }  // namespace perception
 }  // namespace apollo
-
-

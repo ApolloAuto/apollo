@@ -120,5 +120,3 @@ class NetModel {
 }  // namespace network
 }  // namespace prediction
 }  // namespace apollo
-
-

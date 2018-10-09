@@ -81,5 +81,3 @@ class FeatureExtractor {
 
 }  // namespace prediction
 }  // namespace apollo
-
-

@@ -65,5 +65,3 @@ class AutotuningSpeedMLPModel : public AutotuningBaseModel {
 
 }  // namespace planning
 }  // namespace apollo
-
-
