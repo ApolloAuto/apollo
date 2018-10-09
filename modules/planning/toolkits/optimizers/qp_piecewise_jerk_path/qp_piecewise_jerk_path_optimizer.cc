@@ -79,9 +79,9 @@ bool QpPiecewiseJerkPathOptimizer::Init(
   if (config.has_qp_piecewise_jerk_path_config()) {
     config_ = config.qp_piecewise_jerk_path_config();
   }
-  lateral_qp_optimizer_.reset(new ActiverSetLateralQPOptimizer());
+  // lateral_qp_optimizer_.reset(new ActiverSetLateralQPOptimizer());
   // TODO(all): use gflags or config to turn on/off new algorithms
-  // lateral_qp_optimizer_.reset(new ActiverSetAugmentedLateralQPOptimizer());
+  lateral_qp_optimizer_.reset(new ActiverSetAugmentedLateralQPOptimizer());
   is_init_ = true;
   return true;
 }
@@ -128,15 +128,16 @@ QpPiecewiseJerkPathOptimizer::GetLateralBounds(
 
   // shrink bounds by obstacles.
   auto find_s_iter = [&](double s) {
-    std::vector<std::pair<double, double>>::iterator iter =
-        lateral_bounds.begin() +
-        std::min(lateral_bounds.size(),
-                 static_cast<size_t>((s - start_s) / qp_delta_s));
-    if (iter == lateral_bounds.end()) {
-      --iter;
+    int index = static_cast<int>(s / qp_delta_s);
+    if (index < 0) {
+      index = 0;
     }
-    return iter;
+    if (index > static_cast<int>(lateral_bounds.size())) {
+      index = lateral_bounds.size();
+    }
+    return lateral_bounds.begin() + index;
   };
+
   for (const auto* path_obstacle :
        reference_line_info_->path_decision()->path_obstacles().Items()) {
     const auto& obstacle = *path_obstacle->obstacle();
@@ -150,8 +151,14 @@ QpPiecewiseJerkPathOptimizer::GetLateralBounds(
         obstacle_sl.start_s() > accumulated_s) {
       continue;
     }
-    auto start_iter = find_s_iter(obstacle_sl.start_s());
-    auto end_iter = find_s_iter(obstacle_sl.end_s()) + 1;
+    auto start_iter = find_s_iter(obstacle_sl.start_s() - start_s);
+    auto end_iter = find_s_iter(obstacle_sl.end_s() - start_s);
+    if (end_iter != lateral_bounds.end()) {  // end is one pass the last one
+      ++end_iter;
+    }
+    if (start_iter == lateral_bounds.end()) {
+      continue;
+    }
     double l_lower = max_pair_second(start_iter, end_iter)->first;
     double l_upper = min_pair_first(start_iter, end_iter)->second;
     // ignore obstacles that are not in lateral range
@@ -231,7 +238,6 @@ Status QpPiecewiseJerkPathOptimizer::Process(
 
   if (!success) {
     AERROR << "lateral qp optimizer failed";
-    DCHECK(false);
     return Status(ErrorCode::PLANNING_ERROR, "lateral qp optimizer failed");
   }
 
