@@ -66,7 +66,7 @@ int MSG_SEND_GAP_US = 0;
 int PROC_TIME_US = 0;
 // 0: usleep; 1: cpu computer; 2: gpu computer
 int PROC_TYPE = 0;
-int MSG_NUM = 0;
+uint64_t MSG_NUM = 0;
 
 void LocalProc(const std::string& node_name,
                const std::shared_ptr<apollo::cybertron::proto::Chatter>& msg) {
@@ -143,7 +143,7 @@ class GaussianComponent
   }
 };
 
-int GenGaussianDag() {
+void GenGaussianDag() {
   std::shared_ptr<apollo::cybertron::Node> start_node;
   std::shared_ptr<apollo::cybertron::Writer<apollo::cybertron::proto::Chatter>>
       start_node_writer;
@@ -232,7 +232,7 @@ int GenGaussianDag() {
       ++idx;
     }
   }
-  for (int i = 0; i < MSG_NUM; ++i) {
+  for (uint64_t i = 0; i < MSG_NUM; ++i) {
     if (apollo::cybertron::IsShutdown()) {
       break;
     }

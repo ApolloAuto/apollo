@@ -18,13 +18,11 @@
 #define CYBERTRON_SCHEDULER_POLICY_CLASSIC_CONTEXT_H_
 
 #include <cstdint>
-#include <future>
-#include <list>
+#include <functional>
 #include <map>
 #include <memory>
 #include <mutex>
 #include <string>
-#include <vector>
 
 #include "cybertron/scheduler/processor_context.h"
 
@@ -49,7 +47,8 @@ class ClassicContext : public ProcessorContext {
 
  private:
   std::mutex mtx_run_queue_;
-  std::multimap<double, std::shared_ptr<CRoutine>> rb_map_;
+  std::multimap<double, std::shared_ptr<CRoutine>, std::greater<double>>
+      rt_queue_;
 };
 
 }  // namespace scheduler

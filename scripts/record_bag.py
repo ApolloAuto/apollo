@@ -203,7 +203,7 @@ class Recorder(object):
         cmd = '''
             cd "{}"
             source /apollo/scripts/apollo_base.sh
-            source /apollo/framework/cybertron/setup.bash
+            source /apollo/framework/install/setup.bash
             nohup cyber_recorder record -c {} >{} 2>&1 &
         '''.format(task_dir, topics_str, log_file)
         shell_cmd(cmd)
