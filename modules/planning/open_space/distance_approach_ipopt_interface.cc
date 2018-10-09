@@ -68,6 +68,12 @@ DistanceApproachIPOPTInterface::DistanceApproachIPOPTInterface(
   state_result_ = Eigen::MatrixXd::Zero(horizon_ + 1, 4);
   control_result_ = Eigen::MatrixXd::Zero(horizon_ + 1, 2);
   time_result_ = Eigen::MatrixXd::Zero(horizon_ + 1, 1);
+
+  state_start_index_ = 0;
+  control_start_index_ = 4 * (horizon_ + 1);
+  time_start_index_ = control_start_index_ + 2 * horizon_;
+  l_start_index_ = time_start_index_ + (horizon_ + 1);
+  n_start_index_ = l_start_index_ + obstacles_vertices_sum_ * (horizon_ + 1);
 }
 
 /*
@@ -232,7 +238,18 @@ bool DistanceApproachIPOPTInterface::get_bounds_info(int n, double* x_l,
   ADEBUG << "constraint_index after adding Euler forward dynamics constraints: "
          << constraint_index;
 
-  // 2. Three obstacles related equal constraints, one equality constraints,
+  // 2. time constraints 1 * (0 ~ horizons-1)
+  // start point pose
+  for (std::size_t i = 0; i < horizon_; ++i) {
+    g_l[i] = 0.0;
+    g_u[i] = 0.0;
+  }
+  constraint_index += (horizon_ + 1);
+
+  ADEBUG << "constraint_index after adding Euler forward dynamics constraints: "
+         << constraint_index;
+
+  // 3. Three obstacles related equal constraints, one equality constraints,
   // (horizon_ + 1) * obstacles_num_ * 4
   for (std::size_t i = 1; i < horizon_ + 1; ++i) {
     for (std::size_t j = 1; j <= obstacles_vertices_sum_; ++j) {
@@ -261,81 +278,91 @@ bool DistanceApproachIPOPTInterface::get_bounds_info(int n, double* x_l,
 
 bool DistanceApproachIPOPTInterface::eval_g(int n, const double* x, bool new_x,
                                             int m, double* g) {
+  // state start index
+  std::size_t state_index = state_start_index_;
+
   // control start index.
-  std::size_t control_start_index = 4 * (horizon_ + 1);
+  std::size_t control_index = control_start_index_;
 
   // time start index
-  std::size_t time_start_index = control_start_index + 2 * horizon_;
-
-  // lagrangian l start index
-  std::size_t l_start_index = time_start_index + (horizon_ + 1);
-
-  // lagrangian n start index
-  std::size_t n_start_index =
-      l_start_index + obstacles_vertices_sum_ * (horizon_ + 1);
-
-  // 1. Constraints from dynamics of the car.
+  std::size_t time_index = time_start_index_;
 
   std::size_t constraint_index = 0;
+
+  // 1. Constraints from dynamics of the car.
   for (std::size_t i = 1; i < horizon_; ++i) {
-    std::size_t state_start_index = 4 * (i - 1);
     // x1
     // TODO(QiL) : optimize and remove redundant calculation in next iteration.
     g[constraint_index] =
-        x[state_start_index + 4] -
-        (x[state_start_index] +
-         ts_ * x[time_start_index] *
-             (x[state_start_index + 3] +
-              ts_ * x[time_start_index] * 0.5 * x[control_start_index + 1]) *
-             (std::cos(x[state_start_index + 2] +
-                       ts_ * x[time_start_index] * 0.5 *
-                           x[state_start_index + 3] *
-                           std::tan(x[control_start_index] / wheelbase_))));
+        x[state_index + 4] -
+        (x[state_index] +
+         ts_ * x[time_index] *
+             (x[state_index + 3] +
+              ts_ * x[time_index] * 0.5 * x[control_index + 1]) *
+             (std::cos(x[state_index + 2] +
+                       ts_ * x[time_index] * 0.5 * x[state_index + 3] *
+                           std::tan(x[control_index] / wheelbase_))));
     // x2
     g[constraint_index + 1] =
-        x[state_start_index + 5] -
-        (x[state_start_index + 1] +
-         ts_ * x[time_start_index] *
-             (x[state_start_index + 3] +
-              ts_ * x[time_start_index] * 0.5 * x[control_start_index + 1]) *
-             std::sin(x[state_start_index + 3]) *
-             std::tan(x[control_start_index] / wheelbase_));
+        x[state_index + 5] -
+        (x[state_index + 1] +
+         ts_ * x[time_index] *
+             (x[state_index + 3] +
+              ts_ * x[time_index] * 0.5 * x[control_index + 1]) *
+             std::sin(x[state_index + 3]) *
+             std::tan(x[control_index] / wheelbase_));
 
     // x3
     g[constraint_index + 2] =
-        x[state_start_index + 6] -
-        (x[state_start_index + 2] +
-         ts_ * x[time_start_index] *
-             (x[state_start_index + 3] +
-              ts_ * x[time_start_index] * 0.5 * x[control_start_index + 1]) *
-             std::tan(x[control_start_index] / wheelbase_));
+        x[state_index + 6] -
+        (x[state_index + 2] +
+         ts_ * x[time_index] *
+             (x[state_index + 3] +
+              ts_ * x[time_index] * 0.5 * x[control_index + 1]) *
+             std::tan(x[control_index] / wheelbase_));
 
     // x4
     g[constraint_index + 3] =
-        x[state_start_index + 7] -
-        (x[state_start_index + 3] +
-         ts_ * x[time_start_index] * x[control_start_index + 1]);
+        x[state_index + 7] -
+        (x[state_index + 3] + ts_ * x[time_index] * x[control_index + 1]);
 
-    control_start_index += 2;
+    control_index += 2;
     constraint_index += 4;
-    time_start_index += 1;
+    time_index += 1;
+    state_index += 4;
   }
 
   ADEBUG << "constraint_index after adding Euler forward dynamics constraints "
             "updated: "
          << constraint_index;
 
-  // 2. Obstacle avoidance constraints
+  // 2. time constraints
+  time_index = time_start_index_;
+  for (std::size_t i = 1; i < horizon_; ++i) {
+    // x[time_index] = x[time_index +1]
+    g[constraint_index] = x[time_index + 1] - x[time_index];
+
+    constraint_index += 1;
+    time_index += 1;
+  }
+
+  ADEBUG << "constraint_index after adding time constraints "
+            "updated: "
+         << constraint_index;
+
+  // 3. Obstacle avoidance constraints
   int counter = 0;
+  state_index = state_start_index_;
+  std::size_t l_index = l_start_index_;
+  std::size_t n_start_index = n_start_index_;
+
   for (std::size_t i = 1; i <= horizon_ + 1; ++i) {
-    std::size_t state_start_index = 4 * (i - 1);
     for (std::size_t j = 1; j <= obstacles_num_; ++j) {
       std::size_t current_vertice_num = obstacles_vertices_num_(i, 0);
       Eigen::MatrixXd Aj =
           obstacles_A_.block(counter, 0, current_vertice_num, 2);
-      std::vector<int> lj(&x[l_start_index],
-                          &x[l_start_index + current_vertice_num]);
-      std::vector<int> nj(&x[n_start_index], &x[n_start_index + 3]);
+      std::vector<int> lj(&x[l_index], &x[l_index + current_vertice_num]);
+      std::vector<int> nj(&x[n_index], &x[n_index + 3]);
       Eigen::MatrixXd bj =
           obstacles_b_.block(counter, 0, current_vertice_num, 1);
 
@@ -344,36 +371,35 @@ bool DistanceApproachIPOPTInterface::eval_g(int n, const double* x, bool new_x,
       double tmp2 = 0;
       for (std::size_t k = 0; k < current_vertice_num; ++k) {
         // TODO(QiL) : replace this one directly with x
-        tmp1 += Aj(k, 0) * x[l_start_index + k];
-        tmp2 += Aj(k, 1) * x[l_start_index + k];
+        tmp1 += Aj(k, 0) * x[l_index + k];
+        tmp2 += Aj(k, 1) * x[l_index + k];
       }
       g[constraint_index] = tmp1 * tmp1 + tmp2 * tmp2 - 1.0;
 
       // G' * mu + R' * lambda == 0
       g[constraint_index + 1] = nj[0] - nj[2] +
-                                std::cos(x[state_start_index + 2]) * tmp1 +
-                                std::sin(x[state_start_index + 2]) * tmp2;
+                                std::cos(x[state_index + 2]) * tmp1 +
+                                std::sin(x[state_index + 2]) * tmp2;
 
       g[constraint_index + 2] = nj[1] - nj[3] -
-                                std::sin(x[state_start_index + 2]) * tmp1 +
-                                std::cos(x[state_start_index + 2]) * tmp2;
+                                std::sin(x[state_index + 2]) * tmp1 +
+                                std::cos(x[state_index + 2]) * tmp2;
 
       //  -g'*mu + (A*t - b)*lambda > 0
       double tmp3 = 0.0;
       for (std::size_t k = 0; k < 4; ++k) {
         // TODO(QiL) : replace this one directly with x
-        tmp3 += g_[k] * x[l_start_index + k];
+        tmp3 += g_[k] * x[l_index + k];
       }
 
-      g[constraint_index + 3] =
-          tmp3 + x[state_start_index] +
-          std::cos(x[state_start_index + 2] * offset_) * tmp1 +
-          x[state_start_index + 1] * offset_ * tmp2;
+      g[constraint_index + 3] = tmp3 + x[state_index] +
+                                std::cos(x[state_index + 2] * offset_) * tmp1 +
+                                x[state_index + 1] * offset_ * tmp2;
 
       // Update index
       counter += 4;
-      l_start_index += current_vertice_num;
-      n_start_index += 4;
+      l_index += current_vertice_num;
+      n_index += 4;
       constraint_index += 4;
     }
   }
