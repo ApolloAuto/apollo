@@ -87,10 +87,6 @@ bool SidePassScenario::Init() {
   CHECK(apollo::common::util::GetProtoFromFile(
       FLAGS_scenario_side_pass_config_file, &config_));
 
-  if (!InitTasks(config_, current_stage_index_, &tasks_)) {
-    return false;
-  }
-
   is_init_ = true;
   status_ = STATUS_INITED;
 
@@ -100,6 +96,10 @@ bool SidePassScenario::Init() {
 Status SidePassScenario::Process(const TrajectoryPoint& planning_start_point,
                                  Frame* frame) {
   status_ = STATUS_PROCESSING;
+
+  if (!InitTasks(config_, current_stage_index_, &tasks_)) {
+    return Status(ErrorCode::PLANNING_ERROR, "failed to init tasks");
+  }
 
   // TODO(all)
 

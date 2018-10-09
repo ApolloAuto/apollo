@@ -93,10 +93,6 @@ bool LaneFollowScenario::Init() {
   CHECK(apollo::common::util::GetProtoFromFile(
       FLAGS_scenario_lane_follow_config_file, &config_));
 
-  if (!InitTasks(config_, current_stage_index_, &tasks_)) {
-    return false;
-  }
-
   is_init_ = true;
   status_ = STATUS_INITED;
 
@@ -153,6 +149,10 @@ void LaneFollowScenario::RecordDebugInfo(ReferenceLineInfo* reference_line_info,
 Status LaneFollowScenario::Process(const TrajectoryPoint& planning_start_point,
                                    Frame* frame) {
   status_ = STATUS_PROCESSING;
+
+  if (!InitTasks(config_, current_stage_index_, &tasks_)) {
+    return Status(ErrorCode::PLANNING_ERROR, "failed to init tasks");
+  }
 
   bool has_drivable_reference_line = false;
   bool disable_low_priority_path = false;
