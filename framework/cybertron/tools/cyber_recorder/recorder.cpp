@@ -146,7 +146,7 @@ bool Recorder::InitReaderImpl(const std::string& channel_name,
     };
     ReaderConfig config;
     config.channel_name = channel_name;
-    config.pending_queue_size = 20;
+    config.pending_queue_size = 50;
     reader = node_->CreateReader<RawMessage>(config, callback);
     if (reader == nullptr) {
       AERROR << "Create reader failed.";
