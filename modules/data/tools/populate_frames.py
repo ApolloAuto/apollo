@@ -55,10 +55,15 @@ gflags.DEFINE_string('pointcloud_channel',
                      '/apollo/sensor/velodyne64/compensator/PointCloud2',
                      'pointcloud channel.')
 
+# Maximum frame count that needs to be populated
+gflags.DEFINE_integer('maximum_frame_count', 50, 'Maximum frame count.')
+
+
 class FramePopulator:
+    """Extract sensors data from record file, and populate to JSON."""
     def __init__(self, args):
         self._args = args
-        self._current_frame_id = '#' 
+        self._current_frame_id = 0 
         self._current_frame = None
         self._frame_count = 0
         self._channel_function_map = {
@@ -66,18 +71,21 @@ class FramePopulator:
         }
 
     def load_yaml_settings(self):
+        """Load settings from YAML config file."""
         # TODO: LOAD YAML FILE AND GET ITS SETTINGS HERE
         return
 
     def dump_to_json_file(self):
+        """Dump the frame content to JSON file."""
         self._frame_count = self._frame_count + 1
         file_name = os.path.join(self._args.output_path, 
-            'frame{}.json'.format(self._frame_count))
+            'frame-{}.json'.format(self._frame_count))
         jsonObj = MessageToJson(self._current_frame)
         with open(file_name, 'w') as outfile:
            outfile.write(jsonObj)
 
     def check_frame(self, frame_id):
+        """Check if a new frame needs to be created."""
         if frame_id != self._current_frame_id:
             glog.info('#current frame {}, changing to {}'.format(
                 self._current_frame_id, frame_id))
@@ -89,14 +97,19 @@ class FramePopulator:
             self._current_frame_id = frame_id
 
     def process(self, func, message, timestamp):
+        """Process the message according to its type.""" 
         if func is not None:
             func(message, timestamp)
 
     def parse_protobuf_pointcloud(self, message, timestamp):
+        """Process PointCloud message."""
         point_cloud = PointCloud()
         point_cloud.ParseFromString(message)
 
-        self.check_frame(point_cloud.frame_id)
+        # Use timestamp to disguish frames
+        # Convert double type of timestamp to 64bit integer
+        frame_id = point_cloud.header.timestamp_sec * 1e9
+        self.check_frame(frame_id)
 
         for pointxyzi in point_cloud.point:
             vector4 = self._current_frame.points.add()
@@ -106,25 +119,27 @@ class FramePopulator:
             vector4.i = pointxyzi.intensity
 
     def process_record_file(self):
-        """read record file and extract the message with specified channels"""
+        """Read record file and extract the message with specified channels"""
         freader = record.RecordReader(self._args.input_file)
         time.sleep(1)
-
         glog.info('#processing record file {}'.format(self._args.input_file))
-
         for channel, message, _type, timestamp in freader.read_messages():
+            if self._frame_count >= self._args.maximum_frame_count:
+                glog.info('#reached the maximum frame count, exiting now')
+                return
             if channel in self._channel_function_map:
                 self.process(self._channel_function_map[channel], 
                     message, timestamp)
 
-        self.dump_to_json_file()
+        # Dump the last frame if has not reached maximum
+        if self._frame_count < self._args.maximum_frame_count:
+            self.dump_to_json_file()
 
 def main():
+    """Entry point."""
     gflags.FLAGS(sys.argv)
-
     frame_populator = FramePopulator(gflags.FLAGS)
     frame_populator.process_record_file()
-
     return
 
 if __name__ == '__main__':
