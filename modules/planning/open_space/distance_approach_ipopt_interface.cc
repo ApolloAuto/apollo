@@ -504,7 +504,53 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
     std::size_t constraint_index = 0;
     std::size_t state_index = state_start_index_;
 
-    // 1. state constraints 4 * [0, horizons-1]
+    // 1. State Constraint with respect to state 4 * [0, horizons-1]
+    for (std::size_t i = 0; i < horizon_ + 1; ++i) {
+      // x'
+      iRow[nz_index] = state_index;
+      jCol[nz_index] = state_index;
+      ++nz_index;
+
+      iRow[nz_index] = state_index;
+      jCol[nz_index] = state_index + 2;
+      ++nz_index;
+
+      iRow[nz_index] = state_index;
+      jCol[nz_index] = state_index + 3;
+      ++nz_index;
+
+      // y'
+      iRow[nz_index] = state_index + 1;
+      jCol[nz_index] = state_index + 1;
+      ++nz_index;
+
+      iRow[nz_index] = state_index + 1;
+      jCol[nz_index] = state_index + 2;
+      ++nz_index;
+
+      iRow[nz_index] = state_index + 1;
+      jCol[nz_index] = state_index + 3;
+      ++nz_index;
+
+      // theta'
+      iRow[nz_index] = state_index + 2;
+      jCol[nz_index] = state_index + 2;
+      ++nz_index;
+
+      iRow[nz_index] = state_index + 2;
+      jCol[nz_index] = state_index + 3;
+      ++nz_index;
+
+      // v'
+      iRow[nz_index] = state_index + 3;
+      jCol[nz_index] = state_index + 3;
+      ++nz_index;
+
+      state_index += 4;
+    }
+
+    // 2. State Constraint with respect to control 2 * [0, horizons-1]
+    state_index = state_start_index_;
     for (std::size_t i = 0; i < horizon_ + 1; ++i) {
       // x'
       iRow[nz_index] = state_index;
