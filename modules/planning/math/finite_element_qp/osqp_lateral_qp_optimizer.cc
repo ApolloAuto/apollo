@@ -38,16 +38,6 @@ bool OsqpLateralQPOptimizer::optimize(
 
   CalcualteKernel(d_bounds, delta_s, &P_data_, &P_indices_, &P_indptr_);
 
-  c_int P_nnz = P_data_.size();
-  c_float P_x[P_nnz];  // NOLINT
-  std::copy(P_data_.begin(), P_data_.end(), P_x);
-
-  c_int P_i[P_indices_.size()];  // NOLINT
-  std::copy(P_indices_.begin(), P_indices_.end(), P_i);
-
-  c_int P_p[P_indptr_.size()];  // NOLINT
-  std::copy(P_indptr_.begin(), P_indptr_.end(), P_p);
-
   const int kNumVariable = d_bounds.size();
 
   delta_s_ = delta_s;
@@ -84,20 +74,7 @@ bool OsqpLateralQPOptimizer::optimize(
   CHECK_EQ(constraint_index, kNumConstraint);
 
   // change affine_constraint to CSC format
-  std::vector<c_float> A_data;
-  std::vector<c_int> A_indices;
-  std::vector<c_int> A_indptr;
-  DenseToCSCMatrix(affine_constraint, &A_data, &A_indices, &A_indptr);
-
-  c_int A_nnz = A_data.size();
-  c_float A_x[A_nnz];  // NOLINT
-  std::copy(A_data.begin(), A_data.end(), A_x);
-
-  c_int A_i[A_indices.size()];  // NOLINT
-  std::copy(A_indices.begin(), A_indices.end(), A_i);
-
-  c_int A_p[A_indptr.size()];  // NOLINT
-  std::copy(A_indptr.begin(), A_indptr.end(), A_p);
+  DenseToCSCMatrix(affine_constraint, &A_data_, &A_indices_, &A_indptr_);
 
   // offset
   double q[kNumVariable];
@@ -123,9 +100,11 @@ bool OsqpLateralQPOptimizer::optimize(
   OSQPData* data = reinterpret_cast<OSQPData*>(c_malloc(sizeof(OSQPData)));
   data->n = kNumVariable;
   data->m = affine_constraint.rows();
-  data->P = csc_matrix(data->n, data->n, P_nnz, P_x, P_i, P_p);
+  data->P = csc_matrix(data->n, data->n, P_data_.size(), P_data_.data(),
+                       P_indices_.data(), P_indptr_.data());
   data->q = q;
-  data->A = csc_matrix(data->m, data->n, A_nnz, A_x, A_i, A_p);
+  data->A = csc_matrix(data->m, data->n, A_data_.size(), A_data_.data(),
+                       A_indices_.data(), A_indptr_.data());
   data->l = lower_bounds;
   data->u = upper_bounds;
 
@@ -164,7 +143,7 @@ bool OsqpLateralQPOptimizer::optimize(
 void OsqpLateralQPOptimizer::CalcualteKernel(
     const std::vector<std::pair<double, double>>& d_bounds,
     const double delta_s, std::vector<c_float>* P_data,
-    std::vector<c_float>* P_indices, std::vector<c_float>* P_indptr) {
+    std::vector<c_int>* P_indices, std::vector<c_int>* P_indptr) {
   const int kNumVariable = d_bounds.size();
 
   // const int kNumOfMatrixElement = kNumVariable * kNumVariable;

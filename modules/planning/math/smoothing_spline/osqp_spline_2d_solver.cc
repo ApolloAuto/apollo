@@ -75,16 +75,6 @@ bool OsqpSpline2dSolver::Solve() {
   std::vector<c_int> P_indptr;
   DenseToCSCMatrix(P, &P_data, &P_indices, &P_indptr);
 
-  c_int P_nnz = P_data.size();
-  c_float P_x[P_nnz];  // NOLINT
-  std::copy(P_data.begin(), P_data.end(), P_x);
-
-  c_int P_i[P_indices.size()];  // NOLINT
-  std::copy(P_indices.begin(), P_indices.end(), P_i);
-
-  c_int P_p[P_indptr.size()];  // NOLINT
-  std::copy(P_indptr.begin(), P_indptr.end(), P_p);
-
   // change A to csc format
   const MatrixXd& inequality_constraint_matrix =
       constraint_.inequality_constraint().constraint_matrix();
@@ -103,16 +93,6 @@ bool OsqpSpline2dSolver::Solve() {
   std::vector<c_int> A_indices;
   std::vector<c_int> A_indptr;
   DenseToCSCMatrix(A, &A_data, &A_indices, &A_indptr);
-
-  c_int A_nnz = A_data.size();
-  c_float A_x[A_nnz];  // NOLINT
-  std::copy(A_data.begin(), A_data.end(), A_x);
-
-  c_int A_i[A_indices.size()];  // NOLINT
-  std::copy(A_indices.begin(), A_indices.end(), A_i);
-
-  c_int A_p[A_indptr.size()];  // NOLINT
-  std::copy(A_indptr.begin(), A_indptr.end(), A_p);
 
   // set q, l, u: l < A < u
   const MatrixXd& q_eigen = kernel_.offset();
@@ -148,17 +128,15 @@ bool OsqpSpline2dSolver::Solve() {
   OSQPSettings* settings =
       reinterpret_cast<OSQPSettings*>(c_malloc(sizeof(OSQPSettings)));
 
-  // Structures
-  OSQPWorkspace* work;  // Workspace
-  OSQPData* data;       // OSQPData
-
   // Populate data
-  data = reinterpret_cast<OSQPData*>(c_malloc(sizeof(OSQPData)));
+  OSQPData* data = reinterpret_cast<OSQPData*>(c_malloc(sizeof(OSQPData)));
   data->n = P.rows();
   data->m = constraint_num;
-  data->P = csc_matrix(data->n, data->n, P_nnz, P_x, P_i, P_p);
+  data->P = csc_matrix(data->n, data->n, P_data.size(), P_data.data(),
+                       P_indices.data(), P_indptr.data());
   data->q = q;
-  data->A = csc_matrix(data->m, data->n, A_nnz, A_x, A_i, A_p);
+  data->A = csc_matrix(data->m, data->n, A_data.size(), A_data.data(),
+                       A_indices.data(), A_indptr.data());
   data->l = l;
   data->u = u;
 
@@ -172,7 +150,7 @@ bool OsqpSpline2dSolver::Solve() {
   settings->verbose = FLAGS_enable_osqp_debug;
 
   // Setup workspace
-  work = osqp_setup(data, settings);
+  OSQPWorkspace* work = osqp_setup(data, settings);
 
   // Solve Problem
   osqp_solve(work);

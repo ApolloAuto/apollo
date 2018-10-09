@@ -94,16 +94,6 @@ bool OsqpSpline1dSolver::Solve() {
   std::vector<c_int> P_indptr;
   DenseToCSCMatrix(P, &P_data, &P_indices, &P_indptr);
 
-  c_int P_nnz = P_data.size();
-  c_float P_x[P_nnz];  // NOLINT
-  std::copy(P_data.begin(), P_data.end(), P_x);
-
-  c_int P_i[P_indices.size()];  // NOLINT
-  std::copy(P_indices.begin(), P_indices.end(), P_i);
-
-  c_int P_p[P_indptr.size()];  // NOLINT
-  std::copy(P_indptr.begin(), P_indptr.end(), P_p);
-
   // change A to csc format
   const MatrixXd& inequality_constraint_matrix =
       constraint_.inequality_constraint().constraint_matrix();
@@ -122,16 +112,6 @@ bool OsqpSpline1dSolver::Solve() {
   std::vector<c_int> A_indices;
   std::vector<c_int> A_indptr;
   DenseToCSCMatrix(A, &A_data, &A_indices, &A_indptr);
-
-  c_int A_nnz = A_data.size();
-  c_float A_x[A_nnz];  // NOLINT
-  std::copy(A_data.begin(), A_data.end(), A_x);
-
-  c_int A_i[A_indices.size()];  // NOLINT
-  std::copy(A_indices.begin(), A_indices.end(), A_i);
-
-  c_int A_p[A_indptr.size()];  // NOLINT
-  std::copy(A_indptr.begin(), A_indptr.end(), A_p);
 
   // set q, l, u: l < A < u
   const MatrixXd& q_eigen = kernel_.offset();
@@ -165,9 +145,11 @@ bool OsqpSpline1dSolver::Solve() {
 
   data_->n = P.rows();
   data_->m = constraint_num;
-  data_->P = csc_matrix(data_->n, data_->n, P_nnz, P_x, P_i, P_p);
+  data_->P = csc_matrix(data_->n, data_->n, P_data.size(), P_data.data(),
+                        P_indices.data(), P_indptr.data());
   data_->q = q;
-  data_->A = csc_matrix(data_->m, data_->n, A_nnz, A_x, A_i, A_p);
+  data_->A = csc_matrix(data_->m, data_->n, A_data.size(), A_data.data(),
+                        A_indices.data(), A_indptr.data());
   data_->l = l;
   data_->u = u;
 
