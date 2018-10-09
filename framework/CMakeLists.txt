@@ -6,10 +6,10 @@ include_directories(${INCLUDE_ROOT} ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_
 enable_language(ASM)
 
 # Cuda Environment
-find_package(CUDA)
+#find_package(CUDA)
 
-include_directories(${CUDA_INCLUDE_DIRS})
-link_directories(${CUDA_LIBRARY_DIRS})
+#include_directories(${CUDA_INCLUDE_DIRS})
+#link_directories(${CUDA_LIBRARY_DIRS})
 # End Cuda Environment
 
 include(${CMAKE_SOURCE_DIR}/cmake/Packages.cmake)
@@ -19,7 +19,10 @@ add_subdirectory(cybertron/common)
 add_subdirectory(cybertron/record)
 add_subdirectory(cybertron/py_wrapper)
 
+if(NOT MAKE_WITHOUT_TOOLS)
 add_subdirectory(cybertron/tools)
+endif()
+
 add_subdirectory(examples)
 #add_subdirectory(benchmark)
 add_subdirectory(cybertron/mainboard)
