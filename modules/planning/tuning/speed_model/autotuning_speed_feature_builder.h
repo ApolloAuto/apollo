@@ -16,7 +16,6 @@
 
 #pragma once
 
-
 #include "modules/planning/tuning/autotuning_feature_builder.h"
 
 namespace apollo {

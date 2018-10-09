@@ -15,7 +15,6 @@
  *****************************************************************************/
 #pragma once
 
-
 #include "modules/perception/common/i_lib/core/i_struct.h"
 #include "modules/perception/common/i_lib/core/i_alloc.h"
 #include "modules/perception/common/i_lib/geometry/i_line.h"

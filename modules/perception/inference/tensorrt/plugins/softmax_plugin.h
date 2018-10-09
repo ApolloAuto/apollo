@@ -16,7 +16,6 @@
 
 #pragma once
 
-
 #include "modules/perception/inference/tensorrt/rt_common.h"
 
 namespace apollo {

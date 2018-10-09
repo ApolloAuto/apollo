@@ -15,7 +15,6 @@
  *****************************************************************************/
 #pragma once
 
-
 #include <cstdlib>
 #include <map>
 #include <memory>

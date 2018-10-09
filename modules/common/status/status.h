@@ -20,7 +20,6 @@
 
 #pragma once
 
-
 #include <string>
 
 #include "google/protobuf/descriptor.h"

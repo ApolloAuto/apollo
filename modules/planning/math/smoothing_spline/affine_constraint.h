@@ -20,7 +20,6 @@
 
 #pragma once
 
-
 #include "Eigen/Core"
 #include "modules/planning/math/polynomial_xd.h"
 

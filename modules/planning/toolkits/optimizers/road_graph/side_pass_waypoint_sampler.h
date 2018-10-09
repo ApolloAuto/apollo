@@ -20,7 +20,6 @@
 
 #pragma once
 
-
 #include <vector>
 
 #include "modules/planning/toolkits/optimizers/road_graph/waypoint_sampler.h"

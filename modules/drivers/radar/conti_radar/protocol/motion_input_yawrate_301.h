@@ -16,7 +16,6 @@
 
 #pragma once
 
-
 #include <cmath>
 
 #include "modules/drivers/canbus/can_comm/protocol_data.h"

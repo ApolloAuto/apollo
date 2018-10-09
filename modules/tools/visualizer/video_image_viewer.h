@@ -16,7 +16,6 @@
 
 #pragma once
 
-
 #include <QOpenGLFunctions>
 #include <QOpenGLWidget>
 #include <memory>

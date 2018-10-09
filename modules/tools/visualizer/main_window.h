@@ -16,7 +16,6 @@
 
 #pragma once
 
-
 #include <QMainWindow>
 #include <QMenu>
 #include <QMutex>

@@ -16,7 +16,6 @@
 
 #pragma once
 
-
 #include <string>
 
 #include "modules/routing/graph/topo_node.h"

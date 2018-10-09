@@ -16,7 +16,6 @@
 
 #pragma once
 
-
 #include <memory>
 
 #include "modules/prediction/proto/scenario.pb.h"

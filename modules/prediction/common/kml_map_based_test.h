@@ -16,7 +16,6 @@
 
 #pragma once
 
-
 #include "gtest/gtest.h"
 
 #include "modules/common/configs/config_gflags.h"

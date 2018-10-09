@@ -16,7 +16,6 @@
 
 #pragma once
 
-
 /**
  * @namespace apollo::dreamview
  * @brief apollo::dreamview

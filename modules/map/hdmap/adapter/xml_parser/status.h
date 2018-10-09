@@ -14,7 +14,6 @@ limitations under the License.
 =========================================================================*/
 #pragma once
 
-
 #include <cstddef>
 #include <ostream>
 #include <sstream>

@@ -15,7 +15,6 @@
  *****************************************************************************/
 #pragma once
 
-
 #include <cfloat>
 #include <memory>
 #include <string>

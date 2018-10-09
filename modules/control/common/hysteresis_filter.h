@@ -21,7 +21,6 @@
 
 #pragma once
 
-
 /**
  * @namespace apollo::control
  * @brief apollo::control

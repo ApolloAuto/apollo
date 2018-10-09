@@ -15,7 +15,6 @@
  *****************************************************************************/
 #pragma once
 
-
 #include <string>
 
 #include "modules/canbus/proto/chassis_detail.pb.h"

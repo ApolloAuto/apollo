@@ -15,7 +15,6 @@
  *****************************************************************************/
 #pragma once
 
-
 #include <vector>
 #include "modules/perception/base/point_cloud.h"
 

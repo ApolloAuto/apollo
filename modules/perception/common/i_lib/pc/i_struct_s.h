@@ -16,7 +16,6 @@
 
 #pragma once
 
-
 #include <smmintrin.h>
 #include <cassert>
 #include <limits>

@@ -21,7 +21,6 @@
 
 #pragma once
 
-
 #include <string>
 #include <vector>
 #include "modules/common/math/box2d.h"

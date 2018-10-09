@@ -20,7 +20,6 @@
 
 #pragma once
 
-
 #include <string>
 
 #include "modules/common/proto/geometry.pb.h"

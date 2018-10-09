@@ -20,7 +20,6 @@
 
 #pragma once
 
-
 #include <memory>
 
 #include "modules/planning/lattice/trajectory1d/piecewise_acceleration_trajectory1d.h"

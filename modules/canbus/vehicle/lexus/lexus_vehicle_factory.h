@@ -20,7 +20,6 @@
 
 #pragma once
 
-
 #include <memory>
 
 #include "modules/canbus/proto/vehicle_parameter.pb.h"

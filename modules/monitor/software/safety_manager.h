@@ -15,7 +15,6 @@
  *****************************************************************************/
 #pragma once
 
-
 #include <string>
 
 #include "modules/dreamview/proto/hmi_config.pb.h"

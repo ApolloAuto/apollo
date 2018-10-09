@@ -20,7 +20,6 @@
 
 #pragma once
 
-
 #include <string>
 
 #include "cybertron/common/macros.h"

@@ -16,7 +16,6 @@
 
 #pragma once
 
-
 #include <rosbag/bag.h>
 #include <rosbag/view.h>
 

@@ -16,7 +16,6 @@
 
 #pragma once
 
-
 #include <memory>
 
 #include "cybertron/class_loader/class_loader.h"

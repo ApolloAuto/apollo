@@ -20,7 +20,6 @@
 
 #pragma once
 
-
 #include <dirent.h>
 #include <fcntl.h>
 #include <stdio.h>

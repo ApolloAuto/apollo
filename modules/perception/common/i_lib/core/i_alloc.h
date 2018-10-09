@@ -15,7 +15,6 @@
  *****************************************************************************/
 #pragma once
 
-
 #include <new>
 #include <iostream>
 #include "modules/perception/common/i_lib/core/i_basic.h"

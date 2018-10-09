@@ -33,7 +33,6 @@
 
 #pragma once
 
-
 #include <vector>
 
 #include "modules/common/proto/pnc_point.pb.h"

@@ -16,7 +16,6 @@
 
 #pragma once
 
-
 #include <QTreeWidget>
 
 class TreeWidget : public QTreeWidget {

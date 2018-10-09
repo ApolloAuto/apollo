@@ -21,7 +21,6 @@
 
 #pragma once
 
-
 #include <sys/time.h>
 
 #include "modules/canbus/proto/chassis_detail.pb.h"

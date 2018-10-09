@@ -14,7 +14,6 @@ limitations under the License.
 =========================================================================*/
 #pragma once
 
-
 #include <vector>
 
 #include "tinyxml2/tinyxml2.h"

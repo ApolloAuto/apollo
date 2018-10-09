@@ -20,7 +20,6 @@
 
 #pragma once
 
-
 #include "modules/common/configs/proto/vehicle_config.pb.h"
 #include "modules/planning/proto/planning_config.pb.h"
 #include "modules/planning/proto/st_boundary_config.pb.h"

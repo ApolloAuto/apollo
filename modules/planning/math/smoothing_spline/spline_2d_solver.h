@@ -20,7 +20,6 @@
 
 #pragma once
 
-
 #include <qpOASES.hpp>
 
 #include <memory>

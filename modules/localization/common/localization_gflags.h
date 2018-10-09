@@ -21,7 +21,6 @@
 
 #pragma once
 
-
 #include "gflags/gflags.h"
 
 DECLARE_string(localization_module_name);

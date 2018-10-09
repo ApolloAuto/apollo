@@ -20,7 +20,6 @@
 
 #pragma once
 
-
 #include "modules/planning/math/curve1d/curve1d.h"
 
 namespace apollo {

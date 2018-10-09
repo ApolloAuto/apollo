@@ -20,7 +20,6 @@
 
 #pragma once
 
-
 #include <vector>
 
 #include "modules/planning/common/trajectory/discretized_trajectory.h"

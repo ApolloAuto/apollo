@@ -21,7 +21,6 @@
 
 #pragma once
 
-
 #include <memory>
 
 #include "modules/localization/proto/localization.pb.h"

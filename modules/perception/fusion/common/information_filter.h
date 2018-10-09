@@ -15,7 +15,6 @@
  *****************************************************************************/
 #pragma once
 
-
 #include "modules/perception/fusion/common/base_filter.h"
 
 namespace apollo {

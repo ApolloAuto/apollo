@@ -15,7 +15,6 @@
  *****************************************************************************/
 #pragma once
 
-
 #include <memory>
 
 #include "cybertron/component/component.h"

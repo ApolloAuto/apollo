@@ -20,7 +20,6 @@
 
 #pragma once
 
-
 namespace apollo {
 namespace planning {
 

@@ -21,7 +21,6 @@
 
 #pragma once
 
-
 #include <cstdint>
 
 #include "modules/drivers/proto/pointcloud.pb.h"

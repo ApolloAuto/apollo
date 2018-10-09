@@ -21,7 +21,6 @@
 
 #pragma once
 
-
 namespace apollo {
 namespace common {
 namespace math {

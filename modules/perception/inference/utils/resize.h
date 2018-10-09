@@ -16,7 +16,6 @@
 
 #pragma once
 
-
 #include <cblas.h>
 #include <cuda_runtime_api.h>
 

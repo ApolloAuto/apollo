@@ -15,7 +15,6 @@
  *****************************************************************************/
 #pragma once
 
-
 #include "Eigen/Core"
 #include "Eigen/Geometry"
 #include "modules/perception/base/camera.h"

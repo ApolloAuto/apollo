@@ -15,7 +15,6 @@
  *****************************************************************************/
 #pragma once
 
-
 #include "cybertron/common/log.h"
 
 // 100-199 reserve for hd lidar(64...) module error

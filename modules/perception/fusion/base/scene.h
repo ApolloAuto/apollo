@@ -16,7 +16,6 @@
 
 #pragma once
 
-
 #include <deque>
 #include <map>
 #include <memory>

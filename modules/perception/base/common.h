@@ -16,7 +16,6 @@
 
 #pragma once
 
-
 #ifndef PERCEPTION_CPU_ONLY
 
 #include <cublas_v2.h>

@@ -16,7 +16,6 @@
 
 #pragma once
 
-
 #include "modules/monitor/hardware/can/esdcan/esdcan_test.h"
 
 /**

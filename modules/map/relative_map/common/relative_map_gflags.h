@@ -16,7 +16,6 @@
 
 #pragma once
 
-
 #include "gflags/gflags.h"
 
 DECLARE_string(relative_map_adapter_config_filename);

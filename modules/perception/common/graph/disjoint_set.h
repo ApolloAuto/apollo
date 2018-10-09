@@ -16,7 +16,6 @@
 
 #pragma once
 
-
 #include <vector>
 
 namespace apollo {

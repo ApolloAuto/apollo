@@ -15,7 +15,6 @@ limitations under the License.
 
 #pragma once
 
-
 #include "modules/canbus/proto/chassis_detail.pb.h"
 #include "modules/drivers/canbus/can_comm/message_manager.h"
 

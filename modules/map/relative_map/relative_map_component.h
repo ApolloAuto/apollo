@@ -16,7 +16,6 @@
 
 #pragma once
 
-
 #include <memory>
 
 #include "cybertron/component/timer_component.h"

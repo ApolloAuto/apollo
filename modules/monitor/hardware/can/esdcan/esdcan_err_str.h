@@ -16,7 +16,6 @@
 
 #pragma once
 
-
 #include "esd_can/include/ntcan.h"
 
 /**

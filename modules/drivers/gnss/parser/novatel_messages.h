@@ -22,7 +22,6 @@
 
 #pragma once
 
-
 #include <stdint.h>
 #include "modules/drivers/gnss/proto/config.pb.h"
 

@@ -20,7 +20,6 @@
 
 #pragma once
 
-
 #include <string>
 
 #include "modules/planning/common/frame.h"

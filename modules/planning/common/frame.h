@@ -20,7 +20,6 @@
 
 #pragma once
 
-
 #include <cstdint>
 #include <list>
 #include <map>

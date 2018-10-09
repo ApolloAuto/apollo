@@ -20,7 +20,6 @@
 
 #pragma once
 
-
 #include "modules/prediction/predictor/predictor.h"
 
 namespace apollo {

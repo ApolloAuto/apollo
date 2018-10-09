@@ -21,7 +21,6 @@
 
 #pragma once
 
-
 #include "modules/control/proto/pid_conf.pb.h"
 
 /**

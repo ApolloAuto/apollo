@@ -19,7 +19,6 @@
 
 #pragma once
 
-
 #include <stdint.h>
 
 #include "modules/drivers/gnss/util/macros.h"

@@ -16,7 +16,6 @@
 
 #pragma once
 
-
 #include <QColor>
 #include "modules/tools/visualizer/renderable_object.h"
 

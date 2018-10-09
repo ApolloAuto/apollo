@@ -20,7 +20,6 @@
 
 #pragma once
 
-
 #include <atomic>
 #include <future>
 #include <memory>

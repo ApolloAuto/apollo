@@ -21,7 +21,6 @@
 
 #pragma once
 
-
 #include <string>
 #include <vector>
 #include "esd_can/include/ntcan.h"

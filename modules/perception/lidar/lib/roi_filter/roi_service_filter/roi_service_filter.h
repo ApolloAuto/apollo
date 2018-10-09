@@ -16,7 +16,6 @@
 
 #pragma once
 
-
 #include <string>
 
 #include "modules/perception/lidar/lib/interface/base_roi_filter.h"

@@ -16,7 +16,6 @@
 
 #pragma once
 
-
 #include "gflags/gflags.h"
 
 DECLARE_bool(enable_adapter_dump);

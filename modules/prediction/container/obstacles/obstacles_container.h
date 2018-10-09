@@ -21,7 +21,6 @@
 
 #pragma once
 
-
 #include <vector>
 
 #include "cybertron/common/macros.h"

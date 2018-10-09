@@ -16,7 +16,6 @@
 
 #pragma once
 
-
 #include <string>
 
 #include "modules/map/proto/map_lane.pb.h"

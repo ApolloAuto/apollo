@@ -21,7 +21,6 @@
 
 #pragma once
 
-
 #include <vector>
 
 #include "modules/common/math/line_segment2d.h"

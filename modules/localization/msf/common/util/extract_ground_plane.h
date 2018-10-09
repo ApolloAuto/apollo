@@ -16,7 +16,6 @@
 
 #pragma once
 
-
 #include <cmath>
 #include <map>
 #include <unordered_map>

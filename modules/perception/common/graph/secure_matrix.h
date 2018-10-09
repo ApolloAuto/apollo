@@ -16,7 +16,6 @@
 
 #pragma once
 
-
 #include <memory>
 
 #include "Eigen/Dense"

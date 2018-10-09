@@ -16,7 +16,6 @@
 
 #pragma once
 
-
 #include <leveldb/db.h>
 #include <memory>
 #include <string>

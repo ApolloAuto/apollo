@@ -15,7 +15,6 @@
  *****************************************************************************/
 #pragma once
 
-
 #include "modules/monitor/common/recurrent_runner.h"
 
 namespace apollo {

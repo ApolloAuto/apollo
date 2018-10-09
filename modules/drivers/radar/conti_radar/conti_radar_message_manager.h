@@ -20,7 +20,6 @@
  */
 #pragma once
 
-
 #include <memory>
 #include "cybertron/cybertron.h"
 #include "modules/drivers/canbus/can_client/can_client_factory.h"

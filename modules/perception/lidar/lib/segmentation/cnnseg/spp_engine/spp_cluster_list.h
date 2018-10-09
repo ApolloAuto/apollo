@@ -15,7 +15,6 @@
  *****************************************************************************/
 #pragma once
 
-
 #include <vector>
 
 #include "modules/perception/lidar/lib/segmentation/cnnseg/spp_engine/spp_cluster.h"
