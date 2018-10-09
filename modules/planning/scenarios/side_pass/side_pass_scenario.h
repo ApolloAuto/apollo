@@ -55,6 +55,14 @@ class SidePassScenario : public Scenario {
                       const Frame& frame) const override;
 
  private:
+  enum SidePassStage {
+    OBSTACLE_APPROACH = 1,
+    PATH_GENERATION = 2,
+    WAITPOINT_STOP = 3,
+    SAFETY_DETECTION = 4,
+    OBSTACLE_PASS = 5,
+  };
+
   void RegisterTasks();
 
   apollo::common::util::Factory<TaskType, Task> task_factory_;
@@ -64,6 +72,8 @@ class SidePassScenario : public Scenario {
   ScenarioConfig config_;
 
   SpeedProfileGenerator speed_profile_generator_;
+
+  SidePassStage stage_ = OBSTACLE_APPROACH;
 };
 
 }  // namespace planning
