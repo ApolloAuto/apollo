@@ -26,7 +26,6 @@
 
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/planning/proto/planning.pb.h"
-#include "modules/planning/proto/planning_config.pb.h"
 
 #include "modules/common/status/status.h"
 #include "modules/common/util/factory.h"
@@ -75,12 +74,10 @@ class LaneFollowScenario : public Scenario {
   void RecordDebugInfo(ReferenceLineInfo* reference_line_info,
                        const std::string& name, const double time_diff_ms);
 
-  apollo::common::util::Factory<TaskType, Task> task_factory_;
-
+ private:
+  static int current_stage_index_;
   std::vector<std::unique_ptr<Task>> tasks_;
-
   ScenarioConfig config_;
-
   SpeedProfileGenerator speed_profile_generator_;
 };
 

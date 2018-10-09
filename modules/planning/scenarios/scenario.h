@@ -20,20 +20,29 @@
 
 #pragma once
 
-#include <set>
+#include <memory>
 #include <string>
+#include <vector>
 
 #include "modules/planning/proto/planning_config.pb.h"
 
 #include "modules/common/status/status.h"
 #include "modules/common/util/factory.h"
 #include "modules/planning/common/frame.h"
+#include "modules/planning/toolkits/task.h"
 
 namespace apollo {
 namespace planning {
 
 class Scenario {
  public:
+  enum ScenarioStatus {
+    STATUS_UNKNOWN = 0,
+    STATUS_INITED = 1,
+    STATUS_PROCESSING = 2,
+    STATUS_DONE = 3,
+  };
+
   Scenario() = default;
 
   explicit Scenario(const ScenarioConfig::ScenarioType& scenario_type)
@@ -52,8 +61,17 @@ class Scenario {
                               const common::TrajectoryPoint& ego_point,
                               const Frame& frame) const = 0;
 
+  const ScenarioStatus& GetStatus() const { return status_; }
+
+ protected:
+  bool InitTasks(const ScenarioConfig& config,
+                 const int current_stage_index,
+                 std::vector<std::unique_ptr<Task>>* tasks);
+
  protected:
   bool is_init_ = false;
+  apollo::common::util::Factory<TaskType, Task> task_factory_;
+  ScenarioStatus status_ = STATUS_UNKNOWN;
   const ScenarioConfig::ScenarioType scenario_type_;
 };
 

@@ -57,6 +57,8 @@ using common::TrajectoryPoint;
 using common::math::Vec2d;
 using common::time::Clock;
 
+int LaneFollowScenario::current_stage_index_ = 0;
+
 namespace {
 constexpr double kPathOptimizationFallbackCost = 2e4;
 constexpr double kSpeedOptimizationFallbackCost = 2e4;
@@ -91,29 +93,13 @@ bool LaneFollowScenario::Init() {
   CHECK(apollo::common::util::GetProtoFromFile(
       FLAGS_scenario_lane_follow_config_file, &config_));
 
-  // get all active tasks
-  std::vector<TaskType> tasks;
-  CHECK_GT(config_.stage_size(), 0);
-  // TODO(All): deal with multiple stages.
-  for (int i = 0; i < config_.stage(0).task_size(); ++i) {
-    tasks.push_back(config_.stage(0).task(i));
-  }
-
-  // init task with conf
-  for (int i = 0; i < config_.scenario_task_config_size(); ++i) {
-    auto task_cfg = config_.scenario_task_config(i);
-    TaskType task_type = task_cfg.task_type();
-    if (std::find(tasks.begin(), tasks.end(), task_type) != tasks.end()) {
-      tasks_.emplace_back(task_factory_.CreateObject(task_type));
-      AINFO << "Created task:" << TaskType_Name(task_type);
-      if (!tasks_.back()->Init(task_cfg)) {
-        AERROR << "Init task[" << TaskType_Name(task_type) << "] failed.";
-        return false;
-      }
-    }
+  if (!InitTasks(config_, current_stage_index_, &tasks_)) {
+    return false;
   }
 
   is_init_ = true;
+  status_ = STATUS_INITED;
+
   return true;
 }
 
@@ -166,6 +152,8 @@ void LaneFollowScenario::RecordDebugInfo(ReferenceLineInfo* reference_line_info,
 
 Status LaneFollowScenario::Process(const TrajectoryPoint& planning_start_point,
                                    Frame* frame) {
+  status_ = STATUS_PROCESSING;
+
   bool has_drivable_reference_line = false;
   bool disable_low_priority_path = false;
   auto status =

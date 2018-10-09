@@ -29,7 +29,6 @@ cc_library(
         "//modules/planning/reference_line",
         "//modules/planning/reference_line:qp_spline_reference_line_smoother",
         "//modules/planning/scenarios:scenario_lib",
-        "//modules/planning/toolkits:task",
         "//modules/planning/toolkits/optimizers:path_optimizer",
         "//modules/planning/toolkits/optimizers:speed_optimizer",
         "//modules/planning/toolkits/optimizers/dp_poly_path:dp_poly_path_optimizer",
