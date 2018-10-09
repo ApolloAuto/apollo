@@ -272,7 +272,6 @@ void Screen::ShowRenderMessage(int ch) {
     case 'D':
     case KEY_RIGHT: {
       RenderableMessage* child = current_render_obj_->Child(*y);
-
       if (child) {
         child->reset_line_page();
         current_render_obj_ = child;

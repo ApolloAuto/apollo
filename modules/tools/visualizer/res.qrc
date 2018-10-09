@@ -14,5 +14,7 @@
         <file>shaders/pointcloud.vert</file>
         <file>shaders/video_image_plane.frag</file>
         <file>shaders/video_image_plane.vert</file>
+        <file>shaders/radarpoints.frag</file>
+        <file>shaders/radarpoints.vert</file>
     </qresource>
 </RCC>
