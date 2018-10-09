@@ -22,7 +22,7 @@
 
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/toolkits/deciders/util.h"
+#include "modules/planning/traffic_rules/util.h"
 
 namespace apollo {
 namespace planning {

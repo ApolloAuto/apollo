@@ -18,20 +18,33 @@
  * @file
  **/
 
-#include "modules/planning/toolkits/deciders/object_priority.h"
+#pragma once
+
+
+#include <string>
+
+#include "modules/planning/traffic_rules/traffic_rule.h"
 
 namespace apollo {
 namespace planning {
 
-using apollo::common::Status;
+/**
+ * This class decides whether we should send rerouting request based on traffic
+ * situation.
+ */
+class ReferenceLineEnd : public TrafficRule {
+ public:
+  explicit ReferenceLineEnd(const TrafficRuleConfig& config);
+  virtual ~ReferenceLineEnd() = default;
 
-ObjectPriority::ObjectPriority(const TrafficRuleConfig& config)
-    : TrafficRule(config) {}
+  common::Status ApplyRule(Frame* const frame,
+                 ReferenceLineInfo* const reference_line_info);
 
-Status ObjectPriority::ApplyRule(Frame* const frame,
-                                 ReferenceLineInfo* const reference_line_info) {
-  return Status::OK();
-}
+ private:
+  static constexpr char const* const REF_LINE_END_VO_ID_PREFIX = "REF_END_";
+};
 
 }  // namespace planning
 }  // namespace apollo
+
+

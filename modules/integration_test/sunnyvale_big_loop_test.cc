@@ -24,7 +24,7 @@
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/toolkits/deciders/stop_sign.h"
+#include "modules/planning/traffic_rules/stop_sign.h"
 
 namespace apollo {
 namespace planning {

@@ -18,7 +18,7 @@
  * @file
  **/
 
-#include "modules/planning/toolkits/deciders/backside_vehicle.h"
+#include "modules/planning/traffic_rules/backside_vehicle.h"
 
 namespace apollo {
 namespace planning {

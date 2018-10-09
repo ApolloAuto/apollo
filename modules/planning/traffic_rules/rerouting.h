@@ -22,33 +22,29 @@
 
 
 #include <string>
-#include <vector>
 
-#include "modules/planning/toolkits/deciders/traffic_rule.h"
+#include "modules/planning/traffic_rules/traffic_rule.h"
 
 namespace apollo {
 namespace planning {
 
-class Crosswalk : public TrafficRule {
+/**
+ * This class decides whether we should send rerouting request based on traffic
+ * situation.
+ */
+class Rerouting : public TrafficRule {
  public:
-  explicit Crosswalk(const TrafficRuleConfig& config);
-  virtual ~Crosswalk() = default;
+  explicit Rerouting(const TrafficRuleConfig& config);
+  virtual ~Rerouting() = default;
 
   common::Status ApplyRule(Frame* const frame,
                  ReferenceLineInfo* const reference_line_info);
 
  private:
-  void MakeDecisions(Frame* const frame,
-                     ReferenceLineInfo* const reference_line_info);
-  bool FindCrosswalks(ReferenceLineInfo* const reference_line_info);
-  int BuildStopDecision(Frame* frame,
-                        ReferenceLineInfo* const reference_line_info,
-                        hdmap::PathOverlap* const crosswalk_overlap,
-                        std::vector<std::string> pedestrians);
+  bool ChangeLaneFailRerouting();
 
- private:
-  static constexpr char const* const CROSSWALK_VO_ID_PREFIX = "CW_";
-  std::vector<const hdmap::PathOverlap*> crosswalk_overlaps_;
+  ReferenceLineInfo* reference_line_info_ = nullptr;
+  Frame* frame_ = nullptr;
 };
 
 }  // namespace planning

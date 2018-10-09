@@ -18,7 +18,7 @@
  * @file
  **/
 
-#include "modules/planning/toolkits/deciders/rerouting.h"
+#include "modules/planning/traffic_rules/rerouting.h"
 
 #include "modules/common/proto/pnc_point.pb.h"
 

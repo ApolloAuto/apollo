@@ -23,28 +23,18 @@
 
 #include <string>
 
-#include "modules/planning/toolkits/deciders/traffic_rule.h"
+#include "modules/planning/traffic_rules/traffic_rule.h"
 
 namespace apollo {
 namespace planning {
 
-/**
- * This class decides whether we should send rerouting request based on traffic
- * situation.
- */
-class Rerouting : public TrafficRule {
+class ObjectPriority : public TrafficRule {
  public:
-  explicit Rerouting(const TrafficRuleConfig& config);
-  virtual ~Rerouting() = default;
+  explicit ObjectPriority(const TrafficRuleConfig& config);
+  virtual ~ObjectPriority() = default;
 
   common::Status ApplyRule(Frame* const frame,
                  ReferenceLineInfo* const reference_line_info);
-
- private:
-  bool ChangeLaneFailRerouting();
-
-  ReferenceLineInfo* reference_line_info_ = nullptr;
-  Frame* frame_ = nullptr;
 };
 
 }  // namespace planning

@@ -22,27 +22,33 @@
 
 
 #include <string>
+#include <vector>
 
-#include "modules/planning/toolkits/deciders/traffic_rule.h"
+#include "modules/planning/traffic_rules/traffic_rule.h"
 
 namespace apollo {
 namespace planning {
 
-class BacksideVehicle : public TrafficRule {
+class Crosswalk : public TrafficRule {
  public:
-  explicit BacksideVehicle(const TrafficRuleConfig& config);
-  virtual ~BacksideVehicle() = default;
+  explicit Crosswalk(const TrafficRuleConfig& config);
+  virtual ~Crosswalk() = default;
 
   common::Status ApplyRule(Frame* const frame,
                  ReferenceLineInfo* const reference_line_info);
 
  private:
-  /**
-   * @brief When the reference line info indicates that there is no lane change,
-   * use lane keeping strategy for back side vehicles.
-   */
-  void MakeLaneKeepingObstacleDecision(const SLBoundary& adc_sl_boundary,
-                                       PathDecision* path_decision);
+  void MakeDecisions(Frame* const frame,
+                     ReferenceLineInfo* const reference_line_info);
+  bool FindCrosswalks(ReferenceLineInfo* const reference_line_info);
+  int BuildStopDecision(Frame* frame,
+                        ReferenceLineInfo* const reference_line_info,
+                        hdmap::PathOverlap* const crosswalk_overlap,
+                        std::vector<std::string> pedestrians);
+
+ private:
+  static constexpr char const* const CROSSWALK_VO_ID_PREFIX = "CW_";
+  std::vector<const hdmap::PathOverlap*> crosswalk_overlaps_;
 };
 
 }  // namespace planning

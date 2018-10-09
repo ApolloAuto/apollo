@@ -80,7 +80,7 @@ cc_library(
         "//modules/planning/proto:planning_config_proto",
         "//modules/planning/proto:planning_proto",
         "//modules/planning/proto:traffic_rule_config_proto",
-        "//modules/planning/toolkits/deciders",
+        "//modules/planning/traffic_rules:traffic_decider",
         "//modules/prediction/proto:prediction_proto",
     ],
 )

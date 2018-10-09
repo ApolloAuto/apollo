@@ -18,7 +18,7 @@
  * @file
  **/
 
-#include "modules/planning/toolkits/deciders/creeper.h"
+#include "modules/planning/traffic_rules/creeper.h"
 
 #include <string>
 #include <vector>
@@ -26,7 +26,7 @@
 #include "modules/common/proto/pnc_point.pb.h"
 
 #include "modules/planning/common/frame.h"
-#include "modules/planning/toolkits/deciders/util.h"
+#include "modules/planning/traffic_rules/util.h"
 
 namespace apollo {
 namespace planning {

@@ -18,24 +18,24 @@
  * @file
  **/
 
-#include "modules/planning/toolkits/deciders/traffic_decider.h"
+#include "modules/planning/traffic_rules/traffic_decider.h"
 
 #include <limits>
 
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/toolkits/deciders/backside_vehicle.h"
-#include "modules/planning/toolkits/deciders/change_lane.h"
-#include "modules/planning/toolkits/deciders/creeper.h"
-#include "modules/planning/toolkits/deciders/crosswalk.h"
-#include "modules/planning/toolkits/deciders/destination.h"
-#include "modules/planning/toolkits/deciders/front_vehicle.h"
-#include "modules/planning/toolkits/deciders/keep_clear.h"
-#include "modules/planning/toolkits/deciders/pull_over.h"
-#include "modules/planning/toolkits/deciders/reference_line_end.h"
-#include "modules/planning/toolkits/deciders/rerouting.h"
-#include "modules/planning/toolkits/deciders/signal_light.h"
-#include "modules/planning/toolkits/deciders/stop_sign.h"
+#include "modules/planning/traffic_rules/backside_vehicle.h"
+#include "modules/planning/traffic_rules/change_lane.h"
+#include "modules/planning/traffic_rules/creeper.h"
+#include "modules/planning/traffic_rules/crosswalk.h"
+#include "modules/planning/traffic_rules/destination.h"
+#include "modules/planning/traffic_rules/front_vehicle.h"
+#include "modules/planning/traffic_rules/keep_clear.h"
+#include "modules/planning/traffic_rules/pull_over.h"
+#include "modules/planning/traffic_rules/reference_line_end.h"
+#include "modules/planning/traffic_rules/rerouting.h"
+#include "modules/planning/traffic_rules/signal_light.h"
+#include "modules/planning/traffic_rules/stop_sign.h"
 
 namespace apollo {
 namespace planning {

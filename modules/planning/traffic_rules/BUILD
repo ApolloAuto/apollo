@@ -52,7 +52,7 @@ cc_library(
 )
 
 cc_library(
-    name = "deciders",
+    name = "traffic_decider",
     srcs = [
         "traffic_decider.cc",
     ],

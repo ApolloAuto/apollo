@@ -20,7 +20,7 @@
 #include <algorithm>
 #include <vector>
 
-#include "modules/planning/toolkits/deciders/destination.h"
+#include "modules/planning/traffic_rules/destination.h"
 
 #include "modules/common/time/time.h"
 #include "modules/map/proto/map_lane.pb.h"

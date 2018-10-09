@@ -23,33 +23,26 @@
 
 #include <string>
 
-#include "modules/common/proto/geometry.pb.h"
-#include "modules/planning/toolkits/deciders/traffic_rule.h"
+#include "modules/planning/traffic_rules/traffic_rule.h"
 
 namespace apollo {
 namespace planning {
 
-/**
- * This class decides whether we should stop for destination.
- * situation.
- */
-class Destination : public TrafficRule {
+class BacksideVehicle : public TrafficRule {
  public:
-  explicit Destination(const TrafficRuleConfig& config);
-  virtual ~Destination() = default;
+  explicit BacksideVehicle(const TrafficRuleConfig& config);
+  virtual ~BacksideVehicle() = default;
 
   common::Status ApplyRule(Frame* const frame,
-                           ReferenceLineInfo* const reference_line_info);
+                 ReferenceLineInfo* const reference_line_info);
 
  private:
-  int BuildStopDecision(Frame* const frame,
-                        ReferenceLineInfo* const reference_line_info);
-  int Stop(Frame* const frame, ReferenceLineInfo* const reference_line_info,
-           const std::string lane_id, const double lane_s);
-  bool CheckPullOver(ReferenceLineInfo* const reference_line_info,
-                     const std::string& dest_lane_id, const double dest_lane_s,
-                     common::PointENU* dest_point);
-  int PullOver(common::PointENU* const dest_point);
+  /**
+   * @brief When the reference line info indicates that there is no lane change,
+   * use lane keeping strategy for back side vehicles.
+   */
+  void MakeLaneKeepingObstacleDecision(const SLBoundary& adc_sl_boundary,
+                                       PathDecision* path_decision);
 };
 
 }  // namespace planning

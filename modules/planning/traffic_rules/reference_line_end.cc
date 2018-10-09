@@ -18,7 +18,7 @@
  * @file
  **/
 
-#include "modules/planning/toolkits/deciders/reference_line_end.h"
+#include "modules/planning/traffic_rules/reference_line_end.h"
 
 #include "modules/common/proto/pnc_point.pb.h"
 
