@@ -2,37 +2,6 @@ import STORE from "store";
 import PARAMETERS from "store/config/parameters.yml";
 import { drawThickBandFromPoints } from "utils/draw";
 
-const PLANNING_PROPERTIES = {
-    planning_reference_line: {
-        optionName: 'showPlanningReference',
-        width: 0.15,
-        color: 0x36A2EB,
-        opacity: 1,
-        zOffset: 7
-    },
-    DpPolyPathOptimizer: {
-        optionName: 'showPlanningDpOptimizer',
-        width: 0.4,
-        color: 0x8DFCB4,
-        opacity: 0.8,
-        zOffset: 6
-    },
-    QpSplinePathOptimizer: {
-        optionName: 'showPlanningQpOptimizer',
-        width: 0.65,
-        color: 0xd85656,
-        opacity: 0.8,
-        zOffset: 5
-    },
-    trajectory: {
-        optionName: 'showPlanning',
-        width: 0.8,
-        color: 0x01D1C1,
-        opacity: 0.65,
-        zOffset: 4
-    }
-};
-
 function normalizePlanningTrajectory(trajectory, coordinates) {
     if (!trajectory) {
         return [];
@@ -99,8 +68,8 @@ export default class PlanningTrajectory {
         }
 
         // Draw paths
-        for (const name in PLANNING_PROPERTIES) {
-            const property = PLANNING_PROPERTIES[name];
+        for (const name in PARAMETERS.planning.pathProperties) {
+            const property = PARAMETERS.planning.pathProperties[name];
             if (!STORE.options[property.optionName]) {
                 if (this.paths[name]) {
                     this.paths[name].visible = false;

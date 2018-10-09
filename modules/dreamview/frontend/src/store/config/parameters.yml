@@ -40,27 +40,60 @@ planning:
   minInterval: 0.1
   defaults:
     width: 1.4
+  pathProperties:
+    trajectory:
+      optionName: 'showPlanningTrajectory'
+      width: 0.8
+      color: 0x01D1C1
+      opacity: 0.65
+      zOffset: 4
+    planning_reference_line:
+      optionName: 'showPlanningReference'
+      width: 0.15
+      color: 0x36A2EB
+      opacity: 1
+      zOffset: 7
+    DpPolyPathOptimizer:
+      optionName: 'showPlanningDpOptimizer'
+      width: 0.4
+      color: 0x8DFCB4
+      opacity: 0.8
+      zOffset: 6
+    QpSplinePathOptimizer:
+      optionName: 'showPlanningQpOptimizer'
+      width: 0.65
+      color: 0xd85656
+      opacity: 0.8
+      zOffset: 5
 options:
   defaults:
-    enableSimControl: false
+    # side bar options
+    showTasks: true
     showModuleController: false
     showMenu: false
+    showRouteEditingBar: false
     showPOI: false
     enableAudioCapture: false
-    showPNCMonitor: false
-    showRouteEditingBar: false
     showDataRecorder: false
-    showTasks: true
+
+    # task panel options
+    showPNCMonitor: false
+    enableSimControl: false
+    lockTaskPanel: false
     showVideo: false
+
+    # layer Menu options
+    cameraAngle: Default
+    showDecisionMain: true
+    showDecisionObstacle: true
+    showPlanningTrajectory: true
     showPlanningCar: false
     showPlanningReference: false
     showPlaningDpOptimizer: false
     showPlanningQpOptimizer: false
-    showPlanning: true
-    showDecisionMain: true
-    showDecisionObstacle: true
     showRouting: true
     showPerceptionLaneMarker: false
+    showPointCloud: false
     showPredictionMajor: true
     showPredictionMinor: true
     showObstaclesVehicle: true
@@ -75,7 +108,6 @@ options:
     showObstaclesHeading: true
     showObstaclesId: true
     showObstaclesInfo: true
-    showPointCloud: false
     showPositionGps: false
     showPositionLocalization: true
     showMapCrosswalk: true
@@ -87,7 +119,6 @@ options:
     showMapStopSign: true
     showMapSpeedBump: true
     showMapParkingSpace: true
-    cameraAngle: Default
 
 navigation:
   # possible options: BaiduMap or GoogleMap

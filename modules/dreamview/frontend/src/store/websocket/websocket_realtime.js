@@ -49,7 +49,7 @@ export default class RosWebSocketEndpoint {
                     STORE.hmi.updateVehicleParam(message.data);
                     break;
                 case "SimControlStatus":
-                    STORE.setOptionStatus('simControlEnabled', message.enabled);
+                    STORE.setOptionStatus('enableSimControl', message.enabled);
                     break;
                 case "SimWorldUpdate":
                     this.checkMessage(message);
