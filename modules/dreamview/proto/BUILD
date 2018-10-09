@@ -20,6 +20,21 @@ proto_library(
 )
 
 cc_proto_library(
+    name = "chart_proto",
+    deps = [
+        ":chart_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "chart_proto_lib",
+    srcs = ["chart.proto"],
+    deps = [
+        "//modules/common/proto:geometry_proto_lib",
+    ],
+)
+
+cc_proto_library(
     name = "point_cloud_proto",
     deps = [
         ":point_cloud_proto_lib",

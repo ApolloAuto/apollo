@@ -23,6 +23,7 @@
 
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/common/proto/pnc_point.pb.h"
+#include "modules/dreamview/proto/chart.pb.h"
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/perception/proto/traffic_light_detection.pb.h"
 #include "modules/planning/proto/planning.pb.h"
@@ -74,6 +75,9 @@ class PlanningBase {
   void FillPlanningPb(const double timestamp,
                       ADCTrajectory* const trajectory_pb);
   void SetFallbackTrajectory(ADCTrajectory* const trajectory_pb);
+
+  void ExportChart(const planning_internal::Debug& debug_info,
+                   planning_internal::Debug* debug_chart);
 
   LocalView local_view_;
   const hdmap::HDMap* hdmap_ = nullptr;

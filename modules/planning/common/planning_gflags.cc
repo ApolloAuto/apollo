@@ -260,9 +260,6 @@ DEFINE_string(planning_config_file,
 DEFINE_int32(trajectory_point_num_for_debug, 10,
              "number of output trajectory points for debugging");
 
-DEFINE_bool(enable_record_debug, true,
-            "True to enable record debug into debug protobuf.");
-
 DEFINE_bool(enable_lag_prediction, true,
             "Enable lagged prediction, which is more tolerant to obstacles "
             "that appear and disappear quickly");
@@ -415,3 +412,6 @@ DEFINE_bool(enable_osqp_debug, false,
             "True to turn on OSQP verbose debug output in log.");
 
 DEFINE_bool(use_static_waypoint_sampler, false, "Use static waypoint sampler");
+DEFINE_bool(export_chart, false, "export chart in planning");
+DEFINE_bool(enable_record_debug, true,
+            "True to enable record debug info in chart format");
