@@ -51,6 +51,16 @@ proto_library(
 )
 
 cc_proto_library(
+    name = "tools_frame_proto",
+    deps = [":tools_frame_proto_lib"],
+)
+
+proto_library(
+    name = "tools_frame_proto_lib",
+    srcs = ["frame.proto"],
+)
+
+cc_proto_library(
     name = "data_conf_proto",
     deps = [":data_conf_proto_lib"],
 )
