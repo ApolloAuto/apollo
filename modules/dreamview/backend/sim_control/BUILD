@@ -12,7 +12,7 @@ cc_library(
         "sim_control_interface.h",
     ],
     deps = [
-        "//cybertron",
+        "//framework:cybertron",
         "//modules/common/adapters:adapter_gflags",
         "//modules/dreamview/backend/common:dreamview_gflags",
         "//modules/dreamview/backend/map:map_service",

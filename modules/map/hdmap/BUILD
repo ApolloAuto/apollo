@@ -32,7 +32,7 @@ cc_library(
     hdrs = ["hdmap_util.h"],
     deps = [
         ":hdmap",
-        "//cybertron",
+        "//framework:cybertron",
         "//modules/common/configs:config_gflags",
         "//modules/common/util",
         "//modules/common/util:string_util",

@@ -22,7 +22,7 @@ cc_binary(
     ],
     deps = [
         ":visualizer_lib",
-        "//cybertron",
+        "//framework:cybertron",
         "@qt//:qt_core",
         "@qt//:qt_widgets",
         "@qt//:qt_gui",
@@ -60,7 +60,7 @@ qt_cc_library(
 
     deps = [
         "//modules/drivers/proto:sensor_proto",
-        "//cybertron",
+        "//framework:cybertron",
         "@qt//:qt_core",
         "@qt//:qt_widgets",
         "@qt//:qt_gui",

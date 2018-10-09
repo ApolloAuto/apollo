@@ -60,7 +60,7 @@ cc_binary(
         ":graph_creator",
         "//external:gflags",
         "//modules/common",
-        "//cybertron",
+        "//framework:cybertron",
         "//modules/common/configs:config_gflags",
         "//modules/common/status",
         "//modules/common/util",

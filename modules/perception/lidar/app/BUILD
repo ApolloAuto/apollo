@@ -19,7 +19,7 @@ cc_library(
         "lidar_obstacle_segmentation.h",
     ],
     deps = [
-        "//cybertron",
+        "//framework:cybertron",
         "//modules/common/proto:error_code_proto",
         "//modules/common/proto:header_proto",
         "//modules/drivers/proto:sensor_proto",
@@ -44,7 +44,7 @@ cc_library(
         "lidar_obstacle_tracking.h",
     ],
     deps = [
-        "//cybertron",
+        "//framework:cybertron",
         "//modules/common/util",
         "//modules/perception/base",
         "//modules/perception/lib/config_manager",

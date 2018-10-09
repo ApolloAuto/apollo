@@ -13,7 +13,7 @@ cc_library(
     ],
     deps = [
         "//modules/transform/proto:transform_proto",
-        "//cybertron",
+        "//framework:cybertron",
         "//third_party/tf2:tf2"
     ],
 )
@@ -27,7 +27,7 @@ cc_library(
     ],
     deps = [
         "//modules/transform/proto:transform_proto",
-        "//cybertron",
+        "//framework:cybertron",
         "//third_party/tf2:tf2"
     ],
 )
@@ -44,7 +44,7 @@ cc_library(
         "//modules/transform/proto:static_transform_conf_proto",
         "//modules/transform/proto:transform_proto",
         "//modules/common/util:file_util",
-        "//cybertron",
+        "//framework:cybertron",
         "//third_party/tf2:tf2",
         "@yaml_cpp//:yaml"
     ],

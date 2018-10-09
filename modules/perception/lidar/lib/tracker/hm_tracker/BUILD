@@ -47,7 +47,7 @@ cc_library(
         "//modules/perception/lib/io:file_util",
         "//modules/perception/common/geometry:basic",
         "//modules/perception/lidar/lib/tracker/common:track_data",
-        "//cybertron",
+        "//framework:cybertron",
         "@eigen",
     ],
 )
@@ -99,7 +99,7 @@ cc_library(
     deps = [
         "//modules/perception/lidar/lib/tracker/common:track_data",
         "//modules/perception/lidar/lib/tracker/common:tracked_object",
-        "//cybertron",
+        "//framework:cybertron",
         "@eigen",
     ],
 )
@@ -115,7 +115,7 @@ cc_library(
     deps = [
         "//modules/perception/common/graph:secure_matrix",
         "//modules/perception/lidar/lib/interface:base_bipartite_graph_matcher",
-        "//cybertron",
+        "//framework:cybertron",
     ],
 )
 
@@ -152,7 +152,7 @@ cc_library(
         "//modules/perception/common/geometry:basic",
         "//modules/perception/common/geometry:common",
         "//modules/perception/lidar/lib/tracker/common:track_data",
-        "//cybertron",
+        "//framework:cybertron",
     ],
 )
 
@@ -190,7 +190,7 @@ cc_library(
         "//modules/perception/common/graph:secure_matrix",
         "//modules/perception/lidar/lib/interface:base_bipartite_graph_matcher",
         "@eigen",
-        "//cybertron",
+        "//framework:cybertron",
     ],
 )
 
@@ -215,7 +215,7 @@ cc_library(
         "//modules/perception/lidar/lib/tracker/common:track_data",
         "//modules/perception/lidar/lib/tracker/common:tracked_object",
         "@eigen",
-        "//cybertron",
+        "//framework:cybertron",
     ],
 )
 
@@ -259,7 +259,7 @@ cc_library(
         "//modules/perception/lidar/lib/tracker/common:track_data",
         "//modules/perception/lidar/lib/tracker/common:track_pool_types",
         "//modules/perception/lidar/lib/tracker/common:tracked_object",
-        "//cybertron",
+        "//framework:cybertron",
     ],
 )
 
@@ -289,7 +289,7 @@ cc_library(
         "//modules/perception/lidar/lib/tracker/common:track_pool_types",
         "//modules/perception/lidar/common:feature_descriptor",
         "//modules/perception/lidar/common:lidar_object_util",
-        "//cybertron",
+        "//framework:cybertron",
     ],
 )
 

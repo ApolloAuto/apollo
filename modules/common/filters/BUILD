@@ -12,7 +12,7 @@ cc_library(
     ],
     deps = [
         ":digital_filter_coefficients",
-        "//cybertron",
+        "//framework:cybertron",
     ],
 )
 
@@ -25,7 +25,7 @@ cc_library(
         "mean_filter.h",
     ],
     deps = [
-        "//cybertron",
+        "//framework:cybertron",
     ],
 )
 
@@ -59,7 +59,7 @@ cc_test(
         ":digital_filter_coefficients",
         "//modules/common",
         "@gtest//:main",
-        "//cybertron",
+        "//framework:cybertron",
     ],
 )
 

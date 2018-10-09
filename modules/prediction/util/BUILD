@@ -10,7 +10,7 @@ cc_library(
         "data_extraction.h",
     ],
     deps = [
-        "//cybertron",
+        "//framework:cybertron",
         "//modules/common",
     ],
 )

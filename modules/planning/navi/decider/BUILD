@@ -11,7 +11,7 @@ cc_library(
         "navi_task.h",
     ],
     deps = [
-        "//cybertron",
+        "//framework:cybertron",
         "//modules/common/status",
         "//modules/planning/common:frame",
         "//modules/planning/common:planning_gflags",
@@ -33,7 +33,7 @@ cc_library(
     ],
     deps = [
         ":navi_task",
-        "//cybertron",
+        "//framework:cybertron",
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/math",
         "//modules/common/status",
@@ -60,7 +60,7 @@ cc_library(
     ],
     deps = [
         ":navi_task",
-        "//cybertron",
+        "//framework:cybertron",
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/math",
         "//modules/common/status",
@@ -85,7 +85,7 @@ cc_library(
     ],
     deps = [
         ":navi_task",
-        "//cybertron",
+        "//framework:cybertron",
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/math",
         "//modules/common/math:path_matcher",

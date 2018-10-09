@@ -34,7 +34,7 @@ cc_library(
         "interpolation_1d.h",
     ],
     deps = [
-        "//cybertron",
+        "//framework:cybertron",
         "@eigen//:eigen",
     ],
 )
@@ -48,7 +48,7 @@ cc_library(
         "interpolation_2d.h",
     ],
     deps = [
-        "//cybertron",
+        "//framework:cybertron",
         "@eigen//:eigen",
     ],
 )
@@ -62,7 +62,7 @@ cc_library(
         "pid_controller.h",
     ],
     deps = [
-        "//cybertron",
+        "//framework:cybertron",
         "//modules/control/proto:control_proto",
     ],
 )
@@ -77,7 +77,7 @@ cc_library(
     ],
     deps = [
         ":pid_controller",
-        "//cybertron",
+        "//framework:cybertron",
         "//modules/common/math",
         "//modules/control/proto:control_proto",
     ],
@@ -93,7 +93,7 @@ cc_library(
     ],
     deps = [
         ":pid_controller",
-        "//cybertron",
+        "//framework:cybertron",
         "//modules/common/math",
         "//modules/control/proto:control_proto",
     ],
@@ -108,7 +108,7 @@ cc_library(
         "trajectory_analyzer.h",
     ],
     deps = [
-        "//cybertron",
+        "//framework:cybertron",
         "//modules/common/math:linear_interpolation",
         "//modules/common/math:search",
         "//modules/common/proto:pnc_point_proto",
@@ -150,7 +150,7 @@ cc_test(
     data = ["//modules/control/testdata:control_testdata"],
     deps = [
         ":interpolation_1d",
-        "//cybertron",
+        "//framework:cybertron",
         "//modules/common/util",
         "//modules/control/proto:control_proto",
         "@gtest//:main",
@@ -166,7 +166,7 @@ cc_test(
     data = ["//modules/control/testdata:control_testdata"],
     deps = [
         ":interpolation_2d",
-        "//cybertron",
+        "//framework:cybertron",
         "//modules/common/util",
         "//modules/control/proto:control_proto",
         "@gtest//:main",

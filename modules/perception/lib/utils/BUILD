@@ -21,7 +21,7 @@ cc_library(
     srcs = ["timer.cc"],
     hdrs = ["timer.h"],
     deps = [
-        "//cybertron",
+        "//framework:cybertron",
         ":perception_perf",
     ],
 )
@@ -56,7 +56,7 @@ cc_library(
     srcs = ["string_util.cc"],
     hdrs = ["string_util.h"],
     deps = [
-        "//cybertron",
+        "//framework:cybertron",
     ],
 )
 

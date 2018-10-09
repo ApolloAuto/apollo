@@ -7,7 +7,7 @@ cc_library(
     srcs = ["empty_predictor.cc"],
     hdrs = ["empty_predictor.h"],
     deps = [
-        "//cybertron",
+        "//framework:cybertron",
         "//modules/prediction/predictor",
     ],
 )

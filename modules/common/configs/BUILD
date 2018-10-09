@@ -31,7 +31,7 @@ cc_library(
     ],
     deps = [
         ":config_gflags",
-        "//cybertron",
+        "//framework:cybertron",
         "//modules/common",
         "//modules/common/configs/proto:vehicle_config_proto",
         "//modules/common/util",

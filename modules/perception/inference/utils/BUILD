@@ -12,7 +12,7 @@ cuda_library(
         "cuda_util.h",
     ],
     deps = [
-        "//cybertron",
+        "//framework:cybertron",
         "@cuda",
     ],
 )
@@ -37,7 +37,7 @@ cuda_library(
         "util.h",
     ],
     deps = [
-        "//cybertron",
+        "//framework:cybertron",
         "@cuda",
         "@eigen",
     ],
@@ -69,7 +69,7 @@ cuda_library(
         "resize.h",
     ],
     deps = [
-        "//cybertron",
+        "//framework:cybertron",
         ":inference_util_lib",
         ":inference_cuda_util_lib",
         "//modules/perception/base:blob",
@@ -87,7 +87,7 @@ cuda_library(
         "gemm.h",
     ],
     deps = [
-        "//cybertron",
+        "//framework:cybertron",
         ":inference_util_lib",
         ":inference_cuda_util_lib",
         "//modules/perception/base:blob",

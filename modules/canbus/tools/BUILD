@@ -11,7 +11,7 @@ cc_binary(
         "//modules/canbus/common:canbus_common",
         "//modules/common",
         "//modules/common/adapters:adapter_gflags",
-        "//cybertron",
+        "//framework:cybertron",
     ],
 )
 
@@ -24,7 +24,7 @@ cc_binary(
         "//modules/canbus/proto:canbus_proto",
         "//modules/common",
         "//modules/control/proto:control_proto",
-        "//cybertron",
+        "//framework:cybertron",
     ],
 )
 
