@@ -92,6 +92,18 @@ class RecordReader(object):
         """
         return _CYBER_RECORD.PyRecordReader_GetHeaderString(self.record_reader)
 
+    def reset(self):
+        """
+        return reset.
+        """
+        return _CYBER_RECORD.PyRecordReader_Reset(self.record_reader)
+
+    def get_channellist(self):
+        """
+        return channel list.
+        """
+        return _CYBER_RECORD.PyRecordReader_GetChannelList(self.record_reader)
+
 class RecordWriter(object):
     """
     Class for cybertron RecordWriter wrapper.
@@ -121,7 +133,7 @@ class RecordWriter(object):
         return _CYBER_RECORD.PyRecordWriter_WriteChannel(self.record_writer,
                     channel_name, type_name, proto_desc)
 
-    def write_message(self, channel_name, data, time, raw = True):
+    def write_message(self, channel_name, data, time, raw=True):
         """
         writer msg:channelname,rawmsg,writer time
         """
@@ -136,3 +148,38 @@ class RecordWriter(object):
             desc_str = proto.SerializeToString()
             return _CYBER_RECORD.PyRecordWriter_WriteMessage(self.record_writer,
                     channel_name, data.SerializeToString(), time, desc_str)
+
+    def set_size_fileseg(self, size_kilobytes):
+        """
+        return filesegment size.
+        """
+        return _CYBER_RECORD.PyRecordWriter_SetSizeOfFileSegmentation(
+                    self.record_writer, size_kilobytes)
+
+    def set_intervaltime_fileseg(self, time_sec):
+        """
+        return file interval time.
+        """
+        return _CYBER_RECORD.PyRecordWriter_SetIntervalOfFileSegmentation(
+                    self.record_writer, time_sec)
+
+    def get_messagenumber(self, channel_name):
+        """
+        return message count.
+        """
+        return _CYBER_RECORD.PyRecordWriter_GetMessageNumber(
+                    self.record_writer, channel_name)
+
+    def get_messagetype(self, channel_name):
+        """
+        return message type.
+        """
+        return _CYBER_RECORD.PyRecordWriter_GetMessageType(
+                    self.record_writer, channel_name)
+
+    def get_protodesc(self, channel_name):
+        """
+        return message protodesc.
+        """
+        return _CYBER_RECORD.PyRecordWriter_GetProtoDesc(
+                    self.record_writer, channel_name)

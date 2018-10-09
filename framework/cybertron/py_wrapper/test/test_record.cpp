@@ -14,6 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include <set>
 #include <string>
 
 #include "cybertron/cybertron.h"
@@ -34,6 +35,9 @@ TEST(CyberRecordTest, record_readerwriter) {
   EXPECT_TRUE(rec_writer.Open(TEST_RECORD_FILE));
   rec_writer.WriteChannel(CHAN_1, MSG_TYPE, STR_10B);
   rec_writer.WriteMessage(CHAN_1, STR_10B, 888);
+  EXPECT_EQ(1, rec_writer.GetMessageNumber(CHAN_1));
+  EXPECT_EQ(MSG_TYPE, rec_writer.GetMessageType(CHAN_1));
+  EXPECT_EQ(STR_10B, rec_writer.GetProtoDesc(CHAN_1));
   rec_writer.Close();
 
   // read
@@ -43,6 +47,10 @@ TEST(CyberRecordTest, record_readerwriter) {
   sleep(1);
   int count = 0;
   apollo::cybertron::record::BagMessage bag_msg = rec_reader.ReadMessage();
+
+  std::set<std::string> channel_list = rec_reader.GetChannelList();
+  EXPECT_EQ(1, channel_list.size());
+  EXPECT_EQ(CHAN_1, *channel_list.begin());
 
   std::string channel_name = bag_msg.channel_name;
   EXPECT_EQ(CHAN_1, channel_name);

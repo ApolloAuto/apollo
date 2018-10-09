@@ -22,6 +22,7 @@
 #include <iostream>
 #include <memory>
 #include <mutex>
+#include <set>
 #include <string>
 #include <thread>
 
@@ -94,6 +95,12 @@ class PyRecordReader {
     return org_data;
   }
 
+  void Reset() { record_reader_->Reset(); }
+
+  std::set<std::string> GetChannelList() const {
+    return record_reader_->GetChannelList();
+  }
+
  private:
   std::unique_ptr<RecordReader> record_reader_;
 };
@@ -118,6 +125,26 @@ class PyRecordWriter {
     return recored_writer_.WriteMessage(
         channel_name, std::make_shared<message::RawMessage>(rawmessage), time,
         proto_desc);
+  }
+
+  bool SetSizeOfFileSegmentation(uint64_t size_kilobytes) {
+    return recored_writer_.SetSizeOfFileSegmentation(size_kilobytes);
+  }
+
+  bool SetIntervalOfFileSegmentation(uint64_t time_sec) {
+    return recored_writer_.SetIntervalOfFileSegmentation(time_sec);
+  }
+
+  uint64_t GetMessageNumber(const std::string& channel_name) const {
+    return recored_writer_.GetMessageNumber(channel_name);
+  }
+
+  const std::string& GetMessageType(const std::string& channel_name) const {
+    return recored_writer_.GetMessageType(channel_name);
+  }
+
+  const std::string& GetProtoDesc(const std::string& channel_name) const {
+    return recored_writer_.GetProtoDesc(channel_name);
   }
 
  private:
