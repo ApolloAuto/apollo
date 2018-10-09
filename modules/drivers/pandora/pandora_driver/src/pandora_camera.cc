@@ -250,8 +250,7 @@ void PandoraCamera::yuv422ToCvmat(boost::shared_ptr<cv::Mat> dst,
 static void my_output_message(j_common_ptr ptr) { return; }
 
 static void print_mem(unsigned char *mem, unsigned int size) {
-  int i = 0;
-  for (i = 0; i < size; i++) {
+  for (int i = 0; i < size; i++) {
     printf("%02x ", mem[i]);
   }
   printf("\n");
