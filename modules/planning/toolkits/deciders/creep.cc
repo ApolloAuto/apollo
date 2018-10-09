@@ -54,6 +54,14 @@ Status Creep::Process(Frame* frame,
   return Status::OK();
 }
 
+
+
+double FindCreepDistance(Frame* frame,
+                         ReferenceLineInfo* reference_line_info) {
+  // TODO(all)
+  return 0.5;
+}
+
 // TODO(all): revisit & rewrite
 // bool Creep::BuildStopDecision(Frame* frame,
 //                              ReferenceLineInfo* reference_line_info,
@@ -65,7 +73,7 @@ bool Creep::BuildStopDecision(
   CHECK_NOTNULL(reference_line_info);
 
   double adc_front_edge_s = reference_line_info->AdcSlBoundary().end_s();
-  const double creep_distance = config_.creep_distance_pass_stop_line();
+  const double creep_distance = FindCreepDistance(frame, reference_line_info);
   double creep_stop_s = adc_front_edge_s + + creep_distance;
 
   // create virtual stop wall
