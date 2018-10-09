@@ -23,4 +23,16 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "proceed_with_caution_speed_generator_test",
+    size = "small",
+    srcs = [
+        "proceed_with_caution_speed_generator_test.cc",
+    ],
+    deps = [
+        ":proceed_with_caution_speed_generator",
+        "@gtest//:main",
+    ],
+)
+
 cpplint()
