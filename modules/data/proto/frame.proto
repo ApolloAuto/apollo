@@ -1,0 +1,60 @@
+syntax = "proto2";
+
+message Vector3 {
+  required double x = 1;
+  required double y = 2;
+  required double z = 3;
+}
+
+message Vector4 {
+  required double x = 1;
+  required double y = 2;
+  required double z = 3;
+  required double i = 4;
+  optional bool is_ground = 5 [default = false];
+}
+
+message Quaternion {
+  required double x = 1;
+  required double y = 2;
+  required double z = 3;
+  required double w = 4;
+}
+
+message GPSPose {
+  required double lat = 1;
+  required double lon = 2;
+  required double bearing = 3;
+}
+
+message CameraImage {
+  optional double timestamp = 1;
+  required string image_url = 2;
+  optional Vector3 position = 3;
+  optional Quaternion heading = 4;
+  optional double fx = 5;
+  optional double fy = 6;
+  optional double cx = 7;
+  optional double cy = 8;
+  optional double skew = 9;
+  optional double k1 = 10;
+  optional double k2 = 11;
+  optional double k3 = 12;
+  optional double p1 = 13;
+  optional double p2 = 14;
+}
+
+message RadarPoint {
+  optional Vector3 position = 1;
+  optional Vector3 direction = 2;
+}
+
+message Frame {
+  optional Vector3 device_position = 1;
+  optional Quaternion device_heading = 2;
+  optional GPSPose device_gps_pose = 3;
+  repeated Vector4 points = 4;
+  repeated RadarPoint radar_points = 5;
+  repeated CameraImage images = 6;
+  optional double timestamp = 7;
+}
