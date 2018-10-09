@@ -11,7 +11,7 @@ cc_library(
         ":third_party_perception_filter",
         ":third_party_perception_fusion",
         "//modules/common/adapters:adapter_gflags",
-        "//framework:cybertron",
+        "//cybertron",
         "//modules/common/util:message_util",
         "//modules/drivers/proto:sensor_proto",
         "//modules/localization/proto:localization_proto",
@@ -82,7 +82,7 @@ cc_library(
     ],
     deps = [
         ":third_party_perception_lib",
-        "//framework:cybertron",
+        "//cybertron",
     ],
     copts = ['-DMODULE_NAME=\\"third_party_perception\\"']
 )

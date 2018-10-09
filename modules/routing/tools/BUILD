@@ -9,7 +9,7 @@ cc_binary(
         "//modules/common",
         "//modules/common/util",
         "//modules/routing:routing_lib",
-        "//framework:cybertron",
+        "//cybertron",
    ],
 )
 
@@ -21,7 +21,7 @@ cc_binary(
         "//modules/common/util",
         "//modules/planning/proto:planning_proto",
         "//modules/routing:routing_lib",
-        "//framework:cybertron",
+        "//cybertron",
    ],
 )
 
@@ -32,7 +32,7 @@ cc_binary(
         "//modules/common",
         "//modules/common/util",
         "//modules/routing:routing_lib",
-        "//framework:cybertron",
+        "//cybertron",
    ],
 )
 

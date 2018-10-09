@@ -14,7 +14,7 @@ cc_library(
         "-lboost_thread",
     ],
     deps = [
-        "//framework:cybertron",
+        "//cybertron",
         "//modules/common/adapters:adapter_gflags",
         "//modules/dreamview/backend/common:dreamview_gflags",
         "//modules/dreamview/backend/handlers:websocket_handler",

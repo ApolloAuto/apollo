@@ -11,7 +11,7 @@ cc_library(
         "constraint_checker.h",
     ],
     deps = [
-        "//framework:cybertron",
+        "//cybertron",
         "//modules/common/proto:pnc_point_proto",
         "//modules/common/vehicle_state:vehicle_state_provider",
         "//modules/planning/common:planning_gflags",
@@ -29,7 +29,7 @@ cc_library(
         "constraint_checker1d.h",
     ],
     deps = [
-        "//framework:cybertron",
+        "//cybertron",
         "//modules/planning/common:frame",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/common/trajectory:discretized_trajectory",
@@ -46,7 +46,7 @@ cc_library(
         "collision_checker.h",
     ],
     deps = [
-        "//framework:cybertron",
+        "//cybertron",
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/math:geometry",
         "//modules/common/math:path_matcher",

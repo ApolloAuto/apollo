@@ -13,7 +13,7 @@ cc_library(
         "timer.h",
     ],
     deps = [
-        "//framework:cybertron",
+        "//cybertron",
         "//modules/common/configs:config_gflags",
     ],
 )

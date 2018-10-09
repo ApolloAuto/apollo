@@ -1,0 +1,46 @@
+syntax = "proto2";
+
+package adu.common.header;
+
+message Header {
+  // Message publishing time in seconds. It is recommended to obtain timestamp_sec from
+  // ros::Time::now(), right before calling SerializeToString() and publish().
+  optional double timestamp_sec = 1;
+
+  // Module name.
+  optional string module_name = 2;
+
+  // Sequence number for each message. Each module maintains its own counter for sequence_num,
+  // always starting from 0 on boot.
+  optional uint32 sequence_num = 3;
+
+  // Lidar Sensor timestamp for nano-second.
+  optional uint64 lidar_timestamp = 4;
+
+  // Camera Sensor timestamp for nano-second.
+  optional uint64 camera_timestamp = 5;
+
+  // Radar Sensor timestamp for nano-second.
+  optional uint64 radar_timestamp = 6;
+
+  // Module Start timestamp, shall be consistant with finish timestamp
+  optional double start_time = 7;
+
+  // Module Finish timestamp
+  optional double finish_time = 8;
+
+  // Depended Module ID
+  repeated Module depended_modules = 9;
+
+  // The frame id of message
+  optional string frame_id = 10;
+
+  // The stamp when message is publishing
+  optional uint64 stamp = 11;
+
+}
+
+message Module {
+  optional string module_name = 1;
+  optional uint32 sequence_num = 2;
+}

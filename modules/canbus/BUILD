@@ -9,7 +9,7 @@ cc_library(
     copts = ["-DMODULE_NAME=\\\"canbus\\\""],
     deps = [
         "//external:gflags",
-        "//framework:cybertron",
+        "//cybertron",
         "//modules/canbus/common:canbus_common",
         "//modules/canbus/vehicle:vehicle_factory",
         "//modules/common",

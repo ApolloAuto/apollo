@@ -6,7 +6,7 @@ cc_binary(
     name = "offline_lidar_obstacle_perception",
     srcs = ["offline_lidar_obstacle_perception.cc"],
     deps = [
-        "//framework:cybertron",
+        "//cybertron",
         "//modules/drivers/proto:sensor_proto",
         "//modules/map/proto:map_proto",
         "//modules/perception/base",
