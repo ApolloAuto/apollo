@@ -46,13 +46,18 @@ class OsqpLateralQPOptimizer : public LateralQPOptimizer {
  private:
   void CalcualteKernel(const std::vector<std::pair<double, double>>& d_bounds,
                        const double delta_s, std::vector<c_float>* P_data,
-                       std::vector<c_float>* P_indices,
-                       std::vector<c_float>* P_indptr);
+                       std::vector<c_int>* P_indices,
+                       std::vector<c_int>* P_indptr);
 
   // kernel
   std::vector<c_float> P_data_;
-  std::vector<c_float> P_indices_;
-  std::vector<c_float> P_indptr_;
+  std::vector<c_int> P_indices_;
+  std::vector<c_int> P_indptr_;
+
+  // affine_constraint
+  std::vector<c_float> A_data_;
+  std::vector<c_int> A_indices_;
+  std::vector<c_int> A_indptr_;
 };
 
 }  // namespace planning
