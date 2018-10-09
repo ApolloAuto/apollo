@@ -1,0 +1,12 @@
+syntax = "proto2";
+
+package apollo.cybertron.proto;
+
+enum RunMode {
+  MODE_REALITY = 0;
+  MODE_SIMULATION = 1;
+}
+
+message RunModeConf {
+  required RunMode run_mode = 1 [default = MODE_REALITY];
+}

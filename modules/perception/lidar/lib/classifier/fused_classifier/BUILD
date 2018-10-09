@@ -11,7 +11,7 @@ cc_library(
         "util.h",
     ],
     deps = [
-        "//framework:cybertron",
+        "//cybertron",
         "//modules/perception/base:object",
         "@eigen",
     ],
@@ -40,7 +40,7 @@ cc_library(
     deps = [
         ":type_fusion_interface",
         ":util",
-        "//framework:cybertron",
+        "//cybertron",
         "//modules/common/util:file_util",
         "//modules/perception/base:object",
         "//modules/perception/base:point_cloud",
@@ -61,7 +61,7 @@ cc_library(
     ],
     deps = [
         ":type_fusion_interface",
-        "//framework:cybertron",
+        "//cybertron",
         "//modules/common/util:file_util",
         "//modules/perception/lib/config_manager",
         "//modules/perception/lib/io:file_util",

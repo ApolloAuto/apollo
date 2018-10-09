@@ -11,7 +11,7 @@ cc_library(
         "rt_common.h",
     ],
     deps = [
-        "//framework:cybertron",
+        "//cybertron",
         "//modules/perception/base:common",
         "//modules/perception/proto:rt_proto",
         "@tensorrt",
@@ -38,7 +38,7 @@ cc_library(
     ],
     deps = [
         "//modules/perception/proto:rt_proto",
-        "//framework:cybertron",
+        "//cybertron",
         "@tensorrt",
     ],
 )
@@ -72,7 +72,7 @@ cc_library(
         "//modules/perception/proto:rt_proto",
         "//modules/perception/inference:inference_lib",
         "//modules/perception/inference/tensorrt/plugins:perception_inference_tensorrt_plugins",
-        "//framework:cybertron",
+        "//cybertron",
         "@tensorrt",
     ],
 )
@@ -129,7 +129,7 @@ cc_library(
     linkopts = ["-lopencv_core -lnvinfer_plugin -lopencv_imgproc -lopencv_highgui -lprotobuf -lcaffe"],
     deps = [
         "//modules/perception/proto:rt_proto",
-        "//framework:cybertron",
+        "//cybertron",
         "@tensorrt",
     ],
 )

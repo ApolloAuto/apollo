@@ -11,7 +11,7 @@ cc_library(
         "roi_service_filter.h",
     ],
     deps = [
-        "//framework:cybertron",
+        "//cybertron",
         "//modules/perception/base:base_type",
         "//modules/perception/base:blob",
         "//modules/perception/base:box",

@@ -29,7 +29,7 @@ cc_library(
     ],
     deps = [
         ":polynomial_curve1d",
-        "//framework:cybertron",
+        "//cybertron",
         "//modules/common/util:string_util",
     ],
 )
@@ -56,7 +56,7 @@ cc_library(
     ],
     deps = [
         ":polynomial_curve1d",
-        "//framework:cybertron",
+        "//cybertron",
         "//modules/common/util:string_util",
     ],
 )
@@ -71,7 +71,7 @@ cc_library(
     ],
     deps = [
         ":polynomial_curve1d",
-        "//framework:cybertron",
+        "//cybertron",
         "//modules/common/util:string_util",
     ],
 )
@@ -98,7 +98,7 @@ cc_library(
     ],
     deps = [
         ":quintic_polynomial_curve1d",
-        "//framework:cybertron",
+        "//cybertron",
         "//modules/common/math",
         "//modules/common/util:string_util",
     ],
@@ -114,7 +114,7 @@ cc_library(
     ],
     deps = [
         ":quintic_spiral_path",
-        "//framework:cybertron",
+        "//cybertron",
         "//modules/common/math",
         "//modules/common/util:string_util",
     ],

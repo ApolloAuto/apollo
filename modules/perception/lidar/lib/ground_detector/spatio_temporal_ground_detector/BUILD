@@ -13,7 +13,7 @@ cc_library(
     copts = ["-msse4.1"],
     deps = [
         "@eigen",
-        "//framework:cybertron",
+        "//cybertron",
         "//modules/perception/base",
         "//modules/perception/lib/registerer",
         "//modules/perception/lib/singleton",

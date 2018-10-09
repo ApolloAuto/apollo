@@ -7,7 +7,7 @@ cc_library(
     deps = [
         "//modules/planning/tuning:autotuning_feature_builder",
         "//modules/common/proto:error_code_proto",
-        "//framework:cybertron",
+        "//cybertron",
     ],
 )
 

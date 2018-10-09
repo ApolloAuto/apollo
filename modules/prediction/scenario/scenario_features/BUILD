@@ -12,7 +12,7 @@ cc_library(
         "//modules/prediction/common:prediction_gflags",
         "//modules/prediction/common:prediction_map",
         "//modules/prediction/common:environment_features",
-        "//framework:cybertron",
+        "//cybertron",
     ],
 )
 

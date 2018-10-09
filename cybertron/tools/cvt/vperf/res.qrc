@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/">
+        <file>close.png</file>
+        <file>open.png</file>
+        <file>find.png</file>
+        <file>findpoints.png</file>
+    </qresource>
+</RCC>

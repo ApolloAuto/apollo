@@ -11,7 +11,7 @@ cc_library(
         "config_manager.h",
     ],
     deps = [
-        "//framework:cybertron",
+        "//cybertron",
         "//modules/perception/common:perception_gflags",
         "//modules/perception/lib/io:file_util",
         "//modules/perception/lib/singleton",

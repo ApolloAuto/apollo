@@ -1,0 +1,12 @@
+syntax = "proto2";
+
+package apollo.cybertron.proto;
+
+import "processor_conf.proto";
+
+message SchedulerConf {
+  optional int32 sysmon_hz = 1;
+  optional int32 sysmon_prio = 2;
+  optional ProcessorConf processor_conf = 3;
+}
+

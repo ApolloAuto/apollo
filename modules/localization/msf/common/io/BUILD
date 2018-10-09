@@ -7,7 +7,7 @@ cc_library(
     srcs = glob(["*.cc"]),
     hdrs = glob(["*.h"]),
     deps = [
-        "//framework:cybertron",
+        "//cybertron",
         "@eigen",
         "@pcl",
         "@yaml_cpp//:yaml",
