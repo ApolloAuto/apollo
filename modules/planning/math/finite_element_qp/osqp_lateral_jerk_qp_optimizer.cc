@@ -33,7 +33,13 @@ bool OsqpLateralJerkQPOptimizer::optimize(
     const std::vector<std::pair<double, double>>& d_bounds) {
   // clean up old results
   opt_d_.resize(d_bounds.size());
+  opt_d_prime_.resize(d_bounds.size());
+  opt_d_pprime_.resize(d_bounds.size());
 
+  // kernel
+  std::vector<c_float> P_data_;
+  std::vector<c_int> P_indices_;
+  std::vector<c_int> P_indptr_;
   CalcualteKernel(d_state, delta_s, d_bounds, &P_data_, &P_indices_,
                   &P_indptr_);
 
@@ -58,7 +64,7 @@ bool OsqpLateralJerkQPOptimizer::optimize(
   }
 
   for (int i = 0; i < kNumVariable; ++i) {
-    for (int j = 0; j < kNumVariable; ++j) {
+    for (int j = 0; j <= i; ++j) {
       affine_constraint(i, j) = 1 / 6.0 * delta_s_tri_;
     }
     lower_bounds[constraint_index] = d_bounds[i].first - lateral_residual_;
@@ -69,6 +75,9 @@ bool OsqpLateralJerkQPOptimizer::optimize(
   CHECK_EQ(constraint_index, kNumConstraint);
 
   // change affine_constraint to CSC format
+  std::vector<c_float> A_data_;
+  std::vector<c_int> A_indices_;
+  std::vector<c_int> A_indptr_;
   DenseToCSCMatrix(affine_constraint, &A_data_, &A_indices_, &A_indptr_);
 
   // offset
@@ -114,6 +123,8 @@ bool OsqpLateralJerkQPOptimizer::optimize(
       l += 1 / 6.0 * delta_s_tri_ * work->solution->x[j];
     }
     opt_d_[i] = l;
+    opt_d_prime_[i] = 0.0;
+    opt_d_pprime_[i] = 0.0;
   }
 
   // Cleanup
