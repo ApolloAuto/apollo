@@ -142,7 +142,7 @@ void Trajectory1dGenerator::GenerateLateralTrajectoryBundle(
 
     // LateralTrajectoryOptimizer lateral_optimizer;
     std::unique_ptr<LateralQPOptimizer> lateral_optimizer(
-        new ActiverSetLateralQPOptimizer);
+        new ActiveSetLateralQPOptimizer);
 
     lateral_optimizer->optimize(init_lat_state_, delta_s, lateral_bounds);
 

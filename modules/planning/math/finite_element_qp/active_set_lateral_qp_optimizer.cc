@@ -24,7 +24,7 @@
 namespace apollo {
 namespace planning {
 
-bool ActiverSetLateralQPOptimizer::optimize(
+bool ActiveSetLateralQPOptimizer::optimize(
     const std::array<double, 3>& d_state, const double delta_s,
     const std::vector<std::pair<double, double>>& d_bounds) {
   delta_s_ = delta_s;
