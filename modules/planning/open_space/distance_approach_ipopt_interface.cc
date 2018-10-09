@@ -354,7 +354,7 @@ bool DistanceApproachIPOPTInterface::eval_g(int n, const double* x, bool new_x,
   int counter = 0;
   state_index = state_start_index_;
   std::size_t l_index = l_start_index_;
-  std::size_t n_start_index = n_start_index_;
+  std::size_t n_index = n_start_index_;
 
   for (std::size_t i = 1; i <= horizon_ + 1; ++i) {
     for (std::size_t j = 1; j <= obstacles_num_; ++j) {
