@@ -36,6 +36,10 @@ bool OsqpLateralQPOptimizer::optimize(
   opt_d_prime_.clear();
   opt_d_pprime_.clear();
 
+  // kernel
+  std::vector<c_float> P_data_;
+  std::vector<c_int> P_indices_;
+  std::vector<c_int> P_indptr_;
   CalcualteKernel(d_bounds, delta_s, &P_data_, &P_indices_, &P_indptr_);
 
   const int kNumVariable = d_bounds.size();
@@ -74,6 +78,9 @@ bool OsqpLateralQPOptimizer::optimize(
   CHECK_EQ(constraint_index, kNumConstraint);
 
   // change affine_constraint to CSC format
+  std::vector<c_float> A_data_;
+  std::vector<c_int> A_indices_;
+  std::vector<c_int> A_indptr_;
   DenseToCSCMatrix(affine_constraint, &A_data_, &A_indices_, &A_indptr_);
 
   // offset
@@ -99,7 +106,7 @@ bool OsqpLateralQPOptimizer::optimize(
   // Populate data
   OSQPData* data = reinterpret_cast<OSQPData*>(c_malloc(sizeof(OSQPData)));
   data->n = kNumVariable;
-  data->m = affine_constraint.rows();
+  data->m = kNumConstraint;
   data->P = csc_matrix(data->n, data->n, P_data_.size(), P_data_.data(),
                        P_indices_.data(), P_indptr_.data());
   data->q = q;
