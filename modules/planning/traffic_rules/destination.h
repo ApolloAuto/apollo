@@ -23,18 +23,33 @@
 
 #include <string>
 
-#include "modules/planning/toolkits/deciders/traffic_rule.h"
+#include "modules/common/proto/geometry.pb.h"
+#include "modules/planning/traffic_rules/traffic_rule.h"
 
 namespace apollo {
 namespace planning {
 
-class ObjectPriority : public TrafficRule {
+/**
+ * This class decides whether we should stop for destination.
+ * situation.
+ */
+class Destination : public TrafficRule {
  public:
-  explicit ObjectPriority(const TrafficRuleConfig& config);
-  virtual ~ObjectPriority() = default;
+  explicit Destination(const TrafficRuleConfig& config);
+  virtual ~Destination() = default;
 
   common::Status ApplyRule(Frame* const frame,
-                 ReferenceLineInfo* const reference_line_info);
+                           ReferenceLineInfo* const reference_line_info);
+
+ private:
+  int BuildStopDecision(Frame* const frame,
+                        ReferenceLineInfo* const reference_line_info);
+  int Stop(Frame* const frame, ReferenceLineInfo* const reference_line_info,
+           const std::string lane_id, const double lane_s);
+  bool CheckPullOver(ReferenceLineInfo* const reference_line_info,
+                     const std::string& dest_lane_id, const double dest_lane_s,
+                     common::PointENU* dest_point);
+  int PullOver(common::PointENU* const dest_point);
 };
 
 }  // namespace planning

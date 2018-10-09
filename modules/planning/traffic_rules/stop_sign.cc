@@ -18,7 +18,7 @@
  * @file
  **/
 
-#include "modules/planning/toolkits/deciders/stop_sign.h"
+#include "modules/planning/traffic_rules/stop_sign.h"
 
 #include <algorithm>
 #include <limits>
@@ -34,7 +34,7 @@
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
-#include "modules/planning/toolkits/deciders/util.h"
+#include "modules/planning/traffic_rules/util.h"
 
 namespace apollo {
 namespace planning {

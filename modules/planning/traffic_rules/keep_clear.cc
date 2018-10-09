@@ -24,7 +24,7 @@
 #include "modules/common/proto/pnc_point.pb.h"
 
 #include "modules/map/hdmap/hdmap_common.h"
-#include "modules/planning/toolkits/deciders/keep_clear.h"
+#include "modules/planning/traffic_rules/keep_clear.h"
 
 namespace apollo {
 namespace planning {

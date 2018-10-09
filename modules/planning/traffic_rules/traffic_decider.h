@@ -30,7 +30,7 @@
 #include "modules/common/status/status.h"
 #include "modules/common/util/factory.h"
 #include "modules/planning/reference_line/reference_line.h"
-#include "modules/planning/toolkits/deciders/traffic_rule.h"
+#include "modules/planning/traffic_rules/traffic_rule.h"
 
 namespace apollo {
 namespace planning {

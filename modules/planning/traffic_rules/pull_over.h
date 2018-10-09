@@ -27,7 +27,7 @@
 
 #include "modules/common/proto/geometry.pb.h"
 #include "modules/perception/proto/traffic_light_detection.pb.h"
-#include "modules/planning/toolkits/deciders/traffic_rule.h"
+#include "modules/planning/traffic_rules/traffic_rule.h"
 
 namespace apollo {
 namespace planning {

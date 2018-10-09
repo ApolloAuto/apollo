@@ -18,7 +18,7 @@
  * @file
  **/
 
-#include "modules/planning/toolkits/deciders/crosswalk.h"
+#include "modules/planning/traffic_rules/crosswalk.h"
 
 #include <limits>
 #include <unordered_map>
@@ -36,7 +36,7 @@
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/proto/planning_status.pb.h"
-#include "modules/planning/toolkits/deciders/util.h"
+#include "modules/planning/traffic_rules/util.h"
 
 namespace apollo {
 namespace planning {

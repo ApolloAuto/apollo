@@ -18,7 +18,7 @@
  * @file
  **/
 
-#include "modules/planning/toolkits/deciders/change_lane.h"
+#include "modules/planning/traffic_rules/change_lane.h"
 
 #include <algorithm>
 

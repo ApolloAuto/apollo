@@ -18,7 +18,7 @@
  * @file
  **/
 
-#include "modules/planning/toolkits/deciders/signal_light.h"
+#include "modules/planning/traffic_rules/signal_light.h"
 
 #include <limits>
 #include <vector>
@@ -31,7 +31,7 @@
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/ego_info.h"
 #include "modules/planning/common/frame.h"
-#include "modules/planning/toolkits/deciders/util.h"
+#include "modules/planning/traffic_rules/util.h"
 
 namespace apollo {
 namespace planning {

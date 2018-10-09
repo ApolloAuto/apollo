@@ -28,7 +28,7 @@
 
 #include "modules/map/hdmap/hdmap.h"
 #include "modules/planning/proto/planning_status.pb.h"
-#include "modules/planning/toolkits/deciders/traffic_rule.h"
+#include "modules/planning/traffic_rules/traffic_rule.h"
 
 namespace apollo {
 namespace planning {

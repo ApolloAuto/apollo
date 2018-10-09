@@ -18,7 +18,7 @@
  * @file
  **/
 
-#include "modules/planning/toolkits/deciders/pull_over.h"
+#include "modules/planning/traffic_rules/pull_over.h"
 
 #include <algorithm>
 #include <iomanip>
@@ -32,7 +32,7 @@
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/proto/sl_boundary.pb.h"
-#include "modules/planning/toolkits/deciders/util.h"
+#include "modules/planning/traffic_rules/util.h"
 
 namespace apollo {
 namespace planning {

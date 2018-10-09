@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,33 +23,32 @@
 
 #include <string>
 
-#include "modules/planning/toolkits/deciders/traffic_rule.h"
+#include "modules/planning/common/frame.h"
+#include "modules/planning/common/reference_line_info.h"
+#include "modules/planning/traffic_rules/traffic_rule.h"
 
 namespace apollo {
 namespace planning {
 
-/**
- * This class creates a virtual obstacle for each clear area region.
- */
-class KeepClear : public TrafficRule {
+class FrontVehicle : public TrafficRule {
  public:
-  explicit KeepClear(const TrafficRuleConfig& config);
-  virtual ~KeepClear() = default;
+  explicit FrontVehicle(const TrafficRuleConfig& config);
+  ~FrontVehicle() = default;
 
   common::Status ApplyRule(Frame* const frame,
                  ReferenceLineInfo* const reference_line_info);
 
  private:
-  bool BuildKeepClearObstacle(Frame* const frame,
-                              ReferenceLineInfo* const reference_line_info,
-                              hdmap::PathOverlap* const keep_clear_overlap,
-                              const std::string& virtual_obstacle_id);
- private:
-  static constexpr char const* const KEEP_CLEAR_VO_ID_PREFIX = "KC_";
-  static constexpr char const* const KEEP_CLEAR_JUNCTION_VO_ID_PREFIX =
-      "KC_JC_";
-};
+  void MakeDecisions(Frame* const frame,
+                     ReferenceLineInfo* const reference_line_info);
 
+  bool MakeSidePassDecision(ReferenceLineInfo* const reference_line_info);
+  bool ProcessSidePass(ReferenceLineInfo* const reference_line_info);
+  std::string FindPassableObstacle(
+      ReferenceLineInfo* const reference_line_info);
+
+  void MakeStopDecision(ReferenceLineInfo* reference_line_info);
+};
 }  // namespace planning
 }  // namespace apollo
 
