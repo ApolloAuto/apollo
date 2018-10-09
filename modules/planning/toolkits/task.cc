@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ * Copyright 2017 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,36 +18,26 @@
  * @file
  **/
 
-#pragma once
+#include "modules/planning/toolkits/task.h"
 
-#include "cybertron/common/macros.h"
-
-#include "modules/map/pnc_map/path.h"
-#include "modules/planning/common/frame.h"
-#include "modules/planning/common/reference_line_info.h"
-#include "modules/planning/toolkits/deciders/decider.h"
+#include "modules/planning/proto/planning_config.pb.h"
 
 namespace apollo {
 namespace planning {
 
-class Creep : public Decider {
- public:
-  Creep();
-  ~Creep() = default;
+using apollo::common::Status;
 
-  bool Init(const ScenarioConfig::ScenarioTaskConfig &config) override;
+Task::Task(const std::string& name) : name_(name) {}
 
- private:
-  apollo::common::Status Process(
-      Frame* frame,
-      ReferenceLineInfo* reference_line_info) override;
+const std::string& Task::Name() const { return name_; }
 
-  bool BuildStopDecision(Frame* frame,
-                         ReferenceLineInfo* reference_line_info);
+bool Task::Init(const ScenarioConfig::ScenarioTaskConfig&) { return true; }
 
- private:
-  static constexpr const char* CREEP_VO_ID_PREFIX = "CREEP_";
-};
+Status Task::Execute(Frame* frame, ReferenceLineInfo* reference_line_info) {
+  frame_ = frame;
+  reference_line_info_ = reference_line_info;
+  return Status::OK();
+}
 
 }  // namespace planning
 }  // namespace apollo

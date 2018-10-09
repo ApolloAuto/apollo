@@ -66,7 +66,7 @@ cc_library(
         "//modules/planning/common:frame",
         "//modules/planning/common:reference_line_info",
         "//modules/planning/proto:traffic_rule_config_proto",
-        "//modules/planning/toolkits/optimizers:task",
+        "//modules/planning/toolkits:task",
     ],
 )
 

@@ -25,7 +25,7 @@
 #include "modules/planning/proto/dp_st_speed_config.pb.h"
 #include "modules/planning/proto/st_boundary_config.pb.h"
 
-#include "modules/planning/toolkits/optimizers/task.h"
+#include "modules/planning/toolkits/task.h"
 namespace apollo {
 namespace planning {
 

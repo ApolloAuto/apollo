@@ -18,25 +18,24 @@
  * @file
  **/
 
-#include "modules/planning/toolkits/optimizers/task.h"
-
-#include "modules/planning/proto/planning_config.pb.h"
+#include "modules/planning/toolkits/deciders/decider.h"
 
 namespace apollo {
 namespace planning {
 
 using apollo::common::Status;
+using apollo::planning_internal::StGraphBoundaryDebug;
+using apollo::planning_internal::STGraphDebug;
 
-Task::Task(const std::string& name) : name_(name) {}
+Decider::Decider(const std::string& name) : Task(name) {}
 
-const std::string& Task::Name() const { return name_; }
+apollo::common::Status Decider::Execute(
+    Frame* frame, ReferenceLineInfo* reference_line_info) {
+  Task::Execute(frame, reference_line_info);
 
-bool Task::Init(const ScenarioConfig::ScenarioTaskConfig&) { return true; }
+  auto ret = Process(frame, reference_line_info);
 
-Status Task::Execute(Frame* frame, ReferenceLineInfo* reference_line_info) {
-  frame_ = frame;
-  reference_line_info_ = reference_line_info;
-  return Status::OK();
+  return ret;
 }
 
 }  // namespace planning

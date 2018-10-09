@@ -26,7 +26,7 @@
 #include "modules/common/status/status.h"
 #include "modules/planning/common/speed/speed_data.h"
 #include "modules/planning/toolkits/optimizers/st_graph/st_graph_data.h"
-#include "modules/planning/toolkits/optimizers/task.h"
+#include "modules/planning/toolkits/task.h"
 
 namespace apollo {
 namespace planning {
