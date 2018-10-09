@@ -44,6 +44,9 @@ class Creep : public Decider {
       Frame* frame,
       ReferenceLineInfo* reference_line_info) override;
 
+  double FindCreepDistance(Frame* frame,
+                           ReferenceLineInfo* reference_line_info);
+
   bool BuildStopDecision(Frame* frame,
                          ReferenceLineInfo* reference_line_info);
 
