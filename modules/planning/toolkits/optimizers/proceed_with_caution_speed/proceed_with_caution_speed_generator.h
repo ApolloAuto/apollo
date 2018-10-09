@@ -46,7 +46,7 @@ class ProceedWithCautionSpeedGenerator : public SpeedOptimizer {
 
   bool Init(const ScenarioConfig::ScenarioTaskConfig& config) override;
 
- private:
+  // private:
   common::Status Process(const SLBoundary& adc_sl_boundary,
                          const PathData& path_data,
                          const apollo::common::TrajectoryPoint& init_point,
@@ -54,6 +54,9 @@ class ProceedWithCautionSpeedGenerator : public SpeedOptimizer {
                          const SpeedData& reference_speed_data,
                          PathDecision* const path_decision,
                          SpeedData* const speed_data) override;
+  ProceedWithCautionSpeedConfig proceed_with_caution_speed_config_;
+  bool isFixedDistanceNotFixedSpeed;
+  double maxDistanceOrSpeed;
 };
 
 }  // namespace planning
