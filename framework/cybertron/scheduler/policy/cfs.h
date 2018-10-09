@@ -18,13 +18,11 @@
 #define CYBERTRON_SCHEDULER_POLICY_CFS_CONTEXT_H_
 
 #include <cstdint>
-#include <future>
-#include <list>
+#include <functional>
 #include <map>
 #include <memory>
 #include <mutex>
 #include <string>
-#include <vector>
 
 #include "cybertron/scheduler/processor_context.h"
 
@@ -53,8 +51,9 @@ class CFSContext : public ProcessorContext {
 
   std::mutex mtx_run_queue_;
   std::mutex rw_affinity_lock_;
-  std::multimap<double, std::shared_ptr<CRoutine>> local_rb_map_;
-  std::multimap<double, std::shared_ptr<CRoutine>> affinity_rb_map_;
+  std::multimap<double, std::shared_ptr<CRoutine>> local_rt_queue_;
+  std::multimap<double, std::shared_ptr<CRoutine>, std::greater<double>>
+      affinity_rt_queue_;
   std::shared_ptr<CRoutine> cur_croutine_ = nullptr;
   double min_vruntime_ = 0;
 };

@@ -48,7 +48,7 @@ std::shared_ptr<CRoutine> ClassicContext::NextRoutine() {
   auto start_perf_time = apollo::cybertron::Time::Now().ToNanosecond();
 
   std::shared_ptr<CRoutine> croutine = nullptr;
-  for (auto it = rb_map_.begin(); it != rb_map_.end();) {
+  for (auto it = rt_queue_.begin(); it != rt_queue_.end();) {
     auto cr = it->second;
     auto lock = cr->TryLock();
     if (!lock) {
@@ -56,8 +56,9 @@ std::shared_ptr<CRoutine> ClassicContext::NextRoutine() {
       continue;
     }
 
+    cr->UpdateState();
     if (cr->state() == RoutineState::FINISHED) {
-      it = rb_map_.erase(it);
+      it = rt_queue_.erase(it);
       continue;
     }
 
@@ -90,7 +91,7 @@ bool ClassicContext::Enqueue(const std::shared_ptr<CRoutine>& cr) {
 bool ClassicContext::EnqueueAffinityRoutine(
     const std::shared_ptr<CRoutine>& cr) {
   std::lock_guard<std::mutex> lg(mtx_run_queue_);
-  rb_map_.insert(
+  rt_queue_.insert(
       std::pair<double, std::shared_ptr<CRoutine>>(cr->priority(), cr));
   return true;
 }

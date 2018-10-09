@@ -62,13 +62,13 @@ std::shared_ptr<CRoutine> CFSContext::NextLocalRoutine() {
         cur_croutine_->priority());
     cur_croutine_->set_exec_time(cur_croutine_->vruntime() *
                                  cur_croutine_->priority());
-    local_rb_map_.insert(std::pair<double, std::shared_ptr<CRoutine>>(
+    local_rt_queue_.insert(std::pair<double, std::shared_ptr<CRoutine>>(
         cur_croutine_->vruntime(), cur_croutine_));
     cur_croutine_ = nullptr;
   }
 
   std::shared_ptr<CRoutine> croutine = nullptr;
-  for (auto it = local_rb_map_.begin(); it != local_rb_map_.end();) {
+  for (auto it = local_rt_queue_.begin(); it != local_rt_queue_.end();) {
     auto cr = it->second;
     auto lock = cr->TryLock();
     if (!lock) {
@@ -77,13 +77,9 @@ std::shared_ptr<CRoutine> CFSContext::NextLocalRoutine() {
     }
 
     cr->UpdateState();
-    if (cr->state() == RoutineState::RUNNING) {
-      ++it;
-      continue;
-    }
 
     if (cr->state() == RoutineState::FINISHED) {
-      it = local_rb_map_.erase(it);
+      it = local_rt_queue_.erase(it);
       continue;
     }
 
@@ -92,11 +88,12 @@ std::shared_ptr<CRoutine> CFSContext::NextLocalRoutine() {
       croutine = cr;
       croutine->set_state(RoutineState::RUNNING);
       cur_croutine_ = croutine;
-      local_rb_map_.erase(it);
+      local_rt_queue_.erase(it);
       break;
     }
     ++it;
   }
+
   if (croutine == nullptr) {
     notified_.store(false);
   } else {
@@ -115,7 +112,7 @@ std::shared_ptr<CRoutine> CFSContext::NextAffinityRoutine() {
   auto start_perf_time = apollo::cybertron::Time::Now().ToNanosecond();
   std::shared_ptr<CRoutine> croutine = nullptr;
 
-  for (auto it = affinity_rb_map_.begin(); it != affinity_rb_map_.end();) {
+  for (auto it = affinity_rt_queue_.begin(); it != affinity_rt_queue_.end();) {
     auto cr = it->second;
     auto lock = cr->TryLock();
     if (!lock) {
@@ -124,13 +121,9 @@ std::shared_ptr<CRoutine> CFSContext::NextAffinityRoutine() {
     }
 
     cr->UpdateState();
-    if (cr->state() == RoutineState::FINISHED) {
-      it = affinity_rb_map_.erase(it);
-      continue;
-    }
 
-    if (cr->state() == RoutineState::RUNNING) {
-      ++it;
+    if (cr->state() == RoutineState::FINISHED) {
+      it = affinity_rt_queue_.erase(it);
       continue;
     }
 
@@ -141,6 +134,7 @@ std::shared_ptr<CRoutine> CFSContext::NextAffinityRoutine() {
     }
     ++it;
   }
+
   if (croutine) {
     PerfEventCache::Instance()->AddSchedEvent(SchedPerf::NEXT_AFFINITY_R,
                                               croutine->id(), proc_index_, 0,
@@ -165,7 +159,7 @@ bool CFSContext::Enqueue(const std::shared_ptr<CRoutine>& cr) {
   std::lock_guard<std::mutex> lg(mtx_run_queue_);
   cr->set_vruntime(min_vruntime_ + cr->normalized_vruntime());
   cr->set_exec_time(cr->vruntime() * cr->priority());
-  local_rb_map_.insert(
+  local_rt_queue_.insert(
       std::pair<double, std::shared_ptr<CRoutine>>(cr->vruntime(), cr));
   return true;
 }
@@ -173,7 +167,7 @@ bool CFSContext::Enqueue(const std::shared_ptr<CRoutine>& cr) {
 bool CFSContext::EnqueueAffinityRoutine(const std::shared_ptr<CRoutine>& cr) {
   std::lock_guard<std::mutex> lg(rw_affinity_lock_);
   if (cr->IsAffinity(id())) {
-    affinity_rb_map_.insert(
+    affinity_rt_queue_.insert(
         std::pair<uint32_t, std::shared_ptr<CRoutine>>(cr->priority(), cr));
     return true;
   }
