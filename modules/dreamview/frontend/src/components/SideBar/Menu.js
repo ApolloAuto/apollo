@@ -51,7 +51,7 @@ const MenuIdOptionMapping = {
         planningReference: 'showPlanningReference',
         planningDpOptimizer: 'showPlanningDpOptimizer',
         planningQpOptimizer: 'showPlanningQpOptimizer',
-        planningLine: 'showPlanning',
+        planningTrajectory: 'showPlanningTrajectory',
         positionLocalization: 'showPositionLocalization',
         positionGps: 'showPositionGps',
         mapCrosswalk: 'showMapCrosswalk',

@@ -9,7 +9,7 @@ export default class Others extends React.Component {
     render() {
         const { options, enableHMIButtonsOnly } = this.props.store;
 
-        const disablePanel = enableHMIButtonsOnly || options.tasksPanelLocked;
+        const disablePanel = enableHMIButtonsOnly || options.lockTaskPanel;
 
         return (
             <div className="others card">
@@ -31,12 +31,12 @@ export default class Others extends React.Component {
                                       this.props.store.handleOptionToggle('showPNCMonitor');
                                   }}/>
                     <CheckboxItem id={"toggleSimControl"}
-                                  title={"SimControl"}
-                                  isChecked={options.simControlEnabled}
-                                  disabled={options.tasksPanelLocked}
+                                  title={"Sim Control"}
+                                  isChecked={options.enableSimControl}
+                                  disabled={options.lockTaskPanel}
                                   onClick={() => {
-                                      WS.toggleSimControl(!options.simControlEnabled);
-                                      this.props.store.handleOptionToggle('simControlEnabled');
+                                      WS.toggleSimControl(!options.enableSimControl);
+                                      this.props.store.handleOptionToggle('enableSimControl');
                                   }}/>
                     <CheckboxItem id={"showVideo"}
                                   title={"Camera Sensor"}
@@ -47,10 +47,10 @@ export default class Others extends React.Component {
                                   }}/>
                     <CheckboxItem id={"panelLock"}
                                   title={"Lock Task Panel"}
-                                  isChecked={options.tasksPanelLocked}
+                                  isChecked={options.lockTaskPanel}
                                   disabled={false}
                                   onClick={() => {
-                                    this.props.store.handleOptionToggle('tasksPanelLocked');
+                                    this.props.store.handleOptionToggle('lockTaskPanel');
                                   }}/>
                 </div>
             </div>

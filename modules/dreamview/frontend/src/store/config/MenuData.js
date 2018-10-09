@@ -63,7 +63,7 @@ export default [
         type: 'checkbox',
         data: {
             planningCar: 'Planning Car',
-            planningLine: 'Planning Line',
+            planningTrajectory: 'Planning Trajectory',
             planningQpOptimizer: 'Qp Optimizer Line',
             planningDpOptimizer: 'Dp Optimizer Line',
             planningReference: 'Reference Line',

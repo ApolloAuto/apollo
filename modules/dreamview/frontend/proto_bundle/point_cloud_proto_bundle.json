@@ -9,10 +9,7 @@
                 "num": {
                   "rule": "repeated",
                   "type": "float",
-                  "id": 1,
-                  "options": {
-                    "packed": false
-                  }
+                  "id": 1
                 }
               }
             }
