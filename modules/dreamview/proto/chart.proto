@@ -1,0 +1,50 @@
+syntax = "proto2";
+
+package apollo.dreamview;
+
+import "modules/common/proto/geometry.proto";
+
+message Options {
+    message Axis {
+        optional double min = 1;
+        optional double max = 2;
+        optional string label_string = 3;
+    }
+
+    optional bool legend_display = 1 [default = true];
+    optional Axis x = 2;
+    optional Axis y = 3;
+}
+
+message Line {
+    optional string label = 1;
+    repeated apollo.common.Point2D data = 2;
+
+    // If the 'color' property is undefined, a random one will be assigned.
+    map<string, string> properties = 3;
+}
+
+message Polygon {
+    optional string label = 1;
+    optional apollo.common.Polygon data = 2;
+
+    // If the 'color' property is undefined, a random one will be assigned.
+    map<string, string> properties = 3;
+}
+
+message Car {
+    optional double x = 1;
+    optional double y = 2;
+    optional double heading = 3;
+    optional string color = 4;
+}
+
+message Chart {
+    optional string title = 1;
+    optional Options options = 2;
+
+    // data sets
+    repeated Line line = 3;
+    repeated Polygon polygon = 4;
+    repeated Car car = 5;
+}
