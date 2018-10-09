@@ -107,6 +107,18 @@ function build_fast() {
     fi
 }
 
+function build_fast_without_tools() {
+    info "start build fast without tools"
+    export LD_LIBRARY_PATH=${CYBERTRON_DIR}/third_party/protobuf/lib:$LD_LIBRARY_PATH
+    CMAKE_OPTIONS="${CMAKE_OPTIONS} -DMAKE_WITHOUT_TOOLS=ON"
+    if [[ ! -d "build" ]]; then
+        build
+    else
+        cd build
+        make install -j${CORE_NUM} -l${CORE_NUM} || exit $?
+    fi
+}
+
 function build_cov() {
     info "build coverage file"
     mkdir -p tmp
@@ -457,6 +469,9 @@ function main() {
         ;;
         build_fast)
             build_fast
+        ;;
+        build_fast_without_tools)
+            build_fast_without_tools
         ;;
         build_cov)
             build_cov
