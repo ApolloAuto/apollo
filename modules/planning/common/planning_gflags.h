@@ -135,8 +135,6 @@ DECLARE_int32(trajectory_point_num_for_debug);
 DECLARE_double(lag_prediction_protection_distance);
 DECLARE_double(perception_confidence_threshold);
 
-DECLARE_bool(enable_record_debug);
-
 DECLARE_double(turn_signal_distance);
 
 // QpSt optimizer
@@ -222,3 +220,5 @@ DECLARE_bool(use_osqp_optimizer_for_reference_line);
 DECLARE_bool(enable_osqp_debug);
 
 DECLARE_bool(use_static_waypoint_sampler);
+DECLARE_bool(export_chart);
+DECLARE_bool(enable_record_debug);

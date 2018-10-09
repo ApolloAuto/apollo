@@ -335,7 +335,6 @@ Status StdPlanning::Plan(
 
   ptr_debug->mutable_planning_data()->set_front_clear_distance(
       EgoInfo::Instance()->front_clear_distance());
-  ExportReferenceLineDebug(ptr_debug);
 
   const auto* best_ref_info = frame_->FindDriveReferenceLineInfo();
   if (!best_ref_info) {
@@ -346,7 +345,12 @@ Status StdPlanning::Plan(
     }
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
-  ptr_debug->MergeFrom(best_ref_info->debug());
+  if (FLAGS_export_chart) {
+    ExportChart(best_ref_info->debug(), ptr_debug);
+  } else {
+    ptr_debug->MergeFrom(best_ref_info->debug());
+    ExportReferenceLineDebug(ptr_debug);
+  }
   trajectory_pb->mutable_latency_stats()->MergeFrom(
       best_ref_info->latency_stats());
   // set right of way status

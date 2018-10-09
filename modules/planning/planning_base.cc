@@ -23,13 +23,18 @@
 #include "modules/common/time/time.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/proto/planning_internal.pb.h"
 
 namespace apollo {
 namespace planning {
 
 using apollo::common::TrajectoryPoint;
 using apollo::common::time::Clock;
+using apollo::dreamview::Chart;
 using apollo::hdmap::HDMapUtil;
+using apollo::planning_internal::SLFrameDebug;
+using apollo::planning_internal::SpeedPlan;
+using apollo::planning_internal::STGraphDebug;
 
 PlanningBase::~PlanningBase() {}
 
@@ -83,6 +88,73 @@ void PlanningBase::SetFallbackTrajectory(ADCTrajectory* const trajectory_pb) {
       p->set_relative_time(t);
     }
   }
+}
+
+void AddStGraph(const STGraphDebug& st_graph, Chart* chart) {
+  chart->set_title(st_graph.name());
+  auto* options = chart->mutable_options();
+  options->mutable_x()->set_min(0.0);
+  options->mutable_x()->set_max(10);  // seconds
+  options->mutable_y()->set_min(0.0);
+  options->mutable_y()->set_max(80.0);  // meters
+  for (const auto& boundary : st_graph.boundary()) {
+    auto* boundary_chart = chart->add_polygon();
+    for (const auto& point : boundary.point()) {
+      auto* point_debug = boundary_chart->add_point();
+      point_debug->set_x(point.t());
+      point_debug->set_y(point.s());
+    }
+  }
+}
+
+void AddSlFrame(const SLFrameDebug& sl_frame, Chart* chart) {
+  chart->set_title(sl_frame.name());
+  auto* options = chart->mutable_options();
+  options->mutable_x()->set_min(0.0);
+  options->mutable_x()->set_max(80.0);  // s, meters
+  options->mutable_y()->set_min(-8.0);
+  options->mutable_y()->set_max(8.0);  // l, meters
+  auto* sl_line = chart->add_line();
+  sl_line->set_label("SL Path");
+  for (const auto& sl_point : sl_frame.sl_path()) {
+    auto* point_debug = sl_line->add_point();
+    point_debug->set_x(sl_point.s());
+    point_debug->set_x(sl_point.l());
+  }
+}
+
+void AddSpeedPlan(
+    const ::google::protobuf::RepeatedPtrField<SpeedPlan>& speed_plans,
+    Chart* chart) {
+  chart->set_title("Speed Plan");
+  auto* options = chart->mutable_options();
+  options->mutable_x()->set_min(0.0);
+  options->mutable_x()->set_max(80.0);  // s, meters
+  options->mutable_y()->set_min(0.0);
+  options->mutable_y()->set_max(50.0);  // v, m/s
+  for (const auto& speed_plan : speed_plans) {
+    auto* line = chart->add_line();
+    line->set_label(speed_plan.name());
+    for (const auto& point : speed_plan.speed_point()) {
+      auto* point_debug = line->add_point();
+      point_debug->set_x(point.s());
+      point_debug->set_y(point.v());
+    }
+  }
+}
+
+void PlanningBase::ExportChart(const planning_internal::Debug& debug_info,
+                               planning_internal::Debug* debug_chart) {
+  for (const auto& st_graph : debug_info.planning_data().st_graph()) {
+    AddStGraph(st_graph, debug_chart->mutable_planning_data()->add_chart());
+  }
+  for (const auto& sl_frame : debug_info.planning_data().sl_frame()) {
+    AddSlFrame(sl_frame, debug_chart->mutable_planning_data()->add_chart());
+  }
+
+  AddSpeedPlan(debug_info.planning_data().speed_plan(),
+               debug_chart->mutable_planning_data()->add_chart());
+  // TODO(all) add more debug for visualization if needed.
 }
 
 }  // namespace planning
