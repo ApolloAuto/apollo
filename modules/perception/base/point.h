@@ -88,5 +88,3 @@ struct Point3D {
 }  // namespace base
 }  // namespace perception
 }  // namespace apollo
-
-

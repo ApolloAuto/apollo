@@ -33,5 +33,3 @@ class LossyMapNode2D : public BaseMapNode {
 }  // namespace msf
 }  // namespace localization
 }  // namespace apollo
-
-

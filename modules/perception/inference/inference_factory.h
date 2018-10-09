@@ -35,5 +35,3 @@ Inference *CreateInferenceByName(const std::string &name,
 }  // namespace inference
 }  // namespace perception
 }  // namespace apollo
-
-

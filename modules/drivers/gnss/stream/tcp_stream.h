@@ -53,5 +53,3 @@ class TcpStream : public Stream {
 }  // namespace gnss
 }  // namespace drivers
 }  // namespace apollo
-
-

@@ -59,5 +59,3 @@ bool ObjectInRoiSlackCheck(
 }  // namespace common
 }  // namespace perception
 }  // namespace apollo
-
-

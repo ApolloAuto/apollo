@@ -226,5 +226,3 @@ bool SensorCanbus<SensorType>::OnError(const std::string &error_msg) {
 
 }  // namespace drivers
 }  // namespace apollo
-
-

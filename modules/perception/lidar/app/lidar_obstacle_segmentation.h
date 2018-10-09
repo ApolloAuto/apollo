@@ -78,5 +78,3 @@ class LidarObstacleSegmentation {
 }  // namespace lidar
 }  // namespace perception
 }  // namespace apollo
-
-

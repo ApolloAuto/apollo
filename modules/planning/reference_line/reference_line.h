@@ -219,5 +219,3 @@ class ReferenceLine {
 
 }  // namespace planning
 }  // namespace apollo
-
-

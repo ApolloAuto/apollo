@@ -36,5 +36,3 @@ class MessageDialog : public QDialog {
  private:
   Ui::MessageDialog* ui_;
 };
-
-

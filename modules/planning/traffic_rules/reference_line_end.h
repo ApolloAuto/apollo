@@ -46,5 +46,3 @@ class ReferenceLineEnd : public TrafficRule {
 
 }  // namespace planning
 }  // namespace apollo
-
-

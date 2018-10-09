@@ -97,5 +97,3 @@ class PoseContainer : public Container {
 
 }  // namespace prediction
 }  // namespace apollo
-
-

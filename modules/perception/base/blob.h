@@ -271,5 +271,3 @@ using BlobConstPtr = std::shared_ptr<const Blob<Dtype>>;
 }  // namespace base
 }  // namespace perception
 }  // namespace apollo
-
-

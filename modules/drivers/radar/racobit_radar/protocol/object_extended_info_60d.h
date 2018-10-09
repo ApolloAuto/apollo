@@ -53,5 +53,3 @@ class ObjectExtendedInfo60D
 }  // namespace racobit_radar
 }  // namespace drivers
 }  // namespace apollo
-
-

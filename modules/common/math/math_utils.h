@@ -210,5 +210,3 @@ std::pair<double, double> Cartesian2Polar(double x, double y);
 }  // namespace math
 }  // namespace common
 }  // namespace apollo
-
-

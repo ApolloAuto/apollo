@@ -57,5 +57,3 @@ class GnssMagTransfer {
 }  // namespace msf
 }  // namespace localization
 }  // namespace apollo
-
-

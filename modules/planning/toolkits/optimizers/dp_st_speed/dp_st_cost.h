@@ -93,5 +93,3 @@ class DpStCost {
 
 }  // namespace planning
 }  // namespace apollo
-
-

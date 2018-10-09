@@ -86,5 +86,3 @@ class HDMapInput {
 }  // namespace map
 }  // namespace perception
 }  // namespace apollo
-
-

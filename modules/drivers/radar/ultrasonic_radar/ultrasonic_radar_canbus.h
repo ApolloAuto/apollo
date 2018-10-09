@@ -108,5 +108,3 @@ class UltrasonicRadarCanbus {
 }  // namespace ultrasonic_radar
 }  // namespace drivers
 }  // namespace apollo
-
-

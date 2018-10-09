@@ -1435,5 +1435,3 @@ bool VoxelGridXYPyramid<DATA_TYPE>::Initialized() const {
 }  // namespace common
 }  // namespace perception
 }  // namespace apollo
-
-

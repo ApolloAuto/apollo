@@ -42,5 +42,3 @@ CYBERTRON_REGISTER_COMPONENT(LidarOutputComponent);
 }  // namespace onboard
 }  // namespace perception
 }  // namespace apollo
-
-

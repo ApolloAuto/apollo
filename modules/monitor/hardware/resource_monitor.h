@@ -36,5 +36,3 @@ class ResourceMonitor : public RecurrentRunner {
 
 }  // namespace monitor
 }  // namespace apollo
-
-

@@ -233,5 +233,3 @@ bool ConvexHull2D<CLOUD_IN_TYPE, CLOUD_OUT_TYPE>::GetConvexHullMonotoneChain(
 }  // namespace common
 }  // namespace perception
 }  // namespace apollo
-
-

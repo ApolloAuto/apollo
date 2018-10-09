@@ -199,5 +199,3 @@ class FeatureXYPlane {
 }  // namespace msf
 }  // namespace localization
 }  // namespace apollo
-
-

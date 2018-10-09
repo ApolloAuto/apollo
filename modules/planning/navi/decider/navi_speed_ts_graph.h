@@ -137,5 +137,3 @@ class NaviSpeedTsGraph {
 
 }  // namespace planning
 }  // namespace apollo
-
-

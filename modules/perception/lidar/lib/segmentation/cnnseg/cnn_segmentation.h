@@ -128,5 +128,3 @@ class CNNSegmentation : public BaseSegmentation {
 }  // namespace lidar
 }  // namespace perception
 }  // namespace apollo
-
-

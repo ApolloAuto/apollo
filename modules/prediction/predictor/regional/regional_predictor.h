@@ -115,5 +115,3 @@ class RegionalPredictor : public Predictor {
 
 }  // namespace prediction
 }  // namespace apollo
-
-

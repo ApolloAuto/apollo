@@ -53,5 +53,3 @@ class QpSplinePathOptimizer : public PathOptimizer {
 
 }  // namespace planning
 }  // namespace apollo
-
-

@@ -46,5 +46,3 @@ class ActiveSetSpline1dSolver : public Spline1dSolver {
 
 }  // namespace planning
 }  // namespace apollo
-
-

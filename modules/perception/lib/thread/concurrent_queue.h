@@ -150,5 +150,3 @@ class FixedSizeConQueue : public ConcurrentQueue<Data> {
 }  // namespace lib
 }  // namespace perception
 }  // namespace apollo
-
-

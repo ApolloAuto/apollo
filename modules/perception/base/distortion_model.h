@@ -94,5 +94,3 @@ typedef std::shared_ptr<const BrownCameraDistortionModel>
 }  // namespace base
 }  // namespace perception
 }  // namespace apollo
-
-

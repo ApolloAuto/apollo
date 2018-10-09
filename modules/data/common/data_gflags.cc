@@ -23,4 +23,3 @@ DEFINE_string(data_conf_file,
 DEFINE_string(data_record_service_name,
               "Data_Record_Service",
               "default recorder service name");
-

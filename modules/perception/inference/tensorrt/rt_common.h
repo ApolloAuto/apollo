@@ -75,5 +75,3 @@ bool ParserConvParam(const ConvolutionParameter &conv, ConvParam *param);
 }  // namespace inference
 }  // namespace perception
 }  // namespace apollo
-
-

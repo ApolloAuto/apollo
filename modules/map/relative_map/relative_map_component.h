@@ -54,6 +54,3 @@ class RelativeMapComponent final
 CYBERTRON_REGISTER_COMPONENT(RelativeMapComponent)
 }  // namespace relative_map
 }  // namespace apollo
-
-
-

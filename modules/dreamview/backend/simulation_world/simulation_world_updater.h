@@ -149,5 +149,3 @@ class SimulationWorldUpdater {
 
 }  // namespace dreamview
 }  // namespace apollo
-
-

@@ -49,5 +49,3 @@ class Layer {
 }  // namespace inference
 }  // namespace perception
 }  // namespace apollo
-
-

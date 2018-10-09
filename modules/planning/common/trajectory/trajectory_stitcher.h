@@ -56,5 +56,3 @@ class TrajectoryStitcher {
 
 }  // namespace planning
 }  // namespace apollo
-
-

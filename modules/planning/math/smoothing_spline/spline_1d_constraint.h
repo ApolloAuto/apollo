@@ -143,5 +143,3 @@ class Spline1dConstraint {
 
 }  // namespace planning
 }  // namespace apollo
-
-

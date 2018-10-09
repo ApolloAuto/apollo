@@ -45,5 +45,3 @@ class BlackListRangeGenerator {
 
 }  // namespace routing
 }  // namespace apollo
-
-

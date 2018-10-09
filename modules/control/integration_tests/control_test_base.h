@@ -65,5 +65,3 @@ class ControlTestBase : public ::testing::Test {
 
 }  // namespace control
 }  // namespace apollo
-
-

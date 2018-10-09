@@ -64,5 +64,3 @@ bool LoadMultipleMatricesFile(const std::string& filename,
 }  // namespace lidar
 }  // namespace perception
 }  // namespace apollo
-
-

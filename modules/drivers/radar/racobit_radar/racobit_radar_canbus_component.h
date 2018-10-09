@@ -103,5 +103,3 @@ CYBERTRON_REGISTER_COMPONENT(RacobitRadarCanbusComponent)
 }  // namespace racobit_radar
 }  // namespace drivers
 }  // namespace apollo
-
-

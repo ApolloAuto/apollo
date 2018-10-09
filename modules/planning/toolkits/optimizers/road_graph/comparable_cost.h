@@ -118,5 +118,3 @@ class ComparableCost {
 
 }  // namespace planning
 }  // namespace apollo
-
-

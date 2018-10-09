@@ -55,6 +55,3 @@ class CanCheckerFactory
 
 }  // namespace monitor
 }  // namespace apollo
-
-
-

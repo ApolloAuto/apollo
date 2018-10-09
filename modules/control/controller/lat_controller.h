@@ -228,5 +228,3 @@ class LatController : public Controller {
 
 }  // namespace control
 }  // namespace apollo
-
-

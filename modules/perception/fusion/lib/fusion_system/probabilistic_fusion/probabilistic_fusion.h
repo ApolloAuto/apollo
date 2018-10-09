@@ -107,5 +107,3 @@ class ProbabilisticFusion : public BaseFusionSystem {
 }  // namespace fusion
 }  // namespace perception
 }  // namespace apollo
-
-

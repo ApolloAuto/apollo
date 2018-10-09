@@ -68,5 +68,3 @@ class HMI {
 
 }  // namespace dreamview
 }  // namespace apollo
-
-

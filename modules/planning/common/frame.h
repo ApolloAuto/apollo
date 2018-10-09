@@ -174,5 +174,3 @@ class FrameHistory : public IndexedQueue<uint32_t, Frame> {
 
 }  // namespace planning
 }  // namespace apollo
-
-

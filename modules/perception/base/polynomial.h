@@ -46,5 +46,3 @@ std::ostream& operator<<(std::ostream& o, const Polynomial& p);
 }  // namespace base
 }  // namespace perception
 }  // namespace apollo
-
-

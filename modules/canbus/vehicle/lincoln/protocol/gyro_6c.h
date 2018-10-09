@@ -79,5 +79,3 @@ class Gyro6c : public ::apollo::drivers::canbus::ProtocolData<
 }  // namespace lincoln
 }  // namespace canbus
 }  // namespace apollo
-
-

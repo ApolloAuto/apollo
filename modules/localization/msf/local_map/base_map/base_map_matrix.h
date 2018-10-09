@@ -59,5 +59,3 @@ class BaseMapMatrix {
 }  // namespace msf
 }  // namespace localization
 }  // namespace apollo
-
-

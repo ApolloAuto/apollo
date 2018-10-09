@@ -72,5 +72,3 @@ class Interpolation2D {
 
 }  // namespace control
 }  // namespace apollo
-
-

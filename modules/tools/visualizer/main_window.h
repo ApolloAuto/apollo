@@ -140,5 +140,3 @@ class MainWindow : public QMainWindow {
   QList<RadarData*> radarData_list_;
   QList<RadarData*> closed_radarData_list_;
 };
-
-

@@ -80,5 +80,3 @@ class PathData {
 
 }  // namespace planning
 }  // namespace apollo
-
-

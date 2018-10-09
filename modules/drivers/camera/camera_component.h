@@ -55,5 +55,3 @@ CYBERTRON_REGISTER_COMPONENT(CameraComponent)
 }  // namespace camera
 }  // namespace drivers
 }  // namespace apollo
-
-

@@ -151,5 +151,3 @@ Eigen::Matrix<T, 3, 1> CalculateCentroid(
 }  // namespace common
 }  // namespace perception
 }  // namespace apollo
-
-

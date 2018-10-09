@@ -43,5 +43,3 @@ class ObjectsXmlParser {
 }  // namespace adapter
 }  // namespace hdmap
 }  // namespace apollo
-
-

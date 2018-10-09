@@ -57,5 +57,3 @@ class BaseMotionFusion {
 }  // namespace fusion
 }  // namespace perception
 }  // namespace apollo
-
-

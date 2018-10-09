@@ -111,5 +111,3 @@ class Parser {
 }  // namespace gnss
 }  // namespace drivers
 }  // namespace apollo
-
-

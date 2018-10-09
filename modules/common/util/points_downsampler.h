@@ -167,5 +167,3 @@ std::vector<int> DownsampleByDistance(const Points &points,
 }  // namespace util
 }  // namespace common
 }  // namespace apollo
-
-

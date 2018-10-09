@@ -726,5 +726,3 @@ void HungarianOptimizer<T>::AugmentPath() {
 }  // namespace common
 }  // namespace perception
 }  // namespace apollo
-
-

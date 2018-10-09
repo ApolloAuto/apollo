@@ -47,4 +47,3 @@ bool RoutingComponent::Proc(const std::shared_ptr<RoutingRequest>& request) {
 
 }  // namespace routing
 }  // namespace apollo
-

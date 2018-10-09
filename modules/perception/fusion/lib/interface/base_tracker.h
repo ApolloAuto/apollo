@@ -63,5 +63,3 @@ class BaseTracker {
 }  // namespace fusion
 }  // namespace perception
 }  // namespace apollo
-
-

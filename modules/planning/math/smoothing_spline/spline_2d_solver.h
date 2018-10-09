@@ -65,5 +65,3 @@ class Spline2dSolver {
 
 }  // namespace planning
 }  // namespace apollo
-
-

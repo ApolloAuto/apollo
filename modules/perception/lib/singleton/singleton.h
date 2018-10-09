@@ -61,5 +61,3 @@ T *Singleton<T>::instance_ = nullptr;
 }  // namespace lib
 }  // namespace perception
 }  // namespace apollo
-
-

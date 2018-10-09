@@ -526,5 +526,3 @@ SIMD_INLINE __m256i LoadPermuted(const __m256i *p) {
 }  // namespace camera
 }  // namespace drivers
 }  // namespace apollo
-
-

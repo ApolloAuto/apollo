@@ -80,5 +80,3 @@ class ProtoOrganizer {
 }  // namespace adapter
 }  // namespace hdmap
 }  // namespace apollo
-
-

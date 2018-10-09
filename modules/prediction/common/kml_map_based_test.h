@@ -34,5 +34,3 @@ class KMLMapBasedTest : public ::testing::Test {
 
 }  // namespace prediction
 }  // namespace apollo
-
-

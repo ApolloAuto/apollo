@@ -71,5 +71,3 @@ class Rtcm3Parser : public Parser {
 }  // namespace gnss
 }  // namespace drivers
 }  // namespace apollo
-
-

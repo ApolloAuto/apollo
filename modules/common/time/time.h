@@ -284,5 +284,3 @@ inline Clock::Clock()
 }  // namespace time
 }  // namespace common
 }  // namespace apollo
-
-

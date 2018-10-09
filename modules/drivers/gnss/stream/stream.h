@@ -108,5 +108,3 @@ class Stream {
 }  // namespace gnss
 }  // namespace drivers
 }  // namespace apollo
-
-

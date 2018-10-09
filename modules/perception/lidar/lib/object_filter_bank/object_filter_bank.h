@@ -49,5 +49,3 @@ class ObjectFilterBank {
 }  // namespace lidar
 }  // namespace perception
 }  // namespace apollo
-
-

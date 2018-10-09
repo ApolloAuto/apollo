@@ -609,4 +609,3 @@ class VoxelGridCovariance : public pcl::VoxelGrid<PointT> {
 }  // namespace msf
 }  // namespace localization
 }  // namespace apollo
-

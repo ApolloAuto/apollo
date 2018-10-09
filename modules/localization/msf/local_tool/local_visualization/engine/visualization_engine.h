@@ -292,5 +292,3 @@ class VisualizationEngine {
 }  // namespace msf
 }  // namespace localization
 }  // namespace apollo
-
-

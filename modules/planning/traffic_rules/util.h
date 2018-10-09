@@ -34,5 +34,3 @@ double GetADCStopDeceleration(ReferenceLineInfo* const reference_line_info,
 }  // util
 }  // namespace planning
 }  // namespace apollo
-
-

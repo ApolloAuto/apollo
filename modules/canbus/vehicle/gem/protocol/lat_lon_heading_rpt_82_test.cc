@@ -52,4 +52,3 @@ TEST_F(Latlonheadingrpt82Test, reset) {
 }  // namespace gem
 }  // namespace canbus
 }  // namespace apollo
-

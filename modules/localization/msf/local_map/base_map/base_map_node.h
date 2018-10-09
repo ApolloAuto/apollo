@@ -193,5 +193,3 @@ class BaseMapNode {
 }  // namespace msf
 }  // namespace localization
 }  // namespace apollo
-
-

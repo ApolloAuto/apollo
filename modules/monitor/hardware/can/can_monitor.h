@@ -32,5 +32,3 @@ class CanMonitor : public RecurrentRunner {
 
 }  // namespace monitor
 }  // namespace apollo
-
-

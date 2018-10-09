@@ -55,5 +55,3 @@ class Evaluator {
 
 }  // namespace prediction
 }  // namespace apollo
-
-

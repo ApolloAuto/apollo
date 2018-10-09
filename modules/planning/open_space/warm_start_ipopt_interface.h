@@ -129,5 +129,3 @@ class WarmStartIPOPTInterface : public Ipopt::TNLP {
 
 }  // namespace planning
 }  // namespace apollo
-
-

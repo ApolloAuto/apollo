@@ -32,5 +32,3 @@
 #define FUSION_TRACK_DATA_EMPTY 523        // no sensor data of the tracker
 #define FUSION_HM_ASSIGN_ERROR 524         // hm assign error
 #define FUSION_BBAMANAGER_ERROR 525        // BBAManager throw error
-
-

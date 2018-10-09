@@ -49,5 +49,3 @@ class PolynomialXd {
 
 }  // namespace planning
 }  // namespace apollo
-
-

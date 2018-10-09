@@ -541,5 +541,3 @@ inline bool IWithin2D(const T x, const T y, const T x_upper_left,
 }  // namespace common
 }  // namespace perception
 }  // namespace apollo
-
-

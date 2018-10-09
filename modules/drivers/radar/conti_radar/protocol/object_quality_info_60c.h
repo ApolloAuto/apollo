@@ -59,5 +59,3 @@ class ObjectQualityInfo60C
 }  // namespace conti_radar
 }  // namespace drivers
 }  // namespace apollo
-
-

@@ -64,5 +64,3 @@ class MapManager {
 }  // namespace lidar
 }  // namespace perception
 }  // namespace apollo
-
-

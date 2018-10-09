@@ -63,5 +63,3 @@ class TimerWrapper {
 }  // namespace lib
 }  // namespace perception
 }  // namespace apollo
-
-

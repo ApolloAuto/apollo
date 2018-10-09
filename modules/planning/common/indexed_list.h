@@ -115,5 +115,3 @@ class ThreadSafeIndexedList : public IndexedList<I, T> {
 
 }  // namespace planning
 }  // namespace apollo
-
-

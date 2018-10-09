@@ -50,4 +50,3 @@ TEST_F(Datetimerpt83Test, reset) {
 }  // namespace gem
 }  // namespace canbus
 }  // namespace apollo
-

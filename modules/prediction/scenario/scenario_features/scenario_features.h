@@ -33,5 +33,3 @@ class ScenarioFeatures {
 
 }  // namespace prediction
 }  // namespace apollo
-
-

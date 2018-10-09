@@ -56,5 +56,3 @@ class PlannerDispatcher {
 
 }  // namespace planning
 }  // namespace apollo
-
-

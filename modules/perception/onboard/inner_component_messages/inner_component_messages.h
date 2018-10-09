@@ -77,5 +77,3 @@ class SensorFrameMessage : public apollo::cybertron::message::IntraMessage {
 }  // namespace onboard
 }  // namespace perception
 }  // namespace apollo
-
-

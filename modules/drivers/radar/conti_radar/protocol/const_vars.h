@@ -83,5 +83,3 @@ const double OBJECT_LENGTH_RES = 0.2;
 }  // namespace conti_radar
 }  // namespace drivers
 }  // namespace apollo
-
-

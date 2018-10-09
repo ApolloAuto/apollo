@@ -57,5 +57,3 @@ class StGraphData {
 
 }  // namespace planning
 }  // namespace apollo
-
-

@@ -68,5 +68,3 @@ class FreeMovePredictor : public Predictor {
 
 }  // namespace prediction
 }  // namespace apollo
-
-

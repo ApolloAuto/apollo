@@ -161,5 +161,3 @@ typedef std::shared_ptr<const KalmanFilter> KalmanFilterConstPtr;
 }  // namespace lidar
 }  // namespace perception
 }  // namespace apollo
-
-

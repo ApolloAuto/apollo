@@ -79,4 +79,3 @@ bool RelativeMapComponent::InitReaders() {
 
 }  // namespace relative_map
 }  // namespace apollo
-

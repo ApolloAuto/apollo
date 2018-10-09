@@ -154,5 +154,3 @@ class WriterMutexLock {
 }  // namespace lib
 }  // namespace perception
 }  // namespace apollo
-
-

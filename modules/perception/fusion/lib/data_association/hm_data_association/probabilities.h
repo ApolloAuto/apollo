@@ -61,5 +61,3 @@ double FuseMultipleProbabilities(const std::vector<double>& probs);
 }  // namespace fusion
 }  // namespace perception
 }  // namespace apollo
-
-

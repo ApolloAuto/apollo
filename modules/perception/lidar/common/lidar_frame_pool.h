@@ -36,5 +36,3 @@ typedef base::ConcurrentObjectPool<LidarFrame, kLidarFramePoolSize,
 }  // namespace lidar
 }  // namespace perception
 }  // namespace apollo
-
-

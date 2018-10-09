@@ -46,5 +46,3 @@ class DummyClassifier : public BaseClassifier {
 }  // namespace lidar
 }  // namespace perception
 }  // namespace apollo
-
-

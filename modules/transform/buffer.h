@@ -147,5 +147,3 @@ class Buffer : public BufferInterface, public tf2::BufferCore {
 
 }  // namespace transform
 }  // namespace apollo
-
-

@@ -47,5 +47,3 @@ class ZlibStrategy : public CompressionStrategy {
 }  // namespace msf
 }  // namespace localization
 }  // namespace apollo
-
-

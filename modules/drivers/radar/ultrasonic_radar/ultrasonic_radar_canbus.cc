@@ -114,4 +114,3 @@ Status UltrasonicRadarCanbus::OnError(const std::string &error_msg) {
 }  // namespace ultrasonic_radar
 }  // namespace drivers
 }  // namespace apollo
-

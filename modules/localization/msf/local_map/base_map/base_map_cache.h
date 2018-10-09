@@ -225,5 +225,3 @@ class MapNodeCacheL2 : public LRUCache<Key, MapNode> {
 }  // namespace msf
 }  // namespace localization
 }  // namespace apollo
-
-

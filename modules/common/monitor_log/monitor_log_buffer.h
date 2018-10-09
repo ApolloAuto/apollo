@@ -115,5 +115,3 @@ class MonitorLogBuffer {
 }  // namespace monitor
 }  // namespace common
 }  // namespace apollo
-
-

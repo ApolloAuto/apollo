@@ -69,5 +69,3 @@ class ImageHandler : public CivetHandler {
 
 }  // namespace dreamview
 }  // namespace apollo
-
-

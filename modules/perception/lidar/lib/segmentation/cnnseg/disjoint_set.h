@@ -90,5 +90,3 @@ void DisjointSetUnion(T* x, T* y) {
 }  // namespace lidar
 }  // namespace perception
 }  // namespace apollo
-
-

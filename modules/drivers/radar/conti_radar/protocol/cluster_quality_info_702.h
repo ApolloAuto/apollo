@@ -55,5 +55,3 @@ class ClusterQualityInfo702
 }  // namespace conti_radar
 }  // namespace drivers
 }  // namespace apollo
-
-

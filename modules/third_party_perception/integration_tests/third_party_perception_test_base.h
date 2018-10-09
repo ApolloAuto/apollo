@@ -63,5 +63,3 @@ class ThirdPartyPerceptionTestBase : public ::testing::Test {
 
 }  // namespace third_party_perception
 }  // namespace apollo
-
-

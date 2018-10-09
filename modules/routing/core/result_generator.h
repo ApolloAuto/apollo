@@ -82,5 +82,3 @@ class ResultGenerator {
 
 }  // namespace routing
 }  // namespace apollo
-
-

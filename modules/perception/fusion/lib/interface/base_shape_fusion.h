@@ -57,5 +57,3 @@ class BaseShapeFusion {
 }  // namespace fusion
 }  // namespace perception
 }  // namespace apollo
-
-

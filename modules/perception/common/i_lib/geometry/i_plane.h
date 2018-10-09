@@ -459,5 +459,3 @@ template <typename T> inline void IPlaneFitAdv(const T *Xs, T *para) {
 }  // namespace common
 }  // namespace perception
 }  // namespace apollo
-
-

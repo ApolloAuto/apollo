@@ -72,5 +72,3 @@ class SceneManager {
 }  // namespace lidar
 }  // namespace perception
 }  // namespace apollo
-
-

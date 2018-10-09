@@ -196,5 +196,3 @@ int MsgBuffer<T>::LookupPeriod(const double timestamp, const double period,
 }  // namespace onboard
 }  // namespace perception
 }  // namespace apollo
-
-

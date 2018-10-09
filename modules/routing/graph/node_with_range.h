@@ -45,5 +45,3 @@ class NodeWithRange : public NodeSRange {
 
 }  // namespace routing
 }  // namespace apollo
-
-

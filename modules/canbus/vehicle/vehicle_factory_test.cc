@@ -48,4 +48,3 @@ TEST_F(VehicleFactoryTest, CreateVehicle) {
 
 }  // namespace canbus
 }  // namespace apollo
-

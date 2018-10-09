@@ -48,5 +48,3 @@ class NodeSRange {
 
 }  // namespace routing
 }  // namespace apollo
-
-

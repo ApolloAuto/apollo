@@ -138,5 +138,3 @@ struct RoadInternal {
 }  // namespace adapter
 }  // namespace hdmap
 }  // namespace apollo
-
-

@@ -64,5 +64,3 @@ constexpr size_t array_size(T (&)[N]) {
 }
 
 }  // namespace apollo
-
-

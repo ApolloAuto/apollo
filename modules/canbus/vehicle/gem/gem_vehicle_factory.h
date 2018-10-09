@@ -64,5 +64,3 @@ class GemVehicleFactory : public AbstractVehicleFactory {
 
 }  // namespace canbus
 }  // namespace apollo
-
-

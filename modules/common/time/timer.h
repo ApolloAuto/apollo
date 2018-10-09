@@ -75,5 +75,3 @@ class TimerWrapper {
   _timer_.Start()
 
 #define PERF_BLOCK_END(msg) _timer_.End(msg)
-
-

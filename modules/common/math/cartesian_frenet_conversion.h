@@ -104,5 +104,3 @@ class CartesianFrenetConverter {
 }  // namespace math
 }  // namespace common
 }  // namespace apollo
-
-

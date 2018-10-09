@@ -53,5 +53,3 @@ class CubicSpiralCurve : public SpiralCurve {
 
 }  // namespace planning
 }  // namespace apollo
-
-

@@ -77,5 +77,3 @@ class JsonUtil {
 }  // namespace util
 }  // namespace common
 }  // namespace apollo
-
-

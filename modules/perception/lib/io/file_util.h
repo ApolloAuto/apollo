@@ -105,5 +105,3 @@ class FileUtil {
 }  // namespace lib
 }  // namespace perception
 }  // namespace apollo
-
-

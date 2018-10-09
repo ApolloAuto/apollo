@@ -100,5 +100,3 @@ typedef std::shared_ptr<const SceneService> SceneServiceConstPtr;
 }  // namespace lidar
 }  // namespace perception
 }  // namespace apollo
-
-

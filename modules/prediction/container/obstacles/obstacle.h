@@ -263,5 +263,3 @@ class Obstacle {
 
 }  // namespace prediction
 }  // namespace apollo
-
-

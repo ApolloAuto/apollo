@@ -44,5 +44,3 @@ class AutotuningMLPModel : public prediction::network::NetModel {
 
 }  // namespace planning
 }  // namespace apollo
-
-

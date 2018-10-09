@@ -53,5 +53,3 @@ class ObjectExtendedInfo60D
 }  // namespace conti_radar
 }  // namespace drivers
 }  // namespace apollo
-
-

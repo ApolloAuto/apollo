@@ -106,5 +106,3 @@ class LocalizationIntegProcess {
 }  // namespace msf
 }  // namespace localization
 }  // namespace apollo
-
-

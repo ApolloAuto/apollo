@@ -260,5 +260,3 @@ template <typename A, typename B>
 std::ostream& operator<<(std::ostream& os, std::pair<A, B>& p) {
   return os << "first: " << p.first << ", second: " << p.second;
 }
-
-

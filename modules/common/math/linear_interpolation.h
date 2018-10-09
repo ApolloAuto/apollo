@@ -85,5 +85,3 @@ TrajectoryPoint InterpolateUsingLinearApproximation(const TrajectoryPoint &tp0,
 }  // namespace math
 }  // namespace common
 }  // namespace apollo
-
-

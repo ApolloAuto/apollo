@@ -53,5 +53,3 @@ CYBERTRON_REGISTER_COMPONENT(StaticTransformComponent)
 
 }  // namespace transform
 }  // namespace apollo
-
-

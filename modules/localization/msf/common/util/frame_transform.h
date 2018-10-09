@@ -52,5 +52,3 @@ void BlhToXYZ(const Eigen::Vector3d &blh, Eigen::Vector3d *xyz);
 }   // namespace msf
 }   // namespace localization
 }   // namespace apollo
-
-

@@ -48,5 +48,3 @@ class CoordinateConvertTool {
 }  // namespace adapter
 }  // namespace hdmap
 }  // namespace apollo
-
-

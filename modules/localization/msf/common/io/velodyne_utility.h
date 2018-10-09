@@ -84,5 +84,3 @@ bool LoadExtrinsic(const std::string& file_path, Eigen::Affine3d* extrinsic);
 }  // namespace msf
 }  // namespace localization
 }  // namespace apollo
-
-

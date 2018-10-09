@@ -271,5 +271,3 @@ void GetFileNamesInFolderById(const std::string &folder, const std::string &ext,
 }  // namespace util
 }  // namespace common
 }  // namespace apollo
-
-

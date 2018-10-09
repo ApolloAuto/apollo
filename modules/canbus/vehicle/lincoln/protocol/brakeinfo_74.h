@@ -219,5 +219,3 @@ class Brakeinfo74 : public ::apollo::drivers::canbus::ProtocolData<
 }  // namespace lincoln
 }  // namespace canbus
 }  // namespace apollo
-
-

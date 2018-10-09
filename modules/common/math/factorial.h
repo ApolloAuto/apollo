@@ -39,5 +39,3 @@ struct Factorial<0> {
 }  // namespace math
 }  // namespace common
 }  // namespace apollo
-
-

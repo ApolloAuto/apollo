@@ -149,5 +149,3 @@ class AbstractCamera {
   QMatrix4x4 projection_mat_;
   QMatrix4x4 model_view_mat_;
 };
-
-

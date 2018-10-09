@@ -52,5 +52,3 @@ class SidePassPathOptimizer final : public PathOptimizer {
 
 }  // namespace planning
 }  // namespace apollo
-
-

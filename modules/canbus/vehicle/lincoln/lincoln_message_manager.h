@@ -54,5 +54,3 @@ class LincolnMessageManager
 }  // namespace lincoln
 }  // namespace canbus
 }  // namespace apollo
-
-

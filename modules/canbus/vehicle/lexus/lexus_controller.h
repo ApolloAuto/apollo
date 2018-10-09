@@ -144,5 +144,3 @@ class LexusController final : public VehicleController {
 }  // namespace lexus
 }  // namespace canbus
 }  // namespace apollo
-
-

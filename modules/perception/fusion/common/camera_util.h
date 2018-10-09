@@ -97,5 +97,3 @@ float ObjectInCameraView(SensorObjectConstPtr sensor_object,
 }  // namespace fusion
 }  // namespace perception
 }  // namespace apollo
-
-

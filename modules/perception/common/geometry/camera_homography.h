@@ -43,5 +43,3 @@ bool IsCamerasFieldOverlap(const base::PinholeCameraModel& from_camera,
 }  // namespace common
 }  // namespace perception
 }  // namespace apollo
-
-

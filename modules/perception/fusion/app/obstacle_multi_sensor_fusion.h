@@ -50,5 +50,3 @@ class ObstacleMultiSensorFusion {
 }  // namespace fusion
 }  // namespace perception
 }  // namespace apollo
-
-

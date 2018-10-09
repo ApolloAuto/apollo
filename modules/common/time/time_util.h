@@ -68,5 +68,3 @@ class TimeUtil {
 }  // namespace time
 }  // namespace common
 }  // namespace apollo
-
-

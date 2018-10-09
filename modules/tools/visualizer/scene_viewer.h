@@ -154,5 +154,3 @@ class SceneViewer : public QOpenGLWidget, protected QOpenGLFunctions {
   std::map<const std::string, TempRenderableObjGroup*> tmp_renderable_obj_list_;
   QList<RenderableObject*> permanent_renderable_obj_list_;
 };
-
-

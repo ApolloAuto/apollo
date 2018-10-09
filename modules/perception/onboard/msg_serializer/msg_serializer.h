@@ -44,5 +44,3 @@ class MsgSerializer {
 }  // namespace onboard
 }  // namespace perception
 }  // namespace apollo
-
-

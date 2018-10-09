@@ -54,5 +54,3 @@ class ChangeLaneDecider {
 
 }  // namespace planning
 }  // namespace apollo
-
-

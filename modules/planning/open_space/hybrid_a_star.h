@@ -132,5 +132,3 @@ class HybridAStar {
 
 }  // namespace planning
 }  // namespace apollo
-
-

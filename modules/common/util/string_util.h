@@ -207,5 +207,3 @@ std::string EncodeBase64(const std::string& in);
 }  // namespace util
 }  // namespace common
 }  // namespace apollo
-
-

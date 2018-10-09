@@ -71,5 +71,3 @@ class SocketCanChecker : public HwCheckerInterface {
 }  // namespace hw
 }  // namespace monitor
 }  // namespace apollo
-
-

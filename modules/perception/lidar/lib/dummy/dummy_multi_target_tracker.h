@@ -51,5 +51,3 @@ class DummyMultiTargetTracker : public BaseMultiTargetTracker {
 }  // namespace lidar
 }  // namespace perception
 }  // namespace apollo
-
-

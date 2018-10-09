@@ -41,5 +41,3 @@ DECLARE_string(localization_tf2_frame_id);
 DECLARE_string(localization_tf2_child_frame_id);
 DECLARE_bool(use_navigation_mode);
 DECLARE_string(navigation_mode_end_way_point_file);
-
-

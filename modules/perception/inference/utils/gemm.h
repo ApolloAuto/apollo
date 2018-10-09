@@ -52,5 +52,3 @@ void GPUMSetFloat(const int n, const float alpha, float *result);
 }  // namespace inference
 }  // namespace perception
 }  // namespace apollo
-
-

@@ -42,4 +42,3 @@ TEST_F(Steeringmotorrpt173Test, reset) {
 }  // namespace gem
 }  // namespace canbus
 }  // namespace apollo
-

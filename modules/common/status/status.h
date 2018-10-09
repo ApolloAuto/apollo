@@ -137,5 +137,3 @@ inline std::ostream &operator<<(std::ostream &os, const Status &s) {
 
 }  // namespace common
 }  // namespace apollo
-
-

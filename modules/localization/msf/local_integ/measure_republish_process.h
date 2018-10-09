@@ -113,5 +113,3 @@ class MeasureRepublishProcess {
 }  // namespace msf
 }  // namespace localization
 }  // namespace apollo
-
-

@@ -45,5 +45,3 @@ class LossyMapNodePool2D : public BaseMapNodePool {
 }  // namespace msf
 }  // namespace localization
 }  // namespace apollo
-
-

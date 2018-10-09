@@ -62,5 +62,3 @@ class ReferenceLineSmoother {
 
 }  // namespace planning
 }  // namespace apollo
-
-

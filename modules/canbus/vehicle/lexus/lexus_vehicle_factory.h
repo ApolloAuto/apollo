@@ -64,5 +64,3 @@ class LexusVehicleFactory : public AbstractVehicleFactory {
 
 }  // namespace canbus
 }  // namespace apollo
-
-

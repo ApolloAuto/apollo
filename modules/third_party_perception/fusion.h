@@ -37,5 +37,3 @@ apollo::perception::PerceptionObstacles MobileyeRadarFusion(
 }  // namespace fusion
 }  // namespace third_party_perception
 }  // namespace apollo
-
-

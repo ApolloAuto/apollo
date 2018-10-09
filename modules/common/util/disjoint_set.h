@@ -73,5 +73,3 @@ void DisjointSetUnion(T *x, T *y) {
 }  // namespace util
 }  // namespace common
 }  // namespace apollo
-
-

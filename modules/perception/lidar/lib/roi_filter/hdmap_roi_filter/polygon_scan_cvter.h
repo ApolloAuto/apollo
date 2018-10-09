@@ -496,5 +496,3 @@ bool PolygonScanCvter<T>::ConvertSegment(const size_t seg_id,
 }  // namespace lidar
 }  // namespace perception
 }  // namespace apollo
-
-

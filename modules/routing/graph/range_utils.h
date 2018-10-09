@@ -101,5 +101,3 @@ int BinarySearchForEndS(const std::vector<T>& sorted_vec, double value_s) {
 
 }  // namespace routing
 }  // namespace apollo
-
-

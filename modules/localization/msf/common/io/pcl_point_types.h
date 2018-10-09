@@ -94,5 +94,3 @@ POINT_CLOUD_REGISTER_POINT_STRUCT(
     apollo::localization::msf::velodyne::PointXYZIRTd,
     (double, x, x)(double, y, y)(double, z, z)(uint8_t, intensity, intensity)(
         uint8_t, ring, ring)(double, timestamp, timestamp))
-
-

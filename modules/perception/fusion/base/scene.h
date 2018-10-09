@@ -65,5 +65,3 @@ typedef std::shared_ptr<const Scene> SceneConstPtr;
 }  // namespace fusion
 }  // namespace perception
 }  // namespace apollo
-
-

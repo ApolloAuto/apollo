@@ -129,5 +129,3 @@ class BaseMap {
 }  // namespace msf
 }  // namespace localization
 }  // namespace apollo
-
-

@@ -290,5 +290,3 @@ double IntegrateByGaussLegendre(const std::function<double(double)>& func,
 }  // namespace math
 }  // namespace common
 }  // namespace apollo
-
-

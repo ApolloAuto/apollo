@@ -105,5 +105,3 @@ class OfflineLocalVisualizer {
 }  // namespace msf
 }  // namespace localization
 }  // namespace apollo
-
-

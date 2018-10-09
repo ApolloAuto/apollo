@@ -67,5 +67,3 @@ class EsdCanChecker : public HwCheckerInterface {
 }  // namespace hw
 }  // namespace monitor
 }  // namespace apollo
-
-

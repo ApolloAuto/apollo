@@ -46,5 +46,3 @@ class TrafficRule {
 
 }  // namespace planning
 }  // namespace apollo
-
-

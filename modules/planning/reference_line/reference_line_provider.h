@@ -185,5 +185,3 @@ class ReferenceLineProvider {
 
 }  // namespace planning
 }  // namespace apollo
-
-

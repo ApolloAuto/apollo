@@ -331,5 +331,3 @@ class PredictionMap {
 
 }  // namespace prediction
 }  // namespace apollo
-
-

@@ -43,5 +43,3 @@ class SidePassWaypointSampler final : public WaypointSampler {
 
 }  // namespace planning
 }  // namespace apollo
-
-

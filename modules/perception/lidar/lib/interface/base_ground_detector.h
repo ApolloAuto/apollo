@@ -59,5 +59,3 @@ PERCEPTION_REGISTER_REGISTERER(BaseGroundDetector);
 }  // namespace lidar
 }  // namespace perception
 }  // namespace apollo
-
-

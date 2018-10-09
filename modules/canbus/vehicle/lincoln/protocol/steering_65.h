@@ -206,5 +206,3 @@ class Steering65 : public ::apollo::drivers::canbus::ProtocolData<
 }  // namespace lincoln
 }  // namespace canbus
 }  // namespace apollo
-
-

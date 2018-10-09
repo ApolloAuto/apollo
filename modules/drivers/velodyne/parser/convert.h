@@ -66,5 +66,3 @@ class Convert {
 }  // namespace velodyne
 }  // namespace drivers
 }  // namespace apollo
-
-

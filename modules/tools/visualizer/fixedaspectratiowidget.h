@@ -51,5 +51,3 @@ class FixedAspectRatioWidget : public QWidget {
   QTimer refresh_timer_;
   VideoImgViewer viewer_;
 };
-
-

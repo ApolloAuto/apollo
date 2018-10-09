@@ -188,5 +188,3 @@ void ConvertCartesiantoPolarCoordinate(const PointT &xyz,
 }  // namespace common
 }  // namespace perception
 }  // namespace apollo
-
-

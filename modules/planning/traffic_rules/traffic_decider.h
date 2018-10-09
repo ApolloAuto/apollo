@@ -67,5 +67,3 @@ class TrafficDecider {
 
 }  // namespace planning
 }  // namespace apollo
-
-

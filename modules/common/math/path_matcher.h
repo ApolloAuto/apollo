@@ -52,5 +52,3 @@ class PathMatcher {
 }  // namespace math
 }  // namespace common
 }  // namespace apollo
-
-

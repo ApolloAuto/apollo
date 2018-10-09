@@ -97,5 +97,3 @@ bool DumpMessage(const std::shared_ptr<T>& msg,
 }  // namespace util
 }  // namespace common
 }  // namespace apollo
-
-

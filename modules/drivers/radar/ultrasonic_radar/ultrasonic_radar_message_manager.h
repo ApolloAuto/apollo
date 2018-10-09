@@ -61,5 +61,3 @@ class UltrasonicRadarMessageManager : public MessageManager<Ultrasonic> {
 }  // namespace ultrasonic_radar
 }  // namespace drivers
 }  // namespace apollo
-
-

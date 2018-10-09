@@ -89,5 +89,3 @@ struct LaneLine {
 }  // namespace base
 }  // namespace perception
 }  // namespace apollo
-
-

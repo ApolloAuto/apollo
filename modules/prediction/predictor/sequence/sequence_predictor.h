@@ -131,4 +131,3 @@ class SequencePredictor : public Predictor {
 
 }  // namespace prediction
 }  // namespace apollo
-

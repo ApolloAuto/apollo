@@ -46,5 +46,3 @@ class NaviPlannerDispatcher final : public PlannerDispatcher {
 
 }  // namespace planning
 }  // namespace apollo
-
-

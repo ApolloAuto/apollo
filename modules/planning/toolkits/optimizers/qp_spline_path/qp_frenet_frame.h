@@ -107,5 +107,3 @@ class QpFrenetFrame {
 
 }  // namespace planning
 }  // namespace apollo
-
-

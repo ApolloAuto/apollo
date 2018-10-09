@@ -60,5 +60,3 @@ inline float Pixel2Pc(int in_pixel, float in_size, float out_range) {
 }  // namespace lidar
 }  // namespace perception
 }  // namespace apollo
-
-

@@ -83,5 +83,3 @@ class Sensor : public std::enable_shared_from_this<Sensor> {
 }  // namespace fusion
 }  // namespace perception
 }  // namespace apollo
-
-

@@ -113,5 +113,3 @@ class Predictor {
 
 }  // namespace prediction
 }  // namespace apollo
-
-

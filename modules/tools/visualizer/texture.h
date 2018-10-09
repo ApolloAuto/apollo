@@ -59,5 +59,3 @@ class Texture {
   GLsizei data_size_;
   GLubyte* data_;
 };
-
-

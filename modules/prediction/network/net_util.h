@@ -97,5 +97,3 @@ bool LoadTensor(const TensorParameter& tensor_pb, Eigen::VectorXf* vector);
 }  // namespace network
 }  // namespace prediction
 }  // namespace apollo
-
-

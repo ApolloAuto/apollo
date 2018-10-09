@@ -69,5 +69,3 @@ class AutotuningBaseModel {
 
 }  // namespace planning
 }  // namespace apollo
-
-

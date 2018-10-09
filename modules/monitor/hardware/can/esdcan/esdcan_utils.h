@@ -38,5 +38,3 @@ void esdcan_print_bitrate(const NTCAN_BITRATE &bitrate);
 }  // namespace hw
 }  // namespace monitor
 }  // namespace apollo
-
-

@@ -33,5 +33,3 @@ class GpsMonitor : public RecurrentRunner {
 
 }  // namespace monitor
 }  // namespace apollo
-
-

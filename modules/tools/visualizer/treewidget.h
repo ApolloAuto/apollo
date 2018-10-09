@@ -33,5 +33,3 @@ class TreeWidget : public QTreeWidget {
   void resizeEvent(QResizeEvent *);
   bool event(QEvent *e);
 };
-
-

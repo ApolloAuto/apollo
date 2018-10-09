@@ -57,5 +57,3 @@ class RtcmParser {
 }  // namespace gnss
 }  // namespace drivers
 }  // namespace apollo
-
-

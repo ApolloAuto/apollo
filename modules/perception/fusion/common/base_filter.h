@@ -87,5 +87,3 @@ class BaseFilter {
 }  // namespace fusion
 }  // namespace perception
 }  // namespace apollo
-
-

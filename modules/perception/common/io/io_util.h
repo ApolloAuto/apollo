@@ -43,5 +43,3 @@ bool LoadOmnidirectionalCameraIntrinsics(
 }  // namespace common
 }  // namespace perception
 }  // namespace apollo
-
-

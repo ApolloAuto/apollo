@@ -57,5 +57,3 @@ class Horncmd78 : public ::apollo::drivers::canbus::ProtocolData<
 }  // namespace gem
 }  // namespace canbus
 }  // namespace apollo
-
-

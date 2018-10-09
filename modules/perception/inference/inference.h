@@ -59,5 +59,3 @@ class Inference {
 }  // namespace inference
 }  // namespace perception
 }  // namespace apollo
-
-

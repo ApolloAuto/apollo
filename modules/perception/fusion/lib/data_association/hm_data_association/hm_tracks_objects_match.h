@@ -102,4 +102,3 @@ class HMTrackersObjectsAssociation : public BaseDataAssociation {
 }  // namespace fusion
 }  // namespace perception
 }  // namespace apollo
-

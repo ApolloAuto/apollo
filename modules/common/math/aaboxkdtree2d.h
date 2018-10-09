@@ -470,5 +470,3 @@ class AABoxKDTree2d {
 }  // namespace math
 }  // namespace common
 }  // namespace apollo
-
-

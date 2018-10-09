@@ -99,5 +99,3 @@ CYBERTRON_REGISTER_COMPONENT(OnlineVisualizerComponent);
 }  // namespace msf
 }  // namespace localization
 }  // namespace apollo
-
-

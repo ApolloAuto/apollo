@@ -41,5 +41,3 @@ const int32_t MAX_CAN_PORT = 3;
 }  // namespace canbus
 }  // namespace drivers
 }  // namespace apollo
-
-

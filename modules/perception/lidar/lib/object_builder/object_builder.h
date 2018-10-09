@@ -98,5 +98,3 @@ class ObjectBuilder {
 }  // namespace lidar
 }  // namespace perception
 }  // namespace apollo
-
-

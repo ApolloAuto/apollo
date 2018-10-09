@@ -56,5 +56,3 @@ class SceneCameraDialog : public QDialog {
  private:
   Ui::SceneCameraDialog *ui;
 };
-
-

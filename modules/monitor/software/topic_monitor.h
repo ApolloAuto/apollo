@@ -42,5 +42,3 @@ class TopicMonitor : public RecurrentRunner {
 
 }  // namespace monitor
 }  // namespace apollo
-
-

@@ -172,5 +172,3 @@ class WebSocketHandler : public CivetWebSocketHandler {
 
 }  // namespace dreamview
 }  // namespace apollo
-
-

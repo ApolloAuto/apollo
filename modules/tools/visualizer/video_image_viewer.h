@@ -50,4 +50,3 @@ class VideoImgViewer : public QOpenGLWidget, protected QOpenGLFunctions {
   std::shared_ptr<QOpenGLShaderProgram> video_image_shader_prog_;
   friend class FixedAspectRatioWidget;
 };
-

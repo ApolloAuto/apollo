@@ -113,5 +113,3 @@ class PointCloudUpdater {
 
 }  // namespace dreamview
 }  // namespace apollo
-
-

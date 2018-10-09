@@ -64,5 +64,3 @@ CYBERTRON_REGISTER_COMPONENT(PriSecFusionComponent)
 }  // namespace velodyne
 }  // namespace drivers
 }  // namespace apollo
-
-

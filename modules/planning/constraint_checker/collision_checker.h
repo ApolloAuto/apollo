@@ -68,5 +68,3 @@ class CollisionChecker {
 
 }  // namespace planning
 }  // namespace apollo
-
-

@@ -71,5 +71,3 @@ class ScenarioManager {
 
 }  // namespace prediction
 }  // namespace apollo
-
-

@@ -92,5 +92,3 @@ typedef std::vector<TrafficLightPtr> TrafficLightPtrs;
 }  // namespace base
 }  // namespace perception
 }  // namespace apollo
-
-

@@ -116,5 +116,3 @@ class VehicleConfigHelper {
 
 }  // namespace common
 }  // namespace apollo
-
-

@@ -76,4 +76,3 @@ class PointCloudPreprocessor {
 }  // namespace lidar
 }  // namespace perception
 }  // namespace apollo
-

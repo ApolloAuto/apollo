@@ -45,5 +45,3 @@ class ROIServiceFilter : public BaseROIFilter {
 }  // namespace lidar
 }  // namespace perception
 }  // namespace apollo
-
-

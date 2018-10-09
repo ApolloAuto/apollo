@@ -86,5 +86,3 @@ class Steeringauxrpt32c : public ::apollo::drivers::canbus::ProtocolData<
 }  // namespace lexus
 }  // namespace canbus
 }  // namespace apollo
-
-

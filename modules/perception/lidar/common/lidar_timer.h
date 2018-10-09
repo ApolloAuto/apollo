@@ -42,5 +42,3 @@ class Timer {
 }  // namespace lidar
 }  // namespace perception
 }  // namespace apollo
-
-

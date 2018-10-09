@@ -122,5 +122,3 @@ typedef ThreadSafeIndexedList<std::string, Obstacle> ThreadSafeIndexedObstacles;
 
 }  // namespace planning
 }  // namespace apollo
-
-

@@ -140,4 +140,3 @@ class LonController : public Controller {
 };
 }  // namespace control
 }  // namespace apollo
-

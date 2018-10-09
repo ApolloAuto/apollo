@@ -54,5 +54,3 @@ class NaviTask {
 
 }  // namespace planning
 }  // namespace apollo
-
-

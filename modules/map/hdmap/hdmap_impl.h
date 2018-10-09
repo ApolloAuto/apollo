@@ -386,5 +386,3 @@ class HDMapImpl {
 
 }  // namespace hdmap
 }  // namespace apollo
-
-

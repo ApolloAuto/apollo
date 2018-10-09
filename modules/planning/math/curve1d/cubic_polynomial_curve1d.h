@@ -61,5 +61,3 @@ class CubicPolynomialCurve1d : public PolynomialCurve1d {
 
 }  // namespace planning
 }  // namespace apollo
-
-

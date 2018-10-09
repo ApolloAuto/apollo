@@ -105,5 +105,3 @@ class PIDController {
 
 }  // namespace control
 }  // namespace apollo
-
-

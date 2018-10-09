@@ -96,5 +96,3 @@ class InformationFilter : public BaseFilter {
 }  // namespace fusion
 }  // namespace perception
 }  // namespace apollo
-
-

@@ -125,5 +125,3 @@ class FeatureGenerator {
 }  // namespace lidar
 }  // namespace perception
 }  // namespace apollo
-
-

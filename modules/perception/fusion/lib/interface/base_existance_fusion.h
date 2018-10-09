@@ -60,5 +60,3 @@ class BaseExistanceFusion {
 }  // namespace fusion
 }  // namespace perception
 }  // namespace apollo
-
-

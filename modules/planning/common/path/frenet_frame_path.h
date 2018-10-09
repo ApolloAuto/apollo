@@ -66,5 +66,3 @@ class FrenetFramePath {
 
 }  // namespace planning
 }  // namespace apollo
-
-

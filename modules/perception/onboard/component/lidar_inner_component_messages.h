@@ -57,5 +57,3 @@ class LidarFrameMessage : public apollo::cybertron::message::IntraMessage {
 }  // namespace onboard
 }  // namespace perception
 }  // namespace apollo
-
-

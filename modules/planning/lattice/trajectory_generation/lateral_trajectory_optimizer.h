@@ -57,5 +57,3 @@ class LateralTrajectoryOptimizer {
 
 }  // namespace planning
 }  // namespace apollo
-
-

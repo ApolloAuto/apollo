@@ -67,5 +67,3 @@ class PiecewiseQuinticSpiralPath : public Curve1d {
 
 }  // namespace planning
 }  // namespace apollo
-
-

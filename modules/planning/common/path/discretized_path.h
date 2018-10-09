@@ -61,5 +61,3 @@ class DiscretizedPath {
 
 }  // namespace planning
 }  // namespace apollo
-
-

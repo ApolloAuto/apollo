@@ -84,5 +84,3 @@ class StringTokenizer {
 }  // namespace util
 }  // namespace common
 }  // namespace apollo
-
-

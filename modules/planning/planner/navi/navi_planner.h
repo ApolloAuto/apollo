@@ -122,5 +122,3 @@ class NaviPlanner : public PlannerWithReferenceLine {
 
 }  // namespace planning
 }  // namespace apollo
-
-

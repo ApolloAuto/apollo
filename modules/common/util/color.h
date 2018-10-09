@@ -39,5 +39,3 @@ constexpr char ANSI_RESET[] = "\x1b[0m";
 }  // namespace color
 }  // namespace common
 }  // namespace apollo
-
-

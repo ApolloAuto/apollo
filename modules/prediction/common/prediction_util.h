@@ -122,5 +122,3 @@ double AdjustSpeedByCurvature(const double speed, const double curvature);
 }  // namespace predictor_util
 }  // namespace prediction
 }  // namespace apollo
-
-

@@ -46,5 +46,3 @@ class TopoRangeManager {
 
 }  // namespace routing
 }  // namespace apollo
-
-

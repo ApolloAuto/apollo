@@ -52,4 +52,3 @@ TEST_F(Globalrpt6aTest, reset) {
 }  // namespace gem
 }  // namespace canbus
 }  // namespace apollo
-

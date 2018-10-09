@@ -218,5 +218,3 @@ void DownsamplingRectangleNeighbour(
 }  // namespace common
 }  // namespace perception
 }  // namespace apollo
-
-

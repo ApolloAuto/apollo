@@ -109,5 +109,3 @@ class RawStream {
 }  // namespace gnss
 }  // namespace drivers
 }  // namespace apollo
-
-

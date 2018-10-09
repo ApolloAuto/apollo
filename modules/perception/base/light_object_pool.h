@@ -179,5 +179,3 @@ class LightObjectPool : public BaseObjectPool<ObjectType> {
 }  // namespace base
 }  // namespace perception
 }  // namespace apollo
-
-

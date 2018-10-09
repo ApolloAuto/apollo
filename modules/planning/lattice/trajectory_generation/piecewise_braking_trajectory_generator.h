@@ -47,5 +47,3 @@ class PiecewiseBrakingTrajectoryGenerator {
 
 }  // namespace planning
 }  // namespace apollo
-
-

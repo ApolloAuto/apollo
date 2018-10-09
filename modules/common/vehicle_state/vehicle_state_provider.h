@@ -185,5 +185,3 @@ class VehicleStateProvider {
 
 }  // namespace common
 }  // namespace apollo
-
-

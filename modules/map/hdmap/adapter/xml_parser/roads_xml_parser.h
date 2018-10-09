@@ -37,5 +37,3 @@ class RoadsXmlParser {
 }  // namespace adapter
 }  // namespace hdmap
 }  // namespace apollo
-
-

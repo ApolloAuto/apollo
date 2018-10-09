@@ -160,5 +160,3 @@ class LincolnController final : public VehicleController {
 }  // namespace lincoln
 }  // namespace canbus
 }  // namespace apollo
-
-

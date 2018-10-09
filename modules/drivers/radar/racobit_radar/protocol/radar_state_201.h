@@ -53,5 +53,3 @@ class RadarState201
 }  // namespace racobit_radar
 }  // namespace drivers
 }  // namespace apollo
-
-

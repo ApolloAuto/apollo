@@ -52,5 +52,3 @@ class RadarState201 : public apollo::drivers::canbus::ProtocolData<ContiRadar> {
 }  // namespace conti_radar
 }  // namespace drivers
 }  // namespace apollo
-
-

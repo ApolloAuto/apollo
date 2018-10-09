@@ -72,5 +72,3 @@ class SplineSegKernel {
 
 }  // namespace planning
 }  // namespace apollo
-
-

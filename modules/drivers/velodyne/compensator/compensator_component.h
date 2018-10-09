@@ -52,5 +52,3 @@ CYBERTRON_REGISTER_COMPONENT(CompensatorComponent)
 }  // namespace velodyne
 }  // namespace drivers
 }  // namespace apollo
-
-

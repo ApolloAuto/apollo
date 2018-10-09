@@ -108,5 +108,3 @@ class TransformWrapper {
 }  // namespace onboard
 }  // namespace perception
 }  // namespace apollo
-
-

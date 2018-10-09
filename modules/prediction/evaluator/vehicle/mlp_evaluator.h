@@ -110,5 +110,3 @@ class MLPEvaluator : public Evaluator {
 
 }  // namespace prediction
 }  // namespace apollo
-
-

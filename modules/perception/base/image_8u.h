@@ -157,5 +157,3 @@ typedef std::shared_ptr<const Image8U> Image8UConstPtr;
 }  // namespace base
 }  // namespace perception
 }  // namespace apollo
-
-

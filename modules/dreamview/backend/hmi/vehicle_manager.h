@@ -42,5 +42,3 @@ class VehicleManager {
 
 }  // namespace dreamview
 }  // namespace apollo
-
-

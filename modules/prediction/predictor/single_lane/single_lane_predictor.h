@@ -65,5 +65,3 @@ class SingleLanePredictor : public SequencePredictor {
 
 }  // namespace prediction
 }  // namespace apollo
-
-

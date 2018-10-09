@@ -63,5 +63,3 @@ class ObjectSequence {
 }  // namespace lidar
 }  // namespace perception
 }  // namespace apollo
-
-

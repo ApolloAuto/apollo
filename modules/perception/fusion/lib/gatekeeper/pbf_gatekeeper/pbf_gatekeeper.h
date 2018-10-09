@@ -69,5 +69,3 @@ class PbfGatekeeper : public BaseGatekeeper {
 }  // namespace fusion
 }  // namespace perception
 }  // namespace apollo
-
-

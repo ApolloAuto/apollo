@@ -372,5 +372,3 @@ class Path {
 
 }  // namespace hdmap
 }  // namespace apollo
-
-

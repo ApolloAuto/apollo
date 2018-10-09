@@ -47,5 +47,3 @@ class EmptyPredictor : public Predictor {
 
 }  // namespace prediction
 }  // namespace apollo
-
-

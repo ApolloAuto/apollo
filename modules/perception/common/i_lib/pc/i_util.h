@@ -60,5 +60,3 @@ inline void IGetPointcloudsDimWBound(const T *threeds, int n, int start_offset,
 }  // namespace common
 }  // namespace perception
 }  // namespace apollo
-
-

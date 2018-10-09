@@ -45,5 +45,3 @@ class ObjectListStatus60A
 }  // namespace conti_radar
 }  // namespace drivers
 }  // namespace apollo
-
-

@@ -68,5 +68,3 @@ class LatticePlanner : public PlannerWithReferenceLine {
 
 }  // namespace planning
 }  // namespace apollo
-
-

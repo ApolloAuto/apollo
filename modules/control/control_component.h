@@ -126,5 +126,3 @@ class ControlComponent final : public apollo::cybertron::TimerComponent {
 CYBERTRON_REGISTER_COMPONENT(ControlComponent)
 }  // namespace control
 }  // namespace apollo
-
-

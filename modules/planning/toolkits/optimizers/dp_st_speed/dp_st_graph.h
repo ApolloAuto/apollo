@@ -109,5 +109,3 @@ class DpStGraph {
 
 }  // namespace planning
 }  // namespace apollo
-
-

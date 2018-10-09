@@ -63,5 +63,3 @@ class MotionInputSpeed300
 }  // namespace conti_radar
 }  // namespace drivers
 }  // namespace apollo
-
-

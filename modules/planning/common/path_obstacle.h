@@ -195,5 +195,3 @@ class PathObstacle {
 
 }  // namespace planning
 }  // namespace apollo
-
-

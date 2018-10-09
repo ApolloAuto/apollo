@@ -72,5 +72,3 @@ class Input {
 }  // namespace velodyne
 }  // namespace drivers
 }  // namespace apollo
-
-

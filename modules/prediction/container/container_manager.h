@@ -92,5 +92,3 @@ class ContainerManager {
 
 }  // namespace prediction
 }  // namespace apollo
-
-

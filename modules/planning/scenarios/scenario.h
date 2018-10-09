@@ -60,5 +60,3 @@ class Scenario {
 
 }  // namespace planning
 }  // namespace apollo
-
-

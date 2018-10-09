@@ -121,5 +121,3 @@ class Factory {
 }  // namespace util
 }  // namespace common
 }  // namespace apollo
-
-

@@ -64,5 +64,3 @@ class LincolnVehicleFactory : public AbstractVehicleFactory {
 
 }  // namespace canbus
 }  // namespace apollo
-
-

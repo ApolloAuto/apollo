@@ -40,5 +40,3 @@ void ComputeObjectShapeFromPolygon(std::shared_ptr<base::Object> object,
 }  // namespace lidar
 }  // namespace perception
 }  // namespace apollo
-
-

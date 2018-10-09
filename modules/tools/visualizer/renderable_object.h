@@ -88,5 +88,3 @@ class RenderableObject : protected QOpenGLFunctions {
   QOpenGLVertexArrayObject vao_;
   QOpenGLBuffer vbo_;
 };
-
-

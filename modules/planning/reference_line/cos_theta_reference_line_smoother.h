@@ -88,5 +88,3 @@ class CosThetaReferenceLineSmoother : public ReferenceLineSmoother {
 
 }  // namespace planning
 }  // namespace apollo
-
-

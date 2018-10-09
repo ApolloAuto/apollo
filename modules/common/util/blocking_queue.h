@@ -116,5 +116,3 @@ class BlockingQueue {
 }  // namespace util
 }  // namespace common
 }  // namespace apollo
-
-

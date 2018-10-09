@@ -62,5 +62,3 @@ class TimeUtil {
 }  // namespace lib
 }  // namespace perception
 }  // namespace apollo
-
-

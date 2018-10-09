@@ -124,5 +124,3 @@ class HoughTransfer {
 }  // namespace common
 }  // namespace perception
 }  // namespace apollo
-
-

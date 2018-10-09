@@ -54,5 +54,3 @@ class Task {
 
 }  // namespace planning
 }  // namespace apollo
-
-

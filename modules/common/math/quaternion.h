@@ -118,5 +118,3 @@ inline Eigen::Vector3d InverseQuaternionRotate(const Quaternion &orientation,
 }  // namespace math
 }  // namespace common
 }  // namespace apollo
-
-

@@ -51,5 +51,3 @@ class PublishableTrajectory : public DiscretizedTrajectory {
 
 }  // namespace planning
 }  // namespace apollo
-
-

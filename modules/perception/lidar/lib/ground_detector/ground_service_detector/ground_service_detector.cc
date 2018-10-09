@@ -93,4 +93,3 @@ PERCEPTION_REGISTER_GROUNDDETECTOR(GroundServiceDetector);
 }  // namespace lidar
 }  // namespace perception
 }  // namespace apollo
-

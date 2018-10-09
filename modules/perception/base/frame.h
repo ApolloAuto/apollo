@@ -63,5 +63,3 @@ typedef std::shared_ptr<const Frame> FrameConstPtr;
 }  // namespace base
 }  // namespace perception
 }  // namespace apollo
-
-

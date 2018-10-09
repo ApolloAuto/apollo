@@ -78,5 +78,3 @@ typedef std::shared_ptr<const PinholeCameraModel> PinholeCameraModelConstPtr;
 }  // namespace base
 }  // namespace perception
 }  // namespace apollo
-
-

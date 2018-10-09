@@ -106,5 +106,3 @@ class SubTopoGraph {
 
 }  // namespace routing
 }  // namespace apollo
-
-

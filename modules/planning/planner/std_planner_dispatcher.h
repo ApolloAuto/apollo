@@ -46,5 +46,3 @@ class StdPlannerDispatcher final : public PlannerDispatcher {
 
 }  // namespace planning
 }  // namespace apollo
-
-

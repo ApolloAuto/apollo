@@ -98,4 +98,3 @@ TEST_F(DataComponentTest, data_input_command) {
 
 }  // namespace data
 }  // namespace apollo
-

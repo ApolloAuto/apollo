@@ -121,5 +121,3 @@ class PredictorManager {
 
 }  // namespace prediction
 }  // namespace apollo
-
-

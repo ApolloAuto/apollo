@@ -42,4 +42,3 @@ TEST_F(Steeringmotorrpt375Test, reset) {
 }  // namespace gem
 }  // namespace canbus
 }  // namespace apollo
-

@@ -77,5 +77,3 @@ class PosesInterpolation {
 }  // namespace msf
 }  // namespace localization
 }  // namespace apollo
-
-

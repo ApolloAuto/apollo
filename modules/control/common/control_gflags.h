@@ -57,5 +57,3 @@ DECLARE_int32(chassis_pending_queue_size);
 DECLARE_int32(planning_pending_queue_size);
 DECLARE_int32(localization_pending_queue_size);
 DECLARE_int32(pad_msg_pending_queue_size);
-
-

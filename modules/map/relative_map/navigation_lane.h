@@ -160,5 +160,3 @@ class NavigationLane {
 
 }  // namespace relative_map
 }  // namespace apollo
-
-

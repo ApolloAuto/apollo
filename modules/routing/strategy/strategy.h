@@ -38,5 +38,3 @@ class Strategy {
 
 }  // namespace routing
 }  // namespace apollo
-
-

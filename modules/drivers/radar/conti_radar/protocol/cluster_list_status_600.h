@@ -47,5 +47,3 @@ class ClusterListStatus600
 }  // namespace conti_radar
 }  // namespace drivers
 }  // namespace apollo
-
-

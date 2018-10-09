@@ -89,5 +89,3 @@ bool IsCamera(const SensorObjectConstPtr& obj);
 }  // namespace fusion
 }  // namespace perception
 }  // namespace apollo
-
-

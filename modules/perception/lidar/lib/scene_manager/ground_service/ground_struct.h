@@ -106,4 +106,3 @@ class GroundGrid {
 }  // namespace lidar
 }  // namespace perception
 }  // namespace apollo
-

@@ -139,5 +139,3 @@ class TrajectoryAnalyzer {
 
 }  // namespace control
 }  // namespace apollo
-
-

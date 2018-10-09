@@ -42,4 +42,3 @@ TEST_F(Brakemotorrpt170Test, reset) {
 }  // namespace gem
 }  // namespace canbus
 }  // namespace apollo
-

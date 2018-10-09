@@ -57,5 +57,3 @@ using FramePool = ConcurrentObjectPool<Frame, kFramePoolSize, FrameInitializer>;
 }  // namespace base
 }  // namespace perception
 }  // namespace apollo
-
-

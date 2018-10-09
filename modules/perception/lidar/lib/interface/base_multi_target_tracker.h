@@ -62,5 +62,3 @@ PERCEPTION_REGISTER_REGISTERER(BaseMultiTargetTracker);
 }  // namespace lidar
 }  // namespace perception
 }  // namespace apollo
-
-

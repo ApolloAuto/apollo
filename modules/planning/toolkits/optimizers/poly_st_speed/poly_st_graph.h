@@ -92,5 +92,3 @@ class PolyStGraph {
 
 }  // namespace planning
 }  // namespace apollo
-
-

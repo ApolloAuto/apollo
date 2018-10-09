@@ -49,4 +49,3 @@ CYBERTRON_REGISTER_COMPONENT(GnssDriverComponent)
 }  // namespace gnss
 }  // namespace drivers
 }  // namespace apollo
-

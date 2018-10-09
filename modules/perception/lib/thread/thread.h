@@ -68,5 +68,3 @@ class Thread {
 }  // namespace lib
 }  // namespace perception
 }  // namespace apollo
-
-

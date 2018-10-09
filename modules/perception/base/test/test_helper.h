@@ -80,5 +80,3 @@ typedef ::testing::Types<CPUDevice<float>, CPUDevice<double>, GPUDevice<float>,
 }  // namespace base
 }  // namespace perception
 }  // namespace apollo
-
-

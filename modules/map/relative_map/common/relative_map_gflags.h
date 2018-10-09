@@ -33,5 +33,3 @@ DECLARE_double(max_lane_half_width);
 DECLARE_bool(enable_cyclic_rerouting);
 DECLARE_bool(relative_map_generate_left_boundray);
 DECLARE_bool(navigator_down_sample);
-
-

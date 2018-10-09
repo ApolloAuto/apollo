@@ -93,5 +93,3 @@ class BaseMapNodePool {
 }  // namespace msf
 }  // namespace localization
 }  // namespace apollo
-
-

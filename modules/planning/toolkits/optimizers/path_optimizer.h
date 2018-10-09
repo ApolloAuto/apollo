@@ -49,5 +49,3 @@ class PathOptimizer : public Task {
 
 }  // namespace planning
 }  // namespace apollo
-
-

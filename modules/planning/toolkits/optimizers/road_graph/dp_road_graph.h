@@ -145,5 +145,3 @@ class DpRoadGraph {
 
 }  // namespace planning
 }  // namespace apollo
-
-

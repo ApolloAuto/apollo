@@ -51,4 +51,3 @@ void RecordService::OnRecordRequest(
 
 }  // namespace data
 }  // namespace apollo
-

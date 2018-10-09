@@ -54,5 +54,3 @@ inline void GPUAssert(cudaError_t code, const char *file, int line,
 }  // namespace base
 }  // namespace perception
 }  // namespace apollo
-
-
