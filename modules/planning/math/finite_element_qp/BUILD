@@ -69,4 +69,19 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "osqp_lateral_jerk_qp_optimizer",
+    srcs = [
+        "osqp_lateral_jerk_qp_optimizer.cc",
+    ],
+    hdrs = [
+        "osqp_lateral_jerk_qp_optimizer.h",
+    ],
+    deps = [
+        ":lateral_qp_optimizer",
+        "@eigen",
+        "@osqp",
+    ],
+)
+
 cpplint()
