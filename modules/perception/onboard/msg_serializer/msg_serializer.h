@@ -15,7 +15,6 @@
  *****************************************************************************/
 #pragma once
 
-
 #include <vector>
 
 #include "cybertron/time/time.h"

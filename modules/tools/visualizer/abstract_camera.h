@@ -16,7 +16,6 @@
 
 #pragma once
 
-
 #include <QMatrix4x4>
 #include <QVector3D>
 

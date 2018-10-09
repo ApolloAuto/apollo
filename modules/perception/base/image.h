@@ -15,5 +15,4 @@
  *****************************************************************************/
 #pragma once
 
-
 #include "modules/perception/base/image_8u.h"

@@ -50,7 +50,6 @@
 
 #pragma once
 
-
 #include <errno.h>
 #include <math.h>
 #include <stdint.h>

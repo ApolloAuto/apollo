@@ -16,7 +16,6 @@
 
 #pragma once
 
-
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 #include "modules/drivers/proto/racobit_radar.pb.h"
 

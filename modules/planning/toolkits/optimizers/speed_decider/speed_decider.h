@@ -20,7 +20,6 @@
 
 #pragma once
 
-
 #include <string>
 
 #include "modules/planning/proto/dp_st_speed_config.pb.h"

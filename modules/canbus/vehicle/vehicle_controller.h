@@ -21,7 +21,6 @@
 
 #pragma once
 
-
 #include <unordered_map>
 
 #include "modules/canbus/proto/canbus_conf.pb.h"

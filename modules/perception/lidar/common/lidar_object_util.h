@@ -15,7 +15,6 @@
  *****************************************************************************/
 #pragma once
 
-
 #include <memory>
 
 #include "modules/perception/base/object.h"

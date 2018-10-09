@@ -20,7 +20,6 @@
 
 #pragma once
 
-
 #include "modules/planning/proto/dp_poly_path_config.pb.h"
 #include "modules/planning/proto/planning_config.pb.h"
 

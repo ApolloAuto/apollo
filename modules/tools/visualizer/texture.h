@@ -16,7 +16,6 @@
 
 #pragma once
 
-
 #include <QImage>
 #include <QOpenGLBuffer>
 #include <memory>

@@ -14,7 +14,6 @@ limitations under the License.
 =========================================================================*/
 #pragma once
 
-
 #include "tinyxml2/tinyxml2.h"
 
 #include "modules/map/hdmap/adapter/xml_parser/common_define.h"

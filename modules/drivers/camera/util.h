@@ -16,7 +16,6 @@
 
 #pragma once
 
-
 #include <assert.h>
 #include <errno.h>
 #include <fcntl.h> /* low-level i/o */

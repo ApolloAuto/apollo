@@ -16,7 +16,6 @@
 
 #pragma once
 
-
 #include "gflags/gflags.h"
 
 DECLARE_string(third_party_perception_node_name);

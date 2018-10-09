@@ -15,7 +15,6 @@
  *****************************************************************************/
 #pragma once
 
-
 namespace apollo {
 namespace perception {
 namespace lidar {

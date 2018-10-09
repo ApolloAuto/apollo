@@ -16,7 +16,6 @@
 
 #pragma once
 
-
 #include "gflags/gflags.h"
 
 // The directory which contains a group of related maps, such as base_map,

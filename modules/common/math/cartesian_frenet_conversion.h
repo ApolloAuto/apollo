@@ -20,7 +20,6 @@
 
 #pragma once
 
-
 #include <array>
 
 #include "modules/common/math/vec2d.h"

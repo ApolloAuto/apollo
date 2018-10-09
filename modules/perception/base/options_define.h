@@ -15,7 +15,6 @@
  *****************************************************************************/
 #pragma once
 
-
 // build perception with cpu or gpu
 /* #undef PERCEPTION_CPU_ONLY */
 

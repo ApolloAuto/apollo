@@ -19,7 +19,6 @@
 
 #pragma once
 
-
 #include <cstddef>
 
 // Put this in the declarations for a class to be uncopyable.

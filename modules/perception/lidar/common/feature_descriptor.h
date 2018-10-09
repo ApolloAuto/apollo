@@ -15,7 +15,6 @@
  *****************************************************************************/
 #pragma once
 
-
 #include <algorithm>
 #include <cfloat>
 #include <vector>

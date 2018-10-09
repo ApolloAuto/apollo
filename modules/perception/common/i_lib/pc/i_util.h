@@ -15,7 +15,6 @@
  *****************************************************************************/
 #pragma once
 
-
 #include <limits>
 #include "modules/perception/common/i_lib/core/i_blas.h"
 

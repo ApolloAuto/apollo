@@ -16,7 +16,6 @@
 
 #pragma once
 
-
 #include <cuda_runtime_api.h>
 #include <float.h>
 #include <sys/stat.h>

@@ -20,7 +20,6 @@
 
 #pragma once
 
-
 #include <vector>
 
 #include "modules/planning/proto/reference_line_smoother_config.pb.h"

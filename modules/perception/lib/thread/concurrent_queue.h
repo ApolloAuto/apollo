@@ -15,7 +15,6 @@
  *****************************************************************************/
 #pragma once
 
-
 #include <queue>
 
 #include "modules/perception/lib/thread/mutex.h"

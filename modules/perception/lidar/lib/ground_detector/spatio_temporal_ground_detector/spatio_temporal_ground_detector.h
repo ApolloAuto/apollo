@@ -16,7 +16,6 @@
 
 #pragma once
 
-
 #include <Eigen/Core>
 #include <algorithm>
 #include <string>

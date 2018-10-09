@@ -21,7 +21,6 @@
 
 #pragma once
 
-
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/dreamview/proto/simulation_world.pb.h"
 

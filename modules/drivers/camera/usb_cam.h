@@ -36,7 +36,6 @@
 
 #pragma once
 
-
 #include <asm/types.h> /* for videodev2.h */
 #include <malloc.h>
 #include <sys/ioctl.h>

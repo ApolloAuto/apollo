@@ -15,7 +15,6 @@
  *****************************************************************************/
 #pragma once
 
-
 #include <gflags/gflags.h>
 
 namespace apollo {

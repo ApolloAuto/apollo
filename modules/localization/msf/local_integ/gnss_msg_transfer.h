@@ -21,7 +21,6 @@
 
 #pragma once
 
-
 #include "modules/drivers/gnss/proto/gnss_raw_observation.pb.h"
 #include "include/gnss_struct.h"
 

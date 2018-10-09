@@ -16,7 +16,6 @@
 
 #pragma once
 
-
 #include "modules/localization/msf/local_map/base_map/base_map_node.h"
 #include "modules/localization/msf/local_map/lossy_map/lossy_map_matrix_2d.h"
 

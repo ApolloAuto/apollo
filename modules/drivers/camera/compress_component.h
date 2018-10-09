@@ -16,7 +16,6 @@
 
 #pragma once
 
-
 #include <memory>
 
 #include "cybertron/base/concurrent_object_pool.h"

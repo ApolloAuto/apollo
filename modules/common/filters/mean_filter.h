@@ -21,7 +21,6 @@
 
 #pragma once
 
-
 #include <cstdint>
 #include <deque>
 #include <utility>

@@ -16,7 +16,6 @@
 
 #pragma once
 
-
 #include <QOpenGLBuffer>
 #include <QOpenGLFunctions>
 #include <QOpenGLShaderProgram>

@@ -15,7 +15,6 @@
  *****************************************************************************/
 #pragma once
 
-
 #include "modules/perception/base/concurrent_object_pool.h"
 #include "modules/perception/lidar/common/lidar_frame.h"
 

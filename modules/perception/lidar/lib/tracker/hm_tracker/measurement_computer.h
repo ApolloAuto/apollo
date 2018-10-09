@@ -15,7 +15,6 @@
  *****************************************************************************/
 #pragma once
 
-
 #include <memory>
 
 #include "modules/perception/lidar/lib/tracker/common/track_data.h"

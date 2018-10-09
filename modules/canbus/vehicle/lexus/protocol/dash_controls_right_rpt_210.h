@@ -16,7 +16,6 @@
 
 #pragma once
 
-
 #include "modules/canbus/proto/chassis_detail.pb.h"
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 

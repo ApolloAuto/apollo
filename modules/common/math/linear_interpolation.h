@@ -21,7 +21,6 @@
 
 #pragma once
 
-
 #include <cmath>
 
 #include "cybertron/common/log.h"

@@ -16,7 +16,6 @@
 
 #pragma once
 
-
 #include <proj_api.h>
 #include <memory>
 #include <string>

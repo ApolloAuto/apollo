@@ -16,7 +16,6 @@
 
 #pragma once
 
-
 #include <memory>
 
 #include "modules/drivers/radar/ultrasonic_radar/ultrasonic_radar_canbus.h"

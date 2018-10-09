@@ -15,7 +15,6 @@
  *****************************************************************************/
 #pragma once
 
-
 #include <vector>
 
 #include "modules/perception/fusion/base/sensor_object.h"

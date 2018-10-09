@@ -20,7 +20,6 @@
 
 #pragma once
 
-
 #include <limits>
 #include <string>
 

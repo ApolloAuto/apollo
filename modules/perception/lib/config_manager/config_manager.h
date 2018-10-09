@@ -110,7 +110,6 @@
 // }
 #pragma once
 
-
 #include <google/protobuf/message.h>
 
 #include <map>

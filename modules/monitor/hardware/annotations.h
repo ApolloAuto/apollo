@@ -16,7 +16,6 @@
 
 #pragma once
 
-
 /// Indicating a pointer class member is not owned by an object of the class; it
 /// is the responsibility of the programmer to make sure the given pointer is
 /// valid during the life time of the object.

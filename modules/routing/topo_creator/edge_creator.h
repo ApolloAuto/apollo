@@ -16,7 +16,6 @@
 
 #pragma once
 
-
 #include "modules/routing/proto/routing_config.pb.h"
 #include "modules/routing/proto/topo_graph.pb.h"
 

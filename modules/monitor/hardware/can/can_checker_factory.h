@@ -16,7 +16,6 @@
 
 #pragma once
 
-
 #include <memory>
 
 #include "modules/common/macro.h"

@@ -24,7 +24,6 @@
 
 #pragma once
 
-
 #include <array>
 
 namespace apollo {

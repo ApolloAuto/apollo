@@ -21,7 +21,6 @@
 
 #pragma once
 
-
 /**
  * @namespace apollo::common::math
  * @brief apollo::common::math

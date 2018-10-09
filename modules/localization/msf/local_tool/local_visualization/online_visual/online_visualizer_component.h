@@ -21,7 +21,6 @@
 
 #pragma once
 
-
 #include <Eigen/Geometry>
 #include <memory>
 #include <sstream>

@@ -16,7 +16,6 @@
 
 #pragma once
 
-
 #include <pcl/common/common.h>
 #include <pcl/filters/boost.h>
 #include <pcl/filters/voxel_grid.h>

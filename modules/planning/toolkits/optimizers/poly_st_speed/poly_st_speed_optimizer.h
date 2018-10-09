@@ -20,7 +20,6 @@
 
 #pragma once
 
-
 #include "modules/common/configs/proto/vehicle_config.pb.h"
 #include "modules/planning/proto/planning_config.pb.h"
 #include "modules/planning/proto/poly_st_speed_config.pb.h"

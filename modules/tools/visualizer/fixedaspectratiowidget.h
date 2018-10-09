@@ -16,7 +16,6 @@
 
 #pragma once
 
-
 #include <QTimer>
 #include <QWidget>
 #include <memory>

@@ -20,7 +20,6 @@
 
 #pragma once
 
-
 #include "modules/planning/common/reference_line_info.h"
 
 namespace apollo {

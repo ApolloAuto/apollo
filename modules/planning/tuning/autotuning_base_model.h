@@ -16,7 +16,6 @@
 
 #pragma once
 
-
 #include <memory>
 #include "modules/common/status/status.h"
 #include "modules/planning/proto/auto_tuning_model_input.pb.h"

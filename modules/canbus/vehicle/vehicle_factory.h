@@ -20,7 +20,6 @@
 
 #pragma once
 
-
 #include <memory>
 
 #include "modules/canbus/vehicle/abstract_vehicle_factory.h"

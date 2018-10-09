@@ -21,7 +21,6 @@
 
 #pragma once
 
-
 #include <Eigen/Geometry>
 #include <iostream>
 #include <vector>

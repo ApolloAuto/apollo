@@ -15,7 +15,6 @@
  *****************************************************************************/
 #pragma once
 
-
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>

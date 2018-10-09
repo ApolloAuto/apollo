@@ -15,7 +15,6 @@
  *****************************************************************************/
 #pragma once
 
-
 #include <string>
 
 #include "gtest/gtest_prod.h"

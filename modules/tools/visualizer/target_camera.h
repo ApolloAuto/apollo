@@ -16,7 +16,6 @@
 
 #pragma once
 
-
 #include "modules/tools/visualizer/abstract_camera.h"
 
 class TargetCamera : public AbstractCamera {

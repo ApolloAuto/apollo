@@ -21,7 +21,6 @@
 
 #pragma once
 
-
 #include <cstdio>
 
 namespace apollo {

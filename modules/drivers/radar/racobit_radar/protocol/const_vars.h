@@ -16,7 +16,6 @@
 
 #pragma once
 
-
 namespace apollo {
 namespace drivers {
 namespace racobit_radar {

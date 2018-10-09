@@ -20,7 +20,6 @@
 
 #pragma once
 
-
 #include <limits>
 
 #include "modules/planning/common/speed/st_point.h"

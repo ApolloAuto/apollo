@@ -16,7 +16,6 @@
 
 #pragma once
 
-
 #include "modules/drivers/gnss/proto/gnss_raw_observation.pb.h"
 #include "modules/drivers/gnss/third_party/rtklib.h"
 

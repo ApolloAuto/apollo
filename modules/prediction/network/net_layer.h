@@ -25,7 +25,6 @@
 
 #pragma once
 
-
 /**
  * @namespace apollo::prediction::network
  * @brief apollo::prediction::network
