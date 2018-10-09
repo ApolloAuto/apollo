@@ -70,7 +70,7 @@ cc_library(
         "lattice_trajectory1d.h",
     ],
     deps = [
-        "//cybertron",
+        "//framework:cybertron",
         "//modules/planning/math/curve1d",
     ],
 )

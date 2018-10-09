@@ -55,7 +55,7 @@ cc_test(
     ],
     deps = [
         ":disjoint_set",
-        "//cybertron",
+        "//framework:cybertron",
         "@gtest//:main",
     ],
 )
@@ -149,7 +149,7 @@ cc_library(
         "factory.h",
     ],
     deps = [
-        "//cybertron",
+        "//framework:cybertron",
     ],
 )
 
@@ -161,7 +161,7 @@ cc_test(
     ],
     deps = [
         ":factory",
-        "//cybertron",
+        "//framework:cybertron",
         "//modules/common",
         "@gtest//:main",
     ],
@@ -181,7 +181,7 @@ cc_library(
     ],
     deps = [
         ":string_util",
-        "//cybertron",
+        "//framework:cybertron",
         "@com_google_protobuf//:protobuf",
     ],
 )
@@ -223,7 +223,7 @@ cc_library(
         "points_downsampler.h",
     ],
     deps = [
-        "//cybertron",
+        "//framework:cybertron",
         "//modules/common/math:geometry",
     ],
 )
@@ -249,7 +249,7 @@ cc_library(
         "json_util.h",
     ],
     deps = [
-        "//cybertron",
+        "//framework:cybertron",
         "//third_party/json",
         "@com_google_protobuf//:protobuf",
     ],
@@ -273,7 +273,7 @@ cc_library(
     srcs = ["http_client.cc"],
     hdrs = ["http_client.h"],
     deps = [
-        "//cybertron",
+        "//framework:cybertron",
         "//modules/common/status",
         "//modules/common/util:string_util",
         "//third_party/json",

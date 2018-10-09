@@ -7,7 +7,7 @@ cc_library(
     srcs = ["scenario_manager.cc"],
     hdrs = ["scenario_manager.h"],
     deps = [
-        "//cybertron",
+        "//framework:cybertron",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/math:geometry",
         "//modules/prediction/proto:prediction_conf_proto",

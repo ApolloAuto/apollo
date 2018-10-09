@@ -14,7 +14,7 @@ cc_library(
         "msg_buffer.h",
     ],
     deps = [
-        "//cybertron",
+        "//framework:cybertron",
     ],
 )
 

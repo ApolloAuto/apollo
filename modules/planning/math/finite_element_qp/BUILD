@@ -21,7 +21,7 @@ cc_library(
         "lateral_qp_optimizer.h",
     ],
     deps = [
-        "//cybertron",
+        "//framework:cybertron",
         "//modules/planning/lattice/trajectory1d:piecewise_jerk_trajectory1d",
     ],
 )

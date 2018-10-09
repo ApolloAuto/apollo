@@ -11,7 +11,7 @@ cc_library(
         "can_client_factory.h",
     ],
     deps = [
-        "//cybertron",
+        "//framework:cybertron",
         "//modules/drivers/canbus/can_client",
         "//modules/drivers/canbus/common:canbus_common",
         "//modules/drivers/canbus/proto:canbus_proto",

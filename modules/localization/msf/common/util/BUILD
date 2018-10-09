@@ -23,7 +23,7 @@ cc_library(
         "-lboost_system",
     ],
     deps = [
-        "//cybertron",
+        "//framework:cybertron",
         "@eigen",
     ],
 )

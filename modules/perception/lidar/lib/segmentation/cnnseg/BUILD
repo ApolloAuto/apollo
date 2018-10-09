@@ -15,7 +15,7 @@ cc_library(
         ":feature_generator",
         ":disjoint_set",
         ":util",
-        "//cybertron",
+        "//framework:cybertron",
         "//modules/common/util:file_util",
         "//modules/common/util:string_util",
         "//modules/perception/base",

@@ -8,7 +8,7 @@ cc_library(
     hdrs = ["recurrent_runner.h"],
     deps = [
         ":monitor_manager",
-        "//cybertron",
+        "//framework:cybertron",
         "//modules/common/time",
     ],
 )

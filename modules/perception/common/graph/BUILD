@@ -46,7 +46,7 @@ cc_library(
         "graph_segmentor.h",
     ],
     deps = [
-        "//cybertron",
+        "//framework:cybertron",
         ":disjoint_set",
     ],
 )
@@ -115,7 +115,7 @@ cc_library(
         "connected_component_analysis.h",
     ],
     deps = [
-        "//cybertron",
+        "//framework:cybertron",
     ],
 )
 
@@ -162,7 +162,7 @@ cc_library(
         "gated_hungarian_bigraph_matcher.h",
     ],
     deps = [
-        "//cybertron",
+        "//framework:cybertron",
         ":connected_component_analysis",
         ":hungarian_optimizer",
         ":secure_matrix",

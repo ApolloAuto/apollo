@@ -15,7 +15,7 @@ cc_library(
         "-lboost_system",
     ],
     deps = [
-        "//cybertron",
+        "//framework:cybertron",
         "//modules/perception/lib/utils:perception_string_util",
     ],
 )

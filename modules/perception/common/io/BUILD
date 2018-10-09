@@ -11,7 +11,7 @@ cc_library(
         "io_util.h",
     ],
     deps = [
-        "//cybertron",
+        "//framework:cybertron",
         "//modules/perception/base:camera",
         "//modules/perception/base:distortion_model",
         "//modules/perception/base:omnidirectional_model",

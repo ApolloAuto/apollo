@@ -32,7 +32,7 @@ cc_library(
         "//modules/perception/proto:pbf_tracker_config_proto",
         "//modules/perception/proto:perception_config_schema_proto",
         "//modules/perception/proto:probabilistic_fusion_config_proto",
-        "//cybertron",
+        "//framework:cybertron",
         "@eigen",
     ],
 )  

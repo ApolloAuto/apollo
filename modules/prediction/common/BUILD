@@ -18,7 +18,7 @@ cc_library(
     deps = [
         ":prediction_gflags",
         ":prediction_map",
-        "//cybertron",
+        "//framework:cybertron",
         "//modules/common/math",
         "//modules/common/proto:pnc_point_proto",
         "//modules/prediction/proto:lane_graph_proto",
@@ -71,7 +71,7 @@ cc_library(
     srcs = ["feature_output.cc"],
     hdrs = ["feature_output.h"],
     deps = [
-        "//cybertron",
+        "//framework:cybertron",
         "//modules/common/util",
         "//modules/prediction/common:prediction_gflags",
         "//modules/prediction/proto:feature_proto",
@@ -159,7 +159,7 @@ cc_library(
     hdrs = ["environment_features.h"],
     deps = [
         "//modules/common/proto:geometry_proto",
-        "//cybertron",
+        "//framework:cybertron",
     ],
 )
 
@@ -170,7 +170,7 @@ cc_test(
     deps = [
         ":environment_features",
         "//modules/common/proto:geometry_proto",
-        "//cybertron",
+        "//framework:cybertron",
         "@gtest//:main",
     ],
 )

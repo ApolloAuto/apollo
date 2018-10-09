@@ -24,7 +24,7 @@ cc_library(
         "//modules/common/proto:pnc_point_proto",
         "//modules/common/util:util",
         "//modules/common/math:math",
-        "//cybertron",
+        "//framework:cybertron",
     ],
 )
 
@@ -42,7 +42,7 @@ cc_library(
         "//modules/canbus/proto:canbus_proto",
         "//modules/drivers/gnss/util:gnss_util",
         "//modules/common/util:message_util",
-        "//cybertron",
+        "//framework:cybertron",
     ],
 )
 
@@ -52,7 +52,7 @@ cc_library(
     deps = [
         ":stream",
         "//modules/drivers/gnss/util:gnss_util",
-        "//cybertron",
+        "//framework:cybertron",
     ],
 )
 
@@ -62,7 +62,7 @@ cc_library(
     hdrs = ["tcp_stream.h"],
     deps = [
         ":stream",
-        "//cybertron",
+        "//framework:cybertron",
     ],
 )
 
@@ -72,7 +72,7 @@ cc_library(
     deps = [
         ":stream",
         "//modules/drivers/gnss/util:gnss_util",
-        "//cybertron",
+        "//framework:cybertron",
     ],
 )
 
@@ -81,7 +81,7 @@ cc_library(
     hdrs = ["stream.h"],
     deps = [
         "//modules/drivers/gnss/util:gnss_util",
-        "//cybertron",
+        "//framework:cybertron",
     ],
 )
 

@@ -11,7 +11,7 @@ cc_library(
         "bitmap2d.h",
     ],
     deps = [
-        "//cybertron",
+        "//framework:cybertron",
         "//modules/perception/lidar/common:lidar_log",
         "@eigen",
     ],
@@ -29,7 +29,7 @@ cc_library(
         ":bitmap2d",
         ":polygon_mask",
         ":polygon_scan_cvter",
-        "//cybertron",
+        "//framework:cybertron",
         "//modules/perception/base:point_cloud",
         "//modules/perception/lidar/common:lidar_point_label",
         "//modules/perception/lidar/lib/interface:base_object_filter",

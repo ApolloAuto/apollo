@@ -9,7 +9,7 @@ cc_library(
     data = ["//modules/map:map_data"],
     deps = [
         "//external:gflags",
-        "//cybertron",
+        "//framework:cybertron",
         "//modules/common",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/configs:config_gflags",

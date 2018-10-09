@@ -12,7 +12,7 @@ cc_library(
     ],
     deps = [
         "//external:gflags",
-        "//cybertron",
+        "//framework:cybertron",
         "//modules/common",
         "//modules/common/proto:pnc_point_proto",
         "//modules/common/status",

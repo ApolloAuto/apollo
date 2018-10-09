@@ -21,7 +21,7 @@ cc_library(
         "dummy_segmentation.h",
     ],
     deps = [
-        "//cybertron",
+        "//framework:cybertron",
         "//modules/perception/base",
         "//modules/perception/common/point_cloud_processing",
         "//modules/perception/lib/registerer",

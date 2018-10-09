@@ -20,7 +20,7 @@ cc_library(
         "-lboost_program_options",
     ],
     deps = [
-        "//cybertron",
+        "//framework:cybertron",
         "//modules/common/proto:geometry_proto",
         "//modules/common/status",
         "//modules/common/time",

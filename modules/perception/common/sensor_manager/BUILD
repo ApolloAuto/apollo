@@ -11,7 +11,7 @@ cc_library(
         "sensor_manager.h",
     ],
     deps = [
-        "//cybertron",
+        "//framework:cybertron",
         "//modules/perception/base:base_type",
         "//modules/perception/base:camera",
         "//modules/perception/base:omnidirectional_model",

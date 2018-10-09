@@ -11,7 +11,7 @@ cc_library(
         "control_test_base.h",
     ],
     deps = [
-        "//cybertron",
+        "//framework:cybertron",
         "//modules/common/proto:geometry_proto",
         "//modules/common/time",
         "//modules/control:control_component_lib",

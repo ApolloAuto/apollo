@@ -11,7 +11,7 @@ cc_library(
         "map_manager.h",
     ],
     deps = [
-        "//cybertron",
+        "//framework:cybertron",
         "//modules/common/util:file_util",
         "//modules/perception/base:base_type",
         "//modules/perception/lib/config_manager",
