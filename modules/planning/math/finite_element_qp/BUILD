@@ -9,6 +9,7 @@ cc_library(
         ":active_set_lateral_qp_optimizer",
         ":lateral_qp_optimizer",
         ":osqp_lateral_jerk_qp_optimizer",
+        ":osqp_lateral_linear_qp_optimizer",
         ":osqp_lateral_qp_optimizer",
     ],
 )
