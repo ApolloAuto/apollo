@@ -42,7 +42,12 @@ def test_record_trans(reader_path):
         fwriter.write_channel(channelname, datatype, desc)
         fwriter.write_message(channelname, msg, timestamp)
         count = count + 1
-    print "all count=", count
+    print "-"*80
+    print "message count is ", count
+    print "channel info:"
+    channel_list = fread.get_channellist()
+    print "channel count is ", len(channel_list)
+    print channel_list
 
 if __name__ == '__main__':
     cybertron.init()

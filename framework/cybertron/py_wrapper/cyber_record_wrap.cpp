@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include <Python.h>
+#include <set>
 #include <string>
 
 #include "cybertron/py_wrapper/py_record.h"
@@ -35,6 +36,7 @@ PyObject *cyber_new_PyRecordReader(PyObject *self, PyObject *args) {
   Py_ssize_t len = 0;
   if (!PyArg_ParseTuple(args, const_cast<char *>("s#:new_PyRecordReader"),
                         &filepath, &len)) {
+    AERROR << "cyber_new_PyRecordReader parsetuple failed!";
     return Py_None;
   }
 
@@ -83,7 +85,7 @@ PyObject *cyber_PyRecordReader_ReadMessage(PyObject *self, PyObject *args) {
 
   apollo::cybertron::record::BagMessage result;
   result = reader->ReadMessage(begin_time, end_time);
-  PyObject *pyobj_bag_message = pyobj_bag_message = PyDict_New();
+  PyObject *pyobj_bag_message = PyDict_New();
   PyDict_SetItemString(pyobj_bag_message, "channel_name",
                        Py_BuildValue("s", result.channel_name.c_str()));
   PyDict_SetItemString(
@@ -103,12 +105,11 @@ PyObject *cyber_PyRecordReader_GetMessageNumber(PyObject *self,
                                                 PyObject *args) {
   PyObject *pyobj_reader = nullptr;
   char *channel_name = nullptr;
-  Py_ssize_t len = 0;
   if (!PyArg_ParseTuple(
           args, const_cast<char *>("Os:PyRecordReader_GetMessageNumber"),
           &pyobj_reader, &channel_name)) {
     AERROR << "PyRecordReader_GetMessageNumber:PyRecordReader failed!";
-    return PyLong_FromLong(0);
+    return PyLong_FromUnsignedLongLong(0);
   }
 
   auto reader =
@@ -116,17 +117,16 @@ PyObject *cyber_PyRecordReader_GetMessageNumber(PyObject *self,
           pyobj_reader, "apollo_cybertron_record_pyrecordfilereader");
   if (nullptr == reader) {
     AINFO << "PyRecordReader_GetMessageNumber ptr is null!";
-    return PyLong_FromLong(0);
+    return PyLong_FromUnsignedLongLong(0);
   }
 
-  uint64_t cur_time = reader->GetMessageNumber(channel_name);
-  return PyLong_FromLong(cur_time);
+  uint64_t num = reader->GetMessageNumber(channel_name);
+  return PyLong_FromUnsignedLongLong(num);
 }
 
 PyObject *cyber_PyRecordReader_GetMessageType(PyObject *self, PyObject *args) {
   PyObject *pyobj_reader = nullptr;
   char *channel_name = nullptr;
-  Py_ssize_t len = 0;
   if (!PyArg_ParseTuple(
           args, const_cast<char *>("Os:cyber_PyRecordReader_GetMessageType"),
           &pyobj_reader, &channel_name)) {
@@ -149,7 +149,6 @@ PyObject *cyber_PyRecordReader_GetMessageType(PyObject *self, PyObject *args) {
 PyObject *cyber_PyRecordReader_GetProtoDesc(PyObject *self, PyObject *args) {
   PyObject *pyobj_reader = nullptr;
   char *channel_name = nullptr;
-  Py_ssize_t len = 0;
   if (!PyArg_ParseTuple(args,
                         const_cast<char *>("Os:PyRecordReader_GetProtoDesc"),
                         &pyobj_reader, &channel_name)) {
@@ -190,6 +189,55 @@ PyObject *cyber_PyRecordReader_GetHeaderString(PyObject *self, PyObject *args) {
                                     header_string.size());
 }
 
+PyObject *cyber_PyRecordReader_Reset(PyObject *self, PyObject *args) {
+  PyObject *pyobj_reader = nullptr;
+  if (!PyArg_ParseTuple(args,
+                        const_cast<char *>("O:cyber_PyRecordReader_Reset"),
+                        &pyobj_reader)) {
+    AERROR << "cyber_PyRecordReader_Reset:PyArg_ParseTuple failed!";
+    return Py_None;
+  }
+
+  auto reader =
+      (apollo::cybertron::record::PyRecordReader *)PyCapsule_GetPointer(
+          pyobj_reader, "apollo_cybertron_record_pyrecordfilereader");
+  if (nullptr == reader) {
+    AERROR << "PyRecordReader_Reset reader is null!";
+    return Py_None;
+  }
+
+  reader->Reset();
+  return Py_None;
+}
+
+PyObject *cyber_PyRecordReader_GetChannelList(PyObject *self, PyObject *args) {
+  PyObject *pyobj_reader = nullptr;
+  if (!PyArg_ParseTuple(
+          args, const_cast<char *>("O:cyber_PyRecordReader_GetChannelList"),
+          &pyobj_reader)) {
+    AERROR << "cyber_PyRecordReader_GetChannelList:PyArg_ParseTuple failed!";
+    return Py_None;
+  }
+
+  auto reader =
+      (apollo::cybertron::record::PyRecordReader *)PyCapsule_GetPointer(
+          pyobj_reader, "apollo_cybertron_record_pyrecordfilereader");
+  if (nullptr == reader) {
+    AERROR << "PyRecordReader_GetChannelList reader is null!";
+    return Py_None;
+  }
+
+  std::set<std::string> channel_list = reader->GetChannelList();
+  PyObject *pyobj_list = PyList_New(channel_list.size());
+  size_t pos = 0;
+  for (const std::string &channel : channel_list) {
+    PyList_SetItem(pyobj_list, pos, Py_BuildValue("s", channel.c_str()));
+    pos++;
+  }
+
+  return pyobj_list;
+}
+
 PyObject *cyber_new_PyRecordWriter(PyObject *self, PyObject *args) {
   apollo::cybertron::record::PyRecordWriter *writer =
       new apollo::cybertron::record::PyRecordWriter();
@@ -209,7 +257,7 @@ PyObject *cyber_delete_PyRecordWriter(PyObject *self, PyObject *args) {
       (apollo::cybertron::record::PyRecordWriter *)PyCapsule_GetPointer(
           pyobj_rec_writer, "apollo_cybertron_record_pyrecordfilewriter");
   if (nullptr == writer) {
-    AINFO << "delete_PyRecordWriter:writer ptr is null!";
+    AERROR << "delete_PyRecordWriter:writer is null!";
     return Py_None;
   }
   delete writer;
@@ -223,7 +271,7 @@ PyObject *cyber_PyRecordWriter_Open(PyObject *self, PyObject *args) {
   if (!PyArg_ParseTuple(args,
                         const_cast<char *>("Os#:cyber_PyRecordWriter_Open"),
                         &pyobj_rec_writer, &path, &len)) {
-    AERROR << "cyber_PyRecordWriter_Open:PyRecordWriter_Open failed!";
+    AERROR << "cyber_PyRecordWriter_Open:PyArg_ParseTuple failed!";
     Py_RETURN_FALSE;
   }
 
@@ -232,7 +280,7 @@ PyObject *cyber_PyRecordWriter_Open(PyObject *self, PyObject *args) {
           pyobj_rec_writer, "apollo_cybertron_record_pyrecordfilewriter");
 
   if (nullptr == writer) {
-    AINFO << "PyRecordWriter_Open:writer ptr is null!";
+    AERROR << "PyRecordWriter_Open:writer is null!";
     Py_RETURN_FALSE;
   }
 
@@ -254,7 +302,7 @@ PyObject *cyber_PyRecordWriter_Close(PyObject *self, PyObject *args) {
       (apollo::cybertron::record::PyRecordWriter *)PyCapsule_GetPointer(
           pyobj_rec_writer, "apollo_cybertron_record_pyrecordfilewriter");
   if (nullptr == writer) {
-    AINFO << "cyber_PyRecordWriterer_Close: ptr is null!";
+    AERROR << "cyber_PyRecordWriterer_Close: writer is null!";
     return Py_None;
   }
   writer->Close();
@@ -323,6 +371,135 @@ PyObject *cyber_PyRecordWriter_WriteMessage(PyObject *self, PyObject *args) {
   Py_RETURN_TRUE;
 }
 
+PyObject *cyber_PyRecordWriter_SetSizeOfFileSegmentation(PyObject *self,
+                                                         PyObject *args) {
+  PyObject *pyobj_rec_writer = nullptr;
+  uint64_t size_kilobytes = 0;
+
+  if (!PyArg_ParseTuple(
+          args, const_cast<char *>(
+                    "OK:cyber_PyRecordWriter_SetSizeOfFileSegmentation"),
+          &pyobj_rec_writer, &size_kilobytes)) {
+    AERROR
+        << "cyber_PyRecordWriter_SetSizeOfFileSegmentation parsetuple failed!";
+    Py_RETURN_FALSE;
+  }
+
+  auto writer = PyObjectToPtr<apollo::cybertron::record::PyRecordWriter *>(
+      pyobj_rec_writer, "apollo_cybertron_record_pyrecordfilewriter");
+
+  if (nullptr == writer) {
+    AERROR
+        << "cyber_PyRecordWriter_SetSizeOfFileSegmentation:writer ptr is null!";
+    Py_RETURN_FALSE;
+  }
+
+  if (!writer->SetSizeOfFileSegmentation(size_kilobytes)) {
+    AERROR << "cyber_PyRecordWriter_SetSizeOfFileSegmentation failed!";
+    Py_RETURN_FALSE;
+  }
+  Py_RETURN_TRUE;
+}
+
+PyObject *cyber_PyRecordWriter_SetIntervalOfFileSegmentation(PyObject *self,
+                                                             PyObject *args) {
+  PyObject *pyobj_rec_writer = nullptr;
+  uint64_t time_sec = 0;
+
+  if (!PyArg_ParseTuple(
+          args, const_cast<char *>(
+                    "OK:cyber_PyRecordWriter_SetIntervalOfFileSegmentation"),
+          &pyobj_rec_writer, &time_sec)) {
+    AERROR << "cyber_PyRecordWriter_SetIntervalOfFileSegmentation parsetuple "
+              "failed!";
+    Py_RETURN_FALSE;
+  }
+
+  auto writer = PyObjectToPtr<apollo::cybertron::record::PyRecordWriter *>(
+      pyobj_rec_writer, "apollo_cybertron_record_pyrecordfilewriter");
+
+  if (nullptr == writer) {
+    AERROR << "cyber_PyRecordWriter_SetIntervalOfFileSegmentation:writer ptr "
+              "is null!";
+    Py_RETURN_FALSE;
+  }
+
+  if (!writer->SetIntervalOfFileSegmentation(time_sec)) {
+    AERROR << "cyber_PyRecordWriter_SetIntervalOfFileSegmentation failed!";
+    Py_RETURN_FALSE;
+  }
+  Py_RETURN_TRUE;
+}
+
+PyObject *cyber_PyRecordWriter_GetMessageNumber(PyObject *self,
+                                                PyObject *args) {
+  PyObject *pyobj_rec_writer = nullptr;
+  char *channel_name = nullptr;
+  if (!PyArg_ParseTuple(
+          args, const_cast<char *>("Os:PyRecordWriter_GetMessageNumber"),
+          &pyobj_rec_writer, &channel_name)) {
+    AERROR << "PyRecordWriter_GetMessageNumber:PyRecordWriter_GetMessageNumber "
+              "failed!";
+    return PyLong_FromUnsignedLongLong(0);
+  }
+
+  auto writer =
+      (apollo::cybertron::record::PyRecordWriter *)PyCapsule_GetPointer(
+          pyobj_rec_writer, "apollo_cybertron_record_pyrecordfilewriter");
+  if (nullptr == writer) {
+    AERROR << "PyRecordWriter_GetMessageNumber ptr is null!";
+    return PyLong_FromUnsignedLongLong(0);
+  }
+
+  uint64_t num = writer->GetMessageNumber(channel_name);
+  return PyLong_FromUnsignedLongLong(num);
+}
+
+PyObject *cyber_PyRecordWriter_GetMessageType(PyObject *self, PyObject *args) {
+  PyObject *pyobj_rec_writer = nullptr;
+  char *channel_name = nullptr;
+  if (!PyArg_ParseTuple(args,
+                        const_cast<char *>("Os:PyRecordWriter_GetMessageType"),
+                        &pyobj_rec_writer, &channel_name)) {
+    AERROR << "PyRecordWriter_GetMessageType failed!";
+    return PYOBJECT_NULL_STRING;
+  }
+
+  auto writer =
+      (apollo::cybertron::record::PyRecordWriter *)PyCapsule_GetPointer(
+          pyobj_rec_writer, "apollo_cybertron_record_pyrecordfilewriter");
+  if (nullptr == writer) {
+    AERROR << "PyRecordWriter_GetMessageType ptr is null!";
+    return PYOBJECT_NULL_STRING;
+  }
+
+  std::string msg_type = writer->GetMessageType(channel_name);
+  return PyString_FromStringAndSize(msg_type.c_str(), msg_type.size());
+}
+
+PyObject *cyber_PyRecordWriter_GetProtoDesc(PyObject *self, PyObject *args) {
+  PyObject *pyobj_rec_writer = nullptr;
+  char *channel_name = nullptr;
+  if (!PyArg_ParseTuple(args,
+                        const_cast<char *>("Os:PyRecordWriter_GetProtoDesc"),
+                        &pyobj_rec_writer, &channel_name)) {
+    AERROR << "PyRecordWriter_GetProtoDesc failed!";
+    return PYOBJECT_NULL_STRING;
+  }
+
+  auto writer =
+      (apollo::cybertron::record::PyRecordWriter *)PyCapsule_GetPointer(
+          pyobj_rec_writer, "apollo_cybertron_record_pyrecordfilewriter");
+  if (nullptr == writer) {
+    AERROR << "PyRecordWriter_GetProtoDesc ptr is null!";
+    return PYOBJECT_NULL_STRING;
+  }
+
+  std::string proto_desc_str = writer->GetProtoDesc(channel_name);
+  return PyString_FromStringAndSize(proto_desc_str.c_str(),
+                                    proto_desc_str.size());
+}
+
 static PyMethodDef _cyber_record_methods[] = {
     // PyRecordReader fun
     {"new_PyRecordReader", cyber_new_PyRecordReader, METH_VARARGS, ""},
@@ -337,6 +514,9 @@ static PyMethodDef _cyber_record_methods[] = {
      METH_VARARGS, ""},
     {"PyRecordReader_GetHeaderString", cyber_PyRecordReader_GetHeaderString,
      METH_VARARGS, ""},
+    {"PyRecordReader_Reset", cyber_PyRecordReader_Reset, METH_VARARGS, ""},
+    {"PyRecordReader_GetChannelList", cyber_PyRecordReader_GetChannelList,
+     METH_VARARGS, ""},
 
     // PyRecordWriter fun
     {"new_PyRecordWriter", cyber_new_PyRecordWriter, METH_VARARGS, ""},
@@ -346,6 +526,16 @@ static PyMethodDef _cyber_record_methods[] = {
     {"PyRecordWriter_WriteChannel", cyber_PyRecordWriter_WriteChannel,
      METH_VARARGS, ""},
     {"PyRecordWriter_WriteMessage", cyber_PyRecordWriter_WriteMessage,
+     METH_VARARGS, ""},
+    {"PyRecordWriter_SetSizeOfFileSegmentation",
+     cyber_PyRecordWriter_SetSizeOfFileSegmentation, METH_VARARGS, ""},
+    {"PyRecordWriter_SetIntervalOfFileSegmentation",
+     cyber_PyRecordWriter_SetIntervalOfFileSegmentation, METH_VARARGS, ""},
+    {"PyRecordWriter_GetMessageNumber", cyber_PyRecordWriter_GetMessageNumber,
+     METH_VARARGS, ""},
+    {"PyRecordWriter_GetMessageType", cyber_PyRecordWriter_GetMessageType,
+     METH_VARARGS, ""},
+    {"PyRecordWriter_GetProtoDesc", cyber_PyRecordWriter_GetProtoDesc,
      METH_VARARGS, ""},
 
     {NULL, NULL, 0, NULL} /* sentinel */

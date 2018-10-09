@@ -44,25 +44,34 @@ class TestRecord(unittest.TestCase):
 
         # writer
         fwriter = record.RecordWriter()
+        fwriter.set_size_fileseg(200)
+        fwriter.set_intervaltime_fileseg(10)
+
         self.assertTrue(fwriter.open(TEST_RECORD_FILE))
         fwriter.write_channel(CHAN_1, MSG_TYPE, STR_10B)
         fwriter.write_message(CHAN_1, STR_10B, TIME)
+
+        self.assertEqual(1, fwriter.get_messagenumber(CHAN_1))
+        self.assertEqual(MSG_TYPE, fwriter.get_messagetype(CHAN_1))
+        self.assertEqual(STR_10B, fwriter.get_protodesc(CHAN_1))
         fwriter.close()
 
         # reader
         fread = record.RecordReader(TEST_RECORD_FILE)
-
+        channel_list = fread.get_channellist()
+        self.assertEqual(1, len(channel_list))
+        self.assertEqual(CHAN_1, channel_list[0])
         for channelname, msg, datatype, timestamp in fread.read_messages():
-            print "+++"
-            print channelname
-            print msg, datatype, timestamp
+            # print "+++"
+            # print channelname
+            # print msg, datatype, timestamp
             self.assertEqual(CHAN_1, channelname)
             self.assertEqual(STR_10B, msg)
             self.assertEqual(TIME, timestamp)
             self.assertEqual(1, fread.get_messagenumber(channelname))
             self.assertEqual(MSG_TYPE, datatype)
             self.assertEqual(MSG_TYPE, fread.get_messagetype(channelname))
-            print "pbdesc -> %s" % fread.get_protodesc(channelname)
+            # print "pbdesc -> %s" % fread.get_protodesc(channelname)
             msg = record_pb2.Header()
             header_msg = fread.get_headerstring()
             msg.ParseFromString(header_msg)
@@ -71,7 +80,6 @@ class TestRecord(unittest.TestCase):
             self.assertEqual(1, msg.chunk_number)
             self.assertEqual(1, msg.channel_number)
             self.assertTrue(msg.is_complete)
-
 
         cybertron.shutdown()
 
