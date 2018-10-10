@@ -103,13 +103,40 @@ Status SidePassScenario::Process(const TrajectoryPoint& planning_start_point,
 
   // TODO(all)
 
+  Status status = Status(ErrorCode::PLANNING_ERROR,
+                         "Failed to process stage in side pass.");
+  switch (stage_) {
+    case SidePassStage::OBSTACLE_APPROACH: {
+      status = ApproachObstacle(planning_start_point, frame);
+      break;
+    }
+    case SidePassStage::PATH_GENERATION: {
+      status = GeneratePath(planning_start_point, frame);
+      break;
+    }
+    case SidePassStage::WAITPOINT_STOP: {
+      status = StopOnWaitPoint(planning_start_point, frame);
+      break;
+    }
+    case SidePassStage::SAFETY_DETECTION: {
+      status = DetectSafety(planning_start_point, frame);
+      break;
+    }
+    case SidePassStage::OBSTACLE_PASS: {
+      status = PassObstacle(planning_start_point, frame);
+      break;
+    }
+    default:
+      break;
+  }
+
   if (current_stage_index_ < config_.stage_size() - 1) {
     current_stage_index_++;
   } else {
     status_ = STATUS_DONE;
   }
 
-  return Status::OK();
+  return status;
 }
 
 bool SidePassScenario::IsTransferable(const Scenario& current_scenario,
@@ -117,6 +144,31 @@ bool SidePassScenario::IsTransferable(const Scenario& current_scenario,
                                       const Frame& frame) const {
   // TODO(All): implement here
   return false;
+}
+
+Status SidePassScenario::ApproachObstacle(
+    const TrajectoryPoint& planning_start_point, Frame* frame) {
+  return Status::OK();
+}
+
+Status SidePassScenario::GeneratePath(
+    const TrajectoryPoint& planning_start_point, Frame* frame) {
+  return Status::OK();
+}
+
+Status SidePassScenario::StopOnWaitPoint(
+    const TrajectoryPoint& planning_start_point, Frame* frame) {
+  return Status::OK();
+}
+
+Status SidePassScenario::DetectSafety(
+    const TrajectoryPoint& planning_start_point, Frame* frame) {
+  return Status::OK();
+}
+
+Status SidePassScenario::PassObstacle(
+    const TrajectoryPoint& planning_start_point, Frame* frame) {
+  return Status::OK();
 }
 
 }  // namespace planning
