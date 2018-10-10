@@ -239,7 +239,7 @@ Status QpPiecewiseJerkPathOptimizer::Process(
                                                  lateral_bounds);
   auto end_time = std::chrono::system_clock::now();
   std::chrono::duration<double> diff = end_time - start_time;
-  AERROR << "lateral_qp_optimizer used time: " << diff.count() * 1000 << " ms.";
+  ADEBUG << "lateral_qp_optimizer used time: " << diff.count() * 1000 << " ms.";
 
   if (!success) {
     AERROR << "lateral qp optimizer failed";
