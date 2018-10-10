@@ -98,9 +98,7 @@ apollo::common::Status OpenSpacePlanner::Plan(
 
   // vertices using V-represetntation (clock wise)
   std::size_t obstacles_num = frame->obstacles_num();
-  Eigen::MatrixXd obstacles_vertices_num = frame->obstacles_vertices_num();
-  std::vector<std::vector<Vec2d>> obstacles_vertices_vec =
-      frame->obstacles_vertices_vec();
+  Eigen::MatrixXd obstacles_edges_num = frame->obstacles_edges_num();
   Eigen::MatrixXd obstacles_A = frame->obstacles_A();
   Eigen::MatrixXd obstacles_b = frame->obstacles_b();
   // std::vector<std::vector<std::vector<double>>> obstacles_vertices_vec = {
@@ -159,7 +157,7 @@ apollo::common::Status OpenSpacePlanner::Plan(
   // approach problem connect
   distance_approach_.reset(new DistanceApproachProblem(
       x0, xF, last_time_u, horizon_, ts_, ego_, xWS, uWS, XYbounds_,
-      obstacles_num, obstacles_vertices_num, obstacles_A, obstacles_b));
+      obstacles_num, obstacles_edges_num, obstacles_A, obstacles_b));
 
   ADEBUG << "Distance approach configs set"
          << distance_approach_config_.ShortDebugString();
