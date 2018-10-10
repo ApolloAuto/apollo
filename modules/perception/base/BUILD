@@ -144,7 +144,7 @@ cc_library(
     ],
     deps = [
         ":camera",
-        "//framework:cybertron",
+        "//cybertron",
         "@eigen",
     ],
 )
@@ -205,7 +205,7 @@ cc_library(
         "impending_collision_edge.h",
     ],
     deps = [
-        "//framework:cybertron",
+        "//cybertron",
         "@eigen",
     ],
 )
@@ -276,7 +276,7 @@ cc_test(
         ":object_pool",
         ":object_pool_types",
         ":point_cloud",
-        "//framework:cybertron",
+        "//cybertron",
         "@eigen",
         "@gtest//:main",
     ],
@@ -295,7 +295,7 @@ cc_library(
         ":object",
         ":object_pool",
         ":point_cloud",
-        "//framework:cybertron",
+        "//cybertron",
         "@eigen",
     ],
 )
@@ -312,7 +312,7 @@ cc_library(
         ":camera",
         ":distortion_model",
         ":polynomial",
-        "//framework:cybertron",
+        "//cybertron",
         "@eigen",
     ],
 )
@@ -386,7 +386,7 @@ cc_library(
     ],
     deps = [
         ":common",
-        "//framework:cybertron",
+        "//cybertron",
     ],
 )
 

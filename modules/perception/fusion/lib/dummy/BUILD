@@ -11,7 +11,7 @@ cc_library(
         "dummy_algorithms.h",
     ],
     deps = [
-        "//framework:cybertron",
+        "//cybertron",
         "//modules/perception/fusion/base",
         "//modules/perception/fusion/lib/interface",
         "@eigen",

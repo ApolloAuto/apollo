@@ -7,6 +7,8 @@ cc_binary(
     srcs = glob([
         "cyber_recorder/*.cpp",
         "cyber_recorder/*.h",
+        "cyber_recorder/**/*.cpp",
+        "cyber_recorder/**/*.h",
     ]),
     deps = [
         "//cybertron:cybertron_core",
@@ -14,7 +16,6 @@ cc_binary(
     linkopts = [
         "-pthread",
     ],
-    #linkstatic = False,
 )
 
 cc_binary(

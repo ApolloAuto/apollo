@@ -11,7 +11,7 @@ cc_library(
         "pointcloud_preprocessor.h",
     ],
     deps = [
-        "//framework:cybertron",
+        "//cybertron",
         "//modules/common/proto:error_code_proto",
         "//modules/common/proto:header_proto",
         "//modules/common/util",

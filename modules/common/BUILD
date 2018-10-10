@@ -5,7 +5,7 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "common",
     deps = [
-        "//framework:cybertron",
+        "//cybertron",
         "//modules/common/math",
         "//modules/common/status",
         "//modules/common/util",

@@ -93,10 +93,10 @@ function check_esd_files() {
 
 function generate_build_targets() {
   if [ -z $NOT_BUILD_PERCEPTION ] ; then
-    BUILD_TARGETS=`bazel query //modules/...`
+    BUILD_TARGETS=`bazel query //modules/... union //cybertron/...`
   else
     info 'Skip building perception module!'
-    BUILD_TARGETS=`bazel query //modules/... except //modules/perception/... except //modules/calibration/lidar_ex_checker/...`
+    BUILD_TARGETS=`bazel query //modules/... except //modules/perception/... except //modules/calibration/lidar_ex_checker/... union //cybertron/...`
   fi
 
   if [ $? -ne 0 ]; then
@@ -123,6 +123,14 @@ function build_cybertron() {
   source framework/install/setup.bash
 }
 
+function build_proto() {
+  cd /apollo/cybertron/proto
+  protoc *.proto --cpp_out=.
+  cd /apollo
+  info "Building proto ..."
+  source cybertron/setup.bash
+}
+
 function build() {
   if [ "${USE_GPU}" = "1" ] ; then
     echo -e "${YELLOW}Running build under GPU mode. GPU is required to run the build.${NO_COLOR}"
@@ -130,7 +138,7 @@ function build() {
     echo -e "${YELLOW}Running build under CPU mode. No GPU is required to run the build.${NO_COLOR}"
   fi
   info "Start building, please wait ..."
-  build_cybertron
+  build_proto
 
   generate_build_targets
   info "Building on $MACHINE_ARCH..."
@@ -172,8 +180,7 @@ function build() {
 
 function cibuild_extended() {
   info "Building framework ..."
-  cd /apollo/framework
-  bash cybertron.sh build_fast
+  build_proto
 
   cd /apollo
   info "Building modules ..."
@@ -186,6 +193,7 @@ function cibuild_extended() {
   info "Building with $JOB_ARG for $MACHINE_ARCH"
   BUILD_TARGETS="
     //modules/perception/...
+    //cybertron/...
     //modules/dreamview/...
     //modules/drivers/radar/conti_radar/...
     //modules/drivers/radar/racobit_radar/...
@@ -209,10 +217,9 @@ function cibuild_extended() {
 }
 function cibuild() {
   info "Building framework ..."
-  cd /apollo/framework
-  bash cybertron.sh build_fast
-
   cd /apollo
+  build_proto
+
   info "Building modules ..."
 
   JOB_ARG="--jobs=$(nproc)"
@@ -222,6 +229,7 @@ function cibuild() {
 
   info "Building with $JOB_ARG for $MACHINE_ARCH"
   BUILD_TARGETS="
+    //cybertron/...
     //modules/canbus/...
     //modules/common/...
     //modules/control/...
@@ -421,13 +429,12 @@ function citest_basic() {
   set -e
 
   info "Building framework ..."
-  cd /apollo/framework
-  bash cybertron.sh build_fast
+  build_proto
   cd /apollo
-  source framework/install/setup.bash
+  source cybertron/setup.bash
 
   BUILD_TARGETS="
-    `bazel query //modules/...`
+    `bazel query //modules/... union //cybertron/...`
   "
 
   JOB_ARG="--jobs=$(nproc) --ram_utilization_factor 80"
@@ -458,13 +465,12 @@ function citest_extended() {
   set -e
 
   info "Building framework ..."
-  cd /apollo/framework
-  bash cybertron.sh build_fast
+  build_proto
   cd /apollo
-  source framework/install/setup.bash
+  source cybertron/setup.bash
 
   BUILD_TARGETS="
-    `bazel query //modules/planning/... union //modules/common/... union //modules/integration_test/...`
+    `bazel query //modules/planning/... union //modules/common/... union //modules/integration_test/... union //cybertron/...`
     `bazel query //modules/prediction/... union //modules/control/...`
   "
 
@@ -484,10 +490,9 @@ function citest_extended() {
 
 function citest() {
   info "Building framework ..."
-  cd /apollo/framework
-  bash cybertron.sh build_fast
+  build_proto
   cd /apollo
-  source framework/install/setup.bash
+  source cybertron/setup.bash
 
   citest_basic
   citest_extended
@@ -507,7 +512,7 @@ function run_cpp_lint() {
   echo "$BUILD_TARGETS" | grep -v "tools/visualizer" | xargs bazel test --config=cpplint -c dbg
 
   # check /apollo/framework
-  BUILD_TARGETS="//framework/cybertron/..."
+  BUILD_TARGETS="//cybertron/..."
   echo "$BUILD_TARGETS" | xargs bazel test --config=cpplint -c dbg
 }
 
@@ -518,7 +523,7 @@ function run_bash_lint() {
 
 function run_lint() {
   # Add cpplint rule to BUILD files that do not contain it.
-  for file in $(find framework modules -name BUILD |  grep -v gnss/third_party | \
+  for file in $(find cybertron modules -name BUILD |  grep -v gnss/third_party | \
     xargs grep -l -E 'cc_library|cc_test|cc_binary' | xargs grep -L 'cpplint()')
   do
     sed -i '1i\load("//tools:cpplint.bzl", "cpplint")\n' $file

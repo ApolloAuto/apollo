@@ -16,7 +16,7 @@ cc_library(
         ":spp_label_image",
         ":spp_seg_cc_2d",
         ":spp_struct",
-        "//framework:cybertron",
+        "//cybertron",
         "@eigen",
     ],
 )
@@ -99,7 +99,7 @@ cc_library(
     ],
     deps = [
         ":spp_label_image",
-        "//framework:cybertron",
+        "//cybertron",
         "//modules/perception/base",
         "//modules/perception/common/i_lib",
         "//modules/perception/lib/thread",

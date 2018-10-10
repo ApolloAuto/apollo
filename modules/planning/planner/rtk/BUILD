@@ -12,7 +12,7 @@ cc_library(
     ],
     deps = [
         "//external:gflags",
-        "//framework:cybertron",
+        "//cybertron",
         "//modules/common/proto:pnc_point_proto",
         "//modules/common/util",
         "//modules/common/util:factory",
@@ -35,7 +35,7 @@ cc_test(
     data = ["//modules/planning:planning_testdata"],
     deps = [
         ":rtk_planner",
-        "//framework:cybertron",
+        "//cybertron",
         "//modules/common/time",
         "//modules/common/util",
         "@gtest//:main",

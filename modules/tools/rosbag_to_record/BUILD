@@ -24,7 +24,7 @@ cc_library(
         "channel_info.h",
     ],
     deps = [
-        "//framework:cybertron", 
+        "//cybertron", 
         "//modules/planning/proto:planning_proto",
         "//modules/control/proto:control_proto",
         "//modules/guardian/proto:guardian_proto",

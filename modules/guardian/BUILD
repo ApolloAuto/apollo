@@ -16,7 +16,7 @@ cc_binary(
         "//modules/monitor/proto:system_status_proto",
         "//modules/guardian/proto:guardian_proto",
         "//modules/guardian/proto:guardian_conf_proto",
-        "//framework:cybertron",
+        "//cybertron",
     ],
     copts = ['-DMODULE_NAME=\\"guardian\\"'],
     linkshared = True,

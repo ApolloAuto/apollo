@@ -18,7 +18,7 @@ package(default_visibility = ["//visibility:public"])
 #     srcs = ["terminal.cc"],
 #     deps = [
 #         "//external:gflags",
-#         "//framework:cybertron",
+#         "//cybertron",
 #         "//modules/planning/proto:planning_proto",
 #         "@ros//:ros_common",
 #     ],

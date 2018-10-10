@@ -7,7 +7,7 @@ cc_library(
     srcs = [],
     hdrs = ["singleton.h"],
     deps = [
-        "//framework:cybertron",
+        "//cybertron",
     ],
 )
 

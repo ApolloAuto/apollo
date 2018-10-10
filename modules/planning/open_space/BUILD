@@ -6,7 +6,7 @@ cc_library(
     name = "node3d",
     srcs = ["node3d.cc"],
     hdrs = ["node3d.h"],
-    deps = ["//framework:cybertron",
+    deps = ["//cybertron",
             "//modules/common/math",
             "//modules/planning/common:obstacle",
             "//modules/planning/constraint_checker:collision_checker",
@@ -18,7 +18,7 @@ cc_library(
     srcs = ["reeds_shepp_path.cc"],
     hdrs = ["reeds_shepp_path.h"],
     deps = [
-        "//framework:cybertron",
+        "//cybertron",
         "//modules/common/math",
         "//modules/common/configs:vehicle_config_helper",
         "//modules/planning/proto:planner_open_space_config_proto",
@@ -36,7 +36,7 @@ cc_test(
     size = "small",
     srcs = ["reeds_shepp_path_test.cc"],
     deps = [
-        "//framework:cybertron",
+        "//cybertron",
         "//modules/planning/open_space:open_space_utils",
         "//modules/common/math",
         "//modules/common/configs:vehicle_config_helper",
@@ -49,7 +49,7 @@ cc_test(
     size = "small",
     srcs = ["node3d_test.cc"],
     deps = [
-        "//framework:cybertron",
+        "//cybertron",
         "//modules/planning/open_space:open_space_utils",
         "@gtest//:main",
     ],
@@ -179,7 +179,7 @@ cc_library(
         "hybrid_a_star.h",
     ],
     deps = [
-        "//framework:cybertron",
+        "//cybertron",
         "//modules/planning/common:obstacle",
         "//modules/common/configs:vehicle_config_helper",
         "//modules/planning/proto:planner_open_space_config_proto",

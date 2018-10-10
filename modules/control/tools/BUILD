@@ -6,7 +6,7 @@ cc_binary(
     name = "control_tester",
     srcs = ["control_tester.cc"],
     deps = [
-        "//framework:cybertron",
+        "//cybertron",
         "//modules/canbus/proto:canbus_proto",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/util",
@@ -22,7 +22,7 @@ cc_binary(
     srcs = ["pad_terminal.cc"],
     deps = [
         "//external:gflags",
-        "//framework:cybertron",
+        "//cybertron",
         "//modules/canbus/proto:canbus_proto",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/util",

@@ -26,7 +26,7 @@ cc_library(
     ],
     deps = [
         ":st_point",
-        "//framework:cybertron",
+        "//cybertron",
         "//modules/planning/proto:planning_proto",
         "@gtest",
     ],
@@ -40,7 +40,7 @@ cc_test(
     ],
     deps = [
         ":st_boundary",
-        "//framework:cybertron",
+        "//cybertron",
         "//modules/common/time",
         "//modules/common/util",
         "@gtest//:main",
