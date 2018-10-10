@@ -63,7 +63,7 @@ Status OpenSpacePlanner::Init(const PlanningConfig&) {
   double x_min = planner_open_space_config_.warm_start_config().min_x();
   double y_min = planner_open_space_config_.warm_start_config().min_y();
   XYbounds_.resize(4, 1);
-  XYbounds_ << x_max, y_max, x_min, y_min;
+  XYbounds_ << x_min, x_max, y_min, y_max;
 
   // initialize warm start class pointer
   warm_start_.reset(new HybridAStar());

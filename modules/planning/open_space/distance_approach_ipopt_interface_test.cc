@@ -101,7 +101,7 @@ TEST_F(DistanceApproachIPOPTInterfaceTest, get_nlp_info) {
   EXPECT_EQ(n, num_of_variables_);
   EXPECT_EQ(m, num_of_constraints_);
   EXPECT_EQ(nnz_jac_g, 0);
-  EXPECT_EQ(nnz_h_lag, 0);
+  EXPECT_EQ(nnz_h_lag, 7285);
   EXPECT_EQ(index_style, Ipopt::TNLP::C_STYLE);
 }
 

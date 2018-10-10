@@ -109,7 +109,7 @@ bool DistanceApproachIPOPTInterface::get_nlp_info(int& n, int& m,
   // number of nonzero hessian and lagrangian.
   nnz_jac_g = 0;
 
-  nnz_h_lag = 0;
+  nnz_h_lag = 14 * num_of_variables_ + 5;
 
   index_style = IndexStyleEnum::C_STYLE;
   return true;
@@ -123,7 +123,7 @@ bool DistanceApproachIPOPTInterface::get_bounds_info(int n, double* x_l,
   CHECK(n == num_of_variables_) << "num_of_variables_ mismatch, n: " << n
                                 << ", num_of_variables_: " << num_of_variables_;
   CHECK(m == num_of_constraints_)
-      << "num_of_constraints_ mismatch, n: " << n
+      << "num_of_constraints_ mismatch, m: " << m
       << ", num_of_constraints_: " << num_of_constraints_;
 
   // Variables: includes state, u, sample time and lagrange multipliers
@@ -137,7 +137,7 @@ bool DistanceApproachIPOPTInterface::get_bounds_info(int n, double* x_l,
   variable_index += 4;
 
   // During horizons, 2 ~ N-1
-  for (std::size_t i = 2; i <= horizon_; ++i) {
+  for (std::size_t i = 2; i < horizon_; ++i) {
     // x
     x_l[variable_index] = XYbounds_(0, 0);
     x_u[variable_index] = XYbounds_(1, 0);
@@ -213,9 +213,9 @@ bool DistanceApproachIPOPTInterface::get_bounds_info(int n, double* x_l,
   // 4. lagrange constraint n, [0, 4*obstacles_num-1] * [0, horizon_]
   for (std::size_t i = 0; i < horizon_ + 1; ++i) {
     for (std::size_t j = 0; j < 4 * obstacles_num_; ++j) {
-      x_l[i * 4 * obstacles_num_ + j] = 0.0;
+      x_l[variable_index] = 0.0;
       // TODO(QiL): refine this variables limits
-      x_u[i * 4 * obstacles_num_ + j] = 100.0;
+      x_u[variable_index] = 100.0;
 
       ++variable_index;
     }
@@ -226,7 +226,7 @@ bool DistanceApproachIPOPTInterface::get_bounds_info(int n, double* x_l,
   // Constraints: includes four state Euler forward constraints, three
   // Obstacle related constraints
 
-  // 1. state constraints 4 * [0, horizons-1]
+  // 1. dynamics constraints 4 * [0, horizons-1]
   std::size_t constraint_index = 0;
   for (std::size_t i = 0; i < 4 * horizon_; ++i) {
     g_l[i] = 0.0;
@@ -469,7 +469,7 @@ bool DistanceApproachIPOPTInterface::get_starting_point(
   }
 
   // 2. time scale variable initialization, 0 ~ horizon_ -1
-  for (std::size_t i = 0; i < horizon_; ++i) {
+  for (std::size_t i = 0; i < horizon_ + 1; ++i) {
     x[variable_index] = 1.0;
     ++variable_index;
   }
@@ -696,7 +696,7 @@ bool DistanceApproachIPOPTInterface::eval_f(int n, const double* x, bool new_x,
       weight_stitching_a_ * last_time_a_rate * last_time_a_rate;
 
   // 4. objective to minimize total time
-  for (std::size_t i = 0; i < horizon_; ++i) {
+  for (std::size_t i = 0; i < horizon_ + 1; ++i) {
     double first_order_penalty =
         weight_first_order_time_ * x[time_start_index + i];
     double second_order_penalty = weight_second_order_time_ *
@@ -722,9 +722,6 @@ bool DistanceApproachIPOPTInterface::eval_f(int n, const double* x, bool new_x,
 bool DistanceApproachIPOPTInterface::eval_grad_f(int n, const double* x,
                                                  bool new_x, double* grad_f) {
   std::fill(grad_f, grad_f + n, 0.0);
-  std::size_t control_start_index = (horizon_ + 1) * 4;
-  std::size_t time_start_index = (horizon_ + 1) * 4 + horizon_ * 2;
-  std::size_t dual_start_index = (horizon_ + 1) * 4 + horizon_ * 3;
   // gradients on states(No.5 in eval_f())
   for (std::size_t i = 0; i < horizon_ + 1; i++) {
     std::size_t index = i * 4;
@@ -738,98 +735,99 @@ bool DistanceApproachIPOPTInterface::eval_grad_f(int n, const double* x,
   // gradients on input absolute value(No.1 in eval_f())
   for (std::size_t i = 0; i < horizon_; i++) {
     std::size_t index = i << 1;
-    grad_f[control_start_index + index] +=
-        weight_input_steer_ * 2 * x[control_start_index + index];
-    grad_f[control_start_index + index + 1] +=
-        weight_input_a_ * 2 * x[control_start_index + index + 1];
+    grad_f[control_start_index_ + index] +=
+        weight_input_steer_ * 2 * x[control_start_index_ + index];
+    grad_f[control_start_index_ + index + 1] +=
+        weight_input_a_ * 2 * x[control_start_index_ + index + 1];
   }
 
   // gradients on input change rate(No.2 in eval_f())
   for (std::size_t i = 1; i < horizon_ - 1; i++) {
     std::size_t index = i << 1;
-    grad_f[control_start_index + index] +=
+    grad_f[control_start_index_ + index] +=
         weight_rate_steer_ *
-        ((2 * x[control_start_index + index] -
-          2 * x[control_start_index + index - 2]) /
-             (ts_ * ts_ * x[time_start_index + i - 1] *
-              x[time_start_index + i - 1]) +
-         (2 * x[control_start_index + index] -
-          2 * x[control_start_index + index + 2]) /
-             (ts_ * ts_ * x[time_start_index + i] * x[time_start_index + i]));
-    grad_f[control_start_index + index + 1] +=
+        ((2 * x[control_start_index_ + index] -
+          2 * x[control_start_index_ + index - 2]) /
+             (ts_ * ts_ * x[time_start_index_ + i - 1] *
+              x[time_start_index_ + i - 1]) +
+         (2 * x[control_start_index_ + index] -
+          2 * x[control_start_index_ + index + 2]) /
+             (ts_ * ts_ * x[time_start_index_ + i] * x[time_start_index_ + i]));
+    grad_f[control_start_index_ + index + 1] +=
         weight_rate_a_ *
-        ((2 * x[control_start_index + index + 1] -
-          2 * x[control_start_index + index + 1 - 2]) /
-             (ts_ * ts_ * x[time_start_index + i - 1] *
-              x[time_start_index + i - 1]) +
-         (2 * x[control_start_index + index + 1] -
-          2 * x[control_start_index + index + 1 + 2]) /
-             (ts_ * ts_ * x[time_start_index + i] * x[time_start_index + i]));
+        ((2 * x[control_start_index_ + index + 1] -
+          2 * x[control_start_index_ + index + 1 - 2]) /
+             (ts_ * ts_ * x[time_start_index_ + i - 1] *
+              x[time_start_index_ + i - 1]) +
+         (2 * x[control_start_index_ + index + 1] -
+          2 * x[control_start_index_ + index + 1 + 2]) /
+             (ts_ * ts_ * x[time_start_index_ + i] * x[time_start_index_ + i]));
   }
-  grad_f[control_start_index] +=
+  grad_f[control_start_index_] +=
       weight_rate_steer_ *
-      ((2 * x[control_start_index] - 2 * x[control_start_index + 2]) /
-       (ts_ * ts_ * x[time_start_index] * x[time_start_index]));
-  grad_f[control_start_index + 1] +=
+      ((2 * x[control_start_index_] - 2 * x[control_start_index_ + 2]) /
+       (ts_ * ts_ * x[time_start_index_] * x[time_start_index_]));
+  grad_f[control_start_index_ + 1] +=
       weight_rate_a_ *
-      ((2 * x[control_start_index + 1] - 2 * x[control_start_index + 1 + 2]) /
-       (ts_ * ts_ * x[time_start_index] * x[time_start_index]));
-  grad_f[control_start_index + 2 * (horizon_ - 1)] +=
+      ((2 * x[control_start_index_ + 1] - 2 * x[control_start_index_ + 1 + 2]) /
+       (ts_ * ts_ * x[time_start_index_] * x[time_start_index_]));
+  grad_f[control_start_index_ + 2 * (horizon_ - 1)] +=
       weight_rate_steer_ *
-      ((2 * x[control_start_index + 2 * (horizon_ - 1)] -
-        2 * x[control_start_index + 2 * (horizon_ - 1) - 2]) /
-       (ts_ * ts_ * x[time_start_index + (horizon_ - 1) - 1] *
-        x[time_start_index + (horizon_ - 1) - 1]));
-  grad_f[control_start_index + 2 * (horizon_ - 1) + 1] +=
+      ((2 * x[control_start_index_ + 2 * (horizon_ - 1)] -
+        2 * x[control_start_index_ + 2 * (horizon_ - 1) - 2]) /
+       (ts_ * ts_ * x[time_start_index_ + (horizon_ - 1) - 1] *
+        x[time_start_index_ + (horizon_ - 1) - 1]));
+  grad_f[control_start_index_ + 2 * (horizon_ - 1) + 1] +=
       weight_rate_a_ *
-      ((2 * x[control_start_index + 2 * (horizon_ - 1) + 1] -
-        2 * x[control_start_index + 2 * (horizon_ - 1) + 1 - 2]) /
-       (ts_ * ts_ * x[time_start_index + (horizon_ - 1) - 1] *
-        x[time_start_index + (horizon_ - 1) - 1]));
+      ((2 * x[control_start_index_ + 2 * (horizon_ - 1) + 1] -
+        2 * x[control_start_index_ + 2 * (horizon_ - 1) + 1 - 2]) /
+       (ts_ * ts_ * x[time_start_index_ + (horizon_ - 1) - 1] *
+        x[time_start_index_ + (horizon_ - 1) - 1]));
   for (std::size_t i = 0; i < horizon_ - 1; i++) {
     std::size_t index = i << 1;
-    grad_f[time_start_index + i] +=
+    grad_f[time_start_index_ + i] +=
         -2 * weight_rate_steer_ *
-            ((x[control_start_index + index] * x[control_start_index + index] +
-              x[control_start_index + index + 2] *
-                  x[control_start_index + index + 2] -
-              2 * x[control_start_index + index] *
-                  x[control_start_index + index + 2]) /
-             (ts_ * ts_ * x[time_start_index + i] * x[time_start_index + i] *
-              x[time_start_index + i])) +
+            ((x[control_start_index_ + index] *
+                  x[control_start_index_ + index] +
+              x[control_start_index_ + index + 2] *
+                  x[control_start_index_ + index + 2] -
+              2 * x[control_start_index_ + index] *
+                  x[control_start_index_ + index + 2]) /
+             (ts_ * ts_ * x[time_start_index_ + i] * x[time_start_index_ + i] *
+              x[time_start_index_ + i])) +
         -2 * weight_rate_a_ *
-            ((x[control_start_index + index + 1] *
-                  x[control_start_index + index + 1] +
-              x[control_start_index + index + 1 + 2] *
-                  x[control_start_index + index + 1 + 2] -
-              2 * x[control_start_index + index + 1] *
-                  x[control_start_index + index + 1 + 2]) /
-             (ts_ * ts_ * x[time_start_index + i] * x[time_start_index + i] *
-              x[time_start_index + i]));
+            ((x[control_start_index_ + index + 1] *
+                  x[control_start_index_ + index + 1] +
+              x[control_start_index_ + index + 1 + 2] *
+                  x[control_start_index_ + index + 1 + 2] -
+              2 * x[control_start_index_ + index + 1] *
+                  x[control_start_index_ + index + 1 + 2]) /
+             (ts_ * ts_ * x[time_start_index_ + i] * x[time_start_index_ + i] *
+              x[time_start_index_ + i]));
   }
 
   // gradients on stitching input (No.3)
-  grad_f[control_start_index] +=
+  grad_f[control_start_index_] +=
       weight_stitching_steer_ *
-      ((2 * x[control_start_index] - 2 * last_time_u_(0, 0)) /
-       (ts_ * ts_ * x[time_start_index] * x[time_start_index]));
-  grad_f[control_start_index + 1] +=
+      ((2 * x[control_start_index_] - 2 * last_time_u_(0, 0)) /
+       (ts_ * ts_ * x[time_start_index_] * x[time_start_index_]));
+  grad_f[control_start_index_ + 1] +=
       weight_stitching_a_ *
-      ((2 * x[control_start_index + 1] - 2 * last_time_u_(1, 0)) /
-       (ts_ * ts_ * x[time_start_index] * x[time_start_index]));
+      ((2 * x[control_start_index_ + 1] - 2 * last_time_u_(1, 0)) /
+       (ts_ * ts_ * x[time_start_index_] * x[time_start_index_]));
 
   // gradients on timestep(No.4 in eval_f())
-  for (std::size_t i = 0; i < horizon_; i++) {
-    grad_f[time_start_index + i] =
+  for (std::size_t i = 0; i < horizon_ + 1; i++) {
+    grad_f[time_start_index_ + i] =
         weight_first_order_time_ +
-        2 * weight_second_order_time_ * x[time_start_index + i];
+        2 * weight_second_order_time_ * x[time_start_index_ + i];
   }
 
   // gradients on dual variables
   for (std::size_t i = 0; i < horizon_ + 1; i++) {
     std::size_t index = i << 1;
-    grad_f[dual_start_index + index] = 0.0;
-    grad_f[dual_start_index + index + 1] = 0.0;
+    grad_f[l_start_index_ + index] = 0.0;
+    grad_f[l_start_index_ + index + 1] = 0.0;
   }
 
   return true;
@@ -840,10 +838,6 @@ void DistanceApproachIPOPTInterface::finalize_solution(
     const double* z_U, int m, const double* g, const double* lambda,
     double obj_value, const Ipopt::IpoptData* ip_data,
     Ipopt::IpoptCalculatedQuantities* ip_cq) {
-  // std::size_t state_start_index = 0;
-  // std::size_t input_start_index = (horizon_ + 1) * 4;
-  // std::size_t time_start_index = input_start_index + horizon_ * 2;
-
   for (std::size_t i = 0; i < horizon_; ++i) {
     std::size_t state_index = i * 4;
 
