@@ -32,6 +32,8 @@ bool Scenario::InitTasks(const ScenarioConfig& config,
                          std::vector<std::unique_ptr<Task>>* tasks) {
   CHECK_GT(config.stage_size(), 0);
 
+  tasks->clear();
+
   ScenarioConfig::Stage stage;
   bool stage_found = false;
   for (int i = 0; i < config.stage_size(); ++i) {
@@ -42,6 +44,10 @@ bool Scenario::InitTasks(const ScenarioConfig& config,
   }
   if (!stage_found) {
     return false;
+  }
+
+  if (!stage.enabled()) {
+    return true;
   }
 
   // get all scenario_task_configs
@@ -60,7 +66,7 @@ bool Scenario::InitTasks(const ScenarioConfig& config,
         });
     if (task_config_it != task_configs.end()) {
       tasks->emplace_back(task_factory_.CreateObject(task));
-      AINFO << "Created task:" << TaskType_Name(task);
+      ADEBUG << "Created task:" << TaskType_Name(task);
       if (!tasks->back()->Init(*task_config_it)) {
         AERROR << "Init task[" << TaskType_Name(task) << "] failed.";
         return false;
