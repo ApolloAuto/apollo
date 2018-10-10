@@ -15,6 +15,7 @@ import positionIcon from "assets/images/menu/position.png";
 import mapIcon from "assets/images/menu/map.png";
 
 import { POINT_CLOUD_WS } from "store/websocket";
+import PARAMETERS from "store/config/parameters.yml";
 
 const MenuIconMapping = {
         perception: perceptionIcon,
@@ -27,59 +28,21 @@ const MenuIconMapping = {
         map: mapIcon,
 };
 
-const MenuIdOptionMapping = {
-        perceptionPointCloud: 'showPointCloud',
-        perceptionVehicle: 'showObstaclesVehicle',
-        perceptionPedestrian: 'showObstaclesPedestrian',
-        perceptionBicycle: 'showObstaclesBicycle',
-        perceptionUnknownMovable: 'showObstaclesUnknownMovable',
-        perceptionUnknownUnmovable: 'showObstaclesUnknownUnmovable',
-        perceptionUnknown: 'showObstaclesUnknown',
-        perceptionVirtual: 'showObstaclesVirtual',
-        perceptionCipv: 'showObstaclesCipv',
-        perceptionVelocity: 'showObstaclesVelocity',
-        perceptionHeading: 'showObstaclesHeading',
-        perceptionId: 'showObstaclesId',
-        perceptionObstacleInfo: 'showObstaclesInfo',
-        perceptionLaneMarker: 'showPerceptionLaneMarker',
-        predictionMajor: 'showPredictionMajor',
-        predictionMinor: 'showPredictionMinor',
-        routing: 'showRouting',
-        decisionMain: 'showDecisionMain',
-        decisionObstacle: 'showDecisionObstacle',
-        planningCar: 'showPlanningCar',
-        planningReference: 'showPlanningReference',
-        planningDpOptimizer: 'showPlanningDpOptimizer',
-        planningQpOptimizer: 'showPlanningQpOptimizer',
-        planningTrajectory: 'showPlanningTrajectory',
-        positionLocalization: 'showPositionLocalization',
-        positionGps: 'showPositionGps',
-        mapCrosswalk: 'showMapCrosswalk',
-        mapClearArea: 'showMapClearArea',
-        mapJunction: 'showMapJunction',
-        mapLane: 'showMapLane',
-        mapRoad: 'showMapRoad',
-        mapSignal: 'showMapSignal',
-        mapStopSign: 'showMapStopSign',
-        mapSpeedBump: 'showMapSpeedBump',
-        mapParkingSpace: 'showMapParkingSpace',
-};
-
 @observer
 class MenuItemCheckbox extends React.Component {
     render() {
-        const {id, title, options} = this.props;
+        const {id, title, optionName, options} = this.props;
         return (
             <ul>
                 <li id={id} onClick={() => {
-                    options.toggle(MenuIdOptionMapping[id]);
+                    options.toggle(optionName);
                     if (id === "perceptionPointCloud") {
                         POINT_CLOUD_WS.togglePointCloud(options.showPointCloud);
                     }
                 }}>
                     <div className="switch">
                         <input type="checkbox" name={id} className="toggle-switch"
-                        id={id} checked={options[MenuIdOptionMapping[id]]} readOnly/>
+                        id={id} checked={options[optionName]} readOnly/>
                         <label className="toggle-switch-label" htmlFor={id} />
                     </div>
                     <span>{title}</span>
@@ -91,6 +54,18 @@ class MenuItemCheckbox extends React.Component {
 
 @observer
 class SubMenu extends React.Component {
+    constructor(props) {
+        super(props);
+
+        this.menuIdOptionMapping = {};
+        for (const name in PARAMETERS.options) {
+            const option = PARAMETERS.options[name];
+            if (option.menuId) {
+                this.menuIdOptionMapping[option.menuId] = name;
+            }
+        }
+    }
+
     render() {
         const {tabId, tabTitle, tabType, data, options} = this.props;
         let entries = null;
@@ -98,19 +73,21 @@ class SubMenu extends React.Component {
             entries = Object.keys(data)
                 .map(key => {
                     const item = data[key];
-                    if (options.hideOptionToggle[key]) {
+                    if (options.togglesToHide[key]) {
                         return null;
                     }
                     return (
-                        <MenuItemCheckbox key={key} id={key} title={item}
-                        options={options}/>
+                        <MenuItemCheckbox
+                            key={key} id={key} title={item}
+                            optionName={this.menuIdOptionMapping[key]}
+                            options={options} />
                     );
                 });
         } else if (tabType === 'radio') {
             entries = Object.keys(data)
                 .map(key => {
                     const item = data[key];
-                    if (options.hideOptionToggle[key]) {
+                    if (options.togglesToHide[key]) {
                         return null;
                     }
                     return (

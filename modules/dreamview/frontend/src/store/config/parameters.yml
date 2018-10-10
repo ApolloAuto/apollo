@@ -65,60 +65,145 @@ planning:
       color: 0xd85656
       opacity: 0.8
       zOffset: 5
+
 options:
-  defaults:
-    # side bar options
-    showTasks: true
-    showModuleController: false
-    showMenu: false
-    showRouteEditingBar: false
-    showPOI: false
-    enableAudioCapture: false
-    showDataRecorder: false
+  # side bar options
+  showTasks:
+    default: true
+  showModuleController:
+    default: false
+  showMenu:
+    default: false
+  showRouteEditingBar:
+    default: false
+  showPOI:
+    default: false
+  enableAudioCapture:
+    default: false
+  showDataRecorder:
+    default: false
 
-    # task panel options
-    showPNCMonitor: false
-    enableSimControl: false
-    lockTaskPanel: false
-    showVideo: false
+  # task panel options
+  showPNCMonitor:
+    default: false
+  enableSimControl:
+    default: false
+  lockTaskPanel:
+    default: false
+  showVideo:
+    default: false
 
-    # layer Menu options
-    cameraAngle: Default
-    showDecisionMain: true
-    showDecisionObstacle: true
-    showPlanningTrajectory: true
-    showPlanningCar: false
-    showPlanningReference: false
-    showPlaningDpOptimizer: false
-    showPlanningQpOptimizer: false
-    showRouting: true
-    showPerceptionLaneMarker: false
-    showPointCloud: false
-    showPredictionMajor: true
-    showPredictionMinor: true
-    showObstaclesVehicle: true
-    showObstaclesPedestrian: true
-    showObstaclesBicycle: true
-    showObstaclesUnknownMovable: true
-    showObstaclesUnknownUnmovable: true
-    showObstaclesUnknown: true
-    showObstaclesVirtual: false
-    showObstaclesCipv: true
-    showObstaclesVelocity: true
-    showObstaclesHeading: true
-    showObstaclesId: true
-    showObstaclesInfo: true
-    showPositionGps: false
-    showPositionLocalization: true
-    showMapCrosswalk: true
-    showMapClearArea: true
-    showMapJunction: false
-    showMapLane: true
-    showMapRoad: false
-    showMapSignal: true
-    showMapStopSign: true
-    showMapSpeedBump: true
-    showMapParkingSpace: true
+  # layer Menu options
+  cameraAngle:
+    default: Default
+  showDecisionMain:
+    default: true
+    menuId: decisionMain
+  showDecisionObstacle:
+    default: true
+    menuId: decisionObstacle
+  showPlanningTrajectory:
+    default: true
+    menuId: planningTrajectory
+  showPlanningCar:
+    default: false
+    menuId: planningCar
+  showPlanningReference:
+    default: false
+    menuId: planningReference
+    forPncMonitor: true
+  showPlanningDpOptimizer:
+    default: false
+    menuId: planningDpOptimizer
+    forPncMonitor: true
+  showPlanningQpOptimizer:
+    default: false
+    menuId: planningQpOptimizer
+    forPncMonitor: true
+  showRouting:
+    default: true
+    menuId: routing
+  showPredictionMajor:
+    default: true
+    menuId: predictionMajor
+  showPredictionMinor:
+    default: true
+    menuId: predictionMinor
+  showPointCloud:
+    default: false
+    menuId: perceptionPointCloud
+  showPerceptionLaneMarker:
+    default: false
+    menuId: perceptionLaneMarker
+  showObstaclesVehicle:
+    default: true
+    menuId: perceptionVehicle
+  showObstaclesPedestrian:
+    default: true
+    menuId: perceptionPedestrian
+  showObstaclesBicycle:
+    default: true
+    menuId: perceptionBicycle
+  showObstaclesUnknownMovable:
+    default: true
+    menuId: perceptionUnknownMovable
+  showObstaclesUnknownUnmovable:
+    default: true
+    menuId: perceptionUnknownUnmovable
+  showObstaclesUnknown:
+    default: true
+    menuId: perceptionUnknown
+  showObstaclesVirtual:
+    default: false
+    menuId: perceptionVirtual
+  showObstaclesCipv:
+    default: true
+    menuId: perceptionCipv
+  showObstaclesVelocity:
+    default: true
+    menuId: perceptionVelocity
+  showObstaclesHeading:
+    default: true
+    menuId: perceptionHeading
+  showObstaclesId:
+    default: true
+    menuId: perceptionId
+  showObstaclesInfo:
+    default: true
+    menuId: perceptionObstacleInfo
+  showPositionGps:
+    default: false
+    menuId: positionGps
+  showPositionLocalization:
+    default: true
+    menuId: positionLocalization
+  showMapCrosswalk:
+    default: true
+    menuId: mapCrosswalk
+  showMapClearArea:
+    default: true
+    menuId: mapClearArea
+  showMapJunction:
+    default: false
+    menuId: mapJunction
+  showMapLane:
+    default: true
+    menuId: mapLane
+  showMapRoad:
+    default: false
+    menuId: mapRoad
+  showMapSignal:
+    default: true
+    menuId: mapSignal
+  showMapStopSign:
+    default: true
+    menuId: mapStopSign
+  showMapSpeedBump:
+    default: true
+    menuId: mapSpeedBump
+  showMapParkingSpace:
+    default: true
+    menuId: mapParkingSpace
 
 navigation:
   # possible options: BaiduMap or GoogleMap

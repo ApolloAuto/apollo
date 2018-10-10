@@ -561,6 +561,126 @@
                   "id": 24
                 }
               }
+            },
+            "Options": {
+              "fields": {
+                "legendDisplay": {
+                  "type": "bool",
+                  "id": 1,
+                  "options": {
+                    "default": true
+                  }
+                },
+                "x": {
+                  "type": "Axis",
+                  "id": 2
+                },
+                "y": {
+                  "type": "Axis",
+                  "id": 3
+                }
+              },
+              "nested": {
+                "Axis": {
+                  "fields": {
+                    "min": {
+                      "type": "double",
+                      "id": 1
+                    },
+                    "max": {
+                      "type": "double",
+                      "id": 2
+                    },
+                    "labelString": {
+                      "type": "string",
+                      "id": 3
+                    }
+                  }
+                }
+              }
+            },
+            "Line": {
+              "fields": {
+                "label": {
+                  "type": "string",
+                  "id": 1
+                },
+                "point": {
+                  "rule": "repeated",
+                  "type": "apollo.common.Point2D",
+                  "id": 2
+                },
+                "properties": {
+                  "keyType": "string",
+                  "type": "string",
+                  "id": 3
+                }
+              }
+            },
+            "Polygon": {
+              "fields": {
+                "label": {
+                  "type": "string",
+                  "id": 1
+                },
+                "point": {
+                  "rule": "repeated",
+                  "type": "apollo.common.Point2D",
+                  "id": 2
+                },
+                "properties": {
+                  "keyType": "string",
+                  "type": "string",
+                  "id": 3
+                }
+              }
+            },
+            "Car": {
+              "fields": {
+                "x": {
+                  "type": "double",
+                  "id": 1
+                },
+                "y": {
+                  "type": "double",
+                  "id": 2
+                },
+                "heading": {
+                  "type": "double",
+                  "id": 3
+                },
+                "color": {
+                  "type": "string",
+                  "id": 4
+                }
+              }
+            },
+            "Chart": {
+              "fields": {
+                "title": {
+                  "type": "string",
+                  "id": 1
+                },
+                "options": {
+                  "type": "Options",
+                  "id": 2
+                },
+                "line": {
+                  "rule": "repeated",
+                  "type": "Line",
+                  "id": 3
+                },
+                "polygon": {
+                  "rule": "repeated",
+                  "type": "Polygon",
+                  "id": 4
+                },
+                "car": {
+                  "rule": "repeated",
+                  "type": "Car",
+                  "id": 5
+                }
+              }
             }
           }
         },
@@ -2658,6 +2778,11 @@
                 "frontClearDistance": {
                   "type": "double",
                   "id": 24
+                },
+                "chart": {
+                  "rule": "repeated",
+                  "type": "apollo.dreamview.Chart",
+                  "id": 25
                 }
               }
             },
