@@ -13,11 +13,8 @@ cc_library(
         "*.h",
     ]),
     deps = [
-          "//framework/cybertron/croutine:croutine_lib",
-          "//framework/cybertron/data:data_lib",
-    ],
-    copts = [
-        "-Iframework",
+          "//cybertron/croutine:croutine_lib",
+          "//cybertron/data:data_lib",
     ],
 )
 

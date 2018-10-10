@@ -11,12 +11,11 @@ cc_library(
         "*.h",
     ]),
     deps = [
-        "//framework/cybertron:init_lib",
-        "//framework/cybertron/common:common_lib",
-        "//framework/cybertron/message:message_lib",
-        "//framework/cybertron/proto:proto_lib",
+        "//cybertron:init_lib",
+        "//cybertron/common:common_lib",
+        "//cybertron/message:message_lib",
+        "//cybertron/proto:proto_lib",
     ],
-    copts = ["-Iframework"],
 )
 
 cpplint()

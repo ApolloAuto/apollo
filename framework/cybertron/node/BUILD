@@ -7,11 +7,10 @@ cc_library(
     hdrs = glob([
         "reader_base.h",
     ]),
-    copts = ["-Iframework"],
     deps = [
-        "//framework/cybertron/transport:transport_lib",
-        "//framework/cybertron/common:common_lib",
-        "//framework/cybertron/event:event_lib",
+        "//cybertron/transport:transport_lib",
+        "//cybertron/common:common_lib",
+        "//cybertron/event:event_lib",
     ],
 )
 
@@ -23,14 +22,13 @@ cc_library(
     hdrs = glob([
         "*.h",
     ]),
-    copts = ["-Iframework"],
     deps = [
-        "//framework/cybertron/transport:transport_lib",
-        "//framework/cybertron/blocker:blocker_lib",
-        "//framework/cybertron/croutine:croutine_lib",
-        "//framework/cybertron/data:data_lib",
-        "//framework/cybertron/scheduler:scheduler_lib",
-        "//framework/cybertron/service:service_lib",
+        "//cybertron/transport:transport_lib",
+        "//cybertron/blocker:blocker_lib",
+        "//cybertron/croutine:croutine_lib",
+        "//cybertron/data:data_lib",
+        "//cybertron/scheduler:scheduler_lib",
+        "//cybertron/service:service_lib",
     ],
 )
 

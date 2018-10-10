@@ -11,13 +11,12 @@ cc_library(
         "*.h",
     ]),
     deps = [
-        "//framework/cybertron/node:node_lib",
-        "//framework/cybertron/data:data_lib",
-        "//framework/cybertron/message:message_lib",
-        "//framework/cybertron/service:service_lib",
+        "//cybertron/node:node_lib",
+        "//cybertron/data:data_lib",
+        "//cybertron/message:message_lib",
+        "//cybertron/service:service_lib",
         "@fastrtps",
     ],
-    copts = ["-Iframework"],
 )
 
 cpplint()
