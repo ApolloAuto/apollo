@@ -71,7 +71,7 @@ cc_library(
     ],
     deps = [
         ":base_forward_declaration",
-        "//framework:cybertron",
+        "//cybertron",
         "//modules/perception/base",
         "//modules/perception/base:base_type",
         "//modules/perception/base:frame",

@@ -7,7 +7,7 @@ cc_library(
     srcs = ["move_sequence_predictor.cc"],
     hdrs = ["move_sequence_predictor.h"],
     deps = [
-        "//framework:cybertron",
+        "//cybertron",
         "//modules/common/adapters/proto:adapter_config_proto",
         "//modules/common/math:geometry",
         "//modules/common/proto:pnc_point_proto",

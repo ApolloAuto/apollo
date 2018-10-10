@@ -10,9 +10,6 @@ cc_binary(
         ".",
     ],
     linkopts = [
-        "-lcybertron",
-        "-lcybertron_proto",
-        "-lcybertron_common",
         "-lfastrtps",
         "-lconsole_bridge",
         "-lprotobuf",
@@ -22,7 +19,7 @@ cc_binary(
     ],
     deps = [
         ":visualizer_lib",
-        "//framework:cybertron",
+        "//cybertron",
         "@qt//:qt_core",
         "@qt//:qt_widgets",
         "@qt//:qt_gui",
@@ -60,7 +57,7 @@ qt_cc_library(
 
     deps = [
         "//modules/drivers/proto:sensor_proto",
-        "//framework:cybertron",
+        "//cybertron",
         "@qt//:qt_core",
         "@qt//:qt_widgets",
         "@qt//:qt_gui",

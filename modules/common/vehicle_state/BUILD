@@ -11,7 +11,7 @@ cc_library(
         "vehicle_state_provider.h",
     ],
     deps = [
-        "//framework:cybertron",
+        "//cybertron",
         "//modules/common/configs:config_gflags",
         "//modules/common/math:geometry",
         "//modules/common/math:quaternion",

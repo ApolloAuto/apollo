@@ -7,7 +7,7 @@ cc_library(
     srcs = ["pose_container.cc"],
     hdrs = ["pose_container.h"],
     deps = [
-        "//framework:cybertron",
+        "//cybertron",
         "//modules/common/math:quaternion",
         "//modules/localization/proto:localization_proto",
         "//modules/perception/proto:perception_proto",

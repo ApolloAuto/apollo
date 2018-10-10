@@ -11,7 +11,7 @@ cc_library(
         "proceed_with_caution_speed_generator.h",
     ],
     deps = [
-        "//framework:cybertron",
+        "//cybertron",
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/configs/proto:vehicle_config_proto",
         "//modules/common/proto:pnc_point_proto",

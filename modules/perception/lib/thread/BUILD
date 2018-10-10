@@ -17,7 +17,7 @@ cc_library(
         "thread.h",
     ],
     deps = [
-        "//framework:cybertron",
+        "//cybertron",
     ],
 )
 

@@ -47,7 +47,7 @@ cc_library(
         "lidar_log.h",
     ],
     deps = [
-        "//framework:cybertron",
+        "//cybertron",
     ],
 )
 
@@ -57,7 +57,7 @@ cc_library(
         "feature_descriptor.h",
     ],
     deps = [
-        "//framework:cybertron",
+        "//cybertron",
         "//modules/perception/base:point_cloud",
     ],
 )
@@ -133,7 +133,7 @@ cc_library(
         "object_sequence.h",
     ],
     deps = [
-        "//framework:cybertron",
+        "//cybertron",
         "//modules/perception/base:object",
         "//modules/perception/lidar/common",
     ],

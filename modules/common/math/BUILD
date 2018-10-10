@@ -41,7 +41,7 @@ cc_library(
         "vec2d.h",
     ],
     deps = [
-        "//framework:cybertron",
+        "//cybertron",
         "//modules/common/util:string_util",
         "@osqp",
     ],
@@ -103,7 +103,7 @@ cc_library(
         "matrix_operations.h",
     ],
     deps = [
-        "//framework:cybertron",
+        "//cybertron",
         "@eigen",
     ],
 )
@@ -126,7 +126,7 @@ cc_library(
         "kalman_filter.h",
     ],
     deps = [
-        "//framework:cybertron",
+        "//cybertron",
         "//modules/common/math:matrix_operations",
         "@eigen",
     ],
@@ -138,7 +138,7 @@ cc_library(
         "extended_kalman_filter.h",
     ],
     deps = [
-        "//framework:cybertron",
+        "//cybertron",
         "//modules/common/math:matrix_operations",
         "@eigen",
     ],
@@ -230,7 +230,7 @@ cc_library(
         "integral.h",
     ],
     deps = [
-        "//framework:cybertron",
+        "//cybertron",
     ],
 )
 
@@ -243,7 +243,7 @@ cc_library(
         "linear_quadratic_regulator.h",
     ],
     deps = [
-        "//framework:cybertron",
+        "//cybertron",
         "@eigen",
     ],
 )
@@ -257,7 +257,7 @@ cc_library(
         "mpc_solver.h",
     ],
     deps = [
-        "//framework:cybertron",
+        "//cybertron",
         "//modules/common/math/qp_solver",
         "//modules/common/math/qp_solver:active_set_qp_solver",
         "@eigen",
@@ -274,7 +274,7 @@ cc_library(
     ],
     deps = [
         ":geometry",
-        "//framework:cybertron",
+        "//cybertron",
         "@eigen",
     ],
 )
@@ -285,7 +285,7 @@ cc_library(
         "hermite_spline.h",
     ],
     deps = [
-        "//framework:cybertron",
+        "//cybertron",
     ],
 )
 
@@ -323,7 +323,7 @@ cc_test(
     ],
     deps = [
         ":linear_interpolation",
-        "//framework:cybertron",
+        "//cybertron",
         "@eigen",
         "@gtest//:main",
     ],

@@ -7,7 +7,7 @@ cc_library(
     srcs = ["gps_monitor.cc"],
     hdrs = ["gps_monitor.h"],
     deps = [
-        "//framework:cybertron",
+        "//cybertron",
         "//modules/drivers/gnss/proto:gnss_proto",
         "//modules/monitor/common:monitor_manager",
         "//modules/monitor/common:recurrent_runner",

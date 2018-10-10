@@ -41,7 +41,7 @@ inline const std::string WorkRoot() {
   // TODO(fengkaiwen01) need a better error handling mechanism
   // assert(!work_root.empty());
   if (work_root.empty()) {
-    work_root = "/apollo/framework/install";
+    work_root = "/apollo/cybertron";
   }
   return work_root;
 }
