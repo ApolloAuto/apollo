@@ -34,6 +34,12 @@ message LaneFeature {
   optional double lane_heading = 8;
 }
 
+message JunctionFeature {
+  optional string junction_id = 1;
+  optional string enter_lane_id = 2;
+  repeated LaneFeature exit_lane = 3;
+}
+
 message ObstaclePriority {
   enum Priority {
     CAUTION = 1;
@@ -43,6 +49,7 @@ message ObstaclePriority {
   optional Priority priority = 25 [default = NORMAL];
 }
 
+// next id = 27
 message Feature {
   // Obstacle ID
   optional int32 id = 1;
@@ -63,6 +70,7 @@ message Feature {
 
   // Obstacle type-specific features
   optional Lane lane = 14;
+  optional JunctionFeature junction_feature = 26;
 
   // Obstacle tracked features
   optional apollo.common.Point3D t_position = 16;
