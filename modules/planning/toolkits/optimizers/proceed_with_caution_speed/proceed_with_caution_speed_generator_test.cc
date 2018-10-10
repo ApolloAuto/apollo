@@ -17,7 +17,6 @@
 /**
  * @file
  **/
-#include "modules/planning/toolkits/optimizers/proceed_with_caution_speed/proceed_with_caution_speed_generator.h"
 
 #include "gtest/gtest.h"
 
@@ -29,8 +28,15 @@
 #include "modules/common/util/file.h"
 #include "modules/planning/common/planning_gflags.h"
 
+#define private public
+
+#include "modules/planning/toolkits/optimizers/proceed_with_caution_speed/proceed_with_caution_speed_generator.h"
+
+
 namespace apollo {
 namespace planning {
+
+
 
 class ProceedWithCautionSpeedGeneratorTest : public ::testing::Test {
  public:

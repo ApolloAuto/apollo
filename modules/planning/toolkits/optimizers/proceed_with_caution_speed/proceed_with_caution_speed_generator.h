@@ -46,7 +46,7 @@ class ProceedWithCautionSpeedGenerator : public SpeedOptimizer {
 
   bool Init(const ScenarioConfig::ScenarioTaskConfig& config) override;
 
-  // private:
+ private:
   common::Status Process(const SLBoundary& adc_sl_boundary,
                          const PathData& path_data,
                          const apollo::common::TrajectoryPoint& init_point,

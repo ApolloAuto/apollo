@@ -124,7 +124,6 @@ void SequencePredictor::FilterLaneSequences(
     }
   }
 
-  
   for (int i = 0; i < num_lane_sequence; ++i) {
     const LaneSequence& sequence = lane_graph.lane_sequence(i);
 
