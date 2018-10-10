@@ -59,8 +59,8 @@ class PlayTaskConsumer {
   uint64_t base_msg_play_time_ns_;
   uint64_t last_played_msg_real_time_ns_;
 
-  static const uint64_t kPauseSleepNanoSec = 100000000UL;
-  static const uint64_t kWaitProduceSleepNanoSec = 5000000UL;
+  const uint64_t kPauseSleepNanoSec = 100000000UL;
+  const uint64_t kWaitProduceSleepNanoSec = 5000000UL;
 };
 
 }  // namespace record

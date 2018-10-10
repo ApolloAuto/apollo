@@ -54,7 +54,7 @@ class Player {
   TermCtrlPtr term_ctrl_;
   TaskBufferPtr task_buffer_;
 
-  static const uint64_t kSleepIntervalMiliSec = 100;
+  const uint64_t kSleepIntervalMiliSec = 100;
 };
 
 }  // namespace record
