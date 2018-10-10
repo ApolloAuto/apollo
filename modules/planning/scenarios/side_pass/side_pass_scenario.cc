@@ -157,7 +157,38 @@ bool SidePassScenario::IsTransferable(const Scenario& current_scenario,
 
 Status SidePassScenario::ApproachObstacle(
     const TrajectoryPoint& planning_start_point, Frame* frame) {
-  return Status::OK();
+  auto status =
+      Status(ErrorCode::PLANNING_ERROR, "reference line not drivable");
+
+  for (auto& reference_line_info : frame->reference_line_info()) {
+    if (!reference_line_info.IsDrivable()) {
+      return status;
+    }
+
+    auto ret = Status::OK();
+    for (auto &optimizer : tasks_) {
+      ret = optimizer->Execute(frame, &reference_line_info);
+      if (!ret.ok()) {
+        AERROR << "Failed to run tasks[" << optimizer->Name()
+               << "], Error message: " << ret.error_message();
+        break;
+      }
+    }
+
+    reference_line_info.set_trajectory_type(ADCTrajectory::NORMAL);
+    DiscretizedTrajectory trajectory;
+    if (!reference_line_info.CombinePathAndSpeedProfile(
+        planning_start_point.relative_time(),
+        planning_start_point.path_point().s(), &trajectory)) {
+      std::string msg("Fail to aggregate planning trajectory.");
+      AERROR << msg;
+      return Status(ErrorCode::PLANNING_ERROR, msg);
+    }
+    reference_line_info.SetTrajectory(trajectory);
+    reference_line_info.SetDrivable(true);
+    return Status::OK();
+  }
+  return status;
 }
 
 Status SidePassScenario::GeneratePath(
