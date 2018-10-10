@@ -78,11 +78,18 @@ class SidePassScenario : public Scenario {
   common::Status PassObstacle(
       const common::TrajectoryPoint& planning_start_point, Frame* frame);
 
+  bool IsSidePassScenario(const common::TrajectoryPoint& planning_start_point,
+                          Frame* frame);
+
+  common::Status RunPlanOnReferenceLine(
+      const common::TrajectoryPoint& planning_start_point, Frame* frame);
+
  private:
   static int current_stage_index_;
   std::vector<std::unique_ptr<Task>> tasks_;
   ScenarioConfig config_;
   SidePassStage stage_ = OBSTACLE_APPROACH;
+  bool stage_init = false;
   SpeedProfileGenerator speed_profile_generator_;
   PathData path_;
   double wait_point_s = 0;
