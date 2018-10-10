@@ -56,6 +56,8 @@ class VelodyneDriver {
 
   uint64_t basetime_ = 0;
   uint32_t last_gps_time_ = 0;
+  uint64_t last_count_ = 0;
+  static uint64_t sync_counter;
 
   std::thread positioning_thread_;
 
