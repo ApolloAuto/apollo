@@ -63,6 +63,8 @@ constexpr double kSpeedOptimizationFallbackCost = 2e4;
 constexpr double kStraightForwardLineCost = 10.0;
 }  // namespace
 
+int LaneFollowScenario::current_stage_index_ = 0;
+
 void LaneFollowScenario::RegisterTasks() {
   task_factory_.Register(DP_POLY_PATH_OPTIMIZER,
                          []() -> Task* { return new DpPolyPathOptimizer(); });
@@ -149,14 +151,7 @@ Status LaneFollowScenario::Process(const TrajectoryPoint& planning_start_point,
                                    Frame* frame) {
   status_ = STATUS_PROCESSING;
 
-  // init tasks
-  std::string stage_name = "";
-  if (stage_ == LaneFollowStage::CRUISE) {
-    stage_name = "";
-  } else if (stage_ == LaneFollowStage::DONE) {
-    return Status(ErrorCode::OK, "side_pass DONE");
-  }
-  if (!InitTasks(config_, stage_name, &tasks_)) {
+  if (!InitTasks(config_, current_stage_index_, &tasks_)) {
     return Status(ErrorCode::PLANNING_ERROR, "failed to init tasks");
   }
 

@@ -53,15 +53,16 @@ class StopSignUnprotectedScenario : public Scenario {
   enum StopSignUnprotectedStage {
     STOP = 1,
     CREEP = 2,
-    CRUISE = 3,
-    DONE = 4,
+    INTERSECTION_CRUISE = 3,
   };
 
   void RegisterTasks();
 
  private:
+  static int current_stage_index_;
   std::vector<std::unique_ptr<Task>> tasks_;
   ScenarioConfig config_;
+
   StopSignUnprotectedStage stage_ = STOP;
   SpeedProfileGenerator speed_profile_generator_;
 };

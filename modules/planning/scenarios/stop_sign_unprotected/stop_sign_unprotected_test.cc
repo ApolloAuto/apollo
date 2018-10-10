@@ -41,9 +41,10 @@ class StopSignUnprotectedScenarioTest : public ::testing::Test {
   std::unique_ptr<StopSignUnprotectedScenario> scenario_;
 };
 
-TEST_F(StopSignUnprotectedScenarioTest, Simple) {
+TEST_F(StopSignUnprotectedScenarioTest, InitTasks) {
   FLAGS_scenario_stop_sign_unprotected_config_file =
-      "modules/planning/conf/scenario_stop_sign_unprotected_config.pb.txt";
+      "//apollo/modules/planning/testdata/conf/"
+      "scenario_stop_sign_unprotected_config.pb.txt";
 
   scenario_.reset(new StopSignUnprotectedScenario());
   EXPECT_EQ(scenario_->scenario_type(),
@@ -56,13 +57,16 @@ TEST_F(StopSignUnprotectedScenarioTest, Simple) {
   EXPECT_TRUE(scenario_->Init());
 
   std::vector<std::unique_ptr<Task>> tasks;
-  scenario_->InitTasks(config, "STOP", &tasks);
+  // stage stop
+  scenario_->InitTasks(config, 0, &tasks);
   EXPECT_EQ(tasks.size(), 0);
 
-  scenario_->InitTasks(config, "CREEP", &tasks);
+  // stage creep
+  scenario_->InitTasks(config, 1, &tasks);
   EXPECT_EQ(tasks.size(), 0);
 
-  scenario_->InitTasks(config, "INTERSECTION_CRUISE", &tasks);
+  // stage intersection_cruise
+  scenario_->InitTasks(config, 2, &tasks);
   EXPECT_EQ(tasks.size(), 5);
 }
 
