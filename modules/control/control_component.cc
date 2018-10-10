@@ -68,8 +68,7 @@ bool ControlComponent::Init() {
   chassis_reader_config.pending_queue_size = FLAGS_chassis_pending_queue_size;
 
   chassis_reader_ = node_->CreateReader<Chassis>(
-      chassis_reader_config,
-      std::bind(&ControlComponent::OnChassis, this, std::placeholders::_1));
+      chassis_reader_config, nullptr);
   CHECK(chassis_reader_ != nullptr);
 
   cybertron::ReaderConfig planning_reader_config;
@@ -77,8 +76,7 @@ bool ControlComponent::Init() {
   planning_reader_config.pending_queue_size = FLAGS_planning_pending_queue_size;
 
   trajectory_reader_ = node_->CreateReader<ADCTrajectory>(
-      planning_reader_config,
-      std::bind(&ControlComponent::OnPlanning, this, std::placeholders::_1));
+      planning_reader_config, nullptr);
   CHECK(trajectory_reader_ != nullptr);
 
   cybertron::ReaderConfig localization_reader_config;
@@ -87,8 +85,7 @@ bool ControlComponent::Init() {
       FLAGS_localization_pending_queue_size;
 
   localization_reader_ = node_->CreateReader<LocalizationEstimate>(
-      localization_reader_config, std::bind(&ControlComponent::OnLocalization,
-                                            this, std::placeholders::_1));
+      localization_reader_config, nullptr);
   CHECK(localization_reader_ != nullptr);
 
   cybertron::ReaderConfig pad_msg_reader_config;
@@ -96,8 +93,7 @@ bool ControlComponent::Init() {
   pad_msg_reader_config.pending_queue_size = FLAGS_pad_msg_pending_queue_size;
 
   pad_msg_reader_ = node_->CreateReader<PadMessage>(
-      pad_msg_reader_config,
-      std::bind(&ControlComponent::OnPad, this, std::placeholders::_1));
+      pad_msg_reader_config, nullptr);
   CHECK(pad_msg_reader_ != nullptr);
 
   control_cmd_writer_ =
@@ -264,6 +260,22 @@ Status ControlComponent::ProduceControlCommand(
 
 bool ControlComponent::Proc() {
   double start_timestamp = Clock::NowInSeconds();
+
+  chassis_reader_->Observe();
+  const auto& chassis_msg = chassis_reader_->GetLatestObserved();
+  OnChassis(chassis_msg);
+
+  trajectory_reader_->Observe();
+  const auto& trajectory_msg = trajectory_reader_->GetLatestObserved();
+  OnPlanning(trajectory_msg);
+
+  localization_reader_->Observe();
+  const auto& localization_msg = localization_reader_->GetLatestObserved();
+  OnLocalization(localization_msg);
+
+  pad_msg_reader_->Observe();
+  const auto& pad_msg = pad_msg_reader_->GetLatestObserved();
+  OnPad(pad_msg);
 
   if (control_conf_.is_control_test_mode() &&
       control_conf_.control_test_duration() > 0 &&
