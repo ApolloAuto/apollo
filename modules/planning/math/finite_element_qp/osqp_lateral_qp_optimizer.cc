@@ -35,13 +35,11 @@ bool OsqpLateralQPOptimizer::optimize(
   std::vector<c_int> P_indices;
   std::vector<c_int> P_indptr;
   CalcualteKernel(d_bounds, &P_data, &P_indices, &P_indptr);
-
   delta_s_ = delta_s;
   const int num_var = d_bounds.size();
   const int kNumParam = 3 * d_bounds.size();
-  const int kNumConstraint = 3 * (num_var - 1) + 5;
-  MatrixXd affine_constraint = MatrixXd::Zero(kNumParam, kNumConstraint);
-  // const int kNumOfConstraint = kNumParam * kNumConstraint;
+  const int kNumConstraint = kNumParam + 3 * (num_var - 1) + 3;
+  MatrixXd affine_constraint = MatrixXd::Zero(kNumConstraint, kNumParam);
   c_float lower_bounds[kNumConstraint];
   c_float upper_bounds[kNumConstraint];
 
@@ -108,15 +106,20 @@ bool OsqpLateralQPOptimizer::optimize(
   upper_bounds[constraint_index] = d_state[2];
   ++constraint_index;
 
-  affine_constraint(constraint_index, prime_offset + num_var - 1) = 1.0;
-  lower_bounds[constraint_index] = 0.0;
-  upper_bounds[constraint_index] = 0.0;
-  ++constraint_index;
+  const double LARGE_VALUE = 2.0;
+  for (int i = 0; i < kNumParam; ++i) {
+    affine_constraint(constraint_index, i) = 1.0;
+    if (i < num_var) {
+      lower_bounds[constraint_index] = d_bounds[i].first;
+      upper_bounds[constraint_index] = d_bounds[i].second;
+    } else {
+      lower_bounds[constraint_index] = -LARGE_VALUE;
+      upper_bounds[constraint_index] = LARGE_VALUE;
+    }
+    ++constraint_index;
+  }
 
-  affine_constraint(constraint_index, pprime_offset + num_var - 1) = 1.0;
-  lower_bounds[constraint_index] = 0.0;
-  upper_bounds[constraint_index] = 0.0;
-  ++constraint_index;
+  CHECK_EQ(constraint_index, kNumConstraint);
 
   // change affine_constraint to CSC format
   std::vector<c_float> A_data;
