@@ -83,10 +83,26 @@ SMALL_TOPICS = [
 ]
 
 LARGE_TOPICS = [
-    '/apollo/sensor/camera/traffic/image_short',
+    '/apollo/sensor/camera/camera_front_6mm',
+    '/apollo/sensor/camera/camera_front_12mm',
+    '/apollo/sensor/camera/camera_front_fisheye',
+    '/apollo/sensor/camera/camera_left_front',
+    '/apollo/sensor/camera/camera_left_rear',
+    '/apollo/sensor/camera/camera_left_fisheye',
+    '/apollo/sensor/camera/camera_rear_6mm',
+    '/apollo/sensor/camera/camera_right_front',
+    '/apollo/sensor/camera/camera_right_rear',
+    '/apollo/sensor/camera/camera_right_fisheye',
     '/apollo/sensor/camera/traffic/image_long',
-    '/apollo/sensor/velodyne64/compensator/PointCloud2',
+    '/apollo/sensor/camera/traffic/image_short',
+    '/apollo/sensor/radar/radar_front',
+    '/apollo/sensor/radar/radar_rear',
     '/apollo/sensor/velodyne16/compensator/PointCloud2',
+    '/apollo/sensor/velodyne16/lidar_16_front_center',
+    '/apollo/sensor/velodyne16/lidar_16_rear_left',
+    '/apollo/sensor/velodyne16/lidar_16_rear_right',
+    '/apollo/sensor/velodyne64/compensator/PointCloud2',
+    '/apollo/sensor/velodyne128/lidar_128',
 ]
 
 
