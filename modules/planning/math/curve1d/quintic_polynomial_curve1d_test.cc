@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "modules/planning/math/curve1d/quintic_polynomial_curve1d.h"
+#include "modules/planning/math/curve1d/quartic_polynomial_curve1d.h"
 
 #include "gtest/gtest.h"
 
@@ -54,5 +55,20 @@ TEST(QuinticPolynomialCurve1dTest, basic_test) {
   EXPECT_NEAR(t, e_t, 1.0e-6);
 }
 
+TEST(QuinticPolynomialCurve1dTest, IntegratedFromQuarticCurve) {
+  QuarticPolynomialCurve1d quartic_curve(2, 1, 4, 3, 2, 4);
+  QuinticPolynomialCurve1d quintic_curve;
+  quintic_curve.IntegratedFromQuarticCurve(quartic_curve, 1);
+  for (double value = 0.0; value < 4.1; value += 0.1) {
+    EXPECT_NEAR(quartic_curve.Evaluate(0, value),
+                quintic_curve.Evaluate(1, value), 1e-8);
+    EXPECT_NEAR(quartic_curve.Evaluate(1, value),
+                quintic_curve.Evaluate(2, value), 1e-8);
+    EXPECT_NEAR(quartic_curve.Evaluate(2, value),
+                quintic_curve.Evaluate(3, value), 1e-8);
+    EXPECT_NEAR(quartic_curve.Evaluate(3, value),
+                quintic_curve.Evaluate(4, value), 1e-8);
+  }
+}
 }  // namespace planning
 }  // namespace apollo
