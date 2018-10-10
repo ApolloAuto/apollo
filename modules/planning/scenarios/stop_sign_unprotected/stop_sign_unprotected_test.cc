@@ -41,6 +41,16 @@ class StopSignUnprotectedScenarioTest : public ::testing::Test {
   std::unique_ptr<StopSignUnprotectedScenario> scenario_;
 };
 
+TEST_F(StopSignUnprotectedScenarioTest, VerifyConf) {
+  FLAGS_scenario_stop_sign_unprotected_config_file =
+      "//apollo/modules/planning/conf/"
+      "scenario_stop_sign_unprotected_config.pb.txt";
+
+  ScenarioConfig config;
+  EXPECT_TRUE(apollo::common::util::GetProtoFromFile(
+      FLAGS_scenario_side_pass_config_file, &config));
+}
+
 TEST_F(StopSignUnprotectedScenarioTest, InitTasks) {
   FLAGS_scenario_stop_sign_unprotected_config_file =
       "//apollo/modules/planning/testdata/conf/"

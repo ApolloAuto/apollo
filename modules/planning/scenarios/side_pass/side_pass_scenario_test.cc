@@ -39,7 +39,18 @@ class SidePassScenarioTest : public ::testing::Test {
  protected:
   std::unique_ptr<SidePassScenario> scenario_;
 };
-TEST_F(SidePassScenarioTest, Simple) {
+
+TEST_F(SidePassScenarioTest, VerifyConf) {
+  FLAGS_scenario_side_pass_config_file =
+      "//apollo/modules/planning/conf/"
+      "scenario_side_pass_config.pb.txt";
+
+  ScenarioConfig config;
+  EXPECT_TRUE(apollo::common::util::GetProtoFromFile(
+      FLAGS_scenario_side_pass_config_file, &config));
+}
+
+TEST_F(SidePassScenarioTest, InitTasks) {
   FLAGS_scenario_side_pass_config_file =
       "//apollo/modules/planning/testdata/conf/"
       "scenario_side_pass_config.pb.txt";
