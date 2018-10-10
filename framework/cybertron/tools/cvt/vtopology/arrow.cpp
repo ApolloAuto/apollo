@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "arrow.h"
-#include "composite_item.h"
+#include "./arrow.h"
+#include "./composite_item.h"
 
 #include <cmath>
 #include <iostream>

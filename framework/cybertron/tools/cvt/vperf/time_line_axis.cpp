@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "time_line_axis.h"
-#include "time_line_scene.h"
+#include "./time_line_axis.h"
+#include "./time_line_scene.h"
 
 #include <QGraphicsLineItem>
 #include <iostream>

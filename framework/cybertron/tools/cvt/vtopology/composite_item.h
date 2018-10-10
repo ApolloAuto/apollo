@@ -40,9 +40,9 @@ class CompositeItem : public QGraphicsItemGroup {
   QColor CurrentPenColor(void) const { return current_pen_.color(); }
   QColor OldPenColor(void) const { return old_pen_.color(); }
 
-  virtual void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
+  void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
                      QWidget* widget = 0) override;
-  virtual int type() const { return Type; }
+  int type() const override { return Type; }
 
   const QString text(void) const { return text_.toPlainText(); }
 

@@ -20,7 +20,7 @@
 #include <QGraphicsItemGroup>
 #include <QGraphicsRectItem>
 #include <QList>
-#include "perf_data_base.h"
+#include "./perf_data_base.h"
 
 class TimeLineRow;
 

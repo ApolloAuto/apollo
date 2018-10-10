@@ -14,7 +14,9 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "perf_data_base.h"
+#include "./perf_data_base.h"
+#include <utility>
+#include <string>
 
 PerfDatabase* PerfDatabase::instance(void) {
   static PerfDatabase dataBase;

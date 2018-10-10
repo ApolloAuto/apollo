@@ -66,7 +66,7 @@ class ChannelMsgFactory final {
   bool isFromHere(const std::string& nodeName);
 
  private:
-  explicit ChannelMsgFactory();
+  ChannelMsgFactory(void);
   ChannelMsgFactory(const ChannelMsgFactory& other) = delete;
   ChannelMsgFactory& operator=(const ChannelMsgFactory&) = delete;
 

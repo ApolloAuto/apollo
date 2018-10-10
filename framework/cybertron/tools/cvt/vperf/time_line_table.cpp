@@ -14,11 +14,12 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "time_line_table.h"
+#include "./time_line_table.h"
+#include "./time_line_row.h"
+
 #include <QGraphicsScene>
 #include <cassert>
 #include <iostream>
-#include "time_line_row.h"
 
 TimeLineTable::TimeLineTable(QGraphicsItem *parent)
     : QGraphicsItemGroup(parent),

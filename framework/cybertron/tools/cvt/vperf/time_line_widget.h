@@ -18,7 +18,7 @@
 #define TOOLS_CVT_VPERF_TIME_LINE_WIDGET_H_
 
 #include <QWidget>
-#include "time_line_scene.h"
+#include "./time_line_scene.h"
 
 namespace Ui {
 class TimeLineWidget;

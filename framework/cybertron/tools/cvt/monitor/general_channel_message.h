@@ -28,7 +28,7 @@ class GeneralChannelMessage
  public:
   RegisterChannelMsgClass(GeneralChannelMessage,
                           apollo::cybertron::message::RawMessage);
-  virtual void Render(const Screen* s, int key) override;
+  void Render(const Screen* s, int key) override;
   ~GeneralChannelMessage() {
     if (raw_msg_class_) {
       delete raw_msg_class_;
@@ -58,7 +58,6 @@ class GeneralChannelMessage
 
   friend class RepeatedItemsMessage;
   friend class GeneralMessageBase;
-
 };  // GeneralChannelMessage
 
 #endif  // TOOLS_CVT_MONITOR_GENERAL_CHANNEL_MESSAGE_H_

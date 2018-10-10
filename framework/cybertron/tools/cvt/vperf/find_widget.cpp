@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "find_widget.h"
+#include "./find_widget.h"
 #include "ui_find_event_id.h"
 #include "ui_find_timelength.h"
 #include "ui_find_timepoint.h"

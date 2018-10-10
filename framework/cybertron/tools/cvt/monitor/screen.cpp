@@ -14,10 +14,10 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "screen.h"
-#include "cybertron_channel_message.h"
-#include "cybertron_topology_message.h"
-#include "renderable_message.h"
+#include "./screen.h"
+#include "./cybertron_channel_message.h"
+#include "./cybertron_topology_message.h"
+#include "./renderable_message.h"
 
 #include <ncurses.h>
 #include <unistd.h>
@@ -27,6 +27,7 @@
 #include <mutex>
 #include <string>
 #include <thread>
+#include <utility>
 
 Screen* Screen::Instance(void) {
   static Screen s;
@@ -186,7 +187,7 @@ int Screen::SwitchState(int ch) {
         clear();
       }
       break;
-    default:;
+    default: {}
   }
   return ch;
 }

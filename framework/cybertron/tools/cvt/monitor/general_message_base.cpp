@@ -14,11 +14,13 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "general_message_base.h"
-#include "general_channel_message.h"
-#include "general_message.h"
-#include "screen.h"
+#include "./general_message_base.h"
+#include "./general_channel_message.h"
+#include "./general_message.h"
+#include "./screen.h"
 
+#include <string>
+#include <vector>
 #include <iomanip>
 
 namespace {

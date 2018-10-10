@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "main_window.h"
-#include "arrow.h"
+#include "./main_window.h"
+#include "./arrow.h"
 #include "cybertron/init.h"
 #include "cybertron/proto/topology_change.pb.h"
 #include "ui_main_window.h"
@@ -30,13 +30,18 @@
 #include <QTreeWidgetItem>
 #include <algorithm>
 #include <iostream>
+#include <string>
+#include <vector>
 
-#define MEMBER_OFFSET(StructType, Member) (size_t) & (((StructType*)0)->Member)
-#define StructPtrByMemberPtr(MemberPtr, StructType, Member) \
-  (StructType*)((char*)MemberPtr - MEMBER_OFFSET(StructType, Member))
+#define MEMBER_OFFSET(StructType, Member)                                    \
+  (size_t)(                                                                  \
+      reinterpret_cast<char*>(&(reinterpret_cast<StructType*>(1)->Member)) - \
+      1)
+#define StructPtrByMemberPtr(MemberPtr, StructType, Member)          \
+  reinterpret_cast<StructType*>(reinterpret_cast<char*>(MemberPtr) - \
+                                MEMBER_OFFSET(StructType, Member))
 
 namespace {
-
 inline void updateMaxVec(const QRectF& rect, QVector2D& v) {
   if (rect.width() > v.x()) {
     v.setX(rect.width());
@@ -46,7 +51,7 @@ inline void updateMaxVec(const QRectF& rect, QVector2D& v) {
     v.setY(rect.height());
   }
 }
-}
+}  // namespace
 
 struct MainWindow::ChannelData {
   CompositeItem _sceneItem;
@@ -139,11 +144,9 @@ void MainWindow::TopologyChanged(
   }
 
   if (change_msg.change_type() ==
-      apollo::cybertron::proto::ChangeType::CHANGE_CHANNEL)  // 2
-  {
+      apollo::cybertron::proto::ChangeType::CHANGE_CHANNEL) {
     if (change_msg.role_type() ==
-        apollo::cybertron::proto::RoleType::ROLE_WRITER)  // 2
-    {
+        apollo::cybertron::proto::RoleType::ROLE_WRITER) {
       (this->*changeSceneFunc)(channelName, nodeName, false);
     }
 
@@ -237,7 +240,7 @@ void MainWindow::AddSceneItem(const std::string& channelName,
   } else {
     ChannelData* nodeData =
         new ChannelData(QString(nodeName.c_str()), CompositeItem::Node);
-    ;
+
     if (nodeData == nullptr) {
       return;
     }

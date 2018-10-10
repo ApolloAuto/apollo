@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "time_line_legend.h"
-#include "time_line_legend_item.h"
+#include "./time_line_legend.h"
+#include "./time_line_legend_item.h"
 
 TimeLineLegend::TimeLineLegend(QGraphicsItem *parent)
     : QGraphicsItemGroup(parent), _items() {}

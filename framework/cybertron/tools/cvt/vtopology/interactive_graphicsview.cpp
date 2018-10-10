@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "interactive_graphicsview.h"
+#include "./interactive_graphicsview.h"
 
 #include <iostream>
 

@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "composite_item.h"
-#include "arrow.h"
+#include "./composite_item.h"
+#include "./arrow.h"
 
 #include <QGraphicsScene>
 #include <QPainter>
@@ -81,7 +81,7 @@ void CompositeItem::removeArrow(Arrow *arrow) {
 }
 
 void CompositeItem::removeArrows() {
-  foreach (Arrow *arrow, arrows_) {
+  for (Arrow *arrow : arrows_) {
     arrow->setVisible(false);
 
     if (arrow->start_item() != this) arrow->start_item()->removeArrow(arrow);
@@ -97,7 +97,7 @@ void CompositeItem::removeArrows() {
 QVariant CompositeItem::itemChange(GraphicsItemChange change,
                                    const QVariant &value) {
   if (change == QGraphicsItem::ItemPositionChange) {
-    foreach (Arrow *arrow, arrows_) { arrow->updatePosition(); }
+    for (Arrow *arrow : arrows_) { arrow->updatePosition(); }
   }
 
   return value;

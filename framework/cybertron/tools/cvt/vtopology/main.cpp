@@ -16,9 +16,9 @@
 
 #include <QApplication>
 #include <QSurfaceFormat>
+#include "./main_window.h"
 #include "cybertron/init.h"
 #include "cybertron/service_discovery/topology_manager.h"
-#include "main_window.h"
 
 int main(int argc, char* argv[]) {
   QApplication a(argc, argv);

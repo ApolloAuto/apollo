@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "renderable_message.h"
-#include "screen.h"
+#include "./renderable_message.h"
+#include "./screen.h"
 
 #include <ncurses.h>
 
@@ -32,6 +32,6 @@ void RenderableMessage::SplitPages(int key) {
       --page_index_;
       if (page_index_ < 1) page_index_ = 0;
       break;
-    default:;
+    default: {}
   }
 }

@@ -14,6 +14,6 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "cybertron_channel_message.h"
+#include "./cybertron_channel_message.h"
 
 double ChannelMessage::max_frmae_ratio_ = 1.0;

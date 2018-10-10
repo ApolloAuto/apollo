@@ -14,10 +14,10 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "time_line_row.h"
-#include "time_block_item.h"
-#include "time_block_item_pool.h"
-#include "time_line_scene.h"
+#include "./time_line_row.h"
+#include "./time_block_item.h"
+#include "./time_block_item_pool.h"
+#include "./time_line_scene.h"
 
 #include <QGraphicsScene>
 #include <iostream>

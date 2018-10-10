@@ -17,14 +17,17 @@
 #ifndef TOOLS_CVT_MONITOR_CYBERTRON_CHANNEL_MESSAGE_H_
 #define TOOLS_CVT_MONITOR_CYBERTRON_CHANNEL_MESSAGE_H_
 
+#include <fstream>
+#include <memory>
+#include <mutex>
+#include <string>
+#include <vector>
+
+#include "./general_message_base.h"
+#include "./renderable_message.h"
 #include "cybertron/cybertron.h"
 #include "cybertron/time/duration.h"
 #include "cybertron/time/time.h"
-#include "general_message_base.h"
-#include "renderable_message.h"
-
-#include <fstream>
-#include <mutex>
 
 class Screen;
 
@@ -55,7 +58,7 @@ class ChannelMessage : public GeneralMessageBase {
       case ChannelMessage::ErrorCode::CreateReaderFailed:
         ret = "Cannot create Cybertron Reader";
         break;
-        
+
       case ChannelMessage::ErrorCode::MessageTypeIsEmptr:
         ret = "Message Type is Empty";
         break;
@@ -72,7 +75,7 @@ class ChannelMessage : public GeneralMessageBase {
       case ErrorCode::MessageTypeIsEmptr:
         return true;
 
-      default:;
+      default: {}
     }
     return false;
   }

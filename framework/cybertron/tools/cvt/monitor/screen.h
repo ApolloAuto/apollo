@@ -66,7 +66,7 @@ class Screen final {
   }
 
  private:
-  explicit Screen();
+  Screen(void);
   Screen(const Screen&) = delete;
   Screen& operator=(const Screen&) = delete;
 

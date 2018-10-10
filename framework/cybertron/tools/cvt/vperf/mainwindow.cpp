@@ -14,15 +14,15 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "mainwindow.h"
-#include "has_data_come_event.h"
-#include "loader_thread.h"
-#include "msg_dialog.h"
-#include "perf_data_base.h"
-#include "time_block_item.h"
-#include "time_block_item_pool.h"
-#include "time_line_scene.h"
-#include "time_line_widget.h"
+#include "./mainwindow.h"
+#include "./has_data_come_event.h"
+#include "./loader_thread.h"
+#include "./msg_dialog.h"
+#include "./perf_data_base.h"
+#include "./time_block_item.h"
+#include "./time_block_item_pool.h"
+#include "./time_line_scene.h"
+#include "./time_line_widget.h"
 #include "ui_mainwindow.h"
 
 #include <QFileDialog>
@@ -50,7 +50,7 @@ const char* licenseMessage =
     "WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n"
     "See the License for the specific language governing permissions and\n"
     "limitations under the License.\n";
-}
+}  // namespace
 
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent),

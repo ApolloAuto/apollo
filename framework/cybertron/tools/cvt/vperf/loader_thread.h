@@ -22,6 +22,7 @@
 
 class LoaderThread : public QThread {
   Q_OBJECT
+  
  public:
   explicit LoaderThread(QObject* parent);
 

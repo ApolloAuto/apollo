@@ -14,12 +14,12 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "cybertron_topology_message.h"
-#include "channel_msg_factory.h"
+#include "./cybertron_topology_message.h"
+#include "./channel_msg_factory.h"
+#include "./general_channel_message.h"
+#include "./screen.h"
 #include "cybertron/message/message_traits.h"
 #include "cybertron/proto/topology_change.pb.h"
-#include "general_channel_message.h"
-#include "screen.h"
 
 #include <ncurses.h>
 #include <iomanip>
@@ -79,7 +79,7 @@ void CybertronTopologyMessage::TopologyChanged(
     return;
   }
 
-  if ((int)channelName.length() > col1_width_) {
+  if (static_cast<int>(channelName.length()) > col1_width_) {
     col1_width_ = channelName.length();
   }
 
@@ -146,7 +146,7 @@ void CybertronTopologyMessage::ChangeState(const Screen* s, int key) {
     case 'T':
       second_column_ = SecondColumnType::MessageType;
       break;
-      
+
     case ' ': {
       ChannelMessage* child = static_cast<ChannelMessage*>(Child(*line_no()));
       if (child) {

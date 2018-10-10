@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "time_block_item.h"
+#include "./time_block_item.h"
 #include <QGraphicsSceneMouseEvent>
 #include <QMessageBox>
 #include <QObject>

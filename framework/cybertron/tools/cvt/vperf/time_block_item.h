@@ -20,7 +20,7 @@
 #include <QBrush>
 #include <QGraphicsRectItem>
 #include <QPen>
-#include "perf_data_base.h"
+#include "./perf_data_base.h"
 
 class TimeBlockItem : public QGraphicsRectItem {
  public:
@@ -29,7 +29,7 @@ class TimeBlockItem : public QGraphicsRectItem {
                          QGraphicsItem *parent = nullptr);
 
   enum { Type = QGraphicsRectItem::UserType + QGraphicsRectItem::Type };
-  virtual int type() const override { return Type; }
+  int type() const override { return Type; }
 
   void setColor(const QColor &color) {
     setPen(QPen(color));

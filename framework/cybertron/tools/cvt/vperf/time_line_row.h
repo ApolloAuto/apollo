@@ -17,14 +17,14 @@
 #ifndef TOOLS_CVT_VPERF_TIMELINEROW_H_
 #define TOOLS_CVT_VPERF_TIMELINEROW_H_
 
-#include "perf_data_base.h"
-
 #include <QGraphicsItemGroup>
 #include <QGraphicsLineItem>
 #include <QGraphicsTextItem>
 #include <QList>
 #include <QMap>
 #include <string>
+
+#include "./perf_data_base.h"
 
 class TimeBlockItem;
 class TimeLineScene;
