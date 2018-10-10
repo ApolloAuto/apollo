@@ -7,7 +7,6 @@ cc_library(
     srcs = [
         "dp_road_graph.cc",
         "side_pass_waypoint_sampler.cc",
-        "static_waypoint_sampler.cc",
         "trajectory_cost.cc",
         "waypoint_sampler.cc",
     ],
@@ -15,7 +14,6 @@ cc_library(
         "comparable_cost.h",
         "dp_road_graph.h",
         "side_pass_waypoint_sampler.h",
-        "static_waypoint_sampler.h",
         "trajectory_cost.h",
         "waypoint_sampler.h",
     ],

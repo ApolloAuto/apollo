@@ -411,7 +411,6 @@ DEFINE_bool(use_osqp_optimizer_for_reference_line, true,
 DEFINE_bool(enable_osqp_debug, false,
             "True to turn on OSQP verbose debug output in log.");
 
-DEFINE_bool(use_static_waypoint_sampler, false, "Use static waypoint sampler");
 DEFINE_bool(export_chart, false, "export chart in planning");
 DEFINE_bool(enable_record_debug, true,
             "True to enable record debug info in chart format");
