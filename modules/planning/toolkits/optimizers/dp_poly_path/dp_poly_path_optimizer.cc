@@ -27,7 +27,6 @@
 #include "modules/common/util/file.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/toolkits/optimizers/road_graph/dp_road_graph.h"
-#include "modules/planning/toolkits/optimizers/road_graph/static_waypoint_sampler.h"
 #include "modules/planning/toolkits/optimizers/road_graph/waypoint_sampler.h"
 
 namespace apollo {
@@ -58,13 +57,8 @@ Status DpPolyPathOptimizer::Process(const SpeedData &speed_data,
   CHECK_NOTNULL(path_data);
   DpRoadGraph dp_road_graph(config_, *reference_line_info_, speed_data);
   dp_road_graph.SetDebugLogger(reference_line_info_->mutable_debug());
-  if (FLAGS_use_static_waypoint_sampler) {
-    dp_road_graph.SetWaypointSampler(
-        new StaticWaypointSampler(config_.waypoint_sampler_config()));
-  } else {
-    dp_road_graph.SetWaypointSampler(
-        new WaypointSampler(config_.waypoint_sampler_config()));
-  }
+  dp_road_graph.SetWaypointSampler(
+      new WaypointSampler(config_.waypoint_sampler_config()));
 
   if (!dp_road_graph.FindPathTunnel(
           init_point,
