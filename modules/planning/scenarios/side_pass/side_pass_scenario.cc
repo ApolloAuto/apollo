@@ -138,8 +138,17 @@ Status SidePassScenario::Process(const TrajectoryPoint& planning_start_point,
 bool SidePassScenario::IsTransferable(const Scenario& current_scenario,
                                       const common::TrajectoryPoint& ego_point,
                                       const Frame& frame) const {
-  // TODO(All): implement here
-  return false;
+  if (frame.reference_line_info().size() > 1) {
+    return false;
+  }
+  if (current_scenario.type() == ScenarioConfig::SIDE_PASS) {
+    return (current_scenario.GetStatus() !=
+            Scenario::ScenarioStatus::STATUS_DONE);
+  } else if (current_scenario.type() != ScenarioConfig::LANE_FOLLOW) {
+    return false;
+  } else {
+    return IsSidePassScenario(ego_point, frame);
+  }
 }
 
 Status SidePassScenario::ApproachObstacle(
@@ -181,7 +190,7 @@ Status SidePassScenario::PassObstacle(
 }
 
 bool SidePassScenario::IsSidePassScenario(
-    const common::TrajectoryPoint& planning_start_point, Frame* frame) {
+    const common::TrajectoryPoint& planning_start_point, const Frame* frame) {
   // TODO(liangliang)
   return true;
 }
@@ -197,7 +206,7 @@ Status SidePassScenario::RunPlanOnReferenceLine(
     }
 
     auto ret = Status::OK();
-    for (auto &optimizer : tasks_) {
+    for (auto& optimizer : tasks_) {
       ret = optimizer->Execute(frame, &reference_line_info);
       if (!ret.ok()) {
         AERROR << "Failed to run tasks[" << optimizer->Name()
@@ -209,8 +218,8 @@ Status SidePassScenario::RunPlanOnReferenceLine(
     reference_line_info.set_trajectory_type(ADCTrajectory::NORMAL);
     DiscretizedTrajectory trajectory;
     if (!reference_line_info.CombinePathAndSpeedProfile(
-        planning_start_point.relative_time(),
-        planning_start_point.path_point().s(), &trajectory)) {
+            planning_start_point.relative_time(),
+            planning_start_point.path_point().s(), &trajectory)) {
       std::string msg("Fail to aggregate planning trajectory.");
       AERROR << msg;
       return Status(ErrorCode::PLANNING_ERROR, msg);
