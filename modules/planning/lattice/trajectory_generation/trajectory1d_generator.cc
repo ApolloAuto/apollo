@@ -32,6 +32,7 @@
 #include "modules/planning/lattice/trajectory1d/standing_still_trajectory1d.h"
 #include "modules/planning/lattice/trajectory_generation/lateral_trajectory_optimizer.h"
 #include "modules/planning/math/finite_element_qp/active_set_lateral_qp_optimizer.h"
+#include "modules/planning/math/finite_element_qp/osqp_lateral_qp_optimizer.h"
 
 namespace apollo {
 namespace planning {
@@ -142,7 +143,7 @@ void Trajectory1dGenerator::GenerateLateralTrajectoryBundle(
 
     // LateralTrajectoryOptimizer lateral_optimizer;
     std::unique_ptr<LateralQPOptimizer> lateral_optimizer(
-        new ActiveSetLateralQPOptimizer);
+        new OsqpLateralQPOptimizer);
 
     lateral_optimizer->optimize(init_lat_state_, delta_s, lateral_bounds);
 

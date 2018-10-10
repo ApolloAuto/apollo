@@ -26,6 +26,7 @@
 #include <vector>
 
 #include "modules/common/proto/pnc_point.pb.h"
+#include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/lattice/trajectory1d/piecewise_jerk_trajectory1d.h"
 
 namespace apollo {
@@ -45,7 +46,7 @@ class LateralQPOptimizer {
   virtual std::vector<common::FrenetFramePoint> GetFrenetFramePath() const;
 
  protected:
-  double delta_s_ = 0.0;
+  double delta_s_ = FLAGS_default_delta_s_lateral_optimization;
 
   std::vector<double> opt_d_;
 
