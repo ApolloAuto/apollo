@@ -19,6 +19,7 @@ cc_library(
     ],
 )
 
+
 cc_test(
     name = "piecewise_poly_speed_curve_test",
     size = "small",
@@ -31,4 +32,29 @@ cc_test(
     ],
 )
 
+cc_library(
+    name = "piecewise_poly_speed_profile",
+    srcs = [
+        "piecewise_poly_speed_profile.cc",
+    ],
+    hdrs = [
+        "piecewise_poly_speed_profile.h",
+    ],
+    deps = [
+        "//modules/common/proto:pnc_point_proto",
+        ":piecewise_poly_speed_curve",
+    ],
+)
+
+cc_test(
+    name = "piecewise_poly_speed_profile_test",
+    size = "small",
+    srcs = [
+        "piecewise_poly_speed_profile_test.cc",
+    ],
+    deps = [
+        ":piecewise_poly_speed_profile",
+        "@gtest//:main",
+    ],
+)
 cpplint()
