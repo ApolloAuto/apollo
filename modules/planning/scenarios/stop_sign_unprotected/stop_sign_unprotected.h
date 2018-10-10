@@ -21,6 +21,7 @@
 #pragma once
 
 #include <memory>
+#include <string>
 #include <vector>
 
 #include "modules/planning/proto/planning.pb.h"
@@ -49,12 +50,19 @@ class StopSignUnprotectedScenario : public Scenario {
                       const Frame& frame) const override;
 
  private:
+  enum StopSignUnprotectedStage {
+    STOP = 1,
+    CREEP = 2,
+    CRUISE = 3,
+    DONE = 4,
+  };
+
   void RegisterTasks();
 
  private:
-  static int current_stage_index_;
   std::vector<std::unique_ptr<Task>> tasks_;
   ScenarioConfig config_;
+  StopSignUnprotectedStage stage_ = STOP;
   SpeedProfileGenerator speed_profile_generator_;
 };
 

@@ -54,6 +54,11 @@ class LaneFollowScenario : public Scenario {
                       const Frame& frame) const override;
 
  private:
+  enum LaneFollowStage {
+    CRUISE = 1,
+    DONE = 2,
+  };
+
   void RegisterTasks();
 
   common::Status PlanOnReferenceLine(
@@ -75,9 +80,9 @@ class LaneFollowScenario : public Scenario {
                        const std::string& name, const double time_diff_ms);
 
  private:
-  static int current_stage_index_;
   std::vector<std::unique_ptr<Task>> tasks_;
   ScenarioConfig config_;
+  LaneFollowStage stage_ = CRUISE;
   SpeedProfileGenerator speed_profile_generator_;
 };
 

@@ -57,8 +57,6 @@ using common::TrajectoryPoint;
 using common::math::Vec2d;
 using common::time::Clock;
 
-int LaneFollowScenario::current_stage_index_ = 0;
-
 namespace {
 constexpr double kPathOptimizationFallbackCost = 2e4;
 constexpr double kSpeedOptimizationFallbackCost = 2e4;
@@ -151,7 +149,14 @@ Status LaneFollowScenario::Process(const TrajectoryPoint& planning_start_point,
                                    Frame* frame) {
   status_ = STATUS_PROCESSING;
 
-  if (!InitTasks(config_, current_stage_index_, &tasks_)) {
+  // init tasks
+  std::string stage_name = "";
+  if (stage_ == LaneFollowStage::CRUISE) {
+    stage_name = "";
+  } else if (stage_ == LaneFollowStage::DONE) {
+    return Status(ErrorCode::OK, "side_pass DONE");
+  }
+  if (!InitTasks(config_, stage_name, &tasks_)) {
     return Status(ErrorCode::PLANNING_ERROR, "failed to init tasks");
   }
 

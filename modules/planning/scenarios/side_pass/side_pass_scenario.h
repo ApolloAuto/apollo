@@ -59,6 +59,7 @@ class SidePassScenario : public Scenario {
     WAITPOINT_STOP = 3,
     SAFETY_DETECTION = 4,
     OBSTACLE_PASS = 5,
+    DONE = 6,
   };
 
   void RegisterTasks();
@@ -79,9 +80,9 @@ class SidePassScenario : public Scenario {
       const common::TrajectoryPoint& planning_start_point, Frame* frame);
 
  private:
-  static int current_stage_index_;
   std::vector<std::unique_ptr<Task>> tasks_;
   ScenarioConfig config_;
+  SidePassStage stage_ = OBSTACLE_APPROACH;
   SpeedProfileGenerator speed_profile_generator_;
   PathData path_;
   double wait_point_s = 0;

@@ -28,10 +28,21 @@ ScenarioConfig::ScenarioType Scenario::scenario_type() const {
 }
 
 bool Scenario::InitTasks(const ScenarioConfig& config,
-                         const int current_stage_index,
+                         const std::string& stage_name,
                          std::vector<std::unique_ptr<Task>>* tasks) {
-  CHECK_GT(config.stage_size(), current_stage_index);
-  ScenarioConfig::Stage stage = config.stage(current_stage_index);
+  CHECK_GT(config.stage_size(), 0);
+
+  ScenarioConfig::Stage stage;
+  bool stage_found = false;
+  for (int i = 0; i < config.stage_size(); ++i) {
+    if (config.stage(i).stage_name() == stage_name) {
+      stage = config.stage(i);
+      stage_found = true;
+    }
+  }
+  if (!stage_found) {
+    return false;
+  }
 
   // get all scenario_task_configs
   std::vector<ScenarioConfig::ScenarioTaskConfig> task_configs;

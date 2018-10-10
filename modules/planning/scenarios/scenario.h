@@ -65,7 +65,7 @@ class Scenario {
 
  protected:
   bool InitTasks(const ScenarioConfig& config,
-                 const int current_stage_index,
+                 const std::string& stage_name,
                  std::vector<std::unique_ptr<Task>>* tasks);
 
  protected:

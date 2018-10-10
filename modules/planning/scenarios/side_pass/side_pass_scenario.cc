@@ -56,8 +56,6 @@ using common::TrajectoryPoint;
 using common::math::Vec2d;
 using common::time::Clock;
 
-int SidePassScenario::current_stage_index_ = 0;
-
 namespace {
 constexpr double kPathOptimizationFallbackCost = 2e4;
 constexpr double kSpeedOptimizationFallbackCost = 2e4;
@@ -98,33 +96,31 @@ Status SidePassScenario::Process(const TrajectoryPoint& planning_start_point,
                                  Frame* frame) {
   status_ = STATUS_PROCESSING;
 
-  if (!InitTasks(config_, current_stage_index_, &tasks_)) {
+  // init tasks
+  std::string stage_name = "";
+  if (stage_ == SidePassStage::OBSTACLE_APPROACH) {
+    stage_name = FLAGS_scenario_side_pass_stage_obstacle_approach;
+  } else if (stage_ == SidePassStage::PATH_GENERATION) {
+    stage_name = FLAGS_scenario_side_pass_stage_path_generation;
+  } else if (stage_ == SidePassStage::WAITPOINT_STOP) {
+    stage_name = FLAGS_scenario_side_pass_stage_waitpoint_stop;
+  } else if (stage_ == SidePassStage::SAFETY_DETECTION) {
+    stage_name = FLAGS_scenario_side_pass_stage_safety_detection;
+  } else if (stage_ == SidePassStage::OBSTACLE_PASS) {
+    stage_name = FLAGS_scenario_side_pass_stage_obstacle_pass;
+  } else if (stage_ == SidePassStage::DONE) {
+    status_ = STATUS_DONE;
+    return Status(ErrorCode::OK, "side_pass DONE");
+  }
+  if (!InitTasks(config_, stage_name, &tasks_)) {
     return Status(ErrorCode::PLANNING_ERROR, "failed to init tasks");
   }
 
   // TODO(all)
 
-  // get current stage
-  const std::string stage_name =
-      config_.stage(current_stage_index_).stage_name();
-  SidePassStage stage = SidePassStage::OBSTACLE_APPROACH;
-  if (stage_name == FLAGS_scenario_side_pass_stage_obstacle_approach) {
-    stage = SidePassStage::OBSTACLE_APPROACH;
-  } else if (stage_name == FLAGS_scenario_side_pass_stage_path_generation) {
-    stage = SidePassStage::PATH_GENERATION;
-  } else if (stage_name == FLAGS_scenario_side_pass_stage_waitpoint_stop) {
-    stage = SidePassStage::WAITPOINT_STOP;
-  } else if (stage_name == FLAGS_scenario_side_pass_stage_safety_detection) {
-    stage = SidePassStage::SAFETY_DETECTION;
-  } else if (stage_name == FLAGS_scenario_side_pass_stage_obstacle_pass) {
-    stage = SidePassStage::OBSTACLE_PASS;
-  } else {
-    return Status(ErrorCode::PLANNING_ERROR, "incorrect stage name in config");
-  }
-
   Status status = Status(ErrorCode::PLANNING_ERROR,
                          "Failed to process stage in side pass.");
-  switch (stage) {
+  switch (stage_) {
     case SidePassStage::OBSTACLE_APPROACH: {
       status = ApproachObstacle(planning_start_point, frame);
       break;
@@ -147,12 +143,6 @@ Status SidePassScenario::Process(const TrajectoryPoint& planning_start_point,
     }
     default:
       break;
-  }
-
-  if (current_stage_index_ < config_.stage_size() - 1) {
-    current_stage_index_++;
-  } else {
-    status_ = STATUS_DONE;
   }
 
   return status;
