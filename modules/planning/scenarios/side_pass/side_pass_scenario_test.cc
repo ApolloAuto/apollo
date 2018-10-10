@@ -17,7 +17,8 @@
 /**
  * @file
  **/
-
+#define protected public
+#define private public
 #include "modules/planning/scenarios/side_pass/side_pass_scenario.h"
 
 #include <memory>
@@ -40,7 +41,8 @@ class SidePassScenarioTest : public ::testing::Test {
 };
 TEST_F(SidePassScenarioTest, Simple) {
   FLAGS_scenario_side_pass_config_file =
-      "modules/planning/conf/scenario_side_pass_config.pb.txt";
+      "//apollo/modules/planning/testdata/conf/"
+      "scenario_side_pass_config.pb.txt";
 
   scenario_.reset(new SidePassScenario());
   EXPECT_EQ(scenario_->scenario_type(), ScenarioConfig::SIDE_PASS);
@@ -49,6 +51,10 @@ TEST_F(SidePassScenarioTest, Simple) {
   EXPECT_TRUE(apollo::common::util::GetProtoFromFile(
       FLAGS_scenario_side_pass_config_file, &config));
   EXPECT_TRUE(scenario_->Init());
+
+  std::vector<std::unique_ptr<Task>> tasks;
+  scenario_->InitTasks(config, 0, &tasks);
+  EXPECT_EQ(tasks.size(), 5);
 }
 
 }  // namespace planning

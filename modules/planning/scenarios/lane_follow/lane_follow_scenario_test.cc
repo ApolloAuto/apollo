@@ -17,7 +17,8 @@
 /**
  * @file
  **/
-
+#define protected public
+#define private public
 #include "modules/planning/scenarios/lane_follow/lane_follow_scenario.h"
 
 #include <memory>
@@ -38,9 +39,10 @@ class LaneFollowScenarioTest : public ::testing::Test {
  protected:
   std::unique_ptr<LaneFollowScenario> scenario_;
 };
-TEST_F(LaneFollowScenarioTest, Simple) {
+TEST_F(LaneFollowScenarioTest, InitTasks) {
   FLAGS_scenario_lane_follow_config_file =
-      "modules/planning/conf/scenario_lane_follow_config.pb.txt";
+      "//apollo/modules/planning/testdata/conf/"
+      "scenario_lane_follow_config.pb.txt";
 
   scenario_.reset(new LaneFollowScenario());
   EXPECT_EQ(scenario_->scenario_type(), ScenarioConfig::LANE_FOLLOW);
@@ -49,6 +51,10 @@ TEST_F(LaneFollowScenarioTest, Simple) {
   EXPECT_TRUE(apollo::common::util::GetProtoFromFile(
       FLAGS_scenario_lane_follow_config_file, &config));
   EXPECT_TRUE(scenario_->Init());
+
+  std::vector<std::unique_ptr<Task>> tasks;
+  scenario_->InitTasks(config, 0, &tasks);
+  EXPECT_EQ(tasks.size(), 5);
 }
 
 }  // namespace planning

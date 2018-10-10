@@ -56,7 +56,6 @@ class LaneFollowScenario : public Scenario {
  private:
   enum LaneFollowStage {
     CRUISE = 1,
-    DONE = 2,
   };
 
   void RegisterTasks();
@@ -80,6 +79,7 @@ class LaneFollowScenario : public Scenario {
                        const std::string& name, const double time_diff_ms);
 
  private:
+  static int current_stage_index_;
   std::vector<std::unique_ptr<Task>> tasks_;
   ScenarioConfig config_;
   LaneFollowStage stage_ = CRUISE;

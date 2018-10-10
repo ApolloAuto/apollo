@@ -29,41 +29,17 @@ DEFINE_bool(enable_collision_detection, false,
             "enable collision detection in planning");
 
 // scenario related
-/// lane_follow
 DEFINE_string(
     scenario_lane_follow_config_file,
     "/apollo/modules/planning/conf/scenario_lane_follow_config.pb.txt",
     "The lane follow scenario configuration file");
-/// side_pass
 DEFINE_string(scenario_side_pass_config_file,
               "/apollo/modules/planning/conf/scenario_side_pass_config.pb.txt",
               "The side pass scenario configuration file");
-DEFINE_string(scenario_side_pass_stage_obstacle_approach,
-              "OBSTACLE_APPROACH",
-              "stage 1: obstacle_approach");
-DEFINE_string(scenario_side_pass_stage_path_generation,
-              "PATH_GENERATION",
-              "stage 2: path_generation");
-DEFINE_string(scenario_side_pass_stage_waitpoint_stop,
-              "WAITPOINT_STOP",
-              "stage 3: waitpoint_stop");
-DEFINE_string(scenario_side_pass_stage_safety_detection,
-              "SAFETY_DETECTION",
-              "stage 4: safety_detection");
-DEFINE_string(scenario_side_pass_stage_obstacle_pass,
-              "OBSTACLE_PASS",
-              "stage 5: obstacle_pass");
-/// stop_sign_unprotected
 DEFINE_string(scenario_stop_sign_unprotected_config_file,
               "/apollo/modules/planning/conf/"
               "scenario_stop_sign_unprotected_config.pb.txt",
               "The stop_sign_unprotected scenario configuration file");
-DEFINE_string(scenario_stop_sign_unprotected_stage_stop,
-              "STOP", "stage 1: stop");
-DEFINE_string(scenario_stop_sign_unprotected_stage_creep,
-              "CREEP", "stage 2: creep");
-DEFINE_string(scenario_stop_sign_unprotected_stage_intersection_cruise,
-              "INTERSECTION_CRUISE", "stage 3: intersection_cruise");
 
 DEFINE_string(planning_adapter_config_filename,
               "/apollo/modules/planning/conf/adapter.conf",

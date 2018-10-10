@@ -62,6 +62,8 @@ constexpr double kSpeedOptimizationFallbackCost = 2e4;
 constexpr double kStraightForwardLineCost = 10.0;
 }  // namespace
 
+int SidePassScenario::current_stage_index_ = 0;
+
 void SidePassScenario::RegisterTasks() {
   task_factory_.Register(DP_POLY_PATH_OPTIMIZER,
                          []() -> Task* { return new DpPolyPathOptimizer(); });
@@ -96,23 +98,7 @@ Status SidePassScenario::Process(const TrajectoryPoint& planning_start_point,
                                  Frame* frame) {
   status_ = STATUS_PROCESSING;
 
-  // init tasks
-  std::string stage_name = "";
-  if (stage_ == SidePassStage::OBSTACLE_APPROACH) {
-    stage_name = FLAGS_scenario_side_pass_stage_obstacle_approach;
-  } else if (stage_ == SidePassStage::PATH_GENERATION) {
-    stage_name = FLAGS_scenario_side_pass_stage_path_generation;
-  } else if (stage_ == SidePassStage::WAITPOINT_STOP) {
-    stage_name = FLAGS_scenario_side_pass_stage_waitpoint_stop;
-  } else if (stage_ == SidePassStage::SAFETY_DETECTION) {
-    stage_name = FLAGS_scenario_side_pass_stage_safety_detection;
-  } else if (stage_ == SidePassStage::OBSTACLE_PASS) {
-    stage_name = FLAGS_scenario_side_pass_stage_obstacle_pass;
-  } else if (stage_ == SidePassStage::DONE) {
-    status_ = STATUS_DONE;
-    return Status(ErrorCode::OK, "side_pass DONE");
-  }
-  if (!InitTasks(config_, stage_name, &tasks_)) {
+  if (!InitTasks(config_, current_stage_index_, &tasks_)) {
     return Status(ErrorCode::PLANNING_ERROR, "failed to init tasks");
   }
 
@@ -145,6 +131,7 @@ Status SidePassScenario::Process(const TrajectoryPoint& planning_start_point,
       break;
   }
 
+  // TODO(all): update current_stage_index_ when current stage is done
   return status;
 }
 
