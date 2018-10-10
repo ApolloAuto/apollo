@@ -248,6 +248,7 @@ void StdPlanning::RunOnce(const LocalView& local_view,
       FillPlanningPb(start_timestamp, trajectory_pb);
     }
 
+    FillPlanningPb(start_timestamp, trajectory_pb);
     frame_->mutable_trajectory()->CopyFrom(*trajectory_pb);
     const uint32_t n = frame_->SequenceNum();
     FrameHistory::Instance()->Add(n, std::move(frame_));
