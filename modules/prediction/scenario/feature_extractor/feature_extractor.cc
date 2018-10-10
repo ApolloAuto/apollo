@@ -89,10 +89,10 @@ void FeatureExtractor::ExtractEgoLaneFeatures(
     const common::math::Vec2d& ego_position) {
 
   if (ptr_ego_lane == nullptr) {
-    ADEBUG << "Ego vehicle is not on any lane.";
+    AERROR << "Ego vehicle is not on any lane.";
     return;
   }
-  AINFO << "Ego vehicle is on lane [" << ptr_ego_lane->id().id() << "]";
+  ADEBUG << "Ego vehicle is on lane [" << ptr_ego_lane->id().id() << "]";
   double curr_lane_s = 0.0;
   double curr_lane_l = 0.0;
   ptr_ego_lane->GetProjection(ego_position, &curr_lane_s, &curr_lane_l);
