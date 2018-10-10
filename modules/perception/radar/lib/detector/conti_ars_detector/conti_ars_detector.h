@@ -13,10 +13,12 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 *****************************************************************************/
-#ifndef RADAR_LIB_DETECTOR_CONTI_ARS_DETECTOR_CONTI_ARS_DETECTOR_H_
-#define RADAR_LIB_DETECTOR_CONTI_ARS_DETECTOR_CONTI_ARS_DETECTOR_H_
+#pragma once
 
 #include <string>
+
+#include "cybertron/common/macros.h"
+
 #include "modules/perception/radar/lib/interface/base_detector.h"
 #include "modules/perception/radar/common/radar_util.h"
 
@@ -32,7 +34,7 @@ class ContiArsDetector : public BaseDetector {
   bool Init() override;
 
   bool Detect(
-       const ContiRadar& corrected_obstacles,
+       const drivers::ContiRadar& corrected_obstacles,
        const DetectorOptions& options,
        base::FramePtr detected_frame) override;
 
@@ -40,15 +42,13 @@ class ContiArsDetector : public BaseDetector {
 
  private:
   void RawObs2Frame(
-       const ContiRadar& corrected_obstacles,
+       const drivers::ContiRadar& corrected_obstacles,
        const DetectorOptions& options,
        base::FramePtr radar_frame);
-  ContiArsDetector(const ContiArsDetector&) = delete;
-  ContiArsDetector& operator=(const ContiArsDetector&) = delete;
+
+  DISALLOW_COPY_AND_ASSIGN(ContiArsDetector);
 };
 
 }  // namespace radar
 }  // namespace perception
 }  // namespace apollo
-
-#endif  // RADAR_LIB_DETECTOR_CONTI_ARS_DETECTOR_CONTI_ARS_DETECTOR_H_

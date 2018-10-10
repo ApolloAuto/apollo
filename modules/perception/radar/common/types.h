@@ -13,8 +13,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 *****************************************************************************/
-#ifndef RADAR_COMMON_TYPES_H_
-#define RADAR_COMMON_TYPES_H_
+#pragma once
 
 namespace apollo {
 namespace perception {
@@ -60,4 +59,3 @@ enum ContiDynProp {
 }  // namespace radar
 }  // namespace perception
 }  // namespace apollo
-#endif  // RADAR_COMMON_TYPES_H_

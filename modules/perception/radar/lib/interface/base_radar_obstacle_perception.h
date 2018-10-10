@@ -13,8 +13,6 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 *****************************************************************************/
-#ifndef RADAR_LIB_INTERFACE_BASE_RADAR_OBSTACLE_PERCEPTION_H_
-#define RADAR_LIB_INTERFACE_BASE_RADAR_OBSTACLE_PERCEPTION_H_
 // SAMPLE CODE:
 //
 // class DefaultRadarObstaclePerception : public BaseRadarObstaclePerception {
@@ -28,7 +26,7 @@
 //   }
 //
 //   virtual bool Perceive(
-//                const ContiRadar& corrected_obstacles,
+//                const drivers::ContiRadar& corrected_obstacles,
 //                const RadarPerceptionOptions& options,
 //                std::vector<base::ObjectPtr>* objects) override {
 //      // Do something.
@@ -51,6 +49,8 @@
 // using radar_perception to do somethings.
 // ////////////////////////////////////////////////////
 
+#pragma once
+
 #include <string>
 #include <vector>
 #include "modules/perception/radar/lib/interface/base_detector.h"
@@ -71,8 +71,8 @@ class BaseRadarObstaclePerception {
  public:
   BaseRadarObstaclePerception() = default;
   virtual ~BaseRadarObstaclePerception() = default;
-  virtual bool Init(const std::string pipeline_name) = 0;
-  virtual bool Perceive(const ContiRadar& corrected_obstacles,
+  virtual bool Init(const std::string& pipeline_name) = 0;
+  virtual bool Perceive(const drivers::ContiRadar& corrected_obstacles,
                         const RadarPerceptionOptions& options,
                         std::vector<base::ObjectPtr>* objects) = 0;
   virtual std::string Name() const = 0;
@@ -85,5 +85,3 @@ PERCEPTION_REGISTER_REGISTERER(BaseRadarObstaclePerception);
 }  // namespace radar
 }  // namespace perception
 }  // namespace apollo
-
-#endif  // RADAR_LIB_INTERFACE_BASE_RADAR_OBSTACLE_PERCEPTION_H_

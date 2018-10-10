@@ -13,10 +13,13 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 *****************************************************************************/
-#ifndef RADAR_LIB_INTERFACE_BASE_FILTER_H_
-#define RADAR_LIB_INTERFACE_BASE_FILTER_H_
-#include <Eigen/Core>
+#pragma once
+
 #include <string>
+#include <Eigen/Core>
+
+#include "cybertron/common/macros.h"
+
 #include "modules/perception/base/object.h"
 
 namespace apollo {
@@ -37,9 +40,11 @@ class BaseFilter {
 
  protected:
   std::string name_;
+
+ private:
+  DISALLOW_COPY_AND_ASSIGN(BaseFilter);
 };
 
 }  // namespace radar
 }  // namespace perception
 }  // namespace apollo
-#endif  // RADAR_LIB_INTERFACE_BASE_FILTER_H_

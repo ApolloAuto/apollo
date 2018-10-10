@@ -13,11 +13,11 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 *****************************************************************************/
-#ifndef RADAR_LIB_PREPROCESSOR_CONTI_ARS_PREPROCESSOR_CONTI_ARS_PREPROCESSOR_H_
-#define RADAR_LIB_PREPROCESSOR_CONTI_ARS_PREPROCESSOR_CONTI_ARS_PREPROCESSOR_H_
+#pragma once
 
 #include <string>
 #include <map>
+#include "cybertron/common/macros.h"
 #include "modules/perception/radar/lib/interface/base_preprocessor.h"
 
 namespace apollo {
@@ -33,9 +33,9 @@ class ContiArsPreprocessor : public BasePreprocessor {
   bool Init() override;
 
   bool Preprocess(
-       const ContiRadar& raw_obstacles,
+       const drivers::ContiRadar& raw_obstacles,
        const PreprocessorOptions& options,
-       ContiRadar* corrected_obstacles) override;
+       drivers::ContiRadar* corrected_obstacles) override;
 
   std::string Name() const override;
 
@@ -44,16 +44,17 @@ class ContiArsPreprocessor : public BasePreprocessor {
   }
 
  private:
-  void SkipObjects(const ContiRadar& raw_obstacles,
-                   ContiRadar* corrected_obstacles);
-  void ExpandIds(ContiRadar* corrected_obstacles);
-  void CorrectTime(ContiRadar* corrected_obstacles);
+  void SkipObjects(const drivers::ContiRadar& raw_obstacles,
+                   drivers::ContiRadar* corrected_obstacles);
+  void ExpandIds(drivers::ContiRadar* corrected_obstacles);
+  void CorrectTime(drivers::ContiRadar* corrected_obstacles);
   int GetNextId();
-  float delay_time_;
+
+  float delay_time_ = 0.0;
   static int current_idx_;
   static int local2global_[ORIGIN_CONTI_MAX_ID_NUM];
-  ContiArsPreprocessor(const ContiArsPreprocessor&) = delete;
-  ContiArsPreprocessor& operator=(const ContiArsPreprocessor&) = delete;
+
+  DISALLOW_COPY_AND_ASSIGN(ContiArsPreprocessor);
 
   friend class ContiArsPreprocessorTest;
 };
@@ -61,5 +62,3 @@ class ContiArsPreprocessor : public BasePreprocessor {
 }  // namespace radar
 }  // namespace perception
 }  // namespace apollo
-
-#endif  // RADAR_LIB_PREPROCESSOR_CONTI_ARS_PREPROCESSOR_CONTI_ARS_PREPROCESSOR_H_ // NOLINT

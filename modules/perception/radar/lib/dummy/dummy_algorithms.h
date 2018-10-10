@@ -13,10 +13,10 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 *****************************************************************************/
-#ifndef RADAR_LIB_DUMMY_DUMMY_ALGORITHMS_H_
-#define RADAR_LIB_DUMMY_DUMMY_ALGORITHMS_H_
+#pragma once
 
 #include <string>
+#include "cybertron/common/macros.h"
 #include "modules/perception/radar/lib/interface/base_preprocessor.h"
 #include "modules/perception/radar/lib/interface/base_detector.h"
 #include "modules/perception/radar/lib/interface/base_roi_filter.h"
@@ -35,14 +35,13 @@ class DummyPreprocessor : public BasePreprocessor {
 
   bool Init() override;
   bool Preprocess(
-       const ContiRadar& raw_obstacles,
+       const drivers::ContiRadar& raw_obstacles,
        const PreprocessorOptions& options,
-       ContiRadar* corrected_obstacles) override;
+       drivers::ContiRadar* corrected_obstacles) override;
   std::string Name() const override;
 
  private:
-  DummyPreprocessor(const DummyPreprocessor&) = delete;
-  DummyPreprocessor& operator=(const DummyPreprocessor&) = delete;
+  DISALLOW_COPY_AND_ASSIGN(DummyPreprocessor);
 };
 
 class DummyDetector : public BaseDetector {
@@ -52,16 +51,16 @@ class DummyDetector : public BaseDetector {
 
   bool Init() override;
   bool Detect(
-       const ContiRadar& corrected_obstacles,
+       const drivers::ContiRadar& corrected_obstacles,
        const DetectorOptions& options,
        base::FramePtr detected_frame) override;
   std::string Name() const override;
 
  private:
-  void ContiObs2Frame(const ContiRadar& corrected_obstacles,
+  void ContiObs2Frame(const drivers::ContiRadar& corrected_obstacles,
                       base::FramePtr radar_frame);
-  DummyDetector(const DummyDetector&) = delete;
-  DummyDetector& operator=(const DummyDetector&) = delete;
+
+  DISALLOW_COPY_AND_ASSIGN(DummyDetector);
 };
 
 class DummyRoiFilter : public BaseRoiFilter {
@@ -76,12 +75,9 @@ class DummyRoiFilter : public BaseRoiFilter {
   std::string Name() const override;
 
  private:
-  DummyRoiFilter(const DummyRoiFilter&) = delete;
-  DummyRoiFilter& operator=(const DummyRoiFilter&) = delete;
+  DISALLOW_COPY_AND_ASSIGN(DummyRoiFilter);
 };
 
 }  // namespace radar
 }  // namespace perception
 }  // namespace apollo
-
-#endif  // RADAR_LIB_DUMMY_DUMMY_ALGORITHMS_H_

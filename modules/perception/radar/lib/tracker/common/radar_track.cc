@@ -25,7 +25,7 @@ int RadarTrack::s_tracked_times_threshold_ = 3;
 bool RadarTrack::s_use_filter_ = false;
 std::string RadarTrack::s_chosen_filter_ = "AdaptiveKalmanFilter"; // NOLINT Be Careful!!!
 
-RadarTrack::RadarTrack(const base::ObjectPtr& obs, const double& timestamp) {
+RadarTrack::RadarTrack(const base::ObjectPtr& obs, const double timestamp) {
   s_current_idx_ %= MAX_RADAR_IDX;
   obs_id_ = s_current_idx_++;
   obs_radar_ = base::ObjectPool::Instance().Get();

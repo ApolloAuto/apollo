@@ -13,11 +13,13 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 *****************************************************************************/
-#ifndef RADAR_LIB_TRACKER_CONTI_ARS_TRACKER_CONTI_ARS_TRACKER_H_
-#define RADAR_LIB_TRACKER_CONTI_ARS_TRACKER_CONTI_ARS_TRACKER_H_
+#pragma once
 
 #include <string>
 #include <vector>
+
+#include "cybertron/common/macros.h"
+
 #include "modules/perception/radar/lib/interface/base_tracker.h"
 #include "modules/perception/radar/lib/tracker/common/radar_track_manager.h"
 #include "modules/perception/radar/lib/tracker/matcher/hm_matcher.h"
@@ -35,11 +37,9 @@ class ContiArsTracker : public BaseTracker {
              base::FramePtr tracked_frame) override;
 
  private:
-  ContiArsTracker(const ContiArsTracker &) = delete;
-  ContiArsTracker &operator=(const ContiArsTracker &) = delete;
   std::string matcher_name_;
-  BaseMatcher *matcher_;
-  RadarTrackManager *track_manager_;
+  BaseMatcher *matcher_ = nullptr;
+  RadarTrackManager *track_manager_ = nullptr;
   static double s_tracking_time_win_;
   void TrackObjects(const base::Frame &radar_frame);
   void UpdateAssignedTracks(const base::Frame &radar_frame,
@@ -50,9 +50,9 @@ class ContiArsTracker : public BaseTracker {
   void CreateNewTracks(const base::Frame &radar_frame,
                        const std::vector<size_t> &unassigned_objects);
   void CollectTrackedFrame(base::FramePtr tracked_frame);
+
+  DISALLOW_COPY_AND_ASSIGN(ContiArsTracker);
 };
 }  // namespace radar
 }  // namespace perception
 }  // namespace apollo
-
-#endif  // RADAR_LIB_TRACKER_CONTI_ARS_TRACKER_CONTI_ARS_TRACKER_H_

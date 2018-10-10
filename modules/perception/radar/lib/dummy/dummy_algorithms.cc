@@ -19,9 +19,9 @@ namespace apollo {
 namespace perception {
 namespace radar {
 
-void DummyDetector::ContiObs2Frame(const ContiRadar& corrected_obstacles,
+void DummyDetector::ContiObs2Frame(const drivers::ContiRadar& corrected_obstacles,
                                    base::FramePtr radar_frame) {
-  for (auto radar_obs : corrected_obstacles.contiobs()) {
+  for (const auto& radar_obs : corrected_obstacles.contiobs()) {
     base::ObjectPtr radar_object(new base::Object);
     radar_object->id = radar_obs.obstacle_id();
     radar_object->track_id = radar_obs.obstacle_id();
@@ -74,9 +74,10 @@ bool DummyPreprocessor::Init() {
   return true;
 }
 bool DummyPreprocessor::Preprocess(
-          const ContiRadar& raw_obstacles,
+          const drivers::ContiRadar& raw_obstacles,
           const PreprocessorOptions& options,
-          ContiRadar *corrected_obstacles) {
+          drivers::ContiRadar *corrected_obstacles) {
+  CHECK_NOTNULL(corrected_obstacles);
   *corrected_obstacles = raw_obstacles;
   return true;
 }
@@ -88,7 +89,7 @@ bool DummyDetector::Init() {
   return true;
 }
 bool DummyDetector::Detect(
-          const ContiRadar &corrected_obstacles,
+          const drivers::ContiRadar &corrected_obstacles,
           const DetectorOptions &options,
           base::FramePtr detected_frame) {
     ContiObs2Frame(corrected_obstacles, detected_frame);

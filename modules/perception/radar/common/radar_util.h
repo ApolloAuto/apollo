@@ -13,8 +13,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 *****************************************************************************/
-#ifndef RADAR_COMMON_RADAR_UTIL_H_
-#define RADAR_COMMON_RADAR_UTIL_H_
+#pragma once
 
 #include "modules/perception/base/object.h"
 
@@ -27,5 +26,3 @@ void MockRadarPolygon(base::ObjectPtr object);
 }  // namespace radar
 }  // namespace perception
 }  // namespace apollo
-
-#endif  // RADAR_COMMON_RADAR_UTIL_H_

@@ -13,8 +13,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 *****************************************************************************/
-#ifndef RADAR_LIB_TRACKER_FILTER_ADAPTIVE_KALMAN_FILTER_H_
-#define RADAR_LIB_TRACKER_FILTER_ADAPTIVE_KALMAN_FILTER_H_
+#pragma once
 
 #include <vector>
 #include "modules/perception/radar/lib/interface/base_filter.h"
@@ -57,4 +56,3 @@ class AdaptiveKalmanFilter : public BaseFilter {
 }  // namespace radar
 }  // namespace perception
 }  // namespace apollo
-#endif  // RADAR_LIB_TRACKER_FILTER_ADAPTIVE_KALMAN_FILTER_H_
