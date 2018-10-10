@@ -14,13 +14,13 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "time_line_scene.h"
-#include "time_block_item.h"
-#include "time_line_axis.h"
-#include "time_line_legend.h"
-#include "time_line_legend_item.h"
-#include "time_line_table.h"
-#include "time_line_view.h"
+#include "./time_line_scene.h"
+#include "./time_block_item.h"
+#include "./time_line_axis.h"
+#include "./time_line_legend.h"
+#include "./time_line_legend_item.h"
+#include "./time_line_table.h"
+#include "./time_line_view.h"
 
 #include <QGraphicsSceneMouseEvent>
 #include <QGraphicsSceneWheelEvent>
@@ -31,6 +31,10 @@
 #include <cstdlib>
 #include <ctime>
 #include <iostream>
+#include <map>
+#include <string>
+#include <list>
+#include <vector>
 
 namespace {
 
@@ -108,7 +112,7 @@ class ColorSys {
  public:
   static constexpr uint ColorSysSize = 13U;
 
-  explicit ColorSys(void) : _colorIndex(0), _colorList() {
+  ColorSys(void) : _colorIndex(0), _colorList() {
     _colorList.resize(ColorSysSize, nullptr);
   }
   ~ColorSys(void) { clear(); }
@@ -164,7 +168,7 @@ class ColorSys {
 };
 
 ColorSys _colorSys;
-}
+}  // namespace
 
 TimeLineScene::TimeLineScene(QObject* parent)
     : QGraphicsScene(parent),

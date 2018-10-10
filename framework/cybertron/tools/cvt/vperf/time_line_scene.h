@@ -18,8 +18,8 @@
 #define TOOLS_CVT_VPERF_TIMELINESCENE_H_
 
 #include <QGraphicsScene>
-#include "perf_data_base.h"
-#include "time_line_row.h"
+#include "./perf_data_base.h"
+#include "./time_line_row.h"
 
 class TimeLineTable;
 class TimeLineAxis;

@@ -14,12 +14,14 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "general_channel_message.h"
-#include "general_message.h"
-#include "screen.h"
+#include "./general_channel_message.h"
+#include "./general_message.h"
+#include "./screen.h"
 
 #include <iomanip>
 #include <sstream>
+#include <string>
+#include <vector>
 
 namespace {
 constexpr int ReaderWriterOffset = 4;
@@ -41,7 +43,7 @@ void GeneralChannelMessage::Render(const Screen* s, int key) {
       current_state_ = State::ShowInfo;
       break;
 
-    default:;
+    default: {}
   }
 
   clear();

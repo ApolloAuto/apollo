@@ -25,22 +25,27 @@ namespace common {
 class Point3D;
 namespace header {
 class Header;
-}
+}  // namespace header
 
 namespace sensor {
 class NovatelHeader;
 class WheelMeasurement;
-}
+}  // namespace sensor
 
-}  // common
-}  // adu
+}  // namespace common
+}  // namespace adu
 
 class Screen;
 
 class RenderableMessage {
  public:
-  explicit RenderableMessage(RenderableMessage* parent = nullptr, int lineNo = 0)
-      : line_no_(lineNo), pages_(1), page_index_(0), page_item_count_(24), parent_(parent) {}
+  explicit RenderableMessage(RenderableMessage* parent = nullptr,
+                             int lineNo = 0)
+      : line_no_(lineNo),
+        pages_(1),
+        page_index_(0),
+        page_item_count_(24),
+        parent_(parent) {}
 
   virtual ~RenderableMessage() { parent_ = nullptr; }
 
@@ -56,8 +61,8 @@ class RenderableMessage {
 
   virtual RenderableMessage* Child(int /* lineNo */) const { return nullptr; }
 
-  int page_item_count(void)const{ return page_item_count_; }
-  
+  int page_item_count(void) const { return page_item_count_; }
+
  protected:
   int* line_no(void) { return &line_no_; }
   void set_line_no(int lineNo) { line_no_ = lineNo; }
@@ -74,6 +79,6 @@ class RenderableMessage {
   RenderableMessage* parent_;
 
   friend class Screen;
-};
+};  // RenderableMessage
 
 #endif  // TOOLS_CVT_MONITOR_RENDERABLE_MESSAGE_H_

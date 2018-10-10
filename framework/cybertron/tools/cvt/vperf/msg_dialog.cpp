@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "msg_dialog.h"
+#include "./msg_dialog.h"
 #include "ui_msg_dialog.h"
 
 MessageDialog::MessageDialog(QWidget *parent)

@@ -14,17 +14,19 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "cybertron_topology_message.h"
-#include "general_channel_message.h"
+#include <signal.h>
+#include <iostream>
+#include <string>
 
-#include "channel_msg_factory.h"
-#include "screen.h"
+#include "./cybertron_topology_message.h"
+#include "./general_channel_message.h"
+
+#include "./channel_msg_factory.h"
+#include "./screen.h"
 
 #include "cybertron/init.h"
 #include "cybertron/service_discovery/topology_manager.h"
 
-#include <signal.h>
-#include <iostream>
 
 namespace {
 void SigResizeHandle(int) { Screen::Instance()->Resize(); }

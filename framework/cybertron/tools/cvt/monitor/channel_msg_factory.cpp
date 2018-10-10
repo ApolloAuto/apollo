@@ -14,10 +14,11 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "channel_msg_factory.h"
-#include "general_channel_message.h"
+#include "./channel_msg_factory.h"
+#include "./general_channel_message.h"
 
 #include <unistd.h>
+#include <string>
 
 ChannelMsgFactory* ChannelMsgFactory::Instance() {
   static ChannelMsgFactory factory;

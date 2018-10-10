@@ -21,9 +21,10 @@
 
 class InteractiveGraphicsView : public QGraphicsView {
   Q_OBJECT
+
  public:
-  InteractiveGraphicsView(QWidget *parent = 0);
-  InteractiveGraphicsView(QGraphicsScene *scene, QWidget *parent = 0);
+  explicit InteractiveGraphicsView(QWidget *parent = 0);
+  explicit InteractiveGraphicsView(QGraphicsScene *scene, QWidget *parent = 0);
   ~InteractiveGraphicsView() {}
 
   void zoom_in();

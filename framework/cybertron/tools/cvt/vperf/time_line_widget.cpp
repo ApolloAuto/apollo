@@ -14,13 +14,13 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "time_line_widget.h"
-#include "has_data_come_event.h"
-#include "perf_data_base.h"
-#include "time_block_item.h"
-#include "time_line_legend.h"
-#include "time_line_row.h"
-#include "time_line_table.h"
+#include "./time_line_widget.h"
+#include "./has_data_come_event.h"
+#include "./perf_data_base.h"
+#include "./time_block_item.h"
+#include "./time_line_legend.h"
+#include "./time_line_row.h"
+#include "./time_line_table.h"
 #include "ui_find_event_id.h"
 #include "ui_find_timelength.h"
 #include "ui_find_timepoint.h"

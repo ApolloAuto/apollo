@@ -14,9 +14,9 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "general_message.h"
-#include "general_channel_message.h"
-#include "screen.h"
+#include "./general_message.h"
+#include "./general_channel_message.h"
+#include "./screen.h"
 
 #include <iomanip>
 #include <sstream>
@@ -90,7 +90,7 @@ void GeneralMessage::Render(const Screen* s, int key) {
           if (itemIndex_ < 0) itemIndex_ = size - 1;
           break;
 
-        default:;
+        default: {}
       }
 
       int lcount =

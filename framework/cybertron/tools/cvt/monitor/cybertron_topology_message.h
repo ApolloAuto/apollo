@@ -19,7 +19,7 @@
 
 #include <map>
 #include <string>
-#include "renderable_message.h"
+#include "./renderable_message.h"
 
 namespace apollo {
 namespace cybertron {

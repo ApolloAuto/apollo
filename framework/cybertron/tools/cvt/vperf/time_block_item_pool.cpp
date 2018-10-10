@@ -14,21 +14,25 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "time_block_item_pool.h"
-#include "time_block_item.h"
+#include "./time_block_item_pool.h"
+#include "./time_block_item.h"
 
 #include <iostream>
 
-#define MEMBER_OFFSET(StructType, Member) (size_t) & (((StructType*)0)->Member)
-#define StructPtrByMemberPtr(MemberPtr, StructType, Member) \
-  (StructType*)((char*)MemberPtr - MEMBER_OFFSET(StructType, Member))
+#define MEMBER_OFFSET(StructType, Member)                                    \
+  (size_t)(                                                                  \
+      reinterpret_cast<char*>(&(reinterpret_cast<StructType*>(1)->Member)) - \
+      1)
+#define StructPtrByMemberPtr(MemberPtr, StructType, Member)          \
+  reinterpret_cast<StructType*>(reinterpret_cast<char*>(MemberPtr) - \
+                                MEMBER_OFFSET(StructType, Member))
 
 namespace {
 struct Warpper {
   TimeBlockItemPool::SmallPool* _poolPtr;
   TimeBlockItem _timeBlockItem;
 
-  explicit Warpper() : _poolPtr(nullptr), _timeBlockItem() {}
+  Warpper(void) : _poolPtr(nullptr), _timeBlockItem() {}
   ~Warpper() { _poolPtr = nullptr; }
 };
 
@@ -38,17 +42,17 @@ struct SmallPoolData {
     Warpper _warpperItem;
   };
 
-  explicit SmallPoolData() : _warpperItem() { _next = nullptr; }
+  SmallPoolData(void) : _warpperItem() { _next = nullptr; }
 
   ~SmallPoolData() { _warpperItem.~Warpper(); }
 };
-}
+}  // namespace
 
 struct TimeBlockItemPool::SmallPool {
   int _freeCount;
   SmallPoolData* _freeList;
 
-  explicit SmallPool() : _freeCount(0), _freeList(nullptr) {}
+  SmallPool(void) : _freeCount(0), _freeList(nullptr) {}
 
   TimeBlockItem* allocate(void) {
     --_freeCount;
@@ -72,7 +76,7 @@ struct SmallPoolWithData {  // don't change the member order
   TimeBlockItemPool::SmallPool _pool;
   SmallPoolData _data[TimeBlockItemPool::SmallPoolBlockCount];
 
-  explicit SmallPoolWithData(void) : _pool(), _data() {}
+  SmallPoolWithData(void) : _pool(), _data() {}
 
   void reset(void) {
     SmallPoolData* cur = _data;  // i = 0
@@ -88,7 +92,7 @@ struct SmallPoolWithData {  // don't change the member order
     cur->_next = nullptr;
   }
 };
-}
+}  // namespace
 
 TimeBlockItemPool* TimeBlockItemPool::instance() {
   static TimeBlockItemPool pool;
@@ -165,5 +169,5 @@ void TimeBlockItemPool::deallocate(TimeBlockItem* item) {
   Warpper* w = StructPtrByMemberPtr(item, ::Warpper, _timeBlockItem);
   SmallPool* p = w->_poolPtr;
 
-  p->deallocate((SmallPoolData*)(w));
+  p->deallocate(reinterpret_cast<SmallPoolData*>(w));
 }

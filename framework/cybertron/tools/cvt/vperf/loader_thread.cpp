@@ -14,15 +14,16 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "loader_thread.h"
+#include "./loader_thread.h"
+#include "./has_data_come_event.h"
+#include "./perf_data_base.h"
+
 #include <QCoreApplication>
 #include <QSemaphore>
 #include <fstream>
 #include <iostream>
 #include <memory>
 #include <thread>
-#include "has_data_come_event.h"
-#include "perf_data_base.h"
 
 namespace {
 constexpr int BufferCount = 4;
@@ -79,7 +80,7 @@ struct ReaderWriterBuffer {
 
   bool canRead(void) const { return _rSem.available(); }
 };
-}
+}  // namespace
 
 LoaderThread::LoaderThread(QObject *parent)
     : QThread(parent), _canRead(false) {}
@@ -90,7 +91,6 @@ void LoaderThread::run() {
   bool canWrite = true;
   _canRead = true;
   auto writerFunc = [&buffer, this, &canWrite]() {
-
     std::ifstream file(this->_dataFileName.toStdString());
 
     if (!file.is_open()) {

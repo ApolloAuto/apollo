@@ -17,9 +17,6 @@
 #ifndef TOOLS_CVT_VTOPOLOGY_MAINWINDOW_H_
 #define TOOLS_CVT_VTOPOLOGY_MAINWINDOW_H_
 
-#include "about_dialog.h"
-#include "composite_item.h"
-
 #include <QColor>
 #include <QList>
 #include <QMainWindow>
@@ -28,6 +25,11 @@
 #include <QTimer>
 #include <QVector2D>
 #include <memory>
+#include <map>
+#include <string>
+
+#include "./about_dialog.h"
+#include "./composite_item.h"
 
 class QTreeWidgetItem;
 
@@ -44,11 +46,12 @@ namespace cybertron {
 namespace proto {
 class ChangeMsg;
 }
-}
-}
+}  // namespace cybertron
+}  // namespace apollo
 
 class MainWindow : public QMainWindow {
   Q_OBJECT
+
  public:
   explicit MainWindow(QWidget* parent = nullptr);
   ~MainWindow();

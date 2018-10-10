@@ -73,9 +73,7 @@ class TaskData {
   TaskData& operator=(const TaskData&) = delete;
 
  public:
-  explicit TaskData() : _datum() /*, _innerIter()*/ {
-    //        _innerIter = _blockDatum.cbegin();
-  }
+  TaskData() : _datum() {}
   ~TaskData(void) {
     for (auto _innerIter = _datum.cbegin(); _innerIter != _datum.cend();
          ++_innerIter) {
@@ -124,7 +122,7 @@ class ProcessorData {
   std::map<const std::string, TaskData*> _processorDatum;
 
  public:
-  explicit ProcessorData(void) : _processorDatum() {}
+  ProcessorData(void) : _processorDatum() {}
   ~ProcessorData() {
     for (auto iter = _processorDatum.begin(); iter != _processorDatum.end();
          ++iter) {
@@ -172,7 +170,7 @@ class PerfBlockDatabase {
   std::vector<ProcessorData*> _datum;
 
  public:
-  explicit PerfBlockDatabase()
+  PerfBlockDatabase(void)
       : _blockIndex(-1),
         _maxEndTimeStamp(-1),
         _minStartTimeStamp(INT64_MAX),

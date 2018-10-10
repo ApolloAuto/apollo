@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "fixed_spinbox.h"
+#include "./fixed_spinbox.h"
 #include <QTimerEvent>
 
 FixedSpinBox::FixedSpinBox(QWidget *parent) : QSpinBox(parent) {}
