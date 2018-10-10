@@ -63,13 +63,33 @@ class SidePassScenario : public Scenario {
 
   void RegisterTasks();
 
- private:
-  static int current_stage_index_;
+  common::Status ApproachObstacle(
+      const common::TrajectoryPoint& planning_start_point, Frame* frame);
+
+  common::Status GeneratePath(
+      const common::TrajectoryPoint& planning_start_point, Frame* frame);
+
+  common::Status StopOnWaitPoint(
+      const common::TrajectoryPoint& planning_start_point, Frame* frame);
+
+  common::Status DetectSafety(
+      const common::TrajectoryPoint& planning_start_point, Frame* frame);
+
+  common::Status PassObstacle(
+      const common::TrajectoryPoint& planning_start_point, Frame* frame);
+
+  apollo::common::util::Factory<TaskType, Task> task_factory_;
+
   std::vector<std::unique_ptr<Task>> tasks_;
   ScenarioConfig config_;
   SpeedProfileGenerator speed_profile_generator_;
 
   SidePassStage stage_ = OBSTACLE_APPROACH;
+  static int current_stage_index_;
+
+  PathData path_;
+
+  double wait_point_s = 0;
 };
 
 }  // namespace planning
