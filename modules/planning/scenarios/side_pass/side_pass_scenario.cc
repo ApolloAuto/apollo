@@ -104,9 +104,27 @@ Status SidePassScenario::Process(const TrajectoryPoint& planning_start_point,
 
   // TODO(all)
 
+  // get current stage
+  const std::string stage_name =
+      config_.stage(current_stage_index_).stage_name();
+  SidePassStage stage = SidePassStage::OBSTACLE_APPROACH;
+  if (stage_name == FLAGS_scenario_side_pass_stage_obstacle_approach) {
+    stage = SidePassStage::OBSTACLE_APPROACH;
+  } else if (stage_name == FLAGS_scenario_side_pass_stage_path_generation) {
+    stage = SidePassStage::PATH_GENERATION;
+  } else if (stage_name == FLAGS_scenario_side_pass_stage_waitpoint_stop) {
+    stage = SidePassStage::WAITPOINT_STOP;
+  } else if (stage_name == FLAGS_scenario_side_pass_stage_safety_detection) {
+    stage = SidePassStage::SAFETY_DETECTION;
+  } else if (stage_name == FLAGS_scenario_side_pass_stage_obstacle_pass) {
+    stage = SidePassStage::OBSTACLE_PASS;
+  } else {
+    return Status(ErrorCode::PLANNING_ERROR, "incorrect stage name in config");
+  }
+
   Status status = Status(ErrorCode::PLANNING_ERROR,
                          "Failed to process stage in side pass.");
-  switch (stage_) {
+  switch (stage) {
     case SidePassStage::OBSTACLE_APPROACH: {
       status = ApproachObstacle(planning_start_point, frame);
       break;

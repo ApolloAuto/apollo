@@ -78,17 +78,12 @@ class SidePassScenario : public Scenario {
   common::Status PassObstacle(
       const common::TrajectoryPoint& planning_start_point, Frame* frame);
 
-  apollo::common::util::Factory<TaskType, Task> task_factory_;
-
+ private:
+  static int current_stage_index_;
   std::vector<std::unique_ptr<Task>> tasks_;
   ScenarioConfig config_;
   SpeedProfileGenerator speed_profile_generator_;
-
-  SidePassStage stage_ = OBSTACLE_APPROACH;
-  static int current_stage_index_;
-
   PathData path_;
-
   double wait_point_s = 0;
 };
 
