@@ -82,10 +82,11 @@ bool SidePassScenario::Init() {
   if (is_init_) {
     return true;
   }
-  RegisterTasks();
 
   CHECK(apollo::common::util::GetProtoFromFile(
       FLAGS_scenario_side_pass_config_file, &config_));
+
+  RegisterTasks();
 
   is_init_ = true;
   status_ = STATUS_INITED;
