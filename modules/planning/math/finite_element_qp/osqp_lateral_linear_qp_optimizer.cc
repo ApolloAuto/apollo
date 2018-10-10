@@ -110,11 +110,33 @@ bool OsqpLateralLinearQPOptimizer::optimize(
   DenseToCSCMatrix(affine_constraint, &A_data_, &A_indices_, &A_indptr_);
 
   // offset
+  // TODO(lianglia-apollo):
+  // complete offset here
   double q[kNumVariable];
   for (int i = 0; i < kNumVariable; ++i) {
     q[i] = -2.0 * FLAGS_weight_lateral_obstacle_distance *
            (d_bounds[i].first + d_bounds[i].second);
   }
+  const double delta_s_tri = delta_s * delta_s_sq;
+  // first order derivative offset
+  q[0] += (-2.0 * d_state[0]) * FLAGS_weight_lateral_derivative / (delta_s_sq);
+
+  // second order derivative offset
+  const double delta_s_quad_offset_coeff =
+      FLAGS_weight_lateral_second_order_derivative / (delta_s_sq * delta_s_sq);
+  q[0] += (-6.0 * d_state[0] - 2.0 * delta_s * d_state[1]) *
+          delta_s_quad_offset_coeff;
+  q[1] += (2.0 * d_state[0]) * delta_s_quad_offset_coeff;
+
+  // third order derivative offset
+  const double delta_s_hex_offset_coeff =
+      FLAGS_weight_lateral_third_order_derivative / (delta_s_tri * delta_s_tri);
+  q[0] += (-20.0 * d_state[0] - 8.0 * delta_s * d_state[1] -
+           2.0 * delta_s_sq * d_state[2]) *
+          delta_s_hex_offset_coeff;
+  q[1] += (10.0 * d_state[0] + 2.0 * delta_s * d_state[1]) *
+          delta_s_hex_offset_coeff;
+  q[2] += (-2.0 * d_state[0]) * delta_s_hex_offset_coeff;
 
   // Problem settings
   OSQPSettings* settings =
@@ -154,7 +176,7 @@ bool OsqpLateralLinearQPOptimizer::optimize(
   for (int i = 0; i < kNumVariable; ++i) {
     opt_d_[i + 1] = work->solution->x[i];
     // TODO(lianglia-apollo):
-    // fix opt_d_prime_ and opt_d_pprime_
+    // extract opt_d_prime_ and opt_d_pprime_
   }
 
   // Cleanup
@@ -182,6 +204,9 @@ void OsqpLateralLinearQPOptimizer::CalcualteKernel(
       1.0 / delta_s_sq * FLAGS_weight_lateral_derivative;
   const double one_over_delta_s_quad_coeff =
       1.0 / delta_s_quad * FLAGS_weight_lateral_second_order_derivative;
+  const double one_over_delta_s_hex_coeff =
+      1.0 / (delta_s_sq * delta_s_quad) *
+      FLAGS_weight_lateral_third_order_derivative;
 
   for (int i = 0; i < kNumVariable; ++i) {
     kernel(i, i) += 2.0 * FLAGS_weight_lateral_obstacle_distance;
@@ -216,6 +241,49 @@ void OsqpLateralLinearQPOptimizer::CalcualteKernel(
       kernel(i - 2, i - 1) += -4.0 * one_over_delta_s_quad_coeff;
       kernel(i, i - 2) += 2.0 * one_over_delta_s_quad_coeff;
       kernel(i - 2, i) += 2.0 * one_over_delta_s_quad_coeff;
+    }
+
+    // third order derivative
+    if (i == 0) {
+      kernel(0, 0) += 2.0 * one_over_delta_s_hex_coeff;
+    } else if (i == 1) {
+      kernel(0, 0) += 18.0 * one_over_delta_s_hex_coeff;
+      kernel(1, 1) += 2.0 * one_over_delta_s_hex_coeff;
+
+      kernel(0, 1) += -6.0 * one_over_delta_s_hex_coeff;
+      kernel(1, 0) += -6.0 * one_over_delta_s_hex_coeff;
+    } else if (i == 2) {
+      kernel(0, 0) += 18.0 * one_over_delta_s_hex_coeff;
+      kernel(1, 1) += 18.0 * one_over_delta_s_hex_coeff;
+      kernel(2, 2) += 2.0 * one_over_delta_s_hex_coeff;
+
+      kernel(1, 2) += -6.0 * one_over_delta_s_hex_coeff;
+      kernel(2, 1) += -6.0 * one_over_delta_s_hex_coeff;
+      kernel(0, 2) += 6.0 * one_over_delta_s_hex_coeff;
+      kernel(2, 0) += 6.0 * one_over_delta_s_hex_coeff;
+
+      kernel(0, 1) += -18.0 * one_over_delta_s_hex_coeff;
+      kernel(1, 0) += -18.0 * one_over_delta_s_hex_coeff;
+    } else {
+      kernel(i - 3, i - 3) += 2.0 * one_over_delta_s_hex_coeff;
+      kernel(i - 2, i - 2) += 18.0 * one_over_delta_s_hex_coeff;
+      kernel(i - 1, i - 1) += 18.0 * one_over_delta_s_hex_coeff;
+      kernel(i, i) += 2.0 * one_over_delta_s_hex_coeff;
+
+      kernel(i - 1, i) += -6.0 * one_over_delta_s_hex_coeff;
+      kernel(i, i - 1) += -6.0 * one_over_delta_s_hex_coeff;
+      kernel(i - 2, i) += 6.0 * one_over_delta_s_hex_coeff;
+      kernel(i, i - 2) += 6.0 * one_over_delta_s_hex_coeff;
+      kernel(i - 3, i) += -2.0 * one_over_delta_s_hex_coeff;
+      kernel(i, i - 3) += -2.0 * one_over_delta_s_hex_coeff;
+
+      kernel(i - 2, i - 1) += -18.0 * one_over_delta_s_hex_coeff;
+      kernel(i - 1, i - 2) += -18.0 * one_over_delta_s_hex_coeff;
+      kernel(i - 3, i - 1) += 6.0 * one_over_delta_s_hex_coeff;
+      kernel(i - 1, i - 3) += 6.0 * one_over_delta_s_hex_coeff;
+
+      kernel(i - 3, i - 2) += -6.0 * one_over_delta_s_hex_coeff;
+      kernel(i - 2, i - 3) += -6.0 * one_over_delta_s_hex_coeff;
     }
   }
 
