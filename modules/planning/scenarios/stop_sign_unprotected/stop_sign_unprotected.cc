@@ -84,6 +84,29 @@ Status StopSignUnprotectedScenario::Process(
 
   // TODO(all)
 
+  Status status = Status(ErrorCode::PLANNING_ERROR,
+                         "Failed to process stage in stop_sign_upprotected.");
+  switch (stage_) {
+    case StopSignUnprotectedStage::CRUISE_AND_MONITOR: {
+      status = CruiseAndMonitor(frame);
+      break;
+    }
+    case StopSignUnprotectedStage::STOP: {
+      status = Stop(frame);
+      break;
+    }
+    case StopSignUnprotectedStage::CREEP: {
+      status = Creep(planning_start_point, frame);
+      break;
+    }
+    case StopSignUnprotectedStage::INTERSECTION_CRUISE: {
+      status = IntersectionCruise(planning_start_point, frame);
+      break;
+    }
+    default:
+      break;
+  }
+
   return Status::OK();
 }
 
@@ -93,6 +116,32 @@ bool StopSignUnprotectedScenario::IsTransferable(
     const Frame& frame) const {
   // TODO(All): implement here
   return false;
+}
+
+common::Status StopSignUnprotectedScenario::CruiseAndMonitor(
+    Frame* frame) {
+  // TODO(all)
+  return Status::OK();
+}
+
+common::Status StopSignUnprotectedScenario::Stop(
+    Frame* frame) {
+  // TODO(all)
+  return Status::OK();
+}
+
+common::Status StopSignUnprotectedScenario::Creep(
+    const common::TrajectoryPoint& planning_start_point,
+    Frame* frame) {
+  // TODO(all)
+  return Status::OK();
+}
+
+common::Status StopSignUnprotectedScenario::IntersectionCruise(
+    const common::TrajectoryPoint& planning_start_point,
+    Frame* frame) {
+  // TODO(all)
+  return Status::OK();
 }
 
 }  // namespace planning
