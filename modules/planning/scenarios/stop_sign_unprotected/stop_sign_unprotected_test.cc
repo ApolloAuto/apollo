@@ -18,6 +18,8 @@
  * @file
  **/
 
+#define protected public
+#define private public
 #include "modules/planning/scenarios/stop_sign_unprotected/stop_sign_unprotected.h"  // NOINT
 
 #include <memory>
@@ -52,6 +54,16 @@ TEST_F(StopSignUnprotectedScenarioTest, Simple) {
       FLAGS_scenario_stop_sign_unprotected_config_file, &config));
 
   EXPECT_TRUE(scenario_->Init());
+
+  std::vector<std::unique_ptr<Task>> tasks;
+  scenario_->InitTasks(config, "STOP", &tasks);
+  EXPECT_EQ(tasks.size(), 0);
+
+  scenario_->InitTasks(config, "CREEP", &tasks);
+  EXPECT_EQ(tasks.size(), 0);
+
+  scenario_->InitTasks(config, "INTERSECTION_CRUISE", &tasks);
+  EXPECT_EQ(tasks.size(), 5);
 }
 
 }  // namespace planning

@@ -83,7 +83,8 @@ Status StopSignUnprotectedScenario::Process(
   } else if (stage_ == StopSignUnprotectedStage::CREEP) {
     stage_name = FLAGS_scenario_stop_sign_unprotected_stage_creep;
   } else if (stage_ == StopSignUnprotectedStage::CRUISE) {
-    stage_name = FLAGS_scenario_stop_sign_unprotected_stage_cruise;
+    stage_name =
+        FLAGS_scenario_stop_sign_unprotected_stage_intersection_cruise;
   } else if (stage_ == StopSignUnprotectedStage::DONE) {
     status_ = STATUS_DONE;
     return Status(ErrorCode::OK, "stop_sign_unprotected DONE");
