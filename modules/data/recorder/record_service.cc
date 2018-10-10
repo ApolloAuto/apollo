@@ -19,7 +19,6 @@
 
 #include "gflags/gflags.h"
 #include "cybertron/common/log.h"
-#include "cybertron/tools/cyber_recorder/recorder.h"
 
 namespace apollo {
 namespace data {
