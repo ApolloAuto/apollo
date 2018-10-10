@@ -105,14 +105,18 @@ Status FrameOpenSpace::Init() {
       return Status(ErrorCode::PLANNING_ERROR, err_str);
     }
   }
+  return Status::OK();
+}
+
+bool FrameOpenSpace::LoadDataOpenSpace() {
   // fill up the v and h presentation of the obstacle
   if (VPresentationObstacle() && HPresentationObstacle()) {
     AINFO << "fill up the v and h presentation of obstacle succeed";
+    return true;
   } else {
     AINFO << "fail to get v and h presentation of obstacle";
+    return false;
   }
-
-  return Status::OK();
 }
 
 const Obstacle *FrameOpenSpace::FindCollisionObstacle() const {
@@ -234,12 +238,43 @@ const std::vector<const Obstacle *> FrameOpenSpace::obstacles() const {
 }
 
 bool FrameOpenSpace::VPresentationObstacle() {
-  obstacles_num_ = obstacles_.Items().size();
-  if (obstacles_num_ == 0) {
-    AINFO << "no obstacle by perception";
+  // load info from pnc map
+  if (!ROI()) {
+    AINFO << "fail at ROI()";
     return false;
   }
-  obstacles_vertices_num_ = 4 * Eigen::MatrixXd::Ones(obstacles_num_, 1);
+  std::size_t perception_obstacles_num = obstacles_.Items().size();
+  std::size_t parking_boundaries_num = ROI_warmstart_parking_boundary_.size();
+  obstacles_num_ = perception_obstacles_num + parking_boundaries_num;
+  if (perception_obstacles_num == 0) {
+    AINFO << "no obstacle by given by percption";
+  }
+  // load obstacle list for warm start
+  for (std::size_t i = 0; i < perception_obstacles_num; i++) {
+    openspace_warmstart_obstacles_.Add(obstacles_.Items().at(i)->Id(),
+                                       *(obstacles_.Items().at(i)));
+  }
+
+  // TODO(Jinyun) : depends on ROI()
+  for (std::size_t i = 0; i < parking_boundaries_num; i++) {
+    // load the points into Box2d, not implemented cause the order of points
+    // given in ROI_warmstart_parking boundary is not implemented yet
+  }
+
+  // load vertice vector for distance approach
+  Eigen::MatrixXd perception_obstacles_edges_num_ =
+      4 * Eigen::MatrixXd::Ones(perception_obstacles_num, 1);
+  Eigen::MatrixXd parking_boundaries_obstacles_edges_num(4, 1);
+  // the order decided by the ROI()
+  parking_boundaries_obstacles_edges_num << 1, 2, 2, 1;
+  obstacles_edges_num_.resize(perception_obstacles_edges_num_.rows() +
+                                  parking_boundaries_obstacles_edges_num.rows(),
+                              1);
+  obstacles_edges_num_ << perception_obstacles_edges_num_,
+      parking_boundaries_obstacles_edges_num;
+
+  // load vertices for perception obstacles(repeat the first vertice at the
+  // last to form closed convex hull)
   for (const auto &obstacle : obstacles_.Items()) {
     Box2d obstacle_box = obstacle->PerceptionBoundingBox();
     std::vector<Vec2d> vertices_ccw = obstacle_box.GetAllCorners();
@@ -254,14 +289,22 @@ bool FrameOpenSpace::VPresentationObstacle() {
     vertices_cw.push_back(vertices_cw.front());
     obstacles_vertices_vec_.emplace_back(vertices_cw);
   }
+  // load vertices for parking boundary (not need to repeat the first vertice to
+  // get close hull)
+  // TODO(Jinyun) : depends on ROI()
+  for (std::size_t i = 0; i < parking_boundaries_num; i++) {
+    // directly load the ROI_distance_approach_parking_boundary_ into
+    // obstacles_vertices_vec_
+  }
+
   return true;
 }
 
 bool FrameOpenSpace::HPresentationObstacle() {
-  obstacles_A_ = Eigen::MatrixXd::Zero(obstacles_vertices_num_.sum(), 2);
-  obstacles_b_ = Eigen::MatrixXd::Zero(obstacles_vertices_num_.sum(), 1);
+  obstacles_A_ = Eigen::MatrixXd::Zero(obstacles_edges_num_.sum(), 2);
+  obstacles_b_ = Eigen::MatrixXd::Zero(obstacles_edges_num_.sum(), 1);
   // vertices using H-represetntation
-  if (!ObsHRep(obstacles_num_, obstacles_vertices_num_, obstacles_vertices_vec_,
+  if (!ObsHRep(obstacles_num_, obstacles_edges_num_, obstacles_vertices_vec_,
                &obstacles_A_, &obstacles_b_)) {
     AINFO << "Fail to present obstacle in hyperplane";
     return false;
@@ -271,7 +314,7 @@ bool FrameOpenSpace::HPresentationObstacle() {
 
 bool FrameOpenSpace::ObsHRep(
     const std::size_t &obstacles_num,
-    const Eigen::MatrixXd &obstacles_vertices_num,
+    const Eigen::MatrixXd &obstacles_edges_num,
     const std::vector<std::vector<Vec2d>> &obstacles_vertices_vec,
     Eigen::MatrixXd *A_all, Eigen::MatrixXd *b_all) {
   if (obstacles_num != obstacles_vertices_vec.size()) {
@@ -279,14 +322,14 @@ bool FrameOpenSpace::ObsHRep(
     return false;
   }
 
-  A_all->resize(obstacles_vertices_num.sum(), 2);
-  b_all->resize(obstacles_vertices_num.sum(), 1);
+  A_all->resize(obstacles_edges_num.sum(), 2);
+  b_all->resize(obstacles_edges_num.sum(), 1);
 
   int counter = 0;
   double kEpsilon = 1.0e-5;
   // start building H representation
   for (std::size_t i = 0; i < obstacles_num; ++i) {
-    std::size_t current_vertice_num = obstacles_vertices_num(i, 0);
+    std::size_t current_vertice_num = obstacles_edges_num(i, 0);
     Eigen::MatrixXd A_i(current_vertice_num, 2);
     Eigen::MatrixXd b_i(current_vertice_num, 1);
 

@@ -81,6 +81,9 @@ bool HybridAStar::RSPCheck(const ReedSheppPath* reeds_shepp_to_end) {
 }
 
 bool HybridAStar::ValidityCheck(std::shared_ptr<Node3d> node) {
+  if ((*obstacles_).Items().empty()) {
+    return true;
+  }
   for (const auto& obstacle_box : (*obstacles_).Items()) {
     if (node->GetBoundingBox(vehicle_param_)
             .HasOverlap(obstacle_box->PerceptionBoundingBox())) {

@@ -100,6 +100,8 @@ void GetResult(ResultContainer* result_ptr, double* x, double* y, double* phi,
     y[i] = result_ptr->GetY()->at(i);
     phi[i] = result_ptr->GetPhi()->at(i);
     v[i] = result_ptr->GetV()->at(i);
+  }
+  for (std::size_t i = 0; i < size - 1; i++) {
     a[i] = result_ptr->GetA()->at(i);
     steer[i] = result_ptr->GetSteer()->at(i);
   }
