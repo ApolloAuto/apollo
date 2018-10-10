@@ -26,6 +26,7 @@ limitations under the License.
 #include "modules/common/util/file.h"
 #include "modules/common/util/string_util.h"
 #include "modules/map/hdmap/hdmap.h"
+#include "modules/map/relative_map/proto/navigation.pb.h"
 
 /**
  * @namespace apollo::hdmap
@@ -91,6 +92,7 @@ class HDMapUtil {
   // Get default base map from the file specified by global flags.
   // Return nullptr if failed to load.
   static const HDMap* BaseMapPtr();
+  static const HDMap* BaseMapPtr(const relative_map::MapMsg& map_msg);
   // Guarantee to return a valid base_map, or else raise fatal error.
   static const HDMap& BaseMap();
 

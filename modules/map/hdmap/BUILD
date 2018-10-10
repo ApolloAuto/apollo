@@ -16,13 +16,14 @@ cc_library(
         "hdmap_util.h",
     ],
     deps = [
+        "@glog//:glog",
         "//modules/common/configs:config_gflags",
         "//modules/common/math",
         "//modules/common/math:linear_interpolation",
         "//modules/common/util",
         "//modules/map/hdmap/adapter:opendrive_adapter",
         "//modules/map/proto:map_proto",
-        "@glog//:glog",
+        "//modules/map/relative_map/proto:navigation_proto",
     ],
 )
 

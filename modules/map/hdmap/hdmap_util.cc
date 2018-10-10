@@ -108,6 +108,19 @@ std::mutex HDMapUtil::base_map_mutex_;
 std::unique_ptr<HDMap> HDMapUtil::sim_map_ = nullptr;
 std::mutex HDMapUtil::sim_map_mutex_;
 
+const HDMap* HDMapUtil::BaseMapPtr(const MapMsg& map_msg) {
+  std::lock_guard<std::mutex> lock(base_map_mutex_);
+  if (base_map_ != nullptr &&
+      base_map_seq_ == map_msg.header().sequence_num()) {
+    // avoid re-create map in the same cycle.
+    return base_map_.get();
+  } else {
+    base_map_ = CreateMap(map_msg);
+    base_map_seq_ = map_msg.header().sequence_num();
+  }
+  return base_map_.get();
+}
+
 const HDMap* HDMapUtil::BaseMapPtr() {
   // TODO(all) Those logics should be removed to planning
   /*if (FLAGS_use_navigation_mode) {
