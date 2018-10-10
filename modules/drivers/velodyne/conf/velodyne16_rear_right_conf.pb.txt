@@ -14,3 +14,5 @@ calibration_online: false
 calibration_file: "/apollo/modules/drivers/velodyne/params/VLP16_calibration.yaml"
 organized: false
 convert_channel_name: "/apollo/sensor/velodyne16/rear/right/PointCloud2"
+use_poll_sync: true
+is_main_frame: false

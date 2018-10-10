@@ -27,6 +27,8 @@ message Config {
   optional string convert_channel_name = 19;
   optional int32 npackets = 20;
   optional bool use_gps_time = 23;
+  optional bool use_poll_sync = 24;
+  optional bool is_main_frame = 25;
 }
 
 message FusionConfig {
@@ -34,6 +36,7 @@ message FusionConfig {
   optional bool drop_expired_data = 2;
   optional string fusion_channel = 3;
   repeated string input_channel = 4;
+  optional float wait_time_s = 5;
 }
 
 message CompensatorConfig {

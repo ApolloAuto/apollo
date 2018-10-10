@@ -28,6 +28,8 @@ namespace apollo {
 namespace drivers {
 namespace velodyne {
 
+uint64_t VelodyneDriver::sync_counter = 0;
+
 VelodyneDriver::~VelodyneDriver() {
   if (positioning_thread_.joinable()) {
     positioning_thread_.join();
@@ -134,7 +136,12 @@ bool VelodyneDriver::Poll(std::shared_ptr<VelodyneScan> scan) {
 int VelodyneDriver::PollStandard(std::shared_ptr<VelodyneScan> scan) {
   // Since the velodyne delivers data at a very high rate, keep reading and
   // publishing scans as fast as possible.
-  for (int i = 0; i < config_.npackets(); ++i) {
+  while ((config_.use_poll_sync()
+          && ((config_.is_main_frame() &&
+             scan->firing_pkts_size() < config_.npackets())
+          || (!config_.is_main_frame() && sync_counter == last_count_)))
+      || (!config_.use_poll_sync()
+          && scan->firing_pkts_size() < config_.npackets())) {
     while (true) {
       // keep reading until full packet received
       VelodynePacket* packet = scan->add_firing_pkts();
@@ -147,11 +154,18 @@ int VelodyneDriver::PollStandard(std::shared_ptr<VelodyneScan> scan) {
       }
     }
   }
+  if (config_.use_poll_sync()) {
+    if (config_.is_main_frame()) {
+      ++sync_counter;
+    } else {
+      last_count_ = sync_counter;
+    }
+  }
   return 0;
 }
 
 void VelodyneDriver::PollPositioningPacket(void) {
-  while (true) {
+  while (!cybertron::IsShutdown()) {
     NMEATimePtr nmea_time(new NMEATime);
     bool ret = true;
     if (config_.has_use_gps_time() && !config_.use_gps_time()) {
@@ -169,7 +183,7 @@ void VelodyneDriver::PollPositioningPacket(void) {
             << "day:" << nmea_time->day << "hour:" << nmea_time->hour
             << "min:" << nmea_time->min << "sec:" << nmea_time->sec;
     } else {
-      while (true) {
+      while (!cybertron::IsShutdown()) {
         int rc = positioning_input_->get_positioning_data_packet(nmea_time);
         if (rc == 0) {
           break;  // got a full packet

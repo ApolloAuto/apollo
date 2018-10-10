@@ -22,6 +22,8 @@ namespace apollo {
 namespace drivers {
 namespace velodyne {
 
+using apollo::cybertron::Time;
+
 bool PriSecFusionComponent::Init() {
   if (!GetProtoConfig(&conf_)) {
     AWARN << "Load config failed, config file" << ConfigFilePath();
@@ -40,18 +42,27 @@ bool PriSecFusionComponent::Init() {
 
 bool PriSecFusionComponent::Proc(
     const std::shared_ptr<PointCloud>& point_cloud) {
+
   auto target = point_cloud;
-  for (const auto& reader : readers_) {
-    reader->Observe();
-    if (!reader->Empty()) {
-      auto source = reader->GetLatestObserved();
-      if (conf_.drop_expired_data()) {
-        if (IsExpired(target, source)) {
-          continue;
+  auto fusion_readers = readers_;
+  auto start_time = Time::Now().ToSecond();
+  while ((Time::Now().ToSecond() - start_time) < conf_.wait_time_s()
+      && fusion_readers.size() > 0) {
+    for (auto itr = fusion_readers.begin(); itr != fusion_readers.end();) {
+      (*itr)->Observe();
+      if (!(*itr)->Empty()) {
+        auto source = (*itr)->GetLatestObserved();
+        if (conf_.drop_expired_data() && IsExpired(target, source)) {
+          ++itr;
+        } else {
+          Fusion(target, source);
+          itr = fusion_readers.erase(itr);
         }
+      } else {
+        ++itr;
       }
-      Fusion(target, source);
     }
+    usleep(USLEEP_INTERVAL);
   }
   fusion_writer_->Write(target);
 
@@ -141,7 +152,9 @@ void PriSecFusionComponent::AppendPointCloud(
 bool PriSecFusionComponent::Fusion(std::shared_ptr<PointCloud> target,
                                    std::shared_ptr<PointCloud> source) {
   Eigen::Affine3d pose;
-  if (QueryPoseAffine(target->frame_id(), source->frame_id(), &pose)) {
+  if (QueryPoseAffine(target->header().frame_id(),
+      source->header().frame_id(),
+      &pose)) {
     AppendPointCloud(target, source, pose);
     return true;
   }

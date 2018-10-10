@@ -13,3 +13,5 @@ calibration_online: true
 calibration_file: "/apollo/modules/drivers/velodyne/params/velodyne64_S3_calibration.yaml"
 organized: false
 convert_channel_name: "/apollo/sensor/velodyne64/PointCloud2"
+use_poll_sync: true
+is_main_frame: true
