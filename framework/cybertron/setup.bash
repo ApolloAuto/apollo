@@ -1,9 +1,9 @@
 export CYBERTRON_PATH=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 library_path="${CYBERTRON_PATH}/third_party:${CYBERTRON_PATH}/python"
-binary_path="/apollo/bazel-bin/framework/cybertron"
-tool_path="/apollo/bazel-bin/framework/cybertron/tools"
+binary_path="/apollo/bazel-bin/cybertron"
+tool_path="/apollo/bazel-bin/cybertron/tools"
 launch_path="${CYBERTRON_PATH}/tools/cyber_launch"
-qt_path=${CYBERTRON_PATH}/../third_party/Qt5.5.1/5.5/gcc_64
+qt_path=${CYBERTRON_PATH}/../framework/third_party/Qt5.5.1/5.5/gcc_64
 
 export LD_LIBRARY_PATH=${library_path}:${qt_path}/lib:$LD_LIBRARY_PATH
 export QT_QPA_PLATFORM_PLUGIN_PATH=${qt_path}/plugins
