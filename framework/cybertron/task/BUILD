@@ -10,9 +10,8 @@ cc_library(
     hdrs = glob([
         "*.h",
     ]),
-    copts = ["-Iframework"],
     deps = [
-        "//framework/cybertron/scheduler:scheduler_lib",
+        "//cybertron/scheduler:scheduler_lib",
     ],
 )
 

@@ -11,11 +11,8 @@ cc_library(
         "*.h",
     ]),
     deps = [
-        "//framework/cybertron/common:common_lib",
-        "//framework/cybertron/proto:proto_lib",
-    ],
-    copts = [
-        "-Iframework",
+        "//cybertron/common:common_lib",
+        "//cybertron/proto:proto_lib",
     ],
 )
 

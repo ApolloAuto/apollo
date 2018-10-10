@@ -11,13 +11,10 @@ cc_library(
         "*.h",
     ]),
     deps = [
-          "//framework/cybertron/class_loader:class_loader_lib",
-          "//framework/cybertron/scheduler:scheduler_lib",
-          "//framework/cybertron/node:node_lib",
-          "//framework/cybertron/blocker:blocker_lib",
-    ],
-    copts = [
-        "-Iframework",
+          "//cybertron/class_loader:class_loader_lib",
+          "//cybertron/scheduler:scheduler_lib",
+          "//cybertron/node:node_lib",
+          "//cybertron/blocker:blocker_lib",
     ],
 )
 

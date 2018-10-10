@@ -10,12 +10,9 @@ cc_library(
     hdrs = glob([
         "*.h",
     ]),
-    copts = [
-        "-Iframework",
-    ],
     deps = [
-          "//framework/cybertron/common:common_lib",
-          "//framework/cybertron/proto:proto_lib",
+          "//cybertron/common:common_lib",
+          "//cybertron/proto:proto_lib",
     ],
 )
 

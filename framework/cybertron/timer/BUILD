@@ -10,18 +10,15 @@ cc_library(
     hdrs = glob([
         "*.h",
     ]),
-    copts = [
-        "-Iframework",
-    ],
     deps = [
-          "//framework/cybertron/common:common_lib",
-          "//framework/cybertron/croutine:croutine_lib",
-          "//framework/cybertron/data:data_lib",
-          "//framework/cybertron/event:event_lib",
-          "//framework/cybertron/proto:proto_lib",
-          "//framework/cybertron/scheduler:scheduler_lib",
-          "//framework/cybertron/task:task_lib",
-          "//framework/cybertron/time:time_lib",
+          "//cybertron/common:common_lib",
+          "//cybertron/croutine:croutine_lib",
+          "//cybertron/data:data_lib",
+          "//cybertron/event:event_lib",
+          "//cybertron/proto:proto_lib",
+          "//cybertron/scheduler:scheduler_lib",
+          "//cybertron/task:task_lib",
+          "//cybertron/time:time_lib",
     ],
 )
 

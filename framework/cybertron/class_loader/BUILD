@@ -11,10 +11,7 @@ cc_library(
         "*.h",
     ]),
     deps = [
-          "//framework/cybertron/common:common_lib",
-    ],
-    copts = [
-        "-Iframework",
+          "//cybertron/common:common_lib",
     ],
     linkopts = [
         "-lPocoFoundation",

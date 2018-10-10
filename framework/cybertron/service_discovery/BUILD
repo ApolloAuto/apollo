@@ -12,19 +12,16 @@ cc_library(
         "*.h",
         "**/*.h",
     ]),
-    copts = [
-        "-Iframework",
-    ],
     deps = [
-        "//framework/cybertron:init_lib",
-        "//framework/cybertron/common:common_lib",
-        "//framework/cybertron/proto:proto_lib",
-        "//framework/cybertron/base:base_lib",
-        "//framework/cybertron/message:message_lib",
-        "//framework/cybertron/time:time_lib",
-        "//framework/cybertron/event:event_lib",
-        "//framework/cybertron/transport/rtps:rtps_lib",
-        "//framework/cybertron/transport/qos:qos_lib",
+        "//cybertron:init_lib",
+        "//cybertron/common:common_lib",
+        "//cybertron/proto:proto_lib",
+        "//cybertron/base:base_lib",
+        "//cybertron/message:message_lib",
+        "//cybertron/time:time_lib",
+        "//cybertron/event:event_lib",
+        "//cybertron/transport/rtps:rtps_lib",
+        "//cybertron/transport/qos:qos_lib",
     ],
 )
 

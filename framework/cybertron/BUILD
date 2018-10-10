@@ -2,6 +2,14 @@ load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
+cc_library(
+    name = "cybertron",
+    deps = [
+        "//cybertron:cybertron_core",
+    ],
+    linkstatic = False,
+)
+
 cc_binary(
     name = "mainboard",
     srcs = glob([
@@ -12,7 +20,7 @@ cc_binary(
         ":cybertron_core",
     ],
     copts = [
-        "-Iframework",
+        "-pthread",
     ],
     linkstatic = False,
 )
@@ -36,9 +44,6 @@ cc_library(
     hdrs = glob([
             "*.h",
     ]),
-    copts = [
-        "-Iframework",
-    ],
 )
 
 cc_library(
@@ -47,25 +52,22 @@ cc_library(
             "*.cpp",
     ]),
     deps = [
-          "//framework/cybertron/blocker:blocker_lib",
-          "//framework/cybertron/common:common_lib",
-          "//framework/cybertron/component:component_lib",
-          "//framework/cybertron/class_loader:class_loader_lib",
-          "//framework/cybertron/croutine:croutine_lib",
-          "//framework/cybertron/event:event_lib",
-          "//framework/cybertron:init_lib",
-          "//framework/cybertron/logger:logger_lib",
-          "//framework/cybertron/node:node_lib",
-          "//framework/cybertron/proto:proto_lib",
-          "//framework/cybertron/parameter:parameter_lib",
-          "//framework/cybertron/record:record_lib",
-          "//framework/cybertron/scheduler:scheduler_lib",
-          "//framework/cybertron/task:task_lib",
+          "//cybertron/blocker:blocker_lib",
+          "//cybertron/common:common_lib",
+          "//cybertron/component:component_lib",
+          "//cybertron/class_loader:class_loader_lib",
+          "//cybertron/croutine:croutine_lib",
+          "//cybertron/event:event_lib",
+          "//cybertron:init_lib",
+          "//cybertron/logger:logger_lib",
+          "//cybertron/node:node_lib",
+          "//cybertron/proto:proto_lib",
+          "//cybertron/parameter:parameter_lib",
+          "//cybertron/record:record_lib",
+          "//cybertron/scheduler:scheduler_lib",
+          "//cybertron/task:task_lib",
           "//third_party/tf2:tf2",
           "@fastrtps",
-    ],
-    copts = [
-        "-Iframework",
     ],
     linkopts = [
         "-luuid",
