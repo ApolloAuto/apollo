@@ -87,6 +87,13 @@ ErrorCode LexusController::Init(
     return ErrorCode::CANBUS_ERROR;
   }
 
+  turn_cmd_130_ = dynamic_cast<Turncmd130*>(
+      message_manager_->GetMutableProtocolDataById(Turncmd130::ID));
+  if (turn_cmd_130_ == nullptr) {
+    AERROR << "Turncmd130 does not exist in the LexusMessageManager!";
+    return ErrorCode::CANBUS_ERROR;
+  }
+
   steering_cmd_12c_ = dynamic_cast<Steeringcmd12c*>(
       message_manager_->GetMutableProtocolDataById(Steeringcmd12c::ID));
   if (steering_cmd_12c_ == nullptr) {
@@ -98,6 +105,7 @@ ErrorCode LexusController::Init(
   can_sender_->AddMessage(Brakecmd104::ID, brake_cmd_104_, false);
   can_sender_->AddMessage(Shiftcmd128::ID, shift_cmd_128_, false);
   can_sender_->AddMessage(Steeringcmd12c::ID, steering_cmd_12c_, false);
+  can_sender_->AddMessage(Turncmd130::ID, turn_cmd_130_, false);
 
   // need sleep to ensure all messages received
   AINFO << "LexusController is initialized.";
@@ -244,15 +252,16 @@ Chassis LexusController::chassis() {
   }
 
   // 16, 17
-  /*
-  if (chassis_detail.has_light() &&
-      chassis_detail.light().has_turn_light_type() &&
-      chassis_detail.light().turn_light_type() != Light::TURN_LIGHT_OFF) {
-    if (chassis_detail.light().turn_light_type() == Light::TURN_LEFT_ON) {
+  if (chassis_detail.lexus().has_turn_rpt_230() &&
+      chassis_detail.lexus().turn_rpt_230().has_output_value() &&
+      chassis_detail.lexus().turn_rpt_230().output_value() !=
+          Turn_rpt_230::OUTPUT_VALUE_NONE) {
+    if (chassis_detail.lexus().turn_rpt_230().output_value() ==
+        Turn_rpt_230::OUTPUT_VALUE_LEFT) {
       chassis_.mutable_signal()->set_turn_signal(
           common::VehicleSignal::TURN_LEFT);
-    } else if (chassis_detail.light().turn_light_type() ==
-               Light::TURN_RIGHT_ON) {
+    } else if (chassis_detail.lexus().turn_rpt_230().output_value() ==
+               Turn_rpt_230::OUTPUT_VALUE_RIGHT) {
       chassis_.mutable_signal()->set_turn_signal(
           common::VehicleSignal::TURN_RIGHT);
     } else {
@@ -263,8 +272,6 @@ Chassis LexusController::chassis() {
     chassis_.mutable_signal()->set_turn_signal(
         common::VehicleSignal::TURN_NONE);
   }
-
-  */
 
   // TODO(all): implement the rest here/
   // 26
