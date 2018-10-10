@@ -43,21 +43,27 @@ from cybertron import cybertron
 from cybertron import record
 from modules.data.proto import frame_pb2
 from modules.drivers.proto.pointcloud_pb2 import PointCloud
+from modules.localization.proto.localization_pb2 import LocalizationEstimate
 
 # Requried flags.
 gflags.DEFINE_string('input_file', None, 'Input record file path.')
 
 # Optional flags.
 gflags.DEFINE_string('output_path', './', 'Output folder path.')
+gflags.DEFINE_integer('maximum_frame_count', 50, 'Maximum frame count.')
 
 # Stable flags which rarely change.
 gflags.DEFINE_string('pointcloud_channel', 
                      '/apollo/sensor/velodyne64/compensator/PointCloud2',
-                     'pointcloud channel.')
-
-# Maximum frame count that needs to be populated
-gflags.DEFINE_integer('maximum_frame_count', 50, 'Maximum frame count.')
-
+                     'point cloud channel.')
+gflags.DEFINE_string('pose_channel', 
+                     '/apollo/localization/pose',
+                     'point cloud channel.')
+gflags.DEFINE_string('pointcloud_yaml',
+                     'apollo/modules/calibration/data/'\
+                     'mkz_example/velodyne_params/'\
+                     'velodyne64_novatel_extrinsics_example.yaml',
+                     'YAML settings for point cloud')
 
 class FramePopulator:
     """Extract sensors data from record file, and populate to JSON."""
@@ -66,21 +72,56 @@ class FramePopulator:
         self._current_frame_id = 0 
         self._current_frame = None
         self._frame_count = 0
+        self._current_pose = frame_pb2.GPSPose() 
         self._channel_function_map = {
             args.pointcloud_channel: self.parse_protobuf_pointcloud,
+            args.pose_channel: self.parse_protobuf_pose,
         }
 
-    def load_yaml_settings(self):
+    def load_yaml_settings(self, yaml_file_name):
         """Load settings from YAML config file."""
-        # TODO: LOAD YAML FILE AND GET ITS SETTINGS HERE
+        yaml_file = open(yaml_file_name)
+        return yaml.safe_load(yaml_file)
+
+    def set_pointcloud_constants(self):
+        """Prepare pointcloud constant settings."""
+        yaml_file_name = os.path.join(apollo_root, self._args.pointcloud_yaml)
+        transform_stamped = self.load_yaml_settings(yaml_file_name)
+        self._current_frame.device_position.x = \
+            transform_stamped['transform']['translation']['x']
+        self._current_frame.device_position.y = \
+            transform_stamped['transform']['translation']['y']
+        self._current_frame.device_position.z = \
+            transform_stamped['transform']['translation']['z']
+        self._current_frame.device_heading.x = \
+            transform_stamped['transform']['rotation']['x']
+        self._current_frame.device_heading.y = \
+            transform_stamped['transform']['rotation']['y']
+        self._current_frame.device_heading.z = \
+            transform_stamped['transform']['rotation']['z']
+        self._current_frame.device_heading.w = \
+            transform_stamped['transform']['rotation']['w']
+    
+    def set_cameraimage_constants(self):
+        """Prepare cameraimage constant settings."""
+        # TODO: pending, leave a placeholder for now
         return
+
+    def construct_final_frame(self):
+        """Construct the current frame to make it ready for dumping."""
+        self.set_pointcloud_constants()
+        self.set_cameraimage_constants()
+        self._current_frame.device_gps_pose.CopyFrom(self._current_pose)
+        self._current_frame.timestamp = self._current_frame_id / 1e9
 
     def dump_to_json_file(self):
         """Dump the frame content to JSON file."""
+        # Construct the final frame before dumping
+        self.construct_final_frame()
         self._frame_count = self._frame_count + 1
         file_name = os.path.join(self._args.output_path, 
             'frame-{}.json'.format(self._frame_count))
-        jsonObj = MessageToJson(self._current_frame)
+        jsonObj = MessageToJson(self._current_frame, False, True)
         with open(file_name, 'w') as outfile:
            outfile.write(jsonObj)
 
@@ -91,7 +132,6 @@ class FramePopulator:
                 self._current_frame_id, frame_id))
             if self._current_frame != None:
                 glog.info('#dumping frame {}'.format(self._current_frame_id))
-                self.load_yaml_settings()
                 self.dump_to_json_file()
             self._current_frame = frame_pb2.Frame()
             self._current_frame_id = frame_id
@@ -106,7 +146,7 @@ class FramePopulator:
         point_cloud = PointCloud()
         point_cloud.ParseFromString(message)
 
-        # Use timestamp to disguish frames
+        # Use timestamp to distinguish frames
         # Convert double type of timestamp to 64bit integer
         frame_id = point_cloud.header.timestamp_sec * 1e9
         self.check_frame(frame_id)
@@ -117,6 +157,14 @@ class FramePopulator:
             vector4.y = pointxyzi.y
             vector4.z = pointxyzi.z
             vector4.i = pointxyzi.intensity
+    
+    def parse_protobuf_pose(self, message, timestamp):
+        """Process Pose message."""
+        localization = LocalizationEstimate()
+        localization.ParseFromString(message)
+        self._current_pose.lat = localization.pose.position.x
+        self._current_pose.lon = localization.pose.position.y
+        self._current_pose.bearing = localization.pose.orientation.qw
 
     def process_record_file(self):
         """Read record file and extract the message with specified channels"""
