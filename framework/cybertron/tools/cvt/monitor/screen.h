@@ -46,6 +46,7 @@ class Screen final {
   void Init(void);
   void Run(void);
   void Resize();
+  void Stop(void){ canRun_ = false; }
 
   int Width(void) const;
   int Height(void) const;
@@ -66,7 +67,7 @@ class Screen final {
   }
 
  private:
-  Screen(void);
+  explicit Screen();
   Screen(const Screen&) = delete;
   Screen& operator=(const Screen&) = delete;
 
@@ -78,8 +79,10 @@ class Screen final {
 
   bool IsInit(void) const;
 
-  mutable ColorPair current_color_pair_;
   enum class State { RenderMessage, RenderInterCmdInfo };
+
+  mutable ColorPair current_color_pair_;
+  bool canRun_;
   State current_state_;
   int highlight_direction_;
   RenderableMessage* current_render_obj_;

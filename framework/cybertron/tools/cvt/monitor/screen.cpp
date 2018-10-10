@@ -14,10 +14,10 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "./screen.h"
-#include "./cybertron_channel_message.h"
-#include "./cybertron_topology_message.h"
-#include "./renderable_message.h"
+#include "screen.h"
+#include "cybertron_channel_message.h"
+#include "cybertron_topology_message.h"
+#include "renderable_message.h"
 
 #include <ncurses.h>
 #include <unistd.h>
@@ -27,7 +27,6 @@
 #include <mutex>
 #include <string>
 #include <thread>
-#include <utility>
 
 Screen* Screen::Instance(void) {
   static Screen s;
@@ -71,6 +70,7 @@ const char Screen::InteractiveCmdStr[] =
 
 Screen::Screen()
     : current_color_pair_(INVALID),
+      canRun_(false),
       current_state_(State::RenderMessage),
       highlight_direction_(0),
       current_render_obj_(nullptr) {}
@@ -103,6 +103,8 @@ void Screen::Init(void) {
 
   refresh();
   clear();
+
+  canRun_ = true;
 
   return;
 }
@@ -187,7 +189,7 @@ int Screen::SwitchState(int ch) {
         clear();
       }
       break;
-    default: {}
+    default:;
   }
   return ch;
 }
@@ -205,14 +207,14 @@ void Screen::Run() {
   do {
     int ch = getch();
 
-    if (ch == 'q' || ch == 'Q' || ch == 27) break;
+    if (ch == 'q' || ch == 'Q' || ch == 27){ canRun_ = false; break; }
 
     ch = SwitchState(ch);
 
     (this->*showFuncs[static_cast<int>(current_state_)])(ch);
     std::this_thread::sleep_for(std::chrono::milliseconds(
         static_cast<int>(1000.0 / (ChannelMessage::max_frame_ratio() + 10.0))));
-  } while (true);
+  } while (canRun_);
 }
 
 void Screen::Resize(void) {
