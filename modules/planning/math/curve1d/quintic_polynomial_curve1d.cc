@@ -86,6 +86,24 @@ double QuinticPolynomialCurve1d::Evaluate(const uint32_t order,
   }
 }
 
+void QuinticPolynomialCurve1d::SetParam(const double x0, const double dx0,
+                                        const double ddx0, const double x1,
+                                        const double dx1, const double ddx1,
+                                        const double param) {
+  ComputeCoefficients(x0, dx0, ddx0, x1, dx1, ddx1, param);
+  param_ = param;
+}
+
+void QuinticPolynomialCurve1d::IntegratedFromQuarticCurve(
+    const PolynomialCurve1d& other, const double init_value) {
+  CHECK_EQ(other.Order(), 4);
+  param_ = other.ParamLength();
+  coef_[0] = init_value;
+  for (std::size_t i = 0; i < 5; ++i) {
+    coef_[i + 1] = other.Coef(i) / (i + 1);
+  }
+}
+
 void QuinticPolynomialCurve1d::ComputeCoefficients(
     const double x0, const double dx0, const double ddx0, const double x1,
     const double dx1, const double ddx1, const double p) {
@@ -114,5 +132,9 @@ std::string QuinticPolynomialCurve1d::ToString() const {
       apollo::common::util::PrintIter(coef_, "\t"), param_, "\n");
 }
 
+double QuinticPolynomialCurve1d::Coef(const std::size_t order) const {
+  CHECK_GT(6, order);
+  return coef_[order];
+}
 }  // namespace planning
 }  // namespace apollo

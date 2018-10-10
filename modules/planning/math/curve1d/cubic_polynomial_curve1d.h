@@ -45,10 +45,16 @@ class CubicPolynomialCurve1d : public PolynomialCurve1d {
   CubicPolynomialCurve1d(const double x0, const double dx0, const double ddx0,
                          const double x1, const double param);
 
+  void DerivedFromQuarticCurve(const PolynomialCurve1d& other);
+
   double Evaluate(const std::uint32_t order, const double p) const override;
 
-  double ParamLength() const { return param_; }
+  double ParamLength() const override { return param_; }
   std::string ToString() const override;
+
+  double Coef(const std::size_t order) const override;
+
+  std::size_t Order() const override { return 3; }
 
  private:
   void ComputeCoefficients(const double x0, const double dx0, const double ddx0,

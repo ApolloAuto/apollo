@@ -43,6 +43,15 @@ CubicPolynomialCurve1d::CubicPolynomialCurve1d(const double x0,
   end_condition_ = x1;
 }
 
+void CubicPolynomialCurve1d::DerivedFromQuarticCurve(
+    const PolynomialCurve1d& other) {
+  CHECK_EQ(other.Order(), 4);
+  param_ = other.ParamLength();
+  for (std::size_t i = 1; i < 5; ++i) {
+    coef_[i - 1] = other.Coef(i) * i;
+  }
+}
+
 double CubicPolynomialCurve1d::Evaluate(const std::uint32_t order,
                                         const double p) const {
   switch (order) {
@@ -80,6 +89,11 @@ void CubicPolynomialCurve1d::ComputeCoefficients(const double x0,
   coef_[1] = dx0;
   coef_[2] = 0.5 * ddx0;
   coef_[3] = (x1 - x0 - dx0 * param - coef_[2] * p2) / p3;
+}
+
+double CubicPolynomialCurve1d::Coef(const std::size_t order) const {
+  CHECK_GT(4, order);
+  return coef_[order];
 }
 
 }  // namespace planning

@@ -42,6 +42,8 @@ cc_test(
     ],
     deps = [
         ":quartic_polynomial_curve1d",
+        ":quintic_polynomial_curve1d",
+        ":cubic_polynomial_curve1d",
         "@gtest//:main",
     ],
 )
@@ -72,6 +74,7 @@ cc_library(
     deps = [
         ":polynomial_curve1d",
         "//cybertron",
+        ":quartic_polynomial_curve1d",
         "//modules/common/util:string_util",
     ],
 )
@@ -84,6 +87,7 @@ cc_test(
     ],
     deps = [
         ":cubic_polynomial_curve1d",
+        ":quartic_polynomial_curve1d",
         "@gtest//:main",
     ],
 )
@@ -128,6 +132,7 @@ cc_test(
     ],
     deps = [
         ":quintic_polynomial_curve1d",
+        ":quartic_polynomial_curve1d",
         "@gtest//:main",
     ],
 )

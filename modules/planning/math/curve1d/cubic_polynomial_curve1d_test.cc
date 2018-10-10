@@ -19,13 +19,14 @@
  **/
 
 #include "modules/planning/math/curve1d/cubic_polynomial_curve1d.h"
+#include "modules/planning/math/curve1d/quartic_polynomial_curve1d.h"
 
 #include "gtest/gtest.h"
 
 namespace apollo {
 namespace planning {
 
-TEST(CubicPolynomialCurve1d, Evaluate) {
+TEST(CubicPolynomialCurve1dTest, Evaluate) {
   {
     double x0 = 0.0;
     double dx0 = 0.0;
@@ -68,5 +69,21 @@ TEST(CubicPolynomialCurve1d, Evaluate) {
   }
 }
 
+TEST(CubicPolynomialCurve1dTest, derived_from_quartic_curve) {
+  QuarticPolynomialCurve1d quartic_curve(0., 0., 0.5, 1., 1., 2.);
+  CubicPolynomialCurve1d cubic_curve;
+  cubic_curve.DerivedFromQuarticCurve(quartic_curve);
+
+  for (double value = 0; value < 2.1; value += 0.1) {
+    EXPECT_NEAR(quartic_curve.Evaluate(1, value),
+                cubic_curve.Evaluate(0, value), 1e-8);
+    EXPECT_NEAR(quartic_curve.Evaluate(2, value),
+                cubic_curve.Evaluate(1, value), 1e-8);
+    EXPECT_NEAR(quartic_curve.Evaluate(3, value),
+                cubic_curve.Evaluate(2, value), 1e-8);
+    EXPECT_NEAR(quartic_curve.Evaluate(4, value),
+                cubic_curve.Evaluate(3, value), 1e-8);
+  }
+}
 }  // namespace planning
 }  // namespace apollo
