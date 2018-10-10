@@ -503,10 +503,12 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
     std::size_t nz_index = 0;
     std::size_t constraint_index = 0;
     std::size_t state_index = state_start_index_;
+    std::size_t control_index = control_start_index_;
+    std::size_t time_index = time_start_index_;
 
-    // 1. State Constraint with respect to state 4 * [0, horizons-1]
-    for (std::size_t i = 0; i < horizon_ + 1; ++i) {
-      // x'
+    // 1. State Constraint with respect to variables
+    for (std::size_t i = 0; i < horizon_; ++i) {
+      // g(0)' with respect to x0 ~ x7
       iRow[nz_index] = state_index;
       jCol[nz_index] = state_index;
       ++nz_index;
@@ -519,7 +521,25 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
       jCol[nz_index] = state_index + 3;
       ++nz_index;
 
-      // y'
+      iRow[nz_index] = state_index;
+      jCol[nz_index] = state_index + 4;
+      ++nz_index;
+
+      // g(0)' with respect to u0 ~ u1'
+      iRow[nz_index] = state_index;
+      jCol[nz_index] = control_index;
+      ++nz_index;
+
+      iRow[nz_index] = state_index;
+      jCol[nz_index] = control_index + 1;
+      ++nz_index;
+
+      // g(0)' with respect to time
+      iRow[nz_index] = state_index;
+      jCol[nz_index] = time_index;
+      ++nz_index;
+
+      // g(1)' with respect to x0 ~ x7
       iRow[nz_index] = state_index + 1;
       jCol[nz_index] = state_index + 1;
       ++nz_index;
@@ -532,7 +552,25 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
       jCol[nz_index] = state_index + 3;
       ++nz_index;
 
-      // theta'
+      iRow[nz_index] = state_index + 1;
+      jCol[nz_index] = state_index + 5;
+      ++nz_index;
+
+      // g(1)' with respect to u0 ~ u1'
+      iRow[nz_index] = state_index + 1;
+      jCol[nz_index] = control_index;
+      ++nz_index;
+
+      iRow[nz_index] = state_index + 1;
+      jCol[nz_index] = control_index + 1;
+      ++nz_index;
+
+      // g(1)' with respect to time
+      iRow[nz_index] = state_index + 1;
+      jCol[nz_index] = time_index;
+      ++nz_index;
+
+      // g(2)' with respect to x0 ~ x7
       iRow[nz_index] = state_index + 2;
       jCol[nz_index] = state_index + 2;
       ++nz_index;
@@ -541,55 +579,36 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
       jCol[nz_index] = state_index + 3;
       ++nz_index;
 
-      // v'
+      iRow[nz_index] = state_index + 2;
+      jCol[nz_index] = state_index + 6;
+      ++nz_index;
+
+      // g(2)' with respect to u0 ~ u1'
+      iRow[nz_index] = state_index + 2;
+      jCol[nz_index] = control_index;
+      ++nz_index;
+
+      iRow[nz_index] = state_index + 2;
+      jCol[nz_index] = control_index + 1;
+      ++nz_index;
+
+      // g(2)' with respect to time
+      iRow[nz_index] = state_index + 2;
+      jCol[nz_index] = time_index;
+      ++nz_index;
+
+      // g(3)'  with x0 ~ x7
       iRow[nz_index] = state_index + 3;
       jCol[nz_index] = state_index + 3;
       ++nz_index;
 
-      state_index += 4;
-    }
-
-    // 2. State Constraint with respect to control 2 * [0, horizons-1]
-    state_index = state_start_index_;
-    for (std::size_t i = 0; i < horizon_ + 1; ++i) {
-      // x'
-      iRow[nz_index] = state_index;
-      jCol[nz_index] = state_index;
-      ++nz_index;
-
-      iRow[nz_index] = state_index;
-      jCol[nz_index] = state_index + 2;
-      ++nz_index;
-
-      iRow[nz_index] = state_index;
-      jCol[nz_index] = state_index + 3;
-      ++nz_index;
-
-      // y'
-      iRow[nz_index] = state_index + 1;
-      jCol[nz_index] = state_index + 1;
-      ++nz_index;
-
-      iRow[nz_index] = state_index + 1;
-      jCol[nz_index] = state_index + 2;
-      ++nz_index;
-
-      iRow[nz_index] = state_index + 1;
-      jCol[nz_index] = state_index + 3;
-      ++nz_index;
-
-      // theta'
-      iRow[nz_index] = state_index + 2;
-      jCol[nz_index] = state_index + 2;
-      ++nz_index;
-
-      iRow[nz_index] = state_index + 2;
-      jCol[nz_index] = state_index + 3;
-      ++nz_index;
-
-      // v'
       iRow[nz_index] = state_index + 3;
-      jCol[nz_index] = state_index + 3;
+      jCol[nz_index] = state_index + 7;
+      ++nz_index;
+
+      // g(3)' with respect to time
+      iRow[nz_index] = state_index + 2;
+      jCol[nz_index] = time_index;
       ++nz_index;
 
       state_index += 4;
@@ -635,6 +654,49 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
                             std::tan(x[control_index] / wheelbase_)));  // b
       ++nz_index;
 
+      values[nz_index] = 1.0;
+      ++nz_index;
+
+      values[nz_index] =
+          x[time_index] * ts_ *
+          (x[state_index] + x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
+          std::sin(x[state_index + 2] +
+                   x[time_index] * ts_ * 0.5 * x[state_index + 3] *
+                       std::tan(x[control_index] / wheelbase_)) *
+          x[time_index] * ts_ * 0.5 * wheelbase_ /
+          (std::cos(x[control_index] / wheelbase_) *
+           std::cos(x[control_index] / wheelbase_));  // c
+      ++nz_index;
+
+      values[nz_index] =
+          -1.0 * (x[time_index] * ts_ * x[time_index] * ts_ * 0.5 *
+                  std::cos(x[state_index + 2] +
+                           x[time_index] * ts_ * 0.5 * x[state_index + 3] *
+                               std::tan(x[control_index] / wheelbase_)));  // d
+      ++nz_index;
+
+      values[nz_index] =
+          -1.0 *
+          (ts_ *
+               (x[state_index + 3] +
+                x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
+               std::cos(x[state_index + 2] +
+                        x[time_index] * ts_ * 0.5 * x[state_index + 3] *
+                            std::tan(x[control_index] / wheelbase_)) +
+           x[time_index] * ts_ * ts_ * 0.5 * x[control_index + 1] *
+               std::cos(x[state_index + 2] +
+                        x[time_index] * ts_ * 0.5 * x[state_index + 3] *
+                            std::tan(x[control_index] / wheelbase_)) -
+           x[time_index] * ts_ *
+               (x[state_index + 3] +
+                x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
+               x[state_index + 3] * ts_ * 0.5 *
+               std::tan(x[control_index] / wheelbase_) *
+               std::sin(x[state_index + 2] +
+                        x[time_index] * ts_ * 0.5 * x[state_index + 3] *
+                            std::tan(x[control_index] / wheelbase_)));  // e
+      ++nz_index;
+
       values[nz_index] = -1.0;
       ++nz_index;
 
@@ -661,13 +723,89 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
                             std::tan(x[control_index] / wheelbase_)));  // g
       ++nz_index;
 
+      values[nz_index] = 1.0;
+      ++nz_index;
+
+      values[nz_index] =
+          -1.0 *
+          (x[time_index] * ts_ *
+           (x[state_index] + x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
+           std::cos(x[state_index + 2] +
+                    x[time_index] * ts_ * 0.5 * x[state_index + 3] *
+                        std::tan(x[control_index] / wheelbase_)) *
+           x[time_index] * ts_ * 0.5 * wheelbase_ /
+           (std::cos(x[control_index] / wheelbase_) *
+            std::cos(x[control_index] / wheelbase_)));  // h
+      ++nz_index;
+
+      values[nz_index] =
+          -1.0 * (x[time_index] * ts_ * x[time_index] * ts_ * 0.5 *
+                  std::sin(x[state_index + 2] +
+                           x[time_index] * ts_ * 0.5 * x[state_index + 3] *
+                               std::tan(x[control_index] / wheelbase_)));  // i
+      ++nz_index;
+
+      values[nz_index] =
+          -1.0 *
+          (ts_ *
+               (x[state_index + 3] +
+                x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
+               std::cos(x[state_index + 2] +
+                        x[time_index] * ts_ * 0.5 * x[state_index + 3] *
+                            std::tan(x[control_index] / wheelbase_)) +
+           x[time_index] * ts_ * ts_ * 0.5 * x[control_index + 1] *
+               std::cos(x[state_index + 2] +
+                        x[time_index] * ts_ * 0.5 * x[state_index + 3] *
+                            std::tan(x[control_index] / wheelbase_)) +
+           x[time_index] * ts_ *
+               (x[state_index + 3] +
+                x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
+               x[state_index + 3] * ts_ * 0.5 *
+               std::tan(x[control_index] / wheelbase_) *
+               std::cos(x[state_index + 2] +
+                        x[time_index] * ts_ * 0.5 * x[state_index + 3] *
+                            std::tan(x[control_index] / wheelbase_)));  // j
+      ++nz_index;
+
       values[nz_index] = -1.0;
       ++nz_index;
 
       values[nz_index] = -1.0 * x[time_index] * ts_;  // k.
       ++nz_index;
 
+      values[nz_index] = 1.0;
+      ++nz_index;
+
+      values[nz_index] =
+          -1.0 * (x[time_index] * ts_ *
+                  (x[state_index + 3] +
+                   x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
+                  wheelbase_ /
+                  (std::cos(x[control_index] / wheelbase_) *
+                   std::cos(x[control_index] / wheelbase_)));  // l.
+      ++nz_index;
+
+      values[nz_index] = 1.0;
+      ++nz_index;
+
+      values[nz_index] =
+          -1.0 * (x[time_index] * ts_ * x[time_index] * ts_ *
+                  std::tan(x[control_index] / wheelbase_));  // m.
+      ++nz_index;
+
+      values[nz_index] =
+          -1.0 * (ts_ *
+                      (x[state_index + 3] +
+                       x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
+                      std::tan(x[control_index] / wheelbase_) +
+                  x[time_index] * ts_ * ts_ * 0.5 * x[control_index + 1] *
+                      std::tan(x[control_index] / wheelbase_));  // n.
+      ++nz_index;
+
       values[nz_index] = -1.0;
+      ++nz_index;
+
+      values[nz_index] = -1.0 * ts_ * x[control_index + 1];  // p.
       ++nz_index;
 
       state_index += 4;
