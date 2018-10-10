@@ -31,7 +31,7 @@ using apollo::common::math::DenseToCSCMatrix;
 bool OsqpLateralLinearQPOptimizer::optimize(
     const std::array<double, 3>& d_state, const double delta_s,
     const std::vector<std::pair<double, double>>& d_bounds) {
-  AERROR << "d_state: " << d_state[0] << ", " << d_state[1] << ", "
+  ADEBUG << "d_state: " << d_state[0] << ", " << d_state[1] << ", "
          << d_state[2];
 
   // clean up old results
