@@ -17,8 +17,8 @@
 #ifndef TOOLS_CVT_MONITOR_GENERAL_MESSAGE_H_
 #define TOOLS_CVT_MONITOR_GENERAL_MESSAGE_H_
 
-#include <cybertron/cybertron.h>
-#include <cybertron/message/raw_message.h>
+#include "cybertron/cybertron.h"
+#include "cybertron/message/raw_message.h"
 #include "general_message_base.h"
 
 class Screen;

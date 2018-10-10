@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include <cybertron/cybertron.h>
+#include "cybertron/cybertron.h"
 
 #include <QThread>
 #include <functional>
