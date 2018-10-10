@@ -30,7 +30,7 @@ TEST(RadarTrackTest, radar_track_test) {
   bool use_filter = false;
   RadarTrack::SetUseFilter(use_filter);
 
-  base::ObjectPtr object(new base::Object);
+  base::ObjectPtr object = std::make_shared<base::Object>();
   object->track_id = 100;
   object->center << 10.0, 20.0, 0.0;
   object->velocity << 3.0, 4.0, 0.0;

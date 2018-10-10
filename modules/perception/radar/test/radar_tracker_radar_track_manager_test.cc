@@ -34,7 +34,7 @@ TEST(RadarTrackManagerTest, radar_track_manager_test) {
   RadarTrackManager* manager = new RadarTrackManager();
   EXPECT_NE(manager, nullptr);
   manager->AddTrack(radar_track);
-  auto& radar_tracks = manager->GetTracks();
+  auto& radar_tracks = manager->mutable_tracks();
   EXPECT_EQ(radar_tracks.size(), 1);
   manager->AddTrack(radar_track2);
   manager->RemoveLostTracks();

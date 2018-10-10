@@ -13,12 +13,15 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 *****************************************************************************/
-#ifndef RADAR_LIB_INTERFACE_BASE_MATCHER_H_
-#define RADAR_LIB_INTERFACE_BASE_MATCHER_H_
-#include <gtest/gtest_prod.h>
+#pragma once
+
 #include <string>
 #include <utility>
 #include <vector>
+#include <gtest/gtest_prod.h>
+
+#include "cybertron/common/macros.h"
+
 #include "modules/perception/base/frame.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lib/registerer/registerer.h"
@@ -76,8 +79,7 @@ class BaseMatcher {
   FRIEND_TEST(BaseMatcherTest, base_matcher_test);
 
  private:
-  BaseMatcher(const BaseMatcher &) = delete;
-  BaseMatcher &operator=(const BaseMatcher &) = delete;
+  DISALLOW_COPY_AND_ASSIGN(BaseMatcher);
 };
 
 PERCEPTION_REGISTER_REGISTERER(BaseMatcher);
@@ -87,4 +89,3 @@ PERCEPTION_REGISTER_REGISTERER(BaseMatcher);
 }  // namespace radar
 }  // namespace perception
 }  // namespace apollo
-#endif  // RADAR_LIB_INTERFACE_BASE_MATCHER_H_

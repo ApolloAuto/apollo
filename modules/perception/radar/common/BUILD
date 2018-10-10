@@ -21,8 +21,6 @@ cc_library(
     hdrs = [
         "types.h",
     ],
-    deps = [
-    ],
 )
 
 cpplint()

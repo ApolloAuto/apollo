@@ -21,9 +21,9 @@ namespace perception {
 namespace radar {
 
 TEST(ContiArsDetector, detect) {
-  ContiRadar corrected_obstacles;
+  drivers::ContiRadar corrected_obstacles;
   corrected_obstacles.mutable_header()->set_timestamp_sec(151237772.355345434);
-  ContiRadarObs* conti_obs = corrected_obstacles.add_contiobs();
+  drivers::ContiRadarObs* conti_obs = corrected_obstacles.add_contiobs();
   conti_obs->set_clusterortrack(0);
   conti_obs->set_obstacle_id(80);
   conti_obs->set_longitude_dist(20);
@@ -129,8 +129,7 @@ TEST(ContiArsDetector, detect) {
   EXPECT_EQ(radar_object->type, base::ObjectType::UNKNOWN);
 
   base::FramePtr radar_frame7(new base::Frame);
-  corrected_obstacles.mutable_contiobs(0)->set_obstacle_class(
-                                           CONTI_TYPE_UNKNOWN);
+  corrected_obstacles.mutable_contiobs(0)->set_obstacle_class(CONTI_TYPE_UNKNOWN);
   detector.Detect(corrected_obstacles, options, radar_frame7);
   radar_object = radar_frame7->objects.front();
   EXPECT_EQ(radar_object->type, base::ObjectType::UNKNOWN);

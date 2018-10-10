@@ -13,9 +13,6 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 *****************************************************************************/
-#ifndef RADAR_LIB_INTERFACE_BASE_ROI_FILTER_H_
-#define RADAR_LIB_INTERFACE_BASE_ROI_FILTER_H_
-
 // SAMPLE CODE:
 //
 // class DefaultRoiFilter : public BaseRoiFilter {
@@ -50,12 +47,18 @@
 //    BaseRoiFilterRegisterer::GetInstanceByName("DefaultRoiFilter");
 // using roi_filter to do somethings.
 // ////////////////////////////////////////////////////
+//
+#pragma once
 
 #include <string>
 #include <vector>
+
 #include "Eigen/Core"
-#include "modules/perception/base/frame.h"
+
+#include "cybertron/common/macros.h"
 #include "cybertron/common/log.h"
+
+#include "modules/perception/base/frame.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lib/registerer/registerer.h"
 #include "modules/perception/common/geometry/roi_filter.h"
@@ -85,8 +88,7 @@ class BaseRoiFilter {
   virtual std::string Name() const = 0;
 
  private:
-  BaseRoiFilter(const BaseRoiFilter&) = delete;
-  BaseRoiFilter& operator=(const BaseRoiFilter&) = delete;
+  DISALLOW_COPY_AND_ASSIGN(BaseRoiFilter);
 };
 
 PERCEPTION_REGISTER_REGISTERER(BaseRoiFilter);
@@ -96,5 +98,3 @@ PERCEPTION_REGISTER_REGISTERER(BaseRoiFilter);
 }  // namespace radar
 }  // namespace perception
 }  // namespace apollo
-
-#endif  // RADAR_LIB_INTERFACE_BASE_ROI_FILTER_H_

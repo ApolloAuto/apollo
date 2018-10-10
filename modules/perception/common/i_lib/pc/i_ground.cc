@@ -886,7 +886,7 @@ int PlaneFitGroundDetector::FitGridWithNeighbors(
     }
   }
 
-  for (i = 0; i < neighbors.size(); ++i) {
+  for (size_t i = 0; i < neighbors.size(); ++i) {
     r_n = neighbors[i].first;
     c_n = neighbors[i].second;
     if (ground_planes_[r_n][c_n].IsValid()) {
@@ -1233,8 +1233,8 @@ bool PlaneFitGroundDetector::Detect(const float *point_cloud,
   if (!vg_coarse_->SetS(point_cloud, nr_points, nr_point_elements)) {
     return false;
   }
-  int nr_candis = 0;
-  int nr_valid_grid = 0;
+  //int nr_candis = 0;
+  //int nr_valid_grid = 0;
   unsigned int r = 0;
   unsigned int c = 0;
   // Filter to generate plane fitting candidates

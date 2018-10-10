@@ -13,11 +13,13 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 *****************************************************************************/
-#ifndef RADAR_LIB_TRACKER_COMMON_RADAR_TRACK_MANAGER_H_
-#define RADAR_LIB_TRACKER_COMMON_RADAR_TRACK_MANAGER_H_
+#pragma once
 
 #include <utility>
 #include <vector>
+
+#include "cybertron/common/macros.h"
+
 #include "modules/perception/base/frame.h"
 #include "modules/perception/radar/lib/tracker/common/radar_track.h"
 
@@ -29,23 +31,21 @@ class RadarTrackManager {
  public:
   RadarTrackManager() = default;
   ~RadarTrackManager() = default;
-  inline std::vector<RadarTrackPtr> &GetTracks() { return tracks_; }
 
+  inline std::vector<RadarTrackPtr> &mutable_tracks() { return tracks_; }
   inline const std::vector<RadarTrackPtr> &GetTracks() const { return tracks_; }
 
   void AddTrack(const RadarTrackPtr &track) { tracks_.push_back(track); }
   int RemoveLostTracks();
   void ClearTracks();
 
- private:
-  RadarTrackManager &operator=(const RadarTrackManager &) = delete;
-
  protected:
   std::vector<RadarTrackPtr> tracks_;
+
+ private:
+  DISALLOW_COPY_AND_ASSIGN(RadarTrackManager);
 };
 
 }  // namespace radar
 }  // namespace perception
 }  // namespace apollo
-
-#endif  // RADAR_LIB_TRACKER_COMMON_RADAR_TRACK_MANAGER_H_

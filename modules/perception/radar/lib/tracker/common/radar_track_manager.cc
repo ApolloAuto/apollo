@@ -22,7 +22,7 @@ namespace perception {
 namespace radar {
 
 int RadarTrackManager::RemoveLostTracks() {
-  int track_count = 0;
+  size_t track_count = 0;
   for (size_t i = 0; i < tracks_.size(); ++i) {
     if (!tracks_[i]->IsDead()) {
       if (i != track_count) {
@@ -32,7 +32,7 @@ int RadarTrackManager::RemoveLostTracks() {
     }
   }
   int removed_count = static_cast<int>(tracks_.size()) - track_count;
-  AINFO << "Remove " << removed_count << " tracks";
+  ADEBUG << "Remove " << removed_count << " tracks";
   tracks_.resize(track_count);
   return track_count;
 }

@@ -13,8 +13,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 *****************************************************************************/
-#ifndef RADAR_LIB_TRACKER_MATCHER_HM_MATCHER_H_
-#define RADAR_LIB_TRACKER_MATCHER_HM_MATCHER_H_
+#pragma once
 
 #include <vector>
 #include "modules/perception/base/frame.h"
@@ -71,4 +70,3 @@ class HMMatcher : public BaseMatcher {
 }  // namespace radar
 }  // namespace perception
 }  // namespace apollo
-#endif  // RADAR_LIB_TRACKER_MATCHER_HM_MATCHER_H_

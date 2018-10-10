@@ -13,9 +13,6 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 *****************************************************************************/
-#ifndef RADAR_LIB_INTERFACE_BASE_DETECTOR_H_
-#define RADAR_LIB_INTERFACE_BASE_DETECTOR_H_
-
 // SAMPLE CODE:
 //
 // class DefaultDetector : public BaseDetector {
@@ -29,7 +26,7 @@
 //   }
 //
 //   virtual bool Detect(
-//           const ContiRadar& corrected_obstacles,
+//           const drivers::ContiRadar& corrected_obstacles,
 //           const DetectorOptions& options,
 //           base::FramePtr detected_frame) override {
 //      // Do something.
@@ -52,12 +49,18 @@
 // using detector to do somethings.
 // ////////////////////////////////////////////////////
 
+#pragma once
+
 #include <string>
 #include <vector>
+
 #include "Eigen/Core"
+
+#include "cybertron/common/macros.h"
+#include "cybertron/common/log.h"
+
 #include "modules/drivers/proto/conti_radar.pb.h"
 #include "modules/perception/base/frame.h"
-#include "cybertron/common/log.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lib/registerer/registerer.h"
 #include "modules/perception/common/geometry/roi_filter.h"
@@ -66,10 +69,6 @@
 namespace apollo {
 namespace perception {
 namespace radar {
-
-using apollo::common::Header;
-using apollo::drivers::ContiRadarObs;
-using apollo::drivers::ContiRadar;
 
 struct DetectorOptions {
   Eigen::Matrix4d* radar2world_pose = nullptr;
@@ -91,15 +90,14 @@ class BaseDetector {
   // @param [in]: options.
   // @param [out]: detected objects.
   virtual bool Detect(
-          const ContiRadar& corrected_obstacles,
+          const drivers::ContiRadar& corrected_obstacles,
           const DetectorOptions& options,
           base::FramePtr detected_frame) = 0;
 
   virtual std::string Name() const = 0;
 
  private:
-  BaseDetector(const BaseDetector&) = delete;
-  BaseDetector& operator=(const BaseDetector&) = delete;
+  DISALLOW_COPY_AND_ASSIGN(BaseDetector);
 };
 
 PERCEPTION_REGISTER_REGISTERER(BaseDetector);
@@ -109,5 +107,3 @@ PERCEPTION_REGISTER_REGISTERER(BaseDetector);
 }  // namespace radar
 }  // namespace perception
 }  // namespace apollo
-
-#endif  // RADAR_LIB_INTERFACE_BASE_DETECTOR_H_

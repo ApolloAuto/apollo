@@ -24,7 +24,7 @@ bool ContiArsDetector::Init() {
 }
 
 bool ContiArsDetector::Detect(
-          const ContiRadar& corrected_obstacles,
+          const drivers::ContiRadar& corrected_obstacles,
           const DetectorOptions& options,
           base::FramePtr radar_frame) {
   RawObs2Frame(corrected_obstacles, options, radar_frame);
@@ -37,7 +37,7 @@ std::string ContiArsDetector::Name() const {
   return "ContiArsDetector";
 }
 
-void ContiArsDetector::RawObs2Frame(const ContiRadar& corrected_obstacles,
+void ContiArsDetector::RawObs2Frame(const drivers::ContiRadar& corrected_obstacles,
                                     const DetectorOptions& options,
                                     base::FramePtr radar_frame) {
   const Eigen::Matrix4d& radar2world = *(options.radar2world_pose);
@@ -52,12 +52,12 @@ void ContiArsDetector::RawObs2Frame(const ContiRadar& corrected_obstacles,
                                    * radar2novatel.topLeftCorner(3, 3);
   Eigen::Matrix3d radar2world_rotate = radar2world.block<3, 3>(0, 0);
   Eigen::Matrix3d radar2world_rotate_t = radar2world_rotate.transpose();
-  Eigen::Vector3d radar2world_translation = radar2world.block<3, 1>(0, 3);
+  //Eigen::Vector3d radar2world_translation = radar2world.block<3, 1>(0, 3);
   ADEBUG << "radar2novatel: " << radar2novatel;
   ADEBUG << "angular_speed: " << angular_speed;
   ADEBUG << "rotation_radar: " << rotation_radar;
-  for (auto radar_obs : corrected_obstacles.contiobs()) {
-    base::ObjectPtr radar_object(new base::Object);
+  for (const auto radar_obs : corrected_obstacles.contiobs()) {
+    base::ObjectPtr radar_object = std::make_shared<base::Object>();
     radar_object->id = radar_obs.obstacle_id();
     radar_object->track_id = radar_obs.obstacle_id();
     Eigen::Vector4d local_loc(radar_obs.longitude_dist(),

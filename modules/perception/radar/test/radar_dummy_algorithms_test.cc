@@ -20,6 +20,8 @@ namespace apollo {
 namespace perception {
 namespace radar {
 
+using drivers::ContiRadar;
+
 class DummyAlgorithmsTest : public testing::Test {
  protected:
   DummyPreprocessor preprocessor;
@@ -30,7 +32,7 @@ class DummyAlgorithmsTest : public testing::Test {
 ContiRadar MockContiObs() {
   ContiRadar raw_obs;
 
-  ContiRadarObs conti_obs;
+  drivers::ContiRadarObs conti_obs;
   conti_obs.set_clusterortrack(0);
   conti_obs.set_obstacle_id(80);
   conti_obs.set_longitude_dist(20);

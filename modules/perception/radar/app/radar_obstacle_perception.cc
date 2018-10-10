@@ -28,11 +28,11 @@ namespace apollo {
 namespace perception {
 namespace radar {
 
-bool RadarObstaclePerception::Init(const std::string pipeline_name) {
+bool RadarObstaclePerception::Init(const std::string& pipeline_name) {
   ConfigManager* config_manager = lib::Singleton<ConfigManager>::get_instance();
   CHECK_NOTNULL(config_manager);
   std::string model_name = pipeline_name;
-  const ModelConfig* model_config = NULL;
+  const ModelConfig* model_config = nullptr;
   CHECK(config_manager->GetModelConfig(model_name, &model_config))
         << "not found model: " << model_name;
 
@@ -48,8 +48,8 @@ bool RadarObstaclePerception::Init(const std::string pipeline_name) {
   CHECK(model_config->get_value("Tracker", &tracker_name))
         << "Tracker not found";
 
-  BaseDetector* detector;
-  detector = BaseDetectorRegisterer::GetInstanceByName(detector_name);
+  BaseDetector* detector = 
+      BaseDetectorRegisterer::GetInstanceByName(detector_name);
   CHECK_NOTNULL(detector);
   detector_.reset(detector);
 
@@ -69,7 +69,7 @@ bool RadarObstaclePerception::Init(const std::string pipeline_name) {
   return true;
 }
 
-bool RadarObstaclePerception::Perceive(const ContiRadar& corrected_obstacles,
+bool RadarObstaclePerception::Perceive(const drivers::ContiRadar& corrected_obstacles,
                                        const RadarPerceptionOptions& options,
                                        std::vector<base::ObjectPtr>* objects) {
   PERCEPTION_PERF_FUNCTION();
@@ -79,12 +79,12 @@ bool RadarObstaclePerception::Perceive(const ContiRadar& corrected_obstacles,
   CHECK(detector_->Detect(corrected_obstacles,
                           options.detector_options,
                           detect_frame_ptr)) << "radar detect error";
-  AINFO << "Detected frame objects number: "
+  ADEBUG << "Detected frame objects number: "
            << detect_frame_ptr->objects.size();
   PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(sensor_name, "detector");
   CHECK(roi_filter_->RoiFilter(options.roi_filter_options,
                                detect_frame_ptr)) << "radar roi filter error";
-  AINFO << "RoiFiltered frame objects number: "
+  ADEBUG << "RoiFiltered frame objects number: "
            << detect_frame_ptr->objects.size();
   PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(sensor_name, "roi_filter");
 
@@ -92,7 +92,7 @@ bool RadarObstaclePerception::Perceive(const ContiRadar& corrected_obstacles,
   CHECK(tracker_->Track(*detect_frame_ptr,
                         options.track_options,
                         tracker_frame_ptr)) << "radar track error";
-  AINFO << "tracked frame objects number: "
+  ADEBUG << "tracked frame objects number: "
            << tracker_frame_ptr->objects.size();
   PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(sensor_name, "tracker");
 

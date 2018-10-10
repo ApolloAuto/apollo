@@ -21,6 +21,9 @@ namespace apollo {
 namespace perception {
 namespace radar {
 
+using common::Header;
+using drivers::ContiRadarObs;
+
 class ContiArsPreprocessorTest : public testing::Test {
  public:
   void SetMaxRadarIdx() {
@@ -43,7 +46,7 @@ TEST_F(ContiArsPreprocessorTest, init) {
 }
 
 TEST_F(ContiArsPreprocessorTest, preprocess) {
-  ContiRadar raw_obs;
+  drivers::ContiRadar raw_obs;
   Header radar_header;
   radar_header.set_timestamp_sec(151237772.355345434);
   radar_header.set_radar_timestamp(151237772355345434);
@@ -52,7 +55,7 @@ TEST_F(ContiArsPreprocessorTest, preprocess) {
   raw_obs.mutable_header()->CopyFrom(radar_header);
 
   PreprocessorOptions options;
-  ContiRadar corrected_obs;
+  drivers::ContiRadar corrected_obs;
 
   ContiRadarObs* conti_obs = raw_obs.add_contiobs();
   conti_obs->set_obstacle_id(80);

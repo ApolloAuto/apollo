@@ -24,30 +24,38 @@ void MockRadarPolygon(base::ObjectPtr object) {
   const auto& center = object->center;
   double length = object->size(0);
   double width = object->size(1);
+
   Eigen::Matrix2d rotation;
   rotation << cos(theta), -sin(theta), sin(theta), cos(theta);
+
   Eigen::Vector2d local_poly(0, 0);
   Eigen::Vector2d world_poly;
+
   object->polygon.resize(4);
+
+  // - -
   local_poly(0) = -0.5 * length;
   local_poly(1) = -0.5 * width;
   world_poly = rotation * local_poly;
   object->polygon[0].x = center(0) + world_poly(0);
   object->polygon[0].y = center(1) + world_poly(1);
   object->polygon[0].z = center(2);
-  local_poly(0) = -0.5 * length;
+
+  // - +
   local_poly(1) = +0.5 * width;
   world_poly = rotation * local_poly;
   object->polygon[1].x = center(0) + world_poly(0);
   object->polygon[1].y = center(1) + world_poly(1);
   object->polygon[1].z = center(2);
+
+  // + +
   local_poly(0) = +0.5 * length;
-  local_poly(1) = +0.5 * width;
   world_poly = rotation * local_poly;
   object->polygon[2].x = center(0) + world_poly(0);
   object->polygon[2].y = center(1) + world_poly(1);
   object->polygon[2].z = center(2);
-  local_poly(0) = +0.5 * length;
+
+  // + - 
   local_poly(1) = -0.5 * width;
   world_poly = rotation * local_poly;
   object->polygon[3].x = center(0) + world_poly(0);

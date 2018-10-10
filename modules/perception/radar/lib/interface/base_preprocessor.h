@@ -13,8 +13,6 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 *****************************************************************************/
-#ifndef RADAR_LIB_INTERFACE_BASE_PREPROCESSOR_H_
-#define RADAR_LIB_INTERFACE_BASE_PREPROCESSOR_H_
 // SAMPLE CODE:
 //
 // class DefaultPreprocessor : public BasePreprocessor {
@@ -28,9 +26,9 @@
 //   }
 //
 //   virtual bool Preprocess(
-//           const ContiRadar& raw_obstacles,
+//           const drivers::ContiRadar& raw_obstacles,
 //           const PreprocessorOptions& options,
-//           ContiRadar* corrected_obstacles) override {
+//           drivers::ContiRadar* corrected_obstacles) override {
 //      // Do something.
 //      return true;
 //    }
@@ -51,24 +49,26 @@
 // using preprocessor to do somethings.
 // ////////////////////////////////////////////////////
 
+#pragma once
+
 #include <string>
 #include <vector>
+
 #include "Eigen/Core"
+
+#include "cybertron/common/macros.h"
+#include "cybertron/common/log.h"
+
 #include "modules/drivers/proto/conti_radar.pb.h"
 #include "modules/perception/lib/registerer/registerer.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lib/singleton/singleton.h"
 #include "modules/perception/base/frame.h"
-#include "cybertron/common/log.h"
 #include "modules/perception/radar/common/types.h"
 
 namespace apollo {
 namespace perception {
 namespace radar {
-
-using apollo::common::Header;
-using apollo::drivers::ContiRadarObs;
-using apollo::drivers::ContiRadar;
 
 struct PreprocessorOptions {
   // reserved
@@ -86,15 +86,14 @@ class BasePreprocessor {
   // @param [in]: options.
   // @param [out]: corrected radar obstacles
   virtual bool Preprocess(
-          const ContiRadar& raw_obstacles,
+          const drivers::ContiRadar& raw_obstacles,
           const PreprocessorOptions& options,
-          ContiRadar* corrected_obstacles) = 0;
+          drivers::ContiRadar* corrected_obstacles) = 0;
 
   virtual std::string Name() const = 0;
 
  private:
-  BasePreprocessor(const BasePreprocessor&) = delete;
-  BasePreprocessor& operator=(const BasePreprocessor&) = delete;
+  DISALLOW_COPY_AND_ASSIGN(BasePreprocessor);
 };
 
 PERCEPTION_REGISTER_REGISTERER(BasePreprocessor);
@@ -104,5 +103,3 @@ PERCEPTION_REGISTER_REGISTERER(BasePreprocessor);
 }  // namespace radar
 }  // namespace perception
 }  // namespace apollo
-
-#endif  // RADAR_LIB_INTERFACE_BASE_PREPROCESSOR_H_

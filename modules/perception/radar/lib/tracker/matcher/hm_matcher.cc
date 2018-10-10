@@ -31,7 +31,7 @@ bool HMMatcher::Init() {
   lib::ConfigManager *config_manager =
       lib::Singleton<lib::ConfigManager>::get_instance();
   std::string model_name = name_;
-  const lib::ModelConfig *model_config = NULL;
+  const lib::ModelConfig *model_config = nullptr;
   AINFO << "matcher name: " << name_;
   if (!config_manager->GetModelConfig(model_name, &model_config)) {
     AERROR << "not found model: " << model_name;
@@ -95,8 +95,8 @@ bool HMMatcher::RefinedTrack(const base::ObjectPtr &track_object,
                                        radar_object, radar_timestamp) +
                 0.5 * compute_distance(radar_object, radar_timestamp,
                                        track_object, track_timestamp);
-  bool state = dist < BaseMatcher::GetMaxMatchDistance() ? true : false;
-  return state;
+
+  return dist < BaseMatcher::GetMaxMatchDistance();
 }
 
 void HMMatcher::TrackObjectPropertyMatch(
@@ -107,13 +107,9 @@ void HMMatcher::TrackObjectPropertyMatch(
   if (unassigned_tracks->empty() || unassigned_objects->empty()) {
     return;
   }
-  std::vector<std::vector<double> > association_mat;
-  association_mat.resize(unassigned_tracks->size());
+  std::vector<std::vector<double> > association_mat(unassigned_tracks->size());
   for (size_t i = 0; i < association_mat.size(); ++i) {
-    association_mat[i].resize(unassigned_objects->size());
-    for (size_t j = 0; j < association_mat[i].size(); ++j) {
-      association_mat[i][j] = 0;
-    }
+    association_mat[i].resize(unassigned_objects->size(), 0);
   }
   ComputeAssociationMat(radar_tracks, radar_frame, *unassigned_tracks,
                         *unassigned_objects, &association_mat);

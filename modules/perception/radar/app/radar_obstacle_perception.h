@@ -13,8 +13,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 *****************************************************************************/
-#ifndef RADAR_APP_RADAR_OBSTACLE_PERCEPTION_H_
-#define RADAR_APP_RADAR_OBSTACLE_PERCEPTION_H_
+#pragma once
 
 #include <string>
 #include <vector>
@@ -30,9 +29,9 @@ class RadarObstaclePerception : public BaseRadarObstaclePerception{
   RadarObstaclePerception() {}
   virtual ~RadarObstaclePerception() {}
 
-  bool Init(const std::string pipeline_name) override;
+  bool Init(const std::string& pipeline_name) override;
 
-  bool Perceive(const ContiRadar& corrected_obstacles,
+  bool Perceive(const drivers::ContiRadar& corrected_obstacles,
                 const RadarPerceptionOptions& options,
                 std::vector<base::ObjectPtr>* objects) override;
 
@@ -47,4 +46,3 @@ class RadarObstaclePerception : public BaseRadarObstaclePerception{
 }  // namespace radar
 }  // namespace perception
 }  // namespace apollo
-#endif  // RADAR_APP_RADAR_OBSTACLE_PERCEPTION_H_

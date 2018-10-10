@@ -13,10 +13,10 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 *****************************************************************************/
-#ifndef RADAR_LIB_ROI_FILTER_HDMAP_RADAR_ROI_FILTER_HDMAP_RADAR_ROI_FILTER_H_
-#define RADAR_LIB_ROI_FILTER_HDMAP_RADAR_ROI_FILTER_HDMAP_RADAR_ROI_FILTER_H_
+#pragma once
 
 #include <string>
+#include "cybertron/common/macros.h"
 #include "modules/perception/radar/lib/interface/base_roi_filter.h"
 
 namespace apollo {
@@ -37,12 +37,9 @@ class HdmapRadarRoiFilter : public BaseRoiFilter {
   std::string Name() const override;
 
  private:
-  HdmapRadarRoiFilter(const HdmapRadarRoiFilter&) = delete;
-  HdmapRadarRoiFilter& operator=(const HdmapRadarRoiFilter&) = delete;
+  DISALLOW_COPY_AND_ASSIGN(HdmapRadarRoiFilter);
 };
 
 }  // namespace radar
 }  // namespace perception
 }  // namespace apollo
-
-#endif  // RADAR_LIB_ROI_FILTER_HDMAP_RADAR_ROI_FILTER_HDMAP_RADAR_ROI_FILTER_H_

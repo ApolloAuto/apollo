@@ -60,7 +60,6 @@ TEST(AdaptiveKalmanFilterTest, adaptive_kalman_filter_test) {
   Eigen::Vector3d anchor_point;
   Eigen::Vector3d velocity;
   filter->GetState(&anchor_point, &velocity);
-  Eigen::Matrix4d conv = filter->GetCovarianceMatrix();
   EXPECT_TRUE((update_result.head(2) - anchor_point.head(2)).norm() < 1e-5);
   EXPECT_TRUE((update_result.tail(2) - velocity.head(2)).norm() < 1e-5);
   AINFO << "upate_result:" << std::setprecision(12) << update_result;

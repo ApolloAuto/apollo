@@ -39,7 +39,7 @@ bool ContiArsTracker::Init() {
   lib::ConfigManager *config_manager =
       lib::Singleton<lib::ConfigManager>::get_instance();
   std::string model_name = name_;
-  const lib::ModelConfig *model_config = NULL;
+  const lib::ModelConfig *model_config = nullptr;
   bool state = true;
   if (!config_manager->GetModelConfig(model_name, &model_config)) {
     AERROR << "not found model: " << model_name;
@@ -111,7 +111,7 @@ void ContiArsTracker::TrackObjects(const base::Frame &radar_frame) {
 
 void ContiArsTracker::UpdateAssignedTracks(
     const base::Frame &radar_frame, std::vector<TrackObjectPair> assignments) {
-  auto &radar_tracks = track_manager_->GetTracks();
+  auto &radar_tracks = track_manager_->mutable_tracks();
   for (size_t i = 0; i < assignments.size(); ++i) {
     radar_tracks[assignments[i].first]->UpdataObsRadar(
         radar_frame.objects[assignments[i].second], radar_frame.timestamp);
@@ -122,7 +122,7 @@ void ContiArsTracker::UpdateUnassignedTracks(
     const base::Frame &radar_frame,
     const std::vector<size_t> &unassigned_tracks) {
   double timestamp = radar_frame.timestamp;
-  auto &radar_tracks = track_manager_->GetTracks();
+  auto &radar_tracks = track_manager_->mutable_tracks();
   for (size_t i = 0; i < unassigned_tracks.size(); ++i) {
     if (radar_tracks[unassigned_tracks[i]]->GetObs() != nullptr) {
       double radar_time = radar_tracks[unassigned_tracks[i]]->GetTimestamp();
