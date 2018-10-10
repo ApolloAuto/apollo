@@ -92,6 +92,7 @@ void FeatureExtractor::ExtractEgoLaneFeatures(
     ADEBUG << "Ego vehicle is not on any lane.";
     return;
   }
+  AINFO << "Ego vehicle is on lane [" << ptr_ego_lane->id().id() << "]";
   double curr_lane_s = 0.0;
   double curr_lane_l = 0.0;
   ptr_ego_lane->GetProjection(ego_position, &curr_lane_s, &curr_lane_l);
