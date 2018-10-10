@@ -166,12 +166,6 @@ void Shutdown() {
   g_ok = false;
 }
 
-void AsyncShutdown() {
-  pid_t pid = getpid();
-  if (kill(pid, SIGINT) != 0) {
-    AERROR << strerror(errno);
-  }
-}
 
 bool IsShutdown() { return g_is_shutdown; }
 

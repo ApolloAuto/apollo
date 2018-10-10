@@ -17,6 +17,14 @@
 #ifndef CYBERTRON_INIT_H_
 #define CYBERTRON_INIT_H_
 
+#include <signal.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <cerrno>
+#include <cstring>
+
+#include "cybertron/common/log.h"
+
 namespace apollo {
 namespace cybertron {
 
@@ -24,10 +32,16 @@ bool Init();
 bool Init(const char* argv);
 bool OK();
 void Shutdown();
-void AsyncShutdown();
 bool IsShutdown();
 void WaitForShutdown();
 void PrintSchedulerStatistics();
+
+inline void AsyncShutdown() {
+  pid_t pid = getpid();
+  if (kill(pid, SIGINT) != 0) {
+    AERROR << strerror(errno);
+  }
+}
 
 }  // namespace cybertron
 }  // namespace apollo
