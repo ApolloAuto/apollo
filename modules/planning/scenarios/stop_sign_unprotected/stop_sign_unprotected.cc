@@ -41,8 +41,6 @@ using common::ErrorCode;
 using common::Status;
 using common::TrajectoryPoint;
 
-int StopSignUnprotectedScenario::current_stage_index_ = 0;
-
 void StopSignUnprotectedScenario::RegisterTasks() {
   task_factory_.Register(DP_POLY_PATH_OPTIMIZER,
                          []() -> Task* { return new DpPolyPathOptimizer(); });
@@ -78,17 +76,24 @@ Status StopSignUnprotectedScenario::Process(
     Frame* frame) {
   status_ = STATUS_PROCESSING;
 
-  if (!InitTasks(config_, current_stage_index_, &tasks_)) {
+  // init tasks
+  std::string stage_name = "";
+  if (stage_ == StopSignUnprotectedStage::STOP) {
+    stage_name = FLAGS_scenario_stop_sign_unprotected_stage_stop;
+  } else if (stage_ == StopSignUnprotectedStage::CREEP) {
+    stage_name = FLAGS_scenario_stop_sign_unprotected_stage_creep;
+  } else if (stage_ == StopSignUnprotectedStage::CRUISE) {
+    stage_name = FLAGS_scenario_stop_sign_unprotected_stage_cruise;
+  } else if (stage_ == StopSignUnprotectedStage::DONE) {
+    status_ = STATUS_DONE;
+    return Status(ErrorCode::OK, "stop_sign_unprotected DONE");
+  }
+  if (!InitTasks(config_, stage_name, &tasks_)) {
     return Status(ErrorCode::PLANNING_ERROR, "failed to init tasks");
   }
 
   // TODO(all)
 
-  if (current_stage_index_ < config_.stage_size() - 1) {
-    current_stage_index_++;
-  } else {
-    status_ = STATUS_DONE;
-  }
   return Status::OK();
 }
 

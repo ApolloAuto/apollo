@@ -39,19 +39,19 @@ DEFINE_string(scenario_side_pass_config_file,
               "/apollo/modules/planning/conf/scenario_side_pass_config.pb.txt",
               "The side pass scenario configuration file");
 DEFINE_string(scenario_side_pass_stage_obstacle_approach,
-              "SCENATIO_SIDE_PASS_STAGE_OBSTACLE_APPROACH",
+              "SCENARIO_SIDE_PASS_STAGE_OBSTACLE_APPROACH",
               "stage 1: obstacle_approach");
 DEFINE_string(scenario_side_pass_stage_path_generation,
-              "SCENATIO_SIDE_PASS_STAGE_PATH_GENERATION",
+              "SCENARIO_SIDE_PASS_STAGE_PATH_GENERATION",
               "stage 2: path_generation");
 DEFINE_string(scenario_side_pass_stage_waitpoint_stop,
-              "SCENATIO_SIDE_PASS_STAGE_WAITPOINT_STOP",
+              "SCENARIO_SIDE_PASS_STAGE_WAITPOINT_STOP",
               "stage 3: waitpoint_stop");
 DEFINE_string(scenario_side_pass_stage_safety_detection,
-              "SCENATIO_SIDE_PASS_STAGE_SAFETY_DETECTION",
+              "SCENARIO_SIDE_PASS_STAGE_SAFETY_DETECTION",
               "stage 4: safety_detection");
 DEFINE_string(scenario_side_pass_stage_obstacle_pass,
-              "SCENATIO_SIDE_PASS_STAGE_OBSTACLE_PASS",
+              "SCENARIO_SIDE_PASS_STAGE_OBSTACLE_PASS",
               "stage 5: obstacle_pass");
 /// stop_sign_unprotected
 DEFINE_string(scenario_stop_sign_unprotected_config_file,
@@ -59,11 +59,11 @@ DEFINE_string(scenario_stop_sign_unprotected_config_file,
               "scenario_stop_sign_unprotected_config.pb.txt",
               "The stop_sign_unprotected scenario configuration file");
 DEFINE_string(scenario_stop_sign_unprotected_stage_stop,
-              "SCENATIO_STOP_SIGN_UNPROTECTED_STAGE_STOP", "stage 1: stop");
+              "SCENARIO_STOP_SIGN_UNPROTECTED_STAGE_STOP", "stage 1: stop");
 DEFINE_string(scenario_stop_sign_unprotected_stage_creep,
-              "SCENATIO_STOP_SIGN_UNPROTECTED_STAGE_CREEP", "stage 2: creep");
+              "SCENARIO_STOP_SIGN_UNPROTECTED_STAGE_CREEP", "stage 2: creep");
 DEFINE_string(scenario_stop_sign_unprotected_stage_cruise,
-              "SCENATIO_STOP_SIGN_UNPROTECTED_STAGE_CRUISE", "stage 3: cruise");
+              "SCENARIO_STOP_SIGN_UNPROTECTED_STAGE_CRUISE", "stage 3: cruise");
 
 DEFINE_string(planning_adapter_config_filename,
               "/apollo/modules/planning/conf/adapter.conf",
