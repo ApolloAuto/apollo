@@ -17,7 +17,7 @@
 #ifndef TOOLS_CVT_MONITOR_GENERAL_CHANNEL_MESSAGE_H_
 #define TOOLS_CVT_MONITOR_GENERAL_CHANNEL_MESSAGE_H_
 
-#include <cybertron/message/raw_message.h>
+#include "cybertron/message/raw_message.h"
 #include "cybertron_channel_message.h"
 #include "general_message_base.h"
 
