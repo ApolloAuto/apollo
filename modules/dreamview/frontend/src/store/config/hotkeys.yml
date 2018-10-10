@@ -7,3 +7,4 @@
 6: enableAudioCapture
 7: showPOI
 v: cameraAngle
+p: showPNCMonitor

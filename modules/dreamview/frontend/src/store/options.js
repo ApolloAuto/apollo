@@ -5,16 +5,6 @@ import MENU_DATA from "store/config/MenuData";
 
 export default class Options {
     constructor() {
-        const options = {};
-        Object.keys(PARAMETERS.options.defaults).forEach(option => {
-            let defaultValue = PARAMETERS.options.defaults[option];
-            if (OFFLINE_PLAYBACK && option === "showTasks") {
-                defaultValue = false;
-            }
-            options[option] = defaultValue;
-        });
-        extendObservable(this, options);
-
         this.cameraAngleNames = null;
         this.mainSideBarOptions = [
             "showTasks",
@@ -24,14 +14,32 @@ export default class Options {
             "showDataRecorder",
         ];
         this.secondarySideBarOptions = ["showPOI", "enableAudioCapture"];
-        this.hideOptionToggle = observable({
-            planningCar: true,
-            planningQpOptimizer: true,
-            planningDpOptimizer: true,
-            planningReference: true,
+
+        // Set options and their default values from PARAMETERS.options
+        const options = {};
+        for (const name in PARAMETERS.options) {
+            let defaultValue = PARAMETERS.options[name].default;
+            if (OFFLINE_PLAYBACK && name === "showTasks") {
+                defaultValue = false;
+            }
+            options[name] = defaultValue;
+        }
+        extendObservable(this, options);
+
+        // Define toggles to hide in layer menu. These include PncMonitor
+        // toggles, which are visible only when PNC Monitor is on.
+        const togglesToHide = {
             perceptionPointCloud: OFFLINE_PLAYBACK,
             perceptionLaneMarker: OFFLINE_PLAYBACK,
-        });
+            planningCar: OFFLINE_PLAYBACK,
+        };
+        for (const name in PARAMETERS.options) {
+            const option = PARAMETERS.options[name];
+            if (option.forPncMonitor) {
+                togglesToHide[option.menuId] = true;
+            }
+        }
+        this.togglesToHide = observable(togglesToHide);
     }
 
     @computed get showTools() {
@@ -62,11 +70,19 @@ export default class Options {
         }
 
         if (option === "showPNCMonitor") {
-            Object.keys(this.hideOptionToggle).map((toggle) => {
-                if (toggle.startsWith("planning")) {
-                    this.hideOptionToggle[toggle] = !this[option];
+            for (const name in PARAMETERS.options) {
+                if (PARAMETERS.options[name].forPncMonitor) {
+                    this.togglesToHide[PARAMETERS.options[name].menuId] = !this[option];
                 }
-            });
+            }
+        }
+    }
+
+    @action setPncMonitorOptions(value) {
+        for (const name in PARAMETERS.options) {
+            if (PARAMETERS.options[name].forPncMonitor) {
+                this[name] = value;
+            }
         }
     }
 

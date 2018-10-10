@@ -83,17 +83,12 @@ class DreamviewStore {
 
     @action enablePNCMonitor() {
         this.updateWidthInPercentage(0.7);
-        this.options.showPlanningReference = true;
-        this.options.showPlanningDpOptimizer = true;
-        this.options.showPlanningQpOptimizer = true;
+        this.options.setPncMonitorOptions(true);
     }
 
     @action disablePNCMonitor() {
         this.updateWidthInPercentage(1.0);
-        this.options.showPlanningCar = false;
-        this.options.showPlanningReference = false;
-        this.options.showPlanningDpOptimizer = false;
-        this.options.showPlanningQpOptimizer = false;
+        this.options.setPncMonitorOptions(false);
     }
 
     @action updateModuleDelay(world) {

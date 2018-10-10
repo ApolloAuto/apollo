@@ -29,7 +29,7 @@ MAP_PROTOS='../../map/proto/*.proto'
 MONITOR_PROTOS='../../common/monitor_log/proto/monitor_log.proto'
 ROUTING_PROTOS='../../routing/proto/routing.proto'
 
-node_modules/protobufjs/bin/pbjs -t json ../proto/simulation_world.proto \
+node_modules/protobufjs/bin/pbjs -t json ../proto/simulation_world.proto ../proto/chart.proto \
     $COMMON_PROTOS $LOCALIZATION_PROTOS $CHASSIS_PROTOS $PLANNING_PROTOS \
     $PERCEPTION_PROTOS $MONITOR_PROTOS $ROUTING_PROTOS $MAP_PROTOS \
     $REALTIVE_MAP_PROTOS \
