@@ -23,6 +23,10 @@ from modules.map.proto import map_overlap_pb2
 from google.protobuf import text_format
 from shapely.geometry import LineString, Point
 
+if len(sys.argv) < 3:
+    print("Usage: %s <map_data> <signal_data>" % sys.argv[0])
+    sys.exit(1)
+
 fmap = sys.argv[1]
 fsignal = sys.argv[2]
 
@@ -72,6 +76,6 @@ for stop_line in signal.stop_line:
             signal.overlap_id.add().id = overlap.id.id
             lanes_map[lane_id].overlap_id.add().id = overlap.id.id
 map.signal.add().CopyFrom(signal)
-fmap = open(fmap + "_" + fsignal, 'w')
-fmap.write(str(map))
-fmap.close()
+
+with open(fmap + "_" + fsignal, 'w') as fmap:
+    fmap.write(str(map))
