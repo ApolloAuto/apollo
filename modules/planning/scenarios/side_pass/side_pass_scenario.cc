@@ -144,6 +144,50 @@ bool SidePassScenario::IsTransferable(const Scenario& current_scenario,
 
 Status SidePassScenario::ApproachObstacle(
     const TrajectoryPoint& planning_start_point, Frame* frame) {
+  if (!stage_init) {
+    // TODO(yifei) init stage
+    stage_init = true;
+  }
+  Status status = RunPlanOnReferenceLine(planning_start_point, frame);
+  if (status.ok()) {
+    if (!IsSidePassScenario(planning_start_point, frame)) {
+      // TODO(yifei) scenario is done
+    } else if (frame->vehicle_state().linear_velocity() < 1.0e-5) {
+      stage_ = PATH_GENERATION;
+      stage_init = false;
+    }
+  }
+  return status;
+}
+
+Status SidePassScenario::GeneratePath(
+    const TrajectoryPoint& planning_start_point, Frame* frame) {
+  return Status::OK();
+}
+
+Status SidePassScenario::StopOnWaitPoint(
+    const TrajectoryPoint& planning_start_point, Frame* frame) {
+  return Status::OK();
+}
+
+Status SidePassScenario::DetectSafety(
+    const TrajectoryPoint& planning_start_point, Frame* frame) {
+  return Status::OK();
+}
+
+Status SidePassScenario::PassObstacle(
+    const TrajectoryPoint& planning_start_point, Frame* frame) {
+  return Status::OK();
+}
+
+bool SidePassScenario::IsSidePassScenario(
+    const common::TrajectoryPoint& planning_start_point, Frame* frame) {
+  // TODO(liangliang)
+  return true;
+}
+
+Status SidePassScenario::RunPlanOnReferenceLine(
+    const TrajectoryPoint& planning_start_point, Frame* frame) {
   auto status =
       Status(ErrorCode::PLANNING_ERROR, "reference line not drivable");
 
@@ -177,26 +221,5 @@ Status SidePassScenario::ApproachObstacle(
   }
   return status;
 }
-
-Status SidePassScenario::GeneratePath(
-    const TrajectoryPoint& planning_start_point, Frame* frame) {
-  return Status::OK();
-}
-
-Status SidePassScenario::StopOnWaitPoint(
-    const TrajectoryPoint& planning_start_point, Frame* frame) {
-  return Status::OK();
-}
-
-Status SidePassScenario::DetectSafety(
-    const TrajectoryPoint& planning_start_point, Frame* frame) {
-  return Status::OK();
-}
-
-Status SidePassScenario::PassObstacle(
-    const TrajectoryPoint& planning_start_point, Frame* frame) {
-  return Status::OK();
-}
-
 }  // namespace planning
 }  // namespace apollo
