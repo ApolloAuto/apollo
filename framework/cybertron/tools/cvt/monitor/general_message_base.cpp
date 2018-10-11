@@ -50,48 +50,6 @@ int calculateStringLines(const std::string& str, int screenWidth) {
   return lineCount;
 }
 
-unsigned outputSubString(std::ostringstream& outStr, const std::string& str,
-                         int screenWidth, int& jumpLines) {
-  int lineWidth = 0;
-  std::size_t i = 0;
-
-  for (; i < str.size() && jumpLines > 0; ++i) {
-    if (str[i] == '\n' || str[i] == '\r') {
-      --jumpLines;
-      lineWidth = 0;
-    } else {
-      ++lineWidth;
-      if (lineWidth == screenWidth) {
-        --jumpLines;
-        lineWidth = 0;
-      }
-    }
-  }
-
-  unsigned lineCount = 0;
-  if (jumpLines == 0) {
-    lineWidth = 0;
-    lineCount = 1;
-    for (; i < str.size(); ++i) {
-      char ch = str[i];
-      if (str[i] == '\n' || str[i] == '\r') {
-        ++lineCount;
-        lineWidth = 0;
-        ch = '\n';
-      } else {
-        ++lineWidth;
-        if (lineWidth == screenWidth) {
-          ++lineCount;
-          lineWidth = 0;
-        }
-      }
-      outStr << ch;
-    }
-  }
-
-  return lineCount;
-}
-
 }  // namespace
 
 int GeneralMessageBase::lineCount(const google::protobuf::Message& msg,
@@ -239,20 +197,6 @@ void GeneralMessageBase::PrintField(
           field->is_repeated()
               ? ref->GetRepeatedStringReference(msg, field, index, &scratch)
               : ref->GetStringReference(msg, field, &scratch);
-      // int lines = calculateStringLines(str, s->Width());
-      // if (lines > jumpLines) {
-      //   const std::string& fieldName = field->name();
-      //   outStr << fieldName << ": ";
-      //   if (field->is_repeated()) {
-      //     outStr << "[" << index << "] ";
-      //   }
-      //   lines = outputSubString(outStr, str, s->Width(), jumpLines);
-      //   s->AddStr(indent, lineNo, outStr.str().c_str());
-      //   lineNo += lines;
-      // } else {
-      //   jumpLines -= lines;
-      // }
-
       {
         int lineWidth = 0;
         std::size_t i = 0;
