@@ -203,16 +203,18 @@ Chassis LexusController::chassis() {
   // 8
   if (chassis_detail.lexus().has_accel_rpt_200() &&
       chassis_detail.lexus().accel_rpt_200().has_output_value()) {
+    // TODO(snehagn): Temp fix until AS to fix the scaling
     chassis_.set_throttle_percentage(
-        chassis_detail.lexus().accel_rpt_200().output_value());
+      chassis_detail.lexus().accel_rpt_200().output_value() * 100);
   } else {
     chassis_.set_throttle_percentage(0);
   }
   // 9
   if (chassis_detail.lexus().has_brake_rpt_204() &&
       chassis_detail.lexus().brake_rpt_204().has_output_value()) {
+    // TODO(snehagn): Temp fix until AS to fix the scaling
     chassis_.set_brake_percentage(
-        chassis_detail.lexus().brake_rpt_204().output_value());
+        chassis_detail.lexus().brake_rpt_204().output_value() * 100);
   } else {
     chassis_.set_brake_percentage(0);
   }
