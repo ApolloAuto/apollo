@@ -84,6 +84,9 @@ class SidePassScenario : public Scenario {
   common::Status RunPlanOnReferenceLine(
       const common::TrajectoryPoint& planning_start_point, Frame* frame);
 
+  bool HasBlockingObstacle(const SLBoundary& adc_sl_boundary,
+                           const PathDecision& path_decision) const;
+
  private:
   static int current_stage_index_;
   std::vector<std::unique_ptr<Task>> tasks_;
