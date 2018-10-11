@@ -43,13 +43,10 @@ namespace planning {
 using common::ErrorCode;
 using common::Status;
 using common::TrajectoryPoint;
-using apollo::hdmap::HDMapUtil;
-using apollo::hdmap::PathOverlap;
-using apollo::hdmap::StopSignInfo;
-using apollo::hdmap::StopSignInfoConstPtr;
-
-
-int StopSignUnprotectedScenario::current_stage_index_ = 0;
+using hdmap::HDMapUtil;
+using hdmap::PathOverlap;
+using hdmap::StopSignInfo;
+using hdmap::StopSignInfoConstPtr;
 
 void StopSignUnprotectedScenario::RegisterTasks() {
   // deciders

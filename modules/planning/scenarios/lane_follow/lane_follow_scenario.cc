@@ -63,8 +63,6 @@ constexpr double kSpeedOptimizationFallbackCost = 2e4;
 constexpr double kStraightForwardLineCost = 10.0;
 }  // namespace
 
-int LaneFollowScenario::current_stage_index_ = 0;
-
 void LaneFollowScenario::RegisterTasks() {
   task_factory_.Register(DP_POLY_PATH_OPTIMIZER,
                          []() -> Task* { return new DpPolyPathOptimizer(); });
