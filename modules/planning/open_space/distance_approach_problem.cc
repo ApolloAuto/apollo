@@ -66,26 +66,27 @@ bool DistanceApproachProblem::Solve(Eigen::MatrixXd* state_result,
   // n5 : dual multipier associated with car shape, obstacles_num*4 * (N+1)
   int n5 = obstacles_num_ * 4 * (horizon_ + 1);
 
-  // m1 : state equality constatins
+  // m1 : dynamics constatins
   int m1 = 4 * horizon_;
 
-  // m2 : sampling time equality constraints
-  int m2 = horizon_;
+  // m2 : control rate constraints (only steering)
+  int m2 = (horizon_ - 1);
 
-  // m3 : state inequality constraints
-  int m3 = 4 * horizon_;
+  // m3 : sampling time equality constraints
+  int m3 = horizon_;
 
-  // m4 : control inequality constraints
-  int m4 = 2 * horizon_;
-
-  // m5 : sampling time inequality constraints
-  int m5 = horizon_;
+  // m4 : obstacle constraints
+  int m4 = 4 * obstacles_num_ * (horizon_ + 1);
 
   int num_of_variables = n1 + n2 + n3 + n4 + n5;
-  int num_of_constraints = m1 + m2 + m3 + m4 + m5;
+  int num_of_constraints = m1 + m2 + m3 + m4;
 
-  ADEBUG << "Number of variables are : " << num_of_variables;
-  ADEBUG << "Number of constraints are : " << num_of_constraints;
+  AINFO << "Number of variables are : " << num_of_variables;
+  AINFO << "Number of constraints are : " << num_of_constraints;
+  AINFO << "m1" << m1;
+  AINFO << "m2" << m2;
+  AINFO << "m3" << m3;
+  AINFO << "m4" << m4;
 
   // TODO(QiL) : evaluate whether need to new it everytime
   bool use_fix_time_ = false;
@@ -124,13 +125,13 @@ bool DistanceApproachProblem::Solve(Eigen::MatrixXd* state_result,
       status == Ipopt::Solved_To_Acceptable_Level) {
     // Retrieve some statistics about the solve
     Ipopt::Index iter_count = app->Statistics()->IterationCount();
-    ADEBUG << "*** The problem solved in " << iter_count << " iterations!";
+    AINFO << "*** The problem solved in " << iter_count << " iterations!";
 
     Ipopt::Number final_obj = app->Statistics()->FinalObjective();
-    ADEBUG << "*** The final value of the objective function is " << final_obj
-           << '.';
+    AINFO << "*** The final value of the objective function is " << final_obj
+          << '.';
   } else {
-    ADEBUG << "Return status: " << int(status);
+    AINFO << "Return status: " << int(status);
   }
 
   ptop->get_optimization_results(state_result, control_result, time_result);
