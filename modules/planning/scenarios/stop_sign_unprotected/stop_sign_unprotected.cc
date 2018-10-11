@@ -103,7 +103,8 @@ Status StopSignUnprotectedScenario::Process(
     Frame* frame) {
   status_ = STATUS_PROCESSING;
 
-  if (!InitTasks(config_, current_stage_index_, &tasks_)) {
+  const int current_stage_index = StageIndexInConf(stage_);
+  if (!InitTasks(config_, current_stage_index, &tasks_)) {
     return Status(ErrorCode::PLANNING_ERROR, "failed to init tasks");
   }
 
@@ -168,6 +169,17 @@ bool StopSignUnprotectedScenario::IsTransferable(
   }
 
   return false;
+}
+
+int StopSignUnprotectedScenario::StageIndexInConf(
+    const StopSignUnprotectedStage& stage) {
+  // note: this is the index in scenario conf file.  must be consistent
+  if (stage == StopSignUnprotectedStage::CREEP) {
+    return 0;
+  } else if (stage == StopSignUnprotectedStage::INTERSECTION_CRUISE) {
+    return 1;
+  }
+  return -1;
 }
 
 common::Status StopSignUnprotectedScenario::PreStop(

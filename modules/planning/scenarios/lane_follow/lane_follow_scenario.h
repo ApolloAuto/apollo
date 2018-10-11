@@ -60,6 +60,8 @@ class LaneFollowScenario : public Scenario {
 
   void RegisterTasks();
 
+  int StageIndexInConf(const LaneFollowStage& stage);
+
   common::Status PlanOnReferenceLine(
       const common::TrajectoryPoint& planning_start_point, Frame* frame,
       ReferenceLineInfo* reference_line_info);
@@ -81,7 +83,6 @@ class LaneFollowScenario : public Scenario {
  private:
   std::vector<std::unique_ptr<Task>> tasks_;
   ScenarioConfig config_;
-  int current_stage_index_ = 0;
   LaneFollowStage stage_ = LaneFollowStage::CRUISE;
   SpeedProfileGenerator speed_profile_generator_;
 };
