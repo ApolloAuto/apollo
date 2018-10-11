@@ -22,6 +22,7 @@
 
 #include <memory>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "modules/planning/proto/planning.pb.h"
@@ -75,6 +76,7 @@ class StopSignUnprotectedScenario : public Scenario {
       Frame* frame);
 
   bool FindNextStopSign(ReferenceLineInfo* const reference_line_info);
+  int GetAssociatedLanes(const hdmap::StopSignInfo& stop_sign_info);
 
  private:
   std::vector<std::unique_ptr<Task>> tasks_;
@@ -84,6 +86,8 @@ class StopSignUnprotectedScenario : public Scenario {
   hdmap::PathOverlap next_stop_sign_overlap_;
   hdmap::StopSignInfoConstPtr next_stop_sign_ = nullptr;
   double adc_distance_to_stop_sign_;
+  std::vector<std::pair<hdmap::LaneInfoConstPtr, hdmap::OverlapInfoConstPtr>>
+      associated_lanes_;
 };
 
 }  // namespace planning
