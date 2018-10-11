@@ -220,6 +220,7 @@ Chassis LexusController::chassis() {
   // 23, previously 10
   if (chassis_detail.lexus().has_shift_rpt_228() &&
       chassis_detail.lexus().shift_rpt_228().has_output_value()) {
+    AINFO << "Start reading shift values";
     Chassis::GearPosition gear_pos = Chassis::GEAR_INVALID;
 
     if (chassis_detail.lexus().shift_rpt_228().output_value() ==
@@ -308,9 +309,13 @@ ErrorCode LexusController::EnableAutoMode() {
   return ErrorCode::OK;
 
   accel_cmd_100_->set_enable(true);
+  accel_cmd_100_->set_clear_override(true);
   brake_cmd_104_->set_enable(true);
+  brake_cmd_104_->set_clear_override(true);
   steering_cmd_12c_->set_enable(true);
+  steering_cmd_12c_->set_clear_override(true);
   shift_cmd_128_->set_enable(true);
+  shift_cmd_128_->set_clear_override(true);
 
   can_sender_->Update();
   const int32_t flag =
