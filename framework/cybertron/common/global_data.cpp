@@ -89,7 +89,9 @@ void GlobalData::InitHostInfo() {
 
 void GlobalData::InitConfig() {
   auto config_path = GetAbsolutePath(WorkRoot(), "conf/cybertron.pb.conf");
-  assert(GetProtoFromFile(config_path, &config_));
+  if (!GetProtoFromFile(config_path, &config_)) {
+    AERROR << "read cybertron global conf failed!";
+  }
 }
 
 const CyberConfig& GlobalData::Config() const { return config_; }
