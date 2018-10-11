@@ -51,7 +51,7 @@ using apollo::hdmap::HDMapUtil;
 
 namespace {
 
-bool IsVehicleStateValid(const VehicleState &vehicle_state) {
+bool IsVehicleStateValid(const VehicleState& vehicle_state) {
   if (std::isnan(vehicle_state.x()) || std::isnan(vehicle_state.y()) ||
       std::isnan(vehicle_state.z()) || std::isnan(vehicle_state.heading()) ||
       std::isnan(vehicle_state.kappa()) ||
@@ -138,10 +138,10 @@ void NaviPlanning::RunOnce(const LocalView& local_view,
   ADEBUG << "Get chassis:" << local_view_.chassis->DebugString();
 
   Status status = VehicleStateProvider::Instance()->Update(
-          *local_view_.localization_estimate, *local_view_.chassis);
+      *local_view_.localization_estimate, *local_view_.chassis);
 
-  auto vehicle_config = ComputeVehicleConfigFromLocalization(
-      *local_view_.localization_estimate);
+  auto vehicle_config =
+      ComputeVehicleConfigFromLocalization(*local_view_.localization_estimate);
 
   if (last_vehicle_config_.is_valid_ && vehicle_config.is_valid_) {
     auto x_diff_map = vehicle_config.x_ - last_vehicle_config_.x_;
@@ -178,8 +178,8 @@ void NaviPlanning::RunOnce(const LocalView& local_view,
   }
 
   auto* not_ready = trajectory_pb->mutable_decision()
-      ->mutable_main_decision()
-      ->mutable_not_ready();
+                        ->mutable_main_decision()
+                        ->mutable_not_ready();
 
   if (!status.ok() || !IsVehicleStateValid(vehicle_state)) {
     std::string msg("Update VehicleStateProvider failed");
@@ -251,7 +251,7 @@ void NaviPlanning::RunOnce(const LocalView& local_view,
     ProcessPadMsg(driving_action_);
   }
 
-  for (auto& ref_line_info : frame_->reference_line_info()) {
+  for (auto& ref_line_info : *frame_->mutable_reference_line_info()) {
     TrafficDecider traffic_decider;
     traffic_decider.Init(traffic_rule_configs_);
     auto traffic_status = traffic_decider.Execute(frame_.get(), &ref_line_info);
@@ -275,7 +275,7 @@ void NaviPlanning::RunOnce(const LocalView& local_view,
   auto* ref_line_task =
       trajectory_pb->mutable_latency_stats()->add_task_stats();
   ref_line_task->set_time_ms(reference_line_provider_->LastTimeDelay() *
-      1000.0);
+                             1000.0);
   ref_line_task->set_name("ReferenceLineProvider");
 
   if (!status.ok()) {
@@ -311,7 +311,7 @@ void NaviPlanning::OnPad(const PadMessage& pad) {
 void NaviPlanning::ProcessPadMsg(DrivingAction drvie_action) {
   if (config_.has_navigation_planning_config()) {
     std::map<std::string, uint32_t> lane_id_to_priority;
-    auto& ref_line_info_group = frame_->reference_line_info();
+    auto& ref_line_info_group = *frame_->mutable_reference_line_info();
     if (is_received_pad_msg_) {
       is_received_pad_msg_ = false;
       using LaneInfoPair = std::pair<std::string, double>;
@@ -380,7 +380,7 @@ void NaviPlanning::ProcessPadMsg(DrivingAction drvie_action) {
 }
 
 std::string NaviPlanning::GetCurrentLaneId() {
-  auto& ref_line_info_group = frame_->reference_line_info();
+  auto& ref_line_info_group = *frame_->mutable_reference_line_info();
   const auto& vehicle_state = frame_->vehicle_state();
   common::math::Vec2d adc_position(vehicle_state.x(), vehicle_state.y());
   std::string current_lane_id;
@@ -397,7 +397,7 @@ std::string NaviPlanning::GetCurrentLaneId() {
 void NaviPlanning::GetLeftNeighborLanesInfo(
     std::vector<std::pair<std::string, double>>* const lane_info_group) {
   DCHECK_NOTNULL(lane_info_group);
-  auto& ref_line_info_group = frame_->reference_line_info();
+  auto& ref_line_info_group = *frame_->mutable_reference_line_info();
   const auto& vehicle_state = frame_->vehicle_state();
   for (auto& ref_line_info : ref_line_info_group) {
     common::math::Vec2d adc_position(vehicle_state.x(), vehicle_state.y());
@@ -425,7 +425,7 @@ void NaviPlanning::GetLeftNeighborLanesInfo(
 void NaviPlanning::GetRightNeighborLanesInfo(
     std::vector<std::pair<std::string, double>>* const lane_info_group) {
   DCHECK_NOTNULL(lane_info_group);
-  auto& ref_line_info_group = frame_->reference_line_info();
+  auto& ref_line_info_group = *frame_->mutable_reference_line_info();
   const auto& vehicle_state = frame_->vehicle_state();
   for (auto& ref_line_info : ref_line_info_group) {
     common::math::Vec2d adc_position(vehicle_state.x(), vehicle_state.y());
@@ -455,7 +455,7 @@ void NaviPlanning::ExportReferenceLineDebug(planning_internal::Debug* debug) {
   if (!FLAGS_enable_record_debug) {
     return;
   }
-  for (auto& reference_line_info : frame_->reference_line_info()) {
+  for (auto& reference_line_info : *frame_->mutable_reference_line_info()) {
     auto rl_debug = debug->mutable_planning_data()->add_reference_line();
     rl_debug->set_id(reference_line_info.Lanes().Id());
     rl_debug->set_length(reference_line_info.reference_line().Length());

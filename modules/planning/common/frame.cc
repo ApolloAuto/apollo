@@ -137,8 +137,12 @@ bool Frame::Rerouting() {
   return true;
 }
 
-std::list<ReferenceLineInfo> &Frame::reference_line_info() {
+const std::list<ReferenceLineInfo> &Frame::reference_line_info() const {
   return reference_line_info_;
+}
+
+std::list<ReferenceLineInfo> *Frame::mutable_reference_line_info() {
+  return &reference_line_info_;
 }
 
 void Frame::UpdateReferenceLinePriority(

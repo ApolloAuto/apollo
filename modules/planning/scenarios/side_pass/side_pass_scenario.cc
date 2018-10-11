@@ -141,10 +141,10 @@ bool SidePassScenario::IsTransferable(const Scenario& current_scenario,
   if (frame.reference_line_info().size() > 1) {
     return false;
   }
-  if (current_scenario.type() == ScenarioConfig::SIDE_PASS) {
+  if (current_scenario.scenario_type() == ScenarioConfig::SIDE_PASS) {
     return (current_scenario.GetStatus() !=
             Scenario::ScenarioStatus::STATUS_DONE);
-  } else if (current_scenario.type() != ScenarioConfig::LANE_FOLLOW) {
+  } else if (current_scenario.scenario_type() != ScenarioConfig::LANE_FOLLOW) {
     return false;
   } else {
     return IsSidePassScenario(ego_point, frame);
@@ -159,7 +159,7 @@ Status SidePassScenario::ApproachObstacle(
   }
   Status status = RunPlanOnReferenceLine(planning_start_point, frame);
   if (status.ok()) {
-    if (!IsSidePassScenario(planning_start_point, frame)) {
+    if (!IsSidePassScenario(planning_start_point, *frame)) {
       // TODO(yifei) scenario is done
     } else if (frame->vehicle_state().linear_velocity() < 1.0e-5) {
       stage_ = PATH_GENERATION;
@@ -190,7 +190,8 @@ Status SidePassScenario::PassObstacle(
 }
 
 bool SidePassScenario::IsSidePassScenario(
-    const common::TrajectoryPoint& planning_start_point, const Frame* frame) {
+    const common::TrajectoryPoint& planning_start_point,
+    const Frame& frame) const {
   // TODO(liangliang)
   return true;
 }
@@ -200,7 +201,7 @@ Status SidePassScenario::RunPlanOnReferenceLine(
   auto status =
       Status(ErrorCode::PLANNING_ERROR, "reference line not drivable");
 
-  for (auto& reference_line_info : frame->reference_line_info()) {
+  for (auto& reference_line_info : *frame->mutable_reference_line_info()) {
     if (!reference_line_info.IsDrivable()) {
       return status;
     }

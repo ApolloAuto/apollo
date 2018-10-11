@@ -112,7 +112,7 @@ Status NaviPlanner::Plan(const TrajectoryPoint& planning_init_point,
   }
 
   std::size_t success_line_count = 0;
-  for (auto& reference_line_info : frame->reference_line_info()) {
+  for (auto& reference_line_info : *frame->mutable_reference_line_info()) {
     uint32_t priority = reference_line_info.GetPriority();
     reference_line_info.SetCost(priority * kStraightForwardLineCost);
     if (priority != KDestLanePriority) {
