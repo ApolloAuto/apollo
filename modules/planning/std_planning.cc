@@ -255,7 +255,7 @@ void StdPlanning::RunOnce(const LocalView& local_view,
     return;
   }
 
-  for (auto& ref_line_info : frame_->reference_line_info()) {
+  for (auto& ref_line_info : *frame_->mutable_reference_line_info()) {
     TrafficDecider traffic_decider;
     traffic_decider.Init(traffic_rule_configs_);
     auto traffic_status = traffic_decider.Execute(frame_.get(), &ref_line_info);
@@ -310,7 +310,7 @@ void StdPlanning::ExportReferenceLineDebug(planning_internal::Debug* debug) {
   if (!FLAGS_enable_record_debug) {
     return;
   }
-  for (auto& reference_line_info : frame_->reference_line_info()) {
+  for (auto& reference_line_info : *frame_->mutable_reference_line_info()) {
     auto rl_debug = debug->mutable_planning_data()->add_reference_line();
     rl_debug->set_id(reference_line_info.Lanes().Id());
     rl_debug->set_length(reference_line_info.reference_line().Length());

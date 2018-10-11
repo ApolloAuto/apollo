@@ -75,7 +75,8 @@ class Frame {
 
   void RecordInputDebug(planning_internal::Debug *debug);
 
-  std::list<ReferenceLineInfo> &reference_line_info();
+  const std::list<ReferenceLineInfo> &reference_line_info() const;
+  std::list<ReferenceLineInfo> *mutable_reference_line_info();
 
   Obstacle *Find(const std::string &id);
 

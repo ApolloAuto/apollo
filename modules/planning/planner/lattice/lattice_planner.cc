@@ -26,8 +26,8 @@
 #include <utility>
 #include <vector>
 
-#include "cybertron/common/macros.h"
 #include "cybertron/common/log.h"
+#include "cybertron/common/macros.h"
 #include "modules/common/math/cartesian_frenet_conversion.h"
 #include "modules/common/math/path_matcher.h"
 #include "modules/common/time/time.h"
@@ -97,7 +97,7 @@ Status LatticePlanner::Plan(const TrajectoryPoint& planning_start_point,
                             Frame* frame) {
   std::size_t success_line_count = 0;
   std::size_t index = 0;
-  for (auto& reference_line_info : frame->reference_line_info()) {
+  for (auto& reference_line_info : *frame->mutable_reference_line_info()) {
     if (index != 0) {
       reference_line_info.SetPriorityCost(
           FLAGS_cost_non_priority_reference_line);

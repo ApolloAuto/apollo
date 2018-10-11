@@ -159,7 +159,7 @@ Status LaneFollowScenario::Process(const TrajectoryPoint& planning_start_point,
   bool disable_low_priority_path = false;
   auto status =
       Status(ErrorCode::PLANNING_ERROR, "reference line not drivable");
-  for (auto& reference_line_info : frame->reference_line_info()) {
+  for (auto& reference_line_info : *frame->mutable_reference_line_info()) {
     if (disable_low_priority_path) {
       reference_line_info.SetDrivable(false);
     }

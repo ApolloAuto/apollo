@@ -43,9 +43,10 @@ Status RTKReplayPlanner::Plan(const TrajectoryPoint& planning_start_point,
   auto status = Status::OK();
   bool has_plan = false;
   auto it = std::find_if(
-      frame->reference_line_info().begin(), frame->reference_line_info().end(),
+      frame->mutable_reference_line_info()->begin(),
+      frame->mutable_reference_line_info()->end(),
       [](const ReferenceLineInfo& ref) { return ref.IsChangeLanePath(); });
-  if (it != frame->reference_line_info().end()) {
+  if (it != frame->mutable_reference_line_info()->end()) {
     status = PlanOnReferenceLine(planning_start_point, frame, &(*it));
     has_plan = (it->IsDrivable() && it->IsChangeLanePath() &&
                 it->TrajectoryLength() > FLAGS_change_lane_min_length);
@@ -55,7 +56,7 @@ Status RTKReplayPlanner::Plan(const TrajectoryPoint& planning_start_point,
   }
 
   if (!has_plan || !FLAGS_prioritize_change_lane) {
-    for (auto& reference_line_info : frame->reference_line_info()) {
+    for (auto& reference_line_info : *frame->mutable_reference_line_info()) {
       if (reference_line_info.IsChangeLanePath()) {
         continue;
       }

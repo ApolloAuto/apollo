@@ -79,7 +79,7 @@ class SidePassScenario : public Scenario {
       const common::TrajectoryPoint& planning_start_point, Frame* frame);
 
   bool IsSidePassScenario(const common::TrajectoryPoint& planning_start_point,
-                          const Frame* frame);
+                          const Frame& frame) const;
 
   common::Status RunPlanOnReferenceLine(
       const common::TrajectoryPoint& planning_start_point, Frame* frame);
