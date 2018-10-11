@@ -57,4 +57,34 @@ cc_test(
         "@gtest//:main",
     ],
 )
+
+cc_library(
+    name = "piecewise_poly_vt_speed_sampler",
+    srcs = [
+        "piecewise_poly_vt_speed_sampler.cc",
+    ],
+    hdrs = [
+        "piecewise_poly_vt_speed_sampler.h",
+    ],
+    deps = [
+        ":piecewise_poly_speed_profile",
+        ":piecewise_poly_speed_curve",
+        "//cybertron",
+        "//modules/common/proto:pnc_point_proto",
+        "//modules/planning/proto:poly_vt_speed_config_proto",
+    ]
+)
+
+cc_test(
+    name = "piecewise_poly_vt_speed_sampler_test",
+    size = "small",
+    srcs = [
+        "piecewise_poly_vt_speed_sampler_test.cc",
+    ],
+    deps = [
+        ":piecewise_poly_vt_speed_sampler",
+        "@gtest//:main",
+    ],
+)
+
 cpplint()
