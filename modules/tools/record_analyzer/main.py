@@ -17,87 +17,53 @@
 ###############################################################################
 
 import sys
-import numpy as np
 from cybertron.record import RecordReader
 from modules.control.proto import control_cmd_pb2
 from modules.planning.proto import planning_pb2
 from modules.canbus.proto import chassis_pb2
+from control_analyzer import ControlAnalyzer
+from planning_analyzer import PlannigAnalyzer
 
 
-class bcolors:
-    """ output color schema"""
-    HEADER = '\033[95m'
-    OKBLUE = '\033[94m'
-    OKGREEN = '\033[92m'
-    WARNING = '\033[93m'
-    FAIL = '\033[91m'
-    ENDC = '\033[0m'
-    BOLD = '\033[1m'
-    UNDERLINE = '\033[4m'
+def process(control_analyzer, planning_analyzer):
+    is_auto_drive = False
 
-
-def statistical_analyzer(data):
-    """ statistical analyzer"""
-    arr = np.array(data)
-
-    v = np.average(arr)
-    print bcolors.OKBLUE + "Average: \t" + bcolors.ENDC, "{0:.2f}".format(v)
-
-    std = np.std(arr)
-    print bcolors.OKBLUE + "STD: \t\t" + bcolors.ENDC, "{0:.2f}".format(std)
-
-    p = np.percentile(arr, 10)
-    print bcolors.OKBLUE + "10 Percentile: \t" + bcolors.ENDC, \
-        "{0:.2f}".format(p)
-
-    p = np.percentile(arr, 50)
-    print bcolors.OKBLUE + "50 Percentile: \t" + bcolors.ENDC, \
-        "{0:.2f}".format(p)
-
-    p = np.percentile(arr, 99)
-    print bcolors.OKBLUE + "90 Percentile: \t" + bcolors.ENDC, \
-        "{0:.2f}".format(p)
-
-
-if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        print "usage: python main.py record_file"
-    record_file = sys.argv[1]
-    reader = RecordReader(record_file)
-
-    control_latency_list = []
-    planning_latency_list = []
-    auto_drive = False
     for msg in reader.read_messages():
         if msg.topic == "/apollo/canbus/chassis":
             chassis = chassis_pb2.Chassis()
             chassis.ParseFromString(msg.message)
             if chassis.driving_mode == \
                     chassis_pb2.Chassis.COMPLETE_AUTO_DRIVE:
-                auto_drive = True
+                is_auto_drive = True
             else:
-                auto_drive = False
+                is_auto_drive = False
 
         if msg.topic == "/apollo/control":
-            if auto_drive:
+            if is_auto_drive:
                 continue
             control_cmd = control_cmd_pb2.ControlCommand()
             control_cmd.ParseFromString(msg.message)
-            control_latency_list.append(
-                control_cmd.latency_stats.total_time_ms)
+            control_analyzer.put(control_cmd)
 
         if msg.topic == "/apollo/planning":
-            if auto_drive:
+            if is_auto_drive:
                 continue
             adc_trajectory = planning_pb2.ADCTrajectory()
             adc_trajectory.ParseFromString(msg.message)
-            latency = adc_trajectory.latency_stats.total_time_ms
-            planning_latency_list.append(latency)
+            planning_analyzer.put(adc_trajectory)
 
-    print ""
-    print bcolors.HEADER + "--- Control Latency (ms) ---" + bcolors.ENDC
-    statistical_analyzer(control_latency_list)
 
-    print ""
-    print bcolors.HEADER + "--- Planning Latency (ms) ---" + bcolors.ENDC
-    statistical_analyzer(planning_latency_list)
+if __name__ == "__main__":
+    if len(sys.argv) < 2:
+        print "usage: python main.py record_file"
+
+    record_file = sys.argv[1]
+    reader = RecordReader(record_file)
+
+    control_analyzer = ControlAnalyzer()
+    planning_analyzer = PlannigAnalyzer()
+
+    process(control_analyzer, planning_analyzer)
+
+    control_analyzer.print_latency_statistics()
+    planning_analyzer.print_latency_statistics()
