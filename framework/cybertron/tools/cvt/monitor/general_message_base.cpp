@@ -19,13 +19,79 @@
 #include "./general_message.h"
 #include "./screen.h"
 
+#include <iomanip>
 #include <string>
 #include <vector>
-#include <iomanip>
 
 namespace {
 constexpr int INT_FLOAT_PRECISION = 6;
 constexpr int DOULBE_PRECISION = 9;
+
+int calculateStringLines(const std::string& str, int screenWidth) {
+  int lineWidth = 0;
+  int lineCount = 0;
+  for (std::size_t i = 0; i < str.size(); ++i) {
+    if (str[i] == '\n' || str[i] == '\r') {
+      ++lineCount;
+      lineWidth = 0;
+    } else {
+      ++lineWidth;
+      if (lineWidth == screenWidth) {
+        ++lineCount;
+        lineWidth = 0;
+      }
+    }
+  }
+
+  if (lineWidth) {
+    ++lineCount;
+  }
+
+  return lineCount;
+}
+
+unsigned outputSubString(std::ostringstream& outStr, const std::string& str,
+                         int screenWidth, int& jumpLines) {
+  int lineWidth = 0;
+  std::size_t i = 0;
+
+  for (; i < str.size() && jumpLines > 0; ++i) {
+    if (str[i] == '\n' || str[i] == '\r') {
+      --jumpLines;
+      lineWidth = 0;
+    } else {
+      ++lineWidth;
+      if (lineWidth == screenWidth) {
+        --jumpLines;
+        lineWidth = 0;
+      }
+    }
+  }
+
+  unsigned lineCount = 0;
+  if (jumpLines == 0) {
+    lineWidth = 0;
+    lineCount = 1;
+    for (; i < str.size(); ++i) {
+      char ch = str[i];
+      if (str[i] == '\n' || str[i] == '\r') {
+        ++lineCount;
+        lineWidth = 0;
+        ch = '\n';
+      } else {
+        ++lineWidth;
+        if (lineWidth == screenWidth) {
+          ++lineCount;
+          lineWidth = 0;
+        }
+      }
+      outStr << ch;
+    }
+  }
+
+  return lineCount;
+}
+
 }  // namespace
 
 int GeneralMessageBase::lineCount(const google::protobuf::Message& msg,
@@ -60,7 +126,7 @@ int GeneralMessageBase::lineCountOfField(
         std::string scratch;
         const std::string& value =
             reflection->GetStringReference(msg, field, &scratch);
-        ret += value.size() / screenWidth + 1;
+        ret += calculateStringLines(value, screenWidth);
         break;
       }
 
@@ -169,25 +235,72 @@ void GeneralMessageBase::PrintField(
 
     case google::protobuf::FieldDescriptor::CPPTYPE_STRING: {
       std::string scratch;
-      const std::string& value =
+      const std::string& str =
           field->is_repeated()
               ? ref->GetRepeatedStringReference(msg, field, index, &scratch)
               : ref->GetStringReference(msg, field, &scratch);
-      int lines = value.size() / s->Width() + 1;
-      if (lines > jumpLines) {
-        const std::string& fieldName = field->name();
-        outStr << fieldName << ": ";
-        if (field->is_repeated()) {
-          outStr << "[" << index << "] ";
-        }
-        outStr << value.substr(jumpLines * s->Width());
-        s->AddStr(indent, lineNo, outStr.str().c_str());
-        lineNo += (lines - jumpLines);
-        jumpLines = 0;
+      // int lines = calculateStringLines(str, s->Width());
+      // if (lines > jumpLines) {
+      //   const std::string& fieldName = field->name();
+      //   outStr << fieldName << ": ";
+      //   if (field->is_repeated()) {
+      //     outStr << "[" << index << "] ";
+      //   }
+      //   lines = outputSubString(outStr, str, s->Width(), jumpLines);
+      //   s->AddStr(indent, lineNo, outStr.str().c_str());
+      //   lineNo += lines;
+      // } else {
+      //   jumpLines -= lines;
+      // }
 
-      } else {
-        jumpLines -= lines;
+      {
+        int lineWidth = 0;
+        std::size_t i = 0;
+
+        for (; i < str.size() && jumpLines > 0; ++i) {
+          if (str[i] == '\n' || str[i] == '\r') {
+            --jumpLines;
+            lineWidth = 0;
+          } else {
+            ++lineWidth;
+            if (lineWidth == s->Width()) {
+              --jumpLines;
+              lineWidth = 0;
+            }
+          }
+        }
+
+        if (jumpLines == 0) {
+          lineWidth = 0;
+          unsigned lineCount = 1;
+
+          const std::string& fieldName = field->name();
+          outStr << fieldName << ": ";
+          if (field->is_repeated()) {
+            outStr << "[" << index << "] ";
+          }
+
+          for (; i < str.size(); ++i) {
+            char ch = str[i];
+            if (str[i] == '\n' || str[i] == '\r') {
+              ++lineCount;
+              lineWidth = 0;
+              ch = '\n';
+            } else {
+              ++lineWidth;
+              if (lineWidth == s->Width()) {
+                ++lineCount;
+                lineWidth = 0;
+              }
+            }
+            outStr << ch;
+          }
+
+          s->AddStr(indent, lineNo, outStr.str().c_str());
+          lineNo += lineCount;
+        }
       }
+
       break;
     }
 
