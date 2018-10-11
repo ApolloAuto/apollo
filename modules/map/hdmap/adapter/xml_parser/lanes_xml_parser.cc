@@ -700,6 +700,7 @@ void LanesXmlParser::ParseLaneLink(const tinyxml2::XMLElement& xml_node,
     }
     sub_node = sub_node->NextSiblingElement("successor");
   }
+
   sub_node = xml_node.FirstChildElement("neighbor");
   while (sub_node) {
     std::string side;
@@ -718,6 +719,17 @@ void LanesXmlParser::ParseLaneLink(const tinyxml2::XMLElement& xml_node,
       }
     }
     sub_node = sub_node->NextSiblingElement("neighbor");
+  }
+
+  sub_node = xml_node.FirstChildElement("selfReverse");
+  while (sub_node) {
+    std::string lane_id;
+    int checker = UtilXmlParser::QueryStringAttribute(*sub_node, "id",
+                                                    &lane_id);
+    if (checker == tinyxml2::XML_SUCCESS) {
+      lane->add_self_reverse_lane_id()->set_id(lane_id);
+    }
+    sub_node = sub_node->NextSiblingElement("selfReverse");
   }
 }
 
