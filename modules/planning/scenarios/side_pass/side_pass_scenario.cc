@@ -62,8 +62,6 @@ constexpr double kSpeedOptimizationFallbackCost = 2e4;
 constexpr double kStraightForwardLineCost = 10.0;
 }  // namespace
 
-int SidePassScenario::current_stage_index_ = 0;
-
 void SidePassScenario::RegisterTasks() {
   task_factory_.Register(DP_POLY_PATH_OPTIMIZER,
                          []() -> Task* { return new DpPolyPathOptimizer(); });
@@ -153,9 +151,9 @@ bool SidePassScenario::IsTransferable(const Scenario& current_scenario,
 
 Status SidePassScenario::ApproachObstacle(
     const TrajectoryPoint& planning_start_point, Frame* frame) {
-  if (!stage_init) {
+  if (!stage_init_) {
     // TODO(yifei) init stage
-    stage_init = true;
+    stage_init_ = true;
   }
   Status status = RunPlanOnReferenceLine(planning_start_point, frame);
   if (status.ok()) {
@@ -163,7 +161,7 @@ Status SidePassScenario::ApproachObstacle(
       // TODO(yifei) scenario is done
     } else if (frame->vehicle_state().linear_velocity() < 1.0e-5) {
       stage_ = PATH_GENERATION;
-      stage_init = false;
+      stage_init_ = false;
     }
   }
   return status;

@@ -54,11 +54,11 @@ class SidePassScenario : public Scenario {
 
  private:
   enum SidePassStage {
-    OBSTACLE_APPROACH = 1,
-    PATH_GENERATION = 2,
-    WAITPOINT_STOP = 3,
-    SAFETY_DETECTION = 4,
-    OBSTACLE_PASS = 5,
+    OBSTACLE_APPROACH,
+    PATH_GENERATION,
+    WAITPOINT_STOP,
+    SAFETY_DETECTION,
+    OBSTACLE_PASS,
   };
 
   void RegisterTasks();
@@ -88,11 +88,11 @@ class SidePassScenario : public Scenario {
                            const PathDecision& path_decision) const;
 
  private:
-  static int current_stage_index_;
   std::vector<std::unique_ptr<Task>> tasks_;
   ScenarioConfig config_;
+  int current_stage_index_ = 0;
   SidePassStage stage_ = OBSTACLE_APPROACH;
-  bool stage_init = false;
+  bool stage_init_ = false;
   SpeedProfileGenerator speed_profile_generator_;
   PathData path_;
   double wait_point_s = 0;

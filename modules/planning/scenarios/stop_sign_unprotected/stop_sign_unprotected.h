@@ -75,9 +75,9 @@ class StopSignUnprotectedScenario : public Scenario {
   bool FindNextStopSign(ReferenceLineInfo* const reference_line_info);
 
  private:
-  static int current_stage_index_;
   std::vector<std::unique_ptr<Task>> tasks_;
   ScenarioConfig config_;
+  int current_stage_index_ = 0;
   StopSignUnprotectedStage stage_ = PRE_STOP;
   SpeedProfileGenerator speed_profile_generator_;
   hdmap::PathOverlap next_stop_sign_overlap_;
