@@ -49,11 +49,11 @@ bool Scenario::InitTasks(const ScenarioConfig& config,
   // init task in the same order as defined on conf
   for (int i = 0; i < stage.task_size(); ++i) {
     TaskType task = stage.task(i);
-    auto task_config_it = std::find_if(
-        task_configs.begin(), task_configs.end(),
-        [task](ScenarioConfig::ScenarioTaskConfig& task_config) {
-          return task_config.task_type() == task;
-        });
+    auto task_config_it =
+        std::find_if(task_configs.begin(), task_configs.end(),
+                     [task](ScenarioConfig::ScenarioTaskConfig& task_config) {
+                       return task_config.task_type() == task;
+                     });
     if (task_config_it != task_configs.end()) {
       tasks->emplace_back(task_factory_.CreateObject(task));
       ADEBUG << "Created task:" << TaskType_Name(task);

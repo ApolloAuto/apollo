@@ -64,8 +64,7 @@ class Scenario {
   const ScenarioStatus& GetStatus() const { return status_; }
 
  protected:
-  bool InitTasks(const ScenarioConfig& config,
-                 const int current_stage_index,
+  bool InitTasks(const ScenarioConfig& config, const int current_stage_index,
                  std::vector<std::unique_ptr<Task>>* tasks);
 
  protected:

@@ -192,8 +192,69 @@ Status SidePassScenario::PassObstacle(
 bool SidePassScenario::IsSidePassScenario(
     const common::TrajectoryPoint& planning_start_point,
     const Frame& frame) const {
-  // TODO(liangliang)
-  return true;
+  // TODO(lianglia-apollo)
+  const SLBoundary& adc_sl_boundary =
+      frame.reference_line_info().front().AdcSlBoundary();
+  const PathDecision& path_decision =
+      frame.reference_line_info().front().path_decision();
+  return HasBlockingObstacle(adc_sl_boundary, path_decision);
+}
+
+bool SidePassScenario::HasBlockingObstacle(
+    const SLBoundary& adc_sl_boundary,
+    const PathDecision& path_decision) const {
+  // a blocking obstacle is an obstacle blocks the road when it is not blocked
+  // (by other obstacles or traffic rules)
+  for (const auto* path_obstacle : path_decision.path_obstacles().Items()) {
+    if (path_obstacle->obstacle()->IsVirtual() ||
+        !path_obstacle->obstacle()->IsStatic()) {
+      continue;
+    }
+    CHECK(path_obstacle->obstacle()->IsStatic());
+
+    if (path_obstacle->PerceptionSLBoundary().start_s() <=
+        adc_sl_boundary.end_s()) {  // such vehicles are behind the adc.
+      continue;
+    }
+    constexpr double kAdcDistanceThreshold = 15.0;  // unit: m
+    if (path_obstacle->PerceptionSLBoundary().start_s() >
+        adc_sl_boundary.end_s() +
+            kAdcDistanceThreshold) {  // vehicles are far away
+      continue;
+    }
+    if (path_obstacle->PerceptionSLBoundary().start_l() > 1.0 ||
+        path_obstacle->PerceptionSLBoundary().end_l() < -1.0) {
+      continue;
+    }
+
+    bool is_blocked_by_others = false;
+    for (const auto* other_obstacle : path_decision.path_obstacles().Items()) {
+      if (other_obstacle->Id() == path_obstacle->Id()) {
+        continue;
+      }
+      if (other_obstacle->PerceptionSLBoundary().start_l() >
+              path_obstacle->PerceptionSLBoundary().end_l() ||
+          other_obstacle->PerceptionSLBoundary().end_l() <
+              path_obstacle->PerceptionSLBoundary().start_l()) {
+        // not blocking the backside vehicle
+        continue;
+      }
+
+      double delta_s = other_obstacle->PerceptionSLBoundary().start_s() -
+                       path_obstacle->PerceptionSLBoundary().end_s();
+      if (delta_s < 0.0 || delta_s > kAdcDistanceThreshold) {
+        continue;
+      } else {
+        // TODO(All): fixed the segmentation bug for large vehicles, otherwise
+        // the follow line will be problematic.
+        // is_blocked_by_others = true; break;
+      }
+    }
+    if (!is_blocked_by_others) {
+      return true;
+    }
+  }
+  return false;
 }
 
 Status SidePassScenario::RunPlanOnReferenceLine(
@@ -231,5 +292,6 @@ Status SidePassScenario::RunPlanOnReferenceLine(
   }
   return status;
 }
+
 }  // namespace planning
 }  // namespace apollo
