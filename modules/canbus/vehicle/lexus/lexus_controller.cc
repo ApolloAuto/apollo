@@ -161,7 +161,7 @@ Chassis LexusController::chassis() {
   if (chassis_detail.lexus().has_vehicle_speed_rpt_400() &&
       chassis_detail.lexus().vehicle_speed_rpt_400().has_vehicle_speed()) {
     chassis_.set_speed_mps(
-        chassis_detail.lexus().vehicle_speed_rpt_400().has_vehicle_speed());
+        chassis_detail.lexus().vehicle_speed_rpt_400().vehicle_speed());
   } else {
     chassis_.set_speed_mps(0);
   }
