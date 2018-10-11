@@ -11,7 +11,7 @@ cc_library(
         "kv_db.h",
     ],
     linkopts = [
-        "-lleveldb",
+        "-lsqlite3",
     ],
     deps = [
         "//external:gflags",
@@ -29,6 +29,14 @@ cc_test(
     deps = [
         ":kv_db",
         "@gtest//:main",
+    ],
+)
+
+cc_binary(
+    name = "kv_db_tool",
+    srcs = ["kv_db_tool.cc"],
+    deps = [
+        ":kv_db",
     ],
 )
 

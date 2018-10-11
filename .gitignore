@@ -58,7 +58,7 @@ data/log
 data/core
 data/bag
 data/cov
-data/kv_db
+data/kv_db.sqlite
 data/pcd
 data/nfs
 data/map_visual
