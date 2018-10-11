@@ -48,8 +48,9 @@ std::string ContiArsPreprocessor::Name() const {
   return "ContiArsPreprocessor";
 }
 
-void ContiArsPreprocessor::SkipObjects(const drivers::ContiRadar& raw_obstacles,
-                                       drivers::ContiRadar* corrected_obstacles) {
+void ContiArsPreprocessor::SkipObjects(
+        const drivers::ContiRadar& raw_obstacles,
+        drivers::ContiRadar* corrected_obstacles) {
   corrected_obstacles->mutable_header()->CopyFrom(raw_obstacles.header());
   double timestamp = raw_obstacles.header().timestamp_sec() - 1e-6;
   for (const auto& contiobs : raw_obstacles.contiobs()) {
@@ -83,7 +84,8 @@ void ContiArsPreprocessor::ExpandIds(drivers::ContiRadar* corrected_obstacles) {
   }
 }
 
-void ContiArsPreprocessor::CorrectTime(drivers::ContiRadar* corrected_obstacles) {
+void ContiArsPreprocessor::CorrectTime(
+        drivers::ContiRadar* corrected_obstacles) {
   double correct_timestamp = corrected_obstacles->header().timestamp_sec()
                            - delay_time_;
   corrected_obstacles->mutable_header()->set_timestamp_sec(correct_timestamp);

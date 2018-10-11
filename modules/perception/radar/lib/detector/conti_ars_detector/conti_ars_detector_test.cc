@@ -129,7 +129,8 @@ TEST(ContiArsDetector, detect) {
   EXPECT_EQ(radar_object->type, base::ObjectType::UNKNOWN);
 
   base::FramePtr radar_frame7(new base::Frame);
-  corrected_obstacles.mutable_contiobs(0)->set_obstacle_class(CONTI_TYPE_UNKNOWN);
+  corrected_obstacles.mutable_contiobs(0)->set_obstacle_class(
+          CONTI_TYPE_UNKNOWN);
   detector.Detect(corrected_obstacles, options, radar_frame7);
   radar_object = radar_frame7->objects.front();
   EXPECT_EQ(radar_object->type, base::ObjectType::UNKNOWN);

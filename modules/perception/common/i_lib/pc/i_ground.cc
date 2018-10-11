@@ -1233,8 +1233,8 @@ bool PlaneFitGroundDetector::Detect(const float *point_cloud,
   if (!vg_coarse_->SetS(point_cloud, nr_points, nr_point_elements)) {
     return false;
   }
-  //int nr_candis = 0;
-  //int nr_valid_grid = 0;
+  // int nr_candis = 0;
+  // int nr_valid_grid = 0;
   unsigned int r = 0;
   unsigned int c = 0;
   // Filter to generate plane fitting candidates
