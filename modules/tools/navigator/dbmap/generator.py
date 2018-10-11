@@ -23,7 +23,7 @@ from modules.map.relative_map.proto import navigation_pb2
 
 if __name__ == '__main__':
     if len(sys.argv) < 2:
-        print "usage: python navimap.py " \
+        print "usage: python generator.py " \
               "navi_line1.smoothed navi_line2.smoothed ..."
         sys.exit(0)
     navi_files = sys.argv[1:]
@@ -53,5 +53,5 @@ if __name__ == '__main__':
                 point.dkappa = json_point['dkappa']
 
     datetime_str = datetime.now().strftime("%Y%m%d_%H%M%S")
-    with open(datetime_str + ".navimap", 'w') as f:
+    with open(datetime_str + ".dbmap", 'w') as f:
         f.write(str(navigation_info))
