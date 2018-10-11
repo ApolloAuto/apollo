@@ -28,6 +28,7 @@ using apollo::planning::ADCTrajectory;
 using apollo::hdmap::HDMapUtil;
 using apollo::hdmap::LaneInfo;
 using apollo::hdmap::JunctionInfo;
+using apollo::perception::PerceptionObstacle;
 using JunctionInfoPtr = std::shared_ptr<const JunctionInfo>;
 using LaneInfoPtr = std::shared_ptr<const LaneInfo>;
 
@@ -47,7 +48,13 @@ EnvironmentFeatures FeatureExtractor::ExtractEnvironmentFeatures() {
   }
   ExtractEgoVehicleFeatures(&environment_features);
 
-  auto ego_trajectory_point = pose_container->GetPosition();
+  const PerceptionObstacle* pose_ptr = pose_container->ToPerceptionObstacle();
+  if (pose_ptr == nullptr) {
+    AERROR << "Null pose pointer, skip extracting environment features.";
+    return environment_features;
+  }
+
+  auto ego_trajectory_point = pose_ptr->position();
   if (!ego_trajectory_point.has_x() ||
       !ego_trajectory_point.has_y()) {
     AERROR << "Fail to get ego vehicle position";
@@ -77,9 +84,16 @@ void FeatureExtractor::ExtractEgoVehicleFeatures(
   PoseContainer* pose_container = dynamic_cast<PoseContainer*>(
       ContainerManager::Instance()->GetContainer(
           AdapterConfig::LOCALIZATION));
+  const PerceptionObstacle* pose_ptr = pose_container->ToPerceptionObstacle();
+  if (pose_ptr == nullptr) {
+    AERROR << "Null pose pointer";
+    return;
+  }
   // TODO(all): change this to ego_speed and ego_heading
-  ptr_environment_features->set_ego_speed(pose_container->GetSpeed());
-  ptr_environment_features->set_ego_heading(pose_container->GetTheta());
+  double pose_speed = std::hypot(pose_ptr->velocity().x(),
+                                 pose_ptr->velocity().y());
+  ptr_environment_features->set_ego_speed(pose_speed);
+  ptr_environment_features->set_ego_heading(pose_ptr->theta());
   // TODO(all): add acceleration if needed
 }
 

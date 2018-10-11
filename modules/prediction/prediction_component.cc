@@ -246,7 +246,7 @@ bool PredictionComponent::Proc(
   CHECK_NOTNULL(pose_container);
   CHECK_NOTNULL(adc_container);
 
-  PerceptionObstacle* adc = pose_container->ToPerceptionObstacle();
+  const PerceptionObstacle* adc = pose_container->ToPerceptionObstacle();
   if (adc != nullptr) {
     obstacles_container->InsertPerceptionObstacle(*adc, adc->timestamp());
     double x = adc->position().x();
