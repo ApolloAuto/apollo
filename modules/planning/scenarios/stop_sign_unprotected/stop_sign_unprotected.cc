@@ -27,6 +27,7 @@
 #include "modules/common/util/file.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/toolkits/deciders/decider_creep.h"
 #include "modules/planning/toolkits/optimizers/dp_poly_path/dp_poly_path_optimizer.h"
 #include "modules/planning/toolkits/optimizers/dp_st_speed/dp_st_speed_optimizer.h"
 #include "modules/planning/toolkits/optimizers/path_decider/path_decider.h"
@@ -44,6 +45,10 @@ using common::TrajectoryPoint;
 int StopSignUnprotectedScenario::current_stage_index_ = 0;
 
 void StopSignUnprotectedScenario::RegisterTasks() {
+  // deciders
+  task_factory_.Register(DECIDER_CREEP,
+                         []() -> Task* { return new DeciderCreep(); });
+  // optimizers
   task_factory_.Register(DP_POLY_PATH_OPTIMIZER,
                          []() -> Task* { return new DpPolyPathOptimizer(); });
   task_factory_.Register(PATH_DECIDER,

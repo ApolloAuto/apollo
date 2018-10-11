@@ -6,46 +6,18 @@ cc_library(
     name = "decider",
     srcs = [
         "decider.cc",
+        "decider_creep.cc",
+        "decider_stop_sign_monitor.cc",
     ],
     hdrs = [
         "decider.h",
+        "decider_creep.h",
+        "decider_stop_sign_monitor.h",
     ],
     deps = [
         "//modules/common/status",
         "//modules/planning/common:reference_line_info",
         "//modules/planning/toolkits:task",
-    ],
-)
-
-cc_library(
-    name = "creep",
-    srcs = [
-        "creep.cc",
-    ],
-    hdrs = [
-        "creep.h",
-    ],
-    deps = [
-        "//modules/common/util:map_util",
-        "//modules/planning/common:frame",
-        "//modules/planning/common:reference_line_info",
-        "//modules/planning/toolkits/deciders:decider",
-    ],
-)
-
-cc_library(
-    name = "side_pass_safety",
-    srcs = [
-        "side_pass_safety.cc",
-    ],
-    hdrs = [
-        "side_pass_safety.h",
-    ],
-    deps = [
-        "//modules/common/util:map_util",
-        "//modules/planning/common:frame",
-        "//modules/planning/common:reference_line_info",
-        "//modules/planning/toolkits/deciders:decider",
     ],
 )
 

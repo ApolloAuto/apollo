@@ -18,7 +18,7 @@
  * @file
  **/
 
-#include "modules/planning/toolkits/deciders/creep.h"
+#include "modules/planning/toolkits/deciders/decider_creep.h"
 
 #include <string>
 
@@ -32,14 +32,16 @@ using apollo::common::ErrorCode;
 using apollo::common::Status;
 using apollo::hdmap::PathOverlap;
 
-bool Creep::Init(const ScenarioConfig::ScenarioTaskConfig &config) {
+DeciderCreep::DeciderCreep() : Decider("DeciderCreep") {}
+
+bool DeciderCreep::Init(const ScenarioConfig::ScenarioTaskConfig &config) {
   CHECK(config.has_decider_creep_config());
   config_ = config.decider_creep_config();
   is_init_ = true;
   return true;
 }
 
-Status Creep::Process(Frame* frame,
+Status DeciderCreep::Process(Frame* frame,
                       ReferenceLineInfo* reference_line_info) {
   if (!is_init_) {
     AERROR << "Please call Init() before Process().";
@@ -56,7 +58,7 @@ Status Creep::Process(Frame* frame,
 
 
 
-double FindCreepDistance(Frame* frame,
+double DeciderCreep::FindCreepDistance(Frame* frame,
                          ReferenceLineInfo* reference_line_info) {
   // TODO(all)
   return 0.5;
@@ -66,7 +68,7 @@ double FindCreepDistance(Frame* frame,
 // bool Creep::BuildStopDecision(Frame* frame,
 //                              ReferenceLineInfo* reference_line_info,
 //                              const PathOverlap& overlap) {
-bool Creep::BuildStopDecision(
+bool DeciderCreep::BuildStopDecision(
     Frame* frame,
     ReferenceLineInfo* reference_line_info) {
   CHECK_NOTNULL(frame);
