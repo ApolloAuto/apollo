@@ -15,8 +15,9 @@
  *****************************************************************************/
 
 /**
- * @file frame_open_space.cc
+ * @file
  **/
+
 #include "modules/planning/common/frame_open_space.h"
 
 #include <algorithm>

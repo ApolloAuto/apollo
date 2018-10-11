@@ -211,4 +211,17 @@ cc_binary(
     ],
 )
 
+cc_binary(
+    name = "distance_approach_problem_wrapper_lib.so",
+    linkshared = True,
+    linkstatic = False,
+    srcs = [
+        "distance_approach_problem_wrapper.cc",
+    ],
+    deps = [
+        "//modules/planning/open_space:hybrid_a_star",
+        "//modules/planning/open_space:distance_approach_problem",
+    ],
+)
+
 cpplint()
