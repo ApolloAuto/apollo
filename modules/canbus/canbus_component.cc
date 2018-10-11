@@ -99,7 +99,9 @@ bool CanbusComponent::Init() {
     AERROR << "Failed to init vehicle controller.";
     return false;
   }
-  AINFO << "The vehicle controller is successfully initialized with canbus conf as : " << canbus_conf_.vehicle_parameter().ShortDebugString();
+  AINFO << "The vehicle controller is successfully initialized with canbus "
+           "conf as : "
+        << canbus_conf_.vehicle_parameter().ShortDebugString();
 
   cybertron::ReaderConfig guardian_cmd_reader_config;
   guardian_cmd_reader_config.channel_name = FLAGS_guardian_topic;

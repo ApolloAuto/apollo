@@ -149,7 +149,7 @@ Shift_rpt_228::Manual_inputType Shiftrpt228::manual_input(
   Byte t0(bytes + 1);
   int32_t x = t0.get_byte(0, 8);
 
-  //TODO(Snehagn) : temporary fix until AS to fix in the firmware
+  // TODO(Snehagn) : temporary fix until AS to fix in the firmware
   if (x == 255) {
     x = 0;
   }
