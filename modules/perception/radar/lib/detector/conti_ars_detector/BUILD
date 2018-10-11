@@ -2,6 +2,18 @@ load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
+cc_test(
+    name = "conti_ars_detector_test",
+    size = "small",
+    srcs = [
+        "conti_ars_detector_test.cc",
+    ],
+    deps = [
+        ":conti_ars_detector",
+        "@gtest//:main",
+    ],
+)
+
 cc_library(
     name = "conti_ars_detector",
     srcs = [

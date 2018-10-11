@@ -2,6 +2,30 @@ load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
+cc_test(
+    name = "radar_track_manager_test",
+    size = "small",
+    srcs = [
+        "radar_track_manager_test.cc",
+    ],
+    deps = [
+        ":radar_track_manager",
+        "@gtest//:main",
+    ],
+)
+
+cc_test(
+    name = "radar_track_test",
+    size = "small",
+    srcs = [
+        "radar_track_test.cc",
+    ],
+    deps = [
+        ":radar_track",
+        "@gtest//:main",
+    ],
+)
+
 cc_library(
     name = "radar_track_manager",
     srcs = [

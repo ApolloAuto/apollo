@@ -2,6 +2,19 @@ load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
+cc_test(
+    name = "hm_matcher_test",
+    size = "small",
+    srcs = [
+        "hm_matcher_test.cc",
+    ],
+    deps = [
+        "//modules/perception/radar/lib/tracker/common:radar_track_manager",
+        ":hm_matcher",
+        "@gtest//:main",
+    ],
+)
+
 cc_library(
     name = "hm_matcher",
     srcs = [
