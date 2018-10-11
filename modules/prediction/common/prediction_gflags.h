@@ -117,3 +117,4 @@ DECLARE_double(turning_curvature_lower_bound);
 DECLARE_double(turning_curvature_upper_bound);
 DECLARE_double(speed_at_lower_curvature);
 DECLARE_double(speed_at_upper_curvature);
+DECLARE_double(cost_function_alpha);

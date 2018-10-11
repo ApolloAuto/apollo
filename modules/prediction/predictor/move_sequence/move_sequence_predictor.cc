@@ -119,18 +119,119 @@ void MoveSequencePredictor::
   std::vector<double> candidate_times;
   GenerateCandidateTimes(&candidate_times);
 
-  // Fit lateral and longitudinal polynomials.
-  // Evaluate all candidates with cost function and select the best one.
-  std::vector<std::array<double, 6>> lateral_coeffs;
-  std::vector<std::array<double, 5>> longitudinal_coeffs;
-  for (size_t i = 0; i < candidate_times.size(); i ++) {
-    // std::array<double, 6> lat_coeff;
-    // std::array<double, 5> lon_coeff;
+  // Evaluate all candidates using the cost function and select the best one.
+
+  // Set up some initial conditions.
+  Eigen::Vector2d position(feature.position().x(), feature.position().y());
+  double vel_heading = feature.velocity_heading();
+  double feature_v = feature.speed();
+  double feature_a = 0.0;
+  if (FLAGS_enable_lane_sequence_acc && lane_sequence.has_acceleration()) {
+    feature_a = lane_sequence.acceleration();
   }
+  double lane_heading = lane_sequence.lane_segment(0).lane_point(0).heading();
+  double ds0 = feature_v * std::cos(vel_heading - lane_heading);
+  double dds0 = feature_a * std::cos(vel_heading - lane_heading);
 
-  // Draw TrajectoryPoints
-  // TODO(Jiacheng)
+  double cost_of_trajectory = 0.0;
+  for (size_t j = 0; j < candidate_times.size(); ++j) {
+    // Fit lateral and longitudinal polynomials.
+    std::array<double, 6> lateral_coeffs;
+    std::array<double, 5> longitudinal_coeffs;
+    double time_to_end_state = candidate_times[j];
+    double min_end_speed = std::min(FLAGS_still_obstacle_speed_threshold, ds0);
+    double ds1 = std::max(min_end_speed, ds0 + dds0 * time_to_end_state);
+    std::pair<double, double> lon_end_vt = {ds1, time_to_end_state};
+    GetLateralPolynomial(obstacle, lane_sequence, time_to_end_state,
+                         &lateral_coeffs);
+    GetLongitudinalPolynomial(obstacle, lane_sequence, lon_end_vt,
+                              &longitudinal_coeffs);
 
+    // Get lane's initial conditions.
+    int lane_segment_index = 0;
+    std::string lane_id = lane_sequence.lane_segment(0).lane_id();
+    std::shared_ptr<const LaneInfo> lane_info =
+        PredictionMap::LaneById(lane_id);
+    double lane_s = 0.0;
+    double lane_l = 0.0;
+    if (!PredictionMap::GetProjection(position, lane_info, &lane_s, &lane_l)) {
+      AERROR << "Failed in getting lane s and lane l";
+      return;
+    }
+    double prev_s = 0.0;
+
+    // Draw each trajectory point within the total time of prediction
+    double max_lat_acc = 0.0;
+    size_t total_num = static_cast<size_t>(total_time / period);
+    std::vector<apollo::common::TrajectoryPoint> curr_points;
+    for (size_t i = 0; i < total_num; ++i) {
+      double relative_time = static_cast<double>(i) * period;
+      Eigen::Vector2d point;
+      double theta = M_PI;
+
+      // Evaluate the new s.
+      double curr_s = EvaluateQuarticPolynomial(longitudinal_coeffs,
+                                                relative_time, 0,
+                                                lon_end_vt.second,
+                                                lon_end_vt.first);
+      // Only if new s is larger (obstacle moving forward),
+      // update the lane_s and lane_l.
+      lane_s += std::max(0.0, (curr_s - prev_s));
+      if (curr_s + FLAGS_double_precision >= prev_s) {
+        lane_l = EvaluateQuinticPolynomial(lateral_coeffs, relative_time, 0,
+                                           time_to_end_state, 0.0);
+        prev_s = curr_s;
+      }
+
+      // Get the universal point and theta info.
+      if (!PredictionMap::SmoothPointFromLane(lane_id, lane_s, lane_l, &point,
+                                              &theta)) {
+        AERROR << "Unable to get smooth point from lane [" << lane_id
+               << "] with s [" << lane_s << "] and l [" << lane_l << "]";
+        break;
+      }
+      PathPoint path_point;
+      path_point.set_x(point.x());
+      path_point.set_y(point.y());
+      path_point.set_z(0.0);
+      path_point.set_theta(theta);
+      path_point.set_lane_id(lane_id);
+      // Get the speed and acceleration info along the lane.
+      double lane_speed =
+          EvaluateQuarticPolynomial(longitudinal_coeffs, relative_time, 1,
+                                    lon_end_vt.second, lon_end_vt.first);
+      double lane_acc =
+          EvaluateQuarticPolynomial(longitudinal_coeffs, relative_time, 2,
+                                    lon_end_vt.second, lon_end_vt.first);
+      TrajectoryPoint trajectory_point;
+      trajectory_point.mutable_path_point()->CopyFrom(path_point);
+      trajectory_point.set_v(lane_speed);
+      trajectory_point.set_a(lane_acc);
+      trajectory_point.set_relative_time(relative_time);
+      curr_points.emplace_back(std::move(trajectory_point));
+
+      double lateral_acc =
+          EvaluateQuinticPolynomial(lateral_coeffs, relative_time, 2,
+                                    time_to_end_state, 0.0);
+      max_lat_acc = std::max(max_lat_acc, std::abs(lateral_acc));
+
+      // If the obstacle gets into the next lane_segment,
+      // update the lane_segment accordingly.
+      while (lane_s > PredictionMap::LaneById(lane_id)->total_length() &&
+             lane_segment_index + 1 < lane_sequence.lane_segment_size()) {
+        lane_segment_index += 1;
+        lane_s = lane_s - PredictionMap::LaneById(lane_id)->total_length();
+        lane_id = lane_sequence.lane_segment(lane_segment_index).lane_id();
+      }
+    }
+
+    // Evaluate using the cost function, and decide whether to keep it or not.
+    double curr_cost = CostFunction(max_lat_acc, time_to_end_state);
+    if (j == 0 || curr_cost < cost_of_trajectory) {
+      cost_of_trajectory = curr_cost;
+      *points = curr_points;
+    }
+  }
   return;
 }
 
@@ -436,6 +537,13 @@ void MoveSequencePredictor::GenerateCandidateTimes(
     candidate_times->push_back(t);
     t += time_gap;
   }
+}
+
+double MoveSequencePredictor::CostFunction(
+    const double max_lat_acc, const double time_to_end_state) {
+  double cost_of_trajectory = max_lat_acc +
+                              FLAGS_cost_function_alpha * time_to_end_state;
+  return (cost_of_trajectory);
 }
 
 }  // namespace prediction
