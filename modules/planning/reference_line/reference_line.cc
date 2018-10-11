@@ -708,8 +708,52 @@ void ReferenceLine::AddSpeedLimit(const hdmap::SpeedControl& speed_control) {
 
 void ReferenceLine::AddSpeedLimit(double start_s, double end_s,
                                   double speed_limit) {
-  // assume no overlaps between speed limit regions.
-  speed_limit_.emplace_back(start_s, end_s, speed_limit);
+  std::vector<SpeedLimit> new_speed_limit;
+  for (auto& limit : speed_limit_) {
+    if (start_s >= limit.end_s || end_s <= limit.start_s) {
+      new_speed_limit.emplace_back(limit);
+    } else {
+      // start_s < speed_limit.end_s && end_s > speed_limit.start_s
+      if (start_s >= limit.start_s) {
+        new_speed_limit.emplace_back(limit.start_s, start_s, limit.speed_limit);
+        if (end_s <= limit.end_s) {
+          new_speed_limit.emplace_back(start_s, end_s, speed_limit);
+          new_speed_limit.emplace_back(end_s, limit.end_s, limit.speed_limit);
+        } else {
+          new_speed_limit.emplace_back(start_s, limit.end_s, speed_limit);
+        }
+      } else {
+        new_speed_limit.emplace_back(start_s, limit.start_s, speed_limit);
+        if (end_s <= limit.end_s) {
+          new_speed_limit.emplace_back(limit.start_s, end_s, speed_limit);
+          new_speed_limit.emplace_back(end_s, limit.end_s, limit.speed_limit);
+        } else {
+          new_speed_limit.emplace_back(limit.start_s, end_s, speed_limit);
+        }
+      }
+      start_s = limit.end_s;
+      end_s = std::max(end_s, limit.end_s);
+    }
+  }
+  speed_limit_.clear();
+  if (end_s > start_s) {
+    new_speed_limit.emplace_back(start_s, end_s, speed_limit);
+  }
+  for (auto& limit : new_speed_limit) {
+    if (limit.start_s < limit.end_s) {
+      speed_limit_.emplace_back(limit);
+    }
+  }
+  std::sort(speed_limit_.begin(), speed_limit_.end(),
+    [](const SpeedLimit& a, const SpeedLimit& b) {
+    if (a.start_s != b.start_s) {
+      return a.start_s < b.start_s;
+    }
+    if (a.end_s != b.end_s) {
+      return a.end_s < b.end_s;
+    }
+    return a.speed_limit < b.speed_limit;
+  });
 }
 
 }  // namespace planning
