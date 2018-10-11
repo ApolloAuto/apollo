@@ -20,11 +20,15 @@
 
 #pragma once
 
+#include <string>
+#include <unordered_map>
+#include <utility>
+#include <vector>
+
+#include "modules/planning/proto/planning_status.pb.h"
+
 #include "cybertron/common/macros.h"
-
-#include "modules/planning/proto/decider_config.pb.h"
-
-#include "modules/map/pnc_map/path.h"
+#include "modules/map/hdmap/hdmap.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/reference_line_info.h"
 #include "modules/planning/toolkits/deciders/decider.h"
@@ -32,10 +36,13 @@
 namespace apollo {
 namespace planning {
 
-class Creep : public Decider {
+class DeciderStopSignMonitor : public Decider {
+  typedef std::unordered_map<std::string, std::vector<std::string>>
+      StopSignLaneVehicles;
+
  public:
-  Creep();
-  ~Creep() = default;
+  DeciderStopSignMonitor();
+  ~DeciderStopSignMonitor() = default;
 
   bool Init(const ScenarioConfig::ScenarioTaskConfig &config) override;
 
@@ -44,15 +51,16 @@ class Creep : public Decider {
       Frame* frame,
       ReferenceLineInfo* reference_line_info) override;
 
-  double FindCreepDistance(Frame* frame,
-                           ReferenceLineInfo* reference_line_info);
-
-  bool BuildStopDecision(Frame* frame,
-                         ReferenceLineInfo* reference_line_info);
+  void UpdateWatchVehicles(StopSignLaneVehicles* watch_vehicles);
+  int AddWatchVehicle(const PathObstacle& path_obstacle,
+                      StopSignLaneVehicles* watch_vehicles);
 
  private:
-  static constexpr const char* CREEP_VO_ID_PREFIX = "CREEP_";
-  DeciderCreepConfig config_;
+  hdmap::PathOverlap next_stop_sign_overlap_;
+  hdmap::StopSignInfoConstPtr next_stop_sign_ = nullptr;
+  StopSignStatus::Status stop_status_;
+  std::vector<std::pair<hdmap::LaneInfoConstPtr, hdmap::OverlapInfoConstPtr>>
+      associated_lanes_;
 };
 
 }  // namespace planning

@@ -21,6 +21,7 @@ cc_library(
         "//modules/planning/math/curve1d:quartic_polynomial_curve1d",
         "//modules/planning/proto:planning_proto",
         "//modules/planning/scenarios:scenario_lib",
+        "//modules/planning/toolkits/deciders:decider",
         "//modules/planning/toolkits/optimizers:path_optimizer",
         "//modules/planning/toolkits/optimizers:speed_optimizer",
         "//modules/planning/toolkits/optimizers/dp_poly_path:dp_poly_path_optimizer",
