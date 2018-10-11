@@ -78,6 +78,7 @@ cc_test(
         "navigation_lane_test.cc",
     ], 
     data = [
+        ":relative_map_conf",
         ":testdata",
     ],   
     deps = [

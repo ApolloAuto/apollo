@@ -290,13 +290,13 @@ DEFINE_double(trajectory_space_resolution, 1.0,
               "Trajectory space resolution in planning");
 DEFINE_double(decision_horizon, 200.0,
               "Longitudinal horizon for decision making");
-DEFINE_uint32(num_velocity_sample, 6,
+DEFINE_uint32(num_velocity_sample, 20,
               "The number of velocity samples in end condition sampler.");
 DEFINE_bool(enable_backup_trajectory, true,
             "If generate backup trajectory when planning fail");
 DEFINE_double(backup_trajectory_cost, 1000.0,
               "Default cost of backup trajectory");
-DEFINE_double(min_velocity_sample_gap, 1.0,
+DEFINE_double(min_velocity_sample_gap, 0.5,
               "Minimal sampling gap for velocity");
 DEFINE_double(lon_collision_buffer, 2.0,
               "The longitudinal buffer to keep distance to other vehicles");
@@ -340,7 +340,7 @@ DEFINE_double(polynomial_minimal_param, 0.01,
 DEFINE_double(lattice_stop_buffer, 0.02,
               "The buffer before the stop s to check trajectories.");
 
-DEFINE_bool(lateral_optimization, false,
+DEFINE_bool(lateral_optimization, true,
             "whether using optimization for lateral trajectory generation");
 DEFINE_double(weight_lateral_offset, 1.0,
               "weight for lateral offset "
