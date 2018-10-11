@@ -86,6 +86,8 @@ class SidePassScenario : public Scenario {
   common::Status RunPlanOnReferenceLine(
       const common::TrajectoryPoint& planning_start_point, Frame* frame);
 
+  bool IsFarFromIntersection(const Frame& frame);
+
   bool HasBlockingObstacle(const SLBoundary& adc_sl_boundary,
                            const PathDecision& path_decision) const;
 

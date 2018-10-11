@@ -209,12 +209,34 @@ Status SidePassScenario::PassObstacle(
 bool SidePassScenario::IsSidePassScenario(
     const common::TrajectoryPoint& planning_start_point,
     const Frame& frame) const {
-  // TODO(lianglia-apollo)
   const SLBoundary& adc_sl_boundary =
       frame.reference_line_info().front().AdcSlBoundary();
   const PathDecision& path_decision =
       frame.reference_line_info().front().path_decision();
+  // TODO(lianglia-apollo)
+
   return HasBlockingObstacle(adc_sl_boundary, path_decision);
+}
+
+bool SidePassScenario::IsFarFromIntersection(const Frame& frame) {
+  if (frame.reference_line_info().size() > 1) {
+    return false;
+  }
+  const SLBoundary& adc_sl_boundary =
+      frame.reference_line_info().front().AdcSlBoundary();
+  const auto& first_encounters =
+      frame.reference_line_info().front().FirstEncounteredOverlaps();
+  const double kClearDistance = 15.0;  // in meters
+  for (const auto& encounter : first_encounters) {
+    if (encounter.first != ReferenceLineInfo::SIGNAL ||
+        encounter.first != ReferenceLineInfo::STOP_SIGN) {
+      continue;
+    }
+    if (encounter.second.start_s - adc_sl_boundary.end_s() < kClearDistance) {
+      return false;
+    }
+  }
+  return true;
 }
 
 bool SidePassScenario::HasBlockingObstacle(
