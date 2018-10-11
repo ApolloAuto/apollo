@@ -36,6 +36,10 @@ class StatisticalAnalyzer:
 
     def print_statistical_results(self, data):
         """ statistical analyzer"""
+        if len(data) == 0:
+            print PrintColors.FAIL + "No Data Generated!" + PrintColors.ENDC
+            return
+
         arr = np.array(data)
 
         v = np.average(arr)
