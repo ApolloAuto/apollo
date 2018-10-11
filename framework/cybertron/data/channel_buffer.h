@@ -68,7 +68,7 @@ bool ChannelBuffer<T>::Fetch(uint64_t* index,
     return false;
   } else if (*index < buffer_->Head()) {
     auto interval = buffer_->Tail() - *index;
-    AINFO << "channel[" << GlobalData::GetChannelById(channel_id_) << "] "
+    AWARN << "channel[" << GlobalData::GetChannelById(channel_id_) << "] "
           << "read buffer overflow, drop_message[" << interval << "] pre_index["
           << *index << "] current_index[" << buffer_->Tail() << "] ";
     *index = buffer_->Tail();
