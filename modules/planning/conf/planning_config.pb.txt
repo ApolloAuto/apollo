@@ -2,6 +2,6 @@ standard_planning_config {
   planner_type : PUBLIC_ROAD
   planner_public_road_config {
     scenario_type : LANE_FOLLOW
-    scenario_type : SIDE_PASS
+    #scenario_type : SIDE_PASS
   }
 }

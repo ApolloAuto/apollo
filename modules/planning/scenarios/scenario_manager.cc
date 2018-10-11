@@ -16,7 +16,11 @@
 
 #include "modules/planning/scenarios/scenario_manager.h"
 
+#include <utility>
+
 #include "modules/planning/scenarios/lane_follow/lane_follow_scenario.h"
+#include "modules/planning/scenarios/side_pass/side_pass_scenario.h"
+#include "modules/planning/scenarios/stop_sign_unprotected/stop_sign_unprotected.h"
 
 namespace apollo {
 namespace planning {
@@ -24,8 +28,12 @@ namespace planning {
 bool ScenarioManager::Init(
     const std::set<ScenarioConfig::ScenarioType>& supported_scenarios) {
   RegisterScenarios();
+  default_scenario_type_ = ScenarioConfig::LANE_FOLLOW;
   supported_scenarios_ = supported_scenarios;
-  scenario_ = scenario_factory_.CreateObject(ScenarioConfig::LANE_FOLLOW);
+  for (const auto scenario_type : supported_scenarios_) {
+    CHECK(scenario_factory_.Contains(scenario_type));
+  }
+  current_scenario_ = scenario_factory_.CreateObject(default_scenario_type_);
   return true;
 }
 
@@ -33,27 +41,102 @@ void ScenarioManager::RegisterScenarios() {
   scenario_factory_.Register(ScenarioConfig::LANE_FOLLOW, []() -> Scenario* {
     return new LaneFollowScenario();
   });
+  scenario_factory_.Register(ScenarioConfig::SIDE_PASS, []() -> Scenario* {
+    return new SidePassScenario();
+  });
+  scenario_factory_.Register(
+      ScenarioConfig::STOP_SIGN_UNPROTECTED,
+      []() -> Scenario* { return new StopSignUnprotectedScenario(); });
+}
+
+bool ScenarioManager::SelectChangeLaneScenario(
+    const common::TrajectoryPoint& ego_point, const Frame& frame) {
+  if (frame.reference_line_info().size() > 1) {
+    if (current_scenario_->scenario_type() != ScenarioConfig::LANE_FOLLOW) {
+      current_scenario_ =
+          scenario_factory_.CreateObject(ScenarioConfig::LANE_FOLLOW);
+    }
+    return true;
+  } else {
+    return false;
+  }
+}
+
+bool ScenarioManager::ReuseCurrentScenario(
+    const common::TrajectoryPoint& ego_point, const Frame& frame) {
+  return current_scenario_->IsTransferable(*current_scenario_, ego_point,
+                                           frame);
+}
+
+bool ScenarioManager::SelectScenario(const ScenarioConfig::ScenarioType type,
+                                     const common::TrajectoryPoint& ego_point,
+                                     const Frame& frame) {
+  if (current_scenario_->scenario_type() == type) {
+    return true;
+  } else {
+    auto scenario = scenario_factory_.CreateObject(type);
+    if (scenario->IsTransferable(*current_scenario_, ego_point, frame)) {
+      current_scenario_ = std::move(scenario);
+      return true;
+    }
+  }
+  return false;
 }
 
 void ScenarioManager::Update(const common::TrajectoryPoint& ego_point,
                              const Frame& frame) {
-  const auto new_scenario_type = DecideCurrentScenario(ego_point, frame);
-  if (new_scenario_type != scenario_->scenario_type()) {
-    scenario_ = scenario_factory_.CreateObject(new_scenario_type);
+  CHECK(!frame.reference_line_info().empty());
+  // change lane case, currently default to LANE_FOLLOW in change lane case.
+  // TODO(all) implement change lane scenario.
+  if (SelectChangeLaneScenario(ego_point, frame)) {
+    ADEBUG << "Use change lane scenario (temporarily use LANE_FOLLOW)";
+    return;
   }
-}
 
-ScenarioConfig::ScenarioType ScenarioManager::DecideCurrentScenario(
-    const common::TrajectoryPoint& ego_point, const Frame& frame) {
-  for (const auto& scenario_type : supported_scenarios_) {
-    // TODO(All): use a better way rather than create object each time.
-    auto tmp_scenario = scenario_factory_.CreateObject(scenario_type);
-    if (tmp_scenario->IsTransferable(*scenario_, ego_point, frame)) {
-      return tmp_scenario->scenario_type();
+  // non change lane case
+  std::set<ScenarioConfig::ScenarioType> rejected_scenarios;
+  if (current_scenario_->scenario_type() != default_scenario_type_ &&
+      ReuseCurrentScenario(ego_point, frame)) {
+    return;
+  }
+  rejected_scenarios.insert(current_scenario_->scenario_type());
+
+  // prefer to use first encountered overlaps/objects
+  const auto& reference_line_info = frame.reference_line_info().front();
+  const auto& first_overlaps = reference_line_info.FirstEncounteredOverlaps();
+  for (const auto& overlap : first_overlaps) {
+    auto preferred_scenario = ScenarioConfig::LANE_FOLLOW;
+    if (overlap.first == ReferenceLineInfo::STOP_SIGN) {
+      preferred_scenario = ScenarioConfig::STOP_SIGN_UNPROTECTED;
+    } else if (overlap.first == ReferenceLineInfo::OBSTACLE) {
+      preferred_scenario = ScenarioConfig::SIDE_PASS;
+    }
+    if (rejected_scenarios.find(preferred_scenario) !=
+        rejected_scenarios.end()) {
+      continue;
+    }
+    if (SelectScenario(preferred_scenario, ego_point, frame)) {
+      return;
+    } else {
+      rejected_scenarios.insert(preferred_scenario);
     }
   }
-  // default scenario type here
-  return ScenarioConfig::LANE_FOLLOW;
+
+  // prefer to use first non-default transferrable scenario.
+  for (const auto scenario : supported_scenarios_) {
+    if (rejected_scenarios.find(scenario) != rejected_scenarios.end()) {
+      continue;
+    }
+    auto tmp_scenario = scenario_factory_.CreateObject(scenario);
+    if (SelectScenario(scenario, ego_point, frame)) {
+      return;
+    }
+  }
+
+  // finally use default transferrable scenario.
+  if (current_scenario_->scenario_type() != default_scenario_type_) {
+    current_scenario_ = scenario_factory_.CreateObject(default_scenario_type_);
+  }
 }
 
 }  // namespace planning

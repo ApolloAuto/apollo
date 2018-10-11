@@ -33,11 +33,19 @@ class ScenarioManager final {
 
   bool Init(const std::set<ScenarioConfig::ScenarioType>& supported_scenarios);
 
-  Scenario* mutable_scenario() { return scenario_.get(); }
+  Scenario* mutable_scenario() { return current_scenario_.get(); }
 
   void Update(const common::TrajectoryPoint& ego_point, const Frame& frame);
 
  private:
+  bool SelectChangeLaneScenario(const common::TrajectoryPoint& ego_point,
+                                const Frame& frame);
+  bool ReuseCurrentScenario(const common::TrajectoryPoint& ego_point,
+                            const Frame& frame);
+  bool SelectScenario(const ScenarioConfig::ScenarioType type,
+                      const common::TrajectoryPoint& ego_point,
+                      const Frame& frame);
+
   void RegisterScenarios();
 
   ScenarioConfig::ScenarioType DecideCurrentScenario(
@@ -46,7 +54,8 @@ class ScenarioManager final {
   common::util::Factory<ScenarioConfig::ScenarioType, Scenario>
       scenario_factory_;
 
-  std::unique_ptr<Scenario> scenario_;
+  std::unique_ptr<Scenario> current_scenario_;
+  ScenarioConfig::ScenarioType default_scenario_type_;
   std::set<ScenarioConfig::ScenarioType> supported_scenarios_;
 };
 

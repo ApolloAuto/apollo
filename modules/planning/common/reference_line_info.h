@@ -26,6 +26,7 @@
 #include <memory>
 #include <string>
 #include <unordered_set>
+#include <utility>
 #include <vector>
 
 #include "modules/common/proto/drive_state.pb.h"
@@ -154,6 +155,8 @@ class ReferenceLineInfo {
 
   void set_is_on_reference_line() { is_on_reference_line_ = true; }
 
+  void InitFirstOverlaps();
+
   uint32_t GetPriority() const { return reference_line_.GetPriority(); }
 
   void SetPriority(uint32_t priority) { reference_line_.SetPriority(priority); }
@@ -167,9 +170,20 @@ class ReferenceLineInfo {
     return trajectory_type_;
   }
 
+  // different types of overlaps that can be handleded by different scenarios.
+  enum OverlapType {
+    STOP_SIGN = 1,
+    SIGNAL = 2,
+    OBSTACLE = 3,
+  };
+
+  const std::vector<std::pair<OverlapType, hdmap::PathOverlap>>&
+  FirstEncounteredOverlaps() const {
+    return first_encounter_overlaps_;
+  }
+
  private:
   bool CheckChangeLane() const;
-
   void ExportTurnSignal(common::VehicleSignal* signal) const;
 
   bool IsUnrelaventObstacle(PathObstacle* path_obstacle);
@@ -231,6 +245,13 @@ class ReferenceLineInfo {
   PlanningTarget planning_target_;
 
   ADCTrajectory::TrajectoryType trajectory_type_ = ADCTrajectory::UNKNOWN;
+
+  /**
+   * Overlaps encountered in the first time along the reference line in front of
+   * the vehicle
+   */
+  std::vector<std::pair<OverlapType, hdmap::PathOverlap>>
+      first_encounter_overlaps_;
 
   DISALLOW_COPY_AND_ASSIGN(ReferenceLineInfo);
 };

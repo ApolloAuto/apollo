@@ -71,6 +71,10 @@ class Factory {
     return producers_.insert(std::make_pair(id, creator)).second;
   }
 
+  bool Contains(const IdentifierType &id) {
+    return producers_.find(id) != producers_.end();
+  }
+
   /**
    * @brief Unregisters the class with the given identifier
    * @param id The identifier of the class to be unregistered
