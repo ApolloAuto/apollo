@@ -26,6 +26,7 @@
 
 #include "modules/planning/proto/planning.pb.h"
 
+#include "modules/map/hdmap/hdmap.h"
 #include "modules/common/status/status.h"
 #include "modules/common/util/factory.h"
 #include "modules/planning/common/speed_profile_generator.h"
@@ -42,6 +43,9 @@ class StopSignUnprotectedScenario : public Scenario {
 
   bool Init() override;
 
+  void Observe(Frame* const frame,
+               ReferenceLineInfo* const reference_line_info);
+
   common::Status Process(const common::TrajectoryPoint& planning_init_point,
                          Frame* frame) override;
 
@@ -51,7 +55,7 @@ class StopSignUnprotectedScenario : public Scenario {
 
  private:
   enum StopSignUnprotectedStage {
-    CRUISE_AND_MONITOR = 1,
+    PRE_STOP = 1,
     STOP = 2,
     CREEP = 3,
     INTERSECTION_CRUISE = 4,
@@ -59,7 +63,7 @@ class StopSignUnprotectedScenario : public Scenario {
 
   void RegisterTasks();
 
-  common::Status CruiseAndMonitor(Frame* frame);
+  common::Status PreStop(Frame* frame);
   common::Status Stop(Frame* frame);
   common::Status Creep(
       const common::TrajectoryPoint& planning_start_point,
@@ -68,13 +72,17 @@ class StopSignUnprotectedScenario : public Scenario {
       const common::TrajectoryPoint& planning_start_point,
       Frame* frame);
 
+  bool FindNextStopSign(ReferenceLineInfo* const reference_line_info);
+
  private:
   static int current_stage_index_;
   std::vector<std::unique_ptr<Task>> tasks_;
   ScenarioConfig config_;
-
-  StopSignUnprotectedStage stage_ = CRUISE_AND_MONITOR;
+  StopSignUnprotectedStage stage_ = PRE_STOP;
   SpeedProfileGenerator speed_profile_generator_;
+  hdmap::PathOverlap next_stop_sign_overlap_;
+  hdmap::StopSignInfoConstPtr next_stop_sign_ = nullptr;
+  double adc_distance_to_stop_sign_;
 };
 
 }  // namespace planning

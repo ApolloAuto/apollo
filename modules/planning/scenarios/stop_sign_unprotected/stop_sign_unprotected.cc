@@ -18,13 +18,15 @@
  * @file
  **/
 
-#include "modules/planning/scenarios/stop_sign_unprotected/stop_sign_unprotected.h"  // NOINT
+#include <limits>
 
+#include "modules/planning/scenarios/stop_sign_unprotected/stop_sign_unprotected.h"  // NOINT
 
 #include "modules/planning/proto/planning_config.pb.h"
 
 #include "cybertron/common/log.h"
 #include "modules/common/util/file.h"
+#include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/toolkits/deciders/decider_creep.h"
@@ -41,6 +43,11 @@ namespace planning {
 using common::ErrorCode;
 using common::Status;
 using common::TrajectoryPoint;
+using apollo::hdmap::HDMapUtil;
+using apollo::hdmap::PathOverlap;
+using apollo::hdmap::StopSignInfo;
+using apollo::hdmap::StopSignInfoConstPtr;
+
 
 int StopSignUnprotectedScenario::current_stage_index_ = 0;
 
@@ -78,6 +85,22 @@ bool StopSignUnprotectedScenario::Init() {
   return true;
 }
 
+void StopSignUnprotectedScenario::Observe(
+    Frame* const frame,
+    ReferenceLineInfo* const reference_line_info) {
+  CHECK_NOTNULL(frame);
+  CHECK_NOTNULL(reference_line_info);
+
+  if (!FindNextStopSign(reference_line_info)) {
+    ADEBUG << "no stop sign found";
+    return;
+  }
+
+  double adc_front_edge_s = reference_line_info->AdcSlBoundary().end_s();
+  adc_distance_to_stop_sign_ =
+      next_stop_sign_overlap_.start_s - adc_front_edge_s;
+}
+
 Status StopSignUnprotectedScenario::Process(
     const TrajectoryPoint& planning_start_point,
     Frame* frame) {
@@ -87,13 +110,11 @@ Status StopSignUnprotectedScenario::Process(
     return Status(ErrorCode::PLANNING_ERROR, "failed to init tasks");
   }
 
-  // TODO(all)
-
   Status status = Status(ErrorCode::PLANNING_ERROR,
                          "Failed to process stage in stop_sign_upprotected.");
   switch (stage_) {
-    case StopSignUnprotectedStage::CRUISE_AND_MONITOR: {
-      status = CruiseAndMonitor(frame);
+    case StopSignUnprotectedStage::PRE_STOP: {
+      status = PreStop(frame);
       break;
     }
     case StopSignUnprotectedStage::STOP: {
@@ -119,11 +140,40 @@ bool StopSignUnprotectedScenario::IsTransferable(
     const Scenario& current_scenario,
     const common::TrajectoryPoint& ego_point,
     const Frame& frame) const {
-  // TODO(All): implement here
+  // TODO(all): move to scenario conf later
+  constexpr uint32_t conf_start_stop_sign_timer = 10;  // second
+
+  if (next_stop_sign_ == nullptr) {
+    return false;
+  }
+
+  const double adc_speed =
+      common::VehicleStateProvider::Instance()->linear_velocity();
+  const uint32_t time_distance = ceil(adc_distance_to_stop_sign_ / adc_speed);
+
+  switch (current_scenario.scenario_type()) {
+    case ScenarioConfig::LANE_FOLLOW:
+    case ScenarioConfig::CHANGE_LANE:
+    case ScenarioConfig::SIDE_PASS:
+    case ScenarioConfig::APPROACH:
+      return time_distance <= conf_start_stop_sign_timer ? true : false;
+    case ScenarioConfig::STOP_SIGN_PROTECTED:
+      return false;
+    case ScenarioConfig::STOP_SIGN_UNPROTECTED:
+      return true;
+    case ScenarioConfig::TRAFFIC_LIGHT_LEFT_TURN_PROTECTED:
+    case ScenarioConfig::TRAFFIC_LIGHT_LEFT_TURN_UNPROTECTED:
+    case ScenarioConfig::TRAFFIC_LIGHT_RIGHT_TURN_PROTECTED:
+    case ScenarioConfig::TRAFFIC_LIGHT_RIGHT_TURN_UNPROTECTED:
+    case ScenarioConfig::TRAFFIC_LIGHT_GO_THROUGH:
+    default:
+      break;
+  }
+
   return false;
 }
 
-common::Status StopSignUnprotectedScenario::CruiseAndMonitor(
+common::Status StopSignUnprotectedScenario::PreStop(
     Frame* frame) {
   // TODO(all)
   return Status::OK();
@@ -147,6 +197,44 @@ common::Status StopSignUnprotectedScenario::IntersectionCruise(
     Frame* frame) {
   // TODO(all)
   return Status::OK();
+}
+
+/**
+ * @brief: fine next stop sign ahead of adc along reference line
+ */
+bool StopSignUnprotectedScenario::FindNextStopSign(
+    ReferenceLineInfo* const reference_line_info) {
+  CHECK_NOTNULL(reference_line_info);
+
+  // TODO(all): move to scenario conf later
+  constexpr double conf_min_pass_s_distance = 3.0;
+
+  const std::vector<PathOverlap>& stop_sign_overlaps =
+      reference_line_info->reference_line().map_path().stop_sign_overlaps();
+  double adc_front_edge_s = reference_line_info->AdcSlBoundary().end_s();
+
+  double min_start_s = std::numeric_limits<double>::max();
+  for (const PathOverlap& stop_sign_overlap : stop_sign_overlaps) {
+    if (adc_front_edge_s - stop_sign_overlap.end_s <=
+        conf_min_pass_s_distance &&
+        stop_sign_overlap.start_s < min_start_s) {
+      min_start_s = stop_sign_overlap.start_s;
+      next_stop_sign_overlap_ = stop_sign_overlap;
+    }
+  }
+
+  if (next_stop_sign_overlap_.object_id.empty()) {
+    return false;
+  }
+
+  next_stop_sign_ = HDMapUtil::BaseMap().GetStopSignById(
+      hdmap::MakeMapId(next_stop_sign_overlap_.object_id));
+  if (!next_stop_sign_) {
+    AERROR << "Could not find stop sign: " << next_stop_sign_overlap_.object_id;
+    return false;
+  }
+
+  return true;
 }
 
 }  // namespace planning
