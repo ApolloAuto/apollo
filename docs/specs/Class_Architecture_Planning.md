@@ -51,7 +51,7 @@ In addition to the query concepts “where I want to go” and “what is surrou
 
 ## Code Structure and Class Hierarchy
 
-The code is organized as follows: The planning code entrance is the `planning.cc`. Inside the planner, the important class members are shown in the illustration below.
+The code is organized as follows: The planning code entrance is the `planning.h`. Inside the planner, the important class members are shown in the illustration below.
 
 ![img](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/images/class_architecture_planning/image006.png)
 
