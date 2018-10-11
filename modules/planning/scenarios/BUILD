@@ -29,18 +29,8 @@ cc_library(
         "//modules/common",
         "//modules/planning/common:planning_common",
         "//modules/planning/scenarios/lane_follow",
-    ],
-)
-
-cc_test(
-    name = "scenario_manager_test",
-    size = "small",
-    srcs = [
-        "scenario_manager_test.cc",
-    ],
-    deps = [
-        ":scenario_manager",
-        "@gtest//:main",
+        "//modules/planning/scenarios/side_pass",
+        "//modules/planning/scenarios/stop_sign_unprotected",
     ],
 )
 

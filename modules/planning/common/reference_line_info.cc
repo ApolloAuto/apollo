@@ -25,8 +25,8 @@
 #include <utility>
 
 #include "cybertron/task/task.h"
-
 #include "modules/planning/proto/sl_boundary.pb.h"
+
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/util/string_util.h"
 #include "modules/common/util/util.h"
@@ -87,6 +87,8 @@ bool ReferenceLineInfo::Init(const std::vector<const Obstacle*>& obstacles) {
     return false;
   }
 
+  InitFirstOverlaps();
+
   if (sl_boundary_info_.adc_sl_boundary_.end_s() < 0 ||
       sl_boundary_info_.adc_sl_boundary_.start_s() > reference_line_.Length()) {
     AWARN << "Vehicle SL "
@@ -119,6 +121,43 @@ bool ReferenceLineInfo::Init(const std::vector<const Obstacle*>& obstacles) {
   is_safe_to_change_lane_ = CheckChangeLane();
   is_inited_ = true;
   return true;
+}
+
+void ReferenceLineInfo::InitFirstOverlaps() {
+  double start_s = sl_boundary_info_.adc_sl_boundary_.start_s();
+  const auto& map_path = reference_line_.map_path();
+  for (const auto& overlap : map_path.signal_overlaps()) {
+    if (overlap.end_s < start_s) {
+      continue;
+    }
+    first_encounter_overlaps_.push_back({SIGNAL, overlap});
+    break;
+  }
+  for (const auto& overlap : map_path.stop_sign_overlaps()) {
+    if (overlap.end_s < start_s) {
+      continue;
+    }
+    first_encounter_overlaps_.push_back({STOP_SIGN, overlap});
+    break;
+  }
+  for (const auto& obstacle : path_decision_.path_obstacles().Items()) {
+    if (!obstacle->IsBlockingObstacle()) {
+      continue;
+    }
+    if (obstacle->PerceptionSLBoundary().end_s() < start_s) {
+      continue;
+    }
+    hdmap::PathOverlap overlap;
+    overlap.start_s = obstacle->PerceptionSLBoundary().start_s();
+    overlap.end_s = obstacle->PerceptionSLBoundary().end_s();
+    overlap.object_id = obstacle->Id();
+    first_encounter_overlaps_.push_back({OBSTACLE, overlap});
+  }
+  std::sort(first_encounter_overlaps_.begin(), first_encounter_overlaps_.end(),
+            [](const std::pair<OverlapType, hdmap::PathOverlap>& lhs,
+               const std::pair<OverlapType, hdmap::PathOverlap>& rhs) {
+              return lhs.second.start_s < rhs.second.start_s;
+            });
 }
 
 bool ReferenceLineInfo::IsInited() const { return is_inited_; }
