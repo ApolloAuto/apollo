@@ -1,0 +1,36 @@
+module_config {
+  module_library : "lib/libperception_trafficlights.so"
+  components {
+    comname : "TrafficLightsPerceptionComponent"
+    comclass : "TrafficLightsPerceptionComponent"
+    confpath : "conf/perception/camera/trafficlights_perception_component.config"
+    sender : {
+      outchannelnames : ["/perception/traffic_light_status","/perception/traffic_light_simulation"]
+    }
+  }
+
+  channels {
+    channelname : "/sensor/camera/traffic/image_long"
+    msgtype : "adu.common.sensor.Image"
+  }
+  channels {
+    channelname : "/sensor/camera/traffic/image_short"
+    msgtype : "adu.common.sensor.Image"
+  }
+  channels {
+    channelname : "/sensor/camera/obstacle/image_wide"
+    msgtype : "adu.common.sensor.Image"
+  }
+  channels {
+    channelname : "/sensor/camera/obstacle/image_narrow"
+    msgtype : "adu.common.sensor.Image"
+  }
+  channels {
+    channelname : "/perception/traffic_light_status"
+    msgtype : "adu.common.traffic_light.TrafficLightDetection"
+  }
+  channels {
+    channelname : "/perception/traffic_light_simulation"
+    msgtype : "adu.common.traffic_light.TrafficLightDetection"
+  }
+}

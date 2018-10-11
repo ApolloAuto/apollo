@@ -35,4 +35,15 @@ cc_test(
     ],
 )
 
+
+cc_library(
+    name = "protobuf_util",
+    hdrs = [
+        "protobuf_util.h",
+    ],
+    deps = [
+        "//framework:cybertron",
+    ],
+)
+
 cpplint()

@@ -1,0 +1,17 @@
+loc_pred
+obj_pred
+cls_pred
+ori_pred
+dim_pred
+brvis_pred
+brswt_pred
+ltvis_pred
+ltswt_pred
+rtvis_pred
+rtswt_pred
+area_id_pred
+vis_pred
+cut_pred
+conv9
+conv10
+conv3_3

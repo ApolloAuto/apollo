@@ -86,6 +86,26 @@ inline void IRandomizedShuffle(T *A, int n, int l, int *s) {
   }
 }
 
+// Generate a random permutation of two corresponding array elements
+// in place - Fisher and Yates algorithm
+// Array A and B has n elements, A's element has size la,
+// B's element has size lb
+template <typename T>
+inline void IRandomizedShuffle(T *A, T *B, int n, int la, int lb,
+                                 int *s) {
+  if (A == reinterpret_cast<T *>(NULL) ||
+    B == reinterpret_cast<T *>(NULL) ||
+    n <= 1 || la < 1 || lb < 1) {
+    return;
+  }
+  int i, r;
+  for (i = n - 1; i > 0; i--) {
+    r = IRandI(i + 1, s); /*pick a random index from 0 to i*/
+    ISwap(A + r * la, A + i * la, la);
+    ISwap(B + r * lb, B + i * lb, lb);
+  }
+}
+
 // Generate a random permutation of array elements in place - Fisher and Yates
 // algorithm Array A has n elements, each element has Size 1
 template <typename T> inline void IRandomizedShuffle1(T *A, int n, int *s) {

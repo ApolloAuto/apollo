@@ -55,8 +55,19 @@ struct PointXYZITHBL : public PointXYZITHB<T> {
   uint8_t label = 0;
 };
 
-using PointF = Point<float>;
-using PointD = Point<double>;
+using PointF         = Point<float>;
+using PointD         = Point<double>;
+
+using PointXYZIF     = Point<float>;
+using PointXYZID     = Point<double>;
+using PointXYZITF    = PointXYZIT<float>;
+using PointXYZITD    = PointXYZIT<double>;
+using PointXYZITHF   = PointXYZITH<float>;
+using PointXYZITHD   = PointXYZITH<double>;
+using PointXYZITHBF  = PointXYZITHB<float>;
+using PointXYZITHBD  = PointXYZITHB<double>;
+using PointXYZITHBLF = PointXYZITHBL<float>;
+using PointXYZITHBLD = PointXYZITHBL<double>;
 
 const std::size_t kDefaultReservePointNum = 50000;
 
@@ -76,6 +87,8 @@ struct Point2D {
 };
 
 using Point2DF = Point2D<float>;
+using Point2DI = Point2D<int>;
+using Point2DD = Point2D<double>;
 
 template <typename T>
 struct Point3D {
@@ -83,6 +96,10 @@ struct Point3D {
   T y = 0;
   T z = 0;
 };
+
+using Point3DF = Point3D<float>;
+using Point3DI = Point3D<int>;
+using Point3DD = Point3D<double>;
 
 }  // namespace base
 }  // namespace perception

@@ -1,0 +1,160 @@
+load("//tools:cpplint.bzl", "cpplint")
+
+package(default_visibility = ["//visibility:public"])
+
+
+
+cc_library(
+    name = "camera_frame",
+    hdrs = [
+        "camera_frame.h",
+    ],
+    deps = [
+        ":data_provider",
+        "//modules/perception/base:base",
+    ],
+)
+
+
+cc_library(
+    name = "camera_ground_plane",
+    srcs = [
+        "camera_ground_plane.cc",
+    ],
+    hdrs = [
+        "camera_ground_plane.h",
+    ],
+    deps = [
+        "//modules/perception/common/i_lib/algorithm:i_sort",
+        "//modules/perception/common/i_lib/core:core",
+        "//modules/perception/common/i_lib/da:i_ransac",
+        "//modules/perception/common/i_lib/geometry:i_plane",
+        #"//modules/perception/common/i_lib/geometry:i_util",
+        #"//modules/perception/common/i_lib/numeric:numeric",
+    ],
+)
+
+
+cc_library(
+    name = "data_provider",
+    srcs = [
+        "data_provider.cc",
+    ],
+    hdrs = [
+        "data_provider.h",
+    ],
+    deps = [
+        "//modules/perception/base:base",
+        ":undistortion_handler",
+    ],
+)
+
+
+cc_library(
+    name = "global_config",
+    hdrs = [
+        "global_config.h",
+    ],
+)
+
+
+cc_library(
+    name = "math_functions",
+    hdrs = [
+        "//modules/perception/base:base",
+        "math_functions.h",
+    ],
+)
+
+
+cc_library(
+    name = "object_template_manager",
+    srcs = [
+        "object_template_manager.cc",
+    ],
+    hdrs = [
+        "object_template_manager.h",
+    ],
+    deps = [
+        "//external:gflags",
+        "//cybertron",
+        "//modules/perception/base:base",
+        "//modules/perception/common/io:io_util",
+        "//modules/perception/lib/config_manager:config_manager",
+        "//modules/perception/lib/io:protobuf_util",
+        "//modules/perception/lib/io:file_util",
+        "//modules/perception/lib/singleton:singleton",
+        "//modules/perception/lib/thread:thread",
+        "//modules/perception/camera/common/proto:object_template_meta_schema_proto",
+    ],
+)
+
+
+cc_library(
+    name = "timer",
+    hdrs = [
+        "timer.h",
+    ],
+)
+
+
+cc_library(
+    name = "twod_threed_util",
+    hdrs = [
+        "twod_threed_util.h",
+    ],
+    deps = [
+        "@eigen",
+        "//modules/perception/common/i_lib/core:core",
+        "//modules/perception/common/i_lib/geometry:i_plane",
+        #"//modules/perception/common/i_lib/geometry:i_util",
+    ],
+)
+
+
+cc_library(
+    name = "undistortion_handler",
+    srcs = [
+        "undistortion_handler.cc",
+    ],
+    hdrs = [
+        "undistortion_handler.h",
+    ],
+    deps = [
+        "//modules/perception/base:base",
+        "//modules/perception/base:blob",
+        "//modules/perception/common/sensor_manager:sensor_manager",
+    ],
+)
+
+cc_library(
+    name = "util",
+    srcs = [
+        "util.cc",
+    ],
+    hdrs = [
+        "util.h",
+    ],
+    deps = [
+        "//modules/perception/base:base",
+    ],
+)
+
+
+cc_library(
+    name = "common",
+    deps = [
+        ":camera_frame",
+        ":camera_ground_plane",
+        ":data_provider",
+        ":global_config",
+        ":math_functions",
+        ":object_template_manager",
+        ":timer",
+        ":twod_threed_util",
+        ":undistortion_handler",
+        ":util",
+    ],
+)
+
+cpplint()

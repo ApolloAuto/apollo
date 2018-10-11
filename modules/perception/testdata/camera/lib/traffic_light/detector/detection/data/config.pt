@@ -1,0 +1,15 @@
+min_crop_size: 210
+crop_method: 0
+mean_r: 122.7717
+mean_g: 115.9465
+mean_b: 102.9801
+is_bgr:true
+crop_scale: 2.5
+input_blob_name : "img"
+im_param_blob_name : "im_info"
+output_blob_name : "bboxes"
+model_name: "./"
+model_type: "CaffeNet"
+proto_file:"models/det_all/2018-09-03/deploy.prototxt"
+weight_file: "models/det_all/2018-09-03/baidu_iter_140000.caffemodel"
+max_batch_size: 1

@@ -1,0 +1,19 @@
+# ieout: /media/idl/Elements/Beijing/JingQC5007/outdoor/ieout
+# proj: +proj=utm +zone=50 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs
+transform:
+  translation:
+    x: 0.006752987721791177
+    y: 0.8707978803016742
+    z: 1
+  rotation:
+    x: 0.01577161907138518
+    y: -0.009506024591691139
+    z: 0.6950375602267317
+    w: 0.7187375608679442
+child_frame_id: velodyne64
+header:
+  stamp:
+    nsecs: 659511381
+    secs: 1481180695
+  seq: 0
+  frame_id: novatel

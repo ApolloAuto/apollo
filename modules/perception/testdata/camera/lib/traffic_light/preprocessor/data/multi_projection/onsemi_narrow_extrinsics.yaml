@@ -1,0 +1,17 @@
+transform:
+  translation:
+    y: 0.1823659515631236
+    x: 0.3309864011425076
+    z: -0.2625793995261765
+  rotation:
+    w: 0.4980656377641512
+    x: -0.4956970799450233
+    y: 0.4962185935042984
+    z: -0.5098844308989855
+header:
+  frame_id: velodyne64
+  stamp:
+    nsecs: 0
+    secs: 0
+  seq: 0
+child_frame_id: onsemi_narrow
