@@ -8,11 +8,13 @@ cc_library(
         "decider.cc",
         "decider_creep.cc",
         "decider_stop_sign_monitor.cc",
+        "side_pass_safety.cc",
     ],
     hdrs = [
         "decider.h",
         "decider_creep.h",
         "decider_stop_sign_monitor.h",
+        "side_pass_safety.h",
     ],
     deps = [
         "//modules/common/status",

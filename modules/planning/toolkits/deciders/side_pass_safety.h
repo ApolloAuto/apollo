@@ -43,6 +43,15 @@ class SidePassSafety : public Decider {
   apollo::common::Status Process(
       Frame *frame,
       ReferenceLineInfo *reference_line_info) override;
+
+  apollo::common::Status BuildSidePathDecision(
+      Frame* frame, ReferenceLineInfo* const reference_line_info);
+
+  bool IsSafeSidePass(Frame* frame,
+                      ReferenceLineInfo* const reference_line_info);
+ private:
+  static constexpr char const* const SIDEPASS_VIRTUAL_OBSTACLE_ID =
+      "side_pass_safety";
 };
 
 }  // namespace planning
