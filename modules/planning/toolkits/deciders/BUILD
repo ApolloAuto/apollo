@@ -30,7 +30,22 @@ cc_library(
         "//modules/planning/common:frame",
         "//modules/planning/common:reference_line_info",
         "//modules/planning/toolkits/deciders:decider",
+    ],
+)
 
+cc_library(
+    name = "side_pass_safety",
+    srcs = [
+        "side_pass_safety.cc",
+    ],
+    hdrs = [
+        "side_pass_safety.h",
+    ],
+    deps = [
+        "//modules/common/util:map_util",
+        "//modules/planning/common:frame",
+        "//modules/planning/common:reference_line_info",
+        "//modules/planning/toolkits/deciders:decider",
     ],
 )
 
