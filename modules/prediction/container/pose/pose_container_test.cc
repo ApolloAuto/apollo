@@ -62,7 +62,7 @@ TEST_F(PoseContainerTest, Insertion) {
   pose_.Insert(localization);
   EXPECT_DOUBLE_EQ(pose_.GetTimestamp(), 3.0);
 
-  PerceptionObstacle *obstacle = pose_.ToPerceptionObstacle();
+  const PerceptionObstacle *obstacle = pose_.ToPerceptionObstacle();
   EXPECT_TRUE(obstacle != nullptr);
   EXPECT_TRUE(obstacle->has_position());
   EXPECT_TRUE(obstacle->has_velocity());

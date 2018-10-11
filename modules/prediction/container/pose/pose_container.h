@@ -53,30 +53,12 @@ class PoseContainer : public Container {
    * @brief Transform pose to a perception obstacle.
    * @return A pointer to a perception obstacle.
    */
-  perception::PerceptionObstacle* ToPerceptionObstacle();
+  const perception::PerceptionObstacle* ToPerceptionObstacle();
 
   /**
    * @brief Get timestamp
    */
   double GetTimestamp();
-
-  /**
-   * @brief Get speed of adc
-   * @return speed of adc
-   */
-  double GetSpeed() const;
-
-  /**
-  * @brief Get heading of adc
-  * @return heading of adc
-  */
-  double GetTheta() const;
-
-  /**
-   * @brief Get adc position
-   * @return adc position
-   */
-  apollo::common::Point3D GetPosition() const;
 
  private:
   /**
