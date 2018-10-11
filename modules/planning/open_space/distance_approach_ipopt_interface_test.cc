@@ -86,8 +86,6 @@ void DistanceApproachIPOPTInterfaceTest::ProblemSetup() {
       num_of_variables_, num_of_constraints_, horizon_, ts_, ego_, xWS_, uWS_,
       timeWS_, x0_, xf_, last_time_u_, XYbounds_, obstacles_vertices_num_,
       obstacles_num_, obstacles_A_, obstacles_b_, use_fix_time_));
-
-  ptop_->set_objective_weights(distance_approach_config_);
 }
 
 TEST_F(DistanceApproachIPOPTInterfaceTest, initilization) {
@@ -100,7 +98,7 @@ TEST_F(DistanceApproachIPOPTInterfaceTest, get_nlp_info) {
   ptop_->get_nlp_info(n, m, nnz_jac_g, nnz_h_lag, index_style);
   EXPECT_EQ(n, num_of_variables_);
   EXPECT_EQ(m, num_of_constraints_);
-  EXPECT_EQ(nnz_jac_g, 0);
+  EXPECT_EQ(nnz_jac_g, 5200);
   EXPECT_EQ(nnz_h_lag, 7285);
   EXPECT_EQ(index_style, Ipopt::TNLP::C_STYLE);
 }

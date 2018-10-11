@@ -20,18 +20,8 @@
 
 #include "modules/planning/open_space/distance_approach_ipopt_interface.h"
 
-#include <math.h>
-#include <utility>
-
-#include "cybertron/common/log.h"
-#include "modules/common/math/math_utils.h"
-#include "modules/common/util/util.h"
-#include "modules/planning/common/planning_gflags.h"
-
 namespace apollo {
 namespace planning {
-
-constexpr double dmin = 0.05;
 
 DistanceApproachIPOPTInterface::DistanceApproachIPOPTInterface(
     const int num_of_variables, const int num_of_constraints,
@@ -59,6 +49,7 @@ DistanceApproachIPOPTInterface::DistanceApproachIPOPTInterface(
       obstacles_A_(obstacles_A),
       obstacles_b_(obstacles_b),
       use_fix_time_(use_fix_time) {
+  AINFO << "constructor";
   w_ev_ = ego_(1, 0) + ego_(3, 0);
   l_ev_ = ego_(0, 0) + ego_(2, 0);
 
@@ -68,21 +59,20 @@ DistanceApproachIPOPTInterface::DistanceApproachIPOPTInterface(
   state_result_ = Eigen::MatrixXd::Zero(horizon_ + 1, 4);
   control_result_ = Eigen::MatrixXd::Zero(horizon_ + 1, 2);
   time_result_ = Eigen::MatrixXd::Zero(horizon_ + 1, 1);
-
   state_start_index_ = 0;
   control_start_index_ = 4 * (horizon_ + 1);
   time_start_index_ = control_start_index_ + 2 * horizon_;
   l_start_index_ = time_start_index_ + (horizon_ + 1);
   n_start_index_ = l_start_index_ + obstacles_vertices_sum_ * (horizon_ + 1);
-}
 
-/*
-  num_of_variables, num_of_constraints, horizon_, x0_, xF_, XYbounds_
-  */
+  // TODO(QiL): integrate open_space planner into task config when refactor done
+  CHECK(common::util::GetProtoFromFile(FLAGS_planner_open_space_config_filename,
+                                       &planner_open_space_config_))
+      << "Failed to load open space config file "
+      << FLAGS_planner_open_space_config_filename;
 
-void DistanceApproachIPOPTInterface::set_objective_weights(
-    const DistanceApproachConfig& distance_approach_config) {
-  distance_approach_config_.CopyFrom(distance_approach_config);
+  distance_approach_config_ =
+      planner_open_space_config_.distance_approach_config();
   weight_state_x_ = distance_approach_config_.weight_state(0);
   weight_state_y_ = distance_approach_config_.weight_state(1);
   weight_state_phi_ = distance_approach_config_.weight_state(2);
@@ -94,12 +84,16 @@ void DistanceApproachIPOPTInterface::set_objective_weights(
   weight_stitching_a_ = distance_approach_config_.weight_stitching(1);
   weight_first_order_time_ = distance_approach_config_.weight_time(0);
   weight_second_order_time_ = distance_approach_config_.weight_time(1);
+
+  wheelbase_ = vehicle_param_.wheel_base();
+  AINFO << "constructor out";
 }
 
 bool DistanceApproachIPOPTInterface::get_nlp_info(int& n, int& m,
                                                   int& nnz_jac_g,
                                                   int& nnz_h_lag,
                                                   IndexStyleEnum& index_style) {
+  AINFO << "get_nlp_info";
   // number of variables
   n = num_of_variables_;
 
@@ -107,17 +101,19 @@ bool DistanceApproachIPOPTInterface::get_nlp_info(int& n, int& m,
   m = num_of_constraints_;
 
   // number of nonzero hessian and lagrangian.
-  nnz_jac_g = 0;
+  nnz_jac_g = 10 * num_of_variables_;
 
   nnz_h_lag = 14 * num_of_variables_ + 5;
 
   index_style = IndexStyleEnum::C_STYLE;
+  AINFO << "get_nlp_info out";
   return true;
 }
 
 bool DistanceApproachIPOPTInterface::get_bounds_info(int n, double* x_l,
                                                      double* x_u, int m,
                                                      double* g_l, double* g_u) {
+  AINFO << "get_bounds_info";
   // here, the n and m we gave IPOPT in get_nlp_info are passed back to us.
   // If desired, we could assert to make sure they are what we think they are.
   CHECK(n == num_of_variables_) << "num_of_variables_ mismatch, n: " << n
@@ -282,12 +278,13 @@ bool DistanceApproachIPOPTInterface::get_bounds_info(int n, double* x_l,
 
   ADEBUG << "constraint_index after adding obstacles constraints: "
          << constraint_index;
-
+  AINFO << "get_bounds_info_ out";
   return true;
 }
 
 bool DistanceApproachIPOPTInterface::eval_g(int n, const double* x, bool new_x,
                                             int m, double* g) {
+  AINFO << "eval_g";
   // state start index
   std::size_t state_index = state_start_index_;
 
@@ -445,55 +442,51 @@ bool DistanceApproachIPOPTInterface::eval_g(int n, const double* x, bool new_x,
 bool DistanceApproachIPOPTInterface::get_starting_point(
     int n, bool init_x, double* x, bool init_z, double* z_L, double* z_U, int m,
     bool init_lambda, double* lambda) {
+  AINFO << "get_starting_point";
   CHECK(n == num_of_variables_)
       << "No. of variables wrong in get_starting_point. n : " << n;
   CHECK(init_x == true) << "Warm start init_x setting failed";
   CHECK(init_z == false) << "Warm start init_z setting failed";
   CHECK(init_lambda == false) << "Warm start init_lambda setting failed";
 
-  std::size_t variable_index = 0;
-
   // 1. state variables 4 * (horizon_ + 1)
   for (std::size_t i = 0; i < horizon_ + 1; ++i) {
+    std::size_t index = i * 4;
     for (std::size_t j = 0; j < 4; ++j) {
-      x[i * 4 + j] = xWS_(j, i);
+      x[index + j] = xWS_(j, i);
     }
-    variable_index += 4;
   }
 
-  // 2. control variable initialization, 2 * N
-  for (std::size_t i = 1; i <= horizon_; ++i) {
-    x[variable_index + i] = uWS_(0, i - 1);
-    x[variable_index + i + 1] = uWS_(1, i - 1);
-    variable_index += 2;
+  // 2. control variable initialization, 2 * horizon_
+  for (std::size_t i = 0; i < horizon_; ++i) {
+    std::size_t index = i * 2;
+    x[control_start_index_ + index] = uWS_(0, i);
+    x[control_start_index_ + index + 1] = uWS_(1, i);
   }
 
-  // 2. time scale variable initialization, 0 ~ horizon_ -1
+  // 2. time scale variable initialization, horizon_ + 1
   for (std::size_t i = 0; i < horizon_ + 1; ++i) {
-    x[variable_index] = 1.0;
-    ++variable_index;
+    x[time_start_index_ + i] = 1.0;
   }
 
   // TODO(QiL) : better hot start l
-  // 3. lagrange constraint l, obstacles_vertices_sum_ * (N+1)
-  for (std::size_t i = 1; i <= (horizon_ + 1); ++i) {
-    for (std::size_t j = 1; j <= obstacles_vertices_sum_; ++j) {
-      x[i * obstacles_vertices_sum_ + j] = 0.2;
-      ++variable_index;
+  // 3. lagrange constraint l, obstacles_vertices_sum_ * (horizon_+1)
+  for (std::size_t i = 0; i < horizon_ + 1; ++i) {
+    std::size_t index = i * obstacles_vertices_sum_;
+    for (std::size_t j = 0; j < obstacles_vertices_sum_; ++j) {
+      x[index + j] = 0.2;
     }
   }
 
   // TODO(QiL) : better hot start m
   // 4. lagrange constraint m, 4*obstacles_num * (horizon_+1)
-  for (std::size_t i = 1; i <= horizon_ + 1; ++i) {
-    for (std::size_t j = 1; j <= 4 * obstacles_num_; ++j) {
-      x[i * 4 * obstacles_num_ + j] = 0.2;
-      ++variable_index;
+  for (std::size_t i = 0; i < horizon_ + 1; ++i) {
+    std::size_t index = i * 4 * obstacles_num_;
+    for (std::size_t j = 0; j < 4 * obstacles_num_; ++j) {
+      x[index + j] = 0.2;
     }
   }
-
-  ADEBUG << "variable index after initialization done : " << variable_index;
-
+  AINFO << "get_starting_point out";
   return true;
 }
 
@@ -501,6 +494,7 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
                                                 bool new_x, int m, int nele_jac,
                                                 int* iRow, int* jCol,
                                                 double* values) {
+  AINFO << "eval_jac_g";
   CHECK_EQ(n, num_of_variables_)
       << "No. of variables wrong in eval_jac_g. n : " << n;
   CHECK_EQ(m, num_of_constraints_)
@@ -647,11 +641,13 @@ bool DistanceApproachIPOPTInterface::eval_h(int n, const double* x, bool new_x,
                                             bool new_lambda, int nele_hess,
                                             int* iRow, int* jCol,
                                             double* values) {
-  return true;
+  AINFO << "eval_h";
+  return false;
 }
 
 bool DistanceApproachIPOPTInterface::eval_f(int n, const double* x, bool new_x,
                                             double& obj_value) {
+  AINFO << "eval_f";
   // Objective is :
   // min control inputs
   // min input rate
@@ -721,6 +717,7 @@ bool DistanceApproachIPOPTInterface::eval_f(int n, const double* x, bool new_x,
 
 bool DistanceApproachIPOPTInterface::eval_grad_f(int n, const double* x,
                                                  bool new_x, double* grad_f) {
+  AINFO << "eval_grad_f";
   std::fill(grad_f, grad_f + n, 0.0);
   // gradients on states(No.5 in eval_f())
   for (std::size_t i = 0; i < horizon_ + 1; i++) {
@@ -838,6 +835,7 @@ void DistanceApproachIPOPTInterface::finalize_solution(
     const double* z_U, int m, const double* g, const double* lambda,
     double obj_value, const Ipopt::IpoptData* ip_data,
     Ipopt::IpoptCalculatedQuantities* ip_cq) {
+  AINFO << "finalize_solution";
   for (std::size_t i = 0; i < horizon_; ++i) {
     std::size_t state_index = i * 4;
     std::size_t control_index = i * 2;
@@ -864,6 +862,7 @@ void DistanceApproachIPOPTInterface::finalize_solution(
 void DistanceApproachIPOPTInterface::get_optimization_results(
     Eigen::MatrixXd* state_result, Eigen::MatrixXd* control_result,
     Eigen::MatrixXd* time_result) const {
+  AINFO << "get_optimization_results";
   *state_result = state_result_;
   *control_result = control_result_;
   *time_result = time_result_;

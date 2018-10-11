@@ -16,8 +16,8 @@ sx = -15.0
 sy = 7
 sphi = 0.0
 
-# scenario = "backward"
-scenario = "parallel"
+scenario = "backward"
+# scenario = "parallel"
 
 if scenario == "backward":
     #obstacles(x, y, heading, length, width, id)

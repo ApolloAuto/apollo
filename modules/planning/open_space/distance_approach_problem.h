@@ -20,10 +20,17 @@
 
 #pragma once
 
+#include <algorithm>
+#include <iomanip>
+#include <utility>
 #include <vector>
 
 #include "Eigen/Dense"
+#include "IpIpoptApplication.hpp"
+#include "IpSolveStatistics.hpp"
 
+#include "modules/common/time/time.h"
+#include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/open_space/distance_approach_ipopt_interface.h"
 #include "modules/planning/proto/planning.pb.h"
 

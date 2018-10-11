@@ -20,16 +20,6 @@
 
 #include "modules/planning/open_space/distance_approach_problem.h"
 
-#include <algorithm>
-#include <iomanip>
-#include <utility>
-
-#include "IpIpoptApplication.hpp"
-#include "IpSolveStatistics.hpp"
-
-#include "modules/common/time/time.h"
-#include "modules/planning/common/planning_gflags.h"
-
 namespace apollo {
 namespace planning {
 
@@ -109,7 +99,7 @@ bool DistanceApproachProblem::Solve(Eigen::MatrixXd* state_result,
   // Create an instance of the IpoptApplication
   Ipopt::SmartPtr<Ipopt::IpoptApplication> app = IpoptApplicationFactory();
 
-  app->Options()->SetStringValue("hessian_approximation", "exact");
+  app->Options()->SetStringValue("hessian_approximation", "limited-memory");
   // TODO(QiL) : Change IPOPT settings to flag or configs
   int print_level = 0;
   app->Options()->SetIntegerValue("print_level", print_level);
@@ -124,7 +114,7 @@ bool DistanceApproachProblem::Solve(Eigen::MatrixXd* state_result,
 
   Ipopt::ApplicationReturnStatus status = app->Initialize();
   if (status != Ipopt::Solve_Succeeded) {
-    AERROR << "*** Distiance Approach problem error during initialization!";
+    AINFO << "*** Distiance Approach problem error during initialization!";
     return false;
   }
 
