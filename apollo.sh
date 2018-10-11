@@ -795,6 +795,7 @@ function main() {
   local cmd=$1
   shift
 
+  NOT_BUILD_FRAMEWORK=false
   START_TIME=$(get_now)
   case $cmd in
     check)
