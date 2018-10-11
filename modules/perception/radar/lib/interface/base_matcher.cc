@@ -84,6 +84,8 @@ bool BaseMatcher::RefinedTrack(const base::ObjectPtr &track_object,
                                double track_timestamp,
                                const base::ObjectPtr &radar_object,
                                double radar_timestamp) {
+  // This function is supposed to return true in the base class.
+  // Specific actions can be overrided in derived classes.
   return true;
 }
 
