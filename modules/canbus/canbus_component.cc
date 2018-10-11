@@ -99,7 +99,6 @@ bool CanbusComponent::Init() {
     AERROR << "Failed to init vehicle controller.";
     return false;
   }
-
   AINFO << "The vehicle controller is successfully"
         << " initialized with canbus conf as : "
         << canbus_conf_.vehicle_parameter().ShortDebugString();
