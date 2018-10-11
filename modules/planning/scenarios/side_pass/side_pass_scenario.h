@@ -63,6 +63,8 @@ class SidePassScenario : public Scenario {
 
   void RegisterTasks();
 
+  int StageIndexInConf(const SidePassStage& stage);
+
   common::Status ApproachObstacle(
       const common::TrajectoryPoint& planning_start_point, Frame* frame);
 
@@ -90,7 +92,6 @@ class SidePassScenario : public Scenario {
  private:
   std::vector<std::unique_ptr<Task>> tasks_;
   ScenarioConfig config_;
-  int current_stage_index_ = 0;
   SidePassStage stage_ = SidePassStage::OBSTACLE_APPROACH;
   bool stage_init_ = false;
   SpeedProfileGenerator speed_profile_generator_;

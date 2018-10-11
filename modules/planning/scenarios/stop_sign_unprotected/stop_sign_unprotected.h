@@ -63,6 +63,8 @@ class StopSignUnprotectedScenario : public Scenario {
 
   void RegisterTasks();
 
+  int StageIndexInConf(const StopSignUnprotectedStage& stage);
+
   common::Status PreStop(Frame* frame);
   common::Status Stop(Frame* frame);
   common::Status Creep(
@@ -77,7 +79,6 @@ class StopSignUnprotectedScenario : public Scenario {
  private:
   std::vector<std::unique_ptr<Task>> tasks_;
   ScenarioConfig config_;
-  int current_stage_index_ = 0;
   StopSignUnprotectedStage stage_ = StopSignUnprotectedStage::PRE_STOP;
   SpeedProfileGenerator speed_profile_generator_;
   hdmap::PathOverlap next_stop_sign_overlap_;

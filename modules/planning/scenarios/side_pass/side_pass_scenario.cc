@@ -96,7 +96,8 @@ Status SidePassScenario::Process(const TrajectoryPoint& planning_start_point,
                                  Frame* frame) {
   status_ = STATUS_PROCESSING;
 
-  if (!InitTasks(config_, current_stage_index_, &tasks_)) {
+  const int current_stage_index = StageIndexInConf(stage_);
+  if (!InitTasks(config_, current_stage_index, &tasks_)) {
     return Status(ErrorCode::PLANNING_ERROR, "failed to init tasks");
   }
 
@@ -129,7 +130,6 @@ Status SidePassScenario::Process(const TrajectoryPoint& planning_start_point,
       break;
   }
 
-  // TODO(all): update current_stage_index_ when current stage is done
   return status;
 }
 
@@ -147,6 +147,22 @@ bool SidePassScenario::IsTransferable(const Scenario& current_scenario,
   } else {
     return IsSidePassScenario(ego_point, frame);
   }
+}
+
+int SidePassScenario::StageIndexInConf(const SidePassStage& stage) {
+  // note: this is the index in scenario conf file.  must be consistent
+  if (stage == SidePassStage::OBSTACLE_APPROACH) {
+    return 0;
+  } else if (stage == SidePassStage::PATH_GENERATION) {
+    return 1;
+  } else if (stage == SidePassStage::WAITPOINT_STOP) {
+    return 2;
+  } else if (stage == SidePassStage::SAFETY_DETECTION) {
+    return 3;
+  } else if (stage == SidePassStage::OBSTACLE_PASS) {
+    return 4;
+  }
+  return -1;
 }
 
 Status SidePassScenario::ApproachObstacle(

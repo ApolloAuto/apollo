@@ -30,9 +30,12 @@ ScenarioConfig::ScenarioType Scenario::scenario_type() const {
 bool Scenario::InitTasks(const ScenarioConfig& config,
                          const int current_stage_index,
                          std::vector<std::unique_ptr<Task>>* tasks) {
-  CHECK_GT(config.stage_size(), current_stage_index);
-
   tasks->clear();
+
+  if (current_stage_index < 0) {
+    return true;
+  }
+  CHECK_GT(config.stage_size(), current_stage_index);
 
   ScenarioConfig::Stage stage = config.stage(current_stage_index);
 
