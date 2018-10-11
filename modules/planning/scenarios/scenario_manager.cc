@@ -55,6 +55,8 @@ bool ScenarioManager::SelectChangeLaneScenario(
     if (current_scenario_->scenario_type() != ScenarioConfig::LANE_FOLLOW) {
       current_scenario_ =
           scenario_factory_.CreateObject(ScenarioConfig::LANE_FOLLOW);
+
+      current_scenario_->Init();
     }
     return true;
   } else {
@@ -77,6 +79,7 @@ bool ScenarioManager::SelectScenario(const ScenarioConfig::ScenarioType type,
     auto scenario = scenario_factory_.CreateObject(type);
     if (scenario->IsTransferable(*current_scenario_, ego_point, frame)) {
       current_scenario_ = std::move(scenario);
+      current_scenario_->Init();
       return true;
     }
   }
@@ -127,15 +130,17 @@ void ScenarioManager::Update(const common::TrajectoryPoint& ego_point,
     if (rejected_scenarios.find(scenario) != rejected_scenarios.end()) {
       continue;
     }
-    auto tmp_scenario = scenario_factory_.CreateObject(scenario);
     if (SelectScenario(scenario, ego_point, frame)) {
       return;
+    } else {
+      rejected_scenarios.insert(scenario);
     }
   }
 
   // finally use default transferrable scenario.
   if (current_scenario_->scenario_type() != default_scenario_type_) {
     current_scenario_ = scenario_factory_.CreateObject(default_scenario_type_);
+    current_scenario_->Init();
   }
 }
 
