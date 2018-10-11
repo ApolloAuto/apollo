@@ -22,7 +22,6 @@ catkin_pkg
 rospkg
 
 # Python tools
-plyvel == 0.9
 pyproj
 shapely
 

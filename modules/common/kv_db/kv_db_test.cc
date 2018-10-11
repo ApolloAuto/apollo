@@ -47,7 +47,7 @@ TEST(KVDBTest, GetDefault) {
 }
 
 TEST(KVDBTest, MultiThreads) {
-  static const int N_THREADS = 3;
+  static const int N_THREADS = 10;
 
   std::vector<std::unique_ptr<std::thread>> threads(N_THREADS);
   for (auto &th : threads) {

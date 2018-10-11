@@ -23,7 +23,6 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 
 apt-get install -y \
    libgeos-dev \
-   libleveldb-dev \
    python-matplotlib \
    python-pip \
    python-psutil \

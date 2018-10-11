@@ -170,10 +170,10 @@ function build() {
   build_py_proto
 
   # Clear KV DB and update commit_id after compiling.
-  rm -fr data/kv_db
+  rm -fr data/kv_db*
   REVISION=$(get_revision)
-  python modules/tools/common/kv_db.py put \
-      "apollo:data:commit_id" "$REVISION"
+  ./bazel-bin/modules/common/kv_db/kv_db_tool --op=put \
+      --key="apollo:data:commit_id" --value="$REVISION"
 
   if [ -d /apollo-simulator ] && [ -e /apollo-simulator/build.sh ]; then
     cd /apollo-simulator && bash build.sh build
