@@ -10,10 +10,10 @@ vehicle_param {
   min_turn_radius: 5.26
   max_acceleration: 1.18
   max_deceleration: -4.5
-  max_steer_angle: 10.935
+  max_steer_angle: 8.75
   max_steer_angle_rate: 10
   min_steer_angle_rate: 0
-  steer_ratio: 23
+  steer_ratio: 14.8
   wheel_base: 2.79
   wheel_rolling_radius: 0.275
   max_abs_speed_when_stopped: 0.15
