@@ -19,8 +19,9 @@ namespace apollo {
 namespace perception {
 namespace radar {
 
-void DummyDetector::ContiObs2Frame(const drivers::ContiRadar& corrected_obstacles,
-                                   base::FramePtr radar_frame) {
+void DummyDetector::ContiObs2Frame(
+        const drivers::ContiRadar& corrected_obstacles,
+        base::FramePtr radar_frame) {
   for (const auto& radar_obs : corrected_obstacles.contiobs()) {
     base::ObjectPtr radar_object(new base::Object);
     radar_object->id = radar_obs.obstacle_id();

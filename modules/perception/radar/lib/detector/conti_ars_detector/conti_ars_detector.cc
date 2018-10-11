@@ -14,6 +14,7 @@
 * limitations under the License.
 *****************************************************************************/
 #include "modules/perception/radar/lib/detector/conti_ars_detector/conti_ars_detector.h"
+#include <memory>
 
 namespace apollo {
 namespace perception {
@@ -37,9 +38,10 @@ std::string ContiArsDetector::Name() const {
   return "ContiArsDetector";
 }
 
-void ContiArsDetector::RawObs2Frame(const drivers::ContiRadar& corrected_obstacles,
-                                    const DetectorOptions& options,
-                                    base::FramePtr radar_frame) {
+void ContiArsDetector::RawObs2Frame(
+        const drivers::ContiRadar& corrected_obstacles,
+        const DetectorOptions& options,
+        base::FramePtr radar_frame) {
   const Eigen::Matrix4d& radar2world = *(options.radar2world_pose);
   const Eigen::Matrix4d& radar2novatel = *(options.radar2novatel_trans);
   const Eigen::Vector3f& angular_speed = options.car_angular_speed;
@@ -52,7 +54,7 @@ void ContiArsDetector::RawObs2Frame(const drivers::ContiRadar& corrected_obstacl
                                    * radar2novatel.topLeftCorner(3, 3);
   Eigen::Matrix3d radar2world_rotate = radar2world.block<3, 3>(0, 0);
   Eigen::Matrix3d radar2world_rotate_t = radar2world_rotate.transpose();
-  //Eigen::Vector3d radar2world_translation = radar2world.block<3, 1>(0, 3);
+  // Eigen::Vector3d radar2world_translation = radar2world.block<3, 1>(0, 3);
   ADEBUG << "radar2novatel: " << radar2novatel;
   ADEBUG << "angular_speed: " << angular_speed;
   ADEBUG << "rotation_radar: " << rotation_radar;

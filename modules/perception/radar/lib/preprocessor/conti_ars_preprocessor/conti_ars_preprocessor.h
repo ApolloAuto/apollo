@@ -54,9 +54,9 @@ class ContiArsPreprocessor : public BasePreprocessor {
   static int current_idx_;
   static int local2global_[ORIGIN_CONTI_MAX_ID_NUM];
 
-  DISALLOW_COPY_AND_ASSIGN(ContiArsPreprocessor);
-
   friend class ContiArsPreprocessorTest;
+
+  DISALLOW_COPY_AND_ASSIGN(ContiArsPreprocessor);
 };
 
 }  // namespace radar

@@ -15,10 +15,10 @@
 *****************************************************************************/
 #pragma once
 
+#include <gtest/gtest_prod.h>
 #include <string>
 #include <utility>
 #include <vector>
-#include <gtest/gtest_prod.h>
 
 #include "cybertron/common/macros.h"
 

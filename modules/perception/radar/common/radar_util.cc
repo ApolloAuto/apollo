@@ -55,7 +55,7 @@ void MockRadarPolygon(base::ObjectPtr object) {
   object->polygon[2].y = center(1) + world_poly(1);
   object->polygon[2].z = center(2);
 
-  // + - 
+  // + -
   local_poly(1) = -0.5 * width;
   world_poly = rotation * local_poly;
   object->polygon[3].x = center(0) + world_poly(0);

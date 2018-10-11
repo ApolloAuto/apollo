@@ -48,7 +48,7 @@ bool RadarObstaclePerception::Init(const std::string& pipeline_name) {
   CHECK(model_config->get_value("Tracker", &tracker_name))
         << "Tracker not found";
 
-  BaseDetector* detector = 
+  BaseDetector* detector =
       BaseDetectorRegisterer::GetInstanceByName(detector_name);
   CHECK_NOTNULL(detector);
   detector_.reset(detector);
@@ -69,9 +69,10 @@ bool RadarObstaclePerception::Init(const std::string& pipeline_name) {
   return true;
 }
 
-bool RadarObstaclePerception::Perceive(const drivers::ContiRadar& corrected_obstacles,
-                                       const RadarPerceptionOptions& options,
-                                       std::vector<base::ObjectPtr>* objects) {
+bool RadarObstaclePerception::Perceive(
+        const drivers::ContiRadar& corrected_obstacles,
+        const RadarPerceptionOptions& options,
+        std::vector<base::ObjectPtr>* objects) {
   PERCEPTION_PERF_FUNCTION();
   const std::string& sensor_name = options.sensor_name;
   PERCEPTION_PERF_BLOCK_START();

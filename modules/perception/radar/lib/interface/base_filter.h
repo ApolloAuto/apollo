@@ -15,8 +15,8 @@
 *****************************************************************************/
 #pragma once
 
-#include <string>
 #include <Eigen/Core>
+#include <string>
 
 #include "cybertron/common/macros.h"
 
