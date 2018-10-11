@@ -2,6 +2,18 @@ load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
+cc_test(
+    name = "conti_ars_preprocessor_test",
+    size = "small",
+    srcs = [
+        "conti_ars_preprocessor_test.cc",
+    ],
+    deps = [
+        ":conti_ars_preprocessor",
+        "@gtest//:main",
+    ],
+)
+
 cc_library(
     name = "conti_ars_preprocessor",
     srcs = [

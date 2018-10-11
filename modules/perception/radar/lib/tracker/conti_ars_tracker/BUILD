@@ -2,6 +2,30 @@ load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
+cc_test(
+    name = "conti_ars_tracker_test",
+    size = "small",
+    srcs = [
+        "conti_ars_tracker_test.cc",
+    ],
+    deps = [
+        ":conti_ars_tracker",
+        "@gtest//:main",
+    ],
+)
+
+cc_test(
+    name = "conti_ars_tracker_empty_test",
+    size = "small",
+    srcs = [
+        "conti_ars_tracker_empty_test.cc",
+    ],
+    deps = [
+        ":conti_ars_tracker",
+        "@gtest//:main",
+    ],
+)
+
 cc_library(
     name = "conti_ars_tracker",
     srcs = [

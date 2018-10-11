@@ -2,6 +2,18 @@ load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
+cc_test(
+    name = "dummy_algorithms_test",
+    size = "small",
+    srcs = [
+        "dummy_algorithms_test.cc",
+    ],
+    deps = [
+        ":dummy_algorithms",
+        "@gtest//:main",
+    ],
+)
+
 cc_library(
     name = "dummy_algorithms",
     srcs = [

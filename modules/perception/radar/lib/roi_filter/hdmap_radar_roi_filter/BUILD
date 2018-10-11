@@ -2,6 +2,18 @@ load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
+cc_test(
+    name = "hdmap_radar_roi_filter_test",
+    size = "small",
+    srcs = [
+        "hdmap_radar_roi_filter_test.cc",
+    ],
+    deps = [
+        ":hdmap_radar_roi_filter",
+        "@gtest//:main",
+    ],
+)
+
 cc_library(
     name = "hdmap_radar_roi_filter",
     srcs = [
