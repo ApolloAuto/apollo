@@ -38,7 +38,7 @@ class Player {
   using TermCtrlPtr = std::unique_ptr<TerminalController>;
   using TaskBufferPtr = std::shared_ptr<PlayTaskBuffer>;
 
-  Player(const PlayParam& play_param);
+  explicit Player(const PlayParam& play_param);
   virtual ~Player();
 
   bool Init();

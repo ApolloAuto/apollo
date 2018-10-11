@@ -96,11 +96,11 @@ void DisplayUsage(const std::string& binary, const std::string& command,
         std::cout << "\t-a, --all\t\t\t\t" << command << " all" << std::endl;
         break;
       case 'c':
-        std::cout << "\t-c, --white-channel <name>\t\t\tonly " << command
+        std::cout << "\t-c, --white-channel <name>\t\tonly " << command
                   << " the specified channel" << std::endl;
         break;
       case 'k':
-        std::cout << "\t-k, --black-channel <name>\t\t\tnot " << command
+        std::cout << "\t-k, --black-channel <name>\t\tnot " << command
                   << " the specified channel" << std::endl;
         break;
       case 'l':
@@ -330,7 +330,7 @@ int main(int argc, char** argv) {
     play_param.delay_time_s = opt_delay;
     play_param.files_to_play.insert(opt_file_vec.begin(), opt_file_vec.end());
     play_param.channels_to_play.insert(opt_white_channels.begin(),
-                                    opt_white_channels.end());
+                                       opt_white_channels.end());
     Player player(play_param);
     play_result = play_result && player.Init() ? true : false;
     play_result = play_result && player.Start() ? true : false;
