@@ -20,13 +20,12 @@ limitations under the License.
 #include <string>
 
 #include "modules/map/proto/map_id.pb.h"
-#include "modules/map/proto/map_speed_control.pb.h"
+#include "modules/map/relative_map/proto/navigation.pb.h"
 
 #include "modules/common/configs/config_gflags.h"
 #include "modules/common/util/file.h"
 #include "modules/common/util/string_util.h"
 #include "modules/map/hdmap/hdmap.h"
-#include "modules/map/relative_map/proto/navigation.pb.h"
 
 /**
  * @namespace apollo::hdmap
@@ -66,13 +65,6 @@ inline std::string EndWayPointFile() {
                                         FLAGS_end_way_point_filename);
   }
 }
-
-inline std::string SpeedControlFile() {
-  return apollo::common::util::StrCat(FLAGS_map_dir, "/",
-                                      FLAGS_speed_control_filename);
-}
-
-const SpeedControls* GetSpeedControls();
 
 /**
  * @brief create a Map ID given a string.

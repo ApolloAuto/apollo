@@ -109,11 +109,12 @@ bool ReferenceLineInfo::Init(const std::vector<const Obstacle*>& obstacles) {
     return false;
   }
 
-  if (hdmap::GetSpeedControls()) {
-    auto* speed_controls = hdmap::GetSpeedControls();
-    for (const auto& speed_control : speed_controls->speed_control()) {
-      reference_line_.AddSpeedLimit(speed_control);
-    }
+  const auto& map_path = reference_line_.map_path();
+  for (const auto& speed_bump : map_path.speed_bump_overlaps()) {
+    // -1 and + 1.0 are added to make sure it can be sampled.
+    reference_line_.AddSpeedLimit(speed_bump.start_s - 1.0,
+                                  speed_bump.end_s + 1.0,
+                                  FLAGS_speed_bump_speed_limit);
   }
 
   // set lattice planning target speed limit;
