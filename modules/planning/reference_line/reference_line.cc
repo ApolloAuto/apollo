@@ -728,7 +728,7 @@ void ReferenceLine::AddSpeedLimit(double start_s, double end_s,
           new_speed_limit.emplace_back(limit.start_s, end_s, speed_limit);
           new_speed_limit.emplace_back(end_s, limit.end_s, limit.speed_limit);
         } else {
-          new_speed_limit.emplace_back(limit.start_s, end_s, speed_limit);
+          new_speed_limit.emplace_back(limit.start_s, limit.end_s, speed_limit);
         }
       }
       start_s = limit.end_s;
