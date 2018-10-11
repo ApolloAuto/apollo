@@ -43,6 +43,7 @@ using ::apollo::common::util::FindOrDie;
 using ::apollo::common::util::FindOrNull;
 using ::apollo::common::PathPoint;
 using ::apollo::hdmap::LaneInfo;
+using ::apollo::hdmap::JunctionInfo;
 using ::apollo::perception::PerceptionObstacle;
 
 namespace {
@@ -205,8 +206,16 @@ void Obstacle::Insert(const PerceptionObstacle& perception_obstacle,
 }
 
 bool Obstacle::IsInJunction(const std::string& junction_id) {
-  // TODO(all) implement
-  return false;
+  // TODO(all) Consider if need to use vehicle front rather than position
+  if (feature_history_.size() == 0) {
+    AERROR << "Obstacle [" << id_ << "] has no history";
+    return false;
+  }
+  std::shared_ptr<const JunctionInfo> junction_info_ptr =
+      PredictionMap::JunctionById(junction_id);
+  const auto& position = latest_feature().position();
+  return PredictionMap::IsPointInJunction(
+      position.x(), position.y(), junction_info_ptr);
 }
 
 void Obstacle::BuildJunctionFeature(const std::string& junction_id) {

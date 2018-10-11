@@ -82,6 +82,14 @@ class PredictionMap {
   static std::shared_ptr<const hdmap::LaneInfo> LaneById(const std::string& id);
 
   /**
+   * @brief Get a shared pointer to a junction by lane ID.
+   * @param id The ID of the target junction ID in the form of string.
+   * @return A shared pointer to the junction with the input junction ID.
+   */
+  static std::shared_ptr<const hdmap::JunctionInfo>
+  JunctionById(const std::string& id);
+
+  /**
    * @brief Get the frenet coordinates (s, l) on a lane by a position.
    * @param position The position to get its frenet coordinates.
    * @param lane_info The lane on which to get the frenet coordinates.
@@ -142,6 +150,17 @@ class PredictionMap {
    * @return If any junctions exist.
    */
   static bool NearJunction(const Eigen::Vector2d& point, const double radius);
+
+  /**
+   * @brief Check if a point with coord x and y is in the junction.
+   * @param X axis coordinate.
+   * @param Y axis coordinate.
+   * @param A pointer to junction info.
+   * @return If the point is in the junction.
+   */
+  static bool IsPointInJunction(
+      const double x, const double y,
+      const std::shared_ptr<const hdmap::JunctionInfo> junction_info_ptr);
 
   /**
   * @brief Check if the obstacle is in a junction.

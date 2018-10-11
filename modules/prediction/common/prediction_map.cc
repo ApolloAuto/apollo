@@ -77,6 +77,11 @@ std::shared_ptr<const LaneInfo> PredictionMap::LaneById(
   return HDMapUtil::BaseMap().GetLaneById(hdmap::MakeMapId(str_id));
 }
 
+std::shared_ptr<const JunctionInfo> PredictionMap::JunctionById(
+    const std::string& str_id) {
+  return HDMapUtil::BaseMap().GetJunctionById(hdmap::MakeMapId(str_id));
+}
+
 bool PredictionMap::GetProjection(
     const Eigen::Vector2d& pos,
     const std::shared_ptr<const LaneInfo> lane_info,
@@ -201,6 +206,13 @@ bool PredictionMap::NearJunction(const Eigen::Vector2d& point,
   std::vector<std::shared_ptr<const JunctionInfo>> junctions;
   HDMapUtil::BaseMap().GetJunctions(hdmap_point, radius, &junctions);
   return junctions.size() > 0;
+}
+
+bool PredictionMap::IsPointInJunction(
+    const double x, const double y,
+    const std::shared_ptr<const JunctionInfo> junction_info_ptr) {
+  const Polygon2d& polygon = junction_info_ptr->polygon();
+  return polygon.IsPointIn({x, y});
 }
 
 std::vector<std::shared_ptr<const JunctionInfo>> PredictionMap::GetJunctions(
