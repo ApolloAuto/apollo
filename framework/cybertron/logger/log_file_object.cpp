@@ -145,7 +145,10 @@ bool LogFileObject::CreateLogfile(const std::string& time_pid_string) {
     // Make the symlink be relative (in the same dir) so that if the
     // entire log directory gets relocated the link is still valid.
     const char* linkdest = slash ? (slash + 1) : filename;
-    symlink(linkdest, linkpath.c_str());  // silently ignore failures
+    // silently ignore failures
+    if (!symlink(linkdest, linkpath.c_str())) {
+      AERROR << "sys link failed.";
+    }
   }
   return true;
 }
