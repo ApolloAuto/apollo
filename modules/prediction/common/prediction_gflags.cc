@@ -182,3 +182,5 @@ DEFINE_double(speed_at_lower_curvature, 8.5,
               "The speed at turning lane with lower bound curvature");
 DEFINE_double(speed_at_upper_curvature, 3.0,
               "The speed at turning lane with upper bound curvature");
+DEFINE_double(cost_function_alpha, 0.25,
+              "alpha of the cost function for best trajectory selection");

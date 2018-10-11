@@ -88,6 +88,8 @@ class MoveSequencePredictor : public SequencePredictor {
       const Obstacle& obstacle, const LaneSequence& lane_sequence);
 
   void GenerateCandidateTimes(std::vector<double>* candidate_times);
+
+  double CostFunction(const double max_lat_acc, const double time_to_end_state);
 };
 
 }  // namespace prediction
