@@ -20,13 +20,22 @@
 
 #pragma once
 
+#include <math.h>
+#include <utility>
 #include <vector>
 
 #include "Eigen/Dense"
 #include "IpTNLP.hpp"
 #include "IpTypes.hpp"
 
+#include "cybertron/common/log.h"
+#include "cybertron/common/macros.h"
+#include "modules/common/configs/proto/vehicle_config.pb.h"
 #include "modules/common/configs/vehicle_config_helper.h"
+#include "modules/common/math/math_utils.h"
+#include "modules/common/util/file.h"
+#include "modules/common/util/util.h"
+#include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/proto/planner_open_space_config.pb.h"
 
 namespace apollo {
@@ -165,7 +174,10 @@ class DistanceApproachIPOPTInterface : public Ipopt::TNLP {
   std::size_t n_start_index_ = 0;
 
  private:
-  apollo::planning::DistanceApproachConfig distance_approach_config_;
+  DistanceApproachConfig distance_approach_config_;
+  PlannerOpenSpaceConfig planner_open_space_config_;
+  const common::VehicleParam vehicle_param_ =
+      common::VehicleConfigHelper::GetConfig().vehicle_param();
 };
 
 }  // namespace planning

@@ -38,15 +38,6 @@ using apollo::common::math::Vec2d;
 
 Status OpenSpacePlanner::Init(const PlanningConfig&) {
   AINFO << "In OpenSpacePlanner::Init()";
-  // TODO(QiL): integrate open_space planner into task config when refactor done
-  CHECK(apollo::common::util::GetProtoFromFile(
-      FLAGS_planner_open_space_config_filename, &planner_open_space_config_))
-      << "Failed to load open space config file "
-      << FLAGS_planner_open_space_config_filename;
-
-  distance_approach_config_ =
-      planner_open_space_config_.distance_approach_config();
-
   // nominal sampling time
   ts_ = planner_open_space_config_.delta_t();
 

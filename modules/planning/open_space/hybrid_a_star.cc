@@ -104,6 +104,7 @@ std::shared_ptr<Node3d> HybridAStar::LoadRSPinCS(
   end_node->SetTrajCost(CalculateRSPCost(reeds_shepp_to_end));
   close_set_.insert(std::make_pair(end_node->GetIndex(), end_node));
   AINFO << "end_node.GetX()" << end_node->GetX();
+  AINFO << "end_node.GetY()" << end_node->GetY();
   return end_node;
 }
 

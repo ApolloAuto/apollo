@@ -97,7 +97,10 @@ cc_library(
         "distance_approach_problem.h",
     ],
     deps = [
+        "//cybertron",
         "//modules/common/util",
+        "//modules/planning/common:planning_gflags",
+        "//modules/planning/proto:planner_open_space_config_proto",
         "distance_approach_ipopt_interface",
     ],
 )
@@ -111,6 +114,7 @@ cc_library(
         "distance_approach_ipopt_interface.h",
     ],
     deps = [
+        "//cybertron",
         "//modules/common/math",
         "//modules/common/util",
         "//modules/planning/common:planning_gflags",
@@ -131,6 +135,7 @@ cc_test(
     deps = [
         "@gtest//:main",
         ":distance_approach_ipopt_interface",
+        "//cybertron",
     ],
 )
 
@@ -143,6 +148,7 @@ cc_test(
     deps = [
         "@gtest//:main",
         ":distance_approach_problem",
+        "//cybertron",
     ],
 )
 
