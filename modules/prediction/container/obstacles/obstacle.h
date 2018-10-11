@@ -156,6 +156,19 @@ class Obstacle {
   bool IsNearJunction();
 
   /**
+   * @brief Check if the obstacle is a junction.
+   * @param junction ID
+   * @return If the obstacle is in a junction.
+   */
+  bool IsInJunction(const std::string& junction_id);
+
+  /**
+   * @brief Build junction feature.
+   * @param junction ID
+   */
+  void BuildJunctionFeature(const std::string& junction_id);
+
+  /**
    * @brief Build obstacle's lane graph
    */
   void BuildLaneGraph();
