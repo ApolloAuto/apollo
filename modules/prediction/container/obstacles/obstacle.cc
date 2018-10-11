@@ -204,6 +204,15 @@ void Obstacle::Insert(const PerceptionObstacle& perception_obstacle,
   Trim();
 }
 
+bool Obstacle::IsInJunction(const std::string& junction_id) {
+  // TODO(all) implement
+  return false;
+}
+
+void Obstacle::BuildJunctionFeature(const std::string& junction_id) {
+  // TODO(all) implement
+}
+
 void Obstacle::SetStatus(const PerceptionObstacle& perception_obstacle,
                          const double timestamp, Feature* feature) {
   SetTimestamp(perception_obstacle, timestamp, feature);
