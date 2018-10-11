@@ -88,9 +88,9 @@ void MoveSequencePredictor::Predict(Obstacle* obstacle) {
            << "] with probability [" << sequence.probability() << "].";
 
     std::vector<TrajectoryPoint> points;
-    DrawMoveSequenceTrajectoryPoints(*obstacle, sequence,
-                                     FLAGS_prediction_duration,
-                                     FLAGS_prediction_period, &points);
+    DrawMoveSequenceTrajectoryPoints_UsingBestTrajectorySelection
+        (*obstacle, sequence, FLAGS_prediction_duration,
+         FLAGS_prediction_period, &points);
 
     Trajectory trajectory = GenerateTrajectory(points);
     trajectory.set_probability(sequence.probability());
