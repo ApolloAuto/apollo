@@ -164,11 +164,11 @@ DEFINE_double(centripedal_acc_threshold, 2.0,
               "Threshold of centripedal acceleration.");
 
 // move sequence prediction
-DEFINE_double(time_upper_bound_to_lane_center, 5.0,
+DEFINE_double(time_upper_bound_to_lane_center, 6.0,
               "Upper bound of time to get to the lane center");
 DEFINE_double(time_lower_bound_to_lane_center, 1.0,
               "Lower bound of time to get to the lane center");
-DEFINE_double(sample_time_gap, 0.2,
+DEFINE_double(sample_time_gap, 0.25,
               "Gap of time to sample time to get to the lane center");
 DEFINE_double(cost_alpha, 100.0,
               "The coefficient of lateral acceleration in cost function");

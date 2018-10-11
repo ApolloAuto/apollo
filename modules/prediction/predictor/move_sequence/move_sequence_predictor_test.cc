@@ -80,10 +80,10 @@ TEST_F(MoveSequencePredictorTest, Polynomial) {
   const Feature& feature = obstacle_ptr->latest_feature();
   const LaneGraph& lane_graph = feature.lane().lane_graph();
   for (const auto& lane_sequence : lane_graph.lane_sequence()) {
-    std::pair<double, double> lon_end_state;
+    std::pair<double, double> lon_end_state = {3.0, 3.0};
     std::array<double, 5> lon_coefficients;
     bool ret_lon = predictor.GetLongitudinalPolynomial(
-        *obstacle_ptr, lane_sequence, &lon_end_state, &lon_coefficients);
+        *obstacle_ptr, lane_sequence, lon_end_state, &lon_coefficients);
     EXPECT_TRUE(ret_lon);
     std::array<double, 6> lat_coefficients;
     bool ret_lat = predictor.GetLateralPolynomial(
