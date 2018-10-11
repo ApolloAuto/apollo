@@ -48,7 +48,35 @@ Status SidePassSafety::Process(Frame *frame,
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
 
+  if (IsSafeSidePass(frame, reference_line_info)) {
+    BuildSidePathDecision(frame, reference_line_info);
+  }
+
   return Status::OK();
+}
+
+apollo::common::Status SidePassSafety::BuildSidePathDecision(
+    Frame *frame, ReferenceLineInfo *const reference_line_info) {
+  std::string virtual_obstacle_id = SIDEPASS_VIRTUAL_OBSTACLE_ID;
+
+  auto* obstacle = frame->CreateStopObstacle(
+      reference_line_info, virtual_obstacle_id,
+      reference_line_info->AdcSlBoundary().end_s());
+  if (!obstacle) {
+    AERROR << "Failed to create side pass safety obstacle["
+           << virtual_obstacle_id << "]";
+    auto status = Status(ErrorCode::PLANNING_ERROR,
+               "Failed to create side pass safety obstacle");
+    return status;
+  }
+
+  return Status().OK();
+}
+
+bool SidePassSafety::IsSafeSidePass(
+    Frame *frame, ReferenceLineInfo *const reference_line_info) {
+  // TODO(yifei)
+  return false;
 }
 
 }  // namespace planning
