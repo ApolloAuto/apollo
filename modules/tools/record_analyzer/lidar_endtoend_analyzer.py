@@ -16,6 +16,8 @@
 # limitations under the License.
 ###############################################################################
 
+from statistical_analyzer import StatisticalAnalyzer
+from statistical_analyzer import PrintColors
 
 class LidarEndToEndAnalyzer:
     """control analyzer"""
@@ -23,11 +25,32 @@ class LidarEndToEndAnalyzer:
     def __init__(self):
         """init"""
         self.endtoend_latency = []
+        self.unprocessed_point_cloud_timestamps = []
 
     def put_control(self, control_cmd):
         """put control data"""
-        pass
+        if control_cmd.header.lidar_timestamp in \
+            self.unprocessed_point_cloud_timestamps:
+            ind = self.unprocessed_point_cloud_timestamps.index(
+                control_cmd.header.lidar_timestamp)
+            del(self.unprocessed_point_cloud_timestamps[ind])
+            self.endtoend_latency.append(
+                control_cmd.header.lidar_timestamp/1.0e-9 -
+                control_cmd.header.timestamp_sec)
 
-    def put_lidar(self, lidar_data):
+    def put_lidar(self, point_cloud):
         """put lidar data"""
-        pass
+        self.unprocessed_point_cloud_timestamps.append(
+            point_cloud.header.lidar_timestamp)
+
+    def print_endtoend_latency(self):
+        """print_endtoend_latency"""
+        print ""
+        print PrintColors.HEADER + "--- End to End Latency (ms) ---" + \
+              PrintColors.ENDC
+        analyzer = StatisticalAnalyzer()
+        analyzer.print_statistical_results(self.endtoend_latency)
+
+        print PrintColors.FAIL + "MISS # OF LIDAR: " + \
+              str(len(self.unprocessed_point_cloud_timestamps)) + \
+              PrintColors.ENDC

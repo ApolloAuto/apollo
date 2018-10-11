@@ -21,11 +21,12 @@ from cybertron.record import RecordReader
 from modules.control.proto import control_cmd_pb2
 from modules.planning.proto import planning_pb2
 from modules.canbus.proto import chassis_pb2
+from modules.drivers.proto import pointcloud_pb2
 from control_analyzer import ControlAnalyzer
 from planning_analyzer import PlannigAnalyzer
+from lidar_endtoend_analyzer import LidarEndToEndAnalyzer
 
-
-def process(control_analyzer, planning_analyzer):
+def process(control_analyzer, planning_analyzer, lidar_endtoend_analyzer):
     is_auto_drive = False
 
     for msg in reader.read_messages():
@@ -44,6 +45,7 @@ def process(control_analyzer, planning_analyzer):
             control_cmd = control_cmd_pb2.ControlCommand()
             control_cmd.ParseFromString(msg.message)
             control_analyzer.put(control_cmd)
+            lidar_endtoend_analyzer.put_control(control_cmd)
 
         if msg.topic == "/apollo/planning":
             if is_auto_drive:
@@ -51,6 +53,13 @@ def process(control_analyzer, planning_analyzer):
             adc_trajectory = planning_pb2.ADCTrajectory()
             adc_trajectory.ParseFromString(msg.message)
             planning_analyzer.put(adc_trajectory)
+
+        if msg.topic == "/apollo/sensor/velodyne64/compensator/PointCloud2":
+            if is_auto_drive:
+                continue
+            point_cloud = pointcloud_pb2.PointCloud()
+            point_cloud.ParseFromString(msg.message)
+            lidar_endtoend_analyzer.put_lidar(point_cloud)
 
 
 if __name__ == "__main__":
@@ -62,8 +71,10 @@ if __name__ == "__main__":
 
     control_analyzer = ControlAnalyzer()
     planning_analyzer = PlannigAnalyzer()
+    lidar_endtoend_analyzer = LidarEndToEndAnalyzer()
 
-    process(control_analyzer, planning_analyzer)
+    process(control_analyzer, planning_analyzer, lidar_endtoend_analyzer)
 
     control_analyzer.print_latency_statistics()
     planning_analyzer.print_latency_statistics()
+    lidar_endtoend_analyzer.print_endtoend_latency()
