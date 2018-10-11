@@ -4,14 +4,9 @@ project(cyber_recorder)
 add_library(cybertron_recorder_tool
   info.cpp
   recorder.cpp
+  player.cpp
   spliter.cpp
   recoverer.cpp
-  player/play_task_buffer.cpp
-  player/play_task_consumer.cpp
-  player/play_task_producer.cpp
-  player/play_task.cpp
-  player/player.cpp
-  player/terminal_controller.cpp
 )
 target_link_libraries(cybertron_recorder_tool
   cybertron
