@@ -24,9 +24,9 @@
 namespace apollo {
 namespace planning {
 
-class ObstacleContainer {
+class HybridAObstacleContainer {
  public:
-  ObstacleContainer() = default;
+  HybridAObstacleContainer() = default;
   void AddVirtualObstacle(const double x, const double y, const double heading,
                           const double length, const double width,
                           const int id) {
@@ -45,9 +45,9 @@ class ObstacleContainer {
   ThreadSafeIndexedObstacles obstacles_list;
 };
 
-class ResultContainer {
+class HybridAResultContainer {
  public:
-  ResultContainer() = default;
+  HybridAResultContainer() = default;
   void LoadResult() {
     x_ = std::move(result_.x);
     y_ = std::move(result_.y);
@@ -76,22 +76,27 @@ class ResultContainer {
 
 extern "C" {
 HybridAStar* CreatePlannerPtr() { return new HybridAStar(); }
-ObstacleContainer* CreateObstaclesPtr() { return new ObstacleContainer(); }
-ResultContainer* CreateResultPtr() { return new ResultContainer(); }
-void AddVirtualObstacle(ObstacleContainer* obstacles_ptr, const double x,
+HybridAObstacleContainer* CreateObstaclesPtr() {
+  return new HybridAObstacleContainer();
+}
+HybridAResultContainer* CreateResultPtr() {
+  return new HybridAResultContainer();
+}
+void AddVirtualObstacle(HybridAObstacleContainer* obstacles_ptr, const double x,
                         const double y, const double heading,
                         const double length, const double width, const int id) {
   obstacles_ptr->AddVirtualObstacle(x, y, heading, length, width, id);
 }
-bool Plan(HybridAStar* planner_ptr, ObstacleContainer* obstacles_ptr,
-          ResultContainer* result_ptr, double sx, double sy, double sphi,
+bool Plan(HybridAStar* planner_ptr, HybridAObstacleContainer* obstacles_ptr,
+          HybridAResultContainer* result_ptr, double sx, double sy, double sphi,
           double ex, double ey, double ephi) {
   return planner_ptr->Plan(sx, sy, sphi, ex, ey, ephi,
                            obstacles_ptr->GetObstacleList(),
                            result_ptr->PrepareResult());
 }
-void GetResult(ResultContainer* result_ptr, double* x, double* y, double* phi,
-               double* v, double* a, double* steer, std::size_t* output_size) {
+void GetResult(HybridAResultContainer* result_ptr, double* x, double* y,
+               double* phi, double* v, double* a, double* steer,
+               std::size_t* output_size) {
   result_ptr->LoadResult();
   std::size_t size = result_ptr->GetX()->size();
   std::cout << "return size is " << size << std::endl;

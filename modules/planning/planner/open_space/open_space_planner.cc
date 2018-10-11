@@ -56,7 +56,7 @@ Status OpenSpacePlanner::Init(const PlanningConfig&) {
   double left_to_center = vehicle_param_.left_edge_to_center();
   double right_to_center = vehicle_param_.right_edge_to_center();
   ego_.resize(4, 1);
-  ego_ << front_to_center, back_to_center, left_to_center, right_to_center;
+  ego_ << front_to_center, right_to_center, back_to_center, left_to_center;
   // load xy boundary into the Plan() from configuration(before ROI is done)
   double x_max = planner_open_space_config_.warm_start_config().max_x();
   double y_max = planner_open_space_config_.warm_start_config().max_y();
@@ -149,12 +149,6 @@ apollo::common::Status OpenSpacePlanner::Plan(
 
   // TODO(QiL): Step 8 : Formulate distance approach problem
   // solution from distance approach
-  Eigen::MatrixXd xp1 = Eigen::MatrixXd::Zero(4, horizon_ + 1);
-  Eigen::MatrixXd up1 = Eigen::MatrixXd::Zero(2, horizon_);
-  Eigen::MatrixXd scaleTime1 = Eigen::MatrixXd::Zero(1, horizon_ + 1);
-
-  // TODO(QiL) : update the I/O to make the warm start problem and distance
-  // approach problem connect
   distance_approach_.reset(new DistanceApproachProblem(
       x0, xF, last_time_u, horizon_, ts_, ego_, xWS, uWS, XYbounds_,
       obstacles_num, obstacles_edges_num, obstacles_A, obstacles_b));

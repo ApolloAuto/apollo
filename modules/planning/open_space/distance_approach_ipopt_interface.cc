@@ -840,24 +840,25 @@ void DistanceApproachIPOPTInterface::finalize_solution(
     Ipopt::IpoptCalculatedQuantities* ip_cq) {
   for (std::size_t i = 0; i < horizon_; ++i) {
     std::size_t state_index = i * 4;
+    std::size_t control_index = i * 2;
 
-    state_result_(i, 0) = x[state_index];
-    state_result_(i, 1) = x[state_index + 1];
-    state_result_(i, 2) = x[state_index + 2];
-    state_result_(i, 3) = x[state_index + 3];
+    state_result_(0, i) = x[state_index];
+    state_result_(1, i) = x[state_index + 1];
+    state_result_(2, i) = x[state_index + 2];
+    state_result_(3, i) = x[state_index + 3];
 
-    std::size_t control_index = (horizon_ + 1) * 4 + i * 2;
-    control_result_(i, 0) = x[control_index];
-    control_result_(i, 1) = x[control_index + 1];
+    control_result_(0, i) = x[control_start_index_ + control_index];
+    control_result_(1, i) = x[control_start_index_ + control_index + 1];
 
-    std::size_t time_index = (horizon_ + 1) * 4 + horizon_ * 2 + i;
-    time_result_(i, 0) = x[time_index];
+    time_result_(0, i) = x[time_start_index_ + i];
   }
   // push back state for N+1
-  state_result_(4 * horizon_, 0) = x[4 * horizon_];
-  state_result_(4 * horizon_, 1) = x[4 * horizon_ + 1];
-  state_result_(4 * horizon_, 2) = x[4 * horizon_ + 2];
-  state_result_(4 * horizon_, 3) = x[4 * horizon_ + 3];
+  state_result_(0, 4 * horizon_) = x[4 * horizon_];
+  state_result_(1, 4 * horizon_ + 1) = x[4 * horizon_ + 1];
+  state_result_(2, 4 * horizon_ + 2) = x[4 * horizon_ + 2];
+  state_result_(3, 4 * horizon_ + 3) = x[4 * horizon_ + 3];
+  time_result_(0, time_start_index_ + horizon_) =
+      x[time_start_index_ + horizon_];
 }
 
 void DistanceApproachIPOPTInterface::get_optimization_results(

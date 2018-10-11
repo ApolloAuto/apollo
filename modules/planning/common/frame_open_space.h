@@ -176,7 +176,8 @@ class FrameOpenSpace {
   // boundary
   std::size_t obstacles_num_ = 0;
 
-  //
+  // @brief the dimension needed for A and b matrix dimension in H
+  // representation
   Eigen::MatrixXd obstacles_edges_num_;
 
   // @brief obstacle list for open space warm start as warm start needs all

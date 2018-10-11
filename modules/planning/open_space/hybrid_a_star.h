@@ -72,13 +72,10 @@ class HybridAStar {
             double ephi, ThreadSafeIndexedObstacles* obstacles, Result* result);
 
  private:
-  // not complete
   bool AnalyticExpansion(std::shared_ptr<Node3d> current_node,
                          ReedSheppPath* reeds_shepp_to_end);
   bool ReedSheppHeuristic(std::shared_ptr<Node3d> current_node,
                           ReedSheppPath* reeds_shepp_to_end);
-  // not complete
-  std::vector<std::shared_ptr<Node3d>> KinemeticModelExpansion();
   // check collision and validity
   bool ValidityCheck(std::shared_ptr<Node3d> node);
   // check Reeds Shepp path collision and validity
@@ -94,7 +91,6 @@ class HybridAStar {
   double HeuristicCost();
   double HoloObstacleHeuristic();
   double NonHoloNoObstacleHeuristic(const ReedSheppPath* reeds_shepp_to_end);
-  double EuclidDist();
   double CalculateRSPCost(const ReedSheppPath* reeds_shepp_to_end);
   bool GetResult(std::shared_ptr<Node3d> final_node, Result* result);
   bool GenerateSpeedAcceleration(Result* result);
