@@ -1,0 +1,55 @@
+gpu_id:0
+detector_param {
+  plugin_param{
+    name: "YoloObstacleDetector"
+    root_dir: "/apollo/modules/perception/production/data/perception/camera/models/yolo_obstacle_detector"
+    config_file: "config.pt"
+  }
+  camera_name : "onsemi_obstacle"
+}
+tracker_param {
+  plugin_param{
+    name: "OMTObstacleTracker"
+    root_dir: "/apollo/modules/perception/production/data/perception/camera/models/omt_obstacle_tracker"
+    config_file: "config.pt"
+  }
+}
+feature_param {
+ plugin_param{
+    name: "ProjectFeature"
+    root_dir: "/apollo/modules/perception/production/data/perception/camera/models/external_feature_extractor"
+    config_file: "config.pt"
+  }
+}
+lane_param {
+  lane_detector_param {
+    plugin_param {
+      name: "DenselineLaneDetector"
+      root_dir: "/apollo/modules/perception/production/data/perception/camera/models/lane_detector/"
+      config_file: "config.pt"
+    }
+  }
+  lane_postprocessor_param {
+      name: "DenselineLanePostprocessor"
+      root_dir: "/apollo/modules/perception/production/data/perception/camera/models/lane_postprocessor/denseline/"
+      config_file: "config.pt"
+  }
+}
+debug_param  {
+  lane_out_dir: "./conf/result/"
+}
+calibration_service_param {
+  plugin_param {
+      name : "OnlineCalibrationService"
+      root_dir : ""
+      config_file : ""
+  }
+  calibrator_method : "LaneLineCalibrator"
+}
+object_template_param {
+ plugin_param{
+    name : "ObjectTemplate"
+    root_dir : "/apollo/modules/perception/production/data/perception/camera/common/object_template/"
+    config_file : "object_template.pt"
+  }
+}

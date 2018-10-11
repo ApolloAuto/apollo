@@ -1,0 +1,31 @@
+syntax = "proto2";
+
+package apollo.perception.camera;
+
+message Dim {
+  required float H = 1;
+  required float W = 2;
+  required float L = 3;
+}
+
+message ObjectTemplate {
+  required float speed_limit = 1;
+  repeated Dim dim = 2;
+}
+
+message ObjectTemplateMeta {
+  required ObjectTemplate unknown = 1;
+  required ObjectTemplate unknown_movable = 2;
+  required ObjectTemplate unknown_unmovable = 3;
+  required ObjectTemplate car = 4;
+  required ObjectTemplate van = 5;
+  required ObjectTemplate truck = 6;
+  required ObjectTemplate bus = 7;
+  required ObjectTemplate cyclist = 8;
+  required ObjectTemplate motorcyclist = 9;
+  required ObjectTemplate tricyclist = 10;
+  required ObjectTemplate pedestrian = 11;
+  required ObjectTemplate trafficcone = 12;
+
+  required float max_dim_change_ratio = 21 [default = 0.1];
+}

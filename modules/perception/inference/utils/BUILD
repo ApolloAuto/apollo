@@ -78,6 +78,18 @@ cuda_library(
     ],
 )
 
+cc_library(
+    name = "inference_resize_lib",
+    srcs = [
+        ":inference_resize_cuda_lib",
+    ],
+    hdrs = ["resize.h"],
+    linkstatic = 1,
+    linkopts = ["-lopencv_core -lopencv_imgproc -lopencv_highgui -lnvinfer_plugin -lcaffe"],
+    deps = [],
+)
+
+
 cuda_library(
     name = "inference_gemm_cuda_lib",
     srcs = [
@@ -95,6 +107,18 @@ cuda_library(
         "@cuda",
     ],
 )
+
+cc_library(
+    name = "inference_gemm_lib",
+    srcs = [
+        ":inference_gemm_cuda_lib",
+    ],
+    hdrs = ["gemm.h"],
+    linkstatic = 1,
+    linkopts = ["-lopencv_core -lopencv_imgproc -lopencv_highgui -lnvinfer_plugin -lcaffe"],
+    deps = [],
+)
+
 
 cc_test(
     name = "inference_util_test",

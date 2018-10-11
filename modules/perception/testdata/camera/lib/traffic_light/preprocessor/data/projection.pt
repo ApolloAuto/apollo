@@ -1,0 +1,21 @@
+params_dir: "./data/multi_projection/"
+camera_params{
+    camera_name: "onsemi_traffic"
+    intrinsic_name: "onsemi_traffic_intrinsics.yaml"
+    camera_id:LONG_FOCUS
+}
+camera_params{
+    camera_name: "onsemi_narrow"
+    intrinsic_name: "onsemi_narrow_intrinsics.yaml"
+    camera_id:NARROW_FOCUS
+}
+camera_params{
+    camera_name: "onsemi_obstacle"
+    intrinsic_name: "onsemi_obstacle_intrinsics.yaml"
+    camera_id:SHORT_FOCUS
+}
+camera_params{
+    camera_name: "onsemi_wide"
+    intrinsic_name: "onsemi_wide_intrinsics.yaml"
+    camera_id:WIDE_FOCUS
+}

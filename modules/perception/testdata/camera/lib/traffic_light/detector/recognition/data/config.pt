@@ -1,0 +1,50 @@
+vertical_model{
+    model_name: "./";
+    model_type: "CaffeNet";
+    input_blob: "data_org";
+    output_blob: "prob";
+    weight_file: "models/rcg_all/2018-09-03/vertical/baidu_iter_250000.caffemodel";
+    proto_file: "models/rcg_all/2018-09-03/vertical/deploy.prototxt";
+    classify_threshold: 0.5;
+    classify_resize_width: 32;
+    classify_resize_height: 96;
+    mean_r: 69.06;
+    mean_g: 66.58;
+    mean_b: 66.56;
+    is_bgr: true;
+    scale: 0.01
+}
+
+quadrate_model{
+    model_name: "./";
+    model_type: "CaffeNet";
+    input_blob: "data_org";
+    output_blob: "prob";
+    weight_file: "models/rcg_all/2018-09-03/quadrate/baidu_iter_200000.caffemodel";
+    proto_file: "models/rcg_all/2018-09-03/quadrate/deploy.prototxt";
+    classify_threshold: 0.5;
+    classify_resize_width: 64;
+    classify_resize_height: 64;
+    mean_r: 69.06;
+    mean_g: 66.58;
+    mean_b: 66.56;
+    is_bgr: true;
+    scale: 0.01
+}
+
+horizontal_model{
+    model_name: "./";
+    model_type: "CaffeNet";
+    input_blob: "data_org";
+    output_blob: "prob";
+    weight_file: "models/rcg_all/2018-09-03/horizontal/baidu_iter_200000.caffemodel";
+    proto_file: "models/rcg_all/2018-09-03/horizontal/deploy.prototxt";
+    classify_threshold: 0.5;
+    classify_resize_width: 96;
+    classify_resize_height: 32;
+    mean_r: 69.06;
+    mean_g: 66.58;
+    mean_b: 66.56;
+    is_bgr: true;
+    scale: 0.01
+}

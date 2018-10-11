@@ -1,0 +1,8 @@
+history_frame_num: 4
+lost_age_num: 5
+camera_x_max: 20
+camera_z_max: 100
+merge_neighbor_group_thresh: 0.6
+laneline_confidence_thresh: 0.8
+filter_outlier_dist_thresh: 0.5
+filter_outlier_vote_thresh: 0

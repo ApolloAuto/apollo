@@ -1,0 +1,51 @@
+module_config {
+  module_library : "lib/libperception_camera_cybertron_viz.so"
+  components {
+    comname : "FusionCameraDetectionViz"
+    comclass : "FusionCameraDetectionComponent"
+    confpath : "conf/perception/camera_onboard/camera_detection_component.cy.config"
+    sender : {
+      outchannelnames : ["/perception/inner/PrefusedObjects", "/perception/obstacles", "/perception/inner/camera_viz_msg", "/perception/obstacles_camera_debug"]
+    }
+  }
+
+  components {
+    comname : "CameraVisualization"
+    comclass : "CameraVisualizationComponent"
+    # confpath : "conf/perception/camera_detection_component.cy.config"
+    receiver : {
+      inchannelnames : ["/perception/inner/camera_viz_msg"]
+      inqosfilter : "PassThrough"
+    }
+  }
+
+  channels {
+    channelname : "/sensor/camera/traffic/image_short"
+    msgtype : "adu.common.sensor.Image"
+  }
+
+  channels {
+    channelname : "/sensor/camera/obstacle/image_narrow"
+    msgtype : "adu.common.sensor.Image"
+  }
+
+  channels {
+    channelname : "/perception/obstacles"
+    msgtype : "adu.common.perception.PerceptionObstacles"
+  }
+
+  channels {
+    channelname : "/perception/inner/PrefusedObjects"
+    msgtype : "SensorFrameMessage"
+  }
+
+  channels {
+    channelname : "/perception/inner/camera_viz_msg"
+    msgtype : "CameraPerceptionVizMessage"
+  }
+
+  channels {
+    channelname : "/perception/obstacles_camera_debug"
+    msgtype : "adu.common.perception.camera.CameraDebug"
+  }
+}

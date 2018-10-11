@@ -78,12 +78,12 @@ bool RobustBinaryFitRansac(T* x, T* xp, int n, T* model, int* consensus_size,
   IZero(model, k);      // initialize the model with zeros
 
   if (random_shuffle_inputs) {
-    IRandomizedShuffle(x, xp, n, l, lp, rseed);
+    IRandomizedShuffle(x, xp, n, l, lp, &rseed);
   }
 
   while (nr_trials > sample_count) {
     // generate random indices
-    IRandomSample(indices, s, n, rseed);
+    IRandomSample(indices, s, n, &rseed);
     // prepare data for model fitting
     for (i = 0; i < s; ++i) {
       idxl = indices[i] * l;

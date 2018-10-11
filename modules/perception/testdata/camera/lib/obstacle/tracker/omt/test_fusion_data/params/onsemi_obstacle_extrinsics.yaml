@@ -1,0 +1,17 @@
+header:
+  stamp:
+    secs: 0
+    nsecs: 0
+  seq: 0
+  frame_id: velodyne64
+transform:
+  rotation:
+    x: -0.5032473552377276
+    z: -0.506011022936818
+    y: 0.4993366298247822
+    w: 0.491281868409466
+  translation:
+    z: -0.3335629252912848
+    y: 0.0001724492058138627
+    x: 0.4301553490164852
+child_frame_id: onsemi_obstacle

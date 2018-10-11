@@ -16,4 +16,31 @@ proto_library(
     ],
 )
 
+cc_proto_library(
+	name = "fusion_camera_detection_proto",
+	deps = [
+		":fusion_camera_detection_proto_lib",
+	],
+)
+
+proto_library(
+	name = "fusion_camera_detection_proto_lib",
+	srcs = [
+		"fusion_camera_detection_component.proto",
+	],
+)
+
+cc_proto_library(
+	name = "trafficlights_perception_component_proto",
+	deps = [
+		":trafficlights_perception_component_proto_lib",
+	],
+)
+
+proto_library(
+	name = "trafficlights_perception_component_proto_lib",
+	srcs = [
+		"trafficlights_perception_component.proto",
+	],
+)
 cpplint()

@@ -1,0 +1,19 @@
+model_param {
+  model_name: "denseline"
+  model_type: "RTNet"
+  weight_file: "deploy.caffemodel"
+  proto_file: "deploy.prototxt"
+  resize_scale: 0.8
+  input_offset_y: 200
+  input_offset_x: 0
+  crop_height: 800
+  crop_width: 1920
+  mean_b: 95
+  mean_g: 99
+  mean_r: 96
+  is_bgr: false
+}
+net_param {
+   in_blob: "data"
+   out_blob: "conv_out"
+}

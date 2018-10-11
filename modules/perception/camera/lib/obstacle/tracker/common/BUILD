@@ -1,0 +1,75 @@
+load("//tools:cpplint.bzl", "cpplint")
+load("//tools:cuda_library.bzl", "cuda_library")
+
+package(default_visibility = ["//visibility:public"])
+
+cuda_library(
+    name = "similar_cuda",
+    srcs = [
+        "similar.cu",
+    ],
+    hdrs = [
+        "similar.h",
+    ],
+    deps = [
+        "@cuda",
+        "//modules/perception/camera/common:common",
+        "//modules/perception/inference/utils:inference_util_lib",
+        "//modules/perception/inference/utils:inference_gemm_lib",
+    ],
+)
+
+cc_library(
+    name = "similar",
+    srcs = [
+        "similar.cc",
+        ":similar_cuda",
+    ],
+    hdrs = [ 
+        "similar.h",
+    ],
+    deps = [
+        "@eigen",
+        "//modules/perception/base:base",
+        "//modules/perception/camera/common:common",
+    ],
+)
+
+cc_library(
+    name = "half_circle_angle",
+    srcs = [
+        "half_circle_angle.cc",
+    ],
+    hdrs = [ 
+        "half_circle_angle.h",
+    ],
+    deps = [
+        "//modules/perception/camera/common:common",
+    ],
+)
+
+cc_library(
+    name = "kalman_filter",
+    srcs = [
+        "kalman_filter.cc",
+    ],
+    hdrs = [ 
+        "kalman_filter.h",
+    ],
+    deps = [
+        "@eigen",
+        "//cybertron",
+    ],
+)
+
+
+cc_library(
+    name = "common",
+    deps = [
+        ":half_circle_angle",
+        ":kalman_filter",
+        ":similar",
+    ],
+)
+
+cpplint()
