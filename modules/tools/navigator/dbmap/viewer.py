@@ -24,7 +24,7 @@ import common.proto_utils as proto_utils
 from modules.map.relative_map.proto import navigation_pb2
 
 
-class GoogleMapViewer:
+class DBMapViewer:
     def __init__(self, utm_zone):
         """
         init function
@@ -45,8 +45,8 @@ class GoogleMapViewer:
         lon, lat = self.projector(x, y, inverse=True)
         return lat, lon
 
-    def add(self, navimap):
-        for navigation_path in navimap.navigation_path:
+    def add(self, dbmap):
+        for navigation_path in dbmap.navigation_path:
             navigation_line = []
             for p in navigation_path.path.path_point:
                 point = {}
@@ -120,7 +120,7 @@ if __name__ == "__main__":
     import google.protobuf.text_format as text_format
 
     if len(sys.argv) < 2:
-        print "usage: python navimap_viewer.py navimap_file [utm_zone=10]"
+        print "usage: python map_viewer.py dbmap_file [utm_zone=10]"
         sys.exit(0)
 
     map_file = sys.argv[1]
@@ -128,12 +128,12 @@ if __name__ == "__main__":
     if len(sys.argv) >= 3:
         utm_zone = int(sys.argv[2])
 
-    navimap = navigation_pb2.NavigationInfo()
-    proto_utils.get_pb_from_file(map_file, navimap)
+    dbmap = navigation_pb2.NavigationInfo()
+    proto_utils.get_pb_from_file(map_file, dbmap)
     with open(map_file, 'r') as file_in:
-        text_format.Merge(file_in.read(), navimap)
-    viewer = GoogleMapViewer(utm_zone)
-    viewer.add(navimap)
+        text_format.Merge(file_in.read(), dbmap)
+    viewer = DBMapViewer(utm_zone)
+    viewer.add(dbmap)
     html = viewer.generate()
-    with open('navimap.html', 'w') as f:
+    with open('dbmap.html', 'w') as f:
         f.write(html)
