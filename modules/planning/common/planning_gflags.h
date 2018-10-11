@@ -202,6 +202,8 @@ DECLARE_double(fallback_total_time);
 DECLARE_double(fallback_time_unit);
 DECLARE_double(polynomial_speed_fallback_velocity);
 
+DECLARE_double(speed_bump_speed_limit);
+
 // navigation mode
 DECLARE_double(navigation_fallback_cruise_time);
 
