@@ -25,13 +25,14 @@
 #include "cybertron/base/signal.h"
 #include "cybertron/cybertron.h"
 #include "cybertron/message/raw_message.h"
-#include "cybertron/proto/record.pb.h"
+#include "cybertron/proto/record_conf.pb.h"
 #include "cybertron/proto/topology_change.pb.h"
 #include "cybertron/record/record_writer.h"
 
 using apollo::cybertron::service_discovery::TopologyManager;
 using apollo::cybertron::service_discovery::ChannelManager;
 using apollo::cybertron::proto::ChangeMsg;
+using apollo::cybertron::proto::RecordConf;
 using apollo::cybertron::proto::RoleType;
 using apollo::cybertron::proto::RoleAttributes;
 using apollo::cybertron::message::RawMessage;
@@ -62,6 +63,7 @@ class Recorder : public std::enable_shared_from_this<Recorder> {
   std::vector<std::string> channel_vec_;
   std::unordered_map<std::string, std::shared_ptr<ReaderBase>>
       channel_reader_map_;
+  RecordConf record_conf_;
 
   bool InitReadersImpl();
 

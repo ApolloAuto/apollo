@@ -80,7 +80,8 @@ bool Player::Start() {
 
   bool is_paused = false;
   const double total_progress_time_s =
-      (double)(play_param.end_time_ns - play_param.begin_time_ns) / 1e9;
+      static_cast<double>(play_param.end_time_ns - play_param.begin_time_ns) /
+      1e9;
   while (!is_stopped_.load() && apollo::cybertron::OK()) {
     auto character = term_ctrl_->ReadChar();
     switch (character) {
@@ -101,10 +102,10 @@ bool Player::Start() {
     }
 
     double last_played_msg_real_time_s =
-        (double)consumer_->last_played_msg_real_time_ns() / 1e9;
+        static_cast<double>(consumer_->last_played_msg_real_time_ns()) / 1e9;
     double progress_time_s =
-        (double)(consumer_->last_played_msg_real_time_ns() -
-                 consumer_->base_msg_play_time_ns()) /
+        static_cast<double>(consumer_->last_played_msg_real_time_ns() -
+                            consumer_->base_msg_play_time_ns()) /
         1e9;
 
     std::cout << std::setprecision(3) << last_played_msg_real_time_s

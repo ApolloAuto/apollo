@@ -8,6 +8,7 @@ import "transport_conf.proto";
 import "log_conf.proto";
 import "perf_conf.proto";
 import "run_mode_conf.proto";
+import "record_conf.proto";
 
 message CyberConfig {
     optional LogConf log_conf = 1;
@@ -16,4 +17,5 @@ message CyberConfig {
     optional TransportConf transport_conf = 4;
     optional PerfConf perf_conf = 5;
     optional RunModeConf run_mode_conf = 6;
+    optional RecordConf record_conf = 7;
 }

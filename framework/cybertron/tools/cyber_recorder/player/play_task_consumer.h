@@ -33,7 +33,8 @@ class PlayTaskConsumer {
   using ThreadPtr = std::unique_ptr<std::thread>;
   using TaskBufferPtr = std::shared_ptr<PlayTaskBuffer>;
 
-  PlayTaskConsumer(const TaskBufferPtr& task_buffer, double play_rate = 1.0);
+  explicit PlayTaskConsumer(const TaskBufferPtr& task_buffer,
+                            double play_rate = 1.0);
   virtual ~PlayTaskConsumer();
 
   void Start();

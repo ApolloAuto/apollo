@@ -22,7 +22,9 @@ namespace record {
 
 Recorder::Recorder(const std::string& output, bool all_channels,
                    const std::vector<std::string>& channel_vec)
-    : output_(output), all_channels_(all_channels), channel_vec_(channel_vec) {}
+    : output_(output), all_channels_(all_channels), channel_vec_(channel_vec) {
+  record_conf_ = common::GlobalData::Instance()->Config().record_conf();
+}
 
 Recorder::~Recorder() { Stop(); }
 
@@ -146,7 +148,7 @@ bool Recorder::InitReaderImpl(const std::string& channel_name,
     };
     ReaderConfig config;
     config.channel_name = channel_name;
-    config.pending_queue_size = 50;
+    config.pending_queue_size = record_conf_.reader_pending_queue_size();
     reader = node_->CreateReader<RawMessage>(config, callback);
     if (reader == nullptr) {
       AERROR << "Create reader failed.";
