@@ -54,7 +54,7 @@ class LaneFollowScenario : public Scenario {
                       const Frame& frame) const override;
 
  private:
-  enum LaneFollowStage {
+  enum class LaneFollowStage {
     CRUISE,
   };
 
@@ -82,7 +82,7 @@ class LaneFollowScenario : public Scenario {
   std::vector<std::unique_ptr<Task>> tasks_;
   ScenarioConfig config_;
   int current_stage_index_ = 0;
-  LaneFollowStage stage_ = CRUISE;
+  LaneFollowStage stage_ = LaneFollowStage::CRUISE;
   SpeedProfileGenerator speed_profile_generator_;
 };
 

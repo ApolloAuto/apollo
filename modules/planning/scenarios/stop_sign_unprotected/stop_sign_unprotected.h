@@ -54,7 +54,7 @@ class StopSignUnprotectedScenario : public Scenario {
                       const Frame& frame) const override;
 
  private:
-  enum StopSignUnprotectedStage {
+  enum class StopSignUnprotectedStage {
     PRE_STOP = 1,
     STOP = 2,
     CREEP = 3,
@@ -78,7 +78,7 @@ class StopSignUnprotectedScenario : public Scenario {
   std::vector<std::unique_ptr<Task>> tasks_;
   ScenarioConfig config_;
   int current_stage_index_ = 0;
-  StopSignUnprotectedStage stage_ = PRE_STOP;
+  StopSignUnprotectedStage stage_ = StopSignUnprotectedStage::PRE_STOP;
   SpeedProfileGenerator speed_profile_generator_;
   hdmap::PathOverlap next_stop_sign_overlap_;
   hdmap::StopSignInfoConstPtr next_stop_sign_ = nullptr;

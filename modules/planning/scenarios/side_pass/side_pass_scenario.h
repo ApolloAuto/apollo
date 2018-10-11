@@ -53,7 +53,7 @@ class SidePassScenario : public Scenario {
                       const Frame& frame) const override;
 
  private:
-  enum SidePassStage {
+  enum class SidePassStage {
     OBSTACLE_APPROACH,
     PATH_GENERATION,
     WAITPOINT_STOP,
@@ -91,7 +91,7 @@ class SidePassScenario : public Scenario {
   std::vector<std::unique_ptr<Task>> tasks_;
   ScenarioConfig config_;
   int current_stage_index_ = 0;
-  SidePassStage stage_ = OBSTACLE_APPROACH;
+  SidePassStage stage_ = SidePassStage::OBSTACLE_APPROACH;
   bool stage_init_ = false;
   SpeedProfileGenerator speed_profile_generator_;
   PathData path_;

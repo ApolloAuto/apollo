@@ -160,7 +160,7 @@ Status SidePassScenario::ApproachObstacle(
     if (!IsSidePassScenario(planning_start_point, *frame)) {
       // TODO(yifei) scenario is done
     } else if (frame->vehicle_state().linear_velocity() < 1.0e-5) {
-      stage_ = PATH_GENERATION;
+      stage_ = SidePassStage::PATH_GENERATION;
       stage_init_ = false;
     }
   }
