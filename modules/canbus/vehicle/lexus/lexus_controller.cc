@@ -283,9 +283,7 @@ Chassis LexusController::chassis() {
   }
 
   // give engage_advice based on error_code and canbus feedback
-  if (!chassis_error_mask_ && !chassis_.parking_brake() &&
-      (chassis_.throttle_percentage() == 0.0) &&
-      (chassis_.brake_percentage() != 0.0)) {
+  if (!chassis_error_mask_ && !chassis_.parking_brake()) {
     chassis_.mutable_engage_advice()->set_advice(
         apollo::common::EngageAdvice::READY_TO_ENGAGE);
   } else {
