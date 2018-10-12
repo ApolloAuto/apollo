@@ -18,6 +18,7 @@
 
 from statistical_analyzer import StatisticalAnalyzer
 from statistical_analyzer import PrintColors
+from error_code_analyzer import ErrorCodeAnalyzer
 
 
 class PlannigAnalyzer:
@@ -26,11 +27,13 @@ class PlannigAnalyzer:
     def __init__(self):
         """init"""
         self.module_latency = []
+        self.error_code_analyzer = ErrorCodeAnalyzer()
 
     def put(self, adc_trajectory):
         """put"""
         latency = adc_trajectory.latency_stats.total_time_ms
         self.module_latency.append(latency)
+        self.error_code_analyzer.put(adc_trajectory.header.status.error_code)
 
     def print_latency_statistics(self):
         """print_latency_statistics"""
@@ -39,3 +42,6 @@ class PlannigAnalyzer:
               PrintColors.ENDC
         analyzer = StatisticalAnalyzer()
         analyzer.print_statistical_results(self.module_latency)
+        print PrintColors.HEADER + "--- Planning Error Code Distribution ---" + \
+              PrintColors.ENDC
+        self.error_code_analyzer.print_results()
