@@ -24,6 +24,7 @@
 #include <vector>
 
 #include "cybertron/logger/logger_util.h"
+#include "cybertron/common/log.h"
 
 namespace apollo {
 namespace cybertron {
@@ -147,7 +148,7 @@ bool LogFileObject::CreateLogfile(const std::string& time_pid_string) {
     const char* linkdest = slash ? (slash + 1) : filename;
     // silently ignore failures
     if (!symlink(linkdest, linkpath.c_str())) {
-      AERROR << "sys link failed.";
+      AERROR << "symlink failed.";
     }
   }
   return true;
