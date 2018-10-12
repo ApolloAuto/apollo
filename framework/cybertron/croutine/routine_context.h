@@ -40,7 +40,7 @@ struct RoutineContext {
   char* sp = nullptr;
 };
 
-void MakeContext(const func &f1, const void *arg, RoutineContext *ctx);
+void MakeContext(const func& f1, const void* arg, RoutineContext* ctx);
 
 inline void SwapContext(RoutineContext* src_ctx, RoutineContext* dst_ctx) {
   ctx_swap(reinterpret_cast<void**>(&src_ctx->sp),

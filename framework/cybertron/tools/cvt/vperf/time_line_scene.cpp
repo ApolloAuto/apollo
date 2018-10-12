@@ -31,9 +31,9 @@
 #include <cstdlib>
 #include <ctime>
 #include <iostream>
+#include <list>
 #include <map>
 #include <string>
-#include <list>
 #include <vector>
 
 namespace {

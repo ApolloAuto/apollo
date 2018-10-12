@@ -24,8 +24,8 @@
 #include <QPixmap>
 #include <QTimer>
 #include <QVector2D>
-#include <memory>
 #include <map>
+#include <memory>
 #include <string>
 
 #include "./about_dialog.h"

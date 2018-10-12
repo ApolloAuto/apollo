@@ -20,8 +20,8 @@
 #include <map>
 #include <utility>
 
-#include "cybertron/cybertron.h"
 #include "./renderable_message.h"
+#include "cybertron/cybertron.h"
 
 class Screen;
 
@@ -34,7 +34,8 @@ class GeneralMessageBase : public RenderableMessage {
   static void PrintField(GeneralMessageBase* baseMsg,
                          const google::protobuf::Message& msg, int& jumpLines,
                          const Screen* s, unsigned& lineNo, int indent,
-                         const google::protobuf::Reflection* ref, const google::protobuf::FieldDescriptor* field,
+                         const google::protobuf::Reflection* ref,
+                         const google::protobuf::FieldDescriptor* field,
                          int index);
 
   static int lineCount(const google::protobuf::Message& msg, int screenWidth);

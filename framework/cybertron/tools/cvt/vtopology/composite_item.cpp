@@ -97,7 +97,9 @@ void CompositeItem::removeArrows() {
 QVariant CompositeItem::itemChange(GraphicsItemChange change,
                                    const QVariant &value) {
   if (change == QGraphicsItem::ItemPositionChange) {
-    for (Arrow *arrow : arrows_) { arrow->updatePosition(); }
+    for (Arrow *arrow : arrows_) {
+      arrow->updatePosition();
+    }
   }
 
   return value;
