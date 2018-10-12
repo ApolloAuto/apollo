@@ -9,12 +9,10 @@ trajectoryGraph:
             y:
                 labelString: 'y (m)'
     properties:
-        lines:
+        cars:
             pose:
                 color: 'rgba(0, 255, 0, 1)' # green
-                borderWidth: 0
-                pointRadius: 0
-                specialMarker: 'car'
+        lines:
             real:
                 color: 'rgba(0, 106, 255, 1)' # blue
                 borderWidth: 2

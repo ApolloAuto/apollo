@@ -11,15 +11,14 @@ export default class PlanningMonitor extends React.Component {
         const names = ['DpStSpeedOptimizer', 'QpSplineStSpeedOptimizer'];
         for (const name of names) {
             const graph = stGraph[name];
-            const boxes = graph ? graph.obstaclesBoundary : [];
+            const polygons = graph ? graph.obstaclesBoundary : [];
             graphs.push(
                 <ScatterGraph
                     key={'stGraph_' + name}
                     title={name}
                     options={SETTING.stGraph.options}
                     properties={SETTING.stGraph.properties}
-                    data={graph}
-                    boxes={boxes}
+                    data={{ lines: graph, polygons: polygons }}
                 />
             );
         }
@@ -27,7 +26,7 @@ export default class PlanningMonitor extends React.Component {
     }
 
     render() {
-        const { planningTime, data } = this.props.store.planningData;
+        const { planningTime, data, chartData } = this.props.store.planningData;
 
         if (!planningTime) {
             return null;
@@ -35,6 +34,13 @@ export default class PlanningMonitor extends React.Component {
 
         return (
             <div>
+                {chartData.map(chart => {
+                    return <ScatterGraph key={chart.title}
+                                         title={chart.title}
+                                         options={chart.options}
+                                         properties={chart.properties}
+                                         data={chart.data} />;
+                })}
                 {generateScatterGraph(SETTING.speedGraph, data.speedGraph)}
                 {generateScatterGraph(SETTING.accelerationGraph, data.accelerationGraph)}
                 {generateScatterGraph(SETTING.thetaGraph, data.thetaGraph)}

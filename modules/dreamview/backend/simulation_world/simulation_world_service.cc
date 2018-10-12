@@ -789,6 +789,9 @@ void SimulationWorldService::UpdatePlanningData(const PlanningData &data) {
 
   size_t max_interval = 10;
 
+  // Update Chart
+  planning_data->mutable_chart()->CopyFrom(data.chart());
+
   // Update SL Frame
   planning_data->mutable_sl_frame()->CopyFrom(data.sl_frame());
 

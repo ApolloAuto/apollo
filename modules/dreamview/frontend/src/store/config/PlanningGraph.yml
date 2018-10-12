@@ -83,15 +83,6 @@ stGraph:
                 max: 220
                 labelString: 's (m)'
     properties:
-        box:
-            color: 'rgba(255, 0, 0, 0.8)' # red
-            borderWidth: 2
-            pointRadius: 0
-            fill: false
-            showLine: true
-            showText: true
-            cubicInterpolationMode: 'monotone'
-            lineTension: 0
         lines:
             curveLine:
                 color: 'rgba(225, 225, 225, 0.5)' # white
