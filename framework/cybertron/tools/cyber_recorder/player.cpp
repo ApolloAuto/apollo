@@ -390,8 +390,8 @@ bool Player::Start() {
     --preload_sec;
   }
 
-  uint64_t base_tw_time = 0;                          // in nanosecond
-  uint64_t pause_time = 0;                            // in nanosecond
+  uint64_t base_tw_time = 0;  // in nanosecond
+  uint64_t pause_time = 0;    // in nanosecond
 
   std::thread progress_thread([this] {
     while (::apollo::cybertron::OK()) {
@@ -403,8 +403,13 @@ bool Player::Start() {
       }
       std::cout << std::setprecision(3) << last_played_time_ / 1e9
                 << "    Progress: " << std::setprecision(3)
-                << (last_played_time_ - base_time_) / 1e9 << " / "
-                << std::setprecision(3) << (end_time_ - begin_time_) / 1e9;
+                << (last_played_time_ > 0 ? (last_played_time_ - base_time_ +
+                                             base_real_time_ - begin_time_)
+                                          : 0) /
+                           1e9 +
+                       start_seconds_
+                << " / " << std::setprecision(3)
+                << (end_time_ - begin_time_) / 1e9 + start_seconds_;
       std::cout.flush();
       if (load_finished_ &&
           TimedPlayer::played_message_number_ >= task_count_ &&
@@ -424,16 +429,21 @@ bool Player::Start() {
         task = task_queue_.front();
         task_queue_.pop();
       }
+      int64_t sleep_interval = 0;
 
       // use the first msg's time as the base time
       if (base_time_ == 0) {
         base_time_ = task->play_time_;
+        base_real_time_ = task->real_time_;
+        // sleep, when begin_time is larger than fist msg's play_time
+        sleep_interval = static_cast<double>(base_time_ - begin_time_) * rate_;
+        if (sleep_interval > MIN_SLEEP_INTERVAL) {
+          std::this_thread::sleep_for(std::chrono::nanoseconds(sleep_interval));
+        }
         base_tw_time = Time::Now().ToNanosecond();
-        ADEBUG << "base_time_: " << base_time_
-               << ", base_tw_time: " << base_tw_time;
       }
 
-      int64_t sleep_interval =
+      sleep_interval =
           static_cast<double>(task->play_time_ - base_time_) * rate_ -
           static_cast<double>(Time::Now().ToNanosecond() - base_tw_time -
                               pause_time);
