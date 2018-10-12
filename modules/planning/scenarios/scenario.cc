@@ -39,10 +39,6 @@ bool Scenario::InitTasks(const ScenarioConfig& config,
 
   ScenarioConfig::Stage stage = config.stage(current_stage_index);
 
-  if (!stage.enabled()) {
-    return true;
-  }
-
   // get all scenario_task_configs
   std::vector<ScenarioConfig::ScenarioTaskConfig> task_configs;
   for (int i = 0; i < config.scenario_task_config_size(); ++i) {

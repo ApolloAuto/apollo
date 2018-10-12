@@ -94,9 +94,12 @@ Status SidePassScenario::Process(const TrajectoryPoint& planning_start_point,
                                  Frame* frame) {
   scenario_status_ = ScenarioStatus::STATUS_PROCESSING;
 
-  const int current_stage_index = StageIndexInConf(stage_);
-  if (!InitTasks(config_, current_stage_index, &tasks_)) {
-    return Status(ErrorCode::PLANNING_ERROR, "failed to init tasks");
+  if (!stage_init_) {
+    const int current_stage_index = StageIndexInConf(stage_);
+    if (!InitTasks(config_, current_stage_index, &tasks_)) {
+      return Status(ErrorCode::PLANNING_ERROR, "failed to init tasks");
+    }
+    stage_init_ = true;
   }
 
   // TODO(all)
@@ -163,22 +166,59 @@ int SidePassScenario::StageIndexInConf(const SidePassStage& stage) {
   return -1;
 }
 
+SidePassScenario::SidePassStage SidePassScenario::GetNextStage(
+    const SidePassStage& current_stage) {
+  SidePassStage stage = current_stage;
+  SidePassStage next_stage;
+
+  bool next_stage_found = false;
+  while (!next_stage_found) {
+    if (stage == SidePassStage::OBSTACLE_APPROACH) {
+      next_stage = SidePassStage::PATH_GENERATION;
+      const int next_stage_index = StageIndexInConf(next_stage);
+      if (config_.stage(next_stage_index).enabled()) {
+        next_stage_found = true;
+        break;
+      }
+      stage = SidePassStage::PATH_GENERATION;
+    } else if (stage == SidePassStage::PATH_GENERATION) {
+      next_stage = SidePassStage::WAITPOINT_STOP;
+      const int next_stage_index = StageIndexInConf(next_stage);
+      if (config_.stage(next_stage_index).enabled()) {
+        next_stage_found = true;
+        break;
+      }
+      stage = SidePassStage::WAITPOINT_STOP;
+    } else if (stage == SidePassStage::WAITPOINT_STOP) {
+      next_stage = SidePassStage::SAFETY_DETECTION;
+      const int next_stage_index = StageIndexInConf(next_stage);
+      if (config_.stage(next_stage_index).enabled()) {
+        next_stage_found = true;
+        break;
+      }
+      stage = SidePassStage::SAFETY_DETECTION;
+    } else if (stage == SidePassStage::SAFETY_DETECTION) {
+      next_stage = SidePassStage::OBSTACLE_PASS;
+      const int next_stage_index = StageIndexInConf(next_stage);
+      if (config_.stage(next_stage_index).enabled()) {
+        next_stage_found = true;
+      }
+      break;  // exit at last stage
+    }
+  }
+
+  stage_init_ = false;
+  return next_stage_found ? next_stage : SidePassStage::UNKNOWN;
+}
+
 Status SidePassScenario::ApproachObstacle(
     const TrajectoryPoint& planning_start_point, Frame* frame) {
-  if (!stage_init_) {
-    const int current_stage_index = StageIndexInConf(stage_);
-    if (!InitTasks(config_, current_stage_index, &tasks_)) {
-      return Status(ErrorCode::PLANNING_ERROR, "failed to init tasks");
-    }
-    stage_init_ = true;
-  }
   Status status = RunPlanOnReferenceLine(planning_start_point, frame);
   if (status.ok()) {
     if (!IsSidePassScenario(planning_start_point, *frame)) {
       scenario_status_ = ScenarioStatus::STATUS_DONE;
     } else if (frame->vehicle_state().linear_velocity() < 1.0e-5) {
-      stage_ = SidePassStage::PATH_GENERATION;
-      stage_init_ = false;
+      stage_ = GetNextStage(stage_);
     }
   }
   return status;
@@ -188,7 +228,7 @@ Status SidePassScenario::GeneratePath(
     const TrajectoryPoint& planning_start_point, Frame* frame) {
   Status status = RunPlanOnReferenceLine(planning_start_point, frame);
   if (status.ok()) {
-    stage_ = SidePassStage::WAITPOINT_STOP;
+    stage_ = GetNextStage(stage_);
   } else {
     AERROR << "Fail at PATH_GENERATION stage in sidepass scenario.";
   }

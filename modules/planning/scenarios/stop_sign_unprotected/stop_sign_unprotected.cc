@@ -200,6 +200,43 @@ int StopSignUnprotectedScenario::StageIndexInConf(
   return -1;
 }
 
+StopSignUnprotectedScenario::StopSignUnprotectedStage
+    StopSignUnprotectedScenario::GetNextStage(
+        const StopSignUnprotectedStage& current_stage) {
+  StopSignUnprotectedStage stage = current_stage;
+  StopSignUnprotectedStage next_stage;
+
+  bool next_stage_found = false;
+  while (!next_stage_found) {
+    if (stage == StopSignUnprotectedStage::PRE_STOP) {
+      next_stage = StopSignUnprotectedStage::STOP;
+      const int next_stage_index = StageIndexInConf(next_stage);
+      if (config_.stage(next_stage_index).enabled()) {
+        next_stage_found = true;
+        break;
+      }
+      stage = StopSignUnprotectedStage::STOP;
+    } else if (stage == StopSignUnprotectedStage::STOP) {
+      next_stage = StopSignUnprotectedStage::CREEP;
+      const int next_stage_index = StageIndexInConf(next_stage);
+      if (config_.stage(next_stage_index).enabled()) {
+        next_stage_found = true;
+        break;
+      }
+      stage = StopSignUnprotectedStage::CREEP;
+    } else if (stage == StopSignUnprotectedStage::CREEP) {
+      next_stage = StopSignUnprotectedStage::INTERSECTION_CRUISE;
+      const int next_stage_index = StageIndexInConf(next_stage);
+      if (config_.stage(next_stage_index).enabled()) {
+        next_stage_found = true;
+      }
+      break;  // exit at last stage
+    }
+  }
+
+  return next_stage_found ? next_stage : StopSignUnprotectedStage::UNKNOWN;
+}
+
 common::Status StopSignUnprotectedScenario::PreStop(
     const ReferenceLineInfo& reference_line_info,
     Frame* frame) {
