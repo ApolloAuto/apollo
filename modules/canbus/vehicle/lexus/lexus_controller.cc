@@ -402,43 +402,41 @@ void LexusController::Gear(Chassis::GearPosition gear_position) {
     return;
   }
   return;
-  /* ADD YOUR OWN CAR CHASSIS OPERATION
   switch (gear_position) {
     case Chassis::GEAR_NEUTRAL: {
-      gear_66_->set_gear_neutral();
+      shift_cmd_128_->set_shift_cmd(Shift_cmd_128::SHIFT_CMD_NEUTRAL);
       break;
     }
     case Chassis::GEAR_REVERSE: {
-      gear_66_->set_gear_reverse();
+      shift_cmd_128_->set_shift_cmd(Shift_cmd_128::SHIFT_CMD_REVERSE);
       break;
     }
     case Chassis::GEAR_DRIVE: {
-      gear_66_->set_gear_drive();
+      shift_cmd_128_->set_shift_cmd(Shift_cmd_128::SHIFT_CMD_FORWARD_HIGH);
       break;
     }
     case Chassis::GEAR_PARKING: {
-      gear_66_->set_gear_park();
+      shift_cmd_128_->set_shift_cmd(Shift_cmd_128::SHIFT_CMD_PARK);
       break;
     }
     case Chassis::GEAR_LOW: {
-      gear_66_->set_gear_low();
+      shift_cmd_128_->set_shift_cmd(Shift_cmd_128::SHIFT_CMD_LOW);
       break;
     }
     case Chassis::GEAR_NONE: {
-      gear_66_->set_gear_none();
+      shift_cmd_128_->set_shift_cmd(Shift_cmd_128::SHIFT_CMD_NONE);
       break;
     }
     case Chassis::GEAR_INVALID: {
       AERROR << "Gear command is invalid!";
-      gear_66_->set_gear_none();
+      shift_cmd_128_->set_shift_cmd(Shift_cmd_128::SHIFT_CMD_NONE);
       break;
     }
     default: {
-      gear_66_->set_gear_none();
+      shift_cmd_128_->set_shift_cmd(Shift_cmd_128::SHIFT_CMD_NONE);
       break;
     }
   }
-  */
 }
 
 // brake with new acceleration
@@ -535,17 +533,14 @@ void LexusController::SetHorn(const ControlCommand& command) {
 }
 
 void LexusController::SetTurningSignal(const ControlCommand& command) {
-  // Set Turn Signal
-  /* ADD YOUR OWN CAR CHASSIS OPERATION
   auto signal = command.signal().turn_signal();
-  if (signal == Signal::TURN_LEFT) {
-    turnsignal_68_->set_turn_left();
-  } else if (signal == Signal::TURN_RIGHT) {
-    turnsignal_68_->set_turn_right();
+  if (signal == common::VehicleSignal::TURN_LEFT) {
+    turn_cmd_130_->set_turn_signal_cmd(Turn_cmd_130::TURN_SIGNAL_CMD_LEFT);
+  } else if (signal == common::VehicleSignal::TURN_RIGHT) {
+    turn_cmd_130_->set_turn_signal_cmd(Turn_cmd_130::TURN_SIGNAL_CMD_RIGHT);
   } else {
-    turnsignal_68_->set_turn_none();
+    turn_cmd_130_->set_turn_signal_cmd(Turn_cmd_130::TURN_SIGNAL_CMD_NONE);
   }
-  */
 }
 
 void LexusController::ResetProtocol() { message_manager_->ResetSendMessages(); }
