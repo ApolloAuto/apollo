@@ -79,7 +79,9 @@ bool AttributesFiller::FillInPubAttr(
   }
 
   // ensure the history depth is at least the requested queue size
-  assert(pub_attr->topic.historyQos.depth >= 0);
+  if (pub_attr->topic.historyQos.depth < 0) {
+    return false;
+  }
 
   // tranform messages per second to rtps heartbeat
   // set default heartbeat period
@@ -164,7 +166,9 @@ bool AttributesFiller::FillInSubAttr(
   }
 
   // ensure the history depth is at least the requested queue size
-  assert(sub_attr->topic.historyQos.depth >= 0);
+  if (sub_attr->topic.historyQos.depth < 0) {
+    return false;
+  }
 
   sub_attr->historyMemoryPolicy =
       eprosima::fastrtps::DYNAMIC_RESERVE_MEMORY_MODE;
