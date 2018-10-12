@@ -17,27 +17,21 @@
 .globl ctx_swap
 .type  ctx_swap, @function
 ctx_swap:
-      leaq 0x8(%rsp),%rax
-      leaq 0x48(%rdi),%rsp
-      pushq %rax
-      pushq %rbx
-      pushq -0x8(%rax)
       pushq %rdi
-      pushq %rbp
       pushq %r12
       pushq %r13
       pushq %r14
       pushq %r15
-      movq %rsi, %rsp
+      pushq %rbx
+      pushq %rbp
+      movq %rsp, (%rdi)
+
+      movq (%rsi), %rsp
+      popq %rbp
+      popq %rbx
       popq %r15
       popq %r14
       popq %r13
       popq %r12
-      popq %rbp
       popq %rdi
-      popq %rax
-      popq %rbx
-      popq %rsp
-      pushq %rax
-      xorl %eax, %eax
       ret
