@@ -112,8 +112,7 @@ TEST_F(MoveSequencePredictorTest, Utils) {
         *obstacle_ptr, lane_sequence);
     EXPECT_GT(speed, 0.0);
   }
-  std::vector<double> candidate_times;
-  predictor.GenerateCandidateTimes(&candidate_times);
+  std::vector<double> candidate_times = predictor.GenerateCandidateTimes();
   EXPECT_GT(candidate_times.size(), 0);
 }
 
