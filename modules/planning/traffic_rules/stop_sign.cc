@@ -339,7 +339,7 @@ int StopSign::ProcessStopStatus(ReferenceLineInfo* const reference_line_info,
     case StopSignStatus::UNKNOWN:
     case StopSignStatus::DRIVE:
       stop_status_ = StopSignStatus::DRIVE;
-      if (CheckADCkStop(reference_line_info)) {
+      if (CheckADCStop(reference_line_info)) {
         stop_start_time = Clock::NowInSeconds();
         stop_status_ = StopSignStatus::STOP;
 
@@ -386,7 +386,7 @@ int StopSign::ProcessStopStatus(ReferenceLineInfo* const reference_line_info,
 /**
  * @brief: check valid stop_sign stop
  */
-bool StopSign::CheckADCkStop(ReferenceLineInfo* const reference_line_info) {
+bool StopSign::CheckADCStop(ReferenceLineInfo* const reference_line_info) {
   CHECK_NOTNULL(reference_line_info);
 
   double adc_speed =

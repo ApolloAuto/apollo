@@ -36,9 +36,9 @@ namespace planning {
 
 class Scenario {
  public:
-  enum ScenarioStatus {
+  enum class ScenarioStatus {
     STATUS_UNKNOWN = 0,
-    STATUS_INITED = 1,
+    STATUS_START = 1,
     STATUS_PROCESSING = 2,
     STATUS_DONE = 3,
   };
@@ -61,7 +61,7 @@ class Scenario {
                               const common::TrajectoryPoint& ego_point,
                               const Frame& frame) const = 0;
 
-  const ScenarioStatus& GetStatus() const { return status_; }
+  const ScenarioStatus& GetStatus() const { return scenario_status_; }
 
  protected:
   bool InitTasks(const ScenarioConfig& config, const int current_stage_index,
@@ -70,7 +70,7 @@ class Scenario {
  protected:
   bool is_init_ = false;
   apollo::common::util::Factory<TaskType, Task> task_factory_;
-  ScenarioStatus status_ = STATUS_UNKNOWN;
+  ScenarioStatus scenario_status_ = ScenarioStatus::STATUS_UNKNOWN;
   const ScenarioConfig::ScenarioType scenario_type_;
 };
 
