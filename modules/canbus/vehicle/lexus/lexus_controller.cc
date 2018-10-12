@@ -205,7 +205,7 @@ Chassis LexusController::chassis() {
       chassis_detail.lexus().accel_rpt_200().has_output_value()) {
     // TODO(snehagn): Temp fix until AS to fix the scaling
     chassis_.set_throttle_percentage(
-      chassis_detail.lexus().accel_rpt_200().output_value() * 100);
+        chassis_detail.lexus().accel_rpt_200().output_value() * 100);
   } else {
     chassis_.set_throttle_percentage(0);
   }
