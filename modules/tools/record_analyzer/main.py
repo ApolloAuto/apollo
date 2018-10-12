@@ -22,9 +22,10 @@ from modules.control.proto import control_cmd_pb2
 from modules.planning.proto import planning_pb2
 from modules.canbus.proto import chassis_pb2
 from modules.drivers.proto import pointcloud_pb2
-from control_analyzer import ControlAnalyzer
-from planning_analyzer import PlannigAnalyzer
+from module_control_analyzer import ControlAnalyzer
+from module_planning_analyzer import PlannigAnalyzer
 from lidar_endtoend_analyzer import LidarEndToEndAnalyzer
+
 
 def process(control_analyzer, planning_analyzer, lidar_endtoend_analyzer):
     is_auto_drive = False

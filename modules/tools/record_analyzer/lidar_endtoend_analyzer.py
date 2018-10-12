@@ -19,6 +19,7 @@
 from statistical_analyzer import StatisticalAnalyzer
 from statistical_analyzer import PrintColors
 
+
 class LidarEndToEndAnalyzer:
     """control analyzer"""
 
@@ -30,12 +31,12 @@ class LidarEndToEndAnalyzer:
     def put_control(self, control_cmd):
         """put control data"""
         if control_cmd.header.lidar_timestamp in \
-            self.unprocessed_point_cloud_timestamps:
+                self.unprocessed_point_cloud_timestamps:
             ind = self.unprocessed_point_cloud_timestamps.index(
                 control_cmd.header.lidar_timestamp)
-            del(self.unprocessed_point_cloud_timestamps[ind])
+            del (self.unprocessed_point_cloud_timestamps[ind])
             self.endtoend_latency.append(
-                control_cmd.header.lidar_timestamp/1.0e-9 -
+                control_cmd.header.lidar_timestamp / 1.0e-9 -
                 control_cmd.header.timestamp_sec)
 
     def put_lidar(self, point_cloud):

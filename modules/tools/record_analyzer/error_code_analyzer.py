@@ -16,26 +16,28 @@
 # limitations under the License.
 ###############################################################################
 
-from statistical_analyzer import StatisticalAnalyzer
+from modules.common.proto import error_code_pb2
 from statistical_analyzer import PrintColors
 
 
-class ControlAnalyzer:
-    """control analyzer"""
+class ErrorCodeAnalyzer:
+    """class"""
 
     def __init__(self):
         """init"""
-        self.module_latency = []
+        self.error_code_count = {}
 
-    def put(self, control_cmd):
-        """put data"""
-        latency = control_cmd.latency_stats.total_time_ms
-        self.module_latency.append(latency)
+    def put(self, error_code):
+        """put"""
+        error_code_name = \
+            error_code_pb2.ErrorCode.Name(error_code)
+        if error_code_name not in self.error_code_count:
+            self.error_code_count[error_code_name] = 1
+        else:
+            self.error_code_count[error_code_name] += 1
 
-    def print_latency_statistics(self):
-        """print_latency_statistics"""
-        print ""
-        print PrintColors.HEADER + "--- Control Latency (ms) ---" + \
-              PrintColors.ENDC
-        analyzer = StatisticalAnalyzer()
-        analyzer.print_statistical_results(self.module_latency)
+    def print_results(self):
+        """print"""
+        for error_code, num in self.error_code_count.items():
+            print PrintColors.OKBLUE + error_code + " = " + str(num) + \
+                  PrintColors.ENDC
