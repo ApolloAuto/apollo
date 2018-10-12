@@ -25,19 +25,20 @@
 #include "cybertron/common/time_conversion.h"
 #include "cybertron/init.h"
 #include "cybertron/tools/cyber_recorder/info.h"
-#include "cybertron/tools/cyber_recorder/player.h"
+#include "cybertron/tools/cyber_recorder/player/player.h"
 #include "cybertron/tools/cyber_recorder/recorder.h"
 #include "cybertron/tools/cyber_recorder/recoverer.h"
 #include "cybertron/tools/cyber_recorder/spliter.h"
 
-using apollo::cybertron::record::Info;
-using apollo::cybertron::record::Recorder;
-using apollo::cybertron::record::Player;
-using apollo::cybertron::record::Spliter;
-using apollo::cybertron::record::Recoverer;
 using apollo::cybertron::common::GetFileName;
 using apollo::cybertron::common::StringToUnixSeconds;
 using apollo::cybertron::common::UnixSecondsToString;
+using apollo::cybertron::record::Info;
+using apollo::cybertron::record::Player;
+using apollo::cybertron::record::PlayParam;
+using apollo::cybertron::record::Recorder;
+using apollo::cybertron::record::Recoverer;
+using apollo::cybertron::record::Spliter;
 
 const char INFO_OPTIONS[] = "f:h";
 const char RECORD_OPTIONS[] = "o:ac:h";
@@ -319,13 +320,20 @@ int main(int argc, char** argv) {
     }
     ::apollo::cybertron::Init(argv[0]);
     bool play_result = true;
-    for (size_t i = 0; i < opt_file_vec.size(); ++i) {
-      Player player(opt_file_vec[i], opt_white_channels.empty(),
-                    opt_white_channels, opt_loop, opt_rate, opt_begin, opt_end,
-                    opt_start, opt_delay);
-      play_result = play_result && player.Init() ? true : false;
-      play_result = play_result && player.Start() ? true : false;
-    }
+    PlayParam play_param;
+    play_param.is_play_all_channels = opt_white_channels.empty();
+    play_param.is_loop_playback = opt_loop;
+    play_param.play_rate = opt_rate;
+    play_param.begin_time_ns = opt_begin;
+    play_param.end_time_ns = opt_end;
+    play_param.start_time_s = opt_start;
+    play_param.delay_time_s = opt_delay;
+    play_param.files_to_play.insert(opt_file_vec.begin(), opt_file_vec.end());
+    play_param.channels_to_play.insert(opt_white_channels.begin(),
+                                       opt_white_channels.end());
+    Player player(play_param);
+    play_result = play_result && player.Init() ? true : false;
+    play_result = play_result && player.Start() ? true : false;
     ::apollo::cybertron::Shutdown();
     return play_result ? 0 : -1;
   } else if (command == "record") {
