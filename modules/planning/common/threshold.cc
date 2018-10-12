@@ -60,9 +60,9 @@ void Threshold::AddItem(const std::string& id,
 bool Threshold::IsInRange(std::string id,
                  const uint32_t seq_num,
                  const double value) {
-  if (_map.find(id) == _map.end()) {
+  if (map_.find(id) == map_.end()) {
     return false;
   }
-  return _map[id].InRange(seq_num, value);
+  return map_[id].InRange(seq_num, value);
 }
 

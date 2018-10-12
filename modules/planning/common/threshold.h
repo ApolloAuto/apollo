@@ -44,5 +44,5 @@ class Threshold {
                  const uint32_t seq_num,
                  const double value);
  private:
-  std::unordered_map<std::string, ThresholdItem> _map;
+  std::unordered_map<std::string, ThresholdItem> map_;
 };
