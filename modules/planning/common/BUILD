@@ -444,6 +444,12 @@ cc_test(
 
 cc_library(
     name = "planning_common",
+    srcs = [
+        "threshold.cc"
+    ],
+    hdrs = [
+        "threshold.h"
+    ],
     deps = [
         ":ego_info",
         ":frame",
