@@ -83,16 +83,16 @@ SMALL_TOPICS = [
 ]
 
 LARGE_TOPICS = [
-    '/apollo/sensor/camera/camera_front_6mm',
-    '/apollo/sensor/camera/camera_front_12mm',
-    '/apollo/sensor/camera/camera_front_fisheye',
-    '/apollo/sensor/camera/camera_left_front',
-    '/apollo/sensor/camera/camera_left_rear',
-    '/apollo/sensor/camera/camera_left_fisheye',
-    '/apollo/sensor/camera/camera_rear_6mm',
-    '/apollo/sensor/camera/camera_right_front',
-    '/apollo/sensor/camera/camera_right_rear',
-    '/apollo/sensor/camera/camera_right_fisheye',
+    '/apollo/sensor/camera/front_12mm/image',
+    '/apollo/sensor/camera/front_6mm/image',
+    '/apollo/sensor/camera/front_fisheye/image',
+    '/apollo/sensor/camera/left_fisheye/image',
+    '/apollo/sensor/camera/left_front/image',
+    '/apollo/sensor/camera/left_rear/image',
+    '/apollo/sensor/camera/rear_6mm/image',
+    '/apollo/sensor/camera/right_fisheye/image',
+    '/apollo/sensor/camera/right_front/image',
+    '/apollo/sensor/camera/right_rear/image',
     '/apollo/sensor/camera/traffic/image_long',
     '/apollo/sensor/camera/traffic/image_short',
     '/apollo/sensor/radar/radar_front',
@@ -102,7 +102,7 @@ LARGE_TOPICS = [
     '/apollo/sensor/velodyne16/lidar_16_rear_left',
     '/apollo/sensor/velodyne16/lidar_16_rear_right',
     '/apollo/sensor/velodyne64/compensator/PointCloud2',
-    '/apollo/sensor/velodyne128/lidar_128',
+    '/apollo/sensor/velodyne128/PointCloud2',
 ]
 
 
