@@ -168,13 +168,16 @@ int SidePassScenario::StageIndexInConf(const SidePassStage& stage) {
 Status SidePassScenario::ApproachObstacle(
     const TrajectoryPoint& planning_start_point, Frame* frame) {
   if (!stage_init_) {
-    // TODO(yifei) init stage
+    const int current_stage_index = StageIndexInConf(stage_);
+    if (!InitTasks(config_, current_stage_index, &tasks_)) {
+      return Status(ErrorCode::PLANNING_ERROR, "failed to init tasks");
+    }
     stage_init_ = true;
   }
   Status status = RunPlanOnReferenceLine(planning_start_point, frame);
   if (status.ok()) {
     if (!IsSidePassScenario(planning_start_point, *frame)) {
-      // TODO(yifei) scenario is done
+      status_ = STATUS_DONE;
     } else if (frame->vehicle_state().linear_velocity() < 1.0e-5) {
       stage_ = SidePassStage::PATH_GENERATION;
       stage_init_ = false;
