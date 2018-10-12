@@ -106,7 +106,9 @@ Reader<MessageT>::Reader(const proto::RoleAttributes& role_attr,
                          uint32_t pending_queue_size)
     : ReaderBase(role_attr),
       reader_func_(reader_func),
-      history_depth_(role_attr.qos_profile().depth()) {}
+      history_depth_(role_attr.qos_profile().depth()) {
+        pending_queue_size_ = pending_queue_size;
+      }
 
 template <typename MessageT>
 Reader<MessageT>::~Reader() {
