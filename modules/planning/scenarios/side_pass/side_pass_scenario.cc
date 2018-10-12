@@ -202,6 +202,39 @@ Status SidePassScenario::StopOnWaitPoint(
 
 Status SidePassScenario::DetectSafety(
     const TrajectoryPoint& planning_start_point, Frame* frame) {
+  if (!stage_init_) {
+    const int current_stage_index = StageIndexInConf(stage_);
+    if (!InitTasks(config_, current_stage_index, &tasks_)) {
+      return Status(ErrorCode::PLANNING_ERROR, "failed to init tasks");
+    }
+    stage_init_ = true;
+  }
+
+  Status status = RunPlanOnReferenceLine(planning_start_point, frame);
+
+  if (!status.ok()) {
+    return Status(ErrorCode::PLANNING_ERROR,
+                  "failed to detect safety in side pass scenario.");
+  }
+
+  if (!IsSidePassScenario(planning_start_point, *frame)) {
+    scenario_status_ = ScenarioStatus::STATUS_DONE;
+    return Status::OK();
+  }
+
+  bool is_safe = true;
+  const PathDecision &path_decision =
+      frame->reference_line_info().front().path_decision();
+  for (const auto *path_obstacle : path_decision.path_obstacles().Items()) {
+    if (path_obstacle->obstacle()->IsVirtual()) {
+      is_safe = false;
+      break;
+    }
+  }
+  if (is_safe) {
+    stage_ = SidePassStage::OBSTACLE_PASS;
+    stage_init_ = false;
+  }
   return Status::OK();
 }
 
