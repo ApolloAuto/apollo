@@ -59,7 +59,6 @@ class SidePassScenario : public Scenario {
     WAITPOINT_STOP,
     SAFETY_DETECTION,
     OBSTACLE_PASS,
-    STATUS_DONE,
   };
 
   void RegisterTasks();
