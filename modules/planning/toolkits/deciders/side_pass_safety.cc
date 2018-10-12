@@ -48,7 +48,7 @@ Status SidePassSafety::Process(Frame *frame,
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
 
-  if (IsSafeSidePass(frame, reference_line_info)) {
+  if (!IsSafeSidePass(frame, reference_line_info)) {
     BuildSidePathDecision(frame, reference_line_info);
   }
 
@@ -69,14 +69,34 @@ apollo::common::Status SidePassSafety::BuildSidePathDecision(
                "Failed to create side pass safety obstacle");
     return status;
   }
-
   return Status().OK();
 }
 
 bool SidePassSafety::IsSafeSidePass(
     Frame *frame, ReferenceLineInfo *const reference_line_info) {
-  // TODO(yifei)
-  return false;
+  const auto& path_obstacles =
+      reference_line_info->path_decision()->path_obstacles().Items();
+
+  for (const auto* path_obstacle : path_obstacles) {
+    if (path_obstacle->obstacle()->IsVirtual()||
+        !path_obstacle->obstacle()->IsStatic()) {
+      continue;
+    }
+    if (path_obstacle->PerceptionSLBoundary().start_l() < 1.0 &&
+        path_obstacle->PerceptionSLBoundary().end_l() > -1.0) {
+      return false;
+    }
+
+    if (path_obstacle->st_boundary().IsEmpty()) {
+      continue;
+    }
+    double s_range = path_obstacle->st_boundary().max_s() -
+        path_obstacle->st_boundary().min_s();
+    if (s_range > 5) {
+      return false;
+    }
+  }
+  return true;
 }
 
 }  // namespace planning
