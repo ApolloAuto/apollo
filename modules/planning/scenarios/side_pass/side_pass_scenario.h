@@ -54,6 +54,7 @@ class SidePassScenario : public Scenario {
 
  private:
   enum class SidePassStage {
+    UNKNOWN,
     OBSTACLE_APPROACH,
     PATH_GENERATION,
     WAITPOINT_STOP,
@@ -64,6 +65,8 @@ class SidePassScenario : public Scenario {
   void RegisterTasks();
 
   int StageIndexInConf(const SidePassStage& stage);
+
+  SidePassStage GetNextStage(const SidePassStage& current_stage);
 
   common::Status ApproachObstacle(
       const common::TrajectoryPoint& planning_start_point, Frame* frame);

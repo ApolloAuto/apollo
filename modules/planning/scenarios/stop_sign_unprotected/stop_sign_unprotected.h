@@ -59,15 +59,19 @@ class StopSignUnprotectedScenario : public Scenario {
 
  private:
   enum class StopSignUnprotectedStage {
-    PRE_STOP = 1,
-    STOP = 2,
-    CREEP = 3,
-    INTERSECTION_CRUISE = 4,
+    UNKNOWN,
+    PRE_STOP,
+    STOP,
+    CREEP,
+    INTERSECTION_CRUISE,
   };
 
   void RegisterTasks();
 
   int StageIndexInConf(const StopSignUnprotectedStage& stage);
+
+  StopSignUnprotectedStage GetNextStage(
+      const StopSignUnprotectedStage& current_stage);
 
   common::Status PreStop(const ReferenceLineInfo& reference_line_info,
                          Frame* frame);
