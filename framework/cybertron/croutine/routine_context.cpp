@@ -21,11 +21,12 @@ namespace cybertron {
 namespace croutine {
 
 void MakeContext(const func &f1, const void *arg, RoutineContext *ctx) {
-  memset(ctx->regs, 0, sizeof(ctx->regs));
-  char *sp = ctx->stack + stack_size;
-  ctx->regs[8] = sp - sizeof(void *);           // return address
-  ctx->regs[6] = reinterpret_cast<char *>(f1);  // rax
-  ctx->regs[5] = reinterpret_cast<char *>(const_cast<void *>(arg));  // rdi
+  ctx->stack = reinterpret_cast<char*>(calloc(1, STACK_SIZE));
+  char *sp = ctx->stack + STACK_SIZE - 2 * sizeof(void *);
+  *reinterpret_cast<void **>(sp) = reinterpret_cast<void *>(f1);
+  sp -= sizeof(void *);
+  *reinterpret_cast<void **>(sp) = const_cast<void *>(arg);
+  ctx->sp = ctx->stack + STACK_SIZE - 2 * sizeof(void*) - REGISTERS_SIZE;
 }
 
 }  // namespace croutine

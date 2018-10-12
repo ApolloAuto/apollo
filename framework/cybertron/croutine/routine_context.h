@@ -20,6 +20,8 @@
 #include <cstdlib>
 #include <cstring>
 
+#include "cybertron/common/log.h"
+
 extern "C" {
 extern void ctx_swap(void**, void**) asm("ctx_swap");
 };
@@ -28,26 +30,21 @@ namespace apollo {
 namespace cybertron {
 namespace croutine {
 
-static const int stack_size = 8 * 1024 * 1024;
+static const int STACK_SIZE = 8 * 1024 * 1024;
+static const int REGISTERS_SIZE = 56;
 
 typedef void (*func)(void*);
 struct RoutineContext {
-  RoutineContext() {
-    memset(regs, 0, sizeof(regs));
-    stack = reinterpret_cast<char*>(malloc(stack_size));
-    sp = stack;
-  }
   ~RoutineContext() { delete stack; }
-  void* regs[9];
-  char* stack;
-  char* sp;
+  char* stack = nullptr;
+  char* sp = nullptr;
 };
 
-void MakeContext(const func& f1, const void* arg, RoutineContext* ctx);
+void MakeContext(const func &f1, const void *arg, RoutineContext *ctx);
 
 inline void SwapContext(RoutineContext* src_ctx, RoutineContext* dst_ctx) {
-  ctx_swap(reinterpret_cast<void**>(src_ctx),
-           reinterpret_cast<void**>(dst_ctx));
+  ctx_swap(reinterpret_cast<void**>(&src_ctx->sp),
+           reinterpret_cast<void**>(&dst_ctx->sp));
 }
 
 }  // namespace croutine
