@@ -237,7 +237,6 @@ StopSignUnprotectedScenario::StopSignUnprotectedStage
     }
   }
 
-  stage_init_ = false;
   return next_stage_found ? next_stage : StopSignUnprotectedStage::UNKNOWN;
 }
 
@@ -251,6 +250,7 @@ common::Status StopSignUnprotectedScenario::PreStop(
     ADEBUG << "stop_start_time[" << stop_start_time_ << "]";
 
     stage_ = GetNextStage(stage_);
+    stage_init_ = false;
     return Status::OK();
   }
 
@@ -276,6 +276,7 @@ common::Status StopSignUnprotectedScenario::Stop(
          << "] wait_time[" << wait_time << "]";
   if (wait_time >= conf_stop_duration && watch_vehicles_.empty()) {
     stage_ = GetNextStage(stage_);
+    stage_init_ = false;
     return Status::OK();
   }
 
