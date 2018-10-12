@@ -202,6 +202,14 @@ class RtkPlayer(object):
             "publish_planningmsg: after adjust start: self.start = %s, self.end=%s"
             % (self.start, self.end))
 
+        planningdata.total_path_length = self.data['s'][self.end] - \
+            self.data['s'][self.start]
+        planningdata.total_path_time = self.data['time'][self.end] - \
+            self.data['time'][self.start]
+        planningdata.gear = int(self.data['gear'][self.closest_time()])
+        planningdata.engage_advice.advice = \
+            drive_state_pb2.EngageAdvice.READY_TO_ENGAGE
+
         for i in range(self.start, self.end):
             adc_point = pnc_point_pb2.TrajectoryPoint()
             adc_point.path_point.x = self.data['x'][i]
@@ -211,6 +219,9 @@ class RtkPlayer(object):
             adc_point.a = self.data['acceleration'][i] * self.speedmultiplier
             adc_point.path_point.kappa = self.data['curvature'][i]
             adc_point.path_point.dkappa = self.data['curvature_change_rate'][i]
+
+            if planningdata.gear == 2:
+                adc_point.a = -adc_point.a
 
             time_diff = self.data['time'][i] - \
                 self.data['time'][self.closestpoint]
@@ -224,14 +235,6 @@ class RtkPlayer(object):
             planningdata.trajectory_point.extend([adc_point])
 
         planningdata.estop.is_estop = self.estop
-
-        planningdata.total_path_length = self.data['s'][self.end] - \
-            self.data['s'][self.start]
-        planningdata.total_path_time = self.data['time'][self.end] - \
-            self.data['time'][self.start]
-        planningdata.gear = int(self.data['gear'][self.closest_time()])
-        planningdata.engage_advice.advice = \
-            drive_state_pb2.EngageAdvice.READY_TO_ENGAGE
 
         self.planning_pub.write(planningdata)
         self.logger.debug("Generated Planning Sequence: " +
