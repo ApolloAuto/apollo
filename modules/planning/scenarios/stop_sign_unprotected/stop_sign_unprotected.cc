@@ -114,9 +114,12 @@ Status StopSignUnprotectedScenario::Process(
     Frame* frame) {
   CHECK_NOTNULL(frame);
 
-  const int current_stage_index = StageIndexInConf(stage_);
-  if (!InitTasks(config_, current_stage_index, &tasks_)) {
-    return Status(ErrorCode::PLANNING_ERROR, "failed to init tasks");
+  if (!stage_init_) {
+    const int current_stage_index = StageIndexInConf(stage_);
+    if (!InitTasks(config_, current_stage_index, &tasks_)) {
+      return Status(ErrorCode::PLANNING_ERROR, "failed to init tasks");
+    }
+    stage_init_ = true;
   }
 
   // init while scenario just entered
@@ -234,6 +237,7 @@ StopSignUnprotectedScenario::StopSignUnprotectedStage
     }
   }
 
+  stage_init_ = false;
   return next_stage_found ? next_stage : StopSignUnprotectedStage::UNKNOWN;
 }
 
@@ -244,9 +248,9 @@ common::Status StopSignUnprotectedScenario::PreStop(
 
   if (CheckADCStop(reference_line_info)) {
     stop_start_time_ = Clock::NowInSeconds();
-    stage_ = StopSignUnprotectedStage::STOP;
+    ADEBUG << "stop_start_time[" << stop_start_time_ << "]";
 
-    ADEBUG << "stop_start_time: " << stop_start_time_;
+    stage_ = GetNextStage(stage_);
     return Status::OK();
   }
 
@@ -271,8 +275,7 @@ common::Status StopSignUnprotectedScenario::Stop(
   ADEBUG << "stop_start_time[" << stop_start_time_
          << "] wait_time[" << wait_time << "]";
   if (wait_time >= conf_stop_duration && watch_vehicles_.empty()) {
-    stage_ = StopSignUnprotectedStage::CREEP;
-    ADEBUG << "stop_start_time: " << stop_start_time_;
+    stage_ = GetNextStage(stage_);
     return Status::OK();
   }
 
