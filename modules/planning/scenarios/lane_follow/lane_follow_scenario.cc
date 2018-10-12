@@ -93,8 +93,6 @@ bool LaneFollowScenario::Init() {
   RegisterTasks();
 
   is_init_ = true;
-  status_ = STATUS_INITED;
-
   return true;
 }
 
@@ -147,7 +145,7 @@ void LaneFollowScenario::RecordDebugInfo(ReferenceLineInfo* reference_line_info,
 
 Status LaneFollowScenario::Process(const TrajectoryPoint& planning_start_point,
                                    Frame* frame) {
-  status_ = STATUS_PROCESSING;
+  scenario_status_ = ScenarioStatus::STATUS_PROCESSING;
 
   const int current_stage_index = StageIndexInConf(stage_);
   if (!InitTasks(config_, current_stage_index,  &tasks_)) {
