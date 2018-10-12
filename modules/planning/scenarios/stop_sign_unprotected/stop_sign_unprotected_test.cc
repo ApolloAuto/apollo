@@ -73,7 +73,7 @@ TEST_F(StopSignUnprotectedScenarioTest, InitTasks) {
 
   // stage creep
   scenario_->InitTasks(config, 1, &tasks);
-  EXPECT_EQ(tasks.size(), 0);
+  EXPECT_EQ(tasks.size(), 1);
 
   // stage intersection_cruise
   scenario_->InitTasks(config, 2, &tasks);

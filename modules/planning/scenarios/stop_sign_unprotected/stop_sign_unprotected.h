@@ -98,6 +98,7 @@ class StopSignUnprotectedScenario : public Scenario {
   std::vector<std::unique_ptr<Task>> tasks_;
   ScenarioConfig config_;
   StopSignUnprotectedStage stage_ = StopSignUnprotectedStage::PRE_STOP;
+  bool stage_init_ = false;
   SpeedProfileGenerator speed_profile_generator_;
   hdmap::PathOverlap next_stop_sign_overlap_;
   hdmap::StopSignInfoConstPtr next_stop_sign_ = nullptr;
