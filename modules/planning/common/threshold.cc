@@ -47,7 +47,7 @@ void Threshold::AddItem(const std::string& id,
                const double max_val,
                const uint32_t max_repeat_time,
                const uint32_t max_time_interval) {
-  ThresholdItem& item = _map[id];
+  ThresholdItem& item = map_[id];
   item.repeat_time = max_repeat_time;
   item.last_seq_num = seq_num;
   item.last_result = false;
