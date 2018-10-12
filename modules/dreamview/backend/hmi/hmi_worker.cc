@@ -33,8 +33,7 @@
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
 #include "modules/dreamview/backend/hmi/vehicle_manager.h"
 
-// TODO(xiaoxq): Set as "/apollo/modules/calibration/modes" when data available.
-DEFINE_string(modes_config_path, "",
+DEFINE_string(modes_config_path, "/apollo/modules/calibration/modes",
               "Available modes to configure and run the vehicle.");
 
 DEFINE_string(map_data_path, "/apollo/modules/map/data", "Path to map data.");
@@ -53,6 +52,7 @@ using apollo::common::DriveEvent;
 using apollo::common::time::Clock;
 using apollo::common::util::ContainsKey;
 using apollo::common::util::FindOrNull;
+using apollo::common::util::LookupOrInsert;
 using apollo::common::util::StrCat;
 using apollo::common::util::StringTokenizer;
 using apollo::control::DrivingAction;
@@ -134,12 +134,9 @@ HMIWorker::HMIWorker(const std::shared_ptr<apollo::cybertron::Node> &node) {
       << "Unable to parse HMI config file " << FLAGS_hmi_config_filename;
   config_.set_docker_image(apollo::data::InfoCollector::GetDockerImage());
 
-  // Enabled when migrate to Cybertron modes.
-  if (!FLAGS_modes_config_path.empty()) {
-    CHECK(LoadModesConfig(FLAGS_modes_config_path, &config_))
-        << "No mode configuration was loaded from directory: "
-        << FLAGS_modes_config_path;
-  }
+  CHECK(LoadModesConfig(FLAGS_modes_config_path, &config_))
+      << "No mode configuration was loaded from directory: "
+      << FLAGS_modes_config_path;
 
   // If the module path doesn't exist, remove it from list.
   auto *modules = config_.mutable_modules();
@@ -189,10 +186,13 @@ HMIWorker::HMIWorker(const std::shared_ptr<apollo::cybertron::Node> &node) {
 bool HMIWorker::LoadModesConfig(
       const std::string& modes_config_path, HMIConfig* config) {
   auto* modes = config->mutable_modes();
-  modes->clear();
   for (const auto& mode_dir : ListDirAsDict(modes_config_path)) {
-    Mode mode;
+    auto& mode = LookupOrInsert(modes, mode_dir.first, {});
     mode.set_path(mode_dir.second);
+    // TODO(xiaoxq): Modules are now managed by launchfile, while recorder is
+    // a common tool for all modes. Need to refactor both backend and frontend
+    // UI to reflect Cybertron control flow.
+    mode.add_live_modules("record_bag");
 
     static const std::string kFileExt = ".launch";
     for (const auto& launch_file :
@@ -203,21 +203,23 @@ bool HMIWorker::LoadModesConfig(
           filename.substr(0, filename.length() - kFileExt.length()));
       mode.mutable_launches()->insert({launch_name, launch_file});
     }
-
-    modes->insert({mode_dir.first, mode});
   }
   return !modes->empty();
 }
 
 bool HMIWorker::CyberLaunch(const std::string& command) const {
+  std::string current_mode;
   std::string current_launch;
   {
     RLock rlock(status_mutex_);
+    current_mode = status_.current_mode();
     current_launch = status_.current_launch();
   }
+  const Mode &mode_conf = config_.modes().at(current_mode);
+  const std::string &launch_file = mode_conf.launches().at(current_launch);
 
   const auto cmd_str = StrCat("/apollo/scripts/cyber_launch.sh ",
-                              command, " ", current_launch);
+                              command, " '", launch_file, "'");
   AINFO << "Execute system command: " << cmd_str;
   const int ret = std::system(cmd_str.c_str());
   if (ret != 0) {
@@ -344,18 +346,7 @@ bool HMIWorker::ChangeToDrivingMode(const Chassis::DrivingMode mode) {
 }
 
 void HMIWorker::RunModeCommand(const std::string &command_name) {
-  std::string current_mode;
-  {
-    RLock rlock(status_mutex_);
-    current_mode = status_.current_mode();
-  }
-  const Mode &mode_conf = config_.modes().at(current_mode);
-  if (command_name == "start" || command_name == "stop") {
-    // Run the command on all live modules.
-    for (const auto &module : mode_conf.live_modules()) {
-      RunModuleCommand(module, command_name);
-    }
-  }
+  CyberLaunch(command_name);
 }
 
 void HMIWorker::ChangeToMap(const std::string &map_name) {

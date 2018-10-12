@@ -29,21 +29,6 @@
 namespace apollo {
 namespace common {
 namespace util {
-namespace {
-
-std::string GetRosHome() {
-  // Note that ROS_ROOT env points to <ROS_HOME>/share/ros.
-  static const std::string kKnownTail = "/share/ros";
-  const char *ros_root = std::getenv("ROS_ROOT");
-  if (ros_root == nullptr || !EndWith(ros_root, kKnownTail)) {
-    AERROR << "Failed to find ROS root";
-    // Return dummy path which simply raises error if an operation is called.
-    return "/CANNOT_FIND_ROS_HOME";
-  }
-  return std::string(ros_root, strlen(ros_root) - kKnownTail.length());
-}
-
-}  // namespace
 
 bool GetContent(const std::string &file_name, std::string *content) {
   std::ifstream fin(file_name);
@@ -58,8 +43,10 @@ bool GetContent(const std::string &file_name, std::string *content) {
 }
 
 std::string TranslatePath(const std::string &src_path) {
+  // TODO(xiaoxq): ROS paths are fading out. Retire this when config files are
+  //               moved to new places.
   static const std::string kRosHomePlaceHolder = "<ros>";
-  static const std::string kRosHome = GetRosHome();
+  static const std::string kRosHome = "/home/tmp/ros";
 
   std::string result(src_path);
 
