@@ -57,7 +57,7 @@ void Threshold::AddItem(const std::string& id,
   item.max_time_interval = max_time_interval;
 }
 
-bool Threshold::IsInRange(std::string id,
+bool Threshold::IsInRange(const std::string& id,
                  const uint32_t seq_num,
                  const double value) {
   if (map_.find(id) == map_.end()) {
