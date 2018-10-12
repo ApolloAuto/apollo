@@ -207,7 +207,10 @@ void Screen::Run() {
   do {
     int ch = getch();
 
-    if (ch == 'q' || ch == 'Q' || ch == 27){ canRun_ = false; break; }
+    if (ch == 'q' || ch == 'Q' || ch == 27) {
+      canRun_ = false;
+      break;
+    }
 
     ch = SwitchState(ch);
 

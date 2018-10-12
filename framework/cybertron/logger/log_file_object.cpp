@@ -23,8 +23,8 @@
 #include <iostream>
 #include <vector>
 
-#include "cybertron/logger/logger_util.h"
 #include "cybertron/common/log.h"
+#include "cybertron/logger/logger_util.h"
 
 namespace apollo {
 namespace cybertron {

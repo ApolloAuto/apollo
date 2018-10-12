@@ -166,7 +166,6 @@ void Shutdown() {
   g_ok = false;
 }
 
-
 bool IsShutdown() { return g_is_shutdown; }
 
 void WaitForShutdown() {

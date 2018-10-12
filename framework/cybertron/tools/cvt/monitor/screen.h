@@ -46,7 +46,7 @@ class Screen final {
   void Init(void);
   void Run(void);
   void Resize();
-  void Stop(void){ canRun_ = false; }
+  void Stop(void) { canRun_ = false; }
 
   int Width(void) const;
   int Height(void) const;
