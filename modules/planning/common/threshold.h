@@ -40,7 +40,7 @@ class Threshold {
                const double max_val,
                const uint32_t max_repeat_time,
                const uint32_t max_time_interval);
-  bool IsInRange(std::string id,
+  bool IsInRange(const std::string& id,
                  const uint32_t seq_num,
                  const double value);
  private:
