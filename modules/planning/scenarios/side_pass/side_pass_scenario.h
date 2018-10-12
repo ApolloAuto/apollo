@@ -59,6 +59,7 @@ class SidePassScenario : public Scenario {
     WAITPOINT_STOP,
     SAFETY_DETECTION,
     OBSTACLE_PASS,
+    STATUS_DONE,
   };
 
   void RegisterTasks();
@@ -99,6 +100,7 @@ class SidePassScenario : public Scenario {
   SpeedProfileGenerator speed_profile_generator_;
   PathData path_;
   double wait_point_s = 0;
+  PathData path_data_;
 };
 
 }  // namespace planning
