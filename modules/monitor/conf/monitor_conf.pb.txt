@@ -142,19 +142,19 @@ modules {
 modules {
   name: "record_bag"
   process_conf {
-    process_cmd_keywords: "rosbag/record"
+    process_cmd_keywords: "cyber_recorder"
   }
 }
 modules {
   name: "record_navi_bag"
   process_conf {
-    process_cmd_keywords: "rosbag/record"
+    process_cmd_keywords: "cyber_recorder"
   }
 }
 modules {
   name: "record_map_data"
   process_conf {
-    process_cmd_keywords: "rosbag/record"
+    process_cmd_keywords: "cyber_recorder"
   }
 }
 modules {

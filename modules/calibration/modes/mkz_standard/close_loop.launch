@@ -89,13 +89,6 @@
 	</module>
 
 	<module>
-		<name>monitor</name>
-		<dag_conf>/apollo/modules/monitor/dag/monitor.dag</dag_conf>
-		<process_name>apollo-monitor</process_name>
-		<version>1.0.0</version>
-	</module>
-
-	<module>
 		<name>static_transform</name>
 		<dag_conf>/apollo/modules/transform/dag/static_transform.dag</dag_conf>
 		<process_name>apollo</process_name>
