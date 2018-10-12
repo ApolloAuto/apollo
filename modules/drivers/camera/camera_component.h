@@ -17,6 +17,7 @@
 #pragma once
 
 #include <memory>
+#include <vector>
 
 #include "cybertron/cybertron.h"
 #include "modules/drivers/proto/sensor_image.pb.h"
@@ -45,9 +46,11 @@ class CameraComponent : public Component<> {
   std::unique_ptr<UsbCam> camera_device_;
   std::shared_ptr<Config> camera_config_;
   CameraImagePtr raw_image_ = nullptr;
-  std::shared_ptr<Image> pb_image_ = nullptr;
+  std::vector<std::shared_ptr<Image>> pb_image_buffer_;
   uint32_t spin_rate_ = 200;
   uint32_t device_wait_ = 2000;
+  int index_ = 0;
+  int buffer_size_ = 8;
 };
 
 CYBERTRON_REGISTER_COMPONENT(CameraComponent)

@@ -31,7 +31,6 @@ bool CameraComponent::Init() {
   camera_device_.reset(new UsbCam());
   camera_device_->init(camera_config_);
   raw_image_.reset(new CameraImage);
-  pb_image_.reset(new Image);
 
   raw_image_->width = camera_config_->width();
   raw_image_->height = camera_config_->height();
@@ -42,22 +41,31 @@ bool CameraComponent::Init() {
 
   if (camera_config_->output_type() == YUYV) {
     raw_image_->image_size = raw_image_->width * raw_image_->height * 2;
-    pb_image_->set_encoding("yuyv");
-    pb_image_->set_step(2 * raw_image_->width);
   } else if (camera_config_->output_type() == RGB) {
     raw_image_->image_size = raw_image_->width * raw_image_->height * 3;
-    pb_image_->set_encoding("rgb8");
-    pb_image_->set_step(3 * raw_image_->width);
   }
   raw_image_->is_new = 0;
   // free memory in this struct desturctor
   raw_image_->image =
       reinterpret_cast<char*>(calloc(raw_image_->image_size, sizeof(char)));
 
-  pb_image_->mutable_header()->set_frame_id(camera_config_->frame_id());
-  pb_image_->set_width(raw_image_->width);
-  pb_image_->set_height(raw_image_->height);
-  pb_image_->mutable_data()->reserve(raw_image_->image_size);
+  for (int i = 0; i < buffer_size_; ++i) {
+    auto pb_image = std::make_shared<Image>();
+    pb_image->mutable_header()->set_frame_id(camera_config_->frame_id());
+    pb_image->set_width(raw_image_->width);
+    pb_image->set_height(raw_image_->height);
+    pb_image->mutable_data()->reserve(raw_image_->image_size);
+
+    if (camera_config_->output_type() == YUYV) {
+      pb_image->set_encoding("yuyv");
+      pb_image->set_step(2 * raw_image_->width);
+    } else if (camera_config_->output_type() == RGB) {
+      pb_image->set_encoding("rgb8");
+      pb_image->set_step(3 * raw_image_->width);
+    }
+
+    pb_image_buffer_.push_back(pb_image);
+  }
 
   writer_ = node_->CreateWriter<Image>(camera_config_->channel_name());
   cybertron::Async(&CameraComponent::run, this);
@@ -78,11 +86,15 @@ void CameraComponent::run() {
     }
 
     cybertron::Time image_time(raw_image_->tv_sec, 1000 * raw_image_->tv_usec);
-    pb_image_->mutable_header()->set_timestamp_sec(
+    if (index_ >= buffer_size_) {
+      index_ = 0;
+    }
+    auto pb_image = pb_image_buffer_.at(index_++);
+    pb_image->mutable_header()->set_timestamp_sec(
         cybertron::Time::Now().ToSecond());
-    pb_image_->set_measurement_time(image_time.ToSecond());
-    pb_image_->set_data(raw_image_->image, raw_image_->image_size);
-    writer_->Write(pb_image_);
+    pb_image->set_measurement_time(image_time.ToSecond());
+    pb_image->set_data(raw_image_->image, raw_image_->image_size);
+    writer_->Write(pb_image);
 
     cybertron::SleepFor(std::chrono::microseconds(spin_rate_));
   }
