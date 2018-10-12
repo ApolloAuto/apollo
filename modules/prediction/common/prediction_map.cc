@@ -198,6 +198,38 @@ void PredictionMap::OnLane(
   }
 }
 
+bool PredictionMap::IsProjectionApproximateWithinLane(
+    const Eigen::Vector2d& ego_position,
+    const std::string& lane_id) {
+
+  auto ptr_lane = LaneById(lane_id);
+  const auto& lane_points = ptr_lane->points();
+  if (lane_points.size() < 2) {
+    return false;
+  }
+
+  const auto& start_point = lane_points.front();
+  const auto& end_point = lane_points.back();
+
+  auto lane_vec = end_point - start_point;
+
+  auto approx_lane_length = lane_vec.Length();
+  if (approx_lane_length < 1.0e-3) {
+    return false;
+  }
+
+  auto dist_vec = common::math::Vec2d(ego_position.x(), ego_position.y()) -
+      start_point;
+
+  auto projection_length = dist_vec.InnerProd(lane_vec) /
+      approx_lane_length;
+
+  if (projection_length < 0.0 || projection_length > approx_lane_length) {
+    return false;
+  }
+  return true;
+}
+
 bool PredictionMap::NearJunction(const Eigen::Vector2d& point,
                                  const double radius) {
   common::PointENU hdmap_point;

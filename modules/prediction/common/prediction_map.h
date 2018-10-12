@@ -143,6 +143,19 @@ class PredictionMap {
       std::vector<std::shared_ptr<const hdmap::LaneInfo>>* lanes);
 
   /**
+   * @brief Check whether the projection of ego vehicle is on the target lane.
+   *        Note: the direction of the lane is approximated
+   *              by the terminal points.
+   * @param ego_position The position of the ego vehicle
+   * @param lane_id The target lane to project
+   * @return true if the projection of ego vehicle is within the lane range;
+   *         false otherwise.
+   */
+  static bool IsProjectionApproximateWithinLane(
+      const Eigen::Vector2d& ego_position,
+      const std::string& lane_id);
+
+  /**
    * @brief Check if there are any junctions within the range centered at
    *        a certain point with a radius.
    * @param point The position.
