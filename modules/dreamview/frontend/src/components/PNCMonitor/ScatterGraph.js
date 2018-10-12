@@ -1,6 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import Chart from "chart.js";
+import _ from "lodash";
 
 Chart.plugins.register({
     afterDatasetsDraw: function(chart, easing) {
@@ -24,7 +25,7 @@ Chart.plugins.register({
                 chart.ctx.save();
 
                 const meta = chart.getDatasetMeta(index);
-                const rotation = chart.data.datasets[index].data[0].rotation || 0;
+                const rotation = chart.data.datasets[index].data[0].heading || 0;
 
                 const xAxis = chart.scales['x-axis-0'];
                 const yAxis = chart.scales['y-axis-0'];
@@ -53,6 +54,16 @@ Chart.plugins.register({
 
 Chart.defaults.global.defaultFontColor = '#FFFFFF';
 
+const defaultPolygonProperties = {
+    color: 'rgba(255, 0, 0, 0.8)', // red
+    borderWidth: 2,
+    pointRadius: 0,
+    fill: false,
+    showLine: true,
+    showText: true,
+    cubicInterpolationMode: 'monotone',
+    lineTension: 0,
+};
 export default class ScatterGraph extends React.Component {
     initializeCanvas(title, options) {
         this.name2idx = {};
@@ -80,7 +91,10 @@ export default class ScatterGraph extends React.Component {
                 const setting = options.axes[axis];
                 const axisOptions = {
                     id: `${axis}-axis-0`,
-                    scaleLabel: { display: true, labelString: setting.labelString },
+                    scaleLabel: {
+                        display: !_.isEmpty(setting.labelString),
+                        labelString: setting.labelString,
+                    },
                     ticks: {
                         min: setting.min,
                         max: setting.max,
@@ -131,28 +145,55 @@ export default class ScatterGraph extends React.Component {
     }
 
     updateChart(props) {
+        if (!props.data || !props.properties) {
+            return;
+        }
+
+        const datasets = props.data;
+
+        // Draw cars
+        for (const name in props.properties.cars) {
+            if (this.name2idx[name] === undefined) {
+                this.name2idx[name] = this.chart.data.datasets.length;
+            }
+            const idx = this.name2idx[name];
+            const point = _.get(datasets, `cars[${name}]`, {});
+            const properties = _.get(props, `properties.cars[${name}]`, {});
+            properties.specialMarker = 'car';
+            properties.borderWidth = 0;
+            properties.pointRadius = 0;
+            this.updateData(idx, name, properties, [point]);
+        }
+
         // Draw lines
         for (const name in props.properties.lines) {
             if (this.name2idx[name] === undefined) {
                 this.name2idx[name] = this.chart.data.datasets.length;
             }
             const idx = this.name2idx[name];
-            const properties = props.properties.lines[name];
-            const data = props.data ? props.data[name] : [];
-            this.updateData(idx, name, properties, data);
+            const properties = _.get(props, `properties.lines[${name}]`, {});
+            const points = _.get(datasets, `lines[${name}]`, []);
+            this.updateData(idx, name, properties, points);
         };
 
-        // Draw boxes
+        // Draw polygons
         let idx = Object.keys(this.name2idx).length;
-        if (props.boxes) {
-            for (const name in props.boxes) {
-                const data = props.boxes[name];
-                this.updateData(idx, name, props.properties.box, data);
+        if (datasets.polygons) {
+            for (const name in datasets.polygons) {
+                const points = _.get(datasets, `polygons[${name}]`);
+                if (!points) {
+                    continue;
+                }
+
+                const properties =
+                    _.get(props, `properties.polygons[${name}]`, defaultPolygonProperties);
+
+                this.updateData(idx, name, properties, points);
                 idx++;
             }
         }
 
-        // Remove un-used box data
+        // Remove un-used polygons data
         this.chart.data.datasets.splice(idx, this.chart.data.datasets.length - idx);
 
         // Update chart
@@ -174,7 +215,7 @@ export default class ScatterGraph extends React.Component {
     }
 
     render() {
-        const { data, properties, options, boxes } = this.props;
+        const { title, options, properties, data } = this.props;
         return (
             <div className="scatter-graph">
                 <canvas ref = {(input) => {
@@ -185,9 +226,9 @@ export default class ScatterGraph extends React.Component {
     }
 }
 
-function generateScatterGraph(setting, data) {
-    if (!setting || !data) {
-        console.error("Graph setting or data not found.");
+function generateScatterGraph(setting, lineDatasets, carDatasets, polygonsDatasets) {
+    if (!lineDatasets || !setting || !setting.properties || !setting.options) {
+        console.error("Graph setting or data not found:", setting.title);
         return null;
     }
 
@@ -197,7 +238,7 @@ function generateScatterGraph(setting, data) {
             title={setting.title}
             options={setting.options}
             properties={setting.properties}
-            data={data} />
+            data={{lines: lineDatasets, cars: carDatasets, polygons: polygonsDatasets}} />
     );
 }
 

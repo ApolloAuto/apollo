@@ -1,10 +1,13 @@
-import {action, computed, observable, runInAction} from 'mobx';
-import {LinearInterpolant} from 'three';
+import { action, computed, observable, runInAction } from 'mobx';
+import { LinearInterpolant } from 'three';
+import { parseChartDataFromProtoBuf } from 'utils/chart';
 
 export default class PlanningData {
   @observable planningTime = null;
 
   data = this.initData();
+
+  chartData = [];
 
   @action updatePlanningTime(newTime) {
     this.planningTime = newTime;
@@ -220,7 +223,14 @@ export default class PlanningData {
         return;
       }
 
+      this.chartData = [];
       this.data = this.initData();
+
+      if (planningData.chart) {
+        for (const chart of planningData.chart) {
+          this.chartData.push(parseChartDataFromProtoBuf(chart));
+        }
+      }
 
       if (planningData.slFrame && planningData.slFrame.length >= 2) {
         this.updateSLFrame(planningData.slFrame);

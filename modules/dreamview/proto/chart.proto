@@ -21,6 +21,8 @@ message Line {
     repeated apollo.common.Point2D point = 2;
 
     // If the 'color' property is undefined, a random one will be assigned.
+    // See http://www.chartjs.org/docs/latest/charts/line.html
+    // for all supported properties from chart.js
     map<string, string> properties = 3;
 }
 
@@ -29,14 +31,17 @@ message Polygon {
     repeated apollo.common.Point2D point = 2;
 
     // If the 'color' property is undefined, a random one will be assigned.
+    // See http://www.chartjs.org/docs/latest/charts/line.html
+    // for all supported properties from chart.js
     map<string, string> properties = 3;
 }
 
 message Car {
-    optional double x = 1;
-    optional double y = 2;
-    optional double heading = 3;
-    optional string color = 4;
+    optional string label = 1;
+    optional double x = 2;
+    optional double y = 3;
+    optional double heading = 4;
+    optional string color = 5;
 }
 
 message Chart {

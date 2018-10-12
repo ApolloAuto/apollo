@@ -20,8 +20,8 @@ export default class ControlData {
                 real: [],
                 autoModeZone: [],
                 steerCurve: [],
-                pose: [{ x: null, y: null, rotation: null }],
             },
+            pose: { x: null, y: null, heading: null },
             speedGraph: {
                 plan: [],
                 target: [],
@@ -194,9 +194,9 @@ export default class ControlData {
             this.updateAdcStatusGraph(this.data.trajectoryGraph,
                 trajectory, adc, 'positionX', 'positionY');
             this.updateSteerCurve(this.data.trajectoryGraph, adc, vehicleParam);
-            this.data.trajectoryGraph.pose[0].x = adc.positionX;
-            this.data.trajectoryGraph.pose[0].y = adc.positionY;
-            this.data.trajectoryGraph.pose[0].rotation = adc.heading;
+            this.data.pose.x = adc.positionX;
+            this.data.pose.y = adc.positionY;
+            this.data.pose.heading = adc.heading;
         }
 
         if (world.controlData) {
