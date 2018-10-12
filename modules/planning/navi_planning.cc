@@ -124,8 +124,7 @@ void NaviPlanning::RunOnce(const LocalView& local_view,
   const double start_timestamp = Clock::NowInSeconds();
 
   // recreate reference line provider in every cycle
-  // TODO(all) change this to relative map
-  hdmap_ = HDMapUtil::BaseMapPtr();
+  hdmap_ = HDMapUtil::BaseMapPtr(*local_view.relative_map);
   // Prefer "std::make_unique" to direct use of "new".
   // Reference "https://herbsutter.com/gotw/_102/" for details.
   reference_line_provider_ = std::make_unique<ReferenceLineProvider>(hdmap_);
