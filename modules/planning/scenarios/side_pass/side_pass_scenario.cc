@@ -175,7 +175,7 @@ Status SidePassScenario::ApproachObstacle(
   Status status = RunPlanOnReferenceLine(planning_start_point, frame);
   if (status.ok()) {
     if (!IsSidePassScenario(planning_start_point, *frame)) {
-      status_ = STATUS_DONE;
+      scenario_status_ = ScenarioStatus::STATUS_DONE;
     } else if (frame->vehicle_state().linear_velocity() < 1.0e-5) {
       stage_ = SidePassStage::PATH_GENERATION;
       stage_init_ = false;
@@ -186,7 +186,13 @@ Status SidePassScenario::ApproachObstacle(
 
 Status SidePassScenario::GeneratePath(
     const TrajectoryPoint& planning_start_point, Frame* frame) {
-  return Status::OK();
+  Status status = RunPlanOnReferenceLine(planning_start_point, frame);
+  if (status.ok()) {
+    stage_ = SidePassStage::WAITPOINT_STOP;
+  } else {
+    AERROR << "Fail at PATH_GENERATION stage in sidepass scenario.";
+  }
+  return status;
 }
 
 Status SidePassScenario::StopOnWaitPoint(
@@ -325,6 +331,9 @@ Status SidePassScenario::RunPlanOnReferenceLine(
     }
     reference_line_info.SetTrajectory(trajectory);
     reference_line_info.SetDrivable(true);
+    if (stage_ == SidePassStage::PATH_GENERATION) {
+      path_data_ = reference_line_info.path_data();
+    }
     return Status::OK();
   }
   return status;
