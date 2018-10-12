@@ -62,18 +62,18 @@ class MoveSequencePredictor : public SequencePredictor {
   FRIEND_TEST(MoveSequencePredictorTest, Utils);
 
  private:
-  void DrawMoveSequenceTrajectoryPoints_UsingBestTrajectorySelection(
+  bool DrawMoveSequenceTrajectoryPointsUsingBestTrajectorySelection(
       const Obstacle& obstacle, const LaneSequence& lane_sequence,
       const double total_time, const double period,
       std::vector<apollo::common::TrajectoryPoint>* points);
-  void DrawMoveSequenceTrajectoryPoints(
+  bool DrawMoveSequenceTrajectoryPoints(
       const Obstacle& obstacle, const LaneSequence& lane_sequence,
       const double total_time, const double period,
       std::vector<apollo::common::TrajectoryPoint>* points);
 
   bool GetLongitudinalPolynomial(const Obstacle& obstacle,
                                  const LaneSequence& lane_sequence,
-                                 const std::pair<double, double> lon_end_state,
+                                 const std::pair<double, double>& lon_end_state,
                                  std::array<double, 5>* coefficients);
 
   bool GetLateralPolynomial(const Obstacle& obstacle,
@@ -87,7 +87,7 @@ class MoveSequencePredictor : public SequencePredictor {
   double ComputeTimeToLatEndConditionByVelocity(
       const Obstacle& obstacle, const LaneSequence& lane_sequence);
 
-  void GenerateCandidateTimes(std::vector<double>* candidate_times);
+  std::vector<double> GenerateCandidateTimes();
 
   double CostFunction(const double max_lat_acc, const double time_to_end_state);
 };
