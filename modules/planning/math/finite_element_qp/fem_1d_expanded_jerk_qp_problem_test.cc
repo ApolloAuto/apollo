@@ -34,7 +34,7 @@ namespace planning {
 TEST(Fem1dLinearQpProblemTest, basic_test) {
   Fem1dQpProblem* fem_qp = new Fem1dExpandedJerkQpProblem();
   FLAGS_enable_osqp_debug = true;
-  std::array<double, 3> x_init = {1.5, 0.0, 0.001};
+  std::array<double, 3> x_init = {1.5, 0.0, 1.001};
   double delta_s = 1.0;
   std::vector<std::pair<double, double>> x_bounds;
   for (int i = 0; i < 200; ++i) {
