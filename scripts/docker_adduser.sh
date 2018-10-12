@@ -38,7 +38,8 @@ genhtml_branch_coverage = 1
 lcov_branch_coverage = 1
 ' > "/home/${DOCKER_USER}/.lcovrc"
 
-chown -R ${DOCKER_USER}:${DOCKER_GRP} "/home/${DOCKER_USER}"
+# Set user files ownership to current user, such as .bashrc, .profile, etc.
+ls -ad /home/${DOCKER_USER}/.??* | xargs chown -R ${DOCKER_USER}:${DOCKER_GRP}
 
 # setup GPS device
 if [ -e /dev/novatel0 ]; then
@@ -61,12 +62,6 @@ fi
 
 
 if [ "$RELEASE_DOCKER" != "1" ];then
-  # setup map data
-  if [ -e /home/tmp/modules_data ]; then
-    cp -r /home/tmp/modules_data/* /apollo/modules/
-    chown -R ${DOCKER_USER}:${DOCKER_GRP} "/apollo/modules"
-  fi
-
   # setup ros package
   # this is a temporary solution to avoid ros package downloading.
   ROS="/home/tmp/ros"
