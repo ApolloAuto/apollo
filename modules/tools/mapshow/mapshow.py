@@ -17,11 +17,9 @@
 ###############################################################################
 
 import argparse
-
 import matplotlib.pyplot as plt
-
-from map import Map
-from localization import Localization
+from libs.map import Map
+from libs.localization import Localization
 
 if __name__ == "__main__":
 

@@ -59,5 +59,5 @@ class SpeedSubplot:
             cnt += 1
 
         self.ax.legend(loc="upper left", borderaxespad=0., ncol=5)
-        #self.ax.axis('equal')
+        # self.ax.axis('equal')
         planning.speed_data_lock.release()

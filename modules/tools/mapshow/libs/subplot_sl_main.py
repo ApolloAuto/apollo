@@ -85,10 +85,14 @@ class SlMainSubplot:
         self.sl_map_upper_boundary_line.set_xdata(new_sampled_s)
         self.sl_map_upper_boundary_line.set_ydata(new_map_upper)
 
-        self.sl_dynamic_obstacle_lower_boundary_line.set_xdata(planning.sl_sampled_s)
-        self.sl_dynamic_obstacle_lower_boundary_line.set_ydata(planning.sl_dynamic_obstacle_lower_boundary)
-        self.sl_dynamic_obstacle_upper_boundary_line.set_xdata(planning.sl_sampled_s)
-        self.sl_dynamic_obstacle_upper_boundary_line.set_ydata(planning.sl_dynamic_obstacle_upper_boundary)
+        self.sl_dynamic_obstacle_lower_boundary_line.set_xdata(
+            planning.sl_sampled_s)
+        self.sl_dynamic_obstacle_lower_boundary_line.set_ydata(
+            planning.sl_dynamic_obstacle_lower_boundary)
+        self.sl_dynamic_obstacle_upper_boundary_line.set_xdata(
+            planning.sl_sampled_s)
+        self.sl_dynamic_obstacle_upper_boundary_line.set_ydata(
+            planning.sl_dynamic_obstacle_upper_boundary)
 
         new_static_lower = []
         for l in planning.sl_static_obstacle_lower_boundary:
@@ -104,8 +108,12 @@ class SlMainSubplot:
         self.sl_static_obstacle_upper_boundary_line.set_ydata(new_static_upper)
         self.sl_path_line.set_xdata(planning.sl_path_s)
         self.sl_path_line.set_ydata(planning.sl_path_l)
-        self.sl_aggregated_boundary_low_line.set_xdata(planning.sl_aggregated_boundary_s)
-        self.sl_aggregated_boundary_low_line.set_ydata(planning.sl_aggregated_boundary_low_l)
-        self.sl_aggregated_boundary_high_line.set_xdata(planning.sl_aggregated_boundary_s)
-        self.sl_aggregated_boundary_high_line.set_ydata(planning.sl_aggregated_boundary_high_l)
+        self.sl_aggregated_boundary_low_line.set_xdata(
+            planning.sl_aggregated_boundary_s)
+        self.sl_aggregated_boundary_low_line.set_ydata(
+            planning.sl_aggregated_boundary_low_l)
+        self.sl_aggregated_boundary_high_line.set_xdata(
+            planning.sl_aggregated_boundary_s)
+        self.sl_aggregated_boundary_high_line.set_ydata(
+            planning.sl_aggregated_boundary_high_l)
         planning.sl_data_lock.release()

@@ -25,6 +25,7 @@ from matplotlib import colors as mcolors
 import common.proto_utils as proto_utils
 from modules.map.proto import map_pb2
 
+
 class Map:
     def __init__(self):
         self.map_pb = map_pb2.Map()
@@ -63,11 +64,11 @@ class Map:
                         for p in segment.line_segment.point:
                             px.append(float(p.x))
                             py.append(float(p.y))
-                        ax.plot(px, py, ls='-', c=color_val, alpha = 0.5)
+                        ax.plot(px, py, ls='-', c=color_val, alpha=0.5)
 
     def draw_lanes(self, ax, is_show_lane_ids, laneids):
         cnt = 1
-        for lane in  self.map_pb.lane:
+        for lane in self.map_pb.lane:
             color_val = self.colors[cnt % len(self.colors)]
             if len(laneids) == 0:
                 self._draw_lane_boundary(lane, ax, color_val)
@@ -99,8 +100,9 @@ class Map:
             lane.id.id,
             xy=(x, y), xytext=lxy,
             textcoords='offset points', ha=has[idx], va=vas[idx],
-            bbox= dict(boxstyle = 'round,pad=0.5', fc=color_val, alpha=0.5),
-            arrowprops = dict(arrowstyle = '-|>', connectionstyle = 'arc3,rad=-0.2', fc=color_val, ec=color_val, alpha=0.5))
+            bbox=dict(boxstyle='round,pad=0.5', fc=color_val, alpha=0.5),
+            arrowprops=dict(arrowstyle='-|>', connectionstyle='arc3,rad=-0.2',
+                            fc=color_val, ec=color_val, alpha=0.5))
 
     @staticmethod
     def _find_lane_central_point(lane):
@@ -140,7 +142,7 @@ class Map:
                 for p in curve.line_segment.point:
                     px.append(float(p.x))
                     py.append(float(p.y))
-                ax.plot(px, py, ls='-', c=color_val, alpha = 0.5)
+                ax.plot(px, py, ls='-', c=color_val, alpha=0.5)
         for curve in lane.right_boundary.curve.segment:
             if curve.HasField('line_segment'):
                 px = []
@@ -148,7 +150,7 @@ class Map:
                 for p in curve.line_segment.point:
                     px.append(float(p.x))
                     py.append(float(p.y))
-                ax.plot(px, py, ls='-', c=color_val, alpha = 0.5)
+                ax.plot(px, py, ls='-', c=color_val, alpha=0.5)
 
     @staticmethod
     def _draw_lane_central(lane, ax, color_val):
@@ -160,7 +162,7 @@ class Map:
                 for p in curve.line_segment.point:
                     px.append(float(p.x))
                     py.append(float(p.y))
-                ax.plot(px, py, ls=':', c=color_val, alpha = 0.5)
+                ax.plot(px, py, ls=':', c=color_val, alpha=0.5)
 
     def draw_signal_lights(self, ax):
         """draw_signal_lights"""
@@ -180,10 +182,10 @@ class Map:
         ax.plot(px, py, 'o-')
         lxy = [random.randint(20, 80) * random.sample([-1, 1], 1)[0],
                random.randint(20, 80) * random.sample([-1, 1], 1)[0]]
-        xy = (sum(px)/len(px), sum(py)/len(py))
+        xy = (sum(px) / len(px), sum(py) / len(py))
         plt.annotate(
             label,
-            xy = xy, xytext = lxy,
-            textcoords = 'offset points',
-            bbox = dict(boxstyle = 'round,pad=0.5', fc = 'yellow', alpha = 0.5),
-            arrowprops = dict(arrowstyle = '->', connectionstyle = 'arc3,rad=0'))
+            xy=xy, xytext=lxy,
+            textcoords='offset points',
+            bbox=dict(boxstyle='round,pad=0.5', fc='yellow', alpha=0.5),
+            arrowprops=dict(arrowstyle='->', connectionstyle='arc3,rad=0'))

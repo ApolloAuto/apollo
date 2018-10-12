@@ -20,6 +20,7 @@ import threading
 import numpy as np
 from modules.planning.proto import planning_internal_pb2
 
+
 class Planning:
     def __init__(self, planning_pb=None):
         self.data_lock = threading.Lock()
@@ -173,19 +174,19 @@ class Planning:
             st_data_boundary_type[st_graph.name] = {}
             for boundary in st_graph.boundary:
                 st_data_boundary_type[st_graph.name][boundary.name] \
-                    = planning_internal_pb2.StGraphBoundaryDebug.StBoundaryType.Name(boundary.type)
+                    = planning_internal_pb2.StGraphBoundaryDebug.StBoundaryType.Name(
+                    boundary.type)
                 st_data_boundary_s[st_graph.name][boundary.name] = []
                 st_data_boundary_t[st_graph.name][boundary.name] = []
                 for point in boundary.point:
-                    st_data_boundary_s[st_graph.name][boundary.name]\
+                    st_data_boundary_s[st_graph.name][boundary.name] \
                         .append(point.s)
-                    st_data_boundary_t[st_graph.name][boundary.name]\
+                    st_data_boundary_t[st_graph.name][boundary.name] \
                         .append(point.t)
                 st_data_boundary_s[st_graph.name][boundary.name].append(
                     st_data_boundary_s[st_graph.name][boundary.name][0])
                 st_data_boundary_t[st_graph.name][boundary.name].append(
                     st_data_boundary_t[st_graph.name][boundary.name][0])
-
 
             st_curve_s[st_graph.name] = []
             st_curve_t[st_graph.name] = []
@@ -212,8 +213,10 @@ class Planning:
                                      st_curve_s[st_graph.name])
                 interp_s_set.append(interp_s)
             st_speed_constraint_s[st_graph.name].extend(interp_s_set)
-            st_speed_constraint_lower[st_graph.name].extend(speed_constraint.lower_bound)
-            st_speed_constraint_upper[st_graph.name].extend(speed_constraint.upper_bound)
+            st_speed_constraint_lower[st_graph.name].extend(
+                speed_constraint.lower_bound)
+            st_speed_constraint_upper[st_graph.name].extend(
+                speed_constraint.upper_bound)
 
             kernel_cruise_t[st_graph.name] = []
             kernel_cruise_s[st_graph.name] = []
@@ -265,9 +268,8 @@ class Planning:
             traj_path_x.append(trajectory_point.path_point.x)
             traj_path_y.append(trajectory_point.path_point.y)
 
-
         self.traj_data_lock.acquire()
-        
+
         self.traj_speed_t_history.append(traj_speed_t)
         self.traj_speed_v_history.append(traj_speed_v)
         if len(self.traj_speed_t_history) > self.traj_speed_history_len:
@@ -277,26 +279,26 @@ class Planning:
             self.traj_speed_v_history = \
                 self.traj_speed_v_history[len(self.traj_speed_v_history)
                                           - self.traj_speed_history_len:]
-            
+
         self.traj_acc_t_history.append(traj_acc_t)
         self.traj_acc_a_history.append(traj_acc_a)
         if len(self.traj_acc_t_history) > self.traj_acc_history_len:
             self.traj_acc_t_history = \
                 self.traj_acc_t_history[len(self.traj_acc_t_history)
-                                          - self.traj_acc_history_len:]
+                                        - self.traj_acc_history_len:]
             self.traj_acc_a_history = \
                 self.traj_acc_a_history[len(self.traj_acc_a_history)
-                                          - self.traj_acc_history_len:]
+                                        - self.traj_acc_history_len:]
 
         self.traj_path_x_history.append(traj_path_x)
         self.traj_path_y_history.append(traj_path_y)
         if len(self.traj_path_x_history) > self.traj_path_history_len:
             self.traj_path_x_history = \
                 self.traj_path_x_history[len(self.traj_path_x_history)
-                                        - self.traj_path_history_len:]
+                                         - self.traj_path_history_len:]
             self.traj_path_y_history = \
                 self.traj_path_y_history[len(self.traj_path_y_history)
-                                        - self.traj_path_history_len:]
+                                         - self.traj_path_history_len:]
 
         self.traj_data_lock.release()
 
@@ -338,9 +340,11 @@ class Planning:
         sl_map_upper_boundary.set_ydata(new_map_upper)
 
         sl_dynamic_obstacle_lower_boundary.set_xdata(self.sl_sampled_s)
-        sl_dynamic_obstacle_lower_boundary.set_ydata(self.sl_dynamic_obstacle_lower_boundary)
+        sl_dynamic_obstacle_lower_boundary.set_ydata(
+            self.sl_dynamic_obstacle_lower_boundary)
         sl_dynamic_obstacle_upper_boundary.set_xdata(self.sl_sampled_s)
-        sl_dynamic_obstacle_upper_boundary.set_ydata(self.sl_dynamic_obstacle_upper_boundary)
+        sl_dynamic_obstacle_upper_boundary.set_ydata(
+            self.sl_dynamic_obstacle_upper_boundary)
 
         new_static_lower = []
         for l in self.sl_static_obstacle_lower_boundary:
@@ -357,9 +361,12 @@ class Planning:
         sl_path.set_xdata(self.sl_path_s)
         sl_path.set_ydata(self.sl_path_l)
         sl_aggregated_boundary_low_line.set_xdata(self.sl_aggregated_boundary_s)
-        sl_aggregated_boundary_low_line.set_ydata(self.sl_aggregated_boundary_low_l)
-        sl_aggregated_boundary_high_line.set_xdata(self.sl_aggregated_boundary_s)
-        sl_aggregated_boundary_high_line.set_ydata(self.sl_aggregated_boundary_high_l)
+        sl_aggregated_boundary_low_line.set_ydata(
+            self.sl_aggregated_boundary_low_l)
+        sl_aggregated_boundary_high_line.set_xdata(
+            self.sl_aggregated_boundary_s)
+        sl_aggregated_boundary_high_line.set_ydata(
+            self.sl_aggregated_boundary_high_l)
         self.sl_data_lock.release()
 
     def replot_st_data(self, boundaries_pool, st_line,
@@ -387,17 +394,17 @@ class Planning:
             boundary.set_ydata(st_graph_boudnary_s[boundary_name])
             center_t = 0
             center_s = 0
-            for i in range(len(st_graph_boudnary_t[boundary_name])-1):
+            for i in range(len(st_graph_boudnary_t[boundary_name]) - 1):
                 center_s += st_graph_boudnary_s[boundary_name][i]
                 center_t += st_graph_boudnary_t[boundary_name][i]
-            center_s /= float(len(st_graph_boudnary_s[boundary_name])-1)
-            center_t /= float(len(st_graph_boudnary_t[boundary_name])-1)
+            center_s /= float(len(st_graph_boudnary_s[boundary_name]) - 1)
+            center_t /= float(len(st_graph_boudnary_t[boundary_name]) - 1)
 
             annotation = obstacle_annotation_pool[cnt]
             annotation.set_visible(True)
-            annotation.set_text(boundary_name+ "_"
-                + st_boundary_type[boundary_name]
-                                .replace("ST_BOUNDARY_TYPE_",""))
+            annotation.set_text(boundary_name + "_"
+                                + st_boundary_type[boundary_name]
+                                .replace("ST_BOUNDARY_TYPE_", ""))
             annotation.set_x(center_t)
             annotation.set_y(center_s)
 
