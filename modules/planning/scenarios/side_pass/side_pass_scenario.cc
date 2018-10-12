@@ -273,6 +273,22 @@ Status SidePassScenario::DetectSafety(
 
 Status SidePassScenario::PassObstacle(
     const TrajectoryPoint& planning_start_point, Frame* frame) {
+  Status status = RunPlanOnReferenceLine(planning_start_point, frame);
+  if (!status.ok()) {
+    return Status(ErrorCode::PLANNING_ERROR,
+                  "failed to pass obstacle in side pass scenario.");
+  }
+  const SLBoundary& adc_sl_boundary =
+      frame->reference_line_info().front().AdcSlBoundary();
+  const auto& frenet_frame_path =
+      frame->reference_line_info().front().path_data().frenet_frame_path();
+  const auto& frenet_frame_point =
+      frenet_frame_path.PointAt(frenet_frame_path.NumOfPoints() - 1);
+  int adc_start_s =  adc_sl_boundary.start_s();
+  int path_end_s = frenet_frame_point.s();
+  if ((path_end_s - adc_start_s) > 20.0) {
+    scenario_status_ = ScenarioStatus::STATUS_DONE;
+  }
   return Status::OK();
 }
 
