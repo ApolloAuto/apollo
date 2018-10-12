@@ -35,8 +35,8 @@ localization = Localization()
 
 
 def update(frame_number):
-    #st_main_subplot.show(planning)
-    #st_speed_subplot.show(planning)
+    # st_main_subplot.show(planning)
+    # st_speed_subplot.show(planning)
     map_path_subplot.show(planning, localization)
     dp_st_main_subplot.show(planning)
     qp_st_main_subplot.show(planning)
@@ -73,7 +73,7 @@ def press_key(event):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         description="plot_planning is a tool to display "
-        "planning trajs on a map.",
+                    "planning trajs on a map.",
         prog="plot_planning_old.py")
     parser.add_argument(
         "-m",

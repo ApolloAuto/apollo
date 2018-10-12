@@ -18,6 +18,7 @@
 
 from map import Map
 
+
 class PathSubplot:
     def __init__(self, ax, map_file=None):
         self.ax = ax
@@ -77,10 +78,12 @@ class PathSubplot:
         localization.localization_data_lock.acquire()
         self.draw_vehicle(localization)
         try:
-            self.ax.set_xlim(localization.localization_pb.pose.position.x - self.map_width,
-                        localization.localization_pb.pose.position.x + self.map_width)
-            self.ax.set_ylim(localization.localization_pb.pose.position.y - self.map_width,
-                        localization.localization_pb.pose.position.y + self.map_width)
+            self.ax.set_xlim(
+                localization.localization_pb.pose.position.x - self.map_width,
+                localization.localization_pb.pose.position.x + self.map_width)
+            self.ax.set_ylim(
+                localization.localization_pb.pose.position.y - self.map_width,
+                localization.localization_pb.pose.position.y + self.map_width)
         except:
             pass
         localization.localization_data_lock.release()
@@ -88,7 +91,7 @@ class PathSubplot:
         self.ax.autoscale_view()
         self.ax.relim()
         self.ax.legend(loc="upper left", borderaxespad=0., ncol=5)
-        #self.ax.axis('equal')
+        # self.ax.axis('equal')
 
     def zoom_in(self):
         if self.map_width > 20:

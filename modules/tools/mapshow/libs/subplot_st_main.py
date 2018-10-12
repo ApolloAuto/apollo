@@ -17,7 +17,6 @@
 ###############################################################################
 
 class StMainSubplot:
-
     def __init__(self, ax, st_name):
         self.st_curve_line, = ax.plot([0], [0], "k.", lw=3, alpha=0.5)
         self.kernel_cruise_line, = ax.plot([0], [0], "g.", lw=3, alpha=0.5)
@@ -30,7 +29,7 @@ class StMainSubplot:
                 ax.plot([0], [0], "r-", lw=1, alpha=1)[0])
             self.obstacle_annotations.append(ax.text(0, 0, ""))
 
-        #self.st_name = planning_config_pb2.TaskType.Name(
+        # self.st_name = planning_config_pb2.TaskType.Name(
         #    planning_config_pb2.QP_SPLINE_ST_SPEED_OPTIMIZER)
         self.st_name = st_name
         ax.set_xlim(-3, 9)
@@ -72,17 +71,17 @@ class StMainSubplot:
             boundary.set_ydata(obstacles_boundary_s[boundary_name])
             center_t = 0
             center_s = 0
-            for i in range(len(obstacles_boundary_t[boundary_name])-1):
+            for i in range(len(obstacles_boundary_t[boundary_name]) - 1):
                 center_s += obstacles_boundary_s[boundary_name][i]
                 center_t += obstacles_boundary_t[boundary_name][i]
-            center_s /= float(len(obstacles_boundary_s[boundary_name])-1)
-            center_t /= float(len(obstacles_boundary_t[boundary_name])-1)
+            center_s /= float(len(obstacles_boundary_s[boundary_name]) - 1)
+            center_t /= float(len(obstacles_boundary_t[boundary_name]) - 1)
 
             annotation = self.obstacle_annotations[cnt]
             annotation.set_visible(True)
-            annotation.set_text(boundary_name+ "_"
+            annotation.set_text(boundary_name + "_"
                                 + obstacles_type[boundary_name]
-                                .replace("ST_BOUNDARY_TYPE_",""))
+                                .replace("ST_BOUNDARY_TYPE_", ""))
             annotation.set_x(center_t)
             annotation.set_y(center_s)
 
@@ -94,13 +93,14 @@ class StMainSubplot:
         self.st_curve_line.set_label(self.st_name[0:5])
 
         self.kernel_cruise_line.set_visible(True)
-        self.kernel_cruise_line.set_xdata(planning.kernel_cruise_t[self.st_name])
-        self.kernel_cruise_line.set_ydata(planning.kernel_cruise_s[self.st_name])
+        self.kernel_cruise_line.set_xdata(
+            planning.kernel_cruise_t[self.st_name])
+        self.kernel_cruise_line.set_ydata(
+            planning.kernel_cruise_s[self.st_name])
         self.kernel_follow_line.set_visible(True)
-        self.kernel_follow_line.set_xdata(planning.kernel_follow_t[self.st_name])
-        self.kernel_follow_line.set_ydata(planning.kernel_follow_s[self.st_name])
+        self.kernel_follow_line.set_xdata(
+            planning.kernel_follow_t[self.st_name])
+        self.kernel_follow_line.set_ydata(
+            planning.kernel_follow_s[self.st_name])
 
         planning.st_data_lock.release()
-
-
-

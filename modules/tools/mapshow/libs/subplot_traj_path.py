@@ -20,6 +20,7 @@ import matplotlib.pyplot as plt
 from matplotlib import cm as cmx
 from matplotlib import colors as mcolors
 
+
 class TrajPathSubplot:
     def __init__(self, ax):
         self.ax = ax
@@ -27,7 +28,7 @@ class TrajPathSubplot:
         self.path_lines_size = 30
         self.colors = []
         self.init_colors()
-        #self.colors = ['b','r', 'y', 'k']
+        # self.colors = ['b','r', 'y', 'k']
         for i in range(self.path_lines_size):
             line, = ax.plot(
                 [0], [0],
@@ -39,11 +40,11 @@ class TrajPathSubplot:
             self.path_lines.append(line)
 
         ax.set_xlabel("x (m)")
-        #ax.set_xlim([-2, 10])
-        #ax.set_ylim([-6, 6])
+        # ax.set_xlim([-2, 10])
+        # ax.set_ylim([-6, 6])
         self.ax.autoscale_view()
-        #self.ax.relim()
-        #ax.set_ylabel("y (m)")
+        # self.ax.relim()
+        # ax.set_ylabel("y (m)")
         ax.set_title("PLANNING ACC")
         self.set_visible(False)
 
@@ -68,14 +69,14 @@ class TrajPathSubplot:
                 print "WARNING: number of path lines is more than " \
                       + str(self.path_lines_size)
                 continue
-            speed_line = self.path_lines[self.path_lines_size-i-1]
+            speed_line = self.path_lines[self.path_lines_size - i - 1]
 
             speed_line.set_xdata(planning.traj_path_x_history[i])
             speed_line.set_ydata(planning.traj_path_y_history[i])
             speed_line.set_visible(True)
 
-        #self.ax.legend(loc="upper left", borderaxespad=0., ncol=5)
-        #self.ax.axis('equal')
+        # self.ax.legend(loc="upper left", borderaxespad=0., ncol=5)
+        # self.ax.axis('equal')
         planning.traj_data_lock.release()
         self.ax.autoscale_view()
         self.ax.relim()

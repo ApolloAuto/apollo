@@ -17,7 +17,6 @@
 ###############################################################################
 
 class StSpeedSubplot:
-
     def __init__(self, ax, st_name):
         self.speed_limit_line = ax.plot([0], [0], "r-",
                                         lw=6, alpha=0.5, label="limits")[0]
@@ -33,7 +32,8 @@ class StSpeedSubplot:
         ax.set_xlabel("s - qp_path(m)")
         ax.set_ylabel("v (m/s)")
         ax.set_title("QP Speed - sv graph")
-        ax.legend(loc="upper left", bbox_to_anchor=(0, 1), ncol=2, borderaxespad=0.)
+        ax.legend(loc="upper left", bbox_to_anchor=(0, 1), ncol=2,
+                  borderaxespad=0.)
         self.set_visible(False)
 
     def set_visible(self, visible):
@@ -59,15 +59,16 @@ class StSpeedSubplot:
         self.speed_limit_line.set_ydata(planning.st_speed_limit_v[self.st_name])
         self.speed_limit_line.set_visible(True)
 
-        self.speed_upper_bound_line.set_xdata(planning.st_speed_constraint_s[self.st_name])
-        self.speed_upper_bound_line.set_ydata(planning.st_speed_constraint_upper[self.st_name])
+        self.speed_upper_bound_line.set_xdata(
+            planning.st_speed_constraint_s[self.st_name])
+        self.speed_upper_bound_line.set_ydata(
+            planning.st_speed_constraint_upper[self.st_name])
         self.speed_upper_bound_line.set_visible(True)
 
-        self.speed_lower_bound_line.set_xdata(planning.st_speed_constraint_s[self.st_name])
-        self.speed_lower_bound_line.set_ydata(planning.st_speed_constraint_lower[self.st_name])
+        self.speed_lower_bound_line.set_xdata(
+            planning.st_speed_constraint_s[self.st_name])
+        self.speed_lower_bound_line.set_ydata(
+            planning.st_speed_constraint_lower[self.st_name])
         self.speed_lower_bound_line.set_visible(True)
 
         planning.st_data_lock.release()
-
-
-

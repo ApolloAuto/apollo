@@ -17,14 +17,10 @@
 ###############################################################################
 
 import argparse
-
 import matplotlib.pyplot as plt
-
-from map import Map
-from localization import Localization
+from libs.map import Map
 
 if __name__ == "__main__":
-
     parser = argparse.ArgumentParser(
         description="Raodshow is a tool to display road info on a map.",
         prog="roadshow.py")
