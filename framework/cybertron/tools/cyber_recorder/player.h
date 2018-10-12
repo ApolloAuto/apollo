@@ -101,6 +101,7 @@ class Player {
   std::mutex mutex_;
   uint64_t total_message_number_ = 0;
   uint64_t base_time_ = 0;
+  uint64_t base_real_time_ = 0;
   uint64_t last_played_time_ = 0;
   uint64_t begin_time_ = 0;         // expect begin time in this playing
   uint64_t end_time_ = UINT64_MAX;  // expect end time in this playing
