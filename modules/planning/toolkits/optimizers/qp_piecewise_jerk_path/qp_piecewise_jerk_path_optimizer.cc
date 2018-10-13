@@ -23,8 +23,6 @@
 #include <algorithm>
 
 #include "modules/common/time/time.h"
-#include "modules/planning/math/finite_element_qp/active_set_augmented_lateral_qp_optimizer.h"
-#include "modules/planning/math/finite_element_qp/active_set_lateral_qp_optimizer.h"
 #include "modules/planning/math/finite_element_qp/osqp_lateral_jerk_qp_optimizer.h"
 #include "modules/planning/math/finite_element_qp/osqp_lateral_linear_qp_optimizer.h"
 #include "modules/planning/math/finite_element_qp/osqp_lateral_qp_optimizer.h"
@@ -82,9 +80,7 @@ bool QpPiecewiseJerkPathOptimizer::Init(
     config_ = config.qp_piecewise_jerk_path_config();
   }
   // TODO(all): use gflags or config to turn on/off new algorithms
-  // lateral_qp_optimizer_.reset(new ActiveSetLateralQPOptimizer());
   // lateral_qp_optimizer_.reset(new OsqpLateralJerkQPOptimizer());
-  // lateral_qp_optimizer_.reset(new ActiveSetAugmentedLateralQPOptimizer());
   lateral_qp_optimizer_.reset(new OsqpLateralLinearQPOptimizer());
 
   is_init_ = true;
