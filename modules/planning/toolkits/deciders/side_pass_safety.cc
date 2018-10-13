@@ -32,6 +32,8 @@ using ::apollo::common::ErrorCode;
 using ::apollo::common::Status;
 using ::apollo::hdmap::PathOverlap;
 
+SidePassSafety::SidePassSafety() : Decider("SidePassSafety") {}
+
 bool SidePassSafety::Init(const ScenarioConfig::ScenarioTaskConfig &config) {
   is_init_ = true;
   return true;
