@@ -21,14 +21,14 @@
 #pragma once
 
 #include <memory>
+#include <mutex>
 #include <string>
 #include <vector>
-#include <mutex>
 
 #include "cybertron/component/component.h"
-#include "modules/common/status/status.h"
 #include "modules/common/adapters/proto/adapter_config.pb.h"
 #include "modules/common/proto/pnc_point.pb.h"
+#include "modules/common/status/status.h"
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/planning/proto/planning.pb.h"
@@ -42,9 +42,9 @@
 namespace apollo {
 namespace prediction {
 
-class PredictionComponent :
-    public cybertron::Component<perception::PerceptionObstacles,
-                                localization::LocalizationEstimate> {
+class PredictionComponent
+    : public cybertron::Component<perception::PerceptionObstacles,
+                                  localization::LocalizationEstimate> {
  public:
   /**
    * @brief Destructor
@@ -70,13 +70,16 @@ class PredictionComponent :
    * @param Planning trajectory message.
    */
   bool Proc(
-      const std::shared_ptr<perception::PerceptionObstacles>&,
-      const std::shared_ptr<localization::LocalizationEstimate>&) override;
+      const std::shared_ptr<perception::PerceptionObstacles> &,
+      const std::shared_ptr<localization::LocalizationEstimate> &) override;
 
  private:
   void OnLocalization(const localization::LocalizationEstimate &localization);
 
   void OnPlanning(const planning::ADCTrajectory &adc_trajectory);
+
+  void OnPerception(
+      const perception::PerceptionObstacles &perception_obstacles);
 
   void ProcessOfflineData(const std::string &filename);
 
@@ -85,12 +88,14 @@ class PredictionComponent :
  private:
   double component_start_time_ = 0.0;
 
+  double frame_start_time_ = 0.0;
+
   PredictionConf prediction_conf_;
 
   common::adapter::AdapterManagerConfig adapter_conf_;
 
   std::shared_ptr<apollo::cybertron::Reader<planning::ADCTrajectory>>
-       planning_reader_;
+      planning_reader_;
 
   std::shared_ptr<apollo::cybertron::Writer<PredictionObstacles>>
       prediction_writer_;
