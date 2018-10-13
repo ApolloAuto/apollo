@@ -38,16 +38,26 @@ import sys
 import psutil
 
 
-MAP_TOPICS = [
+MAP_MKZ_STD_TOPICS = [
+    '/apollo/sensor/gnss/raw_data',
+    '/apollo/sensor/gnss/odometry',
+    '/apollo/sensor/gnss/ins_stat',
+    '/apollo/sensor/velodyne64/VelodyneScan',
+    '/apollo/sensor/velodyne64/compensator/PointCloud2',
+    '/apollo/sensor/velodyne16/VelodyneScan',
+    '/apollo/sensor/camera/traffic/image_short/compressed',
+    '/apollo/sensor/camera/traffic/image_long/compressed',
+]
+
+MAP_UDEV_STD_TOPICS = [
     '/apollo/sensor/gnss/raw_data',
     '/apollo/sensor/gnss/odometry',
     '/apollo/sensor/gnss/ins_stat',
     '/apollo/sensor/velodyne128/VelodyneScan',
     '/apollo/sensor/velodyne128/compensator/PointCloud2',
-    '/apollo/sensor/velodyne16/VelodyneScan',
-    '/apollo/sensor/velodyne16/compensator/PointCloud2',
-    '/apollo/sensor/camera/traffic/image_short/compressed',
-    '/apollo/sensor/camera/traffic/image_long/compressed',
+    '/apollo/sensor/velodyne16/front/center/VelodyneScan',
+    '/apollo/sensor/camera/front_6mm/image/compressed',
+    '/apollo/sensor/camera/front_12mm/image/compressed',
 ]
 
 
@@ -81,6 +91,10 @@ class ArgManager(object):
         self.parser.add_argument('--split_duration', default="1m",
                                  help='Duration to split bags, will be applied '
                                  'as parameter to "rosbag record --duration".')
+        self.parser.add_argument('--map_type', default="mkz_std",
+                                 help='Select the type of car '
+                                 'used to collect data. '
+                                 'Valid type: mkz_std, udev_std.')
         self._args = None
 
     def args(self):
@@ -133,7 +147,12 @@ class Recorder(object):
         # Use the best disk, or fallback '/apollo' if none available.
         disk_to_use = disks[0]['mountpoint'] if len(disks) > 0 else '/apollo'
 
-        topics = MAP_TOPICS.copy()
+        topics = []
+        if self.args.map_type == 'mkz_std':
+            topics.extend(MAP_MKZ_STD_TOPICS)
+        elif self.args.map_type == 'udev_std':
+            topics.extend(MAP_UDEV_STD_TOPICS)
+
         if self.args.additional_topics:
             topics.extend(self.args.additional_topics)
         self.record_task(disk_to_use, topics)
