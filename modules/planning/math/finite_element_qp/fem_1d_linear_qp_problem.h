@@ -21,6 +21,7 @@
 #pragma once
 
 #include <array>
+#include <iostream>
 #include <vector>
 
 #include "modules/planning/math/finite_element_qp/fem_1d_qp_problem.h"
@@ -41,6 +42,8 @@ class Fem1dLinearQpProblem : public Fem1dQpProblem {
 
   bool Optimize() override;
 
+  void PreSetKernel() override;
+
  private:
   // naming convention follows osqp solver.
   void CalcualteKernel(std::vector<c_float>* P_data,
@@ -54,6 +57,13 @@ class Fem1dLinearQpProblem : public Fem1dQpProblem {
                                  std::vector<c_int>* A_indptr,
                                  std::vector<c_float>* lower_bounds,
                                  std::vector<c_float>* upper_bounds) override;
+
+ private:
+  bool is_const_kernel_ = false;
+
+  std::vector<c_float> P_data;
+  std::vector<c_int> P_indices;
+  std::vector<c_int> P_indptr;
 };
 
 }  // namespace planning

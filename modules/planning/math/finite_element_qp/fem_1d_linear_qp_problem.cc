@@ -16,6 +16,9 @@
 
 #include "modules/planning/math/finite_element_qp/fem_1d_linear_qp_problem.h"
 
+#include <algorithm>
+#include <chrono>
+
 #include "Eigen/Core"
 #include "cybertron/common/log.h"
 
@@ -28,10 +31,13 @@ using Eigen::MatrixXd;
 using apollo::common::math::DenseToCSCMatrix;
 
 bool Fem1dLinearQpProblem::Optimize() {
-  std::vector<c_float> P_data;
-  std::vector<c_int> P_indices;
-  std::vector<c_int> P_indptr;
-  CalcualteKernel(&P_data, &P_indices, &P_indptr);
+  auto start_time = std::chrono::system_clock::now();
+  if (!is_const_kernel_) {
+    PreSetKernel();
+  }
+  auto end_time1 = std::chrono::system_clock::now();
+  std::chrono::duration<double> diff = end_time1 - start_time;
+  ADEBUG << "Set Kernel used time: " << diff.count() * 1000 << " ms.";
 
   std::vector<c_float> A_data;
   std::vector<c_int> A_indices;
@@ -40,9 +46,16 @@ bool Fem1dLinearQpProblem::Optimize() {
   std::vector<c_float> upper_bounds;
   CalcualteAffineConstraint(&A_data, &A_indices, &A_indptr, &lower_bounds,
                             &upper_bounds);
+  auto end_time2 = std::chrono::system_clock::now();
+  diff = end_time2 - end_time1;
+  ADEBUG << "CalcualteAffineConstraint used time: " << diff.count() * 1000
+         << " ms.";
 
   std::vector<c_float> q;
   CalcualteOffset(&q);
+  auto end_time3 = std::chrono::system_clock::now();
+  diff = end_time3 - end_time2;
+  ADEBUG << "CalcualteOffset used time: " << diff.count() * 1000 << " ms.";
 
   // Problem settings
   OSQPSettings* settings =
@@ -73,97 +86,17 @@ bool Fem1dLinearQpProblem::Optimize() {
   c_free(data->P);
   c_free(data);
   c_free(settings);
+
+  auto end_time4 = std::chrono::system_clock::now();
+  diff = end_time4 - end_time3;
+  ADEBUG << "Run OptimizeWithOsqp used time: " << diff.count() * 1000 << " ms.";
+
   return true;
 }
 
 void Fem1dLinearQpProblem::CalcualteKernel(std::vector<c_float>* P_data,
                                            std::vector<c_int>* P_indices,
                                            std::vector<c_int>* P_indptr) {
-  MatrixXd kernel_x = MatrixXd::Zero(num_var_, num_var_);  // dense matrix
-  MatrixXd kernel_x_mid_line =
-      MatrixXd::Zero(num_var_, num_var_);                      // dense matrix
-  MatrixXd kernel_x_p = MatrixXd::Zero(num_var_, num_var_);    // dense matrix
-  MatrixXd kernel_x_pp = MatrixXd::Zero(num_var_, num_var_);   // dense matrix
-  MatrixXd kernel_x_ppp = MatrixXd::Zero(num_var_, num_var_);  // dense matrix
-
-  for (size_t i = 0; i < num_var_; ++i) {
-    kernel_x(i, i) += 1.0;
-    kernel_x_mid_line(i, i) += 1.0;
-
-    // first order derivative
-    if (i == 0) {
-      kernel_x_p(i, i) += 1.0;
-    } else {
-      kernel_x_p(i, i) += 1.0;
-      kernel_x_p(i - 1, i - 1) += 1.0;
-      kernel_x_p(i, i - 1) += -1.0;
-      kernel_x_p(i - 1, i) += -1.0;
-    }
-
-    // second order derivative
-    if (i == 0) {
-      kernel_x_pp(i, i) += 1.0;
-    } else if (i == 1) {
-      kernel_x_pp(i, i) += 1.0;
-      kernel_x_pp(i - 1, i - 1) += 4.0;
-      kernel_x_pp(i, i - 1) += -2.0;
-      kernel_x_pp(i - 1, i) += -2.0;
-    } else {
-      kernel_x_pp(i, i) += 1.0;
-      kernel_x_pp(i - 1, i - 1) += 4.0;
-      kernel_x_pp(i - 2, i - 2) += 1.0;
-
-      kernel_x_pp(i, i - 1) += -2.0;
-      kernel_x_pp(i - 1, i) += -2.0;
-      kernel_x_pp(i - 1, i - 2) += -2.0;
-      kernel_x_pp(i - 2, i - 1) += -2.0;
-      kernel_x_pp(i, i - 2) += 1.0;
-      kernel_x_pp(i - 2, i) += 1.0;
-    }
-
-    // third order derivative
-    if (i == 0) {
-      kernel_x_ppp(0, 0) += 1.0;
-    } else if (i == 1) {
-      kernel_x_ppp(0, 0) += 9.0;
-      kernel_x_ppp(1, 1) += 1.0;
-
-      kernel_x_ppp(0, 1) += -3.0;
-      kernel_x_ppp(1, 0) += -3.0;
-    } else if (i == 2) {
-      kernel_x_ppp(0, 0) += 9.0;
-      kernel_x_ppp(1, 1) += 9.0;
-      kernel_x_ppp(2, 2) += 1.0;
-
-      kernel_x_ppp(1, 2) += -3.0;
-      kernel_x_ppp(2, 1) += -3.0;
-      kernel_x_ppp(0, 2) += 3.0;
-      kernel_x_ppp(2, 0) += 3.0;
-
-      kernel_x_ppp(0, 1) += -9.0;
-      kernel_x_ppp(1, 0) += -9.0;
-    } else {
-      kernel_x_ppp(i - 3, i - 3) += 1.0;
-      kernel_x_ppp(i - 2, i - 2) += 9.0;
-      kernel_x_ppp(i - 1, i - 1) += 9.0;
-      kernel_x_ppp(i, i) += 1.0;
-
-      kernel_x_ppp(i - 1, i) += -3.0;
-      kernel_x_ppp(i, i - 1) += -3.0;
-      kernel_x_ppp(i - 2, i) += 3.0;
-      kernel_x_ppp(i, i - 2) += 3.0;
-      kernel_x_ppp(i - 3, i) += -1.0;
-      kernel_x_ppp(i, i - 3) += -1.0;
-
-      kernel_x_ppp(i - 2, i - 1) += -9.0;
-      kernel_x_ppp(i - 1, i - 2) += -9.0;
-      kernel_x_ppp(i - 3, i - 1) += 3.0;
-      kernel_x_ppp(i - 1, i - 3) += 3.0;
-
-      kernel_x_ppp(i - 3, i - 2) += -3.0;
-      kernel_x_ppp(i - 2, i - 3) += -3.0;
-    }
-  }
   // pre-calculate some const
   const double one_over_delta_s_sq_coeff =
       1.0 / delta_s_sq_ * weight_.x_derivative_w;
@@ -172,13 +105,75 @@ void Fem1dLinearQpProblem::CalcualteKernel(std::vector<c_float>* P_data,
   const double one_over_delta_s_hex_coeff =
       1.0 / (delta_s_sq_ * delta_s_tetra_) * weight_.x_third_order_derivative_w;
 
-  const MatrixXd kernel = kernel_x * 2.0 * weight_.x_w +
-                          kernel_x_mid_line * 2.0 * weight_.x_mid_line_w +
-                          kernel_x_p * 2.0 * one_over_delta_s_sq_coeff +
-                          kernel_x_pp * 2.0 * one_over_delta_s_tetra_coeff +
-                          kernel_x_ppp * 2.0 * one_over_delta_s_hex_coeff;
+  int N = num_var_;
 
-  DenseToCSCMatrix(kernel, P_data, P_indices, P_indptr);
+  std::array<double, 7> k;
+  k[0] = -1.0 * 2.0 * one_over_delta_s_hex_coeff;
+  k[1] = 1.0 * 2.0 * one_over_delta_s_tetra_coeff +
+         (3.0 + 3.0) * 2.0 * one_over_delta_s_hex_coeff;
+  k[2] = (-1.0) * 2.0 * one_over_delta_s_sq_coeff +
+         (-2.0 - 2.0) * 2.0 * one_over_delta_s_tetra_coeff +
+         (-3.0 - 9.0 - 3.0) * 2.0 * one_over_delta_s_hex_coeff;
+  k[3] = 1.0 * 2.0 * weight_.x_w + 1.0 * 2.0 * weight_.x_mid_line_w +
+         (1.0 + 1.0) * 2.0 * one_over_delta_s_sq_coeff +
+         (1.0 + 4.0 + 1.0) * 2.0 * one_over_delta_s_tetra_coeff +
+         (1.0 + 9.0 + 9.0 + 1.0) * 2.0 * one_over_delta_s_hex_coeff;
+  k[4] = k[2];
+  k[5] = k[1];
+  k[6] = k[0];
+
+  for (int i = 0; i < N; ++i) {
+    if (i + 3 < N) {
+      for (int j = std::max(0, 3 - i); j < 7; ++j) {
+        P_data->push_back(k[j]);
+      }
+    } else if (i + 3 == N) {
+      P_data->push_back(k[0]);
+      P_data->push_back(k[1]);
+      P_data->push_back(k[2]);
+      P_data->push_back(k[3] - 1.0 * 2.0 * one_over_delta_s_hex_coeff);
+      P_data->push_back(k[4] - (-3.0 * 2.0 * one_over_delta_s_hex_coeff));
+      P_data->push_back(k[5] - 3.0 * 2.0 * one_over_delta_s_hex_coeff);
+    } else if (i + 2 == N) {
+      P_data->push_back(k[0]);
+      P_data->push_back(k[1]);
+      P_data->push_back(k[2] - (-3.0 * 2.0 * one_over_delta_s_hex_coeff));
+      P_data->push_back(k[3] - (1.0 * 2.0 * one_over_delta_s_tetra_coeff) -
+                        ((9.0 + 1.0) * 2.0 * one_over_delta_s_hex_coeff));
+      P_data->push_back(k[4] - (-2.0 * 2.0 * one_over_delta_s_tetra_coeff) -
+                        (-9.0 - 3.0) * 2.0 * one_over_delta_s_hex_coeff);
+    } else {  // i + 1 == N
+      P_data->push_back(k[0]);
+      P_data->push_back(k[1] - 3.0 * 2.0 * one_over_delta_s_hex_coeff);
+      P_data->push_back(k[2] - (-2.0 * 2.0 * one_over_delta_s_tetra_coeff) -
+                        (-9.0 - 3.0) * 2.0 * one_over_delta_s_hex_coeff);
+      P_data->push_back(k[3] - (1.0 * 2.0 * one_over_delta_s_sq_coeff) -
+                        (4.0 + 1.0) * 2.0 * one_over_delta_s_tetra_coeff -
+                        (1.0 + 9.0 + 9.0) * 2.0 * one_over_delta_s_hex_coeff);
+    }
+  }
+
+  // P_indices
+  for (int i = 0; i < N; ++i) {
+    for (int j = std::max(0, i - 3); j < std::min(i + 4, N); ++j) {
+      P_indices->push_back(j);
+    }
+  }
+
+  int ind_p = 0;
+  for (int i = 0; i < N; ++i) {
+    P_indptr->push_back(ind_p);
+    int delta = std::min(i + 3, N - 1) - std::max(0, i - 3) + 1;
+    ind_p += delta;
+  }
+  P_indptr->push_back(ind_p);
+
+  CHECK_EQ(P_data->size(), P_indices->size());
+}
+
+void Fem1dLinearQpProblem::PreSetKernel() {
+  CalcualteKernel(&P_data, &P_indices, &P_indptr);
+  is_const_kernel_ = true;
 }
 
 void Fem1dLinearQpProblem::CalcualteOffset(std::vector<c_float>* q) {
