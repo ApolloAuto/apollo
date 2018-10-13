@@ -84,20 +84,32 @@ bool Fem1dExpandedQpProblem::Optimize() {
 void Fem1dExpandedQpProblem::CalcualteKernel(std::vector<c_float>* P_data,
                                              std::vector<c_int>* P_indices,
                                              std::vector<c_int>* P_indptr) {
-  const size_t kNumParam = 3 * x_bounds_.size();
+  P_data->clear();
+  P_indices->clear();
+  P_indptr->clear();
+
+  const int kNumParam = 3 * num_var_;
+  const int N = num_var_;
 
   MatrixXd kernel = MatrixXd::Zero(kNumParam, kNumParam);  // dense matrix
 
-  for (size_t i = 0; i < kNumParam; ++i) {
-    if (i < num_var_) {
-      kernel(i, i) = 2.0 * weight_.x_w + 2.0 * weight_.x_mid_line_w;
-    } else if (i < 2 * num_var_) {
-      kernel(i, i) = 2.0 * weight_.x_derivative_w;
+  int idx_ptr = 0;
+  for (int i = 0; i < kNumParam; ++i) {
+    if (i < N) {
+      P_data->emplace_back(2.0 * weight_.x_w + 2.0 * weight_.x_mid_line_w);
+      P_indices->emplace_back(i);
+    } else if (i < 2 * N) {
+      P_data->emplace_back(2.0 * weight_.x_derivative_w);
+      P_indices->emplace_back(i);
     } else {
-      kernel(i, i) = 2.0 * weight_.x_second_order_derivative_w;
+      P_indices->emplace_back(i);
+      P_data->emplace_back(2.0 * weight_.x_second_order_derivative_w);
     }
+    P_indptr->emplace_back(idx_ptr);
+    idx_ptr += 1;
   }
-  DenseToCSCMatrix(kernel, P_data, P_indices, P_indptr);
+  P_indptr->emplace_back(idx_ptr);
+  DCHECK_EQ(P_data->size(), P_indices->size());
 }
 
 void Fem1dExpandedQpProblem::CalcualteOffset(std::vector<c_float>* q) {

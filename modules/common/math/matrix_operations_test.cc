@@ -327,6 +327,59 @@ TEST(DENSE_TO_CSC_MATRIX, dense_to_csc_matrix_test) {
   }
 }
 
+TEST(DENSE_TO_CSC_MATRIX, patterned_dense_to_csc_matrix_test) {
+  int N = 5;
+  Eigen::MatrixXd dense_matrix = Eigen::MatrixXd::Zero(N * 3, N * 3);
+  for (int i = 0; i < N; ++i) {
+    dense_matrix(i, i) = 1.0;
+    if (i + 1 < N) {
+      dense_matrix(i, i + 1) = 1.0;
+    }
+    if (i > 0) {
+      dense_matrix(i, i - 1) = 1.0;
+    }
+  }
+
+  for (int i = 0; i < N; ++i) {
+    dense_matrix(i + N, i + N) = 1.0;
+  }
+
+  for (int i = 0; i < N; ++i) {
+    dense_matrix(i + 2 * N, i + 2 * N) = 1.0;
+    if (i + 1 < N) {
+      dense_matrix(i + 2 * N, i + 2 * N + 1) = 1.0;
+    }
+    if (i > 0) {
+      dense_matrix(i + 2 * N, i + 2 * N - 1) = 1.0;
+    }
+  }
+
+  for (int i = 0; i < dense_matrix.rows(); ++i) {
+    for (int j = 0; j < dense_matrix.cols(); ++j) {
+      std::cout << dense_matrix(i, j) << ", ";
+    }
+    std::cout << std::endl;
+  }
+  std::cout << std::endl;
+
+  std::vector<double> data;
+  std::vector<int> indices;
+  std::vector<int> indptr;
+
+  DenseToCSCMatrix(dense_matrix, &data, &indices, &indptr);
+  EXPECT_EQ(data.size(), indices.size());
+
+  for (const auto ind : indices) {
+    std::cout << ind << ", ";
+  }
+  std::cout << std::endl;
+
+  for (const auto ipr : indptr) {
+    std::cout << ipr << ", ";
+  }
+  std::cout << std::endl;
+}
+
 }  // namespace math
 }  // namespace common
 }  // namespace apollo
