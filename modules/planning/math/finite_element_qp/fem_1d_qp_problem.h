@@ -77,6 +77,8 @@ class Fem1dQpProblem {
 
   virtual bool Optimize() = 0;
 
+  virtual void PreSetKernel() {}
+
   virtual std::vector<double> x() const { return x_; }
 
   virtual std::vector<double> x_derivative() const { return x_derivative_; }

@@ -25,15 +25,18 @@
 #include "cybertron/common/log.h"
 #include "gtest/gtest.h"
 
+#include "modules/planning/common/planning_gflags.h"
+
 namespace apollo {
 namespace planning {
 
 TEST(Fem1dLinearQpProblemTest, basic_test) {
+  FLAGS_enable_osqp_debug = false;
   Fem1dQpProblem* fem_qp = new Fem1dLinearQpProblem();
   std::array<double, 3> x_init = {1.5, 0.0, 0.001};
   double delta_s = 1.0;
   std::vector<std::pair<double, double>> x_bounds;
-  for (int i = 0; i < 200; ++i) {
+  for (int i = 0; i < 1000; ++i) {
     x_bounds.emplace_back(std::make_pair(-1.81, 1.95));
   }
   std::array<double, 5> w = {1.0, 2.0, 3.0, 4.0, 1.45};
@@ -41,11 +44,13 @@ TEST(Fem1dLinearQpProblemTest, basic_test) {
   EXPECT_TRUE(
       fem_qp->Init(x_init, delta_s, x_bounds, w, max_x_third_order_derivative));
 
-  auto start_time = std::chrono::system_clock::now();
-  EXPECT_TRUE(fem_qp->Optimize());
-  auto end_time = std::chrono::system_clock::now();
-  std::chrono::duration<double> diff = end_time - start_time;
-  AINFO << "qp_optimizer used time: " << diff.count() * 1000 << " ms.";
+  for (int i = 0; i < 3; ++i) {
+    auto start_time = std::chrono::system_clock::now();
+    EXPECT_TRUE(fem_qp->Optimize());
+    auto end_time = std::chrono::system_clock::now();
+    std::chrono::duration<double> diff = end_time - start_time;
+    AINFO << "qp_optimizer used time: " << diff.count() * 1000 << " ms.\n\n";
+  }
 
   const std::vector<double> x = fem_qp->x();
   for (size_t i = 1; i < x.size(); ++i) {
