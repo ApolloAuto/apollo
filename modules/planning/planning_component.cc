@@ -117,10 +117,6 @@ bool PlanningComponent::Proc(
 
   ADCTrajectory adc_trajectory_pb;
 
-  if (local_view_.is_new_routing) {
-    PlanningContext::Instance()->UpdateRouting(*local_view_.routing);
-  }
-
   planning_base_->RunOnce(local_view_, &adc_trajectory_pb);
 
   common::util::FillHeader(node_->Name(), &adc_trajectory_pb);
