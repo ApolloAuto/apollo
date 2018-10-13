@@ -32,6 +32,8 @@ using ::apollo::common::ErrorCode;
 using ::apollo::common::Status;
 using ::apollo::hdmap::PathOverlap;
 
+SidePassPathDecider::SidePassPathDecider() : Decider("SidePassPathDecider") {}
+
 bool SidePassPathDecider::Init(
     const ScenarioConfig::ScenarioTaskConfig &config) {
   is_init_ = true;
