@@ -26,6 +26,7 @@
 #include "cybertron/common/file.h"
 #include "cybertron/node/node.h"
 #include "cybertron/proto/component_config.pb.h"
+#include "gflags/gflags.h"
 
 namespace apollo {
 namespace cybertron {
@@ -44,21 +45,51 @@ class ComponentBase : public std::enable_shared_from_this<ComponentBase> {
   virtual bool Initialize(const TimerComponentConfig& config) { return false; }
 
   template <typename T>
-  bool GetProtoConfig(T* config) {
+  bool GetProtoConfig(T* config) const {
     return common::GetProtoFromFile(config_file_path_, config);
   }
 
  protected:
   virtual bool Init() = 0;
   const std::string& ConfigFilePath() const { return config_file_path_; }
-  void SetConfigFilePath(const ComponentConfig& config) {
-    if (config.has_config_file_path()) {
+
+  void LoadConfigFiles(const ComponentConfig& config) {
+    if (!config.config_file_path().empty()) {
       if (config.config_file_path()[0] != '/') {
         config_file_path_ = common::GetAbsolutePath(common::ModuleRoot(),
                                                     config.config_file_path());
       } else {
         config_file_path_ = config.config_file_path();
       }
+    }
+
+    if (!config.flag_file_path().empty()) {
+      std::string flag_file_path = config.flag_file_path();
+      if (flag_file_path[0] != '/') {
+        flag_file_path =
+            common::GetAbsolutePath(common::ModuleRoot(), flag_file_path);
+      }
+      google::SetCommandLineOption("flagfile", flag_file_path.c_str());
+    }
+  }
+
+  void LoadConfigFiles(const TimerComponentConfig& config) {
+    if (!config.config_file_path().empty()) {
+      if (config.config_file_path()[0] != '/') {
+        config_file_path_ = common::GetAbsolutePath(common::ModuleRoot(),
+                                                    config.config_file_path());
+      } else {
+        config_file_path_ = config.config_file_path();
+      }
+    }
+
+    if (!config.flag_file_path().empty()) {
+      std::string flag_file_path = config.flag_file_path();
+      if (flag_file_path[0] != '/') {
+        flag_file_path =
+            common::GetAbsolutePath(common::ModuleRoot(), flag_file_path);
+      }
+      google::SetCommandLineOption("flagfile", flag_file_path.c_str());
     }
   }
 

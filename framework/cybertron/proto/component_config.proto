@@ -13,11 +13,13 @@ message ReaderOption {
 message ComponentConfig {
     optional string name  = 1;
     optional string config_file_path = 2;
-    repeated ReaderOption readers = 3;
+    optional string flag_file_path = 3;
+    repeated ReaderOption readers = 4;
 }
 
 message TimerComponentConfig {
     optional string name = 1;
     optional string config_file_path = 2;
-    optional uint32 interval = 3;
+    optional string flag_file_path = 3;
+    optional uint32 interval = 4;
 }

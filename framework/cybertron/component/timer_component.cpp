@@ -30,10 +30,12 @@ bool TimerComponent::Process() {
 }
 
 bool TimerComponent::Initialize(const TimerComponentConfig& config) {
-  node_.reset(new Node(config.name()));
-  if (config.has_config_file_path()) {
-    config_file_path_ = config.config_file_path();
+  if (!config.has_name() || !config.has_interval()) {
+    AERROR << "Missing required field in config file.";
+    return false;
   }
+  node_.reset(new Node(config.name()));
+  LoadConfigFiles(config);
   if (!Init()) {
     return false;
   }
