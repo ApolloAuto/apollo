@@ -55,7 +55,7 @@ MAP_UDEV_STD_TOPICS = [
     '/apollo/sensor/gnss/ins_stat',
     '/apollo/sensor/velodyne128/VelodyneScan',
     '/apollo/sensor/velodyne128/compensator/PointCloud2',
-    '/apollo/sensor/velodyne16/front/center/VelodyneScan',
+    '/apollo/sensor/velodyne16/up/center/VelodyneScan',
     '/apollo/sensor/camera/front_6mm/image/compressed',
     '/apollo/sensor/camera/front_12mm/image/compressed',
 ]
