@@ -24,6 +24,8 @@
 #include "boost/filesystem.hpp"
 #include "boost/range/iterator_range.hpp"
 
+#include "cybertron/cybertron.h"
+#include "cybertron/record/record_reader.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/math/vec2d.h"
 #include "modules/common/time/time.h"
@@ -57,6 +59,8 @@ using apollo::localization::LocalizationEstimate;
 using apollo::perception::PerceptionObstacle;
 using apollo::perception::PerceptionObstacles;
 using apollo::planning::ADCTrajectory;
+using cybertron::record::RecordMessage;
+using cybertron::record::RecordReader;
 
 PredictionComponent::~PredictionComponent() { Stop(); }
 
@@ -65,34 +69,26 @@ std::string PredictionComponent::Name() const {
 }
 
 void PredictionComponent::ProcessOfflineData(const std::string& filename) {
-  // TODO(all) implement
-
-  /**
-   const std::vector<std::string> topics{FLAGS_perception_obstacle_topic,
-                                         FLAGS_localization_topic};
-   rosbag::Bag bag;
-   try {
-     bag.open(filename, rosbag::bagmode::Read);
-   } catch (const rosbag::BagIOException& e) {
-     AERROR << "BagIOException when open bag: " << filename
-            << " Exception: " << e.what();
-     bag.close();
-     return;
-   } catch (...) {
-     AERROR << "Failed to open bag: " << filename;
-     bag.close();
-     return;
-   }
-   rosbag::View view(bag, rosbag::TopicQuery(topics));
-   for (auto it = view.begin(); it != view.end(); ++it) {
-     if (it->getTopic() == FLAGS_localization_topic) {
-       OnLocalization(*(it->instantiate<LocalizationEstimate>()));
-     } else if (it->getTopic() == FLAGS_perception_obstacle_topic) {
-       RunOnce(*(it->instantiate<PerceptionObstacles>()));
-     }
-   }
-   bag.close();
-   **/
+  RecordReader reader(filename);
+  RecordMessage message;
+  while (reader.ReadMessage(&message)) {
+    if (message.channel_name == FLAGS_perception_obstacle_topic) {
+      PerceptionObstacles perception_obstacles;
+      if (perception_obstacles.ParseFromString(message.content)) {
+        OnPerception(perception_obstacles);
+      }
+    } else if (message.channel_name == FLAGS_localization_topic) {
+      LocalizationEstimate localization;
+      if (localization.ParseFromString(message.content)) {
+        OnLocalization(localization);
+      }
+    } else if (message.channel_name == FLAGS_planning_trajectory_topic) {
+      ADCTrajectory adc_trajectory;
+      if (adc_trajectory.ParseFromString(message.content)) {
+        OnPlanning(adc_trajectory);
+      }
+    }
+  }
 }
 
 bool PredictionComponent::Init() {
@@ -179,7 +175,9 @@ void PredictionComponent::OnLocalization(
     const LocalizationEstimate& localization) {
   PoseContainer* pose_container = dynamic_cast<PoseContainer*>(
       ContainerManager::Instance()->GetContainer(AdapterConfig::LOCALIZATION));
-  CHECK_NOTNULL(pose_container);
+  if (!pose_container) {
+    return;
+  }
   pose_container->Insert(localization);
 
   ADEBUG << "Received a localization message ["
@@ -192,11 +190,97 @@ void PredictionComponent::OnPlanning(
       dynamic_cast<ADCTrajectoryContainer*>(
           ContainerManager::Instance()->GetContainer(
               AdapterConfig::PLANNING_TRAJECTORY));
-  CHECK_NOTNULL(adc_trajectory_container);
+  if (!adc_trajectory_container) {
+    return;
+  }
   adc_trajectory_container->Insert(adc_trajectory);
 
   ADEBUG << "Received a planning message [" << adc_trajectory.ShortDebugString()
          << "].";
+}
+
+void PredictionComponent::OnPerception(
+    const PerceptionObstacles& perception_obstacles) {
+  // Insert obstacle
+  ObstaclesContainer* obstacles_container = dynamic_cast<ObstaclesContainer*>(
+      ContainerManager::Instance()->GetContainer(
+          AdapterConfig::PERCEPTION_OBSTACLES));
+  if (!obstacles_container) {
+    return;
+  }
+  obstacles_container->Insert(perception_obstacles);
+
+  // Scenario analysis
+  ScenarioManager::Instance()->Run();
+
+  // Set up obstacle cluster
+  obstacles_container->BuildLaneGraph();
+
+  ADEBUG << "Received a perception message ["
+         << perception_obstacles.ShortDebugString() << "].";
+
+  // Update ADC status
+  PoseContainer* pose_container = dynamic_cast<PoseContainer*>(
+      ContainerManager::Instance()->GetContainer(AdapterConfig::LOCALIZATION));
+  ADCTrajectoryContainer* adc_container = dynamic_cast<ADCTrajectoryContainer*>(
+      ContainerManager::Instance()->GetContainer(
+          AdapterConfig::PLANNING_TRAJECTORY));
+  if (!pose_container || !adc_container) {
+    return;
+  }
+
+  const PerceptionObstacle* adc = pose_container->ToPerceptionObstacle();
+  if (adc != nullptr) {
+    obstacles_container->InsertPerceptionObstacle(*adc, adc->timestamp());
+    double x = adc->position().x();
+    double y = adc->position().y();
+    ADEBUG << "Get ADC position [" << std::fixed << std::setprecision(6) << x
+           << ", " << std::fixed << std::setprecision(6) << y << "].";
+    adc_container->SetPosition({x, y});
+  }
+
+  // Make evaluations
+  EvaluatorManager::Instance()->Run(perception_obstacles);
+
+  // No prediction trajectories for offline mode
+  if (FLAGS_prediction_offline_mode) {
+    return;
+  }
+
+  // Make predictions
+  PredictorManager::Instance()->Run(perception_obstacles);
+
+  // Get predicted obstacles
+  auto prediction_obstacles =
+      PredictorManager::Instance()->prediction_obstacles();
+  prediction_obstacles.set_start_timestamp(frame_start_time_);
+  prediction_obstacles.set_end_timestamp(Clock::NowInSeconds());
+  prediction_obstacles.mutable_header()->set_lidar_timestamp(
+      perception_obstacles.header().lidar_timestamp());
+  prediction_obstacles.mutable_header()->set_camera_timestamp(
+      perception_obstacles.header().camera_timestamp());
+  prediction_obstacles.mutable_header()->set_radar_timestamp(
+      perception_obstacles.header().radar_timestamp());
+
+  if (FLAGS_prediction_test_mode) {
+    for (auto const& prediction_obstacle :
+         prediction_obstacles.prediction_obstacle()) {
+      for (auto const& trajectory : prediction_obstacle.trajectory()) {
+        for (auto const& trajectory_point : trajectory.trajectory_point()) {
+          if (!ValidationChecker::ValidTrajectoryPoint(trajectory_point)) {
+            AERROR << "Invalid trajectory point ["
+                   << trajectory_point.ShortDebugString() << "]";
+            return;
+          }
+        }
+      }
+    }
+  }
+
+  // Publish output
+  common::util::FillHeader(node_->Name(), &prediction_obstacles);
+  prediction_writer_->Write(
+      std::make_shared<PredictionObstacles>(prediction_obstacles));
 }
 
 bool PredictionComponent::Proc(
@@ -215,85 +299,11 @@ bool PredictionComponent::Proc(
     return false;
   }
 
-  double start_timestamp = Clock::NowInSeconds();
+  frame_start_time_ = Clock::NowInSeconds();
 
   OnLocalization(*localization);
+  OnPerception(*perception_obstacles);
 
-  // Insert obstacle
-  ObstaclesContainer* obstacles_container = dynamic_cast<ObstaclesContainer*>(
-      ContainerManager::Instance()->GetContainer(
-          AdapterConfig::PERCEPTION_OBSTACLES));
-  CHECK_NOTNULL(obstacles_container);
-  obstacles_container->Insert(*perception_obstacles);
-
-  // Scenario analysis
-  ScenarioManager::Instance()->Run();
-
-  obstacles_container->BuildLaneGraph();
-
-  ADEBUG << "Received a perception message ["
-         << perception_obstacles->ShortDebugString() << "].";
-
-  // Update ADC status
-  PoseContainer* pose_container = dynamic_cast<PoseContainer*>(
-      ContainerManager::Instance()->GetContainer(AdapterConfig::LOCALIZATION));
-  ADCTrajectoryContainer* adc_container = dynamic_cast<ADCTrajectoryContainer*>(
-      ContainerManager::Instance()->GetContainer(
-          AdapterConfig::PLANNING_TRAJECTORY));
-  CHECK_NOTNULL(pose_container);
-  CHECK_NOTNULL(adc_container);
-
-  const PerceptionObstacle* adc = pose_container->ToPerceptionObstacle();
-  if (adc != nullptr) {
-    obstacles_container->InsertPerceptionObstacle(*adc, adc->timestamp());
-    double x = adc->position().x();
-    double y = adc->position().y();
-    ADEBUG << "Get ADC position [" << std::fixed << std::setprecision(6) << x
-           << ", " << std::fixed << std::setprecision(6) << y << "].";
-    adc_container->SetPosition({x, y});
-  }
-
-  // Make evaluations
-  EvaluatorManager::Instance()->Run(*perception_obstacles);
-
-  // No prediction trajectories for offline mode
-  if (FLAGS_prediction_offline_mode) {
-    return true;
-  }
-
-  // Make predictions
-  PredictorManager::Instance()->Run(*perception_obstacles);
-
-  auto prediction_obstacles =
-      PredictorManager::Instance()->prediction_obstacles();
-  prediction_obstacles.set_start_timestamp(start_timestamp);
-  prediction_obstacles.set_end_timestamp(Clock::NowInSeconds());
-  prediction_obstacles.mutable_header()->set_lidar_timestamp(
-      perception_obstacles->header().lidar_timestamp());
-  prediction_obstacles.mutable_header()->set_camera_timestamp(
-      perception_obstacles->header().camera_timestamp());
-  prediction_obstacles.mutable_header()->set_radar_timestamp(
-      perception_obstacles->header().radar_timestamp());
-
-  if (FLAGS_prediction_test_mode) {
-    for (auto const& prediction_obstacle :
-         prediction_obstacles.prediction_obstacle()) {
-      for (auto const& trajectory : prediction_obstacle.trajectory()) {
-        for (auto const& trajectory_point : trajectory.trajectory_point()) {
-          if (!ValidationChecker::ValidTrajectoryPoint(trajectory_point)) {
-            AERROR << "Invalid trajectory point ["
-                   << trajectory_point.ShortDebugString() << "]";
-            return false;
-          }
-        }
-      }
-    }
-  }
-
-  common::util::FillHeader(node_->Name(), &prediction_obstacles);
-
-  prediction_writer_->Write(
-      std::make_shared<PredictionObstacles>(prediction_obstacles));
   return true;
 }
 
