@@ -21,6 +21,7 @@
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/map/pnc_map/pnc_map.h"
 #include "modules/planning/common/planning_context.h"
+#include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
 namespace planning {
@@ -32,9 +33,6 @@ using apollo::routing::RoutingRequest;
 using apollo::routing::RoutingResponse;
 
 bool PlanningComponent::Init() {
-  AINFO << "Loading gflag from file: " << ConfigFilePath();
-  google::SetCommandLineOption("flagfile", ConfigFilePath().c_str());
-
   planning_base_->Init();
   routing_reader_ = node_->CreateReader<RoutingResponse>(
       FLAGS_routing_response_topic,
