@@ -14,7 +14,7 @@ cc_library(
         "//cybertron:init_lib",
         "//cybertron/common:common_lib",
         "//cybertron/message:message_lib",
-        "//cybertron/proto:proto_lib",
+        "//cybertron/proto:record_cc_proto",
     ],
 )
 

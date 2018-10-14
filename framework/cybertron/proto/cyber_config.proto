@@ -2,13 +2,13 @@ syntax = "proto2";
 
 package apollo.cybertron.proto;
 
-import "routine_conf.proto";
-import "scheduler_conf.proto";
-import "transport_conf.proto";
-import "log_conf.proto";
-import "perf_conf.proto";
-import "run_mode_conf.proto";
-import "record_conf.proto";
+import "cybertron/proto/routine_conf.proto";
+import "cybertron/proto/scheduler_conf.proto";
+import "cybertron/proto/transport_conf.proto";
+import "cybertron/proto/log_conf.proto";
+import "cybertron/proto/perf_conf.proto";
+import "cybertron/proto/run_mode_conf.proto";
+import "cybertron/proto/record_conf.proto";
 
 message CyberConfig {
     optional LogConf log_conf = 1;

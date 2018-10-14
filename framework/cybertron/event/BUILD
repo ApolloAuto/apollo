@@ -13,7 +13,7 @@ cc_library(
     deps = [
           "//cybertron:init_lib",
           "//cybertron/common:common_lib",
-          "//cybertron/proto:proto_lib",
+          "//cybertron/proto:perf_conf_cc_proto",
           "//cybertron/time:time_lib",
     ],
 )

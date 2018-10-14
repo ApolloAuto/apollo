@@ -2,7 +2,7 @@ syntax = "proto2";
 
 package apollo.cybertron.proto;
 
-import "role_attributes.proto";
+import "cybertron/proto/role_attributes.proto";
 
 enum ChangeType {
     CHANGE_NODE = 1;

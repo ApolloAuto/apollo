@@ -2,7 +2,7 @@ syntax = "proto2";
 
 package apollo.cybertron.proto;
 
-import "component_config.proto";
+import "cybertron/proto/component_config.proto";
 
 message ComponentInfo {
     required string class_name = 1;

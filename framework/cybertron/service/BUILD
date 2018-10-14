@@ -12,7 +12,6 @@ cc_library(
     ]),
     deps = [
           "//cybertron:init_lib",
-          "//cybertron/proto:proto_lib",
           "//cybertron/time:time_lib",
     ],
 )

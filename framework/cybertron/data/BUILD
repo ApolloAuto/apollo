@@ -12,7 +12,9 @@ cc_library(
         "*.h",
         "**/*.h",
     ]),
-    copts = ["-Iframework"],
+    deps = [
+        "//cybertron/proto:component_config_cc_proto",
+    ],        
 )
 
 cpplint()

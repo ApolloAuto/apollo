@@ -13,7 +13,8 @@ cc_library(
     deps = [
         "//cybertron/common:common_lib",
         "//cybertron/base:base_lib",
-        "//cybertron/proto:proto_lib",
+        "//cybertron/proto:qos_profile_cc_proto",
+        "//cybertron/proto:transport_conf_cc_proto",
         "//cybertron/transport/common:transport_common_lib",
         "//cybertron/transport/message:transport_message_lib",
         "//cybertron/transport/qos:qos_lib",

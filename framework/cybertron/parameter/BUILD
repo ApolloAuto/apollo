@@ -15,6 +15,7 @@ cc_library(
         "//cybertron/data:data_lib",
         "//cybertron/message:message_lib",
         "//cybertron/service:service_lib",
+        "//cybertron/proto:parameter_cc_proto",
         "@fastrtps",
     ],
 )

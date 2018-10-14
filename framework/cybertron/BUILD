@@ -18,6 +18,7 @@ cc_binary(
     ]),
     deps = [
         ":cybertron_core",
+        "//cybertron/proto:dag_config_cc_proto",
     ],
     copts = [
         "-pthread",
@@ -61,7 +62,7 @@ cc_library(
           "//cybertron:init_lib",
           "//cybertron/logger:logger_lib",
           "//cybertron/node:node_lib",
-          "//cybertron/proto:proto_lib",
+          "//cybertron/proto:run_mode_conf_cc_proto",
           "//cybertron/parameter:parameter_lib",
           "//cybertron/record:record_lib",
           "//cybertron/scheduler:scheduler_lib",

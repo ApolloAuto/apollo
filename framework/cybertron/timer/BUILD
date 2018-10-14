@@ -15,7 +15,6 @@ cc_library(
           "//cybertron/croutine:croutine_lib",
           "//cybertron/data:data_lib",
           "//cybertron/event:event_lib",
-          "//cybertron/proto:proto_lib",
           "//cybertron/scheduler:scheduler_lib",
           "//cybertron/task:task_lib",
           "//cybertron/time:time_lib",

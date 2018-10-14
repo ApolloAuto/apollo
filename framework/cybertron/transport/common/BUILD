@@ -12,6 +12,7 @@ cc_library(
     ]),
     deps = [
         "//cybertron/common:common_lib",
+        "//cybertron/proto:role_attributes_cc_proto",
     ],
 )
 
