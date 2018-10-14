@@ -41,7 +41,7 @@ void Velodyne64Driver::Init() {
  *
  *  @returns true unless end of file reached
  */
-bool Velodyne64Driver::Poll(std::shared_ptr<VelodyneScan> scan) {
+bool Velodyne64Driver::Poll(const std::shared_ptr<VelodyneScan>& scan) {
   // Allocate a new shared pointer for zero-copy sharing with other nodelets.
   int poll_result = config_.use_sensor_sync() ? PollStandardSync(scan)
                                               : PollStandard(scan);

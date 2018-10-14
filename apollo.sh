@@ -99,16 +99,6 @@ function generate_build_targets() {
     BUILD_TARGETS=`bazel query //modules/... except //modules/perception/... except //modules/calibration/lidar_ex_checker/... union //cybertron/...`
   fi
 
-  # TODO: to remove once framework is ready to pass test
-  if $NOT_BUILD_FRAMEWORK; then
-    if [ -z $NOT_BUILD_PERCEPTION ] ; then
-      BUILD_TARGETS=`bazel query //modules/...`
-    else
-      info 'Skip building perception module!'
-      BUILD_TARGETS=`bazel query //modules/... except //modules/perception/... except //modules/calibration/lidar_ex_checker/...`
-    fi
-  fi
-
   if [ $? -ne 0 ]; then
     fail 'Build failed!'
   fi
@@ -406,9 +396,7 @@ function gen_coverage() {
 function run_test() {
   JOB_ARG="--jobs=$(nproc) --ram_utilization_factor 80"
 
-  NOT_BUILD_FRAMEWORK=true   # TODO: to remove
   generate_build_targets
-  NOT_BUILD_FRAMEWORK=false  # TODO: to remove
   if [ "$USE_GPU" == "1" ]; then
     echo -e "${YELLOW}Running tests under GPU mode. GPU is required to run the tests.${NO_COLOR}"
     echo "$BUILD_TARGETS" | xargs bazel test $DEFINES $JOB_ARG --config=unit_test -c dbg --test_verbose_timeout_warnings $@
@@ -781,7 +769,6 @@ function main() {
   local cmd=$1
   shift
 
-  NOT_BUILD_FRAMEWORK=false
   START_TIME=$(get_now)
   case $cmd in
     check)

@@ -97,7 +97,7 @@ bool VelodyneDriver::SetBaseTime() {
  *
  *  @returns true unless end of file reached
  */
-bool VelodyneDriver::Poll(std::shared_ptr<VelodyneScan> scan) {
+bool VelodyneDriver::Poll(const std::shared_ptr<VelodyneScan>& scan) {
   // Allocate a new shared pointer for zero-copy sharing with other nodelets.
   if (basetime_ == 0) {
     usleep(100);  // waiting for positioning data
