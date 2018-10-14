@@ -10,25 +10,25 @@ enum OptionalMode {
 }
 
 message ShmMulticastLocator {
-    required string ip = 1;
-    required int32 port = 2;
+    optional string ip = 1;
+    optional int32 port = 2;
 };
 
 message RtpsParticipantAttr {
-    required int32 lease_duration = 1;
-    required int32 announcement_period = 2;
-    required int32 domain_id_gain = 3;
-    required int32 port_base = 4;
+    optional int32 lease_duration = 1;
+    optional int32 announcement_period = 2;
+    optional int32 domain_id_gain = 3;
+    optional int32 port_base = 4;
 };
 
 message CommunicationMode {
-    required OptionalMode same_proc = 1 [default = INTRA];  // INTRA SHM RTPS
-    required OptionalMode diff_proc = 2 [default = SHM];    // SHM RTPS
-    required OptionalMode diff_host = 3 [default = RTPS];   // RTPS
+    optional OptionalMode same_proc = 1 [default = INTRA];  // INTRA SHM RTPS
+    optional OptionalMode diff_proc = 2 [default = SHM];    // SHM RTPS
+    optional OptionalMode diff_host = 3 [default = RTPS];   // RTPS
 };
 
 message ResourceLimit {
-    required uint32 max_history_depth = 1;
+    optional uint32 max_history_depth = 1;
 };
 
 message TransportConf {

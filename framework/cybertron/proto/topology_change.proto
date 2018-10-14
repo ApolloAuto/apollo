@@ -26,9 +26,9 @@ enum RoleType {
 };
 
 message ChangeMsg {
-    required uint64 timestamp = 1;
-    required ChangeType change_type = 2;
-    required OperateType operate_type = 3;
-    required RoleType role_type = 4;
-    required RoleAttributes role_attr = 5;
+    optional uint64 timestamp = 1;
+    optional ChangeType change_type = 2;
+    optional OperateType operate_type = 3;
+    optional RoleType role_type = 4;
+    optional RoleAttributes role_attr = 5;
 };

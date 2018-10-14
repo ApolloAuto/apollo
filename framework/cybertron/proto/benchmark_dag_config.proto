@@ -21,19 +21,19 @@ enum BTrigeType {
 }
 
 message BReaderConfig {
-  required string channel_name = 1;
+  optional string channel_name = 1;
   optional uint64 proc_gap_us = 2 [ default = 10000 ];
   optional BProcType proc_type = 3 [ default = BCPU ];
 }
 
 message BWriterConfig {
-  required string channel_name = 1;
+  optional string channel_name = 1;
   optional uint64 write_gap_us = 2 [ default = 100000 ];
   optional int32 msg_num = 3 [default = 100];
 }
 
 message BNodeConfig {
-    required string node_name = 1;
+    optional string node_name = 1;
     repeated BReaderConfig reader_conf = 2;
     repeated BWriterConfig writer_conf = 3;
     optional BNodeType type = 4 [ default = COMMON_NODE ];

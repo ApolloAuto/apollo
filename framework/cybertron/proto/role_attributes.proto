@@ -5,8 +5,8 @@ package apollo.cybertron.proto;
 import "cybertron/proto/qos_profile.proto";
 
 message SocketAddr {
-    required string ip = 1;  // dotted decimal
-    required uint32 port = 2;
+    optional string ip = 1;  // dotted decimal
+    optional uint32 port = 2;
 };
 
 message RoleAttributes {

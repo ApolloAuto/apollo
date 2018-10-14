@@ -23,13 +23,13 @@ enum Mode {
 
 message VelodynePacket {
   optional uint64 stamp = 1;
-  required bytes data = 2;
+  optional bytes data = 2;
 }
 
 message VelodyneScan {
   optional apollo.common.Header header = 1;
-  required Model model = 2;  // velodyne device model
-  required Mode mode = 3;    // velodyne work mode
+  optional Model model = 2;  // velodyne device model
+  optional Mode mode = 3;    // velodyne work mode
 
   repeated VelodynePacket firing_pkts = 4;
 
@@ -37,5 +37,5 @@ message VelodyneScan {
   repeated VelodynePacket positioning_pkts = 5;
   // velodyne device serial number, corresponds to a specific calibration file
   optional string sn = 6;
-  required uint64 basetime = 7 [default = 0];
+  optional uint64 basetime = 7 [default = 0];
 }

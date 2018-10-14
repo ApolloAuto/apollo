@@ -42,13 +42,13 @@ message RacobitRadarObs {
   optional bool clusterortrack = 2;  // 0 = track, 1 = cluster
   optional int32 obstacle_id = 3;    // obstacle Id
   // longitude distance to the radar; (+) = forward; unit = m
-  required double longitude_dist = 4;
+  optional double longitude_dist = 4;
   // lateral distance to the radar; (+) = left; unit = m
-  required double lateral_dist = 5;
+  optional double lateral_dist = 5;
   // longitude velocity to the radar; (+) = farword; unit = m/s
-  required double longitude_vel = 6;
+  optional double longitude_vel = 6;
   // lateral velocity to the radar; (+) = left; unit = m/s
-  required double lateral_vel = 7;
+  optional double lateral_vel = 7;
   // obstacle Radar Cross-Section; unit = dBsm
   optional double rcs = 8;
   // 0 = moving, 1 = stationary, 2 = oncoming, 3 = stationary candidate

@@ -54,7 +54,7 @@ message PerceptionParam {
     optional LanePerceptionParam lane_param = 8;
     optional CalibrationServiceParam calibration_service_param = 9;
     optional DebugParam debug_param = 10;
-    required ObjectTemplateParam object_template_param = 11;
+    optional ObjectTemplateParam object_template_param = 11;
 }
 message TrafficLightParam {
     repeated DetectorParam detector_param = 1;

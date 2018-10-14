@@ -10,5 +10,5 @@ message RecordResponse {
       FAIL = 1;
   }
   optional apollo.common.Header header = 1;
-  required RecordResult record_result = 2;
+  optional RecordResult record_result = 2;
 }
