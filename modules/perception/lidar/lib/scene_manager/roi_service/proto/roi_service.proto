@@ -2,6 +2,6 @@ syntax = "proto2";
 package apollo.perception.lidar;
 
 message ROIServiceConfig {
-  required double range = 1 [default = 120.0];
-  required double cell_size = 2 [default = 0.25];
+  optional double range = 1 [default = 120.0];
+  optional double cell_size = 2 [default = 0.25];
 }

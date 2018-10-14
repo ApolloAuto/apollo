@@ -66,7 +66,7 @@ enum PixelFormat {
 message Image {
   optional apollo.common.Header header = 1;
   optional string frame_id = 2;
-  required double measurement_time = 3;
+  optional double measurement_time = 3;
 
   optional uint32 height = 4;  // image height, that is, number of rows
   optional uint32 width = 5;   // image width, that is, number of columns

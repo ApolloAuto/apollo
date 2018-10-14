@@ -26,12 +26,12 @@ message PathTimeObstacle {
 }
 
 message StopPoint {
-  required double s = 1;
+  optional double s = 1;
   enum Type {
     HARD = 0;
     SOFT = 1;
   }
-  required Type type = 2 [default = HARD];
+  optional Type type = 2 [default = HARD];
 }
 
 message PlanningTarget {

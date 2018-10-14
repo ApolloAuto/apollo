@@ -10,7 +10,7 @@ message RecordRequest {
     STOP = 1;
   }
   optional apollo.common.Header header = 1;
-  required RecordSwitch record_switch = 2;
+  optional RecordSwitch record_switch = 2;
   optional bool record_all = 3 [default = true];
   repeated string record_topics = 4;
 }

@@ -8,5 +8,5 @@ enum RunMode {
 }
 
 message RunModeConf {
-  required RunMode run_mode = 1 [default = MODE_REALITY];
+  optional RunMode run_mode = 1 [default = MODE_REALITY];
 }

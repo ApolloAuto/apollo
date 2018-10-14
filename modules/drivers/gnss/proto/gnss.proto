@@ -105,5 +105,5 @@ message GnssRange {
 // gnss raw data
 message RawData {
   optional apollo.common.Header header = 1;
-  required bytes data = 2;
+  optional bytes data = 2;
 }

@@ -5,11 +5,11 @@ package apollo.drivers.velodyne;
 import "modules/drivers/velodyne/proto/velodyne.proto";
 
 message Config {
-  required string frame_id = 1;
-  required string scan_channel = 2;
+  optional string frame_id = 1;
+  optional string scan_channel = 2;
   optional double rpm = 3 [default = 600.0];
-  required Model model = 4;
-  required Mode mode = 21;
+  optional Model model = 4;
+  optional Mode mode = 21;
   optional string pcap = 5;
   optional int32 prefix_angle = 6;
   optional int32 firing_data_port = 7;

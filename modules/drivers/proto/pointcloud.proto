@@ -4,11 +4,11 @@ package apollo.drivers;
 import "modules/common/proto/header.proto";
 
 message PointXYZIT {
-  required float x = 1 [default = nan];
-  required float y = 2 [default = nan];
-  required float z = 3 [default = nan];
-  required uint32 intensity = 4 [default = 0];
-  required uint64 timestamp = 5 [default = 0];
+  optional float x = 1 [default = nan];
+  optional float y = 2 [default = nan];
+  optional float z = 3 [default = nan];
+  optional uint32 intensity = 4 [default = 0];
+  optional uint64 timestamp = 5 [default = 0];
 }
 
 message PointCloud {

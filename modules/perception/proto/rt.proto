@@ -1192,7 +1192,7 @@ message HingeLossParameter {
 }
 
 message RepeatedList {
-    required string list_path = 1;
+    optional string list_path = 1;
     optional uint32 num_repeat = 2 [default = 1];
 }
 

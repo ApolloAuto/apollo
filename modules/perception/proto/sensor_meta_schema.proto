@@ -28,9 +28,9 @@ message SensorMeta {
     PANORAMIC           =  8;
   }
 
-  required string name = 1;
-  required SensorType type = 2;
-  required SensorOrientation orientation = 3;
+  optional string name = 1;
+  optional SensorType type = 2;
+  optional SensorOrientation orientation = 3;
 }
 
 message MultiSensorMeta {

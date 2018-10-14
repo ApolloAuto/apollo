@@ -12,8 +12,8 @@ enum SensorType {
 
 //TODO:add type
 message SensorInfo {
-  required SensorType type = 1;
-  required string conf_path = 2;
+  optional SensorType type = 1;
+  optional string conf_path = 2;
 }
 
 message SensorConfig {
