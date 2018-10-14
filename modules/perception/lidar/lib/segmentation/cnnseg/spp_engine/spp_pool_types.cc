@@ -22,7 +22,9 @@ namespace lidar {
 
 // @brief call pool instance once to intialize memory
 __attribute__((constructor)) void SppPoolInitialize() {
-  SppClusterPool::Instance();
+  SppClusterPool::Instance("velodyne16");
+  SppClusterPool::Instance("velodyne64");
+  SppClusterPool::Instance("velodyne128");
   AINFO << "Initialize spp cluster pool.";
 }
 

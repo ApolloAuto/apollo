@@ -16,7 +16,9 @@
 #pragma once
 
 #include <vector>
+#include <string>
 
+#include "cybertron/common/macros.h"
 #include "modules/perception/lidar/lib/segmentation/cnnseg/spp_engine/spp_cluster.h"
 #include "modules/perception/lidar/lib/segmentation/cnnseg/spp_engine/spp_label_image.h"
 
@@ -29,7 +31,8 @@ class SppClusterList {
   SppClusterList() { clusters_.reserve(kDefaultReserveSize); }
   // @brief: initialize cluster list
   // @param [in]: size
-  void Init(size_t size);
+  // @param [in]: sensor_name
+  void Init(size_t size, const std::string& sensor_name = "velodyne64");
   // @brief: reset cluster list
   inline void Reset() { clusters_.clear(); }
   // @brief: resize cluster list
@@ -82,14 +85,13 @@ class SppClusterList {
     return *this;
   }
 
-  SppClusterList(const SppClusterList& rhs) = delete;
-  SppClusterList& operator=(const SppClusterList& rhs) = delete;
-
  private:
   static const size_t kDefaultReserveSize = 500;
 
  private:
   std::vector<SppClusterPtr> clusters_;
+  std::string sensor_name_;
+  DISALLOW_COPY_AND_ASSIGN(SppClusterList);
 };
 
 }  // namespace lidar

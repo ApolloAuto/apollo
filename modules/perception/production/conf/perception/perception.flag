@@ -36,38 +36,6 @@
 --obs_roi_radius_for_object_check=180
 
 ###########################################################################
-# Flags from lidar_onboard/component/segmentation_component.cc
-
-# segmentation component send message name
-# type: string
-# default:
---obs_segmentation_component_output_channel_name=/perception/inner/SegmentationObjects
-
-# lidar to novatel child frame id.
-# type: string
-# default:
---obs_lidar2novatel_tf2_child_frame_id=velodyne64
-
-# velodyne64 query tf offset
-# type: double
-# default: 8
---obs_velodyne64_query_tf_offset=20
-
-
-###########################################################################
-# Flags from lidar_onboard/component/recognition_component.cc
-
-# recognition component send message name
-# type: string
-# default:
---obs_recognition_component_output_channel_name=/perception/inner/PrefusedObjects
-
-# sensor name
-# type: string
-# default:
---obs_lidar_onboard_sensor_name=velodyne64
-
-###########################################################################
 # Flags from common_flags
 
 # enable hdmap input for roi filter.

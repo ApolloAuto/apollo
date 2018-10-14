@@ -1,6 +1,18 @@
 sensor_meta {
+    name: "velodyne128"
+    type: VELODYNE_128
+    orientation: PANORAMIC
+}
+
+sensor_meta {
     name: "velodyne64"
     type: VELODYNE_64
+    orientation: PANORAMIC
+}
+
+sensor_meta {
+    name: "velodyne16"
+    type: VELODYNE_16
     orientation: FRONT
 }
 

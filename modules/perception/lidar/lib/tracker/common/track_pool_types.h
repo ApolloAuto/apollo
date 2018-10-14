@@ -18,6 +18,7 @@
 #include "modules/perception/base/concurrent_object_pool.h"
 #include "modules/perception/lidar/lib/tracker/common/track_data.h"
 #include "modules/perception/lidar/lib/tracker/common/tracked_object.h"
+#include "modules/perception/lidar/lib/tracker/common/mlf_track_data.h"
 
 namespace apollo {
 namespace perception {
@@ -31,7 +32,14 @@ struct TrackDataInitializer {
   void operator()(TrackData* data) const { data->Reset(); }
 };
 
-static const size_t kTrackedObjectPoolSize = 1000;
+struct MlfTrackDataInitializer {
+  void operator()(MlfTrackData* data) const {
+    data->Reset();
+  }
+};
+
+
+static const size_t kTrackedObjectPoolSize = 20000;
 static const size_t kTrackDataPoolSize = 1000;
 
 typedef base::ConcurrentObjectPool<TrackedObject, kTrackedObjectPoolSize,
@@ -41,6 +49,8 @@ typedef base::ConcurrentObjectPool<TrackedObject, kTrackedObjectPoolSize,
 typedef base::ConcurrentObjectPool<TrackData, kTrackDataPoolSize,
                                    TrackDataInitializer>
     TrackDataPool;
+typedef base::ConcurrentObjectPool<MlfTrackData,
+        kTrackDataPoolSize, MlfTrackDataInitializer> MlfTrackDataPool;
 
 }  // namespace lidar
 }  // namespace perception

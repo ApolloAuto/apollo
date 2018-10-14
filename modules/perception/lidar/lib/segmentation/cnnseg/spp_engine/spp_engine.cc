@@ -24,14 +24,14 @@ namespace perception {
 namespace lidar {
 
 void SppEngine::Init(size_t width, size_t height, float range,
-                     const SppParams& param) {
+                     const SppParams& param, const std::string& sensor_name) {
   // initialize connect component detector
   detector_2d_cc_.Init(height, width);
   detector_2d_cc_.SetData(data_.obs_prob_data_ref, data_.offset_data,
                           static_cast<float>(height) / (2.f * range),
                           data_.objectness_threshold);
   // initialize label image
-  labels_2d_.Init(width, height);
+  labels_2d_.Init(width, height, sensor_name);
   labels_2d_.InitRangeMask(range, param.confidence_range);
   // set parameters of dynamic map
   params_ = param;
@@ -40,7 +40,7 @@ void SppEngine::Init(size_t width, size_t height, float range,
   width_ = width;
   height_ = height;
   range_ = range;
-  // bind worker
+    // bind worker
   worker_.Bind([&]() {
     data_.confidence_pt_blob->cpu_data();
     data_.classify_pt_blob->cpu_data();
@@ -60,8 +60,8 @@ size_t SppEngine::ProcessConnectedComponentCluster(
   worker_.WakeUp();
   size_t num = detector_2d_cc_.Detect(&labels_2d_);
   if (num == 0) {
-      ADEBUG << "No object detected";
-      // Later will decide if return this function here
+    ADEBUG << "No object detected";
+    // Later will decide if return this function here
   }
   double detect_time = timer.toc(true);
   worker_.Join();

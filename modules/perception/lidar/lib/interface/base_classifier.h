@@ -18,6 +18,7 @@
 #include <string>
 #include <vector>
 
+#include "cybertron/common/macros.h"
 #include "modules/perception/lib/registerer/registerer.h"
 #include "modules/perception/lidar/common/lidar_frame.h"
 
@@ -25,9 +26,11 @@ namespace apollo {
 namespace perception {
 namespace lidar {
 
-struct ClassifierInitOptions {};
+struct ClassifierInitOptions {
+};
 
-struct ClassifierOptions {};
+struct ClassifierOptions {
+};
 
 class BaseClassifier {
  public:
@@ -46,8 +49,8 @@ class BaseClassifier {
 
   virtual std::string Name() const = 0;
 
-  BaseClassifier(const BaseClassifier&) = delete;
-  BaseClassifier& operator=(const BaseClassifier&) = delete;
+ private:
+  DISALLOW_COPY_AND_ASSIGN(BaseClassifier);
 };  // class BaseClassifier
 
 PERCEPTION_REGISTER_REGISTERER(BaseClassifier);

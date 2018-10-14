@@ -17,6 +17,7 @@
 
 #include <string>
 #include <vector>
+#include "cybertron/common/macros.h"
 #include "modules/perception/lidar/lib/interface/base_object_filter.h"
 
 namespace apollo {
@@ -27,7 +28,11 @@ class ObjectFilterBank {
  public:
   ObjectFilterBank() = default;
 
-  ~ObjectFilterBank() = default;
+  ~ObjectFilterBank() {
+    for (auto& filter : filter_bank_) {
+      delete filter;
+    }
+  }
 
   bool Init(const ObjectFilterInitOptions& options = ObjectFilterInitOptions());
 
@@ -43,6 +48,7 @@ class ObjectFilterBank {
 
  private:
   std::vector<BaseObjectFilter*> filter_bank_;
+  DISALLOW_COPY_AND_ASSIGN(ObjectFilterBank);
 };
 
 }  // namespace lidar

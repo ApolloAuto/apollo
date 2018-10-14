@@ -15,12 +15,14 @@
  *****************************************************************************/
 #pragma once
 
+#include <utility>
+#include <string>
 #include <deque>
 #include <list>
 #include <memory>
 #include <queue>
 #include <vector>
-
+#include <map>
 #include "modules/perception/base/concurrent_object_pool.h"
 #include "modules/perception/base/sensor_meta.h"
 
@@ -38,9 +40,17 @@ class LightObjectPool : public BaseObjectPool<ObjectType> {
   using BaseObjectPool<ObjectType>::capacity_;
 
   // @brief Only allow accessing from global instance
-  static LightObjectPool& Instance() {
-    static LightObjectPool pool(N);
-    return pool;
+  static LightObjectPool& Instance(
+      const std::string& sensor_name = "velodyne64") {
+    typedef std::shared_ptr<LightObjectPool> LightObjectPoolPtr;
+    static std::map<std::string, LightObjectPoolPtr> object_pool;
+    auto itr = object_pool.find(sensor_name);
+    if (itr == object_pool.end()) {
+      auto ret = object_pool.insert(std::pair<std::string, LightObjectPoolPtr>(
+        sensor_name, LightObjectPoolPtr(new LightObjectPool(N))));
+      return *(ret.first->second);
+    }
+    return *(itr->second);
   }
 
   // @brief overrided function to get object smart pointer

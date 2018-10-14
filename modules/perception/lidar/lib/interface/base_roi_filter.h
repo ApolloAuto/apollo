@@ -18,6 +18,7 @@
 #include <string>
 #include <vector>
 
+#include "cybertron/common/macros.h"
 #include "modules/perception/lib/registerer/registerer.h"
 #include "modules/perception/lidar/common/lidar_frame.h"
 
@@ -25,9 +26,11 @@ namespace apollo {
 namespace perception {
 namespace lidar {
 
-struct ROIFilterInitOptions {};
+struct ROIFilterInitOptions {
+};
 
-struct ROIFilterOptions {};
+struct ROIFilterOptions {
+};
 
 class BaseROIFilter {
  public:
@@ -48,8 +51,8 @@ class BaseROIFilter {
 
   virtual std::string Name() const = 0;
 
-  BaseROIFilter(const BaseROIFilter&) = delete;
-  BaseROIFilter& operator=(const BaseROIFilter&) = delete;
+ private:
+  DISALLOW_COPY_AND_ASSIGN(BaseROIFilter);
 };  // class BaseROIFilter
 
 PERCEPTION_REGISTER_REGISTERER(BaseROIFilter);

@@ -33,6 +33,7 @@ namespace perception {
 namespace lidar {
 
 struct LidarObstacleSegmentationInitOptions {
+  std::string sensor_name = "velodyne64";
   bool enable_hdmap_input = true;
 };
 

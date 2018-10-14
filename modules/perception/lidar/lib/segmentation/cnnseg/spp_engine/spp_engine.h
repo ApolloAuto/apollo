@@ -16,7 +16,7 @@
 #pragma once
 
 #include <utility>
-
+#include <string>
 #include "Eigen/Dense"
 
 #include "modules/perception/lib/thread/thread_worker.h"
@@ -38,8 +38,10 @@ class SppEngine {
   // @param [in]: feature map width
   // @param [in]: feature map height
   // @param [in]: feature map range
+  // @param [in]: sensor name
   void Init(size_t width, size_t height, float range,
-            const SppParams& param = SppParams());
+            const SppParams& param = SppParams(),
+            const std::string& sensor_name = "velodyne64");
   // @brief: process foreground segmentation
   // @param [in]: point cloud
   // @return: size of foreground clusters

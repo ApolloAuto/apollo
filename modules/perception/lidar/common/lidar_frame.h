@@ -24,6 +24,7 @@
 #include "modules/perception/base/hdmap_struct.h"
 #include "modules/perception/base/object_pool_types.h"
 #include "modules/perception/base/point_cloud.h"
+#include "modules/perception/base/sensor_meta.h"
 
 namespace apollo {
 namespace perception {
@@ -48,6 +49,8 @@ struct LidarFrame {
   base::PointIndices roi_indices;
   // point cloud non ground indices
   base::PointIndices non_ground_indices;
+  // sensor info
+  base::SensorInfo sensor_info;
   // reserve string
   std::string reserve;
 

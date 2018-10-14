@@ -17,6 +17,7 @@
 
 #include <string>
 
+#include "cybertron/common/macros.h"
 #include "modules/perception/lib/registerer/registerer.h"
 #include "modules/perception/lidar/common/lidar_frame.h"
 
@@ -24,9 +25,11 @@ namespace apollo {
 namespace perception {
 namespace lidar {
 
-struct GroundDetectorInitOptions {};
+struct GroundDetectorInitOptions {
+};
 
-struct GroundDetectorOptions {};
+struct GroundDetectorOptions {
+};
 
 class BaseGroundDetector {
  public:
@@ -34,8 +37,8 @@ class BaseGroundDetector {
 
   virtual ~BaseGroundDetector() = default;
 
-  virtual bool Init(const GroundDetectorInitOptions& options =
-                        GroundDetectorInitOptions()) = 0;
+  virtual bool Init(const GroundDetectorInitOptions&
+                        options = GroundDetectorInitOptions()) = 0;
 
   // @brief: detect ground points from point cloud.
   // @param [in]: options
@@ -47,8 +50,8 @@ class BaseGroundDetector {
 
   virtual std::string Name() const = 0;
 
-  BaseGroundDetector(const BaseGroundDetector&) = delete;
-  BaseGroundDetector& operator=(const BaseGroundDetector&) = delete;
+ private:
+  DISALLOW_COPY_AND_ASSIGN(BaseGroundDetector);
 };  // class BaseGroundDetector
 
 PERCEPTION_REGISTER_REGISTERER(BaseGroundDetector);

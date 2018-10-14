@@ -38,7 +38,7 @@ bool FusionComponent::Init() {
   // init algorithm plugin
   CHECK(InitAlgorithmPlugin() == true) << "Failed to init algorithm plugin.";
   writer_ =
-    node_->CreateWriter<PerceptionObstacles>("/apollo/perception/obstacles");
+      node_->CreateWriter<PerceptionObstacles>("/apollo/perception/obstacles");
   inner_writer_ = node_->CreateWriter<SensorFrameMessage>(
       "/perception/inner/PrefusedObjects");
   return true;
@@ -51,9 +51,9 @@ bool FusionComponent::Proc(const std::shared_ptr<SensorFrameMessage>& message) {
     return true;
   }
   std::shared_ptr<PerceptionObstacles> out_message(new (std::nothrow)
-                                                       PerceptionObstacles);
+                                                   PerceptionObstacles);
   std::shared_ptr<SensorFrameMessage> viz_message(new (std::nothrow)
-                                                      SensorFrameMessage);
+                                                  SensorFrameMessage);
   bool status = InternalProc(message, out_message, viz_message);
   if (status == true) {
     // TODO(conver sensor id)
