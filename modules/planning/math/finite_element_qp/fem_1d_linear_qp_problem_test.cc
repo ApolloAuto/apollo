@@ -34,11 +34,17 @@ TEST(Fem1dLinearQpProblemTest, basic_test) {
   FLAGS_enable_osqp_debug = false;
   Fem1dQpProblem* fem_qp = new Fem1dLinearQpProblem();
   std::array<double, 3> x_init = {1.5, 0.0, 0.001};
-  size_t n = 1000;
-  double delta_s = 1.0;
+  size_t n = 400;
+  double delta_s = 0.5;
   std::vector<std::tuple<double, double, double>> x_bounds;
   for (size_t i = 0; i < n; ++i) {
-    x_bounds.emplace_back(std::make_tuple(static_cast<double>(i), -1.81, 1.95));
+    if (i != 400) {
+      x_bounds.emplace_back(
+          std::make_tuple(static_cast<double>(i), -1.81, 1.95));
+    } else {
+      x_bounds.emplace_back(
+          std::make_tuple(static_cast<double>(i), 1.11, 1.95));
+    }
   }
   std::array<double, 5> w = {1.0, 2.0, 3.0, 4.0, 1.45};
   double max_x_third_order_derivative = 0.25;
@@ -57,8 +63,8 @@ TEST(Fem1dLinearQpProblemTest, basic_test) {
 
   const std::vector<double> x = fem_qp->x();
   for (size_t i = 1; i < x.size(); ++i) {
-    EXPECT_LE(x[i], std::get<2>(x_bounds[i - 1]));
-    EXPECT_GE(x[i], std::get<1>(x_bounds[i - 1]));
+    EXPECT_LE(x[i] - 1e-5, std::get<2>(x_bounds[i - 1]));
+    EXPECT_GE(x[i] + 1e-5, std::get<1>(x_bounds[i - 1]));
   }
 }
 

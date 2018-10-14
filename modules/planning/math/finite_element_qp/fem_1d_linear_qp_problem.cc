@@ -39,23 +39,20 @@ bool Fem1dLinearQpProblem::Optimize() {
   std::chrono::duration<double> diff = end_time1 - start_time;
   ADEBUG << "Set Kernel used time: " << diff.count() * 1000 << " ms.";
 
-  std::vector<c_float> A_data;
-  std::vector<c_int> A_indices;
-  std::vector<c_int> A_indptr;
   std::vector<c_float> lower_bounds;
   std::vector<c_float> upper_bounds;
-  CalcualteAffineConstraint(&A_data, &A_indices, &A_indptr, &lower_bounds,
+  CalculateAffineConstraint(&A_data, &A_indices, &A_indptr, &lower_bounds,
                             &upper_bounds);
   auto end_time2 = std::chrono::system_clock::now();
   diff = end_time2 - end_time1;
-  ADEBUG << "CalcualteAffineConstraint used time: " << diff.count() * 1000
+  ADEBUG << "CalculateAffineConstraint used time: " << diff.count() * 1000
          << " ms.";
 
   std::vector<c_float> q;
-  CalcualteOffset(&q);
+  CalculateOffset(&q);
   auto end_time3 = std::chrono::system_clock::now();
   diff = end_time3 - end_time2;
-  ADEBUG << "CalcualteOffset used time: " << diff.count() * 1000 << " ms.";
+  ADEBUG << "CalculateOffset used time: " << diff.count() * 1000 << " ms.";
 
   // Problem settings
   OSQPSettings* settings =
@@ -94,7 +91,7 @@ bool Fem1dLinearQpProblem::Optimize() {
   return true;
 }
 
-void Fem1dLinearQpProblem::CalcualteKernel(std::vector<c_float>* P_data,
+void Fem1dLinearQpProblem::CalculateKernel(std::vector<c_float>* P_data,
                                            std::vector<c_int>* P_indices,
                                            std::vector<c_int>* P_indptr) {
   // pre-calculate some const
@@ -172,11 +169,51 @@ void Fem1dLinearQpProblem::CalcualteKernel(std::vector<c_float>* P_data,
 }
 
 void Fem1dLinearQpProblem::PreSetKernel() {
-  CalcualteKernel(&P_data, &P_indices, &P_indptr);
+  CalculateKernel(&P_data, &P_indices, &P_indptr);
   is_const_kernel_ = true;
 }
 
-void Fem1dLinearQpProblem::CalcualteOffset(std::vector<c_float>* q) {
+void Fem1dLinearQpProblem::PreSetAffineConstraintMatrix() {
+  const int N = static_cast<int>(num_var_);
+  for (int i = 0; i < N; ++i) {
+    A_data.push_back(1.0);
+    A_data.push_back(1.0);
+
+    A_indices.push_back(i);
+    A_indices.push_back(i + N);
+
+    if (i + 1 < N) {
+      A_data.push_back(-3.0);
+      A_indices.push_back(i + N + 1);
+    }
+    if (i + 2 < N) {
+      A_data.push_back(3.0);
+      A_indices.push_back(i + N + 2);
+    }
+    if (i + 3 < N) {
+      A_data.push_back(-1.0);
+      A_indices.push_back(i + N + 3);
+    }
+  }
+  CHECK_EQ(A_data.size(), A_indices.size());
+
+  int ind_p = 0;
+  for (int i = 0; i < N; ++i) {
+    A_indptr.push_back(ind_p);
+    if (i + 3 < N) {
+      ind_p += 5;
+    } else if (i + 2 < N) {
+      ind_p += 4;
+    } else if (i + 1 < N) {
+      ind_p += 3;
+    } else {  // i + 1 == N
+      ind_p += 2;
+    }
+  }
+  A_indptr.push_back(ind_p);
+}
+
+void Fem1dLinearQpProblem::CalculateOffset(std::vector<c_float>* q) {
   CHECK_NOTNULL(q);
   q->resize(num_var_);
   for (size_t i = 0; i < num_var_; ++i) {
@@ -204,7 +241,7 @@ void Fem1dLinearQpProblem::CalcualteOffset(std::vector<c_float>* q) {
   q->at(2) += (-2.0 * x_init_[0]) * delta_s_hex_offset_coeff;
 }
 
-void Fem1dLinearQpProblem::CalcualteAffineConstraint(
+void Fem1dLinearQpProblem::CalculateAffineConstraint(
     std::vector<c_float>* A_data, std::vector<c_int>* A_indices,
     std::vector<c_int>* A_indptr, std::vector<c_float>* lower_bounds,
     std::vector<c_float>* upper_bounds) {
@@ -212,11 +249,9 @@ void Fem1dLinearQpProblem::CalcualteAffineConstraint(
   lower_bounds->resize(kNumConstraint);
   upper_bounds->resize(kNumConstraint);
 
-  MatrixXd affine_constraint = MatrixXd::Zero(kNumConstraint, num_var_);
-
   int constraint_index = 0;
   for (size_t i = 0; i < num_var_; ++i) {
-    affine_constraint(i, i) = 1.0;
+    // affine_constraint(i, i) = 1.0;
     lower_bounds->at(constraint_index) = std::get<1>(x_bounds_[i]);
     upper_bounds->at(constraint_index) = std::get<2>(x_bounds_[i]);
     ++constraint_index;
@@ -224,42 +259,38 @@ void Fem1dLinearQpProblem::CalcualteAffineConstraint(
 
   const double third_order_derivative_max_coff =
       max_x_third_order_derivative_ * delta_s_tri_;
-
-  for (size_t i = 0; i < num_var_; ++i) {
-    if (i == 0) {
-      affine_constraint(constraint_index, i) = 1.0;
-      const double t =
-          x_init_[0] + x_init_[1] * delta_s_ + x_init_[2] * delta_s_sq_;
-      lower_bounds->at(constraint_index) = -third_order_derivative_max_coff + t;
-      upper_bounds->at(constraint_index) = third_order_derivative_max_coff + t;
-    } else if (i == 1) {
-      affine_constraint(constraint_index, i) = 1.0;
-      affine_constraint(constraint_index, i - 1) = -3.0;
-      const double t = 2 * x_init_[0] + x_init_[1] * delta_s_;
-      lower_bounds->at(constraint_index) = -third_order_derivative_max_coff - t;
-      upper_bounds->at(constraint_index) = third_order_derivative_max_coff - t;
-    } else if (i == 2) {
-      affine_constraint(constraint_index, i) = 1.0;
-      affine_constraint(constraint_index, i - 1) = -3.0;
-      affine_constraint(constraint_index, i - 2) = 3.0;
-      lower_bounds->at(constraint_index) =
-          -third_order_derivative_max_coff + x_init_[0];
-      upper_bounds->at(constraint_index) =
-          third_order_derivative_max_coff + x_init_[0];
-    } else {
-      affine_constraint(constraint_index, i) = 1.0;
-      affine_constraint(constraint_index, i - 1) = -3.0;
-      affine_constraint(constraint_index, i - 2) = 3.0;
-      affine_constraint(constraint_index, i - 3) = -1.0;
-      lower_bounds->at(constraint_index) = -third_order_derivative_max_coff;
-      upper_bounds->at(constraint_index) = third_order_derivative_max_coff;
-    }
+  {
+    // affine_constraint(constraint_index, i) = 1.0;
+    const double t =
+        x_init_[0] + x_init_[1] * delta_s_ + x_init_[2] * delta_s_sq_;
+    lower_bounds->at(constraint_index) = -third_order_derivative_max_coff + t;
+    upper_bounds->at(constraint_index) = third_order_derivative_max_coff + t;
+    ++constraint_index;
+  }
+  {
+    const double t = 2 * x_init_[0] + x_init_[1] * delta_s_;
+    lower_bounds->at(constraint_index) = -third_order_derivative_max_coff - t;
+    upper_bounds->at(constraint_index) = third_order_derivative_max_coff - t;
+    ++constraint_index;
+  }
+  {
+    lower_bounds->at(constraint_index) =
+        -third_order_derivative_max_coff + x_init_[0];
+    upper_bounds->at(constraint_index) =
+        third_order_derivative_max_coff + x_init_[0];
     ++constraint_index;
   }
 
-  CHECK_EQ(constraint_index, kNumConstraint);
+  std::fill(lower_bounds->begin() + constraint_index, lower_bounds->end(),
+            -third_order_derivative_max_coff);
+  std::fill(upper_bounds->begin() + constraint_index, upper_bounds->end(),
+            third_order_derivative_max_coff);
 
-  DenseToCSCMatrix(affine_constraint, A_data, A_indices, A_indptr);
+  if (!is_const_affine_constraint_matrix_) {
+    PreSetAffineConstraintMatrix();
+    ADEBUG << "PreSetAffineConstraintMatrix() called.";
+    is_const_affine_constraint_matrix_ = true;
+  }
 }
 
 }  // namespace planning

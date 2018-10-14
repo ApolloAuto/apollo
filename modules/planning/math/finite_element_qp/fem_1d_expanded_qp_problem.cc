@@ -31,18 +31,18 @@ bool Fem1dExpandedQpProblem::Optimize() {
   std::vector<c_float> P_data;
   std::vector<c_int> P_indices;
   std::vector<c_int> P_indptr;
-  CalcualteKernel(&P_data, &P_indices, &P_indptr);
+  CalculateKernel(&P_data, &P_indices, &P_indptr);
 
   std::vector<c_float> A_data;
   std::vector<c_int> A_indices;
   std::vector<c_int> A_indptr;
   std::vector<c_float> lower_bounds;
   std::vector<c_float> upper_bounds;
-  CalcualteAffineConstraint(&A_data, &A_indices, &A_indptr, &lower_bounds,
+  CalculateAffineConstraint(&A_data, &A_indices, &A_indptr, &lower_bounds,
                             &upper_bounds);
 
   std::vector<c_float> q;
-  CalcualteOffset(&q);
+  CalculateOffset(&q);
 
   // extract primal results
   x_.resize(num_var_);
@@ -81,7 +81,7 @@ bool Fem1dExpandedQpProblem::Optimize() {
   return true;
 }
 
-void Fem1dExpandedQpProblem::CalcualteKernel(std::vector<c_float>* P_data,
+void Fem1dExpandedQpProblem::CalculateKernel(std::vector<c_float>* P_data,
                                              std::vector<c_int>* P_indices,
                                              std::vector<c_int>* P_indptr) {
   P_data->clear();
@@ -112,7 +112,7 @@ void Fem1dExpandedQpProblem::CalcualteKernel(std::vector<c_float>* P_data,
   DCHECK_EQ(P_data->size(), P_indices->size());
 }
 
-void Fem1dExpandedQpProblem::CalcualteOffset(std::vector<c_float>* q) {
+void Fem1dExpandedQpProblem::CalculateOffset(std::vector<c_float>* q) {
   CHECK_NOTNULL(q);
   const size_t kNumParam = 3 * x_bounds_.size();
   q->resize(kNumParam);
@@ -126,7 +126,7 @@ void Fem1dExpandedQpProblem::CalcualteOffset(std::vector<c_float>* q) {
   }
 }
 
-void Fem1dExpandedQpProblem::CalcualteAffineConstraint(
+void Fem1dExpandedQpProblem::CalculateAffineConstraint(
     std::vector<c_float>* A_data, std::vector<c_int>* A_indices,
     std::vector<c_int>* A_indptr, std::vector<c_float>* lower_bounds,
     std::vector<c_float>* upper_bounds) {

@@ -34,7 +34,7 @@ bool OsqpLateralQPOptimizer::optimize(
   std::vector<c_float> P_data;
   std::vector<c_int> P_indices;
   std::vector<c_int> P_indptr;
-  CalcualteKernel(d_bounds, &P_data, &P_indices, &P_indptr);
+  CalculateKernel(d_bounds, &P_data, &P_indices, &P_indptr);
   delta_s_ = delta_s;
   const int num_var = d_bounds.size();
   const int kNumParam = 3 * d_bounds.size();
@@ -188,7 +188,7 @@ bool OsqpLateralQPOptimizer::optimize(
   return true;
 }
 
-void OsqpLateralQPOptimizer::CalcualteKernel(
+void OsqpLateralQPOptimizer::CalculateKernel(
     const std::vector<std::pair<double, double>>& d_bounds,
     std::vector<c_float>* P_data, std::vector<c_int>* P_indices,
     std::vector<c_int>* P_indptr) {

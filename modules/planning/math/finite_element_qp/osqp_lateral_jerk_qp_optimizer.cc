@@ -40,7 +40,7 @@ bool OsqpLateralJerkQPOptimizer::optimize(
   std::vector<c_float> P_data_;
   std::vector<c_int> P_indices_;
   std::vector<c_int> P_indptr_;
-  CalcualteKernel(d_state, delta_s, d_bounds, &P_data_, &P_indices_,
+  CalculateKernel(d_state, delta_s, d_bounds, &P_data_, &P_indices_,
                   &P_indptr_);
 
   const int kNumVariable = d_bounds.size();
@@ -137,7 +137,7 @@ bool OsqpLateralJerkQPOptimizer::optimize(
   return true;
 }
 
-void OsqpLateralJerkQPOptimizer::CalcualteKernel(
+void OsqpLateralJerkQPOptimizer::CalculateKernel(
     const std::array<double, 3>& d_state, const double delta_s,
     const std::vector<std::pair<double, double>>& d_bounds,
     std::vector<c_float>* P_data, std::vector<c_int>* P_indices,

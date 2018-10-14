@@ -32,7 +32,7 @@ bool Fem1dJerkQpProblem::Optimize() {
   return true;
 }
 
-void Fem1dJerkQpProblem::CalcualteKernel(std::vector<c_float>* P_data,
+void Fem1dJerkQpProblem::CalculateKernel(std::vector<c_float>* P_data,
                                          std::vector<c_int>* P_indices,
                                          std::vector<c_int>* P_indptr) {
   CHECK_NOTNULL(P_data);
@@ -41,13 +41,13 @@ void Fem1dJerkQpProblem::CalcualteKernel(std::vector<c_float>* P_data,
   return;
 }
 
-void Fem1dJerkQpProblem::CalcualteOffset(std::vector<c_float>* q) {
+void Fem1dJerkQpProblem::CalculateOffset(std::vector<c_float>* q) {
   CHECK_NOTNULL(q);
   // TODO(All): implement here.
   return;
 }
 
-void Fem1dJerkQpProblem::CalcualteAffineConstraint(
+void Fem1dJerkQpProblem::CalculateAffineConstraint(
     std::vector<c_float>* A_data, std::vector<c_int>* A_indices,
     std::vector<c_int>* A_indptr, std::vector<c_float>* lower_bounds,
     std::vector<c_float>* upper_bounds) {
