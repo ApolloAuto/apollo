@@ -111,7 +111,7 @@ void Fem1dExpandedJerkQpProblem::CalcualteOffset(std::vector<c_float>* q) {
   for (size_t i = 0; i < kNumParam; ++i) {
     if (i < x_bounds_.size()) {
       q->at(i) = -2.0 * weight_.x_mid_line_w *
-                 (x_bounds_[i].first + x_bounds_[i].second);
+                 (std::get<1>(x_bounds_[i]) + std::get<2>(x_bounds_[i]));
     } else {
       q->at(i) = 0.0;
     }
@@ -133,8 +133,8 @@ void Fem1dExpandedJerkQpProblem::CalcualteAffineConstraint(
   lower_bounds->resize(kNumConstraint);
   upper_bounds->resize(kNumConstraint);
 
-  const int prime_offset = num_var_;
-  const int ppprime_offset = 2 * num_var_;
+  const int prime_offset = static_cast<int>(num_var_);
+  const int ppprime_offset = static_cast<int>(2 * num_var_);
 
   int constraint_index = 0;
 
@@ -143,8 +143,8 @@ void Fem1dExpandedJerkQpProblem::CalcualteAffineConstraint(
     affine_constraint(constraint_index, i) = 1.0;
     if (i < num_var_) {
       // x_bounds_[i].first <= x[i] <= x_bounds_[i].second
-      lower_bounds->at(constraint_index) = x_bounds_[i].first;
-      upper_bounds->at(constraint_index) = x_bounds_[i].second;
+      lower_bounds->at(constraint_index) = std::get<1>(x_bounds_[i]);
+      upper_bounds->at(constraint_index) = std::get<2>(x_bounds_[i]);
     } else {
       lower_bounds->at(constraint_index) = -LARGE_VALUE;
       upper_bounds->at(constraint_index) = LARGE_VALUE;

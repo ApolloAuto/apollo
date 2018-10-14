@@ -105,7 +105,7 @@ void Fem1dLinearQpProblem::CalcualteKernel(std::vector<c_float>* P_data,
   const double one_over_delta_s_hex_coeff =
       1.0 / (delta_s_sq_ * delta_s_tetra_) * weight_.x_third_order_derivative_w;
 
-  int N = num_var_;
+  int N = static_cast<int>(num_var_);
 
   std::array<double, 7> k;
   k[0] = -1.0 * 2.0 * one_over_delta_s_hex_coeff;
@@ -181,7 +181,7 @@ void Fem1dLinearQpProblem::CalcualteOffset(std::vector<c_float>* q) {
   q->resize(num_var_);
   for (size_t i = 0; i < num_var_; ++i) {
     q->at(i) = -2.0 * weight_.x_mid_line_w *
-               (x_bounds_[i].first + x_bounds_[i].second);
+               (std::get<1>(x_bounds_[i]) + std::get<2>(x_bounds_[i]));
   }
   // first order derivative offset
   q->at(0) += (-2.0 * x_init_[0]) * weight_.x_derivative_w / delta_s_sq_;
@@ -208,7 +208,7 @@ void Fem1dLinearQpProblem::CalcualteAffineConstraint(
     std::vector<c_float>* A_data, std::vector<c_int>* A_indices,
     std::vector<c_int>* A_indptr, std::vector<c_float>* lower_bounds,
     std::vector<c_float>* upper_bounds) {
-  const int kNumConstraint = num_var_ + num_var_;
+  const int kNumConstraint = static_cast<int>(num_var_ + num_var_);
   lower_bounds->resize(kNumConstraint);
   upper_bounds->resize(kNumConstraint);
 
@@ -217,8 +217,8 @@ void Fem1dLinearQpProblem::CalcualteAffineConstraint(
   int constraint_index = 0;
   for (size_t i = 0; i < num_var_; ++i) {
     affine_constraint(i, i) = 1.0;
-    lower_bounds->at(constraint_index) = x_bounds_[i].first;
-    upper_bounds->at(constraint_index) = x_bounds_[i].second;
+    lower_bounds->at(constraint_index) = std::get<1>(x_bounds_[i]);
+    upper_bounds->at(constraint_index) = std::get<2>(x_bounds_[i]);
     ++constraint_index;
   }
 

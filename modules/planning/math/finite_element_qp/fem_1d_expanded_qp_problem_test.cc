@@ -33,14 +33,17 @@ TEST(Fem1dLinearQpProblemTest, basic_test) {
   Fem1dQpProblem* fem_qp = new Fem1dExpandedQpProblem();
   std::array<double, 3> x_init = {1.5, 0.0, 0.001};
   double delta_s = 1.0;
-  std::vector<std::pair<double, double>> x_bounds;
-  for (int i = 0; i < 200; ++i) {
-    x_bounds.emplace_back(std::make_pair(-1.81, 1.95));
+  size_t n = 200;
+  std::vector<std::tuple<double, double, double>> x_bounds;
+  for (size_t i = 0; i < n; ++i) {
+    x_bounds.emplace_back(std::make_tuple(static_cast<double>(i), -1.81, 1.95));
   }
   std::array<double, 5> w = {1.0, 2.0, 3.0, 4.0, 1.45};
   double max_x_third_order_derivative = 0.25;
   EXPECT_TRUE(
-      fem_qp->Init(x_init, delta_s, x_bounds, w, max_x_third_order_derivative));
+      fem_qp->Init(n, x_init, delta_s, w, max_x_third_order_derivative));
+
+  fem_qp->SetVariableBounds(x_bounds);
 
   auto start_time = std::chrono::system_clock::now();
   EXPECT_TRUE(fem_qp->Optimize());
@@ -50,8 +53,8 @@ TEST(Fem1dLinearQpProblemTest, basic_test) {
 
   const std::vector<double> x = fem_qp->x();
   for (size_t i = 0; i < x.size(); ++i) {
-    EXPECT_LE(x[i], x_bounds[i].second);
-    EXPECT_GE(x[i], x_bounds[i].first);
+    EXPECT_LE(x[i], std::get<2>(x_bounds[i]));
+    EXPECT_GE(x[i], std::get<1>(x_bounds[i]));
   }
 }
 
