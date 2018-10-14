@@ -25,16 +25,16 @@
 namespace apollo {
 namespace planning {
 
-bool Fem1dQpProblem::Init(
-    const std::array<double, 3>& x_init, const double delta_s,
-    const std::vector<std::pair<double, double>>& x_bounds,
-    const std::array<double, 5>& w, const double max_x_third_order_derivative) {
-  x_init_ = x_init;
-  x_bounds_ = x_bounds;
-  num_var_ = x_bounds.size();
-  if (num_var_ < 3) {
+bool Fem1dQpProblem::Init(const size_t num_var,
+                          const std::array<double, 3>& x_init,
+                          const double delta_s, const std::array<double, 5>& w,
+                          const double max_x_third_order_derivative) {
+  num_var_ = num_var;
+  if (num_var_ < 4) {
     return false;
   }
+
+  x_init_ = x_init;
 
   weight_.x_w = w[0];
   weight_.x_derivative_w = w[1];

@@ -22,6 +22,7 @@
 
 #include <array>
 #include <memory>
+#include <tuple>
 #include <utility>
 #include <vector>
 
@@ -67,17 +68,34 @@ class Fem1dQpProblem {
    * -- w[4]: default reference line weight, (x_bounds[k].first +
    * x_bounds[k].second)/2
    */
-  virtual bool Init(const std::array<double, 3>& x_init, const double delta_s,
-                    const std::vector<std::pair<double, double>>& x_bounds,
-                    const std::array<double, 5>& w,
+  virtual bool Init(const size_t num_var, const std::array<double, 3>& x_init,
+                    const double delta_s, const std::array<double, 5>& w,
                     const double max_x_third_order_derivative);
 
   virtual void AddReferenceLineKernel(const std::vector<double>& ref_line,
                                       const double wweight) {}
 
-  virtual bool Optimize() = 0;
+  // x_bounds: tuple(s, lower_bounds, upper_bounds)
+  virtual void SetVariableBounds(
+      const std::vector<std::tuple<double, double, double>>& x_bounds) {
+    x_bounds_ = x_bounds;
+  }
+
+  // dx_bounds: tuple(s, lower_bounds, upper_bounds)
+  virtual void SetVariableDerivativeBounds(
+      const std::vector<std::tuple<double, double, double>>& dx_bounds) {
+    dx_bounds_ = dx_bounds;
+  }
+
+  // ddx_bounds: tuple(s, lower_bounds, upper_bounds)
+  virtual void SetVariableSecondOrderDerivativeBounds(
+      const std::vector<std::tuple<double, double, double>>& ddx_bounds) {
+    ddx_bounds_ = ddx_bounds;
+  }
 
   virtual void PreSetKernel() {}
+
+  virtual bool Optimize() = 0;
 
   virtual std::vector<double> x() const { return x_; }
 
@@ -116,13 +134,18 @@ class Fem1dQpProblem {
 
  protected:
   size_t num_var_ = 0;
+
+  // output
   std::vector<double> x_;
   std::vector<double> x_derivative_;
   std::vector<double> x_second_order_derivative_;
   std::vector<double> x_third_order_derivative_;
 
   std::array<double, 3> x_init_;
-  std::vector<std::pair<double, double>> x_bounds_;
+  std::vector<std::tuple<double, double, double>> x_bounds_;
+  std::vector<std::tuple<double, double, double>> dx_bounds_;
+  std::vector<std::tuple<double, double, double>> ddx_bounds_;
+
   struct {
     double x_w = 0.0;
     double x_derivative_w = 0.0;
