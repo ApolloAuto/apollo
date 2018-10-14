@@ -5,7 +5,11 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "record_lib",
     srcs = glob([
-        "*.cpp",
+        "header_builder.cpp",
+        "record_file.cpp",
+        "record_reader.cpp",
+        "record_viewer.cpp",
+        "record_writer.cpp",
     ]),
     hdrs = glob([
         "*.h",

@@ -42,7 +42,7 @@ class VelodyneDriver {
   explicit VelodyneDriver(const Config &config) : config_(config) {}
   virtual ~VelodyneDriver();
 
-  virtual bool Poll(std::shared_ptr<VelodyneScan> scan);
+  virtual bool Poll(const std::shared_ptr<VelodyneScan>& scan);
   virtual void Init();
   virtual void PollPositioningPacket();
   void SetPacketRate(const double packet_rate) { packet_rate_ = packet_rate; }
@@ -74,7 +74,7 @@ class Velodyne64Driver : public VelodyneDriver {
   ~Velodyne64Driver() {}
 
   void Init() override;
-  bool Poll(std::shared_ptr<VelodyneScan> scan) override;
+  bool Poll(const std::shared_ptr<VelodyneScan>& scan) override;
 
  private:
   bool CheckAngle(const VelodynePacket &packet);

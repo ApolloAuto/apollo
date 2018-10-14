@@ -17,7 +17,7 @@ cc_library(
 cc_library(
     name = "node_lib",
     srcs = glob([
-        "*.cpp",
+        "node.cpp",
     ]),
     hdrs = glob([
         "*.h",
@@ -29,6 +29,32 @@ cc_library(
         "//cybertron/data:data_lib",
         "//cybertron/scheduler:scheduler_lib",
         "//cybertron/service:service_lib",
+    ],
+)
+
+cc_test(
+    name = "node_test",
+    size = "small",
+    srcs = [
+        "node_test.cpp",
+    ],
+    deps = [
+        "//cybertron",
+        "//cybertron/proto:unit_test_cc_proto",
+        "@gtest//:main",
+    ],
+)
+
+cc_test(
+    name = "writer_reader_test",
+    size = "small",
+    srcs = [
+        "writer_reader_test.cpp",
+    ],
+    deps = [
+        "//cybertron",
+        "//cybertron/proto:unit_test_cc_proto",
+        "@gtest//:main",
     ],
 )
 
