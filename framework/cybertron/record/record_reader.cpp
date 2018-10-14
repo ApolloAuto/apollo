@@ -81,15 +81,14 @@ bool RecordReader::ReadMessage(RecordMessage* message, uint64_t begin_time,
     return true;
   }
 
-  if (ReadNextChunk(&chunk_, begin_time, end_time)) {
+  if (ReadNextChunk(begin_time, end_time)) {
     message_index_ = 0;
     return ReadMessage(message, begin_time, end_time);
   }
   return false;
 }
 
-bool RecordReader::ReadNextChunk(ChunkBody* chunk, uint64_t begin_time,
-                                 uint64_t end_time) {
+bool RecordReader::ReadNextChunk(uint64_t begin_time, uint64_t end_time) {
   bool skip_next_chunk_body = false;
   Section section;
   while (file_reader_->ReadSection(&section)) {
@@ -114,8 +113,11 @@ bool RecordReader::ReadNextChunk(ChunkBody* chunk, uint64_t begin_time,
           AERROR << "Failed to read chunk header section.";
           return false;
         }
-        if (begin_time > header.end_time() || end_time < header.begin_time()) {
+        if (header.end_time() < begin_time) {
           skip_next_chunk_body = true;
+        }
+        if (header.begin_time() > end_time) {
+          return false;
         }
         break;
       }
@@ -125,7 +127,7 @@ bool RecordReader::ReadNextChunk(ChunkBody* chunk, uint64_t begin_time,
           skip_next_chunk_body = false;
           break;
         }
-        if (!file_reader_->ReadSection<ChunkBody>(section.size, chunk)) {
+        if (!file_reader_->ReadSection<ChunkBody>(section.size, &chunk_)) {
           AERROR << "Failed to read chunk body section.";
           return false;
         }

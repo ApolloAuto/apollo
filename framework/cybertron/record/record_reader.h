@@ -57,8 +57,7 @@ class RecordReader : public RecordBase {
   const ChannelInfoMap& channel_info() const { return channel_info_; }
 
  private:
-  bool ReadNextChunk(proto::ChunkBody* chunk, uint64_t begin_time,
-                     uint64_t end_time);
+  bool ReadNextChunk(uint64_t begin_time, uint64_t end_time);
 
   proto::ChunkBody chunk_;
   proto::Index index_;

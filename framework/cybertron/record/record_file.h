@@ -152,10 +152,12 @@ bool RecordFileReader::ReadSection(uint64_t size, T* message,
   if (fixed_size > size) {
     ifstream_.seekg(backup_position + fixed_size, std::ios::beg);
   }
-  if (!message->ParseFromString(str)) {
-    AERROR << "parse message from string fail";
+  T msg;
+  if (!msg.ParseFromString(str)) {
+    AERROR << "Failed to parse section info.";
     return false;
   }
+  message->Swap(&msg);
   return true;
 }
 
