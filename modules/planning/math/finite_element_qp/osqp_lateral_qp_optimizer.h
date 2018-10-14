@@ -44,7 +44,7 @@ class OsqpLateralQPOptimizer : public LateralQPOptimizer {
       const std::vector<std::pair<double, double>>& d_bounds) override;
 
  private:
-  void CalcualteKernel(const std::vector<std::pair<double, double>>& d_bounds,
+  void CalculateKernel(const std::vector<std::pair<double, double>>& d_bounds,
                        std::vector<c_float>* P_data,
                        std::vector<c_int>* P_indices,
                        std::vector<c_int>* P_indptr);

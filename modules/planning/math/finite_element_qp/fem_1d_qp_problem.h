@@ -111,13 +111,13 @@ class Fem1dQpProblem {
 
  protected:
   // naming convention follows osqp solver.
-  virtual void CalcualteKernel(std::vector<c_float>* P_data,
+  virtual void CalculateKernel(std::vector<c_float>* P_data,
                                std::vector<c_int>* P_indices,
                                std::vector<c_int>* P_indptr) = 0;
 
-  virtual void CalcualteOffset(std::vector<c_float>* q) = 0;
+  virtual void CalculateOffset(std::vector<c_float>* q) = 0;
 
-  virtual void CalcualteAffineConstraint(
+  virtual void CalculateAffineConstraint(
       std::vector<c_float>* A_data, std::vector<c_int>* A_indices,
       std::vector<c_int>* A_indptr, std::vector<c_float>* lower_bounds,
       std::vector<c_float>* upper_bounds) = 0;

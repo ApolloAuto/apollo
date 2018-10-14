@@ -32,11 +32,11 @@ namespace apollo {
 namespace planning {
 
 TEST(Fem1dLinearQpProblemTest, basic_test) {
+  FLAGS_enable_osqp_debug = false;
   Fem1dQpProblem* fem_qp = new Fem1dExpandedJerkQpProblem();
-  FLAGS_enable_osqp_debug = true;
-  std::array<double, 3> x_init = {1.5, 0.0, 1.001};
-  double delta_s = 1.0;
-  size_t n = 200;
+  std::array<double, 3> x_init = {1.5, 0.01, 0.001};
+  double delta_s = 0.5;
+  size_t n = 400;
   std::vector<std::tuple<double, double, double>> x_bounds;
   for (size_t i = 0; i < n; ++i) {
     x_bounds.emplace_back(std::make_tuple(static_cast<double>(i), -1.81, 1.95));
@@ -55,6 +55,7 @@ TEST(Fem1dLinearQpProblemTest, basic_test) {
   AINFO << "qp_optimizer used time: " << diff.count() * 1000 << " ms.";
 
   const std::vector<double> x = fem_qp->x();
+  AINFO << "x.size() = " << x.size();
   for (size_t i = 0; i < x.size(); ++i) {
     EXPECT_LE(x[i], std::get<2>(x_bounds[i]));
     EXPECT_GE(x[i], std::get<1>(x_bounds[i]));

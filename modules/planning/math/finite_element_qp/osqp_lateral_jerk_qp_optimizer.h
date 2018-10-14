@@ -44,7 +44,7 @@ class OsqpLateralJerkQPOptimizer : public LateralQPOptimizer {
       const std::vector<std::pair<double, double>>& d_bounds) override;
 
  private:
-  void CalcualteKernel(const std::array<double, 3>& d_state,
+  void CalculateKernel(const std::array<double, 3>& d_state,
                        const double delta_s,
                        const std::vector<std::pair<double, double>>& d_bounds,
                        std::vector<c_float>* P_data,

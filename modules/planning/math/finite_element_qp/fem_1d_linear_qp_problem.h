@@ -44,15 +44,17 @@ class Fem1dLinearQpProblem : public Fem1dQpProblem {
 
   void PreSetKernel() override;
 
+  void PreSetAffineConstraintMatrix();
+
  private:
   // naming convention follows osqp solver.
-  void CalcualteKernel(std::vector<c_float>* P_data,
+  void CalculateKernel(std::vector<c_float>* P_data,
                        std::vector<c_int>* P_indices,
                        std::vector<c_int>* P_indptr) override;
 
-  void CalcualteOffset(std::vector<c_float>* q) override;
+  void CalculateOffset(std::vector<c_float>* q) override;
 
-  void CalcualteAffineConstraint(std::vector<c_float>* A_data,
+  void CalculateAffineConstraint(std::vector<c_float>* A_data,
                                  std::vector<c_int>* A_indices,
                                  std::vector<c_int>* A_indptr,
                                  std::vector<c_float>* lower_bounds,
@@ -60,10 +62,15 @@ class Fem1dLinearQpProblem : public Fem1dQpProblem {
 
  private:
   bool is_const_kernel_ = false;
+  bool is_const_affine_constraint_matrix_ = false;
 
   std::vector<c_float> P_data;
   std::vector<c_int> P_indices;
   std::vector<c_int> P_indptr;
+
+  std::vector<c_float> A_data;
+  std::vector<c_int> A_indices;
+  std::vector<c_int> A_indptr;
 };
 
 }  // namespace planning
