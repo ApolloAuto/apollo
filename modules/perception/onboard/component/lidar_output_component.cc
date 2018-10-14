@@ -22,7 +22,7 @@ namespace onboard {
 
 bool LidarOutputComponent::Init() {
   writer_ =
-    node_->CreateWriter<PerceptionObstacles>("/apollo/perception/obstacles");
+      node_->CreateWriter<PerceptionObstacles>("/apollo/perception/obstacles");
   return true;
 }
 

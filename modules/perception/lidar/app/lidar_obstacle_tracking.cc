@@ -28,8 +28,9 @@ namespace lidar {
 
 bool LidarObstacleTracking::Init(
     const LidarObstacleTrackingInitOptions& options) {
-  lib::ConfigManager* config_manager =
-      lib::Singleton<lib::ConfigManager>::get_instance();
+  auto& sensor_name = options.sensor_name;
+  lib::ConfigManager* config_manager
+    = lib::Singleton<lib::ConfigManager>::get_instance();
   CHECK_NOTNULL(config_manager);
   const lib::ModelConfig* model_config = nullptr;
   CHECK(config_manager->GetModelConfig(Name(), &model_config));
@@ -39,8 +40,10 @@ bool LidarObstacleTracking::Init(
   std::string root_path;
   CHECK(model_config->get_value("root_path", &root_path));
   config_file = lib::FileUtil::GetAbsolutePath(work_root, root_path);
-  config_file = lib::FileUtil::GetAbsolutePath(config_file,
-                                               "lidar_obstacle_tracking.conf");
+  config_file = lib::FileUtil::GetAbsolutePath(config_file, sensor_name);
+  config_file
+    = lib::FileUtil::GetAbsolutePath(config_file,
+        "lidar_obstacle_tracking.conf");
 
   LidarObstacleTrackingConfig config;
   CHECK(apollo::common::util::GetProtoFromFile(config_file, &config));

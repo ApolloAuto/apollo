@@ -21,6 +21,7 @@
 
 #include "Eigen/Core"
 
+#include "cybertron/common/macros.h"
 #include "modules/perception/common/graph/secure_matrix.h"
 #include "modules/perception/lib/registerer/registerer.h"
 
@@ -53,13 +54,13 @@ class BaseBipartiteGraphMatcher {
 
   virtual common::SecureMat<float> *cost_matrix() { return cost_matrix_; }
 
-  BaseBipartiteGraphMatcher(const BaseBipartiteGraphMatcher &) = delete;
-  BaseBipartiteGraphMatcher &operator=(const BaseBipartiteGraphMatcher &) =
-      delete;
 
  protected:
   common::SecureMat<float> *cost_matrix_ = nullptr;
   float max_match_distance_ = 0.0f;
+
+ private:
+  DISALLOW_COPY_AND_ASSIGN(BaseBipartiteGraphMatcher);
 };  // class BaseBipartiteGraphMatcher
 
 PERCEPTION_REGISTER_REGISTERER(BaseBipartiteGraphMatcher);

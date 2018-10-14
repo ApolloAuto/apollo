@@ -11,6 +11,7 @@ cc_binary(
         "//modules/map/proto:map_proto",
         "//modules/perception/base",
         "//modules/perception/common:perception_gflags",
+        "//modules/perception/common/sensor_manager:sensor_manager",
         "//modules/perception/common/io:io_util",
         "//modules/perception/common/point_cloud_processing",
         "//modules/perception/lidar/app",

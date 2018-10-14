@@ -117,6 +117,9 @@ class CNNSegmentation : public BaseSegmentation {
   double roi_filter_time_ = 0.0;
   double ground_detector_time_ = 0.0;
 
+  // sensor_name
+  std::string sensor_name_;
+
  private:
   const int kDefaultPointCloudSize = 120000;
 

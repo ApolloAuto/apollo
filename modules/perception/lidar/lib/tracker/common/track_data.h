@@ -36,15 +36,27 @@ class TrackData {
  public:
   TrackData();
   explicit TrackData(TrackedObjectPtr obj, int track_id);
-  ~TrackData();
+  virtual ~TrackData();
   std::pair<double, TrackedObjectPtr> GetLatestObject() {
     if (history_objects_.size() != 0) {
       return *history_objects_.rbegin();
     }
     return std::pair<double, TrackedObjectPtr>(0.0, TrackedObjectPtr(nullptr));
   }
-
+  std::pair<double, TrackedObjectConstPtr> GetLatestObject() const {
+    if (history_objects_.size() != 0) {
+      return *history_objects_.rbegin();
+    }
+    return std::pair<double, TrackedObjectPtr>(0.0, TrackedObjectPtr(nullptr));
+  }
   std::pair<double, TrackedObjectPtr> GetOldestObject() {
+    if (history_objects_.size() != 0) {
+      return *history_objects_.begin();
+    }
+    return std::pair<double, TrackedObjectPtr>(0.0, TrackedObjectPtr(nullptr));
+  }
+
+  std::pair<double, TrackedObjectConstPtr> GetOldestObject() const {
     if (history_objects_.size() != 0) {
       return *history_objects_.begin();
     }
@@ -56,19 +68,22 @@ class TrackData {
   // when abs_idx is large than history size, return farest object close to idx
   std::pair<double, TrackedObjectPtr> GetHistoryObject(int idx);
 
-  void Reset();
+  const std::pair<double, TrackedObjectConstPtr> GetHistoryObject(
+      int idx) const;
 
-  void Reset(TrackedObjectPtr obj, double time, int track_id);
+  virtual void Reset();
 
-  void PushTrackedObjectToTrack(TrackedObjectPtr obj, double time);
+  virtual void Reset(TrackedObjectPtr obj, double time, int track_id);
+
+  virtual void PushTrackedObjectToTrack(TrackedObjectPtr obj, double time);
 
   int track_id_ = -1;
   int age_ = 0;
   int consecutive_invisible_count_ = 0;
-  size_t total_visible_count_ = 0;
-  int max_history_size_ = 40;
+  int total_visible_count_ = 0;
+  static const int kMaxHistorySize;
   std::map<double, TrackedObjectPtr> history_objects_;
-
+  int max_history_size_ = 40;
   // motion state related
   // used for judge object is static or not
   MotionState motion_state_ = MotionState::STATIC;

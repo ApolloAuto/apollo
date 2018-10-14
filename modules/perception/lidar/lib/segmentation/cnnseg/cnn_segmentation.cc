@@ -44,6 +44,7 @@ bool CNNSegmentation::Init(const SegmentationInitOptions& options) {
   std::string proto_file;
   std::string weight_file;
   std::string engine_file;
+  sensor_name_ = options.sensor_name;
   CHECK(GetConfigs(&param_file, &proto_file, &weight_file, &engine_file));
   AINFO << "--    param_file: " << param_file;
   AINFO << "--    proto_file: " << proto_file;
@@ -175,7 +176,7 @@ bool CNNSegmentation::InitClusterAndBackgroundSegmentation() {
   spp_data.MakeReference(width_, height_, range_);
 
   // init spp engine
-  spp_engine_.Init(width_, height_, range_, params);
+  spp_engine_.Init(width_, height_, range_, params, sensor_name_);
 
   roi_cloud_ = base::PointFCloudPool::Instance().Get();
   roi_world_cloud_ = base::PointDCloudPool::Instance().Get();
@@ -191,8 +192,6 @@ bool CNNSegmentation::InitClusterAndBackgroundSegmentation() {
                                  lidar_frame_ref_->roi_indices);
       roi_world_cloud_->CopyPointCloud(*lidar_frame_ref_->world_cloud,
                                        lidar_frame_ref_->roi_indices);
-      lidar_frame_ref_->cloud = roi_cloud_;
-      lidar_frame_ref_->world_cloud = roi_world_cloud_;
     } else {
       AINFO << "Fail to call roi filter, use origin cloud.";
       lidar_frame_ref_->roi_indices.indices.resize(original_cloud_->size());
@@ -203,6 +202,9 @@ bool CNNSegmentation::InitClusterAndBackgroundSegmentation() {
       *roi_cloud_ = *original_cloud_;
       *roi_world_cloud_ = *original_world_cloud_;
     }
+    lidar_frame_ref_->cloud = roi_cloud_;
+    lidar_frame_ref_->world_cloud = roi_world_cloud_;
+
     roi_filter_time_ = timer.toc(true);
     AINFO << "after roi filter";
     GroundDetectorOptions ground_detector_options;
@@ -436,6 +438,7 @@ bool CNNSegmentation::GetConfigs(std::string* param_file,
       << "Failed to get value of root_path.";
   std::string config_file;
   config_file = lib::FileUtil::GetAbsolutePath(work_root, root_path);
+  config_file = lib::FileUtil::GetAbsolutePath(config_file, sensor_name_);
   config_file = lib::FileUtil::GetAbsolutePath(config_file, "cnnseg.conf");
 
   CNNSegConfig config;

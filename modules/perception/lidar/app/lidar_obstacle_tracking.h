@@ -26,7 +26,9 @@ namespace apollo {
 namespace perception {
 namespace lidar {
 
-struct LidarObstacleTrackingInitOptions {};
+struct LidarObstacleTrackingInitOptions {
+  std::string sensor_name = "velodyne64";
+};
 
 struct LidarObstacleTrackingOptions {
   std::string sensor_name;
@@ -37,8 +39,8 @@ class LidarObstacleTracking {
   LidarObstacleTracking() = default;
   ~LidarObstacleTracking() = default;
 
-  bool Init(const LidarObstacleTrackingInitOptions& options =
-                LidarObstacleTrackingInitOptions());
+  bool Init(const LidarObstacleTrackingInitOptions& options
+      = LidarObstacleTrackingInitOptions());
 
   LidarProcessResult Process(const LidarObstacleTrackingOptions& options,
                              LidarFrame* frame);

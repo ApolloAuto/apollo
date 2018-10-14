@@ -38,6 +38,7 @@
 #include "modules/perception/lidar/common/lidar_frame_pool.h"
 #include "modules/perception/lidar/common/lidar_log.h"
 #include "modules/perception/lidar/common/pcl_util.h"
+#include "modules/perception/common/sensor_manager/sensor_manager.h"
 
 DEFINE_string(pcd_path, "./pcd/", "pcd path");
 DEFINE_string(pose_path, "", "pose path");
@@ -46,6 +47,7 @@ DEFINE_bool(enable_tracking, false, "option to enable tracking");
 DEFINE_double(min_life_time, -1.0, "minimum track time for output");
 DEFINE_bool(use_hdmap, false, "option to enable using hdmap");
 DEFINE_bool(use_tracking_info, false, "option to use tracking info");
+DEFINE_string(sensor_name, "velodyne64", "sensor name");
 
 namespace apollo {
 namespace perception {
@@ -74,6 +76,7 @@ class OfflineLidarObstaclePerception {
       return false;
     }
     segment_init_options_.enable_hdmap_input = FLAGS_use_hdmap;
+    segment_init_options_.sensor_name = FLAGS_sensor_name;
     if (!lidar_segmentation_->Init(segment_init_options_)) {
       AINFO << "Failed to init LidarObstacleSegmentation.";
       return false;
@@ -83,10 +86,26 @@ class OfflineLidarObstaclePerception {
       AERROR << "Failed to get LidarObstacleTracking instance.";
       return false;
     }
+    tracking_init_options_.sensor_name = FLAGS_sensor_name;
     if (!lidar_tracking_->Init(tracking_init_options_)) {
       AINFO << "Failed to init LidarObstacleSegmentation.";
       return false;
     }
+
+    common::SensorManager* sensor_manager =
+      lib::Singleton<common::SensorManager>::get_instance();
+    if (sensor_manager == nullptr) {
+      AERROR << "Failed to get sensor manager instance";
+      return false;
+    }
+    bool ret = sensor_manager->GetSensorInfo(FLAGS_sensor_name,
+        &sensor_info_);
+    if (!ret) {
+      AERROR << "Failed to get sensor info, sensor name: "
+        << FLAGS_sensor_name;
+      return false;
+    }
+    ADEBUG << "Sensor_name: " << sensor_info_.name;
 
     return true;
   }
@@ -114,6 +133,7 @@ class OfflineLidarObstaclePerception {
       AINFO << pcd_file_names[i];
       lib::FileUtil::GetFileName(pcd_file_names[i], &file_name);
       frame_ = LidarFramePool::Instance().Get();
+      frame_->sensor_info = sensor_info_;
       frame_->reserve = file_name;
       if (frame_->cloud == nullptr) {
         frame_->cloud = base::PointFCloudPool::Instance().Get();
@@ -312,6 +332,7 @@ class OfflineLidarObstaclePerception {
   LidarObstacleTrackingOptions tracking_options_;
   std::unique_ptr<LidarObstacleSegmentation> lidar_segmentation_;
   std::unique_ptr<LidarObstacleTracking> lidar_tracking_;
+  base::SensorInfo sensor_info_;
 };
 
 }  // namespace lidar

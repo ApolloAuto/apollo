@@ -18,6 +18,7 @@
 #include <string>
 #include <vector>
 
+#include "cybertron/common/macros.h"
 #include "modules/perception/lib/registerer/registerer.h"
 #include "modules/perception/lidar/common/lidar_frame.h"
 
@@ -25,9 +26,12 @@ namespace apollo {
 namespace perception {
 namespace lidar {
 
-struct SegmentationInitOptions {};
+struct SegmentationInitOptions {
+  std::string sensor_name = "velodyne64";
+};
 
-struct SegmentationOptions {};
+struct SegmentationOptions {
+};
 
 class BaseSegmentation {
  public:
@@ -48,8 +52,8 @@ class BaseSegmentation {
 
   virtual std::string Name() const = 0;
 
-  BaseSegmentation(const BaseSegmentation&) = delete;
-  BaseSegmentation& operator=(const BaseSegmentation&) = delete;
+ private:
+  DISALLOW_COPY_AND_ASSIGN(BaseSegmentation);
 };  // class BaseSegmentation
 
 PERCEPTION_REGISTER_REGISTERER(BaseSegmentation);

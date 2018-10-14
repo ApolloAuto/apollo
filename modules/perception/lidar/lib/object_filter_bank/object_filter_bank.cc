@@ -36,7 +36,10 @@ bool ObjectFilterBank::Init(const ObjectFilterInitOptions& options) {
   std::string root_path;
   CHECK(model_config->get_value("root_path", &root_path));
   config_file = lib::FileUtil::GetAbsolutePath(work_root, root_path);
-  config_file = lib::FileUtil::GetAbsolutePath(config_file, "filter_bank.conf");
+  config_file = lib::FileUtil::GetAbsolutePath(config_file,
+                                               options.sensor_name);
+  config_file
+    = lib::FileUtil::GetAbsolutePath(config_file, "filter_bank.conf");
   FilterBankConfig config;
   CHECK(apollo::common::util::GetProtoFromFile(config_file, &config));
   filter_bank_.clear();

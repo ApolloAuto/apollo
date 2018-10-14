@@ -13,7 +13,6 @@ cc_library(
     name = "perception_component_inner",
     srcs = [
         "fusion_component.cc",
-        "lidar_common_flags.cc",
         "lidar_output_component.cc",
         "recognition_component.cc",
         "camera_perception_viz_message.cc",
@@ -23,7 +22,6 @@ cc_library(
     ],
     hdrs = [
         "fusion_component.h",
-        "lidar_common_flags.h",
         "lidar_inner_component_messages.h",
         "camera_perception_viz_message.h",
         "fusion_camera_detection_component.h",
@@ -54,6 +52,7 @@ cc_library(
         "//modules/perception/common:perception_gflags",
         "//modules/drivers/proto:sensor_proto",
         "//modules/map/proto:map_proto",
+
         "//modules/perception/fusion/lib/dummy:dummy_algorithms",
         "//modules/perception/fusion/lib/fusion_system/probabilistic_fusion",
         "//modules/perception/fusion/lib/interface",
@@ -67,9 +66,6 @@ cc_library(
         "//modules/perception/lidar/lib/scene_manager/ground_service",
         "//modules/perception/lidar/lib/scene_manager/roi_service",
         "//modules/perception/lidar/lib/segmentation/cnnseg:cnn_segmentation",
-        "//modules/perception/lidar/lib/tracker/hm_tracker:hm_multi_target_tracker",
-        "//modules/perception/lidar/lib/tracker/hm_tracker:kalman_filter",
-        "//modules/perception/lidar/lib/tracker/hm_tracker:multi_hm_bipartite_graph_matcher",
 
         "//modules/perception/lidar/lib/classifier/fused_classifier",
         "//modules/perception/lidar/lib/classifier/fused_classifier:ccrf_type_fusion",
@@ -80,6 +76,13 @@ cc_library(
         "//modules/perception/camera/lib/traffic_light/preprocessor:tl_preprocessor",
         "//modules/perception/camera/lib/traffic_light/preprocessor:multi_camera_projection",
         "//modules/perception/camera/lib/traffic_light/preprocessor:pose",
+
+        "//modules/perception/onboard/proto:lidar_component_config_proto",
+        "//modules/perception/lidar/lib/tracker/multi_lidar_fusion:mlf_engine",
+        "//modules/perception/lidar/lib/tracker/multi_lidar_fusion:mlf_track_object_matcher",
+        "//modules/perception/lidar/lib/tracker/multi_lidar_fusion:mlf_tracker",
+
+
         "//modules/perception/map/hdmap:hdmap_input",
         "//modules/perception/onboard/common_flags",
         "//modules/perception/onboard/msg_serializer",

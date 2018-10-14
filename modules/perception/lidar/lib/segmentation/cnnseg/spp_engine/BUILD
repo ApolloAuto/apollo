@@ -42,6 +42,7 @@ cc_library(
     deps = [
         ":spp_cluster",
         ":spp_label_image",
+        ":spp_pool_types",
     ],
 )
 

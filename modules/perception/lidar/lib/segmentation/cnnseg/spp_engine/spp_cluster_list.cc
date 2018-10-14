@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include "modules/perception/lidar/lib/segmentation/cnnseg/spp_engine/spp_cluster_list.h"
 #include <algorithm>
+
+#include "modules/perception/lidar/lib/segmentation/cnnseg/spp_engine/spp_cluster_list.h"
 #include "modules/perception/lidar/common/lidar_log.h"
 #include "modules/perception/lidar/lib/segmentation/cnnseg/spp_engine/spp_pool_types.h"
 
@@ -22,14 +23,16 @@ namespace apollo {
 namespace perception {
 namespace lidar {
 
-void SppClusterList::Init(size_t size) {
+void SppClusterList::Init(size_t size, const std::string& sensor_name) {
+  sensor_name_ = sensor_name;
   clusters_.clear();
-  SppClusterPool::Instance().BatchGet(size, &clusters_);
+  SppClusterPool::Instance(sensor_name_).BatchGet(size, &clusters_);
 }
 
 void SppClusterList::resize(size_t size) {
   if (clusters_.size() < size) {
-    SppClusterPool::Instance().BatchGet(size - clusters_.size(), &clusters_);
+    SppClusterPool::Instance(sensor_name_)
+        .BatchGet(size - clusters_.size(), &clusters_);
   } else {
     clusters_.resize(size);
   }

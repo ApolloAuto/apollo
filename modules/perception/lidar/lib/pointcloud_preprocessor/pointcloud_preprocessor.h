@@ -25,7 +25,9 @@ namespace apollo {
 namespace perception {
 namespace lidar {
 
-struct PointCloudPreprocessorInitOptions {};
+struct PointCloudPreprocessorInitOptions {
+  std::string sensor_name = "velodyne64";
+};
 
 struct PointCloudPreprocessorOptions {};
 

@@ -26,13 +26,15 @@ namespace apollo {
 namespace perception {
 namespace lidar {
 
-void SppLabelImage::Init(size_t width, size_t height) {
+void SppLabelImage::Init(size_t width, size_t height,
+                         const std::string& sensor_name) {
   // simply release the last memory and allocate new one
   if (labels_) {
     common::IFree2(&labels_);
   }
   width_ = width;
   height_ = height;
+  sensor_name_ = sensor_name;
   labels_ = common::IAlloc2<uint16_t>(height_, width_);
   memset(labels_[0], 0, sizeof(uint16_t) * width_ * height_);
   clusters_.clear();
@@ -64,7 +66,7 @@ void SppLabelImage::CollectClusterFromSppLabelImage() {
   // find max label
   uint16_t max_label = *(std::max_element(labels_[0], labels_[0] + size));
   clusters_.clear();
-  SppClusterPool::Instance().BatchGet(max_label, &clusters_);
+  SppClusterPool::Instance(sensor_name_).BatchGet(max_label, &clusters_);
   for (size_t y = 0; y < height_; ++y) {
     for (size_t x = 0; x < width_; ++x) {
       uint16_t& label = labels_[y][x];
@@ -130,9 +132,9 @@ void SppLabelImage::FilterClusters(const float* confidence_map,
     for (auto& pixel : cluster->pixels) {
       sum_confidence += confidence_map[pixel];
     }
-    sum_confidence = cluster->pixels.size() > 0
-                         ? sum_confidence / cluster->pixels.size()
-                         : sum_confidence;
+    sum_confidence =
+        cluster->pixels.size() > 0 ? sum_confidence / cluster->pixels.size()
+                                   : sum_confidence;
     cluster->confidence = sum_confidence;
     if (mask) {  // in range, use confidence estimation
       is_valid.push_back(cluster->confidence >= confidence_threshold);
@@ -141,9 +143,9 @@ void SppLabelImage::FilterClusters(const float* confidence_map,
       for (auto& pixel : cluster->pixels) {
         sum_category += category_map[pixel];
       }
-      sum_category = cluster->pixels.size() > 0
-                         ? sum_category / cluster->pixels.size()
-                         : sum_category;
+      sum_category =
+          cluster->pixels.size() > 0 ? sum_category / cluster->pixels.size()
+                                     : sum_category;
       is_valid.push_back(sum_category >= category_threshold);
       // category is not stable, here we hack the confidence
       cluster->confidence =
@@ -230,14 +232,16 @@ void SppLabelImage::CalculateClusterTopZ(const float* top_z_map) {
 
 void SppLabelImage::AddPixelSample(size_t id, uint32_t pixel) {
   if (clusters_.size() <= id) {
-    SppClusterPool::Instance().BatchGet(id + 1 - clusters_.size(), &clusters_);
+    SppClusterPool::Instance(sensor_name_)
+        .BatchGet(id + 1 - clusters_.size(), &clusters_);
   }
   clusters_[id]->pixels.push_back(pixel);
 }
 
 void SppLabelImage::ResizeClusters(size_t size) {
   if (size > clusters_.size()) {
-    SppClusterPool::Instance().BatchGet(size - clusters_.size(), &clusters_);
+    SppClusterPool::Instance(sensor_name_)
+        .BatchGet(size - clusters_.size(), &clusters_);
   } else {
     clusters_.resize(size);
   }

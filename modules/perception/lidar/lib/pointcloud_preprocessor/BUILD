@@ -25,23 +25,4 @@ cc_library(
     ],
 )
 
-cc_test(
-    name = "pointcloud_preprocessor_test",
-    size = "small",
-    srcs = [
-        "pointcloud_preprocessor_test.cc",
-    ],
-    deps = [
-        ":pointcloud_preprocessor",
-        "@gtest//:main",
-        "//modules/perception/base",
-        "//modules/perception/common/io:io_util",
-        "//modules/perception/lidar/common",
-        "//modules/perception/lidar/lib/interface",
-        "//modules/perception/common/graph",
-        "//modules/perception/lidar/lib/object_builder",
-        "//modules/perception/lidar/lib/tracker/common:track_pool_types",
-    ],
-)
-
 cpplint()

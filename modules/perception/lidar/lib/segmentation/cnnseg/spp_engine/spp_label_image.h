@@ -17,9 +17,11 @@
 
 #include <memory>
 #include <vector>
+#include <string>
 
 #include "gtest/gtest_prod.h"
 
+#include "cybertron/common/macros.h"
 #include "modules/perception/common/i_lib/core/i_alloc.h"
 #include "modules/perception/lidar/lib/segmentation/cnnseg/spp_engine/spp_cluster.h"
 
@@ -41,7 +43,9 @@ class SppLabelImage {
   // @brief: initialize label image
   // @param [in]: image width
   // @param [in]: image height
-  void Init(size_t width, size_t height);
+  // @param [in]: sensor name
+  void Init(size_t width, size_t height,
+            const std::string& sensor_name = "velodyne64");
   // @brief: initialize range mask of label image
   // @param [in]: range
   // @param [in]: boundary distance for mask
@@ -124,9 +128,6 @@ class SppLabelImage {
   // @param [in]: target cluster size
   void ResetClusters(size_t size);
 
-  SppLabelImage(const SppLabelImage& rhs) = delete;
-  SppLabelImage& operator=(const SppLabelImage& rhs) = delete;
-
  private:
   // note the correspondence between label and cluster id is
   // label - 1 == cluster id, label zero is reserved for background
@@ -135,11 +136,13 @@ class SppLabelImage {
   size_t height_ = 0;
   char** range_mask_ = nullptr;
   std::vector<SppClusterPtr> clusters_;
+  std::string sensor_name_;
 
  private:
   static const size_t kDefaultReserveSize = 500;
 
   FRIEND_TEST(SppClusterTest, spp_cluster_test);
+  DISALLOW_COPY_AND_ASSIGN(SppLabelImage);
 };
 
 typedef std::shared_ptr<SppLabelImage> SppLabelImagePtr;

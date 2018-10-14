@@ -14,6 +14,7 @@ message SensorMeta {
     MONOCULAR_CAMERA    =  7;
     STEREO_CAMERA       =  8;
     ULTRASONIC          =  9;
+    VELODYNE_128        =  10;
   }
 
   enum SensorOrientation {

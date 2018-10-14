@@ -19,6 +19,7 @@
 #include <mutex>
 #include <string>
 
+#include "cybertron/common/macros.h"
 #include "modules/perception/lib/registerer/registerer.h"
 
 namespace apollo {
@@ -29,9 +30,6 @@ class SceneServiceContent {
  public:
   SceneServiceContent() = default;
   virtual ~SceneServiceContent() = default;
-  // forbid copy or assign directly
-  SceneServiceContent(const SceneServiceContent&) = delete;
-  SceneServiceContent& operator=(const SceneServiceContent&) = delete;
   // @brief: get service content name
   // @return: name
   virtual std::string Name() const = 0;
@@ -47,6 +45,9 @@ class SceneServiceContent {
 
  protected:
   bool service_ready_ = false;
+
+ private:
+  DISALLOW_COPY_AND_ASSIGN(SceneServiceContent);
 };
 
 PERCEPTION_REGISTER_REGISTERER(SceneServiceContent);
@@ -62,8 +63,6 @@ class SceneService {
  public:
   SceneService() = default;
   virtual ~SceneService() = default;
-  SceneService(const SceneService&) = delete;
-  SceneService& operator=(const SceneService&) = delete;
   // @brief: initialize scene service
   // @param [in]: init options
   virtual bool Init(
@@ -87,6 +86,9 @@ class SceneService {
  protected:
   SceneServiceContentPtr self_content_;
   std::mutex mutex_;
+
+ private:
+  DISALLOW_COPY_AND_ASSIGN(SceneService);
 };
 
 PERCEPTION_REGISTER_REGISTERER(SceneService);

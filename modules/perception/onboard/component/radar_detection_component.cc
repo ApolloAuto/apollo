@@ -72,7 +72,7 @@ bool RadarDetectionComponent::Proc(
            << std::to_string(message->header().timestamp_sec())
            << " current timestamp " << lib::TimeUtil::GetCurrentTime();
   std::shared_ptr<SensorFrameMessage> out_message(new (std::nothrow)
-                                                      SensorFrameMessage);
+                                                  SensorFrameMessage);
   int status = InternalProc(message, out_message);
   if (status) {
     writer_->Write(out_message);

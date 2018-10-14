@@ -20,6 +20,7 @@
 namespace apollo {
 namespace perception {
 namespace lidar {
+const int TrackData::kMaxHistorySize = 40;
 TrackData::TrackData() { Reset(); }
 
 TrackData::TrackData(TrackedObjectPtr obj, int track_id) {}
@@ -51,6 +52,34 @@ std::pair<double, TrackedObjectPtr> TrackData::GetHistoryObject(int idx) {
     return *cur_obj;
   }
 }
+
+const std::pair<double, TrackedObjectConstPtr>
+TrackData::GetHistoryObject(int idx) const {
+  if (history_objects_.size() == 0) {
+    AINFO << "no object in track";
+    return std::pair<double, TrackedObjectPtr>(0.0, TrackedObjectPtr(nullptr));
+  }
+  int max_idx =
+      static_cast<size_t>(abs(idx)) >= history_objects_.size() ?
+      history_objects_.size() - 1 : abs(idx);
+  // from oldest
+  if (idx > 0) {
+    std::map<double, TrackedObjectPtr>::const_iterator cur_obj =
+        history_objects_.cbegin();
+    for (int i = 0; i < max_idx; ++i) {
+      ++cur_obj;
+    }
+    return *cur_obj;
+  } else {
+    std::map<double, TrackedObjectPtr>::const_reverse_iterator cur_obj =
+        history_objects_.crbegin();
+    for (int i = 0; i < max_idx; ++i) {
+      ++cur_obj;
+    }
+    return *cur_obj;
+  }
+}
+
 
 void TrackData::Reset() {
   track_id_ = -1;
@@ -86,7 +115,7 @@ void TrackData::PushTrackedObjectToTrack(TrackedObjectPtr obj, double time) {
       consecutive_invisible_count_ = 0;
       ++total_visible_count_;
     }
-    if (history_objects_.size() > static_cast<size_t>(max_history_size_)) {
+    if (history_objects_.size() > kMaxHistorySize) {
       history_objects_.erase(history_objects_.begin());
     }
   } else {

@@ -20,8 +20,8 @@
 #include "modules/perception/lidar/common/lidar_error_code.h"
 #include "modules/perception/lidar/common/lidar_frame_pool.h"
 #include "modules/perception/lidar/common/lidar_log.h"
+#include "modules/perception/common/sensor_manager/sensor_manager.h"
 #include "modules/perception/onboard/common_flags/common_flags.h"
-#include "modules/perception/onboard/component/lidar_common_flags.h"
 
 namespace apollo {
 namespace perception {
@@ -37,8 +37,19 @@ bool SegmentationComponent::Init() {
     AERROR << "Failed to init segmentation component algorithm plugin.";
     return false;
   }
-  writer_ = node_->CreateWriter<LidarFrameMessage>(
-      FLAGS_obs_segmentation_component_output_channel_name);
+  LidarSegmentationComponentConfig comp_config;
+  if (!GetProtoConfig(&comp_config)) {
+    return false;
+  }
+  ADEBUG << "Lidar Component Configs: " << comp_config.DebugString();
+  output_channel_name_ = comp_config.output_channel_name();
+  sensor_name_ = comp_config.sensor_name();
+  lidar2novatel_tf2_child_frame_id_ =
+      comp_config.lidar2novatel_tf2_child_frame_id();
+  lidar_query_tf_offset_ = comp_config.lidar_query_tf_offset();
+  enable_hdmap_ = comp_config.enable_hdmap();
+  writer_ = node_->CreateWriter<LidarFrameMessage>(output_channel_name_);
+
   return true;
 }
 
@@ -49,37 +60,46 @@ bool SegmentationComponent::Proc(
         << std::to_string(lib::TimeUtil::GetCurrentTime());
 
   std::shared_ptr<LidarFrameMessage> out_message(new (std::nothrow)
-                                                     LidarFrameMessage);
+                                                 LidarFrameMessage);
 
   bool status = InternalProc(message, out_message);
   if (status == true) {
     writer_->Write(out_message);
-    // Send(FLAGS_obs_segmentation_component_output_channel_name, out_message);
     AINFO << "Send lidar segment output message.";
   }
   return status;
 }
 
 bool SegmentationComponent::InitAlgorithmPlugin() {
+  apollo::perception::common::SensorManager* sensor_manager =
+      lib::Singleton<apollo::perception::common::SensorManager>::get_instance();
+  CHECK_NOTNULL(sensor_manager);
+  CHECK(sensor_manager->GetSensorInfo(sensor_name_, &sensor_info_));
+
   segmentor_.reset(new lidar::LidarObstacleSegmentation);
   if (segmentor_ == nullptr) {
-    AERROR << "Failed to get segmentation instance";
+    AERROR << "sensor_name_ "
+           << "Failed to get segmentation instance";
     return false;
   }
   lidar::LidarObstacleSegmentationInitOptions init_options;
-  init_options.enable_hdmap_input = FLAGS_obs_enable_hdmap_input;
+  init_options.sensor_name = sensor_name_;
+  init_options.enable_hdmap_input =
+      FLAGS_obs_enable_hdmap_input && enable_hdmap_;
   if (!segmentor_->Init(init_options)) {
-    AINFO << "Failed to init segmentation.";
+    AINFO << "sensor_name_ "
+          << "Failed to init segmentation.";
     return false;
   }
-  velodyne2world_trans_.Init(FLAGS_obs_lidar2novatel_tf2_child_frame_id);
+
+  lidar2world_trans_.Init(lidar2novatel_tf2_child_frame_id_);
   return true;
 }
 
 bool SegmentationComponent::InternalProc(
     const std::shared_ptr<const drivers::PointCloud>& in_message,
     const std::shared_ptr<LidarFrameMessage>& out_message) {
-  PERCEPTION_PERF_FUNCTION_WITH_INDICATOR(FLAGS_obs_lidar_onboard_sensor_name);
+  PERCEPTION_PERF_FUNCTION_WITH_INDICATOR(sensor_name_);
   {
     std::unique_lock<std::mutex> lock(s_mutex_);
     s_seq_num_++;
@@ -88,6 +108,7 @@ bool SegmentationComponent::InternalProc(
   const double cur_time = lib::TimeUtil::GetCurrentTime();
   const double start_latency = (cur_time - timestamp) * 1e3;
   AINFO << "FRAME_STATISTICS:Lidar:Start:msg_time[" << std::to_string(timestamp)
+        << sensor_name_ << ":Start:msg_time["
         << "]:cur_time[" << std::to_string(cur_time) << "]:cur_latency["
         << start_latency << "]";
 
@@ -97,28 +118,27 @@ bool SegmentationComponent::InternalProc(
   out_message->error_code_ = apollo::common::ErrorCode::OK;
 
   PERCEPTION_PERF_BLOCK_START();
-  Eigen::Affine3d velodyne_trans;
-  const double velodyne64_query_tf_timestamp =
-      timestamp - FLAGS_obs_velodyne64_query_tf_offset * 0.001;
-  if (velodyne2world_trans_.GetSensor2worldTrans(velodyne64_query_tf_timestamp,
-                                                 &velodyne_trans) != true) {
+  Eigen::Affine3d pose = Eigen::Affine3d::Identity();
+  const double lidar_query_tf_timestamp =
+      timestamp - lidar_query_tf_offset_ * 0.001;
+  if (lidar2world_trans_.GetSensor2worldTrans(lidar_query_tf_timestamp,
+                                              &pose) != true) {
     out_message->error_code_ = apollo::common::ErrorCode::PERCEPTION_ERROR_TF;
-    AERROR << "Fail to get pose at time: "
-           << std::to_string(velodyne64_query_tf_timestamp);
+    AERROR << "Fail to get pose at time: " << std::to_string(
+                                                  lidar_query_tf_timestamp);
     return true;
   }
   PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(
-      FLAGS_obs_lidar_onboard_sensor_name,
-      "segmentation_1::get_lidar_to_world_pose");
+      sensor_name_, "segmentation_1::get_lidar_to_world_pose");
 
   auto& frame = out_message->lidar_frame_;
   frame = lidar::LidarFramePool::Instance().Get();
-  frame->lidar2world_pose = velodyne_trans;
+  frame->lidar2world_pose = pose;
   frame->cloud = base::PointFCloudPool::Instance().Get();
   frame->timestamp = timestamp;
 
   lidar::LidarObstacleSegmentationOptions segment_opts;
-  segment_opts.sensor_name = FLAGS_obs_lidar_onboard_sensor_name;
+  segment_opts.sensor_name = sensor_name_;
   lidar::LidarProcessResult ret =
       segmentor_->Process(segment_opts, in_message, frame.get());
   if (ret.error_code != lidar::LidarErrorCode::Succeed) {
@@ -126,7 +146,7 @@ bool SegmentationComponent::InternalProc(
         apollo::common::ErrorCode::PERCEPTION_ERROR_PROCESS;
     AERROR << "Lidar segmentation process error, " << ret.log;
   }
-  PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(FLAGS_obs_lidar_onboard_sensor_name,
+  PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(sensor_name_,
                                            "segmentation_2::segment_obstacle");
 
   return true;

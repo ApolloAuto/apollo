@@ -29,8 +29,9 @@ namespace lidar {
 
 bool LidarObstacleSegmentation::Init(
     const LidarObstacleSegmentationInitOptions& options) {
-  lib::ConfigManager* config_manager =
-      lib::Singleton<lib::ConfigManager>::get_instance();
+  auto& sensor_name = options.sensor_name;
+  lib::ConfigManager* config_manager
+    = lib::Singleton<lib::ConfigManager>::get_instance();
   CHECK_NOTNULL(config_manager);
   const lib::ModelConfig* model_config = nullptr;
   CHECK(config_manager->GetModelConfig(Name(), &model_config));
@@ -40,8 +41,10 @@ bool LidarObstacleSegmentation::Init(
   std::string root_path;
   CHECK(model_config->get_value("root_path", &root_path));
   config_file = lib::FileUtil::GetAbsolutePath(work_root, root_path);
-  config_file = lib::FileUtil::GetAbsolutePath(
-      config_file, "lidar_obstacle_segmentation.conf");
+  config_file = lib::FileUtil::GetAbsolutePath(config_file, sensor_name);
+  config_file
+    = lib::FileUtil::GetAbsolutePath(config_file,
+        "lidar_obstacle_segmentation.conf");
 
   LidarObstacleSegmentationConfig config;
   CHECK(apollo::common::util::GetProtoFromFile(config_file, &config));
@@ -55,6 +58,7 @@ bool LidarObstacleSegmentation::Init(
   CHECK(SceneManager::Instance().Init(scene_manager_init_options));
 
   PointCloudPreprocessorInitOptions preprocessor_init_options;
+  preprocessor_init_options.sensor_name = sensor_name;
   CHECK(cloud_preprocessor_.Init(preprocessor_init_options));
 
   if (use_map_manager_) {
@@ -65,10 +69,11 @@ bool LidarObstacleSegmentation::Init(
     }
   }
 
-  segmentor_.reset(
-      BaseSegmentationRegisterer::GetInstanceByName(segmentor_name_));
+  segmentor_.reset(BaseSegmentationRegisterer::GetInstanceByName(
+        segmentor_name_));
   CHECK_NOTNULL(segmentor_.get());
   SegmentationInitOptions segmentation_init_options;
+  segmentation_init_options.sensor_name = sensor_name;
   CHECK(segmentor_->Init(segmentation_init_options));
 
   ObjectBuilderInitOptions builder_init_options;
@@ -76,6 +81,7 @@ bool LidarObstacleSegmentation::Init(
 
   if (use_object_filter_bank_) {
     ObjectFilterInitOptions filter_bank_init_options;
+    filter_bank_init_options.sensor_name = sensor_name;
     CHECK(filter_bank_.Init(filter_bank_init_options));
   }
 

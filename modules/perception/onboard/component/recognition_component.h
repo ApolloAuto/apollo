@@ -16,6 +16,7 @@
 #pragma once
 
 #include <memory>
+#include <string>
 
 #include "cybertron/cybertron.h"
 
@@ -23,6 +24,7 @@
 #include "modules/perception/lidar/app/lidar_obstacle_tracking.h"
 #include "modules/perception/onboard/component/lidar_inner_component_messages.h"
 #include "modules/perception/onboard/inner_component_messages/inner_component_messages.h"
+#include "modules/perception/onboard/proto/lidar_component_config.pb.h"
 
 namespace apollo {
 namespace perception {
@@ -42,6 +44,8 @@ class RecognitionComponent : public cybertron::Component<LidarFrameMessage> {
                     const std::shared_ptr<SensorFrameMessage>& out_message);
   std::unique_ptr<lidar::LidarObstacleTracking> tracker_;
   base::SensorInfo sensor_info_;
+  std::string main_sensor_name_;
+  std::string output_channel_name_;
   std::shared_ptr<apollo::cybertron::Writer<SensorFrameMessage>> writer_;
 };
 

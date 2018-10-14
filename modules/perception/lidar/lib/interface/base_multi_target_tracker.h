@@ -14,10 +14,11 @@
  * limitations under the License.
  *****************************************************************************/
 #pragma once
-
+#include <map>
 #include <string>
 #include <vector>
 
+#include "cybertron/common/macros.h"
 #include "modules/perception/lib/registerer/registerer.h"
 #include "modules/perception/lidar/common/lidar_frame.h"
 
@@ -25,9 +26,11 @@ namespace apollo {
 namespace perception {
 namespace lidar {
 
-struct MultiTargetTrackerInitOptions {};
+struct MultiTargetTrackerInitOptions {
+};
 
-struct MultiTargetTrackerOptions {};
+struct MultiTargetTrackerOptions {
+};
 
 class BaseMultiTargetTracker {
  public:
@@ -35,8 +38,8 @@ class BaseMultiTargetTracker {
 
   virtual ~BaseMultiTargetTracker() = default;
 
-  virtual bool Init(const MultiTargetTrackerInitOptions& options =
-                        MultiTargetTrackerInitOptions()) = 0;
+  virtual bool Init(const MultiTargetTrackerInitOptions&
+                        options = MultiTargetTrackerInitOptions()) = 0;
 
   // @brief: track segmented objects, and estimate motion
   // @param [in]: options
@@ -47,11 +50,8 @@ class BaseMultiTargetTracker {
 
   virtual std::string Name() const = 0;
 
-  BaseMultiTargetTracker(const BaseMultiTargetTracker& rhs) = delete;
-
-  BaseMultiTargetTracker& operator=(const BaseMultiTargetTracker&) = delete;
-
  private:
+  DISALLOW_COPY_AND_ASSIGN(BaseMultiTargetTracker);
 };  // class BaseMultiTargetTracker
 
 PERCEPTION_REGISTER_REGISTERER(BaseMultiTargetTracker);

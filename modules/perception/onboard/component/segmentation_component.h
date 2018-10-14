@@ -16,6 +16,7 @@
 #pragma once
 
 #include <memory>
+#include <string>
 
 #include "cybertron/cybertron.h"
 
@@ -24,6 +25,8 @@
 #include "modules/perception/lidar/common/lidar_frame.h"
 #include "modules/perception/onboard/component/lidar_inner_component_messages.h"
 #include "modules/perception/onboard/transform_wrapper/transform_wrapper.h"
+#include "modules/perception/onboard/proto/lidar_component_config.pb.h"
+
 
 namespace apollo {
 namespace perception {
@@ -47,7 +50,13 @@ class SegmentationComponent : public cybertron::Component<drivers::PointCloud> {
  private:
   static std::mutex s_mutex_;
   static uint32_t s_seq_num_;
-  TransformWrapper velodyne2world_trans_;
+  std::string sensor_name_;
+  bool enable_hdmap_ = true;
+  float lidar_query_tf_offset_ = 20.0;
+  std::string lidar2novatel_tf2_child_frame_id_;
+  std::string output_channel_name_;
+  base::SensorInfo sensor_info_;
+  TransformWrapper lidar2world_trans_;
   std::unique_ptr<lidar::LidarObstacleSegmentation> segmentor_;
   std::shared_ptr<apollo::cybertron::Writer<LidarFrameMessage>> writer_;
 };

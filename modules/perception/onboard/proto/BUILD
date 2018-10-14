@@ -43,4 +43,18 @@ proto_library(
 		"trafficlights_perception_component.proto",
 	],
 )
+cc_proto_library(
+    name = "lidar_component_config_proto",
+    deps = [
+        ":lidar_component_config_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "lidar_component_config_proto_lib",
+    srcs = [
+        "lidar_component_config.proto"
+    ],
+)
+
 cpplint()
