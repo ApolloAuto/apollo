@@ -63,40 +63,29 @@ constexpr double kSpeedOptimizationFallbackCost = 2e4;
 constexpr double kStraightForwardLineCost = 10.0;
 }  // namespace
 
-void LaneFollowScenario::RegisterTasks() {
-  task_factory_.Register(DP_POLY_PATH_OPTIMIZER,
-                         []() -> Task* { return new DpPolyPathOptimizer(); });
-  task_factory_.Register(PATH_DECIDER,
-                         []() -> Task* { return new PathDecider(); });
-  task_factory_.Register(DP_ST_SPEED_OPTIMIZER,
-                         []() -> Task* { return new DpStSpeedOptimizer(); });
-  task_factory_.Register(SPEED_DECIDER,
-                         []() -> Task* { return new SpeedDecider(); });
-  task_factory_.Register(QP_SPLINE_ST_SPEED_OPTIMIZER, []() -> Task* {
-    return new QpSplineStSpeedOptimizer();
-  });
-  task_factory_.Register(QP_PIECEWISE_JERK_PATH_OPTIMIZER, []() -> Task* {
-    return new QpPiecewiseJerkPathOptimizer();
-  });
-  task_factory_.Register(POLY_ST_SPEED_OPTIMIZER,
-                         []() -> Task* { return new PolyStSpeedOptimizer(); });
-}
+LaneFollowStage::LaneFollowStage(const ScenarioConfig::StageConfig& config)
+    : Stage(config) {}
 
-bool LaneFollowScenario::Init() {
-  if (is_init_) {
-    return true;
+LaneFollowScenario::LaneFollowScenario()
+    : Scenario(FLAGS_scenario_lane_follow_config_file) {}
+
+LaneFollowScenario::LaneFollowScenario(const std::string& config_file)
+    : Scenario(config_file) {}
+
+LaneFollowScenario::LaneFollowScenario(const ScenarioConfig& config)
+    : Scenario(config) {}
+
+std::unique_ptr<Stage> LaneFollowScenario::CreateStage(
+    const ScenarioConfig::StageConfig& stage_config) const {
+  if (stage_config.stage_type() != ScenarioConfig::LANE_FOLLOW_DEFAULT_STAGE) {
+    AERROR << "Follow lane does not support stage type: "
+           << ScenarioConfig::StageType_Name(stage_config.stage_type());
+    return nullptr;
   }
-
-  CHECK(apollo::common::util::GetProtoFromFile(
-      FLAGS_scenario_lane_follow_config_file, &config_));
-
-  RegisterTasks();
-
-  is_init_ = true;
-  return true;
+  return std::unique_ptr<Stage>(new LaneFollowStage(stage_config));
 }
 
-void LaneFollowScenario::RecordObstacleDebugInfo(
+void LaneFollowStage::RecordObstacleDebugInfo(
     ReferenceLineInfo* reference_line_info) {
   if (!FLAGS_enable_record_debug) {
     ADEBUG << "Skip record debug info";
@@ -124,9 +113,9 @@ void LaneFollowScenario::RecordObstacleDebugInfo(
   }
 }
 
-void LaneFollowScenario::RecordDebugInfo(ReferenceLineInfo* reference_line_info,
-                                         const std::string& name,
-                                         const double time_diff_ms) {
+void LaneFollowStage::RecordDebugInfo(ReferenceLineInfo* reference_line_info,
+                                      const std::string& name,
+                                      const double time_diff_ms) {
   if (!FLAGS_enable_record_debug) {
     ADEBUG << "Skip record debug info";
     return;
@@ -143,19 +132,10 @@ void LaneFollowScenario::RecordDebugInfo(ReferenceLineInfo* reference_line_info,
   ptr_stats->set_time_ms(time_diff_ms);
 }
 
-Status LaneFollowScenario::Process(const TrajectoryPoint& planning_start_point,
-                                   Frame* frame) {
-  scenario_status_ = ScenarioStatus::STATUS_PROCESSING;
-
-  const int current_stage_index = StageIndexInConf(stage_);
-  if (!InitTasks(config_, current_stage_index,  &tasks_)) {
-    return Status(ErrorCode::PLANNING_ERROR, "failed to init tasks");
-  }
-
+Stage::StageStatus LaneFollowStage::Process(
+    const TrajectoryPoint& planning_start_point, Frame* frame) {
   bool has_drivable_reference_line = false;
   bool disable_low_priority_path = false;
-  auto status =
-      Status(ErrorCode::PLANNING_ERROR, "reference line not drivable");
   for (auto& reference_line_info : *frame->mutable_reference_line_info()) {
     if (disable_low_priority_path) {
       reference_line_info.SetDrivable(false);
@@ -176,10 +156,11 @@ Status LaneFollowScenario::Process(const TrajectoryPoint& planning_start_point,
       reference_line_info.SetDrivable(false);
     }
   }
-  return has_drivable_reference_line ? Status::OK() : status;
+  return has_drivable_reference_line ? StageStatus::RUNNING
+                                     : StageStatus::ERROR;
 }
 
-Status LaneFollowScenario::PlanOnReferenceLine(
+Status LaneFollowStage::PlanOnReferenceLine(
     const TrajectoryPoint& planning_start_point, Frame* frame,
     ReferenceLineInfo* reference_line_info) {
   if (!reference_line_info->IsChangeLanePath()) {
@@ -198,7 +179,7 @@ Status LaneFollowScenario::PlanOnReferenceLine(
 
   auto ret = Status::OK();
 
-  for (auto& optimizer : tasks_) {
+  for (auto* optimizer : task_list_) {
     const double start_timestamp = Clock::NowInSeconds();
     ret = optimizer->Execute(frame, reference_line_info);
     if (!ret.ok()) {
@@ -299,7 +280,7 @@ Status LaneFollowScenario::PlanOnReferenceLine(
   return Status::OK();
 }
 
-void LaneFollowScenario::GenerateFallbackPathProfile(
+void LaneFollowStage::GenerateFallbackPathProfile(
     const ReferenceLineInfo* reference_line_info, PathData* path_data) {
   auto adc_point = EgoInfo::Instance()->start_point();
   double adc_s = reference_line_info->AdcSlBoundary().end_s();
@@ -328,9 +309,8 @@ void LaneFollowScenario::GenerateFallbackPathProfile(
   path_data->SetDiscretizedPath(DiscretizedPath(std::move(path_points)));
 }
 
-SLPoint LaneFollowScenario::GetStopSL(
-    const ObjectStop& stop_decision,
-    const ReferenceLine& reference_line) const {
+SLPoint LaneFollowStage::GetStopSL(const ObjectStop& stop_decision,
+                                   const ReferenceLine& reference_line) const {
   SLPoint sl_point;
   reference_line.XYToSL(
       {stop_decision.stop_point().x(), stop_decision.stop_point().y()},
@@ -347,14 +327,6 @@ bool LaneFollowScenario::IsTransferable(
   } else {
     return false;
   }
-}
-
-int LaneFollowScenario::StageIndexInConf(const LaneFollowStage& stage) {
-  // note: this is the index in scenario conf file.  must be consistent
-  if (stage == LaneFollowStage::CRUISE) {
-    return 0;
-  }
-  return -1;
 }
 
 }  // namespace planning

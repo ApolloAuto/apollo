@@ -41,16 +41,12 @@ using apollo::common::VehicleConfigHelper;
 using apollo::localization::LocalizationEstimate;
 using apollo::planning_internal::STGraphDebug;
 
-DpStSpeedOptimizer::DpStSpeedOptimizer()
-    : SpeedOptimizer("DpStSpeedOptimizer") {}
-
-bool DpStSpeedOptimizer::Init(
-    const ScenarioConfig::ScenarioTaskConfig& config) {
+DpStSpeedOptimizer::DpStSpeedOptimizer(const TaskConfig& config)
+    : SpeedOptimizer(config) {
   CHECK(config.has_dp_st_speed_config());
   dp_st_speed_config_ = config.dp_st_speed_config();
   st_boundary_config_ = dp_st_speed_config_.st_boundary_config();
-  is_init_ = true;
-  return true;
+  SetName("DpStSpeedOptimizer");
 }
 
 bool DpStSpeedOptimizer::SearchStGraph(
@@ -133,10 +129,6 @@ Status DpStSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
                                    const SpeedData& reference_speed_data,
                                    PathDecision* const path_decision,
                                    SpeedData* const speed_data) {
-  if (!is_init_) {
-    AERROR << "Please call Init() before process DpStSpeedOptimizer.";
-    return Status(ErrorCode::PLANNING_ERROR, "Not inited.");
-  }
   init_point_ = init_point;
   adc_sl_boundary_ = adc_sl_boundary;
   reference_line_ = &reference_line;

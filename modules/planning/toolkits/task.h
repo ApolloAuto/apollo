@@ -33,22 +33,26 @@ namespace planning {
 
 class Task {
  public:
-  explicit Task(const std::string& name);
+  explicit Task(const TaskConfig& config);
+
   virtual ~Task() = default;
-  virtual const std::string& Name() const;
+
+  void SetName(const std::string& name) { name_ = name; }
+
+  const std::string& Name() const;
+
+  const TaskConfig& Config() const { return config_; }
 
   virtual apollo::common::Status Execute(
       Frame* frame, ReferenceLineInfo* reference_line_info);
 
-  virtual bool Init(const ScenarioConfig::ScenarioTaskConfig& config);
-
  protected:
-  bool is_init_ = false;
   Frame* frame_ = nullptr;
   ReferenceLineInfo* reference_line_info_ = nullptr;
 
  private:
-  const std::string name_;
+  TaskConfig config_;
+  std::string name_;
 };
 
 }  // namespace planning

@@ -56,28 +56,12 @@ TEST_F(StopSignUnprotectedScenarioTest, InitTasks) {
       "//apollo/modules/planning/testdata/conf/"
       "scenario_stop_sign_unprotected_config.pb.txt";
 
-  scenario_.reset(new StopSignUnprotectedScenario());
-  EXPECT_EQ(scenario_->scenario_type(),
-            ScenarioConfig::STOP_SIGN_UNPROTECTED);
-
   ScenarioConfig config;
   EXPECT_TRUE(apollo::common::util::GetProtoFromFile(
       FLAGS_scenario_stop_sign_unprotected_config_file, &config));
 
-  EXPECT_TRUE(scenario_->Init());
-
-  std::vector<std::unique_ptr<Task>> tasks;
-  // stage stop
-  scenario_->InitTasks(config, 0, &tasks);
-  EXPECT_EQ(tasks.size(), 0);
-
-  // stage creep
-  scenario_->InitTasks(config, 1, &tasks);
-  EXPECT_EQ(tasks.size(), 1);
-
-  // stage intersection_cruise
-  scenario_->InitTasks(config, 2, &tasks);
-  EXPECT_EQ(tasks.size(), 5);
+  scenario_.reset(new StopSignUnprotectedScenario(config));
+  EXPECT_EQ(scenario_->scenario_type(), ScenarioConfig::STOP_SIGN_UNPROTECTED);
 }
 
 }  // namespace planning

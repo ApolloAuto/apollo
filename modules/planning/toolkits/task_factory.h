@@ -20,32 +20,26 @@
 
 #pragma once
 
-#include "modules/common/configs/proto/vehicle_config.pb.h"
-#include "modules/planning/proto/planning_config.pb.h"
-#include "modules/planning/proto/poly_st_speed_config.pb.h"
-#include "modules/planning/proto/st_boundary_config.pb.h"
+#include <memory>
+#include <string>
 
-#include "modules/planning/toolkits/optimizers/speed_optimizer.h"
-#include "modules/planning/toolkits/optimizers/st_graph/st_boundary_mapper.h"
+#include "modules/planning/proto/planning_config.pb.h"
+
+#include "modules/common/util/factory.h"
+#include "modules/planning/toolkits/task.h"
 
 namespace apollo {
 namespace planning {
 
-class PolyStSpeedOptimizer : public SpeedOptimizer {
+class TaskFactory {
  public:
-  explicit PolyStSpeedOptimizer(const TaskConfig& config);
+  static void Init();
+  static std::unique_ptr<Task> CreateTask(const TaskConfig &task_config);
 
  private:
-  common::Status Process(const SLBoundary& adc_sl_boundary,
-                         const PathData& path_data,
-                         const apollo::common::TrajectoryPoint& init_point,
-                         const ReferenceLine& reference_line,
-                         const SpeedData& reference_speed_data,
-                         PathDecision* const path_decision,
-                         SpeedData* const speed_data) override;
-
-  PolyStSpeedConfig poly_st_speed_config_;
-  StBoundaryConfig st_boundary_config_;
+  static apollo::common::util::Factory<TaskConfig::TaskType, Task,
+                                       Task *(*)(const TaskConfig &config)>
+      task_factory_;
 };
 
 }  // namespace planning

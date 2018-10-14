@@ -34,10 +34,7 @@ namespace planning {
 
 class SidePassPathDecider : public Decider {
  public:
-  SidePassPathDecider();
-  ~SidePassPathDecider() = default;
-
-  bool Init(const ScenarioConfig::ScenarioTaskConfig& config) override;
+  explicit SidePassPathDecider(const TaskConfig& config);
 
  private:
   apollo::common::Status Process(

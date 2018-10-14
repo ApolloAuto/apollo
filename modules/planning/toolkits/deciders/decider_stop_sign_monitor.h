@@ -41,15 +41,11 @@ class DeciderStopSignMonitor : public Decider {
       StopSignLaneVehicles;
 
  public:
-  DeciderStopSignMonitor();
-  ~DeciderStopSignMonitor() = default;
-
-  bool Init(const ScenarioConfig::ScenarioTaskConfig &config) override;
+  explicit DeciderStopSignMonitor(const TaskConfig& config);
 
  private:
   apollo::common::Status Process(
-      Frame* frame,
-      ReferenceLineInfo* reference_line_info) override;
+      Frame* frame, ReferenceLineInfo* reference_line_info) override;
 
   void UpdateWatchVehicles(StopSignLaneVehicles* watch_vehicles);
   int AddWatchVehicle(const PathObstacle& path_obstacle,

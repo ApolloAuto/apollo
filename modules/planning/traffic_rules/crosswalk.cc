@@ -63,7 +63,7 @@ Status Crosswalk::ApplyRule(Frame* const frame,
   CHECK_NOTNULL(reference_line_info);
 
   if (!FindCrosswalks(reference_line_info)) {
-    mutable_planning_status()->clear_crosswalk();
+    PlanningContext::MutablePlanningStatus()->clear_crosswalk();
     return Status::OK();
   }
 
@@ -104,7 +104,8 @@ void Crosswalk::MakeDecisions(Frame* const frame,
         config_.crosswalk().max_valid_stop_distance()) {
       stopped_at_crosswalk = true;
 
-      const auto& crosswalk_status = mutable_planning_status()->crosswalk();
+      const auto& crosswalk_status =
+          PlanningContext::MutablePlanningStatus()->crosswalk();
       if (crosswalk_status.has_crosswalk_id() &&
           crosswalk_status.crosswalk_id() == crosswalk_overlap->object_id) {
         crosswalk_stop_timer.first = crosswalk_status.crosswalk_id();
@@ -115,7 +116,7 @@ void Crosswalk::MakeDecisions(Frame* const frame,
         }
       } else {
         // reset crosswalk_status
-        mutable_planning_status()->clear_crosswalk();
+        PlanningContext::MutablePlanningStatus()->clear_crosswalk();
         crosswalk_stop_timer.first = crosswalk_overlap->object_id;
       }
     }
@@ -298,8 +299,9 @@ void Crosswalk::MakeDecisions(Frame* const frame,
 
     // update CrosswalkStatus
     if (stopped_at_crosswalk) {
-      mutable_planning_status()->clear_crosswalk();
-      auto* crosswalk_status = mutable_planning_status()->mutable_crosswalk();
+      PlanningContext::MutablePlanningStatus()->clear_crosswalk();
+      auto* crosswalk_status =
+          PlanningContext::MutablePlanningStatus()->mutable_crosswalk();
       crosswalk_status->set_crosswalk_id(crosswalk_stop_timer.first);
       for (auto it = crosswalk_stop_timer.second.begin();
            it != crosswalk_stop_timer.second.end(); ++it) {

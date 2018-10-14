@@ -27,6 +27,7 @@
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/common/status/status.h"
 #include "modules/common/util/factory.h"
+#include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/reference_line_info.h"
 #include "modules/planning/common/speed_profile_generator.h"
 #include "modules/planning/proto/planning.pb.h"
@@ -38,56 +39,29 @@
 namespace apollo {
 namespace planning {
 
+DECLARE_STAGE(SidePassApproachObstacle);
+DECLARE_STAGE(SidePassGeneratePath);
+DECLARE_STAGE(SidePassStopOnWaitPoint);
+DECLARE_STAGE(SidePassDetectSafety);
+DECLARE_STAGE(SidePassPassObstacle);
+
 class SidePassScenario : public Scenario {
  public:
-  SidePassScenario() : Scenario(ScenarioConfig::SIDE_PASS) {}
-  virtual ~SidePassScenario() = default;
-
-  bool Init() override;
-
-  common::Status Process(const common::TrajectoryPoint& planning_init_point,
-                         Frame* frame) override;
+  SidePassScenario() : Scenario(FLAGS_scenario_side_pass_config_file) {}
+  explicit SidePassScenario(const ScenarioConfig& config) : Scenario(config) {}
 
   bool IsTransferable(const Scenario& current_scenario,
                       const common::TrajectoryPoint& ego_point,
                       const Frame& frame) const override;
 
+  std::unique_ptr<Stage> CreateStage(
+      const ScenarioConfig::StageConfig& stage_config) const;
+
  private:
-  enum class SidePassStage {
-    UNKNOWN,
-    OBSTACLE_APPROACH,
-    PATH_GENERATION,
-    WAITPOINT_STOP,
-    SAFETY_DETECTION,
-    OBSTACLE_PASS,
-  };
-
-  void RegisterTasks();
-
-  int StageIndexInConf(const SidePassStage& stage);
-
-  SidePassStage GetNextStage(const SidePassStage& current_stage);
-
-  common::Status ApproachObstacle(
-      const common::TrajectoryPoint& planning_start_point, Frame* frame);
-
-  common::Status GeneratePath(
-      const common::TrajectoryPoint& planning_start_point, Frame* frame);
-
-  common::Status StopOnWaitPoint(
-      const common::TrajectoryPoint& planning_start_point, Frame* frame);
-
-  common::Status DetectSafety(
-      const common::TrajectoryPoint& planning_start_point, Frame* frame);
-
-  common::Status PassObstacle(
-      const common::TrajectoryPoint& planning_start_point, Frame* frame);
+  static void RegisterStages();
 
   bool IsSidePassScenario(const common::TrajectoryPoint& planning_start_point,
                           const Frame& frame) const;
-
-  common::Status RunPlanOnReferenceLine(
-      const common::TrajectoryPoint& planning_start_point, Frame* frame);
 
   bool IsFarFromIntersection(const Frame& frame);
 
@@ -95,9 +69,13 @@ class SidePassScenario : public Scenario {
                            const PathDecision& path_decision) const;
 
  private:
+  static apollo::common::util::Factory<
+      ScenarioConfig::StageType, Stage,
+      Stage* (*)(const ScenarioConfig::StageConfig& stage_config)>
+      s_stage_factory_;
+
   std::vector<std::unique_ptr<Task>> tasks_;
   ScenarioConfig config_;
-  SidePassStage stage_ = SidePassStage::OBSTACLE_APPROACH;
   bool stage_init_ = false;
   SpeedProfileGenerator speed_profile_generator_;
   PathData path_;

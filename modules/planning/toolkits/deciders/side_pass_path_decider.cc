@@ -32,22 +32,13 @@ using ::apollo::common::ErrorCode;
 using ::apollo::common::Status;
 using ::apollo::hdmap::PathOverlap;
 
-SidePassPathDecider::SidePassPathDecider() : Decider("SidePassPathDecider") {}
-
-bool SidePassPathDecider::Init(
-    const ScenarioConfig::ScenarioTaskConfig &config) {
-  is_init_ = true;
-  return true;
+SidePassPathDecider::SidePassPathDecider(const TaskConfig &config)
+    : Decider(config) {
+  SetName("SidePassPathDecider");
 }
 
 Status SidePassPathDecider::Process(Frame *frame,
                                     ReferenceLineInfo *reference_line_info) {
-  if (!is_init_) {
-    AERROR << "Please call Init() before Process().";
-    return Status(ErrorCode::PLANNING_ERROR,
-                  "SidePassPathDecider DeciderNot inited.");
-  }
-
   return Status::OK();
 }
 

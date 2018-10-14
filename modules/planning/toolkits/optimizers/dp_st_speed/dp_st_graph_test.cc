@@ -42,10 +42,12 @@ class DpStGraphTest : public ::testing::Test {
     CHECK(apollo::common::util::GetProtoFromFile(
         FLAGS_scenario_lane_follow_config_file, &config));
 
-    for (const auto& cfg : config.scenario_task_config()) {
-      if (cfg.task_type() == DP_ST_SPEED_OPTIMIZER) {
-        dp_config_ = cfg.dp_st_speed_config();
-        break;
+    for (const auto& stage : config.stage_config()) {
+      for (const auto& cfg : stage.task_config()) {
+        if (cfg.task_type() == TaskConfig::DP_ST_SPEED_OPTIMIZER) {
+          dp_config_ = cfg.dp_st_speed_config();
+          break;
+        }
       }
     }
 

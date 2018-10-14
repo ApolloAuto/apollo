@@ -115,7 +115,7 @@ class NaviPlanner : public PlannerWithReferenceLine {
                        const std::string& name, const double time_diff_ms);
 
  private:
-  apollo::common::util::Factory<TaskType, NaviTask> task_factory_;
+  apollo::common::util::Factory<TaskConfig::TaskType, NaviTask> task_factory_;
   std::vector<std::unique_ptr<NaviTask>> tasks_;
 };
 

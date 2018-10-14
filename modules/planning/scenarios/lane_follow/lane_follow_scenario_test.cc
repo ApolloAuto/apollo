@@ -55,17 +55,11 @@ TEST_F(LaneFollowScenarioTest, InitTasks) {
       "//apollo/modules/planning/testdata/conf/"
       "scenario_lane_follow_config.pb.txt";
 
-  scenario_.reset(new LaneFollowScenario());
-  EXPECT_EQ(scenario_->scenario_type(), ScenarioConfig::LANE_FOLLOW);
-
   ScenarioConfig config;
   EXPECT_TRUE(apollo::common::util::GetProtoFromFile(
       FLAGS_scenario_lane_follow_config_file, &config));
-  EXPECT_TRUE(scenario_->Init());
-
-  std::vector<std::unique_ptr<Task>> tasks;
-  scenario_->InitTasks(config, 0, &tasks);
-  EXPECT_EQ(tasks.size(), 5);
+  scenario_.reset(new LaneFollowScenario(config));
+  EXPECT_EQ(scenario_->scenario_type(), ScenarioConfig::LANE_FOLLOW);
 }
 
 }  // namespace planning

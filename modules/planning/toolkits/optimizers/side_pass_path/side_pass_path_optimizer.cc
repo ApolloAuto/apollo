@@ -34,24 +34,16 @@ namespace planning {
 using apollo::common::ErrorCode;
 using apollo::common::Status;
 
-SidePassPathOptimizer::SidePassPathOptimizer()
-    : PathOptimizer("SidePassPathOptimizer") {}
-
-bool SidePassPathOptimizer::Init(
-    const ScenarioConfig::ScenarioTaskConfig &config) {
+SidePassPathOptimizer::SidePassPathOptimizer(const TaskConfig &config)
+    : PathOptimizer(config) {
   config_ = config.dp_poly_path_config();
-  is_init_ = true;
-  return true;
+  SetName("SidePassPathOptimizer");
 }
 
 Status SidePassPathOptimizer::Process(const SpeedData &speed_data,
                                       const ReferenceLine &,
                                       const common::TrajectoryPoint &init_point,
                                       PathData *const path_data) {
-  if (!is_init_) {
-    AERROR << "Please call Init() before Process().";
-    return Status(ErrorCode::PLANNING_ERROR, "Not inited.");
-  }
   CHECK_NOTNULL(path_data);
   DpRoadGraph dp_road_graph(config_, *reference_line_info_, speed_data);
   dp_road_graph.SetDebugLogger(reference_line_info_->mutable_debug());

@@ -83,6 +83,8 @@ class Factory {
     return producers_.erase(id) == 1;
   }
 
+  void Clear() { producers_.clear(); }
+
   bool Empty() const { return producers_.empty(); }
 
   /**

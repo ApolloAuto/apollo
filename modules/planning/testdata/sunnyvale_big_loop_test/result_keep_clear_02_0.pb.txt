@@ -8,8 +8,8 @@ decision {
       reason_code: STOP_REASON_CLEAR_ZONE
       reason: "stop by KC_1254"
       stop_point {
-        x: 586424.20103133633
-        y: 4140676.1581023959
+        x: 586424.20117284427
+        y: 4140676.1586053297
       }
       stop_heading: 1.2952328024341349
       change_lane_type: FORWARD
@@ -39,8 +39,8 @@ decision {
           reason_code: STOP_REASON_CLEAR_ZONE
           distance_s: -1
           stop_point {
-            x: 586424.20103133633
-            y: 4140676.1581023959
+            x: 586424.20117284427
+            y: 4140676.1586053297
             z: 0
           }
           stop_heading: 1.2952328024341349

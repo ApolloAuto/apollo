@@ -20,6 +20,7 @@
 
 #pragma once
 
+#include <list>
 #include <memory>
 #include <string>
 #include <vector>
@@ -29,6 +30,7 @@
 #include "modules/common/status/status.h"
 #include "modules/common/util/factory.h"
 #include "modules/planning/common/frame.h"
+#include "modules/planning/scenarios/stage.h"
 #include "modules/planning/toolkits/task.h"
 
 namespace apollo {
@@ -36,42 +38,49 @@ namespace planning {
 
 class Scenario {
  public:
-  enum class ScenarioStatus {
+  enum ScenarioStatus {
     STATUS_UNKNOWN = 0,
-    STATUS_START = 1,
-    STATUS_PROCESSING = 2,
-    STATUS_DONE = 3,
+    STATUS_PROCESSING = 1,
+    STATUS_DONE = 2,
   };
 
-  Scenario() = default;
+  explicit Scenario(const std::string& config_file);
 
-  explicit Scenario(const ScenarioConfig::ScenarioType& scenario_type)
-      : scenario_type_(scenario_type) {}
+  explicit Scenario(const ScenarioConfig& config);
 
   virtual ~Scenario() = default;
 
-  virtual ScenarioConfig::ScenarioType scenario_type() const;
+  ScenarioConfig::ScenarioType scenario_type() const {
+    return config_.scenario_type();
+  }
 
-  virtual bool Init() = 0;
+  /**
+   * Each scenario should define it's own stages object's creation
+   * scenario will call stage's Stage::Process function following a configured
+   * order, The return value of Stage::Process function determines the
+   * transition from one stage to another.
+   */
+  virtual std::unique_ptr<Stage> CreateStage(
+      const ScenarioConfig::StageConfig& stage_config) const = 0;
 
-  virtual common::Status Process(
-      const common::TrajectoryPoint& planning_init_point, Frame* frame) = 0;
-
-  virtual bool IsTransferable(const Scenario& current_scenario,
+  // Each scenario should define it's own transfer condition, i.e., when it
+  // should allow to transfer from other scenario ot itself.
+  virtual bool IsTransferable(const Scenario& other_scenario,
                               const common::TrajectoryPoint& ego_point,
                               const Frame& frame) const = 0;
 
+  ScenarioStatus Process(const common::TrajectoryPoint& planning_init_point,
+                         Frame* frame);
+
   const ScenarioStatus& GetStatus() const { return scenario_status_; }
 
- protected:
-  bool InitTasks(const ScenarioConfig& config, const int current_stage_index,
-                 std::vector<std::unique_ptr<Task>>* tasks);
+  void Init();
 
  protected:
-  bool is_init_ = false;
-  apollo::common::util::Factory<TaskType, Task> task_factory_;
-  ScenarioStatus scenario_status_ = ScenarioStatus::STATUS_UNKNOWN;
-  const ScenarioConfig::ScenarioType scenario_type_;
+  ScenarioStatus scenario_status_ = STATUS_UNKNOWN;
+  std::list<std::unique_ptr<Stage>> stages_;
+  std::list<std::unique_ptr<Stage>>::iterator current_stage_iter_;
+  ScenarioConfig config_;
 };
 
 }  // namespace planning

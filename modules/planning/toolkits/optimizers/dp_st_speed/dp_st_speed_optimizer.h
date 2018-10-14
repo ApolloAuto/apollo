@@ -40,9 +40,7 @@ namespace planning {
  */
 class DpStSpeedOptimizer : public SpeedOptimizer {
  public:
-  DpStSpeedOptimizer();
-
-  bool Init(const ScenarioConfig::ScenarioTaskConfig& config) override;
+  explicit DpStSpeedOptimizer(const TaskConfig& config);
 
  private:
   apollo::common::Status Process(const SLBoundary& adc_sl_boundary,

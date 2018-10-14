@@ -39,20 +39,20 @@ namespace planning {
 
 class PlanningContext {
  public:
-  void Clear();
+  static void Clear();
 
-  PlanningStatus* mutable_planning_status() { return &planning_status_; }
+  static void Init();
+
+  static const PlanningStatus& Planningstatus() { return planning_status_; }
+
+  static PlanningStatus* MutablePlanningStatus() { return &planning_status_; }
 
  private:
-  PlanningStatus planning_status_;
+  static PlanningStatus planning_status_;
 
   // this is a singleton class
   DECLARE_SINGLETON(PlanningContext);
 };
-
-inline PlanningStatus* mutable_planning_status() {
-  return PlanningContext::Instance()->mutable_planning_status();
-}
 
 }  // namespace planning
 }  // namespace apollo

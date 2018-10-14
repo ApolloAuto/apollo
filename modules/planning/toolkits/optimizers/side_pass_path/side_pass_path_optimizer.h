@@ -35,9 +35,7 @@ namespace planning {
  */
 class SidePassPathOptimizer final : public PathOptimizer {
  public:
-  SidePassPathOptimizer();
-
-  bool Init(const ScenarioConfig::ScenarioTaskConfig &config) override;
+  explicit SidePassPathOptimizer(const TaskConfig &config);
 
  private:
   apollo::common::Status Process(const SpeedData &speed_data,

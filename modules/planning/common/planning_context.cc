@@ -21,7 +21,11 @@
 namespace apollo {
 namespace planning {
 
+PlanningStatus PlanningContext::planning_status_;
+
 PlanningContext::PlanningContext() {}
+
+void PlanningContext::Init() {}
 
 void PlanningContext::Clear() { planning_status_.Clear(); }
 

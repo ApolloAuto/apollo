@@ -10,6 +10,7 @@ cc_library(
     deps = [
         "//external:gflags",
         "//modules/common/math",
+        "//modules/common/monitor_log/proto:monitor_log_proto",
         "//modules/common/proto:pnc_point_proto",
     ],
 )
@@ -26,6 +27,7 @@ cc_library(
         ":trajectory",
         "//modules/common/math:linear_interpolation",
         "//modules/common/proto:pnc_point_proto",
+        "//modules/common/vehicle_state/proto:vehicle_state_proto",
         "//modules/planning/common:planning_context",
         "@eigen//:eigen",
     ],
@@ -89,7 +91,6 @@ cc_library(
         ":publishable_trajectory",
         "//cybertron",
         "//modules/common/proto:pnc_point_proto",
-        "//modules/common/vehicle_state/proto:vehicle_state_proto",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/reference_line",
     ],

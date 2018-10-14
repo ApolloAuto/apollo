@@ -20,50 +20,59 @@
 
 #include "modules/planning/scenarios/scenario.h"
 
+#include <map>
+#include <utility>
+
 namespace apollo {
 namespace planning {
 
-ScenarioConfig::ScenarioType Scenario::scenario_type() const {
-  return scenario_type_;
+Scenario::Scenario(const std::string& config_file) {
+  CHECK(apollo::common::util::GetProtoFromFile(config_file, &config_));
 }
 
-bool Scenario::InitTasks(const ScenarioConfig& config,
-                         const int current_stage_index,
-                         std::vector<std::unique_ptr<Task>>* tasks) {
-  tasks->clear();
+Scenario::Scenario(const ScenarioConfig& config) : config_(config) {}
 
-  if (current_stage_index < 0) {
-    return true;
+void Scenario::Init() {
+  CHECK(!config_.stage_type().empty());
+  std::map<ScenarioConfig::StageType, const ScenarioConfig::StageConfig*>
+      stage_index;
+  for (const auto& stage_config : config_.stage_config()) {
+    stage_index[stage_config.stage_type()] = &stage_config;
   }
-  CHECK_GT(config.stage_size(), current_stage_index);
-
-  ScenarioConfig::Stage stage = config.stage(current_stage_index);
-
-  // get all scenario_task_configs
-  std::vector<ScenarioConfig::ScenarioTaskConfig> task_configs;
-  for (int i = 0; i < config.scenario_task_config_size(); ++i) {
-    task_configs.push_back(config.scenario_task_config(i));
+  for (int i = 0; i < config_.stage_type_size(); ++i) {
+    auto stage_type = config_.stage_type(i);
+    auto iter = stage_index.find(stage_type);
+    CHECK(iter != stage_index.end())
+        << "stage type : " << ScenarioConfig::StageType_Name(stage_type)
+        << " has no config";
+    auto ptr = CreateStage(*(iter->second));
+    CHECK_NOTNULL(ptr);
+    stages_.emplace_back(std::move(ptr));
   }
+  current_stage_iter_ = stages_.begin();
+}
 
-  // init task in the same order as defined on conf
-  for (int i = 0; i < stage.task_size(); ++i) {
-    TaskType task = stage.task(i);
-    auto task_config_it =
-        std::find_if(task_configs.begin(), task_configs.end(),
-                     [task](ScenarioConfig::ScenarioTaskConfig& task_config) {
-                       return task_config.task_type() == task;
-                     });
-    if (task_config_it != task_configs.end()) {
-      tasks->emplace_back(task_factory_.CreateObject(task));
-      ADEBUG << "Created task:" << TaskType_Name(task);
-      if (!tasks->back()->Init(*task_config_it)) {
-        AERROR << "Init task[" << TaskType_Name(task) << "] failed.";
-        return false;
-      }
+Scenario::ScenarioStatus Scenario::Process(
+    const common::TrajectoryPoint& planning_init_point, Frame* frame) {
+  if (current_stage_iter_ == stages_.end()) {
+    return STATUS_DONE;
+  }
+  auto ret = (*current_stage_iter_)->Process(planning_init_point, frame);
+  if (ret == Stage::ERROR) {
+    return STATUS_UNKNOWN;
+  } else if (ret == Stage::RUNNING) {
+    return STATUS_PROCESSING;
+  } else if (ret == Stage::FINISHED) {
+    if (current_stage_iter_ != stages_.end()) {
+      ++current_stage_iter_;
+      return STATUS_PROCESSING;
+    } else {
+      return STATUS_DONE;
     }
+  } else {
+    AWARN << "Unexpected Stage return value: " << ret;
+    return Scenario::STATUS_PROCESSING;
   }
-
-  return true;
 }
 
 }  // namespace planning

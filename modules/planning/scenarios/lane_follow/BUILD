@@ -11,8 +11,8 @@ cc_library(
         "lane_follow_scenario.h",
     ],
     deps = [
-        "//external:gflags",
         "//cybertron",
+        "//external:gflags",
         "//modules/common",
         "//modules/common/proto:pnc_point_proto",
         "//modules/common/status",
@@ -28,7 +28,7 @@ cc_library(
         "//modules/planning/proto:planning_proto",
         "//modules/planning/reference_line",
         "//modules/planning/reference_line:qp_spline_reference_line_smoother",
-        "//modules/planning/scenarios:scenario_lib",
+        "//modules/planning/scenarios:scenario",
         "//modules/planning/toolkits/optimizers:path_optimizer",
         "//modules/planning/toolkits/optimizers:speed_optimizer",
         "//modules/planning/toolkits/optimizers/dp_poly_path:dp_poly_path_optimizer",

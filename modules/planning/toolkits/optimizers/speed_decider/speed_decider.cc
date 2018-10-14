@@ -27,8 +27,8 @@
 
 #include "modules/planning/proto/decision.pb.h"
 
-#include "modules/common/configs/vehicle_config_helper.h"
 #include "cybertron/common/log.h"
+#include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/util/util.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/planning/common/planning_gflags.h"
@@ -37,17 +37,15 @@ namespace apollo {
 namespace planning {
 
 using apollo::common::ErrorCode;
-using apollo::common::math::Vec2d;
 using apollo::common::Status;
+using apollo::common::math::Vec2d;
 using apollo::perception::PerceptionObstacle;
 
-SpeedDecider::SpeedDecider() : Task("SpeedDecider") {}
-
-bool SpeedDecider::Init(const ScenarioConfig::ScenarioTaskConfig& config) {
+SpeedDecider::SpeedDecider(const TaskConfig& config) : Task(config) {
+  SetName("SpeedDecider");
   CHECK(config.has_dp_st_speed_config());
   dp_st_speed_config_ = config.dp_st_speed_config();
   st_boundary_config_ = dp_st_speed_config_.st_boundary_config();
-  return true;
 }
 
 apollo::common::Status SpeedDecider::Execute(

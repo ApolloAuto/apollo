@@ -66,9 +66,9 @@ constexpr double kStraightForwardLineCost = 10.0;
 }  // namespace
 
 void NaviPlanner::RegisterTasks() {
-  task_factory_.Register(NAVI_PATH_DECIDER,
+  task_factory_.Register(TaskConfig::NAVI_PATH_DECIDER,
                          []() -> NaviTask* { return new NaviPathDecider(); });
-  task_factory_.Register(NAVI_SPEED_DECIDER,
+  task_factory_.Register(TaskConfig::NAVI_SPEED_DECIDER,
                          []() -> NaviTask* { return new NaviSpeedDecider(); });
 }
 
@@ -87,7 +87,7 @@ Status NaviPlanner::Init(const PlanningConfig& config) {
       config.navigation_planning_config().planner_navi_config();
   for (const auto task : planner_conf.task()) {
     tasks_.emplace_back(
-        task_factory_.CreateObject(static_cast<TaskType>(task)));
+        task_factory_.CreateObject(static_cast<TaskConfig::TaskType>(task)));
     AINFO << "Created task:" << tasks_.back()->Name();
   }
   for (auto& task : tasks_) {

@@ -30,7 +30,7 @@ using apollo::common::Status;
 using apollo::planning_internal::StGraphBoundaryDebug;
 using apollo::planning_internal::STGraphDebug;
 
-SpeedOptimizer::SpeedOptimizer(const std::string& name) : Task(name) {}
+SpeedOptimizer::SpeedOptimizer(const TaskConfig& config) : Task(config) {}
 
 apollo::common::Status SpeedOptimizer::Execute(
     Frame* frame, ReferenceLineInfo* reference_line_info) {

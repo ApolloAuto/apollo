@@ -68,12 +68,13 @@ NaviPlanning::~NaviPlanning() {
   frame_.reset(nullptr);
   planner_.reset(nullptr);
   FrameHistory::Instance()->Clear();
-  mutable_planning_status()->Clear();
+  PlanningContext::MutablePlanningStatus()->Clear();
 }
 
 std::string NaviPlanning::Name() const { return "navi_planning"; }
 
 Status NaviPlanning::Init() {
+  PlanningBase::Init();
   CHECK(apollo::common::util::GetProtoFromFile(FLAGS_planning_config_file,
                                                &config_))
       << "failed to load planning config file " << FLAGS_planning_config_file;
@@ -91,7 +92,7 @@ Status NaviPlanning::Init() {
       << FLAGS_traffic_rule_config_filename;
 
   // clear planning status
-  mutable_planning_status()->Clear();
+  PlanningContext::MutablePlanningStatus()->Clear();
 
   planner_ = planner_dispatcher_->DispatchPlanner();
   if (!planner_) {
@@ -567,7 +568,7 @@ Status NaviPlanning::Plan(
   frame_.reset(nullptr);
   planner_.reset(nullptr);
   FrameHistory::Instance()->Clear();
-  mutable_planning_status()->Clear();
+ PlanningContext::MutablePlanningStatus()->Clear();
 }*/
 
 NaviPlanning::VehicleConfig NaviPlanning::ComputeVehicleConfigFromLocalization(

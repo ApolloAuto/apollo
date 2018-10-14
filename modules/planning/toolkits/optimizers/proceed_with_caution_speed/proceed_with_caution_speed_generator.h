@@ -42,9 +42,7 @@ namespace planning {
  */
 class ProceedWithCautionSpeedGenerator : public SpeedOptimizer {
  public:
-  ProceedWithCautionSpeedGenerator();
-
-  bool Init(const ScenarioConfig::ScenarioTaskConfig& config) override;
+  explicit ProceedWithCautionSpeedGenerator(const TaskConfig& config);
 
  private:
   common::Status Process(const SLBoundary& adc_sl_boundary,

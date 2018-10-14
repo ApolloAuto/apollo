@@ -36,8 +36,7 @@ namespace planning {
 
 class QpPiecewiseJerkPathOptimizer : public PathOptimizer {
  public:
-  QpPiecewiseJerkPathOptimizer();
-  bool Init(const ScenarioConfig::ScenarioTaskConfig& config) override;
+  explicit QpPiecewiseJerkPathOptimizer(const TaskConfig& config);
 
  private:
   apollo::common::Status Process(const SpeedData& speed_data,

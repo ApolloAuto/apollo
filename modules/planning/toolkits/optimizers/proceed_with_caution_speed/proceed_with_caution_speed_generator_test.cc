@@ -32,11 +32,8 @@
 
 #include "modules/planning/toolkits/optimizers/proceed_with_caution_speed/proceed_with_caution_speed_generator.h"
 
-
 namespace apollo {
 namespace planning {
-
-
 
 class ProceedWithCautionSpeedGeneratorTest : public ::testing::Test {
  public:
@@ -54,19 +51,16 @@ class ProceedWithCautionSpeedGeneratorTest : public ::testing::Test {
 };
 
 TEST_F(ProceedWithCautionSpeedGeneratorTest, FixedSpeed) {
-  ProceedWithCautionSpeedGenerator test_obj;
-
   // Set up testing for ProceedWithCautionSpeedGenerator::Init
   ProceedWithCautionSpeedConfig proceed_with_caution_speed_config;
 
-  proceed_with_caution_speed_config.
-      set_type(ProceedWithCautionSpeedConfig::FIXED_SPEED);
+  proceed_with_caution_speed_config.set_type(
+      ProceedWithCautionSpeedConfig::FIXED_SPEED);
   proceed_with_caution_speed_config.set_max_speed(5.0);
-  ScenarioConfig::ScenarioTaskConfig scenario_task_config;
-  scenario_task_config.mutable_proceed_with_caution_speed_config()->
-      CopyFrom(proceed_with_caution_speed_config);
-  bool init_output = test_obj.Init(scenario_task_config);
-  EXPECT_TRUE(init_output);
+  TaskConfig scenario_task_config;
+  scenario_task_config.mutable_proceed_with_caution_speed_config()->CopyFrom(
+      proceed_with_caution_speed_config);
+  ProceedWithCautionSpeedGenerator test_obj(scenario_task_config);
 
   // Set up testing for ProceedWithCautionSpeedGenerator::Process
   std::vector<common::PathPoint> path_points;
@@ -94,8 +88,8 @@ TEST_F(ProceedWithCautionSpeedGeneratorTest, FixedSpeed) {
 
   SpeedData speed_data1;
   SpeedData speed_data2;
-  common::Status process_status = test_obj.Process(adc_sl_boundary_,
-      path_data_, init_point_, reference_line_, speed_data1,
+  common::Status process_status = test_obj.Process(
+      adc_sl_boundary_, path_data_, init_point_, reference_line_, speed_data1,
       &path_decision_, &speed_data2);
   EXPECT_EQ(process_status, common::Status::OK());
 

@@ -33,7 +33,7 @@ namespace planning {
 
 class PathOptimizer : public Task {
  public:
-  explicit PathOptimizer(const std::string &name);
+  explicit PathOptimizer(const TaskConfig &config);
   virtual ~PathOptimizer() = default;
   apollo::common::Status Execute(
       Frame *frame, ReferenceLineInfo *reference_line_info) override;

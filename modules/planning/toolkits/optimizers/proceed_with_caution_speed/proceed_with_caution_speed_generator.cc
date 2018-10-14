@@ -40,30 +40,22 @@ using apollo::common::Status;
 using apollo::common::TrajectoryPoint;
 using apollo::planning_internal::STGraphDebug;
 
-const double proceeding_speed = 2.23;  // (5mph proceeding speed)
+const double proceeding_speed = 2.23;    // (5mph proceeding speed)
 const double const_deceleration = -0.8;  // (~3sec to fully stop)
 const double increment_s = 0.1;
 const double increment_t = 0.1;
 
-ProceedWithCautionSpeedGenerator::ProceedWithCautionSpeedGenerator()
-    : SpeedOptimizer("ProceedWithCautionSpeedGenerator") {}
-
-bool ProceedWithCautionSpeedGenerator::Init(
-    const ScenarioConfig::ScenarioTaskConfig& config) {
-  if (is_init_) {
-    AERROR << "Duplicated Init.";
-    return false;
-  }
+ProceedWithCautionSpeedGenerator::ProceedWithCautionSpeedGenerator(
+    const TaskConfig& config)
+    : SpeedOptimizer(config) {
   CHECK(config.has_proceed_with_caution_speed_config());
   proceed_with_caution_speed_config_ =
       config.proceed_with_caution_speed_config();
   isFixedDistanceNotFixedSpeed = proceed_with_caution_speed_config_.type();
-  maxDistanceOrSpeed = isFixedDistanceNotFixedSpeed ?
-      proceed_with_caution_speed_config_.max_distance() :
-      proceed_with_caution_speed_config_.max_speed();
-
-  is_init_ = true;
-  return true;
+  maxDistanceOrSpeed = isFixedDistanceNotFixedSpeed
+                           ? proceed_with_caution_speed_config_.max_distance()
+                           : proceed_with_caution_speed_config_.max_speed();
+  SetName("ProceedWithCautionSpeedGenerator");
 }
 
 Status ProceedWithCautionSpeedGenerator::Process(
@@ -71,11 +63,6 @@ Status ProceedWithCautionSpeedGenerator::Process(
     const TrajectoryPoint& init_point, const ReferenceLine& reference_line,
     const SpeedData& reference_speed_data, PathDecision* const path_decision,
     SpeedData* const speed_data) {
-  if (!is_init_) {
-    AERROR << "Please call Init() before Process.";
-    return Status(ErrorCode::PLANNING_ERROR, "Not init.");
-  }
-
   if (path_data.discretized_path().NumOfPoints() == 0) {
     std::string msg("Empty path data");
     AERROR << msg;
@@ -92,8 +79,8 @@ Status ProceedWithCautionSpeedGenerator::Process(
       return Status(ErrorCode::PLANNING_ERROR, msg);
     }
     tot_len = maxDistanceOrSpeed;
-    double Distance2StartDeceleration = proceeding_speed * proceeding_speed
-                                        / const_deceleration / 2;
+    double Distance2StartDeceleration =
+        proceeding_speed * proceeding_speed / const_deceleration / 2;
     bool ConstDecelerationMode = tot_len < Distance2StartDeceleration;
     double a = const_deceleration;
     double t = 0.0;
@@ -104,13 +91,13 @@ Status ProceedWithCautionSpeedGenerator::Process(
       if (ConstDecelerationMode) {
         speed_data->AppendSpeedPoint(s, t, v, a, 0.0);
         t += increment_t;
-        double v_new = std::max(0.0, v+a*t);
+        double v_new = std::max(0.0, v + a * t);
         s += increment_t * (v + v_new) / 2;
         v = v_new;
       } else {
         speed_data->AppendSpeedPoint(s, t, v, 0.0, 0.0);
         t += increment_t;
-        s += increment_t*v;
+        s += increment_t * v;
         if (tot_len - s < Distance2StartDeceleration)
           ConstDecelerationMode = true;
       }
@@ -123,7 +110,7 @@ Status ProceedWithCautionSpeedGenerator::Process(
     }
     double v = proceeding_speed;
     for (double s = 0.0; s < tot_len; s += increment_s) {
-      speed_data->AppendSpeedPoint(s, s/v, v, 0.0, 0.0);
+      speed_data->AppendSpeedPoint(s, s / v, v, 0.0, 0.0);
     }
   }
 
