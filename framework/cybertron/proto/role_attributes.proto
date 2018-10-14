@@ -2,7 +2,7 @@ syntax = "proto2";
 
 package apollo.cybertron.proto;
 
-import "qos_profile.proto";
+import "cybertron/proto/qos_profile.proto";
 
 message SocketAddr {
     required string ip = 1;  // dotted decimal

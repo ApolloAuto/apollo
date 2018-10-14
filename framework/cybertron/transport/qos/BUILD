@@ -11,7 +11,7 @@ cc_library(
         "*.h",
     ]),
     deps = [
-        "//cybertron/proto:proto_lib",
+        "//cybertron/proto:qos_profile_cc_proto",
     ],
 )
 

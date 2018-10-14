@@ -2,7 +2,7 @@ syntax = "proto2";
 
 package apollo.cybertron.proto;
 
-import "processor_conf.proto";
+import "cybertron/proto/processor_conf.proto";
 
 message SchedulerConf {
   optional int32 sysmon_hz = 1;

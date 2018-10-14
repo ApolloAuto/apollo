@@ -133,14 +133,6 @@ function build_cybertron() {
   source framework/install/setup.bash
 }
 
-function build_proto() {
-  cd /apollo/cybertron/proto
-  protoc *.proto --cpp_out=.
-  cd /apollo
-  info "Building proto ..."
-  source cybertron/setup.bash
-}
-
 function build() {
   if [ "${USE_GPU}" = "1" ] ; then
     echo -e "${YELLOW}Running build under GPU mode. GPU is required to run the build.${NO_COLOR}"
@@ -148,7 +140,6 @@ function build() {
     echo -e "${YELLOW}Running build under CPU mode. No GPU is required to run the build.${NO_COLOR}"
   fi
   info "Start building, please wait ..."
-  build_proto
 
   generate_build_targets
   info "Building on $MACHINE_ARCH..."
@@ -190,7 +181,6 @@ function build() {
 
 function cibuild_extended() {
   info "Building framework ..."
-  build_proto
 
   cd /apollo
   info "Building modules ..."
@@ -228,7 +218,6 @@ function cibuild_extended() {
 function cibuild() {
   info "Building framework ..."
   cd /apollo
-  build_proto
 
   info "Building modules ..."
 
@@ -442,7 +431,6 @@ function citest_basic() {
   set -e
 
   info "Building framework ..."
-  build_proto
   cd /apollo
   source cybertron/setup.bash
 
@@ -477,7 +465,6 @@ function citest_extended() {
   set -e
 
   info "Building framework ..."
-  build_proto
   cd /apollo
   source cybertron/setup.bash
 
@@ -502,7 +489,6 @@ function citest_extended() {
 
 function citest() {
   info "Building framework ..."
-  build_proto
   cd /apollo
   source cybertron/setup.bash
 

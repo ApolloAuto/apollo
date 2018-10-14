@@ -15,7 +15,6 @@ cc_library(
           "//cybertron:init_lib",
           "//cybertron/common:common_lib",
           "//cybertron/event:event_lib",
-          "//cybertron/proto:proto_lib",
           "//cybertron/time:time_lib",
     ],
 )
