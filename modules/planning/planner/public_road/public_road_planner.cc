@@ -44,8 +44,12 @@ Status PublicRoadPlanner::Plan(const TrajectoryPoint& planning_start_point,
                                Frame* frame) {
   scenario_manager_.Update(planning_start_point, *frame);
   scenario_ = scenario_manager_.mutable_scenario();
-  scenario_->Init();  // init will be skipped if it was called before
-  return scenario_->Process(planning_start_point, frame);
+  auto result = scenario_->Process(planning_start_point, frame);
+  if (result == Scenario::STATUS_UNKNOWN) {
+    return Status(common::PLANNING_ERROR, "scenario returned unknown");
+  } else {
+    return Status::OK();
+  }
 }
 
 }  // namespace planning

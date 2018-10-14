@@ -34,21 +34,16 @@ namespace planning {
 
 class DeciderCreep : public Decider {
  public:
-  DeciderCreep();
-  ~DeciderCreep() = default;
-
-  bool Init(const ScenarioConfig::ScenarioTaskConfig &config) override;
+  explicit DeciderCreep(const TaskConfig& config);
 
  private:
   apollo::common::Status Process(
-      Frame* frame,
-      ReferenceLineInfo* reference_line_info) override;
+      Frame* frame, ReferenceLineInfo* reference_line_info) override;
 
   double FindCreepDistance(Frame* frame,
                            ReferenceLineInfo* reference_line_info);
 
-  bool BuildStopDecision(Frame* frame,
-                         ReferenceLineInfo* reference_line_info);
+  bool BuildStopDecision(Frame* frame, ReferenceLineInfo* reference_line_info);
 
  private:
   static constexpr const char* CREEP_VO_ID_PREFIX = "CREEP_";

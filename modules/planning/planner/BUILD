@@ -13,7 +13,7 @@ cc_library(
         "//modules/planning/common:frame",
         "//modules/planning/common:reference_line_info",
         "//modules/planning/proto:planning_proto",
-        "//modules/planning/scenarios:scenario_lib",
+        "//modules/planning/scenarios:scenario",
         "//modules/planning/scenarios:scenario_manager",
     ],
 )
@@ -33,10 +33,10 @@ cc_library(
     deps = [
         "//modules/common/status",
         "//modules/common/util",
+        "//modules/planning/planner/lattice:lattice_planner",
         "//modules/planning/planner/navi:navi_planner",
         "//modules/planning/planner/public_road:public_road_planner",
         "//modules/planning/planner/rtk:rtk_planner",
-        "//modules/planning/planner/lattice:lattice_planner",
         "//modules/planning/proto:planning_proto",
     ],
 )
@@ -48,8 +48,8 @@ cc_test(
         "std_planner_dispatcher_test.cc",
     ],
     deps = [
-        "@gtest//:main",
         ":planner_dispatcher",
+        "@gtest//:main",
     ],
 )
 
@@ -60,8 +60,8 @@ cc_test(
         "navi_planner_dispatcher_test.cc",
     ],
     deps = [
-        "@gtest//:main",
         ":planner_dispatcher",
+        "@gtest//:main",
     ],
 )
 

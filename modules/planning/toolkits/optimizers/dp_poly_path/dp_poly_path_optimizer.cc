@@ -35,25 +35,16 @@ namespace planning {
 using apollo::common::ErrorCode;
 using apollo::common::Status;
 
-DpPolyPathOptimizer::DpPolyPathOptimizer()
-    : PathOptimizer("DpPolyPathOptimizer") {}
-
-bool DpPolyPathOptimizer::Init(
-    const ScenarioConfig::ScenarioTaskConfig &config) {
+DpPolyPathOptimizer::DpPolyPathOptimizer(const TaskConfig &config)
+    : PathOptimizer(config) {
   CHECK(config.has_dp_poly_path_config());
-  config_ = config.dp_poly_path_config();
-  is_init_ = true;
-  return true;
+  SetName("DpPolyPathOptimizer");
 }
 
 Status DpPolyPathOptimizer::Process(const SpeedData &speed_data,
                                     const ReferenceLine &,
                                     const common::TrajectoryPoint &init_point,
                                     PathData *const path_data) {
-  if (!is_init_) {
-    AERROR << "Please call Init() before Process().";
-    return Status(ErrorCode::PLANNING_ERROR, "Not inited.");
-  }
   CHECK_NOTNULL(path_data);
   DpRoadGraph dp_road_graph(config_, *reference_line_info_, speed_data);
   dp_road_graph.SetDebugLogger(reference_line_info_->mutable_debug());

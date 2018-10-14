@@ -32,23 +32,13 @@ using apollo::common::ErrorCode;
 using apollo::common::Status;
 using apollo::hdmap::PathOverlap;
 
-DeciderStopSignMonitor::DeciderStopSignMonitor()
-    : Decider("DeciderStopSignMonitor") {}
-
-bool DeciderStopSignMonitor::Init(
-    const ScenarioConfig::ScenarioTaskConfig &config) {
-  is_init_ = true;
-  return true;
+DeciderStopSignMonitor::DeciderStopSignMonitor(const TaskConfig& config)
+    : Decider(config) {
+  SetName("DeciderStopSignMonitor");
 }
 
 Status DeciderStopSignMonitor::Process(Frame* frame,
-                      ReferenceLineInfo* reference_line_info) {
-  if (!is_init_) {
-    AERROR << "Please call Init() before Process().";
-    return Status(ErrorCode::PLANNING_ERROR,
-                  "DeciderStopSignMonitor not inited");
-  }
-
+                                       ReferenceLineInfo* reference_line_info) {
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
 
@@ -61,12 +51,10 @@ void DeciderStopSignMonitor::UpdateWatchVehicles(
 }
 
 int DeciderStopSignMonitor::AddWatchVehicle(
-    const PathObstacle& path_obstacle,
-    StopSignLaneVehicles* watch_vehicles) {
+    const PathObstacle& path_obstacle, StopSignLaneVehicles* watch_vehicles) {
   // TODo(all)
   return 0;
 }
-
 
 }  // namespace planning
 }  // namespace apollo

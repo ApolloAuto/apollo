@@ -31,10 +31,7 @@ namespace planning {
 
 class SpeedDecider : public Task {
  public:
-  SpeedDecider();
-  ~SpeedDecider() = default;
-
-  bool Init(const ScenarioConfig::ScenarioTaskConfig& config) override;
+  explicit SpeedDecider(const TaskConfig& config);
 
   apollo::common::Status Execute(
       Frame* frame, ReferenceLineInfo* reference_line_info) override;

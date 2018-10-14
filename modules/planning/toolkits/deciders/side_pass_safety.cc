@@ -32,21 +32,12 @@ using ::apollo::common::ErrorCode;
 using ::apollo::common::Status;
 using ::apollo::hdmap::PathOverlap;
 
-SidePassSafety::SidePassSafety() : Decider("SidePassSafety") {}
-
-bool SidePassSafety::Init(const ScenarioConfig::ScenarioTaskConfig &config) {
-  is_init_ = true;
-  return true;
+SidePassSafety::SidePassSafety(const TaskConfig &config) : Decider(config) {
+  SetName("SidePassSafety");
 }
 
 Status SidePassSafety::Process(Frame *frame,
                                ReferenceLineInfo *reference_line_info) {
-  if (!is_init_) {
-    AERROR << "Please call Init() before Process().";
-    return Status(ErrorCode::PLANNING_ERROR,
-                  "SidePassSafety DeciderNot inited.");
-  }
-
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
 
@@ -61,14 +52,14 @@ apollo::common::Status SidePassSafety::BuildSidePathDecision(
     Frame *frame, ReferenceLineInfo *const reference_line_info) {
   std::string virtual_obstacle_id = SIDEPASS_VIRTUAL_OBSTACLE_ID;
 
-  auto* obstacle = frame->CreateStopObstacle(
-      reference_line_info, virtual_obstacle_id,
-      reference_line_info->AdcSlBoundary().end_s());
+  auto *obstacle =
+      frame->CreateStopObstacle(reference_line_info, virtual_obstacle_id,
+                                reference_line_info->AdcSlBoundary().end_s());
   if (!obstacle) {
     AERROR << "Failed to create side pass safety obstacle["
            << virtual_obstacle_id << "]";
     auto status = Status(ErrorCode::PLANNING_ERROR,
-               "Failed to create side pass safety obstacle");
+                         "Failed to create side pass safety obstacle");
     return status;
   }
   return Status().OK();
@@ -76,11 +67,11 @@ apollo::common::Status SidePassSafety::BuildSidePathDecision(
 
 bool SidePassSafety::IsSafeSidePass(
     Frame *frame, ReferenceLineInfo *const reference_line_info) {
-  const auto& path_obstacles =
+  const auto &path_obstacles =
       reference_line_info->path_decision()->path_obstacles().Items();
 
-  for (const auto* path_obstacle : path_obstacles) {
-    if (path_obstacle->obstacle()->IsVirtual()||
+  for (const auto *path_obstacle : path_obstacles) {
+    if (path_obstacle->obstacle()->IsVirtual() ||
         !path_obstacle->obstacle()->IsStatic()) {
       continue;
     }
@@ -93,7 +84,7 @@ bool SidePassSafety::IsSafeSidePass(
       continue;
     }
     double s_range = path_obstacle->st_boundary().max_s() -
-        path_obstacle->st_boundary().min_s();
+                     path_obstacle->st_boundary().min_s();
     if (s_range > 5) {
       return false;
     }

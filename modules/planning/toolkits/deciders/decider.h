@@ -20,7 +20,6 @@
 
 #pragma once
 
-
 #include <string>
 #include <vector>
 
@@ -32,19 +31,15 @@ namespace planning {
 
 class Decider : public Task {
  public:
-  explicit Decider(const std::string& name);
+  explicit Decider(const TaskConfig& config);
   virtual ~Decider() = default;
   apollo::common::Status Execute(
-      Frame* frame,
-      ReferenceLineInfo* reference_line_info) override;
+      Frame* frame, ReferenceLineInfo* reference_line_info) override;
 
  protected:
   virtual apollo::common::Status Process(
-      Frame* frame,
-      ReferenceLineInfo* reference_line_info) = 0;
+      Frame* frame, ReferenceLineInfo* reference_line_info) = 0;
 };
 
 }  // namespace planning
 }  // namespace apollo
-
-

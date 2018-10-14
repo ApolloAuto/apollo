@@ -30,29 +30,21 @@ namespace planning {
 using apollo::common::ErrorCode;
 using apollo::common::Status;
 
-QpSplinePathOptimizer::QpSplinePathOptimizer()
-    : PathOptimizer("QpSplinePathOptimizer") {}
-
-bool QpSplinePathOptimizer::Init(
-    const ScenarioConfig::ScenarioTaskConfig& config) {
+QpSplinePathOptimizer::QpSplinePathOptimizer(const TaskConfig& config)
+    : PathOptimizer(config) {
   CHECK(config.has_qp_spline_path_config());
   qp_spline_path_config_ = config.qp_spline_path_config();
 
   std::vector<double> init_knots;
   spline_solver_.reset(new ActiveSetSpline1dSolver(
       init_knots, qp_spline_path_config_.spline_order()));
-  is_init_ = true;
-  return true;
+  SetName("QpSplinePathOptimizer");
 }
 
 Status QpSplinePathOptimizer::Process(const SpeedData& speed_data,
                                       const ReferenceLine& reference_line,
                                       const common::TrajectoryPoint& init_point,
                                       PathData* const path_data) {
-  if (!is_init_) {
-    AERROR << "Please call Init() before Process.";
-    return Status(ErrorCode::PLANNING_ERROR, "Not init.");
-  }
   QpSplinePathGenerator path_generator(spline_solver_.get(), reference_line,
                                        qp_spline_path_config_,
                                        reference_line_info_->AdcSlBoundary());

@@ -20,7 +20,7 @@ cc_library(
         "//modules/planning/common:speed_profile_generator",
         "//modules/planning/math/curve1d:quartic_polynomial_curve1d",
         "//modules/planning/proto:planning_proto",
-        "//modules/planning/scenarios:scenario_lib",
+        "//modules/planning/scenarios:scenario",
         "//modules/planning/toolkits/deciders:decider",
         "//modules/planning/toolkits/optimizers:path_optimizer",
         "//modules/planning/toolkits/optimizers:speed_optimizer",

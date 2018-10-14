@@ -38,19 +38,21 @@ namespace {
 std::vector<std::pair<double, double>>::iterator min_pair_first(
     std::vector<std::pair<double, double>>::iterator begin,
     std::vector<std::pair<double, double>>::iterator end) {
-  return std::min_element(begin, end, [](const std::pair<double, double>& lhs,
-                                         const std::pair<double, double>& rhs) {
-    return lhs.first < rhs.first;
-  });
+  return std::min_element(begin, end,
+                          [](const std::pair<double, double>& lhs,
+                             const std::pair<double, double>& rhs) {
+                            return lhs.first < rhs.first;
+                          });
 }
 
 std::vector<std::pair<double, double>>::iterator max_pair_second(
     std::vector<std::pair<double, double>>::iterator begin,
     std::vector<std::pair<double, double>>::iterator end) {
-  return std::max_element(begin, end, [](const std::pair<double, double>& lhs,
-                                         const std::pair<double, double>& rhs) {
-    return lhs.second < rhs.second;
-  });
+  return std::max_element(begin, end,
+                          [](const std::pair<double, double>& lhs,
+                             const std::pair<double, double>& rhs) {
+                            return lhs.second < rhs.second;
+                          });
 }
 
 void assign_pair_first(std::vector<std::pair<double, double>>::iterator begin,
@@ -71,20 +73,16 @@ void assign_pair_second(std::vector<std::pair<double, double>>::iterator begin,
 
 }  // namespace
 
-QpPiecewiseJerkPathOptimizer::QpPiecewiseJerkPathOptimizer()
-    : PathOptimizer("QpPiecewiseJerkPathOptimizer") {}
-
-bool QpPiecewiseJerkPathOptimizer::Init(
-    const ScenarioConfig::ScenarioTaskConfig& config) {
+QpPiecewiseJerkPathOptimizer::QpPiecewiseJerkPathOptimizer(
+    const TaskConfig& config)
+    : PathOptimizer(config) {
+  SetName("QpPiecewiseJerkPathOptimizer");
   if (config.has_qp_piecewise_jerk_path_config()) {
     config_ = config.qp_piecewise_jerk_path_config();
   }
   // TODO(all): use gflags or config to turn on/off new algorithms
   // lateral_qp_optimizer_.reset(new OsqpLateralJerkQPOptimizer());
   lateral_qp_optimizer_.reset(new OsqpLateralLinearQPOptimizer());
-
-  is_init_ = true;
-  return true;
 }
 
 std::vector<std::pair<double, double>>
@@ -214,10 +212,6 @@ QpPiecewiseJerkPathOptimizer::GetLateralBounds(
 Status QpPiecewiseJerkPathOptimizer::Process(
     const SpeedData& speed_data, const ReferenceLine& reference_line,
     const common::TrajectoryPoint& init_point, PathData* const path_data) {
-  if (!is_init_) {
-    AERROR << "Please call Init() before Process.";
-    return Status(ErrorCode::PLANNING_ERROR, "Not init.");
-  }
   const auto frenet_point = reference_line.GetFrenetPoint(init_point);
   const auto& adc_sl = reference_line_info_->AdcSlBoundary();
   const double qp_delta_s = config_.qp_delta_s();

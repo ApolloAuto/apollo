@@ -23,15 +23,16 @@
 
 #include "modules/planning/scenarios/stop_sign_unprotected/stop_sign_unprotected.h"  // NOINT
 
-#include "modules/planning/proto/planning_config.pb.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
+#include "modules/planning/proto/planning_config.pb.h"
 
 #include "cybertron/common/log.h"
-#include "modules/common/util/file.h"
 #include "modules/common/time/time.h"
+#include "modules/common/util/file.h"
 #include "modules/common/util/util.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/frame.h"
+#include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/toolkits/deciders/decider_creep.h"
 #include "modules/planning/toolkits/optimizers/dp_poly_path/dp_poly_path_optimizer.h"
@@ -45,13 +46,9 @@ namespace apollo {
 namespace planning {
 
 using common::ErrorCode;
-using common::Status;
-using common::time::Clock;
 using common::TrajectoryPoint;
+using common::time::Clock;
 using hdmap::HDMapUtil;
-using hdmap::PathOverlap;
-using hdmap::StopSignInfo;
-using hdmap::StopSignInfoConstPtr;
 using hdmap::LaneInfo;
 using hdmap::LaneInfoConstPtr;
 using hdmap::OverlapInfoConstPtr;
@@ -60,36 +57,44 @@ using hdmap::StopSignInfo;
 using hdmap::StopSignInfoConstPtr;
 using perception::PerceptionObstacle;
 
-void StopSignUnprotectedScenario::RegisterTasks() {
-  // deciders
-  task_factory_.Register(DECIDER_CREEP,
-                         []() -> Task* { return new DeciderCreep(); });
-  // optimizers
-  task_factory_.Register(DP_POLY_PATH_OPTIMIZER,
-                         []() -> Task* { return new DpPolyPathOptimizer(); });
-  task_factory_.Register(PATH_DECIDER,
-                         []() -> Task* { return new PathDecider(); });
-  task_factory_.Register(DP_ST_SPEED_OPTIMIZER,
-                         []() -> Task* { return new DpStSpeedOptimizer(); });
-  task_factory_.Register(SPEED_DECIDER,
-                         []() -> Task* { return new SpeedDecider(); });
-  task_factory_.Register(QP_SPLINE_ST_SPEED_OPTIMIZER, []() -> Task* {
-    return new QpSplineStSpeedOptimizer();
-  });
+apollo::common::util::Factory<
+    ScenarioConfig::StageType, Stage,
+    Stage* (*)(const ScenarioConfig::StageConfig& stage_config)>
+    StopSignUnprotectedScenario::s_stage_factory_;
+
+void StopSignUnprotectedScenario::RegisterStages() {
+  if (!s_stage_factory_.Empty()) {
+    s_stage_factory_.Clear();
+  }
+  s_stage_factory_.Register(
+      ScenarioConfig::STOP_SIGN_UNPROTECTED_PRE_STOP,
+      [](const ScenarioConfig::StageConfig& config) -> Stage* {
+        return new StopSignUnprotectedPreStop(config);
+      });
+  s_stage_factory_.Register(
+      ScenarioConfig::STOP_SIGN_UNPROTECTED_STOP,
+      [](const ScenarioConfig::StageConfig& config) -> Stage* {
+        return new StopSignUnprotectedStop(config);
+      });
+  s_stage_factory_.Register(
+      ScenarioConfig::STOP_SIGN_UNPROTECTED_CREEP,
+      [](const ScenarioConfig::StageConfig& config) -> Stage* {
+        return new StopSignUnprotectedCreep(config);
+      });
+  s_stage_factory_.Register(
+      ScenarioConfig::STOP_SIGN_UNPROTECTED_INTERSECTION_CRUISE,
+      [](const ScenarioConfig::StageConfig& config) -> Stage* {
+        return new StopSignUnprotectedIntersectionCruise(config);
+      });
 }
 
-bool StopSignUnprotectedScenario::Init() {
-  if (is_init_) {
-    return true;
+std::unique_ptr<Stage> StopSignUnprotectedScenario::CreateStage(
+    const ScenarioConfig::StageConfig& stage_config) const {
+  if (s_stage_factory_.Empty()) {
+    RegisterStages();
   }
-
-  CHECK(apollo::common::util::GetProtoFromFile(
-      FLAGS_scenario_stop_sign_unprotected_config_file, &config_));
-
-  RegisterTasks();
-
-  is_init_ = true;
-  return true;
+  return s_stage_factory_.CreateObjectOrNull(stage_config.stage_type(),
+                                             stage_config);
 }
 
 void StopSignUnprotectedScenario::Observe(Frame* const frame) {
@@ -109,58 +114,8 @@ void StopSignUnprotectedScenario::Observe(Frame* const frame) {
       next_stop_sign_overlap_.start_s - adc_front_edge_s;
 }
 
-Status StopSignUnprotectedScenario::Process(
-    const TrajectoryPoint& planning_start_point,
-    Frame* frame) {
-  CHECK_NOTNULL(frame);
-
-  if (!stage_init_) {
-    const int current_stage_index = StageIndexInConf(stage_);
-    if (!InitTasks(config_, current_stage_index, &tasks_)) {
-      return Status(ErrorCode::PLANNING_ERROR, "failed to init tasks");
-    }
-    stage_init_ = true;
-  }
-
-  // init while scenario just entered
-  if (scenario_status_ == ScenarioStatus::STATUS_UNKNOWN ||
-      scenario_status_ == ScenarioStatus::STATUS_START) {
-    watch_vehicles_.clear();
-  }
-  scenario_status_ = ScenarioStatus::STATUS_PROCESSING;
-
-  const auto& reference_line_info = frame->reference_line_info().front();
-
-  Status status = Status(ErrorCode::PLANNING_ERROR,
-                         "Failed to process stage in stop_sign_upprotected.");
-  switch (stage_) {
-    case StopSignUnprotectedStage::PRE_STOP: {
-      status = PreStop(reference_line_info, frame);
-      break;
-    }
-    case StopSignUnprotectedStage::STOP: {
-      status = Stop(reference_line_info, frame);
-      break;
-    }
-    case StopSignUnprotectedStage::CREEP: {
-      status = Creep(reference_line_info, frame);
-      break;
-    }
-    case StopSignUnprotectedStage::INTERSECTION_CRUISE: {
-      status = IntersectionCruise(
-          planning_start_point, reference_line_info, frame);
-      break;
-    }
-    default:
-      break;
-  }
-
-  return Status::OK();
-}
-
 bool StopSignUnprotectedScenario::IsTransferable(
-    const Scenario& current_scenario,
-    const common::TrajectoryPoint& ego_point,
+    const Scenario& current_scenario, const common::TrajectoryPoint& ego_point,
     const Frame& frame) const {
   if (next_stop_sign_ == nullptr) {
     return false;
@@ -192,126 +147,76 @@ bool StopSignUnprotectedScenario::IsTransferable(
   return false;
 }
 
-int StopSignUnprotectedScenario::StageIndexInConf(
-    const StopSignUnprotectedStage& stage) {
-  // note: this is the index in scenario conf file.  must be consistent
-  if (stage == StopSignUnprotectedStage::CREEP) {
-    return 0;
-  } else if (stage == StopSignUnprotectedStage::INTERSECTION_CRUISE) {
-    return 1;
-  }
-  return -1;
-}
-
-StopSignUnprotectedScenario::StopSignUnprotectedStage
-    StopSignUnprotectedScenario::GetNextStage(
-        const StopSignUnprotectedStage& current_stage) {
-  StopSignUnprotectedStage stage = current_stage;
-  StopSignUnprotectedStage next_stage;
-
-  bool next_stage_found = false;
-  while (!next_stage_found) {
-    if (stage == StopSignUnprotectedStage::PRE_STOP) {
-      next_stage = StopSignUnprotectedStage::STOP;
-      const int next_stage_index = StageIndexInConf(next_stage);
-      if (config_.stage(next_stage_index).enabled()) {
-        next_stage_found = true;
-        break;
-      }
-      stage = StopSignUnprotectedStage::STOP;
-    } else if (stage == StopSignUnprotectedStage::STOP) {
-      next_stage = StopSignUnprotectedStage::CREEP;
-      const int next_stage_index = StageIndexInConf(next_stage);
-      if (config_.stage(next_stage_index).enabled()) {
-        next_stage_found = true;
-        break;
-      }
-      stage = StopSignUnprotectedStage::CREEP;
-    } else if (stage == StopSignUnprotectedStage::CREEP) {
-      next_stage = StopSignUnprotectedStage::INTERSECTION_CRUISE;
-      const int next_stage_index = StageIndexInConf(next_stage);
-      if (config_.stage(next_stage_index).enabled()) {
-        next_stage_found = true;
-      }
-      break;  // exit at last stage
-    }
-  }
-
-  return next_stage_found ? next_stage : StopSignUnprotectedStage::UNKNOWN;
-}
-
-common::Status StopSignUnprotectedScenario::PreStop(
-    const ReferenceLineInfo& reference_line_info,
-    Frame* frame) {
+Stage::StageStatus StopSignUnprotectedPreStop::Process(
+    const TrajectoryPoint& planning_start_point, Frame* frame) {
   CHECK_NOTNULL(frame);
+  const auto& reference_line_info = frame->reference_line_info().front();
 
   if (CheckADCStop(reference_line_info)) {
-    stop_start_time_ = Clock::NowInSeconds();
-    ADEBUG << "stop_start_time[" << stop_start_time_ << "]";
+    PlanningContext::MutablePlanningStatus()
+        ->mutable_stop_sign()
+        ->set_stop_start_time(Clock::NowInSeconds());
 
-    stage_ = GetNextStage(stage_);
-    stage_init_ = false;
-    return Status::OK();
+    return Stage::FINISHED;
   }
 
   const PathDecision& path_decision = reference_line_info.path_decision();
-  for (const auto* path_obstacle :
-       path_decision.path_obstacles().Items()) {
+  for (const auto* path_obstacle : path_decision.path_obstacles().Items()) {
     // add to watch_vehicles if adc is still proceeding to stop sign
     AddWatchVehicle(*path_obstacle, &watch_vehicles_);
   }
 
   // TODO(all): call decider to add stop fence
-
-  return Status::OK();
+  return Stage::RUNNING;
 }
 
-common::Status StopSignUnprotectedScenario::Stop(
-    const ReferenceLineInfo& reference_line_info,
-    Frame* frame) {
+Stage::StageStatus StopSignUnprotectedStop::Process(
+    const TrajectoryPoint& planning_start_point, Frame* frame) {
   CHECK_NOTNULL(frame);
+  const auto& reference_line_info = frame->reference_line_info().front();
 
-  double wait_time = Clock::NowInSeconds() - stop_start_time_;
-  ADEBUG << "stop_start_time[" << stop_start_time_
-         << "] wait_time[" << wait_time << "]";
-  if (wait_time >= conf_stop_duration && watch_vehicles_.empty()) {
-    stage_ = GetNextStage(stage_);
-    stage_init_ = false;
-    return Status::OK();
+  auto start_time =
+      PlanningContext::PlanningStatus().stop_sign().stop_start_time();
+
+  double wait_time = Clock::NowInSeconds() - start_time;
+  ;
+  ADEBUG << "stop_start_time[" << start_time << "] wait_time[" << wait_time
+         << "]";
+  auto& watch_vehicles = Planningstatus::MutablePlanningStatus()
+                             ->mutable_stop_sign()
+                             ->lane_watch_vehicles();
+  if (wait_time >= conf_stop_duration && watch_vehicles.empty()) {
+    return Stage::FINISHED;
   }
 
   // get all vehicles currently watched
   std::vector<std::string> watch_vehicle_ids;
-  for (StopSignLaneVehicles::iterator it = watch_vehicles_.begin();
-       it != watch_vehicles_.end(); ++it) {
+  for (auto it = watch_vehicles.begin(); it != watch_vehicles.end(); ++it) {
     std::copy(it->second.begin(), it->second.end(),
               std::back_inserter(watch_vehicle_ids));
   }
 
   const PathDecision& path_decision = reference_line_info.path_decision();
-  for (const auto* path_obstacle :
-       path_decision.path_obstacles().Items()) {
+  for (const auto* path_obstacle : path_decision.path_obstacles().Items()) {
     // remove from watch_vehicles_ if adc is stopping/waiting at stop sign
     RemoveWatchVehicle(*path_obstacle, watch_vehicle_ids, &watch_vehicles_);
   }
 
   // TODO(all):
-  return Status::OK();
+  return Stage::RUNNING;
 }
 
-common::Status StopSignUnprotectedScenario::Creep(
-    const ReferenceLineInfo& reference_line_info,
-    Frame* frame) {
+Stage::StageStatus StopSignUnprotectedScenarioCreep::Process(
+    const ReferenceLineInfo& reference_line_info, Frame* frame) {
   // TODO(all)
-  return Status::OK();
+  return Stage::FINISHED;
 }
 
-common::Status StopSignUnprotectedScenario::IntersectionCruise(
+Stage::StageStatus StopSignUnprotectedScenarioIntersectionCruise::Process(
     const common::TrajectoryPoint& planning_start_point,
-    const ReferenceLineInfo& reference_line_info,
-    Frame* frame) {
+    const ReferenceLineInfo& reference_line_info, Frame* frame) {
   // TODO(all)
-  return Status::OK();
+  return Stage::FINISHED;
 }
 
 /**
@@ -326,7 +231,7 @@ bool StopSignUnprotectedScenario::FindNextStopSign(
   double min_start_s = std::numeric_limits<double>::max();
   for (const PathOverlap& stop_sign_overlap : stop_sign_overlaps) {
     if (adc_front_edge_s - stop_sign_overlap.end_s <=
-        conf_min_pass_s_distance &&
+            conf_min_pass_s_distance &&
         stop_sign_overlap.start_s < min_start_s) {
       min_start_s = stop_sign_overlap.start_s;
       next_stop_sign_overlap_ = stop_sign_overlap;
@@ -355,8 +260,8 @@ int StopSignUnprotectedScenario::GetAssociatedLanes(
   associated_lanes_.clear();
 
   std::vector<StopSignInfoConstPtr> associated_stop_signs;
-  HDMapUtil::BaseMap().GetStopSignAssociatedStopSigns(
-      stop_sign_info.id(), &associated_stop_signs);
+  HDMapUtil::BaseMap().GetStopSignAssociatedStopSigns(stop_sign_info.id(),
+                                                      &associated_stop_signs);
 
   for (const auto stop_sign : associated_stop_signs) {
     if (stop_sign == nullptr) {
@@ -390,8 +295,7 @@ int StopSignUnprotectedScenario::GetAssociatedLanes(
  * @brief: add a watch vehicle which arrives at stop sign ahead of adc
  */
 int StopSignUnprotectedScenario::AddWatchVehicle(
-    const PathObstacle& path_obstacle,
-    StopSignLaneVehicles* watch_vehicles) {
+    const PathObstacle& path_obstacle, StopSignLaneVehicles* watch_vehicles) {
   CHECK_NOTNULL(watch_vehicles);
 
   const PerceptionObstacle& perception_obstacle =
@@ -607,8 +511,7 @@ int StopSignUnprotectedScenario::RemoveWatchVehicle(
 /**
  * @brief: check valid stop_sign stop
  */
-bool StopSignUnprotectedScenario::CheckADCStop(
-    const ReferenceLineInfo& reference_line_info) {
+bool CheckADCStop(const ReferenceLineInfo& reference_line_info) {
   double adc_speed =
       common::VehicleStateProvider::Instance()->linear_velocity();
   if (adc_speed > conf_max_adc_stop_speed) {

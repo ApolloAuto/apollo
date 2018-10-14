@@ -37,9 +37,7 @@ namespace planning {
  */
 class DpPolyPathOptimizer : public PathOptimizer {
  public:
-  DpPolyPathOptimizer();
-
-  bool Init(const ScenarioConfig::ScenarioTaskConfig &config) override;
+  explicit DpPolyPathOptimizer(const TaskConfig &config);
 
  private:
   apollo::common::Status Process(const SpeedData &speed_data,

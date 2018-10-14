@@ -32,22 +32,14 @@ using apollo::common::ErrorCode;
 using apollo::common::Status;
 using apollo::hdmap::PathOverlap;
 
-DeciderCreep::DeciderCreep() : Decider("DeciderCreep") {}
-
-bool DeciderCreep::Init(const ScenarioConfig::ScenarioTaskConfig &config) {
+DeciderCreep::DeciderCreep(const TaskConfig& config) : Decider(config) {
   CHECK(config.has_decider_creep_config());
   config_ = config.decider_creep_config();
-  is_init_ = true;
-  return true;
+  SetName("DeciderCreep");
 }
 
 Status DeciderCreep::Process(Frame* frame,
-                      ReferenceLineInfo* reference_line_info) {
-  if (!is_init_) {
-    AERROR << "Please call Init() before Process().";
-    return Status(ErrorCode::PLANNING_ERROR, "Not inited.");
-  }
-
+                             ReferenceLineInfo* reference_line_info) {
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
 
@@ -56,10 +48,8 @@ Status DeciderCreep::Process(Frame* frame,
   return Status::OK();
 }
 
-
-
 double DeciderCreep::FindCreepDistance(Frame* frame,
-                         ReferenceLineInfo* reference_line_info) {
+                                       ReferenceLineInfo* reference_line_info) {
   // TODO(all)
   return 0.5;
 }
@@ -68,9 +58,8 @@ double DeciderCreep::FindCreepDistance(Frame* frame,
 // bool Creep::BuildStopDecision(Frame* frame,
 //                              ReferenceLineInfo* reference_line_info,
 //                              const PathOverlap& overlap) {
-bool DeciderCreep::BuildStopDecision(
-    Frame* frame,
-    ReferenceLineInfo* reference_line_info) {
+bool DeciderCreep::BuildStopDecision(Frame* frame,
+                                     ReferenceLineInfo* reference_line_info) {
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
 
@@ -82,8 +71,8 @@ bool DeciderCreep::BuildStopDecision(
   // TODO(all)
   // std::string virtual_obstacle_id = CREEP_VO_ID_PREFIX + overlap.object_id;
   std::string virtual_obstacle_id = CREEP_VO_ID_PREFIX + std::string("test");
-  auto* obstacle = frame->CreateStopObstacle(
-      reference_line_info, virtual_obstacle_id, creep_stop_s);
+  auto* obstacle = frame->CreateStopObstacle(reference_line_info,
+                                             virtual_obstacle_id, creep_stop_s);
   if (!obstacle) {
     AERROR << "Failed to create obstacle [" << virtual_obstacle_id << "]";
     return false;

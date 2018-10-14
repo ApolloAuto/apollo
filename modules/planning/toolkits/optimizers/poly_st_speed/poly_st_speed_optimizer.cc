@@ -43,20 +43,12 @@ using apollo::common::Status;
 using apollo::common::TrajectoryPoint;
 using apollo::planning_internal::STGraphDebug;
 
-PolyStSpeedOptimizer::PolyStSpeedOptimizer()
-    : SpeedOptimizer("PolyStSpeedOptimizer") {}
-
-bool PolyStSpeedOptimizer::Init(
-    const ScenarioConfig::ScenarioTaskConfig& config) {
-  if (is_init_) {
-    AERROR << "Duplicated Init.";
-    return false;
-  }
+PolyStSpeedOptimizer::PolyStSpeedOptimizer(const TaskConfig& config)
+    : SpeedOptimizer(config) {
+  SetName("PolyStSpeedOptimizer");
   CHECK(config.has_poly_st_speed_config());
   poly_st_speed_config_ = config.poly_st_speed_config();
   st_boundary_config_ = poly_st_speed_config_.st_boundary_config();
-  is_init_ = true;
-  return true;
 }
 
 Status PolyStSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
@@ -68,10 +60,6 @@ Status PolyStSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
                                      SpeedData* const speed_data) {
   if (reference_line_info_->ReachedDestination()) {
     return Status::OK();
-  }
-  if (!is_init_) {
-    AERROR << "Please call Init() before Process.";
-    return Status(ErrorCode::PLANNING_ERROR, "Not init.");
   }
 
   if (path_data.discretized_path().NumOfPoints() == 0) {

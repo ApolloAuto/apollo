@@ -36,8 +36,7 @@ namespace planning {
 
 class QpSplinePathOptimizer : public PathOptimizer {
  public:
-  QpSplinePathOptimizer();
-  bool Init(const ScenarioConfig::ScenarioTaskConfig& config) override;
+  explicit QpSplinePathOptimizer(const TaskConfig& config);
 
  private:
   apollo::common::Status Process(const SpeedData& speed_data,

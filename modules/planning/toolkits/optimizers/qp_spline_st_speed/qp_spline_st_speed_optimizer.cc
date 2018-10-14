@@ -42,11 +42,9 @@ using apollo::common::Status;
 using apollo::common::TrajectoryPoint;
 using apollo::planning_internal::STGraphDebug;
 
-QpSplineStSpeedOptimizer::QpSplineStSpeedOptimizer()
-    : SpeedOptimizer("QpSplineStSpeedOptimizer") {}
-
-bool QpSplineStSpeedOptimizer::Init(
-    const ScenarioConfig::ScenarioTaskConfig& config) {
+QpSplineStSpeedOptimizer::QpSplineStSpeedOptimizer(const TaskConfig& config)
+    : SpeedOptimizer(config) {
+  SetName("QpSplineStSpeedOptimizer");
   CHECK(config.has_qp_st_speed_config());
   qp_st_speed_config_ = config.qp_st_speed_config();
   st_boundary_config_ = qp_st_speed_config_.st_boundary_config();
@@ -57,8 +55,6 @@ bool QpSplineStSpeedOptimizer::Init(
   } else {
     spline_solver_.reset(new ActiveSetSpline1dSolver(init_knots, 5));
   }
-  is_init_ = true;
-  return true;
 }
 
 Status QpSplineStSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
@@ -70,10 +66,6 @@ Status QpSplineStSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
                                          SpeedData* const speed_data) {
   if (reference_line_info_->ReachedDestination()) {
     return Status::OK();
-  }
-  if (!is_init_) {
-    AERROR << "Please call Init() before Process.";
-    return Status(ErrorCode::PLANNING_ERROR, "Not init.");
   }
 
   if (path_data.discretized_path().NumOfPoints() == 0) {

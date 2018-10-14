@@ -55,17 +55,11 @@ TEST_F(SidePassScenarioTest, InitTasks) {
       "//apollo/modules/planning/testdata/conf/"
       "scenario_side_pass_config.pb.txt";
 
-  scenario_.reset(new SidePassScenario());
-  EXPECT_EQ(scenario_->scenario_type(), ScenarioConfig::SIDE_PASS);
-
   ScenarioConfig config;
   EXPECT_TRUE(apollo::common::util::GetProtoFromFile(
       FLAGS_scenario_side_pass_config_file, &config));
-  EXPECT_TRUE(scenario_->Init());
-
-  std::vector<std::unique_ptr<Task>> tasks;
-  scenario_->InitTasks(config, 0, &tasks);
-  EXPECT_EQ(tasks.size(), 5);
+  scenario_.reset(new SidePassScenario(config));
+  EXPECT_EQ(scenario_->scenario_type(), ScenarioConfig::SIDE_PASS);
 }
 
 }  // namespace planning

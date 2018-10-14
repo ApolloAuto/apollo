@@ -51,7 +51,6 @@ namespace planning {
 using common::ErrorCode;
 using common::SLPoint;
 using common::SpeedPoint;
-using common::Status;
 using common::TrajectoryPoint;
 using common::math::Vec2d;
 using common::time::Clock;
@@ -62,76 +61,47 @@ constexpr double kSpeedOptimizationFallbackCost = 2e4;
 constexpr double kStraightForwardLineCost = 10.0;
 }  // namespace
 
-void SidePassScenario::RegisterTasks() {
-  task_factory_.Register(DP_POLY_PATH_OPTIMIZER,
-                         []() -> Task* { return new DpPolyPathOptimizer(); });
-  task_factory_.Register(PATH_DECIDER,
-                         []() -> Task* { return new PathDecider(); });
-  task_factory_.Register(DP_ST_SPEED_OPTIMIZER,
-                         []() -> Task* { return new DpStSpeedOptimizer(); });
-  task_factory_.Register(SPEED_DECIDER,
-                         []() -> Task* { return new SpeedDecider(); });
-  task_factory_.Register(QP_SPLINE_ST_SPEED_OPTIMIZER, []() -> Task* {
-    return new QpSplineStSpeedOptimizer();
-  });
+apollo::common::util::Factory<
+    ScenarioConfig::StageType, Stage,
+    Stage* (*)(const ScenarioConfig::StageConfig& stage_config)>
+    SidePassScenario::s_stage_factory_;
+
+void SidePassScenario::RegisterStages() {
+  s_stage_factory_.Clear();
+  s_stage_factory_.Register(
+      ScenarioConfig::SIDE_PASS_APPROACH_OBSTACLE,
+      [](const ScenarioConfig::StageConfig& config) -> Stage* {
+        return new SidePassApproachObstacle(config);
+      });
+  s_stage_factory_.Register(
+      ScenarioConfig::SIDE_PASS_DETECT_SAFETY,
+      [](const ScenarioConfig::StageConfig& config) -> Stage* {
+        return new SidePassDetectSafety(config);
+      });
+  s_stage_factory_.Register(
+      ScenarioConfig::SIDE_PASS_GENERATE_PATH,
+      [](const ScenarioConfig::StageConfig& config) -> Stage* {
+        return new SidePassGeneratePath(config);
+      });
+  s_stage_factory_.Register(
+      ScenarioConfig::SIDE_PASS_STOP_ON_WAITPOINT,
+      [](const ScenarioConfig::StageConfig& config) -> Stage* {
+        return new SidePassStopOnWaitPoint(config);
+      });
+  s_stage_factory_.Register(
+      ScenarioConfig::SIDE_PASS_PASS_OBSTACLE,
+      [](const ScenarioConfig::StageConfig& config) -> Stage* {
+        return new SidePassPassObstacle(config);
+      });
 }
 
-bool SidePassScenario::Init() {
-  if (is_init_) {
-    return true;
+std::unique_ptr<Stage> SidePassScenario::CreateStage(
+    const ScenarioConfig::StageConfig& stage_config) const {
+  if (s_stage_factory_.Empty()) {
+    RegisterStages();
   }
-
-  CHECK(apollo::common::util::GetProtoFromFile(
-      FLAGS_scenario_side_pass_config_file, &config_));
-
-  RegisterTasks();
-
-  is_init_ = true;
-  return true;
-}
-
-Status SidePassScenario::Process(const TrajectoryPoint& planning_start_point,
-                                 Frame* frame) {
-  scenario_status_ = ScenarioStatus::STATUS_PROCESSING;
-
-  if (!stage_init_) {
-    const int current_stage_index = StageIndexInConf(stage_);
-    if (!InitTasks(config_, current_stage_index, &tasks_)) {
-      return Status(ErrorCode::PLANNING_ERROR, "failed to init tasks");
-    }
-    stage_init_ = true;
-  }
-
-  // TODO(all)
-
-  Status status = Status(ErrorCode::PLANNING_ERROR,
-                         "Failed to process stage in side pass.");
-  switch (stage_) {
-    case SidePassStage::OBSTACLE_APPROACH: {
-      status = ApproachObstacle(planning_start_point, frame);
-      break;
-    }
-    case SidePassStage::PATH_GENERATION: {
-      status = GeneratePath(planning_start_point, frame);
-      break;
-    }
-    case SidePassStage::WAITPOINT_STOP: {
-      status = StopOnWaitPoint(planning_start_point, frame);
-      break;
-    }
-    case SidePassStage::SAFETY_DETECTION: {
-      status = DetectSafety(planning_start_point, frame);
-      break;
-    }
-    case SidePassStage::OBSTACLE_PASS: {
-      status = PassObstacle(planning_start_point, frame);
-      break;
-    }
-    default:
-      break;
-  }
-
-  return status;
+  return s_stage_factory_.CreateObjectOrNull(stage_config.stage_type(),
+                                             stage_config);
 }
 
 bool SidePassScenario::IsTransferable(const Scenario& current_scenario,
@@ -150,133 +120,54 @@ bool SidePassScenario::IsTransferable(const Scenario& current_scenario,
   }
 }
 
-int SidePassScenario::StageIndexInConf(const SidePassStage& stage) {
-  // note: this is the index in scenario conf file.  must be consistent
-  if (stage == SidePassStage::OBSTACLE_APPROACH) {
-    return 0;
-  } else if (stage == SidePassStage::PATH_GENERATION) {
-    return 1;
-  } else if (stage == SidePassStage::WAITPOINT_STOP) {
-    return 2;
-  } else if (stage == SidePassStage::SAFETY_DETECTION) {
-    return 3;
-  } else if (stage == SidePassStage::OBSTACLE_PASS) {
-    return 4;
-  }
-  return -1;
-}
-
-SidePassScenario::SidePassStage SidePassScenario::GetNextStage(
-    const SidePassStage& current_stage) {
-  SidePassStage stage = current_stage;
-  SidePassStage next_stage;
-
-  bool next_stage_found = false;
-  while (!next_stage_found) {
-    if (stage == SidePassStage::OBSTACLE_APPROACH) {
-      next_stage = SidePassStage::PATH_GENERATION;
-      const int next_stage_index = StageIndexInConf(next_stage);
-      if (config_.stage(next_stage_index).enabled()) {
-        next_stage_found = true;
-        break;
-      }
-      stage = SidePassStage::PATH_GENERATION;
-    } else if (stage == SidePassStage::PATH_GENERATION) {
-      next_stage = SidePassStage::WAITPOINT_STOP;
-      const int next_stage_index = StageIndexInConf(next_stage);
-      if (config_.stage(next_stage_index).enabled()) {
-        next_stage_found = true;
-        break;
-      }
-      stage = SidePassStage::WAITPOINT_STOP;
-    } else if (stage == SidePassStage::WAITPOINT_STOP) {
-      next_stage = SidePassStage::SAFETY_DETECTION;
-      const int next_stage_index = StageIndexInConf(next_stage);
-      if (config_.stage(next_stage_index).enabled()) {
-        next_stage_found = true;
-        break;
-      }
-      stage = SidePassStage::SAFETY_DETECTION;
-    } else if (stage == SidePassStage::SAFETY_DETECTION) {
-      next_stage = SidePassStage::OBSTACLE_PASS;
-      const int next_stage_index = StageIndexInConf(next_stage);
-      if (config_.stage(next_stage_index).enabled()) {
-        next_stage_found = true;
-      }
-      break;  // exit at last stage
-    }
-  }
-
-  return next_stage_found ? next_stage : SidePassStage::UNKNOWN;
-}
-
-Status SidePassScenario::ApproachObstacle(
+Stage::StageStatus SidePassApproachObstacle::Process(
     const TrajectoryPoint& planning_start_point, Frame* frame) {
-  Status status = RunPlanOnReferenceLine(planning_start_point, frame);
-  if (status.ok()) {
-    if (!IsSidePassScenario(planning_start_point, *frame)) {
-      scenario_status_ = ScenarioStatus::STATUS_DONE;
-    } else if (frame->vehicle_state().linear_velocity() < 1.0e-5) {
-      stage_ = GetNextStage(stage_);
-      stage_init_ = false;
-    }
+  bool plan_ok = PlanningOnReferenceLine(planning_start_point, frame);
+  if (!plan_ok) {
+    return Stage::ERROR;
   }
-  return status;
+  if (frame->vehicle_state().linear_velocity() < 1.0e-5) {
+    return Stage::FINISHED;
+  }
+  return Stage::RUNNING;
 }
 
-Status SidePassScenario::GeneratePath(
+Stage::StageStatus SidePassGeneratePath::Process(
     const TrajectoryPoint& planning_start_point, Frame* frame) {
-  Status status = RunPlanOnReferenceLine(planning_start_point, frame);
-  if (status.ok()) {
-    stage_ = GetNextStage(stage_);
-    stage_init_ = false;
+  if (PlanningOnReferenceLine(planning_start_point, frame)) {
+    return Stage::FINISHED;
   } else {
-    AERROR << "Fail at PATH_GENERATION stage in sidepass scenario.";
+    return Stage::ERROR;
   }
-  return status;
 }
 
-Status SidePassScenario::StopOnWaitPoint(
+Stage::StageStatus SidePassStopOnWaitPoint::Process(
     const TrajectoryPoint& planning_start_point, Frame* frame) {
-  return Status::OK();
+  return Stage::FINISHED;
 }
 
-Status SidePassScenario::DetectSafety(
+Stage::StageStatus SidePassDetectSafety::Process(
     const TrajectoryPoint& planning_start_point, Frame* frame) {
-  Status status = RunPlanOnReferenceLine(planning_start_point, frame);
-
-  if (!status.ok()) {
-    return Status(ErrorCode::PLANNING_ERROR,
-                  "failed to detect safety in side pass scenario.");
+  if (PlanningOnReferenceLine(planning_start_point, frame)) {
+    return Stage::ERROR;
   }
-
-  if (!IsSidePassScenario(planning_start_point, *frame)) {
-    scenario_status_ = ScenarioStatus::STATUS_DONE;
-    return Status::OK();
-  }
-
   bool is_safe = true;
-  const PathDecision &path_decision =
+  const PathDecision& path_decision =
       frame->reference_line_info().front().path_decision();
-  for (const auto *path_obstacle : path_decision.path_obstacles().Items()) {
+  for (const auto* path_obstacle : path_decision.path_obstacles().Items()) {
     if (path_obstacle->obstacle()->IsVirtual()) {
       is_safe = false;
       break;
     }
   }
-  if (is_safe) {
-    stage_ = SidePassStage::OBSTACLE_PASS;
-    stage_init_ = false;
-  }
-  return Status::OK();
+  return is_safe ? Stage::FINISHED : Stage::RUNNING;
 }
 
-Status SidePassScenario::PassObstacle(
+Stage::StageStatus SidePassPassObstacle::Process(
     const TrajectoryPoint& planning_start_point, Frame* frame) {
-  Status status = RunPlanOnReferenceLine(planning_start_point, frame);
-  if (!status.ok()) {
-    return Status(ErrorCode::PLANNING_ERROR,
-                  "failed to pass obstacle in side pass scenario.");
+  bool plan_ok = PlanningOnReferenceLine(planning_start_point, frame);
+  if (!plan_ok) {
+    return Stage::ERROR;
   }
   const SLBoundary& adc_sl_boundary =
       frame->reference_line_info().front().AdcSlBoundary();
@@ -284,12 +175,12 @@ Status SidePassScenario::PassObstacle(
       frame->reference_line_info().front().path_data().frenet_frame_path();
   const auto& frenet_frame_point =
       frenet_frame_path.PointAt(frenet_frame_path.NumOfPoints() - 1);
-  int adc_start_s =  adc_sl_boundary.start_s();
+  int adc_start_s = adc_sl_boundary.start_s();
   int path_end_s = frenet_frame_point.s();
   if ((path_end_s - adc_start_s) > 20.0) {
-    scenario_status_ = ScenarioStatus::STATUS_DONE;
+    return Stage::FINISHED;
   }
-  return Status::OK();
+  return Stage::RUNNING;
 }
 
 bool SidePassScenario::IsSidePassScenario(
@@ -380,45 +271,6 @@ bool SidePassScenario::HasBlockingObstacle(
     }
   }
   return false;
-}
-
-Status SidePassScenario::RunPlanOnReferenceLine(
-    const TrajectoryPoint& planning_start_point, Frame* frame) {
-  auto status =
-      Status(ErrorCode::PLANNING_ERROR, "reference line not drivable");
-
-  for (auto& reference_line_info : *frame->mutable_reference_line_info()) {
-    if (!reference_line_info.IsDrivable()) {
-      return status;
-    }
-
-    auto ret = Status::OK();
-    for (auto& optimizer : tasks_) {
-      ret = optimizer->Execute(frame, &reference_line_info);
-      if (!ret.ok()) {
-        AERROR << "Failed to run tasks[" << optimizer->Name()
-               << "], Error message: " << ret.error_message();
-        break;
-      }
-    }
-
-    reference_line_info.set_trajectory_type(ADCTrajectory::NORMAL);
-    DiscretizedTrajectory trajectory;
-    if (!reference_line_info.CombinePathAndSpeedProfile(
-            planning_start_point.relative_time(),
-            planning_start_point.path_point().s(), &trajectory)) {
-      std::string msg("Fail to aggregate planning trajectory.");
-      AERROR << msg;
-      return Status(ErrorCode::PLANNING_ERROR, msg);
-    }
-    reference_line_info.SetTrajectory(trajectory);
-    reference_line_info.SetDrivable(true);
-    if (stage_ == SidePassStage::PATH_GENERATION) {
-      path_data_ = reference_line_info.path_data();
-    }
-    return Status::OK();
-  }
-  return status;
 }
 
 }  // namespace planning

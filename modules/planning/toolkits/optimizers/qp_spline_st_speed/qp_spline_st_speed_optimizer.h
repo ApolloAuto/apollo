@@ -40,9 +40,7 @@ namespace planning {
 
 class QpSplineStSpeedOptimizer : public SpeedOptimizer {
  public:
-  QpSplineStSpeedOptimizer();
-
-  bool Init(const ScenarioConfig::ScenarioTaskConfig& config) override;
+  explicit QpSplineStSpeedOptimizer(const TaskConfig& config);
 
  private:
   common::Status Process(const SLBoundary& adc_sl_boundary,

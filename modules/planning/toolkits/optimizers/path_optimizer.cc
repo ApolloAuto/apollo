@@ -27,7 +27,7 @@ namespace planning {
 
 using apollo::common::Status;
 
-PathOptimizer::PathOptimizer(const std::string& name) : Task(name) {}
+PathOptimizer::PathOptimizer(const TaskConfig& config) : Task(config) {}
 
 apollo::common::Status PathOptimizer::Execute(
     Frame* frame, ReferenceLineInfo* const reference_line_info) {

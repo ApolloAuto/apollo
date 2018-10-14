@@ -87,7 +87,7 @@ StdPlanning::~StdPlanning() {
   frame_.reset(nullptr);
   planner_.reset(nullptr);
   FrameHistory::Instance()->Clear();
-  mutable_planning_status()->Clear();
+  PlanningContext::MutablePlanningStatus()->Clear();
   last_routing_.Clear();
   EgoInfo::Instance()->Clear();
 }
@@ -95,6 +95,8 @@ StdPlanning::~StdPlanning() {
 std::string StdPlanning::Name() const { return "std_planning"; }
 
 Status StdPlanning::Init() {
+  PlanningBase::Init();
+
   CHECK(apollo::common::util::GetProtoFromFile(FLAGS_planning_config_file,
                                                &config_))
       << "failed to load planning config file " << FLAGS_planning_config_file;
@@ -111,7 +113,7 @@ Status StdPlanning::Init() {
       << FLAGS_traffic_rule_config_filename;
 
   // clear planning status
-  mutable_planning_status()->Clear();
+  PlanningContext::MutablePlanningStatus()->Clear();
 
   // load map
   hdmap_ = HDMapUtil::BaseMapPtr();
@@ -198,7 +200,7 @@ void StdPlanning::RunOnce(const LocalView& local_view,
 
   if (IsDifferentRouting(last_routing_, *local_view_.routing)) {
     last_routing_ = *local_view_.routing;
-    mutable_planning_status()->Clear();
+    PlanningContext::MutablePlanningStatus()->Clear();
     reference_line_provider_->UpdateRoutingResponse(*local_view_.routing);
   }
 

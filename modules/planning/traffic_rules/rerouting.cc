@@ -83,7 +83,8 @@ bool Rerouting::ChangeLaneFailRerouting() {
     return true;
   }
   // 6. Check if we have done rerouting before
-  auto* rerouting = mutable_planning_status()->mutable_rerouting();
+  auto* rerouting =
+      PlanningContext::MutablePlanningStatus()->mutable_rerouting();
   if (rerouting == nullptr) {
     AERROR << "rerouting is nullptr.";
     return false;

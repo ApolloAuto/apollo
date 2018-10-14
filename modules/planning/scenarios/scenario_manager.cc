@@ -19,8 +19,9 @@
 #include <utility>
 
 #include "modules/planning/scenarios/lane_follow/lane_follow_scenario.h"
-#include "modules/planning/scenarios/side_pass/side_pass_scenario.h"
-#include "modules/planning/scenarios/stop_sign_unprotected/stop_sign_unprotected.h"
+// #include "modules/planning/scenarios/side_pass/side_pass_scenario.h"
+// #include
+// "modules/planning/scenarios/stop_sign_unprotected/stop_sign_unprotected.h"
 
 namespace apollo {
 namespace planning {
@@ -34,6 +35,7 @@ bool ScenarioManager::Init(
     CHECK(scenario_factory_.Contains(scenario_type));
   }
   current_scenario_ = scenario_factory_.CreateObject(default_scenario_type_);
+  current_scenario_->Init();
   return true;
 }
 
@@ -41,12 +43,12 @@ void ScenarioManager::RegisterScenarios() {
   scenario_factory_.Register(ScenarioConfig::LANE_FOLLOW, []() -> Scenario* {
     return new LaneFollowScenario();
   });
-  scenario_factory_.Register(ScenarioConfig::SIDE_PASS, []() -> Scenario* {
-    return new SidePassScenario();
-  });
-  scenario_factory_.Register(
-      ScenarioConfig::STOP_SIGN_UNPROTECTED,
-      []() -> Scenario* { return new StopSignUnprotectedScenario(); });
+  // scenario_factory_.Register(ScenarioConfig::SIDE_PASS, []() -> Scenario* {
+  //   return new SidePassScenario();
+  // });
+  // scenario_factory_.Register(
+  //     ScenarioConfig::STOP_SIGN_UNPROTECTED,
+  //     []() -> Scenario* { return new StopSignUnprotectedScenario(); });
 }
 
 bool ScenarioManager::SelectChangeLaneScenario(
@@ -55,7 +57,6 @@ bool ScenarioManager::SelectChangeLaneScenario(
     if (current_scenario_->scenario_type() != ScenarioConfig::LANE_FOLLOW) {
       current_scenario_ =
           scenario_factory_.CreateObject(ScenarioConfig::LANE_FOLLOW);
-
       current_scenario_->Init();
     }
     return true;
@@ -79,7 +80,6 @@ bool ScenarioManager::SelectScenario(const ScenarioConfig::ScenarioType type,
     auto scenario = scenario_factory_.CreateObject(type);
     if (scenario->IsTransferable(*current_scenario_, ego_point, frame)) {
       current_scenario_ = std::move(scenario);
-      current_scenario_->Init();
       return true;
     }
   }
@@ -115,7 +115,8 @@ void ScenarioManager::Update(const common::TrajectoryPoint& ego_point,
       preferred_scenario = ScenarioConfig::SIDE_PASS;
     }
     if (rejected_scenarios.find(preferred_scenario) !=
-        rejected_scenarios.end()) {
+            rejected_scenarios.end() ||
+        supported_scenarios_.count(preferred_scenario) == 0) {
       continue;
     }
     if (SelectScenario(preferred_scenario, ego_point, frame)) {
@@ -140,7 +141,6 @@ void ScenarioManager::Update(const common::TrajectoryPoint& ego_point,
   // finally use default transferrable scenario.
   if (current_scenario_->scenario_type() != default_scenario_type_) {
     current_scenario_ = scenario_factory_.CreateObject(default_scenario_type_);
-    current_scenario_->Init();
   }
 }
 

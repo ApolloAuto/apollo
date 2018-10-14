@@ -34,40 +34,22 @@
 #include "modules/planning/reference_line/reference_line.h"
 #include "modules/planning/reference_line/reference_point.h"
 #include "modules/planning/scenarios/scenario.h"
+#include "modules/planning/scenarios/stage.h"
 #include "modules/planning/toolkits/task.h"
 
 namespace apollo {
 namespace planning {
 
-class LaneFollowScenario : public Scenario {
+class LaneFollowStage : public Stage {
  public:
-  LaneFollowScenario() : Scenario(ScenarioConfig::LANE_FOLLOW) {}
-  virtual ~LaneFollowScenario() = default;
+  explicit LaneFollowStage(const ScenarioConfig::StageConfig& config);
 
-  bool Init() override;
-
-  common::Status Process(const common::TrajectoryPoint& planning_init_point,
-                         Frame* frame) override;
-
-  bool IsTransferable(const Scenario& current_scenario,
-                      const common::TrajectoryPoint& ego_point,
-                      const Frame& frame) const override;
-
- private:
-  enum class LaneFollowStage {
-    CRUISE,
-  };
-
-  void RegisterTasks();
-
-  int StageIndexInConf(const LaneFollowStage& stage);
+  StageStatus Process(const common::TrajectoryPoint& planning_init_point,
+                      Frame* frame) override;
 
   common::Status PlanOnReferenceLine(
       const common::TrajectoryPoint& planning_start_point, Frame* frame,
       ReferenceLineInfo* reference_line_info);
-
-  std::vector<common::SpeedPoint> DummyHotStart(
-      const common::TrajectoryPoint& planning_init_point);
 
   void GenerateFallbackPathProfile(const ReferenceLineInfo* reference_line_info,
                                    PathData* path_data);
@@ -81,10 +63,25 @@ class LaneFollowScenario : public Scenario {
                        const std::string& name, const double time_diff_ms);
 
  private:
-  std::vector<std::unique_ptr<Task>> tasks_;
   ScenarioConfig config_;
-  LaneFollowStage stage_ = LaneFollowStage::CRUISE;
+  std::unique_ptr<Stage> stage_;
   SpeedProfileGenerator speed_profile_generator_;
+};
+
+class LaneFollowScenario : public Scenario {
+ public:
+  LaneFollowScenario();
+  explicit LaneFollowScenario(const std::string& config_file);
+  explicit LaneFollowScenario(const ScenarioConfig& config);
+
+  std::unique_ptr<Stage> CreateStage(
+      const ScenarioConfig::StageConfig& stage_config) const override;
+
+  bool IsTransferable(const Scenario& current_scenario,
+                      const common::TrajectoryPoint& ego_point,
+                      const Frame& frame) const override;
+
+ private:
 };
 
 }  // namespace planning
