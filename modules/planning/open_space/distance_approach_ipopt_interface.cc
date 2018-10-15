@@ -500,11 +500,11 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
       << "No. of constraints wrong in eval_jac_g. n : " << m;
 
   if (values == nullptr) {
-    std::size_t nz_index = 0;
-    std::size_t constraint_index = 0;
-    std::size_t state_index = state_start_index_;
-    std::size_t control_index = control_start_index_;
-    std::size_t time_index = time_start_index_;
+    int nz_index = 0;
+    int constraint_index = 0;
+    int state_index = state_start_index_;
+    int control_index = control_start_index_;
+    int time_index = time_start_index_;
 
     // 1. State Constraint with respect to variables
     for (std::size_t i = 0; i < horizon_; ++i) {
@@ -612,6 +612,52 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
       ++nz_index;
 
       state_index += 4;
+      control_index += 2;
+      time_index += 1;
+    }
+
+    // 2. only have control rate constraints on u0 , range [0, horizon_-1]
+    control_index = control_start_index_;
+    state_index = state_start_index_;
+    time_index = time_start_index_;
+    std::size_t control_rate_constraint_index = control_start_index_;
+
+    for (std::size_t i = 0; i < horizon_; ++i) {
+      // with respect to u(0, i-1)
+      iRow[nz_index] = control_rate_constraint_index;
+      jCol[nz_index] = control_index;
+      ++nz_index;
+
+      // with respect to u(0, i)
+      iRow[nz_index] = control_rate_constraint_index;
+      jCol[nz_index] = control_index + 2;
+      ++nz_index;
+
+      // with respect to time
+      iRow[nz_index] = control_rate_constraint_index;
+      jCol[nz_index] = time_index;
+      ++nz_index;
+
+      // only consider rate limits on u0
+      control_index += 2;
+      control_rate_constraint_index += 1;
+    }
+
+    // 3. Time constraints [0, horizon_ -1]
+    time_index = time_start_index_;
+
+    for (std::size_t i = 0; i < horizon_; ++i) {
+      // with respect to timescale(0, i-1)
+      iRow[nz_index] = time_index;
+      jCol[nz_index] = time_index;
+      ++nz_index;
+
+      // with respect to timescale(0, i)
+      iRow[nz_index] = time_index;
+      jCol[nz_index] = time_index + 1;
+      ++nz_index;
+
+      time_index += 1;
     }
 
     CHECK_EQ(nz_index, static_cast<std::size_t>(nele_jac));
@@ -810,6 +856,58 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
 
       state_index += 4;
       control_index += 2;
+      time_index += 1;
+    }
+
+    // 2. control rate constraints 1 * [0, horizons-1]
+    control_index = control_start_index_;
+    state_index = state_start_index_;
+    time_index = time_start_index_;
+    // std::size_t control_rate_constraint_index = control_start_index_;
+
+    for (std::size_t i = 0; i < horizon_; ++i) {
+      // with respect to u(0, i-1)
+      if (i == 0) {
+        values[nz_index] = 0.0;
+      } else {
+        values[nz_index] = -1.0 / x[time_index] / ts_;
+      }
+      ++nz_index;
+
+      // with respect to u(0, i)
+      values[nz_index] = 1.0 / x[time_index] / ts_;
+      ++nz_index;
+
+      // with respect to time
+      values[nz_index] = 1.0 / x[time_index] / ts_;
+      ++nz_index;
+
+      // only consider rate limits on u0
+      if (i == 0) {
+        values[nz_index] = -1.0 * (x[control_index] - last_time_u_(0, 0)) /
+                           x[time_index] / x[time_index] / ts_;
+      } else {
+        values[nz_index] = -1.0 * (x[control_index + 2] - x[control_index]) /
+                           x[time_index] / x[time_index] / ts_;
+      }
+      control_index += 2;
+      time_index += 1;
+    }
+
+    // 3. Time constraints [0, horizon_ -1]
+    time_index = time_start_index_;
+
+    for (std::size_t i = 0; i < horizon_; ++i) {
+      // with respect to timescale(0, i-1)
+      // with respect to u(0, i)
+      values[nz_index] = -1.0;
+      ++nz_index;
+
+      // with respect to timescale(0, i)
+      values[nz_index] = 1.0;
+      ++nz_index;
+      ++nz_index;
+
       time_index += 1;
     }
 
