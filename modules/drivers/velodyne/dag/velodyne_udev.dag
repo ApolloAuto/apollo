@@ -55,7 +55,7 @@ module_config {
         name : "velodyne_128_convert"
         config_file_path : "/apollo/modules/drivers/velodyne/conf/velodyne128_conf.pb.txt"
         readers {
-          channel: "/apollo/sensor/velodyne128/VelodyneScan"
+          channel: "/apollo/sensor/lidar128/Scan"
         }
       }
     }
@@ -66,7 +66,7 @@ module_config {
         name : "velodyne_16_front_center_convert"
         config_file_path : "/apollo/modules/drivers/velodyne/conf/velodyne16_front_center_conf.pb.txt"
         readers {
-          channel: "/apollo/sensor/velodyne16/front/center/VelodyneScan"
+          channel: "/apollo/sensor/lidar16/front/center/Scan"
         }
       }
     }
@@ -77,7 +77,7 @@ module_config {
         name : "velodyne_16_rear_left_convert"
         config_file_path : "/apollo/modules/drivers/velodyne/conf/velodyne16_rear_left_conf.pb.txt"
         readers {
-          channel: "/apollo/sensor/velodyne16/rear/left/VelodyneScan"
+          channel: "/apollo/sensor/lidar16/rear/left/Scan"
         }
       }
     }
@@ -88,7 +88,7 @@ module_config {
         name : "velodyne_16_rear_right_convert"
         config_file_path : "/apollo/modules/drivers/velodyne/conf/velodyne16_rear_right_conf.pb.txt"
         readers {
-          channel: "/apollo/sensor/velodyne16/rear/right/VelodyneScan"
+          channel: "/apollo/sensor/lidar16/rear/right/Scan"
         }
       }
     }
@@ -106,7 +106,7 @@ module_config {
       config {
         name : "velodyne_fusion"
         config_file_path : "/apollo/modules/drivers/velodyne/conf/velodyne_fusion_conf.pb.txt"
-        readers {channel: "/apollo/sensor/velodyne16/front/center/PointCloud2"}
+        readers {channel: "/apollo/sensor/lidar16/front/center/PointCloud2"}
       }
     }
 }
@@ -124,7 +124,7 @@ module_config {
       config {
         name : "velodyne16_fusion_compensator"
         config_file_path : "/apollo/modules/drivers/velodyne/conf/velodyne16_fusion_compensator.pb.txt"
-        readers {channel: "/apollo/sensor/velodyne16/fusion/PointCloud2"}
+        readers {channel: "/apollo/sensor/lidar16/fusion/PointCloud2"}
       }
     }
 }
@@ -137,7 +137,7 @@ module_config {
       config {
         name : "velodyne128_compensator"
         config_file_path : "/apollo/modules/drivers/velodyne/conf/velodyne128_fusion_compensator.pb.txt"
-        readers {channel: "/apollo/sensor/velodyne128/PointCloud2"}
+        readers {channel: "/apollo/sensor/lidar128/PointCloud2"}
       }
     }
 }
