@@ -69,15 +69,15 @@ TEST(Util, uniform_slice) {
   uniform_slice(0.0, 10.0, 3, &result);
   ASSERT_EQ(4, result.size());
   EXPECT_DOUBLE_EQ(0.0, result[0]);
-  EXPECT_DOUBLE_EQ(3.3333333, result[1]);
-  EXPECT_DOUBLE_EQ(6.6666666, result[2]);
+  EXPECT_DOUBLE_EQ(3.3333333333333335, result[1]);
+  EXPECT_DOUBLE_EQ(6.666666666666667, result[2]);
   EXPECT_DOUBLE_EQ(10.0, result[3]);
 
   uniform_slice(0.0, -10.0, 3, &result);
   ASSERT_EQ(4, result.size());
   EXPECT_DOUBLE_EQ(0.0, result[0]);
-  EXPECT_DOUBLE_EQ(-3.3333333, result[1]);
-  EXPECT_DOUBLE_EQ(-6.6666666, result[2]);
+  EXPECT_DOUBLE_EQ(-3.3333333333333335, result[1]);
+  EXPECT_DOUBLE_EQ(-6.666666666666667, result[2]);
   EXPECT_DOUBLE_EQ(-10.0, result[3]);
 }
 
