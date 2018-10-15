@@ -29,7 +29,9 @@ struct PointCloudPreprocessorInitOptions {
   std::string sensor_name = "velodyne64";
 };
 
-struct PointCloudPreprocessorOptions {};
+struct PointCloudPreprocessorOptions {
+  Eigen::Affine3d sensor2novatel_extrinsics;
+};
 
 class PointCloudPreprocessor {
  public:

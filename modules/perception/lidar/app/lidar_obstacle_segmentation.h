@@ -39,6 +39,7 @@ struct LidarObstacleSegmentationInitOptions {
 
 struct LidarObstacleSegmentationOptions {
   std::string sensor_name;
+  Eigen::Affine3d sensor2novatel_extrinsics;
 };
 
 class LidarObstacleSegmentation {

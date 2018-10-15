@@ -17,6 +17,7 @@
 
 #include <memory>
 
+#include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/util/file.h"
 #include "modules/perception/base/object_pool_types.h"
 #include "modules/perception/lidar/lib/pointcloud_preprocessor/proto/pointcloud_preprocessor_config.pb.h"
@@ -51,10 +52,16 @@ bool PointCloudPreprocessor::Init(
   CHECK(apollo::common::util::GetProtoFromFile(config_file, &config));
   filter_naninf_points_ = config.filter_naninf_points();
   filter_nearby_box_points_ = config.filter_nearby_box_points();
-  box_forward_x_ = config.box_forward_x();
-  box_backward_x_ = config.box_backward_x();
-  box_forward_y_ = config.box_forward_y();
-  box_backward_y_ = config.box_backward_y();
+  // box_forward_x_ = config.box_forward_x();
+  // box_backward_x_ = config.box_backward_x();
+  // box_forward_y_ = config.box_forward_y();
+  // box_backward_y_ = config.box_backward_y();
+  const auto &vehicle_param =
+    common::VehicleConfigHelper::GetConfig().vehicle_param();
+  box_forward_x_ = vehicle_param.right_edge_to_center();
+  box_backward_x_ = -vehicle_param.left_edge_to_center();
+  box_forward_y_ = vehicle_param.front_edge_to_center();
+  box_backward_y_ = -vehicle_param.back_edge_to_center();
   filter_high_z_points_ = config.filter_high_z_points();
   z_threshold_ = config.z_threshold();
   return true;
@@ -89,9 +96,13 @@ bool PointCloudPreprocessor::Preprocess(
           continue;
         }
       }
-      if (filter_nearby_box_points_ && pt.x() < box_forward_x_ &&
-          pt.x() > box_backward_x_ && pt.y() < box_forward_y_ &&
-          pt.y() > box_backward_y_) {
+      Eigen::Vector3d vec3d_lidar(pt.x(), pt.y(), pt.z());
+      Eigen::Vector3d vec3d_novatel =
+        options.sensor2novatel_extrinsics * vec3d_lidar;
+      if (filter_nearby_box_points_ && vec3d_novatel[0] < box_forward_x_ &&
+          vec3d_novatel[0] > box_backward_x_ &&
+          vec3d_novatel[1] < box_forward_y_ &&
+          vec3d_novatel[1] > box_backward_y_) {
         continue;
       }
       if (filter_high_z_points_ && pt.z() > z_threshold_) {
@@ -134,9 +145,13 @@ bool PointCloudPreprocessor::Preprocess(
           continue;
         }
       }
-      if (filter_nearby_box_points_ && pt.x < box_forward_x_ &&
-          pt.x > box_backward_x_ && pt.y < box_forward_y_ &&
-          pt.y > box_backward_y_) {
+      Eigen::Vector3d vec3d_lidar(pt.x, pt.y, pt.z);
+      Eigen::Vector3d vec3d_novatel =
+        options.sensor2novatel_extrinsics * vec3d_lidar;
+      if (filter_nearby_box_points_ && vec3d_novatel[0] < box_forward_x_ &&
+          vec3d_novatel[0] > box_backward_x_ &&
+          vec3d_novatel[1] < box_forward_y_ &&
+          vec3d_novatel[1] > box_backward_y_) {
         frame->cloud->SwapPoint(i, size--);
         continue;
       }

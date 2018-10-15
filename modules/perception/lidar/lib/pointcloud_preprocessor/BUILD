@@ -21,6 +21,8 @@ cc_library(
         "//modules/perception/lidar/common",
         "//modules/perception/lidar/lib/pointcloud_preprocessor/proto:pointcloud_preprocessor_config_proto",
         "//modules/perception/proto:perception_config_schema_proto",
+        "//modules/common/configs:vehicle_config_helper",
+        "//modules/common/configs/proto:vehicle_config_proto",
         "@eigen",
     ],
 )

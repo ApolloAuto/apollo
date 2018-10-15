@@ -137,6 +137,7 @@ bool SegmentationComponent::InternalProc(
 
   lidar::LidarObstacleSegmentationOptions segment_opts;
   segment_opts.sensor_name = sensor_name_;
+  lidar2world_trans_.GetExtrinsics(&segment_opts.sensor2novatel_extrinsics);
   lidar::LidarProcessResult ret =
       segmentor_->Process(segment_opts, in_message, frame.get());
   if (ret.error_code != lidar::LidarErrorCode::Succeed) {
