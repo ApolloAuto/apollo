@@ -19,6 +19,7 @@
 from statistical_analyzer import StatisticalAnalyzer
 from statistical_analyzer import PrintColors
 from error_code_analyzer import ErrorCodeAnalyzer
+from error_msg_analyzer import ErrorMsgAnalyzer
 
 
 class ControlAnalyzer:
@@ -28,12 +29,14 @@ class ControlAnalyzer:
         """init"""
         self.module_latency = []
         self.error_code_analyzer = ErrorCodeAnalyzer()
+        self.error_msg_analyzer = ErrorMsgAnalyzer()
 
     def put(self, control_cmd):
         """put data"""
         latency = control_cmd.latency_stats.total_time_ms
         self.module_latency.append(latency)
         self.error_code_analyzer.put(control_cmd.header.status.error_code)
+        self.error_msg_analyzer.put(control_cmd.header.status.msg)
 
     def print_latency_statistics(self):
         """print_latency_statistics"""
@@ -42,6 +45,11 @@ class ControlAnalyzer:
               PrintColors.ENDC
         analyzer = StatisticalAnalyzer()
         analyzer.print_statistical_results(self.module_latency)
+
         print PrintColors.HEADER + "--- Control Error Code Distribution ---" + \
               PrintColors.ENDC
         self.error_code_analyzer.print_results()
+
+        print PrintColors.HEADER + "--- Control Error Msg Distribution ---" + \
+              PrintColors.ENDC
+        self.error_msg_analyzer.print_results()
