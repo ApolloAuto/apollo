@@ -61,7 +61,7 @@ TEST_F(AutotuningRawFeatureGeneratorTest, generate_input_trajectory) {
   // init trajectory
   std::vector<common::TrajectoryPoint> trajectory;
   ASSERT_TRUE(generator_ != nullptr);
-  auto result = generator_->evaluate_trajectory(trajectory, *ref_line_info_,
+  auto result = generator_->EvaluateTrajectory(trajectory, *ref_line_info_,
                                                 *frame_, nullptr);
   EXPECT_TRUE(result == common::Status::OK());
 }
@@ -69,7 +69,7 @@ TEST_F(AutotuningRawFeatureGeneratorTest, generate_input_trajectory) {
 TEST_F(AutotuningRawFeatureGeneratorTest, generate_input_trajectory_pointwise) {
   common::TrajectoryPoint trajectory_point;
   ASSERT_TRUE(generator_ != nullptr);
-  auto result = generator_->evaluate_trajectory_point(
+  auto result = generator_->EvaluateTrajectoryPoint(
       trajectory_point, *ref_line_info_, *frame_, nullptr);
   EXPECT_TRUE(result == common::Status::OK());
 }

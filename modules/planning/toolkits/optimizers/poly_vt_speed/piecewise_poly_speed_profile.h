@@ -37,19 +37,25 @@ class PiecewisePolySpeedProfile {
 
   void set_cost(const double cost);
 
+  void set_collision(const bool collision);
   /**
    * @brief: Generate discretized speed points
    */
   void GeneratePoints(const std::size_t num_eval_points);
 
+  void GeneratePointsByTime(const double t_resolution);
+
   const std::vector<common::SpeedPoint>& eval_points() const;
 
   double cost() const;
+
+  bool collision() const;
 
  private:
   PiecewisePolySpeedCurve curve_;
   std::vector<common::SpeedPoint> eval_points_;
   double cost_;
+  bool collision_ = false;
 };
 
 }  // namespace planning

@@ -11,6 +11,7 @@ import "modules/planning/proto/qp_st_speed_config.proto";
 import "modules/planning/proto/side_pass_path_decider_config.proto";
 import "modules/planning/proto/proceed_with_caution_speed_config.proto";
 import "modules/planning/proto/poly_st_speed_config.proto";
+import "modules/planning/proto/poly_vt_speed_config.proto";
 import "modules/planning/proto/navi_path_decider_config.proto";
 import "modules/planning/proto/navi_speed_decider_config.proto";
 import "modules/planning/proto/navi_obstacle_decider_config.proto";
@@ -57,6 +58,7 @@ message TaskConfig {
     DeciderStopSignConfig decider_stop_sign_config = 11;
     SidePassSafetyConfig side_pass_safety_config = 12;
     SidePassPathDeciderConfig side_pass_path_decider_config = 13;
+    PolyVTSpeedConfig poly_vt_speed_config = 14;
   }
 }
 

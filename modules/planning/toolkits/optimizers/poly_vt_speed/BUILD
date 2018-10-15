@@ -87,4 +87,36 @@ cc_test(
     ],
 )
 
+cc_library(
+    name = "poly_vt_speed_optimizer",
+    srcs = [
+        "poly_vt_speed_optimizer.cc",
+    ],
+    hdrs = [
+        "poly_vt_speed_optimizer.h",
+    ],
+    deps = [
+        "//cybertron",
+        "//modules/common/status",
+        "//modules/common/configs:vehicle_config_helper",
+        "//modules/common/configs/proto:vehicle_config_proto",
+        "//modules/common/proto:pnc_point_proto",
+        "//modules/localization/proto:pose_proto",
+        "//modules/planning/proto:planning_config_proto",
+        "//modules/planning/proto:planning_proto",
+        "//modules/planning/proto:poly_vt_speed_config_proto",
+        "//modules/planning/common:path_decision",
+        "//modules/planning/common:reference_line_info",
+        "//modules/planning/common:speed_limit",
+        "//modules/planning/common/path:path_data",
+        "//modules/planning/common/speed:speed_data",
+        "//modules/planning/toolkits:task",
+        "//modules/planning/toolkits/optimizers/st_graph:st_boundary_mapper",
+        "//modules/planning/toolkits/optimizers/st_graph:st_graph_data",
+        "//modules/planning/tuning:autotuning_raw_feature_generator",
+        "//modules/planning/tuning/speed_model:autotuning_speed_feature_builder",
+        "//modules/planning/tuning/speed_model:autotuning_speed_mlp_model",
+        ":piecewise_poly_vt_speed_sampler",
+    ],
+)
 cpplint()
