@@ -95,14 +95,15 @@ LARGE_TOPICS = [
     '/apollo/sensor/camera/right_rear/image',
     '/apollo/sensor/camera/traffic/image_long',
     '/apollo/sensor/camera/traffic/image_short',
-    '/apollo/sensor/radar/radar_front',
-    '/apollo/sensor/radar/radar_rear',
-    '/apollo/sensor/velodyne16/compensator/PointCloud2',
-    '/apollo/sensor/velodyne16/lidar_16_front_center',
-    '/apollo/sensor/velodyne16/lidar_16_rear_left',
-    '/apollo/sensor/velodyne16/lidar_16_rear_right',
+    '/apollo/sensor/radar/front',
+    '/apollo/sensor/radar/rear',
+    '/apollo/sensor/lidar16/compensator/PointCloud2',
+    '/apollo/sensor/lidar128/compensator/PointCloud2',
+    '/apollo/sensor/lidar16/rear/right//PointCloud2',
+    '/apollo/sensor/lidar16/rear/left/center/PointCloud2',
+    '/apollo/sensor/lidar16/front/center/PointCloud2',
     '/apollo/sensor/velodyne64/compensator/PointCloud2',
-    '/apollo/sensor/velodyne128/PointCloud2',
+    '/apollo/sensor/lidar128/PointCloud2',
 ]
 
 

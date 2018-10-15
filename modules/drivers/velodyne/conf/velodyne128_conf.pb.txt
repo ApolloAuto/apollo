@@ -1,5 +1,5 @@
 frame_id: "velodyne128"
-scan_channel: "/apollo/sensor/velodyne128/VelodyneScan"
+scan_channel: "/apollo/sensor/lidar128/Scan"
 rpm: 600.0
 model: VLS128
 mode: STRONGEST
@@ -13,6 +13,6 @@ use_gps_time: true
 calibration_online: false
 calibration_file: "/apollo/modules/drivers/velodyne/params/velodyne128_VLS_calibration.yaml"
 organized: false
-convert_channel_name: "/apollo/sensor/velodyne128/PointCloud2"
+convert_channel_name: "/apollo/sensor/lidar128/PointCloud2"
 use_poll_sync: true
 is_main_frame: true

@@ -37,4 +37,4 @@ radar_conf {
   input_send_interval: 20000000 
 }
 
-radar_channel: "apollo/sensor/radar/front/conti_radar"
+radar_channel: "/apollo/sensor/radar/front"

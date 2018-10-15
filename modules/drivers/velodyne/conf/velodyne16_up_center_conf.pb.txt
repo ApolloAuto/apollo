@@ -1,5 +1,5 @@
 frame_id: "velodyne16_front_center"
-scan_channel: "/apollo/sensor/velodyne16/up/center/VelodyneScan"
+scan_channel: "/apollo/sensor/lidar16/up/center/Scan"
 rpm: 600.0
 model: VLP16
 mode: STRONGEST
@@ -13,6 +13,6 @@ use_gps_time: true
 calibration_online: false
 calibration_file: "/apollo/modules/drivers/velodyne/params/VLP16_calibration.yaml"
 organized: false
-convert_channel_name: "/apollo/sensor/velodyne16/up/center/PointCloud2"
+convert_channel_name: "/apollo/sensor/lidar16/up/center/PointCloud2"
 use_poll_sync: true
 is_main_frame: false
