@@ -91,6 +91,8 @@ bool LidarObstacleSegmentation::Init(
 LidarProcessResult LidarObstacleSegmentation::Process(
     const LidarObstacleSegmentationOptions& options, LidarFrame* frame) {
   PointCloudPreprocessorOptions preprocessor_options;
+  preprocessor_options.sensor2novatel_extrinsics =
+    options.sensor2novatel_extrinsics;
   if (cloud_preprocessor_.Preprocess(preprocessor_options, frame)) {
     return ProcessCommon(options, frame);
   } else {
@@ -109,6 +111,8 @@ LidarProcessResult LidarObstacleSegmentation::Process(
 
   PERCEPTION_PERF_BLOCK_START();
   PointCloudPreprocessorOptions preprocessor_options;
+  preprocessor_options.sensor2novatel_extrinsics =
+    options.sensor2novatel_extrinsics;
   if (cloud_preprocessor_.Preprocess(preprocessor_options, message, frame)) {
     PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(sensor_name, "preprocess");
     return ProcessCommon(options, frame);

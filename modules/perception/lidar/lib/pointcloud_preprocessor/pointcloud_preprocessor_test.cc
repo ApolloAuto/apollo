@@ -95,6 +95,7 @@ TEST_F(PointCloudPreprocessorTest, basic_test) {
     EXPECT_FALSE(preprocessor.Preprocess(option, &frame));
     frame.cloud = base::PointFCloudPool::Instance().Get();
     frame.lidar2world_pose = Eigen::Affine3d::Identity();
+    option.sensor2novatel_extrinsics = Eigen::Affine3d::Identity();
     MockPointcloud(frame.cloud.get());
     EXPECT_EQ(frame.cloud->size(), 10);
     EXPECT_TRUE(preprocessor.Preprocess(option, &frame));
