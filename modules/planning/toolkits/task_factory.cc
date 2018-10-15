@@ -44,6 +44,9 @@ apollo::common::util::Factory<TaskConfig::TaskType, Task,
                               Task* (*)(const TaskConfig& config)>
     TaskFactory::task_factory_;
 
+std::unordered_map<TaskConfig::TaskType, TaskConfig, EnumHash>
+    TaskFactory::default_task_configs_;
+
 void TaskFactory::Init(const PlanningConfig& config) {
   task_factory_.Register(TaskConfig::DP_ST_SPEED_OPTIMIZER,
                          [](const TaskConfig& config) -> Task* {
@@ -81,10 +84,20 @@ void TaskFactory::Init(const PlanningConfig& config) {
                          [](const TaskConfig& config) -> Task* {
                            return new DeciderCreep(config);
                          });
+  for (const auto& default_task_config : config.default_task_config()) {
+    default_task_configs_[default_task_config.task_type()] =
+        default_task_config;
+  }
 }
 
 std::unique_ptr<Task> TaskFactory::CreateTask(const TaskConfig& task_config) {
-  return task_factory_.CreateObject(task_config.task_type(), task_config);
+  TaskConfig merged_config;
+  if (default_task_configs_.find(task_config.task_type()) !=
+      default_task_configs_.end()) {
+    merged_config = default_task_configs_[task_config.task_type()];
+  }
+  merged_config.MergeFrom(task_config);
+  return task_factory_.CreateObject(task_config.task_type(), merged_config);
 }
 
 }  // namespace planning

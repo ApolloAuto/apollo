@@ -22,6 +22,7 @@
 
 #include <memory>
 #include <string>
+#include <unordered_map>
 
 #include "modules/planning/proto/planning_config.pb.h"
 
@@ -30,6 +31,13 @@
 
 namespace apollo {
 namespace planning {
+
+struct EnumHash {
+  template <typename T>
+  std::size_t operator()(T t) const {
+    return static_cast<std::size_t>(t);
+  }
+};
 
 class TaskFactory {
  public:
@@ -40,6 +48,8 @@ class TaskFactory {
   static apollo::common::util::Factory<TaskConfig::TaskType, Task,
                                        Task *(*)(const TaskConfig &config)>
       task_factory_;
+  static std::unordered_map<TaskConfig::TaskType, TaskConfig, EnumHash>
+      default_task_configs_;
 };
 
 }  // namespace planning
