@@ -5,7 +5,7 @@ module_config {
         class_name : "DataComponent"
         config {
             name: "data"
-            config_file_path:  "/apollo/modules/data/conf/data.conf"
+            flag_file_path:  "/apollo/modules/data/conf/data.conf"
             readers: [
                 {
                     channel: "/apollo/data"

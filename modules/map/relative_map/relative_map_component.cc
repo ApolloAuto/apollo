@@ -26,9 +26,6 @@ using apollo::canbus::Chassis;
 using apollo::localization::LocalizationEstimate;
 
 bool RelativeMapComponent::Init() {
-  AINFO << "Loading gflag from file: " << ConfigFilePath();
-  google::SetCommandLineOption("flagfile", ConfigFilePath().c_str());
-
   InitReaders();
   return relative_map_.Init().ok() && relative_map_.Start().ok();
 }

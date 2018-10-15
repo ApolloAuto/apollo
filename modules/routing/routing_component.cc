@@ -25,9 +25,6 @@ namespace apollo {
 namespace routing {
 
 bool RoutingComponent::Init() {
-  AINFO << "Loading gflag from file: " << ConfigFilePath();
-  google::SetCommandLineOption("flagfile", ConfigFilePath().c_str());
-
   response_writer_ =
       node_->CreateWriter<RoutingResponse>(FLAGS_routing_response_topic);
 
