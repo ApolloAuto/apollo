@@ -24,9 +24,6 @@ namespace apollo {
 namespace third_party_perception {
 
 bool ThirdPartyPerceptionComponent::Init() {
-  AINFO << "Loading gflag from file: " << ConfigFilePath();
-  google::SetCommandLineOption("flagfile", ConfigFilePath().c_str());
-
   if (!perception_.Init().ok()) {
     return false;
   }

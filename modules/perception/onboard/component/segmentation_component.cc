@@ -31,8 +31,6 @@ uint32_t SegmentationComponent::s_seq_num_ = 0;
 std::mutex SegmentationComponent::s_mutex_;
 
 bool SegmentationComponent::Init() {
-  AINFO << "Loading gflag from file: " << ConfigFilePath();
-  google::SetCommandLineOption("flagfile", ConfigFilePath().c_str());
   if (InitAlgorithmPlugin() != true) {
     AERROR << "Failed to init segmentation component algorithm plugin.";
     return false;

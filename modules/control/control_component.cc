@@ -46,9 +46,6 @@ bool ControlComponent::Init() {
 
   AINFO << "Control init, starting ...";
 
-  AINFO << "Loading gflag from file: " << ConfigFilePath();
-  google::SetCommandLineOption("flagfile", ConfigFilePath().c_str());
-
   CHECK(apollo::common::util::GetProtoFromFile(FLAGS_control_conf_file,
                                                &control_conf_))
       << "Unable to load control conf file: " + FLAGS_control_conf_file;

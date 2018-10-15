@@ -59,9 +59,6 @@ DEFINE_double(traffic_light_distance, 1000.0,
 class ManualTrafficLight final : public ::apollo::cybertron::TimerComponent {
  public:
   bool Init() {
-    AINFO << "Loading gflag from file: " << ConfigFilePath();
-    google::SetCommandLineOption("flagfile", ConfigFilePath().c_str());
-
     localization_reader_ = node_->CreateReader<LocalizationEstimate>(
         FLAGS_localization_topic,
         [this](const std::shared_ptr<LocalizationEstimate> &localization) {

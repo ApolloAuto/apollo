@@ -26,9 +26,6 @@ namespace apollo {
 namespace data {
 
 bool DataComponent::Init() {
-  AINFO << "Loading config from file: " << ConfigFilePath();
-  google::SetCommandLineOption("flagfile", ConfigFilePath().c_str());
-
   CHECK(apollo::common::util::GetProtoFromFile(FLAGS_data_conf_file,
                                                &data_conf_))
       << "Unable to load data conf file: " << FLAGS_data_conf_file;

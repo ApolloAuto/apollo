@@ -5,7 +5,7 @@ module_config {
         class_name : "RoutingComponent"
         config {
             name : "routing"
-            config_file_path: "/apollo/modules/routing/conf/routing.conf"
+            flag_file_path: "/apollo/modules/routing/conf/routing.conf"
             readers: [
                 {
                     channel: "/apollo/routing_request"

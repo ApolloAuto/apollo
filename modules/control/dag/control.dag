@@ -4,7 +4,7 @@ module_config {
         class_name : "ControlComponent"
         config {
             name: "control"
-            config_file_path:  "/apollo/modules/control/conf/control.conf"
+            flag_file_path: "/apollo/modules/control/conf/control.conf"
             interval: 10
       }
    }
