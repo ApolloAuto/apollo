@@ -26,7 +26,7 @@ class RepeatedItemsMessage;
 class GeneralChannelMessage
     : public CybertronChannelMessage<apollo::cybertron::message::RawMessage> {
  public:
-  RegisterChannelMsgClass(GeneralChannelMessage,
+  ChannelMsgSubFactory(GeneralChannelMessage,
                           apollo::cybertron::message::RawMessage);
   void Render(const Screen* s, int key) override;
   ~GeneralChannelMessage() {
@@ -38,14 +38,11 @@ class GeneralChannelMessage
 
   RenderableMessage* Child(int lineNo) const override;
 
+ private:
   explicit GeneralChannelMessage(RenderableMessage* parent = nullptr)
       : CybertronChannelMessage<apollo::cybertron::message::RawMessage>(parent),
         current_state_(State::ShowDebugString),
-        // pages_(0),
-        // page_index_(0),
         raw_msg_class_(nullptr) {}
-
- private:
   GeneralChannelMessage(const GeneralChannelMessage&) = delete;
   GeneralChannelMessage& operator=(const GeneralChannelMessage&) = delete;
 
