@@ -39,6 +39,11 @@ class SidePassPathDecider : public Decider {
  public:
   explicit SidePassPathDecider(const TaskConfig& config);
 
+  enum SidePassDirection {
+    LEFT = 0,
+    RIGHT = 1,
+  };
+
  private:
   apollo::common::Status Process(
       Frame* frame, ReferenceLineInfo* reference_line_info) override;
@@ -50,6 +55,7 @@ class SidePassPathDecider : public Decider {
 
  private:
   std::unique_ptr<Fem1dQpProblem> fem_qp_;
+  SidePassDirection decided_direction_;
 };
 
 }  // namespace planning
