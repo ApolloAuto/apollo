@@ -108,9 +108,16 @@ void Fem1dQpProblem::ProcessBound(
   for (size_t i = 0; i < src.size(); ++i) {
     size_t index = static_cast<size_t>(std::get<0>(src[i]) / delta_s_ + 0.5);
     if (index < dst->size()) {
-      dst->at(index) = std::min(dst->at(index), src[i]);
+      std::get<1>(dst->at(index)) =
+          std::max(std::get<1>(dst->at(index)), std::get<1>(src[i]));
+      std::get<2>(dst->at(index)) =
+          std::min(std::get<2>(dst->at(index)), std::get<2>(src[i]));
     }
   }
+  int ind = 0;
+  std::for_each(
+      dst->begin(), dst->end(),
+      [&](std::tuple<double, double, double>& t) { std::get<0>(t) = ind++; });
 }
 
 // x_bounds: tuple(s, lower_bounds, upper_bounds)
