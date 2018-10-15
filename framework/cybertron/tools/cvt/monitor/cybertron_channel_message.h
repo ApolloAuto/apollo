@@ -208,7 +208,7 @@ class CybertronChannelMessage : public ChannelMessage {
   mutable std::mutex inner_lock_;
 };
 
-#define RegisterChannelMsgClass(ChannelMsgSubClass, MessageType)           \
+#define ChannelMsgSubFactory(ChannelMsgSubClass, MessageType)           \
   static ChannelMessage* Instance(const std::string& channelName,          \
                                   const std::string& nodeName) {           \
     ChannelMessage* ret = castErrorCode2Ptr(ErrorCode::NewSubClassFailed); \
