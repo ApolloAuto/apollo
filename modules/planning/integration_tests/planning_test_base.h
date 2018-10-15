@@ -100,6 +100,7 @@ class PlanningTestBase : public ::testing::Test {
   std::map<TrafficRuleConfig::RuleId, bool> rule_enabled_;
   ADCTrajectory adc_trajectory_;
   LocalView local_view_;
+  PlanningConfig config_;
 };
 
 }  // namespace planning

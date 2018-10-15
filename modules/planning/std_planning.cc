@@ -94,16 +94,14 @@ StdPlanning::~StdPlanning() {
 
 std::string StdPlanning::Name() const { return "std_planning"; }
 
-Status StdPlanning::Init() {
-  PlanningBase::Init();
-
-  CHECK(apollo::common::util::GetProtoFromFile(FLAGS_planning_config_file,
-                                               &config_))
-      << "failed to load planning config file " << FLAGS_planning_config_file;
-  if (!CheckPlanningConfig()) {
+Status StdPlanning::Init(const PlanningConfig& config) {
+  config_ = config;
+  if (!CheckPlanningConfig(config_)) {
     return Status(ErrorCode::PLANNING_ERROR,
                   "planning config error: " + config_.DebugString());
   }
+
+  PlanningBase::Init(config_);
 
   planner_dispatcher_->Init();
 
@@ -414,11 +412,11 @@ Status StdPlanning::Plan(
   return status;
 }
 
-bool StdPlanning::CheckPlanningConfig() {
-  if (!config_.has_standard_planning_config()) {
+bool StdPlanning::CheckPlanningConfig(const PlanningConfig& config) {
+  if (!config.has_standard_planning_config()) {
     return false;
   }
-  if (config_.standard_planning_config()
+  if (config.standard_planning_config()
           .planner_public_road_config()
           .scenario_type_size() == 0) {
     return false;

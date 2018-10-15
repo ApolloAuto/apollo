@@ -44,7 +44,7 @@ apollo::common::util::Factory<TaskConfig::TaskType, Task,
                               Task* (*)(const TaskConfig& config)>
     TaskFactory::task_factory_;
 
-void TaskFactory::Init() {
+void TaskFactory::Init(const PlanningConfig& config) {
   task_factory_.Register(TaskConfig::DP_ST_SPEED_OPTIMIZER,
                          [](const TaskConfig& config) -> Task* {
                            return new DpStSpeedOptimizer(config);
