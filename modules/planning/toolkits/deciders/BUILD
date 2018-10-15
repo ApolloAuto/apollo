@@ -27,9 +27,10 @@ cc_library(
 )
 
 cc_test(
-    name = "side_pass_safety_test",
+    name = "decider_test",
     size = "small",
     srcs = [
+        "side_pass_path_decider_test.cc",
         "side_pass_safety_test.cc",
     ],
     deps = [
