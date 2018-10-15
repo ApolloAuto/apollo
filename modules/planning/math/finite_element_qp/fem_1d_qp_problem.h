@@ -77,21 +77,15 @@ class Fem1dQpProblem {
 
   // x_bounds: tuple(s, lower_bounds, upper_bounds)
   virtual void SetVariableBounds(
-      const std::vector<std::tuple<double, double, double>>& x_bounds) {
-    x_bounds_ = x_bounds;
-  }
+      const std::vector<std::tuple<double, double, double>>& x_bounds);
 
   // dx_bounds: tuple(s, lower_bounds, upper_bounds)
   virtual void SetVariableDerivativeBounds(
-      const std::vector<std::tuple<double, double, double>>& dx_bounds) {
-    dx_bounds_ = dx_bounds;
-  }
+      const std::vector<std::tuple<double, double, double>>& dx_bounds);
 
   // ddx_bounds: tuple(s, lower_bounds, upper_bounds)
   virtual void SetVariableSecondOrderDerivativeBounds(
-      const std::vector<std::tuple<double, double, double>>& ddx_bounds) {
-    ddx_bounds_ = ddx_bounds;
-  }
+      const std::vector<std::tuple<double, double, double>>& ddx_bounds);
 
   virtual void PreSetKernel() {}
 
@@ -132,7 +126,13 @@ class Fem1dQpProblem {
       std::vector<c_float>& q, OSQPData* data, OSQPWorkspace** work,  // NOLINT
       OSQPSettings* settings);
 
+  virtual void ProcessBound(
+      const std::vector<std::tuple<double, double, double>>& src,
+      std::vector<std::tuple<double, double, double>>* dst);
+
  protected:
+  bool is_init_ = false;
+
   size_t num_var_ = 0;
 
   // output

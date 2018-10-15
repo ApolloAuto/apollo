@@ -62,6 +62,11 @@ class Fem1dExpandedJerkQpProblem : public Fem1dQpProblem {
                                  std::vector<c_int>* A_indptr,
                                  std::vector<c_float>* lower_bounds,
                                  std::vector<c_float>* upper_bounds) override;
+
+  void CalculateAffineConstraintUsingDenseMatrix(
+      std::vector<c_float>* A_data, std::vector<c_int>* A_indices,
+      std::vector<c_int>* A_indptr, std::vector<c_float>* lower_bounds,
+      std::vector<c_float>* upper_bounds);
 };
 
 }  // namespace planning

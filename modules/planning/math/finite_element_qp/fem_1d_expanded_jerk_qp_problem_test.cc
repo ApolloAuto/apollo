@@ -18,8 +18,6 @@
  * @file
  **/
 
-#include "modules/planning/math/finite_element_qp/fem_1d_expanded_jerk_qp_problem.h"
-
 #include <chrono>
 #include <iostream>
 
@@ -27,6 +25,9 @@
 #include "gtest/gtest.h"
 
 #include "modules/planning/common/planning_gflags.h"
+
+#define private public
+#include "modules/planning/math/finite_element_qp/fem_1d_expanded_jerk_qp_problem.h"
 
 namespace apollo {
 namespace planning {
@@ -59,6 +60,55 @@ TEST(Fem1dLinearQpProblemTest, basic_test) {
   for (size_t i = 0; i < x.size(); ++i) {
     EXPECT_LE(x[i], std::get<2>(x_bounds[i]));
     EXPECT_GE(x[i], std::get<1>(x_bounds[i]));
+  }
+}
+
+TEST(Fem1dLinearQpProblemTest, affine_constraint_test) {
+  FLAGS_enable_osqp_debug = false;
+  Fem1dExpandedJerkQpProblem* fem_qp = new Fem1dExpandedJerkQpProblem();
+  std::array<double, 3> x_init = {1.5, 0.01, 0.001};
+  double delta_s = 0.5;
+  size_t n = 5;
+  std::vector<std::tuple<double, double, double>> x_bounds;
+  for (size_t i = 0; i < n; ++i) {
+    x_bounds.emplace_back(std::make_tuple(static_cast<double>(i), -1.81, 1.95));
+  }
+  std::array<double, 5> w = {1.0, 2.0, 3.0, 4.0, 1.45};
+  double max_x_third_order_derivative = 0.25;
+  EXPECT_TRUE(
+      fem_qp->Init(n, x_init, delta_s, w, max_x_third_order_derivative));
+
+  fem_qp->SetVariableBounds(x_bounds);
+
+  std::vector<c_float> A_data;
+  std::vector<c_int> A_indices;
+  std::vector<c_int> A_indptr;
+  std::vector<c_float> lower_bounds;
+  std::vector<c_float> upper_bounds;
+  fem_qp->CalculateAffineConstraint(&A_data, &A_indices, &A_indptr,
+                                    &lower_bounds, &upper_bounds);
+
+  std::vector<c_float> A_data_d;
+  std::vector<c_int> A_indices_d;
+  std::vector<c_int> A_indptr_d;
+  std::vector<c_float> lower_bounds_d;
+  std::vector<c_float> upper_bounds_d;
+  fem_qp->CalculateAffineConstraintUsingDenseMatrix(
+      &A_data_d, &A_indices_d, &A_indptr_d, &lower_bounds_d, &upper_bounds_d);
+
+  EXPECT_EQ(A_data.size(), A_indices.size());
+  EXPECT_EQ(A_data.size(), A_data_d.size());
+  EXPECT_EQ(A_indices.size(), A_indices_d.size());
+  EXPECT_EQ(A_indptr.size(), A_indptr_d.size());
+
+  for (size_t i = 0; i < A_data.size(); ++i) {
+    EXPECT_FLOAT_EQ(A_data[i], A_data_d[i]);
+  }
+  for (size_t i = 0; i < A_indices.size(); ++i) {
+    EXPECT_EQ(A_indices[i], A_indices_d[i]);
+  }
+  for (size_t i = 0; i < A_indptr.size(); ++i) {
+    EXPECT_EQ(A_indptr[i], A_indptr_d[i]);
   }
 }
 
