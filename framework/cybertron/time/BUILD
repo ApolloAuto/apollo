@@ -3,17 +3,56 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "time_lib",
-    srcs = glob([
-        "duration.cpp",
-        "rate.cpp",
+    name = "time",
+    srcs = [
         "time.cpp",
-    ]),
-    hdrs = glob([
-        "*.h",
-    ]),
+    ],
+    hdrs = [
+        "time.h",
+    ],
     deps = [
-          "//cybertron/common:common_lib",
+          "//cybertron/time:duration",
+          "//cybertron/common:common",
+    ],
+)
+
+cc_test(
+    name = "time_test",
+    size = "small",
+    srcs = [
+        "time_test.cpp",
+    ],
+    deps = [
+        "//cybertron",
+        "@gtest//:main",
+    ],
+)
+
+cc_library(
+    name = "rate",
+    srcs = [
+        "rate.cpp",
+    ],
+    hdrs = [
+        "rate.h",
+    ],
+    deps = [
+          "//cybertron/common:common",
+          "//cybertron/time:duration",
+          "//cybertron/time:time",
+    ],
+)
+
+cc_library(
+    name = "duration",
+    srcs = [
+        "duration.cpp",
+    ],
+    hdrs = [
+        "duration.h",
+    ],
+    deps = [
+          "//cybertron/common:common",
     ],
 )
 
@@ -29,16 +68,5 @@ cc_test(
     ],
 )
 
-cc_test(
-    name = "time_test",
-    size = "small",
-    srcs = [
-        "time_test.cpp",
-    ],
-    deps = [
-        "//cybertron",
-        "@gtest//:main",
-    ],
-)
 
 cpplint()

@@ -16,7 +16,7 @@ cc_library(
     ]),
     deps = [
         "//cybertron:init_lib",
-        "//cybertron/common:common_lib",
+        "//cybertron/common:common",
         "//cybertron/message:message_lib",
         "//cybertron/proto:record_cc_proto",
     ],

@@ -11,8 +11,8 @@ cc_library(
         "*.h",
     ]),
     deps = [
-        "//cybertron/common:common_lib",
-        "//cybertron/transport/common:transport_common_lib",
+        "//cybertron/common:common",
+        "//cybertron/transport/common:transport_common",
     ],
 )
 

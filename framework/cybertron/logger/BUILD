@@ -3,17 +3,16 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "logger_lib",
-    srcs = glob([
-        "async_logger.cpp",
-        "log_file_object.cpp",
+    name = "logger",
+    srcs = [
         "logger.cpp",
-    ]),
+    ],
     hdrs = glob([
-        "*.h",
+        "logger.h",
     ]),
     deps = [
-        "//cybertron/common:common_lib",
+        "//cybertron/common:common",
+        "//cybertron/logger:log_file_object",
     ],
 )
 
@@ -27,6 +26,42 @@ cc_test(
         "//cybertron",
         "@gtest//:main",
     ],
+)
+
+cc_library(
+    name = "async_logger",
+    srcs = [
+        "async_logger.cpp",
+    ],
+    hdrs = glob([
+        "async_logger.h",
+    ]),
+    deps = [
+        "//cybertron/common:macros",
+        "//cybertron/logger:logger",
+        "//cybertron/logger:log_file_object",
+    ]
+)
+
+cc_library(
+    name = "log_file_object",
+    srcs = [
+        "log_file_object.cpp",
+    ],
+    hdrs = glob([
+        "log_file_object.h",
+    ]),
+    deps = [
+        "//cybertron/common:log",
+        "//cybertron/logger:logger_util",
+    ]
+)
+
+cc_library(
+    name = "logger_util",
+    hdrs = glob([
+        "logger_util.h",
+    ]),
 )
 
 cpplint()

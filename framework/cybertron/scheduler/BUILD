@@ -15,7 +15,7 @@ cc_library(
         "*.h",
     ]),
     deps = [
-          "//cybertron/croutine:croutine_lib",
+          "//cybertron/croutine:croutine",
           "//cybertron/data:data_lib",
     ],
 )
