@@ -40,7 +40,7 @@ class ControlAnalyzer:
 
     def print_latency_statistics(self):
         """print_latency_statistics"""
-        print ""
+        print "\n\n"
         print PrintColors.HEADER + "--- Control Latency (ms) ---" + \
               PrintColors.ENDC
         analyzer = StatisticalAnalyzer()
