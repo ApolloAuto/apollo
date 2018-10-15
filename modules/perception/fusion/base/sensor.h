@@ -38,6 +38,9 @@ class Sensor : public std::enable_shared_from_this<Sensor> {
   explicit Sensor(const base::SensorInfo& sensor_info)
       : sensor_info_(sensor_info) {}
 
+  // static members initialization
+  inline static void SetMaxCachedFrameNum(int num) { kMaxCachedFrameNum = num; }
+
   // query frames whose time stamp is in range
   // (_latest_fused_time_stamp, time_stamp]
   void QueryLatestFrames(double timestamp, std::vector<SensorFramePtr>* frames);

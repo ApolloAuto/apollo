@@ -40,6 +40,17 @@ class Track {
   Track(const Track&) = delete;
   Track& operator=(const Track&) = delete;
 
+  // static members initialization
+  inline static void SetMaxLidarInvisiblePeriod(double period) {
+    s_max_lidar_invisible_period_ = period;
+  }
+  inline static void SetMaxRadarInvisiblePeriod(double period) {
+    s_max_radar_invisible_period_ = period;
+  }
+  inline static void SetMaxCameraInvisiblePeriod(double period) {
+    s_max_camera_invisible_period_ = period;
+  }
+
   bool Initialize(SensorObjectPtr obj, bool is_background = false);
 
   void Reset();
