@@ -20,6 +20,8 @@
 
 #pragma once
 
+#include <memory>
+
 #include "cybertron/common/macros.h"
 
 #include "modules/planning/proto/decider_config.pb.h"
@@ -27,6 +29,7 @@
 #include "modules/map/pnc_map/path.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/reference_line_info.h"
+#include "modules/planning/math/finite_element_qp/fem_1d_expanded_jerk_qp_problem.h"
 #include "modules/planning/toolkits/deciders/decider.h"
 
 namespace apollo {
@@ -44,6 +47,9 @@ class SidePassPathDecider : public Decider {
       Frame* frame, ReferenceLineInfo* const reference_line_info);
 
   bool GeneratePath(Frame* frame, ReferenceLineInfo* reference_line_info);
+
+ private:
+  std::unique_ptr<Fem1dQpProblem> fem_qp_;
 };
 
 }  // namespace planning
