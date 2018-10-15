@@ -40,9 +40,18 @@ void PiecewisePolySpeedProfile::set_curve(
 
 void PiecewisePolySpeedProfile::set_cost(const double cost) { cost_ = cost; }
 
+void PiecewisePolySpeedProfile::set_collision(const bool collision) {
+  collision_ = collision;
+}
+
 void PiecewisePolySpeedProfile::GeneratePoints(
     const std::size_t num_eval_points) {
   curve_.SampleSpeedPoints(num_eval_points, &eval_points_);
+}
+
+void PiecewisePolySpeedProfile::GeneratePointsByTime(
+    const double t_res) {
+  curve_.SampleSpeedPointsWithTime(t_res, &eval_points_);
 }
 
 const std::vector<common::SpeedPoint>& PiecewisePolySpeedProfile::eval_points()
@@ -52,5 +61,6 @@ const std::vector<common::SpeedPoint>& PiecewisePolySpeedProfile::eval_points()
 
 double PiecewisePolySpeedProfile::cost() const { return cost_; }
 
+bool PiecewisePolySpeedProfile::collision() const { return collision_; }
 }  // namespace planning
 }  // namespace apollo

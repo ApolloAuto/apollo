@@ -179,7 +179,7 @@ void PiecewisePolySpeedCurve::SampleSpeedPointsWithTime(
   double t_res = std::fmax(unit_t, kMinTimeRes);
   speed_points->clear();
   double pre_s = 0.0;
-  for (double t = 0; t < param_t_; t += t_res) {
+  for (double t = 0; t < param_t_ + t_res; t += t_res) {
     speed_points->emplace_back();
     Evaluate(t, &speed_points->back());
     speed_points->back().set_s(std::fmax(pre_s, speed_points->back().s()));

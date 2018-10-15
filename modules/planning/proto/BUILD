@@ -194,6 +194,7 @@ proto_library(
         ":navi_speed_decider_config_proto_lib",
         ":planner_open_space_config_proto_lib",
         ":poly_st_speed_config_proto_lib",
+        ":poly_vt_speed_config_proto_lib",
         ":proceed_with_caution_speed_config_proto_lib",
         ":qp_piecewise_jerk_path_config_proto_lib",
         ":qp_spline_path_config_proto_lib",

@@ -1,5 +1,7 @@
 load("//tools:cpplint.bzl", "cpplint")
 
+package(default_visibility = ["//visibility:public"])
+
 cc_library(
     name = "autotuning_speed_feature_builder",
     srcs = ["autotuning_speed_feature_builder.cc"],

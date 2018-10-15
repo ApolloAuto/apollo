@@ -24,18 +24,33 @@ AutotuningRawFeatureGenerator::AutotuningRawFeatureGenerator(
   evaluate_time_ = evaluate_time;
 }
 
-common::Status AutotuningRawFeatureGenerator::evaluate_trajectory(
+common::Status AutotuningRawFeatureGenerator::EvaluateTrajectory(
     const std::vector<common::TrajectoryPoint>& trajectory,
     const ReferenceLineInfo& reference_line_info, const Frame& frame,
     autotuning::TrajectoryRawFeature* const trajectory_feature) const {
   return common::Status::OK();
 }
 
-common::Status AutotuningRawFeatureGenerator::evaluate_trajectory_point(
+common::Status AutotuningRawFeatureGenerator::EvaluateTrajectoryPoint(
     const common::TrajectoryPoint& trajectory_point,
     const ReferenceLineInfo& reference_line_info, const Frame& frame,
     autotuning::TrajectoryPointRawFeature* const trajectory_point_feature)
     const {
+  return common::Status::OK();
+}
+
+common::Status AutotuningRawFeatureGenerator::EvaluateSpeedPoint(
+    const common::SpeedPoint& speed_point,
+    const ReferenceLineInfo& reference_line_info, const Frame& frame,
+    autotuning::TrajectoryPointRawFeature* const trajectory_point_feature)
+    const {
+  return common::Status::OK();
+}
+
+common::Status AutotuningRawFeatureGenerator::EvaluateSpeedProfile(
+  const std::vector<common::SpeedPoint>& speed_profile,
+    const ReferenceLineInfo& reference_line_info, const Frame& frame,
+    autotuning::TrajectoryRawFeature* const trajectory_feature) const {
   return common::Status::OK();
 }
 

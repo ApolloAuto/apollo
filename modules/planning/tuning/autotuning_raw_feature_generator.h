@@ -40,7 +40,7 @@ class AutotuningRawFeatureGenerator {
    * @param frame related status
    * @return OK if the evaluation succeeds; error otherwise.
    */
-  common::Status evaluate_trajectory(
+  common::Status EvaluateTrajectory(
       const std::vector<common::TrajectoryPoint>& trajectory,
       const ReferenceLineInfo& reference_line_info, const Frame& frame,
       autotuning::TrajectoryRawFeature* const trajectory_feature) const;
@@ -53,11 +53,23 @@ class AutotuningRawFeatureGenerator {
    * @param frame related status
    * @return OK if the evaluation succeeds; error otherwise.
    */
-  common::Status evaluate_trajectory_point(
+  common::Status EvaluateTrajectoryPoint(
       const common::TrajectoryPoint& trajectory_point,
       const ReferenceLineInfo& reference_line_info, const Frame& frame,
       autotuning::TrajectoryPointRawFeature* const trajectory_point_feature)
       const;
+
+
+  common::Status EvaluateSpeedPoint(
+      const common::SpeedPoint& speed_point,
+      const ReferenceLineInfo& reference_line_info, const Frame& frame,
+      autotuning::TrajectoryPointRawFeature* const trajectory_point_feature)
+      const;
+
+  common::Status EvaluateSpeedProfile(
+    const std::vector<common::SpeedPoint>& speed_profile,
+      const ReferenceLineInfo& reference_line_info, const Frame& frame,
+      autotuning::TrajectoryRawFeature* const trajectory_feature) const;
 
  private:
   std::vector<double> evaluate_time_;
