@@ -24,7 +24,7 @@ namespace cybertron {
 namespace base {
 
 TEST(SlotTest, zero_input_param) {
-  char ch = '/0';
+  char ch = '0';
   Slot<> slot_a([&ch]() { ch = 'a'; });
   EXPECT_TRUE(slot_a.connected());
 
@@ -34,14 +34,14 @@ TEST(SlotTest, zero_input_param) {
   slot_a.Disconnect();
   EXPECT_FALSE(slot_a.connected());
 
-  ch = '/0';
+  ch = '0';
   slot_a();
   EXPECT_NE(ch, 'a');
 
   Slot<> slot_b([&ch]() { ch = 'b'; }, false);
   EXPECT_FALSE(slot_b.connected());
 
-  ch = '/0';
+  ch = '0';
   slot_b();
   EXPECT_NE(ch, 'b');
 
