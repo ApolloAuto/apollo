@@ -77,6 +77,12 @@ bool ProbabilisticFusion::Init(const FusionInitOptions& init_options) {
     params_.prohibition_sensors.push_back(params.prohibition_sensors(i));
   }
 
+  // static member initialization from PB config
+  Track::SetMaxLidarInvisiblePeriod(params.max_lidar_invisible_period());
+  Track::SetMaxRadarInvisiblePeriod(params.max_radar_invisible_period());
+  Track::SetMaxCameraInvisiblePeriod(params.max_camera_invisible_period());
+  Sensor::SetMaxCachedFrameNum(params.max_cached_frame_num());
+
   sensor_data_manager_ = lib::Singleton<SensorDataManager>::get_instance();
 
   scenes_.reset(new Scene());
