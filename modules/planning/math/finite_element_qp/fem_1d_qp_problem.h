@@ -76,14 +76,17 @@ class Fem1dQpProblem {
                                       const double wweight) {}
 
   // x_bounds: tuple(s, lower_bounds, upper_bounds)
+  // s doesn't need to be sorted
   virtual void SetVariableBounds(
       const std::vector<std::tuple<double, double, double>>& x_bounds);
 
   // dx_bounds: tuple(s, lower_bounds, upper_bounds)
+  // s doesn't need to be sorted
   virtual void SetVariableDerivativeBounds(
       const std::vector<std::tuple<double, double, double>>& dx_bounds);
 
   // ddx_bounds: tuple(s, lower_bounds, upper_bounds)
+  // s doesn't need to be sorted
   virtual void SetVariableSecondOrderDerivativeBounds(
       const std::vector<std::tuple<double, double, double>>& ddx_bounds);
 
