@@ -21,6 +21,7 @@ cc_library(
     deps = [
         "//modules/common/status",
         "//modules/planning/common:reference_line_info",
+        "//modules/planning/math/finite_element_qp:fem_1d_expanded_jerk_qp_problem",
         "//modules/planning/toolkits:task",
     ],
 )

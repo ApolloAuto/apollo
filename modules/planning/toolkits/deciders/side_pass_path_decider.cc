@@ -21,6 +21,8 @@
 #include "modules/planning/toolkits/deciders/side_pass_path_decider.h"
 
 #include <string>
+#include <tuple>
+#include <vector>
 
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/planning/common/frame.h"
@@ -35,6 +37,15 @@ using ::apollo::hdmap::PathOverlap;
 SidePassPathDecider::SidePassPathDecider(const TaskConfig &config)
     : Decider(config) {
   SetName("SidePassPathDecider");
+  fem_qp_.reset(new Fem1dExpandedJerkQpProblem());
+  // TODO(lianglia-apollo):
+  // Put numbers into config when refactor is finished.
+  const int n = 400;
+  std::array<double, 3> l_init = {0.0, 0.0, 0.0};
+  const double delta_s = 0.5;
+  std::array<double, 5> w = {1.0, 2.0, 3.0, 4.0, 5.0};
+  constexpr double kMaxLThirdOrderDerivative = 10.0;
+  CHECK(fem_qp_->Init(n, l_init, delta_s, w, kMaxLThirdOrderDerivative));
 }
 
 Status SidePassPathDecider::Process(Frame *frame,
@@ -51,6 +62,13 @@ Status SidePassPathDecider::BuildSidePathDecision(
 bool SidePassPathDecider::GeneratePath(Frame *frame,
                                        ReferenceLineInfo *reference_line_info) {
   // TODO(All): generate path here
+
+  std::vector<std::tuple<double, double, double>> l_bounds;
+
+  // TODO(All): set up l_bounds here.
+  fem_qp_->SetVariableBounds(l_bounds);
+  fem_qp_->Optimize();
+  // TODO(All): put optimized results into ReferenceLineInfo.
   return true;
 }
 

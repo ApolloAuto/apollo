@@ -191,7 +191,7 @@ inline void L2Norm(int feat_dim, float *feat_data) {
     l2norm += feat_data[i] * feat_data[i];
   }
   if (l2norm == 0) {
-    auto val = 1.0 / std::sqrt(feat_dim);
+    float val = 1.f / std::sqrt(static_cast<float>(feat_dim));
     for (int i = 0; i < feat_dim; ++i) {
       feat_data[i] = val;
     }
