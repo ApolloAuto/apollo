@@ -142,7 +142,11 @@ void PlanningTestBase::SetUp() {
 
   CHECK(FeedTestData()) << "Failed to feed test data";
 
-  CHECK(planning_->Init().ok()) << "Failed to init planning module";
+  CHECK(apollo::common::util::GetProtoFromFile(FLAGS_planning_config_file,
+                                               &config_))
+      << "failed to load planning config file " << FLAGS_planning_config_file;
+
+  CHECK(planning_->Init(config_).ok()) << "Failed to init planning module";
 
   // Do not use fallback trajectory during testing
   FLAGS_use_planning_fallback = false;

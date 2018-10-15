@@ -57,7 +57,7 @@ class NaviPlanning : public PlanningBase {
    * @brief module initialization function
    * @return initialization status
    */
-  apollo::common::Status Init() override;
+  apollo::common::Status Init(const PlanningConfig& config) override;
 
   /**
    * @brief main logic of the planning module, runs periodically triggered by
@@ -78,7 +78,7 @@ class NaviPlanning : public PlanningBase {
                            const double start_time,
                            const common::VehicleState& vehicle_state);
 
-  bool CheckPlanningConfig();
+  bool CheckPlanningConfig(const PlanningConfig& config);
 
   /**
    * @brief receiving planning pad message

@@ -56,7 +56,7 @@ class PlanningBase {
   PlanningBase() = default;
   virtual ~PlanningBase();
 
-  virtual apollo::common::Status Init();
+  virtual apollo::common::Status Init(const PlanningConfig& config);
 
   virtual std::string Name() const = 0;
 

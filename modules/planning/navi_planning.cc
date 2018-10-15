@@ -73,16 +73,14 @@ NaviPlanning::~NaviPlanning() {
 
 std::string NaviPlanning::Name() const { return "navi_planning"; }
 
-Status NaviPlanning::Init() {
-  PlanningBase::Init();
-  CHECK(apollo::common::util::GetProtoFromFile(FLAGS_planning_config_file,
-                                               &config_))
-      << "failed to load planning config file " << FLAGS_planning_config_file;
-
-  if (!CheckPlanningConfig()) {
+Status NaviPlanning::Init(const PlanningConfig& config) {
+  config_ = config;
+  if (!CheckPlanningConfig(config_)) {
     return Status(ErrorCode::PLANNING_ERROR,
                   "planning config error: " + config_.DebugString());
   }
+
+  PlanningBase::Init(config_);
 
   planner_dispatcher_->Init();
 
@@ -595,8 +593,8 @@ NaviPlanning::VehicleConfig NaviPlanning::ComputeVehicleConfigFromLocalization(
   return vehicle_config;
 }
 
-bool NaviPlanning::CheckPlanningConfig() {
-  if (!config_.has_navigation_planning_config()) {
+bool NaviPlanning::CheckPlanningConfig(const PlanningConfig& config) {
+  if (!config.has_navigation_planning_config()) {
     return false;
   }
   // TODO(All): check other config params

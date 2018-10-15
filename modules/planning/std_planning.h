@@ -53,7 +53,7 @@ class StdPlanning : public PlanningBase {
    * @brief module initialization function
    * @return initialization status
    */
-  apollo::common::Status Init() override;
+  apollo::common::Status Init(const PlanningConfig& config) override;
 
   /**
    * @brief main logic of the planning module, runs periodically triggered by
@@ -73,7 +73,7 @@ class StdPlanning : public PlanningBase {
                            const double start_time,
                            const common::VehicleState& vehicle_state);
   void ExportReferenceLineDebug(planning_internal::Debug* debug);
-  bool CheckPlanningConfig();
+  bool CheckPlanningConfig(const PlanningConfig& config);
 
  private:
   routing::RoutingResponse last_routing_;

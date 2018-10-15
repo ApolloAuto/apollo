@@ -28,6 +28,7 @@
 #include "modules/perception/proto/traffic_light_detection.pb.h"
 #include "modules/planning/proto/pad_msg.pb.h"
 #include "modules/planning/proto/planning.pb.h"
+#include "modules/planning/proto/planning_config.pb.h"
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
 #include "modules/routing/proto/routing.pb.h"
 
@@ -79,6 +80,8 @@ class PlanningComponent final
   LocalView local_view_;
 
   std::unique_ptr<PlanningBase> planning_base_;
+
+  PlanningConfig config_;
 };
 
 CYBERTRON_REGISTER_COMPONENT(PlanningComponent)

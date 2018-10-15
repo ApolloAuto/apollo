@@ -33,7 +33,7 @@ namespace planning {
 
 class TaskFactory {
  public:
-  static void Init();
+  static void Init(const PlanningConfig& config);
   static std::unique_ptr<Task> CreateTask(const TaskConfig &task_config);
 
  private:
