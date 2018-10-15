@@ -46,7 +46,7 @@ class LidarEndToEndAnalyzer:
 
     def print_endtoend_latency(self):
         """print_endtoend_latency"""
-        print ""
+        print "\n\n"
         print PrintColors.HEADER + "--- End to End Latency (ms) ---" + \
               PrintColors.ENDC
         analyzer = StatisticalAnalyzer()

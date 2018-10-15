@@ -18,8 +18,10 @@
 
 from statistical_analyzer import StatisticalAnalyzer
 from statistical_analyzer import PrintColors
+from distribution_analyzer import DistributionAnalyzer
 from error_code_analyzer import ErrorCodeAnalyzer
 from error_msg_analyzer import ErrorMsgAnalyzer
+from modules.planning.proto import planning_pb2
 
 
 class PlannigAnalyzer:
@@ -28,6 +30,7 @@ class PlannigAnalyzer:
     def __init__(self):
         """init"""
         self.module_latency = []
+        self.trajectory_type_dist = {}
         self.error_code_analyzer = ErrorCodeAnalyzer()
         self.error_msg_analyzer = ErrorMsgAnalyzer()
 
@@ -35,17 +38,28 @@ class PlannigAnalyzer:
         """put"""
         latency = adc_trajectory.latency_stats.total_time_ms
         self.module_latency.append(latency)
+
         self.error_code_analyzer.put(adc_trajectory.header.status.error_code)
         self.error_msg_analyzer.put(adc_trajectory.header.status.msg)
 
+        traj_type = planning_pb2.ADCTrajectory.TrajectoryType.Name(
+            adc_trajectory.trajectory_type)
+        self.trajectory_type_dist[traj_type] = \
+            self.trajectory_type_dist.get(traj_type, 0) + 1
+
     def print_latency_statistics(self):
         """print_latency_statistics"""
-        print ""
+        print "\n\n"
         print PrintColors.HEADER + "--- Planning Latency (ms) ---" + \
               PrintColors.ENDC
-        analyzer = StatisticalAnalyzer()
-        analyzer.print_statistical_results(self.module_latency)
-        print PrintColors.HEADER + "--- Planning Error Code Distribution ---" + \
+        StatisticalAnalyzer().print_statistical_results(self.module_latency)
+
+        print PrintColors.HEADER + "--- Planning Trajectroy Type Distribution" \
+                                   " (ms) ---" + PrintColors.ENDC
+        DistributionAnalyzer().print_distribution_results(
+            self.trajectory_type_dist)
+
+        print PrintColors.HEADER + "--- Planning Error Code Distribution---" + \
               PrintColors.ENDC
         self.error_code_analyzer.print_results()
         print PrintColors.HEADER + "--- Planning Error Msg Distribution ---" + \
