@@ -16,6 +16,7 @@
 
 #include "modules/planning/math/finite_element_qp/fem_1d_qp_problem.h"
 
+#include <algorithm>
 #include <chrono>
 
 #include "cybertron/common/log.h"
@@ -52,6 +53,15 @@ bool Fem1dQpProblem::Init(const size_t num_var,
   delta_s_penta_ = delta_s_sq_ * delta_s_tri_;
   delta_s_hex_ = delta_s_tri_ * delta_s_tri_;
 
+  constexpr double kMaxVariableRange = 100.0;
+  x_bounds_.resize(num_var_,
+                   std::make_tuple(0.0, -kMaxVariableRange, kMaxVariableRange));
+  dx_bounds_.resize(
+      num_var_, std::make_tuple(0.0, -kMaxVariableRange, kMaxVariableRange));
+  ddx_bounds_.resize(
+      num_var_, std::make_tuple(0.0, -kMaxVariableRange, kMaxVariableRange));
+
+  is_init_ = true;
   return true;
 }
 
@@ -67,8 +77,8 @@ bool Fem1dQpProblem::OptimizeWithOsqp(
   // Define Solver settings as default
   osqp_set_default_settings(settings);
   settings->alpha = 1.0;  // Change alpha parameter
-  settings->eps_abs = 1.0e-04;
-  settings->eps_rel = 1.0e-04;
+  settings->eps_abs = 1.0e-05;
+  settings->eps_rel = 1.0e-05;
   settings->max_iter = 5000;
   settings->polish = true;
   settings->verbose = FLAGS_enable_osqp_debug;
@@ -91,5 +101,47 @@ bool Fem1dQpProblem::OptimizeWithOsqp(
   osqp_solve(*work);
   return true;
 }
+
+void Fem1dQpProblem::ProcessBound(
+    const std::vector<std::tuple<double, double, double>>& src,
+    std::vector<std::tuple<double, double, double>>* dst) {
+  for (size_t i = 0; i < src.size(); ++i) {
+    size_t index = static_cast<size_t>(std::get<0>(src[i]) / delta_s_ + 0.5);
+    if (index < dst->size()) {
+      dst->at(index) = std::min(dst->at(index), src[i]);
+    }
+  }
+}
+
+// x_bounds: tuple(s, lower_bounds, upper_bounds)
+void Fem1dQpProblem::SetVariableBounds(
+    const std::vector<std::tuple<double, double, double>>& x_bounds) {
+  if (!is_init_) {
+    AERROR << "Please Init() before setting bounds.";
+    return;
+  }
+  ProcessBound(x_bounds, &x_bounds_);
+}
+
+// dx_bounds: tuple(s, lower_bounds, upper_bounds)
+void Fem1dQpProblem::SetVariableDerivativeBounds(
+    const std::vector<std::tuple<double, double, double>>& dx_bounds) {
+  if (!is_init_) {
+    AERROR << "Please Init() before setting bounds.";
+    return;
+  }
+  ProcessBound(dx_bounds, &dx_bounds_);
+}
+
+// ddx_bounds: tuple(s, lower_bounds, upper_bounds)
+void Fem1dQpProblem::SetVariableSecondOrderDerivativeBounds(
+    const std::vector<std::tuple<double, double, double>>& ddx_bounds) {
+  if (!is_init_) {
+    AERROR << "Please Init() before setting bounds.";
+    return;
+  }
+  ProcessBound(ddx_bounds, &ddx_bounds_);
+}
+
 }  // namespace planning
 }  // namespace apollo
