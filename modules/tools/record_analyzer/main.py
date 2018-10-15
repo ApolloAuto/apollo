@@ -17,6 +17,7 @@
 ###############################################################################
 
 import sys
+import argparse
 from cybertron.record import RecordReader
 from modules.control.proto import control_cmd_pb2
 from modules.planning.proto import planning_pb2
@@ -66,8 +67,17 @@ def process(control_analyzer, planning_analyzer, lidar_endtoend_analyzer):
 if __name__ == "__main__":
     if len(sys.argv) < 2:
         print "usage: python main.py record_file"
+    parser = argparse.ArgumentParser(
+        description="Recode Analyzer is a tool to analyze record files.",
+        prog="main.py")
 
-    record_file = sys.argv[1]
+    parser.add_argument(
+        "-f", "--file", action="store", type=str, required=True,
+        help="Specify the record file for analysis.")
+
+    args = parser.parse_args()
+
+    record_file = args.file
     reader = RecordReader(record_file)
 
     control_analyzer = ControlAnalyzer()
