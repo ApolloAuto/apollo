@@ -21,8 +21,7 @@ cc_library(
         "**/*.h",
     ]),
     deps = [
-        "//cybertron/base:base_lib",
-        "//cybertron/common:common_lib",
+        "//cybertron/common:common",
         "//cybertron/event:event_lib",
         "//cybertron/message:message_lib",
         "//cybertron/proto:qos_profile_cc_proto",
@@ -30,9 +29,9 @@ cc_library(
         "//cybertron/proto:transport_conf_cc_proto",
         "//cybertron/service_discovery:service_discovery_lib",
         "//cybertron/transport/rtps:rtps_lib",
-        "//cybertron/transport/common:transport_common_lib",
+        "//cybertron/transport/common:transport_common",
         "//cybertron/transport/message:transport_message_lib",
-        "//cybertron/time:time_lib",
+        "//cybertron/time:time",
         "//cybertron/timer:timer_lib",
     ],
 )

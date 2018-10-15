@@ -18,7 +18,7 @@ cc_library(
         "class_loader_utility.h",
     ]),
     deps = [
-          "//cybertron/common:common_lib",
+          "//cybertron/common:common",
     ],
     linkopts = [
         "-lPocoFoundation",

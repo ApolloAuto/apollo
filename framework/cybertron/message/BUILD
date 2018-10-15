@@ -12,7 +12,7 @@ cc_library(
         "*.h",
     ]),
     deps = [
-        "//cybertron/common:common_lib",
+        "//cybertron/common:common",
         "//cybertron/proto:proto_desc_cc_proto",
     ],
 )

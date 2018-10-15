@@ -3,13 +3,13 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "reader_base_lib",
+    name = "reader_base",
     hdrs = glob([
         "reader_base.h",
     ]),
     deps = [
         "//cybertron/transport:transport_lib",
-        "//cybertron/common:common_lib",
+        "//cybertron/common:common",
         "//cybertron/event:event_lib",
     ],
 )
@@ -25,7 +25,7 @@ cc_library(
     deps = [
         "//cybertron/transport:transport_lib",
         "//cybertron/blocker:blocker_lib",
-        "//cybertron/croutine:croutine_lib",
+        "//cybertron/croutine:croutine",
         "//cybertron/data:data_lib",
         "//cybertron/scheduler:scheduler_lib",
         "//cybertron/service:service_lib",

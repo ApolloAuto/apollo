@@ -3,15 +3,12 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "task_lib",
-    srcs = glob([
-        "task_manager.cpp",
-    ]),
-    hdrs = glob([
-        "*.h",
-    ]),
+    name = "task",
+    hdrs = [
+        "task.h",
+    ],
     deps = [
-        "//cybertron/scheduler:scheduler_lib",
+        "//cybertron/task:task_manager",
     ],
 )
 
@@ -22,8 +19,21 @@ cc_test(
         "task_test.cpp",
     ],
     deps = [
-        "//cybertron",
+        "//cybertron:cybertron_core",
         "@gtest//:main",
+    ],
+)
+
+cc_library(
+    name = "task_manager",
+    srcs = [
+        "task_manager.cpp",
+    ],
+    hdrs = [
+        "task_manager.h",
+    ],
+    deps = [
+        "//cybertron/scheduler:scheduler_lib",
     ],
 )
 

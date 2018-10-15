@@ -3,20 +3,57 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "croutine_lib",
-    srcs = glob([
+    name = "croutine",
+    srcs = [
         "croutine.cpp",
-        "routine_context.cpp",
-        "*.S",
-    ]),
-    hdrs = glob([
-        "*.h",
-    ]),
+    ],
+    hdrs = [
+        "croutine.h",
+    ],
     deps = [
-          "//cybertron:init_lib",
-          "//cybertron/common:common_lib",
+        "//cybertron:init_lib",
+        "//cybertron/base:atomic_hash_map",
+        "//cybertron/base:atomic_rw_lock",
+        "//cybertron/base:bounded_queue",
+        "//cybertron/base:macros",
+        "//cybertron/base:wait_strategy",
+        "//cybertron/common:common",
+        "//cybertron/event:event_lib",
+        "//cybertron/time:time",
+        "//cybertron/croutine:routine_context",
+        "//cybertron/croutine:routine_factory",
+        "//cybertron/croutine:swap",
+    ],
+)
+
+cc_library(
+    name = "routine_context",
+    srcs = [
+        "routine_context.cpp",
+    ],
+    hdrs = [
+        "routine_context.h",
+    ],
+    deps = [
+          "//cybertron/common:common",
+    ],
+)
+
+cc_library(
+    name = "routine_factory",
+    hdrs = [
+        "routine_factory.h",
+    ],
+    deps = [
+          "//cybertron/common:common",
           "//cybertron/event:event_lib",
-          "//cybertron/time:time_lib",
+    ],
+)
+
+cc_library(
+    name = "swap",
+    srcs = [
+        "swap.S",
     ],
 )
 

@@ -12,7 +12,7 @@ cc_library(
     ]),
     deps = [
           "//cybertron:init_lib",
-          "//cybertron/time:time_lib",
+          "//cybertron/time:time",
     ],
 )
 

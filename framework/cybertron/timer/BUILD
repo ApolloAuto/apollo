@@ -15,13 +15,15 @@ cc_library(
         "*.h",
     ]),
     deps = [
-          "//cybertron/common:common_lib",
-          "//cybertron/croutine:croutine_lib",
+          "//cybertron/base:thread_pool",
+          "//cybertron/common:common",
+          "//cybertron/croutine:croutine",
           "//cybertron/data:data_lib",
           "//cybertron/event:event_lib",
           "//cybertron/scheduler:scheduler_lib",
-          "//cybertron/task:task_lib",
-          "//cybertron/time:time_lib",
+          "//cybertron/task:task",
+          "//cybertron/time:rate",
+          "//cybertron/time:time",
     ],
 )
 
