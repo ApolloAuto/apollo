@@ -35,12 +35,12 @@ TEST(TimeTest, DurationToMillis) {
 
 TEST(TimeTest, AsDouble) {
   Duration duration = std::chrono::microseconds(123456789012);
-  EXPECT_FLOAT_EQ(123456.789012, ToSecond(duration));
+  EXPECT_DOUBLE_EQ(123456.789012, ToSecond(duration));
 }
 
 TEST(TimeTest, TimestampAsDouble) {
   Timestamp timestamp = FromInt64<nanos>(123456789012345);
-  EXPECT_FLOAT_EQ(123456.789012345, ToSecond(timestamp));
+  EXPECT_DOUBLE_EQ(123456.789012345, ToSecond(timestamp));
 }
 
 TEST(TimeTest, TimestampFromAndTo) {
@@ -50,7 +50,7 @@ TEST(TimeTest, TimestampFromAndTo) {
 
 TEST(TimeTest, TimestampFromAndToDouble) {
   Timestamp timestamp = From(1234567.889923456);
-  EXPECT_FLOAT_EQ(1234567.889923456, ToSecond(timestamp));
+  EXPECT_DOUBLE_EQ(1234567.889923456, ToSecond(timestamp));
 }
 
 TEST(TimeTest, MockTime) {
