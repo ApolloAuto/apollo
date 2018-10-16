@@ -14,32 +14,29 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef CYBERTRON_INIT_H_
-#define CYBERTRON_INIT_H_
+#ifndef CYBERTRON_STATE_H_
+#define CYBERTRON_STATE_H_
 
-#include <signal.h>
-#include <sys/types.h>
-#include <unistd.h>
-#include <cerrno>
-#include <cstring>
-
-#include "cybertron/common/log.h"
-#include "cybertron/state.h"
+#include <cstdint>
 
 namespace apollo {
 namespace cybertron {
 
-bool Init();
-bool Init(const char* argv);
-void Shutdown();
-inline void AsyncShutdown() {
-  pid_t pid = getpid();
-  if (kill(pid, SIGINT) != 0) {
-    AERROR << strerror(errno);
-  }
-}
+enum State : std::uint8_t {
+  STATE_UNINITIALIZED = 0,
+  STATE_INITIALIZED,
+  STATE_SHUTTING_DOWN,
+  STATE_SHUTDOWN,
+};
+
+State GetState();
+void SetState(const State& state);
+
+bool OK();
+bool IsShutdown();
+void WaitForShutdown();
 
 }  // namespace cybertron
 }  // namespace apollo
 
-#endif  // CYBERTRON_INIT_H_
+#endif  // CYBERTRON_STATE_H_

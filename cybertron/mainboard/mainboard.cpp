@@ -14,30 +14,24 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "cybertron/common/environment.h"
-#include "cybertron/common/file.h"
 #include "cybertron/common/log.h"
-#include "cybertron/common/types.h"
 #include "cybertron/init.h"
 #include "cybertron/mainboard/module_argument.h"
 #include "cybertron/mainboard/module_controller.h"
+#include "cybertron/state.h"
 
 #include "gflags/gflags.h"
 
-using apollo::cybertron::common::EnsureDirectory;
-using apollo::cybertron::common::GetAbsolutePath;
-using apollo::cybertron::common::GetProtoFromFile;
-using apollo::cybertron::common::WorkRoot;
 using apollo::cybertron::mainboard::ModuleArgument;
 using apollo::cybertron::mainboard::ModuleController;
 
 int main(int argc, char** argv) {
-  google::SetUsageMessage("This program used for load dag and run user apps.");
+  google::SetUsageMessage("we use this program to load dag and run user apps.");
 
-  // Initialize cybertron internal static objects
+  // initialize cybertron
   apollo::cybertron::Init(argv[0]);
 
-  // parser the argument
+  // parse the argument
   ModuleArgument module_args;
   if (!module_args.ParseArgument(argc, argv)) {
     AERROR << "parse argument error!";
@@ -52,10 +46,9 @@ int main(int argc, char** argv) {
     return -1;
   }
 
-  while (!apollo::cybertron::IsShutdown()) {
-    std::this_thread::sleep_for(std::chrono::milliseconds(200));
-  }
+  apollo::cybertron::WaitForShutdown();
   controller.Clear();
-  AINFO << "Exit mainboard.";
+  AINFO << "exit mainboard.";
+
   return 0;
 }

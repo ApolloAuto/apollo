@@ -51,8 +51,6 @@ TEST(InitCybertronTest, all_in_one) {
   auto node = CreateNode("create_node");
   EXPECT_NE(node, nullptr);
 
-  PrintSchedulerStatistics();
-
   std::thread wait_th([]() { WaitForShutdown(); });
 
   Shutdown();
