@@ -53,13 +53,13 @@ bool Fem1dQpProblem::Init(const size_t num_var,
   delta_s_penta_ = delta_s_sq_ * delta_s_tri_;
   delta_s_hex_ = delta_s_tri_ * delta_s_tri_;
 
-  constexpr double kMaxVariableRange = 100.0;
+  constexpr double kMaxVariableRange = 1e10;
   x_bounds_.resize(num_var_,
-                   std::make_tuple(0.0, -kMaxVariableRange, kMaxVariableRange));
-  dx_bounds_.resize(
-      num_var_, std::make_tuple(0.0, -kMaxVariableRange, kMaxVariableRange));
-  ddx_bounds_.resize(
-      num_var_, std::make_tuple(0.0, -kMaxVariableRange, kMaxVariableRange));
+                   std::make_pair(-kMaxVariableRange, kMaxVariableRange));
+  dx_bounds_.resize(num_var_,
+                    std::make_pair(-kMaxVariableRange, kMaxVariableRange));
+  ddx_bounds_.resize(num_var_,
+                     std::make_pair(-kMaxVariableRange, kMaxVariableRange));
 
   is_init_ = true;
   return true;
@@ -104,20 +104,16 @@ bool Fem1dQpProblem::OptimizeWithOsqp(
 
 void Fem1dQpProblem::ProcessBound(
     const std::vector<std::tuple<double, double, double>>& src,
-    std::vector<std::tuple<double, double, double>>* dst) {
+    std::vector<std::pair<double, double>>* dst) {
   for (size_t i = 0; i < src.size(); ++i) {
     size_t index = static_cast<size_t>(std::get<0>(src[i]) / delta_s_ + 0.5);
     if (index < dst->size()) {
-      std::get<1>(dst->at(index)) =
-          std::max(std::get<1>(dst->at(index)), std::get<1>(src[i]));
-      std::get<2>(dst->at(index)) =
-          std::min(std::get<2>(dst->at(index)), std::get<2>(src[i]));
+      dst->at(index).first =
+          std::max(dst->at(index).first, std::get<1>(src[i]));
+      dst->at(index).second =
+          std::min(dst->at(index).second, std::get<2>(src[i]));
     }
   }
-  int ind = 0;
-  std::for_each(
-      dst->begin(), dst->end(),
-      [&](std::tuple<double, double, double>& t) { std::get<0>(t) = ind++; });
 }
 
 // x_bounds: tuple(s, lower_bounds, upper_bounds)
