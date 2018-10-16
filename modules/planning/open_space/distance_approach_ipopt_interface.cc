@@ -416,12 +416,18 @@ bool DistanceApproachIPOPTInterface::eval_g(int n, const double* x, bool new_x,
       double tmp3 = 0.0;
       for (std::size_t k = 0; k < 4; ++k) {
         // TODO(QiL) : replace this one directly with x
-        tmp3 += g_[k] * x[l_index + k];
+        tmp3 += -g_[k] * nj[k];
       }
 
-      g[constraint_index + 3] = tmp3 + x[state_index] +
-                                std::cos(x[state_index + 2] * offset_) * tmp1 +
-                                x[state_index + 1] * offset_ * tmp2;
+      for (std::size_t k = 0; k < current_vertice_num; ++k) {
+        tmp4 += bj(k, 0) * x[l_index + k];
+      }
+
+      g[constraint_index + 3] =
+          tmp3 +
+          (x[state_index] + std::cos(x[state_index + 2]) * offset_) * tmp1 +
+          (x[state_index + 1] + std::sin(x[state_index + 2]) * offset_) * tmp2 -
+          tmp4;
 
       // Update index
       counter += 4;
@@ -614,33 +620,33 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
       state_index += 4;
       control_index += 2;
       time_index += 1;
+      constraint_index += 4;
     }
 
     // 2. only have control rate constraints on u0 , range [0, horizon_-1]
     control_index = control_start_index_;
     state_index = state_start_index_;
     time_index = time_start_index_;
-    std::size_t control_rate_constraint_index = control_start_index_;
 
     for (std::size_t i = 0; i < horizon_; ++i) {
       // with respect to u(0, i-1)
-      iRow[nz_index] = control_rate_constraint_index;
+      iRow[nz_index] = constraint_index;
       jCol[nz_index] = control_index;
       ++nz_index;
 
       // with respect to u(0, i)
-      iRow[nz_index] = control_rate_constraint_index;
+      iRow[nz_index] = constraint_index;
       jCol[nz_index] = control_index + 2;
       ++nz_index;
 
       // with respect to time
-      iRow[nz_index] = control_rate_constraint_index;
+      iRow[nz_index] = constraint_index;
       jCol[nz_index] = time_index;
       ++nz_index;
 
       // only consider rate limits on u0
       control_index += 2;
-      control_rate_constraint_index += 1;
+      constraint_index += 1;
     }
 
     // 3. Time constraints [0, horizon_ -1]
@@ -648,16 +654,122 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
 
     for (std::size_t i = 0; i < horizon_; ++i) {
       // with respect to timescale(0, i-1)
-      iRow[nz_index] = time_index;
+      iRow[nz_index] = constraint_index;
       jCol[nz_index] = time_index;
       ++nz_index;
 
       // with respect to timescale(0, i)
-      iRow[nz_index] = time_index;
+      iRow[nz_index] = constraint_index;
       jCol[nz_index] = time_index + 1;
       ++nz_index;
 
       time_index += 1;
+      constraint_index += 1;
+    }
+
+    // 4. Three obstacles related equal constraints, one equality constraints,
+    // [0, horizon_] * [0, obstacles_num_-1] * 4
+
+    state_index = state_start_index_;
+    l_index = l_start_index_;
+    n_index = n_start_index_;
+
+    for (std::size_t i = 0; i < horizon_ + 1; ++i) {
+      for (std::size_t j = 0; j < obstacles_num_; ++j) {
+        std::size_t current_vertice_num = obstacles_vertices_num_(i, 0);
+
+        // 1. norm(A* lambda == 1)
+        for (std::size_t k = 0; k < current_vertice_num; ++k) {
+          // with respect to l
+          iRow[nz_index] = constraint_index;
+          jCol[nz_index] = l_index + k;
+          ++nz_index;
+        }
+        constraint_index += 1;
+
+        // 2. G' * mu + R' * lambda == 0, part 1
+        // With respect to x
+        iRow[nz_index] = constraint_index;
+        jCol[nz_index] = state_index + 2;
+        ++nz_index;
+
+        // with respect to l
+        for (std::size_t k = 0; k < current_vertice_num; ++k) {
+          iRow[nz_index] = constraint_index;
+          jCol[nz_index] = l_index + k;
+          ++nz_index;
+        }
+
+        // With respect to n
+        iRow[nz_index] = constraint_index;
+        jCol[nz_index] = n_index;
+        ++nz_index;
+
+        iRow[nz_index] = constraint_index;
+        jCol[nz_index] = n_index + 2;
+        ++nz_index;
+
+        constraint_index += 1;
+
+        // 2. G' * mu + R' * lambda == 0, part 2
+        // With respect to x
+        iRow[nz_index] = constraint_index;
+        jCol[nz_index] = state_index + 2;
+        ++nz_index;
+
+        // with respect to l
+        for (std::size_t k = 0; k < current_vertice_num; ++k) {
+          iRow[nz_index] = constraint_index;
+          jCol[nz_index] = l_index + k;
+          ++nz_index;
+        }
+
+        // With respect to n
+        iRow[nz_index] = constraint_index;
+        jCol[nz_index] = n_index + 1;
+        ++nz_index;
+
+        iRow[nz_index] = constraint_index;
+        jCol[nz_index] = n_index + 3;
+        ++nz_index;
+
+        constraint_index += 1;
+
+        //  -g'*mu + (A*t - b)*lambda > 0
+
+        // With respect to x
+        iRow[nz_index] = constraint_index;
+        jCol[nz_index] = state_index;
+        ++nz_index;
+
+        iRow[nz_index] = constraint_index;
+        jCol[nz_index] = state_index + 1;
+        ++nz_index;
+
+        iRow[nz_index] = constraint_index;
+        jCol[nz_index] = state_index + 2;
+        ++nz_index;
+
+        // with respect to l
+        for (std::size_t k = 0; k < current_vertice_num; ++k) {
+          iRow[nz_index] = constraint_index;
+          jCol[nz_index] = l_index + k;
+          ++nz_index;
+        }
+
+        // with respect to n
+        for (std::size_t k = 0; k < 4; ++k) {
+          iRow[nz_index] = constraint_index;
+          jCol[nz_index] = n_index + k;
+          ++nz_index;
+        }
+
+        // Update index
+        counter += 4;
+        l_index += current_vertice_num;
+        n_index += 4;
+        constraint_index += 1;
+      }
     }
 
     CHECK_EQ(nz_index, static_cast<std::size_t>(nele_jac));
@@ -899,16 +1011,137 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
 
     for (std::size_t i = 0; i < horizon_; ++i) {
       // with respect to timescale(0, i-1)
-      // with respect to u(0, i)
       values[nz_index] = -1.0;
       ++nz_index;
 
       // with respect to timescale(0, i)
       values[nz_index] = 1.0;
       ++nz_index;
-      ++nz_index;
 
       time_index += 1;
+    }
+
+    // 4. Three obstacles related equal constraints, one equality constraints,
+    // [0, horizon_] * [0, obstacles_num_-1] * 4
+
+    state_index = state_start_index_;
+    l_index = l_start_index_;
+    n_index = n_start_index_;
+
+    for (std::size_t i = 0; i < horizon_ + 1; ++i) {
+      for (std::size_t j = 0; j < obstacles_num_; ++j) {
+        std::size_t current_vertice_num = obstacles_vertices_num_(i, 0);
+        Eigen::MatrixXd Aj =
+            obstacles_A_.block(counter, 0, current_vertice_num, 2);
+        std::vector<int> lj(&x[l_index], &x[l_index + current_vertice_num]);
+        std::vector<int> nj(&x[n_index], &x[n_index + 3]);
+        Eigen::MatrixXd bj =
+            obstacles_b_.block(counter, 0, current_vertice_num, 1);
+
+        // TODO(QiL) : Remove redudant calculation
+        double tmp1 = 0;
+        double tmp2 = 0;
+        for (std::size_t k = 0; k < current_vertice_num; ++k) {
+          // TODO(QiL) : replace this one directly with x
+          tmp1 += Aj(k, 0) * x[l_index + k];
+          tmp2 += Aj(k, 1) * x[l_index + k];
+        }
+
+        double tmp3 = 0.0;
+        for (std::size_t k = 0; k < 4; ++k) {
+          // TODO(QiL) : replace this one directly with x
+          tmp3 += -g_[k] * nj[k];
+        }
+
+        for (std::size_t k = 0; k < current_vertice_num; ++k) {
+          tmp4 += bj(k, 0) * x[l_index + k];
+        }
+
+        // 1. norm(A* lambda == 1)
+        for (std::size_t k = 0; k < current_vertice_num; ++k) {
+          // with respect to l
+          values[nz_index] = 2 * Aj(k, 0) * Aj(k, 0) * x[l_index + k] +
+                             2 * Aj(k, 0) * Aj(k, 1) * x[l_index + k];  // t0~tk
+          ++nz_index;
+        }
+
+        // 2. G' * mu + R' * lambda == 0, part 1
+        // With respect to x
+        values[nz_index] = -std::sin(x[state_index + 2]) * tmp1 +
+                           std::cos(x[state_index + 2]) * tmp2;  // u
+        ++nz_index;
+
+        // with respect to l
+        for (std::size_t k = 0; k < current_vertice_num; ++k) {
+          values[nz_index] = std::cos(x[state_index + 2]) * Aj(k, 0) +
+                             std::sin(x[state_index + 2]) * Aj(k, 1);  // v0~vn
+          ++nz_index;
+        }
+
+        // With respect to n
+        values[nz_index] = 1.0;  // w0
+        ++nz_index;
+
+        values[nz_index] = -1.0;  // w2
+        ++nz_index;
+
+        // 2. G' * mu + R' * lambda == 0, part 2
+        // With respect to x
+        values[nz_index] = -std::cos(x[state_index + 2]) * tmp1 -
+                           std::sin(x[state_index + 2]) * tmp2;  // x
+        ++nz_index;
+
+        // with respect to l
+        for (std::size_t k = 0; k < current_vertice_num; ++k) {
+          values[nz_index] = std::cos(x[state_index + 2]) * Aj(k, 0) +
+                             std::sin(x[state_index + 2]) * Aj(k, 1);  // y0~yn
+          ++nz_index;
+        }
+
+        // With respect to n
+        values[nz_index] = 1.0;  // z1
+        ++nz_index;
+
+        values[nz_index] = -1.0;  // z3
+        ++nz_index;
+
+        //  -g'*mu + (A*t - b)*lambda > 0
+
+        // With respect to x
+        values[nz_index] = tmp1;  // aa1
+        ++nz_index;
+
+        values[nz_index] = tmp2;  // bb1
+        ++nz_index;
+
+        values[nz_index] =
+            -std::sin(x[state_index + 2]) * offset_ * tmp1 +
+            std::cos(x[state_index + 2]) * offset_ * tmp2;  // cc1
+        ++nz_index;
+
+        // with respect to l
+        for (std::size_t k = 0; k < current_vertice_num; ++k) {
+          values[nz_index] =
+              (x[state_index] + std::cos(x[state_index + 2]) * offset_) *
+                  Aj(k, 0) +
+              (x[state_index + 1] + std::sin(x[state_index + 2]) * offset_) *
+                  Aj(k, 1) -
+              bj(k, 0);  // ddk
+          ++nz_index;
+        }
+
+        // with respect to n
+        for (std::size_t k = 0; k < 4; ++k) {
+          values[nz_index] = -g_[k];  // eek
+          ++nz_index;
+        }
+
+        // Update index
+        counter += 4;
+        l_index += current_vertice_num;
+        n_index += 4;
+        constraint_index += 1;
+      }
     }
 
     //  CHECK_EQ(nz_index, static_cast<std::size_t>(nele_jac));
