@@ -164,14 +164,14 @@ bool SidePassPathDecider::GeneratePath(Frame *frame,
   double curr_s = start_path_point_SL.s();
   bool bound_cond_gen_finished = false;
   bool is_blocked_by_obs = false;
-  std::vector<std::vector<double>> list_s_leftbound_rightbound;
+  std::vector<std::tuple<double, double, double>> list_s_leftbound_rightbound;
   // Currently, it only considers one obstacle.
   // For future scaling so that multiple obstacles can be considered,
   // a sweep-line method can be used. The code here leaves some room
   // for the sweep-line method.
   while (!bound_cond_gen_finished) {
-    std::vector<double> s_leftbound_rightbound;
-    s_leftbound_rightbound.push_back(curr_s);
+    std::tuple<double, double, double> s_leftbound_rightbound;
+    std::get<0>(s_leftbound_rightbound) = curr_s;
     // Check if boundary should be dictated by obstacle or road
     if (curr_s >= nearest_obs_start_s && curr_s <= nearest_obs_end_s) {
       is_blocked_by_obs = true;
@@ -183,45 +183,39 @@ bool SidePassPathDecider::GeneratePath(Frame *frame,
     reference_line.GetRoadWidth(curr_s,
         &road_left_width_at_curr_s, &road_right_width_at_curr_s);
     if (!is_blocked_by_obs) {
-      s_leftbound_rightbound.push_back
-          (-std::abs(road_left_width_at_curr_s-ROAD_BUFFER));
-      s_leftbound_rightbound.push_back
-          (std::abs(road_right_width_at_curr_s-ROAD_BUFFER));
+      std::get<1>(s_leftbound_rightbound) =
+          -std::abs(road_left_width_at_curr_s-ROAD_BUFFER);
+      std::get<2>(s_leftbound_rightbound) =
+          std::abs(road_right_width_at_curr_s-ROAD_BUFFER);
     } else {
       if (decided_direction_ == LEFT) {
-        s_leftbound_rightbound.push_back
-            (-std::abs(road_left_width_at_curr_s-ROAD_BUFFER));
-        s_leftbound_rightbound.push_back
-            (-nearest_obs_end_l);
+        std::get<1>(s_leftbound_rightbound) =
+            -std::abs(road_left_width_at_curr_s-ROAD_BUFFER);
+        std::get<2>(s_leftbound_rightbound) =
+            -nearest_obs_end_l;
       } else if (decided_direction_ == RIGHT) {
-        s_leftbound_rightbound.push_back
-            (-nearest_obs_start_l);
-        s_leftbound_rightbound.push_back
-            (std::abs(road_right_width_at_curr_s-ROAD_BUFFER));
+        std::get<1>(s_leftbound_rightbound) =
+            -nearest_obs_start_l;
+        std::get<2>(s_leftbound_rightbound) =
+            std::abs(road_right_width_at_curr_s-ROAD_BUFFER);
       } else {
         AERROR << "Side-pass direction undefined.";
         return false;
       }
     }
+    list_s_leftbound_rightbound.push_back(s_leftbound_rightbound);
     // Move to next s
     curr_s += s_increment;
     if (curr_s > PLANNING_DIST_AFTER_OBSTACLE + nearest_obs_end_s) {
       bound_cond_gen_finished = true;
     }
   }
-  // Call optimizer: (name to be filled) to generate smooth path.
-
-  // Update Reference_Line_Info with this newly generated path.
-
-  // TODO(All): generate path here
-
-  std::vector<std::tuple<double, double, double>> l_bounds;
-
-  // TODO(All): set up l_bounds here.
-  fem_qp_->SetVariableBounds(l_bounds);
+  // Call optimizer to generate smooth path.
+  fem_qp_->SetVariableBounds(list_s_leftbound_rightbound);
   fem_qp_->Optimize();
-  // TODO(All): put optimized results into ReferenceLineInfo.
 
+  // TODO(All): put optimized results into ReferenceLineInfo.
+  // Update Reference_Line_Info with this newly generated path.
 
 
   return true;
