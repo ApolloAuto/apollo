@@ -50,7 +50,7 @@ TEST_F(SidePassScenarioTest, VerifyConf) {
       FLAGS_scenario_side_pass_config_file, &config));
 }
 
-TEST_F(SidePassScenarioTest, InitTasks) {
+TEST_F(SidePassScenarioTest, Init) {
   FLAGS_scenario_side_pass_config_file =
       "//apollo/modules/planning/testdata/conf/"
       "scenario_side_pass_config.pb.txt";

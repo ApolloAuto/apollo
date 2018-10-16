@@ -51,7 +51,7 @@ TEST_F(StopSignUnprotectedScenarioTest, VerifyConf) {
       FLAGS_scenario_side_pass_config_file, &config));
 }
 
-TEST_F(StopSignUnprotectedScenarioTest, InitTasks) {
+TEST_F(StopSignUnprotectedScenarioTest, Init) {
   FLAGS_scenario_stop_sign_unprotected_config_file =
       "//apollo/modules/planning/testdata/conf/"
       "scenario_stop_sign_unprotected_config.pb.txt";

@@ -18,43 +18,39 @@
  * @file
  **/
 
-#include "modules/planning/toolkits/deciders/decider_stop_sign_monitor.h"
+#pragma once
 
 #include <string>
 
-#include "modules/common/proto/pnc_point.pb.h"
+#include "modules/planning/proto/decider_config.pb.h"
+
+#include "cybertron/common/macros.h"
+
 #include "modules/planning/common/frame.h"
+#include "modules/planning/common/reference_line_info.h"
+#include "modules/planning/toolkits/deciders/decider.h"
 
 namespace apollo {
 namespace planning {
 
-using apollo::common::ErrorCode;
-using apollo::common::Status;
-using apollo::hdmap::PathOverlap;
+class DeciderStopSign : public Decider {
+ public:
+  explicit DeciderStopSign(const TaskConfig& config);
 
-DeciderStopSignMonitor::DeciderStopSignMonitor(const TaskConfig& config)
-    : Decider(config) {
-  SetName("DeciderStopSignMonitor");
-}
+ private:
+  apollo::common::Status Process(
+      Frame* frame, ReferenceLineInfo* reference_line_info) override;
 
-Status DeciderStopSignMonitor::Process(Frame* frame,
-                                       ReferenceLineInfo* reference_line_info) {
-  CHECK_NOTNULL(frame);
-  CHECK_NOTNULL(reference_line_info);
+    bool BuildStopDecision(Frame* const frame,
+                         ReferenceLineInfo* const reference_line_info,
+                         const std::string& stop_wall_id,
+                         const double stop_line_s,
+                         const double stop_distance);
 
-  return Status::OK();
-}
-
-void DeciderStopSignMonitor::UpdateWatchVehicles(
-    StopSignLaneVehicles* watch_vehicles) {
-  // TODo(all)
-}
-
-int DeciderStopSignMonitor::AddWatchVehicle(
-    const PathObstacle& path_obstacle, StopSignLaneVehicles* watch_vehicles) {
-  // TODo(all)
-  return 0;
-}
+ private:
+  static constexpr const char* STOP_SIGN_VO_ID_PREFIX = "SS_";
+  DeciderStopSignConfig config_;
+};
 
 }  // namespace planning
 }  // namespace apollo

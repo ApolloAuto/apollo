@@ -37,6 +37,7 @@ message TaskConfig {
      NAVI_OBSTACLE_DECIDER = 9;
      QP_PIECEWISE_JERK_PATH_OPTIMIZER = 10;
      DECIDER_CREEP = 11;
+     DECIDER_STOP_SIGN = 12;
    };
   optional TaskType task_type = 1;
   oneof task_config {
@@ -49,6 +50,7 @@ message TaskConfig {
     ProceedWithCautionSpeedConfig proceed_with_caution_speed_config = 8;
     QpPiecewiseJerkPathConfig qp_piecewise_jerk_path_config = 9;
     DeciderCreepConfig decider_creep_config = 10;
+    DeciderStopSignConfig decider_stop_sign_config = 11;
   }
 }
 

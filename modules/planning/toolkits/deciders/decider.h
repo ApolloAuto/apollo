@@ -20,9 +20,6 @@
 
 #pragma once
 
-#include <string>
-#include <vector>
-
 #include "modules/common/status/status.h"
 #include "modules/planning/toolkits/task.h"
 
