@@ -129,6 +129,7 @@ Stage::StageStatus SidePassApproachObstacle::Process(
     return Stage::ERROR;
   }
   if (frame->vehicle_state().linear_velocity() < 1.0e-5) {
+    next_stage_ = ScenarioConfig::SIDE_PASS_GENERATE_PATH;
     return Stage::FINISHED;
   }
   return Stage::RUNNING;
@@ -137,6 +138,7 @@ Stage::StageStatus SidePassApproachObstacle::Process(
 Stage::StageStatus SidePassGeneratePath::Process(
     const TrajectoryPoint& planning_start_point, Frame* frame) {
   if (PlanningOnReferenceLine(planning_start_point, frame)) {
+    next_stage_ = ScenarioConfig::SIDE_PASS_STOP_ON_WAITPOINT;
     return Stage::FINISHED;
   } else {
     return Stage::ERROR;
@@ -145,6 +147,7 @@ Stage::StageStatus SidePassGeneratePath::Process(
 
 Stage::StageStatus SidePassStopOnWaitPoint::Process(
     const TrajectoryPoint& planning_start_point, Frame* frame) {
+  next_stage_ = ScenarioConfig::SIDE_PASS_DETECT_SAFETY;
   return Stage::FINISHED;
 }
 
@@ -162,7 +165,11 @@ Stage::StageStatus SidePassDetectSafety::Process(
       break;
     }
   }
-  return is_safe ? Stage::FINISHED : Stage::RUNNING;
+  if (is_safe) {
+    next_stage_ = ScenarioConfig::SIDE_PASS_PASS_OBSTACLE;
+    return Stage::FINISHED;
+  }
+  return Stage::RUNNING;
 }
 
 Stage::StageStatus SidePassPassObstacle::Process(
@@ -180,6 +187,7 @@ Stage::StageStatus SidePassPassObstacle::Process(
   int adc_start_s = adc_sl_boundary.start_s();
   int path_end_s = frenet_frame_point.s();
   if ((path_end_s - adc_start_s) > 20.0) {
+    next_stage_ = ScenarioConfig::NO_STAGE;
     return Stage::FINISHED;
   }
   return Stage::RUNNING;
