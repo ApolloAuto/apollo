@@ -16,24 +16,28 @@
 
 #pragma once
 
+#include <list>
+#include <mutex>
+#include <string>
+#include <unordred_map>
+#include <vector>
+
+#include "modules/prediction/proto/prediction_obstacle.pb.h"
+
+#include "modules/planning/common/path_obstacle.h"
+#include "modules/planning/reference_line/reference_line.h"
+
 namespace apollo {
 namespace planning {
 
 enum VirtualObjectType {
-  DESTINATION = 0,
-  CROSSWALK = 1,
-  TRAFFIC_LIGHT = 2,
-  CLEAR_ZONE = 3,
-  REROUTE = 4,
-  DECISION_JUMP = 5,
-  PRIORITY = 6
-};
-
-struct EnumClassHash {
-  template <typename T>
-  std::size_t operator()(T t) const {
-      return static_cast<std::size_t>(t);
-  }
+  VIRTUAL_OBJECT_TYPE_DESTINATION = 0,
+  VIRTUAL_OBJECT_TYPE_CROSSWALK = 1,
+  VIRTUAL_OBJECT_TYPE_TRAFFIC_LIGHT = 2,
+  VIRTUAL_OBJECT_TYPE_CLEAR_ZONE = 3,
+  VIRTUAL_OBJECT_TYPE_REROUTE = 4,
+  VIRTUAL_OBJECT_TYPE_DECISION_JUMP = 5,
+  VIRTUAL_OBJECT_TYPE_PRIORITY = 6
 };
 
 class DecisionData {
@@ -53,6 +57,7 @@ class DecisionData {
   const std::vector<PathObstacle*>& GetVirtualObstacle() const;
   const std::vector<PathObstacle*>& GetPracticalObstacle() const;
   const std::vector<PathObstacle*>& GetAllObstacle() const;
+  void Update();
  public:
   bool CreateVirtualObstacle(const ReferencePoint& point,
                              const VirtualObjectType& type,
@@ -71,7 +76,7 @@ class DecisionData {
   std::list<std::unique_ptr<PathObstacle>> obstacle_;
   std::unordered_map<std::string, PathObstacle*> obstacle_map_;
   std::unordered_map<VirtualObjectType,
-        std::vector<std::string>, EnumClassHash> virtual_object_id_map_;
+        std::vector<std::string>, std::hash<int>> virtual_object_id_map_;
   std::mutex mutex_;
 };
 
