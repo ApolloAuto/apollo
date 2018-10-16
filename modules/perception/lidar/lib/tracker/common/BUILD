@@ -50,7 +50,7 @@ cc_library(
     deps = [
         ":track_data",
         "//modules/perception/base:object_pool",
-        "//framework:cybertron",
+        "//cybertron",
         "@eigen",
     ],
 )

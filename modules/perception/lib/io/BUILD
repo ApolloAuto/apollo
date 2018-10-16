@@ -42,7 +42,7 @@ cc_library(
         "protobuf_util.h",
     ],
     deps = [
-        "//framework:cybertron",
+        "//cybertron",
     ],
 )
 
