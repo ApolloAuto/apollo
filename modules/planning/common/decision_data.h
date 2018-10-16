@@ -65,7 +65,7 @@ class DecisionData {
   std::vector<PathObstacle*> dynamic_obstacle_;
   std::vector<PathObstacle*> virtual_obstacle_;
   std::vector<PathObstacle*> practical_obstacle_;
-  std::vector<PathObstacle*> all_obstacle;`
+  std::vector<PathObstacle*> all_obstacle_;
  private:
   const ReferenceLine& reference_line_;
   std::list<std::unique_ptr<PathObstacle>> obstacle_;
