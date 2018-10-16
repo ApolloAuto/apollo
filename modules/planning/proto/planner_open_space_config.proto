@@ -35,5 +35,5 @@ message DistanceApproachConfig {
   repeated double weight_state = 3;
   repeated double weight_stitching = 4;
   repeated double weight_time = 5;
-
+  optional double min_safety_distance = 6;
 }

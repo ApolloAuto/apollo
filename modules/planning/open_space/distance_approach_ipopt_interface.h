@@ -173,6 +173,8 @@ class DistanceApproachIPOPTInterface : public Ipopt::TNLP {
   // lagrangian n start index
   std::size_t n_start_index_ = 0;
 
+  double min_safety_distance_ = 0.0;
+
  private:
   DistanceApproachConfig distance_approach_config_;
   PlannerOpenSpaceConfig planner_open_space_config_;
