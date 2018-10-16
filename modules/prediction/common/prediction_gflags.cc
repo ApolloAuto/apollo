@@ -118,6 +118,9 @@ DEFINE_string(evaluator_vehicle_mlp_file,
 DEFINE_string(evaluator_vehicle_rnn_file,
               "/apollo/modules/prediction/data/rnn_vehicle_model.bin",
               "rnn model file for vehicle evaluator");
+DEFINE_string(evaluator_vehicle_junction_mlp_file,
+              "/apollo/modules/prediction/data/junction_mlp_vehicle_model.bin",
+              "Vehicle junction MLP model file");
 DEFINE_int32(max_num_obstacles, 100,
              "maximal number of obstacles stored in obstacles container.");
 DEFINE_double(valid_position_diff_threshold, 0.5,
