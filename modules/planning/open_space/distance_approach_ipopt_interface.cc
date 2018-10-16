@@ -105,8 +105,8 @@ bool DistanceApproachIPOPTInterface::get_nlp_info(int& n, int& m,
 
   for (std::size_t i = 0; i < horizon_ + 1; ++i) {
     for (std::size_t j = 0; j < obstacles_num_; ++j) {
-      std::size_t current_vertice_num = obstacles_edges_num_(j, 0);
-      tmp += current_vertice_num * 4 + 9 + 4;
+      std::size_t current_edges_num = obstacles_edges_num_(j, 0);
+      tmp += current_edges_num * 4 + 9 + 4;
     }
   }
 
@@ -389,25 +389,26 @@ bool DistanceApproachIPOPTInterface::eval_g(int n, const double* x, bool new_x,
 
   // 4. Three obstacles related equal constraints, one equality constraints,
   // [0, horizon_] * [0, obstacles_num_-1] * 4
-  int counter = 0;
+
   state_index = state_start_index_;
   std::size_t l_index = l_start_index_;
   std::size_t n_index = n_start_index_;
 
   for (std::size_t i = 0; i < horizon_ + 1; ++i) {
+    int edges_counter = 0;
     for (std::size_t j = 0; j < obstacles_num_; ++j) {
-      std::size_t current_vertice_num = obstacles_edges_num_(i, 0);
+      std::size_t current_edges_num = obstacles_edges_num_(i, 0);
       Eigen::MatrixXd Aj =
-          obstacles_A_.block(counter, 0, current_vertice_num, 2);
-      std::vector<int> lj(&x[l_index], &x[l_index + current_vertice_num]);
+          obstacles_A_.block(edges_counter, 0, current_edges_num, 2);
+      std::vector<int> lj(&x[l_index], &x[l_index + current_edges_num]);
       std::vector<int> nj(&x[n_index], &x[n_index + 3]);
       Eigen::MatrixXd bj =
-          obstacles_b_.block(counter, 0, current_vertice_num, 1);
+          obstacles_b_.block(edges_counter, 0, current_edges_num, 1);
 
       // norm(A* lambda == 1)
       double tmp1 = 0;
       double tmp2 = 0;
-      for (std::size_t k = 0; k < current_vertice_num; ++k) {
+      for (std::size_t k = 0; k < current_edges_num; ++k) {
         // TODO(QiL) : replace this one directly with x
         tmp1 += Aj(k, 0) * x[l_index + k];
         tmp2 += Aj(k, 1) * x[l_index + k];
@@ -431,7 +432,7 @@ bool DistanceApproachIPOPTInterface::eval_g(int n, const double* x, bool new_x,
       }
 
       double tmp4 = 0.0;
-      for (std::size_t k = 0; k < current_vertice_num; ++k) {
+      for (std::size_t k = 0; k < current_edges_num; ++k) {
         tmp4 += bj(k, 0) * x[l_index + k];
       }
 
@@ -442,8 +443,8 @@ bool DistanceApproachIPOPTInterface::eval_g(int n, const double* x, bool new_x,
           tmp4 - min_safety_distance_;
 
       // Update index
-      counter += 4;
-      l_index += current_vertice_num;
+      edges_counter += current_edges_num;
+      l_index += current_edges_num;
       n_index += 4;
       constraint_index += 4;
     }
@@ -697,10 +698,10 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
 
     for (std::size_t i = 0; i < horizon_ + 1; ++i) {
       for (std::size_t j = 0; j < obstacles_num_; ++j) {
-        std::size_t current_vertice_num = obstacles_edges_num_(j, 0);
+        std::size_t current_edges_num = obstacles_edges_num_(j, 0);
 
         // 1. norm(A* lambda == 1)
-        for (std::size_t k = 0; k < current_vertice_num; ++k) {
+        for (std::size_t k = 0; k < current_edges_num; ++k) {
           // with respect to l
           iRow[nz_index] = constraint_index;
           jCol[nz_index] = l_index + k;
@@ -715,7 +716,7 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
         ++nz_index;
 
         // with respect to l
-        for (std::size_t k = 0; k < current_vertice_num; ++k) {
+        for (std::size_t k = 0; k < current_edges_num; ++k) {
           iRow[nz_index] = constraint_index;
           jCol[nz_index] = l_index + k;
           ++nz_index;
@@ -739,7 +740,7 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
         ++nz_index;
 
         // with respect to l
-        for (std::size_t k = 0; k < current_vertice_num; ++k) {
+        for (std::size_t k = 0; k < current_edges_num; ++k) {
           iRow[nz_index] = constraint_index;
           jCol[nz_index] = l_index + k;
           ++nz_index;
@@ -772,7 +773,7 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
         ++nz_index;
 
         // with respect to l
-        for (std::size_t k = 0; k < current_vertice_num; ++k) {
+        for (std::size_t k = 0; k < current_edges_num; ++k) {
           iRow[nz_index] = constraint_index;
           jCol[nz_index] = l_index + k;
           ++nz_index;
@@ -786,7 +787,7 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
         }
 
         // Update inde
-        l_index += current_vertice_num;
+        l_index += current_edges_num;
         n_index += 4;
         constraint_index += 1;
       }
@@ -1056,20 +1057,25 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
     state_index = state_start_index_;
     std::size_t l_index = l_start_index_;
     std::size_t n_index = n_start_index_;
-    std::size_t counter = 0;
 
     for (std::size_t i = 0; i < horizon_ + 1; ++i) {
+      std::size_t edges_counter = 0;
       for (std::size_t j = 0; j < obstacles_num_; ++j) {
-        std::size_t current_vertice_num = obstacles_edges_num_(j, 0);
+        std::size_t current_edges_num = obstacles_edges_num_(j, 0);
         AINFO << "eval_jac_g, obstacle constraint values, current "
                  "vertice_num : "
-              << current_vertice_num << " i :  " << i << " j : " << j;
+              << current_edges_num << " i :  " << i << " j : " << j;
+        AINFO << "obstacles_A_ size : " << obstacles_A_.rows() << " and "
+              << obstacles_A_.cols();
+        AINFO << "edges_counter : " << edges_counter;
         Eigen::MatrixXd Aj =
-            obstacles_A_.block(counter, 0, current_vertice_num, 2);
-        std::vector<int> lj(&x[l_index], &x[l_index + current_vertice_num]);
+            obstacles_A_.block(edges_counter, 0, current_edges_num, 2);
+        AINFO << "before after Aj";
+        std::vector<int> lj(&x[l_index], &x[l_index + current_edges_num]);
+        AINFO << "before nj";
         std::vector<int> nj(&x[n_index], &x[n_index + 3]);
         Eigen::MatrixXd bj =
-            obstacles_b_.block(counter, 0, current_vertice_num, 1);
+            obstacles_b_.block(edges_counter, 0, current_edges_num, 1);
 
         AINFO
             << "eval_jac_g, obstacle constraint values, extraction number : i "
@@ -1077,7 +1083,7 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
         // TODO(QiL) : Remove redudant calculation
         double tmp1 = 0;
         double tmp2 = 0;
-        for (std::size_t k = 0; k < current_vertice_num; ++k) {
+        for (std::size_t k = 0; k < current_edges_num; ++k) {
           // TODO(QiL) : replace this one directly with x
           tmp1 += Aj(k, 0) * x[l_index + k];
           tmp2 += Aj(k, 1) * x[l_index + k];
@@ -1090,7 +1096,7 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
           tmp3 += -g_[k] * nj[k];
         }
 
-        for (std::size_t k = 0; k < current_vertice_num; ++k) {
+        for (std::size_t k = 0; k < current_edges_num; ++k) {
           tmp4 += bj(k, 0) * x[l_index + k];
         }
 
@@ -1098,7 +1104,7 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
               << " j : " << j;
 
         // 1. norm(A* lambda == 1)
-        for (std::size_t k = 0; k < current_vertice_num; ++k) {
+        for (std::size_t k = 0; k < current_edges_num; ++k) {
           // with respect to l
           values[nz_index] = 2 * Aj(k, 0) * Aj(k, 0) * x[l_index + k] +
                              2 * Aj(k, 0) * Aj(k, 1) * x[l_index + k];  // t0~tk
@@ -1115,7 +1121,7 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
         ++nz_index;
 
         // with respect to l
-        for (std::size_t k = 0; k < current_vertice_num; ++k) {
+        for (std::size_t k = 0; k < current_edges_num; ++k) {
           values[nz_index] = std::cos(x[state_index + 2]) * Aj(k, 0) +
                              std::sin(x[state_index + 2]) * Aj(k, 1);  // v0~vn
           ++nz_index;
@@ -1135,7 +1141,7 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
         ++nz_index;
 
         // with respect to l
-        for (std::size_t k = 0; k < current_vertice_num; ++k) {
+        for (std::size_t k = 0; k < current_edges_num; ++k) {
           values[nz_index] = std::cos(x[state_index + 2]) * Aj(k, 0) +
                              std::sin(x[state_index + 2]) * Aj(k, 1);  // y0~yn
           ++nz_index;
@@ -1166,7 +1172,7 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
         ++nz_index;
 
         // with respect to l
-        for (std::size_t k = 0; k < current_vertice_num; ++k) {
+        for (std::size_t k = 0; k < current_edges_num; ++k) {
           values[nz_index] =
               (x[state_index] + std::cos(x[state_index + 2]) * offset_) *
                   Aj(k, 0) +
@@ -1186,8 +1192,8 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
               << " j : " << j;
 
         // Update index
-        counter += 4;
-        l_index += current_vertice_num;
+        edges_counter += current_edges_num;
+        l_index += current_edges_num;
         n_index += 4;
       }
     }
