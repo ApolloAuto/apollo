@@ -39,11 +39,12 @@
 namespace apollo {
 namespace planning {
 
-DECLARE_STAGE(SidePassApproachObstacle);
-DECLARE_STAGE(SidePassGeneratePath);
-DECLARE_STAGE(SidePassStopOnWaitPoint);
-DECLARE_STAGE(SidePassDetectSafety);
-DECLARE_STAGE(SidePassPassObstacle);
+struct SidePassContext {};
+DECLARE_STAGE(SidePassApproachObstacle, SidePassContext);
+DECLARE_STAGE(SidePassGeneratePath, SidePassContext);
+DECLARE_STAGE(SidePassStopOnWaitPoint, SidePassContext);
+DECLARE_STAGE(SidePassDetectSafety, SidePassContext);
+DECLARE_STAGE(SidePassPassObstacle, SidePassContext);
 
 class SidePassScenario : public Scenario {
  public:
@@ -55,7 +56,7 @@ class SidePassScenario : public Scenario {
                       const Frame& frame) const override;
 
   std::unique_ptr<Stage> CreateStage(
-      const ScenarioConfig::StageConfig& stage_config) const;
+      const ScenarioConfig::StageConfig& stage_config) override;
 
  private:
   static void RegisterStages();
@@ -74,6 +75,7 @@ class SidePassScenario : public Scenario {
       Stage* (*)(const ScenarioConfig::StageConfig& stage_config)>
       s_stage_factory_;
 
+  SidePassContext context_;
   std::vector<std::unique_ptr<Task>> tasks_;
   ScenarioConfig config_;
   bool stage_init_ = false;

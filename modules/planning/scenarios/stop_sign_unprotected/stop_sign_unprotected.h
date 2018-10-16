@@ -38,61 +38,84 @@
 namespace apollo {
 namespace planning {
 
-DECLARE_STAGE(StopSignUnprotectedPreStop);
-DECLARE_STAGE(StopSignUnprotectedStop);
-DECLARE_STAGE(StopSignUnprotectedCreep);
-DECLARE_STAGE(StopSignUnprotectedIntersectionCruise);
+// stage context
+struct StopSignUnprotectedContext {
+  double stop_start_time;
+  std::unordered_map<std::string, std::vector<std::string>> watch_vehicles;
+  hdmap::PathOverlap next_stop_sign_overlap;
+  std::vector<std::pair<hdmap::LaneInfoConstPtr, hdmap::OverlapInfoConstPtr>>
+      associated_lanes;
+};
 
-bool CheckADCStop(const ReferenceLineInfo& reference_line_info);
+DECLARE_STAGE(StopSignUnprotectedCreep, StopSignUnprotectedContext);
+DECLARE_STAGE(StopSignUnprotectedIntersectionCruise,
+              StopSignUnprotectedContext);
+
+class StopSignUnprotectedStop : public Stage {
+ public:
+  explicit StopSignUnprotectedStop(const ScenarioConfig::StageConfig& config)
+      : Stage(config) {}
+  Stage::StageStatus Process(const common::TrajectoryPoint& planning_init_point,
+                             Frame* frame);
+  StopSignUnprotectedContext* GetContext() {
+    return Stage::GetContextAs<StopSignUnprotectedContext>();
+  }
+  int RemoveWatchVehicle(
+      const PathObstacle& path_obstacle,
+      const std::vector<std::string>& watch_vehicle_ids,
+      std::unordered_map<std::string, std::vector<std::string>>*
+          watch_vehicles);
+};
+
+class StopSignUnprotectedPreStop : public Stage {
+ public:
+  explicit StopSignUnprotectedPreStop(const ScenarioConfig::StageConfig& config)
+      : Stage(config) {}
+  Stage::StageStatus Process(const common::TrajectoryPoint& planning_init_point,
+                             Frame* frame);
+  int AddWatchVehicle(const PathObstacle& path_obstacle,
+                      std::unordered_map<std::string, std::vector<std::string>>*
+                          watch_vehicles);
+  StopSignUnprotectedContext* GetContext() {
+    return Stage::GetContextAs<StopSignUnprotectedContext>();
+  }
+  bool CheckADCStop(const ReferenceLineInfo& reference_line_info);
+};
 
 class StopSignUnprotectedScenario : public Scenario {
-  typedef std::unordered_map<std::string, std::vector<std::string>>
-      StopSignLaneVehicles;
-
  public:
   StopSignUnprotectedScenario()
       : Scenario(FLAGS_scenario_stop_sign_unprotected_config_file) {}
-  StopSignUnprotectedScenario(const ScenarioConfig& config)
+  explicit StopSignUnprotectedScenario(const ScenarioConfig& config)
       : Scenario(config) {}
 
   void Observe(Frame* const frame);
 
   std::unique_ptr<Stage> CreateStage(
-      const ScenarioConfig::StageConfig& stage_config) const;
+      const ScenarioConfig::StageConfig& stage_config);
 
   bool IsTransferable(const Scenario& current_scenario,
                       const common::TrajectoryPoint& ego_point,
                       const Frame& frame) const override;
+
+  StopSignUnprotectedContext* GetContext() { return &context_; }
 
  private:
   static void RegisterStages();
 
   bool FindNextStopSign(const ReferenceLineInfo& reference_line_info);
   int GetAssociatedLanes(const hdmap::StopSignInfo& stop_sign_info);
-  int AddWatchVehicle(const PathObstacle& path_obstacle,
-                      StopSignLaneVehicles* watch_vehicles);
-  int RemoveWatchVehicle(const PathObstacle& path_obstacle,
-                         const std::vector<std::string>& watch_vehicle_ids,
-                         StopSignLaneVehicles* watch_vehicles);
 
  private:
   SpeedProfileGenerator speed_profile_generator_;
-  hdmap::PathOverlap next_stop_sign_overlap_;
+
+  StopSignUnprotectedContext context_;
+
   hdmap::StopSignInfoConstPtr next_stop_sign_ = nullptr;
   double adc_distance_to_stop_sign_;
-  std::vector<std::pair<hdmap::LaneInfoConstPtr, hdmap::OverlapInfoConstPtr>>
-      associated_lanes_;
-
-  // status related
-  StopSignLaneVehicles watch_vehicles_;
 
   // TODO(all): move to scenario conf later
   const uint32_t conf_start_stop_sign_timer = 10;  // second
-  const double conf_min_pass_s_distance = 3.0;
-  const double conf_max_adc_stop_speed = 0.3;
-  const double conf_max_valid_stop_distance = 3.5;
-  const double conf_stop_duration = 1.0;  // second
-  const double conf_watch_vehicle_max_valid_stop_distance = 5.0;
 
   static apollo::common::util::Factory<
       ScenarioConfig::StageType, Stage,

@@ -48,12 +48,32 @@ class Stage {
 
   const ScenarioConfig::StageConfig& config() const { return config_; }
 
+  ScenarioConfig::StageType stage_type() const { return config_.stage_type(); }
+
+  /**
+   * @brief Each stage does its bussines logic inside Process function.
+   * If the stage want to transite to a different stage after finish,
+   * it should set the type of 'next_stage_'.
+   */
   virtual StageStatus Process(
       const common::TrajectoryPoint& planning_init_point, Frame* frame) = 0;
 
+  /**
+   * @brief The sequence of tasks inside the stage. These tasks usually will be
+   * executed in order.
+   */
   const std::vector<Task*>& TaskList() const { return task_list_; }
 
+  template <typename T>
+  T* GetContextAs() {
+    return static_cast<T*>(context_);
+  }
+
+  void SetContext(void* context) { context_ = context; }
+
   Task* FindTask(TaskConfig::TaskType task_type) const;
+
+  ScenarioConfig::StageType NextStage() const { return next_stage_; }
 
  protected:
   bool PlanningOnReferenceLine(
@@ -62,15 +82,18 @@ class Stage {
   std::map<TaskConfig::TaskType, std::unique_ptr<Task>> tasks_;
   std::vector<Task*> task_list_;
   ScenarioConfig::StageConfig config_;
+  ScenarioConfig::StageType next_stage_;
+  void* context_;
 };
 
-#define DECLARE_STAGE(NAME)                                                \
+#define DECLARE_STAGE(NAME, CONTEXT)                                       \
   class NAME : public Stage {                                              \
    public:                                                                 \
     explicit NAME(const ScenarioConfig::StageConfig& config)               \
         : Stage(config) {}                                                 \
     Stage::StageStatus Process(                                            \
         const common::TrajectoryPoint& planning_init_point, Frame* frame); \
+    CONTEXT* GetContext() { return GetContextAs<CONTEXT>(); }              \
   }
 
 }  // namespace planning

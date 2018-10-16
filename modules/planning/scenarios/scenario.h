@@ -20,9 +20,9 @@
 
 #pragma once
 
-#include <list>
 #include <memory>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 #include "modules/planning/proto/planning_config.pb.h"
@@ -61,7 +61,7 @@ class Scenario {
    * transition from one stage to another.
    */
   virtual std::unique_ptr<Stage> CreateStage(
-      const ScenarioConfig::StageConfig& stage_config) const = 0;
+      const ScenarioConfig::StageConfig& stage_config) = 0;
 
   // Each scenario should define it's own transfer condition, i.e., when it
   // should allow to transfer from other scenario ot itself.
@@ -78,9 +78,11 @@ class Scenario {
 
  protected:
   ScenarioStatus scenario_status_ = STATUS_UNKNOWN;
-  std::list<std::unique_ptr<Stage>> stages_;
-  std::list<std::unique_ptr<Stage>>::iterator current_stage_iter_;
+  std::unique_ptr<Stage> current_stage_;
   ScenarioConfig config_;
+  std::unordered_map<ScenarioConfig::StageType,
+                     const ScenarioConfig::StageConfig*, std::hash<int>>
+      stage_config_map_;
 };
 
 }  // namespace planning

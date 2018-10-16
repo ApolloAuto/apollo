@@ -75,7 +75,7 @@ class LaneFollowScenario : public Scenario {
   explicit LaneFollowScenario(const ScenarioConfig& config);
 
   std::unique_ptr<Stage> CreateStage(
-      const ScenarioConfig::StageConfig& stage_config) const override;
+      const ScenarioConfig::StageConfig& stage_config) override;
 
   bool IsTransferable(const Scenario& current_scenario,
                       const common::TrajectoryPoint& ego_point,

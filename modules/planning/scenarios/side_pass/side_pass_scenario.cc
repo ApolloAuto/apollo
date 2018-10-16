@@ -96,12 +96,14 @@ void SidePassScenario::RegisterStages() {
 }
 
 std::unique_ptr<Stage> SidePassScenario::CreateStage(
-    const ScenarioConfig::StageConfig& stage_config) const {
+    const ScenarioConfig::StageConfig& stage_config) {
   if (s_stage_factory_.Empty()) {
     RegisterStages();
   }
-  return s_stage_factory_.CreateObjectOrNull(stage_config.stage_type(),
-                                             stage_config);
+  auto ptr = s_stage_factory_.CreateObjectOrNull(stage_config.stage_type(),
+                                                 stage_config);
+  ptr->SetContext(&context_);
+  return ptr;
 }
 
 bool SidePassScenario::IsTransferable(const Scenario& current_scenario,
