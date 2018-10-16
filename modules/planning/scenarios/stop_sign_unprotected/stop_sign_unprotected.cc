@@ -164,6 +164,7 @@ Stage::StageStatus StopSignUnprotectedPreStop::Process(
         ->mutable_stop_sign()
         ->set_stop_start_time(Clock::NowInSeconds());
 
+    next_stage_ = ScenarioConfig::STOP_SIGN_UNPROTECTED_STOP;
     return Stage::FINISHED;
   }
 
@@ -191,6 +192,8 @@ Stage::StageStatus StopSignUnprotectedStop::Process(
          << "]";
   auto& watch_vehicles = GetContext()->watch_vehicles;
   if (wait_time >= conf_stop_duration && watch_vehicles.empty()) {
+
+    next_stage_ = ScenarioConfig::STOP_SIGN_UNPROTECTED_CREEP;
     return Stage::FINISHED;
   }
 
@@ -214,12 +217,16 @@ Stage::StageStatus StopSignUnprotectedStop::Process(
 Stage::StageStatus StopSignUnprotectedCreep::Process(
     const common::TrajectoryPoint& planning_init_point, Frame* frame) {
   // TODO(all)
+
+  next_stage_ = ScenarioConfig::STOP_SIGN_UNPROTECTED_INTERSECTION_CRUISE;
   return Stage::FINISHED;
 }
 
 Stage::StageStatus StopSignUnprotectedIntersectionCruise::Process(
     const common::TrajectoryPoint& planning_start_point, Frame* frame) {
   // TODO(all)
+
+  next_stage_ = ScenarioConfig::NO_STAGE;
   return Stage::FINISHED;
 }
 
