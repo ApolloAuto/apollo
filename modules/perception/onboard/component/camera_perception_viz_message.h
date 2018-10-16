@@ -13,8 +13,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 *****************************************************************************/
-#ifndef PERCEPTION_CAMERA_ONBOARD_COMPONENT_CAMERA_PERCEPTION_VIZ_MESSAGE_H_
-#define PERCEPTION_CAMERA_ONBOARD_COMPONENT_CAMERA_PERCEPTION_VIZ_MESSAGE_H_
+#pragma once
 
 #include <Eigen/Dense>
 #include <Eigen/Core>
@@ -77,5 +76,3 @@ class CameraPerceptionVizMessage : public apollo::cybertron::message::IntraMessa
 }  // namespace onboard
 }  // namespace perception
 }  // namespace apollo
-
-#endif  // PERCEPTION_CAMERA_ONBOARD_COMPONENT_CAMERA_PERCEPTION_VIZ_MESSAGE_H_

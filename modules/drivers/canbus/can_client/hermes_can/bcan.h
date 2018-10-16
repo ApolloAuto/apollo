@@ -14,8 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef ADU_PLAT_SW_LIB_BCAN_BCAN_H
-#define ADU_PLAT_SW_LIB_BCAN_BCAN_H
+#pragma once
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -94,5 +93,3 @@ int bcan_id_remove_all(bcan_hdl_t hdl);
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* ADU_PLAT_SW_LIB_BCAN_BCAN_LIB_H */

@@ -13,8 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef PERCEPTION_LIDAR_LIB_CLASSIFIER_FUSED_CLASSIFIER_CCRF_TYPE_FUSION_H
-#define PERCEPTION_LIDAR_LIB_CLASSIFIER_FUSED_CLASSIFIER_CCRF_TYPE_FUSION_H
+#pragma once
 #include <Eigen/Dense>
 #include <map>
 #include <string>
@@ -84,5 +83,3 @@ class CCRFSequenceTypeFusion : public BaseSequenceTypeFusion {
 }  // namespace lidar
 }  // namespace perception
 }  // namespace apollo
-
-#endif  // PERCEPTION_LIDAR_LIB_CLASSIFIER_FUSED_CLASSIFIER_CCRF_TYPE_FUSION_H

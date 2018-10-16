@@ -14,8 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef THREADPOOL_POOL_CORE_HPP_INCLUDED
-#define THREADPOOL_POOL_CORE_HPP_INCLUDED
+#pragma once
 
 #include <condition_variable>
 #include <deque>
@@ -443,5 +442,3 @@ class ThreadPool {
 
 }  // namespace localization
 }  // namespace apollo
-
-#endif  // THREADPOOL_POOL_CORE_HPP_INCLUDED

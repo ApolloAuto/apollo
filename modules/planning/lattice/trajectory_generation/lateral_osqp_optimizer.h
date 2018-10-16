@@ -18,8 +18,7 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_LATTICE_LATERAL_OSQP_OPTIMIZER_H_
-#define MODULES_PLANNING_LATTICE_LATERAL_OSQP_OPTIMIZER_H_
+#pragma once
 
 #include <array>
 #include <memory>
@@ -45,5 +44,3 @@ class LateralOSQPOptimizer : public LateralQPOptimizer {
 
 }  // namespace planning
 }  // namespace apollo
-
-#endif  // MODULES_PLANNING_LATTICE_LATERAL_OSQP_OPTIMIZER_H_

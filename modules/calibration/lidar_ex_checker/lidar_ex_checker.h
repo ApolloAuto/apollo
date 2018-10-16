@@ -18,8 +18,7 @@
  * @file
  */
 
-#ifndef MODEULES_CALIBRATION_LIDAR_EX_CHECKER_H_
-#define MODEULES_CALIBRATION_LIDAR_EX_CHECKER_H_
+#pragma once
 
 #include <map>
 #include <string>
@@ -95,5 +94,3 @@ class LidarExChecker : public apollo::common::ApolloApp {
 
 }  // namespace calibration
 }  // namespace apollo
-
-#endif  // MODEULES_CALIBRATION_LIDAR_EX_CHECKER_H_

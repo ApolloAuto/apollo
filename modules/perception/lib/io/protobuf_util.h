@@ -13,8 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_LIB_IO_PROTOBUF_UTIL_H_
-#define MODULES_PERCEPTION_LIB_IO_PROTOBUF_UTIL_H_
+#pragma once
 
 #include <fcntl.h>
 
@@ -51,5 +50,3 @@ bool ParseProtobufFromFile(const std::string &file_name, T *pb) {
 }  // namespace lib
 }  // namespace perception
 }  // namespace apollo
-
-#endif  // MODULES_PERCEPTION_LIB_IO_PROTOBUF_UTIL_H_

@@ -13,8 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef RADAR_ONBOARD_COMPONENT_RADAR_DETECTION_COMPONENT_H_
-#define RADAR_ONBOARD_COMPONENT_RADAR_DETECTION_COMPONENT_H_
+#pragma once
 #include <string>
 #include <memory>
 #include <vector>
@@ -85,5 +84,3 @@ CYBERTRON_REGISTER_COMPONENT(RadarDetectionComponent);
 }  // namespace onboard
 }  // namespace perception
 }  // namespace apollo
-
-#endif  // RADAR_ONBOARD_COMPONENT_RADAR_DETECTION_COMPONENT_H_

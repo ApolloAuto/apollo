@@ -18,8 +18,7 @@
  * @file
  */
 
-#ifndef MODEULES_DATA_DATA_COMPONENT_H_
-#define MODEULES_DATA_DATA_COMPONENT_H_
+#pragma once
 
 #include <memory>
 #include <string>
@@ -63,5 +62,3 @@ CYBERTRON_REGISTER_COMPONENT(DataComponent)
 
 }  // namespace data
 }  // namespace apollo
-
-#endif  // MODEULES_DATA_DATA_COMPONENT_H_

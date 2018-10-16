@@ -72,8 +72,7 @@
 * Copy from
 * https://github.com/tomojitakasu/RTKLIB/tree/76b9c97257f304aedad38b5a6bbbac444724aab3/src/rtklib.h
 */
-#ifndef RTKLIB_H
-#define RTKLIB_H
+#pragma once
 #include <ctype.h>
 #include <math.h>
 #include <stdarg.h>
@@ -1786,4 +1785,3 @@ extern int lexioncorr(gtime_t time, const nav_t* nav, const double* pos,
 #ifdef __cplusplus
 }
 #endif
-#endif /* RTKLIB_H */

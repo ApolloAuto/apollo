@@ -13,8 +13,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 *****************************************************************************/
-#ifndef PERCEPTION_CAMERA_ONBOARD_COMPONENT_TRAFFICLIGHTS_PERCEPTION_COMPONENT_H_  // NOLINT
-#define PERCEPTION_CAMERA_ONBOARD_COMPONENT_TRAFFICLIGHTS_PERCEPTION_COMPONENT_H_  // NOLINT
+#pragma once
 
 #include <Eigen/Dense>
 #include <Eigen/Core>
@@ -188,5 +187,3 @@ CYBERTRON_REGISTER_COMPONENT(TrafficLightsPerceptionComponent);
 }  // namespace onboard
 }  // namespace perception
 }  // namespace apollo
-
-#endif  // PERCEPTION_CAMERA_ONBOARD_COMPONENT_TRAFFICLIGHTS_PERCEPTION_COMPONENT_H_  // NOLINT
