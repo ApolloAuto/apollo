@@ -355,21 +355,37 @@ TEST_F(HDMapImplTestSuite, GetForwardNearestSignalsOnLane) {
   point.set_y(4140745.25);
   point.set_z(0.0);
   std::vector<SignalInfoConstPtr> signals;
-  EXPECT_EQ(0, hdmap_impl_.GetForwardNearestSignalsOnLane(point,
-                  10.0, &signals));
+  EXPECT_EQ(0,
+            hdmap_impl_.GetForwardNearestSignalsOnLane(point, 10.0, &signals));
   EXPECT_EQ(1, signals.size());
   EXPECT_EQ("1278", signals[0]->id().id());
 
-  EXPECT_EQ(0, hdmap_impl_.GetForwardNearestSignalsOnLane(point,
-                  3.0, &signals));
+  EXPECT_EQ(0,
+            hdmap_impl_.GetForwardNearestSignalsOnLane(point, 3.0, &signals));
   EXPECT_EQ(0, signals.size());
 
   point.set_x(586443.28);
   point.set_y(4140751.22);
-  EXPECT_EQ(0, hdmap_impl_.GetForwardNearestSignalsOnLane(point,
-                  10.0, &signals));
+  EXPECT_EQ(0,
+            hdmap_impl_.GetForwardNearestSignalsOnLane(point, 10.0, &signals));
   EXPECT_EQ(1, signals.size());
   EXPECT_EQ("1278", signals[0]->id().id());
+}
+
+TEST_F(HDMapImplTestSuite, GetRoi) {
+  apollo::common::PointENU point;
+  point.set_x(586441.73);
+  point.set_y(4140745.25);
+  double distance = 100.0;
+  std::vector<RoadRoiPtr> roads_roi;
+  std::vector<PolygonRoiPtr> polygons_roi;
+  ASSERT_EQ(0, hdmap_impl_.GetRoi(point, distance, &roads_roi, &polygons_roi));
+  ASSERT_EQ(5, roads_roi.size());
+  ASSERT_EQ(1, polygons_roi.size());
+  distance = 1.0;
+  ASSERT_EQ(0, hdmap_impl_.GetRoi(point, distance, &roads_roi, &polygons_roi));
+  ASSERT_EQ(1, roads_roi.size());
+  ASSERT_EQ(0, polygons_roi.size());
 }
 
 }  // namespace hdmap
