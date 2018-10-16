@@ -73,6 +73,7 @@ class ReferenceLine {
 
   bool Shrink(const common::math::Vec2d& point, double look_backward,
               double look_forward);
+  bool Shrink(const double s, double look_backward, double look_forward);
 
   const hdmap::Path& map_path() const;
   const std::vector<ReferencePoint>& reference_points() const;

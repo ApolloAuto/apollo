@@ -194,19 +194,19 @@ bool Destination::CheckPullOver(ReferenceLineInfo* const reference_line_info,
     change_lane = true;
   }
 
-  // check dest OnRoad
-  const auto& reference_line = reference_line_info->reference_line();
+  // check dest OnLane
   *dest_point = dest_lane->GetSmoothPoint(dest_lane_s);
-  if (!change_lane && !reference_line.IsOnLane(*dest_point)) {
-    return false;
-  }
-
-  // check dest within pull_over_plan_distance
   common::SLPoint dest_sl;
+  const auto& reference_line = reference_line_info->reference_line();
   if (!reference_line.XYToSL({dest_point->x(), dest_point->y()}, &dest_sl)) {
     AERROR << "failed to project the dest point to the other reference line";
     return false;
   }
+  if (!change_lane && !reference_line.IsOnLane(dest_sl)) {
+    return false;
+  }
+
+  // check dest within pull_over_plan_distance
   double adc_front_edge_s = reference_line_info->AdcSlBoundary().end_s();
   double distance_to_dest = dest_sl.s() - adc_front_edge_s;
   ADEBUG << "adc_front_edge_s[" << adc_front_edge_s << "] distance_to_dest["
