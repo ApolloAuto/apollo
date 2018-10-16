@@ -192,7 +192,6 @@ Stage::StageStatus StopSignUnprotectedStop::Process(
          << "]";
   auto& watch_vehicles = GetContext()->watch_vehicles;
   if (wait_time >= conf_stop_duration && watch_vehicles.empty()) {
-
     next_stage_ = ScenarioConfig::STOP_SIGN_UNPROTECTED_CREEP;
     return Stage::FINISHED;
   }
@@ -216,6 +215,11 @@ Stage::StageStatus StopSignUnprotectedStop::Process(
 
 Stage::StageStatus StopSignUnprotectedCreep::Process(
     const common::TrajectoryPoint& planning_init_point, Frame* frame) {
+  if (!config_.enabled()) {
+    next_stage_ = ScenarioConfig::STOP_SIGN_UNPROTECTED_INTERSECTION_CRUISE;
+    return Stage::FINISHED;
+  }
+
   // TODO(all)
 
   next_stage_ = ScenarioConfig::STOP_SIGN_UNPROTECTED_INTERSECTION_CRUISE;
