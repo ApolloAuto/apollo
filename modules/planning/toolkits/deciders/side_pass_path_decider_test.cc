@@ -40,8 +40,18 @@ class SidePassPathDeciderTest : public ::testing::Test {
 };
 
 TEST_F(SidePassPathDeciderTest, Init) {
-  const TaskConfig &config = config_;
-  SidePassPathDecider side_pass_path_decider(config);
+  config_.mutable_side_pass_path_decider_config();
+  config_.mutable_side_pass_path_decider_config()->set_total_path_length(200.0);
+  config_.mutable_side_pass_path_decider_config()->set_path_resolution(0.5);
+  config_.mutable_side_pass_path_decider_config()->set_l_weight(1.0);
+  config_.mutable_side_pass_path_decider_config()->set_dl_weight(1.0);
+  config_.mutable_side_pass_path_decider_config()->set_ddl_weight(1.0);
+  config_.mutable_side_pass_path_decider_config()->set_dddl_weight(1.0);
+  config_.mutable_side_pass_path_decider_config()->set_guiding_line_weight(1.0);
+
+  AINFO << config_.DebugString();
+
+  SidePassPathDecider side_pass_path_decider(config_);
   EXPECT_EQ(side_pass_path_decider.Name(), "SidePassPathDecider");
 }
 

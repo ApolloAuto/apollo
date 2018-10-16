@@ -8,6 +8,7 @@ import "modules/planning/proto/dp_st_speed_config.proto";
 import "modules/planning/proto/qp_piecewise_jerk_path_config.proto";
 import "modules/planning/proto/qp_spline_path_config.proto";
 import "modules/planning/proto/qp_st_speed_config.proto";
+import "modules/planning/proto/side_pass_path_decider_config.proto";
 import "modules/planning/proto/proceed_with_caution_speed_config.proto";
 import "modules/planning/proto/poly_st_speed_config.proto";
 import "modules/planning/proto/navi_path_decider_config.proto";
@@ -55,6 +56,7 @@ message TaskConfig {
     DeciderCreepConfig decider_creep_config = 10;
     DeciderStopSignConfig decider_stop_sign_config = 11;
     SidePassSafetyConfig side_pass_safety_config = 12;
+    SidePassPathDeciderConfig side_pass_path_decider_config = 13;
   }
 }
 

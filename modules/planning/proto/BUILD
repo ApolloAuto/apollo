@@ -50,7 +50,6 @@ proto_library(
     ],
 )
 
-
 cc_proto_library(
     name = "decision_proto",
     deps = [
@@ -200,6 +199,7 @@ proto_library(
         ":qp_spline_path_config_proto_lib",
         ":qp_st_speed_config_proto_lib",
         ":reference_line_smoother_config_proto_lib",
+        ":side_pass_path_decider_config_proto_lib",
     ],
 )
 
@@ -484,6 +484,20 @@ proto_library(
     name = "qp_problem_lib",
     srcs = [
         "qp_problem.proto",
+    ],
+)
+
+proto_library(
+    name = "side_pass_path_decider_config_proto_lib",
+    srcs = [
+        "side_pass_path_decider_config.proto",
+    ],
+)
+
+cc_proto_library(
+    name = "side_pass_path_decider_config_proto",
+    deps = [
+        ":side_pass_path_decider_config_proto_lib",
     ],
 )
 

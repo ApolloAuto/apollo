@@ -46,12 +46,20 @@ SidePassPathDecider::SidePassPathDecider(const TaskConfig &config)
   fem_qp_.reset(new Fem1dExpandedJerkQpProblem());
   // TODO(lianglia-apollo):
   // Put numbers into config when refactor is finished.
-  const int n = 400;
+  const double delta_s =
+      config.side_pass_path_decider_config().path_resolution();
+  const int n = static_cast<int>(
+      config.side_pass_path_decider_config().total_path_length() / delta_s);
   std::array<double, 3> l_init = {0.0, 0.0, 0.0};
-  const double delta_s = 0.5;
-  std::array<double, 5> w = {1.0, 2.0, 3.0, 4.0, 5.0};
-  constexpr double kMaxLThirdOrderDerivative = 10.0;
-  CHECK(fem_qp_->Init(n, l_init, delta_s, w, kMaxLThirdOrderDerivative));
+  std::array<double, 5> w = {
+      config.side_pass_path_decider_config().l_weight(),
+      config.side_pass_path_decider_config().dl_weight(),
+      config.side_pass_path_decider_config().ddl_weight(),
+      config.side_pass_path_decider_config().dddl_weight(),
+      config.side_pass_path_decider_config().guiding_line_weight(),
+  };
+  CHECK(fem_qp_->Init(n, l_init, delta_s, w,
+                      config.side_pass_path_decider_config().max_dddl()));
 }
 
 Status SidePassPathDecider::Process(Frame *frame,

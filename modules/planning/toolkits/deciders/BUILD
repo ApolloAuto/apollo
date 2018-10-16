@@ -34,8 +34,8 @@ cc_test(
         "side_pass_safety_test.cc",
     ],
     deps = [
-        "@gtest//:main",
         ":decider",
+        "@gtest//:main",
     ],
 )
 
