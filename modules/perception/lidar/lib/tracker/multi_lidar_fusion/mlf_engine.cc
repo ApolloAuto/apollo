@@ -16,13 +16,12 @@
 
 #include <utility>
 
+#include "modules/perception/lidar/lib/tracker/multi_lidar_fusion/mlf_engine.h"
+#include "modules/common/util/file.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lib/io/file_util.h"
-#include "modules/common/util/file.h"
-#include "modules/perception/lidar/lib/tracker/multi_lidar_fusion/proto/multi_lidar_fusion_config.pb.h"  // NOLINT
-
 #include "modules/perception/lidar/lib/tracker/common/track_pool_types.h"
-#include "modules/perception/lidar/lib/tracker/multi_lidar_fusion/mlf_engine.h"
+#include "modules/perception/lidar/lib/tracker/multi_lidar_fusion/proto/multi_lidar_fusion_config.pb.h"
 
 namespace apollo {
 namespace perception {

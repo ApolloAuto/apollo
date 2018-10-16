@@ -19,12 +19,10 @@
 #include <algorithm>
 #include <string>
 #include <vector>
-#include "cybertron/common/log.h"
-#include "modules/perception/common/geometry/common.h"
 
-// #include "hdmap_definitions.h"  // NOLINT
-// #include "hdmap_trajectory.h"  // NOLINT
+#include "cybertron/common/log.h"
 #include "modules/perception/base/object_pool_types.h"
+#include "modules/perception/common/geometry/common.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lib/io/file_util.h"
 

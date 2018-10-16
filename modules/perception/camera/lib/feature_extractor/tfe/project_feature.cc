@@ -15,16 +15,16 @@
 *****************************************************************************/
 #include "modules/perception/camera/lib/feature_extractor/tfe/project_feature.h"
 
-#include <vector>
 #include <map>
+#include <vector>
 
 #include "cybertron/common/log.h"
-#include "modules/perception/lib/singleton/singleton.h"
+#include "modules/perception/camera/common/global_config.h"
+#include "modules/perception/inference/inference_factory.h"
+#include "modules/perception/inference/utils/gemm.h"
 #include "modules/perception/lib/io/file_util.h"
 #include "modules/perception/lib/io/protobuf_util.h"
-#include "modules/perception/camera/common/global_config.h"
-#include "modules/perception/inference/utils/gemm.h"
-#include "modules/perception/inference/inference_factory.h"
+#include "modules/perception/lib/singleton/singleton.h"
 
 namespace apollo {
 namespace perception {
@@ -84,7 +84,7 @@ bool ProjectFeature::Extract(const FeatureExtractorOptions &options,
   inference_->Infer();
   cudaDeviceSynchronize();
   frame->track_feature_blob->Reshape({
-    static_cast<int>(frame->detected_objects.size()),  // NOLINT
+    static_cast<int>(frame->detected_objects.size()),
     output_blob->shape(1),
     output_blob->shape(2),
     output_blob->shape(3)});

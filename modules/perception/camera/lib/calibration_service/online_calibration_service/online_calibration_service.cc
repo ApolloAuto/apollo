@@ -13,11 +13,12 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 *****************************************************************************/
-#include "modules/perception/camera/lib/calibration_service/online_calibration_service/online_calibration_service.h"  // NOLINT
+#include "modules/perception/camera/lib/calibration_service/online_calibration_service/online_calibration_service.h"
 
-#include <float.h>
 #include <assert.h>
+#include <float.h>
 #include <utility>
+
 #include "modules/perception/common/i_lib/core/i_blas.h"
 #include "modules/perception/common/i_lib/core/i_constant.h"
 #include "modules/perception/common/i_lib/geometry/i_util.h"
