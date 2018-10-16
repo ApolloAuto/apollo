@@ -49,7 +49,7 @@ class DistanceApproachIPOPTInterface : public Ipopt::TNLP {
       const Eigen::MatrixXd& xWS, const Eigen::MatrixXd& uWS,
       const Eigen::MatrixXd& timeWS, Eigen::MatrixXd x0, Eigen::MatrixXd xf,
       Eigen::MatrixXd last_time_u, Eigen::MatrixXd XYbounds,
-      Eigen::MatrixXd obstacles_vertices_num, std::size_t obstacles_num,
+      Eigen::MatrixXd obstacles_edges_num, std::size_t obstacles_num,
       const Eigen::MatrixXd& obstacles_A, const Eigen::MatrixXd& obstacles_b,
       bool use_fix_time);
 
@@ -140,7 +140,7 @@ class DistanceApproachIPOPTInterface : public Ipopt::TNLP {
   double l_ev_;
   std::vector<double> g_;
   double offset_;
-  Eigen::MatrixXd obstacles_vertices_num_;
+  Eigen::MatrixXd obstacles_edges_num_;
   std::size_t obstacles_num_;
   std::size_t obstacles_vertices_sum_;
   double wheelbase_;

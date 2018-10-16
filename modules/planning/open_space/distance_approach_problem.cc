@@ -29,7 +29,7 @@ DistanceApproachProblem::DistanceApproachProblem(
     Eigen::MatrixXd x0, Eigen::MatrixXd xF, Eigen::MatrixXd last_time_u,
     std::size_t horizon, float ts, Eigen::MatrixXd ego, Eigen::MatrixXd xWS,
     Eigen::MatrixXd uWS, Eigen::MatrixXd XYbounds, std::size_t obstacles_num,
-    Eigen::MatrixXd obstacles_vertices_num, Eigen::MatrixXd obstacles_A,
+    Eigen::MatrixXd obstacles_edges_num, Eigen::MatrixXd obstacles_A,
     Eigen::MatrixXd obstacles_b)
     : x0_(x0),
       xF_(xF),
@@ -41,7 +41,7 @@ DistanceApproachProblem::DistanceApproachProblem(
       uWS_(uWS),
       XYbounds_(XYbounds),
       obstacles_num_(obstacles_num),
-      obstacles_vertices_num_(obstacles_vertices_num),
+      obstacles_edges_num_(obstacles_edges_num),
       obstacles_A_(obstacles_A),
       obstacles_b_(obstacles_b) {}
 
@@ -61,7 +61,7 @@ bool DistanceApproachProblem::Solve(Eigen::MatrixXd* state_result,
   int n3 = horizon_ + 1;
 
   // n4 : dual multiplier associated with obstacleShape
-  int n4 = obstacles_vertices_num_.sum() * (horizon_ + 1);
+  int n4 = obstacles_edges_num_.sum() * (horizon_ + 1);
 
   // n5 : dual multipier associated with car shape, obstacles_num*4 * (N+1)
   int n5 = obstacles_num_ * 4 * (horizon_ + 1);
@@ -92,7 +92,7 @@ bool DistanceApproachProblem::Solve(Eigen::MatrixXd* state_result,
   bool use_fix_time_ = false;
   DistanceApproachIPOPTInterface* ptop = new DistanceApproachIPOPTInterface(
       num_of_variables, num_of_constraints, horizon_, ts_, ego_, xWS_, uWS_,
-      timeWS_, x0_, xF_, last_time_u_, XYbounds_, obstacles_vertices_num_,
+      timeWS_, x0_, xF_, last_time_u_, XYbounds_, obstacles_edges_num_,
       obstacles_num_, obstacles_A_, obstacles_b_, use_fix_time_);
 
   Ipopt::SmartPtr<Ipopt::TNLP> problem = ptop;

@@ -29,7 +29,7 @@ DistanceApproachIPOPTInterface::DistanceApproachIPOPTInterface(
     const Eigen::MatrixXd& xWS, const Eigen::MatrixXd& uWS,
     const Eigen::MatrixXd& timeWS, Eigen::MatrixXd x0, Eigen::MatrixXd xf,
     Eigen::MatrixXd last_time_u, Eigen::MatrixXd XYbounds,
-    Eigen::MatrixXd obstacles_vertices_num, std::size_t obstacles_num,
+    Eigen::MatrixXd obstacles_edges_num, std::size_t obstacles_num,
     const Eigen::MatrixXd& obstacles_A, const Eigen::MatrixXd& obstacles_b,
     bool use_fix_time)
     : num_of_variables_(num_of_variables),
@@ -44,7 +44,7 @@ DistanceApproachIPOPTInterface::DistanceApproachIPOPTInterface(
       xf_(xf),
       last_time_u_(last_time_u),
       XYbounds_(XYbounds),
-      obstacles_vertices_num_(obstacles_vertices_num),
+      obstacles_edges_num_(obstacles_edges_num),
       obstacles_num_(obstacles_num),
       obstacles_A_(obstacles_A),
       obstacles_b_(obstacles_b),
@@ -54,7 +54,7 @@ DistanceApproachIPOPTInterface::DistanceApproachIPOPTInterface(
 
   g_ = {l_ev_ / 2, w_ev_ / 2, l_ev_ / 2, w_ev_ / 2};
   offset_ = (ego_(0, 0) + ego_(2, 0)) / 2 - ego_(2, 0);
-  obstacles_vertices_sum_ = std::size_t(obstacles_vertices_num_.sum());
+  obstacles_vertices_sum_ = std::size_t(obstacles_edges_num_.sum());
   state_result_ = Eigen::MatrixXd::Zero(horizon_ + 1, 4);
   control_result_ = Eigen::MatrixXd::Zero(horizon_ + 1, 2);
   time_result_ = Eigen::MatrixXd::Zero(horizon_ + 1, 1);
@@ -105,7 +105,7 @@ bool DistanceApproachIPOPTInterface::get_nlp_info(int& n, int& m,
 
   for (std::size_t i = 0; i < horizon_ + 1; ++i) {
     for (std::size_t j = 0; j < obstacles_num_; ++j) {
-      std::size_t current_vertice_num = obstacles_vertices_num_(j, 0);
+      std::size_t current_vertice_num = obstacles_edges_num_(j, 0);
       tmp += current_vertice_num * 4 + 9 + 4;
     }
   }
@@ -396,7 +396,7 @@ bool DistanceApproachIPOPTInterface::eval_g(int n, const double* x, bool new_x,
 
   for (std::size_t i = 0; i < horizon_ + 1; ++i) {
     for (std::size_t j = 0; j < obstacles_num_; ++j) {
-      std::size_t current_vertice_num = obstacles_vertices_num_(i, 0);
+      std::size_t current_vertice_num = obstacles_edges_num_(i, 0);
       Eigen::MatrixXd Aj =
           obstacles_A_.block(counter, 0, current_vertice_num, 2);
       std::vector<int> lj(&x[l_index], &x[l_index + current_vertice_num]);
@@ -697,7 +697,7 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
 
     for (std::size_t i = 0; i < horizon_ + 1; ++i) {
       for (std::size_t j = 0; j < obstacles_num_; ++j) {
-        std::size_t current_vertice_num = obstacles_vertices_num_(j, 0);
+        std::size_t current_vertice_num = obstacles_edges_num_(j, 0);
 
         // 1. norm(A* lambda == 1)
         for (std::size_t k = 0; k < current_vertice_num; ++k) {
@@ -1060,7 +1060,7 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
 
     for (std::size_t i = 0; i < horizon_ + 1; ++i) {
       for (std::size_t j = 0; j < obstacles_num_; ++j) {
-        std::size_t current_vertice_num = obstacles_vertices_num_(j, 0);
+        std::size_t current_vertice_num = obstacles_edges_num_(j, 0);
         AINFO << "eval_jac_g, obstacle constraint values, current "
                  "vertice_num : "
               << current_vertice_num << " i :  " << i << " j : " << j;
