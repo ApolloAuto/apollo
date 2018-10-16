@@ -45,43 +45,36 @@ using apollo::cybertron::common::GetAbsolutePath;
 using apollo::cybertron::common::GetProtoFromFile;
 using apollo::cybertron::common::WorkRoot;
 using apollo::cybertron::croutine::CRoutine;
+using apollo::cybertron::event::PerfEventCache;
 using apollo::cybertron::scheduler::Scheduler;
 using apollo::cybertron::service_discovery::TopologyManager;
-using apollo::cybertron::event::PerfEventCache;
 
-static bool g_ok = false;
-static bool g_is_shutdown = false;
 static bool g_atexit_registered = false;
 // TODO(hewei03): why not use simple mutex?
 static std::recursive_mutex g_mutex;
 
 static ::apollo::cybertron::logger::AsyncLogger* async_logger;
 
-void OnShutdown(int signal) {
-  // TODO(hewei03)
-  if (!IsShutdown()) {
-    AINFO << "Shutdown with signal interrupt.";
-    Shutdown();
+void OnShutdown(int sig) {
+  (void)sig;
+  if (GetState() != STATE_SHUTDOWN) {
+    SetState(STATE_SHUTTING_DOWN);
   }
 }
 
 void ExitHandle() {
-  if (OK() && !IsShutdown()) {
-    AINFO << "Shutdown in ExitHandle";
-    Shutdown();
-  }
+  AINFO << "Shutdown in ExitHandle";
+  Shutdown();
 }
 
 bool Init() {
   std::lock_guard<std::recursive_mutex> lg(g_mutex);
-  if (g_ok) {
+  if (GetState() != STATE_UNINITIALIZED) {
     // avoid reinit
-    return true;
-  }
-  if (g_is_shutdown) {
-    // cybertron is shutdown
     return false;
   }
+
+  std::signal(SIGINT, OnShutdown);
 
   // Initialize internal static objects
   common::GlobalData::Instance();
@@ -91,7 +84,6 @@ bool Init() {
   PerfEventCache::Instance();
 
   // Register exit handlers
-  std::signal(SIGINT, OnShutdown);
   if (!g_atexit_registered) {
     if (std::atexit(ExitHandle) != 0) {
       AERROR << "Register exit handle failed";
@@ -100,7 +92,7 @@ bool Init() {
     AINFO << "Register exit handle succ.";
     g_atexit_registered = true;
   }
-  g_ok = true;
+  SetState(STATE_INITIALIZED);
   return true;
 }
 
@@ -113,10 +105,10 @@ bool Init(const char* argv) {
   }
 
   // Get log conf object
-  auto log_conf = common::GlobalData::Instance()->Config().log_conf();
+  auto& log_conf = common::GlobalData::Instance()->Config().log_conf();
 
   // Ensure log dir
-  std::string log_dir = log_conf.log_dir();
+  auto& log_dir = log_conf.log_dir();
   std::string abs_log_dir(log_dir);
   if (log_dir[0] != '/') {
     abs_log_dir = GetAbsolutePath(WorkRoot(), log_dir);
@@ -152,30 +144,16 @@ bool Init(const char* argv) {
   return Init();
 }
 
-bool OK() { return g_ok; }
-
 void Shutdown() {
   std::lock_guard<std::recursive_mutex> lg(g_mutex);
-  if (g_is_shutdown) {
+  if (IsShutdown()) {
     return;
   }
   scheduler::Scheduler::Instance()->ShutDown();
   service_discovery::TopologyManager::Instance()->Shutdown();
   transport::Transport::Shutdown();
-  g_is_shutdown = true;
-  g_ok = false;
+  SetState(STATE_SHUTDOWN);
 }
-
-bool IsShutdown() { return g_is_shutdown; }
-
-void WaitForShutdown() {
-  while (OK() && !IsShutdown()) {
-    usleep(200 * 1000);
-  }
-}
-
-// Internal interface for debug.
-void PrintSchedulerStatistics() { Scheduler::Instance()->PrintStatistics(); }
 
 }  // namespace cybertron
 }  // namespace apollo
