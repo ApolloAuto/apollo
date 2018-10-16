@@ -31,6 +31,7 @@ class PlannigAnalyzer:
         """init"""
         self.module_latency = []
         self.trajectory_type_dist = {}
+        self.estop_reason_dist = {}
         self.error_code_analyzer = ErrorCodeAnalyzer()
         self.error_msg_analyzer = ErrorMsgAnalyzer()
 
@@ -47,6 +48,10 @@ class PlannigAnalyzer:
         self.trajectory_type_dist[traj_type] = \
             self.trajectory_type_dist.get(traj_type, 0) + 1
 
+        if adc_trajectory.estop.is_estop:
+            self.estop_reason_dist[adc_trajectory.estop.reason] = \
+                self.estop_reason_dist.get(adc_trajectory.estop.reason, 0) + 1
+
     def print_latency_statistics(self):
         """print_latency_statistics"""
         print "\n\n"
@@ -55,9 +60,14 @@ class PlannigAnalyzer:
         StatisticalAnalyzer().print_statistical_results(self.module_latency)
 
         print PrintColors.HEADER + "--- Planning Trajectroy Type Distribution" \
-                                   " (ms) ---" + PrintColors.ENDC
+                                   " ---" + PrintColors.ENDC
         DistributionAnalyzer().print_distribution_results(
             self.trajectory_type_dist)
+
+        print PrintColors.HEADER + "--- Planning Estop Distribution" \
+                                   " ---" + PrintColors.ENDC
+        DistributionAnalyzer().print_distribution_results(
+            self.estop_reason_dist)
 
         print PrintColors.HEADER + "--- Planning Error Code Distribution---" + \
               PrintColors.ENDC
