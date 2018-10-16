@@ -28,6 +28,7 @@
 
 #include "cybertron/task/task.h"
 #include "modules/common/configs/vehicle_config_helper.h"
+#include "modules/common/math/math_utils.h"
 #include "modules/common/time/time.h"
 #include "modules/common/util/file.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
@@ -46,6 +47,7 @@ namespace planning {
 
 using apollo::common::VehicleConfigHelper;
 using apollo::common::VehicleState;
+using apollo::common::math::AngleDiff;
 using apollo::common::math::Vec2d;
 using apollo::common::time::Clock;
 using apollo::hdmap::HDMapUtil;
@@ -673,16 +675,50 @@ bool ReferenceLineProvider::ExtendReferenceLine(const VehicleState &state,
     AWARN << "Failed to project point: " << vec2d.DebugString()
           << " to stitched reference line";
   }
+  return Shrink(sl, reference_line, segments);
+}
+
+bool ReferenceLineProvider::Shrink(const common::SLPoint &sl,
+                                   ReferenceLine *reference_line,
+                                   RouteSegments *segments) {
+  constexpr double kMaxHeadingDiff = M_PI * 3.0 / 4.0;
+  // shrink reference line
+  double new_backward_distance = sl.s();
+  double new_forward_distance = reference_line->Length() - sl.s();
+  bool need_shrink = false;
   if (sl.s() > FLAGS_look_backward_distance * 1.5) {
     ADEBUG << "reference line back side is " << sl.s()
            << ", shrink reference line: origin lenght: "
            << reference_line->Length();
-    if (!reference_line->Shrink(vec2d, FLAGS_look_backward_distance,
-                                std::numeric_limits<double>::infinity())) {
+    new_backward_distance = FLAGS_look_backward_distance;
+    need_shrink = true;
+  }
+  // check heading
+  const auto index = reference_line->GetNearestReferenceIndex(sl.s());
+  const auto &ref_points = reference_line->reference_points();
+  const double cur_heading = ref_points[index].heading();
+  auto last_index = index;
+  while (last_index < ref_points.size() &&
+         AngleDiff(cur_heading, ref_points[last_index].heading()) <
+             kMaxHeadingDiff) {
+    ++last_index;
+  }
+  --last_index;
+  if (last_index != ref_points.size() - 1) {
+    need_shrink = true;
+    common::SLPoint forward_sl;
+    common::math::Vec2d vec2d{ref_points[last_index].x(),
+                              ref_points[last_index].y()};
+    reference_line->XYToSL(ref_points[last_index], &forward_sl);
+    new_forward_distance = forward_sl.s() - sl.s();
+  }
+  if (need_shrink) {
+    if (!reference_line->Shrink(sl.s(), new_backward_distance,
+                                new_forward_distance)) {
       AWARN << "Failed to shrink reference line";
     }
-    if (!segments->Shrink(vec2d, FLAGS_look_backward_distance,
-                          std::numeric_limits<double>::infinity())) {
+    if (!segments->Shrink(sl.s(), new_backward_distance,
+                          new_forward_distance)) {
       AWARN << "Failed to shrink route segment";
     }
   }

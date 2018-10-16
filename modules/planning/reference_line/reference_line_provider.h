@@ -154,6 +154,9 @@ class ReferenceLineProvider {
       const std::unordered_set<std::string>& navigation_lane_ids,
       hdmap::LaneWaypoint* waypoint);
 
+  bool Shrink(const common::SLPoint& sl, ReferenceLine* ref,
+              hdmap::RouteSegments* segments);
+
  private:
   bool is_initialized_ = false;
   std::atomic<bool> is_stop_{false};

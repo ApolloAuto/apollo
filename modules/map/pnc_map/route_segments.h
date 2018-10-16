@@ -104,6 +104,9 @@ class RouteSegments : public std::vector<LaneSegment> {
                      common::SLPoint *sl_point, LaneWaypoint *waypoint) const;
   bool GetProjection(const common::math::Vec2d &point,
                      common::SLPoint *sl_point, LaneWaypoint *waypoint) const;
+
+  bool GetWaypoint(const double s, LaneWaypoint *waypoint) const;
+
   /**
    * Check whether the map allows a vehicle can reach current RouteSegment
    * from
@@ -145,6 +148,12 @@ class RouteSegments : public std::vector<LaneSegment> {
 
   bool Shrink(const common::math::Vec2d &point, const double look_backward,
               const double look_forward);
+
+  bool Shrink(const double s, const double look_backward,
+              const double look_forward);
+
+  bool Shrink(const double s, const LaneWaypoint &waypoint,
+              const double look_backward, const double look_forward);
 
   bool IsOnSegment() const;
   void SetIsOnSegment(bool on_segment);
