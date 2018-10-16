@@ -38,6 +38,9 @@ message TaskConfig {
      QP_PIECEWISE_JERK_PATH_OPTIMIZER = 10;
      DECIDER_CREEP = 11;
      DECIDER_STOP_SIGN = 12;
+     SIDE_PASS_PATH_DECIDER = 13;
+     SIDE_PASS_SAFETY = 14;
+     PROCEED_WITH_CAUTION_SPEED = 15;
    };
   optional TaskType task_type = 1;
   oneof task_config {
@@ -51,6 +54,7 @@ message TaskConfig {
     QpPiecewiseJerkPathConfig qp_piecewise_jerk_path_config = 9;
     DeciderCreepConfig decider_creep_config = 10;
     DeciderStopSignConfig decider_stop_sign_config = 11;
+    SidePassSafetyConfig side_pass_safety_config = 12;
   }
 }
 

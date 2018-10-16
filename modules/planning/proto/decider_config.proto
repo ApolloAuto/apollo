@@ -17,3 +17,8 @@ message DeciderStopSignConfig {
   // stop distance(m) to the stop line of the stop sign
   optional double stop_distance = 1 [default = 1.0];  // meter
 }
+
+message SidePassSafetyConfig {
+  // min lateral distance(m) for safe obstacle
+  optional double min_obstacle_lateral_distance = 1 [default = 1.0];  // meter
+}
