@@ -61,3 +61,7 @@ class StatisticalAnalyzer:
         p = np.percentile(arr, 90)
         print PrintColors.OKBLUE + "90 Percentile: \t" + PrintColors.ENDC, \
             "{0:.2f}".format(p)
+
+        p = np.percentile(arr, 99)
+        print PrintColors.OKBLUE + "99 Percentile: \t" + PrintColors.ENDC, \
+            "{0:.2f}".format(p)
