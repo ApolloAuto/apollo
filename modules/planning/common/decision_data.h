@@ -44,8 +44,10 @@ class DecisionData {
  public:
   bool GetObstacleById(const str::string& id,
                        PathObstacle* const obstacle) const;
-  bool GetObstacleByType(const VirtualObjectType& type,
+  bool GetObstacleIdByType(const VirtualObjectType& type,
                          std::vector<std::string>* const ids) const;
+  bool GetObstacleByType(const VirtualObjectType& type,
+                         std::list<PathObstacle*>* const ids) const;
  public:
   bool CreateVirtualObstacle(const ReferencePoint& point,
                              const VirtualObjectType& type,
