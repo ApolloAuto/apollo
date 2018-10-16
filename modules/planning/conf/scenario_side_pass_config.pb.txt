@@ -209,6 +209,19 @@ stage_config : {
       }
     }
   }
+  task_config : {
+    task_type : SIDE_PASS_PATH_DECIDER
+    side_pass_path_decider_config {
+      total_path_length: 200
+      path_resolution: 0.5
+      max_dddl: 2.0
+      l_weight: 1.0
+      dl_weight: 1.0
+      ddl_weight: 1.0
+      dddl_weight: 1.0
+      guiding_line_weight: 1.0
+    }
+  }
 }
 
 stage_config : {
