@@ -42,10 +42,26 @@ class DpStGraphTest : public ::testing::Test {
     CHECK(apollo::common::util::GetProtoFromFile(
         FLAGS_scenario_lane_follow_config_file, &config));
 
+    FLAGS_planning_config_file =
+        "modules/planning/conf/planning_config.pb.txt";
+    PlanningConfig planning_config;
+    CHECK(apollo::common::util::GetProtoFromFile(FLAGS_planning_config_file,
+                                                 &planning_config))
+        << "failed to load planning config file " << FLAGS_planning_config_file;
+
+    DpStSpeedConfig default_dp_config;
+    for (const auto& cfg : planning_config.default_task_config()) {
+      if (cfg.task_type() == TaskConfig::DP_ST_SPEED_OPTIMIZER) {
+        default_dp_config = cfg.dp_st_speed_config();
+        break;
+      }
+    }
+    dp_config_ = default_dp_config;
+
     for (const auto& stage : config.stage_config()) {
       for (const auto& cfg : stage.task_config()) {
         if (cfg.task_type() == TaskConfig::DP_ST_SPEED_OPTIMIZER) {
-          dp_config_ = cfg.dp_st_speed_config();
+          dp_config_.MergeFrom(cfg.dp_st_speed_config());
           break;
         }
       }
