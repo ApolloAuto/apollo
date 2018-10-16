@@ -14,8 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef _BCAN_LIB_H_
-#define _BCAN_LIB_H_
+#pragma once
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -58,5 +57,3 @@ typedef struct bcan_ihdl {
 #define BCAN_DEV_STOP (1 << 7)
 #define BCAN_DEV_ACTIVE (1 << 8)
 #define BCAN_DEV_RECVD (1 << 9)
-
-#endif /* _BCAN_LIB_H_ */

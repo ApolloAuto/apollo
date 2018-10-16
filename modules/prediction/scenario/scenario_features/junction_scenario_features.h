@@ -18,8 +18,7 @@
  * @file
  */
 
-#ifndef MODULES_PREDICTION_SCENARIO_JUNCTION_SCENARIO_FEATURES_H_
-#define MODULES_PREDICTION_SCENARIO_JUNCTION_SCENARIO_FEATURES_H_
+#pragma once
 
 #include <string>
 #include <unordered_set>
@@ -39,5 +38,3 @@ class JunctionScenarioFeatures : public ScenarioFeatures {
 
 }  // namespace prediction
 }  // namespace apollo
-
-#endif /* MODULES_PREDICTION_SCENARIO_JUNCTION_SCENARIO_FEATURES_H_ */

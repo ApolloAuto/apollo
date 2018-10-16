@@ -13,8 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef PERCETPION_FUSION_LIB_DATA_ASSOCIATION_TRACK_OBJECT_DISTANCE_H_
-#define PERCETPION_FUSION_LIB_DATA_ASSOCIATION_TRACK_OBJECT_DISTANCE_H_
+#pragma once
 
 #include <string>
 #include <unordered_map>
@@ -200,5 +199,3 @@ class TrackObjectDistance {
 }  // namespace fusion
 }  // namespace perception
 }  // namespace apollo
-
-#endif  // PERCETPION_FUSION_LIB_DATA_ASSOCIATION_TRACK_OBJECT_DISTANCE_H_

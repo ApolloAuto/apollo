@@ -18,8 +18,7 @@
  * @file
  */
 
-#ifndef MODEULES_GUARDIAN_GUARDIAN_COMPONENT_H_
-#define MODEULES_GUARDIAN_GUARDIAN_COMPONENT_H_
+#pragma once
 
 #include <map>
 #include <memory>
@@ -75,5 +74,3 @@ CYBERTRON_REGISTER_COMPONENT(GuardianComponent)
 
 }  // namespace guardian
 }  // namespace apollo
-
-#endif  // MODEULES_GUARDIAN_GUARDIAN_COMPONENT_H_

@@ -14,8 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULE_LOCALIZAION_MSF_LOCAL_MAP_LOSSY_MAP_LOSSY_MAP_MATRIX_2D_H_
-#define MODULE_LOCALIZAION_MSF_LOCAL_MAP_LOSSY_MAP_LOSSY_MAP_MATRIX_2D_H_
+#pragma once
 
 #include <vector>
 #include "modules/localization/msf/local_map/base_map/base_map_matrix.h"
@@ -130,5 +129,3 @@ class LossyMapMatrix2D : public BaseMapMatrix {
 }  // namespace msf
 }  // namespace localization
 }  // namespace apollo
-
-#endif  // MODULE_LOCALIZAION_MSF_LOCAL_MAP_LOSSY_MAP_LOSSY_MAP_MATRIX_2D_H_

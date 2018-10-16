@@ -14,8 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULE_LOCALIZAION_MSF_LOCAL_MAP_LOSSLESS_MAP_LOSSLESS_MAP_NODE_H_
-#define MODULE_LOCALIZAION_MSF_LOCAL_MAP_LOSSLESS_MAP_LOSSLESS_MAP_NODE_H_
+#pragma once
 
 #include <vector>
 #include "modules/localization/msf/local_map/base_map/base_map_node.h"
@@ -145,5 +144,3 @@ class LosslessMapNode : public BaseMapNode {
 }  // namespace msf
 }  // namespace localization
 }  // namespace apollo
-
-#endif  // MODULE_LOCALIZAION_MSF_LOCAL_MAP_LOSSLESS_MAP_LOSSLESS_MAP_NODE_H_

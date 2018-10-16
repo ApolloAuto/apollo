@@ -18,8 +18,7 @@
  * @file
  */
 
-#ifndef MODEULES_CALIBRATION_REPUBLISH_MSG_H_
-#define MODEULES_CALIBRATION_REPUBLISH_MSG_H_
+#pragma once
 
 #include <string>
 

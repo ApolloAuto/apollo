@@ -14,8 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_TOOLS_VISUALIZER_RADARPOINTS_H_
-#define MODULES_TOOLS_VISUALIZER_RADARPOINTS_H_
+#pragma once
 
 #include <QVector3D>
 #include <QColor>
@@ -77,5 +76,3 @@ private:
     QVector3D color_; // r, g, b
     GLfloat* buffer_;
 };
-
-#endif // MODULES_TOOLS_VISUALIZER_RADARPOINTS_H_
