@@ -14,9 +14,11 @@
  * limitations under the License.
  *****************************************************************************/
 #pragma once
-#include <string>
+
 #include <memory>
+#include <string>
 #include <vector>
+
 #include "cybertron/component/component.h"
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/perception/base/sensor_meta.h"
@@ -25,16 +27,16 @@
 #include "modules/perception/onboard/common_flags/common_flags.h"
 #include "modules/perception/onboard/inner_component_messages/inner_component_messages.h"
 #include "modules/perception/onboard/msg_buffer/msg_buffer.h"
+#include "modules/perception/onboard/proto/radar_component_config.pb.h"
 #include "modules/perception/onboard/transform_wrapper/transform_wrapper.h"
 #include "modules/perception/radar/app/radar_obstacle_perception.h"
-#include "modules/perception/onboard/proto/radar_component_config.pb.h"
 
 namespace apollo {
 namespace perception {
 namespace onboard {
 
-using apollo::cybertron::SUCC;
 using apollo::cybertron::FAIL;
+using apollo::cybertron::SUCC;
 using apollo::drivers::ContiRadar;
 using apollo::localization::LocalizationEstimate;
 using apollo::perception::onboard::RadarComponentConfig;

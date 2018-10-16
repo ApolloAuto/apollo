@@ -15,31 +15,28 @@
 *****************************************************************************/
 #pragma once
 
-#include <Eigen/Dense>
 #include <Eigen/Core>
+#include <Eigen/Dense>
+
+#include <map>
 #include <memory>
-#include <mutex>  // NOLINT
+#include <mutex>
 #include <string>
 #include <vector>
-#include <map>
 
-#include "modules/drivers/proto/sensor_image.pb.h"  // NOLINT
-#include "modules/perception/proto/perception_obstacle.pb.h"  // NOLINT
-#include "modules/perception/onboard/proto/fusion_camera_detection_component.pb.h"
 #include "cybertron/component/component.h"
-
+#include "modules/drivers/proto/sensor_image.pb.h"
 #include "modules/perception/base/object.h"
 #include "modules/perception/base/object_types.h"
 #include "modules/perception/base/point.h"
-
-#include "modules/perception/camera/common/util.h"
-#include "modules/perception/camera/app/perception.pb.h"
-#include "modules/perception/camera/lib/interface/base_camera_perception.h"
 #include "modules/perception/camera/app/obstacle_camera_perception.h"
-
-#include "modules/perception/onboard/transform_wrapper/transform_wrapper.h"
+#include "modules/perception/camera/app/perception.pb.h"
+#include "modules/perception/camera/common/util.h"
+#include "modules/perception/camera/lib/interface/base_camera_perception.h"
 #include "modules/perception/onboard/inner_component_messages/inner_component_messages.h"
-
+#include "modules/perception/onboard/proto/fusion_camera_detection_component.pb.h"
+#include "modules/perception/onboard/transform_wrapper/transform_wrapper.h"
+#include "modules/perception/proto/perception_obstacle.pb.h"
 
 namespace apollo {
 namespace perception {
@@ -119,10 +116,9 @@ class FusionCameraDetectionComponent :
   std::map<std::string, Eigen::Matrix3f> intrinsic_map_;
 
   // camera obstacle pipeline
-  apollo::perception::camera::CameraPerceptionInitOptions camera_perception_init_options_; // NOLINT
-  apollo::perception::camera::CameraPerceptionOptions camera_perception_options_; // NOLINT
-  std::unique_ptr<
-      camera::ObstacleCameraPerception> camera_obstacle_pipeline_;
+  camera::CameraPerceptionInitOptions camera_perception_init_options_;
+  camera::CameraPerceptionOptions camera_perception_options_;
+  std::unique_ptr<camera::ObstacleCameraPerception> camera_obstacle_pipeline_;
 
   // fixed size camera frames
   int frame_capacity_ = 20;

@@ -13,17 +13,18 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 *****************************************************************************/
-#pragma once  // NOLINT
+#pragma once
 
 #include <Eigen/Dense>
-#include <memory>
-#include <vector>
-#include <map>
-#include <string>
 
+#include <map>
+#include <memory>
+#include <string>
+#include <vector>
+
+#include "modules/perception/base/distortion_model.h"
 #include "modules/perception/base/point.h"
 #include "modules/perception/base/traffic_light.h"
-#include "modules/perception/base/distortion_model.h"
 #include "modules/perception/camera/lib/traffic_light/preprocessor/pose.h"
 
 namespace apollo {

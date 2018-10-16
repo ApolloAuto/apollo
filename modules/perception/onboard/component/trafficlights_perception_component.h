@@ -15,28 +15,28 @@
 *****************************************************************************/
 #pragma once
 
-#include <Eigen/Dense>
 #include <Eigen/Core>
+#include <Eigen/Dense>
+
+#include <map>
 #include <memory>
-#include <mutex>  // NOLINT
+#include <mutex>
 #include <string>
 #include <vector>
-#include <map>
 
-#include "modules/perception/proto/traffic_light_detection.pb.h"
-#include "modules/drivers/proto/sensor_image.pb.h"  // NOLINT
-#include "modules/perception/proto/perception_obstacle.pb.h"  // NOLINT
-#include "modules/map/proto/map_signal.pb.h"
-#include "modules/map/proto/map_geometry.pb.h"
-#include "modules/perception/onboard/proto/trafficlights_perception_component.pb.h"
 #include "cybertron/component/component.h"
-#include "modules/transform/buffer.h"
-
-#include "modules/perception/onboard/transform_wrapper/transform_wrapper.h"
+#include "modules/drivers/proto/sensor_image.pb.h"
+#include "modules/map/proto/map_geometry.pb.h"
+#include "modules/map/proto/map_signal.pb.h"
+#include "modules/perception/camera/app/traffic_light_camera_perception.h"
+#include "modules/perception/camera/common/util.h"
 #include "modules/perception/camera/lib/traffic_light/preprocessor/tl_preprocessor.h"
 #include "modules/perception/map/hdmap/hdmap_input.h"
-#include "modules/perception/camera/common/util.h"
-#include "modules/perception/camera/app/traffic_light_camera_perception.h"
+#include "modules/perception/onboard/proto/trafficlights_perception_component.pb.h"
+#include "modules/perception/onboard/transform_wrapper/transform_wrapper.h"
+#include "modules/perception/proto/perception_obstacle.pb.h"
+#include "modules/perception/proto/traffic_light_detection.pb.h"
+#include "modules/transform/buffer.h"
 
 namespace apollo {
 namespace perception {
