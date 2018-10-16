@@ -70,7 +70,7 @@ bool DistanceApproachProblem::Solve(Eigen::MatrixXd* state_result,
   int m1 = 4 * horizon_;
 
   // m2 : control rate constraints (only steering)
-  int m2 = (horizon_ - 1);
+  int m2 = horizon_;
 
   // m3 : sampling time equality constraints
   int m3 = horizon_;
