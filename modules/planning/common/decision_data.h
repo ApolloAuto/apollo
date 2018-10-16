@@ -61,8 +61,8 @@ class DecisionData {
   std::vector<PathObstacle*> all_obstacle;`
  private:
   const ReferenceLine& reference_line_;
-  std::list<PathObstacle> obstacle_;
-  std::unordered_map<std::string, std::unique_ptr<PathObstacle>> obstacle_map_;
+  std::list<std::unique_ptr<PathObstacle>> obstacle_;
+  std::unordered_map<std::string, PathObstacle*> obstacle_map_;
   std::unordered_map<VirtualObjectType,
         std::vector<std::string>, EnumClassHash> virtual_object_id_map_;
   std::mutex mutex_;
