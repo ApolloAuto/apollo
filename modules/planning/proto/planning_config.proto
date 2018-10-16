@@ -101,7 +101,7 @@ message ScenarioConfig {
       repeated TaskConfig task_config = 4;
   }
 
-  // an ordered list of stages that are used at runtime.  Its order determines the runtime order of the stages.
+  // a list of stages that are used at runtime.  The first one is default stage.
   repeated StageType stage_type = 2;
   // an unordered list of stage configs.
   repeated StageConfig stage_config = 3;

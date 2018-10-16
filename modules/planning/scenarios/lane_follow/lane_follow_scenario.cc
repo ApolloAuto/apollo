@@ -76,7 +76,7 @@ LaneFollowScenario::LaneFollowScenario(const ScenarioConfig& config)
     : Scenario(config) {}
 
 std::unique_ptr<Stage> LaneFollowScenario::CreateStage(
-    const ScenarioConfig::StageConfig& stage_config) const {
+    const ScenarioConfig::StageConfig& stage_config) {
   if (stage_config.stage_type() != ScenarioConfig::LANE_FOLLOW_DEFAULT_STAGE) {
     AERROR << "Follow lane does not support stage type: "
            << ScenarioConfig::StageType_Name(stage_config.stage_type());

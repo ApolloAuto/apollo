@@ -29,6 +29,7 @@ namespace apollo {
 namespace planning {
 
 Stage::Stage(const ScenarioConfig::StageConfig& config) : config_(config) {
+  next_stage_ = config_.stage_type();
   std::unordered_map<TaskConfig::TaskType, const TaskConfig*, std::hash<int>>
       config_map;
   for (const auto& task_config : config_.task_config()) {

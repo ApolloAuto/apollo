@@ -34,44 +34,43 @@ Scenario::Scenario(const ScenarioConfig& config) : config_(config) {}
 
 void Scenario::Init() {
   CHECK(!config_.stage_type().empty());
-  std::map<ScenarioConfig::StageType, const ScenarioConfig::StageConfig*>
-      stage_index;
   for (const auto& stage_config : config_.stage_config()) {
-    stage_index[stage_config.stage_type()] = &stage_config;
+    stage_config_map_[stage_config.stage_type()] = &stage_config;
   }
   for (int i = 0; i < config_.stage_type_size(); ++i) {
     auto stage_type = config_.stage_type(i);
-    auto iter = stage_index.find(stage_type);
-    CHECK(iter != stage_index.end())
+    auto iter = stage_config_map_.find(stage_type);
+    CHECK(iter != stage_config_map_.end())
         << "stage type : " << ScenarioConfig::StageType_Name(stage_type)
         << " has no config";
-    auto ptr = CreateStage(*(iter->second));
-    CHECK_NOTNULL(ptr);
-    stages_.emplace_back(std::move(ptr));
   }
-  current_stage_iter_ = stages_.begin();
+  current_stage_ = CreateStage(*stage_config_map_[config_.stage_type(0)]);
 }
 
 Scenario::ScenarioStatus Scenario::Process(
     const common::TrajectoryPoint& planning_init_point, Frame* frame) {
-  if (current_stage_iter_ == stages_.end()) {
+  if (current_stage_->stage_type() == ScenarioConfig::NO_STAGE) {
     return STATUS_DONE;
   }
-  auto ret = (*current_stage_iter_)->Process(planning_init_point, frame);
+  auto ret = current_stage_->Process(planning_init_point, frame);
   if (ret == Stage::ERROR) {
     return STATUS_UNKNOWN;
   } else if (ret == Stage::RUNNING) {
     return STATUS_PROCESSING;
   } else if (ret == Stage::FINISHED) {
-    if (current_stage_iter_ != stages_.end()) {
-      ++current_stage_iter_;
+    auto next_stage = current_stage_->NextStage();
+    if (next_stage != current_stage_->stage_type()) {
+      current_stage_ = CreateStage(*stage_config_map_[next_stage]);
+    }
+    if (current_stage_ != nullptr &&
+        current_stage_->stage_type() != ScenarioConfig::NO_STAGE) {
       return STATUS_PROCESSING;
     } else {
       return STATUS_DONE;
     }
   } else {
     AWARN << "Unexpected Stage return value: " << ret;
-    return Scenario::STATUS_PROCESSING;
+    return STATUS_UNKNOWN;
   }
 }
 
