@@ -2,14 +2,19 @@ modes {
   key: "Test Mode"
   value: {
     path: "/apollo/modules/dreamview/backend/hmi/testdata/modes/test_mode"
-    live_modules: "record_bag"
     launches: {
       key: "Close Loop"
-      value: "/apollo/modules/dreamview/backend/hmi/testdata/modes/test_mode/close_loop.launch"
+      value: {
+        path: "/apollo/modules/dreamview/backend/hmi/testdata/modes/test_mode/close_loop.launch"
+        additional_modules: "record_bag"
+      }
     }
     launches: {
       key: "Map Collection"
-      value: "/apollo/modules/dreamview/backend/hmi/testdata/modes/test_mode/map_collection.launch"
+      value: {
+        path: "/apollo/modules/dreamview/backend/hmi/testdata/modes/test_mode/map_collection.launch"
+        additional_modules: "record_bag"
+      }
     }
   }
 }

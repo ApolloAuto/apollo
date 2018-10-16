@@ -26,20 +26,21 @@ message Component {
   map<string, Command> commands = 3;
 }
 
+message Launch {
+  // Major Cybertron components are configured in the launch file.
+  optional string path = 1;
+  // Addtional components besides those in launch file, such as data recorder.
+  repeated string additional_modules = 2;
+}
+
 message Mode {
-  repeated string live_modules = 1;
+  // Modules are now bound to Launch.additional_modules.
+  repeated string live_modules = 1 [deprecated = true];
   repeated string live_hardware = 2;
 
   // TODO(xiaoxq): Migrate to Cybertron.
   optional string path = 3;  // /apollo/modules/calibration/modes/<name>.
-  map<string, string> launches = 4;  // {launch_name: launch_file_path}
-}
-
-message AudioCapturingConfig {
-  // Currently we only support single channel.
-  optional int32 channels = 1 [default = 1];
-  optional int32 sample_rate = 2;
-  optional int32 bits_per_sample = 3;
+  map<string, Launch> launches = 4;  // {launch_name: launch_conf}
 }
 
 message HMIConfig {
@@ -51,8 +52,9 @@ message HMIConfig {
   map<string, string> available_vehicles = 6;  // {vehicle_name: vehicle_dir}
   map<string, Mode> modes = 7;                 // {mode_name: mode_config}
   optional int32 utm_zone_id = 8;              // FLAGS_local_utm_zone_id
-  optional AudioCapturingConfig audio_capturing_conf = 9;
   optional HMIAction chassis_high_beam_action = 10;
+
+  reserved 9;
 }
 
 message VehicleData {

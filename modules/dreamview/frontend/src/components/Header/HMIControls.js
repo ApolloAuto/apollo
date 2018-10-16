@@ -9,7 +9,7 @@ export default class HMIControls extends React.Component {
     render() {
         const {
             dockerImage,
-            modes, currentMode,
+            modes, currentMode, currentLaunch,
             maps, currentMap,
             vehicles, currentVehicle,
             isCoDriver,
@@ -32,6 +32,7 @@ export default class HMIControls extends React.Component {
                 <HMISelectors
                     modes={modes}
                     currentMode={currentMode}
+                    currentLaunch={currentLaunch}
                     maps={maps}
                     currentMap={currentMap}
                     vehicles={vehicles}

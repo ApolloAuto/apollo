@@ -203,6 +203,13 @@ export default class RosWebSocketEndpoint {
         }));
     }
 
+    changeLaunch(launch) {
+        this.websocket.send(JSON.stringify({
+            type: "ChangeLaunch",
+            new_launch: launch,
+        }));
+    }
+
     changeMap(map) {
         this.websocket.send(JSON.stringify({
             type: "ChangeMap",

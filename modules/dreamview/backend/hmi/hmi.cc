@@ -195,11 +195,17 @@ void HMI::RegisterMessageHandlers() {
         }
       });
 
-  // HMI client asks for changing mode.
-  hmi_worker_->RegisterChangeModeHandler([this](const std::string &new_mode) {
-    // Broadcast new HMIStatus.
-    DeferredBroadcastHMIStatus();
-  });
+  // HMI client asks for changing mode or launch.
+  hmi_worker_->RegisterChangeModeHandler(
+      [this](const std::string &new_mode) {
+        // Broadcast new HMIStatus.
+        DeferredBroadcastHMIStatus();
+      });
+  hmi_worker_->RegisterChangeLaunchHandler(
+      [this](const std::string &new_launch) {
+        // Broadcast new HMIStatus.
+        DeferredBroadcastHMIStatus();
+      });
   websocket_->RegisterMessageHandler(
       "ChangeMode",
       [this](const Json &json, WebSocketHandler::Connection *conn) {
@@ -210,6 +216,19 @@ void HMI::RegisterMessageHandlers() {
           hmi_worker_->ChangeToMode(new_mode);
         } else {
           AERROR << "Truncated ChangeMode request.";
+        }
+      });
+
+  websocket_->RegisterMessageHandler(
+      "ChangeLaunch",
+      [this](const Json &json, WebSocketHandler::Connection *conn) {
+        // json should contain {new_launch: "LaunchName"}.
+        // LaunchName should be a key of config_.modes[current_mode].launches.
+        std::string new_launch;
+        if (JsonUtil::GetStringFromJson(json, "new_launch", &new_launch)) {
+          hmi_worker_->ChangeToLaunch(new_launch);
+        } else {
+          AERROR << "Truncated ChangeLaunch request.";
         }
       });
 
